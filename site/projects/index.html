@@ -43,6 +43,7 @@
     <ul>
 <li><a href="/">Home</a></li>
 <li><a href="/projects/" aria-current="page">Projects</a></li>
+<li><a href="/work-with-me/">Work with me</a></li>
 <li><a href="/e-books/">E-Books</a></li>
 <li><a href="/exhibitions/">Exhibitions</a></li>
 <li><a href="/publications/">Publications</a></li>
@@ -68,6 +69,23 @@
 </section>
 
 </main>
+<dialog class="modal" id="contact" aria-labelledby="contact-t">
+  <div class="modal-band" style="background:#D85A30"></div>
+  <button class="modal-close" aria-label="Close">✕</button>
+  <p class="modal-kicker">Say hello</p>
+  <h2 id="contact-t">Write to me</h2>
+  <form class="contact-form" action="https://formsubmit.co/ajax/769d04d721e5563890ed721ba698f9bc" method="POST">
+    <label>Your email
+      <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
+    </label>
+    <label>Message <span>(optional)</span>
+      <textarea name="message" placeholder="Hi Alina, …"></textarea>
+    </label>
+    <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
+    <button type="submit">Send</button>
+    <p class="form-status" role="status" aria-live="polite"></p>
+  </form>
+</dialog>
 <footer class="site-footer">
   <p>© Alina Otkinska · Pigeon Polly Art Lab</p>
   <p class="footer-links">

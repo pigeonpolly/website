@@ -22,6 +22,8 @@ PAGES = [
      "Creative AI, learning that fits different minds, and illustrated worlds by Alina Otkinska."),
     ("projects", "Projects", "projects.html",
      "Learning design, EdTech and AI automation projects by Alina Otkinska."),
+    ("work-with-me", "Work with me", "work-with-me.html",
+     "Learning design, AI in education and sketching workshops by Alina Otkinska."),
     ("e-books", "E-Books", "e-books.html", "E-books by Alina Otkinska."),
     ("exhibitions", "Exhibitions", "exhibitions.html", "Exhibitions of Pigeon Polly art."),
     ("publications", "Publications", "publications.html", "Publications of Pigeon Polly art."),
@@ -47,6 +49,7 @@ PORTFOLIO = [
 NAV = [
     ("", "Home"),
     ("projects", "Projects"),
+    ("work-with-me", "Work with me"),
     ("e-books", "E-Books"),
     ("exhibitions", "Exhibitions"),
     ("publications", "Publications"),
