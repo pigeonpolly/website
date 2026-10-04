@@ -66,6 +66,8 @@
 
 ## Стена рисунков (/sketch-wall/) — в разработке, в меню нет, в sitemap нет (`UNLISTED` в build.py)
 - Вход через Google (Google Identity Services, кнопка; ID token проверяется на сервере), ник (обязателен, уникален без учёта регистра), загрузка работы дня (1 в день, можно заменить/удалить), серии, уровни (1/3/7/14/30/60/100/365 дней по рекорду) и спец-бейджи (ЭКСТРА, Ч/Б, 23 января), топ серий, общая стена, модерация (скрыть/заблокировать — только админ, админ = sha256 e-mail в `ADMIN_HASHES`), GDPR: «Скачать мои данные» (/api/export), «Удалить аккаунт».
+- Картинки ужимаются в браузере: полная 1280px JPEG 0.8, превью 480px 0.75 (~230 КБ на работу; KV бесплатно 1 ГБ ≈ 4 500 работ).
+- Автоочистка: cron раз в сутки (`triggers.crons` в wrangler.jsonc, `scheduled` в worker) удаляет картинки тех, у кого нет загрузок больше 30 дней (`INACTIVE_DAYS`); перед этим рекорд и бейджи сохраняются в users.best / users.badges, уровень не теряется. Не больше ~900 удалений KV за запуск. В dev: POST /api/dev/cleanup.
 - Сервер: `worker/index.js` (Cloudflare Worker: отдаёт site/ через ASSETS и /api/*). Данные — D1 (`DB`, таблицы создаются сами), картинки — KV (`IMAGES`). Фронт: `site/assets/sketch-wall.js`.
 - Подключено (4.10.2026): `wrangler.jsonc` — `main` worker/index.js, ASSETS, D1 `pigeonpolly` (DB), KV (IMAGES), `GOOGLE_CLIENT_ID`. Если /api отвечает 503 {ready:false} — пропала привязка.
 - Локальная проверка: wrangler dev с отдельным конфигом и `DEV_FAKE_LOGIN=1` (тестовый вход «dev:ник», `dev:admin` = админ). В рабочем конфиге DEV_FAKE_LOGIN НЕ ставить.

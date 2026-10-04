@@ -6,6 +6,7 @@
 const ADMIN_HASHES = ['80ac2786b60d61a30d6691a3d40de5d784cdefc580717add788821a7bf900118'];
 const SESSION_DAYS = 180;
 const MAX_FULL = 2_500_000, MAX_THUMB = 400_000;
+const INACTIVE_DAYS = 30; // нет загрузок дольше — картинки удаляются (уровень и бейджи остаются)
 
 export default {
   async fetch(req, env) {
@@ -20,6 +21,12 @@ export default {
       console.error(e);
       return json({ error: 'server' }, 500);
     }
+  },
+  // раз в сутки (cron в wrangler.jsonc): чистим картинки тех, кто пропал больше чем на 30 дней
+  async scheduled(event, env, ctx) {
+    if (!env.DB || !env.IMAGES) return;
+    await ensureSchema(env);
+    ctx.waitUntil(cleanupInactive(env));
   },
 };
 
@@ -42,6 +49,10 @@ async function ensureSchema(env) {
       created_at INTEGER, hidden INTEGER DEFAULT 0, UNIQUE(user_id, day))`),
     env.DB.prepare(`CREATE INDEX IF NOT EXISTS posts_created ON posts(created_at)`),
   ]);
+  // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
+  for (const sql of ['ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''"]) {
+    try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
+  }
   schemaReady = true;
 }
 
@@ -104,9 +115,54 @@ function streaks(days) {
   return { current, best };
 }
 
+// день ЭКСТРА — та же формула, что в site/assets/challenge-theme.js
+function rngFor(str) {
+  let h = 1779033703 ^ str.length;
+  for (let i = 0; i < str.length; i++) { h = Math.imul(h ^ str.charCodeAt(i), 3432918353); h = h << 13 | h >>> 19; }
+  let a = h >>> 0;
+  return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let x = Math.imul(a ^ a >>> 15, 1 | a); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296; };
+}
+const extraMemo = {};
+function extraDay(y, m) {
+  const key = y * 12 + m; if (extraMemo[key]) return extraMemo[key];
+  const days = new Date(y, m + 1, 0).getDate(), rm = rngFor('extra-' + y + '-' + m);
+  let v = 1 + Math.floor(rm() * days);
+  if (key > 2026 * 12 + 9) { const prev = extraDay(m ? y : y - 1, m ? m - 1 : 11); while (v === prev) v = 1 + Math.floor(rm() * days); }
+  return (extraMemo[key] = v);
+}
+function badgesOf(posts) {
+  const got = new Set();
+  for (const p of posts) {
+    const y = +p.day.slice(0, 4), m = +p.day.slice(5, 7) - 1, d = +p.day.slice(8, 10);
+    if (p.bw) got.add('bw');
+    if (m === 0 && d === 23) got.add('bday');
+    if (d === extraDay(y, m)) got.add('extra');
+  }
+  return got;
+}
+// рекорд и бейджи пользователя: из его работ + сохранённое после прошлых очисток
+const mergedBest = (u, days) => Math.max(u.best || 0, streaks(days).best);
+const mergedBadges = (u, posts) => [...new Set([...String(u.badges || '').split(',').filter(Boolean), ...badgesOf(posts)])];
+
+async function cleanupInactive(env) {
+  const cutoff = new Date((utcToday() - INACTIVE_DAYS) * 864e5).toISOString().slice(0, 10);
+  const users = (await env.DB.prepare('SELECT u.* FROM users u JOIN posts p ON p.user_id = u.id GROUP BY u.id HAVING MAX(p.day) < ? LIMIT 200').bind(cutoff).all()).results;
+  let deletes = 0;
+  for (const u of users) {
+    const posts = (await env.DB.prepare('SELECT id, day, bw FROM posts WHERE user_id = ?').bind(u.id).all()).results;
+    if (deletes + posts.length * 2 > 900) break; // бесплатный лимит KV — 1000 удалений в сутки
+    await env.DB.prepare('UPDATE users SET best = ?, badges = ? WHERE id = ?')
+      .bind(mergedBest(u, posts.map(p => p.day)), mergedBadges(u, posts).join(','), u.id).run();
+    for (const p of posts) { await env.IMAGES.delete('i/' + p.id); await env.IMAGES.delete('t/' + p.id); deletes += 2; }
+    await env.DB.prepare('DELETE FROM posts WHERE user_id = ?').bind(u.id).run();
+  }
+  return { users: users.length, deletes };
+}
+
 // ---------- маршруты ----------
 async function route(req, env, url) {
   const p = url.pathname, m = req.method;
+  if (m === 'POST' && p === '/api/dev/cleanup' && env.DEV_FAKE_LOGIN === '1') return json(await cleanupInactive(env));
   if (m === 'GET' && p === '/api/config') return json({ ready: true, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
 
   if (m === 'POST' && p === '/api/login') {
@@ -142,7 +198,9 @@ async function route(req, env, url) {
     const u = await currentUser(req, env);
     if (!u) return json({ user: null });
     const rows = (await env.DB.prepare('SELECT id, day, theme, bw, hidden FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
-    return json({ user: { nick: u.nick, consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), ...streaks(rows.map(r => r.day)), posts: rows } });
+    const st = streaks(rows.map(r => r.day));
+    return json({ user: { nick: u.nick, consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
+      best: mergedBest(u, rows.map(r => r.day)), keptBadges: String(u.badges || '').split(',').filter(Boolean), posts: rows } });
   }
 
   if (m === 'POST' && p === '/api/nick') {
@@ -206,8 +264,9 @@ async function route(req, env, url) {
     const top = [];
     for (const uid of active.slice(0, 500)) {
       const rows = (await env.DB.prepare('SELECT day FROM posts WHERE user_id = ?').bind(uid).all()).results;
-      const nick = (await env.DB.prepare('SELECT nick FROM users WHERE id = ?').bind(uid).first()).nick;
-      top.push({ nick, ...streaks(rows.map(r => r.day)) });
+      const u = await env.DB.prepare('SELECT nick, best FROM users WHERE id = ?').bind(uid).first();
+      const days = rows.map(r => r.day);
+      top.push({ nick: u.nick, current: streaks(days).current, best: mergedBest(u, days) });
     }
     top.sort((a, b) => b.current - a.current || b.best - a.best);
     return json({ top: top.slice(0, 10) });

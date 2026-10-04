@@ -101,7 +101,7 @@
     `<span class="sw-medal${on ? '' : ' off'}${big ? ' big' : ''}" style="--bg:${lv.bg}" title="${esc(lv.n[L])}${lv.d ? ` · ${lv.d}` : ''}">${lv.s ? spriteSvg(lv.s) : `<b>${lv.icon}</b>`}</span>`;
   const levelOf = best => [...LEVELS].reverse().find(l => best >= l.d) || null;
   function specials(posts) {
-    const got = new Set();
+    const got = new Set(me?.keptBadges || []);
     for (const p of posts) {
       const d = new Date(p.day + 'T12:00:00');
       if (p.bw) got.add('bw');
@@ -233,7 +233,7 @@
       const f = input.files[0]; if (!f) return;
       try {
         if (!/^image\//.test(f.type)) throw 0;
-        full = await shrink(f, 1600, 0.85); thumb = await shrink(f, 600, 0.8);
+        full = await shrink(f, 1280, 0.8); thumb = await shrink(f, 480, 0.75);
         if (!full || full.size > 2.4e6) throw 0;
         prev.querySelector('img').src = URL.createObjectURL(thumb); prev.hidden = false; btn.disabled = false;
       } catch (e) { st.textContent = t('big'); }

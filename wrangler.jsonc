@@ -15,6 +15,8 @@
   "kv_namespaces": [
     { "binding": "IMAGES", "id": "2af1033ad2bc49b99a15255d3bf33fae" }
   ],
+  // раз в сутки в 03:23 UTC: удаляем картинки тех, кто не загружал работы больше 30 дней
+  "triggers": { "crons": ["23 3 * * *"] },
   "vars": {
     "GOOGLE_CLIENT_ID": "1094519099125-atpm5nimhbg8sk5i7p50lp86duc5n98c.apps.googleusercontent.com"
   }
