@@ -30,6 +30,7 @@
     stage2Bw: ['Tones & textures', 'Тон и фактура', 'Toņi un faktūras'],
     hint2Bw: ['Build up the darks with hatching, dots or solid fills.', 'Наберите тёмные места штриховкой, точками или заливкой.', 'Veido tumšās vietas ar svītrojumu, punktiem vai pilnu aizkrāsojumu.'],
     bday: ['Today is my birthday! Draw something festive with me 🎂', 'Сегодня мой день рождения! Нарисуйте со мной что-нибудь праздничное 🎂', 'Šodien ir mana dzimšanas diena! Uzzīmē ar mani kaut ko svētku 🎂'],
+    today: ['Today', 'Сегодня', 'Šodien'],
     locked: ['Opens on this day', 'Откроется в этот день', 'Atvērsies šajā dienā'],
     photo: ['Add a photo of my sketch', 'Добавить фото рисунка', 'Pievienot skices foto'],
     photoChange: ['Change photo', 'Заменить фото', 'Mainīt foto'],
@@ -155,7 +156,7 @@
     ${selKey !== todayKey ? `<p class="back-today"><button type="button" id="ch-today">${t('backToday')}</button></p>` : ''}
     <div class="tip"><b>${t('tip')}</b><p>${theme.tip}</p></div>`;
     const old = $('.page.old'); old && old.addEventListener('animationend', () => old.remove());
-    const bt = $('#ch-today'); bt && bt.addEventListener('click', () => selectDay(new Date(today)));
+    const bt = $('#ch-today'); bt && bt.addEventListener('click', () => { view = new Date(today.getFullYear(), today.getMonth(), 1); selectDay(new Date(today)); });
     renderMin();
   }
   function extraText(th) { return bw ? `${t('extraBw')} ${th.extraBw[0].toUpperCase() + th.extraBw.slice(1)}.` : t('extra'); }
@@ -259,7 +260,7 @@
     return n;
   }
   function renderDiary() {
-    $('#ch-month').textContent = view.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+    $('#ch-month').textContent = view.toLocaleDateString(locale, { month: 'long', year: 'numeric' }).replace(/\s*г\.$/, '');
     const first = (view.getDay() + 6) % 7, days = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
     const names = [...Array(7)].map((_, i) => new Date(2024, 0, 1 + i).toLocaleDateString(locale, { weekday: 'short' }));
     let html = names.map(n => `<span class="dow">${n}</span>`).join('') + '<span></span>'.repeat(first);
@@ -291,6 +292,12 @@
   }
   $('#ch-prev').addEventListener('click', () => { view.setMonth(view.getMonth() - 1); renderDiary(); });
   $('#ch-next').addEventListener('click', () => { view.setMonth(view.getMonth() + 1); renderDiary(); });
+  const tb = document.createElement('button'); tb.type = 'button'; tb.id = 'ch-goto-today'; tb.className = 'diary-today'; tb.textContent = t('today');
+  $('#ch-next').after(tb);
+  tb.addEventListener('click', () => {
+    view = new Date(today.getFullYear(), today.getMonth(), 1); selectDay(new Date(today));
+    root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
   $('#ch-prev').setAttribute('aria-label', t('prev')); $('#ch-next').setAttribute('aria-label', t('next'));
 
   // ---------- карточка «поделиться» ----------

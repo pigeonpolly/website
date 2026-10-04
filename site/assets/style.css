@@ -626,6 +626,11 @@ html:not([lang="en"]) .hero h1 { white-space: normal; }
 .page-extra.page-bday { background: #F0A987; color: #2B1A51; }
 .diary-grid .day.bday { box-shadow: inset 0 0 0 2px #F0A987; }
 .diary-grid .day.bday::after { content: '🎂'; position: absolute; right: 6px; bottom: 5px; font-size: 14px; }
+.diary-nav .diary-today { width: auto; height: 36px; padding: 0 16px; border-radius: 999px; border: 0; background: var(--peach); color: var(--bg); font: 700 14px var(--sans); margin-left: auto; }
+.diary-nav .diary-today:hover { filter: brightness(1.08); }
+#challenge { scroll-margin-top: 84px; }
+#ch-month { white-space: nowrap; }
+@media (max-width: 420px) { .diary-nav { gap: 8px; } .diary-nav .diary-today { padding: 0 12px; } }
 .ch-toggles { display: flex; flex-wrap: wrap; gap: 8px; }
 .page-twist { margin: 6px 0 4px; font: 600 22px/1.25 var(--serif); color: #D85A30; }
 .d-dots em { font-style: normal; font-size: 13px; color: var(--muted); line-height: 1; }
