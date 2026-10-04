@@ -4,7 +4,7 @@
 
 ## Как устроено
 
-- `site/` — готовый сайт, его публикует Cloudflare Pages (Build output directory: `site`, Build command: пусто).
+- `site/` — готовый сайт. Его публикует Cloudflare (проект Workers `website`, команда `npx wrangler deploy`, настройки в `wrangler.jsonc`).
 - `src/layout.html` — общая шапка, меню и подвал для всех страниц.
 - `src/pages/*.html` — содержимое страниц.
 - `content/galleries/*.json` — галереи (картинки, подписи, порядок).
@@ -19,6 +19,6 @@ python3 tools/add_images.py bird "2023 Pigeon Polly space.jpg"   # картин�
 python3 build.py                                                  # пересобрать страницы
 ```
 
-Затем закоммитить и запушить в `main`: Cloudflare Pages обновит сайт сам.
+Затем закоммитить и запушить в `main`: Cloudflare обновит сайт сам.
 
 Адреса страниц совпадают со старым сайтом на Google Sites (`/e-books`, `/art-portfolio/bird` и т. д.).
