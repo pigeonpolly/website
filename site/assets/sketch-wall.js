@@ -43,6 +43,7 @@
     tapBadge: ['Tap a badge to see how to get it.', 'Нажмите на значок, чтобы узнать, как его получить.', 'Pieskaries nozīmītei, lai uzzinātu, kā to iegūt.'],
     newBadge: ['New badge!', 'Новый бейдж!', 'Jauna nozīmīte!'],
     unpick: ['Remove', 'Снять', 'Noņemt'],
+    picked: [n => `Picked ${n} time${n === 1 ? '' : 's'}. Every 5 picks = a star, 3 stars = a golden nickname.`, n => `Выбран(а) ${n} ${pl(n, 'раз', 'раза', 'раз')}. Каждые 5 раз — звезда, 3 звезды — золотой ник.`, n => `Izvēlēts ${n} reizi. Katras 5 reizes — zvaigzne, 3 zvaigznes — zelta segvārds.`],
     hide: ['Hide', 'Скрыть', 'Paslēpt'], ban: ['Block', 'Блок', 'Bloķēt'],
     banAsk: ['Block this user? Their sketches disappear from the wall.', 'Заблокировать пользователя? Его рисунки пропадут со стены.', 'Bloķēt lietotāju? Viņa skices pazudīs no sienas.'],
   };
@@ -83,7 +84,7 @@
     { k: 'pick', n: ['Polly’s pick', 'Выбор Полли', 'Pollijas izvēle'], icon: '★', bg: '#F0A987',
       f: ['Polly pecked your sketch with approval. The highest honour.', 'Полли одобрительно клюнула ваш рисунок. Высшая награда.', 'Pollija atzinīgi noknābāja tavu skici. Augstākais gods.'],
       past: ['Once Polly’s pick. Forever in history.', 'Когда-то — выбор Полли. Навсегда в истории.', 'Reiz Pollijas izvēle. Uz visiem laikiem vēsturē.'],
-      h: ['Polly picks one sketch she loves. Only one owner at a time: when she picks another, yours turns black & white.', 'Полли выбирает один рисунок, который ей особенно понравился. Владелец только один: когда она выберет другой, ваш бейдж станет чёрно-белым.', 'Pollija izvēlas vienu skici, kas viņai īpaši patīk. Īpašnieks tikai viens: kad viņa izvēlas citu, tava nozīmīte kļūst melnbalta.'] },
+      h: ['Polly picks one sketch she loves. Only one owner at a time: when she picks another, yours turns black & white. Every 5 picks earn a star; 3 stars give you a golden nickname.', 'Полли выбирает один рисунок, который ей особенно понравился. Владелец только один: когда она выберет другой, ваш бейдж станет чёрно-белым. Каждые 5 выборов — звезда, 3 звезды — золотой ник.', 'Pollija izvēlas vienu skici, kas viņai īpaši patīk. Īpašnieks tikai viens: kad viņa izvēlas citu, tava nozīmīte kļūst melnbalta. Katras 5 izvēles — zvaigzne, 3 zvaigznes — zelta segvārds.'] },
     { k: 'clock', f: ['Polly sets her watch by you.', 'Полли сверяет по вам часы.', 'Pollija pēc tevis regulē pulksteni.'], n: ['Like clockwork', 'Как по часам', 'Kā pulkstenis'], icon: '⏰', bg: '#F7E7A6',
       h: ['Upload 10 sketches in a row at about the same time of day (within one hour)', 'Загрузить 10 рисунков подряд примерно в одно время суток (в пределах часа)', 'Augšupielādēt 10 skices pēc kārtas apmēram vienā laikā (vienas stundas robežās)'] },
   ];
@@ -118,7 +119,9 @@
   const medal = (lv, on = true, big = false, tag = 'span') => {
     const fun = on === 'past' && lv.past ? lv.past[L] : lv.f[L];
     const cls = on === 'past' ? ' past' : on ? '' : ' off';
-    return `<${tag}${tag === 'button' ? ' type="button"' : ''} class="sw-medal${cls}${big ? ' big' : ''}" style="--bg:${lv.bg}" aria-label="${esc(lv.n[L])}" data-tip="${esc(lv.n[L])}&#10;${esc(fun)}" data-badge="${esc(lv.k || lv.s)}">${lv.s ? spriteSvg(lv.s) : `<b>${lv.icon}</b>`}</${tag}>`;
+    const stars = lv.k === 'pick' && me && me.picks ? `<span class="sw-stars" aria-label="${Math.min(3, Math.floor(me.picks / 5))}/3">${[1, 2, 3].map(i => `<i class="${me.picks >= i * 5 ? 'on' : ''}">★</i>`).join('')}</span>` : '';
+    const tip = lv.k === 'pick' && me && me.picks ? `${fun}&#10;${t('picked', me.picks)}` : esc(fun);
+    return `<${tag}${tag === 'button' ? ' type="button"' : ''} class="sw-medal${cls}${big ? ' big' : ''}" style="--bg:${lv.bg}" aria-label="${esc(lv.n[L])}" data-tip="${esc(lv.n[L])}&#10;${tip}" data-badge="${esc(lv.k || lv.s)}">${lv.s ? spriteSvg(lv.s) : `<b>${lv.icon}</b>`}${stars}</${tag}>`;
   };
   const stateOf = (s, got) => s.k === 'pick' ? (got.has('pick') ? true : got.has('pick_past') ? 'past' : false) : got.has(s.k);
   const levelOf = best => [...LEVELS].reverse().find(l => best >= l.d) || null;
@@ -206,7 +209,7 @@
     app.innerHTML = `<div class="sw-grid">
       <div class="sw-card sw-profile">
         ${lv ? medal(lv, true, true) : `<span class="sw-medal big off" style="--bg:#F4F0FA">${spriteSvg('egg')}</span>`}
-        <div class="sw-who"><h2>@${esc(me.nick)}</h2><p class="sw-level">${lv ? esc(lv.n[L]) : '—'}</p>
+        <div class="sw-who"><h2><span class="sw-nickname${me.gold ? ' gold' : ''}">@${esc(me.nick)}</span></h2><p class="sw-level">${lv ? esc(lv.n[L]) : '—'}</p>
           <p class="sw-streak">🔥 ${t('streak', me.current)} · ${t('best', me.best)}</p>
           <div class="sw-bar"><i style="width:${progress}%"></i></div>
           <p class="sw-next">${next ? t('toNext', next.d - me.best, next.n[L]) : t('maxLevel')}</p></div>
@@ -305,12 +308,12 @@
 
   // ---------- топ и стена ----------
   // парад над заголовком: впереди — «Выбор Полли» в короне, за ним — ники из топа
-  function parade(top, pick) {
+  function parade(top, pick, pickGold) {
     const el = document.getElementById('parade');
     if (!el) return;
     const birds = [];
-    if (pick) birds.push({ nick: pick, crown: true });
-    top.filter(r => r.nick !== pick).slice(0, 8).forEach(r => birds.push({ nick: r.nick, fire: r.current }));
+    if (pick) birds.push({ nick: pick, crown: true, gold: pickGold });
+    top.filter(r => r.nick !== pick).slice(0, 8).forEach(r => birds.push({ nick: r.nick, fire: r.current, gold: r.gold }));
     if (!birds.length) { el.innerHTML = ''; el.classList.remove('on'); return; }
     const key = JSON.stringify(birds);
     if (el.dataset.key === key) return; // те же птицы — не перезапускаем шествие
@@ -318,7 +321,7 @@
     const pickName = SPECIAL.find(x => x.k === 'pick').n[L];
     // идут слева направо, поэтому первый (лидер) — последний в ряду, самый правый
     el.innerHTML = `<div class="parade-track">${birds.slice().reverse().map((b, i) => `<span class="pb${b.crown ? ' crown' : ''}" style="--d:${(i % 3) * .17}s">
-      <span class="pb-tag">${b.crown ? `★ ${esc(pickName)} · ` : ''}@${esc(b.nick)}${b.fire ? ` 🔥${b.fire}` : ''}</span>
+      <span class="pb-tag${b.gold ? ' gold' : ''}">${b.crown ? `★ ${esc(pickName)} · ` : ''}@${esc(b.nick)}${b.fire ? ` 🔥${b.fire}` : ''}</span>
       <span class="pb-bird">${spriteSvg(b.crown ? 'crown' : 'polly')}</span></span>`).join('')}</div>`;
     el.classList.add('on');
     const track = el.firstElementChild;
@@ -331,11 +334,11 @@
   async function loadTop() {
     const el = document.getElementById('sw-top');
     try {
-      const { top, pick } = await api('top');
-      parade(top, pick);
+      const { top, pick, pickGold } = await api('top');
+      parade(top, pick, pickGold);
       el.innerHTML = top.length ? top.map((r, i) => {
         const lv = levelOf(r.best);
-        return `<li><span class="sw-pos">${i + 1}</span>${lv ? medal(lv) : ''}<span class="sw-topnick">@${esc(r.nick)}</span><span class="sw-fire">🔥 ${r.current}</span></li>`;
+        return `<li><span class="sw-pos">${i + 1}</span>${lv ? medal(lv) : ''}<span class="sw-topnick"><span class="sw-nickname${r.gold ? ' gold' : ''}">@${esc(r.nick)}</span></span><span class="sw-fire">🔥 ${r.current}</span></li>`;
       }).join('') : `<li class="sw-empty">${t('emptyTop')}</li>`;
     } catch (e) { el.innerHTML = ''; }
   }
@@ -349,7 +352,7 @@
       el.insertAdjacentHTML('beforeend', posts.map(p => `<figure class="sw-tile${p.bw ? ' bw' : ''}${p.id === pick ? ' pick' : ''}" data-id="${p.id}">
         ${p.id === pick ? `<span class="sw-stamp">★ ${esc(SPECIAL.find(x => x.k === 'pick').n[L])}</span>` : ''}
         <a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"></a>
-        <figcaption><b>@${esc(p.nick)}</b> <span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></figcaption>
+        <figcaption><b class="sw-nickname${p.gold ? ' gold' : ''}">@${esc(p.nick)}</b> <span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></figcaption>
         ${me && me.admin ? `<div class="sw-mod">${p.id === pick ? `<button type="button" data-unpick="1">☆ ${t('unpick')}</button>` : `<button type="button" data-pick="${p.id}" title="${esc(SPECIAL.find(x => x.k === 'pick').n[L])}">★</button>`}<button type="button" data-hide="${p.id}">${t('hide')}</button><button type="button" data-ban="${p.uid}">${t('ban')}</button></div>` : ''}
       </figure>`).join(''));
       if (posts.length) cursor = posts[posts.length - 1].created_at;

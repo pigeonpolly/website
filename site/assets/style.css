@@ -988,3 +988,12 @@ button.sw-medal:hover, button.sw-medal.sel { transform: scale(1.12); box-shadow:
 @keyframes parade-walk { from { transform: translateX(calc(-1 * var(--w, 100%))); } to { transform: translateX(100vw); } }
 @keyframes pb-step { 50% { transform: translateY(-3px) rotate(-3deg); } }
 @media (prefers-reduced-motion: reduce) { .parade-track { animation: none; left: var(--gutter); } .pb-bird { animation: none; } }
+
+/* звёзды «Выбора Полли» и золотой ник (15 выборов) */
+.sw-stars { position: absolute; left: 50%; bottom: -9px; transform: translateX(-50%); display: flex; gap: 1px; padding: 0 4px; border-radius: 99px; background: #2B1A51; font-size: 10px; line-height: 14px; }
+.sw-stars i { font-style: normal; color: rgba(255, 255, 255, .25); }
+.sw-stars i.on { color: #F2C230; text-shadow: 0 0 4px rgba(242, 194, 48, .8); }
+.sw-medal.big .sw-stars { font-size: 14px; line-height: 18px; bottom: -11px; }
+.sw-nickname.gold { padding: 0 8px; border-radius: 99px; box-shadow: 0 0 0 2px #F2C230, 0 0 12px rgba(242, 194, 48, .55); color: #F7E7A6; }
+h2 .sw-nickname.gold { padding: 2px 12px; }
+.pb-tag.gold { box-shadow: 0 0 0 2px #F2C230, 0 0 10px rgba(242, 194, 48, .55); }

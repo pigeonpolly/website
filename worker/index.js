@@ -6,6 +6,7 @@
 const ADMIN_HASHES = ['80ac2786b60d61a30d6691a3d40de5d784cdefc580717add788821a7bf900118'];
 const SESSION_DAYS = 180;
 const MAX_FULL = 2_500_000, MAX_THUMB = 400_000;
+const GOLD_PICKS = 15; // 3 звезды «Выбора Полли» (каждые 5 раз — звезда) = золотой ник
 const INACTIVE_DAYS = 30; // нет загрузок дольше — картинки удаляются (уровень и бейджи остаются)
 
 export default {
@@ -52,7 +53,8 @@ async function ensureSchema(env) {
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
   for (const sql of ['ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
-    "ALTER TABLE users ADD COLUMN months TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN tod INTEGER']) {
+    "ALTER TABLE users ADD COLUMN months TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN tod INTEGER',
+    'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   schemaReady = true;
@@ -244,7 +246,7 @@ async function route(req, env, url) {
     const pickUser = Number(await getMeta(env, 'pick_user'));
     const kept = mergedBadges(u, rows).filter(b => b !== 'pick_past' || pickUser !== u.id);
     if (pickUser === u.id) kept.push('pick');
-    return json({ user: { nick: u.nick, consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
+    return json({ user: { picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
       best: mergedBest(u, rows.map(r => r.day)), keptBadges: kept, posts: rows } });
   }
 
@@ -306,7 +308,7 @@ async function route(req, env, url) {
 
   if (m === 'GET' && p === '/api/wall') {
     const before = Number(url.searchParams.get('before')) || 9e12;
-    const rows = (await env.DB.prepare(`SELECT p.id, p.day, p.theme, p.bw, p.created_at, u.nick, u.id AS uid FROM posts p JOIN users u ON u.id = p.user_id
+    const rows = (await env.DB.prepare(`SELECT p.id, p.day, p.theme, p.bw, p.created_at, u.nick, u.id AS uid, (COALESCE(u.picks, 0) >= ${GOLD_PICKS}) AS gold FROM posts p JOIN users u ON u.id = p.user_id
       WHERE p.hidden = 0 AND u.banned = 0 AND u.nick IS NOT NULL AND p.created_at < ? ORDER BY p.created_at DESC LIMIT 24`).bind(before).all()).results;
     return json({ posts: rows, pick: await getMeta(env, 'pick_post') });
   }
@@ -318,14 +320,14 @@ async function route(req, env, url) {
     const top = [];
     for (const uid of active.slice(0, 500)) {
       const rows = (await env.DB.prepare('SELECT day FROM posts WHERE user_id = ?').bind(uid).all()).results;
-      const u = await env.DB.prepare('SELECT nick, best FROM users WHERE id = ?').bind(uid).first();
+      const u = await env.DB.prepare('SELECT nick, best, picks FROM users WHERE id = ?').bind(uid).first();
       const days = rows.map(r => r.day);
-      top.push({ nick: u.nick, current: streaks(days).current, best: mergedBest(u, days) });
+      top.push({ nick: u.nick, current: streaks(days).current, best: mergedBest(u, days), gold: (u.picks || 0) >= GOLD_PICKS });
     }
     top.sort((a, b) => b.current - a.current || b.best - a.best);
     const pickUser = Number(await getMeta(env, 'pick_user'));
-    const pick = pickUser ? (await env.DB.prepare('SELECT nick FROM users WHERE id = ? AND banned = 0').bind(pickUser).first())?.nick || null : null;
-    return json({ top: top.slice(0, 10), pick });
+    const pu = pickUser ? await env.DB.prepare('SELECT nick, picks FROM users WHERE id = ? AND banned = 0').bind(pickUser).first() : null;
+    return json({ top: top.slice(0, 10), pick: pu?.nick || null, pickGold: (pu?.picks || 0) >= GOLD_PICKS });
   }
 
   const img = p.match(/^\/api\/img\/([0-9a-f]{24})$/);
@@ -371,8 +373,12 @@ async function route(req, env, url) {
       await env.DB.prepare("DELETE FROM meta WHERE key IN ('pick_post', 'pick_user')").run();
       return json({ ok: true });
     }
-    const post = await env.DB.prepare('SELECT id, user_id FROM posts WHERE id = ?').bind(String(id)).first();
+    const post = await env.DB.prepare('SELECT id, user_id, picked FROM posts WHERE id = ?').bind(String(id)).first();
     if (!post) fail(404, 'post');
+    if (!post.picked) await env.DB.batch([
+      env.DB.prepare('UPDATE posts SET picked = 1 WHERE id = ?').bind(post.id),
+      env.DB.prepare('UPDATE users SET picks = COALESCE(picks, 0) + 1 WHERE id = ?').bind(post.user_id),
+    ]);
     if (prev && prev !== post.user_id) await addBadge(env, prev, 'pick_past');
     await setMeta(env, 'pick_post', post.id);
     await setMeta(env, 'pick_user', String(post.user_id));
