@@ -121,10 +121,32 @@
 #blk-patreon .item:focus-visible { outline: 3px solid #D85A30; outline-offset: 4px; }
 #blk-patreon .item h3 { margin: 0 0 8px; font-family: 'Fraunces', serif; font-weight: 600; font-size: 20px; line-height: 1.25; }
 #blk-patreon .item p { margin: 0; max-width: 24ch; font-size: 15px; line-height: 1.55; color: #5A4E78; }
-@media (max-width: 760px) {#blk-patreon .pat { padding: 44px 0; }
+#blk-patreon .dots, #blk-patreon .swipe-hint { display: none; }
+@media (max-width: 760px) {#blk-patreon .pat { padding: 48px 0 40px; }
 #blk-patreon .pat h2, #blk-patreon .pat .sub { padding: 0 20px; }
-#blk-patreon .row { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding: 8px 20px 16px; gap: 12px; }
-#blk-patreon .item { flex: 0 0 58%; scroll-snap-align: center; }}
+#blk-patreon .pat .sub { margin-bottom: 28px; }
+#blk-patreon .row {
+      display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory;
+      padding: 12px 17vw 20px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
+    }
+#blk-patreon .row::-webkit-scrollbar { display: none; }
+#blk-patreon .item {
+      flex: 0 0 66vw; scroll-snap-align: center; scroll-snap-stop: always;
+      padding: 28px 18px 26px; border-radius: 24px; background: #F4F0FA;
+      box-shadow: 0 10px 24px rgba(43, 26, 81, .10);
+      opacity: .35; transform: scale(.9);
+      transition: opacity .3s, transform .3s;
+    }
+#blk-patreon .item.active { opacity: 1; transform: none; }
+#blk-patreon .item.active .circle { transform: rotate(-4deg); }
+#blk-patreon .item p { max-width: none; }
+#blk-patreon .dots { display: flex; justify-content: center; gap: 8px; margin-top: 6px; }
+#blk-patreon .dots button {
+      width: 9px; height: 9px; padding: 0; border: 0; border-radius: 999px;
+      background: #CFC7E8; cursor: pointer; transition: width .25s, background .25s;
+    }
+#blk-patreon .dots button[aria-current="true"] { width: 26px; background: #D85A30; }
+#blk-patreon .swipe-hint { display: block; margin: 12px 0 0; font-size: 13px; color: #8C7FB0; }}
 @media (prefers-reduced-motion: reduce) {#blk-patreon .circle { transition: none; }
 #blk-patreon .item:hover .circle { transform: none; }}</style><section class="pat">
   <h2>News on Patreon</h2>
@@ -168,7 +190,40 @@
       <p>Your questions, my honest answers, and feedback that actually helps.</p>
     </a>
   </div>
+  <div class="dots" role="tablist" aria-label="Patreon collections"></div>
+  <p class="swipe-hint" aria-hidden="true">Swipe to see more →</p>
 </section>
+<script>
+(function () {
+  var root = document.currentScript.previousElementSibling;
+  var row = root.querySelector('.row'), items = [].slice.call(row.children), dotsBox = root.querySelector('.dots');
+  var dots = items.map(function (it, i) {
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.setAttribute('aria-label', it.querySelector('h3').textContent);
+    b.addEventListener('click', function () { go(i); });
+    dotsBox.appendChild(b);
+    return b;
+  });
+  function go(i) {
+    var it = items[i];
+    row.scrollTo({ left: it.offsetLeft - (row.clientWidth - it.clientWidth) / 2, behavior: 'smooth' });
+  }
+  function update() {
+    var mid = row.scrollLeft + row.clientWidth / 2, best = 0, dist = Infinity;
+    items.forEach(function (it, i) {
+      var d = Math.abs(it.offsetLeft + it.clientWidth / 2 - mid);
+      if (d < dist) { dist = d; best = i; }
+    });
+    items.forEach(function (it, i) { it.classList.toggle('active', i === best); });
+    dots.forEach(function (d, i) { d.setAttribute('aria-current', i === best ? 'true' : 'false'); });
+  }
+  var t;
+  row.addEventListener('scroll', function () { cancelAnimationFrame(t); t = requestAnimationFrame(update); }, { passive: true });
+  addEventListener('resize', update);
+  update();
+})();
+</script>
 </div>
 <div class="blk" id="blk-about"><style>#blk-about { margin: 0; background: #F4F0FA; }
 #blk-about .about {
