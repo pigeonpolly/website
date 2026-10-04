@@ -905,6 +905,21 @@ button.day:hover { background: rgba(255, 255, 255, .12); transform: translateY(-
 .sw-medal b { font-size: 20px; color: #2B1A51; }
 .sw-medal.big { width: 96px; height: 96px; }
 .sw-medal.off { filter: grayscale(1) brightness(.55); opacity: .5; }
+button.sw-medal { border: 0; padding: 0; cursor: pointer; transition: transform .15s; }
+button.sw-medal:hover, button.sw-medal.sel { transform: scale(1.12); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .15), 0 0 0 3px var(--peach); }
+.sw-medal { position: relative; }
+.sw-medal.past { filter: grayscale(1) contrast(1.1); }
+.sw-medal[data-tip]:hover::after, .sw-medal[data-tip]:focus-visible::after {
+  content: attr(data-tip); position: absolute; left: 50%; bottom: calc(100% + 10px); transform: translateX(-50%); z-index: 20;
+  width: max-content; max-width: 230px; padding: 8px 12px; border-radius: 12px; background: #FFFDF8; color: #2B1A51;
+  font: 500 13px/1.35 var(--sans); text-align: left; white-space: pre-line; box-shadow: 0 10px 24px rgba(0, 0, 0, .35); pointer-events: none;
+}
+.sw-medal[data-tip]:hover::before { content: ''; position: absolute; left: 50%; bottom: calc(100% + 2px); margin-left: -8px; border: 8px solid transparent; border-top-color: #FFFDF8; z-index: 20; }
+.sw-how i { color: var(--peach); }
+.sw-tile.pick { box-shadow: 0 0 0 3px #F0A987, 0 10px 24px rgba(240, 169, 135, .35); }
+.sw-stamp { position: absolute; top: 8px; left: 8px; z-index: 2; padding: 4px 10px; border-radius: 99px; background: #F0A987; color: #2B1A51; font: 700 12px var(--sans); transform: rotate(-4deg); box-shadow: 0 4px 10px rgba(0, 0, 0, .3); }
+.sw-how { margin: 12px 0 0; font-size: 14px; color: var(--muted); min-height: 2.6em; }
+.sw-how b { color: var(--text); }
 .sw-acc { grid-column: 1 / -1; margin: 6px 0 0; font-size: 14px; color: var(--muted); }
 .sw-link { background: none; border: 0; padding: 0; color: var(--muted); font: inherit; text-decoration: underline; cursor: pointer; }
 .sw-link.danger { color: #FF9A85; }

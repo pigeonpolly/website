@@ -48,9 +48,11 @@ async function ensureSchema(env) {
       id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, day TEXT NOT NULL, theme TEXT, bw INTEGER DEFAULT 0,
       created_at INTEGER, hidden INTEGER DEFAULT 0, UNIQUE(user_id, day))`),
     env.DB.prepare(`CREATE INDEX IF NOT EXISTS posts_created ON posts(created_at)`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)`),
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
-  for (const sql of ['ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''"]) {
+  for (const sql of ['ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
+    "ALTER TABLE users ADD COLUMN months TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN tod INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   schemaReady = true;
@@ -130,7 +132,7 @@ function extraDay(y, m) {
   if (key > 2026 * 12 + 9) { const prev = extraDay(m ? y : y - 1, m ? m - 1 : 11); while (v === prev) v = 1 + Math.floor(rm() * days); }
   return (extraMemo[key] = v);
 }
-function badgesOf(posts) {
+function badgesOf(posts, months = []) {
   const got = new Set();
   for (const p of posts) {
     const y = +p.day.slice(0, 4), m = +p.day.slice(5, 7) - 1, d = +p.day.slice(8, 10);
@@ -138,18 +140,36 @@ function badgesOf(posts) {
     if (m === 0 && d === 23) got.add('bday');
     if (d === extraDay(y, m)) got.add('extra');
   }
+  const sorted = [...posts].sort((a, b) => a.day < b.day ? -1 : 1);
+  // «Через денёк»: 15 загрузок подряд, каждая ровно через день (≈ месяц)
+  const n = [...new Set(sorted.map(p => dayNum(p.day)))];
+  for (let i = 1, run = 1; i < n.length; i++) { run = n[i] - n[i - 1] === 2 ? run + 1 : 1; if (run >= 15) { got.add('alt'); break; } }
+  // «Как по часам»: 10 загрузок подряд в пределах одного часа (по кругу суток)
+  const tods = sorted.map(p => p.tod);
+  for (let i = 0; i + 10 <= tods.length; i++) {
+    const w = tods.slice(i, i + 10);
+    if (w.some(t => t == null)) continue;
+    const s = [...w].sort((a, b) => a - b);
+    let gap = s[0] + 1440 - s[s.length - 1];
+    for (let j = 1; j < s.length; j++) gap = Math.max(gap, s[j] - s[j - 1]);
+    if (1440 - gap <= 60) { got.add('clock'); break; }
+  }
+  // «Каждый месяц»: работы в 3 календарных месяцах подряд
+  const ms = [...new Set([...months, ...posts.map(p => p.day.slice(0, 7))])].map(k => +k.slice(0, 4) * 12 + +k.slice(5, 7) - 1).sort((a, b) => a - b);
+  for (let i = 1, run = 1; i < ms.length; i++) { run = ms[i] - ms[i - 1] === 1 ? run + 1 : 1; if (run >= 3) { got.add('monthly'); break; } }
   return got;
 }
 // рекорд и бейджи пользователя: из его работ + сохранённое после прошлых очисток
 const mergedBest = (u, days) => Math.max(u.best || 0, streaks(days).best);
-const mergedBadges = (u, posts) => [...new Set([...String(u.badges || '').split(',').filter(Boolean), ...badgesOf(posts)])];
+const monthsOf = u => String(u.months || '').split(',').filter(Boolean);
+const mergedBadges = (u, posts) => [...new Set([...String(u.badges || '').split(',').filter(Boolean), ...badgesOf(posts, monthsOf(u))])];
 
 async function cleanupInactive(env) {
   const cutoff = new Date((utcToday() - INACTIVE_DAYS) * 864e5).toISOString().slice(0, 10);
   const users = (await env.DB.prepare('SELECT u.* FROM users u JOIN posts p ON p.user_id = u.id GROUP BY u.id HAVING MAX(p.day) < ? LIMIT 200').bind(cutoff).all()).results;
   let deletes = 0;
   for (const u of users) {
-    const posts = (await env.DB.prepare('SELECT id, day, bw FROM posts WHERE user_id = ?').bind(u.id).all()).results;
+    const posts = (await env.DB.prepare('SELECT id, day, bw, tod FROM posts WHERE user_id = ?').bind(u.id).all()).results;
     if (deletes + posts.length * 2 > 900) break; // бесплатный лимит KV — 1000 удалений в сутки
     await env.DB.prepare('UPDATE users SET best = ?, badges = ? WHERE id = ?')
       .bind(mergedBest(u, posts.map(p => p.day)), mergedBadges(u, posts).join(','), u.id).run();
@@ -157,6 +177,16 @@ async function cleanupInactive(env) {
     await env.DB.prepare('DELETE FROM posts WHERE user_id = ?').bind(u.id).run();
   }
   return { users: users.length, deletes };
+}
+
+// «Выбор Полли»: один текущий рисунок, его автор — носитель бейджа; прошлые носители получают 'pick_past'
+const getMeta = async (env, k) => (await env.DB.prepare('SELECT value FROM meta WHERE key = ?').bind(k).first())?.value ?? null;
+const setMeta = (env, k, v) => env.DB.prepare('INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value').bind(k, v).run();
+async function addBadge(env, uid, badge) {
+  const u = await env.DB.prepare('SELECT badges FROM users WHERE id = ?').bind(uid).first();
+  if (!u) return;
+  const set = new Set(String(u.badges || '').split(',').filter(Boolean)); set.add(badge);
+  await env.DB.prepare('UPDATE users SET badges = ? WHERE id = ?').bind([...set].join(','), uid).run();
 }
 
 // ---------- маршруты ----------
@@ -197,10 +227,13 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/me') {
     const u = await currentUser(req, env);
     if (!u) return json({ user: null });
-    const rows = (await env.DB.prepare('SELECT id, day, theme, bw, hidden FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
+    const rows = (await env.DB.prepare('SELECT id, day, theme, bw, tod, hidden FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
     const st = streaks(rows.map(r => r.day));
+    const pickUser = Number(await getMeta(env, 'pick_user'));
+    const kept = mergedBadges(u, rows).filter(b => b !== 'pick_past' || pickUser !== u.id);
+    if (pickUser === u.id) kept.push('pick');
     return json({ user: { nick: u.nick, consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
-      best: mergedBest(u, rows.map(r => r.day)), keptBadges: String(u.badges || '').split(',').filter(Boolean), posts: rows } });
+      best: mergedBest(u, rows.map(r => r.day)), keptBadges: kept, posts: rows } });
   }
 
   if (m === 'POST' && p === '/api/nick') {
@@ -235,8 +268,16 @@ async function route(req, env, url) {
       await env.DB.prepare('DELETE FROM posts WHERE id = ?').bind(old.id).run();
       await Promise.all([env.IMAGES.delete('i/' + old.id), env.IMAGES.delete('t/' + old.id)]);
     }
-    await env.DB.prepare('INSERT INTO posts (id, user_id, day, theme, bw, created_at) VALUES (?, ?, ?, ?, ?, ?)')
-      .bind(id, u.id, day, String(f.get('theme') || '').slice(0, 120), f.get('bw') === '1' ? 1 : 0, now()).run();
+    const tod = Number(f.get('tod'));
+    await env.DB.prepare('INSERT INTO posts (id, user_id, day, theme, bw, tod, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+      .bind(id, u.id, day, String(f.get('theme') || '').slice(0, 120), f.get('bw') === '1' ? 1 : 0,
+        Number.isInteger(tod) && tod >= 0 && tod < 1440 ? tod : null, now()).run();
+    // бейджи и рекорд записываем сразу — их не отнимет ни очистка, ни пропуск
+    const months = [...new Set([...monthsOf(u), day.slice(0, 7)])].sort().slice(-24);
+    const all = (await env.DB.prepare('SELECT day, bw, tod FROM posts WHERE user_id = ?').bind(u.id).all()).results;
+    const uu = { ...u, months: months.join(',') };
+    await env.DB.prepare('UPDATE users SET months = ?, best = ?, badges = ? WHERE id = ?')
+      .bind(uu.months, mergedBest(u, all.map(p => p.day)), mergedBadges(uu, all).join(','), u.id).run();
     return json({ ok: true, id });
   }
 
@@ -254,7 +295,7 @@ async function route(req, env, url) {
     const before = Number(url.searchParams.get('before')) || 9e12;
     const rows = (await env.DB.prepare(`SELECT p.id, p.day, p.theme, p.bw, p.created_at, u.nick, u.id AS uid FROM posts p JOIN users u ON u.id = p.user_id
       WHERE p.hidden = 0 AND u.banned = 0 AND u.nick IS NOT NULL AND p.created_at < ? ORDER BY p.created_at DESC LIMIT 24`).bind(before).all()).results;
-    return json({ posts: rows });
+    return json({ posts: rows, pick: await getMeta(env, 'pick_post') });
   }
 
   if (m === 'GET' && p === '/api/top') {
@@ -305,6 +346,19 @@ async function route(req, env, url) {
   }
 
   // ---------- модерация ----------
+  if (m === 'POST' && p === '/api/admin/pick') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const { id } = await req.json().catch(() => ({}));
+    const post = await env.DB.prepare('SELECT id, user_id FROM posts WHERE id = ?').bind(String(id)).first();
+    if (!post) fail(404, 'post');
+    const prev = Number(await getMeta(env, 'pick_user'));
+    if (prev && prev !== post.user_id) await addBadge(env, prev, 'pick_past');
+    await setMeta(env, 'pick_post', post.id);
+    await setMeta(env, 'pick_user', String(post.user_id));
+    return json({ ok: true });
+  }
+
   if (m === 'POST' && (p === '/api/admin/hide' || p === '/api/admin/ban')) {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');

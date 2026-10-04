@@ -36,12 +36,10 @@ PAGES = [
     ("art-portfolio/detective", "Mr.Titos", "detective.html", "Detective Mr.Titos."),
     ("art-portfolio/halloween", "Pumpkin Family", "halloween.html", "Welcome to the Pumpkin-Heads family."),
     ("art-portfolio/ai-art", "AI Art", "ai-art.html", "AI art based on the Pigeon Polly traditional art style."),
-    ("sketch-wall", "Sketch Wall", "sketch-wall.html",
-     "Upload your daily sketch, keep your streak and collect Pigeon Polly badges."),
     ("privacy", "Privacy", "privacy.html", "How pigeonpolly.com handles your data."),
 ]
 # готовые, но пока не открытые страницы: не попадают в sitemap
-UNLISTED = {"sketch-wall"}
+UNLISTED = set()
 
 
 PORTFOLIO = [
