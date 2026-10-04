@@ -101,8 +101,8 @@
     });
   }
 
-  const links = [...document.querySelectorAll('a[data-lightbox]')];
-  if (!links.length) return;
+  // Просмотр картинок: любые ссылки a[data-lightbox], в том числе догруженные позже (стена рисунков)
+  let links = [];
   const box = document.createElement('div');
   box.className = 'lightbox';
   box.setAttribute('role', 'dialog');
@@ -119,13 +119,19 @@
     i = (n + links.length) % links.length;
     const a = links[i], fig = a.closest('figure');
     img.src = a.href;
-    img.alt = a.querySelector('img').alt;
-    cap.textContent = fig.querySelector('figcaption')?.textContent || '';
+    img.alt = a.querySelector('img')?.alt || '';
+    cap.textContent = (fig?.querySelector('figcaption')?.textContent || '').replace(/\s+/g, ' ').trim();
   };
   const open = n => { lastFocus = document.activeElement; show(n); box.classList.add('open'); document.body.style.overflow = 'hidden'; box.querySelector('.lb-close').focus(); };
   const close = () => { box.classList.remove('open'); document.body.style.overflow = ''; img.src = ''; lastFocus?.focus(); };
 
-  links.forEach((a, n) => a.addEventListener('click', e => { e.preventDefault(); open(n); }));
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[data-lightbox]');
+    if (!a || e.ctrlKey || e.metaKey) return;
+    e.preventDefault();
+    links = [...document.querySelectorAll('a[data-lightbox]')];
+    open(links.indexOf(a));
+  });
   box.querySelector('.lb-close').onclick = close;
   box.querySelector('.lb-prev').onclick = () => show(i - 1);
   box.querySelector('.lb-next').onclick = () => show(i + 1);

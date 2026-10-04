@@ -290,8 +290,8 @@
       const { posts } = await api('wall' + (cursor ? `?before=${cursor}` : ''));
       if (!posts.length && !el.children.length) el.innerHTML = `<p class="sw-empty">${t('emptyWall')}</p>`;
       el.insertAdjacentHTML('beforeend', posts.map(p => `<figure class="sw-tile${p.bw ? ' bw' : ''}" data-id="${p.id}">
-        <a href="/api/img/${p.id}" target="_blank" rel="noopener"><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"></a>
-        <figcaption><b>@${esc(p.nick)}</b><span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></figcaption>
+        <a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"></a>
+        <figcaption><b>@${esc(p.nick)}</b> <span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></figcaption>
         ${me && me.admin ? `<div class="sw-mod"><button type="button" data-hide="${p.id}">${t('hide')}</button><button type="button" data-ban="${p.uid}">${t('ban')}</button></div>` : ''}
       </figure>`).join(''));
       if (posts.length) cursor = posts[posts.length - 1].created_at;
