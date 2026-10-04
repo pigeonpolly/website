@@ -174,10 +174,15 @@ def projects_html():
             f'<h3>{esc(sec["h"])}</h3><ul>' + "".join(f"<li>{esc(i)}</li>" for i in sec["items"]) + "</ul>"
             for sec in p["sections"])
         tags = "".join(f'<span class="tag">{esc(x)}</span>' for x in p["topics"])
+        pages = ""
+        if p.get("pages"):
+            pages = '<div class="doc-pages">' + "".join(
+                f'<img src="/{pg}" alt="{esc(p["title"])}, page {i + 1}" width="1240" height="1754" loading="lazy" decoding="async">'
+                for i, pg in enumerate(p["pages"])) + "</div>"
         link = (f'<p><a class="pill" href="{esc(p["link"]["url"])}" target="_blank" rel="noopener">{esc(p["link"]["label"])} ↗</a></p>'
                 if p.get("link") else "")
         dialogs.append(
-            f'<dialog class="modal project" id="p-{p["slug"]}" aria-labelledby="p-{p["slug"]}-t">'
+            f'<dialog class="modal project{" wide" if p.get("pages") else ""}" id="p-{p["slug"]}" aria-labelledby="p-{p["slug"]}-t">'
             f'<div class="modal-band" style="background:{t["color"]}"></div>'
             f'<button class="modal-close" aria-label="Close">✕</button>'
             f'<p class="modal-kicker">{esc(t["label"])} · {esc(p["years"])}</p>'
@@ -185,8 +190,8 @@ def projects_html():
             f'<dl class="facts"><div><dt>Role</dt><dd>{esc(p["role"])}</dd></div>'
             f'<div><dt>Domain</dt><dd>{esc(p["domain"])}</dd></div>'
             f'<div><dt>Scale</dt><dd>{esc(p["scale"])}</dd></div></dl>'
-            f'<p class="modal-lead">{esc(p["summary"])}</p>{secs}'
-            f'<p class="tags">{tags}</p>{link}</dialog>')
+            f'<p class="modal-lead">{esc(p["summary"])}</p>{link}{pages}{secs}'
+            f'<p class="tags">{tags}</p></dialog>')
     return (f'<div class="legend" role="group" aria-label="Filter by theme">{legend}</div>'
             f'<div class="bookshelf">{"".join(books)}</div>' + "".join(dialogs))
 

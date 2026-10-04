@@ -1,10 +1,30 @@
 {
   "themes": {
-    "ai": {"label": "AI & automation", "color": "#D85A30", "ink": "#FFF6F1"},
-    "platforms": {"label": "Learning platforms", "color": "#534AB7", "ink": "#F3EFFA"},
-    "pedagogy": {"label": "Teaching & pedagogy", "color": "#F0A987", "ink": "#2B1A51"},
-    "research": {"label": "Research & data", "color": "#3E8E8A", "ink": "#F1FBF9"},
-    "creative": {"label": "Creative & publishing", "color": "#E9A93B", "ink": "#42280A"}
+    "ai": {
+      "label": "AI & automation",
+      "color": "#D85A30",
+      "ink": "#FFF6F1"
+    },
+    "platforms": {
+      "label": "Learning platforms",
+      "color": "#534AB7",
+      "ink": "#F3EFFA"
+    },
+    "pedagogy": {
+      "label": "Teaching & pedagogy",
+      "color": "#F0A987",
+      "ink": "#2B1A51"
+    },
+    "research": {
+      "label": "Research & data",
+      "color": "#3E8E8A",
+      "ink": "#F1FBF9"
+    },
+    "creative": {
+      "label": "Creative & publishing",
+      "color": "#E9A93B",
+      "ink": "#42280A"
+    }
   },
   "projects": [
     {
@@ -12,26 +32,42 @@
       "title": "Interactive Multimedia Instruction Builder",
       "years": "2026",
       "theme": "ai",
-      "themes": ["ai", "platforms"],
-      "topics": ["EdTech", "LLM Automation", "Workflow Optimization"],
+      "themes": [
+        "ai",
+        "platforms"
+      ],
+      "topics": [
+        "EdTech",
+        "LLM Automation",
+        "Workflow Optimization"
+      ],
       "domain": "EdTech / Workflow Automation",
       "scale": "Multi-language interactive HTML course materials",
       "role": "Pipeline Architect & Developer",
       "summary": "Converting legacy Word documents and screen recordings into interactive, multi-language instructional guides traditionally required hours of tedious manual synchronization. An automated Python pipeline driven by Claude and TTS now compiles offline-ready HTML materials with embedded screenshots, synchronized voiceovers and bilingual support in under 30 minutes.",
       "sections": [
-        {"h": "Challenge", "items": [
-          "High manual overhead: structuring text, translating multi-step guides, logging video timestamps and aligning voiceovers took hours per lecture.",
-          "Technical fragmentation: browsers can’t switch between audio tracks inside a single video, which complicates localized training."
-        ]},
-        {"h": "Solution", "items": [
-          "Three-step pipeline: code parses .docx files and video keyframes, Claude analyzes visuals, drafts instructions and translates, then everything is compiled locally.",
-          "Robust media sync with decoupled audio tracks and smart pause logic, so visuals align without speed distortion.",
-          "A portable, self-contained package (236 MB) running on local Python and FFmpeg."
-        ]},
-        {"h": "Impact", "items": [
-          "Production time for a 3-language multimedia guide dropped from 5+ hours to 20–30 minutes.",
-          "Asset embedding, translation and audio clipping are fully automated and can run in the background."
-        ]}
+        {
+          "h": "Challenge",
+          "items": [
+            "High manual overhead: structuring text, translating multi-step guides, logging video timestamps and aligning voiceovers took hours per lecture.",
+            "Technical fragmentation: browsers can’t switch between audio tracks inside a single video, which complicates localized training."
+          ]
+        },
+        {
+          "h": "Solution",
+          "items": [
+            "Three-step pipeline: code parses .docx files and video keyframes, Claude analyzes visuals, drafts instructions and translates, then everything is compiled locally.",
+            "Robust media sync with decoupled audio tracks and smart pause logic, so visuals align without speed distortion.",
+            "A portable, self-contained package (236 MB) running on local Python and FFmpeg."
+          ]
+        },
+        {
+          "h": "Impact",
+          "items": [
+            "Production time for a 3-language multimedia guide dropped from 5+ hours to 20–30 minutes.",
+            "Asset embedding, translation and audio clipping are fully automated and can run in the background."
+          ]
+        }
       ]
     },
     {
@@ -39,26 +75,42 @@
       "title": "AI Course-Production Pipeline",
       "years": "2026",
       "theme": "ai",
-      "themes": ["ai", "platforms"],
-      "topics": ["EdTech", "LLM Automation", "Workflow Optimization"],
+      "themes": [
+        "ai",
+        "platforms"
+      ],
+      "topics": [
+        "EdTech",
+        "LLM Automation",
+        "Workflow Optimization"
+      ],
       "domain": "AI Automation / EdTech",
       "scale": "30-slide lecture production",
       "role": "Pipeline Architect & Developer",
       "summary": "Turning raw lecture materials into branded, narrated presentations took extensive manual work. A portable local pipeline combining Python, LLMs and text-to-speech automated the workflow end to end: 8x faster, from almost 5 hours to half an hour per lecture.",
       "sections": [
-        {"h": "Challenge", "items": [
-          "Converting raw documents and slide decks into a narrated, branded presentation consumed hours of repetitive work per lecture.",
-          "Scripts, slide formatting and voiceovers were all handled separately by hand."
-        ]},
-        {"h": "Solution", "items": [
-          "Ingests .pptx, .docx and .pdf source materials automatically.",
-          "Drafts structured narration notes in Latvian and English with an LLM and shows a clear plan for review before assembly.",
-          "Assembles the deck in the official corporate template and embeds the generated voiceover."
-        ]},
-        {"h": "Impact", "items": [
-          "From about 4 h 48 min down to 30–35 minutes per 30-slide lecture, measured on real production runs.",
-          "A single creator can now produce publication-ready, narrated course content at scale."
-        ]}
+        {
+          "h": "Challenge",
+          "items": [
+            "Converting raw documents and slide decks into a narrated, branded presentation consumed hours of repetitive work per lecture.",
+            "Scripts, slide formatting and voiceovers were all handled separately by hand."
+          ]
+        },
+        {
+          "h": "Solution",
+          "items": [
+            "Ingests .pptx, .docx and .pdf source materials automatically.",
+            "Drafts structured narration notes in Latvian and English with an LLM and shows a clear plan for review before assembly.",
+            "Assembles the deck in the official corporate template and embeds the generated voiceover."
+          ]
+        },
+        {
+          "h": "Impact",
+          "items": [
+            "From about 4 h 48 min down to 30–35 minutes per 30-slide lecture, measured on real production runs.",
+            "A single creator can now produce publication-ready, narrated course content at scale."
+          ]
+        }
       ]
     },
     {
@@ -66,26 +118,43 @@
       "title": "Agentic AI Course Operations",
       "years": "2026",
       "theme": "ai",
-      "themes": ["ai", "platforms"],
-      "topics": ["EdTech", "Moodle", "LMS", "Runbook Engineering"],
+      "themes": [
+        "ai",
+        "platforms"
+      ],
+      "topics": [
+        "EdTech",
+        "Moodle",
+        "LMS",
+        "Runbook Engineering"
+      ],
       "domain": "EdTech / AI Automation",
       "scale": "Category-wide Moodle operations",
       "role": "AI Workflow Architect & Automation Lead",
       "summary": "Bulk structural changes across whole course categories in Moodle used to mean editing every course by hand. Operational runbooks powered by Claude now run category-wide configuration updates fully unattended, with built-in error handling and state management.",
       "sections": [
-        {"h": "Challenge", "items": [
-          "Updating hundreds of courses one by one wasted administrative hours.",
-          "The platform had no safe bulk tooling, so batch edits were error-prone."
-        ]},
-        {"h": "Solution", "items": [
-          "Runbooks that let an AI agent safely carry out multi-step operations in Moodle.",
-          "Conditional logic for three different configuration states per course.",
-          "Comment logging, strict retry limits, per-course tracking and completion notifications."
-        ]},
-        {"h": "Impact", "items": [
-          "Category-wide configuration changes run end to end without supervision.",
-          "Manual per-course editing is gone entirely."
-        ]}
+        {
+          "h": "Challenge",
+          "items": [
+            "Updating hundreds of courses one by one wasted administrative hours.",
+            "The platform had no safe bulk tooling, so batch edits were error-prone."
+          ]
+        },
+        {
+          "h": "Solution",
+          "items": [
+            "Runbooks that let an AI agent safely carry out multi-step operations in Moodle.",
+            "Conditional logic for three different configuration states per course.",
+            "Comment logging, strict retry limits, per-course tracking and completion notifications."
+          ]
+        },
+        {
+          "h": "Impact",
+          "items": [
+            "Category-wide configuration changes run end to end without supervision.",
+            "Manual per-course editing is gone entirely."
+          ]
+        }
       ]
     },
     {
@@ -93,74 +162,108 @@
       "title": "AI-Support Tool (DILC Robot)",
       "years": "2026",
       "theme": "ai",
-      "themes": ["ai", "pedagogy", "creative"],
-      "topics": ["Onboarding", "EdTech", "LLM Automation", "Workflow Optimization", "Game Design"],
+      "themes": [
+        "ai",
+        "pedagogy",
+        "creative"
+      ],
+      "topics": [
+        "Onboarding",
+        "EdTech",
+        "LLM Automation",
+        "Workflow Optimization",
+        "Game Design"
+      ],
       "domain": "EdTech / Team Tooling",
       "scale": "Internal tool for a learning-design team",
       "role": "Designer & Developer",
-      "summary": "A friendly AI assistant for the DILC team, living on an animated pixel-art office page. Colleagues ask questions, log facts in plain language and run tasks; a Claude helper on a team computer reads course records, the task board, the calendar, statistics and the team wiki, and twice a day sorts the inbox into ready-to-send draft replies.",
-      "sections": [
-        {"h": "What it does", "items": [
-          "Ask: answers only from its own sources and says who recorded a fact and when, or plainly says it has no data.",
-          "Remember: a fact written the way you’d say it is parsed into type, course, person, topic and date, and feeds statistics and reports.",
-          "Mail: reads the inbox twice a day and lays out each letter with what the robot can do, what needs a person, and a draft reply. It never sends mail on its own.",
-          "Tasks and courses: a shared task board and course catalogue, with automatic tasks arriving from mail and Notion."
-        ]},
-        {"h": "Design choices", "items": [
-          "Knows courses by number, not title, because many courses share a name.",
-          "A field manual explains every tab, how the robot thinks and the small tricks that save clicks."
-        ]}
-      ]
+      "summary": "A friendly AI assistant for the DILC team, living on an animated pixel-art office page. The field manual below shows what every tab does, how the robot thinks, and the small tricks that save clicks.",
+      "sections": [],
+      "pages": [
+        "images/projects/ai-support-tool/page-1.jpg",
+        "images/projects/ai-support-tool/page-2.jpg",
+        "images/projects/ai-support-tool/page-3.jpg",
+        "images/projects/ai-support-tool/page-4.jpg",
+        "images/projects/ai-support-tool/page-5.jpg"
+      ],
+      "link": {
+        "url": "/files/DILC-Robot-Field-Manual.pdf",
+        "label": "Open the field manual (PDF)"
+      }
     },
     {
       "slug": "on-leave-ai-support",
       "title": "On-Leave AI-Support Program (Alina 2.0)",
       "years": "2026",
       "theme": "ai",
-      "themes": ["ai", "creative", "pedagogy"],
-      "topics": ["Onboarding", "EdTech", "Process Automation", "LLM Automation", "Creative Industries", "Game Design"],
+      "themes": [
+        "ai",
+        "creative",
+        "pedagogy"
+      ],
+      "topics": [
+        "Onboarding",
+        "EdTech",
+        "Process Automation",
+        "LLM Automation",
+        "Creative Industries",
+        "Game Design"
+      ],
       "domain": "EdTech / Knowledge Handover",
       "scale": "Team support during my leave",
       "role": "Designer & Developer",
-      "summary": "Alina 2.0 is a pixel-art page that covers for me while I’m on leave. It shows what I finished and what is still open, answers colleagues’ questions from my notes, and hides plenty of things to click: a cactus that switches the page between Russian and English, a cat that purrs, and a water cooler with 30 questions about me.",
-      "sections": [
-        {"h": "What it does", "items": [
-          "Four views: What’s done, What’s left, Ask a question and Water cooler.",
-          "Answers questions from my notes in Russian or English, and remembers the chosen language.",
-          "Small human touches: the greeting sends you home after 18:00, and a cookie appears every 40 minutes."
-        ]},
-        {"h": "Why", "items": [
-          "A handover that people actually open: playful enough to explore, structured enough to find answers without me."
-        ]}
-      ]
+      "summary": "Alina 2.0 is a pixel-art page that covers for me while I’m on leave: what I finished, what is still open, answers from my notes, and quite a few things to click. Here is its user guide.",
+      "sections": [],
+      "pages": [
+        "images/projects/on-leave-ai-support/page-1.jpg",
+        "images/projects/on-leave-ai-support/page-2.jpg"
+      ],
+      "link": {
+        "url": "/files/Alina-2.0-User-Guide.pdf",
+        "label": "Open the user guide (PDF)"
+      }
     },
     {
       "slug": "silent-failure-diagnosis",
       "title": "Interactive Course Generation Toolchain — Silent Failure Diagnosis",
       "years": "2026",
       "theme": "platforms",
-      "themes": ["platforms"],
-      "topics": ["EdTech", "QA"],
+      "themes": [
+        "platforms"
+      ],
+      "topics": [
+        "EdTech",
+        "QA"
+      ],
       "domain": "EdTech / Internal Tooling Reliability",
       "scale": "Multi-user desktop application, production course pipeline",
       "role": "Diagnostic Lead & Technical Analyst",
       "summary": "An internal AI course-generation app seemed to freeze forever during long runs, with no cancel button and no error. It had been written off as a local machine fault. Systematic investigation showed in under an hour that it was a reproducible product defect: not a hang, but a stale saved status flag with no check at startup. The result was a developer-ready defect report with a proposed patch and regression tests, plus a workaround that restored blocked courses right away.",
       "sections": [
-        {"h": "Challenge", "items": [
-          "The interface showed an active progress indicator, and relaunching didn’t help because the state was read back from disk.",
-          "The same issue on a second workstation had been blamed on individual setups.",
-          "There was no stop, cancel or reset control, so affected courses were stuck."
-        ]},
-        {"h": "Method", "items": [
-          "Five independent checks (processes, CPU, network, file writes, transcripts) confirmed nothing was actually running.",
-          "Reframed the question from “why is it stuck” to “why does the app think it’s running”.",
-          "Reviewed the packaged app logic and correlated system logs to build a timestamped causal chain."
-        ]},
-        {"h": "Impact", "items": [
-          "A four-step reproduction that works on any machine, a ~10-line patch proposal and five regression tests.",
-          "A safe manual recovery procedure so staff could restore frozen courses themselves.",
-          "Also surfaced a second defect where completed quality-check results were lost on interruption."
-        ]}
+        {
+          "h": "Challenge",
+          "items": [
+            "The interface showed an active progress indicator, and relaunching didn’t help because the state was read back from disk.",
+            "The same issue on a second workstation had been blamed on individual setups.",
+            "There was no stop, cancel or reset control, so affected courses were stuck."
+          ]
+        },
+        {
+          "h": "Method",
+          "items": [
+            "Five independent checks (processes, CPU, network, file writes, transcripts) confirmed nothing was actually running.",
+            "Reframed the question from “why is it stuck” to “why does the app think it’s running”.",
+            "Reviewed the packaged app logic and correlated system logs to build a timestamped causal chain."
+          ]
+        },
+        {
+          "h": "Impact",
+          "items": [
+            "A four-step reproduction that works on any machine, a ~10-line patch proposal and five regression tests.",
+            "A safe manual recovery procedure so staff could restore frozen courses themselves.",
+            "Also surfaced a second defect where completed quality-check results were lost on interruption."
+          ]
+        }
       ]
     },
     {
@@ -168,27 +271,48 @@
       "title": "Published Instructional Guides",
       "years": "2025–2026",
       "theme": "creative",
-      "themes": ["creative", "pedagogy"],
-      "topics": ["EdTech", "Self-Publishing", "Pedagogy", "Creative Industries", "Art"],
+      "themes": [
+        "creative",
+        "pedagogy"
+      ],
+      "topics": [
+        "EdTech",
+        "Self-Publishing",
+        "Pedagogy",
+        "Creative Industries",
+        "Art"
+      ],
       "domain": "EdTech / Publishing",
       "scale": "2 published English instructional guides",
       "role": "Author, Illustrator & Publisher",
-      "link": {"url": "https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ", "label": "My books on Amazon"},
+      "link": {
+        "url": "https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ",
+        "label": "My books on Amazon"
+      },
       "summary": "Wrote, illustrated, designed and self-published two instructional guides, “Watercolor Sketches” and “Ink Sketching”, on Amazon. Creative skills are taught through solid learning theory: deliberate practice, timed drills and spaced repetition.",
       "sections": [
-        {"h": "Challenge", "items": [
-          "Typical art tutorials have no structured learning system, so learners can’t see their progress.",
-          "A professional book usually needs a writer, an illustrator, a layout designer and a publisher."
-        ]},
-        {"h": "Solution", "items": [
-          "Timed sketching drills, red-pen self-review and spaced repetition built into the curriculum.",
-          "Cognitive-science principles applied directly to creative skill building.",
-          "The whole cycle done solo: pedagogy, illustration, layout and Amazon publishing."
-        ]},
-        {"h": "Impact", "items": [
-          "Two complete educational products shipped from concept to print.",
-          "A practical example of learning theory applied to creative skills."
-        ]}
+        {
+          "h": "Challenge",
+          "items": [
+            "Typical art tutorials have no structured learning system, so learners can’t see their progress.",
+            "A professional book usually needs a writer, an illustrator, a layout designer and a publisher."
+          ]
+        },
+        {
+          "h": "Solution",
+          "items": [
+            "Timed sketching drills, red-pen self-review and spaced repetition built into the curriculum.",
+            "Cognitive-science principles applied directly to creative skill building.",
+            "The whole cycle done solo: pedagogy, illustration, layout and Amazon publishing."
+          ]
+        },
+        {
+          "h": "Impact",
+          "items": [
+            "Two complete educational products shipped from concept to print.",
+            "A practical example of learning theory applied to creative skills."
+          ]
+        }
       ]
     },
     {
@@ -196,27 +320,43 @@
       "title": "Architectural Redesign: Scalable Learning Platform Model",
       "years": "2025",
       "theme": "platforms",
-      "themes": ["platforms", "ai"],
-      "topics": ["EdTech", "Process Automation", "Scalability"],
+      "themes": [
+        "platforms",
+        "ai"
+      ],
+      "topics": [
+        "EdTech",
+        "Process Automation",
+        "Scalability"
+      ],
       "domain": "EdTech / LMS",
       "scale": "600–800 active courses",
       "role": "Platform Architect & Methodological Lead",
       "summary": "A fully online university struggled with a “dead copy” model: every course was duplicated for each programme that used it. Restructuring delivery around master courses and student groups removed the duplicated maintenance, cut update friction by 91% and made the platform manageable by one person.",
       "sections": [
-        {"h": "Challenge", "items": [
-          "One change could require up to 11 identical manual edits across duplicated courses.",
-          "Fragmented updates caused version drift, inconsistent student experience and broken links.",
-          "Platform management needed far too many people to scale."
-        ]},
-        {"h": "Solution", "items": [
-          "Master-course model: a single source of truth for each curriculum item.",
-          "Group-based delivery inside master courses, with separate tracking, grading and communication.",
-          "A clear taxonomy and step-by-step migration plan that didn’t interrupt the academic year."
-        ]},
-        {"h": "Impact", "items": [
-          "From up to 11 repeated edits to one central edit.",
-          "A lean, resilient platform fully maintainable by one administrator."
-        ]}
+        {
+          "h": "Challenge",
+          "items": [
+            "One change could require up to 11 identical manual edits across duplicated courses.",
+            "Fragmented updates caused version drift, inconsistent student experience and broken links.",
+            "Platform management needed far too many people to scale."
+          ]
+        },
+        {
+          "h": "Solution",
+          "items": [
+            "Master-course model: a single source of truth for each curriculum item.",
+            "Group-based delivery inside master courses, with separate tracking, grading and communication.",
+            "A clear taxonomy and step-by-step migration plan that didn’t interrupt the academic year."
+          ]
+        },
+        {
+          "h": "Impact",
+          "items": [
+            "From up to 11 repeated edits to one central edit.",
+            "A lean, resilient platform fully maintainable by one administrator."
+          ]
+        }
       ]
     },
     {
@@ -224,26 +364,42 @@
       "title": "Higher Education Teaching & Faculty Onboarding",
       "years": "2019–2025",
       "theme": "pedagogy",
-      "themes": ["pedagogy", "platforms"],
-      "topics": ["Pedagogy", "Onboarding", "EdTech"],
+      "themes": [
+        "pedagogy",
+        "platforms"
+      ],
+      "topics": [
+        "Pedagogy",
+        "Onboarding",
+        "EdTech"
+      ],
       "domain": "Higher Education / Faculty Training",
       "scale": "6 years of online and on-site teaching",
       "role": "Lecturer & Instructional Lead",
       "summary": "Six years of teaching HR management, mediation and conflict resolution at fully online colleges and universities. Teaching is my testing ground for pedagogical frameworks. I also designed onboarding programmes for teachers and digital-skills bootcamps for students from scratch.",
       "sections": [
-        {"h": "Challenge", "items": [
-          "Soft skills like mediation need active, scenario-based learning, not passive lectures.",
-          "New staff and students often struggle with digital learning environments without proper onboarding."
-        ]},
-        {"h": "Solution", "items": [
-          "Courses in HR management, mediation and conflict resolution for bachelor students and professionals.",
-          "Complete onboarding tracks for educators, bridging pedagogy and digital tools.",
-          "Digital-skills programmes so incoming students can navigate virtual learning confidently."
-        ]},
-        {"h": "Impact", "items": [
-          "A continuous feedback loop: platform designs and automated pipelines are tested on real student cohorts.",
-          "Standardized teacher onboarding and student digital readiness."
-        ]}
+        {
+          "h": "Challenge",
+          "items": [
+            "Soft skills like mediation need active, scenario-based learning, not passive lectures.",
+            "New staff and students often struggle with digital learning environments without proper onboarding."
+          ]
+        },
+        {
+          "h": "Solution",
+          "items": [
+            "Courses in HR management, mediation and conflict resolution for bachelor students and professionals.",
+            "Complete onboarding tracks for educators, bridging pedagogy and digital tools.",
+            "Digital-skills programmes so incoming students can navigate virtual learning confidently."
+          ]
+        },
+        {
+          "h": "Impact",
+          "items": [
+            "A continuous feedback loop: platform designs and automated pipelines are tested on real student cohorts.",
+            "Standardized teacher onboarding and student digital readiness."
+          ]
+        }
       ]
     },
     {
@@ -251,27 +407,46 @@
       "title": "Distance Learner Success Factors Research",
       "years": "2023",
       "theme": "research",
-      "themes": ["research", "pedagogy"],
-      "topics": ["Educational Research", "SPSS Analysis", "Data-Driven Pedagogy"],
+      "themes": [
+        "research",
+        "pedagogy"
+      ],
+      "topics": [
+        "Educational Research",
+        "SPSS Analysis",
+        "Data-Driven Pedagogy"
+      ],
       "domain": "Educational Research / EdTech",
       "scale": "357 distance-learning students",
       "role": "Lead Researcher (MA Thesis)",
-      "link": {"url": "https://dspace.lu.lv/items/38016941-0a9a-417d-8034-461b11b6a92b", "label": "Read the thesis"},
+      "link": {
+        "url": "https://dspace.lu.lv/items/38016941-0a9a-417d-8034-461b11b6a92b",
+        "label": "Read the thesis"
+      },
       "summary": "Master’s thesis research at the University of Latvia on what drives success in online education. Survey analysis, a pilot study, expert interviews and SPSS correlation analysis showed that self-directed learning skills are the strongest predictor of student success, and the findings became practical course design principles.",
       "sections": [
-        {"h": "Challenge", "items": [
-          "Institutions lacked data on which student competencies matter most for academic achievement.",
-          "Online course design often relied on intuition rather than evidence."
-        ]},
-        {"h": "Method", "items": [
-          "A pilot study, in-depth expert interviews and a survey of 357 distance-learning students.",
-          "SPSS correlation analysis linking learner competencies to academic outcomes.",
-          "Key finding: self-directed learning skills correlate most strongly with performance."
-        ]},
-        {"h": "Impact", "items": [
-          "Concrete course design recommendations that foster self-directed learning.",
-          "Evidence-based frameworks applied to real online courses to improve retention and results."
-        ]}
+        {
+          "h": "Challenge",
+          "items": [
+            "Institutions lacked data on which student competencies matter most for academic achievement.",
+            "Online course design often relied on intuition rather than evidence."
+          ]
+        },
+        {
+          "h": "Method",
+          "items": [
+            "A pilot study, in-depth expert interviews and a survey of 357 distance-learning students.",
+            "SPSS correlation analysis linking learner competencies to academic outcomes.",
+            "Key finding: self-directed learning skills correlate most strongly with performance."
+          ]
+        },
+        {
+          "h": "Impact",
+          "items": [
+            "Concrete course design recommendations that foster self-directed learning.",
+            "Evidence-based frameworks applied to real online courses to improve retention and results."
+          ]
+        }
       ]
     }
   ]

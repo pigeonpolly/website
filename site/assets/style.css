@@ -453,3 +453,7 @@ body.modal-open { overflow: hidden; }
 .form-status { margin: 0; font-size: 15px; }
 .form-status.error { color: #B3261E; }
 .form-status.ok { color: #2E7D5B; }
+.modal.wide { width: min(940px, calc(100vw - 24px)); }
+.doc-pages { display: flex; flex-direction: column; gap: 16px; margin-top: 22px; }
+.doc-pages img { width: 100%; height: auto; border-radius: 10px; background: #fff; box-shadow: 0 8px 24px rgba(43, 26, 81, .15); }
+.modal:focus, .modal:focus-visible { outline: none; }
