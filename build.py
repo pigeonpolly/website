@@ -36,7 +36,12 @@ PAGES = [
     ("art-portfolio/detective", "Mr.Titos", "detective.html", "Detective Mr.Titos."),
     ("art-portfolio/halloween", "Pumpkin Family", "halloween.html", "Welcome to the Pumpkin-Heads family."),
     ("art-portfolio/ai-art", "AI Art", "ai-art.html", "AI art based on the Pigeon Polly traditional art style."),
+    ("sketch-wall", "Sketch Wall", "sketch-wall.html",
+     "Upload your daily sketch, keep your streak and collect Pigeon Polly badges."),
+    ("privacy", "Privacy", "privacy.html", "How pigeonpolly.com handles your data."),
 ]
+# готовые, но пока не открытые страницы: не попадают в sitemap
+UNLISTED = {"sketch-wall"}
 
 
 PORTFOLIO = [
@@ -332,6 +337,10 @@ def build():
         for lang, prefix in LANGS.items():
             canonical, hreflang, switch = lang_bits(path, lang)
             page_body = body.replace("{{projects}}", projects_html(lang)) if "{{projects}}" in body else body
+            # отдельный файл страницы для языка (длинные тексты): privacy.ru.html, privacy.lv.html
+            alt = SRC / "pages" / f"{pathlib.Path(file).stem}.{lang}.html"
+            if lang != "en" and alt.exists():
+                page_body = alt.read_text()
             page = (layout
                     .replace("{{title}}", esc(full_title))
                     .replace("{{description}}", esc(desc))
@@ -353,7 +362,7 @@ def build():
     (OUT / "404.html").write_text(nf)
     # sitemap
     urls = "".join(f"<url><loc>{SITE_URL}/{(v + '/') if v else ''}{(p + '/') if p else ''}</loc></url>"
-                   for p, *_ in PAGES for v in LANGS.values())
+                   for p, *_ in PAGES if p not in UNLISTED for v in LANGS.values())
     (OUT / "sitemap.xml").write_text(
         f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
 
