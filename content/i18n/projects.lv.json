@@ -1,0 +1,66 @@
+{
+  "multimedia-instruction-builder": {
+    "role": "Procesa arhitekte un izstrādātāja",
+    "domain": "EdTech / darba procesu automatizācija",
+    "scale": "Interaktīvi HTML kursu materiāli vairākās valodās",
+    "summary": "Veco Word dokumentu un ekrāna ierakstu pārvēršana interaktīvās daudzvalodu instrukcijās agrāk prasīja stundām ilgu manuālu sinhronizāciju. Automatizēts Python process ar Claude un runas sintēzi tagad mazāk nekā 30 minūtēs izveido bezsaistes HTML materiālus ar ekrānuzņēmumiem, sinhronizētu ierunu un divām valodām."
+  },
+  "ai-course-production-pipeline": {
+    "role": "Procesa arhitekte un izstrādātāja",
+    "domain": "MI automatizācija / EdTech",
+    "scale": "30 slaidu lekcijas izstrāde",
+    "summary": "Neapstrādātu lekciju materiālu pārvēršana zīmola prezentācijās ar ierunu prasīja daudz manuāla darba. Pārnēsājams lokāls process ar Python, LLM un runas sintēzi to automatizēja no sākuma līdz beigām: 8 reizes ātrāk, no gandrīz 5 stundām līdz pusstundai vienai lekcijai."
+  },
+  "agentic-ai-course-operations": {
+    "role": "MI darba procesu arhitekte un automatizācijas vadītāja",
+    "domain": "EdTech / MI automatizācija",
+    "scale": "Operācijas visās Moodle kategorijās",
+    "summary": "Masveida struktūras izmaiņas veselās Moodle kursu kategorijās agrāk nozīmēja katra kursa labošanu ar roku. Darba instrukcijas (runbooks) Claude tagad veic šīs izmaiņas pilnīgi bez uzraudzības, ar kļūdu apstrādi un kursu stāvokļa uzskaiti."
+  },
+  "ai-support-tool": {
+    "role": "Dizainere un izstrādātāja",
+    "domain": "EdTech / komandas rīki",
+    "scale": "Iekšējs rīks mācību dizaina komandai",
+    "summary": "Draudzīgs MI asistents DILC komandai, kas dzīvo animētā pikseļu biroja lapā. Lauka rokasgrāmata zemāk parāda, ko dara katra cilne, kā robots domā un kādi triki ietaupa klikšķus.",
+    "link": "Atvērt rokasgrāmatu (PDF)"
+  },
+  "on-leave-ai-support": {
+    "role": "Dizainere un izstrādātāja",
+    "domain": "EdTech / zināšanu nodošana",
+    "scale": "Komandas atbalsts manā atvaļinājuma laikā",
+    "summary": "Alina 2.0 ir pikseļu lapa, kas aizvieto mani atvaļinājuma laikā: kas izdarīts, kas vēl atvērts, atbildes no manām piezīmēm un daudz kā, uz ko uzklikšķināt. Šeit ir tās lietotāja rokasgrāmata.",
+    "link": "Atvērt rokasgrāmatu (PDF)"
+  },
+  "silent-failure-diagnosis": {
+    "role": "Diagnostikas vadītāja un tehniskā analītiķe",
+    "domain": "EdTech / iekšējo rīku uzticamība",
+    "scale": "Vairāku lietotāju lietotne, kursu izstrādes process",
+    "summary": "Iekšēja MI kursu veidošanas lietotne garos darbos šķietami “sastinga uz visiem laikiem” — bez atcelšanas pogas un bez kļūdām. To norakstīja uz konkrētā datora problēmām. Sistemātiska pārbaude mazāk nekā stundā parādīja atkārtojamu produkta defektu: nevis sastingšanu, bet novecojušu saglabātu statusa karogu bez pārbaudes palaišanas brīdī. Rezultāts — izstrādātājiem gatavs ziņojums ar labojumu un regresijas testiem, kā arī apiešanas ceļš, kas uzreiz atbloķēja kursus."
+  },
+  "published-instructional-guides": {
+    "role": "Autore, ilustratore un izdevēja",
+    "domain": "EdTech / izdevējdarbība",
+    "scale": "2 publicēti mācību ceļveži angļu valodā",
+    "summary": "Uzrakstīju, ilustrēju, maketēju un pati izdevu Amazon divus mācību ceļvežus — “Watercolor Sketches” un “Ink Sketching”. Radošās prasmes tajos balstās mācīšanās teorijā: apzināta prakse, uzdevumi uz laiku un intervālu atkārtošana.",
+    "link": "Manas grāmatas Amazon"
+  },
+  "scalable-learning-platform": {
+    "role": "Platformas arhitekte un metodiskā vadītāja",
+    "domain": "EdTech / LMS",
+    "scale": "600–800 aktīvu kursu",
+    "summary": "Pilnībā tiešsaistes augstskola cieta no “mirušo kopiju” modeļa: katrs kurss tika kopēts katrai programmai, kur to izmantoja. Pārbūve ap meistarkursiem un studentu grupām novērsa dublēto uzturēšanu, samazināja atjauninājumu slodzi par 91% un ļāva platformu vadīt vienam cilvēkam."
+  },
+  "higher-education-teaching": {
+    "role": "Pasniedzēja un metodiskā vadītāja",
+    "domain": "Augstākā izglītība / pasniedzēju apmācība",
+    "scale": "6 gadi tiešsaistes un klātienes mācīšanas",
+    "summary": "Sešus gadus pasniedzu personāla vadību, mediāciju un konfliktu risināšanu pilnībā tiešsaistes koledžās un augstskolās. Mācīšana ir mans poligons pedagoģiskām pieejām. Es arī no nulles izveidoju ievadapmācības programmas pasniedzējiem un digitālo prasmju nometnes studentiem."
+  },
+  "distance-learner-research": {
+    "role": "Vadošā pētniece (maģistra darbs)",
+    "domain": "Izglītības pētniecība / EdTech",
+    "scale": "357 tālmācības studenti",
+    "summary": "Maģistra darba pētījums Latvijas Universitātē par to, kas nosaka panākumus tiešsaistes izglītībā. Aptauja, pilotpētījums, ekspertu intervijas un korelācijas analīze SPSS parādīja, ka pašvadītas mācīšanās prasmes ir spēcīgākais studentu panākumu prognozētājs. Secinājumi kļuva par praktiskiem kursu dizaina principiem.",
+    "link": "Lasīt darbu"
+  }
+}

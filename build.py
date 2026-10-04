@@ -166,7 +166,7 @@ def block_html(name):
     return f'<div class="blk" id="blk-{name}"><style>{scope_css(styles, "#blk-" + name)}</style>{body}</div>'
 
 
-def projects_html():
+def projects_html(lang="en"):
     data = json.loads((CONTENT / "projects.json").read_text())
     themes = data["themes"]
     legend = "".join(
@@ -175,7 +175,22 @@ def projects_html():
         for k, t in themes.items())
     books, dialogs = [], []
     heights = [208, 192, 216, 200, 184, 212, 196]
+    tr_file = CONTENT / "i18n" / f"projects.{lang}.json"
+    tr = json.loads(tr_file.read_text()) if lang != "en" and tr_file.exists() else {}
+    heads = {"lv": {"Challenge": "Izaicinājums", "Solution": "Risinājums", "Impact": "Rezultāts", "Method": "Metode", "What it does": "Ko tas dara", "Why": "Kāpēc"},
+             "ru": {"Challenge": "Задача", "Solution": "Решение", "Impact": "Результат", "Method": "Метод", "What it does": "Что делает", "Why": "Зачем"}}.get(lang, {})
     for n, p in enumerate(data["projects"]):
+        p = dict(p)
+        o = tr.get(p["slug"], {})
+        for key in ("role", "domain", "scale", "summary"):
+            if o.get(key):
+                p[key] = o[key]
+        if o.get("sections"):
+            p["sections"] = [{"h": h, "items": items} for h, items in o["sections"]]
+        else:
+            p["sections"] = [{"h": heads.get(sec["h"], sec["h"]), "items": sec["items"]} for sec in p["sections"]]
+        if o.get("link") and p.get("link"):
+            p["link"] = dict(p["link"], label=o["link"])
         t = themes[p["theme"]]
         dots = "".join(f'<i style="background:{themes[k]["color"]}"></i>' for k in p["themes"] if k != p["theme"])
         books.append(
@@ -271,18 +286,19 @@ def build():
             end = body.index("}}", start)
             body = body[:start] + block_html(body[start + 8:end]) + body[end + 2:]
         body = body.replace("{{cv}}", cv_html() if "{{cv}}" in body else "")
-        body = body.replace("{{projects}}", projects_html() if "{{projects}}" in body else "")
+
         body = body.replace("{{ebooks}}", ebooks_html() if "{{ebooks}}" in body else "")
         full_title = title if not path else f"{title} · Pigeon Polly Art Lab"
         for lang, prefix in LANGS.items():
             canonical, hreflang, switch = lang_bits(path, lang)
+            page_body = body.replace("{{projects}}", projects_html(lang)) if "{{projects}}" in body else body
             page = (layout
                     .replace("{{title}}", esc(full_title))
                     .replace("{{description}}", esc(desc))
                     .replace("{{canonical}}", canonical)
                     .replace("{{nav}}", nav_html(path))
                     .replace("{{body_class}}", "home" if not path else "inner")
-                    .replace("{{content}}", body))
+                    .replace("{{content}}", page_body))
             page = localize(page, lang)
             page = page.replace("{{hreflang}}", hreflang).replace("{{lang_switch}}", switch)
             dest = OUT / prefix / path / "index.html"
