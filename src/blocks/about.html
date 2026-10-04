@@ -20,6 +20,10 @@
   .txt { margin: 0 0 12px; max-width: 52ch; font-size: 17px; line-height: 1.7; color: #4A3E68; }
   .btn { display: inline-block; margin-top: 10px; padding: 12px 24px; border-radius: 999px; border: 1.5px solid #2B1A51; color: #2B1A51; font-size: 15px; font-weight: 500; text-decoration: none; transition: background-color .2s, color .2s; }
   .btn:hover { background: #2B1A51; color: #F3EFFA; }
+  .about-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
+  .about-actions .btn { margin-top: 0; background: none; font-family: 'Karla', sans-serif; cursor: pointer; }
+  .about-actions .btn-solid { background: #2B1A51; color: #F3EFFA; }
+  .about-actions .btn-solid:hover { background: #3C2670; }
   .btn:focus-visible { outline: 3px solid #D85A30; outline-offset: 3px; }
 
   @media (max-width: 800px) {
@@ -42,6 +46,9 @@
     <p class="txt">I'm a learning experience designer with over six years in digital education. I design online courses and integrate AI into the learning process, from course production to everyday teaching workflows.</p>
     <p class="txt">I'm also doing a master's in Creative Industries and Growth Management, exploring how culture shapes the creative economy.</p>
     <p class="txt">And I paint. The drawing here is the very first Pigeon Polly, made while I was writing my thesis. Studying and drawing have gone hand in hand ever since, and this lab is where they meet.</p>
-    <a class="btn" href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener">Connect on LinkedIn</a>
+    <div class="about-actions">
+      <button class="btn btn-solid" type="button" data-open="contact">Write to me</button>
+      <a class="btn" href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener">Connect on LinkedIn</a>
+    </div>
   </div>
 </section>

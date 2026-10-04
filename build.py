@@ -20,6 +20,8 @@ SITE_URL = "https://www.pigeonpolly.com"
 PAGES = [
     ("", "Pigeon Polly Art Lab", "home.html",
      "Creative AI, learning that fits different minds, and illustrated worlds by Alina Otkinska."),
+    ("projects", "Projects", "projects.html",
+     "Learning design, EdTech and AI automation projects by Alina Otkinska."),
     ("e-books", "E-Books", "e-books.html", "E-books by Alina Otkinska."),
     ("exhibitions", "Exhibitions", "exhibitions.html", "Exhibitions of Pigeon Polly art."),
     ("publications", "Publications", "publications.html", "Publications of Pigeon Polly art."),
@@ -44,6 +46,7 @@ PORTFOLIO = [
 
 NAV = [
     ("", "Home"),
+    ("projects", "Projects"),
     ("e-books", "E-Books"),
     ("exhibitions", "Exhibitions"),
     ("publications", "Publications"),
@@ -148,6 +151,46 @@ def block_html(name):
     return f'<div class="blk" id="blk-{name}"><style>{scope_css(styles, "#blk-" + name)}</style>{body}</div>'
 
 
+def projects_html():
+    data = json.loads((CONTENT / "projects.json").read_text())
+    themes = data["themes"]
+    legend = "".join(
+        f'<button class="theme-chip" data-theme="{k}" aria-pressed="false">'
+        f'<i style="background:{t["color"]}"></i>{esc(t["label"])}</button>'
+        for k, t in themes.items())
+    books, dialogs = [], []
+    heights = [208, 192, 216, 200, 184, 212, 196]
+    for n, p in enumerate(data["projects"]):
+        t = themes[p["theme"]]
+        dots = "".join(f'<i style="background:{themes[k]["color"]}"></i>' for k in p["themes"] if k != p["theme"])
+        books.append(
+            f'<div class="book-slot"><button class="spine" data-open="p-{p["slug"]}" data-themes="{" ".join(p["themes"])}" '
+            f'style="--c:{t["color"]};--ink:{t["ink"]};height:{heights[n % len(heights)]}px" '
+            f'aria-label="{esc(p["title"])}, {esc(p["years"])}">'
+            f'<span class="spine-title">{esc(p["title"])}</span>'
+            f'<span class="spine-dots">{dots}</span>'
+            f'<span class="spine-year">{esc(p["years"])}</span></button></div>')
+        secs = "".join(
+            f'<h3>{esc(sec["h"])}</h3><ul>' + "".join(f"<li>{esc(i)}</li>" for i in sec["items"]) + "</ul>"
+            for sec in p["sections"])
+        tags = "".join(f'<span class="tag">{esc(x)}</span>' for x in p["topics"])
+        link = (f'<p><a class="pill" href="{esc(p["link"]["url"])}" target="_blank" rel="noopener">{esc(p["link"]["label"])} ↗</a></p>'
+                if p.get("link") else "")
+        dialogs.append(
+            f'<dialog class="modal project" id="p-{p["slug"]}" aria-labelledby="p-{p["slug"]}-t">'
+            f'<div class="modal-band" style="background:{t["color"]}"></div>'
+            f'<button class="modal-close" aria-label="Close">✕</button>'
+            f'<p class="modal-kicker">{esc(t["label"])} · {esc(p["years"])}</p>'
+            f'<h2 id="p-{p["slug"]}-t">{esc(p["title"])}</h2>'
+            f'<dl class="facts"><div><dt>Role</dt><dd>{esc(p["role"])}</dd></div>'
+            f'<div><dt>Domain</dt><dd>{esc(p["domain"])}</dd></div>'
+            f'<div><dt>Scale</dt><dd>{esc(p["scale"])}</dd></div></dl>'
+            f'<p class="modal-lead">{esc(p["summary"])}</p>{secs}'
+            f'<p class="tags">{tags}</p>{link}</dialog>')
+    return (f'<div class="legend" role="group" aria-label="Filter by theme">{legend}</div>'
+            f'<div class="bookshelf">{"".join(books)}</div>' + "".join(dialogs))
+
+
 def build():
     layout = (SRC / "layout.html").read_text()
     for path, title, file, desc in PAGES:
@@ -160,6 +203,7 @@ def build():
             start = body.index("{{block:")
             end = body.index("}}", start)
             body = body[:start] + block_html(body[start + 8:end]) + body[end + 2:]
+        body = body.replace("{{projects}}", projects_html() if "{{projects}}" in body else "")
         body = body.replace("{{ebooks}}", ebooks_html() if "{{ebooks}}" in body else "")
         full_title = title if not path else f"{title} · Pigeon Polly Art Lab"
         page = (layout

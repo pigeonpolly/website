@@ -336,3 +336,120 @@ h1, h2 { font-family: var(--serif); font-weight: 600; line-height: 1.1; }
 /* ---------- Блоки главной (свои стили у каждого, см. src/blocks) ---------- */
 .blk { overflow: hidden; }
 .blk img { display: block; }
+
+/* ---------- Библиотека проектов ---------- */
+.library { padding: 8px var(--gutter) 72px; }
+.legend { display: flex; flex-wrap: wrap; gap: 10px; margin: 8px 0 28px; }
+.theme-chip {
+  display: inline-flex; align-items: center; gap: 8px;
+  padding: 8px 14px; border-radius: 999px;
+  border: 1.5px solid var(--line); background: none;
+  color: var(--muted); font: 500 14px/1 var(--sans); cursor: pointer;
+  transition: border-color .2s, color .2s;
+}
+.theme-chip i { width: 12px; height: 12px; border-radius: 50%; flex: none; }
+.theme-chip:hover, .theme-chip[aria-pressed="true"] { border-color: var(--muted); color: var(--text); }
+.bookshelf {
+  --row: 232px;
+  display: flex; flex-wrap: wrap; align-content: flex-start;
+  gap: 0 10px; padding: 0 18px;
+  border-radius: 12px;
+  background:
+    repeating-linear-gradient(to bottom,
+      transparent 0 calc(var(--row) - 14px),
+      #8a5a3c calc(var(--row) - 14px) calc(var(--row) - 10px),
+      #6b4430 calc(var(--row) - 10px) var(--row));
+  background-color: rgba(0, 0, 0, .12);
+}
+.book-slot { height: var(--row); padding-bottom: 14px; display: flex; align-items: flex-end; }
+.spine {
+  position: relative; width: 64px; max-height: 210px;
+  display: flex; flex-direction: column; align-items: center; justify-content: space-between;
+  gap: 8px; padding: 12px 0 10px;
+  border: 0; border-radius: 6px 6px 3px 3px;
+  background: var(--c); color: var(--ink);
+  box-shadow: inset -6px 0 0 rgba(0, 0, 0, .14), inset 3px 0 0 rgba(255, 255, 255, .18), 0 6px 14px rgba(0, 0, 0, .25);
+  cursor: pointer; transform-origin: bottom center;
+  transition: transform .25s, opacity .25s, filter .25s;
+}
+.spine::before, .spine::after { content: ''; position: absolute; left: 8px; right: 8px; height: 2px; background: currentColor; opacity: .35; }
+.spine::before { top: 6px; }
+.spine::after { bottom: 30px; }
+.spine:hover, .spine:focus-visible { transform: translateY(-10px) rotate(-2deg); }
+.spine-title {
+  writing-mode: vertical-rl; transform: rotate(180deg);
+  font: 600 14px/1.15 var(--serif); text-align: left;
+  max-height: 150px; overflow: hidden; padding: 0 2px;
+}
+.spine-dots { display: flex; flex-direction: column; gap: 4px; }
+.spine-dots i { width: 9px; height: 9px; border-radius: 50%; border: 1.5px solid rgba(255, 255, 255, .7); }
+.spine-year { font: 500 10px/1 var(--sans); letter-spacing: -.02em; opacity: .85; white-space: nowrap; }
+.bookshelf.filtering .spine:not(.match) { opacity: .25; filter: grayscale(.6); }
+@media (max-width: 600px) {
+  .bookshelf { --row: 206px; gap: 0 7px; padding: 0 10px; justify-content: center; }
+  .spine { width: 52px; max-height: 184px; }
+  .spine-title { font-size: 12.5px; max-height: 128px; }
+}
+
+/* ---------- Всплывающие окна (проекты, письмо) ---------- */
+.modal {
+  width: min(680px, calc(100vw - 24px));
+  max-height: calc(100vh - 48px);
+  padding: 32px clamp(20px, 4vw, 40px) 36px;
+  border: 0; border-radius: 20px;
+  background: #F4F0FA; color: #2B1A51;
+  font-family: var(--sans);
+  box-shadow: 0 30px 80px rgba(0, 0, 0, .45);
+  overflow-y: auto;
+}
+.modal::backdrop { background: rgba(20, 12, 40, .7); }
+.modal[open] { animation: modal-in .2s ease-out; }
+@keyframes modal-in { from { opacity: 0; transform: translateY(12px); } }
+.modal-band { position: absolute; left: 0; right: 0; top: 0; height: 8px; }
+.modal-close {
+  position: absolute; top: 14px; right: 14px; width: 40px; height: 40px;
+  border-radius: 50%; border: 1.5px solid #2B1A51; background: none;
+  color: #2B1A51; font-size: 16px; cursor: pointer;
+}
+.modal-close:hover { background: #2B1A51; color: #F3EFFA; }
+.modal-kicker { margin: 4px 0 8px; font: italic 400 17px/1.3 var(--serif); color: var(--orange); }
+.modal h2 { margin: 0 48px 18px 0; font-size: clamp(24px, 3.4vw, 32px); color: #2B1A51; }
+.modal h3 { margin: 22px 0 8px; font: 600 18px/1.3 var(--serif); color: #2B1A51; }
+.modal ul { margin: 0; padding-left: 20px; }
+.modal li { margin: 0 0 6px; line-height: 1.6; color: #4A3E68; }
+.modal-lead { margin: 0; line-height: 1.7; color: #4A3E68; }
+.facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin: 0 0 20px; }
+.facts div { padding: 10px 12px; border-radius: 12px; background: #fff; }
+.facts dt { font-size: 12px; letter-spacing: .05em; text-transform: uppercase; color: #8C7FB0; }
+.facts dd { margin: 4px 0 0; font-size: 14px; line-height: 1.4; }
+@media (max-width: 560px) { .facts { grid-template-columns: 1fr; } }
+.tags { display: flex; flex-wrap: wrap; gap: 6px; margin: 22px 0 0; }
+.tag { padding: 4px 10px; border-radius: 999px; background: #E3DEF2; font-size: 13px; color: #2B1A51; }
+.pill {
+  display: inline-block; margin-top: 8px; padding: 11px 20px; border-radius: 999px;
+  border: 1.5px solid #2B1A51; color: #2B1A51; font-weight: 500; text-decoration: none;
+}
+.pill:hover, .pill:focus-visible { background: #2B1A51; color: #F3EFFA; }
+body.modal-open { overflow: hidden; }
+
+/* форма письма */
+.contact-form { display: flex; flex-direction: column; gap: 14px; margin-top: 8px; }
+.contact-form label { display: flex; flex-direction: column; gap: 6px; font-weight: 500; font-size: 15px; }
+.contact-form label span { font-weight: 400; color: #8C7FB0; }
+.contact-form input, .contact-form textarea {
+  font: 16px/1.5 var(--sans); color: #2B1A51;
+  padding: 12px 14px; border-radius: 12px;
+  border: 1.5px solid #CFC7E8; background: #fff;
+}
+.contact-form textarea { min-height: 150px; resize: vertical; }
+.contact-form input:focus, .contact-form textarea:focus { outline: none; border-color: #534AB7; box-shadow: 0 0 0 3px rgba(83, 74, 183, .2); }
+.contact-form .hp { position: absolute; left: -9999px; }
+.contact-form button[type="submit"] {
+  align-self: flex-start; padding: 12px 26px; border-radius: 999px; border: 0;
+  background: #2B1A51; color: #fff; font: 500 15px/1 var(--sans); cursor: pointer;
+}
+.contact-form button[type="submit"]:hover { background: #3C2670; }
+.contact-form button[disabled] { opacity: .6; cursor: wait; }
+.form-status { margin: 0; font-size: 15px; }
+.form-status.error { color: #B3261E; }
+.form-status.ok { color: #2E7D5B; }

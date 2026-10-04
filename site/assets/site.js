@@ -27,6 +27,79 @@
     });
   });
 
+  // Всплывающие окна: кнопка с data-open="id" открывает <dialog id="id">
+  document.querySelectorAll('[data-open]').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const d = document.getElementById(btn.dataset.open);
+      if (!d || !d.showModal) return;
+      d.showModal();
+      document.body.classList.add('modal-open');
+      history.replaceState(null, '', '#' + d.id);
+    });
+  });
+  document.querySelectorAll('dialog.modal').forEach(d => {
+    d.querySelector('.modal-close')?.addEventListener('click', () => d.close());
+    d.addEventListener('click', e => { if (e.target === d) d.close(); });
+    d.addEventListener('close', () => {
+      document.body.classList.remove('modal-open');
+      if (location.hash === '#' + d.id) history.replaceState(null, '', location.pathname);
+    });
+  });
+  // прямая ссылка на проект: /projects/#p-...
+  if (location.hash) {
+    const d = document.getElementById(location.hash.slice(1));
+    if (d && d.tagName === 'DIALOG' && d.showModal) { d.showModal(); document.body.classList.add('modal-open'); }
+  }
+
+  // Фильтр тем на полке проектов
+  const shelf = document.querySelector('.bookshelf');
+  document.querySelectorAll('.theme-chip').forEach(chip => {
+    chip.addEventListener('click', () => {
+      const on = chip.getAttribute('aria-pressed') !== 'true';
+      document.querySelectorAll('.theme-chip').forEach(c => c.setAttribute('aria-pressed', 'false'));
+      chip.setAttribute('aria-pressed', on);
+      shelf.classList.toggle('filtering', on);
+      shelf.querySelectorAll('.spine').forEach(b =>
+        b.classList.toggle('match', on && b.dataset.themes.split(' ').includes(chip.dataset.theme)));
+    });
+  });
+
+  // Форма письма
+  const form = document.querySelector('.contact-form');
+  if (form) {
+    form.addEventListener('submit', async e => {
+      e.preventDefault();
+      const status = form.querySelector('.form-status'), btn = form.querySelector('button[type="submit"]');
+      if (form.elements._honey.value) return;
+      btn.disabled = true;
+      status.className = 'form-status';
+      status.textContent = 'Sending…';
+      try {
+        const res = await fetch(form.action, {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+          body: JSON.stringify({
+            email: form.elements.email.value,
+            message: form.elements.message.value,
+            _subject: 'New message from pigeonpolly.com',
+            _replyto: form.elements.email.value,
+            _template: 'table',
+          }),
+        });
+        const data = await res.json().catch(() => ({}));
+        if (!res.ok || String(data.success) === 'false') throw new Error(data.message || res.status);
+        form.reset();
+        status.className = 'form-status ok';
+        status.textContent = 'Thank you! Your message is on its way. I’ll get back to you soon.';
+      } catch (err) {
+        status.className = 'form-status error';
+        status.textContent = 'Sorry, the message didn’t go through. Please try again a bit later.';
+      } finally {
+        btn.disabled = false;
+      }
+    });
+  }
+
   const links = [...document.querySelectorAll('a[data-lightbox]')];
   if (!links.length) return;
   const box = document.createElement('div');

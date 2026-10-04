@@ -9,6 +9,7 @@
 - `src/pages/*.html` — содержимое страниц.
 - `content/galleries/*.json` — галереи (картинки, подписи, порядок).
 - `content/ebooks.json` — список книг.
+- `content/projects.json` — проекты для книжной полки на /projects (темы, цвета, описания).
 - `build.py` — собирает страницы из `src/` и `content/` в `site/`.
 - `tools/add_images.py` — ужимает картинки и добавляет их в галерею.
 - `tools/import_uploads.py` — разбирает картинки, загруженные в корень репозитория через GitHub (префиксы `polly_`, `chew_`, `aiart_` и т. д.), по галереям.
