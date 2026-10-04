@@ -139,7 +139,7 @@ a:hover { color: var(--text); }
 .menu-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
 .menu-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-@media (max-width: 1440px) {
+@media (max-width: 1200px) {
   .menu-toggle { display: flex; }
   .site-nav {
     position: fixed;
@@ -493,7 +493,7 @@ body.modal-open { overflow: hidden; }
 .lang-switch a[aria-current="true"] { color: var(--bg); background: var(--peach); }
 .site-nav { order: 1; }
 .menu-toggle { order: 3; }
-@media (min-width: 1441px) { .lang-switch { order: 3; margin: 0 0 0 4px; } .site-nav { margin-left: auto; } }
+@media (min-width: 1201px) { .lang-switch { order: 3; margin: 0 0 0 4px; } .site-nav { margin-left: auto; } }
 @media (max-width: 480px) {
   .site-header { gap: 10px; }
   .brand { font-size: 17px; gap: 8px; }
@@ -595,4 +595,4 @@ html:not([lang="en"]) .hero h1 { white-space: normal; }
 @media (max-width: 1000px) { .services { grid-template-columns: 1fr; } .steps ol { grid-template-columns: 1fr 1fr; } }
 @media (max-width: 560px) { .steps ol { grid-template-columns: 1fr; } }
 /* меню стало длиннее — чуть компактнее пункты на компьютере */
-@media (min-width: 1441px) { .site-nav a, .sub-toggle { padding: 8px 10px; font-size: 14.5px; } }
+@media (min-width: 1201px) { .site-nav a, .sub-toggle { padding: 8px 10px; font-size: 14.5px; } }

@@ -231,7 +231,7 @@
     if (spot === 'floor' && !body.classList.contains('sleeping')) { y = floorY(); x = Math.min(x, innerWidth - W - 10); place(); return; }
     clearTimeout(st);
     st = setTimeout(() => {
-      if (spot === 'button' || spot === 'header' && innerWidth < 1441) { token++; body.classList.remove('sleeping'); zzz.classList.remove('show'); goFloor(); }
+      if (spot === 'button' || spot === 'header' && innerWidth < 1201) { token++; body.classList.remove('sleeping'); zzz.classList.remove('show'); goFloor(); }
       if (spot === 'floor') { y = floorY(); place(); }
     }, 150);
   };

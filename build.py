@@ -54,8 +54,6 @@ NAV = [
     ("exhibitions", "Exhibitions"),
     ("publications", "Publications"),
     ("art-portfolio", "Art Portfolio"),
-    ("https://www.patreon.com/cw/pigeon_polly", "Patreon Blog"),
-    ("https://www.pinterest.com/pigeonpollyart/", "Pinterest"),
 ]
 
 esc = html.escape
