@@ -196,6 +196,25 @@ def projects_html():
             f'<div class="bookshelf">{"".join(books)}</div>' + "".join(dialogs))
 
 
+def cv_html():
+    d = json.loads((CONTENT / "cv.json").read_text())
+
+    def items(lst, key="years"):
+        out = []
+        for it in lst:
+            text = f'<p>{esc(it["text"])}</p>' if it.get("text") else ""
+            out.append(f'<li><span class="when">{esc(it[key])}</span>'
+                       f'<h3>{esc(it["title"])}</h3><p class="org">{esc(it["org"])}</p>{text}</li>')
+        return "".join(out)
+
+    return (
+        '<div class="cv-grid">'
+        f'<section class="cv-col"><h2 class="cv-title">Experience</h2><ol class="timeline">{items(d["experience"])}</ol></section>'
+        f'<section class="cv-col"><h2 class="cv-title">Education</h2><ol class="timeline">{items(d["education"])}</ol></section>'
+        f'<section class="cv-col"><h2 class="cv-title">Courses &amp; certificates</h2><ol class="timeline compact">{items(d["courses"], "year")}</ol></section>'
+        '</div>')
+
+
 def build():
     layout = (SRC / "layout.html").read_text()
     for path, title, file, desc in PAGES:
@@ -208,6 +227,7 @@ def build():
             start = body.index("{{block:")
             end = body.index("}}", start)
             body = body[:start] + block_html(body[start + 8:end]) + body[end + 2:]
+        body = body.replace("{{cv}}", cv_html() if "{{cv}}" in body else "")
         body = body.replace("{{projects}}", projects_html() if "{{projects}}" in body else "")
         body = body.replace("{{ebooks}}", ebooks_html() if "{{ebooks}}" in body else "")
         full_title = title if not path else f"{title} · Pigeon Polly Art Lab"
