@@ -51,21 +51,27 @@
   </nav>
 </header>
 <main id="main">
-<section class="page-head">
+<section class="page-head ch-head">
+  <div class="ch-head-text">
   <p class="topics">daily sketch challenge</p>
   <h1>Daily Challenge</h1>
   <p class="lead">Every day Polly tears off a new page: one subject, three colours and a few minutes. Draw it, make a card and share your work with #dailypigeonpolly.</p>
-  <p class="lead ch-materials">Any materials are welcome: pencil, pen, markers, crayons, paint or digital. Drawing with one colour? Switch to “Black &amp; white”.</p>
+  <p class="lead ch-materials">Any materials are welcome: pencil, pen, markers, crayons, paint or digital.</p>
+  </div>
+  <div class="bw-pick" id="ch-bw-pick">
+    <div class="bw-polly" id="ch-bw-polly" aria-hidden="true"></div>
+    <div class="bw-body">
+      <p class="bw-q" id="ch-bw-q"></p>
+      <div class="ch-level" id="ch-palette" role="group" aria-label="Colour mode"></div>
+    </div>
+  </div>
 </section>
 <section class="ch" id="challenge">
   <div class="ch-grid">
     <div id="ch-cal" class="ch-cal"></div>
     <div class="ch-side">
       <div class="ch-card-box">
-        <div class="ch-toggles">
-          <div class="ch-level" id="ch-palette" role="group" aria-label="Colour mode"></div>
-          <div class="ch-level" id="ch-level" role="group" aria-label="Level"></div>
-        </div>
+        <div class="ch-level" id="ch-level" role="group" aria-label="Level"></div>
         <div class="ch-clock" id="ch-clock" aria-live="off">00:00</div>
         <div class="ch-bar" id="ch-bar"></div>
         <p class="ch-stage" id="ch-stage"></p>

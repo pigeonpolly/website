@@ -51,21 +51,27 @@
   </nav>
 </header>
 <main id="main">
-<section class="page-head">
+<section class="page-head ch-head">
+  <div class="ch-head-text">
   <p class="topics">ежедневный скетч-челлендж</p>
   <h1>Челлендж</h1>
   <p class="lead">Каждый день Полли отрывает новый листок: один предмет, три цвета и несколько минут. Рисуйте, делайте карточку и делитесь работами с хэштегом #dailypigeonpolly.</p>
-  <p class="lead ch-materials">Подходят любые материалы: карандаш, ручка, маркеры, мелки, краски или цифра. Рисуете одним цветом? Переключите на «Ч/Б».</p>
+  <p class="lead ch-materials">Подходят любые материалы: карандаш, ручка, маркеры, мелки, краски или цифра.</p>
+  </div>
+  <div class="bw-pick" id="ch-bw-pick">
+    <div class="bw-polly" id="ch-bw-polly" aria-hidden="true"></div>
+    <div class="bw-body">
+      <p class="bw-q" id="ch-bw-q"></p>
+      <div class="ch-level" id="ch-palette" role="group" aria-label="Colour mode"></div>
+    </div>
+  </div>
 </section>
 <section class="ch" id="challenge">
   <div class="ch-grid">
     <div id="ch-cal" class="ch-cal"></div>
     <div class="ch-side">
       <div class="ch-card-box">
-        <div class="ch-toggles">
-          <div class="ch-level" id="ch-palette" role="group" aria-label="Colour mode"></div>
-          <div class="ch-level" id="ch-level" role="group" aria-label="Уровень"></div>
-        </div>
+        <div class="ch-level" id="ch-level" role="group" aria-label="Уровень"></div>
         <div class="ch-clock" id="ch-clock" aria-live="off">00:00</div>
         <div class="ch-bar" id="ch-bar"></div>
         <p class="ch-stage" id="ch-stage"></p>

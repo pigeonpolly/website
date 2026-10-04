@@ -31,6 +31,7 @@
     hint2Bw: ['Build up the darks with hatching, dots or solid fills.', 'Наберите тёмные места штриховкой, точками или заливкой.', 'Veido tumšās vietas ar svītrojumu, punktiem vai pilnu aizkrāsojumu.'],
     bday: ['Today is my birthday! Draw something festive with me 🎂', 'Сегодня мой день рождения! Нарисуйте со мной что-нибудь праздничное 🎂', 'Šodien ir mana dzimšanas diena! Uzzīmē ar mani kaut ko svētku 🎂'],
     today: ['Today', 'Сегодня', 'Šodien'],
+    bwQ: ['Only a pen or ink today?', 'Сегодня только ручка или тушь?', 'Šodien tikai pildspalva vai tuša?'],
     locked: ['Opens on this day', 'Откроется в этот день', 'Atvērsies šajā dienā'],
     photo: ['Add a photo of my sketch', 'Добавить фото рисунка', 'Pievienot skices foto'],
     photoChange: ['Change photo', 'Заменить фото', 'Mainīt foto'],
@@ -163,13 +164,19 @@
   const renderMin = () => { $('#ch-min').textContent = `${minutes()} ${t('min')}`; };
   renderCal(true);
 
-  // ---------- цвет / Ч/Б ----------
-  const pm = $('#ch-palette');
+  // ---------- цвет / Ч/Б: Полли в тёмных очках ----------
+  const COOL = ['......ddd.....', '.....dbbbd....', '....dggggggg..', '....dbgwgggoo.', '....dbbbbbdo..', '...dbbbbbbd...', '..dbbsbbbbd...',
+    '.dbbssbbbbd...', 'dbbssbbbbbd...', 'dbbbbbbbbd....', '.ddbbbbbdd....', '...ddddd......', '....o..o......', '...oo.oo......'];
+  const COOLC = { d: '#1a1528', b: '#7f81bf', s: '#5e5a9c', g: '#0d0a14', w: '#ffffff', o: '#f2a73b' };
+  document.getElementById('ch-bw-polly').innerHTML = `<svg viewBox="0 0 14 14" shape-rendering="crispEdges">${COOL.map((r, y) => [...r].map((ch, x) => COOLC[ch] ? `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${COOLC[ch]}"/>` : '').join('')).join('')}</svg>`;
+  document.getElementById('ch-bw-q').textContent = t('bwQ');
+  const pick = document.getElementById('ch-bw-pick'); pick.classList.toggle('on', bw);
+  const pm = document.getElementById('ch-palette');
   pm.innerHTML = ['color', 'bw'].map(v => `<button type="button" data-v="${v}" aria-pressed="${(v === 'bw') === bw}">${t(v === 'bw' ? 'modeBw' : 'modeColor')}</button>`).join('');
   pm.addEventListener('click', e => {
     const b = e.target.closest('button'); if (!b) return;
     bw = b.dataset.v === 'bw'; try { localStorage.setItem('ch-bw', bw ? '1' : '0'); } catch (err) { /* без памяти */ }
-    pm.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    pm.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b)); pick.classList.toggle('on', bw);
     renderCal(false); renderDiary(); draw(); $('#ch-card').innerHTML = '';
   });
 
