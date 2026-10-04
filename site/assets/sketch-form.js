@@ -1,5 +1,6 @@
 // Форма «Прислать рисунок на стену»: обычная отправка в FormSubmit (файлы не работают через AJAX)
-// в невидимый iframe; FormSubmit перенаправляет его на /assets/sent.html — так понимаем, что всё ушло.
+// в невидимый iframe. Прочитать ответ FormSubmit нельзя (другой сайт), поэтому: ответ пришёл в iframe —
+// значит отправлено; ошибка — только если нет интернета или ответа нет 45 секунд.
 (() => {
   const form = document.querySelector('.sketch-form');
   if (!form) return;
@@ -48,6 +49,7 @@
   let waiting = false;
   form.addEventListener('submit', e => {
     if (form.elements._honey.value) { e.preventDefault(); return; }
+    if (navigator.onLine === false) { e.preventDefault(); done(false); return; }
     waiting = true; btn.disabled = true;
     status.className = 'form-status'; status.textContent = t('sending');
     setTimeout(() => { if (waiting) done(false); }, 45000);
@@ -60,8 +62,6 @@
   }
   sink.addEventListener('load', () => {
     if (!waiting) return;
-    let ok = false;
-    try { ok = /\/assets\/sent\.html$/.test(sink.contentWindow.location.pathname); } catch (e) { ok = false; }
-    done(ok);
+    done(navigator.onLine !== false);
   });
 })();
