@@ -49,16 +49,34 @@
     let a = h >>> 0;
     return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let x = Math.imul(a ^ a >>> 15, 1 | a); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296; };
   }
+  // день ЭКСТРА: свой случайный день каждый месяц, число не повторяет прошлый месяц
+  const extraMemo = {};
+  function extraDay(y, m) {
+    const key = y * 12 + m; if (extraMemo[key]) return extraMemo[key];
+    const days = new Date(y, m + 1, 0).getDate(), rm = rngFor('extra-' + y + '-' + m);
+    let v = 1 + Math.floor(rm() * days);
+    if (key > 2026 * 12 + 9) { const prev = extraDay(m ? y : y - 1, m ? m - 1 : 11); while (v === prev) v = 1 + Math.floor(rm() * days); }
+    return (extraMemo[key] = v);
+  }
+  let order = null;
+  function subjectOrder() {
+    if (order) return order;
+    const r = rngFor('polly-order'); order = D.subjects.map((_, i) => i);
+    for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
+    return order;
+  }
   function themeFor(d) {
     const r = rngFor('polly-' + keyOf(d));
-    const subject = D.subjects[Math.floor(r() * D.subjects.length)];
+    // до 5 октября 2026 — старая формула (первые 98 тем), дальше все темы по кругу без повторов
+    const legacy = Math.floor(r() * 98);
+    const n = Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 9, 5)) / 864e5);
+    const subject = n < 0 ? D.subjects[legacy] : D.subjects[subjectOrder()[n % D.subjects.length]];
     const cols = D.colors.slice();
     for (let i = cols.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [cols[i], cols[j]] = [cols[j], cols[i]]; }
     const time = D.times[Math.floor(r() * D.times.length)];
     const day = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
     // раз в месяц — день ЭКСТРА (свой случайный день для каждого месяца)
-    const rm = rngFor('extra-' + d.getFullYear() + '-' + d.getMonth());
-    const extra = d.getDate() === 1 + Math.floor(rm() * new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate());
+    const extra = d.getDate() === extraDay(d.getFullYear(), d.getMonth());
     return { subject: subject[L], colors: cols.slice(0, 3), time, extra, tip: D.tips[day % D.tips.length][L] };
   }
   let sel = new Date(today), selKey = todayKey, theme = themeFor(sel);
@@ -195,13 +213,16 @@
     for (let i = 1; i <= days; i++) {
       const d = new Date(view.getFullYear(), view.getMonth(), i), k = keyOf(d), e = diary[k];
       if (d < START) { html += `<span class="day before"><b>${i}</b></span>`; continue; }
-      if (d > t0) { html += `<span class="day locked" title="${t('locked')}"><b>${i}</b><i aria-hidden="true">🔒</i></span>`; continue; }
+      if (d > t0) { html += `<span class="day locked${i === extraDay(d.getFullYear(), d.getMonth()) ? ' extra' : ''}" title="${t('locked')}"><b>${i}</b><i aria-hidden="true">🔒</i></span>`; continue; }
       const th = themeFor(d);
       html += `<button type="button" class="day${th.extra ? ' extra' : ''}${k === todayKey ? ' today' : ''}${k === selKey ? ' sel' : ''}" data-k="${k}">`
         + (e && e.img ? `<img src="${e.img}" alt="">` : '')
         + `<b>${i}</b><span class="d-subj">${th.subject}</span><span class="d-dots">${th.colors.map(c => `<i style="background:${c.hex}"></i>`).join('')}</span></button>`;
     }
     $('#ch-grid').innerHTML = html;
+    let lg = $('#ch-legend');
+    if (!lg) { lg = document.createElement('p'); lg.id = 'ch-legend'; lg.className = 'extra-legend'; $('#ch-grid').after(lg); }
+    lg.innerHTML = `<span aria-hidden="true">✦</span> ${t('extra')}`;
     $('#ch-prev').disabled = view <= START;
   }
   $('#ch-grid').addEventListener('click', e => {
