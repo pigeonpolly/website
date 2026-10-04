@@ -793,7 +793,11 @@ button.day:hover { background: rgba(255, 255, 255, .12); transform: translateY(-
 .ch-materials { margin-top: -12px; font-size: 16px; color: var(--peach); }
 
 /* ---------- Главная: «Тема дня» с конвертом ---------- */
-.today-sec { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 56px; align-items: center; padding: 72px var(--gutter) 56px; }
+.today-sec {
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 56px; align-items: center; padding: 64px var(--gutter) 48px;
+  background: radial-gradient(rgba(245, 196, 179, .14) 1.5px, transparent 1.6px) 0 0 / 26px 26px, linear-gradient(135deg, #3A2470 0%, #534AB7 100%);
+  border-top: 1px solid rgba(255, 255, 255, .08);
+}
 .td-title { margin: 0 0 14px; font-size: clamp(30px, 3.6vw, 46px); }
 .td-lead { margin: 0 0 24px; color: var(--muted); font-size: 18px; line-height: 1.6; max-width: 520px; }
 .td-go { display: none; text-decoration: none; }
@@ -821,10 +825,10 @@ button.day:hover { background: rgba(255, 255, 255, .12); transform: translateY(-
   transform-origin: top; transition: transform .45s ease-in, z-index 0s .25s;
 }
 .td-seal {
-  position: absolute; left: 50%; top: 92px; z-index: 4; width: 50px; height: 50px; margin-left: -25px; border: 0; border-radius: 50%;
-  background: radial-gradient(circle at 35% 30%, #F0A987, #D85A30 60%, #A9401F); color: #FFF3E8; font-size: 22px; cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, .3); animation: td-pulse 1.8s ease-in-out infinite; transition: transform .35s, opacity .35s;
+  position: absolute; left: 50%; top: 84px; z-index: 4; width: 70px; height: 70px; margin-left: -35px; padding: 0; border: 0; background: none; cursor: pointer;
+  filter: drop-shadow(0 4px 5px rgba(60, 10, 5, .45)); animation: td-pulse 1.8s ease-in-out infinite; transition: transform .35s, opacity .35s;
 }
+.td-seal svg { display: block; width: 100%; height: 100%; }
 .td-polly { position: absolute; left: 50%; bottom: 58px; width: 74px; margin-left: -86px; z-index: 5; opacity: 0; transform: translate(-260px, -200px) rotate(-20deg); transition: transform .9s cubic-bezier(.3, .8, .4, 1.1), opacity .3s; pointer-events: none; }
 .td-polly svg { display: block; width: 100%; height: auto; }
 .td-spark { position: absolute; left: 50%; bottom: 103px; z-index: 6; pointer-events: none; }
@@ -841,7 +845,7 @@ button.day:hover { background: rgba(255, 255, 255, .12); transform: translateY(-
 .today-sec.bw .td-card { background: #FCFCFA; color: #151515; }
 .today-sec.bw .td-cols, .today-sec.bw .td-date { color: #151515; }
 @keyframes td-bob { 50% { transform: translateY(-8px) rotate(-1deg); } }
-@keyframes td-pulse { 50% { box-shadow: 0 0 0 10px rgba(240, 169, 135, .25), 0 4px 10px rgba(0, 0, 0, .3); } }
+@keyframes td-pulse { 50% { transform: scale(1.07); } }
 @keyframes td-peck { 50% { transform: translate(12px, 6px) rotate(24deg); } }
 @keyframes td-shake { 25% { transform: rotate(-12deg); } 75% { transform: rotate(12deg); } }
 @keyframes td-hop { 0% { transform: translate(0, 0); } 40% { transform: translate(-50px, -70px) rotate(-10deg); } 100% { transform: translate(-112px, -22px); } }
