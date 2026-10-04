@@ -2,14 +2,17 @@
   <p class="topics">daily sketch challenge</p>
   <h1>Daily Challenge</h1>
   <p class="lead">Every day Polly tears off a new page: one subject, three colours and a few minutes. Draw it, make a card and share your work with #dailypigeonpolly.</p>
-  <p class="lead ch-materials">Any materials are welcome: pencil, pen, markers, crayons, paint or digital.</p>
+  <p class="lead ch-materials">Any materials are welcome: pencil, pen, markers, crayons, paint or digital. Drawing with one colour? Switch to “Black &amp; white”.</p>
 </section>
 <section class="ch" id="challenge">
   <div class="ch-grid">
     <div id="ch-cal" class="ch-cal"></div>
     <div class="ch-side">
       <div class="ch-card-box">
-        <div class="ch-level" id="ch-level" role="group" aria-label="Level"></div>
+        <div class="ch-toggles">
+          <div class="ch-level" id="ch-palette" role="group" aria-label="Colour mode"></div>
+          <div class="ch-level" id="ch-level" role="group" aria-label="Level"></div>
+        </div>
         <div class="ch-clock" id="ch-clock" aria-live="off">00:00</div>
         <div class="ch-bar" id="ch-bar"></div>
         <p class="ch-stage" id="ch-stage"></p>
@@ -46,7 +49,7 @@
 </section>
 <section class="wall">
   <h2 class="section-title">Your works</h2>
-  <p class="lead">Post your sketch with <b>#dailypigeonpolly</b> on <a href="https://www.instagram.com/pigeonpolly" target="_blank" rel="noopener">Instagram</a> or <a href="https://www.tiktok.com/@pigeonpolly" target="_blank" rel="noopener">TikTok</a>. Every week I pick favourites for this wall.</p>
+  <p class="lead">Post your sketch with <b>#dailypigeonpolly</b> on <a href="https://www.instagram.com/pigeonpolly" target="_blank" rel="noopener">Instagram</a>, <a href="https://www.threads.net/@pigeonpolly" target="_blank" rel="noopener">Threads</a> or <a href="https://www.tiktok.com/@pigeonpolly" target="_blank" rel="noopener">TikTok</a>. Every week I pick favourites for this wall.</p>
   {{gallery:challenge}}
 </section>
 <script src="/assets/challenge-data.js" defer></script>

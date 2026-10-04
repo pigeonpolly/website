@@ -23,6 +23,13 @@
     doneYes: ['Drawn ✓', 'Нарисовано ✓', 'Uzzīmēts ✓'],
     backToday: ['← Back to today', '← Вернуться к сегодня', '← Atpakaļ uz šodienu'],
     extra: ['EXTRA day! Add 1 extra art material in any colour.', 'День ЭКСТРА! Добавьте 1 дополнительный арт-материал любого цвета.', 'EKSTRA diena! Pievieno 1 papildu mākslas materiālu jebkurā krāsā.'],
+    extraBw: ['EXTRA day!', 'День ЭКСТРА!', 'EKSTRA diena!'],
+    twist: ['Your twist', 'Особенность', 'Tavs pavērsiens'],
+    modeColor: ['In colour', 'В цвете', 'Krāsās'],
+    modeBw: ['Black & white', 'Ч/Б', 'Melnbalts'],
+    stage2Bw: ['Tones & textures', 'Тон и фактура', 'Toņi un faktūras'],
+    hint2Bw: ['Build up the darks with hatching, dots or solid fills.', 'Наберите тёмные места штриховкой, точками или заливкой.', 'Veido tumšās vietas ar svītrojumu, punktiem vai pilnu aizkrāsojumu.'],
+    bday: ['Today is my birthday! Draw something festive with me 🎂', 'Сегодня мой день рождения! Нарисуйте со мной что-нибудь праздничное 🎂', 'Šodien ir mana dzimšanas diena! Uzzīmē ar mani kaut ko svētku 🎂'],
     locked: ['Opens on this day', 'Откроется в этот день', 'Atvērsies šajā dienā'],
     photo: ['Add a photo of my sketch', 'Добавить фото рисунка', 'Pievienot skices foto'],
     photoChange: ['Change photo', 'Заменить фото', 'Mainīt foto'],
@@ -58,28 +65,63 @@
     if (key > 2026 * 12 + 9) { const prev = extraDay(m ? y : y - 1, m ? m - 1 : 11); while (v === prev) v = 1 + Math.floor(rm() * days); }
     return (extraMemo[key] = v);
   }
-  let order = null;
-  function subjectOrder() {
-    if (order) return order;
-    const r = rngFor('polly-order'); order = D.subjects.map((_, i) => i);
-    for (let i = order.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [order[i], order[j]] = [order[j], order[i]]; }
-    return order;
+  const orders = {};
+  function orderOf(name, len) {
+    if (orders[name]) return orders[name];
+    const r = rngFor(name), o = [...Array(len).keys()];
+    for (let i = o.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [o[i], o[j]] = [o[j], o[i]]; }
+    return (orders[name] = o);
   }
+  // 2/3 дней — предмет текущего сезона, остальные — любой другой; внутри каждой группы без повторов
+  const SEASON = ['winter', 'winter', 'spring', 'spring', 'spring', 'summer', 'summer', 'summer', 'autumn', 'autumn', 'autumn', 'winter'];
+  const pools = { none: [] }; D.subjects.forEach((r, i) => (r[3] || 'none').split(' ').forEach(t => (pools[t] = pools[t] || []).push(i)));
+  const plan = [], used = {};
+  // ровно 2/3 дней каждого месяца — сезонные (какие именно — случайно, но одинаково у всех)
+  function seasonalDay(d) {
+    const days = new Date(d.getFullYear(), d.getMonth() + 1, 0).getDate();
+    const o = orderOf('season-' + d.getFullYear() + '-' + d.getMonth(), days);
+    return o.indexOf(d.getDate() - 1) < Math.ceil(days * 2 / 3);
+  }
+  function planFor(n) {
+    while (plan.length <= n) {
+      const d = new Date(2026, 9, 5 + plan.length);
+      const bd = d.getMonth() === 0 && d.getDate() === 23;
+      const p = seasonalDay(d) ? SEASON[d.getMonth()] : 'none';
+      const pool = pools[p], o = orderOf('pool-' + p, pool.length);
+      let k = used[p] || 0, idx = pool[o[k % pool.length]];
+      // сезонный предмет мог встретиться в соседнем сезоне недавно — пропускаем повтор за последние 60 дней
+      for (let tries = 0; tries < pool.length && plan.slice(-60).includes(idx); tries++) { k++; idx = pool[o[k % pool.length]]; }
+      if (!bd) used[p] = k + 1;
+      plan.push(bd ? -1 : idx);
+    }
+    return plan[n];
+  }
+  const BDAY = ['a birthday cake', 'a gift box with a bow', 'a bunch of balloons', 'a party hat', 'a birthday candle', 'a cupcake', 'a piñata', 'a greeting card', 'a confetti cannon', 'a paper crown'];
+  function birthdayIdx(y) {
+    const name = BDAY[mod(y - 2027, BDAY.length)], i = D.subjects.findIndex(r => r[0] === name);
+    return i < 0 ? 0 : i;
+  }
+  const mod = (a, b) => ((a % b) + b) % b;
   function themeFor(d) {
     const r = rngFor('polly-' + keyOf(d));
     // до 5 октября 2026 — старая формула (первые 98 тем), дальше все темы по кругу без повторов
     const legacy = Math.floor(r() * 98);
     const n = Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 9, 5)) / 864e5);
-    const subject = n < 0 ? D.subjects[legacy] : D.subjects[subjectOrder()[n % D.subjects.length]];
+    const bday = d.getMonth() === 0 && d.getDate() === 23;
+    const subject = n < 0 ? D.subjects[legacy] : bday ? D.subjects[birthdayIdx(d.getFullYear())] : D.subjects[planFor(n)];
     const cols = D.colors.slice();
     for (let i = cols.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [cols[i], cols[j]] = [cols[j], cols[i]]; }
     const time = D.times[Math.floor(r() * D.times.length)];
     const day = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
     // раз в месяц — день ЭКСТРА (свой случайный день для каждого месяца)
     const extra = d.getDate() === extraDay(d.getFullYear(), d.getMonth());
-    return { subject: subject[L], colors: cols.slice(0, 3), time, extra, tip: D.tips[day % D.tips.length][L] };
+    const twist = D.twists[orderOf('polly-twist', D.twists.length)[mod(n, D.twists.length)]][L];
+    const mi = d.getFullYear() * 12 + d.getMonth() - (2026 * 12 + 9);
+    const extraBw = D.extrasBw[orderOf('polly-extrabw', D.extrasBw.length)[mod(mi, D.extrasBw.length)]][L];
+    return { subject: subject[L], colors: cols.slice(0, 3), twist, extraBw, time, extra, bday, tip: D.tips[day % D.tips.length][L] };
   }
   let sel = new Date(today), selKey = todayKey, theme = themeFor(sel);
+  let bw = false; try { bw = localStorage.getItem('ch-bw') === '1'; } catch (e) { /* без памяти */ }
 
   // ---------- хранилище ----------
   const store = {
@@ -103,10 +145,11 @@
         <div class="page-day">${sel.getDate()}</div>
         <div class="page-weekday">${weekday}</div>
         <div class="page-subject">${theme.subject}</div>
-        <div class="page-label">${t('colors')}</div>
-        <div class="swatches">${theme.colors.map(c => `<span class="sw"><i style="background:${c.hex}"></i>${c.n[L]}</span>`).join('')}</div>
+        <div class="page-label">${bw ? t('twist') : t('colors')}</div>
+        ${bw ? `<div class="page-twist">✒ ${theme.twist}</div>` : `<div class="swatches">${theme.colors.map(c => `<span class="sw"><i style="background:${c.hex}"></i>${c.n[L]}</span>`).join('')}</div>`}
         <div class="page-time"><span class="page-label">${t('time')}</span> <b id="ch-min"></b></div>
-        ${theme.extra ? `<div class="page-extra">✦ ${t('extra')}</div>` : ''}
+        ${theme.bday ? `<div class="page-extra page-bday">${t('bday')}</div>` : ''}
+        ${theme.extra ? `<div class="page-extra">✦ ${extraText(theme)}</div>` : ''}
       </div>
     </div>
     ${selKey !== todayKey ? `<p class="back-today"><button type="button" id="ch-today">${t('backToday')}</button></p>` : ''}
@@ -115,8 +158,19 @@
     const bt = $('#ch-today'); bt && bt.addEventListener('click', () => selectDay(new Date(today)));
     renderMin();
   }
+  function extraText(th) { return bw ? `${t('extraBw')} ${th.extraBw[0].toUpperCase() + th.extraBw.slice(1)}.` : t('extra'); }
   const renderMin = () => { $('#ch-min').textContent = `${minutes()} ${t('min')}`; };
   renderCal(true);
+
+  // ---------- цвет / Ч/Б ----------
+  const pm = $('#ch-palette');
+  pm.innerHTML = ['color', 'bw'].map(v => `<button type="button" data-v="${v}" aria-pressed="${(v === 'bw') === bw}">${t(v === 'bw' ? 'modeBw' : 'modeColor')}</button>`).join('');
+  pm.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    bw = b.dataset.v === 'bw'; try { localStorage.setItem('ch-bw', bw ? '1' : '0'); } catch (err) { /* без памяти */ }
+    pm.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    renderCal(false); renderDiary(); draw(); $('#ch-card').innerHTML = '';
+  });
 
   // ---------- уровень ----------
   const lv = $('#ch-level');
@@ -155,8 +209,8 @@
     if (!running && left === total) { stageEl.textContent = t('ready'); hintEl.textContent = ''; return; }
     const s = stageAt(elapsed);
     if (s !== stage) { if (stage >= 0 && running) beep(660); stage = s; }
-    stageEl.textContent = `${s + 1}/3 · ${UI.stages[s][L]}`;
-    hintEl.textContent = UI.stageHints[s][L];
+    stageEl.textContent = `${s + 1}/3 · ${bw && s === 1 ? t('stage2Bw') : UI.stages[s][L]}`;
+    hintEl.textContent = bw && s === 1 ? t('hint2Bw') : UI.stageHints[s][L];
   }
   function resetTimer() { clearInterval(iv); running = false; total = left = minutes() * 60; stage = -1; go.textContent = t('start'); draw(); }
   go.addEventListener('click', () => {
@@ -213,16 +267,16 @@
     for (let i = 1; i <= days; i++) {
       const d = new Date(view.getFullYear(), view.getMonth(), i), k = keyOf(d), e = diary[k];
       if (d < START) { html += `<span class="day before"><b>${i}</b></span>`; continue; }
-      if (d > t0) { html += `<span class="day locked${i === extraDay(d.getFullYear(), d.getMonth()) ? ' extra' : ''}" title="${t('locked')}"><b>${i}</b><i aria-hidden="true">🔒</i></span>`; continue; }
+      if (d > t0) { html += `<span class="day locked${i === extraDay(d.getFullYear(), d.getMonth()) ? ' extra' : ''}${d.getMonth() === 0 && i === 23 ? ' bday' : ''}" title="${t('locked')}"><b>${i}</b><i aria-hidden="true">🔒</i></span>`; continue; }
       const th = themeFor(d);
-      html += `<button type="button" class="day${th.extra ? ' extra' : ''}${k === todayKey ? ' today' : ''}${k === selKey ? ' sel' : ''}" data-k="${k}">`
+      html += `<button type="button" class="day${th.extra ? ' extra' : ''}${th.bday ? ' bday' : ''}${k === todayKey ? ' today' : ''}${k === selKey ? ' sel' : ''}" data-k="${k}">`
         + (e && e.img ? `<img src="${e.img}" alt="">` : '')
-        + `<b>${i}</b><span class="d-subj">${th.subject}</span><span class="d-dots">${th.colors.map(c => `<i style="background:${c.hex}"></i>`).join('')}</span></button>`;
+        + `<b>${i}</b><span class="d-subj">${th.subject}</span><span class="d-dots">${bw ? '<em>✒</em>' : th.colors.map(c => `<i style="background:${c.hex}"></i>`).join('')}</span></button>`;
     }
     $('#ch-grid').innerHTML = html;
     let lg = $('#ch-legend');
     if (!lg) { lg = document.createElement('p'); lg.id = 'ch-legend'; lg.className = 'extra-legend'; $('#ch-grid').after(lg); }
-    lg.innerHTML = `<span aria-hidden="true">✦</span> ${t('extra')}`;
+    lg.innerHTML = `<span aria-hidden="true">✦</span> ${bw ? t('extraBw') : t('extra')}`;
     $('#ch-prev').disabled = view <= START;
   }
   $('#ch-grid').addEventListener('click', e => {
@@ -269,13 +323,18 @@
     }
     g.fillStyle = '#F3EFFA'; g.font = '600 58px Fraunces, Georgia, serif';
     wrapText(g, theme.subject, 70, 1010, 760, 66);
-    theme.colors.forEach((col, i) => {
-      g.fillStyle = col.hex; g.beginPath(); g.arc(100 + i * 70, 1110, 26, 0, Math.PI * 2); g.fill();
-      g.strokeStyle = '#F3EFFA'; g.lineWidth = 4; g.stroke();
-    });
-    g.fillStyle = '#D9D3F2'; g.font = '500 34px Karla, sans-serif';
-    g.fillText(`${minutes()} ${t('min')}`, 330, 1122);
-    if (theme.extra) { g.fillStyle = '#E9A93B'; g.font = '700 30px Karla, sans-serif'; wrapText(g, '✦ ' + t('extra'), 70, 1185, 760, 36); }
+    if (bw) {
+      g.fillStyle = '#F0A987'; g.font = '500 36px Karla, sans-serif';
+      wrapText(g, `✒ ${theme.twist} · ${minutes()} ${t('min')}`, 70, 1122, 760, 42);
+    } else {
+      theme.colors.forEach((col, i) => {
+        g.fillStyle = col.hex; g.beginPath(); g.arc(100 + i * 70, 1110, 26, 0, Math.PI * 2); g.fill();
+        g.strokeStyle = '#F3EFFA'; g.lineWidth = 4; g.stroke();
+      });
+      g.fillStyle = '#D9D3F2'; g.font = '500 34px Karla, sans-serif';
+      g.fillText(`${minutes()} ${t('min')}`, 330, 1122);
+    }
+    if (theme.extra) { g.fillStyle = '#E9A93B'; g.font = '700 30px Karla, sans-serif'; wrapText(g, '✦ ' + extraText(theme), 70, 1185, 760, 36); }
     g.fillStyle = '#F0A987'; g.font = '700 40px Karla, sans-serif'; g.fillText('#dailypigeonpolly', 70, 1250);
     g.fillStyle = '#D9D3F2'; g.font = '500 32px Karla, sans-serif'; g.fillText('pigeonpolly.com', 70, 1300);
     const px = 9;
