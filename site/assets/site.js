@@ -65,7 +65,7 @@
   });
 
   // Форма письма
-  const form = document.querySelector('.contact-form');
+  const form = document.querySelector('#contact .contact-form');
   if (form) {
     form.addEventListener('submit', async e => {
       e.preventDefault();

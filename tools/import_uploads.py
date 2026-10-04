@@ -3,7 +3,8 @@
 
 Префикс имени файла -> галерея:
   polly_ bird, chew_ snail, titos_ detective, pumpkin_ halloween, anxiety_ anxiety,
-  sketchbook_ sketchbook, aiart_ ai-art, exhibition_ exhibitions, publication_ publications
+  sketchbook_ sketchbook, aiart_ ai-art, exhibition_ exhibitions, publication_ publications,
+  challenge_ challenge (стена работ челленджа; подпись = имя файла: "challenge_pigeonpolly · cactus · 4.10.2026.jpg")
 Подпись берётся из имени, если в нём есть год: "polly_(2023) Pigeon Polly space.jpg".
 Файлы без года (aiart_3.png) идут без подписи, по номеру.
 После обработки исходники удаляются. Затем: python3 build.py
@@ -17,7 +18,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent
 PREFIX = {
     "polly_": "bird", "chew_": "snail", "titos_": "detective", "pumpkin_": "halloween",
     "anxiety_": "anxiety", "sketchbook_": "sketchbook", "aiart_": "ai-art",
-    "exhibition_": "exhibitions", "publication_": "publications",
+    "exhibition_": "exhibitions", "publication_": "publications", "challenge_": "challenge",
 }
 EXT = {".jpg", ".jpeg", ".png", ".webp"}
 
@@ -58,6 +59,8 @@ def main():
         new = []
         for src, stem in files:
             year, cap, num = parse(stem)
+            if gal == "challenge":  # стена работ: подпись — всё имя файла, новые сверху
+                cap, num = stem.replace("_", " ").strip(), -len(items) - len(new)
             base = slug(f"{gal} {stem}") if not year else slug(cap)
             full, thumb = out / f"{base}.jpg", out / f"{base}-800.jpg"
             rel = full.relative_to(ROOT / "site").as_posix()

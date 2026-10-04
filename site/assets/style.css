@@ -863,3 +863,13 @@ button.day:hover { background: rgba(255, 255, 255, .12); transform: translateY(-
 @media (max-width: 480px) { .today-sec { padding: 32px 16px 24px; border-width: 6px; } .td-stage { height: 300px; transform: scale(.82); transform-origin: 50% 100%; } }
 @media (max-width: 360px) { .td-stage { height: 270px; transform: scale(.72); } }
 @media (prefers-reduced-motion: reduce) { .td-env, .td-seal { animation: none; } }
+
+/* ---------- Форма «Прислать рисунок» ---------- */
+.wall-send { display: flex; flex-wrap: wrap; align-items: center; gap: 12px 20px; margin-top: 22px; }
+.wall-send span { color: var(--muted); }
+.sketch-form input[type="file"] { padding: 10px; background: #fff; }
+.sketch-preview img { display: block; max-width: 100%; max-height: 220px; border-radius: 12px; box-shadow: 0 6px 18px rgba(43, 26, 81, .2); }
+.contact-form label.check { flex-direction: row; align-items: flex-start; gap: 10px; font-weight: 400; color: #4A3E68; }
+.contact-form label.check input { width: 20px; height: 20px; margin: 2px 0 0; flex: none; accent-color: #534AB7; }
+.contact-form label.check .check-text { color: #4A3E68; }
+.sketch-sink { position: absolute; width: 0; height: 0; border: 0; visibility: hidden; }
