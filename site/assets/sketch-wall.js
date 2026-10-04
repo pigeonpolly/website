@@ -304,10 +304,35 @@
   }
 
   // ---------- топ и стена ----------
+  // парад над заголовком: впереди — «Выбор Полли» в короне, за ним — ники из топа
+  function parade(top, pick) {
+    const el = document.getElementById('parade');
+    if (!el) return;
+    const birds = [];
+    if (pick) birds.push({ nick: pick, crown: true });
+    top.filter(r => r.nick !== pick).slice(0, 8).forEach(r => birds.push({ nick: r.nick, fire: r.current }));
+    if (!birds.length) { el.innerHTML = ''; el.classList.remove('on'); return; }
+    const key = JSON.stringify(birds);
+    if (el.dataset.key === key) return; // те же птицы — не перезапускаем шествие
+    el.dataset.key = key;
+    const pickName = SPECIAL.find(x => x.k === 'pick').n[L];
+    // идут слева направо, поэтому первый (лидер) — последний в ряду, самый правый
+    el.innerHTML = `<div class="parade-track">${birds.slice().reverse().map((b, i) => `<span class="pb${b.crown ? ' crown' : ''}" style="--d:${(i % 3) * .17}s">
+      <span class="pb-tag">${b.crown ? `★ ${esc(pickName)} · ` : ''}@${esc(b.nick)}${b.fire ? ` 🔥${b.fire}` : ''}</span>
+      <span class="pb-bird">${spriteSvg(b.crown ? 'crown' : 'polly')}</span></span>`).join('')}</div>`;
+    el.classList.add('on');
+    const track = el.firstElementChild;
+    // скорость ~45 px/с независимо от ширины экрана
+    const dist = innerWidth + track.scrollWidth;
+    track.style.setProperty('--w', track.scrollWidth + 'px');
+    track.style.animationDuration = Math.round(dist / 45) + 's';
+  }
+
   async function loadTop() {
     const el = document.getElementById('sw-top');
     try {
-      const { top } = await api('top');
+      const { top, pick } = await api('top');
+      parade(top, pick);
       el.innerHTML = top.length ? top.map((r, i) => {
         const lv = levelOf(r.best);
         return `<li><span class="sw-pos">${i + 1}</span>${lv ? medal(lv) : ''}<span class="sw-topnick">@${esc(r.nick)}</span><span class="sw-fire">🔥 ${r.current}</span></li>`;

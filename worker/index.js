@@ -323,7 +323,9 @@ async function route(req, env, url) {
       top.push({ nick: u.nick, current: streaks(days).current, best: mergedBest(u, days) });
     }
     top.sort((a, b) => b.current - a.current || b.best - a.best);
-    return json({ top: top.slice(0, 10) });
+    const pickUser = Number(await getMeta(env, 'pick_user'));
+    const pick = pickUser ? (await env.DB.prepare('SELECT nick FROM users WHERE id = ? AND banned = 0').bind(pickUser).first())?.nick || null : null;
+    return json({ top: top.slice(0, 10), pick });
   }
 
   const img = p.match(/^\/api\/img\/([0-9a-f]{24})$/);
