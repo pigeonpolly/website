@@ -26,6 +26,28 @@
   q('.td-polly').innerHTML = `<svg viewBox="0 0 14 14" shape-rendering="crispEdges">${P.map((r, y) => [...r].map((ch, x) => C[ch] ? `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${C[ch]}"/>` : '').join('')).join('')}</svg>`;
   q('.td-spark').innerHTML = [...Array(14)].map((_, i) => `<i style="--a:${i * 360 / 14}deg;--d:${70 + (i % 3) * 22}px;--c:${['#F0A987', '#E9A93B', '#F5C4B3', '#D85A30'][i % 4]}"></i>`).join('');
 
+  // счётчики: сколько работ загружено и сколько людей присоединилось с момента создания сайта
+  const pl = (n, a, b, c) => { const m = n % 10, h = n % 100; return m === 1 && h !== 11 ? a : m >= 2 && m <= 4 && (h < 12 || h > 14) ? b : c; };
+  const LBL = {
+    works: [n => n === 1 ? 'sketch uploaded' : 'sketches uploaded', n => `${pl(n, 'работа загружена', 'работы загружено', 'работ загружено')}`, n => n % 10 === 1 && n % 100 !== 11 ? 'skice augšupielādēta' : 'skices augšupielādētas'],
+    users: [n => n === 1 ? 'artist joined' : 'artists joined', n => `${pl(n, 'художник присоединился', 'художника присоединились', 'художников присоединились')}`, n => n % 10 === 1 && n % 100 !== 11 ? 'mākslinieks pievienojies' : 'mākslinieki pievienojušies'],
+  };
+  fetch('/api/stats').then(r => r.ok ? r.json() : null).then(st => {
+    if (!st) return;
+    const row = q('.td-stats'); row.hidden = false;
+    for (const k of ['works', 'users']) row.querySelector(`[data-l="${k}"]`).textContent = LBL[k][L](st[k]);
+    const run = () => ['works', 'users'].forEach(k => {
+      const el = row.querySelector(`[data-n="${k}"]`), to = st[k], t0 = performance.now();
+      if (matchMedia('(prefers-reduced-motion: reduce)').matches || to < 2) { el.textContent = to.toLocaleString(locale); return; }
+      const step = now => { const k2 = Math.min(1, (now - t0) / 1200); el.textContent = Math.round(to * (1 - Math.pow(1 - k2, 3))).toLocaleString(locale); if (k2 < 1) requestAnimationFrame(step); };
+      requestAnimationFrame(step);
+    });
+    if ('IntersectionObserver' in window) {
+      const io = new IntersectionObserver(es => { if (es.some(e => e.isIntersecting)) { io.disconnect(); run(); } }, { threshold: 0.4 });
+      io.observe(row);
+    } else run();
+  }).catch(() => {});
+
   let done = false;
   const wait = ms => new Promise(r => setTimeout(r, ms));
   async function open() {

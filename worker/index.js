@@ -182,6 +182,12 @@ async function cleanupInactive(env) {
 // «Выбор Полли»: один текущий рисунок, его автор — носитель бейджа; прошлые носители получают 'pick_past'
 const getMeta = async (env, k) => (await env.DB.prepare('SELECT value FROM meta WHERE key = ?').bind(k).first())?.value ?? null;
 const setMeta = (env, k, v) => env.DB.prepare('INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value').bind(k, v).run();
+// счётчики «с момента создания сайта»: только растут (удаления их не уменьшают)
+async function bump(env, key, countSql) {
+  const cur = await getMeta(env, key);
+  const base = cur === null ? (await env.DB.prepare(countSql).first()).n - 1 : Number(cur);
+  await setMeta(env, key, String(base + 1));
+}
 async function addBadge(env, uid, badge) {
   const u = await env.DB.prepare('SELECT badges FROM users WHERE id = ?').bind(uid).first();
   if (!u) return;
@@ -193,6 +199,11 @@ async function addBadge(env, uid, badge) {
 async function route(req, env, url) {
   const p = url.pathname, m = req.method;
   if (m === 'POST' && p === '/api/dev/cleanup' && env.DEV_FAKE_LOGIN === '1') return json(await cleanupInactive(env));
+  if (m === 'GET' && p === '/api/stats') {
+    const works = await getMeta(env, 'works_total') ?? (await env.DB.prepare('SELECT COUNT(*) AS n FROM posts').first()).n;
+    const users = await getMeta(env, 'users_total') ?? (await env.DB.prepare('SELECT COUNT(*) AS n FROM users').first()).n;
+    return json({ works: Number(works), users: Number(users) }, 200, { 'cache-control': 'public, max-age=60' });
+  }
   if (m === 'GET' && p === '/api/config') return json({ ready: true, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
 
   if (m === 'POST' && p === '/api/login') {
@@ -205,6 +216,7 @@ async function route(req, env, url) {
     let u = await env.DB.prepare('SELECT * FROM users WHERE sub = ?').bind(who.sub).first();
     if (!u) {
       await env.DB.prepare('INSERT INTO users (sub, email, created_at) VALUES (?, ?, ?)').bind(who.sub, who.email, now()).run();
+      await bump(env, 'users_total', 'SELECT COUNT(*) AS n FROM users');
       u = await env.DB.prepare('SELECT * FROM users WHERE sub = ?').bind(who.sub).first();
     } else if (who.email && who.email !== u.email) {
       await env.DB.prepare('UPDATE users SET email = ? WHERE id = ?').bind(who.email, u.id).run();
@@ -268,6 +280,7 @@ async function route(req, env, url) {
       await env.DB.prepare('DELETE FROM posts WHERE id = ?').bind(old.id).run();
       await Promise.all([env.IMAGES.delete('i/' + old.id), env.IMAGES.delete('t/' + old.id)]);
     }
+    if (!old) await bump(env, 'works_total', 'SELECT COUNT(*) + 1 AS n FROM posts'); // замена работы дня не считается
     const tod = Number(f.get('tod'));
     await env.DB.prepare('INSERT INTO posts (id, user_id, day, theme, bw, tod, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
       .bind(id, u.id, day, String(f.get('theme') || '').slice(0, 120), f.get('bw') === '1' ? 1 : 0,

@@ -805,6 +805,11 @@ button.day:hover { background: rgba(255, 255, 255, .12); transform: translateY(-
 }
 .td-title { margin: 0 0 14px; font-size: clamp(30px, 3.6vw, 46px); }
 .td-lead { margin: 0 0 24px; color: var(--muted); font-size: 18px; line-height: 1.6; max-width: 520px; }
+.td-stats { display: flex; flex-wrap: wrap; gap: 10px 28px; margin: -6px 0 24px; }
+.td-stats[hidden] { display: none; }
+.td-stat { display: flex; align-items: baseline; gap: 8px; color: var(--muted); font-size: 15px; }
+.td-stat b { font: 700 34px/1 var(--serif); color: var(--peach); font-variant-numeric: tabular-nums; }
+.td-stat i { font-style: normal; }
 .td-go { display: none; text-decoration: none; }
 .td-go, .td-go:hover { color: var(--bg); }
 .today-sec.revealed .td-go { display: inline-flex; animation: td-pop .4s ease-out; }
