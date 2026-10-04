@@ -631,6 +631,18 @@ html:not([lang="en"]) .hero h1 { white-space: normal; }
 #challenge { scroll-margin-top: 84px; }
 #ch-month { white-space: nowrap; }
 @media (max-width: 420px) { .diary-nav { gap: 8px; } .diary-nav .diary-today { padding: 0 12px; } }
+/* Ч/Б листок с кляксами */
+.page .ink { position: absolute; pointer-events: none; opacity: .9; }
+.tearpad.bw .page > :not(.ink) { position: relative; }
+.tearpad.bw::before { background: #CFCFCF; }
+.tearpad.bw .page { color: #151515; background: #FCFCFA; }
+.tearpad.bw .page-top { background: #151515; }
+.tearpad.bw .page-top::after { background: radial-gradient(circle at 6px 0, transparent 5px, #FCFCFA 5px) 0 0 / 14px 6px repeat-x; }
+.tearpad.bw .page-day, .tearpad.bw .page-subject, .tearpad.bw .page-twist { color: #151515; }
+.tearpad.bw .page-weekday { color: #555; }
+.tearpad.bw .page-label { color: #8A8A8A; }
+.tearpad.bw .page-extra { background: #151515; color: #fff; }
+.tearpad.bw .page-extra.page-bday { background: #E2E2E2; color: #151515; }
 .ch-head { display: grid; grid-template-columns: minmax(0, 780px) auto; gap: 24px 56px; align-items: center; max-width: none; }
 .bw-pick { justify-self: start; width: max-content; max-width: 100%; display: flex; align-items: center; gap: 18px; padding: 16px 22px 16px 16px; border-radius: 22px; background: rgba(255, 255, 255, .05); border: 1px dashed var(--line); transform: rotate(-1.5deg); transition: transform .3s; }
 .bw-pick:hover { transform: rotate(0); }

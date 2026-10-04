@@ -140,9 +140,10 @@
     const weekday = sel.toLocaleDateString(locale, { weekday: 'long' });
     const month = sel.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
     $('#ch-cal').innerHTML = `
-    <div class="tearpad">
+    <div class="tearpad${bw ? ' bw' : ''}">
       ${anim ? '<div class="page old" aria-hidden="true"></div>' : ''}
       <div class="page">
+        ${bw ? inkBlots(selKey) : ''}
         <div class="page-top"><span>${month}</span></div>
         <div class="page-day">${sel.getDate()}</div>
         <div class="page-weekday">${weekday}</div>
@@ -161,6 +162,32 @@
     renderMin();
   }
   function extraText(th) { return bw ? `${t('extraBw')} ${th.extraBw[0].toUpperCase() + th.extraBw.slice(1)}.` : t('extra'); }
+  // кляксы для Ч/Б листка: свои на каждый день, всегда по краям, под текстом
+  function blot(r, x, y, R) {
+    const n = 11 + Math.floor(r() * 5), pts = [];
+    for (let i = 0; i < n; i++) { const a = i / n * Math.PI * 2, k = R * (0.65 + r() * 0.55); pts.push([x + Math.cos(a) * k, y + Math.sin(a) * k]); }
+    const mid = (p, q) => [(p[0] + q[0]) / 2, (p[1] + q[1]) / 2];
+    let d = `M${mid(pts[n - 1], pts[0]).join(' ')}`;
+    pts.forEach((p, i) => { const m = mid(p, pts[(i + 1) % n]); d += ` Q${p[0].toFixed(1)} ${p[1].toFixed(1)} ${m[0].toFixed(1)} ${m[1].toFixed(1)}`; });
+    let dots = '';
+    for (let i = 0, m = 3 + Math.floor(r() * 5); i < m; i++) {
+      const a = r() * Math.PI * 2, dist = R * (1.25 + r() * 0.9);
+      dots += `<circle cx="${(x + Math.cos(a) * dist).toFixed(1)}" cy="${(y + Math.sin(a) * dist).toFixed(1)}" r="${(1.5 + r() * R * 0.13).toFixed(1)}"/>`;
+    }
+    const drip = r() < 0.5 ? `<path d="M${x - 4} ${y + R * 0.6} q4 ${R * 1.1} 8 0 z"/><circle cx="${x}" cy="${y + R * 1.55}" r="4"/>` : '';
+    return `<path d="${d} Z"/>${dots}${drip}`;
+  }
+  function inkBlots(seed) {
+    const r = rngFor('ink-' + seed);
+    // центры клякс в % листка — только края, чтобы не закрывать текст
+    const spots = [[4, 26], [94, 22], [95, 62], [3, 74], [72, 95], [22, 96], [96, 42], [2, 48], [86, 88]];
+    for (let i = spots.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [spots[i], spots[j]] = [spots[j], spots[i]]; }
+    const k = 2 + Math.floor(r() * 2);
+    return spots.slice(0, k).map(([x, y]) => {
+      const size = 70 + Math.floor(r() * 60);
+      return `<svg class="ink" style="left:${x}%;top:${y}%;width:${size}px;height:${size}px;transform:translate(-50%,-50%) rotate(${Math.floor(r() * 360)}deg)" viewBox="-60 -60 120 120" aria-hidden="true"><g fill="#141414">${blot(r, 0, 0, 20 + r() * 10)}</g></svg>`;
+    }).join('');
+  }
   const renderMin = () => { $('#ch-min').textContent = `${minutes()} ${t('min')}`; };
   renderCal(true);
 
