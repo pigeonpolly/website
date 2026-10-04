@@ -520,29 +520,29 @@ html:not([lang="en"]) .hero h1 { white-space: normal; }
 
 /* ---------- Полли, которая живёт на сайте ---------- */
 .polly-pet {
-  position: fixed; left: 0; bottom: 10px; z-index: 40;
-  pointer-events: none; opacity: 0; transition: opacity .3s;
+  position: fixed; left: 0; top: 0; z-index: 60;
+  pointer-events: none; transition: opacity .3s;
+  will-change: transform;
 }
-.polly-pet.visible { opacity: 1; }
+.polly-pet.hidden { opacity: 0; }
+.polly-pet.hidden .polly-body { pointer-events: none; }
 .polly-body {
   display: block; padding: 0; border: 0; background: none; cursor: pointer;
-  pointer-events: auto; image-rendering: pixelated;
-  filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .25));
-  transform-origin: 60% 100%;
+  pointer-events: auto; filter: drop-shadow(0 3px 0 rgba(0, 0, 0, .28));
 }
-.polly-body canvas { display: block; image-rendering: pixelated; }
-.polly-body.flip { transform: scaleX(-1); }
-.polly-body.hop { translate: 0 -3px; }
-.polly-body.peck { animation: polly-peck .38s steps(2) 1; }
-.polly-body.flip.peck { animation-name: polly-peck-flip; }
-.polly-body.flying { animation: polly-fly 1.4s ease-in forwards; }
-@keyframes polly-peck { 50% { transform: rotate(18deg) translateY(4px); } }
-@keyframes polly-peck-flip { 0%, 100% { transform: scaleX(-1); } 50% { transform: scaleX(-1) rotate(18deg) translateY(4px); } }
-@keyframes polly-fly {
-  0% { transform: translate(0, 0); }
-  20% { transform: translate(6px, -16px) rotate(-8deg); }
-  100% { transform: translate(260px, -70vh) rotate(-20deg); opacity: 0; }
-}
+.polly-body canvas { display: block; image-rendering: pixelated; transform-origin: 50% 70%; transition: transform .25s; }
+.polly-body.flip canvas { transform: scaleX(-1); }
+.polly-body.peck canvas { animation: polly-peck .38s steps(2) 1; }
+.polly-body.flip.peck canvas { animation-name: polly-peck-flip; }
+.polly-body.flap canvas { translate: 0 -2px; }
+.polly-body.sleeping canvas { transform: rotate(180deg) translateY(-6px); }
+.polly-body.flip.sleeping canvas { transform: scaleX(-1) rotate(180deg) translateY(-6px); }
+.polly-body.startle canvas { animation: polly-startle .4s ease-out 1; }
+@keyframes polly-peck { 50% { transform: rotate(20deg) translateY(4px); } }
+@keyframes polly-peck-flip { 0%, 100% { transform: scaleX(-1); } 50% { transform: scaleX(-1) rotate(20deg) translateY(4px); } }
+@keyframes polly-startle { 30% { translate: 0 -14px; } }
+.pecked { animation: pecked .38s ease-out 1; }
+@keyframes pecked { 40% { transform: translateY(2px) rotate(-1.5deg); } }
 .polly-bubble {
   position: absolute; left: 6px; bottom: calc(100% + 10px);
   width: max-content; max-width: 220px;
@@ -551,9 +551,24 @@ html:not([lang="en"]) .hero h1 { white-space: normal; }
   font: 500 14px/1.35 var(--sans);
   box-shadow: 0 8px 20px rgba(0, 0, 0, .3);
   opacity: 0; transform: translateY(6px); transition: opacity .2s, transform .2s;
-  pointer-events: none;
 }
 .polly-bubble.show { opacity: 1; transform: none; }
+.polly-zzz { position: absolute; left: 60%; bottom: 60%; opacity: 0; transition: opacity .4s; }
+.polly-zzz.show { opacity: 1; }
+.polly-zzz i {
+  position: absolute; left: 0; bottom: 0;
+  font: 700 14px/1 var(--sans); font-style: normal; color: #D9D3F2;
+  text-shadow: 0 1px 0 #1a1528; opacity: 0;
+}
+.polly-zzz.show i { animation: polly-z 3s ease-out infinite; }
+.polly-zzz.show i:nth-child(2) { animation-delay: 1s; font-size: 17px; }
+.polly-zzz.show i:nth-child(3) { animation-delay: 2s; font-size: 21px; }
+@keyframes polly-z {
+  0% { opacity: 0; transform: translate(0, 0); }
+  20% { opacity: 1; }
+  100% { opacity: 0; transform: translate(26px, -46px); }
+}
+@media (prefers-reduced-motion: reduce) { .polly-zzz.show i { animation: none; opacity: 1; } .polly-zzz i:nth-child(2) { transform: translate(10px, -16px); } .polly-zzz i:nth-child(3) { transform: translate(22px, -34px); } }
 @media print { .polly-pet { display: none; } }
 
 /* ---------- Work with me ---------- */
