@@ -40,7 +40,12 @@
     emptyTop: ['No streaks yet. Be the first!', 'Серий пока нет. Будьте первым!', 'Sēriju vēl nav. Esi pirmais!'],
     emptyWall: ['The wall is waiting for the first sketch.', 'Стена ждёт первый рисунок.', 'Siena gaida pirmo skici.'],
     levelUp: ['New level!', 'Новый уровень!', 'Jauns līmenis!'],
-    tapBadge: ['Tap a badge to see how to get it.', 'Нажмите на значок, чтобы узнать, как его получить.', 'Pieskaries nozīmītei, lai uzzinātu, kā to iegūt.'],
+    have: ['You have it ✓', 'Получен ✓', 'Iegūta ✓'],
+    dToday: ['Today', 'Сегодня', 'Šodien'], dYesterday: ['Yesterday', 'Вчера', 'Vakar'], d2ago: ['2 days ago', 'Позавчера', 'Aizvakar'],
+    themeOf: ['Theme of', 'Тема за', 'Tēma par'],
+    hadIt: ['You had it once', 'Был у вас', 'Tev tā bija'],
+    notYet: ['Not yet', 'Ещё впереди', 'Vēl priekšā'],
+    tapBadge: ['Tap a badge to see it up close and how to get it.', 'Нажмите на значок, чтобы рассмотреть его и узнать, как получить.', 'Pieskaries nozīmītei, lai to apskatītu un uzzinātu, kā to iegūt.'],
     newBadge: ['New badge!', 'Новый бейдж!', 'Jauna nozīmīte!'],
     unpick: ['Remove', 'Снять', 'Noņemt'],
     picked: [n => `Picked ${n} time${n === 1 ? '' : 's'}. Every 5 picks = a star, 3 stars = a golden nickname.`, n => `Выбран(а) ${n} ${pl(n, 'раз', 'раза', 'раз')}. Каждые 5 раз — звезда, 3 звезды — золотой ник.`, n => `Izvēlēts ${n} reizi. Katras 5 reizes — zvaigzne, 3 zvaigznes — zelta segvārds.`],
@@ -71,21 +76,21 @@
     { d: 365, n: ['Polly legend', 'Легенда Полли', 'Pollijas leģenda'], f: ['A whole year. Pigeons tell legends about you.', 'Целый год. Голуби слагают о вас легенды.', 'Vesels gads. Baloži par tevi stāsta leģendas.'], s: 'crown', bg: '#9C8FE0' },
   ];
   const SPECIAL = [
-    { k: 'extra', f: ['Took the extra challenge and didn’t even blink.', 'Взял(а) экстра-задание и даже не моргнул(а).', 'Paņēmi papildu uzdevumu un pat nesamirkšķināji.'], n: ['EXTRA day done', 'День ЭКСТРА пройден', 'EKSTRA diena paveikta'], icon: '✦', bg: '#E9A93B',
+    { k: 'extra', f: ['Took the extra challenge and didn’t even blink.', 'Взял(а) экстра-задание и даже не моргнул(а).', 'Paņēmi papildu uzdevumu un pat nesamirkšķināji.'], n: ['EXTRA day done', 'День ЭКСТРА пройден', 'EKSTRA diena paveikta'], s: 'sparkle', bg: '#F7E7A6',
       h: ['Upload a sketch on the monthly EXTRA day (see the calendar on the Daily Challenge page)', 'Загрузить рисунок в день ЭКСТРА (раз в месяц, отмечен в календаре челленджа)', 'Augšupielādēt skici EKSTRA dienā (reizi mēnesī, atzīmēta izaicinājuma kalendārā)'] },
-    { k: 'bw', f: ['Ink in the veins. Colours are overrated.', 'Тушь в венах. Цвета переоценены.', 'Tuša vēnās. Krāsas ir pārvērtētas.'], n: ['Ink mood: drew in B/W', 'Нарисовал(а) в Ч/Б', 'Zīmēju melnbalti'], icon: '✒', bg: '#E2E2E2',
+    { k: 'bw', f: ['Ink in the veins. Colours are overrated.', 'Тушь в венах. Цвета переоценены.', 'Tuša vēnās. Krāsas ir pārvērtētas.'], n: ['Ink mood: drew in B/W', 'Нарисовал(а) в Ч/Б', 'Zīmēju melnbalti'], s: 'ink', bg: '#F4F4F4',
       h: ['Upload a sketch with “Black & white” mode switched on on the Daily Challenge page', 'Загрузить рисунок, когда на странице челленджа включён режим «Ч/Б»', 'Augšupielādēt skici, kad izaicinājuma lapā ieslēgts “Melnbalts”'] },
-    { k: 'bday', f: ['Came to Polly’s party with a drawing instead of a cake.', 'Пришёл(ла) к Полли на день рождения с рисунком вместо торта.', 'Atnāci uz Pollijas ballīti ar zīmējumu kūkas vietā.'], n: ['Polly’s birthday guest', 'Гость на дне рождения Полли', 'Pollijas dzimšanas dienas viesis'], icon: '🎂', bg: '#F5C4B3',
+    { k: 'bday', f: ['Came to Polly’s party with a drawing instead of a cake.', 'Пришёл(ла) к Полли на день рождения с рисунком вместо торта.', 'Atnāci uz Pollijas ballīti ar zīmējumu kūkas vietā.'], n: ['Polly’s birthday guest', 'Гость на дне рождения Полли', 'Pollijas dzimšanas dienas viesis'], s: 'party', bg: '#F9D3E3',
       h: ['Upload a sketch on 23 January', 'Загрузить рисунок 23 января', 'Augšupielādēt skici 23. janvārī'] },
-    { k: 'alt', f: ['Draws every other day, rests like a pro.', 'Рисует через день, отдыхает как профи.', 'Zīmē katru otro dienu, atpūšas kā profesionālis.'], n: ['Every other day', 'Через денёк', 'Katru otro dienu'], icon: '🔁', bg: '#C6E4D6',
+    { k: 'alt', f: ['Draws every other day, rests like a pro.', 'Рисует через день, отдыхает как профи.', 'Zīmē katru otro dienu, atpūšas kā profesionālis.'], n: ['Every other day', 'Через денёк', 'Katru otro dienu'], s: 'sleepy', bg: '#CDE7F7',
       h: ['Upload 15 sketches in a row, each exactly every other day (about a month)', 'Загрузить 15 рисунков подряд строго через день (примерно месяц)', 'Augšupielādēt 15 skices pēc kārtas, katru otro dienu (apmēram mēnesis)'] },
-    { k: 'monthly', f: ['Drops in once a month, like a full moon.', 'Заглядывает раз в месяц, как полнолуние.', 'Ienāk reizi mēnesī kā pilnmēness.'], n: ['Monthly regular', 'Каждый месяц', 'Ik mēnesi'], icon: '📅', bg: '#CFC7E8',
+    { k: 'monthly', f: ['Drops in once a month, like a full moon.', 'Заглядывает раз в месяц, как полнолуние.', 'Ienāk reizi mēnesī kā pilnmēness.'], n: ['Monthly regular', 'Каждый месяц', 'Ik mēnesi'], s: 'moon', bg: '#D9D3F2',
       h: ['Upload at least one sketch in 3 calendar months in a row', 'Загрузить хотя бы один рисунок в 3 календарных месяцах подряд', 'Augšupielādēt vismaz vienu skici 3 kalendāra mēnešos pēc kārtas'] },
-    { k: 'pick', n: ['Polly’s pick', 'Выбор Полли', 'Pollijas izvēle'], icon: '★', bg: '#F0A987',
+    { k: 'pick', n: ['Polly’s pick', 'Выбор Полли', 'Pollijas izvēle'], s: 'medal', bg: '#F0A987',
       f: ['Polly pecked your sketch with approval. The highest honour.', 'Полли одобрительно клюнула ваш рисунок. Высшая награда.', 'Pollija atzinīgi noknābāja tavu skici. Augstākais gods.'],
       past: ['Once Polly’s pick. Forever in history.', 'Когда-то — выбор Полли. Навсегда в истории.', 'Reiz Pollijas izvēle. Uz visiem laikiem vēsturē.'],
       h: ['Polly picks one sketch she loves. Only one owner at a time: when she picks another, yours turns black & white. Every 5 picks earn a star; 3 stars give you a golden nickname.', 'Полли выбирает один рисунок, который ей особенно понравился. Владелец только один: когда она выберет другой, ваш бейдж станет чёрно-белым. Каждые 5 выборов — звезда, 3 звезды — золотой ник.', 'Pollija izvēlas vienu skici, kas viņai īpaši patīk. Īpašnieks tikai viens: kad viņa izvēlas citu, tava nozīmīte kļūst melnbalta. Katras 5 izvēles — zvaigzne, 3 zvaigznes — zelta segvārds.'] },
-    { k: 'clock', f: ['Polly sets her watch by you.', 'Полли сверяет по вам часы.', 'Pollija pēc tevis regulē pulksteni.'], n: ['Like clockwork', 'Как по часам', 'Kā pulkstenis'], icon: '⏰', bg: '#F7E7A6',
+    { k: 'clock', f: ['Polly sets her watch by you.', 'Полли сверяет по вам часы.', 'Pollija pēc tevis regulē pulksteni.'], n: ['Like clockwork', 'Как по часам', 'Kā pulkstenis'], s: 'clock', bg: '#FBE3D6',
       h: ['Upload 10 sketches in a row at about the same time of day (within one hour)', 'Загрузить 10 рисунков подряд примерно в одно время суток (в пределах часа)', 'Augšupielādēt 10 skices pēc kārtas apmēram vienā laikā (vienas stundas robežās)'] },
   ];
   const POLLY = ['......ddd.....', '.....dbbbd....', '....dbbwwbd...', '....dbbwkbdoo.', '....dbbbbbdo..', '...dbbbbbbd...', '..dbbsbbbbd...',
@@ -97,16 +102,26 @@
       '.dyyyyyyyyyd..', '.dwdwdwdwdwd..', '.dwwwwwwwwwd..', '..dwwwwwwwd...', '...ddddddd....', '..............', '..............'],
   };
   const COL = { d: '#1a1528', b: '#7f81bf', s: '#5e5a9c', w: '#ffffff', k: '#1a1528', o: '#f2a73b', y: '#F2C230', e: '#FFFDF8', r: '#D9372B',
-    n: '#8A5A3C', g: '#E9A93B', h: '#BFE3FF', c: '#c9b8e8' };
+    n: '#8A5A3C', g: '#E9A93B', h: '#BFE3FF', c: '#c9b8e8', p: '#EE7DB0', l: '#FFF3B0', m: '#F7D774' };
   const EXTRA_PIX = {
     post: [[10, 6, 'eeee'], [10, 7, 'eree'], [10, 8, 'eeee']],
     travel: [[10, 9, '.nn.'], [9, 10, 'nnnnn'], [9, 11, 'nggnn'], [9, 12, 'nnnnn']],
     artist: [[4, -2, '..rrrr'], [3, -1, '.rrrrrrr'], [3, 0, 'rrr...r']],
     crown: [[4, -3, 'd.d.d'], [4, -2, 'gdgdg'], [3, -1, 'dgggggd'], [3, 0, 'dgrgrgd'], [4, 1, 'ddddd']],
+    // особые бейджи — тоже Полли в образе
+    sparkle: [[11, -3, '.l.'], [10, -2, 'lml'], [11, -1, '.l.'], [1, 0, '.m.'], [0, 1, 'mlm'], [1, 2, '.m.'], [12, 4, 'l'], [3, -2, 'm']],
+    ink: [[9, 13, '.dd'], [8, 12, 'd'], [12, 12, 'd'], [12, 9, 'dd'], [13, 8, 'd'], [12, 6, '.n'], [12, 7, 'dd']],
+    party: [[7, -3, 'y'], [6, -2, 'pyp'], [5, -1, 'ypypy'], [1, 0, 'p'], [12, -1, 'y'], [2, 3, 'h'], [13, 1, 'p'], [0, 5, 'y']],
+    sleepy: [[7, 2, 'bb'], [7, 3, 'dd'], [10, -3, 'hhh'], [11, -2, 'h'], [10, -1, 'hhh'], [13, -2, 'h'], [12, 0, 'hh']],
+    moon: [[1, -3, '.mmm'], [0, -2, 'mm'], [0, -1, 'mm'], [1, 0, '.mmm'], [12, -2, 'l'], [6, -3, 'l']],
+    clock: [[9, 7, 'd...d'], [9, 8, '.rrr.'], [9, 9, 'rwwwr'], [9, 10, 'rwddr'], [9, 11, 'rwwwr'], [9, 12, '.rrr.'], [9, 13, 'd...d']],
+    medal: [[10, -3, '.m.'], [9, -2, 'mmm'], [10, -1, 'm.m'], [5, 8, 'r.r'], [5, 9, 'r.r'], [5, 10, 'mmm'], [4, 11, 'mmlmm'], [5, 12, 'mmm']],
   };
+  const MONO = { b: '#D9D9D9', s: '#9A9A9A', o: '#6B6B6B' };
   function spriteSvg(kind) {
     const rows = SPR[kind] || POLLY, px = [];
-    rows.forEach((r, y) => [...r].forEach((ch, x) => COL[ch] && px.push([x, y + 3, COL[ch]])));
+    const pal = kind === 'ink' ? { ...COL, ...MONO } : COL;
+    rows.forEach((r, y) => [...r].forEach((ch, x) => pal[ch] && px.push([x, y + 3, pal[ch]])));
     (EXTRA_PIX[kind] || []).forEach(([x0, y0, s]) => [...s].forEach((ch, i) => COL[ch] && px.push([x0 + i, y0 + 3, COL[ch]])));
     // шлем астронавта: стеклянное кольцо вокруг головы
     if (kind === 'astro') for (let y = -3; y < 9; y++) for (let x = 0; x < 14; x++) {
@@ -140,6 +155,10 @@
     const row = (window.CHALLENGE_DATA?.subjects || []).find(r => r[0] === en);
     return row ? row[L] : en;
   }
+  // загрузка за сегодня, вчера или позавчера
+  let upOff = 0;
+  const dayAgo = n => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - n); return d; };
+  const keyOfD = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
   const todayKey = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`; };
   const fmtDay = k => new Date(k + 'T12:00:00').toLocaleDateString(locale, { day: 'numeric', month: 'short' });
 
@@ -202,8 +221,10 @@
 
   function renderProfile(prev) {
     const lv = levelOf(me.best), next = LEVELS.find(l => l.d > me.best);
-    const got = specials(me.posts), today = todayKey(), mine = me.posts.find(p => p.day === today);
-    const th = window.ChallengeTheme ? window.ChallengeTheme.themeFor(new Date(), L) : null;
+    const upDate = dayAgo(upOff), upKey = keyOfD(upDate);
+    const got = specials(me.posts), mine = me.posts.find(p => p.day === upKey);
+    const th = window.ChallengeTheme ? window.ChallengeTheme.themeFor(upDate, L) : null;
+    const dayBtns = [0, 1, 2].map(n => `<button type="button" data-off="${n}" aria-pressed="${n === upOff}">${t(['dToday', 'dYesterday', 'd2ago'][n])}${me.posts.some(p => p.day === keyOfD(dayAgo(n))) ? ' ✓' : ''}</button>`).join('');
     const base = (LEVELS.indexOf(next) > 0 ? LEVELS[LEVELS.indexOf(next) - 1].d : 0);
     const progress = next ? Math.round((me.best - base) / (next.d - base) * 100) : 100;
     app.innerHTML = `<div class="sw-grid">
@@ -217,7 +238,8 @@
         <p class="sw-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a>${me.admin ? ' · <b>admin</b>' : ''}</p>
       </div>
       <form class="sw-card sw-upload" id="sw-up">
-        <p class="sw-kicker">${t('today')}</p><h2>${th ? esc(th.subject) : ''}</h2>
+        <div class="ch-level sw-days" role="group">${dayBtns}</div>
+        <p class="sw-kicker">${upOff ? `${t('themeOf')} ${upDate.toLocaleDateString(locale, { day: 'numeric', month: 'long' })}` : t('today')}</p><h2>${th ? esc(th.subject) : ''}</h2>
         ${mine ? `<div class="sw-mine"><img src="/api/img/${mine.id}?t=1" alt=""><div><p>${t('posted')}</p><button type="button" class="sw-link danger" data-del="${mine.id}">${t('del')}</button></div></div>` : ''}
         <label class="pill-btn sw-file">${mine ? t('replace') : t('pick')}<input type="file" accept="image/*" name="file" hidden></label>
         <div class="sw-prev" hidden><img alt=""></div>
@@ -226,11 +248,21 @@
         <p class="sw-status" id="sw-status"></p>
       </form></div>`;
     if (prev) celebrate(prev, lv, got);
+    // по нажатию — бейдж крупно, с описанием
     app.querySelectorAll('.sw-badges .sw-medal').forEach(b => b.onclick = () => {
-      const all = [...LEVELS, ...SPECIAL], x = all.find(v => (v.k || v.s) === b.dataset.badge);
-      app.querySelectorAll('.sw-badges .sw-medal').forEach(o => o.classList.toggle('sel', o === b));
-      const fun = b.classList.contains('past') && x.past ? x.past[L] : x.f[L];
-      document.getElementById('sw-how').innerHTML = `<b>${esc(x.n[L])}</b>${b.classList.contains('off') ? '' : ' ✓'} <i>${esc(fun)}</i><br>${esc(howTo(x))}`;
+      const x = [...LEVELS, ...SPECIAL].find(v => (v.k || v.s) === b.dataset.badge);
+      const state = b.classList.contains('past') ? 'past' : !b.classList.contains('off');
+      const fun = state === 'past' && x.past ? x.past[L] : x.f[L];
+      const v = document.createElement('div');
+      v.className = 'sw-bv'; v.setAttribute('role', 'dialog');
+      v.innerHTML = `<div class="sw-bv-card"><button type="button" class="sw-bv-close" aria-label="Close">✕</button>${medal(x, state)}
+        <h3>${esc(x.n[L])}</h3><p class="sw-bv-fun">${esc(fun)}</p><p class="sw-bv-how">${esc(howTo(x))}${x.k === 'pick' && me.picks ? `<br>${esc(t('picked', me.picks))}` : ''}</p>
+        <span class="sw-bv-state${state === true ? ' ok' : ''}">${state === true ? t('have') : state === 'past' ? t('hadIt') : t('notYet')}</span></div>`;
+      const close = () => { v.remove(); document.removeEventListener('keydown', esc1); };
+      const esc1 = e => e.key === 'Escape' && close();
+      v.addEventListener('click', e => { if (e.target === v || e.target.closest('.sw-bv-close')) close(); });
+      document.addEventListener('keydown', esc1);
+      document.body.appendChild(v); v.querySelector('.sw-bv-close').focus();
     });
     document.getElementById('sw-out').onclick = async () => { await post('logout'); me = null; render(); loadWall(true); };
     // «Удалить аккаунт» — в самом низу страницы, подальше от «Выйти»
@@ -243,7 +275,8 @@
       if (!confirm(t('delAsk'))) return;
       try { await post('delete-post', { id: b.dataset.del }); await refresh(); loadTop(); loadWall(true); } catch (e) { alert(t('err')); }
     });
-    setupUpload(th);
+    app.querySelectorAll('.sw-days [data-off]').forEach(b => b.onclick = () => { upOff = +b.dataset.off; renderProfile(); });
+    setupUpload(th, upDate, upKey);
   }
 
   // ---------- загрузка ----------
@@ -255,7 +288,7 @@
     URL.revokeObjectURL(img.src);
     return new Promise(r => c.toBlob(r, 'image/jpeg', q));
   }
-  function setupUpload(th) {
+  function setupUpload(th, upDate, upKey) {
     const form = document.getElementById('sw-up'), input = form.file, btn = form.querySelector('button[type="submit"]');
     const prev = form.querySelector('.sw-prev'), st = document.getElementById('sw-status');
     let full = null, thumb = null;
@@ -276,9 +309,10 @@
       const fd = new FormData();
       fd.append('image', new File([full], 'sketch.jpg', { type: 'image/jpeg' }));
       fd.append('thumb', new File([thumb], 'thumb.jpg', { type: 'image/jpeg' }));
-      fd.append('day', todayKey());
-      const nowD = new Date(); fd.append('tod', String(nowD.getHours() * 60 + nowD.getMinutes()));
-      fd.append('theme', th ? window.ChallengeTheme.themeFor(new Date(), 0).subject : '');
+      fd.append('day', upKey);
+      // время суток — только для сегодняшней работы (для бейджа «Как по часам»)
+      if (upKey === todayKey()) { const nowD = new Date(); fd.append('tod', String(nowD.getHours() * 60 + nowD.getMinutes())); }
+      fd.append('theme', th ? window.ChallengeTheme.themeFor(upDate, 0).subject : '');
       let bw = false; try { bw = localStorage.getItem('ch-bw') === '1'; } catch (err) { /* без памяти */ }
       fd.append('bw', bw ? '1' : '0');
       if (form.consent) fd.append('consent', form.consent.checked ? 'yes' : '');

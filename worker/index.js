@@ -268,7 +268,7 @@ async function route(req, env, url) {
     const full = f.get('image'), thumb = f.get('thumb'), day = String(f.get('day') || '');
     if (f.get('consent') === 'yes' && !u.consent) await env.DB.prepare('UPDATE users SET consent = 1 WHERE id = ?').bind(u.id).run();
     else if (!u.consent) fail(400, 'consent');
-    if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || Math.abs(dayNum(day) - utcToday()) > 1) fail(400, 'day');
+    if (!/^\d{4}-\d{2}-\d{2}$/.test(day) || dayNum(day) < utcToday() - 3 || dayNum(day) > utcToday() + 1) fail(400, 'day'); // сегодня, вчера, позавчера (с запасом на часовые пояса)
     if (!(full instanceof File) || !(thumb instanceof File)) fail(400, 'file');
     if (full.size > MAX_FULL || thumb.size > MAX_THUMB) fail(413, 'big');
     const fb = await full.arrayBuffer(), tb = await thumb.arrayBuffer();

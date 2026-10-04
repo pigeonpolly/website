@@ -904,12 +904,14 @@ button.day:hover { background: rgba(255, 255, 255, .12); transform: translateY(-
 .sw-next { margin: 6px 0 0; font-size: 14px; color: var(--muted); }
 .sw-badges { grid-column: 1 / -1; }
 .sw-badges h3 { margin: 4px 0 10px; font: 600 15px var(--sans); color: var(--muted); text-transform: uppercase; letter-spacing: .06em; }
-.sw-badges > div { display: flex; flex-wrap: wrap; gap: 8px; }
-.sw-medal { display: inline-grid; place-items: center; width: 46px; height: 46px; border-radius: 50%; background: var(--bg); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .15), 0 0 0 2px rgba(255, 255, 255, .15); flex: none; }
-.sw-medal svg { width: 70%; height: 70%; }
+.sw-badges > div { display: flex; flex-wrap: wrap; gap: 12px 10px; }
+.sw-medal { display: inline-grid; place-items: center; width: 62px; height: 62px; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255, 255, 255, .55), transparent 55%), var(--bg); box-shadow: inset 0 -4px 0 rgba(0, 0, 0, .12), 0 0 0 3px rgba(255, 255, 255, .9), 0 4px 10px rgba(0, 0, 0, .3); flex: none; }
+.sw-medal svg { width: 74%; height: 74%; }
 .sw-medal b { font-size: 20px; color: #2B1A51; }
-.sw-medal.big { width: 96px; height: 96px; }
-.sw-medal.off { filter: grayscale(1) brightness(.55); opacity: .5; }
+.sw-medal.big { width: 120px; height: 120px; }
+/* ещё не получен: загадочный силуэт */
+.sw-medal.off { background: rgba(255, 255, 255, .06); box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .14); }
+.sw-medal.off svg { filter: brightness(0) invert(1); opacity: .22; }
 button.sw-medal { border: 0; padding: 0; cursor: pointer; transition: transform .15s; }
 button.sw-medal:hover, button.sw-medal.sel { transform: scale(1.12); box-shadow: inset 0 -3px 0 rgba(0, 0, 0, .15), 0 0 0 3px var(--peach); }
 .sw-medal { position: relative; }
@@ -940,7 +942,7 @@ button.sw-medal:hover, button.sw-medal.sel { transform: scale(1.12); box-shadow:
 .sw-cols { display: grid; grid-template-columns: 280px minmax(0, 1fr); gap: 32px; margin-top: 40px; }
 .sw-top { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
 .sw-top li { display: flex; align-items: center; gap: 10px; padding: 8px 12px; border-radius: 14px; background: rgba(255, 255, 255, .05); }
-.sw-top .sw-medal { width: 34px; height: 34px; }
+.sw-top .sw-medal { width: 38px; height: 38px; box-shadow: 0 0 0 2px rgba(255, 255, 255, .8); }
 .sw-pos { width: 18px; color: var(--peach); font-weight: 700; }
 .sw-top .sw-topnick { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
 .sw-fire { font-weight: 700; }
@@ -997,3 +999,19 @@ button.sw-medal:hover, button.sw-medal.sel { transform: scale(1.12); box-shadow:
 .sw-nickname.gold { padding: 0 8px; border-radius: 99px; box-shadow: 0 0 0 2px #F2C230, 0 0 12px rgba(242, 194, 48, .55); color: #F7E7A6; }
 h2 .sw-nickname.gold { padding: 2px 12px; }
 .pb-tag.gold { box-shadow: 0 0 0 2px #F2C230, 0 0 10px rgba(242, 194, 48, .55); }
+
+/* большой просмотр бейджа */
+.sw-bv { position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; padding: 16px; background: rgba(20, 12, 40, .75); animation: modal-in .2s ease-out; }
+.sw-bv-card { position: relative; width: min(360px, 100%); padding: 32px 24px 24px; border-radius: 26px; background: #FFFDF8; color: #2B1A51; text-align: center; box-shadow: 0 30px 60px rgba(0, 0, 0, .5); }
+.sw-bv-card .sw-medal { width: 200px; height: 200px; margin: 0 auto 12px; }
+.sw-bv-card .sw-medal .sw-stars { font-size: 20px; line-height: 26px; bottom: -12px; }
+.sw-bv-card .sw-medal.off { background: #EDE8F7; box-shadow: inset 0 0 0 3px #D9D3F2; }
+.sw-bv-card .sw-medal.off svg { filter: brightness(0); opacity: .18; }
+.sw-bv-card h3 { margin: 10px 0 4px; font: 700 24px var(--serif); }
+.sw-bv-fun { margin: 0 0 10px; color: #D85A30; font: italic 400 17px/1.4 var(--serif); }
+.sw-bv-how { margin: 0 0 10px; color: #4A3E68; font-size: 15px; line-height: 1.5; }
+.sw-bv-state { display: inline-block; padding: 4px 12px; border-radius: 99px; background: #EDE8F7; font: 700 13px var(--sans); }
+.sw-bv-state.ok { background: #C6E4D6; color: #1F5E3F; }
+.sw-bv-close { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #D9D3F2; background: none; color: #2B1A51; font-size: 16px; cursor: pointer; }
+@media (max-width: 520px) { .sw-medal { width: 54px; height: 54px; } }
+.sw-days { flex-wrap: wrap; }
