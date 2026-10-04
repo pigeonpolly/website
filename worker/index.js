@@ -362,10 +362,15 @@ async function route(req, env, url) {
   if (m === 'POST' && p === '/api/admin/pick') {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');
-    const { id } = await req.json().catch(() => ({}));
+    const { id, undo } = await req.json().catch(() => ({}));
+    const prev = Number(await getMeta(env, 'pick_user'));
+    if (undo) { // снять «Выбор Полли»: у владельца бейдж становится чёрно-белым
+      if (prev) await addBadge(env, prev, 'pick_past');
+      await env.DB.prepare("DELETE FROM meta WHERE key IN ('pick_post', 'pick_user')").run();
+      return json({ ok: true });
+    }
     const post = await env.DB.prepare('SELECT id, user_id FROM posts WHERE id = ?').bind(String(id)).first();
     if (!post) fail(404, 'post');
-    const prev = Number(await getMeta(env, 'pick_user'));
     if (prev && prev !== post.user_id) await addBadge(env, prev, 'pick_past');
     await setMeta(env, 'pick_post', post.id);
     await setMeta(env, 'pick_user', String(post.user_id));

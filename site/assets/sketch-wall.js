@@ -42,6 +42,7 @@
     levelUp: ['New level!', 'Новый уровень!', 'Jauns līmenis!'],
     tapBadge: ['Tap a badge to see how to get it.', 'Нажмите на значок, чтобы узнать, как его получить.', 'Pieskaries nozīmītei, lai uzzinātu, kā to iegūt.'],
     newBadge: ['New badge!', 'Новый бейдж!', 'Jauna nozīmīte!'],
+    unpick: ['Remove', 'Снять', 'Noņemt'],
     hide: ['Hide', 'Скрыть', 'Paslēpt'], ban: ['Block', 'Блок', 'Bloķēt'],
     banAsk: ['Block this user? Their sketches disappear from the wall.', 'Заблокировать пользователя? Его рисунки пропадут со стены.', 'Bloķēt lietotāju? Viņa skices pazudīs no sienas.'],
   };
@@ -324,7 +325,7 @@
         ${p.id === pick ? `<span class="sw-stamp">★ ${esc(SPECIAL.find(x => x.k === 'pick').n[L])}</span>` : ''}
         <a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"></a>
         <figcaption><b>@${esc(p.nick)}</b> <span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></figcaption>
-        ${me && me.admin ? `<div class="sw-mod">${p.id === pick ? '' : `<button type="button" data-pick="${p.id}" title="${esc(SPECIAL.find(x => x.k === 'pick').n[L])}">★</button>`}<button type="button" data-hide="${p.id}">${t('hide')}</button><button type="button" data-ban="${p.uid}">${t('ban')}</button></div>` : ''}
+        ${me && me.admin ? `<div class="sw-mod">${p.id === pick ? `<button type="button" data-unpick="1">☆ ${t('unpick')}</button>` : `<button type="button" data-pick="${p.id}" title="${esc(SPECIAL.find(x => x.k === 'pick').n[L])}">★</button>`}<button type="button" data-hide="${p.id}">${t('hide')}</button><button type="button" data-ban="${p.uid}">${t('ban')}</button></div>` : ''}
       </figure>`).join(''));
       if (posts.length) cursor = posts[posts.length - 1].created_at;
       more.hidden = posts.length < 24;
@@ -335,6 +336,7 @@
     const h = e.target.closest('[data-hide]'), b = e.target.closest('[data-ban]'), pk = e.target.closest('[data-pick]');
     try {
       if (pk) { await post('admin/pick', { id: pk.dataset.pick }); loadWall(true); refresh(); }
+      if (e.target.closest('[data-unpick]')) { await post('admin/pick', { undo: true }); loadWall(true); refresh(); }
       if (h) { await post('admin/hide', { id: h.dataset.hide }); h.closest('.sw-tile').remove(); }
       if (b && confirm(t('banAsk'))) { await post('admin/ban', { uid: b.dataset.ban }); loadWall(true); loadTop(); }
     } catch (err) { alert(t('err')); }
