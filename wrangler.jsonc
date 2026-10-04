@@ -1,9 +1,21 @@
-// Настройки Cloudflare: сайт — это статические файлы из папки site/
+// Настройки Cloudflare: сайт — статические файлы из папки site/,
+// worker/index.js обслуживает /api/* («Стена рисунков»), всё остальное отдаёт из site/.
 {
   "name": "website",
   "compatibility_date": "2025-09-01",
+  "main": "worker/index.js",
   "assets": {
     "directory": "./site",
+    "binding": "ASSETS",
     "not_found_handling": "404-page"
+  },
+  "d1_databases": [
+    { "binding": "DB", "database_name": "pigeonpolly", "database_id": "4c664cd2-ab5c-4061-8914-47d9860723dd" }
+  ],
+  "kv_namespaces": [
+    { "binding": "IMAGES", "id": "2af1033ad2bc49b99a15255d3bf33fae" }
+  ],
+  "vars": {
+    "GOOGLE_CLIENT_ID": "1094519099125-atpm5nimhbg8sk5i7p50lp86duc5n98c.apps.googleusercontent.com"
   }
 }
