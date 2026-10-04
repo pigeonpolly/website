@@ -83,15 +83,27 @@ def nav_html(current):
     return "\n".join(items)
 
 
+GALLERY_LABELS = {
+    "bird": "Pigeon Polly illustration", "snail": "Mr.Chew illustration", "detective": "Mr.Titos illustration",
+    "halloween": "Pumpkin Family illustration", "anxiety": "Anxiety series, ecoline painting",
+    "sketchbook": "Sketchbook page", "ai-art": "AI art in the Pigeon Polly style",
+    "exhibitions": "Exhibition photo, The House of the Blackheads, Riga 2022",
+    "publications": "Flora Fiction publication, 2023",
+}
+
+
 def gallery_html(name):
     f = CONTENT / "galleries" / f"{name}.json"
     items = json.loads(f.read_text()) if f.exists() else []
     if not items:
         return '<p class="empty">Gallery is coming soon.</p>'
     out = []
-    for it in items:
+    for n, it in enumerate(items):
         cap = esc(it.get("caption", ""))
-        alt = esc(it.get("alt") or it.get("caption", ""))
+        label = GALLERY_LABELS.get(name, "Artwork")
+        cap_txt = re.sub(r"^\(\d{4}\)\s*", "", it.get("caption", ""))
+        alt = esc(it.get("alt") or (f"{cap_txt} — {label} by Alina Otkinska" if cap_txt
+                                     else f"{label} by Alina Otkinska, artwork {n + 1}"))
         out.append(
             f'<figure><a href="/{it["full"]}" data-lightbox>'
             f'<img src="/{it["thumb"]}" width="{it["w"]}" height="{it["h"]}" alt="{alt}" loading="lazy" decoding="async"></a>'
