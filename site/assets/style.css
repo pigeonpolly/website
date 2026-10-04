@@ -710,3 +710,26 @@ button.day:hover { background: rgba(255, 255, 255, .12); transform: translateY(-
 .wall .gallery { padding-left: 0; padding-right: 0; }
 @media (max-width: 860px) { .ch-grid { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { .page.old { display: none; } }
+
+/* ---------- On Walls & Pages ---------- */
+.seen { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; padding: 16px var(--gutter) 80px; }
+.seen-card { position: relative; padding: 30px 28px 10px; border-radius: 22px; }
+.seen-card h2 { margin: 0 0 6px; font-size: clamp(24px, 2.6vw, 32px); }
+.seen-kicker { margin: 0 0 10px; font: italic 400 19px/1.2 var(--serif); }
+.seen-meta { margin: 0 0 12px; font-size: 15px; letter-spacing: .02em; }
+.seen-card .gallery { columns: 2 160px; padding: 12px 0 20px; }
+/* стены: тёмная «галерея» с рамами */
+.seen-walls { background: #241544; box-shadow: inset 0 0 0 1px var(--line); }
+.seen-walls .seen-kicker { color: var(--peach); }
+.seen-walls .seen-meta { color: var(--muted); }
+.seen-walls .gallery figure { background: #8a5a3c; padding: 8px; border-radius: 4px; box-shadow: 0 10px 24px rgba(0, 0, 0, .4), inset 0 0 0 3px #6b4430; }
+.seen-walls .gallery img { border-radius: 2px; }
+/* страницы: светлая «бумага» */
+.seen-pages { background: #FFFDF8; color: #2B1A51; transform: rotate(.6deg); box-shadow: 0 18px 40px rgba(0, 0, 0, .3); }
+.seen-pages h2 { color: #2B1A51; }
+.seen-pages .seen-kicker { color: #D85A30; }
+.seen-pages .seen-meta { color: #6B5AA8; }
+.seen-pages .gallery figure { background: #fff; border-radius: 4px; box-shadow: 0 4px 14px rgba(43, 26, 81, .18); }
+.seen-link { color: #D85A30; font-weight: 500; }
+@media (max-width: 860px) { .seen { grid-template-columns: 1fr; } .seen-pages { transform: none; } }
+.diary-nav button:disabled { opacity: .3; cursor: default; } .diary-grid .day.before { opacity: .25; }

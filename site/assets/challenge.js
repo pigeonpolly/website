@@ -174,6 +174,7 @@
   });
 
   let view = new Date(today.getFullYear(), today.getMonth(), 1);
+  const START = new Date(2026, 9, 1); // челлендж начался 1 октября 2026
   function streak() {
     let n = 0; const d = new Date(today);
     if (!diary[keyOf(d)]) d.setDate(d.getDate() - 1);
@@ -188,6 +189,7 @@
     const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     for (let i = 1; i <= days; i++) {
       const d = new Date(view.getFullYear(), view.getMonth(), i), k = keyOf(d), e = diary[k];
+      if (d < START) { html += `<span class="day before"><b>${i}</b></span>`; continue; }
       if (d > t0) { html += `<span class="day locked" title="${t('locked')}"><b>${i}</b><i aria-hidden="true">🔒</i></span>`; continue; }
       const th = themeFor(d);
       html += `<button type="button" class="day${k === todayKey ? ' today' : ''}${k === selKey ? ' sel' : ''}" data-k="${k}">`
@@ -195,6 +197,7 @@
         + `<b>${i}</b><span class="d-subj">${th.subject}</span><span class="d-dots">${th.colors.map(c => `<i style="background:${c.hex}"></i>`).join('')}</span></button>`;
     }
     $('#ch-grid').innerHTML = html;
+    $('#ch-prev').disabled = view <= START;
   }
   $('#ch-grid').addEventListener('click', e => {
     const b = e.target.closest('button.day'); if (!b) return;

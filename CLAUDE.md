@@ -16,7 +16,8 @@
 - `src/pages/*.html` — страницы. Плейсхолдеры: `{{gallery:имя}}`, `{{ebooks}}`, `{{projects}}`, `{{cv}}`, `{{block:имя}}`.
 - `src/blocks/*.html` — блоки главной (coming-soon, patreon, about, sketching-guides, game). Их `<style>` при сборке автоматически ограничивается блоком (`#blk-имя`); правила для `html, body` переносятся на сам блок.
 - `content/galleries/*.json` — галереи (full, thumb, w, h, caption). `content/ebooks.json` — книги. `content/projects.json` — книжная полка проектов (темы и цвета, описания). `content/cv.json` — опыт, образование, курсы (`"current": true` — зелёный мигающий кружок).
-- `build.py` — список страниц `PAGES`, меню `NAV`, подменю `PORTFOLIO`, языки `LANGS`.
+- `build.py` — список страниц `PAGES`, меню `NAV` (пункт с тремя элементами = выпадающий список), подменю `PORTFOLIO` и `SOCIAL`, языки `LANGS`.
+- Меню: Daily Challenge · E-Books · Art Portfolio ▾ · Learning & AI ▾ (Projects, Work with me) · On Walls & Pages (выставки + публикации, старые /exhibitions и /publications перенаправляются) · Social Media ▾. «Home» в меню нет — главная открывается по логотипу.
 - `_held/` — готово, но **не публиковать без просьбы**: Wobbleland (страница, квиз), обложки комиксов «Robbery on the Wobbleton Express» и «The Paper Girl».
 
 ## Языки
@@ -50,6 +51,7 @@
 ## Daily Challenge (/challenge)
 - Тема дня одинаковая у всех в один день: выбирается по дате из `site/assets/challenge-data.js` (предметы, 10 базовых цветов, время 5/10/15 мин, советы — всё в формате [en, ru, lv]). Логика — `site/assets/challenge.js`.
 - «Спокойно» = время +5 мин, «Посложнее» = базовое время. Таймер с этапами 20/55/25%.
+- Календарь тем начинается с 1 октября 2026 и листается вперёд бесконечно.
 - «Календарь тем»: в прошедших днях видна тема (клик — открыть день), будущие закрыты замком. Отметок «нарисовано» и сохранения нет (Алина решила убрать). Фото рисунка нужно только для карточки и нигде не хранится.
 - Карточка «поделиться» рисуется на canvas (1080×1350) с #dailypigeonpolly.
 - «Ваши работы»: стена в 3 ряда, листается вбок; пока работ меньше 15, добиваются заглушками с Полли. Избранное по хэштегу добавлять в `content/galleries/challenge.json` через `tools/add_images.py challenge …`, подпись — «ник · тема · дата».

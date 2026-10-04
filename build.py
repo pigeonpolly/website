@@ -27,8 +27,8 @@ PAGES = [
     ("challenge", "Daily Challenge", "challenge.html",
      "A daily sketch challenge with Pigeon Polly: one subject, three colours, a few minutes."),
     ("e-books", "E-Books", "e-books.html", "E-books by Alina Otkinska."),
-    ("exhibitions", "Exhibitions", "exhibitions.html", "Exhibitions of Pigeon Polly art."),
-    ("publications", "Publications", "publications.html", "Publications of Pigeon Polly art."),
+    ("on-walls-and-pages", "On Walls & Pages", "on-walls-and-pages.html",
+     "Exhibitions and publications of Pigeon Polly art: on gallery walls and printed pages."),
     ("art-portfolio/anxiety", "Anxiety", "anxiety.html", "Anxiety, a series in ecolines."),
     ("art-portfolio/sketchbook", "My Sketchbook", "sketchbook.html", "Pages from my sketchbook."),
     ("art-portfolio/snail", "Mr.Chew", "snail.html", "Mr.Chew the snail, illustrations 2023–2025."),
@@ -37,6 +37,7 @@ PAGES = [
     ("art-portfolio/halloween", "Pumpkin Family", "halloween.html", "Welcome to the Pumpkin-Heads family."),
     ("art-portfolio/ai-art", "AI Art", "ai-art.html", "AI art based on the Pigeon Polly traditional art style."),
 ]
+
 
 PORTFOLIO = [
     ("art-portfolio/anxiety", "Anxiety"),
@@ -48,15 +49,20 @@ PORTFOLIO = [
     ("art-portfolio/ai-art", "AI Art"),
 ]
 
+# пункт меню: (путь, название) или (ключ, название, [подпункты])
+SOCIAL = [
+    ("https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ", "Amazon"),
+    ("https://lv.linkedin.com/in/otkinska", "LinkedIn"),
+    ("https://www.patreon.com/cw/pigeon_polly", "Patreon"),
+    ("https://www.pinterest.com/pigeonpollyart/", "Pinterest"),
+]
 NAV = [
-    ("", "Home"),
-    ("projects", "Projects"),
-    ("work-with-me", "Work with me"),
     ("challenge", "Daily Challenge"),
     ("e-books", "E-Books"),
-    ("exhibitions", "Exhibitions"),
-    ("publications", "Publications"),
-    ("art-portfolio", "Art Portfolio"),
+    ("art-portfolio", "Art Portfolio", PORTFOLIO),
+    ("learning", "Learning & AI", [("projects", "Projects"), ("work-with-me", "Work with me")]),
+    ("on-walls-and-pages", "On Walls & Pages"),
+    ("social", "Social Media", SOCIAL),
 ]
 
 esc = html.escape
@@ -66,24 +72,26 @@ def href(path):
     return path if path.startswith("http") else "/" + (path + "/" if path else "")
 
 
+def nav_link(path, label, current):
+    if path.startswith("http"):
+        return f'<a href="{path}" target="_blank" rel="noopener">{esc(label)}<span class="ext" aria-hidden="true">↗</span></a>'
+    cur = ' aria-current="page"' if path == current else ""
+    return f'<a href="{href(path)}"{cur}>{esc(label)}</a>'
+
+
 def nav_html(current):
     items = []
-    for path, label in NAV:
-        if path == "art-portfolio":
-            active = current.startswith("art-portfolio")
-            cur_attr = ' aria-current="page"'
-            sub = "".join(
-                f'<li><a href="{href(p)}"{cur_attr if p == current else ""}>{esc(l)}</a></li>'
-                for p, l in PORTFOLIO)
+    for entry in NAV:
+        if len(entry) == 3:
+            key, label, children = entry
+            active = any(p == current for p, _ in children)
+            sub = "".join(f"<li>{nav_link(p, l, current)}</li>" for p, l in children)
             items.append(
                 f'<li class="has-sub{" active" if active else ""}">'
                 f'<button class="sub-toggle" aria-expanded="false">{esc(label)}<span aria-hidden="true">▾</span></button>'
                 f'<ul class="nav-sub">{sub}</ul></li>')
-        elif path.startswith("http"):
-            items.append(f'<li><a href="{path}" target="_blank" rel="noopener">{esc(label)}<span class="ext" aria-hidden="true">↗</span></a></li>')
         else:
-            cur = ' aria-current="page"' if path == current else ""
-            items.append(f'<li><a href="{href(path)}"{cur}>{esc(label)}</a></li>')
+            items.append(f"<li>{nav_link(entry[0], entry[1], current)}</li>")
     return "\n".join(items)
 
 
