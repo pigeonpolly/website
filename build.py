@@ -53,6 +53,8 @@ PORTFOLIO = [
 SOCIAL = [
     ("https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ", "Amazon"),
     ("https://lv.linkedin.com/in/otkinska", "LinkedIn"),
+    ("https://www.instagram.com/pigeonpolly", "Instagram"),
+    ("https://www.tiktok.com/@pigeonpolly", "TikTok"),
     ("https://www.patreon.com/cw/pigeon_polly", "Patreon"),
     ("https://www.pinterest.com/pigeonpollyart/", "Pinterest"),
 ]
