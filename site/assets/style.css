@@ -794,9 +794,12 @@ button.day:hover { background: rgba(255, 255, 255, .12); transform: translateY(-
 
 /* ---------- Главная: «Тема дня» с конвертом ---------- */
 .today-sec {
-  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 56px; align-items: center; padding: 64px var(--gutter) 48px;
-  background: radial-gradient(rgba(245, 196, 179, .14) 1.5px, transparent 1.6px) 0 0 / 26px 26px, linear-gradient(135deg, #3A2470 0%, #534AB7 100%);
-  border-top: 1px solid rgba(255, 255, 255, .08);
+  display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 32px 56px; align-items: center;
+  margin: 24px var(--gutter) 40px; padding: 48px clamp(20px, 4vw, 56px) 36px; border-radius: 28px;
+  border: 7px solid transparent;
+  background: linear-gradient(#321F5F, #2E1C58) padding-box,
+    repeating-linear-gradient(135deg, #F0A987 0 16px, #2B1A51 16px 24px, #7F81BF 24px 40px, #2B1A51 40px 48px) border-box;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, .3);
 }
 .td-title { margin: 0 0 14px; font-size: clamp(30px, 3.6vw, 46px); }
 .td-lead { margin: 0 0 24px; color: var(--muted); font-size: 18px; line-height: 1.6; max-width: 520px; }
@@ -855,5 +858,6 @@ button.day:hover { background: rgba(255, 255, 255, .12); transform: translateY(-
   .today-sec { grid-template-columns: 1fr; padding-top: 48px; }
   .td-stage { height: 350px; }
 }
-@media (max-width: 380px) { .td-env { transform: scale(.9); } }
+@media (max-width: 480px) { .today-sec { padding: 32px 16px 24px; border-width: 6px; } .td-stage { zoom: .82; } }
+@media (max-width: 360px) { .td-stage { zoom: .72; } }
 @media (prefers-reduced-motion: reduce) { .td-env, .td-seal { animation: none; } }
