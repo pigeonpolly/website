@@ -96,11 +96,40 @@ GALLERY_LABELS = {
 }
 
 
+POLLY_ROWS = ['......ddd.....', '.....dbbbd....', '....dbbwwbd...', '....dbbwkbdoo.', '....dbbbbbdo..', '...dbbbbbbd...',
+              '..dbbsbbbbd...', '.dbbssbbbbd...', 'dbbssbbbbbd...', 'dbbbbbbbbd....', '.ddbbbbbdd....', '...ddddd......',
+              '....o..o......', '...oo.oo......']
+POLLY_COL = {"d": "#1a1528", "b": "#7f81bf", "s": "#5e5a9c", "w": "#ffffff", "k": "#1a1528", "o": "#f2a73b"}
+POLLY_SVG = ('<svg class="ph-polly" viewBox="0 0 14 14" shape-rendering="crispEdges" aria-hidden="true">' + "".join(
+    f'<rect x="{x}" y="{y}" width="1" height="1" fill="{POLLY_COL[ch]}"/>'
+    for y, row in enumerate(POLLY_ROWS) for x, ch in enumerate(row) if ch in POLLY_COL) + "</svg>")
+
+
+def wall_html():
+    """Стена работ челленджа: настоящие работы + заглушки, 3 ряда, листается вбок."""
+    f = CONTENT / "galleries" / "challenge.json"
+    items = json.loads(f.read_text()) if f.exists() else []
+    cards = []
+    for it in items:
+        cap = esc(it.get("caption", ""))
+        cards.append(f'<figure class="wall-item"><a href="/{it["full"]}" data-lightbox>'
+                     f'<img src="/{it["thumb"]}" alt="{cap or "Daily challenge sketch"}" loading="lazy"></a>'
+                     f'<figcaption>{cap}</figcaption></figure>')
+    tints = ["#F5C4B3", "#CFC7E8", "#F2E3B3", "#BFE3D3", "#F4F0FA"]
+    for i in range(max(0, 15 - len(items))):
+        cards.append(f'<div class="wall-ph" style="--t:{tints[i % len(tints)]};--r:{(i * 37 % 7) - 3}deg">'
+                     f'{POLLY_SVG}<span class="ph-text">Your sketch could be here</span>'
+                     f'<span class="ph-tag">#dailypigeonpolly</span></div>')
+    return '<div class="wall-strip">' + "".join(cards) + "</div>"
+
+
 def gallery_html(name):
+    if name == "challenge":
+        return wall_html()
     f = CONTENT / "galleries" / f"{name}.json"
     items = json.loads(f.read_text()) if f.exists() else []
     if not items:
-        return "" if name == "challenge" else '<p class="empty">Gallery is coming soon.</p>'
+        return '<p class="empty">Gallery is coming soon.</p>'
     out = []
     for n, it in enumerate(items):
         cap = esc(it.get("caption", ""))

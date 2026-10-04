@@ -20,7 +20,9 @@
     ready: ['Ready when you are', 'Начинайте, когда будете готовы', 'Sāc, kad esi gatavs'],
     timeUp: ['Time! Brush down, you did it.', 'Время! Кисть в сторону — вы справились.', 'Laiks! Ota malā — tu to izdarīji.'],
     done: ['I drew it', 'Я нарисовал(а)', 'Es uzzīmēju'],
-    doneYes: ['Drawn today ✓', 'Сегодня нарисовано ✓', 'Šodien uzzīmēts ✓'],
+    doneYes: ['Drawn ✓', 'Нарисовано ✓', 'Uzzīmēts ✓'],
+    backToday: ['← Back to today', '← Вернуться к сегодня', '← Atpakaļ uz šodienu'],
+    locked: ['Opens on this day', 'Откроется в этот день', 'Atvērsies šajā dienā'],
     photo: ['Add a photo of my sketch', 'Добавить фото рисунка', 'Pievienot skices foto'],
     photoChange: ['Change photo', 'Заменить фото', 'Mainīt foto'],
     share: ['Make a share card', 'Сделать карточку для соцсетей', 'Izveidot kartīti dalīšanai'],
@@ -55,7 +57,7 @@
     const day = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
     return { subject: subject[L], colors: cols.slice(0, 3), time, tip: D.tips[day % D.tips.length][L] };
   }
-  const theme = themeFor(today);
+  let sel = new Date(today), selKey = todayKey, theme = themeFor(sel);
 
   // ---------- хранилище ----------
   const store = {
@@ -63,19 +65,20 @@
     set(k, v) { try { localStorage.setItem(k, JSON.stringify(v)); return true; } catch (e) { return false; } },
   };
   let level = store.get('ch-level', 'easy');
-  let diary = store.get('ch-diary', {});
+  const diary = {}; // фото только в памяти — для карточки, нигде не сохраняется
   const minutes = () => theme.time + (level === 'easy' ? 5 : 0);
 
   // ---------- календарь ----------
   const $ = s => root.querySelector(s);
-  const weekday = today.toLocaleDateString(locale, { weekday: 'long' });
-  const month = today.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
-  $('#ch-cal').innerHTML = `
+  function renderCal(anim) {
+    const weekday = sel.toLocaleDateString(locale, { weekday: 'long' });
+    const month = sel.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
+    $('#ch-cal').innerHTML = `
     <div class="tearpad">
-      <div class="page old" aria-hidden="true"></div>
+      ${anim ? '<div class="page old" aria-hidden="true"></div>' : ''}
       <div class="page">
         <div class="page-top"><span>${month}</span></div>
-        <div class="page-day">${today.getDate()}</div>
+        <div class="page-day">${sel.getDate()}</div>
         <div class="page-weekday">${weekday}</div>
         <div class="page-subject">${theme.subject}</div>
         <div class="page-label">${t('colors')}</div>
@@ -83,10 +86,14 @@
         <div class="page-time"><span class="page-label">${t('time')}</span> <b id="ch-min"></b></div>
       </div>
     </div>
+    ${selKey !== todayKey ? `<p class="back-today"><button type="button" id="ch-today">${t('backToday')}</button></p>` : ''}
     <div class="tip"><b>${t('tip')}</b><p>${theme.tip}</p></div>`;
-  const old = $('.page.old'); old && old.addEventListener('animationend', () => old.remove());
+    const old = $('.page.old'); old && old.addEventListener('animationend', () => old.remove());
+    const bt = $('#ch-today'); bt && bt.addEventListener('click', () => selectDay(new Date(today)));
+    renderMin();
+  }
   const renderMin = () => { $('#ch-min').textContent = `${minutes()} ${t('min')}`; };
-  renderMin();
+  renderCal(true);
 
   // ---------- уровень ----------
   const lv = $('#ch-level');
@@ -143,20 +150,14 @@
   resetTimer();
 
   // ---------- дневник ----------
-  const doneBtn = $('#ch-done'), photoBtn = $('#ch-photo'), fileIn = $('#ch-file'), note = $('#ch-note'), shareBtn = $('#ch-share');
-  const save = () => { if (!store.set('ch-diary', diary)) { note.textContent = t('full'); return false; } return true; };
+  const photoBtn = $('#ch-photo'), fileIn = $('#ch-file'), note = $('#ch-note'), shareBtn = $('#ch-share');
+  const save = () => true;
   function renderToday() {
-    const e = diary[todayKey];
-    doneBtn.textContent = e ? t('doneYes') : t('done');
-    doneBtn.classList.toggle('on', !!e);
+    const e = diary[selKey];
     photoBtn.textContent = e && e.img ? t('photoChange') : t('photo');
     shareBtn.textContent = t('share');
     $('#ch-thumb').innerHTML = e && e.img ? `<img src="${e.img}" alt="">` : '';
   }
-  doneBtn.addEventListener('click', () => {
-    if (diary[todayKey]) delete diary[todayKey]; else diary[todayKey] = { done: 1 };
-    save(); renderToday(); renderDiary();
-  });
   photoBtn.addEventListener('click', () => fileIn.click());
   fileIn.addEventListener('change', () => {
     const f = fileIn.files[0]; if (!f) return;
@@ -165,9 +166,7 @@
       const s = Math.min(1, 520 / Math.max(img.width, img.height));
       const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
       c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      const prev = diary[todayKey];
-      diary[todayKey] = { done: 1, img: c.toDataURL('image/jpeg', 0.72) };
-      if (!save()) { diary[todayKey] = prev || { done: 1 }; store.set('ch-diary', diary); }
+      diary[selKey] = { done: 1, img: c.toDataURL('image/jpeg', 0.72) };
       URL.revokeObjectURL(img.src); fileIn.value = '';
       renderToday(); renderDiary();
     };
@@ -182,17 +181,30 @@
     return n;
   }
   function renderDiary() {
-    $('#ch-streak').textContent = UI.streak[L](streak());
-    $('#ch-total').textContent = UI.total[L](Object.keys(diary).length);
     $('#ch-month').textContent = view.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
     const first = (view.getDay() + 6) % 7, days = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
     const names = [...Array(7)].map((_, i) => new Date(2024, 0, 1 + i).toLocaleDateString(locale, { weekday: 'short' }));
     let html = names.map(n => `<span class="dow">${n}</span>`).join('') + '<span></span>'.repeat(first);
+    const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     for (let i = 1; i <= days; i++) {
-      const k = `${view.getFullYear()}-${pad(view.getMonth() + 1)}-${pad(i)}`, e = diary[k];
-      html += `<span class="day${e ? ' done' : ''}${k === todayKey ? ' today' : ''}">${e && e.img ? `<img src="${e.img}" alt="">` : ''}<b>${i}</b></span>`;
+      const d = new Date(view.getFullYear(), view.getMonth(), i), k = keyOf(d), e = diary[k];
+      if (d > t0) { html += `<span class="day locked" title="${t('locked')}"><b>${i}</b><i aria-hidden="true">🔒</i></span>`; continue; }
+      const th = themeFor(d);
+      html += `<button type="button" class="day${k === todayKey ? ' today' : ''}${k === selKey ? ' sel' : ''}" data-k="${k}">`
+        + (e && e.img ? `<img src="${e.img}" alt="">` : '')
+        + `<b>${i}</b><span class="d-subj">${th.subject}</span><span class="d-dots">${th.colors.map(c => `<i style="background:${c.hex}"></i>`).join('')}</span></button>`;
     }
     $('#ch-grid').innerHTML = html;
+  }
+  $('#ch-grid').addEventListener('click', e => {
+    const b = e.target.closest('button.day'); if (!b) return;
+    const [yy, mm, dd] = b.dataset.k.split('-').map(Number);
+    selectDay(new Date(yy, mm - 1, dd));
+    root.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  });
+  function selectDay(d) {
+    sel = d; selKey = keyOf(d); theme = themeFor(d);
+    renderCal(true); resetTimer(); $('#ch-card').innerHTML = ''; renderToday(); renderDiary();
   }
   $('#ch-prev').addEventListener('click', () => { view.setMonth(view.getMonth() - 1); renderDiary(); });
   $('#ch-next').addEventListener('click', () => { view.setMonth(view.getMonth() + 1); renderDiary(); });
@@ -213,8 +225,8 @@
     const g = c.getContext('2d');
     g.fillStyle = '#2B1A51'; g.fillRect(0, 0, 1080, 1350);
     g.fillStyle = '#F0A987'; g.font = '500 36px Karla, sans-serif';
-    g.fillText(`Daily Challenge · ${today.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}`, 70, 100);
-    const e = diary[todayKey];
+    g.fillText(`Daily Challenge · ${sel.toLocaleDateString(locale, { day: 'numeric', month: 'long', year: 'numeric' })}`, 70, 100);
+    const e = diary[selKey];
     const box = { x: 70, y: 150, w: 940, h: 760 };
     g.fillStyle = '#F4F0FA'; g.beginPath(); g.roundRect ? g.roundRect(box.x, box.y, box.w, box.h, 28) : g.rect(box.x, box.y, box.w, box.h); g.fill();
     if (e && e.img) {
@@ -244,10 +256,10 @@
     const c = await makeCard();
     const url = c.toDataURL('image/png');
     const out = $('#ch-card');
-    out.innerHTML = `<img src="${url}" alt=""><p>${t('shareHint')}</p><div class="card-actions"><a class="cta-btn" download="dailypigeonpolly-${todayKey}.png" href="${url}">${t('download')}</a></div>`;
+    out.innerHTML = `<img src="${url}" alt=""><p>${t('shareHint')}</p><div class="card-actions"><a class="cta-btn" download="dailypigeonpolly-${selKey}.png" href="${url}">${t('download')}</a></div>`;
     try {
       const blob = await new Promise(r => c.toBlob(r, 'image/png'));
-      const file = new File([blob], `dailypigeonpolly-${todayKey}.png`, { type: 'image/png' });
+      const file = new File([blob], `dailypigeonpolly-${selKey}.png`, { type: 'image/png' });
       if (navigator.canShare && navigator.canShare({ files: [file] })) {
         const b = document.createElement('button'); b.className = 'cta-link'; b.type = 'button'; b.textContent = '↗ ' + t('share');
         b.onclick = () => navigator.share({ files: [file], text: '#dailypigeonpolly' }).catch(() => {});
