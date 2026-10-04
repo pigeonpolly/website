@@ -41,6 +41,7 @@
     emptyWall: ['The wall is waiting for the first sketch.', 'Стена ждёт первый рисунок.', 'Siena gaida pirmo skici.'],
     levelUp: ['New level!', 'Новый уровень!', 'Jauns līmenis!'],
     have: ['You have it ✓', 'Получен ✓', 'Iegūta ✓'],
+    noWorks: ['No sketches on the wall right now.', 'Сейчас работ на стене нет.', 'Šobrīd uz sienas nav skiču.'],
     dToday: ['Today', 'Сегодня', 'Šodien'], dYesterday: ['Yesterday', 'Вчера', 'Vakar'], d2ago: ['2 days ago', 'Позавчера', 'Aizvakar'],
     themeOf: ['Theme of', 'Тема за', 'Tēma par'],
     hadIt: ['You had it once', 'Был у вас', 'Tev tā bija'],
@@ -131,11 +132,11 @@
   }
   const howTo = lv => lv.h ? lv.h[L] : HOW_LEVEL[L](lv.d);
   // state: true — есть, false — нет, 'past' — был (чёрно-белый)
-  const medal = (lv, on = true, big = false, tag = 'span') => {
+  const medal = (lv, on = true, big = false, tag = 'span', picks = me?.picks || 0) => {
     const fun = on === 'past' && lv.past ? lv.past[L] : lv.f[L];
     const cls = on === 'past' ? ' past' : on ? '' : ' off';
-    const stars = lv.k === 'pick' && me && me.picks ? `<span class="sw-stars" aria-label="${Math.min(3, Math.floor(me.picks / 5))}/3">${[1, 2, 3].map(i => `<i class="${me.picks >= i * 5 ? 'on' : ''}">★</i>`).join('')}</span>` : '';
-    const tip = lv.k === 'pick' && me && me.picks ? `${fun}&#10;${t('picked', me.picks)}` : esc(fun);
+    const stars = lv.k === 'pick' && picks ? `<span class="sw-stars" aria-label="${Math.min(3, Math.floor(picks / 5))}/3">${[1, 2, 3].map(i => `<i class="${picks >= i * 5 ? 'on' : ''}">★</i>`).join('')}</span>` : '';
+    const tip = lv.k === 'pick' && picks ? `${fun}&#10;${t('picked', picks)}` : esc(fun);
     return `<${tag}${tag === 'button' ? ' type="button"' : ''} class="sw-medal${cls}${big ? ' big' : ''}" style="--bg:${lv.bg}" aria-label="${esc(lv.n[L])}" data-tip="${esc(lv.n[L])}&#10;${tip}" data-badge="${esc(lv.k || lv.s)}">${lv.s ? spriteSvg(lv.s) : `<b>${lv.icon}</b>`}${stars}</${tag}>`;
   };
   const stateOf = (s, got) => s.k === 'pick' ? (got.has('pick') ? true : got.has('pick_past') ? 'past' : false) : got.has(s.k);
@@ -340,6 +341,35 @@
     setTimeout(() => pop.remove(), 3800);
   }
 
+  // ---------- публичный профиль ----------
+  async function openProfile(nick) {
+    let pr;
+    try { pr = await api('profile?nick=' + encodeURIComponent(nick)); } catch (e) { return; }
+    const got = new Set(pr.badges), lv = levelOf(pr.best);
+    const st = s => s.k === 'pick' ? (got.has('pick') ? true : got.has('pick_past') ? 'past' : false) : got.has(s.k);
+    const v = document.createElement('div');
+    v.className = 'sw-bv sw-pv'; v.setAttribute('role', 'dialog');
+    v.innerHTML = `<div class="sw-bv-card sw-pv-card"><button type="button" class="sw-bv-close" aria-label="Close">✕</button>
+      <div class="sw-pv-head">${lv ? medal(lv, true, true) : `<span class="sw-medal big off" style="--bg:#F4F0FA">${spriteSvg('egg')}</span>`}
+        <div><h3><span class="sw-nickname${pr.gold ? ' gold' : ''}">@${esc(pr.nick)}</span></h3><p class="sw-level">${lv ? esc(lv.n[L]) : '—'}</p>
+        <p class="sw-pv-streak">🔥 ${t('streak', pr.current)} · ${t('best', pr.best)}</p></div></div>
+      <div class="sw-pv-badges">${LEVELS.map(l => medal(l, pr.best >= l.d)).join('')}${SPECIAL.map(x => medal(x, st(x), false, 'span', pr.picks)).join('')}</div>
+      <div class="sw-pv-works">${pr.posts.map(p => `<a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"><span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></a>`).join('') || `<p class="sw-empty">${t('noWorks')}</p>`}</div>
+    </div>`;
+    // Esc: если открыта картинка — закрывается только она (слушаем раньше просмотрщика, в фазе перехвата)
+    const close = () => { v.remove(); document.removeEventListener('keydown', k, true); };
+    const k = e => e.key === 'Escape' && !document.querySelector('.lightbox.open') && close();
+    v.addEventListener('click', e => { if (e.target === v || e.target.closest('.sw-bv-close')) close(); });
+    document.addEventListener('keydown', k, true);
+    document.body.appendChild(v); v.querySelector('.sw-bv-close').focus();
+  }
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-profile]');
+    if (!b) return;
+    e.preventDefault(); e.stopPropagation();
+    openProfile(b.dataset.profile);
+  });
+
   // ---------- топ и стена ----------
   // парад над заголовком: впереди — «Выбор Полли» в короне, за ним — ники из топа
   function parade(top, pick, pickGold) {
@@ -355,7 +385,7 @@
     const pickName = SPECIAL.find(x => x.k === 'pick').n[L];
     // идут слева направо, поэтому первый (лидер) — последний в ряду, самый правый
     el.innerHTML = `<div class="parade-track">${birds.slice().reverse().map((b, i) => `<span class="pb${b.crown ? ' crown' : ''}" style="--d:${(i % 3) * .17}s">
-      <span class="pb-tag${b.gold ? ' gold' : ''}">${b.crown ? `★ ${esc(pickName)} · ` : ''}@${esc(b.nick)}${b.fire ? ` 🔥${b.fire}` : ''}</span>
+      <span class="pb-tag${b.gold ? ' gold' : ''}" data-profile="${esc(b.nick)}">${b.crown ? `★ ${esc(pickName)} · ` : ''}@${esc(b.nick)}${b.fire ? ` 🔥${b.fire}` : ''}</span>
       <span class="pb-bird">${spriteSvg(b.crown ? 'crown' : 'polly')}</span></span>`).join('')}</div>`;
     el.classList.add('on');
     const track = el.firstElementChild;
@@ -372,7 +402,7 @@
       parade(top, pick, pickGold);
       el.innerHTML = top.length ? top.map((r, i) => {
         const lv = levelOf(r.best);
-        return `<li><span class="sw-pos">${i + 1}</span>${lv ? medal(lv) : ''}<span class="sw-topnick"><span class="sw-nickname${r.gold ? ' gold' : ''}">@${esc(r.nick)}</span></span><span class="sw-fire">🔥 ${r.current}</span></li>`;
+        return `<li><span class="sw-pos">${i + 1}</span>${lv ? medal(lv) : ''}<span class="sw-topnick"><button type="button" class="sw-nickname sw-plink${r.gold ? ' gold' : ''}" data-profile="${esc(r.nick)}">@${esc(r.nick)}</button></span><span class="sw-fire">🔥 ${r.current}</span></li>`;
       }).join('') : `<li class="sw-empty">${t('emptyTop')}</li>`;
     } catch (e) { el.innerHTML = ''; }
   }
@@ -386,7 +416,7 @@
       el.insertAdjacentHTML('beforeend', posts.map(p => `<figure class="sw-tile${p.bw ? ' bw' : ''}${p.id === pick ? ' pick' : ''}" data-id="${p.id}">
         ${p.id === pick ? `<span class="sw-stamp">★ ${esc(SPECIAL.find(x => x.k === 'pick').n[L])}</span>` : ''}
         <a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"></a>
-        <figcaption><b class="sw-nickname${p.gold ? ' gold' : ''}">@${esc(p.nick)}</b> <span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></figcaption>
+        <figcaption><button type="button" class="sw-nickname sw-plink${p.gold ? ' gold' : ''}" data-profile="${esc(p.nick)}">@${esc(p.nick)}</button> <span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></figcaption>
         ${me && me.admin ? `<div class="sw-mod">${p.id === pick ? `<button type="button" data-unpick="1">☆ ${t('unpick')}</button>` : `<button type="button" data-pick="${p.id}" title="${esc(SPECIAL.find(x => x.k === 'pick').n[L])}">★</button>`}<button type="button" data-hide="${p.id}">${t('hide')}</button><button type="button" data-ban="${p.uid}">${t('ban')}</button></div>` : ''}
       </figure>`).join(''));
       if (posts.length) cursor = posts[posts.length - 1].created_at;

@@ -1003,10 +1003,10 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 /* большой просмотр бейджа */
 .sw-bv { position: fixed; inset: 0; z-index: 300; display: grid; place-items: center; padding: 16px; background: rgba(20, 12, 40, .75); animation: modal-in .2s ease-out; }
 .sw-bv-card { position: relative; width: min(360px, 100%); padding: 32px 24px 24px; border-radius: 26px; background: #FFFDF8; color: #2B1A51; text-align: center; box-shadow: 0 30px 60px rgba(0, 0, 0, .5); }
-.sw-bv-card .sw-medal { width: 200px; height: 200px; margin: 0 auto 12px; }
-.sw-bv-card .sw-medal .sw-stars { font-size: 20px; line-height: 26px; bottom: -12px; }
-.sw-bv-card .sw-medal.off { background: #EDE8F7; box-shadow: inset 0 0 0 3px #D9D3F2; }
-.sw-bv-card .sw-medal.off svg { filter: brightness(0); opacity: .18; }
+.sw-bv-card > .sw-medal { width: 200px; height: 200px; margin: 0 auto 12px; }
+.sw-bv-card > .sw-medal .sw-stars { font-size: 20px; line-height: 26px; bottom: -12px; }
+.sw-bv-card > .sw-medal.off { background: #EDE8F7; box-shadow: inset 0 0 0 3px #D9D3F2; }
+.sw-bv-card > .sw-medal.off svg { filter: brightness(0); opacity: .18; }
 .sw-bv-card h3 { margin: 10px 0 4px; font: 700 24px var(--serif); }
 .sw-bv-fun { margin: 0 0 10px; color: #D85A30; font: italic 400 17px/1.4 var(--serif); }
 .sw-bv-how { margin: 0 0 10px; color: #4A3E68; font-size: 15px; line-height: 1.5; }
@@ -1015,3 +1015,27 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 .sw-bv-close { position: absolute; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid #D9D3F2; background: none; color: #2B1A51; font-size: 16px; cursor: pointer; }
 @media (max-width: 520px) { .sw-medal { width: 54px; height: 54px; } }
 .sw-days { flex-wrap: wrap; }
+
+/* публичный профиль */
+.sw-plink { border: 0; background: none; padding: 0; color: inherit; font: inherit; font-weight: 700; cursor: pointer; pointer-events: auto; text-align: left; }
+.sw-plink:hover { text-decoration: underline; }
+.sw-plink.gold { padding: 0 8px; }
+.pb-tag[data-profile] { cursor: pointer; }
+.parade { pointer-events: auto; }
+.sw-pv { z-index: 150; }
+.sw-pv-card { width: min(720px, 100%); max-height: calc(100vh - 32px); overflow-y: auto; text-align: left; }
+.sw-pv-head { display: flex; gap: 18px; align-items: center; margin-bottom: 18px; }
+.sw-pv-head .sw-medal.big { width: 96px; height: 96px; }
+.sw-pv-head h3 { margin: 0; font: 700 24px var(--serif); }
+.sw-pv-head .sw-level { margin: 2px 0 4px; }
+.sw-pv-streak { margin: 0; font-weight: 700; }
+.sw-pv-card .sw-nickname.gold { color: #8A6A00; }
+.sw-pv-badges { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 20px; }
+.sw-pv-badges .sw-medal { width: 50px; height: 50px; }
+.sw-pv-badges .sw-medal.off { background: #EDE8F7; box-shadow: inset 0 0 0 2px #D9D3F2; }
+.sw-pv-badges .sw-medal.off svg { filter: brightness(0); opacity: .15; }
+.sw-pv-works { display: grid; grid-template-columns: repeat(auto-fill, minmax(130px, 1fr)); gap: 10px; }
+.sw-pv-works a { position: relative; display: block; aspect-ratio: 4 / 5; border-radius: 12px; overflow: hidden; background: #EDE8F7; }
+.sw-pv-works img { width: 100%; height: 100%; object-fit: cover; object-position: 50% 35%; }
+.sw-pv-works span { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 8px 6px; font-size: 11px; color: #fff; background: linear-gradient(transparent, rgba(20, 12, 40, .8)); }
+.sw-pv-card .sw-empty { color: #6B5AA8; }

@@ -201,6 +201,19 @@ async function addBadge(env, uid, badge) {
 async function route(req, env, url) {
   const p = url.pathname, m = req.method;
   if (m === 'POST' && p === '/api/dev/cleanup' && env.DEV_FAKE_LOGIN === '1') return json(await cleanupInactive(env));
+  // публичный профиль: ник, серия, рекорд, бейджи и работы на стене (e-mail не отдаём)
+  if (m === 'GET' && p === '/api/profile') {
+    const nick = String(url.searchParams.get('nick') || '').replace(/^@/, '');
+    const u = await env.DB.prepare('SELECT * FROM users WHERE nick = ? AND banned = 0').bind(nick).first();
+    if (!u) fail(404, 'user');
+    const rows = (await env.DB.prepare('SELECT id, day, theme, bw, tod, hidden FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
+    const pickUser = Number(await getMeta(env, 'pick_user'));
+    const badges = mergedBadges(u, rows).filter(b => b !== 'pick_past' || pickUser !== u.id);
+    if (pickUser === u.id) badges.push('pick');
+    return json({ nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(rows.map(r => r.day)).current,
+      best: mergedBest(u, rows.map(r => r.day)), badges, posts: rows.filter(r => !r.hidden).map(({ id, day, theme, bw }) => ({ id, day, theme, bw })) });
+  }
+
   if (m === 'GET' && p === '/api/stats') {
     const works = await getMeta(env, 'works_total') ?? (await env.DB.prepare('SELECT COUNT(*) AS n FROM posts').first()).n;
     const users = await getMeta(env, 'users_total') ?? (await env.DB.prepare('SELECT COUNT(*) AS n FROM users').first()).n;
