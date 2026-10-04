@@ -20,7 +20,7 @@
   });
   document.addEventListener('click', e => {
     document.querySelectorAll('.has-sub.open').forEach(li => {
-      if (!li.contains(e.target) && window.matchMedia('(min-width: 1081px)').matches) {
+      if (!li.contains(e.target) && window.matchMedia('(min-width: 1381px)').matches) {
         li.classList.remove('open');
         li.querySelector('.sub-toggle').setAttribute('aria-expanded', 'false');
       }
@@ -73,8 +73,8 @@
       if (form.elements._honey.value) return;
       btn.disabled = true;
       status.className = 'form-status';
-      const lv = document.documentElement.lang === 'lv';
-      status.textContent = lv ? 'Sūta…' : 'Sending…';
+      const lang = document.documentElement.lang, lv = lang === 'lv', ru = lang === 'ru';
+      status.textContent = ru ? 'Отправляю…' : lv ? 'Sūta…' : 'Sending…';
       try {
         const res = await fetch(form.action, {
           method: 'POST',
@@ -91,10 +91,10 @@
         if (!res.ok || String(data.success) === 'false') throw new Error(data.message || res.status);
         form.reset();
         status.className = 'form-status ok';
-        status.textContent = lv ? 'Paldies! Ziņa ir ceļā, drīz atbildēšu.' : 'Thank you! Your message is on its way. I’ll get back to you soon.';
+        status.textContent = ru ? 'Спасибо! Сообщение отправлено, скоро отвечу.' : lv ? 'Paldies! Ziņa ir ceļā, drīz atbildēšu.' : 'Thank you! Your message is on its way. I’ll get back to you soon.';
       } catch (err) {
         status.className = 'form-status error';
-        status.textContent = lv ? 'Diemžēl ziņu neizdevās nosūtīt. Lūdzu, pamēģini vēlāk.' : 'Sorry, the message didn’t go through. Please try again a bit later.';
+        status.textContent = ru ? 'Не получилось отправить сообщение. Попробуйте чуть позже.' : lv ? 'Diemžēl ziņu neizdevās nosūtīt. Lūdzu, pamēģini vēlāk.' : 'Sorry, the message didn’t go through. Please try again a bit later.';
       } finally {
         btn.disabled = false;
       }

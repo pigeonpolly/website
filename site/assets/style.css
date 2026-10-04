@@ -139,7 +139,7 @@ a:hover { color: var(--text); }
 .menu-toggle[aria-expanded="true"] span:nth-child(2) { opacity: 0; }
 .menu-toggle[aria-expanded="true"] span:nth-child(3) { transform: translateY(-8px) rotate(-45deg); }
 
-@media (max-width: 1080px) {
+@media (max-width: 1380px) {
   .menu-toggle { display: flex; }
   .site-nav {
     position: fixed;
@@ -493,7 +493,7 @@ body.modal-open { overflow: hidden; }
 .lang-switch a[aria-current="true"] { color: var(--bg); background: var(--peach); }
 .site-nav { order: 1; }
 .menu-toggle { order: 3; }
-@media (min-width: 1081px) { .lang-switch { order: 3; margin: 0 0 0 4px; } .site-nav { margin-left: auto; } }
+@media (min-width: 1381px) { .lang-switch { order: 3; margin: 0 0 0 4px; } .site-nav { margin-left: auto; } }
 @media (max-width: 480px) {
   .site-header { gap: 10px; }
   .brand { font-size: 17px; gap: 8px; }
@@ -515,3 +515,5 @@ body.modal-open { overflow: hidden; }
   100% { transform: scale(2.6); opacity: 0; }
 }
 @media (prefers-reduced-motion: reduce) { .timeline li.current::after { animation: none; opacity: 0; } }
+/* в переводах заголовок длиннее — разрешаем перенос */
+html:not([lang="en"]) .hero h1 { white-space: normal; }

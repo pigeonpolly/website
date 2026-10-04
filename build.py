@@ -216,7 +216,7 @@ def cv_html():
         '</div>')
 
 
-LANGS = {"en": "", "lv": "lv"}
+LANGS = {"en": "", "lv": "lv", "ru": "ru"}
 
 
 def localize(page, lang):
