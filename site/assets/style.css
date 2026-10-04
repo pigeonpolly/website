@@ -809,7 +809,8 @@ button.day:hover { background: rgba(255, 255, 255, .12); transform: translateY(-
 .today-sec.revealed .td-open { display: none; }
 .td-stage { position: relative; height: 380px; }
 .td-env { position: absolute; left: 50%; bottom: 20px; width: 320px; height: 200px; margin-left: -160px; animation: td-bob 2.6s ease-in-out infinite; }
-.today-sec.fly .td-env { animation: none; }
+.today-sec.fly .td-env, .today-sec.still .td-env { animation: none; }
+.td-seal.pecked { animation: td-shake .25s ease-in-out; }
 .td-back { position: absolute; inset: 0; border-radius: 10px; background: #DCD2F0; box-shadow: 0 20px 40px rgba(0, 0, 0, .35); }
 .td-card {
   position: absolute; left: 16px; right: 16px; top: 12px; height: 176px; z-index: 1; padding: 16px 14px; border-radius: 8px;

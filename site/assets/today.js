@@ -27,9 +27,22 @@
   q('.td-spark').innerHTML = [...Array(14)].map((_, i) => `<i style="--a:${i * 360 / 14}deg;--d:${70 + (i % 3) * 22}px;--c:${['#F0A987', '#E9A93B', '#F5C4B3', '#D85A30'][i % 4]}"></i>`).join('');
 
   let done = false;
-  function open() {
+  const wait = ms => new Promise(r => setTimeout(r, ms));
+  async function open() {
     if (done) return; done = true;
     const quick = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const seal = q('.td-seal'), pp = window.PollyPet;
+    box.classList.add('still');
+    // прилетает сама Полли-питомец, чтобы на странице не было двух Полли
+    if (!quick && pp) {
+      const r = seal.getBoundingClientRect();
+      if (r.top < 90 || r.bottom > innerHeight - 20) { seal.scrollIntoView({ behavior: 'smooth', block: 'center' }); await wait(600); }
+      if (await pp.visit(seal)) {
+        box.classList.add('opened'); await wait(450);
+        box.classList.add('revealed', 'pet'); pp.done();
+        return;
+      }
+    }
     const steps = quick ? [['fly', 0], ['peck', 0], ['opened', 0], ['revealed', 0]] : [['fly', 0], ['peck', 900], ['opened', 1700], ['revealed', 2150]];
     steps.forEach(([c, ms]) => setTimeout(() => box.classList.add(c), ms));
   }

@@ -238,6 +238,26 @@
   addEventListener('scroll', () => { if (spot === 'button') reset(); }, { passive: true });
   addEventListener('resize', reset);
 
+  // Полли сама прилетает клевать печать конверта на главной (today.js)
+  window.PollyPet = {
+    async visit(el) {
+      if (pet.classList.contains('hidden') || reduce) return false;
+      busy = true; token++;
+      body.classList.remove('sleeping', 'peck', 'flap'); zzz.classList.remove('show'); show('a');
+      spot = 'visit'; perch = null;
+      const r = el.getBoundingClientRect();
+      await flyTo(r.left + r.width * 0.5 - W + 6, r.top + r.height * 0.5 - H * 0.3);
+      face(1);
+      await peck(3, el);
+      return true;
+    },
+    async done() {
+      await wait(700);
+      await goFloor();
+      busy = false;
+    },
+  };
+
   y = floorY(); place();
   life();
 })();
