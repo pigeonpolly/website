@@ -20,7 +20,7 @@
   });
   document.addEventListener('click', e => {
     document.querySelectorAll('.has-sub.open').forEach(li => {
-      if (!li.contains(e.target) && window.matchMedia('(min-width: 1201px)').matches) {
+      if (!li.contains(e.target) && window.matchMedia('(min-width: 1281px)').matches) {
         li.classList.remove('open');
         li.querySelector('.sub-toggle').setAttribute('aria-expanded', 'false');
       }

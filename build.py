@@ -24,6 +24,8 @@ PAGES = [
      "Learning design, EdTech and AI automation projects by Alina Otkinska."),
     ("work-with-me", "Work with me", "work-with-me.html",
      "Learning design, AI in education and sketching workshops by Alina Otkinska."),
+    ("challenge", "Daily Challenge", "challenge.html",
+     "A daily sketch challenge with Pigeon Polly: one subject, three colours, a few minutes."),
     ("e-books", "E-Books", "e-books.html", "E-books by Alina Otkinska."),
     ("exhibitions", "Exhibitions", "exhibitions.html", "Exhibitions of Pigeon Polly art."),
     ("publications", "Publications", "publications.html", "Publications of Pigeon Polly art."),
@@ -50,6 +52,7 @@ NAV = [
     ("", "Home"),
     ("projects", "Projects"),
     ("work-with-me", "Work with me"),
+    ("challenge", "Daily Challenge"),
     ("e-books", "E-Books"),
     ("exhibitions", "Exhibitions"),
     ("publications", "Publications"),
@@ -97,7 +100,7 @@ def gallery_html(name):
     f = CONTENT / "galleries" / f"{name}.json"
     items = json.loads(f.read_text()) if f.exists() else []
     if not items:
-        return '<p class="empty">Gallery is coming soon.</p>'
+        return "" if name == "challenge" else '<p class="empty">Gallery is coming soon.</p>'
     out = []
     for n, it in enumerate(items):
         cap = esc(it.get("caption", ""))
