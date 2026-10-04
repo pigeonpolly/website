@@ -1,0 +1,25 @@
+<section class="today-sec">
+  <div class="td-text">
+    <p class="topics">daily sketch challenge</p>
+    <h2 class="td-title">What will you draw today?</h2>
+    <p class="td-lead">Every day Polly brings a new theme: one subject, three colours and a few minutes. Open the envelope to see today’s.</p>
+    <div class="td-actions">
+      <button class="cta-btn td-open" type="button">Open today’s envelope</button>
+      <a class="cta-btn td-go" href="/challenge/">Draw it now →</a>
+    </div>
+  </div>
+  <div class="td-stage" aria-live="polite">
+    <div class="td-env">
+      <div class="td-back"></div>
+      <div class="td-card"><span class="td-date"></span><b class="td-subj"></b><span class="td-cols"></span><span class="td-meta"></span></div>
+      <div class="td-front"></div>
+      <div class="td-flap"></div>
+      <button class="td-seal" type="button" aria-label="Open today’s envelope">✦</button>
+    </div>
+    <div class="td-polly" aria-hidden="true"></div>
+    <div class="td-spark" aria-hidden="true"></div>
+  </div>
+</section>
+<script src="/assets/challenge-data.js" defer></script>
+<script src="/assets/challenge-theme.js" defer></script>
+<script src="/assets/today.js" defer></script>

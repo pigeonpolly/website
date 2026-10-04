@@ -14,7 +14,7 @@
 - `site/` — готовый сайт (он и публикуется). HTML-страницы в `site/` **генерируются**, руками не править — править `src/` и `content/`, затем `python3 build.py`. CSS/JS/картинки в `site/assets/`, `site/images/`, `site/files/` правятся напрямую.
 - `src/layout.html` — общий шаблон (шапка, меню, подвал, окно «Write to me», мета-теги, Person schema).
 - `src/pages/*.html` — страницы. Плейсхолдеры: `{{gallery:имя}}`, `{{ebooks}}`, `{{projects}}`, `{{cv}}`, `{{block:имя}}`.
-- `src/blocks/*.html` — блоки главной (coming-soon, patreon, about, sketching-guides, game). Их `<style>` при сборке автоматически ограничивается блоком (`#blk-имя`); правила для `html, body` переносятся на сам блок.
+- `src/blocks/*.html` — блоки главной (today, coming-soon, patreon, about, sketching-guides, game). `today` — «Тема дня»: конверт, Полли клюёт печать, вылетает листок с темой (логика `site/assets/today.js`). Их `<style>` при сборке автоматически ограничивается блоком (`#blk-имя`); правила для `html, body` переносятся на сам блок.
 - `content/galleries/*.json` — галереи (full, thumb, w, h, caption). `content/ebooks.json` — книги. `content/projects.json` — книжная полка проектов (темы и цвета, описания). `content/cv.json` — опыт, образование, курсы (`"current": true` — зелёный мигающий кружок).
 - `build.py` — список страниц `PAGES`, меню `NAV` (пункт с тремя элементами = выпадающий список), подменю `PORTFOLIO` и `SOCIAL`, языки `LANGS`.
 - Меню: Daily Challenge · E-Books · Art Portfolio ▾ · Learning & AI ▾ (Projects, Work with me) · On Walls & Pages (выставки + публикации, старые /exhibitions и /publications перенаправляются) · Social Media ▾. «Home» в меню нет — главная открывается по логотипу.
@@ -49,7 +49,7 @@
 3. `git add -A && git commit && git push origin main`.
 
 ## Daily Challenge (/challenge)
-- Тема дня одинаковая у всех в один день: выбирается по дате из `site/assets/challenge-data.js` (1080 предметов, 10 базовых цветов, время 5/10/15 мин, советы, Ч/Б-особенности — всё в формате [en, ru, lv]). Логика — `site/assets/challenge.js`.
+- Расчёт темы — `site/assets/challenge-theme.js` (общий для /challenge и главной). Тема дня одинаковая у всех в один день: выбирается по дате из `site/assets/challenge-data.js` (1080 предметов, 10 базовых цветов, время 5/10/15 мин, советы, Ч/Б-особенности — всё в формате [en, ru, lv]). Логика — `site/assets/challenge.js`.
 - Сезоны: у предмета может быть 4-й элемент — `'autumn' | 'winter' | 'spring' | 'summer'` (можно несколько через пробел). Ровно 2/3 дней каждого месяца — предмет текущего сезона (зима = дек–фев и т.д.), остальные — из предметов без сезона. Внутри каждой группы без повторов; один предмет не повторяется ближе 60 дней.
 - 23 января (день рождения Алины) — каждый год праздничный предмет (список `BDAY` в challenge.js) и плашка «Сегодня мой день рождения!», в календаре 🎂.
 - До 5.10.2026 — старая формула по первым 98 предметам. Новые предметы дописывать только В КОНЕЦ; добавление меняет порядок будущих (и прошлых с 5.10) тем, поэтому лучше пачкой и редко.
