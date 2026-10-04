@@ -91,6 +91,9 @@
       f: ['Polly pecked your sketch with approval. The highest honour.', 'Полли одобрительно клюнула ваш рисунок. Высшая награда.', 'Pollija atzinīgi noknābāja tavu skici. Augstākais gods.'],
       past: ['Once Polly’s pick. Forever in history.', 'Когда-то — выбор Полли. Навсегда в истории.', 'Reiz Pollijas izvēle. Uz visiem laikiem vēsturē.'],
       h: ['Polly picks one sketch she loves. Only one owner at a time: when she picks another, yours turns black & white. Every 5 picks earn a star; 3 stars give you a golden nickname.', 'Полли выбирает один рисунок, который ей особенно понравился. Владелец только один: когда она выберет другой, ваш бейдж станет чёрно-белым. Каждые 5 выборов — звезда, 3 звезды — золотой ник.', 'Pollija izvēlas vienu skici, kas viņai īpaši patīk. Īpašnieks tikai viens: kad viņa izvēlas citu, tava nozīmīte kļūst melnbalta. Katras 5 izvēles — zvaigzne, 3 zvaigznes — zelta segvārds.'] },
+    { k: 'veteran', f: ['Here since the dinosaurs. Well, almost three years.', 'Здесь со времён динозавров. Ну, почти три года.', 'Šeit kopš dinozauru laikiem. Nu, gandrīz trīs gadus.'],
+      n: ['Old-timer', 'Старожил', 'Vecais draugs'], s: 'wise', bg: '#EADFC8',
+      h: ['Upload at least 2 sketches every month for 36 months in a row (3 years). No daily streak needed.', 'Загружать хотя бы 2 рисунка в каждом месяце 36 месяцев подряд (3 года). Ежедневная серия не нужна.', 'Augšupielādēt vismaz 2 skices katru mēnesi 36 mēnešus pēc kārtas (3 gadus). Ikdienas sērija nav vajadzīga.'] },
     { k: 'clock', f: ['Polly sets her watch by you.', 'Полли сверяет по вам часы.', 'Pollija pēc tevis regulē pulksteni.'], n: ['Like clockwork', 'Как по часам', 'Kā pulkstenis'], s: 'clock', bg: '#FBE3D6',
       h: ['Upload 10 sketches in a row at about the same time of day (within one hour)', 'Загрузить 10 рисунков подряд примерно в одно время суток (в пределах часа)', 'Augšupielādēt 10 skices pēc kārtas apmēram vienā laikā (vienas stundas robežās)'] },
   ];
@@ -116,6 +119,8 @@
     sleepy: [[7, 2, 'bb'], [7, 3, 'dd'], [10, -3, 'hhh'], [11, -2, 'h'], [10, -1, 'hhh'], [13, -2, 'h'], [12, 0, 'hh']],
     moon: [[1, -3, '.mmm'], [0, -2, 'mm'], [0, -1, 'mm'], [1, 0, '.mmm'], [12, -2, 'l'], [6, -3, 'l']],
     clock: [[9, 7, 'd...d'], [9, 8, '.rrr.'], [9, 9, 'rwwwr'], [9, 10, 'rwddr'], [9, 11, 'rwwwr'], [9, 12, '.rrr.'], [9, 13, 'd...d']],
+    // мудрая Полли: круглые очки и тросточка
+    wise: [[7, 1, 'mm'], [6, 2, 'm'], [9, 2, 'm'], [6, 3, 'm'], [9, 3, 'm'], [7, 4, 'mm'], [5, 2, 'm'], [3, -1, '.c.'], [4, 0, 'c'], [12, 6, 'nn'], [12, 7, '.n'], [12, 8, '.n'], [12, 9, '.n'], [12, 10, '.n'], [12, 11, '.n'], [12, 12, '.n'], [13, 13, 'd']],
     medal: [[10, -3, '.m.'], [9, -2, 'mmm'], [10, -1, 'm.m'], [5, 8, 'r.r'], [5, 9, 'r.r'], [5, 10, 'mmm'], [4, 11, 'mmlmm'], [5, 12, 'mmm']],
   };
   const MONO = { b: '#D9D9D9', s: '#9A9A9A', o: '#6B6B6B' };

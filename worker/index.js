@@ -54,7 +54,8 @@ async function ensureSchema(env) {
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
   for (const sql of ['ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
     "ALTER TABLE users ADD COLUMN months TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN tod INTEGER',
-    'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0']) {
+    'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
+    "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''"]) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   schemaReady = true;
@@ -164,7 +165,16 @@ function badgesOf(posts, months = []) {
 // рекорд и бейджи пользователя: из его работ + сохранённое после прошлых очисток
 const mergedBest = (u, days) => Math.max(u.best || 0, streaks(days).best);
 const monthsOf = u => String(u.months || '').split(',').filter(Boolean);
-const mergedBadges = (u, posts) => [...new Set([...String(u.badges || '').split(',').filter(Boolean), ...badgesOf(posts, monthsOf(u))])];
+// работ по месяцам: "2026-10:3,2026-11:2" — хранится в профиле, очистка картинок её не трогает
+const VETERAN_MONTHS = 36, VETERAN_PER_MONTH = 2;
+const mcountOf = u => Object.fromEntries(String(u.mcount || '').split(',').filter(Boolean).map(x => { const [k, n] = x.split(':'); return [k, +n || 0]; }));
+function isVeteran(u) {
+  const mc = mcountOf(u);
+  const ok = Object.keys(mc).filter(k => mc[k] >= VETERAN_PER_MONTH).map(k => +k.slice(0, 4) * 12 + +k.slice(5, 7) - 1).sort((a, b) => a - b);
+  for (let i = 1, run = ok.length ? 1 : 0; i <= ok.length; i++) { if (run >= VETERAN_MONTHS) return true; run = ok[i] - ok[i - 1] === 1 ? run + 1 : 1; }
+  return false;
+}
+const mergedBadges = (u, posts) => [...new Set([...String(u.badges || '').split(',').filter(Boolean), ...badgesOf(posts, monthsOf(u)), ...(isVeteran(u) ? ['veteran'] : [])])];
 
 async function cleanupInactive(env) {
   const cutoff = new Date((utcToday() - INACTIVE_DAYS) * 864e5).toISOString().slice(0, 10);
@@ -302,10 +312,13 @@ async function route(req, env, url) {
         Number.isInteger(tod) && tod >= 0 && tod < 1440 ? tod : null, now()).run();
     // бейджи и рекорд записываем сразу — их не отнимет ни очистка, ни пропуск
     const months = [...new Set([...monthsOf(u), day.slice(0, 7)])].sort().slice(-24);
+    const mc = mcountOf(u);
+    if (!old) mc[day.slice(0, 7)] = (mc[day.slice(0, 7)] || 0) + 1; // замена работы дня не считается
+    const mcount = Object.keys(mc).sort().slice(-48).map(k => `${k}:${mc[k]}`).join(',');
     const all = (await env.DB.prepare('SELECT day, bw, tod FROM posts WHERE user_id = ?').bind(u.id).all()).results;
-    const uu = { ...u, months: months.join(',') };
-    await env.DB.prepare('UPDATE users SET months = ?, best = ?, badges = ? WHERE id = ?')
-      .bind(uu.months, mergedBest(u, all.map(p => p.day)), mergedBadges(uu, all).join(','), u.id).run();
+    const uu = { ...u, months: months.join(','), mcount };
+    await env.DB.prepare('UPDATE users SET months = ?, mcount = ?, best = ?, badges = ? WHERE id = ?')
+      .bind(uu.months, mcount, mergedBest(u, all.map(p => p.day)), mergedBadges(uu, all).join(','), u.id).run();
     return json({ ok: true, id });
   }
 
