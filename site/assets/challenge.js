@@ -32,6 +32,9 @@
     bday: ['Today is my birthday! Draw something festive with me 🎂', 'Сегодня мой день рождения! Нарисуйте со мной что-нибудь праздничное 🎂', 'Šodien ir mana dzimšanas diena! Uzzīmē ar mani kaut ko svētku 🎂'],
     today: ['Today', 'Сегодня', 'Šodien'],
     bwQ: ['Only a pen or ink today?', 'Сегодня только ручка или тушь?', 'Šodien tikai pildspalva vai tuša?'],
+    saveShare: ['Save to photos or share', 'Сохранить в фото или поделиться', 'Saglabāt foto vai dalīties'],
+    downloadFile: ['Download as a file', 'Скачать файлом', 'Lejupielādēt failu'],
+    holdHint: ['Or press and hold the picture and choose “Save to Photos”.', 'Или нажмите на картинку и удерживайте → «Сохранить в Фото».', 'Vai turi nospiestu attēlu un izvēlies “Saglabāt attēlu”.'],
     locked: ['Opens on this day', 'Откроется в этот день', 'Atvērsies šajā dienā'],
     photo: ['Add a photo of my sketch', 'Добавить фото рисунка', 'Pievienot skices foto'],
     photoChange: ['Change photo', 'Заменить фото', 'Mainīt foto'],
@@ -315,18 +318,20 @@
   }
   shareBtn.addEventListener('click', async () => {
     const c = await makeCard();
-    const url = c.toDataURL('image/png');
+    const name = `dailypigeonpolly-${selKey}.png`;
+    const blob = await new Promise(r => c.toBlob(r, 'image/png'));
+    const url = URL.createObjectURL(blob);
+    let file = null;
+    try { file = new File([blob], name, { type: 'image/png' }); } catch (e) { /* старый браузер */ }
+    const canShare = !!(file && navigator.canShare && navigator.canShare({ files: [file] }));
     const out = $('#ch-card');
-    out.innerHTML = `<img src="${url}" alt=""><p>${t('shareHint')}</p><div class="card-actions"><a class="cta-btn" download="dailypigeonpolly-${selKey}.png" href="${url}">${t('download')}</a></div>`;
-    try {
-      const blob = await new Promise(r => c.toBlob(r, 'image/png'));
-      const file = new File([blob], `dailypigeonpolly-${selKey}.png`, { type: 'image/png' });
-      if (navigator.canShare && navigator.canShare({ files: [file] })) {
-        const b = document.createElement('button'); b.className = 'cta-link'; b.type = 'button'; b.textContent = '↗ ' + t('share');
-        b.onclick = () => navigator.share({ files: [file], text: '#dailypigeonpolly' }).catch(() => {});
-        out.querySelector('.card-actions').appendChild(b);
-      }
-    } catch (e) { /* только скачивание */ }
+    // на телефоне главное — «Поделиться»: там есть «Сохранить изображение» в фотоплёнку
+    out.innerHTML = `<img src="${url}" alt=""><p>${t('shareHint')}</p><div class="card-actions">`
+      + (canShare ? `<button type="button" class="cta-btn" id="ch-share-go">${t('saveShare')}</button><a class="cta-link" download="${name}" href="${url}">${t('downloadFile')}</a>`
+        : `<a class="cta-btn" download="${name}" href="${url}">${t('download')}</a>`)
+      + `</div>${canShare || matchMedia('(pointer: coarse)').matches ? `<p class="hold-hint">${t('holdHint')}</p>` : ''}`;
+    const go = $('#ch-share-go');
+    go && go.addEventListener('click', () => navigator.share({ files: [file], text: '#dailypigeonpolly' }).catch(() => {}));
     out.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
   });
 

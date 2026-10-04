@@ -683,7 +683,10 @@ html:not([lang="en"]) .hero h1 { white-space: normal; }
 .ch-share-card p { color: var(--peach); margin: 10px 0; }
 .card-actions { display: flex; flex-wrap: wrap; gap: 14px; align-items: center; }
 .card-actions .cta-btn { text-decoration: none; display: inline-block; }
-.card-actions .cta-link { background: none; border: 0; font: 500 15px var(--sans); cursor: pointer; }
+a.cta-btn, a.cta-btn:hover, a.cta-btn:visited { color: var(--bg); text-decoration: none; }
+.card-actions .cta-link, .card-actions a.cta-link { color: var(--peach); text-decoration: underline; }
+.hold-hint { font-size: 14px; color: var(--muted) !important; }
+.card-actions .cta-link { background: none; border: 0; padding: 0; font: 500 15px var(--sans); cursor: pointer; }
 .diary { margin-top: 48px; }
 .diary-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 24px; }
 .diary-head .section-title { margin: 0; }
