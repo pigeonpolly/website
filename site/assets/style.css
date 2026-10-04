@@ -936,6 +936,8 @@ button.day:hover { background: rgba(255, 255, 255, .12); transform: translateY(-
 .sw-mod button { border: 0; border-radius: 99px; padding: 4px 8px; font: 700 11px var(--sans); background: rgba(20, 12, 40, .8); color: #fff; cursor: pointer; }
 .sw-more-row { text-align: center; margin: 18px 0 0; }
 .sw-privacy { margin: 40px 0 0; font-size: 14px; color: var(--muted); }
+.sw-danger { margin: 28px 0 0; padding-top: 18px; border-top: 1px solid var(--line); font-size: 14px; }
+.sw-danger:empty { display: none; }
 .sw-pop { position: fixed; left: 50%; top: 50%; z-index: 300; transform: translate(-50%, -50%); padding: 28px 36px; border-radius: 24px; background: #FFFDF8; color: #2B1A51; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 6px; box-shadow: 0 30px 60px rgba(0, 0, 0, .5); animation: sw-pop .45s cubic-bezier(.2, 1.4, .4, 1); cursor: pointer; }
 .sw-pop b { font: 700 22px var(--serif); } .sw-pop span { color: #6B5AA8; }
 .sw-pop i { position: absolute; left: 50%; top: 40%; width: 10px; height: 10px; margin: -5px; border-radius: 50%; background: var(--c); animation: td-burst 1s ease-out forwards; --d: 140px; }

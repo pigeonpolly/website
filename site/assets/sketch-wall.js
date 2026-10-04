@@ -136,6 +136,7 @@
   }
 
   function render(prev) {
+    const dz = document.getElementById('sw-danger'); if (dz) dz.innerHTML = '';
     if (!me) return renderSignIn();
     if (me.banned) { app.innerHTML = `<div class="sw-card"><p>${t('banned')}</p></div>`; return; }
     if (!me.nick) return renderNick();
@@ -188,7 +189,7 @@
           <div class="sw-bar"><i style="width:${progress}%"></i></div>
           <p class="sw-next">${next ? t('toNext', next.d - me.best, next.n[L]) : t('maxLevel')}</p></div>
         <div class="sw-badges"><h3>${t('badges')}</h3><div>${LEVELS.map(l => medal(l, me.best >= l.d)).join('')}${SPECIAL.map(s => medal(s, got.has(s.k))).join('')}</div></div>
-        <p class="sw-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a> · <button type="button" class="sw-link danger" id="sw-delacc">${t('delAcc')}</button>${me.admin ? ' · <b>admin</b>' : ''}</p>
+        <p class="sw-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a>${me.admin ? ' · <b>admin</b>' : ''}</p>
       </div>
       <form class="sw-card sw-upload" id="sw-up">
         <p class="sw-kicker">${t('today')}</p><h2>${th ? esc(th.subject) : ''}</h2>
@@ -201,6 +202,8 @@
       </form></div>`;
     if (prev) celebrate(prev, lv, got);
     document.getElementById('sw-out').onclick = async () => { await post('logout'); me = null; render(); loadWall(true); };
+    // «Удалить аккаунт» — в самом низу страницы, подальше от «Выйти»
+    document.getElementById('sw-danger').innerHTML = `<button type="button" class="sw-link danger" id="sw-delacc">${t('delAcc')}</button>`;
     document.getElementById('sw-delacc').onclick = async () => {
       if (!confirm(t('delAccAsk'))) return;
       try { await post('delete-account'); me = null; render(); loadTop(); loadWall(true); } catch (e) { alert(t('err')); }
