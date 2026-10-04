@@ -1,13 +1,11 @@
 {
   "sections": [
     {
-      "title": "E-Books",
+      "title": "Art related e-books",
       "books": [
-        {"title": "E-book 1", "url": "https://a.co/d/0cJY0kk5", "cover": ""},
-        {"title": "E-book 2", "url": "https://drive.google.com/file/d/1IWMWb0nLOaN2UuJLZA-DqhdmwDh3T9Nx/view?usp=sharing", "cover": ""},
-        {"title": "E-book 3", "url": "https://a.co/d/009gymDC", "cover": ""},
-        {"title": "E-book 4", "url": "https://a.co/d/08kxH5vC", "cover": ""},
-        {"title": "E-book 5", "url": "https://a.co/d/0fc4npXi", "cover": ""}
+        {"title": "Watercolor Sketches: Creative Guide", "url": "https://a.co/d/0cJY0kk5", "cover": "images/e-books/watercolor-sketches.jpg"},
+        {"title": "Ink Sketching: Creative Guide", "url": "https://a.co/d/009gymDC", "cover": "images/e-books/ink-sketching.jpg"},
+        {"title": "Coloring Book: World Breakfasts (free)", "url": "https://drive.google.com/file/d/1IWMWb0nLOaN2UuJLZA-DqhdmwDh3T9Nx/view?usp=sharing", "cover": "images/e-books/coloring-book-world-breakfasts.jpg"}
       ]
     }
   ]

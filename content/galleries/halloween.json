@@ -1,0 +1,30 @@
+[
+  {
+    "full": "images/halloween/halloween-cup.jpg",
+    "thumb": "images/halloween/halloween-cup-800.jpg",
+    "w": 800,
+    "h": 349,
+    "caption": ""
+  },
+  {
+    "full": "images/halloween/halloween-in-blue.jpg",
+    "thumb": "images/halloween/halloween-in-blue-800.jpg",
+    "w": 516,
+    "h": 800,
+    "caption": ""
+  },
+  {
+    "full": "images/halloween/halloween-lady.jpg",
+    "thumb": "images/halloween/halloween-lady-800.jpg",
+    "w": 516,
+    "h": 800,
+    "caption": ""
+  },
+  {
+    "full": "images/halloween/halloween-poirot.jpg",
+    "thumb": "images/halloween/halloween-poirot-800.jpg",
+    "w": 800,
+    "h": 596,
+    "caption": ""
+  }
+]

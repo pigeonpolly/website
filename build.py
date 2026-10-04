@@ -8,6 +8,7 @@
 import html
 import json
 import pathlib
+import re
 
 ROOT = pathlib.Path(__file__).parent
 SRC = ROOT / "src"
@@ -29,7 +30,6 @@ PAGES = [
     ("art-portfolio/detective", "Mr.Titos", "detective.html", "Detective Mr.Titos."),
     ("art-portfolio/halloween", "Pumpkin Family", "halloween.html", "Welcome to the Pumpkin-Heads family."),
     ("art-portfolio/ai-art", "AI Art", "ai-art.html", "AI art based on the Pigeon Polly traditional art style."),
-    ("wobbleland-comics", "Wobbleland", "wobbleland.html", "Welcome to Wobbleland, an island told by Pigeon Polly."),
 ]
 
 PORTFOLIO = [
@@ -48,8 +48,7 @@ NAV = [
     ("exhibitions", "Exhibitions"),
     ("publications", "Publications"),
     ("art-portfolio", "Art Portfolio"),
-    ("wobbleland-comics", "Wobbleland"),
-    ("http://blog.pigeonpolly.com", "Patreon Blog"),
+    ("https://www.patreon.com/cw/pigeon_polly", "Patreon Blog"),
     ("https://www.pinterest.com/pigeonpollyart/", "Pinterest"),
 ]
 
@@ -72,7 +71,7 @@ def nav_html(current):
             items.append(
                 f'<li class="has-sub{" active" if active else ""}">'
                 f'<button class="sub-toggle" aria-expanded="false">{esc(label)}<span aria-hidden="true">▾</span></button>'
-                f'<ul class="sub">{sub}</ul></li>')
+                f'<ul class="nav-sub">{sub}</ul></li>')
         elif path.startswith("http"):
             items.append(f'<li><a href="{path}" target="_blank" rel="noopener">{esc(label)}<span class="ext" aria-hidden="true">↗</span></a></li>')
         else:
@@ -109,8 +108,44 @@ def ebooks_html():
                 f'<a class="book" href="{esc(b["url"])}" target="_blank" rel="noopener">'
                 f'<span class="cover">{cover}</span>'
                 f'<span class="book-title">{esc(b["title"])}</span></a>')
-        out.append(f'<h2 class="section-title">{esc(section["title"])}</h2><div class="books">{"".join(cards)}</div>')
+        out.append(f'<h2 class="section-title">{esc(section["title"])}</h2><div class="book-grid">{"".join(cards)}</div>')
     return "\n".join(out)
+
+
+def scope_css(css, scope):
+    """Приставляет #scope ко всем селекторам, чтобы стили блока не задевали остальной сайт."""
+    css = re.sub(r"/\*.*?\*/", "", css, flags=re.S)
+    out, i = [], 0
+    while True:
+        j = css.find("{", i)
+        if j < 0:
+            break
+        head = css[i:j].strip()
+        depth, k = 1, j + 1
+        while depth:
+            depth += {"{": 1, "}": -1}.get(css[k], 0)
+            k += 1
+        inner = css[j + 1:k - 1]
+        if head.startswith("@media") or head.startswith("@supports"):
+            out.append(f"{head} {{{scope_css(inner, scope)}}}")
+        elif head.startswith("@"):
+            out.append(f"{head} {{{inner}}}")
+        else:
+            sels = [x.strip() for x in head.split(",")]
+            # фон, заданный блоку через html/body, переносим на сам блок
+            sels = [scope if re.match(r"^(html|body)$", x) else f"{scope} {x}" for x in sels]
+            sels = list(dict.fromkeys(sels))
+            if sels:
+                out.append(f"{', '.join(sels)} {{{inner}}}")
+        i = k
+    return "\n".join(out)
+
+
+def block_html(name):
+    raw = (SRC / "blocks" / f"{name}.html").read_text()
+    styles = "".join(re.findall(r"<style>(.*?)</style>", raw, flags=re.S))
+    body = re.sub(r"<style>.*?</style>\s*", "", raw, flags=re.S)
+    return f'<div class="blk" id="blk-{name}"><style>{scope_css(styles, "#blk-" + name)}</style>{body}</div>'
 
 
 def build():
@@ -121,6 +156,10 @@ def build():
             start = body.index("{{gallery:")
             end = body.index("}}", start)
             body = body[:start] + gallery_html(body[start + 10:end]) + body[end + 2:]
+        while "{{block:" in body:
+            start = body.index("{{block:")
+            end = body.index("}}", start)
+            body = body[:start] + block_html(body[start + 8:end]) + body[end + 2:]
         body = body.replace("{{ebooks}}", ebooks_html() if "{{ebooks}}" in body else "")
         full_title = title if not path else f"{title} · Pigeon Polly Art Lab"
         page = (layout

@@ -1,0 +1,277 @@
+<style>
+  html, body { margin: 0; background: #2B1A51; }
+  .run { box-sizing: border-box; padding: 40px 32px 48px; font-family: 'Karla', sans-serif; color: #F3EFFA; text-align: center; }
+  h2 { margin: 0 0 8px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(26px, 3.2vw, 38px); line-height: 1.1; }
+  .sub { margin: 0 auto 20px; max-width: 46ch; font-size: 16px; line-height: 1.6; color: #CFC7E8; }
+  .stage { position: relative; max-width: 900px; margin: 0 auto; }
+  canvas { width: 100%; display: block; border-radius: 16px; background: #241546; touch-action: manipulation; }
+  .overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: rgba(36, 21, 70, .88); border-radius: 16px; }
+  .overlay[hidden] { display: none; }
+  .overlay p { margin: 0; font-size: 16px; color: #CFC7E8; }
+  .overlay .big { font-family: 'Fraunces', serif; font-size: 24px; color: #F3EFFA; }
+  .picks { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+  .char { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 20px; border-radius: 14px; border: 1.5px solid #6B5AA8; background: none; color: #F3EFFA; font-family: 'Karla', sans-serif; font-size: 15px; cursor: pointer; }
+  .char:hover, .char:focus-visible { border-color: #E9A93B; outline: none; }
+  .char canvas { width: 72px; height: 72px; background: none; border-radius: 0; }
+  .btn { padding: 11px 24px; border-radius: 999px; border: 1.5px solid #D9D3F2; background: none; color: #F3EFFA; font-family: 'Karla', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; }
+  .btn:hover { background: #F3EFFA; color: #2B1A51; }
+  .hint { margin: 14px 0 0; font-size: 14px; color: #9E93C9; }
+  /* на телефоне поле выше, чтобы выбор персонажа помещался */
+  @media (max-width: 640px) {
+    .run { padding: 40px 16px 44px; }
+    #game { height: 340px; object-fit: contain; }
+    .char { padding: 12px 14px; }
+  }
+</style>
+
+<section class="run">
+  <h2>Take a break and play</h2>
+  <p class="sub">Pick your companion, jump over the rocks, and collect what they love most.</p>
+
+  <div class="stage">
+    <canvas id="game" width="900" height="260"></canvas>
+
+    <div class="overlay" id="menu">
+      <p class="big">Who is running today?</p>
+      <div class="picks">
+        <button class="char" data-char="polly"><canvas width="72" height="72" data-sprite="polly"></canvas>Pigeon Polly<br><span style="color:#9E93C9">collects coffee</span></button>
+        <button class="char" data-char="chew"><canvas width="72" height="72" data-sprite="chew"></canvas>Mr. Chew<br><span style="color:#9E93C9">collects letters</span></button>
+      </div>
+    </div>
+
+    <div class="overlay" id="over" hidden>
+      <p class="big" id="overTitle">Nice run!</p>
+      <p id="overText"></p>
+      <button class="btn" id="again">Play again</button>
+      <button class="btn" id="switch" style="border-color:#6B5AA8">Change character</button>
+    </div>
+  </div>
+
+  <p class="hint">Space, arrow up or tap to jump. Hold to jump higher.</p>
+</section>
+
+<script>
+(function () {
+  const cv = document.getElementById('game'), ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height, GROUND = H - 42, PX = 4;
+  ctx.imageSmoothingEnabled = false;
+
+  const C = { n:'#6B5AA8', m:'#8F82C2', p:'#9E93C9', b:'#3E7BB6', d:'#24406B', o:'#E9A93B', w:'#FFFFFF', k:'#2B1A51', s:'#B4622F', l:'#F0C58B', c:'#F3EFFA', g:'#7FD0A5', r:'#D85A30' };
+
+  // пиксельные спрайты: каждая строка — ряд пикселей, точка = пусто
+  const SPR = {
+    polly: [
+      '....dddd....',
+      '...dbbbbd...',
+      '..dbwkbbbd..',
+      '..dbwkbbbbo.',
+      '..dbbbbbbboo',
+      '.dbbbbbbbd..',
+      'dbbbbbbbd...',
+      'dbbbbbbd....',
+      '.dbbbbd.....',
+      '..dddd......',
+      '..o..o......',
+      '.ooo.ooo....'
+    ],
+    chew: [
+      '............',
+      '......k.k...',
+      '.....k.k....',
+      '..ssss.l....',
+      '.ss..ssll...',
+      's.sss.sllk..',
+      's.s.s.sl.l..',
+      's.sss.sl....',
+      '.ss..ss.....',
+      '.lsssss.....',
+      'llllllllll..',
+      '.llllllll...'
+    ],
+    coffee: [
+      '..p..p....',
+      '...p.p....',
+      '.wwwwwww..',
+      '.wsssssw..',
+      '.wwwwwwwww',
+      '.wwwwwww.w',
+      '.wwwwwww.w',
+      '.wwwwwwwww',
+      '..wwwww...',
+      '.wwwwwww..'
+    ],
+    letter: [
+      '..........',
+      '.cccccccc.',
+      '.ckcccckc.',
+      '.cckcckcc.',
+      '.ccckkccc.',
+      '.cccccccc.',
+      '.cccccccc.',
+      '.cccccccc.',
+      '..........',
+      '..........'
+    ],
+    rock: [
+      '...mmm....',
+      '..mmmmmn..',
+      '.mmmmmmmn.',
+      '.mmmmmmnn.',
+      'nmmmmmnnnn',
+      'nmmmmnnnnn',
+      'nnnnnnnnnn',
+      '.nnnnnnnn.'
+    ]
+  };
+
+  function draw(sprite, x, y, px, g) {
+    const rows = SPR[sprite]; g = g || ctx;
+    for (let r = 0; r < rows.length; r++)
+      for (let c = 0; c < rows[r].length; c++) {
+        const ch = rows[r][c];
+        if (ch === '.' || ch === ' ') continue;
+        g.fillStyle = C[ch] || '#fff';
+        g.fillRect(x + c * px, y + r * px, px, px);
+      }
+  }
+
+  document.querySelectorAll('[data-sprite]').forEach(c => {
+    const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+    draw(c.dataset.sprite, 0, 0, 6, g);
+  });
+
+  let char = 'polly', running = false, t = 0, speed = 3.6, score = 0, best = 0, dead = false;
+  const hero = { x: 90, y: GROUND - 48, vy: 0, w: 48, h: 48, onGround: true };
+  let holding = false, obstacles = [], goodies = [], ground = [];
+  // физика: все величины заданы на кадр при 60 кадрах в секунду и умножаются на dt,
+  // поэтому на экранах 120 Гц и при просадках игра идёт с той же скоростью
+  const GRAV = .40, JUMP = -8.7, HOLD = .17, COYOTE = 7, BUFFER = 8;
+  let last = 0, nextRock = 120, nextGoodie = 80, coyote = 0, buffered = 0;
+
+  try { best = parseInt(localStorage.getItem('pp-runner-best') || '0', 10) || 0; } catch (e) {}
+
+  for (let i = 0; i < 40; i++) ground.push({ x: Math.random() * W, w: 2 + Math.random() * 14 });
+
+  function reset() {
+    t = 0; speed = 3.6; score = 0; dead = false;
+    hero.y = GROUND - hero.h; hero.vy = 0; hero.onGround = true;
+    obstacles = []; goodies = []; last = 0; nextRock = 120; nextGoodie = 80; coyote = 0; buffered = 0;
+  }
+
+  function jump() {
+    if (!running || dead) return;
+    buffered = BUFFER;                       // нажатие чуть раньше приземления не теряется
+    if (hero.onGround || coyote > 0) doJump();
+  }
+
+  function doJump() {
+    hero.vy = JUMP; hero.onGround = false; holding = true; coyote = 0; buffered = 0;
+  }
+
+  function hit(a, b) {
+    return a.x < b.x + b.w - 6 && a.x + a.w - 8 > b.x && a.y < b.y + b.h - 4 && a.y + a.h - 6 > b.y;
+  }
+
+  function loop(now) {
+    if (!running) return;
+    if (!last) last = now;
+    const dt = Math.min(2.5, (now - last) / 16.667);   // 1 = кадр при 60 Гц
+    last = now;
+    t += dt;
+
+    if (!dead) {
+      // разгон: плавно и без рывков, потолок примерно через полторы минуты
+      speed = 3.6 + Math.min(3, t / 1800);
+
+      // прыжок: держишь кнопку — гравитация слабее, пока летишь вверх
+      if (hero.vy < 0 && holding) hero.vy -= HOLD * dt;
+      hero.vy += GRAV * dt;
+      hero.y += hero.vy * dt;
+
+      if (hero.y >= GROUND - hero.h) {
+        hero.y = GROUND - hero.h; hero.vy = 0;
+        if (!hero.onGround) { hero.onGround = true; coyote = COYOTE; }
+        if (buffered > 0) doJump();
+      } else if (hero.onGround) {
+        hero.onGround = false; coyote = COYOTE;        // сошёл с края — короткое окно на прыжок
+      }
+      if (hero.y < 0) { hero.y = 0; hero.vy = 0; }     // не улетаем за верх поля
+      coyote -= dt; buffered -= dt;
+      if (!hero.onGround && coyote <= 0) coyote = 0;
+
+      nextRock -= dt; nextGoodie -= dt;
+      if (nextRock <= 0) {
+        obstacles.push({ x: W + 20, y: GROUND - 32, w: 40, h: 32 });
+        // промежутки считаются в пикселях, поэтому с ростом скорости остаются честными
+        nextRock = (Math.max(300, 460 - t / 14) + Math.random() * 220) / speed;
+      }
+      if (nextGoodie <= 0) {
+        goodies.push({ x: W + 40, y: GROUND - 60 - Math.random() * 60, w: 40, h: 40, got: false });
+        nextGoodie = (420 + Math.random() * 280) / speed;
+      }
+
+      obstacles.forEach(o => o.x -= speed * dt);
+      goodies.forEach(o => o.x -= speed * dt);
+      ground.forEach(s => { s.x -= speed * dt; if (s.x < -20) { s.x = W + Math.random() * 60; s.w = 2 + Math.random() * 14; } });
+      obstacles = obstacles.filter(o => o.x > -60);
+      goodies = goodies.filter(o => o.x > -60 && !o.got);
+
+      goodies.forEach(o => { if (hit(hero, o)) { o.got = true; score++; } });
+      if (obstacles.some(o => hit(hero, o))) gameOver();
+    }
+
+    // рисуем
+    ctx.fillStyle = '#241546'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#3A2566';
+    ground.forEach(s => ctx.fillRect(s.x, GROUND + 12 + (s.w % 3) * 4, s.w, 3));
+    ctx.fillStyle = '#D85A30'; ctx.fillRect(0, GROUND, W, 4);
+
+    obstacles.forEach(o => draw('rock', o.x, o.y, PX));
+    goodies.forEach(o => draw(char === 'polly' ? 'coffee' : 'letter', o.x, o.y, PX));
+    const bob = hero.onGround && Math.floor(t / 9) % 2 ? 2 : 0;
+    draw(char, hero.x, hero.y + bob, PX);
+
+    ctx.fillStyle = '#F3EFFA'; ctx.font = '600 20px Karla, sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText((char === 'polly' ? '\u2615 ' : '\u2709 ') + score, W - 20, 36);
+    if (best) { ctx.fillStyle = '#9E93C9'; ctx.font = '400 14px Karla, sans-serif'; ctx.fillText('best ' + best, W - 20, 58); }
+
+    requestAnimationFrame(loop);
+  }
+
+  function start(c) {
+    char = c || char; reset(); running = true; dead = false;
+    document.getElementById('menu').hidden = true;
+    document.getElementById('over').hidden = true;
+    requestAnimationFrame(loop);
+  }
+
+  function gameOver() {
+    dead = true; running = false;
+    if (score > best) { best = score; try { localStorage.setItem('pp-runner-best', String(best)); } catch (e) {} }
+    document.getElementById('overTitle').textContent = score > 0 ? 'Nice run!' : 'Ouch, a rock!';
+    document.getElementById('overText').textContent =
+      (char === 'polly' ? 'Polly collected ' + score + ' coffee' + (score === 1 ? '' : 's') : 'Mr. Chew collected ' + score + ' letter' + (score === 1 ? '' : 's')) +
+      (best ? '. Best so far: ' + best + '.' : '.');
+    document.getElementById('over').hidden = false;
+  }
+
+  document.querySelectorAll('.char').forEach(b => b.onclick = () => start(b.dataset.char));
+  document.getElementById('again').onclick = () => start();
+  document.getElementById('switch').onclick = () => {
+    document.getElementById('over').hidden = true;
+    document.getElementById('menu').hidden = false;
+  };
+
+  addEventListener('keydown', e => {
+    if ((e.code === 'Space' || e.code === 'ArrowUp') && running && !dead) { e.preventDefault(); jump(); }
+  });
+  addEventListener('keyup', e => { if (e.code === 'Space' || e.code === 'ArrowUp') holding = false; });
+  cv.addEventListener('pointerdown', e => { e.preventDefault(); jump(); });
+  addEventListener('pointerup', () => { holding = false; });
+
+  // первый кадр, чтобы блок не выглядел пустым
+  ctx.fillStyle = '#241546'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#D85A30'; ctx.fillRect(0, GROUND, W, 4);
+  draw('polly', 90, GROUND - 48, PX);
+})();
+</script>

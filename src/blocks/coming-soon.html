@@ -1,0 +1,54 @@
+<style>
+  html, body { margin: 0; background: #FFFFFF; }
+  .bk { box-sizing: border-box; padding: 64px 32px; font-family: 'Karla', sans-serif; color: #2B1A51; }
+  .bk-in { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 56px; align-items: center; max-width: 1080px; margin: 0 auto; }
+  .bk-cover { position: relative; }
+  .bk-cover img { display: block; width: 100%; height: auto; border-radius: 10px; box-shadow: 0 18px 40px rgba(43, 26, 81, .22); transform: rotate(-2deg); transition: transform .3s; }
+  .bk-cover:hover img { transform: rotate(0deg) translateY(-4px); }
+  .bk-cover .spark { position: absolute; top: -18px; right: -14px; width: 56px; height: 56px; }
+  .bk p.bk-eyebrow { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 6px 14px; border-radius: 999px; background: #FBEFEA; color: #D85A30; font-size: 14px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+  .bk-eyebrow i { width: 8px; height: 8px; border-radius: 50%; background: #D85A30; animation: pulse 1.8s infinite; }
+  @keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+  .bk h2 { margin: 0 0 16px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(30px, 4vw, 46px); line-height: 1.08; }
+  .bk h2 span { color: #8E6FE0; }
+  .bk p { margin: 0 0 14px; max-width: 56ch; font-size: 17px; line-height: 1.65; color: #5A4E78; }
+  .bk .note { font-size: 15px; }
+  .bk-btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+  .btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px; border-radius: 999px; font-size: 16px; font-weight: 700; text-decoration: none; transition: transform .2s, background .2s; }
+  .btn:hover { transform: translateY(-2px); }
+  .btn:focus-visible { outline: 3px solid #D85A30; outline-offset: 3px; }
+  .btn-main { background: #2B1A51; color: #FFFFFF; }
+  .btn-main:hover { background: #3C2670; }
+  .btn-ghost { border: 2px solid #2B1A51; color: #2B1A51; }
+  .btn svg { width: 18px; height: 18px; }
+  @media (max-width: 760px) {
+    .bk { padding: 44px 20px; }
+    .bk-in { grid-template-columns: 1fr; gap: 32px; text-align: center; }
+    .bk-cover { max-width: 260px; margin: 0 auto; }
+    .bk p { margin-left: auto; margin-right: auto; }
+    .bk-btns { justify-content: center; }
+  }
+  @media (prefers-reduced-motion: reduce) { .bk-cover img, .btn { transition: none; } .bk-eyebrow i { animation: none; } }
+</style>
+
+<section class="bk">
+  <div class="bk-in">
+    <div class="bk-cover">
+      <img src="/images/home/urban-sketching-digital-traveler.jpg" width="848" height="1200" loading="lazy" alt="Cover of the book Urban Sketching: Digital Traveler by Alina Otkinska, a watercolor and ink sketch of old towers and rooftops">
+      <svg class="spark" viewBox="-50 -50 100 100" aria-hidden="true"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/></svg>
+    </div>
+    <div>
+      <p class="bk-eyebrow"><i></i> Work in progress · Book 3</p>
+      <h2>Urban Sketching<br><span>Digital Traveler</span></h2>
+      <p>I&#39;m writing my third sketching guide. This time it&#39;s about drawing cities you can&#39;t (or don&#39;t want to) walk into right now: street panoramas, photos and videos, and a sketchbook on your own kitchen table.</p>
+      <p>Perspective made simple, weather, people and pigeons, color accents, composition, references and a lot of stories.</p>
+      <p class="note">Every illustration is made by hand, without AI. Coming soon on Amazon.</p>
+      <div class="bk-btns">
+        <a class="btn btn-main" href="https://www.patreon.com/collection/2400979" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="15" cy="9.5" r="6.5" fill="#E9A93B"/><rect x="3" y="3" width="3.5" height="18" rx="1" fill="#FFFFFF"/></svg>
+          Behind the Scenes on Patreon
+        </a>
+      </div>
+    </div>
+  </div>
+</section>

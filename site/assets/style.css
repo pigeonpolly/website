@@ -98,7 +98,7 @@ a:hover { color: var(--text); }
 .sub-toggle span { font-size: 11px; transition: transform .2s; }
 
 .has-sub { position: relative; }
-.sub {
+.nav-sub {
   position: absolute;
   top: calc(100% + 6px);
   left: 0;
@@ -113,8 +113,8 @@ a:hover { color: var(--text); }
   transform: translateY(-4px);
   transition: opacity .15s, transform .15s, visibility .15s;
 }
-.has-sub:hover .sub, .has-sub:focus-within .sub, .has-sub.open .sub { visibility: visible; opacity: 1; transform: none; }
-.sub a { border-radius: 10px; }
+.has-sub:hover .nav-sub, .has-sub:focus-within .nav-sub, .has-sub.open .nav-sub { visibility: visible; opacity: 1; transform: none; }
+.nav-sub a { border-radius: 10px; }
 
 .menu-toggle {
   display: none;
@@ -148,11 +148,11 @@ a:hover { color: var(--text); }
   .site-nav.open { visibility: visible; opacity: 1; }
   .site-nav > ul { flex-direction: column; align-items: stretch; gap: 2px; }
   .site-nav a, .sub-toggle { width: 100%; padding: 14px 16px; font-size: 18px; justify-content: space-between; }
-  .sub { position: static; visibility: visible; opacity: 1; transform: none; display: none; box-shadow: none; border: 0; background: none; padding: 0 0 8px 16px; }
-  .has-sub:hover .sub, .has-sub:focus-within .sub { display: none; }
-  .has-sub.open .sub { display: block; }
+  .nav-sub { position: static; visibility: visible; opacity: 1; transform: none; display: none; box-shadow: none; border: 0; background: none; padding: 0 0 8px 16px; }
+  .has-sub:hover .nav-sub, .has-sub:focus-within .nav-sub { display: none; }
+  .has-sub.open .nav-sub { display: block; }
   .has-sub.open .sub-toggle span { transform: rotate(180deg); }
-  .sub a { font-size: 17px; padding: 11px 16px; }
+  .nav-sub a { font-size: 17px; padding: 11px 16px; }
   body.menu-open { overflow: hidden; }
 }
 
@@ -171,7 +171,7 @@ h1, h2 { font-family: var(--serif); font-weight: 600; line-height: 1.1; }
 .lead { margin: 0 0 28px; max-width: 62ch; font-size: clamp(16px, 1.6vw, 18px); line-height: 1.65; color: var(--muted); }
 .hero .lead { max-width: 42ch; }
 .actions { display: flex; gap: 12px; flex-wrap: wrap; }
-.btn {
+.hero .btn {
   display: inline-block;
   padding: 12px 22px;
   border-radius: 999px;
@@ -183,7 +183,7 @@ h1, h2 { font-family: var(--serif); font-weight: 600; line-height: 1.1; }
   text-align: center;
   transition: background-color .2s, color .2s;
 }
-.btn:hover { background: var(--text); color: var(--bg); }
+.hero .btn:hover { background: var(--text); color: var(--bg); }
 
 .art {
   position: relative;
@@ -197,7 +197,7 @@ h1, h2 { font-family: var(--serif); font-weight: 600; line-height: 1.1; }
   inset: 0;
   border-radius: 999px 999px 18px 18px;
   background: var(--bg-2) 36% center / cover no-repeat;
-  background-image: url('https://lh3.googleusercontent.com/d/1xML5kPGP6JLJr7F1VTVJzmxu9E0BF9sd=w900');
+  background-image: url('/images/bird/2023-pigeon-polly-thinking-about-relocation-to-mars.jpg');
 }
 .art::before { content: ''; position: absolute; inset: -12px; border: 3px solid var(--orange); border-radius: 999px 999px 26px 26px; pointer-events: none; }
 .art::after { content: ''; position: absolute; left: -40px; right: -40px; bottom: -20px; height: 4px; border-radius: 4px; background: var(--orange); }
@@ -253,9 +253,9 @@ h1, h2 { font-family: var(--serif); font-weight: 600; line-height: 1.1; }
 @media (max-width: 560px) { .gallery { columns: 1; } }
 
 /* ---------- Книги ---------- */
-.books {
+.book-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(200px, 240px));
   gap: 24px;
   padding: 0 var(--gutter) 48px;
 }
@@ -274,7 +274,7 @@ h1, h2 { font-family: var(--serif); font-weight: 600; line-height: 1.1; }
 .cover-ph { font-size: 44px; opacity: .5; }
 .book:hover .cover { transform: translateY(-4px); }
 .book-title { font-weight: 500; }
-@media (max-width: 480px) { .books { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
+@media (max-width: 480px) { .book-grid { grid-template-columns: repeat(2, 1fr); gap: 16px; } }
 
 /* ---------- Просмотр картинки на весь экран ---------- */
 .lightbox {
@@ -326,3 +326,7 @@ h1, h2 { font-family: var(--serif); font-weight: 600; line-height: 1.1; }
 .footer-links a:hover { color: var(--text); }
 
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+
+/* ---------- Блоки главной (свои стили у каждого, см. src/blocks) ---------- */
+.blk { overflow: hidden; }
+.blk img { display: block; }

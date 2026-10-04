@@ -13,7 +13,7 @@
 <link rel="icon" href="/assets/favicon.svg" type="image/svg+xml">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Karla:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/style.css">
 <script src="/assets/site.js" defer></script>
 </head>
@@ -33,9 +33,8 @@
 <li><a href="/e-books/">E-Books</a></li>
 <li><a href="/exhibitions/">Exhibitions</a></li>
 <li><a href="/publications/">Publications</a></li>
-<li class="has-sub"><button class="sub-toggle" aria-expanded="false">Art Portfolio<span aria-hidden="true">▾</span></button><ul class="sub"><li><a href="/art-portfolio/anxiety/">Anxiety</a></li><li><a href="/art-portfolio/sketchbook/">My Sketchbook</a></li><li><a href="/art-portfolio/snail/">Mr.Chew</a></li><li><a href="/art-portfolio/bird/">PigeonPolly</a></li><li><a href="/art-portfolio/detective/">Mr.Titos</a></li><li><a href="/art-portfolio/halloween/">Pumpkin Family</a></li><li><a href="/art-portfolio/ai-art/">AI Art</a></li></ul></li>
-<li><a href="/wobbleland-comics/">Wobbleland</a></li>
-<li><a href="http://blog.pigeonpolly.com" target="_blank" rel="noopener">Patreon Blog<span class="ext" aria-hidden="true">↗</span></a></li>
+<li class="has-sub"><button class="sub-toggle" aria-expanded="false">Art Portfolio<span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/art-portfolio/anxiety/">Anxiety</a></li><li><a href="/art-portfolio/sketchbook/">My Sketchbook</a></li><li><a href="/art-portfolio/snail/">Mr.Chew</a></li><li><a href="/art-portfolio/bird/">PigeonPolly</a></li><li><a href="/art-portfolio/detective/">Mr.Titos</a></li><li><a href="/art-portfolio/halloween/">Pumpkin Family</a></li><li><a href="/art-portfolio/ai-art/">AI Art</a></li></ul></li>
+<li><a href="https://www.patreon.com/cw/pigeon_polly" target="_blank" rel="noopener">Patreon Blog<span class="ext" aria-hidden="true">↗</span></a></li>
 <li><a href="https://www.pinterest.com/pigeonpollyart/" target="_blank" rel="noopener">Pinterest<span class="ext" aria-hidden="true">↗</span></a></li>
     </ul>
   </nav>
@@ -49,7 +48,6 @@
     <div class="actions">
       <a class="btn" href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener">Read my articles on LinkedIn</a>
       <a class="btn" href="/e-books/">See my e-books</a>
-      <a class="btn" href="/wobbleland-comics/">Visit Wobbleland</a>
     </div>
   </div>
   <div class="art">
@@ -59,14 +57,482 @@
     <span class="dot dot-2"></span>
   </div>
 </section>
-<!-- Сюда переедут остальные блоки главной (Coming soon и др.), когда придут их коды -->
+<div class="blk" id="blk-sketching-guides"><style>#blk-sketching-guides { margin: 0; background: #FFFFFF; }
+#blk-sketching-guides .books {
+    box-sizing: border-box; padding: 56px 64px;
+    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 48px; align-items: center;
+    font-family: 'Karla', sans-serif; color: #2B1A51;
+  }
+#blk-sketching-guides .kicker { margin: 0 0 10px; font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; color: #D85A30; }
+#blk-sketching-guides h2 { margin: 0 0 18px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(30px, 3.2vw, 44px); line-height: 1.1; }
+#blk-sketching-guides .txt { margin: 0 0 12px; max-width: 44ch; font-size: 17px; line-height: 1.7; color: #4A3E68; }
+#blk-sketching-guides .hint { margin: 18px 0 0; font-size: 15px; color: #8C7FB0; }
+#blk-sketching-guides svg { width: 100%; height: auto; display: block; overflow: visible; }
+#blk-sketching-guides .mine { cursor: pointer; }
+#blk-sketching-guides .mine > g { transition: transform .25s; transform-box: fill-box; transform-origin: center; }
+#blk-sketching-guides .mine:hover > g { transform: translateX(-18px); }
+#blk-sketching-guides .mine:focus-visible { outline: 3px solid #D85A30; outline-offset: 4px; }
+@media (max-width: 820px) {#blk-sketching-guides .books { grid-template-columns: 1fr; gap: 36px; padding: 48px 26px; }
+#blk-sketching-guides .pile { order: -1; }}</style><section class="books">
+  <div>
+    <p class="kicker">Written and painted by me</p>
+    <h2>Sketching guides from my own desk</h2>
+    <p class="txt">Short, practical books for people who want to start sketching, not to be perfect. Watercolor, ink, and the small habits that keep a sketchbook alive.</p>
+    <p class="txt">More guides are on the way.</p>
+    <p class="hint">Click a coloured book to open it.</p>
+  </div>
+
+  <div class="pile">
+    <svg viewBox="0 0 640 470" role="img" aria-label="A scattered pile of books with my sketching guides among them">
+      <!-- чужие книги в стопке -->
+      <g>
+        <rect x="70" y="392" width="470" height="46" rx="10" fill="#E3DEF2"/>
+        <rect x="92" y="398" width="24" height="34" rx="4" fill="#CFC7E8"/>
+        <rect x="96" y="346" width="430" height="42" rx="10" fill="#CFC7E8"/>
+        <rect x="118" y="352" width="22" height="30" rx="4" fill="#B9AFDD"/>
+      </g>
+
+      <!-- МОЯ КНИГА 1 — Watercolor Sketches -->
+      <a class="mine" href="https://a.co/d/0cJY0kk5" target="_blank" rel="noopener">
+        <g>
+          <rect x="52" y="288" width="486" height="54" rx="12" fill="#D85A30"/>
+          <rect x="76" y="296" width="26" height="38" rx="5" fill="#F5C4B3"/>
+          <text x="126" y="323" font-family="Fraunces, serif" font-size="23" font-weight="600" fill="#FFF6F1">Watercolor Sketches</text>
+          <path d="M498 315 l8 -14 8 14 -8 14z" fill="#F5C4B3"/>
+        </g>
+      </a>
+
+      <!-- МОЯ КНИГА 2 — Ink Sketching -->
+      <a class="mine" href="https://a.co/d/009gymDC" target="_blank" rel="noopener">
+        <g>
+          <rect x="66" y="238" width="458" height="50" rx="12" fill="#2B1A51"/>
+          <rect x="88" y="246" width="24" height="34" rx="5" fill="#E9A93B"/>
+          <text x="136" y="270" font-family="Fraunces, serif" font-size="22" font-weight="600" fill="#F3EFFA">Ink Sketching</text>
+          <path d="M486 263 l8 -13 8 13 -8 13z" fill="#E9A93B"/>
+        </g>
+      </a>
+
+      <!-- чужая книга -->
+      <rect x="58" y="192" width="452" height="44" rx="10" fill="#D9D2EE"/>
+      <rect x="80" y="198" width="22" height="32" rx="4" fill="#BEB4E0"/>
+
+      <!-- МОЯ КНИГА 3 — бесплатный гайд с Google Диска -->
+      <a class="mine" href="https://drive.google.com/file/d/1IWMWb0nLOaN2UuJLZA-DqhdmwDh3T9Nx/view?usp=sharing" target="_blank" rel="noopener">
+        <g>
+          <rect x="80" y="142" width="426" height="48" rx="12" fill="#7F5AC0"/>
+          <rect x="102" y="150" width="24" height="32" rx="5" fill="#E3D6FA"/>
+          <text x="150" y="173" font-family="Fraunces, serif" font-size="22" font-weight="600" fill="#F3EFFA">Free sketching guide</text>
+          <path d="M468 166 l8 -13 8 13 -8 13z" fill="#E3D6FA"/>
+        </g>
+      </a>
+      <rect x="104" y="94" width="384" height="46" rx="10" fill="#D9D2EE"/>
+      <rect x="126" y="101" width="24" height="32" rx="4" fill="#BEB4E0"/>
+
+      <!-- чужая книга сверху -->
+      <rect x="150" y="50" width="330" height="40" rx="10" fill="#E3DEF2"/>
+      <rect x="172" y="56" width="20" height="28" rx="4" fill="#CFC7E8"/>
+
+      <!-- кисточка, прислонённая к стопке -->
+      <g>
+        <path d="M566 412 L596 140" stroke="#B9AFDD" stroke-width="9" stroke-linecap="round"/>
+        <path d="M596 140 c10 -22 2 -40 -8 -46 c-12 8 -14 26 -6 46z" fill="#E9A93B"/>
+      </g>
+      <path d="M60 438 H600" stroke="#D85A30" stroke-width="6" stroke-linecap="round"/>
+
+    </svg>
+  </div>
+</section>
+</div>
+<div class="blk" id="blk-coming-soon"><style>#blk-coming-soon { margin: 0; background: #FFFFFF; }
+#blk-coming-soon .bk { box-sizing: border-box; padding: 64px 32px; font-family: 'Karla', sans-serif; color: #2B1A51; }
+#blk-coming-soon .bk-in { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 56px; align-items: center; max-width: 1080px; margin: 0 auto; }
+#blk-coming-soon .bk-cover { position: relative; }
+#blk-coming-soon .bk-cover img { display: block; width: 100%; height: auto; border-radius: 10px; box-shadow: 0 18px 40px rgba(43, 26, 81, .22); transform: rotate(-2deg); transition: transform .3s; }
+#blk-coming-soon .bk-cover:hover img { transform: rotate(0deg) translateY(-4px); }
+#blk-coming-soon .bk-cover .spark { position: absolute; top: -18px; right: -14px; width: 56px; height: 56px; }
+#blk-coming-soon .bk p.bk-eyebrow { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 6px 14px; border-radius: 999px; background: #FBEFEA; color: #D85A30; font-size: 14px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
+#blk-coming-soon .bk-eyebrow i { width: 8px; height: 8px; border-radius: 50%; background: #D85A30; animation: pulse 1.8s infinite; }
+@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
+#blk-coming-soon .bk h2 { margin: 0 0 16px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(30px, 4vw, 46px); line-height: 1.08; }
+#blk-coming-soon .bk h2 span { color: #8E6FE0; }
+#blk-coming-soon .bk p { margin: 0 0 14px; max-width: 56ch; font-size: 17px; line-height: 1.65; color: #5A4E78; }
+#blk-coming-soon .bk .note { font-size: 15px; }
+#blk-coming-soon .bk-btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
+#blk-coming-soon .btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px; border-radius: 999px; font-size: 16px; font-weight: 700; text-decoration: none; transition: transform .2s, background .2s; }
+#blk-coming-soon .btn:hover { transform: translateY(-2px); }
+#blk-coming-soon .btn:focus-visible { outline: 3px solid #D85A30; outline-offset: 3px; }
+#blk-coming-soon .btn-main { background: #2B1A51; color: #FFFFFF; }
+#blk-coming-soon .btn-main:hover { background: #3C2670; }
+#blk-coming-soon .btn-ghost { border: 2px solid #2B1A51; color: #2B1A51; }
+#blk-coming-soon .btn svg { width: 18px; height: 18px; }
+@media (max-width: 760px) {#blk-coming-soon .bk { padding: 44px 20px; }
+#blk-coming-soon .bk-in { grid-template-columns: 1fr; gap: 32px; text-align: center; }
+#blk-coming-soon .bk-cover { max-width: 260px; margin: 0 auto; }
+#blk-coming-soon .bk p { margin-left: auto; margin-right: auto; }
+#blk-coming-soon .bk-btns { justify-content: center; }}
+@media (prefers-reduced-motion: reduce) {#blk-coming-soon .bk-cover img, #blk-coming-soon .btn { transition: none; }
+#blk-coming-soon .bk-eyebrow i { animation: none; }}</style><section class="bk">
+  <div class="bk-in">
+    <div class="bk-cover">
+      <img src="/images/home/urban-sketching-digital-traveler.jpg" width="848" height="1200" loading="lazy" alt="Cover of the book Urban Sketching: Digital Traveler by Alina Otkinska, a watercolor and ink sketch of old towers and rooftops">
+      <svg class="spark" viewBox="-50 -50 100 100" aria-hidden="true"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/></svg>
+    </div>
+    <div>
+      <p class="bk-eyebrow"><i></i> Work in progress · Book 3</p>
+      <h2>Urban Sketching<br><span>Digital Traveler</span></h2>
+      <p>I&#39;m writing my third sketching guide. This time it&#39;s about drawing cities you can&#39;t (or don&#39;t want to) walk into right now: street panoramas, photos and videos, and a sketchbook on your own kitchen table.</p>
+      <p>Perspective made simple, weather, people and pigeons, color accents, composition, references and a lot of stories.</p>
+      <p class="note">Every illustration is made by hand, without AI. Coming soon on Amazon.</p>
+      <div class="bk-btns">
+        <a class="btn btn-main" href="https://www.patreon.com/collection/2400979" target="_blank" rel="noopener">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="15" cy="9.5" r="6.5" fill="#E9A93B"/><rect x="3" y="3" width="3.5" height="18" rx="1" fill="#FFFFFF"/></svg>
+          Behind the Scenes on Patreon
+        </a>
+      </div>
+    </div>
+  </div>
+</section>
+</div>
+<div class="blk" id="blk-patreon"><style>#blk-patreon { margin: 0; background: #FFFFFF; }
+#blk-patreon .pat { box-sizing: border-box; padding: 64px 32px; font-family: 'Karla', sans-serif; color: #2B1A51; text-align: center; }
+#blk-patreon .pat h2 { margin: 0 0 12px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(28px, 4vw, 44px); line-height: 1.1; }
+#blk-patreon .pat .sub { margin: 0 auto 48px; max-width: 44ch; font-size: 17px; line-height: 1.6; color: #5A4E78; }
+#blk-patreon .row { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 28px; max-width: 1180px; margin: 0 auto; }
+#blk-patreon .item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit; padding: 8px 4px; border-radius: 16px; }
+#blk-patreon .circle { width: 132px; height: 132px; border-radius: 50%; background: #2B1A51; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; transition: transform .25s; }
+#blk-patreon .circle svg { width: 88px; height: 88px; }
+#blk-patreon .item:hover .circle { transform: translateY(-6px) rotate(-4deg); }
+#blk-patreon .item:focus-visible { outline: 3px solid #D85A30; outline-offset: 4px; }
+#blk-patreon .item h3 { margin: 0 0 8px; font-family: 'Fraunces', serif; font-weight: 600; font-size: 20px; line-height: 1.25; }
+#blk-patreon .item p { margin: 0; max-width: 24ch; font-size: 15px; line-height: 1.55; color: #5A4E78; }
+@media (max-width: 760px) {#blk-patreon .pat { padding: 44px 0; }
+#blk-patreon .pat h2, #blk-patreon .pat .sub { padding: 0 20px; }
+#blk-patreon .row { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; padding: 8px 20px 16px; gap: 12px; }
+#blk-patreon .item { flex: 0 0 58%; scroll-snap-align: center; }}
+@media (prefers-reduced-motion: reduce) {#blk-patreon .circle { transition: none; }
+#blk-patreon .item:hover .circle { transform: none; }}</style><section class="pat">
+  <h2>News on Patreon</h2>
+  <p class="sub">Six collections, one for each side of my work. Pick a theme and follow along.</p>
+  <div class="row">
+    <!-- Culture &amp; Creativity -->
+    <a class="item" href="https://www.patreon.com/collection/2381937" target="_blank" rel="noopener">
+      <span class="circle"><svg viewBox="480 100 560 560" aria-hidden="true"><path d="M600 560 V330 a160 160 0 0 1 320 0 V560" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M660 560 V340 a100 100 0 0 1 200 0 V560" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path transform="translate(760 298) scale(0.7)" d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/><line x1="560" y1="560" x2="960" y2="560" stroke="#D85A30" stroke-width="16" stroke-linecap="round"/><circle cx="540" cy="260" r="10" fill="#F5C4B3"/><circle cx="970" cy="470" r="8" fill="#F5C4B3"/></svg></span>
+      <h3>Culture &amp; Creativity</h3>
+      <p>Notes from my master&#39;s studies on culture in the creative industries.</p>
+    </a>
+    <!-- Education &amp; Technologies -->
+    <a class="item" href="https://www.patreon.com/collection/2381936" target="_blank" rel="noopener">
+      <span class="circle"><svg viewBox="480 100 560 560" aria-hidden="true"><path d="M580 540 V330 q105 -40 180 10 q75 -50 180 -10 V540 q-105 -40 -180 10 q-75 -50 -180 -10z" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="760" y1="340" x2="760" y2="550" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M620 400 q55 -18 105 5" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M795 405 q50 -23 105 -5" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M620 450 q55 -18 105 5" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M795 455 q50 -23 105 -5" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M620 500 q55 -18 105 5" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M795 505 q50 -23 105 -5" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path transform="translate(760 230) scale(1)" d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/><line x1="560" y1="560" x2="960" y2="560" stroke="#D85A30" stroke-width="16" stroke-linecap="round"/><circle cx="540" cy="260" r="10" fill="#F5C4B3"/><circle cx="970" cy="470" r="8" fill="#F5C4B3"/></svg></span>
+      <h3>Education &amp; Technologies</h3>
+      <p>Learning design, AI tools, and what helps people learn.</p>
+    </a>
+    <!-- Art &amp; Technologies -->
+    <a class="item" href="https://www.patreon.com/collection/2381935" target="_blank" rel="noopener">
+      <span class="circle"><svg viewBox="480 100 560 560" aria-hidden="true"><path d="M905 205 L760 395" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M760 395 c-40 -20 -85 5 -95 50 c-8 38 -30 60 -60 70 c55 30 130 25 165 -15 c30 -32 25 -80 -10 -105z" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M600 470 q-20 30 0 60" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0"/><rect x="820" y="440" width="34" height="34" rx="4" fill="#F5C4B3"/><rect x="880" y="405" width="24" height="24" rx="4" fill="#F5C4B3"/><rect x="900" y="480" width="20" height="20" rx="4" fill="#F5C4B3"/><rect x="955" y="445" width="14" height="14" rx="4" fill="#F5C4B3"/><path transform="translate(620 260) scale(1)" d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/><line x1="560" y1="560" x2="960" y2="560" stroke="#D85A30" stroke-width="16" stroke-linecap="round"/><circle cx="960" cy="300" r="10" fill="#F5C4B3"/><circle cx="540" cy="420" r="8" fill="#F5C4B3"/></svg></span>
+      <h3>Art &amp; Technologies</h3>
+      <p>Digital art experiments and AI in the creative process.</p>
+    </a>
+    <!-- (Not) Weekly Polly -->
+    <a class="item" href="https://www.patreon.com/collection/2381934" target="_blank" rel="noopener">
+      <span class="circle"><svg viewBox="480 100 560 560" aria-hidden="true"><rect x="600" y="240" width="320" height="300" rx="26" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="600" y1="320" x2="920" y2="320" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="680" y1="205" x2="680" y2="265" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="840" y1="205" x2="840" y2="265" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="650" cy="375" r="9" fill="#F5C4B3"/><circle cx="705" cy="375" r="9" fill="#F5C4B3"/><circle cx="760" cy="375" r="9" fill="#F5C4B3"/><circle cx="815" cy="375" r="9" fill="#F5C4B3"/><circle cx="870" cy="375" r="9" fill="#F5C4B3"/><circle cx="650" cy="430" r="9" fill="#F5C4B3"/><circle cx="705" cy="430" r="9" fill="#F5C4B3"/><circle cx="815" cy="430" r="9" fill="#F5C4B3"/><circle cx="870" cy="430" r="9" fill="#F5C4B3"/><circle cx="650" cy="485" r="9" fill="#F5C4B3"/><circle cx="705" cy="485" r="9" fill="#F5C4B3"/><circle cx="760" cy="485" r="9" fill="#F5C4B3"/><circle cx="815" cy="485" r="9" fill="#F5C4B3"/><circle cx="870" cy="485" r="9" fill="#F5C4B3"/><path transform="translate(760 430) scale(0.8)" d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/><circle cx="760" cy="430" r="52" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="560" y1="560" x2="960" y2="560" stroke="#D85A30" stroke-width="16" stroke-linecap="round"/><circle cx="540" cy="260" r="10" fill="#F5C4B3"/><circle cx="975" cy="460" r="8" fill="#F5C4B3"/></svg></span>
+      <h3>(Not) Weekly Polly</h3>
+      <p>Studio notes and the occasional news, whenever life allows.</p>
+    </a>
+    <!-- Traditional Art -->
+    <a class="item" href="https://www.patreon.com/collection/2381925" target="_blank" rel="noopener">
+      <span class="circle"><svg viewBox="480 100 560 560" aria-hidden="true"><path d="M760 300 c-120 0 -190 80 -190 150 c0 60 50 90 110 90 h150 c90 0 150 -50 150 -120 c0 -70 -80 -120 -130 -85 c-30 20 -60 5 -45 -20 c10 -15 -10 -15 -45 -15z" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="665" cy="450" r="30" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="740" cy="400" r="24" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="880" cy="470" r="26" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="800" cy="485" r="22" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path transform="translate(900 230) scale(1)" d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/><line x1="560" y1="560" x2="960" y2="560" stroke="#D85A30" stroke-width="16" stroke-linecap="round"/><circle cx="560" cy="250" r="10" fill="#F5C4B3"/><circle cx="990" cy="330" r="8" fill="#F5C4B3"/></svg></span>
+      <h3>Traditional Art</h3>
+      <p>Watercolor, ink, and pages straight from my sketchbook.</p>
+    </a>
+
+    <!-- Ask & Feedback — ЗАМЕНИ на ссылку своей коллекции -->
+    <a class="item" href="https://www.patreon.com/collection/2402857" target="_blank" rel="noopener">
+      <span class="circle"><svg viewBox="480 80 540 500" aria-hidden="true"><rect width="1080" height="1080" fill="#2B1A51"/><path d="M680 140 Q680 100 715 100 H950 Q985 100 985 140 V260 Q985 300 950 300 H840 L810 340 L810 300 H715 Q680 300 680 260 Z" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><text x="832" y="248" text-anchor="middle" font-family="serif" font-size="110" font-weight="700" fill="#D85A30">?</text><path d="M700 360 Q700 330 722 330 H880 Q900 330 900 355 V405 Q900 425 878 425 H770 L750 450 L750 425 H722 Q700 425 700 405 Z" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M722 375 L754 405 L828 348" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path transform="translate(640 108) scale(0.7)" d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/><line x1="560" y1="560" x2="960" y2="560" stroke="#D85A30" stroke-width="16" stroke-linecap="round"/><circle cx="545" cy="285" r="10" fill="#F5C4B3"/><circle cx="975" cy="490" r="8" fill="#F5C4B3"/></svg></span>
+      <h3>Ask &amp; Feedback</h3>
+      <p>Your questions, my honest answers, and feedback that actually helps.</p>
+    </a>
+  </div>
+</section>
+</div>
+<div class="blk" id="blk-game"><style>#blk-game { margin: 0; background: #2B1A51; }
+#blk-game .run { box-sizing: border-box; padding: 40px 32px 48px; font-family: 'Karla', sans-serif; color: #F3EFFA; text-align: center; }
+#blk-game h2 { margin: 0 0 8px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(26px, 3.2vw, 38px); line-height: 1.1; }
+#blk-game .sub { margin: 0 auto 20px; max-width: 46ch; font-size: 16px; line-height: 1.6; color: #CFC7E8; }
+#blk-game .stage { position: relative; max-width: 900px; margin: 0 auto; }
+#blk-game canvas { width: 100%; display: block; border-radius: 16px; background: #241546; touch-action: manipulation; }
+#blk-game .overlay { position: absolute; inset: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 16px; background: rgba(36, 21, 70, .88); border-radius: 16px; }
+#blk-game .overlay[hidden] { display: none; }
+#blk-game .overlay p { margin: 0; font-size: 16px; color: #CFC7E8; }
+#blk-game .overlay .big { font-family: 'Fraunces', serif; font-size: 24px; color: #F3EFFA; }
+#blk-game .picks { display: flex; gap: 14px; flex-wrap: wrap; justify-content: center; }
+#blk-game .char { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 14px 20px; border-radius: 14px; border: 1.5px solid #6B5AA8; background: none; color: #F3EFFA; font-family: 'Karla', sans-serif; font-size: 15px; cursor: pointer; }
+#blk-game .char:hover, #blk-game .char:focus-visible { border-color: #E9A93B; outline: none; }
+#blk-game .char canvas { width: 72px; height: 72px; background: none; border-radius: 0; }
+#blk-game .btn { padding: 11px 24px; border-radius: 999px; border: 1.5px solid #D9D3F2; background: none; color: #F3EFFA; font-family: 'Karla', sans-serif; font-size: 15px; font-weight: 500; cursor: pointer; }
+#blk-game .btn:hover { background: #F3EFFA; color: #2B1A51; }
+#blk-game .hint { margin: 14px 0 0; font-size: 14px; color: #9E93C9; }
+@media (max-width: 640px) {#blk-game .run { padding: 40px 16px 44px; }
+#blk-game #game { height: 340px; object-fit: contain; }
+#blk-game .char { padding: 12px 14px; }}</style><section class="run">
+  <h2>Take a break and play</h2>
+  <p class="sub">Pick your companion, jump over the rocks, and collect what they love most.</p>
+
+  <div class="stage">
+    <canvas id="game" width="900" height="260"></canvas>
+
+    <div class="overlay" id="menu">
+      <p class="big">Who is running today?</p>
+      <div class="picks">
+        <button class="char" data-char="polly"><canvas width="72" height="72" data-sprite="polly"></canvas>Pigeon Polly<br><span style="color:#9E93C9">collects coffee</span></button>
+        <button class="char" data-char="chew"><canvas width="72" height="72" data-sprite="chew"></canvas>Mr. Chew<br><span style="color:#9E93C9">collects letters</span></button>
+      </div>
+    </div>
+
+    <div class="overlay" id="over" hidden>
+      <p class="big" id="overTitle">Nice run!</p>
+      <p id="overText"></p>
+      <button class="btn" id="again">Play again</button>
+      <button class="btn" id="switch" style="border-color:#6B5AA8">Change character</button>
+    </div>
+  </div>
+
+  <p class="hint">Space, arrow up or tap to jump. Hold to jump higher.</p>
+</section>
+
+<script>
+(function () {
+  const cv = document.getElementById('game'), ctx = cv.getContext('2d');
+  const W = cv.width, H = cv.height, GROUND = H - 42, PX = 4;
+  ctx.imageSmoothingEnabled = false;
+
+  const C = { n:'#6B5AA8', m:'#8F82C2', p:'#9E93C9', b:'#3E7BB6', d:'#24406B', o:'#E9A93B', w:'#FFFFFF', k:'#2B1A51', s:'#B4622F', l:'#F0C58B', c:'#F3EFFA', g:'#7FD0A5', r:'#D85A30' };
+
+  // пиксельные спрайты: каждая строка — ряд пикселей, точка = пусто
+  const SPR = {
+    polly: [
+      '....dddd....',
+      '...dbbbbd...',
+      '..dbwkbbbd..',
+      '..dbwkbbbbo.',
+      '..dbbbbbbboo',
+      '.dbbbbbbbd..',
+      'dbbbbbbbd...',
+      'dbbbbbbd....',
+      '.dbbbbd.....',
+      '..dddd......',
+      '..o..o......',
+      '.ooo.ooo....'
+    ],
+    chew: [
+      '............',
+      '......k.k...',
+      '.....k.k....',
+      '..ssss.l....',
+      '.ss..ssll...',
+      's.sss.sllk..',
+      's.s.s.sl.l..',
+      's.sss.sl....',
+      '.ss..ss.....',
+      '.lsssss.....',
+      'llllllllll..',
+      '.llllllll...'
+    ],
+    coffee: [
+      '..p..p....',
+      '...p.p....',
+      '.wwwwwww..',
+      '.wsssssw..',
+      '.wwwwwwwww',
+      '.wwwwwww.w',
+      '.wwwwwww.w',
+      '.wwwwwwwww',
+      '..wwwww...',
+      '.wwwwwww..'
+    ],
+    letter: [
+      '..........',
+      '.cccccccc.',
+      '.ckcccckc.',
+      '.cckcckcc.',
+      '.ccckkccc.',
+      '.cccccccc.',
+      '.cccccccc.',
+      '.cccccccc.',
+      '..........',
+      '..........'
+    ],
+    rock: [
+      '...mmm....',
+      '..mmmmmn..',
+      '.mmmmmmmn.',
+      '.mmmmmmnn.',
+      'nmmmmmnnnn',
+      'nmmmmnnnnn',
+      'nnnnnnnnnn',
+      '.nnnnnnnn.'
+    ]
+  };
+
+  function draw(sprite, x, y, px, g) {
+    const rows = SPR[sprite]; g = g || ctx;
+    for (let r = 0; r < rows.length; r++)
+      for (let c = 0; c < rows[r].length; c++) {
+        const ch = rows[r][c];
+        if (ch === '.' || ch === ' ') continue;
+        g.fillStyle = C[ch] || '#fff';
+        g.fillRect(x + c * px, y + r * px, px, px);
+      }
+  }
+
+  document.querySelectorAll('[data-sprite]').forEach(c => {
+    const g = c.getContext('2d'); g.imageSmoothingEnabled = false;
+    draw(c.dataset.sprite, 0, 0, 6, g);
+  });
+
+  let char = 'polly', running = false, t = 0, speed = 3.6, score = 0, best = 0, dead = false;
+  const hero = { x: 90, y: GROUND - 48, vy: 0, w: 48, h: 48, onGround: true };
+  let holding = false, obstacles = [], goodies = [], ground = [];
+  // физика: все величины заданы на кадр при 60 кадрах в секунду и умножаются на dt,
+  // поэтому на экранах 120 Гц и при просадках игра идёт с той же скоростью
+  const GRAV = .40, JUMP = -8.7, HOLD = .17, COYOTE = 7, BUFFER = 8;
+  let last = 0, nextRock = 120, nextGoodie = 80, coyote = 0, buffered = 0;
+
+  try { best = parseInt(localStorage.getItem('pp-runner-best') || '0', 10) || 0; } catch (e) {}
+
+  for (let i = 0; i < 40; i++) ground.push({ x: Math.random() * W, w: 2 + Math.random() * 14 });
+
+  function reset() {
+    t = 0; speed = 3.6; score = 0; dead = false;
+    hero.y = GROUND - hero.h; hero.vy = 0; hero.onGround = true;
+    obstacles = []; goodies = []; last = 0; nextRock = 120; nextGoodie = 80; coyote = 0; buffered = 0;
+  }
+
+  function jump() {
+    if (!running || dead) return;
+    buffered = BUFFER;                       // нажатие чуть раньше приземления не теряется
+    if (hero.onGround || coyote > 0) doJump();
+  }
+
+  function doJump() {
+    hero.vy = JUMP; hero.onGround = false; holding = true; coyote = 0; buffered = 0;
+  }
+
+  function hit(a, b) {
+    return a.x < b.x + b.w - 6 && a.x + a.w - 8 > b.x && a.y < b.y + b.h - 4 && a.y + a.h - 6 > b.y;
+  }
+
+  function loop(now) {
+    if (!running) return;
+    if (!last) last = now;
+    const dt = Math.min(2.5, (now - last) / 16.667);   // 1 = кадр при 60 Гц
+    last = now;
+    t += dt;
+
+    if (!dead) {
+      // разгон: плавно и без рывков, потолок примерно через полторы минуты
+      speed = 3.6 + Math.min(3, t / 1800);
+
+      // прыжок: держишь кнопку — гравитация слабее, пока летишь вверх
+      if (hero.vy < 0 && holding) hero.vy -= HOLD * dt;
+      hero.vy += GRAV * dt;
+      hero.y += hero.vy * dt;
+
+      if (hero.y >= GROUND - hero.h) {
+        hero.y = GROUND - hero.h; hero.vy = 0;
+        if (!hero.onGround) { hero.onGround = true; coyote = COYOTE; }
+        if (buffered > 0) doJump();
+      } else if (hero.onGround) {
+        hero.onGround = false; coyote = COYOTE;        // сошёл с края — короткое окно на прыжок
+      }
+      if (hero.y < 0) { hero.y = 0; hero.vy = 0; }     // не улетаем за верх поля
+      coyote -= dt; buffered -= dt;
+      if (!hero.onGround && coyote <= 0) coyote = 0;
+
+      nextRock -= dt; nextGoodie -= dt;
+      if (nextRock <= 0) {
+        obstacles.push({ x: W + 20, y: GROUND - 32, w: 40, h: 32 });
+        // промежутки считаются в пикселях, поэтому с ростом скорости остаются честными
+        nextRock = (Math.max(300, 460 - t / 14) + Math.random() * 220) / speed;
+      }
+      if (nextGoodie <= 0) {
+        goodies.push({ x: W + 40, y: GROUND - 60 - Math.random() * 60, w: 40, h: 40, got: false });
+        nextGoodie = (420 + Math.random() * 280) / speed;
+      }
+
+      obstacles.forEach(o => o.x -= speed * dt);
+      goodies.forEach(o => o.x -= speed * dt);
+      ground.forEach(s => { s.x -= speed * dt; if (s.x < -20) { s.x = W + Math.random() * 60; s.w = 2 + Math.random() * 14; } });
+      obstacles = obstacles.filter(o => o.x > -60);
+      goodies = goodies.filter(o => o.x > -60 && !o.got);
+
+      goodies.forEach(o => { if (hit(hero, o)) { o.got = true; score++; } });
+      if (obstacles.some(o => hit(hero, o))) gameOver();
+    }
+
+    // рисуем
+    ctx.fillStyle = '#241546'; ctx.fillRect(0, 0, W, H);
+    ctx.fillStyle = '#3A2566';
+    ground.forEach(s => ctx.fillRect(s.x, GROUND + 12 + (s.w % 3) * 4, s.w, 3));
+    ctx.fillStyle = '#D85A30'; ctx.fillRect(0, GROUND, W, 4);
+
+    obstacles.forEach(o => draw('rock', o.x, o.y, PX));
+    goodies.forEach(o => draw(char === 'polly' ? 'coffee' : 'letter', o.x, o.y, PX));
+    const bob = hero.onGround && Math.floor(t / 9) % 2 ? 2 : 0;
+    draw(char, hero.x, hero.y + bob, PX);
+
+    ctx.fillStyle = '#F3EFFA'; ctx.font = '600 20px Karla, sans-serif'; ctx.textAlign = 'right';
+    ctx.fillText((char === 'polly' ? '\u2615 ' : '\u2709 ') + score, W - 20, 36);
+    if (best) { ctx.fillStyle = '#9E93C9'; ctx.font = '400 14px Karla, sans-serif'; ctx.fillText('best ' + best, W - 20, 58); }
+
+    requestAnimationFrame(loop);
+  }
+
+  function start(c) {
+    char = c || char; reset(); running = true; dead = false;
+    document.getElementById('menu').hidden = true;
+    document.getElementById('over').hidden = true;
+    requestAnimationFrame(loop);
+  }
+
+  function gameOver() {
+    dead = true; running = false;
+    if (score > best) { best = score; try { localStorage.setItem('pp-runner-best', String(best)); } catch (e) {} }
+    document.getElementById('overTitle').textContent = score > 0 ? 'Nice run!' : 'Ouch, a rock!';
+    document.getElementById('overText').textContent =
+      (char === 'polly' ? 'Polly collected ' + score + ' coffee' + (score === 1 ? '' : 's') : 'Mr. Chew collected ' + score + ' letter' + (score === 1 ? '' : 's')) +
+      (best ? '. Best so far: ' + best + '.' : '.');
+    document.getElementById('over').hidden = false;
+  }
+
+  document.querySelectorAll('.char').forEach(b => b.onclick = () => start(b.dataset.char));
+  document.getElementById('again').onclick = () => start();
+  document.getElementById('switch').onclick = () => {
+    document.getElementById('over').hidden = true;
+    document.getElementById('menu').hidden = false;
+  };
+
+  addEventListener('keydown', e => {
+    if ((e.code === 'Space' || e.code === 'ArrowUp') && running && !dead) { e.preventDefault(); jump(); }
+  });
+  addEventListener('keyup', e => { if (e.code === 'Space' || e.code === 'ArrowUp') holding = false; });
+  cv.addEventListener('pointerdown', e => { e.preventDefault(); jump(); });
+  addEventListener('pointerup', () => { holding = false; });
+
+  // первый кадр, чтобы блок не выглядел пустым
+  ctx.fillStyle = '#241546'; ctx.fillRect(0, 0, W, H);
+  ctx.fillStyle = '#D85A30'; ctx.fillRect(0, GROUND, W, 4);
+  draw('polly', 90, GROUND - 48, PX);
+})();
+</script>
+</div>
+<!-- Готов, но пока не опубликован: {{ block:about }} -->
 
 </main>
 <footer class="site-footer">
   <p>© Alina Otkinska · Pigeon Polly Art Lab</p>
   <p class="footer-links">
     <a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener">LinkedIn</a>
-    <a href="http://blog.pigeonpolly.com" target="_blank" rel="noopener">Patreon</a>
+    <a href="https://www.patreon.com/cw/pigeon_polly" target="_blank" rel="noopener">Patreon</a>
     <a href="https://www.pinterest.com/pigeonpollyart/" target="_blank" rel="noopener">Pinterest</a>
   </p>
 </footer>
