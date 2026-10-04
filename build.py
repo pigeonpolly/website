@@ -203,7 +203,8 @@ def cv_html():
         out = []
         for it in lst:
             text = f'<p>{esc(it["text"])}</p>' if it.get("text") else ""
-            out.append(f'<li><span class="when">{esc(it[key])}</span>'
+            cls = ' class="current"' if it.get("current") else ""
+            out.append(f'<li{cls}><span class="when">{esc(it[key])}</span>'
                        f'<h3>{esc(it["title"])}</h3><p class="org">{esc(it["org"])}</p>{text}</li>')
         return "".join(out)
 

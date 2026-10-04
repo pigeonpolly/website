@@ -1,40 +1,178 @@
 {
   "experience": [
-    {"years": "2026 – now", "title": "Senior Specialist of Methodological Support and E-learning", "org": "Transport and Telecommunication Institute (TSI), Riga"},
-    {"years": "2026 – now", "title": "Author and Lecturer of the course", "org": "EKA University of Applied Sciences", "text": "Developed the full course: syllabus, lecture materials, presentations, practical tasks and assessment. Designed the exam structure and evaluation criteria; consult students and assess exam results."},
-    {"years": "2025 – now", "title": "Author and instructor of a non-formal education course", "org": "Self-employed", "text": "“Watercolor Sketching – Fundamentals and Practice for Adults” (20 hours)."},
-    {"years": "2019 – now", "title": "Independent Artist & Author", "org": "Pigeon Polly Art Lab", "text": "E-books on Amazon, publications and exhibitions."},
-    {"years": "2020 – 2026", "title": "Methodologist", "org": "Biznesa vadības koledža (Business Management College), Riga", "text": "Configured, organized and maintained the Moodle environment, coordinated semester transitions, trained lecturers and students, took part in building a new Moodle platform and an AI implementation strategy, and developed methodological materials for e-studies."},
-    {"years": "2020 – 2026", "title": "Lecturer", "org": "Biznesa vadības koledža (Business Management College), Riga", "text": "Curriculum and teaching for “Human Resource Management” and “Conflict Management and Mediation”."},
-    {"years": "2016 – 2017", "title": "Clerk", "org": "Financial Intelligence Unit of Latvia"},
-    {"years": "2015 – 2016", "title": "Teacher", "org": "PIKC Riga State Technical School", "text": "Computerized information processing in vocational education programmes."},
-    {"years": "2014 – 2016", "title": "Accounting Clerk", "org": "PIKC Riga State Technical School", "text": "European-funded scholarship documentation and mobility programmes."},
-    {"years": "2014", "title": "Data Entry Operator", "org": "SIA SUIS Riga"},
-    {"years": "2014", "title": "Secretary (internship)", "org": "State Police of Latvia"}
+    {
+      "years": "2026 – now",
+      "title": "Senior Specialist of Methodological Support and E-learning",
+      "org": "Transport and Telecommunication Institute (TSI), Riga",
+      "current": true
+    },
+    {
+      "years": "2026 – now",
+      "title": "Author and Lecturer of the course",
+      "org": "EKA University of Applied Sciences",
+      "text": "Developed the full course: syllabus, lecture materials, presentations, practical tasks and assessment. Designed the exam structure and evaluation criteria; consult students and assess exam results."
+    },
+    {
+      "years": "2025 – now",
+      "title": "Author and instructor of a non-formal education course",
+      "org": "Self-employed",
+      "text": "“Watercolor Sketching – Fundamentals and Practice for Adults” (20 hours)."
+    },
+    {
+      "years": "2019 – now",
+      "title": "Independent Artist & Author",
+      "org": "Pigeon Polly Art Lab",
+      "text": "E-books on Amazon, publications and exhibitions."
+    },
+    {
+      "years": "2020 – 2026",
+      "title": "Methodologist",
+      "org": "Biznesa vadības koledža (Business Management College), Riga",
+      "text": "Configured, organized and maintained the Moodle environment, coordinated semester transitions, trained lecturers and students, took part in building a new Moodle platform and an AI implementation strategy, and developed methodological materials for e-studies."
+    },
+    {
+      "years": "2020 – 2026",
+      "title": "Lecturer",
+      "org": "Biznesa vadības koledža (Business Management College), Riga",
+      "text": "Curriculum and teaching for “Human Resource Management” and “Conflict Management and Mediation”."
+    },
+    {
+      "years": "2016 – 2017",
+      "title": "Clerk",
+      "org": "Financial Intelligence Unit of Latvia"
+    },
+    {
+      "years": "2015 – 2016",
+      "title": "Teacher",
+      "org": "PIKC Riga State Technical School",
+      "text": "Computerized information processing in vocational education programmes."
+    },
+    {
+      "years": "2014 – 2016",
+      "title": "Accounting Clerk",
+      "org": "PIKC Riga State Technical School",
+      "text": "European-funded scholarship documentation and mobility programmes."
+    },
+    {
+      "years": "2014",
+      "title": "Data Entry Operator",
+      "org": "SIA SUIS Riga"
+    },
+    {
+      "years": "2014",
+      "title": "Secretary (internship)",
+      "org": "State Police of Latvia"
+    }
   ],
   "education": [
-    {"years": "2026 – now", "title": "Master of Arts, Creative Industries and Growth Management", "org": "Latvian Academy of Culture", "text": "Joint master’s programme with Riga Technical University."},
-    {"years": "2022 – 2024", "title": "Master’s degree, Human Behavior and Counseling in Education", "org": "University of Latvia"},
-    {"years": "2020 – 2022", "title": "1st level higher education, Micro, Small and Medium-Sized Enterprise Management", "org": "Biznesa vadības koledža (Business Management College)"},
-    {"years": "2015 – 2019", "title": "Bachelor’s degree, Human Resources", "org": "University of Latvia"},
-    {"years": "2011 – 2015", "title": "Secondary vocational education, Secretary", "org": "Riga State Technical School"}
+    {
+      "years": "2026 – now",
+      "title": "Master of Arts, Creative Industries and Growth Management",
+      "org": "Latvian Academy of Culture",
+      "text": "Joint master’s programme with Riga Technical University.",
+      "current": true
+    },
+    {
+      "years": "2022 – 2024",
+      "title": "Master’s degree, Human Behavior and Counseling in Education",
+      "org": "University of Latvia"
+    },
+    {
+      "years": "2020 – 2022",
+      "title": "1st level higher education, Micro, Small and Medium-Sized Enterprise Management",
+      "org": "Biznesa vadības koledža (Business Management College)"
+    },
+    {
+      "years": "2015 – 2019",
+      "title": "Bachelor’s degree, Human Resources",
+      "org": "University of Latvia"
+    },
+    {
+      "years": "2011 – 2015",
+      "title": "Secondary vocational education, Secretary",
+      "org": "Riga State Technical School"
+    }
   ],
   "courses": [
-    {"year": "2026", "title": "Creating tests in Moodle & H5P", "org": "SIA Datorzinību centrs"},
-    {"year": "2026", "title": "Using AI tools and agents in everyday work and business", "org": "timefor.ai"},
-    {"year": "2026", "title": "Instructional Design Foundations and Applications", "org": "University of Illinois Urbana-Champaign"},
-    {"year": "2026", "title": "Arts and Heritage Management", "org": "Università Bocconi"},
-    {"year": "2026", "title": "Modern and Contemporary Art and Design", "org": "The Museum of Modern Art"},
-    {"year": "2026", "title": "Fashion As Design", "org": "The Museum of Modern Art"},
-    {"year": "2025", "title": "EF SET English Certificate (B2 Upper Intermediate)", "org": "EF SET"},
-    {"year": "2025", "title": "Graphic Design Essentials", "org": "Canva"},
-    {"year": "2024", "title": "Adobe Illustrator and Photoshop basic skills", "org": "SIA KOGRA"},
-    {"year": "2024", "title": "Graphic Design", "org": "California Institute of the Arts"},
-    {"year": "2021", "title": "International Coaching", "org": "CoachingUP University"},
-    {"year": "2020", "title": "Life Coaching", "org": "New Skill Academy"},
-    {"year": "2020", "title": "Cognitive Psychology", "org": "Lektorium"},
-    {"year": "2020", "title": "Career Psychology", "org": "Saint Petersburg State University"},
-    {"year": "2019", "title": "HR Week", "org": "CONFINN"},
-    {"year": "2018", "title": "Using the EIS system", "org": "Liberta SIA"}
+    {
+      "year": "2026",
+      "title": "Creating tests in Moodle & H5P",
+      "org": "SIA Datorzinību centrs"
+    },
+    {
+      "year": "2026",
+      "title": "Using AI tools and agents in everyday work and business",
+      "org": "timefor.ai"
+    },
+    {
+      "year": "2026",
+      "title": "Instructional Design Foundations and Applications",
+      "org": "University of Illinois Urbana-Champaign"
+    },
+    {
+      "year": "2026",
+      "title": "Arts and Heritage Management",
+      "org": "Università Bocconi"
+    },
+    {
+      "year": "2026",
+      "title": "Modern and Contemporary Art and Design",
+      "org": "The Museum of Modern Art"
+    },
+    {
+      "year": "2026",
+      "title": "Fashion As Design",
+      "org": "The Museum of Modern Art"
+    },
+    {
+      "year": "2025",
+      "title": "EF SET English Certificate (B2 Upper Intermediate)",
+      "org": "EF SET"
+    },
+    {
+      "year": "2025",
+      "title": "Graphic Design Essentials",
+      "org": "Canva"
+    },
+    {
+      "year": "2024",
+      "title": "Adobe Illustrator and Photoshop basic skills",
+      "org": "SIA KOGRA"
+    },
+    {
+      "year": "2024",
+      "title": "Graphic Design",
+      "org": "California Institute of the Arts"
+    },
+    {
+      "year": "2021",
+      "title": "International Coaching",
+      "org": "CoachingUP University"
+    },
+    {
+      "year": "2020",
+      "title": "Life Coaching",
+      "org": "New Skill Academy"
+    },
+    {
+      "year": "2020",
+      "title": "Cognitive Psychology",
+      "org": "Lektorium"
+    },
+    {
+      "year": "2020",
+      "title": "Career Psychology",
+      "org": "Saint Petersburg State University"
+    },
+    {
+      "year": "2019",
+      "title": "HR Week",
+      "org": "CONFINN"
+    },
+    {
+      "year": "2018",
+      "title": "Using the EIS system",
+      "org": "Liberta SIA"
+    }
   ]
 }
