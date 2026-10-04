@@ -215,6 +215,33 @@ def cv_html():
         '</div>')
 
 
+LANGS = {"en": "", "lv": "lv"}
+
+
+def localize(page, lang):
+    """Переводит готовую страницу по словарю content/i18n/<lang>.json и переписывает внутренние ссылки."""
+    if lang == "en":
+        return page
+    tr = json.loads((CONTENT / "i18n" / f"{lang}.json").read_text())
+    for k in sorted(tr, key=len, reverse=True):
+        page = page.replace(k, tr[k])
+    page = page.replace('<html lang="en">', f'<html lang="{lang}">')
+    page = re.sub(r'href="/(?!assets/|images/|files/|' + lang + r'/)([^"]*)"', rf'href="/{lang}/\1"', page)
+    return page
+
+
+def lang_bits(path, lang):
+    url = {k: SITE_URL + "/" + (v + "/" if v else "") + (path + "/" if path else "") for k, v in LANGS.items()}
+    hreflang = "".join(f'<link rel="alternate" hreflang="{k}" href="{u}">' for k, u in url.items())
+    hreflang += f'<link rel="alternate" hreflang="x-default" href="{url["en"]}">'
+    links = []
+    for k in LANGS:
+        rel = url[k][len(SITE_URL):]
+        cur = ' aria-current="true"' if k == lang else ""
+        links.append(f'<a href="{rel}" hreflang="{k}" lang="{k}"{cur}>{k.upper()}</a>')
+    return url[lang], hreflang, '<nav class="lang-switch" aria-label="Language">' + "".join(links) + "</nav>"
+
+
 def build():
     layout = (SRC / "layout.html").read_text()
     for path, title, file, desc in PAGES:
@@ -231,24 +258,30 @@ def build():
         body = body.replace("{{projects}}", projects_html() if "{{projects}}" in body else "")
         body = body.replace("{{ebooks}}", ebooks_html() if "{{ebooks}}" in body else "")
         full_title = title if not path else f"{title} · Pigeon Polly Art Lab"
-        page = (layout
-                .replace("{{title}}", esc(full_title))
-                .replace("{{description}}", esc(desc))
-                .replace("{{canonical}}", SITE_URL + href(path))
-                .replace("{{nav}}", nav_html(path))
-                .replace("{{body_class}}", "home" if not path else "inner")
-                .replace("{{content}}", body))
-        dest = OUT / path / "index.html"
-        dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(page)
+        for lang, prefix in LANGS.items():
+            canonical, hreflang, switch = lang_bits(path, lang)
+            page = (layout
+                    .replace("{{title}}", esc(full_title))
+                    .replace("{{description}}", esc(desc))
+                    .replace("{{canonical}}", canonical)
+                    .replace("{{nav}}", nav_html(path))
+                    .replace("{{body_class}}", "home" if not path else "inner")
+                    .replace("{{content}}", body))
+            page = localize(page, lang)
+            page = page.replace("{{hreflang}}", hreflang).replace("{{lang_switch}}", switch)
+            dest = OUT / prefix / path / "index.html"
+            dest.parent.mkdir(parents=True, exist_ok=True)
+            dest.write_text(page)
         print("built", dest.relative_to(ROOT))
     # 404
     nf = layout.replace("{{title}}", "Page not found · Pigeon Polly Art Lab").replace("{{description}}", "")
     nf = nf.replace("{{canonical}}", SITE_URL + "/").replace("{{nav}}", nav_html("404")).replace("{{body_class}}", "inner")
     nf = nf.replace("{{content}}", (SRC / "pages" / "404.html").read_text())
+    nf = nf.replace("{{hreflang}}", "").replace("{{lang_switch}}", "")
     (OUT / "404.html").write_text(nf)
     # sitemap
-    urls = "".join(f"<url><loc>{SITE_URL}{href(p)}</loc></url>" for p, *_ in PAGES)
+    urls = "".join(f"<url><loc>{SITE_URL}/{(v + '/') if v else ''}{(p + '/') if p else ''}</loc></url>"
+                   for p, *_ in PAGES for v in LANGS.values())
     (OUT / "sitemap.xml").write_text(
         f'<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">{urls}</urlset>\n')
 

@@ -481,3 +481,23 @@ body.modal-open { overflow: hidden; }
 .cv-link { color: var(--peach); }
 @media (max-width: 1000px) { .cv-grid { grid-template-columns: 1fr 1fr; } .cv-grid .cv-col:first-child { grid-column: 1 / -1; } }
 @media (max-width: 640px) { .cv-grid { grid-template-columns: 1fr; gap: 32px; } }
+
+/* ---------- Переключатель языка ---------- */
+.lang-switch { display: flex; gap: 2px; margin-left: auto; margin-right: 8px; order: 2; }
+.lang-switch a {
+  padding: 6px 9px; border-radius: 999px;
+  font: 500 13px/1 var(--sans); letter-spacing: .04em;
+  color: var(--muted); text-decoration: none;
+}
+.lang-switch a:hover { color: var(--text); }
+.lang-switch a[aria-current="true"] { color: var(--bg); background: var(--peach); }
+.site-nav { order: 1; }
+.menu-toggle { order: 3; }
+@media (min-width: 1081px) { .lang-switch { order: 3; margin: 0 0 0 4px; } .site-nav { margin-left: auto; } }
+@media (max-width: 480px) {
+  .site-header { gap: 10px; }
+  .brand { font-size: 17px; gap: 8px; }
+  .brand-star { width: 18px; height: 18px; }
+  .lang-switch { margin-right: 2px; }
+  .lang-switch a { padding: 6px 7px; font-size: 12px; }
+}

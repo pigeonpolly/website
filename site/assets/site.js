@@ -73,7 +73,8 @@
       if (form.elements._honey.value) return;
       btn.disabled = true;
       status.className = 'form-status';
-      status.textContent = 'Sending…';
+      const lv = document.documentElement.lang === 'lv';
+      status.textContent = lv ? 'Sūta…' : 'Sending…';
       try {
         const res = await fetch(form.action, {
           method: 'POST',
@@ -90,10 +91,10 @@
         if (!res.ok || String(data.success) === 'false') throw new Error(data.message || res.status);
         form.reset();
         status.className = 'form-status ok';
-        status.textContent = 'Thank you! Your message is on its way. I’ll get back to you soon.';
+        status.textContent = lv ? 'Paldies! Ziņa ir ceļā, drīz atbildēšu.' : 'Thank you! Your message is on its way. I’ll get back to you soon.';
       } catch (err) {
         status.className = 'form-status error';
-        status.textContent = 'Sorry, the message didn’t go through. Please try again a bit later.';
+        status.textContent = lv ? 'Diemžēl ziņu neizdevās nosūtīt. Lūdzu, pamēģini vēlāk.' : 'Sorry, the message didn’t go through. Please try again a bit later.';
       } finally {
         btn.disabled = false;
       }
