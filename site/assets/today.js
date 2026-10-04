@@ -36,7 +36,13 @@
     // прилетает сама Полли-питомец, чтобы на странице не было двух Полли
     if (!quick && pp) {
       const r = seal.getBoundingClientRect();
-      if (r.top < 90 || r.bottom > innerHeight - 20) { seal.scrollIntoView({ behavior: 'smooth', block: 'center' }); await wait(600); }
+      if (r.top < 90 || r.bottom > innerHeight - 20) seal.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      // ждём, пока прокрутка остановится (блок не двигается несколько кадров подряд)
+      for (let still = 0, last = null, t0 = Date.now(); still < 4 && Date.now() - t0 < 2500;) {
+        await new Promise(requestAnimationFrame);
+        const top = box.getBoundingClientRect().top;
+        still = last !== null && Math.abs(top - last) < 0.5 ? still + 1 : 0; last = top;
+      }
       if (await pp.visit(seal)) {
         box.classList.add('opened'); await wait(450);
         box.classList.add('revealed', 'pet'); pp.done();

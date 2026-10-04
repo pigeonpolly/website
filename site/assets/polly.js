@@ -245,8 +245,14 @@
       busy = true; token++;
       body.classList.remove('sleeping', 'peck', 'flap'); zzz.classList.remove('show'); show('a');
       spot = 'visit'; perch = null;
-      const r = el.getBoundingClientRect();
-      await flyTo(r.left + r.width * 0.5 - W + 6, r.top + r.height * 0.5 - H * 0.3);
+      const target = () => { const r = el.getBoundingClientRect(); return [r.left + r.width * 0.5 - W + 6, r.top + r.height * 0.5 - H * 0.3]; };
+      await flyTo(...target());
+      // страница могла сдвинуться (прокрутка, панель браузера на телефоне) — подлетаем точнее
+      for (let i = 0; i < 3; i++) {
+        const [tx, ty] = target();
+        if (Math.hypot(tx - x, ty - y) < 6) break;
+        await flyTo(tx, ty);
+      }
       face(1);
       await peck(3, el);
       return true;
