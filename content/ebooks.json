@@ -3,10 +3,26 @@
     {
       "title": "Art related e-books",
       "books": [
-        {"title": "Coloring Book: World Breakfasts (free)", "url": "https://drive.google.com/file/d/1IWMWb0nLOaN2UuJLZA-DqhdmwDh3T9Nx/view?usp=sharing", "cover": "images/e-books/coloring-book-world-breakfasts.jpg"},
-        {"title": "Watercolor Sketches: Creative Guide", "url": "https://a.co/d/0cJY0kk5", "cover": "images/e-books/watercolor-sketches.jpg"},
-        {"title": "Ink Sketching: Creative Guide", "url": "https://a.co/d/009gymDC", "cover": "images/e-books/ink-sketching.jpg"},
-        {"title": "Urban Sketching: Digital Traveler (coming soon)", "url": "https://www.patreon.com/pigeon_polly/posts/new-book-coming-170600168", "cover": "images/e-books/urban-sketching-digital-traveler.jpg"}
+        {
+          "title": "Urban Sketching: Digital Traveler (coming soon)",
+          "url": "https://www.patreon.com/pigeon_polly/posts/new-book-coming-170600168",
+          "cover": "images/e-books/urban-sketching-digital-traveler.jpg"
+        },
+        {
+          "title": "Ink Sketching: Creative Guide",
+          "url": "https://a.co/d/009gymDC",
+          "cover": "images/e-books/ink-sketching.jpg"
+        },
+        {
+          "title": "Watercolor Sketches: Creative Guide",
+          "url": "https://a.co/d/0cJY0kk5",
+          "cover": "images/e-books/watercolor-sketches.jpg"
+        },
+        {
+          "title": "Coloring Book: World Breakfasts (free)",
+          "url": "https://drive.google.com/file/d/1IWMWb0nLOaN2UuJLZA-DqhdmwDh3T9Nx/view?usp=sharing",
+          "cover": "images/e-books/coloring-book-world-breakfasts.jpg"
+        }
       ]
     }
   ]
