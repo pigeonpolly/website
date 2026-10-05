@@ -7,7 +7,7 @@
     <p class="wl-sign">— Полли, ваш пернатый гид</p>
     <div class="wl-jump">
       <a class="pill-btn" href="#wl-map">🗺 Исследовать карту</a>
-      <a class="pill-btn" href="#wl-recipes">📖 Книга рецептов</a>
+      <a class="pill-btn" href="#recipes" data-open-book>📖 Книга рецептов</a>
       <a class="pill-btn" href="#wl-cal">📅 Календарь праздников</a>
     </div>
   </div>
@@ -60,14 +60,6 @@
 
 
 
-<section class="wl-book-sec" id="wl-recipes">
-  <p class="topics">Книга рецептов Полли</p>
-  <h2 class="section-title">Что едят в Wobbleland</h2>
-  <p class="wl-hint">Все фирменные блюда острова, по одному на страницу. Листайте стрелками (или свайпом) или откройте закладку города, чтобы перейти к его кухне.</p>
-  <div class="wl-filter" id="wl-rec-filter"></div>
-  <div class="wl-book" id="wl-book" tabindex="0"></div>
-</section>
-
 <section class="wl-book-sec" id="wl-cal">
   <p class="topics">Календарь Wobbleland</p>
   <h2 class="section-title">Все праздники острова</h2>
@@ -76,7 +68,7 @@
 </section>
 
 <div class="wl-bookmodal" id="wl-bookmodal" role="dialog" aria-modal="true" aria-label="Книга рецептов Полли" hidden>
-  <div class="wl-bookmodal-in"><button type="button" class="wl-bookmodal-x" aria-label="Закрыть">✕</button><div class="wl-bookmodal-slot"></div></div>
+  <div class="wl-bookmodal-in"><button type="button" class="wl-bookmodal-x" aria-label="Закрыть">✕</button><div class="wl-filter" id="wl-rec-filter"></div><div class="wl-bookwrap"><div class="wl-book" id="wl-book" tabindex="0"></div><aside class="wl-kitchen" id="wl-kitchen"></aside></div></div>
 </div>
 <div class="wl-scrim" id="wl-scrim"></div>
 <aside class="wl-panel" id="wl-panel" aria-hidden="true" role="dialog" aria-label="Город">

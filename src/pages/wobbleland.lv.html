@@ -7,7 +7,7 @@
     <p class="wl-sign">— Pollija, tavs spalvainais ceļvedis</p>
     <div class="wl-jump">
       <a class="pill-btn" href="#wl-map">🗺 Izpētīt karti</a>
-      <a class="pill-btn" href="#wl-recipes">📖 Recepšu grāmata</a>
+      <a class="pill-btn" href="#recipes" data-open-book>📖 Recepšu grāmata</a>
       <a class="pill-btn" href="#wl-cal">📅 Svētku kalendārs</a>
     </div>
   </div>
@@ -60,14 +60,6 @@
 
 
 
-<section class="wl-book-sec" id="wl-recipes">
-  <p class="topics">Pollijas recepšu grāmata</p>
-  <h2 class="section-title">Ko ēd Wobbleland</h2>
-  <p class="wl-hint">Visi salas firmas ēdieni, katrs savā lapā. Šķir lapas ar bultiņām (vai pavelkot) vai atver pilsētas grāmatzīmi, lai nonāktu tās virtuvē.</p>
-  <div class="wl-filter" id="wl-rec-filter"></div>
-  <div class="wl-book" id="wl-book" tabindex="0"></div>
-</section>
-
 <section class="wl-book-sec" id="wl-cal">
   <p class="topics">Wobbleland kalendārs</p>
   <h2 class="section-title">Visi salas svētki</h2>
@@ -76,7 +68,7 @@
 </section>
 
 <div class="wl-bookmodal" id="wl-bookmodal" role="dialog" aria-modal="true" aria-label="Pollijas recepšu grāmata" hidden>
-  <div class="wl-bookmodal-in"><button type="button" class="wl-bookmodal-x" aria-label="Aizvērt">✕</button><div class="wl-bookmodal-slot"></div></div>
+  <div class="wl-bookmodal-in"><button type="button" class="wl-bookmodal-x" aria-label="Aizvērt">✕</button><div class="wl-filter" id="wl-rec-filter"></div><div class="wl-bookwrap"><div class="wl-book" id="wl-book" tabindex="0"></div><aside class="wl-kitchen" id="wl-kitchen"></aside></div></div>
 </div>
 <div class="wl-scrim" id="wl-scrim"></div>
 <aside class="wl-panel" id="wl-panel" aria-hidden="true" role="dialog" aria-label="Pilsēta">

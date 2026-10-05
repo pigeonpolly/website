@@ -61,7 +61,7 @@
     <p class="wl-sign">— Polly, your feathered guide</p>
     <div class="wl-jump">
       <a class="pill-btn" href="#wl-map">🗺 Explore the map</a>
-      <a class="pill-btn" href="#wl-recipes">📖 Recipe book</a>
+      <a class="pill-btn" href="#recipes" data-open-book>📖 Recipe book</a>
       <a class="pill-btn" href="#wl-cal">📅 Holiday calendar</a>
     </div>
   </div>
@@ -114,14 +114,6 @@
 
 
 
-<section class="wl-book-sec" id="wl-recipes">
-  <p class="topics">Polly’s recipe book</p>
-  <h2 class="section-title">What Wobbleland eats</h2>
-  <p class="wl-hint">Every signature dish on the island, one page each. Turn the pages with the arrows (or a swipe), or use a town bookmark to jump to its kitchen.</p>
-  <div class="wl-filter" id="wl-rec-filter"></div>
-  <div class="wl-book" id="wl-book" tabindex="0"></div>
-</section>
-
 <section class="wl-book-sec" id="wl-cal">
   <p class="topics">Wobbleland calendar</p>
   <h2 class="section-title">Every holiday on the island</h2>
@@ -130,7 +122,7 @@
 </section>
 
 <div class="wl-bookmodal" id="wl-bookmodal" role="dialog" aria-modal="true" aria-label="Polly’s Recipe Book" hidden>
-  <div class="wl-bookmodal-in"><button type="button" class="wl-bookmodal-x" aria-label="Close">✕</button><div class="wl-bookmodal-slot"></div></div>
+  <div class="wl-bookmodal-in"><button type="button" class="wl-bookmodal-x" aria-label="Close">✕</button><div class="wl-filter" id="wl-rec-filter"></div><div class="wl-bookwrap"><div class="wl-book" id="wl-book" tabindex="0"></div><aside class="wl-kitchen" id="wl-kitchen"></aside></div></div>
 </div>
 <div class="wl-scrim" id="wl-scrim"></div>
 <aside class="wl-panel" id="wl-panel" aria-hidden="true" role="dialog" aria-label="Town">

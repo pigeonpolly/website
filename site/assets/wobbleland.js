@@ -425,25 +425,35 @@
       no: ['Recipe No.', 'Рецепт №', 'Recepte Nr.'], from: ['Signature dish of', 'Фирменное блюдо города', 'Pilsētas firmas ēdiens:'],
       prev: ['Previous page', 'Предыдущая страница', 'Iepriekšējā lapa'], next: ['Next page', 'Следующая страница', 'Nākamā lapa'],
       open: ['Open the town', 'Открыть город', 'Atvērt pilsētu'], of: ['of', 'из', 'no'],
+      kitchen: ['Kitchen of', 'Кухня города', 'Pilsētas virtuve'],
     };
     const tb = k => TB[k][L];
     const R = C.flatMap(c => c.dishes.map((f, i) => ({ f, c, img: `/images/wobbleland/dish-${c.key}-${i}.png` })));
     let at = 0, busy = false;
-    const wide = () => book.clientWidth >= 760;
-    const left = r => `<div class="wl-pg-in"><p class="wl-pg-kick">${tb('no')} ${String(R.indexOf(r) + 1).padStart(2, '0')}</p>
-      <div class="wl-pg-pic"><img src="${r.img}" alt="${esc(r.f.name)}"></div>
+    const wide = () => book.clientWidth >= 640;
+    const no = r => String(R.indexOf(r) + 1).padStart(2, '0');
+    const left = r => `<div class="wl-pg-in"><div class="wl-pg-head"><span>${tb('no')} ${no(r)}</span></div>
+      <div class="wl-pg-pic"><i class="c tl"></i><i class="c tr"></i><i class="c bl"></i><i class="c br"></i><img src="${r.img}" alt="${esc(r.f.name)}"></div>
+      <p class="wl-pg-cap">~ ${esc(r.c.short || r.c.name)} ~</p>
       <p class="wl-pg-num">${R.indexOf(r) * 2 + 1}</p></div>`;
-    const right = r => `<div class="wl-pg-in"><p class="wl-pg-kick">${tb('from')}</p>
+    const right = r => `<div class="wl-pg-in"><div class="wl-pg-head"><span>${tb('from')}</span></div>
       <button type="button" class="wl-town-tag" data-key="${r.c.key}"><img src="${img('crest', r.c.key)}" alt="">${esc(r.c.short || r.c.name)}</button>
-      <h3>${esc(r.f.name)}</h3><p class="wl-pg-desc">${esc(r.f.desc)}</p>
-      <p class="wl-pg-orn">✦ ✦ ✦</p><p class="wl-pg-num">${R.indexOf(r) * 2 + 2}</p></div>`;
-    book.innerHTML = `<div class="wl-spread"><div class="wl-pg wl-pg-l"></div><div class="wl-pg wl-pg-r"></div></div>
+      <h3>${esc(r.f.name)}</h3><div class="wl-pg-rule"><span>❦</span></div>
+      <p class="wl-pg-desc">${esc(r.f.desc)}</p>
+      <p class="wl-pg-num">${R.indexOf(r) * 2 + 2}</p></div>`;
+    book.innerHTML = `<div class="wl-spread"><i class="wl-ribbon"></i><div class="wl-pg wl-pg-l"></div><div class="wl-pg wl-pg-r"></div></div>
       <div class="wl-book-nav"><button type="button" class="wl-bk-prev" aria-label="${tb('prev')}">‹</button><span class="wl-bk-count"></span><button type="button" class="wl-bk-next" aria-label="${tb('next')}">›</button></div>`;
     const spread = book.querySelector('.wl-spread'), pl = book.querySelector('.wl-pg-l'), pr = book.querySelector('.wl-pg-r');
-    const count = book.querySelector('.wl-bk-count');
+    const count = book.querySelector('.wl-bk-count'), kitchen = document.getElementById('wl-kitchen');
+    if (kitchen) kitchen.addEventListener('click', e => { const b = e.target.closest('[data-i]'); if (b) go(+b.dataset.i); });
     const marks = () => {
       count.textContent = `${at + 1} ${tb('of')} ${R.length}`;
       recF.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.k === R[at].c.key));
+      if (kitchen) {
+        const c = R[at].c;
+        kitchen.innerHTML = `<p class="wl-kt-kick">${tb('kitchen')}</p><h4><img src="${img('crest', c.key)}" alt="">${esc(c.short || c.name)}</h4><ol>` +
+          R.map((r, i) => r.c === c ? `<li><button type="button" data-i="${i}" class="${i === at ? 'on' : ''}"><img src="${r.img}" alt=""><span>${esc(r.f.name)}</span></button></li>` : '').join('') + '</ol>';
+      }
     };
     const show = () => { pl.innerHTML = left(R[at]); pr.innerHTML = right(R[at]); marks(); };
     const go = (to) => {
@@ -480,20 +490,24 @@
     show();
   }
 
-  // ---------- корешок книги рецептов в шапке: открывает книгу во всплывающем окне ----------
-  const spine = document.getElementById('wl-spine'), bm = document.getElementById('wl-bookmodal');
-  if (spine && bm) {
-    const sec = document.getElementById('wl-recipes'), slot = bm.querySelector('.wl-bookmodal-slot');
-    const parts = [document.getElementById('wl-rec-filter'), document.getElementById('wl-book')];
-    const close = () => {
-      parts.forEach(n => sec.appendChild(n)); bm.hidden = true; document.body.style.overflow = ''; spine.focus();
+  // ---------- корешок книги рецептов и кнопка в шапке: книга во всплывающем окне (#recipes) ----------
+  const bm = document.getElementById('wl-bookmodal');
+  if (bm) {
+    let opener = null;
+    const openBook = (from) => {
+      opener = from || null; bm.hidden = false; document.body.style.overflow = 'hidden';
+      requestAnimationFrame(() => bm.classList.add('open')); document.getElementById('wl-book').focus();
+      if (location.hash !== '#recipes') history.replaceState(null, '', '#recipes');
     };
-    spine.addEventListener('click', () => {
-      parts.forEach(n => slot.appendChild(n)); bm.hidden = false; document.body.style.overflow = 'hidden';
-      requestAnimationFrame(() => bm.classList.add('open')); parts[1].focus();
-    });
-    bm.querySelector('.wl-bookmodal-x').addEventListener('click', () => { bm.classList.remove('open'); close(); });
-    bm.addEventListener('click', e => { if (e.target === bm) { bm.classList.remove('open'); close(); } });
-    addEventListener('keydown', e => { if (e.key === 'Escape' && !bm.hidden) { bm.classList.remove('open'); close(); } });
+    const closeBook = () => {
+      bm.classList.remove('open'); bm.hidden = true; document.body.style.overflow = '';
+      if (location.hash === '#recipes') history.replaceState(null, '', location.pathname + location.search);
+      opener && opener.focus();
+    };
+    document.querySelectorAll('#wl-spine, [data-open-book]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); openBook(el); }));
+    bm.querySelector('.wl-bookmodal-x').addEventListener('click', closeBook);
+    bm.addEventListener('click', e => { if (e.target === bm) closeBook(); });
+    addEventListener('keydown', e => { if (e.key === 'Escape' && !bm.hidden) closeBook(); });
+    if (location.hash === '#recipes') openBook();
   }
 })();
