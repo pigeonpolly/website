@@ -37,6 +37,8 @@ PAGES = [
     ("art-portfolio/halloween", "Pumpkin Family", "halloween.html", "Welcome to the Pumpkin-Heads family."),
     ("art-portfolio/ai-art", "AI Art", "ai-art.html", "AI art based on the Pigeon Polly traditional art style."),
     ("privacy", "Privacy", "privacy.html", "How pigeonpolly.com handles your data."),
+    ("wobbleland", "Wobbleland", "wobbleland.html",
+     "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
 # готовые, но пока не открытые страницы: не попадают в sitemap
 UNLISTED = set()
@@ -64,6 +66,7 @@ SOCIAL = [
 NAV = [
     ("challenge", "Daily Challenge"),
     ("e-books", "E-Books"),
+    ("wobbleland", "Wobbleland"),
     ("art-portfolio", "Art Portfolio", PORTFOLIO),
     ("learning", "Learning & AI", [("projects", "Projects"), ("work-with-me", "Work with me")]),
     ("on-walls-and-pages", "On Walls & Pages"),
@@ -316,7 +319,27 @@ def lang_bits(path, lang):
     return url[lang], hreflang, '<nav class="lang-switch" aria-label="Language">' + "".join(links) + "</nav>"
 
 
+def wobbleland_data():
+    """Данные Wobbleland по языкам: content/wobbleland.json + переводы content/i18n/wobbleland.<lang>.json."""
+    base = json.loads((CONTENT / "wobbleland.json").read_text())
+    for lang in LANGS:
+        data = json.loads(json.dumps(base))
+        tr_file = CONTENT / "i18n" / f"wobbleland.{lang}.json"
+        tr = json.loads(tr_file.read_text()) if lang != "en" and tr_file.exists() else {}
+        for c in data["cities"]:
+            o = tr.get(c["key"], {})
+            for k in ("name", "short", "motto", "desc", "neighbors"):
+                if o.get(k): c[k] = o[k]
+            for part in ("holidays", "dishes", "streets", "residents"):
+                for item, t in zip(c[part], o.get(part, [])):
+                    item.update({k: v for k, v in t.items() if v})
+        (OUT / "assets" / f"wobbleland-data.{lang}.js").write_text(
+            "// Сгенерировано build.py из content/wobbleland.json — не править руками\nwindow.WOBBLELAND = "
+            + json.dumps(data, ensure_ascii=False) + ";\n")
+
+
 def build():
+    wobbleland_data()
     layout = (SRC / "layout.html").read_text()
     for path, title, file, desc in PAGES:
         body = (SRC / "pages" / file).read_text()
@@ -347,7 +370,7 @@ def build():
                     .replace("{{body_class}}", "home" if not path else "inner")
                     .replace("{{content}}", page_body))
             page = localize(page, lang)
-            page = page.replace("{{hreflang}}", hreflang).replace("{{lang_switch}}", switch)
+            page = page.replace("{{hreflang}}", hreflang).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
             dest = OUT / prefix / path / "index.html"
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_text(page)

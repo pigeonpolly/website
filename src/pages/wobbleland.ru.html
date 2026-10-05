@@ -1,0 +1,57 @@
+<section class="page-head wl-head">
+  <div class="wl-head-text">
+    <p class="topics">остров в картинках</p>
+    <h1>Добро пожаловать в Wobbleland!</h1>
+    <p class="lead">Приветствую, дорогой читатель. Меня зовут Полли, и я голубь. Хотя, если быть совсем точной, не вполне обычная представительница своего вида. Полагаю, в нашем мире никого не удивит птица, способная поддержать беседу за чашкой крепкого утреннего кофе или с критическим выражением лица разобрать последние литературные новинки, если, конечно, про голубя можно сказать, что у него есть лицо.</p>
+    <p class="lead">Моя жизнь, как и жизнь самого Wobbleland, — череда маленьких странностей, ставших привычкой. Но если вы не против компании пернатого проводника с острым клювом и ещё более острым глазом, я буду вашим гидом. В конце концов, кто ещё расскажет вам о нашем острове так, как птица, привыкшая смотреть на всё с высоты карниза и знающая о городских секретах чуть больше, чем положено любому уважающему себя горожанину?</p>
+    <p class="wl-sign">— Полли, ваш пернатый гид</p>
+    <div class="wl-jump">
+      <a class="pill-btn" href="#wl-map">🗺 Исследовать карту</a>
+    </div>
+  </div>
+</section>
+
+<section class="wl-map-sec" id="wl-map">
+  <div class="wl-map-head">
+    <div>
+      <p class="topics">Море Ripple Tickle</p>
+      <h2 class="section-title">Одиннадцать городов, одна качка</h2>
+      <p class="wl-hint">Нажмите на герб на карте или на город ниже, чтобы открыть его страницу. Приближайте кнопкой + или двойным касанием и перетаскивайте карту, чтобы осмотреться.</p>
+    </div>
+    <p class="wl-stat">11 городов<br>+ 1 департамент, куда лучше не попадать</p>
+  </div>
+  <div class="wl-map" id="wl-mapbox" tabindex="0" aria-label="Пиксельная карта Wobbleland, архипелага из одиннадцати городов вокруг моря Ripple Tickle">
+    <div class="wl-stage" id="wl-stage">
+      <img class="wl-basemap" src="/images/wobbleland/map-pixel.png" alt="Пиксельная карта Wobbleland" width="640" height="464" draggable="false">
+    </div>
+    <div class="wl-zoom" role="group" aria-label="Масштаб">
+      <button type="button" data-z="in" aria-label="Приблизить">+</button>
+      <button type="button" data-z="out" aria-label="Отдалить">−</button>
+      <button type="button" data-z="reset" aria-label="Сбросить карту">⟲</button>
+    </div>
+    <details class="wl-legend">
+      <summary>Легенда</summary>
+      <ul>
+        <li><span class="wl-k wl-k-house"></span> Дом</li>
+        <li><span class="wl-k wl-k-station"></span> Станция</li>
+        <li><span class="wl-k wl-k-rail"></span> Железная дорога</li>
+        <li><span class="wl-k wl-k-forest"></span> Лес</li>
+        <li><span class="wl-k wl-k-shallow"></span> Мелководье</li>
+        <li><span class="wl-k wl-k-deep"></span> Глубокое море</li>
+      </ul>
+    </details>
+  </div>
+  <div class="wl-chips" id="wl-chips"></div>
+  <p class="wl-intro">Совет городов заседает в столице, <b>New Wobbleton</b>, но у каждого города на карте свой девиз, свои праздники и своё представление о хорошем обеде. Начинайте откуда угодно: паромы и единственная красная железная дорога рано или поздно соединят их все.</p>
+</section>
+
+
+
+<div class="wl-scrim" id="wl-scrim"></div>
+<aside class="wl-panel" id="wl-panel" aria-hidden="true" role="dialog" aria-label="Город">
+  <div class="wl-panel-close"><button type="button" id="wl-close" aria-label="Закрыть">✕</button></div>
+  <div class="wl-panel-body" id="wl-panel-body"></div>
+</aside>
+
+<script src="/assets/wobbleland-data.{{lang}}.js" defer></script>
+<script src="/assets/wobbleland.js" defer></script>

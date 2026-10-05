@@ -1,0 +1,57 @@
+<section class="page-head wl-head">
+  <div class="wl-head-text">
+    <p class="topics">ilustrēta sala</p>
+    <h1>Laipni lūdzam Wobbleland!</h1>
+    <p class="lead">Sveicināts, dārgais lasītāj. Mani sauc Pollija, un es esmu balodis. Gan, ja runājam pavisam precīzi, ne gluži parasta savas sugas pārstāve. Domāju, mūsu pasaulē nevienu nepārsteigs putns, kas spēj uzturēt sarunu pie stipras rīta kafijas tases vai ar kritisku sejas izteiksmi izvērtēt jaunākās grāmatas, ja vien, protams, var teikt, ka balodim ir seja.</p>
+    <p class="lead">Mana dzīve, tāpat kā pašas Wobbleland dzīve, ir sīku dīvainību virkne, kas kļuvušas par ieradumu. Bet, ja tev nav iebildumu pret spalvaina ceļveža ar asu knābi un vēl asāku aci sabiedrību, es būšu tavs gids. Galu galā, kurš gan cits tev pastāstīs par mūsu salu tā, kā to darītu putns, kas pieradis visu redzēt no dzegas augstuma un zina par pilsētas noslēpumiem mazliet vairāk, nekā pienāktos jebkuram sevi cienošam pilsētniekam?</p>
+    <p class="wl-sign">— Pollija, tavs spalvainais ceļvedis</p>
+    <div class="wl-jump">
+      <a class="pill-btn" href="#wl-map">🗺 Izpētīt karti</a>
+    </div>
+  </div>
+</section>
+
+<section class="wl-map-sec" id="wl-map">
+  <div class="wl-map-head">
+    <div>
+      <p class="topics">Ripple Tickle jūra</p>
+      <h2 class="section-title">Vienpadsmit pilsētas, viena šūpošanās</h2>
+      <p class="wl-hint">Pieskaries ģerbonim kartē vai pilsētai zemāk, lai atvērtu tās lapu. Pietuvini ar + vai dubultpieskārienu un velc karti, lai apskatītos apkārt.</p>
+    </div>
+    <p class="wl-stat">11 pilsētas<br>+ 1 departaments, kur labāk nenonākt</p>
+  </div>
+  <div class="wl-map" id="wl-mapbox" tabindex="0" aria-label="Wobbleland pikseļu karte: vienpadsmit pilsētu arhipelāgs ap Ripple Tickle jūru">
+    <div class="wl-stage" id="wl-stage">
+      <img class="wl-basemap" src="/images/wobbleland/map-pixel.png" alt="Wobbleland pikseļu karte" width="640" height="464" draggable="false">
+    </div>
+    <div class="wl-zoom" role="group" aria-label="Mērogs">
+      <button type="button" data-z="in" aria-label="Pietuvināt">+</button>
+      <button type="button" data-z="out" aria-label="Attālināt">−</button>
+      <button type="button" data-z="reset" aria-label="Atiestatīt karti">⟲</button>
+    </div>
+    <details class="wl-legend">
+      <summary>Apzīmējumi</summary>
+      <ul>
+        <li><span class="wl-k wl-k-house"></span> Māja</li>
+        <li><span class="wl-k wl-k-station"></span> Stacija</li>
+        <li><span class="wl-k wl-k-rail"></span> Dzelzceļš</li>
+        <li><span class="wl-k wl-k-forest"></span> Mežs</li>
+        <li><span class="wl-k wl-k-shallow"></span> Sēklis</li>
+        <li><span class="wl-k wl-k-deep"></span> Dziļa jūra</li>
+      </ul>
+    </details>
+  </div>
+  <div class="wl-chips" id="wl-chips"></div>
+  <p class="wl-intro">Pilsētu padome sanāk galvaspilsētā <b>New Wobbleton</b>, taču katrai pilsētai kartē ir savs moto, savi svētki un savs priekšstats par labām pusdienām. Sāc no jebkuras vietas: prāmji un vienīgā sarkanā dzelzceļa līnija agri vai vēlu savieno tās visas.</p>
+</section>
+
+
+
+<div class="wl-scrim" id="wl-scrim"></div>
+<aside class="wl-panel" id="wl-panel" aria-hidden="true" role="dialog" aria-label="Pilsēta">
+  <div class="wl-panel-close"><button type="button" id="wl-close" aria-label="Aizvērt">✕</button></div>
+  <div class="wl-panel-body" id="wl-panel-body"></div>
+</aside>
+
+<script src="/assets/wobbleland-data.{{lang}}.js" defer></script>
+<script src="/assets/wobbleland.js" defer></script>
