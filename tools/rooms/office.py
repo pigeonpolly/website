@@ -167,42 +167,47 @@ for m in ('day', 'night'): scene(m).save(f'{OUT}/office-{m}.png')
 import numpy as _np
 from PIL import ImageDraw as _ID
 def polly(blink=False):
+    # силуэт-кегля: голова плавно переходит в шею и грушевидное тело (по рефу Алины)
     PW, PH_ = 52, 104
     im = Image.new('RGBA', (PW, PH_), (0, 0, 0, 0)); d = _ID.Draw(im)
-    B, Dd, Lt, Bl = (86, 94, 170), (58, 62, 122), (124, 134, 206), (104, 116, 190)
+    B, Dd, Lt = (92, 100, 190), (64, 68, 142), (132, 142, 222)
     O, Od = (244, 170, 50), (206, 120, 30)
-    # хвост
-    d.polygon([(4, 70), (14, 64), (18, 80), (6, 84)], fill=Dd); d.line([(7, 74), (14, 70)], fill=B); d.line([(8, 79), (15, 76)], fill=B)
+    prof = [(3, 0), (5, 6), (8, 9), (12, 11), (18, 11), (24, 10), (30, 9), (36, 10), (44, 13), (52, 16), (60, 19), (68, 20), (76, 19), (82, 16), (86, 11), (89, 5)]
+    def hw(y):
+        for (y0, w0), (y1, w1) in zip(prof, prof[1:]):
+            if y0 <= y <= y1: return w0 + (w1 - w0) * (y - y0) / max(1, y1 - y0)
+        return 0
+    cx = 25
+    for y in range(3, 90):
+        w = hw(y); d.line([(cx - w, y), (cx + w, y)], fill=B)
+        d.line([(cx + w - 3, y), (cx + w, y)], fill=Dd)          # тень справа
+        if 8 < y < 80: d.point((cx - w + 2, y), fill=Lt)         # блик слева
+    d.ellipse((cx - 11, 66, cx + 13, 90), fill=Dd); d.ellipse((cx - 12, 64, cx + 10, 86), fill=B)  # низ тела
     # ноги
-    for x in (20, 30):
-        d.rectangle((x, 80, x + 1, 96), fill=O); d.rectangle((x + 1, 80, x + 1, 96), fill=Od)
-        d.line([(x - 3, 98), (x, 96), (x + 5, 98)], fill=O); d.line([(x + 1, 96), (x + 2, 99)], fill=O)
-    # тело-яйцо, грудка светлее
-    d.ellipse((8, 40, 42, 84), fill=B); d.ellipse((20, 44, 42, 80), fill=Bl); d.ellipse((24, 48, 34, 60), fill=Lt)
-    # крыло
-    d.polygon([(10, 50), (24, 48), (28, 62), (22, 78), (12, 74)], fill=Dd)
-    for y in (58, 64, 70): d.line([(13, y), (22, y + 3)], fill=B)
-    # шея и голова
-    d.polygon([(18, 46), (20, 24), (34, 24), (36, 46)], fill=B); d.line([(30, 28), (32, 44)], fill=Lt)
-    d.ellipse((16, 4, 40, 32), fill=B); d.ellipse((19, 6, 30, 16), fill=Lt)
-    # клюв
-    d.polygon([(38, 16), (45, 21), (38, 24)], fill=O); d.line([(38, 21), (44, 21)], fill=Od)
-    # глаз: большой белый овал, жёлтая радужка, зрачок, полуприкрытое веко
-    E = (24, 6, 37, 27)
-    d.ellipse(E, fill=(255, 255, 255))
+    for x in (19, 29):
+        d.rectangle((x, 88, x + 1, 98), fill=O); d.line([(x - 3, 100), (x, 98), (x + 5, 100)], fill=O); d.line([(x + 1, 98), (x + 2, 101)], fill=O)
+    # клюв — короткий, вниз-вправо
+    d.polygon([(cx + 9, 18), (cx + 17, 21), (cx + 9, 25)], fill=O); d.line([(cx + 9, 22), (cx + 15, 22)], fill=Od)
+    # большой глаз: белый овал, огромный зрачок, жёлтое нижнее веко, тяжёлое верхнее веко
+    E = (cx - 6, 8, cx + 8, 28)
+    d.ellipse(E, fill=(255, 255, 255)); d.chord(E, 20, 160, fill=(240, 196, 60))
     if blink:
-        d.ellipse(E, fill=Dd); d.line([(25, 17), (36, 17)], fill=(26, 21, 40))
+        d.ellipse(E, fill=Dd); d.line([(cx - 5, 18), (cx + 7, 18)], fill=(26, 21, 40))
     else:
-        d.ellipse((29, 11, 36, 25), fill=(246, 204, 56)); d.ellipse((31, 13, 35, 23), fill=(26, 21, 40)); d.rectangle((32, 14, 33, 15), fill=(255, 255, 255))
-        em = Image.new('L', (PW, PH_), 0); _ID.Draw(em).ellipse(E, fill=255); lid = Image.new('RGBA', (PW, PH_), Dd + (255,))
-        lm = Image.new('L', (PW, PH_), 0); _ID.Draw(lm).rectangle((0, 0, PW, 12), fill=255)
+        d.ellipse((cx - 3, 12, cx + 7, 26), fill=(26, 21, 40)); d.rectangle((cx - 1, 15, cx, 17), fill=(255, 255, 255))
+        em = Image.new('L', (PW, PH_), 0); _ID.Draw(em).ellipse(E, fill=255)
+        lm = Image.new('L', (PW, PH_), 0); _ID.Draw(lm).rectangle((0, 0, PW, 15), fill=255)
         from PIL import ImageChops as _IC
-        im.paste(lid, (0, 0), _IC.multiply(em, lm)); d.line([(25, 12), (36, 12)], fill=(26, 21, 40)); d.line([(24, 13), (37, 13)], fill=(26, 21, 40))
-    # оранжевый шарф (как на офисной картине)
-    d.polygon([(17, 34), (37, 33), (38, 40), (16, 41)], fill=O); d.line([(18, 37), (36, 36)], fill=Od)
-    d.polygon([(20, 40), (26, 40), (25, 54), (19, 53)], fill=O); d.line([(20, 46), (25, 46)], fill=Od)
-    # бейдж на шнурке
-    d.line([(30, 40), (33, 52)], fill=(60, 120, 200)); d.rectangle((31, 52, 36, 58), fill=(250, 246, 230)); d.rectangle((32, 53, 35, 54), fill=(60, 120, 200))
+        im.paste(Image.new('RGBA', (PW, PH_), B + (255,)), (0, 0), _IC.multiply(em, lm))
+        d.line([(cx - 6, 15), (cx + 8, 15)], fill=(26, 21, 40)); d.line([(cx - 5, 16), (cx + 7, 16)], fill=(26, 21, 40))
+        d.line([(cx - 6, 14), (cx - 8, 12)], fill=(26, 21, 40))
+    # шарф и бейдж
+    d.polygon([(cx - 10, 33), (cx + 10, 32), (cx + 11, 39), (cx - 11, 40)], fill=O); d.line([(cx - 9, 36), (cx + 9, 35)], fill=Od)
+    d.polygon([(cx - 7, 39), (cx - 1, 39), (cx - 2, 52), (cx - 8, 51)], fill=O)
+    d.line([(cx + 4, 39), (cx + 7, 52)], fill=(60, 120, 200)); d.rectangle((cx + 5, 52, cx + 10, 58), fill=(250, 246, 230)); d.rectangle((cx + 6, 53, cx + 9, 54), fill=(60, 120, 200))
+    # крыло-рука с «пальцами»
+    d.polygon([(cx - 14, 46), (cx - 6, 46), (cx - 4, 70), (cx - 10, 76), (cx - 17, 72)], fill=Dd)
+    for fx_ in (-15, -12, -9): d.line([(cx + fx_, 74), (cx + fx_ + 1, 80)], fill=Dd, width=2)
     a = _np.asarray(im).copy(); m = a[..., 3] > 0; pp = _np.pad(m, 1)
     nb = pp[:-2, 1:-1] | pp[2:, 1:-1] | pp[1:-1, :-2] | pp[1:-1, 2:]; a[nb & ~m] = INK + (255,)
     return Image.fromarray(a, 'RGBA')

@@ -130,33 +130,47 @@ for m in ('day', 'night'): scene(m).save(f'{OUT}/detective-{m}.png')
 # Титос по картине Алины: голова-купол без лица со строчкой-швом, тонкая антенна-проводок, белая рубашка, бордовые подтяжки и галстук
 from PIL import ImageDraw as _ID
 def titos(blink=False):
-    PW, PH_ = 60, 106
+    # человек с головой улитки (по картине Алины): голова-купол на тонкой шее, два длинных стебелька с глазками,
+    # маленькие щупальца-лапки у подбородка, строчка ресниц; рубашка с пышными рукавами, бордовые подтяжки и галстук
+    PW, PH_ = 56, 112
     im = Image.new('RGBA', (PW, PH_), (0, 0, 0, 0)); d = _ID.Draw(im)
     G, Gd, Gl = (150, 150, 198), (112, 110, 162), (186, 186, 224)
-    Wt, Ws, R_, S = (238, 238, 246), (196, 196, 216), (150, 40, 52), (130, 36, 44)
-    d.line([(30, 16), (31, 9), (35, 4), (41, 2)], fill=(80, 76, 110)); d.ellipse((40, 0, 44, 4), fill=(80, 76, 110))
-    d.chord((11, 16, 49, 60), 180, 360, fill=G); d.rectangle((11, 37, 49, 44), fill=G); d.ellipse((11, 40, 49, 50), fill=Gd); d.rectangle((11, 37, 49, 43), fill=G)
-    d.ellipse((16, 20, 27, 28), fill=Gl)
-    for x in range(15, 46, 3): d.line([(x, 40 if not blink else 41), (x, 43)], fill=(60, 56, 90))
-    d.line([(14, 41), (46, 41)], fill=(90, 86, 126))
-    # шея, воротник, рубашка
-    d.rectangle((24, 50, 36, 56), fill=Gd)
-    d.polygon([(12, 58), (48, 58), (50, 90), (10, 90)], fill=Wt); d.polygon([(40, 60), (48, 58), (50, 90), (42, 90)], fill=Ws)
-    d.polygon([(22, 54), (30, 60), (24, 64), (18, 58)], fill=Wt); d.polygon([(38, 54), (30, 60), (36, 64), (42, 58)], fill=Ws)
-    d.polygon([(28, 60), (32, 60), (33, 82), (30, 86), (27, 82)], fill=R_)
-    d.line([(17, 58), (19, 90)], fill=S, width=2); d.line([(43, 58), (41, 90)], fill=S, width=2)
-    # рукава закатаны, руки серые
-    for x0, sgn in ((4, 1), (50, -1)):
-        d.polygon([(x0 + (0 if sgn > 0 else 6), 60), (x0 + (10 if sgn > 0 else -4), 60), (x0 + (8 if sgn > 0 else -2), 76), (x0 + (0 if sgn > 0 else 6), 76)], fill=Wt)
-        d.rectangle((x0 + (1 if sgn > 0 else 0), 74, x0 + (7 if sgn > 0 else 6), 77), fill=Ws)
-        d.ellipse((x0 + (1 if sgn > 0 else 0), 77, x0 + (7 if sgn > 0 else 6), 86), fill=G)
+    Wt, Ws, R_, S = (232, 232, 244), (190, 192, 214), (150, 40, 52), (130, 36, 44)
+    cx = 28
+    # стебельки с глазками
+    for sx, ex, ey in ((cx - 5, cx - 13, 2), (cx + 5, cx + 11, 6)):
+        d.line([(sx, 22), (sx + (ex - sx) // 3, 14), (ex, ey + 4)], fill=Gd, width=2)
+        d.ellipse((ex - 4, ey - 3, ex + 4, ey + 5), fill=(214, 214, 232))
+        if not blink: d.rectangle((ex - 1, ey - 1, ex + 1, ey + 3), fill=(40, 34, 52))
+        else: d.line([(ex - 3, ey + 1), (ex + 3, ey + 1)], fill=(40, 34, 52))
+    # голова-купол
+    d.ellipse((cx - 13, 18, cx + 13, 46), fill=G); d.ellipse((cx - 10, 36, cx + 10, 48), fill=Gd); d.ellipse((cx - 11, 20, cx + 11, 42), fill=G)
+    d.ellipse((cx - 9, 22, cx - 2, 28), fill=Gl)
+    for x in range(cx - 8, cx + 9, 2): d.line([(x, 37), (x, 39)], fill=(60, 56, 90))
+    d.line([(cx - 9, 38), (cx + 9, 38)], fill=(90, 86, 126))
+    # щупальца-лапки у подбородка
+    d.line([(cx - 9, 44), (cx - 12, 49), (cx - 10, 51)], fill=Gd, width=2); d.line([(cx + 9, 44), (cx + 12, 49), (cx + 10, 51)], fill=Gd, width=2)
+    # шея
+    d.rectangle((cx - 3, 46, cx + 3, 54), fill=Gd)
+    # рубашка: узкий торс, покатые плечи, пышные рукава отдельно от торса
+    d.polygon([(cx - 11, 57), (cx - 6, 54), (cx + 6, 54), (cx + 11, 57), (cx + 9, 88), (cx - 9, 88)], fill=Wt)
+    d.polygon([(cx + 4, 55), (cx + 11, 57), (cx + 9, 88), (cx + 4, 88)], fill=Ws)
+    d.polygon([(cx - 6, 52), (cx, 58), (cx - 4, 62), (cx - 9, 56)], fill=Wt); d.polygon([(cx + 6, 52), (cx, 58), (cx + 4, 62), (cx + 9, 56)], fill=Ws)
+    d.polygon([(cx - 2, 58), (cx + 2, 58), (cx + 3, 80), (cx, 84), (cx - 3, 80)], fill=R_)
+    d.line([(cx - 7, 56), (cx - 6, 88)], fill=S, width=2); d.line([(cx + 7, 56), (cx + 6, 88)], fill=S, width=2)
+    for sgn in (-1, 1):
+        ax = cx + sgn * 15
+        d.ellipse((ax - 5, 56, ax + 5, 72), fill=Wt if sgn < 0 else Ws); d.line([(ax - 3, 64), (ax + 3, 66)], fill=Ws if sgn < 0 else (170, 172, 198))
+        d.rectangle((ax - 2, 70, ax + 2, 82), fill=Wt if sgn < 0 else Ws); d.line([(ax - 3, 80), (ax + 3, 80)], fill=Ws)
+        d.ellipse((ax - 3, 81, ax + 3, 89), fill=G)
     # брюки, ботинки
-    d.rectangle((14, 90, 46, 94), fill=(54, 50, 70)); d.rectangle((15, 94, 28, 100), fill=(60, 66, 100)); d.rectangle((32, 94, 45, 100), fill=(60, 66, 100))
-    d.rectangle((12, 100, 28, 103), fill=(30, 26, 36)); d.rectangle((32, 100, 48, 103), fill=(30, 26, 36))
+    d.rectangle((cx - 12, 88, cx + 12, 92), fill=(54, 50, 70))
+    d.rectangle((cx - 11, 92, cx - 2, 104), fill=(60, 66, 100)); d.rectangle((cx + 2, 92, cx + 11, 104), fill=(60, 66, 100))
+    d.rectangle((cx - 13, 104, cx - 1, 107), fill=(30, 26, 36)); d.rectangle((cx + 1, 104, cx + 13, 107), fill=(30, 26, 36))
     a = _np.asarray(im).copy(); m = a[..., 3] > 0; pp = _np.pad(m, 1)
     nb = pp[:-2, 1:-1] | pp[2:, 1:-1] | pp[1:-1, :-2] | pp[1:-1, 2:]; a[nb & ~m] = INK + (255,)
     return Image.fromarray(a, 'RGBA')
 titos().save(f'{OUT}/detective-titos.png'); titos(True).save(f'{OUT}/detective-titos-blink.png')
-hot('titos', (96, 108, 150, 212))
-json.dump({'w': W, 'h': H, 'hot': HOT, 'sprites': {'titos': [92, 106, 60]}}, open(os.path.join(os.path.dirname(__file__), 'detective.json'), 'w'))
+hot('titos', (94, 102, 152, 212))
+json.dump({'w': W, 'h': H, 'hot': HOT, 'sprites': {'titos': [94, 100, 56]}}, open(os.path.join(os.path.dirname(__file__), 'detective.json'), 'w'))
 print('ok', len(HOT))
