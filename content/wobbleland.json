@@ -6,8 +6,8 @@
       "name": "New Wobbleton",
       "mapLabel": null,
       "coords": {
-        "left": 41.5,
-        "top": 33
+        "left": 41.8,
+        "top": 33.84
       },
       "motto": "Steady in the Wobble",
       "desc": "Capital of Wobbleland, where the Council of Cities meets and the Seagull Guardians keep watch. Home to a fragment of the Great Cauldron and the island's main train hub. Known for its clock towers and endless arguments over the syrup tax.",
@@ -67,8 +67,8 @@
       "name": "Maplewink",
       "mapLabel": "Mapplewink on the map",
       "coords": {
-        "left": 89,
-        "top": 59
+        "left": 90.39,
+        "top": 62.07
       },
       "motto": "Life's Better with Syrup",
       "desc": "A maple-syrup town where mornings begin with a wink over a cup of maple coffee. Its economy runs on maple syrup and small craft workshops. Famous for its golden-leaf autumn season and deep reverence for bees, whose honey syrup is prized as highly as maple.",
@@ -119,8 +119,8 @@
       "name": "Snailhollow",
       "mapLabel": null,
       "coords": {
-        "left": 14.5,
-        "top": 29
+        "left": 12.73,
+        "top": 31.68
       },
       "motto": "Better Late than Faster",
       "desc": "A slow-paced, moss-covered town where nothing is ever rushed; snails of every size roam the streets, some large enough for children to ride. Home to Mr. Chew and Detective Titos.",
@@ -166,8 +166,8 @@
       "name": "Pinecrust",
       "mapLabel": null,
       "coords": {
-        "left": 44,
-        "top": 83
+        "left": 44.14,
+        "top": 91.7
       },
       "motto": "Crisp Outside, Warm Inside",
       "desc": "A forest bakery town smelling of pine and fresh pastry, famous for its crisp nut-crust pies and its Festival of Pies Under the Pines.",
@@ -225,8 +225,8 @@
       "name": "LemonVale",
       "mapLabel": null,
       "coords": {
-        "left": 58,
-        "top": 16
+        "left": 58.52,
+        "top": 18.64
       },
       "motto": "Squeeze the Day!",
       "desc": "A fertile valley built entirely around lemons — used in soups, pies, candles, and decoration; the old local currency was called \"wedges.\" Famously hospitable; no traveler leaves hungry.",
@@ -276,8 +276,8 @@
       "name": "Buttonspire",
       "mapLabel": null,
       "coords": {
-        "left": 83,
-        "top": 15
+        "left": 84.61,
+        "top": 15.73
       },
       "motto": "Stitched Together, Forever",
       "desc": "A town built around a tower studded with buttons, a symbol of prosperity since its founding. Losing a button means good luck; finding one means a new friend.",
@@ -317,8 +317,8 @@
       "name": "Noodleford",
       "mapLabel": null,
       "coords": {
-        "left": 80,
-        "top": 41
+        "left": 84.22,
+        "top": 42.46
       },
       "motto": "Slurp Loud, Live Long",
       "desc": "A noodle-obsessed town of steaming windows and lantern-strung dried noodles. Home to hundreds of noodle-house varieties; even weddings and funerals have their own noodle dishes.",
@@ -375,8 +375,8 @@
       "name": "Jamshire",
       "mapLabel": null,
       "coords": {
-        "left": 5.5,
-        "top": 49
+        "left": 6.09,
+        "top": 50.22
       },
       "motto": "Spread the Sweetness",
       "desc": "A jam-obsessed region where every household has a cellar of preserves, from strawberry to rhubarb-rose. \"Having tea\" locally means \"gathering for a jar.\"",
@@ -438,8 +438,8 @@
       "name": "Cheddarford",
       "mapLabel": null,
       "coords": {
-        "left": 24,
-        "top": 61
+        "left": 23.98,
+        "top": 61.85
       },
       "motto": "Sharp Minds, Sharper Cheddar",
       "desc": "A river valley devoted to cheese, with caves used as natural aging cellars. Bridges are carved with wheel-of-cheese motifs.",
@@ -510,8 +510,8 @@
       "name": "Kettleford",
       "mapLabel": null,
       "coords": {
-        "left": 65,
-        "top": 57
+        "left": 69.69,
+        "top": 65.19
       },
       "motto": "Brewing Joy, Hour by Hour",
       "desc": "A town centered on tea and coffee culture, with a giant copper samovar and coffee cezve at its main square. Every household keeps at least three kettles and a copper cezve \"just in case.\"",
@@ -569,8 +569,8 @@
       "name": "Department of Reflection on the Deed",
       "mapLabel": null,
       "coords": {
-        "left": 94,
-        "top": 10
+        "left": 95.86,
+        "top": 15.73
       },
       "motto": "No Truth, No Exit",
       "desc": "A lone stone building on the road between Buttonspire and Noodleford, half prison, half filing office. Wrongdoers serve their sentence writing endless reflections until a confession finally rings true.",
