@@ -1040,3 +1040,6 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 .sw-pv-works span { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 8px 6px; font-size: 11px; color: #fff; background: linear-gradient(transparent, rgba(20, 12, 40, .8)); }
 .sw-pv-card .sw-empty { color: #6B5AA8; }
 .ch-card-style { margin: 6px 0 10px; flex-wrap: wrap; }
+.ch-news { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 18px 0 0; }
+.ch-news-btn { text-decoration: none; }
+.ch-news span { color: var(--muted); font-size: 14px; }
