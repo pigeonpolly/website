@@ -303,7 +303,7 @@
       const f = input.files[0]; if (!f) return;
       try {
         if (!/^image\//.test(f.type)) throw 0;
-        full = await shrink(f, 1280, 0.8); thumb = await shrink(f, 480, 0.75);
+        full = await shrink(f, 1000, 0.76); thumb = await shrink(f, 400, 0.72);
         if (!full || full.size > 2.4e6) throw 0;
         prev.querySelector('img').src = URL.createObjectURL(thumb); prev.hidden = false; btn.disabled = false;
       } catch (e) { st.textContent = t('big'); }
