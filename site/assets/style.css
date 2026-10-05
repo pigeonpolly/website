@@ -1055,8 +1055,8 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 .sw-out-top { font-size: 14px; }
 
 /* ---------- Wobbleland ---------- */
-.wl-head .lead { max-width: 760px; }
-.wl-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(300px, 380px); gap: 56px; align-items: start; max-width: 1320px; }
+.wl-head .lead { max-width: none; }
+.wl-head { display: grid; grid-template-columns: minmax(0, 1fr) minmax(320px, 400px); gap: 64px; align-items: start; max-width: none; }
 .wl-tear { padding-top: 6px; }
 .wl-tear .tearpad { margin-top: 0; }
 .wl-tear-label { margin: 0 0 12px; text-align: center; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--peach); }
