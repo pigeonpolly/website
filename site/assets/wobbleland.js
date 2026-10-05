@@ -479,4 +479,21 @@
     recF.addEventListener('click', e => { const b = e.target.closest('button'); if (b) go(R.findIndex(r => r.c.key === b.dataset.k)); });
     show();
   }
+
+  // ---------- корешок книги рецептов в шапке: открывает книгу во всплывающем окне ----------
+  const spine = document.getElementById('wl-spine'), bm = document.getElementById('wl-bookmodal');
+  if (spine && bm) {
+    const sec = document.getElementById('wl-recipes'), slot = bm.querySelector('.wl-bookmodal-slot');
+    const parts = [document.getElementById('wl-rec-filter'), document.getElementById('wl-book')];
+    const close = () => {
+      parts.forEach(n => sec.appendChild(n)); bm.hidden = true; document.body.style.overflow = ''; spine.focus();
+    };
+    spine.addEventListener('click', () => {
+      parts.forEach(n => slot.appendChild(n)); bm.hidden = false; document.body.style.overflow = 'hidden';
+      requestAnimationFrame(() => bm.classList.add('open')); parts[1].focus();
+    });
+    bm.querySelector('.wl-bookmodal-x').addEventListener('click', () => { bm.classList.remove('open'); close(); });
+    bm.addEventListener('click', e => { if (e.target === bm) { bm.classList.remove('open'); close(); } });
+    addEventListener('keydown', e => { if (e.key === 'Escape' && !bm.hidden) { bm.classList.remove('open'); close(); } });
+  }
 })();
