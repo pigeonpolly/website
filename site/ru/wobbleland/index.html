@@ -61,8 +61,11 @@
     <p class="wl-sign">— Полли, ваш пернатый гид</p>
     <div class="wl-jump">
       <a class="pill-btn" href="#wl-map">🗺 Исследовать карту</a>
+      <a class="pill-btn" href="#wl-recipes">📖 Книга рецептов</a>
+      <a class="pill-btn" href="#wl-cal">📅 Календарь праздников</a>
     </div>
   </div>
+  <div class="wl-tear" id="wl-tear" aria-live="polite"></div>
 </section>
 
 <section class="wl-map-sec" id="wl-map">
@@ -100,6 +103,21 @@
 </section>
 
 
+
+<section class="wl-book-sec" id="wl-recipes">
+  <p class="topics">Книга рецептов Полли</p>
+  <h2 class="section-title">Что едят в Wobbleland</h2>
+  <p class="wl-hint">Все фирменные блюда острова и где их попробовать. Выберите город, чтобы увидеть только его кухню.</p>
+  <div class="wl-filter" id="wl-rec-filter"></div>
+  <div class="wl-recipes" id="wl-rec-list"></div>
+</section>
+
+<section class="wl-book-sec" id="wl-cal">
+  <p class="topics">Календарь Wobbleland</p>
+  <h2 class="section-title">Все праздники острова</h2>
+  <p class="wl-hint">Двенадцать месяцев шатких праздников. Нажмите на праздник, чтобы заглянуть в его город.</p>
+  <div class="wl-cal" id="wl-cal-grid"></div>
+</section>
 
 <div class="wl-scrim" id="wl-scrim"></div>
 <aside class="wl-panel" id="wl-panel" aria-hidden="true" role="dialog" aria-label="Город">

@@ -39,7 +39,7 @@
   const C = D.cities;
 
   // ---------- карта: гербы-булавки ----------
-  const stage = document.getElementById('wl-stage'), chips = document.getElementById('wl-chips');
+  const stage = document.getElementById('wl-stage'), chips = document.getElementById('wl-chips'), wall = document.getElementById('wl-wall');
   C.forEach(c => {
     const pin = document.createElement('button');
     pin.type = 'button'; pin.className = 'wl-pin'; pin.dataset.key = c.key;
@@ -53,6 +53,13 @@
     chip.innerHTML = `<img src="${img('crest', c.key)}" alt=""><span class="n">${c.no}</span>${esc(c.name)}`;
     chip.addEventListener('click', () => openCity(c.key));
     chips.appendChild(chip);
+    if (wall) {
+      const w = document.createElement('button');
+      w.type = 'button'; w.className = 'wl-wall-c'; w.title = c.name;
+      w.innerHTML = `<img src="${img('crest', c.key)}" alt="${esc(c.name)}">`;
+      w.addEventListener('click', () => openCity(c.key));
+      wall.appendChild(w);
+    }
   });
 
   // ---------- приближение и перетаскивание ----------
@@ -234,4 +241,84 @@
     document.getElementById('wl-q-again').onclick = () => { step = 0; score = {}; quiz(); };
   }
   if (qbox) quiz(); // квиз пока не показываем на странице — код готов
+
+  // ---------- отрывной календарь (ближайший праздник), календарь праздников, книга рецептов ----------
+  const LOC = ['en-GB', 'ru-RU', 'lv-LV'][L];
+  const TT = {
+    today: ['Today!', 'Сегодня!', 'Šodien!'],
+    inDays: [n => n === 1 ? 'Tomorrow' : `In ${n} days`, n => n === 1 ? 'Завтра' : `Через ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'день' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 'дня' : 'дней'}`, n => n === 1 ? 'Rīt' : `Pēc ${n} dienām`],
+    next: ['Tear off · next holiday', 'Оторвать · следующий праздник', 'Noplēst · nākamie svētki'],
+    nextLabel: ['Next holiday in Wobbleland', 'Ближайший праздник в Wobbleland', 'Tuvākie svētki Wobbleland'],
+    all: ['All towns', 'Все города', 'Visas pilsētas'],
+    upcoming: ['coming up', 'скоро', 'drīz'],
+  };
+  const tt = (k, ...a) => { const v = TT[k][L]; return typeof v === 'function' ? v(...a) : v; };
+  const HOL = [];
+  C.forEach(c => c.holidays.forEach(h => { if (h.m) HOL.push({ ...h, c }); }));
+  HOL.sort((a, b) => a.m - b.m || a.d - b.d);
+  const now = new Date(); const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const daysTo = h => {
+    let d = new Date(today.getFullYear(), h.m - 1, h.d);
+    if (d < today) d = new Date(today.getFullYear() + 1, h.m - 1, h.d);
+    return { date: d, n: Math.round((d - today) / 864e5) };
+  };
+  const upcoming = HOL.map(h => ({ h, ...daysTo(h) })).sort((a, b) => a.n - b.n);
+  const tear = document.getElementById('wl-tear');
+  let ti = 0;
+  const renderTear = (anim) => {
+    if (!tear) return;
+    const u = upcoming[ti % upcoming.length], h = u.h;
+    const month = u.date.toLocaleDateString(LOC, { month: 'long' });
+    tear.innerHTML = `<p class="wl-tear-label">${tt('nextLabel')}</p>
+      <div class="tearpad">${anim ? '<div class="page old" aria-hidden="true"></div>' : ''}
+        <div class="page">
+          <div class="page-top"><span>${esc(month)}</span></div>
+          <div class="page-day">${u.date.getDate()}</div>
+          <div class="page-weekday">${u.n === 0 ? tt('today') : tt('inDays', u.n)}</div>
+          <h3 class="page-subject">${esc(h.title)}</h3>
+          <p class="wl-tear-desc">${esc(h.desc)}</p>
+          <button type="button" class="wl-town-tag" data-key="${h.c.key}"><img src="${img('crest', h.c.key)}" alt="">${esc(h.c.short || h.c.name)}</button>
+        </div>
+      </div>
+      <button type="button" class="wl-tear-next">${tt('next')} ✂</button>`;
+    tear.querySelector('.wl-town-tag').addEventListener('click', () => openCity(h.c.key));
+    tear.querySelector('.wl-tear-next').addEventListener('click', () => { ti++; renderTear(true); });
+  };
+  renderTear(false);
+
+  const calBox = document.getElementById('wl-cal-grid');
+  if (calBox) {
+    const next = upcoming[0].h;
+    let html = '';
+    for (let m = 1; m <= 12; m++) {
+      const list = HOL.filter(h => h.m === m);
+      const name = new Date(2026, m - 1, 1).toLocaleDateString(LOC, { month: 'long' });
+      html += `<div class="wl-cal-m${list.length ? '' : ' empty'}"><h3>${esc(name)}</h3>${list.length ? list.map(h => `
+        <button type="button" class="wl-cal-h${h === next ? ' next' : ''}" data-key="${h.c.key}">
+          <span class="wl-cal-d">${h.d}</span>
+          <span class="wl-cal-t"><b>${esc(h.title)}</b><i><img src="${img('crest', h.c.key)}" alt="">${esc(h.c.short || h.c.name)}</i></span>
+          ${h === next ? `<em>${tt('upcoming')}</em>` : ''}
+        </button>`).join('') : '<p class="wl-cal-none">—</p>'}</div>`;
+    }
+    calBox.innerHTML = html;
+    calBox.addEventListener('click', e => { const b = e.target.closest('.wl-cal-h'); if (b) openCity(b.dataset.key); });
+  }
+
+  const recBox = document.getElementById('wl-rec-list'), recF = document.getElementById('wl-rec-filter');
+  if (recBox) {
+    let only = '';
+    const draw = () => {
+      recBox.innerHTML = C.filter(c => !only || c.key === only).flatMap(c => c.dishes.map(f => `
+        <article class="wl-rec">
+          <h3>${esc(f.name)}</h3>
+          <p>${esc(f.desc)}</p>
+          <button type="button" class="wl-town-tag" data-key="${c.key}"><img src="${img('crest', c.key)}" alt="">${esc(c.short || c.name)}</button>
+        </article>`)).join('');
+      recF.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.k === only));
+    };
+    recF.innerHTML = `<button type="button" data-k="">${tt('all')}</button>` + C.map(c => `<button type="button" data-k="${c.key}"><img src="${img('crest', c.key)}" alt="">${esc(c.short || c.name)}</button>`).join('');
+    recF.addEventListener('click', e => { const b = e.target.closest('button'); if (b) { only = b.dataset.k; draw(); } });
+    recBox.addEventListener('click', e => { const b = e.target.closest('.wl-town-tag'); if (b) openCity(b.dataset.key); });
+    draw();
+  }
 })();

@@ -322,6 +322,11 @@ def lang_bits(path, lang):
 def wobbleland_data():
     """Данные Wobbleland по языкам: content/wobbleland.json + переводы content/i18n/wobbleland.<lang>.json."""
     base = json.loads((CONTENT / "wobbleland.json").read_text())
+    months = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+    for c in base["cities"]:
+        for h in c["holidays"]:  # месяц и день из английской даты «Mar 12» — для календаря
+            m, d = h["date"].split()
+            h["m"], h["d"] = months.index(m[:3]) + 1, int(d)
     for lang in LANGS:
         data = json.loads(json.dumps(base))
         tr_file = CONTENT / "i18n" / f"wobbleland.{lang}.json"

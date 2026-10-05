@@ -1056,6 +1056,42 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 
 /* ---------- Wobbleland ---------- */
 .wl-head .lead { max-width: 760px; }
+.wl-head { display: grid; grid-template-columns: minmax(0, 820px) minmax(300px, 400px); justify-content: space-between; gap: 48px; align-items: start; max-width: none; }
+.wl-tear { padding-top: 6px; }
+.wl-tear .tearpad { margin-top: 0; }
+.wl-tear-label { margin: 0 0 12px; text-align: center; font-size: 13px; letter-spacing: .08em; text-transform: uppercase; color: var(--peach); }
+.wl-tear .page-day { font-size: 96px; }
+.wl-tear .page-weekday { text-transform: none; }
+.wl-tear .page-subject { font-size: 26px; margin-bottom: 10px; }
+.wl-tear-desc { margin: 0 0 16px; font-size: 14px; line-height: 1.55; color: #4A3E68; }
+.wl-town-tag { display: inline-flex; align-items: center; gap: 8px; padding: 4px 14px 4px 4px; border: 1.5px solid #D9D3F2; border-radius: 999px; background: #F4F0FA; color: #2B1A51; font: 700 13px var(--sans); cursor: pointer; }
+.wl-town-tag img { width: 24px; image-rendering: pixelated; }
+.wl-town-tag:hover { background: #2B1A51; color: #F3EFFA; }
+.wl-tear-next { display: block; margin: 22px auto 0; padding: 8px 18px; border: 1.5px solid var(--line); border-radius: 999px; background: none; color: var(--text); font: 600 14px var(--sans); cursor: pointer; }
+.wl-tear-next:hover { background: rgba(255, 255, 255, .1); }
+.wl-book-sec { padding: 48px var(--gutter) 24px; scroll-margin-top: 70px; }
+.wl-filter { display: flex; flex-wrap: wrap; gap: 8px; margin: 18px 0 22px; }
+.wl-filter button { display: inline-flex; align-items: center; gap: 6px; padding: 6px 14px; border: 1.5px solid var(--line); border-radius: 999px; background: none; color: var(--text); font: 600 13px var(--sans); cursor: pointer; }
+.wl-filter button img { width: 18px; image-rendering: pixelated; }
+.wl-filter button.on { background: var(--peach); border-color: var(--peach); color: var(--bg); }
+.wl-recipes { display: grid; grid-template-columns: repeat(auto-fill, minmax(250px, 1fr)); gap: 16px; }
+.wl-rec { display: flex; flex-direction: column; align-items: flex-start; padding: 20px 22px; border-radius: 6px 18px 18px 6px; background: #FFFDF8; color: #2B1A51; box-shadow: inset 6px 0 0 #D85A30, 0 12px 26px rgba(0, 0, 0, .3); }
+.wl-rec h3 { margin: 0 0 6px; font: 600 21px/1.2 var(--serif); }
+.wl-rec p { flex: 1; margin: 0 0 14px; font-size: 14.5px; line-height: 1.55; color: #4A3E68; }
+.wl-cal { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 16px; margin-top: 20px; }
+.wl-cal-m { padding: 0 0 12px; border-radius: 16px; background: #FFFDF8; color: #2B1A51; overflow: hidden; box-shadow: 0 12px 26px rgba(0, 0, 0, .3); }
+.wl-cal-m h3 { margin: 0 0 6px; padding: 10px 16px; background: #D85A30; color: #fff; font: 600 16px var(--sans); text-transform: capitalize; }
+.wl-cal-m.empty h3 { background: #B9B0D6; }
+.wl-cal-h { position: relative; display: flex; gap: 12px; width: 100%; padding: 8px 16px; border: 0; background: none; color: inherit; text-align: left; cursor: pointer; }
+.wl-cal-h:hover { background: #F4F0FA; }
+.wl-cal-h.next { background: #FDEBDD; }
+.wl-cal-d { flex: none; width: 34px; font: 600 26px/1 var(--serif); color: #D85A30; }
+.wl-cal-t b { display: block; font-size: 15px; }
+.wl-cal-t i { display: inline-flex; align-items: center; gap: 6px; margin-top: 3px; font: normal 600 12.5px var(--sans); color: #6B5AA8; }
+.wl-cal-t i img { width: 16px; image-rendering: pixelated; }
+.wl-cal-h em { position: absolute; right: 12px; bottom: 10px; padding: 2px 8px; border-radius: 999px; background: #D85A30; color: #fff; font: normal 700 11px var(--sans); text-transform: uppercase; }
+.wl-cal-none { margin: 4px 16px; color: #B9B0D6; }
+@media (max-width: 1100px) { .wl-cal { grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); } .wl-head { grid-template-columns: 1fr; gap: 28px; } .wl-tear { max-width: 420px; width: 100%; margin: 0 auto; } }
 .wl-sign { margin: 6px 0 22px; font: italic 400 18px var(--serif); color: var(--peach); }
 .wl-jump { display: flex; flex-wrap: wrap; gap: 10px; }
 .wl-jump .pill-btn { text-decoration: none; }
@@ -1185,3 +1221,4 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 .wl-comic:hover { transform: rotate(0) translateY(-6px); color: var(--peach); }
 .wl-comic img { display: block; width: 100%; border-radius: 6px; box-shadow: 0 18px 36px rgba(0, 0, 0, .45); }
 .wl-comic span { display: block; margin-top: 12px; font: 600 17px/1.3 var(--serif); }
+.wl-book-sec .section-title { margin: 6px 0 10px; }

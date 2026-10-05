@@ -7,8 +7,11 @@
     <p class="wl-sign">— Pollija, tavs spalvainais ceļvedis</p>
     <div class="wl-jump">
       <a class="pill-btn" href="#wl-map">🗺 Izpētīt karti</a>
+      <a class="pill-btn" href="#wl-recipes">📖 Recepšu grāmata</a>
+      <a class="pill-btn" href="#wl-cal">📅 Svētku kalendārs</a>
     </div>
   </div>
+  <div class="wl-tear" id="wl-tear" aria-live="polite"></div>
 </section>
 
 <section class="wl-map-sec" id="wl-map">
@@ -46,6 +49,21 @@
 </section>
 
 
+
+<section class="wl-book-sec" id="wl-recipes">
+  <p class="topics">Pollijas recepšu grāmata</p>
+  <h2 class="section-title">Ko ēd Wobbleland</h2>
+  <p class="wl-hint">Visi salas firmas ēdieni un kur tos nobaudīt. Izvēlies pilsētu, lai redzētu tikai tās virtuvi.</p>
+  <div class="wl-filter" id="wl-rec-filter"></div>
+  <div class="wl-recipes" id="wl-rec-list"></div>
+</section>
+
+<section class="wl-book-sec" id="wl-cal">
+  <p class="topics">Wobbleland kalendārs</p>
+  <h2 class="section-title">Visi salas svētki</h2>
+  <p class="wl-hint">Divpadsmit mēneši ļodzīgu svētku. Pieskaries svētkiem, lai apciemotu to pilsētu.</p>
+  <div class="wl-cal" id="wl-cal-grid"></div>
+</section>
 
 <div class="wl-scrim" id="wl-scrim"></div>
 <aside class="wl-panel" id="wl-panel" aria-hidden="true" role="dialog" aria-label="Pilsēta">
