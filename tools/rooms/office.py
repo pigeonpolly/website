@@ -188,19 +188,18 @@ def polly(blink=False):
         d.rectangle((x, 88, x + 1, 98), fill=O); d.line([(x - 3, 100), (x, 98), (x + 5, 100)], fill=O); d.line([(x + 1, 98), (x + 2, 101)], fill=O)
     # клюв — короткий, вниз-вправо
     d.polygon([(cx + 9, 18), (cx + 17, 21), (cx + 9, 25)], fill=O); d.line([(cx + 9, 22), (cx + 15, 22)], fill=Od)
-    # большой глаз: белый овал, огромный зрачок, жёлтое нижнее веко, тяжёлое верхнее веко
-    E = (cx - 6, 8, cx + 8, 28)
-    d.ellipse(E, fill=(255, 255, 255)); d.chord(E, 20, 160, fill=(240, 196, 60))
+    # глаз как в прежней версии: белый овал, жёлтая радужка, зрачок с бликом, спокойное полуприкрытое веко
+    E = (cx - 4, 6, cx + 9, 27)
+    d.ellipse(E, fill=(255, 255, 255))
     if blink:
-        d.ellipse(E, fill=Dd); d.line([(cx - 5, 18), (cx + 7, 18)], fill=(26, 21, 40))
+        d.ellipse(E, fill=Dd); d.line([(cx - 3, 17), (cx + 8, 17)], fill=(26, 21, 40))
     else:
-        d.ellipse((cx - 3, 12, cx + 7, 26), fill=(26, 21, 40)); d.rectangle((cx - 1, 15, cx, 17), fill=(255, 255, 255))
+        d.ellipse((cx + 1, 11, cx + 8, 25), fill=(246, 204, 56)); d.ellipse((cx + 3, 13, cx + 7, 23), fill=(26, 21, 40)); d.rectangle((cx + 4, 14, cx + 5, 15), fill=(255, 255, 255))
         em = Image.new('L', (PW, PH_), 0); _ID.Draw(em).ellipse(E, fill=255)
-        lm = Image.new('L', (PW, PH_), 0); _ID.Draw(lm).rectangle((0, 0, PW, 15), fill=255)
+        lm = Image.new('L', (PW, PH_), 0); _ID.Draw(lm).rectangle((0, 0, PW, 12), fill=255)
         from PIL import ImageChops as _IC
-        im.paste(Image.new('RGBA', (PW, PH_), B + (255,)), (0, 0), _IC.multiply(em, lm))
-        d.line([(cx - 6, 15), (cx + 8, 15)], fill=(26, 21, 40)); d.line([(cx - 5, 16), (cx + 7, 16)], fill=(26, 21, 40))
-        d.line([(cx - 6, 14), (cx - 8, 12)], fill=(26, 21, 40))
+        im.paste(Image.new('RGBA', (PW, PH_), Dd + (255,)), (0, 0), _IC.multiply(em, lm))
+        d.line([(cx - 3, 12), (cx + 8, 12)], fill=(26, 21, 40)); d.line([(cx - 4, 13), (cx + 9, 13)], fill=(26, 21, 40))
     # шарф и бейдж
     d.polygon([(cx - 10, 33), (cx + 10, 32), (cx + 11, 39), (cx - 11, 40)], fill=O); d.line([(cx - 9, 36), (cx + 9, 35)], fill=Od)
     d.polygon([(cx - 7, 39), (cx - 1, 39), (cx - 2, 52), (cx - 8, 51)], fill=O)
