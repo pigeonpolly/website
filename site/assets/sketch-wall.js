@@ -224,7 +224,8 @@
       return;
     }
     const lv = levelOf(me.best || 0);
-    q.innerHTML = `<a class="sw-chip" href="#works">${lv ? medal(lv) : ''}<span>${me.nick ? `<b class="sw-nickname${me.gold ? ' gold' : ''}">@${esc(me.nick)}</b> · 🔥 ${me.current || 0}` : t('nickTitle')}</span></a>`;
+    q.innerHTML = `<a class="sw-chip" href="#works">${lv ? medal(lv) : ''}<span>${me.nick ? `<b class="sw-nickname${me.gold ? ' gold' : ''}">@${esc(me.nick)}</b> · 🔥 ${me.current || 0}` : t('nickTitle')}</span></a><button type="button" class="sw-link sw-out-top">${t('logout')}</button>`;
+    q.querySelector('.sw-out-top').onclick = async () => { await post('logout'); me = null; render(); loadWall(true); };
   }
   async function login(credential) {
     const st = document.getElementById('sw-status');

@@ -1051,3 +1051,5 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 .sw-chip:hover { color: var(--text); background: rgba(255, 255, 255, .14); }
 .sw-chip .sw-medal { width: 36px; height: 36px; box-shadow: 0 0 0 2px #fff; }
 #sw-wall, #works { scroll-margin-top: 84px; }
+.sw-quick { display: inline-flex; align-items: center; gap: 12px; }
+.sw-out-top { font-size: 14px; }
