@@ -1,7 +1,7 @@
 # Набор для пиксельных комнат: слои с контуром, шрифт 3x5, освещение «вечер»
 from PIL import Image, ImageDraw
 import numpy as np, math, json
-W, H = 320, 192
+W, H = 384, 216
 INK = (26, 21, 40)
 def L(c, k=40): return tuple(min(255, v + k) for v in c[:3])
 def D(c, k=40): return tuple(max(0, v - k) for v in c[:3])

@@ -1397,7 +1397,7 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 .rm-hint { margin: 0; color: var(--muted); }
 .rm-time { padding: 10px 20px; border: 0; border-radius: 999px; background: var(--peach); color: var(--bg); font: 700 15px var(--sans); cursor: pointer; }
 .rm-time:hover { filter: brightness(1.08); }
-.rm { position: relative; max-width: 1280px; margin: 0 auto; aspect-ratio: 320 / 192; border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 4px #1A1528, 0 0 0 7px var(--orange), 0 24px 50px rgba(0, 0, 0, .45); user-select: none; }
+.rm { position: relative; max-width: 1280px; margin: 0 auto; aspect-ratio: 384 / 216; border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 4px #1A1528, 0 0 0 7px var(--orange), 0 24px 50px rgba(0, 0, 0, .45); user-select: none; }
 .rm-bg { position: absolute; inset: 0; width: 100%; height: 100%; image-rendering: pixelated; transition: opacity 1.2s ease; pointer-events: none; }
 .rm-bg.night { opacity: 0; }
 .rm.evening .rm-bg.night { opacity: 1; }
@@ -1420,3 +1420,32 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 .rm-paper { position: absolute; width: 4%; aspect-ratio: 3 / 4; background: #fff; box-shadow: 0 0 0 2px #1A1528; pointer-events: none; animation: rm-paper 1.4s ease-out forwards; }
 @keyframes rm-paper { from { transform: translate(0, 0) rotate(0); } to { transform: translate(140%, 160%) rotate(25deg); opacity: .9; } }
 @media (max-width: 640px) { .rm { border-radius: 10px; } .rm-bub span { font-size: 13px; padding: 8px 10px; } .rm-bar { flex-wrap: wrap; } }
+
+/* пасхалки в комнатах */
+.rm-count { margin-left: auto; padding: 8px 14px; border-radius: 999px; background: rgba(255, 255, 255, .08); border: 1px solid var(--line); font: 700 14px var(--sans); color: var(--text); }
+.rm-prop { position: absolute; z-index: 2; height: auto; image-rendering: pixelated; pointer-events: none; transform-origin: 50% 100%; transition: filter 1.2s; }
+.rm.evening .rm-prop { filter: brightness(.7); }
+.rm-prop.drop { animation: rm-drop .35s ease-out; }
+@keyframes rm-drop { from { transform: translateY(-60%); opacity: 0; } }
+.rm-prop.hop { animation: rm-hop .5s ease; }
+.rm-prop.fly { animation: rm-fly 1.5s ease-in forwards; }
+@keyframes rm-fly { 0% { transform: scale(.6) rotate(-10deg); opacity: 0; } 15% { opacity: 1; } 100% { transform: translate(var(--tx), var(--ty)) scale(.5) rotate(15deg); opacity: 0; } }
+.rm-prop.peek { animation: rm-peek .5s ease-out; }
+@keyframes rm-peek { from { transform: translateY(40%); opacity: 0; } }
+.rm-sprite.jitter { animation: rm-jit .12s linear infinite; }
+.rm-sprite.jitter.hop { animation: rm-hop .5s ease, rm-jit .12s linear infinite .5s; }
+@keyframes rm-jit { 25% { transform: translate(-1.5%, .5%); } 75% { transform: translate(1.5%, -.5%); } }
+.rm-badge { position: absolute; z-index: 3; min-width: 2.4%; padding: .2% .5%; background: #D83A3A; color: #fff; font: 800 clamp(9px, 1.1vw, 15px)/1.2 var(--sans); text-align: center; box-shadow: 0 0 0 2px #1A1528; pointer-events: none; animation: rm-pulse 1.2s ease infinite; }
+.rm-badge.zero { display: none; }
+@keyframes rm-pulse { 50% { transform: scale(1.12); } }
+.rm-win { position: absolute; z-index: 6; left: 50%; top: 8%; width: min(460px, 86%); transform: translateX(-50%); background: #E9E6DC; color: #1A1528; box-shadow: 0 0 0 3px #1A1528, 6px 6px 0 3px rgba(26, 21, 40, .4); font: 13px/1.35 var(--sans); }
+.rm-win[hidden] { display: none; }
+.rm-win-t { display: flex; justify-content: space-between; align-items: center; padding: 6px 8px; background: linear-gradient(90deg, #2B3A8C, #5A6EC8); color: #fff; font-weight: 700; }
+.rm-win-t button { width: 22px; height: 20px; border: 0; background: #E9E6DC; box-shadow: inset -2px -2px 0 #9C998E, inset 2px 2px 0 #fff; font: 700 11px var(--sans); cursor: pointer; }
+.rm-win ul { list-style: none; margin: 8px; padding: 0; max-height: min(240px, 40vw); overflow-y: auto; background: #fff; box-shadow: inset 2px 2px 0 #9C998E; }
+.rm-win li { display: grid; grid-template-columns: 34% 1fr; gap: 8px; padding: 5px 8px; border-bottom: 1px solid #E2DFD4; font-weight: 400; }
+.rm-win li.u { font-weight: 700; background: #FFF8DC; }
+.rm-win li b { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.rm-win-b { padding: 0 8px 8px; text-align: right; }
+.rm-win-b button { padding: 5px 12px; border: 0; background: #E9E6DC; box-shadow: inset -2px -2px 0 #9C998E, inset 2px 2px 0 #fff, 0 0 0 1px #1A1528; font: 600 12px var(--sans); cursor: pointer; }
+@media (max-width: 640px) { .rm-count { order: 3; margin-left: 0; } .rm-win { top: 4%; font-size: 11px; } }
