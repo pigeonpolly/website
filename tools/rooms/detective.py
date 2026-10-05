@@ -138,18 +138,28 @@ def titos(blink=False):
     Wt, Ws, R_, S = (232, 232, 244), (190, 192, 214), (150, 40, 52), (130, 36, 44)
     cx = 28
     # стебельки с глазками
-    for sx, ex, ey in ((cx - 5, cx - 13, 2), (cx + 5, cx + 11, 6)):
-        d.line([(sx, 22), (sx + (ex - sx) // 3, 14), (ex, ey + 4)], fill=Gd, width=2)
+    for sx, ex, ey in ((cx - 4, cx - 12, 6), (cx + 4, cx + 10, 9)):
+        d.line([(sx, 28), (sx + (ex - sx) // 3, 20), (ex, ey + 4)], fill=Gd, width=2)
         d.ellipse((ex - 4, ey - 3, ex + 4, ey + 5), fill=(214, 214, 232))
         if not blink: d.rectangle((ex - 1, ey - 1, ex + 1, ey + 3), fill=(40, 34, 52))
         else: d.line([(ex - 3, ey + 1), (ex + 3, ey + 1)], fill=(40, 34, 52))
-    # голова-купол
-    d.ellipse((cx - 13, 18, cx + 13, 46), fill=G); d.ellipse((cx - 10, 36, cx + 10, 48), fill=Gd); d.ellipse((cx - 11, 20, cx + 11, 42), fill=G)
-    d.ellipse((cx - 9, 22, cx - 2, 28), fill=Gl)
-    for x in range(cx - 8, cx + 9, 2): d.line([(x, 37), (x, 39)], fill=(60, 56, 90))
-    d.line([(cx - 9, 38), (cx + 9, 38)], fill=(90, 86, 126))
+    # голова-подушка: небольшая, мягкий скруглённый прямоугольник с чуть «надутыми» боками
+    import math as _m
+    def pillow(x0, y0, x1, y1, bulge):
+        pts = []
+        for t in range(0, 21): u = t / 20; pts.append((x0 + (x1 - x0) * u, y0 - bulge * _m.sin(_m.pi * u)))
+        for t in range(1, 21): u = t / 20; pts.append((x1 + bulge * _m.sin(_m.pi * u), y0 + (y1 - y0) * u))
+        for t in range(1, 21): u = t / 20; pts.append((x1 - (x1 - x0) * u, y1 + bulge * _m.sin(_m.pi * u)))
+        for t in range(1, 20): u = t / 20; pts.append((x0 - bulge * _m.sin(_m.pi * u), y1 - (y1 - y0) * u))
+        return pts
+    d.polygon(pillow(cx - 13, 28, cx + 13, 44, 3), fill=G)
+    d.polygon([(x, y) for x, y in pillow(cx - 13, 28, cx + 13, 44, 3) if y > 41] + [(cx + 13, 41), (cx - 13, 41)], fill=Gd)
+    d.polygon(pillow(cx - 12, 29, cx + 12, 41, 2), fill=G)
+    d.ellipse((cx - 9, 28, cx - 3, 32), fill=Gl)
+    for x in range(cx - 8, cx + 9, 2): d.line([(x, 38), (x, 40)], fill=(60, 56, 90))
+    d.line([(cx - 9, 39), (cx + 9, 39)], fill=(90, 86, 126))
     # щупальца-лапки у подбородка
-    d.line([(cx - 9, 44), (cx - 12, 49), (cx - 10, 51)], fill=Gd, width=2); d.line([(cx + 9, 44), (cx + 12, 49), (cx + 10, 51)], fill=Gd, width=2)
+    d.line([(cx - 8, 45), (cx - 11, 49), (cx - 9, 51)], fill=Gd, width=2); d.line([(cx + 8, 45), (cx + 11, 49), (cx + 9, 51)], fill=Gd, width=2)
     # шея
     d.rectangle((cx - 3, 46, cx + 3, 54), fill=Gd)
     # рубашка: обычные плечи, длинный торс, прямые руки
