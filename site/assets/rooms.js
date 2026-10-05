@@ -113,6 +113,7 @@
     },
   }[room];
   const pick = a => a[Math.floor(Math.random() * a.length)];
+  const API = window.ROOM = { box, R, L, esc, pct: v => v + '%', hero: null, sayAt: null, setEvening: null, place: null, hook: null, coffee: { on: true } };
   const pct = v => v + '%';
   // спрайты
   const SP = {};
@@ -124,11 +125,13 @@
   });
   const who = box.dataset.who, hero = SP[who];
   if (hero) setInterval(() => { hero.src = `/images/rooms/${room}-${who}-blink.png`; setTimeout(() => hero.src = `/images/rooms/${room}-${who}.png`, 160); }, 3800);
+  API.hero = hero;
   // вечер
   const btn = document.getElementById('rm-time');
   const setEvening = on => { box.classList.toggle('evening', on); btn.textContent = on ? btn.dataset.day : btn.dataset.ev; btn.setAttribute('aria-pressed', on); };
   const h = new Date().getHours(); setEvening(h >= 18 || h < 7);
   btn.addEventListener('click', () => setEvening(!box.classList.contains('evening')));
+  API.setEvening = setEvening;
   // облачко
   const bub = document.createElement('div'); bub.className = 'rm-bub'; bub.setAttribute('role', 'status'); box.appendChild(bub);
   let bt;
@@ -148,6 +151,12 @@
     bub.classList.remove('on'); void bub.offsetWidth; bub.classList.add('on');
     clearTimeout(bt); bt = setTimeout(() => bub.classList.remove('on'), 5200);
   };
+  const sayAt = (txt, x, y, ms = 5200) => {
+    bub.innerHTML = `<span>${esc(txt)}</span>`; bub.classList.toggle('below', y < 24);
+    bub.style.left = Math.min(80, Math.max(20, x)) + '%'; bub.style.top = y + '%';
+    bub.classList.remove('on'); void bub.offsetWidth; bub.classList.add('on'); clearTimeout(bt); bt = setTimeout(() => bub.classList.remove('on'), ms);
+  };
+  API.sayAt = sayAt;
   const fx = {
     cooler: () => { const [x, y, w, hh] = R.hot.cooler; for (let i = 0; i < 6; i++) { const b = document.createElement('i'); b.className = 'rm-bubble'; b.style.left = pct(x + w * (.3 + Math.random() * .4)); b.style.top = pct(y + hh * .48); b.style.animationDelay = i * .18 + 's'; box.appendChild(b); setTimeout(() => b.remove(), 2200); } },
     copier: () => { const [x, y] = R.hot.copier; const p = document.createElement('i'); p.className = 'rm-paper'; p.style.left = pct(x + 14); p.style.top = pct(y + 9); box.appendChild(p); setTimeout(() => p.remove(), 1500); },
@@ -164,7 +173,7 @@
     const z = document.createElement('button'); z.type = 'button'; z.className = 'rm-hot'; z.dataset.k = k;
     z.style.left = pct(x); z.style.top = pct(y); z.style.width = pct(w); z.style.height = pct(hh);
     z.setAttribute('aria-label', line(k));
-    z.addEventListener('click', () => { say(k, z); (fx[k] || fx[base]) && (fx[k] || fx[base])(); });
+    z.addEventListener('click', () => { if (API.hook && API.hook(k)) return; say(k, z); (fx[k] || fx[base]) && (fx[k] || fx[base])(); });
     box.appendChild(z);
   });
 
@@ -175,6 +184,7 @@
     const im = document.createElement('img'); im.src = src; im.alt = ''; im.className = 'rm-prop ' + cls;
     im.style.left = pct(x / R.w * 100); im.style.top = pct(y / R.h * 100); im.style.width = pct(w / R.w * 100); box.appendChild(im); return im;
   };
+  API.place = place; API.fx = fx;
   const clicks = {};
   const bump = k => (clicks[k] = (clicks[k] || 0) + 1);
   if (room === 'office') {
@@ -244,7 +254,7 @@
       cups++; counter.textContent = `☕ ${TX.cups[L]}: ${cups}`;
       const t = towers[Math.floor((cups - 1) / 6) % towers.length], n = (cups - 1) % 6;
       place('/images/rooms/prop-cup.png', t[0], t[1] - 8 - n * 6, 9, 'drop');
-      if (hero) { hero.classList.remove('hop'); void hero.offsetWidth; hero.classList.add('hop'); hero.classList.toggle('jitter', cups >= 5); }
+      if (hero) { hero.classList.remove('hop'); void hero.offsetWidth; hero.classList.add('hop'); hero.classList.toggle('jitter', cups >= 5 && API.coffee.on); }
       if (talk) {
         const lines = cups >= 5 ? TX.jit[L] : TX.sip[L];
         bub.innerHTML = `<span>${esc(pick(lines))}</span>`; const [x, y, w] = R.hot.titos; bub.classList.remove('below'); bub.style.left = (x + w / 2) + '%'; bub.style.top = y + '%';
@@ -252,8 +262,9 @@
       }
     };
     counter.textContent = `☕ ${TX.cups[L]}: 0`;
-    setTimeout(function auto() { sip(true); setTimeout(auto, 11000 + Math.random() * 8000); }, 4000);
+    setTimeout(function auto() { if (API.coffee.on) sip(true); setTimeout(auto, 11000 + Math.random() * 8000); }, 4000);
     fx.mug = () => setTimeout(() => sip(true), 900);
+    API.coffee.sip = sip;
     const potZ = document.createElement('button'); potZ.type = 'button'; potZ.className = 'rm-hot'; potZ.setAttribute('aria-label', TX.pot[L]);
     potZ.style.left = pct(298 / R.w * 100); potZ.style.top = pct(100 / R.h * 100); potZ.style.width = pct(14 / R.w * 100); potZ.style.height = pct(14 / R.h * 100);
     potZ.addEventListener('click', () => { pot.classList.remove('hop'); void pot.offsetWidth; pot.classList.add('hop'); bub.innerHTML = `<span>${esc(TX.pot[L])}</span>`; bub.classList.remove('below'); bub.style.left = '80%'; bub.style.top = '44%'; bub.classList.remove('on'); void bub.offsetWidth; bub.classList.add('on'); setTimeout(() => sip(false), 600); });

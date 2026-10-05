@@ -1449,3 +1449,65 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 .rm-win-b { padding: 0 8px 8px; text-align: right; }
 .rm-win-b button { padding: 5px 12px; border: 0; background: #E9E6DC; box-shadow: inset -2px -2px 0 #9C998E, inset 2px 2px 0 #fff, 0 0 0 1px #1A1528; font: 600 12px var(--sans); cursor: pointer; }
 @media (max-width: 640px) { .rm-count { order: 3; margin-left: 0; } .rm-win { top: 4%; font-size: 11px; } }
+
+/* ---------- квесты в комнатах ---------- */
+.rm-bar { flex-wrap: wrap; }
+.q-banner { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; flex: 1 1 100%; order: -1; }
+.q-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.q-tabs button { padding: 7px 14px; border: 1.5px solid var(--line); border-radius: 10px 10px 4px 4px; background: rgba(255, 255, 255, .05); color: var(--muted); font: 700 13px var(--sans); cursor: pointer; }
+.q-tabs button.on { background: #FBF4E2; color: #2B1A51; border-color: #FBF4E2; }
+.q-tabs button:disabled { opacity: .55; cursor: default; }
+.q-stat { font: 700 14px var(--sans); color: var(--text); }
+.q-banner > button { padding: 7px 14px; border: 0; border-radius: 999px; background: var(--peach); color: var(--bg); font: 700 13px var(--sans); cursor: pointer; }
+.q-pockets { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; max-width: 1280px; margin: 12px auto 0; color: var(--muted); font-size: 14px; }
+.q-pockets img { width: 22px; image-rendering: pixelated; }
+.q-pockets button { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border: 1.5px solid var(--line); border-radius: 8px; background: rgba(255, 255, 255, .06); color: var(--text); font: 600 13px var(--sans); cursor: pointer; }
+.q-clue { position: absolute; z-index: 3; padding: 0; border: 0; background: none; cursor: pointer; animation: q-glint 2.4s ease-in-out infinite; }
+.q-clue img { display: block; width: 100%; image-rendering: pixelated; }
+.q-clue[hidden] { display: none; }
+@keyframes q-glint { 50% { filter: drop-shadow(0 0 3px #FFF6B0) brightness(1.15); } }
+.q-modal { position: absolute; inset: 0; z-index: 8; display: flex; align-items: center; justify-content: center; padding: 3%; background: rgba(20, 12, 36, .6); }
+.q-modal[hidden] { display: none; }
+.q-card { position: relative; width: min(620px, 100%); max-height: 100%; overflow-y: auto; padding: 22px 24px; background: #FBF4E2; color: #2B1A51; box-shadow: 0 0 0 3px #1A1528, 8px 8px 0 3px rgba(26, 21, 40, .45); }
+.q-card h3 { margin: 0 0 12px; font: 600 24px/1.2 var(--serif); }
+.q-kick { margin: 0 0 6px; font-size: 12px; letter-spacing: .1em; text-transform: uppercase; color: #B0573A; }
+.q-x { position: absolute; right: 8px; top: 8px; width: 32px; height: 32px; border: 0; background: #2B1A51; color: #fff; font-size: 14px; cursor: pointer; }
+.q-paper { display: flex; gap: 16px; align-items: flex-start; padding: 16px; background: #fff; box-shadow: inset 0 0 0 1px #E3D3AE, 4px 4px 0 #E3D3AE; transform: rotate(-.6deg); }
+.q-paper.photo { background: #F4F1EA; }
+.q-paper img { width: 64px; flex: none; image-rendering: pixelated; }
+.q-paper p { margin: 0; font: 16px/1.6 var(--serif); }
+.q-acts { margin-top: 16px; }
+.q-acts button, .q-sus button { padding: 9px 16px; border: 0; background: #2B1A51; color: #FBF4E2; font: 700 14px var(--sans); cursor: pointer; box-shadow: 3px 3px 0 #B0573A; }
+.q-acts em, .q-sus em { color: #8C6A40; }
+.q-cork { position: relative; height: 300px; background: #C99A64; box-shadow: inset 0 0 0 6px #8E5E36; }
+.q-cork svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.q-cork line { stroke: #C21E2A; stroke-width: .6; }
+.q-slot { position: absolute; display: flex; align-items: center; justify-content: center; width: 22%; min-height: 15%; padding: 6px; border: 2px dashed rgba(255, 255, 255, .6); color: rgba(255, 255, 255, .8); font: 700 20px var(--sans); }
+.q-slot.on { flex-direction: column; gap: 4px; border: 0; background: #FFFDF6; color: #2B1A51; font: 600 12px/1.25 var(--sans); box-shadow: 2px 3px 0 rgba(0, 0, 0, .3); cursor: pointer; transform: rotate(-2deg); }
+.q-slot.on:nth-of-type(2n) { transform: rotate(2deg); }
+.q-slot.on i { position: absolute; top: -4px; width: 8px; height: 8px; border-radius: 50%; background: #D83A3A; }
+.q-slot img { width: 26px; image-rendering: pixelated; }
+.q-sus { margin-top: 14px; display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.q-sus p { flex: 1 1 100%; margin: 0; font: 600 18px var(--serif); }
+.q-sus button { display: inline-flex; align-items: center; gap: 8px; }
+.q-sus button:disabled { opacity: .45; cursor: default; }
+.q-sus img, .q-doss img { width: 40px; image-rendering: pixelated; box-shadow: 0 0 0 2px #2B1A51; }
+.q-doss { display: grid; gap: 12px; }
+.q-doss article { display: grid; grid-template-columns: 64px 1fr; gap: 4px 14px; padding: 12px; background: #E9D9B0; box-shadow: 3px 3px 0 #C9A86A; }
+.q-doss article img { width: 64px; grid-row: span 2; }
+.q-doss h4 { margin: 0; font: 600 16px var(--serif); } .q-doss p { margin: 0; font-size: 14px; line-height: 1.5; }
+.q-verdict { font: 17px/1.6 var(--serif); }
+.q-stamp { display: inline-block; margin: 6px 0 12px; padding: 6px 16px; border: 4px solid #C21E2A; color: #C21E2A; font: 800 28px var(--sans); letter-spacing: .08em; transform: rotate(-6deg); }
+.rm-sprite.q-walk { transition: left 3s linear, opacity 1s 2.4s; left: 54% !important; opacity: 0; }
+.rm-sprite.q-gone { opacity: 0; }
+.rm.q-lightsout .rm-bg.night { filter: brightness(.55); }
+@media (max-width: 640px) { .q-card { padding: 16px; } .q-card h3 { font-size: 19px; } .q-paper p { font-size: 14px; } .q-cork { height: 240px; } .q-slot.on { font-size: 10px; } }
+.q-note { margin: 12px 0 0; padding: 10px 12px; background: #FFF3A6; box-shadow: 2px 2px 0 #E0C860; font: 14px/1.5 var(--sans); transform: rotate(.6deg); }
+.q-h4 { margin: 16px 0 2px; font: 600 18px var(--serif); } .q-small { margin: 0 0 8px; font-size: 13px; color: #6B5AA8; }
+.q-attach { list-style: none; margin: 0; padding: 0; display: grid; gap: 4px; }
+.q-attach li { display: flex; align-items: center; gap: 8px; padding: 6px 10px; border: 1.5px dashed #C9B8E0; color: #9A8CC0; font: 600 13px var(--sans); }
+.q-attach li.on { border: 1.5px solid #2B1A51; background: #fff; color: #2B1A51; }
+.q-attach img { width: 16px; image-rendering: pixelated; }
+.q-ghost { background: none !important; color: #2B1A51 !important; box-shadow: inset 0 0 0 2px #2B1A51 !important; }
+.q-err { min-height: 1.2em; margin: 8px 0 0; color: #C21E2A; font-weight: 700; }
+.rm-sprite.q-dance { animation: rm-hop .5s ease 4; }
