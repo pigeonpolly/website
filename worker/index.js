@@ -181,6 +181,7 @@ async function cleanupInactive(env) {
   const users = (await env.DB.prepare('SELECT u.* FROM users u JOIN posts p ON p.user_id = u.id GROUP BY u.id HAVING MAX(p.day) < ? LIMIT 200').bind(cutoff).all()).results;
   let deletes = 0;
   for (const u of users) {
+    if (await isAdmin(u, env)) continue; // работы Алины не удаляются, пока она сама их не удалит
     const posts = (await env.DB.prepare('SELECT id, day, bw, tod FROM posts WHERE user_id = ?').bind(u.id).all()).results;
     if (deletes + posts.length * 2 > 900) break; // бесплатный лимит KV — 1000 удалений в сутки
     await env.DB.prepare('UPDATE users SET best = ?, badges = ? WHERE id = ?')

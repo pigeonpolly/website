@@ -35,6 +35,9 @@
     saveShare: ['Save to photos or share', 'Сохранить в фото или поделиться', 'Saglabāt foto vai dalīties'],
     downloadFile: ['Download as a file', 'Скачать файлом', 'Lejupielādēt failu'],
     holdHint: ['Or press and hold the picture and choose “Save to Photos”.', 'Или нажмите на картинку и удерживайте → «Сохранить в Фото».', 'Vai turi nospiestu attēlu un izvēlies “Saglabāt attēlu”.'],
+    styleFull: ['Full card', 'Полная карточка', 'Pilna kartīte'],
+    styleMini: ['Just the photo', 'Только фото', 'Tikai foto'],
+    needPhoto: ['Add a photo of your sketch first.', 'Сначала добавьте фото рисунка.', 'Vispirms pievieno skices foto.'],
     locked: ['Opens on this day', 'Откроется в этот день', 'Atvērsies šajā dienā'],
     photo: ['Add a photo of my sketch', 'Добавить фото рисунка', 'Pievienot skices foto'],
     photoChange: ['Change photo', 'Заменить фото', 'Mainīt foto'],
@@ -204,15 +207,27 @@
     shareBtn.textContent = t('share');
     $('#ch-thumb').innerHTML = e && e.img ? `<img src="${e.img}" alt="">` : '';
   }
+  // стиль карточки: полная рамка или только фото с хэштегом, сайтом и Полли в кружке
+  let cardStyle = store.get('ch-card-style', 'full');
+  const styleBox = document.createElement('div');
+  styleBox.className = 'ch-level ch-card-style'; styleBox.setAttribute('role', 'group');
+  styleBox.innerHTML = ['full', 'mini'].map(v => `<button type="button" data-v="${v}" aria-pressed="${v === cardStyle}">${t(v === 'full' ? 'styleFull' : 'styleMini')}</button>`).join('');
+  shareBtn.before(styleBox);
+  styleBox.addEventListener('click', e => {
+    const b = e.target.closest('button'); if (!b) return;
+    cardStyle = b.dataset.v; store.set('ch-card-style', cardStyle);
+    styleBox.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b));
+    $('#ch-card').innerHTML = '';
+  });
   photoBtn.addEventListener('click', () => fileIn.click());
   fileIn.addEventListener('change', () => {
     const f = fileIn.files[0]; if (!f) return;
     const img = new Image();
     img.onload = () => {
-      const s = Math.min(1, 520 / Math.max(img.width, img.height));
+      const s = Math.min(1, 1600 / Math.max(img.width, img.height)); // хватает и для карточки «только фото»
       const c = document.createElement('canvas'); c.width = Math.round(img.width * s); c.height = Math.round(img.height * s);
       c.getContext('2d').drawImage(img, 0, 0, c.width, c.height);
-      diary[selKey] = { done: 1, img: c.toDataURL('image/jpeg', 0.72) };
+      diary[selKey] = { done: 1, img: c.toDataURL('image/jpeg', 0.86) };
       URL.revokeObjectURL(img.src); fileIn.value = '';
       renderToday(); renderDiary();
     };
@@ -316,8 +331,34 @@
     POLLY.forEach((row, y) => [...row].forEach((ch, x) => { if (PC[ch]) { g.fillStyle = PC[ch]; g.fillRect(860 + x * px, 1150 + y * px, px, px); } }));
     return c;
   }
+  async function makeMini() {
+    await (document.fonts ? document.fonts.ready : Promise.resolve());
+    const im = await new Promise(r => { const i = new Image(); i.onload = () => r(i); i.src = diary[selKey].img; });
+    // пропорции фото, но в рамках, которые принимает Instagram (от 1.91:1 до 4:5)
+    const W = 1080, H = Math.max(566, Math.min(1350, Math.round(W * im.height / im.width)));
+    const c = document.createElement('canvas'); c.width = W; c.height = H;
+    const g = c.getContext('2d');
+    const k = Math.max(W / im.width, H / im.height), w = im.width * k, h = im.height * k;
+    g.drawImage(im, (W - w) / 2, (H - h) * 0.35, w, h);
+    // Полли в кружке
+    const R = 62, cx = 40 + R, cy = H - 40 - R;
+    g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.arc(cx + 3, cy + 5, R + 4, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#FFFDF8'; g.beginPath(); g.arc(cx, cy, R + 4, 0, Math.PI * 2); g.fill();
+    g.fillStyle = '#F0A987'; g.beginPath(); g.arc(cx, cy, R - 2, 0, Math.PI * 2); g.fill();
+    const px = 6, ox = cx - 7 * px + 2, oy = cy - 7 * px;
+    POLLY.forEach((row, y) => [...row].forEach((ch, x) => { if (PC[ch]) { g.fillStyle = PC[ch]; g.fillRect(ox + x * px, oy + y * px, px, px); } }));
+    // плашка: хэштег и сайт
+    g.font = '700 34px Karla, sans-serif'; const t1 = '#dailypigeonpolly', w1 = g.measureText(t1).width;
+    g.font = '500 28px Karla, sans-serif'; const t2 = 'pigeonpolly.com', w2 = g.measureText(t2).width;
+    const pw = Math.max(w1, w2) + 52, ph = 96, x0 = cx + R + 18, y0 = cy - ph / 2;
+    g.fillStyle = 'rgba(20,12,40,.72)'; g.beginPath(); g.roundRect ? g.roundRect(x0, y0, pw, ph, 26) : g.rect(x0, y0, pw, ph); g.fill();
+    g.fillStyle = '#FFFFFF'; g.font = '700 34px Karla, sans-serif'; g.fillText(t1, x0 + 26, y0 + 42);
+    g.fillStyle = '#F0A987'; g.font = '500 28px Karla, sans-serif'; g.fillText(t2, x0 + 26, y0 + 78);
+    return c;
+  }
   shareBtn.addEventListener('click', async () => {
-    const c = await makeCard();
+    if (cardStyle === 'mini' && !(diary[selKey] && diary[selKey].img)) { $('#ch-card').innerHTML = `<p>${t('needPhoto')}</p>`; return; }
+    const c = cardStyle === 'mini' ? await makeMini() : await makeCard();
     const name = `dailypigeonpolly-${selKey}.png`;
     const blob = await new Promise(r => c.toBlob(r, 'image/png'));
     const url = URL.createObjectURL(blob);
