@@ -187,6 +187,7 @@
 
   function render(prev) {
     const dz = document.getElementById('sw-danger'); if (dz) dz.innerHTML = '';
+    renderQuick();
     if (!me) return renderSignIn();
     if (me.banned) { app.innerHTML = `<div class="sw-card"><p>${t('banned')}</p></div>`; return; }
     if (!me.nick) return renderNick();
@@ -200,16 +201,37 @@
       <p class="sw-status" id="sw-status"></p></div></div>`;
     const dev = document.getElementById('sw-dev');
     dev && dev.addEventListener('click', () => login('dev:' + (prompt('nick?', 'tester') || 'tester')));
-    const tryGoogle = (n = 0) => {
-      if (!window.google?.accounts?.id) return n < 50 && setTimeout(() => tryGoogle(n + 1), 200);
-      google.accounts.id.initialize({ client_id: cfg.clientId, callback: r => login(r.credential), ux_mode: 'popup' });
-      google.accounts.id.renderButton(document.getElementById('sw-gbtn'), { theme: 'outline', size: 'large', shape: 'pill', text: 'continue_with', locale: ['en', 'ru', 'lv'][L] });
-    };
-    tryGoogle();
+    googleButton(document.getElementById('sw-gbtn'), 'large');
+  }
+  // кнопка Google: одна инициализация, кнопок может быть несколько (внизу и в шапке страницы)
+  let gsiInit = false;
+  function googleButton(el, size, n = 0) {
+    if (!el) return;
+    if (!window.google?.accounts?.id) { if (n < 50) setTimeout(() => googleButton(el, size, n + 1), 200); return; }
+    if (!gsiInit) { google.accounts.id.initialize({ client_id: cfg.clientId, callback: r => login(r.credential), ux_mode: 'popup' }); gsiInit = true; }
+    google.accounts.id.renderButton(el, { theme: 'outline', size, shape: 'pill', text: size === 'large' ? 'continue_with' : 'signin_with', locale: ['en', 'ru', 'lv'][L] });
+  }
+  // шапка челленджа: «Войти» или плашка с ником, уровнем и серией
+  function renderQuick() {
+    const q = document.getElementById('sw-quick');
+    if (!q) return;
+    if (!cfg || !cfg.ready || (me && me.banned)) { q.innerHTML = ''; return; }
+    if (!me) {
+      q.innerHTML = '<span class="sw-quick-g"></span>' + (cfg.dev ? `<button class="pill-btn" type="button" id="sw-dev-top">${t('devLogin')}</button>` : '');
+      googleButton(q.querySelector('.sw-quick-g'), 'medium');
+      const d = document.getElementById('sw-dev-top');
+      d && d.addEventListener('click', () => login('dev:' + (prompt('nick?', 'tester') || 'tester')));
+      return;
+    }
+    const lv = levelOf(me.best || 0);
+    q.innerHTML = `<a class="sw-chip" href="#works">${lv ? medal(lv) : ''}<span>${me.nick ? `<b class="sw-nickname${me.gold ? ' gold' : ''}">@${esc(me.nick)}</b> · 🔥 ${me.current || 0}` : t('nickTitle')}</span></a>`;
   }
   async function login(credential) {
     const st = document.getElementById('sw-status');
-    try { await post('login', { credential }); await refresh(); loadTop(); loadWall(true); }
+    try {
+      await post('login', { credential }); await refresh(); loadTop(); loadWall(true);
+      document.getElementById('works')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
     catch (e) { if (st) st.textContent = e.code === 'banned' ? t('banned') : t('err'); }
   }
 

@@ -1040,6 +1040,14 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 .sw-pv-works span { position: absolute; left: 0; right: 0; bottom: 0; padding: 18px 8px 6px; font-size: 11px; color: #fff; background: linear-gradient(transparent, rgba(20, 12, 40, .8)); }
 .sw-pv-card .sw-empty { color: #6B5AA8; }
 .ch-card-style { margin: 6px 0 10px; flex-wrap: wrap; }
-.ch-news { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 18px 0 0; }
-.ch-news-btn { text-decoration: none; }
-.ch-news span { color: var(--muted); font-size: 14px; }
+.ch-news { display: flex; flex-wrap: wrap; align-items: flex-start; gap: 10px; margin: 20px 0 0; }
+.ch-news-btn { text-decoration: none; padding: 9px 18px; font-size: 15px; }
+.ch-sub { display: inline-flex; flex-direction: column; align-items: center; gap: 3px; }
+.ch-sub small { color: var(--muted); font-size: 12px; }
+@media (max-width: 520px) { .ch-news-btn { padding: 8px 14px; font-size: 14px; } }
+.sw-quick:empty { display: none; }
+.sw-quick-g { display: inline-block; min-height: 40px; vertical-align: middle; }
+.sw-chip { display: inline-flex; align-items: center; gap: 10px; padding: 4px 16px 4px 4px; border-radius: 999px; background: rgba(255, 255, 255, .08); border: 1.5px solid var(--line); color: var(--text); text-decoration: none; font-size: 15px; }
+.sw-chip:hover { color: var(--text); background: rgba(255, 255, 255, .14); }
+.sw-chip .sw-medal { width: 36px; height: 36px; box-shadow: 0 0 0 2px #fff; }
+#sw-wall, #works { scroll-margin-top: 84px; }
