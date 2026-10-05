@@ -19,7 +19,9 @@
     hint: ['Polly’s sticky note: “Letter — yellow binder. Table — cabinet, 2nd drawer. Chart — print on the copier. Receipts — red binder. Form — signed it this morning… and then?”',
            'Стикер Полли: «Письмо — жёлтая папка. Таблица — шкаф, 2-й ящик. График — распечатать на копире. Чеки — красная папка. Бланк — подписала утром… а потом?»',
            'Pollijas lapiņa: “Vēstule — dzeltenā mape. Tabula — skapis, 2. atvilktne. Grafiks — izdrukāt uz kopētāja. Čeki — sarkanā mape. Veidlapa — parakstīju no rīta… un tad?”'],
-    reply: ['Reply', 'Ответ', 'Atbilde'], attach: ['Click the pages in your pockets to attach them in order.', 'Нажимайте на листы в карманах, чтобы прикрепить их по порядку.', 'Spied uz lapām kabatās, lai pievienotu tās secībā.'],
+    reply: ['Reply', 'Ответ', 'Atbilde'], attach: ['Click a found page below to put it into the next empty line. Click an attached line to take the page back.', 'Нажмите на найденный лист ниже — он встанет в следующую пустую строку. Нажмите на прикреплённую строку — лист вернётся обратно.', 'Spied uz atrastās lapas zemāk — tā nostāsies nākamajā tukšajā rindā. Spied uz pievienotās rindas — lapa atgriezīsies atpakaļ.'],
+    foundL: ['Found pages:', 'Найденные листы:', 'Atrastās lapas:'], none: ['No pages found yet. Close the email and search the office: folders, drawers, the copier…', 'Пока не найдено ни одного листа. Закройте письмо и поищите по кабинету: папки, ящики, копир…', 'Vēl nav atrasta neviena lapa. Aizver vēstuli un meklē birojā: mapēs, atvilktnēs, kopētājā…'],
+    allUsed: ['All found pages are attached.', 'Все найденные листы прикреплены.', 'Visas atrastās lapas ir pievienotas.'],
     clear: ['Start over', 'Сначала', 'No sākuma'], send: ['Send ➤', 'Отправить ➤', 'Sūtīt ➤'], wrong: ['The order is wrong. Check the email again.', 'Порядок неправильный. Перечитайте письмо.', 'Secība nav pareiza. Pārlasi vēstuli.'],
     missing: ['Not all five pages are attached yet.', 'Прикреплены ещё не все пять листов.', 'Vēl nav pievienotas visas piecas lapas.'],
     sent: ['Sent! ✅', 'Отправлено! ✅', 'Nosūtīts! ✅'],
@@ -65,10 +67,14 @@
   const close = () => { modal.hidden = true; };
   const openMail = () => {
     st.read = true; save();
-    const slots = [0, 1, 2, 3, 4].map(i => st.order[i] ? `<li class="on"><img src="/images/rooms/prop-page.png" alt="">${esc(t(P[st.order[i]].title))}</li>` : `<li>${i + 1}. …</li>`).join('');
+    const slots = [0, 1, 2, 3, 4].map(i => st.order[i] ? `<li class="on"><button type="button" data-det="${i}"><img src="/images/rooms/prop-page.png" alt="">${esc(t(P[st.order[i]].title))}<span>✕</span></button></li>` : `<li>${i + 1}. …</li>`).join('');
+    const free = ORDER.filter(id => st.found.includes(id) && !st.order.includes(id));
+    const avail = !st.found.length ? `<p class="q-small">${t(UI.none)}</p>` : free.length
+      ? `<div class="q-avail"><span>${t(UI.foundL)}</span>${free.map(id => `<button type="button" data-att="${id}"><img src="/images/rooms/prop-page.png" alt="">${esc(t(P[id].title))}</button>`).join('')}</div>`
+      : `<p class="q-small">✓ ${t(UI.allUsed)}</p>`;
     card(`<p class="q-kick">${esc(t(UI.from))}</p><h3>${esc(t(UI.subj))}</h3><div class="q-paper"><p>${esc(t(UI.body))}</p></div>
       <p class="q-note">📝 ${esc(t(UI.hint))}</p>
-      ${st.sent ? `<p class="q-verdict">${esc(t(UI.thanks))}</p>` : `<h4 class="q-h4">${t(UI.reply)}</h4><p class="q-small">${t(UI.attach)}</p><ol class="q-attach">${slots}</ol>
+      ${st.sent ? `<p class="q-verdict">${esc(t(UI.thanks))}</p>` : `<h4 class="q-h4">${t(UI.reply)}</h4><p class="q-small">${t(UI.attach)}</p>${avail}<ol class="q-attach">${slots}</ol>
       <div class="q-acts"><button type="button" data-q="send">${t(UI.send)}</button> <button type="button" class="q-ghost" data-q="clear">${t(UI.clear)}</button> <button type="button" class="q-ghost" data-q="inbox">${t(UI.other)}</button></div><p class="q-err" id="q-err"></p>`}`);
   };
   const find = id => {
@@ -85,7 +91,8 @@
     return false;
   };
   const click = e => {
-    const q = e.target.closest('[data-q]'), a = e.target.closest('[data-att]');
+    const q = e.target.closest('[data-q]'), a = e.target.closest('[data-att]'), dt = e.target.closest('[data-det]');
+    if (dt) { st.order.splice(+dt.dataset.det, 1); save(); draw(); openMail(); return; }
     if (a) { if (!st.order.includes(a.dataset.att) && st.order.length < 5) { st.order.push(a.dataset.att); save(); draw(); } openMail(); return; }
     if (!q) return;
     const k = q.dataset.q;

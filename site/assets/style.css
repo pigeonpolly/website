@@ -1513,3 +1513,11 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 .rm-sprite.q-dance { animation: rm-hop .5s ease 4; }
 .rm-hot.q-want { animation: q-want 1.6s ease-in-out infinite; }
 @keyframes q-want { 50% { box-shadow: 0 0 0 2px #FFF6B0, 0 0 14px 4px rgba(255, 246, 176, .8); } }
+.q-avail { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 0 0 10px; padding: 10px; background: #EFE6CF; }
+.q-avail > span { flex: 1 1 100%; font: 700 13px var(--sans); color: #6B5AA8; }
+.q-avail button { display: inline-flex; align-items: center; gap: 6px; padding: 7px 12px; border: 0; background: #fff; color: #2B1A51; font: 700 13px var(--sans); box-shadow: 0 0 0 2px #2B1A51, 3px 3px 0 2px #B0573A; cursor: pointer; }
+.q-avail button:hover { transform: translateY(-1px); }
+.q-avail img { width: 14px; image-rendering: pixelated; }
+.q-attach li.on { padding: 0; }
+.q-attach li.on button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 10px; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
+.q-attach li.on button span { margin-left: auto; color: #B0573A; }
