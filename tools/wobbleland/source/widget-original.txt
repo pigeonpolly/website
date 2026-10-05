@@ -1,0 +1,1017 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Wobbleland — The Bestiary of Cities</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;0,9..144,600;0,9..144,700;1,9..144,500&family=Special+Elite&family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --ink:#182A3D;
+    --ink-soft:#3C5064;
+    --parchment:#F4ECD8;
+    --parchment-deep:#E9DCB9;
+    --parchment-line:#D9C89E;
+    --sea:#2C7A85;
+    --sea-deep:#123B45;
+    --moss:#6E8B57;
+    --rust:#9C3D2E;
+    --gold:#C9922E;
+    --gold-bright:#E0A93B;
+    --paper-shadow: 0 18px 40px -18px rgba(18,30,45,0.45);
+    --radius: 14px;
+  }
+  *{box-sizing:border-box;}
+  html,body{margin:0;padding:0;}
+  body{
+    background:
+      radial-gradient(ellipse at top left, rgba(44,122,133,0.18), transparent 55%),
+      radial-gradient(ellipse at bottom right, rgba(156,61,46,0.10), transparent 55%),
+      var(--parchment);
+    color:var(--ink);
+    font-family:'Inter', sans-serif;
+    -webkit-font-smoothing:antialiased;
+  }
+  ::selection{ background: var(--gold-bright); color:var(--ink); }
+
+  a{ color:inherit; }
+
+  .eyebrow{
+    font-family:'Special Elite', monospace;
+    letter-spacing:0.14em;
+    text-transform:uppercase;
+    font-size:11.5px;
+    color:var(--sea-deep);
+    opacity:0.85;
+  }
+
+  /* ---------- Header ---------- */
+  header.site{
+    position:relative;
+    padding:22px clamp(16px,4vw,48px) 14px;
+    border-bottom:1px solid var(--parchment-line);
+    display:flex;
+    align-items:center;
+    justify-content:space-between;
+    gap:16px;
+    flex-wrap:wrap;
+  }
+  .wordmark{
+    display:flex;
+    align-items:baseline;
+    gap:10px;
+  }
+  .wordmark h1{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:clamp(24px,3.6vw,34px);
+    letter-spacing:0.01em;
+    margin:0;
+    color:var(--ink);
+  }
+  .wordmark .tag{
+    font-family:'Special Elite', monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--rust);
+    border:1px solid var(--rust);
+    border-radius:100px;
+    padding:3px 9px;
+    transform:rotate(-2deg);
+    white-space:nowrap;
+  }
+  header.site .subhead{
+    font-family:'Fraunces', serif;
+    font-style:italic;
+    font-size:14.5px;
+    color:var(--ink-soft);
+    max-width:420px;
+    text-align:right;
+  }
+  @media (max-width:720px){
+    header.site .subhead{ display:none; }
+  }
+
+  /* ---------- Hero / Map ---------- */
+  .map-wrap{
+    position:relative;
+    max-width:1180px;
+    margin:26px auto 0;
+    padding:0 clamp(12px,3vw,28px);
+  }
+  .map-frame{
+    position:relative;
+    width:100%;
+    aspect-ratio:1280/928;
+    border-radius:18px;
+    overflow:hidden;
+    box-shadow: var(--paper-shadow);
+    border:1px solid rgba(24,42,61,0.12);
+    background:var(--sea-deep);
+  }
+  .map-frame img.basemap{
+    position:absolute;
+    inset:0;
+    width:100%;
+    height:100%;
+    object-fit:cover;
+    display:block;
+  }
+  .map-caption-card{
+    position:absolute;
+    left:clamp(10px,2.2vw,26px);
+    top:clamp(10px,2.2vw,26px);
+    background:rgba(244,236,216,0.92);
+    backdrop-filter:blur(2px);
+    border:1px solid rgba(24,42,61,0.18);
+    border-radius:10px;
+    padding:12px 16px 13px;
+    max-width:300px;
+    box-shadow:0 10px 22px -12px rgba(18,30,45,0.4);
+  }
+  .map-caption-card h2{
+    font-family:'Fraunces', serif;
+    font-size:15px;
+    margin:2px 0 4px;
+    letter-spacing:0.01em;
+  }
+  .map-caption-card p{
+    font-size:12px;
+    line-height:1.45;
+    margin:0;
+    color:var(--ink-soft);
+  }
+
+  /* pins */
+  .pin{
+    position:absolute;
+    transform:translate(-50%,-100%);
+    display:flex;
+    flex-direction:column;
+    align-items:center;
+    cursor:pointer;
+    border:none;
+    background:none;
+    padding:0;
+    -webkit-tap-highlight-color:transparent;
+  }
+  .pin .dot{
+    width:16px;
+    height:16px;
+    border-radius:50% 50% 50% 0;
+    background:var(--rust);
+    border:2px solid var(--parchment);
+    transform:rotate(-45deg);
+    box-shadow:0 3px 8px -2px rgba(18,30,45,0.6);
+    transition:transform .18s ease, background .18s ease;
+  }
+  .pin:hover .dot, .pin:focus-visible .dot, .pin.active .dot{
+    background:var(--gold-bright);
+    transform:rotate(-45deg) scale(1.18);
+  }
+  .pin .plabel{
+    position:absolute;
+    bottom:calc(100% + 4px);
+    left:50%;
+    transform:translateX(-50%) translateY(4px);
+    font-family:'Special Elite', monospace;
+    font-size:10.5px;
+    letter-spacing:0.04em;
+    white-space:nowrap;
+    background:rgba(24,42,61,0.92);
+    color:var(--parchment);
+    padding:3px 8px;
+    border-radius:5px;
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .15s ease, transform .15s ease;
+  }
+  .pin:hover .plabel, .pin:focus-visible .plabel{
+    opacity:1;
+    transform:translateX(-50%) translateY(0);
+  }
+  .pin:focus-visible .dot{ outline:2px solid var(--gold-bright); outline-offset:2px; }
+
+  /* legend */
+  .legend{
+    position:absolute;
+    right:clamp(10px,2.2vw,20px);
+    bottom:clamp(10px,2.2vw,20px);
+    background:rgba(244,236,216,0.94);
+    border:1px solid rgba(24,42,61,0.18);
+    border-radius:10px;
+    padding:10px 12px;
+    font-size:11px;
+    color:var(--ink-soft);
+    max-width:190px;
+    box-shadow:0 10px 22px -12px rgba(18,30,45,0.4);
+  }
+  .legend summary{
+    font-family:'Special Elite', monospace;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    font-size:10.5px;
+    cursor:pointer;
+    color:var(--ink);
+    outline:none;
+  }
+  .legend ul{ list-style:none; margin:8px 0 0; padding:0; display:grid; gap:5px;}
+  .legend li{ display:flex; align-items:center; gap:7px; }
+  .legend .swatch{ width:13px; text-align:center; font-weight:700; color:var(--rust); flex:none; }
+
+  /* ---------- Index strip ---------- */
+  .index-strip{
+    max-width:1180px;
+    margin:18px auto 0;
+    padding:0 clamp(12px,3vw,28px);
+  }
+  .index-strip .row{
+    display:flex;
+    flex-wrap:wrap;
+    justify-content:center;
+    row-gap:8px;
+    column-gap:8px;
+    padding:4px 2px 16px;
+  }
+  .chip{
+    flex:none;
+    font-family:'Inter',sans-serif;
+    font-weight:600;
+    font-size:12px;
+    color:var(--ink);
+    background:#fff;
+    border:1px solid var(--parchment-line);
+    padding:7px 12px;
+    border-radius:100px;
+    cursor:pointer;
+    transition:background .15s ease, color .15s ease, border-color .15s ease;
+    white-space:nowrap;
+  }
+  @media (max-width:640px){
+    .chip{ font-size:11px; padding:6px 10px; }
+    .chip .crest-icon{ width:16px; height:16px; }
+    .index-strip .row{ justify-content:flex-start; }
+  }
+  .chip .n{
+    font-family:'Special Elite', monospace;
+    font-size:10px;
+    color:var(--rust);
+    margin-right:6px;
+  }
+  .chip{ display:inline-flex; align-items:center; gap:8px; }
+  .chip .crest-icon{
+    width:20px;height:20px;
+    border-radius:4px;
+    object-fit:cover;
+    object-position:top center;
+    flex:none;
+    box-shadow:0 0 0 1px rgba(24,42,61,0.15);
+  }
+  .chip:hover, .chip.active{
+    background:var(--ink);
+    color:var(--parchment);
+    border-color:var(--ink);
+  }
+  .chip:hover .n, .chip.active .n{ color:var(--gold-bright); }
+
+  /* ---------- Intro strip ---------- */
+  .intro{
+    max-width:1180px;
+    margin:8px auto 0;
+    padding:6px clamp(12px,3vw,28px) 4px;
+    display:flex;
+    gap:26px;
+    flex-wrap:wrap;
+    align-items:flex-start;
+    justify-content:space-between;
+  }
+  .intro p{
+    font-family:'Fraunces', serif;
+    font-size:15px;
+    line-height:1.6;
+    color:var(--ink-soft);
+    max-width:620px;
+    margin:6px 0;
+  }
+  .intro .stat{
+    font-family:'Special Elite', monospace;
+    font-size:11px;
+    letter-spacing:0.08em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    border-left:2px solid var(--rust);
+    padding-left:10px;
+  }
+
+  footer.site{
+    max-width:1180px;
+    margin:36px auto 0;
+    padding:16px clamp(12px,3vw,28px) 40px;
+    font-family:'Special Elite', monospace;
+    font-size:10.5px;
+    letter-spacing:0.05em;
+    color:var(--ink-soft);
+    opacity:0.75;
+  }
+
+  /* ---------- Detail panel ---------- */
+  .scrim{
+    position:fixed;
+    inset:0;
+    background:rgba(15,25,36,0.5);
+    opacity:0;
+    pointer-events:none;
+    transition:opacity .25s ease;
+    z-index:40;
+  }
+  .scrim.open{ opacity:1; pointer-events:auto; }
+
+  .panel{
+    position:fixed;
+    top:0;
+    right:0;
+    height:100%;
+    width:min(440px,100%);
+    background:var(--parchment);
+    box-shadow:-18px 0 40px -18px rgba(15,25,36,0.5);
+    transform:translateX(100%);
+    transition:transform .32s cubic-bezier(.2,.8,.2,1);
+    z-index:41;
+    overflow-y:auto;
+    border-left:1px solid var(--parchment-line);
+  }
+  .panel.open{ transform:translateX(0); }
+
+  @media (max-width:720px){
+    .panel{
+      width:100%;
+      height:88%;
+      top:auto;
+      bottom:0;
+      right:0;
+      border-radius:18px 18px 0 0;
+      transform:translateY(100%);
+      border-left:none;
+      border-top:1px solid var(--parchment-line);
+    }
+    .panel.open{ transform:translateY(0); }
+  }
+
+  .panel-close{
+    position:sticky;
+    top:0;
+    z-index:2;
+    display:flex;
+    justify-content:flex-end;
+    padding:12px 12px 0;
+    background:linear-gradient(var(--parchment) 60%, transparent);
+  }
+  .panel-close button{
+    width:34px;height:34px;
+    border-radius:50%;
+    border:1px solid var(--parchment-line);
+    background:#fff;
+    font-size:16px;
+    cursor:pointer;
+    color:var(--ink);
+    line-height:1;
+  }
+  .panel-close button:hover{ background:var(--ink); color:var(--parchment); }
+
+  .panel-hero{
+    padding:0 22px;
+  }
+  .panel-hero img{
+    width:100%;
+    border-radius:12px;
+    display:block;
+    box-shadow:0 14px 28px -16px rgba(15,25,36,0.5);
+  }
+  .panel-hero .imgcap{
+    font-family:'Special Elite', monospace;
+    font-size:10px;
+    letter-spacing:0.06em;
+    text-transform:uppercase;
+    color:var(--ink-soft);
+    opacity:0.7;
+    margin:6px 2px 0;
+  }
+
+  .panel-body{ padding:18px 22px 40px; }
+
+  .entry-no{
+    font-family:'Special Elite', monospace;
+    font-size:11px;
+    letter-spacing:0.12em;
+    color:var(--rust);
+    text-transform:uppercase;
+  }
+  .title-row{
+    display:flex;
+    align-items:flex-start;
+    gap:14px;
+    margin-top:6px;
+  }
+  .crest-badge{
+    flex:none;
+    width:64px;
+    height:76px;
+    border-radius:8px;
+    overflow:hidden;
+    box-shadow:0 8px 18px -8px rgba(15,25,36,0.55), 0 0 0 1px rgba(24,42,61,0.15);
+    background:var(--parchment-deep);
+    margin-top:2px;
+  }
+  .crest-badge img{
+    width:100%;
+    height:100%;
+    object-fit:cover;
+  }
+  .title-row .titles{ min-width:0; }
+  .panel-body h2{
+    font-family:'Fraunces', serif;
+    font-weight:700;
+    font-size:28px;
+    margin:2px 0 10px;
+    line-height:1.08;
+  }
+  .motto{
+    display:inline-block;
+    font-family:'Special Elite', monospace;
+    font-size:12px;
+    letter-spacing:0.04em;
+    background:#fff;
+    border:1.5px solid var(--ink);
+    border-radius:4px;
+    padding:6px 12px;
+    transform:rotate(-2deg);
+    margin-bottom:16px;
+  }
+  .motto::before{ content:"“ "; }
+  .motto::after{ content:" ”"; }
+
+  .desc{
+    font-family:'Fraunces', serif;
+    font-size:15.5px;
+    line-height:1.65;
+    color:var(--ink);
+    margin:0 0 22px;
+  }
+
+  .section-title{
+    font-family:'Special Elite', monospace;
+    font-size:11.5px;
+    letter-spacing:0.12em;
+    text-transform:uppercase;
+    color:var(--sea-deep);
+    display:flex;
+    align-items:center;
+    gap:8px;
+    margin:24px 0 12px;
+  }
+  .section-title::after{
+    content:"";
+    flex:1;
+    height:1px;
+    background:var(--parchment-line);
+  }
+
+  .holiday{
+    display:grid;
+    grid-template-columns:78px 1fr;
+    gap:12px;
+    padding:10px 0;
+    border-bottom:1px dashed var(--parchment-line);
+  }
+  .holiday:last-child{ border-bottom:none; }
+  .holiday .date{
+    font-family:'Special Elite', monospace;
+    font-size:11px;
+    color:var(--rust);
+    line-height:1.4;
+  }
+  .holiday .htitle{
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:13.5px;
+    margin:0 0 3px;
+  }
+  .holiday .hdesc{
+    font-size:13px;
+    line-height:1.5;
+    color:var(--ink-soft);
+    margin:0;
+  }
+
+  .dish{
+    background:#fff;
+    border:1px solid var(--parchment-line);
+    border-radius:10px;
+    padding:12px 14px;
+    margin-bottom:10px;
+  }
+  .dish .dname{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:14.5px;
+    margin:0 0 4px;
+  }
+  .dish .ddesc{
+    font-size:13px;
+    line-height:1.5;
+    color:var(--ink-soft);
+    margin:0;
+  }
+
+  .streets{ margin:0; padding:0; list-style:none; display:grid; gap:12px; }
+  .streets li .sname{
+    font-family:'Inter',sans-serif;
+    font-weight:700;
+    font-size:13.5px;
+  }
+  .streets li .sdesc{
+    font-size:13px;
+    line-height:1.5;
+    color:var(--ink-soft);
+    margin:3px 0 0;
+  }
+
+  .residents{ margin:0; padding:0; list-style:none; display:grid; gap:10px; }
+  .residents li{
+    background:var(--parchment-deep);
+    border-radius:10px;
+    padding:10px 13px;
+  }
+  .residents .rname{
+    font-family:'Fraunces', serif;
+    font-weight:600;
+    font-size:14px;
+  }
+  .residents .raddr{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin:3px 0 0;
+    line-height:1.5;
+  }
+  .residents .raddr b{ color:var(--ink); font-weight:600; }
+
+  .neighbors{
+    font-size:12.5px;
+    color:var(--ink-soft);
+    margin-top:26px;
+    padding-top:14px;
+    border-top:1px solid var(--parchment-line);
+  }
+  .neighbors b{ color:var(--ink); }
+
+  @media (prefers-reduced-motion: reduce){
+    .panel, .scrim, .pin .dot, .pin .plabel{ transition:none !important; }
+  }
+</style>
+</head>
+<body>
+
+<header class="site">
+  <div class="wordmark">
+    <h1>Wobbleland</h1>
+    <span class="tag">Bestiary of Cities</span>
+  </div>
+  <div class="subhead">A field guide for travelers, collectors, and the mildly curious.</div>
+</header>
+
+<div class="index-strip">
+  <div class="row" id="chipRow"></div>
+</div>
+
+<div class="map-wrap">
+  <div class="map-frame" id="mapFrame">
+    <img class="basemap" src="DATAURI" alt="Illustrated watercolor map of Wobbleland, an archipelago of eleven towns around the Ripple Tickle Sea">
+
+    <div class="map-caption-card">
+      <div class="eyebrow">Ripple Tickle Sea</div>
+      <h2>Eleven towns, one wobble.</h2>
+      <p>Tap a pin — or a name above the map — to open its page in the Bestiary.</p>
+    </div>
+
+    <details class="legend">
+      <summary>Map key</summary>
+      <ul>
+        <li><span class="swatch">Ⓟ</span> Police</li>
+        <li><span class="swatch">▲</span> Gas station</li>
+        <li><span class="swatch">✛</span> Hospital</li>
+        <li><span class="swatch">●</span> Main station</li>
+        <li><span class="swatch">—</span> Railway</li>
+        <li><span class="swatch">≈</span> River / lake</li>
+        <li><span class="swatch">▦</span> House / building</li>
+        <li><span class="swatch">Apt.</span> High-rise</li>
+      </ul>
+    </details>
+
+    <!-- pins injected by JS -->
+  </div>
+</div>
+
+<div class="intro">
+  <p>The Council of Cities meets in <b>New Wobbleton</b>, the capital, but every town on the map keeps its own motto, its own festivals, and its own idea of a good meal. Start anywhere — the ferries and the one red railway line eventually connect them all.</p>
+  <div class="stat">11 towns<br>+ 1 department you'd rather not visit</div>
+</div>
+
+<footer class="site">Wobbleland — an original watercolor universe. Click any town to open its Bestiary entry.</footer>
+
+<div class="scrim" id="scrim"></div>
+<aside class="panel" id="panel" aria-hidden="true">
+  <div class="panel-close"><button id="panelClose" aria-label="Close">✕</button></div>
+  <div class="panel-hero">
+    <img id="panelImg" src="" alt="">
+    <div class="imgcap" id="panelImgCap"></div>
+  </div>
+  <div class="panel-body" id="panelBody"></div>
+</aside>
+
+<script>
+const IMAGES = {
+  overview: "DATAURI",
+  newwobbleton: "DATAURI",
+  maplewink: "DATAURI",
+  snailhollow: "DATAURI",
+  pinecrust: "DATAURI",
+  lemonvale: "DATAURI",
+  buttonspire: "DATAURI",
+  noodleford: "DATAURI",
+  jamshire: "DATAURI",
+  cheddarford: "DATAURI",
+  kettleford: "DATAURI",
+  department: "DATAURI"
+};
+
+const CRESTS = {
+  newwobbleton: "DATAURI",
+  maplewink: "DATAURI",
+  snailhollow: "DATAURI",
+  pinecrust: "DATAURI",
+  lemonvale: "DATAURI",
+  buttonspire: "DATAURI",
+  noodleford: "DATAURI",
+  jamshire: "DATAURI",
+  cheddarford: "DATAURI",
+  kettleford: "DATAURI",
+  department: "DATAURI"
+};
+
+const CITIES = [
+{
+  key:"newwobbleton", no:"01", name:"New Wobbleton", mapLabel:null,
+  coords:{left:41.5, top:33},
+  motto:"Steady in the Wobble",
+  desc:"Capital of Wobbleland, where the Council of Cities meets and the Seagull Guardians keep watch. Home to a fragment of the Great Cauldron and the island's main train hub. Known for its clock towers and endless arguments over the syrup tax.",
+  holidays:[
+    {date:"Mar 12", title:"The Great Wobble Day", desc:"Giant swaying platforms are built on Seagull Square; residents compete to stand longest holding a cup of coffee for the title of \"Wobble Master\"; seagulls march the main street and get bread treats."},
+    {date:"Dec 31", title:"New Year", desc:"Taverns serve gooseberry wine; seagulls take places of honor at the tables; children share sweet pies with the birds by the bonfires."}
+  ],
+  dishes:[
+    {name:"Clocktower Stew", desc:"Meat-and-vegetable stew slow-cooked and served in small pots with clock-shaped lids."},
+    {name:"Seagull's Bite Pastry", desc:"Fish-and-lemon pastries so fragrant that seagulls try to steal them."}
+  ],
+  streets:[
+    {name:"Seagull Square", desc:"The main square, where all city life converges."},
+    {name:"Yesterday's Tomorrow Street", desc:"Home to the club of messenger hens."},
+    {name:"Falling Up Rock Street", desc:"Site of the 24-hour fuel station."}
+  ],
+  residents:[
+    {name:"Pigeon Polly", home:"Yesterday's Tomorrow Street 5", work:"Yesterday's Tomorrow Street 11"},
+    {name:"Mr. Chew", home:"Yesterday's Tomorrow Street 4", note:"Originally from Snailhollow, Mossy Shell Lane 3."}
+  ],
+  neighbors:"Sits between LemonVale and Snailhollow, across the Ripple Tickle Sea from Noodleford."
+},
+{
+  key:"maplewink", no:"02", name:"Maplewink", mapLabel:"Mapplewink on the map",
+  coords:{left:89, top:59},
+  motto:"Life's Better with Syrup",
+  desc:"A maple-syrup town where mornings begin with a wink over a cup of maple coffee. Its economy runs on maple syrup and small craft workshops. Famous for its golden-leaf autumn season and deep reverence for bees, whose honey syrup is prized as highly as maple.",
+  holidays:[
+    {date:"Mar 3", title:"Hivekeeper's Eve", desc:"Residents leave wax candles by the beehives to thank the bees; a gift of homemade honey cookies is considered a blessing for the year."},
+    {date:"Sep 17", title:"The Great Wink Day", desc:"Everyone winks at their neighbor over maple coffee; a \"Winking Marathon\" is held; free syrup of unusual flavors is poured; evening street concerts."},
+    {date:"Oct 21", title:"The Fall of Leaves Festival", desc:"Leaf fights, a contest for the pancake that looks most like a fallen leaf, and a giant pancake filling the main square, drenched in syrup."},
+    {date:"Dec 25", title:"Amber Night", desc:"The city is lit with amber lamps; residents drink hot mead and syrup drinks and tell tales of giant bees."}
+  ],
+  dishes:[
+    {name:"Maple-Soaked Pancakes", desc:"Fluffy pancakes served swimming in maple syrup."}
+  ],
+  streets:[
+    {name:"Pancake Lane", desc:"Morning-breakfast and evening-pancake street with live music."},
+    {name:"Golden Sap Square", desc:"Central square hosting the syrup fairs."}
+  ],
+  residents:[],
+  neighbors:"East of Noodleford and the Syrup Factory, at the far edge of the sea."
+},
+{
+  key:"snailhollow", no:"03", name:"Snailhollow", mapLabel:null,
+  coords:{left:14.5, top:29},
+  motto:"Better Late than Faster",
+  desc:"A slow-paced, moss-covered town where nothing is ever rushed; snails of every size roam the streets, some large enough for children to ride. Home to Mr. Chu and Detective Titos.",
+  holidays:[
+    {date:"Jun 1", title:"Slowstep Festival", desc:"Residents compete to walk the length of a street as slowly as possible without stopping; herbalists and bakers offer honeyed snail teas; children decorate snails with ribbons for a parade."}
+  ],
+  dishes:[
+    {name:"Mossy Tea", desc:"Mild, faintly sweet herbal tea with mint and forest moss."},
+    {name:"Slow-Baked Honey Bread", desc:"Bread baked for a full day, moist and sweet with honey."}
+  ],
+  streets:[
+    {name:"Mossy Shell Lane", desc:"Green, moss-covered lane where local snails parade."},
+    {name:"Slowstep Street", desc:"Street where even the lamps are lit unhurriedly."}
+  ],
+  residents:[
+    {name:"Detective Titos", home:"Slowtep Street 5", work:"Snailhollow Police Department"}
+  ],
+  neighbors:"Wraps around Mossy Lake, just north of New Wobbleton and Jamshire."
+},
+{
+  key:"pinecrust", no:"04", name:"Pinecrust", mapLabel:null,
+  coords:{left:44, top:83},
+  motto:"Crisp Outside, Warm Inside",
+  desc:"A forest bakery town smelling of pine and fresh pastry, famous for its crisp nut-crust pies and its Festival of Pies Under the Pines.",
+  holidays:[
+    {date:"Aug 30", title:"Festival of Pies Under the Pines", desc:"Long tables of pies fill the streets; tradition is to give the first slice to a neighbor or stranger; pie-shaped lanterns are lit at dusk."},
+    {date:"Sep 28", title:"Day of Squirrel Bakers", desc:"Children dress as squirrels and \"baked nuts\"; a contest for the best nut pie, winner gets a golden pinecone; legend says squirrels help bake that day."},
+    {date:"Dec 15", title:"Festival of Warm Ovens", desc:"Bakers compete to keep their pastries hot the longest; residents bring mittens to warm their hands; the evening ends with communal tea and icing-decorated pastries."}
+  ],
+  dishes:[
+    {name:"Pine Nut Pie", desc:"Nut pie with an extra-crisp crust."},
+    {name:"Forest Brew", desc:"Tea made from young pine needles and forest berries."},
+    {name:"Crispy Squirrel Loaf", desc:"Nut-heavy bread, a nod to the squirrel-baker legend."}
+  ],
+  streets:[
+    {name:"Nutmeg Hollow Road", desc:"Smells of fresh pastry and pine forest."},
+    {name:"Pinecone Alley", desc:"Where children hold pinecone fights."},
+    {name:"Crisp Crust Street", desc:"Street of bakeries and pie shops."}
+  ],
+  residents:[],
+  neighbors:"Tucked into the Nut Forest, south of Cheddarford and west of Kettleford."
+},
+{
+  key:"lemonvale", no:"05", name:"LemonVale", mapLabel:null,
+  coords:{left:58, top:16},
+  motto:"Squeeze the Day!",
+  desc:"A fertile valley built entirely around lemons — used in soups, pies, candles, and decoration; the old local currency was called \"wedges.\" Famously hospitable; no traveler leaves hungry.",
+  holidays:[
+    {date:"Mar 22", title:"Festival of Lemon Drops", desc:"Lemon-drop candies are handed out on the square; children play \"Catch the Wedge\"; adults boil syrup."},
+    {date:"Sep 30", title:"Festival of Lemon Lights", desc:"The city is decorated with candied lemon-peel garlands; a contest for \"sourest lemon.\""},
+    {date:"Oct 31", title:"Lantern Lemon Night", desc:"Residents craft lanterns out of lemons; children go door to door for lemon pastries; families gather to tell spooky stories around the citrus lanterns."}
+  ],
+  dishes:[
+    {name:"Vale Zest Bread", desc:"Fragrant bread with candied lemon-peel bits."},
+    {name:"Lemon Spark Ale", desc:"Sparkling drink of fermented lemon juice with herbs."}
+  ],
+  streets:[
+    {name:"Zest Cellar Road", desc:"Stores candied lemon zest."},
+    {name:"Sourstone Alley", desc:"Walls said to be soaked in lemon scent."}
+  ],
+  residents:[],
+  neighbors:"The bright yellow valley between New Wobbleton and Buttonspire."
+},
+{
+  key:"buttonspire", no:"06", name:"Buttonspire", mapLabel:null,
+  coords:{left:83, top:15},
+  motto:"Stitched Together, Forever",
+  desc:"A town built around a tower studded with buttons, a symbol of prosperity since its founding. Losing a button means good luck; finding one means a new friend.",
+  holidays:[
+    {date:"May 27", title:"Festival of the Lost Button", desc:"Residents wear clothes with deliberately mismatched buttons all day; in the evening they trade found buttons; the brighter the button, the more luck it brings."}
+  ],
+  dishes:[
+    {name:"Button Stew", desc:"Hearty vegetable stew with button-shaped bread dumplings."},
+    {name:"Threaded Pie", desc:"Sweet pie with a lattice crust resembling stitched thread."}
+  ],
+  streets:[
+    {name:"Copper Button Alley", desc:"Lane of button craftsmen."},
+    {name:"Patchwork Square", desc:"Main square, named for its patchwork-style paving."}
+  ],
+  residents:[],
+  neighbors:"Below the Mountains of Buttons, just west of the Department of Reflection on the Deed."
+},
+{
+  key:"noodleford", no:"07", name:"Noodleford", mapLabel:null,
+  coords:{left:80, top:41},
+  motto:"Slurp Loud, Live Long",
+  desc:"A noodle-obsessed town of steaming windows and lantern-strung dried noodles. Home to hundreds of noodle-house varieties; even weddings and funerals have their own noodle dishes.",
+  holidays:[
+    {date:"Apr 3", title:"Tanglefork Parade", desc:"Giant figures made of noodles and sauce are paraded through the streets; residents throw fried noodles at each other like confetti."},
+    {date:"Nov 5", title:"Golden Broth Week", desc:"Every street brews its own signature broth — mushroom, meat, vegetable, or spicy."}
+  ],
+  dishes:[
+    {name:"Brothmoon Soup", desc:"Clear night broth with onion and egg."},
+    {name:"Spicy Slurp Noodles", desc:"Noodles in spicy sauce, impossible to eat quietly."},
+    {name:"Sweet Sesame Tangles", desc:"Sweet noodles with sesame and honey."}
+  ],
+  streets:[
+    {name:"Brothpot Lane", desc:"Street of broth-pot cooks."},
+    {name:"Chopstick Street", desc:"—"},
+    {name:"Slurpsound Road", desc:"—"},
+    {name:"Tanglefork Square", desc:"Hosts the main festival."}
+  ],
+  residents:[],
+  neighbors:"Between Buttonspire, Kettleford, and Maplewink — the crossroads of the eastern isles."
+},
+{
+  key:"jamshire", no:"08", name:"Jamshire", mapLabel:null,
+  coords:{left:5.5, top:49},
+  motto:"Spread the Sweetness",
+  desc:"A jam-obsessed region where every household has a cellar of preserves, from strawberry to rhubarb-rose. \"Having tea\" locally means \"gathering for a jar.\"",
+  holidays:[
+    {date:"Jun 10", title:"Festival of Sticky Fingers", desc:"Children race to eat jam without a spoon; adults brew winter blends with cinnamon, clove, and orange."},
+    {date:"Jul 7", title:"Jam Jamboree", desc:"A massive communal jam-making session on the main square using fruit brought by every resident."},
+    {date:"Oct 1", title:"Festival of Inkberries", desc:"Residents gather ink-berries to make ink and jam, then write short poems on leaves hung from the trees."}
+  ],
+  dishes:[
+    {name:"Jamshire Layer Cake", desc:"Layered cake with a different jam flavor in each layer."},
+    {name:"Hot Berry Cider", desc:"Warm cider made from apples and jam syrups."},
+    {name:"Morning Jam Porridge", desc:"Classic breakfast porridge topped with jam."}
+  ],
+  streets:[
+    {name:"Strawberry Spoon Street", desc:"Main pedestrian street, lined with tea houses."},
+    {name:"Raspberry Ripple Road", desc:"Jam is made with patterns swirled right in the jar."},
+    {name:"Apricot Glow Avenue", desc:"Smells of warm apricot jam in the evenings."},
+    {name:"Jelly Jar Square", desc:"Hosts the main festival."}
+  ],
+  residents:[],
+  neighbors:"Beside the Berry Fields, just south of Snailhollow and north of Cheddarford."
+},
+{
+  key:"cheddarford", no:"09", name:"Cheddarford", mapLabel:null,
+  coords:{left:24, top:61},
+  motto:"Sharp Minds, Sharper Cheddar",
+  desc:"A river valley devoted to cheese, with caves used as natural aging cellars. Bridges are carved with wheel-of-cheese motifs.",
+  holidays:[
+    {date:"Jan 5", title:"Golden Grid Night", desc:"Festive waffles with a golden cheese crust are baked; tradition is to count waffle squares instead of stars."},
+    {date:"Feb 14", title:"Bride & Bond Day", desc:"Townsfolk braid a giant cheese braid for luck; couples exchange small cheese braids tied with red ribbon and hide wish-notes inside."},
+    {date:"Nov 8", title:"Aged Day", desc:"Each family opens its oldest wheel of cheese; elders tell stories; \"Century Secret\" pies hide different cheeses inside; the young give the old \"wisdom braids.\""},
+    {date:"Dec 7", title:"Golden Melt Festival", desc:"Everyone dips bread, vegetables, or fruit into melted cheese; a contest for the longest cheese-string pull; the evening ends with \"Melted Steps\" dancing."}
+  ],
+  dishes:[
+    {name:"Cheddar Soup Bowl", desc:"Thick soup served in a bread bowl with melted cheese."},
+    {name:"River Crust Pie", desc:"Pie with potato, onion, and melted cheddar."},
+    {name:"Mature Ale", desc:"Amber ale aged in the cheese caves."},
+    {name:"Melted Bread Rolls", desc:"Cheese-filled breakfast rolls."},
+    {name:"Smoked Cheese Braids", desc:"The town's signature dish."},
+    {name:"Sweet Cheese-and-Honey Braids", desc:"Symbolize \"sweet love.\""}
+  ],
+  streets:[
+    {name:"Melted Wheel Road", desc:"Street of cheesemakers."},
+    {name:"Golden Melt Square", desc:"Site of the main festivals."}
+  ],
+  residents:[],
+  neighbors:"Straddles the river between Jamshire and Pinecrust."
+},
+{
+  key:"kettleford", no:"10", name:"Kettleford", mapLabel:null,
+  coords:{left:65, top:57},
+  motto:"Brewing Joy, Hour by Hour",
+  desc:"A town centered on tea and coffee culture, with a giant copper samovar and coffee cezve at its main square. Every household keeps at least three kettles and a copper cezve \"just in case.\"",
+  holidays:[
+    {date:"Feb 25", title:"Great Whistle Day", desc:"The whole town boils its kettles at once; the louder the collective whistle, the luckier the year."},
+    {date:"Dec 30", title:"Winter Brew Eve", desc:"The town's main winter holiday — residents brew one giant communal pot of spiced tea for anyone who stops by."}
+  ],
+  dishes:[
+    {name:"Copper Roast Coffee", desc:"Strong black coffee roasted and brewed only in copper cezves."},
+    {name:"Honey Kettle Cakes", desc:"Small honey cakes made for tea time."},
+    {name:"Spiced Brew Duo", desc:"Spiced apple-cider drink with a shot of espresso and tea infusion."}
+  ],
+  streets:[
+    {name:"Copper Steam Street", desc:"Home to samovar workshops and coffee roasters."},
+    {name:"Chamomile & Bean Court", desc:"Quiet spot for evening tea and coffee."},
+    {name:"Kettleclock Avenue", desc:"Its tower releases steam every hour to announce fresh brewing time."}
+  ],
+  residents:[
+    {name:"The Pumpkin Family", home:"Kettleford Square 11"}
+  ],
+  neighbors:"South of Noodleford, across the water from Pinecrust and Maplewink."
+},
+{
+  key:"department", no:"11", name:"Department of Reflection on the Deed", mapLabel:null,
+  coords:{left:94, top:10},
+  motto:"No Truth, No Exit",
+  desc:"A lone stone building on the road between Buttonspire and Noodleford, half prison, half filing office. Wrongdoers serve their sentence writing endless reflections until a confession finally rings true.",
+  holidays:[
+    {date:"Apr 1", title:"Confession Day", desc:"Any inmate who writes a genuinely honest (or genuinely funny) confession gets a shot at early release; outside, islanders mail in mock \"confessions\" for their smallest sins, just for the joke of it."}
+  ],
+  dishes:[
+    {name:"Regret Stew", desc:"A plain grey stew that locals swear tastes better the more honest you've been that day."},
+    {name:"Ink-Black Tea", desc:"Bitter, strong tea served to those writing long into the night."}
+  ],
+  streets:[
+    {name:"The Confession Hall", desc:"Main room where sentences are read aloud."},
+    {name:"The Ink Room", desc:"Where inmates write."},
+    {name:"The Long Corridor", desc:"Cells on either side."},
+    {name:"The Release Gate", desc:"The only door out."}
+  ],
+  residents:[],
+  neighbors:"Wedged on the road between Buttonspire and Noodleford — best visited briefly."
+}
+];
+
+const mapFrame = document.getElementById('mapFrame');
+const chipRow = document.getElementById('chipRow');
+const panel = document.getElementById('panel');
+const scrim = document.getElementById('scrim');
+const panelBody = document.getElementById('panelBody');
+const panelImg = document.getElementById('panelImg');
+const panelImgCap = document.getElementById('panelImgCap');
+
+CITIES.forEach(c=>{
+  const pin = document.createElement('button');
+  pin.className = 'pin';
+  pin.style.left = c.coords.left + '%';
+  pin.style.top = c.coords.top + '%';
+  pin.setAttribute('aria-label', 'Open ' + c.name);
+  pin.dataset.key = c.key;
+  pin.innerHTML = '<span class="plabel">'+c.name+'</span><span class="dot"></span>';
+  pin.addEventListener('click', ()=>openCity(c.key));
+  mapFrame.appendChild(pin);
+
+  const chip = document.createElement('button');
+  chip.className = 'chip';
+  chip.dataset.key = c.key;
+  chip.innerHTML = '<img class="crest-icon" src="'+CRESTS[c.key]+'" alt=""><span class="n">'+c.no+'</span>'+c.name;
+  chip.addEventListener('click', ()=>openCity(c.key));
+  chipRow.appendChild(chip);
+});
+
+function sectionHoliday(h){
+  return '<div class="holiday"><div class="date">'+h.date+'</div><div><p class="htitle">'+h.title+'</p><p class="hdesc">'+h.desc+'</p></div></div>';
+}
+function sectionDish(d){
+  return '<div class="dish"><p class="dname">'+d.name+'</p><p class="ddesc">'+d.desc+'</p></div>';
+}
+function sectionStreet(s){
+  return '<li><div class="sname">'+s.name+'</div>'+(s.desc && s.desc !== '—' ? '<div class="sdesc">'+s.desc+'</div>' : '')+'</li>';
+}
+function sectionResident(r){
+  let addr = '';
+  if(r.home) addr += '<b>Home:</b> '+r.home+'. ';
+  if(r.work) addr += '<b>Work:</b> '+r.work+'. ';
+  if(r.note) addr += r.note;
+  return '<li><div class="rname">'+r.name+'</div><div class="raddr">'+addr+'</div></li>';
+}
+
+function openCity(key){
+  const c = CITIES.find(x=>x.key===key);
+  if(!c) return;
+
+  document.querySelectorAll('.pin').forEach(p=>p.classList.toggle('active', p.dataset.key===key));
+  document.querySelectorAll('.chip').forEach(p=>p.classList.toggle('active', p.dataset.key===key));
+
+  panelImg.src = IMAGES[c.key];
+  panelImg.alt = c.name + ' — detail from the Wobbleland map';
+  panelImgCap.textContent = 'Entry No. ' + c.no + (c.mapLabel ? ' · labeled "'+c.mapLabel+'"' : '');
+
+  let html = '';
+  html += '<div class="title-row">';
+  html += '<div class="crest-badge"><img src="'+CRESTS[c.key]+'" alt="Crest of '+c.name+'"></div>';
+  html += '<div class="titles">';
+  html += '<div class="entry-no">Bestiary Entry No. '+c.no+'</div>';
+  html += '<h2>'+c.name+'</h2>';
+  html += '</div></div>';
+  html += '<div class="motto">'+c.motto+'</div>';
+  html += '<p class="desc">'+c.desc+'</p>';
+
+  if(c.holidays.length){
+    html += '<div class="section-title">Local holidays</div>';
+    html += c.holidays.map(sectionHoliday).join('');
+  }
+  if(c.dishes.length){
+    html += '<div class="section-title">Signature dishes</div>';
+    html += c.dishes.map(sectionDish).join('');
+  }
+  if(c.streets.length){
+    html += '<div class="section-title">Streets &amp; landmarks</div>';
+    html += '<ul class="streets">' + c.streets.map(sectionStreet).join('') + '</ul>';
+  }
+  if(c.residents.length){
+    html += '<div class="section-title">Notable residents</div>';
+    html += '<ul class="residents">' + c.residents.map(sectionResident).join('') + '</ul>';
+  }
+  html += '<div class="neighbors">'+c.neighbors+'</div>';
+
+  panelBody.innerHTML = html;
+  panel.classList.add('open');
+  panel.setAttribute('aria-hidden','false');
+  scrim.classList.add('open');
+  panelBody.parentElement.scrollTop = 0;
+}
+
+function closePanel(){
+  panel.classList.remove('open');
+  panel.setAttribute('aria-hidden','true');
+  scrim.classList.remove('open');
+  document.querySelectorAll('.pin').forEach(p=>p.classList.remove('active'));
+  document.querySelectorAll('.chip').forEach(p=>p.classList.remove('active'));
+}
+
+document.getElementById('panelClose').addEventListener('click', closePanel);
+scrim.addEventListener('click', closePanel);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closePanel(); });
+</script>
+</body>
+</html>

@@ -1,10 +1,11 @@
+import os
 from PIL import Image, ImageDraw
 import numpy as np, random, json, math
 from collections import deque
 exec(open('anno.py').read())
 W, H = 1280, 928
 G = 640  # сетка рельефа: считаем на 640 и увеличиваем ×2 (рельеф крупным пикселем, детали — мелким)
-src = Image.open('../wl/map.jpg').convert('RGB')
+src = Image.open(os.path.join(os.path.dirname(__file__), 'source/map.jpg')).convert('RGB')
 sm = np.asarray(src.resize((G, int(G * H / W)), Image.BOX)).astype(float) / 255
 GH = sm.shape[0]
 r, g, b = sm[..., 0], sm[..., 1], sm[..., 2]
