@@ -37,6 +37,10 @@ PAGES = [
     ("art-portfolio/halloween", "Pumpkin Family", "halloween.html", "Welcome to the Pumpkin-Heads family."),
     ("art-portfolio/ai-art", "AI Art", "ai-art.html", "AI art based on the Pigeon Polly traditional art style."),
     ("privacy", "Privacy", "privacy.html", "How pigeonpolly.com handles your data."),
+    ("polly-office", "Polly, Office Clerk", "polly-office.html",
+     "Polly's pixel office: old blinds, a water cooler and a desk you can click. Switch to evening and watch the light change."),
+    ("detective-office", "Detective Titos", "detective-office.html",
+     "Detective Titos' pixel office: boxes of cases, a board of clues and red string. Click anything and switch to the evening shift."),
     ("wobbleland", "Wobbleland", "wobbleland.html",
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
@@ -66,7 +70,7 @@ SOCIAL = [
 NAV = [
     ("challenge", "Daily Challenge"),
     ("e-books", "E-Books"),
-    ("wobbleland", "Wobbleland"),
+    ("fantasy", "Fantasy World", [("wobbleland", "Wobbleland"), ("polly-office", "Polly Office Clerk"), ("detective-office", "Detective Titos")]),
     ("art-portfolio", "Art Portfolio", PORTFOLIO),
     ("learning", "Learning & AI", [("projects", "Projects"), ("work-with-me", "Work with me")]),
     ("on-walls-and-pages", "On Walls & Pages"),
@@ -350,7 +354,14 @@ def wobbleland_data():
             + json.dumps(data, ensure_ascii=False) + ";\n")
 
 
+def rooms_data():
+    """Зоны для клика и спрайты комнат (tools/rooms/*.json — пишут office.py и detective.py) → site/assets/rooms-data.js."""
+    data = {p.stem: json.loads(p.read_text()) for p in sorted((ROOT / "tools" / "rooms").glob("*.json"))}
+    (OUT / "assets" / "rooms-data.js").write_text("// Сгенерировано build.py из tools/rooms/*.json\nwindow.ROOMS = " + json.dumps(data) + ";\n")
+
+
 def build():
+    rooms_data()
     wobbleland_data()
     layout = (SRC / "layout.html").read_text()
     for path, title, file, desc in PAGES:
