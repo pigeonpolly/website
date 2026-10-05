@@ -156,8 +156,8 @@ def titos(blink=False):
     d.polygon([(x, y) for x, y in pillow(cx - 13, 28, cx + 13, 44, 3) if y > 41] + [(cx + 13, 41), (cx - 13, 41)], fill=Gd)
     d.polygon(pillow(cx - 12, 29, cx + 12, 41, 2), fill=G)
     d.ellipse((cx - 9, 28, cx - 3, 32), fill=Gl)
-    for x in range(cx - 8, cx + 9, 2): d.line([(x, 38), (x, 40)], fill=(60, 56, 90))
-    d.line([(cx - 9, 39), (cx + 9, 39)], fill=(90, 86, 126))
+    # простой рот: короткая мягкая улыбка
+    d.line([(cx - 3, 37), (cx - 2, 38), (cx + 2, 38), (cx + 3, 37)], fill=(60, 56, 90))
     # щупальца-лапки у подбородка
     d.line([(cx - 8, 45), (cx - 11, 49), (cx - 9, 51)], fill=Gd, width=2); d.line([(cx + 8, 45), (cx + 11, 49), (cx + 9, 51)], fill=Gd, width=2)
     # шея
