@@ -260,13 +260,37 @@
     Object.values(MP.squares).forEach(q => lbl(q.name, q.at, 0, 'sq'));
     Object.values(MP.streets).forEach(q => lbl(q.name, q.at.slice(0, 2), q.at[2], 'st'));
     const who = {};
+    const SAY = {
+      polly: [['Coo! Welcome to Wobbleland. Mind the seagulls, they bite pastries.', 'Hello! I’m off to the office. Number 11, it’s just down the street.', 'Have you had coffee yet? I’ve had three.'],
+              ['Курлык! Добро пожаловать в Wobbleland. Осторожно с чайками, они кусают пирожки.', 'Привет! Бегу в офис, дом 11, тут рядом.', 'Вы уже пили кофе? Я уже три чашки.'],
+              ['Kū! Laipni lūdzam Wobbleland. Uzmanies no kaijām, tās kož pīrādziņos.', 'Sveiks! Skrienu uz biroju, 11. māja, tepat blakus.', 'Vai jau dzēri kafiju? Es jau trīs tases.']],
+      chew: [['Good day! Mail’s on its way. Slowly, but it’s on its way.', 'Hello, neighbour. Polly lives right next door, don’t tell her I said hi.', 'No rush. There’s never any rush.'],
+             ['Добрый день! Почта уже в пути. Медленно, но в пути.', 'Здравствуйте, соседи! Полли живёт прямо за стенкой.', 'Не торопитесь. Торопиться некуда.'],
+             ['Labdien! Pasts jau ceļā. Lēnām, bet ceļā.', 'Sveiki, kaimiņi! Pollija dzīvo tepat aiz sienas.', 'Nesteidzies. Nav kur steigties.']],
+      titos: [['Detective Titos. Lovely day for a little investigation.', 'Evening. Seen anything suspicious? Anything at all?', 'Every clue counts. Even crumbs.'],
+              ['Детектив Титос. Отличный день для небольшого расследования.', 'Добрый вечер. Ничего подозрительного не видели? Совсем ничего?', 'Важна каждая улика. Даже крошки.'],
+              ['Detektīvs Titoss. Lieliska diena nelielai izmeklēšanai.', 'Labvakar. Neko aizdomīgu neesi redzējis? Pilnīgi neko?', 'Svarīga ir katra pierādījuma druska. Pat drupačas.']],
+      pumpkin: [['Hello from the Pumpkin Family! The kettle’s always on.', 'Come in, come in! Mind the step, it squeaks.', 'We waved at you from the window. Did you see?'],
+                ['Привет от семьи Тыквиных! У нас чайник всегда горячий.', 'Заходите, заходите! Осторожно, ступенька скрипит.', 'Мы помахали вам из окна. Заметили?'],
+                ['Sveiciens no Ķirbju ģimenes! Mūsu tējkanna vienmēr ir karsta.', 'Nāc iekšā, nāc! Uzmanīgi, pakāpiens čīkst.', 'Mēs tev pamājām pa logu. Pamanīji?']],
+    };
+    let bub = null, bubT;
+    const say = (el, k, name) => {
+      if (bub) bub.remove();
+      const list = SAY[k][L], line = list[Math.floor(Math.random() * list.length)];
+      bub = document.createElement('div'); bub.className = 'wl-say';
+      bub.style.left = el.style.left; bub.style.top = el.style.top;
+      bub.innerHTML = `<span>${name ? `<b>${esc(name)}</b>` : ''}${esc(line)}</span>`;
+      stage.appendChild(bub);
+      clearTimeout(bubT); bubT = setTimeout(() => { bub && bub.remove(); bub = null; }, 5000);
+    };
     MP.chars.forEach(ch => {
       const city = C.find(c => c.key === ch.city), r = city && city.residents[ch.ri];
       const el = document.createElement('button');
       el.type = 'button'; el.className = 'wl-char'; el.style.left = ch.at[0] + '%'; el.style.top = ch.at[1] + '%';
       el.title = r ? r.name : ''; el.setAttribute('aria-label', el.title);
       el.innerHTML = `<img src="/images/wobbleland/ch-${ch.who}.png" alt="">`;
-      el.addEventListener('click', e => { e.stopPropagation(); openCity(ch.city); });
+      el.addEventListener('click', e => { e.stopPropagation(); say(el, ch.who, r ? r.name : ''); });
       stage.appendChild(el);
       if (r) who[ch.street + '|' + ch.no] = r.name;
     });
@@ -305,7 +329,10 @@
   const TT = {
     today: ['Today!', 'Сегодня!', 'Šodien!'],
     inDays: [n => n === 1 ? 'Tomorrow' : `In ${n} days`, n => n === 1 ? 'Завтра' : `Через ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'день' : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20)) ? 'дня' : 'дней'}`, n => n === 1 ? 'Rīt' : `Pēc ${n} dienām`],
-    next: ['Tear off · next holiday', 'Оторвать · следующий праздник', 'Noplēst · nākamie svētki'],
+    prevH: ['Previous holiday', 'Предыдущий праздник', 'Iepriekšējie svētki'], nextH: ['Next holiday', 'Следующий праздник', 'Nākamie svētki'],
+    todayBtn: ['Today', 'Сегодня', 'Šodien'],
+    noHol: ['No holidays this month — a perfectly quiet month on the island.', 'В этом месяце праздников нет — на острове тихо.', 'Šomēnes svētku nav — salā valda klusums.'],
+    monthHol: ['Holidays this month', 'Праздники месяца', 'Šī mēneša svētki'],
     nextLabel: ['Next holiday in Wobbleland', 'Ближайший праздник в Wobbleland', 'Tuvākie svētki Wobbleland'],
     all: ['All towns', 'Все города', 'Visas pilsētas'],
     upcoming: ['coming up', 'скоро', 'drīz'],
@@ -325,11 +352,11 @@
   let ti = 0;
   const renderTear = (anim) => {
     if (!tear) return;
-    const u = upcoming[ti % upcoming.length], h = u.h;
+    const n = upcoming.length, u = upcoming[((ti % n) + n) % n], h = u.h;
     const month = u.date.toLocaleDateString(LOC, { month: 'long' });
     tear.innerHTML = `<p class="wl-tear-label">${tt('nextLabel')}</p>
-      <div class="tearpad">${anim ? '<div class="page old" aria-hidden="true"></div>' : ''}
-        <div class="page">
+      <div class="tearpad">${anim === 'fwd' ? '<div class="page old" aria-hidden="true"></div>' : ''}
+        <div class="page${anim === 'back' ? ' wl-back-in' : ''}">
           <div class="page-top"><span>${esc(month)}</span></div>
           <div class="page-day">${u.date.getDate()}</div>
           <div class="page-weekday">${u.n === 0 ? tt('today') : tt('inDays', u.n)}</div>
@@ -338,28 +365,57 @@
           <button type="button" class="wl-town-tag" data-key="${h.c.key}"><img src="${img('crest', h.c.key)}" alt="">${esc(h.c.short || h.c.name)}</button>
         </div>
       </div>
-      <button type="button" class="wl-tear-next">${tt('next')} ✂</button>`;
+      <div class="wl-tear-nav">
+        <button type="button" class="wl-tn-prev" aria-label="${tt('prevH')}"${ti <= 0 ? ' disabled' : ''}>‹</button>
+        <button type="button" class="wl-tn-today"${ti === 0 ? ' disabled' : ''}>${tt('todayBtn')}</button>
+        <button type="button" class="wl-tn-next" aria-label="${tt('nextH')}">›</button>
+      </div>`;
+    if (anim === 'fwd') { const old = tear.querySelector('.page.old'); old.innerHTML = tear.dataset.prev || ''; }
     tear.querySelector('.wl-town-tag').addEventListener('click', () => openCity(h.c.key));
-    tear.querySelector('.wl-tear-next').addEventListener('click', () => { ti++; renderTear(true); });
+    tear.querySelector('.wl-tn-next').addEventListener('click', () => { tear.dataset.prev = tear.querySelector('.page:not(.old)').innerHTML; ti++; renderTear('fwd'); });
+    tear.querySelector('.wl-tn-prev').addEventListener('click', () => { if (ti > 0) { ti--; renderTear('back'); } });
+    tear.querySelector('.wl-tn-today').addEventListener('click', () => { if (ti !== 0) { ti = 0; renderTear('back'); } });
   };
   renderTear(false);
 
   const calBox = document.getElementById('wl-cal-grid');
   if (calBox) {
-    const next = upcoming[0].h;
-    let html = '';
-    for (let m = 1; m <= 12; m++) {
-      const list = HOL.filter(h => h.m === m);
-      const name = new Date(2026, m - 1, 1).toLocaleDateString(LOC, { month: 'long' });
-      html += `<div class="wl-cal-m${list.length ? '' : ' empty'}"><h3>${esc(name)}</h3>${list.length ? list.map(h => `
-        <button type="button" class="wl-cal-h${h === next ? ' next' : ''}" data-key="${h.c.key}">
-          <span class="wl-cal-d">${h.d}</span>
-          <span class="wl-cal-t"><b>${esc(h.title)}</b><i><img src="${img('crest', h.c.key)}" alt="">${esc(h.c.short || h.c.name)}</i></span>
-          ${h === next ? `<em>${tt('upcoming')}</em>` : ''}
-        </button>`).join('') : '<p class="wl-cal-none">—</p>'}</div>`;
-    }
-    calBox.innerHTML = html;
-    calBox.addEventListener('click', e => { const b = e.target.closest('.wl-cal-h'); if (b) openCity(b.dataset.key); });
+    let cm = today.getMonth(), sel = null;
+    const dows = [...Array(7)].map((_, i) => new Date(2024, 0, 1 + i).toLocaleDateString(LOC, { weekday: 'short' }));
+    const draw = () => {
+      const y = today.getFullYear(), first = new Date(y, cm, 1), days = new Date(y, cm + 1, 0).getDate();
+      const lead = (first.getDay() + 6) % 7;
+      const list = HOL.filter(h => h.m === cm + 1);
+      let cells = dows.map(d => `<div class="wl-cg-dow">${esc(d)}</div>`).join('');
+      for (let i = 0; i < lead; i++) cells += '<div class="wl-cg-day empty"></div>';
+      for (let d = 1; d <= days; d++) {
+        const hs = list.filter(h => h.d === d), isT = cm === today.getMonth() && d === today.getDate();
+        cells += `<button type="button" class="wl-cg-day${hs.length ? ' hol' : ''}${isT ? ' today' : ''}${sel === d ? ' sel' : ''}" data-d="${d}"${hs.length ? '' : ' tabindex="-1"'}>
+          <b>${d}</b>${hs.map(h => `<img src="${img('crest', h.c.key)}" alt="${esc(h.c.name)}" title="${esc(h.title)}">`).join('')}</button>`;
+      }
+      const shown = sel ? list.filter(h => h.d === sel) : list;
+      const month = first.toLocaleDateString(LOC, { month: 'long' });
+      calBox.innerHTML = `<div class="wl-cg">
+          <div class="wl-cg-nav"><button type="button" data-m="-1" aria-label="‹">‹</button><span>${esc(month)}</span><button type="button" data-m="1" aria-label="›">›</button>
+            <button type="button" class="wl-cg-today">${tt('todayBtn')}</button></div>
+          <div class="wl-cg-grid">${cells}</div>
+        </div>
+        <div class="wl-cg-side">
+          <p class="wl-cg-kick">${tt('monthHol')} · ${esc(month)}</p>
+          ${shown.length ? shown.map(h => `<article class="wl-cg-h">
+            <div class="wl-cg-date"><b>${h.d}</b><span>${esc(month.slice(0, 3))}</span></div>
+            <div><h3>${esc(h.title)}</h3><p>${esc(h.desc)}</p>
+            <button type="button" class="wl-town-tag" data-key="${h.c.key}"><img src="${img('crest', h.c.key)}" alt="">${esc(h.c.short || h.c.name)}</button></div>
+          </article>`).join('') : `<p class="wl-cg-none">${tt('noHol')}</p>`}
+        </div>`;
+    };
+    calBox.addEventListener('click', e => {
+      const m = e.target.closest('[data-m]'); if (m) { cm = (cm + +m.dataset.m + 12) % 12; sel = null; draw(); return; }
+      if (e.target.closest('.wl-cg-today')) { cm = today.getMonth(); sel = null; draw(); return; }
+      const t = e.target.closest('.wl-town-tag'); if (t) { openCity(t.dataset.key); return; }
+      const d = e.target.closest('.wl-cg-day.hol'); if (d) { sel = sel === +d.dataset.d ? null : +d.dataset.d; draw(); }
+    });
+    draw();
   }
 
   // ---------- книга рецептов: разворот, перелистывание, закладки-города ----------
