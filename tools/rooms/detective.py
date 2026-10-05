@@ -132,7 +132,7 @@ from PIL import ImageDraw as _ID
 def titos(blink=False):
     # человек с головой улитки (по картине Алины): голова-купол на тонкой шее, два длинных стебелька с глазками,
     # маленькие щупальца-лапки у подбородка, строчка ресниц; рубашка с пышными рукавами, бордовые подтяжки и галстук
-    PW, PH_ = 56, 112
+    PW, PH_ = 56, 134
     im = Image.new('RGBA', (PW, PH_), (0, 0, 0, 0)); d = _ID.Draw(im)
     G, Gd, Gl = (150, 150, 198), (112, 110, 162), (186, 186, 224)
     Wt, Ws, R_, S = (232, 232, 244), (190, 192, 214), (150, 40, 52), (130, 36, 44)
@@ -152,25 +152,25 @@ def titos(blink=False):
     d.line([(cx - 9, 44), (cx - 12, 49), (cx - 10, 51)], fill=Gd, width=2); d.line([(cx + 9, 44), (cx + 12, 49), (cx + 10, 51)], fill=Gd, width=2)
     # шея
     d.rectangle((cx - 3, 46, cx + 3, 54), fill=Gd)
-    # рубашка: узкий торс, покатые плечи, пышные рукава отдельно от торса
-    d.polygon([(cx - 11, 57), (cx - 6, 54), (cx + 6, 54), (cx + 11, 57), (cx + 9, 88), (cx - 9, 88)], fill=Wt)
-    d.polygon([(cx + 4, 55), (cx + 11, 57), (cx + 9, 88), (cx + 4, 88)], fill=Ws)
+    # рубашка: обычные плечи, длинный торс, прямые руки
+    d.polygon([(cx - 11, 58), (cx - 6, 54), (cx + 6, 54), (cx + 11, 58), (cx + 10, 100), (cx - 10, 100)], fill=Wt)
+    d.polygon([(cx + 4, 55), (cx + 11, 58), (cx + 10, 100), (cx + 4, 100)], fill=Ws)
     d.polygon([(cx - 6, 52), (cx, 58), (cx - 4, 62), (cx - 9, 56)], fill=Wt); d.polygon([(cx + 6, 52), (cx, 58), (cx + 4, 62), (cx + 9, 56)], fill=Ws)
-    d.polygon([(cx - 2, 58), (cx + 2, 58), (cx + 3, 80), (cx, 84), (cx - 3, 80)], fill=R_)
-    d.line([(cx - 7, 56), (cx - 6, 88)], fill=S, width=2); d.line([(cx + 7, 56), (cx + 6, 88)], fill=S, width=2)
+    d.polygon([(cx - 2, 58), (cx + 2, 58), (cx + 3, 88), (cx, 92), (cx - 3, 88)], fill=R_)
+    d.line([(cx - 7, 56), (cx - 7, 100)], fill=S, width=2); d.line([(cx + 7, 56), (cx + 7, 100)], fill=S, width=2)
     for sgn in (-1, 1):
-        ax = cx + sgn * 15
-        d.ellipse((ax - 5, 56, ax + 5, 72), fill=Wt if sgn < 0 else Ws); d.line([(ax - 3, 64), (ax + 3, 66)], fill=Ws if sgn < 0 else (170, 172, 198))
-        d.rectangle((ax - 2, 70, ax + 2, 82), fill=Wt if sgn < 0 else Ws); d.line([(ax - 3, 80), (ax + 3, 80)], fill=Ws)
-        d.ellipse((ax - 3, 81, ax + 3, 89), fill=G)
+        sx_ = cx + sgn * 11
+        d.polygon([(sx_, 58), (sx_ + sgn * 4, 60), (sx_ + sgn * 5, 92), (sx_ + sgn * 1, 92)], fill=Wt if sgn < 0 else Ws)
+        d.line([(sx_ + sgn * 1, 80), (sx_ + sgn * 5, 80)], fill=Ws if sgn < 0 else (170, 172, 198))
+        d.ellipse((sx_ + (sgn * 5 if sgn < 0 else 0) - (0 if sgn < 0 else 0), 91, sx_ + (0 if sgn < 0 else sgn * 5), 98), fill=G)
     # брюки, ботинки
-    d.rectangle((cx - 12, 88, cx + 12, 92), fill=(54, 50, 70))
-    d.rectangle((cx - 11, 92, cx - 2, 104), fill=(60, 66, 100)); d.rectangle((cx + 2, 92, cx + 11, 104), fill=(60, 66, 100))
-    d.rectangle((cx - 13, 104, cx - 1, 107), fill=(30, 26, 36)); d.rectangle((cx + 1, 104, cx + 13, 107), fill=(30, 26, 36))
+    d.rectangle((cx - 10, 100, cx + 10, 104), fill=(54, 50, 70))
+    d.rectangle((cx - 9, 104, cx - 1, 126), fill=(60, 66, 100)); d.rectangle((cx + 1, 104, cx + 9, 126), fill=(60, 66, 100)); d.line([(cx + 6, 106), (cx + 6, 124)], fill=(48, 52, 82))
+    d.rectangle((cx - 11, 126, cx - 1, 129), fill=(30, 26, 36)); d.rectangle((cx + 1, 126, cx + 11, 129), fill=(30, 26, 36))
     a = _np.asarray(im).copy(); m = a[..., 3] > 0; pp = _np.pad(m, 1)
     nb = pp[:-2, 1:-1] | pp[2:, 1:-1] | pp[1:-1, :-2] | pp[1:-1, 2:]; a[nb & ~m] = INK + (255,)
     return Image.fromarray(a, 'RGBA')
 titos().save(f'{OUT}/detective-titos.png'); titos(True).save(f'{OUT}/detective-titos-blink.png')
-hot('titos', (94, 102, 152, 212))
-json.dump({'w': W, 'h': H, 'hot': HOT, 'sprites': {'titos': [94, 100, 56]}}, open(os.path.join(os.path.dirname(__file__), 'detective.json'), 'w'))
+hot('titos', (94, 78, 152, 212))
+json.dump({'w': W, 'h': H, 'hot': HOT, 'sprites': {'titos': [94, 80, 56]}}, open(os.path.join(os.path.dirname(__file__), 'detective.json'), 'w'))
 print('ok', len(HOT))

@@ -172,7 +172,7 @@ def polly(blink=False):
     im = Image.new('RGBA', (PW, PH_), (0, 0, 0, 0)); d = _ID.Draw(im)
     B, Dd, Lt = (92, 100, 190), (64, 68, 142), (132, 142, 222)
     O, Od = (244, 170, 50), (206, 120, 30)
-    prof = [(3, 0), (5, 6), (8, 9), (12, 11), (18, 11), (24, 10), (30, 9), (36, 10), (44, 13), (52, 16), (60, 19), (68, 20), (76, 19), (82, 16), (86, 11), (89, 5)]
+    prof = [(3, 0), (5, 6), (8, 9), (12, 10), (20, 10), (28, 9), (36, 9), (42, 10), (48, 12), (56, 16), (64, 19), (72, 20), (78, 19), (84, 15), (88, 9), (90, 3)]
     def hw(y):
         for (y0, w0), (y1, w1) in zip(prof, prof[1:]):
             if y0 <= y <= y1: return w0 + (w1 - w0) * (y - y0) / max(1, y1 - y0)
@@ -205,9 +205,15 @@ def polly(blink=False):
     d.polygon([(cx - 10, 33), (cx + 10, 32), (cx + 11, 39), (cx - 11, 40)], fill=O); d.line([(cx - 9, 36), (cx + 9, 35)], fill=Od)
     d.polygon([(cx - 7, 39), (cx - 1, 39), (cx - 2, 52), (cx - 8, 51)], fill=O)
     d.line([(cx + 4, 39), (cx + 7, 52)], fill=(60, 120, 200)); d.rectangle((cx + 5, 52, cx + 10, 58), fill=(250, 246, 230)); d.rectangle((cx + 6, 53, cx + 9, 54), fill=(60, 120, 200))
-    # крыло-рука с «пальцами»
-    d.polygon([(cx - 14, 46), (cx - 6, 46), (cx - 4, 70), (cx - 10, 76), (cx - 17, 72)], fill=Dd)
-    for fx_ in (-15, -12, -9): d.line([(cx + fx_, 74), (cx + fx_ + 1, 80)], fill=Dd, width=2)
+    # руки-крылья с контуром: задняя висит вдоль тела, передняя согнута и держит стаканчик кофе
+    K = (26, 21, 40)
+    d.polygon([(cx + 13, 50), (cx + 17, 54), (cx + 20, 72), (cx + 18, 78), (cx + 15, 76), (cx + 14, 60)], fill=Dd, outline=K)
+    for fx_ in (15, 17, 19): d.line([(cx + fx_, 76), (cx + fx_, 81)], fill=K)
+    d.polygon([(cx - 9, 46), (cx - 3, 46), (cx - 4, 58), (cx - 11, 66), (cx - 14, 62), (cx - 12, 52)], fill=Dd, outline=K)
+    d.polygon([(cx - 13, 60), (cx - 9, 66), (cx + 4, 64), (cx + 5, 60), (cx - 6, 58)], fill=Dd, outline=K)
+    # стаканчик с кофе в руке
+    d.polygon([(cx + 3, 52), (cx + 11, 52), (cx + 10, 64), (cx + 4, 64)], fill=(250, 248, 240), outline=K); d.rectangle((cx + 4, 56, cx + 10, 59), fill=(176, 110, 60)); d.rectangle((cx + 2, 50, cx + 12, 52), fill=(240, 240, 236), outline=K)
+    for fy in (59, 62): d.line([(cx + 3, fy), (cx + 7, fy)], fill=K)
     a = _np.asarray(im).copy(); m = a[..., 3] > 0; pp = _np.pad(m, 1)
     nb = pp[:-2, 1:-1] | pp[2:, 1:-1] | pp[1:-1, :-2] | pp[1:-1, 2:]; a[nb & ~m] = INK + (255,)
     return Image.fromarray(a, 'RGBA')
