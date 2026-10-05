@@ -362,21 +362,65 @@
     calBox.addEventListener('click', e => { const b = e.target.closest('.wl-cal-h'); if (b) openCity(b.dataset.key); });
   }
 
-  const recBox = document.getElementById('wl-rec-list'), recF = document.getElementById('wl-rec-filter');
-  if (recBox) {
-    let only = '';
-    const draw = () => {
-      recBox.innerHTML = C.filter(c => !only || c.key === only).flatMap(c => c.dishes.map(f => `
-        <article class="wl-rec">
-          <h3>${esc(f.name)}</h3>
-          <p>${esc(f.desc)}</p>
-          <button type="button" class="wl-town-tag" data-key="${c.key}"><img src="${img('crest', c.key)}" alt="">${esc(c.short || c.name)}</button>
-        </article>`)).join('');
-      recF.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.k === only));
+  // ---------- книга рецептов: разворот, перелистывание, закладки-города ----------
+  const book = document.getElementById('wl-book'), recF = document.getElementById('wl-rec-filter');
+  if (book) {
+    const TB = {
+      no: ['Recipe No.', 'Рецепт №', 'Recepte Nr.'], from: ['Signature dish of', 'Фирменное блюдо города', 'Pilsētas firmas ēdiens:'],
+      prev: ['Previous page', 'Предыдущая страница', 'Iepriekšējā lapa'], next: ['Next page', 'Следующая страница', 'Nākamā lapa'],
+      open: ['Open the town', 'Открыть город', 'Atvērt pilsētu'], of: ['of', 'из', 'no'],
     };
-    recF.innerHTML = `<button type="button" data-k="">${tt('all')}</button>` + C.map(c => `<button type="button" data-k="${c.key}"><img src="${img('crest', c.key)}" alt="">${esc(c.short || c.name)}</button>`).join('');
-    recF.addEventListener('click', e => { const b = e.target.closest('button'); if (b) { only = b.dataset.k; draw(); } });
-    recBox.addEventListener('click', e => { const b = e.target.closest('.wl-town-tag'); if (b) openCity(b.dataset.key); });
-    draw();
+    const tb = k => TB[k][L];
+    const R = C.flatMap(c => c.dishes.map((f, i) => ({ f, c, img: `/images/wobbleland/dish-${c.key}-${i}.png` })));
+    let at = 0, busy = false;
+    const wide = () => book.clientWidth >= 760;
+    const left = r => `<div class="wl-pg-in"><p class="wl-pg-kick">${tb('no')} ${String(R.indexOf(r) + 1).padStart(2, '0')}</p>
+      <div class="wl-pg-pic"><img src="${r.img}" alt="${esc(r.f.name)}"></div>
+      <p class="wl-pg-num">${R.indexOf(r) * 2 + 1}</p></div>`;
+    const right = r => `<div class="wl-pg-in"><p class="wl-pg-kick">${tb('from')}</p>
+      <button type="button" class="wl-town-tag" data-key="${r.c.key}"><img src="${img('crest', r.c.key)}" alt="">${esc(r.c.short || r.c.name)}</button>
+      <h3>${esc(r.f.name)}</h3><p class="wl-pg-desc">${esc(r.f.desc)}</p>
+      <p class="wl-pg-orn">✦ ✦ ✦</p><p class="wl-pg-num">${R.indexOf(r) * 2 + 2}</p></div>`;
+    book.innerHTML = `<div class="wl-spread"><div class="wl-pg wl-pg-l"></div><div class="wl-pg wl-pg-r"></div></div>
+      <div class="wl-book-nav"><button type="button" class="wl-bk-prev" aria-label="${tb('prev')}">‹</button><span class="wl-bk-count"></span><button type="button" class="wl-bk-next" aria-label="${tb('next')}">›</button></div>`;
+    const spread = book.querySelector('.wl-spread'), pl = book.querySelector('.wl-pg-l'), pr = book.querySelector('.wl-pg-r');
+    const count = book.querySelector('.wl-bk-count');
+    const marks = () => {
+      count.textContent = `${at + 1} ${tb('of')} ${R.length}`;
+      recF.querySelectorAll('button').forEach(b => b.classList.toggle('on', b.dataset.k === R[at].c.key));
+    };
+    const show = () => { pl.innerHTML = left(R[at]); pr.innerHTML = right(R[at]); marks(); };
+    const go = (to) => {
+      to = (to + R.length) % R.length;
+      if (busy || to === at) return;
+      const fwd = to > at, from = R[at]; at = to;
+      const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+      if (reduce || !wide()) {
+        spread.classList.remove('wl-slide-l', 'wl-slide-r'); void spread.offsetWidth;
+        show(); spread.classList.add(fwd ? 'wl-slide-l' : 'wl-slide-r'); return;
+      }
+      busy = true;
+      const leaf = document.createElement('div');
+      leaf.className = 'wl-leaf ' + (fwd ? 'fwd' : 'back');
+      leaf.innerHTML = `<div class="wl-leaf-f wl-pg">${fwd ? right(from) : left(from)}</div><div class="wl-leaf-b wl-pg">${fwd ? left(R[at]) : right(R[at])}</div>`;
+      if (fwd) pr.innerHTML = right(R[at]); else pl.innerHTML = left(R[at]);
+      spread.appendChild(leaf); marks();
+      requestAnimationFrame(() => requestAnimationFrame(() => leaf.classList.add('turn')));
+      setTimeout(() => { if (fwd) pl.innerHTML = left(R[at]); else pr.innerHTML = right(R[at]); leaf.remove(); busy = false; }, 720);
+    };
+    book.querySelector('.wl-bk-prev').addEventListener('click', () => go(at - 1));
+    book.querySelector('.wl-bk-next').addEventListener('click', () => go(at + 1));
+    book.addEventListener('keydown', e => { if (e.key === 'ArrowRight') go(at + 1); if (e.key === 'ArrowLeft') go(at - 1); });
+    spread.addEventListener('click', e => {
+      const t = e.target.closest('.wl-town-tag'); if (t) { openCity(t.dataset.key); return; }
+      if (!wide()) return;
+      const r = spread.getBoundingClientRect(); go(e.clientX > r.left + r.width / 2 ? at + 1 : at - 1);
+    });
+    let sx = null;
+    spread.addEventListener('touchstart', e => { sx = e.touches[0].clientX; }, { passive: true });
+    spread.addEventListener('touchend', e => { if (sx == null) return; const dx = e.changedTouches[0].clientX - sx; if (Math.abs(dx) > 40) go(dx < 0 ? at + 1 : at - 1); sx = null; });
+    recF.innerHTML = C.map(c => `<button type="button" data-k="${c.key}"><img src="${img('crest', c.key)}" alt="">${esc(c.short || c.name)}</button>`).join('');
+    recF.addEventListener('click', e => { const b = e.target.closest('button'); if (b) go(R.findIndex(r => r.c.key === b.dataset.k)); });
+    show();
   }
 })();
