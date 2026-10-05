@@ -55,7 +55,7 @@ async function ensureSchema(env) {
   for (const sql of ['ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
     "ALTER TABLE users ADD COLUMN months TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN tod INTEGER',
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
-    "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''"]) {
+    "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   schemaReady = true;
@@ -176,20 +176,35 @@ function isVeteran(u) {
 }
 const mergedBadges = (u, posts) => [...new Set([...String(u.badges || '').split(',').filter(Boolean), ...badgesOf(posts, monthsOf(u)), ...(isVeteran(u) ? ['veteran'] : [])])];
 
-async function cleanupInactive(env) {
+// Очистка: предупреждаем про 30 дней, но удаляем, только когда картинки заняли ≥50% бесплатного KV (1 ГБ).
+// Тогда удаляем работы неактивных >30 дней, начиная с самых давно пропавших, пока не станет <45%.
+const KV_LIMIT = 1e9, CLEAN_START = 0.5, CLEAN_STOP = 0.45;
+async function cleanupInactive(env, limit = KV_LIMIT) {
+  // вес работ, загруженных до появления учёта, считаем один раз
+  const unknown = (await env.DB.prepare('SELECT id FROM posts WHERE bytes IS NULL LIMIT 200').all()).results;
+  for (const p of unknown) {
+    const [a, b] = await Promise.all([env.IMAGES.get('i/' + p.id, 'arrayBuffer'), env.IMAGES.get('t/' + p.id, 'arrayBuffer')]);
+    await env.DB.prepare('UPDATE posts SET bytes = ? WHERE id = ?').bind((a?.byteLength || 0) + (b?.byteLength || 0), p.id).run();
+  }
+  let used = (await env.DB.prepare('SELECT COALESCE(SUM(bytes), 0) AS n FROM posts').first()).n;
+  const report = { used, limit, percent: Math.round(used / limit * 1000) / 10, users: 0, deletes: 0 };
+  if (used < limit * CLEAN_START) return report;
   const cutoff = new Date((utcToday() - INACTIVE_DAYS) * 864e5).toISOString().slice(0, 10);
-  const users = (await env.DB.prepare('SELECT u.* FROM users u JOIN posts p ON p.user_id = u.id GROUP BY u.id HAVING MAX(p.day) < ? LIMIT 200').bind(cutoff).all()).results;
-  let deletes = 0;
+  const users = (await env.DB.prepare(`SELECT u.*, MAX(p.day) AS last FROM users u JOIN posts p ON p.user_id = u.id
+    GROUP BY u.id HAVING last < ? ORDER BY last ASC LIMIT 200`).bind(cutoff).all()).results;
   for (const u of users) {
+    if (used < limit * CLEAN_STOP) break;
     if (await isAdmin(u, env)) continue; // работы Алины не удаляются, пока она сама их не удалит
-    const posts = (await env.DB.prepare('SELECT id, day, bw, tod FROM posts WHERE user_id = ?').bind(u.id).all()).results;
-    if (deletes + posts.length * 2 > 900) break; // бесплатный лимит KV — 1000 удалений в сутки
+    const posts = (await env.DB.prepare('SELECT id, day, bw, tod, bytes FROM posts WHERE user_id = ?').bind(u.id).all()).results;
+    if (report.deletes + posts.length * 2 > 900) break; // бесплатный лимит KV — 1000 удалений в сутки
     await env.DB.prepare('UPDATE users SET best = ?, badges = ? WHERE id = ?')
       .bind(mergedBest(u, posts.map(p => p.day)), mergedBadges(u, posts).join(','), u.id).run();
-    for (const p of posts) { await env.IMAGES.delete('i/' + p.id); await env.IMAGES.delete('t/' + p.id); deletes += 2; }
+    for (const p of posts) { await env.IMAGES.delete('i/' + p.id); await env.IMAGES.delete('t/' + p.id); report.deletes += 2; used -= p.bytes || 0; }
     await env.DB.prepare('DELETE FROM posts WHERE user_id = ?').bind(u.id).run();
+    report.users++;
   }
-  return { users: users.length, deletes };
+  report.usedAfter = used;
+  return report;
 }
 
 // «Выбор Полли»: один текущий рисунок, его автор — носитель бейджа; прошлые носители получают 'pick_past'
@@ -211,7 +226,7 @@ async function addBadge(env, uid, badge) {
 // ---------- маршруты ----------
 async function route(req, env, url) {
   const p = url.pathname, m = req.method;
-  if (m === 'POST' && p === '/api/dev/cleanup' && env.DEV_FAKE_LOGIN === '1') return json(await cleanupInactive(env));
+  if (m === 'POST' && p === '/api/dev/cleanup' && env.DEV_FAKE_LOGIN === '1') return json(await cleanupInactive(env, Number(url.searchParams.get('limit')) || KV_LIMIT));
   // публичный профиль: ник, серия, рекорд, бейджи и работы на стене (e-mail не отдаём)
   if (m === 'GET' && p === '/api/profile') {
     const nick = String(url.searchParams.get('nick') || '').replace(/^@/, '');
@@ -270,7 +285,9 @@ async function route(req, env, url) {
     const pickUser = Number(await getMeta(env, 'pick_user'));
     const kept = mergedBadges(u, rows).filter(b => b !== 'pick_past' || pickUser !== u.id);
     if (pickUser === u.id) kept.push('pick');
-    return json({ user: { picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
+    const admin = await isAdmin(u, env);
+    const storage = admin ? Math.round((await env.DB.prepare('SELECT COALESCE(SUM(bytes), 0) AS n FROM posts').first()).n / KV_LIMIT * 1000) / 10 : undefined;
+    return json({ user: { storage, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
       best: mergedBest(u, rows.map(r => r.day)), keptBadges: kept, posts: rows } });
   }
 
@@ -308,9 +325,9 @@ async function route(req, env, url) {
     }
     if (!old) await bump(env, 'works_total', 'SELECT COUNT(*) + 1 AS n FROM posts'); // замена работы дня не считается
     const tod = Number(f.get('tod'));
-    await env.DB.prepare('INSERT INTO posts (id, user_id, day, theme, bw, tod, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
+    await env.DB.prepare('INSERT INTO posts (id, user_id, day, theme, bw, tod, bytes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
       .bind(id, u.id, day, String(f.get('theme') || '').slice(0, 120), f.get('bw') === '1' ? 1 : 0,
-        Number.isInteger(tod) && tod >= 0 && tod < 1440 ? tod : null, now()).run();
+        Number.isInteger(tod) && tod >= 0 && tod < 1440 ? tod : null, fb.byteLength + tb.byteLength, now()).run();
     // бейджи и рекорд записываем сразу — их не отнимет ни очистка, ни пропуск
     const months = [...new Set([...monthsOf(u), day.slice(0, 7)])].sort().slice(-24);
     const mc = mcountOf(u);
