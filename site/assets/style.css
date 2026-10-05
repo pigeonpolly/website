@@ -1511,3 +1511,5 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 .q-ghost { background: none !important; color: #2B1A51 !important; box-shadow: inset 0 0 0 2px #2B1A51 !important; }
 .q-err { min-height: 1.2em; margin: 8px 0 0; color: #C21E2A; font-weight: 700; }
 .rm-sprite.q-dance { animation: rm-hop .5s ease 4; }
+.rm-hot.q-want { animation: q-want 1.6s ease-in-out infinite; }
+@keyframes q-want { 50% { box-shadow: 0 0 0 2px #FFF6B0, 0 0 14px 4px rgba(255, 246, 176, .8); } }

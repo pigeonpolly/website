@@ -249,7 +249,7 @@
       cat: ['Meow. (The cat from case 1999. Case closed.)', 'Мяу. (Тот самый кот из дела 1999. Дело закрыто.)', 'Ņau. (Tas pats kaķis no 1999. gada lietas. Lieta slēgta.)'] };
     let cups = 0;
     const pot = place('/images/rooms/prop-pot.png', 298, 100, 13);
-    const towers = [[224, 118], [233, 118], [196, 196], [206, 200]];
+    const towers = [[196, 196], [206, 200], [216, 196], [226, 200]];
     const sip = (talk) => {
       cups++; counter.textContent = `☕ ${TX.cups[L]}: ${cups}`;
       const t = towers[Math.floor((cups - 1) / 6) % towers.length], n = (cups - 1) % 6;

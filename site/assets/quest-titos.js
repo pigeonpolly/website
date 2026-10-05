@@ -21,7 +21,7 @@
     pin: ['📌 Pin to the board', '📌 Приколоть на доску', '📌 Piespraust pie dēļa'],
     pinned: ['On the board ✓', 'Уже на доске ✓', 'Jau uz dēļa ✓'],
     exam: ['🔍 Examine with the magnifier', '🔍 Рассмотреть под лупой', '🔍 Apskatīt ar lupu'],
-    needMag: ['You need a magnifying glass. There is one on the desk.', 'Нужна лупа. Она лежит на столе.', 'Vajag lupu. Tā ir uz galda.'],
+    needMag: ['You need a magnifying glass. There is one on the filing cabinet, next to the coffee pot.', 'Нужна лупа. Она лежит на шкафу с документами, рядом с кофейником.', 'Vajag lupu. Tā ir uz dokumentu skapja, blakus kafijas kannai.'],
     smeared: ['Something is smeared on it. Too small to see with the naked eye.', 'На этом что-то размазано. Невооружённым глазом не разглядеть.', 'Uz tā kaut kas ir nosmērēts. Ar neapbruņotu aci neredz.'],
     close: ['Close', 'Закрыть', 'Aizvērt'],
     suspects: ['Suspects', 'Подозреваемые', 'Aizdomās turamie'],
@@ -79,6 +79,7 @@
   const modal = document.createElement('div'); modal.className = 'q-modal'; modal.hidden = true; box.appendChild(modal);
   const icon = id => C[id].sprite ? `/images/rooms/${C[id].sprite[0]}.png` : id === 'report' ? '/images/rooms/prop-mail.png' : id === 'statement' ? '/images/rooms/prop-pot.png' : id === 'receipt' ? '/images/rooms/clue-ticket.png' : id === 'lid' ? '/images/rooms/clue-lid.png' : '/images/rooms/clue-ticket.png';
   const draw = () => {
+    const mz = box.querySelector('.rm-hot[data-k="magnifier"]'); if (mz) mz.classList.toggle('q-want', !st.mag && !st.solved);
     banner.innerHTML = `<nav class="q-tabs">${CASES.map(c => `<button type="button" class="${c.no === 1 ? 'on' : ''}"${c.soon ? ' disabled' : ''}>${t(UI.caseNo)} ${c.no}${c.soon ? ' · ' + t(UI.soon) : ' · ' + t(c.title) + (st.solved ? ' ✅' : '')}</button>`).join('')}</nav>` +
       (st.solved ? `<span class="q-stat">✅ ${t(UI.solvedT)}</span><button type="button" data-q="again">${t(UI.again)}</button>`
       : `<span class="q-stat">${t(UI.clues)}: ${st.pinned.length}/7</span><button type="button" data-q="board">${t(UI.board)}</button>`);
