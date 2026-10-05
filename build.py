@@ -338,6 +338,13 @@ def wobbleland_data():
             for part in ("holidays", "dishes", "streets", "residents"):
                 for item, t in zip(c[part], o.get(part, [])):
                     item.update({k: v for k, v in t.items() if v})
+        # карта: улицы, площади, дома (адреса), персонажи — content/wobbleland-map.json, названия переводятся через "_map"
+        mp = json.loads((CONTENT / "wobbleland-map.json").read_text())
+        names = tr.get("_map", {})
+        for part in ("streets", "squares"):
+            for v in mp[part].values():
+                v["name"] = names.get(v["name"], v["name"])
+        data["map"] = mp
         (OUT / "assets" / f"wobbleland-data.{lang}.js").write_text(
             "// Сгенерировано build.py из content/wobbleland.json — не править руками\nwindow.WOBBLELAND = "
             + json.dumps(data, ensure_ascii=False) + ";\n")

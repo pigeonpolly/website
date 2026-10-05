@@ -64,7 +64,7 @@
 
   // ---------- приближение и перетаскивание ----------
   let s = 1, tx = 0, ty = 0;
-  const MAX = 4;
+  const MAX = innerWidth < 700 ? 9 : 6;
   const clamp = () => {
     const w = box.clientWidth, h = box.clientHeight;
     tx = Math.min(0, Math.max(w - w * s, tx)); ty = Math.min(0, Math.max(h - h * s, ty));
@@ -75,6 +75,7 @@
     stage.style.transform = `translate(${tx}px, ${ty}px) scale(${s})`;
     stage.style.setProperty('--inv', 1 / s);
     box.classList.toggle('zoomed', s > 1.01);
+    box.classList.toggle('z2', s >= 1.8);
   };
   const zoomAt = (px, py, ns, anim = true) => {
     ns = Math.max(1, Math.min(MAX, ns));
@@ -242,6 +243,63 @@
   }
   if (qbox) quiz(); // квиз пока не показываем на странице — код готов
 
+
+  // ---------- слой карты: названия улиц и площадей, персонажи, подсказка-адрес у домиков ----------
+  const MP = D.map;
+  if (MP) {
+    const TM = {
+      lives: ['lives here', 'живёт здесь', 'dzīvo šeit'],
+      works: ['works here', 'работает здесь', 'strādā šeit'],
+    };
+    const tm = k => TM[k][L];
+    const lbl = (txt, at, ang, cls) => {
+      const el = document.createElement('div'); el.className = 'wl-lbl ' + cls;
+      el.style.left = at[0] + '%'; el.style.top = at[1] + '%'; el.style.setProperty('--a', (ang || 0) + 'deg');
+      el.innerHTML = `<span>${esc(txt)}</span>`; stage.appendChild(el);
+    };
+    Object.values(MP.squares).forEach(q => lbl(q.name, q.at, 0, 'sq'));
+    Object.values(MP.streets).forEach(q => lbl(q.name, q.at.slice(0, 2), q.at[2], 'st'));
+    const who = {};
+    MP.chars.forEach(ch => {
+      const city = C.find(c => c.key === ch.city), r = city && city.residents[ch.ri];
+      const el = document.createElement('button');
+      el.type = 'button'; el.className = 'wl-char'; el.style.left = ch.at[0] + '%'; el.style.top = ch.at[1] + '%';
+      el.title = r ? r.name : ''; el.setAttribute('aria-label', el.title);
+      el.innerHTML = `<img src="/images/wobbleland/ch-${ch.who}.png" alt="">`;
+      el.addEventListener('click', e => { e.stopPropagation(); openCity(ch.city); });
+      stage.appendChild(el);
+      if (r) who[ch.street + '|' + ch.no] = r.name;
+    });
+    // кто где живёт/работает — из адресов жителей (улица + номер)
+    const streetName = k => (MP.streets[k] || MP.squares[k] || {}).name || '';
+    const tip = document.createElement('div'); tip.className = 'wl-tip'; box.appendChild(tip);
+    const workAt = {};
+    (MP.works || []).forEach(w => { const c = C.find(x => x.key === w.city), r = c && c.residents[w.ri]; if (r) workAt[w.street + '|' + w.no] = r.name; });
+    const showTip = (cx, cy) => {
+      const R = stage.getBoundingClientRect();
+      const px = (cx - R.left) / R.width * 100, py = (cy - R.top) / R.height * 100;
+      let best = null, bd = 1e9;
+      MP.houses.forEach(h => { const dx = (h[0] - px) * R.width / 100, dy = (h[1] - py) * R.height / 100, dd = dx * dx + dy * dy; if (dd < bd) { bd = dd; best = h; } });
+      const lim = Math.max(8, 7 * R.width / 1280);
+      if (!best || bd > lim * lim) { tip.classList.remove('on'); return false; }
+      const key = best[3] + '|' + best[2];
+      tip.innerHTML = `<b>${esc(streetName(best[3]))}${best[2] ? ' ' + esc(best[2]) : ''}</b>` +
+        (who[key] ? `<span>🏠 ${esc(who[key])} ${tm('lives')}</span>` : '') + (workAt[key] ? `<span>💼 ${esc(workAt[key])} ${tm('works')}</span>` : '');
+      const B = box.getBoundingClientRect();
+      tip.style.left = Math.min(cx - B.left, B.width - 200) + 'px'; tip.style.top = (cy - B.top) + 'px';
+      tip.classList.add('on'); return true;
+    };
+    box.addEventListener('pointermove', e => {
+      if (e.pointerType === 'touch' || (pts.size && moved > 4)) return;
+      showTip(e.clientX, e.clientY);
+    });
+    let tipT;
+    stage.addEventListener('click', e => {
+      if (e.target.closest('.wl-pin, .wl-char') || moved > 6) return;
+      if (showTip(e.clientX, e.clientY)) { clearTimeout(tipT); tipT = setTimeout(() => tip.classList.remove('on'), 3500); }
+    });
+    box.addEventListener('pointerleave', () => tip.classList.remove('on'));
+  }
   // ---------- отрывной календарь (ближайший праздник), календарь праздников, книга рецептов ----------
   const LOC = ['en-GB', 'ru-RU', 'lv-LV'][L];
   const TT = {
