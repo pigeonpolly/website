@@ -41,6 +41,8 @@ PAGES = [
      "Polly's pixel office: old blinds, a water cooler and a desk you can click. Switch to evening and watch the light change."),
     ("detective-office", "Detective Titos", "detective-office.html",
      "Detective Titos' pixel office: boxes of cases, a board of clues and red string. Click anything and switch to the evening shift."),
+    ("polly-helps", "Polly, help me draw", "polly-helps.html",
+     "Polly's little drawing guides: build any object from simple shapes, and find ideas for what to draw with an association map."),
     ("wobbleland", "Wobbleland", "wobbleland.html",
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
@@ -69,7 +71,7 @@ SOCIAL = [
 ]
 NAV = [
     ("challenge", "Daily Challenge"),
-    ("e-books", "E-Books"),
+    ("books", "E-Books", [("e-books", "E-Books"), ("polly-helps", "Polly, help me draw")]),
     ("fantasy", "Fantasy World", [("wobbleland", "Wobbleland"), ("polly-office", "Polly Office Clerk"), ("detective-office", "Detective Titos")]),
     ("art-portfolio", "Art Portfolio", PORTFOLIO),
     ("learning", "Learning & AI", [("projects", "Projects"), ("work-with-me", "Work with me")]),

@@ -42,7 +42,7 @@
   <nav id="site-nav" class="site-nav" aria-label="Main">
     <ul>
 <li><a href="/challenge/">Daily Challenge</a></li>
-<li><a href="/e-books/">E-Books</a></li>
+<li class="has-sub"><button class="sub-toggle" aria-expanded="false">E-Books<span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/e-books/">E-Books</a></li><li><a href="/polly-helps/">Polly, help me draw</a></li></ul></li>
 <li class="has-sub"><button class="sub-toggle" aria-expanded="false">Fantasy World<span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/wobbleland/">Wobbleland</a></li><li><a href="/polly-office/">Polly Office Clerk</a></li><li><a href="/detective-office/">Detective Titos</a></li></ul></li>
 <li class="has-sub"><button class="sub-toggle" aria-expanded="false">Art Portfolio<span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/art-portfolio/anxiety/">Anxiety</a></li><li><a href="/art-portfolio/sketchbook/">My Sketchbook</a></li><li><a href="/art-portfolio/snail/">Mr.Chew</a></li><li><a href="/art-portfolio/bird/">PigeonPolly</a></li><li><a href="/art-portfolio/detective/">Mr.Titos</a></li><li><a href="/art-portfolio/halloween/">Pumpkin Family</a></li><li><a href="/art-portfolio/ai-art/">AI Art</a></li></ul></li>
 <li class="has-sub"><button class="sub-toggle" aria-expanded="false">Learning &amp; AI<span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/projects/">Projects</a></li><li><a href="/work-with-me/">Work with me</a></li></ul></li>
@@ -79,7 +79,7 @@
     <div class="td-actions">
       <button class="cta-btn td-open" type="button">Open today’s envelope</button>
       <a class="cta-btn td-go" href="/challenge/">Draw it now →</a>
-      <button type="button" class="ph-open td-help" data-polly-help>🕊 Polly, help me draw</button>
+      <a class="ph-open td-help" href="/polly-helps/">🕊 Polly, help me draw</a>
     </div>
   </div>
   <div class="td-stage" aria-live="polite">
@@ -97,7 +97,6 @@
 <script src="/assets/challenge-data.js" defer></script>
 <script src="/assets/challenge-theme.js" defer></script>
 <script src="/assets/today.js" defer></script>
-<script src="/assets/polly-help.js" defer></script>
 </div>
 <div class="blk" id="blk-coming-soon"><style>#blk-coming-soon { margin: 0; background: #FFFFFF; }
 #blk-coming-soon .bk { box-sizing: border-box; padding: 64px 32px; font-family: 'Karla', sans-serif; color: #2B1A51; }
