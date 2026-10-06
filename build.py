@@ -71,7 +71,7 @@ SOCIAL = [
 ]
 NAV = [
     ("challenge", "Daily Challenge"),
-    ("books", "E-Books", [("e-books", "E-Books"), ("polly-helps", "Polly, help me draw")]),
+    ("books", "Useful", [("e-books", "E-Books"), ("polly-helps", "Polly, help me draw")]),
     ("fantasy", "Fantasy World", [("wobbleland", "Wobbleland"), ("polly-office", "Polly Office Clerk"), ("detective-office", "Detective Titos")]),
     ("art-portfolio", "Art Portfolio", PORTFOLIO),
     ("learning", "Learning & AI", [("projects", "Projects"), ("work-with-me", "Work with me")]),
