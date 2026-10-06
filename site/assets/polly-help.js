@@ -57,14 +57,14 @@
     const W = g('w'), A = G.assoc[L], F = G.feat[L], Q = G.qs[L];
     const pos = [[40, 34], [160, 30], [22, 86], [178, 90], [60, 124], [146, 128]];
     const sparrow = (x, y) => `<g transform="translate(${x - 6} ${y - 12})"><ellipse cx="6" cy="5" rx="6" ry="4.5" fill="#B07A4A"/><circle cx="10" cy="2" r="3" fill="#8A5A34"/><path d="M13 2 l3 1 -3 1z" fill="#E9A93B"/><circle cx="10.6" cy="1.6" r=".7" fill="#1a1528"/></g>`;
-    let s = '<rect width="200" height="150" fill="#FFFDF6"/>';
+    let s = '<rect width="200" height="170" fill="#FFFDF6"/>';
     if (step >= 1) s += pos.map(([x, y], i) => `<line x1="100" y1="76" x2="${x}" y2="${y}" stroke="#E3D3AE" stroke-width="1.5"/>`).join('');
     s += `<ellipse cx="100" cy="76" rx="36" ry="18" fill="#E9B872" stroke="#2B1A51" stroke-width="2"/><path d="M78 70 q10 -6 22 0 q10 -6 22 0" fill="none" stroke="#C98A4A" stroke-width="2"/><text x="100" y="84" text-anchor="middle" font-size="12" font-weight="700" fill="#2B1A51">${W}</text>`;
     if (step >= 1) s += pos.map(([x, y], i) => `${sparrow(x, y)}<text x="${x}" y="${y + 9}" text-anchor="middle" font-size="9.5" fill="#5A4E78">${A[i]}</text>`).join('');
     if (step >= 2) s += F.map((f, i) => `<text x="${[100, 100, 52, 150][i]}" y="${[50, 108, 66, 64][i]}" text-anchor="middle" font-size="9" font-style="italic" fill="#D85A30">${f}</text>`).join('');
-    if (step >= 3) s += Q.slice(0, 4).map((q, i) => `<g transform="translate(${[6, 152, 6, 150][i]} ${[4, 4, 140 - 4, 140 - 4][i] - 4})"><rect width="44" height="13" rx="6" fill="#7F81BF"/><text x="22" y="9.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#fff">${q}</text></g>`).join('');
-    if (step >= 4) { const hl = [2, 4, 5].map(i => pos[i]); s += `<path d="M${hl[0][0]} ${hl[0][1] + 4} L${hl[1][0]} ${hl[1][1] + 4} L${hl[2][0]} ${hl[2][1] + 4}" fill="none" stroke="#D85A30" stroke-width="2.5" stroke-dasharray="4 3"/>` + hl.map(([x, y]) => `<circle cx="${x}" cy="${y + 2}" r="15" fill="none" stroke="#D85A30" stroke-width="2"/>`).join(''); }
-    return `<svg viewBox="0 0 200 150" aria-hidden="true">${s}</svg>`;
+    if (step >= 3) s += Q.slice(0, 4).map((q, i) => `<g transform="translate(${[4, 144, 4, 144][i]} ${[2, 2, 154, 154][i]})"><rect width="52" height="13" rx="6" fill="#7F81BF"/><text x="26" y="9.5" text-anchor="middle" font-size="8.5" font-weight="700" fill="#fff">${q}</text></g>`).join('');
+    if (step >= 4) { const hl = [2, 4, 5].map(i => pos[i]); s += `<path d="M${hl[0][0] + 6} ${hl[0][1] - 3} L${hl[1][0] - 7} ${hl[1][1] - 10} M${hl[1][0] + 10} ${hl[1][1] - 7} L${hl[2][0] - 10} ${hl[2][1] - 7}" fill="none" stroke="#D85A30" stroke-width="2.5" stroke-dasharray="4 3"/>` + hl.map(([x, y]) => `<circle cx="${x}" cy="${y - 7}" r="10" fill="none" stroke="#D85A30" stroke-width="2"/>`).join(''); }
+    return `<svg viewBox="0 0 200 170" aria-hidden="true">${s}</svg>`;
   };
   const guide = (id, title, lead, bub, steps, art, tips, extra = '') => `<article class="ph-guide" id="${id}">
     <div class="ph-top">${polly}<div><h2>${title}</h2><p class="ph-lead">${lead}</p></div></div>
