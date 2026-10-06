@@ -10,6 +10,7 @@
     colors: ['Your 3 colours', 'Ваши 3 цвета', 'Tavas 3 krāsas'],
     time: ['Time', 'Время', 'Laiks'],
     tip: ['Tip of the day', 'Совет дня', 'Dienas padoms'],
+    help: ['🕊 Polly, help me draw', '🕊 Полли, помоги нарисовать', '🕊 Pollija, palīdzi uzzīmēt'],
     easy: ['Relaxed', 'Спокойно', 'Mierīgi'],
     pro: ['Challenge me', 'Посложнее', 'Grūtāk'],
     start: ['Start', 'Старт', 'Sākt'], pause: ['Pause', 'Пауза', 'Pauze'], resume: ['Resume', 'Продолжить', 'Turpināt'], reset: ['Reset', 'Сброс', 'No sākuma'],
@@ -93,6 +94,7 @@
       </div>
     </div>
     ${selKey !== todayKey ? `<p class="back-today"><button type="button" id="ch-today">${t('backToday')}</button></p>` : ''}
+    <p class="ph-open-wrap"><button type="button" class="ph-open" data-polly-help>${t('help')}</button></p>
     <div class="tip"><b>${t('tip')}</b><p>${theme.tip}</p></div>`;
     const old = $('.page.old'); old && old.addEventListener('animationend', () => old.remove());
     const bt = $('#ch-today'); bt && bt.addEventListener('click', () => { view = new Date(today.getFullYear(), today.getMonth(), 1); selectDay(new Date(today)); });
