@@ -10,7 +10,8 @@
   .fl-nick { position: absolute; left: 0; top: 0; padding: 1px 6px; border-radius: 99px; background: rgba(26, 21, 40, .72); color: #F3EFFA; font: 700 11px/1.4 var(--sans); white-space: nowrap; text-decoration: none; pointer-events: auto; will-change: transform; }
   .fl-nick:hover { background: #F0A987; color: #2B1A51; z-index: 2; }
   .fl-nick.me { background: #E9A93B; color: #2B1A51; z-index: 1; }
-  .fl-join { display: inline-block; margin-top: 22px; }
+  .fl-join { display: inline-block; margin-top: 12px; }
+  .fl-how { margin: 22px 0 0; font-size: 15px; color: #F3EFFA; font-weight: 700; }
   @media (max-width: 600px) { .fl-nick { font-size: 10px; padding: 0 4px; } }
 </style>
 <section class="fl" id="flock" aria-labelledby="fl-title">
@@ -19,6 +20,7 @@
   <p class="fl-sub">Everyone who has ever signed in on this site lives here as a little pixel bird. No two birds are alike: different shapes, hats and very fancy shoes. Every 10th guest is a friendly cat, every 11th a crow with a treasure in its beak. Click a nickname to see the profile.</p>
   <p class="fl-count" data-tpl="Birds in the flock: {n}" data-recent="· showing those who dropped by recently"></p>
   <div class="fl-stage"><canvas width="300" height="142" role="img" aria-label="Pixel birds wandering around a bench, a bin, a bun, a baguette, a book and a coffee cup"></canvas><div class="fl-labels"></div></div>
+  <p class="fl-how">To get into the flock, just sign in with Google and pick a nickname.</p>
   <a class="pill-btn pill-fill fl-join" href="/challenge/">Get my bird →</a>
 </section>
 <script src="/assets/flock.js" defer></script>

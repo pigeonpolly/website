@@ -15,7 +15,7 @@ const T = {
     comments: 'Comments', noComments: 'No comments yet. Be the first!', back: '← All posts', tagged: 'Posts tagged',
     min: 'min read', share: 'Share', copy: 'Copy link', copied: 'Link copied ✓', email: 'E-mail', draft: 'Draft', read: 'Read →', months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     descr: 'Notes on drawing, learning and creativity by Alina Otkinska and Pigeon Polly.',
-    featured: '★ Favourites', archive: 'Archive', inMonth: 'Posts from', onlyFav: 'My favourite posts',
+    featured: '★ Favourites', archive: 'Archive', inMonth: 'Posts from', onlyFav: 'My favourite posts', allSections: 'All', search: 'Search the blog…', searchBtn: 'Search', found: 'Search results for', nothing: 'Nothing found. Try another word.', prev: '← Newer', next: 'Older →', section: 'Section',
     monthsFull: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
   },
   ru: {
@@ -24,7 +24,7 @@ const T = {
     comments: 'Комментарии', noComments: 'Комментариев пока нет. Будьте первым!', back: '← Все статьи', tagged: 'Статьи с тегом',
     min: 'мин чтения', share: 'Поделиться', copy: 'Скопировать ссылку', copied: 'Ссылка скопирована ✓', email: 'Почта', draft: 'Черновик', read: 'Читать →', months: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
     descr: 'Заметки о рисовании, обучении и творчестве от Алины Откинской и голубя Полли.',
-    featured: '★ Избранное', archive: 'Архив', inMonth: 'Статьи за', onlyFav: 'Мои избранные статьи',
+    featured: '★ Избранное', archive: 'Архив', inMonth: 'Статьи за', onlyFav: 'Мои избранные статьи', allSections: 'Все', search: 'Поиск по блогу…', searchBtn: 'Найти', found: 'Результаты поиска', nothing: 'Ничего не нашлось. Попробуйте другое слово.', prev: '← Новее', next: 'Старше →', section: 'Раздел',
     monthsFull: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
   },
   lv: {
@@ -33,7 +33,7 @@ const T = {
     comments: 'Komentāri', noComments: 'Komentāru vēl nav. Esi pirmais!', back: '← Visi raksti', tagged: 'Raksti ar birku',
     min: 'min lasīšanas', share: 'Dalīties', copy: 'Kopēt saiti', copied: 'Saite nokopēta ✓', email: 'E-pasts', draft: 'Melnraksts', read: 'Lasīt →', months: ['janv.', 'febr.', 'marts', 'apr.', 'maijs', 'jūn.', 'jūl.', 'aug.', 'sept.', 'okt.', 'nov.', 'dec.'],
     descr: 'Piezīmes par zīmēšanu, mācīšanos un radošumu no Alīnas Otkinskas un baloža Pollijas.',
-    featured: '★ Izlase', archive: 'Arhīvs', inMonth: 'Raksti par', onlyFav: 'Mani izlases raksti',
+    featured: '★ Izlase', archive: 'Arhīvs', inMonth: 'Raksti par', onlyFav: 'Mani izlases raksti', allSections: 'Visi', search: 'Meklēt blogā…', searchBtn: 'Meklēt', found: 'Meklēšanas rezultāti', nothing: 'Nekas netika atrasts. Pamēģiniet citu vārdu.', prev: '← Jaunāki', next: 'Vecāki →', section: 'Sadaļa',
     monthsFull: ['janvāris', 'februāris', 'marts', 'aprīlis', 'maijs', 'jūnijs', 'jūlijs', 'augusts', 'septembris', 'oktobris', 'novembris', 'decembris'],
   },
 };
@@ -59,11 +59,13 @@ const langOf = (p, lang) => p['t_' + lang] ? lang : ['ru', 'en', 'lv'].find(l =>
 // теги: в статье хранится английский тег (tags_en), перевод — общий словарь blog_tags (en → ru, lv), правится во вкладке «Теги»
 const splitTags = s => String(s || '').split(',').map(x => x.trim().toLowerCase().replace(/^#/, '')).filter(Boolean);
 const tagsOf = p => splitTags(p.tags_en || p.tags_ru || p.tags_lv);
-let TAGMAP = {};
+let TAGMAP = {}, SECTIONS = [];
+const sectionName = (slug, lang) => { const r = SECTIONS.find(x => x.slug === slug); return r ? (r[lang] || r.en || slug) : ''; };
 const tagLabel = (g, lang) => (lang !== 'en' && TAGMAP[g] && TAGMAP[g][lang]) || g;
 async function loadTags(env) {
   TAGMAP = {};
-  for (const r of (await env.DB.prepare('SELECT en, ru, lv FROM blog_tags').all()).results) TAGMAP[r.en] = r;
+  for (const r of (await env.DB.prepare('SELECT en, ru, lv, checked, src, created_at FROM blog_tags').all()).results) TAGMAP[r.en] = r;
+  SECTIONS = (await env.DB.prepare('SELECT * FROM blog_sections ORDER BY sort, en').all()).results;
 }
 const stripTags = s => String(s || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 const fmtDate = (ts, lang) => { const d = new Date(ts * 1000); return `${d.getUTCDate()} ${T[lang].months[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
@@ -89,6 +91,12 @@ async function ensureBlogSchema(env) {
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN pinned INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ }
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN src_lang TEXT').run(); } catch (e) { /* уже есть */ }
   await env.DB.prepare(`CREATE TABLE IF NOT EXISTS blog_tags (en TEXT PRIMARY KEY, ru TEXT DEFAULT '', lv TEXT DEFAULT '')`).run();
+  // разделы блога (как коллекции на Patreon): у статьи один раздел, названия на трёх языках
+  await env.DB.prepare(`CREATE TABLE IF NOT EXISTS blog_sections (slug TEXT PRIMARY KEY, en TEXT DEFAULT '', ru TEXT DEFAULT '', lv TEXT DEFAULT '', sort INTEGER DEFAULT 0)`).run();
+  try { await env.DB.prepare("ALTER TABLE blog_posts ADD COLUMN section TEXT DEFAULT ''").run(); } catch (e) { /* уже есть */ }
+  for (const sql of ['ALTER TABLE blog_tags ADD COLUMN checked INTEGER DEFAULT 0', "ALTER TABLE blog_tags ADD COLUMN src TEXT DEFAULT ''", 'ALTER TABLE blog_tags ADD COLUMN created_at INTEGER']) {
+    try { await env.DB.prepare(sql).run(); } catch (e) { /* уже есть */ }
+  }
   // один раз: переносим уже существующие теги статей в словарь (перевод берём из тегов RU/LV той же статьи по порядку)
   const done = await env.DB.prepare("SELECT value FROM meta WHERE key = 'blog_tags_v1'").first().catch(() => null);
   if (!done) {
@@ -235,7 +243,7 @@ export async function blogApi(req, env, url, h) {
     await admin();
     const a = p.slice('/api/blog/admin/'.length);
     if (m === 'GET' && a === 'posts') {
-      const rows = (await env.DB.prepare(`SELECT p.id, p.slug, p.status, p.featured, p.pinned, p.t_ru, p.t_en, p.t_lv, p.tags_ru, p.tags_en, p.tags_lv, p.cover, p.views, p.likes, p.updated_at, p.published_at,
+      const rows = (await env.DB.prepare(`SELECT p.id, p.slug, p.status, p.featured, p.pinned, p.section, p.t_ru, p.t_en, p.t_lv, p.tags_ru, p.tags_en, p.tags_lv, p.cover, p.views, p.likes, p.updated_at, p.published_at,
         (SELECT COUNT(*) FROM blog_comments c WHERE c.post_id = p.id) AS comments FROM blog_posts p ORDER BY COALESCE(p.published_at, p.updated_at) DESC`).all()).results;
       const pending = (await env.DB.prepare(`SELECT c.id, c.body, c.anon, c.created_at, c.post_id, p.slug, p.t_ru, u.nick FROM blog_comments c
         JOIN blog_posts p ON p.id = c.post_id LEFT JOIN users u ON u.id = c.user_id WHERE c.status = 'pending' ORDER BY c.created_at DESC LIMIT 100`).all()).results
@@ -261,9 +269,10 @@ export async function blogApi(req, env, url, h) {
       // теги — на английском; новые сразу добавляем в словарь и стараемся перевести (потом можно поправить во вкладке «Теги»)
       const tagList = [...new Set(splitTags(b.tags_en))].slice(0, 12);
       await loadTags(env);
-      const untranslated = g => !TAGMAP[g] || !TAGMAP[g].ru || !TAGMAP[g].lv || TAGMAP[g].ru === g || TAGMAP[g].lv === g;
+      const untranslated = g => !TAGMAP[g] || (!TAGMAP[g].checked && (!TAGMAP[g].ru || !TAGMAP[g].lv || TAGMAP[g].ru === g || TAGMAP[g].lv === g));
       const fresh = tagList.filter(untranslated);
       if (fresh.length) await translateTags(env, fresh);
+      f.section = slugify(b.section || '');
       f.tags_en = tagList.join(', ');
       f.tags_ru = tagList.map(g => tagLabel(g, 'ru')).join(', ');
       f.tags_lv = tagList.map(g => tagLabel(g, 'lv')).join(', ');
@@ -321,20 +330,89 @@ export async function blogApi(req, env, url, h) {
       await env.DB.prepare('UPDATE blog_posts SET featured = ? WHERE id = ?').bind(featured ? 1 : 0, Number(id)).run();
       return json({ ok: true });
     }
+    // резервная копия блога: все статьи, теги, разделы, комментарии и список картинок (сами картинки браузер скачивает по /media/...)
+    if (m === 'GET' && a === 'export') {
+      const all = q => env.DB.prepare(q).all().then(r => r.results);
+      const media = [];
+      if (env.MEDIA) { let cursor; do { const r = await env.MEDIA.list({ prefix: 'blog/', cursor }); media.push(...r.objects.map(o => o.key)); cursor = r.truncated ? r.cursor : null; } while (cursor); }
+      return json({ version: 1, site: SITE, exported_at: new Date().toISOString(), posts: await all('SELECT * FROM blog_posts'), tags: await all('SELECT * FROM blog_tags'),
+        sections: await all('SELECT * FROM blog_sections'), comments: await all('SELECT c.*, p.slug FROM blog_comments c JOIN blog_posts p ON p.id = c.post_id'), media });
+    }
+    // восстановление: картинка с прежним адресом (если её уже нет) и данные блога (статьи по адресу slug — обновляются, новых добавляются)
+    if (m === 'POST' && a === 'restore-media') {
+      if (!env.MEDIA) fail(503, 'media');
+      const form = await req.formData(), file = form.get('file'), key = String(form.get('key') || '');
+      if (!(file instanceof File) || !/^blog\/[\w\/.-]+$/.test(key)) fail(400, 'bad');
+      if (!(await env.MEDIA.head(key))) await env.MEDIA.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type || 'image/jpeg', cacheControl: 'public, max-age=31536000, immutable' } });
+      return json({ ok: true });
+    }
+    if (m === 'POST' && a === 'import') {
+      const b = await body();
+      if (!b || b.version !== 1 || !Array.isArray(b.posts)) fail(400, 'bad');
+      const COLS = ['slug', 'status', 'cover', 't_ru', 't_en', 't_lv', 'd_ru', 'd_en', 'd_lv', 'b_ru', 'b_en', 'b_lv', 'tags_ru', 'tags_en', 'tags_lv', 'views', 'likes', 'created_at', 'updated_at', 'published_at', 'featured', 'pinned', 'src_lang', 'section'];
+      let posts = 0, comments = 0;
+      for (const p of b.posts) {
+        if (!p.slug) continue;
+        const vals = COLS.map(c => p[c] ?? (['views', 'likes', 'featured', 'pinned'].includes(c) ? 0 : c.endsWith('_at') ? null : ''));
+        await env.DB.prepare(`INSERT INTO blog_posts (${COLS.join(', ')}) VALUES (${COLS.map(() => '?').join(', ')}) ON CONFLICT(slug) DO UPDATE SET ${COLS.filter(c => c !== 'slug').map(c => `${c} = excluded.${c}`).join(', ')}`).bind(...vals).run();
+        posts++;
+      }
+      for (const t of b.tags || []) await env.DB.prepare('INSERT INTO blog_tags (en, ru, lv, checked, src, created_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(en) DO UPDATE SET ru = excluded.ru, lv = excluded.lv, checked = excluded.checked, src = excluded.src')
+        .bind(t.en, t.ru || '', t.lv || '', t.checked || 0, t.src || '', t.created_at || null).run();
+      for (const x of b.sections || []) await env.DB.prepare('INSERT INTO blog_sections (slug, en, ru, lv, sort) VALUES (?, ?, ?, ?, ?) ON CONFLICT(slug) DO UPDATE SET en = excluded.en, ru = excluded.ru, lv = excluded.lv, sort = excluded.sort')
+        .bind(x.slug, x.en || '', x.ru || '', x.lv || '', x.sort || 0).run();
+      for (const c of b.comments || []) {
+        const post = await env.DB.prepare('SELECT id FROM blog_posts WHERE slug = ?').bind(c.slug).first();
+        if (!post) continue;
+        const dup = await env.DB.prepare('SELECT 1 FROM blog_comments WHERE post_id = ? AND created_at = ? AND body = ?').bind(post.id, c.created_at, c.body).first();
+        if (dup) continue;
+        await env.DB.prepare('INSERT INTO blog_comments (post_id, user_id, anon, body, ip, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(post.id, c.user_id || null, c.anon || null, c.body, c.ip || '', c.status || 'ok', c.created_at).run();
+        comments++;
+      }
+      return json({ ok: true, posts, comments });
+    }
+    // разделы: список, создать/изменить (названия на трёх языках, порядок), удалить
+    if (m === 'GET' && a === 'sections') {
+      await loadTags(env);
+      const cnt = {};
+      for (const r of (await env.DB.prepare('SELECT section FROM blog_posts').all()).results) if (r.section) cnt[r.section] = (cnt[r.section] || 0) + 1;
+      return json({ sections: SECTIONS.map(x => ({ ...x, count: cnt[x.slug] || 0 })) });
+    }
+    if (m === 'POST' && a === 'section-set') {
+      const b = await body();
+      const en = String(b.en || '').trim().slice(0, 60);
+      if (!en) fail(400, 'bad');
+      const slug = b.slug ? slugify(b.slug) : slugify(en);
+      let ru = String(b.ru || '').trim().slice(0, 60), lv = String(b.lv || '').trim().slice(0, 60);
+      if (!b.slug && (!ru || !lv)) { // новый раздел — пробуем перевести название
+        for (const l of ['ru', 'lv']) { if (l === 'ru' ? ru : lv) continue; try { const v = (await translateAll(env, [en], 'en', l)).texts[0] || ''; if (l === 'ru') ru = v.trim(); else lv = v.trim(); } catch (e) { /* оставим пустым */ } }
+      }
+      const max = (await env.DB.prepare('SELECT COALESCE(MAX(sort), 0) AS m FROM blog_sections').first()).m;
+      await env.DB.prepare('INSERT INTO blog_sections (slug, en, ru, lv, sort) VALUES (?, ?, ?, ?, ?) ON CONFLICT(slug) DO UPDATE SET en = excluded.en, ru = excluded.ru, lv = excluded.lv' + (b.sort != null ? ', sort = excluded.sort' : ''))
+        .bind(slug, en, ru, lv, b.sort != null ? Number(b.sort) : max + 1).run();
+      return json({ ok: true, slug });
+    }
+    if (m === 'POST' && a === 'section-delete') {
+      const { slug } = await body();
+      await env.DB.batch([env.DB.prepare("UPDATE blog_posts SET section = '' WHERE section = ?").bind(String(slug)), env.DB.prepare('DELETE FROM blog_sections WHERE slug = ?').bind(String(slug))]);
+      return json({ ok: true });
+    }
     // словарь тегов: список со счётчиками, правка перевода, перевод пустых
     if (m === 'GET' && a === 'tags') {
       await loadTags(env);
       const count = {};
       for (const p of (await env.DB.prepare('SELECT tags_en, tags_ru, tags_lv FROM blog_posts').all()).results) for (const g of tagsOf(p)) count[g] = (count[g] || 0) + 1;
       const keys = Object.keys(count).sort();
-      return json({ tags: keys.map(g => ({ en: g, ru: TAGMAP[g]?.ru || '', lv: TAGMAP[g]?.lv || '', count: count[g] })) });
+      return json({ tags: keys.map(g => ({ en: g, ru: TAGMAP[g]?.ru || '', lv: TAGMAP[g]?.lv || '', count: count[g], checked: !!TAGMAP[g]?.checked, src: TAGMAP[g]?.src || '', created: TAGMAP[g]?.created_at || 0 })) });
     }
     if (m === 'POST' && a === 'tag-set') {
       const b = await body();
       const en = String(b.en || '').trim().toLowerCase();
       if (!en) fail(400, 'bad');
       const clean = v => String(v || '').trim().toLowerCase().replace(/^#/, '').replace(/,/g, ' ').slice(0, 60);
-      await env.DB.prepare('INSERT INTO blog_tags (en, ru, lv) VALUES (?, ?, ?) ON CONFLICT(en) DO UPDATE SET ru = excluded.ru, lv = excluded.lv').bind(en, clean(b.ru), clean(b.lv)).run();
+      const checked = b.checked === false ? 0 : 1; // правка руками = проверено
+      await env.DB.prepare("INSERT INTO blog_tags (en, ru, lv, checked, src, created_at) VALUES (?, ?, ?, ?, 'manual', ?) ON CONFLICT(en) DO UPDATE SET ru = excluded.ru, lv = excluded.lv, checked = excluded.checked, src = CASE WHEN excluded.checked = 1 THEN 'manual' ELSE blog_tags.src END")
+        .bind(en, clean(b.ru), clean(b.lv), checked, Math.floor(Date.now() / 1000)).run();
       await syncTagColumns(env);
       return json({ ok: true });
     }
@@ -342,7 +420,7 @@ export async function blogApi(req, env, url, h) {
       await loadTags(env);
       const count = {};
       for (const p of (await env.DB.prepare('SELECT tags_en, tags_ru, tags_lv FROM blog_posts').all()).results) for (const g of tagsOf(p)) count[g] = 1;
-      const todo = Object.keys(count).filter(g => !TAGMAP[g] || !TAGMAP[g].ru || !TAGMAP[g].lv || TAGMAP[g].ru === g || TAGMAP[g].lv === g);
+      const todo = Object.keys(count).filter(g => !TAGMAP[g] || (!TAGMAP[g].checked && (!TAGMAP[g].ru || !TAGMAP[g].lv || TAGMAP[g].ru === g || TAGMAP[g].lv === g)));
       if (todo.length) await translateTags(env, todo);
       await syncTagColumns(env);
       return json({ ok: true, translated: todo.length });
@@ -524,14 +602,85 @@ async function translateAll(env, texts, from, to) {
   return { texts: out, engine: 'cloudflare' };
 }
 
+// частые теги про рисование — готовый перевод без машинного переводчика (RU/LV)
+const GLOSSARY = {
+  'watercolor': ['акварель', 'akvarelis'],
+  'watercolour': ['акварель', 'akvarelis'],
+  'sketchbook': ['скетчбук', 'skiču bloks'],
+  'sketchbooks': ['скетчбуки', 'skiču bloki'],
+  'review': ['обзор', 'apskats'],
+  'reviews': ['обзоры', 'apskati'],
+  'paper': ['бумага', 'papīrs'],
+  'ink': ['тушь', 'tuša'],
+  'gouache': ['гуашь', 'guaša'],
+  'acrylic': ['акрил', 'akrils'],
+  'pencil': ['карандаш', 'zīmulis'],
+  'drawing': ['рисование', 'zīmēšana'],
+  'illustration': ['иллюстрация', 'ilustrācija'],
+  'painting': ['живопись', 'glezniecība'],
+  'art': ['искусство', 'māksla'],
+  'ai': ['ии', 'mi'],
+  'ai art': ['ии-арт', 'mi māksla'],
+  'tutorial': ['урок', 'pamācība'],
+  'tips': ['советы', 'padomi'],
+  'guide': ['гайд', 'ceļvedis'],
+  'inspiration': ['вдохновение', 'iedvesma'],
+  'style': ['стиль', 'stils'],
+  'color': ['цвет', 'krāsa'],
+  'colour': ['цвет', 'krāsa'],
+  'palette': ['палитра', 'palete'],
+  'composition': ['композиция', 'kompozīcija'],
+  'character design': ['дизайн персонажей', 'tēlu dizains'],
+  'characters': ['персонажи', 'tēli'],
+  'process': ['процесс', 'process'],
+  'behind the scenes': ['за кадром', 'aizkulises'],
+  'materials': ['материалы', 'materiāli'],
+  'art supplies': ['художественные материалы', 'mākslas piederumi'],
+  'brushes': ['кисти', 'otas'],
+  'markers': ['маркеры', 'marķieri'],
+  'sketching': ['скетчинг', 'skicēšana'],
+  'urban sketching': ['урбан-скетчинг', 'pilsētas skicēšana'],
+  'creativity': ['творчество', 'radošums'],
+  'learning': ['обучение', 'mācīšanās'],
+  'experiment': ['эксперимент', 'eksperiments'],
+  'challenge': ['челлендж', 'izaicinājums'],
+  'diary': ['дневник', 'dienasgrāmata'],
+  'motivation': ['мотивация', 'motivācija'],
+  'artist': ['художник', 'mākslinieks'],
+  'artists': ['художники', 'mākslinieki'],
+  'landscape': ['пейзаж', 'ainava'],
+  'portrait': ['портрет', 'portrets'],
+  'nature': ['природа', 'daba'],
+  'animals': ['животные', 'dzīvnieki'],
+  'birds': ['птицы', 'putni'],
+  'cats': ['коты', 'kaķi'],
+  'books': ['книги', 'grāmatas'],
+  'education': ['образование', 'izglītība'],
+  'copyright': ['авторское право', 'autortiesības'],
+  'abstract': ['абстракция', 'abstrakcija'],
+  'texture': ['текстура', 'tekstūra'],
+  'granulation': ['грануляция', 'granulācija'],
+  'signature style': ['авторский стиль', 'autora stils'],
+  'art history': ['история искусства', 'mākslas vēsture'],
+  'music': ['музыка', 'mūzika'],
+  'football': ['футбол', 'futbols'],
+};
 // перевод тегов словаря на RU и LV (Gemini или запасной переводчик); не получилось — тег останется английским, его можно перевести вручную
 async function translateTags(env, list) {
-  for (const l of ['ru', 'lv']) {
+  const now = Math.floor(Date.now() / 1000);
+  const known = list.filter(g => GLOSSARY[g]), rest = list.filter(g => !GLOSSARY[g]);
+  for (const g of known) {
+    await env.DB.prepare(`INSERT INTO blog_tags (en, ru, lv, src, checked, created_at) VALUES (?, ?, ?, 'glossary', 1, ?) ON CONFLICT(en) DO UPDATE SET
+      ru = CASE WHEN blog_tags.ru = '' OR blog_tags.ru = blog_tags.en THEN excluded.ru ELSE blog_tags.ru END,
+      lv = CASE WHEN blog_tags.lv = '' OR blog_tags.lv = blog_tags.en THEN excluded.lv ELSE blog_tags.lv END,
+      src = CASE WHEN blog_tags.checked = 1 THEN blog_tags.src ELSE 'glossary' END, checked = 1`).bind(g, GLOSSARY[g][0], GLOSSARY[g][1], now).run();
+  }
+  for (const l of rest.length ? ['ru', 'lv'] : []) {
     let out = [];
-    try { out = (await translateAll(env, list, 'en', l)).texts; } catch (e) { out = []; }
-    for (const [i, g] of list.entries()) {
+    try { out = (await translateAll(env, rest, 'en', l)).texts; } catch (e) { out = []; }
+    for (const [i, g] of rest.entries()) {
       const v = String(out[i] || '').trim().toLowerCase().replace(/^#/, '').replace(/[,.]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
-      await env.DB.prepare(`INSERT INTO blog_tags (en, ${l}) VALUES (?, ?) ON CONFLICT(en) DO UPDATE SET ${l} = CASE WHEN blog_tags.${l} = '' OR blog_tags.${l} = blog_tags.en THEN excluded.${l} ELSE blog_tags.${l} END`).bind(g, v).run();
+      await env.DB.prepare(`INSERT INTO blog_tags (en, ${l}, src, checked, created_at) VALUES (?, ?, 'auto', 0, ?) ON CONFLICT(en) DO UPDATE SET ${l} = CASE WHEN blog_tags.checked = 0 AND (blog_tags.${l} = '' OR blog_tags.${l} = blog_tags.en) THEN excluded.${l} ELSE blog_tags.${l} END`).bind(g, v, now).run();
     }
   }
   await loadTags(env);
@@ -561,7 +710,7 @@ function card(p, lang) {
   return `<article class="bl-card">
     <a class="bl-cover" href="${blogUrl(lang, p.slug)}" tabindex="-1" aria-hidden="true">${p.cover ? `<img src="${esc(p.cover)}" alt="" loading="lazy">` : '<span class="bl-nocover">🕊</span>'}</a>
     <div class="bl-text">
-      <p class="bl-meta">${p.status === 'draft' ? `<span class="bl-draft">${t.draft}</span> · ` : ''}${fmtDate(p.published_at || p.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}</p>
+      <p class="bl-meta">${p.status === 'draft' ? `<span class="bl-draft">${t.draft}</span> · ` : ''}${p.section && sectionName(p.section, lang) ? `<a class="bl-sec" href="${blogUrl(lang, '', '?section=' + encodeURIComponent(p.section))}">${esc(sectionName(p.section, lang))}</a> · ` : ''}${fmtDate(p.published_at || p.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}</p>
       <h2><a href="${blogUrl(lang, p.slug)}">${esc(field(p, 't', lang))}</a></h2>
       <p class="bl-excerpt">${esc(excerpt)}</p>
       <p class="bl-foot">${tags.map(g => `<a class="bl-tag" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}">#${esc(tagLabel(g, lang))}</a>`).join(' ')}
@@ -572,22 +721,23 @@ function card(p, lang) {
 const ym = p => new Date((p.published_at || p.updated_at) * 1000).toISOString().slice(0, 7);
 function sidebar(posts, lang, activeTag, activeMonth = '', post = false) {
   const t = T[lang], count = {};
-  const fav = posts.filter(p => p.featured).slice(0, 6);
+  const fav = posts.filter(p => p.featured).slice(0, 5);
   const months = {};
   for (const p of posts) { const k = ym(p); months[k] = (months[k] || 0) + 1; }
   const years = [...new Set(Object.keys(months).map(k => k.slice(0, 4)))].sort().reverse();
   for (const p of posts) for (const g of tagsOf(p)) count[g] = (count[g] || 0) + 1;
-  const tags = Object.entries(count).sort((a, b) => b[1] - a[1]).slice(0, 30).sort((a, b) => tagLabel(a[0], lang).localeCompare(tagLabel(b[0], lang)));
-  const max = Math.max(1, ...tags.map(x => x[1]));
+  // теги — по убыванию частоты: самый частый золотой, следующие три фиолетовые, остальные белые
+  const tags = Object.entries(count).sort((a, b) => b[1] - a[1] || tagLabel(a[0], lang).localeCompare(tagLabel(b[0], lang))).slice(0, 24);
   const popular = [...posts].sort((a, b) => (b.likes * 5 + b.views + b.comments * 3) - (a.likes * 5 + a.views + a.comments * 3)).slice(0, 5);
+  const list = arr => `<ul class="bs-list">${arr.map(p => `<li><a href="${blogUrl(lang, p.slug)}">${esc(field(p, 't', lang))}</a></li>`).join('')}</ul>`;
   return `<aside class="bl-side">
-    ${fav.length ? `<section><h2>${t.featured}</h2><ol class="bl-pop bl-fav">${fav.map(p => `<li><a href="${blogUrl(lang, p.slug)}">${esc(field(p, 't', lang))}</a></li>`).join('')}</ol>
+    ${fav.length ? `<section><h2>★ ${t.featured.replace(/^★\s*/, '')}</h2>${list(fav)}
       ${!post && fav.length > 1 ? `<p class="bl-more"><a href="${blogUrl(lang, '', '?fav=1')}">${t.onlyFav} →</a></p>` : ''}</section>` : ''}
-    ${tags.length ? `<section><h2>${t.tags}</h2><p class="bl-cloud">${tags.map(([g, n]) =>
-      `<a href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}" style="--s:${(0.9 + (max > 1 ? 0.45 * (n - 1) / (max - 1) : 0)).toFixed(2)}"${g === activeTag ? ' aria-current="true"' : ''}>${esc(tagLabel(g, lang))}</a>`).join(' ')}</p></section>` : ''}
+    ${tags.length ? `<section><h2>${t.tags}</h2><p class="bs-tags">${tags.map(([g, n], i) =>
+      `<a class="bs-tag${i === 0 ? ' gold' : i < 4 ? ' violet' : ''}" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}"${g === activeTag ? ' aria-current="true"' : ''}>${esc(tagLabel(g, lang))}<span>${n}</span></a>`).join('')}</p></section>` : ''}
     ${years.length ? `<section><h2>${t.archive}</h2><ul class="bl-arch">${years.map(y => `<li><b>${y}</b><ul>${Object.keys(months).filter(k => k.startsWith(y)).sort().reverse().map(k =>
       `<li><a href="${blogUrl(lang, '', '?month=' + k)}"${k === activeMonth ? ' aria-current="true"' : ''}>${t.monthsFull[+k.slice(5) - 1]}</a> <span>${months[k]}</span></li>`).join('')}</ul></li>`).join('')}</ul></section>` : ''}
-    ${popular.length ? `<section><h2>${t.popular}</h2><ol class="bl-pop">${popular.map(p => `<li><a href="${blogUrl(lang, p.slug)}">${esc(field(p, 't', lang))}</a><span>♥ ${p.likes || 0}</span></li>`).join('')}</ol></section>` : ''}
+    ${popular.length ? `<section><h2>${t.popular}</h2>${list(popular)}</section>` : ''}
   </aside>`;
 }
 
@@ -648,20 +798,43 @@ export async function blogPage(req, env, url, h) {
   const published = posts.filter(x => x.status === 'published');
 
   if (!slug) {
-    const tag = (url.searchParams.get('tag') || '').trim().toLowerCase();
-    const month = /^\d{4}-\d{2}$/.test(url.searchParams.get('month') || '') ? url.searchParams.get('month') : '';
-    const favOnly = url.searchParams.get('fav') === '1';
+    const P = url.searchParams;
+    const tag = (P.get('tag') || '').trim().toLowerCase();
+    const month = /^\d{4}-\d{2}$/.test(P.get('month') || '') ? P.get('month') : '';
+    const favOnly = P.get('fav') === '1';
+    const section = (P.get('section') || '').trim().toLowerCase();
+    const q = (P.get('q') || '').trim().slice(0, 80);
     let list = posts;
+    if (section) list = list.filter(x => x.section === section);
     if (tag) list = list.filter(x => tagsOf(x).includes(tag) || splitTags(x['tags_' + lang]).includes(tag)); // старые ссылки с переводом тега тоже работают
     if (month) list = list.filter(x => ym(x) === month);
     if (favOnly) list = list.filter(x => x.featured);
-    const filtered = tag || month || favOnly;
-    const label = tag ? `${t.tagged} <b>#${esc(tagLabel(tag, lang))}</b>` : month ? `${t.inMonth} <b>${t.monthsFull[+month.slice(5) - 1]} ${month.slice(0, 4)}</b>` : favOnly ? `<b>${t.featured}</b>` : '';
+    if (q) { // поиск: заголовок, описание, текст и теги на любом языке
+      const words = q.toLowerCase().split(/\s+/).filter(Boolean);
+      list = list.filter(x => { const hay = [...LANGS.flatMap(l => [x['t_' + l], x['d_' + l], stripTags(x['b_' + l])]), ...tagsOf(x).map(g => g + ' ' + tagLabel(g, lang))].join(' ').toLowerCase(); return words.every(w => hay.includes(w)); });
+    }
+    // по 8 статей на странице
+    const PER = 8, pages = Math.max(1, Math.ceil(list.length / PER)), page = Math.min(pages, Math.max(1, parseInt(P.get('page')) || 1));
+    const shown = list.slice((page - 1) * PER, page * PER);
+    const link = (over) => { const u = new URLSearchParams(P); for (const [k, v] of Object.entries(over)) { if (v === '' || v == null) u.delete(k); else u.set(k, v); } const qs = u.toString(); return blogUrl(lang, '', qs ? '?' + qs : ''); };
+    const filtered = tag || month || favOnly || section || q || page > 1;
+    const label = q ? `${t.found}: <b>«${esc(q)}»</b> (${list.length})` : tag ? `${t.tagged} <b>#${esc(tagLabel(tag, lang))}</b>` : month ? `${t.inMonth} <b>${t.monthsFull[+month.slice(5) - 1]} ${month.slice(0, 4)}</b>` : favOnly ? `<b>${t.featured}</b>` : '';
+    const used = new Set(published.map(x => x.section).filter(Boolean));
+    const secs = SECTIONS.filter(x => used.has(x.slug) || isAdm);
+    const pager = pages > 1 ? `<nav class="bl-pager" aria-label="Pages">${page > 1 ? `<a href="${link({ page: page - 1 > 1 ? page - 1 : '' })}">${t.prev}</a>` : '<span></span>'}
+      <span class="bl-pages">${Array.from({ length: pages }, (_, k) => k + 1).map(n => n === page ? `<b aria-current="page">${n}</b>` : `<a href="${link({ page: n > 1 ? n : '' })}">${n}</a>`).join('')}</span>
+      ${page < pages ? `<a href="${link({ page: page + 1 })}">${t.next}</a>` : '<span></span>'}</nav>` : '';
     const content = `<section class="page-head bl-head"><p class="topics">${t.blog.toLowerCase()}</p><h1>${t.head}</h1><p class="lead">${t.lead}</p>
       <div class="bl-admin" data-blog-admin hidden><a class="pill-btn" href="/blog-editor/">＋ ${lang === 'ru' ? 'Новая статья' : lang === 'lv' ? 'Jauns raksts' : 'New post'}</a></div></section>
+      <div class="bl-tools">
+        ${secs.length ? `<nav class="bl-sections" aria-label="${t.section}"><a href="${link({ section: '', page: '' })}"${section ? '' : ' aria-current="true"'}>${t.allSections}</a>${secs.map(x => `<a href="${link({ section: x.slug, page: '' })}"${section === x.slug ? ' aria-current="true"' : ''}>${esc(x[lang] || x.en)}</a>`).join('')}</nav>` : '<span></span>'}
+        <form class="bl-search" action="${blogUrl(lang, '')}" method="get" role="search">${section ? `<input type="hidden" name="section" value="${esc(section)}">` : ''}
+          <input type="search" name="q" value="${esc(q)}" placeholder="${t.search}" aria-label="${t.search}"><button type="submit" aria-label="${t.searchBtn}">🔍</button></form>
+      </div>
       <div class="bl-grid"><div class="bl-list">
-        ${filtered ? `<p class="bl-filter">${label} · <a href="${blogUrl(lang, '')}">${t.all}</a></p>` : ''}
-        ${list.map(x => card(x, lang)).join('') || `<p class="bl-empty">${t.empty}</p>`}
+        ${filtered && (label || section) ? `<p class="bl-filter">${label || `<b>${esc(sectionName(section, lang))}</b>`} · <a href="${blogUrl(lang, '')}">${t.all}</a></p>` : ''}
+        ${shown.map(x => card(x, lang)).join('') || `<p class="bl-empty">${q ? t.nothing : t.empty}</p>`}
+        ${pager}
       </div>${sidebar(published, lang, tag, month)}</div>
       <script src="/assets/blog.js" defer></script>`;
     return html(fill(tpl, { title: `${t.blog} · Pigeon Polly Art Lab`, description: t.descr, canonical: SITE + blogUrl(lang, ''), content, noindex: !!filtered }));
@@ -685,6 +858,7 @@ export async function blogPage(req, env, url, h) {
     <p class="bp-back"><a href="${blogUrl(lang, '')}">${t.back}</a></p>
     <header class="bp-head"${textLang !== lang ? ` lang="${textLang}"` : ''}>
       ${post.status === 'draft' ? `<p class="bl-draft">${t.draft}</p>` : ''}
+      ${post.section && sectionName(post.section, lang) ? `<p class="bp-sec"><a href="${blogUrl(lang, '', '?section=' + encodeURIComponent(post.section))}">${esc(sectionName(post.section, lang))}</a></p>` : ''}
       <h1>${esc(title)}</h1>
       <p class="bl-meta">${fmtDate(post.published_at || post.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}
         ${tags.length ? ' · ' + tags.map(g => `<a class="bl-tag" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}">#${esc(tagLabel(g, lang))}</a>`).join(' ') : ''}</p>

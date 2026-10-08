@@ -150,6 +150,10 @@
 
   const say = async (text, ms = 2600) => {
     bubble.textContent = text;
+    // наверху (на шапке) облачко ушло бы за край экрана — тогда показываем его под Полли; у правого края — левее
+    const r = pet.getBoundingClientRect();
+    bubble.classList.toggle('below', r.top < 140);
+    bubble.classList.toggle('flip', r.left > innerWidth - 240);
     bubble.classList.add('show');
     await wait(ms);
     bubble.classList.remove('show');

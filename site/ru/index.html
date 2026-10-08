@@ -508,13 +508,15 @@
 #blk-flock .fl-nick { position: absolute; left: 0; top: 0; padding: 1px 6px; border-radius: 99px; background: rgba(26, 21, 40, .72); color: #F3EFFA; font: 700 11px/1.4 var(--sans); white-space: nowrap; text-decoration: none; pointer-events: auto; will-change: transform; }
 #blk-flock .fl-nick:hover { background: #F0A987; color: #2B1A51; z-index: 2; }
 #blk-flock .fl-nick.me { background: #E9A93B; color: #2B1A51; z-index: 1; }
-#blk-flock .fl-join { display: inline-block; margin-top: 22px; }
+#blk-flock .fl-join { display: inline-block; margin-top: 12px; }
+#blk-flock .fl-how { margin: 22px 0 0; font-size: 15px; color: #F3EFFA; font-weight: 700; }
 @media (max-width: 600px) {#blk-flock .fl-nick { font-size: 10px; padding: 0 4px; }}</style><section class="fl" id="flock" aria-labelledby="fl-title">
   <p class="fl-kick">Каждый, кто входит, получает птичку</p>
   <h2 id="fl-title">Наша стая</h2>
   <p class="fl-sub">Здесь живут все, кто хоть раз входил на сайт, — каждый в виде маленькой пиксельной птички. Двух одинаковых нет: разные формы, шляпы и очень модные туфли. Каждый 10-й гость — дружелюбный котик, каждый 11-й — ворона с сокровищем в клюве. Нажмите на ник, чтобы открыть профиль.</p>
   <p class="fl-count" data-tpl="Птиц в стае: {n}" data-recent="· показаны те, кто заходил недавно"></p>
   <div class="fl-stage"><canvas width="300" height="142" role="img" aria-label="Пиксельные птички гуляют вокруг скамейки, урны, булки, багета, книги и стаканчика кофе"></canvas><div class="fl-labels"></div></div>
+  <p class="fl-how">Чтобы попасть в стаю, просто войдите через Google и выберите ник.</p>
   <a class="pill-btn pill-fill fl-join" href="/ru/challenge/">Хочу свою птичку →</a>
 </section>
 <script src="/assets/flock.js" defer></script>

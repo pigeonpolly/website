@@ -23,7 +23,7 @@
   const errText = e => ERR[e.code] || 'Что-то пошло не так (' + esc(e.code || e.message) + ').';
   let flash = '', state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null;
   // все теги из статей: { ru: ['акварель', …], … } и счётчики
-  let tagDict = []; // словарь тегов: [{ en, ru, lv, count }]
+  let sections = [], tagDict = [], tagSort = 'unchecked'; // словарь тегов: [{ en, ru, lv, count, checked, src, created }]
   function tagsByLang() {
     knownTagCounts = {};
     for (const l of ['ru', 'en', 'lv']) {
@@ -69,7 +69,7 @@
   // ---------- список статей ----------
   async function dashboard() {
     app.innerHTML = '<p class="be-note">Загрузка…</p>';
-    try { [state, tagDict] = await Promise.all([api('blog/admin/posts'), api('blog/admin/tags').then(r => r.tags).catch(() => [])]); } catch (e) { app.innerHTML = `<p class="be-note">${errText(e)}</p>`; return; }
+    try { [state, tagDict, sections] = await Promise.all([api('blog/admin/posts'), api('blog/admin/tags').then(r => r.tags).catch(() => []), api('blog/admin/sections').then(r => r.sections).catch(() => [])]); } catch (e) { app.innerHTML = `<p class="be-note">${errText(e)}</p>`; return; }
     const pend = state.pending;
     const pub = state.posts.filter(p => p.status === 'published'), drafts = state.posts.filter(p => p.status !== 'published');
     knownTags = tagsByLang();
@@ -86,19 +86,38 @@
       </tbody></table>`;
     };
     // словарь тегов: английский тег (как в статьях) и его перевод — правится прямо в таблице
+    // разделы блога (как коллекции на Patreon)
+    const sectionsHtml = () => `<p class="be-note">Разделы — крупные темы блога (как коллекции на Patreon). У каждой статьи один раздел; читатели видят их кнопками над списком статей. Названия на RU и LV подставляются сами — их можно поправить прямо здесь.</p>
+      <form class="be-newsec" id="be-newsec"><input type="text" name="en" placeholder="Название нового раздела (на английском), например Weekly Polly" required maxlength="60"><button class="pill-btn pill-fill" type="submit">＋ Добавить раздел</button></form>
+      ${sections.length ? `<table class="be-table be-tagtable"><thead><tr><th>EN</th><th>RU</th><th>LV</th><th>Статей</th><th>Порядок</th><th></th></tr></thead><tbody>
+      ${sections.map((r, i) => `<tr data-s="${esc(r.slug)}"><td><input type="text" class="be-tr-in" data-f="en" value="${esc(r.en)}"></td><td><input type="text" class="be-tr-in" data-f="ru" value="${esc(r.ru)}"></td><td><input type="text" class="be-tr-in" data-f="lv" value="${esc(r.lv)}"></td>
+        <td>${r.count}</td><td class="be-acts"><button type="button" class="be-ico" data-move="-1" ${i ? '' : 'disabled'} aria-label="Выше">↑</button><button type="button" class="be-ico" data-move="1" ${i < sections.length - 1 ? '' : 'disabled'} aria-label="Ниже">↓</button></td>
+        <td><button type="button" class="be-ico be-danger" data-delsec aria-label="Удалить раздел">✕</button></td></tr>`).join('')}</tbody></table>` : '<p class="be-note">Разделов пока нет.</p>'}`;
+    const SRC = { glossary: 'словарь', auto: 'автоперевод', manual: 'вы' };
+    const sorted = () => [...tagDict].sort({
+      unchecked: (a, b) => a.checked - b.checked || b.count - a.count || a.en.localeCompare(b.en),
+      count: (a, b) => b.count - a.count || a.en.localeCompare(b.en),
+      recent: (a, b) => (b.created || 0) - (a.created || 0) || a.en.localeCompare(b.en),
+      abc: (a, b) => a.en.localeCompare(b.en),
+    }[tagSort]);
     const tagsHtml = () => tagDict.length ? `<p class="be-note">Теги в статьях — на английском. Перевод на RU и LV общий для всех статей: исправьте в таблице, и он поменяется везде (сохраняется сам).
         Нажмите на тег, чтобы увидеть его статьи.</p>
-      <p><button type="button" class="pill-btn" id="be-tags-tr">🌐 Перевести пустые</button></p>
-      <table class="be-table be-tagtable"><thead><tr><th>EN (в статьях)</th><th>RU</th><th>LV</th><th>Статей</th><th></th></tr></thead><tbody>
-      ${tagDict.map(r => `<tr data-t="${esc(r.en)}"><td><button type="button" class="be-tagname" data-show title="Показать статьи">#${esc(r.en)}</button></td>
+      <div class="be-tagbar"><label>Сортировка: <select id="be-tagsort">${[['unchecked', 'сначала непроверенные'], ['count', 'по частоте'], ['recent', 'сначала новые'], ['abc', 'по алфавиту']].map(([k, n]) => `<option value="${k}"${tagSort === k ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
+        <span class="be-note">Не проверено: <b>${tagDict.filter(x => !x.checked).length}</b> из ${tagDict.length}</span>
+        <button type="button" class="pill-btn" id="be-tags-tr">🌐 Перевести пустые</button></div>
+      <table class="be-table be-tagtable"><thead><tr><th>EN (в статьях)</th><th>RU</th><th>LV</th><th>Статей</th><th>Проверено</th><th></th></tr></thead><tbody>
+      ${sorted().map(r => `<tr data-t="${esc(r.en)}" class="${r.checked ? 'ok' : 'todo'}"><td><button type="button" class="be-tagname" data-show title="Показать статьи">#${esc(r.en)}</button></td>
         <td><input type="text" class="be-tr-in" data-l="ru" value="${esc(r.ru)}" placeholder="перевод…" aria-label="Перевод #${esc(r.en)} на русский"></td>
         <td><input type="text" class="be-tr-in" data-l="lv" value="${esc(r.lv)}" placeholder="tulkojums…" aria-label="Перевод #${esc(r.en)} на латышский"></td>
         <td>${r.count}</td>
+        <td><label class="be-chk"><input type="checkbox" data-checked ${r.checked ? 'checked' : ''}> <small>${SRC[r.src] || ''}</small></label></td>
         <td class="be-acts"><button type="button" class="be-ico" data-ren title="Переименовать английский тег во всех статьях" aria-label="Переименовать #${esc(r.en)}">✎</button><button type="button" class="be-ico be-danger" data-deltag title="Удалить из всех статей" aria-label="Удалить #${esc(r.en)}">✕</button></td></tr>`).join('')}
       </tbody></table>` : '<p class="be-note">Тегов пока нет — они появятся, когда вы добавите их в статьи.</p>';
     const flashHtml = flash ? `<p class="be-flash" role="status">${flash}</p>` : ''; flash = '';
     app.innerHTML = `${flashHtml}<div class="be-top">
         <a class="pill-btn pill-fill" href="#new">＋ Новая статья</a>
+        <button type="button" class="pill-btn" id="be-backup" title="Все статьи на трёх языках, картинки, теги, разделы и комментарии — одним ZIP-файлом">💾 Скачать копию блога</button>
+        <label class="pill-btn be-restore" title="Вернуть статьи и картинки из ранее скачанной копии">♻ Восстановить из копии<input type="file" id="be-restore" accept=".zip" hidden></label>
         <label class="be-switch"><input type="checkbox" id="be-strict" ${state.strict ? 'checked' : ''}><span></span>
           <b>Строгий режим</b><small>не больше 1 комментария в час с одного адреса</small></label>
       </div>
@@ -106,9 +125,9 @@
         <li data-cid="${c.id}"><p><b>${esc(c.name)}</b> → <a href="/ru/blog/${esc(c.slug)}/#comments" target="_blank">${esc(c.t_ru)}</a> · ${fmt(c.created_at)}</p>
         <p class="be-ctext">${esc(c.body)}</p><p><button class="pill-btn" data-ok>Одобрить</button> <button class="pill-btn be-danger" data-del>Удалить</button></p></li>`).join('')}</ol></section>` : ''}
       <section class="be-card">
-        <div class="be-dtabs" role="tablist">${[['published', 'Опубликованные', pub.length], ['draft', 'Черновики', drafts.length], ['tags', 'Теги', tagCount]].map(([k, n, c]) =>
+        <div class="be-dtabs" role="tablist">${[['published', 'Опубликованные', pub.length], ['draft', 'Черновики', drafts.length], ['sections', 'Разделы', sections.length], ['tags', 'Теги', tagCount]].map(([k, n, c]) =>
           `<button type="button" role="tab" data-dtab="${k}" aria-selected="${dashTab === k}">${n} <span>${c}</span></button>`).join('')}</div>
-        ${dashTab === 'tags' ? tagsHtml() : postsHtml(dashTab === 'draft' ? drafts : pub)}
+        ${dashTab === 'tags' ? tagsHtml() : dashTab === 'sections' ? sectionsHtml() : postsHtml(dashTab === 'draft' ? drafts : pub)}
       </section>
       ${state.gemini ? '' : '<p class="be-note">⚠ Ключ Gemini (GEMINI_KEY) не подключён в Cloudflare — переводит запасной, более слабый переводчик.</p>'}
       ${state.media ? '' : '<p class="be-note">⚠ Хранилище картинок (R2) не подключено — загрузка картинок не заработает.</p>'}`;
@@ -123,18 +142,96 @@
       try { await api('blog/admin/tag', { from: t, to }); } catch (e) { alert(errText(e)); }
       dashboard();
     }));
-    // перевод тега сохраняется сам, когда уходите из поля
+    // перевод тега сохраняется сам, когда уходите из поля; правка руками = «проверено»
+    const saveRow = async (tr, checked) => {
+      const row = tagDict.find(x => x.en === tr.dataset.t);
+      tr.querySelectorAll('.be-tr-in').forEach(i => { row[i.dataset.l] = i.value.trim().toLowerCase(); });
+      row.checked = checked;
+      await api('blog/admin/tag-set', { en: row.en, ru: row.ru, lv: row.lv, checked });
+      tr.className = checked ? 'ok' : 'todo'; tr.querySelector('[data-checked]').checked = checked;
+      if (checked) tr.querySelector('.be-chk small').textContent = 'вы';
+    };
     app.querySelectorAll('.be-tr-in').forEach(inp => inp.addEventListener('change', async () => {
-      const tr = inp.closest('tr'), row = tagDict.find(x => x.en === tr.dataset.t);
-      row[inp.dataset.l] = inp.value.trim().toLowerCase();
       inp.classList.remove('saved');
-      try { await api('blog/admin/tag-set', { en: row.en, ru: row.ru, lv: row.lv }); inp.classList.add('saved'); } catch (e) { alert(errText(e)); }
+      try { await saveRow(inp.closest('tr'), true); inp.classList.add('saved'); } catch (e) { alert(errText(e)); }
     }));
+    app.querySelectorAll('[data-checked]').forEach(c => c.addEventListener('change', async () => {
+      try { await saveRow(c.closest('tr'), c.checked); } catch (e) { c.checked = !c.checked; alert(errText(e)); }
+    }));
+    // разделы: добавить, переименовать, порядок, удалить
+    const ns = app.querySelector('#be-newsec');
+    ns && ns.addEventListener('submit', async e => { e.preventDefault(); try { await api('blog/admin/section-set', { en: ns.en.value.trim() }); } catch (err) { alert(errText(err)); } dashboard(); });
+    app.querySelectorAll('tr[data-s] .be-tr-in').forEach(inp => inp.addEventListener('change', async () => {
+      const tr = inp.closest('tr'), r = sections.find(x => x.slug === tr.dataset.s);
+      tr.querySelectorAll('.be-tr-in').forEach(i => { r[i.dataset.f] = i.value.trim(); });
+      try { await api('blog/admin/section-set', { slug: r.slug, en: r.en, ru: r.ru, lv: r.lv }); inp.classList.add('saved'); } catch (err) { alert(errText(err)); }
+    }));
+    app.querySelectorAll('[data-move]').forEach(b => b.addEventListener('click', async () => {
+      const i = sections.findIndex(x => x.slug === b.closest('tr').dataset.s), j = i + Number(b.dataset.move);
+      const list = [...sections]; [list[i], list[j]] = [list[j], list[i]];
+      for (const [k, r] of list.entries()) await api('blog/admin/section-set', { slug: r.slug, en: r.en, ru: r.ru, lv: r.lv, sort: k + 1 });
+      dashboard();
+    }));
+    app.querySelectorAll('[data-delsec]').forEach(b => b.addEventListener('click', async () => {
+      const r = sections.find(x => x.slug === b.closest('tr').dataset.s);
+      if (!confirm(`Удалить раздел «${r.en}»? Статьи останутся, просто без раздела.`)) return;
+      await api('blog/admin/section-delete', { slug: r.slug }); dashboard();
+    }));
+    const ts = app.querySelector('#be-tagsort'); ts && ts.addEventListener('change', () => { tagSort = ts.value; dashboard(); });
     const ttr = app.querySelector('#be-tags-tr');
     ttr && ttr.addEventListener('click', async () => {
       ttr.disabled = true; ttr.textContent = 'Перевожу…';
       try { await api('blog/admin/tags-translate', {}); } catch (e) { alert(errText(e)); }
       dashboard();
+    });
+    // резервная копия: data.json + картинки + читаемые HTML-файлы статей, одним ZIP
+    app.querySelector('#be-backup').addEventListener('click', async e => {
+      const btn = e.currentTarget; btn.disabled = true;
+      const say = t => { btn.textContent = t; };
+      try {
+        say('Готовлю…');
+        const [JSZip, data] = await Promise.all([loadZip(), api('blog/admin/export')]);
+        const zip = new JSZip();
+        zip.file('data.json', JSON.stringify(data, null, 1));
+        zip.file('README.txt', 'Резервная копия блога pigeonpolly.com от ' + data.exported_at + '\n\ndata.json — все статьи (RU/EN/LV), теги, разделы, комментарии.\nmedia/ — картинки статей.\nposts/ — статьи как обычные HTML-файлы, их можно открыть в браузере.\n\nВосстановить: Редактор блога → «Восстановить из копии» → выбрать этот ZIP.\n');
+        for (const p of data.posts) for (const l of ['ru', 'en', 'lv']) {
+          if (!p['t_' + l] && !p['b_' + l]) continue;
+          zip.file(`posts/${p.slug}/${l}.html`, `<!doctype html><meta charset="utf-8"><title>${esc(p['t_' + l])}</title><body style="max-width:760px;margin:40px auto;font:18px/1.6 Georgia,serif">` +
+            `<h1>${esc(p['t_' + l])}</h1><p><i>${esc(p['d_' + l] || '')}</i></p>` + String(p['b_' + l] || '').replace(/src="\/media\//g, 'src="../../media/') + '</body>');
+        }
+        let n = 0;
+        for (const key of data.media) {
+          say(`Картинки: ${++n} из ${data.media.length}…`);
+          try { const r = await fetch('/media/' + key); if (r.ok) zip.file('media/' + key, await r.blob()); } catch (err) { /* пропускаем */ }
+        }
+        say('Упаковываю…');
+        const blob = await zip.generateAsync({ type: 'blob' });
+        const a = document.createElement('a');
+        a.href = URL.createObjectURL(blob); a.download = `pigeonpolly-blog-${new Date().toISOString().slice(0, 10)}.zip`;
+        document.body.appendChild(a); a.click(); a.remove();
+        say('✓ Копия скачана');
+      } catch (err) { alert('Не получилось сделать копию: ' + errText(err)); say('💾 Скачать копию блога'); }
+      btn.disabled = false;
+    });
+    app.querySelector('#be-restore').addEventListener('change', async e => {
+      const f = e.target.files[0]; e.target.value = '';
+      if (!f || !confirm('Восстановить блог из этой копии? Статьи с теми же адресами будут заменены версиями из копии, остальные останутся как есть.')) return;
+      const lbl = app.querySelector('.be-restore');
+      try {
+        const JSZip = await loadZip(), zip = await JSZip.loadAsync(f);
+        const data = JSON.parse(await zip.file('data.json').async('string'));
+        const media = zip.file(/^media\/blog\//);
+        let n = 0;
+        for (const m of media) {
+          lbl.firstChild.textContent = `Картинки: ${++n} из ${media.length}…`;
+          const fd = new FormData(); fd.append('key', m.name.slice(6)); fd.append('file', await m.async('blob'), 'img');
+          await api('blog/admin/restore-media', null, fd);
+        }
+        lbl.firstChild.textContent = 'Статьи…';
+        const r = await api('blog/admin/import', data);
+        flash = `✓ Восстановлено: статей ${r.posts}, комментариев ${r.comments}, картинок ${media.length}.`;
+        dashboard();
+      } catch (err) { alert('Не получилось восстановить: ' + errText(err)); dashboard(); }
     });
     app.querySelector('#be-strict').addEventListener('change', async e => {
       try { await api('blog/admin/settings', { strict: e.target.checked }); } catch (err) { e.target.checked = !e.target.checked; alert(errText(err)); }
@@ -167,6 +264,7 @@
   async function editor(id) {
     let post = { id: 0, slug: '', status: 'draft', cover: '' };
     if (!state) { try { state = await api('blog/admin/posts'); } catch (e) { /* подсказки тегов просто не появятся */ } }
+    try { sections = (await api('blog/admin/sections')).sections; } catch (e) { /* без разделов */ }
     knownTags = tagsByLang();
     if (id) {
       app.innerHTML = '<p class="be-note">Загрузка…</p>';
@@ -193,6 +291,8 @@
             ${post.cover ? '<button type="button" class="bc-link" id="be-cover-rm">убрать обложку</button>' : ''}</div></div></div>
         <label class="be-f be-srclang"><span>Язык оригинала <small>(на остальных языках внизу статьи появится маленькая пометка «перевод сделан онлайн-инструментами» со ссылкой на оригинал; кнопка «Перевести» ставит его сама)</small></span>
           <select id="be-src"><option value="">— не указан (пометки не будет) —</option>${LANGS.map(([l, n]) => `<option value="${l}"${post.src_lang === l ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
+        <label class="be-f"><span>Раздел <small>(крупная тема, как коллекция на Patreon)</small></span>
+          <select id="be-section"><option value="">— без раздела —</option>${sections.map(r => `<option value="${esc(r.slug)}"${post.section === r.slug ? ' selected' : ''}>${esc(r.en)}${r.ru ? ' / ' + esc(r.ru) : ''}</option>`).join('')}<option value="__new">＋ Новый раздел…</option></select></label>
         <div class="be-f"><span>Теги <small>(на английском: впишите тег и нажмите Enter. Перевод на RU и LV подставится сам — поправить его можно во вкладке «Теги» списка статей)</small></span>
           <div class="be-tags" data-tags="en"><input type="text" class="be-tag-in" list="be-taglist-en" placeholder="new tag…" aria-label="Новый тег"></div>
           <datalist id="be-taglist-en">${(knownTags.en || []).map(x => `<option value="${esc(x)}">`).join('')}</datalist>
@@ -214,7 +314,7 @@
     document.execCommand('defaultParagraphSeparator', false, 'p');
 
     const collect = () => {
-      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value };
+      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value, section: $('#be-section').value === '__new' ? '' : $('#be-section').value };
       app.querySelectorAll('[data-k]').forEach(el => {
         if (!el.isContentEditable) { d[el.dataset.k] = el.value; return; }
         const c = el.cloneNode(true);
@@ -276,6 +376,18 @@
       const others = LANGS.map(x => x[0]).filter(x => x !== active).map(x => x.toUpperCase());
       $('#be-tr').textContent = `🌐 Перевести с ${active.toUpperCase()} на ${others.join(' и ')}`;
     }));
+    $('#be-section').addEventListener('change', async e => {
+      if (e.target.value !== '__new') return;
+      const en = prompt('Название нового раздела на английском (например Weekly Polly):', '');
+      if (!en || !en.trim()) { e.target.value = post.section || ''; return; }
+      try {
+        const r = await api('blog/admin/section-set', { en: en.trim() });
+        sections = (await api('blog/admin/sections')).sections;
+        e.target.insertAdjacentHTML('afterbegin', '');
+        const opt = document.createElement('option'); opt.value = r.slug; opt.textContent = en.trim();
+        e.target.insertBefore(opt, e.target.querySelector('[value="__new"]')); e.target.value = r.slug; touch();
+      } catch (err) { alert(errText(err)); e.target.value = ''; }
+    });
     // открываем вкладку языка оригинала (если не указан — первую, где есть текст)
     const startLang = post.src_lang || LANGS.map(x => x[0]).find(l => post['t_' + l] || stripHtml(post['b_' + l])) || 'ru';
     if (startLang !== 'ru') app.querySelector(`[data-tab="${startLang}"]`).click();
@@ -586,6 +698,13 @@
   const slugify = s => String(s || '').toLowerCase()
     .replace(/[а-яё]/g, c => ({ а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya' }[c]))
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 70);
+  // JSZip для резервных копий — подгружаем только когда нужен
+  let zipLib = null;
+  const loadZip = () => zipLib || (zipLib = new Promise((res, rej) => {
+    if (window.JSZip) return res(window.JSZip);
+    const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
+    sc.onload = () => res(window.JSZip); sc.onerror = () => { zipLib = null; rej(new Error('zip')); }; document.head.appendChild(sc);
+  }));
   const stripHtml = s => String(s || '').replace(/<[^>]*>/g, '').trim();
 
   start();

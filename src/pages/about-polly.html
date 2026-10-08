@@ -25,3 +25,25 @@
   </div>
   <p class="ap-play">Want to play with us? <a href="/detective-office/">Help Detective Titos solve a case →</a></p>
 </section>
+<section class="ap-flock">
+  <canvas class="ap-flock-pic" width="150" height="34" aria-hidden="true"></canvas>
+  <div>
+    <h2 class="section-title">The flock of visitors</h2>
+    <p>Every visitor who signs in gets their own pixel bird. Some become cats, some become crows with a treasure in their beak, and they all hang out together on the home page.</p>
+    <p class="ap-flock-how"><b>To join the flock, just sign in with Google</b> and choose a nickname. That’s all.</p>
+    <div class="actions"><button type="button" class="pill-btn pill-fill" data-signin>Sign in and get my bird</button><a class="pill-btn" href="/#flock">See the flock →</a></div>
+  </div>
+</section>
+<script>
+  // превью стаи: несколько птичек, котик и ворона; кнопка входа открывает окно Google в шапке
+  addEventListener('load', () => {
+    const c = document.querySelector('.ap-flock-pic'), B = window.PPBirds;
+    if (c && B) { const g = c.getContext('2d'); [3, 10, 7, 11, 15].forEach((id, i) => g.drawImage(B.sprite(B.looks(id), i === 1 ? 2 : 0), 2 + i * 29, 6)); }
+    const btn = document.querySelector('[data-signin]');
+    btn && btn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (window.PPAccount && window.PPAccount.signedIn()) { location.href = btn.closest('section').querySelector('a').href; return; }
+      window.PPAccount && window.PPAccount.openSignIn();
+    });
+  });
+</script>
