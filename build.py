@@ -89,10 +89,10 @@ SECTIONS = {
 TAB_ALIAS = {"art-portfolio/anxiety": "art-portfolio", "art-portfolio/sketchbook": "art-portfolio", "art-portfolio/ai-art": "art-portfolio"}
 NAV = [
     ("challenge", "Daily Challenge"),
+    ("blog", "Blog"),
     ("detective-office", "Games", "games"),
     ("about-polly", "Polly’s World", "world"),
     ("e-books", "Books & Helpful", "books"),
-    ("blog", "Blog"),
     ("about-me", "About me", "about"),
 ]
 

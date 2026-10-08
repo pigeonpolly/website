@@ -24,6 +24,12 @@
   .hb-side b { display: block; font: 600 18px/1.25 var(--serif); color: #2B1A51; }
   .hb-side small { display: block; margin-top: 4px; font: 600 13px var(--sans); color: #7A6F99; }
   .hb-tag { color: #534AB7; }
+  .hb-none .hb-side { display: none; }
+  .hb-soon { display: flex; gap: 28px; align-items: center; padding: 28px 32px; border-radius: 18px; background: #F3EEFB; }
+  .hb-soon h3 { margin: 0 0 8px; font: 600 clamp(22px, 2.4vw, 30px)/1.2 var(--serif); color: #2B1A51; }
+  .hb-soon .hb-ex { margin: 0; }
+  .hb-soon-pic { font-size: 48px; flex: none; }
+  @media (max-width: 600px) { .hb-soon { flex-direction: column; text-align: center; padding: 24px 18px; } }
   .hb-solo .hb-grid { grid-template-columns: 1fr; }
   .hb-solo .hb-main { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 36px; align-items: center; }
   .hb-solo .hb-meta { margin-top: 0; }
@@ -35,7 +41,7 @@
     <a class="hb-all" href="/blog/">All posts →</a>
   </div>
   <div class="hb-grid">
-    <div class="hb-latest"></div>
+    <div class="hb-latest"><div class="hb-soon"><span class="hb-soon-pic" aria-hidden="true">✍️🕊</span><div><h3>The first posts are on their way</h3><p class="hb-ex">Soon here: my Patreon articles about sketchbooks, watercolor, AI experiments and finding your own style. Free for everyone.</p></div></div></div>
     <aside class="hb-side"><h3 class="hb-fav">★ Favourites</h3><ol></ol></aside>
   </div>
   <span class="hb-label" hidden data-read>Read the article →</span>

@@ -66,7 +66,7 @@ async function ensureSchema(env) {
   for (const sql of ['ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
     "ALTER TABLE users ADD COLUMN months TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN tod INTEGER',
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
-    "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER']) {
+    "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   schemaReady = true;
@@ -88,8 +88,11 @@ const sessionCookie = (token, maxAge) => `pp_s=${token}; Path=/; HttpOnly; Secur
 async function currentUser(req, env) {
   const token = cookie(req, 'pp_s');
   if (!token || !/^[0-9a-f]{64}$/.test(token)) return null;
-  return env.DB.prepare(`SELECT u.* FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ? AND s.expires > ?`)
+  const u = await env.DB.prepare(`SELECT u.* FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ? AND s.expires > ?`)
     .bind(token, now()).first();
+  // «был недавно» для стаи на главной: обновляем не чаще раза в 10 минут
+  if (u && (u.last_seen || 0) < now() - 600) await env.DB.prepare('UPDATE users SET last_seen = ? WHERE id = ?').bind(now(), u.id).run();
+  return u;
 }
 async function needUser(req, env) {
   const u = await currentUser(req, env);
@@ -255,6 +258,15 @@ async function route(req, env, url) {
     const works = await getMeta(env, 'works_total') ?? (await env.DB.prepare('SELECT COUNT(*) AS n FROM posts').first()).n;
     const users = await getMeta(env, 'users_total') ?? (await env.DB.prepare('SELECT COUNT(*) AS n FROM users').first()).n;
     return json({ works: Number(works), users: Number(users) }, 200, { 'cache-control': 'public, max-age=60' });
+  }
+  // «Стая» на главной: все, кто хоть раз входил; когда их много — те, кто заходил недавно (+ сам посетитель)
+  if (m === 'GET' && p === '/api/flock') {
+    const LIMIT = 36;
+    const me = await currentUser(req, env);
+    const total = (await env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE banned = 0').first()).n;
+    let rows = (await env.DB.prepare(`SELECT id, nick FROM users WHERE banned = 0 ORDER BY COALESCE(last_seen, created_at) DESC LIMIT ?`).bind(LIMIT).all()).results;
+    if (me && !me.banned && !rows.some(r => r.id === me.id)) rows = [{ id: me.id, nick: me.nick }, ...rows.slice(0, LIMIT - 1)];
+    return json({ total, recent: total > LIMIT, birds: rows.map(r => ({ id: r.id, nick: r.nick || null, me: !!me && r.id === me.id })) });
   }
   if (m === 'GET' && p === '/api/config') return json({ ready: true, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
 

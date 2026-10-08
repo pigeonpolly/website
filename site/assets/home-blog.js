@@ -6,7 +6,7 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const pic = (p, cls) => `<span class="${cls}">${p.cover ? `<img src="${esc(p.cover)}" alt="" loading="lazy">` : '🕊'}</span>`;
   fetch('/api/blog/home?lang=' + lang).then(r => r.ok ? r.json() : null).then(d => {
-    if (!d || !d.latest) return;
+    if (!d || !d.latest) { box.classList.add('hb-solo', 'hb-none'); box.hidden = false; return; } // статей ещё нет — показываем заглушку
     const p = d.latest, read = box.querySelector('[data-read]').textContent;
     box.querySelector('.hb-latest').innerHTML = `<a class="hb-main" href="${esc(p.url)}">${pic(p, 'hb-img')}<span>
       <p class="hb-meta">${esc(p.date)}${p.tags.map(t => ` · <span class="hb-tag">#${esc(t)}</span>`).join('')}</p>
@@ -17,5 +17,5 @@
     else side.hidden = true;
     if (side.hidden) box.classList.add('hb-solo');
     box.hidden = false;
-  }).catch(() => {});
+  }).catch(() => { box.classList.add('hb-solo', 'hb-none'); box.hidden = false; });
 })();

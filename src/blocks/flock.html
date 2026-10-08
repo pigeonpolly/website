@@ -1,0 +1,24 @@
+<style>
+  .fl { padding: 56px var(--gutter) 64px; text-align: center; }
+  .fl-kick { margin: 0 0 6px; font: italic 400 18px var(--serif); color: #F0A987; }
+  .fl h2 { margin: 0 0 10px; font: 600 clamp(28px, 3.2vw, 40px)/1.1 var(--serif); }
+  .fl-sub { margin: 0 auto 8px; max-width: 58ch; font-size: 16px; line-height: 1.6; color: #D9D3F2; }
+  .fl-count { margin: 0 0 20px; font-size: 14px; font-weight: 700; color: #E9A93B; min-height: 1.2em; }
+  .fl-stage { position: relative; max-width: 1200px; margin: 0 auto; border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 3px #1a1528, 0 18px 40px rgba(0, 0, 0, .35); cursor: pointer; }
+  .fl-stage canvas { display: block; width: 100%; image-rendering: pixelated; }
+  .fl-labels { position: absolute; inset: 0; pointer-events: none; }
+  .fl-nick { position: absolute; left: 0; top: 0; padding: 1px 6px; border-radius: 99px; background: rgba(26, 21, 40, .72); color: #F3EFFA; font: 700 11px/1.4 var(--sans); white-space: nowrap; text-decoration: none; pointer-events: auto; will-change: transform; }
+  .fl-nick:hover { background: #F0A987; color: #2B1A51; z-index: 2; }
+  .fl-nick.me { background: #E9A93B; color: #2B1A51; z-index: 1; }
+  .fl-join { display: inline-block; margin-top: 22px; }
+  @media (max-width: 600px) { .fl-nick { font-size: 10px; padding: 0 4px; } }
+</style>
+<section class="fl" id="flock" aria-labelledby="fl-title">
+  <p class="fl-kick">Everyone who signs in gets a bird</p>
+  <h2 id="fl-title">Our flock</h2>
+  <p class="fl-sub">Everyone who has ever signed in on this site lives here as a little pixel bird. No two birds are alike: different shapes, hats and very fancy shoes. Click a nickname to see the profile.</p>
+  <p class="fl-count" data-tpl="Birds in the flock: {n}" data-recent="· showing those who dropped by recently"></p>
+  <div class="fl-stage"><canvas width="300" height="142" role="img" aria-label="Pixel birds wandering around a bench, a bin, a bun, a baguette, a book and a coffee cup"></canvas><div class="fl-labels"></div></div>
+  <a class="pill-btn pill-fill fl-join" href="/challenge/">Get my bird →</a>
+</section>
+<script src="/assets/flock.js" defer></script>
