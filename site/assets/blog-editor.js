@@ -173,7 +173,12 @@
     }));
     // разделы: добавить, переименовать, порядок, удалить
     const ns = app.querySelector('#be-newsec');
-    ns && ns.addEventListener('submit', async e => { e.preventDefault(); try { await api('blog/admin/section-set', { en: ns.en.value.trim() }); } catch (err) { alert(errText(err)); } dashboard(); });
+    ns && ns.addEventListener('submit', async e => {
+      e.preventDefault();
+      const btn = ns.querySelector('button'); btn.disabled = true; btn.textContent = 'Добавляю и перевожу…';
+      try { await api('blog/admin/section-set', { en: ns.en.value.trim() }); flash = 'Раздел добавлен ✓'; } catch (err) { alert(errText(err)); }
+      dashboard();
+    });
     app.querySelectorAll('tr[data-s] .be-tr-in').forEach(inp => inp.addEventListener('change', async () => {
       const tr = inp.closest('tr'), r = sections.find(x => x.slug === tr.dataset.s);
       tr.querySelectorAll('.be-tr-in').forEach(i => { r[i.dataset.f] = i.value.trim(); });

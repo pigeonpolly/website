@@ -413,7 +413,9 @@ export async function blogApi(req, env, url, h) {
       const slug = b.slug ? slugify(b.slug) : slugify(en);
       let ru = String(b.ru || '').trim().slice(0, 60), lv = String(b.lv || '').trim().slice(0, 60);
       if (!b.slug && (!ru || !lv)) { // новый раздел — пробуем перевести название
-        for (const l of ['ru', 'lv']) { if (l === 'ru' ? ru : lv) continue; try { const v = (await translateAll(env, [en], 'en', l)).texts[0] || ''; if (l === 'ru') ru = v.trim(); else lv = v.trim(); } catch (e) { /* оставим пустым */ } }
+        // переводим сразу на оба языка, но не дольше 12 секунд — иначе оставляем пустым, можно вписать руками
+        const tr = l => Promise.race([translateAll(env, [en], 'en', l).then(r => String(r.texts[0] || '').trim()), new Promise(r => setTimeout(() => r(''), 12000))]).catch(() => '');
+        const [r1, r2] = await Promise.all([ru ? ru : tr('ru'), lv ? lv : tr('lv')]); ru = r1; lv = r2;
       }
       const max = (await env.DB.prepare('SELECT COALESCE(MAX(sort), 0) AS m FROM blog_sections').first()).m;
       await env.DB.prepare('INSERT INTO blog_sections (slug, en, ru, lv, sort) VALUES (?, ?, ?, ?, ?) ON CONFLICT(slug) DO UPDATE SET en = excluded.en, ru = excluded.ru, lv = excluded.lv' + (b.sort != null ? ', sort = excluded.sort' : ''))
