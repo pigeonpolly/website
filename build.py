@@ -19,7 +19,7 @@ SITE_URL = "https://www.pigeonpolly.com"
 # path, title, file, description
 PAGES = [
     ("", "Pigeon Polly Art Lab", "home.html",
-     "Creative AI, learning that fits different minds, and illustrated worlds by Alina Otkinska."),
+     "Get your own pixel bird and join the flock, try the daily drawing challenge and mini-games, and support an artist for free. Books and art by the author of Pigeon Polly."),
     ("projects", "Projects", "projects.html",
      "Learning design, EdTech and AI automation projects by Alina Otkinska."),
     ("work-with-me", "Work with me", "work-with-me.html",
