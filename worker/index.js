@@ -8,7 +8,7 @@ const ADMIN_HASHES = ['80ac2786b60d61a30d6691a3d40de5d784cdefc580717add788821a7b
 const SESSION_DAYS = 180;
 const MAX_FULL = 2_500_000, MAX_THUMB = 400_000;
 const GOLD_PICKS = 15; // 3 звезды «Выбора Полли» (каждые 5 раз — звезда) = золотой ник
-const INACTIVE_DAYS = 30; // нет загрузок дольше — картинки удаляются (уровень и бейджи остаются)
+const INACTIVE_DAYS = 90; // 3 месяца без загрузок и без входа — картинки можно удалить (уровень и бейджи остаются), но только при заполненном хранилище
 
 export default {
   async fetch(req, env) {
@@ -190,9 +190,9 @@ function isVeteran(u) {
 }
 const mergedBadges = (u, posts) => [...new Set([...String(u.badges || '').split(',').filter(Boolean), ...badgesOf(posts, monthsOf(u)), ...(isVeteran(u) ? ['veteran'] : [])])];
 
-// Очистка: предупреждаем про 30 дней, но удаляем, только когда картинки заняли ≥50% бесплатного KV (1 ГБ).
-// Тогда удаляем работы неактивных >30 дней, начиная с самых давно пропавших, пока не станет <45%.
-const KV_LIMIT = 1e9, CLEAN_START = 0.5, CLEAN_STOP = 0.45;
+// Очистка (решение Алины): удаляем, только когда картинки заняли ≥85% бесплатного KV (1 ГБ).
+// Тогда удаляем работы тех, кто больше 3 месяцев ничего не загружал И не заходил на сайт, начиная с самых давно пропавших, пока не станет <80%.
+const KV_LIMIT = 1e9, CLEAN_START = 0.85, CLEAN_STOP = 0.8;
 async function cleanupInactive(env, limit = KV_LIMIT) {
   // вес работ, загруженных до появления учёта, считаем один раз
   const unknown = (await env.DB.prepare('SELECT id FROM posts WHERE bytes IS NULL LIMIT 200').all()).results;
@@ -205,7 +205,7 @@ async function cleanupInactive(env, limit = KV_LIMIT) {
   if (used < limit * CLEAN_START) return report;
   const cutoff = new Date((utcToday() - INACTIVE_DAYS) * 864e5).toISOString().slice(0, 10);
   const users = (await env.DB.prepare(`SELECT u.*, MAX(p.day) AS last FROM users u JOIN posts p ON p.user_id = u.id
-    GROUP BY u.id HAVING last < ? ORDER BY last ASC LIMIT 200`).bind(cutoff).all()).results;
+    WHERE COALESCE(u.last_seen, 0) < ? GROUP BY u.id HAVING last < ? ORDER BY last ASC LIMIT 200`).bind(now() - INACTIVE_DAYS * 86400, cutoff).all()).results;
   for (const u of users) {
     if (used < limit * CLEAN_STOP) break;
     if (await isAdmin(u, env)) continue; // работы Алины не удаляются, пока она сама их не удалит
