@@ -5,89 +5,8 @@
   if (!box) return;
   const cv = box.querySelector('canvas'), ctx = cv.getContext('2d'), labels = box.querySelector('.fl-labels');
   const lang = document.documentElement.lang || 'en';
-  const OUT = '#1a1528';
 
-  // ---------- внешность ----------
-  const SHAPES = [
-    { bw: 10, bh: 8, hr: 3, neck: 0 },  // круглая
-    { bw: 8, bh: 11, hr: 3, neck: 0 },  // высокая
-    { bw: 13, bh: 9, hr: 3, neck: 0 },  // пухлая
-    { bw: 9, bh: 7, hr: 2, neck: 3 },   // длинная шея
-    { bw: 7, bh: 6, hr: 4, neck: 0 },   // кроха с большой головой
-  ];
-  const BODY = ['#8C8FC9', '#B39DDB', '#A0784F', '#F1EEE6', '#3A3550', '#D9A441', '#5FA8A0', '#E59BAE'];
-  const HATS = ['top', 'beret', 'cap', 'bow', 'party', 'crown'];
-  const HAT_C = ['#E0443A', '#E9A93B', '#4CC38A', '#4A7BD8', '#F08BC0', '#2B2340'];
-  const SHOES = ['heels', 'sneakers', 'boots'];
-  const SHOE_C = ['#E0443A', '#F08BC0', '#E9A93B', '#4A7BD8', '#FFFFFF', '#9B5DE5'];
-  const N_HAT = 1 + HATS.length * HAT_C.length, N_SHOE = 1 + SHOES.length * SHOE_C.length;
-  const N = SHAPES.length * BODY.length * N_HAT * N_SHOE;
-  function looks(id) {
-    let k = (id * 7919 + 12345) % N; // 7919 — простое, не делит N: у разных id разная внешность
-    const shoe = k % N_SHOE; k = Math.floor(k / N_SHOE);
-    const hat = k % N_HAT; k = Math.floor(k / N_HAT);
-    const body = k % BODY.length; k = Math.floor(k / BODY.length);
-    return { shape: SHAPES[k % SHAPES.length], body: BODY[body],
-      hat: hat ? { t: HATS[(hat - 1) % HATS.length], c: HAT_C[Math.floor((hat - 1) / HATS.length)] } : null,
-      shoe: shoe ? { t: SHOES[(shoe - 1) % SHOES.length], c: SHOE_C[Math.floor((shoe - 1) / SHOES.length)] } : null };
-  }
-  const shade = (hex, k) => '#' + hex.slice(1).match(/../g).map(h => Math.max(0, Math.min(255, Math.round(parseInt(h, 16) * k))).toString(16).padStart(2, '0')).join('');
-
-  // ---------- спрайт птички (20×26, смотрит вправо): кадры 0,1 — шаг, 2 — клюёт ----------
-  const SW = 20, SH = 26, BASE = 25;
-  function sprite(lk, frame) {
-    const g = {}; // "x,y" → [цвет, слой]; слой 'leg' без контура
-    const put = (x, y, c, layer = 'body') => { if (x >= 0 && y >= 0 && x < SW && y < SH) g[x + ',' + y] = [c, layer]; };
-    const ell = (cx, cy, rx, ry, c) => { for (let y = 0; y < SH; y++) for (let x = 0; x < SW; x++) if (((x + .5 - cx) / rx) ** 2 + ((y + .5 - cy) / ry) ** 2 <= 1) put(x, y, c); };
-    const s = lk.shape, legH = lk.shoe && lk.shoe.t === 'heels' ? 4 : 3;
-    const cx = 9, bottom = BASE - legH + 1, cy = bottom - s.bh / 2, top = bottom - s.bh;
-    const dark = shade(lk.body, lk.body === '#3A3550' ? 1.5 : .72), light = shade(lk.body, 1.12);
-    // хвост
-    for (let i = 0; i < 4; i++) for (let j = -1; j <= Math.min(1, i); j++) put(Math.round(cx - s.bw / 2) - i + 1, Math.round(cy) + j - i + 1, dark);
-    ell(cx, cy, s.bw / 2, s.bh / 2, lk.body);
-    ell(cx + 1, cy + s.bh / 4, s.bw / 3, s.bh / 4, light); // грудка
-    ell(cx - 1, cy, s.bw / 3, s.bh / 3.2, dark);            // крыло
-    // голова и шея
-    const peck = frame === 2;
-    const hx = cx + s.bw / 2 - 1 + (peck ? 2 : 0), hy = top - s.hr + 2 - s.neck + (peck ? s.bh / 2 + 2 : 0);
-    if (s.neck) for (let i = 0; i <= s.neck + 1; i++) put(Math.round(hx - 1 + (peck ? -1 : 0)), Math.round(hy + s.hr - 1 + i), lk.body), put(Math.round(hx) + (peck ? -1 : 0), Math.round(hy + s.hr - 1 + i), lk.body);
-    ell(hx, hy, s.hr + .2, s.hr + .2, lk.body);
-    const ex = Math.round(hx + s.hr / 2), ey = Math.round(hy - (s.hr > 2 ? 1 : 0));
-    put(ex, ey, '#120e1c'); if (s.hr >= 3) put(ex - 1, ey, '#FFFFFF');
-    const bx = Math.round(hx + s.hr + .5), by = Math.round(hy) + (peck ? 1 : 0);
-    put(bx, by, '#F2A73B'); put(bx + 1, by, '#F2A73B'); if (s.hr >= 3) put(bx, by - 1, '#F2A73B');
-    // ноги и обувь
-    const legs = frame === 1 ? [cx - 2, cx + 2] : [cx - 1, cx + 1];
-    for (const lx of legs) {
-      for (let y = bottom; y <= BASE; y++) put(lx, y, '#E9A93B', 'leg');
-      const sh = lk.shoe;
-      if (!sh) { put(lx + 1, BASE, '#E9A93B', 'leg'); continue; }
-      if (sh.t === 'heels') { put(lx, BASE - 1, sh.c, 'leg'); put(lx + 1, BASE - 1, sh.c, 'leg'); put(lx + 1, BASE, sh.c, 'leg'); put(lx - 1, BASE, sh.c, 'leg'); put(lx, BASE, null, 'leg'); }
-      if (sh.t === 'sneakers') { for (let x = lx - 1; x <= lx + 1; x++) { put(x, BASE - 1, sh.c, 'leg'); put(x, BASE, '#FFFFFF', 'leg'); } }
-      if (sh.t === 'boots') { for (let y = BASE - 3; y <= BASE; y++) put(lx, y, sh.c, 'leg'); put(lx + 1, BASE, sh.c, 'leg'); put(lx + 1, BASE - 1, sh.c, 'leg'); }
-    }
-    // шляпа
-    if (lk.hat) {
-      const c = lk.hat.c, c2 = shade(c, c === '#2B2340' ? 2.2 : .7), hxR = Math.round(hx), ht = Math.round(hy - s.hr - .2);
-      const t = lk.hat.t;
-      if (t === 'top') { for (let x = -3; x <= 3; x++) put(hxR + x, ht, c); for (let y = 1; y <= 4; y++) for (let x = -2; x <= 2; x++) put(hxR + x, ht - y, y === 1 ? c2 : c); }
-      if (t === 'beret') { for (let x = -3; x <= 2; x++) put(hxR + x, ht, c); for (let x = -2; x <= 2; x++) put(hxR + x, ht - 1, c); put(hxR, ht - 2, c2); }
-      if (t === 'cap') { for (let x = -2; x <= 2; x++) put(hxR + x, ht, c); for (let x = -1; x <= 1; x++) put(hxR + x, ht - 1, c); for (let x = 3; x <= 5; x++) put(hxR + x, ht + 1, c2); put(hxR + 2, ht + 1, c2); }
-      if (t === 'bow') { const bx0 = hxR - 2; put(bx0 - 1, ht, c); put(bx0 - 1, ht + 1, c); put(bx0 - 1, ht - 1, c); put(bx0, ht, c2); put(bx0 + 1, ht - 1, c); put(bx0 + 1, ht + 1, c); put(bx0 + 1, ht, c); }
-      if (t === 'party') { for (let y = 0; y < 5; y++) for (let x = -2 + Math.ceil(y / 2); x <= 2 - Math.ceil(y / 2); x++) put(hxR + x, ht - y, y % 2 ? c2 : c); put(hxR, ht - 5, '#FFFFFF'); }
-      if (t === 'crown') { for (let x = -2; x <= 2; x++) { put(hxR + x, ht, c); put(hxR + x, ht - 1, c); } put(hxR - 2, ht - 2, c); put(hxR, ht - 2, c); put(hxR + 2, ht - 2, c); put(hxR, ht - 1, '#FFFFFF'); }
-    }
-    // контур
-    const keys = Object.keys(g).filter(k => g[k][0] && g[k][1] !== 'leg');
-    for (const k of keys) {
-      const [x, y] = k.split(',').map(Number);
-      for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const n = (x + dx) + ',' + (y + dy); if (!g[n]) g[n] = [OUT, 'out']; }
-    }
-    const c = document.createElement('canvas'); c.width = SW; c.height = SH;
-    const x2 = c.getContext('2d');
-    for (const k in g) { if (!g[k][0]) continue; const [x, y] = k.split(',').map(Number); x2.fillStyle = g[k][0]; x2.fillRect(x, y, 1, 1); }
-    return c;
-  }
+  const { looks, sprite, SW, BASE } = window.PPBirds;
 
   // ---------- сцена ----------
   let W = 300, H = 120, S = 3, props = {}, perches = [];
@@ -157,7 +76,9 @@
     const free = perches.filter(p => !p.by);
     const r = Math.random();
     if (r < .14 && free.length) { const p = free[Math.floor(Math.random() * free.length)]; p.by = b; b.perch = p; b.state = 'hop'; b.t = 0; b.from = { x: b.x, y: b.y }; b.to = { x: p.x, y: p.y }; return; }
-    if (r < .5) { b.tx = food() + rnd(-14, 14); b.ty = rnd(98, 124); b.eat = true; }
+    if (r < .5 && !b.cat) { b.tx = food() + rnd(-14, 14); b.ty = rnd(98, 124); b.eat = true; }
+    else if (r < .5 && b.cat) { const f = birds.filter(x => !x.cat && !x.perch); const o = f[Math.floor(Math.random() * f.length)]; // котик идёт посидеть рядом с другом
+      b.tx = o ? Math.max(8, Math.min(W - 8, o.x + (Math.random() < .5 ? -12 : 12))) : rnd(8, W - 8); b.ty = o ? Math.max(88, Math.min(128, o.y + rnd(-3, 3))) : rnd(88, 128); b.eat = false; }
     else { b.tx = rnd(8, W - 8); b.ty = rnd(88, 128); b.eat = false; }
     b.state = 'walk';
   }
@@ -165,8 +86,8 @@
     labels.innerHTML = '';
     birds = list.slice(0, Math.max(8, Math.floor(W / (W < 260 ? 13 : 9)))).map(u => {
       const lk = looks(u.id);
-      const b = { u, frames: [0, 1, 2].map(f => sprite(lk, f)), x: rnd(10, W - 10), y: rnd(90, 128), dir: Math.random() < .5 ? 1 : -1,
-        state: 'idle', timer: rnd(.5, 3), anim: 0, speed: rnd(9, 15), perch: null };
+      const b = { u, cat: lk.kind === 'cat', frames: [0, 1, 2].map(f => sprite(lk, f)), x: rnd(10, W - 10), y: rnd(90, 128), dir: Math.random() < .5 ? 1 : -1,
+        state: 'idle', timer: rnd(.5, 3), anim: 0, speed: lk.kind === 'cat' ? rnd(6, 9) : rnd(9, 15), perch: null };
       if (u.nick) {
         const a = document.createElement('a');
         a.className = 'fl-nick' + (u.me ? ' me' : '');
@@ -177,7 +98,29 @@
       return b;
     });
   }
+  // котики дружат с птичками: когда рядом — сердечки
+  let hearts = [];
+  function friends(dt) {
+    for (const c of birds) {
+      if (!c.cat || c.state === 'hop') continue;
+      for (const o of birds) {
+        if (o.cat || o.state === 'hop' || Math.abs(o.x - c.x) > 18 || Math.abs(o.y - c.y) > 8) continue;
+        if (Math.random() < dt * .35) hearts.push({ x: (o.x + c.x) / 2 + rnd(-3, 3), y: Math.min(o.y, c.y) - 24, life: 1.8 });
+      }
+    }
+    hearts = hearts.filter(h => (h.life -= dt) > 0).slice(-12);
+    for (const h of hearts) h.y -= dt * 7;
+  }
+  const HEART = ['.##.##.', '#######', '.#####.', '..###..', '...#...'];
+  function drawHearts() {
+    for (const h of hearts) {
+      ctx.globalAlpha = Math.min(1, h.life);
+      HEART.forEach((row, y) => [...row].forEach((ch, x) => { if (ch === '#') R(h.x - 3 + x, h.y + y, 1, 1, y === 0 && x === 1 ? '#FFD0E4' : '#F06A9A'); }));
+    }
+    ctx.globalAlpha = 1;
+  }
   function step(dt) {
+    friends(dt);
     for (const b of birds) {
       b.anim += dt;
       if (b.state === 'idle' || b.state === 'peck' || b.state === 'sit') {
@@ -211,6 +154,7 @@
       let f = 0;
       if (b.state === 'walk') f = Math.floor(b.anim / .16) % 2;
       if (b.state === 'peck') f = Math.floor(b.anim / .22) % 2 ? 2 : 0;
+      if (b.cat && b.state !== 'walk' && b.state !== 'hop') f = 2; // котик сидит
       const img = b.frames[f], x = Math.round(b.x), y = Math.round(b.y) - (b.state === 'walk' && f ? 1 : 0);
       if (!b.perch && b.state !== 'hop') { ctx.fillStyle = 'rgba(0,0,0,.16)'; ctx.fillRect(x - 5, Math.round(b.y), 10, 1); }
       ctx.save();
@@ -219,6 +163,7 @@
       ctx.restore();
       if (b.label) b.label.style.transform = `translate(${(b.x * k).toFixed(1)}px, ${((b.y + 2) * k).toFixed(1)}px) translateX(-50%)`;
     }
+    drawHearts();
   }
   const still = matchMedia('(prefers-reduced-motion: reduce)').matches;
   let visible = true;

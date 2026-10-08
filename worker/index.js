@@ -268,6 +268,11 @@ async function route(req, env, url) {
     if (me && !me.banned && !rows.some(r => r.id === me.id)) rows = [{ id: me.id, nick: me.nick }, ...rows.slice(0, LIMIT - 1)];
     return json({ total, recent: total > LIMIT, birds: rows.map(r => ({ id: r.id, nick: r.nick || null, me: !!me && r.id === me.id })) });
   }
+  // шапка сайта: кто вошёл (для кнопки входа и птички-аватара)
+  if (m === 'GET' && p === '/api/whoami') {
+    const u = await currentUser(req, env);
+    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env) } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
+  }
   if (m === 'GET' && p === '/api/config') return json({ ready: true, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
 
   if (m === 'POST' && p === '/api/login') {
