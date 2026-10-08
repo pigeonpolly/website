@@ -96,8 +96,8 @@
     for (const it of items) it.home = { x: it.x, y: it.y };
     for (const [dx, dy] of [[-6, 4], [-3, 7], [18, 5], [10, 8]]) items.push({ type: 'crumb', x: props.bun + dx, y: 100 + dy, bites: 1 });
   }
-  const FOOD = ['bun', 'baguette', 'half', 'crumb', 'seed'];
-  const CARRY = ['bun', 'half', 'book', 'cup', 'plane', 'leaf', 'scrap'];
+  const FOOD = ['bun', 'baguette', 'half', 'crumb', 'seed', 'cake', 'slice'];
+  const CARRY = ['bun', 'half', 'book', 'cup', 'plane', 'leaf', 'scrap', 'slice', 'letter'];
   function bite(it) {
     if (!it || it.gone || it.held) return;
     it.bites = (it.bites || 1) - 1;
@@ -146,6 +146,22 @@
       case 'plane':
         if (it.fly) { R(x - 4, y, 9, 1, '#FFFFFF'); R(x - 3 * it.dir, y - 1, 4, 1, '#E6E1F2'); R(x - 4 * it.dir, y - 2, 2, 1, '#FFFFFF'); R(x - 2, y + 1, 5, 1, '#C8C2D8'); break; }
         R(x - 4, y - 2, 9, 1, '#FFFFFF'); R(x - 3, y - 1, 7, 1, '#E6E1F2'); sh(8); break;
+      case 'cake': {
+        const s2 = it.bites > 8 ? 0 : it.bites > 4 ? 1 : 2, w = [14, 10, 6][s2];
+        R(x - w / 2, y - 7 + s2, w, 7 - s2, '#F7C6D9'); R(x - w / 2, y - 8 + s2, w, 2, '#FFFDF5');
+        for (let i = 0; i < w; i += 3) R(x - w / 2 + i, y - 6 + s2, 1, 1, '#FFFDF5');
+        R(x - w / 2, y - 3, w, 1, '#E59BAE');
+        if (!s2) { R(x + 3, y - 9, 2, 1, '#E0443A'); if (it.lit != null) { R(x - 1, y - 12, 1, 4, '#4A7BD8'); if (it.lit) R(x - 1, y - 14 - (Math.floor(performance.now() / 150) % 2), 1, 2, '#FFD15C'); } }
+        sh(w); break;
+      }
+      case 'pizza': R(x - 7, y - 4, 14, 4, '#D9944A'); R(x - 6, y - 4, 12, 3, '#F3D06B'); for (const [a, b2] of [[-4, -3], [0, -2], [3, -3], [-2, -2]]) R(x + a, y + b2, 1, 1, '#C0392B'); sh(14); break;
+      case 'slice': R(x - 3, y - 3, 6, 1, '#D9944A'); R(x - 2, y - 2, 5, 1, '#F3D06B'); R(x - 1, y - 1, 3, 1, '#F3D06B'); R(x, y - 2, 1, 1, '#C0392B'); sh(5); break;
+      case 'letter': R(x - 4, y - 5, 8, 5, '#FFFDF5'); R(x - 3, y - 4, 1, 1, '#C8C2D8'); R(x - 2, y - 3, 1, 1, '#C8C2D8'); R(x + 2, y - 4, 1, 1, '#C8C2D8'); R(x + 1, y - 3, 1, 1, '#C8C2D8'); R(x - 1, y - 3, 2, 2, '#E0443A'); sh(8); break;
+      case 'worm': { const ph = performance.now() / 120; for (let i = 0; i < 6; i++) R(x - 3 + i, y - 2 + Math.round(Math.sin(ph + i * 1.2) * .8), 1, 2, i === (it.dir > 0 ? 5 : 0) ? '#D96B8A' : '#F08BA8'); break; }
+      case 'yarn': {
+        if (it.thread && it.thread.length > 1) for (const [tx, ty] of it.thread) R(tx, ty - 1, 1, 1, '#B98BE8');
+        R(x - 2, y - 5, 5, 5, '#9B5DE5'); R(x - 3, y - 4, 7, 3, '#9B5DE5'); R(x - 1, y - 4, 1, 3, '#C8A2F2'); R(x + 1, y - 3, 2, 1, '#C8A2F2'); sh(6); break;
+      }
       case 'scrap': R(x - 1, y - 2, 3, 2, '#C8955B'); R(x - 1, y - 2, 3, 1, '#DDB07A'); break;
       case 'bigbox': {
         const w = Math.round(it.w), h = Math.round(it.h), x0 = x - Math.round(w / 2) + Math.round(it.shake || 0), top = y - h;
@@ -374,7 +390,7 @@
       ok: () => freeBirds().length >= 3, w: 3,
       start(e) {
         const from = Math.random() < .5 ? -1 : 1;
-        e.ball = { type: 'ball', x: from < 0 ? -4 : W + 4, y: rnd(100, 120), bv: { x: -from * rnd(45, 60), y: rnd(-8, 8) }, spin: 0, lock: true };
+        e.ball = e.at ? { type: 'ball', x: e.at.x, y: e.at.y, bv: { x: rnd(-40, 40), y: rnd(-10, 10) }, spin: 0, lock: true } : { type: 'ball', x: from < 0 ? -4 : W + 4, y: rnd(100, 120), bv: { x: -from * rnd(45, 60), y: rnd(-8, 8) }, spin: 0, lock: true };
         items.push(e.ball);
         e.team = closest(freeBirds(), e.ball.x, Math.min(6, Math.max(3, Math.floor(birds.length / 2)))); enlist(e.team, e);
         for (const b of e.team) { say(b, '!', 1); b.ctl = true; b.cool = rnd(0, 1); }
@@ -528,8 +544,10 @@
     delivery: {
       ok: () => missing(), w: 6,
       start(e) {
-        e.box = { type: 'parcel', x: rnd(W * .3, W * .75), y: -10 - OFF, vy: 14 + OFF * .12, lock: true, held: 'ev' };
+        e.box = { type: 'parcel', x: rnd(W * .3, W * .75), y: -10 - OFF, vy: 30 + OFF * .2, lock: true, held: 'ev' };
         e.land = rnd(104, 118); items.push(e.box); e.t = 0;
+        // по кнопке — всегда сюрприз, сама по себе — иногда
+        if (e.force || Math.random() < .45) e.kind = pickOne(Object.keys(SURPRISES));
       },
       update(e, dt) {
         const p = e.box; e.t += dt;
@@ -546,10 +564,12 @@
           if (!items.some(i => !i.gone && i.type === 'bun') || (e.force && items.filter(i => !i.gone && i.type === 'bun').length < 3)) items.push({ type: 'bun', x: cx(p.x - 10), y: p.y, bites: 10, home: { x: props.bun + 7, y: 106 } });
           if (!items.some(i => !i.gone && (i.type === 'baguette' || i.type === 'half'))) items.push({ type: 'baguette', x: cx(p.x + 12), y: p.y - 2, bites: 14, home: { x: props.baguette + 15, y: 100 } });
           const cup = items.find(i => i.type === 'cup' && !i.gone); if (cup && !cup.full) { cup.full = true; cup.emptyFor = 0; }
+          if (e.kind) { for (const b of birds) if (b.ev === e) { b.ev = null; } e.sur = SURPRISES[e.kind]; e.sur.start(e, cx(p.x), cy(p.y)); }
         }
+        if (e.sur && p.gone) return e.sur.update(e, dt);
         if (e.t - e.landed > 2.5) return true;
       },
-      end(e) { e.box.gone = true; e.box.held = null; },
+      end(e) { e.box.gone = true; e.box.held = null; if (e.sur && e.sur.end) e.sur.end(e); for (const b of birds) if (b.balloon) b.balloon = null; },
     },
     // котик укладывается спать прямо на книгу
     catbook: {
@@ -666,6 +686,132 @@
     },
     end(e) { e.bx.gone = true; for (const b of e.list) { b.inBox = false; b.ctl = false; } },
   };
+  // сюрпризы в посылке: торт, пицца, шарик, клубок, мяч, письмо от Полли, червячок
+  const SURPRISES = {
+    cake: {
+      start(e, x, y) {
+        const cake = e.it = { type: 'cake', x, y, bites: 12, lit: true, lock: true }; items.push(cake);
+        e.fans = closest(freeBirds(), x, 8); enlist(e.fans, e);
+        e.fans.forEach((b, i) => { const a = (i / e.fans.length) * Math.PI * 2; b.tasks.push({ go: { x: cx(x + Math.cos(a) * 24), y: cy(y + Math.sin(a) * 9) }, fast: 1.3 }, { face: Math.cos(a) > 0 ? -1 : 1 }); });
+        e.st = 'gather'; e.st_t = 0;
+      },
+      update(e, dt) {
+        e.st_t += dt;
+        if (e.st === 'gather') { if (done(e.fans) || e.st_t > 8) { e.st = 'sing'; e.st_t = 0; } return; }
+        if (e.st === 'sing') {
+          for (const b of e.fans) if (!b.emote && Math.random() < dt * 1.5) say(b, 'note', .9);
+          if (Math.random() < dt * 4) fx.push({ type: 'note', x: e.it.x + rnd(-20, 20), y: e.it.y - 30, t: 1.5 });
+          if (e.st_t > 4) { // задули свечку
+            e.it.lit = false; fx.push({ type: 'poof', x: e.it.x - 1, y: e.it.y - 14, t: .5 }); e.it.lock = false;
+            for (const b of e.fans) { say(b, pickOne(['star', 'heart', '!']), 1.4); hop(b, 7, .4); const p = beside(b, e.it, 9); b.tasks.push({ wait: rnd(.5, 1.5) }, { go: { x: cx(p.x + rnd(-4, 4)), y: cy(p.y + rnd(-4, 4)) } }, { face: p.face }, { wait: rnd(2, 4), pose: 'peck' }, { fn: () => bite(e.it) }); }
+            e.st = 'eat'; e.st_t = 0;
+          }
+          return;
+        }
+        return done(e.fans) || e.st_t > 15;
+      },
+    },
+    pizza: {
+      start(e, x, y) {
+        e.slices = [];
+        for (let i = 0; i < 6; i++) { const a = i / 6 * Math.PI * 2, sl = { type: 'slice', x: cx(x + Math.cos(a) * 6), y: cy(y + Math.sin(a) * 3), bites: 3 }; items.push(sl); e.slices.push(sl); }
+        fx.push({ type: 'poof', x, y: y - 3, t: .6 });
+        e.fans = closest(freeBirds(isBird), x, 5); enlist(e.fans, e);
+        e.fans.forEach((b, i) => { const sl = e.slices[i]; if (!sl) return; b.tasks.push({ say: '!', t: 1 }); fetchTo(b, sl, rnd(X0, W - X0), rnd(Y0, Y1), 1.5); b.tasks.push({ fn: b2 => { const p = beside(b2, sl, 7); b2.tasks.unshift({ go: p }, { face: p.face }, { wait: rnd(2, 3), pose: 'peck' }, { fn: () => bite(sl) }); } }); });
+      },
+      update(e) { return done(e.fans); },
+    },
+    balloon: {
+      start(e, x, y) {
+        const [b] = closest(freeBirds(isBird), x, 1); e.fans = b ? [b] : []; if (!b) return;
+        enlist([b], e); e.b = b; e.base = y;
+        b.tasks.push({ go: { x: cx(x + 6), y } }, { say: '!', t: 1 }, { fn: () => { b.balloon = pickOne(['#E0443A', '#4A7BD8', '#E9A93B', '#4CC38A', '#F08BC0']); b.ctl = true; e.st = 'lift'; e.st_t = 0; } });
+        e.st = 'walk'; e.st_t = 0;
+      },
+      update(e, dt) {
+        const b = e.b; if (!b) return true;
+        e.st_t += dt;
+        if (e.st === 'lift') {
+          b.y = e.base - Math.min(38, e.st_t * 11); b.x = cx(b.x + Math.sin(e.st_t * 1.5) * dt * 10); b.pose = 'idle'; b.anim += dt;
+          if (e.st_t > .6 && !e.wow) { e.wow = true; for (const o of closest(freeBirds(), b.x, 5)) say(o, '!', 1.5); say(b, 'heart', 1.5); }
+          if (e.st_t > 6) { // ПУФ — шарик лопнул
+            fx.push({ type: 'snap', x: b.x + b.dir * 4, y: b.y - 37, t: .6 }); b.balloon = null; b.ctl = false;
+            b.hop = { from: { x: b.x, y: b.y }, to: { x: b.x, y: e.base }, t: 0, dur: .6, h: 0 }; b.tasks.push({ say: 'drop', t: 1.5 }, { wait: 1.5 });
+            e.st = 'fall';
+          }
+          return;
+        }
+        if (e.st === 'fall') return done([b]);
+        return e.st_t > 12;
+      },
+      end(e) { if (e.b) { e.b.balloon = null; if (e.b.y < Y0) e.b.y = cy(e.base || Y0); } },
+    },
+    yarn: {
+      start(e, x, y) {
+        e.it = { type: 'yarn', x, y, bv: { x: rnd(-30, 30), y: rnd(-8, 8) }, thread: [[Math.round(x), Math.round(y)]], lock: true }; items.push(e.it);
+        const cats = freeBirds(b => b.cat), others = closest(freeBirds(b => !b.cat), x, Math.max(2, 4 - cats.length));
+        e.fans = [...cats.slice(0, 3), ...others]; enlist(e.fans, e);
+        for (const b of e.fans) { b.ctl = true; b.cool = rnd(0, .8); say(b, b.cat ? 'heart' : '!', 1.2); }
+        e.st_t = 0;
+      },
+      update(e, dt) {
+        const it = e.it, v = it.bv; e.st_t += dt;
+        for (const b of e.fans) {
+          if (!b.ctl) continue; b.cool -= dt; b.anim += dt; if (b.hop) continue;
+          const dx = it.x - b.x - Math.sign(v.x || 1) * 3, dy = it.y - b.y, d = Math.hypot(dx, dy);
+          if (d > 2) { b.dir = dx >= 0 ? 1 : -1; const st = Math.min(d, b.speed * 1.3 * dt); b.x = cx(b.x + dx / d * st); b.y = cy(b.y + dy / d * st); b.pose = 'walk'; } else b.pose = b.cat ? 'sit' : 'idle';
+          if (Math.hypot(it.x - b.x, it.y - b.y) < 7 && b.cool <= 0) { const a = rnd(0, Math.PI * 2), sp = rnd(25, 50); v.x = Math.cos(a) * sp; v.y = Math.sin(a) * sp * .5; b.cool = rnd(.8, 1.6); if (Math.random() < .3) hop(b, 5, .3); }
+        }
+        it.x = cx(it.x + v.x * dt); it.y = cy(it.y + v.y * dt); v.x *= Math.pow(.5, dt); v.y *= Math.pow(.5, dt);
+        if (it.x <= X0 || it.x >= W - X0) v.x = -v.x; if (it.y <= Y0 || it.y >= Y1) v.y = -v.y;
+        const lastP = it.thread[it.thread.length - 1];
+        if (Math.hypot(lastP[0] - it.x, lastP[1] - it.y) >= 1) { it.thread.push([Math.round(it.x), Math.round(it.y)]); if (it.thread.length > 220) it.thread.shift(); }
+        return e.st_t > 11;
+      },
+      end(e) { if (e.it) e.it.lock = false; },
+    },
+    ball: { start(e, x, y) { queued = { name: 'football', at: { x, y } }; e.fans = []; }, update() { return true; } },
+    letter: {
+      start(e, x, y) {
+        const it = e.it = { type: 'letter', x, y, lock: true }; items.push(it);
+        const [b] = closest(freeBirds(isBird), x, 1); e.fans = b ? [b] : []; if (!b) return;
+        enlist([b], e); const p = beside(b, it, 7);
+        b.tasks.push({ go: p, fast: 1.3 }, { face: p.face }, { wait: 1, pose: 'peck' }, { say: 'dots', t: 1.2 }, { wait: 1.4 }, { say: 'dots', t: 1.2 }, { wait: 1.4 },
+          { fn: () => { say(b, 'heart', 2.5); for (let i = 0; i < 6; i++) hearts.push({ x: b.x + rnd(-8, 8), y: b.y - 26 - rnd(0, 8), life: rnd(1.4, 2.4) }); for (const o of closest(freeBirds(), b.x, 4)) say(o, 'heart', 1.5); it.lock = false; } }, { wait: 2 });
+      },
+      update(e) { return done(e.fans); },
+      end(e) { if (e.it) e.it.lock = false; },
+    },
+    worm: {
+      start(e, x, y) {
+        const it = e.it = { type: 'worm', x, y, dir: 1, wv: { x: rnd(-1, 1), y: rnd(-1, 1) }, lock: true }; items.push(it);
+        e.fans = closest(freeBirds(), x, 6); enlist(e.fans, e);
+        for (const b of e.fans) { b.ctl = true; say(b, '!', 1); }
+        e.st_t = 0; e.turn = 0;
+      },
+      update(e, dt) {
+        const it = e.it; e.st_t += dt; e.turn -= dt;
+        if (e.turn <= 0) { const a = rnd(0, Math.PI * 2); it.wv = { x: Math.cos(a), y: Math.sin(a) * .5 }; e.turn = rnd(.4, 1.1); }
+        const near = e.fans.some(b => Math.hypot(b.x - it.x, b.y - it.y) < 9);
+        const sp = near ? 42 : 22;
+        it.x = cx(it.x + it.wv.x * sp * dt); it.y = cy(it.y + it.wv.y * sp * dt); it.dir = it.wv.x >= 0 ? 1 : -1;
+        if (it.x <= X0 || it.x >= W - X0) it.wv.x *= -1; if (it.y <= Y0 || it.y >= Y1) it.wv.y *= -1;
+        for (const b of e.fans) {
+          if (!b.ctl || b.hop) continue; b.anim += dt;
+          const dx = it.x - b.x, dy = it.y - b.y, d = Math.hypot(dx, dy);
+          if (d > 3) { b.dir = dx >= 0 ? 1 : -1; const st = Math.min(d, b.speed * 1.4 * dt); b.x = cx(b.x + dx / d * st); b.y = cy(b.y + dy / d * st); b.pose = 'walk'; }
+          else if (Math.random() < dt * 2) { hop(b, 6, .3); say(b, '?', .8); const a = rnd(0, Math.PI * 2); it.wv = { x: Math.cos(a), y: Math.sin(a) * .5 }; }
+        }
+        if (e.st_t > 9) { // червячок зарылся в щель между плитками
+          it.gone = true; fx.push({ type: 'poof', x: it.x, y: it.y - 1, t: .5 });
+          for (const b of e.fans) { b.ctl = false; say(b, pickOne(['?', 'drop']), 1.5); b.tasks.push({ wait: rnd(1, 2), pose: 'peck' }); }
+          return true;
+        }
+      },
+      end(e) { if (e.it) e.it.gone = true; },
+    },
+  };
+  let queued = null;
   const messy = () => items.filter(i => free(i) && i.home && CARRY.includes(i.type) && Math.hypot(i.x - i.home.x, i.y - i.home.y) > 25);
   // ---------- зёрнышки: насыпать курсором, птички слетаются ----------
   const nearestSeed = (b, maxD = 1e9) => { let best = null, bd = maxD; for (const i of items) if (i.type === 'seed' && free(i)) { const d = Math.hypot(i.x - b.x, (i.y - b.y) * 2); if (d < bd) { bd = d; best = i; } } return best; };
@@ -717,10 +863,10 @@
   function tidyAll() {
     endEvent();
     if (party) setParty(false);
-    night = 0; disco = 0; gloom = 0; puddles = []; fx = []; hearts = [];
+    night = 0; disco = 0; gloom = 0; puddles = []; fx = []; hearts = []; queued = null;
     for (const p of perches) p.by = null;
     for (const b of birds) {
-      b.hold = null; b.tasks = []; b.goal = null; b.hop = null; b.ctl = false; b.ev = null; b.perch = null; b.hat = null; b.inBox = false;
+      b.hold = null; b.tasks = []; b.goal = null; b.hop = null; b.ctl = false; b.ev = null; b.perch = null; b.hat = null; b.inBox = false; b.balloon = null;
       b.wait = rnd(.5, 2); b.pose = 'idle'; b.y = cy(b.y); b.x = cx(b.x);
       if (Math.random() < .5) say(b, pickOne(['star', 'heart', 'note']), 1.4);
     }
@@ -776,7 +922,13 @@
   function endEvent() { if (!ev) return; ev.def.end && ev.def.end(ev); release(birds.filter(b => b.ev === ev)); ev = null; evIn = rnd(8, 16); }
   function director(dt) {
     for (const it of items) if (it.type === 'cup' && !it.full) it.emptyFor = (it.emptyFor || 0) + dt;
-    if (ev) { if (ev.def.update(ev, dt) || (ev.age += dt) > 60) endEvent(); return; }
+    if (ev) {
+      if (ev.def.update(ev, dt) || (ev.age += dt) > 60) {
+        endEvent();
+        if (queued) { const q = queued; queued = null; ev = { name: q.name, def: EVENTS[q.name], age: 0, at: q.at }; EVENTS[q.name].start(ev); }
+      }
+      return;
+    }
     if ((evIn -= dt) > 0) return;
     const pool = Object.entries(EVENTS).filter(([n, d]) => d.ok() && n !== lastEv);
     if (!pool.length) { evIn = 5; return; }
@@ -862,6 +1014,11 @@
       if (b.dir < 0) { ctx.translate(x, 0); ctx.scale(-1, 1); ctx.drawImage(img, -SW / 2, y - BASE); }
       else ctx.drawImage(img, x - SW / 2, y - BASE);
       ctx.restore();
+      if (b.balloon) { // воздушный шарик на ниточке
+        const sx = x + b.dir * 4, top = y - 40 + Math.round(Math.sin(b.anim * 2) * 1.5);
+        for (let yy = top + 8; yy < y - 12; yy++) R(sx + Math.round(Math.sin(yy / 4 + b.anim * 3) * .6), yy, 1, 1, '#FFFDF5');
+        R(sx - 3, top, 7, 7, b.balloon); R(sx - 2, top - 1, 5, 1, b.balloon); R(sx - 2, top + 7, 5, 1, b.balloon); R(sx, top + 8, 1, 1, b.balloon); R(sx - 1, top + 1, 1, 2, '#FFFFFF');
+      }
       if (b.hat) { // праздничный колпак на макушке
         const hd = b.heads[f], hx = b.dir > 0 ? x - SW / 2 + hd.x : x + SW / 2 - hd.x - 1, hy = y - BASE + hd.y;
         const [c1, c2] = b.hat;
@@ -988,7 +1145,7 @@
       scatter(clamp((e.clientX - r.left) / r.width * W, 20, W - 20));
     });
   }
-  window.PPFlockDebug = { run(name) { endEvent(); if (!EVENTS[name].ok()) return false; ev = { name, def: EVENTS[name], age: 0 }; EVENTS[name].start(ev); return true; }, get ev() { return ev && ev.name; }, items: () => items, birds: () => birds };
+  window.PPFlockDebug = { surprise(kind) { endEvent(); ev = { name: 'delivery', def: EVENTS.delivery, age: 0, force: true }; EVENTS.delivery.start(ev); ev.kind = kind; }, run(name) { endEvent(); if (!EVENTS[name].ok()) return false; ev = { name, def: EVENTS[name], age: 0 }; EVENTS[name].start(ev); return true; }, get ev() { return ev && ev.name; }, items: () => items, birds: () => birds };
   fetch('/api/flock' + (full ? '?limit=60' : ''), { credentials: 'same-origin' }).then(r => r.ok ? r.json() : Promise.reject())
     .then(d => start(d.birds.length ? d : { total: 0, birds: demo() }))
     .catch(() => start({ total: 0, birds: demo() }));
