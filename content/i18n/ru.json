@@ -249,5 +249,20 @@
   ">See the flock →<": ">Посмотреть стаю →<",
   "To get into the flock, just sign in with Google and pick a nickname.": "Чтобы попасть в стаю, просто войдите через Google и выберите ник.",
   "🌾 Scatter seeds": "🌾 Насыпать зёрнышек",
-  "✓ Done feeding": "✓ Хватит"
+  "✓ Done feeding": "✓ Хватит",
+  "Play with the flock": "Поиграть со стаей",
+"</span> Seeds</button>": "</span> Зёрнышки</button>",
+"</span> Party</button>": "</span> Праздник</button>",
+"</span> Wind</button>": "</span> Ветер</button>",
+"</span> Rain</button>": "</span> Дождь</button>",
+"</span> Football</button>": "</span> Футбол</button>",
+"</span> Disco</button>": "</span> Дискотека</button>",
+"</span> Night</button>": "</span> Ночь</button>",
+"</span> Coffee</button>": "</span> Кофе</button>",
+"</span> Baguette tug</button>": "</span> Багет</button>",
+"</span> Paper plane</button>": "</span> Самолётик</button>",
+"</span> Book club</button>": "</span> Книжный клуб</button>",
+"</span> Delivery</button>": "</span> Доставка</button>",
+"</span> Tidy up</button>": "</span> Уборка</button>",
+  "Hold the mouse button (or your finger) and move over the scene — the birds will flock to the seeds.": "Зажмите кнопку мыши (или палец) и ведите по сцене — птички слетятся к зёрнышкам."
 }

@@ -510,18 +510,24 @@
 #blk-flock .fl-nick.me { background: #E9A93B; color: #2B1A51; z-index: 1; }
 #blk-flock .fl-join { display: inline-block; margin-top: 12px; }
 #blk-flock .fl-how { margin: 22px 0 0; font-size: 15px; color: #F3EFFA; font-weight: 700; }
-#blk-flock .fl-seed { position: absolute; top: 10px; left: 10px; z-index: 3; padding: 6px 14px; border: 0; border-radius: 99px; background: rgba(255, 253, 245, .92); color: #2B1A51; font: 700 13px var(--sans); cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, .25); }
-#blk-flock .fl-seed:hover { background: #F0A987; }
-#blk-flock .fl-seed[aria-pressed="true"] { background: #E9A93B; }
+#blk-flock .fl-tools { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 1000px; margin: 0 auto 14px; }
+#blk-flock .fl-tools button { padding: 6px 12px; border-radius: 99px; border: 1.5px solid rgba(243, 239, 250, .35); background: rgba(255, 255, 255, .06); color: #F3EFFA; font: 700 13px var(--sans); cursor: pointer; transition: background .15s, transform .15s; }
+#blk-flock .fl-tools button:hover { background: rgba(240, 169, 135, .25); border-color: #F0A987; }
+#blk-flock .fl-tools button[aria-pressed="true"] { background: #E9A93B; border-color: #E9A93B; color: #2B1A51; }
+#blk-flock .fl-tools button.pop { animation: fl-pop .35s; }
+@keyframes fl-pop { 40% { transform: scale(1.12); } }
+#blk-flock .fl-seedhint { margin: -6px 0 12px; font-size: 14px; color: #E9A93B; font-weight: 700; }
 #blk-flock .fl-stage.seeding { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Ctext y='22' font-size='22'%3E%F0%9F%8C%BE%3C/text%3E%3C/svg%3E") 6 22, crosshair; touch-action: none; }
 #blk-flock .fl-stage.seeding .fl-nick { pointer-events: none; }
-@media (max-width: 600px) {#blk-flock .fl-seed { font-size: 12px; padding: 5px 10px; }
+@media (max-width: 600px) {#blk-flock .fl-tools button { font-size: 12px; padding: 5px 9px; }
 #blk-flock .fl-nick { font-size: 10px; padding: 0 4px; }}</style><section class="fl" id="flock" aria-labelledby="fl-title">
   <p class="fl-kick">Katrs, kurš pieslēdzas, saņem putniņu</p>
   <h2 id="fl-title">Mūsu bars</h2>
   <p class="fl-sub">Šeit dzīvo visi, kas kaut reizi ir pieslēgušies vietnei, — katrs kā mazs pikseļu putniņš. Divu vienādu nav: dažādas formas, cepures un ļoti modernas kurpes. Katrs 10. viesis ir draudzīgs kaķītis, katrs 11. — vārna ar dārgumu knābī. Noklikšķiniet uz segvārda, lai atvērtu profilu.</p>
   <p class="fl-count" data-tpl="Putni barā: {n}" data-recent="· redzami tie, kas nesen ienāca"></p>
-  <div class="fl-stage"><button type="button" class="fl-seed" aria-pressed="false" data-off="🌾 Uzbērt graudiņus" data-on="✓ Pietiek">🌾 Uzbērt graudiņus</button><canvas width="300" height="142" role="img" aria-label="Pikseļu putniņi dzīvo savu dzīvi pie soliņa: nēsā mantas, velk bageti, spēlē futbolu, lasa grāmatu un dzer kafiju"></canvas><div class="fl-labels"></div></div>
+  <div class="fl-tools" role="toolbar" aria-label="Paspēlējies ar baru"><button type="button" data-act="seed" aria-pressed="false"><span aria-hidden="true">🌾</span> Graudiņi</button><button type="button" data-act="party" aria-pressed="false"><span aria-hidden="true">🎉</span> Svētki</button><button type="button" data-act="wind"><span aria-hidden="true">💨</span> Vējš</button><button type="button" data-act="rain"><span aria-hidden="true">🌧</span> Lietus</button><button type="button" data-act="football"><span aria-hidden="true">⚽</span> Futbols</button><button type="button" data-act="dance"><span aria-hidden="true">🪩</span> Diskotēka</button><button type="button" data-act="nap"><span aria-hidden="true">🌙</span> Nakts</button><button type="button" data-act="coffee"><span aria-hidden="true">☕</span> Kafija</button><button type="button" data-act="tug"><span aria-hidden="true">🥖</span> Bagete</button><button type="button" data-act="plane"><span aria-hidden="true">✈️</span> Lidmašīnīte</button><button type="button" data-act="bookclub"><span aria-hidden="true">📖</span> Grāmatu klubs</button><button type="button" data-act="delivery"><span aria-hidden="true">📦</span> Piegāde</button><button type="button" data-act="tidy"><span aria-hidden="true">🧹</span> Kārtība</button></div>
+  <p class="fl-seedhint" hidden>Turi nospiestu peles pogu (vai pirkstu) un vadi pa ainu — putniņi salidos pie graudiņiem.</p>
+  <div class="fl-stage"><canvas width="300" height="142" role="img" aria-label="Pikseļu putniņi dzīvo savu dzīvi pie soliņa: nēsā mantas, velk bageti, spēlē futbolu, lasa grāmatu un dzer kafiju"></canvas><div class="fl-labels"></div></div>
   <p class="fl-how">Lai nokļūtu barā, vienkārši pieslēdzies ar Google un izvēlies segvārdu.</p>
   <a class="pill-btn pill-fill fl-join" href="/lv/challenge/">Gribu savu putniņu →</a>
 </section>

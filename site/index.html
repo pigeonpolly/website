@@ -510,18 +510,24 @@
 #blk-flock .fl-nick.me { background: #E9A93B; color: #2B1A51; z-index: 1; }
 #blk-flock .fl-join { display: inline-block; margin-top: 12px; }
 #blk-flock .fl-how { margin: 22px 0 0; font-size: 15px; color: #F3EFFA; font-weight: 700; }
-#blk-flock .fl-seed { position: absolute; top: 10px; left: 10px; z-index: 3; padding: 6px 14px; border: 0; border-radius: 99px; background: rgba(255, 253, 245, .92); color: #2B1A51; font: 700 13px var(--sans); cursor: pointer; box-shadow: 0 2px 8px rgba(0, 0, 0, .25); }
-#blk-flock .fl-seed:hover { background: #F0A987; }
-#blk-flock .fl-seed[aria-pressed="true"] { background: #E9A93B; }
+#blk-flock .fl-tools { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 1000px; margin: 0 auto 14px; }
+#blk-flock .fl-tools button { padding: 6px 12px; border-radius: 99px; border: 1.5px solid rgba(243, 239, 250, .35); background: rgba(255, 255, 255, .06); color: #F3EFFA; font: 700 13px var(--sans); cursor: pointer; transition: background .15s, transform .15s; }
+#blk-flock .fl-tools button:hover { background: rgba(240, 169, 135, .25); border-color: #F0A987; }
+#blk-flock .fl-tools button[aria-pressed="true"] { background: #E9A93B; border-color: #E9A93B; color: #2B1A51; }
+#blk-flock .fl-tools button.pop { animation: fl-pop .35s; }
+@keyframes fl-pop { 40% { transform: scale(1.12); } }
+#blk-flock .fl-seedhint { margin: -6px 0 12px; font-size: 14px; color: #E9A93B; font-weight: 700; }
 #blk-flock .fl-stage.seeding { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Ctext y='22' font-size='22'%3E%F0%9F%8C%BE%3C/text%3E%3C/svg%3E") 6 22, crosshair; touch-action: none; }
 #blk-flock .fl-stage.seeding .fl-nick { pointer-events: none; }
-@media (max-width: 600px) {#blk-flock .fl-seed { font-size: 12px; padding: 5px 10px; }
+@media (max-width: 600px) {#blk-flock .fl-tools button { font-size: 12px; padding: 5px 9px; }
 #blk-flock .fl-nick { font-size: 10px; padding: 0 4px; }}</style><section class="fl" id="flock" aria-labelledby="fl-title">
   <p class="fl-kick">Everyone who signs in gets a bird</p>
   <h2 id="fl-title">Our flock</h2>
   <p class="fl-sub">Everyone who has ever signed in on this site lives here as a little pixel bird. No two birds are alike: different shapes, hats and very fancy shoes. Every 10th guest is a friendly cat, every 11th a crow with a treasure in its beak. Click a nickname to see the profile.</p>
   <p class="fl-count" data-tpl="Birds in the flock: {n}" data-recent="· showing those who dropped by recently"></p>
-  <div class="fl-stage"><button type="button" class="fl-seed" aria-pressed="false" data-off="🌾 Scatter seeds" data-on="✓ Done feeding">🌾 Scatter seeds</button><canvas width="300" height="142" role="img" aria-label="Pixel birds living their little lives around a bench: they carry things, tug a baguette, play football, read a book and drink coffee"></canvas><div class="fl-labels"></div></div>
+  <div class="fl-tools" role="toolbar" aria-label="Play with the flock"><button type="button" data-act="seed" aria-pressed="false"><span aria-hidden="true">🌾</span> Seeds</button><button type="button" data-act="party" aria-pressed="false"><span aria-hidden="true">🎉</span> Party</button><button type="button" data-act="wind"><span aria-hidden="true">💨</span> Wind</button><button type="button" data-act="rain"><span aria-hidden="true">🌧</span> Rain</button><button type="button" data-act="football"><span aria-hidden="true">⚽</span> Football</button><button type="button" data-act="dance"><span aria-hidden="true">🪩</span> Disco</button><button type="button" data-act="nap"><span aria-hidden="true">🌙</span> Night</button><button type="button" data-act="coffee"><span aria-hidden="true">☕</span> Coffee</button><button type="button" data-act="tug"><span aria-hidden="true">🥖</span> Baguette tug</button><button type="button" data-act="plane"><span aria-hidden="true">✈️</span> Paper plane</button><button type="button" data-act="bookclub"><span aria-hidden="true">📖</span> Book club</button><button type="button" data-act="delivery"><span aria-hidden="true">📦</span> Delivery</button><button type="button" data-act="tidy"><span aria-hidden="true">🧹</span> Tidy up</button></div>
+  <p class="fl-seedhint" hidden>Hold the mouse button (or your finger) and move over the scene — the birds will flock to the seeds.</p>
+  <div class="fl-stage"><canvas width="300" height="142" role="img" aria-label="Pixel birds living their little lives around a bench: they carry things, tug a baguette, play football, read a book and drink coffee"></canvas><div class="fl-labels"></div></div>
   <p class="fl-how">To get into the flock, just sign in with Google and pick a nickname.</p>
   <a class="pill-btn pill-fill fl-join" href="/challenge/">Get my bird →</a>
 </section>

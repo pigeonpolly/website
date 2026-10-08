@@ -249,5 +249,20 @@
   ">See the flock →<": ">Apskatīt baru →<",
   "To get into the flock, just sign in with Google and pick a nickname.": "Lai nokļūtu barā, vienkārši pieslēdzies ar Google un izvēlies segvārdu.",
   "🌾 Scatter seeds": "🌾 Uzbērt graudiņus",
-  "✓ Done feeding": "✓ Pietiek"
+  "✓ Done feeding": "✓ Pietiek",
+  "Play with the flock": "Paspēlējies ar baru",
+"</span> Seeds</button>": "</span> Graudiņi</button>",
+"</span> Party</button>": "</span> Svētki</button>",
+"</span> Wind</button>": "</span> Vējš</button>",
+"</span> Rain</button>": "</span> Lietus</button>",
+"</span> Football</button>": "</span> Futbols</button>",
+"</span> Disco</button>": "</span> Diskotēka</button>",
+"</span> Night</button>": "</span> Nakts</button>",
+"</span> Coffee</button>": "</span> Kafija</button>",
+"</span> Baguette tug</button>": "</span> Bagete</button>",
+"</span> Paper plane</button>": "</span> Lidmašīnīte</button>",
+"</span> Book club</button>": "</span> Grāmatu klubs</button>",
+"</span> Delivery</button>": "</span> Piegāde</button>",
+"</span> Tidy up</button>": "</span> Kārtība</button>",
+  "Hold the mouse button (or your finger) and move over the scene — the birds will flock to the seeds.": "Turi nospiestu peles pogu (vai pirkstu) un vadi pa ainu — putniņi salidos pie graudiņiem."
 }

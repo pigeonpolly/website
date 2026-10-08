@@ -154,16 +154,25 @@
   }
 
   // ---------- птички: у каждой очередь маленьких дел ----------
-  let birds = [], last = 0;
+  let birds = [], last = 0, party = false;
+  const HAT_COLORS = [['#E0443A', '#FFE7A3'], ['#4A7BD8', '#F7C6D9'], ['#4CC38A', '#FFFFFF'], ['#9B5DE5', '#E9A93B'], ['#F08BC0', '#4A7BD8']];
   const say = (b, icon, t = 1.6) => { b.emote = { icon, t, max: t }; };
   const freeBirds = (pred = () => true) => birds.filter(b => !b.ev && !b.perch && !b.hop && pred(b));
   const isBird = b => !b.cat && !b.crow;
+  // верхняя точка спрайта (макушка) — сюда садится праздничный колпак
+  function headOf(c) {
+    const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    for (let y = 0; y < c.height; y++) { const xs = []; for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3] > 0) xs.push(x); if (xs.length) return { x: xs[Math.floor(xs.length / 2)], y }; }
+    return { x: c.width / 2, y: 0 };
+  }
   function makeBirds(list) {
     labels.innerHTML = '';
     birds = list.slice(0, Math.max(8, Math.floor(W / (W < 260 ? 13 : 9)))).map(u => {
       const lk = looks(u.id);
-      const b = { u, cat: lk.kind === 'cat', crow: lk.kind === 'crow', frames: [0, 1, 2].map(f => sprite(lk, f)), x: rnd(10, W - 10), y: rnd(Y0, Y1), dir: Math.random() < .5 ? 1 : -1,
+      const b = { u, cat: lk.kind === 'cat', crow: lk.kind === 'crow', frames: [0, 1, 2].map(f => sprite(lk, f)), hat: null, x: rnd(10, W - 10), y: rnd(Y0, Y1), dir: Math.random() < .5 ? 1 : -1,
         tasks: [], goal: null, wait: rnd(.3, 3), pose: 'idle', anim: rnd(0, 5), speed: lk.kind === 'cat' ? rnd(6, 9) : rnd(9, 15), fast: 1, perch: null, hold: null, emote: null, ev: null };
+      b.heads = b.frames.map(headOf);
+      if (party) b.hat = pickOne(HAT_COLORS);
       if (u.nick) {
         const a = document.createElement('a');
         a.className = 'fl-nick' + (u.me ? ' me' : '');
@@ -256,14 +265,14 @@
     if (b.goal) {
       const dx = b.goal.x - b.x, dy = b.goal.y - b.y, d = Math.hypot(dx, dy);
       if (d < 1) { b.goal = null; b.pose = 'idle'; }
-      else { if (Math.abs(dx) > .3) b.dir = dx >= 0 ? 1 : -1; const v = Math.min(d, b.speed * b.fast * dt); b.x += dx / d * v; b.y += dy / d * v; b.pose = 'walk'; return; }
+      else { if (Math.abs(dx) > .3) b.dir = dx >= 0 ? 1 : -1; const v = Math.min(d, b.speed * b.fast * dt); b.x += dx / d * v; b.y += dy / d * v; b.pose = 'walk'; if (puddles.length && Math.random() < dt * 6 && puddles.some(p => p.a > .4 && ((b.x - p.x) / p.r) ** 2 + ((b.y - p.y) / (p.r * .35)) ** 2 < 1)) fx.push({ type: 'splash', x: b.x, y: b.y, t: .3 }); return; }
     }
     if (b.wait > 0) { b.wait -= dt; if (b.pose === 'idle' && Math.random() < dt * .3) b.dir *= -1; if (b.wait > 0) return; }
     nextTask(b);
   }
 
   // ---------- события ----------
-  let ev = null, evIn = rnd(6, 10), night = 0, disco = 0, fx = [];
+  let ev = null, evIn = rnd(6, 10), night = 0, disco = 0, fx = [], gloom = 0, puddles = [];
   function release(list) { for (const b of list) { if (b.hold) drop(b); b.ev = null; b.ctl = false; b.tasks = []; b.goal = null; b.wait = rnd(.3, 1.2); b.pose = 'idle'; } }
   const done = list => list.every(b => !b.tasks.length && !b.goal && !b.hop && b.wait <= 0);
   const enlist = (list, e) => { for (const b of list) { if (b.hold) drop(b); if (b.perch) { b.perch.by = null; b.perch = null; } b.ev = e; b.tasks = []; b.goal = null; b.wait = 0; b.ctl = false; } };
@@ -462,7 +471,7 @@
     },
     // аккуратистка возвращает вещи на место (и ворчит)
     tidy: {
-      ok: () => messy().length >= 2 && freeBirds(isBird).length >= 1, w: 2,
+      ok: () => messy().length >= 1 && freeBirds(isBird).length >= 1, w: 2,
       start(e) {
         const list = messy().slice(0, 3);
         const b = e.b = pickOne(freeBirds(isBird)); enlist([b], e);
@@ -491,7 +500,7 @@
         }
         if (e.t - e.landed > 1.5 && !p.gone) {
           p.gone = true; fx.push({ type: 'poof', x: p.x, y: p.y - 4, t: .6 });
-          if (!items.some(i => !i.gone && i.type === 'bun')) items.push({ type: 'bun', x: cx(p.x - 10), y: p.y, bites: 10, home: { x: props.bun + 7, y: 106 } });
+          if (!items.some(i => !i.gone && i.type === 'bun') || (e.force && items.filter(i => !i.gone && i.type === 'bun').length < 3)) items.push({ type: 'bun', x: cx(p.x - 10), y: p.y, bites: 10, home: { x: props.bun + 7, y: 106 } });
           if (!items.some(i => !i.gone && (i.type === 'baguette' || i.type === 'half'))) items.push({ type: 'baguette', x: cx(p.x + 12), y: p.y - 2, bites: 14, home: { x: props.baguette + 15, y: 100 } });
           const cup = items.find(i => i.type === 'cup' && !i.gone); if (cup && !cup.full) { cup.full = true; cup.emptyFor = 0; }
         }
@@ -513,6 +522,57 @@
       end(e) { e.book.lock = false; e.book.cat = false; },
     },
   };
+  Object.assign(EVENTS, {
+    // сильный ветер: всех сдувает, листья и крошки улетают, стаканчик падает
+    wind: {
+      ok: () => true, w: 1,
+      start(e) {
+        e.dir = Math.random() < .5 ? 1 : -1; e.t = 0; e.dur = rnd(7, 9);
+        e.list = freeBirds(); enlist(e.list, e);
+        for (const b of e.list) { b.ctl = true; say(b, pickOne(['!', 'drop']), 1.2); }
+        for (const b of birds) if (b.perch && !b.ev) say(b, '!', 1.5);
+      },
+      update(e, dt) {
+        e.t += dt; const s = clamp(Math.min(e.t / 1.5, (e.dur - e.t) / 1.5), 0, 1);
+        if (Math.random() < dt * 25 * s) fx.push({ type: 'gust', x: e.dir > 0 ? rnd(-30, W * .3) : rnd(W * .7, W + 30), y: rnd(4, H - 6), vx: e.dir * rnd(140, 220), len: rnd(6, 16), t: 1.4 });
+        if (Math.random() < dt * 4 * s) fx.push({ type: 'leaf', x: e.dir > 0 ? -4 : W + 4, y: rnd(20, 120), vx: e.dir * rnd(70, 110), vy: rnd(-6, 6), land: H + 50, c: pickOne(['#E9A93B', '#C0582F', '#D9944A', '#4CC38A']), t: 6, ph: rnd(0, 6), item: true });
+        for (const b of e.list) {
+          if (b.hop) continue;
+          b.dir = -e.dir; b.pose = 'walk'; b.anim += dt * .3;
+          b.x = cx(b.x + e.dir * s * dt * (b.cat ? 3 : 9));
+          if (!b.cat && Math.random() < dt * .35 * s) { say(b, '!', .8); b.hop = { from: { x: b.x, y: b.y }, to: { x: cx(b.x + e.dir * rnd(18, 40)), y: cy(b.y + rnd(-6, 6)) }, t: 0, dur: .6, h: 10 }; }
+        }
+        for (const it of items) {
+          if (it.held || it.vy != null) continue;
+          const v = { leaf: 70, plane: 55, crumb: 22, seed: 16 }[it.type];
+          if (v) { it.x += e.dir * s * v * dt * rnd(.6, 1.2); if (it.x < -10 || it.x > W + 10) it.gone = true; }
+          if (it.type === 'cup' && s > .8 && !it.tipped && !it.lock) { it.tipped = true; if (it.full) { it.full = false; it.emptyFor = 0; } }
+        }
+        return e.t >= e.dur;
+      },
+      end() { for (const it of items) if (it.type === 'cup' && !it.lock) it.tipped = false; },
+    },
+    // дождь: все прячутся под скамейку, остаются лужи
+    rain: {
+      ok: () => true, w: 1,
+      start(e) {
+        e.t = 0; e.dur = rnd(9, 12);
+        e.list = freeBirds(); enlist(e.list, e);
+        const B = props.bench;
+        for (const b of e.list) b.tasks.push({ say: '!', t: 1 }, { go: { x: rnd(B + 4, B + 46), y: rnd(Y0, Y0 + 5) }, fast: 1.8 }, { wait: 99 });
+        for (let i = 0; i < 4; i++) puddles.push({ x: rnd(W * .3, W * .95), y: rnd(Y0 + 8, Y1), r: rnd(8, 16), a: 0, life: 40 });
+      },
+      update(e, dt) {
+        e.t += dt; const s = clamp(Math.min(e.t / 1.5, (e.dur - e.t) / 1.5), 0, 1);
+        gloom = s;
+        for (let i = 0; i < 60 * s * dt * 10; i++) fx.push({ type: 'rain', x: rnd(0, W + 30), y: rnd(-10, 0), land: rnd(48, H), t: 2 });
+        for (const p of puddles) p.a = Math.min(1, p.a + dt * .2 * s);
+        for (const b of e.list) if (!b.goal && Math.random() < dt * .3) say(b, pickOne(['drop', 'dots', 'heart']), 1.2);
+        if (e.t >= e.dur) { gloom = 0; for (const b of e.list) { b.tasks = []; b.wait = 0; } return true; }
+      },
+      end() { gloom = 0; },
+    },
+  });
   const messy = () => items.filter(i => free(i) && i.home && CARRY.includes(i.type) && Math.hypot(i.x - i.home.x, i.y - i.home.y) > 25);
   // ---------- зёрнышки: насыпать курсором, птички слетаются ----------
   const nearestSeed = (b, maxD = 1e9) => { let best = null, bd = maxD; for (const i of items) if (i.type === 'seed' && free(i)) { const d = Math.hypot(i.x - b.x, (i.y - b.y) * 2); if (d < bd) { bd = d; best = i; } } return best; };
@@ -540,6 +600,25 @@
       b.tasks.push({ face: -side });
       for (let i = 0; i < 4; i++) b.tasks.push({ wait: rnd(.5, 1), pose: 'peck' }, { fn: () => { for (let k = 0; k < 2; k++) { const s2 = nearestSeed(b, 9); if (s2) s2.gone = true; } } });
     }
+  }
+  function setParty(on) {
+    party = on;
+    for (const b of birds) b.hat = on ? pickOne(HAT_COLORS) : null;
+    if (!on) return;
+    for (let i = 0; i < 140; i++) fx.push({ type: 'confetti', x: rnd(0, W), y: rnd(-60, -2), vy: rnd(25, 45), land: rnd(Y0 - 30, Y1 + 8), ph: rnd(0, 6), c: pickOne(['#E0443A', '#E9A93B', '#4CC38A', '#4A7BD8', '#F08BC0', '#FFFFFF', '#9B5DE5']), t: 14 });
+    for (const b of birds) { say(b, pickOne(['note', 'star', 'heart', '!']), 1.8); if (!b.ev && !b.hop && !b.perch) hop(b, rnd(6, 12), .45); }
+  }
+  // кнопки над сценой: запустить событие сразу
+  function trigger(name) {
+    if (!EVENTS[name]) return;
+    if (ev && ev.name === name) return;
+    endEvent(); // кнопка прерывает то, что идёт сейчас
+    for (const b of birds) if (b.hold && !b.ev) { drop(b); b.tasks = []; b.goal = null; b.wait = .5; } // и кладёт на землю всё, что птички несут
+    if (name === 'coffee' && !EVENTS.coffee.ok()) { const cup = items.find(i => i.type === 'cup' && !i.gone); if (cup && !cup.lock && !cup.held) { cup.full = true; cup.tipped = false; fx.push({ type: 'poof', x: cup.x, y: cup.y - 6, t: .6 }); } }
+    if (name === 'tug' && !EVENTS.tug.ok() && !items.some(i => i.type === 'baguette' && !i.gone)) name = 'delivery';
+    const d = EVENTS[name];
+    if (name !== 'delivery' && !d.ok()) { const b = pickOne(birds); if (b) say(b, '?', 1.5); return; }
+    ev = { name, def: d, age: 0, force: true }; lastEv = name; d.start(ev);
   }
   let lastPour = 0, lastCall = 0;
   function pour(wx, wy) {
@@ -583,13 +662,18 @@
     for (const f of fx) {
       f.t -= dt;
       if (f.type === 'note') f.y -= dt * 10;
+      if (f.type === 'gust') f.x += f.vx * dt;
+      if (f.type === 'rain') { if (f.y < f.land) { f.y += 170 * dt; f.x -= 25 * dt; } else { f.type = 'splash'; f.t = .25; } }
+      if (f.type === 'confetti') { if (f.y < f.land) { f.y += f.vy * dt; f.x += Math.sin(f.ph += dt * 5) * dt * 12; } else if (f.t > 8) f.t = 8; }
       if (f.type === 'leaf' || f.type === 'snow' || f.type === 'petal') {
         if (f.y < f.land) { f.ph += dt * 3; f.x += (f.vx + Math.sin(f.ph) * 8) * dt; f.y += f.vy * dt; }
         else if (f.type === 'leaf' && !f.item) { f.item = true; f.t = 0; if (items.filter(i => i.type === 'leaf').length < 8) items.push({ type: 'leaf', x: cx(f.x), y: cy(f.y), c: f.c, fade: rnd(30, 60) }); }
         else if (f.t > 3) f.t = 3;
       }
     }
-    fx = fx.filter(f => f.t > 0).slice(-60);
+    fx = fx.filter(f => f.t > 0).slice(-400);
+    for (const p of puddles) p.life -= dt;
+    puddles = puddles.filter(p => p.life > 0);
     // падающие и разлетающиеся крошки
     for (const it of items) if (it.vy != null && (it.type === 'crumb' || it.type === 'seed')) {
       it.vy += 60 * dt; it.y += it.vy * dt; if (it.vx) it.x = cx(it.x + it.vx * dt);
@@ -618,6 +702,7 @@
     ctx.fillStyle = disco > 0 ? `hsla(${(now / 6) % 360},90%,65%,.3)` : `rgba(255, 220, 140, ${.14 + night * .2})`;
     ctx.beginPath(); ctx.arc(L, 18, 22 + night * 10, 0, 7); ctx.fill();
     if (disco > 0) for (let i = 0; i < 8; i++) { const a = now / 700 + i * .8; R(W / 2 + Math.cos(a) * W * .4, 104 + Math.sin(a * 1.3) * 16, 2, 2, `hsla(${i * 45},90%,70%,.55)`); }
+    for (const p of puddles) { ctx.globalAlpha = Math.min(p.a, p.life / 5) * .7; ctx.fillStyle = '#7FA6C9'; ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r, p.r * .35, 0, 0, 7); ctx.fill(); ctx.fillStyle = '#B9D3E8'; ctx.fillRect(Math.round(p.x - p.r * .4), Math.round(p.y - 1), Math.round(p.r * .5), 1); ctx.globalAlpha = 1; }
     const k = cv.getBoundingClientRect().width / W;
     // всё на земле — по глубине (кто ниже, тот ближе)
     const ents = [];
@@ -638,6 +723,12 @@
       if (b.dir < 0) { ctx.translate(x, 0); ctx.scale(-1, 1); ctx.drawImage(img, -SW / 2, y - BASE); }
       else ctx.drawImage(img, x - SW / 2, y - BASE);
       ctx.restore();
+      if (b.hat) { // праздничный колпак на макушке
+        const hd = b.heads[f], hx = b.dir > 0 ? x - SW / 2 + hd.x : x + SW / 2 - hd.x - 1, hy = y - BASE + hd.y;
+        const [c1, c2] = b.hat;
+        [[0, 1], [-1, 3], [-1, 3], [-2, 5], [-2, 5]].forEach(([o, w], i) => R(hx + o, hy - 5 + i, w, 1, i % 2 ? c2 : c1));
+        R(hx, hy - 7, 1, 2, '#FFE7A3'); R(hx - 1, hy - 7, 3, 1, '#FFE7A3');
+      }
       if (b.hold) { const it = b.hold, long = it.type === 'baguette' || it.type === 'half'; drawItem(it, x + b.dir * (long ? 9 : 8), y - (long ? 9 : 7), true); }
       if (b.label) b.label.style.transform = `translate(${(b.x * k).toFixed(1)}px, ${((b.y + 2) * k).toFixed(1)}px) translateX(-50%)`;
     }
@@ -650,6 +741,13 @@
       else if (f.type === 'petal') R(f.x, f.y, 2, 1, f.c);
       else if (f.type === 'note') { ctx.globalAlpha = Math.min(1, f.t); ICON.note.forEach((row, yy) => [...row].forEach((ch, xx) => { if (ch === '#') R(f.x - 2 + xx, f.y + yy, 1, 1, '#FFE7A3'); })); ctx.globalAlpha = 1; }
       else if (f.type === 'poof' || f.type === 'snap') { const r = (1 - f.t / .6) * 10 + 3; for (let i = 0; i < 8; i++) { const a = i / 8 * 6.28; R(f.x + Math.cos(a) * r, f.y + Math.sin(a) * r * .6, 2, 2, f.type === 'snap' ? '#F0C27C' : '#FFFDF5'); } }
+    }
+    if (gloom > 0) { ctx.fillStyle = `rgba(40, 50, 80, ${gloom * .3})`; ctx.fillRect(0, 0, W, H); }
+    for (const f of fx) {
+      if (f.type === 'gust') { ctx.globalAlpha = Math.min(1, f.t) * .55; R(f.x, f.y, f.len, 1, '#FFFFFF'); ctx.globalAlpha = 1; }
+      else if (f.type === 'rain') R(f.x, f.y, 1, 3, 'rgba(185, 211, 232, .8)');
+      else if (f.type === 'splash') { R(f.x - 2, f.y - 1, 1, 1, '#B9D3E8'); R(f.x + 2, f.y - 1, 1, 1, '#B9D3E8'); R(f.x, f.y - 2, 1, 1, '#B9D3E8'); }
+      else if (f.type === 'confetti') { ctx.globalAlpha = Math.min(1, f.t); R(f.x, f.y, (f.ph | 0) % 2 ? 2 : 1, (f.ph | 0) % 2 ? 1 : 2, f.c); ctx.globalAlpha = 1; }
     }
     if (night > 0) { ctx.fillStyle = `rgba(12, 6, 40, ${night * .45})`; ctx.fillRect(0, 0, W, H); ctx.fillStyle = `rgba(255, 220, 140, ${night * .16})`; ctx.beginPath(); ctx.arc(L, 60, 40, 0, 7); ctx.fill(); }
     for (const b of birds) if (b.emote) drawEmote(b.x, b.y - (b.cat ? 17 : 24), b.emote.icon, Math.min(b.emote.t / .3, (b.emote.max - b.emote.t) / .15 + .2));
@@ -673,7 +771,7 @@
     requestAnimationFrame(loop);
   }
 
-  function reset(list) { ev = null; evIn = rnd(6, 10); night = 0; disco = 0; fx = []; hearts = []; makeItems(); makeBirds(list); }
+  function reset(list) { ev = null; evIn = rnd(6, 10); night = 0; disco = 0; gloom = 0; puddles = []; fx = []; hearts = []; makeItems(); makeBirds(list); }
   function start(data) {
     layout();
     reset(data.birds);
@@ -691,22 +789,25 @@
     let rw = box.clientWidth;
     addEventListener('resize', () => { if (Math.abs(box.clientWidth - rw) < 40) return; rw = box.clientWidth; layout(); reset(data.birds); });
     // «Насыпать зёрнышек»: зажать мышку (или палец) и водить над сценой
-    const stage = box.querySelector('.fl-stage'), seedBtn = box.querySelector('.fl-seed');
+    const stage = box.querySelector('.fl-stage');
     let seeding = false, pouring = false;
     const toWorld = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; };
-    if (seedBtn) seedBtn.addEventListener('click', e => {
+    box.querySelectorAll('.fl-tools [data-act]').forEach(btn => btn.addEventListener('click', e => {
       e.stopPropagation();
-      seeding = !seeding; seedBtn.setAttribute('aria-pressed', String(seeding));
-      seedBtn.textContent = seeding ? seedBtn.dataset.on : seedBtn.dataset.off;
-      stage.classList.toggle('seeding', seeding);
-    });
-    stage.addEventListener('pointerdown', e => { if (!seeding || e.target.closest('.fl-seed')) return; pouring = true; stage.setPointerCapture(e.pointerId); pour(...toWorld(e)); e.preventDefault(); });
+      const act = btn.dataset.act;
+      if (act === 'seed') { seeding = !seeding; btn.setAttribute('aria-pressed', String(seeding)); stage.classList.toggle('seeding', seeding); const h = box.querySelector('.fl-seedhint'); if (h) h.hidden = !seeding; return; }
+      if (act === 'party') { setParty(!party); btn.setAttribute('aria-pressed', String(party)); return; }
+      if (still) return;
+      trigger(act);
+      btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
+    }));
+    stage.addEventListener('pointerdown', e => { if (!seeding) return; pouring = true; stage.setPointerCapture(e.pointerId); pour(...toWorld(e)); e.preventDefault(); });
     stage.addEventListener('pointermove', e => { if (seeding && pouring) pour(...toWorld(e)); });
     const stopPour = () => { pouring = false; };
     stage.addEventListener('pointerup', stopPour); stage.addEventListener('pointercancel', stopPour);
     // клик по сцене — бросить крошки в это место
     stage.addEventListener('click', e => {
-      if (e.target.closest('a') || e.target.closest('.fl-seed') || still || seeding) return;
+      if (e.target.closest('a') || still || seeding) return;
       const r = cv.getBoundingClientRect();
       scatter(clamp((e.clientX - r.left) / r.width * W, 20, W - 20));
     });
