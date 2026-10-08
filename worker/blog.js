@@ -203,9 +203,9 @@ export async function blogApi(req, env, url, h) {
     const rows = (await env.DB.prepare(`SELECT * FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC`).all()).results;
     const pack = x => ({ url: blogUrl(lang, x.slug), title: field(x, 't', lang), excerpt: field(x, 'd', lang) || stripTags(field(x, 'b', lang)).slice(0, 200),
       cover: x.cover, date: fmtDate(x.published_at, lang), tags: tagsOf(x, lang).slice(0, 3), likes: x.likes });
-    const latest = rows.find(x => x.pinned) || rows[0] || null; // 📌 закреплённая статья, иначе самая новая
-    const featured = rows.filter(x => x.featured && x !== latest).slice(0, 3); // справа — только статьи со ★, не больше трёх
-    return json({ latest: latest && pack(latest), featured: featured.map(x => ({ ...pack(x), star: !!x.featured })) }, 200, { 'cache-control': 'public, max-age=60' });
+    const latest = rows[0] || null; // крупно — самая новая статья
+    const featured = rows.filter(x => x.featured && x !== latest).slice(0, 3); // справа — три последние со ★ (кроме той, что уже крупно)
+    return json({ latest: latest && pack(latest), featured: featured.map(x => ({ ...pack(x), star: true })) });
   }
 
   // ---------- редактор (только админ) ----------
@@ -233,14 +233,13 @@ export async function blogApi(req, env, url, h) {
         f['t_' + l] = String(b['t_' + l] || '').trim().slice(0, 200);
         f['d_' + l] = String(b['d_' + l] || '').trim().slice(0, 400);
         f['tags_' + l] = String(b['tags_' + l] || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean).slice(0, 12).join(', ');
-        f['b_' + l] = await cleanHtml(String(b['b_' + l] || '').slice(0, 400_000));
+        f['b_' + l] = await cleanHtml(String(b['b_' + l] || '').replace(/<img[^>]+src="data:[^"]*"[^>]*>/gi, '')); // картинки-«data:» в базу не кладём
+        if (f['b_' + l].length > 900_000) fail(413, 'too_big');
       }
       if (!f.t_ru && !f.t_en && !f.t_lv) fail(400, 'title');
       let cover = safeUrl(b.cover || '') ? String(b.cover).trim() : '';
       // картинки, вставленные из Google Docs, живут там временно — копируем их в своё хранилище
-      const moved = {};
-      for (const l of LANGS) f['b_' + l] = await rehost(env, f['b_' + l], moved);
-      if (TEMP_IMG.test(cover)) cover = (await rehostOne(env, cover, moved)) || cover;
+      // картинки из Google Docs копируются в редакторе сразу при вставке (fetch-image), здесь сохраняем быстро
       const status = b.status === 'published' ? 'published' : 'draft';
       const featured = b.featured ? 1 : 0;
       let slug = slugify(b.slug || f.t_en || f.t_ru) || 'post';
@@ -351,13 +350,12 @@ export async function blogApi(req, env, url, h) {
   fail(404, 'not_found');
 }
 
-const TEMP_IMG = /^https:\/\/[a-z0-9.-]*(googleusercontent\.com|docs\.google\.com)\//i;
 async function rehostOne(env, src, moved) {
   if (moved[src] !== undefined) return moved[src];
   moved[src] = null;
   if (!env.MEDIA) return null;
   try {
-    const r = await fetch(src, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36', Referer: 'https://docs.google.com/', Accept: 'image/avif,image/webp,image/png,image/jpeg,image/*;q=0.8' } });
+    const r = await fetch(src, { signal: AbortSignal.timeout(15000), headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36', Referer: 'https://docs.google.com/', Accept: 'image/avif,image/webp,image/png,image/jpeg,image/*;q=0.8' } });
     let type = (r.headers.get('content-type') || '').split(';')[0];
     if (type === 'application/octet-stream' || type === 'binary/octet-stream') type = 'image/png';
     const ext = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }[type];
@@ -369,14 +367,6 @@ async function rehostOne(env, src, moved) {
     await env.MEDIA.put(key, buf, { httpMetadata: { contentType: type, cacheControl: 'public, max-age=31536000, immutable' } });
     return (moved[src] = '/media/' + key);
   } catch (e) { return null; }
-}
-async function rehost(env, html, moved) {
-  const srcs = [...new Set([...html.matchAll(/<img [^>]*src="([^"]+)"/g)].map(m => m[1].replace(/&amp;/g, '&')).filter(u => TEMP_IMG.test(u)))];
-  for (const u of srcs) {
-    const local = await rehostOne(env, u, moved);
-    if (local) html = html.split(u.replace(/&/g, '&amp;')).join(local).split(u).join(local);
-  }
-  return html;
 }
 
 // перевод: Workers AI (m2m100). Теги внутри абзаца прячем за метками ⟦1⟧; если метки потерялись — переводим чистый текст.
@@ -395,6 +385,19 @@ async function translateOne(env, text, from, to) {
       throw Object.assign(new Error(msg), { code: /limit|quota|429|4006|neuron/i.test(msg) ? 'ai_limit' : 'ai' });
     }
   };
+  // m2m100 обрезает длинные куски — длинный абзац переводим по предложениям (оформление внутри него теряется, но текст целый)
+  if (text.length > 380) {
+    const plain = stripTags(text), parts = [];
+    let cur = '';
+    for (const sent of plain.match(/[^.!?…]+[.!?…]+["»”')]*\s*|[^.!?…]+$/g) || [plain]) {
+      if ((cur + sent).length > 350 && cur) { parts.push(cur); cur = ''; }
+      cur += sent;
+    }
+    if (cur) parts.push(cur);
+    const out = [];
+    for (const part of parts) out.push(await run(part.trim()));
+    return out.join(' ');
+  }
   const tags = [];
   const masked = text.replace(/<[^>]+>/g, t => { tags.push(t); return `⟦${tags.length}⟧`; });
   if (!tags.length) return run(text);
@@ -404,8 +407,8 @@ async function translateOne(env, text, from, to) {
 }
 // Gemini (ключ GEMINI_KEY в Cloudflare): переводит по смыслу и держит HTML. Модели по очереди — если одна перегружена, берём следующую.
 const LANG_NAME = { ru: 'Russian', en: 'English', lv: 'Latvian' };
-const GEMINI_MODELS = ['gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash'];
-const tagsSig = s => (String(s).match(/<\/?[a-z0-9]+/gi) || []).join(',').toLowerCase();
+// Flash-Lite — быстрые (30 абзацев ≈ 8 с) и реже перегружены; полная Flash — запасная
+const GEMINI_MODELS = ['gemini-3.1-flash-lite', 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.5-flash'];
 async function gemini(env, texts, from, to) {
   const prompt = `You are a careful professional translator. Translate every string in the JSON array below from ${LANG_NAME[from]} to ${LANG_NAME[to]}.
 The strings are consecutive parts of one blog post written by an illustrator about drawing.
@@ -420,6 +423,8 @@ Return only a JSON array of exactly ${texts.length} strings in the same order.
 ${JSON.stringify(texts)}`;
   const models = env.GEMINI_MODEL ? [env.GEMINI_MODEL, ...GEMINI_MODELS] : GEMINI_MODELS;
   let lastErr = 'ai';
+  for (let attempt = 0; attempt < 2; attempt++) {
+    if (attempt) await new Promise(res => setTimeout(res, 8000)); // все заняты — ждём и пробуем ещё раз
   for (const model of models) {
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
       method: 'POST', headers: { 'x-goog-api-key': env.GEMINI_KEY, 'content-type': 'application/json' },
@@ -432,6 +437,7 @@ ${JSON.stringify(texts)}`;
       if (Array.isArray(out) && out.length === texts.length) return out.map(x => String(x ?? ''));
     } catch (e) { /* ответ не разобрался — следующая модель */ }
   }
+  }
   throw Object.assign(new Error(lastErr), { code: lastErr });
 }
 
@@ -440,9 +446,9 @@ async function translateAll(env, texts, from, to) {
   if (env.GEMINI_KEY) {
     try {
       const res = await gemini(env, texts, from, to);
-      // если в каком-то абзаце потерялось оформление — этот абзац переводим запасным переводчиком
+      // пустой ответ на непустой абзац — этот абзац переводим запасным переводчиком
       for (let i = 0; i < res.length; i++) {
-        if (tagsSig(res[i]) !== tagsSig(texts[i]) || (texts[i].trim() && !res[i].trim())) {
+        if (texts[i].trim() && !res[i].trim()) {
           try { res[i] = await translateOne(env, texts[i], from, to); } catch (e) { res[i] = texts[i]; }
         }
       }

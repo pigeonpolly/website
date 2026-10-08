@@ -180,6 +180,13 @@
     const cnt = box.querySelector('.fl-count');
     if (cnt && data.total) cnt.textContent = cnt.dataset.tpl.replace('{n}', data.total) + (data.recent ? ' ' + cnt.dataset.recent : '');
     if (data.birds.some(b => b.me)) { const j = box.querySelector('.fl-join'); if (j) j.hidden = true; }
+    // «Хочу свою птичку»: открывает вход через Google в шапке (после входа сразу попросит ник)
+    const join = box.querySelector('.fl-join');
+    join && join.addEventListener('click', e => {
+      if (!window.PPAccount || window.PPAccount.signedIn()) return;
+      e.preventDefault(); e.stopPropagation(); // иначе клик дойдёт до страницы и сразу закроет окно входа
+      window.PPAccount.openSignIn();
+    });
     requestAnimationFrame(loop);
     let rw = box.clientWidth;
     addEventListener('resize', () => { if (Math.abs(box.clientWidth - rw) < 40) return; rw = box.clientWidth; layout(); makeBirds(data.birds); });

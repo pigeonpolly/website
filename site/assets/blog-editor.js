@@ -18,7 +18,7 @@
     ai_limit: 'Бесплатный лимит переводов на сегодня закончился — попробуйте завтра.',
     ai: 'Переводчик сейчас не отвечает. Попробуйте ещё раз чуть позже.',
     media: 'Хранилище картинок не подключено.', big: 'Картинка слишком большая (до 8 МБ).', type: 'Подходят JPG, PNG, WebP и GIF.',
-    title: 'Нужен заголовок.', fetch: 'Не удалось скопировать картинку.', login: 'Сессия закончилась — войдите снова.', admin: 'Нужен вход администратора.',
+    title: 'Нужен заголовок.', too_big: 'Статья слишком большая для сохранения (больше ~900 000 символов вместе с разметкой).', save: 'сервер не подтвердил сохранение.', fetch: 'Не удалось скопировать картинку.', login: 'Сессия закончилась — войдите снова.', admin: 'Нужен вход администратора.',
   };
   const errText = e => ERR[e.code] || 'Что-то пошло не так (' + esc(e.code || e.message) + ').';
   let state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null;
@@ -76,7 +76,7 @@
       const head = tagFilter ? `<p class="be-filter">Статьи с тегом <b>#${esc(tagFilter.t)}</b> (${tagFilter.l.toUpperCase()}) · <button type="button" class="bc-link" data-unfilter>показать все</button></p>` : '';
       if (!list.length) return head + `<p class="be-note">${dashTab === 'draft' ? 'Черновиков нет.' : 'Опубликованных статей пока нет.'}</p>`;
       return head + `<table class="be-table"><thead><tr><th>Статья</th><th>Статус</th><th>Дата</th><th title="лайки">♥</th><th title="просмотры">👁</th><th title="комментарии">💬</th><th></th></tr></thead><tbody>
-        ${list.map(p => `<tr data-id="${p.id}"><td><button class="be-pin" data-pin aria-pressed="${!!p.pinned}" title="${p.pinned ? 'Стоит крупно на главной' : 'Поставить крупно на главную'}">📌</button><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a><small>/blog/${esc(p.slug)}/ · ${['ru', 'en', 'lv'].map(l => p['t_' + l] ? l.toUpperCase() : `<s>${l.toUpperCase()}</s>`).join(' ')}</small></td>
+        ${list.map(p => `<tr data-id="${p.id}"><td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a><small>/blog/${esc(p.slug)}/ · ${['ru', 'en', 'lv'].map(l => p['t_' + l] ? l.toUpperCase() : `<s>${l.toUpperCase()}</s>`).join(' ')}</small></td>
           <td><span class="be-st ${p.status}">${p.status === 'published' ? 'опубликована' : 'черновик'}</span></td><td>${fmt(p.published_at || p.updated_at)}</td>
           <td>${p.likes}</td><td>${p.views}</td><td>${p.comments}</td>
           <td class="be-acts"><a href="#${p.id}">Изменить</a> <a href="/ru/blog/${esc(p.slug)}/" target="_blank">Открыть ↗</a> <button class="bc-link be-danger" data-delpost>Удалить</button></td></tr>`).join('')}
@@ -126,13 +126,6 @@
       await api('blog/admin/comment', { id: Number(li.dataset.cid), action: b.hasAttribute('data-ok') ? 'approve' : 'delete' });
       dashboard();
     }));
-    app.querySelectorAll('[data-pin]').forEach(b => b.addEventListener('click', async () => {
-      const on = b.getAttribute('aria-pressed') !== 'true';
-      const tr = b.closest('tr'), p = state.posts.find(x => x.id === Number(tr.dataset.id));
-      if (on && p && p.status !== 'published' && !confirm('Это черновик — на главной он появится только после публикации. Всё равно закрепить?')) return;
-      await api('blog/admin/pin', { id: Number(tr.dataset.id), pinned: on });
-      dashboard();
-    }));
     app.querySelectorAll('[data-star]').forEach(b => b.addEventListener('click', async () => {
       const on = b.getAttribute('aria-pressed') !== 'true';
       await api('blog/admin/feature', { id: Number(b.closest('tr').dataset.id), featured: on });
@@ -161,10 +154,6 @@
       try { post = (await api('blog/admin/post?id=' + id)).post; } catch (e) { app.innerHTML = `<p class="be-note">${errText(e)}</p>`; return; }
     }
     for (const [l] of LANGS) for (const k of ['t', 'd', 'tags', 'b']) post[`${k}_${l}`] = post[`${k}_${l}`] || '';
-    const local = loadLocal(post.id);
-    if (local && local.saved > (post.updated_at || 0) * 1000 && confirm('Есть несохранённая версия этой статьи из этого браузера. Восстановить её?')) {
-      Object.assign(post, local.data); dirty = true;
-    }
     app.innerHTML = `<p class="be-back"><a href="#">← Все статьи</a></p>
       <div class="be-tabs" role="tablist">${LANGS.map(([l, n], i) => `<button type="button" role="tab" data-tab="${l}" aria-selected="${!i}">${n}</button>`).join('')}
         <button type="button" class="pill-btn pill-fill be-tr" id="be-tr">🌐 Перевести с RU на EN и LV</button></div>
@@ -189,7 +178,6 @@
             ${post.cover ? '<button type="button" class="bc-link" id="be-cover-rm">убрать обложку</button>' : ''}</div></div></div>
         <label class="be-f be-srclang"><span>Язык оригинала <small>(на остальных языках внизу статьи появится маленькая пометка «перевод сделан онлайн-инструментами» со ссылкой на оригинал; кнопка «Перевести» ставит его сама)</small></span>
           <select id="be-src"><option value="">— не указан (пометки не будет) —</option>${LANGS.map(([l, n]) => `<option value="${l}"${post.src_lang === l ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
-        <label class="be-check"><input type="checkbox" id="be-pinned" ${post.pinned ? 'checked' : ''}> <b>📌 Крупно на главной</b> <small>— эта статья будет большой на главной вместо самой новой (только одна статья)</small></label>
         <label class="be-check"><input type="checkbox" id="be-featured" ${post.featured ? 'checked' : ''}> <b>★ Избранное</b> <small>— показывать справа в блоке блога на главной</small></label>
         <label class="be-f"><span>Адрес статьи <small id="be-slug-note">${post.status === 'published' ? '(статья опубликована — адрес лучше не менять, иначе старые ссылки перестанут работать)' : '(заполняется сам из заголовка; можно поправить)'}</small></span><div class="be-slug"><span>pigeonpolly.com/blog/</span><input type="text" id="be-slug" value="${esc(post.slug)}" spellcheck="false"><span>/</span></div></label>
       </section>
@@ -207,7 +195,7 @@
     document.execCommand('defaultParagraphSeparator', false, 'p');
 
     const collect = () => {
-      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, pinned: $('#be-pinned').checked, src_lang: $('#be-src').value };
+      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value };
       app.querySelectorAll('[data-k]').forEach(el => {
         if (!el.isContentEditable) { d[el.dataset.k] = el.value; return; }
         const c = el.cloneNode(true);
@@ -220,7 +208,7 @@
       });
       return d;
     };
-    const touch = () => { dirty = true; saveLocal(post.id, collect()); };
+    const touch = () => { dirty = true; };
     app.addEventListener('input', touch);
     app.addEventListener('change', touch);
 
@@ -385,7 +373,8 @@
     });
 
     // картинки из Google Docs живут там по временным ссылкам — копируем их на сайт сразу при вставке
-    const foreign = src => /^https?:\/\//i.test(src) && !src.startsWith(location.origin) && /googleusercontent\.com|docs\.google\.com|ggpht\.com/i.test(src);
+    const foreign = src => /^(data:image|blob:)/i.test(src) || (/^https?:\/\//i.test(src) && !src.startsWith(location.origin) && /googleusercontent\.com|docs\.google\.com|ggpht\.com/i.test(src));
+    const copied = {}; // одна и та же картинка в RU/EN/LV копируется один раз
     async function copyImages(body) {
       const imgs = [...body.querySelectorAll('img')].filter(i => foreign(i.getAttribute('src') || ''));
       if (!imgs.length) return;
@@ -393,11 +382,12 @@
       for (const [i, img] of imgs.entries()) {
         status(`Копирую картинки из Google Docs на сайт: ${i + 1} из ${imgs.length}…`);
         const src = img.getAttribute('src');
-        let local = null;
-        try { local = (await api('blog/admin/fetch-image', { url: src })).url; } catch (e) { /* попробуем через браузер */ }
+        let local = copied[src] || null;
+        if (!local && /^https?:/i.test(src)) { try { local = (await api('blog/admin/fetch-image', { url: src })).url; } catch (e) { /* попробуем через браузер */ } }
         if (!local) {
           try { const r = await fetch(src); if (r.ok) local = await upload(await r.blob()); } catch (e) { /* не вышло */ }
         }
+        if (local) copied[src] = local;
         const fig = img.closest('figure');
         if (local) { img.setAttribute('src', local); fig && fig.classList.remove('be-img-bad'); ok++; }
         else { (fig || img).classList.add('be-img-bad'); img.title = 'Не скопировалась — перетащите сюда файл картинки'; bad++; }
@@ -406,8 +396,12 @@
       status(bad ? `Скопировано ${ok} из ${imgs.length}. ${bad} не удалось — они обведены красным: сохраните их с Google Docs и перетащите файлами на их место (старую удалите).`
         : `Готово: все картинки (${ok}) скопированы на сайт ✓`);
     }
-    // если статью открыли, а в ней остались ссылки на Google Docs (старые вставки) — пробуем скопировать
-    bodies.forEach(b => { if ([...b.querySelectorAll('img')].some(i => foreign(i.getAttribute('src') || ''))) copyImages(b); });
+    // если в статье остались картинки со ссылками на Google Docs — предлагаем скопировать их одной кнопкой (не автоматически)
+    const leftovers = bodies.reduce((n, b) => n + [...b.querySelectorAll('img')].filter(i => foreign(i.getAttribute('src') || '')).length, 0);
+    if (leftovers) {
+      status(`В статье ${leftovers} картин(ки/ок) со ссылками на Google Docs — они могут не показываться читателям. <button type="button" class="bc-link" id="be-copy-left">Скопировать их на сайт</button>`);
+      $('#be-copy-left').addEventListener('click', async () => { for (const b of bodies) await copyImages(b); });
+    }
 
     // обложка
     const setCover = url => {
@@ -469,12 +463,17 @@
       status('Сохраняю…');
       try {
         const r = await api('blog/admin/save', d);
-        dirty = false; dropLocal(post.id); dropLocal(r.id);
+        if (!r || !r.id) throw Object.assign(new Error('save'), { code: 'save' });
+        dirty = false;
         if (!post.id) { history.replaceState(null, '', '#' + r.id); }
         await editor(r.id);
         app.querySelector('.be-status').innerHTML = r.status === 'published'
           ? `Опубликовано ✓ <a href="/ru/blog/${esc(r.slug)}/" target="_blank">открыть статью ↗</a>` : 'Черновик сохранён ✓ (его видите только вы)';
-      } catch (e) { status(errText(e)); app.querySelectorAll('[data-save]').forEach(x => { x.disabled = false; }); }
+      } catch (e) {
+        status('⚠ Не сохранилось: ' + errText(e));
+        alert('Статья НЕ сохранилась: ' + errText(e).replace(/<[^>]+>/g, '') + '\nНе закрывайте страницу — попробуйте ещё раз.');
+        app.querySelectorAll('[data-save]').forEach(x => { x.disabled = false; });
+      }
     }));
   }
 
@@ -563,11 +562,6 @@
     .replace(/[а-яё]/g, c => ({ а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya' }[c]))
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 70);
   const stripHtml = s => String(s || '').replace(/<[^>]*>/g, '').trim();
-  // запасная копия в браузере на случай закрытой вкладки
-  const lk = id => 'pp-blog-draft-' + (id || 'new');
-  function saveLocal(id, data) { try { localStorage.setItem(lk(id), JSON.stringify({ saved: Date.now(), data })); } catch (e) { /* нет места */ } }
-  function loadLocal(id) { try { return JSON.parse(localStorage.getItem(lk(id))); } catch (e) { return null; } }
-  function dropLocal(id) { try { localStorage.removeItem(lk(id)); } catch (e) { /* ок */ } }
 
   start();
 })();

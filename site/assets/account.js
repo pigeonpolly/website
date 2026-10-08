@@ -41,7 +41,16 @@
       if (d.user && !d.user.nick) askNick(d.user);
     }).catch(() => {});
   }
-  window.PPAccount = { check };
+  // открыть окно входа из любого места страницы (кнопка «Хочу свою птичку» в стае)
+  function openSignIn() {
+    const btn = el.querySelector('.acct-btn');
+    if (!btn) return false;
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+    if (btn.getAttribute('aria-expanded') !== 'true') btn.click();
+    btn.focus({ preventScroll: true });
+    return true;
+  }
+  window.PPAccount = { check, openSignIn, signedIn: () => !!(info && info.user) };
   check();
 
   // ник обязателен: окно сразу после первого входа, закрыть можно только выбрав ник (или выйдя)

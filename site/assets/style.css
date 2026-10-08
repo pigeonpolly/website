@@ -1915,3 +1915,23 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .bp-body .bp-tr-note a { color: #9A90B8; text-decoration: underline; text-decoration-color: #D6CFE6; }
 .bp-body .bp-tr-note a:hover { color: #534AB7; }
 .be-srclang select { max-width: 320px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line); background: #1F1240; color: var(--text); font: 16px var(--sans); }
+
+/* ---------- Белые карточки статей и белая боковая колонка блога ---------- */
+.bl-card { background: #FFFDF8; color: #2B1A51; box-shadow: 0 10px 28px rgba(0, 0, 0, .22); }
+.bl-card h2 a { color: #2B1A51; }
+.bl-card .bl-meta, .bl-card .bl-stats { color: #7A6F99; }
+.bl-card .bl-excerpt { color: #4A3F6B; }
+.bl-card .bl-tag { color: #C0582F; }
+.bl-card .bl-cover { background: #EDE8F7; }
+.bl-side { background: #FFFDF8; color: #2B1A51; padding: 26px 24px; border-radius: 20px; box-shadow: 0 10px 28px rgba(0, 0, 0, .22); align-self: start; }
+.bl-side h2 { color: #C98A12; }
+.bl-cloud a { color: #2B1A51; border-color: #DCD5EC; }
+.bl-cloud a:hover, .bl-cloud a[aria-current] { background: #F0A987; border-color: #F0A987; color: #2B1A51; }
+.bl-pop a, .bl-arch a, .bl-fav a { color: #2B1A51; }
+.bl-pop a:hover, .bl-fav a:hover { color: #534AB7; text-decoration: underline; }
+.bl-arch a:hover, .bl-arch a[aria-current] { color: #C0582F; }
+.bl-pop span, .bl-arch span { color: #7A6F99; }
+.bl-arch > li > b { color: #2B1A51; }
+.bl-pop li::marker { color: #7A6F99; }
+.bl-side .bl-more a { color: #C0582F; }
+.bp-more .bl-side { gap: 22px; }
