@@ -639,6 +639,21 @@
     if (name !== 'delivery' && !d.ok()) { const b = pickOne(birds); if (b) say(b, '?', 1.5); return; }
     ev = { name, def: d, age: 0, force: true }; lastEv = name; d.start(ev);
   }
+  // «Всё как было»: остановить всё, снять колпаки, убрать лужи и мусор, разложить вещи по местам
+  function tidyAll() {
+    endEvent();
+    if (party) setParty(false);
+    night = 0; disco = 0; gloom = 0; puddles = []; fx = []; hearts = [];
+    for (const p of perches) p.by = null;
+    for (const b of birds) {
+      b.hold = null; b.tasks = []; b.goal = null; b.hop = null; b.ctl = false; b.ev = null; b.perch = null; b.hat = null;
+      b.wait = rnd(.5, 2); b.pose = 'idle'; b.y = cy(b.y); b.x = cx(b.x);
+      if (Math.random() < .5) say(b, pickOne(['star', 'heart', 'note']), 1.4);
+    }
+    makeItems();
+    for (const it of items) if (it.type !== 'crumb') fx.push({ type: 'poof', x: it.x, y: it.y - 4, t: .6 });
+    evIn = rnd(10, 16);
+  }
   let lastPour = 0, lastCall = 0;
   function pour(wx, wy) {
     const now = performance.now();
@@ -827,6 +842,13 @@
       const act = btn.dataset.act;
       if (act === 'seed') { seeding = !seeding; btn.setAttribute('aria-pressed', String(seeding)); stage.classList.toggle('seeding', seeding); const h = box.querySelector('.fl-seedhint'); if (h) h.hidden = !seeding; return; }
       if (act === 'party') { setParty(!party); btn.setAttribute('aria-pressed', String(party)); return; }
+      if (act === 'reset') {
+        tidyAll(); seeding = false; stage.classList.remove('seeding');
+        box.querySelectorAll('.fl-tools [aria-pressed]').forEach(x => x.setAttribute('aria-pressed', 'false'));
+        const h = box.querySelector('.fl-seedhint'); if (h) h.hidden = true;
+        btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
+        return;
+      }
       if (still) return;
       trigger(act);
       btn.classList.remove('pop'); void btn.offsetWidth; btn.classList.add('pop');
