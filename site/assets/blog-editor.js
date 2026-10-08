@@ -15,6 +15,7 @@
   };
   const fmt = ts => ts ? new Date(ts * 1000).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
   const ERR = {
+    google: 'Google Переводчик сейчас не ответил — попробуйте ещё раз или нажмите «✨ Gemini».', google_limit: 'Google Переводчик просит передохнуть — подождите пару минут или нажмите «✨ Gemini».',
     ai_limit: 'Бесплатный лимит Gemini на сейчас закончился — попробуйте через час или завтра.',
     ai: 'Gemini сейчас не отвечает (бывает, когда он перегружен). Попробуйте ещё раз через пару минут.',
     no_key: 'Перевод не подключён: нажмите в списке статей «⚙ Перевод (Gemini)» и вставьте ключ.', bad_key: 'Google не принял ключ Gemini — проверьте его в «⚙ Перевод (Gemini)».',
@@ -294,10 +295,11 @@
     for (const [l] of LANGS) for (const k of ['t', 'd', 'tags', 'b']) post[`${k}_${l}`] = post[`${k}_${l}`] || '';
     app.innerHTML = `<p class="be-back"><a href="#">← Все статьи</a></p>
       <div class="be-tabs" role="tablist">${LANGS.map(([l, n], i) => `<button type="button" role="tab" data-tab="${l}" aria-selected="${!i}">${n}</button>`).join('')}
-        <button type="button" class="pill-btn pill-fill be-tr" id="be-tr">🌐 Перевести с RU на EN и LV</button></div>
+        <span class="be-trs"><button type="button" class="pill-btn pill-fill be-tr" id="be-tr" data-engine="google">🌐 Перевести с RU на EN и LV</button>
+        <button type="button" class="pill-btn be-tr2" id="be-tr-g" data-engine="gemini" title="Перевод через Gemini: точнее и живее, но с дневным лимитом">✨ Gemini</button></span></div>
       <div class="be-progress" id="be-progress" hidden></div>
       <details class="be-hint"><summary>Как перевести статью и не потерять картинки</summary>
-        <ol><li><b>Кнопка «🌐 Перевести»</b> (вверху справа): переводит открытую вкладку на два других языка через Gemini — картинки, подписи, заголовки и жирный остаются на месте, переводится только текст. Потом проверьте и поправьте перевод.</li>
+        <ol><li><b>Кнопка «🌐 Перевести»</b> (вверху справа): переводит открытую вкладку на два других языка через Google Переводчик — бесплатно и без лимитов. Кнопка <b>«✨ Gemini»</b> рядом переводит живее и точнее, но у неё дневной лимит. В обоих случаях картинки, подписи, заголовки и жирный остаются на месте, переводится только текст. Потом проверьте и поправьте перевод.</li>
         <li><b>Или в Google Docs:</b> откройте документ со статьёй → <i>Инструменты → Перевести документ</i> → выберите язык. Google сделает копию документа уже на нужном языке, с картинками и оформлением. Откройте её, Ctrl+A, Ctrl+C и вставьте во вкладку RU / EN / LV здесь.</li>
         <li><b>Если переводите в другом переводчике</b> (DeepL, Google Translate) и вставили текст без картинок — нажмите в панели над текстом кнопку <b>«🖼 Картинки из оригинала»</b>: картинки (с подписями) встанут на те же места между абзацами, что и в оригинале. Подписи потом переведите сами.</li></ol>
         Писать можно и прямо здесь, или вставлять из Google Docs (Ctrl+A, Ctrl+C → Ctrl+V в поле «Текст») — картинки сразу скопируются на сайт.</details>
@@ -597,12 +599,13 @@
     app.addEventListener('click', e => { if (e.target.id === 'be-cover-rm') setCover(''); });
 
     // перевод с открытой вкладки на две другие
-    $('#be-tr').addEventListener('click', async () => {
+    // Google Переводчик (бесплатно, без ключа и лимитов) или Gemini (точнее, но с лимитом)
+    const runTranslate = async engine => {
       const ru = collect(), from = active, targets = LANGS.map(x => x[0]).filter(x => x !== from);
       if (!ru['t_' + from].trim() && !stripHtml(ru['b_' + from])) { status(`Во вкладке ${from.toUpperCase()} пока пусто — напишите или вставьте статью.`); return; }
       const filled = targets.filter(l => ru['t_' + l] || stripHtml(ru['b_' + l]));
       if (filled.length && !confirm(`Во вкладках ${filled.map(x => x.toUpperCase()).join(' и ')} уже есть текст. Заменить его новым переводом?`)) return;
-      const btn = $('#be-tr'); btn.disabled = true;
+      const btns = app.querySelectorAll('#be-tr, #be-tr-g'); btns.forEach(x => { x.disabled = true; });
       // полоска загрузки на каждый язык: переводим кусочками по несколько абзацев
       status('');
       const prog = $('#be-progress');
@@ -615,10 +618,16 @@
           const out = [];
           bar(l, 2, '0%');
           let backup = false;
-          for (let i = 0; i < texts.length; i += 15) {
-            const r = await api('blog/admin/translate', { texts: texts.slice(i, i + 15), from, to: l, strict: true });
-            out.push(...r.texts);
-            if (r.engine !== 'gemini') backup = true;
+          for (let i = 0; i < texts.length;) {
+            let n;
+            if (engine === 'google') { n = googleBatch(texts, i); out.push(...await googleTranslate(texts.slice(i, i + n), from, l)); }
+            else {
+              n = 15;
+              const r = await api('blog/admin/translate', { texts: texts.slice(i, i + n), from, to: l, strict: true });
+              out.push(...r.texts);
+              if (r.engine !== 'gemini') backup = true;
+            }
+            i += n;
             const pct = Math.round(out.length / texts.length * 100);
             bar(l, pct, pct >= 100 ? (backup ? 'готово (запасной переводчик — проверьте внимательнее)' : 'готово ✓') : pct + '%');
           }
@@ -632,8 +641,10 @@
         status(`Готово! Проверьте переводы во вкладках ${targets.map(x => x.toUpperCase()).join(' и ')} — их можно поправить.`);
         touch();
       } catch (e) { status(errText(e)); prog.querySelectorAll('.be-prog:not(.done) em').forEach(x => { x.textContent = 'остановлено'; }); }
-      btn.disabled = false;
-    });
+      btns.forEach(x => { x.disabled = false; });
+    };
+    $('#be-tr').addEventListener('click', () => runTranslate('google'));
+    $('#be-tr-g').addEventListener('click', () => runTranslate('gemini'));
 
     // сохранение
     app.querySelectorAll('[data-save]').forEach(b => b.addEventListener('click', async () => {
@@ -663,6 +674,29 @@
     }));
   }
 
+
+  // Google Переводчик прямо из браузера: бесплатно и без ключа; HTML (жирный, ссылки) сохраняется
+  const googleBatch = (texts, i) => { let n = 0, len = 0; while (i + n < texts.length && (n === 0 || len + String(texts[i + n]).length < 4500) && n < 40) { len += String(texts[i + n]).length; n++; } return n; };
+  async function googleTranslate(texts, from, to) {
+    const idx = [], body = new URLSearchParams();
+    texts.forEach((x, i) => { if (String(x || '').trim()) { idx.push(i); body.append('q', x); } });
+    const out = texts.map(() => '');
+    if (!idx.length) return out;
+    let d = null, code = 'google';
+    for (let attempt = 0; attempt < 4 && !d; attempt++) { // Google иногда отвечает ошибкой — пробуем ещё раз с паузой
+      if (attempt) await new Promise(r => setTimeout(r, attempt * 1500));
+      try {
+        const r = await fetch(`https://translate.googleapis.com/translate_a/t?client=gtx&sl=${from}&tl=${to}&format=html`, { method: 'POST', body });
+        if (r.ok) d = await r.json(); else code = r.status === 429 ? 'google_limit' : 'google';
+      } catch (e) { /* сеть — ещё попытка */ }
+    }
+    if (!d) throw Object.assign(new Error('google'), { code });
+    if (!Array.isArray(d)) d = [d];
+    // Google ставит лишний пробел перед запятой после жирного/ссылки: «<b>руками</b> ,» → «<b>руками</b>,»
+    const tidy = v => String(v ?? '').replace(/(<\/(?:b|strong|i|em|a|u|s)>)\s+([,.;:!?)»])/g, '$1$2');
+    idx.forEach((k, j) => { const v = d[j]; out[k] = tidy(Array.isArray(v) ? v[0] : v); });
+    return out;
+  }
 
   // делим статью на кусочки для переводчика и собираем обратно
   function splitForTranslation(ru, from) {
