@@ -24,6 +24,10 @@
     nBad: ['Use 2–24 letters, numbers, dots, dashes or underscores.', 'Нужно 2–24 символа: буквы, цифры, точка, дефис или подчёркивание.', 'Vajag 2–24 simbolus: burtus, ciparus, punktu, defisi vai pasvītru.'],
     nErr: ['Something went wrong, please try again.', 'Что-то пошло не так, попробуй ещё раз.', 'Kaut kas nogāja greizi, mēģini vēlreiz.'],
     nOut: ['Sign out instead', 'Лучше выйти', 'Labāk iziet'],
+    pub: ['Your nickname and bird will be visible to everyone on the site.', 'Твой ник и птичка будут видны всем на сайте.', 'Tavs segvārds un putniņš būs redzami visiem vietnē.'],
+    terms: ['By signing in you agree to the', 'Входя, ты соглашаешься с', 'Ieejot tu piekrīti'],
+    termsLink: ['privacy rules', 'правилами конфиденциальности', 'privātuma noteikumiem'],
+    termsMore: ['Privacy rules', 'Правила конфиденциальности', 'Privātuma noteikumi'],
   };
   const t = k => S[k][L];
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -48,6 +52,7 @@
     d.innerHTML = `<form method="dialog"><canvas width="${window.PPBirds ? window.PPBirds.SW : 28}" height="26" aria-hidden="true"></canvas>
       <h2>${t(kind === 'cat' ? 'nTitleCat' : kind === 'crow' ? 'nTitleCrow' : 'nTitle')}</h2><p>${t('nText')}</p>
       <input name="nick" required minlength="2" maxlength="24" autocomplete="nickname" placeholder="${t('nPlace')}">
+      <p class="acct-terms">${t('pub')} <a href="${pre}/privacy/" target="_blank">${t('termsMore')} ↗</a></p>
       <p class="acct-nick-st" role="status" aria-live="polite"></p>
       <button class="pill-btn pill-fill" type="submit">${t('nSave')}</button>
       <button class="acct-nick-out" type="button">${t('nOut')}</button></form>`;
@@ -74,6 +79,7 @@
     if (!u) {
       el.innerHTML = `<button type="button" class="acct-btn acct-in" aria-expanded="false" aria-haspopup="dialog" aria-label="${t('signIn')}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span>${t('signIn')}</span></button>
         <div class="acct-pop" hidden role="dialog" aria-label="${t('signIn')}"><p>${t('why')}</p><div class="acct-g"></div>
+        <p class="acct-terms">${t('pub')} ${t('terms')} <a href="${pre}/privacy/">${t('termsLink')}</a>.</p>
         ${info.dev ? '<button type="button" class="pill-btn" data-dev>dev login</button>' : ''}</div>`;
     } else {
       el.innerHTML = `<button type="button" class="acct-btn acct-me" aria-expanded="false" aria-haspopup="menu" aria-label="${t('menu')}"><canvas width="20" height="26" aria-hidden="true"></canvas></button>

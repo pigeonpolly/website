@@ -1812,3 +1812,5 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .acct-nick .acct-nick-st { min-height: 1.3em; color: #C0392B; font-weight: 600; }
 .acct-nick .pill-btn { width: 100%; padding: 14px; font-size: 17px; }
 .acct-nick-out { border: 0; background: none; color: #7A6F99; font: 14px var(--sans); text-decoration: underline; cursor: pointer; }
+.acct-pop .acct-terms, .acct-nick .acct-terms { margin: 10px 0 0; font-size: 12.5px; line-height: 1.45; color: #7A6F99; }
+.acct-pop .acct-terms a, .acct-nick .acct-terms a { display: inline; padding: 0; color: #534AB7; font: inherit; text-decoration: underline; }
