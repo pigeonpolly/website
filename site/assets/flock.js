@@ -12,7 +12,7 @@
   const { looks, sprite, SW, BASE } = window.PPBirds;
 
   // ---------- сцена ----------
-  let W = 300, H = 120, S = 3, props = {}, perches = [];
+  let W = 300, H = 120, S = 3, OFF = 0, props = {}, perches = []; // OFF — лишнее небо сверху на высоком экране (/flock/)
   const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
   const rnd = (a, b) => a + Math.random() * (b - a);
   const pickOne = a => a[Math.floor(Math.random() * a.length)];
@@ -20,11 +20,19 @@
   const X0 = 6, Y0 = 90, Y1 = 128; // где можно ходить
   const cx = x => clamp(x, X0, W - X0), cy = y => clamp(y, Y0, Y1);
   let bg = null;
+  const full = !!box.closest('.fl-full'); // отдельная страница /flock/: сцена на всю высоту окна
   function layout() {
-    const cw = box.querySelector('.fl-stage').clientWidth;
+    const st = box.querySelector('.fl-stage'), cw = st.clientWidth;
     S = cw >= 900 ? 3 : cw >= 560 ? 2.5 : 2;
-    W = Math.round(cw / S); H = 142;
-    cv.width = W; cv.height = H; cv.style.height = H * S + 'px';
+    H = 142; OFF = 0;
+    if (full) { // сцена во всю высоту окна: птички того же размера, сверху просто больше неба
+      if (cw >= 1300) S = 3.5;
+      const avail = Math.max(300, innerHeight - Math.max(0, st.getBoundingClientRect().top) - (document.fullscreenElement === box ? 12 : 20));
+      if (avail / S < 142) S = Math.max(2, avail / 142);
+      H = Math.max(142, Math.floor(avail / S)); OFF = H - 142;
+    }
+    W = Math.round(cw / S);
+    cv.width = W; cv.height = H; cv.style.height = Math.round(H * S) + 'px';
     props = { bin: Math.round(W * .05), bench: Math.round(W * .13), cup: Math.round(W * .13) + 52, bun: Math.round(W * .52), baguette: Math.round(W * .68), book: Math.round(W * .86), lamp: Math.round(W * .955) };
     perches = [{ x: props.bench + 10, y: 66 }, { x: props.bench + 24, y: 66 }, { x: props.bench + 38, y: 66 }, { x: props.bin + 6, y: 62 }].map(p => ({ ...p, by: null }));
     bg = drawBackground();
@@ -33,6 +41,17 @@
     const c = document.createElement('canvas'); c.width = W; c.height = H;
     const g = c.getContext('2d');
     const r = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(Math.round(x), Math.round(y), w, h); };
+    if (OFF) { // высокое небо: темнее кверху, звёзды и луна
+      for (let y = 0; y < OFF; y++) { const k = y / OFF; r(0, y, W, 1, `rgb(${Math.round(24 + 19 * k)},${Math.round(14 + 14 * k)},${Math.round(56 + 26 * k)})`); }
+      for (let i = 0; i < W * OFF / 220; i++) r((i * 97) % W, (i * 61) % OFF, 1, 1, i % 4 ? '#F5C4B3' : '#FFFFFF');
+      if (OFF > 30) {
+        const mx = Math.round(W * .22), my = Math.round(Math.min(OFF * .45, 40)) + 6;
+        g.fillStyle = 'rgba(255, 240, 200, .12)'; g.beginPath(); g.arc(mx, my, 14, 0, 7); g.fill();
+        g.fillStyle = '#FFF3D6'; g.beginPath(); g.arc(mx, my, 7, 0, 7); g.fill();
+        g.fillStyle = '#EFE0BC'; r(mx - 3, my - 2, 2, 2, '#EFE0BC'); r(mx + 2, my + 2, 2, 1, '#EFE0BC');
+      }
+      g.translate(0, OFF);
+    }
     // небо и звёзды
     for (let y = 0; y < 40; y++) r(0, y, W, 1, `rgb(${43 + y},${28 + y * .6},${82 + y * .4})`);
     for (let i = 0; i < W / 9; i++) r((i * 53) % W, (i * 29) % 30, 1, 1, i % 3 ? '#F5C4B3' : '#FFFFFF');
@@ -485,7 +504,7 @@
     delivery: {
       ok: () => missing(), w: 6,
       start(e) {
-        e.box = { type: 'parcel', x: rnd(W * .3, W * .75), y: -10, vy: 14, lock: true, held: 'ev' };
+        e.box = { type: 'parcel', x: rnd(W * .3, W * .75), y: -10 - OFF, vy: 14 + OFF * .12, lock: true, held: 'ev' };
         e.land = rnd(104, 118); items.push(e.box); e.t = 0;
       },
       update(e, dt) {
@@ -534,7 +553,7 @@
       },
       update(e, dt) {
         e.t += dt; const s = clamp(Math.min(e.t / 1.5, (e.dur - e.t) / 1.5), 0, 1);
-        if (Math.random() < dt * 25 * s) fx.push({ type: 'gust', x: e.dir > 0 ? rnd(-30, W * .3) : rnd(W * .7, W + 30), y: rnd(4, H - 6), vx: e.dir * rnd(140, 220), len: rnd(6, 16), t: 1.4 });
+        if (Math.random() < dt * 25 * s) fx.push({ type: 'gust', x: e.dir > 0 ? rnd(-30, W * .3) : rnd(W * .7, W + 30), y: rnd(4 - OFF, 136), vx: e.dir * rnd(140, 220), len: rnd(6, 16), t: 1.4 });
         if (Math.random() < dt * 4 * s) fx.push({ type: 'leaf', x: e.dir > 0 ? -4 : W + 4, y: rnd(20, 120), vx: e.dir * rnd(70, 110), vy: rnd(-6, 6), land: H + 50, c: pickOne(['#E9A93B', '#C0582F', '#D9944A', '#4CC38A']), t: 6, ph: rnd(0, 6), item: true });
         for (const b of e.list) {
           if (b.hop) continue;
@@ -565,7 +584,7 @@
       update(e, dt) {
         e.t += dt; const s = clamp(Math.min(e.t / 1.5, (e.dur - e.t) / 1.5), 0, 1);
         gloom = s;
-        for (let i = 0; i < 60 * s * dt * 10; i++) fx.push({ type: 'rain', x: rnd(0, W + 30), y: rnd(-10, 0), land: rnd(48, H), t: 2 });
+        for (let i = 0; i < 60 * s * dt * 10 * (1 + OFF / 142); i++) fx.push({ type: 'rain', x: rnd(0, W + 30), y: rnd(-10, 0) - OFF, land: rnd(48, H), t: 2 });
         for (const p of puddles) p.a = Math.min(1, p.a + dt * .2 * s);
         for (const b of e.list) if (!b.goal && Math.random() < dt * .3) say(b, pickOne(['drop', 'dots', 'heart']), 1.2);
         if (e.t >= e.dur) { gloom = 0; for (const b of e.list) { b.tasks = []; b.wait = 0; } return true; }
@@ -605,7 +624,7 @@
     party = on;
     for (const b of birds) b.hat = on ? pickOne(HAT_COLORS) : null;
     if (!on) return;
-    for (let i = 0; i < 140; i++) fx.push({ type: 'confetti', x: rnd(0, W), y: rnd(-60, -2), vy: rnd(25, 45), land: rnd(Y0 - 30, Y1 + 8), ph: rnd(0, 6), c: pickOne(['#E0443A', '#E9A93B', '#4CC38A', '#4A7BD8', '#F08BC0', '#FFFFFF', '#9B5DE5']), t: 14 });
+    for (let i = 0; i < 140; i++) fx.push({ type: 'confetti', x: rnd(0, W), y: rnd(-60, -2) - OFF, vy: rnd(25, 45), land: rnd(Y0 - 30, Y1 + 8), ph: rnd(0, 6), c: pickOne(['#E0443A', '#E9A93B', '#4CC38A', '#4A7BD8', '#F08BC0', '#FFFFFF', '#9B5DE5']), t: 14 });
     for (const b of birds) { say(b, pickOne(['note', 'star', 'heart', '!']), 1.8); if (!b.ev && !b.hop && !b.perch) hop(b, rnd(6, 12), .45); }
   }
   // кнопки над сценой: запустить событие сразу
@@ -656,7 +675,7 @@
     const kind = m >= 8 && m <= 10 ? 'leaf' : m === 11 || m <= 1 ? 'snow' : m >= 2 && m <= 4 ? 'petal' : null;
     if (!kind || Math.random() > dt * .5) return;
     const c = kind === 'leaf' ? pickOne(['#E9A93B', '#C0582F', '#D9944A', '#B23A48']) : kind === 'snow' ? '#FFFFFF' : '#F7C6D9';
-    fx.push({ type: kind, x: rnd(0, W), y: -3, vx: rnd(-6, 6), vy: rnd(8, 14), land: rnd(Y0, Y1 + 6), c, t: 30, ph: rnd(0, 6) });
+    fx.push({ type: kind, x: rnd(0, W), y: -OFF - 3, vx: rnd(-6, 6), vy: rnd(8, 14), land: rnd(Y0, Y1 + 6), c, t: 30, ph: rnd(0, 6) });
   }
   function stepFx(dt) {
     for (const f of fx) {
@@ -697,6 +716,7 @@
 
   function draw() {
     ctx.drawImage(bg, 0, 0);
+    ctx.save(); ctx.translate(0, OFF);
     // свет фонаря
     const L = props.lamp, now = performance.now();
     ctx.fillStyle = disco > 0 ? `hsla(${(now / 6) % 360},90%,65%,.3)` : `rgba(255, 220, 140, ${.14 + night * .2})`;
@@ -730,7 +750,7 @@
         R(hx, hy - 7, 1, 2, '#FFE7A3'); R(hx - 1, hy - 7, 3, 1, '#FFE7A3');
       }
       if (b.hold) { const it = b.hold, long = it.type === 'baguette' || it.type === 'half'; drawItem(it, x + b.dir * (long ? 9 : 8), y - (long ? 9 : 7), true); }
-      if (b.label) b.label.style.transform = `translate(${(b.x * k).toFixed(1)}px, ${((b.y + 2) * k).toFixed(1)}px) translateX(-50%)`;
+      if (b.label) b.label.style.transform = `translate(${(b.x * k).toFixed(1)}px, ${((b.y + 2 + OFF) * k).toFixed(1)}px) translateX(-50%)`;
     }
     // багет в перетягивании, падающее и летящее
     for (const it of items) if (it.held === 'ev' && !it.fly && it.vy == null) drawItem(it, it.x, it.y, true);
@@ -742,16 +762,17 @@
       else if (f.type === 'note') { ctx.globalAlpha = Math.min(1, f.t); ICON.note.forEach((row, yy) => [...row].forEach((ch, xx) => { if (ch === '#') R(f.x - 2 + xx, f.y + yy, 1, 1, '#FFE7A3'); })); ctx.globalAlpha = 1; }
       else if (f.type === 'poof' || f.type === 'snap') { const r = (1 - f.t / .6) * 10 + 3; for (let i = 0; i < 8; i++) { const a = i / 8 * 6.28; R(f.x + Math.cos(a) * r, f.y + Math.sin(a) * r * .6, 2, 2, f.type === 'snap' ? '#F0C27C' : '#FFFDF5'); } }
     }
-    if (gloom > 0) { ctx.fillStyle = `rgba(40, 50, 80, ${gloom * .3})`; ctx.fillRect(0, 0, W, H); }
+    if (gloom > 0) { ctx.fillStyle = `rgba(40, 50, 80, ${gloom * .3})`; ctx.fillRect(0, -OFF, W, H); }
     for (const f of fx) {
       if (f.type === 'gust') { ctx.globalAlpha = Math.min(1, f.t) * .55; R(f.x, f.y, f.len, 1, '#FFFFFF'); ctx.globalAlpha = 1; }
       else if (f.type === 'rain') R(f.x, f.y, 1, 3, 'rgba(185, 211, 232, .8)');
       else if (f.type === 'splash') { R(f.x - 2, f.y - 1, 1, 1, '#B9D3E8'); R(f.x + 2, f.y - 1, 1, 1, '#B9D3E8'); R(f.x, f.y - 2, 1, 1, '#B9D3E8'); }
       else if (f.type === 'confetti') { ctx.globalAlpha = Math.min(1, f.t); R(f.x, f.y, (f.ph | 0) % 2 ? 2 : 1, (f.ph | 0) % 2 ? 1 : 2, f.c); ctx.globalAlpha = 1; }
     }
-    if (night > 0) { ctx.fillStyle = `rgba(12, 6, 40, ${night * .45})`; ctx.fillRect(0, 0, W, H); ctx.fillStyle = `rgba(255, 220, 140, ${night * .16})`; ctx.beginPath(); ctx.arc(L, 60, 40, 0, 7); ctx.fill(); }
+    if (night > 0) { ctx.fillStyle = `rgba(12, 6, 40, ${night * .45})`; ctx.fillRect(0, -OFF, W, H); ctx.fillStyle = `rgba(255, 220, 140, ${night * .16})`; ctx.beginPath(); ctx.arc(L, 60, 40, 0, 7); ctx.fill(); }
     for (const b of birds) if (b.emote) drawEmote(b.x, b.y - (b.cat ? 17 : 24), b.emote.icon, Math.min(b.emote.t / .3, (b.emote.max - b.emote.t) / .15 + .2));
     drawHearts();
+    ctx.restore();
   }
   const HEART = ['.##.##.', '#######', '.#####.', '..###..', '...#...'];
   function drawHearts() {
@@ -786,12 +807,21 @@
       window.PPAccount.openSignIn();
     });
     requestAnimationFrame(loop);
-    let rw = box.clientWidth;
-    addEventListener('resize', () => { if (Math.abs(box.clientWidth - rw) < 40) return; rw = box.clientWidth; layout(); reset(data.birds); });
+    let rw = box.clientWidth, rh = innerHeight;
+    const relayout = () => { layout(); reset(data.birds); };
+    addEventListener('resize', () => { if (Math.abs(box.clientWidth - rw) < 40 && (!full || Math.abs(innerHeight - rh) < 60)) return; rw = box.clientWidth; rh = innerHeight; relayout(); });
+    // «На весь экран»: на главной открывает /flock/, на самой /flock/ — настоящий полноэкранный режим
+    const open = box.querySelector('.fl-open');
+    if (open && full) {
+      if (!box.requestFullscreen) open.hidden = true;
+      open.removeAttribute('target');
+      open.addEventListener('click', e => { e.preventDefault(); if (document.fullscreenElement) document.exitFullscreen(); else box.requestFullscreen().catch(() => {}); });
+      document.addEventListener('fullscreenchange', () => setTimeout(relayout, 60));
+    }
     // «Насыпать зёрнышек»: зажать мышку (или палец) и водить над сценой
     const stage = box.querySelector('.fl-stage');
     let seeding = false, pouring = false;
-    const toWorld = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H]; };
+    const toWorld = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * W, (e.clientY - r.top) / r.height * H - OFF]; };
     box.querySelectorAll('.fl-tools [data-act]').forEach(btn => btn.addEventListener('click', e => {
       e.stopPropagation();
       const act = btn.dataset.act;

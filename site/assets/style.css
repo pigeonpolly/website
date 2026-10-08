@@ -2127,3 +2127,13 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .be-app .be-menu > div .be-danger { color: #C0392B; }
 .be-posts .be-langs { margin-top: 6px; }
 @media (max-width: 640px) { .be-posts th:nth-child(3), .be-posts td:nth-child(3) { display: table-cell; } .be-app .be-rowsec { max-width: 120px; } }
+/* Стая на отдельной странице: сцена на весь экран */
+.fl-page-head { padding-bottom: 0; }
+.fl-page-head h1 { font-size: clamp(30px, 4vw, 48px); margin-bottom: 8px; }
+.fl-page-head .lead { margin-bottom: 0; }
+.fl-full .fl { padding-top: 12px; padding-bottom: 24px; }
+.fl-full .fl-kick, .fl-full #fl-title, .fl-full .fl-sub { display: none; }
+.fl-full .fl-stage { max-width: none; }
+.fl-full .fl:fullscreen { display: flex; flex-direction: column; padding: 12px; background: #2B1A51; overflow: auto; }
+#flock:fullscreen .fl-count, #flock:fullscreen .fl-how, #flock:fullscreen .fl-join { display: none; }
+.fl-full .fl:fullscreen .fl-stage { flex: 1; border-radius: 12px; }

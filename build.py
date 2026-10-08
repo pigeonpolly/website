@@ -50,6 +50,8 @@ PAGES = [
      "Detective Titos' pixel office: boxes of cases, a board of clues and red string. Click anything and switch to the evening shift."),
     ("polly-helps", "Polly, help me draw", "polly-helps.html",
      "Polly's little drawing guides: build any object from simple shapes, and find ideas for what to draw with an association map."),
+    ("flock", "The Flock", "flock.html",
+     "Our flock of pixel birds: everyone who signs in gets one. Scatter seeds, call the wind or rain, throw a party and watch what happens."),
     ("wobbleland", "Wobbleland", "wobbleland.html",
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
@@ -78,7 +80,7 @@ SOCIAL = [
 ]
 # Разделы: пункт меню ведёт на первую вкладку, внутри раздела — ряд вкладок (section_tabs)
 SECTIONS = {
-    "games": [("detective-office", "Detective Titos"), ("polly-office", "Polly, Office Clerk")],
+    "games": [("detective-office", "Detective Titos"), ("polly-office", "Polly, Office Clerk"), ("flock", "The Flock")],
     "world": [("about-polly", "About Polly"), ("wobbleland", "Wobbleland"), ("art-portfolio/bird", "Pigeon Polly"),
               ("art-portfolio/snail", "Mr.Chew"), ("art-portfolio/detective", "Mr.Titos"), ("art-portfolio/halloween", "Pumpkin Family")],
     "books": [("e-books", "Books"), ("polly-helps", "Polly, help me draw")],
