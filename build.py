@@ -37,6 +37,12 @@ PAGES = [
     ("art-portfolio/halloween", "Pumpkin Family", "halloween.html", "Welcome to the Pumpkin-Heads family."),
     ("art-portfolio/ai-art", "AI Art", "ai-art.html", "AI art based on the Pigeon Polly traditional art style."),
     ("privacy", "Privacy", "privacy.html", "How pigeonpolly.com handles your data."),
+    ("about-me", "About me", "about-me.html",
+     "Alina Otkinska: learning experience designer, artist and author of Pigeon Polly. Portfolio, projects and how to work together."),
+    ("art-portfolio", "Art Portfolio", "art-portfolio.html", "Art portfolio of Alina Otkinska: ecoline series, sketchbook pages and AI art."),
+    ("about-polly", "About Polly", "about-polly.html",
+     "Meet Pigeon Polly, an office clerk pigeon from Wobbleland, and her friends: Mr.Chew, Detective Titos and the Pumpkin Family."),
+    ("blog", "Blog", "blog.html", "Notes on drawing, learning and creativity by Alina Otkinska and Pigeon Polly."),
     ("polly-office", "Polly, Office Clerk", "polly-office.html",
      "Polly's pixel office: old blinds, a water cooler and a desk you can click. Switch to evening and watch the light change."),
     ("detective-office", "Detective Titos", "detective-office.html",
@@ -69,15 +75,42 @@ SOCIAL = [
     ("https://www.patreon.com/cw/pigeon_polly", "Patreon"),
     ("https://www.pinterest.com/pigeonpollyart/", "Pinterest"),
 ]
+# Разделы: пункт меню ведёт на первую вкладку, внутри раздела — ряд вкладок (section_tabs)
+SECTIONS = {
+    "games": [("detective-office", "Detective Titos"), ("polly-office", "Polly, Office Clerk")],
+    "world": [("about-polly", "About Polly"), ("wobbleland", "Wobbleland"), ("art-portfolio/bird", "Pigeon Polly"),
+              ("art-portfolio/snail", "Mr.Chew"), ("art-portfolio/detective", "Mr.Titos"), ("art-portfolio/halloween", "Pumpkin Family")],
+    "books": [("e-books", "Books"), ("polly-helps", "Polly, help me draw")],
+    "about": [("about-me", "About me"), ("art-portfolio", "Art Portfolio"), ("on-walls-and-pages", "On Walls & Pages"),
+              ("projects", "Learning & AI"), ("work-with-me", "Work with me")],
+}
+# страницы, у которых активна вкладка с другим адресом
+TAB_ALIAS = {"art-portfolio/anxiety": "art-portfolio", "art-portfolio/sketchbook": "art-portfolio", "art-portfolio/ai-art": "art-portfolio"}
 NAV = [
     ("challenge", "Daily Challenge"),
-    ("books", "Useful", [("e-books", "E-Books"), ("polly-helps", "Polly, help me draw")]),
-    ("fantasy", "Fantasy World", [("wobbleland", "Wobbleland"), ("polly-office", "Polly Office Clerk"), ("detective-office", "Detective Titos")]),
-    ("art-portfolio", "Art Portfolio", PORTFOLIO),
-    ("learning", "Learning & AI", [("projects", "Projects"), ("work-with-me", "Work with me")]),
-    ("on-walls-and-pages", "On Walls & Pages"),
-    ("social", "Social Media", SOCIAL),
+    ("detective-office", "Games", "games"),
+    ("about-polly", "Polly’s World", "world"),
+    ("e-books", "Books & Helpful", "books"),
+    ("blog", "Blog"),
+    ("about-me", "About me", "about"),
 ]
+
+
+def section_of(path):
+    path = TAB_ALIAS.get(path, path)
+    for key, tabs in SECTIONS.items():
+        if any(p == path for p, _ in tabs):
+            return key, path
+    return None, path
+
+
+def section_tabs(path):
+    key, cur = section_of(path)
+    if not key:
+        return ""
+    cur_attr = ' aria-current="page"'
+    links = "".join(f'<a href="{href(p)}"{cur_attr if p == cur else ""}>{esc(l)}</a>' for p, l in SECTIONS[key])
+    return f'<nav class="sec-tabs" aria-label="Section"><div class="sec-tabs-in">{links}</div></nav>\n'
 
 esc = html.escape
 
@@ -95,17 +128,12 @@ def nav_link(path, label, current):
 
 def nav_html(current):
     items = []
+    key, _ = section_of(current)
     for entry in NAV:
-        if len(entry) == 3:
-            key, label, children = entry
-            active = any(p == current for p, _ in children)
-            sub = "".join(f"<li>{nav_link(p, l, current)}</li>" for p, l in children)
-            items.append(
-                f'<li class="has-sub{" active" if active else ""}">'
-                f'<button class="sub-toggle" aria-expanded="false">{esc(label)}<span aria-hidden="true">▾</span></button>'
-                f'<ul class="nav-sub">{sub}</ul></li>')
-        else:
-            items.append(f"<li>{nav_link(entry[0], entry[1], current)}</li>")
+        path, label = entry[0], entry[1]
+        on = (len(entry) == 3 and entry[2] == key) or path == current
+        cur_attr = ' aria-current="page"' if on else ""
+        items.append(f'<li><a href="{href(path)}"{cur_attr}>{esc(label)}</a></li>')
     return "\n".join(items)
 
 
@@ -387,6 +415,7 @@ def build():
             alt = SRC / "pages" / f"{pathlib.Path(file).stem}.{lang}.html"
             if lang != "en" and alt.exists():
                 page_body = alt.read_text()
+            page_body = section_tabs(path) + page_body
             page = (layout
                     .replace("{{title}}", esc(full_title))
                     .replace("{{description}}", esc(desc))
