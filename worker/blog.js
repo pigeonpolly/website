@@ -13,7 +13,7 @@ const T = {
     blog: 'Blog', head: 'Notes from the lab', lead: 'Articles about drawing, learning and creativity: what I try, what works, and what Polly thinks about it.',
     tags: 'Tags', popular: 'Popular', all: 'All posts', empty: 'No posts here yet. The first one is on its way!',
     comments: 'Comments', noComments: 'No comments yet. Be the first!', back: '← All posts', tagged: 'Posts tagged',
-    min: 'min read', draft: 'Draft', read: 'Read →', months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    min: 'min read', share: 'Share', copy: 'Copy link', copied: 'Link copied ✓', email: 'E-mail', draft: 'Draft', read: 'Read →', months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     descr: 'Notes on drawing, learning and creativity by Alina Otkinska and Pigeon Polly.',
     featured: '★ Favourites', archive: 'Archive', inMonth: 'Posts from', onlyFav: 'My favourite posts',
     monthsFull: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
@@ -22,7 +22,7 @@ const T = {
     blog: 'Блог', head: 'Заметки из лаборатории', lead: 'Статьи о рисовании, обучении и творчестве: что я пробую, что работает и что об этом думает Полли.',
     tags: 'Теги', popular: 'Популярное', all: 'Все статьи', empty: 'Здесь пока нет статей. Первая уже в пути!',
     comments: 'Комментарии', noComments: 'Комментариев пока нет. Будьте первым!', back: '← Все статьи', tagged: 'Статьи с тегом',
-    min: 'мин чтения', draft: 'Черновик', read: 'Читать →', months: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
+    min: 'мин чтения', share: 'Поделиться', copy: 'Скопировать ссылку', copied: 'Ссылка скопирована ✓', email: 'Почта', draft: 'Черновик', read: 'Читать →', months: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
     descr: 'Заметки о рисовании, обучении и творчестве от Алины Откинской и голубя Полли.',
     featured: '★ Избранное', archive: 'Архив', inMonth: 'Статьи за', onlyFav: 'Мои избранные статьи',
     monthsFull: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
@@ -31,7 +31,7 @@ const T = {
     blog: 'Blogs', head: 'Piezīmes no laboratorijas', lead: 'Raksti par zīmēšanu, mācīšanos un radošumu: ko es izmēģinu, kas strādā un ko par to domā Pollija.',
     tags: 'Birkas', popular: 'Populārākie', all: 'Visi raksti', empty: 'Šeit vēl nav rakstu. Pirmais jau ceļā!',
     comments: 'Komentāri', noComments: 'Komentāru vēl nav. Esi pirmais!', back: '← Visi raksti', tagged: 'Raksti ar birku',
-    min: 'min lasīšanas', draft: 'Melnraksts', read: 'Lasīt →', months: ['janv.', 'febr.', 'marts', 'apr.', 'maijs', 'jūn.', 'jūl.', 'aug.', 'sept.', 'okt.', 'nov.', 'dec.'],
+    min: 'min lasīšanas', share: 'Dalīties', copy: 'Kopēt saiti', copied: 'Saite nokopēta ✓', email: 'E-pasts', draft: 'Melnraksts', read: 'Lasīt →', months: ['janv.', 'febr.', 'marts', 'apr.', 'maijs', 'jūn.', 'jūl.', 'aug.', 'sept.', 'okt.', 'nov.', 'dec.'],
     descr: 'Piezīmes par zīmēšanu, mācīšanos un radošumu no Alīnas Otkinskas un baloža Pollijas.',
     featured: '★ Izlase', archive: 'Arhīvs', inMonth: 'Raksti par', onlyFav: 'Mani izlases raksti',
     monthsFull: ['janvāris', 'februāris', 'marts', 'aprīlis', 'maijs', 'jūnijs', 'jūlijs', 'augusts', 'septembris', 'oktobris', 'novembris', 'decembris'],
@@ -610,6 +610,8 @@ export async function blogPage(req, env, url, h) {
     <div class="bp-body"${textLang !== lang ? ` lang="${textLang}"` : ''}>${field(post, 'b', lang)}${post.src_lang && post.src_lang !== textLang && post['t_' + post.src_lang]
       ? `<p class="bp-tr-note">${TR_NOTE[lang](post.src_lang, blogUrl(post.src_lang, post.slug))}</p>` : ''}</div>
     <div class="bp-actions"><button type="button" class="bp-like" aria-pressed="false"><span class="bp-heart">♥</span> <span class="bp-likes">${post.likes || 0}</span></button>
+      <div class="bp-share-wrap"><button type="button" class="bp-share" aria-expanded="false" data-url="${SITE + blogUrl(lang, post.slug)}" data-title="${esc(title)}" data-img="${esc(post.cover ? (post.cover.startsWith('/') ? SITE + post.cover : post.cover) : '')}"
+        data-l-copy="${t.copy}" data-l-copied="${t.copied}" data-l-email="${t.email}"><span aria-hidden="true">↗</span> ${t.share}</button></div>
       <a class="bp-edit pill-btn" href="/blog-editor/#${post.id}" hidden data-blog-admin>✎ Edit</a></div>
     <section class="bp-comments" id="comments"><h2>${t.comments} <span class="bp-ccount">${comments.length}</span></h2>
       <ol class="bc-list">${comments.map(c => commentHtml(c, lang)).join('')}</ol>
@@ -618,7 +620,7 @@ export async function blogPage(req, env, url, h) {
     </section>
   </article>
   <div class="bp-more">${sidebar(published, lang, '', '', true)}</div></div>
-  <script src="/assets/blog.js" defer></script>`;
+  <script src="/assets/blog.js" defer></script><script src="/assets/scroll-nav.js" defer></script>`;
   const jsonld = { '@context': 'https://schema.org', '@type': 'BlogPosting', headline: title, description, inLanguage: textLang,
     datePublished: new Date((post.published_at || post.updated_at) * 1000).toISOString(), dateModified: new Date(post.updated_at * 1000).toISOString(),
     author: { '@type': 'Person', name: 'Alina Otkinska', url: SITE + '/about-me/' }, mainEntityOfPage: SITE + blogUrl(lang, post.slug),

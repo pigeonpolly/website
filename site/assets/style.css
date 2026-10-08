@@ -1937,3 +1937,21 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .bp-more .bl-side { gap: 22px; }
 .be-flash { margin: 0 0 18px; padding: 14px 18px; border-radius: 14px; background: #DDF5E7; color: #1E5E3A; font-weight: 700; }
 .be-flash a { color: #1E5E3A; }
+
+/* стрелочки наверх/вниз */
+.scroll-nav { position: fixed; right: 18px; bottom: 22px; z-index: 40; display: grid; gap: 8px; }
+.scroll-nav button { width: 44px; height: 44px; border-radius: 50%; border: 2px solid var(--peach); background: rgba(43, 26, 81, .92); color: var(--peach); font: 700 20px/1 var(--sans); cursor: pointer; box-shadow: 0 6px 18px rgba(0, 0, 0, .3); opacity: 0; pointer-events: none; transform: translateY(6px); transition: opacity .2s, transform .2s, background .2s; }
+.scroll-nav button.on { opacity: 1; pointer-events: auto; transform: none; }
+.scroll-nav button:hover, .scroll-nav button:focus-visible { background: var(--peach); color: #2B1A51; }
+@media (max-width: 600px) { .scroll-nav { right: 12px; bottom: 14px; } .scroll-nav button { width: 40px; height: 40px; font-size: 18px; } }
+.be-app ~ .scroll-nav, body:has(.be-save) .scroll-nav { bottom: 92px; } /* в редакторе не закрываем кнопки «Сохранить» */
+
+/* поделиться статьёй */
+.bp-share-wrap { position: relative; }
+.bp-share { display: inline-flex; align-items: center; gap: 8px; padding: 10px 20px; border-radius: 99px; border: 2px solid var(--muted); background: transparent; color: var(--text); font: 700 16px var(--sans); cursor: pointer; }
+.bp-share:hover, .bp-share[aria-expanded="true"] { background: var(--text); color: var(--bg); border-color: var(--text); }
+.bp-share-menu { position: absolute; left: 0; bottom: calc(100% + 10px); z-index: 30; min-width: 230px; padding: 8px; border-radius: 16px; background: #fff; box-shadow: 0 16px 40px rgba(0, 0, 0, .35); display: grid; }
+.bp-share-menu[hidden] { display: none; }
+.bp-share-menu a, .bp-share-menu button { display: block; padding: 10px 12px; border: 0; border-radius: 10px; background: none; color: #2B1A51; font: 600 15px var(--sans); text-align: left; text-decoration: none; cursor: pointer; }
+.bp-share-menu a:hover, .bp-share-menu button:hover { background: #F3EEFB; }
+.bp-share-menu button[data-copy] { border-bottom: 1px solid #ECE6F5; border-radius: 10px 10px 0 0; margin-bottom: 4px; }

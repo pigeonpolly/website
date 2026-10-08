@@ -127,5 +127,41 @@
     } catch (err) { /* молча */ }
   });
 
+  // «Поделиться»: на телефоне — системное окно, на компьютере — меню соцсетей и «скопировать ссылку»
+  const share = art && art.querySelector('.bp-share');
+  if (share) {
+    const { url, title, img } = share.dataset, u = encodeURIComponent(url), tt = encodeURIComponent(title);
+    const links = [
+      ['Facebook', `https://www.facebook.com/sharer/sharer.php?u=${u}`],
+      ['Telegram', `https://t.me/share/url?url=${u}&text=${tt}`],
+      ['WhatsApp', `https://wa.me/?text=${tt}%20${u}`],
+      ['Pinterest', `https://pinterest.com/pin/create/button/?url=${u}&description=${tt}${img ? '&media=' + encodeURIComponent(img) : ''}`],
+      ['LinkedIn', `https://www.linkedin.com/sharing/share-offsite/?url=${u}`],
+      ['X', `https://twitter.com/intent/tweet?url=${u}&text=${tt}`],
+      [share.dataset.lEmail, `mailto:?subject=${tt}&body=${tt}%0A${u}`],
+    ];
+    const menu = document.createElement('div');
+    menu.className = 'bp-share-menu'; menu.hidden = true;
+    menu.innerHTML = `<button type="button" data-copy>🔗 ${esc(share.dataset.lCopy)}</button>` +
+      links.map(([n, h]) => `<a href="${h}" target="_blank" rel="noopener">${esc(n)}</a>`).join('');
+    share.parentElement.appendChild(menu);
+    const close = () => { menu.hidden = true; share.setAttribute('aria-expanded', 'false'); };
+    share.addEventListener('click', async e => {
+      e.stopPropagation();
+      if (navigator.share && matchMedia('(pointer: coarse)').matches) {
+        try { await navigator.share({ title, url }); } catch (err) { /* закрыли окно */ }
+        return;
+      }
+      menu.hidden = !menu.hidden; share.setAttribute('aria-expanded', String(!menu.hidden));
+    });
+    menu.querySelector('[data-copy]').addEventListener('click', async ev => {
+      const b = ev.currentTarget;
+      try { await navigator.clipboard.writeText(url); } catch (err) { prompt('', url); }
+      b.textContent = share.dataset.lCopied; setTimeout(() => { b.textContent = '🔗 ' + share.dataset.lCopy; close(); }, 1400);
+    });
+    document.addEventListener('click', e => { if (!menu.contains(e.target)) close(); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
+  }
+
   load();
 })();
