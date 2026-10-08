@@ -312,6 +312,14 @@ export async function blogApi(req, env, url, h) {
       await env.MEDIA.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type, cacheControl: 'public, max-age=31536000, immutable' } });
       return json({ url: '/media/' + key });
     }
+    // картинка по ссылке (из Google Docs) → сразу в наше хранилище, пока ссылка ещё работает
+    if (m === 'POST' && a === 'fetch-image') {
+      const { url: src } = await body();
+      if (!/^https:\/\//i.test(String(src || ''))) fail(400, 'bad');
+      const local = await rehostOne(env, String(src), {});
+      if (!local) fail(502, 'fetch');
+      return json({ url: local });
+    }
     if (m === 'POST' && a === 'translate') {
       const { texts, to, from } = await body();
       if (!LANGS.includes(to) || !LANGS.includes(from) || to === from || !Array.isArray(texts)) fail(400, 'bad');
@@ -328,8 +336,9 @@ async function rehostOne(env, src, moved) {
   moved[src] = null;
   if (!env.MEDIA) return null;
   try {
-    const r = await fetch(src);
-    const type = (r.headers.get('content-type') || '').split(';')[0];
+    const r = await fetch(src, { headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36', Referer: 'https://docs.google.com/', Accept: 'image/avif,image/webp,image/png,image/jpeg,image/*;q=0.8' } });
+    let type = (r.headers.get('content-type') || '').split(';')[0];
+    if (type === 'application/octet-stream' || type === 'binary/octet-stream') type = 'image/png';
     const ext = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }[type];
     if (!r.ok || !ext) return null;
     const buf = await r.arrayBuffer();

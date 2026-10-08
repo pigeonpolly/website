@@ -18,7 +18,7 @@
     ai_limit: 'Бесплатный лимит переводов на сегодня закончился — попробуйте завтра.',
     ai: 'Переводчик сейчас не отвечает. Попробуйте ещё раз чуть позже.',
     media: 'Хранилище картинок не подключено.', big: 'Картинка слишком большая (до 8 МБ).', type: 'Подходят JPG, PNG, WebP и GIF.',
-    title: 'Нужен заголовок.', login: 'Сессия закончилась — войдите снова.', admin: 'Нужен вход администратора.',
+    title: 'Нужен заголовок.', fetch: 'Не удалось скопировать картинку.', login: 'Сессия закончилась — войдите снова.', admin: 'Нужен вход администратора.',
   };
   const errText = e => ERR[e.code] || 'Что-то пошло не так (' + esc(e.code || e.message) + ').';
   let state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null;
@@ -161,7 +161,7 @@
       <div class="be-tabs" role="tablist">${LANGS.map(([l, n], i) => `<button type="button" role="tab" data-tab="${l}" aria-selected="${!i}">${n}</button>`).join('')}
         <button type="button" class="pill-btn pill-fill be-tr" id="be-tr">🌐 Перевести с RU на EN и LV</button></div>
       <div class="be-progress" id="be-progress" hidden></div>
-      <p class="be-hint">Можно писать прямо здесь или вставить готовую статью из Google Docs (Ctrl+A, Ctrl+C → Ctrl+V в поле «Текст»): заголовок, жирный, списки и картинки перенесутся, а картинки при сохранении скопируются на сайт.</p>
+      <p class="be-hint">Можно писать прямо здесь или вставить готовую статью из Google Docs (Ctrl+A, Ctrl+C → Ctrl+V в поле «Текст»): заголовок, жирный, списки и картинки перенесутся, а картинки сразу скопируются на сайт (это займёт несколько секунд).</p>
       ${LANGS.map(([l], i) => `<section class="be-pane" data-pane="${l}" ${i ? 'hidden' : ''}>
         <label class="be-f"><span>Заголовок</span><input type="text" data-k="t_${l}" maxlength="200" value="${esc(post['t_' + l])}"></label>
         <label class="be-f"><span>Краткое описание <small>(видно в списке статей и в Google)</small></span><textarea data-k="d_${l}" rows="2" maxlength="400">${esc(post['d_' + l])}</textarea></label>
@@ -368,9 +368,35 @@
           const res = clean(htmlData, !titleIn.value.trim());
           if (res.title) titleIn.value = res.title;
           document.execCommand('insertHTML', false, res.html); touch();
+          copyImages(body);
         }
       });
     });
+
+    // картинки из Google Docs живут там по временным ссылкам — копируем их на сайт сразу при вставке
+    const foreign = src => /^https?:\/\//i.test(src) && !src.startsWith(location.origin) && /googleusercontent\.com|docs\.google\.com|ggpht\.com/i.test(src);
+    async function copyImages(body) {
+      const imgs = [...body.querySelectorAll('img')].filter(i => foreign(i.getAttribute('src') || ''));
+      if (!imgs.length) return;
+      let ok = 0, bad = 0;
+      for (const [i, img] of imgs.entries()) {
+        status(`Копирую картинки из Google Docs на сайт: ${i + 1} из ${imgs.length}…`);
+        const src = img.getAttribute('src');
+        let local = null;
+        try { local = (await api('blog/admin/fetch-image', { url: src })).url; } catch (e) { /* попробуем через браузер */ }
+        if (!local) {
+          try { const r = await fetch(src); if (r.ok) local = await upload(await r.blob()); } catch (e) { /* не вышло */ }
+        }
+        const fig = img.closest('figure');
+        if (local) { img.setAttribute('src', local); fig && fig.classList.remove('be-img-bad'); ok++; }
+        else { (fig || img).classList.add('be-img-bad'); img.title = 'Не скопировалась — перетащите сюда файл картинки'; bad++; }
+      }
+      touch();
+      status(bad ? `Скопировано ${ok} из ${imgs.length}. ${bad} не удалось — они обведены красным: сохраните их с Google Docs и перетащите файлами на их место (старую удалите).`
+        : `Готово: все картинки (${ok}) скопированы на сайт ✓`);
+    }
+    // если статью открыли, а в ней остались ссылки на Google Docs (старые вставки) — пробуем скопировать
+    bodies.forEach(b => { if ([...b.querySelectorAll('img')].some(i => foreign(i.getAttribute('src') || ''))) copyImages(b); });
 
     // обложка
     const setCover = url => {
