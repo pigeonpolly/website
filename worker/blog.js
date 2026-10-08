@@ -333,6 +333,25 @@ export async function blogApi(req, env, url, h) {
       ]);
       return json({ ok: true });
     }
+    // действия сразу с несколькими статьями: раздел, избранное, опубликовать/в черновики, удалить
+    if (m === 'POST' && a === 'bulk') {
+      const b = await body();
+      const ids = [...new Set((b.ids || []).map(Number).filter(Boolean))].slice(0, 500);
+      if (!ids.length) fail(400, 'bad');
+      const q = (sql, ...args) => ids.map(id => env.DB.prepare(sql).bind(...args, id));
+      let st;
+      if (b.action === 'section') st = q('UPDATE blog_posts SET section = ? WHERE id = ?', slugify(b.value || ''));
+      else if (b.action === 'feature' || b.action === 'unfeature') st = q('UPDATE blog_posts SET featured = ? WHERE id = ?', b.action === 'feature' ? 1 : 0);
+      else if (b.action === 'publish') st = q("UPDATE blog_posts SET status = 'published', published_at = COALESCE(published_at, ?) WHERE id = ?", h.now());
+      else if (b.action === 'draft') st = q("UPDATE blog_posts SET status = 'draft' WHERE id = ?");
+      else if (b.action === 'delete') st = ids.flatMap(id => [
+        env.DB.prepare('DELETE FROM blog_comments WHERE post_id = ?').bind(id),
+        env.DB.prepare('DELETE FROM blog_likes WHERE post_id = ?').bind(id),
+        env.DB.prepare('DELETE FROM blog_posts WHERE id = ?').bind(id)]);
+      else fail(400, 'bad');
+      await env.DB.batch(st);
+      return json({ ok: true, count: ids.length });
+    }
     if (m === 'POST' && a === 'feature') {
       const { id, featured } = await body();
       await env.DB.prepare('UPDATE blog_posts SET featured = ? WHERE id = ?').bind(featured ? 1 : 0, Number(id)).run();

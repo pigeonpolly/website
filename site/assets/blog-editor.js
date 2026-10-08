@@ -23,7 +23,7 @@
     title: 'Нужен заголовок.', too_big: 'Статья слишком большая для сохранения (больше ~900 000 символов вместе с разметкой).', save: 'сервер не подтвердил сохранение.', fetch: 'Не удалось скопировать картинку.', login: 'Сессия закончилась — войдите снова.', admin: 'Нужен вход администратора.',
   };
   const errText = e => ERR[e.code] || 'Что-то пошло не так (' + esc(e.code || e.message) + ').';
-  let flash = '', state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null, langFilter = 'all';
+  let flash = '', state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null, langFilter = 'all', picked = new Set();
   // все теги из статей: { ru: ['акварель', …], … } и счётчики
   let sections = [], tagDict = [], tagSort = 'unchecked'; // словарь тегов: [{ en, ru, lv, count, checked, src, created }]
   function tagsByLang() {
@@ -69,9 +69,14 @@
   }
 
   // ---------- список статей ----------
-  async function dashboard() {
+  // меню «⋯» в списке статей закрывается кликом мимо
+  document.addEventListener('click', e => { document.querySelectorAll('.be-menu[open]').forEach(d => { if (!d.contains(e.target)) d.open = false; }); });
+  const dashboardLocal = () => dashboard(false); // перерисовать без повторной загрузки (галочки, фильтры)
+  async function dashboard(reload = true) {
+    if (reload || !state) {
     app.innerHTML = '<p class="be-note">Загрузка…</p>';
     try { [state, tagDict, sections] = await Promise.all([api('blog/admin/posts'), api('blog/admin/tags').then(r => r.tags).catch(() => []), api('blog/admin/sections').then(r => r.sections).catch(() => [])]); } catch (e) { app.innerHTML = `<p class="be-note">${errText(e)}</p>`; return; }
+    }
     const pend = state.pending;
     const pub = state.posts.filter(p => p.status === 'published'), drafts = state.posts.filter(p => p.status !== 'published');
     knownTags = tagsByLang();
@@ -88,11 +93,25 @@
         `<button type="button" data-lf="${k}" aria-pressed="${langFilter === k}">${n} <span>${base.filter(f).length}</span></button>`).join('')}</div>` : '';
       const head = bar + (tagFilter ? `<p class="be-filter">Статьи с тегом <b>#${esc(tagFilter.t)}</b> · <button type="button" class="bc-link" data-unfilter>показать все</button></p>` : '');
       if (!list.length) return head + `<p class="be-note">${langFilter === 'part' ? 'Все статьи переведены 🎉' : langFilter === 'full' ? 'Полностью переведённых статей пока нет.' : dashTab === 'draft' ? 'Черновиков нет.' : 'Опубликованных статей пока нет.'}</p>`;
-      return head + `<table class="be-table"><thead><tr><th>Статья</th><th>Статус</th><th>Дата</th><th title="лайки">♥</th><th title="просмотры">👁</th><th title="комментарии">💬</th><th></th></tr></thead><tbody>
-        ${list.map(p => `<tr data-id="${p.id}"><td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a><small>/blog/${esc(p.slug)}/</small><span class="be-langs">${['ru', 'en', 'lv'].map(l => p['t_' + l] ? `<i class="on" title="Есть на ${l.toUpperCase()}">✓ ${l.toUpperCase()}</i>` : `<i title="Нет перевода на ${l.toUpperCase()}">${l.toUpperCase()}</i>`).join('')}</span></td>
-          <td><span class="be-st ${p.status}">${p.status === 'published' ? 'опубликована' : 'черновик'}</span></td><td>${fmt(p.published_at || p.updated_at)}</td>
+      // галочки слева → действия с выбранными; раздел меняется прямо в строке; остальное — в меню «⋯»
+      const ids = new Set(list.map(p => p.id));
+      for (const id of [...picked]) if (!ids.has(id)) picked.delete(id);
+      const secOpts = cur => `<option value="">— без раздела —</option>${sections.map(x => `<option value="${esc(x.slug)}"${x.slug === cur ? ' selected' : ''}>${esc(x.ru || x.en)}</option>`).join('')}`;
+      const n = picked.size;
+      const bulk = `<div class="be-bulk${n ? ' on' : ''}"><span>${n ? `Выбрано: <b>${n}</b>` : 'Отметьте статьи галочками, чтобы сделать что-то сразу с несколькими'}</span>
+        ${n ? `<select id="be-bulk" aria-label="Что сделать с выбранными"><option value="">Что сделать…</option>
+          ${sections.length ? `<optgroup label="Перенести в раздел">${sections.map(x => `<option value="section:${esc(x.slug)}">→ ${esc(x.ru || x.en)}</option>`).join('')}<option value="section:">→ без раздела</option></optgroup>` : ''}
+          <optgroup label="Избранное"><option value="feature">★ Добавить в избранное</option><option value="unfeature">☆ Убрать из избранного</option></optgroup>
+          <optgroup label="Статус">${dashTab === 'draft' ? '<option value="publish">Опубликовать</option>' : '<option value="draft">Снять с публикации (в черновики)</option>'}</optgroup>
+          <optgroup label="Опасно"><option value="delete">🗑 Удалить</option></optgroup></select>
+          <button type="button" class="bc-link" data-unpick>снять выбор</button>` : ''}</div>`;
+      return head + bulk + `<table class="be-table be-posts"><thead><tr><th class="be-ck"><input type="checkbox" id="be-pickall" aria-label="Выбрать все" ${n && n === list.length ? 'checked' : ''}></th><th>Статья</th><th>Раздел</th><th>Дата</th><th title="лайки">♥</th><th title="просмотры">👁</th><th title="комментарии">💬</th><th></th></tr></thead><tbody>
+        ${list.map(p => `<tr data-id="${p.id}"${picked.has(p.id) ? ' class="picked"' : ''}><td class="be-ck"><input type="checkbox" data-pick ${picked.has(p.id) ? 'checked' : ''} aria-label="Выбрать"></td>
+          <td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a><span class="be-langs">${['ru', 'en', 'lv'].map(l => p['t_' + l] ? `<i class="on" title="Есть на ${l.toUpperCase()}">✓ ${l.toUpperCase()}</i>` : `<i title="Нет перевода на ${l.toUpperCase()}">${l.toUpperCase()}</i>`).join('')}</span></td>
+          <td><select class="be-rowsec" data-rowsec aria-label="Раздел">${secOpts(p.section || '')}</select></td>
+          <td>${fmt(p.published_at || p.updated_at)}</td>
           <td>${p.likes}</td><td>${p.views}</td><td>${p.comments}</td>
-          <td class="be-acts"><a href="#${p.id}">Изменить</a> <a href="/ru/blog/${esc(p.slug)}/" target="_blank">Открыть ↗</a> <button class="bc-link be-danger" data-delpost>Удалить</button></td></tr>`).join('')}
+          <td><details class="be-menu"><summary aria-label="Ещё">⋯</summary><div><a href="#${p.id}">✎ Изменить</a><a href="/ru/blog/${esc(p.slug)}/" target="_blank">↗ Открыть на сайте</a><button type="button" class="be-danger" data-delpost>🗑 Удалить</button></div></details></td></tr>`).join('')}
       </tbody></table>`;
     };
     // словарь тегов: английский тег (как в статьях) и его перевод — правится прямо в таблице
@@ -142,8 +161,8 @@
         ${dashTab === 'tags' ? tagsHtml() : dashTab === 'sections' ? sectionsHtml() : postsHtml(dashTab === 'draft' ? drafts : pub)}
       </section>
       ${state.media ? '' : '<p class="be-note">⚠ Хранилище картинок (R2) не подключено — загрузка картинок не заработает.</p>'}`;
-    app.querySelectorAll('[data-dtab]').forEach(b => b.addEventListener('click', () => { dashTab = b.dataset.dtab; tagFilter = null; dashboard(); }));
-    app.querySelectorAll('[data-lf]').forEach(b => b.addEventListener('click', () => { langFilter = b.dataset.lf; dashboard(); }));
+    app.querySelectorAll('[data-dtab]').forEach(b => b.addEventListener('click', () => { dashTab = b.dataset.dtab; tagFilter = null; picked.clear(); dashboard(); }));
+    app.querySelectorAll('[data-lf]').forEach(b => b.addEventListener('click', () => { langFilter = b.dataset.lf; dashboardLocal(); }));
     const unf = app.querySelector('[data-unfilter]'); unf && unf.addEventListener('click', () => { tagFilter = null; dashboard(); });
     app.querySelectorAll('[data-show]').forEach(b => b.addEventListener('click', () => { tagFilter = { t: b.closest('tr').dataset.t }; dashTab = 'published'; dashboard(); }));
     app.querySelectorAll('[data-ren], [data-deltag]').forEach(b => b.addEventListener('click', async () => {
@@ -269,6 +288,36 @@
       await api('blog/admin/feature', { id: Number(b.closest('tr').dataset.id), featured: on });
       b.setAttribute('aria-pressed', on); b.textContent = on ? '★' : '☆';
     }));
+    // выбор галочками и действия с выбранными
+    const pick = () => { const y = scrollY; dashboardLocal(); scrollTo(0, y); };
+    app.querySelectorAll('[data-pick]').forEach(c => c.addEventListener('change', () => { const id = Number(c.closest('tr').dataset.id); c.checked ? picked.add(id) : picked.delete(id); pick(); }));
+    const all = app.querySelector('#be-pickall');
+    all && all.addEventListener('change', () => { app.querySelectorAll('tr[data-id]').forEach(tr => { const id = Number(tr.dataset.id); all.checked ? picked.add(id) : picked.delete(id); }); pick(); });
+    const unp = app.querySelector('[data-unpick]'); unp && unp.addEventListener('click', () => { picked.clear(); pick(); });
+    const bulkSel = app.querySelector('#be-bulk');
+    bulkSel && bulkSel.addEventListener('change', async () => {
+      const v = bulkSel.value; if (!v) return;
+      const [action, value] = v.split(':'), n = picked.size;
+      const word = n === 1 ? 'статью' : n < 5 ? 'статьи' : 'статей';
+      if (action === 'delete' && !confirm(`Удалить ${n} ${word} вместе с комментариями и лайками? Это нельзя отменить.`)) { bulkSel.value = ''; return; }
+      if (action === 'draft' && !confirm(`Снять с публикации ${n} ${word}? Читатели перестанут их видеть.`)) { bulkSel.value = ''; return; }
+      bulkSel.disabled = true;
+      try {
+        await api('blog/admin/bulk', { ids: [...picked], action, value: value || '' });
+        flash = `✓ Готово: ${n} ${word} — ${bulkSel.selectedOptions[0].textContent.trim()}`;
+        picked.clear();
+      } catch (e) { alert(errText(e)); }
+      const y = scrollY; await dashboard(); scrollTo(0, y);
+    });
+    // раздел прямо в строке
+    app.querySelectorAll('[data-rowsec]').forEach(sel => sel.addEventListener('change', async () => {
+      const tr = sel.closest('tr'), id = Number(tr.dataset.id);
+      sel.classList.remove('saved'); sel.disabled = true;
+      try { await api('blog/admin/bulk', { ids: [id], action: 'section', value: sel.value }); (state.posts.find(x => x.id === id) || {}).section = sel.value; sel.classList.add('saved'); } catch (e) { alert(errText(e)); }
+      sel.disabled = false;
+    }));
+    // меню «⋯»: открыто только одно, закрывается кликом мимо
+    app.querySelectorAll('.be-menu').forEach(d => d.addEventListener('toggle', () => { if (d.open) app.querySelectorAll('.be-menu[open]').forEach(x => { if (x !== d) x.open = false; }); }));
     app.querySelectorAll('[data-delpost]').forEach(b => b.addEventListener('click', async () => {
       const tr = b.closest('tr');
       if (!confirm('Удалить статью вместе с комментариями и лайками? Это нельзя отменить.')) return;

@@ -2107,3 +2107,23 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .bs-secs a[aria-current] { background: #534AB7; color: #fff; }
 .bs-secs span { font: 700 11px var(--sans); color: #9A90B8; }
 .bs-secs li.bs-empty a { color: #A79FC0; font-style: italic; }
+/* список статей: галочки, раздел в строке, меню «⋯» */
+.be-bulk { display: flex; flex-wrap: wrap; align-items: center; gap: 12px; min-height: 44px; margin: 0 0 8px; padding: 6px 14px; border-radius: 14px; color: #8a83a0; font-size: 14px; }
+.be-bulk.on { background: #2B1A51; color: #fff; }
+.be-app .be-bulk select { padding: 7px 12px; border-radius: 10px; border: 0; background: #fff; color: #2B1A51; font: 600 14px var(--sans); cursor: pointer; }
+.be-app .be-bulk .bc-link { color: #cfc6ea; }
+.be-posts .be-ck { width: 28px; padding-right: 0; }
+.be-posts input[type=checkbox] { width: 18px; height: 18px; accent-color: #534AB7; cursor: pointer; }
+.be-posts tr.picked td { background: #F3EEFB; }
+.be-app .be-rowsec { max-width: 170px; padding: 6px 8px; border-radius: 10px; border: 1px solid #E2DCEE; background: #fff; color: #2B1A51; font: 14px var(--sans); cursor: pointer; }
+.be-app .be-rowsec.saved { border-color: #4CC38A; }
+.be-menu { position: relative; }
+.be-menu summary { list-style: none; cursor: pointer; width: 34px; height: 34px; display: grid; place-items: center; border-radius: 50%; font: 700 20px/1 var(--sans); color: #6B6290; }
+.be-menu summary::-webkit-details-marker { display: none; }
+.be-menu summary:hover, .be-menu[open] summary { background: #F3EEFB; color: #2B1A51; }
+.be-menu > div { position: absolute; right: 0; top: 38px; z-index: 20; min-width: 200px; padding: 6px; border-radius: 14px; background: #fff; box-shadow: 0 10px 30px rgba(43, 26, 81, .2); display: grid; }
+.be-app .be-menu > div a, .be-app .be-menu > div button { display: block; padding: 9px 12px; border: 0; border-radius: 10px; background: none; color: #2B1A51; font: 600 14px var(--sans); text-align: left; text-decoration: none; cursor: pointer; }
+.be-app .be-menu > div a:hover, .be-app .be-menu > div button:hover { background: #F3EEFB; color: #2B1A51; }
+.be-app .be-menu > div .be-danger { color: #C0392B; }
+.be-posts .be-langs { margin-top: 6px; }
+@media (max-width: 640px) { .be-posts th:nth-child(3), .be-posts td:nth-child(3) { display: table-cell; } .be-app .be-rowsec { max-width: 120px; } }
