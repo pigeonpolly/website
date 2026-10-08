@@ -77,7 +77,9 @@
 #blk-home-blog .hb-top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
 #blk-home-blog .hb-top h2 { margin: 0; font: 600 clamp(28px, 3.2vw, 40px)/1.1 var(--serif); color: #2B1A51; }
 #blk-home-blog .hb-kick { margin: 0 0 6px; font: italic 400 18px var(--serif); color: #D85A30; }
-#blk-home-blog .hb-all { font: 700 16px var(--sans); color: #534AB7; }
+#blk-home-blog .hb-all { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 999px; border: 2px solid #2B1A51; color: #2B1A51; font: 700 16px/1 var(--sans); text-decoration: none; transition: background .2s, color .2s, transform .2s; white-space: nowrap; }
+#blk-home-blog .hb-all:hover, #blk-home-blog .hb-all:focus-visible { background: #2B1A51; color: #FFFDF8; transform: translateY(-1px); }
+#blk-home-blog .hb-top { align-items: center; }
 #blk-home-blog .hb-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: 36px; align-items: start; }
 #blk-home-blog .hb-main { display: block; color: inherit; text-decoration: none; }
 #blk-home-blog .hb-main .hb-img { aspect-ratio: 16 / 9; border-radius: 18px; overflow: hidden; background: #EDE8F7; display: grid; place-items: center; font-size: 64px; box-shadow: 0 14px 34px rgba(43, 26, 81, .14); }

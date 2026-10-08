@@ -4,7 +4,9 @@
   .hb-top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
   .hb-top h2 { margin: 0; font: 600 clamp(28px, 3.2vw, 40px)/1.1 var(--serif); color: #2B1A51; }
   .hb-kick { margin: 0 0 6px; font: italic 400 18px var(--serif); color: #D85A30; }
-  .hb-all { font: 700 16px var(--sans); color: #534AB7; }
+  .hb-all { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 999px; border: 2px solid #2B1A51; color: #2B1A51; font: 700 16px/1 var(--sans); text-decoration: none; transition: background .2s, color .2s, transform .2s; white-space: nowrap; }
+  .hb-all:hover, .hb-all:focus-visible { background: #2B1A51; color: #FFFDF8; transform: translateY(-1px); }
+  .hb-top { align-items: center; }
   .hb-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: 36px; align-items: start; }
   .hb-main { display: block; color: inherit; text-decoration: none; }
   .hb-main .hb-img { aspect-ratio: 16 / 9; border-radius: 18px; overflow: hidden; background: #EDE8F7; display: grid; place-items: center; font-size: 64px; box-shadow: 0 14px 34px rgba(43, 26, 81, .14); }
