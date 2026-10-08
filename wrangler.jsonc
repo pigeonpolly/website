@@ -7,7 +7,9 @@
   "assets": {
     "directory": "./site",
     "binding": "ASSETS",
-    "not_found_handling": "404-page"
+    "not_found_handling": "404-page",
+    // блог собирается сервером, поэтому эти адреса сначала идут в worker, а не в готовые файлы
+    "run_worker_first": ["/api/*", "/media/*", "/sitemap-blog.xml", "/blog/*", "/ru/blog/*", "/lv/blog/*"]
   },
   "d1_databases": [
     { "binding": "DB", "database_name": "pigeonpolly", "database_id": "4c664cd2-ab5c-4061-8914-47d9860723dd" }
@@ -15,6 +17,12 @@
   "kv_namespaces": [
     { "binding": "IMAGES", "id": "2af1033ad2bc49b99a15255d3bf33fae" }
   ],
+  // картинки блога (загружаются из редактора, отдаются по адресу /media/...)
+  "r2_buckets": [
+    { "binding": "MEDIA", "bucket_name": "pigeonpolly-media" }
+  ],
+  // бесплатный переводчик статей (Workers AI, дневной бесплатный лимит)
+  "ai": { "binding": "AI" },
   // раз в сутки в 03:23 UTC: удаляем картинки тех, кто не загружал работы больше 30 дней
   "triggers": { "crons": ["23 3 * * *"] },
   "vars": {

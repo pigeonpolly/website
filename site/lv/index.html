@@ -69,6 +69,47 @@
     <span class="dot dot-2"></span>
   </div>
 </section>
+<div class="blk" id="blk-home-blog"><style>#blk-home-blog .hb { padding: 56px var(--gutter) 60px; background: #FFFDF8; color: #2B1A51; }
+#blk-home-blog .hb[hidden] { display: none; }
+#blk-home-blog .hb-top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
+#blk-home-blog .hb-top h2 { margin: 0; font: 600 clamp(28px, 3.2vw, 40px)/1.1 var(--serif); color: #2B1A51; }
+#blk-home-blog .hb-kick { margin: 0 0 6px; font: italic 400 18px var(--serif); color: #D85A30; }
+#blk-home-blog .hb-all { font: 700 16px var(--sans); color: #534AB7; }
+#blk-home-blog .hb-grid { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: 36px; align-items: start; }
+#blk-home-blog .hb-main { display: block; color: inherit; text-decoration: none; }
+#blk-home-blog .hb-main .hb-img { aspect-ratio: 16 / 9; border-radius: 18px; overflow: hidden; background: #EDE8F7; display: grid; place-items: center; font-size: 64px; box-shadow: 0 14px 34px rgba(43, 26, 81, .14); }
+#blk-home-blog .hb-main img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
+#blk-home-blog .hb-main:hover img { transform: scale(1.03); }
+#blk-home-blog .hb-meta { margin: 18px 0 6px; font: 600 14px var(--sans); color: #7A6F99; }
+#blk-home-blog .hb-main h3 { margin: 0 0 10px; font: 600 clamp(24px, 2.6vw, 34px)/1.15 var(--serif); color: #2B1A51; }
+#blk-home-blog .hb-main:hover h3 { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
+#blk-home-blog .hb-main p.hb-ex { margin: 0 0 14px; font: 17px/1.6 var(--sans); color: #4A3F6B; max-width: 62ch; }
+#blk-home-blog .hb-more { font: 800 16px var(--sans); color: #D85A30; }
+#blk-home-blog .hb-side h3.hb-fav { margin: 0 0 14px; font: 700 15px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: #E9A93B; }
+#blk-home-blog .hb-side ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 16px; }
+#blk-home-blog .hb-side a { display: grid; grid-template-columns: 96px minmax(0, 1fr); gap: 14px; align-items: center; color: inherit; text-decoration: none; padding: 10px; margin: -10px; border-radius: 14px; transition: background .2s; }
+#blk-home-blog .hb-side a:hover { background: #F3EEFB; }
+#blk-home-blog .hb-side .hb-th { width: 96px; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden; background: #EDE8F7; display: grid; place-items: center; font-size: 28px; }
+#blk-home-blog .hb-side img { width: 100%; height: 100%; object-fit: cover; display: block; }
+#blk-home-blog .hb-side b { display: block; font: 600 18px/1.25 var(--serif); color: #2B1A51; }
+#blk-home-blog .hb-side small { display: block; margin-top: 4px; font: 600 13px var(--sans); color: #7A6F99; }
+#blk-home-blog .hb-tag { color: #534AB7; }
+#blk-home-blog .hb-solo .hb-grid { grid-template-columns: 1fr; }
+#blk-home-blog .hb-solo .hb-main { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 5fr); gap: 36px; align-items: center; }
+#blk-home-blog .hb-solo .hb-meta { margin-top: 0; }
+@media (max-width: 860px) {#blk-home-blog .hb-grid, #blk-home-blog .hb-solo .hb-main { grid-template-columns: 1fr; gap: 24px; }}</style><section class="hb" id="home-blog" hidden aria-labelledby="hb-title">
+  <div class="hb-top">
+    <div><p class="hb-kick">Jaunākais blogā</p><h2 id="hb-title">Piezīmes no laboratorijas</h2></div>
+    <a class="hb-all" href="/lv/blog/">Visi raksti →</a>
+  </div>
+  <div class="hb-grid">
+    <div class="hb-latest"></div>
+    <aside class="hb-side"><h3 class="hb-fav">★ Izlase</h3><ol></ol></aside>
+  </div>
+  <span class="hb-label" hidden data-read>Lasīt rakstu →</span>
+</section>
+<script src="/assets/home-blog.js" defer></script>
+</div>
 <div class="blk" id="blk-today"><style></style><section class="today-sec">
   <div class="td-text">
     <p class="topics">dienas skiču izaicinājums</p>

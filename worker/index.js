@@ -1,6 +1,7 @@
 // Сервер сайта: отдаёт статические файлы из site/ и обслуживает /api/* для «Стены рисунков»:
 // вход через Google, ник, загрузка работы дня, серии, стена, топ, модерация, GDPR (экспорт и удаление).
-// Данные — Cloudflare D1 (env.DB), картинки — Cloudflare KV (env.IMAGES).
+// Данные — Cloudflare D1 (env.DB), картинки — Cloudflare KV (env.IMAGES). Блог — worker/blog.js (картинки блога в R2, env.MEDIA).
+import { blogApi, blogPage } from './blog.js';
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
 const ADMIN_HASHES = ['80ac2786b60d61a30d6691a3d40de5d784cdefc580717add788821a7bf900118'];
@@ -12,10 +13,17 @@ const INACTIVE_DAYS = 30; // нет загрузок дольше — карти
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
-    if (!url.pathname.startsWith('/api/')) return env.ASSETS.fetch(req);
+    const p = url.pathname;
+    if (/^\/(?:(?:ru|lv)\/)?blog\//.test(p) || p.startsWith('/media/') || p === '/sitemap-blog.xml') {
+      if (!env.DB) return env.ASSETS.fetch(req);
+      try { await ensureSchema(env); return await blogPage(req, env, url, helpers(env)); }
+      catch (e) { console.error(e); return env.ASSETS.fetch(req); } // если база недоступна — статическая заглушка
+    }
+    if (!p.startsWith('/api/')) return env.ASSETS.fetch(req);
     if (!env.DB || !env.IMAGES || !env.GOOGLE_CLIENT_ID) return json({ ready: false }, 503);
     try {
       await ensureSchema(env);
+      if (p.startsWith('/api/blog/')) return await blogApi(req, env, url, helpers(env));
       return await route(req, env, url);
     } catch (e) {
       if (e instanceof HttpError) return json({ error: e.code }, e.status);
@@ -30,6 +38,9 @@ export default {
     ctx.waitUntil(cleanupInactive(env));
   },
 };
+
+// общие функции для worker/blog.js
+const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v) });
 
 class HttpError extends Error { constructor(status, code) { super(code); this.status = status; this.code = code; } }
 const fail = (status, code) => { throw new HttpError(status, code); };

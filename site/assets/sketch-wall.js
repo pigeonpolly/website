@@ -392,6 +392,8 @@
     document.addEventListener('keydown', k, true);
     document.body.appendChild(v); v.querySelector('.sw-bv-close').focus();
   }
+  // ссылка вида /challenge/#@ник (например, из комментариев блога) сразу открывает профиль
+  if (location.hash.startsWith('#@')) setTimeout(() => openProfile(decodeURIComponent(location.hash.slice(2))), 400);
   document.addEventListener('click', e => {
     const b = e.target.closest('[data-profile]');
     if (!b) return;

@@ -1,3 +1,7 @@
 User-agent: *
 Allow: /
+Disallow: /blog-editor/
+Disallow: /ru/blog-editor/
+Disallow: /lv/blog-editor/
 Sitemap: https://www.pigeonpolly.com/sitemap.xml
+Sitemap: https://www.pigeonpolly.com/sitemap-blog.xml
