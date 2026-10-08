@@ -57,6 +57,39 @@
     return i < 0 ? 0 : i;
   }
   const mod = (a, b) => ((a % b) + b) % b;
+  // цвета с 10 октября 2026 — «колодой» по 8 дней: каждый яркий цвет 3 раза, коричневый, чёрный и серый — по 1 разу;
+  // в один день не больше одного неяркого цвета и ни один цвет не повторяется два дня подряд (до этого было просто случайно)
+  const NEUTRAL = ['#8A5A3C', '#2B2B2B', '#9A9A9A'];
+  const blocks = [];
+  function colorBlock(b) {
+    while (blocks.length <= b) {
+      const k = blocks.length, prev = k ? blocks[k - 1][7] : [];
+      const neutral = D.colors.map((c, i) => i).filter(i => NEUTRAL.includes(D.colors[i].hex));
+      const bright = D.colors.map((c, i) => i).filter(i => !NEUTRAL.includes(D.colors[i].hex));
+      let days = null;
+      for (let attempt = 0; attempt < 200 && !days; attempt++) {
+        const r = rngFor('cols-' + k + '-' + attempt), left = {};
+        for (const i of bright) left[i] = 3; for (const i of neutral) left[i] = 1;
+        const out = []; let last = prev, ok = true;
+        for (let dd = 0; dd < 8 && ok; dd++) {
+          const day = [];
+          for (let s2 = 0; s2 < 3; s2++) {
+            // берём случайный цвет из оставшихся, чаще те, которых осталось больше (чтобы в конце не застрять)
+            const cand = Object.keys(left).map(Number).filter(i => left[i] > 0 && !day.includes(i) && !last.includes(i) && !(neutral.includes(i) && day.some(j => neutral.includes(j))));
+            if (!cand.length) { ok = false; break; }
+            const tot = cand.reduce((t, i) => t + left[i], 0); let x = r() * tot, pickI = cand[0];
+            for (const i of cand) { x -= left[i]; if (x <= 0) { pickI = i; break; } }
+            day.push(pickI); left[pickI]--;
+          }
+          out.push(day); last = day;
+        }
+        if (ok) days = out;
+      }
+      blocks.push(days || blocks[k - 1] || [[0, 1, 2]]);
+    }
+    return blocks[b];
+  }
+  const balancedColors = n => colorBlock(Math.floor(n / 8))[n % 8];
   function themeFor(d, L) {
     const r = rngFor('polly-' + keyOf(d));
     // до 5 октября 2026 — старая формула (первые 98 тем), дальше все темы по кругу без повторов
@@ -66,6 +99,8 @@
     const subject = n < 0 ? D.subjects[legacy] : bday ? D.subjects[birthdayIdx(d.getFullYear())] : D.subjects[planFor(n)];
     const cols = D.colors.slice();
     for (let i = cols.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [cols[i], cols[j]] = [cols[j], cols[i]]; }
+    const n2 = Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 9, 10)) / 864e5);
+    if (n2 >= 0) { const pick = balancedColors(n2); cols.splice(0, 3, ...pick.map(i => D.colors[i])); }
     const time = D.times[Math.floor(r() * D.times.length)];
     const day = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
     // раз в месяц — день ЭКСТРА (свой случайный день для каждого месяца)
