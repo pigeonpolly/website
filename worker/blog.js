@@ -204,8 +204,7 @@ export async function blogApi(req, env, url, h) {
     const pack = x => ({ url: blogUrl(lang, x.slug), title: field(x, 't', lang), excerpt: field(x, 'd', lang) || stripTags(field(x, 'b', lang)).slice(0, 200),
       cover: x.cover, date: fmtDate(x.published_at, lang), tags: tagsOf(x, lang).slice(0, 3), likes: x.likes });
     const latest = rows.find(x => x.pinned) || rows[0] || null; // 📌 закреплённая статья, иначе самая новая
-    const featured = rows.filter(x => x.featured && x !== latest).slice(0, 4);
-    if (featured.length < 2) featured.push(...rows.filter(x => !x.featured && x !== latest).slice(0, 3 - featured.length)); // пока звёздочек мало — добираем свежими
+    const featured = rows.filter(x => x.featured && x !== latest).slice(0, 3); // справа — только статьи со ★, не больше трёх
     return json({ latest: latest && pack(latest), featured: featured.map(x => ({ ...pack(x), star: !!x.featured })) }, 200, { 'cache-control': 'public, max-age=60' });
   }
 
