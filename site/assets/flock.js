@@ -97,7 +97,7 @@
     for (const [dx, dy] of [[-6, 4], [-3, 7], [18, 5], [10, 8]]) items.push({ type: 'crumb', x: props.bun + dx, y: 100 + dy, bites: 1 });
   }
   const FOOD = ['bun', 'baguette', 'half', 'crumb', 'seed'];
-  const CARRY = ['bun', 'half', 'book', 'cup', 'plane', 'leaf'];
+  const CARRY = ['bun', 'half', 'book', 'cup', 'plane', 'leaf', 'scrap'];
   function bite(it) {
     if (!it || it.gone || it.held) return;
     it.bites = (it.bites || 1) - 1;
@@ -146,6 +146,16 @@
       case 'plane':
         if (it.fly) { R(x - 4, y, 9, 1, '#FFFFFF'); R(x - 3 * it.dir, y - 1, 4, 1, '#E6E1F2'); R(x - 4 * it.dir, y - 2, 2, 1, '#FFFFFF'); R(x - 2, y + 1, 5, 1, '#C8C2D8'); break; }
         R(x - 4, y - 2, 9, 1, '#FFFFFF'); R(x - 3, y - 1, 7, 1, '#E6E1F2'); sh(8); break;
+      case 'scrap': R(x - 1, y - 2, 3, 2, '#C8955B'); R(x - 1, y - 2, 3, 1, '#DDB07A'); break;
+      case 'bigbox': {
+        const w = Math.round(it.w), h = Math.round(it.h), x0 = x - Math.round(w / 2) + Math.round(it.shake || 0), top = y - h;
+        R(x0, top, w, h, '#C8955B'); R(x0, top, w, 1, '#DDB07A'); R(x0, top, 1, h, '#B07D45'); R(x0 + w - 1, top, 1, h, '#9C6B3F');
+        R(x0 + Math.round(w / 2) - 1, top, 2, h, '#E3C08C'); // скотч
+        for (let i = 0; i < 5; i++) { R(x0 - 1 - i, top - i, 1, 1, '#B07D45'); R(x0 + w + i, top - i, 1, 1, '#B07D45'); } // клапаны
+        R(x0 + 3, top + h - 5, 6, 1, '#9C6B3F'); R(x0 + 3, top + h - 3, 4, 1, '#9C6B3F'); // «надпись»
+        if (it.vy == null) R(x0, y, w, 1, 'rgba(0,0,0,.22)');
+        break;
+      }
       case 'leaf': R(x - 1, y - 2, 3, 1, it.c); R(x - 2, y - 1, 4, 1, it.c); R(x, y - 3, 1, 1, '#7A4A2A'); break;
       case 'parcel': {
         if (it.vy != null) { // парашют
@@ -271,9 +281,9 @@
   let hearts = [];
   function friends(dt) {
     for (const c of birds) {
-      if (!c.cat || c.hop) continue;
+      if (!c.cat || c.hop || c.inBox) continue;
       for (const o of birds) {
-        if (o.cat || o.hop || Math.abs(o.x - c.x) > 18 || Math.abs(o.y - c.y) > 8) continue;
+        if (o.cat || o.hop || o.inBox || Math.abs(o.x - c.x) > 18 || Math.abs(o.y - c.y) > 8) continue;
         if (Math.random() < dt * .35) hearts.push({ x: (o.x + c.x) / 2 + rnd(-3, 3), y: Math.min(o.y, c.y) - 24, life: 1.8 });
       }
     }
@@ -606,6 +616,56 @@
       end() { gloom = 0; },
     },
   });
+  // коробка: все пытаются залезть, не помещаются — и коробка лопается
+  EVENTS.box = {
+    ok: () => freeBirds().length >= 3, w: 2,
+    start(e) {
+      const bx = { type: 'bigbox', x: clamp(rnd(W * .35, W * .65), 30, W - 30), y: rnd(Y0 + 16, Y1 - 6), w: 24, h: 15, lock: true };
+      bx.land = bx.y; bx.y = -OFF - 30; bx.vy = 0; e.bx = bx; items.push(bx);
+      e.list = freeBirds(); enlist(e.list, e); e.inside = []; e.phase = 'drop'; e.t = 0;
+    },
+    update(e, dt) {
+      const bx = e.bx; e.t += dt;
+      if (e.phase === 'drop') {
+        bx.vy += 320 * dt; bx.y += bx.vy * dt;
+        if (bx.y >= bx.land) {
+          bx.y = bx.land; bx.vy = null; e.phase = 'climb'; e.t = 0;
+          fx.push({ type: 'poof', x: bx.x, y: bx.y - 2, t: .6 });
+          e.list.forEach((b, i) => {
+            const side = b.x < bx.x ? -1 : 1;
+            b.tasks.push({ say: pickOne(['!', 'heart', 'star']), t: 1.2 }, { go: { x: cx(bx.x + side * rnd(30, 50)), y: cy(bx.y + rnd(-9, 2)) }, fast: 1.6 }, { wait: rnd(.2, 1.5) + i * .12 },
+              { fn: b2 => { b2.hop = { from: { x: b2.x, y: b2.y }, to: { x: bx.x + rnd(-bx.w / 2 + 5, bx.w / 2 - 5), y: bx.y - 1 - (e.inside.length % 3) * 2 }, t: 0, dur: .5, h: 20 }; } },
+              { fn: b2 => { b2.inBox = true; b2.ctl = true; e.inside.push(b2); bx.w = Math.min(46, bx.w + 1.6); bx.h = Math.min(19, bx.h + .25); if (Math.random() < .3) say(b2, pickOne(['heart', '!']), 1); } });
+          });
+        }
+        return;
+      }
+      if (e.phase === 'climb') {
+        bx.shake = Math.sin(e.t * 30) * Math.min(2, e.inside.length * .15);
+        for (const b of e.inside) { if (Math.random() < dt * .12) say(b, pickOne(['drop', '!']), .9); b.x = clamp(b.x, bx.x - bx.w / 2 + 4, bx.x + bx.w / 2 - 4); }
+        if (e.inside.length >= Math.min(12, Math.ceil(e.list.length * .6)) || e.t > 9) { e.phase = 'shake'; e.t = 0; for (const b of e.list) if (!b.inBox) { b.tasks = []; b.goal = null; b.wait = 0; say(b, '?', 1.5); } }
+        return;
+      }
+      if (e.phase === 'shake') {
+        bx.shake = Math.sin(e.t * 60) * 3; bx.w += dt * 3;
+        for (const b of e.inside) if (Math.random() < dt * 3) b.hop || (b.hop = { from: { x: b.x, y: b.y }, to: { x: b.x, y: b.y }, t: 0, dur: .25, h: 3 });
+        if (e.t < 1.6) return;
+        // БАХ! обрывки картона и птички во все стороны
+        bx.gone = true; e.phase = 'after'; e.t = 0;
+        fx.push({ type: 'poof', x: bx.x, y: bx.y - 8, t: .6 }, { type: 'snap', x: bx.x, y: bx.y - 10, t: .6 });
+        for (let i = 0; i < 12; i++) items.push({ type: 'scrap', x: bx.x + rnd(-8, 8), y: bx.y - rnd(4, 14), land: cy(bx.y + rnd(-10, 14)), vy: rnd(-70, -30), vx: rnd(-70, 70), bites: 1, fade: rnd(25, 40) });
+        for (const b of e.inside) {
+          b.inBox = false; b.ctl = false;
+          const ang = rnd(0, Math.PI * 2), d = rnd(25, 70);
+          b.hop = { from: { x: b.x, y: b.y }, to: { x: cx(b.x + Math.cos(ang) * d), y: cy(b.y + Math.sin(ang) * d * .4) }, t: 0, dur: rnd(.6, .9), h: rnd(18, 34) };
+          b.tasks.push({ say: pickOne(['!', '?', 'star', 'drop']), t: 1.4 }, { wait: rnd(1, 2.5) });
+        }
+        return;
+      }
+      if (e.phase === 'after') return done(e.list) && e.t > 1;
+    },
+    end(e) { e.bx.gone = true; for (const b of e.list) { b.inBox = false; b.ctl = false; } },
+  };
   const messy = () => items.filter(i => free(i) && i.home && CARRY.includes(i.type) && Math.hypot(i.x - i.home.x, i.y - i.home.y) > 25);
   // ---------- зёрнышки: насыпать курсором, птички слетаются ----------
   const nearestSeed = (b, maxD = 1e9) => { let best = null, bd = maxD; for (const i of items) if (i.type === 'seed' && free(i)) { const d = Math.hypot(i.x - b.x, (i.y - b.y) * 2); if (d < bd) { bd = d; best = i; } } return best; };
@@ -660,7 +720,7 @@
     night = 0; disco = 0; gloom = 0; puddles = []; fx = []; hearts = [];
     for (const p of perches) p.by = null;
     for (const b of birds) {
-      b.hold = null; b.tasks = []; b.goal = null; b.hop = null; b.ctl = false; b.ev = null; b.perch = null; b.hat = null;
+      b.hold = null; b.tasks = []; b.goal = null; b.hop = null; b.ctl = false; b.ev = null; b.perch = null; b.hat = null; b.inBox = false;
       b.wait = rnd(.5, 2); b.pose = 'idle'; b.y = cy(b.y); b.x = cx(b.x);
       if (Math.random() < .5) say(b, pickOne(['star', 'heart', 'note']), 1.4);
     }
@@ -753,7 +813,7 @@
     for (const p of puddles) p.life -= dt;
     puddles = puddles.filter(p => p.life > 0);
     // падающие и разлетающиеся крошки
-    for (const it of items) if (it.vy != null && (it.type === 'crumb' || it.type === 'seed')) {
+    for (const it of items) if (it.vy != null && (it.type === 'crumb' || it.type === 'seed' || it.type === 'scrap')) {
       it.vy += 60 * dt; it.y += it.vy * dt; if (it.vx) it.x = cx(it.x + it.vx * dt);
       if (it.y >= it.land && it.vy > 0) { it.y = it.land; it.vy = null; it.vx = 0; }
     }

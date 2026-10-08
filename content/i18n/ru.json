@@ -273,5 +273,6 @@
   "</span> Back to normal</button>": "</span> Всё как было</button>",
   "</span> Nicknames</button>": "</span> Ники</button>",
   "Find a bird by nickname": "Найти птичку по нику",
-  "🔍 Find</button>": "🔍 Найти</button>"
+  "🔍 Find</button>": "🔍 Найти</button>",
+  "</span> Box</button>": "</span> Коробка</button>"
 }
