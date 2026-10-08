@@ -8,6 +8,11 @@
   if (!box) return;
   const cv = box.querySelector('canvas'), ctx = cv.getContext('2d'), labels = box.querySelector('.fl-labels');
   const lang = document.documentElement.lang || 'en';
+  const FIND = {
+    en: { here: 'Here it is! 💛', flying: 'Flying in! 🪽', none: 'No bird with this nickname yet.', short: 'Type at least 2 letters.', error: 'Could not search right now.' },
+    ru: { here: 'Вот она! 💛', flying: 'Летит к вам! 🪽', none: 'Птички с таким ником пока нет.', short: 'Введите хотя бы 2 буквы.', error: 'Сейчас не получилось поискать.' },
+    lv: { here: 'Re, kur viņš! 💛', flying: 'Lido šurp! 🪽', none: 'Putniņa ar tādu segvārdu vēl nav.', short: 'Ievadi vismaz 2 burtus.', error: 'Šobrīd neizdevās meklēt.' },
+  };
 
   const { looks, sprite, SW, BASE } = window.PPBirds;
 
@@ -184,9 +189,17 @@
     for (let y = 0; y < c.height; y++) { const xs = []; for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3] > 0) xs.push(x); if (xs.length) return { x: xs[Math.floor(xs.length / 2)], y }; }
     return { x: c.width / 2, y: 0 };
   }
+  let guests = []; // найденные по нику — остаются в сцене и после перестройки
+  const cap = () => Math.max(8, Math.floor(W / (W < 260 ? 13 : 9)));
   function makeBirds(list) {
     labels.innerHTML = '';
-    birds = list.slice(0, Math.max(8, Math.floor(W / (W < 260 ? 13 : 9)))).map(u => {
+    const ids = new Set(guests.map(g => g.id));
+    const me = list.filter(u => u.me);
+    list = [...me, ...guests.filter(g => !me.some(m => m.id === g.id)), ...list.filter(u => !u.me && !ids.has(u.id))];
+    birds = list.slice(0, cap()).map(makeBird);
+  }
+  function makeBird(u) {
+    {
       const lk = looks(u.id);
       const b = { u, cat: lk.kind === 'cat', crow: lk.kind === 'crow', frames: [0, 1, 2].map(f => sprite(lk, f)), hat: null, x: rnd(10, W - 10), y: rnd(Y0, Y1), dir: Math.random() < .5 ? 1 : -1,
         tasks: [], goal: null, wait: rnd(.3, 3), pose: 'idle', anim: rnd(0, 5), speed: lk.kind === 'cat' ? rnd(6, 9) : rnd(9, 15), fast: 1, perch: null, hold: null, emote: null, ev: null };
@@ -200,7 +213,7 @@
         labels.appendChild(a); b.label = a;
       }
       return b;
-    });
+    }
   }
   // встать рядом с предметом, лицом к нему
   const beside = (b, it, gap = 8) => { const side = b.x < it.x ? -1 : 1; return { x: cx(it.x + side * gap), y: cy(it.y), face: -side }; };
@@ -270,6 +283,7 @@
 
   function stepBird(b, dt) {
     b.anim += dt;
+    if (b.found > 0 && (b.found -= dt) <= 0) { b.found = 0; if (b.label) b.label.classList.remove('found'); }
     if (b.emote && (b.emote.t -= dt) <= 0) b.emote = null;
     if (b.hop) {
       const h = b.hop; h.t += dt / h.dur;
@@ -654,6 +668,36 @@
     for (const it of items) if (it.type !== 'crumb') fx.push({ type: 'poof', x: it.x, y: it.y - 4, t: .6 });
     evIn = rnd(10, 16);
   }
+  // «Найти птичку»: ищем в сцене, а если её тут нет — спрашиваем сервер, и она прилетает сверху
+  function spotlight(b) {
+    birds.forEach(x => { if (x.found) { x.found = 0; if (x.label) x.label.classList.remove('found'); } });
+    b.found = 7; if (b.label) b.label.classList.add('found');
+    if (!b.hop) { b.tasks = []; b.goal = null; b.wait = 0; if (b.perch) { b.perch.by = null; b.perch = null; b.y = cy(b.y); } }
+    b.tasks.push({ say: 'heart', t: 2 }, { hop: { x: b.x, y: b.y }, h: 8, dur: .4 }, { hop: { x: b.x, y: b.y }, h: 8, dur: .4 }, { wait: 2 });
+  }
+  async function findBird(q) {
+    q = q.trim().replace(/^@/, '').toLowerCase();
+    if (q.length < 2) return 'short';
+    let b = birds.find(x => x.u.nick && x.u.nick.toLowerCase() === q) || birds.find(x => x.u.nick && x.u.nick.toLowerCase().startsWith(q));
+    if (b) { spotlight(b); return 'here'; }
+    let r;
+    try { r = await (await fetch('/api/flock/find?nick=' + encodeURIComponent(q))).json(); } catch (e) { return 'error'; }
+    const u = r.birds && r.birds[0];
+    if (!u) return 'none';
+    b = birds.find(x => x.u.id === u.id);
+    if (b) { spotlight(b); return 'here'; }
+    guests = [u, ...guests.filter(g => g.id !== u.id)].slice(0, 5);
+    if (birds.length >= cap()) { // кто-то улетает, чтобы освободить место
+      const out = birds.filter(x => !x.u.me && !x.ev && !guests.some(g => g.id === x.u.id)).sort(() => Math.random() - .5)[0];
+      if (out) { if (out.hold) drop(out); if (out.perch) out.perch.by = null; if (out.label) out.label.remove(); birds = birds.filter(x => x !== out); }
+    }
+    b = makeBird(u);
+    const tx = rnd(W * .2, W * .8), ty = rnd(Y0 + 4, Y1 - 4);
+    b.x = tx; b.y = ty; b.hop = { from: { x: tx + rnd(-60, 60), y: -OFF - 30 }, to: { x: tx, y: ty }, t: 0, dur: 1.6, h: 0 }; b.wait = 0;
+    birds.push(b);
+    spotlight(b);
+    return 'flying';
+  }
   let lastPour = 0, lastCall = 0;
   function pour(wx, wy) {
     const now = performance.now();
@@ -785,6 +829,11 @@
       else if (f.type === 'confetti') { ctx.globalAlpha = Math.min(1, f.t); R(f.x, f.y, (f.ph | 0) % 2 ? 2 : 1, (f.ph | 0) % 2 ? 1 : 2, f.c); ctx.globalAlpha = 1; }
     }
     if (night > 0) { ctx.fillStyle = `rgba(12, 6, 40, ${night * .45})`; ctx.fillRect(0, -OFF, W, H); ctx.fillStyle = `rgba(255, 220, 140, ${night * .16})`; ctx.beginPath(); ctx.arc(L, 60, 40, 0, 7); ctx.fill(); }
+    for (const b of birds) if (b.found > 0) { // стрелка над найденной птичкой
+      const ax = Math.round(b.x), ay = Math.round(b.y - (b.cat ? 26 : 34) - (b.emote ? 11 : 0) - Math.abs(Math.sin(b.anim * 5)) * 3);
+      ['#####', '.###.', '..#..'].forEach((row, yy) => [...row].forEach((ch, xx) => { if (ch === '#') R(ax - 2 + xx, ay + yy, 1, 1, '#E9A93B'); }));
+      R(ax - 1, ay - 3, 3, 3, '#E9A93B');
+    }
     for (const b of birds) if (b.emote) drawEmote(b.x, b.y - (b.cat ? 17 : 24), b.emote.icon, Math.min(b.emote.t / .3, (b.emote.max - b.emote.t) / .15 + .2));
     drawHearts();
     ctx.restore();
@@ -825,6 +874,21 @@
     let rw = box.clientWidth, rh = innerHeight;
     const relayout = () => { layout(); reset(data.birds); };
     addEventListener('resize', () => { if (Math.abs(box.clientWidth - rw) < 40 && (!full || Math.abs(innerHeight - rh) < 60)) return; rw = box.clientWidth; rh = innerHeight; relayout(); });
+    // ники: показать/скрыть (запоминаем в браузере); свой ник и найденный видны всегда
+    const nickBtn = box.querySelector('[data-act=nicks]');
+    const setNicks = on => { labels.classList.toggle('hide-nicks', !on); if (nickBtn) nickBtn.setAttribute('aria-pressed', String(on)); try { localStorage.setItem('fl-nicks', on ? '1' : '0'); } catch (e) { /* без памяти */ } };
+    let nicksOn = true; try { nicksOn = localStorage.getItem('fl-nicks') !== '0'; } catch (e) { /* */ }
+    setNicks(nicksOn);
+    if (nickBtn) nickBtn.addEventListener('click', e => { e.stopPropagation(); nicksOn = !nicksOn; setNicks(nicksOn); });
+    const findForm = box.querySelector('.fl-find');
+    if (findForm) findForm.addEventListener('submit', async e => {
+      e.preventDefault();
+      const out = findForm.querySelector('.fl-find-msg'), inp = findForm.querySelector('input');
+      out.textContent = '…';
+      const r = await findBird(inp.value);
+      out.textContent = (FIND[lang] || FIND.en)[r] || '';
+      if (r === 'here' || r === 'flying') box.querySelector('.fl-stage').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
     // «На весь экран»: на главной открывает /flock/, на самой /flock/ — настоящий полноэкранный режим
     const open = box.querySelector('.fl-open');
     if (open && full) {

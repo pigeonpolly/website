@@ -327,6 +327,15 @@ async function route(req, env, url) {
     if (me && !me.banned && !rows.some(r => r.id === me.id)) rows = [{ id: me.id, nick: me.nick }, ...rows.slice(0, LIMIT - 1)];
     return json({ total, recent: total > LIMIT, birds: rows.map(r => ({ id: r.id, nick: r.nick || null, me: !!me && r.id === me.id })) });
   }
+  // «Найти птичку»: по нику (сначала точное совпадение, потом начало ника)
+  if (m === 'GET' && p === '/api/flock/find') {
+    const q = String(url.searchParams.get('nick') || '').trim().replace(/^@/, '').slice(0, 40);
+    if (q.length < 2) return json({ birds: [] });
+    const exact = await env.DB.prepare('SELECT id, nick FROM users WHERE banned = 0 AND nick = ? COLLATE NOCASE').bind(q).first();
+    const rows = exact ? [exact] : (await env.DB.prepare("SELECT id, nick FROM users WHERE banned = 0 AND nick LIKE ? ESCAPE '\\' ORDER BY COALESCE(last_seen, created_at) DESC LIMIT 5")
+      .bind(q.replace(/[\\%_]/g, c => '\\' + c) + '%').all()).results;
+    return json({ birds: rows.map(r => ({ id: r.id, nick: r.nick })) });
+  }
   // шапка сайта: кто вошёл (для кнопки входа и птички-аватара)
   if (m === 'GET' && p === '/api/whoami') {
     const u = await currentUser(req, env);
