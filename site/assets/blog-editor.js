@@ -197,7 +197,16 @@
 
     const collect = () => {
       const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked };
-      app.querySelectorAll('[data-k]').forEach(el => { d[el.dataset.k] = el.isContentEditable ? el.innerHTML : el.value; });
+      app.querySelectorAll('[data-k]').forEach(el => {
+        if (!el.isContentEditable) { d[el.dataset.k] = el.value; return; }
+        const c = el.cloneNode(true);
+        c.querySelectorAll('figure').forEach(f => {
+          const cap = f.querySelector('figcaption'), img = f.querySelector('img'), txt = cap ? cap.textContent.trim() : '';
+          if (img && txt && !img.getAttribute('alt')) img.setAttribute('alt', txt); // подпись = описание картинки для Google и незрячих
+          if (cap && !txt) cap.remove();                                         // пустая подпись в статью не попадает
+        });
+        d[el.dataset.k] = c.innerHTML;
+      });
       return d;
     };
     const touch = () => { dirty = true; saveLocal(post.id, collect()); };
@@ -290,11 +299,40 @@
     });
 
     // картинки: перетаскивание, вставка из буфера, выбор файла
+    // картинка сразу с местом для подписи: курсор встаёт в подпись
+    // курсор в абзац после картинки (создаём абзац, если его нет)
+    const afterFigure = fig => {
+      let next = fig.nextElementSibling;
+      if (!next || next.tagName !== 'P') { next = document.createElement('p'); next.innerHTML = '<br>'; fig.after(next); }
+      const r = document.createRange(); r.setStart(next, 0); r.collapse(true);
+      const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); lastRange = r.cloneRange();
+    };
     const insertImage = (body, url) => {
       restore(body);
-      document.execCommand('insertHTML', false, `<figure><img src="${esc(url)}" alt=""></figure><p><br></p>`);
+      const at = getSelection().anchorNode, inFig = at && (at.nodeType === 1 ? at : at.parentElement).closest('figure');
+      if (inFig && body.contains(inFig)) afterFigure(inFig); // не вкладываем картинку в картинку
+      document.execCommand('insertHTML', false, `<figure data-new><img src="${esc(url)}" alt=""><figcaption></figcaption></figure><p><br></p>`);
+      const fig = body.querySelector('figure[data-new]');
+      if (fig) {
+        fig.removeAttribute('data-new');
+        const cap = fig.querySelector('figcaption') || fig.appendChild(document.createElement('figcaption'));
+        const r = document.createRange(); r.setStart(cap, 0); r.collapse(true);
+        const sel = getSelection(); sel.removeAllRanges(); sel.addRange(r); cap.focus();
+      }
       touch();
     };
+    // у каждой картинки в тексте — место для подписи (и у вставленных из Google Docs, и у старых статей)
+    const addCaptions = body => body.querySelectorAll('figure').forEach(f => { if (!f.querySelector('figcaption')) f.appendChild(document.createElement('figcaption')); });
+    bodies.forEach(addCaptions);
+    bodies.forEach(b => {
+      // Enter в подписи — новый абзац под картинкой; пустое поле сразу начинается с абзаца
+      b.addEventListener('keydown', e => {
+        const at = getSelection().anchorNode, cap = at && (at.nodeType === 1 ? at : at.parentElement).closest('figcaption');
+        if (e.key === 'Enter' && cap) { e.preventDefault(); afterFigure(cap.closest('figure')); }
+      });
+      b.addEventListener('focus', () => { if (!b.innerHTML.trim()) { b.innerHTML = '<p><br></p>'; const r = document.createRange(); r.setStart(b.firstChild, 0); r.collapse(true); getSelection().removeAllRanges(); getSelection().addRange(r); } });
+    });
+    bodies.forEach(b => new MutationObserver(() => addCaptions(b)).observe(b, { childList: true }));
     async function upload(file) {
       status('Загружаю картинку…');
       const blob = await shrink(file);

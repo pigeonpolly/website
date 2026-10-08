@@ -1893,3 +1893,8 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .bl-card h2 { font-weight: 700; }
 #blk-home-blog .hb-main h3, #blk-home-blog .hb-side b, #blk-home-blog .hb-ex, #blk-home-blog .hb-soon h3 { font-family: var(--article); }
 .be-pane input[data-k^="t_"] { font-family: var(--article); font-weight: 700; }
+/* подписи к картинкам: наклонный шрифт сайта (как раньше), в редакторе — место для подписи */
+.bp-body figcaption { font-family: var(--sans); font-style: italic; font-size: 16px; }
+.be-body figcaption { min-height: 1.5em; margin-top: 8px; padding: 2px 8px; border-radius: 8px; outline: 1px dashed transparent; }
+.be-body figcaption:hover, .be-body figcaption:focus { outline-color: #C8C2D8; }
+.be-body figcaption:empty::before { content: 'Подпись к картинке… (можно оставить пустой)'; color: #B3AACB; }
