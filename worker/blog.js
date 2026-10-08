@@ -15,7 +15,7 @@ const T = {
     comments: 'Comments', noComments: 'No comments yet. Be the first!', back: '← All posts', tagged: 'Posts tagged',
     min: 'min read', share: 'Share', copy: 'Copy link', copied: 'Link copied ✓', email: 'E-mail', draft: 'Draft', read: 'Read →', months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     descr: 'Notes on drawing, learning and creativity by Alina Otkinska and Pigeon Polly.',
-    featured: '★ Favourites', archive: 'Archive', inMonth: 'Posts from', onlyFav: 'My favourite posts', allSections: 'All', search: 'Search the blog…', searchBtn: 'Search', found: 'Search results for', nothing: 'Nothing found. Try another word.', prev: '← Newer', next: 'Older →', section: 'Section',
+    featured: '★ Favourites', archive: 'Archive', inMonth: 'Posts from', onlyFav: 'My favourite posts', allSections: 'All', search: 'Search the blog…', searchBtn: 'Search', found: 'Search results for', nothing: 'Nothing found. Try another word.', prev: '← Newer', next: 'Older →', section: 'Section', sections: 'Sections',
     monthsFull: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
   },
   ru: {
@@ -24,7 +24,7 @@ const T = {
     comments: 'Комментарии', noComments: 'Комментариев пока нет. Будьте первым!', back: '← Все статьи', tagged: 'Статьи с тегом',
     min: 'мин чтения', share: 'Поделиться', copy: 'Скопировать ссылку', copied: 'Ссылка скопирована ✓', email: 'Почта', draft: 'Черновик', read: 'Читать →', months: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
     descr: 'Заметки о рисовании, обучении и творчестве от Алины Откинской и голубя Полли.',
-    featured: '★ Избранное', archive: 'Архив', inMonth: 'Статьи за', onlyFav: 'Мои избранные статьи', allSections: 'Все', search: 'Поиск по блогу…', searchBtn: 'Найти', found: 'Результаты поиска', nothing: 'Ничего не нашлось. Попробуйте другое слово.', prev: '← Новее', next: 'Старше →', section: 'Раздел',
+    featured: '★ Избранное', archive: 'Архив', inMonth: 'Статьи за', onlyFav: 'Мои избранные статьи', allSections: 'Все', search: 'Поиск по блогу…', searchBtn: 'Найти', found: 'Результаты поиска', nothing: 'Ничего не нашлось. Попробуйте другое слово.', prev: '← Новее', next: 'Старше →', section: 'Раздел', sections: 'Разделы',
     monthsFull: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
   },
   lv: {
@@ -33,7 +33,7 @@ const T = {
     comments: 'Komentāri', noComments: 'Komentāru vēl nav. Esi pirmais!', back: '← Visi raksti', tagged: 'Raksti ar birku',
     min: 'min lasīšanas', share: 'Dalīties', copy: 'Kopēt saiti', copied: 'Saite nokopēta ✓', email: 'E-pasts', draft: 'Melnraksts', read: 'Lasīt →', months: ['janv.', 'febr.', 'marts', 'apr.', 'maijs', 'jūn.', 'jūl.', 'aug.', 'sept.', 'okt.', 'nov.', 'dec.'],
     descr: 'Piezīmes par zīmēšanu, mācīšanos un radošumu no Alīnas Otkinskas un baloža Pollijas.',
-    featured: '★ Izlase', archive: 'Arhīvs', inMonth: 'Raksti par', onlyFav: 'Mani izlases raksti', allSections: 'Visi', search: 'Meklēt blogā…', searchBtn: 'Meklēt', found: 'Meklēšanas rezultāti', nothing: 'Nekas netika atrasts. Pamēģiniet citu vārdu.', prev: '← Jaunāki', next: 'Vecāki →', section: 'Sadaļa',
+    featured: '★ Izlase', archive: 'Arhīvs', inMonth: 'Raksti par', onlyFav: 'Mani izlases raksti', allSections: 'Visi', search: 'Meklēt blogā…', searchBtn: 'Meklēt', found: 'Meklēšanas rezultāti', nothing: 'Nekas netika atrasts. Pamēģiniet citu vārdu.', prev: '← Jaunāki', next: 'Vecāki →', section: 'Sadaļa', sections: 'Sadaļas',
     monthsFull: ['janvāris', 'februāris', 'marts', 'aprīlis', 'maijs', 'jūnijs', 'jūlijs', 'augusts', 'septembris', 'oktobris', 'novembris', 'decembris'],
   },
 };
@@ -777,8 +777,12 @@ function card(p, lang) {
 }
 
 const ym = p => new Date((p.published_at || p.updated_at) * 1000).toISOString().slice(0, 7);
-function sidebar(posts, lang, activeTag, activeMonth = '', post = false) {
+function sidebar(posts, lang, activeTag, activeMonth = '', post = false, activeSection = '') {
   const t = T[lang], count = {};
+  // разделы (как коллекции на Patreon) — только те, где есть опубликованные статьи
+  const secCount = {};
+  for (const p of posts) if (p.section) secCount[p.section] = (secCount[p.section] || 0) + 1;
+  const secs = SECTIONS.filter(x => secCount[x.slug]);
   const fav = posts.filter(p => p.featured).slice(0, 5);
   const months = {};
   for (const p of posts) { const k = ym(p); months[k] = (months[k] || 0) + 1; }
@@ -791,6 +795,8 @@ function sidebar(posts, lang, activeTag, activeMonth = '', post = false) {
   return `<aside class="bl-side">
     ${fav.length ? `<section><h2>★ ${t.featured.replace(/^★\s*/, '')}</h2>${list(fav)}
       ${!post && fav.length > 1 ? `<p class="bl-more"><a href="${blogUrl(lang, '', '?fav=1')}">${t.onlyFav} →</a></p>` : ''}</section>` : ''}
+    ${secs.length ? `<section><h2>${t.sections}</h2><ul class="bs-secs">${secs.map(x =>
+      `<li><a href="${blogUrl(lang, '', '?section=' + encodeURIComponent(x.slug))}"${x.slug === activeSection ? ' aria-current="true"' : ''}>${esc(x[lang] || x.en)}</a> <span>${secCount[x.slug]}</span></li>`).join('')}</ul></section>` : ''}
     ${tags.length ? `<section><h2>${t.tags}</h2><p class="bs-tags">${tags.map(([g, n], i) =>
       `<a class="bs-tag${i === 0 ? ' gold' : i < 4 ? ' violet' : ''}" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}"${g === activeTag ? ' aria-current="true"' : ''}>${esc(tagLabel(g, lang))}<span>${n}</span></a>`).join('')}</p></section>` : ''}
     ${years.length ? `<section><h2>${t.archive}</h2><ul class="bl-arch">${years.map(y => `<li><b>${y}</b><ul>${Object.keys(months).filter(k => k.startsWith(y)).sort().reverse().map(k =>
@@ -893,7 +899,7 @@ export async function blogPage(req, env, url, h) {
         ${filtered && (label || section) ? `<p class="bl-filter">${label || `<b>${esc(sectionName(section, lang))}</b>`} · <a href="${blogUrl(lang, '')}">${t.all}</a></p>` : ''}
         ${shown.map(x => card(x, lang)).join('') || `<p class="bl-empty">${q ? t.nothing : t.empty}</p>`}
         ${pager}
-      </div>${sidebar(published, lang, tag, month)}</div>
+      </div>${sidebar(published, lang, tag, month, false, section)}</div>
       <script src="/assets/blog.js" defer></script>`;
     return html(fill(tpl, { title: `${t.blog} · Pigeon Polly Art Lab`, description: t.descr, canonical: SITE + blogUrl(lang, ''), content, noindex: !!filtered }));
   }
