@@ -265,7 +265,7 @@
           <div class="sw-bar"><i style="width:${progress}%"></i></div>
           <p class="sw-next">${next ? t('toNext', next.d - me.best, next.n[L]) : t('maxLevel')}</p></div>
         <div class="sw-badges"><h3>${t('badges')}</h3><div>${LEVELS.map(l => medal(l, me.best >= l.d, false, 'button')).join('')}${SPECIAL.map(s => medal(s, stateOf(s, got), false, 'button')).join('')}</div><p class="sw-how" id="sw-how">${t('tapBadge')}</p></div>
-        <p class="sw-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a>${me.admin ? ` · <b>admin</b> · ${t('storage')}: ${me.storage ?? 0}%` : ''}</p>
+        <p class="sw-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a>${me.admin ? ` · <b>admin</b> · ${t('storage')}: ${me.storage ?? 0}%${me.migration && me.migration.total ? ` · R2: ${me.migration.r2 + me.migration.missing >= me.migration.total ? `✓ ${me.migration.r2}/${me.migration.total}` : `${me.migration.r2}/${me.migration.total}…`}` : ''}` : ''}</p>
       </div>
       <form class="sw-card sw-upload" id="sw-up">
         <div class="ch-level sw-days" role="group">${dayBtns}</div>

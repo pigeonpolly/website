@@ -1,6 +1,6 @@
 // Сервер сайта: отдаёт статические файлы из site/ и обслуживает /api/* для «Стены рисунков»:
 // вход через Google, ник, загрузка работы дня, серии, стена, топ, модерация, GDPR (экспорт и удаление).
-// Данные — Cloudflare D1 (env.DB), картинки — Cloudflare KV (env.IMAGES). Блог — worker/blog.js (картинки блога в R2, env.MEDIA).
+// Данные — Cloudflare D1 (env.DB), картинки челленджа — R2 (env.MEDIA, папка challenge/), старые ещё и в KV (env.IMAGES), пока идёт перенос. Блог — worker/blog.js (картинки блога в R2, env.MEDIA).
 import { blogApi, blogPage } from './blog.js';
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
@@ -31,11 +31,11 @@ export default {
       return json({ error: 'server' }, 500);
     }
   },
-  // раз в сутки (cron в wrangler.jsonc): чистим картинки тех, кто пропал больше чем на 30 дней
+  // раз в час (cron в wrangler.jsonc): переносим порцию старых картинок из KV в R2 и, если хранилище почти полное, чистим картинки давно пропавших
   async scheduled(event, env, ctx) {
     if (!env.DB || !env.IMAGES) return;
     await ensureSchema(env);
-    ctx.waitUntil(cleanupInactive(env));
+    ctx.waitUntil((async () => { await migrateToR2(env); await cleanupInactive(env); })());
   },
 };
 
@@ -66,7 +66,9 @@ async function ensureSchema(env) {
   for (const sql of ['ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
     "ALTER TABLE users ADD COLUMN months TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN tod INTEGER',
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
-    "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER']) {
+    "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
+    // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   schemaReady = true;
@@ -190,6 +192,59 @@ function isVeteran(u) {
 }
 const mergedBadges = (u, posts) => [...new Set([...String(u.badges || '').split(',').filter(Boolean), ...badgesOf(posts, monthsOf(u)), ...(isVeteran(u) ? ['veteran'] : [])])];
 
+// ---------- картинки работ: R2 (новые и перенесённые) или KV (старые, пока не перенесены) ----------
+const r2Key = (kind, id) => `challenge/${kind}/${id}.jpg`; // kind: i — полная, t — превью
+const R2_LIMIT = 10e9; // бесплатные 10 ГБ R2
+async function imgPut(env, id, fb, tb) {
+  if (env.MEDIA) {
+    const meta = { httpMetadata: { contentType: 'image/jpeg', cacheControl: 'public, max-age=31536000, immutable' } };
+    await Promise.all([env.MEDIA.put(r2Key('i', id), fb, meta), env.MEDIA.put(r2Key('t', id), tb, meta)]);
+    return { store: 'r2', kv: 0 };
+  }
+  await env.IMAGES.put('i/' + id, fb, { metadata: { type: 'image/jpeg' } });
+  await env.IMAGES.put('t/' + id, tb, { metadata: { type: 'image/jpeg' } });
+  return { store: null, kv: 1 };
+}
+async function imgGet(env, kind, id) {
+  if (env.MEDIA) { const o = await env.MEDIA.get(r2Key(kind, id)); if (o) return o.arrayBuffer(); }
+  return env.IMAGES.get(kind + '/' + id, 'arrayBuffer'); // ещё не перенесена — из KV
+}
+// удалить картинки работы отовсюду, где они лежат; возвращает число удалений в KV (их бесплатно 1000 в сутки)
+async function imgDelete(env, post) {
+  const jobs = [];
+  if (post.store === 'r2' && env.MEDIA) jobs.push(env.MEDIA.delete([r2Key('i', post.id), r2Key('t', post.id)]));
+  if (post.kv !== 0) jobs.push(env.IMAGES.delete('i/' + post.id), env.IMAGES.delete('t/' + post.id));
+  await Promise.all(jobs);
+  return post.kv !== 0 ? 2 : 0;
+}
+// перенос старых работ из KV в R2 порциями: копируем, сверяем размер, отмечаем store = 'r2'. Копия в KV остаётся.
+async function migrateToR2(env, batch = 100) {
+  if (!env.MEDIA) return { moved: 0 };
+  const rows = (await env.DB.prepare("SELECT id FROM posts WHERE store IS NULL ORDER BY created_at LIMIT ?").bind(batch).all()).results;
+  let moved = 0, missing = 0, failed = 0;
+  for (const { id } of rows) {
+    try {
+      const [a, b] = await Promise.all([env.IMAGES.get('i/' + id, 'arrayBuffer'), env.IMAGES.get('t/' + id, 'arrayBuffer')]);
+      if (!a || !b) { missing++; await env.DB.prepare("UPDATE posts SET store = 'missing' WHERE id = ?").bind(id).run(); continue; } // в KV нет — нечего переносить
+      const meta = { httpMetadata: { contentType: 'image/jpeg', cacheControl: 'public, max-age=31536000, immutable' } };
+      const [x, y] = await Promise.all([env.MEDIA.put(r2Key('i', id), a, meta), env.MEDIA.put(r2Key('t', id), b, meta)]);
+      if (!x || !y || x.size !== a.byteLength || y.size !== b.byteLength) { failed++; continue; } // не совпало — попробуем в следующий раз
+      await env.DB.prepare("UPDATE posts SET store = 'r2' WHERE id = ?").bind(id).run();
+      moved++;
+    } catch (e) { failed++; }
+  }
+  return { moved, missing, failed };
+}
+async function migrationStatus(env) {
+  const r = await env.DB.prepare("SELECT COUNT(*) AS total, SUM(CASE WHEN store = 'r2' THEN 1 ELSE 0 END) AS r2, SUM(CASE WHEN store = 'missing' THEN 1 ELSE 0 END) AS missing, SUM(CASE WHEN kv = 1 THEN 1 ELSE 0 END) AS kv FROM posts").first();
+  return { total: r.total || 0, r2: r.r2 || 0, missing: r.missing || 0, kv: r.kv || 0 };
+}
+// занятость хранилища: KV (1 ГБ) — то, что ещё лежит в KV; R2 (10 ГБ) — перенесённое и новое; считаем по более заполненному
+async function storageUsed(env) {
+  const r = await env.DB.prepare("SELECT COALESCE(SUM(CASE WHEN kv = 1 THEN bytes ELSE 0 END), 0) AS kv, COALESCE(SUM(CASE WHEN store = 'r2' THEN bytes ELSE 0 END), 0) AS r2 FROM posts").first();
+  return Math.max(r.kv / KV_LIMIT, r.r2 / R2_LIMIT);
+}
+
 // Очистка (решение Алины): удаляем, только когда картинки заняли ≥85% бесплатного KV (1 ГБ).
 // Тогда удаляем работы тех, кто больше 3 месяцев ничего не загружал И не заходил на сайт, начиная с самых давно пропавших, пока не станет <80%.
 const KV_LIMIT = 1e9, CLEAN_START = 0.85, CLEAN_STOP = 0.8;
@@ -197,27 +252,30 @@ async function cleanupInactive(env, limit = KV_LIMIT) {
   // вес работ, загруженных до появления учёта, считаем один раз
   const unknown = (await env.DB.prepare('SELECT id FROM posts WHERE bytes IS NULL LIMIT 200').all()).results;
   for (const p of unknown) {
-    const [a, b] = await Promise.all([env.IMAGES.get('i/' + p.id, 'arrayBuffer'), env.IMAGES.get('t/' + p.id, 'arrayBuffer')]);
+    const [a, b] = await Promise.all([imgGet(env, 'i', p.id), imgGet(env, 't', p.id)]);
     await env.DB.prepare('UPDATE posts SET bytes = ? WHERE id = ?').bind((a?.byteLength || 0) + (b?.byteLength || 0), p.id).run();
   }
-  let used = (await env.DB.prepare('SELECT COALESCE(SUM(bytes), 0) AS n FROM posts').first()).n;
-  const report = { used, limit, percent: Math.round(used / limit * 1000) / 10, users: 0, deletes: 0 };
-  if (used < limit * CLEAN_START) return report;
+  // занято: в KV (лимит limit) и в R2 (в 10 раз больше); решает более заполненное
+  const r = await env.DB.prepare("SELECT COALESCE(SUM(CASE WHEN kv = 1 THEN bytes ELSE 0 END), 0) AS kv, COALESCE(SUM(CASE WHEN store = 'r2' THEN bytes ELSE 0 END), 0) AS r2 FROM posts").first();
+  let kvUsed = r.kv, r2Used = r.r2;
+  const frac = () => Math.max(kvUsed / limit, r2Used / (limit * R2_LIMIT / KV_LIMIT));
+  const report = { kv: kvUsed, r2: r2Used, limit, percent: Math.round(frac() * 1000) / 10, users: 0, deletes: 0 };
+  if (frac() < CLEAN_START) return report;
   const cutoff = new Date((utcToday() - INACTIVE_DAYS) * 864e5).toISOString().slice(0, 10);
   const users = (await env.DB.prepare(`SELECT u.*, MAX(p.day) AS last FROM users u JOIN posts p ON p.user_id = u.id
     WHERE COALESCE(u.last_seen, 0) < ? GROUP BY u.id HAVING last < ? ORDER BY last ASC LIMIT 200`).bind(now() - INACTIVE_DAYS * 86400, cutoff).all()).results;
   for (const u of users) {
-    if (used < limit * CLEAN_STOP) break;
+    if (frac() < CLEAN_STOP) break;
     if (await isAdmin(u, env)) continue; // работы Алины не удаляются, пока она сама их не удалит
-    const posts = (await env.DB.prepare('SELECT id, day, bw, tod, bytes FROM posts WHERE user_id = ?').bind(u.id).all()).results;
-    if (report.deletes + posts.length * 2 > 900) break; // бесплатный лимит KV — 1000 удалений в сутки
+    const posts = (await env.DB.prepare('SELECT id, day, bw, tod, bytes, store, kv FROM posts WHERE user_id = ?').bind(u.id).all()).results;
+    if (report.deletes + posts.filter(x => x.kv !== 0).length * 2 > 900) break; // бесплатный лимит KV — 1000 удалений в сутки
     await env.DB.prepare('UPDATE users SET best = ?, badges = ? WHERE id = ?')
       .bind(mergedBest(u, posts.map(p => p.day)), mergedBadges(u, posts).join(','), u.id).run();
-    for (const p of posts) { await env.IMAGES.delete('i/' + p.id); await env.IMAGES.delete('t/' + p.id); report.deletes += 2; used -= p.bytes || 0; }
+    for (const p of posts) { report.deletes += await imgDelete(env, p); if (p.kv !== 0) kvUsed -= p.bytes || 0; if (p.store === 'r2') r2Used -= p.bytes || 0; }
     await env.DB.prepare('DELETE FROM posts WHERE user_id = ?').bind(u.id).run();
     report.users++;
   }
-  report.usedAfter = used;
+  report.percentAfter = Math.round(frac() * 1000) / 10;
   return report;
 }
 
@@ -240,6 +298,7 @@ async function addBadge(env, uid, badge) {
 // ---------- маршруты ----------
 async function route(req, env, url) {
   const p = url.pathname, m = req.method;
+  if (m === 'POST' && p === '/api/dev/migrate' && env.DEV_FAKE_LOGIN === '1') return json({ ...(await migrateToR2(env, Number(url.searchParams.get('batch')) || 100)), status: await migrationStatus(env) });
   if (m === 'POST' && p === '/api/dev/cleanup' && env.DEV_FAKE_LOGIN === '1') return json(await cleanupInactive(env, Number(url.searchParams.get('limit')) || KV_LIMIT));
   // публичный профиль: ник, серия, рекорд, бейджи и работы на стене (e-mail не отдаём)
   if (m === 'GET' && p === '/api/profile') {
@@ -314,8 +373,9 @@ async function route(req, env, url) {
     const kept = mergedBadges(u, rows).filter(b => b !== 'pick_past' || pickUser !== u.id);
     if (pickUser === u.id) kept.push('pick');
     const admin = await isAdmin(u, env);
-    const storage = admin ? Math.round((await env.DB.prepare('SELECT COALESCE(SUM(bytes), 0) AS n FROM posts').first()).n / KV_LIMIT * 1000) / 10 : undefined;
-    return json({ user: { storage, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
+    const storage = admin ? Math.round(await storageUsed(env) * 1000) / 10 : undefined;
+    const migration = admin && env.MEDIA ? await migrationStatus(env) : undefined;
+    return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
       best: mergedBest(u, rows.map(r => r.day)), keptBadges: kept, posts: rows } });
   }
 
@@ -343,19 +403,18 @@ async function route(req, env, url) {
     const fb = await full.arrayBuffer(), tb = await thumb.arrayBuffer();
     const isJpeg = b => { const a = new Uint8Array(b, 0, 3); return a[0] === 0xff && a[1] === 0xd8 && a[2] === 0xff; };
     if (!isJpeg(fb) || !isJpeg(tb)) fail(400, 'file');
-    const old = await env.DB.prepare('SELECT id FROM posts WHERE user_id = ? AND day = ?').bind(u.id, day).first();
+    const old = await env.DB.prepare('SELECT id, store, kv FROM posts WHERE user_id = ? AND day = ?').bind(u.id, day).first();
     const id = randomHex(12);
-    await env.IMAGES.put('i/' + id, fb, { metadata: { type: 'image/jpeg' } });
-    await env.IMAGES.put('t/' + id, tb, { metadata: { type: 'image/jpeg' } });
+    const where = await imgPut(env, id, fb, tb);
     if (old) {
       await env.DB.prepare('DELETE FROM posts WHERE id = ?').bind(old.id).run();
-      await Promise.all([env.IMAGES.delete('i/' + old.id), env.IMAGES.delete('t/' + old.id)]);
+      await imgDelete(env, old);
     }
     if (!old) await bump(env, 'works_total', 'SELECT COUNT(*) + 1 AS n FROM posts'); // замена работы дня не считается
     const tod = Number(f.get('tod'));
-    await env.DB.prepare('INSERT INTO posts (id, user_id, day, theme, bw, tod, bytes, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)')
+    await env.DB.prepare('INSERT INTO posts (id, user_id, day, theme, bw, tod, bytes, created_at, store, kv) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
       .bind(id, u.id, day, String(f.get('theme') || '').slice(0, 120), f.get('bw') === '1' ? 1 : 0,
-        Number.isInteger(tod) && tod >= 0 && tod < 1440 ? tod : null, fb.byteLength + tb.byteLength, now()).run();
+        Number.isInteger(tod) && tod >= 0 && tod < 1440 ? tod : null, fb.byteLength + tb.byteLength, now(), where.store, where.kv).run();
     // бейджи и рекорд записываем сразу — их не отнимет ни очистка, ни пропуск
     const months = [...new Set([...monthsOf(u), day.slice(0, 7)])].sort().slice(-24);
     const mc = mcountOf(u);
@@ -374,7 +433,7 @@ async function route(req, env, url) {
     const post = await env.DB.prepare('SELECT * FROM posts WHERE id = ?').bind(String(id)).first();
     if (!post || post.user_id !== u.id) fail(404, 'post');
     await env.DB.prepare('DELETE FROM posts WHERE id = ?').bind(post.id).run();
-    await Promise.all([env.IMAGES.delete('i/' + post.id), env.IMAGES.delete('t/' + post.id)]);
+    await imgDelete(env, post);
     return json({ ok: true });
   }
 
@@ -404,7 +463,7 @@ async function route(req, env, url) {
 
   const img = p.match(/^\/api\/img\/([0-9a-f]{24})$/);
   if (m === 'GET' && img) {
-    const v = await env.IMAGES.get((url.searchParams.get('t') ? 't/' : 'i/') + img[1], 'arrayBuffer');
+    const v = await imgGet(env, url.searchParams.get('t') ? 't' : 'i', img[1]);
     if (!v) return new Response('Not found', { status: 404 });
     return new Response(v, { headers: { 'content-type': 'image/jpeg', 'cache-control': 'public, max-age=31536000, immutable' } });
   }
@@ -424,8 +483,8 @@ async function route(req, env, url) {
   if (m === 'POST' && p === '/api/delete-account') {
     const u = await currentUser(req, env);
     if (!u) fail(401, 'login');
-    const posts = (await env.DB.prepare('SELECT id FROM posts WHERE user_id = ?').bind(u.id).all()).results;
-    await Promise.all(posts.flatMap(x => [env.IMAGES.delete('i/' + x.id), env.IMAGES.delete('t/' + x.id)]));
+    const posts = (await env.DB.prepare('SELECT id, store, kv FROM posts WHERE user_id = ?').bind(u.id).all()).results;
+    await Promise.all(posts.map(x => imgDelete(env, x)));
     await env.DB.batch([
       env.DB.prepare('DELETE FROM posts WHERE user_id = ?').bind(u.id),
       env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(u.id),
