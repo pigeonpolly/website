@@ -258,6 +258,9 @@
       const others = LANGS.map(x => x[0]).filter(x => x !== active).map(x => x.toUpperCase());
       $('#be-tr').textContent = `🌐 Перевести с ${active.toUpperCase()} на ${others.join(' и ')}`;
     }));
+    // открываем вкладку языка оригинала (если не указан — первую, где есть текст)
+    const startLang = post.src_lang || LANGS.map(x => x[0]).find(l => post['t_' + l] || stripHtml(post['b_' + l])) || 'ru';
+    if (startLang !== 'ru') app.querySelector(`[data-tab="${startLang}"]`).click();
 
     // панель инструментов
     let lastRange = null;
