@@ -56,7 +56,15 @@ const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': 
 // текст на языке читателя, а если перевода нет — на любом заполненном
 const field = (p, k, lang) => p[`${k}_${lang}`] || p[`${k}_ru`] || p[`${k}_en`] || p[`${k}_lv`] || '';
 const langOf = (p, lang) => p['t_' + lang] ? lang : ['ru', 'en', 'lv'].find(l => p['t_' + l]) || lang;
-const tagsOf = (p, lang) => String(field(p, 'tags', lang)).split(',').map(s => s.trim()).filter(Boolean);
+// теги: в статье хранится английский тег (tags_en), перевод — общий словарь blog_tags (en → ru, lv), правится во вкладке «Теги»
+const splitTags = s => String(s || '').split(',').map(x => x.trim().toLowerCase().replace(/^#/, '')).filter(Boolean);
+const tagsOf = p => splitTags(p.tags_en || p.tags_ru || p.tags_lv);
+let TAGMAP = {};
+const tagLabel = (g, lang) => (lang !== 'en' && TAGMAP[g] && TAGMAP[g][lang]) || g;
+async function loadTags(env) {
+  TAGMAP = {};
+  for (const r of (await env.DB.prepare('SELECT en, ru, lv FROM blog_tags').all()).results) TAGMAP[r.en] = r;
+}
 const stripTags = s => String(s || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
 const fmtDate = (ts, lang) => { const d = new Date(ts * 1000); return `${d.getUTCDate()} ${T[lang].months[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
 const blogUrl = (lang, slug, q = '') => `${PREFIX[lang]}/blog/${slug ? slug + '/' : ''}${q}`;
@@ -80,6 +88,19 @@ async function ensureBlogSchema(env) {
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN featured INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ }
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN pinned INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ }
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN src_lang TEXT').run(); } catch (e) { /* уже есть */ }
+  await env.DB.prepare(`CREATE TABLE IF NOT EXISTS blog_tags (en TEXT PRIMARY KEY, ru TEXT DEFAULT '', lv TEXT DEFAULT '')`).run();
+  // один раз: переносим уже существующие теги статей в словарь (перевод берём из тегов RU/LV той же статьи по порядку)
+  const done = await env.DB.prepare("SELECT value FROM meta WHERE key = 'blog_tags_v1'").first().catch(() => null);
+  if (!done) {
+    for (const p of (await env.DB.prepare('SELECT tags_en, tags_ru, tags_lv FROM blog_posts').all()).results) {
+      const en = splitTags(p.tags_en), ru = splitTags(p.tags_ru), lv = splitTags(p.tags_lv);
+      for (const [i, g] of en.entries()) {
+        await env.DB.prepare("INSERT INTO blog_tags (en, ru, lv) VALUES (?, ?, ?) ON CONFLICT(en) DO UPDATE SET ru = CASE WHEN blog_tags.ru = '' THEN excluded.ru ELSE blog_tags.ru END, lv = CASE WHEN blog_tags.lv = '' THEN excluded.lv ELSE blog_tags.lv END")
+          .bind(g, en.length === ru.length ? ru[i] : '', en.length === lv.length ? lv[i] : '').run();
+      }
+    }
+    await env.DB.prepare("INSERT INTO meta (key, value) VALUES ('blog_tags_v1', '1') ON CONFLICT(key) DO UPDATE SET value = '1'").run().catch(() => {});
+  }
   ready = true;
 }
 
@@ -200,9 +221,10 @@ export async function blogApi(req, env, url, h) {
   // блок блога на главной: самая новая статья + избранные (★)
   if (m === 'GET' && p === '/api/blog/home') {
     const lang = LANGS.includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
+    await loadTags(env);
     const rows = (await env.DB.prepare(`SELECT * FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC`).all()).results;
     const pack = x => ({ url: blogUrl(lang, x.slug), title: field(x, 't', lang), excerpt: field(x, 'd', lang) || stripTags(field(x, 'b', lang)).slice(0, 200),
-      cover: x.cover, date: fmtDate(x.published_at, lang), tags: tagsOf(x, lang).slice(0, 3), likes: x.likes });
+      cover: x.cover, date: fmtDate(x.published_at, lang), tags: tagsOf(x).slice(0, 3).map(g => tagLabel(g, lang)), likes: x.likes });
     const latest = rows[0] || null; // крупно — самая новая статья
     const featured = rows.filter(x => x.featured && x !== latest).slice(0, 3); // справа — три последние со ★ (кроме той, что уже крупно)
     return json({ latest: latest && pack(latest), featured: featured.map(x => ({ ...pack(x), star: true })) });
@@ -232,11 +254,19 @@ export async function blogApi(req, env, url, h) {
       for (const l of LANGS) {
         f['t_' + l] = String(b['t_' + l] || '').trim().slice(0, 200);
         f['d_' + l] = String(b['d_' + l] || '').trim().slice(0, 400);
-        f['tags_' + l] = String(b['tags_' + l] || '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean).slice(0, 12).join(', ');
         f['b_' + l] = await cleanHtml(String(b['b_' + l] || '').replace(/<img[^>]+src="data:[^"]*"[^>]*>/gi, '')); // картинки-«data:» в базу не кладём
         if (f['b_' + l].length > 900_000) fail(413, 'too_big');
       }
       if (!f.t_ru && !f.t_en && !f.t_lv) fail(400, 'title');
+      // теги — на английском; новые сразу добавляем в словарь и стараемся перевести (потом можно поправить во вкладке «Теги»)
+      const tagList = [...new Set(splitTags(b.tags_en))].slice(0, 12);
+      await loadTags(env);
+      const untranslated = g => !TAGMAP[g] || !TAGMAP[g].ru || !TAGMAP[g].lv || TAGMAP[g].ru === g || TAGMAP[g].lv === g;
+      const fresh = tagList.filter(untranslated);
+      if (fresh.length) await translateTags(env, fresh);
+      f.tags_en = tagList.join(', ');
+      f.tags_ru = tagList.map(g => tagLabel(g, 'ru')).join(', ');
+      f.tags_lv = tagList.map(g => tagLabel(g, 'lv')).join(', ');
       let cover = safeUrl(b.cover || '') ? String(b.cover).trim() : '';
       // картинки, вставленные из Google Docs, живут там временно — копируем их в своё хранилище
       // картинки из Google Docs копируются в редакторе сразу при вставке (fetch-image), здесь сохраняем быстро
@@ -291,10 +321,36 @@ export async function blogApi(req, env, url, h) {
       await env.DB.prepare('UPDATE blog_posts SET featured = ? WHERE id = ?').bind(featured ? 1 : 0, Number(id)).run();
       return json({ ok: true });
     }
-    // тег во всех статьях сразу: переименовать (to) или удалить (to пустой)
+    // словарь тегов: список со счётчиками, правка перевода, перевод пустых
+    if (m === 'GET' && a === 'tags') {
+      await loadTags(env);
+      const count = {};
+      for (const p of (await env.DB.prepare('SELECT tags_en, tags_ru, tags_lv FROM blog_posts').all()).results) for (const g of tagsOf(p)) count[g] = (count[g] || 0) + 1;
+      const keys = Object.keys(count).sort();
+      return json({ tags: keys.map(g => ({ en: g, ru: TAGMAP[g]?.ru || '', lv: TAGMAP[g]?.lv || '', count: count[g] })) });
+    }
+    if (m === 'POST' && a === 'tag-set') {
+      const b = await body();
+      const en = String(b.en || '').trim().toLowerCase();
+      if (!en) fail(400, 'bad');
+      const clean = v => String(v || '').trim().toLowerCase().replace(/^#/, '').replace(/,/g, ' ').slice(0, 60);
+      await env.DB.prepare('INSERT INTO blog_tags (en, ru, lv) VALUES (?, ?, ?) ON CONFLICT(en) DO UPDATE SET ru = excluded.ru, lv = excluded.lv').bind(en, clean(b.ru), clean(b.lv)).run();
+      await syncTagColumns(env);
+      return json({ ok: true });
+    }
+    if (m === 'POST' && a === 'tags-translate') {
+      await loadTags(env);
+      const count = {};
+      for (const p of (await env.DB.prepare('SELECT tags_en, tags_ru, tags_lv FROM blog_posts').all()).results) for (const g of tagsOf(p)) count[g] = 1;
+      const todo = Object.keys(count).filter(g => !TAGMAP[g] || !TAGMAP[g].ru || !TAGMAP[g].lv || TAGMAP[g].ru === g || TAGMAP[g].lv === g);
+      if (todo.length) await translateTags(env, todo);
+      await syncTagColumns(env);
+      return json({ ok: true, translated: todo.length });
+    }
+    // тег во всех статьях сразу: переименовать (to) или удалить (to пустой); теги статей — английские
     if (m === 'POST' && a === 'tag') {
       const b = await body();
-      if (!LANGS.includes(b.lang)) fail(400, 'bad');
+      b.lang = 'en';
       const col = 'tags_' + b.lang, from = String(b.from || '').trim().toLowerCase(), to = String(b.to || '').trim().toLowerCase().replace(/^#/, '').replace(/,/g, ' ');
       if (!from) fail(400, 'bad');
       const rows = (await env.DB.prepare(`SELECT id, ${col} AS t FROM blog_posts`).all()).results;
@@ -306,6 +362,11 @@ export async function blogApi(req, env, url, h) {
         await env.DB.prepare(`UPDATE blog_posts SET ${col} = ? WHERE id = ?`).bind(next, r.id).run();
         n++;
       }
+      // словарь: при переименовании переносим перевод на новое имя, при удалении — убираем
+      const old = await env.DB.prepare('SELECT ru, lv FROM blog_tags WHERE en = ?').bind(from).first();
+      if (to && old) await env.DB.prepare('INSERT INTO blog_tags (en, ru, lv) VALUES (?, ?, ?) ON CONFLICT(en) DO NOTHING').bind(to, old.ru, old.lv).run();
+      await env.DB.prepare('DELETE FROM blog_tags WHERE en = ?').bind(from).run();
+      await syncTagColumns(env);
       return json({ ok: true, posts: n });
     }
     if (m === 'POST' && a === 'settings') {
@@ -463,6 +524,27 @@ async function translateAll(env, texts, from, to) {
   return { texts: out, engine: 'cloudflare' };
 }
 
+// перевод тегов словаря на RU и LV (Gemini или запасной переводчик); не получилось — тег останется английским, его можно перевести вручную
+async function translateTags(env, list) {
+  for (const l of ['ru', 'lv']) {
+    let out = [];
+    try { out = (await translateAll(env, list, 'en', l)).texts; } catch (e) { out = []; }
+    for (const [i, g] of list.entries()) {
+      const v = String(out[i] || '').trim().toLowerCase().replace(/^#/, '').replace(/[,.]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 60);
+      await env.DB.prepare(`INSERT INTO blog_tags (en, ${l}) VALUES (?, ?) ON CONFLICT(en) DO UPDATE SET ${l} = CASE WHEN blog_tags.${l} = '' OR blog_tags.${l} = blog_tags.en THEN excluded.${l} ELSE blog_tags.${l} END`).bind(g, v).run();
+    }
+  }
+  await loadTags(env);
+}
+// переводы тегов, сохранённые в самих статьях (tags_ru/tags_lv), держим в согласии со словарём
+async function syncTagColumns(env) {
+  await loadTags(env);
+  for (const p of (await env.DB.prepare('SELECT id, tags_en, tags_ru, tags_lv FROM blog_posts').all()).results) {
+    const list = tagsOf(p);
+    await env.DB.prepare('UPDATE blog_posts SET tags_ru = ?, tags_lv = ? WHERE id = ?').bind(list.map(g => tagLabel(g, 'ru')).join(', '), list.map(g => tagLabel(g, 'lv')).join(', '), p.id).run();
+  }
+}
+
 // ---------- страницы ----------
 function commentHtml(c, lang) {
   const name = c.nick
@@ -473,7 +555,7 @@ function commentHtml(c, lang) {
 }
 
 function card(p, lang) {
-  const t = T[lang], tags = tagsOf(p, lang);
+  const t = T[lang], tags = tagsOf(p);
   const words = stripTags(field(p, 'b', lang)).split(' ').length;
   const excerpt = field(p, 'd', lang) || stripTags(field(p, 'b', lang)).slice(0, 180) + '…';
   return `<article class="bl-card">
@@ -482,7 +564,7 @@ function card(p, lang) {
       <p class="bl-meta">${p.status === 'draft' ? `<span class="bl-draft">${t.draft}</span> · ` : ''}${fmtDate(p.published_at || p.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}</p>
       <h2><a href="${blogUrl(lang, p.slug)}">${esc(field(p, 't', lang))}</a></h2>
       <p class="bl-excerpt">${esc(excerpt)}</p>
-      <p class="bl-foot">${tags.map(g => `<a class="bl-tag" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}">#${esc(g)}</a>`).join(' ')}
+      <p class="bl-foot">${tags.map(g => `<a class="bl-tag" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}">#${esc(tagLabel(g, lang))}</a>`).join(' ')}
         <span class="bl-stats">♥ ${p.likes || 0} · 💬 ${p.comments || 0}</span></p>
     </div></article>`;
 }
@@ -494,15 +576,15 @@ function sidebar(posts, lang, activeTag, activeMonth = '', post = false) {
   const months = {};
   for (const p of posts) { const k = ym(p); months[k] = (months[k] || 0) + 1; }
   const years = [...new Set(Object.keys(months).map(k => k.slice(0, 4)))].sort().reverse();
-  for (const p of posts) for (const g of tagsOf(p, lang)) count[g] = (count[g] || 0) + 1;
-  const tags = Object.entries(count).sort((a, b) => b[1] - a[1]).slice(0, 30).sort((a, b) => a[0].localeCompare(b[0]));
+  for (const p of posts) for (const g of tagsOf(p)) count[g] = (count[g] || 0) + 1;
+  const tags = Object.entries(count).sort((a, b) => b[1] - a[1]).slice(0, 30).sort((a, b) => tagLabel(a[0], lang).localeCompare(tagLabel(b[0], lang)));
   const max = Math.max(1, ...tags.map(x => x[1]));
   const popular = [...posts].sort((a, b) => (b.likes * 5 + b.views + b.comments * 3) - (a.likes * 5 + a.views + a.comments * 3)).slice(0, 5);
   return `<aside class="bl-side">
     ${fav.length ? `<section><h2>${t.featured}</h2><ol class="bl-pop bl-fav">${fav.map(p => `<li><a href="${blogUrl(lang, p.slug)}">${esc(field(p, 't', lang))}</a></li>`).join('')}</ol>
       ${!post && fav.length > 1 ? `<p class="bl-more"><a href="${blogUrl(lang, '', '?fav=1')}">${t.onlyFav} →</a></p>` : ''}</section>` : ''}
     ${tags.length ? `<section><h2>${t.tags}</h2><p class="bl-cloud">${tags.map(([g, n]) =>
-      `<a href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}" style="--s:${(0.9 + (max > 1 ? 0.45 * (n - 1) / (max - 1) : 0)).toFixed(2)}"${g === activeTag ? ' aria-current="true"' : ''}>${esc(g)}</a>`).join(' ')}</p></section>` : ''}
+      `<a href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}" style="--s:${(0.9 + (max > 1 ? 0.45 * (n - 1) / (max - 1) : 0)).toFixed(2)}"${g === activeTag ? ' aria-current="true"' : ''}>${esc(tagLabel(g, lang))}</a>`).join(' ')}</p></section>` : ''}
     ${years.length ? `<section><h2>${t.archive}</h2><ul class="bl-arch">${years.map(y => `<li><b>${y}</b><ul>${Object.keys(months).filter(k => k.startsWith(y)).sort().reverse().map(k =>
       `<li><a href="${blogUrl(lang, '', '?month=' + k)}"${k === activeMonth ? ' aria-current="true"' : ''}>${t.monthsFull[+k.slice(5) - 1]}</a> <span>${months[k]}</span></li>`).join('')}</ul></li>`).join('')}</ul></section>` : ''}
     ${popular.length ? `<section><h2>${t.popular}</h2><ol class="bl-pop">${popular.map(p => `<li><a href="${blogUrl(lang, p.slug)}">${esc(field(p, 't', lang))}</a><span>♥ ${p.likes || 0}</span></li>`).join('')}</ol></section>` : ''}
@@ -547,6 +629,7 @@ export async function blogPage(req, env, url, h) {
     return new Response(obj.body, { headers: { 'content-type': obj.httpMetadata?.contentType || 'application/octet-stream', 'cache-control': 'public, max-age=31536000, immutable', etag: obj.httpEtag } });
   }
   await ensureBlogSchema(env);
+  await loadTags(env);
   if (p === '/sitemap-blog.xml') {
     const rows = (await env.DB.prepare("SELECT slug, updated_at FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC").all()).results;
     const urls = rows.flatMap(r => LANGS.map(l => `<url><loc>${SITE}${blogUrl(l, r.slug)}</loc><lastmod>${new Date(r.updated_at * 1000).toISOString().slice(0, 10)}</lastmod></url>`)).join('');
@@ -569,11 +652,11 @@ export async function blogPage(req, env, url, h) {
     const month = /^\d{4}-\d{2}$/.test(url.searchParams.get('month') || '') ? url.searchParams.get('month') : '';
     const favOnly = url.searchParams.get('fav') === '1';
     let list = posts;
-    if (tag) list = list.filter(x => tagsOf(x, lang).includes(tag));
+    if (tag) list = list.filter(x => tagsOf(x).includes(tag) || splitTags(x['tags_' + lang]).includes(tag)); // старые ссылки с переводом тега тоже работают
     if (month) list = list.filter(x => ym(x) === month);
     if (favOnly) list = list.filter(x => x.featured);
     const filtered = tag || month || favOnly;
-    const label = tag ? `${t.tagged} <b>#${esc(tag)}</b>` : month ? `${t.inMonth} <b>${t.monthsFull[+month.slice(5) - 1]} ${month.slice(0, 4)}</b>` : favOnly ? `<b>${t.featured}</b>` : '';
+    const label = tag ? `${t.tagged} <b>#${esc(tagLabel(tag, lang))}</b>` : month ? `${t.inMonth} <b>${t.monthsFull[+month.slice(5) - 1]} ${month.slice(0, 4)}</b>` : favOnly ? `<b>${t.featured}</b>` : '';
     const content = `<section class="page-head bl-head"><p class="topics">${t.blog.toLowerCase()}</p><h1>${t.head}</h1><p class="lead">${t.lead}</p>
       <div class="bl-admin" data-blog-admin hidden><a class="pill-btn" href="/blog-editor/">＋ ${lang === 'ru' ? 'Новая статья' : lang === 'lv' ? 'Jauns raksts' : 'New post'}</a></div></section>
       <div class="bl-grid"><div class="bl-list">
@@ -594,7 +677,7 @@ export async function blogPage(req, env, url, h) {
   }
   const comments = (await env.DB.prepare(`SELECT c.id, c.body, c.anon, c.created_at, u.nick FROM blog_comments c LEFT JOIN users u ON u.id = c.user_id
     WHERE c.post_id = ? AND c.status = 'ok' ORDER BY c.created_at`).bind(post.id).all()).results;
-  const title = field(post, 't', lang), tags = tagsOf(post, lang);
+  const title = field(post, 't', lang), tags = tagsOf(post);
   const textLang = langOf(post, lang);
   const words = stripTags(field(post, 'b', lang)).split(' ').length;
   const description = field(post, 'd', lang) || stripTags(field(post, 'b', lang)).slice(0, 160);
@@ -604,7 +687,7 @@ export async function blogPage(req, env, url, h) {
       ${post.status === 'draft' ? `<p class="bl-draft">${t.draft}</p>` : ''}
       <h1>${esc(title)}</h1>
       <p class="bl-meta">${fmtDate(post.published_at || post.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}
-        ${tags.length ? ' · ' + tags.map(g => `<a class="bl-tag" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}">#${esc(g)}</a>`).join(' ') : ''}</p>
+        ${tags.length ? ' · ' + tags.map(g => `<a class="bl-tag" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}">#${esc(tagLabel(g, lang))}</a>`).join(' ') : ''}</p>
     </header>
     ${post.cover ? `<figure class="bp-cover"><img src="${esc(post.cover)}" alt=""></figure>` : ''}
     <div class="bp-body"${textLang !== lang ? ` lang="${textLang}"` : ''}>${field(post, 'b', lang)}${post.src_lang && post.src_lang !== textLang && post['t_' + post.src_lang]

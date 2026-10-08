@@ -23,13 +23,16 @@
   const errText = e => ERR[e.code] || 'Что-то пошло не так (' + esc(e.code || e.message) + ').';
   let flash = '', state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null;
   // все теги из статей: { ru: ['акварель', …], … } и счётчики
+  let tagDict = []; // словарь тегов: [{ en, ru, lv, count }]
   function tagsByLang() {
     knownTagCounts = {};
     for (const l of ['ru', 'en', 'lv']) {
       const c = knownTagCounts[l] = {};
       for (const p of (state && state.posts) || []) for (const t of String(p['tags_' + l] || '').split(',').map(x => x.trim()).filter(Boolean)) c[t] = (c[t] || 0) + 1;
     }
-    return Object.fromEntries(Object.entries(knownTagCounts).map(([l, c]) => [l, Object.keys(c).sort()]));
+    const out = Object.fromEntries(Object.entries(knownTagCounts).map(([l, c]) => [l, Object.keys(c).sort()]));
+    out.en = [...new Set([...(out.en || []), ...tagDict.map(x => x.en)])].sort();
+    return out;
   }
   window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 
@@ -66,14 +69,14 @@
   // ---------- список статей ----------
   async function dashboard() {
     app.innerHTML = '<p class="be-note">Загрузка…</p>';
-    try { state = await api('blog/admin/posts'); } catch (e) { app.innerHTML = `<p class="be-note">${errText(e)}</p>`; return; }
+    try { [state, tagDict] = await Promise.all([api('blog/admin/posts'), api('blog/admin/tags').then(r => r.tags).catch(() => [])]); } catch (e) { app.innerHTML = `<p class="be-note">${errText(e)}</p>`; return; }
     const pend = state.pending;
     const pub = state.posts.filter(p => p.status === 'published'), drafts = state.posts.filter(p => p.status !== 'published');
     knownTags = tagsByLang();
-    const tagCount = new Set(['ru', 'en', 'lv'].flatMap(l => Object.keys(knownTagCounts[l] || {}).map(t => l + ':' + t))).size;
+    const tagCount = tagDict.length;
     const postsHtml = list => {
-      if (tagFilter) list = state.posts.filter(p => String(p['tags_' + tagFilter.l] || '').split(',').map(x => x.trim()).includes(tagFilter.t));
-      const head = tagFilter ? `<p class="be-filter">Статьи с тегом <b>#${esc(tagFilter.t)}</b> (${tagFilter.l.toUpperCase()}) · <button type="button" class="bc-link" data-unfilter>показать все</button></p>` : '';
+      if (tagFilter) list = state.posts.filter(p => String(p.tags_en || '').split(',').map(x => x.trim().toLowerCase()).includes(tagFilter.t));
+      const head = tagFilter ? `<p class="be-filter">Статьи с тегом <b>#${esc(tagFilter.t)}</b> · <button type="button" class="bc-link" data-unfilter>показать все</button></p>` : '';
       if (!list.length) return head + `<p class="be-note">${dashTab === 'draft' ? 'Черновиков нет.' : 'Опубликованных статей пока нет.'}</p>`;
       return head + `<table class="be-table"><thead><tr><th>Статья</th><th>Статус</th><th>Дата</th><th title="лайки">♥</th><th title="просмотры">👁</th><th title="комментарии">💬</th><th></th></tr></thead><tbody>
         ${list.map(p => `<tr data-id="${p.id}"><td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a><small>/blog/${esc(p.slug)}/ · ${['ru', 'en', 'lv'].map(l => p['t_' + l] ? l.toUpperCase() : `<s>${l.toUpperCase()}</s>`).join(' ')}</small></td>
@@ -82,15 +85,17 @@
           <td class="be-acts"><a href="#${p.id}">Изменить</a> <a href="/ru/blog/${esc(p.slug)}/" target="_blank">Открыть ↗</a> <button class="bc-link be-danger" data-delpost>Удалить</button></td></tr>`).join('')}
       </tbody></table>`;
     };
-    const tagsHtml = () => {
-      const cols = ['ru', 'en', 'lv'].map(l => {
-        const c = knownTagCounts[l] || {}, keys = Object.keys(c).sort((a, b) => c[b] - c[a] || a.localeCompare(b));
-        return `<div class="be-tagcol"><h3>${l.toUpperCase()}</h3>${keys.length ? `<ul>${keys.map(t => `<li data-l="${l}" data-t="${esc(t)}">
-          <button type="button" class="be-tagname" data-show title="Показать статьи">#${esc(t)} <span>${c[t]}</span></button>
-          <button type="button" class="be-ico" data-ren title="Переименовать во всех статьях" aria-label="Переименовать #${esc(t)}">✎</button><button type="button" class="be-ico be-danger" data-deltag title="Удалить из всех статей" aria-label="Удалить #${esc(t)}">✕</button></li>`).join('')}</ul>` : '<p class="be-note">Тегов нет.</p>'}</div>`;
-      }).join('');
-      return `<p class="be-note">Нажмите на тег, чтобы увидеть его статьи. Переименование и удаление меняют тег сразу во всех статьях.</p><div class="be-tagcols">${cols}</div>`;
-    };
+    // словарь тегов: английский тег (как в статьях) и его перевод — правится прямо в таблице
+    const tagsHtml = () => tagDict.length ? `<p class="be-note">Теги в статьях — на английском. Перевод на RU и LV общий для всех статей: исправьте в таблице, и он поменяется везде (сохраняется сам).
+        Нажмите на тег, чтобы увидеть его статьи.</p>
+      <p><button type="button" class="pill-btn" id="be-tags-tr">🌐 Перевести пустые</button></p>
+      <table class="be-table be-tagtable"><thead><tr><th>EN (в статьях)</th><th>RU</th><th>LV</th><th>Статей</th><th></th></tr></thead><tbody>
+      ${tagDict.map(r => `<tr data-t="${esc(r.en)}"><td><button type="button" class="be-tagname" data-show title="Показать статьи">#${esc(r.en)}</button></td>
+        <td><input type="text" class="be-tr-in" data-l="ru" value="${esc(r.ru)}" placeholder="перевод…" aria-label="Перевод #${esc(r.en)} на русский"></td>
+        <td><input type="text" class="be-tr-in" data-l="lv" value="${esc(r.lv)}" placeholder="tulkojums…" aria-label="Перевод #${esc(r.en)} на латышский"></td>
+        <td>${r.count}</td>
+        <td class="be-acts"><button type="button" class="be-ico" data-ren title="Переименовать английский тег во всех статьях" aria-label="Переименовать #${esc(r.en)}">✎</button><button type="button" class="be-ico be-danger" data-deltag title="Удалить из всех статей" aria-label="Удалить #${esc(r.en)}">✕</button></td></tr>`).join('')}
+      </tbody></table>` : '<p class="be-note">Тегов пока нет — они появятся, когда вы добавите их в статьи.</p>';
     const flashHtml = flash ? `<p class="be-flash" role="status">${flash}</p>` : ''; flash = '';
     app.innerHTML = `${flashHtml}<div class="be-top">
         <a class="pill-btn pill-fill" href="#new">＋ Новая статья</a>
@@ -109,15 +114,28 @@
       ${state.media ? '' : '<p class="be-note">⚠ Хранилище картинок (R2) не подключено — загрузка картинок не заработает.</p>'}`;
     app.querySelectorAll('[data-dtab]').forEach(b => b.addEventListener('click', () => { dashTab = b.dataset.dtab; tagFilter = null; dashboard(); }));
     const unf = app.querySelector('[data-unfilter]'); unf && unf.addEventListener('click', () => { tagFilter = null; dashboard(); });
-    app.querySelectorAll('[data-show]').forEach(b => b.addEventListener('click', () => { const li = b.closest('li'); tagFilter = { l: li.dataset.l, t: li.dataset.t }; dashTab = 'published'; dashboard(); }));
+    app.querySelectorAll('[data-show]').forEach(b => b.addEventListener('click', () => { tagFilter = { t: b.closest('tr').dataset.t }; dashTab = 'published'; dashboard(); }));
     app.querySelectorAll('[data-ren], [data-deltag]').forEach(b => b.addEventListener('click', async () => {
-      const li = b.closest('li'), l = li.dataset.l, t = li.dataset.t, n = (knownTagCounts[l] || {})[t];
+      const t = b.closest('tr').dataset.t, n = (tagDict.find(x => x.en === t) || {}).count || 0;
       let to = '';
-      if (b.hasAttribute('data-ren')) { to = prompt(`Новое название для #${t} (${l.toUpperCase()}):`, t); if (to === null || !to.trim() || to.trim() === t) return; }
+      if (b.hasAttribute('data-ren')) { to = prompt(`Новое английское название для #${t}:`, t); if (to === null || !to.trim() || to.trim() === t) return; }
       else if (!confirm(`Убрать тег #${t} из ${n} стат${n === 1 ? 'ьи' : 'ей'}?`)) return;
-      try { await api('blog/admin/tag', { lang: l, from: t, to }); } catch (e) { alert(errText(e)); }
+      try { await api('blog/admin/tag', { from: t, to }); } catch (e) { alert(errText(e)); }
       dashboard();
     }));
+    // перевод тега сохраняется сам, когда уходите из поля
+    app.querySelectorAll('.be-tr-in').forEach(inp => inp.addEventListener('change', async () => {
+      const tr = inp.closest('tr'), row = tagDict.find(x => x.en === tr.dataset.t);
+      row[inp.dataset.l] = inp.value.trim().toLowerCase();
+      inp.classList.remove('saved');
+      try { await api('blog/admin/tag-set', { en: row.en, ru: row.ru, lv: row.lv }); inp.classList.add('saved'); } catch (e) { alert(errText(e)); }
+    }));
+    const ttr = app.querySelector('#be-tags-tr');
+    ttr && ttr.addEventListener('click', async () => {
+      ttr.disabled = true; ttr.textContent = 'Перевожу…';
+      try { await api('blog/admin/tags-translate', {}); } catch (e) { alert(errText(e)); }
+      dashboard();
+    });
     app.querySelector('#be-strict').addEventListener('change', async e => {
       try { await api('blog/admin/settings', { strict: e.target.checked }); } catch (err) { e.target.checked = !e.target.checked; alert(errText(err)); }
     });
@@ -163,10 +181,6 @@
       ${LANGS.map(([l], i) => `<section class="be-pane" data-pane="${l}" ${i ? 'hidden' : ''}>
         <label class="be-f"><span>Заголовок</span><input type="text" data-k="t_${l}" maxlength="200" value="${esc(post['t_' + l])}"></label>
         <label class="be-f"><span>Краткое описание <small>(видно в списке статей и в Google)</small></span><textarea data-k="d_${l}" rows="2" maxlength="400">${esc(post['d_' + l])}</textarea></label>
-        <div class="be-f"><span>Теги <small>(впишите тег и нажмите Enter)</small></span>
-          <div class="be-tags" data-tags="${l}"><input type="text" class="be-tag-in" list="be-taglist-${l}" placeholder="новый тег…" aria-label="Новый тег"></div>
-          <datalist id="be-taglist-${l}">${(knownTags[l] || []).map(x => `<option value="${esc(x)}">`).join('')}</datalist>
-          <input type="hidden" data-k="tags_${l}" value="${esc(post['tags_' + l])}"></div>
         <div class="be-f"><span>Текст</span>
           <div class="be-tools">${TOOLS.map(([c, title, label]) => `<button type="button" data-cmd="${c}" title="${title}">${label}</button>`).join('')}</div>
           <div class="be-body bp-body" contenteditable="true" data-k="b_${l}" data-ph="Начните писать… Картинки можно перетащить прямо сюда.">${post['b_' + l]}</div>
@@ -179,6 +193,10 @@
             ${post.cover ? '<button type="button" class="bc-link" id="be-cover-rm">убрать обложку</button>' : ''}</div></div></div>
         <label class="be-f be-srclang"><span>Язык оригинала <small>(на остальных языках внизу статьи появится маленькая пометка «перевод сделан онлайн-инструментами» со ссылкой на оригинал; кнопка «Перевести» ставит его сама)</small></span>
           <select id="be-src"><option value="">— не указан (пометки не будет) —</option>${LANGS.map(([l, n]) => `<option value="${l}"${post.src_lang === l ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
+        <div class="be-f"><span>Теги <small>(на английском: впишите тег и нажмите Enter. Перевод на RU и LV подставится сам — поправить его можно во вкладке «Теги» списка статей)</small></span>
+          <div class="be-tags" data-tags="en"><input type="text" class="be-tag-in" list="be-taglist-en" placeholder="new tag…" aria-label="Новый тег"></div>
+          <datalist id="be-taglist-en">${(knownTags.en || []).map(x => `<option value="${esc(x)}">`).join('')}</datalist>
+          <input type="hidden" data-k="tags_en" value="${esc(post.tags_en || post.tags_ru || post.tags_lv || '')}"></div>
         <label class="be-check"><input type="checkbox" id="be-featured" ${post.featured ? 'checked' : ''}> <b>★ Избранное</b> <small>— показывать справа в блоке блога на главной</small></label>
         <label class="be-f"><span>Адрес статьи <small id="be-slug-note">${post.status === 'published' ? '(статья опубликована — адрес лучше не менять, иначе старые ссылки перестанут работать)' : '(заполняется сам из заголовка; можно поправить)'}</small></span><div class="be-slug"><span>pigeonpolly.com/blog/</span><input type="text" id="be-slug" value="${esc(post.slug)}" spellcheck="false"><span>/</span></div></label>
       </section>
@@ -446,7 +464,6 @@
           const res = rebuild(out);
           app.querySelector(`[data-k="t_${l}"]`).value = res.t;
           app.querySelector(`[data-k="d_${l}"]`).value = res.d;
-          setTags(l, res.tags.split(','));
           app.querySelector(`[data-k="b_${l}"]`).innerHTML = res.b;
           autoSlug();
         }
@@ -487,7 +504,7 @@
 
   // делим статью на кусочки для переводчика и собираем обратно
   function splitForTranslation(ru, from) {
-    const texts = [ru['t_' + from], ru['d_' + from], ru['tags_' + from]];
+    const texts = [ru['t_' + from], ru['d_' + from], '']; // теги не переводим здесь — у них общий словарь
     const box = document.createElement('div'); box.innerHTML = ru['b_' + from];
     const slots = [];
     const walk = el => {

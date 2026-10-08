@@ -1955,3 +1955,8 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .bp-share-menu a, .bp-share-menu button { display: block; padding: 10px 12px; border: 0; border-radius: 10px; background: none; color: #2B1A51; font: 600 15px var(--sans); text-align: left; text-decoration: none; cursor: pointer; }
 .bp-share-menu a:hover, .bp-share-menu button:hover { background: #F3EEFB; }
 .bp-share-menu button[data-copy] { border-bottom: 1px solid #ECE6F5; border-radius: 10px 10px 0 0; margin-bottom: 4px; }
+.be-tagtable td { vertical-align: middle; }
+.be-tagtable .be-tr-in { width: 100%; min-width: 120px; box-sizing: border-box; padding: 7px 10px; border-radius: 10px; border: 1px solid var(--line); background: #1F1240; color: var(--text); font: 15px var(--sans); }
+.be-tagtable .be-tr-in:focus { outline: none; border-color: var(--peach); }
+.be-tagtable .be-tr-in.saved { border-color: #4CC38A; }
+.be-tagtable .be-tr-in:placeholder-shown { border-style: dashed; }
