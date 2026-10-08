@@ -57,13 +57,13 @@
     return i < 0 ? 0 : i;
   }
   const mod = (a, b) => ((a % b) + b) % b;
-  // цвета с 10 октября 2026 — «колодой» по 8 дней: каждый яркий цвет 3 раза, коричневый, чёрный и серый — по 1 разу;
+  // цвета с 9 октября 2026 — «колодой» по 8 дней: каждый яркий цвет 3 раза, коричневый, чёрный и серый — по 1 разу;
   // в один день не больше одного неяркого цвета и ни один цвет не повторяется два дня подряд (до этого было просто случайно)
   const NEUTRAL = ['#8A5A3C', '#2B2B2B', '#9A9A9A'];
   const blocks = [];
   function colorBlock(b) {
     while (blocks.length <= b) {
-      const k = blocks.length, prev = k ? blocks[k - 1][7] : [];
+      const k = blocks.length, prev = k ? blocks[k - 1][7] : legacyColors(new Date(2026, 9, 8)); // первый день не повторяет цвета 8 октября
       const neutral = D.colors.map((c, i) => i).filter(i => NEUTRAL.includes(D.colors[i].hex));
       const bright = D.colors.map((c, i) => i).filter(i => !NEUTRAL.includes(D.colors[i].hex));
       let days = null;
@@ -89,6 +89,12 @@
     }
     return blocks[b];
   }
+  function legacyColors(d) { // как выбирались цвета до 9 октября (та же последовательность случайных чисел, что в themeFor)
+    const r = rngFor('polly-' + keyOf(d)); r();
+    const o = D.colors.map((c, i) => i);
+    for (let i = o.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [o[i], o[j]] = [o[j], o[i]]; }
+    return o.slice(0, 3);
+  }
   const balancedColors = n => colorBlock(Math.floor(n / 8))[n % 8];
   function themeFor(d, L) {
     const r = rngFor('polly-' + keyOf(d));
@@ -99,7 +105,7 @@
     const subject = n < 0 ? D.subjects[legacy] : bday ? D.subjects[birthdayIdx(d.getFullYear())] : D.subjects[planFor(n)];
     const cols = D.colors.slice();
     for (let i = cols.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [cols[i], cols[j]] = [cols[j], cols[i]]; }
-    const n2 = Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 9, 10)) / 864e5);
+    const n2 = Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 9, 9)) / 864e5);
     if (n2 >= 0) { const pick = balancedColors(n2); cols.splice(0, 3, ...pick.map(i => D.colors[i])); }
     const time = D.times[Math.floor(r() * D.times.length)];
     const day = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
