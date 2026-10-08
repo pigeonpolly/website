@@ -22,7 +22,7 @@
     title: 'Нужен заголовок.', too_big: 'Статья слишком большая для сохранения (больше ~900 000 символов вместе с разметкой).', save: 'сервер не подтвердил сохранение.', fetch: 'Не удалось скопировать картинку.', login: 'Сессия закончилась — войдите снова.', admin: 'Нужен вход администратора.',
   };
   const errText = e => ERR[e.code] || 'Что-то пошло не так (' + esc(e.code || e.message) + ').';
-  let flash = '', state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null;
+  let flash = '', state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null, langFilter = 'all';
   // все теги из статей: { ru: ['акварель', …], … } и счётчики
   let sections = [], tagDict = [], tagSort = 'unchecked'; // словарь тегов: [{ en, ru, lv, count, checked, src, created }]
   function tagsByLang() {
@@ -77,7 +77,17 @@
     const tagCount = tagDict.length;
     const postsHtml = list => {
       if (tagFilter) list = state.posts.filter(p => String(p.tags_en || '').split(',').map(x => x.trim().toLowerCase()).includes(tagFilter.t));
-      const head = tagFilter ? `<p class="be-filter">Статьи с тегом <b>#${esc(tagFilter.t)}</b> · <button type="button" class="bc-link" data-unfilter>показать все</button></p>` : '';
+      // фильтр по языкам: на всех трёх / не на всех / только один язык / нет перевода на язык
+      const has = p => ['ru', 'en', 'lv'].filter(l => p['t_' + l]);
+      const LF = [['all', 'Все', () => true], ['full', '✓ На всех трёх', p => has(p).length === 3], ['part', 'Не на всех', p => has(p).length < 3],
+        ...['ru', 'en', 'lv'].map(l => ['only_' + l, 'Только ' + l.toUpperCase(), p => has(p).join() === l]),
+        ...['ru', 'en', 'lv'].map(l => ['no_' + l, 'Нет ' + l.toUpperCase(), p => !p['t_' + l]])];
+      const base = list;
+      if (!LF.some(([k, , f]) => k === langFilter && base.some(f))) langFilter = 'all';
+      list = base.filter(LF.find(([k]) => k === langFilter)[2]);
+      const bar = base.length ? `<div class="be-langbar" role="group" aria-label="Фильтр по языкам">${LF.map(([k, n, f]) => [k, n, base.filter(f).length])
+        .filter(([k, , c]) => k === 'all' || c).map(([k, n, c]) => `<button type="button" class="be-lchip" data-lf="${k}" aria-pressed="${langFilter === k}">${n} <span>${c}</span></button>`).join('')}</div>` : '';
+      const head = bar + (tagFilter ? `<p class="be-filter">Статьи с тегом <b>#${esc(tagFilter.t)}</b> · <button type="button" class="bc-link" data-unfilter>показать все</button></p>` : '');
       if (!list.length) return head + `<p class="be-note">${dashTab === 'draft' ? 'Черновиков нет.' : 'Опубликованных статей пока нет.'}</p>`;
       return head + `<table class="be-table"><thead><tr><th>Статья</th><th>Статус</th><th>Дата</th><th title="лайки">♥</th><th title="просмотры">👁</th><th title="комментарии">💬</th><th></th></tr></thead><tbody>
         ${list.map(p => `<tr data-id="${p.id}"><td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a><small>/blog/${esc(p.slug)}/ · ${['ru', 'en', 'lv'].map(l => p['t_' + l] ? l.toUpperCase() : `<s>${l.toUpperCase()}</s>`).join(' ')}</small></td>
@@ -134,6 +144,7 @@
       </section>
       ${state.media ? '' : '<p class="be-note">⚠ Хранилище картинок (R2) не подключено — загрузка картинок не заработает.</p>'}`;
     app.querySelectorAll('[data-dtab]').forEach(b => b.addEventListener('click', () => { dashTab = b.dataset.dtab; tagFilter = null; dashboard(); }));
+    app.querySelectorAll('[data-lf]').forEach(b => b.addEventListener('click', () => { langFilter = b.dataset.lf; dashboard(); }));
     const unf = app.querySelector('[data-unfilter]'); unf && unf.addEventListener('click', () => { tagFilter = null; dashboard(); });
     app.querySelectorAll('[data-show]').forEach(b => b.addEventListener('click', () => { tagFilter = { t: b.closest('tr').dataset.t }; dashTab = 'published'; dashboard(); }));
     app.querySelectorAll('[data-ren], [data-deltag]').forEach(b => b.addEventListener('click', async () => {
