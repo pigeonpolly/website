@@ -116,7 +116,8 @@
     const flashHtml = flash ? `<p class="be-flash" role="status">${flash}</p>` : ''; flash = '';
     app.innerHTML = `${flashHtml}<div class="be-top">
         <a class="pill-btn pill-fill" href="#new">＋ Новая статья</a>
-        <button type="button" class="pill-btn" id="be-backup" title="Все статьи на трёх языках, картинки, теги, разделы и комментарии — одним ZIP-файлом">💾 Скачать копию блога</button>
+        <button type="button" class="pill-btn" id="be-backup" title="Блог (статьи, картинки, теги, разделы, комментарии) и челлендж (аккаунты и рисунки участников) — одним ZIP-файлом">💾 Скачать полную копию сайта</button>
+        <button type="button" class="pill-btn" id="be-auto" title="Копия всего сайта сама раз в неделю в ваш Google Drive">🔁 Автокопия в Google Drive</button>
         <label class="pill-btn be-restore" title="Вернуть статьи и картинки из ранее скачанной копии">♻ Восстановить из копии<input type="file" id="be-restore" accept=".zip" hidden></label>
         <label class="be-switch"><input type="checkbox" id="be-strict" ${state.strict ? 'checked' : ''}><span></span>
           <b>Строгий режим</b><small>не больше 1 комментария в час с одного адреса</small></label>
@@ -129,7 +130,6 @@
           `<button type="button" role="tab" data-dtab="${k}" aria-selected="${dashTab === k}">${n} <span>${c}</span></button>`).join('')}</div>
         ${dashTab === 'tags' ? tagsHtml() : dashTab === 'sections' ? sectionsHtml() : postsHtml(dashTab === 'draft' ? drafts : pub)}
       </section>
-      ${state.gemini ? '' : '<p class="be-note">⚠ Ключ Gemini (GEMINI_KEY) не подключён в Cloudflare — переводит запасной, более слабый переводчик.</p>'}
       ${state.media ? '' : '<p class="be-note">⚠ Хранилище картинок (R2) не подключено — загрузка картинок не заработает.</p>'}`;
     app.querySelectorAll('[data-dtab]').forEach(b => b.addEventListener('click', () => { dashTab = b.dataset.dtab; tagFilter = null; dashboard(); }));
     const unf = app.querySelector('[data-unfilter]'); unf && unf.addEventListener('click', () => { tagFilter = null; dashboard(); });
@@ -190,29 +190,30 @@
       const say = t => { btn.textContent = t; };
       try {
         say('Готовлю…');
-        const [JSZip, data] = await Promise.all([loadZip(), api('blog/admin/export')]);
+        const [JSZip, data] = await Promise.all([loadZip(), api('blog/backup')]);
         const zip = new JSZip();
         zip.file('data.json', JSON.stringify(data, null, 1));
-        zip.file('README.txt', 'Резервная копия блога pigeonpolly.com от ' + data.exported_at + '\n\ndata.json — все статьи (RU/EN/LV), теги, разделы, комментарии.\nmedia/ — картинки статей.\nposts/ — статьи как обычные HTML-файлы, их можно открыть в браузере.\n\nВосстановить: Редактор блога → «Восстановить из копии» → выбрать этот ZIP.\n');
+        zip.file('README.txt', README(data));
         for (const p of data.posts) for (const l of ['ru', 'en', 'lv']) {
           if (!p['t_' + l] && !p['b_' + l]) continue;
           zip.file(`posts/${p.slug}/${l}.html`, `<!doctype html><meta charset="utf-8"><title>${esc(p['t_' + l])}</title><body style="max-width:760px;margin:40px auto;font:18px/1.6 Georgia,serif">` +
             `<h1>${esc(p['t_' + l])}</h1><p><i>${esc(p['d_' + l] || '')}</i></p>` + String(p['b_' + l] || '').replace(/src="\/media\//g, 'src="../../media/') + '</body>');
         }
         let n = 0;
-        for (const key of data.media) {
-          say(`Картинки: ${++n} из ${data.media.length}…`);
-          try { const r = await fetch('/media/' + key); if (r.ok) zip.file('media/' + key, await r.blob()); } catch (err) { /* пропускаем */ }
+        for (const f of data.files) {
+          say(`Файлы: ${++n} из ${data.files.length}…`);
+          try { const r = await fetch(f.url); if (r.ok) zip.file(f.path, await r.blob()); } catch (err) { /* пропускаем */ }
         }
         say('Упаковываю…');
         const blob = await zip.generateAsync({ type: 'blob' });
         const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob); a.download = `pigeonpolly-blog-${new Date().toISOString().slice(0, 10)}.zip`;
+        a.href = URL.createObjectURL(blob); a.download = `pigeonpolly-${new Date().toISOString().slice(0, 10)}.zip`;
         document.body.appendChild(a); a.click(); a.remove();
         say('✓ Копия скачана');
-      } catch (err) { alert('Не получилось сделать копию: ' + errText(err)); say('💾 Скачать копию блога'); }
+      } catch (err) { alert('Не получилось сделать копию: ' + errText(err)); say('💾 Скачать полную копию сайта'); }
       btn.disabled = false;
     });
+    app.querySelector('#be-auto').addEventListener('click', () => autoBackupPanel());
     app.querySelector('#be-restore').addEventListener('change', async e => {
       const f = e.target.files[0]; e.target.value = '';
       if (!f || !confirm('Восстановить блог из этой копии? Статьи с теми же адресами будут заменены версиями из копии, остальные останутся как есть.')) return;
@@ -259,7 +260,7 @@
   const TOOLS = [
     ['h2', 'Заголовок', 'Заг'], ['h3', 'Подзаголовок', 'Подзаг'], ['p', 'Обычный текст', '¶'], ['bold', 'Жирный', '<b>Ж</b>'], ['italic', 'Курсив', '<i>К</i>'],
     ['ul', 'Список', '• —'], ['ol', 'Нумерованный список', '1.'], ['quote', 'Цитата', '❝'], ['link', 'Ссылка', '🔗'], ['img', 'Картинка', '🖼'],
-    ['hr', 'Разделитель', '—'], ['clear', 'Убрать оформление', '⌫'],
+    ['hr', 'Разделитель', '—'], ['clear', 'Убрать оформление', '⌫'], ['imgs', 'Вставить картинки (с подписями) из оригинала на те же места', '🖼 Картинки из оригинала'],
   ];
   async function editor(id) {
     let post = { id: 0, slug: '', status: 'draft', cover: '' };
@@ -273,9 +274,11 @@
     for (const [l] of LANGS) for (const k of ['t', 'd', 'tags', 'b']) post[`${k}_${l}`] = post[`${k}_${l}`] || '';
     app.innerHTML = `<p class="be-back"><a href="#">← Все статьи</a></p>
       <div class="be-tabs" role="tablist">${LANGS.map(([l, n], i) => `<button type="button" role="tab" data-tab="${l}" aria-selected="${!i}">${n}</button>`).join('')}
-        <button type="button" class="pill-btn pill-fill be-tr" id="be-tr">🌐 Перевести с RU на EN и LV</button></div>
-      <div class="be-progress" id="be-progress" hidden></div>
-      <p class="be-hint">Можно писать прямо здесь или вставить готовую статью из Google Docs (Ctrl+A, Ctrl+C → Ctrl+V в поле «Текст»): заголовок, жирный, списки и картинки перенесутся, а картинки сразу скопируются на сайт (это займёт несколько секунд).</p>
+</div>
+      <details class="be-hint"><summary>Как перевести статью и не потерять картинки</summary>
+        <ol><li><b>Проще всего — в Google Docs:</b> откройте документ со статьёй → <i>Инструменты → Перевести документ</i> → выберите язык. Google сделает копию документа уже на нужном языке, с картинками и оформлением. Откройте её, Ctrl+A, Ctrl+C и вставьте во вкладку RU / EN / LV здесь.</li>
+        <li><b>Если переводите в другом переводчике</b> (DeepL, Google Translate) и вставили текст без картинок — нажмите в панели над текстом кнопку <b>«🖼 Картинки из оригинала»</b>: картинки (с подписями) встанут на те же места между абзацами, что и в оригинале. Подписи потом переведите сами.</li></ol>
+        Писать можно и прямо здесь, или вставлять из Google Docs (Ctrl+A, Ctrl+C → Ctrl+V в поле «Текст») — картинки сразу скопируются на сайт.</details>
       ${LANGS.map(([l], i) => `<section class="be-pane" data-pane="${l}" ${i ? 'hidden' : ''}>
         <label class="be-f"><span>Заголовок</span><input type="text" data-k="t_${l}" maxlength="200" value="${esc(post['t_' + l])}"></label>
         <label class="be-f"><span>Краткое описание <small>(видно в списке статей и в Google)</small></span><textarea data-k="d_${l}" rows="2" maxlength="400">${esc(post['d_' + l])}</textarea></label>
@@ -374,7 +377,6 @@
       app.querySelectorAll('[data-tab]').forEach(x => x.setAttribute('aria-selected', x === b));
       app.querySelectorAll('[data-pane]').forEach(p => { p.hidden = p.dataset.pane !== active; });
       const others = LANGS.map(x => x[0]).filter(x => x !== active).map(x => x.toUpperCase());
-      $('#be-tr').textContent = `🌐 Перевести с ${active.toUpperCase()} на ${others.join(' и ')}`;
     }));
     $('#be-section').addEventListener('change', async e => {
       if (e.target.value !== '__new') return;
@@ -414,6 +416,7 @@
         else if (c === 'ul') document.execCommand('insertUnorderedList');
         else if (c === 'ol') document.execCommand('insertOrderedList');
         else if (c === 'hr') document.execCommand('insertHorizontalRule');
+        else if (c === 'imgs') { mergeImages(body); return; }
         else if (c === 'clear') { document.execCommand('removeFormat'); document.execCommand('unlink'); document.execCommand('formatBlock', false, 'p'); }
         else if (c === 'link') {
           const u = prompt('Адрес ссылки (https://…). Пусто — убрать ссылку.', 'https://');
@@ -537,6 +540,29 @@
       $('#be-copy-left').addEventListener('click', async () => { for (const b of bodies) await copyImages(b); });
     }
 
+    // «Картинки из оригинала»: переведённый текст вставили без картинок — ставим картинки оригинала после того же по счёту абзаца
+    function mergeImages(body) {
+      const target = body.dataset.k.slice(2);
+      const srcLang = [$('#be-src').value, ...LANGS.map(x => x[0])].find(l => l && l !== target && app.querySelector(`[data-k="b_${l}"]`).querySelector('figure, img'));
+      if (!srcLang) { status('В других вкладках нет картинок, которые можно перенести.'); return; }
+      const src = app.querySelector(`[data-k="b_${srcLang}"]`);
+      const isText = el => el.tagName !== 'FIGURE' && !el.querySelector('img') && el.textContent.trim();
+      const have = new Set([...body.querySelectorAll('img')].map(i => i.getAttribute('src')));
+      const plan = []; let k = 0;
+      for (const el of src.children) {
+        if (isText(el)) k++;
+        else if (el.tagName === 'FIGURE' || el.querySelector('img')) { const img = el.querySelector('img') || el; if (!have.has(img.getAttribute('src'))) plan.push([k, el]); }
+      }
+      if (!plan.length) { status('Все картинки оригинала уже есть в этой вкладке.'); return; }
+      const texts = [...body.children].filter(isText);
+      for (const [n, el] of plan.reverse()) {
+        const fig = el.tagName === 'FIGURE' ? el.cloneNode(true) : Object.assign(document.createElement('figure'), { innerHTML: el.innerHTML });
+        if (n === 0) body.prepend(fig); else (texts[Math.min(n, texts.length) - 1] || body.lastElementChild).after(fig);
+      }
+      addCaptions(body); touch();
+      status(`Готово: перенесено картинок — ${plan.length} (из вкладки ${srcLang.toUpperCase()}). Проверьте, что они стоят на своих местах, и переведите подписи.`);
+    }
+
     // обложка
     const setCover = url => {
       cover = url; $('#be-cover-url').value = url;
@@ -546,45 +572,6 @@
     $('#be-cover-up').addEventListener('click', () => { fileTarget = 'cover'; $('#be-file').click(); });
     $('#be-cover-url').addEventListener('change', e => setCover(e.target.value.trim()));
     app.addEventListener('click', e => { if (e.target.id === 'be-cover-rm') setCover(''); });
-
-    // перевод с открытой вкладки на две другие
-    $('#be-tr').addEventListener('click', async () => {
-      const ru = collect(), from = active, targets = LANGS.map(x => x[0]).filter(x => x !== from);
-      if (!ru['t_' + from].trim() && !stripHtml(ru['b_' + from])) { status(`Во вкладке ${from.toUpperCase()} пока пусто — напишите или вставьте статью.`); return; }
-      const filled = targets.filter(l => ru['t_' + l] || stripHtml(ru['b_' + l]));
-      if (filled.length && !confirm(`Во вкладках ${filled.map(x => x.toUpperCase()).join(' и ')} уже есть текст. Заменить его новым переводом?`)) return;
-      const btn = $('#be-tr'); btn.disabled = true;
-      // полоска загрузки на каждый язык: переводим кусочками по несколько абзацев
-      status('');
-      const prog = $('#be-progress');
-      prog.hidden = false;
-      prog.innerHTML = targets.map(l => `<div class="be-prog" data-p="${l}"><b>${l.toUpperCase()}</b><span class="be-bar"><i style="width:0%"></i></span><em>ждёт…</em></div>`).join('');
-      const bar = (l, pct, text) => { const r = prog.querySelector(`[data-p="${l}"]`); r.querySelector('i').style.width = pct + '%'; r.querySelector('em').textContent = text; r.classList.toggle('done', pct >= 100); };
-      try {
-        for (const l of targets) {
-          const { texts, rebuild } = splitForTranslation(ru, from);
-          const out = [];
-          bar(l, 2, '0%');
-          let backup = false;
-          for (let i = 0; i < texts.length; i += 15) {
-            const r = await api('blog/admin/translate', { texts: texts.slice(i, i + 15), from, to: l });
-            out.push(...r.texts);
-            if (r.engine !== 'gemini') backup = true;
-            const pct = Math.round(out.length / texts.length * 100);
-            bar(l, pct, pct >= 100 ? (backup ? 'готово (запасной переводчик — проверьте внимательнее)' : 'готово ✓') : pct + '%');
-          }
-          const res = rebuild(out);
-          app.querySelector(`[data-k="t_${l}"]`).value = res.t;
-          app.querySelector(`[data-k="d_${l}"]`).value = res.d;
-          app.querySelector(`[data-k="b_${l}"]`).innerHTML = res.b;
-          autoSlug();
-        }
-        $('#be-src').value = from; // запоминаем язык оригинала — для пометки под переводом
-        status(`Готово! Проверьте переводы во вкладках ${targets.map(x => x.toUpperCase()).join(' и ')} — их можно поправить.`);
-        touch();
-      } catch (e) { status(errText(e)); prog.querySelectorAll('.be-prog:not(.done) em').forEach(x => { x.textContent = 'остановлено'; }); }
-      btn.disabled = false;
-    });
 
     // сохранение
     app.querySelectorAll('[data-save]').forEach(b => b.addEventListener('click', async () => {
@@ -614,29 +601,6 @@
     }));
   }
 
-  // делим статью на кусочки для переводчика и собираем обратно
-  function splitForTranslation(ru, from) {
-    const texts = [ru['t_' + from], ru['d_' + from], '']; // теги не переводим здесь — у них общий словарь
-    const box = document.createElement('div'); box.innerHTML = ru['b_' + from];
-    const slots = [];
-    const walk = el => {
-      for (const ch of el.children) {
-        const tag = ch.tagName.toLowerCase();
-        if (tag === 'ul' || tag === 'ol' || tag === 'blockquote' && ch.querySelector('p')) walk(ch);
-        else if (tag === 'figure') { const cap = ch.querySelector('figcaption'); if (cap && cap.textContent.trim()) { slots.push(cap); texts.push(cap.innerHTML); } } // подпись к картинке тоже переводим
-        else if (tag === 'hr' || tag === 'img' || !ch.textContent.trim()) continue;
-        else { slots.push(ch); texts.push(ch.innerHTML); }
-      }
-    };
-    walk(box);
-    return {
-      texts,
-      rebuild(out) {
-        slots.forEach((el, i) => { el.innerHTML = out[3 + i]; });
-        return { t: out[0], d: out[1], tags: out[2], b: box.innerHTML };
-      },
-    };
-  }
 
   // уменьшаем большие фото до 1600px, чтобы страницы грузились быстро (GIF не трогаем)
   async function shrink(file) {
@@ -698,6 +662,73 @@
   const slugify = s => String(s || '').toLowerCase()
     .replace(/[а-яё]/g, c => ({ а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya' }[c]))
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 70);
+  const README = d => `Резервная копия сайта pigeonpolly.com от ${d.exported_at}
+
+data.json — всё содержимое базы:
+  • блог: статьи (RU/EN/LV), теги, разделы, комментарии, лайки;
+  • челлендж: аккаунты (ник, e-mail, серии, бейджи) и список работ.
+media/ — картинки статей блога.
+challenge/works/ — рисунки участников челленджа.
+posts/ — статьи как обычные HTML-файлы (открываются в браузере без сайта).
+
+Восстановить блог: Редактор блога → «♻ Восстановить из копии» → выбрать этот ZIP.
+Код и страницы сайта хранятся отдельно — на GitHub (pigeonpolly/website).
+`;
+  // автокопия раз в неделю: готовый скрипт для Google Apps Script с личным ключом
+  async function autoBackupPanel(rotate) {
+    let t;
+    try { t = rotate ? await api('blog/admin/backup-token', {}) : await api('blog/admin/backup-token'); } catch (e) { alert(errText(e)); return; }
+    const code = `// Автокопия сайта pigeonpolly.com в Google Drive — раз в неделю (понедельник, ~6 утра)
+const SITE = 'https://www.pigeonpolly.com';
+const TOKEN = '${t.token}';            // личный ключ — никому не показывайте
+const FOLDER = 'pigeonpolly — резервные копии';
+const KEEP = 12;                      // сколько последних копий хранить
+
+// Запустите ОДИН раз: включает еженедельную копию и сразу делает первую
+function setup() {
+  ScriptApp.getProjectTriggers().forEach(t => ScriptApp.deleteTrigger(t));
+  ScriptApp.newTrigger('backup').timeBased().onWeekDay(ScriptApp.WeekDay.MONDAY).atHour(6).create();
+  backup();
+}
+
+function backup() {
+  const res = UrlFetchApp.fetch(SITE + '/api/blog/backup?token=' + TOKEN, { muteHttpExceptions: true });
+  if (res.getResponseCode() !== 200) throw new Error('Сайт не отдал копию: ' + res.getResponseCode());
+  const text = res.getContentText(), data = JSON.parse(text);
+  const blobs = [Utilities.newBlob(text, 'application/json', 'data.json')];
+  for (let i = 0; i < data.files.length; i += 40) {
+    const part = data.files.slice(i, i + 40);
+    UrlFetchApp.fetchAll(part.map(f => ({ url: SITE + f.url, muteHttpExceptions: true })))
+      .forEach((r, k) => { if (r.getResponseCode() === 200) blobs.push(r.getBlob().setName(part[k].path)); });
+  }
+  const date = Utilities.formatDate(new Date(), 'Europe/Riga', 'yyyy-MM-dd');
+  const it = DriveApp.getFoldersByName(FOLDER);
+  const folder = it.hasNext() ? it.next() : DriveApp.createFolder(FOLDER);
+  folder.createFile(Utilities.zip(blobs, 'pigeonpolly-' + date + '.zip'));
+  const files = []; const fi = folder.getFiles(); while (fi.hasNext()) files.push(fi.next());
+  files.sort((a, b) => b.getDateCreated() - a.getDateCreated()).slice(KEEP).forEach(f => f.setTrashed(true));
+}
+`;
+    const d = document.createElement('dialog');
+    d.className = 'be-dialog';
+    d.innerHTML = `<h2>🔁 Автокопия всего сайта в Google Drive — раз в неделю</h2>
+      <ol>
+        <li>Нажмите <b>«Скопировать скрипт»</b> ниже.</li>
+        <li>Откройте <a href="https://script.google.com/home/projects/create" target="_blank" rel="noopener">script.google.com → Новый проект ↗</a> (тем же Google-аккаунтом, где ваш Google Drive).</li>
+        <li>Удалите всё, что там написано, и вставьте скрипт (Ctrl+V). Нажмите 💾 «Сохранить».</li>
+        <li>Вверху в списке функций выберите <b>setup</b> и нажмите <b>▶ Выполнить</b>.</li>
+        <li>Google попросит разрешения: <i>Проверить разрешения → ваш аккаунт → Дополнительно → Перейти к проекту → Разрешить</i>. Это нормально: скрипт ваш, он только скачивает копию с сайта и кладёт её в ваш Drive.</li>
+        <li>Готово. В Google Drive появится папка <b>«pigeonpolly — резервные копии»</b> с первой копией, дальше — новая каждый понедельник утром (хранятся последние 12). Если копия когда-нибудь не получится, Google сам пришлёт письмо.</li>
+      </ol>
+      <textarea readonly rows="10">${esc(code)}</textarea>
+      <p class="be-dialog-acts"><button type="button" class="pill-btn pill-fill" data-copy>📋 Скопировать скрипт</button>
+        <button type="button" class="pill-btn" data-rotate title="Если ключ попал к кому-то чужому: старый перестанет работать, скрипт нужно будет вставить заново">Сменить ключ</button>
+        <button type="button" class="pill-btn" data-close>Закрыть</button></p>`;
+    document.body.appendChild(d); d.showModal();
+    d.querySelector('[data-close]').onclick = () => { d.close(); d.remove(); };
+    d.querySelector('[data-copy]').onclick = async e => { try { await navigator.clipboard.writeText(code); } catch (err) { d.querySelector('textarea').select(); document.execCommand('copy'); } e.target.textContent = '✓ Скопировано'; };
+    d.querySelector('[data-rotate]').onclick = () => { if (confirm('Сменить ключ? Старый скрипт перестанет работать — его нужно будет вставить заново.')) { d.close(); d.remove(); autoBackupPanel(true); } };
+  }
   // JSZip для резервных копий — подгружаем только когда нужен
   let zipLib = null;
   const loadZip = () => zipLib || (zipLib = new Promise((res, rej) => {

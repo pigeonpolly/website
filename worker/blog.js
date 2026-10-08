@@ -238,6 +238,14 @@ export async function blogApi(req, env, url, h) {
     return json({ latest: latest && pack(latest), featured: featured.map(x => ({ ...pack(x), star: true })) });
   }
 
+  // полная копия сайта: блог + челлендж (аккаунты, работы) + список файлов картинок. Доступ — админ или личный ключ автокопии (?token=)
+  if (m === 'GET' && p === '/api/blog/backup') {
+    const tok = await h.getMeta('backup_token');
+    const byToken = tok && url.searchParams.get('token') === tok;
+    if (!byToken) await admin();
+    return json(await fullBackup(env));
+  }
+
   // ---------- редактор (только админ) ----------
   if (p.startsWith('/api/blog/admin/')) {
     await admin();
@@ -330,6 +338,12 @@ export async function blogApi(req, env, url, h) {
       await env.DB.prepare('UPDATE blog_posts SET featured = ? WHERE id = ?').bind(featured ? 1 : 0, Number(id)).run();
       return json({ ok: true });
     }
+    // личный ключ для автокопии в Google Drive (создать / сменить)
+    if (a === 'backup-token') {
+      let tok = await h.getMeta('backup_token');
+      if (m === 'POST' || !tok) { tok = randomHex(24); await h.setMeta('backup_token', tok); }
+      return json({ token: tok, url: SITE + '/api/blog/backup?token=' + tok });
+    }
     // резервная копия блога: все статьи, теги, разделы, комментарии и список картинок (сами картинки браузер скачивает по /media/...)
     if (m === 'GET' && a === 'export') {
       const all = q => env.DB.prepare(q).all().then(r => r.results);
@@ -348,7 +362,7 @@ export async function blogApi(req, env, url, h) {
     }
     if (m === 'POST' && a === 'import') {
       const b = await body();
-      if (!b || b.version !== 1 || !Array.isArray(b.posts)) fail(400, 'bad');
+      if (!b || ![1, 2].includes(b.version) || !Array.isArray(b.posts)) fail(400, 'bad');
       const COLS = ['slug', 'status', 'cover', 't_ru', 't_en', 't_lv', 'd_ru', 'd_en', 'd_lv', 'b_ru', 'b_en', 'b_lv', 'tags_ru', 'tags_en', 'tags_lv', 'views', 'likes', 'created_at', 'updated_at', 'published_at', 'featured', 'pinned', 'src_lang', 'section'];
       let posts = 0, comments = 0;
       for (const p of b.posts) {
@@ -694,6 +708,23 @@ async function syncTagColumns(env) {
   }
 }
 
+async function fullBackup(env) {
+  const all = q => env.DB.prepare(q).all().then(r => r.results);
+  const media = [];
+  if (env.MEDIA) { let cursor; do { const r = await env.MEDIA.list({ prefix: 'blog/', cursor }); media.push(...r.objects.map(o => o.key)); cursor = r.truncated ? r.cursor : null; } while (cursor); }
+  const works = await all('SELECT * FROM posts');
+  return {
+    version: 2, site: SITE, exported_at: new Date().toISOString(),
+    // блог (тот же формат, что понимает «Восстановить из копии»)
+    posts: await all('SELECT * FROM blog_posts'), tags: await all('SELECT * FROM blog_tags'), sections: await all('SELECT * FROM blog_sections'),
+    comments: await all('SELECT c.*, p.slug FROM blog_comments c JOIN blog_posts p ON p.id = c.post_id'), likes: await all('SELECT * FROM blog_likes'), media,
+    // челлендж: аккаунты (ник, e-mail, бейджи, серии) и работы на стене
+    challenge: { users: await all('SELECT id, sub, email, nick, consent, banned, created_at, best, badges, months, mcount, picks, last_seen FROM users'), works, meta: await all('SELECT * FROM meta WHERE key NOT IN (\'backup_token\', \'blog_salt\')') },
+    // все файлы, которые надо скачать вместе с копией
+    files: [...media.map(k => ({ path: 'media/' + k, url: '/media/' + k })), ...works.map(w => ({ path: `challenge/works/${w.day}-${w.id}.jpg`, url: '/api/img/' + w.id }))],
+  };
+}
+
 // ---------- страницы ----------
 function commentHtml(c, lang) {
   const name = c.nick
@@ -729,7 +760,7 @@ function sidebar(posts, lang, activeTag, activeMonth = '', post = false) {
   // теги — по убыванию частоты: самый частый золотой, следующие три фиолетовые, остальные белые
   const tags = Object.entries(count).sort((a, b) => b[1] - a[1] || tagLabel(a[0], lang).localeCompare(tagLabel(b[0], lang))).slice(0, 24);
   const popular = [...posts].sort((a, b) => (b.likes * 5 + b.views + b.comments * 3) - (a.likes * 5 + a.views + a.comments * 3)).slice(0, 5);
-  const list = arr => `<ul class="bs-list">${arr.map(p => `<li><a href="${blogUrl(lang, p.slug)}">${esc(field(p, 't', lang))}</a></li>`).join('')}</ul>`;
+  const list = arr => `<ul class="bs-list">${arr.map(p => `<li><a href="${blogUrl(lang, p.slug)}" title="${esc(field(p, 't', lang))}">${esc(field(p, 't', lang))}</a></li>`).join('')}</ul>`;
   return `<aside class="bl-side">
     ${fav.length ? `<section><h2>★ ${t.featured.replace(/^★\s*/, '')}</h2>${list(fav)}
       ${!post && fav.length > 1 ? `<p class="bl-more"><a href="${blogUrl(lang, '', '?fav=1')}">${t.onlyFav} →</a></p>` : ''}</section>` : ''}
