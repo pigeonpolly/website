@@ -1900,3 +1900,10 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .be-body figcaption:empty::before { content: 'Подпись к картинке… (можно оставить пустой)'; color: #B3AACB; }
 .be-body .be-img-bad, .be-body img.be-img-bad { outline: 4px solid #E0443A; outline-offset: 4px; border-radius: 12px; }
 .be-body figure.be-img-bad::before { content: '⚠ картинка не скопировалась — перетащите сюда файл'; display: block; margin-bottom: 6px; color: #E0443A; font: 700 14px var(--sans); }
+/* статья + боковая колонка (теги, архив, популярное) справа */
+@media (min-width: 1101px) {
+  .bp-wrap { display: grid; grid-template-columns: minmax(0, 760px) 280px; gap: 56px; justify-content: center; align-items: start; padding: 0 var(--gutter); }
+  .bp-wrap .bp { margin: 0; padding: 32px 0 40px; box-sizing: border-box; max-width: none; }
+  .bp-wrap .bp-more { margin: 0; padding: 140px 0 72px; position: sticky; top: calc(var(--header-h) - 100px); max-width: none; }
+  .bp-wrap .bp-more .bl-side { grid-template-columns: 1fr; position: static; }
+}

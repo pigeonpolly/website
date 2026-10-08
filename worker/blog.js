@@ -526,7 +526,7 @@ export async function blogPage(req, env, url, h) {
   const textLang = langOf(post, lang);
   const words = stripTags(field(post, 'b', lang)).split(' ').length;
   const description = field(post, 'd', lang) || stripTags(field(post, 'b', lang)).slice(0, 160);
-  const content = `<article class="bp" data-post-id="${post.id}" data-status="${post.status}">
+  const content = `<div class="bp-wrap"><article class="bp" data-post-id="${post.id}" data-status="${post.status}">
     <p class="bp-back"><a href="${blogUrl(lang, '')}">${t.back}</a></p>
     <header class="bp-head"${textLang !== lang ? ` lang="${textLang}"` : ''}>
       ${post.status === 'draft' ? `<p class="bl-draft">${t.draft}</p>` : ''}
@@ -544,7 +544,7 @@ export async function blogPage(req, env, url, h) {
       <div class="bc-form-wrap" data-comment-form></div>
     </section>
   </article>
-  <div class="bp-more">${sidebar(published, lang, '', '', true)}</div>
+  <div class="bp-more">${sidebar(published, lang, '', '', true)}</div></div>
   <script src="/assets/blog.js" defer></script>`;
   const jsonld = { '@context': 'https://schema.org', '@type': 'BlogPosting', headline: title, description, inLanguage: textLang,
     datePublished: new Date((post.published_at || post.updated_at) * 1000).toISOString(), dateModified: new Date(post.updated_at * 1000).toISOString(),
