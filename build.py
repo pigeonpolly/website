@@ -137,6 +137,21 @@ def nav_html(current):
     return "\n".join(items)
 
 
+def footer_html():
+    """Карта сайта в подвале: колонка на каждый пункт меню, внутри — вкладки раздела."""
+    cols = []
+    for entry in NAV:
+        path, label = entry[0], entry[1]
+        links = SECTIONS.get(entry[2], []) if len(entry) == 3 else []
+        if path == "challenge":
+            links = [("polly-helps", "Polly, help me draw")]
+        if path == "blog":
+            links = []
+        lis = "".join(f'<li><a href="{href(p)}">{esc(l)}</a></li>' for p, l in links)
+        cols.append(f'<div class="ft-col"><p class="ft-h"><a href="{href(path)}">{esc(label)}</a></p><ul>{lis}</ul></div>')
+    return '<nav class="ft-map" aria-label="Site map">' + "".join(cols) + "</nav>"
+
+
 GALLERY_LABELS = {
     "bird": "Pigeon Polly illustration", "snail": "Mr.Chew illustration", "detective": "Mr.Titos illustration",
     "halloween": "Pumpkin Family illustration", "anxiety": "Anxiety series, ecoline painting",
@@ -420,7 +435,7 @@ def build():
                     .replace("{{title}}", esc(full_title))
                     .replace("{{description}}", esc(desc))
                     .replace("{{canonical}}", canonical)
-                    .replace("{{nav}}", nav_html(path))
+                    .replace("{{nav}}", nav_html(path)).replace("{{footer_map}}", footer_html())
                     .replace("{{body_class}}", "home" if not path else "inner")
                     .replace("{{content}}", page_body))
             page = localize(page, lang)
@@ -431,7 +446,7 @@ def build():
         print("built", dest.relative_to(ROOT))
     # 404
     nf = layout.replace("{{title}}", "Page not found · Pigeon Polly Art Lab").replace("{{description}}", "")
-    nf = nf.replace("{{canonical}}", SITE_URL + "/").replace("{{nav}}", nav_html("404")).replace("{{body_class}}", "inner")
+    nf = nf.replace("{{canonical}}", SITE_URL + "/").replace("{{nav}}", nav_html("404")).replace("{{footer_map}}", footer_html()).replace("{{body_class}}", "inner")
     nf = nf.replace("{{content}}", (SRC / "pages" / "404.html").read_text())
     nf = nf.replace("{{hreflang}}", "").replace("{{lang_switch}}", "")
     (OUT / "404.html").write_text(nf)

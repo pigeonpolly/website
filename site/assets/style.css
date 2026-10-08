@@ -1614,3 +1614,14 @@ details.am-art .am-series { padding: 0 24px 24px; }
 }
 .pill-btn { text-decoration: none; }
 .ap-hero { overflow-x: clip; }
+
+/* ---------- Карта сайта в подвале ---------- */
+.ft-map { flex: 1 1 100%; display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 20px 24px;
+  padding-bottom: 22px; margin-bottom: 4px; border-bottom: 1px solid var(--line); }
+.ft-map ul { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.ft-h { margin: 0 0 10px !important; font-weight: 700; }
+.ft-h a { color: var(--text); text-decoration: none; }
+.ft-map ul a { color: var(--muted); text-decoration: none; font-size: 14px; }
+.ft-map a:hover { color: var(--text); text-decoration: underline; }
+@media (max-width: 900px) { .ft-map { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .ft-map { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
