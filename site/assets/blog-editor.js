@@ -77,20 +77,18 @@
     const tagCount = tagDict.length;
     const postsHtml = list => {
       if (tagFilter) list = state.posts.filter(p => String(p.tags_en || '').split(',').map(x => x.trim().toLowerCase()).includes(tagFilter.t));
-      // фильтр по языкам: на всех трёх / не на всех / только один язык / нет перевода на язык
-      const has = p => ['ru', 'en', 'lv'].filter(l => p['t_' + l]);
-      const LF = [['all', 'Все', () => true], ['full', '✓ На всех трёх', p => has(p).length === 3], ['part', 'Не на всех', p => has(p).length < 3],
-        ...['ru', 'en', 'lv'].map(l => ['only_' + l, 'Только ' + l.toUpperCase(), p => has(p).join() === l]),
-        ...['ru', 'en', 'lv'].map(l => ['no_' + l, 'Нет ' + l.toUpperCase(), p => !p['t_' + l]])];
+      // фильтр по переводам: все / переведены на все три языка / нужен перевод
+      const full = p => ['ru', 'en', 'lv'].every(l => p['t_' + l]);
+      const LF = [['all', 'Все статьи', () => true], ['full', 'Переведены полностью', full], ['part', 'Нужен перевод', p => !full(p)]];
       const base = list;
-      if (!LF.some(([k, , f]) => k === langFilter && base.some(f))) langFilter = 'all';
+      if (!LF.some(([k]) => k === langFilter)) langFilter = 'all';
       list = base.filter(LF.find(([k]) => k === langFilter)[2]);
-      const bar = base.length ? `<div class="be-langbar" role="group" aria-label="Фильтр по языкам">${LF.map(([k, n, f]) => [k, n, base.filter(f).length])
-        .filter(([k, , c]) => k === 'all' || c).map(([k, n, c]) => `<button type="button" class="be-lchip" data-lf="${k}" aria-pressed="${langFilter === k}">${n} <span>${c}</span></button>`).join('')}</div>` : '';
+      const bar = base.length ? `<div class="be-seg" role="group" aria-label="Переводы">${LF.map(([k, n, f]) =>
+        `<button type="button" data-lf="${k}" aria-pressed="${langFilter === k}">${n} <span>${base.filter(f).length}</span></button>`).join('')}</div>` : '';
       const head = bar + (tagFilter ? `<p class="be-filter">Статьи с тегом <b>#${esc(tagFilter.t)}</b> · <button type="button" class="bc-link" data-unfilter>показать все</button></p>` : '');
-      if (!list.length) return head + `<p class="be-note">${dashTab === 'draft' ? 'Черновиков нет.' : 'Опубликованных статей пока нет.'}</p>`;
+      if (!list.length) return head + `<p class="be-note">${langFilter === 'part' ? 'Все статьи переведены 🎉' : langFilter === 'full' ? 'Полностью переведённых статей пока нет.' : dashTab === 'draft' ? 'Черновиков нет.' : 'Опубликованных статей пока нет.'}</p>`;
       return head + `<table class="be-table"><thead><tr><th>Статья</th><th>Статус</th><th>Дата</th><th title="лайки">♥</th><th title="просмотры">👁</th><th title="комментарии">💬</th><th></th></tr></thead><tbody>
-        ${list.map(p => `<tr data-id="${p.id}"><td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a><small>/blog/${esc(p.slug)}/ · ${['ru', 'en', 'lv'].map(l => p['t_' + l] ? l.toUpperCase() : `<s>${l.toUpperCase()}</s>`).join(' ')}</small></td>
+        ${list.map(p => `<tr data-id="${p.id}"><td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a><small>/blog/${esc(p.slug)}/</small><span class="be-langs">${['ru', 'en', 'lv'].map(l => p['t_' + l] ? `<i class="on" title="Есть на ${l.toUpperCase()}">✓ ${l.toUpperCase()}</i>` : `<i title="Нет перевода на ${l.toUpperCase()}">${l.toUpperCase()}</i>`).join('')}</span></td>
           <td><span class="be-st ${p.status}">${p.status === 'published' ? 'опубликована' : 'черновик'}</span></td><td>${fmt(p.published_at || p.updated_at)}</td>
           <td>${p.likes}</td><td>${p.views}</td><td>${p.comments}</td>
           <td class="be-acts"><a href="#${p.id}">Изменить</a> <a href="/ru/blog/${esc(p.slug)}/" target="_blank">Открыть ↗</a> <button class="bc-link be-danger" data-delpost>Удалить</button></td></tr>`).join('')}
