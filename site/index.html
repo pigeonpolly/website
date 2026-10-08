@@ -112,8 +112,15 @@
 @media (max-width: 1100px) {#blk-home-blog .hb-grid { grid-template-columns: 1fr; gap: 36px; }
 #blk-home-blog .hb-side { border-left: 0; padding-left: 0; border-top: 1px solid #ECE6F5; padding-top: 28px; }
 #blk-home-blog .hb-side ol { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }}
-@media (max-width: 700px) {#blk-home-blog .hb-main { grid-template-columns: 1fr; gap: 18px; }
-#blk-home-blog .hb-soon { flex-direction: column; text-align: center; padding: 24px 18px; }}</style><section class="hb" id="home-blog" hidden aria-labelledby="hb-title">
+@media (max-width: 700px) {#blk-home-blog .hb { padding-top: 40px; padding-bottom: 44px; }
+#blk-home-blog .hb-top { margin-bottom: 20px; }
+#blk-home-blog .hb-main, #blk-home-blog .hb-solo .hb-main { grid-template-columns: 1fr; gap: 16px; }
+#blk-home-blog .hb-main .hb-img, #blk-home-blog .hb-solo .hb-main .hb-img { aspect-ratio: 16 / 10; }
+#blk-home-blog .hb-main h3 { font-size: 24px; }
+#blk-home-blog .hb-main p.hb-ex { font-size: 16px; margin-bottom: 18px; -webkit-line-clamp: 3; }
+#blk-home-blog .hb-more { padding: 12px 22px; font-size: 15px; }
+#blk-home-blog .hb-all { padding: 10px 18px; font-size: 15px; }}
+@media (max-width: 700px) {#blk-home-blog .hb-soon { flex-direction: column; text-align: center; padding: 24px 18px; }}</style><section class="hb" id="home-blog" hidden aria-labelledby="hb-title">
   <div class="hb-top">
     <div><p class="hb-kick">Fresh from the blog</p><h2 id="hb-title">Notes from the lab</h2></div>
     <a class="hb-all" href="/blog/">All posts →</a>
