@@ -14,12 +14,60 @@
     editor: ['Blog editor', 'Редактор блога', 'Bloga redaktors'],
     out: ['Sign out', 'Выйти', 'Iziet'],
     menu: ['Account', 'Аккаунт', 'Konts'],
+    nTitle: ['Meet your bird! Now pick a nickname', 'Знакомься со своей птичкой! Теперь выбери ник', 'Iepazīsties ar savu putniņu! Tagad izvēlies segvārdu'],
+    nTitleCat: ['You are a cat! Now pick a nickname', 'Ты котик! Теперь выбери ник', 'Tu esi kaķītis! Tagad izvēlies segvārdu'],
+    nTitleCrow: ['You are a crow with a treasure! Now pick a nickname', 'Ты ворона с сокровищем! Теперь выбери ник', 'Tu esi vārna ar dārgumu! Tagad izvēlies segvārdu'],
+    nText: ['This name will be shown in the flock, on the Daily Challenge wall and in blog comments. 2–24 letters, numbers, dots, dashes or underscores.', 'Под этим ником тебя увидят в стае, на стене челленджа и в комментариях блога. 2–24 символа: буквы, цифры, точка, дефис или подчёркивание.', 'Ar šo vārdu tevi redzēs barā, izaicinājuma sienā un bloga komentāros. 2–24 simboli: burti, cipari, punkts, defise vai pasvītra.'],
+    nPlace: ['your nickname', 'твой ник', 'tavs segvārds'],
+    nSave: ['Done', 'Готово', 'Gatavs'],
+    nTaken: ['This nickname is taken, try another one.', 'Этот ник уже занят, попробуй другой.', 'Šis segvārds jau aizņemts, mēģini citu.'],
+    nBad: ['Use 2–24 letters, numbers, dots, dashes or underscores.', 'Нужно 2–24 символа: буквы, цифры, точка, дефис или подчёркивание.', 'Vajag 2–24 simbolus: burtus, ciparus, punktu, defisi vai pasvītru.'],
+    nErr: ['Something went wrong, please try again.', 'Что-то пошло не так, попробуй ещё раз.', 'Kaut kas nogāja greizi, mēģini vēlreiz.'],
+    nOut: ['Sign out instead', 'Лучше выйти', 'Labāk iziet'],
   };
   const t = k => S[k][L];
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let info = null;
 
-  fetch('/api/whoami', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => { if (d) { info = d; render(); } }).catch(() => {});
+  function check() {
+    return fetch('/api/whoami', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => {
+      if (!d) return;
+      info = d; render();
+      if (d.user && !d.user.nick) askNick(d.user);
+    }).catch(() => {});
+  }
+  window.PPAccount = { check };
+  check();
+
+  // ник обязателен: окно сразу после первого входа, закрыть можно только выбрав ник (или выйдя)
+  function askNick(u) {
+    if (document.getElementById('acct-nick')) return;
+    const kind = window.PPBirds ? window.PPBirds.looks(u.id).kind : 'bird';
+    const d = document.createElement('dialog');
+    d.id = 'acct-nick'; d.className = 'acct-nick';
+    d.innerHTML = `<form method="dialog"><canvas width="${window.PPBirds ? window.PPBirds.SW : 28}" height="26" aria-hidden="true"></canvas>
+      <h2>${t(kind === 'cat' ? 'nTitleCat' : kind === 'crow' ? 'nTitleCrow' : 'nTitle')}</h2><p>${t('nText')}</p>
+      <input name="nick" required minlength="2" maxlength="24" autocomplete="nickname" placeholder="${t('nPlace')}">
+      <p class="acct-nick-st" role="status" aria-live="polite"></p>
+      <button class="pill-btn pill-fill" type="submit">${t('nSave')}</button>
+      <button class="acct-nick-out" type="button">${t('nOut')}</button></form>`;
+    document.body.appendChild(d);
+    if (window.PPBirds) d.querySelector('canvas').getContext('2d').drawImage(window.PPBirds.sprite(window.PPBirds.looks(u.id), 0), 0, 0);
+    d.addEventListener('cancel', e => e.preventDefault()); // Esc не закрывает
+    const f = d.querySelector('form'), st = d.querySelector('.acct-nick-st');
+    f.addEventListener('submit', async e => {
+      e.preventDefault();
+      const nick = f.nick.value.trim().replace(/^@/, '');
+      if (!/^[\p{L}\p{N}_.-]{2,24}$/u.test(nick)) { st.textContent = t('nBad'); return; }
+      const r = await fetch('/api/nick', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ nick }) });
+      const j = await r.json().catch(() => ({}));
+      if (r.ok) { location.reload(); return; }
+      st.textContent = t(j.error === 'taken' ? 'nTaken' : j.error === 'nick' ? 'nBad' : 'nErr');
+    });
+    d.querySelector('.acct-nick-out').addEventListener('click', async () => { await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }); location.reload(); });
+    d.showModal();
+    f.nick.focus();
+  }
 
   function render() {
     const u = info.user;

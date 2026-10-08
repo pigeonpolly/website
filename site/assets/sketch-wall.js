@@ -231,7 +231,7 @@
   async function login(credential) {
     const st = document.getElementById('sw-status');
     try {
-      await post('login', { credential }); await refresh(); loadTop(); loadWall(true);
+      await post('login', { credential }); window.PPAccount && window.PPAccount.check(); await refresh(); loadTop(); loadWall(true);
       document.getElementById('works')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     catch (e) { if (st) st.textContent = e.code === 'banned' ? t('banned') : t('err'); }

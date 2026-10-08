@@ -80,7 +80,7 @@
 
   async function login(credential) {
     try { await api('login', { credential }); } catch (e) { return; }
-    load();
+    location.reload(); // шапка обновится и, если ника ещё нет, сразу попросит его выбрать
   }
   function gButton(el) {
     const go = () => {
