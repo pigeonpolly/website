@@ -21,7 +21,7 @@
     title: 'Нужен заголовок.', too_big: 'Статья слишком большая для сохранения (больше ~900 000 символов вместе с разметкой).', save: 'сервер не подтвердил сохранение.', fetch: 'Не удалось скопировать картинку.', login: 'Сессия закончилась — войдите снова.', admin: 'Нужен вход администратора.',
   };
   const errText = e => ERR[e.code] || 'Что-то пошло не так (' + esc(e.code || e.message) + ').';
-  let state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null;
+  let flash = '', state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null;
   // все теги из статей: { ru: ['акварель', …], … } и счётчики
   function tagsByLang() {
     knownTagCounts = {};
@@ -91,7 +91,8 @@
       }).join('');
       return `<p class="be-note">Нажмите на тег, чтобы увидеть его статьи. Переименование и удаление меняют тег сразу во всех статьях.</p><div class="be-tagcols">${cols}</div>`;
     };
-    app.innerHTML = `<div class="be-top">
+    const flashHtml = flash ? `<p class="be-flash" role="status">${flash}</p>` : ''; flash = '';
+    app.innerHTML = `${flashHtml}<div class="be-top">
         <a class="pill-btn pill-fill" href="#new">＋ Новая статья</a>
         <label class="be-switch"><input type="checkbox" id="be-strict" ${state.strict ? 'checked' : ''}><span></span>
           <b>Строгий режим</b><small>не больше 1 комментария в час с одного адреса</small></label>
@@ -465,10 +466,14 @@
         const r = await api('blog/admin/save', d);
         if (!r || !r.id) throw Object.assign(new Error('save'), { code: 'save' });
         dirty = false;
-        if (!post.id) { history.replaceState(null, '', '#' + r.id); }
-        await editor(r.id);
-        app.querySelector('.be-status').innerHTML = r.status === 'published'
-          ? `Опубликовано ✓ <a href="/ru/blog/${esc(r.slug)}/" target="_blank">открыть статью ↗</a>` : 'Черновик сохранён ✓ (его видите только вы)';
+        // после сохранения — сразу к списку статей, на нужную вкладку, с отметкой «сохранено»
+        const title = d.t_ru || d.t_en || d.t_lv;
+        flash = r.status === 'published'
+          ? `✓ «${esc(title)}» опубликована. <a href="/ru/blog/${esc(r.slug)}/" target="_blank">Открыть статью ↗</a>`
+          : `✓ Черновик «${esc(title)}» сохранён (его видите только вы).`;
+        dashTab = r.status === 'published' ? 'published' : 'draft'; tagFilter = null;
+        if (location.hash) location.hash = ''; else dashboard();
+        window.scrollTo(0, 0);
       } catch (e) {
         status('⚠ Не сохранилось: ' + errText(e));
         alert('Статья НЕ сохранилась: ' + errText(e).replace(/<[^>]+>/g, '') + '\nНе закрывайте страницу — попробуйте ещё раз.');

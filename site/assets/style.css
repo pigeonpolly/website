@@ -1935,3 +1935,5 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .bl-pop li::marker { color: #7A6F99; }
 .bl-side .bl-more a { color: #C0582F; }
 .bp-more .bl-side { gap: 22px; }
+.be-flash { margin: 0 0 18px; padding: 14px 18px; border-radius: 14px; background: #DDF5E7; color: #1E5E3A; font-weight: 700; }
+.be-flash a { color: #1E5E3A; }
