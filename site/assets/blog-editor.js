@@ -15,8 +15,9 @@
   };
   const fmt = ts => ts ? new Date(ts * 1000).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
   const ERR = {
-    ai_limit: 'Бесплатный лимит переводов на сегодня закончился — попробуйте завтра.',
-    ai: 'Переводчик сейчас не отвечает. Попробуйте ещё раз чуть позже.',
+    ai_limit: 'Бесплатный лимит Gemini на сейчас закончился — попробуйте через час или завтра.',
+    ai: 'Gemini сейчас не отвечает (бывает, когда он перегружен). Попробуйте ещё раз через пару минут.',
+    no_key: 'Перевод не подключён: нажмите в списке статей «⚙ Перевод (Gemini)» и вставьте ключ.', bad_key: 'Google не принял ключ Gemini — проверьте его в «⚙ Перевод (Gemini)».',
     media: 'Хранилище картинок не подключено.', big: 'Картинка слишком большая (до 8 МБ).', type: 'Подходят JPG, PNG, WebP и GIF.',
     title: 'Нужен заголовок.', too_big: 'Статья слишком большая для сохранения (больше ~900 000 символов вместе с разметкой).', save: 'сервер не подтвердил сохранение.', fetch: 'Не удалось скопировать картинку.', login: 'Сессия закончилась — войдите снова.', admin: 'Нужен вход администратора.',
   };
@@ -117,6 +118,7 @@
     app.innerHTML = `${flashHtml}<div class="be-top">
         <a class="pill-btn pill-fill" href="#new">＋ Новая статья</a>
         <button type="button" class="pill-btn" id="be-backup" title="Два архива: данные (блог, челлендж, все картинки) и код сайта с GitHub">💾 Скачать полную копию сайта</button>
+        <button type="button" class="pill-btn" id="be-gkey">⚙ Перевод (Gemini)${state.gemini ? ' ✓' : ''}</button>
         <button type="button" class="pill-btn" id="be-auto" title="Копия всего сайта сама раз в неделю в ваш Google Drive">🔁 Автокопия в Google Drive</button>
         <label class="pill-btn be-restore" title="Вернуть статьи и картинки из ранее скачанной копии">♻ Восстановить из копии<input type="file" id="be-restore" accept=".zip" hidden></label>
         <label class="be-switch"><input type="checkbox" id="be-strict" ${state.strict ? 'checked' : ''}><span></span>
@@ -217,6 +219,7 @@
       btn.disabled = false;
     });
     app.querySelector('#be-auto').addEventListener('click', () => autoBackupPanel());
+    app.querySelector('#be-gkey').addEventListener('click', () => geminiPanel());
     app.querySelector('#be-restore').addEventListener('change', async e => {
       const f = e.target.files[0]; e.target.value = '';
       if (!f || !confirm('Восстановить блог из этой копии? Статьи с теми же адресами будут заменены версиями из копии, остальные останутся как есть.')) return;
@@ -277,9 +280,11 @@
     for (const [l] of LANGS) for (const k of ['t', 'd', 'tags', 'b']) post[`${k}_${l}`] = post[`${k}_${l}`] || '';
     app.innerHTML = `<p class="be-back"><a href="#">← Все статьи</a></p>
       <div class="be-tabs" role="tablist">${LANGS.map(([l, n], i) => `<button type="button" role="tab" data-tab="${l}" aria-selected="${!i}">${n}</button>`).join('')}
-</div>
+        <button type="button" class="pill-btn pill-fill be-tr" id="be-tr">🌐 Перевести с RU на EN и LV</button></div>
+      <div class="be-progress" id="be-progress" hidden></div>
       <details class="be-hint"><summary>Как перевести статью и не потерять картинки</summary>
-        <ol><li><b>Проще всего — в Google Docs:</b> откройте документ со статьёй → <i>Инструменты → Перевести документ</i> → выберите язык. Google сделает копию документа уже на нужном языке, с картинками и оформлением. Откройте её, Ctrl+A, Ctrl+C и вставьте во вкладку RU / EN / LV здесь.</li>
+        <ol><li><b>Кнопка «🌐 Перевести»</b> (вверху справа): переводит открытую вкладку на два других языка через Gemini — картинки, подписи, заголовки и жирный остаются на месте, переводится только текст. Потом проверьте и поправьте перевод.</li>
+        <li><b>Или в Google Docs:</b> откройте документ со статьёй → <i>Инструменты → Перевести документ</i> → выберите язык. Google сделает копию документа уже на нужном языке, с картинками и оформлением. Откройте её, Ctrl+A, Ctrl+C и вставьте во вкладку RU / EN / LV здесь.</li>
         <li><b>Если переводите в другом переводчике</b> (DeepL, Google Translate) и вставили текст без картинок — нажмите в панели над текстом кнопку <b>«🖼 Картинки из оригинала»</b>: картинки (с подписями) встанут на те же места между абзацами, что и в оригинале. Подписи потом переведите сами.</li></ol>
         Писать можно и прямо здесь, или вставлять из Google Docs (Ctrl+A, Ctrl+C → Ctrl+V в поле «Текст») — картинки сразу скопируются на сайт.</details>
       ${LANGS.map(([l], i) => `<section class="be-pane" data-pane="${l}" ${i ? 'hidden' : ''}>
@@ -380,6 +385,7 @@
       app.querySelectorAll('[data-tab]').forEach(x => x.setAttribute('aria-selected', x === b));
       app.querySelectorAll('[data-pane]').forEach(p => { p.hidden = p.dataset.pane !== active; });
       const others = LANGS.map(x => x[0]).filter(x => x !== active).map(x => x.toUpperCase());
+      $('#be-tr').textContent = `🌐 Перевести с ${active.toUpperCase()} на ${others.join(' и ')}`;
     }));
     $('#be-section').addEventListener('change', async e => {
       if (e.target.value !== '__new') return;
@@ -576,6 +582,45 @@
     $('#be-cover-url').addEventListener('change', e => setCover(e.target.value.trim()));
     app.addEventListener('click', e => { if (e.target.id === 'be-cover-rm') setCover(''); });
 
+    // перевод с открытой вкладки на две другие
+    $('#be-tr').addEventListener('click', async () => {
+      const ru = collect(), from = active, targets = LANGS.map(x => x[0]).filter(x => x !== from);
+      if (!ru['t_' + from].trim() && !stripHtml(ru['b_' + from])) { status(`Во вкладке ${from.toUpperCase()} пока пусто — напишите или вставьте статью.`); return; }
+      const filled = targets.filter(l => ru['t_' + l] || stripHtml(ru['b_' + l]));
+      if (filled.length && !confirm(`Во вкладках ${filled.map(x => x.toUpperCase()).join(' и ')} уже есть текст. Заменить его новым переводом?`)) return;
+      const btn = $('#be-tr'); btn.disabled = true;
+      // полоска загрузки на каждый язык: переводим кусочками по несколько абзацев
+      status('');
+      const prog = $('#be-progress');
+      prog.hidden = false;
+      prog.innerHTML = targets.map(l => `<div class="be-prog" data-p="${l}"><b>${l.toUpperCase()}</b><span class="be-bar"><i style="width:0%"></i></span><em>ждёт…</em></div>`).join('');
+      const bar = (l, pct, text) => { const r = prog.querySelector(`[data-p="${l}"]`); r.querySelector('i').style.width = pct + '%'; r.querySelector('em').textContent = text; r.classList.toggle('done', pct >= 100); };
+      try {
+        for (const l of targets) {
+          const { texts, rebuild } = splitForTranslation(ru, from);
+          const out = [];
+          bar(l, 2, '0%');
+          let backup = false;
+          for (let i = 0; i < texts.length; i += 15) {
+            const r = await api('blog/admin/translate', { texts: texts.slice(i, i + 15), from, to: l, strict: true });
+            out.push(...r.texts);
+            if (r.engine !== 'gemini') backup = true;
+            const pct = Math.round(out.length / texts.length * 100);
+            bar(l, pct, pct >= 100 ? (backup ? 'готово (запасной переводчик — проверьте внимательнее)' : 'готово ✓') : pct + '%');
+          }
+          const res = rebuild(out);
+          app.querySelector(`[data-k="t_${l}"]`).value = res.t;
+          app.querySelector(`[data-k="d_${l}"]`).value = res.d;
+          app.querySelector(`[data-k="b_${l}"]`).innerHTML = res.b;
+          autoSlug();
+        }
+        $('#be-src').value = from; // запоминаем язык оригинала — для пометки под переводом
+        status(`Готово! Проверьте переводы во вкладках ${targets.map(x => x.toUpperCase()).join(' и ')} — их можно поправить.`);
+        touch();
+      } catch (e) { status(errText(e)); prog.querySelectorAll('.be-prog:not(.done) em').forEach(x => { x.textContent = 'остановлено'; }); }
+      btn.disabled = false;
+    });
+
     // сохранение
     app.querySelectorAll('[data-save]').forEach(b => b.addEventListener('click', async () => {
       const d = collect(); d.status = b.dataset.save;
@@ -604,6 +649,30 @@
     }));
   }
 
+
+  // делим статью на кусочки для переводчика и собираем обратно
+  function splitForTranslation(ru, from) {
+    const texts = [ru['t_' + from], ru['d_' + from], '']; // теги не переводим здесь — у них общий словарь
+    const box = document.createElement('div'); box.innerHTML = ru['b_' + from];
+    const slots = [];
+    const walk = el => {
+      for (const ch of el.children) {
+        const tag = ch.tagName.toLowerCase();
+        if (tag === 'ul' || tag === 'ol' || tag === 'blockquote' && ch.querySelector('p')) walk(ch);
+        else if (tag === 'figure') { const cap = ch.querySelector('figcaption'); if (cap && cap.textContent.trim()) { slots.push(cap); texts.push(cap.innerHTML); } } // подпись к картинке тоже переводим
+        else if (tag === 'hr' || tag === 'img' || !ch.textContent.trim()) continue;
+        else { slots.push(ch); texts.push(ch.innerHTML); }
+      }
+    };
+    walk(box);
+    return {
+      texts,
+      rebuild(out) {
+        slots.forEach((el, i) => { el.innerHTML = out[3 + i]; });
+        return { t: out[0], d: out[1], tags: out[2], b: box.innerHTML };
+      },
+    };
+  }
 
   // уменьшаем большие фото до 1600px, чтобы страницы грузились быстро (GIF не трогаем)
   async function shrink(file) {
@@ -677,6 +746,37 @@ posts/ — статьи как обычные HTML-файлы (открываю�
 Восстановить блог: Редактор блога → «♻ Восстановить из копии» → выбрать этот ZIP.
 Код и страницы сайта — во втором архиве (website-main.zip с GitHub, скачивается вместе с этим).
 `;
+  // ключ Gemini для перевода статей — вставляется прямо здесь (хранится на сервере сайта)
+  async function geminiPanel() {
+    let st = await api('blog/admin/gemini-key').catch(() => ({}));
+    const d = document.createElement('dialog');
+    d.className = 'be-dialog';
+    const render = () => {
+      d.innerHTML = `<h2>⚙ Перевод статей (Gemini)</h2>
+        <p>Статус: ${st.connected ? `<b style="color:#1E7A45">ключ подключён ✓</b>${st.from === 'cloudflare' ? ' (из настроек Cloudflare)' : ''}` : '<b style="color:#C0392B">ключ не подключён</b>'}</p>
+        <ol><li>Откройте <a href="https://aistudio.google.com/app/apikey" target="_blank" rel="noopener">aistudio.google.com → API keys ↗</a> (бесплатно, тем же Google-аккаунтом).</li>
+        <li>Нажмите <b>Create API key</b>, скопируйте ключ.</li><li>Вставьте его сюда и нажмите «Сохранить». Ключ хранится на сервере сайта, читатели его не видят.</li></ol>
+        <p><input type="password" id="be-gk" placeholder="вставьте ключ Gemini" autocomplete="off" style="width:100%;box-sizing:border-box;padding:10px 14px;border-radius:12px;border:1px solid #CFC7E2;font:15px var(--sans)"></p>
+        <p class="be-gk-test"></p>
+        <p class="be-dialog-acts"><button type="button" class="pill-btn pill-fill" data-save>Сохранить</button>
+          ${st.connected ? '<button type="button" class="pill-btn" data-test>Проверить перевод</button>' : ''}
+          <button type="button" class="pill-btn" data-close>Закрыть</button></p>`;
+      d.querySelector('[data-close]').onclick = () => { d.close(); d.remove(); dashboard(); };
+      d.querySelector('[data-save]').onclick = async () => {
+        const key = d.querySelector('#be-gk').value.trim();
+        if (!key) return;
+        st = await api('blog/admin/gemini-key?test=1', { key });
+        render(); showTest();
+      };
+      const t = d.querySelector('[data-test]');
+      t && (t.onclick = async () => { d.querySelector('.be-gk-test').textContent = 'Проверяю…'; st = await api('blog/admin/gemini-key?test=1'); showTest(); });
+    };
+    const showTest = () => {
+      const el = d.querySelector('.be-gk-test'); if (!el || st.test == null) return;
+      el.innerHTML = String(st.test).startsWith('ERROR:') ? `⚠ Не получилось: ${errText({ code: st.test.slice(6) })}` : `✓ Работает! «Привет! Это проверка перевода.» → «${esc(st.test)}»`;
+    };
+    render(); document.body.appendChild(d); d.showModal();
+  }
   // автокопия раз в неделю: готовый скрипт для Google Apps Script с личным ключом
   async function autoBackupPanel(rotate) {
     let t;

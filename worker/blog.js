@@ -256,7 +256,7 @@ export async function blogApi(req, env, url, h) {
       const pending = (await env.DB.prepare(`SELECT c.id, c.body, c.anon, c.created_at, c.post_id, p.slug, p.t_ru, u.nick FROM blog_comments c
         JOIN blog_posts p ON p.id = c.post_id LEFT JOIN users u ON u.id = c.user_id WHERE c.status = 'pending' ORDER BY c.created_at DESC LIMIT 100`).all()).results
         .map(c => ({ ...c, name: c.nick ? '@' + c.nick : birdName(c.anon, 'ru') }));
-      return json({ posts: rows, pending, strict: (await h.getMeta('blog_strict')) === '1', ai: !!env.AI || env.DEV_FAKE_LOGIN === '1', gemini: !!env.GEMINI_KEY, media: !!env.MEDIA });
+      return json({ posts: rows, pending, strict: (await h.getMeta('blog_strict')) === '1', ai: !!env.AI || env.DEV_FAKE_LOGIN === '1', gemini: !!(await geminiKey(env)), media: !!env.MEDIA });
     }
     if (m === 'GET' && a === 'post') {
       const post = await env.DB.prepare('SELECT * FROM blog_posts WHERE id = ?').bind(Number(url.searchParams.get('id'))).first();
@@ -337,6 +337,20 @@ export async function blogApi(req, env, url, h) {
       const { id, featured } = await body();
       await env.DB.prepare('UPDATE blog_posts SET featured = ? WHERE id = ?').bind(featured ? 1 : 0, Number(id)).run();
       return json({ ok: true });
+    }
+    // ключ Gemini из редактора: сохранить / проверить (сам ключ наружу не отдаём)
+    if (a === 'gemini-key') {
+      if (m === 'POST') {
+        const { key } = await body();
+        const k = String(key || '').trim();
+        if (k) await h.setMeta('gemini_key', k); else await env.DB.prepare("DELETE FROM meta WHERE key = 'gemini_key'").run();
+      }
+      const k = await geminiKey(env);
+      let test = null;
+      if (k && url.searchParams.get('test')) {
+        try { test = (await gemini(env, ['Привет! Это проверка перевода.'], 'ru', 'en', k))[0]; } catch (e) { test = 'ERROR:' + (e.code || 'ai'); }
+      }
+      return json({ connected: !!k, from: env.GEMINI_KEY ? 'cloudflare' : k ? 'site' : '', test });
     }
     // личный ключ для автокопии в Google Drive (создать / сменить)
     if (a === 'backup-token') {
@@ -494,9 +508,9 @@ export async function blogApi(req, env, url, h) {
       return json({ url: local });
     }
     if (m === 'POST' && a === 'translate') {
-      const { texts, to, from } = await body();
+      const { texts, to, from, strict } = await body();
       if (!LANGS.includes(to) || !LANGS.includes(from) || to === from || !Array.isArray(texts)) fail(400, 'bad');
-      try { return json(await translateAll(env, texts.slice(0, 300).map(s => String(s).slice(0, 4000)), from, to)); }
+      try { return json(await translateAll(env, texts.slice(0, 300).map(s => String(s).slice(0, 4000)), from, to, !!strict)); }
       catch (e) { fail(e.status || 502, e.code || 'ai'); }
     }
   }
@@ -562,7 +576,13 @@ async function translateOne(env, text, from, to) {
 const LANG_NAME = { ru: 'Russian', en: 'English', lv: 'Latvian' };
 // Flash-Lite — быстрые (30 абзацев ≈ 8 с) и реже перегружены; полная Flash — запасная
 const GEMINI_MODELS = ['gemini-3.1-flash-lite', 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.5-flash'];
-async function gemini(env, texts, from, to) {
+// ключ Gemini: из Cloudflare (GEMINI_KEY) или из настроек редактора (meta.gemini_key)
+async function geminiKey(env) {
+  if (env.GEMINI_KEY) return env.GEMINI_KEY;
+  const r = await env.DB.prepare("SELECT value FROM meta WHERE key = 'gemini_key'").first().catch(() => null);
+  return r && r.value || '';
+}
+async function gemini(env, texts, from, to, key) {
   const prompt = `You are a careful professional translator. Translate every string in the JSON array below from ${LANG_NAME[from]} to ${LANG_NAME[to]}.
 The strings are consecutive parts of one blog post written by an illustrator about drawing.
 Rules:
@@ -580,9 +600,10 @@ ${JSON.stringify(texts)}`;
     if (attempt) await new Promise(res => setTimeout(res, 8000)); // все заняты — ждём и пробуем ещё раз
   for (const model of models) {
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-      method: 'POST', headers: { 'x-goog-api-key': env.GEMINI_KEY, 'content-type': 'application/json' },
+      method: 'POST', headers: { 'x-goog-api-key': key, 'content-type': 'application/json' },
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.2, responseMimeType: 'application/json', responseSchema: { type: 'ARRAY', items: { type: 'STRING' } } } }),
     });
+    if (r.status === 400 || r.status === 401 || r.status === 403) { const t = await r.text(); if (/API key|PERMISSION|UNAUTHENTICATED|API_KEY/i.test(t)) throw Object.assign(new Error('bad_key'), { code: 'bad_key' }); }
     if (!r.ok) { lastErr = r.status === 429 ? 'ai_limit' : 'ai'; continue; } // 404 (модель закрыли), 503 (перегружена), 429 (лимит) — пробуем следующую
     try {
       const d = await r.json();
@@ -594,11 +615,15 @@ ${JSON.stringify(texts)}`;
   throw Object.assign(new Error(lastErr), { code: lastErr });
 }
 
-async function translateAll(env, texts, from, to) {
+// strict: только Gemini (для статей) — если не вышло, ошибка, а не слабый перевод
+async function translateAll(env, texts, from, to, strict = false) {
   const out = [];
-  if (env.GEMINI_KEY) {
+  const key = await geminiKey(env);
+  const err = code => Object.assign(new Error(code), { code, status: code === 'ai_limit' ? 429 : code === 'no_key' || code === 'bad_key' ? 400 : 502 });
+  if (strict && !key) throw err('no_key');
+  if (key) {
     try {
-      const res = await gemini(env, texts, from, to);
+      const res = await gemini(env, texts, from, to, key);
       // пустой ответ на непустой абзац — этот абзац переводим запасным переводчиком
       for (let i = 0; i < res.length; i++) {
         if (texts[i].trim() && !res[i].trim()) {
@@ -606,7 +631,7 @@ async function translateAll(env, texts, from, to) {
         }
       }
       return { texts: res, engine: 'gemini' };
-    } catch (e) { /* Gemini недоступен — ниже запасной вариант */ }
+    } catch (e) { if (strict) throw err(e.code || 'ai'); /* иначе — запасной вариант ниже */ }
   }
   try {
     for (let i = 0; i < texts.length; i += 4) out.push(...await Promise.all(texts.slice(i, i + 4).map(s => translateOne(env, s, from, to))));
