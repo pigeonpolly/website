@@ -320,7 +320,7 @@ async function route(req, env, url) {
   }
   // «Стая» на главной: все, кто хоть раз входил; когда их много — те, кто заходил недавно (+ сам посетитель)
   if (m === 'GET' && p === '/api/flock') {
-    const LIMIT = 36;
+    const LIMIT = Math.min(60, Math.max(36, parseInt(url.searchParams.get('limit')) || 36)); // главная — 36, страница «Стая» — до 60
     const me = await currentUser(req, env);
     const total = (await env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE banned = 0').first()).n;
     let rows = (await env.DB.prepare(`SELECT id, nick FROM users WHERE banned = 0 ORDER BY COALESCE(last_seen, created_at) DESC LIMIT ?`).bind(LIMIT).all()).results;

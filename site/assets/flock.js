@@ -190,7 +190,7 @@
     return { x: c.width / 2, y: 0 };
   }
   let guests = []; // найденные по нику — остаются в сцене и после перестройки
-  const cap = () => Math.max(8, Math.floor(W / (W < 260 ? 13 : 9)));
+  const cap = () => full ? Math.min(60, Math.max(12, Math.floor(W / (W < 260 ? 9 : 6.5)))) : Math.max(8, Math.floor(W / (W < 260 ? 13 : 9)));
   function makeBirds(list) {
     labels.innerHTML = '';
     const ids = new Set(guests.map(g => g.id));
@@ -929,7 +929,7 @@
     });
   }
   window.PPFlockDebug = { run(name) { endEvent(); if (!EVENTS[name].ok()) return false; ev = { name, def: EVENTS[name], age: 0 }; EVENTS[name].start(ev); return true; }, get ev() { return ev && ev.name; }, items: () => items, birds: () => birds };
-  fetch('/api/flock', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : Promise.reject())
+  fetch('/api/flock' + (full ? '?limit=60' : ''), { credentials: 'same-origin' }).then(r => r.ok ? r.json() : Promise.reject())
     .then(d => start(d.birds.length ? d : { total: 0, birds: demo() }))
     .catch(() => start({ total: 0, birds: demo() }));
   // пока никого нет (или сервер недоступен) — безымянные птички для настроения
