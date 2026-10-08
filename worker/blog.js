@@ -744,7 +744,7 @@ async function fullBackup(env) {
     posts: await all('SELECT * FROM blog_posts'), tags: await all('SELECT * FROM blog_tags'), sections: await all('SELECT * FROM blog_sections'),
     comments: await all('SELECT c.*, p.slug FROM blog_comments c JOIN blog_posts p ON p.id = c.post_id'), likes: await all('SELECT * FROM blog_likes'), media,
     // челлендж: аккаунты (ник, e-mail, бейджи, серии) и работы на стене
-    challenge: { users: await all('SELECT id, sub, email, nick, consent, banned, created_at, best, badges, months, mcount, picks, last_seen FROM users'), works, meta: await all('SELECT * FROM meta WHERE key NOT IN (\'backup_token\', \'blog_salt\')') },
+    challenge: { users: await all('SELECT id, sub, email, nick, consent, banned, created_at, best, badges, months, mcount, picks, last_seen FROM users'), works, meta: await all('SELECT * FROM meta WHERE key NOT IN (\'backup_token\', \'blog_salt\', \'gemini_key\')') },
     // все файлы, которые надо скачать вместе с копией
     files: [...media.map(k => ({ path: 'media/' + k, url: '/media/' + k })), ...works.map(w => ({ path: `challenge/works/${w.day}-${w.id}.jpg`, url: '/api/img/' + w.id }))],
   };
