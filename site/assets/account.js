@@ -14,6 +14,7 @@
     editor: ['Blog editor', 'Редактор блога', 'Bloga redaktors'],
     out: ['Sign out', 'Выйти', 'Iziet'],
     menu: ['Account', 'Аккаунт', 'Konts'],
+    admin: ['admin', 'админ', 'admins'],
     nTitle: ['Meet your bird! Now pick a nickname', 'Знакомься со своей птичкой! Теперь выбери ник', 'Iepazīsties ar savu putniņu! Tagad izvēlies segvārdu'],
     nTitleCat: ['You are a cat! Now pick a nickname', 'Ты котик! Теперь выбери ник', 'Tu esi kaķītis! Tagad izvēlies segvārdu'],
     nTitleCrow: ['You are a crow with a treasure! Now pick a nickname', 'Ты ворона с сокровищем! Теперь выбери ник', 'Tu esi vārna ar dārgumu! Tagad izvēlies segvārdu'],
@@ -82,9 +83,9 @@
         <p class="acct-terms">${t('pub')} ${t('terms')} <a href="${pre}/privacy/">${t('termsLink')}</a>.</p>
         ${info.dev ? '<button type="button" class="pill-btn" data-dev>dev login</button>' : ''}</div>`;
     } else {
-      el.innerHTML = `<button type="button" class="acct-btn acct-me" aria-expanded="false" aria-haspopup="menu" aria-label="${t('menu')}"><canvas width="20" height="26" aria-hidden="true"></canvas></button>
+      el.innerHTML = `<button type="button" class="acct-btn acct-me${u.admin ? ' acct-admin' : ''}" aria-expanded="false" aria-haspopup="menu" aria-label="${t('menu')}"><canvas width="20" height="26" aria-hidden="true"></canvas></button>
         <div class="acct-pop" hidden role="menu">
-          <p class="acct-name">${u.nick ? '@' + esc(u.nick) : `<i>${t('noNick')}</i>`}</p>
+          <p class="acct-name">${u.nick ? '@' + esc(u.nick) : `<i>${t('noNick')}</i>`}${u.admin ? ` <span class="acct-badge">★ ${t('admin')}</span>` : ''}</p>
           <a role="menuitem" href="${pre}/challenge/${u.nick ? '#works' : ''}">${u.nick ? t('profile') : t('nick')}</a>
           ${u.admin ? `<a role="menuitem" href="/blog-editor/">${t('editor')}</a>` : ''}
           <button type="button" role="menuitem" data-out>${t('out')}</button>

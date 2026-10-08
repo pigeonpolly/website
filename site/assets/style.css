@@ -1875,3 +1875,9 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .be-tagcol li { flex-wrap: nowrap; gap: 4px; }
 .be-ico { width: 28px; height: 28px; flex: none; border: 0; border-radius: 50%; background: none; color: var(--muted); font-size: 14px; cursor: pointer; }
 .be-ico:hover { background: rgba(255, 255, 255, .12); color: var(--text); }
+/* аккаунт админа: золотая рамка и метка — видно, что вошла именно Алина */
+.acct-me.acct-admin { position: relative; overflow: visible; border: 3px solid #E9C14A; box-shadow: 0 0 0 2px #2B1A51, 0 0 0 4px #E9A93B, 0 0 14px rgba(233, 193, 74, .6); }
+.acct-me.acct-admin canvas { border-radius: 50%; }
+.acct-me.acct-admin::after { content: '★'; position: absolute; right: -7px; top: -8px; width: 18px; height: 18px; border-radius: 50%; background: #E9C14A; color: #2B1A51; font: 700 11px/18px var(--sans); text-align: center; box-shadow: 0 0 0 2px #2B1A51; }
+.acct-me.acct-admin:hover, .acct-me.acct-admin[aria-expanded="true"] { border-color: #FFE08A; }
+.acct-badge { display: inline-block; margin-left: 6px; padding: 2px 10px; border-radius: 99px; background: linear-gradient(135deg, #F7D774, #E9A93B); color: #2B1A51; font: 800 12px var(--sans); letter-spacing: .04em; text-transform: uppercase; vertical-align: 2px; }
