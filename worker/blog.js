@@ -15,6 +15,8 @@ const T = {
     comments: 'Comments', noComments: 'No comments yet. Be the first!', back: '← All posts', tagged: 'Posts tagged',
     min: 'min read', draft: 'Draft', read: 'Read →', months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     descr: 'Notes on drawing, learning and creativity by Alina Otkinska and Pigeon Polly.',
+    featured: '★ Favourites', archive: 'Archive', inMonth: 'Posts from', onlyFav: 'My favourite posts',
+    monthsFull: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
   },
   ru: {
     blog: 'Блог', head: 'Заметки из лаборатории', lead: 'Статьи о рисовании, обучении и творчестве: что я пробую, что работает и что об этом думает Полли.',
@@ -22,6 +24,8 @@ const T = {
     comments: 'Комментарии', noComments: 'Комментариев пока нет. Будьте первым!', back: '← Все статьи', tagged: 'Статьи с тегом',
     min: 'мин чтения', draft: 'Черновик', read: 'Читать →', months: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
     descr: 'Заметки о рисовании, обучении и творчестве от Алины Откинской и голубя Полли.',
+    featured: '★ Избранное', archive: 'Архив', inMonth: 'Статьи за', onlyFav: 'Мои избранные статьи',
+    monthsFull: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
   },
   lv: {
     blog: 'Blogs', head: 'Piezīmes no laboratorijas', lead: 'Raksti par zīmēšanu, mācīšanos un radošumu: ko es izmēģinu, kas strādā un ko par to domā Pollija.',
@@ -29,6 +33,8 @@ const T = {
     comments: 'Komentāri', noComments: 'Komentāru vēl nav. Esi pirmais!', back: '← Visi raksti', tagged: 'Raksti ar birku',
     min: 'min lasīšanas', draft: 'Melnraksts', read: 'Lasīt →', months: ['janv.', 'febr.', 'marts', 'apr.', 'maijs', 'jūn.', 'jūl.', 'aug.', 'sept.', 'okt.', 'nov.', 'dec.'],
     descr: 'Piezīmes par zīmēšanu, mācīšanos un radošumu no Alīnas Otkinskas un baloža Pollijas.',
+    featured: '★ Izlase', archive: 'Arhīvs', inMonth: 'Raksti par', onlyFav: 'Mani izlases raksti',
+    monthsFull: ['janvāris', 'februāris', 'marts', 'aprīlis', 'maijs', 'jūnijs', 'jūlijs', 'augusts', 'septembris', 'oktobris', 'novembris', 'decembris'],
   },
 };
 
@@ -200,7 +206,7 @@ export async function blogApi(req, env, url, h) {
     await admin();
     const a = p.slice('/api/blog/admin/'.length);
     if (m === 'GET' && a === 'posts') {
-      const rows = (await env.DB.prepare(`SELECT p.id, p.slug, p.status, p.featured, p.t_ru, p.t_en, p.cover, p.views, p.likes, p.updated_at, p.published_at,
+      const rows = (await env.DB.prepare(`SELECT p.id, p.slug, p.status, p.featured, p.t_ru, p.t_en, p.t_lv, p.tags_ru, p.tags_en, p.tags_lv, p.cover, p.views, p.likes, p.updated_at, p.published_at,
         (SELECT COUNT(*) FROM blog_comments c WHERE c.post_id = p.id) AS comments FROM blog_posts p ORDER BY COALESCE(p.published_at, p.updated_at) DESC`).all()).results;
       const pending = (await env.DB.prepare(`SELECT c.id, c.body, c.anon, c.created_at, c.post_id, p.slug, p.t_ru, u.nick FROM blog_comments c
         JOIN blog_posts p ON p.id = c.post_id LEFT JOIN users u ON u.id = c.user_id WHERE c.status = 'pending' ORDER BY c.created_at DESC LIMIT 100`).all()).results
@@ -264,6 +270,23 @@ export async function blogApi(req, env, url, h) {
       const { id, featured } = await body();
       await env.DB.prepare('UPDATE blog_posts SET featured = ? WHERE id = ?').bind(featured ? 1 : 0, Number(id)).run();
       return json({ ok: true });
+    }
+    // тег во всех статьях сразу: переименовать (to) или удалить (to пустой)
+    if (m === 'POST' && a === 'tag') {
+      const b = await body();
+      if (!LANGS.includes(b.lang)) fail(400, 'bad');
+      const col = 'tags_' + b.lang, from = String(b.from || '').trim().toLowerCase(), to = String(b.to || '').trim().toLowerCase().replace(/^#/, '').replace(/,/g, ' ');
+      if (!from) fail(400, 'bad');
+      const rows = (await env.DB.prepare(`SELECT id, ${col} AS t FROM blog_posts`).all()).results;
+      let n = 0;
+      for (const r of rows) {
+        const list = String(r.t || '').split(',').map(x => x.trim()).filter(Boolean);
+        if (!list.includes(from)) continue;
+        const next = [...new Set(list.map(x => x === from ? to : x).filter(Boolean))].join(', ');
+        await env.DB.prepare(`UPDATE blog_posts SET ${col} = ? WHERE id = ?`).bind(next, r.id).run();
+        n++;
+      }
+      return json({ ok: true, posts: n });
     }
     if (m === 'POST' && a === 'settings') {
       const { strict } = await body();
@@ -383,15 +406,24 @@ function card(p, lang) {
     </div></article>`;
 }
 
-function sidebar(posts, lang, activeTag) {
+const ym = p => new Date((p.published_at || p.updated_at) * 1000).toISOString().slice(0, 7);
+function sidebar(posts, lang, activeTag, activeMonth = '', post = false) {
   const t = T[lang], count = {};
+  const fav = posts.filter(p => p.featured).slice(0, 6);
+  const months = {};
+  for (const p of posts) { const k = ym(p); months[k] = (months[k] || 0) + 1; }
+  const years = [...new Set(Object.keys(months).map(k => k.slice(0, 4)))].sort().reverse();
   for (const p of posts) for (const g of tagsOf(p, lang)) count[g] = (count[g] || 0) + 1;
   const tags = Object.entries(count).sort((a, b) => b[1] - a[1]).slice(0, 30).sort((a, b) => a[0].localeCompare(b[0]));
   const max = Math.max(1, ...tags.map(x => x[1]));
   const popular = [...posts].sort((a, b) => (b.likes * 5 + b.views + b.comments * 3) - (a.likes * 5 + a.views + a.comments * 3)).slice(0, 5);
   return `<aside class="bl-side">
+    ${fav.length ? `<section><h2>${t.featured}</h2><ol class="bl-pop bl-fav">${fav.map(p => `<li><a href="${blogUrl(lang, p.slug)}">${esc(field(p, 't', lang))}</a></li>`).join('')}</ol>
+      ${!post && fav.length > 1 ? `<p class="bl-more"><a href="${blogUrl(lang, '', '?fav=1')}">${t.onlyFav} →</a></p>` : ''}</section>` : ''}
     ${tags.length ? `<section><h2>${t.tags}</h2><p class="bl-cloud">${tags.map(([g, n]) =>
       `<a href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}" style="--s:${(0.9 + (max > 1 ? 0.45 * (n - 1) / (max - 1) : 0)).toFixed(2)}"${g === activeTag ? ' aria-current="true"' : ''}>${esc(g)}</a>`).join(' ')}</p></section>` : ''}
+    ${years.length ? `<section><h2>${t.archive}</h2><ul class="bl-arch">${years.map(y => `<li><b>${y}</b><ul>${Object.keys(months).filter(k => k.startsWith(y)).sort().reverse().map(k =>
+      `<li><a href="${blogUrl(lang, '', '?month=' + k)}"${k === activeMonth ? ' aria-current="true"' : ''}>${t.monthsFull[+k.slice(5) - 1]}</a> <span>${months[k]}</span></li>`).join('')}</ul></li>`).join('')}</ul></section>` : ''}
     ${popular.length ? `<section><h2>${t.popular}</h2><ol class="bl-pop">${popular.map(p => `<li><a href="${blogUrl(lang, p.slug)}">${esc(field(p, 't', lang))}</a><span>♥ ${p.likes || 0}</span></li>`).join('')}</ol></section>` : ''}
   </aside>`;
 }
@@ -453,15 +485,22 @@ export async function blogPage(req, env, url, h) {
 
   if (!slug) {
     const tag = (url.searchParams.get('tag') || '').trim().toLowerCase();
-    const list = tag ? posts.filter(x => tagsOf(x, lang).includes(tag)) : posts;
+    const month = /^\d{4}-\d{2}$/.test(url.searchParams.get('month') || '') ? url.searchParams.get('month') : '';
+    const favOnly = url.searchParams.get('fav') === '1';
+    let list = posts;
+    if (tag) list = list.filter(x => tagsOf(x, lang).includes(tag));
+    if (month) list = list.filter(x => ym(x) === month);
+    if (favOnly) list = list.filter(x => x.featured);
+    const filtered = tag || month || favOnly;
+    const label = tag ? `${t.tagged} <b>#${esc(tag)}</b>` : month ? `${t.inMonth} <b>${t.monthsFull[+month.slice(5) - 1]} ${month.slice(0, 4)}</b>` : favOnly ? `<b>${t.featured}</b>` : '';
     const content = `<section class="page-head bl-head"><p class="topics">${t.blog.toLowerCase()}</p><h1>${t.head}</h1><p class="lead">${t.lead}</p>
       <div class="bl-admin" data-blog-admin hidden><a class="pill-btn" href="/blog-editor/">＋ ${lang === 'ru' ? 'Новая статья' : lang === 'lv' ? 'Jauns raksts' : 'New post'}</a></div></section>
       <div class="bl-grid"><div class="bl-list">
-        ${tag ? `<p class="bl-filter">${t.tagged} <b>#${esc(tag)}</b> · <a href="${blogUrl(lang, '')}">${t.all}</a></p>` : ''}
+        ${filtered ? `<p class="bl-filter">${label} · <a href="${blogUrl(lang, '')}">${t.all}</a></p>` : ''}
         ${list.map(x => card(x, lang)).join('') || `<p class="bl-empty">${t.empty}</p>`}
-      </div>${sidebar(published, lang, tag)}</div>
+      </div>${sidebar(published, lang, tag, month)}</div>
       <script src="/assets/blog.js" defer></script>`;
-    return html(fill(tpl, { title: `${t.blog} · Pigeon Polly Art Lab`, description: t.descr, canonical: SITE + blogUrl(lang, ''), content, noindex: !!tag }));
+    return html(fill(tpl, { title: `${t.blog} · Pigeon Polly Art Lab`, description: t.descr, canonical: SITE + blogUrl(lang, ''), content, noindex: !!filtered }));
   }
 
   const post = posts.find(x => x.slug === slug);
@@ -496,7 +535,7 @@ export async function blogPage(req, env, url, h) {
       <div class="bc-form-wrap" data-comment-form></div>
     </section>
   </article>
-  <div class="bp-more">${sidebar(published, lang, '')}</div>
+  <div class="bp-more">${sidebar(published, lang, '', '', true)}</div>
   <script src="/assets/blog.js" defer></script>`;
   const jsonld = { '@context': 'https://schema.org', '@type': 'BlogPosting', headline: title, description, inLanguage: textLang,
     datePublished: new Date((post.published_at || post.updated_at) * 1000).toISOString(), dateModified: new Date(post.updated_at * 1000).toISOString(),

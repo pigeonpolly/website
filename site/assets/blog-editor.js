@@ -21,7 +21,16 @@
     title: 'Нужен заголовок.', login: 'Сессия закончилась — войдите снова.', admin: 'Нужен вход администратора.',
   };
   const errText = e => ERR[e.code] || 'Что-то пошло не так (' + esc(e.code || e.message) + ').';
-  let state = null, dirty = false;
+  let state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null;
+  // все теги из статей: { ru: ['акварель', …], … } и счётчики
+  function tagsByLang() {
+    knownTagCounts = {};
+    for (const l of ['ru', 'en', 'lv']) {
+      const c = knownTagCounts[l] = {};
+      for (const p of (state && state.posts) || []) for (const t of String(p['tags_' + l] || '').split(',').map(x => x.trim()).filter(Boolean)) c[t] = (c[t] || 0) + 1;
+    }
+    return Object.fromEntries(Object.entries(knownTagCounts).map(([l, c]) => [l, Object.keys(c).sort()]));
+  }
   window.addEventListener('beforeunload', e => { if (dirty) { e.preventDefault(); e.returnValue = ''; } });
 
   // ---------- вход ----------
@@ -59,6 +68,29 @@
     app.innerHTML = '<p class="be-note">Загрузка…</p>';
     try { state = await api('blog/admin/posts'); } catch (e) { app.innerHTML = `<p class="be-note">${errText(e)}</p>`; return; }
     const pend = state.pending;
+    const pub = state.posts.filter(p => p.status === 'published'), drafts = state.posts.filter(p => p.status !== 'published');
+    knownTags = tagsByLang();
+    const tagCount = new Set(['ru', 'en', 'lv'].flatMap(l => Object.keys(knownTagCounts[l] || {}).map(t => l + ':' + t))).size;
+    const postsHtml = list => {
+      if (tagFilter) list = state.posts.filter(p => String(p['tags_' + tagFilter.l] || '').split(',').map(x => x.trim()).includes(tagFilter.t));
+      const head = tagFilter ? `<p class="be-filter">Статьи с тегом <b>#${esc(tagFilter.t)}</b> (${tagFilter.l.toUpperCase()}) · <button type="button" class="bc-link" data-unfilter>показать все</button></p>` : '';
+      if (!list.length) return head + `<p class="be-note">${dashTab === 'draft' ? 'Черновиков нет.' : 'Опубликованных статей пока нет.'}</p>`;
+      return head + `<table class="be-table"><thead><tr><th>Статья</th><th>Статус</th><th>Дата</th><th title="лайки">♥</th><th title="просмотры">👁</th><th title="комментарии">💬</th><th></th></tr></thead><tbody>
+        ${list.map(p => `<tr data-id="${p.id}"><td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a><small>/blog/${esc(p.slug)}/ · ${['ru', 'en', 'lv'].map(l => p['t_' + l] ? l.toUpperCase() : `<s>${l.toUpperCase()}</s>`).join(' ')}</small></td>
+          <td><span class="be-st ${p.status}">${p.status === 'published' ? 'опубликована' : 'черновик'}</span></td><td>${fmt(p.published_at || p.updated_at)}</td>
+          <td>${p.likes}</td><td>${p.views}</td><td>${p.comments}</td>
+          <td class="be-acts"><a href="#${p.id}">Изменить</a> <a href="/ru/blog/${esc(p.slug)}/" target="_blank">Открыть ↗</a> <button class="bc-link be-danger" data-delpost>Удалить</button></td></tr>`).join('')}
+      </tbody></table>`;
+    };
+    const tagsHtml = () => {
+      const cols = ['ru', 'en', 'lv'].map(l => {
+        const c = knownTagCounts[l] || {}, keys = Object.keys(c).sort((a, b) => c[b] - c[a] || a.localeCompare(b));
+        return `<div class="be-tagcol"><h3>${l.toUpperCase()}</h3>${keys.length ? `<ul>${keys.map(t => `<li data-l="${l}" data-t="${esc(t)}">
+          <button type="button" class="be-tagname" data-show title="Показать статьи">#${esc(t)} <span>${c[t]}</span></button>
+          <button type="button" class="be-ico" data-ren title="Переименовать во всех статьях" aria-label="Переименовать #${esc(t)}">✎</button><button type="button" class="be-ico be-danger" data-deltag title="Удалить из всех статей" aria-label="Удалить #${esc(t)}">✕</button></li>`).join('')}</ul>` : '<p class="be-note">Тегов нет.</p>'}</div>`;
+      }).join('');
+      return `<p class="be-note">Нажмите на тег, чтобы увидеть его статьи. Переименование и удаление меняют тег сразу во всех статьях.</p><div class="be-tagcols">${cols}</div>`;
+    };
     app.innerHTML = `<div class="be-top">
         <a class="pill-btn pill-fill" href="#new">＋ Новая статья</a>
         <label class="be-switch"><input type="checkbox" id="be-strict" ${state.strict ? 'checked' : ''}><span></span>
@@ -67,13 +99,23 @@
       ${pend.length ? `<section class="be-card be-pend"><h2>Комментарии со ссылками ждут проверки (${pend.length})</h2><ol>${pend.map(c => `
         <li data-cid="${c.id}"><p><b>${esc(c.name)}</b> → <a href="/ru/blog/${esc(c.slug)}/#comments" target="_blank">${esc(c.t_ru)}</a> · ${fmt(c.created_at)}</p>
         <p class="be-ctext">${esc(c.body)}</p><p><button class="pill-btn" data-ok>Одобрить</button> <button class="pill-btn be-danger" data-del>Удалить</button></p></li>`).join('')}</ol></section>` : ''}
-      <section class="be-card"><h2>Статьи</h2>${state.posts.length ? `<table class="be-table"><thead><tr><th>Статья</th><th>Статус</th><th>Дата</th><th title="лайки">♥</th><th title="просмотры">👁</th><th title="комментарии">💬</th><th></th></tr></thead><tbody>
-        ${state.posts.map(p => `<tr data-id="${p.id}"><td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || '(без названия)')}</b></a><small>/blog/${esc(p.slug)}/</small></td>
-          <td><span class="be-st ${p.status}">${p.status === 'published' ? 'опубликована' : 'черновик'}</span></td><td>${fmt(p.published_at || p.updated_at)}</td>
-          <td>${p.likes}</td><td>${p.views}</td><td>${p.comments}</td>
-          <td class="be-acts"><a href="#${p.id}">Изменить</a> <a href="/ru/blog/${esc(p.slug)}/" target="_blank">Открыть ↗</a> <button class="bc-link be-danger" data-delpost>Удалить</button></td></tr>`).join('')}
-      </tbody></table>` : '<p class="be-note">Пока ни одной статьи. Нажмите «Новая статья».</p>'}</section>
+      <section class="be-card">
+        <div class="be-dtabs" role="tablist">${[['published', 'Опубликованные', pub.length], ['draft', 'Черновики', drafts.length], ['tags', 'Теги', tagCount]].map(([k, n, c]) =>
+          `<button type="button" role="tab" data-dtab="${k}" aria-selected="${dashTab === k}">${n} <span>${c}</span></button>`).join('')}</div>
+        ${dashTab === 'tags' ? tagsHtml() : postsHtml(dashTab === 'draft' ? drafts : pub)}
+      </section>
       ${state.media ? '' : '<p class="be-note">⚠ Хранилище картинок (R2) не подключено — загрузка картинок не заработает.</p>'}`;
+    app.querySelectorAll('[data-dtab]').forEach(b => b.addEventListener('click', () => { dashTab = b.dataset.dtab; tagFilter = null; dashboard(); }));
+    const unf = app.querySelector('[data-unfilter]'); unf && unf.addEventListener('click', () => { tagFilter = null; dashboard(); });
+    app.querySelectorAll('[data-show]').forEach(b => b.addEventListener('click', () => { const li = b.closest('li'); tagFilter = { l: li.dataset.l, t: li.dataset.t }; dashTab = 'published'; dashboard(); }));
+    app.querySelectorAll('[data-ren], [data-deltag]').forEach(b => b.addEventListener('click', async () => {
+      const li = b.closest('li'), l = li.dataset.l, t = li.dataset.t, n = (knownTagCounts[l] || {})[t];
+      let to = '';
+      if (b.hasAttribute('data-ren')) { to = prompt(`Новое название для #${t} (${l.toUpperCase()}):`, t); if (to === null || !to.trim() || to.trim() === t) return; }
+      else if (!confirm(`Убрать тег #${t} из ${n} стат${n === 1 ? 'ьи' : 'ей'}?`)) return;
+      try { await api('blog/admin/tag', { lang: l, from: t, to }); } catch (e) { alert(errText(e)); }
+      dashboard();
+    }));
     app.querySelector('#be-strict').addEventListener('change', async e => {
       try { await api('blog/admin/settings', { strict: e.target.checked }); } catch (err) { e.target.checked = !e.target.checked; alert(errText(err)); }
     });
@@ -104,6 +146,8 @@
   ];
   async function editor(id) {
     let post = { id: 0, slug: '', status: 'draft', cover: '' };
+    if (!state) { try { state = await api('blog/admin/posts'); } catch (e) { /* подсказки тегов просто не появятся */ } }
+    knownTags = tagsByLang();
     if (id) {
       app.innerHTML = '<p class="be-note">Загрузка…</p>';
       try { post = (await api('blog/admin/post?id=' + id)).post; } catch (e) { app.innerHTML = `<p class="be-note">${errText(e)}</p>`; return; }
@@ -116,11 +160,15 @@
     app.innerHTML = `<p class="be-back"><a href="#">← Все статьи</a></p>
       <div class="be-tabs" role="tablist">${LANGS.map(([l, n], i) => `<button type="button" role="tab" data-tab="${l}" aria-selected="${!i}">${n}</button>`).join('')}
         <button type="button" class="pill-btn pill-fill be-tr" id="be-tr">🌐 Перевести с RU на EN и LV</button></div>
+      <div class="be-progress" id="be-progress" hidden></div>
       <p class="be-hint">Можно писать прямо здесь или вставить готовую статью из Google Docs (Ctrl+A, Ctrl+C → Ctrl+V в поле «Текст»): заголовок, жирный, списки и картинки перенесутся, а картинки при сохранении скопируются на сайт.</p>
       ${LANGS.map(([l], i) => `<section class="be-pane" data-pane="${l}" ${i ? 'hidden' : ''}>
         <label class="be-f"><span>Заголовок</span><input type="text" data-k="t_${l}" maxlength="200" value="${esc(post['t_' + l])}"></label>
         <label class="be-f"><span>Краткое описание <small>(видно в списке статей и в Google)</small></span><textarea data-k="d_${l}" rows="2" maxlength="400">${esc(post['d_' + l])}</textarea></label>
-        <label class="be-f"><span>Теги <small>(через запятую)</small></span><input type="text" data-k="tags_${l}" value="${esc(post['tags_' + l])}"></label>
+        <div class="be-f"><span>Теги <small>(впишите тег и нажмите Enter)</small></span>
+          <div class="be-tags" data-tags="${l}"><input type="text" class="be-tag-in" list="be-taglist-${l}" placeholder="новый тег…" aria-label="Новый тег"></div>
+          <datalist id="be-taglist-${l}">${(knownTags[l] || []).map(x => `<option value="${esc(x)}">`).join('')}</datalist>
+          <input type="hidden" data-k="tags_${l}" value="${esc(post['tags_' + l])}"></div>
         <div class="be-f"><span>Текст</span>
           <div class="be-tools">${TOOLS.map(([c, title, label]) => `<button type="button" data-cmd="${c}" title="${title}">${label}</button>`).join('')}</div>
           <div class="be-body bp-body" contenteditable="true" data-k="b_${l}" data-ph="Начните писать… Картинки можно перетащить прямо сюда.">${post['b_' + l]}</div>
@@ -132,7 +180,7 @@
             <input type="url" id="be-cover-url" placeholder="или вставьте ссылку на картинку" value="${esc(post.cover)}">
             ${post.cover ? '<button type="button" class="bc-link" id="be-cover-rm">убрать обложку</button>' : ''}</div></div></div>
         <label class="be-check"><input type="checkbox" id="be-featured" ${post.featured ? 'checked' : ''}> <b>★ Избранное</b> <small>— показывать справа в блоке блога на главной</small></label>
-        <label class="be-f"><span>Адрес статьи <small>(пусто = из английского заголовка)</small></span><div class="be-slug"><span>/blog/</span><input type="text" id="be-slug" value="${esc(post.slug)}" pattern="[a-z0-9-]*"><span>/</span></div></label>
+        <label class="be-f"><span>Адрес статьи <small id="be-slug-note">${post.status === 'published' ? '(статья опубликована — адрес лучше не менять, иначе старые ссылки перестанут работать)' : '(заполняется сам из заголовка; можно поправить)'}</small></span><div class="be-slug"><span>pigeonpolly.com/blog/</span><input type="text" id="be-slug" value="${esc(post.slug)}" spellcheck="false"><span>/</span></div></label>
       </section>
       <div class="be-save">
         <button type="button" class="pill-btn" data-save="draft">${post.status === 'published' ? 'Снять с публикации' : 'Сохранить черновик'}</button>
@@ -148,13 +196,50 @@
     document.execCommand('defaultParagraphSeparator', false, 'p');
 
     const collect = () => {
-      const d = { id: post.id, slug: $('#be-slug').value.trim(), cover, featured: $('#be-featured').checked };
+      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked };
       app.querySelectorAll('[data-k]').forEach(el => { d[el.dataset.k] = el.isContentEditable ? el.innerHTML : el.value; });
       return d;
     };
     const touch = () => { dirty = true; saveLocal(post.id, collect()); };
     app.addEventListener('input', touch);
     app.addEventListener('change', touch);
+
+    // теги: вписать и нажать Enter (или запятую) — появляется «чип» с крестиком
+    const tagList = l => app.querySelector(`[data-k="tags_${l}"]`).value.split(',').map(x => x.trim()).filter(Boolean);
+    const setTags = (l, arr) => {
+      const uniq = [...new Set(arr.map(x => x.trim().toLowerCase().replace(/^#/, '')).filter(Boolean))].slice(0, 12);
+      app.querySelector(`[data-k="tags_${l}"]`).value = uniq.join(', ');
+      const box = app.querySelector(`[data-tags="${l}"]`), inp = box.querySelector('.be-tag-in');
+      box.querySelectorAll('.be-chip').forEach(c => c.remove());
+      for (const tg of uniq) inp.insertAdjacentHTML('beforebegin', `<span class="be-chip">#${esc(tg)}<button type="button" data-rm="${esc(tg)}" aria-label="Убрать тег ${esc(tg)}">×</button></span>`);
+    };
+    app.querySelectorAll('[data-tags]').forEach(box => {
+      const l = box.dataset.tags, inp = box.querySelector('.be-tag-in');
+      setTags(l, tagList(l));
+      const add = () => { if (!inp.value.trim()) return; setTags(l, [...tagList(l), ...inp.value.split(',')]); inp.value = ''; touch(); };
+      inp.addEventListener('keydown', e => {
+        if (e.key === 'Enter' || e.key === ',') { e.preventDefault(); add(); }
+        else if (e.key === 'Backspace' && !inp.value) { setTags(l, tagList(l).slice(0, -1)); touch(); }
+      });
+      inp.addEventListener('blur', add);
+      inp.addEventListener('change', () => { if (knownTags[l]?.includes(inp.value.trim().toLowerCase())) add(); }); // выбрали из подсказки
+      box.addEventListener('click', e => {
+        const rm = e.target.closest('[data-rm]');
+        if (rm) { setTags(l, tagList(l).filter(x => x !== rm.dataset.rm)); touch(); } else inp.focus();
+      });
+    });
+
+    // адрес: сам из заголовка (английский, если есть), пока его не поправили руками и статья не опубликована
+    let slugManual = post.status === 'published' || (!!post.slug && post.slug !== slugify(post.t_en || post.t_ru || post.t_lv));
+    const autoSlug = () => {
+      if (slugManual) return;
+      const v = (n => app.querySelector(`[data-k="t_${n}"]`).value.trim());
+      $('#be-slug').value = slugify(v('en') || v('ru') || v('lv'));
+    };
+    app.querySelectorAll('[data-k^="t_"]').forEach(i => i.addEventListener('input', autoSlug));
+    $('#be-slug').addEventListener('input', () => { slugManual = true; });
+    $('#be-slug').addEventListener('blur', e => { e.target.value = slugify(e.target.value); });
+    autoSlug();
 
     // вкладки языков
     app.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => {
@@ -266,20 +351,33 @@
       const filled = targets.filter(l => ru['t_' + l] || stripHtml(ru['b_' + l]));
       if (filled.length && !confirm(`Во вкладках ${filled.map(x => x.toUpperCase()).join(' и ')} уже есть текст. Заменить его новым переводом?`)) return;
       const btn = $('#be-tr'); btn.disabled = true;
+      // полоска загрузки на каждый язык: переводим кусочками по несколько абзацев
+      status('');
+      const prog = $('#be-progress');
+      prog.hidden = false;
+      prog.innerHTML = targets.map(l => `<div class="be-prog" data-p="${l}"><b>${l.toUpperCase()}</b><span class="be-bar"><i style="width:0%"></i></span><em>ждёт…</em></div>`).join('');
+      const bar = (l, pct, text) => { const r = prog.querySelector(`[data-p="${l}"]`); r.querySelector('i').style.width = pct + '%'; r.querySelector('em').textContent = text; r.classList.toggle('done', pct >= 100); };
       try {
         for (const l of targets) {
           const { texts, rebuild } = splitForTranslation(ru, from);
-          status(`Перевожу на ${l.toUpperCase()}… (длинная статья — до минуты)`);
-          const r = await api('blog/admin/translate', { texts, from, to: l });
-          const out = rebuild(r.texts);
-          app.querySelector(`[data-k="t_${l}"]`).value = out.t;
-          app.querySelector(`[data-k="d_${l}"]`).value = out.d;
-          app.querySelector(`[data-k="tags_${l}"]`).value = out.tags;
-          app.querySelector(`[data-k="b_${l}"]`).innerHTML = out.b;
+          const out = [];
+          bar(l, 2, '0%');
+          for (let i = 0; i < texts.length; i += 6) {
+            const r = await api('blog/admin/translate', { texts: texts.slice(i, i + 6), from, to: l });
+            out.push(...r.texts);
+            const pct = Math.round(out.length / texts.length * 100);
+            bar(l, pct, pct >= 100 ? 'готово ✓' : pct + '%');
+          }
+          const res = rebuild(out);
+          app.querySelector(`[data-k="t_${l}"]`).value = res.t;
+          app.querySelector(`[data-k="d_${l}"]`).value = res.d;
+          setTags(l, res.tags.split(','));
+          app.querySelector(`[data-k="b_${l}"]`).innerHTML = res.b;
+          autoSlug();
         }
         status(`Готово! Проверьте переводы во вкладках ${targets.map(x => x.toUpperCase()).join(' и ')} — их можно поправить.`);
         touch();
-      } catch (e) { status(errText(e)); }
+      } catch (e) { status(errText(e)); prog.querySelectorAll('.be-prog:not(.done) em').forEach(x => { x.textContent = 'остановлено'; }); }
       btn.disabled = false;
     });
 
@@ -381,6 +479,10 @@
     doc.querySelectorAll('p, li').forEach(p => { if (!p.textContent.trim() && !p.querySelector('img')) p.remove(); });
     return { html: doc.body.innerHTML, title };
   }
+  // как на сервере: кириллица → латиница, всё остальное → дефисы
+  const slugify = s => String(s || '').toLowerCase()
+    .replace(/[а-яё]/g, c => ({ а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya' }[c]))
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 70);
   const stripHtml = s => String(s || '').replace(/<[^>]*>/g, '').trim();
   // запасная копия в браузере на случай закрытой вкладки
   const lk = id => 'pp-blog-draft-' + (id || 'new');
