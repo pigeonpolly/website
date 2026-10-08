@@ -44,6 +44,12 @@ const BIRDS = {
   ru: ['Малиновка', 'Воробей', 'Зяблик', 'Крапивник', 'Скворец', 'Ласточка', 'Сорока', 'Сова', 'Тупик', 'Цапля', 'Зимородок', 'Чёрный дрозд', 'Дрозд', 'Жаворонок', 'Горлица', 'Голубь', 'Сойка', 'Соловей', 'Щегол', 'Синица'],
   lv: ['Sarkanrīklīte', 'Zvirbulis', 'Žubīte', 'Sētas karaliņš', 'Mājas strazds', 'Bezdelīga', 'Žagata', 'Pūce', 'Tupelis', 'Gārnis', 'Zivju dzenītis', 'Melnais strazds', 'Strazds', 'Cīrulis', 'Ūbele', 'Balodis', 'Sīlis', 'Lakstīgala', 'Dadzītis', 'Zīlīte'],
 };
+// пометка под переведённой статьёй: «переведено онлайн-инструментами, возможны неточности» + ссылка на оригинал
+const TR_NOTE = {
+  en: (src, url) => `Translated from ${{ ru: 'Russian', lv: 'Latvian', en: 'English' }[src]} with online tools, so small inaccuracies are possible. <a href="${url}">Read the original</a>.`,
+  ru: (src, url) => `Перевод с ${{ en: 'английского', lv: 'латышского', ru: 'русского' }[src]} сделан с помощью онлайн-инструментов и может быть немного неточным. <a href="${url}">Оригинал</a>.`,
+  lv: (src, url) => `Tulkots no ${{ en: 'angļu', ru: 'krievu', lv: 'latviešu' }[src]} valodas ar tiešsaistes rīkiem, tāpēc iespējamas nelielas neprecizitātes. <a href="${url}">Oriģināls</a>.`,
+};
 const birdName = (code, lang) => { const [i, n] = String(code || '0:10').split(':'); return `${BIRDS[lang][+i % 20]} ${n}`; };
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -73,6 +79,7 @@ async function ensureBlogSchema(env) {
   ]);
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN featured INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ }
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN pinned INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ }
+  try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN src_lang TEXT').run(); } catch (e) { /* уже есть */ }
   ready = true;
 }
 
@@ -256,6 +263,7 @@ export async function blogApi(req, env, url, h) {
           .bind(...cols.map(c => f[c]), slug, cover, status, featured, t, t, published).run();
         id = r.meta.last_row_id;
       }
+      await env.DB.prepare('UPDATE blog_posts SET src_lang = ? WHERE id = ?').bind(LANGS.includes(b.src_lang) ? b.src_lang : null, id).run();
       if (typeof b.pinned === 'boolean') {
         if (b.pinned) await env.DB.batch([env.DB.prepare('UPDATE blog_posts SET pinned = 0'), env.DB.prepare('UPDATE blog_posts SET pinned = 1 WHERE id = ?').bind(id)]);
         else await env.DB.prepare('UPDATE blog_posts SET pinned = 0 WHERE id = ?').bind(id).run();
@@ -594,7 +602,8 @@ export async function blogPage(req, env, url, h) {
         ${tags.length ? ' · ' + tags.map(g => `<a class="bl-tag" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}">#${esc(g)}</a>`).join(' ') : ''}</p>
     </header>
     ${post.cover ? `<figure class="bp-cover"><img src="${esc(post.cover)}" alt=""></figure>` : ''}
-    <div class="bp-body"${textLang !== lang ? ` lang="${textLang}"` : ''}>${field(post, 'b', lang)}</div>
+    <div class="bp-body"${textLang !== lang ? ` lang="${textLang}"` : ''}>${field(post, 'b', lang)}${post.src_lang && post.src_lang !== textLang && post['t_' + post.src_lang]
+      ? `<p class="bp-tr-note">${TR_NOTE[lang](post.src_lang, blogUrl(post.src_lang, post.slug))}</p>` : ''}</div>
     <div class="bp-actions"><button type="button" class="bp-like" aria-pressed="false"><span class="bp-heart">♥</span> <span class="bp-likes">${post.likes || 0}</span></button>
       <a class="bp-edit pill-btn" href="/blog-editor/#${post.id}" hidden data-blog-admin>✎ Edit</a></div>
     <section class="bp-comments" id="comments"><h2>${t.comments} <span class="bp-ccount">${comments.length}</span></h2>

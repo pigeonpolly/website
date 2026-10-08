@@ -1910,3 +1910,8 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .be-pin { background: none; border: 0; font-size: 16px; cursor: pointer; padding: 0 4px 0 0; filter: grayscale(1); opacity: .35; vertical-align: -1px; }
 .be-pin[aria-pressed="true"] { filter: none; opacity: 1; }
 .be-prog { grid-template-columns: 34px minmax(0, 1fr) minmax(90px, auto); }
+/* пометка под переведённой статьёй — тихая, не бросается в глаза */
+.bp-body .bp-tr-note { margin: 2.2em 0 0; padding-top: 14px; border-top: 1px dashed #E2DCEE; font: italic 13.5px/1.5 var(--sans); color: #9A90B8; }
+.bp-body .bp-tr-note a { color: #9A90B8; text-decoration: underline; text-decoration-color: #D6CFE6; }
+.bp-body .bp-tr-note a:hover { color: #534AB7; }
+.be-srclang select { max-width: 320px; padding: 10px 14px; border-radius: 12px; border: 1px solid var(--line); background: #1F1240; color: var(--text); font: 16px var(--sans); }

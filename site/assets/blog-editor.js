@@ -187,6 +187,8 @@
           <div><button type="button" class="pill-btn" id="be-cover-up">Загрузить картинку</button>
             <input type="url" id="be-cover-url" placeholder="или вставьте ссылку на картинку" value="${esc(post.cover)}">
             ${post.cover ? '<button type="button" class="bc-link" id="be-cover-rm">убрать обложку</button>' : ''}</div></div></div>
+        <label class="be-f be-srclang"><span>Язык оригинала <small>(на остальных языках внизу статьи появится маленькая пометка «перевод сделан онлайн-инструментами» со ссылкой на оригинал; кнопка «Перевести» ставит его сама)</small></span>
+          <select id="be-src"><option value="">— не указан (пометки не будет) —</option>${LANGS.map(([l, n]) => `<option value="${l}"${post.src_lang === l ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
         <label class="be-check"><input type="checkbox" id="be-pinned" ${post.pinned ? 'checked' : ''}> <b>📌 Крупно на главной</b> <small>— эта статья будет большой на главной вместо самой новой (только одна статья)</small></label>
         <label class="be-check"><input type="checkbox" id="be-featured" ${post.featured ? 'checked' : ''}> <b>★ Избранное</b> <small>— показывать справа в блоке блога на главной</small></label>
         <label class="be-f"><span>Адрес статьи <small id="be-slug-note">${post.status === 'published' ? '(статья опубликована — адрес лучше не менять, иначе старые ссылки перестанут работать)' : '(заполняется сам из заголовка; можно поправить)'}</small></span><div class="be-slug"><span>pigeonpolly.com/blog/</span><input type="text" id="be-slug" value="${esc(post.slug)}" spellcheck="false"><span>/</span></div></label>
@@ -205,7 +207,7 @@
     document.execCommand('defaultParagraphSeparator', false, 'p');
 
     const collect = () => {
-      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, pinned: $('#be-pinned').checked };
+      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, pinned: $('#be-pinned').checked, src_lang: $('#be-src').value };
       app.querySelectorAll('[data-k]').forEach(el => {
         if (!el.isContentEditable) { d[el.dataset.k] = el.value; return; }
         const c = el.cloneNode(true);
@@ -450,6 +452,7 @@
           app.querySelector(`[data-k="b_${l}"]`).innerHTML = res.b;
           autoSlug();
         }
+        $('#be-src').value = from; // запоминаем язык оригинала — для пометки под переводом
         status(`Готово! Проверьте переводы во вкладках ${targets.map(x => x.toUpperCase()).join(' и ')} — их можно поправить.`);
         touch();
       } catch (e) { status(errText(e)); prog.querySelectorAll('.be-prog:not(.done) em').forEach(x => { x.textContent = 'остановлено'; }); }
