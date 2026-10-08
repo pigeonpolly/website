@@ -72,6 +72,7 @@ async function ensureBlogSchema(env) {
     env.DB.prepare(`CREATE INDEX IF NOT EXISTS blog_comments_ip ON blog_comments(ip, created_at)`),
   ]);
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN featured INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ }
+  try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN pinned INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ }
   ready = true;
 }
 
@@ -195,7 +196,7 @@ export async function blogApi(req, env, url, h) {
     const rows = (await env.DB.prepare(`SELECT * FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC`).all()).results;
     const pack = x => ({ url: blogUrl(lang, x.slug), title: field(x, 't', lang), excerpt: field(x, 'd', lang) || stripTags(field(x, 'b', lang)).slice(0, 200),
       cover: x.cover, date: fmtDate(x.published_at, lang), tags: tagsOf(x, lang).slice(0, 3), likes: x.likes });
-    const latest = rows[0] || null;
+    const latest = rows.find(x => x.pinned) || rows[0] || null; // 📌 закреплённая статья, иначе самая новая
     const featured = rows.filter(x => x.featured && x !== latest).slice(0, 4);
     if (featured.length < 2) featured.push(...rows.filter(x => !x.featured && x !== latest).slice(0, 3 - featured.length)); // пока звёздочек мало — добираем свежими
     return json({ latest: latest && pack(latest), featured: featured.map(x => ({ ...pack(x), star: !!x.featured })) }, 200, { 'cache-control': 'public, max-age=60' });
@@ -206,12 +207,12 @@ export async function blogApi(req, env, url, h) {
     await admin();
     const a = p.slice('/api/blog/admin/'.length);
     if (m === 'GET' && a === 'posts') {
-      const rows = (await env.DB.prepare(`SELECT p.id, p.slug, p.status, p.featured, p.t_ru, p.t_en, p.t_lv, p.tags_ru, p.tags_en, p.tags_lv, p.cover, p.views, p.likes, p.updated_at, p.published_at,
+      const rows = (await env.DB.prepare(`SELECT p.id, p.slug, p.status, p.featured, p.pinned, p.t_ru, p.t_en, p.t_lv, p.tags_ru, p.tags_en, p.tags_lv, p.cover, p.views, p.likes, p.updated_at, p.published_at,
         (SELECT COUNT(*) FROM blog_comments c WHERE c.post_id = p.id) AS comments FROM blog_posts p ORDER BY COALESCE(p.published_at, p.updated_at) DESC`).all()).results;
       const pending = (await env.DB.prepare(`SELECT c.id, c.body, c.anon, c.created_at, c.post_id, p.slug, p.t_ru, u.nick FROM blog_comments c
         JOIN blog_posts p ON p.id = c.post_id LEFT JOIN users u ON u.id = c.user_id WHERE c.status = 'pending' ORDER BY c.created_at DESC LIMIT 100`).all()).results
         .map(c => ({ ...c, name: c.nick ? '@' + c.nick : birdName(c.anon, 'ru') }));
-      return json({ posts: rows, pending, strict: (await h.getMeta('blog_strict')) === '1', ai: !!env.AI || env.DEV_FAKE_LOGIN === '1', media: !!env.MEDIA });
+      return json({ posts: rows, pending, strict: (await h.getMeta('blog_strict')) === '1', ai: !!env.AI || env.DEV_FAKE_LOGIN === '1', gemini: !!env.GEMINI_KEY, media: !!env.MEDIA });
     }
     if (m === 'GET' && a === 'post') {
       const post = await env.DB.prepare('SELECT * FROM blog_posts WHERE id = ?').bind(Number(url.searchParams.get('id'))).first();
@@ -255,6 +256,10 @@ export async function blogApi(req, env, url, h) {
           .bind(...cols.map(c => f[c]), slug, cover, status, featured, t, t, published).run();
         id = r.meta.last_row_id;
       }
+      if (typeof b.pinned === 'boolean') {
+        if (b.pinned) await env.DB.batch([env.DB.prepare('UPDATE blog_posts SET pinned = 0'), env.DB.prepare('UPDATE blog_posts SET pinned = 1 WHERE id = ?').bind(id)]);
+        else await env.DB.prepare('UPDATE blog_posts SET pinned = 0 WHERE id = ?').bind(id).run();
+      }
       return json({ ok: true, id, slug, status });
     }
     if (m === 'POST' && a === 'delete') {
@@ -263,6 +268,15 @@ export async function blogApi(req, env, url, h) {
         env.DB.prepare('DELETE FROM blog_comments WHERE post_id = ?').bind(Number(id)),
         env.DB.prepare('DELETE FROM blog_likes WHERE post_id = ?').bind(Number(id)),
         env.DB.prepare('DELETE FROM blog_posts WHERE id = ?').bind(Number(id)),
+      ]);
+      return json({ ok: true });
+    }
+    // 📌 какая статья стоит крупно на главной (только одна)
+    if (m === 'POST' && a === 'pin') {
+      const { id, pinned } = await body();
+      await env.DB.batch([
+        env.DB.prepare('UPDATE blog_posts SET pinned = 0'),
+        ...(pinned ? [env.DB.prepare('UPDATE blog_posts SET pinned = 1 WHERE id = ?').bind(Number(id))] : []),
       ]);
       return json({ ok: true });
     }
@@ -323,7 +337,7 @@ export async function blogApi(req, env, url, h) {
     if (m === 'POST' && a === 'translate') {
       const { texts, to, from } = await body();
       if (!LANGS.includes(to) || !LANGS.includes(from) || to === from || !Array.isArray(texts)) fail(400, 'bad');
-      try { return json({ texts: await translateAll(env, texts.slice(0, 300).map(s => String(s).slice(0, 4000)), from, to) }); }
+      try { return json(await translateAll(env, texts.slice(0, 300).map(s => String(s).slice(0, 4000)), from, to)); }
       catch (e) { fail(e.status || 502, e.code || 'ai'); }
     }
   }
@@ -381,14 +395,59 @@ async function translateOne(env, text, from, to) {
   if (tags.every((_, i) => out.includes(`⟦${i + 1}⟧`))) return out.replace(/⟦(\d+)⟧/g, (_, n) => tags[n - 1]);
   return run(stripTags(text));
 }
+// Gemini (ключ GEMINI_KEY в Cloudflare): переводит по смыслу и держит HTML. Модели по очереди — если одна перегружена, берём следующую.
+const LANG_NAME = { ru: 'Russian', en: 'English', lv: 'Latvian' };
+const GEMINI_MODELS = ['gemini-3.5-flash', 'gemini-flash-latest', 'gemini-3.8-flash'];
+const tagsSig = s => (String(s).match(/<\/?[a-z0-9]+/gi) || []).join(',').toLowerCase();
+async function gemini(env, texts, from, to) {
+  const prompt = `You are a careful professional translator. Translate every string in the JSON array below from ${LANG_NAME[from]} to ${LANG_NAME[to]}.
+The strings are consecutive parts of one blog post written by an illustrator about drawing.
+Rules:
+- Translate faithfully and accurately. Do not add, remove, soften or change any facts, opinions, numbers or details. Do not add your own jokes, idioms or explanations.
+- Make it read naturally and fluently in ${LANG_NAME[to]}, keeping the author's tone (personal, friendly), but stay close to the original meaning sentence by sentence.
+- Keep every HTML tag and attribute exactly as it is, in the same places; translate only the human-readable text between tags.
+- Keep brand, product and personal names (e.g. Moleskine, Talens, SM*LT, Pigeon Polly), numbers and units unchanged.
+- If a string is a comma-separated list of short tags, return a comma-separated list of lowercase tags. Empty strings stay empty.
+Return only a JSON array of exactly ${texts.length} strings in the same order.
+
+${JSON.stringify(texts)}`;
+  const models = env.GEMINI_MODEL ? [env.GEMINI_MODEL, ...GEMINI_MODELS] : GEMINI_MODELS;
+  let lastErr = 'ai';
+  for (const model of models) {
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+      method: 'POST', headers: { 'x-goog-api-key': env.GEMINI_KEY, 'content-type': 'application/json' },
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.2, responseMimeType: 'application/json', responseSchema: { type: 'ARRAY', items: { type: 'STRING' } } } }),
+    });
+    if (!r.ok) { lastErr = r.status === 429 ? 'ai_limit' : 'ai'; continue; } // 404 (модель закрыли), 503 (перегружена), 429 (лимит) — пробуем следующую
+    try {
+      const d = await r.json();
+      const out = JSON.parse(d.candidates[0].content.parts.map(p => p.text || '').join(''));
+      if (Array.isArray(out) && out.length === texts.length) return out.map(x => String(x ?? ''));
+    } catch (e) { /* ответ не разобрался — следующая модель */ }
+  }
+  throw Object.assign(new Error(lastErr), { code: lastErr });
+}
+
 async function translateAll(env, texts, from, to) {
   const out = [];
+  if (env.GEMINI_KEY) {
+    try {
+      const res = await gemini(env, texts, from, to);
+      // если в каком-то абзаце потерялось оформление — этот абзац переводим запасным переводчиком
+      for (let i = 0; i < res.length; i++) {
+        if (tagsSig(res[i]) !== tagsSig(texts[i]) || (texts[i].trim() && !res[i].trim())) {
+          try { res[i] = await translateOne(env, texts[i], from, to); } catch (e) { res[i] = texts[i]; }
+        }
+      }
+      return { texts: res, engine: 'gemini' };
+    } catch (e) { /* Gemini недоступен — ниже запасной вариант */ }
+  }
   try {
     for (let i = 0; i < texts.length; i += 4) out.push(...await Promise.all(texts.slice(i, i + 4).map(s => translateOne(env, s, from, to))));
   } catch (e) {
     const err = new Error(e.code || 'ai'); err.status = e.code === 'ai_limit' ? 429 : 502; err.code = e.code || 'ai'; throw err;
   }
-  return out;
+  return { texts: out, engine: 'cloudflare' };
 }
 
 // ---------- страницы ----------

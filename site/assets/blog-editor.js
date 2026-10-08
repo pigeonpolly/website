@@ -76,7 +76,7 @@
       const head = tagFilter ? `<p class="be-filter">Статьи с тегом <b>#${esc(tagFilter.t)}</b> (${tagFilter.l.toUpperCase()}) · <button type="button" class="bc-link" data-unfilter>показать все</button></p>` : '';
       if (!list.length) return head + `<p class="be-note">${dashTab === 'draft' ? 'Черновиков нет.' : 'Опубликованных статей пока нет.'}</p>`;
       return head + `<table class="be-table"><thead><tr><th>Статья</th><th>Статус</th><th>Дата</th><th title="лайки">♥</th><th title="просмотры">👁</th><th title="комментарии">💬</th><th></th></tr></thead><tbody>
-        ${list.map(p => `<tr data-id="${p.id}"><td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a><small>/blog/${esc(p.slug)}/ · ${['ru', 'en', 'lv'].map(l => p['t_' + l] ? l.toUpperCase() : `<s>${l.toUpperCase()}</s>`).join(' ')}</small></td>
+        ${list.map(p => `<tr data-id="${p.id}"><td><button class="be-pin" data-pin aria-pressed="${!!p.pinned}" title="${p.pinned ? 'Стоит крупно на главной' : 'Поставить крупно на главную'}">📌</button><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a><small>/blog/${esc(p.slug)}/ · ${['ru', 'en', 'lv'].map(l => p['t_' + l] ? l.toUpperCase() : `<s>${l.toUpperCase()}</s>`).join(' ')}</small></td>
           <td><span class="be-st ${p.status}">${p.status === 'published' ? 'опубликована' : 'черновик'}</span></td><td>${fmt(p.published_at || p.updated_at)}</td>
           <td>${p.likes}</td><td>${p.views}</td><td>${p.comments}</td>
           <td class="be-acts"><a href="#${p.id}">Изменить</a> <a href="/ru/blog/${esc(p.slug)}/" target="_blank">Открыть ↗</a> <button class="bc-link be-danger" data-delpost>Удалить</button></td></tr>`).join('')}
@@ -104,6 +104,7 @@
           `<button type="button" role="tab" data-dtab="${k}" aria-selected="${dashTab === k}">${n} <span>${c}</span></button>`).join('')}</div>
         ${dashTab === 'tags' ? tagsHtml() : postsHtml(dashTab === 'draft' ? drafts : pub)}
       </section>
+      ${state.gemini ? '' : '<p class="be-note">⚠ Ключ Gemini (GEMINI_KEY) не подключён в Cloudflare — переводит запасной, более слабый переводчик.</p>'}
       ${state.media ? '' : '<p class="be-note">⚠ Хранилище картинок (R2) не подключено — загрузка картинок не заработает.</p>'}`;
     app.querySelectorAll('[data-dtab]').forEach(b => b.addEventListener('click', () => { dashTab = b.dataset.dtab; tagFilter = null; dashboard(); }));
     const unf = app.querySelector('[data-unfilter]'); unf && unf.addEventListener('click', () => { tagFilter = null; dashboard(); });
@@ -123,6 +124,13 @@
       const li = b.closest('li');
       if (b.hasAttribute('data-del') && !confirm('Удалить комментарий?')) return;
       await api('blog/admin/comment', { id: Number(li.dataset.cid), action: b.hasAttribute('data-ok') ? 'approve' : 'delete' });
+      dashboard();
+    }));
+    app.querySelectorAll('[data-pin]').forEach(b => b.addEventListener('click', async () => {
+      const on = b.getAttribute('aria-pressed') !== 'true';
+      const tr = b.closest('tr'), p = state.posts.find(x => x.id === Number(tr.dataset.id));
+      if (on && p && p.status !== 'published' && !confirm('Это черновик — на главной он появится только после публикации. Всё равно закрепить?')) return;
+      await api('blog/admin/pin', { id: Number(tr.dataset.id), pinned: on });
       dashboard();
     }));
     app.querySelectorAll('[data-star]').forEach(b => b.addEventListener('click', async () => {
@@ -179,6 +187,7 @@
           <div><button type="button" class="pill-btn" id="be-cover-up">Загрузить картинку</button>
             <input type="url" id="be-cover-url" placeholder="или вставьте ссылку на картинку" value="${esc(post.cover)}">
             ${post.cover ? '<button type="button" class="bc-link" id="be-cover-rm">убрать обложку</button>' : ''}</div></div></div>
+        <label class="be-check"><input type="checkbox" id="be-pinned" ${post.pinned ? 'checked' : ''}> <b>📌 Крупно на главной</b> <small>— эта статья будет большой на главной вместо самой новой (только одна статья)</small></label>
         <label class="be-check"><input type="checkbox" id="be-featured" ${post.featured ? 'checked' : ''}> <b>★ Избранное</b> <small>— показывать справа в блоке блога на главной</small></label>
         <label class="be-f"><span>Адрес статьи <small id="be-slug-note">${post.status === 'published' ? '(статья опубликована — адрес лучше не менять, иначе старые ссылки перестанут работать)' : '(заполняется сам из заголовка; можно поправить)'}</small></span><div class="be-slug"><span>pigeonpolly.com/blog/</span><input type="text" id="be-slug" value="${esc(post.slug)}" spellcheck="false"><span>/</span></div></label>
       </section>
@@ -196,13 +205,13 @@
     document.execCommand('defaultParagraphSeparator', false, 'p');
 
     const collect = () => {
-      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked };
+      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, pinned: $('#be-pinned').checked };
       app.querySelectorAll('[data-k]').forEach(el => {
         if (!el.isContentEditable) { d[el.dataset.k] = el.value; return; }
         const c = el.cloneNode(true);
         c.querySelectorAll('figure').forEach(f => {
           const cap = f.querySelector('figcaption'), img = f.querySelector('img'), txt = cap ? cap.textContent.trim() : '';
-          if (img && txt && !img.getAttribute('alt')) img.setAttribute('alt', txt); // подпись = описание картинки для Google и незрячих
+          if (img && txt) img.setAttribute('alt', txt); // подпись = описание картинки для Google и незрячих (на языке вкладки)
           if (cap && !txt) cap.remove();                                         // пустая подпись в статью не попадает
         });
         d[el.dataset.k] = c.innerHTML;
@@ -426,11 +435,13 @@
           const { texts, rebuild } = splitForTranslation(ru, from);
           const out = [];
           bar(l, 2, '0%');
-          for (let i = 0; i < texts.length; i += 6) {
-            const r = await api('blog/admin/translate', { texts: texts.slice(i, i + 6), from, to: l });
+          let backup = false;
+          for (let i = 0; i < texts.length; i += 15) {
+            const r = await api('blog/admin/translate', { texts: texts.slice(i, i + 15), from, to: l });
             out.push(...r.texts);
+            if (r.engine !== 'gemini') backup = true;
             const pct = Math.round(out.length / texts.length * 100);
-            bar(l, pct, pct >= 100 ? 'готово ✓' : pct + '%');
+            bar(l, pct, pct >= 100 ? (backup ? 'готово (запасной переводчик — проверьте внимательнее)' : 'готово ✓') : pct + '%');
           }
           const res = rebuild(out);
           app.querySelector(`[data-k="t_${l}"]`).value = res.t;
@@ -473,7 +484,8 @@
       for (const ch of el.children) {
         const tag = ch.tagName.toLowerCase();
         if (tag === 'ul' || tag === 'ol' || tag === 'blockquote' && ch.querySelector('p')) walk(ch);
-        else if (tag === 'figure' || tag === 'hr' || tag === 'img' || !ch.textContent.trim()) continue;
+        else if (tag === 'figure') { const cap = ch.querySelector('figcaption'); if (cap && cap.textContent.trim()) { slots.push(cap); texts.push(cap.innerHTML); } } // подпись к картинке тоже переводим
+        else if (tag === 'hr' || tag === 'img' || !ch.textContent.trim()) continue;
         else { slots.push(ch); texts.push(ch.innerHTML); }
       }
     };

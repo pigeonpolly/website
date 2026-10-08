@@ -1907,3 +1907,6 @@ details.am-art .am-series { padding: 0 24px 24px; }
   .bp-wrap .bp-more { margin: 0; padding: 140px 0 72px; position: sticky; top: calc(var(--header-h) - 100px); max-width: none; }
   .bp-wrap .bp-more .bl-side { grid-template-columns: 1fr; position: static; }
 }
+.be-pin { background: none; border: 0; font-size: 16px; cursor: pointer; padding: 0 4px 0 0; filter: grayscale(1); opacity: .35; vertical-align: -1px; }
+.be-pin[aria-pressed="true"] { filter: none; opacity: 1; }
+.be-prog { grid-template-columns: 34px minmax(0, 1fr) minmax(90px, auto); }
