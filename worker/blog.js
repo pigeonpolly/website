@@ -777,12 +777,12 @@ function card(p, lang) {
 }
 
 const ym = p => new Date((p.published_at || p.updated_at) * 1000).toISOString().slice(0, 7);
-function sidebar(posts, lang, activeTag, activeMonth = '', post = false, activeSection = '') {
+function sidebar(posts, lang, activeTag, activeMonth = '', post = false, activeSection = '', isAdm = false) {
   const t = T[lang], count = {};
-  // разделы (как коллекции на Patreon) — только те, где есть опубликованные статьи
+  // разделы (как коллекции на Patreon): посетителям — только с опубликованными статьями, админу — все (пустые бледные)
   const secCount = {};
   for (const p of posts) if (p.section) secCount[p.section] = (secCount[p.section] || 0) + 1;
-  const secs = SECTIONS.filter(x => secCount[x.slug]);
+  const secs = SECTIONS.filter(x => secCount[x.slug] || isAdm);
   const fav = posts.filter(p => p.featured).slice(0, 5);
   const months = {};
   for (const p of posts) { const k = ym(p); months[k] = (months[k] || 0) + 1; }
@@ -796,7 +796,7 @@ function sidebar(posts, lang, activeTag, activeMonth = '', post = false, activeS
     ${fav.length ? `<section><h2>★ ${t.featured.replace(/^★\s*/, '')}</h2>${list(fav)}
       ${!post && fav.length > 1 ? `<p class="bl-more"><a href="${blogUrl(lang, '', '?fav=1')}">${t.onlyFav} →</a></p>` : ''}</section>` : ''}
     ${secs.length ? `<section><h2>${t.sections}</h2><ul class="bs-secs">${secs.map(x =>
-      `<li><a href="${blogUrl(lang, '', '?section=' + encodeURIComponent(x.slug))}"${x.slug === activeSection ? ' aria-current="true"' : ''}>${esc(x[lang] || x.en)}</a> <span>${secCount[x.slug]}</span></li>`).join('')}</ul></section>` : ''}
+      `<li${secCount[x.slug] ? '' : ' class="bs-empty" title="Пока пусто — видите только вы"'}><a href="${blogUrl(lang, '', '?section=' + encodeURIComponent(x.slug))}"${x.slug === activeSection ? ' aria-current="true"' : ''}>${esc(x[lang] || x.en)}</a> <span>${secCount[x.slug] || 0}</span></li>`).join('')}</ul></section>` : ''}
     ${tags.length ? `<section><h2>${t.tags}</h2><p class="bs-tags">${tags.map(([g, n], i) =>
       `<a class="bs-tag${i === 0 ? ' gold' : i < 4 ? ' violet' : ''}" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}"${g === activeTag ? ' aria-current="true"' : ''}>${esc(tagLabel(g, lang))}<span>${n}</span></a>`).join('')}</p></section>` : ''}
     ${years.length ? `<section><h2>${t.archive}</h2><ul class="bl-arch">${years.map(y => `<li><b>${y}</b><ul>${Object.keys(months).filter(k => k.startsWith(y)).sort().reverse().map(k =>
@@ -882,16 +882,14 @@ export async function blogPage(req, env, url, h) {
     const shown = list.slice((page - 1) * PER, page * PER);
     const link = (over) => { const u = new URLSearchParams(P); for (const [k, v] of Object.entries(over)) { if (v === '' || v == null) u.delete(k); else u.set(k, v); } const qs = u.toString(); return blogUrl(lang, '', qs ? '?' + qs : ''); };
     const filtered = tag || month || favOnly || section || q || page > 1;
-    const label = q ? `${t.found}: <b>«${esc(q)}»</b> (${list.length})` : tag ? `${t.tagged} <b>#${esc(tagLabel(tag, lang))}</b>` : month ? `${t.inMonth} <b>${t.monthsFull[+month.slice(5) - 1]} ${month.slice(0, 4)}</b>` : favOnly ? `<b>${t.featured}</b>` : '';
-    const used = new Set(published.map(x => x.section).filter(Boolean));
-    const secs = SECTIONS.filter(x => used.has(x.slug) || isAdm);
+    const label = q ? `${t.found}: <b>«${esc(q)}»</b> (${list.length})` : tag ? `${t.tagged} <b>#${esc(tagLabel(tag, lang))}</b>` : month ? `${t.inMonth} <b>${t.monthsFull[+month.slice(5) - 1]} ${month.slice(0, 4)}</b>` : favOnly ? `<b>${t.featured}</b>` : section ? `${t.section}: <b>${esc(sectionName(section, lang))}</b>` : '';
     const pager = pages > 1 ? `<nav class="bl-pager" aria-label="Pages">${page > 1 ? `<a href="${link({ page: page - 1 > 1 ? page - 1 : '' })}">${t.prev}</a>` : '<span></span>'}
       <span class="bl-pages">${Array.from({ length: pages }, (_, k) => k + 1).map(n => n === page ? `<b aria-current="page">${n}</b>` : `<a href="${link({ page: n > 1 ? n : '' })}">${n}</a>`).join('')}</span>
       ${page < pages ? `<a href="${link({ page: page + 1 })}">${t.next}</a>` : '<span></span>'}</nav>` : '';
     const content = `<section class="page-head bl-head"><p class="topics">${t.blog.toLowerCase()}</p><h1>${t.head}</h1><p class="lead">${t.lead}</p>
       <div class="bl-admin" data-blog-admin hidden><a class="pill-btn" href="/blog-editor/">＋ ${lang === 'ru' ? 'Новая статья' : lang === 'lv' ? 'Jauns raksts' : 'New post'}</a></div></section>
       <div class="bl-tools">
-        ${secs.length ? `<nav class="bl-sections" aria-label="${t.section}"><a href="${link({ section: '', page: '' })}"${section ? '' : ' aria-current="true"'}>${t.allSections}</a>${secs.map(x => `<a href="${link({ section: x.slug, page: '' })}"${section === x.slug ? ' aria-current="true"' : ''}>${esc(x[lang] || x.en)}</a>`).join('')}</nav>` : '<span></span>'}
+        <span></span>
         <form class="bl-search" action="${blogUrl(lang, '')}" method="get" role="search">${section ? `<input type="hidden" name="section" value="${esc(section)}">` : ''}
           <input type="search" name="q" value="${esc(q)}" placeholder="${t.search}" aria-label="${t.search}"><button type="submit" aria-label="${t.searchBtn}">🔍</button></form>
       </div>
@@ -899,7 +897,7 @@ export async function blogPage(req, env, url, h) {
         ${filtered && (label || section) ? `<p class="bl-filter">${label || `<b>${esc(sectionName(section, lang))}</b>`} · <a href="${blogUrl(lang, '')}">${t.all}</a></p>` : ''}
         ${shown.map(x => card(x, lang)).join('') || `<p class="bl-empty">${q ? t.nothing : t.empty}</p>`}
         ${pager}
-      </div>${sidebar(published, lang, tag, month, false, section)}</div>
+      </div>${sidebar(published, lang, tag, month, false, section, isAdm)}</div>
       <script src="/assets/blog.js" defer></script>`;
     return html(fill(tpl, { title: `${t.blog} · Pigeon Polly Art Lab`, description: t.descr, canonical: SITE + blogUrl(lang, ''), content, noindex: !!filtered }));
   }
@@ -940,7 +938,7 @@ export async function blogPage(req, env, url, h) {
       <div class="bc-form-wrap" data-comment-form></div>
     </section>
   </article>
-  <div class="bp-more">${sidebar(published, lang, '', '', true)}</div></div>
+  <div class="bp-more">${sidebar(published, lang, '', '', true, post.section || '', isAdm)}</div></div>
   <script src="/assets/blog.js" defer></script><script src="/assets/scroll-nav.js" defer></script>`;
   const jsonld = { '@context': 'https://schema.org', '@type': 'BlogPosting', headline: title, description, inLanguage: textLang,
     datePublished: new Date((post.published_at || post.updated_at) * 1000).toISOString(), dateModified: new Date(post.updated_at * 1000).toISOString(),
