@@ -163,5 +163,9 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
   }
 
+  // на телефоне панель «Разделы, теги и архив» стоит над статьями — сворачиваем её, чтобы статьи были сразу видны
+  const sw = document.querySelector('.bl-sidewrap');
+  if (sw && matchMedia('(max-width: 960px)').matches) sw.open = false;
+
   load();
 })();

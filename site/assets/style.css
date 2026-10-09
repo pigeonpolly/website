@@ -2200,3 +2200,14 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .adm-back { margin: 0 0 6px; } .adm-back a { color: var(--peach); font-weight: 700; text-decoration: none; }
 @media (max-width: 800px) { .adm.be-app { grid-template-columns: 1fr; } .adm-nav { position: static; grid-template-columns: repeat(2, 1fr); } .adm-cols { grid-template-columns: 1fr; } }
 .be-posts .be-langs i { white-space: nowrap; }
+/* блог: число статей; на телефоне панель (разделы, теги, архив) — над статьями и свёрнута */
+.bl-count { margin: 6px 0 0; font: 700 15px var(--sans); color: #E9A93B; }
+.bl-sidewrap > summary { display: none; }
+.bl-sidewrap { align-self: start; position: sticky; top: calc(var(--header-h) + 24px); }
+.bl-sidewrap .bl-side { position: static; }
+@media (max-width: 960px) {
+  .bl-sidewrap { order: -1; position: static; }
+  .bl-sidewrap > summary { display: flex; align-items: center; justify-content: center; gap: 6px; list-style: none; cursor: pointer; padding: 11px 18px; border-radius: 99px; background: #FFFDF8; color: #2B1A51; font: 700 15px var(--sans); box-shadow: 0 6px 18px rgba(0, 0, 0, .2); }
+  .bl-sidewrap > summary::-webkit-details-marker { display: none; }
+  .bl-sidewrap[open] > summary { margin-bottom: 12px; }
+}
