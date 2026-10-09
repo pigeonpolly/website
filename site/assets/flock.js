@@ -193,22 +193,64 @@
   };
   const allowed = name => { const l = ALLOW[loc || 'park']; return !Object.values(ALLOW).some(a => a.includes(name)) || l.includes(name); };
   function syncMenu() { box.querySelectorAll('.fl-menu [data-act]').forEach(b => { if (!b.dataset.act.startsWith('loc')) b.hidden = !allowed(b.dataset.act); }); }
-  // настоящие книги Алины на витрине книжного: обложки — ссылки
-  let BOOKS = [], bookEls = [];
-  fetch('/assets/books.json').then(r => r.ok ? r.json() : []).then(d => { BOOKS = d || []; placeBooks(); }).catch(e => console.warn('books', e));
+  // мини-истории на полках книжного: светящиеся корешки и обложки на витрине открывают рассказ
+  const TALES = [
+    { c: '#2B4A7A', i: '🌙',
+      en: ['The Pigeon Who Collected Moons', 'Every night Bartholomew flew to the fountain and caught the moon in the water. He never kept it long: by morning it slipped away. "It is fine," he told the others. "A moon you have to catch again every night is the best kind of moon." One cloudy evening there was no moon at all. Bartholomew sat by the dark fountain until a little girl dropped a round, shiny button into it. He decided that counted.'],
+      ru: ['Голубь, который собирал луны', 'Каждую ночь Варфоломей прилетал к фонтану и ловил луну в воде. Подолгу она у него не задерживалась: к утру ускользала. «Ничего, — говорил он остальным. — Луна, которую приходится ловить каждую ночь заново, — самая лучшая». Однажды вечер выдался облачным, и луны не было вовсе. Варфоломей сидел у тёмного фонтана, пока маленькая девочка не уронила в воду круглую блестящую пуговицу. Он решил, что это считается.'],
+      lv: ['Balodis, kurš krāja mēnešus', 'Katru nakti Bartolomejs lidoja pie strūklakas un ķēra mēnesi ūdenī. Ilgi tas pie viņa nepalika: līdz rītam izslīdēja. "Nekas," viņš teica pārējiem. "Mēness, kas katru nakti jānoķer no jauna, ir pats labākais." Kādu mākoņainu vakaru mēness nebija nemaz. Bartolomejs sēdēja pie tumšās strūklakas, līdz maza meitene iemeta ūdenī apaļu, spīdīgu pogu. Viņš nolēma, ka tā skaitās.'] },
+    { c: '#B8384A', i: '🧦',
+      en: ['The Lost Sock', 'A striped sock fell from a balcony and landed right in the middle of the square. The flock held a meeting. "It is a tent," said the crow. "It is a scarf," said the cat. "It is a very long hat," said Polly, and tried it on. By evening the sock had been a sleeping bag, a sail and a slide. When its owner finally came looking for it, he found twelve birds asleep inside. He went home with one sock and never complained about it again.'],
+      ru: ['Потерянный носок', 'С балкона упал полосатый носок и приземлился прямо посреди площади. Стая собрала совещание. «Это палатка», — сказала ворона. «Это шарф», — сказал кот. «Это очень длинная шапка», — сказала Полли и примерила. К вечеру носок успел побыть спальным мешком, парусом и горкой. Когда хозяин наконец пришёл его искать, внутри спали двенадцать птиц. Он ушёл домой с одним носком и больше никогда на это не жаловался.'],
+      lv: ['Pazudusī zeķe', 'No balkona nokrita svītraina zeķe un piezemējās tieši laukuma vidū. Bars sasauca sapulci. "Tā ir telts," teica vārna. "Tā ir šalle," teica kaķis. "Tā ir ļoti gara cepure," teica Pollija un to uzlaikoja. Līdz vakaram zeķe paspēja būt guļammaiss, bura un slidkalniņš. Kad saimnieks beidzot atnāca to meklēt, iekšā gulēja divpadsmit putni. Viņš aizgāja mājās ar vienu zeķi un vairs nekad par to nesūdzējās.'] },
+    { c: '#3E7A55', i: '🐉',
+      en: ['Polly and the Very Small Dragon', 'Under the bookstore stairs lived a dragon the size of a teaspoon. He breathed fire, but only enough to warm one cup of cocoa. Everyone was a little afraid of him, except Polly, who simply brought a cup. "Nobody ever asks me to do the thing I am good at," the dragon sighed, warming it. Now every Thursday there is a queue of birds with cups under the stairs, and the dragon wears a tiny apron.'],
+      ru: ['Полли и очень маленький дракон', 'Под лестницей в книжном жил дракон размером с чайную ложку. Он дышал огнём, но ровно настолько, чтобы согреть одну чашку какао. Все его немного побаивались, кроме Полли — она просто принесла чашку. «Никто никогда не просит меня делать то, что у меня получается», — вздохнул дракон, согревая её. Теперь каждый четверг под лестницей очередь птиц с чашками, а дракон носит крошечный фартук.'],
+      lv: ['Pollija un ļoti mazais pūķis', 'Zem grāmatnīcas kāpnēm dzīvoja tējkarotes lieluma pūķis. Viņš spļāva uguni, bet tieši tik daudz, lai sasildītu vienu kakao krūzīti. Visi viņa mazliet baidījās, izņemot Polliju, kura vienkārši atnesa krūzīti. "Neviens nekad nelūdz mani darīt to, kas man padodas," nopūtās pūķis, to sildīdams. Tagad katru ceturtdienu zem kāpnēm stāv putnu rinda ar krūzītēm, un pūķis valkā sīku priekšautu.'] },
+    { c: '#8B5A3C', i: '🪑',
+      en: ['The Bench That Waited', 'The old bench in the square was sure it had a job: to wait. It waited for the man with the newspaper, for the couple who argued about pigeons, for the boy who always dropped half his bun. One winter nobody came for a week. The bench got worried that it had waited wrong. Then on Monday the whole flock landed on it at once, all thirty of them, and the bench creaked so happily that the man with the newspaper laughed out loud.'],
+      ru: ['Скамейка, которая ждала', 'Старая скамейка на площади была уверена, что у неё есть работа — ждать. Она ждала мужчину с газетой, парочку, которая спорила о голубях, мальчика, который всегда ронял половину булки. Однажды зимой целую неделю никто не приходил. Скамейка забеспокоилась, что ждала как-то неправильно. А в понедельник на неё разом опустилась вся стая, все тридцать птиц, и скамейка скрипнула так радостно, что мужчина с газетой засмеялся вслух.'],
+      lv: ['Sols, kas gaidīja', 'Vecais sols laukumā bija pārliecināts, ka viņam ir darbs — gaidīt. Viņš gaidīja vīru ar avīzi, pāri, kas strīdējās par baložiem, zēnu, kurš vienmēr nometa pusi maizītes. Kādu ziemu veselu nedēļu neviens nenāca. Sols sāka uztraukties, ka gaidījis nepareizi. Bet pirmdien uz viņa vienlaikus nolaidās viss bars, visi trīsdesmit putni, un sols nočīkstēja tik priecīgi, ka vīrs ar avīzi skaļi iesmējās.'] },
+    { c: '#E9A93B', i: '✉️',
+      en: ['A Letter Nobody Sent', 'The delivery pigeon found a letter with no address and no name. Inside it said only: "I hope your day gets better." He did not know whose day it was, so he decided it was everyone\'s. He read it to the baker, to the bus driver and to a very grumpy cat. By sunset the letter was soft from being unfolded so often, and the town was in a slightly better mood. Nobody ever found out who wrote it. Some say it was Polly.'],
+      ru: ['Письмо, которое никто не отправлял', 'Голубь-почтальон нашёл письмо без адреса и без имени. Внутри было написано только: «Надеюсь, твой день станет лучше». Он не знал, чей это день, и решил, что всех. Он прочитал письмо пекарю, водителю автобуса и одному очень сердитому коту. К закату письмо стало мягким от того, что его столько раз разворачивали, а у города заметно улучшилось настроение. Никто так и не узнал, кто его написал. Говорят, Полли.'],
+      lv: ['Vēstule, ko neviens nesūtīja', 'Pasta balodis atrada vēstuli bez adreses un bez vārda. Iekšā bija rakstīts tikai: "Ceru, ka tava diena kļūs labāka." Viņš nezināja, kura tā diena ir, tāpēc nolēma, ka visu. Viņš nolasīja vēstuli maiznieciņam, autobusa šoferim un vienam ļoti īgnam kaķim. Līdz saulrietam vēstule bija kļuvusi mīksta no tik biežas atlocīšanas, un pilsētai bija krietni labāks garastāvoklis. Neviens tā arī neuzzināja, kas to uzrakstīja. Saka, ka Pollija.'] },
+    { c: '#6B4FA0', i: '📚',
+      en: ['The Night Library', 'When the bookstore closes, the books do not sleep. They lean towards each other and swap endings. The sad ones borrow a happy line or two; the funny ones learn to be quiet for a page. In the morning the owner never notices, but the birds do: the story they read yesterday is always a tiny bit different today. That is why pigeons reread everything. They are checking.'],
+      ru: ['Ночная библиотека', 'Когда книжный закрывается, книги не спят. Они наклоняются друг к другу и меняются концовками. Грустные одалживают пару счастливых строчек, смешные учатся помолчать хотя бы страницу. Утром хозяйка ничего не замечает, а птицы замечают: история, которую они читали вчера, сегодня всегда чуть-чуть другая. Поэтому голуби всё перечитывают. Они проверяют.'],
+      lv: ['Nakts bibliotēka', 'Kad grāmatnīca aizveras, grāmatas neguļ. Tās pieliecas viena pie otras un mainās ar beigām. Skumjās aizņemas pāris laimīgu rindiņu, smieklīgās mācās vismaz lappusi paklusēt. No rīta saimniece neko nepamana, bet putni pamana: stāsts, ko viņi lasīja vakar, šodien vienmēr ir mazliet citāds. Tāpēc baloži visu pārlasa. Viņi pārbauda.'] },
+  ];
+  const TALE_UI = { en: ['Close', 'A tale from the bookstore shelf'], ru: ['Закрыть', 'История с полки книжного'], lv: ['Aizvērt', 'Stāsts no grāmatnīcas plaukta'] }[lang] || ['Close', 'A tale from the bookstore shelf'];
+  const taleOf = t => t[lang] || t.en;
+  let taleDlg = null;
+  function openTale(t) {
+    if (!taleDlg) {
+      taleDlg = document.createElement('dialog'); taleDlg.className = 'fl-tale';
+      taleDlg.addEventListener('click', e => { if (e.target === taleDlg || e.target.closest('[data-close]')) taleDlg.close(); });
+      box.appendChild(taleDlg); // стили блока привязаны к #blk-flock
+    }
+    const [title, text] = taleOf(t), esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+    taleDlg.innerHTML = `<article style="--tc:${t.c}"><p class="fl-tale-kick"><span aria-hidden="true">${t.i}</span> ${esc(TALE_UI[1])}</p><h3>${esc(title)}</h3><p>${esc(text)}</p><button type="button" data-close>${esc(TALE_UI[0])}</button></article>`;
+    taleDlg.showModal();
+  }
+  // 4 обложки на витрине + 3 светящихся корешка на полках
+  let bookEls = [];
   function placeBooks() {
     if (!labels) return;
-    if (!bookEls.length && BOOKS.length) bookEls = BOOKS.map(bk => {
-      const a = document.createElement('a'); a.className = 'fl-book'; a.href = bk.url; a.title = bk.title;
-      if (/^https?:/.test(bk.url)) { a.target = '_blank'; a.rel = 'noopener'; }
-      a.innerHTML = `<img src="${bk.cover}" alt="${bk.title.replace(/"/g, '&quot;')}" loading="lazy">`; labels.appendChild(a); return a;
+    if (!bookEls.length) bookEls = TALES.map((t, i) => {
+      const a = document.createElement('button'); a.type = 'button'; a.className = 'fl-book' + (i < 4 ? '' : ' fl-spine'); a.title = taleOf(t)[0];
+      a.style.setProperty('--tc', t.c); a.setAttribute('aria-label', taleOf(t)[0]);
+      if (i < 4) a.innerHTML = `<span aria-hidden="true">${t.i}</span>`;
+      a.addEventListener('click', e => { e.stopPropagation(); openTale(t); });
+      return a;
     });
-    const k = cv.getBoundingClientRect().width / W, d0 = Math.round(W * .46);
+    const k = cv.getBoundingClientRect().width / W, d0 = Math.round(W * .46), spX = [W * .08, W * .62, W * .9];
     bookEls.forEach((a, i) => {
       if (!a.isConnected) labels.appendChild(a); // слой подписей пересоздаётся, когда приходят птички
-      a.hidden = loc !== 'bookstore';
-      a.style.transform = `translate(${((d0 + 1 + i * 12) * k).toFixed(1)}px, ${((OFF + 44) * k).toFixed(1)}px)`;
-      a.style.width = (10 * k).toFixed(1) + 'px'; a.style.height = (14 * k).toFixed(1) + 'px';
+      a.style.display = loc === 'bookstore' ? '' : 'none';
+      const [x, y, w, h] = i < 4 ? [d0 + 1 + i * 12, 44, 10, 14] : [Math.round(spX[i - 4]), i === 5 ? 23 : 35, 4, 9];
+      a.style.transform = `translate(${(x * k).toFixed(1)}px, ${((OFF + y) * k).toFixed(1)}px)`;
+      a.style.width = (w * k).toFixed(1) + 'px'; a.style.height = (h * k).toFixed(1) + 'px';
     });
   }
   // где сидеть в каждой локации: скамейка и урна / табуреты и диванчик / кресло, касса и стопка книг
@@ -702,17 +744,17 @@
         return e.pc.gone || e.t > 22;
       },
     },
-    // ---- книжный: час чтения — птички берут книги Алины с витрины и читают на ковре ----
+    // ---- книжный: час чтения — птички берут мини-истории с витрины и читают на ковре ----
     reading: {
       ok: () => loc === 'bookstore' && freeBirds(isBird).length >= 2, w: 3,
       start(e) {
         const d0 = Math.round(W * .46);
-        e.list = closest(freeBirds(isBird), d0 + 20, Math.min(4, Math.max(2, BOOKS.length || 3))); enlist(e.list, e); e.books = []; e.tags = [];
+        e.list = closest(freeBirds(isBird), d0 + 20, 4); enlist(e.list, e); e.books = []; e.tags = [];
         e.list.forEach((b, i) => {
-          const bk = BOOKS.length ? BOOKS[i % BOOKS.length] : null, sx = cx(W * .34 + i * (W * .36 / e.list.length) + 6), sy = cy(rnd(100, 118));
+          const bk = TALES[(e.off = e.off ?? Math.floor(Math.random() * TALES.length), (e.off + i) % TALES.length)], sx = cx(W * .34 + i * (W * .36 / e.list.length) + 6), sy = cy(rnd(100, 118));
           b.tasks.push({ go: { x: cx(d0 + 4 + i * 12), y: Y0 } }, { say: 'star', t: .8 }, { go: { x: sx, y: sy } }, { face: 1 },
             { fn: () => { const it = { type: 'book', x: sx + 11, y: sy + 1, lock: true, reading: true }; items.push(it); e.books.push(it);
-              if (bk && labels) { const a = document.createElement('a'); a.className = 'fl-reading'; a.href = bk.url; if (/^https?:/.test(bk.url)) { a.target = '_blank'; a.rel = 'noopener'; } a.textContent = '📖 ' + bk.title.replace(/\s*\(.*?\)\s*$/, ''); labels.appendChild(a); b.readTag = a; e.tags.push(a); } } },
+              if (labels) { const a = document.createElement('button'); a.type = 'button'; a.className = 'fl-reading'; a.addEventListener('click', ev => { ev.stopPropagation(); openTale(bk); }); a.textContent = bk.i + ' ' + taleOf(bk)[0]; labels.appendChild(a); b.readTag = a; e.tags.push(a); } } },
             { wait: 99, pose: 'idle' });
         });
         e.t = 0;

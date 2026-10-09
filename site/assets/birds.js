@@ -394,7 +394,7 @@
   function giftPic(kind, v, id, size, av) {
     const w = document.createElement('span'); w.className = 'gift-pic';
     w.appendChild(itemIcon(kind, v, size, id));
-    if (!['bg', 'frame', 'anim'].includes(kind)) w.appendChild(avatar(id, Object.assign({}, av || {}, { [kind]: v }), size));
+    if (!['bg', 'frame', 'anim'].includes(kind)) w.classList.add('dual'), w.appendChild(avatar(id, Object.assign({}, av || {}, { [kind]: v }), size));
     w.addEventListener('touchstart', () => w.classList.toggle('show'), { passive: true });
     return w;
   }

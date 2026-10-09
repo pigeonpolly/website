@@ -2660,7 +2660,8 @@ html.sb-hide { --sb: 0px; }
 .gift-pic { position: relative; display: inline-grid; }
 .gift-pic > .pp-ava { position: absolute; inset: 0; opacity: 0; transition: opacity .2s; }
 .gift-pic:hover > .pp-ava, .gift-pic.show > .pp-ava, button:hover > .gift-pic > .pp-ava, figure:hover > .gift-pic > .pp-ava { opacity: 1; }
-.gift-pic:hover > .pp-icon, .gift-pic.show > .pp-icon, button:hover > .gift-pic > .pp-icon, figure:hover > .gift-pic > .pp-icon { opacity: 0; }
+/* иконку прячем, только если есть птичка-примерка (у фонов, рамок и анимаций её нет — иконка и есть птичка) */
+.gift-pic.dual:hover > .pp-icon, .gift-pic.dual.show > .pp-icon, button:hover > .gift-pic.dual > .pp-icon, figure:hover > .gift-pic.dual > .pp-icon { opacity: 0; }
 .legend-tag { position: absolute; top: 4px; left: 6px; color: #E9A93B; font: 700 14px var(--sans); text-shadow: 0 0 6px rgba(245, 213, 71, .9); }
 .fl-coll-item.legend .pp-icon { box-shadow: 0 0 0 3px #F5D547, 0 0 16px rgba(245, 213, 71, .7); }
 /* детальные бейджи */
