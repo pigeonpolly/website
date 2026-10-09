@@ -29,7 +29,7 @@
   const secsOf = p => String(p && p.section || '').split(',').map(x => x.trim()).filter(Boolean); // у статьи может быть несколько разделов
   const HOME_SECS = ['traditional-art', 'technologies', 'education', 'pollys-life', 'tips-guides', 'stories'];
   let warnedHome = false;
-  const lf = { q: '', sec: '', from: '', to: '', sort: 'date', dir: -1 };
+  const lf = { q: '', sec: '', from: '', to: '', fav: false, sort: 'date', dir: -1 };
   // на каком языке показывать названия статей и разделов в списке (запоминается)
   let vl = 'ru'; try { vl = localStorage.getItem('pp-admin-lang') || 'ru'; } catch (e) {}
   const VL_ORDER = () => [vl, ...['ru', 'en', 'lv'].filter(x => x !== vl)];
@@ -90,6 +90,9 @@
     }
     const pend = state.pending;
     const pub = state.posts.filter(p => p.status === 'published'), drafts = state.posts.filter(p => p.status !== 'published');
+    // копии одной статьи (одинаковые заголовки на всех языках) — от повторных сохранений
+    const dupKey = p => ['t_ru', 't_en', 't_lv'].map(k => String(p[k] || '').toLowerCase().replace(/\s+/g, ' ').trim()).join('|');
+    const dupN = (() => { const c = new Map(); for (const p of state.posts) { const k = dupKey(p); if (k.replace(/\|/g, '')) c.set(k, (c.get(k) || 0) + 1); } return [...c.values()].reduce((n, v) => n + v - 1, 0); })();
     knownTags = tagsByLang();
     const tagCount = tagDict.length;
     const postsHtml = list => {
@@ -100,24 +103,30 @@
       // поиск (название на любом языке, адрес, теги), раздел, период
       const words = lf.q.toLowerCase().split(/\s+/).filter(Boolean);
       const day = p => localDate(p.published_at || p.updated_at);
-      list = list.filter(p => {
+      const match = p => {
+        if (lf.fav && !p.featured) return false;
         if (lf.sec && (lf.sec === '-' ? secsOf(p).length : !secsOf(p).includes(lf.sec))) return false;
         if (lf.from && day(p) < lf.from) return false;
         if (lf.to && day(p) > lf.to) return false;
         if (!words.length) return true;
         const hay = [p.t_ru, p.t_en, p.t_lv, p.slug, p.tags_en, p.tags_ru, p.tags_lv].join(' ').toLowerCase();
         return words.every(w => hay.includes(w));
-      });
+      };
+      list = list.filter(match);
+      // то же самое в другой вкладке (опубликованные ↔ черновики) — чтобы статья не «пропадала» при поиске
+      const otherTab = dashTab === 'draft' ? 'published' : 'draft', otherN = (lf.q || lf.fav || lf.sec) && !tagFilter ? (otherTab === 'draft' ? drafts : pub).filter(match).length : 0;
+      const otherNote = otherN ? `<p class="be-filter">Ещё <b>${otherN}</b> ${otherTab === 'draft' ? 'в черновиках' : 'среди опубликованных'} · <button type="button" class="bc-link" data-dtab="${otherTab}">показать</button></p>` : '';
       const SORT = { date: p => p.published_at || p.updated_at || 0, likes: p => p.likes || 0, views: p => p.views || 0, comments: p => p.comments || 0, title: p => ptitle(p).toLowerCase() };
       list = [...list].sort((a, b) => { const x = SORT[lf.sort](a), y = SORT[lf.sort](b); return (x > y ? 1 : x < y ? -1 : 0) * lf.dir; });
       const months = [...new Set(state.posts.map(day).map(d => d.slice(0, 7)))].sort().reverse();
       const MN = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
-      const active = lf.q || lf.sec || lf.from || lf.to;
+      const active = lf.q || lf.sec || lf.from || lf.to || lf.fav;
       const filters = `<div class="be-filters">
         <input type="search" id="be-q" placeholder="🔍 Поиск: название, тег, адрес…" value="${esc(lf.q)}" aria-label="Поиск по статьям">
         <select id="be-fsec" aria-label="Раздел"><option value="">Все разделы</option>${sections.map(x => `<option value="${esc(x.slug)}"${lf.sec === x.slug ? ' selected' : ''}>${esc(sname(x))}</option>`).join('')}<option value="-"${lf.sec === '-' ? ' selected' : ''}>— без раздела —</option></select>
         <select id="be-fmonth" aria-label="Месяц"><option value="">Любой месяц</option>${months.map(m => { const a = m + '-01', b = m + '-31'; return `<option value="${m}"${lf.from === a && lf.to === b ? ' selected' : ''}>${MN[+m.slice(5) - 1]} ${m.slice(0, 4)}</option>`; }).join('')}</select>
         <span class="be-period"><label>с <input type="date" id="be-from" value="${lf.from}"></label><label>по <input type="date" id="be-to" value="${lf.to}"></label></span>
+        <button type="button" class="be-favf" id="be-fav" aria-pressed="${lf.fav}" title="Только статьи, отмеченные звёздочкой">★ Избранные <span>${state.posts.filter(p => p.featured && (dashTab === 'draft' ? p.status !== 'published' : p.status === 'published')).length}</span></button>
         ${active ? '<button type="button" class="bc-link" id="be-freset">✕ сбросить</button>' : ''}</div>`;
       const sum = (k) => list.reduce((n, p) => n + (p[k] || 0), 0);
       const stats = list.length ? `<p class="be-sum">Найдено: <b>${list.length}</b> · 👁 ${sum('views')} просмотров · ♥ ${sum('likes')} · 💬 ${sum('comments')}${list.length > 1 ? ` · в среднем 👁 ${Math.round(sum('views') / list.length)} на статью` : ''}</p>` : '';
@@ -128,7 +137,7 @@
       list = base.filter(LF.find(([k]) => k === langFilter)[2]);
       const bar = base.length ? `<div class="be-seg" role="group" aria-label="Переводы">${LF.map(([k, n, f]) =>
         `<button type="button" data-lf="${k}" aria-pressed="${langFilter === k}">${n} <span>${base.filter(f).length}</span></button>`).join('')}</div>` : '';
-      const head = filters + bar + stats + (tagFilter ? `<p class="be-filter">Статьи с тегом <b>#${esc(tagFilter.t)}</b> · <button type="button" class="bc-link" data-unfilter>показать все</button></p>` : '');
+      const head = filters + bar + stats + otherNote + (tagFilter ? `<p class="be-filter">Статьи с тегом <b>#${esc(tagFilter.t)}</b> · <button type="button" class="bc-link" data-unfilter>показать все</button></p>` : '');
       if (!list.length) return head + `<p class="be-note">${active ? 'Ничего не нашлось — попробуйте изменить фильтры.' : langFilter === 'part' ? 'Все статьи переведены 🎉' : langFilter === 'full' ? 'Полностью переведённых статей пока нет.' : dashTab === 'draft' ? 'Черновиков нет.' : 'Опубликованных статей пока нет.'}</p>`;
       // галочки слева → действия с выбранными; раздел меняется прямо в строке; остальное — в меню «⋯»
       const ids = new Set(list.map(p => p.id));
@@ -191,6 +200,7 @@
       ${pend.length ? `<section class="be-card be-pend"><h2>Комментарии со ссылками ждут проверки (${pend.length})</h2><ol>${pend.map(c => `
         <li data-cid="${c.id}"><p><b>${esc(c.name)}</b> → <a href="/ru/blog/${esc(c.slug)}/#comments" target="_blank">${esc(c.t_ru)}</a> · ${fmt(c.created_at)}</p>
         <p class="be-ctext">${esc(c.body)}</p><p><button class="pill-btn" data-ok>Одобрить</button> <button class="pill-btn be-danger" data-del>Удалить</button></p></li>`).join('')}</ol></section>` : ''}
+      ${dupN ? `<p class="be-dupes">⚠ Найдены копии статей (одинаковые заголовки): <b>${dupN}</b> ${dupN === 1 ? 'лишняя' : 'лишних'} · <button type="button" class="pill-btn" id="be-dedupe">🧹 Убрать дубли</button></p>` : ''}
       <section class="be-card">
         <div class="be-dtabs" role="tablist">${[['published', 'Опубликованные', pub.length], ['draft', 'Черновики', drafts.length], ['sections', 'Разделы', sections.length], ['tags', 'Теги', tagCount]].map(([k, n, c]) =>
           `<button type="button" role="tab" data-dtab="${k}" aria-selected="${dashTab === k}">${n} <span>${c}</span></button>`).join('')}
@@ -198,6 +208,19 @@
         ${dashTab === 'tags' ? tagsHtml() : dashTab === 'sections' ? sectionsHtml() : postsHtml(dashTab === 'draft' ? drafts : pub)}
       </section>
       ${state.media ? '' : '<p class="be-note">⚠ Хранилище картинок (R2) не подключено — загрузка картинок не заработает.</p>'}`;
+    const dd = app.querySelector('#be-dedupe');
+    dd && dd.addEventListener('click', async () => {
+      let groups;
+      try { groups = (await api('blog/admin/dupes')).groups; } catch (e) { alert(errText(e)); return; }
+      if (!groups.length) { alert('Дублей нет 🎉'); dashboard(); return; }
+      const st = r => (r.status === 'published' ? 'опубликована' : 'черновик') + (r.views ? `, 👁 ${r.views}` : '') + (r.comments ? `, 💬 ${r.comments}` : '');
+      const text = groups.map(g => `• «${g.keep.t_ru || g.keep.t_en || g.keep.t_lv}» — оставлю одну (${st(g.keep)}), удалю копий: ${g.remove.length}`).join('\n');
+      if (!confirm('Убрать копии статей?\n\n' + text + '\n\nРазделы, звёздочка, просмотры, лайки и комментарии копий перейдут к оставшейся статье.')) return;
+      dd.disabled = true; dd.textContent = 'Убираю…';
+      let n = 0;
+      for (const g of groups) { try { n += (await api('blog/admin/dedupe', { keep: g.keep.id, remove: g.remove.map(r => r.id) })).removed; } catch (e) { alert(errText(e)); } }
+      flash = `✓ Убрано копий: ${n}. Осталось по одной статье.`; dashboard();
+    });
     app.querySelectorAll('[data-dtab]').forEach(b => b.addEventListener('click', () => { dashTab = b.dataset.dtab; tagFilter = null; picked.clear(); dashboard(); }));
     app.querySelectorAll('[data-lf]').forEach(b => b.addEventListener('click', () => { langFilter = b.dataset.lf; dashboardLocal(); }));
     // фильтры списка; поиск перерисовывает список, курсор остаётся в поле
@@ -209,7 +232,8 @@
       app.querySelector('#be-fmonth').addEventListener('change', e => { const m = e.target.value; lf.from = m ? m + '-01' : ''; lf.to = m ? m + '-31' : ''; dashboardLocal(); });
       app.querySelector('#be-from').addEventListener('change', e => { lf.from = e.target.value; dashboardLocal(); });
       app.querySelector('#be-to').addEventListener('change', e => { lf.to = e.target.value; dashboardLocal(); });
-      const fr = app.querySelector('#be-freset'); fr && fr.addEventListener('click', () => { Object.assign(lf, { q: '', sec: '', from: '', to: '' }); dashboardLocal(); });
+      const fr = app.querySelector('#be-freset'); fr && fr.addEventListener('click', () => { Object.assign(lf, { q: '', sec: '', from: '', to: '', fav: false }); dashboardLocal(); });
+      app.querySelector('#be-fav').addEventListener('click', () => { lf.fav = !lf.fav; dashboardLocal(); });
     }
     app.querySelectorAll('[data-vl]').forEach(b => b.addEventListener('click', () => { vl = b.dataset.vl; try { localStorage.setItem('pp-admin-lang', vl); } catch (e) {} dashboardLocal(); }));
     app.querySelectorAll('[data-sort]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.sort; lf.dir = lf.sort === k ? -lf.dir : (k === 'title' ? 1 : -1); lf.sort = k; dashboardLocal(); }));
@@ -1046,4 +1070,66 @@
   const stripHtml = s => String(s || '').replace(/<[^>]*>/g, '').trim();
 
   start();
+})();
+
+// ---------- свой календарь вместо встроенного: неделя с понедельника, дата как 09.10.2026 ----------
+// поле <input type="date"> становится скрытым (значение по-прежнему 2026-10-09, события change те же), рядом — кнопка с датой
+(function () {
+  const MN = ['Январь', 'Февраль', 'Март', 'Апрель', 'Май', 'Июнь', 'Июль', 'Август', 'Сентябрь', 'Октябрь', 'Ноябрь', 'Декабрь'];
+  const pad = n => String(n).padStart(2, '0'), iso = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const show = v => v ? v.split('-').reverse().join('.') : 'дд.мм.гггг';
+  const css = document.createElement('style');
+  css.textContent = `.be-dbtn{display:inline-flex;align-items:center;gap:8px;min-width:132px;padding:8px 12px;border:1px solid #ddd6ea;border-radius:10px;background:#fff;font:15px var(--sans);color:#2B1A51;cursor:pointer;white-space:nowrap}
+  .be-dbtn.empty{color:#9A90B8}.be-dbtn::after{content:'📅';font-size:14px;margin-left:auto}
+  .be-dbtn.be-rowdate{min-width:0;padding:5px 8px;font-size:14px;border-color:transparent;background:transparent}.be-dbtn.be-rowdate:hover{border-color:#ddd6ea;background:#fff}
+  .be-cal{position:absolute;z-index:200;width:280px;padding:12px;border-radius:16px;background:#fff;box-shadow:0 14px 36px rgba(43,26,81,.25);font:14px var(--sans);color:#2B1A51}
+  .be-cal-h{display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;font-weight:700}
+  .be-cal-h button{width:32px;height:32px;border:0;border-radius:50%;background:#F4F0FA;color:#2B1A51;font-size:16px;cursor:pointer}
+  .be-cal-g{display:grid;grid-template-columns:repeat(7,1fr);gap:2px;text-align:center}
+  .be-cal-g b{padding:4px 0;font-size:12px;color:#8C7FB0}.be-cal-g b:nth-child(n+6):nth-child(-n+7){color:#D85A30}
+  .be-cal-g button{height:34px;border:0;border-radius:8px;background:none;color:#2B1A51;font:14px var(--sans);cursor:pointer}
+  .be-cal-g button:hover{background:#F4F0FA}.be-cal-g button.out{color:#C4BCDA}.be-cal-g button.today{box-shadow:inset 0 0 0 1.5px #E9A93B}.be-cal-g button.sel{background:#2B1A51;color:#fff}
+  .be-cal-f{display:flex;justify-content:space-between;margin-top:8px}.be-cal-f button{border:0;background:none;color:#534AB7;font:700 13px var(--sans);cursor:pointer}`;
+  document.head.appendChild(css);
+  let pop = null;
+  const closePop = () => { if (pop) { pop.remove(); pop = null; } };
+  document.addEventListener('mousedown', e => { if (pop && !pop.contains(e.target) && !e.target.closest('.be-dbtn')) closePop(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') closePop(); });
+  function open(inp, btn) {
+    closePop();
+    const now = new Date(), cur = inp.value ? new Date(inp.value + 'T12:00') : now;
+    let y = cur.getFullYear(), m = cur.getMonth();
+    pop = document.createElement('div'); pop.className = 'be-cal'; pop.setAttribute('role', 'dialog');
+    const set = v => { inp.value = v; sync(inp, btn); closePop(); inp.dispatchEvent(new Event('input', { bubbles: true })); inp.dispatchEvent(new Event('change', { bubbles: true })); };
+    const render = () => {
+      const first = new Date(y, m, 1), shift = (first.getDay() + 6) % 7, start = new Date(y, m, 1 - shift); // неделя с понедельника
+      let days = '';
+      for (let i = 0; i < 42; i++) { const d = new Date(start.getFullYear(), start.getMonth(), start.getDate() + i), v = iso(d);
+        days += `<button type="button" data-v="${v}" class="${d.getMonth() !== m ? 'out ' : ''}${v === iso(now) ? 'today ' : ''}${v === inp.value ? 'sel' : ''}">${d.getDate()}</button>`; }
+      pop.innerHTML = `<div class="be-cal-h"><button type="button" data-m="-1" aria-label="Предыдущий месяц">‹</button><span>${MN[m]} ${y}</span><button type="button" data-m="1" aria-label="Следующий месяц">›</button></div>
+        <div class="be-cal-g">${['Пн', 'Вт', 'Ср', 'Чт', 'Пт', 'Сб', 'Вс'].map(x => `<b>${x}</b>`).join('')}${days}</div>
+        <div class="be-cal-f"><button type="button" data-clear>Очистить</button><button type="button" data-today>Сегодня</button></div>`;
+    };
+    pop.addEventListener('click', e => {
+      e.stopPropagation();
+      const b = e.target.closest('button'); if (!b) return;
+      if (b.dataset.m) { m += +b.dataset.m; if (m < 0) { m = 11; y--; } if (m > 11) { m = 0; y++; } render(); return; }
+      if (b.dataset.v) set(b.dataset.v); else if (b.hasAttribute('data-today')) set(iso(now)); else if (b.hasAttribute('data-clear')) set('');
+    });
+    render(); document.body.appendChild(pop);
+    const r = btn.getBoundingClientRect();
+    pop.style.left = Math.max(8, Math.min(innerWidth - 296, r.left + scrollX)) + 'px'; pop.style.top = (r.bottom + scrollY + 6) + 'px';
+  }
+  function sync(inp, btn) { btn.textContent = show(inp.value); btn.classList.toggle('empty', !inp.value); }
+  function enhance(inp) {
+    if (inp.dataset.cal) return; inp.dataset.cal = '1';
+    const btn = document.createElement('button'); btn.type = 'button';
+    btn.className = 'be-dbtn ' + inp.className; btn.title = inp.title || 'Выбрать дату'; btn.setAttribute('aria-label', inp.getAttribute('aria-label') || 'Дата');
+    inp.type = 'hidden'; (inp.closest('label') || inp).after(btn); sync(inp, btn); // кнопка — рядом с подписью «с/по», а не внутри неё
+    btn.addEventListener('click', e => { e.stopPropagation(); pop && pop.dataset.for === inp.id ? closePop() : open(inp, btn); });
+    new MutationObserver(() => { btn.className = 'be-dbtn ' + inp.className + (inp.value ? '' : ' empty'); }).observe(inp, { attributes: true, attributeFilter: ['class'] });
+  }
+  const scan = () => document.querySelectorAll('input[type="date"]').forEach(enhance);
+  new MutationObserver(scan).observe(document.documentElement, { childList: true, subtree: true });
+  scan();
 })();

@@ -389,6 +389,38 @@ export async function blogApi(req, env, url, h) {
       return json({ ok: true });
     }
     // действия сразу с несколькими статьями: раздел, избранное, опубликовать/в черновики, удалить
+    // 🧹 дубли: статьи с одинаковыми заголовками (копии от повторных сохранений). Оставляем одну, у неё — все разделы, звёздочка, лайки и комментарии копий
+    if (m === 'GET' && a === 'dupes') {
+      const rows = (await env.DB.prepare(`SELECT p.id, p.slug, p.status, p.featured, p.section, p.t_ru, p.t_en, p.t_lv, p.views, p.likes, p.updated_at, p.published_at,
+        LENGTH(COALESCE(p.b_ru, '')) + LENGTH(COALESCE(p.b_en, '')) + LENGTH(COALESCE(p.b_lv, '')) AS len, (SELECT COUNT(*) FROM blog_comments c WHERE c.post_id = p.id) AS comments FROM blog_posts p`).all()).results;
+      const norm = x => String(x || '').toLowerCase().replace(/\s+/g, ' ').trim();
+      const groups = new Map();
+      for (const r of rows) { const k = [r.t_ru, r.t_en, r.t_lv].map(norm).join('|'); if (k.replace(/\|/g, '')) (groups.get(k) || groups.set(k, []).get(k)).push(r); }
+      // кого оставить: опубликованную, потом с просмотрами/лайками/комментариями, потом самую полную, потом самую свежую
+      const score = r => [r.status === 'published' ? 1 : 0, (r.views || 0) + (r.likes || 0) * 5 + (r.comments || 0) * 10, r.len || 0, r.updated_at || 0];
+      const better = (x, y) => { const a = score(x), b = score(y); for (let i = 0; i < a.length; i++) if (a[i] !== b[i]) return a[i] > b[i]; return x.id < y.id; };
+      const out = [...groups.values()].filter(g => g.length > 1).map(g => { const keep = g.reduce((k, r) => better(r, k) ? r : k); return { keep, remove: g.filter(r => r !== keep) }; });
+      return json({ groups: out });
+    }
+    if (m === 'POST' && a === 'dedupe') {
+      const b = await body(), keep = Number(b.keep), remove = [...new Set((b.remove || []).map(Number))].filter(x => x && x !== keep).slice(0, 50);
+      const k = await env.DB.prepare('SELECT * FROM blog_posts WHERE id = ?').bind(keep).first();
+      if (!k || !remove.length) fail(400, 'bad');
+      const others = (await env.DB.prepare(`SELECT * FROM blog_posts WHERE id IN (${remove.map(() => '?').join(',')})`).bind(...remove).all()).results;
+      const norm = x => String(x || '').toLowerCase().replace(/\s+/g, ' ').trim(), key = r => [r.t_ru, r.t_en, r.t_lv].map(norm).join('|');
+      if (others.some(r => key(r) !== key(k))) fail(400, 'not_dupes'); // удаляем только настоящие копии
+      const secs = [...new Set([k, ...others].flatMap(r => secsOf(r)))].join(','), featured = [k, ...others].some(r => r.featured) ? 1 : 0;
+      await env.DB.batch([
+        env.DB.prepare('UPDATE blog_posts SET section = ?, featured = ?, views = views + ?, likes = likes + ? WHERE id = ?').bind(secs, featured, others.reduce((n, r) => n + (r.views || 0), 0), 0, keep),
+        ...remove.flatMap(id => [
+          env.DB.prepare('UPDATE blog_comments SET post_id = ? WHERE post_id = ?').bind(keep, id),
+          env.DB.prepare('INSERT OR IGNORE INTO blog_likes (post_id, who) SELECT ?, who FROM blog_likes WHERE post_id = ?').bind(keep, id),
+          env.DB.prepare('DELETE FROM blog_likes WHERE post_id = ?').bind(id),
+          env.DB.prepare('DELETE FROM blog_posts WHERE id = ?').bind(id)]),
+        env.DB.prepare('UPDATE blog_posts SET likes = (SELECT COUNT(*) FROM blog_likes WHERE post_id = ?) WHERE id = ?').bind(keep, keep),
+      ]);
+      return json({ ok: true, removed: remove.length });
+    }
     if (m === 'POST' && a === 'bulk') {
       const b = await body();
       const ids = [...new Set((b.ids || []).map(Number).filter(Boolean))].slice(0, 500);
