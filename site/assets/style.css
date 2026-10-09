@@ -2401,7 +2401,7 @@ tr[data-s] td:first-child .be-tr-in { width: calc(100% - 28px); }
 .ch-me .sw-card { padding: 20px; }
 .ch-me .sw-medal.big { width: 92px; height: 92px; }
 .ch-me .sw-badges > div { gap: 8px; }
-.ch-me .sw-badges .sw-medal { width: 44px; height: 44px; box-shadow: inset 0 -3px 0 rgba(0,0,0,.12), 0 0 0 2px rgba(255,255,255,.85), 0 3px 8px rgba(0,0,0,.25); }
+.ch-me .sw-badges .sw-medal { width: 58px; height: 58px; box-shadow: inset 0 -3px 0 rgba(0,0,0,.12), 0 0 0 2px rgba(255,255,255,.85), 0 3px 8px rgba(0,0,0,.25); }
 .ch-me .sw-badges .sw-medal.off { box-shadow: inset 0 0 0 2px rgba(255,255,255,.14); }
 .ch-me .sw-how { min-height: 0; font-size: 13px; }
 .ch-today { display: flex; flex-direction: column; gap: 14px; }
@@ -2468,7 +2468,7 @@ tr[data-s] td:first-child .be-tr-in { width: calc(100% - 28px); }
 .sw-page2 .sw-top-box .section-title { font-size: 22px; margin: 6px 0 14px; }
 @media (max-width: 600px) {
   .ch-me .sw-medal.big { width: 72px; height: 72px; }
-  .ch-me .sw-badges .sw-medal { width: 34px; height: 34px; }
+  .ch-me .sw-badges .sw-medal { width: 44px; height: 44px; }
   .ch-me .sw-badges > div { gap: 6px; }
   .ch-me .sw-card { padding: 16px; }
 }
@@ -2647,3 +2647,5 @@ html.sb-hide { --sb: 0px; }
 .pp-c-quote { border-left: 4px solid var(--peach); padding: 8px 0 8px 22px; font: italic 22px/1.5 var(--serif); }
 .pp-c-quote cite { display: block; margin-top: 8px; font: 500 15px var(--sans); color: var(--muted); }
 .pp-c-btn { text-align: center; }
+.sw-pv-badges .sw-medal { width: 60px; height: 60px; }
+.sw-medal svg { image-rendering: pixelated; }
