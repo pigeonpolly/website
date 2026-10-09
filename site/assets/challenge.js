@@ -379,4 +379,12 @@
   });
 
   renderToday(); renderDiary();
+  // таймер свёрнут в кнопку «⏱ 10:00 Таймер»: время на кнопке повторяет большие часы, во время рисования кнопка подсвечена
+  const tclock = document.getElementById('ch-tclock'), clockEl = $('#ch-clock'), tbox = document.getElementById('ch-timer-box');
+  if (tclock && clockEl) {
+    const sync = () => { tclock.textContent = clockEl.textContent; tbox.classList.toggle('run', /pause|пауза|pauze/i.test($('#ch-go').textContent)); };
+    new MutationObserver(sync).observe(clockEl, { childList: true, characterData: true, subtree: true });
+    new MutationObserver(sync).observe($('#ch-go'), { childList: true, characterData: true, subtree: true });
+    sync();
+  }
 })();

@@ -292,5 +292,7 @@
   ">Notify me<": ">Paziņot man<",
   "I agree that Alina will email me once when the book is published. My address is not shared with anyone, and I can unsubscribe at any time.": "Piekrītu, ka Alīna man uzrakstīs uz šo adresi, kad grāmata iznāks. Adrese netiek nodota citiem, atrakstīties var jebkurā brīdī.",
   ">Unsubscribe<": ">Atrakstīties<",
-  ">Privacy<": ">Privātums<"
+  ">Privacy<": ">Privātums<",
+  "</b> <span>Timer</span>": "</b> <span>Taimeris</span>",
+  "<span>Card for social media</span>": "<span>Kartīte sociālajiem tīkliem</span>"
 }

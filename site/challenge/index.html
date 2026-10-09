@@ -57,7 +57,7 @@
 </header>
 <main id="main">
 <div data-ppb="challenge.1" class="parade" id="parade" aria-hidden="true"></div>
-<section data-ppb="challenge.2" class="page-head ch-head">
+<section data-ppb="challenge.2" class="page-head ch-head ch-head2">
   <div class="ch-head-text">
   <p class="topics">daily sketch challenge</p>
   <h1>Daily Challenge</h1>
@@ -69,40 +69,53 @@
     <span class="ch-sub"><a class="pill-btn ch-news-btn" href="https://www.patreon.com/cw/pigeon_polly" target="_blank" rel="noopener">🔔 Subscribe for news</a><small>on Patreon, free</small></span>
   </div>
   </div>
-  <div class="bw-pick" id="ch-bw-pick">
-    <div class="bw-polly" id="ch-bw-polly" aria-hidden="true"></div>
-    <div class="bw-body">
-      <p class="bw-q" id="ch-bw-q"></p>
-      <div class="ch-level" id="ch-palette" role="group" aria-label="Colour mode"></div>
-    </div>
-  </div>
 </section>
-<section data-ppb="challenge.3" class="ch" id="challenge">
-  <div class="ch-grid">
-    <div id="ch-cal" class="ch-cal"></div>
-    <div class="ch-side">
-      <div class="ch-card-box">
-        <div class="ch-level" id="ch-level" role="group" aria-label="Level"></div>
-        <div class="ch-clock" id="ch-clock" aria-live="off">00:00</div>
-        <div class="ch-bar" id="ch-bar"></div>
-        <p class="ch-stage" id="ch-stage"></p>
-        <p class="ch-hint" id="ch-hint"></p>
-        <div class="ch-actions">
-          <button class="cta-btn" type="button" id="ch-go">Start</button>
-          <button class="cta-link ch-reset" type="button" id="ch-reset">Reset</button>
-        </div>
-      </div>
-      <div class="ch-card-box">
-        <div class="ch-actions">
-          <button class="pill-btn" type="button" id="ch-photo"></button>
-          <input type="file" id="ch-file" accept="image/*" hidden>
-        </div>
-        <div class="ch-thumb" id="ch-thumb"></div>
-        <p class="ch-note" id="ch-note">The photo is only used to make your card. Nothing is uploaded or saved.</p>
-        <button class="pill-btn" type="button" id="ch-share"></button>
-        <div class="ch-share-card" id="ch-card"></div>
-      </div>
+<section data-ppb="challenge.3" class="ch ch2" id="challenge">
+  <!-- сверху: профиль и загрузка рисунка; справа — Ч/Б, отрывной листок дня, таймер и карточка кнопками -->
+  <div class="ch-top">
+    <div class="ch-me" id="works">
+      <p class="sw-lead">Sign in, upload your daily sketch, keep your streak going and collect Pigeon Polly badges. Every sketch counts, even a tiny pen doodle on a napkin.</p>
+      <div class="sw-app" id="sw-app" aria-live="polite"><p class="sw-loading">…</p></div>
     </div>
+    <aside class="ch-today">
+  <div class="bw-pick" id="ch-bw-pick">
+        <div class="bw-polly" id="ch-bw-polly" aria-hidden="true"></div>
+        <div class="bw-body">
+          <p class="bw-q" id="ch-bw-q"></p>
+          <div class="ch-level" id="ch-palette" role="group" aria-label="Colour mode"></div>
+        </div>
+      </div>
+      <div id="ch-cal" class="ch-cal"></div>
+      <div class="ch-tools">
+        <details class="ch-tool" id="ch-timer-box">
+          <summary><span aria-hidden="true">⏱</span> <b class="ch-tclock" id="ch-tclock"></b> <span>Timer</span></summary>
+          <div class="ch-card-box">
+            <div class="ch-level" id="ch-level" role="group" aria-label="Level"></div>
+            <div class="ch-clock" id="ch-clock" aria-live="off">00:00</div>
+            <div class="ch-bar" id="ch-bar"></div>
+            <p class="ch-stage" id="ch-stage"></p>
+            <p class="ch-hint" id="ch-hint"></p>
+            <div class="ch-actions">
+              <button class="cta-btn" type="button" id="ch-go">Start</button>
+              <button class="cta-link ch-reset" type="button" id="ch-reset">Reset</button>
+            </div>
+          </div>
+        </details>
+        <details class="ch-tool">
+          <summary><span aria-hidden="true">📸</span> <span>Card for social media</span></summary>
+          <div class="ch-card-box">
+            <div class="ch-actions">
+              <button class="pill-btn" type="button" id="ch-photo"></button>
+              <input type="file" id="ch-file" accept="image/*" hidden>
+            </div>
+            <div class="ch-thumb" id="ch-thumb"></div>
+            <p class="ch-note" id="ch-note">The photo is only used to make your card. Nothing is uploaded or saved.</p>
+            <button class="pill-btn" type="button" id="ch-share"></button>
+            <div class="ch-share-card" id="ch-card"></div>
+          </div>
+        </details>
+      </div>
+    </aside>
   </div>
   <div class="diary">
     <div class="diary-head">
@@ -117,19 +130,17 @@
     <div class="diary-grid" id="ch-grid"></div>
   </div>
 </section>
-<section data-ppb="challenge.4" class="sw-page" id="works">
-  <h2 class="section-title">Your works</h2>
-  <p class="lead sw-lead">Sign in, upload your daily sketch, keep your streak going and collect Pigeon Polly badges. Every sketch counts, even a tiny pen doodle on a napkin.</p>
-  <div class="sw-app" id="sw-app" aria-live="polite"><p class="sw-loading">…</p></div>
+<section data-ppb="challenge.4" class="sw-page sw-page2">
   <div class="sw-cols">
+    <div class="sw-wall-box">
+      <div class="sw-strip-head"><h2 class="section-title">Fresh from the community</h2>
+        <span class="sw-strip-nav"><button type="button" data-strip="-1" aria-label="Back">‹</button><button type="button" data-strip="1" aria-label="Forward">›</button></span></div>
+      <div class="sw-wall sw-strip" id="sw-wall"></div>
+      <p class="sw-more-row"><button class="pill-btn" type="button" id="sw-more" hidden>Show more</button></p>
+    </div>
     <div class="sw-top-box">
       <h2 class="section-title">Longest streaks</h2>
       <ol class="sw-top" id="sw-top"></ol>
-    </div>
-    <div class="sw-wall-box">
-      <h2 class="section-title">Fresh from the community</h2>
-      <div class="sw-wall" id="sw-wall"></div>
-      <p class="sw-more-row"><button class="pill-btn" type="button" id="sw-more" hidden>Show more</button></p>
     </div>
   </div>
   <p class="sw-privacy">Sketches stay on the wall while you keep drawing. If you neither upload nor visit for 3 months, they may be removed when storage gets full, but your level and badges stay.</p>

@@ -455,6 +455,16 @@
     } catch (e) { more.hidden = true; }
   }
   document.getElementById('sw-more')?.addEventListener('click', () => loadWall());
+  // лента работ листается стрелками; у конца ленты сама подгружает ещё
+  document.querySelectorAll('[data-strip]').forEach(b => b.addEventListener('click', () => {
+    const el = document.getElementById('sw-wall');
+    el.scrollBy({ left: Math.sign(+b.dataset.strip) * el.clientWidth * 0.8, behavior: 'smooth' });
+  }));
+  const stripEl = document.getElementById('sw-wall');
+  stripEl?.addEventListener('scroll', () => {
+    const more = document.getElementById('sw-more');
+    if (more && !more.hidden && !more.disabled && stripEl.scrollLeft + stripEl.clientWidth > stripEl.scrollWidth - 300) { more.disabled = true; loadWall().finally(() => { more.disabled = false; }); }
+  }, { passive: true });
   document.getElementById('sw-wall')?.addEventListener('click', async e => {
     const h = e.target.closest('[data-hide]'), b = e.target.closest('[data-ban]'), pk = e.target.closest('[data-pick]');
     try {
