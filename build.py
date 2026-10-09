@@ -270,7 +270,18 @@ def block_html(name):
     raw = (SRC / "blocks" / f"{name}.html").read_text()
     styles = "".join(re.findall(r"<style>(.*?)</style>", raw, flags=re.S))
     body = re.sub(r"<style>.*?</style>\s*", "", raw, flags=re.S)
-    return f'<div class="blk" id="blk-{name}"><style>{scope_css(styles, "#blk-" + name)}</style>{body}</div>'
+    return f'<div class="blk" id="blk-{name}" data-ppb="blk-{name}"><style>{scope_css(styles, "#blk-" + name)}</style>{body}</div>'
+
+
+def mark_editable(body, key):
+    """Метка data-ppb на каждом блоке верхнего уровня страницы: по ней админ правит блок прямо на сайте
+    (изменения хранятся в базе, worker подставляет их при отдаче страницы). Блоки {{block:..}} уже помечены."""
+    n = 0
+    def tag(m):
+        nonlocal n
+        n += 1
+        return f'{m.group(1)} data-ppb="{key}.{n}"'
+    return re.sub(r'^(<(?:section|div|header|article|aside|figure|nav|ul|ol|p|h1|h2|h3|dl|table|form)\b)(?![^>]*data-ppb)', tag, body, flags=re.M)
 
 
 def projects_html(lang="en"):
@@ -459,6 +470,7 @@ def build():
             alt = SRC / "pages" / f"{pathlib.Path(file).stem}.{lang}.html"
             if lang != "en" and alt.exists():
                 page_body = alt.read_text()
+            page_body = mark_editable(page_body, (path or "home").replace("/", "-"))
             page_body = section_tabs(path) + page_body
             page = (layout
                     .replace("{{title}}", esc(full_title))

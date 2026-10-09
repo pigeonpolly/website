@@ -54,7 +54,9 @@ const birdName = (code, lang) => { const [i, n] = String(code || '0:10').split('
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 // текст на языке читателя, а если перевода нет — на любом заполненном
-const field = (p, k, lang) => p[`${k}_${lang}`] || p[`${k}_ru`] || p[`${k}_en`] || p[`${k}_lv`] || '';
+// в названиях и описаниях — обычный текст; старые автопереводы могли сохранить «&quot;» и т.п. — показываем как символы
+const unent = v => String(v || '').replace(/&(quot|#34|#39|apos|amp|lt|gt|nbsp);/g, (m, k) => ({ quot: '"', '#34': '"', '#39': "'", apos: "'", amp: '&', lt: '<', gt: '>', nbsp: ' ' }[k]));
+const field = (p, k, lang) => { const v = p[`${k}_${lang}`] || p[`${k}_ru`] || p[`${k}_en`] || p[`${k}_lv`] || ''; return k === 't' || k === 'd' ? unent(v) : v; };
 const langOf = (p, lang) => p['t_' + lang] ? lang : ['ru', 'en', 'lv'].find(l => p['t_' + l]) || lang;
 // теги: в статье хранится английский тег (tags_en), перевод — общий словарь blog_tags (en → ru, lv), правится во вкладке «Теги»
 const splitTags = s => String(s || '').split(',').map(x => x.trim().toLowerCase().replace(/^#/, '')).filter(Boolean);
@@ -296,8 +298,8 @@ export async function blogApi(req, env, url, h) {
       const t = h.now();
       const f = {};
       for (const l of LANGS) {
-        f['t_' + l] = String(b['t_' + l] || '').trim().slice(0, 200);
-        f['d_' + l] = String(b['d_' + l] || '').trim().slice(0, 400);
+        f['t_' + l] = unent(b['t_' + l]).trim().slice(0, 200);
+        f['d_' + l] = unent(b['d_' + l]).trim().slice(0, 400);
         f['b_' + l] = await cleanHtml(String(b['b_' + l] || '').replace(/<img[^>]+src="data:[^"]*"[^>]*>/gi, '')); // картинки-«data:» в базу не кладём
         if (f['b_' + l].length > 900_000) fail(413, 'too_big');
       }

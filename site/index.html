@@ -56,7 +56,7 @@
   </nav>
 </header>
 <main id="main">
-<section class="hero">
+<section data-ppb="home.1" class="hero">
   <div class="hero-text">
     <p class="topics">ai &middot; learning &middot; art &amp; culture</p>
     <h1>A small lab for big imagination</h1>
@@ -79,7 +79,7 @@
 // фото Алины под Полли: наведение на компьютере, касание на телефоне
 (function () { var a = document.querySelector('.hero .art'); if (a) a.addEventListener('click', function () { a.classList.toggle('on'); }); })();
 </script>
-<div class="blk" id="blk-home-blog"><style>#blk-home-blog .hb { padding: 56px var(--gutter) 60px; background: #FFFDF8; color: #2B1A51; }
+<div class="blk" id="blk-home-blog" data-ppb="blk-home-blog"><style>#blk-home-blog .hb { padding: 56px var(--gutter) 60px; background: #FFFDF8; color: #2B1A51; }
 #blk-home-blog .hb[hidden] { display: none; }
 #blk-home-blog .hb-top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
 #blk-home-blog .hb-top h2 { margin: 0; font: 600 clamp(28px, 3.2vw, 40px)/1.1 var(--serif); color: #2B1A51; }
@@ -140,7 +140,7 @@
 </section>
 <script src="/assets/home-blog.js" defer></script>
 </div>
-<div class="blk" id="blk-today"><style></style><section class="today-sec">
+<div class="blk" id="blk-today" data-ppb="blk-today"><style></style><section class="today-sec">
   <div class="td-text">
     <p class="topics">daily sketch challenge</p>
     <h2 class="td-title">What will you draw today?</h2>
@@ -168,7 +168,7 @@
 <script src="/assets/challenge-theme.js" defer></script>
 <script src="/assets/today.js" defer></script>
 </div>
-<div class="blk" id="blk-coming-soon"><style>#blk-coming-soon { margin: 0; background: #FFFFFF; }
+<div class="blk" id="blk-coming-soon" data-ppb="blk-coming-soon"><style>#blk-coming-soon { margin: 0; background: #FFFFFF; }
 #blk-coming-soon .bk { box-sizing: border-box; padding: 64px 32px; font-family: 'Karla', sans-serif; color: #2B1A51; }
 #blk-coming-soon .bk-in { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 56px; align-items: center; max-width: 1080px; margin: 0 auto; }
 #blk-coming-soon .bk-cover { position: relative; }
@@ -258,7 +258,7 @@ document.querySelectorAll('.bk-notify').forEach(function (f) {
 });
 </script>
 </div>
-<div class="blk" id="blk-patreon"><style>#blk-patreon { margin: 0; background: #FFFFFF; }
+<div class="blk" id="blk-patreon" data-ppb="blk-patreon"><style>#blk-patreon { margin: 0; background: #FFFFFF; }
 #blk-patreon .pat { box-sizing: border-box; padding: 64px 32px; font-family: 'Karla', sans-serif; color: #2B1A51; text-align: center; }
 #blk-patreon .pat h2 { margin: 0 0 12px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(28px, 4vw, 44px); line-height: 1.1; }
 #blk-patreon .pat .sub { margin: 0 auto 48px; max-width: 44ch; font-size: 17px; line-height: 1.6; color: #5A4E78; }
@@ -405,7 +405,7 @@ document.querySelectorAll('.bk-notify').forEach(function (f) {
 })();
 </script>
 </div>
-<div class="blk" id="blk-titos-case"><style>#blk-titos-case .tc { box-sizing: border-box; padding: 64px 72px; background: #1A1528; color: #F3EFFA; display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 56px; align-items: center; }
+<div class="blk" id="blk-titos-case" data-ppb="blk-titos-case"><style>#blk-titos-case .tc { box-sizing: border-box; padding: 64px 72px; background: #1A1528; color: #F3EFFA; display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 56px; align-items: center; }
 #blk-titos-case .tc-pic { position: relative; margin: 0; }
 #blk-titos-case .tc-pic img { display: block; width: 100%; height: auto; image-rendering: pixelated; box-shadow: 0 0 0 4px #0E0A18, 0 0 0 7px #D85A30, 0 24px 50px rgba(0, 0, 0, .5); border-radius: 6px; }
 #blk-titos-case .tc-stamp { position: absolute; right: -10px; top: -14px; padding: 6px 14px; border: 4px solid #E0443A; color: #E0443A; background: rgba(26, 21, 40, .85); font: 800 18px 'Karla', sans-serif; letter-spacing: .08em; transform: rotate(8deg); }
@@ -434,7 +434,7 @@ document.querySelectorAll('.bk-notify').forEach(function (f) {
   </div>
 </section>
 </div>
-<div class="blk" id="blk-about"><style>#blk-about { margin: 0; background: #F4F0FA; }
+<div class="blk" id="blk-about" data-ppb="blk-about"><style>#blk-about { margin: 0; background: #F4F0FA; }
 #blk-about .about {
     box-sizing: border-box; padding: 56px 72px;
     display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 72px; align-items: center;
@@ -481,7 +481,7 @@ document.querySelectorAll('.bk-notify').forEach(function (f) {
   </div>
 </section>
 </div>
-<div class="blk" id="blk-sketching-guides"><style>#blk-sketching-guides { margin: 0; background: #FFFFFF; }
+<div class="blk" id="blk-sketching-guides" data-ppb="blk-sketching-guides"><style>#blk-sketching-guides { margin: 0; background: #FFFFFF; }
 #blk-sketching-guides .books {
     box-sizing: border-box; padding: 56px 64px;
     display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 48px; align-items: center;
@@ -574,7 +574,7 @@ document.querySelectorAll('.bk-notify').forEach(function (f) {
   </div>
 </section>
 </div>
-<div class="blk" id="blk-flock"><style>#blk-flock .fl { padding: 56px var(--gutter) 64px; text-align: center; }
+<div class="blk" id="blk-flock" data-ppb="blk-flock"><style>#blk-flock .fl { padding: 56px var(--gutter) 64px; text-align: center; }
 #blk-flock .fl-kick { margin: 0 0 6px; font: italic 400 18px var(--serif); color: #F0A987; }
 #blk-flock .fl h2 { margin: 0 0 10px; font: 600 clamp(28px, 3.2vw, 40px)/1.1 var(--serif); }
 #blk-flock .fl-sub { margin: 0 auto 8px; max-width: 58ch; font-size: 16px; line-height: 1.6; color: #D9D3F2; }

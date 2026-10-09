@@ -888,7 +888,9 @@
       texts,
       rebuild(out) {
         slots.forEach((el, i) => { el.innerHTML = out[3 + i]; });
-        return { t: out[0], d: out[1], tags: out[2], b: box.innerHTML };
+        // название и описание — обычный текст: Google в режиме HTML отдаёт кавычки как &quot; — раскодируем
+        const plain = v => { const x = document.createElement('textarea'); x.innerHTML = String(v || ''); return x.value; };
+        return { t: plain(out[0]), d: plain(out[1]), tags: out[2], b: box.innerHTML };
       },
     };
   }
