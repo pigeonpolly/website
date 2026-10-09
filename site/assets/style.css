@@ -2253,3 +2253,8 @@ details.am-art .am-series { padding: 0 24px 24px; }
 @media (max-width: 420px) { .search-btn { width: 36px; height: 36px; } .search-btn + .lang-switch { margin-left: 4px; } }
 .adm-restore { cursor: pointer; }
 .be-app #be-date { max-width: 220px; padding: 10px 14px; border-radius: 12px; border: 1px solid #E2DCEE; background: #fff; color: #2B1A51; font: 16px var(--sans); }
+/* карандаш админа на странице статьи */
+.bp-back { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.bp-pencil { padding: 8px 16px; border-radius: 99px; background: #E9A93B; color: #2B1A51 !important; font: 700 14px var(--sans); text-decoration: none !important; box-shadow: 0 4px 14px rgba(0, 0, 0, .25); }
+.bp-pencil:hover { background: #F7C66A; }
+.bp-pencil[hidden] { display: none; }

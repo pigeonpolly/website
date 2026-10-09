@@ -986,7 +986,7 @@ export async function blogPage(req, env, url, h) {
   const words = stripTags(field(post, 'b', lang)).split(' ').length;
   const description = field(post, 'd', lang) || stripTags(field(post, 'b', lang)).slice(0, 160);
   const content = `<div class="bp-wrap"><article class="bp" data-post-id="${post.id}" data-status="${post.status}">
-    <p class="bp-back"><a href="${blogUrl(lang, '')}">${t.back}</a></p>
+    <p class="bp-back"><a href="${blogUrl(lang, '')}">${t.back}</a><a class="bp-pencil" href="/blog-editor/#${post.id}" hidden data-blog-admin title="Редактировать статью">✎ Редактировать</a></p>
     <header class="bp-head"${textLang !== lang ? ` lang="${textLang}"` : ''}>
       ${post.status === 'draft' ? `<p class="bl-draft">${t.draft}</p>` : ''}
       ${post.section && sectionName(post.section, lang) ? `<p class="bp-sec"><a href="${blogUrl(lang, '', '?section=' + encodeURIComponent(post.section))}">${esc(sectionName(post.section, lang))}</a></p>` : ''}
