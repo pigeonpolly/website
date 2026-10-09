@@ -136,7 +136,15 @@ def nav_html(current):
         path, label = entry[0], entry[1]
         on = (len(entry) == 3 and entry[2] == key) or path == current
         cur_attr = ' aria-current="page"' if on else ""
-        items.append(f'<li><a href="{href(path)}"{cur_attr}>{esc(label)}</a></li>')
+        subs = SECTIONS.get(entry[2], []) if len(entry) == 3 else []
+        if not subs:
+            items.append(f'<li><a href="{href(path)}"{cur_attr}>{esc(label)}</a></li>')
+            continue
+        # подменю: на компьютере выпадает при наведении, на телефоне раскрывается стрелкой (вкладки внутри страниц остаются)
+        sub = "".join(f'<li><a href="{href(p)}"{" aria-current=" + chr(34) + "page" + chr(34) if p == current else ""}>{esc(l)}</a></li>' for p, l in subs)
+        items.append(f'<li class="has-sub{" active" if on else ""}"><a href="{href(path)}"{cur_attr}>{esc(label)}</a>'
+                     f'<button type="button" class="sub-toggle" aria-expanded="false" aria-label="Show submenu"><span aria-hidden="true">▾</span></button>'
+                     f'<ul class="nav-sub">{sub}</ul></li>')
     return "\n".join(items)
 
 

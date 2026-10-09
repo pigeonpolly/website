@@ -2137,3 +2137,16 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .fl-full .fl:fullscreen { display: flex; flex-direction: column; padding: 12px; background: #2B1A51; overflow: auto; }
 #flock:fullscreen .fl-count, #flock:fullscreen .fl-how, #flock:fullscreen .fl-join { display: none; }
 .fl-full .fl:fullscreen .fl-stage { flex: 1; border-radius: 12px; }
+/* подменю в шапке: выпадает при наведении (компьютер), раскрывается стрелкой (телефон) */
+.site-nav .has-sub > .sub-toggle { display: none; }
+.has-sub > .nav-sub::before { content: ''; position: absolute; left: 0; right: 0; top: -10px; height: 10px; } /* «мостик», чтобы меню не закрывалось по пути */
+.site-nav > ul > .has-sub:last-child > .nav-sub, .site-nav > ul > .has-sub:nth-last-child(2) > .nav-sub { left: auto; right: 0; }
+.nav-sub li + li { margin-top: 2px; }
+.nav-sub a[aria-current="page"] { box-shadow: none; background: rgba(240, 169, 135, .18); color: var(--text); }
+@media (max-width: 1300px) {
+  .site-nav .has-sub { display: flex; flex-wrap: wrap; align-items: center; }
+  .site-nav .has-sub > a { flex: 1; width: auto; }
+  .site-nav .has-sub > .sub-toggle { display: flex; width: 52px; justify-content: center; font-size: 18px; padding: 14px 0; }
+  .site-nav .has-sub > .nav-sub { flex-basis: 100%; }
+  .site-nav > ul > .has-sub:last-child > .nav-sub, .site-nav > ul > .has-sub:nth-last-child(2) > .nav-sub { right: auto; }
+}
