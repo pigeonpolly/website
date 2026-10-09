@@ -26,7 +26,8 @@
   const errText = e => ERR[e.code] || 'Что-то пошло не так (' + esc(e.code || e.message) + ').';
   let flash = '', state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null, langFilter = 'all', picked = new Set();
   // фильтры списка: поиск, раздел, период, сортировка по столбцу
-  const HOME_SECS = ['culture-creativity', 'education-technologies', 'art-technologies', 'not-weekly-polly', 'traditional-art', 'ask-feedback'];
+  const secsOf = p => String(p && p.section || '').split(',').map(x => x.trim()).filter(Boolean); // у статьи может быть несколько разделов
+  const HOME_SECS = ['traditional-art', 'technologies', 'education', 'pollys-life', 'tips-guides'];
   let warnedHome = false;
   const lf = { q: '', sec: '', from: '', to: '', sort: 'date', dir: -1 };
   // на каком языке показывать названия статей и разделов в списке (запоминается)
@@ -100,7 +101,7 @@
       const words = lf.q.toLowerCase().split(/\s+/).filter(Boolean);
       const day = p => localDate(p.published_at || p.updated_at);
       list = list.filter(p => {
-        if (lf.sec && (p.section || '') !== (lf.sec === '-' ? '' : lf.sec)) return false;
+        if (lf.sec && (lf.sec === '-' ? secsOf(p).length : !secsOf(p).includes(lf.sec))) return false;
         if (lf.from && day(p) < lf.from) return false;
         if (lf.to && day(p) > lf.to) return false;
         if (!words.length) return true;
@@ -137,17 +138,20 @@
       const n = picked.size;
       const bulk = `<div class="be-bulk${n ? ' on' : ''}"><span>${n ? `Выбрано: <b>${n}</b>` : 'Отметьте статьи галочками, чтобы сделать что-то сразу с несколькими'}</span>
         ${n ? `<select id="be-bulk" aria-label="Что сделать с выбранными"><option value="">Что сделать…</option>
-          ${sections.length ? `<optgroup label="Перенести в раздел">${sections.map(x => `<option value="section:${esc(x.slug)}">→ ${esc(sname(x))}</option>`).join('')}<option value="section:">→ без раздела</option></optgroup>` : ''}
+          ${sections.length ? `<optgroup label="Добавить в раздел (остальные разделы остаются)">${sections.map(x => `<option value="addsection:${esc(x.slug)}">＋ ${esc(sname(x))}</option>`).join('')}</optgroup>
+          <optgroup label="Убрать из раздела">${sections.map(x => `<option value="rmsection:${esc(x.slug)}">− ${esc(sname(x))}</option>`).join('')}</optgroup>
+          <optgroup label="Только в одном разделе">${sections.map(x => `<option value="section:${esc(x.slug)}">→ ${esc(sname(x))}</option>`).join('')}<option value="section:">→ без раздела</option></optgroup>` : ''}
           <optgroup label="Избранное"><option value="feature">★ Добавить в избранное</option><option value="unfeature">☆ Убрать из избранного</option></optgroup>
           <optgroup label="Статус">${dashTab === 'draft' ? '<option value="publish">Опубликовать</option>' : '<option value="draft">Снять с публикации (в черновики)</option>'}</optgroup>
           <optgroup label="Опасно"><option value="delete">🗑 Удалить</option></optgroup></select>
           <button type="button" class="bc-link" data-unpick>снять выбор</button>` : ''}</div>`;
-      return head + bulk + `<table class="be-table be-posts"><thead><tr><th class="be-ck"><input type="checkbox" id="be-pickall" aria-label="Выбрать все" ${n && n === list.length ? 'checked' : ''}></th>${th('title', 'Статья')}<th>Языки</th><th>Раздел</th>${th('date', 'Дата')}${th('likes', '♥', 'лайки')}${th('views', '👁', 'просмотры')}${th('comments', '💬', 'комментарии')}<th></th></tr></thead><tbody>
+      return head + bulk + `<table class="be-table be-posts"><thead><tr><th class="be-ck"><input type="checkbox" id="be-pickall" aria-label="Выбрать все" ${n && n === list.length ? 'checked' : ''}></th>${th('title', 'Статья')}<th>Языки</th><th>Разделы</th>${th('date', 'Дата')}${th('likes', '♥', 'лайки')}${th('views', '👁', 'просмотры')}${th('comments', '💬', 'комментарии')}<th></th></tr></thead><tbody>
         ${list.map(p => `<tr data-id="${p.id}"${picked.has(p.id) ? ' class="picked"' : ''}><td class="be-ck"><input type="checkbox" data-pick ${picked.has(p.id) ? 'checked' : ''} aria-label="Выбрать"></td>
           <td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(ptitle(p) || '(без названия)')}${ptitle(p) && !p['t_' + vl] ? ` <small class="be-nolang">(нет на ${vl.toUpperCase()})</small>` : ''}</b></a></td>
           <td><span class="be-langs">${['ru', 'en', 'lv'].map(l => p['t_' + l] ? `<i class="on" title="Есть на ${l.toUpperCase()}">✓ ${l.toUpperCase()}</i>` : `<i title="Нет перевода на ${l.toUpperCase()}">${l.toUpperCase()}</i>`).join('')}</span></td>
-          <td><select class="be-rowsec" data-rowsec aria-label="Раздел">${secOpts(p.section || '')}</select></td>
-          <td>${fmt(p.published_at || p.updated_at)}</td>
+          <td><details class="be-rowsecs" data-rowsecs><summary>${secsOf(p).length ? secsOf(p).map(x => `<i>${esc(sname(sections.find(r => r.slug === x) || { en: x }))}</i>`).join('') : '<span>— без раздела —</span>'}</summary>
+            <div>${sections.map(x => `<label><input type="checkbox" value="${esc(x.slug)}" ${secsOf(p).includes(x.slug) ? 'checked' : ''}> ${esc(sname(x))}</label>`).join('')}</div></details></td>
+          <td><input type="date" class="be-rowdate" data-rowdate value="${localDate(p.published_at || p.updated_at)}" title="Дата статьи — можно поменять прямо здесь" aria-label="Дата"></td>
           <td>${p.likes}</td><td class="be-views"><span style="--w:${Math.round((p.views || 0) / maxViews * 100)}%">${p.views}</span></td><td>${p.comments}</td>
           <td><details class="be-menu"><summary aria-label="Ещё">⋯</summary><div><a href="#${p.id}">✎ Изменить</a><a href="${vl === 'en' ? '' : '/' + vl}/blog/${esc(p.slug)}/" target="_blank">↗ Открыть на сайте</a><button type="button" class="be-danger" data-delpost>🗑 Удалить</button></div></details></td></tr>`).join('')}
       </tbody></table>`;
@@ -256,7 +260,7 @@
     }));
     // разделы, на которые ведут кружки «Мои заметки» на главной (src/blocks/patreon.html, data-section)
     const warnHome = slug => HOME_SECS.includes(slug) && !warnedHome && (warnedHome = true,
-      alert('⚠ Этот раздел связан с кружком на главной странице («Мои заметки: шесть тем»).\n\nЕсли изменить название здесь, подпись под кружком на главной останется прежней.\nЕсли удалить раздел, кружок на главной будет вести на пустую страницу.\n\nСкажите Claude, чтобы поменять кружки вместе с разделом.'), true);
+      alert('⚠ Этот раздел связан с кружком на главной странице («Мои заметки»).\n\nЕсли изменить название здесь, подпись под кружком на главной останется прежней.\nЕсли удалить раздел, кружок на главной будет вести на пустую страницу.\n\nСкажите Claude, чтобы поменять кружки вместе с разделом.'), true);
     app.querySelectorAll('tr[data-s] .be-tr-in').forEach(inp => inp.addEventListener('focus', () => warnHome(inp.closest('tr').dataset.s)));
     app.querySelectorAll('[data-delsec]').forEach(b => b.addEventListener('click', async () => {
       const r = sections.find(x => x.slug === b.closest('tr').dataset.s);
@@ -304,11 +308,20 @@
       const y = scrollY; await dashboard(); scrollTo(0, y);
     });
     // раздел прямо в строке
-    app.querySelectorAll('[data-rowsec]').forEach(sel => sel.addEventListener('change', async () => {
-      const tr = sel.closest('tr'), id = Number(tr.dataset.id);
-      sel.classList.remove('saved'); sel.disabled = true;
-      try { await api('blog/admin/bulk', { ids: [id], action: 'section', value: sel.value }); (state.posts.find(x => x.id === id) || {}).section = sel.value; sel.classList.add('saved'); } catch (e) { alert(errText(e)); }
-      sel.disabled = false;
+    // разделы прямо в строке: галочки, сразу сохраняются; можно несколько
+    app.querySelectorAll('[data-rowsecs]').forEach(d => d.addEventListener('change', async () => {
+      const id = Number(d.closest('tr').dataset.id), val = [...d.querySelectorAll('input:checked')].map(i => i.value);
+      try { await api('blog/admin/bulk', { ids: [id], action: 'section', value: val }); (state.posts.find(x => x.id === id) || {}).section = val.join(','); } catch (e) { alert(errText(e)); return; }
+      d.querySelector('summary').innerHTML = val.length ? val.map(x => `<i>${esc(sname(sections.find(r => r.slug === x) || { en: x }))}</i>`).join('') : '<span>— без раздела —</span>';
+    }));
+    app.querySelectorAll('.be-rowsecs').forEach(d => d.addEventListener('toggle', () => { if (d.open) app.querySelectorAll('.be-rowsecs[open]').forEach(x => { if (x !== d) x.open = false; }); }));
+    // дата прямо в строке (время статьи сохраняется прежним)
+    app.querySelectorAll('[data-rowdate]').forEach(inp => inp.addEventListener('change', async () => {
+      const id = Number(inp.closest('tr').dataset.id), p = state.posts.find(x => x.id === id);
+      if (!inp.value) return;
+      const ts = dateToTs(inp.value, p.published_at ? localTime(p.published_at) : '12:00', p.published_at);
+      inp.classList.remove('saved');
+      try { await api('blog/admin/bulk', { ids: [id], action: 'date', value: ts }); p.published_at = ts; inp.classList.add('saved'); } catch (e) { alert(errText(e)); }
     }));
     // меню «⋯»: открыто только одно, закрывается кликом мимо
     app.querySelectorAll('.be-menu').forEach(d => d.addEventListener('toggle', () => { if (d.open) app.querySelectorAll('.be-menu[open]').forEach(x => { if (x !== d) x.open = false; }); }));
@@ -373,8 +386,9 @@
           <select id="be-src"><option value="">— не указан (пометки не будет) —</option>${LANGS.map(([l, n]) => `<option value="${l}"${post.src_lang === l ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
         <div class="be-f be-date"><span>Дата и время публикации <small>(статьи идут по дате — от новых к старым. Пусто — сейчас. Если поставить будущее время, статья выйдет сама в этот момент)</small></span>
           <div class="be-dt"><input type="date" id="be-date" value="${post.published_at ? localDate(post.published_at) : ''}"><input type="time" id="be-time" value="${post.published_at ? localTime(post.published_at) : ''}"></div></div>
-        <label class="be-f"><span>Раздел <small>(крупная тема, как коллекция на Patreon)</small></span>
-          <select id="be-section"><option value="">— без раздела —</option>${sections.map(r => `<option value="${esc(r.slug)}"${post.section === r.slug ? ' selected' : ''}>${esc(r.en)}${r.ru ? ' / ' + esc(r.ru) : ''}</option>`).join('')}<option value="__new">＋ Новый раздел…</option></select></label>
+        <div class="be-f"><span>Разделы <small>(как коллекции на Patreon: отметьте один или несколько — статья будет в каждом из них, это одна и та же статья)</small></span>
+          <div class="be-secs" id="be-secs">${sections.map(r => `<label><input type="checkbox" value="${esc(r.slug)}" ${secsOf(post).includes(r.slug) ? 'checked' : ''}> ${esc(sname(r))}</label>`).join('')}</div>
+          <button type="button" class="bc-link" id="be-newsec-btn">＋ Новый раздел…</button></div>
         <div class="be-f"><span>Теги <small>(на английском: впишите тег и нажмите Enter. Перевод на RU и LV подставится сам — поправить его можно во вкладке «Теги» списка статей)</small></span>
           <div class="be-tags" data-tags="en"><input type="text" class="be-tag-in" list="be-taglist-en" placeholder="new tag…" aria-label="Новый тег"></div>
           <datalist id="be-taglist-en">${(knownTags.en || []).map(x => `<option value="${esc(x)}">`).join('')}</datalist>
@@ -397,7 +411,7 @@
     document.execCommand('defaultParagraphSeparator', false, 'p');
 
     const collect = () => {
-      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value, published_at: dateToTs($('#be-date').value, $('#be-time').value, post.published_at), section: $('#be-section').value === '__new' ? '' : $('#be-section').value };
+      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value, published_at: dateToTs($('#be-date').value, $('#be-time').value, post.published_at), section: [...app.querySelectorAll('#be-secs input:checked')].map(i => i.value) };
       app.querySelectorAll('[data-k]').forEach(el => {
         if (!el.isContentEditable) { d[el.dataset.k] = el.value; return; }
         const c = el.cloneNode(true);
@@ -493,17 +507,15 @@
     app.querySelectorAll('[data-pane]').forEach(p => p.addEventListener('input', () => { clearTimeout(langTimer); langTimer = setTimeout(checkLang, 900); }));
     app.querySelectorAll('[data-pane]').forEach(p => p.addEventListener('paste', () => { clearTimeout(langTimer); langTimer = setTimeout(checkLang, 900); }));
     checkLang();
-    $('#be-section').addEventListener('change', async e => {
-      if (e.target.value !== '__new') return;
+    $('#be-secs').addEventListener('change', touch);
+    $('#be-newsec-btn').addEventListener('click', async () => {
       const en = prompt('Название нового раздела на английском (например Weekly Polly):', '');
-      if (!en || !en.trim()) { e.target.value = post.section || ''; return; }
+      if (!en || !en.trim()) return;
       try {
         const r = await api('blog/admin/section-set', { en: en.trim() });
         sections = (await api('blog/admin/sections')).sections;
-        e.target.insertAdjacentHTML('afterbegin', '');
-        const opt = document.createElement('option'); opt.value = r.slug; opt.textContent = en.trim();
-        e.target.insertBefore(opt, e.target.querySelector('[value="__new"]')); e.target.value = r.slug; touch();
-      } catch (err) { alert(errText(err)); e.target.value = ''; }
+        $('#be-secs').insertAdjacentHTML('beforeend', `<label><input type="checkbox" value="${esc(r.slug)}" checked> ${esc(en.trim())}</label>`); touch();
+      } catch (err) { alert(errText(err)); }
     });
     // открываем вкладку языка оригинала (если не указан — первую, где есть текст)
     const startLang = post.src_lang || LANGS.map(x => x[0]).find(l => post['t_' + l] || stripHtml(post['b_' + l])) || 'ru';

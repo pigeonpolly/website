@@ -307,5 +307,14 @@
   "\">What is Wobbleland?</a>": "\">Kas ir Wobbleland?</a>",
   ">All birds<": ">Visi putni<",
   ">Tap a bird to see its profile, badges and bag.<": ">Pieskaries putnam, lai redzētu tā profilu, nozīmītes un somu.<",
-  "placeholder=\"🔍 Nickname\" aria-label=\"Nickname\"": "placeholder=\"🔍 Segvārds\" aria-label=\"Segvārds\""
+  "placeholder=\"🔍 Nickname\" aria-label=\"Nickname\"": "placeholder=\"🔍 Segvārds\" aria-label=\"Segvārds\"",
+  ">My notes<": ">Manas piezīmes<",
+  "Five themes I write about. Pick one and read along.": "Piecas tēmas, par kurām rakstu. Izvēlies savu un lasi.",
+  ">Technologies<": ">Tehnoloģijas<",
+  "Digital art, AI and the tools I try in my creative work.": "Digitālā māksla, AI un rīki, ko izmēģinu radošajā darbā.",
+  "Learning design and what helps people learn.": "Mācību dizains un tas, kas palīdz cilvēkiem mācīties.",
+  ">Polly’s Life<": ">Pollijas dzīve<",
+  "Weekly Polly, notes from my life and behind the scenes.": "Weekly Polly, piezīmes no manas dzīves un aizkulises.",
+  ">Tips &amp; Guides<": ">Padomi un noderīgais<",
+  "Guides, books, life hacks and other useful things.": "Ceļveži, grāmatas, dzīves knifi un citas noderīgas lietas."
 }

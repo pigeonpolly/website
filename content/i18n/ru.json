@@ -89,7 +89,7 @@
   "<dt>Scale</dt>": "<dt>Масштаб</dt>",
   ">the path so far<": ">мой путь<",
   ">Experience<": ">Опыт работы<",
-  ">Education<": ">Образование<",
+  ">Education<": ">Обучение<",
   ">Courses &amp; certificates<": ">Курсы и сертификаты<",
   "Full profile on LinkedIn ↗": "Полный профиль в LinkedIn ↗",
   "– now<": "– сейчас<",
@@ -307,5 +307,14 @@
   "\">What is Wobbleland?</a>": "\">Что такое Wobbleland?</a>",
   ">All birds<": ">Все птицы<",
   ">Tap a bird to see its profile, badges and bag.<": ">Нажмите на птичку, чтобы увидеть её профиль, бейджи и сумку.<",
-  "placeholder=\"🔍 Nickname\" aria-label=\"Nickname\"": "placeholder=\"🔍 Ник\" aria-label=\"Ник\""
+  "placeholder=\"🔍 Nickname\" aria-label=\"Nickname\"": "placeholder=\"🔍 Ник\" aria-label=\"Ник\"",
+  ">My notes<": ">Мои заметки<",
+  "Five themes I write about. Pick one and read along.": "Пять тем, о которых я пишу. Выберите свою и читайте.",
+  ">Technologies<": ">Технологии<",
+  "Digital art, AI and the tools I try in my creative work.": "Цифровое искусство, AI и инструменты, которые я пробую в творчестве.",
+  "Learning design and what helps people learn.": "Дизайн обучения и то, что помогает людям учиться.",
+  ">Polly’s Life<": ">Жизнь Полли<",
+  "Weekly Polly, notes from my life and behind the scenes.": "Weekly Polly, заметки из моей жизни и закулисье.",
+  ">Tips &amp; Guides<": ">Советы и полезное<",
+  "Guides, books, life hacks and other useful things.": "Гайды, книги, лайфхаки и другое полезное."
 }
