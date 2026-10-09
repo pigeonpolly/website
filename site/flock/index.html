@@ -69,6 +69,7 @@
   <p class="topics">pixel birds</p>
   <h1>The Flock</h1>
   <p class="lead">Everyone who signs in on this site lives here as a little pixel bird. Press the buttons and see what happens.</p>
+  <div class="fl-top-btns"><a class="pill-btn pill-fill" href="#all-birds">🐦 See the whole flock</a><a class="pill-btn" href="#collections">🎒 Collections</a></div>
 </section>
 <div data-ppb="flock.2" class="fl-full"><div class="blk" id="blk-flock" data-ppb="blk-flock"><style>#blk-flock .fl { padding: 56px var(--gutter) 64px; text-align: center; }
 #blk-flock .fl-kick { margin: 0 0 6px; font: italic 400 18px var(--serif); color: #F0A987; }
@@ -119,7 +120,13 @@
 </section>
 <script src="/assets/flock.js" defer></script>
 </div></div>
-<section data-ppb="flock.3" class="fl-all" id="all-birds">
+<section data-ppb="flock.3" class="fl-all fl-coll" id="collections">
+  <h2 class="section-title">Collections</h2>
+  <p class="fl-all-lead">Everything a bird (or a cat, or a crow) can collect. Alina gives these as gift seeds.</p>
+  <p class="fl-coll-me" hidden></p>
+  <div class="fl-coll-box"></div>
+</section>
+<section data-ppb="flock.4" class="fl-all" id="all-birds">
   <h2 class="section-title">All birds</h2>
   <p class="fl-all-lead">Tap a bird to see its profile, badges and bag.</p>
   <input type="search" class="fl-all-q" placeholder="🔍 Nickname" aria-label="Nickname">
@@ -142,6 +149,42 @@
   }
   q.addEventListener('input', draw);
   fetch('/api/birds').then(function (r) { return r.ok ? r.json() : { birds: [] }; }).then(function (d) { list = d.birds || []; draw(); }).catch(function () {});
+})();
+</script>
+<script>
+// «Коллекции»: все вещи из каталога подарков (PPBirds.GIFTS) — появляются здесь сами, когда добавляются новые;
+// вошедшему видно, что у него уже есть (✓)
+(function () {
+  var L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
+  var T = { got: ['You have {n} of {t}', 'У вас {n} из {t}', 'Tev ir {n} no {t}'], have: ['✓ yours', '✓ есть', '✓ ir'], gift: ['🎁 not opened', '🎁 не открыт', '🎁 nav atvērts'] };
+  var KINDS = [['hat', ['Hats', 'Головные уборы', 'Galvassegas']], ['item', ['Treats to hold', 'Вкусняшки и вещички', 'Gardumi un lietiņas']], ['shoes', ['Shoes', 'Обувь', 'Apavi']], ['scarf', ['Scarves', 'Шарфики', 'Šallītes']],
+    ['frame', ['Frames', 'Рамки', 'Rāmji']], ['bg', ['Backgrounds', 'Фоны', 'Foni']], ['anim', ['Animations', 'Анимации', 'Animācijas']]];
+  var box = document.querySelector('.fl-coll-box'), me = null, owned = {};
+  function draw() {
+    var B = window.PPBirds; if (!B) return;
+    var id = me ? me.id : 2, total = 0, have = 0;
+    box.innerHTML = '';
+    KINDS.forEach(function (k) {
+      var list = B.GIFTS[k[0]] || []; if (!list.length) return;
+      var h = document.createElement('h3'); h.textContent = k[1][L]; box.appendChild(h);
+      var g = document.createElement('div'); g.className = 'fl-coll-grid'; box.appendChild(g);
+      list.forEach(function (v) {
+        total++;
+        var st = owned[k[0] + '|' + v], t = document.createElement('figure'); t.className = 'fl-coll-item' + (st ? ' got' : '');
+        var av = {}; av[k[0]] = v;
+        t.appendChild(B.avatar(id, av, 84));
+        var c = document.createElement('figcaption'); c.textContent = B.giftName(k[0], v, L); t.appendChild(c);
+        if (st) { have++; var m = document.createElement('span'); m.className = 'fl-coll-mark'; m.textContent = st === 'new' ? T.gift[L] : T.have[L]; t.appendChild(m); }
+        g.appendChild(t);
+      });
+    });
+    var mm = document.querySelector('.fl-coll-me');
+    if (me) { mm.hidden = false; mm.textContent = T.got[L].replace('{n}', have).replace('{t}', total); }
+  }
+  fetch('/api/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
+    if (d && d.user) { me = d.user; (d.user.gifts || []).forEach(function (g) { if (g.status === 'bag' || !owned[g.kind + '|' + g.item]) owned[g.kind + '|' + g.item] = g.status; }); }
+    draw();
+  }).catch(draw);
 })();
 </script>
 <script src="/assets/challenge-data.js" defer></script>

@@ -359,5 +359,24 @@
     return el;
   }
 
-  window.PPBirds = { looks, sprite, spriteHD, dress, avatar, GIFTS, SW, SH, BASE, OX };
+  // названия вещей для «Коллекций» (en, ru, lv)
+  const GIFT_NAMES = {
+    top: ['Top hat', 'Цилиндр', 'Cilindrs'], beret: ['Beret', 'Берет', 'Berete'], cap: ['Cap', 'Кепка', 'Cepure'], bow: ['Bow', 'Бантик', 'Bantīte'], party: ['Party hat', 'Колпак', 'Ballītes cepure'], crown: ['Crown', 'Корона', 'Kronis'],
+    heels: ['Heels', 'Туфельки', 'Kurpītes'], sneakers: ['Sneakers', 'Кеды', 'Kedas'], boots: ['Boots', 'Сапожки', 'Zābaciņi'],
+    wizard: ['Wizard hat', 'Шляпа волшебника', 'Burvja cepure'], witch: ['Witch hat', 'Шляпа ведьмы', 'Raganas cepure'], pumpkin: ['Pumpkin hat', 'Тыква', 'Ķirbis'], santa: ['Santa hat', 'Колпак Санты', 'Salaveča cepure'],
+    antlers: ['Reindeer antlers', 'Рожки оленя', 'Ziemeļbrieža ragi'], beanie: ['Winter beanie', 'Зимняя шапка', 'Ziemas cepure'], heartband: ['Heart headband', 'Ободок с сердцем', 'Sirsniņu stīpiņa'],
+    wreath: ['Spring wreath', 'Весенний венок', 'Pavasara vainags'], strawhat: ['Straw hat', 'Летняя шляпа', 'Salmu cepure'], leafcrown: ['Autumn wreath', 'Осенний венок', 'Rudens vainags'], headset: ['Gamer headset', 'Игровые наушники', 'Spēļu austiņas'],
+    pizza: ['Pizza slice', 'Кусочек пиццы', 'Picas gabaliņš'], cherry: ['Cherries', 'Вишенки', 'Ķirši'], wand: ['Magic wand', 'Волшебная палочка', 'Burvju nūjiņa'], crystal: ['Crystal ball', 'Хрустальный шар', 'Kristāla bumba'], star: ['Star', 'Звёздочка', 'Zvaigznīte'],
+    lollipop: ['Lollipop', 'Леденец', 'Konfekte'], minipumpkin: ['Little pumpkin', 'Тыковка', 'Ķirbītis'], candycane: ['Candy cane', 'Карамельная трость', 'Karameļu spieķītis'], giftbox: ['Present', 'Подарок', 'Dāvana'],
+    ornament: ['Ornament', 'Ёлочный шар', 'Eglītes bumba'], snowflake: ['Snowflake', 'Снежинка', 'Sniegpārsliņa'], heart: ['Heart', 'Сердечко', 'Sirsniņa'], rose: ['Rose', 'Роза', 'Roze'], letter: ['Valentine', 'Валентинка', 'Valentīna kartīte'],
+    icecream: ['Ice cream', 'Мороженое', 'Saldējums'], mapleleaf: ['Maple leaf', 'Кленовый лист', 'Kļavas lapa'], gamepad: ['Gamepad', 'Геймпад', 'Spēļu pults'], coin: ['Coin', 'Монетка', 'Monēta'], sword: ['Pixel sword', 'Пиксельный меч', 'Pikseļu zobens'],
+    mushroom: ['Mushroom', 'Грибок', 'Sēnīte'], cheese: ['Cheese', 'Сыр', 'Siers'], ring: ['Ring', 'Колечко', 'Gredzens'], pearl: ['Pearl', 'Жемчужина', 'Pērle'], ruby: ['Ruby', 'Рубин', 'Rubīns'], sapphire: ['Sapphire', 'Сапфир', 'Safīrs'], key: ['Key', 'Ключик', 'Atslēdziņa'], spoon: ['Spoon', 'Ложечка', 'Karotīte'],
+    gold: ['Gold frame', 'Золотая рамка', 'Zelta rāmis'], rainbow: ['Rainbow frame', 'Радуга', 'Varavīksne'], stars: ['Stars', 'Звёзды', 'Zvaigznes'], hearts: ['Hearts', 'Сердечки', 'Sirsniņas'], leaves: ['Leaves', 'Листики', 'Lapiņas'], dotted: ['Dotted', 'Пунктир', 'Punktiņi'],
+    snow: ['Snowflakes', 'Снежинки', 'Sniegpārslas'], magic: ['Magic', 'Волшебная', 'Burvju'], spooky: ['Halloween', 'Хеллоуин', 'Helovīns'], neon: ['Neon', 'Неон', 'Neons'],
+    bounce: ['Bounces', 'Прыгает', 'Lēkā'], wiggle: ['Wiggles', 'Качается', 'Šūpojas'], float: ['Floats', 'Парит', 'Lidinās'], spin: ['Spins', 'Кружится', 'Griežas'], sparkle: ['Sparkles', 'Сияет', 'Mirdz'], heartbeat: ['Heartbeat', 'Стучит сердечком', 'Sirdspuksti'],
+    bg: ['Background', 'Фон', 'Fons'], scarf: ['Scarf', 'Шарфик', 'Šallīte'],
+  };
+  const giftName = (kind, v, L = 0) => kind === 'anim' && v === 'heart' ? GIFT_NAMES.heartbeat[L] : kind === 'bg' || kind === 'scarf' ? GIFT_NAMES[kind][L] : (GIFT_NAMES[String(v).split(':')[0]] || [v, v, v])[L];
+
+  window.PPBirds = { looks, sprite, spriteHD, dress, avatar, giftName, GIFTS, SW, SH, BASE, OX };
 })();
