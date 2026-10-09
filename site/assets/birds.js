@@ -70,6 +70,16 @@
     return c;
   }
 
+  // обувь котика (подарок): по пикселю на лапку, сапожки — повыше, кеды — с белой подошвой рядом
+  function catShoes(put, sh, paws) {
+    if (!sh) return;
+    for (const x of paws) {
+      put(x, BASE, sh.c);
+      if (sh.t === 'boots') put(x, BASE - 1, sh.c);
+      if (sh.t === 'sneakers') put(x + 1, BASE, '#FFFFFF', 'leg');
+      if (sh.t === 'heels') put(x, BASE - 1, sh.c);
+    }
+  }
   // котик (смотрит вправо): кадры 0,1 — шаг, 2 — сидит
   function catSprite(lk, frame) {
     const { g, put, ell, has } = grid();
@@ -81,6 +91,7 @@
       if (lk.pattern === 'patches') ell(10.5, 21, 2, 3, white);
       if (lk.pattern === 'stripes') for (let y = 16; y <= 23; y += 2) for (let x = 6; x <= 11; x++) if (has(x, y)) put(x, y, dark);
       put(10, BASE, fur); put(12, BASE, fur); put(11, BASE, fur);
+      catShoes(put, lk.shoe, [10, 12]);
       hx = 11; hy = 12;
     } else {
       const sw = frame === 1 ? 1 : 0;
@@ -89,6 +100,7 @@
       if (lk.pattern === 'patches') { ell(10, 22.5, 4, 1.4, white); ell(6, 19, 2, 1.3, dark); }
       if (lk.pattern === 'stripes') for (let x = 4; x <= 12; x += 2) for (let y = 17; y <= 21; y++) if (has(x, y)) put(x, y, dark);
       for (const lx of frame === 1 ? [3, 6, 11, 14] : [4, 5, 12, 13]) { put(lx, BASE - 1, fur); put(lx, BASE, fur); }
+      catShoes(put, lk.shoe, frame === 1 ? [3, 6, 11, 14] : [4, 5, 12, 13]);
       hx = 14.5; hy = 15.5;
     }
     ell(hx, hy, 3.7, 3.4, fur);
@@ -165,7 +177,7 @@
     if (!av) return lk;
     const d = Object.assign({}, lk);
     if (av.hat) d.hat = pair(av.hat, HATS, HAT_C) || d.hat;
-    if (av.shoes && d.kind !== 'cat') d.shoe = pair(av.shoes, SHOES, SHOE_C) || d.shoe;
+    if (av.shoes) d.shoe = pair(av.shoes, SHOES, SHOE_C) || d.shoe;
     return d;
   }
   // круглый аватар: фон, рамка, анимация и птичка (крупные пиксели)
