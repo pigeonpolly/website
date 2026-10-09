@@ -2584,3 +2584,5 @@ html.sb-hide { --sb: 0px; }
 .fl-all-bird { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text); text-decoration: none; font: 600 14px var(--sans); padding: 8px 4px; border-radius: 14px; transition: background .2s, transform .2s; }
 .fl-all-bird:hover { background: rgba(255,255,255,.07); transform: translateY(-3px); }
 .fl-all-bird span:last-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.sw-pv-wrap { display: inline-grid; place-items: center; width: 58px; height: 58px; font-size: 30px; background: #FFF7E6; box-shadow: 0 0 0 2px #E9A93B; }
+.sw-pv-empty { margin: 0; color: #8C7FB0; font-size: 14px; text-align: left; }

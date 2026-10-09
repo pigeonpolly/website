@@ -60,6 +60,7 @@
     later: ['↩ Back (into the bag)', '↩ Вернуться (в сумку)', '↩ Atpakaļ (somā)'],
     bagTitle: ['Your bag', 'Твоя сумка', 'Tava soma'],
     bagNote: ['Everything you get stays here forever. Tap a thing to put it on or take it off.', 'Всё, что ты получаешь, остаётся здесь навсегда. Нажми на вещь, чтобы надеть или снять.', 'Viss, ko saņem, paliek šeit uz visiem laikiem. Pieskaries lietai, lai to uzvilktu vai novilktu.'],
+    bagEmptyOther: ['The bag is empty for now.', 'Сумка пока пустая.', 'Soma pagaidām ir tukša.'],
     bagEmpty: ['Empty for now. Gifts from Alina will appear here.', 'Пока пусто. Здесь появятся подарки от Алины.', 'Pagaidām tukšs. Šeit parādīsies Alīnas dāvanas.'],
     wearing: ['on ✓', 'надето ✓', 'uzvilkts ✓'],
     kinds: [{ bg: 'background', shoes: 'shoes', hat: 'hat', anim: 'animation', frame: 'frame', item: 'a treat to hold', scarf: 'scarf' }, { bg: 'фон', shoes: 'обувь', hat: 'головной убор', anim: 'анимация', frame: 'рамка', item: 'вкусняшка в клюв', scarf: 'шарфик' }, { bg: 'fons', shoes: 'apavi', hat: 'galvassega', anim: 'animācija', frame: 'rāmis', item: 'gardums knābī', scarf: 'šalle' }],
@@ -449,13 +450,13 @@
         <div><h3><span class="sw-nickname${pr.gold ? ' gold' : ''}">@${esc(pr.nick)}</span></h3><p class="sw-level">${lv ? esc(lv.n[L]) : '—'}</p>
         <p class="sw-pv-streak">🔥 ${t('streak', pr.current)} · ${t('best', pr.best)}</p></div></div>
       <div class="sw-pv-badges">${LEVELS.map(l => medal(l, pr.best >= l.d)).join('')}${SPECIAL.map(x => medal(x, st(x), false, 'span', pr.picks)).join('')}</div>
-      ${pr.bag && pr.bag.length && window.PPBirds ? `<h4 class="sw-pv-bag-t">🎒 ${t('bag')}</h4><div class="sw-pv-bag"></div>` : ''}
+      ${window.PPBirds && pr.id ? `<h4 class="sw-pv-bag-t">🎒 ${t('bag')}</h4><div class="sw-pv-bag">${'<span class="sw-pv-item sw-pv-wrap" title="🎁">🎁</span>'.repeat(Math.min(pr.unopened || 0, 12))}</div>${!(pr.bag || []).length && !pr.unopened ? `<p class="sw-pv-empty">${t('bagEmptyOther')}</p>` : ''}` : ''}
       <div class="sw-pv-works">${pr.posts.map(p => `<a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"><span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></a>`).join('') || `<p class="sw-empty">${t('noWorks')}</p>`}</div>
     </div>`;
     if (window.PPBirds && pr.id) {
       const slot = v.querySelector('.sw-ava-slot'); if (slot) slot.replaceWith(window.PPBirds.avatar(pr.id, pr.avatar, 110));
       const bagEl = v.querySelector('.sw-pv-bag');
-      if (bagEl) for (const g of pr.bag) { const it = document.createElement('span'); it.className = 'sw-pv-item' + (pr.avatar && pr.avatar[g.kind] === g.item ? ' on' : ''); it.title = kindName(g.kind); it.appendChild(window.PPBirds.avatar(pr.id, Object.assign({}, pr.avatar, { [g.kind]: g.item }), 52)); bagEl.appendChild(it); }
+      if (bagEl) for (const g of pr.bag || []) { const it = document.createElement('span'); it.className = 'sw-pv-item' + (pr.avatar && pr.avatar[g.kind] === g.item ? ' on' : ''); it.title = kindName(g.kind); it.appendChild(window.PPBirds.avatar(pr.id, Object.assign({}, pr.avatar, { [g.kind]: g.item }), 52)); bagEl.appendChild(it); }
     }
     // Esc: если открыта картинка — закрывается только она (слушаем раньше просмотрщика, в фазе перехвата)
     const close = () => { v.remove(); document.removeEventListener('keydown', k, true); };
