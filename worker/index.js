@@ -907,7 +907,7 @@ async function route(req, env, url) {
     if (prev && prev !== post.user_id) await addBadge(env, prev, 'pick_past');
     await setMeta(env, 'pick_post', post.id);
     await setMeta(env, 'pick_user', String(post.user_id));
-    await award(env, post.user_id, 'pick', post.id, BTN.pick); // +50 пуговок за «Выбор Полли» (за каждую выбранную работу)
+    await award(env, post.user_id, 'pick', post.id, BTN.pick); // +11 пуговок за «Выбор Полли» (один раз за каждую выбранную работу; снятие и передача их не отнимают)
     return json({ ok: true });
   }
 
