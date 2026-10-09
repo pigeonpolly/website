@@ -163,6 +163,10 @@ const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, p
   levels: { 1: 5, 3: 10, 7: 20, 14: 30, 30: 50, 60: 80, 100: 120, 365: 300 },
   badges: { bw: 5, extra: 15, bday: 15, early: 15, owl: 15, comeback: 15, ten: 20, weekend: 20, newyear: 20, halloween: 20,
     monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, hundred: 100 } };
+// легендарные вещи (как LEGEND в birds.js): в магазине по одной штуке на птичку, дарить нельзя; обычных — до трёх одинаковых
+const LEGEND = new Set(['hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora']);
+const SHOP_MAX = 3;
+const copies = async (env, uid, kind, item) => (await env.DB.prepare("SELECT COUNT(*) AS n FROM gifts WHERE user_id = ? AND kind = ? AND item = ? AND status IN ('bag', 'new')").bind(uid, kind, item).first()).n;
 const rigaDay = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }); // сутки по Риге
 async function award(env, uid, kind, ref, amount) {
   const r = await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(uid, kind, String(ref), amount, rigaDay(), now()).run();
@@ -626,7 +630,7 @@ async function route(req, env, url) {
     if (!GIFT_KINDS.includes(kind) || !item) fail(400, 'bad');
     const row = await env.DB.prepare('SELECT price, stock FROM shop WHERE kind = ? AND item = ?').bind(kind, item).first();
     if (!row || row.stock <= 0) fail(409, 'soldout');
-    if (await env.DB.prepare("SELECT 1 FROM gifts WHERE user_id = ? AND kind = ? AND item = ? AND status IN ('bag', 'new')").bind(u.id, kind, item).first()) fail(409, 'have');
+    if (await copies(env, u.id, kind, item) >= (LEGEND.has(kind + '|' + item) ? 1 : SHOP_MAX)) fail(409, 'limit'); // обычных — до 3 одинаковых, легендарных — 1
     if ((u.buttons || 0) < row.price) fail(402, 'poor');
     // остаток и пуговки списываем условно (если кто-то успел раньше — ничего не теряется)
     const s1 = await env.DB.prepare('UPDATE shop SET stock = stock - 1 WHERE kind = ? AND item = ? AND stock > 0').bind(kind, item).run();
@@ -657,9 +661,10 @@ async function route(req, env, url) {
     const b = await req.json().catch(() => ({}));
     const g = await env.DB.prepare("SELECT * FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag' AND note = 'shop'").bind(Number(b.id), u.id).first();
     if (!g) fail(404, 'gift');
+    if (LEGEND.has(g.kind + '|' + g.item)) fail(403, 'legend'); // легендарные не дарятся
     const to = await env.DB.prepare("SELECT id, nick FROM users WHERE nick = ? AND banned = 0 AND id != ?").bind(String(b.to || '').trim().replace(/^@/, ''), u.id).first();
     if (!to) fail(404, 'bird');
-    if (await env.DB.prepare("SELECT 1 FROM gifts WHERE user_id = ? AND kind = ? AND item = ? AND status IN ('bag', 'new')").bind(to.id, g.kind, g.item).first()) fail(409, 'has');
+    if (await copies(env, to.id, g.kind, g.item) >= SHOP_MAX) fail(409, 'has'); // у получателя уже три таких
     await env.DB.prepare("UPDATE gifts SET user_id = ?, status = 'new', note = ?, created_at = ?, opened_at = NULL WHERE id = ?").bind(to.id, 'from:' + u.nick, now(), g.id).run();
     // если даритель носил эту вещь и другой такой у него нет — снять
     const a = avatarOf(u);

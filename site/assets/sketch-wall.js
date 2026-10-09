@@ -68,12 +68,13 @@
     btnForBadges: [n => `+${n} 🔘 buttons for your badges!`, n => `+${n} 🔘 пуговок за достижения!`, n => `+${n} 🔘 pogas par sasniegumiem!`],
     give: ['🎁 Gift', '🎁 Подарить', '🎁 Uzdāvināt'],
     giveT: ['Gift it to another bird', 'Подарить другой птичке', 'Uzdāvināt citam putniņam'],
-    giveText: ['The thing leaves your bag and arrives as an unopened gift. Only things bought in the shop can be gifted.', 'Вещь уйдёт из вашей сумки и придёт птичке неоткрытым подарком. Дарить можно только купленное в магазине.', 'Lieta pazudīs no tavas somas un pienāks putniņam kā neatvērta dāvana. Dāvināt var tikai veikalā pirktās lietas.'],
+    giveText: ['The thing leaves your bag and arrives as an unopened gift. Only things bought in the shop can be gifted, except legendary ones.', 'Вещь уйдёт из вашей сумки и придёт птичке неоткрытым подарком. Дарить можно только купленное в магазине, кроме легендарных вещей.', 'Lieta pazudīs no tavas somas un pienāks putniņam kā neatvērta dāvana. Dāvināt var tikai veikalā pirktās lietas, izņemot leģendārās.'],
     givePh: ['bird’s nickname', 'ник птички', 'putniņa segvārds'],
     giveGo: ['Give', 'Подарить', 'Uzdāvināt'],
     giveOk: [n => `Gift sent to @${n} 🎁`, n => `Подарок отправлен @${n} 🎁`, n => `Dāvana nosūtīta @${n} 🎁`],
     giveNo: ['There is no bird with this nickname.', 'Птички с таким ником нет.', 'Putniņa ar tādu segvārdu nav.'],
-    giveHas: ['This bird already has this thing.', 'У этой птички уже есть эта вещь.', 'Šim putniņam šī lieta jau ir.'],
+    giveHas: ['This bird already has three of these.', 'У этой птички уже три такие вещи.', 'Šim putniņam jau ir trīs tādas lietas.'],
+    giveLegend: ['Legendary things cannot be gifted.', 'Легендарные вещи дарить нельзя.', 'Leģendārās lietas nevar dāvināt.'],
     fromBird: [n => `🎁 A gift from @${n}`, n => `🎁 Подарок от @${n}`, n => `🎁 Dāvana no @${n}`],
     btnShop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'],
     btnInvite: ['📤 Invite a friend', '📤 Позвать друга', '📤 Uzaicināt draugu'],
@@ -361,7 +362,7 @@
     f.onsubmit = async e => {
       e.preventDefault();
       try { const r = await post('gift/give', { id: g.id, to: f.to.value }); me.avatar = r.avatar; m.close && m.close(); m.card.closest('.sw-bv') && m.card.closest('.sw-bv').remove(); window.PPToast && window.PPToast(t('giveOk', r.to)); await refresh(); done && done(); }
-      catch (err) { st.textContent = err.code === 'bird' ? t('giveNo') : err.code === 'has' ? t('giveHas') : t('err'); }
+      catch (err) { st.textContent = err.code === 'bird' ? t('giveNo') : err.code === 'has' ? t('giveHas') : err.code === 'legend' ? t('giveLegend') : t('err'); }
     };
   }
   function openBag() {
@@ -372,8 +373,9 @@
       const kinds = ['hat', 'item', 'shoes', 'scarf', 'bg', 'frame', 'anim'].filter(k => items.some(g => g.kind === k));
       m.card.innerHTML = `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3><p class="sw-bv-how">${t('bagNote')}</p>
         ${items.length ? kinds.map(k => `<h4>${esc(kindName(k))}</h4><div class="bag-grid">${items.filter(g => g.kind === k).map(g =>
-          { const sh = (me.gifts || []).find(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item && x.note === 'shop');
-            return `<div class="bag-cell"><button type="button" class="bag-item${me.avatar && me.avatar[k] === g.item ? ' on' : ''}" data-k="${k}" data-i="${esc(g.item)}"><span class="bag-ava"></span>${me.avatar && me.avatar[k] === g.item ? t('wearing') : ''}</button>${sh ? `<button type="button" class="bag-give" data-gid="${sh.id}">${t('give')}</button>` : ''}</div>`; }).join('')}</div>`).join('') : `<p class="bag-empty">${t('bagEmpty')}</p>`}`;
+          { const leg = window.PPBirds.LEGEND && window.PPBirds.LEGEND.has(g.kind + '|' + g.item), n = (me.gifts || []).filter(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item).length;
+            const sh = !leg && (me.gifts || []).find(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item && x.note === 'shop');
+            return `<div class="bag-cell"><button type="button" class="bag-item${me.avatar && me.avatar[k] === g.item ? ' on' : ''}" data-k="${k}" data-i="${esc(g.item)}"><span class="bag-ava"></span>${me.avatar && me.avatar[k] === g.item ? t('wearing') : ''}${n > 1 ? `<span class="bag-n">×${n}</span>` : ''}</button>${sh ? `<button type="button" class="bag-give" data-gid="${sh.id}">${t('give')}</button>` : ''}</div>`; }).join('')}</div>`).join('') : `<p class="bag-empty">${t('bagEmpty')}</p>`}`;
       m.card.querySelectorAll('.bag-give').forEach(b => b.onclick = () => { const g = me.gifts.find(x => x.id === +b.dataset.gid); m.card.closest('.sw-bv') && m.card.closest('.sw-bv').remove(); giveDialog(g); });
       m.card.querySelectorAll('.bag-item').forEach(b => {
         b.querySelector('.bag-ava').appendChild(window.PPBirds.giftPic(b.dataset.k, b.dataset.i, me.id, 64, me.avatar));

@@ -24,6 +24,10 @@
     sure: ['Buy “{n}” for {p} 🔘?', 'Купить «{n}» за {p} 🔘?', 'Pirkt “{n}” par {p} 🔘?'],
     err: ['Could not buy, please try again.', 'Не получилось купить, попробуйте ещё раз.', 'Neizdevās nopirkt, mēģini vēlreiz.'],
     none: ['Nothing on sale here yet. Check back soon!', 'Здесь пока ничего не продаётся. Загляните позже!', 'Šeit pagaidām nekas netiek pārdots. Ieskaties vēlāk!'],
+    onSale: ['🛍 In stock', '🛍 В наличии', '🛍 Pārdošanā'], gone: ['Out of stock', 'Нет в наличии', 'Nav pieejams'],
+    count: ['You have {n} of {m}', 'У вас {n} из {m}', 'Tev ir {n} no {m}'], max: ['✓ You have the maximum', '✓ У вас максимум', '✓ Tev ir maksimums'],
+    legend: ['★ Legendary: one per bird, cannot be gifted', '★ Легендарная: одна на птичку, дарить нельзя', '★ Leģendāra: viena putniņam, dāvināt nevar'],
+    rule: ['You can buy up to 3 of the same thing (legendary ones: just 1).', 'Одну и ту же вещь можно купить до 3 штук (легендарные — только 1).', 'Vienu un to pašu lietu var nopirkt līdz 3 gab. (leģendārās — tikai 1).'],
   };
   var bar = document.querySelector('.shop-bar'), box = document.querySelector('.shop-box'), meEl = document.querySelector('.shop-me');
   var me = null, owned = {}, shop = {}, filter = 'all';
@@ -31,7 +35,7 @@
   function buttons() {
     var B = window.PPBirds; if (!B || bar.children.length) return;
     var add = function (k, label, cls) { var b = document.createElement('button'); b.type = 'button'; b.className = 'pill-btn ' + (cls || ''); b.dataset.f = k; b.textContent = label; b.onclick = function () { filter = k; draw(); }; bar.appendChild(b); };
-    add('all', T.all[L]); add('stock', T.inStock[L], 'shop-instock');
+    add('all', T.all[L]);
     B.GIFT_KINDS.forEach(function (k) { add('kind:' + k[0], k[1][L]); });
     var br = document.createElement('span'); br.className = 'fl-coll-br'; bar.appendChild(br);
     B.GIFT_THEMES.forEach(function (t) { add('theme:' + t[0], t[1][L], 'fl-theme'); });
@@ -41,42 +45,50 @@
     if (me) { meEl.innerHTML = '<b>' + T.have[L].replace('{n}', me.btn ? me.btn.buttons : 0) + '</b> · <a href="' + pre + '/challenge/#works">' + T.how[L] + '</a>'; }
     else meEl.textContent = T.login[L];
   }
+  function item(k, v, id, money) {
+    var B = window.PPBirds, s = shop[key(k[0], v)] || { price: 0, stock: 0 }, have = owned[key(k[0], v)] || 0, leg = B.LEGEND && B.LEGEND.has(key(k[0], v)), lim = leg ? 1 : 3;
+    var t = document.createElement('figure'); t.className = 'fl-coll-item shop-item' + (s.stock > 0 ? '' : ' sold') + (have ? ' got' : '') + (leg ? ' legend' : '');
+    t.appendChild(B.giftPic(k[0], v, id, 84, me && me.avatar));
+    if (leg) { var lt = document.createElement('span'); lt.className = 'legend-tag'; lt.textContent = '★'; lt.title = T.legend[L]; t.appendChild(lt); }
+    var c = document.createElement('figcaption'); c.textContent = B.giftName(k[0], v, L); t.appendChild(c);
+    var info = document.createElement('p'); info.className = 'shop-price';
+    info.innerHTML = s.stock > 0 ? '<b>' + (s.price ? '🔘 ' + s.price : T.free[L]) + '</b><small>' + T.left[L].replace('{n}', s.stock) + '</small>' : '<small>' + T.sold[L] + '</small>';
+    t.appendChild(info);
+    if (have) { var m = document.createElement('span'); m.className = 'fl-coll-mark'; m.textContent = have >= lim ? T.max[L] : T.count[L].replace('{n}', have).replace('{m}', lim); t.appendChild(m); }
+    if (s.stock > 0 && me && have < lim) {
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'pill-btn shop-buy';
+      b.textContent = money >= s.price ? T.buy[L] : T.poor[L]; b.disabled = money < s.price;
+      b.onclick = function () { buy(k[0], v, s.price, b); }; t.appendChild(b);
+    }
+    return t;
+  }
   function draw() {
     var B = window.PPBirds; if (!B) return;
     buttons(); head();
     [].forEach.call(bar.children, function (b) { if (b.dataset) b.setAttribute('aria-pressed', String(b.dataset.f === filter)); });
-    var id = me ? me.id : 2, n = 0, money = me && me.btn ? me.btn.buttons : 0;
+    var id = me ? me.id : 2, money = me && me.btn ? me.btn.buttons : 0;
     var theme = filter.indexOf('theme:') === 0 ? B.GIFT_THEMES.filter(function (t) { return 'theme:' + t[0] === filter; })[0] : null;
     box.innerHTML = '';
-    B.GIFT_KINDS.forEach(function (k) {
-      if (filter.indexOf('kind:') === 0 && filter !== 'kind:' + k[0]) return;
-      var list = (B.GIFTS[k[0]] || []).filter(function (v) {
-        if (theme && theme[2].indexOf(key(k[0], v)) < 0) return false;
-        return filter !== 'stock' || ((shop[key(k[0], v)] || {}).stock > 0);
+    var rule = document.createElement('p'); rule.className = 'fl-all-lead'; rule.textContent = T.rule[L]; box.appendChild(rule);
+    // сначала то, что есть в наличии, ниже — чего нет
+    [true, false].forEach(function (inStock) {
+      var sec = document.createElement('section'); sec.className = 'shop-block' + (inStock ? ' on' : ' off');
+      var h2 = document.createElement('h2'); h2.className = 'shop-block-h'; h2.textContent = inStock ? T.onSale[L] : T.gone[L]; sec.appendChild(h2);
+      var n = 0;
+      B.GIFT_KINDS.forEach(function (k) {
+        if (filter.indexOf('kind:') === 0 && filter !== 'kind:' + k[0]) return;
+        var list = (B.GIFTS[k[0]] || []).filter(function (v) {
+          if (theme && theme[2].indexOf(key(k[0], v)) < 0) return false;
+          return ((shop[key(k[0], v)] || {}).stock > 0) === inStock;
+        });
+        if (!list.length) return;
+        var h = document.createElement('h3'); h.textContent = k[1][L]; sec.appendChild(h);
+        var g = document.createElement('div'); g.className = 'fl-coll-grid'; sec.appendChild(g);
+        list.forEach(function (v) { n++; g.appendChild(item(k, v, id, money)); });
       });
-      if (!list.length) return;
-      var h = document.createElement('h3'); h.textContent = k[1][L]; box.appendChild(h);
-      var g = document.createElement('div'); g.className = 'fl-coll-grid'; box.appendChild(g);
-      list.forEach(function (v) {
-        n++;
-        var s = shop[key(k[0], v)] || { price: 0, stock: 0 }, mine = owned[key(k[0], v)], leg = B.LEGEND && B.LEGEND.has(key(k[0], v));
-        var t = document.createElement('figure'); t.className = 'fl-coll-item shop-item' + (s.stock > 0 ? '' : ' sold') + (mine ? ' got' : '') + (leg ? ' legend' : '');
-        t.appendChild(B.giftPic(k[0], v, id, 84, me && me.avatar));
-        if (leg) { var lt = document.createElement('span'); lt.className = 'legend-tag'; lt.textContent = '★'; t.appendChild(lt); }
-        var c = document.createElement('figcaption'); c.textContent = B.giftName(k[0], v, L); t.appendChild(c);
-        var info = document.createElement('p'); info.className = 'shop-price';
-        info.innerHTML = s.stock > 0 ? '<b>' + (s.price ? '🔘 ' + s.price : T.free[L]) + '</b><small>' + T.left[L].replace('{n}', s.stock) + '</small>' : '<small>' + T.sold[L] + '</small>';
-        t.appendChild(info);
-        if (mine) { var m = document.createElement('span'); m.className = 'fl-coll-mark'; m.textContent = T.mine[L]; t.appendChild(m); }
-        else if (s.stock > 0 && me) {
-          var b = document.createElement('button'); b.type = 'button'; b.className = 'pill-btn shop-buy';
-          b.textContent = money >= s.price ? T.buy[L] : T.poor[L]; b.disabled = money < s.price;
-          b.onclick = function () { buy(k[0], v, s.price, b); }; t.appendChild(b);
-        }
-        g.appendChild(t);
-      });
+      if (!n && inStock) { var p = document.createElement('p'); p.className = 'fl-all-lead'; p.textContent = T.none[L]; sec.appendChild(p); }
+      if (n || inStock) box.appendChild(sec);
     });
-    if (!n) { var p = document.createElement('p'); p.className = 'fl-all-lead'; p.textContent = T.none[L]; box.appendChild(p); }
   }
   function buy(kind, item, price, b) {
     var B = window.PPBirds;
@@ -85,7 +97,7 @@
     fetch('/api/shop/buy', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ kind: kind, item: item }) })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (x) {
-        if (!x.ok) { alert(x.d.error === 'poor' ? T.poor[L] : x.d.error === 'soldout' ? T.sold[L] : x.d.error === 'have' ? T.mine[L] : T.err[L]); return load(); }
+        if (!x.ok) { alert(x.d.error === 'poor' ? T.poor[L] : x.d.error === 'soldout' ? T.sold[L] : x.d.error === 'limit' ? T.max[L] : T.err[L]); return load(); }
         if (window.PPToast) window.PPToast(T.ok[L]);
         load();
       }).catch(function () { alert(T.err[L]); b.disabled = false; });
@@ -97,7 +109,7 @@
     ]).then(function (a) {
       shop = {}; (a[0].items || []).forEach(function (r) { shop[key(r.kind, r.item)] = r; });
       me = a[1] && a[1].user ? a[1].user : null; owned = {};
-      if (me) (me.gifts || []).forEach(function (g) { owned[key(g.kind, g.item)] = g.status; });
+      if (me) (me.gifts || []).forEach(function (g) { if (g.status === 'bag' || g.status === 'new') owned[key(g.kind, g.item)] = (owned[key(g.kind, g.item)] || 0) + 1; });
       draw();
     });
   }

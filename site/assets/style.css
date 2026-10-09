@@ -2784,3 +2784,8 @@ html.sb-hide { --sb: 0px; }
 .give-f input { flex: 1 1 180px; padding: 10px 14px; border: 1.5px solid #CFC7E8; border-radius: 999px; font: 15px var(--sans); }
 .give-st { min-height: 1.2em; margin: 8px 0 0; color: #D85A30; font: 600 14px var(--sans); }
 .sw-bv-btn { margin: 6px 0; font: 700 14px var(--sans); color: #B8862B; }
+.shop-block { margin-top: 28px; }
+.shop-block-h { margin: 0 0 6px; font: 600 24px var(--serif); }
+.shop-block.off .shop-block-h { color: var(--muted); }
+.bag-item { position: relative; }
+.bag-n { position: absolute; top: 2px; right: 4px; padding: 0 6px; border-radius: 999px; background: #2B1A51; color: #F5D547; font: 700 12px var(--sans); }
