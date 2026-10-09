@@ -2789,3 +2789,7 @@ html.sb-hide { --sb: 0px; }
 .shop-block.off .shop-block-h { color: var(--muted); }
 .bag-item { position: relative; }
 .bag-n { position: absolute; top: 2px; right: 4px; padding: 0 6px; border-radius: 999px; background: #2B1A51; color: #F5D547; font: 700 12px var(--sans); }
+
+.adm-shop tr.adm-legend td { background: #FFF6D6; }
+.adm-shop tr.adm-legend .gift-pic { box-shadow: 0 0 0 3px #E9A93B; border-radius: 50%; }
+.adm-leg-tag { margin-left: 6px; padding: 2px 9px; border-radius: 999px; background: #E9A93B; color: #2B1A51; font: 700 12px var(--sans); white-space: nowrap; }
