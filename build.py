@@ -417,10 +417,27 @@ def rooms_data():
     (OUT / "assets" / "rooms-data.js").write_text("// Сгенерировано build.py из tools/rooms/*.json\nwindow.ROOMS = " + json.dumps(data) + ";\n")
 
 
+def search_entry(page, lang, path):
+    """Заголовок, описание и видимый текст страницы — для поиска по сайту."""
+    title = html.unescape(re.search(r"<title>(.*?)</title>", page, re.S).group(1)).replace(" · Pigeon Polly Art Lab", "")
+    h1 = re.search(r"<h1[^>]*>(.*?)</h1>", page, re.S)  # заголовок на странице уже переведён
+    if h1 and path:
+        title = html.unescape(re.sub(r"<[^>]+>", "", h1.group(1))).strip() or title
+    m = re.search(r'<meta name="description" content="([^"]*)"', page)
+    main = re.search(r"<main[^>]*>(.*?)</main>", page, re.S)
+    text = main.group(1) if main else ""
+    text = re.sub(r"<(script|style|svg|nav)[^>]*>.*?</\1>", " ", text, flags=re.S)
+    text = html.unescape(re.sub(r"<[^>]+>", " ", text))
+    text = re.sub(r"\s+", " ", text).strip()
+    pre = "" if lang == "en" else "/" + lang
+    return {"u": pre + "/" + (path + "/" if path else ""), "t": title, "d": html.unescape(m.group(1)) if m else "", "x": text[:4000]}
+
+
 def build():
     rooms_data()
     wobbleland_data()
     layout = (SRC / "layout.html").read_text()
+    search_index = {lang: [] for lang in LANGS}
     for path, title, file, desc in PAGES:
         body = (SRC / "pages" / file).read_text()
         while "{{gallery:" in body:
@@ -455,7 +472,12 @@ def build():
             dest = OUT / prefix / path / "index.html"
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_text(page)
+            if path not in UNLISTED:
+                search_index[lang].append(search_entry(page, lang, path))
         print("built", dest.relative_to(ROOT))
+    # индекс для поиска по сайту (кнопка 🔍 в шапке; статьи блога ищутся отдельно на сервере)
+    for lang, entries in search_index.items():
+        (OUT / "assets" / f"search-{lang}.json").write_text(json.dumps(entries, ensure_ascii=False, separators=(",", ":")))
     # 404
     nf = layout.replace("{{title}}", "Page not found · Pigeon Polly Art Lab").replace("{{description}}", "")
     nf = nf.replace("{{canonical}}", SITE_URL + "/").replace("{{nav}}", nav_html("404")).replace("{{footer_map}}", footer_html()).replace("{{body_class}}", "inner")

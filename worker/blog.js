@@ -227,6 +227,25 @@ export async function blogApi(req, env, url, h) {
   }
 
   // блок блога на главной: самая новая статья + избранные (★)
+  // поиск по статьям (для 🔍 в шапке): заголовок, описание, текст и теги на любом языке
+  if (m === 'GET' && p === '/api/blog/search') {
+    const lang = LANGS.includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
+    const q = String(url.searchParams.get('q') || '').trim().toLowerCase().slice(0, 80);
+    if (q.length < 2) return json({ posts: [] });
+    await loadTags(env);
+    const words = q.split(/\s+/).filter(Boolean);
+    const rows = (await env.DB.prepare("SELECT * FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC").all()).results;
+    const hits = [];
+    for (const x of rows) {
+      const hay = [...LANGS.flatMap(l => [x['t_' + l], x['d_' + l], stripTags(x['b_' + l])]), ...tagsOf(x).map(g => g + ' ' + tagLabel(g, lang))].join(' ').toLowerCase();
+      if (!words.every(w => hay.includes(w))) continue;
+      const t = field(x, 't', lang), inTitle = words.every(w => LANGS.some(l => String(x['t_' + l] || '').toLowerCase().includes(w)));
+      hits.push({ t, d: field(x, 'd', lang), u: blogUrl(lang, x.slug), cover: x.cover || '', score: inTitle ? 2 : 1 });
+      if (hits.length >= 30) break;
+    }
+    hits.sort((a, b) => b.score - a.score);
+    return json({ posts: hits.slice(0, 12) }, 200, { 'cache-control': 'public, max-age=60' });
+  }
   if (m === 'GET' && p === '/api/blog/home') {
     const lang = LANGS.includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
     await loadTags(env);

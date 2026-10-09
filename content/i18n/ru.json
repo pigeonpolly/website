@@ -284,5 +284,6 @@
   "</span> Read on the site</button>": "</span> Читать на сайте</button>",
   "</span> Read on Patreon</button>": "</span> Читать на Patreon</button>",
   "aria-label=\"Where to read\"": "aria-label=\"Где читать\"",
-  "<h2>My notes: six themes</h2>": "<h2>Мои заметки: шесть тем</h2>"
+  "<h2>My notes: six themes</h2>": "<h2>Мои заметки: шесть тем</h2>",
+  "aria-label=\"Search the site\"": "aria-label=\"Поиск по сайту\""
 }
