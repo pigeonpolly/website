@@ -519,6 +519,12 @@ async function route(req, env, url) {
     await env.DB.prepare('UPDATE users SET avatar = ? WHERE id = ?').bind(JSON.stringify(a), u.id).run();
     return json({ ok: true, avatar: a });
   }
+  // что у птички уже есть (для окна подарка в кабинете)
+  if (m === 'GET' && p === '/api/admin/gifts') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    return json({ gifts: (await env.DB.prepare('SELECT kind, item, status FROM gifts WHERE user_id = ?').bind(Number(url.searchParams.get('uid'))).all()).results });
+  }
   // админ дарит семечко
   if (m === 'POST' && p === '/api/admin/gift') {
     const u = await needUser(req, env);

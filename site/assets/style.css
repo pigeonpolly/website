@@ -2559,3 +2559,10 @@ html.sb-hide { --sb: 0px; }
 .pp-ava.fr-magic { box-shadow: 0 0 0 4px #B39DDB, 0 0 18px rgba(155,93,229,.6); }
 .pp-ava.fr-spooky { box-shadow: 0 0 0 4px #E8792B, 0 0 0 7px #2A2433, 0 6px 16px rgba(0,0,0,.3); }
 .pp-ava.fr-neon { box-shadow: 0 0 0 3px #39E07A, 0 0 0 6px #0F0F2D, 0 0 0 8px #F08BC0, 0 0 22px rgba(57,224,122,.55); }
+.adm-gift-prev figure { margin: 0; text-align: center; }
+.adm-gift-prev figcaption { font: 700 12px var(--sans); color: #8C7FB0; margin-top: 6px; }
+.adm-gift-arrow { font-size: 22px; color: #8C7FB0; }
+.adm-gift-items button { position: relative; }
+.adm-gift-items button.owned { background: #EEF8F0; border-color: #A8DDB5; }
+.adm-gift-items button.worn { box-shadow: inset 0 0 0 2px #4CC38A; }
+.adm-own { position: absolute; top: 2px; right: 4px; font: 700 12px var(--sans); color: #2E7D4F; }
