@@ -222,7 +222,7 @@
     ORDER.forEach(id => { const sp = sprites[id]; if (sp) sp.hidden = st.pinned.includes(id) || st.solved; });
   };
   const close = () => { modal.hidden = true; };
-  const card = (html, wide) => { modal.innerHTML = `<div class="q-card${wide ? ' wide' : ''}">${html}<button type="button" class="q-x" data-q="close">✕</button></div>`; modal.hidden = false; };
+  const card = (html, wide) => { modal.innerHTML = `<div class="q-card${wide ? ' wide' : ''}"><button type="button" class="q-x" data-q="close" aria-label="${t(UI.close)}">✕</button>${html}</div>`; modal.hidden = false; };
   const openClue = id => {
     const c = C[id];
     if (c.kind === 'witness') { openWitness(c.w); return; }

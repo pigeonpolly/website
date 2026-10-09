@@ -63,7 +63,7 @@
     pockets.innerHTML = `<span>${t(UI.inv)}:</span>` + ORDER.filter(id => st.found.includes(id) && !st.order.includes(id))
       .map(id => `<button type="button" data-att="${id}"><img src="/images/rooms/prop-page.png" alt="">${esc(t(P[id].title))}</button>`).join('');
   };
-  const card = html => { modal.innerHTML = `<div class="q-card">${html}<button type="button" class="q-x" data-q="close">✕</button></div>`; modal.hidden = false; };
+  const card = html => { modal.innerHTML = `<div class="q-card"><button type="button" class="q-x" data-q="close" aria-label="✕">✕</button>${html}</div>`; modal.hidden = false; };
   const close = () => { modal.hidden = true; };
   const openMail = () => {
     st.read = true; save();

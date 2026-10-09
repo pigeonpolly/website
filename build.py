@@ -221,6 +221,20 @@ def gallery_html(name):
     return '<div class="gallery">' + "\n".join(out) + "</div>"
 
 
+_bust_cache = {}
+def bust(html):
+    """Метка версии у своих скриптов и стилей (/assets/x.js?v=хеш): после обновления сайта телефоны берут новые файлы, а не старые из кэша."""
+    import hashlib
+    def ver(m):
+        path = m.group(2)
+        if path not in _bust_cache:
+            f = OUT / path.lstrip("/")
+            _bust_cache[path] = hashlib.md5(f.read_bytes()).hexdigest()[:8] if f.exists() else ""
+        v = _bust_cache[path]
+        return f'{m.group(1)}="{path}?v={v}"' if v else m.group(0)
+    return re.sub(r'(src|href)="(/assets/[\w.-]+\.(?:js|css))"', ver, html)
+
+
 def ebooks_html():
     data = json.loads((CONTENT / "ebooks.json").read_text())
     out = []
@@ -481,6 +495,7 @@ def build():
                     .replace("{{content}}", page_body))
             page = localize(page, lang)
             page = page.replace("{{hreflang}}", hreflang).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
+            page = bust(page)
             dest = OUT / prefix / path / "index.html"
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_text(page)
@@ -498,7 +513,7 @@ def build():
     nf = nf.replace("{{canonical}}", SITE_URL + "/").replace("{{nav}}", nav_html("404")).replace("{{footer_map}}", footer_html()).replace("{{body_class}}", "inner")
     nf = nf.replace("{{content}}", (SRC / "pages" / "404.html").read_text())
     nf = nf.replace("{{hreflang}}", "").replace("{{lang_switch}}", "")
-    (OUT / "404.html").write_text(nf)
+    (OUT / "404.html").write_text(bust(nf))
     # sitemap
     urls = "".join(f"<url><loc>{SITE_URL}/{(v + '/') if v else ''}{(p + '/') if p else ''}</loc></url>"
                    for p, *_ in PAGES if p not in UNLISTED for v in LANGS.values())
