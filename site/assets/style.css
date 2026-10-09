@@ -2566,3 +2566,14 @@ html.sb-hide { --sb: 0px; }
 .adm-gift-items button.owned { background: #EEF8F0; border-color: #A8DDB5; }
 .adm-gift-items button.worn { box-shadow: inset 0 0 0 2px #4CC38A; }
 .adm-own { position: absolute; top: 2px; right: 4px; font: 700 12px var(--sans); color: #2E7D4F; }
+/* окно подарка — широкое: слева вещи, справа превью, записка и кнопки */
+@media (min-width: 761px) {
+  .adm-gift-card { width: min(1120px, calc(100vw - 48px)); max-height: calc(100vh - 48px); display: grid; grid-template-columns: minmax(0, 1fr) 320px; grid-template-areas: "t t" "k k" "i p" "i n" "i b" "i ."; grid-template-rows: auto auto auto auto auto 1fr; gap: 0 24px; align-items: start; }
+  .adm-gift-card h3 { grid-area: t; }
+  .adm-gift-kinds { grid-area: k; }
+  .adm-gift-items { grid-area: i; max-height: calc(100vh - 240px); grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); }
+  .adm-gift-prev { grid-area: p; flex-wrap: wrap; justify-content: center; margin-top: 0; }
+  .adm-gift-prev .be-note { flex: 1 1 100%; font-size: 13px; }
+  .adm-gift-card > input { grid-area: n; }
+  .adm-gift-card > .adm-quick { grid-area: b; }
+}
