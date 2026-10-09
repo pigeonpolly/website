@@ -304,5 +304,8 @@
   "aria-label=\"Pigeon Polly in numbers\"": "aria-label=\"Pigeon Polly в цифрах\"",
   "\">🐦 Join the flock</a>": "\">🐦 Присоединиться к стае</a>",
   "\">🔍 Play the detective game</a>": "\">🔍 Сыграть в детектив</a>",
-  "\">What is Wobbleland?</a>": "\">Что такое Wobbleland?</a>"
+  "\">What is Wobbleland?</a>": "\">Что такое Wobbleland?</a>",
+  ">All birds<": ">Все птицы<",
+  ">Tap a bird to see its profile, badges and bag.<": ">Нажмите на птичку, чтобы увидеть её профиль, бейджи и сумку.<",
+  "placeholder=\"🔍 Nickname\" aria-label=\"Nickname\"": "placeholder=\"🔍 Ник\" aria-label=\"Ник\""
 }

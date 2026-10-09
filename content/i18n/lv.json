@@ -304,5 +304,8 @@
   "aria-label=\"Pigeon Polly in numbers\"": "aria-label=\"Pigeon Polly skaitļos\"",
   "\">🐦 Join the flock</a>": "\">🐦 Pievienoties baram</a>",
   "\">🔍 Play the detective game</a>": "\">🔍 Spēlēt detektīvspēli</a>",
-  "\">What is Wobbleland?</a>": "\">Kas ir Wobbleland?</a>"
+  "\">What is Wobbleland?</a>": "\">Kas ir Wobbleland?</a>",
+  ">All birds<": ">Visi putni<",
+  ">Tap a bird to see its profile, badges and bag.<": ">Pieskaries putnam, lai redzētu tā profilu, nozīmītes un somu.<",
+  "placeholder=\"🔍 Nickname\" aria-label=\"Nickname\"": "placeholder=\"🔍 Segvārds\" aria-label=\"Segvārds\""
 }

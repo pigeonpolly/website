@@ -2577,3 +2577,10 @@ html.sb-hide { --sb: 0px; }
   .adm-gift-card > input { grid-area: n; }
   .adm-gift-card > .adm-quick { grid-area: b; }
 }
+.fl-all { padding: 24px var(--gutter) 56px; max-width: 1280px; margin: 0 auto; }
+.fl-all-lead { color: var(--muted); margin: 0 0 12px; }
+.fl-all-q { width: min(320px, 100%); padding: 10px 16px; border-radius: 999px; border: 1.5px solid var(--line); background: rgba(0,0,0,.2); color: var(--text); font: 500 15px var(--sans); margin-bottom: 18px; }
+.fl-all-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(110px, 1fr)); gap: 16px 10px; }
+.fl-all-bird { display: flex; flex-direction: column; align-items: center; gap: 8px; color: var(--text); text-decoration: none; font: 600 14px var(--sans); padding: 8px 4px; border-radius: 14px; transition: background .2s, transform .2s; }
+.fl-all-bird:hover { background: rgba(255,255,255,.07); transform: translateY(-3px); }
+.fl-all-bird span:last-child { max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }

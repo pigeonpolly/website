@@ -379,6 +379,11 @@ async function route(req, env, url) {
     if (me && !me.banned && !rows.some(r => r.id === me.id)) rows = [{ id: me.id, nick: me.nick, avatar: me.avatar }, ...rows.slice(0, LIMIT - 1)];
     return json({ total, recent: total > LIMIT, birds: rows.map(r => ({ id: r.id, nick: r.nick || null, me: !!me && r.id === me.id, avatar: avatarOf(r) })) });
   }
+  // все птицы с ником — для списка на странице «Стая»
+  if (m === 'GET' && p === '/api/birds') {
+    const rows = (await env.DB.prepare("SELECT id, nick, avatar FROM users WHERE banned = 0 AND nick IS NOT NULL AND nick != '' ORDER BY created_at LIMIT 2000").all()).results;
+    return json({ birds: rows.map(r => ({ id: r.id, nick: r.nick, avatar: avatarOf(r) })) }, 200, { 'cache-control': 'public, max-age=60' });
+  }
   // «Найти птичку»: по нику (сначала точное совпадение, потом начало ника)
   // ---------- подписка на новость о книге ----------
   if (m === 'POST' && p === '/api/subscribe') {
