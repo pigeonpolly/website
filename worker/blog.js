@@ -11,7 +11,7 @@ const MAX_COMMENT = 1500;
 const T = {
   en: {
     blog: 'Blog', head: 'Notes from the lab', lead: 'Articles about drawing, learning and creativity: what I try, what works, and what Polly thinks about it.',
-    tags: 'Tags', popular: 'Popular', all: 'All posts', empty: 'No posts here yet. The first one is on its way!',
+    tags: 'Tags', moreTags: 'Show all tags', lessTags: 'Show less', popular: 'Popular', all: 'All posts', empty: 'No posts here yet. The first one is on its way!',
     comments: 'Comments', noComments: 'No comments yet. Be the first!', back: '← All posts', tagged: 'Posts tagged',
     min: 'min read', share: 'Share', copy: 'Copy link', copied: 'Link copied ✓', email: 'E-mail', draft: 'Draft', read: 'Read →', months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     descr: 'Notes on drawing, learning and creativity by Alina Otkinska and Pigeon Polly.',
@@ -20,7 +20,7 @@ const T = {
   },
   ru: {
     blog: 'Блог', head: 'Заметки из лаборатории', lead: 'Статьи о рисовании, обучении и творчестве: что я пробую, что работает и что об этом думает Полли.',
-    tags: 'Теги', popular: 'Популярное', all: 'Все статьи', empty: 'Здесь пока нет статей. Первая уже в пути!',
+    tags: 'Теги', moreTags: 'Показать все теги', lessTags: 'Свернуть', popular: 'Популярное', all: 'Все статьи', empty: 'Здесь пока нет статей. Первая уже в пути!',
     comments: 'Комментарии', noComments: 'Комментариев пока нет. Будьте первым!', back: '← Все статьи', tagged: 'Статьи с тегом',
     min: 'мин чтения', share: 'Поделиться', copy: 'Скопировать ссылку', copied: 'Ссылка скопирована ✓', email: 'Почта', draft: 'Черновик', read: 'Читать →', months: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
     descr: 'Заметки о рисовании, обучении и творчестве от Алины Откинской и голубя Полли.',
@@ -29,7 +29,7 @@ const T = {
   },
   lv: {
     blog: 'Blogs', head: 'Piezīmes no laboratorijas', lead: 'Raksti par zīmēšanu, mācīšanos un radošumu: ko es izmēģinu, kas strādā un ko par to domā Pollija.',
-    tags: 'Birkas', popular: 'Populārākie', all: 'Visi raksti', empty: 'Šeit vēl nav rakstu. Pirmais jau ceļā!',
+    tags: 'Birkas', moreTags: 'Rādīt visas birkas', lessTags: 'Sakļaut', popular: 'Populārākie', all: 'Visi raksti', empty: 'Šeit vēl nav rakstu. Pirmais jau ceļā!',
     comments: 'Komentāri', noComments: 'Komentāru vēl nav. Esi pirmais!', back: '← Visi raksti', tagged: 'Raksti ar birku',
     min: 'min lasīšanas', share: 'Dalīties', copy: 'Kopēt saiti', copied: 'Saite nokopēta ✓', email: 'E-pasts', draft: 'Melnraksts', read: 'Lasīt →', months: ['janv.', 'febr.', 'marts', 'apr.', 'maijs', 'jūn.', 'jūl.', 'aug.', 'sept.', 'okt.', 'nov.', 'dec.'],
     descr: 'Piezīmes par zīmēšanu, mācīšanos un radošumu no Alīnas Otkinskas un baloža Pollijas.',
@@ -868,7 +868,11 @@ function sidebar(posts, lang, activeTag, activeMonth = '', post = false, activeS
   const years = [...new Set(Object.keys(months).map(k => k.slice(0, 4)))].sort().reverse();
   for (const p of posts) for (const g of tagsOf(p)) count[g] = (count[g] || 0) + 1;
   // теги — по убыванию частоты: самый частый золотой, следующие три фиолетовые, остальные белые
-  const tags = Object.entries(count).sort((a, b) => b[1] - a[1] || tagLabel(a[0], lang).localeCompare(tagLabel(b[0], lang))).slice(0, 24);
+  const tags = Object.entries(count).sort((a, b) => b[1] - a[1] || tagLabel(a[0], lang).localeCompare(tagLabel(b[0], lang)));
+  // первые 12 видны сразу, остальные — под кнопкой «Показать все теги» (раскрыта, если выбран тег из хвоста)
+  const TOP = 12, tagHtml = ([g, n], i) =>
+    `<a class="bs-tag${i === 0 ? ' gold' : i < 4 ? ' violet' : ''}" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}"${g === activeTag ? ' aria-current="true"' : ''}>${esc(tagLabel(g, lang))}<span>${n}</span></a>`;
+  const restOpen = tags.slice(TOP).some(([g]) => g === activeTag);
   const popular = [...posts].sort((a, b) => (b.likes * 5 + b.views + b.comments * 3) - (a.likes * 5 + a.views + a.comments * 3)).slice(0, 5);
   const list = arr => `<ul class="bs-list">${arr.map(p => `<li><a href="${blogUrl(lang, p.slug)}" title="${esc(field(p, 't', lang))}">${esc(field(p, 't', lang))}</a></li>`).join('')}</ul>`;
   return `<aside class="bl-side">
@@ -876,8 +880,7 @@ function sidebar(posts, lang, activeTag, activeMonth = '', post = false, activeS
       ${!post && fav.length > 1 ? `<p class="bl-more"><a href="${blogUrl(lang, '', '?fav=1')}">${t.onlyFav} →</a></p>` : ''}</section>` : ''}
     ${secs.length ? `<section><h2>${t.sections}</h2><ul class="bs-secs">${secs.map(x =>
       `<li${secCount[x.slug] ? '' : ' class="bs-empty" title="Пока пусто — видите только вы"'}><a href="${blogUrl(lang, '', '?section=' + encodeURIComponent(x.slug))}"${x.slug === activeSection ? ' aria-current="true"' : ''}>${esc(x[lang] || x.en)}</a> <span>${secCount[x.slug] || 0}</span></li>`).join('')}</ul></section>` : ''}
-    ${tags.length ? `<section><h2>${t.tags}</h2><p class="bs-tags">${tags.map(([g, n], i) =>
-      `<a class="bs-tag${i === 0 ? ' gold' : i < 4 ? ' violet' : ''}" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}"${g === activeTag ? ' aria-current="true"' : ''}>${esc(tagLabel(g, lang))}<span>${n}</span></a>`).join('')}</p></section>` : ''}
+    ${tags.length ? `<section><h2>${t.tags}</h2><p class="bs-tags">${tags.slice(0, TOP).map(tagHtml).join('')}</p>${tags.length > TOP ? `<details class="bs-moretags"${restOpen ? ' open' : ''}><summary><span class="m">${t.moreTags} (${tags.length})</span><span class="l">${t.lessTags}</span></summary><p class="bs-tags">${tags.slice(TOP).map((x, i) => tagHtml(x, i + TOP)).join('')}</p></details>` : ''}</section>` : ''}
     ${years.length ? `<section><h2>${t.archive}</h2><ul class="bl-arch">${years.map(y => `<li><b>${y}</b><ul>${Object.keys(months).filter(k => k.startsWith(y)).sort().reverse().map(k =>
       `<li><a href="${blogUrl(lang, '', '?month=' + k)}"${k === activeMonth ? ' aria-current="true"' : ''}>${t.monthsFull[+k.slice(5) - 1]}</a> <span>${months[k]}</span></li>`).join('')}</ul></li>`).join('')}</ul></section>` : ''}
     ${popular.length ? `<section><h2>${t.popular}</h2>${list(popular)}</section>` : ''}

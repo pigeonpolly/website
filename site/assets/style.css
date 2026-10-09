@@ -2308,3 +2308,14 @@ details.am-art .am-series { padding: 0 24px 24px; }
 /* Блог: длинные ссылки и слова переносятся, а не вылезают за край статьи */
 .bp-body, .bp-head { overflow-wrap: anywhere; }
 .bp-body a { word-break: break-word; overflow-wrap: anywhere; }
+
+/* Блог: хвост тегов под кнопкой «Показать все теги» */
+.bs-moretags { margin-top: 6px; }
+.bs-moretags > summary { list-style: none; cursor: pointer; display: inline-block; margin-top: 4px; padding: 4px 0; color: #5B47C2; font: 700 13px var(--sans); }
+.bs-moretags > summary::-webkit-details-marker { display: none; }
+.bs-moretags > summary::after { content: ' ▾'; }
+.bs-moretags[open] > summary::after { content: ' ▴'; }
+.bs-moretags .l, .bs-moretags[open] .m { display: none; }
+.bs-moretags[open] .l { display: inline; }
+.bs-moretags[open] > summary { order: 2; }
+.bs-moretags[open] { display: flex; flex-direction: column; align-items: flex-start; }
