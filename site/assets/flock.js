@@ -40,13 +40,15 @@
     W = Math.round(cw / S);
     cv.width = W * 2; cv.height = H * 2; cv.style.height = Math.round(H * S) + 'px'; // холст в 2 раза подробнее: детальные птички и мелкие детали сцены
     props = { bin: Math.round(W * .05), bench: Math.round(W * .13), cup: Math.round(W * .13) + 52, bun: Math.round(W * .52), baguette: Math.round(W * .68), book: Math.round(W * .86), lamp: Math.round(W * .955) };
-    perches = [{ x: props.bench + 10, y: 66 }, { x: props.bench + 24, y: 66 }, { x: props.bench + 38, y: 66 }, { x: props.bin + 6, y: 62 }].map(p => ({ ...p, by: null }));
+    if (loc) props.lamp = loc === 'diner' ? Math.round(W * .55) : Math.round(W * .2);
+    perches = scenePerches();
     bg = drawBackground();
   }
   function drawBackground() {
     const c = document.createElement('canvas'); c.width = W * 2; c.height = H * 2;
     const g = c.getContext('2d'); g.scale(2, 2);
     const r = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(Math.round(x), Math.round(y), w, h); };
+    if (loc) { g.translate(0, OFF); (loc === 'diner' ? drawDiner : drawBookstore)(g); return c; } // отдельная локация — своя сцена целиком
     if (OFF) { // высокое небо: темнее кверху, звёзды и луна
       for (let y = 0; y < OFF; y++) { const k = y / OFF; r(0, y, W, 1, `rgb(${Math.round(24 + 19 * k)},${Math.round(14 + 14 * k)},${Math.round(56 + 26 * k)})`); }
       for (let i = 0; i < W * OFF / 220; i++) r((i * 97) % W, (i * 61) % OFF, 1, 1, i % 4 ? '#F5C4B3' : '#FFFFFF');
@@ -82,7 +84,6 @@
     for (const y of [67, 70]) { r(Bx - 1, y, 50, 3, '#9C6B3F'); r(Bx - 1, y, 50, 1, '#B98652'); }
     r(Bx, 84, 48, 1, 'rgba(0,0,0,.18)');
     details(g);
-    if (loc) drawPlace(g, loc); // здание поверх листвы
     return c;
   }
   // ---------- локации: время от времени за площадью открывается ретро-закусочная или книжный, птички заходят внутрь ----------
@@ -91,51 +92,110 @@
   const placeX = () => Math.round(W * .52), DOOR_Y = 47;
   const GLYPH = { D: ['##.', '#.#', '#.#', '#.#', '##.'], I: ['###', '.#.', '.#.', '.#.', '###'], N: ['#.#', '###', '###', '#.#', '#.#'], E: ['###', '#..', '##.', '#..', '###'], R: ['##.', '#.#', '##.', '#.#', '#.#'],
     B: ['##.', '#.#', '##.', '#.#', '##.'], O: ['.#.', '#.#', '#.#', '#.#', '.#.'], K: ['#.#', '#.#', '##.', '#.#', '#.#'], S: ['.##', '#..', '.#.', '..#', '##.'] };
-  function drawPlace(g, kind) {
-    const r = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(Math.round(x * 2) / 2, Math.round(y * 2) / 2, w, h); };
-    const text = (str, x, y, col, k = 1) => [...str].forEach((ch, i) => (GLYPH[ch] || []).forEach((row, yy) => [...row].forEach((c, xx) => { if (c === '#') r(x + (i * 4 + xx) * k, y + yy * k, k, k, col); })));
-    const X = placeX(), w = 70, x0 = X - w / 2;
-    if (kind === 'diner') {
-      // корпус как вагончик: бирюзовый с кремовой полосой, скруглённая крыша
-      r(x0, 14, w, 33, '#4FB3A9'); r(x0 + 2, 12, w - 4, 2, '#4FB3A9'); r(x0 + 5, 11, w - 10, 1, '#4FB3A9');
-      r(x0, 14, w, 1, '#7FD6CC'); r(x0, 30, w, 3, '#FFF3D6'); r(x0, 33, w, 1, '#E0443A'); r(x0, 44, w, 3, '#2F7F78');
-      for (let x = x0 + 2; x < x0 + w - 2; x += 4) r(x, 44.5, 2, .5, '#3E9A92');
-      // вывеска DINER с неоном
-      r(X - 14, 2, 28, 9, '#2B2340'); r(X - 13, 3, 26, 7, '#3A2F58'); text('DINER', X - 10, 4, '#FF6FB5', 1);
-      r(X - 1, 11, 2, 1, '#2B2340');
-      // окна с жалюзи и тёплым светом
-      for (const wx of [x0 + 4, x0 + 18, X + 9, X + 23]) { r(wx, 17, 11, 11, '#2B2340'); r(wx + 1, 18, 9, 9, '#FFE7A3'); for (let y = 19; y < 27; y += 2) r(wx + 1, y, 9, .5, '#F5C77E'); r(wx + 1, 18, 3, 1, '#FFF8E0'); }
-      // дверь с иллюминатором и навесом в полоску
-      r(X - 5, 31, 10, 16, '#2B2340'); r(X - 4, 32, 8, 15, '#E0443A'); r(X - 2, 34, 4, 4, '#FFE7A3'); r(X - 2, 34, 4, .5, '#2B2340'); r(X + 2, 40, 1, 1, '#F5D547');
-      for (let i = 0; i < 8; i++) r(X - 8 + i * 2, 28, 2, 2, i % 2 ? '#FFFFFF' : '#E0443A');
-      // табличка с кофе и пирогом
-      r(x0 + 5, 35, 12, 7, '#FFF3D6'); r(x0 + 7, 37, 3, 3, '#FFFFFF'); r(x0 + 10, 38, 1, 1, '#FFFFFF'); r(x0 + 7.5, 37.5, 2, 1, '#6B3E26'); r(x0 + 12, 38, 4, 3, '#E9A93B'); r(x0 + 12, 38, 4, 1, '#C0582F');
-      r(X + 15, 35, 14, 7, '#FFF3D6'); for (let i = 0; i < 3; i++) r(X + 17 + i * 4, 37, 2, 3, ['#E0443A', '#4CC38A', '#4A7BD8'][i]);
-    } else {
-      // кирпичный дом, тёмная вывеска BOOKS, зелёный навес, витрина с книгами
-      r(x0, 8, w, 39, '#A0503C');
-      for (let y = 8, row = 0; y < 47; y += 3, row++) { r(x0, y, w, .5, '#7E3A2C'); for (let x = x0 + (row % 2 ? 0 : 3); x < x0 + w; x += 6) r(x, y, .5, 3, '#7E3A2C'); }
-      r(x0 - 1, 6, w + 2, 3, '#5A2A20'); r(x0 - 1, 6, w + 2, 1, '#7E3A2C');
-      r(X - 16, 10, 32, 9, '#1F3B2E'); r(X - 15, 11, 30, 7, '#2B5A44'); text('BOOKS', X - 10, 12, '#F5D547', 1);
-      for (let i = 0; i < 18; i++) r(x0 + 2 + i * (w - 4) / 18, 21, (w - 4) / 18, 3, i % 2 ? '#FFFFFF' : '#3E8E4F');
-      for (let i = 0; i < 18; i++) r(x0 + 2 + i * (w - 4) / 18 + .5, 24, (w - 4) / 18 - 1, 1, i % 2 ? '#E8E8E8' : '#2F7040');
-      // витрины: полки с корешками
-      const spines = ['#E0443A', '#4A7BD8', '#F5D547', '#4CC38A', '#9B5DE5', '#F08BC0', '#E9A93B', '#FFFDF5'];
-      for (const wx of [x0 + 4, X + 9]) {
-        r(wx, 26, 21, 18, '#3A2C22'); r(wx + 1, 27, 19, 16, '#FFE7A3');
-        for (const sy of [28, 35]) { for (let i = 0; i < 9; i++) r(wx + 1.5 + i * 2, sy + (i % 3 === 1 ? 1 : 0), 1.5, 6 - (i % 3 === 1 ? 1 : 0), spines[(i + sy) % spines.length]); r(wx + 1, sy + 6, 19, 1, '#6B4A32'); }
+  // ---------- интерьеры локаций (координаты как у сквера: пол — от y=46, ходят по 90–128) ----------
+  const px = g => (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(Math.round(x * 2) / 2, Math.round(y * 2) / 2, w, h); };
+  const hashN = n => { const x = Math.sin(n * 127.1) * 43758.5453; return x - Math.floor(x); };
+  function windowNight(r, x, y, w, h, frame) {
+    r(x - 1, y - 1, w + 2, h + 2, frame); r(x, y, w, h, '#1B1035');
+    for (let i = 0; i < h; i++) r(x, y + i, w, 1, `rgba(80,60,140,${i / h * .5})`);
+    for (let i = 0; i < w * h / 40; i++) r(x + hashN(i + x) * w, y + hashN(i + y) * h * .7, .5, .5, i % 3 ? '#F5C4B3' : '#FFFFFF');
+    r(x + w * .7, y + 3, 3, 3, '#FFF3D6'); r(x + w * .7 + 1, y + 4, 1, 1, '#EFE0BC');
+    r(x + w / 2 - .5, y, 1, h, frame); r(x, y + h / 2 - .5, w, 1, frame);
+  }
+  function drawDiner(g) {
+    const r = px(g);
+    // стены: мятная сверху, красная панель снизу с белой и хромовой полосками
+    r(0, -OFF, W, OFF + 46, '#9ED9CF');
+    for (let x = 0; x < W; x += 8) r(x, -OFF, .5, OFF + 28, 'rgba(255,255,255,.18)');
+    r(0, -OFF, W, Math.min(OFF, 6) + 2, '#6FB8AD');
+    r(0, 27, W, 2, '#FFFFFF'); r(0, 29, W, 17, '#C8323C'); for (let x = 0; x < W; x += 6) r(x + 2, 30, 1, 15, '#B02A33'); r(0, 44, W, 2, '#D7DEE3');
+    // окна в ночь, неоновая вывеска, часы
+    for (const wx of [W * .06, W * .25]) windowNight(r, wx, 4, 22, 18, '#D7DEE3');
+    const nx = W * .52;
+    r(nx - 18, 4, 36, 12, '#2B2340'); r(nx - 17, 5, 34, 10, '#3A2F58');
+    [...'DINER'].forEach((ch, i) => (GLYPH[ch] || []).forEach((row, yy) => [...row].forEach((c, xx) => { if (c === '#') { r(nx - 14 + i * 6 + xx * 1.5, 6 + yy * 1.5, 1.5, 1.5, '#FF6FB5'); } })));
+    g.fillStyle = 'rgba(255,111,181,.18)'; g.fillRect(nx - 22, 1, 44, 18);
+    const cx0 = W * .82; r(cx0 - 5, 6, 10, 10, '#FFFFFF'); r(cx0 - 6, 7, 12, 8, '#FFFFFF'); r(cx0 - 5, 6, 10, .5, '#C8323C'); r(cx0, 8, .5, 3.5, '#2B2340'); r(cx0, 11, 3, .5, '#2B2340');
+    // пол в шахматку
+    for (let y = 46, row = 0; y < H; y += 6, row++) for (let x = 0, i = 0; x < W; x += 6, i++) r(x, y, 6, 6, (i + row) % 2 ? '#2B2340' : '#F4F1EA');
+    for (let y = 46; y < H; y += 6) r(0, y, W, .5, 'rgba(255,255,255,.12)');
+    // стойка с хромом, на ней кофеварка, торт под колпаком, молочные коктейли, кетчуп
+    const s0 = Math.round(W * .32), s1 = Math.round(W * .78);
+    r(s0, 50, s1 - s0, 2, '#E0443A'); r(s0, 50, s1 - s0, .5, '#FF7A6E'); r(s0, 52, s1 - s0, 1, '#D7DEE3');
+    r(s0, 53, s1 - s0, 13, '#F4F1EA'); for (let x = s0 + 2; x < s1; x += 6) r(x, 53, 2, 13, '#E0443A'); r(s0, 66, s1 - s0, 1.5, '#AEB8C0');
+    r(s0 + 4, 40, 9, 10, '#AEB8C0'); r(s0 + 5, 41, 7, 4, '#2B2340'); r(s0 + 6, 46, 2, 2, '#FFFFFF'); r(s0 + 6.5, 45.5, 1, .5, '#6B3E26');
+    const ck = s0 + 26; r(ck - 5, 42, 10, 8, 'rgba(220,240,255,.45)'); r(ck - 4, 41, 8, 1, 'rgba(220,240,255,.45)'); r(ck - 4, 46, 8, 3, '#F08BC0'); r(ck - 4, 45, 8, 1, '#FFFFFF'); r(ck - 1, 44, 2, 1, '#E0443A'); r(ck - 6, 49, 12, 1, '#D7DEE3');
+    for (const [mx, c] of [[s0 + 44, '#F7A8C4'], [s0 + 50, '#8B5A2B']]) { r(mx, 44, 4, 6, 'rgba(255,255,255,.7)'); r(mx + .5, 45, 3, 4, c); r(mx + .5, 43, 3, 1.5, '#FFFFFF'); r(mx + 2, 40, .5, 4, '#E0443A'); }
+    r(s1 - 14, 45, 2, 5, '#E0443A'); r(s1 - 11, 45, 2, 5, '#F5D547'); r(s1 - 14, 44, 2, 1, '#2B2340'); r(s1 - 11, 44, 2, 1, '#2B2340');
+    // табуреты перед стойкой
+    for (let i = 0; i < 5; i++) { const x = s0 + 8 + i * ((s1 - s0 - 16) / 4); r(x - 4, 68, 8, 2, '#E0443A'); r(x - 3, 67.5, 6, .5, '#FF7A6E'); r(x - .5, 70, 1, 12, '#AEB8C0'); r(x - 3, 82, 6, 1, '#8E99A1'); }
+    // диванчик со столиком слева
+    const b0 = Math.round(W * .03);
+    r(b0, 52, 4, 28, '#B02A33'); r(b0, 70, 18, 6, '#E0443A'); r(b0, 70, 18, .5, '#FF7A6E'); r(b0 + 22, 62, 22, 2, '#F4F1EA'); r(b0 + 22, 64, 22, .5, '#AEB8C0'); r(b0 + 32, 64, 1.5, 16, '#AEB8C0');
+    r(b0 + 26, 59, 3, 3, '#FFFFFF'); r(b0 + 35, 58, 4, 4, '#E9A93B'); r(b0 + 35, 58, 4, 1, '#C0582F');
+    // музыкальный автомат справа с огоньками
+    const j = Math.round(W * .9);
+    r(j - 9, 40, 18, 44, '#8B3A3A'); r(j - 8, 36, 16, 6, '#8B3A3A'); r(j - 6, 34, 12, 3, '#8B3A3A');
+    ['#E0443A', '#E9A93B', '#4CC38A', '#4A7BD8', '#9B5DE5'].forEach((c, i) => r(j - 7 + i * 3, 38, 2, 3, c));
+    r(j - 6, 44, 12, 10, '#FFE7A3'); for (let x = j - 5; x < j + 6; x += 2) r(x, 45, 1, 8, '#E9A93B'); r(j - 6, 58, 12, 16, '#2B2340'); for (let y = 59; y < 74; y += 2) r(j - 5, y, 10, .5, '#AEB8C0');
+    // подвесные лампы
+    for (const lx of [W * .4, W * .55, W * .7]) { r(lx - .25, -OFF, .5, OFF + 13, '#2B2340'); r(lx - 4, 13, 8, 3, '#E0443A'); r(lx - 3, 12, 6, 1, '#E0443A'); r(lx - 1, 16, 2, 1, '#FFF3C4'); }
+  }
+  function drawBookstore(g) {
+    const r = px(g);
+    const spines = ['#E0443A', '#4A7BD8', '#F5D547', '#4CC38A', '#9B5DE5', '#F08BC0', '#E9A93B', '#FFFDF5', '#8B5A2B', '#2B5A44'];
+    // стена — стеллажи до потолка
+    r(0, -OFF, W, OFF + 46, '#5A3A26');
+    let n = 0;
+    for (let y = 44; y > -OFF; y -= 12) {
+      r(0, y, W, 2, '#8B5A3C'); r(0, y, W, .5, '#A8714A');
+      for (let x = 1; x < W - 1;) {
+        n++; const w = 1.5 + Math.floor(hashN(n) * 3) / 2, h = 7 + Math.floor(hashN(n + 3) * 3);
+        if (hashN(n + 9) > .93) { x += 3; continue; } // промежуток
+        const col = spines[Math.floor(hashN(n + 5) * spines.length)];
+        r(x, y - h, w, h, col); r(x, y - h + 1.5, w, .5, 'rgba(255,255,255,.35)'); r(x, y - 2, w, .5, 'rgba(0,0,0,.25)');
+        x += w + (hashN(n + 7) > .8 ? 1 : 0);
       }
-      // дверь с окошком и колокольчиком, тележка с книгами у входа
-      r(X - 5, 27, 10, 20, '#3A2C22'); r(X - 4, 28, 8, 19, '#6B4A32'); r(X - 3, 29, 6, 7, '#FFE7A3'); r(X + 2, 38, 1, 1, '#F5D547'); r(X - .5, 26, 1, 1.5, '#F5D547');
-      r(X + 30, 40, 10, 5, '#6B4A32'); for (let i = 0; i < 5; i++) r(X + 30.5 + i * 2, 37, 1.5, 3, spines[i]); r(X + 31, 45, 1.5, 1.5, '#2B2340'); r(X + 37, 45, 1.5, 1.5, '#2B2340');
     }
-    // крыльцо и тень
-    r(X - 7, 46, 14, 1, '#8E7D63'); r(x0, 47, w, 1, 'rgba(0,0,0,.15)');
+    for (let x = 0; x < W; x += Math.round(W / 5)) r(x, -OFF, 2, OFF + 46, '#6B4A32');
+    // окно-ниша и висящая вывеска
+    windowNight(r, W * .44, 12, 26, 22, '#8B5A3C');
+    r(W * .5 - 16, 0, 32, 9, '#1F3B2E'); r(W * .5 - 15, 1, 30, 7, '#2B5A44'); r(W * .5 - 10.25, -OFF, .5, OFF, '#2B2340'); r(W * .5 + 9.75, -OFF, .5, OFF, '#2B2340');
+    [...'BOOKS'].forEach((ch, i) => (GLYPH[ch] || []).forEach((row, yy) => [...row].forEach((c, xx) => { if (c === '#') r(W * .5 - 10 + i * 4 + xx, 2 + yy, 1, 1, '#F5D547'); })));
+    // лестница у стеллажа
+    const lx = Math.round(W * .27); for (let y = -6; y < 62; y += 6) r(lx - 3 + (y + 6) * .06, y, 9, 1, '#A8714A'); r(lx - 4, -8, 1.5, 72, '#8B5A3C'); r(lx + 6, -8, 1.5, 72, '#8B5A3C');
+    // деревянный пол и ковёр
+    for (let y = 46, row = 0; y < H; y += 5, row++) { r(0, y, W, 5, row % 2 ? '#A86F45' : '#B07A4F'); r(0, y, W, .5, '#7E5232'); for (let x = (row * 17) % 40; x < W; x += 40) r(x, y, .5, 5, '#7E5232'); }
+    const k0 = Math.round(W * .3), k1 = Math.round(W * .74);
+    r(k0, 94, k1 - k0, 30, '#9E2A3A'); r(k0 + 2, 96, k1 - k0 - 4, 26, '#B8384A'); r(k0, 94, k1 - k0, 1, '#E9C14A'); r(k0, 123, k1 - k0, 1, '#E9C14A');
+    for (let x = k0 + 6; x < k1 - 4; x += 8) { r(x, 101, 2, 2, '#E9C14A'); r(x + 4, 115, 2, 2, '#E9C14A'); }
+    for (let x = k0; x < k1; x += 2) { r(x, 124, .5, 1.5, '#E9C14A'); r(x, 92.5, .5, 1.5, '#E9C14A'); }
+    // кресло с торшером слева
+    const a = Math.round(W * .07);
+    r(a, 54, 22, 16, '#3E7A55'); r(a + 1, 55, 20, 2, '#5C9C6C'); r(a - 2, 62, 5, 18, '#356A49'); r(a + 19, 62, 5, 18, '#356A49'); r(a + 2, 68, 18, 6, '#4C8A61'); r(a + 2, 68, 18, .5, '#6FB07F'); r(a, 80, 2, 4, '#5A3A26'); r(a + 20, 80, 2, 4, '#5A3A26');
+    const L = props.lamp; r(L - .5, 30, 1, 52, '#2B2340'); r(L - 5, 24, 10, 7, '#F5D547'); r(L - 4, 23, 8, 1, '#E9C14A'); r(L - 3, 82, 6, 1.5, '#2B2340');
+    // стопки книг на полу и касса справа
+    for (const [bx, cnt] of [[W * .62, 4], [W * .66, 3]]) for (let i = 0; i < cnt; i++) { r(bx + (i % 2) * .5, 82 - i * 2.5, 10, 2.5, spines[(i + Math.round(bx)) % spines.length]); r(bx + 1, 82 - i * 2.5, 8, .5, '#FFFDF5'); }
+    const c0 = Math.round(W * .82);
+    r(c0, 56, W - c0 - 4, 20, '#8B5A3C'); r(c0, 54, W - c0 - 4, 2, '#A8714A'); for (let x = c0 + 3; x < W - 6; x += 8) r(x, 59, 5, 14, '#7A4C30');
+    r(c0 + 6, 46, 10, 8, '#4A3C64'); r(c0 + 7, 47, 8, 3, '#B9F0D6'); r(c0 + 7, 51, 2, 2, '#E9A93B'); r(c0 + 10, 51, 2, 2, '#E9A93B'); r(c0 + 20, 48, 6, 6, '#4C8A61'); r(c0 + 21, 44, 4, 4, '#3E7A55'); r(c0 + 19, 53, 8, 1, '#8B5A2B');
+  }
+  // где сидеть в каждой локации: скамейка и урна / табуреты и диванчик / кресло, касса и стопка книг
+  function scenePerches() {
+    let list;
+    if (loc === 'diner') { const s0 = Math.round(W * .32), s1 = Math.round(W * .78); list = [0, 1, 2, 3, 4].map(i => ({ x: s0 + 8 + i * ((s1 - s0 - 16) / 4), y: 67 })).concat([{ x: Math.round(W * .03) + 9, y: 69 }]); }
+    else if (loc === 'bookstore') list = [{ x: Math.round(W * .07) + 11, y: 67 }, { x: Math.round(W * .07) + 21, y: 61 }, { x: Math.round(W * .82) + 10, y: 53 }, { x: Math.round(W * .62) + 5, y: 72 }];
+    else list = [{ x: props.bench + 10, y: 66 }, { x: props.bench + 24, y: 66 }, { x: props.bench + 38, y: 66 }, { x: props.bin + 6, y: 62 }];
+    return list.map(p => ({ ...p, by: null }));
   }
   function setLoc(kind) {
-    if (loc && !kind) for (const b of birds) if (b.inside) comeOut(b);
+    for (const b of birds) { if (b.inside) comeOut(b); if (b.perch) { b.perch.by = null; b.perch = null; } }
     loc = kind; locIn = kind ? rnd(110, 170) : rnd(50, 80);
+    props.lamp = kind === 'diner' ? Math.round(W * .55) : kind === 'bookstore' ? Math.round(W * .2) : Math.round(W * .955);
+    perches = scenePerches();
     bg = drawBackground();
+    // вся стая перелетает в новое место: влетают сверху по очереди
+    for (const b of birds) if (!b.ev) { b.tasks = []; b.goal = null; b.wait = 0; b.pose = 'idle'; b.hop = { from: { x: b.x + rnd(-40, 40), y: -OFF - 30 }, to: { x: b.x, y: b.y }, t: -rnd(0, 1.2), dur: 1.4, h: 0 }; }
     box.querySelectorAll('[data-act^="loc"]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.act === (kind === 'diner' ? 'loc-diner' : kind === 'bookstore' ? 'loc-books' : 'loc-park'))));
   }
   function locTick(dt) {
@@ -378,7 +438,6 @@
   // обычная жизнь, когда ничего не происходит
   function ambient(b) {
     const r = Math.random();
-    if (loc && r > .88 && !b.hold && birds.filter(x => x.inside).length < 4) { visitPlace(b); return; }
     const freePerch = perches.filter(p => !p.by);
     if (r < .12 && freePerch.length && !b.hold) {
       const p = pickOne(freePerch); p.by = b;
@@ -424,7 +483,7 @@
     if (b.emote && (b.emote.t -= dt) <= 0) b.emote = null;
     if (b.hop) {
       const h = b.hop; h.t += dt / h.dur;
-      const t = Math.min(1, h.t);
+      const t = Math.max(0, Math.min(1, h.t));
       if (h.to.x !== h.from.x) b.dir = h.to.x > h.from.x ? 1 : -1;
       b.x = h.from.x + (h.to.x - h.from.x) * t;
       b.y = h.from.y + (h.to.y - h.from.y) * t - Math.sin(t * Math.PI) * h.h;
@@ -700,7 +759,7 @@
   Object.assign(EVENTS, {
     // сильный ветер: всех сдувает, листья и крошки улетают, стаканчик падает
     wind: {
-      ok: () => true, w: 1,
+      ok: () => !loc, w: 1, // ветер — только в сквере
       start(e) {
         e.dir = Math.random() < .5 ? 1 : -1; e.t = 0; e.dur = rnd(7, 9);
         e.list = freeBirds(); enlist(e.list, e);
@@ -729,7 +788,7 @@
     },
     // дождь: все прячутся под скамейку, остаются лужи
     rain: {
-      ok: () => true, w: 1,
+      ok: () => !loc, w: 1, // дождь — только в сквере
       start(e) {
         e.t = 0; e.dur = rnd(9, 12);
         e.list = freeBirds(); enlist(e.list, e);
@@ -1057,7 +1116,7 @@
   function seasonTick(dt) {
     const m = new Date().getMonth();
     const kind = m >= 8 && m <= 10 ? 'leaf' : m === 11 || m <= 1 ? 'snow' : m >= 2 && m <= 4 ? 'petal' : null;
-    if (!kind || Math.random() > dt * .5) return;
+    if (!kind || loc || Math.random() > dt * .5) return; // в помещении листья и снег не падают
     const c = kind === 'leaf' ? pickOne(['#E9A93B', '#C0582F', '#D9944A', '#B23A48']) : kind === 'snow' ? '#FFFFFF' : '#F7C6D9';
     fx.push({ type: kind, x: rnd(0, W), y: -OFF - 3, vx: rnd(-6, 6), vy: rnd(8, 14), land: rnd(Y0, Y1 + 6), c, t: 30, ph: rnd(0, 6) });
   }
@@ -1239,13 +1298,13 @@
     box.querySelectorAll('.fl-tools [data-act]').forEach(btn => btn.addEventListener('click', e => {
       e.stopPropagation();
       const act = btn.dataset.act;
+      const menu = btn.closest('details'); if (menu && act !== 'seed') menu.open = false;
       if (act === 'seed') { seeding = !seeding; btn.setAttribute('aria-pressed', String(seeding)); stage.classList.toggle('seeding', seeding); const h = box.querySelector('.fl-seedhint'); if (h) h.hidden = !seeding; return; }
       if (act === 'party') { setParty(!party); btn.setAttribute('aria-pressed', String(party)); return; }
       if (act.startsWith('loc')) { // локации: сквер / закусочная / книжный — птички сразу бегут туда
         const kind = act === 'loc-diner' ? 'diner' : act === 'loc-books' ? 'bookstore' : null;
-        setLoc(kind); if (kind) locIn = 240;
+        setLoc(kind); locIn = 300; // выбранная вручную локация держится дольше
         box.querySelectorAll('[data-act^="loc"]').forEach(x => x.setAttribute('aria-pressed', String(x === btn)));
-        if (kind) for (const b of freeBirds().slice(0, 6)) { b.tasks = []; b.goal = null; b.wait = 0; visitPlace(b); nextTask(b); }
         return;
       }
       if (act === 'reset') {
