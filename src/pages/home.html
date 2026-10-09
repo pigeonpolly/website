@@ -9,13 +9,18 @@
       <a class="btn" href="https://www.patreon.com/pigeon_polly/posts/get-free-ask-170699984" target="_blank" rel="noopener">Get free feedback on your art</a>
     </div>
   </div>
-  <div class="art">
+  <div class="art" tabindex="0">
     <div class="frame" role="img" aria-label="Pigeon Polly as an astronaut planting sunflowers, an illustration by Alina Otkinska"></div>
+    <div class="frame frame-me" aria-hidden="true"></div>
     <svg class="star" viewBox="-48 -48 96 96" aria-hidden="true"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z"/></svg>
     <span class="dot dot-1"></span>
     <span class="dot dot-2"></span>
   </div>
 </section>
+<script>
+// фото Алины под Полли: наведение на компьютере, касание на телефоне
+(function () { var a = document.querySelector('.hero .art'); if (a) a.addEventListener('click', function () { a.classList.toggle('on'); }); })();
+</script>
 {{block:home-blog}}
 {{block:today}}
 {{block:coming-soon}}

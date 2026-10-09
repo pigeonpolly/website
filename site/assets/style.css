@@ -2298,3 +2298,9 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .be-auto { color: #2E8B57; }
 /* видео YouTube в статье */
 .bp-body figure iframe { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; border: 0; border-radius: 14px; background: #000; }
+
+/* Главная: при наведении на арку Полли сменяется фото Алины */
+.art { outline: none; cursor: pointer; }
+.frame-me { background-image: url('/images/home/alina.jpg'); background-position: center top; opacity: 0; transition: opacity .5s ease; }
+.art:hover .frame-me, .art:focus-visible .frame-me, .art.on .frame-me { opacity: 1; }
+@media (prefers-reduced-motion: reduce) { .frame-me { transition: none; } }
