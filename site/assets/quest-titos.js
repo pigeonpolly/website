@@ -211,7 +211,7 @@
   const bar = document.querySelector('.rm-bar');
   const banner = document.createElement('div'); banner.className = 'q-banner'; bar.insertBefore(banner, bar.firstChild.nextSibling);
   const pockets = document.createElement('div'); pockets.className = 'q-pockets'; (A.pan || box).after(pockets);
-  const modal = document.createElement('div'); modal.className = 'q-modal'; modal.hidden = true; box.appendChild(modal);
+  const modal = document.createElement('div'); modal.className = 'q-modal'; modal.hidden = true; document.body.appendChild(modal); // окно — поверх всей страницы (на iPhone внутри прокручиваемой комнаты оно обрезалось)
   const draw = () => {
     const mz = box.querySelector('.rm-hot[data-k="magnifier"]'); if (mz) mz.classList.toggle('q-want', !st.mag && !st.solved);
     banner.innerHTML = `<nav class="q-tabs">${CASES.map(c => `<button type="button" data-case="${c.no}" class="${c.no === K.no ? 'on' : ''}">${t(UI.caseNo)} ${c.no} · ${esc(t(c.title))}${load(c.key).solved ? ' ✅' : ''}</button>`).join('')}</nav>` +
