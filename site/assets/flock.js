@@ -88,12 +88,12 @@
     return c;
   }
   // ---------- локации: время от времени за площадью открывается ретро-закусочная или книжный, птички заходят внутрь ----------
-  let loc = null, locIn = rnd(25, 45), locNext = 0;
+  let loc = homeLoc(), locIn = rnd(25, 45), locNext = 0;
   const LOCS = ['diner', 'bookstore'];
   const LOC_ACT = { diner: 'loc-diner', bookstore: 'loc-books', pumpkins: 'loc-pumpkins', xmas: 'loc-xmas' };
   const lampX = kind => Math.round(W * ({ diner: .55, bookstore: .2, pumpkins: .62, xmas: .1 }[kind] || .955));
-  // сами по себе птички перелетают и в сезонные места: тыквенное поле — сентябрь–ноябрь, ёлка — декабрь–январь
-  const autoLocs = () => { const m = new Date().getMonth(); return LOCS.concat(m >= 8 && m <= 10 ? ['pumpkins'] : [], m === 11 || m === 0 ? ['xmas'] : []); };
+  // «домашнее» место по сезону: в октябре стая на тыквенном поле, в ноябре и декабре — у ёлки, с января — в сквере (null)
+  function homeLoc() { const m = new Date().getMonth(); return m === 9 ? 'pumpkins' : m === 10 || m === 11 ? 'xmas' : null; }
   const placeX = () => Math.round(W * .52), DOOR_Y = 47;
   const GLYPH = { D: ['##.', '#.#', '#.#', '#.#', '##.'], I: ['###', '.#.', '.#.', '.#.', '###'], N: ['#.#', '###', '###', '#.#', '#.#'], E: ['###', '#..', '##.', '#..', '###'], R: ['##.', '#.#', '##.', '#.#', '#.#'],
     B: ['##.', '#.#', '##.', '#.#', '##.'], O: ['.#.', '#.#', '#.#', '#.#', '.#.'], K: ['#.#', '#.#', '##.', '#.#', '#.#'], S: ['.##', '#..', '.#.', '..#', '##.'] };
@@ -406,7 +406,7 @@
     if (ev) endEvent(); // действие прошлой локации заканчивается вместе с ней
     for (const b of birds) if (b.origHd) { b.hd = b.origHd; b.origHd = null; } // подарки из-под ёлки снимаются, когда стая уходит
     for (const b of birds) { if (b.inside) comeOut(b); if (b.perch) { b.perch.by = null; b.perch = null; } }
-    loc = kind; locIn = kind ? rnd(110, 170) : rnd(50, 80);
+    loc = kind; locIn = kind !== homeLoc() ? rnd(110, 170) : rnd(50, 80);
     props.lamp = lampX(kind);
     perches = scenePerches(); spawnLocItems();
     bg = drawBackground(); placeBooks(); syncMenu();
@@ -416,7 +416,7 @@
   }
   function locTick(dt) {
     if ((locIn -= dt) > 0) return;
-    const L = autoLocs(); setLoc(loc ? null : L[locNext++ % L.length]);
+    const home = homeLoc(), L = LOCS.filter(k => k !== home); setLoc(loc !== home ? home : L[locNext++ % L.length]); // сходили в гости — и домой
   }
   function comeOut(b) {
     if (b.pk) return popOut(b);
@@ -1725,6 +1725,7 @@
   function start(data) {
     layout();
     reset(data.birds);
+    box.querySelectorAll('[data-act^="loc"]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.act === (LOC_ACT[loc] || 'loc-park'))));
     const cnt = box.querySelector('.fl-count');
     if (cnt && data.total) cnt.textContent = cnt.dataset.tpl.replace('{n}', data.total) + (data.recent ? ' ' + cnt.dataset.recent : '');
     if (data.birds.some(b => b.me)) { const j = box.querySelector('.fl-join'); if (j) j.hidden = true; }
