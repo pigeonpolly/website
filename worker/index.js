@@ -35,7 +35,10 @@ export default {
   async scheduled(event, env, ctx) {
     if (!env.DB || !env.IMAGES) return;
     await ensureSchema(env);
-    ctx.waitUntil((async () => { await migrateToR2(env); await cleanupInactive(env); })());
+    ctx.waitUntil((async () => {
+      if (!(await getMeta(env, 'buttons_backfill'))) await backfillButtons(env).catch(e => console.error('backfill', e)); // разовое начисление пуговок за прошлое
+      await migrateToR2(env); await cleanupInactive(env);
+    })());
   },
 };
 
@@ -188,6 +191,27 @@ async function awardBadges(env, uid, best, badges) {
   let total = 0; const got = [];
   for (const [ref, n] of want) if (!have.has(ref)) { const a = await award(env, uid, 'badge', ref, n); if (a) { total += a; got.push(ref); } }
   return { total, got };
+}
+// разовое начисление за прошлое (октябрь 2026): каждому — за все бейджи, за каждый загруженный рисунок и за «Выбор Полли».
+// Считается в памяти из трёх запросов, записи — пачками (INSERT OR IGNORE: повторно не начислит), баланс = сумма журнала.
+async function backfillButtons(env) {
+  const users = (await env.DB.prepare("SELECT * FROM users WHERE banned = 0 AND nick IS NOT NULL AND nick != ''").all()).results;
+  const posts = (await env.DB.prepare('SELECT user_id, id, day, bw, tod, picked FROM posts').all()).results;
+  const byUser = new Map(); for (const x of posts) (byUser.get(x.user_id) || byUser.set(x.user_id, []).get(x.user_id)).push(x);
+  const pickUser = Number(await getMeta(env, 'pick_user'));
+  const day = rigaDay(), t = now(), ins = [];
+  const add = (uid, kind, ref, amount) => ins.push(env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(uid, kind, String(ref), amount, day, t));
+  for (const u of users) {
+    const ps = byUser.get(u.id) || [];
+    const best = mergedBest(u, ps.map(x => x.day)), badges = mergedBadges(u, ps).filter(b => b !== 'pick_past' || pickUser !== u.id);
+    for (const [d, n] of Object.entries(BTN.levels)) if (best >= +d) add(u.id, 'badge', 'lv' + d, n);
+    for (const k of badges) if (BTN.badges[k]) add(u.id, 'badge', k, BTN.badges[k]);
+    for (const x of ps) { add(u.id, 'upload', x.day, BTN.upload); if (x.picked) add(u.id, 'pick', x.id, BTN.pick); }
+  }
+  for (let i = 0; i < ins.length; i += 80) await env.DB.batch(ins.slice(i, i + 80));
+  await env.DB.prepare('UPDATE users SET buttons = MAX(0, (SELECT COALESCE(SUM(amount), 0) FROM button_log b WHERE b.user_id = users.id))').run();
+  await setMeta(env, 'buttons_backfill', String(t));
+  return { users: users.length, records: ins.length };
 }
 // что уже получено сегодня — для списка условий в профиле
 async function buttonStatus(env, u) {
@@ -672,6 +696,12 @@ async function route(req, env, url) {
       delete a[g.kind]; await env.DB.prepare('UPDATE users SET avatar = ? WHERE id = ?').bind(JSON.stringify(a), u.id).run();
     }
     return json({ ok: true, to: to.nick, avatar: a });
+  }
+  // админ: начислить всем за прошлые бейджи, рисунки и «Выбор Полли» (можно нажимать сколько угодно — повторно не начислит)
+  if (m === 'POST' && p === '/api/admin/buttons-backfill') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    return json({ ok: true, ...(await backfillButtons(env)) });
   }
   // админ меняет пуговки птичке вручную (например, приз)
   if (m === 'POST' && p === '/api/admin/buttons') {

@@ -238,6 +238,7 @@
       const th = (k, l) => `<th><button type="button" class="adm-sort" data-bsort="${k}" aria-pressed="${bSort === k}">${l}${bSort === k ? ' ↓' : ''}</button></th>`;
       main.innerHTML = `<section class="adm-box"><h2>🐦 Все птицы: ${d.users.length}</h2>
         <p class="be-note">Новых за неделю: <b>${week}</b>. Нажмите на ник, чтобы открыть профиль и работы.</p>
+        <p><button type="button" class="pill-btn" id="adm-backfill">🔘 Начислить всем за прошлые бейджи и рисунки</button> <small class="be-note">Повторно не начислит — каждая награда даётся один раз.</small></p>
         <div class="be-filters"><input type="search" id="adm-bq" placeholder="🔍 Найти по нику" value="${esc(bq)}"></div>
         <table class="be-table adm-table"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}${th('buttons', '🔘 Пуговки')}${th('invited', '👥 Позвали')}<th>Подарки</th></tr></thead><tbody>
         ${list.map(u => `<tr><td>${u.nick ? `<a href="/challenge/#@${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}${u.banned ? ' <small class="be-danger">заблокирована</small>' : ''}</td>
@@ -246,6 +247,10 @@
           <td><button type="button" class="pill-btn" data-gift="${u.id}" title="Подарить семечко для аватара">🎁${u.gifts ? ' ' + u.gifts : ''}</button></td></tr>`).join('')}</tbody></table></section>`;
       main.querySelectorAll('[data-gift]').forEach(b => b.onclick = () => giftDialog(d.users.find(u => u.id === +b.dataset.gift), birds));
       main.querySelectorAll('[data-bsort]').forEach(b => b.onclick = () => { bSort = b.dataset.bsort; draw(); });
+      main.querySelector('#adm-backfill').onclick = async e => {
+        e.target.disabled = true; e.target.textContent = 'Считаю…';
+        try { const r = await api('admin/buttons-backfill', {}); alert(`Готово: птиц ${r.users}. Пуговки за прошлые достижения начислены.`); birds(); } catch (x) { alert(err(x)); e.target.disabled = false; }
+      };
       main.querySelectorAll('[data-btn]').forEach(b => b.onclick = async () => {
         const u = d.users.find(x => x.id === +b.dataset.btn), v = prompt(`Пуговки для @${u.nick || u.id}: сейчас ${u.buttons}. Сколько добавить? (например 50, или -10 чтобы забрать)`, '10');
         const amount = Math.floor(Number(v)); if (!v || !amount) return;
