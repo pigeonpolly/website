@@ -3,14 +3,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Blog editor · Pigeon Polly Art Lab</title>
-<meta name="description" content="Blog editor.">
-<link rel="canonical" href="https://www.pigeonpolly.com/ru/blog-editor/">
-<link rel="alternate" hreflang="en" href="https://www.pigeonpolly.com/blog-editor/"><link rel="alternate" hreflang="lv" href="https://www.pigeonpolly.com/lv/blog-editor/"><link rel="alternate" hreflang="ru" href="https://www.pigeonpolly.com/ru/blog-editor/"><link rel="alternate" hreflang="x-default" href="https://www.pigeonpolly.com/blog-editor/">
-<meta property="og:title" content="Blog editor · Pigeon Polly Art Lab">
-<meta property="og:description" content="Blog editor.">
+<title>Admin · Pigeon Polly Art Lab</title>
+<meta name="description" content="Admin.">
+<link rel="canonical" href="https://www.pigeonpolly.com/ru/admin/">
+<link rel="alternate" hreflang="en" href="https://www.pigeonpolly.com/admin/"><link rel="alternate" hreflang="lv" href="https://www.pigeonpolly.com/lv/admin/"><link rel="alternate" hreflang="ru" href="https://www.pigeonpolly.com/ru/admin/"><link rel="alternate" hreflang="x-default" href="https://www.pigeonpolly.com/admin/">
+<meta property="og:title" content="Admin · Pigeon Polly Art Lab">
+<meta property="og:description" content="Admin.">
 <meta property="og:type" content="website">
-<meta property="og:url" content="https://www.pigeonpolly.com/ru/blog-editor/">
+<meta property="og:url" content="https://www.pigeonpolly.com/ru/admin/">
 <meta property="og:site_name" content="Pigeon Polly Art Lab">
 <meta property="og:image" content="https://www.pigeonpolly.com/assets/og-flock-ru.jpg">
 <meta property="og:image:width" content="1200">
@@ -37,7 +37,7 @@
     <svg class="brand-star" viewBox="-48 -48 96 96" aria-hidden="true"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z"/></svg>
     <span>Pigeon Polly <em>Art Lab</em></span>
   </a>
-  <nav class="lang-switch" aria-label="Language"><a href="/blog-editor/" hreflang="en" lang="en">EN</a><a href="/lv/blog-editor/" hreflang="lv" lang="lv">LV</a><a href="/ru/blog-editor/" hreflang="ru" lang="ru" aria-current="true">RU</a></nav>
+  <nav class="lang-switch" aria-label="Language"><a href="/admin/" hreflang="en" lang="en">EN</a><a href="/lv/admin/" hreflang="lv" lang="lv">LV</a><a href="/ru/admin/" hreflang="ru" lang="ru" aria-current="true">RU</a></nav>
   <div class="acct" id="acct"></div>
   <button class="menu-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Меню">
     <span></span><span></span><span></span>
@@ -54,14 +54,22 @@
   </nav>
 </header>
 <main id="main">
-<section class="page-head be-head">
-  <p class="topics">блог</p>
-  <p class="adm-back"><a href="/ru/admin/">← Кабинет</a></p>
-  <h1>Редактор блога</h1>
+<section class="page-head adm-head">
+  <p class="topics">admin</p>
+  <h1>Кабинет</h1>
 </section>
-<div id="be-app" class="be-app"><p class="be-note">Загрузка…</p></div>
-<script src="/assets/blog-editor.js" defer></script>
-<script src="/assets/scroll-nav.js" defer></script>
+<div class="adm be-app" id="adm">
+  <nav class="adm-nav" aria-label="Кабинет">
+    <a href="#overview" data-sec="overview">📊 Обзор</a>
+    <a href="#comments" data-sec="comments">💬 Комментарии <span class="adm-count" id="adm-pend" hidden></span></a>
+    <a href="/ru/blog-editor/">✍️ Блог: статьи</a>
+    <a href="#analytics" data-sec="analytics">📈 Аналитика</a>
+    <a href="/ru/challenge/#sw-wall">🎨 Челлендж: работы</a>
+    <a href="/ru/flock/">🐦 Стая</a>
+  </nav>
+  <div class="adm-main" id="adm-main"><p class="be-note">Загрузка…</p></div>
+</div>
+<script src="/assets/admin.js" defer></script>
 
 </main>
 <dialog class="modal" id="contact" aria-labelledby="contact-t">

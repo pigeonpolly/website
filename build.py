@@ -44,6 +44,7 @@ PAGES = [
      "Meet Pigeon Polly, an office clerk pigeon from Wobbleland, and her friends: Mr.Chew, Detective Titos and the Pumpkin Family."),
     ("blog", "Blog", "blog.html", "Notes on drawing, learning and creativity by Alina Otkinska and Pigeon Polly."),
     ("blog-editor", "Blog editor", "blog-editor.html", "Blog editor."),
+    ("admin", "Admin", "admin.html", "Admin."),
     ("polly-office", "Polly, Office Clerk", "polly-office.html",
      "Polly's pixel office: old blinds, a water cooler and a desk you can click. Switch to evening and watch the light change."),
     ("detective-office", "Detective Titos", "detective-office.html",
@@ -56,7 +57,7 @@ PAGES = [
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
 # готовые, но пока не открытые страницы: не попадают в sitemap
-UNLISTED = {"blog-editor"}
+UNLISTED = {"blog-editor", "admin"}
 
 
 PORTFOLIO = [

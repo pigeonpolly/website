@@ -358,6 +358,35 @@ export async function blogApi(req, env, url, h) {
       return json({ ok: true });
     }
     // ключ Gemini из редактора: сохранить / проверить (сам ключ наружу не отдаём)
+    // ---------- кабинет админа ----------
+    // сводка: статьи, комментарии, птицы, работы челленджа
+    if (m === 'GET' && a === 'overview') {
+      const one = async (sql, ...v) => (await env.DB.prepare(sql).bind(...v).first()) || {};
+      const all = async (sql, ...v) => (await env.DB.prepare(sql).bind(...v).all()).results;
+      const t = h.now(), week = t - 7 * 86400;
+      const posts = await one("SELECT SUM(status = 'published') AS pub, SUM(status != 'published') AS draft, COALESCE(SUM(views), 0) AS views, COALESCE(SUM(likes), 0) AS likes FROM blog_posts");
+      const com = await one("SELECT COUNT(*) AS total, SUM(status = 'pending') AS pending, SUM(created_at > ?) AS week FROM blog_comments", week);
+      let users = {}, works = {}, newUsers = [], newWorks = [];
+      try {
+        users = await one('SELECT COUNT(*) AS total, SUM(created_at > ?) AS week, SUM(COALESCE(last_seen, 0) > ?) AS active FROM users WHERE banned = 0', week, week);
+        works = await one('SELECT COUNT(*) AS total, SUM(created_at > ?) AS week FROM posts', week);
+        newUsers = await all('SELECT id, nick, created_at FROM users WHERE banned = 0 ORDER BY created_at DESC LIMIT 8');
+        newWorks = await all('SELECT p.id, p.day, p.theme, u.nick FROM posts p JOIN users u ON u.id = p.user_id ORDER BY p.created_at DESC LIMIT 8');
+      } catch (e) { /* таблиц челленджа может не быть */ }
+      const top = await all("SELECT id, slug, t_ru, t_en, t_lv, views, likes, (SELECT COUNT(*) FROM blog_comments c WHERE c.post_id = p.id) AS comments FROM blog_posts p WHERE status = 'published' ORDER BY views DESC LIMIT 6");
+      const meta = async k => (await one('SELECT value FROM meta WHERE key = ?', k)).value;
+      return json({ posts, comments: com, users, works, top, newUsers, newWorks,
+        totals: { works: Number(await meta('works_total')) || works.total || 0, users: Number(await meta('users_total')) || users.total || 0 } });
+    }
+    // все комментарии блога (новые сверху), с фильтром
+    if (m === 'GET' && a === 'comments') {
+      const f = url.searchParams.get('filter') || 'all';
+      const where = f === 'pending' ? "WHERE c.status = 'pending'" : '';
+      const rows = (await env.DB.prepare(`SELECT c.id, c.body, c.anon, c.status, c.created_at, c.post_id, p.slug, p.t_ru, p.t_en, p.t_lv, u.nick
+        FROM blog_comments c JOIN blog_posts p ON p.id = c.post_id LEFT JOIN users u ON u.id = c.user_id ${where} ORDER BY c.created_at DESC LIMIT 300`).all()).results
+        .map(c => ({ ...c, name: c.nick ? '@' + c.nick : birdName(c.anon, 'ru') }));
+      return json({ comments: rows });
+    }
     if (a === 'gemini-key') {
       if (m === 'POST') {
         const { key } = await body();
