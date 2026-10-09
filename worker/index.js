@@ -19,7 +19,7 @@ export default {
       try { await ensureSchema(env); return await blogPage(req, env, url, helpers(env)); }
       catch (e) { console.error(e); return env.ASSETS.fetch(req); } // если база недоступна — статическая заглушка
     }
-    if (!p.startsWith('/api/')) return env.ASSETS.fetch(req);
+    if (!p.startsWith('/api/')) return sitePage(req, env, url);
     if (!env.DB || !env.IMAGES || !env.GOOGLE_CLIENT_ID) return json({ ready: false }, 503);
     try {
       await ensureSchema(env);
@@ -38,6 +38,37 @@ export default {
     ctx.waitUntil((async () => { await migrateToR2(env); await cleanupInactive(env); })());
   },
 };
+
+// ---------- правки блоков сайта (режим «✏️ Править страницу» для админа) ----------
+// страница берётся из статики, а блоки с правками (data-ppb) подменяются на лету; ?raw=1 — оригинал без правок (для редактора)
+let blocksCache = { at: 0, rows: null };
+async function siteBlocks(env) {
+  if (blocksCache.rows && Date.now() - blocksCache.at < 20000) return blocksCache.rows;
+  await ensureSchema(env);
+  const rows = (await env.DB.prepare('SELECT id, lang, html, hidden FROM site_blocks').all()).results;
+  blocksCache = { at: Date.now(), rows };
+  return rows;
+}
+async function sitePage(req, env, url) {
+  const res = await env.ASSETS.fetch(req);
+  if (req.method !== 'GET' || !env.DB || url.searchParams.has('raw') || res.status !== 200 || !(res.headers.get('content-type') || '').includes('text/html')) return res;
+  let rows;
+  try { rows = await siteBlocks(env); } catch (e) { console.error(e); return res; }
+  if (!rows.length) return res;
+  const lang = (url.pathname.match(/^\/(ru|lv)\//) || [])[1] || 'en';
+  const hidden = new Set(rows.filter(r => r.lang === '*' && r.hidden).map(r => r.id));
+  const html = new Map(rows.filter(r => r.lang === lang && r.html != null).map(r => [r.id, r.html]));
+  if (!hidden.size && !html.size) return res;
+  const out = new Response(res.body, res);
+  out.headers.set('cache-control', 'no-cache');
+  return new HTMLRewriter().on('[data-ppb]', {
+    element(el) {
+      const id = el.getAttribute('data-ppb');
+      if (hidden.has(id)) { el.setAttribute('data-ppb-hidden', ''); el.setAttribute('hidden', ''); } // скрыт: админ видит его в режиме правки и может вернуть
+      if (html.has(id)) { el.setInnerContent(html.get(id), { html: true }); el.setAttribute('data-ppb-edited', ''); }
+    },
+  }).transform(out);
+}
 
 // общие функции для worker/blog.js
 const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v) });
@@ -64,6 +95,8 @@ async function ensureSchema(env) {
     // подписка «сообщите, когда выйдет книга»: только адрес, язык и текст согласия (GDPR); рассылает Алина вручную
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS subscribers (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, topic TEXT NOT NULL DEFAULT 'books',
       lang TEXT, consent TEXT, created_at INTEGER, UNIQUE(email, topic))`),
+    // правки блоков сайта из режима «✏️ Править страницу»: id = data-ppb блока, lang = en/ru/lv; hidden — скрыт на всех языках (lang = '*')
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS site_blocks (id TEXT NOT NULL, lang TEXT NOT NULL, html TEXT, hidden INTEGER DEFAULT 0, page TEXT, updated_at INTEGER, PRIMARY KEY (id, lang))`),
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
   for (const sql of ['ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
@@ -348,6 +381,34 @@ async function route(req, env, url) {
     const email = String(b.email || '').trim().toLowerCase();
     await env.DB.prepare('DELETE FROM subscribers WHERE email = ?').bind(email).run();
     return json({ ok: true }); // одинаковый ответ, даже если адреса не было
+  }
+  // все птицы (аккаунты) для кабинета: ник, когда появились, когда заходили, сколько работ
+  if (m === 'GET' && p === '/api/admin/users') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    return json({ users: (await env.DB.prepare(`SELECT u.id, u.nick, u.created_at, u.last_seen, u.banned, u.best, u.picks,
+      (SELECT COUNT(*) FROM posts w WHERE w.user_id = u.id) AS works FROM users u ORDER BY u.created_at DESC`).all()).results });
+  }
+  if (p === '/api/admin/blocks') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    if (m === 'POST') {
+      const b = await req.json().catch(() => ({}));
+      const id = String(b.id || ''), lang = String(b.lang || '');
+      if (!/^[a-z0-9.-]{1,80}$/.test(id) || !['en', 'ru', 'lv', '*'].includes(lang)) fail(400, 'bad');
+      if (lang === '*') {
+        if (b.hidden) await env.DB.prepare('INSERT INTO site_blocks (id, lang, hidden, page, updated_at) VALUES (?, ?, 1, ?, ?) ON CONFLICT(id, lang) DO UPDATE SET hidden = 1, page = excluded.page, updated_at = excluded.updated_at').bind(id, '*', String(b.page || '').slice(0, 200), now()).run();
+        else await env.DB.prepare("DELETE FROM site_blocks WHERE id = ? AND lang = '*'").bind(id).run();
+      } else if (b.html == null) await env.DB.prepare('DELETE FROM site_blocks WHERE id = ? AND lang = ?').bind(id, lang).run(); // «вернуть как было»
+      else {
+        const html = String(b.html);
+        if (html.length > 300000) fail(413, 'big');
+        await env.DB.prepare('INSERT INTO site_blocks (id, lang, html, page, updated_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(id, lang) DO UPDATE SET html = excluded.html, page = excluded.page, updated_at = excluded.updated_at')
+          .bind(id, lang, html, String(b.page || '').slice(0, 200), now()).run();
+      }
+      blocksCache = { at: 0, rows: null };
+    }
+    return json({ blocks: (await env.DB.prepare('SELECT id, lang, hidden, page, updated_at, html IS NOT NULL AS edited FROM site_blocks ORDER BY updated_at DESC').all()).results });
   }
   if (p === '/api/admin/subscribers') {
     const u = await needUser(req, env);

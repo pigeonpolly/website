@@ -2339,3 +2339,4 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .be-homelink { margin-right: 6px; cursor: help; }
 tr[data-s] td:first-child { white-space: nowrap; }
 tr[data-s] td:first-child .be-tr-in { width: calc(100% - 28px); }
+.adm-all { float: right; font: 600 14px var(--sans); color: #C0582F; }
