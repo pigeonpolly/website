@@ -27,7 +27,7 @@
   let flash = '', state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null, langFilter = 'all', picked = new Set();
   // фильтры списка: поиск, раздел, период, сортировка по столбцу
   const secsOf = p => String(p && p.section || '').split(',').map(x => x.trim()).filter(Boolean); // у статьи может быть несколько разделов
-  const HOME_SECS = ['traditional-art', 'technologies', 'education', 'pollys-life', 'tips-guides'];
+  const HOME_SECS = ['traditional-art', 'technologies', 'education', 'pollys-life', 'tips-guides', 'stories'];
   let warnedHome = false;
   const lf = { q: '', sec: '', from: '', to: '', sort: 'date', dir: -1 };
   // на каком языке показывать названия статей и разделов в списке (запоминается)
