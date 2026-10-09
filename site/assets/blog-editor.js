@@ -337,8 +337,11 @@
   // форматирование — всплывает над выделенным текстом; вставка — кнопкой ＋ на пустой строке
   const TOOLS = [
     ['bold', 'Жирный', '<b>Ж</b>'], ['italic', 'Курсив', '<i>К</i>'], ['link', 'Ссылка', '🔗'], ['h2', 'Заголовок', 'H2'], ['h3', 'Подзаголовок', 'H3'],
-    ['p', 'Обычный текст', '¶'], ['ul', 'Список', '•'], ['ol', 'Нумерованный список', '1.'], ['quote', 'Цитата', '❝'], ['clear', 'Убрать оформление', '⌫'],
+    ['underline', 'Подчёркнутый', '<u>П</u>'], ['strike', 'Зачёркнутый', '<s>З</s>'], ['color', 'Цвет текста', '<span style="color:#E0443A">A</span>'], ['mark', 'Выделить маркером', '🖍'],
+    ['p', 'Обычный текст', '¶'], ['ul', 'Список', '•'], ['ol', 'Нумерованный список', '1.'], ['quote', 'Цитата (как на Patreon — с полоской слева)', '❝'], ['center', 'По центру / обратно', '≡'], ['clear', 'Убрать оформление', '⌫'],
   ];
+  const PALETTE = ['#2B1A51', '#E0443A', '#D85A30', '#E9A93B', '#3E8E4F', '#4A7BD8', '#9B5DE5', '#F08BC0', '#8C7FB0'];
+  const MARKS = ['#FFF3A8', '#FFD6E0', '#CDEBD8', '#BFD7F5', '#E2D3F7'];
   const INSERTS = [
     ['img', 'Картинка с устройства или по ссылке', '🖼 Картинка'], ['yt', 'Видео с YouTube', '🎬 Видео YouTube'], ['quote', 'Цитата', '❝ Цитата'],
     ['hr', 'Разделитель', '— Разделитель'], ['h2', 'Заголовок раздела', 'H2 Заголовок'], ['imgs', 'Вставить картинки (с подписями) из оригинала на те же места', '🖼 Картинки из оригинала'],
@@ -370,7 +373,9 @@
         <label class="be-f be-title"><span>Заголовок</span><input type="text" data-k="t_${l}" maxlength="200" placeholder="Заголовок" value="${esc(post['t_' + l])}"></label>
         <label class="be-f be-desc"><span>Краткое описание</span><textarea data-k="d_${l}" rows="2" maxlength="400" placeholder="Короткое описание — видно в списке статей и в Google">${esc(post['d_' + l])}</textarea></label>
         <div class="be-f be-bodywrap"><span>Текст</span>
-          <div class="be-tools be-bubble" hidden>${TOOLS.map(([c, title, label]) => `<button type="button" data-cmd="${c}" title="${title}">${label}</button>`).join('')}</div>
+          <div class="be-tools be-bubble" hidden>${TOOLS.map(([c, title, label]) => `<button type="button" data-cmd="${c}" title="${title}">${label}</button>`).join('')}
+            <div class="be-swatches" data-sw="color" hidden>${PALETTE.map(c => `<button type="button" data-cmd="fg" data-v="${c}" style="background:${c}" title="${c}"></button>`).join('')}<button type="button" data-cmd="fg" data-v="" title="Обычный цвет">✕</button></div>
+            <div class="be-swatches" data-sw="mark" hidden>${MARKS.map(c => `<button type="button" data-cmd="bg" data-v="${c}" style="background:${c}" title="маркер"></button>`).join('')}<button type="button" data-cmd="bg" data-v="" title="Без маркера">✕</button></div></div>
           <button type="button" class="be-plus" hidden title="Вставить: картинку, видео, цитату, разделитель" aria-label="Вставить">＋</button>
           <div class="be-tools be-plusmenu" hidden>${INSERTS.map(([c, title, label]) => `<button type="button" data-cmd="${c}" title="${title}">${label}</button>`).join('')}</div>
           <div class="be-body bp-body" contenteditable="true" data-k="b_${l}" data-ph="Начните писать… Картинки можно перетащить прямо сюда.">${post['b_' + l]}</div>
@@ -539,7 +544,17 @@
         const c = b.dataset.cmd;
         if (c === 'h2' || c === 'h3' || c === 'p') document.execCommand('formatBlock', false, c);
         else if (c === 'quote') document.execCommand('formatBlock', false, 'blockquote');
-        else if (c === 'bold' || c === 'italic') document.execCommand(c);
+        else if (c === 'bold' || c === 'italic' || c === 'underline') document.execCommand(c);
+        else if (c === 'strike') document.execCommand('strikeThrough');
+        else if (c === 'color' || c === 'mark') { const sw = b.closest('.be-bubble').querySelector(`[data-sw="${c}"]`), was = !sw.hidden; b.closest('.be-bubble').querySelectorAll('.be-swatches').forEach(x => { x.hidden = true; }); sw.hidden = was; return; }
+        else if (c === 'fg' || c === 'bg') {
+          document.execCommand('styleWithCSS', false, true);
+          if (c === 'fg') document.execCommand('foreColor', false, b.dataset.v || '#2B1A51');
+          else document.execCommand('hiliteColor', false, b.dataset.v || 'transparent');
+          document.execCommand('styleWithCSS', false, false);
+          b.closest('.be-swatches').hidden = true;
+        }
+        else if (c === 'center') { const blk = (getSelection().anchorNode && (getSelection().anchorNode.nodeType === 1 ? getSelection().anchorNode : getSelection().anchorNode.parentElement)).closest('p, h2, h3, blockquote, li'); if (blk) blk.style.textAlign = blk.style.textAlign === 'center' ? '' : 'center'; }
         else if (c === 'ul') document.execCommand('insertUnorderedList');
         else if (c === 'ol') document.execCommand('insertOrderedList');
         else if (c === 'hr') document.execCommand('insertHorizontalRule');

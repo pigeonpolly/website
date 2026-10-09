@@ -125,8 +125,10 @@ async function ensureBlogSchema(env) {
 }
 
 // ---------- очистка HTML статьи (пишет только админ, но всё равно оставляем только безопасные теги) ----------
-const ALLOWED = { p: [], h2: [], h3: [], b: [], strong: [], i: [], em: [], u: [], s: [], br: [], hr: [], ul: [], ol: [], li: [],
-  blockquote: [], figure: [], figcaption: [], a: ['href'], img: ['src', 'alt'] };
+const ALLOWED = { p: ['style'], h2: ['style'], h3: ['style'], b: [], strong: [], i: [], em: [], u: [], s: [], strike: [], del: [], br: [], hr: [], ul: [], ol: [], li: ['style'],
+  blockquote: ['style'], figure: [], figcaption: [], a: ['href'], img: ['src', 'alt'], span: ['style'], mark: ['style'], font: ['color'] };
+// из style оставляем только цвет текста, цвет маркера и выравнивание
+const safeStyle = v => String(v || '').split(';').map(x => x.trim()).filter(x => /^(color|background-color)\s*:\s*(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\)|transparent)$/i.test(x) || /^text-align\s*:\s*(left|center|right)$/i.test(x)).join('; ');
 const DROP = new Set(['script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'textarea', 'select', 'meta', 'link', 'svg', 'math', 'template', 'noscript']);
 const safeUrl = u => /^(https?:\/\/|\/(?!\/)|mailto:)/i.test(String(u).trim());
 async function cleanHtml(html) {
@@ -147,7 +149,11 @@ async function cleanHtml(html) {
       if (!ALLOWED[tag]) { e.removeAndKeepContent(); return; }
       for (const [name, value] of [...e.attributes]) {
         if (!ALLOWED[tag].includes(name) || ((name === 'href' || name === 'src') && !safeUrl(value))) e.removeAttribute(name);
+        else if (name === 'style') { const st = safeStyle(value); if (st) e.setAttribute('style', st); else e.removeAttribute('style'); }
+        else if (name === 'color' && !/^#[0-9a-f]{3,8}$/i.test(value)) e.removeAttribute('color');
       }
+      if (tag === 'font') { const c = e.getAttribute('color'); e.tagName = 'span'; e.removeAttribute('color'); if (c) e.setAttribute('style', 'color: ' + c); }
+      if (tag === 'span' && !e.getAttribute('style')) { e.removeAndKeepContent(); return; }
       if (tag === 'a') {
         const href = e.getAttribute('href') || '';
         if (/^https?:\/\//i.test(href) && !href.startsWith(SITE)) { e.setAttribute('target', '_blank'); e.setAttribute('rel', 'noopener'); }

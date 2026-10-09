@@ -2609,3 +2609,7 @@ html.sb-hide { --sb: 0px; }
 .fl-coll-item figcaption { font: 600 13px/1.3 var(--sans); color: var(--text); }
 .fl-coll-item.got { background: rgba(76, 195, 138, .14); box-shadow: inset 0 0 0 2px rgba(76, 195, 138, .6); }
 .fl-coll-mark { position: absolute; top: 6px; right: 6px; padding: 1px 7px; border-radius: 99px; background: #4CC38A; color: #10301F; font: 700 11px var(--sans); }
+.be-swatches { display: flex; flex-wrap: wrap; gap: 4px; padding: 4px 2px 2px; width: 100%; }
+.be-swatches[hidden] { display: none; }
+.be-app .be-swatches button { width: 22px; height: 22px; min-width: 0; padding: 0; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #CFC7E8; font-size: 11px; color: #2B1A51; background: #fff; }
+.bp-body s, .bp-body strike, .bp-body del { text-decoration-thickness: 2px; }
