@@ -118,8 +118,7 @@
         <select id="be-fsec" aria-label="Раздел"><option value="">Все разделы</option>${sections.map(x => `<option value="${esc(x.slug)}"${lf.sec === x.slug ? ' selected' : ''}>${esc(sname(x))}</option>`).join('')}<option value="-"${lf.sec === '-' ? ' selected' : ''}>— без раздела —</option></select>
         <select id="be-fmonth" aria-label="Месяц"><option value="">Любой месяц</option>${months.map(m => { const a = m + '-01', b = m + '-31'; return `<option value="${m}"${lf.from === a && lf.to === b ? ' selected' : ''}>${MN[+m.slice(5) - 1]} ${m.slice(0, 4)}</option>`; }).join('')}</select>
         <span class="be-period"><label>с <input type="date" id="be-from" value="${lf.from}"></label><label>по <input type="date" id="be-to" value="${lf.to}"></label></span>
-        ${active ? '<button type="button" class="bc-link" id="be-freset">✕ сбросить</button>' : ''}
-        <span class="be-vl" role="group" aria-label="Язык названий">Названия: ${['ru', 'en', 'lv'].map(l => `<button type="button" data-vl="${l}" aria-pressed="${vl === l}">${l.toUpperCase()}</button>`).join('')}</span></div>`;
+        ${active ? '<button type="button" class="bc-link" id="be-freset">✕ сбросить</button>' : ''}</div>`;
       const sum = (k) => list.reduce((n, p) => n + (p[k] || 0), 0);
       const stats = list.length ? `<p class="be-sum">Найдено: <b>${list.length}</b> · 👁 ${sum('views')} просмотров · ♥ ${sum('likes')} · 💬 ${sum('comments')}${list.length > 1 ? ` · в среднем 👁 ${Math.round(sum('views') / list.length)} на статью` : ''}</p>` : '';
       const maxViews = Math.max(1, ...list.map(p => p.views || 0));
@@ -194,7 +193,8 @@
         <p class="be-ctext">${esc(c.body)}</p><p><button class="pill-btn" data-ok>Одобрить</button> <button class="pill-btn be-danger" data-del>Удалить</button></p></li>`).join('')}</ol></section>` : ''}
       <section class="be-card">
         <div class="be-dtabs" role="tablist">${[['published', 'Опубликованные', pub.length], ['draft', 'Черновики', drafts.length], ['sections', 'Разделы', sections.length], ['tags', 'Теги', tagCount]].map(([k, n, c]) =>
-          `<button type="button" role="tab" data-dtab="${k}" aria-selected="${dashTab === k}">${n} <span>${c}</span></button>`).join('')}</div>
+          `<button type="button" role="tab" data-dtab="${k}" aria-selected="${dashTab === k}">${n} <span>${c}</span></button>`).join('')}
+          <span class="be-vl" role="group" aria-label="Язык названий">🌐 Названия статей и разделов на: ${['ru', 'en', 'lv'].map(l => `<button type="button" data-vl="${l}" aria-pressed="${vl === l}">${l.toUpperCase()}</button>`).join('')}</span></div>
         ${dashTab === 'tags' ? tagsHtml() : dashTab === 'sections' ? sectionsHtml() : postsHtml(dashTab === 'draft' ? drafts : pub)}
       </section>
       ${state.media ? '' : '<p class="be-note">⚠ Хранилище картинок (R2) не подключено — загрузка картинок не заработает.</p>'}`;

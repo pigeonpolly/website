@@ -2623,3 +2623,5 @@ html.sb-hide { --sb: 0px; }
 .sw-pv-bag { margin-bottom: 18px; align-items: center; }
 .sw-pv-bag > * { flex: none; }
 .sw-pv-works { margin-top: 14px; clear: both; }
+.be-dtabs .be-vl { margin-left: auto; padding: 6px 10px; border-radius: 12px; background: #FFF7E6; border: 1px solid #F2D9A6; }
+.be-dtabs { flex-wrap: wrap; align-items: center; }
