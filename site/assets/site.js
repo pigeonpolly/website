@@ -150,4 +150,21 @@
     if (Math.abs(dx) > 50) show(i + (dx < 0 ? 1 : -1));
     x0 = null;
   });
+  // полоска «в цифрах» над меню: прячется, когда листаете вниз; цифры — с сервера (запоминаются на 10 минут)
+  const sb = document.querySelector('.statbar');
+  if (sb) {
+    let lastY = scrollY;
+    addEventListener('scroll', () => {
+      const y = scrollY;
+      if (Math.abs(y - lastY) > 6) { document.documentElement.classList.toggle('sb-hide', y > 40 && y > lastY); lastY = y; }
+    }, { passive: true });
+    const days = Math.floor((Date.now() - new Date(2019, 0, 1)) / 864e5) + 1;
+    const loc = { ru: 'ru-RU', lv: 'lv-LV' }[document.documentElement.lang] || 'en-GB';
+    const fill = d => sb.querySelectorAll('[data-stat]').forEach(b => { const v = b.dataset.stat === 'days' ? days : d && d[b.dataset.stat]; if (v != null) b.textContent = Number(v).toLocaleString(loc); });
+    fill(null);
+    let cached = null;
+    try { const c = JSON.parse(sessionStorage.getItem('pp-stats') || 'null'); if (c && Date.now() - c.at < 6e5) cached = c.d; } catch (e) { /* без памяти */ }
+    if (cached) fill(cached);
+    else fetch('/api/stats').then(r => r.ok ? r.json() : null).then(d => { if (!d) return; fill(d); try { sessionStorage.setItem('pp-stats', JSON.stringify({ at: Date.now(), d })); } catch (e) { /* без памяти */ } }).catch(() => {});
+  }
 })();

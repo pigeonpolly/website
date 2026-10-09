@@ -294,5 +294,12 @@
   ">Unsubscribe<": ">Atrakstīties<",
   ">Privacy<": ">Privātums<",
   "</b> <span>Timer</span>": "</b> <span>Taimeris</span>",
-  "<span>Card for social media</span>": "<span>Kartīte sociālajiem tīkliem</span>"
+  "<span>Card for social media</span>": "<span>Kartīte sociālajiem tīkliem</span>",
+  "<span class=\"sb-l\">Books out</span>": "<span class=\"sb-l\">Izdotas grāmatas</span>",
+  "<span class=\"sb-l\">Games</span>": "<span class=\"sb-l\">Spēles</span>",
+  "<span class=\"sb-l\">Birds in the flock</span>": "<span class=\"sb-l\">Putni barā</span>",
+  "<span class=\"sb-l\">Challenge sketches</span>": "<span class=\"sb-l\">Izaicinājuma zīmējumi</span>",
+  "<span class=\"sb-l\">Days on the artist's path</span>": "<span class=\"sb-l\">Dienas mākslinieces ceļā</span>",
+  "<span class=\"sb-l\">Blog articles</span>": "<span class=\"sb-l\">Raksti blogā</span>",
+  "aria-label=\"Pigeon Polly in numbers\"": "aria-label=\"Pigeon Polly skaitļos\""
 }

@@ -358,7 +358,9 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/stats') {
     const works = await getMeta(env, 'works_total') ?? (await env.DB.prepare('SELECT COUNT(*) AS n FROM posts').first()).n;
     const users = await getMeta(env, 'users_total') ?? (await env.DB.prepare('SELECT COUNT(*) AS n FROM users').first()).n;
-    return json({ works: Number(works), users: Number(users) }, 200, { 'cache-control': 'public, max-age=60' });
+    const birds = (await env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE banned = 0').first()).n; // как счётчик «Стаи»
+    const posts = (await env.DB.prepare("SELECT COUNT(*) AS n FROM blog_posts WHERE status = 'published' AND COALESCE(published_at, 0) <= CAST(strftime('%s', 'now') AS INTEGER)").first().catch(() => ({ n: 0 }))).n;
+    return json({ works: Number(works), users: Number(users), birds, posts }, 200, { 'cache-control': 'public, max-age=60' });
   }
   // «Стая» на главной: все, кто хоть раз входил; когда их много — те, кто заходил недавно (+ сам посетитель)
   if (m === 'GET' && p === '/api/flock') {
