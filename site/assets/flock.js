@@ -28,23 +28,24 @@
   const full = !!box.closest('.fl-full'); // отдельная страница /flock/: сцена на всю высоту окна
   function layout() {
     const st = box.querySelector('.fl-stage'), cw = st.clientWidth;
-    S = cw >= 900 ? 3 : cw >= 560 ? 2.5 : 2;
+    S = cw >= 900 ? 3.5 : cw >= 560 ? 2.8 : 2.2; // крупнее: птички и вещи на них лучше видны
     H = 142; OFF = 0;
     if (full) { // сцена во всю высоту окна: птички того же размера, сверху просто больше неба
-      if (cw >= 1300) S = 3.5;
-      const avail = Math.max(300, innerHeight - Math.max(0, st.getBoundingClientRect().top) - (document.fullscreenElement === box ? 12 : 20));
+      if (cw >= 1300) S = Math.max(4, cw / 330);
+      const avail = Math.max(360, innerHeight - (document.fullscreenElement === box ? 12 : 110)); // во всю высоту окна (под шапкой), а не от того места, где сцена начинается
+      S = Math.max(S, avail / 185, cw / 420); // крупнее: неба немного, остальное — площадь с птичками
       if (avail / S < 142) S = Math.max(2, avail / 142);
       H = Math.max(142, Math.floor(avail / S)); OFF = H - 142;
     }
     W = Math.round(cw / S);
-    cv.width = W; cv.height = H; cv.style.height = Math.round(H * S) + 'px';
+    cv.width = W * 2; cv.height = H * 2; cv.style.height = Math.round(H * S) + 'px'; // холст в 2 раза подробнее: детальные птички и мелкие детали сцены
     props = { bin: Math.round(W * .05), bench: Math.round(W * .13), cup: Math.round(W * .13) + 52, bun: Math.round(W * .52), baguette: Math.round(W * .68), book: Math.round(W * .86), lamp: Math.round(W * .955) };
     perches = [{ x: props.bench + 10, y: 66 }, { x: props.bench + 24, y: 66 }, { x: props.bench + 38, y: 66 }, { x: props.bin + 6, y: 62 }].map(p => ({ ...p, by: null }));
     bg = drawBackground();
   }
   function drawBackground() {
-    const c = document.createElement('canvas'); c.width = W; c.height = H;
-    const g = c.getContext('2d');
+    const c = document.createElement('canvas'); c.width = W * 2; c.height = H * 2;
+    const g = c.getContext('2d'); g.scale(2, 2);
     const r = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(Math.round(x), Math.round(y), w, h); };
     if (OFF) { // высокое небо: темнее кверху, звёзды и луна
       for (let y = 0; y < OFF; y++) { const k = y / OFF; r(0, y, W, 1, `rgb(${Math.round(24 + 19 * k)},${Math.round(14 + 14 * k)},${Math.round(56 + 26 * k)})`); }
@@ -80,7 +81,42 @@
     for (const y of [53, 58]) { r(Bx, y, 48, 3, '#9C6B3F'); r(Bx, y, 48, 1, '#B98652'); }
     for (const y of [67, 70]) { r(Bx - 1, y, 50, 3, '#9C6B3F'); r(Bx - 1, y, 50, 1, '#B98652'); }
     r(Bx, 84, 48, 1, 'rgba(0,0,0,.18)');
+    details(g);
     return c;
+  }
+  // мелкие детали в полпикселя: листва с цветами, плитка с бликами и трещинками, текстура дерева, фонарь с узором
+  function details(g) {
+    const f = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(Math.round(x * 2) / 2, Math.round(y * 2) / 2, w, h); };
+    const hash = n => { const x = Math.sin(n * 127.1) * 43758.5453; return x - Math.floor(x); };
+    // листва: светлые и тёмные листики, цветочки и ягодки
+    for (let i = 0; i < W * 3; i++) {
+      const x = hash(i) * W, top = 46 - (12 + 3 * Math.sin(x / 6) + 2 * Math.sin(x / 2.3)), y = top + 1 + hash(i + 999) * (45 - top);
+      f(x, y, .5, .5, hash(i + 7) > .5 ? '#4E8A5E' : '#24493A');
+      if (hash(i + 3) > .985) { f(x, y, 1, 1, ['#F08BC0', '#F5D547', '#FFFFFF', '#E0443A'][i % 4]); f(x + .5, y + .5, .5, .5, '#FFF3C4'); }
+    }
+    for (let x = 0; x < W; x += .5) f(x, 46 - (12 + Math.round(3 * Math.sin(x / 6) + 2 * Math.sin(x / 2.3))), .5, .5, '#5C9C6C');
+    // плитка: у каждой блик сверху, тень снизу, у некоторых — оттенок и трещинка
+    let n = 0;
+    for (let y = 46; y < H; y += 7) for (let x = (y / 7) % 2 ? 0 : 6, i = 0; x < W; x += 12, i++) {
+      n++;
+      if (hash(n) > .8) f(x + 1, y + 1, 11, 6, hash(n + 5) > .5 ? 'rgba(255,255,255,.07)' : 'rgba(0,0,0,.05)');
+      f(x + 1, y + 1, 10.5, .5, 'rgba(255,255,255,.18)'); f(x + 1, y + 6.5, 11, .5, 'rgba(0,0,0,.08)');
+      if (hash(n + 11) > .9) { f(x + 4, y + 2, .5, .5, '#9C8A6E'); f(x + 4.5, y + 2.5, .5, .5, '#9C8A6E'); f(x + 5, y + 3, .5, .5, '#9C8A6E'); f(x + 5, y + 3.5, .5, .5, '#9C8A6E'); }
+      if (hash(n + 21) > .93) { f(x + 7, y + 4, .5, .5, '#6FA36A'); f(x + 7.5, y + 3.5, .5, .5, '#8BC07F'); } // травинка в шве
+    }
+    // скамейка: волокна дерева, гвоздики, тень под сиденьем
+    const Bx = props.bench;
+    for (const y of [53, 58, 67, 70]) for (let x = Bx; x < Bx + 48; x += 3) f(x + hash(x + y) * 2, y + 1 + hash(x * y) * 1.5, 1.5, .5, '#86592F');
+    for (const y of [53, 58, 67, 70]) { f(Bx + 3, y + 1, .5, .5, '#3A2C22'); f(Bx + 45, y + 1, .5, .5, '#3A2C22'); }
+    f(Bx, 73, 48, 1, 'rgba(0,0,0,.12)');
+    for (const x of [Bx + 2, Bx + 44]) { f(x, 52, .5, 32, '#4A3C64'); }
+    // урна: блик на ободке, полоски, смятая бумажка
+    const B = props.bin;
+    f(B - 1, 64, 14, .5, '#3F6A53'); for (let x = B + 2; x < B + 12; x += 3) f(x + .5, 67, .5, 16, '#4F7E64'); f(B + 6, 61.5, 2, .5, '#FFFFFF');
+    // фонарь: стёкла, навершие, узор на основании
+    const L = props.lamp;
+    f(L - 1.5, 12.5, 1, 3, '#FFF3C4'); f(L + .5, 12.5, 1, 3, '#FFE08A'); f(L - .25, 8.5, .5, 1.5, '#2B2340'); f(L - .75, 8, 1.5, .5, '#E9A93B');
+    f(L - 3, 78, 6, .5, '#4A3C64'); f(L - .5, 30, 1, .5, '#4A3C64'); f(L - .5, 50, 1, .5, '#4A3C64');
   }
 
   // ---------- предметы: их можно носить, есть, пинать ----------
@@ -227,7 +263,7 @@
   function makeBird(u) {
     {
       const lk = window.PPBirds.dress ? window.PPBirds.dress(looks(u.id), u.avatar) : looks(u.id); // с подарками (шапка, обувь)
-      const b = { u, cat: lk.kind === 'cat', crow: lk.kind === 'crow', frames: [0, 1, 2].map(f => sprite(lk, f)), hat: null, x: rnd(10, W - 10), y: rnd(Y0, Y1), dir: Math.random() < .5 ? 1 : -1,
+      const b = { u, cat: lk.kind === 'cat', crow: lk.kind === 'crow', frames: [0, 1, 2].map(f => sprite(lk, f)), hd: window.PPBirds.spriteHD ? [0, 1, lk.kind === 'cat' ? 0 : 2].map(f => window.PPBirds.spriteHD(lk, f)) : null, hat: null, x: rnd(10, W - 10), y: rnd(Y0, Y1), dir: Math.random() < .5 ? 1 : -1,
         tasks: [], goal: null, wait: rnd(.3, 3), pose: 'idle', anim: rnd(0, 5), speed: lk.kind === 'cat' ? rnd(6, 9) : rnd(9, 15), fast: 1, perch: null, hold: null, emote: null, ev: null };
       b.heads = b.frames.map(headOf);
       if (party) b.hat = pickOne(HAT_COLORS);
@@ -987,7 +1023,8 @@
   }
 
   function draw() {
-    ctx.drawImage(bg, 0, 0);
+    ctx.setTransform(2, 0, 0, 2, 0, 0); ctx.imageSmoothingEnabled = false;
+    ctx.drawImage(bg, 0, 0, W, H);
     ctx.save(); ctx.translate(0, OFF);
     // свет фонаря
     const L = props.lamp, now = performance.now();
@@ -1012,7 +1049,11 @@
       const img = b.frames[f], x = Math.round(b.x), y = Math.round(b.y - dy) - (b.pose === 'walk' && f ? 1 : 0);
       if (!b.perch && !b.hop) { ctx.fillStyle = 'rgba(0,0,0,.16)'; ctx.fillRect(x - 5, Math.round(b.y), 10, 1); }
       ctx.save();
-      if (b.dir < 0) { ctx.translate(x, 0); ctx.scale(-1, 1); ctx.drawImage(img, -SW / 2, y - BASE); }
+      if (b.hd) { // детальная птичка: вдвое больше пикселей, тот же размер
+        const h = b.hd[f], hw = h.width / 2, hh = h.height / 2;
+        if (b.dir < 0) { ctx.translate(x, 0); ctx.scale(-1, 1); ctx.drawImage(h, -13, y - 26.5, hw, hh); }
+        else ctx.drawImage(h, x - 13, y - 26.5, hw, hh);
+      } else if (b.dir < 0) { ctx.translate(x, 0); ctx.scale(-1, 1); ctx.drawImage(img, -SW / 2, y - BASE); }
       else ctx.drawImage(img, x - SW / 2, y - BASE);
       ctx.restore();
       if (b.balloon) { // воздушный шарик на ниточке

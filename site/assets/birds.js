@@ -255,7 +255,7 @@
     for (let k = 0; k < 6; k++) for (let j = 0; j < 3; j++) put(tailX + j, y + 2 + k, k % 2 ? d : color);
     put(tailX, y + 8, d); put(tailX + 2, y + 8, d);
   }
-  function spriteHD(lk) {
+  function spriteHD(lk, frame = 0) { // кадры как у маленькой: 0 — стоит, 1 — шаг, 2 — клюёт (котик: сидит)
     const { g, put, ell, has } = hgrid();
     if (lk.kind === 'cat') {
       const fur = lk.fur, dark = shade(fur, fur === '#3A3550' ? 1.6 : .72), white = '#FBF8F0';
@@ -264,8 +264,9 @@
       ell(20, HB - 9, 13, 7.5, fur);
       if (lk.pattern === 'patches') { ell(23, HB - 6, 8, 3, white); ell(14, HB - 12, 4, 2.5, dark); }
       if (lk.pattern === 'stripes') for (let x = 10; x <= 28; x += 4) for (let y = HB - 16; y <= HB - 4; y++) if (has(x, y)) { put(x, y, dark); put(x + 1, y, dark); }
-      for (const px of [9, 14, 25, 30]) { for (let y = HB - 4; y <= HB; y++) { put(px, y, fur); put(px + 1, y, fur); put(px + 2, y, fur); } put(px, HB, shade(fur, .85)); }
-      if (lk.shoe) for (const px of [9, 14, 25, 30]) hdShoe(put, lk.shoe, px);
+      const paws = frame === 1 ? [7, 15, 23, 31] : [9, 14, 25, 30];
+      for (const px of paws) { for (let y = HB - 4; y <= HB; y++) { put(px, y, fur); put(px + 1, y, fur); put(px + 2, y, fur); } put(px, HB, shade(fur, .85)); }
+      if (lk.shoe) for (const px of paws) hdShoe(put, lk.shoe, px);
       const H = 34, V = HB - 21;
       ell(H, V, 8, 7.2, fur);
       stamp(put, ['c....', 'cc...', 'cpc..', 'cppc.'], H - 8, V - 10, { c: fur, p: '#F4A6C6' });
@@ -289,7 +290,7 @@
     ell(cx + 2, cy + bh / 4, bw / 3, bh / 4, light);                 // грудка
     ell(cx - 2, cy, bw / 3, bh / 3.2, dark);                           // крыло
     for (let x = Math.round(cx - 2 - bw / 3) + 2; x < cx - 2 + bw / 3 - 1; x += 2) put(x, Math.round(cy + bh / 3.2) - 1, deep); // перья на крыле
-    const hx = cx + bw / 2 - 2, hy = top - hr + 4 - neck;
+    const peck = frame === 2, hx = cx + bw / 2 - 2 + (peck ? 4 : 0), hy = top - hr + 4 - neck + (peck ? bh / 2 + 4 : 0);
     if (neck) for (let i = 0; i <= neck + 2; i++) for (let k = -2; k <= 1; k++) put(hx + k, hy + hr - 2 + i, lk.body);
     ell(hx, hy, hr + .4, hr + .4, lk.body);
     const ex = Math.round(hx + hr / 2), ey = Math.round(hy - (hr > 4 ? 2 : 1));
@@ -302,7 +303,7 @@
     const item = lk.item && HD_ITEMS[lk.item];
     if (item) stamp(put, item.r, bx + (lk.kind === 'crow' ? 5 : 3), by + item.dy, item.p);
     // лапки с пальчиками
-    for (const lx of [cx - 3, cx + 2]) {
+    for (const lx of frame === 1 ? [cx - 5, cx + 4] : [cx - 3, cx + 2]) {
       for (let y = bottom; y <= HB; y++) { put(lx, y, '#E9A93B', 'leg'); put(lx + 1, y, '#D9952B', 'leg'); }
       if (lk.shoe) hdShoe(put, lk.shoe, lx);
       else { put(lx + 2, HB, '#D9952B', 'leg'); put(lx + 3, HB, '#D9952B', 'leg'); put(lx - 1, HB, '#D9952B', 'leg'); }
@@ -378,5 +379,5 @@
   };
   const giftName = (kind, v, L = 0) => kind === 'anim' && v === 'heart' ? GIFT_NAMES.heartbeat[L] : kind === 'bg' || kind === 'scarf' ? GIFT_NAMES[kind][L] : (GIFT_NAMES[String(v).split(':')[0]] || [v, v, v])[L];
 
-  window.PPBirds = { looks, sprite, spriteHD, dress, avatar, giftName, GIFTS, SW, SH, BASE, OX };
+  window.PPBirds = { looks, sprite, spriteHD, crop, dress, avatar, giftName, HW, HH, HB, HO, GIFTS, SW, SH, BASE, OX };
 })();
