@@ -898,8 +898,8 @@
       }
     };
     walk(box);
-    // описание картинок (alt) тоже переводим — его читают поисковики и незрячие
-    box.querySelectorAll('img[alt]').forEach(i => { if (i.alt.trim() && !i.parentElement.closest('p, li, h2, h3, h4, blockquote')) { // в абзаце картинка переводится вместе с текстом абзаца slots.push({ set: v => { i.alt = plainText(v); } }); texts.push(i.alt); } });
+    // описание картинок (alt) тоже переводим — его читают поисковики и незрячие (картинка в абзаце переводится вместе с абзацем)
+    box.querySelectorAll('img[alt]').forEach(i => { if (i.alt.trim() && !i.parentElement.closest('p, li, h2, h3, h4, blockquote')) { slots.push({ set: v => { i.alt = plainText(v); } }); texts.push(i.alt); } });
     return {
       texts,
       rebuild(out) {
