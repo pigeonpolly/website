@@ -1,0 +1,54 @@
+<style>
+  .sp { position: relative; overflow: hidden; box-sizing: border-box; padding: 64px 32px; background: radial-gradient(ellipse at 50% 120%, #7A3A1E 0, #3A1F4E 55%, #24143F 100%); font-family: 'Karla', sans-serif; color: #FBF4E2; text-align: center; }
+  .sp-kick { margin: 0 0 8px; font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; color: #F5A25D; }
+  .sp h2 { margin: 0 0 12px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(28px, 4vw, 44px); line-height: 1.1; }
+  .sp-sub { margin: 0 auto 32px; max-width: 48ch; font-size: 17px; line-height: 1.6; color: #E6D9F2; }
+  .sp-sub b { color: #F5D547; }
+  .sp-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; max-width: 980px; margin: 0 auto; }
+  .sp-it { margin: 0; width: 104px; }
+  .sp-it .gift-pic { border-radius: 50%; background: #FBF4E2; box-shadow: 0 0 0 3px #E8792B, 0 8px 18px rgba(0, 0, 0, .35); transition: transform .25s; }
+  .sp-it:hover .gift-pic { transform: translateY(-5px) rotate(-4deg); }
+  .sp-it figcaption { margin-top: 8px; font: 600 13px/1.3 'Karla', sans-serif; color: #FBF4E2; }
+  .sp-it small { display: block; margin-top: 2px; font: 700 12px 'Karla', sans-serif; color: #F5D547; }
+  .sp-btn { display: inline-block; margin-top: 36px; padding: 15px 34px; border-radius: 999px; background: #E8792B; color: #FFFFFF; font: 700 17px 'Karla', sans-serif; text-decoration: none; box-shadow: 0 6px 0 #9A4A18; transition: transform .2s, box-shadow .2s; }
+  .sp-btn:hover { transform: translateY(2px); box-shadow: 0 4px 0 #9A4A18; }
+  .sp-hurry { margin: 14px 0 0; font: 600 14px 'Karla', sans-serif; color: #F5A25D; }
+  .sp-deco { position: absolute; font-size: 34px; opacity: .55; pointer-events: none; animation: sp-sway 5s ease-in-out infinite; }
+  @keyframes sp-sway { 50% { transform: translateY(10px) rotate(12deg); } }
+  @media (prefers-reduced-motion: reduce) { .sp-deco { animation: none; } .sp-it .gift-pic { transition: none; } }
+  @media (max-width: 760px) { .sp { padding: 48px 12px; } .sp-row { gap: 10px 6px; } .sp-it { width: calc(25% - 6px); } .sp-it .gift-pic { --ic: 64px; } .sp-it figcaption { font-size: 11px; } .sp-deco { font-size: 22px; opacity: .35; } }
+</style>
+
+<section class="sp" id="season-shop">
+  <span class="sp-deco" style="left:5%;top:12%" aria-hidden="true">🍂</span>
+  <span class="sp-deco" style="right:6%;top:18%;animation-delay:-2s" aria-hidden="true">🎃</span>
+  <span class="sp-deco" style="left:9%;bottom:14%;animation-delay:-1s" aria-hidden="true">🦇</span>
+  <span class="sp-deco" style="right:10%;bottom:10%;animation-delay:-3s" aria-hidden="true">🍁</span>
+  <p class="sp-kick">Seasonal shop</p>
+  <h2>Autumn and Halloween things for your bird</h2>
+  <p class="sp-sub">Witch hats, pumpkins, autumn wreaths and spooky frames are in the shop now. <b>Only a few of each, so hurry!</b></p>
+  <div class="sp-row" data-sp-row></div>
+  <a class="sp-btn" href="/shop/">🛍 Go to the shop →</a>
+  <p class="sp-hurry">Pay with buttons 🔘 you earn on the site.</p>
+</section>
+<script>
+  // сезонные вещи (темы «Осень» и «Хеллоуин» из PPBirds.GIFT_THEMES) с ценой и остатком из магазина; наведение — примерка на птичку
+  addEventListener('load', () => {
+    const B = window.PPBirds, row = document.querySelector('[data-sp-row]');
+    if (!B || !row) return;
+    const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
+    const left = ['{n} left', 'осталось {n}', 'atlikuši {n}'][L];
+    const items = B.GIFT_THEMES.filter(t => t[0] === 'halloween' || t[0] === 'autumn').flatMap(t => t[2]);
+    fetch('/api/shop').then(r => r.ok ? r.json() : { items: [] }).catch(() => ({ items: [] })).then(d => {
+      const shop = {}; (d.items || []).forEach(x => { shop[x.kind + '|' + x.item] = x; });
+      // сначала то, что есть в наличии
+      items.sort((a, b) => ((shop[b] || {}).stock > 0) - ((shop[a] || {}).stock > 0)).forEach(k => {
+        const [kind, v] = k.split('|'), s = shop[k], f = document.createElement('figure'); f.className = 'sp-it';
+        try { f.appendChild(B.giftPic(kind, v, 8, matchMedia('(max-width: 760px)').matches ? 66 : 96)); } catch (e) { return; }
+        const c = document.createElement('figcaption'); c.textContent = B.giftName(kind, v, L);
+        if (s && s.stock > 0) { const m = document.createElement('small'); m.textContent = '🔘 ' + s.price + ' · ' + left.replace('{n}', s.stock); c.appendChild(m); }
+        f.appendChild(c); row.appendChild(f);
+      });
+    });
+  });
+</script>
