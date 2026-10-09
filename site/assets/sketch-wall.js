@@ -2,7 +2,7 @@
 // Сервер — worker/index.js (/api/*). Пока сервер не подключён, показываем «Скоро».
 (() => {
   const app = document.getElementById('sw-app');
-  if (!app) return;
+  const profileOnly = !app; // на других страницах (например, «Стая») — только окно профиля птички
   const L = { en: 0, ru: 1, lv: 2 }[document.documentElement.lang] ?? 0;
   const locale = ['en-GB', 'ru-RU', 'lv-LV'][L];
   const T = {
@@ -548,5 +548,6 @@
     } catch (err) { alert(t('err')); }
   });
 
-  start();
+  window.PPProfile = openProfile;
+  if (!profileOnly) start();
 })();

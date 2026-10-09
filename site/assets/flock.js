@@ -236,6 +236,7 @@
         a.className = 'fl-nick' + (u.me ? ' me' : '');
         a.href = (lang === 'en' ? '' : '/' + lang) + '/challenge/#@' + encodeURIComponent(u.nick);
         a.textContent = (u.me ? '★ ' : '') + '@' + u.nick;
+        a.dataset.profile = u.nick; // там, где подключён sketch-wall.js, открывается окно профиля, без перехода
         labels.appendChild(a); b.label = a;
       }
       return b;

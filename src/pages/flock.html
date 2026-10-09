@@ -19,7 +19,7 @@
     var f = q.value.trim().toLowerCase().replace(/^@/, '');
     box.innerHTML = '';
     list.filter(function (b) { return !f || b.nick.toLowerCase().indexOf(f) >= 0; }).forEach(function (b) {
-      var a = document.createElement('a'); a.className = 'fl-all-bird'; a.href = pre + '/challenge/#@' + encodeURIComponent(b.nick);
+      var a = document.createElement('a'); a.className = 'fl-all-bird'; a.href = pre + '/challenge/#@' + encodeURIComponent(b.nick); a.dataset.profile = b.nick; // окно профиля открывается здесь же (sketch-wall.js)
       if (window.PPBirds) a.appendChild(window.PPBirds.avatar(b.id, b.avatar, 76));
       var n = document.createElement('span'); n.textContent = '@' + b.nick; a.appendChild(n);
       box.appendChild(a);
@@ -29,3 +29,5 @@
   fetch('/api/birds').then(function (r) { return r.ok ? r.json() : { birds: [] }; }).then(function (d) { list = d.birds || []; draw(); }).catch(function () {});
 })();
 </script>
+<script src="/assets/challenge-data.js" defer></script>
+<script src="/assets/sketch-wall.js" defer></script>
