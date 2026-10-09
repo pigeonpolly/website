@@ -330,12 +330,15 @@
 
   // ---------- подарки-семечки для аватара (выдаёт админ): фон, обувь, головной убор, анимация, рамка ----------
   // значение подарка — короткая строка: hat «crown:1» (вид:цвет), shoes «boots:3», bg «#F5C4B3», anim «bounce», frame «gold»
+  // тематические фоны-картинки и рамки-картинки (рисунки — site/assets/ava-deco.css, генератор tools/ava_deco_gen.py)
+  const BG_PICS = ['nightsky', 'hauntedmoon', 'pumpkinpatch', 'autumnleaves', 'rainyday', 'snowfall', 'xmas', 'hearts', 'blossom', 'beach', 'galaxy', 'synthwave', 'library', 'cafe'];
+  const SVG_FRAMES = ['web', 'candycorn', 'bats', 'autumnwreath', 'mushrooms', 'flowers', 'canestripe', 'lights', 'pixel', 'catears', 'bubbles', 'sunrays', 'clouds', 'jewels'];
   const GIFTS = {
-    bg: ['#F5C4B3', '#FBE3A1', '#CDEBD8', '#BFD7F5', '#E2D3F7', '#F7C6DA', '#FFFDF8', '#2B1A51', '#1D6B4F', '#D85A30', '#1B1035', '#E8F4FF', '#FFD6E0', '#F2C27B', '#0F0F2D'],
+    bg: ['#F5C4B3', '#FBE3A1', '#CDEBD8', '#BFD7F5', '#E2D3F7', '#F7C6DA', '#FFFDF8', '#2B1A51', '#1D6B4F', '#D85A30', '#1B1035', '#E8F4FF', '#FFD6E0', '#F2C27B', '#0F0F2D', ...BG_PICS],
     hat: ['halo', 'unicorn', 'flamecrown', 'wizard', 'witch', 'pumpkin', 'santa', 'antlers', 'beanie', 'heartband', 'wreath', 'strawhat', 'leafcrown', 'headset', 'pirate', 'chef', 'graduation', ...HATS.flatMap(h => HAT_C.map((c, i) => h + ':' + i))],
     shoes: SHOES.flatMap(h => SHOE_C.map((c, i) => h + ':' + i)),
     anim: ['bounce', 'wiggle', 'float', 'spin', 'sparkle', 'heart', 'aurora'],
-    frame: ['gold', 'rainbow', 'stars', 'hearts', 'leaves', 'dotted', 'snow', 'magic', 'spooky', 'neon', 'legend'],
+    frame: ['gold', 'rainbow', 'stars', 'hearts', 'leaves', 'dotted', 'snow', 'magic', 'spooky', 'neon', 'legend', ...SVG_FRAMES],
     item: ['dragonegg', 'goldfeather', 'comet', 'goldenapple', 'paintbrush', 'palette', 'pencil', 'coffee', 'croissant', 'pizza', 'cherry', 'wand', 'crystal', 'star', 'lollipop', 'minipumpkin', 'candycane', 'giftbox', 'ornament', 'snowflake', 'heart', 'rose', 'letter', 'icecream', 'mapleleaf', 'gamepad', 'coin', 'sword', 'mushroom', 'cheese', 'ring', 'pearl', 'ruby', 'sapphire', 'key', 'spoon'],
     scarf: ['#E0443A', '#E9A93B', '#4CC38A', '#4A7BD8', '#F08BC0', '#9B5DE5', '#FFFFFF', '#2B2340', '#5FA8A0', '#D85A30'],
   };
@@ -364,7 +367,7 @@
   function avatar(id, av, size) {
     av = av || {};
     const el = document.createElement('span');
-    el.className = 'pp-ava' + (av.frame ? ' fr-' + av.frame : '') + (av.anim ? ' an-' + av.anim : '');
+    el.className = 'pp-ava' + (av.frame ? ' fr-' + av.frame : '') + (SVG_FRAMES.includes(av.frame) ? ' fr-svg' : '') + (BG_PICS.includes(av.bg) ? ' bg-' + av.bg : '') + (av.anim ? ' an-' + av.anim : ''); // фоны-картинки и рамки-картинки — в ava-deco.css
     el.style.setProperty('--ava', (size || 120) + 'px');
     if (/^#[0-9a-f]{6}$/i.test(av.bg || '')) el.style.setProperty('--ava-bg', av.bg);
     const c = crop(spriteHD(dress(looks(id), av)));
@@ -419,27 +422,37 @@
     dragonegg: ['Dragon egg', 'Яйцо дракона', 'Pūķa ola'], goldfeather: ['Golden feather', 'Золотое перо', 'Zelta spalva'], comet: ['Comet', 'Комета', 'Komēta'], goldenapple: ['Golden apple', 'Золотое яблоко', 'Zelta ābols'],
     paintbrush: ['Paintbrush', 'Кисточка', 'Ota'], palette: ['Palette', 'Палитра', 'Palete'], pencil: ['Pencil', 'Карандаш', 'Zīmulis'], coffee: ['Coffee', 'Кофе', 'Kafija'], croissant: ['Croissant', 'Круассан', 'Kruasāns'],
     legend: ['Legendary frame', 'Легендарная рамка', 'Leģendārais rāmis'], aurora: ['Aurora glow', 'Северное сияние', 'Ziemeļblāzma'],
+    'bg:nightsky': ['Night sky', 'Ночное небо', 'Nakts debesis'], 'bg:hauntedmoon': ['Haunted moon', 'Жуткая луна', 'Spoku mēness'], 'bg:pumpkinpatch': ['Pumpkin patch', 'Тыквенная грядка', 'Ķirbju dobe'],
+    'bg:autumnleaves': ['Falling leaves', 'Листопад', 'Lapkritis'], 'bg:rainyday': ['Rainy day', 'Дождливый день', 'Lietaina diena'], 'bg:snowfall': ['Snowfall', 'Снегопад', 'Sniegs krīt'],
+    'bg:xmas': ['Christmas lights', 'Праздничная гирлянда', 'Svētku virtene'], 'bg:hearts': ['Sweetheart', 'Сердечный фон', 'Sirsniņu fons'], 'bg:blossom': ['Cherry blossom', 'Цветущая сакура', 'Ziedoša sakura'],
+    'bg:beach': ['Beach day', 'Пляж', 'Pludmale'], 'bg:galaxy': ['Galaxy', 'Галактика', 'Galaktika'], 'bg:synthwave': ['Retro arcade', 'Ретро-аркада', 'Retro arkāde'],
+    'bg:library': ['Library', 'Библиотека', 'Bibliotēka'], 'bg:cafe': ['Café tablecloth', 'Скатерть в кафе', 'Kafejnīcas galdauts'],
+    web: ['Spider web', 'Паутина', 'Zirnekļa tīkls'], candycorn: ['Candy corn', 'Конфеты-кукурузки', 'Konfekšu kukurūza'], bats: ['Bats', 'Летучие мыши', 'Sikspārņi'],
+    autumnwreath: ['Leaf wreath', 'Венок из листьев', 'Lapu vainags'], mushrooms: ['Mushroom ring', 'Грибная полянка', 'Sēņu aplis'], flowers: ['Flower crown', 'Цветочный венок', 'Ziedu vainags'],
+    canestripe: ['Candy cane frame', 'Карамельная рамка', 'Konfekšu rāmis'], lights: ['Fairy lights', 'Гирлянда', 'Virtene'], pixel: ['8-bit', '8 бит', '8 biti'],
+    catears: ['Cat ears', 'Кошачьи ушки', 'Kaķa austiņas'], bubbles: ['Bubbles', 'Пузырьки', 'Burbulīši'], sunrays: ['Sunshine', 'Солнышко', 'Saulīte'],
+    clouds: ['Clouds', 'Облака', 'Mākoņi'], jewels: ['Jewels', 'Драгоценности', 'Dārgakmeņi'],
     bg: ['Background', 'Фон', 'Fons'], scarf: ['Scarf', 'Шарфик', 'Šallīte'],
   };
-  const giftName = (kind, v, L = 0) => kind === 'anim' && v === 'heart' ? GIFT_NAMES.heartbeat[L] : kind === 'bg' || kind === 'scarf' ? GIFT_NAMES[kind][L] : (GIFT_NAMES[String(v).split(':')[0]] || [v, v, v])[L];
+  const giftName = (kind, v, L = 0) => kind === 'anim' && v === 'heart' ? GIFT_NAMES.heartbeat[L] : kind === 'bg' && GIFT_NAMES['bg:' + v] ? GIFT_NAMES['bg:' + v][L] : kind === 'bg' || kind === 'scarf' ? GIFT_NAMES[kind][L] : (GIFT_NAMES[String(v).split(':')[0]] || [v, v, v])[L];
 
   // темы и сезоны вещей (для кнопок-фильтров в «Коллекциях» и в кабинете): 'вид|значение'
   // легендарные вещи: редкие, в коллекциях с золотой звездой
   const LEGEND = new Set(['hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora']);
   const GIFT_THEMES = [
     ['legendary', ['★ Legendary', '★ Легендарные', '★ Leģendārie'], [...LEGEND]],
-    ['art', ['🎨 Artist', '🎨 Художник', '🎨 Mākslinieks'], ['hat|beret:0', 'hat|beret:4', 'item|paintbrush', 'item|palette', 'item|pencil', 'scarf|#9B5DE5']],
-    ['cafe', ['☕ Café', '☕ Кафе', '☕ Kafejnīca'], ['hat|chef', 'item|coffee', 'item|croissant', 'item|pizza', 'item|cheese', 'item|icecream']],
-    ['school', ['🎓 Study', '🎓 Учёба', '🎓 Mācības'], ['hat|graduation', 'item|pencil', 'item|letter', 'item|star', 'frame|stars']],
-    ['pirate', ['🏴‍☠️ Pirates', '🏴‍☠️ Пираты', '🏴‍☠️ Pirāti'], ['hat|pirate', 'item|coin', 'item|key', 'item|sword', 'item|ruby', 'scarf|#E0443A']],
-    ['magic', ['✨ Magic', '✨ Волшебство', '✨ Burvība'], ['hat|wizard', 'item|wand', 'item|crystal', 'item|star', 'frame|magic', 'frame|stars', 'anim|sparkle']],
-    ['halloween', ['🎃 Halloween', '🎃 Хеллоуин', '🎃 Helovīns'], ['hat|witch', 'hat|pumpkin', 'item|minipumpkin', 'item|lollipop', 'frame|spooky', 'bg|#1B1035']],
-    ['newyear', ['🎄 New Year', '🎄 Новый год', '🎄 Jaunais gads'], ['hat|santa', 'hat|antlers', 'hat|beanie', 'item|candycane', 'item|giftbox', 'item|ornament', 'item|snowflake', 'frame|snow', 'bg|#E8F4FF', 'scarf|#E0443A', 'scarf|#FFFFFF']],
-    ['valentine', ["💘 Valentine's Day", '💘 День влюблённых', '💘 Valentīndiena'], ['hat|heartband', 'item|heart', 'item|rose', 'item|letter', 'frame|hearts', 'bg|#FFD6E0', 'anim|heart', 'scarf|#F08BC0']],
-    ['spring', ['🌸 Spring', '🌸 Весна', '🌸 Pavasaris'], ['hat|wreath', 'item|cherry', 'bg|#CDEBD8', 'bg|#F7C6DA', 'frame|leaves']],
-    ['summer', ['☀️ Summer', '☀️ Лето', '☀️ Vasara'], ['hat|strawhat', 'item|icecream', 'item|cherry', 'bg|#FBE3A1', 'bg|#BFD7F5']],
-    ['autumn', ['🍂 Autumn', '🍂 Осень', '🍂 Rudens'], ['hat|leafcrown', 'item|mapleleaf', 'bg|#F2C27B', 'frame|leaves', 'scarf|#D85A30', 'scarf|#E9A93B']],
-    ['gaming', ['🎮 Gaming', '🎮 Гейминг', '🎮 Spēles'], ['hat|headset', 'item|gamepad', 'item|coin', 'item|sword', 'item|mushroom', 'frame|neon', 'bg|#0F0F2D']],
+    ['art', ['🎨 Artist', '🎨 Художник', '🎨 Mākslinieks'], ['hat|beret:0', 'hat|beret:4', 'item|paintbrush', 'item|palette', 'item|pencil', 'scarf|#9B5DE5', 'frame|catears']],
+    ['cafe', ['☕ Café', '☕ Кафе', '☕ Kafejnīca'], ['hat|chef', 'item|coffee', 'item|croissant', 'item|pizza', 'item|cheese', 'item|icecream', 'bg|cafe']],
+    ['school', ['🎓 Study', '🎓 Учёба', '🎓 Mācības'], ['hat|graduation', 'item|pencil', 'item|letter', 'item|star', 'frame|stars', 'bg|library']],
+    ['pirate', ['🏴‍☠️ Pirates', '🏴‍☠️ Пираты', '🏴‍☠️ Pirāti'], ['hat|pirate', 'item|coin', 'item|key', 'item|sword', 'item|ruby', 'scarf|#E0443A', 'frame|jewels']],
+    ['magic', ['✨ Magic', '✨ Волшебство', '✨ Burvība'], ['hat|wizard', 'item|wand', 'item|crystal', 'item|star', 'frame|magic', 'frame|stars', 'anim|sparkle', 'bg|galaxy', 'bg|nightsky', 'frame|clouds']],
+    ['halloween', ['🎃 Halloween', '🎃 Хеллоуин', '🎃 Helovīns'], ['hat|witch', 'hat|pumpkin', 'item|minipumpkin', 'item|lollipop', 'frame|spooky', 'bg|#1B1035', 'bg|hauntedmoon', 'bg|pumpkinpatch', 'frame|web', 'frame|candycorn', 'frame|bats']],
+    ['newyear', ['🎄 New Year', '🎄 Новый год', '🎄 Jaunais gads'], ['hat|santa', 'hat|antlers', 'hat|beanie', 'item|candycane', 'item|giftbox', 'item|ornament', 'item|snowflake', 'frame|snow', 'bg|#E8F4FF', 'scarf|#E0443A', 'scarf|#FFFFFF', 'bg|snowfall', 'bg|xmas', 'frame|canestripe', 'frame|lights']],
+    ['valentine', ["💘 Valentine's Day", '💘 День влюблённых', '💘 Valentīndiena'], ['hat|heartband', 'item|heart', 'item|rose', 'item|letter', 'frame|hearts', 'bg|#FFD6E0', 'anim|heart', 'scarf|#F08BC0', 'bg|hearts']],
+    ['spring', ['🌸 Spring', '🌸 Весна', '🌸 Pavasaris'], ['hat|wreath', 'item|cherry', 'bg|#CDEBD8', 'bg|#F7C6DA', 'frame|leaves', 'bg|blossom', 'frame|flowers']],
+    ['summer', ['☀️ Summer', '☀️ Лето', '☀️ Vasara'], ['hat|strawhat', 'item|icecream', 'item|cherry', 'bg|#FBE3A1', 'bg|#BFD7F5', 'bg|beach', 'frame|bubbles', 'frame|sunrays']],
+    ['autumn', ['🍂 Autumn', '🍂 Осень', '🍂 Rudens'], ['hat|leafcrown', 'item|mapleleaf', 'bg|#F2C27B', 'frame|leaves', 'scarf|#D85A30', 'scarf|#E9A93B', 'bg|autumnleaves', 'bg|rainyday', 'bg|pumpkinpatch', 'frame|autumnwreath', 'frame|mushrooms']],
+    ['gaming', ['🎮 Gaming', '🎮 Гейминг', '🎮 Spēles'], ['hat|headset', 'item|gamepad', 'item|coin', 'item|sword', 'item|mushroom', 'frame|neon', 'bg|#0F0F2D', 'bg|synthwave', 'frame|pixel']],
   ];
   const GIFT_KINDS = [['hat', ['Hats', 'Головные уборы', 'Galvassegas']], ['item', ['Treats to hold', 'В клюв', 'Knābī']], ['shoes', ['Shoes', 'Обувь', 'Apavi']], ['scarf', ['Scarves', 'Шарфики', 'Šallītes']],
     ['frame', ['Frames', 'Рамки', 'Rāmji']], ['bg', ['Backgrounds', 'Фоны', 'Foni']], ['anim', ['Animations', 'Анимации', 'Animācijas']]];
