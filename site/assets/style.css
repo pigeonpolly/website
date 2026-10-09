@@ -2547,3 +2547,7 @@ html.sb-hide { --sb: 0px; }
 .adm-gift-card .pill-btn.pill-fill { color: #2B1A51; }
 .adm-gift-card .be-note { color: #5A4E78; }
 .adm-gift-items small { font-size: 11px; color: #5A4E78; margin-top: 4px; }
+.sw-pv-bag-t { margin: 14px 0 6px; font: 700 13px var(--sans); text-transform: uppercase; letter-spacing: .06em; color: #8C7FB0; text-align: left; }
+.sw-pv-bag { display: flex; flex-wrap: wrap; gap: 8px; }
+.sw-pv-item { padding: 3px; border-radius: 50%; }
+.sw-pv-item.on { box-shadow: 0 0 0 2px #E9A93B; }

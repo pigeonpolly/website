@@ -358,7 +358,8 @@ async function route(req, env, url) {
     const pickUser = Number(await getMeta(env, 'pick_user'));
     const badges = mergedBadges(u, rows).filter(b => b !== 'pick_past' || pickUser !== u.id);
     if (pickUser === u.id) badges.push('pick');
-    return json({ id: u.id, avatar: avatarOf(u), nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(rows.map(r => r.day)).current,
+    const bag = (await env.DB.prepare("SELECT DISTINCT kind, item FROM gifts WHERE user_id = ? AND status = 'bag'").bind(u.id).all()).results; // вещи в сумке — их видят все
+    return json({ id: u.id, avatar: avatarOf(u), bag, nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(rows.map(r => r.day)).current,
       best: mergedBest(u, rows.map(r => r.day)), badges, posts: rows.filter(r => !r.hidden).map(({ id, day, theme, bw }) => ({ id, day, theme, bw })) });
   }
 

@@ -445,12 +445,18 @@
     const v = document.createElement('div');
     v.className = 'sw-bv sw-pv'; v.setAttribute('role', 'dialog');
     v.innerHTML = `<div class="sw-bv-card sw-pv-card"><button type="button" class="sw-bv-close" aria-label="Close">✕</button>
-      <div class="sw-pv-head">${lv ? medal(lv, true, true) : `<span class="sw-medal big off" style="--bg:#F4F0FA">${spriteSvg('egg')}</span>`}
+      <div class="sw-pv-head">${window.PPBirds && pr.id ? '<span class="sw-ava-slot"></span>' : lv ? medal(lv, true, true) : `<span class="sw-medal big off" style="--bg:#F4F0FA">${spriteSvg('egg')}</span>`}
         <div><h3><span class="sw-nickname${pr.gold ? ' gold' : ''}">@${esc(pr.nick)}</span></h3><p class="sw-level">${lv ? esc(lv.n[L]) : '—'}</p>
         <p class="sw-pv-streak">🔥 ${t('streak', pr.current)} · ${t('best', pr.best)}</p></div></div>
       <div class="sw-pv-badges">${LEVELS.map(l => medal(l, pr.best >= l.d)).join('')}${SPECIAL.map(x => medal(x, st(x), false, 'span', pr.picks)).join('')}</div>
+      ${pr.bag && pr.bag.length && window.PPBirds ? `<h4 class="sw-pv-bag-t">🎒 ${t('bag')}</h4><div class="sw-pv-bag"></div>` : ''}
       <div class="sw-pv-works">${pr.posts.map(p => `<a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"><span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></a>`).join('') || `<p class="sw-empty">${t('noWorks')}</p>`}</div>
     </div>`;
+    if (window.PPBirds && pr.id) {
+      const slot = v.querySelector('.sw-ava-slot'); if (slot) slot.replaceWith(window.PPBirds.avatar(pr.id, pr.avatar, 110));
+      const bagEl = v.querySelector('.sw-pv-bag');
+      if (bagEl) for (const g of pr.bag) { const it = document.createElement('span'); it.className = 'sw-pv-item' + (pr.avatar && pr.avatar[g.kind] === g.item ? ' on' : ''); it.title = kindName(g.kind); it.appendChild(window.PPBirds.avatar(pr.id, Object.assign({}, pr.avatar, { [g.kind]: g.item }), 52)); bagEl.appendChild(it); }
+    }
     // Esc: если открыта картинка — закрывается только она (слушаем раньше просмотрщика, в фазе перехвата)
     const close = () => { v.remove(); document.removeEventListener('keydown', k, true); };
     const k = e => e.key === 'Escape' && !document.querySelector('.lightbox.open') && close();
