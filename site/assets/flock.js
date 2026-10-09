@@ -42,6 +42,7 @@
     props = { bin: Math.round(W * .05), bench: Math.round(W * .13), cup: Math.round(W * .13) + 52, bun: Math.round(W * .52), baguette: Math.round(W * .68), book: Math.round(W * .86), lamp: Math.round(W * .955) };
     if (loc) props.lamp = loc === 'diner' ? Math.round(W * .55) : Math.round(W * .2);
     perches = scenePerches();
+    setTimeout(() => { placeBooks(); syncMenu(); }, 0);
     bg = drawBackground();
   }
   function drawBackground() {
@@ -176,9 +177,39 @@
     const L = props.lamp; r(L - .5, 30, 1, 52, '#2B2340'); r(L - 5, 24, 10, 7, '#F5D547'); r(L - 4, 23, 8, 1, '#E9C14A'); r(L - 3, 82, 6, 1.5, '#2B2340');
     // стопки книг на полу и касса справа
     for (const [bx, cnt] of [[W * .62, 4], [W * .66, 3]]) for (let i = 0; i < cnt; i++) { r(bx + (i % 2) * .5, 82 - i * 2.5, 10, 2.5, spines[(i + Math.round(bx)) % spines.length]); r(bx + 1, 82 - i * 2.5, 8, .5, '#FFFDF5'); }
+    // витрина «Книги Алины»: столик, обложки поверх — настоящие ссылки (HTML)
+    const d0 = Math.round(W * .46);
+    r(d0 - 2, 58, 52, 3, '#A8714A'); r(d0 - 2, 58, 52, .5, '#C98C5E'); r(d0, 61, 2, 20, '#7E5232'); r(d0 + 46, 61, 2, 20, '#7E5232'); r(d0 - 2, 61, 52, 1, 'rgba(0,0,0,.2)');
+    r(d0 + 10, 64, 28, 6, '#2B5A44'); r(d0 + 11, 65, 26, 4, '#3E7A55'); [...'BOOKS'].forEach(() => 0);
     const c0 = Math.round(W * .82);
     r(c0, 56, W - c0 - 4, 20, '#8B5A3C'); r(c0, 54, W - c0 - 4, 2, '#A8714A'); for (let x = c0 + 3; x < W - 6; x += 8) r(x, 59, 5, 14, '#7A4C30');
     r(c0 + 6, 46, 10, 8, '#4A3C64'); r(c0 + 7, 47, 8, 3, '#B9F0D6'); r(c0 + 7, 51, 2, 2, '#E9A93B'); r(c0 + 10, 51, 2, 2, '#E9A93B'); r(c0 + 20, 48, 6, 6, '#4C8A61'); r(c0 + 21, 44, 4, 4, '#3E7A55'); r(c0 + 19, 53, 8, 1, '#8B5A2B');
+  }
+  // что можно делать в каждой локации (кнопки «Поиграть» и случайные события)
+  const ALLOW = {
+    park: ['seed', 'party', 'wind', 'rain', 'football', 'dance', 'nap', 'coffee', 'tug', 'plane', 'bookclub', 'box', 'delivery', 'tidy'],
+    diner: ['seed', 'party', 'dance', 'nap', 'coffee', 'tug', 'plane', 'box', 'tidy', 'milkshake', 'pancakes'],
+    bookstore: ['party', 'nap', 'coffee', 'plane', 'bookclub', 'box', 'tidy', 'reading', 'booktower'],
+  };
+  const allowed = name => { const l = ALLOW[loc || 'park']; return !Object.values(ALLOW).some(a => a.includes(name)) || l.includes(name); };
+  function syncMenu() { box.querySelectorAll('.fl-menu [data-act]').forEach(b => { if (!b.dataset.act.startsWith('loc')) b.hidden = !allowed(b.dataset.act); }); }
+  // настоящие книги Алины на витрине книжного: обложки — ссылки
+  let BOOKS = [], bookEls = [];
+  fetch('/assets/books.json').then(r => r.ok ? r.json() : []).then(d => { BOOKS = d || []; placeBooks(); }).catch(e => console.warn('books', e));
+  function placeBooks() {
+    if (!labels) return;
+    if (!bookEls.length && BOOKS.length) bookEls = BOOKS.map(bk => {
+      const a = document.createElement('a'); a.className = 'fl-book'; a.href = bk.url; a.title = bk.title;
+      if (/^https?:/.test(bk.url)) { a.target = '_blank'; a.rel = 'noopener'; }
+      a.innerHTML = `<img src="${bk.cover}" alt="${bk.title.replace(/"/g, '&quot;')}" loading="lazy">`; labels.appendChild(a); return a;
+    });
+    const k = cv.getBoundingClientRect().width / W, d0 = Math.round(W * .46);
+    bookEls.forEach((a, i) => {
+      if (!a.isConnected) labels.appendChild(a); // слой подписей пересоздаётся, когда приходят птички
+      a.hidden = loc !== 'bookstore';
+      a.style.transform = `translate(${((d0 + 1 + i * 12) * k).toFixed(1)}px, ${((OFF + 44) * k).toFixed(1)}px)`;
+      a.style.width = (10 * k).toFixed(1) + 'px'; a.style.height = (14 * k).toFixed(1) + 'px';
+    });
   }
   // где сидеть в каждой локации: скамейка и урна / табуреты и диванчик / кресло, касса и стопка книг
   function scenePerches() {
@@ -189,11 +220,13 @@
     return list.map(p => ({ ...p, by: null }));
   }
   function setLoc(kind) {
+    if (ev) endEvent(); // действие прошлой локации заканчивается вместе с ней
+    for (const it of items) if (['tower', 'shake', 'pancakes'].includes(it.type)) it.gone = true;
     for (const b of birds) { if (b.inside) comeOut(b); if (b.perch) { b.perch.by = null; b.perch = null; } }
     loc = kind; locIn = kind ? rnd(110, 170) : rnd(50, 80);
     props.lamp = kind === 'diner' ? Math.round(W * .55) : kind === 'bookstore' ? Math.round(W * .2) : Math.round(W * .955);
     perches = scenePerches();
-    bg = drawBackground();
+    bg = drawBackground(); placeBooks(); syncMenu();
     // вся стая перелетает в новое место: влетают сверху по очереди
     for (const b of birds) if (!b.ev) { b.tasks = []; b.goal = null; b.wait = 0; b.pose = 'idle'; b.hop = { from: { x: b.x + rnd(-40, 40), y: -OFF - 30 }, to: { x: b.x, y: b.y }, t: -rnd(0, 1.2), dur: 1.4, h: 0 }; }
     box.querySelectorAll('[data-act^="loc"]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.act === (kind === 'diner' ? 'loc-diner' : kind === 'bookstore' ? 'loc-books' : 'loc-park'))));
@@ -265,7 +298,7 @@
     for (const it of items) it.home = { x: it.x, y: it.y };
     for (const [dx, dy] of [[-6, 4], [-3, 7], [18, 5], [10, 8]]) items.push({ type: 'crumb', x: props.bun + dx, y: 100 + dy, bites: 1 });
   }
-  const FOOD = ['bun', 'baguette', 'half', 'crumb', 'seed', 'cake', 'slice'];
+  const FOOD = ['bun', 'baguette', 'half', 'crumb', 'seed', 'cake', 'slice', 'pancakes'];
   const CARRY = ['bun', 'half', 'book', 'cup', 'plane', 'leaf', 'scrap', 'slice', 'letter'];
   function bite(it) {
     if (!it || it.gone || it.held) return;
@@ -293,6 +326,23 @@
         if (held || it.flat) { for (let i = 0; i < len; i++) { R(x0 + i, y - 3, 1, 3, '#D9944A'); R(x0 + i, y - 3, 1, 1, '#EDB56E'); if (i % 6 === 3) R(x0 + i, y - 2, 2, 1, '#F7D9A3'); } }
         else { for (let i = 0; i < len; i++) { const yy = y - 4 - Math.floor(i / 6); R(x0 + i, yy, 1, 4, '#D9944A'); R(x0 + i, yy, 1, 1, '#EDB56E'); if (i % 6 === 3) R(x0 + i, yy + 1, 2, 1, '#F7D9A3'); } sh(len); }
         break;
+      }
+      case 'shake': { // молочный коктейль с трубочкой
+        R(x - 2, y - 9, 5, 8, 'rgba(255,255,255,.75)'); R(x - 1, y - 8, 3, 6, it.c || '#F7A8C4'); R(x - 2, y - 10, 5, 2, '#FFFFFF'); R(x, y - 12, 1, 3, '#E0443A'); R(x - 1, y - 1, 3, 1, '#D7DEE3'); R(x, y - 11, 1, 1, '#E0443A');
+        break;
+      }
+      case 'pancakes': { // стопка блинчиков с сиропом и маслом
+        const n = Math.max(1, Math.ceil((it.bites || 1) / 3));
+        R(x - 9, y - 1, 18, 1, '#D7DEE3');
+        for (let i = 0; i < n; i++) { R(x - 7, y - 3 - i * 2, 14, 2, '#E3A35A'); R(x - 7, y - 3 - i * 2, 14, 1, '#F0C27C'); }
+        R(x - 5, y - 3 - n * 2, 10, 1, '#B5651D'); R(x - 6, y - 2 - n * 2 + 2, 2, 2, '#B5651D'); R(x + 3, y - 2 - n * 2 + 3, 1, 3, '#B5651D'); R(x - 1, y - 4 - n * 2, 3, 2, '#FFF3B0');
+        sh(16); break;
+      }
+      case 'tower': { // книжная башня из разноцветных книг
+        const cols = ['#E0443A', '#4A7BD8', '#F5D547', '#4CC38A', '#9B5DE5', '#F08BC0', '#E9A93B', '#2B5A44'];
+        const wob = it.wobble ? Math.sin(performance.now() / 90) * Math.min(3, it.wobble) : 0;
+        for (let i = 0; i < (it.n || 0); i++) { const off = Math.round(wob * i / 6); R(x - 7 + off + (i % 2), y - 3 - i * 3, 14 - (i % 3), 3, cols[i % cols.length]); R(x - 6 + off + (i % 2), y - 3 - i * 3, 12 - (i % 3), 1, '#FFFDF5'); }
+        sh(16); break;
       }
       case 'book':
         if (held) { R(x - 5, y - 4, 10, 4, '#B23A48'); R(x - 5, y - 1, 10, 1, '#FFFDF5'); break; }
@@ -619,6 +669,85 @@
         if (e.read > 10) return true;
       },
       end(e) { e.book.reading = false; e.book.lock = false; },
+    },
+    // ---- закусочная: молочные коктейли у стойки ----
+    milkshake: {
+      ok: () => loc === 'diner' && freeBirds(isBird).length >= 2, w: 3,
+      start(e) {
+        const seats = perches.filter(p => !p.by).slice(0, 5);
+        e.list = closest(freeBirds(isBird), W / 2, Math.min(seats.length, 4)); enlist(e.list, e); e.shakes = [];
+        e.list.forEach((b, i) => { const p = seats[i]; p.by = b; b.tasks.push({ go: { x: cx(p.x), y: Y0 } }, { hop: { x: p.x, y: p.y } }, { fn: () => { b.perch = p; const sk = { type: 'shake', x: p.x + 6, y: 50, lock: true, c: pickOne(['#F7A8C4', '#8B5A2B', '#FFF3B0', '#9ED9CF']) }; items.push(sk); e.shakes.push(sk); } }, { wait: 99, pose: 'sit' }); });
+        e.t = 0;
+      },
+      update(e, dt) {
+        e.t += dt;
+        for (const b of e.list) if (b.perch && Math.random() < dt * .5) say(b, pickOne(['heart', 'note']), 1);
+        return e.t > 14;
+      },
+      end(e) { for (const sk of e.shakes || []) sk.gone = true; for (const b of e.list) { if (b.perch) { b.perch.by = null; b.perch = null; } b.y = Y0 + 4; } },
+    },
+    // ---- закусочная: блинчики! все сбегаются ----
+    pancakes: {
+      ok: () => loc === 'diner' && freeBirds(isBird).length >= 2, w: 3,
+      start(e) {
+        const pc = e.pc = { type: 'pancakes', x: cx(W * rnd(.3, .7)), y: cy(rnd(Y0 + 8, Y1 - 6)), bites: 15 }; items.push(pc);
+        fx.push({ type: 'poof', x: pc.x, y: pc.y - 6, t: .6 });
+        e.list = closest(freeBirds(isBird), pc.x, 6); enlist(e.list, e);
+        e.list.forEach((b, i) => { const a = i / e.list.length * Math.PI * 2; b.tasks.push({ say: '!', t: .8 }, { go: { x: cx(pc.x + Math.cos(a) * 14), y: cy(pc.y + Math.sin(a) * 5) }, fast: 1.8 }, { face: Math.cos(a) > 0 ? -1 : 1 }, { wait: 99, pose: 'peck' }); });
+        e.t = 0;
+      },
+      update(e, dt) {
+        e.t += dt;
+        if (done(e.list) || e.t > 3) { if (Math.random() < dt * 2) bite(e.pc); }
+        return e.pc.gone || e.t > 22;
+      },
+    },
+    // ---- книжный: час чтения — птички берут книги Алины с витрины и читают на ковре ----
+    reading: {
+      ok: () => loc === 'bookstore' && freeBirds(isBird).length >= 2, w: 3,
+      start(e) {
+        const d0 = Math.round(W * .46);
+        e.list = closest(freeBirds(isBird), d0 + 20, Math.min(4, Math.max(2, BOOKS.length || 3))); enlist(e.list, e); e.books = []; e.tags = [];
+        e.list.forEach((b, i) => {
+          const bk = BOOKS.length ? BOOKS[i % BOOKS.length] : null, sx = cx(W * .34 + i * (W * .36 / e.list.length) + 6), sy = cy(rnd(100, 118));
+          b.tasks.push({ go: { x: cx(d0 + 4 + i * 12), y: Y0 } }, { say: 'star', t: .8 }, { go: { x: sx, y: sy } }, { face: 1 },
+            { fn: () => { const it = { type: 'book', x: sx + 11, y: sy + 1, lock: true, reading: true }; items.push(it); e.books.push(it);
+              if (bk && labels) { const a = document.createElement('a'); a.className = 'fl-reading'; a.href = bk.url; if (/^https?:/.test(bk.url)) { a.target = '_blank'; a.rel = 'noopener'; } a.textContent = '📖 ' + bk.title.replace(/\s*\(.*?\)\s*$/, ''); labels.appendChild(a); b.readTag = a; e.tags.push(a); } } },
+            { wait: 99, pose: 'idle' });
+        });
+        e.t = 0;
+      },
+      update(e, dt) {
+        e.t += dt;
+        for (const it of e.books) it.flip = (it.flip || 0) + dt * 2;
+        for (const b of e.list) if (b.readTag && Math.random() < dt * .4) say(b, pickOne(['dots', 'heart', '!']), 1.2);
+        return e.t > 26;
+      },
+      end(e) { for (const it of e.books || []) it.gone = true; for (const a of e.tags || []) a.remove(); for (const b of e.list) b.readTag = null; },
+    },
+    // ---- книжный: книжная башня — носят книги в стопку, пока она не рухнет ----
+    booktower: {
+      ok: () => loc === 'bookstore' && freeBirds(isBird).length >= 3, w: 2,
+      start(e) {
+        const tw = e.tw = { type: 'tower', x: cx(W * .52), y: cy(112), n: 1, lock: true }; items.push(tw);
+        e.list = closest(freeBirds(isBird), tw.x, 4); enlist(e.list, e); e.t = 0; e.trips = 0;
+        const trip = b => b.tasks.push({ go: { x: cx(W * rnd(.05, .95)), y: cy(rnd(Y0, Y1)) }, fast: 1.4 }, { say: 'star', t: .6 }, { go: { x: cx(tw.x + (Math.random() < .5 ? -10 : 10)), y: tw.y }, fast: 1.4 },
+          { fn: () => { tw.n = Math.min(14, tw.n + 1); e.trips++; if (e.trips < 11) trip(b); else b.tasks.push({ wait: 99 }); } });
+        e.list.forEach(trip);
+      },
+      update(e, dt) {
+        e.t += dt;
+        if (e.tw.n >= 9) e.tw.wobble = (e.tw.wobble || 0) + dt * 1.5;
+        if (!e.fell && (e.tw.n >= 12 || e.t > 24)) {
+          e.fell = true; e.tw.gone = true;
+          for (let i = 0; i < e.tw.n; i++) fx.push({ type: 'poof', x: e.tw.x + rnd(-16, 16), y: e.tw.y - rnd(0, 20), t: .6 });
+          for (let i = 0; i < 4; i++) items.push({ type: 'book', x: cx(e.tw.x + rnd(-30, 30)), y: cy(e.tw.y + rnd(-6, 6)), home: null });
+          for (const b of e.list) { say(b, '!', 1.6); hop(b, 10, .4); }
+          e.after = 0;
+        }
+        if (e.fell) return (e.after += dt) > 3;
+      },
+      end(e) { if (e.tw) e.tw.gone = true; },
     },
     // кофе: глоток — и птичка носится как ракета, а потом засыпает
     coffee: {
@@ -1020,7 +1149,7 @@
   }
   // кнопки над сценой: запустить событие сразу
   function trigger(name) {
-    if (!EVENTS[name]) return;
+    if (!EVENTS[name] || !allowed(name)) return;
     if (ev && ev.name === name) return;
     endEvent(); // кнопка прерывает то, что идёт сейчас
     for (const b of birds) if (b.hold && !b.ev) { drop(b); b.tasks = []; b.goal = null; b.wait = .5; } // и кладёт на землю всё, что птички несут
@@ -1102,7 +1231,7 @@
       return;
     }
     if ((evIn -= dt) > 0) return;
-    const pool = Object.entries(EVENTS).filter(([n, d]) => d.ok() && n !== lastEv);
+    const pool = Object.entries(EVENTS).filter(([n, d]) => d.ok() && n !== lastEv && allowed(n));
     if (!pool.length) { evIn = 5; return; }
     let r = Math.random() * pool.reduce((s, [, d]) => s + d.w, 0), pick = pool[0];
     for (const p of pool) { r -= p[1].w; if (r <= 0) { pick = p; break; } }
@@ -1204,6 +1333,7 @@
       }
       if (b.hold) { const it = b.hold, long = it.type === 'baguette' || it.type === 'half'; drawItem(it, x + b.dir * (long ? 9 : 8), y - (long ? 9 : 7), true); }
       if (b.label) b.label.style.transform = `translate(${(b.x * k).toFixed(1)}px, ${((b.y + 2 + OFF) * k).toFixed(1)}px) translateX(-50%)`;
+      if (b.readTag) b.readTag.style.transform = `translate(${(b.x * k).toFixed(1)}px, ${((b.y - 34 + OFF) * k).toFixed(1)}px) translateX(-50%)`;
     }
     // багет в перетягивании, падающее и летящее
     for (const it of items) if (it.held === 'ev' && !it.fly && it.vy == null) drawItem(it, it.x, it.y, true);
@@ -1329,7 +1459,7 @@
       scatter(clamp((e.clientX - r.left) / r.width * W, 20, W - 20));
     });
   }
-  window.PPFlockDebug = { loc(kind) { setLoc(kind || null); }, surprise(kind) { endEvent(); ev = { name: 'delivery', def: EVENTS.delivery, age: 0, force: true }; EVENTS.delivery.start(ev); ev.kind = kind; }, run(name) { endEvent(); if (!EVENTS[name].ok()) return false; ev = { name, def: EVENTS[name], age: 0 }; EVENTS[name].start(ev); return true; }, get ev() { return ev && ev.name; }, items: () => items, birds: () => birds };
+  window.PPFlockDebug = { loc(kind) { setLoc(kind || null); }, allowed, surprise(kind) { endEvent(); ev = { name: 'delivery', def: EVENTS.delivery, age: 0, force: true }; EVENTS.delivery.start(ev); ev.kind = kind; }, run(name) { endEvent(); if (!EVENTS[name].ok()) return false; ev = { name, def: EVENTS[name], age: 0 }; EVENTS[name].start(ev); return true; }, get ev() { return ev && ev.name; }, items: () => items, birds: () => birds };
   fetch('/api/flock' + (full ? '?limit=60' : ''), { credentials: 'same-origin' }).then(r => r.ok ? r.json() : Promise.reject())
     .then(d => start(d.birds.length ? d : { total: 0, birds: demo() }))
     .catch(() => start({ total: 0, birds: demo() }));

@@ -487,6 +487,9 @@ def build():
             if path not in UNLISTED:
                 search_index[lang].append(search_entry(page, lang, path))
         print("built", dest.relative_to(ROOT))
+    # книги Алины для стаи (витрина в книжном: обложки кликабельные, птички их читают)
+    books = [b for sec in json.loads((CONTENT / "ebooks.json").read_text())["sections"] for b in sec["books"]]
+    (OUT / "assets" / "books.json").write_text(json.dumps([{"title": b["title"], "url": b["url"], "cover": "/" + b["cover"]} for b in books if b.get("cover")], ensure_ascii=False))
     # индекс для поиска по сайту (кнопка 🔍 в шапке; статьи блога ищутся отдельно на сервере)
     for lang, entries in search_index.items():
         (OUT / "assets" / f"search-{lang}.json").write_text(json.dumps(entries, ensure_ascii=False, separators=(",", ":")))
