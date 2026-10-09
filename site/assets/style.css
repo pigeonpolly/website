@@ -2304,3 +2304,7 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .frame-me { background-image: url('/images/home/alina.jpg'); background-position: center top; opacity: 0; transition: opacity .5s ease; }
 .art:hover .frame-me, .art:focus-visible .frame-me, .art.on .frame-me { opacity: 1; }
 @media (prefers-reduced-motion: reduce) { .frame-me { transition: none; } }
+
+/* Блог: длинные ссылки и слова переносятся, а не вылезают за край статьи */
+.bp-body, .bp-head { overflow-wrap: anywhere; }
+.bp-body a { word-break: break-word; overflow-wrap: anywhere; }
