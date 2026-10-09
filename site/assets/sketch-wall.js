@@ -64,6 +64,7 @@
     bagEmpty: ['Empty for now. Gifts from Alina will appear here.', 'Пока пусто. Здесь появятся подарки от Алины.', 'Pagaidām tukšs. Šeit parādīsies Alīnas dāvanas.'],
     wearing: ['on ✓', 'надето ✓', 'uzvilkts ✓'],
     kinds: [{ bg: 'background', shoes: 'shoes', hat: 'hat', anim: 'animation', frame: 'frame', item: 'a treat to hold', scarf: 'scarf' }, { bg: 'фон', shoes: 'обувь', hat: 'головной убор', anim: 'анимация', frame: 'рамка', item: 'вкусняшка в клюв', scarf: 'шарфик' }, { bg: 'fons', shoes: 'apavi', hat: 'galvassega', anim: 'animācija', frame: 'rāmis', item: 'gardums knābī', scarf: 'šalle' }],
+    pageN: [n => `Page ${n}`, n => `Страница ${n}`, n => `Lapa ${n}`],
     hide: ['Hide', 'Скрыть', 'Paslēpt'], ban: ['Block', 'Блок', 'Bloķēt'],
     banAsk: ['Block this user? Their sketches disappear from the wall.', 'Заблокировать пользователя? Его рисунки пропадут со стены.', 'Bloķēt lietotāju? Viņa skices pazudīs no sienas.'],
   };
@@ -108,6 +109,26 @@
     { k: 'veteran', f: ['Here since the dinosaurs. Well, almost three years.', 'Здесь со времён динозавров. Ну, почти три года.', 'Šeit kopš dinozauru laikiem. Nu, gandrīz trīs gadus.'],
       n: ['Old-timer', 'Старожил', 'Vecais draugs'], s: 'wise', bg: '#EADFC8',
       h: ['Upload at least 2 sketches every month for 36 months in a row (3 years). No daily streak needed.', 'Загружать хотя бы 2 рисунка в каждом месяце 36 месяцев подряд (3 года). Ежедневная серия не нужна.', 'Augšupielādēt vismaz 2 skices katru mēnesi 36 mēnešus pēc kārtas (3 gadus). Ikdienas sērija nav vajadzīga.'] },
+    { k: 'early', s: 'early', bg: '#FBE3A1', n: ['Early bird', 'Ранняя пташка', 'Agrais putniņš'], f: ['Draws before the coffee is ready.', 'Рисует раньше, чем сварится кофе.', 'Zīmē, pirms kafija gatava.'],
+      h: ['Upload 5 sketches before 8 in the morning', 'Загрузить 5 рисунков до 8 утра', 'Augšupielādēt 5 skices pirms 8 rītā'] },
+    { k: 'owl', s: 'owl', bg: '#C9C3EA', n: ['Night owl', 'Ночная сова', 'Nakts pūce'], f: ['The best ideas come after midnight.', 'Лучшие идеи приходят после полуночи.', 'Labākās idejas nāk pēc pusnakts.'],
+      h: ['Upload 5 sketches between 11 pm and 4 am', 'Загрузить 5 рисунков между 23:00 и 4:00', 'Augšupielādēt 5 skices no 23:00 līdz 4:00'] },
+    { k: 'weekend', s: 'weekend', bg: '#BFE3FF', n: ['Weekend artist', 'Художник выходного дня', 'Brīvdienu mākslinieks'], f: ['Saturday? Sunday? Sketchbook day.', 'Суббота? Воскресенье? День скетчбука.', 'Sestdiena? Svētdiena? Skiču dienas.'],
+      h: ['Draw on both Saturday and Sunday of the same weekend, 4 times', 'Нарисовать и в субботу, и в воскресенье одних выходных — 4 раза', 'Zīmēt gan sestdienā, gan svētdienā vienās brīvdienās — 4 reizes'] },
+    { k: 'ten', s: 'ten', bg: '#E2D3F7', n: ['First ten', 'Первая десятка', 'Pirmais desmitnieks'], f: ['Ten sketches. The habit has a pulse.', 'Десять рисунков. У привычки появился пульс.', 'Desmit skices. Ieradumam ir pulss.'],
+      h: ['Upload 10 sketches in total', 'Загрузить всего 10 рисунков', 'Kopā augšupielādēt 10 skices'] },
+    { k: 'fifty', s: 'fifty', bg: '#CDEBD8', n: ['Half a hundred', 'Полсотни', 'Pussimts'], f: ['A whole stack of sketchbooks!', 'Целая стопка скетчбуков!', 'Vesela skiču bloku kaudze!'],
+      h: ['Upload 50 sketches in total', 'Загрузить всего 50 рисунков', 'Kopā augšupielādēt 50 skices'] },
+    { k: 'hundred', s: 'hundred', bg: '#FBE3A1', n: ['Hundred club', 'Клуб сотни', 'Simtnieku klubs'], f: ['One hundred sketches. Laurels well earned.', 'Сто рисунков. Лавры заслужены.', 'Simts skices. Lauri pelnīti.'],
+      h: ['Upload 100 sketches in total', 'Загрузить всего 100 рисунков', 'Kopā augšupielādēt 100 skices'] },
+    { k: 'inkmaster', s: 'inkpot', bg: '#E6E6E6', n: ['Ink master', 'Мастер туши', 'Tušas meistars'], f: ['Ten times in black and white. Ink runs in the family.', 'Десять раз в Ч/Б. Тушь — это семейное.', 'Desmit reizes melnbaltā. Tuša ir ģimenē.'],
+      h: ['Upload 10 sketches in “Black & white” mode', 'Загрузить 10 рисунков в режиме «Ч/Б»', 'Augšupielādēt 10 skices “Melnbaltā” režīmā'] },
+    { k: 'comeback', s: 'comeback', bg: '#FBD3E3', n: ['Welcome back', 'С возвращением', 'Laipni atpakaļ'], f: ['Life happens. The sketchbook waited for you.', 'Жизнь бывает разной. Скетчбук вас дождался.', 'Dzīve notiek. Skiču bloks tevi gaidīja.'],
+      h: ['Come back and upload a sketch after a break of 30 days or more', 'Вернуться и загрузить рисунок после перерыва в 30 дней и больше', 'Atgriezties un augšupielādēt skici pēc 30 vai vairāk dienu pārtraukuma'] },
+    { k: 'newyear', s: 'newyear', bg: '#CFE6F7', n: ['New Year sketch', 'Новогодний скетч', 'Jaungada skice'], f: ['Started the year with a pencil in hand.', 'Встретил(а) год с карандашом в руке.', 'Sagaidīji gadu ar zīmuli rokā.'],
+      h: ['Upload a sketch on 31 December or 1 January', 'Загрузить рисунок 31 декабря или 1 января', 'Augšupielādēt skici 31. decembrī vai 1. janvārī'] },
+    { k: 'halloween', s: 'pumpkin', bg: '#F7C9A3', n: ['Spooky sketch', 'Тыквенный скетч', 'Ķirbju skice'], f: ['Drew on Halloween and wasn’t even scared.', 'Рисовал(а) на Хеллоуин и даже не испугался(ась).', 'Zīmēji Helovīnā un pat nenobijies.'],
+      h: ['Upload a sketch on 31 October', 'Загрузить рисунок 31 октября', 'Augšupielādēt skici 31. oktobrī'] },
     { k: 'clock', f: ['Polly sets her watch by you.', 'Полли сверяет по вам часы.', 'Pollija pēc tevis regulē pulksteni.'], n: ['Like clockwork', 'Как по часам', 'Kā pulkstenis'], s: 'clock', bg: '#FBE3D6',
       h: ['Upload 10 sketches in a row at about the same time of day (within one hour)', 'Загрузить 10 рисунков подряд примерно в одно время суток (в пределах часа)', 'Augšupielādēt 10 skices pēc kārtas apmēram vienā laikā (vienas stundas robežās)'] },
   ];
@@ -135,90 +156,20 @@
     clock: [[9, 7, 'd...d'], [9, 8, '.rrr.'], [9, 9, 'rwwwr'], [9, 10, 'rwddr'], [9, 11, 'rwwwr'], [9, 12, '.rrr.'], [9, 13, 'd...d']],
     // мудрая Полли: круглые очки и тросточка
     wise: [[7, 1, 'mm'], [6, 2, 'm'], [9, 2, 'm'], [6, 3, 'm'], [9, 3, 'm'], [7, 4, 'mm'], [5, 2, 'm'], [3, -1, '.c.'], [4, 0, 'c'], [12, 6, 'nn'], [12, 7, '.n'], [12, 8, '.n'], [12, 9, '.n'], [12, 10, '.n'], [12, 11, '.n'], [12, 12, '.n'], [13, 13, 'd']],
+    early: [[0, -3, 'm.m.m'], [1, -2, 'mmm'], [0, -1, 'mmlmm'], [1, 0, 'mmm'], [0, 1, 'm.m.m']],
+    owl: [[5, -3, '...c'], [4, -2, '..ccc'], [3, -1, '.ccccl'], [3, 0, 'cccccc'], [12, -3, 'l'], [1, -2, 'l'], [0, 3, 'l'], [13, 2, 'l']],
+    weekend: [[6, 2, 'kkk.kk'], [6, 3, 'kkkkkk'], [7, 4, 'k..k'], [12, 8, 'h'], [11, 9, 'hhh'], [12, 10, 'p'], [12, 11, 'd']],
+    ten: [[0, 3, 'g.ggg'], [0, 4, 'g.g.g'], [0, 5, 'g.g.g'], [0, 6, 'g.g.g'], [0, 7, 'g.ggg']],
+    fifty: [[9, 9, 'rrrrr'], [9, 10, 'nnnnn'], [9, 11, 'hhhhh'], [9, 12, 'ppppp'], [10, 8, 'eee']],
+    hundred: [[1, 2, 'g'], [0, 3, 'g'], [0, 4, 'g'], [0, 5, 'g'], [1, 6, 'g'], [2, 7, 'g'], [12, 2, 'g'], [13, 3, 'g'], [13, 4, 'g'], [13, 5, 'g'], [12, 6, 'g'], [11, 7, 'g'], [5, -3, '.m.m.'], [5, -2, 'mmmmm']],
+    inkpot: [[10, 7, '.d.'], [9, 8, 'ddd'], [9, 9, 'dkd'], [9, 10, 'dkd'], [9, 11, 'ddd'], [12, 5, 'n'], [12, 6, 'n'], [13, 4, 'n']],
+    comeback: [[10, -3, 'pp.pp'], [10, -2, 'ppppp'], [11, -1, 'ppp'], [12, 0, 'p'], [0, 2, 'hh'], [0, 3, 'h'], [0, 4, 'hhh']],
+    newyear: [[8, -3, '....w'], [5, -2, '.rrrrw'], [4, -1, 'rrrrr'], [3, 0, 'wwwwwww'], [0, 2, 'h.h'], [1, 3, 'h'], [0, 4, 'h.h']],
+    pumpkin: [[1, 8, '.n.'], [0, 9, 'ooooo'], [0, 10, 'okoko'], [0, 11, 'ooooo'], [0, 12, 'okkko'], [1, 13, 'ooo']],
     medal: [[10, -3, '.m.'], [9, -2, 'mmm'], [10, -1, 'm.m'], [5, 8, 'r.r'], [5, 9, 'r.r'], [5, 10, 'mmm'], [4, 11, 'mmlmm'], [5, 12, 'mmm']],
   };
   const MONO = { b: '#D9D9D9', s: '#9A9A9A', o: '#6B6B6B' };
-  // ---------- детальные бейджи: Полли в образе (крупная пиксельная птичка из birds.js + свои предметы) ----------
-  const badgeCache = {};
-  function badgeImg(kind) {
-    const B = window.PPBirds;
-    if (!B || !B.spriteHD || !document.createElement('canvas').getContext) return null;
-    if (badgeCache[kind]) return badgeCache[kind];
-    const c = document.createElement('canvas'); c.width = 72; c.height = 64;
-    const x = c.getContext('2d');
-    const P = (px, py, w, h, col) => { x.fillStyle = col; x.fillRect(px, py, w, h); };
-    const map = (rows, x0, y0, pal) => rows.forEach((r, yy) => [...r].forEach((ch, xx) => { if (pal[ch]) P(x0 + xx, y0 + yy, 1, 1, pal[ch]); }));
-    const ell = (cx, cy, rx, ry, col) => { for (let yy = -ry; yy <= ry; yy++) for (let xx = -rx; xx <= rx; xx++) if ((xx / rx) ** 2 + (yy / ry) ** 2 <= 1) P(cx + xx, cy + yy, 1, 1, col); };
-    const OUT = '#1a1528';
-    const sparkle = (sx, sy, col) => { P(sx, sy - 2, 1, 5, col); P(sx - 2, sy, 5, 1, col); P(sx, sy, 1, 1, '#FFFFFF'); };
-    const polly = { kind: 'bird', shape: { bw: 10, bh: 8, hr: 3, neck: 0 }, body: '#7F81BF' };
-    const bird = (lk, dx = 4, dy = 4) => x.drawImage(B.spriteHD(lk, 0), dx, dy);
-    // голова Полли на холсте: около (36, 34), грудка — (30, 46)
-    switch (kind) {
-      case 'egg': {
-        ell(36, 36, 15, 19, OUT); ell(36, 36, 14, 18, '#FFFDF5'); ell(31, 28, 5, 6, '#FFFFFF');
-        for (const [ex, ey, r] of [[42, 30, 2], [30, 44, 2], [44, 46, 1], [27, 36, 1], [39, 22, 1]]) ell(ex, ey, r, r, '#E8D9F2');
-        map(['k.....', '.k.k..', '..k.k.', '.....k'], 38, 38, { k: '#B8A9C9' });
-        break;
-      }
-      case 'chick':
-        bird({ kind: 'bird', shape: { bw: 7, bh: 6, hr: 4, neck: 0 }, body: '#F2C230' }, 6, 2);
-        map(['w.w.w.w.w.w.w.w', 'wwwwwwwwwwwwwww', 'wwwwwwwwwwwwwww', '.wwwwwwwwwwwww.'], 18, 46, { w: '#FFFDF5' });
-        map(['k.k.k.k.k.k.k.k'], 18, 45, { k: '#B8A9C9' });
-        break;
-      case 'polly': bird(polly); break;
-      case 'post': bird({ ...polly, hat: { t: 'cap', c: '#4A7BD8' }, item: 'letter' }); break;
-      case 'travel':
-        bird({ ...polly, hat: { t: 'strawhat' } });
-        map(['..nnnn..', '.n....n.', 'nnnnnnnn', 'nggnnggn', 'nnnnnnnn', 'nnnnnnnn', '.d....d.'], 50, 48, { n: '#8A5A3C', g: '#E9A93B', d: OUT });
-        break;
-      case 'artist': bird({ ...polly, hat: { t: 'beret', c: '#E0443A' }, item: 'paintbrush', scarf: '#F5D547' }); break;
-      case 'astro':
-        bird(polly);
-        for (let yy = 10; yy < 52; yy++) for (let xx = 14; xx < 58; xx++) { const r = Math.hypot(xx - 37, yy - 30); if (r > 13 && r < 15.5) P(xx, yy, 1, 1, r < 14.2 ? '#BFE3FF' : '#7FB8E6'); }
-        P(28, 21, 3, 1, '#FFFFFF'); P(27, 22, 1, 2, '#FFFFFF');
-        break;
-      case 'crown': bird({ ...polly, hat: { t: 'flamecrown' }, item: 'goldfeather' }); sparkle(10, 14, '#F5D547'); sparkle(62, 20, '#F5D547'); sparkle(60, 52, '#FFF1A8'); break;
-      case 'sparkle': bird({ ...polly, item: 'star' }); sparkle(10, 12, '#F5D547'); sparkle(58, 10, '#FFF1A8'); sparkle(8, 44, '#F7D774'); sparkle(62, 40, '#F5D547'); break;
-      case 'ink': {
-        bird(polly);
-        const d = x.getImageData(0, 0, c.width, c.height); for (let i = 0; i < d.data.length; i += 4) { const g = d.data[i] * .3 + d.data[i + 1] * .59 + d.data[i + 2] * .11; d.data[i] = d.data[i + 1] = d.data[i + 2] = g > 200 ? 255 : g * .8; } x.putImageData(d, 0, 0);
-        for (const [ix, iy, r] of [[56, 50, 4], [62, 44, 2], [10, 46, 3], [14, 54, 2], [60, 56, 1]]) ell(ix, iy, r, r, '#141414');
-        map(['..k', '.kk', 'kkk', 'kk.'], 50, 20, { k: '#141414' });
-        break;
-      }
-      case 'party': bird({ ...polly, hat: { t: 'party', c: '#F08BC0' }, item: 'giftbox' }); for (const [cx, cy, col] of [[8, 10, '#E0443A'], [62, 12, '#4CC38A'], [12, 40, '#4A7BD8'], [64, 34, '#F5D547'], [20, 6, '#9B5DE5']]) P(cx, cy, 2, 3, col); break;
-      case 'sleepy': {
-        bird({ ...polly, hat: { t: 'beanie' } });
-        P(37, 27, 4, 1, OUT); P(36, 28, 1, 1, OUT); P(41, 28, 1, 1, OUT);
-        map(['zzzz', '..z.', '.z..', 'zzzz'], 52, 8, { z: '#BFE3FF' }); map(['zzz', '.z.', 'zzz'], 60, 2, { z: '#BFE3FF' });
-        break;
-      }
-      case 'moon': ell(14, 16, 9, 9, '#F7D774'); ell(18, 13, 8, 8, 'rgba(0,0,0,0)'); x.globalCompositeOperation = 'destination-out'; ell(19, 13, 7, 8, '#000'); x.globalCompositeOperation = 'source-over'; bird(polly, 8, 4); sparkle(60, 10, '#FFF1A8'); break;
-      case 'clock':
-        bird(polly, 0, 4);
-        ell(56, 46, 9, 9, OUT); ell(56, 46, 8, 8, '#E0443A'); ell(56, 46, 6, 6, '#FFFDF5'); P(56, 41, 1, 5, OUT); P(56, 46, 4, 1, OUT); P(49, 36, 3, 3, '#E0443A'); P(60, 36, 3, 3, '#E0443A'); P(52, 55, 2, 2, OUT); P(59, 55, 2, 2, OUT);
-        break;
-      case 'wise':
-        bird({ ...polly, scarf: '#8C7FB0' }, 2, 4);
-        ell(35, 31, 3, 3, '#F7D774'); ell(35, 31, 2, 2, '#BFE3FF'); ell(42, 31, 3, 3, '#F7D774'); ell(42, 31, 2, 2, '#BFE3FF'); P(38, 31, 1, 1, '#F7D774');
-        P(58, 30, 6, 2, '#8A5A3C'); P(62, 30, 2, 28, '#8A5A3C'); P(62, 58, 2, 2, OUT);
-        break;
-      case 'medal':
-        bird(polly);
-        P(28, 38, 2, 8, '#E0443A'); P(34, 38, 2, 8, '#E0443A'); ell(32, 50, 6, 6, OUT); ell(32, 50, 5, 5, '#F7D774'); ell(32, 50, 3, 3, '#E9A93B'); P(31, 47, 2, 1, '#FFF3B0');
-        sparkle(60, 12, '#F7D774'); sparkle(10, 16, '#FFF1A8');
-        break;
-      default: bird(polly);
-    }
-    // обрезаем пустые края и ставим по центру квадрата — рисунок занимает весь бейдж
-    const t = B.crop ? B.crop(c) : c, side = Math.max(t.width, t.height) + 4, q = document.createElement('canvas'); q.width = side; q.height = side;
-    q.getContext('2d').drawImage(t, Math.round((side - t.width) / 2), Math.round((side - t.height) / 2));
-    return (badgeCache[kind] = q.toDataURL());
-  }
   function spriteSvg(kind) {
-    const url = badgeImg(kind);
-    if (url) return `<img class="badge-img" src="${url}" alt="" draggable="false">`;
     const rows = SPR[kind] || POLLY, px = [];
     const pal = kind === 'ink' ? { ...COL, ...MONO } : COL;
     rows.forEach((r, y) => [...r].forEach((ch, x) => pal[ch] && px.push([x, y + 3, pal[ch]])));
@@ -590,34 +541,29 @@
       }).join('') : `<li class="sw-empty">${t('emptyTop')}</li>`;
     } catch (e) { el.innerHTML = ''; }
   }
-  let cursor = null;
+  // работы участников — страницами по 24, первыми самые новые
+  let pageCursors = [null], pageIdx = 0;
   async function loadWall(reset) {
-    const el = document.getElementById('sw-wall'), more = document.getElementById('sw-more');
-    if (reset) { cursor = null; el.innerHTML = ''; }
+    const el = document.getElementById('sw-wall'), more = document.getElementById('sw-more'), newer = document.getElementById('sw-newer'), pg = document.getElementById('sw-page');
+    if (reset) { pageCursors = [null]; pageIdx = 0; }
+    const cursor = pageCursors[pageIdx];
     try {
       const { posts, pick } = await api('wall' + (cursor ? `?before=${cursor}` : ''));
-      if (!posts.length && !el.children.length) el.innerHTML = `<p class="sw-empty">${t('emptyWall')}</p>`;
-      el.insertAdjacentHTML('beforeend', posts.map(p => `<figure class="sw-tile${p.bw ? ' bw' : ''}${p.id === pick ? ' pick' : ''}" data-id="${p.id}">
+      el.innerHTML = posts.length ? posts.map(p => `<figure class="sw-tile${p.bw ? ' bw' : ''}${p.id === pick ? ' pick' : ''}" data-id="${p.id}">
         ${p.id === pick ? `<span class="sw-stamp">★ ${esc(SPECIAL.find(x => x.k === 'pick').n[L])}</span>` : ''}
         <a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"></a>
         <figcaption><button type="button" class="sw-nickname sw-plink${p.gold ? ' gold' : ''}" data-profile="${esc(p.nick)}">@${esc(p.nick)}</button> <span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></figcaption>
         ${me && me.admin ? `<div class="sw-mod">${p.id === pick ? `<button type="button" data-unpick="1">☆ ${t('unpick')}</button>` : `<button type="button" data-pick="${p.id}" title="${esc(SPECIAL.find(x => x.k === 'pick').n[L])}">★</button>`}<button type="button" data-hide="${p.id}">${t('hide')}</button><button type="button" data-ban="${p.uid}">${t('ban')}</button></div>` : ''}
-      </figure>`).join(''));
-      if (posts.length) cursor = posts[posts.length - 1].created_at;
-      more.hidden = posts.length < 24;
-    } catch (e) { more.hidden = true; }
+      </figure>`).join('') : `<p class="sw-empty">${t('emptyWall')}</p>`;
+      if (posts.length) pageCursors[pageIdx + 1] = posts[posts.length - 1].created_at;
+      if (more) more.hidden = posts.length < 24;
+      if (newer) newer.hidden = pageIdx === 0;
+      if (pg) pg.textContent = more && more.hidden && !pageIdx ? '' : t('pageN', pageIdx + 1);
+    } catch (e) { if (more) more.hidden = true; }
   }
-  document.getElementById('sw-more')?.addEventListener('click', () => loadWall());
-  // лента работ листается стрелками; у конца ленты сама подгружает ещё
-  document.querySelectorAll('[data-strip]').forEach(b => b.addEventListener('click', () => {
-    const el = document.getElementById('sw-wall');
-    el.scrollBy({ left: Math.sign(+b.dataset.strip) * el.clientWidth * 0.8, behavior: 'smooth' });
-  }));
-  const stripEl = document.getElementById('sw-wall');
-  stripEl?.addEventListener('scroll', () => {
-    const more = document.getElementById('sw-more');
-    if (more && !more.hidden && !more.disabled && stripEl.scrollLeft + stripEl.clientWidth > stripEl.scrollWidth - 300) { more.disabled = true; loadWall().finally(() => { more.disabled = false; }); }
-  }, { passive: true });
+  const toPage = d => { pageIdx = Math.max(0, pageIdx + d); loadWall().then(() => document.getElementById('sw-wall')?.closest('.sw-wall-box')?.scrollIntoView({ behavior: 'smooth', block: 'start' })); };
+  document.getElementById('sw-more')?.addEventListener('click', () => toPage(1));
+  document.getElementById('sw-newer')?.addEventListener('click', () => toPage(-1));
   document.getElementById('sw-wall')?.addEventListener('click', async e => {
     const h = e.target.closest('[data-hide]'), b = e.target.closest('[data-ban]'), pk = e.target.closest('[data-pick]');
     try {

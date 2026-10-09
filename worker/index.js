@@ -253,7 +253,24 @@ function isVeteran(u) {
   for (let i = 1, run = ok.length ? 1 : 0; i <= ok.length; i++) { if (run >= VETERAN_MONTHS) return true; run = ok[i] - ok[i - 1] === 1 ? run + 1 : 1; }
   return false;
 }
-const mergedBadges = (u, posts) => [...new Set([...String(u.badges || '').split(',').filter(Boolean), ...badgesOf(posts, monthsOf(u)), ...(isVeteran(u) ? ['veteran'] : [])])];
+// ещё 10 особых бейджей (октябрь 2026): время рисования, количество работ, праздники, выходные, возвращение
+function moreBadges(u, posts) {
+  const got = new Set();
+  const tods = posts.map(p => p.tod).filter(t => t != null);
+  if (tods.filter(t => t < 480).length >= 5) got.add('early');                 // 5 рисунков до 8 утра
+  if (tods.filter(t => t >= 1380 || t < 240).length >= 5) got.add('owl');      // 5 рисунков с 23:00 до 4:00
+  const total = Math.max(posts.length, Object.values(mcountOf(u)).reduce((a, b) => a + b, 0));
+  if (total >= 10) got.add('ten'); if (total >= 50) got.add('fifty'); if (total >= 100) got.add('hundred');
+  if (posts.filter(p => p.bw).length >= 10) got.add('inkmaster');               // 10 рисунков в Ч/Б
+  const days = new Set(posts.map(p => p.day)), nums = [...new Set(posts.map(p => dayNum(p.day)))].sort((a, b) => a - b);
+  for (let i = 1; i < nums.length; i++) if (nums[i] - nums[i - 1] >= 30) { got.add('comeback'); break; } // вернулся после месяца перерыва
+  let weekends = 0;
+  for (const d of days) { const dt = new Date(d + 'T12:00:00Z'); if (dt.getUTCDay() === 6) { dt.setUTCDate(dt.getUTCDate() + 1); if (days.has(dt.toISOString().slice(0, 10))) weekends++; } }
+  if (weekends >= 4) got.add('weekend');                                         // суббота и воскресенье — 4 выходных
+  for (const d of days) { const md = d.slice(5); if (md === '12-31' || md === '01-01') got.add('newyear'); if (md === '10-31') got.add('halloween'); }
+  return got;
+}
+const mergedBadges = (u, posts) => [...new Set([...String(u.badges || '').split(',').filter(Boolean), ...badgesOf(posts, monthsOf(u)), ...moreBadges(u, posts), ...(isVeteran(u) ? ['veteran'] : [])])];
 
 // ---------- картинки работ: R2 (новые и перенесённые) или KV (старые, пока не перенесены) ----------
 const r2Key = (kind, id) => `challenge/${kind}/${id}.jpg`; // kind: i — полная, t — превью

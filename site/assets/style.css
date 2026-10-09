@@ -2668,3 +2668,5 @@ html.sb-hide { --sb: 0px; }
 .sw-medal.off .badge-img { filter: brightness(0) invert(1); opacity: .22; }
 .sw-bv-card > .sw-medal.off .badge-img, .sw-pv-badges .sw-medal.off .badge-img { filter: brightness(0); opacity: .16; }
 .sw-medal.past .badge-img { filter: grayscale(1) contrast(1.1); }
+.sw-pager { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 16px; }
+.sw-pager #sw-page { color: var(--muted); font-weight: 700; }
