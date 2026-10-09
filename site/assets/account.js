@@ -11,7 +11,6 @@
     profile: ['My profile and works', 'Мой профиль и работы', 'Mans profils un darbi'],
     nick: ['Choose a nickname', 'Выбрать ник', 'Izvēlēties segvārdu'],
     noNick: ['no nickname yet', 'ник ещё не выбран', 'segvārds vēl nav izvēlēts'],
-    editor: ['Blog editor', 'Редактор блога', 'Bloga redaktors'],
     out: ['Sign out', 'Выйти', 'Iziet'],
     menu: ['Account', 'Аккаунт', 'Konts'],
     admin: ['admin', 'админ', 'admins'],
@@ -97,7 +96,7 @@
         <div class="acct-pop" hidden role="menu">
           <p class="acct-name">${u.nick ? '@' + esc(u.nick) : `<i>${t('noNick')}</i>`}${u.admin ? ` <span class="acct-badge">★ ${t('admin')}</span>` : ''}</p>
           <a role="menuitem" href="${pre}/challenge/${u.nick ? '#works' : ''}">${u.nick ? t('profile') : t('nick')}</a>
-          ${u.admin ? `<a role="menuitem" href="/admin/">${t('cabinet')}</a><a role="menuitem" href="/blog-editor/">${t('editor')}</a>` : ''}
+          ${u.admin ? `<a role="menuitem" href="/admin/">${t('cabinet')}</a>` : ''}
           <button type="button" role="menuitem" data-out>${t('out')}</button>
         </div>`;
       if (window.PPBirds) el.querySelector('canvas').getContext('2d').drawImage(window.PPBirds.sprite(window.PPBirds.looks(u.id), 0), -window.PPBirds.OX, 0);
