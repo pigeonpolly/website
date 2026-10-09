@@ -2517,6 +2517,9 @@ html.sb-hide { --sb: 0px; }
 @media (prefers-reduced-motion: reduce) { .pp-ava i { animation: none !important; } }
 /* подарок и сумка в профиле */
 .sw-gifts { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 8px; }
+.sw-share-btn { background: #D85A30; border-color: #D85A30; color: #FFFFFF; }
+.sw-share-btn:hover { background: #2B1A51; border-color: #2B1A51; }
+.sw-pv-share { margin-top: 8px; padding: 6px 14px; font-size: 13px; }
 .sw-gift-btn { animation: gift-wiggle 2.4s ease-in-out infinite; background: #E9A93B !important; border-color: #E9A93B !important; color: #2B1A51 !important; }
 @keyframes gift-wiggle { 0%, 80%, 100% { transform: none; } 85% { transform: rotate(-4deg); } 90% { transform: rotate(4deg); } 95% { transform: rotate(-2deg); } }
 .gf-card { max-width: 420px; text-align: center; }

@@ -53,6 +53,8 @@
     picked: [n => `Picked ${n} time${n === 1 ? '' : 's'}. Every 5 picks = a star, 3 stars = a golden nickname.`, n => `Выбран(а) ${n} ${pl(n, 'раз', 'раза', 'раз')}. Каждые 5 раз — звезда, 3 звезды — золотой ник.`, n => `Izvēlēts ${n} reizi. Katras 5 reizes — zvaigzne, 3 zvaigznes — zelta segvārds.`],
     giftNew: [n => `A gift for you!${n > 1 ? ' (' + n + ')' : ''}`, n => `Тебе подарок!${n > 1 ? ' (' + n + ')' : ''}`, n => `Tev dāvana!${n > 1 ? ' (' + n + ')' : ''}`],
     bag: ['Bag', 'Сумка', 'Soma'],
+    shareBird: ['Share my bird', 'Поделиться птичкой', 'Dalīties ar putniņu'],
+    shareThis: ['Share', 'Поделиться', 'Dalīties'],
     seedOf: [k => `A seed: ${k}`, k => `Семечко: ${k}`, k => `Sēkla: ${k}`],
     fromAlina: ['— Alina', '— Алина', '— Alīna'],
     open: ['Open', 'Открыть', 'Atvērt'],
@@ -358,7 +360,7 @@
           <p class="sw-streak">🔥 ${t('streak', me.current)} · ${t('best', me.best)}</p>
           <div class="sw-bar"><i style="width:${progress}%"></i></div>
           <p class="sw-next">${next ? t('toNext', next.d - me.best, next.n[L]) : t('maxLevel')}</p></div>
-        ${me.id ? `<div class="sw-gifts">${newGifts.length ? `<button type="button" class="pill-btn sw-gift-btn" id="sw-gift">🎁 ${t('giftNew', newGifts.length)}</button>` : ''}<button type="button" class="pill-btn" id="sw-bag">🎒 ${t('bag')} (${bagItems().length})</button></div>` : ''}
+        ${me.id ? `<div class="sw-gifts">${newGifts.length ? `<button type="button" class="pill-btn sw-gift-btn" id="sw-gift">🎁 ${t('giftNew', newGifts.length)}</button>` : ''}<button type="button" class="pill-btn" id="sw-bag">🎒 ${t('bag')} (${bagItems().length})</button><button type="button" class="pill-btn sw-share-btn" id="sw-share">📤 ${t('shareBird')}</button></div>` : ''}
         <div class="sw-badges"><h3>${t('badges')}</h3><div>${LEVELS.map(l => medal(l, me.best >= l.d, false, 'button')).join('')}${SPECIAL.map(s => medal(s, stateOf(s, got), false, 'button')).join('')}</div><p class="sw-how" id="sw-how">${t('tapBadge')}</p></div>
         <p class="sw-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a>${me.admin ? ` · <b>admin</b> · ${t('storage')}: ${me.storage ?? 0}%${me.migration && me.migration.total ? ` · R2: ${me.migration.r2 + me.migration.missing >= me.migration.total ? `✓ ${me.migration.r2}/${me.migration.total}` : `${me.migration.r2}/${me.migration.total}…`}` : ''}` : ''}</p>
       </div>
@@ -375,6 +377,7 @@
     const slot = app.querySelector('.sw-ava-slot'); if (slot) slot.replaceWith(window.PPBirds.avatar(me.id, me.avatar, 120));
     const gb = document.getElementById('sw-gift'); if (gb) gb.onclick = () => openGift(newGifts[newGifts.length - 1]);
     const bb = document.getElementById('sw-bag'); if (bb) bb.onclick = openBag;
+    const sb = document.getElementById('sw-share'); if (sb) sb.onclick = () => shareBird({ id: me.id, nick: me.nick, avatar: me.avatar, mine: true });
     if (prev) celebrate(prev, lv, got);
     // по нажатию — бейдж крупно, с описанием
     app.querySelectorAll('.sw-badges .sw-medal').forEach(b => b.onclick = () => {
@@ -469,6 +472,12 @@
   }
 
   // ---------- публичный профиль ----------
+  // карточка «Моя птичка в стае» (bird-card.js грузится, только когда нужна)
+  function shareBird(o) {
+    const go = () => window.PPBirdCard && window.PPBirdCard.open(o);
+    if (window.PPBirdCard) return go();
+    const s = document.createElement('script'); s.src = '/assets/bird-card.js'; s.onload = go; document.head.appendChild(s);
+  }
   async function openProfile(nick) {
     let pr;
     try { pr = await api('profile?nick=' + encodeURIComponent(nick)); } catch (e) { return; }
@@ -479,12 +488,13 @@
     v.innerHTML = `<div class="sw-bv-card sw-pv-card"><button type="button" class="sw-bv-close" aria-label="Close">✕</button>
       <div class="sw-pv-head">${window.PPBirds && pr.id ? '<span class="sw-ava-slot"></span>' : lv ? medal(lv, true, true) : `<span class="sw-medal big off" style="--bg:#F4F0FA">${spriteSvg('egg')}</span>`}
         <div><h3><span class="sw-nickname${pr.gold ? ' gold' : ''}">@${esc(pr.nick)}</span></h3><p class="sw-level">${lv ? esc(lv.n[L]) : '—'}</p>
-        <p class="sw-pv-streak">🔥 ${t('streak', pr.current)} · ${t('best', pr.best)}</p></div></div>
+        <p class="sw-pv-streak">🔥 ${t('streak', pr.current)} · ${t('best', pr.best)}</p>${window.PPBirds && pr.id ? `<button type="button" class="pill-btn sw-pv-share">📤 ${t('shareThis')}</button>` : ''}</div></div>
       <div class="sw-pv-badges">${LEVELS.map(l => medal(l, pr.best >= l.d)).join('')}${SPECIAL.map(x => medal(x, st(x), false, 'span', pr.picks)).join('')}</div>
       ${window.PPBirds && pr.id ? `<h4 class="sw-pv-bag-t">🎒 ${t('bag')}</h4><div class="sw-pv-bag">${'<span class="sw-pv-item sw-pv-wrap" title="🎁">🎁</span>'.repeat(Math.min(pr.unopened || 0, 12))}</div>${!(pr.bag || []).length && !pr.unopened ? `<p class="sw-pv-empty">${t('bagEmptyOther')}</p>` : ''}` : ''}
       <div class="sw-pv-works">${pr.posts.map(p => `<a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"><span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></a>`).join('') || `<p class="sw-empty">${t('noWorks')}</p>`}</div>
     </div>`;
     if (window.PPBirds && pr.id) {
+      v.querySelector('.sw-pv-share').onclick = () => shareBird({ id: pr.id, nick: pr.nick, avatar: pr.avatar, mine: !!(me && me.id === pr.id) });
       const slot = v.querySelector('.sw-ava-slot'); if (slot) slot.replaceWith(window.PPBirds.avatar(pr.id, pr.avatar, 110));
       const bagEl = v.querySelector('.sw-pv-bag');
       if (bagEl) for (const g of pr.bag || []) { const it = document.createElement('span'); it.className = 'sw-pv-item' + (pr.avatar && pr.avatar[g.kind] === g.item ? ' on' : ''); it.title = kindName(g.kind); it.appendChild(window.PPBirds.giftPic(g.kind, g.item, pr.id, 52, pr.avatar)); bagEl.appendChild(it); }

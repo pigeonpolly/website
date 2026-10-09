@@ -70,9 +70,22 @@ async function sitePage(req, env, url) {
   let struct = null;
   const pg = rows.find(r => r.lang === '*' && r.id === 'page:' + url.pathname.replace(/^\/(ru|lv)(?=\/)/, ''));
   try { struct = pg && pg.html ? JSON.parse(pg.html) : null; } catch (e) { struct = null; }
-  if (!hidden.size && !html.size && !struct) return out;
+  // ссылка «моя птичка» (/flock/?bird=ник): в превью мессенджеров — карточка этой птички
+  const bird = /^\/(?:(?:ru|lv)\/)?flock\/$/.test(url.pathname) ? String(url.searchParams.get('bird') || '').replace(/^@/, '') : '';
+  const birdOk = /^[\p{L}\p{N}_.-]{2,24}$/u.test(bird);
+  if (!hidden.size && !html.size && !struct && !birdOk) return out;
   const anyLang = id => html.get(id) ?? (rows.find(r => r.id === id && r.html != null && ['en', 'ru', 'lv'].includes(r.lang)) || {}).html;
   const rw = new HTMLRewriter();
+  if (birdOk) {
+    const og = { en: [`@${bird} lives in the Pigeon Polly flock 🐦`, 'Everyone who signs in gets their own pixel bird. Get yours!'],
+      ru: [`@${bird} живёт в стае Pigeon Polly 🐦`, 'Каждый, кто входит на сайт, получает свою пиксельную птичку. Заведи свою!'],
+      lv: [`@${bird} dzīvo Pigeon Polly barā 🐦`, 'Katrs, kurš ienāk vietnē, saņem savu pikseļu putniņu. Iegūsti savu!'] }[lang];
+    const set = v => ({ element(el) { el.setAttribute('content', v); } });
+    rw.on('meta[property="og:image"]', set(`${url.origin}/api/birdcard?nick=${encodeURIComponent(bird)}`))
+      .on('meta[property="og:title"]', set(og[0])).on('meta[property="og:description"]', set(og[1])).on('meta[name="description"]', set(og[1]))
+      .on('meta[property="og:url"]', set(url.href)).on('meta[property="og:image:alt"]', set(og[0]))
+      .on('title', { element(el) { el.setInnerContent(og[0]); } });
+  }
   if (struct) {
     if (Array.isArray(struct.order) && struct.order.length) {
       const css = 'main#main{display:flex;flex-direction:column}main#main>*{order:-1}main#main>[data-ppb]{order:999}' + struct.order.map((id, i) => `main#main>[data-ppb="${String(id).replace(/[^a-z0-9.-]/g, '')}"]{order:${i}}`).join('');
@@ -395,6 +408,23 @@ async function route(req, env, url) {
       best: mergedBest(u, rows.map(r => r.day)), badges, posts: rows.filter(r => !r.hidden).map(({ id, day, theme, bw }) => ({ id, day, theme, bw })) });
   }
 
+  // карточка птички для превью ссылки /flock/?bird=ник: картинку рисует браузер владельца (bird-card.js) и присылает сюда
+  if (m === 'POST' && p === '/api/birdcard') {
+    const u = await needUser(req, env);
+    if (!env.MEDIA) fail(503, 'storage');
+    const buf = await req.arrayBuffer(), b = new Uint8Array(buf);
+    if (buf.byteLength < 100 || buf.byteLength > 900_000 || b[0] !== 0x89 || b[1] !== 0x50 || b[2] !== 0x4E || b[3] !== 0x47) fail(400, 'bad');
+    await env.MEDIA.put(`birdcards/${u.id}.png`, buf, { httpMetadata: { contentType: 'image/png' } });
+    return json({ ok: true });
+  }
+  if (m === 'GET' && p === '/api/birdcard') {
+    const nick = String(url.searchParams.get('nick') || '').replace(/^@/, '');
+    const u = nick ? await env.DB.prepare('SELECT id FROM users WHERE nick = ? AND banned = 0').bind(nick).first() : null;
+    const o = u && env.MEDIA ? await env.MEDIA.get(`birdcards/${u.id}.png`) : null;
+    if (!o) return Response.redirect(`${url.origin}/assets/og-flock-en.jpg`, 302); // карточку ещё не делали — общая картинка стаи
+    return new Response(o.body, { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=600' } });
+  }
+
   if (m === 'GET' && p === '/api/stats') {
     const works = await getMeta(env, 'works_total') ?? (await env.DB.prepare('SELECT COUNT(*) AS n FROM posts').first()).n;
     const users = await getMeta(env, 'users_total') ?? (await env.DB.prepare('SELECT COUNT(*) AS n FROM users').first()).n;
@@ -682,6 +712,7 @@ async function route(req, env, url) {
     if (!u) fail(401, 'login');
     const posts = (await env.DB.prepare('SELECT id, store, kv FROM posts WHERE user_id = ?').bind(u.id).all()).results;
     await Promise.all(posts.map(x => imgDelete(env, x)));
+    if (env.MEDIA) await env.MEDIA.delete(`birdcards/${u.id}.png`).catch(() => {});
     await env.DB.batch([
       env.DB.prepare('DELETE FROM posts WHERE user_id = ?').bind(u.id),
       env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(u.id),

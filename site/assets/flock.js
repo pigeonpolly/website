@@ -1756,6 +1756,21 @@
       out.textContent = (FIND[lang] || FIND.en)[r] || '';
       if (r === 'here' || r === 'flying') box.querySelector('.fl-stage').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
     });
+    // ссылка «моя птичка» (/flock/?bird=ник из карточки bird-card.js): приглашение сверху, а сама птичка подсвечена в стае
+    const invited = new URLSearchParams(location.search).get('bird');
+    if (invited && findForm && !box.querySelector('.fl-invite')) {
+      const I = { en: ['lives in this flock. Want a bird of your own?', 'Get my bird'], ru: ['живёт в этой стае. Хочешь свою птичку?', 'Получить птичку'], lv: ['dzīvo šajā barā. Gribi savu putniņu?', 'Saņemt putniņu'] }[lang] || [];
+      const inv = document.createElement('p'); inv.className = 'fl-invite';
+      inv.innerHTML = `🐦 <b></b> ${I[0]} <button type="button">${I[1]}</button>`;
+      inv.querySelector('b').textContent = '@' + invited.replace(/^@/, '');
+      inv.querySelector('button').addEventListener('click', e => {
+        e.stopPropagation();
+        if (window.PPAccount && !window.PPAccount.signedIn()) window.PPAccount.openSignIn(); else location.href = (lang === 'en' ? '' : '/' + lang) + '/challenge/';
+      });
+      findForm.before(inv);
+      findForm.querySelector('input').value = invited.replace(/^@/, '');
+      setTimeout(() => findForm.requestSubmit(), 900);
+    }
     // «На весь экран»: на главной открывает /flock/, на самой /flock/ — настоящий полноэкранный режим
     const open = box.querySelector('.fl-open');
     if (open && full) {
