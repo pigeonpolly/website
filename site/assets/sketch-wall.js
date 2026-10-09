@@ -138,7 +138,87 @@
     medal: [[10, -3, '.m.'], [9, -2, 'mmm'], [10, -1, 'm.m'], [5, 8, 'r.r'], [5, 9, 'r.r'], [5, 10, 'mmm'], [4, 11, 'mmlmm'], [5, 12, 'mmm']],
   };
   const MONO = { b: '#D9D9D9', s: '#9A9A9A', o: '#6B6B6B' };
+  // ---------- детальные бейджи: Полли в образе (крупная пиксельная птичка из birds.js + свои предметы) ----------
+  const badgeCache = {};
+  function badgeImg(kind) {
+    const B = window.PPBirds;
+    if (!B || !B.spriteHD || !document.createElement('canvas').getContext) return null;
+    if (badgeCache[kind]) return badgeCache[kind];
+    const c = document.createElement('canvas'); c.width = 72; c.height = 64;
+    const x = c.getContext('2d');
+    const P = (px, py, w, h, col) => { x.fillStyle = col; x.fillRect(px, py, w, h); };
+    const map = (rows, x0, y0, pal) => rows.forEach((r, yy) => [...r].forEach((ch, xx) => { if (pal[ch]) P(x0 + xx, y0 + yy, 1, 1, pal[ch]); }));
+    const ell = (cx, cy, rx, ry, col) => { for (let yy = -ry; yy <= ry; yy++) for (let xx = -rx; xx <= rx; xx++) if ((xx / rx) ** 2 + (yy / ry) ** 2 <= 1) P(cx + xx, cy + yy, 1, 1, col); };
+    const OUT = '#1a1528';
+    const sparkle = (sx, sy, col) => { P(sx, sy - 2, 1, 5, col); P(sx - 2, sy, 5, 1, col); P(sx, sy, 1, 1, '#FFFFFF'); };
+    const polly = { kind: 'bird', shape: { bw: 10, bh: 8, hr: 3, neck: 0 }, body: '#7F81BF' };
+    const bird = (lk, dx = 4, dy = 4) => x.drawImage(B.spriteHD(lk, 0), dx, dy);
+    // голова Полли на холсте: около (36, 34), грудка — (30, 46)
+    switch (kind) {
+      case 'egg': {
+        ell(36, 36, 15, 19, OUT); ell(36, 36, 14, 18, '#FFFDF5'); ell(31, 28, 5, 6, '#FFFFFF');
+        for (const [ex, ey, r] of [[42, 30, 2], [30, 44, 2], [44, 46, 1], [27, 36, 1], [39, 22, 1]]) ell(ex, ey, r, r, '#E8D9F2');
+        map(['k.....', '.k.k..', '..k.k.', '.....k'], 38, 38, { k: '#B8A9C9' });
+        break;
+      }
+      case 'chick':
+        bird({ kind: 'bird', shape: { bw: 7, bh: 6, hr: 4, neck: 0 }, body: '#F2C230' }, 6, 2);
+        map(['w.w.w.w.w.w.w.w', 'wwwwwwwwwwwwwww', 'wwwwwwwwwwwwwww', '.wwwwwwwwwwwww.'], 18, 46, { w: '#FFFDF5' });
+        map(['k.k.k.k.k.k.k.k'], 18, 45, { k: '#B8A9C9' });
+        break;
+      case 'polly': bird(polly); break;
+      case 'post': bird({ ...polly, hat: { t: 'cap', c: '#4A7BD8' }, item: 'letter' }); break;
+      case 'travel':
+        bird({ ...polly, hat: { t: 'strawhat' } });
+        map(['..nnnn..', '.n....n.', 'nnnnnnnn', 'nggnnggn', 'nnnnnnnn', 'nnnnnnnn', '.d....d.'], 50, 48, { n: '#8A5A3C', g: '#E9A93B', d: OUT });
+        break;
+      case 'artist': bird({ ...polly, hat: { t: 'beret', c: '#E0443A' }, item: 'paintbrush', scarf: '#F5D547' }); break;
+      case 'astro':
+        bird(polly);
+        for (let yy = 10; yy < 52; yy++) for (let xx = 14; xx < 58; xx++) { const r = Math.hypot(xx - 37, yy - 30); if (r > 13 && r < 15.5) P(xx, yy, 1, 1, r < 14.2 ? '#BFE3FF' : '#7FB8E6'); }
+        P(28, 21, 3, 1, '#FFFFFF'); P(27, 22, 1, 2, '#FFFFFF');
+        break;
+      case 'crown': bird({ ...polly, hat: { t: 'flamecrown' }, item: 'goldfeather' }); sparkle(10, 14, '#F5D547'); sparkle(62, 20, '#F5D547'); sparkle(60, 52, '#FFF1A8'); break;
+      case 'sparkle': bird({ ...polly, item: 'star' }); sparkle(10, 12, '#F5D547'); sparkle(58, 10, '#FFF1A8'); sparkle(8, 44, '#F7D774'); sparkle(62, 40, '#F5D547'); break;
+      case 'ink': {
+        bird(polly);
+        const d = x.getImageData(0, 0, c.width, c.height); for (let i = 0; i < d.data.length; i += 4) { const g = d.data[i] * .3 + d.data[i + 1] * .59 + d.data[i + 2] * .11; d.data[i] = d.data[i + 1] = d.data[i + 2] = g > 200 ? 255 : g * .8; } x.putImageData(d, 0, 0);
+        for (const [ix, iy, r] of [[56, 50, 4], [62, 44, 2], [10, 46, 3], [14, 54, 2], [60, 56, 1]]) ell(ix, iy, r, r, '#141414');
+        map(['..k', '.kk', 'kkk', 'kk.'], 50, 20, { k: '#141414' });
+        break;
+      }
+      case 'party': bird({ ...polly, hat: { t: 'party', c: '#F08BC0' }, item: 'giftbox' }); for (const [cx, cy, col] of [[8, 10, '#E0443A'], [62, 12, '#4CC38A'], [12, 40, '#4A7BD8'], [64, 34, '#F5D547'], [20, 6, '#9B5DE5']]) P(cx, cy, 2, 3, col); break;
+      case 'sleepy': {
+        bird({ ...polly, hat: { t: 'beanie' } });
+        P(37, 27, 4, 1, OUT); P(36, 28, 1, 1, OUT); P(41, 28, 1, 1, OUT);
+        map(['zzzz', '..z.', '.z..', 'zzzz'], 52, 8, { z: '#BFE3FF' }); map(['zzz', '.z.', 'zzz'], 60, 2, { z: '#BFE3FF' });
+        break;
+      }
+      case 'moon': ell(14, 16, 9, 9, '#F7D774'); ell(18, 13, 8, 8, 'rgba(0,0,0,0)'); x.globalCompositeOperation = 'destination-out'; ell(19, 13, 7, 8, '#000'); x.globalCompositeOperation = 'source-over'; bird(polly, 8, 4); sparkle(60, 10, '#FFF1A8'); break;
+      case 'clock':
+        bird(polly, 0, 4);
+        ell(56, 46, 9, 9, OUT); ell(56, 46, 8, 8, '#E0443A'); ell(56, 46, 6, 6, '#FFFDF5'); P(56, 41, 1, 5, OUT); P(56, 46, 4, 1, OUT); P(49, 36, 3, 3, '#E0443A'); P(60, 36, 3, 3, '#E0443A'); P(52, 55, 2, 2, OUT); P(59, 55, 2, 2, OUT);
+        break;
+      case 'wise':
+        bird({ ...polly, scarf: '#8C7FB0' }, 2, 4);
+        ell(35, 31, 3, 3, '#F7D774'); ell(35, 31, 2, 2, '#BFE3FF'); ell(42, 31, 3, 3, '#F7D774'); ell(42, 31, 2, 2, '#BFE3FF'); P(38, 31, 1, 1, '#F7D774');
+        P(58, 30, 6, 2, '#8A5A3C'); P(62, 30, 2, 28, '#8A5A3C'); P(62, 58, 2, 2, OUT);
+        break;
+      case 'medal':
+        bird(polly);
+        P(28, 38, 2, 8, '#E0443A'); P(34, 38, 2, 8, '#E0443A'); ell(32, 50, 6, 6, OUT); ell(32, 50, 5, 5, '#F7D774'); ell(32, 50, 3, 3, '#E9A93B'); P(31, 47, 2, 1, '#FFF3B0');
+        sparkle(60, 12, '#F7D774'); sparkle(10, 16, '#FFF1A8');
+        break;
+      default: bird(polly);
+    }
+    // обрезаем пустые края и ставим по центру квадрата — рисунок занимает весь бейдж
+    const t = B.crop ? B.crop(c) : c, side = Math.max(t.width, t.height) + 4, q = document.createElement('canvas'); q.width = side; q.height = side;
+    q.getContext('2d').drawImage(t, Math.round((side - t.width) / 2), Math.round((side - t.height) / 2));
+    return (badgeCache[kind] = q.toDataURL());
+  }
   function spriteSvg(kind) {
+    const url = badgeImg(kind);
+    if (url) return `<img class="badge-img" src="${url}" alt="" draggable="false">`;
     const rows = SPR[kind] || POLLY, px = [];
     const pal = kind === 'ink' ? { ...COL, ...MONO } : COL;
     rows.forEach((r, y) => [...r].forEach((ch, x) => pal[ch] && px.push([x, y + 3, pal[ch]])));

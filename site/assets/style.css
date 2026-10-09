@@ -2663,3 +2663,8 @@ html.sb-hide { --sb: 0px; }
 .gift-pic:hover > .pp-icon, .gift-pic.show > .pp-icon, button:hover > .gift-pic > .pp-icon, figure:hover > .gift-pic > .pp-icon { opacity: 0; }
 .legend-tag { position: absolute; top: 4px; left: 6px; color: #E9A93B; font: 700 14px var(--sans); text-shadow: 0 0 6px rgba(245, 213, 71, .9); }
 .fl-coll-item.legend .pp-icon { box-shadow: 0 0 0 3px #F5D547, 0 0 16px rgba(245, 213, 71, .7); }
+/* детальные бейджи */
+.sw-medal .badge-img { width: 84%; height: auto; image-rendering: pixelated; pointer-events: none; }
+.sw-medal.off .badge-img { filter: brightness(0) invert(1); opacity: .22; }
+.sw-bv-card > .sw-medal.off .badge-img, .sw-pv-badges .sw-medal.off .badge-img { filter: brightness(0); opacity: .16; }
+.sw-medal.past .badge-img { filter: grayscale(1) contrast(1.1); }
