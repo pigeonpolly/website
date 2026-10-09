@@ -185,7 +185,22 @@
 #blk-coming-soon .btn-main:hover { background: #3C2670; }
 #blk-coming-soon .btn-ghost { border: 2px solid #2B1A51; color: #2B1A51; }
 #blk-coming-soon .btn svg { width: 18px; height: 18px; }
-@media (max-width: 760px) {#blk-coming-soon .bk { padding: 44px 20px; }
+#blk-coming-soon .bk-notify { margin-top: 26px; max-width: 520px; }
+#blk-coming-soon .bk p.bk-notify-h { margin: 0 0 10px; font-weight: 700; color: #2B1A51; }
+#blk-coming-soon .bk-row { display: flex; gap: 10px; flex-wrap: wrap; }
+#blk-coming-soon .bk-row input { flex: 1; min-width: 200px; padding: 13px 18px; border-radius: 999px; border: 2px solid #D9D0EC; font: 16px 'Karla', sans-serif; color: #2B1A51; background: #fff; }
+#blk-coming-soon .bk-row input:focus { outline: none; border-color: #8E6FE0; }
+#blk-coming-soon .bk-row .btn { border: 0; cursor: pointer; font-family: inherit; }
+#blk-coming-soon .bk-consent { display: flex; gap: 10px; align-items: flex-start; margin-top: 12px; font-size: 13px; line-height: 1.5; color: #6B6290; text-align: left; cursor: pointer; }
+#blk-coming-soon .bk-consent input { margin-top: 3px; width: 17px; height: 17px; accent-color: #8E6FE0; flex: none; }
+#blk-coming-soon .bk-consent a { color: #8E6FE0; }
+#blk-coming-soon .bk p.bk-msg { margin: 10px 0 0; font-weight: 700; color: #2E8B57; min-height: 1em; }
+#blk-coming-soon .bk p.bk-msg.err { color: #C0392B; }
+#blk-coming-soon .bk p.bk-unsub { margin: 4px 0 0; }
+#blk-coming-soon .bk-link { border: 0; background: none; padding: 0; color: #8C7FB0; font: 13px 'Karla', sans-serif; text-decoration: underline; cursor: pointer; }
+#blk-coming-soon .hp { position: absolute; left: -9999px; }
+@media (max-width: 760px) {#blk-coming-soon .bk-notify { margin-left: auto; margin-right: auto; }
+#blk-coming-soon .bk { padding: 44px 20px; }
 #blk-coming-soon .bk-in { grid-template-columns: 1fr; gap: 32px; text-align: center; }
 #blk-coming-soon .bk-cover { max-width: 260px; margin: 0 auto; }
 #blk-coming-soon .bk p { margin-left: auto; margin-right: auto; }
@@ -203,15 +218,40 @@
       <p>Я пишу свой третий гайд по скетчингу. На этот раз о том, как рисовать города, в которые сейчас не попасть (или не хочется): уличные панорамы, фото и видео — и скетчбук на собственном кухонном столе.</p>
       <p>Простая перспектива, погода, люди и голуби, цветовые акценты, композиция, референсы и много историй.</p>
       <p class="note">Каждая иллюстрация нарисована от руки, без AI. Скоро на Amazon.</p>
-      <div class="bk-btns">
-        <a class="btn btn-main" href="https://www.patreon.com/collection/2400979" target="_blank" rel="noopener">
-          <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="15" cy="9.5" r="6.5" fill="#E9A93B"/><rect x="3" y="3" width="3.5" height="18" rx="1" fill="#FFFFFF"/></svg>
-          За кадром на Patreon
-        </a>
-      </div>
+      <form class="bk-notify" data-topic="books">
+        <p class="bk-notify-h">🔔 Получить письмо, когда книга выйдет</p>
+        <div class="bk-row"><input type="email" name="email" required maxlength="254" placeholder="your@email.com" aria-label="Ваш email" autocomplete="email"><button class="btn btn-main" type="submit">Сообщить мне</button></div>
+        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <label class="bk-consent"><input type="checkbox" name="consent" required> <span>Я согласен(на), что Алина напишет мне на этот адрес, когда книга выйдет. Адрес никому не передаётся, отписаться можно в любой момент. <a href="/ru/privacy/">Конфиденциальность</a></span></label>
+        <p class="bk-msg" role="status" aria-live="polite"></p>
+        <p class="bk-unsub"><button type="button" class="bk-link" data-unsub>Отписаться</button></p>
+      </form>
     </div>
   </div>
 </section>
+<script>
+// «Сообщите, когда выйдет книга»: адрес + согласие → /api/subscribe; «Отписаться» → /api/unsubscribe
+document.querySelectorAll('.bk-notify').forEach(function (f) {
+  var lang = document.documentElement.lang || 'en', L = { en: 0, ru: 1, lv: 2 }[lang] || 0;
+  var T = { ok: ['Done! I will write to you when the book is out 💛', 'Готово! Я напишу вам, когда книга выйдет 💛', 'Gatavs! Uzrakstīšu, kad grāmata iznāks 💛'],
+    bye: ['You are unsubscribed. The address is deleted.', 'Вы отписались. Адрес удалён.', 'Tu esi atrakstījies. Adrese ir dzēsta.'],
+    unsubQ: ['Enter the email to unsubscribe:', 'Введите адрес, который нужно отписать:', 'Ievadi e-pastu, ko atrakstīt:'],
+    email: ['Please check the email address.', 'Проверьте адрес почты.', 'Pārbaudi e-pasta adresi.'],
+    consent: ['Please tick the consent box.', 'Отметьте, пожалуйста, согласие.', 'Lūdzu, atzīmē piekrišanu.'], err: ['Something went wrong. Please try again.', 'Что-то пошло не так. Попробуйте ещё раз.', 'Kaut kas nogāja greizi. Mēģini vēlreiz.'] };
+  var msg = f.querySelector('.bk-msg');
+  var say = function (k, bad) { msg.textContent = T[k][L]; msg.classList.toggle('err', !!bad); };
+  var post = function (url, body) { return fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw d; return d; }); }); };
+  f.addEventListener('submit', function (e) {
+    e.preventDefault();
+    post('/api/subscribe', { email: f.email.value, consent: f.consent.checked, consentText: f.querySelector('.bk-consent span').textContent.trim(), topic: f.dataset.topic, lang: lang, website: f.website.value })
+      .then(function () { say('ok'); f.email.value = ''; }).catch(function (d) { say(d && d.error === 'email' ? 'email' : d && d.error === 'consent' ? 'consent' : 'err', true); });
+  });
+  f.querySelector('[data-unsub]').addEventListener('click', function () {
+    var em = prompt(T.unsubQ[L], f.email.value || ''); if (!em) return;
+    post('/api/unsubscribe', { email: em }).then(function () { say('bye'); }).catch(function () { say('err', true); });
+  });
+});
+</script>
 </div>
 <div class="blk" id="blk-patreon"><style>#blk-patreon { margin: 0; background: #FFFFFF; }
 #blk-patreon .pat { box-sizing: border-box; padding: 64px 32px; font-family: 'Karla', sans-serif; color: #2B1A51; text-align: center; }

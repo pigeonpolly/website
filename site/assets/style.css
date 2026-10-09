@@ -2258,3 +2258,4 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .bp-pencil { padding: 8px 16px; border-radius: 99px; background: #E9A93B; color: #2B1A51 !important; font: 700 14px var(--sans); text-decoration: none !important; box-shadow: 0 4px 14px rgba(0, 0, 0, .25); }
 .bp-pencil:hover { background: #F7C66A; }
 .bp-pencil[hidden] { display: none; }
+.adm-cbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; margin-bottom: 14px; } .adm-cbar .adm-seg { margin: 0; }

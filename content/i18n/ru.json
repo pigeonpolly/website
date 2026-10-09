@@ -286,5 +286,11 @@
   "aria-label=\"Where to read\"": "aria-label=\"Где читать\"",
   "<h2>My notes: six themes</h2>": "<h2>Мои заметки: шесть тем</h2>",
   "aria-label=\"Search the site\"": "aria-label=\"Поиск по сайту\"",
-  "alt=\"Alina Otkinska, the artist behind Pigeon Polly\"": "alt=\"Алина — художница, которая придумала Pigeon Polly\""
+  "alt=\"Alina Otkinska, the artist behind Pigeon Polly\"": "alt=\"Алина — художница, которая придумала Pigeon Polly\"",
+  "🔔 Get an email when the book is out": "🔔 Получить письмо, когда книга выйдет",
+  "aria-label=\"Your email\"": "aria-label=\"Ваш email\"",
+  ">Notify me<": ">Сообщить мне<",
+  "I agree that Alina will email me once when the book is published. My address is not shared with anyone, and I can unsubscribe at any time.": "Я согласен(на), что Алина напишет мне на этот адрес, когда книга выйдет. Адрес никому не передаётся, отписаться можно в любой момент.",
+  ">Unsubscribe<": ">Отписаться<",
+  ">Privacy<": ">Конфиденциальность<"
 }

@@ -61,6 +61,9 @@ async function ensureSchema(env) {
       created_at INTEGER, hidden INTEGER DEFAULT 0, UNIQUE(user_id, day))`),
     env.DB.prepare(`CREATE INDEX IF NOT EXISTS posts_created ON posts(created_at)`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)`),
+    // подписка «сообщите, когда выйдет книга»: только адрес, язык и текст согласия (GDPR); рассылает Алина вручную
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS subscribers (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, topic TEXT NOT NULL DEFAULT 'books',
+      lang TEXT, consent TEXT, created_at INTEGER, UNIQUE(email, topic))`),
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
   for (const sql of ['ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
@@ -328,6 +331,30 @@ async function route(req, env, url) {
     return json({ total, recent: total > LIMIT, birds: rows.map(r => ({ id: r.id, nick: r.nick || null, me: !!me && r.id === me.id })) });
   }
   // «Найти птичку»: по нику (сначала точное совпадение, потом начало ника)
+  // ---------- подписка на новость о книге ----------
+  if (m === 'POST' && p === '/api/subscribe') {
+    const b = await req.json().catch(() => ({}));
+    if (b.website) return json({ ok: true }); // ловушка для ботов
+    const email = String(b.email || '').trim().toLowerCase().slice(0, 254);
+    if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(email)) fail(400, 'email');
+    if (!b.consent) fail(400, 'consent');
+    const topic = ['books', 'news'].includes(b.topic) ? b.topic : 'books';
+    await env.DB.prepare('INSERT OR IGNORE INTO subscribers (email, topic, lang, consent, created_at) VALUES (?, ?, ?, ?, ?)')
+      .bind(email, topic, ['en', 'ru', 'lv'].includes(b.lang) ? b.lang : 'en', String(b.consentText || '').slice(0, 500), now()).run();
+    return json({ ok: true });
+  }
+  if (m === 'POST' && p === '/api/unsubscribe') {
+    const b = await req.json().catch(() => ({}));
+    const email = String(b.email || '').trim().toLowerCase();
+    await env.DB.prepare('DELETE FROM subscribers WHERE email = ?').bind(email).run();
+    return json({ ok: true }); // одинаковый ответ, даже если адреса не было
+  }
+  if (p === '/api/admin/subscribers') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    if (m === 'POST') { const b = await req.json().catch(() => ({})); await env.DB.prepare('DELETE FROM subscribers WHERE id = ?').bind(Number(b.id)).run(); }
+    return json({ subscribers: (await env.DB.prepare('SELECT id, email, topic, lang, consent, created_at FROM subscribers ORDER BY created_at DESC').all()).results });
+  }
   if (m === 'GET' && p === '/api/flock/find') {
     const q = String(url.searchParams.get('nick') || '').trim().replace(/^@/, '').slice(0, 40);
     if (q.length < 2) return json({ birds: [] });

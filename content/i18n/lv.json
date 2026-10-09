@@ -286,5 +286,11 @@
   "aria-label=\"Where to read\"": "aria-label=\"Kur lasīt\"",
   "<h2>My notes: six themes</h2>": "<h2>Manas piezīmes: sešas tēmas</h2>",
   "aria-label=\"Search the site\"": "aria-label=\"Meklēt vietnē\"",
-  "alt=\"Alina Otkinska, the artist behind Pigeon Polly\"": "alt=\"Alīna Otkinska, māksliniece, kas radīja Pigeon Polly\""
+  "alt=\"Alina Otkinska, the artist behind Pigeon Polly\"": "alt=\"Alīna Otkinska, māksliniece, kas radīja Pigeon Polly\"",
+  "🔔 Get an email when the book is out": "🔔 Saņemt e-pastu, kad grāmata iznāks",
+  "aria-label=\"Your email\"": "aria-label=\"Tavs e-pasts\"",
+  ">Notify me<": ">Paziņot man<",
+  "I agree that Alina will email me once when the book is published. My address is not shared with anyone, and I can unsubscribe at any time.": "Piekrītu, ka Alīna man uzrakstīs uz šo adresi, kad grāmata iznāks. Adrese netiek nodota citiem, atrakstīties var jebkurā brīdī.",
+  ">Unsubscribe<": ">Atrakstīties<",
+  ">Privacy<": ">Privātums<"
 }

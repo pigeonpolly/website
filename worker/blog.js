@@ -406,7 +406,7 @@ export async function blogApi(req, env, url, h) {
       const rows = (await env.DB.prepare(`SELECT c.id, c.body, c.anon, c.status, c.created_at, c.post_id, p.slug, p.t_ru, p.t_en, p.t_lv, u.nick
         FROM blog_comments c JOIN blog_posts p ON p.id = c.post_id LEFT JOIN users u ON u.id = c.user_id ${where} ORDER BY c.created_at DESC LIMIT 300`).all()).results
         .map(c => ({ ...c, name: c.nick ? '@' + c.nick : birdName(c.anon, 'ru') }));
-      return json({ comments: rows });
+      return json({ comments: rows, strict: (await h.getMeta('blog_strict')) === '1' });
     }
     if (a === 'gemini-key') {
       if (m === 'POST') {
@@ -814,6 +814,7 @@ async function fullBackup(env) {
     // блог (тот же формат, что понимает «Восстановить из копии»)
     posts: await all('SELECT * FROM blog_posts'), tags: await all('SELECT * FROM blog_tags'), sections: await all('SELECT * FROM blog_sections'),
     comments: await all('SELECT c.*, p.slug FROM blog_comments c JOIN blog_posts p ON p.id = c.post_id'), likes: await all('SELECT * FROM blog_likes'), media,
+    subscribers: await all('SELECT * FROM subscribers').catch(() => []), // «сообщите, когда выйдет книга»
     // челлендж: аккаунты (ник, e-mail, бейджи, серии) и работы на стене
     challenge: { users: await all('SELECT id, sub, email, nick, consent, banned, created_at, best, badges, months, mcount, picks, last_seen FROM users'), works, meta: await all('SELECT * FROM meta WHERE key NOT IN (\'backup_token\', \'blog_salt\', \'gemini_key\')') },
     // все файлы, которые надо скачать вместе с копией

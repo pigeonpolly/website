@@ -148,8 +148,6 @@
     app.innerHTML = `${flashHtml}<div class="be-top">
         <a class="pill-btn pill-fill" href="#new">＋ Новая статья</a>
         <button type="button" class="pill-btn" id="be-gkey">⚙ Перевод (Gemini)${state.gemini ? ' ✓' : ''}</button>
-        <label class="be-switch"><input type="checkbox" id="be-strict" ${state.strict ? 'checked' : ''}><span></span>
-          <b>Строгий режим</b><small>не больше 1 комментария в час с одного адреса</small></label>
       </div>
       ${pend.length ? `<section class="be-card be-pend"><h2>Комментарии со ссылками ждут проверки (${pend.length})</h2><ol>${pend.map(c => `
         <li data-cid="${c.id}"><p><b>${esc(c.name)}</b> → <a href="/ru/blog/${esc(c.slug)}/#comments" target="_blank">${esc(c.t_ru)}</a> · ${fmt(c.created_at)}</p>
@@ -220,9 +218,6 @@
       dashboard();
     });
     app.querySelector('#be-gkey').addEventListener('click', () => geminiPanel());
-    app.querySelector('#be-strict').addEventListener('change', async e => {
-      try { await api('blog/admin/settings', { strict: e.target.checked }); } catch (err) { e.target.checked = !e.target.checked; alert(errText(err)); }
-    });
     app.querySelectorAll('.be-pend [data-ok], .be-pend [data-del]').forEach(b => b.addEventListener('click', async () => {
       const li = b.closest('li');
       if (b.hasAttribute('data-del') && !confirm('Удалить комментарий?')) return;
