@@ -94,6 +94,7 @@ async function ensureBlogSchema(env) {
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN featured INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ }
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN pinned INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ }
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN src_lang TEXT').run(); } catch (e) { /* уже есть */ }
+  try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN client_key TEXT').run(); } catch (e) { /* уже есть */ } // метка новой статьи из редактора: повторное «Сохранить» не создаёт копию
   await env.DB.prepare(`CREATE TABLE IF NOT EXISTS blog_tags (en TEXT PRIMARY KEY, ru TEXT DEFAULT '', lv TEXT DEFAULT '')`).run();
   // разделы блога (как коллекции на Patreon): у статьи один раздел, названия на трёх языках
   await env.DB.prepare(`CREATE TABLE IF NOT EXISTS blog_sections (slug TEXT PRIMARY KEY, en TEXT DEFAULT '', ru TEXT DEFAULT '', lv TEXT DEFAULT '', sort INTEGER DEFAULT 0)`).run();
@@ -335,8 +336,11 @@ export async function blogApi(req, env, url, h) {
       let cover = safeUrl(b.cover || '') ? String(b.cover).trim() : '';
       // картинки, вставленные из Google Docs, живут там временно — копируем их в своё хранилище
       // картинки из Google Docs копируются в редакторе сразу при вставке (fetch-image), здесь сохраняем быстро
-      const status = b.status === 'published' ? 'published' : 'draft';
+      let status = b.status === 'published' ? 'published' : 'draft';
       const featured = b.featured ? 1 : 0;
+      // новая статья, которую уже сохраняли (ответ не дошёл, автосохранение, второе нажатие) — обновляем её, а не создаём копию
+      const key = /^[\w-]{8,64}$/.test(String(b.client_key || '')) ? String(b.client_key) : null;
+      if (!Number(b.id) && key) { const was = await env.DB.prepare('SELECT id FROM blog_posts WHERE client_key = ?').bind(key).first(); if (was) b.id = was.id; }
       let slug = slugify(b.slug || f.t_en || f.t_ru) || 'post';
       for (let i = 2; ; i++) {
         const other = await env.DB.prepare('SELECT id FROM blog_posts WHERE slug = ?').bind(slug).first();
@@ -346,6 +350,7 @@ export async function blogApi(req, env, url, h) {
       let id = Number(b.id) || 0;
       const old = id ? await env.DB.prepare('SELECT * FROM blog_posts WHERE id = ?').bind(id).first() : null;
       if (id && !old) fail(404, 'post');
+      if (b.auto && old && old.status === 'published') status = 'published'; // автосохранение никогда не снимает статью с публикации
       // дату можно поменять в редакторе (b.published_at — секунды); иначе первая публикация
       const custom = Number(b.published_at) > 0 && Number(b.published_at) < t + 366 * 86400 ? Math.floor(Number(b.published_at)) : null;
       const published = custom || (status === 'published' ? (old?.published_at || t) : old?.published_at || null);
@@ -358,7 +363,7 @@ export async function blogApi(req, env, url, h) {
           .bind(...cols.map(c => f[c]), slug, cover, status, featured, t, t, published).run();
         id = r.meta.last_row_id;
       }
-      await env.DB.prepare('UPDATE blog_posts SET src_lang = ? WHERE id = ?').bind(LANGS.includes(b.src_lang) ? b.src_lang : null, id).run();
+      await env.DB.prepare('UPDATE blog_posts SET src_lang = ?, client_key = COALESCE(client_key, ?) WHERE id = ?').bind(LANGS.includes(b.src_lang) ? b.src_lang : null, key, id).run();
       if (typeof b.pinned === 'boolean') {
         if (b.pinned) await env.DB.batch([env.DB.prepare('UPDATE blog_posts SET pinned = 0'), env.DB.prepare('UPDATE blog_posts SET pinned = 1 WHERE id = ?').bind(id)]);
         else await env.DB.prepare('UPDATE blog_posts SET pinned = 0 WHERE id = ?').bind(id).run();

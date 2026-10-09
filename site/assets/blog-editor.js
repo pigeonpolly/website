@@ -415,8 +415,10 @@
     const bodies = [...app.querySelectorAll('.be-body')];
     document.execCommand('defaultParagraphSeparator', false, 'p');
 
+    // метка этой новой статьи: если ответ на сохранение потерялся, повторное сохранение обновит ту же статью, а не создаст копию
+    if (!post.id && !post.key) post.key = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
     const collect = () => {
-      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value, published_at: dateToTs($('#be-date').value, $('#be-time').value, post.published_at), section: [...app.querySelectorAll('#be-secs input:checked')].map(i => i.value) };
+      const d = { id: post.id, client_key: post.key, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value, published_at: dateToTs($('#be-date').value, $('#be-time').value, post.published_at), section: [...app.querySelectorAll('#be-secs input:checked')].map(i => i.value) };
       app.querySelectorAll('[data-k]').forEach(el => {
         if (!el.isContentEditable) { d[el.dataset.k] = el.value; return; }
         const c = el.cloneNode(true);
@@ -635,21 +637,22 @@
     };
     $('#be-date').addEventListener('change', schedLabel); $('#be-time').addEventListener('change', schedLabel); schedLabel();
     // ---- автосохранение черновика (у опубликованной статьи — только напоминание) ----
-    let autoTimer = 0, saving = false;
+    let autoTimer = 0, saving = false, savingP = null, left = false;
     const autoMark = t => { $('#be-auto').textContent = t; };
     async function autosave() {
-      if (saving) return;
+      if (saving || left || !document.body.contains(pubBtn)) return; // редактор уже закрыт — не сохраняем
       if (post.status === 'published') { autoMark('● есть несохранённые изменения'); return; }
-      const d = collect(); d.status = 'draft';
+      const d = collect(); d.status = 'draft'; d.auto = true;
       if (!d.t_ru.trim() && !d.t_en.trim() && !d.t_lv.trim()) { autoMark('черновик сохранится, когда появится заголовок'); return; }
       saving = true; autoMark('сохраняю…');
+      let done; savingP = new Promise(r => { done = r; });
       try {
         const r = await api('blog/admin/save', d);
         post.id = r.id; post.slug = r.slug || post.slug; dirty = false;
         if (location.hash !== '#' + r.id) history.replaceState(null, '', '#' + r.id);
         autoMark('✓ черновик сохранён в ' + new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }));
       } catch (e) { autoMark('⚠ не сохранилось автоматически — нажмите «Сохранить черновик»'); }
-      saving = false;
+      saving = false; done();
     }
     app.addEventListener('input', () => { countWords(); clearTimeout(autoTimer); autoTimer = setTimeout(autosave, 4000); });
     app.addEventListener('change', () => { clearTimeout(autoTimer); autoTimer = setTimeout(autosave, 4000); });
@@ -859,6 +862,7 @@
     // сохранение
     app.querySelectorAll('[data-save]').forEach(b => b.addEventListener('click', async () => {
       clearTimeout(autoTimer);
+      if (saving && savingP) { status('Сохраняю…'); await savingP; } // дождаться автосохранения: у статьи уже будет номер
       const d = collect(); d.status = b.dataset.save;
       if (!d.t_ru.trim() && !d.t_en.trim() && !d.t_lv.trim()) { status(ERR.title); return; }
       const empty = LANGS.map(x => x[0]).filter(l => !d['t_' + l].trim());
@@ -868,7 +872,7 @@
       try {
         const r = await api('blog/admin/save', d);
         if (!r || !r.id) throw Object.assign(new Error('save'), { code: 'save' });
-        dirty = false;
+        post.id = r.id; post.status = r.status; dirty = false; left = true; clearTimeout(autoTimer);
         // после сохранения — сразу к списку статей, на нужную вкладку, с отметкой «сохранено»
         const title = d.t_ru || d.t_en || d.t_lv;
         flash = r.status === 'published'
