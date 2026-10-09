@@ -58,13 +58,13 @@
     if (t === 'party') { for (let y = 0; y < 5; y++) for (let x = -2 + Math.ceil(y / 2); x <= 2 - Math.ceil(y / 2); x++) put(hxR + x, ht - y, y % 2 ? c2 : c); put(hxR, ht - 5, '#FFFFFF'); }
     if (t === 'crown') { for (let x = -2; x <= 2; x++) { put(hxR + x, ht, c); put(hxR + x, ht - 1, c); } put(hxR - 2, ht - 2, c); put(hxR, ht - 2, c); put(hxR + 2, ht - 2, c); put(hxR, ht - 1, '#FFFFFF'); }
   }
-  function finish(g) {
+  function finish(g, w = SW, h = SH) {
     const keys = Object.keys(g).filter(k => g[k][0] && g[k][1] !== 'leg');
     for (const k of keys) {
       const [x, y] = k.split(',').map(Number);
       for (const [dx, dy] of [[1, 0], [-1, 0], [0, 1], [0, -1]]) { const n = (x + dx) + ',' + (y + dy); if (!g[n]) g[n] = [OUT, 'out']; }
     }
-    const c = document.createElement('canvas'); c.width = SW; c.height = SH;
+    const c = document.createElement('canvas'); c.width = w; c.height = h;
     const x2 = c.getContext('2d');
     for (const k in g) { if (!g[k][0]) continue; const [x, y] = k.split(',').map(Number); x2.fillStyle = g[k][0]; x2.fillRect(x, y, 1, 1); }
     return c;
@@ -168,6 +168,114 @@
     return finish(g);
   }
 
+  // ---------- крупная детальная птичка для аватара (в 2 раза подробнее): профиль, сумка, подарки ----------
+  const HW = 64, HH = 56, HB = 53, HO = 4;
+  function hgrid() {
+    const g = {};
+    const put = (x, y, c, layer = 'body') => { x = Math.round(x) + HO; y = Math.round(y); if (c !== undefined && x >= 0 && y >= 0 && x < HW && y < HH) g[x + ',' + y] = [c, layer]; };
+    const ell = (cx, cy, rx, ry, c) => { for (let y = 0; y < HH; y++) for (let x = -HO; x < HW - HO; x++) if (((x + .5 - cx) / rx) ** 2 + ((y + .5 - cy) / ry) ** 2 <= 1) put(x, y, c); };
+    const has = (x, y) => !!g[(Math.round(x) + HO) + ',' + Math.round(y)];
+    return { g, put, ell, has };
+  }
+  // пиксельная картинка из строк: «.» — пусто, буквы — цвета из палитры
+  function stamp(put, rows, x0, y0, pal, flip) {
+    rows.forEach((r, y) => [...r].forEach((ch, x) => { if (pal[ch]) put(x0 + (flip ? r.length - 1 - x : x), y0 + y, pal[ch]); }));
+  }
+  const HD_HATS = {
+    top: ['..cccccccc..', '..clcccccc..', '..clcccccc..', '..cccccccc..', '..cccccccc..', '..bbbbbbbb..', 'cccccccccccc', '.dddddddddd.'],
+    beret: ['......d.....', '...cccccc...', '.cclllcccc..', 'ccccccccccc.', 'cccccccccccc', '.dddddddddd.'],
+    cap: ['...cccc.......', '..clllccc.....', '.cccccccccc...', 'cccbcccccccc..', 'dddddddddddddd'],
+    bow: ['cc........cc', 'cccc....cccc', 'cclccddcclcc', 'cccccddccccc', 'cccc....cccc', 'cc........cc'],
+    party: ['....ww....', '...wwww...', '....cc....', '...cccc...', '...bbbb...', '..cccccc..', '..bbbbbb..', '.cccccccc.', '.bbbbbbbb.', 'cccccccccc'],
+    crown: ['c....c....c', 'cc..cwc..cc', 'ccc.ccc.ccc', 'ccccccccccc', 'crccbccrccc', 'ddddddddddd'],
+  };
+  const HD_ITEMS = {
+    pizza: { r: ['ooooooooo', 'oOOOOOOOo', '.yyrryyy.', '.yrryyry.', '..yyyrr..', '..yyyyy..', '...ryy...', '...yyy...', '....y....'], p: { y: '#FFD966', r: '#D84A3A', o: '#B8743A', O: '#E0A060' }, dy: -1 }, // кусочек висит из клюва, держится за корочку
+    cherry: { r: ['....gG.', '...gGG.', '..g.g..', '.g...g.', 'rr..rr.', 'rRr.rRr', 'rrr.rrr', '.r...r.'], p: { g: '#3E8E4F', G: '#5FC46F', r: '#D8203A', R: '#FF8A9A' }, dy: -1 },
+    cheese: { r: ['..yy...', 'yyyyy..', 'yhyyyyy', 'yyyyhyy', 'ddddddd'], p: { y: '#F5C842', h: '#D9A72A', d: '#C9921F' }, dy: -2 },
+    ring: { r: ['.wbw.', '..y..', '.y.y.', 'y...y', 'y...y', '.yyy.'], p: { w: '#FFFFFF', b: '#5FD3F3', y: '#E9C14A' }, dy: -1 },
+    pearl: { r: ['.pp.', 'pwpp', 'pppp', '.pd.'], p: { p: '#E8E4F0', w: '#FFFFFF', d: '#C8C2D8' }, dy: -1 },
+    ruby: { r: ['.cc.', 'cwcc', 'cccc', '.dd.'], p: { c: '#E0443A', w: '#FFB3AA', d: '#9E2A22' }, dy: -1 },
+    sapphire: { r: ['.cc.', 'cwcc', 'cccc', '.dd.'], p: { c: '#4A7BD8', w: '#B5CCF5', d: '#2C4F96' }, dy: -1 },
+    key: { r: ['.......yyy', 'yyyyyyyy.y', '.y.y...yyy'], p: { y: '#E9C14A' }, dy: -1 },
+    spoon: { r: ['......sss', 'ggggggsws', '......sss'], p: { g: '#B8BCC8', s: '#D0D4E0', w: '#FFFFFF' }, dy: -1 },
+  };
+  function hdHat(put, hat, cx, bottom) {
+    const rows = HD_HATS[hat.t]; if (!rows) return;
+    const c = hat.c, dark = c === '#2B2340';
+    const pal = { c, d: shade(c, dark ? 1.6 : .7), l: shade(c, dark ? 2.2 : 1.3), b: hat.t === 'party' ? '#FFFFFF' : dark ? '#E0443A' : shade(c, .55), w: '#FFFFFF', r: '#E0443A' };
+    if (hat.t === 'crown') pal.b = '#4A7BD8';
+    stamp(put, rows, Math.round(cx - rows[0].length / 2), bottom - rows.length + 1, pal);
+  }
+  function hdShoe(put, sh, x) { // x — левый край лапки (2px)
+    const c = sh.c, d = shade(c, c === '#FFFFFF' ? .82 : .7);
+    if (sh.t === 'sneakers') { stamp(put, ['.cccc.', 'cwcwcc', 'ssssss'], x - 1, HB - 2, { c, w: '#FFFFFF', s: c === '#FFFFFF' ? '#C8C2D8' : '#FFFFFF' }); }
+    if (sh.t === 'boots') { stamp(put, ['lll.', 'cc..', 'cc..', 'cc..', 'cccc', 'ccccc', 'ddddd'], x, HB - 6, { c, d, l: shade(c, 1.25) }); }
+    if (sh.t === 'heels') { stamp(put, ['.cccc', 'cccccc', 'd...dd'], x - 1, HB - 2, { c, d }); }
+  }
+  function hdScarf(put, color, x0, x1, y, tailX) {
+    const d = shade(color, color === '#FFFFFF' ? .85 : .72), l = shade(color, 1.2);
+    for (let x = x0; x <= x1; x++) for (let k = 0; k < 3; k++) put(x, y + k, (x - x0) % 4 < 2 ? (k === 0 ? l : color) : d);
+    for (let k = 0; k < 6; k++) for (let j = 0; j < 3; j++) put(tailX + j, y + 2 + k, k % 2 ? d : color);
+    put(tailX, y + 8, d); put(tailX + 2, y + 8, d);
+  }
+  function spriteHD(lk) {
+    const { g, put, ell, has } = hgrid();
+    if (lk.kind === 'cat') {
+      const fur = lk.fur, dark = shade(fur, fur === '#3A3550' ? 1.6 : .72), white = '#FBF8F0';
+      // хвост
+      for (let i = 0; i < 12; i++) { const tx = 6 - Math.round(Math.sin(i / 3) * 3), ty = HB - 10 - i; put(tx, ty, dark); put(tx + 1, ty, dark); put(tx + 2, ty, i > 9 ? shade(dark, .8) : dark); }
+      ell(20, HB - 9, 13, 7.5, fur);
+      if (lk.pattern === 'patches') { ell(23, HB - 6, 8, 3, white); ell(14, HB - 12, 4, 2.5, dark); }
+      if (lk.pattern === 'stripes') for (let x = 10; x <= 28; x += 4) for (let y = HB - 16; y <= HB - 4; y++) if (has(x, y)) { put(x, y, dark); put(x + 1, y, dark); }
+      for (const px of [9, 14, 25, 30]) { for (let y = HB - 4; y <= HB; y++) { put(px, y, fur); put(px + 1, y, fur); put(px + 2, y, fur); } put(px, HB, shade(fur, .85)); }
+      if (lk.shoe) for (const px of [9, 14, 25, 30]) hdShoe(put, lk.shoe, px);
+      const H = 34, V = HB - 21;
+      ell(H, V, 8, 7.2, fur);
+      stamp(put, ['c....', 'cc...', 'cpc..', 'cppc.'], H - 8, V - 10, { c: fur, p: '#F4A6C6' });
+      stamp(put, ['....c', '...cc', '..cpc', '.cppc'], H + 4, V - 10, { c: fur, p: '#F4A6C6' });
+      if (lk.pattern !== 'solid') ell(H + 1, V + 3, 4, 2.5, lk.pattern === 'patches' ? white : shade(fur, 1.15));
+      for (const ex of [H - 4, H + 2]) { put(ex, V - 1, '#7CC36A'); put(ex + 1, V - 1, '#7CC36A'); put(ex, V, '#7CC36A'); put(ex + 1, V, '#120e1c'); put(ex, V + 1, '#4E9A45'); put(ex + 1, V + 1, '#4E9A45'); }
+      put(H - 1, V + 2, '#F08BC0'); put(H, V + 2, '#F08BC0'); put(H - 1, V + 3, '#120e1c'); put(H - 2, V + 4, '#120e1c'); put(H, V + 4, '#120e1c');
+      for (const [x, y] of [[H - 9, V + 2], [H - 10, V + 4], [H + 7, V + 2], [H + 8, V + 4]]) put(x, y, '#FFFFFF', 'leg');
+      if (lk.scarf) hdScarf(put, lk.scarf, H - 7, H + 5, V + 6, H - 7);
+      if (lk.item && HD_ITEMS[lk.item]) { const it = HD_ITEMS[lk.item]; stamp(put, it.r, H + 6, V + 3 + it.dy, it.p); }
+      if (lk.hat) hdHat(put, lk.hat, H, V - 7);
+      return finish(g, HW, HH);
+    }
+    const s = lk.shape, legH = lk.shoe && lk.shoe.t === 'heels' ? 8 : 6;
+    const bw = s.bw * 2, bh = s.bh * 2, hr = s.hr * 2, neck = s.neck * 2;
+    const cx = 20, bottom = HB - legH + 1, cy = bottom - bh / 2, top = bottom - bh;
+    const dark = shade(lk.body, lk.body === '#3A3550' ? 1.5 : .72), light = shade(lk.body, 1.14), deep = shade(dark, .8);
+    // хвост из трёх перьев
+    for (let i = 0; i < 8; i++) for (let j = -2; j <= Math.min(2, i); j++) put(Math.round(cx - bw / 2) - i + 2, Math.round(cy) + j - i + 2, j === 0 ? deep : dark);
+    ell(cx, cy, bw / 2, bh / 2, lk.body);
+    ell(cx + 2, cy + bh / 4, bw / 3, bh / 4, light);                 // грудка
+    ell(cx - 2, cy, bw / 3, bh / 3.2, dark);                           // крыло
+    for (let x = Math.round(cx - 2 - bw / 3) + 2; x < cx - 2 + bw / 3 - 1; x += 2) put(x, Math.round(cy + bh / 3.2) - 1, deep); // перья на крыле
+    const hx = cx + bw / 2 - 2, hy = top - hr + 4 - neck;
+    if (neck) for (let i = 0; i <= neck + 2; i++) for (let k = -2; k <= 1; k++) put(hx + k, hy + hr - 2 + i, lk.body);
+    ell(hx, hy, hr + .4, hr + .4, lk.body);
+    const ex = Math.round(hx + hr / 2), ey = Math.round(hy - (hr > 4 ? 2 : 1));
+    stamp(put, ['ww.', 'wkk', 'wkh'], ex - 1, ey - 1, { w: '#FFFFFF', k: '#120e1c', h: '#3a3150' });
+    if (lk.kind !== 'crow') { put(ex - 2, ey + 2, '#F2A0B0'); put(ex - 1, ey + 2, '#F2A0B0'); }
+    const bx = Math.round(hx + hr + .5), by = Math.round(hy);
+    const beak = lk.beak || '#F2A73B', beak2 = shade(beak, .78);
+    if (lk.kind === 'crow') stamp(put, ['bbbbb.', 'bbbbbb', 'dddd..'], bx - 1, by - 1, { b: beak, d: beak2 });
+    else stamp(put, ['bb..', 'bbbb', 'ddd.'], bx - 1, by - 1, { b: beak, d: beak2 });
+    const item = lk.item && HD_ITEMS[lk.item];
+    if (item) stamp(put, item.r, bx + (lk.kind === 'crow' ? 5 : 3), by + item.dy, item.p);
+    // лапки с пальчиками
+    for (const lx of [cx - 3, cx + 2]) {
+      for (let y = bottom; y <= HB; y++) { put(lx, y, '#E9A93B', 'leg'); put(lx + 1, y, '#D9952B', 'leg'); }
+      if (lk.shoe) hdShoe(put, lk.shoe, lx);
+      else { put(lx + 2, HB, '#D9952B', 'leg'); put(lx + 3, HB, '#D9952B', 'leg'); put(lx - 1, HB, '#D9952B', 'leg'); }
+    }
+    if (lk.scarf) hdScarf(put, lk.scarf, Math.round(hx - hr), Math.round(hx + 2), Math.round(hy + hr - 2), Math.round(hx - hr) - 1);
+    if (lk.hat) hdHat(put, lk.hat, Math.round(hx), Math.round(hy - hr) + 1);
+    return finish(g, HW, HH);
+  }
+
   // ---------- подарки-семечки для аватара (выдаёт админ): фон, обувь, головной убор, анимация, рамка ----------
   // значение подарка — короткая строка: hat «crown:1» (вид:цвет), shoes «boots:3», bg «#F5C4B3», anim «bounce», frame «gold»
   const GIFTS = {
@@ -190,6 +298,16 @@
     if (/^#[0-9a-f]{6}$/i.test(av.scarf || '')) d.scarf = av.scarf;
     return d;
   }
+  // обрезать пустые края спрайта
+  function crop(c) {
+    const d = c.getContext('2d').getImageData(0, 0, c.width, c.height).data;
+    let x0 = c.width, y0 = c.height, x1 = -1, y1 = -1;
+    for (let y = 0; y < c.height; y++) for (let x = 0; x < c.width; x++) if (d[(y * c.width + x) * 4 + 3]) { if (x < x0) x0 = x; if (x > x1) x1 = x; if (y < y0) y0 = y; if (y > y1) y1 = y; }
+    if (x1 < 0) return c;
+    const o = document.createElement('canvas'); o.width = x1 - x0 + 1; o.height = y1 - y0 + 1;
+    o.getContext('2d').drawImage(c, -x0, -y0);
+    return o;
+  }
   // круглый аватар: фон, рамка, анимация и птичка (крупные пиксели)
   function avatar(id, av, size) {
     av = av || {};
@@ -197,11 +315,13 @@
     el.className = 'pp-ava' + (av.frame ? ' fr-' + av.frame : '') + (av.anim ? ' an-' + av.anim : '');
     el.style.setProperty('--ava', (size || 120) + 'px');
     if (/^#[0-9a-f]{6}$/i.test(av.bg || '')) el.style.setProperty('--ava-bg', av.bg);
-    const c = document.createElement('canvas'); c.width = SW; c.height = SH;
-    c.getContext('2d').drawImage(sprite(dress(looks(id), av), 0), 0, 0);
+    const c = crop(spriteHD(dress(looks(id), av)));
+    // целый масштаб пикселей, чтобы картинка была чёткой; персонаж занимает ~75% кружка
+    const k = Math.max(1, Math.floor((size || 120) * .75 / Math.max(c.width, c.height)));
+    c.style.width = c.width * k + 'px'; c.style.height = c.height * k + 'px';
     const i = document.createElement('i'); i.appendChild(c); el.appendChild(i);
     return el;
   }
 
-  window.PPBirds = { looks, sprite, dress, avatar, GIFTS, SW, SH, BASE, OX };
+  window.PPBirds = { looks, sprite, spriteHD, dress, avatar, GIFTS, SW, SH, BASE, OX };
 })();

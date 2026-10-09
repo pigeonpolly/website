@@ -2490,8 +2490,8 @@ html.sb-hide { --sb: 0px; }
 
 /* ---------- аватар-птичка с подарками: фон, рамка, анимация ---------- */
 .pp-ava { --ava: 120px; --ava-bg: #F4F0FA; position: relative; display: inline-grid; place-items: center; width: var(--ava); height: var(--ava); flex: none; border-radius: 50%; background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.5), transparent 60%), var(--ava-bg); box-shadow: 0 0 0 4px rgba(255,255,255,.9), 0 6px 16px rgba(0,0,0,.3); }
-.pp-ava i { display: block; width: 62%; }
-.pp-ava canvas { display: block; width: 100%; height: auto; image-rendering: pixelated; }
+.pp-ava i { display: grid; place-items: center; }
+.pp-ava canvas { display: block; image-rendering: pixelated; }
 .pp-ava.fr-gold { box-shadow: 0 0 0 5px #E9A93B, 0 0 0 8px #FBE3A1, 0 6px 16px rgba(0,0,0,.3); }
 .pp-ava.fr-rainbow { border: calc(var(--ava) * .06) solid transparent; box-sizing: border-box; box-shadow: 0 6px 16px rgba(0,0,0,.3);
   background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.5), transparent 60%) padding-box, linear-gradient(var(--ava-bg), var(--ava-bg)) padding-box, conic-gradient(#E0443A, #E9A93B, #4CC38A, #4A7BD8, #9B5DE5, #E0443A) border-box; }
