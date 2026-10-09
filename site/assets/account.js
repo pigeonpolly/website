@@ -96,9 +96,17 @@
         <div class="acct-pop" hidden role="menu">
           <p class="acct-name">${u.nick ? '@' + esc(u.nick) : `<i>${t('noNick')}</i>`}${u.admin ? ` <span class="acct-badge">★ ${t('admin')}</span>` : ''}</p>
           <a role="menuitem" href="${pre}/challenge/${u.nick ? '#works' : ''}">${u.nick ? t('profile') : t('nick')}</a>
-          ${u.admin ? `<a role="menuitem" href="/admin/">${t('cabinet')}</a>` : ''}
+          ${u.admin ? `<a role="menuitem" href="/admin/">${t('cabinet')}</a>${document.querySelector('[data-ppb]') ? '<button type="button" role="menuitem" data-edit>✏️ Править страницу</button>' : ''}` : ''}
           <button type="button" role="menuitem" data-out>${t('out')}</button>
         </div>`;
+      // админ: режим правки блоков страницы (site-edit.js грузится только для админа)
+      const ed = el.querySelector('[data-edit]');
+      if (ed) ed.addEventListener('click', () => {
+        el.querySelector('.acct-pop').hidden = true;
+        const go = () => window.PPEdit && window.PPEdit.toggle();
+        if (window.PPEdit) go(); else { const sc = document.createElement('script'); sc.src = '/assets/site-edit.js'; sc.onload = go; document.head.appendChild(sc); }
+      });
+      if (u.admin && document.querySelector('[data-ppb-hidden]')) document.documentElement.classList.add('pp-admin');
       if (window.PPBirds) el.querySelector('canvas').getContext('2d').drawImage(window.PPBirds.sprite(window.PPBirds.looks(u.id), 0), -window.PPBirds.OX, 0);
     }
     const btn = el.querySelector('.acct-btn'), pop = el.querySelector('.acct-pop');

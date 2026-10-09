@@ -45,26 +45,32 @@ let blocksCache = { at: 0, rows: null };
 async function siteBlocks(env) {
   if (blocksCache.rows && Date.now() - blocksCache.at < 20000) return blocksCache.rows;
   await ensureSchema(env);
-  const rows = (await env.DB.prepare('SELECT id, lang, html, hidden FROM site_blocks').all()).results;
+  const rows = (await env.DB.prepare('SELECT id, lang, html, hidden, updated_at FROM site_blocks').all()).results;
   blocksCache = { at: Date.now(), rows };
   return rows;
 }
 async function sitePage(req, env, url) {
-  const res = await env.ASSETS.fetch(req);
-  if (req.method !== 'GET' || !env.DB || url.searchParams.has('raw') || res.status !== 200 || !(res.headers.get('content-type') || '').includes('text/html')) return res;
+  if (req.method !== 'GET' || !env.DB || url.searchParams.has('raw')) return env.ASSETS.fetch(req);
   let rows;
-  try { rows = await siteBlocks(env); } catch (e) { console.error(e); return res; }
-  if (!rows.length) return res;
+  try { rows = await siteBlocks(env); } catch (e) { console.error(e); return env.ASSETS.fetch(req); }
+  // страницу просим целиком (без «If-None-Match»): ответ браузеру зависит ещё и от правок,
+  // поэтому метка версии (ETag) = метка файла + версия правок
+  const h = new Headers(req.headers); h.delete('if-none-match'); h.delete('if-modified-since');
+  const res = await env.ASSETS.fetch(new Request(req, { headers: h }));
+  if (res.status !== 200 || !(res.headers.get('content-type') || '').includes('text/html')) return res;
+  const ver = rows.length + '.' + rows.reduce((m, r) => Math.max(m, r.updated_at || 0), 0);
+  const etag = `W/"${(res.headers.get('etag') || '').replace(/^W\/|"/g, '')}-${ver}"`;
+  if ((req.headers.get('if-none-match') || '') === etag) return new Response(null, { status: 304, headers: { etag, 'cache-control': 'no-cache' } });
+  const out = new Response(res.body, res);
+  out.headers.set('etag', etag); out.headers.delete('last-modified'); out.headers.set('cache-control', 'no-cache');
   const lang = (url.pathname.match(/^\/(ru|lv)\//) || [])[1] || 'en';
   const hidden = new Set(rows.filter(r => r.lang === '*' && r.hidden).map(r => r.id));
   const html = new Map(rows.filter(r => r.lang === lang && r.html != null).map(r => [r.id, r.html]));
-  if (!hidden.size && !html.size) return res;
-  const out = new Response(res.body, res);
-  out.headers.set('cache-control', 'no-cache');
+  if (!hidden.size && !html.size) return out;
   return new HTMLRewriter().on('[data-ppb]', {
     element(el) {
       const id = el.getAttribute('data-ppb');
-      if (hidden.has(id)) { el.setAttribute('data-ppb-hidden', ''); el.setAttribute('hidden', ''); } // скрыт: админ видит его в режиме правки и может вернуть
+      if (hidden.has(id)) el.setAttribute('data-ppb-hidden', ''); // скрыт: админ видит его в режиме правки и может вернуть
       if (html.has(id)) { el.setInnerContent(html.get(id), { html: true }); el.setAttribute('data-ppb-edited', ''); }
     },
   }).transform(out);
@@ -408,7 +414,7 @@ async function route(req, env, url) {
       }
       blocksCache = { at: 0, rows: null };
     }
-    return json({ blocks: (await env.DB.prepare('SELECT id, lang, hidden, page, updated_at, html IS NOT NULL AS edited FROM site_blocks ORDER BY updated_at DESC').all()).results });
+    return json({ blocks: (await env.DB.prepare('SELECT id, lang, hidden, page, updated_at, html FROM site_blocks ORDER BY updated_at DESC').all()).results });
   }
   if (p === '/api/admin/subscribers') {
     const u = await needUser(req, env);

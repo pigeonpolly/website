@@ -16,7 +16,7 @@
   const n = v => Number(v || 0).toLocaleString('ru-RU');
   const err = e => e.code === 401 || e.code === 'auth' || e.code === 'login' ? 'Войдите через Google (кнопка в шапке), чтобы открыть кабинет.' : e.code === 'admin' || e.code === 403 ? 'Этот кабинет только для админа.' : 'Не получилось загрузить: ' + esc(e.message);
 
-  const SECTIONS = { overview, comments, analytics, backup, subscribers, birds };
+  const SECTIONS = { overview, comments, analytics, backup, subscribers, birds, edits };
   function route() {
     const sec = (location.hash || '#overview').slice(1);
     document.querySelectorAll('.adm-nav [data-sec]').forEach(a => a.setAttribute('aria-current', a.dataset.sec === sec ? 'page' : 'false'));
@@ -112,6 +112,24 @@
         <table class="be-table adm-table"><thead><tr><th>Статья</th>${[['views', '👁 Просмотры'], ['likes', '♥ Лайки'], ['comments', '💬 Комментарии']].map(([k, l]) => `<th><button type="button" class="adm-sort" data-sort="${k}" aria-pressed="${aSort === k}">${l}${aSort === k ? ' ↓' : ''}</button></th>`).join('')}<th></th></tr></thead>
         <tbody>${posts.map(p => `<tr><td><a href="/ru/blog/${esc(p.slug)}/" target="_blank">${esc(title(p))}</a></td><td>${n(p.views)}</td><td>${n(p.likes)}</td><td>${n(p.comments)}</td><td><a href="/blog-editor/#${p.id}" title="Редактировать">✎</a></td></tr>`).join('')}</tbody></table></section>`;
     main.querySelectorAll('[data-sort]').forEach(b => b.onclick = () => { aSort = b.dataset.sort; analytics(); });
+  }
+
+  // ---------- правки блоков сайта (режим «✏️ Править страницу») ----------
+  async function edits() {
+    main.innerHTML = '<p class="be-note">Загрузка…</p>';
+    let d; try { d = await api('admin/blocks'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    const L = { en: '', ru: '/ru', lv: '/lv', '*': '' };
+    main.innerHTML = `<section class="adm-box"><h2>🧩 Правки сайта: ${d.blocks.length}</h2>
+      <p class="be-note">Блоки, которые вы изменили или скрыли прямо на сайте. Чтобы править: откройте страницу и в меню аккаунта (птичка справа вверху) выберите <b>«✏️ Править страницу»</b>, затем нажмите на нужный блок.</p>
+      ${d.blocks.length ? `<table class="be-table adm-table"><thead><tr><th>Страница</th><th>Блок</th><th>Что</th><th>Когда</th><th></th></tr></thead><tbody>
+      ${d.blocks.map(b => `<tr data-id="${esc(b.id)}" data-lang="${b.lang}"><td><a href="${L[b.lang]}${esc(b.page || '/')}" target="_blank">${b.page && b.page !== '/' ? esc(b.page) : 'Главная'}</a></td><td><code>${esc(b.id)}</code></td>
+        <td>${b.lang === '*' ? '🙈 скрыт на всех языках' : '✎ изменён (' + b.lang.toUpperCase() + ')'}</td><td>${fmt(b.updated_at)}</td>
+        <td><button type="button" class="bc-link be-danger" data-undo>${b.lang === '*' ? 'Показать' : 'Вернуть как было'}</button></td></tr>`).join('')}</tbody></table>` : '<p class="be-note">Правок пока нет — сайт такой, как в коде.</p>'}</section>`;
+    main.querySelectorAll('[data-undo]').forEach(btn => btn.onclick = async () => {
+      const tr = btn.closest('tr'), id = tr.dataset.id, l = tr.dataset.lang;
+      if (!confirm(l === '*' ? 'Снова показать этот блок посетителям?' : 'Убрать правку и вернуть оригинал этого блока?')) return;
+      try { await api('admin/blocks', l === '*' ? { id, lang: '*', hidden: false } : { id, lang: l, html: null }); edits(); } catch (e) { alert(err(e)); }
+    });
   }
 
   // ---------- все птицы ----------
