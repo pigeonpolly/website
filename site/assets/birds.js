@@ -111,6 +111,8 @@
     if (lk.pattern !== 'solid') ell(hx + .5, hy + 1.5, 2, 1.2, lk.pattern === 'patches' ? white : shade(fur, 1.15));
     put(H - 1, V - 1, '#120e1c'); put(H + 1, V - 1, '#120e1c');              // глаза
     put(H, V, '#F08BC0');                                                       // носик
+    if (lk.item) drawItem(put, lk.item, H + 2, V + 1);
+    if (lk.scarf) { for (let x = H - 3; x <= H + 2; x++) put(x, V + 3, lk.scarf); put(H - 3, V + 4, shade(lk.scarf, .75)); put(H - 4, V + 5, shade(lk.scarf, .75)); }
     if (lk.hat) drawHat(put, lk.hat, H - 1, V - 4);
     return finish(g);
   }
@@ -123,6 +125,8 @@
     if (item === 'pearl') { P(0, 1, '#C8C2D8'); P(0, 2, '#C8C2D8'); P(0, 3, '#FFFFFF'); P(1, 3, '#FFFFFF'); P(0, 4, '#E8E4F0'); P(1, 4, '#E8E4F0'); }
     if (item === 'ruby' || item === 'sapphire') { const c = item === 'ruby' ? '#E0443A' : '#4A7BD8'; P(1, -1, c); P(0, 0, c); P(1, 0, '#FFFFFF'); P(2, 0, c); P(1, 1, c); }
     if (item === 'key') { for (let i = 0; i < 4; i++) P(i, 0, '#E9C14A'); P(3, 1, '#E9C14A'); P(4, -1, '#E9C14A'); P(4, 0, '#E9C14A'); P(4, 1, '#E9C14A'); P(5, 0, '#E9C14A'); }
+    if (item === 'pizza') { for (let dy = 0; dy < 4; dy++) for (let dx = 0; dx <= 3 - dy; dx++) P(dx, dy - 1, dy === 0 ? '#C98A3E' : '#F5C842'); P(1, 0, '#D84A3A'); P(0, 1, '#D84A3A'); }
+    if (item === 'cherry') { P(0, -2, '#3E8E4F'); P(1, -1, '#3E8E4F'); P(0, -1, '#3E8E4F'); P(0, 0, '#D8203A'); P(1, 0, '#D8203A'); P(0, 1, '#D8203A'); P(1, 1, '#A81428'); P(0, 0, '#FF8A9A'); }
     if (item === 'spoon') { for (let i = 0; i < 3; i++) P(i, 0, '#D0D4E0'); P(3, -1, '#E8EBF2'); P(3, 0, '#E8EBF2'); P(4, -1, '#E8EBF2'); P(4, 0, '#E8EBF2'); P(3, 1, '#B8BCC8'); }
   }
 
@@ -148,6 +152,8 @@
     const beak = lk.beak || '#F2A73B';
     put(bx, by, beak); put(bx + 1, by, beak); if (s.hr >= 3) put(bx, by - 1, beak);
     if (lk.kind === 'crow') { put(bx + 2, by, beak); put(bx + 1, by - 1, beak); drawItem(put, lk.item, bx + 3, by); }
+    else if (lk.item) drawItem(put, lk.item, bx + 2, by);
+    if (lk.scarf) { const ny = Math.round(hy + s.hr) + (peck ? -1 : 0), nx = Math.round(hx); for (let x = nx - s.hr; x <= nx + 1; x++) put(x, ny, lk.scarf); put(nx - s.hr, ny + 1, shade(lk.scarf, .75)); put(nx - s.hr - 1, ny + 2, shade(lk.scarf, .75)); }
     // ноги и обувь
     const legs = frame === 1 ? [cx - 2, cx + 2] : [cx - 1, cx + 1];
     for (const lx of legs) {
@@ -170,6 +176,8 @@
     shoes: SHOES.flatMap(h => SHOE_C.map((c, i) => h + ':' + i)),
     anim: ['bounce', 'wiggle', 'float', 'spin', 'sparkle', 'heart'],
     frame: ['gold', 'rainbow', 'stars', 'hearts', 'leaves', 'dotted'],
+    item: ['pizza', 'cherry', 'cheese', 'ring', 'pearl', 'ruby', 'sapphire', 'key', 'spoon'],
+    scarf: ['#E0443A', '#E9A93B', '#4CC38A', '#4A7BD8', '#F08BC0', '#9B5DE5', '#FFFFFF', '#2B2340', '#5FA8A0', '#D85A30'],
   };
   const pair = (v, list, cols) => { const [t, i] = String(v || '').split(':'); return list.includes(t) && cols[+i] ? { t, c: cols[+i] } : null; };
   // внешность с надетыми подарками (у котика нет обуви)
@@ -178,6 +186,8 @@
     const d = Object.assign({}, lk);
     if (av.hat) d.hat = pair(av.hat, HATS, HAT_C) || d.hat;
     if (av.shoes) d.shoe = pair(av.shoes, SHOES, SHOE_C) || d.shoe;
+    if (GIFTS.item.includes(av.item)) d.item = av.item;         // в клюве / в зубках
+    if (/^#[0-9a-f]{6}$/i.test(av.scarf || '')) d.scarf = av.scarf;
     return d;
   }
   // круглый аватар: фон, рамка, анимация и птичка (крупные пиксели)

@@ -136,8 +136,8 @@
   function giftDialog(u, done) {
     const B = window.PPBirds; if (!B) return;
     let av = {}; try { av = JSON.parse(u.avatar || '{}') || {}; } catch (e) { /* пусто */ }
-    const KINDS = [['hat', '🎩 Головной убор'], ['shoes', '👟 Обувь'], ['bg', '🎨 Фон'], ['frame', '⭕ Рамка'], ['anim', '✨ Анимация']];
-    const NAMES = { bounce: 'прыгает', wiggle: 'качается', float: 'парит', spin: 'кружится', sparkle: 'сияет', heart: 'сердечко', gold: 'золотая', rainbow: 'радуга', stars: 'звёзды', hearts: 'сердечки', leaves: 'листики', dotted: 'пунктир' };
+    const KINDS = [['hat', '🎩 Головной убор'], ['shoes', '👟 Обувь'], ['item', '🍕 В клюв'], ['scarf', '🧣 Шарфик'], ['bg', '🎨 Фон'], ['frame', '⭕ Рамка'], ['anim', '✨ Анимация']];
+    const NAMES = { bounce: 'прыгает', wiggle: 'качается', float: 'парит', spin: 'кружится', sparkle: 'сияет', heart: 'сердечко', pizza: 'пицца', cherry: 'вишенка', cheese: 'сыр', ring: 'колечко', pearl: 'жемчужина', ruby: 'рубин', sapphire: 'сапфир', key: 'ключик', spoon: 'ложечка', gold: 'золотая', rainbow: 'радуга', stars: 'звёзды', hearts: 'сердечки', leaves: 'листики', dotted: 'пунктир' };
     let kind = 'hat', item = B.GIFTS.hat[0];
     const w = document.createElement('div'); w.className = 'adm-gift';
     w.innerHTML = `<div class="adm-gift-card" role="dialog" aria-label="Подарок"><h3>🎁 Подарок для ${u.nick ? '@' + esc(u.nick) : 'птички без ника'}</h3>

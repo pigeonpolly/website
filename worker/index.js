@@ -77,7 +77,7 @@ async function sitePage(req, env, url) {
 }
 
 // ---------- аватар: что надето из подарков (фон, обувь, головной убор, анимация, рамка) ----------
-const GIFT_KINDS = ['bg', 'shoes', 'hat', 'anim', 'frame'];
+const GIFT_KINDS = ['bg', 'shoes', 'hat', 'anim', 'frame', 'item', 'scarf'];
 const avatarOf = u => { try { const a = JSON.parse(u && u.avatar || '{}'); return a && typeof a === 'object' ? a : {}; } catch (e) { return {}; } };
 const okItem = (kind, item) => GIFT_KINDS.includes(kind) && /^[#a-z0-9:-]{1,24}$/i.test(String(item || ''));
 

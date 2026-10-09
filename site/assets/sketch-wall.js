@@ -62,7 +62,7 @@
     bagNote: ['Everything you get stays here forever. Tap a thing to put it on or take it off.', 'Всё, что ты получаешь, остаётся здесь навсегда. Нажми на вещь, чтобы надеть или снять.', 'Viss, ko saņem, paliek šeit uz visiem laikiem. Pieskaries lietai, lai to uzvilktu vai novilktu.'],
     bagEmpty: ['Empty for now. Gifts from Alina will appear here.', 'Пока пусто. Здесь появятся подарки от Алины.', 'Pagaidām tukšs. Šeit parādīsies Alīnas dāvanas.'],
     wearing: ['on ✓', 'надето ✓', 'uzvilkts ✓'],
-    kinds: [{ bg: 'background', shoes: 'shoes', hat: 'hat', anim: 'animation', frame: 'frame' }, { bg: 'фон', shoes: 'обувь', hat: 'головной убор', anim: 'анимация', frame: 'рамка' }, { bg: 'fons', shoes: 'apavi', hat: 'galvassega', anim: 'animācija', frame: 'rāmis' }],
+    kinds: [{ bg: 'background', shoes: 'shoes', hat: 'hat', anim: 'animation', frame: 'frame', item: 'a treat to hold', scarf: 'scarf' }, { bg: 'фон', shoes: 'обувь', hat: 'головной убор', anim: 'анимация', frame: 'рамка', item: 'вкусняшка в клюв', scarf: 'шарфик' }, { bg: 'fons', shoes: 'apavi', hat: 'galvassega', anim: 'animācija', frame: 'rāmis', item: 'gardums knābī', scarf: 'šalle' }],
     hide: ['Hide', 'Скрыть', 'Paslēpt'], ban: ['Block', 'Блок', 'Bloķēt'],
     banAsk: ['Block this user? Their sketches disappear from the wall.', 'Заблокировать пользователя? Его рисунки пропадут со стены.', 'Bloķēt lietotāju? Viņa skices pazudīs no sienas.'],
   };
@@ -294,7 +294,7 @@
     const m = modal('');
     m.card.classList.add('bag-card');
     const draw = () => {
-      const kinds = ['hat', 'shoes', 'bg', 'frame', 'anim'].filter(k => items.some(g => g.kind === k));
+      const kinds = ['hat', 'shoes', 'scarf', 'item', 'bg', 'frame', 'anim'].filter(k => items.some(g => g.kind === k));
       m.card.innerHTML = `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3><p class="sw-bv-how">${t('bagNote')}</p>
         ${items.length ? kinds.map(k => `<h4>${esc(kindName(k))}</h4><div class="bag-grid">${items.filter(g => g.kind === k).map(g =>
           `<button type="button" class="bag-item${me.avatar && me.avatar[k] === g.item ? ' on' : ''}" data-k="${k}" data-i="${esc(g.item)}"><span class="bag-ava"></span>${me.avatar && me.avatar[k] === g.item ? t('wearing') : ''}</button>`).join('')}</div>`).join('') : `<p class="bag-empty">${t('bagEmpty')}</p>`}`;
