@@ -268,10 +268,14 @@
   }
 
   // ---------- редактор статьи ----------
+  // форматирование — всплывает над выделенным текстом; вставка — кнопкой ＋ на пустой строке
   const TOOLS = [
-    ['h2', 'Заголовок', 'Заг'], ['h3', 'Подзаголовок', 'Подзаг'], ['p', 'Обычный текст', '¶'], ['bold', 'Жирный', '<b>Ж</b>'], ['italic', 'Курсив', '<i>К</i>'],
-    ['ul', 'Список', '• —'], ['ol', 'Нумерованный список', '1.'], ['quote', 'Цитата', '❝'], ['link', 'Ссылка', '🔗'], ['img', 'Картинка', '🖼'],
-    ['hr', 'Разделитель', '—'], ['clear', 'Убрать оформление', '⌫'], ['imgs', 'Вставить картинки (с подписями) из оригинала на те же места', '🖼 Картинки из оригинала'],
+    ['bold', 'Жирный', '<b>Ж</b>'], ['italic', 'Курсив', '<i>К</i>'], ['link', 'Ссылка', '🔗'], ['h2', 'Заголовок', 'H2'], ['h3', 'Подзаголовок', 'H3'],
+    ['p', 'Обычный текст', '¶'], ['ul', 'Список', '•'], ['ol', 'Нумерованный список', '1.'], ['quote', 'Цитата', '❝'], ['clear', 'Убрать оформление', '⌫'],
+  ];
+  const INSERTS = [
+    ['img', 'Картинка с устройства или по ссылке', '🖼 Картинка'], ['yt', 'Видео с YouTube', '🎬 Видео YouTube'], ['quote', 'Цитата', '❝ Цитата'],
+    ['hr', 'Разделитель', '— Разделитель'], ['h2', 'Заголовок раздела', 'H2 Заголовок'], ['imgs', 'Вставить картинки (с подписями) из оригинала на те же места', '🖼 Картинки из оригинала'],
   ];
   async function editor(id) {
     let post = { id: 0, slug: '', status: 'draft', cover: '' };
@@ -285,24 +289,27 @@
     for (const [l] of LANGS) for (const k of ['t', 'd', 'tags', 'b']) post[`${k}_${l}`] = post[`${k}_${l}`] || '';
     app.innerHTML = `<p class="be-back"><a href="#">← Все статьи</a></p>
       <div class="be-tabs" role="tablist">${LANGS.map(([l, n], i) => `<button type="button" role="tab" data-tab="${l}" aria-selected="${!i}">${n}</button>`).join('')}
-        <span class="be-trs"><button type="button" class="pill-btn pill-fill be-tr" id="be-tr" data-engine="google">🌐 Перевести с RU на EN и LV</button>
+        <span class="be-trs"><button type="button" class="pill-btn be-setbtn" id="be-set">⚙ Настройки</button><button type="button" class="pill-btn pill-fill be-tr" id="be-tr" data-engine="google">🌐 Перевести с RU на EN и LV</button>
         <button type="button" class="pill-btn be-tr2" id="be-tr-g" data-engine="gemini" title="Перевод через Gemini: точнее и живее, но с дневным лимитом">✨ Gemini</button></span></div>
       <div class="be-progress" id="be-progress" hidden></div>
       <details class="be-hint"><summary>Как перевести статью и не потерять картинки</summary>
         <ol><li><b>Кнопка «🌐 Перевести»</b> (вверху справа): переводит открытую вкладку на два других языка через Google Переводчик — бесплатно и без лимитов. Кнопка <b>«✨ Gemini»</b> рядом переводит живее и точнее, но у неё дневной лимит. В обоих случаях картинки, подписи, заголовки и жирный остаются на месте, переводится только текст. Потом проверьте и поправьте перевод.</li>
         <li><b>Или в Google Docs:</b> откройте документ со статьёй → <i>Инструменты → Перевести документ</i> → выберите язык. Google сделает копию документа уже на нужном языке, с картинками и оформлением. Откройте её, Ctrl+A, Ctrl+C и вставьте во вкладку RU / EN / LV здесь.</li>
-        <li><b>Если переводите в другом переводчике</b> (DeepL, Google Translate) и вставили текст без картинок — нажмите в панели над текстом кнопку <b>«🖼 Картинки из оригинала»</b>: картинки (с подписями) встанут на те же места между абзацами, что и в оригинале. Подписи потом переведите сами.</li></ol>
+        <li><b>Если переводите в другом переводчике</b> (DeepL, Google Translate) и вставили текст без картинок — поставьте курсор на пустую строку, нажмите <b>＋</b> слева и выберите <b>«🖼 Картинки из оригинала»</b>: картинки (с подписями) встанут на те же места между абзацами, что и в оригинале. Подписи потом переведите сами.</li></ol>
         Писать можно и прямо здесь, или вставлять из Google Docs (Ctrl+A, Ctrl+C → Ctrl+V в поле «Текст») — картинки сразу скопируются на сайт.</details>
       ${LANGS.map(([l], i) => `<section class="be-pane" data-pane="${l}" ${i ? 'hidden' : ''}>
         <div class="be-panehead be-ph-${l}"><b>${PANE_NAME[l]}</b>
           <span class="be-move">Текст не на этом языке? Перенести в: ${LANGS.filter(x => x[0] !== l).map(([o, n]) => `<button type="button" class="bc-link" data-move="${o}">${n}</button>`).join(' · ')}</span></div>
         <p class="be-langwarn" hidden></p>
-        <label class="be-f"><span>Заголовок</span><input type="text" data-k="t_${l}" maxlength="200" value="${esc(post['t_' + l])}"></label>
-        <label class="be-f"><span>Краткое описание <small>(видно в списке статей и в Google)</small></span><textarea data-k="d_${l}" rows="2" maxlength="400">${esc(post['d_' + l])}</textarea></label>
-        <div class="be-f"><span>Текст</span>
-          <div class="be-tools">${TOOLS.map(([c, title, label]) => `<button type="button" data-cmd="${c}" title="${title}">${label}</button>`).join('')}</div>
+        <label class="be-f be-title"><span>Заголовок</span><input type="text" data-k="t_${l}" maxlength="200" placeholder="Заголовок" value="${esc(post['t_' + l])}"></label>
+        <label class="be-f be-desc"><span>Краткое описание</span><textarea data-k="d_${l}" rows="2" maxlength="400" placeholder="Короткое описание — видно в списке статей и в Google">${esc(post['d_' + l])}</textarea></label>
+        <div class="be-f be-bodywrap"><span>Текст</span>
+          <div class="be-tools be-bubble" hidden>${TOOLS.map(([c, title, label]) => `<button type="button" data-cmd="${c}" title="${title}">${label}</button>`).join('')}</div>
+          <button type="button" class="be-plus" hidden title="Вставить: картинку, видео, цитату, разделитель" aria-label="Вставить">＋</button>
+          <div class="be-tools be-plusmenu" hidden>${INSERTS.map(([c, title, label]) => `<button type="button" data-cmd="${c}" title="${title}">${label}</button>`).join('')}</div>
           <div class="be-body bp-body" contenteditable="true" data-k="b_${l}" data-ph="Начните писать… Картинки можно перетащить прямо сюда.">${post['b_' + l]}</div>
         </div></section>`).join('')}
+      <aside class="be-drawer" id="be-drawer" aria-label="Настройки публикации"><div class="be-drawer-head"><b>⚙ Настройки публикации</b><button type="button" class="be-x" data-drawer-close aria-label="Закрыть">✕</button></div>
       <section class="be-card be-common">
         <div class="be-f"><span>Обложка</span><div class="be-cover">
           <div class="be-cover-img">${post.cover ? `<img src="${esc(post.cover)}" alt="">` : '<span>нет обложки</span>'}</div>
@@ -311,8 +318,8 @@
             ${post.cover ? '<button type="button" class="bc-link" id="be-cover-rm">убрать обложку</button>' : ''}</div></div></div>
         <label class="be-f be-srclang"><span>Язык оригинала <small>(на остальных языках внизу статьи появится маленькая пометка «перевод сделан онлайн-инструментами» со ссылкой на оригинал; кнопка «Перевести» ставит его сама)</small></span>
           <select id="be-src"><option value="">— не указан (пометки не будет) —</option>${LANGS.map(([l, n]) => `<option value="${l}"${post.src_lang === l ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
-        <label class="be-f be-date"><span>Дата статьи <small>(показывается на сайте; статьи идут по ней — от новых к старым. Пусто — дата первой публикации)</small></span>
-          <input type="date" id="be-date" value="${post.published_at ? new Date(post.published_at * 1000).toISOString().slice(0, 10) : ''}"></label>
+        <div class="be-f be-date"><span>Дата и время публикации <small>(статьи идут по дате — от новых к старым. Пусто — сейчас. Если поставить будущее время, статья выйдет сама в этот момент)</small></span>
+          <div class="be-dt"><input type="date" id="be-date" value="${post.published_at ? localDate(post.published_at) : ''}"><input type="time" id="be-time" value="${post.published_at ? localTime(post.published_at) : ''}"></div></div>
         <label class="be-f"><span>Раздел <small>(крупная тема, как коллекция на Patreon)</small></span>
           <select id="be-section"><option value="">— без раздела —</option>${sections.map(r => `<option value="${esc(r.slug)}"${post.section === r.slug ? ' selected' : ''}>${esc(r.en)}${r.ru ? ' / ' + esc(r.ru) : ''}</option>`).join('')}<option value="__new">＋ Новый раздел…</option></select></label>
         <div class="be-f"><span>Теги <small>(на английском: впишите тег и нажмите Enter. Перевод на RU и LV подставится сам — поправить его можно во вкладке «Теги» списка статей)</small></span>
@@ -321,12 +328,13 @@
           <input type="hidden" data-k="tags_en" value="${esc(post.tags_en || post.tags_ru || post.tags_lv || '')}"></div>
         <label class="be-check"><input type="checkbox" id="be-featured" ${post.featured ? 'checked' : ''}> <b>★ Избранное</b> <small>— показывать справа в блоке блога на главной</small></label>
         <label class="be-f"><span>Адрес статьи <small id="be-slug-note">${post.status === 'published' ? '(статья опубликована — адрес лучше не менять, иначе старые ссылки перестанут работать)' : '(заполняется сам из заголовка; можно поправить)'}</small></span><div class="be-slug"><span>pigeonpolly.com/blog/</span><input type="text" id="be-slug" value="${esc(post.slug)}" spellcheck="false"><span>/</span></div></label>
-      </section>
+      </section></aside><div class="be-shade" id="be-shade" hidden></div>
       <div class="be-save">
         <button type="button" class="pill-btn" data-save="draft">${post.status === 'published' ? 'Снять с публикации' : 'Сохранить черновик'}</button>
         <button type="button" class="pill-btn pill-fill" data-save="published">${post.status === 'published' ? 'Сохранить изменения' : 'Опубликовать'}</button>
         ${post.id ? `<a class="pill-btn" href="/ru/blog/${esc(post.slug)}/" target="_blank">Посмотреть ↗</a>` : ''}
         <p class="be-status" role="status" aria-live="polite"></p>
+        <span class="be-meta"><span class="be-auto" id="be-auto"></span><span class="be-words" id="be-words"></span></span>
       </div>
       <input type="file" id="be-file" accept="image/*" hidden>`;
     const $ = s => app.querySelector(s);
@@ -336,7 +344,7 @@
     document.execCommand('defaultParagraphSeparator', false, 'p');
 
     const collect = () => {
-      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value, published_at: dateToTs($('#be-date').value, post.published_at), section: $('#be-section').value === '__new' ? '' : $('#be-section').value };
+      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value, published_at: dateToTs($('#be-date').value, $('#be-time').value, post.published_at), section: $('#be-section').value === '__new' ? '' : $('#be-section').value };
       app.querySelectorAll('[data-k]').forEach(el => {
         if (!el.isContentEditable) { d[el.dataset.k] = el.value; return; }
         const c = el.cloneNode(true);
@@ -477,6 +485,11 @@
           if (u === null) return;
           if (!u.trim() || u.trim() === 'https://') document.execCommand('unlink');
           else document.execCommand('createLink', false, u.trim());
+        } else if (c === 'yt') {
+          const u = prompt('Ссылка на видео YouTube:', 'https://www.youtube.com/watch?v=');
+          const m = String(u || '').match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{6,20})/);
+          if (!m) { if (u && u.trim() && !/watch\?v=$/.test(u)) alert('Не похоже на ссылку YouTube.'); return; }
+          document.execCommand('insertHTML', false, `<figure><iframe src="https://www.youtube-nocookie.com/embed/${m[1]}"></iframe></figure><p><br></p>`);
         } else if (c === 'img') {
           const how = prompt('Вставьте ссылку на картинку или оставьте пустым, чтобы загрузить файл с устройства:', '');
           if (how === null) return;
@@ -487,6 +500,81 @@
         touch();
       });
     });
+
+    // ---- панель форматирования всплывает над выделенным текстом ----
+    const hideBubbles = () => app.querySelectorAll('.be-bubble').forEach(x => { x.hidden = true; });
+    document.addEventListener('selectionchange', () => {
+      const sel = getSelection(); if (!app.isConnected) return;
+      const body = sel.rangeCount && bodies.find(b => b.contains(sel.anchorNode));
+      if (!body || sel.isCollapsed) { if (!app.querySelector('.be-bubble:hover')) hideBubbles(); placePlus(); return; }
+      const bub = body.closest('.be-pane').querySelector('.be-bubble'), r = sel.getRangeAt(0).getBoundingClientRect();
+      if (!r.width && !r.height) return;
+      bub.hidden = false;
+      const w = bub.offsetWidth, top = r.top - bub.offsetHeight - 10;
+      bub.style.left = Math.max(8, Math.min(innerWidth - w - 8, r.left + r.width / 2 - w / 2)) + 'px';
+      bub.style.top = (top < 70 ? r.bottom + 10 : top) + 'px';
+      placePlus();
+    });
+    addEventListener('scroll', hideBubbles, { passive: true });
+    // ---- ＋ на пустой строке: вставить картинку, видео, цитату, разделитель ----
+    function placePlus() {
+      app.querySelectorAll('.be-plus').forEach(pl => { pl.hidden = true; });
+      const sel = getSelection(); if (!sel.rangeCount || !sel.isCollapsed) return;
+      const body = bodies.find(b => b.contains(sel.anchorNode)); if (!body) return;
+      let blk = sel.anchorNode.nodeType === 1 ? sel.anchorNode : sel.anchorNode.parentElement;
+      while (blk && blk.parentElement !== body) blk = blk.parentElement;
+      const empty = !body.textContent.trim() && !body.querySelector('img, iframe') || (blk && blk.tagName === 'P' && !blk.textContent.trim() && !blk.querySelector('img, iframe'));
+      if (!empty) return;
+      const wrap = body.closest('.be-bodywrap'), pl = wrap.querySelector('.be-plus');
+      const top = (blk ? blk.getBoundingClientRect().top : body.getBoundingClientRect().top + 16) - wrap.getBoundingClientRect().top;
+      pl.style.top = top + 'px'; pl.hidden = false;
+    }
+    app.querySelectorAll('.be-plus').forEach(pl => {
+      pl.addEventListener('mousedown', e => e.preventDefault());
+      pl.addEventListener('click', () => { const m = pl.nextElementSibling; m.hidden = !m.hidden; m.style.top = (parseFloat(pl.style.top) + 40) + 'px'; });
+    });
+    app.querySelectorAll('.be-plusmenu button').forEach(b => b.addEventListener('click', () => { b.closest('.be-plusmenu').hidden = true; setTimeout(placePlus, 50); }));
+    document.addEventListener('mousedown', e => { if (!e.target.closest('.be-plusmenu, .be-plus')) app.querySelectorAll('.be-plusmenu').forEach(m => { m.hidden = true; }); });
+    // ---- настройки публикации — выезжают справа ----
+    const drawer = $('#be-drawer'), shade = $('#be-shade');
+    const openDrawer = on => { drawer.classList.toggle('open', on); shade.hidden = !on; };
+    $('#be-set').addEventListener('click', () => openDrawer(true));
+    shade.addEventListener('click', () => openDrawer(false));
+    drawer.querySelector('[data-drawer-close]').addEventListener('click', () => openDrawer(false));
+    addEventListener('keydown', e => { if (e.key === 'Escape' && drawer.classList.contains('open')) openDrawer(false); });
+    // ---- счётчик слов и время чтения ----
+    const countWords = () => {
+      const b = app.querySelector(`[data-k="b_${active}"]`), n = (b.innerText.match(/[\p{L}\p{N}]+/gu) || []).length;
+      $('#be-words').textContent = n ? `${n.toLocaleString('ru-RU')} слов · ~${Math.max(1, Math.round(n / 200))} мин чтения` : '';
+    };
+    // ---- кнопка публикации: «Запланировать», если выбрано будущее время ----
+    const pubBtn = app.querySelector('[data-save="published"]'), pubLabel = pubBtn.textContent;
+    const schedLabel = () => {
+      const ts = dateToTs($('#be-date').value, $('#be-time').value, post.published_at);
+      pubBtn.textContent = ts && ts > Date.now() / 1000 + 60 ? `⏰ Запланировать на ${new Date(ts * 1000).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : pubLabel;
+    };
+    $('#be-date').addEventListener('change', schedLabel); $('#be-time').addEventListener('change', schedLabel); schedLabel();
+    // ---- автосохранение черновика (у опубликованной статьи — только напоминание) ----
+    let autoTimer = 0, saving = false;
+    const autoMark = t => { $('#be-auto').textContent = t; };
+    async function autosave() {
+      if (saving) return;
+      if (post.status === 'published') { autoMark('● есть несохранённые изменения'); return; }
+      const d = collect(); d.status = 'draft';
+      if (!d.t_ru.trim() && !d.t_en.trim() && !d.t_lv.trim()) { autoMark('черновик сохранится, когда появится заголовок'); return; }
+      saving = true; autoMark('сохраняю…');
+      try {
+        const r = await api('blog/admin/save', d);
+        post.id = r.id; post.slug = r.slug || post.slug; dirty = false;
+        if (location.hash !== '#' + r.id) history.replaceState(null, '', '#' + r.id);
+        autoMark('✓ черновик сохранён в ' + new Date().toLocaleTimeString('ru-RU', { hour: '2-digit', minute: '2-digit' }));
+      } catch (e) { autoMark('⚠ не сохранилось автоматически — нажмите «Сохранить черновик»'); }
+      saving = false;
+    }
+    app.addEventListener('input', () => { countWords(); clearTimeout(autoTimer); autoTimer = setTimeout(autosave, 4000); });
+    app.addEventListener('change', () => { clearTimeout(autoTimer); autoTimer = setTimeout(autosave, 4000); });
+    app.querySelectorAll('[data-tab]').forEach(b => b.addEventListener('click', () => setTimeout(countWords, 0)));
+    countWords();
 
     // картинки: перетаскивание, вставка из буфера, выбор файла
     // картинка сразу с местом для подписи: курсор встаёт в подпись
@@ -677,6 +765,7 @@
 
     // сохранение
     app.querySelectorAll('[data-save]').forEach(b => b.addEventListener('click', async () => {
+      clearTimeout(autoTimer);
       const d = collect(); d.status = b.dataset.save;
       if (!d.t_ru.trim() && !d.t_en.trim() && !d.t_lv.trim()) { status(ERR.title); return; }
       const empty = LANGS.map(x => x[0]).filter(l => !d['t_' + l].trim());
@@ -842,12 +931,15 @@
     };
     render(); document.body.appendChild(d); d.showModal();
   }
-  // дата из поля (ГГГГ-ММ-ДД) → секунды; если день тот же — время оставляем прежним
-  const dateToTs = (v, prev) => {
-    if (!v) return null;
-    const [y, m, d] = v.split('-').map(Number), keep = prev ? new Date(prev * 1000) : null;
-    if (keep && keep.toISOString().slice(0, 10) === v) return prev;
-    return Math.floor(Date.UTC(y, m - 1, d, keep ? keep.getUTCHours() : 12, keep ? keep.getUTCMinutes() : 0) / 1000);
+  // дата и время публикации (местное время) ↔ секунды
+  const pad2 = n => String(n).padStart(2, '0');
+  const localDate = ts => { const d = new Date(ts * 1000); return `${d.getFullYear()}-${pad2(d.getMonth() + 1)}-${pad2(d.getDate())}`; };
+  const localTime = ts => { const d = new Date(ts * 1000); return `${pad2(d.getHours())}:${pad2(d.getMinutes())}`; };
+  const dateToTs = (date, time, prev) => {
+    if (!date) return null;
+    if (prev && localDate(prev) === date && localTime(prev) === (time || localTime(prev))) return prev;
+    const [y, m, d] = date.split('-').map(Number), [hh, mm] = (time || (prev ? localTime(prev) : '12:00')).split(':').map(Number);
+    return Math.floor(new Date(y, m - 1, d, hh, mm).getTime() / 1000);
   };
   const stripHtml = s => String(s || '').replace(/<[^>]*>/g, '').trim();
 

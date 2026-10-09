@@ -2259,3 +2259,42 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .bp-pencil:hover { background: #F7C66A; }
 .bp-pencil[hidden] { display: none; }
 .adm-cbar { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 20px; margin-bottom: 14px; } .adm-cbar .adm-seg { margin: 0; }
+/* ---------- Редактор статьи: чисто, как на Patreon ---------- */
+.be-app .be-title > span, .be-app .be-desc > span, .be-app .be-bodywrap > span { display: none; }
+.be-app .be-title input { border: 0 !important; background: none !important; padding: 6px 0 !important; font: 600 clamp(28px, 3.4vw, 40px)/1.15 var(--serif) !important; color: #2B1A51 !important; box-shadow: none !important; }
+.be-app .be-desc textarea { border: 0 !important; background: none !important; padding: 2px 0 10px !important; font: 400 18px/1.5 var(--sans) !important; color: #6B6290 !important; resize: none; box-shadow: none !important; }
+.be-app .be-title input:focus, .be-app .be-desc textarea:focus { outline: none; }
+.be-bodywrap { position: relative; }
+.be-app .be-bodywrap .be-body { border-radius: 14px; }
+/* всплывающая панель форматирования */
+.be-app .be-bubble { position: fixed; z-index: 60; display: flex; flex-wrap: nowrap; gap: 2px; padding: 5px; border-radius: 12px; background: #2B1A51; box-shadow: 0 10px 30px rgba(0, 0, 0, .35); top: auto; }
+.be-app .be-bubble[hidden] { display: none; }
+.be-app .be-bubble button { min-width: 34px; padding: 6px 9px; color: #fff; }
+/* ＋ на пустой строке и меню вставки */
+.be-plus { position: absolute; left: -46px; z-index: 5; width: 34px; height: 34px; border-radius: 50%; border: 1.5px solid #C8C2D8; background: #fff; color: #534AB7; font: 400 22px/1 var(--sans); cursor: pointer; box-shadow: 0 2px 8px rgba(43, 26, 81, .12); }
+.be-plus:hover { border-color: #534AB7; background: #F3EEFB; }
+.be-plus[hidden] { display: none; }
+.be-app .be-plusmenu { position: absolute; left: -46px; z-index: 30; display: grid; gap: 2px; padding: 6px; min-width: 220px; border-radius: 14px; background: #fff; box-shadow: 0 14px 40px rgba(43, 26, 81, .25); position: absolute; top: auto; }
+.be-app .be-plusmenu[hidden] { display: none; }
+.be-app .be-plusmenu button { text-align: left; color: #2B1A51; padding: 9px 12px; border-radius: 10px; margin: 0 !important; background: none !important; }
+.be-app .be-plusmenu button:hover { background: #F3EEFB !important; }
+@media (max-width: 900px) { .be-plus { left: auto; right: 8px; } .be-app .be-plusmenu { left: auto; right: 0; } }
+/* настройки публикации — выезжающая панель */
+.be-drawer { position: fixed; top: 0; right: 0; bottom: 0; z-index: 80; width: min(460px, 100vw); overflow-y: auto; background: #FFFDF8; color: #2B1A51; box-shadow: -20px 0 50px rgba(0, 0, 0, .3); transform: translateX(105%); transition: transform .25s ease; padding: 0 0 30px; }
+.be-drawer.open { transform: none; }
+.be-drawer-head { position: sticky; top: 0; z-index: 2; display: flex; align-items: center; justify-content: space-between; padding: 16px 20px; background: #FFFDF8; border-bottom: 1px solid #ECE6F5; }
+.be-drawer-head b { font: 700 18px var(--sans); }
+.be-x { width: 36px; height: 36px; border: 0; border-radius: 50%; background: #F3EEFB; color: #2B1A51; cursor: pointer; font-size: 16px; }
+.be-drawer .be-common { margin: 0; border: 0; box-shadow: none; background: none; padding: 16px 20px; }
+.be-shade { position: fixed; inset: 0; z-index: 79; background: rgba(20, 10, 45, .45); }
+.be-shade[hidden] { display: none; }
+.be-dt { display: flex; gap: 8px; flex-wrap: wrap; }
+.be-app #be-time { padding: 10px 14px; border-radius: 12px; border: 1px solid #E2DCEE; background: #fff; color: #2B1A51; font: 16px var(--sans); }
+.be-app .be-setbtn { background: #fff; }
+/* нижняя панель: сохранение, автосохранение, счётчик слов */
+.be-app .be-save { position: sticky; bottom: 0; z-index: 20; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; margin: 20px -12px 0; padding: 12px; border-radius: 16px; background: rgba(255, 253, 248, .96); box-shadow: 0 -8px 24px rgba(43, 26, 81, .08); backdrop-filter: blur(4px); }
+.be-app .be-save .be-status { flex-basis: 100%; margin: 0; order: 9; }
+.be-meta { margin-left: auto; display: flex; flex-wrap: wrap; gap: 4px 14px; font-size: 13px; color: #8A83A0; }
+.be-auto { color: #2E8B57; }
+/* видео YouTube в статье */
+.bp-body figure iframe { display: block; width: 100%; aspect-ratio: 16 / 9; height: auto; border: 0; border-radius: 14px; background: #000; }

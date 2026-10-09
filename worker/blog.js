@@ -15,7 +15,7 @@ const T = {
     comments: 'Comments', noComments: 'No comments yet. Be the first!', back: '← All posts', tagged: 'Posts tagged',
     min: 'min read', share: 'Share', copy: 'Copy link', copied: 'Link copied ✓', email: 'E-mail', draft: 'Draft', read: 'Read →', months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     descr: 'Notes on drawing, learning and creativity by Alina Otkinska and Pigeon Polly.',
-    featured: '★ Favourites', archive: 'Archive', inMonth: 'Posts from', onlyFav: 'My favourite posts', allSections: 'All', search: 'Search the blog…', searchBtn: 'Search', found: 'Search results for', nothing: 'Nothing found. Try another word.', prev: '← Newer', next: 'Older →', section: 'Section', sections: 'Sections', browse: 'Sections, tags & archive', count: n => `${n} ${n === 1 ? 'post' : 'posts'} in the blog`,
+    featured: '★ Favourites', archive: 'Archive', inMonth: 'Posts from', onlyFav: 'My favourite posts', allSections: 'All', search: 'Search the blog…', searchBtn: 'Search', found: 'Search results for', nothing: 'Nothing found. Try another word.', prev: '← Newer', next: 'Older →', section: 'Section', sections: 'Sections', scheduled: '⏰ Scheduled', browse: 'Sections, tags & archive', count: n => `${n} ${n === 1 ? 'post' : 'posts'} in the blog`,
     monthsFull: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
   },
   ru: {
@@ -24,7 +24,7 @@ const T = {
     comments: 'Комментарии', noComments: 'Комментариев пока нет. Будьте первым!', back: '← Все статьи', tagged: 'Статьи с тегом',
     min: 'мин чтения', share: 'Поделиться', copy: 'Скопировать ссылку', copied: 'Ссылка скопирована ✓', email: 'Почта', draft: 'Черновик', read: 'Читать →', months: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
     descr: 'Заметки о рисовании, обучении и творчестве от Алины Откинской и голубя Полли.',
-    featured: '★ Избранное', archive: 'Архив', inMonth: 'Статьи за', onlyFav: 'Мои избранные статьи', allSections: 'Все', search: 'Поиск по блогу…', searchBtn: 'Найти', found: 'Результаты поиска', nothing: 'Ничего не нашлось. Попробуйте другое слово.', prev: '← Новее', next: 'Старше →', section: 'Раздел', sections: 'Разделы', browse: 'Разделы, теги и архив', count: n => `В блоге ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'статья' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'статьи' : 'статей'}`,
+    featured: '★ Избранное', archive: 'Архив', inMonth: 'Статьи за', onlyFav: 'Мои избранные статьи', allSections: 'Все', search: 'Поиск по блогу…', searchBtn: 'Найти', found: 'Результаты поиска', nothing: 'Ничего не нашлось. Попробуйте другое слово.', prev: '← Новее', next: 'Старше →', section: 'Раздел', sections: 'Разделы', scheduled: '⏰ Запланирована', browse: 'Разделы, теги и архив', count: n => `В блоге ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'статья' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'статьи' : 'статей'}`,
     monthsFull: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
   },
   lv: {
@@ -33,7 +33,7 @@ const T = {
     comments: 'Komentāri', noComments: 'Komentāru vēl nav. Esi pirmais!', back: '← Visi raksti', tagged: 'Raksti ar birku',
     min: 'min lasīšanas', share: 'Dalīties', copy: 'Kopēt saiti', copied: 'Saite nokopēta ✓', email: 'E-pasts', draft: 'Melnraksts', read: 'Lasīt →', months: ['janv.', 'febr.', 'marts', 'apr.', 'maijs', 'jūn.', 'jūl.', 'aug.', 'sept.', 'okt.', 'nov.', 'dec.'],
     descr: 'Piezīmes par zīmēšanu, mācīšanos un radošumu no Alīnas Otkinskas un baloža Pollijas.',
-    featured: '★ Izlase', archive: 'Arhīvs', inMonth: 'Raksti par', onlyFav: 'Mani izlases raksti', allSections: 'Visi', search: 'Meklēt blogā…', searchBtn: 'Meklēt', found: 'Meklēšanas rezultāti', nothing: 'Nekas netika atrasts. Pamēģiniet citu vārdu.', prev: '← Jaunāki', next: 'Vecāki →', section: 'Sadaļa', sections: 'Sadaļas', browse: 'Sadaļas, birkas un arhīvs', count: n => `Blogā ir ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'raksts' : 'raksti'}`,
+    featured: '★ Izlase', archive: 'Arhīvs', inMonth: 'Raksti par', onlyFav: 'Mani izlases raksti', allSections: 'Visi', search: 'Meklēt blogā…', searchBtn: 'Meklēt', found: 'Meklēšanas rezultāti', nothing: 'Nekas netika atrasts. Pamēģiniet citu vārdu.', prev: '← Jaunāki', next: 'Vecāki →', section: 'Sadaļa', sections: 'Sadaļas', scheduled: '⏰ Ieplānots', browse: 'Sadaļas, birkas un arhīvs', count: n => `Blogā ir ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'raksts' : 'raksti'}`,
     monthsFull: ['janvāris', 'februāris', 'marts', 'aprīlis', 'maijs', 'jūnijs', 'jūlijs', 'augusts', 'septembris', 'oktobris', 'novembris', 'decembris'],
   },
 };
@@ -121,6 +121,15 @@ async function cleanHtml(html) {
   const out = await new HTMLRewriter().on('*', {
     element(e) {
       let tag = e.tagName.toLowerCase();
+      // видео: только YouTube (в режиме без cookie), остальные iframe выбрасываем
+      if (tag === 'iframe') {
+        const src = e.getAttribute('src') || '';
+        if (!/^https:\/\/www\.youtube-nocookie\.com\/embed\/[\w-]{6,20}(\?[\w=&;-]*)?$/.test(src)) { e.remove(); return; }
+        for (const [name] of [...e.attributes]) if (name !== 'src') e.removeAttribute(name);
+        e.setAttribute('loading', 'lazy'); e.setAttribute('allowfullscreen', ''); e.setAttribute('title', 'YouTube video');
+        e.setAttribute('allow', 'accelerometer; encrypted-media; gyroscope; picture-in-picture');
+        return;
+      }
       if (DROP.has(tag)) { e.remove(); return; }
       if (tag === 'div') { e.tagName = 'p'; tag = 'p'; }
       if (!ALLOWED[tag]) { e.removeAndKeepContent(); return; }
@@ -183,7 +192,7 @@ export async function blogApi(req, env, url, h) {
   if (m === 'POST' && p === '/api/blog/like') {
     const { id } = await body();
     const v = visitor(req, h.cookie);
-    const post = await env.DB.prepare("SELECT id FROM blog_posts WHERE id = ? AND status = 'published'").bind(Number(id)).first();
+    const post = await env.DB.prepare("SELECT id FROM blog_posts WHERE id = ? AND status = 'published' AND COALESCE(published_at, 0) <= CAST(strftime('%s', 'now') AS INTEGER)").bind(Number(id)).first();
     if (!post) fail(404, 'post');
     const had = await env.DB.prepare('SELECT 1 FROM blog_likes WHERE post_id = ? AND who = ?').bind(post.id, v.id).first();
     await env.DB.batch(had ? [
@@ -203,7 +212,7 @@ export async function blogApi(req, env, url, h) {
     const lang = LANGS.includes(b.lang) ? b.lang : 'en';
     const text = String(b.body || '').replace(/\r/g, '').trim().slice(0, MAX_COMMENT);
     if (text.length < 2) fail(400, 'empty');
-    const post = await env.DB.prepare("SELECT id FROM blog_posts WHERE id = ? AND status = 'published'").bind(Number(b.id)).first();
+    const post = await env.DB.prepare("SELECT id FROM blog_posts WHERE id = ? AND status = 'published' AND COALESCE(published_at, 0) <= CAST(strftime('%s', 'now') AS INTEGER)").bind(Number(b.id)).first();
     if (!post) fail(404, 'post');
     const u = await h.currentUser(req, env);
     if (u?.banned) fail(403, 'banned');
@@ -234,7 +243,7 @@ export async function blogApi(req, env, url, h) {
     if (q.length < 2) return json({ posts: [] });
     await loadTags(env);
     const words = q.split(/\s+/).filter(Boolean);
-    const rows = (await env.DB.prepare("SELECT * FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC").all()).results;
+    const rows = (await env.DB.prepare("SELECT * FROM blog_posts WHERE status = 'published' AND COALESCE(published_at, 0) <= CAST(strftime('%s', 'now') AS INTEGER) ORDER BY published_at DESC").all()).results;
     const hits = [];
     for (const x of rows) {
       const hay = [...LANGS.flatMap(l => [x['t_' + l], x['d_' + l], stripTags(x['b_' + l])]), ...tagsOf(x).map(g => g + ' ' + tagLabel(g, lang))].join(' ').toLowerCase();
@@ -249,7 +258,7 @@ export async function blogApi(req, env, url, h) {
   if (m === 'GET' && p === '/api/blog/home') {
     const lang = LANGS.includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
     await loadTags(env);
-    const rows = (await env.DB.prepare(`SELECT * FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC`).all()).results;
+    const rows = (await env.DB.prepare(`SELECT * FROM blog_posts WHERE status = 'published' AND COALESCE(published_at, 0) <= CAST(strftime('%s', 'now') AS INTEGER) ORDER BY published_at DESC`).all()).results;
     const pack = x => ({ url: blogUrl(lang, x.slug), title: field(x, 't', lang), excerpt: field(x, 'd', lang) || stripTags(field(x, 'b', lang)).slice(0, 200),
       cover: x.cover, date: fmtDate(x.published_at, lang), tags: tagsOf(x).slice(0, 3).map(g => tagLabel(g, lang)), likes: x.likes });
     const latest = rows[0] || null; // крупно — самая новая статья
@@ -838,7 +847,7 @@ function card(p, lang) {
   return `<article class="bl-card">
     <a class="bl-cover" href="${blogUrl(lang, p.slug)}" tabindex="-1" aria-hidden="true">${p.cover ? `<img src="${esc(p.cover)}" alt="" loading="lazy">` : '<span class="bl-nocover">🕊</span>'}</a>
     <div class="bl-text">
-      <p class="bl-meta">${p.status === 'draft' ? `<span class="bl-draft">${t.draft}</span> · ` : ''}${p.section && sectionName(p.section, lang) ? `<a class="bl-sec" href="${blogUrl(lang, '', '?section=' + encodeURIComponent(p.section))}">${esc(sectionName(p.section, lang))}</a> · ` : ''}${fmtDate(p.published_at || p.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}</p>
+      <p class="bl-meta">${p.status === 'draft' ? `<span class="bl-draft">${t.draft}</span> · ` : (p.published_at || 0) > Date.now() / 1000 ? `<span class="bl-draft">${t.scheduled}</span> · ` : ''}${p.section && sectionName(p.section, lang) ? `<a class="bl-sec" href="${blogUrl(lang, '', '?section=' + encodeURIComponent(p.section))}">${esc(sectionName(p.section, lang))}</a> · ` : ''}${fmtDate(p.published_at || p.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}</p>
       <h2><a href="${blogUrl(lang, p.slug)}">${esc(field(p, 't', lang))}</a></h2>
       <p class="bl-excerpt">${esc(excerpt)}</p>
       <p class="bl-foot">${tags.map(g => `<a class="bl-tag" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}">#${esc(tagLabel(g, lang))}</a>`).join(' ')}
@@ -915,7 +924,7 @@ export async function blogPage(req, env, url, h) {
   await ensureBlogSchema(env);
   await loadTags(env);
   if (p === '/sitemap-blog.xml') {
-    const rows = (await env.DB.prepare("SELECT slug, updated_at FROM blog_posts WHERE status = 'published' ORDER BY published_at DESC").all()).results;
+    const rows = (await env.DB.prepare("SELECT slug, updated_at FROM blog_posts WHERE status = 'published' AND COALESCE(published_at, 0) <= CAST(strftime('%s', 'now') AS INTEGER) ORDER BY published_at DESC").all()).results;
     const urls = rows.flatMap(r => LANGS.map(l => `<url><loc>${SITE}${blogUrl(l, r.slug)}</loc><lastmod>${new Date(r.updated_at * 1000).toISOString().slice(0, 10)}</lastmod></url>`)).join('');
     return new Response(`<?xml version="1.0" encoding="UTF-8"?><urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">${urls}</urlset>`, { headers: { 'content-type': 'application/xml; charset=utf-8' } });
   }
@@ -926,10 +935,11 @@ export async function blogPage(req, env, url, h) {
   if (!tpl) return env.ASSETS.fetch(req);
   const u = await h.currentUser(req, env);
   const isAdm = await h.isAdmin(u, env);
-  const visible = isAdm ? '' : "WHERE p.status = 'published'";
+  const visible = isAdm ? '' : "WHERE p.status = 'published' AND COALESCE(p.published_at, 0) <= CAST(strftime('%s', 'now') AS INTEGER)";
   const posts = (await env.DB.prepare(`SELECT p.*, (SELECT COUNT(*) FROM blog_comments c WHERE c.post_id = p.id AND c.status = 'ok') AS comments
     FROM blog_posts p ${visible} ORDER BY COALESCE(p.published_at, p.updated_at) DESC`).all()).results;
-  const published = posts.filter(x => x.status === 'published');
+  const nowS = h.now(), live = x => x.status === 'published' && (x.published_at || 0) <= nowS;
+  const published = posts.filter(live);
 
   if (!slug) {
     const P = url.searchParams;
@@ -989,7 +999,7 @@ export async function blogPage(req, env, url, h) {
   const content = `<div class="bp-wrap"><article class="bp" data-post-id="${post.id}" data-status="${post.status}">
     <p class="bp-back"><a href="${blogUrl(lang, '')}">${t.back}</a><a class="bp-pencil" href="/blog-editor/#${post.id}" hidden data-blog-admin title="Редактировать статью">✎ Редактировать</a></p>
     <header class="bp-head"${textLang !== lang ? ` lang="${textLang}"` : ''}>
-      ${post.status === 'draft' ? `<p class="bl-draft">${t.draft}</p>` : ''}
+      ${post.status === 'draft' ? `<p class="bl-draft">${t.draft}</p>` : (post.published_at || 0) > Date.now() / 1000 ? `<p class="bl-draft">${t.scheduled}</p>` : ''}
       ${post.section && sectionName(post.section, lang) ? `<p class="bp-sec"><a href="${blogUrl(lang, '', '?section=' + encodeURIComponent(post.section))}">${esc(sectionName(post.section, lang))}</a></p>` : ''}
       <h1>${esc(title)}</h1>
       <p class="bl-meta">${fmtDate(post.published_at || post.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}
@@ -1015,5 +1025,5 @@ export async function blogPage(req, env, url, h) {
     author: { '@type': 'Person', name: 'Alina Otkinska', url: SITE + '/about-me/' }, mainEntityOfPage: SITE + blogUrl(lang, post.slug),
     ...(post.cover ? { image: post.cover.startsWith('/') ? SITE + post.cover : post.cover } : {}), keywords: tags.join(', ') };
   return html(fill(tpl, { title: `${title} · Pigeon Polly Art Lab`, description, canonical: SITE + blogUrl(lang, post.slug), content, image: post.cover,
-    type: 'article', slug: post.slug, jsonld, noindex: post.status !== 'published' }));
+    type: 'article', slug: post.slug, jsonld, noindex: post.status !== 'published' || (post.published_at || 0) > Date.now() / 1000 }));
 }
