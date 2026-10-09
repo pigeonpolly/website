@@ -460,7 +460,7 @@ document.querySelectorAll('.bk-notify').forEach(function (f) {
 #blk-flock-intro .fi-sub { margin: 0 auto 44px; max-width: 46ch; font-size: 17px; line-height: 1.6; color: #5A4E78; }
 #blk-flock-intro .fi-kinds { display: flex; justify-content: center; gap: 56px; flex-wrap: wrap; }
 #blk-flock-intro .fi-kind { margin: 0; width: 180px; }
-#blk-flock-intro .fi-pic { width: 150px; height: 150px; margin: 0 auto 16px; border-radius: 50%; background: radial-gradient(circle at 50% 42%, #5B4A99 0, #3A2A6B 45%, #2B1A51 72%); display: grid; place-items: center; transition: transform .25s; }
+#blk-flock-intro .fi-pic { width: 150px; height: 150px; margin: 0 auto 16px; border-radius: 50%; background: var(--c, #E2D3F7); box-shadow: inset 0 -8px 0 rgba(43, 26, 81, .08); display: grid; place-items: center; transition: transform .25s; }
 #blk-flock-intro .fi-pic canvas { image-rendering: pixelated; }
 #blk-flock-intro .fi-kind:hover .fi-pic { transform: translateY(-6px) rotate(-4deg); }
 #blk-flock-intro .fi-kind h3 { margin: 0 0 4px; font-family: 'Fraunces', serif; font-weight: 600; font-size: 20px; }
@@ -488,9 +488,9 @@ document.querySelectorAll('.bk-notify').forEach(function (f) {
   <h2>Get your own pixel bird</h2>
   <p class="fi-sub">Sign in with Google, pick a nickname, and a little character moves into the flock. No two are alike.</p>
   <div class="fi-kinds">
-    <figure class="fi-kind"><span class="fi-pic" data-fi-id="3"></span><h3>Birds</h3><p>Most of the flock</p></figure>
-    <figure class="fi-kind"><span class="fi-pic" data-fi-id="10"></span><h3>Cats</h3><p>Every 10th guest</p></figure>
-    <figure class="fi-kind"><span class="fi-pic" data-fi-id="22"></span><h3>Crows</h3><p>Every 11th, with a treasure</p></figure>
+    <figure class="fi-kind"><span class="fi-pic" data-fi-id="3" style="--c:#F5C4B3"></span><h3>Birds</h3><p>Most of the flock</p></figure>
+    <figure class="fi-kind"><span class="fi-pic" data-fi-id="10" style="--c:#CDEBD8"></span><h3>Cats</h3><p>Every 10th guest</p></figure>
+    <figure class="fi-kind"><span class="fi-pic" data-fi-id="22" style="--c:#CFC7E8"></span><h3>Crows</h3><p>Every 11th, with a treasure</p></figure>
   </div>
   <div class="fi-gifts">
     <h3>Gifts for your bird</h3>
