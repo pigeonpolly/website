@@ -154,6 +154,14 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
+  // «Выбор Полли» подешевел с 50 до 11 пуговок: уже начисленные записи пересчитать один раз, баланс = сумма журнала
+  try {
+    if (!(await env.DB.prepare("SELECT value FROM meta WHERE key = 'pick_price_11'").first())) {
+      await env.DB.prepare("UPDATE button_log SET amount = 11 WHERE kind = 'pick' AND amount != 11").run();
+      await env.DB.prepare("UPDATE users SET buttons = MAX(0, (SELECT COALESCE(SUM(amount), 0) FROM button_log b WHERE b.user_id = users.id)) WHERE id IN (SELECT DISTINCT user_id FROM button_log WHERE kind = 'pick')").run();
+      await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('pick_price_11', '1')").run();
+    }
+  } catch (e) { console.error('pick price', e); }
   schemaReady = true;
 }
 
@@ -161,7 +169,7 @@ const now = () => Math.floor(Date.now() / 1000);
 
 // ---------- пуговки (валюта сайта) ----------
 // сколько и за что: заход раз в день, рисунок в челлендж, до 3 комментариев в день, друг, указавший тебя при регистрации
-const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, pick: 50,
+const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, pick: 11,
   // бейджи: уровни по рекордной серии (дней) и особые достижения — пуговки один раз за каждый
   levels: { 1: 5, 3: 10, 7: 20, 14: 30, 30: 50, 60: 80, 100: 120, 365: 300 },
   badges: { bw: 5, extra: 15, bday: 15, early: 15, owl: 15, comeback: 15, ten: 20, weekend: 20, newyear: 20, halloween: 20,
