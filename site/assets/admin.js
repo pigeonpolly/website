@@ -10,7 +10,9 @@
     return d;
   };
   const fmt = ts => ts ? new Date(ts * 1000).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' }) : '—';
-  const title = p => p.t_ru || p.t_en || p.t_lv || '(без названия)';
+  // язык названий статей — тот же, что выбран в редакторе блога («Названия: RU / EN / LV»)
+  let vl = 'ru'; try { vl = localStorage.getItem('pp-admin-lang') || 'ru'; } catch (e) {}
+  const title = p => [vl, 'ru', 'en', 'lv'].map(l => p['t_' + l]).find(Boolean) || '(без названия)';
   const n = v => Number(v || 0).toLocaleString('ru-RU');
   const err = e => e.code === 401 || e.code === 'auth' || e.code === 'login' ? 'Войдите через Google (кнопка в шапке), чтобы открыть кабинет.' : e.code === 'admin' || e.code === 403 ? 'Этот кабинет только для админа.' : 'Не получилось загрузить: ' + esc(e.message);
 

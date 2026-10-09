@@ -26,7 +26,14 @@
   const errText = e => ERR[e.code] || 'Что-то пошло не так (' + esc(e.code || e.message) + ').';
   let flash = '', state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null, langFilter = 'all', picked = new Set();
   // фильтры списка: поиск, раздел, период, сортировка по столбцу
+  const HOME_SECS = ['culture-creativity', 'education-technologies', 'art-technologies', 'not-weekly-polly', 'traditional-art', 'ask-feedback'];
+  let warnedHome = false;
   const lf = { q: '', sec: '', from: '', to: '', sort: 'date', dir: -1 };
+  // на каком языке показывать названия статей и разделов в списке (запоминается)
+  let vl = 'ru'; try { vl = localStorage.getItem('pp-admin-lang') || 'ru'; } catch (e) {}
+  const VL_ORDER = () => [vl, ...['ru', 'en', 'lv'].filter(x => x !== vl)];
+  const ptitle = p => { for (const l of VL_ORDER()) if (p['t_' + l]) return p['t_' + l]; return ''; };
+  const sname = x => x[vl] || x.en || x.ru;
   // все теги из статей: { ru: ['акварель', …], … } и счётчики
   let sections = [], tagDict = [], tagSort = 'unchecked'; // словарь тегов: [{ en, ru, lv, count, checked, src, created }]
   function tagsByLang() {
@@ -100,17 +107,18 @@
         const hay = [p.t_ru, p.t_en, p.t_lv, p.slug, p.tags_en, p.tags_ru, p.tags_lv].join(' ').toLowerCase();
         return words.every(w => hay.includes(w));
       });
-      const SORT = { date: p => p.published_at || p.updated_at || 0, likes: p => p.likes || 0, views: p => p.views || 0, comments: p => p.comments || 0, title: p => (p.t_ru || p.t_en || p.t_lv || '').toLowerCase() };
+      const SORT = { date: p => p.published_at || p.updated_at || 0, likes: p => p.likes || 0, views: p => p.views || 0, comments: p => p.comments || 0, title: p => ptitle(p).toLowerCase() };
       list = [...list].sort((a, b) => { const x = SORT[lf.sort](a), y = SORT[lf.sort](b); return (x > y ? 1 : x < y ? -1 : 0) * lf.dir; });
       const months = [...new Set(state.posts.map(day).map(d => d.slice(0, 7)))].sort().reverse();
       const MN = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
       const active = lf.q || lf.sec || lf.from || lf.to;
       const filters = `<div class="be-filters">
         <input type="search" id="be-q" placeholder="🔍 Поиск: название, тег, адрес…" value="${esc(lf.q)}" aria-label="Поиск по статьям">
-        <select id="be-fsec" aria-label="Раздел"><option value="">Все разделы</option>${sections.map(x => `<option value="${esc(x.slug)}"${lf.sec === x.slug ? ' selected' : ''}>${esc(x.ru || x.en)}</option>`).join('')}<option value="-"${lf.sec === '-' ? ' selected' : ''}>— без раздела —</option></select>
+        <select id="be-fsec" aria-label="Раздел"><option value="">Все разделы</option>${sections.map(x => `<option value="${esc(x.slug)}"${lf.sec === x.slug ? ' selected' : ''}>${esc(sname(x))}</option>`).join('')}<option value="-"${lf.sec === '-' ? ' selected' : ''}>— без раздела —</option></select>
         <select id="be-fmonth" aria-label="Месяц"><option value="">Любой месяц</option>${months.map(m => { const a = m + '-01', b = m + '-31'; return `<option value="${m}"${lf.from === a && lf.to === b ? ' selected' : ''}>${MN[+m.slice(5) - 1]} ${m.slice(0, 4)}</option>`; }).join('')}</select>
         <span class="be-period"><label>с <input type="date" id="be-from" value="${lf.from}"></label><label>по <input type="date" id="be-to" value="${lf.to}"></label></span>
-        ${active ? '<button type="button" class="bc-link" id="be-freset">✕ сбросить</button>' : ''}</div>`;
+        ${active ? '<button type="button" class="bc-link" id="be-freset">✕ сбросить</button>' : ''}
+        <span class="be-vl" role="group" aria-label="Язык названий">Названия: ${['ru', 'en', 'lv'].map(l => `<button type="button" data-vl="${l}" aria-pressed="${vl === l}">${l.toUpperCase()}</button>`).join('')}</span></div>`;
       const sum = (k) => list.reduce((n, p) => n + (p[k] || 0), 0);
       const stats = list.length ? `<p class="be-sum">Найдено: <b>${list.length}</b> · 👁 ${sum('views')} просмотров · ♥ ${sum('likes')} · 💬 ${sum('comments')}${list.length > 1 ? ` · в среднем 👁 ${Math.round(sum('views') / list.length)} на статью` : ''}</p>` : '';
       const maxViews = Math.max(1, ...list.map(p => p.views || 0));
@@ -125,31 +133,31 @@
       // галочки слева → действия с выбранными; раздел меняется прямо в строке; остальное — в меню «⋯»
       const ids = new Set(list.map(p => p.id));
       for (const id of [...picked]) if (!ids.has(id)) picked.delete(id);
-      const secOpts = cur => `<option value="">— без раздела —</option>${sections.map(x => `<option value="${esc(x.slug)}"${x.slug === cur ? ' selected' : ''}>${esc(x.ru || x.en)}</option>`).join('')}`;
+      const secOpts = cur => `<option value="">— без раздела —</option>${sections.map(x => `<option value="${esc(x.slug)}"${x.slug === cur ? ' selected' : ''}>${esc(sname(x))}</option>`).join('')}`;
       const n = picked.size;
       const bulk = `<div class="be-bulk${n ? ' on' : ''}"><span>${n ? `Выбрано: <b>${n}</b>` : 'Отметьте статьи галочками, чтобы сделать что-то сразу с несколькими'}</span>
         ${n ? `<select id="be-bulk" aria-label="Что сделать с выбранными"><option value="">Что сделать…</option>
-          ${sections.length ? `<optgroup label="Перенести в раздел">${sections.map(x => `<option value="section:${esc(x.slug)}">→ ${esc(x.ru || x.en)}</option>`).join('')}<option value="section:">→ без раздела</option></optgroup>` : ''}
+          ${sections.length ? `<optgroup label="Перенести в раздел">${sections.map(x => `<option value="section:${esc(x.slug)}">→ ${esc(sname(x))}</option>`).join('')}<option value="section:">→ без раздела</option></optgroup>` : ''}
           <optgroup label="Избранное"><option value="feature">★ Добавить в избранное</option><option value="unfeature">☆ Убрать из избранного</option></optgroup>
           <optgroup label="Статус">${dashTab === 'draft' ? '<option value="publish">Опубликовать</option>' : '<option value="draft">Снять с публикации (в черновики)</option>'}</optgroup>
           <optgroup label="Опасно"><option value="delete">🗑 Удалить</option></optgroup></select>
           <button type="button" class="bc-link" data-unpick>снять выбор</button>` : ''}</div>`;
       return head + bulk + `<table class="be-table be-posts"><thead><tr><th class="be-ck"><input type="checkbox" id="be-pickall" aria-label="Выбрать все" ${n && n === list.length ? 'checked' : ''}></th>${th('title', 'Статья')}<th>Языки</th><th>Раздел</th>${th('date', 'Дата')}${th('likes', '♥', 'лайки')}${th('views', '👁', 'просмотры')}${th('comments', '💬', 'комментарии')}<th></th></tr></thead><tbody>
         ${list.map(p => `<tr data-id="${p.id}"${picked.has(p.id) ? ' class="picked"' : ''}><td class="be-ck"><input type="checkbox" data-pick ${picked.has(p.id) ? 'checked' : ''} aria-label="Выбрать"></td>
-          <td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a></td>
+          <td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(ptitle(p) || '(без названия)')}${ptitle(p) && !p['t_' + vl] ? ` <small class="be-nolang">(нет на ${vl.toUpperCase()})</small>` : ''}</b></a></td>
           <td><span class="be-langs">${['ru', 'en', 'lv'].map(l => p['t_' + l] ? `<i class="on" title="Есть на ${l.toUpperCase()}">✓ ${l.toUpperCase()}</i>` : `<i title="Нет перевода на ${l.toUpperCase()}">${l.toUpperCase()}</i>`).join('')}</span></td>
           <td><select class="be-rowsec" data-rowsec aria-label="Раздел">${secOpts(p.section || '')}</select></td>
           <td>${fmt(p.published_at || p.updated_at)}</td>
           <td>${p.likes}</td><td class="be-views"><span style="--w:${Math.round((p.views || 0) / maxViews * 100)}%">${p.views}</span></td><td>${p.comments}</td>
-          <td><details class="be-menu"><summary aria-label="Ещё">⋯</summary><div><a href="#${p.id}">✎ Изменить</a><a href="/ru/blog/${esc(p.slug)}/" target="_blank">↗ Открыть на сайте</a><button type="button" class="be-danger" data-delpost>🗑 Удалить</button></div></details></td></tr>`).join('')}
+          <td><details class="be-menu"><summary aria-label="Ещё">⋯</summary><div><a href="#${p.id}">✎ Изменить</a><a href="${vl === 'en' ? '' : '/' + vl}/blog/${esc(p.slug)}/" target="_blank">↗ Открыть на сайте</a><button type="button" class="be-danger" data-delpost>🗑 Удалить</button></div></details></td></tr>`).join('')}
       </tbody></table>`;
     };
     // словарь тегов: английский тег (как в статьях) и его перевод — правится прямо в таблице
     // разделы блога (как коллекции на Patreon)
-    const sectionsHtml = () => `<p class="be-note">Разделы — крупные темы блога (как коллекции на Patreon). У каждой статьи один раздел; читатели видят их кнопками над списком статей. Названия на RU и LV подставляются сами — их можно поправить прямо здесь.</p>
+    const sectionsHtml = () => `<p class="be-note">Разделы — крупные темы блога (как коллекции на Patreon). У каждой статьи один раздел; читатели видят их кнопками над списком статей. Названия на RU и LV подставляются сами — их можно поправить прямо здесь. 🏠 — на раздел ведёт кружок на главной странице.</p>
       <form class="be-newsec" id="be-newsec"><input type="text" name="en" placeholder="Название нового раздела (на английском), например Weekly Polly" required maxlength="60"><button class="pill-btn pill-fill" type="submit">＋ Добавить раздел</button></form>
       ${sections.length ? `<table class="be-table be-tagtable"><thead><tr><th>EN</th><th>RU</th><th>LV</th><th>Статей</th><th>Порядок</th><th></th></tr></thead><tbody>
-      ${sections.map((r, i) => `<tr data-s="${esc(r.slug)}"><td><input type="text" class="be-tr-in" data-f="en" value="${esc(r.en)}"></td><td><input type="text" class="be-tr-in" data-f="ru" value="${esc(r.ru)}"></td><td><input type="text" class="be-tr-in" data-f="lv" value="${esc(r.lv)}"></td>
+      ${sections.map((r, i) => `<tr data-s="${esc(r.slug)}"><td>${HOME_SECS.includes(r.slug) ? '<span class="be-homelink" title="На этот раздел ведёт кружок на главной странице">🏠</span>' : ''}<input type="text" class="be-tr-in" data-f="en" value="${esc(r.en)}"></td><td><input type="text" class="be-tr-in" data-f="ru" value="${esc(r.ru)}"></td><td><input type="text" class="be-tr-in" data-f="lv" value="${esc(r.lv)}"></td>
         <td>${r.count}</td><td class="be-acts"><button type="button" class="be-ico" data-move="-1" ${i ? '' : 'disabled'} aria-label="Выше">↑</button><button type="button" class="be-ico" data-move="1" ${i < sections.length - 1 ? '' : 'disabled'} aria-label="Ниже">↓</button></td>
         <td><button type="button" class="be-ico be-danger" data-delsec aria-label="Удалить раздел">✕</button></td></tr>`).join('')}</tbody></table>` : '<p class="be-note">Разделов пока нет.</p>'}`;
     const SRC = { glossary: 'словарь', auto: 'автоперевод', manual: 'вы' };
@@ -199,6 +207,7 @@
       app.querySelector('#be-to').addEventListener('change', e => { lf.to = e.target.value; dashboardLocal(); });
       const fr = app.querySelector('#be-freset'); fr && fr.addEventListener('click', () => { Object.assign(lf, { q: '', sec: '', from: '', to: '' }); dashboardLocal(); });
     }
+    app.querySelectorAll('[data-vl]').forEach(b => b.addEventListener('click', () => { vl = b.dataset.vl; try { localStorage.setItem('pp-admin-lang', vl); } catch (e) {} dashboardLocal(); }));
     app.querySelectorAll('[data-sort]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.sort; lf.dir = lf.sort === k ? -lf.dir : (k === 'title' ? 1 : -1); lf.sort = k; dashboardLocal(); }));
     const unf = app.querySelector('[data-unfilter]'); unf && unf.addEventListener('click', () => { tagFilter = null; dashboard(); });
     app.querySelectorAll('[data-show]').forEach(b => b.addEventListener('click', () => { tagFilter = { t: b.closest('tr').dataset.t }; dashTab = 'published'; dashboard(); }));
@@ -245,9 +254,13 @@
       for (const [k, r] of list.entries()) await api('blog/admin/section-set', { slug: r.slug, en: r.en, ru: r.ru, lv: r.lv, sort: k + 1 });
       dashboard();
     }));
+    // разделы, на которые ведут кружки «Мои заметки» на главной (src/blocks/patreon.html, data-section)
+    const warnHome = slug => HOME_SECS.includes(slug) && !warnedHome && (warnedHome = true,
+      alert('⚠ Этот раздел связан с кружком на главной странице («Мои заметки: шесть тем»).\n\nЕсли изменить название здесь, подпись под кружком на главной останется прежней.\nЕсли удалить раздел, кружок на главной будет вести на пустую страницу.\n\nСкажите Claude, чтобы поменять кружки вместе с разделом.'), true);
+    app.querySelectorAll('tr[data-s] .be-tr-in').forEach(inp => inp.addEventListener('focus', () => warnHome(inp.closest('tr').dataset.s)));
     app.querySelectorAll('[data-delsec]').forEach(b => b.addEventListener('click', async () => {
       const r = sections.find(x => x.slug === b.closest('tr').dataset.s);
-      if (!confirm(`Удалить раздел «${r.en}»? Статьи останутся, просто без раздела.`)) return;
+      if (!confirm(`Удалить раздел «${r.en}»? Статьи останутся, просто без раздела.${HOME_SECS.includes(r.slug) ? '\n\n⚠ На этот раздел ведёт кружок на главной странице — после удаления он будет вести на пустую страницу.' : ''}`)) return;
       await api('blog/admin/section-delete', { slug: r.slug }); dashboard();
     }));
     const ts = app.querySelector('#be-tagsort'); ts && ts.addEventListener('change', () => { tagSort = ts.value; dashboard(); });
