@@ -29,16 +29,26 @@
     terms: ['By signing in you agree to the', 'Входя, ты соглашаешься с', 'Ieejot tu piekrīti'],
     termsLink: ['privacy rules', 'правилами конфиденциальности', 'privātuma noteikumiem'],
     termsMore: ['Privacy rules', 'Правила конфиденциальности', 'Privātuma noteikumi'],
+    refL: ['Who invited you? (optional)', 'Кто тебя пригласил? (необязательно)', 'Kurš tevi uzaicināja? (nav obligāti)'],
+    refP: ['friend’s nickname', 'ник друга', 'drauga segvārds'],
+    refHint: ['Your friend gets 20 buttons 🔘', 'Другу достанется 20 пуговок 🔘', 'Draugs saņems 20 pogas 🔘'],
+    refBad: ['There is no bird with this nickname. Pick one from the list or leave it empty.', 'Птички с таким ником нет. Выбери из списка или оставь пустым.', 'Putniņa ar tādu segvārdu nav. Izvēlies no saraksta vai atstāj tukšu.'],
+    btns: ['buttons', 'пуговок', 'pogas'],
+    daily: [n => `+${n} 🔘 buttons for visiting today!`, n => `+${n} 🔘 пуговки за заход сегодня!`, n => `+${n} 🔘 pogas par šodienas apmeklējumu!`],
   };
   const t = k => S[k][L];
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let info = null;
+  try { const q = new URLSearchParams(location.search), r = (q.get('ref') || q.get('bird') || '').replace(/^@/, ''); if (/^[\p{L}\p{N}_.-]{2,24}$/u.test(r)) localStorage.setItem('pp-ref', r); } catch (e) {}
+  const toast = msg => { const d = document.createElement('div'); d.className = 'pp-toast'; d.textContent = msg; document.body.appendChild(d); setTimeout(() => d.classList.add('off'), 3800); setTimeout(() => d.remove(), 4400); };
+  window.PPToast = toast;
 
   function check() {
     return fetch('/api/whoami', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => {
       if (!d) return;
       info = d; render();
       if (d.user && !d.user.nick) askNick(d.user);
+      if (d.user && d.user.earned) toast(t('daily')(d.user.earned));
     }).catch(() => {});
   }
   // открыть окно входа из любого места страницы (кнопка «Хочу свою птичку» в стае)
@@ -62,6 +72,7 @@
     d.innerHTML = `<form method="dialog"><canvas width="${window.PPBirds ? window.PPBirds.SW : 28}" height="26" aria-hidden="true"></canvas>
       <h2>${t(kind === 'cat' ? 'nTitleCat' : kind === 'crow' ? 'nTitleCrow' : 'nTitle')}</h2><p>${t('nText')}</p>
       <input name="nick" required minlength="2" maxlength="24" autocomplete="nickname" placeholder="${t('nPlace')}">
+      <label class="acct-ref">${t('refL')}<input name="ref" maxlength="24" list="acct-ref-list" autocomplete="off" placeholder="${t('refP')}"><small>${t('refHint')}</small></label><datalist id="acct-ref-list"></datalist>
       <p class="acct-terms">${t('pub')} <a href="${pre}/privacy/" target="_blank">${t('termsMore')} ↗</a></p>
       <p class="acct-nick-st" role="status" aria-live="polite"></p>
       <button class="pill-btn pill-fill" type="submit">${t('nSave')}</button>
@@ -70,14 +81,17 @@
     if (window.PPBirds) d.querySelector('canvas').getContext('2d').drawImage(window.PPBirds.sprite(window.PPBirds.dress(window.PPBirds.looks(u.id), u.avatar), 0), 0, 0);
     d.addEventListener('cancel', e => e.preventDefault()); // Esc не закрывает
     const f = d.querySelector('form'), st = d.querySelector('.acct-nick-st');
+    try { f.ref.value = localStorage.getItem('pp-ref') || ''; } catch (e) {}
+    fetch('/api/birds').then(r => r.ok ? r.json() : { birds: [] }).then(x => { d.querySelector('#acct-ref-list').innerHTML = (x.birds || []).filter(b => b.nick).map(b => `<option value="${esc(b.nick)}">`).join(''); }).catch(() => {});
     f.addEventListener('submit', async e => {
       e.preventDefault();
       const nick = f.nick.value.trim().replace(/^@/, '');
       if (!/^[\p{L}\p{N}_.-]{2,24}$/u.test(nick)) { st.textContent = t('nBad'); return; }
-      const r = await fetch('/api/nick', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ nick }) });
+      const ref = f.ref.value.trim().replace(/^@/, '');
+      const r = await fetch('/api/nick', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ nick, ref }) });
       const j = await r.json().catch(() => ({}));
-      if (r.ok) { location.reload(); return; }
-      st.textContent = t(j.error === 'taken' ? 'nTaken' : j.error === 'nick' ? 'nBad' : 'nErr');
+      if (r.ok) { try { localStorage.removeItem('pp-ref'); } catch (e) {} location.reload(); return; }
+      st.textContent = t(j.error === 'taken' ? 'nTaken' : j.error === 'nick' ? 'nBad' : j.error === 'ref' ? 'refBad' : 'nErr');
     });
     d.querySelector('.acct-nick-out').addEventListener('click', async () => { await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }); location.reload(); });
     d.showModal();
@@ -95,6 +109,7 @@
       el.innerHTML = `<button type="button" class="acct-btn acct-me${u.admin ? ' acct-admin' : ''}" aria-expanded="false" aria-haspopup="menu" aria-label="${t('menu')}"><canvas width="40" height="52" aria-hidden="true"></canvas></button>
         <div class="acct-pop" hidden role="menu">
           <p class="acct-name">${u.nick ? '@' + esc(u.nick) : `<i>${t('noNick')}</i>`}${u.admin ? ` <span class="acct-badge">★ ${t('admin')}</span>` : ''}</p>
+          ${u.nick ? `<p class="acct-btns">🔘 <b>${u.buttons || 0}</b> ${t('btns')}</p>` : ''}
           <a role="menuitem" href="${pre}/challenge/${u.nick ? '#works' : ''}">${u.nick ? t('profile') : t('nick')}</a>
           ${u.admin ? `<a role="menuitem" href="/admin/">${t('cabinet')}</a>${document.querySelector('[data-ppb]') ? '<button type="button" role="menuitem" data-edit>✏️ Править страницу</button>' : ''}` : ''}
           <button type="button" role="menuitem" data-out>${t('out')}</button>

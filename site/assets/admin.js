@@ -16,7 +16,7 @@
   const n = v => Number(v || 0).toLocaleString('ru-RU');
   const err = e => e.code === 401 || e.code === 'auth' || e.code === 'login' ? 'Войдите через Google (кнопка в шапке), чтобы открыть кабинет.' : e.code === 'admin' || e.code === 403 ? 'Этот кабинет только для админа.' : 'Не получилось загрузить: ' + esc(e.message);
 
-  const SECTIONS = { overview, comments, analytics, backup, subscribers, birds, edits };
+  const SECTIONS = { overview, comments, analytics, backup, subscribers, birds, shop, edits };
   function route() {
     const sec = (location.hash || '#overview').slice(1);
     document.querySelectorAll('.adm-nav [data-sec]').forEach(a => a.setAttribute('aria-current', a.dataset.sec === sec ? 'page' : 'false'));
@@ -185,6 +185,47 @@
     draw();
   }
 
+  // ---------- магазин: цена и количество каждой вещи из коллекций ----------
+  let sFilter = 'all', sq = '';
+  async function shop() {
+    main.innerHTML = '<p class="be-note">Загрузка…</p>';
+    let d; try { d = await api('admin/shop'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    const B = window.PPBirds; if (!B) { main.innerHTML = '<p class="be-note">Не загрузился каталог вещей (birds.js).</p>'; return; }
+    const rows = {}; d.items.forEach(r => { rows[r.kind + '|' + r.item] = r; });
+    const all = []; B.GIFT_KINDS.forEach(k => (B.GIFTS[k[0]] || []).forEach(v => all.push({ kind: k[0], kindName: k[1][1], item: v, name: B.giftName(k[0], v, 1) })));
+    const draw = () => {
+      const theme = sFilter.startsWith('theme:') ? B.GIFT_THEMES.find(t => 'theme:' + t[0] === sFilter) : null, q = sq.trim().toLowerCase();
+      const list = all.filter(x => {
+        const r = rows[x.kind + '|' + x.item] || {};
+        if (sFilter === 'stock' && !(r.stock > 0)) return false;
+        if (sFilter.startsWith('kind:') && sFilter !== 'kind:' + x.kind) return false;
+        if (theme && !theme[2].includes(x.kind + '|' + x.item)) return false;
+        return !q || x.name.toLowerCase().includes(q) || x.item.toLowerCase().includes(q);
+      });
+      const onSale = all.filter(x => (rows[x.kind + '|' + x.item] || {}).stock > 0).length;
+      const fb = (k, l) => `<button type="button" class="pill-btn" data-sf="${k}" aria-pressed="${sFilter === k}">${l}</button>`;
+      main.innerHTML = `<section class="adm-box"><h2>🛍 Магазин</h2>
+        <p class="be-note">Здесь все вещи из «Коллекций». Укажите цену в пуговках 🔘 и сколько штук продаётся — вещь появится в магазине как «в продаже». Количество 0 — «нет в наличии». Цена 0 — бесплатно. Сейчас в продаже: <b>${onSale}</b> из ${all.length}. Сохраняется сразу.</p>
+        <div class="be-filters"><input type="search" id="adm-sq" placeholder="🔍 Найти вещь" value="${esc(sq)}"></div>
+        <div class="adm-sbar">${fb('all', 'Все')}${fb('stock', '🛍 В продаже')}${B.GIFT_KINDS.map(k => fb('kind:' + k[0], k[1][1])).join('')}${B.GIFT_THEMES.map(t => fb('theme:' + t[0], t[1][1])).join('')}</div>
+        <table class="be-table adm-table adm-shop"><thead><tr><th>Вещь</th><th>Вид</th><th>Цена 🔘</th><th>Количество</th><th></th></tr></thead><tbody>
+        ${list.map(x => { const r = rows[x.kind + '|' + x.item] || { price: 0, stock: 0 }; return `<tr data-k="${esc(x.kind)}" data-i="${esc(x.item)}"><td class="adm-shop-it"><span class="adm-shop-pic"></span>${esc(x.name)}</td><td>${esc(x.kindName)}</td>
+          <td><input type="number" min="0" max="100000" step="1" value="${r.price}" data-f="price" aria-label="Цена"></td><td><input type="number" min="0" max="100000" step="1" value="${r.stock}" data-f="stock" aria-label="Количество"></td><td class="adm-shop-st">${r.stock > 0 ? '🛍 в продаже' : '—'}</td></tr>`; }).join('')}</tbody></table></section>`;
+      main.querySelectorAll('tr[data-k]').forEach(tr => { const pic = tr.querySelector('.adm-shop-pic'); try { pic.appendChild(B.giftPic(tr.dataset.k, tr.dataset.i, 2, 48)); } catch (e) {} });
+      main.querySelectorAll('[data-sf]').forEach(b => b.onclick = () => { sFilter = b.dataset.sf; draw(); });
+      const inp = main.querySelector('#adm-sq');
+      inp.oninput = () => { sq = inp.value; draw(); const x = main.querySelector('#adm-sq'); x.focus(); x.setSelectionRange(x.value.length, x.value.length); };
+      main.querySelectorAll('.adm-shop input').forEach(i => i.onchange = async () => {
+        const tr = i.closest('tr'), kind = tr.dataset.k, item = tr.dataset.i;
+        const price = tr.querySelector('[data-f="price"]').value, stock = tr.querySelector('[data-f="stock"]').value;
+        tr.classList.remove('saved');
+        try { const r = await api('admin/shop', { kind, item, price, stock }); rows[kind + '|' + item] = { kind, item, price: r.price, stock: r.stock }; tr.classList.add('saved'); tr.querySelector('.adm-shop-st').textContent = r.stock > 0 ? '🛍 в продаже' : '—'; }
+        catch (e) { alert(err(e)); }
+      });
+    };
+    draw();
+  }
+
   // ---------- все птицы ----------
   let bSort = 'created_at', bq = '';
   async function birds() {
@@ -198,12 +239,18 @@
       main.innerHTML = `<section class="adm-box"><h2>🐦 Все птицы: ${d.users.length}</h2>
         <p class="be-note">Новых за неделю: <b>${week}</b>. Нажмите на ник, чтобы открыть профиль и работы.</p>
         <div class="be-filters"><input type="search" id="adm-bq" placeholder="🔍 Найти по нику" value="${esc(bq)}"></div>
-        <table class="be-table adm-table"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}<th>Подарки</th></tr></thead><tbody>
+        <table class="be-table adm-table"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}${th('buttons', '🔘 Пуговки')}${th('invited', '👥 Позвали')}<th>Подарки</th></tr></thead><tbody>
         ${list.map(u => `<tr><td>${u.nick ? `<a href="/challenge/#@${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}${u.banned ? ' <small class="be-danger">заблокирована</small>' : ''}</td>
           <td>${fmt(u.created_at)}</td><td>${fmt(u.last_seen)}</td><td>${n(u.works)}</td><td>${n(u.best)}</td>
+          <td><b>${n(u.buttons)}</b> <button type="button" class="adm-mini" data-btn="${u.id}" title="Добавить или забрать пуговки">±</button></td><td>${n(u.invited)}</td>
           <td><button type="button" class="pill-btn" data-gift="${u.id}" title="Подарить семечко для аватара">🎁${u.gifts ? ' ' + u.gifts : ''}</button></td></tr>`).join('')}</tbody></table></section>`;
       main.querySelectorAll('[data-gift]').forEach(b => b.onclick = () => giftDialog(d.users.find(u => u.id === +b.dataset.gift), birds));
       main.querySelectorAll('[data-bsort]').forEach(b => b.onclick = () => { bSort = b.dataset.bsort; draw(); });
+      main.querySelectorAll('[data-btn]').forEach(b => b.onclick = async () => {
+        const u = d.users.find(x => x.id === +b.dataset.btn), v = prompt(`Пуговки для @${u.nick || u.id}: сейчас ${u.buttons}. Сколько добавить? (например 50, или -10 чтобы забрать)`, '10');
+        const amount = Math.floor(Number(v)); if (!v || !amount) return;
+        try { await api('admin/buttons', { uid: u.id, amount }); u.buttons = Math.max(0, (u.buttons || 0) + amount); draw(); } catch (e) { alert(err(e)); }
+      });
       const inp = main.querySelector('#adm-bq');
       inp.oninput = () => { bq = inp.value; draw(); const x = main.querySelector('#adm-bq'); x.focus(); x.setSelectionRange(x.value.length, x.value.length); };
     };

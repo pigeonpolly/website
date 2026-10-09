@@ -109,7 +109,7 @@ const avatarOf = u => { try { const a = JSON.parse(u && u.avatar || '{}'); retur
 const okItem = (kind, item) => GIFT_KINDS.includes(kind) && /^[#a-z0-9:-]{1,24}$/i.test(String(item || ''));
 
 // общие функции для worker/blog.js
-const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v) });
+const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), awardComment: (uid, cid) => awardComment(env, uid, cid) });
 
 class HttpError extends Error { constructor(status, code) { super(code); this.status = status; this.code = code; } }
 const fail = (status, code) => { throw new HttpError(status, code); };
@@ -137,6 +137,9 @@ async function ensureSchema(env) {
     // подарки-семечки для аватара: Алина выдаёт из кабинета; status: new — ещё не открыт, bag — в сумке (удалить нельзя)
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS gifts (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, kind TEXT NOT NULL, item TEXT NOT NULL, note TEXT, status TEXT DEFAULT 'new', created_at INTEGER, opened_at INTEGER)`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS site_blocks (id TEXT NOT NULL, lang TEXT NOT NULL, html TEXT, hidden INTEGER DEFAULT 0, page TEXT, updated_at INTEGER, PRIMARY KEY (id, lang))`),
+    // пуговки: журнал начислений и трат (одно начисление на (кто, за что, ref) — повторно не дать); магазин: цена и сколько осталось
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS button_log (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, kind TEXT NOT NULL, ref TEXT NOT NULL, amount INTEGER NOT NULL, day TEXT, created_at INTEGER, UNIQUE (user_id, kind, ref))`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS shop (kind TEXT NOT NULL, item TEXT NOT NULL, price INTEGER DEFAULT 0, stock INTEGER DEFAULT 0, PRIMARY KEY (kind, item))`),
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
   for (const sql of ["ALTER TABLE users ADD COLUMN avatar TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
@@ -144,13 +147,38 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1']) {
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   schemaReady = true;
 }
 
 const now = () => Math.floor(Date.now() / 1000);
+
+// ---------- пуговки (валюта сайта) ----------
+// сколько и за что: заход раз в день, рисунок в челлендж, до 3 комментариев в день, друг, указавший тебя при регистрации
+const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20 };
+const rigaDay = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }); // сутки по Риге
+async function award(env, uid, kind, ref, amount) {
+  const r = await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(uid, kind, String(ref), amount, rigaDay(), now()).run();
+  if (!r.meta.changes) return 0;
+  await env.DB.prepare('UPDATE users SET buttons = COALESCE(buttons, 0) + ? WHERE id = ?').bind(amount, uid).run();
+  return amount;
+}
+// комментарий: пуговки только за первые три в сутки
+async function awardComment(env, uid, commentId) {
+  const n = (await env.DB.prepare("SELECT COUNT(*) AS n FROM button_log WHERE user_id = ? AND kind = 'comment' AND day = ?").bind(uid, rigaDay()).first()).n;
+  return n < BTN.commentsPerDay ? award(env, uid, 'comment', commentId, BTN.comment) : 0;
+}
+// что уже получено сегодня — для списка условий в профиле
+async function buttonStatus(env, u) {
+  const day = rigaDay();
+  const rows = (await env.DB.prepare('SELECT kind, COUNT(*) AS n FROM button_log WHERE user_id = ? AND day = ? GROUP BY kind').bind(u.id, day).all()).results;
+  const got = Object.fromEntries(rows.map(r => [r.kind, r.n]));
+  const invited = (await env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE referrer = ?').bind(u.id).first()).n;
+  return { buttons: u.buttons || 0, daily: !!got.daily, upload: !!got.upload, comments: got.comment || 0, invited, rules: BTN };
+}
 const randomHex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, '0')).join('');
 async function sha256(s) {
   const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
@@ -404,7 +432,7 @@ async function route(req, env, url) {
     if (pickUser === u.id) badges.push('pick');
     const bag = (await env.DB.prepare("SELECT DISTINCT kind, item FROM gifts WHERE user_id = ? AND status = 'bag'").bind(u.id).all()).results; // вещи в сумке — их видят все
     const unopened = (await env.DB.prepare("SELECT COUNT(*) AS n FROM gifts WHERE user_id = ? AND status = 'new'").bind(u.id).first()).n;
-    return json({ id: u.id, avatar: avatarOf(u), bag, unopened, nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(rows.map(r => r.day)).current,
+    return json({ id: u.id, avatar: avatarOf(u), bag, unopened, buttons: u.buttons || 0, nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(rows.map(r => r.day)).current,
       best: mergedBest(u, rows.map(r => r.day)), badges, posts: rows.filter(r => !r.hidden).map(({ id, day, theme, bw }) => ({ id, day, theme, bw })) });
   }
 
@@ -469,7 +497,8 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/admin/users') {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');
-    return json({ users: (await env.DB.prepare(`SELECT u.id, u.nick, u.created_at, u.last_seen, u.banned, u.best, u.picks, u.avatar,
+    return json({ users: (await env.DB.prepare(`SELECT u.id, u.nick, u.created_at, u.last_seen, u.banned, u.best, u.picks, u.avatar, COALESCE(u.buttons, 0) AS buttons,
+      (SELECT COUNT(*) FROM users f WHERE f.referrer = u.id) AS invited,
       (SELECT COUNT(*) FROM gifts g WHERE g.user_id = u.id) AS gifts,
       (SELECT COUNT(*) FROM posts w WHERE w.user_id = u.id) AS works FROM users u ORDER BY u.created_at DESC`).all()).results });
   }
@@ -514,7 +543,8 @@ async function route(req, env, url) {
   // шапка сайта: кто вошёл (для кнопки входа и птички-аватара)
   if (m === 'GET' && p === '/api/whoami') {
     const u = await currentUser(req, env);
-    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), avatar: avatarOf(u) } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
+    const earned = u && u.nick && !u.banned ? await award(env, u.id, 'daily', rigaDay(), BTN.daily) : 0; // +3 пуговки за первый заход за сутки (шапка спрашивает на каждой странице)
+    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), avatar: avatarOf(u), buttons: (u.buttons || 0) + earned, earned } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
   }
   if (m === 'GET' && p === '/api/config') return json({ ready: true, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
 
@@ -551,6 +581,8 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/me') {
     const u = await currentUser(req, env);
     if (!u) return json({ user: null });
+    const earned = u.nick && !u.banned ? await award(env, u.id, 'daily', rigaDay(), BTN.daily) : 0; // +3 за первый заход за сутки
+    if (earned) u.buttons = (u.buttons || 0) + earned;
     const rows = (await env.DB.prepare('SELECT id, day, theme, bw, tod, hidden FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
     const st = streaks(rows.map(r => r.day));
     const pickUser = Number(await getMeta(env, 'pick_user'));
@@ -560,8 +592,57 @@ async function route(req, env, url) {
     const storage = admin ? Math.round(await storageUsed(env) * 1000) / 10 : undefined;
     const migration = admin && env.MEDIA ? await migrationStatus(env) : undefined;
     return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
-      best: mergedBest(u, rows.map(r => r.day)), keptBadges: kept, posts: rows, id: u.id, avatar: avatarOf(u),
+      best: mergedBest(u, rows.map(r => r.day)), keptBadges: kept, posts: rows, id: u.id, avatar: avatarOf(u), earned, btn: await buttonStatus(env, u),
       gifts: (await env.DB.prepare('SELECT id, kind, item, note, status, created_at FROM gifts WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results } });
+  }
+
+  // ---------- магазин: вещи из коллекций за пуговки; цену и остаток задаёт Алина в кабинете ----------
+  if (m === 'GET' && p === '/api/shop') {
+    const rows = (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results;
+    return json({ items: rows }, 200, { 'cache-control': 'no-store' });
+  }
+  if (m === 'POST' && p === '/api/shop/buy') {
+    const u = await needUser(req, env);
+    if (!u.nick) fail(400, 'nick');
+    const b = await req.json().catch(() => ({}));
+    const kind = String(b.kind || ''), item = String(b.item || '');
+    if (!GIFT_KINDS.includes(kind) || !item) fail(400, 'bad');
+    const row = await env.DB.prepare('SELECT price, stock FROM shop WHERE kind = ? AND item = ?').bind(kind, item).first();
+    if (!row || row.stock <= 0) fail(409, 'soldout');
+    if (await env.DB.prepare("SELECT 1 FROM gifts WHERE user_id = ? AND kind = ? AND item = ? AND status IN ('bag', 'new')").bind(u.id, kind, item).first()) fail(409, 'have');
+    if ((u.buttons || 0) < row.price) fail(402, 'poor');
+    // остаток и пуговки списываем условно (если кто-то успел раньше — ничего не теряется)
+    const s1 = await env.DB.prepare('UPDATE shop SET stock = stock - 1 WHERE kind = ? AND item = ? AND stock > 0').bind(kind, item).run();
+    if (!s1.meta.changes) fail(409, 'soldout');
+    const s2 = await env.DB.prepare('UPDATE users SET buttons = COALESCE(buttons, 0) - ? WHERE id = ? AND COALESCE(buttons, 0) >= ?').bind(row.price, u.id, row.price).run();
+    if (!s2.meta.changes) { await env.DB.prepare('UPDATE shop SET stock = stock + 1 WHERE kind = ? AND item = ?').bind(kind, item).run(); fail(402, 'poor'); }
+    const g = await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'shop', 'bag', ?, ?)").bind(u.id, kind, item, now(), now()).run();
+    await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(u.id, 'buy', String(g.meta.last_row_id), -row.price, rigaDay(), now()).run();
+    return json({ ok: true, buttons: (u.buttons || 0) - row.price });
+  }
+  if (p === '/api/admin/shop') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    if (m === 'POST') {
+      const b = await req.json().catch(() => ({}));
+      const kind = String(b.kind || ''), item = String(b.item || '');
+      if (!GIFT_KINDS.includes(kind) || !item || item.length > 40) fail(400, 'bad');
+      const price = Math.max(0, Math.min(100000, Math.floor(Number(b.price) || 0))), stock = Math.max(0, Math.min(100000, Math.floor(Number(b.stock) || 0)));
+      await env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET price = excluded.price, stock = excluded.stock').bind(kind, item, price, stock).run();
+      return json({ ok: true, price, stock });
+    }
+    return json({ items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results });
+  }
+  // админ меняет пуговки птичке вручную (например, приз)
+  if (m === 'POST' && p === '/api/admin/buttons') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({}));
+    const uid = Number(b.uid), amount = Math.floor(Number(b.amount) || 0);
+    if (!uid || !amount || Math.abs(amount) > 100000) fail(400, 'bad');
+    await env.DB.prepare('INSERT INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(uid, 'admin', randomHex(6), amount, rigaDay(), now()).run();
+    await env.DB.prepare('UPDATE users SET buttons = MAX(0, COALESCE(buttons, 0) + ?) WHERE id = ?').bind(amount, uid).run();
+    return json({ ok: true });
   }
 
   // подарок: открыть и сразу надеть (use) или положить в сумку
@@ -608,12 +689,17 @@ async function route(req, env, url) {
   }
   if (m === 'POST' && p === '/api/nick') {
     const u = await needUser(req, env);
-    const { nick } = await req.json().catch(() => ({}));
+    const { nick, ref } = await req.json().catch(() => ({}));
     const n = String(nick || '').trim().replace(/^@/, '');
     if (!/^[\p{L}\p{N}_.-]{2,24}$/u.test(n)) fail(400, 'nick');
     const taken = await env.DB.prepare('SELECT id FROM users WHERE nick = ? AND id != ?').bind(n, u.id).first();
     if (taken) fail(409, 'taken');
-    await env.DB.prepare('UPDATE users SET nick = ? WHERE id = ?').bind(n, u.id).run();
+    // друг, который пригласил: указывается один раз, при первом выборе ника; ему +20 пуговок
+    const first = !u.nick && !u.referrer, rn = String(ref || '').trim().replace(/^@/, '');
+    const friend = first && rn ? await env.DB.prepare('SELECT id FROM users WHERE nick = ? AND banned = 0 AND id != ?').bind(rn, u.id).first() : null;
+    if (first && rn && !friend) fail(400, 'ref');
+    await env.DB.prepare('UPDATE users SET nick = ?, referrer = COALESCE(referrer, ?) WHERE id = ?').bind(n, friend ? friend.id : null, u.id).run();
+    if (friend) await award(env, friend.id, 'friend', u.id, BTN.friend);
     return json({ ok: true, nick: n });
   }
 
@@ -651,7 +737,8 @@ async function route(req, env, url) {
     const uu = { ...u, months: months.join(','), mcount };
     await env.DB.prepare('UPDATE users SET months = ?, mcount = ?, best = ?, badges = ? WHERE id = ?')
       .bind(uu.months, mcount, mergedBest(u, all.map(p => p.day)), mergedBadges(uu, all).join(','), u.id).run();
-    return json({ ok: true, id });
+    const earned = await award(env, u.id, 'upload', day, BTN.upload);
+    return json({ ok: true, id, earned });
   }
 
   if (m === 'POST' && p === '/api/delete-post') {
@@ -716,6 +803,7 @@ async function route(req, env, url) {
     await env.DB.batch([
       env.DB.prepare('DELETE FROM posts WHERE user_id = ?').bind(u.id),
       env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(u.id),
+      env.DB.prepare('DELETE FROM button_log WHERE user_id = ?').bind(u.id),
       env.DB.prepare('DELETE FROM users WHERE id = ?').bind(u.id),
     ]);
     return json({ ok: true }, 200, { 'set-cookie': sessionCookie('', 0) });

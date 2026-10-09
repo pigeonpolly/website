@@ -1,0 +1,106 @@
+<section class="page-head">
+  <p class="topics">buttons and gifts</p>
+  <h1>Shop</h1>
+  <p class="lead">Things for your bird, paid for with buttons 🔘. Quantities are limited: when an item is gone, it’s gone.</p>
+  <p class="shop-me"></p>
+</section>
+<section class="fl-all fl-coll shop" id="shop">
+  <div class="fl-coll-bar shop-bar" role="toolbar" aria-label="Filter"></div>
+  <div class="fl-coll-box shop-box"></div>
+</section>
+<script>
+// Магазин: каталог вещей (PPBirds.GIFTS, как в «Коллекциях») с ценой и остатком из /api/shop; покупка кладёт вещь в сумку
+(function () {
+  var L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, pre = ['', '/ru', '/lv'][L];
+  var T = {
+    have: ['You have {n} 🔘 buttons', 'У вас {n} 🔘 пуговок', 'Tev ir {n} 🔘 pogas'],
+    how: ['How to earn buttons →', 'Как получить пуговки →', 'Kā nopelnīt pogas →'],
+    login: ['Sign in to collect buttons and shop.', 'Войдите, чтобы копить пуговки и покупать.', 'Ienāc, lai krātu pogas un iepirktos.'],
+    all: ['All', 'Все', 'Visi'], inStock: ['🛍 In stock', '🛍 В продаже', '🛍 Pārdošanā'],
+    left: ['{n} left', 'осталось {n}', 'atlikuši {n}'], sold: ['Sold out', 'Нет в наличии', 'Izpārdots'],
+    buy: ['Buy', 'Купить', 'Pirkt'], free: ['Free', 'Бесплатно', 'Bez maksas'], mine: ['✓ yours', '✓ уже есть', '✓ jau ir'],
+    poor: ['Not enough buttons', 'Не хватает пуговок', 'Nepietiek pogu'],
+    ok: ['Bought! It is in your bag 🎒', 'Куплено! Вещь уже в сумке 🎒', 'Nopirkts! Lieta jau ir somā 🎒'],
+    sure: ['Buy “{n}” for {p} 🔘?', 'Купить «{n}» за {p} 🔘?', 'Pirkt “{n}” par {p} 🔘?'],
+    err: ['Could not buy, please try again.', 'Не получилось купить, попробуйте ещё раз.', 'Neizdevās nopirkt, mēģini vēlreiz.'],
+    none: ['Nothing on sale here yet. Check back soon!', 'Здесь пока ничего не продаётся. Загляните позже!', 'Šeit pagaidām nekas netiek pārdots. Ieskaties vēlāk!'],
+  };
+  var bar = document.querySelector('.shop-bar'), box = document.querySelector('.shop-box'), meEl = document.querySelector('.shop-me');
+  var me = null, owned = {}, shop = {}, filter = 'all';
+  function key(k, v) { return k + '|' + v; }
+  function buttons() {
+    var B = window.PPBirds; if (!B || bar.children.length) return;
+    var add = function (k, label, cls) { var b = document.createElement('button'); b.type = 'button'; b.className = 'pill-btn ' + (cls || ''); b.dataset.f = k; b.textContent = label; b.onclick = function () { filter = k; draw(); }; bar.appendChild(b); };
+    add('all', T.all[L]); add('stock', T.inStock[L], 'shop-instock');
+    B.GIFT_KINDS.forEach(function (k) { add('kind:' + k[0], k[1][L]); });
+    var br = document.createElement('span'); br.className = 'fl-coll-br'; bar.appendChild(br);
+    B.GIFT_THEMES.forEach(function (t) { add('theme:' + t[0], t[1][L], 'fl-theme'); });
+  }
+  function head() {
+    meEl.innerHTML = '';
+    if (me) { meEl.innerHTML = '<b>' + T.have[L].replace('{n}', me.btn ? me.btn.buttons : 0) + '</b> · <a href="' + pre + '/challenge/#works">' + T.how[L] + '</a>'; }
+    else meEl.textContent = T.login[L];
+  }
+  function draw() {
+    var B = window.PPBirds; if (!B) return;
+    buttons(); head();
+    [].forEach.call(bar.children, function (b) { if (b.dataset) b.setAttribute('aria-pressed', String(b.dataset.f === filter)); });
+    var id = me ? me.id : 2, n = 0, money = me && me.btn ? me.btn.buttons : 0;
+    var theme = filter.indexOf('theme:') === 0 ? B.GIFT_THEMES.filter(function (t) { return 'theme:' + t[0] === filter; })[0] : null;
+    box.innerHTML = '';
+    B.GIFT_KINDS.forEach(function (k) {
+      if (filter.indexOf('kind:') === 0 && filter !== 'kind:' + k[0]) return;
+      var list = (B.GIFTS[k[0]] || []).filter(function (v) {
+        if (theme && theme[2].indexOf(key(k[0], v)) < 0) return false;
+        return filter !== 'stock' || ((shop[key(k[0], v)] || {}).stock > 0);
+      });
+      if (!list.length) return;
+      var h = document.createElement('h3'); h.textContent = k[1][L]; box.appendChild(h);
+      var g = document.createElement('div'); g.className = 'fl-coll-grid'; box.appendChild(g);
+      list.forEach(function (v) {
+        n++;
+        var s = shop[key(k[0], v)] || { price: 0, stock: 0 }, mine = owned[key(k[0], v)], leg = B.LEGEND && B.LEGEND.has(key(k[0], v));
+        var t = document.createElement('figure'); t.className = 'fl-coll-item shop-item' + (s.stock > 0 ? '' : ' sold') + (mine ? ' got' : '') + (leg ? ' legend' : '');
+        t.appendChild(B.giftPic(k[0], v, id, 84, me && me.avatar));
+        if (leg) { var lt = document.createElement('span'); lt.className = 'legend-tag'; lt.textContent = '★'; t.appendChild(lt); }
+        var c = document.createElement('figcaption'); c.textContent = B.giftName(k[0], v, L); t.appendChild(c);
+        var info = document.createElement('p'); info.className = 'shop-price';
+        info.innerHTML = s.stock > 0 ? '<b>' + (s.price ? '🔘 ' + s.price : T.free[L]) + '</b><small>' + T.left[L].replace('{n}', s.stock) + '</small>' : '<small>' + T.sold[L] + '</small>';
+        t.appendChild(info);
+        if (mine) { var m = document.createElement('span'); m.className = 'fl-coll-mark'; m.textContent = T.mine[L]; t.appendChild(m); }
+        else if (s.stock > 0 && me) {
+          var b = document.createElement('button'); b.type = 'button'; b.className = 'pill-btn shop-buy';
+          b.textContent = money >= s.price ? T.buy[L] : T.poor[L]; b.disabled = money < s.price;
+          b.onclick = function () { buy(k[0], v, s.price, b); }; t.appendChild(b);
+        }
+        g.appendChild(t);
+      });
+    });
+    if (!n) { var p = document.createElement('p'); p.className = 'fl-all-lead'; p.textContent = T.none[L]; box.appendChild(p); }
+  }
+  function buy(kind, item, price, b) {
+    var B = window.PPBirds;
+    if (!confirm(T.sure[L].replace('{n}', B.giftName(kind, item, L)).replace('{p}', price))) return;
+    b.disabled = true;
+    fetch('/api/shop/buy', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ kind: kind, item: item }) })
+      .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+      .then(function (x) {
+        if (!x.ok) { alert(x.d.error === 'poor' ? T.poor[L] : x.d.error === 'soldout' ? T.sold[L] : x.d.error === 'have' ? T.mine[L] : T.err[L]); return load(); }
+        if (window.PPToast) window.PPToast(T.ok[L]);
+        load();
+      }).catch(function () { alert(T.err[L]); b.disabled = false; });
+  }
+  function load() {
+    Promise.all([
+      fetch('/api/shop', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : { items: [] }; }).catch(function () { return { items: [] }; }),
+      fetch('/api/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }),
+    ]).then(function (a) {
+      shop = {}; (a[0].items || []).forEach(function (r) { shop[key(r.kind, r.item)] = r; });
+      me = a[1] && a[1].user ? a[1].user : null; owned = {};
+      if (me) (me.gifts || []).forEach(function (g) { owned[key(g.kind, g.item)] = g.status; });
+      draw();
+    });
+  }
+  if (window.PPBirds) load(); else addEventListener('load', load);
+})();
+</script>

@@ -59,6 +59,7 @@
       btn.disabled = true; status.textContent = '';
       try {
         const r = await api('blog/comment', { id, lang, body: f.body.value, website: f.website.value });
+        if (r.earned && window.PPToast) window.PPToast(({ ru: `+${r.earned} 🔘 пуговки за комментарий!`, lv: `+${r.earned} 🔘 pogas par komentāru!` })[lang] || `+${r.earned} 🔘 buttons for your comment!`);
         f.body.value = '';
         if (r.status === 'pending') status.textContent = t('pending');
         else if (r.comment) {

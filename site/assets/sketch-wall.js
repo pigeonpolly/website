@@ -54,6 +54,18 @@
     giftNew: [n => `A gift for you!${n > 1 ? ' (' + n + ')' : ''}`, n => `Тебе подарок!${n > 1 ? ' (' + n + ')' : ''}`, n => `Tev dāvana!${n > 1 ? ' (' + n + ')' : ''}`],
     bag: ['Bag', 'Сумка', 'Soma'],
     shareBird: ['Share my bird', 'Поделиться птичкой', 'Dalīties ar putniņu'],
+    btnT: ['🔘 Buttons', '🔘 Пуговки', '🔘 Pogas'],
+    btnHave: [n => `You have ${n}`, n => `У вас ${n}`, n => `Tev ir ${n}`],
+    btnHow: ['How to earn buttons', 'Как получить пуговки', 'Kā nopelnīt pogas'],
+    btnDaily: [n => `Visit the site: +${n} once a day`, n => `Зайти на сайт: +${n} раз в сутки`, n => `Apmeklē vietni: +${n} reizi dienā`],
+    btnUpload: [n => `Upload a drawing to the challenge: +${n}`, n => `Загрузить рисунок в челлендж: +${n}`, n => `Augšupielādē zīmējumu izaicinājumā: +${n}`],
+    btnComment: [(n, k, m) => `Comment on any blog post: +${n} each, ${m} times a day (today ${k}/${m})`, (n, k, m) => `Комментарий под любым постом: +${n}, до ${m} раз в сутки (сегодня ${k}/${m})`, (n, k, m) => `Komentārs zem jebkura ieraksta: +${n}, līdz ${m} reizēm dienā (šodien ${k}/${m})`],
+    btnFriend: [(n, k) => `A friend signs up and picks you as the one who invited them: +${n} for each (friends: ${k})`, (n, k) => `Друг регистрируется и выбирает тебя как пригласившего: +${n} за каждого (друзей: ${k})`, (n, k) => `Draugs reģistrējas un izvēlas tevi kā uzaicinātāju: +${n} par katru (draugi: ${k})`],
+    btnToday: ['done today', 'сегодня уже', 'šodien jau'],
+    btnShop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'],
+    btnInvite: ['📤 Invite a friend', '📤 Позвать друга', '📤 Uzaicināt draugu'],
+    btnEarned: [n => `+${n} 🔘 buttons!`, n => `+${n} 🔘 пуговок!`, n => `+${n} 🔘 pogas!`],
+    btnOther: [n => `🔘 ${n} buttons`, n => `🔘 ${n} пуговок`, n => `🔘 ${n} pogas`],
     shareThis: ['Share', 'Поделиться', 'Dalīties'],
     seedOf: [k => `A seed: ${k}`, k => `Семечко: ${k}`, k => `Sēkla: ${k}`],
     fromAlina: ['— Alina', '— Алина', '— Alīna'],
@@ -344,6 +356,16 @@
     draw();
   }
 
+  // 🔘 пуговки: сколько есть и что можно получить сегодня (✅ — уже получено)
+  function buttonsHtml(b) {
+    const R = b.rules, pre = L === 1 ? '/ru' : L === 2 ? '/lv' : '';
+    const row = (done, text) => `<li class="${done ? 'done' : ''}"><span>${done ? '✅' : '⬜'}</span> ${esc(text)}${done ? ` <em>${t('btnToday')}</em>` : ''}</li>`;
+    return `<div class="sw-btns"><h3>${t('btnT')} <b>${b.buttons}</b></h3>
+      <p class="sw-btns-how">${t('btnHow')}:</p><ul>
+      ${row(b.daily, t('btnDaily', R.daily))}${row(b.upload, t('btnUpload', R.upload))}${row(b.comments >= R.commentsPerDay, t('btnComment', R.comment, b.comments, R.commentsPerDay))}
+      <li class="sw-btns-friend"><span>👥</span> ${esc(t('btnFriend', R.friend, b.invited))}</li></ul>
+      <p class="sw-btns-acts"><a class="pill-btn" href="${pre}/shop/">${t('btnShop')}</a><button type="button" class="pill-btn" id="sw-invite">${t('btnInvite')}</button></p></div>`;
+  }
   function renderProfile(prev) {
     const lv = levelOf(me.best), next = LEVELS.find(l => l.d > me.best);
     const upDate = dayAgo(upOff), upKey = keyOfD(upDate);
@@ -361,6 +383,7 @@
           <div class="sw-bar"><i style="width:${progress}%"></i></div>
           <p class="sw-next">${next ? t('toNext', next.d - me.best, next.n[L]) : t('maxLevel')}</p></div>
         ${me.id ? `<div class="sw-gifts">${newGifts.length ? `<button type="button" class="pill-btn sw-gift-btn" id="sw-gift">🎁 ${t('giftNew', newGifts.length)}</button>` : ''}<button type="button" class="pill-btn" id="sw-bag">🎒 ${t('bag')} (${bagItems().length})</button><button type="button" class="pill-btn sw-share-btn" id="sw-share">📤 ${t('shareBird')}</button></div>` : ''}
+        ${me.btn ? buttonsHtml(me.btn) : ''}
         <div class="sw-badges"><h3>${t('badges')}</h3><div>${LEVELS.map(l => medal(l, me.best >= l.d, false, 'button')).join('')}${SPECIAL.map(s => medal(s, stateOf(s, got), false, 'button')).join('')}</div><p class="sw-how" id="sw-how">${t('tapBadge')}</p></div>
         <p class="sw-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a>${me.admin ? ` · <b>admin</b> · ${t('storage')}: ${me.storage ?? 0}%${me.migration && me.migration.total ? ` · R2: ${me.migration.r2 + me.migration.missing >= me.migration.total ? `✓ ${me.migration.r2}/${me.migration.total}` : `${me.migration.r2}/${me.migration.total}…`}` : ''}` : ''}</p>
       </div>
@@ -378,6 +401,7 @@
     const gb = document.getElementById('sw-gift'); if (gb) gb.onclick = () => openGift(newGifts[newGifts.length - 1]);
     const bb = document.getElementById('sw-bag'); if (bb) bb.onclick = openBag;
     const sb = document.getElementById('sw-share'); if (sb) sb.onclick = () => shareBird({ id: me.id, nick: me.nick, avatar: me.avatar, mine: true });
+    const inv = document.getElementById('sw-invite'); if (inv) inv.onclick = () => shareBird({ id: me.id, nick: me.nick, avatar: me.avatar, mine: true });
     if (prev) celebrate(prev, lv, got);
     // по нажатию — бейдж крупно, с описанием
     app.querySelectorAll('.sw-badges .sw-medal').forEach(b => b.onclick = () => {
@@ -448,7 +472,8 @@
       fd.append('bw', bw ? '1' : '0');
       if (form.consent) fd.append('consent', form.consent.checked ? 'yes' : '');
       try {
-        await api('upload', { method: 'POST', body: fd });
+        const up = await api('upload', { method: 'POST', body: fd });
+        if (up.earned && window.PPToast) window.PPToast(t('btnEarned', up.earned));
         const before = { best: me.best, got: specials(me.posts) };
         await refresh(before); loadTop(); loadWall(true);
       } catch (err) { st.textContent = err.code === 'big' || err.code === 'file' ? t('big') : t('err'); btn.disabled = false; }
@@ -488,7 +513,7 @@
     v.innerHTML = `<div class="sw-bv-card sw-pv-card"><button type="button" class="sw-bv-close" aria-label="Close">✕</button>
       <div class="sw-pv-head">${window.PPBirds && pr.id ? '<span class="sw-ava-slot"></span>' : lv ? medal(lv, true, true) : `<span class="sw-medal big off" style="--bg:#F4F0FA">${spriteSvg('egg')}</span>`}
         <div><h3><span class="sw-nickname${pr.gold ? ' gold' : ''}">@${esc(pr.nick)}</span></h3><p class="sw-level">${lv ? esc(lv.n[L]) : '—'}</p>
-        <p class="sw-pv-streak">🔥 ${t('streak', pr.current)} · ${t('best', pr.best)}</p>${window.PPBirds && pr.id ? `<button type="button" class="pill-btn sw-pv-share">📤 ${t('shareThis')}</button>` : ''}</div></div>
+        <p class="sw-pv-streak">🔥 ${t('streak', pr.current)} · ${t('best', pr.best)}${pr.buttons != null ? ` · ${t('btnOther', pr.buttons)}` : ''}</p>${window.PPBirds && pr.id ? `<button type="button" class="pill-btn sw-pv-share">📤 ${t('shareThis')}</button>` : ''}</div></div>
       <div class="sw-pv-badges">${LEVELS.map(l => medal(l, pr.best >= l.d)).join('')}${SPECIAL.map(x => medal(x, st(x), false, 'span', pr.picks)).join('')}</div>
       ${window.PPBirds && pr.id ? `<h4 class="sw-pv-bag-t">🎒 ${t('bag')}</h4><div class="sw-pv-bag">${'<span class="sw-pv-item sw-pv-wrap" title="🎁">🎁</span>'.repeat(Math.min(pr.unopened || 0, 12))}</div>${!(pr.bag || []).length && !pr.unopened ? `<p class="sw-pv-empty">${t('bagEmptyOther')}</p>` : ''}` : ''}
       <div class="sw-pv-works">${pr.posts.map(p => `<a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"><span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></a>`).join('') || `<p class="sw-empty">${t('noWorks')}</p>`}</div>

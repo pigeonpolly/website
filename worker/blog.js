@@ -252,7 +252,9 @@ export async function blogApi(req, env, url, h) {
     const status = hasLink && !isAdm ? 'pending' : 'ok';
     const r = await env.DB.prepare('INSERT INTO blog_comments (post_id, user_id, anon, body, ip, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')
       .bind(post.id, named ? u.id : null, anon, text, ip, status, h.now()).run();
-    return json({ status, comment: { id: r.meta.last_row_id, html: commentHtml({ id: r.meta.last_row_id, body: text, nick: named ? u.nick : null, anon, created_at: h.now() }, lang) } },
+    // пуговки: +2 за комментарий вошедшему (не больше трёх в сутки; ссылки на проверке не считаются)
+    const earned = named && status === 'ok' && h.awardComment ? await h.awardComment(u.id, r.meta.last_row_id) : 0;
+    return json({ status, earned, comment: { id: r.meta.last_row_id, html: commentHtml({ id: r.meta.last_row_id, body: text, nick: named ? u.nick : null, anon, created_at: h.now() }, lang) } },
       200, v.set ? { 'set-cookie': v.set } : {});
   }
 
