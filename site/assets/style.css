@@ -2125,8 +2125,8 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .be-app .be-menu > div a, .be-app .be-menu > div button { display: block; padding: 9px 12px; border: 0; border-radius: 10px; background: none; color: #2B1A51; font: 600 14px var(--sans); text-align: left; text-decoration: none; cursor: pointer; }
 .be-app .be-menu > div a:hover, .be-app .be-menu > div button:hover { background: #F3EEFB; color: #2B1A51; }
 .be-app .be-menu > div .be-danger { color: #C0392B; }
-.be-posts .be-langs { margin-top: 6px; }
-@media (max-width: 640px) { .be-posts th:nth-child(3), .be-posts td:nth-child(3) { display: table-cell; } .be-app .be-rowsec { max-width: 120px; } }
+.be-posts .be-langs { margin-top: 0; flex-wrap: nowrap; }
+@media (max-width: 640px) { .be-posts th:nth-child(4), .be-posts td:nth-child(4) { display: table-cell; } .be-app .be-rowsec { max-width: 120px; } }
 /* Стая на отдельной странице: сцена на весь экран */
 .fl-page-head { padding-bottom: 0; }
 .fl-page-head h1 { font-size: clamp(30px, 4vw, 48px); margin-bottom: 8px; }
@@ -2199,3 +2199,4 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .adm-sort[aria-pressed="true"] { color: #C0582F; }
 .adm-back { margin: 0 0 6px; } .adm-back a { color: var(--peach); font-weight: 700; text-decoration: none; }
 @media (max-width: 800px) { .adm.be-app { grid-template-columns: 1fr; } .adm-nav { position: static; grid-template-columns: repeat(2, 1fr); } .adm-cols { grid-template-columns: 1fr; } }
+.be-posts .be-langs i { white-space: nowrap; }

@@ -106,9 +106,10 @@
           <optgroup label="Статус">${dashTab === 'draft' ? '<option value="publish">Опубликовать</option>' : '<option value="draft">Снять с публикации (в черновики)</option>'}</optgroup>
           <optgroup label="Опасно"><option value="delete">🗑 Удалить</option></optgroup></select>
           <button type="button" class="bc-link" data-unpick>снять выбор</button>` : ''}</div>`;
-      return head + bulk + `<table class="be-table be-posts"><thead><tr><th class="be-ck"><input type="checkbox" id="be-pickall" aria-label="Выбрать все" ${n && n === list.length ? 'checked' : ''}></th><th>Статья</th><th>Раздел</th><th>Дата</th><th title="лайки">♥</th><th title="просмотры">👁</th><th title="комментарии">💬</th><th></th></tr></thead><tbody>
+      return head + bulk + `<table class="be-table be-posts"><thead><tr><th class="be-ck"><input type="checkbox" id="be-pickall" aria-label="Выбрать все" ${n && n === list.length ? 'checked' : ''}></th><th>Статья</th><th>Языки</th><th>Раздел</th><th>Дата</th><th title="лайки">♥</th><th title="просмотры">👁</th><th title="комментарии">💬</th><th></th></tr></thead><tbody>
         ${list.map(p => `<tr data-id="${p.id}"${picked.has(p.id) ? ' class="picked"' : ''}><td class="be-ck"><input type="checkbox" data-pick ${picked.has(p.id) ? 'checked' : ''} aria-label="Выбрать"></td>
-          <td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a><span class="be-langs">${['ru', 'en', 'lv'].map(l => p['t_' + l] ? `<i class="on" title="Есть на ${l.toUpperCase()}">✓ ${l.toUpperCase()}</i>` : `<i title="Нет перевода на ${l.toUpperCase()}">${l.toUpperCase()}</i>`).join('')}</span></td>
+          <td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a></td>
+          <td><span class="be-langs">${['ru', 'en', 'lv'].map(l => p['t_' + l] ? `<i class="on" title="Есть на ${l.toUpperCase()}">✓ ${l.toUpperCase()}</i>` : `<i title="Нет перевода на ${l.toUpperCase()}">${l.toUpperCase()}</i>`).join('')}</span></td>
           <td><select class="be-rowsec" data-rowsec aria-label="Раздел">${secOpts(p.section || '')}</select></td>
           <td>${fmt(p.published_at || p.updated_at)}</td>
           <td>${p.likes}</td><td>${p.views}</td><td>${p.comments}</td>
