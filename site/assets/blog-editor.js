@@ -749,13 +749,26 @@
         else if (el.tagName === 'FIGURE' || el.querySelector('img')) { const img = el.querySelector('img') || el; if (!have.has(img.getAttribute('src'))) plan.push([k, el]); }
       }
       if (!plan.length) { status('Все картинки оригинала уже есть в этой вкладке.'); return; }
-      const texts = [...body.children].filter(isText);
+      const texts = [...body.children].filter(isText), added = [];
       for (const [n, el] of plan.reverse()) {
         const fig = el.tagName === 'FIGURE' ? el.cloneNode(true) : Object.assign(document.createElement('figure'), { innerHTML: el.innerHTML });
         if (n === 0) body.prepend(fig); else (texts[Math.min(n, texts.length) - 1] || body.lastElementChild).after(fig);
+        added.push(fig);
       }
       addCaptions(body); touch();
-      status(`Готово: перенесено картинок — ${plan.length} (из вкладки ${srcLang.toUpperCase()}). Проверьте, что они стоят на своих местах, и переведите подписи.`);
+      // подписи и описания (alt) перенесённых картинок сразу переводим Google-переводчиком
+      const slots = [];
+      for (const f of added) {
+        const cap = f.querySelector('figcaption');
+        if (cap && cap.textContent.trim()) slots.push([cap.innerHTML, v => { cap.innerHTML = v; }]);
+        f.querySelectorAll('img[alt]').forEach(i => { if (i.alt.trim()) slots.push([i.alt, v => { i.alt = plainText(v); }]); });
+      }
+      const done = `Готово: перенесено картинок — ${plan.length} (из вкладки ${srcLang.toUpperCase()}). Проверьте, что они стоят на своих местах`;
+      if (!slots.length) { status(done + '.'); return; }
+      status('Перевожу подписи к картинкам…');
+      googleTranslate(slots.map(x => x[0]), srcLang, target)
+        .then(out => { out.forEach((v, i) => v && slots[i][1](v)); touch(); status(done + ' — подписи переведены, проверьте их.'); })
+        .catch(() => status(done + '. Подписи перевести не получилось — переведите их вручную.'));
     }
 
     // обложка
@@ -869,6 +882,7 @@
     return out;
   }
 
+  const plainText = v => { const x = document.createElement('textarea'); x.innerHTML = String(v || ''); return x.value; };
   // делим статью на кусочки для переводчика и собираем обратно
   function splitForTranslation(ru, from) {
     const texts = [ru['t_' + from], ru['d_' + from], '']; // теги не переводим здесь — у них общий словарь
@@ -877,17 +891,19 @@
     const walk = el => {
       for (const ch of el.children) {
         const tag = ch.tagName.toLowerCase();
-        if (tag === 'ul' || tag === 'ol' || tag === 'blockquote' && ch.querySelector('p')) walk(ch);
-        else if (tag === 'figure') { const cap = ch.querySelector('figcaption'); if (cap && cap.textContent.trim()) { slots.push(cap); texts.push(cap.innerHTML); } } // подпись к картинке тоже переводим
+        if (tag === 'ul' || tag === 'ol' || tag === 'blockquote' && ch.querySelector('p') || (tag === 'div' || tag === 'section') && ch.querySelector('figure')) walk(ch);
+        else if (tag === 'figure') { ch.querySelectorAll('figcaption').forEach(cap => { if (cap.textContent.trim()) { slots.push(cap); texts.push(cap.innerHTML); } }); } // подпись к картинке тоже переводим
         else if (tag === 'hr' || tag === 'img' || !ch.textContent.trim()) continue;
         else { slots.push(ch); texts.push(ch.innerHTML); }
       }
     };
     walk(box);
+    // описание картинок (alt) тоже переводим — его читают поисковики и незрячие
+    box.querySelectorAll('img[alt]').forEach(i => { if (i.alt.trim() && !i.parentElement.closest('p, li, h2, h3, h4, blockquote')) { // в абзаце картинка переводится вместе с текстом абзаца slots.push({ set: v => { i.alt = plainText(v); } }); texts.push(i.alt); } });
     return {
       texts,
       rebuild(out) {
-        slots.forEach((el, i) => { el.innerHTML = out[3 + i]; });
+        slots.forEach((el, i) => { if (el.set) el.set(out[3 + i]); else el.innerHTML = out[3 + i]; });
         // название и описание — обычный текст: Google в режиме HTML отдаёт кавычки как &quot; — раскодируем
         const plain = v => { const x = document.createElement('textarea'); x.innerHTML = String(v || ''); return x.value; };
         return { t: plain(out[0]), d: plain(out[1]), tags: out[2], b: box.innerHTML };
