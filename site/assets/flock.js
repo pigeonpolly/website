@@ -1206,7 +1206,7 @@
   Object.assign(EVENTS, {
     // сильный ветер: всех сдувает, листья и крошки улетают, стаканчик падает
     wind: {
-      ok: () => !loc, w: 1, // ветер — только в сквере
+      ok: () => !loc || loc === 'pumpkins', w: 1, // ветер — только на улице: в сквере и на тыквенном поле
       start(e) {
         e.dir = Math.random() < .5 ? 1 : -1; e.t = 0; e.dur = rnd(7, 9);
         e.list = freeBirds(); enlist(e.list, e);
@@ -1235,12 +1235,13 @@
     },
     // дождь: все прячутся под скамейку, остаются лужи
     rain: {
-      ok: () => !loc, w: 1, // дождь — только в сквере
+      ok: () => !loc || loc === 'pumpkins', w: 1, // дождь — только на улице
       start(e) {
         e.t = 0; e.dur = rnd(9, 12);
         e.list = freeBirds(); enlist(e.list, e);
-        const B = props.bench;
-        for (const b of e.list) b.tasks.push({ say: '!', t: 1 }, { go: { x: rnd(B + 4, B + 46), y: rnd(Y0, Y0 + 5) }, fast: 1.8 }, { wait: 99 });
+        const B = loc === 'pumpkins' ? Math.round(W * .03) : props.bench; // на поле прячутся в тыквы, остальные — к тюкам сена
+        const pks = loc === 'pumpkins' ? items.filter(i => i.type === 'bigpk' && !i.gone && !(i.who && i.who.inside)) : [];
+        e.list.forEach((b, i) => { b.tasks.push({ say: '!', t: 1 }); if (i < pks.length) hideIn(b, pks[i], 99); else b.tasks.push({ go: { x: rnd(B + 4, B + 46), y: rnd(Y0, Y0 + 5) }, fast: 1.8 }, { wait: 99 }); });
         for (let i = 0; i < 4; i++) puddles.push({ x: rnd(W * .3, W * .95), y: rnd(Y0 + 8, Y1), r: rnd(8, 16), a: 0, life: 40 });
       },
       update(e, dt) {
