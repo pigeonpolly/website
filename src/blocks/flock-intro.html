@@ -1,0 +1,78 @@
+<style>
+  .fi { box-sizing: border-box; padding: 64px; background: #FFFFFF; font-family: 'Karla', sans-serif; color: #2B1A51;
+    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 48px; align-items: center; }
+  .fi-kick { margin: 0 0 10px; font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; color: #D85A30; }
+  .fi h2 { margin: 0 0 18px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(30px, 3.2vw, 44px); line-height: 1.1; }
+  .fi-txt { margin: 0 0 18px; max-width: 46ch; font-size: 17px; line-height: 1.7; color: #4A3E68; }
+  .fi-steps { margin: 0 0 24px; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 10px; }
+  .fi-steps li { counter-increment: s; display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: start; font-size: 16px; line-height: 1.5; color: #4A3E68; }
+  .fi-steps li::before { content: counter(s); display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #2B1A51; color: #F5D547; font-weight: 800; }
+  .fi-steps b { color: #2B1A51; }
+  .fi-act { display: flex; flex-wrap: wrap; gap: 10px; }
+  .fi-act a, .fi-act button { padding: 11px 20px; border-radius: 99px; border: 2px solid #2B1A51; background: #fff; color: #2B1A51; font: 700 15px 'Karla', sans-serif; text-decoration: none; cursor: pointer; }
+  .fi-act .fi-main { background: #2B1A51; color: #fff; }
+  .fi-act a:hover, .fi-act button:hover { background: #E9A93B; border-color: #E9A93B; color: #2B1A51; }
+  .fi-kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+  .fi-kind { margin: 0; padding: 18px 12px 16px; border-radius: 22px; background: #F3EFFA; text-align: center; }
+  .fi-kind .pp-ava { margin: 0 auto 10px; }
+  .fi-kind h3 { margin: 0 0 4px; font-family: 'Fraunces', serif; font-size: 21px; }
+  .fi-kind p { margin: 0; font-size: 14px; line-height: 1.45; color: #6A5E8A; }
+  .fi-kind small { display: inline-block; margin-top: 8px; padding: 2px 10px; border-radius: 99px; background: #2B1A51; color: #F5D547; font-weight: 700; font-size: 12px; }
+  .fi-gifts { margin-top: 22px; padding: 18px 18px 14px; border-radius: 22px; background: #2B1A51; color: #F3EFFA; }
+  .fi-gifts h3 { margin: 0 0 4px; font-family: 'Fraunces', serif; font-size: 21px; color: #F5D547; }
+  .fi-gifts p { margin: 0 0 12px; font-size: 14px; line-height: 1.5; opacity: .85; }
+  .fi-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; }
+  @media (max-width: 900px) {
+    .fi { grid-template-columns: 1fr; gap: 32px; padding: 48px 20px; }
+    .fi-kinds { gap: 10px; }
+    .fi-kind { padding: 14px 6px; }
+    .fi-kind h3 { font-size: 18px; }
+    .fi-row { justify-content: center; }
+  }
+</style>
+
+<section class="fi" id="get-a-bird">
+  <div>
+    <p class="fi-kick">Your own pixel character</p>
+    <h2>Get a bird and join the flock</h2>
+    <p class="fi-txt">Everyone who signs in on this site gets their own little pixel character. It is drawn from your account, so no two are alike: different shapes, colours, hats and very fancy shoes.</p>
+    <ol class="fi-steps">
+      <li><span><b>Sign in with Google</b> and choose a nickname. Your character appears in the flock right away.</span></li>
+      <li><span><b>Draw in the daily challenge</b> to collect badges and keep your streak going.</span></li>
+      <li><span><b>Open gifts</b> in your bag: hats, scarves, backgrounds, frames and treasures. Wear them or keep them for later.</span></li>
+    </ol>
+    <div class="fi-act"><button type="button" class="fi-main" data-fi-signin>🐦 Sign in and get my bird</button><a href="/flock/">See the flock</a><a href="/flock/#collections">🎒 Collections</a></div>
+  </div>
+
+  <div>
+    <div class="fi-kinds">
+      <figure class="fi-kind" data-fi-id="3"><h3>Birds</h3><p>Most of the flock. Round, tall or tiny, every one is different.</p></figure>
+      <figure class="fi-kind" data-fi-id="10"><h3>Cats</h3><p>Every 10th guest is a friendly cat. Yes, cats wear shoes too.</p><small>1 in 10</small></figure>
+      <figure class="fi-kind" data-fi-id="22"><h3>Crows</h3><p>Every 11th guest is a crow with a treasure in its beak.</p><small>1 in 11</small></figure>
+    </div>
+    <div class="fi-gifts">
+      <h3>Things to collect</h3>
+      <p>Gift seeds arrive in your profile. Hover to see a bird wearing them.</p>
+      <div class="fi-row" data-fi-gifts></div>
+    </div>
+  </div>
+</section>
+<script>
+  // персонажи и примеры подарков рисует birds.js; кнопка входа открывает окно Google в шапке
+  addEventListener('load', () => {
+    const B = window.PPBirds, root = document.getElementById('get-a-bird');
+    if (!root) return;
+    if (B) {
+      root.querySelectorAll('[data-fi-id]').forEach(f => f.prepend(B.avatar(+f.dataset.fiId, { bg: "#FFFDF5" }, matchMedia("(max-width: 900px)").matches ? 88 : 120)));
+      const row = root.querySelector('[data-fi-gifts]');
+      [['hat', 'wizard'], ['item', 'pizza'], ['scarf', '#E0443A'], ['shoes', 'boots:3'], ['hat', 'crown:0'], ['item', 'dragonegg'], ['frame', 'gold']]
+        .forEach(([k, v]) => { try { row.appendChild(B.giftPic(k, v, 7, 64)); } catch (e) { console.warn('gift', k, v, e); } });
+    }
+    const btn = root.querySelector('[data-fi-signin]');
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (window.PPAccount && window.PPAccount.signedIn()) { location.href = '/flock/'; return; }
+      window.PPAccount ? window.PPAccount.openSignIn() : location.href = '/flock/';
+    });
+  });
+</script>

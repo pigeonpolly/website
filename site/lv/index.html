@@ -454,98 +454,78 @@ document.querySelectorAll('.bk-notify').forEach(function (f) {
   </div>
 </section>
 </div>
-<div class="blk" id="blk-sketching-guides" data-ppb="blk-sketching-guides"><style>#blk-sketching-guides { margin: 0; background: #FFFFFF; }
-#blk-sketching-guides .books {
-    box-sizing: border-box; padding: 56px 64px;
-    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 48px; align-items: center;
-    font-family: 'Karla', sans-serif; color: #2B1A51;
-  }
-#blk-sketching-guides .kicker { margin: 0 0 10px; font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; color: #D85A30; }
-#blk-sketching-guides h2 { margin: 0 0 18px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(30px, 3.2vw, 44px); line-height: 1.1; }
-#blk-sketching-guides .txt { margin: 0 0 12px; max-width: 44ch; font-size: 17px; line-height: 1.7; color: #4A3E68; }
-#blk-sketching-guides .hint { margin: 18px 0 0; font-size: 15px; color: #8C7FB0; }
-#blk-sketching-guides svg { width: 100%; height: auto; display: block; overflow: visible; }
-#blk-sketching-guides .mine { cursor: pointer; }
-#blk-sketching-guides .mine > g { transition: transform .25s; transform-box: fill-box; transform-origin: center; }
-#blk-sketching-guides .mine:hover > g { transform: translateX(-18px); }
-#blk-sketching-guides .mine:focus-visible { outline: 3px solid #D85A30; outline-offset: 4px; }
-@media (max-width: 820px) {#blk-sketching-guides .books { grid-template-columns: 1fr; gap: 36px; padding: 48px 26px; }
-#blk-sketching-guides .pile { order: -1; }}</style><section class="books">
+<div class="blk" id="blk-flock-intro" data-ppb="blk-flock-intro"><style>#blk-flock-intro .fi { box-sizing: border-box; padding: 64px; background: #FFFFFF; font-family: 'Karla', sans-serif; color: #2B1A51;
+    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 48px; align-items: center; }
+#blk-flock-intro .fi-kick { margin: 0 0 10px; font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; color: #D85A30; }
+#blk-flock-intro .fi h2 { margin: 0 0 18px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(30px, 3.2vw, 44px); line-height: 1.1; }
+#blk-flock-intro .fi-txt { margin: 0 0 18px; max-width: 46ch; font-size: 17px; line-height: 1.7; color: #4A3E68; }
+#blk-flock-intro .fi-steps { margin: 0 0 24px; padding: 0; list-style: none; counter-reset: s; display: grid; gap: 10px; }
+#blk-flock-intro .fi-steps li { counter-increment: s; display: grid; grid-template-columns: 32px 1fr; gap: 12px; align-items: start; font-size: 16px; line-height: 1.5; color: #4A3E68; }
+#blk-flock-intro .fi-steps li::before { content: counter(s); display: grid; place-items: center; width: 32px; height: 32px; border-radius: 50%; background: #2B1A51; color: #F5D547; font-weight: 800; }
+#blk-flock-intro .fi-steps b { color: #2B1A51; }
+#blk-flock-intro .fi-act { display: flex; flex-wrap: wrap; gap: 10px; }
+#blk-flock-intro .fi-act a, #blk-flock-intro .fi-act button { padding: 11px 20px; border-radius: 99px; border: 2px solid #2B1A51; background: #fff; color: #2B1A51; font: 700 15px 'Karla', sans-serif; text-decoration: none; cursor: pointer; }
+#blk-flock-intro .fi-act .fi-main { background: #2B1A51; color: #fff; }
+#blk-flock-intro .fi-act a:hover, #blk-flock-intro .fi-act button:hover { background: #E9A93B; border-color: #E9A93B; color: #2B1A51; }
+#blk-flock-intro .fi-kinds { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 16px; }
+#blk-flock-intro .fi-kind { margin: 0; padding: 18px 12px 16px; border-radius: 22px; background: #F3EFFA; text-align: center; }
+#blk-flock-intro .fi-kind .pp-ava { margin: 0 auto 10px; }
+#blk-flock-intro .fi-kind h3 { margin: 0 0 4px; font-family: 'Fraunces', serif; font-size: 21px; }
+#blk-flock-intro .fi-kind p { margin: 0; font-size: 14px; line-height: 1.45; color: #6A5E8A; }
+#blk-flock-intro .fi-kind small { display: inline-block; margin-top: 8px; padding: 2px 10px; border-radius: 99px; background: #2B1A51; color: #F5D547; font-weight: 700; font-size: 12px; }
+#blk-flock-intro .fi-gifts { margin-top: 22px; padding: 18px 18px 14px; border-radius: 22px; background: #2B1A51; color: #F3EFFA; }
+#blk-flock-intro .fi-gifts h3 { margin: 0 0 4px; font-family: 'Fraunces', serif; font-size: 21px; color: #F5D547; }
+#blk-flock-intro .fi-gifts p { margin: 0 0 12px; font-size: 14px; line-height: 1.5; opacity: .85; }
+#blk-flock-intro .fi-row { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; }
+@media (max-width: 900px) {#blk-flock-intro .fi { grid-template-columns: 1fr; gap: 32px; padding: 48px 20px; }
+#blk-flock-intro .fi-kinds { gap: 10px; }
+#blk-flock-intro .fi-kind { padding: 14px 6px; }
+#blk-flock-intro .fi-kind h3 { font-size: 18px; }
+#blk-flock-intro .fi-row { justify-content: center; }}</style><section class="fi" id="get-a-bird">
   <div>
-    <p class="kicker">Rakstījusi un zīmējusi es</p>
-    <h2>Skicēšanas ceļveži no mana galda</h2>
-    <p class="txt">Īsas, praktiskas grāmatas tiem, kas grib sākt skicēt, nevis būt perfekti. Akvarelis, tuša un mazie ieradumi, kas uztur skiču burtnīcu dzīvu.</p>
-    <p class="txt">Drīzumā vairāk ceļvežu.</p>
-    <p class="hint">Noklikšķini uz krāsainas grāmatas, lai to atvērtu.</p>
+    <p class="fi-kick">Tavs pikseļu tēls</p>
+    <h2>Saņem putniņu un pievienojies baram</h2>
+    <p class="fi-txt">Katrs, kurš ienāk vietnē, saņem savu mazo pikseļu tēlu. Tas tiek uzzīmēts pēc tava konta, tāpēc divu vienādu nav: dažādas formas, krāsas, cepures un ļoti stilīgas kurpes.</p>
+    <ol class="fi-steps">
+      <li><span><b>Ienāc ar Google</b> un izvēlies segvārdu. Tavs tēls uzreiz parādīsies barā.</span></li>
+      <li><span><b>Zīmē ikdienas izaicinājumā</b>, krāj nozīmītes un turpini savu sēriju.</span></li>
+      <li><span><b>Atver dāvanas</b> savā somā: cepures, šallītes, fonus, rāmjus un dārgumus. Valkā tās uzreiz vai glabā vēlākam.</span></li>
+    </ol>
+    <div class="fi-act"><button type="button" class="fi-main" data-fi-signin>🐦 Ienākt un saņemt putniņu</button><a href="/lv/flock/">Apskatīt baru</a><a href="/lv/flock/#collections">🎒 Kolekcijas</a></div>
   </div>
 
-  <div class="pile">
-    <svg viewBox="0 0 640 470" role="img" aria-label="A scattered pile of books with my sketching guides among them">
-      <!-- чужие книги в стопке -->
-      <g>
-        <rect x="70" y="392" width="470" height="46" rx="10" fill="#E3DEF2"/>
-        <rect x="92" y="398" width="24" height="34" rx="4" fill="#CFC7E8"/>
-        <rect x="96" y="346" width="430" height="42" rx="10" fill="#CFC7E8"/>
-        <rect x="118" y="352" width="22" height="30" rx="4" fill="#B9AFDD"/>
-      </g>
-
-      <!-- МОЯ КНИГА 1 — Watercolor Sketches -->
-      <a class="mine" href="https://a.co/d/009gymDC" target="_blank" rel="noopener">
-        <g>
-          <rect x="52" y="288" width="486" height="54" rx="12" fill="#D85A30"/>
-          <rect x="76" y="296" width="26" height="38" rx="5" fill="#F5C4B3"/>
-          <text x="126" y="323" font-family="Fraunces, serif" font-size="23" font-weight="600" fill="#FFF6F1">Watercolor Sketches</text>
-          <path d="M498 315 l8 -14 8 14 -8 14z" fill="#F5C4B3"/>
-        </g>
-      </a>
-
-      <!-- МОЯ КНИГА 2 — Ink Sketching -->
-      <a class="mine" href="https://a.co/d/0cJY0kk5" target="_blank" rel="noopener">
-        <g>
-          <rect x="66" y="238" width="458" height="50" rx="12" fill="#2B1A51"/>
-          <rect x="88" y="246" width="24" height="34" rx="5" fill="#E9A93B"/>
-          <text x="136" y="270" font-family="Fraunces, serif" font-size="22" font-weight="600" fill="#F3EFFA">Ink Sketching</text>
-          <path d="M486 263 l8 -13 8 13 -8 13z" fill="#E9A93B"/>
-        </g>
-      </a>
-
-      <!-- чужая книга -->
-      <rect x="58" y="192" width="452" height="44" rx="10" fill="#D9D2EE"/>
-      <rect x="80" y="198" width="22" height="32" rx="4" fill="#BEB4E0"/>
-
-      <!-- МОЯ КНИГА 3 — бесплатный гайд с Google Диска -->
-      <a class="mine" href="https://drive.google.com/file/d/1IWMWb0nLOaN2UuJLZA-DqhdmwDh3T9Nx/view?usp=sharing" target="_blank" rel="noopener">
-        <g>
-          <rect x="80" y="142" width="426" height="48" rx="12" fill="#7F5AC0"/>
-          <rect x="102" y="150" width="24" height="32" rx="5" fill="#E3D6FA"/>
-          <text x="150" y="173" font-family="Fraunces, serif" font-size="22" font-weight="600" fill="#F3EFFA">Coloring Book (bezmaksas)</text>
-          <path d="M468 166 l8 -13 8 13 -8 13z" fill="#E3D6FA"/>
-        </g>
-      </a>
-      <!-- НОВАЯ КНИГА — Urban Sketching: Digital Traveler (скоро) -->
-      <a class="mine" href="/lv/blog/new-book-coming-soon/">
-        <g>
-          <rect x="104" y="94" width="384" height="46" rx="12" fill="#8E6FE0"/>
-          <rect x="126" y="101" width="24" height="32" rx="5" fill="#F5C4B3"/>
-          <text x="174" y="124" font-family="Fraunces, serif" font-size="21" font-weight="600" fill="#FFFFFF">Urban Sketching · soon</text>
-          <path d="M456 117 l8 -13 8 13 -8 13z" fill="#F5C4B3"/>
-        </g>
-      </a>
-
-      <!-- чужая книга сверху -->
-      <rect x="150" y="50" width="330" height="40" rx="10" fill="#E3DEF2"/>
-      <rect x="172" y="56" width="20" height="28" rx="4" fill="#CFC7E8"/>
-
-      <!-- кисточка, прислонённая к стопке -->
-      <g>
-        <path d="M566 412 L596 140" stroke="#B9AFDD" stroke-width="9" stroke-linecap="round"/>
-        <path d="M596 140 c10 -22 2 -40 -8 -46 c-12 8 -14 26 -6 46z" fill="#E9A93B"/>
-      </g>
-      <path d="M60 438 H600" stroke="#D85A30" stroke-width="6" stroke-linecap="round"/>
-
-    </svg>
+  <div>
+    <div class="fi-kinds">
+      <figure class="fi-kind" data-fi-id="3"><h3>Putniņi</h3><p>Lielākā bara daļa. Apaļi, gari vai sīciņi, visi atšķirīgi.</p></figure>
+      <figure class="fi-kind" data-fi-id="10"><h3>Kaķi</h3><p>Katrs 10. viesis ir draudzīgs kaķis. Jā, arī kaķi nēsā kurpes.</p><small>1 no 10</small></figure>
+      <figure class="fi-kind" data-fi-id="22"><h3>Vārnas</h3><p>Katrs 11. viesis ir vārna ar dārgumu knābī.</p><small>1 no 11</small></figure>
+    </div>
+    <div class="fi-gifts">
+      <h3>Ko var savākt</h3>
+      <p>Dāvanu sēkliņas pienāk tavā profilā. Uzbrauc, lai redzētu tās uz putniņa.</p>
+      <div class="fi-row" data-fi-gifts></div>
+    </div>
   </div>
 </section>
+<script>
+  // персонажи и примеры подарков рисует birds.js; кнопка входа открывает окно Google в шапке
+  addEventListener('load', () => {
+    const B = window.PPBirds, root = document.getElementById('get-a-bird');
+    if (!root) return;
+    if (B) {
+      root.querySelectorAll('[data-fi-id]').forEach(f => f.prepend(B.avatar(+f.dataset.fiId, { bg: "#FFFDF5" }, matchMedia("(max-width: 900px)").matches ? 88 : 120)));
+      const row = root.querySelector('[data-fi-gifts]');
+      [['hat', 'wizard'], ['item', 'pizza'], ['scarf', '#E0443A'], ['shoes', 'boots:3'], ['hat', 'crown:0'], ['item', 'dragonegg'], ['frame', 'gold']]
+        .forEach(([k, v]) => { try { row.appendChild(B.giftPic(k, v, 7, 64)); } catch (e) { console.warn('gift', k, v, e); } });
+    }
+    const btn = root.querySelector('[data-fi-signin]');
+    btn.addEventListener('click', e => {
+      e.stopPropagation();
+      if (window.PPAccount && window.PPAccount.signedIn()) { location.href = '/flock/'; return; }
+      window.PPAccount ? window.PPAccount.openSignIn() : location.href = '/flock/';
+    });
+  });
+</script>
 </div>
 <div class="blk" id="blk-flock" data-ppb="blk-flock"><style>#blk-flock .fl { padding: 56px var(--gutter) 64px; text-align: center; }
 #blk-flock .fl-kick { margin: 0 0 6px; font: italic 400 18px var(--serif); color: #F0A987; }
