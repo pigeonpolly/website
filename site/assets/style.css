@@ -1489,8 +1489,9 @@ html:has(.q-modal:not([hidden])) { overflow: hidden; } /* пока открыт�
 .q-zone { position: absolute; padding: 0; border: 2px solid transparent; border-radius: 10px; background: transparent; cursor: zoom-in; transition: border-color .15s, background .15s; }
 .q-zone:hover, .q-zone:focus-visible { border-color: #F5D547; background: rgba(245, 213, 71, .14); outline: 0; }
 .q-zone.done::after { content: '📌'; position: absolute; top: -10px; right: -6px; font-size: 18px; line-height: 1; }
-.q-zone.spark::before { content: ''; position: absolute; left: 50%; top: 50%; width: 14px; height: 14px; margin: -7px; border-radius: 50%; background: radial-gradient(circle, #FFF8C4 0, rgba(245, 213, 71, .8) 35%, rgba(245, 213, 71, 0) 70%); animation: q-glint 1.6s ease-in-out infinite; }
-@keyframes q-glint { 50% { transform: scale(1.8); opacity: .4; } }
+.q-zone.spark::before { content: ''; position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; margin: -9px; border-radius: 50%; background: #F5D547; box-shadow: 0 0 0 3px #2B1A51, 0 0 0 6px rgba(245, 213, 71, .55), 0 0 18px 6px rgba(245, 213, 71, .7); animation: q-glint 1.4s ease-in-out infinite; }
+.q-zone.spark.person::before { top: 26%; }
+@keyframes q-glint { 50% { transform: scale(1.35); opacity: .75; } }
 @media (prefers-reduced-motion: reduce) { .q-zone.spark::before { animation: none; } }
 .q-say { margin: 12px 0 0; padding: 10px 14px; background: #E9D9B0; box-shadow: 3px 3px 0 #C9A86A; font: italic 15px/1.5 var(--serif); }
 .q-emo { display: inline-block; font-size: 26px; line-height: 1; }
@@ -2728,3 +2729,16 @@ html.sb-hide { --sb: 0px; }
   .q-tabs button { font-size: 12px; padding: 6px 10px; }
   .q-banner > button { font-size: 12px; padding: 6px 12px; }
 }
+
+/* квесты: «Что делать» — шаги над комнатой */
+.q-guide { display: flex; flex-wrap: wrap; gap: 6px; max-width: 1280px; margin: 0 auto 12px; padding: 0; list-style: none; }
+.q-guide[hidden] { display: none; }
+.q-guide-h { flex: 1 1 100%; }
+.q-guide .q-guide-h button { padding: 0; border: 0; background: none; font: 700 13px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: var(--peach); }
+.q-guide button { display: block; padding: 7px 12px; border: 1.5px solid var(--line); border-radius: 10px; background: rgba(255, 255, 255, .04); color: var(--muted); font: 600 13px/1.35 var(--sans); text-align: left; cursor: pointer; }
+.q-guide .done button { opacity: .6; text-decoration: line-through; text-decoration-color: rgba(255, 255, 255, .35); }
+.q-guide .cur { flex: 1 1 100%; }
+.q-guide .cur button { width: 100%; padding: 11px 16px; border-color: #F5D547; background: rgba(245, 213, 71, .12); color: var(--text); font-size: 15px; }
+.rm-hot.q-flash, .q-clue.q-flash { animation: q-want .8s ease-in-out 4; outline: 3px dashed #F5D547; outline-offset: 2px; z-index: 4; }
+.q-zone.spark.talk::before { background: #FFFFFF; }
+@media (max-width: 760px) { .q-guide button { font-size: 12px; } .q-guide .cur button { font-size: 14px; } .q-guide:not(.open) li:not(.cur):not(.q-guide-h) { display: none; } }

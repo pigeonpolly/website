@@ -24,6 +24,15 @@
     needAll: [n => `Pin all ${n} clues to the board first.`, n => `Сначала приколите на доску все ${n} улик.`, n => `Vispirms piesprauž pie dēļa visus ${n} pierādījumus.`],
     scene: ['🖼 Crime scene', '🖼 Место происшествия', '🖼 Notikuma vieta'],
     sceneHint: ['Click the people and things in the photo.', 'Нажимайте на людей и вещи на фото.', 'Spied uz cilvēkiem un lietām foto.'],
+    guideT: ['What to do', 'Что делать', 'Ko darīt'],
+    gMag: ['Take the magnifying glass: it is on the filing cabinet, next to the coffee pot', 'Возьмите лупу: она лежит на шкафу с документами, рядом с кофейником', 'Paņem lupu: tā ir uz dokumentu skapja, blakus kafijas kannai'],
+    gSearch: [n => `Search the office: tap folders, papers, the dictaphone, the bin, the coat and everything that sticks out (${n} found)`, n => `Обыщите кабинет: нажимайте на папки, бумаги, диктофон, корзину, плащ и всё, что выделяется (найдено ${n})`, n => `Pārmeklē kabinetu: spied uz mapēm, papīriem, diktofonu, grozu, mēteli un visu, kas izceļas (atrasti ${n})`],
+    gScene: ['Open “🖼 Crime scene” and tap everything that blinks', 'Откройте «🖼 Место происшествия» и нажимайте на всё, что мигает', 'Atver “🖼 Notikuma vieta” un spied uz visu, kas mirgo'],
+    gWit: [n => `Question the three gentlemen in top hats, all three questions each (${n}/3)`, n => `Допросите трёх джентльменов в цилиндрах, каждому все три вопроса (${n}/3)`, n => `Nopratini trīs džentlmeņus cilindros, katram visus trīs jautājumus (${n}/3)`],
+    gExam: [(n, m) => `Examine the small clues with the magnifier (${n}/${m})`, (n, m) => `Рассмотрите мелкие улики под лупой (${n}/${m})`, (n, m) => `Apskati sīkos pierādījumus ar lupu (${n}/${m})`],
+    gPin: [(n, m) => `Pin every clue to the evidence board (${n}/${m})`, (n, m) => `Приколите все улики на доску (${n}/${m})`, (n, m) => `Piesprauž visus pierādījumus pie dēļa (${n}/${m})`],
+    gDoss: ['Read the suspects’ folders (filing cabinet drawer)', 'Изучите папки подозреваемых (ящик шкафа)', 'Izlasi aizdomās turamo mapes (skapja atvilktne)'],
+    gAcc: ['Name the culprit on the evidence board', 'Назовите виновного на доске улик', 'Nosauc vainīgo uz pierādījumu dēļa'],
     sceneSwipe: ['The photo scrolls sideways.', 'Фото листается вбок.', 'Foto var ritināt uz sāniem.'],
     ask: ['🗣 Interrogation', '🗣 Допрос', '🗣 Nopratināšana'],
     askAll: ['Ask all three questions first.', 'Сначала задайте все три вопроса.', 'Vispirms uzdodiet visus trīs jautājumus.'],
@@ -212,7 +221,34 @@
   const banner = document.createElement('div'); banner.className = 'q-banner'; bar.insertBefore(banner, bar.firstChild.nextSibling);
   const pockets = document.createElement('div'); pockets.className = 'q-pockets'; (A.pan || box).after(pockets);
   const modal = document.createElement('div'); modal.className = 'q-modal'; modal.hidden = true; document.body.appendChild(modal); // окно — поверх всей страницы (на iPhone внутри прокручиваемой комнаты оно обрезалось)
+  // «Что делать»: шаги над комнатой; текущий выделен, нажатие показывает место или открывает окно
+  const guide = document.createElement('ol'); guide.className = 'q-guide'; (A.pan || box).before(guide);
+  const steps = () => {
+    const pinned = st.pinned.length, an = ORDER.filter(id => C[id].kind === 'analyze'), anDone = an.filter(id => st.analyzed.includes(id)).length;
+    const list = [{ done: st.mag, text: t(UI.gMag), act: 'mag' }];
+    if (K.scene) {
+      const wits = Object.keys(K.W), wDone = wits.filter(w => (st.asked[w] || []).length >= K.W[w].qa.length).length;
+      list.push({ done: st.found.length > 0, text: t(UI.gScene), act: 'scene' }, { done: wDone === wits.length, text: t(UI.gWit)(wDone), act: 'scene' });
+    } else list.push({ done: st.found.length >= N, text: t(UI.gSearch)(st.found.length), act: 'show' });
+    list.push({ done: anDone === an.length, text: t(UI.gExam)(anDone, an.length), act: K.scene ? 'scene' : 'show' },
+      { done: pinned >= N, text: t(UI.gPin)(pinned, N), act: 'board' }, { done: st.dossiers, text: t(UI.gDoss), act: 'doss' }, { done: st.solved, text: t(UI.gAcc), act: 'board' });
+    return list;
+  };
+  const drawGuide = () => {
+    if (st.solved) { guide.hidden = true; return; }
+    const list = steps(), cur = list.findIndex(x => !x.done);
+    guide.hidden = false;
+    guide.innerHTML = `<li class="q-guide-h"><button type="button" data-g="all">${t(UI.guideT)} · ${Math.min(cur + 1, list.length)}/${list.length} <span class="q-m">▾</span></button></li>` + list.map((x, i) => `<li class="${x.done ? 'done' : i === cur ? 'cur' : ''}"><button type="button" data-g="${x.act}">${x.done ? '✅' : i === cur ? '👉' : '▫️'} ${esc(x.text)}</button></li>`).join('');
+  };
+  const flash = keys => { // подсветить места в комнате и прокрутить к первому
+    const els = keys.map(k => box.querySelector(`.rm-hot[data-k="${k}"]`) || sprites[k]).filter(Boolean);
+    els.forEach(el => { el.classList.remove('q-flash'); void el.offsetWidth; el.classList.add('q-flash'); setTimeout(() => el.classList.remove('q-flash'), 3200); });
+    const pan = A.pan, el = els[0];
+    if (pan && el && pan.scrollWidth > pan.clientWidth + 4) { const r = el.getBoundingClientRect(), b = box.getBoundingClientRect(); pan.scrollTo({ left: r.left - b.left + r.width / 2 - pan.clientWidth / 2, behavior: 'smooth' }); }
+    (A.pan || box).scrollIntoView({ behavior: 'smooth', block: 'center' });
+  };
   const draw = () => {
+    drawGuide();
     const mz = box.querySelector('.rm-hot[data-k="magnifier"]'); if (mz) mz.classList.toggle('q-want', !st.mag && !st.solved);
     banner.innerHTML = `<nav class="q-tabs">${CASES.map(c => `<button type="button" data-case="${c.no}" class="${c.no === K.no ? 'on' : ''}">${t(UI.caseNo)} ${c.no} · ${esc(t(c.title))}${load(c.key).solved ? ' ✅' : ''}</button>`).join('')}</nav>` +
       (st.solved ? `<span class="q-stat">✅ ${t(UI.solvedT)}</span><button type="button" data-q="again">${t(UI.again)}</button>`
@@ -249,7 +285,8 @@
     const z = K.scene.zones.map((z, i) => {
       const done = z.clue ? st.pinned.includes(z.clue) : z.wit ? st.pinned.includes('w_' + z.wit) : false;
       const label = z.clue ? t(C[z.clue].title) : z.wit ? t(K.W[z.wit].name) : '';
-      return `<button type="button" class="q-zone${z.spark && !st.found.includes(z.clue) ? ' spark' : ''}${done ? ' done' : ''}" style="left:${z.x}%;top:${z.y}%;width:${z.w}%;height:${z.h}%" data-zone="${i}" aria-label="${esc(label || '…')}"${label ? ` title="${esc(label)}"` : ''}></button>`;
+      const seen = z.say ? st.heard : done;
+      return `<button type="button" class="q-zone${seen ? '' : ' spark'}${z.clue || z.wit ? '' : ' talk'}${z.h > 30 ? ' person' : ''}${done ? ' done' : ''}" style="left:${z.x}%;top:${z.y}%;width:${z.w}%;height:${z.h}%" data-zone="${i}" aria-label="${esc(label || '…')}"${label ? ` title="${esc(label)}"` : ''}></button>`;
     }).join('');
     card(`<p class="q-kick">${t(UI.scene)} · ${esc(t(K.label))}</p><p class="q-hint">${t(UI.sceneHint)} <span class="q-m">${t(UI.sceneSwipe)}</span></p>
       <div class="q-scene"><img src="${K.scene.img}" alt="${esc(t(K.title))}">${z}</div>${msg ? `<p class="q-say">${esc(msg)}</p>` : ''}`, true);
@@ -266,7 +303,7 @@
     card(`<h3>${t(UI.board)}</h3><div class="q-cork${N > 7 ? ' tall' : ''}"><svg viewBox="0 0 100 100" preserveAspectRatio="none">${lines}</svg>${slots}</div>${sus}`);
   };
   const openDossiers = () => {
-    st.dossiers = true; save();
+    st.dossiers = true; save(); drawGuide();
     card(`<p class="q-kick">🗂 ${t(UI.suspects)}</p><div class="q-doss">${Object.entries(S).map(([k, s]) => `<article><img src="${K.sus(k)}" alt=""><h4>${esc(t(s.name))}</h4><p>${esc(t(s.text))}</p></article>`).join('')}</div>`);
   };
   const solve = (k) => {
@@ -306,9 +343,11 @@
   };
   const click = e => {
     const q = e.target.closest('[data-q]'), o = e.target.closest('[data-open]'), a = e.target.closest('[data-acc]'), cs = e.target.closest('[data-case]');
-    const zn = e.target.closest('[data-zone]'), ask = e.target.closest('[data-ask]');
+    const zn = e.target.closest('[data-zone]'), ask = e.target.closest('[data-ask]'), g = e.target.closest('[data-g]');
+    if (g) { const a = g.dataset.g; if (a === 'all') { guide.classList.toggle('open'); return; } if (a === 'mag') flash(['magnifier']); if (a === 'scene') openScene(); if (a === 'board') openBoard(); if (a === 'doss') openDossiers();
+      if (a === 'show') flash(ORDER.filter(id => !st.found.includes(id)).map(id => C[id].hot || id)); return; }
     if (cs) { if (Number(cs.dataset.case) !== K.no) { try { localStorage.setItem('pp-titos-case', cs.dataset.case); } catch (x) {} location.reload(); } return; }
-    if (zn) { const z = K.scene.zones[zn.dataset.zone]; if (z.clue) openClue(z.clue); else if (z.wit) openWitness(z.wit); else openScene(t(z.say)); return; }
+    if (zn) { const z = K.scene.zones[zn.dataset.zone]; if (z.clue) openClue(z.clue); else if (z.wit) openWitness(z.wit); else { st.heard = true; save(); openScene(t(z.say)); } return; }
     if (ask) { const w = ask.dataset.ask, list = st.asked[w] || (st.asked[w] = []); if (!list.includes(+ask.dataset.i)) list.push(+ask.dataset.i); save(); openWitness(w); return; }
     if (o) { openClue(o.dataset.open); return; }
     if (a && !a.disabled) { solve(a.dataset.acc); return; }
@@ -321,7 +360,7 @@
     if (q.dataset.q === 'pin') { if (!st.pinned.includes(id)) st.pinned.push(id); if (!st.found.includes(id)) st.found.push(id); save(); draw(); openBoard(); }
     if (q.dataset.q === 'again') { localStorage.removeItem(K.key); location.reload(); }
   };
-  [modal, banner, pockets].forEach(el => el.addEventListener('click', click));
+  [modal, banner, pockets, guide].forEach(el => el.addEventListener('click', click));
   modal.addEventListener('click', e => { if (e.target === modal) close(); });
   addEventListener('keydown', e => { if (e.key === 'Escape' && !modal.hidden) close(); });
   if (st.solved) { A.coffee.on = false; A.hero && A.hero.classList.add('q-gone'); box.classList.add('q-lightsout'); }
