@@ -126,6 +126,15 @@
   const who = box.dataset.who, hero = SP[who];
   if (hero) setInterval(() => { hero.src = `/images/rooms/${room}-${who}-blink.png`; setTimeout(() => hero.src = `/images/rooms/${room}-${who}.png`, 160); }, 3800);
   API.hero = hero;
+  // телефон: комната шире экрана, её листают пальцем вбок, как панораму (стили — .rm-pan в style.css)
+  const pan = document.createElement('div'); pan.className = 'rm-pan'; box.before(pan); pan.appendChild(box); API.pan = pan;
+  const centerOn = () => { if (pan.scrollWidth <= pan.clientWidth + 4) return; const r = (hero || box).getBoundingClientRect(), b = box.getBoundingClientRect(); pan.scrollLeft = r.left - b.left + r.width / 2 - pan.clientWidth / 2; };
+  setTimeout(centerOn, 50); addEventListener('load', centerOn);
+  if (matchMedia('(max-width: 760px)').matches) {
+    const tip = document.createElement('p'); tip.className = 'rm-swipe';
+    tip.textContent = ['👆 Swipe sideways to look around the room', '👆 Листайте вбок, чтобы осмотреть комнату', '👆 Velc uz sāniem, lai apskatītu istabu'][L];
+    pan.after(tip); pan.addEventListener('scroll', () => tip.classList.add('off'), { once: true });
+  }
   // вечер
   const btn = document.getElementById('rm-time');
   const setEvening = on => { box.classList.toggle('evening', on); btn.textContent = on ? btn.dataset.day : btn.dataset.ev; btn.setAttribute('aria-pressed', on); };

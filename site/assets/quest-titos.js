@@ -24,6 +24,7 @@
     needAll: [n => `Pin all ${n} clues to the board first.`, n => `Сначала приколите на доску все ${n} улик.`, n => `Vispirms piesprauž pie dēļa visus ${n} pierādījumus.`],
     scene: ['🖼 Crime scene', '🖼 Место происшествия', '🖼 Notikuma vieta'],
     sceneHint: ['Click the people and things in the photo.', 'Нажимайте на людей и вещи на фото.', 'Spied uz cilvēkiem un lietām foto.'],
+    sceneSwipe: ['The photo scrolls sideways.', 'Фото листается вбок.', 'Foto var ritināt uz sāniem.'],
     ask: ['🗣 Interrogation', '🗣 Допрос', '🗣 Nopratināšana'],
     askAll: ['Ask all three questions first.', 'Сначала задайте все три вопроса.', 'Vispirms uzdodiet visus trīs jautājumus.'],
     pinW: ['📌 Pin the statement to the board', '📌 Приколоть показания на доску', '📌 Piespraust liecību pie dēļa'],
@@ -195,7 +196,7 @@
     bye: ['Case closed. The cucumbers are safe, the Tomato is home. Time for bed, without coffee. Good night!', 'Дело закрыто. Огурцы в безопасности, Помидорка дома. Пора спать — без кофе. Спокойной ночи!', 'Lieta slēgta. Gurķi ir drošībā, Tomātiņa mājās. Laiks gulēt — bez kafijas. Ar labu nakti!'],
     sus: k => P2(k),
     STR: [[0, 1], [0, 2], [0, 3], [0, 4], [1, 6], [2, 7], [3, 5], [4, 6]],
-    POS: [[4, 6], [29, 4], [54, 6], [78, 8], [4, 44], [29, 46], [54, 44], [78, 46]],
+    POS: [[3, 6], [27, 4], [51, 6], [75, 8], [3, 44], [27, 46], [51, 44], [75, 46]],
   };
   // ---------- какое дело открыто ----------
   const CASES = [CASE1, CASE2];
@@ -209,7 +210,7 @@
   // --- полоска дела над комнатой и карманы под ней
   const bar = document.querySelector('.rm-bar');
   const banner = document.createElement('div'); banner.className = 'q-banner'; bar.insertBefore(banner, bar.firstChild.nextSibling);
-  const pockets = document.createElement('div'); pockets.className = 'q-pockets'; box.after(pockets);
+  const pockets = document.createElement('div'); pockets.className = 'q-pockets'; (A.pan || box).after(pockets);
   const modal = document.createElement('div'); modal.className = 'q-modal'; modal.hidden = true; box.appendChild(modal);
   const draw = () => {
     const mz = box.querySelector('.rm-hot[data-k="magnifier"]'); if (mz) mz.classList.toggle('q-want', !st.mag && !st.solved);
@@ -250,7 +251,7 @@
       const label = z.clue ? t(C[z.clue].title) : z.wit ? t(K.W[z.wit].name) : '';
       return `<button type="button" class="q-zone${z.spark && !st.found.includes(z.clue) ? ' spark' : ''}${done ? ' done' : ''}" style="left:${z.x}%;top:${z.y}%;width:${z.w}%;height:${z.h}%" data-zone="${i}" aria-label="${esc(label || '…')}"${label ? ` title="${esc(label)}"` : ''}></button>`;
     }).join('');
-    card(`<p class="q-kick">${t(UI.scene)} · ${esc(t(K.label))}</p><p class="q-hint">${t(UI.sceneHint)}</p>
+    card(`<p class="q-kick">${t(UI.scene)} · ${esc(t(K.label))}</p><p class="q-hint">${t(UI.sceneHint)} <span class="q-m">${t(UI.sceneSwipe)}</span></p>
       <div class="q-scene"><img src="${K.scene.img}" alt="${esc(t(K.title))}">${z}</div>${msg ? `<p class="q-say">${esc(msg)}</p>` : ''}`, true);
   };
   const openBoard = () => {

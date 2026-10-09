@@ -2709,3 +2709,21 @@ html.sb-hide { --sb: 0px; }
 .sw-medal.past .badge-img { filter: grayscale(1) contrast(1.1); }
 .sw-pager { display: flex; align-items: center; justify-content: center; gap: 14px; margin-top: 16px; }
 .sw-pager #sw-page { color: var(--muted); font-weight: 700; }
+
+/* комнаты на телефоне: панорама, которую листают пальцем; окна квестов — на весь экран */
+.q-m { display: none; }
+@media (max-width: 760px) {
+  .rm-pan { overflow-x: auto; overflow-y: hidden; margin: 0 calc(-1 * var(--gutter)); padding: 8px var(--gutter) 14px; scrollbar-width: none; -webkit-overflow-scrolling: touch; overscroll-behavior-x: contain; }
+  .rm-pan::-webkit-scrollbar { display: none; }
+  .rm-pan > .rm { width: 780px; max-width: none; }
+  .rm-swipe { margin: 4px 0 0; text-align: center; font: 600 14px var(--sans); color: var(--muted); transition: opacity .4s; }
+  .rm-swipe.off { opacity: 0; }
+  .q-modal { position: fixed; z-index: 1000; padding: 10px; }
+  .q-card { max-height: calc(100vh - 20px); max-height: calc(100dvh - 20px); padding: 18px 16px; }
+  .q-card.wide { overflow: auto; }
+  .q-scene { max-width: none; }
+  .q-scene img { max-width: none; max-height: none; height: min(62vh, 520px); width: auto; }
+  .q-m { display: inline; }
+  .q-tabs button { font-size: 12px; padding: 6px 10px; }
+  .q-banner > button { font-size: 12px; padding: 6px 12px; }
+}
