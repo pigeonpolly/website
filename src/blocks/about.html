@@ -32,13 +32,17 @@
     .card { width: min(88%, 360px); }
     .card p { font-size: 16px; }
   }
+  .swap { position: relative; display: block; outline: none; }
+  .swap img { display: block; width: 100%; }
+  .swap .swap-me { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .45s ease; }
+  .swap:hover .swap-me, .swap:focus .swap-me, .swap.on .swap-me { opacity: 1; }
 </style>
 
 <section class="about">
   <div class="card">
     <span class="tape" aria-hidden="true"></span>
     <!-- КАРТИНКА: ID файла с Google Диска после /d/ -->
-    <img src="/images/home/first-pigeon-polly.jpg" alt="The first Pigeon Polly mascot drawing: Polly studying at a cozy desk, a watercolor illustration by Alina Otkinska">
+    <div class="swap" tabindex="0"><img src="/images/home/first-pigeon-polly.jpg" alt="The first Pigeon Polly mascot drawing: Polly studying at a cozy desk, a watercolor illustration by Alina Otkinska"><img class="swap-me" src="/images/home/alina.jpg" alt="Alina Otkinska, the artist behind Pigeon Polly" loading="lazy" onerror="this.parentNode.classList.add('no-me');this.remove()"></div>
     <p>The first Pigeon Polly mascot drawing</p>
   </div>
   <div>
@@ -53,3 +57,7 @@
     </div>
   </div>
 </section>
+<script>
+// на телефоне наведения нет — касание переключает рисунок и фото
+document.querySelectorAll('.about .swap').forEach(function (el) { el.addEventListener('click', function () { el.classList.toggle('on'); }); });
+</script>

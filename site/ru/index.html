@@ -404,11 +404,15 @@
 #blk-about .btn:focus-visible { outline: 3px solid #D85A30; outline-offset: 3px; }
 @media (max-width: 800px) {#blk-about .about { grid-template-columns: 1fr; gap: 48px; padding: 56px 28px; }
 #blk-about .card { width: min(88%, 360px); }
-#blk-about .card p { font-size: 16px; }}</style><section class="about">
+#blk-about .card p { font-size: 16px; }}
+#blk-about .swap { position: relative; display: block; outline: none; }
+#blk-about .swap img { display: block; width: 100%; }
+#blk-about .swap .swap-me { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; opacity: 0; transition: opacity .45s ease; }
+#blk-about .swap:hover .swap-me, #blk-about .swap:focus .swap-me, #blk-about .swap.on .swap-me { opacity: 1; }</style><section class="about">
   <div class="card">
     <span class="tape" aria-hidden="true"></span>
     <!-- КАРТИНКА: ID файла с Google Диска после /d/ -->
-    <img src="/images/home/first-pigeon-polly.jpg" alt="Самый первый рисунок Pigeon Polly: Polly studying at a cozy desk, a watercolor illustration by Alina Otkinska">
+    <div class="swap" tabindex="0"><img src="/images/home/first-pigeon-polly.jpg" alt="Самый первый рисунок Pigeon Polly: Polly studying at a cozy desk, a watercolor illustration by Alina Otkinska"><img class="swap-me" src="/images/home/alina.jpg" alt="Алина — художница, которая придумала Pigeon Polly" loading="lazy" onerror="this.parentNode.classList.add('no-me');this.remove()"></div>
     <p>Самый первый рисунок Pigeon Polly</p>
   </div>
   <div>
@@ -423,6 +427,10 @@
     </div>
   </div>
 </section>
+<script>
+// на телефоне наведения нет — касание переключает рисунок и фото
+document.querySelectorAll('.about .swap').forEach(function (el) { el.addEventListener('click', function () { el.classList.toggle('on'); }); });
+</script>
 </div>
 <div class="blk" id="blk-sketching-guides"><style>#blk-sketching-guides { margin: 0; background: #FFFFFF; }
 #blk-sketching-guides .books {
