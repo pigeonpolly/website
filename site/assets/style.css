@@ -2150,3 +2150,10 @@ details.am-art .am-series { padding: 0 24px 24px; }
   .site-nav .has-sub > .nav-sub { flex-basis: 100%; }
   .site-nav > ul > .has-sub:last-child > .nav-sub, .site-nav > ul > .has-sub:nth-last-child(2) > .nav-sub { right: auto; }
 }
+.be-panehead { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 8px 16px; margin: 4px 0 14px; padding: 10px 14px; border-radius: 14px; border-left: 5px solid; }
+.be-panehead b { font: 700 17px var(--sans); }
+.be-ph-ru { background: #FDEDEA; border-color: #E0443A; } .be-ph-en { background: #E8EFFB; border-color: #4A7BD8; } .be-ph-lv { background: #F7E9EC; border-color: #9E3039; }
+.be-move { font-size: 14px; color: var(--be-mute, #6B6290); }
+.be-move .bc-link { font-weight: 700; }
+.be-langwarn { margin: -4px 0 14px; padding: 10px 14px; border-radius: 12px; background: #FFF4D6; color: #6B4A00; font-size: 15px; display: flex; flex-wrap: wrap; gap: 8px 12px; align-items: center; }
+.be-langwarn[hidden] { display: none; }

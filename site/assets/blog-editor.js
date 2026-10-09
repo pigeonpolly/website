@@ -3,6 +3,7 @@
 (function () {
   const app = document.getElementById('be-app');
   const LANGS = [['ru', 'RU'], ['en', 'EN'], ['lv', 'LV']];
+  const PANE_NAME = { ru: '🇷🇺 Русская версия', en: '🇬🇧 English version', lv: '🇱🇻 Latviešu versija' };
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const api = async (path, body, raw) => {
     const opt = { credentials: 'same-origin' };
@@ -353,6 +354,9 @@
         <li><b>Если переводите в другом переводчике</b> (DeepL, Google Translate) и вставили текст без картинок — нажмите в панели над текстом кнопку <b>«🖼 Картинки из оригинала»</b>: картинки (с подписями) встанут на те же места между абзацами, что и в оригинале. Подписи потом переведите сами.</li></ol>
         Писать можно и прямо здесь, или вставлять из Google Docs (Ctrl+A, Ctrl+C → Ctrl+V в поле «Текст») — картинки сразу скопируются на сайт.</details>
       ${LANGS.map(([l], i) => `<section class="be-pane" data-pane="${l}" ${i ? 'hidden' : ''}>
+        <div class="be-panehead be-ph-${l}"><b>${PANE_NAME[l]}</b>
+          <span class="be-move">Текст не на этом языке? Перенести в: ${LANGS.filter(x => x[0] !== l).map(([o, n]) => `<button type="button" class="bc-link" data-move="${o}">${n}</button>`).join(' · ')}</span></div>
+        <p class="be-langwarn" hidden></p>
         <label class="be-f"><span>Заголовок</span><input type="text" data-k="t_${l}" maxlength="200" value="${esc(post['t_' + l])}"></label>
         <label class="be-f"><span>Краткое описание <small>(видно в списке статей и в Google)</small></span><textarea data-k="d_${l}" rows="2" maxlength="400">${esc(post['d_' + l])}</textarea></label>
         <div class="be-f"><span>Текст</span>
@@ -452,6 +456,40 @@
       const others = LANGS.map(x => x[0]).filter(x => x !== active).map(x => x.toUpperCase());
       $('#be-tr').textContent = `🌐 Перевести с ${active.toUpperCase()} на ${others.join(' и ')}`;
     }));
+    // текст попал не в ту вкладку: перенести (если там уже что-то есть — вкладки меняются местами)
+    const fieldsOf = l => [app.querySelector(`[data-k="t_${l}"]`), app.querySelector(`[data-k="d_${l}"]`), app.querySelector(`[data-k="b_${l}"]`)];
+    const hasText = l => { const [t, d, b] = fieldsOf(l); return !!(t.value.trim() || d.value.trim() || stripHtml(b.innerHTML)); };
+    function moveLang(from, to) {
+      if (hasText(to) && !confirm(`Во вкладке ${to.toUpperCase()} уже есть текст. Поменять вкладки ${from.toUpperCase()} и ${to.toUpperCase()} местами?`)) return;
+      const [t1, d1, b1] = fieldsOf(from), [t2, d2, b2] = fieldsOf(to);
+      [t1.value, t2.value] = [t2.value, t1.value]; [d1.value, d2.value] = [d2.value, d1.value]; [b1.innerHTML, b2.innerHTML] = [b2.innerHTML, b1.innerHTML];
+      const src = $('#be-src'); if (src.value === from) src.value = to; else if (src.value === to) src.value = from;
+      touch(); autoSlug();
+      app.querySelector(`[data-tab="${to}"]`).click();
+      status(`✓ Текст перенесён во вкладку ${to.toUpperCase()}.`);
+      checkLang();
+    }
+    app.querySelectorAll('[data-move]').forEach(b => b.addEventListener('click', () => moveLang(b.closest('[data-pane]').dataset.pane, b.dataset.move)));
+    // подсказка, если язык текста не совпадает с вкладкой
+    function guessLang(l) {
+      const [t, d, b] = fieldsOf(l);
+      const txt = (t.value + ' ' + d.value + ' ' + b.innerText).slice(0, 3000);
+      const cyr = (txt.match(/[а-яё]/gi) || []).length, lat = (txt.match(/[a-zāčēģīķļņšūž]/gi) || []).length, lvd = (txt.match(/[āčēģīķļņšūž]/gi) || []).length;
+      if (cyr + lat < 25) return null;
+      if (cyr > lat) return 'ru';
+      return lvd / Math.max(1, lat) > .015 ? 'lv' : 'en';
+    }
+    function checkLang() {
+      for (const [l] of LANGS) {
+        const w = app.querySelector(`[data-pane="${l}"] .be-langwarn`), g = guessLang(l);
+        if (g && g !== l) { w.hidden = false; w.innerHTML = `⚠ Похоже, здесь текст на <b>${g.toUpperCase()}</b>, а это вкладка <b>${l.toUpperCase()}</b>. <button type="button" class="pill-btn" data-fix="${g}">Перенести во вкладку ${g.toUpperCase()}</button>`; w.querySelector('[data-fix]').onclick = () => moveLang(l, g); }
+        else w.hidden = true;
+      }
+    }
+    let langTimer = 0;
+    app.querySelectorAll('[data-pane]').forEach(p => p.addEventListener('input', () => { clearTimeout(langTimer); langTimer = setTimeout(checkLang, 900); }));
+    app.querySelectorAll('[data-pane]').forEach(p => p.addEventListener('paste', () => { clearTimeout(langTimer); langTimer = setTimeout(checkLang, 900); }));
+    checkLang();
     $('#be-section').addEventListener('change', async e => {
       if (e.target.value !== '__new') return;
       const en = prompt('Название нового раздела на английском (например Weekly Polly):', '');
