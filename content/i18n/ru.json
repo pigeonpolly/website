@@ -292,7 +292,5 @@
   ">Notify me<": ">Сообщить мне<",
   "I agree that Alina will email me once when the book is published. My address is not shared with anyone, and I can unsubscribe at any time.": "Я согласен(на), что Алина напишет мне на этот адрес, когда книга выйдет. Адрес никому не передаётся, отписаться можно в любой момент.",
   ">Unsubscribe<": ">Отписаться<",
-  ">Privacy<": ">Конфиденциальность<",
-  "data-go-site=\"Read in the blog →\"": "data-go-site=\"Читать в блоге →\"",
-  "data-go-patreon=\"Open on Patreon ↗\"": "data-go-patreon=\"Открыть на Patreon ↗\""
+  ">Privacy<": ">Конфиденциальность<"
 }

@@ -44,24 +44,19 @@
   .pat-where button { padding: 8px 16px; border: 0; border-radius: 999px; background: none; color: #2B1A51; font: 700 14px 'Karla', sans-serif; cursor: pointer; }
   .pat-where button[aria-pressed="true"] { background: #2B1A51; color: #fff; }
   .circle { position: relative; }
-  .pw-badge { position: absolute; right: 2px; bottom: 2px; width: 42px; height: 42px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 20px; background: #fff; border: 3px solid #2B1A51; box-shadow: 0 4px 10px rgba(43,26,81,.18); }
-  .pat[data-where="patreon"] .pw-badge { background: #FFE1D6; border-color: #D85A30; }
-  .pat[data-where="patreon"] .circle { box-shadow: 0 0 0 5px #F5C4B3; }
-  .go { display: inline-block; margin-top: 12px; padding: 5px 11px; white-space: nowrap; font-size: 13px !important; border-radius: 999px; background: #F3EEFB; color: #2B1A51; font-weight: 700; font-size: 14px; }
-  .pat[data-where="patreon"] .go { background: #FFE1D6; color: #A63E1B; }
-  .item:hover .go { background: #2B1A51; color: #fff; }
+  .circle { transition: transform .25s, filter .4s, background .4s; }
   .flip .circle { animation: patflip .55s ease; }
-  .flip .pw-badge, .flip .go { animation: patpop .45s ease .2s both; }
   @keyframes patflip { 0% { transform: rotateY(0) } 50% { transform: rotateY(90deg) scale(.92) } 100% { transform: rotateY(0) } }
-  @keyframes patpop { 0% { transform: scale(.4); opacity: 0 } 70% { transform: scale(1.15); opacity: 1 } 100% { transform: none } }
-  @media (prefers-reduced-motion: reduce) { .flip .circle, .flip .pw-badge, .flip .go { animation: none; } }
+  .pat[data-where="patreon"] .circle { filter: grayscale(1); background: #3A3A3A; }
+  .pat[data-where="patreon"] .item:hover .circle { filter: grayscale(.6); }
+  @media (prefers-reduced-motion: reduce) { .flip .circle { animation: none; } }
   @media (prefers-reduced-motion: reduce) { .circle { transition: none; } .item:hover .circle { transform: none; } }
 </style>
 
 <section class="pat">
   <h2>My notes: six themes</h2>
   <p class="sub">Six collections, one for each side of my work. Pick a theme and follow along.</p>
-  <div class="pat-where" role="group" aria-label="Where to read" data-go-site="Read in the blog →" data-go-patreon="Open on Patreon ↗"><button type="button" data-where="site" aria-pressed="true"><span aria-hidden="true">📖</span> Read on the site</button><button type="button" data-where="patreon" aria-pressed="false"><span aria-hidden="true">🧡</span> Read on Patreon</button></div>
+  <div class="pat-where" role="group" aria-label="Where to read"><button type="button" data-where="site" aria-pressed="true"><span aria-hidden="true">📖</span> Read on the site</button><button type="button" data-where="patreon" aria-pressed="false"><span aria-hidden="true">🧡</span> Read on Patreon</button></div>
   <div class="row">
     <!-- Culture &amp; Creativity -->
     <a class="item" href="https://www.patreon.com/collection/2381937" target="_blank" rel="noopener" data-patreon="https://www.patreon.com/collection/2381937" data-section="culture-creativity">
@@ -137,18 +132,10 @@
   var lang = document.documentElement.lang, pre = lang === 'en' ? '' : '/' + lang, where = 'site';
   try { where = localStorage.getItem('pat-where') || 'site'; } catch (e) {}
   var btns = [].slice.call(root.querySelectorAll('[data-where]'));
-  var wbox = root.querySelector('.pat-where');
-  items.forEach(function (it) {
-    var b = document.createElement('span'); b.className = 'pw-badge'; b.setAttribute('aria-hidden', 'true');
-    it.querySelector('.circle').appendChild(b);
-    var g = document.createElement('span'); g.className = 'go'; it.appendChild(g);
-  });
   function setWhere(w, anim) {
     where = w;
     root.dataset.where = w;
     items.forEach(function (it) {
-      it.querySelector('.pw-badge').textContent = w === 'site' ? '📖' : '🧡';
-      it.querySelector('.go').textContent = wbox.getAttribute(w === 'site' ? 'data-go-site' : 'data-go-patreon');
       if (anim) { it.classList.remove('flip'); void it.offsetWidth; it.classList.add('flip'); }
     });
     btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.where === w)); });
