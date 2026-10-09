@@ -295,12 +295,12 @@
     const m = modal('');
     m.card.classList.add('bag-card');
     const draw = () => {
-      const kinds = ['hat', 'shoes', 'scarf', 'item', 'bg', 'frame', 'anim'].filter(k => items.some(g => g.kind === k));
+      const kinds = ['hat', 'item', 'shoes', 'scarf', 'bg', 'frame', 'anim'].filter(k => items.some(g => g.kind === k));
       m.card.innerHTML = `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3><p class="sw-bv-how">${t('bagNote')}</p>
         ${items.length ? kinds.map(k => `<h4>${esc(kindName(k))}</h4><div class="bag-grid">${items.filter(g => g.kind === k).map(g =>
           `<button type="button" class="bag-item${me.avatar && me.avatar[k] === g.item ? ' on' : ''}" data-k="${k}" data-i="${esc(g.item)}"><span class="bag-ava"></span>${me.avatar && me.avatar[k] === g.item ? t('wearing') : ''}</button>`).join('')}</div>`).join('') : `<p class="bag-empty">${t('bagEmpty')}</p>`}`;
       m.card.querySelectorAll('.bag-item').forEach(b => {
-        b.querySelector('.bag-ava').appendChild(window.PPBirds.avatar(me.id, Object.assign({}, me.avatar, { [b.dataset.k]: b.dataset.i }), 64));
+        b.querySelector('.bag-ava').appendChild(window.PPBirds.giftPic(b.dataset.k, b.dataset.i, me.id, 64, me.avatar));
         b.onclick = async () => {
           const on = me.avatar && me.avatar[b.dataset.k] === b.dataset.i;
           try { const r = await post('avatar', { kind: b.dataset.k, item: on ? null : b.dataset.i }); me.avatar = r.avatar; } catch (e) { alert(t('err')); return; }
@@ -456,7 +456,7 @@
     if (window.PPBirds && pr.id) {
       const slot = v.querySelector('.sw-ava-slot'); if (slot) slot.replaceWith(window.PPBirds.avatar(pr.id, pr.avatar, 110));
       const bagEl = v.querySelector('.sw-pv-bag');
-      if (bagEl) for (const g of pr.bag || []) { const it = document.createElement('span'); it.className = 'sw-pv-item' + (pr.avatar && pr.avatar[g.kind] === g.item ? ' on' : ''); it.title = kindName(g.kind); it.appendChild(window.PPBirds.avatar(pr.id, Object.assign({}, pr.avatar, { [g.kind]: g.item }), 52)); bagEl.appendChild(it); }
+      if (bagEl) for (const g of pr.bag || []) { const it = document.createElement('span'); it.className = 'sw-pv-item' + (pr.avatar && pr.avatar[g.kind] === g.item ? ' on' : ''); it.title = kindName(g.kind); it.appendChild(window.PPBirds.giftPic(g.kind, g.item, pr.id, 52, pr.avatar)); bagEl.appendChild(it); }
     }
     // Esc: если открыта картинка — закрывается только она (слушаем раньше просмотрщика, в фазе перехвата)
     const close = () => { v.remove(); document.removeEventListener('keydown', k, true); };

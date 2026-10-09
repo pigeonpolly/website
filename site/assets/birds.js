@@ -128,7 +128,7 @@
     if (item === 'key') { for (let i = 0; i < 4; i++) P(i, 0, '#E9C14A'); P(3, 1, '#E9C14A'); P(4, -1, '#E9C14A'); P(4, 0, '#E9C14A'); P(4, 1, '#E9C14A'); P(5, 0, '#E9C14A'); }
     if (item === 'pizza') { for (let dy = 0; dy < 4; dy++) for (let dx = 0; dx <= 3 - dy; dx++) P(dx, dy - 1, dy === 0 ? '#C98A3E' : '#F5C842'); P(1, 0, '#D84A3A'); P(0, 1, '#D84A3A'); }
     if (item === 'cherry') { P(0, -2, '#3E8E4F'); P(1, -1, '#3E8E4F'); P(0, -1, '#3E8E4F'); P(0, 0, '#D8203A'); P(1, 0, '#D8203A'); P(0, 1, '#D8203A'); P(1, 1, '#A81428'); P(0, 0, '#FF8A9A'); }
-    const LO = { gamepad: '#3A3550', coin: '#F5D547', sword: '#C8CCD8', mushroom: '#E0443A', wand: '#F5D547', crystal: '#9B7FE0', star: '#F5D547', lollipop: '#F08BC0', minipumpkin: '#E8792B', candycane: '#D8283A', giftbox: '#D8283A', ornament: '#4A7BD8', snowflake: '#DDEEFF', heart: '#E0243A', rose: '#D8203A', letter: '#FFFDF8', icecream: '#F7A8C4', mapleleaf: '#E8792B' };
+    const LO = { dragonegg: '#4CC38A', goldfeather: '#E9A93B', comet: '#F5D547', goldenapple: '#E9C14A', paintbrush: '#E0443A', palette: '#D9A441', pencil: '#F5D547', coffee: '#FFFFFF', croissant: '#D9944A', gamepad: '#3A3550', coin: '#F5D547', sword: '#C8CCD8', mushroom: '#E0443A', wand: '#F5D547', crystal: '#9B7FE0', star: '#F5D547', lollipop: '#F08BC0', minipumpkin: '#E8792B', candycane: '#D8283A', giftbox: '#D8283A', ornament: '#4A7BD8', snowflake: '#DDEEFF', heart: '#E0243A', rose: '#D8203A', letter: '#FFFDF8', icecream: '#F7A8C4', mapleleaf: '#E8792B' };
     if (LO[item]) { P(0, 0, LO[item]); P(1, 0, LO[item]); P(0, 1, LO[item]); P(1, 1, shade(LO[item], .8)); }
     if (item === 'spoon') { for (let i = 0; i < 3; i++) P(i, 0, '#D0D4E0'); P(3, -1, '#E8EBF2'); P(3, 0, '#E8EBF2'); P(4, -1, '#E8EBF2'); P(4, 0, '#E8EBF2'); P(3, 1, '#B8BCC8'); }
   }
@@ -203,6 +203,12 @@
     heartband: { r: ['.rr.rr......', 'rRrrrrr.....', 'rrrrrrr.....', '.rrrrr......', '..rrr.......', '...r........', 'hhhhhhhhhhhh'], p: { r: '#E0243A', R: '#FF9AA8', h: '#F08BC0' }, lo: ['bow', '#F08BC0'] },
     wreath: { r: ['.p...y...p.', 'pyp.gyg.pyp', 'gpgygpgygpg', 'ggggggggggg'], p: { p: '#F08BC0', y: '#F5D547', g: '#4C9A5B' }, lo: ['crown', '#4CC38A'] },
     strawhat: { r: ['...ssssss...', '..ssssssss..', '..rrrrrrrr..', 'ssssssssssss', '.dddddddddd.'], p: { s: '#E9C46A', d: '#C9A040', r: '#E0443A' }, lo: ['beret', '#E9A93B'] },
+    halo: { r: ['..yyyyyyyy..', '.yY......Yy.', '..yyyyyyyy..', '............', '............'], p: { y: '#F5D547', Y: '#FFF8C4' }, lo: ['crown', '#E9A93B'] },
+    unicorn: { r: ['....w....', '...wp....', '...ww....', '..wpw....', '..www....', '.wpww.mm.', '.wwwwmmm.'], p: { w: '#FFF3D6', p: '#F7A8C4', m: '#B39DDB' }, lo: ['party', '#F7A8C4'] },
+    flamecrown: { r: ['r....r....r', 'ro..ror..or', 'ooyoyyyoyoo', 'yyyyyyyyyyy', 'yryybyyryyy', 'ddddddddddd'], p: { r: '#E0443A', o: '#F5873A', y: '#F5D547', b: '#4A7BD8', d: '#C9921F' }, lo: ['crown', '#E0443A'] },
+    pirate: { r: ['....kkkkkk....', '..kkkkkkkkkk..', '.kkkkkwwkkkkk.', 'kkkkkkwwkkkkkk', '.yyyyyyyyyyyy.'], p: { k: '#2A2433', w: '#FFFFFF', y: '#E9C14A' }, lo: ['top', '#2B2340'] },
+    chef: { r: ['..wwww..', '.wwwwww.', 'wwwwwwww', 'wwwgwwww', '.wwwwww.', '.gwgwgw.', '.wwwwww.'], p: { w: '#FFFFFF', g: '#DCDCE6' }, lo: ['top', '#FFFFFF'] },
+    graduation: { r: ['kkkkkkkkkkkk', '.kkkkkkkkkk.', '....kkkk..y.', '...kkkkkk.y.', '...kkkkkk.yy'], p: { k: '#2A2433', y: '#F5D547' }, lo: ['cap', '#2B2340'] },
     headset: { r: ['...kkkkkk...', '..k......k..', '.k........k.', 'gk........kg', 'gk........kg', 'gk........kg', '.k.......mm.'], p: { k: '#2A2433', g: '#39E07A', m: '#39E07A' }, lo: ['cap', '#4CC38A'] },
     leafcrown: { r: ['o..r..y..o.', 'oo.rr.yy.oo', 'orryyoorryo', 'ddddddddddd'], p: { o: '#E8792B', r: '#C0392B', y: '#E9C14A', d: '#8B5A2B' }, lo: ['crown', '#E0443A'] },
   };
@@ -220,6 +226,15 @@
     rose: { r: ['..rr.', '.rRrr', '..rr.', '..g..', '.gg..', '..g..', '..g..'], p: { r: '#D8203A', R: '#FF8A9A', g: '#3E8E4F' }, dy: -6 },
     letter: { r: ['wwwwwww', 'wpwwwpw', 'wwprpww', 'wwwpwww', 'wwwwwww'], p: { w: '#FFFDF8', p: '#CFC7E8', r: '#E0243A' }, dy: -2 },
     icecream: { r: ['.ppp.', 'ppwpp', '.ppp.', '.oooo', '..oo.', '..o..'], p: { p: '#F7A8C4', w: '#FFFFFF', o: '#D9A441' }, dy: -3 },
+    dragonegg: { r: ['..gg..', '.gGgg.', 'gggpgg', 'gpgggg', 'ggggpg', '.gggg.'], p: { g: '#4CC38A', G: '#C8FFE0', p: '#9B5DE5' }, dy: -3 },
+    goldfeather: { r: ['.....yy', '....yYy', '...yYy.', '..yYy..', '.yYy...', 'yy.....', 'w......'], p: { y: '#E9A93B', Y: '#FFF1A8', w: '#FFFFFF' }, dy: -6 },
+    comet: { r: ['......yY', '....yyYy', '..oyyyy.', 'oo.oy...', 'o.o.....'], p: { y: '#F5D547', Y: '#FFFFFF', o: '#F5873A' }, dy: -2 },
+    goldenapple: { r: ['...g.', '..gG.', '.yyyy', 'yYyyy', 'yyyyy', '.yyy.'], p: { y: '#E9C14A', Y: '#FFF3A8', g: '#4C9A5B', G: '#7FC28A' }, dy: -3 },
+    paintbrush: { r: ['......rr', '......rr', '.....kk.', '....kk..', '...kk...', '..kk....', '.kk.....'], p: { r: '#E0443A', k: '#8B5A2B' }, dy: -6 },
+    palette: { r: ['.bbbbb.', 'bbrbbyb', 'bgbbbbb', 'bbbbwbb', '.bbbb..'], p: { b: '#D9A441', r: '#E0443A', y: '#F5D547', g: '#4CC38A', w: '#FFFFFF' }, dy: -2 },
+    pencil: { r: ['.......k', '......wy', '....yyy.', '..yyy...', 'rrr.....'], p: { k: '#2A2433', w: '#F0C27C', y: '#F5D547', r: '#F08BC0' }, dy: -4 },
+    coffee: { r: ['.s.s.', '.....', 'wwwww', 'wbbbww', 'wbbbw.', '.www.'], p: { w: '#FFFFFF', b: '#6B3E26', s: '#DCDCE6' }, dy: -4 },
+    croissant: { r: ['..oooo..', '.oOooOo.', 'oOoooooO', 'o......o'], p: { o: '#D9944A', O: '#F0C27C' }, dy: -2 },
     gamepad: { r: ['.kkkkkkk.', 'kkwkkkrkk', 'kwwwkbkgk', 'kkwkkkykk', '.kk...kk.'], p: { k: '#3A3550', w: '#FFFFFF', r: '#E0443A', b: '#4A7BD8', g: '#4CC38A', y: '#F5D547' }, dy: -2 },
     coin: { r: ['.yyy.', 'yYddy', 'yYdyy', 'yYddy', '.yyy.'], p: { y: '#F5D547', Y: '#FFF1A8', d: '#C9921F' }, dy: -2 },
     sword: { r: ['.......ss', '......sws', '.....sws.', '....sws..', '.y.sws...', '..yss....', '..bb.....', '.b..y....'], p: { s: '#C8CCD8', w: '#FFFFFF', y: '#E9C14A', b: '#8B5A2B' }, dy: -7 },
@@ -317,11 +332,11 @@
   // значение подарка — короткая строка: hat «crown:1» (вид:цвет), shoes «boots:3», bg «#F5C4B3», anim «bounce», frame «gold»
   const GIFTS = {
     bg: ['#F5C4B3', '#FBE3A1', '#CDEBD8', '#BFD7F5', '#E2D3F7', '#F7C6DA', '#FFFDF8', '#2B1A51', '#1D6B4F', '#D85A30', '#1B1035', '#E8F4FF', '#FFD6E0', '#F2C27B', '#0F0F2D'],
-    hat: ['wizard', 'witch', 'pumpkin', 'santa', 'antlers', 'beanie', 'heartband', 'wreath', 'strawhat', 'leafcrown', 'headset', ...HATS.flatMap(h => HAT_C.map((c, i) => h + ':' + i))],
+    hat: ['halo', 'unicorn', 'flamecrown', 'wizard', 'witch', 'pumpkin', 'santa', 'antlers', 'beanie', 'heartband', 'wreath', 'strawhat', 'leafcrown', 'headset', 'pirate', 'chef', 'graduation', ...HATS.flatMap(h => HAT_C.map((c, i) => h + ':' + i))],
     shoes: SHOES.flatMap(h => SHOE_C.map((c, i) => h + ':' + i)),
-    anim: ['bounce', 'wiggle', 'float', 'spin', 'sparkle', 'heart'],
-    frame: ['gold', 'rainbow', 'stars', 'hearts', 'leaves', 'dotted', 'snow', 'magic', 'spooky', 'neon'],
-    item: ['pizza', 'cherry', 'wand', 'crystal', 'star', 'lollipop', 'minipumpkin', 'candycane', 'giftbox', 'ornament', 'snowflake', 'heart', 'rose', 'letter', 'icecream', 'mapleleaf', 'gamepad', 'coin', 'sword', 'mushroom', 'cheese', 'ring', 'pearl', 'ruby', 'sapphire', 'key', 'spoon'],
+    anim: ['bounce', 'wiggle', 'float', 'spin', 'sparkle', 'heart', 'aurora'],
+    frame: ['gold', 'rainbow', 'stars', 'hearts', 'leaves', 'dotted', 'snow', 'magic', 'spooky', 'neon', 'legend'],
+    item: ['dragonegg', 'goldfeather', 'comet', 'goldenapple', 'paintbrush', 'palette', 'pencil', 'coffee', 'croissant', 'pizza', 'cherry', 'wand', 'crystal', 'star', 'lollipop', 'minipumpkin', 'candycane', 'giftbox', 'ornament', 'snowflake', 'heart', 'rose', 'letter', 'icecream', 'mapleleaf', 'gamepad', 'coin', 'sword', 'mushroom', 'cheese', 'ring', 'pearl', 'ruby', 'sapphire', 'key', 'spoon'],
     scarf: ['#E0443A', '#E9A93B', '#4CC38A', '#4A7BD8', '#F08BC0', '#9B5DE5', '#FFFFFF', '#2B2340', '#5FA8A0', '#D85A30'],
   };
   const pair = (v, list, cols) => { const [t, i] = String(v || '').split(':'); return list.includes(t) && cols[+i] ? { t, c: cols[+i] } : null; };
@@ -360,6 +375,30 @@
     return el;
   }
 
+  // картинка самой вещи (без птички): шапка, вещица, пара обуви, шарфик; фон, рамка и анимация — кружок-аватар
+  function itemIcon(kind, v, size, id) {
+    const box = document.createElement('span'); box.className = 'pp-icon'; box.style.setProperty('--ic', (size || 80) + 'px');
+    if (kind === 'bg' || kind === 'frame' || kind === 'anim') { box.appendChild(avatar(id || 2, { [kind]: v }, size || 80)); return box; }
+    const { g, put } = hgrid();
+    if (kind === 'hat') hdHat(put, SPECIAL_HATS[v] ? { t: v } : pair(v, HATS, HAT_C) || { t: 'top', c: '#2B2340' }, 20, 30);
+    else if (kind === 'item' && HD_ITEMS[v]) stamp(put, HD_ITEMS[v].r, 14, 22, HD_ITEMS[v].p);
+    else if (kind === 'shoes') { const sh = pair(v, SHOES, SHOE_C); if (sh) { hdShoe(put, sh, 12); hdShoe(put, sh, 22); } }
+    else if (kind === 'scarf') hdScarf(put, v, 10, 26, 30, 10);
+    const c = crop(finish(g, HW, HH));
+    const k = Math.max(2, Math.floor((size || 80) * .62 / Math.max(c.width, c.height)));
+    c.style.width = c.width * k + 'px'; c.style.height = c.height * k + 'px';
+    box.appendChild(c); return box;
+  }
+
+  // картинка вещи, а при наведении (или касании) — птичка в этой вещи
+  function giftPic(kind, v, id, size, av) {
+    const w = document.createElement('span'); w.className = 'gift-pic';
+    w.appendChild(itemIcon(kind, v, size, id));
+    if (!['bg', 'frame', 'anim'].includes(kind)) w.appendChild(avatar(id, Object.assign({}, av || {}, { [kind]: v }), size));
+    w.addEventListener('touchstart', () => w.classList.toggle('show'), { passive: true });
+    return w;
+  }
+
   // названия вещей для «Коллекций» (en, ru, lv)
   const GIFT_NAMES = {
     top: ['Top hat', 'Цилиндр', 'Cilindrs'], beret: ['Beret', 'Берет', 'Berete'], cap: ['Cap', 'Кепка', 'Cepure'], bow: ['Bow', 'Бантик', 'Bantīte'], party: ['Party hat', 'Колпак', 'Ballītes cepure'], crown: ['Crown', 'Корона', 'Kronis'],
@@ -375,12 +414,24 @@
     gold: ['Gold frame', 'Золотая рамка', 'Zelta rāmis'], rainbow: ['Rainbow frame', 'Радуга', 'Varavīksne'], stars: ['Stars', 'Звёзды', 'Zvaigznes'], hearts: ['Hearts', 'Сердечки', 'Sirsniņas'], leaves: ['Leaves', 'Листики', 'Lapiņas'], dotted: ['Dotted', 'Пунктир', 'Punktiņi'],
     snow: ['Snowflakes', 'Снежинки', 'Sniegpārslas'], magic: ['Magic', 'Волшебная', 'Burvju'], spooky: ['Halloween', 'Хеллоуин', 'Helovīns'], neon: ['Neon', 'Неон', 'Neons'],
     bounce: ['Bounces', 'Прыгает', 'Lēkā'], wiggle: ['Wiggles', 'Качается', 'Šūpojas'], float: ['Floats', 'Парит', 'Lidinās'], spin: ['Spins', 'Кружится', 'Griežas'], sparkle: ['Sparkles', 'Сияет', 'Mirdz'], heartbeat: ['Heartbeat', 'Стучит сердечком', 'Sirdspuksti'],
+    halo: ['Angel halo', 'Нимб', 'Oreols'], unicorn: ['Unicorn horn', 'Рог единорога', 'Vienradža rags'], flamecrown: ['Phoenix crown', 'Корона феникса', 'Fēniksa kronis'],
+    pirate: ['Pirate hat', 'Пиратская шляпа', 'Pirāta cepure'], chef: ['Chef hat', 'Колпак повара', 'Pavāra cepure'], graduation: ['Graduation cap', 'Шапочка выпускника', 'Absolventa cepure'],
+    dragonegg: ['Dragon egg', 'Яйцо дракона', 'Pūķa ola'], goldfeather: ['Golden feather', 'Золотое перо', 'Zelta spalva'], comet: ['Comet', 'Комета', 'Komēta'], goldenapple: ['Golden apple', 'Золотое яблоко', 'Zelta ābols'],
+    paintbrush: ['Paintbrush', 'Кисточка', 'Ota'], palette: ['Palette', 'Палитра', 'Palete'], pencil: ['Pencil', 'Карандаш', 'Zīmulis'], coffee: ['Coffee', 'Кофе', 'Kafija'], croissant: ['Croissant', 'Круассан', 'Kruasāns'],
+    legend: ['Legendary frame', 'Легендарная рамка', 'Leģendārais rāmis'], aurora: ['Aurora glow', 'Северное сияние', 'Ziemeļblāzma'],
     bg: ['Background', 'Фон', 'Fons'], scarf: ['Scarf', 'Шарфик', 'Šallīte'],
   };
   const giftName = (kind, v, L = 0) => kind === 'anim' && v === 'heart' ? GIFT_NAMES.heartbeat[L] : kind === 'bg' || kind === 'scarf' ? GIFT_NAMES[kind][L] : (GIFT_NAMES[String(v).split(':')[0]] || [v, v, v])[L];
 
   // темы и сезоны вещей (для кнопок-фильтров в «Коллекциях» и в кабинете): 'вид|значение'
+  // легендарные вещи: редкие, в коллекциях с золотой звездой
+  const LEGEND = new Set(['hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora']);
   const GIFT_THEMES = [
+    ['legendary', ['★ Legendary', '★ Легендарные', '★ Leģendārie'], [...LEGEND]],
+    ['art', ['🎨 Artist', '🎨 Художник', '🎨 Mākslinieks'], ['hat|beret:0', 'hat|beret:4', 'item|paintbrush', 'item|palette', 'item|pencil', 'scarf|#9B5DE5']],
+    ['cafe', ['☕ Café', '☕ Кафе', '☕ Kafejnīca'], ['hat|chef', 'item|coffee', 'item|croissant', 'item|pizza', 'item|cheese', 'item|icecream']],
+    ['school', ['🎓 Study', '🎓 Учёба', '🎓 Mācības'], ['hat|graduation', 'item|pencil', 'item|letter', 'item|star', 'frame|stars']],
+    ['pirate', ['🏴‍☠️ Pirates', '🏴‍☠️ Пираты', '🏴‍☠️ Pirāti'], ['hat|pirate', 'item|coin', 'item|key', 'item|sword', 'item|ruby', 'scarf|#E0443A']],
     ['magic', ['✨ Magic', '✨ Волшебство', '✨ Burvība'], ['hat|wizard', 'item|wand', 'item|crystal', 'item|star', 'frame|magic', 'frame|stars', 'anim|sparkle']],
     ['halloween', ['🎃 Halloween', '🎃 Хеллоуин', '🎃 Helovīns'], ['hat|witch', 'hat|pumpkin', 'item|minipumpkin', 'item|lollipop', 'frame|spooky', 'bg|#1B1035']],
     ['newyear', ['🎄 New Year', '🎄 Новый год', '🎄 Jaunais gads'], ['hat|santa', 'hat|antlers', 'hat|beanie', 'item|candycane', 'item|giftbox', 'item|ornament', 'item|snowflake', 'frame|snow', 'bg|#E8F4FF', 'scarf|#E0443A', 'scarf|#FFFFFF']],
@@ -393,5 +444,5 @@
   const GIFT_KINDS = [['hat', ['Hats', 'Головные уборы', 'Galvassegas']], ['item', ['Treats to hold', 'В клюв', 'Knābī']], ['shoes', ['Shoes', 'Обувь', 'Apavi']], ['scarf', ['Scarves', 'Шарфики', 'Šallītes']],
     ['frame', ['Frames', 'Рамки', 'Rāmji']], ['bg', ['Backgrounds', 'Фоны', 'Foni']], ['anim', ['Animations', 'Анимации', 'Animācijas']]];
 
-  window.PPBirds = { looks, sprite, spriteHD, crop, dress, avatar, giftName, GIFT_THEMES, GIFT_KINDS, HW, HH, HB, HO, GIFTS, SW, SH, BASE, OX };
+  window.PPBirds = { looks, sprite, spriteHD, crop, dress, avatar, giftName, itemIcon, giftPic, LEGEND, GIFT_THEMES, GIFT_KINDS, HW, HH, HB, HO, GIFTS, SW, SH, BASE, OX };
 })();

@@ -7,7 +7,7 @@
 <div class="fl-full">{{block:flock}}</div>
 <section class="fl-all fl-coll" id="collections">
   <h2 class="section-title">Collections</h2>
-  <p class="fl-all-lead">Everything a bird (or a cat, or a crow) can collect. Alina gives these as gift seeds.</p>
+  <p class="fl-all-lead">Everything a bird (or a cat, or a crow) can collect. Alina gives these as gift seeds. Hover over a thing to see a bird wearing it. ★ — legendary.</p>
   <p class="fl-coll-me" hidden></p>
   <div class="fl-coll-bar" role="toolbar" aria-label="Filter"></div>
   <div class="fl-coll-box"></div>
@@ -67,9 +67,10 @@
       var g = document.createElement('div'); g.className = 'fl-coll-grid'; box.appendChild(g);
       list.forEach(function (v) {
         total++;
-        var st = owned[k[0] + '|' + v], t = document.createElement('figure'); t.className = 'fl-coll-item' + (st ? ' got' : '');
-        var av = {}; av[k[0]] = v;
-        t.appendChild(B.avatar(id, av, 84));
+        var st = owned[k[0] + '|' + v], t = document.createElement('figure'), leg = B.LEGEND && B.LEGEND.has(k[0] + '|' + v);
+        t.className = 'fl-coll-item' + (st ? ' got' : '') + (leg ? ' legend' : '');
+        t.appendChild(B.giftPic(k[0], v, id, 84, me && me.avatar));
+        if (leg) { var lt = document.createElement('span'); lt.className = 'legend-tag'; lt.textContent = '★'; lt.title = 'Legendary'; t.appendChild(lt); }
         var c = document.createElement('figcaption'); c.textContent = B.giftName(k[0], v, L); t.appendChild(c);
         if (st) { have++; var m = document.createElement('span'); m.className = 'fl-coll-mark'; m.textContent = st === 'new' ? T.gift[L] : T.have[L]; t.appendChild(m); }
         g.appendChild(t);
