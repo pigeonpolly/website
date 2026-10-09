@@ -2775,3 +2775,12 @@ html.sb-hide { --sb: 0px; }
 .adm-shop tr.saved input { box-shadow: 0 0 0 2px #4CC38A; }
 .adm-shop-it { display: flex; align-items: center; gap: 10px; }
 .adm-shop-pic .gift-pic { vertical-align: middle; }
+.bag-cell { display: grid; gap: 4px; justify-items: center; }
+.bag-give { padding: 3px 10px; border: 1.5px solid #E9A93B; border-radius: 999px; background: transparent; color: inherit; font: 700 12px var(--sans); cursor: pointer; }
+.bag-give:hover { background: #E9A93B; color: #2B1A51; }
+.give-card { text-align: center; }
+.give-pic { display: flex; justify-content: center; margin: 4px 0 8px; }
+.give-f { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; }
+.give-f input { flex: 1 1 180px; padding: 10px 14px; border: 1.5px solid #CFC7E8; border-radius: 999px; font: 15px var(--sans); }
+.give-st { min-height: 1.2em; margin: 8px 0 0; color: #D85A30; font: 600 14px var(--sans); }
+.sw-bv-btn { margin: 6px 0; font: 700 14px var(--sans); color: #B8862B; }

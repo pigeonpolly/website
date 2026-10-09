@@ -158,7 +158,11 @@ const now = () => Math.floor(Date.now() / 1000);
 
 // ---------- пуговки (валюта сайта) ----------
 // сколько и за что: заход раз в день, рисунок в челлендж, до 3 комментариев в день, друг, указавший тебя при регистрации
-const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20 };
+const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, pick: 50,
+  // бейджи: уровни по рекордной серии (дней) и особые достижения — пуговки один раз за каждый
+  levels: { 1: 5, 3: 10, 7: 20, 14: 30, 30: 50, 60: 80, 100: 120, 365: 300 },
+  badges: { bw: 5, extra: 15, bday: 15, early: 15, owl: 15, comeback: 15, ten: 20, weekend: 20, newyear: 20, halloween: 20,
+    monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, hundred: 100 } };
 const rigaDay = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }); // сутки по Риге
 async function award(env, uid, kind, ref, amount) {
   const r = await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(uid, kind, String(ref), amount, rigaDay(), now()).run();
@@ -170,6 +174,16 @@ async function award(env, uid, kind, ref, amount) {
 async function awardComment(env, uid, commentId) {
   const n = (await env.DB.prepare("SELECT COUNT(*) AS n FROM button_log WHERE user_id = ? AND kind = 'comment' AND day = ?").bind(uid, rigaDay()).first()).n;
   return n < BTN.commentsPerDay ? award(env, uid, 'comment', commentId, BTN.comment) : 0;
+}
+// пуговки за бейджи: за каждый уровень серии и особый бейдж — один раз (в том числе за полученные раньше)
+async function awardBadges(env, uid, best, badges) {
+  const want = [...Object.entries(BTN.levels).filter(([d]) => best >= +d).map(([d, n]) => ['lv' + d, n]),
+    ...badges.filter(k => BTN.badges[k]).map(k => [k, BTN.badges[k]])];
+  if (!want.length) return { total: 0, got: [] };
+  const have = new Set((await env.DB.prepare("SELECT ref FROM button_log WHERE user_id = ? AND kind = 'badge'").bind(uid).all()).results.map(r => r.ref));
+  let total = 0; const got = [];
+  for (const [ref, n] of want) if (!have.has(ref)) { const a = await award(env, uid, 'badge', ref, n); if (a) { total += a; got.push(ref); } }
+  return { total, got };
 }
 // что уже получено сегодня — для списка условий в профиле
 async function buttonStatus(env, u) {
@@ -589,10 +603,13 @@ async function route(req, env, url) {
     const kept = mergedBadges(u, rows).filter(b => b !== 'pick_past' || pickUser !== u.id);
     if (pickUser === u.id) kept.push('pick');
     const admin = await isAdmin(u, env);
+    const bestNow = mergedBest(u, rows.map(r => r.day));
+    const forBadges = u.nick && !u.banned ? await awardBadges(env, u.id, bestNow, kept) : { total: 0, got: [] };
+    if (forBadges.total) u.buttons = (u.buttons || 0) + forBadges.total;
     const storage = admin ? Math.round(await storageUsed(env) * 1000) / 10 : undefined;
     const migration = admin && env.MEDIA ? await migrationStatus(env) : undefined;
     return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
-      best: mergedBest(u, rows.map(r => r.day)), keptBadges: kept, posts: rows, id: u.id, avatar: avatarOf(u), earned, btn: await buttonStatus(env, u),
+      best: mergedBest(u, rows.map(r => r.day)), keptBadges: kept, posts: rows, id: u.id, avatar: avatarOf(u), earned, badgeEarned: forBadges, btn: await buttonStatus(env, u),
       gifts: (await env.DB.prepare('SELECT id, kind, item, note, status, created_at FROM gifts WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results } });
   }
 
@@ -632,6 +649,24 @@ async function route(req, env, url) {
       return json({ ok: true, price, stock });
     }
     return json({ items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results });
+  }
+  // подарить купленную в магазине вещь другой птичке: вещь уходит из сумки и приходит ей неоткрытым подарком
+  if (m === 'POST' && p === '/api/gift/give') {
+    const u = await needUser(req, env);
+    if (!u.nick) fail(400, 'nick');
+    const b = await req.json().catch(() => ({}));
+    const g = await env.DB.prepare("SELECT * FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag' AND note = 'shop'").bind(Number(b.id), u.id).first();
+    if (!g) fail(404, 'gift');
+    const to = await env.DB.prepare("SELECT id, nick FROM users WHERE nick = ? AND banned = 0 AND id != ?").bind(String(b.to || '').trim().replace(/^@/, ''), u.id).first();
+    if (!to) fail(404, 'bird');
+    if (await env.DB.prepare("SELECT 1 FROM gifts WHERE user_id = ? AND kind = ? AND item = ? AND status IN ('bag', 'new')").bind(to.id, g.kind, g.item).first()) fail(409, 'has');
+    await env.DB.prepare("UPDATE gifts SET user_id = ?, status = 'new', note = ?, created_at = ?, opened_at = NULL WHERE id = ?").bind(to.id, 'from:' + u.nick, now(), g.id).run();
+    // если даритель носил эту вещь и другой такой у него нет — снять
+    const a = avatarOf(u);
+    if (a[g.kind] === g.item && !(await env.DB.prepare("SELECT 1 FROM gifts WHERE user_id = ? AND kind = ? AND item = ? AND status = 'bag'").bind(u.id, g.kind, g.item).first())) {
+      delete a[g.kind]; await env.DB.prepare('UPDATE users SET avatar = ? WHERE id = ?').bind(JSON.stringify(a), u.id).run();
+    }
+    return json({ ok: true, to: to.nick, avatar: a });
   }
   // админ меняет пуговки птичке вручную (например, приз)
   if (m === 'POST' && p === '/api/admin/buttons') {
@@ -829,6 +864,7 @@ async function route(req, env, url) {
     if (prev && prev !== post.user_id) await addBadge(env, prev, 'pick_past');
     await setMeta(env, 'pick_post', post.id);
     await setMeta(env, 'pick_user', String(post.user_id));
+    await award(env, post.user_id, 'pick', post.id, BTN.pick); // +50 пуговок за «Выбор Полли» (за каждую выбранную работу)
     return json({ ok: true });
   }
 

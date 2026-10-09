@@ -62,6 +62,19 @@
     btnComment: [(n, k, m) => `Comment on any blog post: +${n} each, ${m} times a day (today ${k}/${m})`, (n, k, m) => `Комментарий под любым постом: +${n}, до ${m} раз в сутки (сегодня ${k}/${m})`, (n, k, m) => `Komentārs zem jebkura ieraksta: +${n}, līdz ${m} reizēm dienā (šodien ${k}/${m})`],
     btnFriend: [(n, k) => `A friend signs up and picks you as the one who invited them: +${n} for each (friends: ${k})`, (n, k) => `Друг регистрируется и выбирает тебя как пригласившего: +${n} за каждого (друзей: ${k})`, (n, k) => `Draugs reģistrējas un izvēlas tevi kā uzaicinātāju: +${n} par katru (draugi: ${k})`],
     btnToday: ['done today', 'сегодня уже', 'šodien jau'],
+    btnBadges: ['New badges: from +5 to +300 for each (tap a badge to see how much)', 'Новые бейджи: от +5 до +300 за каждый (нажмите на бейдж — там видно, сколько)', 'Jaunas nozīmītes: no +5 līdz +300 par katru (spied uz nozīmītes, lai redzētu, cik)'],
+    btnPick: [n => `Polly’s Choice for your drawing: +${n}`, n => `«Выбор Полли» для вашего рисунка: +${n}`, n => `“Pollijas izvēle” tavam zīmējumam: +${n}`],
+    btnBadge: [n => `🔘 +${n} buttons for this badge`, n => `🔘 +${n} пуговок за этот бейдж`, n => `🔘 +${n} pogas par šo nozīmīti`],
+    btnForBadges: [n => `+${n} 🔘 buttons for your badges!`, n => `+${n} 🔘 пуговок за достижения!`, n => `+${n} 🔘 pogas par sasniegumiem!`],
+    give: ['🎁 Gift', '🎁 Подарить', '🎁 Uzdāvināt'],
+    giveT: ['Gift it to another bird', 'Подарить другой птичке', 'Uzdāvināt citam putniņam'],
+    giveText: ['The thing leaves your bag and arrives as an unopened gift. Only things bought in the shop can be gifted.', 'Вещь уйдёт из вашей сумки и придёт птичке неоткрытым подарком. Дарить можно только купленное в магазине.', 'Lieta pazudīs no tavas somas un pienāks putniņam kā neatvērta dāvana. Dāvināt var tikai veikalā pirktās lietas.'],
+    givePh: ['bird’s nickname', 'ник птички', 'putniņa segvārds'],
+    giveGo: ['Give', 'Подарить', 'Uzdāvināt'],
+    giveOk: [n => `Gift sent to @${n} 🎁`, n => `Подарок отправлен @${n} 🎁`, n => `Dāvana nosūtīta @${n} 🎁`],
+    giveNo: ['There is no bird with this nickname.', 'Птички с таким ником нет.', 'Putniņa ar tādu segvārdu nav.'],
+    giveHas: ['This bird already has this thing.', 'У этой птички уже есть эта вещь.', 'Šim putniņam šī lieta jau ir.'],
+    fromBird: [n => `🎁 A gift from @${n}`, n => `🎁 Подарок от @${n}`, n => `🎁 Dāvana no @${n}`],
     btnShop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'],
     btnInvite: ['📤 Invite a friend', '📤 Позвать друга', '📤 Uzaicināt draugu'],
     btnEarned: [n => `+${n} 🔘 buttons!`, n => `+${n} 🔘 пуговок!`, n => `+${n} 🔘 pogas!`],
@@ -241,6 +254,7 @@
   }
   async function refresh(prev) {
     try { me = (await api('me')).user; } catch (e) { me = null; }
+    if (me && me.badgeEarned && me.badgeEarned.total && window.PPToast) window.PPToast(t('btnForBadges', me.badgeEarned.total));
     render(prev);
   }
 
@@ -322,17 +336,32 @@
   function openGift(g) {
     if (!g) return;
     const m = modal(`<div class="gf-card"><span class="gf-seed" aria-hidden="true">🌰</span><h3>${esc(t('seedOf', kindName(g.kind)))}</h3>
-      ${g.note ? `<p class="gf-note">«${esc(g.note)}» ${t('fromAlina')}</p>` : ''}<div class="gf-btns"><button type="button" class="cta-btn" data-open>${t('open')}</button></div></div>`);
+      ${noteHtml(g)}<div class="gf-btns"><button type="button" class="cta-btn" data-open>${t('open')}</button></div></div>`);
     m.card.classList.add('gf-card');
     m.card.querySelector('[data-open]').onclick = () => {
       const box = m.card.querySelector('.gf-card');
-      box.innerHTML = `<h3>🎁 ${esc(kindName(g.kind))}</h3><div class="gf-ava"></div>${g.note ? `<p class="gf-note">«${esc(g.note)}» ${t('fromAlina')}</p>` : ''}
+      box.innerHTML = `<h3>🎁 ${esc(kindName(g.kind))}</h3><div class="gf-ava"></div>${noteHtml(g)}
         <div class="gf-btns"><button type="button" class="cta-btn" data-use>${t('use')}</button><button type="button" class="pill-btn" data-later>${t('later')}</button></div>`;
       const a = window.PPBirds.avatar(me.id, Object.assign({}, me.avatar, { [g.kind]: g.item }), 140); a.classList.add('gf-pop');
       box.querySelector('.gf-ava').appendChild(a);
       const act = async use => { try { await post('gift', { id: g.id, use }); } catch (e) { alert(t('err')); return; } m.close(); await refresh(); };
       box.querySelector('[data-use]').onclick = () => act(true);
       box.querySelector('[data-later]').onclick = () => act(false);
+    };
+  }
+  const noteHtml = g => !g.note || g.note === 'shop' ? '' : g.note.startsWith('from:') ? `<p class="gf-note">${esc(t('fromBird', g.note.slice(5)))}</p>` : `<p class="gf-note">«${esc(g.note)}» ${t('fromAlina')}</p>`;
+  // подарить купленную вещь: ник птички (подсказки — из списка стаи)
+  async function giveDialog(g, done) {
+    const m = modal(''); m.card.classList.add('give-card');
+    m.card.innerHTML = `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>${t('giveT')}</h3><div class="give-pic"></div><p class="sw-bv-how">${t('giveText')}</p>
+      <form class="give-f"><input name="to" list="give-list" required maxlength="24" autocomplete="off" placeholder="${t('givePh')}"><datalist id="give-list"></datalist><button type="submit" class="cta-btn">${t('giveGo')}</button></form><p class="give-st" role="status"></p>`;
+    m.card.querySelector('.give-pic').appendChild(window.PPBirds.giftPic(g.kind, g.item, me.id, 84));
+    fetch('/api/birds').then(r => r.ok ? r.json() : { birds: [] }).then(x => { const dl = m.card.querySelector('#give-list'); if (dl) dl.innerHTML = (x.birds || []).filter(b => b.nick && b.id !== me.id).map(b => `<option value="${esc(b.nick)}">`).join(''); }).catch(() => {});
+    const f = m.card.querySelector('.give-f'), st = m.card.querySelector('.give-st');
+    f.onsubmit = async e => {
+      e.preventDefault();
+      try { const r = await post('gift/give', { id: g.id, to: f.to.value }); me.avatar = r.avatar; m.close && m.close(); m.card.closest('.sw-bv') && m.card.closest('.sw-bv').remove(); window.PPToast && window.PPToast(t('giveOk', r.to)); await refresh(); done && done(); }
+      catch (err) { st.textContent = err.code === 'bird' ? t('giveNo') : err.code === 'has' ? t('giveHas') : t('err'); }
     };
   }
   function openBag() {
@@ -343,7 +372,9 @@
       const kinds = ['hat', 'item', 'shoes', 'scarf', 'bg', 'frame', 'anim'].filter(k => items.some(g => g.kind === k));
       m.card.innerHTML = `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3><p class="sw-bv-how">${t('bagNote')}</p>
         ${items.length ? kinds.map(k => `<h4>${esc(kindName(k))}</h4><div class="bag-grid">${items.filter(g => g.kind === k).map(g =>
-          `<button type="button" class="bag-item${me.avatar && me.avatar[k] === g.item ? ' on' : ''}" data-k="${k}" data-i="${esc(g.item)}"><span class="bag-ava"></span>${me.avatar && me.avatar[k] === g.item ? t('wearing') : ''}</button>`).join('')}</div>`).join('') : `<p class="bag-empty">${t('bagEmpty')}</p>`}`;
+          { const sh = (me.gifts || []).find(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item && x.note === 'shop');
+            return `<div class="bag-cell"><button type="button" class="bag-item${me.avatar && me.avatar[k] === g.item ? ' on' : ''}" data-k="${k}" data-i="${esc(g.item)}"><span class="bag-ava"></span>${me.avatar && me.avatar[k] === g.item ? t('wearing') : ''}</button>${sh ? `<button type="button" class="bag-give" data-gid="${sh.id}">${t('give')}</button>` : ''}</div>`; }).join('')}</div>`).join('') : `<p class="bag-empty">${t('bagEmpty')}</p>`}`;
+      m.card.querySelectorAll('.bag-give').forEach(b => b.onclick = () => { const g = me.gifts.find(x => x.id === +b.dataset.gid); m.card.closest('.sw-bv') && m.card.closest('.sw-bv').remove(); giveDialog(g); });
       m.card.querySelectorAll('.bag-item').forEach(b => {
         b.querySelector('.bag-ava').appendChild(window.PPBirds.giftPic(b.dataset.k, b.dataset.i, me.id, 64, me.avatar));
         b.onclick = async () => {
@@ -356,6 +387,7 @@
     draw();
   }
 
+  const badgeReward = x => { const R = me && me.btn && me.btn.rules; if (!R) return 0; return x.d ? (R.levels || {})[x.d] || 0 : x.k === 'pick' ? R.pick || 0 : (R.badges || {})[x.k] || 0; };
   // 🔘 пуговки: сколько есть и что можно получить сегодня (✅ — уже получено)
   function buttonsHtml(b) {
     const R = b.rules, pre = L === 1 ? '/ru' : L === 2 ? '/lv' : '';
@@ -363,7 +395,8 @@
     return `<div class="sw-btns"><h3>${t('btnT')} <b>${b.buttons}</b></h3>
       <p class="sw-btns-how">${t('btnHow')}:</p><ul>
       ${row(b.daily, t('btnDaily', R.daily))}${row(b.upload, t('btnUpload', R.upload))}${row(b.comments >= R.commentsPerDay, t('btnComment', R.comment, b.comments, R.commentsPerDay))}
-      <li class="sw-btns-friend"><span>👥</span> ${esc(t('btnFriend', R.friend, b.invited))}</li></ul>
+      <li class="sw-btns-friend"><span>👥</span> ${esc(t('btnFriend', R.friend, b.invited))}</li>
+      <li><span>🏅</span> ${esc(t('btnBadges'))}</li>${R.pick ? `<li><span>⭐</span> ${esc(t('btnPick', R.pick))}</li>` : ''}</ul>
       <p class="sw-btns-acts"><a class="pill-btn" href="${pre}/shop/">${t('btnShop')}</a><button type="button" class="pill-btn" id="sw-invite">${t('btnInvite')}</button></p></div>`;
   }
   function renderProfile(prev) {
@@ -412,7 +445,7 @@
       v.className = 'sw-bv'; v.setAttribute('role', 'dialog');
       v.innerHTML = `<div class="sw-bv-card"><button type="button" class="sw-bv-close" aria-label="Close">✕</button>${medal(x, state)}
         <h3>${esc(x.n[L])}</h3><p class="sw-bv-fun">${esc(fun)}</p><p class="sw-bv-how">${esc(howTo(x))}${x.k === 'pick' && me.picks ? `<br>${esc(t('picked', me.picks))}` : ''}</p>
-        <span class="sw-bv-state${state === true ? ' ok' : ''}">${state === true ? t('have') : state === 'past' ? t('hadIt') : t('notYet')}</span></div>`;
+        ${badgeReward(x) ? `<p class="sw-bv-btn">${esc(t('btnBadge', badgeReward(x)))}</p>` : ''}<span class="sw-bv-state${state === true ? ' ok' : ''}">${state === true ? t('have') : state === 'past' ? t('hadIt') : t('notYet')}</span></div>`;
       const close = () => { v.remove(); document.removeEventListener('keydown', esc1); };
       const esc1 = e => e.key === 'Escape' && close();
       v.addEventListener('click', e => { if (e.target === v || e.target.closest('.sw-bv-close')) close(); });
