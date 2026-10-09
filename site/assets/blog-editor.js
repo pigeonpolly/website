@@ -25,6 +25,8 @@
   };
   const errText = e => ERR[e.code] || 'Что-то пошло не так (' + esc(e.code || e.message) + ').';
   let flash = '', state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null, langFilter = 'all', picked = new Set();
+  // фильтры списка: поиск, раздел, период, сортировка по столбцу
+  const lf = { q: '', sec: '', from: '', to: '', sort: 'date', dir: -1 };
   // все теги из статей: { ru: ['акварель', …], … } и счётчики
   let sections = [], tagDict = [], tagSort = 'unchecked'; // словарь тегов: [{ en, ru, lv, count, checked, src, created }]
   function tagsByLang() {
@@ -87,13 +89,39 @@
       // фильтр по переводам: все / переведены на все три языка / нужен перевод
       const full = p => ['ru', 'en', 'lv'].every(l => p['t_' + l]);
       const LF = [['all', 'Все статьи', () => true], ['full', 'Переведены полностью', full], ['part', 'Нужен перевод', p => !full(p)]];
+      // поиск (название на любом языке, адрес, теги), раздел, период
+      const words = lf.q.toLowerCase().split(/\s+/).filter(Boolean);
+      const day = p => localDate(p.published_at || p.updated_at);
+      list = list.filter(p => {
+        if (lf.sec && (p.section || '') !== (lf.sec === '-' ? '' : lf.sec)) return false;
+        if (lf.from && day(p) < lf.from) return false;
+        if (lf.to && day(p) > lf.to) return false;
+        if (!words.length) return true;
+        const hay = [p.t_ru, p.t_en, p.t_lv, p.slug, p.tags_en, p.tags_ru, p.tags_lv].join(' ').toLowerCase();
+        return words.every(w => hay.includes(w));
+      });
+      const SORT = { date: p => p.published_at || p.updated_at || 0, likes: p => p.likes || 0, views: p => p.views || 0, comments: p => p.comments || 0, title: p => (p.t_ru || p.t_en || p.t_lv || '').toLowerCase() };
+      list = [...list].sort((a, b) => { const x = SORT[lf.sort](a), y = SORT[lf.sort](b); return (x > y ? 1 : x < y ? -1 : 0) * lf.dir; });
+      const months = [...new Set(state.posts.map(day).map(d => d.slice(0, 7)))].sort().reverse();
+      const MN = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
+      const active = lf.q || lf.sec || lf.from || lf.to;
+      const filters = `<div class="be-filters">
+        <input type="search" id="be-q" placeholder="🔍 Поиск: название, тег, адрес…" value="${esc(lf.q)}" aria-label="Поиск по статьям">
+        <select id="be-fsec" aria-label="Раздел"><option value="">Все разделы</option>${sections.map(x => `<option value="${esc(x.slug)}"${lf.sec === x.slug ? ' selected' : ''}>${esc(x.ru || x.en)}</option>`).join('')}<option value="-"${lf.sec === '-' ? ' selected' : ''}>— без раздела —</option></select>
+        <select id="be-fmonth" aria-label="Месяц"><option value="">Любой месяц</option>${months.map(m => { const a = m + '-01', b = m + '-31'; return `<option value="${m}"${lf.from === a && lf.to === b ? ' selected' : ''}>${MN[+m.slice(5) - 1]} ${m.slice(0, 4)}</option>`; }).join('')}</select>
+        <span class="be-period"><label>с <input type="date" id="be-from" value="${lf.from}"></label><label>по <input type="date" id="be-to" value="${lf.to}"></label></span>
+        ${active ? '<button type="button" class="bc-link" id="be-freset">✕ сбросить</button>' : ''}</div>`;
+      const sum = (k) => list.reduce((n, p) => n + (p[k] || 0), 0);
+      const stats = list.length ? `<p class="be-sum">Найдено: <b>${list.length}</b> · 👁 ${sum('views')} просмотров · ♥ ${sum('likes')} · 💬 ${sum('comments')}${list.length > 1 ? ` · в среднем 👁 ${Math.round(sum('views') / list.length)} на статью` : ''}</p>` : '';
+      const maxViews = Math.max(1, ...list.map(p => p.views || 0));
+      const th = (k, label, title) => `<th${title ? ` title="${title}"` : ''}><button type="button" class="be-sort" data-sort="${k}" aria-pressed="${lf.sort === k}">${label}${lf.sort === k ? (lf.dir < 0 ? ' ▾' : ' ▴') : ''}</button></th>`;
       const base = list;
       if (!LF.some(([k]) => k === langFilter)) langFilter = 'all';
       list = base.filter(LF.find(([k]) => k === langFilter)[2]);
       const bar = base.length ? `<div class="be-seg" role="group" aria-label="Переводы">${LF.map(([k, n, f]) =>
         `<button type="button" data-lf="${k}" aria-pressed="${langFilter === k}">${n} <span>${base.filter(f).length}</span></button>`).join('')}</div>` : '';
-      const head = bar + (tagFilter ? `<p class="be-filter">Статьи с тегом <b>#${esc(tagFilter.t)}</b> · <button type="button" class="bc-link" data-unfilter>показать все</button></p>` : '');
-      if (!list.length) return head + `<p class="be-note">${langFilter === 'part' ? 'Все статьи переведены 🎉' : langFilter === 'full' ? 'Полностью переведённых статей пока нет.' : dashTab === 'draft' ? 'Черновиков нет.' : 'Опубликованных статей пока нет.'}</p>`;
+      const head = filters + bar + stats + (tagFilter ? `<p class="be-filter">Статьи с тегом <b>#${esc(tagFilter.t)}</b> · <button type="button" class="bc-link" data-unfilter>показать все</button></p>` : '');
+      if (!list.length) return head + `<p class="be-note">${active ? 'Ничего не нашлось — попробуйте изменить фильтры.' : langFilter === 'part' ? 'Все статьи переведены 🎉' : langFilter === 'full' ? 'Полностью переведённых статей пока нет.' : dashTab === 'draft' ? 'Черновиков нет.' : 'Опубликованных статей пока нет.'}</p>`;
       // галочки слева → действия с выбранными; раздел меняется прямо в строке; остальное — в меню «⋯»
       const ids = new Set(list.map(p => p.id));
       for (const id of [...picked]) if (!ids.has(id)) picked.delete(id);
@@ -106,13 +134,13 @@
           <optgroup label="Статус">${dashTab === 'draft' ? '<option value="publish">Опубликовать</option>' : '<option value="draft">Снять с публикации (в черновики)</option>'}</optgroup>
           <optgroup label="Опасно"><option value="delete">🗑 Удалить</option></optgroup></select>
           <button type="button" class="bc-link" data-unpick>снять выбор</button>` : ''}</div>`;
-      return head + bulk + `<table class="be-table be-posts"><thead><tr><th class="be-ck"><input type="checkbox" id="be-pickall" aria-label="Выбрать все" ${n && n === list.length ? 'checked' : ''}></th><th>Статья</th><th>Языки</th><th>Раздел</th><th>Дата</th><th title="лайки">♥</th><th title="просмотры">👁</th><th title="комментарии">💬</th><th></th></tr></thead><tbody>
+      return head + bulk + `<table class="be-table be-posts"><thead><tr><th class="be-ck"><input type="checkbox" id="be-pickall" aria-label="Выбрать все" ${n && n === list.length ? 'checked' : ''}></th>${th('title', 'Статья')}<th>Языки</th><th>Раздел</th>${th('date', 'Дата')}${th('likes', '♥', 'лайки')}${th('views', '👁', 'просмотры')}${th('comments', '💬', 'комментарии')}<th></th></tr></thead><tbody>
         ${list.map(p => `<tr data-id="${p.id}"${picked.has(p.id) ? ' class="picked"' : ''}><td class="be-ck"><input type="checkbox" data-pick ${picked.has(p.id) ? 'checked' : ''} aria-label="Выбрать"></td>
           <td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(p.t_ru || p.t_en || p.t_lv || '(без названия)')}</b></a></td>
           <td><span class="be-langs">${['ru', 'en', 'lv'].map(l => p['t_' + l] ? `<i class="on" title="Есть на ${l.toUpperCase()}">✓ ${l.toUpperCase()}</i>` : `<i title="Нет перевода на ${l.toUpperCase()}">${l.toUpperCase()}</i>`).join('')}</span></td>
           <td><select class="be-rowsec" data-rowsec aria-label="Раздел">${secOpts(p.section || '')}</select></td>
           <td>${fmt(p.published_at || p.updated_at)}</td>
-          <td>${p.likes}</td><td>${p.views}</td><td>${p.comments}</td>
+          <td>${p.likes}</td><td class="be-views"><span style="--w:${Math.round((p.views || 0) / maxViews * 100)}%">${p.views}</span></td><td>${p.comments}</td>
           <td><details class="be-menu"><summary aria-label="Ещё">⋯</summary><div><a href="#${p.id}">✎ Изменить</a><a href="/ru/blog/${esc(p.slug)}/" target="_blank">↗ Открыть на сайте</a><button type="button" class="be-danger" data-delpost>🗑 Удалить</button></div></details></td></tr>`).join('')}
       </tbody></table>`;
     };
@@ -160,6 +188,18 @@
       ${state.media ? '' : '<p class="be-note">⚠ Хранилище картинок (R2) не подключено — загрузка картинок не заработает.</p>'}`;
     app.querySelectorAll('[data-dtab]').forEach(b => b.addEventListener('click', () => { dashTab = b.dataset.dtab; tagFilter = null; picked.clear(); dashboard(); }));
     app.querySelectorAll('[data-lf]').forEach(b => b.addEventListener('click', () => { langFilter = b.dataset.lf; dashboardLocal(); }));
+    // фильтры списка; поиск перерисовывает список, курсор остаётся в поле
+    const fq = app.querySelector('#be-q');
+    if (fq) {
+      let qt;
+      fq.addEventListener('input', () => { clearTimeout(qt); qt = setTimeout(() => { lf.q = fq.value; dashboardLocal(); const n = app.querySelector('#be-q'); n.focus(); n.setSelectionRange(n.value.length, n.value.length); }, 200); });
+      app.querySelector('#be-fsec').addEventListener('change', e => { lf.sec = e.target.value; dashboardLocal(); });
+      app.querySelector('#be-fmonth').addEventListener('change', e => { const m = e.target.value; lf.from = m ? m + '-01' : ''; lf.to = m ? m + '-31' : ''; dashboardLocal(); });
+      app.querySelector('#be-from').addEventListener('change', e => { lf.from = e.target.value; dashboardLocal(); });
+      app.querySelector('#be-to').addEventListener('change', e => { lf.to = e.target.value; dashboardLocal(); });
+      const fr = app.querySelector('#be-freset'); fr && fr.addEventListener('click', () => { Object.assign(lf, { q: '', sec: '', from: '', to: '' }); dashboardLocal(); });
+    }
+    app.querySelectorAll('[data-sort]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.sort; lf.dir = lf.sort === k ? -lf.dir : (k === 'title' ? 1 : -1); lf.sort = k; dashboardLocal(); }));
     const unf = app.querySelector('[data-unfilter]'); unf && unf.addEventListener('click', () => { tagFilter = null; dashboard(); });
     app.querySelectorAll('[data-show]').forEach(b => b.addEventListener('click', () => { tagFilter = { t: b.closest('tr').dataset.t }; dashTab = 'published'; dashboard(); }));
     app.querySelectorAll('[data-ren], [data-deltag]').forEach(b => b.addEventListener('click', async () => {

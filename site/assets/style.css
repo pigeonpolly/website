@@ -2319,3 +2319,15 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .bs-moretags[open] .l { display: inline; }
 .bs-moretags[open] > summary { order: 2; }
 .bs-moretags[open] { display: flex; flex-direction: column; align-items: flex-start; }
+
+/* Редактор блога: фильтры списка, сводка, сортировка по столбцам */
+.be-filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0 0 12px; }
+.be-filters input, .be-filters select { padding: 8px 12px; border: 1px solid #ddd6ea; border-radius: 10px; background: #fff; font: 15px var(--sans); color: #2B1A51; }
+.be-filters #be-q { flex: 1 1 200px; min-width: 0; }
+.be-period { display: inline-flex; gap: 8px; }
+.be-filters label { display: inline-flex; align-items: center; gap: 6px; font: 600 14px var(--sans); color: #5A4E78; }
+.be-sum { margin: 0 0 12px; font: 15px var(--sans); color: #5A4E78; }
+.be-app .be-sort { border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; white-space: nowrap; }
+.be-app .be-sort[aria-pressed="true"] { color: #5B47C2; }
+.be-views span { display: inline-block; min-width: 2.2em; padding: 1px 6px; border-radius: 6px; background: linear-gradient(90deg, #E4DCFA var(--w), transparent var(--w)); }
+@media (max-width: 700px) { .be-period { flex: 1 1 100%; } .be-filters label { flex: 1 1 45%; } .be-filters label input { flex: 1; min-width: 0; } }
