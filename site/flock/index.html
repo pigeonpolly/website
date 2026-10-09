@@ -111,7 +111,7 @@
   <h2 id="fl-title">Our flock</h2>
   <p class="fl-sub">Everyone who has ever signed in on this site lives here as a little pixel bird. No two birds are alike: different shapes, hats and very fancy shoes. Every 10th guest is a friendly cat, every 11th a crow with a treasure in its beak. Click a nickname to see the profile.</p>
   <p class="fl-count" data-tpl="Birds in the flock: {n}" data-recent="· showing those who dropped by recently"></p>
-  <div class="fl-tools" role="toolbar" aria-label="Play with the flock"><button type="button" data-act="seed" aria-pressed="false"><span aria-hidden="true">🌾</span> Seeds</button><button type="button" data-act="party" aria-pressed="false"><span aria-hidden="true">🎉</span> Party</button><button type="button" data-act="wind"><span aria-hidden="true">💨</span> Wind</button><button type="button" data-act="rain"><span aria-hidden="true">🌧</span> Rain</button><button type="button" data-act="football"><span aria-hidden="true">⚽</span> Football</button><button type="button" data-act="dance"><span aria-hidden="true">🪩</span> Disco</button><button type="button" data-act="nap"><span aria-hidden="true">🌙</span> Night</button><button type="button" data-act="coffee"><span aria-hidden="true">☕</span> Coffee</button><button type="button" data-act="tug"><span aria-hidden="true">🥖</span> Baguette tug</button><button type="button" data-act="plane"><span aria-hidden="true">✈️</span> Paper plane</button><button type="button" data-act="bookclub"><span aria-hidden="true">📖</span> Book club</button><button type="button" data-act="box"><span aria-hidden="true">📦</span> Box</button><button type="button" data-act="delivery"><span aria-hidden="true">🪂</span> Delivery</button><button type="button" data-act="tidy"><span aria-hidden="true">🧹</span> Tidy up</button><button type="button" data-act="nicks" aria-pressed="true"><span aria-hidden="true">🏷</span> Nicknames</button><button type="button" data-act="reset" class="fl-reset"><span aria-hidden="true">↺</span> Back to normal</button><a class="fl-open" href="/flock/" target="_blank"><span aria-hidden="true">⛶</span> Full screen</a></div>
+  <div class="fl-tools" role="toolbar" aria-label="Play with the flock"><button type="button" data-act="seed" aria-pressed="false"><span aria-hidden="true">🌾</span> Seeds</button><button type="button" data-act="party" aria-pressed="false"><span aria-hidden="true">🎉</span> Party</button><button type="button" data-act="wind"><span aria-hidden="true">💨</span> Wind</button><button type="button" data-act="rain"><span aria-hidden="true">🌧</span> Rain</button><button type="button" data-act="football"><span aria-hidden="true">⚽</span> Football</button><button type="button" data-act="dance"><span aria-hidden="true">🪩</span> Disco</button><button type="button" data-act="nap"><span aria-hidden="true">🌙</span> Night</button><button type="button" data-act="coffee"><span aria-hidden="true">☕</span> Coffee</button><button type="button" data-act="tug"><span aria-hidden="true">🥖</span> Baguette tug</button><button type="button" data-act="plane"><span aria-hidden="true">✈️</span> Paper plane</button><button type="button" data-act="bookclub"><span aria-hidden="true">📖</span> Book club</button><button type="button" data-act="box"><span aria-hidden="true">📦</span> Box</button><button type="button" data-act="delivery"><span aria-hidden="true">🪂</span> Delivery</button><button type="button" data-act="tidy"><span aria-hidden="true">🧹</span> Tidy up</button><button type="button" data-act="loc-park" aria-pressed="true"><span aria-hidden="true">🌳</span> Square</button><button type="button" data-act="loc-diner" aria-pressed="false"><span aria-hidden="true">🍽</span> Diner</button><button type="button" data-act="loc-books" aria-pressed="false"><span aria-hidden="true">📚</span> Bookstore</button><button type="button" data-act="nicks" aria-pressed="true"><span aria-hidden="true">🏷</span> Nicknames</button><button type="button" data-act="reset" class="fl-reset"><span aria-hidden="true">↺</span> Back to normal</button><a class="fl-open" href="/flock/" target="_blank"><span aria-hidden="true">⛶</span> Full screen</a></div>
   <form class="fl-find" role="search"><input type="search" name="nick" placeholder="Find a bird by nickname" aria-label="Find a bird by nickname" maxlength="40" autocomplete="off"><button type="submit">🔍 Find</button><span class="fl-find-msg" role="status" aria-live="polite"></span></form>
   <p class="fl-seedhint" hidden>Hold the mouse button (or your finger) and move over the scene — the birds will flock to the seeds.</p>
   <div class="fl-stage"><canvas width="300" height="142" role="img" aria-label="Pixel birds living their little lives around a bench: they carry things, tug a baguette, play football, read a book and drink coffee"></canvas><div class="fl-labels"></div></div>
@@ -124,6 +124,7 @@
   <h2 class="section-title">Collections</h2>
   <p class="fl-all-lead">Everything a bird (or a cat, or a crow) can collect. Alina gives these as gift seeds.</p>
   <p class="fl-coll-me" hidden></p>
+  <div class="fl-coll-bar" role="toolbar" aria-label="Filter"></div>
   <div class="fl-coll-box"></div>
 </section>
 <section data-ppb="flock.4" class="fl-all" id="all-birds">
@@ -157,15 +158,26 @@
 (function () {
   var L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
   var T = { got: ['You have {n} of {t}', 'У вас {n} из {t}', 'Tev ir {n} no {t}'], have: ['✓ yours', '✓ есть', '✓ ir'], gift: ['🎁 not opened', '🎁 не открыт', '🎁 nav atvērts'] };
-  var KINDS = [['hat', ['Hats', 'Головные уборы', 'Galvassegas']], ['item', ['Treats to hold', 'Вкусняшки и вещички', 'Gardumi un lietiņas']], ['shoes', ['Shoes', 'Обувь', 'Apavi']], ['scarf', ['Scarves', 'Шарфики', 'Šallītes']],
-    ['frame', ['Frames', 'Рамки', 'Rāmji']], ['bg', ['Backgrounds', 'Фоны', 'Foni']], ['anim', ['Animations', 'Анимации', 'Animācijas']]];
-  var box = document.querySelector('.fl-coll-box'), me = null, owned = {};
+  var box = document.querySelector('.fl-coll-box'), bar = document.querySelector('.fl-coll-bar'), me = null, owned = {}, filter = 'all';
+  var ALL = ['All', 'Все', 'Visi'];
+  function buttons() {
+    var B = window.PPBirds; if (!B || bar.children.length) return;
+    var add = function (key, label, cls) { var b = document.createElement('button'); b.type = 'button'; b.className = 'pill-btn ' + (cls || ''); b.dataset.f = key; b.textContent = label; b.onclick = function () { filter = key; draw(); }; bar.appendChild(b); };
+    add('all', ALL[L]);
+    B.GIFT_KINDS.forEach(function (k) { add('kind:' + k[0], k[1][L]); });
+    var br = document.createElement('span'); br.className = 'fl-coll-br'; bar.appendChild(br);
+    B.GIFT_THEMES.forEach(function (t) { add('theme:' + t[0], t[1][L], 'fl-theme'); });
+  }
   function draw() {
     var B = window.PPBirds; if (!B) return;
+    buttons();
+    [].forEach.call(bar.children, function (b) { if (b.dataset) b.setAttribute('aria-pressed', String(b.dataset.f === filter)); });
     var id = me ? me.id : 2, total = 0, have = 0;
+    var theme = filter.indexOf('theme:') === 0 ? B.GIFT_THEMES.filter(function (t) { return 'theme:' + t[0] === filter; })[0] : null;
     box.innerHTML = '';
-    KINDS.forEach(function (k) {
-      var list = B.GIFTS[k[0]] || []; if (!list.length) return;
+    B.GIFT_KINDS.forEach(function (k) {
+      if (filter.indexOf('kind:') === 0 && filter !== 'kind:' + k[0]) return;
+      var list = (B.GIFTS[k[0]] || []).filter(function (v) { return !theme || theme[2].indexOf(k[0] + '|' + v) >= 0; }); if (!list.length) return;
       var h = document.createElement('h3'); h.textContent = k[1][L]; box.appendChild(h);
       var g = document.createElement('div'); g.className = 'fl-coll-grid'; box.appendChild(g);
       list.forEach(function (v) {

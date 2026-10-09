@@ -379,5 +379,19 @@
   };
   const giftName = (kind, v, L = 0) => kind === 'anim' && v === 'heart' ? GIFT_NAMES.heartbeat[L] : kind === 'bg' || kind === 'scarf' ? GIFT_NAMES[kind][L] : (GIFT_NAMES[String(v).split(':')[0]] || [v, v, v])[L];
 
-  window.PPBirds = { looks, sprite, spriteHD, crop, dress, avatar, giftName, HW, HH, HB, HO, GIFTS, SW, SH, BASE, OX };
+  // темы и сезоны вещей (для кнопок-фильтров в «Коллекциях» и в кабинете): 'вид|значение'
+  const GIFT_THEMES = [
+    ['magic', ['✨ Magic', '✨ Волшебство', '✨ Burvība'], ['hat|wizard', 'item|wand', 'item|crystal', 'item|star', 'frame|magic', 'frame|stars', 'anim|sparkle']],
+    ['halloween', ['🎃 Halloween', '🎃 Хеллоуин', '🎃 Helovīns'], ['hat|witch', 'hat|pumpkin', 'item|minipumpkin', 'item|lollipop', 'frame|spooky', 'bg|#1B1035']],
+    ['newyear', ['🎄 New Year', '🎄 Новый год', '🎄 Jaunais gads'], ['hat|santa', 'hat|antlers', 'hat|beanie', 'item|candycane', 'item|giftbox', 'item|ornament', 'item|snowflake', 'frame|snow', 'bg|#E8F4FF', 'scarf|#E0443A', 'scarf|#FFFFFF']],
+    ['valentine', ["💘 Valentine's Day", '💘 День влюблённых', '💘 Valentīndiena'], ['hat|heartband', 'item|heart', 'item|rose', 'item|letter', 'frame|hearts', 'bg|#FFD6E0', 'anim|heart', 'scarf|#F08BC0']],
+    ['spring', ['🌸 Spring', '🌸 Весна', '🌸 Pavasaris'], ['hat|wreath', 'item|cherry', 'bg|#CDEBD8', 'bg|#F7C6DA', 'frame|leaves']],
+    ['summer', ['☀️ Summer', '☀️ Лето', '☀️ Vasara'], ['hat|strawhat', 'item|icecream', 'item|cherry', 'bg|#FBE3A1', 'bg|#BFD7F5']],
+    ['autumn', ['🍂 Autumn', '🍂 Осень', '🍂 Rudens'], ['hat|leafcrown', 'item|mapleleaf', 'bg|#F2C27B', 'frame|leaves', 'scarf|#D85A30', 'scarf|#E9A93B']],
+    ['gaming', ['🎮 Gaming', '🎮 Гейминг', '🎮 Spēles'], ['hat|headset', 'item|gamepad', 'item|coin', 'item|sword', 'item|mushroom', 'frame|neon', 'bg|#0F0F2D']],
+  ];
+  const GIFT_KINDS = [['hat', ['Hats', 'Головные уборы', 'Galvassegas']], ['item', ['Treats to hold', 'В клюв', 'Knābī']], ['shoes', ['Shoes', 'Обувь', 'Apavi']], ['scarf', ['Scarves', 'Шарфики', 'Šallītes']],
+    ['frame', ['Frames', 'Рамки', 'Rāmji']], ['bg', ['Backgrounds', 'Фоны', 'Foni']], ['anim', ['Animations', 'Анимации', 'Animācijas']]];
+
+  window.PPBirds = { looks, sprite, spriteHD, crop, dress, avatar, giftName, GIFT_THEMES, GIFT_KINDS, HW, HH, HB, HO, GIFTS, SW, SH, BASE, OX };
 })();

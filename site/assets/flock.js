@@ -136,6 +136,7 @@
     if (loc && !kind) for (const b of birds) if (b.inside) comeOut(b);
     loc = kind; locIn = kind ? rnd(110, 170) : rnd(50, 80);
     bg = drawBackground();
+    box.querySelectorAll('[data-act^="loc"]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.act === (kind === 'diner' ? 'loc-diner' : kind === 'bookstore' ? 'loc-books' : 'loc-park'))));
   }
   function locTick(dt) {
     if ((locIn -= dt) > 0) return;
@@ -1240,6 +1241,13 @@
       const act = btn.dataset.act;
       if (act === 'seed') { seeding = !seeding; btn.setAttribute('aria-pressed', String(seeding)); stage.classList.toggle('seeding', seeding); const h = box.querySelector('.fl-seedhint'); if (h) h.hidden = !seeding; return; }
       if (act === 'party') { setParty(!party); btn.setAttribute('aria-pressed', String(party)); return; }
+      if (act.startsWith('loc')) { // локации: сквер / закусочная / книжный — птички сразу бегут туда
+        const kind = act === 'loc-diner' ? 'diner' : act === 'loc-books' ? 'bookstore' : null;
+        setLoc(kind); if (kind) locIn = 240;
+        box.querySelectorAll('[data-act^="loc"]').forEach(x => x.setAttribute('aria-pressed', String(x === btn)));
+        if (kind) for (const b of freeBirds().slice(0, 6)) { b.tasks = []; b.goal = null; b.wait = 0; visitPlace(b); nextTask(b); }
+        return;
+      }
       if (act === 'reset') {
         tidyAll(); seeding = false; stage.classList.remove('seeding');
         box.querySelectorAll('.fl-tools [aria-pressed]').forEach(x => x.setAttribute('aria-pressed', 'false'));

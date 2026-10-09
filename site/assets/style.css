@@ -2613,3 +2613,13 @@ html.sb-hide { --sb: 0px; }
 .be-swatches[hidden] { display: none; }
 .be-app .be-swatches button { width: 22px; height: 22px; min-width: 0; padding: 0; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #CFC7E8; font-size: 11px; color: #2B1A51; background: #fff; }
 .bp-body s, .bp-body strike, .bp-body del { text-decoration-thickness: 2px; }
+.fl-coll-bar { display: flex; flex-wrap: wrap; gap: 6px; margin: 8px 0 4px; }
+.fl-coll-bar .pill-btn { padding: 6px 13px; font-size: 14px; }
+.fl-coll-bar .pill-btn[aria-pressed="true"] { background: #E9A93B; border-color: #E9A93B; color: #2B1A51; }
+.fl-coll-bar .fl-theme { border-style: dashed; }
+.fl-coll-br { flex-basis: 100%; height: 0; }
+.adm-gift-br { flex-basis: 100%; height: 0; }
+.adm-gift-card .adm-th { border-style: dashed; }
+.sw-pv-bag { margin-bottom: 18px; align-items: center; }
+.sw-pv-bag > * { flex: none; }
+.sw-pv-works { margin-top: 14px; clear: both; }

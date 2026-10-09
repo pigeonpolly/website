@@ -111,7 +111,7 @@
   <h2 id="fl-title">Mūsu bars</h2>
   <p class="fl-sub">Šeit dzīvo visi, kas kaut reizi ir pieslēgušies vietnei, — katrs kā mazs pikseļu putniņš. Divu vienādu nav: dažādas formas, cepures un ļoti modernas kurpes. Katrs 10. viesis ir draudzīgs kaķītis, katrs 11. — vārna ar dārgumu knābī. Noklikšķiniet uz segvārda, lai atvērtu profilu.</p>
   <p class="fl-count" data-tpl="Putni barā: {n}" data-recent="· redzami tie, kas nesen ienāca"></p>
-  <div class="fl-tools" role="toolbar" aria-label="Paspēlējies ar baru"><button type="button" data-act="seed" aria-pressed="false"><span aria-hidden="true">🌾</span> Graudiņi</button><button type="button" data-act="party" aria-pressed="false"><span aria-hidden="true">🎉</span> Svētki</button><button type="button" data-act="wind"><span aria-hidden="true">💨</span> Vējš</button><button type="button" data-act="rain"><span aria-hidden="true">🌧</span> Lietus</button><button type="button" data-act="football"><span aria-hidden="true">⚽</span> Futbols</button><button type="button" data-act="dance"><span aria-hidden="true">🪩</span> Diskotēka</button><button type="button" data-act="nap"><span aria-hidden="true">🌙</span> Nakts</button><button type="button" data-act="coffee"><span aria-hidden="true">☕</span> Kafija</button><button type="button" data-act="tug"><span aria-hidden="true">🥖</span> Bagete</button><button type="button" data-act="plane"><span aria-hidden="true">✈️</span> Lidmašīnīte</button><button type="button" data-act="bookclub"><span aria-hidden="true">📖</span> Grāmatu klubs</button><button type="button" data-act="box"><span aria-hidden="true">📦</span> Kaste</button><button type="button" data-act="delivery"><span aria-hidden="true">🪂</span> Piegāde</button><button type="button" data-act="tidy"><span aria-hidden="true">🧹</span> Kārtība</button><button type="button" data-act="nicks" aria-pressed="true"><span aria-hidden="true">🏷</span> Segvārdi</button><button type="button" data-act="reset" class="fl-reset"><span aria-hidden="true">↺</span> Kā bija</button><a class="fl-open" href="/lv/flock/" target="_blank"><span aria-hidden="true">⛶</span> Pa visu ekrānu</a></div>
+  <div class="fl-tools" role="toolbar" aria-label="Paspēlējies ar baru"><button type="button" data-act="seed" aria-pressed="false"><span aria-hidden="true">🌾</span> Graudiņi</button><button type="button" data-act="party" aria-pressed="false"><span aria-hidden="true">🎉</span> Svētki</button><button type="button" data-act="wind"><span aria-hidden="true">💨</span> Vējš</button><button type="button" data-act="rain"><span aria-hidden="true">🌧</span> Lietus</button><button type="button" data-act="football"><span aria-hidden="true">⚽</span> Futbols</button><button type="button" data-act="dance"><span aria-hidden="true">🪩</span> Diskotēka</button><button type="button" data-act="nap"><span aria-hidden="true">🌙</span> Nakts</button><button type="button" data-act="coffee"><span aria-hidden="true">☕</span> Kafija</button><button type="button" data-act="tug"><span aria-hidden="true">🥖</span> Bagete</button><button type="button" data-act="plane"><span aria-hidden="true">✈️</span> Lidmašīnīte</button><button type="button" data-act="bookclub"><span aria-hidden="true">📖</span> Grāmatu klubs</button><button type="button" data-act="box"><span aria-hidden="true">📦</span> Kaste</button><button type="button" data-act="delivery"><span aria-hidden="true">🪂</span> Piegāde</button><button type="button" data-act="tidy"><span aria-hidden="true">🧹</span> Kārtība</button><button type="button" data-act="loc-park" aria-pressed="true"><span aria-hidden="true">🌳</span> Skvērs</button><button type="button" data-act="loc-diner" aria-pressed="false"><span aria-hidden="true">🍽</span> Ēstuve</button><button type="button" data-act="loc-books" aria-pressed="false"><span aria-hidden="true">📚</span> Grāmatnīca</button><button type="button" data-act="nicks" aria-pressed="true"><span aria-hidden="true">🏷</span> Segvārdi</button><button type="button" data-act="reset" class="fl-reset"><span aria-hidden="true">↺</span> Kā bija</button><a class="fl-open" href="/lv/flock/" target="_blank"><span aria-hidden="true">⛶</span> Pa visu ekrānu</a></div>
   <form class="fl-find" role="search"><input type="search" name="nick" placeholder="Atrast putniņu pēc segvārda" aria-label="Atrast putniņu pēc segvārda" maxlength="40" autocomplete="off"><button type="submit">🔍 Meklēt</button><span class="fl-find-msg" role="status" aria-live="polite"></span></form>
   <p class="fl-seedhint" hidden>Turi nospiestu peles pogu (vai pirkstu) un vadi pa ainu — putniņi salidos pie graudiņiem.</p>
   <div class="fl-stage"><canvas width="300" height="142" role="img" aria-label="Pikseļu putniņi dzīvo savu dzīvi pie soliņa: nēsā mantas, velk bageti, spēlē futbolu, lasa grāmatu un dzer kafiju"></canvas><div class="fl-labels"></div></div>
@@ -124,6 +124,7 @@
   <h2 class="section-title">Kolekcijas</h2>
   <p class="fl-all-lead">Viss, ko var savākt putniņš (kā arī kaķis vai vārna). Alīna to dāvina kā sēkliņas-dāvanas.</p>
   <p class="fl-coll-me" hidden></p>
+  <div class="fl-coll-bar" role="toolbar" aria-label="Filter"></div>
   <div class="fl-coll-box"></div>
 </section>
 <section data-ppb="flock.4" class="fl-all" id="all-birds">
@@ -157,15 +158,26 @@
 (function () {
   var L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
   var T = { got: ['You have {n} of {t}', 'У вас {n} из {t}', 'Tev ir {n} no {t}'], have: ['✓ yours', '✓ есть', '✓ ir'], gift: ['🎁 not opened', '🎁 не открыт', '🎁 nav atvērts'] };
-  var KINDS = [['hat', ['Hats', 'Головные уборы', 'Galvassegas']], ['item', ['Treats to hold', 'Вкусняшки и вещички', 'Gardumi un lietiņas']], ['shoes', ['Shoes', 'Обувь', 'Apavi']], ['scarf', ['Scarves', 'Шарфики', 'Šallītes']],
-    ['frame', ['Frames', 'Рамки', 'Rāmji']], ['bg', ['Backgrounds', 'Фоны', 'Foni']], ['anim', ['Animations', 'Анимации', 'Animācijas']]];
-  var box = document.querySelector('.fl-coll-box'), me = null, owned = {};
+  var box = document.querySelector('.fl-coll-box'), bar = document.querySelector('.fl-coll-bar'), me = null, owned = {}, filter = 'all';
+  var ALL = ['All', 'Все', 'Visi'];
+  function buttons() {
+    var B = window.PPBirds; if (!B || bar.children.length) return;
+    var add = function (key, label, cls) { var b = document.createElement('button'); b.type = 'button'; b.className = 'pill-btn ' + (cls || ''); b.dataset.f = key; b.textContent = label; b.onclick = function () { filter = key; draw(); }; bar.appendChild(b); };
+    add('all', ALL[L]);
+    B.GIFT_KINDS.forEach(function (k) { add('kind:' + k[0], k[1][L]); });
+    var br = document.createElement('span'); br.className = 'fl-coll-br'; bar.appendChild(br);
+    B.GIFT_THEMES.forEach(function (t) { add('theme:' + t[0], t[1][L], 'fl-theme'); });
+  }
   function draw() {
     var B = window.PPBirds; if (!B) return;
+    buttons();
+    [].forEach.call(bar.children, function (b) { if (b.dataset) b.setAttribute('aria-pressed', String(b.dataset.f === filter)); });
     var id = me ? me.id : 2, total = 0, have = 0;
+    var theme = filter.indexOf('theme:') === 0 ? B.GIFT_THEMES.filter(function (t) { return 'theme:' + t[0] === filter; })[0] : null;
     box.innerHTML = '';
-    KINDS.forEach(function (k) {
-      var list = B.GIFTS[k[0]] || []; if (!list.length) return;
+    B.GIFT_KINDS.forEach(function (k) {
+      if (filter.indexOf('kind:') === 0 && filter !== 'kind:' + k[0]) return;
+      var list = (B.GIFTS[k[0]] || []).filter(function (v) { return !theme || theme[2].indexOf(k[0] + '|' + v) >= 0; }); if (!list.length) return;
       var h = document.createElement('h3'); h.textContent = k[1][L]; box.appendChild(h);
       var g = document.createElement('div'); g.className = 'fl-coll-grid'; box.appendChild(g);
       list.forEach(function (v) {

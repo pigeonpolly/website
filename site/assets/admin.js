@@ -142,7 +142,8 @@
     api('admin/gifts?uid=' + u.id).then(r => { for (const g of r.gifts) owned[g.kind + '|' + g.item] = g.status; draw(); }).catch(() => {});
     const w = document.createElement('div'); w.className = 'adm-gift';
     w.innerHTML = `<div class="adm-gift-card" role="dialog" aria-label="Подарок"><h3>🎁 Подарок для ${u.nick ? '@' + esc(u.nick) : 'птички без ника'}</h3>
-      <div class="adm-gift-kinds">${KINDS.map(([k, l]) => `<button type="button" class="pill-btn" data-k="${k}">${l}</button>`).join('')}</div>
+      <div class="adm-gift-kinds">${KINDS.map(([k, l]) => `<button type="button" class="pill-btn" data-k="${k}">${l}</button>`).join('')}
+        <span class="adm-gift-br"></span>${(B.GIFT_THEMES || []).map(t => `<button type="button" class="pill-btn adm-th" data-th="${t[0]}">${t[1][1]}</button>`).join('')}</div>
       <div class="adm-gift-items"></div>
       <div class="adm-gift-prev"><figure><span class="gnow"></span><figcaption>Сейчас</figcaption></figure><span class="adm-gift-arrow">→</span><figure><span class="gp"></span><figcaption>С подарком</figcaption></figure>
         <p class="be-note">✓ — у птички это уже есть (в сумке), 🎁 — подарено, но ещё не открыто. Человек увидит «🎁 Тебе подарок!» в профиле челленджа.</p></div>
@@ -152,23 +153,29 @@
     const close = () => w.remove();
     w.onclick = e => { if (e.target === w) close(); };
     w.querySelector('[data-x]').onclick = close;
+    let theme = null; // выбрана тема/сезон: показываем вещи разных видов этой темы
     const draw = () => {
-      w.querySelectorAll('[data-k]').forEach(b => b.classList.toggle('pill-fill', b.dataset.k === kind));
+      w.querySelectorAll('[data-k]').forEach(b => b.classList.toggle('pill-fill', !theme && b.dataset.k === kind));
+      w.querySelectorAll('[data-th]').forEach(b => b.classList.toggle('pill-fill', theme === b.dataset.th));
       const box = w.querySelector('.adm-gift-items'); box.innerHTML = '';
-      B.GIFTS[kind].forEach(v => {
-        const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-pressed', String(v === item)); b.title = NAMES[v] || v;
-        b.appendChild(B.avatar(u.id, Object.assign({}, av, { [kind]: v }), 48));
-        if (NAMES[v]) b.insertAdjacentHTML('beforeend', `<small>${NAMES[v]}</small>`);
-        const st = owned[kind + '|' + v];
+      const th = theme && B.GIFT_THEMES.find(t => t[0] === theme);
+      const list = th ? th[2].map(x => x.split('|')) : B.GIFTS[kind].map(v => [kind, v]);
+      for (const [kd, v] of list) {
+        const nm = NAMES[v] || (B.giftName ? B.giftName(kd, v, 1) : v);
+        const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-pressed', String(v === item && kd === kind)); b.title = nm;
+        b.appendChild(B.avatar(u.id, Object.assign({}, av, { [kd]: v }), 48));
+        if (NAMES[v] || th) b.insertAdjacentHTML('beforeend', `<small>${esc(nm)}</small>`);
+        const st = owned[kd + '|' + v];
         if (st) { b.classList.add('owned'); b.insertAdjacentHTML('beforeend', `<span class="adm-own">${st === 'new' ? '🎁' : '✓'}</span>`); }
-        if (av[kind] === v) b.classList.add('worn');
-        b.onclick = () => { item = v; draw(); };
+        if (av[kd] === v) b.classList.add('worn');
+        b.onclick = () => { item = v; kind = kd; draw(); };
         box.appendChild(b);
-      });
+      }
       const gn = w.querySelector('.gnow'); if (!gn.firstChild) gn.appendChild(B.avatar(u.id, av, 96));
       const gp = w.querySelector('.gp'); gp.innerHTML = ''; gp.appendChild(B.avatar(u.id, Object.assign({}, av, { [kind]: item }), 96));
     };
-    w.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { kind = b.dataset.k; item = B.GIFTS[kind][0]; draw(); });
+    w.querySelectorAll('[data-th]').forEach(b => b.onclick = () => { theme = b.dataset.th; const first = B.GIFT_THEMES.find(t => t[0] === theme)[2][0].split('|'); kind = first[0]; item = first[1]; draw(); });
+    w.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { theme = null; kind = b.dataset.k; item = B.GIFTS[kind][0]; draw(); });
     w.querySelector('[data-send]').onclick = async e => {
       e.target.disabled = true;
       try { await api('admin/gift', { uid: u.id, kind, item, note: w.querySelector('input').value.trim() }); close(); alert('🎁 Подарок отправлен! Он появится у птички в профиле челленджа.'); done && done(); }
