@@ -317,7 +317,9 @@ export async function blogApi(req, env, url, h) {
       let id = Number(b.id) || 0;
       const old = id ? await env.DB.prepare('SELECT * FROM blog_posts WHERE id = ?').bind(id).first() : null;
       if (id && !old) fail(404, 'post');
-      const published = status === 'published' ? (old?.published_at || t) : old?.published_at || null;
+      // дату можно поменять в редакторе (b.published_at — секунды); иначе первая публикация
+      const custom = Number(b.published_at) > 0 && Number(b.published_at) < t + 366 * 86400 ? Math.floor(Number(b.published_at)) : null;
+      const published = custom || (status === 'published' ? (old?.published_at || t) : old?.published_at || null);
       const cols = Object.keys(f);
       if (old) {
         await env.DB.prepare(`UPDATE blog_posts SET ${cols.map(c => c + ' = ?').join(', ')}, slug = ?, cover = ?, status = ?, featured = ?, updated_at = ?, published_at = ? WHERE id = ?`)

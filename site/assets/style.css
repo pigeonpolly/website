@@ -2251,3 +2251,5 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .search-btn { flex: none; }
 .search-box input::-webkit-search-cancel-button { -webkit-appearance: none; display: none; }
 @media (max-width: 420px) { .search-btn { width: 36px; height: 36px; } .search-btn + .lang-switch { margin-left: 4px; } }
+.adm-restore { cursor: pointer; }
+.be-app #be-date { max-width: 220px; padding: 10px 14px; border-radius: 12px; border: 1px solid #E2DCEE; background: #fff; color: #2B1A51; font: 16px var(--sans); }

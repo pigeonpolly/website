@@ -147,10 +147,7 @@
     const flashHtml = flash ? `<p class="be-flash" role="status">${flash}</p>` : ''; flash = '';
     app.innerHTML = `${flashHtml}<div class="be-top">
         <a class="pill-btn pill-fill" href="#new">＋ Новая статья</a>
-        <button type="button" class="pill-btn" id="be-backup" title="Два архива: данные (блог, челлендж, все картинки) и код сайта с GitHub">💾 Скачать полную копию сайта</button>
         <button type="button" class="pill-btn" id="be-gkey">⚙ Перевод (Gemini)${state.gemini ? ' ✓' : ''}</button>
-        <button type="button" class="pill-btn" id="be-auto" title="Копия всего сайта сама раз в неделю в ваш Google Drive">🔁 Автокопия в Google Drive</button>
-        <label class="pill-btn be-restore" title="Вернуть статьи и картинки из ранее скачанной копии">♻ Восстановить из копии<input type="file" id="be-restore" accept=".zip" hidden></label>
         <label class="be-switch"><input type="checkbox" id="be-strict" ${state.strict ? 'checked' : ''}><span></span>
           <b>Строгий режим</b><small>не больше 1 комментария в час с одного адреса</small></label>
       </div>
@@ -222,60 +219,7 @@
       try { await api('blog/admin/tags-translate', {}); } catch (e) { alert(errText(e)); }
       dashboard();
     });
-    // резервная копия: data.json + картинки + читаемые HTML-файлы статей, одним ZIP
-    app.querySelector('#be-backup').addEventListener('click', async e => {
-      const btn = e.currentTarget; btn.disabled = true;
-      const say = t => { btn.textContent = t; };
-      try {
-        say('Готовлю…');
-        const [JSZip, data] = await Promise.all([loadZip(), api('blog/backup')]);
-        const zip = new JSZip();
-        zip.file('data.json', JSON.stringify(data, null, 1));
-        zip.file('README.txt', README(data));
-        for (const p of data.posts) for (const l of ['ru', 'en', 'lv']) {
-          if (!p['t_' + l] && !p['b_' + l]) continue;
-          zip.file(`posts/${p.slug}/${l}.html`, `<!doctype html><meta charset="utf-8"><title>${esc(p['t_' + l])}</title><body style="max-width:760px;margin:40px auto;font:18px/1.6 Georgia,serif">` +
-            `<h1>${esc(p['t_' + l])}</h1><p><i>${esc(p['d_' + l] || '')}</i></p>` + String(p['b_' + l] || '').replace(/src="\/media\//g, 'src="../../media/') + '</body>');
-        }
-        let n = 0;
-        for (const f of data.files) {
-          say(`Файлы: ${++n} из ${data.files.length}…`);
-          try { const r = await fetch(f.url); if (r.ok) zip.file(f.path, await r.blob()); } catch (err) { /* пропускаем */ }
-        }
-        say('Упаковываю…');
-        const blob = await zip.generateAsync({ type: 'blob' });
-        const a = document.createElement('a');
-        a.href = URL.createObjectURL(blob); a.download = `pigeonpolly-${new Date().toISOString().slice(0, 10)}.zip`;
-        document.body.appendChild(a); a.click(); a.remove();
-        // и код сайта с GitHub — вторым файлом
-        const c = document.createElement('a'); c.href = 'https://codeload.github.com/pigeonpolly/website/zip/refs/heads/main'; c.download = '';
-        document.body.appendChild(c); setTimeout(() => { c.click(); c.remove(); }, 800);
-        say('✓ Скачано: данные + код');
-      } catch (err) { alert('Не получилось сделать копию: ' + errText(err)); say('💾 Скачать полную копию сайта'); }
-      btn.disabled = false;
-    });
-    app.querySelector('#be-auto').addEventListener('click', () => autoBackupPanel());
     app.querySelector('#be-gkey').addEventListener('click', () => geminiPanel());
-    app.querySelector('#be-restore').addEventListener('change', async e => {
-      const f = e.target.files[0]; e.target.value = '';
-      if (!f || !confirm('Восстановить блог из этой копии? Статьи с теми же адресами будут заменены версиями из копии, остальные останутся как есть.')) return;
-      const lbl = app.querySelector('.be-restore');
-      try {
-        const JSZip = await loadZip(), zip = await JSZip.loadAsync(f);
-        const data = JSON.parse(await zip.file('data.json').async('string'));
-        const media = zip.file(/^media\/blog\//);
-        let n = 0;
-        for (const m of media) {
-          lbl.firstChild.textContent = `Картинки: ${++n} из ${media.length}…`;
-          const fd = new FormData(); fd.append('key', m.name.slice(6)); fd.append('file', await m.async('blob'), 'img');
-          await api('blog/admin/restore-media', null, fd);
-        }
-        lbl.firstChild.textContent = 'Статьи…';
-        const r = await api('blog/admin/import', data);
-        flash = `✓ Восстановлено: статей ${r.posts}, комментариев ${r.comments}, картинок ${media.length}.`;
-        dashboard();
-      } catch (err) { alert('Не получилось восстановить: ' + errText(err)); dashboard(); }
-    });
     app.querySelector('#be-strict').addEventListener('change', async e => {
       try { await api('blog/admin/settings', { strict: e.target.checked }); } catch (err) { e.target.checked = !e.target.checked; alert(errText(err)); }
     });
@@ -372,6 +316,8 @@
             ${post.cover ? '<button type="button" class="bc-link" id="be-cover-rm">убрать обложку</button>' : ''}</div></div></div>
         <label class="be-f be-srclang"><span>Язык оригинала <small>(на остальных языках внизу статьи появится маленькая пометка «перевод сделан онлайн-инструментами» со ссылкой на оригинал; кнопка «Перевести» ставит его сама)</small></span>
           <select id="be-src"><option value="">— не указан (пометки не будет) —</option>${LANGS.map(([l, n]) => `<option value="${l}"${post.src_lang === l ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
+        <label class="be-f be-date"><span>Дата статьи <small>(показывается на сайте; статьи идут по ней — от новых к старым. Пусто — дата первой публикации)</small></span>
+          <input type="date" id="be-date" value="${post.published_at ? new Date(post.published_at * 1000).toISOString().slice(0, 10) : ''}"></label>
         <label class="be-f"><span>Раздел <small>(крупная тема, как коллекция на Patreon)</small></span>
           <select id="be-section"><option value="">— без раздела —</option>${sections.map(r => `<option value="${esc(r.slug)}"${post.section === r.slug ? ' selected' : ''}>${esc(r.en)}${r.ru ? ' / ' + esc(r.ru) : ''}</option>`).join('')}<option value="__new">＋ Новый раздел…</option></select></label>
         <div class="be-f"><span>Теги <small>(на английском: впишите тег и нажмите Enter. Перевод на RU и LV подставится сам — поправить его можно во вкладке «Теги» списка статей)</small></span>
@@ -395,7 +341,7 @@
     document.execCommand('defaultParagraphSeparator', false, 'p');
 
     const collect = () => {
-      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value, section: $('#be-section').value === '__new' ? '' : $('#be-section').value };
+      const d = { id: post.id, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value, published_at: dateToTs($('#be-date').value, post.published_at), section: $('#be-section').value === '__new' ? '' : $('#be-section').value };
       app.querySelectorAll('[data-k]').forEach(el => {
         if (!el.isContentEditable) { d[el.dataset.k] = el.value; return; }
         const c = el.cloneNode(true);
@@ -870,18 +816,6 @@
   const slugify = s => String(s || '').toLowerCase()
     .replace(/[а-яё]/g, c => ({ а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya' }[c]))
     .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 70);
-  const README = d => `Резервная копия сайта pigeonpolly.com от ${d.exported_at}
-
-data.json — всё содержимое базы:
-  • блог: статьи (RU/EN/LV), теги, разделы, комментарии, лайки;
-  • челлендж: аккаунты (ник, e-mail, серии, бейджи) и список работ.
-media/ — картинки статей блога.
-challenge/works/ — рисунки участников челленджа.
-posts/ — статьи как обычные HTML-файлы (открываются в браузере без сайта).
-
-Восстановить блог: Редактор блога → «♻ Восстановить из копии» → выбрать этот ZIP.
-Код и страницы сайта — во втором архиве (website-main.zip с GitHub, скачивается вместе с этим).
-`;
   // ключ Gemini для перевода статей — вставляется прямо здесь (хранится на сервере сайта)
   async function geminiPanel() {
     let st = await api('blog/admin/gemini-key').catch(() => ({}));
@@ -913,81 +847,13 @@ posts/ — статьи как обычные HTML-файлы (открываю�
     };
     render(); document.body.appendChild(d); d.showModal();
   }
-  // автокопия раз в неделю: готовый скрипт для Google Apps Script с личным ключом
-  async function autoBackupPanel(rotate) {
-    let t;
-    try { t = rotate ? await api('blog/admin/backup-token', {}) : await api('blog/admin/backup-token'); } catch (e) { alert(errText(e)); return; }
-    const code = `// Автокопия ВСЕГО сайта pigeonpolly.com в Google Drive — раз в неделю (понедельник, ~6 утра)
-// Каждую неделю — папка с датой: «данные» (блог, челлендж, все картинки) и «код» (весь сайт с GitHub)
-const SITE = 'https://www.pigeonpolly.com';
-const TOKEN = '${t.token}';            // личный ключ — никому не показывайте
-const CODE = 'https://codeload.github.com/pigeonpolly/website/zip/refs/heads/main';
-const FOLDER = 'pigeonpolly — резервные копии';
-const KEEP = 12;                      // сколько последних недель хранить
-
-// Запустите ОДИН раз: включает еженедельную копию и сразу делает первую
-function setup() {
-  ScriptApp.getProjectTriggers().forEach(t => ScriptApp.deleteTrigger(t));
-  ScriptApp.newTrigger('backup').timeBased().onWeekDay(ScriptApp.WeekDay.MONDAY).atHour(6).create();
-  backup();
-}
-
-function backup() {
-  const date = Utilities.formatDate(new Date(), 'Europe/Riga', 'yyyy-MM-dd');
-  const it = DriveApp.getFoldersByName(FOLDER);
-  const root = it.hasNext() ? it.next() : DriveApp.createFolder(FOLDER);
-  const week = root.createFolder(date);
-
-  // 1) данные сайта: статьи, теги, комментарии, аккаунты и рисунки челленджа, все картинки
-  const res = UrlFetchApp.fetch(SITE + '/api/blog/backup?token=' + TOKEN, { muteHttpExceptions: true });
-  if (res.getResponseCode() !== 200) throw new Error('Сайт не отдал копию данных: ' + res.getResponseCode());
-  const text = res.getContentText(), data = JSON.parse(text);
-  const blobs = [Utilities.newBlob(text, 'application/json', 'data.json')];
-  for (let i = 0; i < data.files.length; i += 40) {
-    const part = data.files.slice(i, i + 40);
-    UrlFetchApp.fetchAll(part.map(f => ({ url: SITE + f.url, muteHttpExceptions: true })))
-      .forEach((r, k) => { if (r.getResponseCode() === 200) blobs.push(r.getBlob().setName(part[k].path)); });
-  }
-  week.createFile(Utilities.zip(blobs, 'pigeonpolly-данные-' + date + '.zip'));
-
-  // 2) код и страницы сайта с GitHub
-  const code = UrlFetchApp.fetch(CODE, { muteHttpExceptions: true });
-  if (code.getResponseCode() !== 200) throw new Error('GitHub не отдал код: ' + code.getResponseCode());
-  week.createFile(code.getBlob().setName('pigeonpolly-код-' + date + '.zip'));
-
-  // старые недели — в корзину
-  const weeks = []; const fi = root.getFolders(); while (fi.hasNext()) weeks.push(fi.next());
-  weeks.sort((a, b) => b.getDateCreated() - a.getDateCreated()).slice(KEEP).forEach(f => f.setTrashed(true));
-}
-`;
-    const d = document.createElement('dialog');
-    d.className = 'be-dialog';
-    d.innerHTML = `<h2>🔁 Автокопия всего сайта в Google Drive — раз в неделю</h2>
-      <p>Каждый понедельник в вашем Google Drive будет появляться папка с датой и двумя архивами: <b>данные</b> (статьи на 3 языках, теги, разделы, комментарии, аккаунты и рисунки челленджа, все картинки) и <b>код</b> (весь сайт с GitHub: страницы, игры, Wobbleland, иллюстрации).</p>
-      <ol>
-        <li>Нажмите <b>«Скопировать скрипт»</b> ниже.</li>
-        <li>Откройте <a href="https://script.google.com/home/projects/create" target="_blank" rel="noopener">script.google.com → Новый проект ↗</a> (тем же Google-аккаунтом, где ваш Google Drive).</li>
-        <li>Удалите всё, что там написано, и вставьте скрипт (Ctrl+V). Нажмите 💾 «Сохранить».</li>
-        <li>Вверху в списке функций выберите <b>setup</b> и нажмите <b>▶ Выполнить</b>.</li>
-        <li>Google попросит разрешения: <i>Проверить разрешения → ваш аккаунт → Дополнительно → Перейти к проекту → Разрешить</i>. Это нормально: скрипт ваш, он только скачивает копию с сайта и кладёт её в ваш Drive.</li>
-        <li>Готово. В Google Drive появится папка <b>«pigeonpolly — резервные копии»</b>, в ней папка с сегодняшней датой и двумя архивами. Дальше — новая каждый понедельник утром (хранятся последние 12 недель). Если копия когда-нибудь не получится, Google сам пришлёт письмо.</li>
-      </ol>
-      <textarea readonly rows="10">${esc(code)}</textarea>
-      <p class="be-dialog-acts"><button type="button" class="pill-btn pill-fill" data-copy>📋 Скопировать скрипт</button>
-        <button type="button" class="pill-btn" data-rotate title="Если ключ попал к кому-то чужому: старый перестанет работать, скрипт нужно будет вставить заново">Сменить ключ</button>
-        <button type="button" class="pill-btn" data-close>Закрыть</button></p>`;
-    document.body.appendChild(d); d.showModal();
-    d.querySelector('[data-close]').onclick = () => { d.close(); d.remove(); };
-    d.querySelector('[data-copy]').onclick = async e => { try { await navigator.clipboard.writeText(code); } catch (err) { d.querySelector('textarea').select(); document.execCommand('copy'); } e.target.textContent = '✓ Скопировано'; };
-    d.querySelector('[data-rotate]').onclick = () => { if (confirm('Сменить ключ? Старый скрипт перестанет работать — его нужно будет вставить заново.')) { d.close(); d.remove(); autoBackupPanel(true); } };
-  }
-  // JSZip для резервных копий — подгружаем только когда нужен
-  let zipLib = null;
-  const loadZip = () => zipLib || (zipLib = new Promise((res, rej) => {
-    if (window.JSZip) return res(window.JSZip);
-    const sc = document.createElement('script'); sc.src = 'https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js';
-    sc.onload = () => res(window.JSZip); sc.onerror = () => { zipLib = null; rej(new Error('zip')); }; document.head.appendChild(sc);
-  }));
+  // дата из поля (ГГГГ-ММ-ДД) → секунды; если день тот же — время оставляем прежним
+  const dateToTs = (v, prev) => {
+    if (!v) return null;
+    const [y, m, d] = v.split('-').map(Number), keep = prev ? new Date(prev * 1000) : null;
+    if (keep && keep.toISOString().slice(0, 10) === v) return prev;
+    return Math.floor(Date.UTC(y, m - 1, d, keep ? keep.getUTCHours() : 12, keep ? keep.getUTCMinutes() : 0) / 1000);
+  };
   const stripHtml = s => String(s || '').replace(/<[^>]*>/g, '').trim();
 
   start();
