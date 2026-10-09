@@ -230,7 +230,7 @@ def ebooks_html():
             cover = (f'<img src="/{b["cover"]}" alt="" loading="lazy">' if b.get("cover")
                      else '<span class="cover-ph" aria-hidden="true">📖</span>')
             cards.append(
-                f'<a class="book" href="{esc(b["url"])}" target="_blank" rel="noopener">'
+                f'<a class="book" href="{esc(b["url"])}"' + ('' if b["url"].startswith("/") else ' target="_blank" rel="noopener"') + '>'
                 f'<span class="cover">{cover}</span>'
                 f'<span class="book-title">{esc(b["title"])}</span></a>')
         out.append(f'<h2 class="section-title">{esc(section["title"])}</h2><div class="book-grid">{"".join(cards)}</div>')
