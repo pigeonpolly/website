@@ -167,5 +167,24 @@
   const sw = document.querySelector('.bl-sidewrap');
   if (sw && matchMedia('(max-width: 960px)').matches) sw.open = false;
 
+  // на компьютере панель «липкая»; если она выше экрана — едет вместе со страницей и останавливается,
+  // когда её низ дошёл до низа экрана (при прокрутке вверх — наоборот), так нижние разделы видны сразу
+  const side = document.querySelector('.bl-sidewrap') || document.querySelector('.bl-grid .bl-side');
+  if (side) {
+    const gap = () => (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--header-h')) || 64) + 24;
+    let top = gap(), last = scrollY;
+    const fit = () => {
+      if (getComputedStyle(side).position !== 'sticky') { side.style.top = ''; return; }
+      const min = Math.min(gap(), innerHeight - side.offsetHeight - 24);
+      top = Math.max(min, Math.min(gap(), top - (scrollY - last)));
+      last = scrollY;
+      side.style.top = top + 'px';
+    };
+    addEventListener('scroll', fit, { passive: true });
+    addEventListener('resize', fit);
+    if (window.ResizeObserver) new ResizeObserver(fit).observe(side);
+    fit();
+  }
+
   load();
 })();
