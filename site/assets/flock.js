@@ -40,7 +40,7 @@
     W = Math.round(cw / S);
     cv.width = W * 2; cv.height = H * 2; cv.style.height = Math.round(H * S) + 'px'; // холст в 2 раза подробнее: детальные птички и мелкие детали сцены
     props = { bin: Math.round(W * .05), bench: Math.round(W * .13), cup: Math.round(W * .13) + 52, bun: Math.round(W * .52), baguette: Math.round(W * .68), book: Math.round(W * .86), lamp: Math.round(W * .955) };
-    if (loc) props.lamp = loc === 'diner' ? Math.round(W * .55) : Math.round(W * .2);
+    if (loc) props.lamp = lampX(loc);
     perches = scenePerches();
     setTimeout(() => { placeBooks(); syncMenu(); }, 0);
     bg = drawBackground();
@@ -49,7 +49,7 @@
     const c = document.createElement('canvas'); c.width = W * 2; c.height = H * 2;
     const g = c.getContext('2d'); g.scale(2, 2);
     const r = (x, y, w, h, col) => { g.fillStyle = col; g.fillRect(Math.round(x), Math.round(y), w, h); };
-    if (loc) { g.translate(0, OFF); (loc === 'diner' ? drawDiner : drawBookstore)(g); return c; } // отдельная локация — своя сцена целиком
+    if (loc) { g.translate(0, OFF); ({ diner: drawDiner, bookstore: drawBookstore, pumpkins: drawPumpkins, xmas: drawXmas })[loc](g); return c; } // отдельная локация — своя сцена целиком
     if (OFF) { // высокое небо: темнее кверху, звёзды и луна
       for (let y = 0; y < OFF; y++) { const k = y / OFF; r(0, y, W, 1, `rgb(${Math.round(24 + 19 * k)},${Math.round(14 + 14 * k)},${Math.round(56 + 26 * k)})`); }
       for (let i = 0; i < W * OFF / 220; i++) r((i * 97) % W, (i * 61) % OFF, 1, 1, i % 4 ? '#F5C4B3' : '#FFFFFF');
@@ -90,6 +90,10 @@
   // ---------- локации: время от времени за площадью открывается ретро-закусочная или книжный, птички заходят внутрь ----------
   let loc = null, locIn = rnd(25, 45), locNext = 0;
   const LOCS = ['diner', 'bookstore'];
+  const LOC_ACT = { diner: 'loc-diner', bookstore: 'loc-books', pumpkins: 'loc-pumpkins', xmas: 'loc-xmas' };
+  const lampX = kind => Math.round(W * ({ diner: .55, bookstore: .2, pumpkins: .62, xmas: .1 }[kind] || .955));
+  // сами по себе птички перелетают и в сезонные места: тыквенное поле — сентябрь–ноябрь, ёлка — декабрь–январь
+  const autoLocs = () => { const m = new Date().getMonth(); return LOCS.concat(m >= 8 && m <= 10 ? ['pumpkins'] : [], m === 11 || m === 0 ? ['xmas'] : []); };
   const placeX = () => Math.round(W * .52), DOOR_Y = 47;
   const GLYPH = { D: ['##.', '#.#', '#.#', '#.#', '##.'], I: ['###', '.#.', '.#.', '.#.', '###'], N: ['#.#', '###', '###', '#.#', '#.#'], E: ['###', '#..', '##.', '#..', '###'], R: ['##.', '#.#', '##.', '#.#', '#.#'],
     B: ['##.', '#.#', '##.', '#.#', '##.'], O: ['.#.', '#.#', '#.#', '#.#', '.#.'], K: ['#.#', '#.#', '##.', '#.#', '#.#'], S: ['.##', '#..', '.#.', '..#', '##.'] };
@@ -185,11 +189,146 @@
     r(c0, 56, W - c0 - 4, 20, '#8B5A3C'); r(c0, 54, W - c0 - 4, 2, '#A8714A'); for (let x = c0 + 3; x < W - 6; x += 8) r(x, 59, 5, 14, '#7A4C30');
     r(c0 + 6, 46, 10, 8, '#4A3C64'); r(c0 + 7, 47, 8, 3, '#B9F0D6'); r(c0 + 7, 51, 2, 2, '#E9A93B'); r(c0 + 10, 51, 2, 2, '#E9A93B'); r(c0 + 20, 48, 6, 6, '#4C8A61'); r(c0 + 21, 44, 4, 4, '#3E7A55'); r(c0 + 19, 53, 8, 1, '#8B5A2B');
   }
+  // ---- тыквенное поле: сумерки, луна, забор, грядки, пугало, тюки сена ----
+  function drawPumpkins(g) {
+    const r = px(g);
+    for (let y = -OFF; y < 40; y++) { const k = (y + OFF) / (OFF + 40); r(0, y, W, 1, `rgb(${Math.round(46 + 170 * k * k)},${Math.round(24 + 80 * k * k)},${Math.round(78 - 20 * k)})`); }
+    for (let i = 0; i < W * (OFF + 20) / 260; i++) r(hashN(i) * W, -OFF + hashN(i + 3) * (OFF + 10), .5, .5, '#FFE7C4');
+    const mx = Math.round(W * .8), my = Math.max(-OFF + 14, 4) + 8;
+    g.fillStyle = 'rgba(255, 200, 120, .16)'; g.beginPath(); g.arc(mx, my, 16, 0, 7); g.fill();
+    g.fillStyle = '#FFE2A8'; g.beginPath(); g.arc(mx, my, 9, 0, 7); g.fill(); r(mx - 3, my - 2, 2, 2, '#F0C982'); r(mx + 2, my + 2, 3, 1.5, '#F0C982');
+    for (let x = 0; x < W; x++) { const h = 7 + Math.sin(x / 23) * 3 + Math.sin(x / 9) * 1.5; r(x, 40 - h, 1, h + 1, '#3B2A5C'); }
+    const tx = Math.round(W * .2); // кривое голое дерево
+    r(tx, 8, 3, 32, '#2A1A3A'); r(tx - 7, 15, 8, 1.5, '#2A1A3A'); r(tx - 8, 11, 1.5, 5, '#2A1A3A'); r(tx + 2, 21, 9, 1.5, '#2A1A3A'); r(tx + 10, 16, 1.5, 6, '#2A1A3A'); r(tx - 2, 4, 2, 5, '#2A1A3A'); r(tx + 2, 2, 1.5, 7, '#2A1A3A');
+    r(0, 36, W, 1.5, '#7A5232'); r(0, 41, W, 1.5, '#7A5232'); for (let x = 2; x < W; x += 7) { r(x, 33, 3, 13, '#8B5A3C'); r(x + .5, 32, 2, 1, '#8B5A3C'); r(x, 33, 1, 13, '#A8714A'); }
+    for (let y = 46, row = 0; y < H; y += 6, row++) { r(0, y, W, 6, row % 2 ? '#5E3E2A' : '#6A4630'); r(0, y + 5, W, 1, '#4A2F20'); for (let x = (row * 13) % 17; x < W; x += 17) r(x, y + 2, 1, 1, '#7A5238'); }
+    r(0, 44, W, 3, '#4C7A3A'); for (let x = 0; x < W; x += 3) r(x, 42 + hashN(x) * 2, 1, 3, '#5E9A48');
+    for (let i = 0; i < W / 9; i++) { // маленькие тыквы на дальних грядках
+      const x = hashN(i + 200) * W, y = 52 + hashN(i + 300) * 28, s = .4 + hashN(i + 400) * .3, w = 10 * s, h = 7 * s;
+      r(x - 8, y, 16, .5, '#3E6A2E'); r(x + 4, y - 2, 2, 2, '#4C9A5B');
+      r(x - w / 2, y - h, w, h, '#E8792B'); r(x - w / 2 + .5, y - h - .5, w - 1, .5, '#E8792B'); r(x - .5, y - h - 1.5, 1, 1.5, '#4C9A5B'); r(x - w / 4, y - h, .5, h, '#C85F1C'); r(x + w / 4, y - h, .5, h, '#C85F1C');
+    }
+    const sx = Math.round(W * .88); // пугало
+    r(sx - .5, 28, 1.5, 54, '#6B4A32'); r(sx - 13, 44, 26, 1.5, '#6B4A32');
+    r(sx - 6, 42, 12, 15, '#B23A48'); r(sx - 6, 42, 12, 1, '#D0505E'); r(sx - 3, 47, 3, 3, '#E9A93B'); r(sx + 2, 51, 3, 3, '#4A7BD8'); for (let x = sx - 6; x < sx + 6; x += 2) r(x, 57, 1, 3, '#E9C14A');
+    r(sx - 15, 43, 3, 3, '#E9C14A'); r(sx + 12, 43, 3, 3, '#E9C14A');
+    r(sx - 4, 33, 8, 9, '#E8C98A'); r(sx - 2, 36, 1, 1, '#2A1A3A'); r(sx + 1, 36, 1, 1, '#2A1A3A'); for (let x = sx - 2; x < sx + 3; x++) r(x, 39, 1, .5, '#8B5A2B');
+    r(sx - 7, 32, 14, 1.5, '#5A3A26'); r(sx - 4, 26, 8, 6, '#5A3A26'); r(sx - 4, 30, 8, 1, '#B23A48');
+    const h0 = Math.round(W * .03); // тюки сена: на них сидят
+    for (const [x, y, w] of [[h0, 66, 24], [h0 + 30, 72, 18]]) { r(x, y, w, 14, '#D9B44A'); r(x, y, w, 1, '#F0D27A'); for (let i = 3; i < w; i += 5) r(x + i, y + 1, .5, 13, '#B8932E'); r(x, y + 6, w, .5, '#B8932E'); r(x - 1, y + 13, w + 2, 1, 'rgba(0,0,0,.25)'); }
+    const L = props.lamp; r(L - .5, 22, 1.5, 28, '#2A1A3A'); r(L - 3, 16, 6, 7, '#2A1A3A'); r(L - 2, 17, 4, 5, '#FFD34D'); r(L - 3.5, 15, 7, 1, '#2A1A3A'); r(L - 3, 49, 6, 1.5, '#2A1A3A');
+  }
+  // ---- новогодняя ёлка: снежная площадь, домики с окнами, большая ёлка, снеговик ----
+  function drawXmas(g) {
+    const r = px(g);
+    for (let y = -OFF; y < 46; y++) { const k = (y + OFF) / (OFF + 46); r(0, y, W, 1, `rgb(${Math.round(16 + 30 * k)},${Math.round(20 + 34 * k)},${Math.round(58 + 50 * k)})`); }
+    for (let i = 0; i < W * (OFF + 30) / 200; i++) r(hashN(i) * W, -OFF + hashN(i + 5) * (OFF + 24), .5, .5, i % 5 ? '#DDE8FF' : '#FFE7A3');
+    for (let x = -4, n = 0; x < W; n++) { // домики
+      const w = 22 + Math.floor(hashN(n + 40) * 14), h = 16 + Math.floor(hashN(n + 50) * 12), y = 46 - h, wall = ['#5A3A5E', '#3E4A7A', '#6B3A3A', '#3E5A4A'][n % 4];
+      r(x, y, w, h, wall);
+      for (let i = 0; i < 6; i++) r(x - 1 + i * 1.5, y - 1 - i * 1.5, w + 2 - i * 3, 1.5, i % 2 ? '#E4ECF8' : '#F4F8FF');
+      for (let wx = x + 3; wx < x + w - 5; wx += 7) for (let wy = y + 4; wy < 40; wy += 8) { const on = hashN(wx * 3 + wy) > .3; r(wx, wy, 4, 4, on ? '#FFD98A' : '#2B2340'); if (on) { r(wx + 1.75, wy, .5, 4, '#C9925A'); r(wx, wy + 1.75, 4, .5, '#C9925A'); } }
+      x += w + 2;
+    }
+    r(0, 44, W, H, '#E8EEF8');
+    for (let y = 47; y < H; y += 3) for (let x = (y * 7) % 11; x < W; x += 11 + (y % 5)) r(x, y, 4, .5, '#D4DEEE');
+    for (let i = 0; i < W / 4; i++) r(hashN(i + 90) * W, 46 + hashN(i + 91) * (H - 50), .5, .5, '#FFFFFF');
+    for (let x = 0; x < W; x++) { const h = 2 + Math.sin(x / 11) * 1.5 + Math.sin(x / 4) * .5; r(x, 46 - h, 1, h, '#F4F8FF'); }
+    const X = treeX(); // ёлка
+    r(X - 3, 82, 6, 8, '#6B4A32'); r(X - 3, 82, 2, 8, '#8B5A3C'); r(X - 10, 89, 20, 1, 'rgba(60,80,120,.25)');
+    const st = (TREE.base - TREE.top) / 5.45, tall = st * 1.45, sc = treeSc();
+    for (let k = 0; k < 5; k++) {
+      const y0 = TREE.top + k * st, y1 = Math.min(y0 + tall, 84), w0 = (2 + k * 4) * sc, w1 = (10 + k * 7) * sc;
+      for (let y = y0; y < y1; y++) { const hw = w0 + (w1 - w0) * (y - y0) / tall; r(X - hw, y, hw * 2, 1, '#1F5A3A'); r(X - hw, y, hw * .7, 1, '#2E7A4E'); r(X + hw * .55, y, hw * .45, 1, '#174A30'); }
+      const hw1 = w0 + (w1 - w0) * (y1 - y0) / tall;
+      for (let x = -hw1; x < hw1; x += 2) r(X + x, y1 - 1 - (Math.abs(Math.sin(x * 1.7)) > .6 ? 1 : 0), 2, 1, '#F4F8FF');
+    }
+    const b0 = Math.round(W * .72); // скамейка в снегу
+    r(b0, 58, 26, 2, '#8B5A3C'); r(b0, 57, 26, 1, '#FFFFFF'); r(b0, 66, 26, 2, '#8B5A3C'); r(b0, 65, 26, 1, '#FFFFFF'); r(b0 + 2, 60, 1.5, 20, '#5A3A26'); r(b0 + 22, 60, 1.5, 20, '#5A3A26');
+    const sm = Math.round(W * .9); // снеговик
+    g.fillStyle = '#FDFEFF'; g.beginPath(); g.arc(sm, 74, 8, 0, 7); g.fill(); g.beginPath(); g.arc(sm, 61, 6, 0, 7); g.fill();
+    g.fillStyle = '#D4DEEE'; g.beginPath(); g.arc(sm + 2, 76, 6, 0, 3.2); g.fill();
+    r(sm - 2, 59, 1, 1, '#2B2340'); r(sm + 1.5, 59, 1, 1, '#2B2340'); r(sm, 61, 4, 1, '#E8792B'); r(sm - 5, 65, 10, 2, '#E0443A'); r(sm + 2, 66, 2, 5, '#E0443A');
+    r(sm - 5, 54, 10, 1.5, '#2B2340'); r(sm - 3, 49, 6, 5, '#2B2340'); r(sm - 3, 52, 6, 1, '#E0443A'); r(sm, 70, 1, 1, '#2B2340'); r(sm, 74, 1, 1, '#2B2340');
+    r(sm - 14, 62, 8, .5, '#6B4A32'); r(sm + 6, 62, 8, .5, '#6B4A32');
+    const L = props.lamp; // фонарь с гирляндой
+    r(L - .5, 22, 1.5, 60, '#2B2340'); r(L - 3, 16, 6, 7, '#2B2340'); r(L - 2, 17, 4, 5, '#FFE7A3'); r(L - 4, 15, 8, 1.5, '#FFFFFF'); r(L - 3, 81, 6, 1.5, '#2B2340');
+    for (let y = 26; y < 80; y += 4) r(L - 1 + ((y / 4) % 2), y, 2, 1.5, (y / 4) % 2 ? '#E0443A' : '#3E7A55');
+  }
+  // ---- тыквенное поле и ёлка: общие штуки ----
+  const TREE = { get top() { return 4 - Math.min(OFF, 46); }, base: 84 }, treeX = () => Math.round(W * .5); // на высокой сцене ёлка растёт в небо
+  const treeSc = () => (TREE.base - TREE.top) / 80;
+  const treeHW = y => (2 + (y - TREE.top) / (TREE.base - TREE.top) * 36) * treeSc();
+  const ORN_C = ['#E0443A', '#E9A93B', '#4A7BD8', '#F08BC0', '#9B5DE5', '#FFFFFF', '#4CC38A'];
+  const LOC_ITEMS = ['tower', 'shake', 'pancakes', 'bigpk', 'present', 'ornbox', 'orn'];
+  let deco = [], spook = 0;
+  function treeSlot(i) { // место для игрушки на ёлке
+    const y = TREE.top + 8 + hashN(i * 3 + 1) * (TREE.base - TREE.top - 14);
+    return { x: Math.round(treeX() + (hashN(i * 7 + 2) * 2 - 1) * treeHW(y) * .72), y: Math.round(y) };
+  }
+  function addPresents() { const X = treeX(); [-34, -22, 20, 32, -6].forEach((dx, i) => items.push({ type: 'present', x: X + dx, y: 93 + (i % 2) * 5, c: ORN_C[i], r: ORN_C[(i + 3) % ORN_C.length], lock: true })); }
+  // вещи, которые есть только в своей локации: большие тыквы, подарки, коробка с игрушками
+  function spawnLocItems() {
+    for (const it of items) if (LOC_ITEMS.includes(it.type)) it.gone = true;
+    spook = 0;
+    if (loc === 'pumpkins') for (let i = 0; i < 6; i++) items.push({ type: 'bigpk', x: Math.round(W * (.12 + i * .15) + rnd(-6, 6)), y: i % 2 ? 114 : 99, s: rnd(1.35, 1.65), lock: true, ph: rnd(0, 6) });
+    if (loc === 'xmas') {
+      items.push({ type: 'ornbox', x: Math.round(W * .26), y: 106, lock: true }); addPresents();
+      deco = []; for (let i = 0; i < 4; i++) deco.push({ ...treeSlot(i), c: ORN_C[i % ORN_C.length] });
+    }
+  }
+  // спрятаться в тыкву: подойти, запрыгнуть, посидеть внутри (тыква качается, из-под крышки глазки) и выпрыгнуть
+  function hideIn(b, pk, secs) {
+    const side = b.x < pk.x ? -1 : 1;
+    b.tasks.push({ go: { x: cx(pk.x + side * 11), y: cy(pk.y) } }, { hop: { x: pk.x, y: pk.y - 3 }, h: 12, dur: .45 },
+      { fn: () => {
+        if (pk.gone || (pk.who && pk.who !== b && pk.who.inside)) { b.tasks = [{ hop: { x: cx(pk.x + side * 14), y: cy(pk.y + 6) }, h: 8 }, { say: '?', t: .8 }]; return; }
+        pk.who = b; b.inside = true; b.pk = pk; b.x = pk.x; b.y = pk.y; if (b.label) b.label.style.visibility = 'hidden';
+      } },
+      { wait: secs }, { fn: () => popOut(b) });
+  }
+  function popOut(b, scared) {
+    const pk = b.pk; if (!b.inside || !pk) return;
+    b.inside = false; b.pk = null; if (pk.who === b) pk.who = null; if (b.label) b.label.style.visibility = '';
+    b.x = pk.x; b.y = pk.y - 3; b.wait = .3;
+    b.hop = { from: { x: b.x, y: b.y }, to: { x: cx(pk.x + rnd(-16, 16)), y: cy(pk.y + rnd(2, 8)) }, t: 0, dur: .5, h: 14 };
+    say(b, scared ? '!' : pickOne(['!', 'star', 'heart']), 1);
+    fx.push({ type: 'poof', x: pk.x, y: pk.y - 10, t: .4 });
+  }
+  // подарок под ёлкой: внутри вещь — она выпрыгивает над коробкой, а птичка тут же её надевает (пока стая у ёлки)
+  const PRESENT_GIFTS = [['hat', 'santa'], ['hat', 'antlers'], ['hat', 'beanie'], ['scarf', '#E0443A'], ['scarf', '#4CC38A'], ['scarf', '#FFFFFF'], ['item', 'candycane'], ['item', 'ornament'], ['item', 'snowflake'], ['item', 'giftbox'], ['item', 'star'], ['item', 'cherry']];
+  function openPresent(b, p) {
+    if (!p || p.gone) return; p.gone = true;
+    fx.push({ type: 'poof', x: p.x, y: p.y - 6, t: .6 });
+    for (let i = 0; i < 16; i++) fx.push({ type: 'confetti', x: p.x + rnd(-8, 8), y: p.y - rnd(14, 26), vy: rnd(20, 35), land: p.y + rnd(-3, 3), ph: rnd(0, 6), c: pickOne(ORN_C), t: 4 });
+    const B = window.PPBirds; if (!B || !B.itemIcon) return;
+    const [kind, v] = pickOne(PRESENT_GIFTS.filter(([k]) => !(b.crow && k === 'item')));
+    const ic = B.itemIcon(kind, v, 40).querySelector('canvas');
+    if (ic) fx.push({ type: 'reveal', img: ic, x: p.x, y: p.y - 14, t: 2.6 });
+    try {
+      const lk = B.dress(looks(b.u.id), Object.assign({}, b.u.avatar || {}, { [kind]: v }));
+      if (!b.origHd) b.origHd = b.hd;
+      b.hd = [0, 1, lk.kind === 'cat' ? 0 : 2].map(f => B.spriteHD(lk, f));
+    } catch (err) { console.warn('present', err); }
+  }
+  function drawTreeDeco(now) {
+    const X = treeX(), lit = deco.length >= 16;
+    if (deco.length >= 8) for (let i = 0; i < 30; i++) { // гирлянда-огоньки
+      const t = i / 30, y = TREE.top + 12 + t * (TREE.base - TREE.top - 16), x = X + Math.sin(t * 19) * treeHW(y) * .8;
+      R(x, y, 1, 1, (Math.floor(now / 400) + i) % 3 ? ['#FFE7A3', '#FF6FB5', '#7FD4FF'][i % 3] : '#3E5A3A');
+    }
+    for (const d of deco) { R(d.x - 1, d.y - 1, 3, 3, d.c); R(d.x - 1, d.y - 1, 1, 1, 'rgba(255,255,255,.75)'); R(d.x, d.y - 2, 1, 1, '#D7DEE3'); }
+    const sy = TREE.top - 2, c = lit ? '#FFD34D' : '#8A8FA0'; // звезда загорается, когда игрушек много
+    if (lit) { ctx.fillStyle = `rgba(255, 220, 120, ${.25 + Math.sin(now / 300) * .08})`; ctx.beginPath(); ctx.arc(X, sy, 9, 0, 7); ctx.fill(); }
+    ['..#..', '.###.', '#####', '.###.', '.#.#.'].forEach((row, yy) => [...row].forEach((ch, xx) => { if (ch === '#') R(X - 2 + xx, sy - 2 + yy, 1, 1, c); }));
+  }
   // что можно делать в каждой локации (кнопки «Поиграть» и случайные события)
   const ALLOW = {
     park: ['seed', 'party', 'wind', 'rain', 'football', 'dance', 'nap', 'coffee', 'tug', 'plane', 'bookclub', 'box', 'delivery', 'tidy'],
     diner: ['seed', 'party', 'dance', 'nap', 'coffee', 'tug', 'plane', 'box', 'tidy', 'milkshake', 'pancakes'],
     bookstore: ['party', 'nap', 'coffee', 'plane', 'bookclub', 'box', 'tidy', 'reading', 'booktower'],
+    pumpkins: ['seed', 'party', 'wind', 'rain', 'football', 'dance', 'nap', 'tug', 'plane', 'box', 'tidy', 'hideseek', 'spooky'],
+    xmas: ['seed', 'party', 'dance', 'nap', 'coffee', 'plane', 'box', 'tidy', 'decorate', 'presents', 'khorovod'],
   };
   const allowed = name => { const l = ALLOW[loc || 'park']; return !Object.values(ALLOW).some(a => a.includes(name)) || l.includes(name); };
   function syncMenu() { box.querySelectorAll('.fl-menu [data-act]').forEach(b => { if (!b.dataset.act.startsWith('loc')) b.hidden = !allowed(b.dataset.act); }); }
@@ -258,26 +397,29 @@
     let list;
     if (loc === 'diner') { const s0 = Math.round(W * .32), s1 = Math.round(W * .78); list = [0, 1, 2, 3, 4].map(i => ({ x: s0 + 8 + i * ((s1 - s0 - 16) / 4), y: 67 })).concat([{ x: Math.round(W * .03) + 9, y: 69 }]); }
     else if (loc === 'bookstore') list = [{ x: Math.round(W * .07) + 11, y: 67 }, { x: Math.round(W * .07) + 21, y: 61 }, { x: Math.round(W * .82) + 10, y: 53 }, { x: Math.round(W * .62) + 5, y: 72 }];
+    else if (loc === 'pumpkins') { const h0 = Math.round(W * .03); list = [{ x: h0 + 7, y: 66 }, { x: h0 + 17, y: 66 }, { x: h0 + 39, y: 72 }]; }
+    else if (loc === 'xmas') { const b0 = Math.round(W * .72); list = [{ x: b0 + 7, y: 65 }, { x: b0 + 19, y: 65 }]; }
     else list = [{ x: props.bench + 10, y: 66 }, { x: props.bench + 24, y: 66 }, { x: props.bench + 38, y: 66 }, { x: props.bin + 6, y: 62 }];
     return list.map(p => ({ ...p, by: null }));
   }
   function setLoc(kind) {
     if (ev) endEvent(); // действие прошлой локации заканчивается вместе с ней
-    for (const it of items) if (['tower', 'shake', 'pancakes'].includes(it.type)) it.gone = true;
+    for (const b of birds) if (b.origHd) { b.hd = b.origHd; b.origHd = null; } // подарки из-под ёлки снимаются, когда стая уходит
     for (const b of birds) { if (b.inside) comeOut(b); if (b.perch) { b.perch.by = null; b.perch = null; } }
     loc = kind; locIn = kind ? rnd(110, 170) : rnd(50, 80);
-    props.lamp = kind === 'diner' ? Math.round(W * .55) : kind === 'bookstore' ? Math.round(W * .2) : Math.round(W * .955);
-    perches = scenePerches();
+    props.lamp = lampX(kind);
+    perches = scenePerches(); spawnLocItems();
     bg = drawBackground(); placeBooks(); syncMenu();
     // вся стая перелетает в новое место: влетают сверху по очереди
     for (const b of birds) if (!b.ev) { b.tasks = []; b.goal = null; b.wait = 0; b.pose = 'idle'; b.hop = { from: { x: b.x + rnd(-40, 40), y: -OFF - 30 }, to: { x: b.x, y: b.y }, t: -rnd(0, 1.2), dur: 1.4, h: 0 }; }
-    box.querySelectorAll('[data-act^="loc"]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.act === (kind === 'diner' ? 'loc-diner' : kind === 'bookstore' ? 'loc-books' : 'loc-park'))));
+    box.querySelectorAll('[data-act^="loc"]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.act === (LOC_ACT[kind] || 'loc-park'))));
   }
   function locTick(dt) {
     if ((locIn -= dt) > 0) return;
-    setLoc(loc ? null : LOCS[locNext++ % LOCS.length]);
+    const L = autoLocs(); setLoc(loc ? null : L[locNext++ % L.length]);
   }
   function comeOut(b) {
+    if (b.pk) return popOut(b);
     b.inside = false; b.x = placeX() + rnd(-3, 3); b.y = DOOR_Y + 2; if (b.label) b.label.style.visibility = '';
   }
   // сходить в заведение: дойти до двери, побыть внутри и выйти с покупкой (из закусочной — пирожок, из книжного — книжка)
@@ -369,6 +511,30 @@
         else { for (let i = 0; i < len; i++) { const yy = y - 4 - Math.floor(i / 6); R(x0 + i, yy, 1, 4, '#D9944A'); R(x0 + i, yy, 1, 1, '#EDB56E'); if (i % 6 === 3) R(x0 + i, yy + 1, 2, 1, '#F7D9A3'); } sh(len); }
         break;
       }
+      case 'bigpk': { // большая тыква: в ней прячутся; в «Спуки» светится лицо
+        const s = it.s || 1, w = Math.round(16 * s), h = Math.round(11 * s), busy = it.who && it.who.inside && it.who.pk === it;
+        const wob = busy ? Math.round(Math.sin(performance.now() / 90 + it.ph)) : 0, x0 = x - Math.round(w / 2) + wob;
+        sh(w + 2);
+        R(x0 + 2, y - h, w - 4, h, '#E8792B'); R(x0, y - h + 2, w, h - 3, '#E8792B'); R(x0 + 1, y - h + 1, w - 2, h - 1, '#E8792B');
+        for (const k of [.25, .5, .75]) R(x0 + Math.round(w * k), y - h + 1, 1, h - 2, '#C85F1C');
+        R(x0 + 2, y - h + 1, 2, 2, '#F5A25D'); R(x0 + 1, y - 1, w - 2, 1, '#C85F1C');
+        const lid = busy ? 2 : 0;
+        R(x - 1 + wob, y - h - 3 - lid, 2, 3, '#4C9A5B'); R(x + 1 + wob, y - h - 3 - lid, 2, 1, '#4C9A5B');
+        if (busy) { R(x0 + 3, y - h - 1, w - 6, 1, '#1B1035'); R(x - 3 + wob, y - h - 1, 1, 1, '#FFFFFF'); R(x + 2 + wob, y - h - 1, 1, 1, '#FFFFFF'); }
+        if (it.lit) { const c = '#FFD34D', e = Math.round(2 * s), X = x + wob; R(X - Math.round(4 * s), y - h + 3, e, e, c); R(X + Math.round(4 * s) - e, y - h + 3, e, e, c); R(X - 1, y - h + 3 + e, 2, 1, c); R(X - Math.round(5 * s), y - Math.round(4 * s), Math.round(10 * s), 1.5, c); for (let i = -2; i <= 2; i += 2) R(X + Math.round(i * s), y - Math.round(4 * s) - 1, 1, 1, c); }
+        break;
+      }
+      case 'present': {
+        R(x - 5, y - 8, 10, 8, it.c); R(x - 6, y - 10, 12, 3, it.c); R(x - 6, y - 10, 12, 1, 'rgba(255,255,255,.35)');
+        R(x - 1, y - 10, 2, 10, it.r); R(x - 6, y - 9, 12, 1, it.r); R(x - 3, y - 12, 2, 2, it.r); R(x + 1, y - 12, 2, 2, it.r);
+        sh(12); break;
+      }
+      case 'ornbox': { // коробка с ёлочными игрушками
+        R(x - 9, y - 7, 18, 7, '#8B5A3C'); R(x - 9, y - 7, 18, 1, '#A8714A'); R(x - 9, y - 4, 18, .5, '#6B4A32');
+        ORN_C.forEach((c, i) => R(x - 8 + i * 2.4, y - 9, 2, 2, c));
+        sh(18); break;
+      }
+      case 'orn': R(x - 1, y - 2, 3, 3, it.c); R(x, y - 3, 1, 1, '#D7DEE3'); R(x - 1, y - 2, 1, 1, 'rgba(255,255,255,.7)'); break;
       case 'shake': { // молочный коктейль с трубочкой
         R(x - 2, y - 9, 5, 8, 'rgba(255,255,255,.75)'); R(x - 1, y - 8, 3, 6, it.c || '#F7A8C4'); R(x - 2, y - 10, 5, 2, '#FFFFFF'); R(x, y - 12, 1, 3, '#E0443A'); R(x - 1, y - 1, 3, 1, '#D7DEE3'); R(x, y - 11, 1, 1, '#E0443A');
         break;
@@ -531,6 +697,7 @@
   function ambient(b) {
     const r = Math.random();
     const freePerch = perches.filter(p => !p.by);
+    if (loc === 'pumpkins' && r < .14 && !b.hold) { const pk = pickOne(items.filter(i => i.type === 'bigpk' && !i.gone && !(i.who && i.who.inside))); if (pk) { hideIn(b, pk, rnd(3, 7)); return; } }
     if (r < .12 && freePerch.length && !b.hold) {
       const p = pickOne(freePerch); p.by = b;
       b.tasks.push({ hop: { x: p.x, y: p.y } }, { fn: () => { b.perch = p; } }, { wait: rnd(4, 10), pose: 'sit' },
@@ -603,6 +770,115 @@
   const missing = () => !items.some(i => !i.gone && i.type === 'bun') || !items.some(i => !i.gone && (i.type === 'baguette' || i.type === 'half')) || items.some(i => i.type === 'cup' && !i.full && !i.gone && (i.emptyFor || 0) > 40);
 
   const EVENTS = {
+    // ---- тыквенное поле: прятки — одна птичка считает, остальные прячутся в тыквы, потом она их находит ----
+    hideseek: {
+      ok: () => loc === 'pumpkins' && freeBirds().length >= 3, w: 3,
+      start(e) {
+        const pks = items.filter(i => i.type === 'bigpk' && !i.gone && !(i.who && i.who.inside)), all = freeBirds();
+        e.seeker = closest(all.filter(isBird), W / 2, 1)[0] || all[0];
+        e.hiders = closest(all.filter(b => b !== e.seeker), W / 2, Math.min(pks.length, 6));
+        e.list = [e.seeker, ...e.hiders]; enlist(e.list, e);
+        e.seeker.tasks.push({ go: { x: cx(W * .5), y: cy(124) } }, { face: 1 }, { wait: 99 });
+        e.hiders.forEach((b, i) => { b.tasks.push({ say: 'heart', t: .6 }); hideIn(b, pks[i], 99); });
+        e.t = 0; e.phase = 'count';
+      },
+      update(e, dt) {
+        e.t += dt; const s = e.seeker;
+        if (e.phase === 'count') {
+          if (!s.emote && Math.random() < dt * 2) say(s, 'dots', .8);
+          if (e.t > 7) {
+            e.phase = 'seek'; s.wait = 0; s.tasks = []; say(s, '?', 1.2);
+            for (const pk of items.filter(i => i.type === 'bigpk' && !i.gone).sort(() => Math.random() - .5))
+              s.tasks.push({ go: { x: cx(pk.x - 11), y: cy(pk.y) }, fast: 1.3 }, { face: 1 }, { wait: .6, pose: 'peck' },
+                { fn: () => { if (pk.who && pk.who.inside) { popOut(pk.who, true); say(s, 'star', 1); } else say(s, '?', .7); } });
+            s.tasks.push({ say: 'heart', t: 1.5 }, { wait: 1.5 });
+          }
+          return false;
+        }
+        return done([s]) || e.t > 45;
+      },
+      end(e) { for (const b of e.hiders || []) if (b.inside) popOut(b); },
+    },
+    // ---- тыквенное поле: «Спуки» — темнеет, тыквы светятся, летают призраки и летучие мыши, птички прячутся ----
+    spooky: {
+      ok: () => loc === 'pumpkins', w: 2,
+      start(e) {
+        e.list = freeBirds(); enlist(e.list, e); e.t = 0;
+        const pks = items.filter(i => i.type === 'bigpk' && !i.gone && !(i.who && i.who.inside));
+        for (const pk of items) if (pk.type === 'bigpk') pk.lit = true;
+        e.list.forEach((b, i) => {
+          b.tasks.push({ say: '!', t: 1 });
+          if (i < pks.length) hideIn(b, pks[i], rnd(9, 13));
+          else b.tasks.push({ go: { x: rnd(X0, W - X0), y: rnd(Y0, Y1) }, fast: 2 }, { wait: 99 });
+        });
+        for (let i = 0; i < 5; i++) fx.push({ type: 'ghost', x: rnd(0, W), y: rnd(20, 80), vx: rnd(-10, 10) || 6, ph: rnd(0, 6), t: 16 });
+        for (let i = 0; i < 7; i++) fx.push({ type: 'bat', x: rnd(-60, W), y: rnd(-OFF + 5, 40), vx: rnd(25, 45), ph: rnd(0, 6), t: 16 });
+      },
+      update(e, dt) {
+        e.t += dt; spook = e.t < 2 ? Math.min(1, spook + dt / 1.5) : e.t > 14 ? Math.max(0, spook - dt / 1.5) : spook;
+        for (const b of e.list) if (!b.inside && !b.hop && Math.random() < dt * .6) { say(b, pickOne(['!', '?', 'drop']), .8); if (Math.random() < .4) hop(b, 5, .3); }
+        return e.t > 16;
+      },
+      end(e) { spook = 0; for (const it of items) if (it.type === 'bigpk') it.lit = false; for (const b of e.list) if (b.inside) popOut(b, true); fx = fx.filter(f => f.type !== 'ghost' && f.type !== 'bat'); },
+    },
+    // ---- ёлка: нарядить — берут игрушки из коробки, взлетают и вешают; когда игрушек много, загорается звезда ----
+    decorate: {
+      ok: () => loc === 'xmas' && freeBirds(isBird).length >= 2 && deco.length < 30, w: 3,
+      start(e) {
+        const bx = items.find(i => i.type === 'ornbox' && !i.gone);
+        e.list = bx ? closest(freeBirds(isBird), bx.x, 6) : []; enlist(e.list, e); e.t = 0; e.next = deco.length;
+        const trip = (b, n) => {
+          const c = pickOne(ORN_C), sl = treeSlot(e.next++);
+          b.tasks.push({ go: { x: cx(bx.x + rnd(-8, 8)), y: cy(bx.y + 3) } }, { wait: .5, pose: 'peck' },
+            { fn: () => { const o = { type: 'orn', c, x: b.x, y: b.y, held: b }; items.push(o); b.hold = o; } },
+            { go: { x: cx(sl.x - 9), y: Y0 } }, { hop: { x: sl.x - 7, y: sl.y + 7 }, h: 10, dur: .7 },
+            { fn: () => { b.perch = { x: b.x, y: b.y, by: b }; b.dir = 1; } }, { wait: .6, pose: 'peck' },
+            { fn: () => { if (b.hold) { b.hold.gone = true; b.hold.held = null; b.hold = null; } deco.push({ x: sl.x, y: sl.y, c }); fx.push({ type: 'poof', x: sl.x, y: sl.y, t: .4 }); say(b, pickOne(['heart', 'star']), .9); b.perch = null;
+              if (deco.length === 16) for (const o of birds) if (Math.random() < .6) say(o, 'star', 1.5); } },
+            { hop: { x: cx(sl.x + rnd(-16, 16)), y: cy(Y0 + rnd(2, 12)) }, h: 6, dur: .6 },
+            { fn: () => { if (n > 1 && deco.length < 30) trip(b, n - 1); } });
+        };
+        if (bx) e.list.forEach(b => trip(b, 3));
+      },
+      update(e, dt) { e.t += dt; return done(e.list) || e.t > 45; },
+      end(e) { for (const b of e.list) { b.perch = null; if (b.hold && b.hold.type === 'orn') { b.hold.gone = true; b.hold.held = null; b.hold = null; } } },
+    },
+    // ---- ёлка: открыть подарки ----
+    presents: {
+      ok: () => loc === 'xmas' && freeBirds().length >= 2, w: 3,
+      start(e) {
+        let ps = items.filter(i => i.type === 'present' && !i.gone);
+        if (!ps.length) { addPresents(); ps = items.filter(i => i.type === 'present' && !i.gone); for (const p of ps) fx.push({ type: 'poof', x: p.x, y: p.y - 5, t: .6 }); }
+        e.list = closest(freeBirds(), treeX(), ps.length); enlist(e.list, e); e.t = 0;
+        e.list.forEach((b, i) => {
+          const p = ps[i], side = b.x < p.x ? -1 : 1;
+          b.tasks.push({ say: '!', t: .6 }, { go: { x: cx(p.x + side * 10), y: cy(p.y + 1) }, fast: 1.6 }, { face: -side }, { wait: 1.2, pose: 'peck' },
+            { fn: () => openPresent(b, p) }, { wait: 1.6 }, { say: 'heart', t: 1.2 }, { wait: 1 });
+        });
+      },
+      update(e, dt) { e.t += dt; return done(e.list) || e.t > 20; },
+    },
+    // ---- ёлка: хоровод вокруг ёлки ----
+    khorovod: {
+      ok: () => loc === 'xmas' && freeBirds().length >= 4, w: 2,
+      start(e) {
+        e.list = closest(freeBirds(), treeX(), 12); enlist(e.list, e); e.t = 0; e.a = 0; e.phase = 'gather';
+        e.rx = Math.min(W * .32, 80); e.ry = 13; e.cy = 108;
+        e.list.forEach((b, i) => { b.slot = i / e.list.length * Math.PI * 2; b.tasks.push({ go: { x: cx(treeX() + Math.cos(b.slot) * e.rx), y: cy(e.cy + Math.sin(b.slot) * e.ry) }, fast: 1.5 }); });
+      },
+      update(e, dt) {
+        e.t += dt;
+        if (e.phase === 'gather') { if (done(e.list) || e.t > 6) { e.phase = 'dance'; e.t = 0; for (const b of e.list) { b.ctl = true; b.goal = null; b.tasks = []; } } return false; }
+        e.a += dt * .45;
+        for (const b of e.list) {
+          const a = b.slot + e.a, nx = cx(treeX() + Math.cos(a) * e.rx), ny = cy(e.cy + Math.sin(a) * e.ry);
+          if (Math.abs(nx - b.x) > .01) b.dir = nx > b.x ? 1 : -1; b.x = nx; b.y = ny; b.pose = 'walk';
+          if (Math.random() < dt * .3) say(b, pickOne(['note', 'heart']), 1);
+        }
+        if (Math.random() < dt * 2) fx.push({ type: 'note', x: treeX() + rnd(-30, 30), y: rnd(40, 70), t: 2 });
+        return e.t > 18;
+      },
+    },
     // двое тянут багет: он ломается пополам или кто-то побеждает и убегает с ним
     tug: {
       ok: () => items.some(i => i.type === 'baguette' && free(i)) && freeBirds(isBird).length >= 2, w: 3,
@@ -1212,8 +1488,8 @@
       b.wait = rnd(.5, 2); b.pose = 'idle'; b.y = cy(b.y); b.x = cx(b.x);
       if (Math.random() < .5) say(b, pickOne(['star', 'heart', 'note']), 1.4);
     }
-    makeItems();
-    for (const it of items) if (it.type !== 'crumb') fx.push({ type: 'poof', x: it.x, y: it.y - 4, t: .6 });
+    makeItems(); spawnLocItems();
+    for (const it of items) if (it.type !== 'crumb' && !LOC_ITEMS.includes(it.type)) fx.push({ type: 'poof', x: it.x, y: it.y - 4, t: .6 });
     evIn = rnd(10, 16);
   }
   // «Найти птичку»: ищем в сцене, а если её тут нет — спрашиваем сервер, и она прилетает сверху
@@ -1287,7 +1563,8 @@
   function seasonTick(dt) {
     const m = new Date().getMonth();
     const kind = m >= 8 && m <= 10 ? 'leaf' : m === 11 || m <= 1 ? 'snow' : m >= 2 && m <= 4 ? 'petal' : null;
-    if (!kind || loc || Math.random() > dt * .5) return; // в помещении листья и снег не падают
+    if (loc === 'xmas') { if (Math.random() < dt * 3) fx.push({ type: 'snow', x: rnd(0, W), y: -OFF - 3, vx: rnd(-4, 4), vy: rnd(8, 14), land: rnd(Y0, Y1 + 6), c: '#FFFFFF', t: 30, ph: rnd(0, 6) }); return; } // у ёлки всегда идёт снег
+    if (!kind || (loc && loc !== 'pumpkins') || Math.random() > dt * .5) return; // в помещении листья и снег не падают
     const c = kind === 'leaf' ? pickOne(['#E9A93B', '#C0582F', '#D9944A', '#B23A48']) : kind === 'snow' ? '#FFFFFF' : '#F7C6D9';
     fx.push({ type: kind, x: rnd(0, W), y: -OFF - 3, vx: rnd(-6, 6), vy: rnd(8, 14), land: rnd(Y0, Y1 + 6), c, t: 30, ph: rnd(0, 6) });
   }
@@ -1296,6 +1573,9 @@
       f.t -= dt;
       if (f.type === 'note') f.y -= dt * 10;
       if (f.type === 'gust') f.x += f.vx * dt;
+      if (f.type === 'ghost') { f.ph += dt * 2; f.x += f.vx * dt; f.y += Math.sin(f.ph) * dt * 8; if (f.x < -8) f.x = W + 8; if (f.x > W + 8) f.x = -8; }
+      if (f.type === 'bat') { f.ph += dt * 14; f.x += f.vx * dt; f.y += Math.sin(f.ph / 3) * dt * 12; if (f.x > W + 10) f.x = -10; }
+      if (f.type === 'reveal') f.y -= dt * 5;
       if (f.type === 'rain') { if (f.y < f.land) { f.y += 170 * dt; f.x -= 25 * dt; } else { f.type = 'splash'; f.t = .25; } }
       if (f.type === 'confetti') { if (f.y < f.land) { f.y += f.vy * dt; f.x += Math.sin(f.ph += dt * 5) * dt * 12; } else if (f.t > 8) f.t = 8; }
       if (f.type === 'leaf' || f.type === 'snow' || f.type === 'petal') {
@@ -1338,6 +1618,7 @@
     ctx.beginPath(); ctx.arc(L, 18, 22 + night * 10, 0, 7); ctx.fill();
     if (disco > 0) for (let i = 0; i < 8; i++) { const a = now / 700 + i * .8; R(W / 2 + Math.cos(a) * W * .4, 104 + Math.sin(a * 1.3) * 16, 2, 2, `hsla(${i * 45},90%,70%,.55)`); }
     for (const p of puddles) { ctx.globalAlpha = Math.min(p.a, p.life / 5) * .7; ctx.fillStyle = '#7FA6C9'; ctx.beginPath(); ctx.ellipse(p.x, p.y, p.r, p.r * .35, 0, 0, 7); ctx.fill(); ctx.fillStyle = '#B9D3E8'; ctx.fillRect(Math.round(p.x - p.r * .4), Math.round(p.y - 1), Math.round(p.r * .5), 1); ctx.globalAlpha = 1; }
+    if (loc === 'xmas') drawTreeDeco(now);
     const k = cv.getBoundingClientRect().width / W;
     // всё на земле — по глубине (кто ниже, тот ближе)
     const ents = [];
@@ -1388,6 +1669,24 @@
       else if (f.type === 'poof' || f.type === 'snap') { const r = (1 - f.t / .6) * 10 + 3; for (let i = 0; i < 8; i++) { const a = i / 8 * 6.28; R(f.x + Math.cos(a) * r, f.y + Math.sin(a) * r * .6, 2, 2, f.type === 'snap' ? '#F0C27C' : '#FFFDF5'); } }
     }
     if (gloom > 0) { ctx.fillStyle = `rgba(40, 50, 80, ${gloom * .3})`; ctx.fillRect(0, -OFF, W, H); }
+    if (spook > 0) { // «Спуки»: темно, светятся только тыквы
+      ctx.fillStyle = `rgba(28, 8, 48, ${spook * .5})`; ctx.fillRect(0, -OFF, W, H);
+      for (const it of items) if (it.type === 'bigpk' && it.lit && !it.gone) { ctx.fillStyle = `rgba(255, 170, 60, ${spook * .22})`; ctx.beginPath(); ctx.arc(it.x, it.y - 6, 14, 0, 7); ctx.fill(); drawItem(it, it.x, it.y, true); }
+    }
+    for (const f of fx) {
+      if (f.type === 'ghost') {
+        ctx.globalAlpha = Math.min(1, f.t) * .85; const x = Math.round(f.x), y = Math.round(f.y);
+        R(x - 2, y - 3, 5, 6, '#F4F0FA'); R(x - 1, y - 4, 3, 1, '#F4F0FA'); R(x - 2, y + 3, 1, 1, '#F4F0FA'); R(x, y + 3, 1, 1, '#F4F0FA'); R(x + 2, y + 3, 1, 1, '#F4F0FA');
+        R(x - 1, y - 1, 1, 1, '#2B2340'); R(x + 1, y - 1, 1, 1, '#2B2340'); ctx.globalAlpha = 1;
+      } else if (f.type === 'bat') {
+        const x = Math.round(f.x), y = Math.round(f.y), up = Math.sin(f.ph) > 0;
+        R(x, y, 2, 2, '#1B1035'); R(x - 3, y + (up ? -1 : 1), 3, 1, '#1B1035'); R(x + 2, y + (up ? -1 : 1), 3, 1, '#1B1035');
+      } else if (f.type === 'reveal') { // вещь из подарка
+        const w = f.img.width * .7, h = f.img.height * .7;
+        ctx.globalAlpha = Math.min(1, f.t); ctx.fillStyle = 'rgba(255, 240, 180, .45)'; ctx.beginPath(); ctx.arc(f.x, f.y - h / 2, Math.max(w, h) * .6, 0, 7); ctx.fill();
+        ctx.drawImage(f.img, Math.round(f.x - w / 2), Math.round(f.y - h), w, h); ctx.globalAlpha = 1;
+      }
+    }
     for (const f of fx) {
       if (f.type === 'gust') { ctx.globalAlpha = Math.min(1, f.t) * .55; R(f.x, f.y, f.len, 1, '#FFFFFF'); ctx.globalAlpha = 1; }
       else if (f.type === 'rain') R(f.x, f.y, 1, 3, 'rgba(185, 211, 232, .8)');
@@ -1422,7 +1721,7 @@
     requestAnimationFrame(loop);
   }
 
-  function reset(list) { ev = null; evIn = rnd(6, 10); night = 0; disco = 0; gloom = 0; puddles = []; fx = []; hearts = []; makeItems(); makeBirds(list); }
+  function reset(list) { ev = null; evIn = rnd(6, 10); night = 0; disco = 0; gloom = 0; puddles = []; fx = []; hearts = []; makeItems(); spawnLocItems(); makeBirds(list); }
   function start(data) {
     layout();
     reset(data.birds);
@@ -1473,8 +1772,8 @@
       const menu = btn.closest('details'); if (menu && act !== 'seed') menu.open = false;
       if (act === 'seed') { seeding = !seeding; btn.setAttribute('aria-pressed', String(seeding)); stage.classList.toggle('seeding', seeding); const h = box.querySelector('.fl-seedhint'); if (h) h.hidden = !seeding; return; }
       if (act === 'party') { setParty(!party); btn.setAttribute('aria-pressed', String(party)); return; }
-      if (act.startsWith('loc')) { // локации: сквер / закусочная / книжный — птички сразу бегут туда
-        const kind = act === 'loc-diner' ? 'diner' : act === 'loc-books' ? 'bookstore' : null;
+      if (act.startsWith('loc')) { // локации: сквер / закусочная / книжный / тыквенное поле / ёлка — птички сразу бегут туда
+        const kind = Object.keys(LOC_ACT).find(k => LOC_ACT[k] === act) || null;
         setLoc(kind); locIn = 300; // выбранная вручную локация держится дольше
         box.querySelectorAll('[data-act^="loc"]').forEach(x => x.setAttribute('aria-pressed', String(x === btn)));
         return;
