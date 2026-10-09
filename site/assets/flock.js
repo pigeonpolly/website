@@ -226,7 +226,7 @@
   }
   function makeBird(u) {
     {
-      const lk = looks(u.id);
+      const lk = window.PPBirds.dress ? window.PPBirds.dress(looks(u.id), u.avatar) : looks(u.id); // с подарками (шапка, обувь)
       const b = { u, cat: lk.kind === 'cat', crow: lk.kind === 'crow', frames: [0, 1, 2].map(f => sprite(lk, f)), hat: null, x: rnd(10, W - 10), y: rnd(Y0, Y1), dir: Math.random() < .5 ? 1 : -1,
         tasks: [], goal: null, wait: rnd(.3, 3), pose: 'idle', anim: rnd(0, 5), speed: lk.kind === 'cat' ? rnd(6, 9) : rnd(9, 15), fast: 1, perch: null, hold: null, emote: null, ev: null };
       b.heads = b.frames.map(headOf);

@@ -76,6 +76,11 @@ async function sitePage(req, env, url) {
   }).transform(out);
 }
 
+// ---------- аватар: что надето из подарков (фон, обувь, головной убор, анимация, рамка) ----------
+const GIFT_KINDS = ['bg', 'shoes', 'hat', 'anim', 'frame'];
+const avatarOf = u => { try { const a = JSON.parse(u && u.avatar || '{}'); return a && typeof a === 'object' ? a : {}; } catch (e) { return {}; } };
+const okItem = (kind, item) => GIFT_KINDS.includes(kind) && /^[#a-z0-9:-]{1,24}$/i.test(String(item || ''));
+
 // общие функции для worker/blog.js
 const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v) });
 
@@ -102,10 +107,12 @@ async function ensureSchema(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS subscribers (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, topic TEXT NOT NULL DEFAULT 'books',
       lang TEXT, consent TEXT, created_at INTEGER, UNIQUE(email, topic))`),
     // правки блоков сайта из режима «✏️ Править страницу»: id = data-ppb блока, lang = en/ru/lv; hidden — скрыт на всех языках (lang = '*')
+    // подарки-семечки для аватара: Алина выдаёт из кабинета; status: new — ещё не открыт, bag — в сумке (удалить нельзя)
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS gifts (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, kind TEXT NOT NULL, item TEXT NOT NULL, note TEXT, status TEXT DEFAULT 'new', created_at INTEGER, opened_at INTEGER)`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS site_blocks (id TEXT NOT NULL, lang TEXT NOT NULL, html TEXT, hidden INTEGER DEFAULT 0, page TEXT, updated_at INTEGER, PRIMARY KEY (id, lang))`),
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
-  for (const sql of ['ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
+  for (const sql of ["ALTER TABLE users ADD COLUMN avatar TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
     "ALTER TABLE users ADD COLUMN months TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN tod INTEGER',
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
@@ -351,7 +358,7 @@ async function route(req, env, url) {
     const pickUser = Number(await getMeta(env, 'pick_user'));
     const badges = mergedBadges(u, rows).filter(b => b !== 'pick_past' || pickUser !== u.id);
     if (pickUser === u.id) badges.push('pick');
-    return json({ nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(rows.map(r => r.day)).current,
+    return json({ id: u.id, avatar: avatarOf(u), nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(rows.map(r => r.day)).current,
       best: mergedBest(u, rows.map(r => r.day)), badges, posts: rows.filter(r => !r.hidden).map(({ id, day, theme, bw }) => ({ id, day, theme, bw })) });
   }
 
@@ -367,9 +374,9 @@ async function route(req, env, url) {
     const LIMIT = Math.min(60, Math.max(36, parseInt(url.searchParams.get('limit')) || 36)); // главная — 36, страница «Стая» — до 60
     const me = await currentUser(req, env);
     const total = (await env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE banned = 0').first()).n;
-    let rows = (await env.DB.prepare(`SELECT id, nick FROM users WHERE banned = 0 ORDER BY COALESCE(last_seen, created_at) DESC LIMIT ?`).bind(LIMIT).all()).results;
-    if (me && !me.banned && !rows.some(r => r.id === me.id)) rows = [{ id: me.id, nick: me.nick }, ...rows.slice(0, LIMIT - 1)];
-    return json({ total, recent: total > LIMIT, birds: rows.map(r => ({ id: r.id, nick: r.nick || null, me: !!me && r.id === me.id })) });
+    let rows = (await env.DB.prepare(`SELECT id, nick, avatar FROM users WHERE banned = 0 ORDER BY COALESCE(last_seen, created_at) DESC LIMIT ?`).bind(LIMIT).all()).results;
+    if (me && !me.banned && !rows.some(r => r.id === me.id)) rows = [{ id: me.id, nick: me.nick, avatar: me.avatar }, ...rows.slice(0, LIMIT - 1)];
+    return json({ total, recent: total > LIMIT, birds: rows.map(r => ({ id: r.id, nick: r.nick || null, me: !!me && r.id === me.id, avatar: avatarOf(r) })) });
   }
   // «Найти птичку»: по нику (сначала точное совпадение, потом начало ника)
   // ---------- подписка на новость о книге ----------
@@ -394,7 +401,8 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/admin/users') {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');
-    return json({ users: (await env.DB.prepare(`SELECT u.id, u.nick, u.created_at, u.last_seen, u.banned, u.best, u.picks,
+    return json({ users: (await env.DB.prepare(`SELECT u.id, u.nick, u.created_at, u.last_seen, u.banned, u.best, u.picks, u.avatar,
+      (SELECT COUNT(*) FROM gifts g WHERE g.user_id = u.id) AS gifts,
       (SELECT COUNT(*) FROM posts w WHERE w.user_id = u.id) AS works FROM users u ORDER BY u.created_at DESC`).all()).results });
   }
   if (p === '/api/admin/blocks') {
@@ -435,7 +443,7 @@ async function route(req, env, url) {
   // шапка сайта: кто вошёл (для кнопки входа и птички-аватара)
   if (m === 'GET' && p === '/api/whoami') {
     const u = await currentUser(req, env);
-    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env) } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
+    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), avatar: avatarOf(u) } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
   }
   if (m === 'GET' && p === '/api/config') return json({ ready: true, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
 
@@ -481,9 +489,46 @@ async function route(req, env, url) {
     const storage = admin ? Math.round(await storageUsed(env) * 1000) / 10 : undefined;
     const migration = admin && env.MEDIA ? await migrationStatus(env) : undefined;
     return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
-      best: mergedBest(u, rows.map(r => r.day)), keptBadges: kept, posts: rows } });
+      best: mergedBest(u, rows.map(r => r.day)), keptBadges: kept, posts: rows, id: u.id, avatar: avatarOf(u),
+      gifts: (await env.DB.prepare('SELECT id, kind, item, note, status, created_at FROM gifts WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results } });
   }
 
+  // подарок: открыть и сразу надеть (use) или положить в сумку
+  if (m === 'POST' && p === '/api/gift') {
+    const u = await needUser(req, env);
+    const b = await req.json().catch(() => ({}));
+    const g = await env.DB.prepare('SELECT * FROM gifts WHERE id = ? AND user_id = ?').bind(Number(b.id), u.id).first();
+    if (!g) fail(404, 'gift');
+    await env.DB.prepare("UPDATE gifts SET status = 'bag', opened_at = COALESCE(opened_at, ?) WHERE id = ?").bind(now(), g.id).run();
+    if (b.use) { const a = avatarOf(u); a[g.kind] = g.item; await env.DB.prepare('UPDATE users SET avatar = ? WHERE id = ?').bind(JSON.stringify(a), u.id).run(); }
+    return json({ ok: true });
+  }
+  // надеть вещь из сумки (только свою) или снять (item: null)
+  if (m === 'POST' && p === '/api/avatar') {
+    const u = await needUser(req, env);
+    const b = await req.json().catch(() => ({}));
+    if (!GIFT_KINDS.includes(b.kind)) fail(400, 'bad');
+    const a = avatarOf(u);
+    if (b.item == null) delete a[b.kind];
+    else {
+      const own = await env.DB.prepare("SELECT 1 FROM gifts WHERE user_id = ? AND kind = ? AND item = ? AND status = 'bag'").bind(u.id, b.kind, String(b.item)).first();
+      if (!own) fail(403, 'notyours');
+      a[b.kind] = String(b.item);
+    }
+    await env.DB.prepare('UPDATE users SET avatar = ? WHERE id = ?').bind(JSON.stringify(a), u.id).run();
+    return json({ ok: true, avatar: a });
+  }
+  // админ дарит семечко
+  if (m === 'POST' && p === '/api/admin/gift') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({}));
+    if (!okItem(b.kind, b.item)) fail(400, 'bad');
+    const to = await env.DB.prepare('SELECT id FROM users WHERE id = ?').bind(Number(b.uid)).first();
+    if (!to) fail(404, 'user');
+    await env.DB.prepare('INSERT INTO gifts (user_id, kind, item, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(to.id, b.kind, String(b.item), String(b.note || '').slice(0, 200), now()).run();
+    return json({ ok: true });
+  }
   if (m === 'POST' && p === '/api/nick') {
     const u = await needUser(req, env);
     const { nick } = await req.json().catch(() => ({}));

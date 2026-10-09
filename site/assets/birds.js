@@ -150,5 +150,36 @@
     return finish(g);
   }
 
-  window.PPBirds = { looks, sprite, SW, SH, BASE, OX };
+  // ---------- подарки-семечки для аватара (выдаёт админ): фон, обувь, головной убор, анимация, рамка ----------
+  // значение подарка — короткая строка: hat «crown:1» (вид:цвет), shoes «boots:3», bg «#F5C4B3», anim «bounce», frame «gold»
+  const GIFTS = {
+    bg: ['#F5C4B3', '#FBE3A1', '#CDEBD8', '#BFD7F5', '#E2D3F7', '#F7C6DA', '#FFFDF8', '#2B1A51', '#1D6B4F', '#D85A30'],
+    hat: HATS.flatMap(h => HAT_C.map((c, i) => h + ':' + i)),
+    shoes: SHOES.flatMap(h => SHOE_C.map((c, i) => h + ':' + i)),
+    anim: ['bounce', 'wiggle', 'float', 'spin', 'sparkle', 'heart'],
+    frame: ['gold', 'rainbow', 'stars', 'hearts', 'leaves', 'dotted'],
+  };
+  const pair = (v, list, cols) => { const [t, i] = String(v || '').split(':'); return list.includes(t) && cols[+i] ? { t, c: cols[+i] } : null; };
+  // внешность с надетыми подарками (у котика нет обуви)
+  function dress(lk, av) {
+    if (!av) return lk;
+    const d = Object.assign({}, lk);
+    if (av.hat) d.hat = pair(av.hat, HATS, HAT_C) || d.hat;
+    if (av.shoes && d.kind !== 'cat') d.shoe = pair(av.shoes, SHOES, SHOE_C) || d.shoe;
+    return d;
+  }
+  // круглый аватар: фон, рамка, анимация и птичка (крупные пиксели)
+  function avatar(id, av, size) {
+    av = av || {};
+    const el = document.createElement('span');
+    el.className = 'pp-ava' + (av.frame ? ' fr-' + av.frame : '') + (av.anim ? ' an-' + av.anim : '');
+    el.style.setProperty('--ava', (size || 120) + 'px');
+    if (/^#[0-9a-f]{6}$/i.test(av.bg || '')) el.style.setProperty('--ava-bg', av.bg);
+    const c = document.createElement('canvas'); c.width = SW; c.height = SH;
+    c.getContext('2d').drawImage(sprite(dress(looks(id), av), 0), 0, 0);
+    const i = document.createElement('i'); i.appendChild(c); el.appendChild(i);
+    return el;
+  }
+
+  window.PPBirds = { looks, sprite, dress, avatar, GIFTS, SW, SH, BASE, OX };
 })();

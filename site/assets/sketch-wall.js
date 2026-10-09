@@ -51,6 +51,18 @@
     newBadge: ['New badge!', 'Новый бейдж!', 'Jauna nozīmīte!'],
     unpick: ['Remove', 'Снять', 'Noņemt'],
     picked: [n => `Picked ${n} time${n === 1 ? '' : 's'}. Every 5 picks = a star, 3 stars = a golden nickname.`, n => `Выбран(а) ${n} ${pl(n, 'раз', 'раза', 'раз')}. Каждые 5 раз — звезда, 3 звезды — золотой ник.`, n => `Izvēlēts ${n} reizi. Katras 5 reizes — zvaigzne, 3 zvaigznes — zelta segvārds.`],
+    giftNew: [n => `A gift for you!${n > 1 ? ' (' + n + ')' : ''}`, n => `Тебе подарок!${n > 1 ? ' (' + n + ')' : ''}`, n => `Tev dāvana!${n > 1 ? ' (' + n + ')' : ''}`],
+    bag: ['Bag', 'Сумка', 'Soma'],
+    seedOf: [k => `A seed: ${k}`, k => `Семечко: ${k}`, k => `Sēkla: ${k}`],
+    fromAlina: ['— Alina', '— Алина', '— Alīna'],
+    open: ['Open', 'Открыть', 'Atvērt'],
+    use: ['✨ Use it', '✨ Использовать', '✨ Izmantot'],
+    later: ['↩ Back (into the bag)', '↩ Вернуться (в сумку)', '↩ Atpakaļ (somā)'],
+    bagTitle: ['Your bag', 'Твоя сумка', 'Tava soma'],
+    bagNote: ['Everything you get stays here forever. Tap a thing to put it on or take it off.', 'Всё, что ты получаешь, остаётся здесь навсегда. Нажми на вещь, чтобы надеть или снять.', 'Viss, ko saņem, paliek šeit uz visiem laikiem. Pieskaries lietai, lai to uzvilktu vai novilktu.'],
+    bagEmpty: ['Empty for now. Gifts from Alina will appear here.', 'Пока пусто. Здесь появятся подарки от Алины.', 'Pagaidām tukšs. Šeit parādīsies Alīnas dāvanas.'],
+    wearing: ['on ✓', 'надето ✓', 'uzvilkts ✓'],
+    kinds: [{ bg: 'background', shoes: 'shoes', hat: 'hat', anim: 'animation', frame: 'frame' }, { bg: 'фон', shoes: 'обувь', hat: 'головной убор', anim: 'анимация', frame: 'рамка' }, { bg: 'fons', shoes: 'apavi', hat: 'galvassega', anim: 'animācija', frame: 'rāmis' }],
     hide: ['Hide', 'Скрыть', 'Paslēpt'], ban: ['Block', 'Блок', 'Bloķēt'],
     banAsk: ['Block this user? Their sketches disappear from the wall.', 'Заблокировать пользователя? Его рисунки пропадут со стены.', 'Bloķēt lietotāju? Viņa skices pazudīs no sienas.'],
   };
@@ -249,6 +261,55 @@
     });
   }
 
+  // ---------- подарки-семечки и сумка ----------
+  const kindName = k => T.kinds[L][k] || k;
+  const bagItems = () => { const seen = new Set(); return (me.gifts || []).filter(g => g.status === 'bag' && !seen.has(g.kind + g.item) && seen.add(g.kind + g.item)); };
+  function modal(html) {
+    const v = document.createElement('div'); v.className = 'sw-bv'; v.setAttribute('role', 'dialog');
+    v.innerHTML = `<div class="sw-bv-card">${html}<button type="button" class="sw-bv-close" aria-label="Close">✕</button></div>`;
+    const close = () => { v.remove(); document.removeEventListener('keydown', k); };
+    const k = e => e.key === 'Escape' && close();
+    v.addEventListener('click', e => { if (e.target === v || e.target.closest('.sw-bv-close')) close(); });
+    document.addEventListener('keydown', k); document.body.appendChild(v);
+    return { v, card: v.querySelector('.sw-bv-card'), close };
+  }
+  function openGift(g) {
+    if (!g) return;
+    const m = modal(`<div class="gf-card"><span class="gf-seed" aria-hidden="true">🌰</span><h3>${esc(t('seedOf', kindName(g.kind)))}</h3>
+      ${g.note ? `<p class="gf-note">«${esc(g.note)}» ${t('fromAlina')}</p>` : ''}<div class="gf-btns"><button type="button" class="cta-btn" data-open>${t('open')}</button></div></div>`);
+    m.card.classList.add('gf-card');
+    m.card.querySelector('[data-open]').onclick = () => {
+      const box = m.card.querySelector('.gf-card');
+      box.innerHTML = `<h3>🎁 ${esc(kindName(g.kind))}</h3><div class="gf-ava"></div>${g.note ? `<p class="gf-note">«${esc(g.note)}» ${t('fromAlina')}</p>` : ''}
+        <div class="gf-btns"><button type="button" class="cta-btn" data-use>${t('use')}</button><button type="button" class="pill-btn" data-later>${t('later')}</button></div>`;
+      const a = window.PPBirds.avatar(me.id, Object.assign({}, me.avatar, { [g.kind]: g.item }), 140); a.classList.add('gf-pop');
+      box.querySelector('.gf-ava').appendChild(a);
+      const act = async use => { try { await post('gift', { id: g.id, use }); } catch (e) { alert(t('err')); return; } m.close(); await refresh(); };
+      box.querySelector('[data-use]').onclick = () => act(true);
+      box.querySelector('[data-later]').onclick = () => act(false);
+    };
+  }
+  function openBag() {
+    const items = bagItems();
+    const m = modal('');
+    m.card.classList.add('bag-card');
+    const draw = () => {
+      const kinds = ['hat', 'shoes', 'bg', 'frame', 'anim'].filter(k => items.some(g => g.kind === k));
+      m.card.innerHTML = `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3><p class="sw-bv-how">${t('bagNote')}</p>
+        ${items.length ? kinds.map(k => `<h4>${esc(kindName(k))}</h4><div class="bag-grid">${items.filter(g => g.kind === k).map(g =>
+          `<button type="button" class="bag-item${me.avatar && me.avatar[k] === g.item ? ' on' : ''}" data-k="${k}" data-i="${esc(g.item)}"><span class="bag-ava"></span>${me.avatar && me.avatar[k] === g.item ? t('wearing') : ''}</button>`).join('')}</div>`).join('') : `<p class="bag-empty">${t('bagEmpty')}</p>`}`;
+      m.card.querySelectorAll('.bag-item').forEach(b => {
+        b.querySelector('.bag-ava').appendChild(window.PPBirds.avatar(me.id, Object.assign({}, me.avatar, { [b.dataset.k]: b.dataset.i }), 64));
+        b.onclick = async () => {
+          const on = me.avatar && me.avatar[b.dataset.k] === b.dataset.i;
+          try { const r = await post('avatar', { kind: b.dataset.k, item: on ? null : b.dataset.i }); me.avatar = r.avatar; } catch (e) { alert(t('err')); return; }
+          draw(); renderProfile(); window.PPAccount && window.PPAccount.check();
+        };
+      });
+    };
+    draw();
+  }
+
   function renderProfile(prev) {
     const lv = levelOf(me.best), next = LEVELS.find(l => l.d > me.best);
     const upDate = dayAgo(upOff), upKey = keyOfD(upDate);
@@ -257,13 +318,15 @@
     const dayBtns = [0, 1, 2].map(n => `<button type="button" data-off="${n}" aria-pressed="${n === upOff}">${t(['dToday', 'dYesterday', 'd2ago'][n])}${me.posts.some(p => p.day === keyOfD(dayAgo(n))) ? ' ✓' : ''}</button>`).join('');
     const base = (LEVELS.indexOf(next) > 0 ? LEVELS[LEVELS.indexOf(next) - 1].d : 0);
     const progress = next ? Math.round((me.best - base) / (next.d - base) * 100) : 100;
+    const newGifts = (me.gifts || []).filter(g => g.status === 'new');
     app.innerHTML = `<div class="sw-grid">
       <div class="sw-card sw-profile">
-        ${lv ? medal(lv, true, true) : `<span class="sw-medal big off" style="--bg:#F4F0FA">${spriteSvg('egg')}</span>`}
+        ${window.PPBirds && me.id ? '<span class="sw-ava-slot"></span>' : lv ? medal(lv, true, true) : `<span class="sw-medal big off" style="--bg:#F4F0FA">${spriteSvg('egg')}</span>`}
         <div class="sw-who"><h2><span class="sw-nickname${me.gold ? ' gold' : ''}">@${esc(me.nick)}</span></h2><p class="sw-level">${lv ? esc(lv.n[L]) : '—'}</p>
           <p class="sw-streak">🔥 ${t('streak', me.current)} · ${t('best', me.best)}</p>
           <div class="sw-bar"><i style="width:${progress}%"></i></div>
           <p class="sw-next">${next ? t('toNext', next.d - me.best, next.n[L]) : t('maxLevel')}</p></div>
+        ${me.id ? `<div class="sw-gifts">${newGifts.length ? `<button type="button" class="pill-btn sw-gift-btn" id="sw-gift">🎁 ${t('giftNew', newGifts.length)}</button>` : ''}<button type="button" class="pill-btn" id="sw-bag">🎒 ${t('bag')} (${bagItems().length})</button></div>` : ''}
         <div class="sw-badges"><h3>${t('badges')}</h3><div>${LEVELS.map(l => medal(l, me.best >= l.d, false, 'button')).join('')}${SPECIAL.map(s => medal(s, stateOf(s, got), false, 'button')).join('')}</div><p class="sw-how" id="sw-how">${t('tapBadge')}</p></div>
         <p class="sw-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a>${me.admin ? ` · <b>admin</b> · ${t('storage')}: ${me.storage ?? 0}%${me.migration && me.migration.total ? ` · R2: ${me.migration.r2 + me.migration.missing >= me.migration.total ? `✓ ${me.migration.r2}/${me.migration.total}` : `${me.migration.r2}/${me.migration.total}…`}` : ''}` : ''}</p>
       </div>
@@ -277,6 +340,9 @@
         <button class="cta-btn" type="submit" disabled>${t('upload')}</button>
         <p class="sw-status" id="sw-status"></p>
       </form></div>`;
+    const slot = app.querySelector('.sw-ava-slot'); if (slot) slot.replaceWith(window.PPBirds.avatar(me.id, me.avatar, 120));
+    const gb = document.getElementById('sw-gift'); if (gb) gb.onclick = () => openGift(newGifts[newGifts.length - 1]);
+    const bb = document.getElementById('sw-bag'); if (bb) bb.onclick = openBag;
     if (prev) celebrate(prev, lv, got);
     // по нажатию — бейдж крупно, с описанием
     app.querySelectorAll('.sw-badges .sw-medal').forEach(b => b.onclick = () => {

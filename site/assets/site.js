@@ -163,8 +163,8 @@
     const fill = d => sb.querySelectorAll('[data-stat]').forEach(b => { const v = b.dataset.stat === 'days' ? days : d && d[b.dataset.stat]; if (v != null) b.textContent = Number(v).toLocaleString(loc); });
     fill(null);
     let cached = null;
-    try { const c = JSON.parse(sessionStorage.getItem('pp-stats') || 'null'); if (c && Date.now() - c.at < 6e5) cached = c.d; } catch (e) { /* без памяти */ }
+    try { const c = JSON.parse(sessionStorage.getItem('pp-stats2') || 'null'); if (c && c.d && c.d.birds != null && Date.now() - c.at < 6e5) cached = c.d; } catch (e) { /* без памяти */ }
     if (cached) fill(cached);
-    else fetch('/api/stats').then(r => r.ok ? r.json() : null).then(d => { if (!d) return; fill(d); try { sessionStorage.setItem('pp-stats', JSON.stringify({ at: Date.now(), d })); } catch (e) { /* без памяти */ } }).catch(() => {});
+    else fetch('/api/stats?v=2', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(d => { if (!d) return; fill(d); try { sessionStorage.setItem('pp-stats2', JSON.stringify({ at: Date.now(), d })); } catch (e) { /* без памяти */ } }).catch(() => {});
   }
 })();

@@ -67,7 +67,7 @@
       <button class="pill-btn pill-fill" type="submit">${t('nSave')}</button>
       <button class="acct-nick-out" type="button">${t('nOut')}</button></form>`;
     document.body.appendChild(d);
-    if (window.PPBirds) d.querySelector('canvas').getContext('2d').drawImage(window.PPBirds.sprite(window.PPBirds.looks(u.id), 0), 0, 0);
+    if (window.PPBirds) d.querySelector('canvas').getContext('2d').drawImage(window.PPBirds.sprite(window.PPBirds.dress(window.PPBirds.looks(u.id), u.avatar), 0), 0, 0);
     d.addEventListener('cancel', e => e.preventDefault()); // Esc не закрывает
     const f = d.querySelector('form'), st = d.querySelector('.acct-nick-st');
     f.addEventListener('submit', async e => {
@@ -107,7 +107,7 @@
         if (window.PPEdit) go(); else { const sc = document.createElement('script'); sc.src = '/assets/site-edit.js'; sc.onload = go; document.head.appendChild(sc); }
       });
       if (u.admin && document.querySelector('[data-ppb-hidden]')) document.documentElement.classList.add('pp-admin');
-      if (window.PPBirds) el.querySelector('canvas').getContext('2d').drawImage(window.PPBirds.sprite(window.PPBirds.looks(u.id), 0), -window.PPBirds.OX, 0);
+      if (window.PPBirds) el.querySelector('canvas').getContext('2d').drawImage(window.PPBirds.sprite(window.PPBirds.dress(window.PPBirds.looks(u.id), u.avatar), 0), -window.PPBirds.OX, 0);
     }
     const btn = el.querySelector('.acct-btn'), pop = el.querySelector('.acct-pop');
     const close = () => { pop.hidden = true; btn.setAttribute('aria-expanded', 'false'); };

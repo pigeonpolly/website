@@ -132,6 +132,45 @@
     });
   }
 
+  // ---------- подарить семечко: фон, обувь, головной убор, анимация, рамка ----------
+  function giftDialog(u, done) {
+    const B = window.PPBirds; if (!B) return;
+    let av = {}; try { av = JSON.parse(u.avatar || '{}') || {}; } catch (e) { /* пусто */ }
+    const KINDS = [['hat', '🎩 Головной убор'], ['shoes', '👟 Обувь'], ['bg', '🎨 Фон'], ['frame', '⭕ Рамка'], ['anim', '✨ Анимация']];
+    const NAMES = { bounce: 'прыгает', wiggle: 'качается', float: 'парит', spin: 'кружится', sparkle: 'сияет', heart: 'сердечко', gold: 'золотая', rainbow: 'радуга', stars: 'звёзды', hearts: 'сердечки', leaves: 'листики', dotted: 'пунктир' };
+    let kind = 'hat', item = B.GIFTS.hat[0];
+    const w = document.createElement('div'); w.className = 'adm-gift';
+    w.innerHTML = `<div class="adm-gift-card" role="dialog" aria-label="Подарок"><h3>🎁 Подарок для ${u.nick ? '@' + esc(u.nick) : 'птички без ника'}</h3>
+      <div class="adm-gift-kinds">${KINDS.map(([k, l]) => `<button type="button" class="pill-btn" data-k="${k}">${l}</button>`).join('')}</div>
+      <div class="adm-gift-items"></div>
+      <div class="adm-gift-prev"><span class="gp"></span><p class="be-note">Так будет выглядеть птичка, если надеть подарок. Человек увидит «🎁 Тебе подарок!» в профиле челленджа.</p></div>
+      <input type="text" maxlength="200" placeholder="Записка к подарку (необязательно), например: «За 7 дней подряд!»">
+      <div class="adm-quick" style="margin-top:12px"><button type="button" class="pill-btn pill-fill" data-send>Подарить</button><button type="button" class="pill-btn" data-x>Отмена</button></div></div>`;
+    document.body.appendChild(w);
+    const close = () => w.remove();
+    w.onclick = e => { if (e.target === w) close(); };
+    w.querySelector('[data-x]').onclick = close;
+    const draw = () => {
+      w.querySelectorAll('[data-k]').forEach(b => b.classList.toggle('pill-fill', b.dataset.k === kind));
+      const box = w.querySelector('.adm-gift-items'); box.innerHTML = '';
+      B.GIFTS[kind].forEach(v => {
+        const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-pressed', String(v === item)); b.title = NAMES[v] || v;
+        b.appendChild(B.avatar(u.id, Object.assign({}, av, { [kind]: v }), 48));
+        if (NAMES[v]) b.insertAdjacentHTML('beforeend', `<small>${NAMES[v]}</small>`);
+        b.onclick = () => { item = v; draw(); };
+        box.appendChild(b);
+      });
+      const gp = w.querySelector('.gp'); gp.innerHTML = ''; gp.appendChild(B.avatar(u.id, Object.assign({}, av, { [kind]: item }), 110));
+    };
+    w.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { kind = b.dataset.k; item = B.GIFTS[kind][0]; draw(); });
+    w.querySelector('[data-send]').onclick = async e => {
+      e.target.disabled = true;
+      try { await api('admin/gift', { uid: u.id, kind, item, note: w.querySelector('input').value.trim() }); close(); alert('🎁 Подарок отправлен! Он появится у птички в профиле челленджа.'); done && done(); }
+      catch (x) { e.target.disabled = false; alert(err(x)); }
+    };
+    draw();
+  }
+
   // ---------- все птицы ----------
   let bSort = 'created_at', bq = '';
   async function birds() {
@@ -145,9 +184,11 @@
       main.innerHTML = `<section class="adm-box"><h2>🐦 Все птицы: ${d.users.length}</h2>
         <p class="be-note">Новых за неделю: <b>${week}</b>. Нажмите на ник, чтобы открыть профиль и работы.</p>
         <div class="be-filters"><input type="search" id="adm-bq" placeholder="🔍 Найти по нику" value="${esc(bq)}"></div>
-        <table class="be-table adm-table"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}</tr></thead><tbody>
+        <table class="be-table adm-table"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}<th>Подарки</th></tr></thead><tbody>
         ${list.map(u => `<tr><td>${u.nick ? `<a href="/challenge/#@${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}${u.banned ? ' <small class="be-danger">заблокирована</small>' : ''}</td>
-          <td>${fmt(u.created_at)}</td><td>${fmt(u.last_seen)}</td><td>${n(u.works)}</td><td>${n(u.best)}</td></tr>`).join('')}</tbody></table></section>`;
+          <td>${fmt(u.created_at)}</td><td>${fmt(u.last_seen)}</td><td>${n(u.works)}</td><td>${n(u.best)}</td>
+          <td><button type="button" class="pill-btn" data-gift="${u.id}" title="Подарить семечко для аватара">🎁${u.gifts ? ' ' + u.gifts : ''}</button></td></tr>`).join('')}</tbody></table></section>`;
+      main.querySelectorAll('[data-gift]').forEach(b => b.onclick = () => giftDialog(d.users.find(u => u.id === +b.dataset.gift), birds));
       main.querySelectorAll('[data-bsort]').forEach(b => b.onclick = () => { bSort = b.dataset.bsort; draw(); });
       const inp = main.querySelector('#adm-bq');
       inp.oninput = () => { bq = inp.value; draw(); const x = main.querySelector('#adm-bq'); x.focus(); x.setSelectionRange(x.value.length, x.value.length); };
