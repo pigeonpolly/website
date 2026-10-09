@@ -2551,3 +2551,11 @@ html.sb-hide { --sb: 0px; }
 .sw-pv-bag { display: flex; flex-wrap: wrap; gap: 8px; }
 .sw-pv-item { padding: 3px; border-radius: 50%; }
 .sw-pv-item.on { box-shadow: 0 0 0 2px #E9A93B; }
+.pp-ava.fr-snow::after, .pp-ava.fr-magic::after, .pp-ava.fr-spooky::after { position: absolute; inset: -14px; border-radius: 50%; font-size: calc(var(--ava) * .14); line-height: 1; pointer-events: none; }
+.pp-ava.fr-snow::after { content: '❄'; color: #DDEEFF; text-shadow: calc(var(--ava) * .78) 0 #BFD7F5, calc(var(--ava) * .1) calc(var(--ava) * .8) #fff, calc(var(--ava) * .7) calc(var(--ava) * .85) #BFD7F5; }
+.pp-ava.fr-magic::after { content: '✧'; color: #B39DDB; text-shadow: calc(var(--ava) * .78) 0 #F5D547, calc(var(--ava) * .1) calc(var(--ava) * .8) #F5D547, calc(var(--ava) * .7) calc(var(--ava) * .85) #9B5DE5; }
+.pp-ava.fr-spooky::after { content: '✶'; color: #E8792B; text-shadow: calc(var(--ava) * .78) 0 #9B5DE5, calc(var(--ava) * .1) calc(var(--ava) * .8) #9B5DE5, calc(var(--ava) * .7) calc(var(--ava) * .85) #E8792B; }
+.pp-ava.fr-snow { box-shadow: 0 0 0 4px #DDEEFF, 0 6px 16px rgba(0,0,0,.3); }
+.pp-ava.fr-magic { box-shadow: 0 0 0 4px #B39DDB, 0 0 18px rgba(155,93,229,.6); }
+.pp-ava.fr-spooky { box-shadow: 0 0 0 4px #E8792B, 0 0 0 7px #2A2433, 0 6px 16px rgba(0,0,0,.3); }
+.pp-ava.fr-neon { box-shadow: 0 0 0 3px #39E07A, 0 0 0 6px #0F0F2D, 0 0 0 8px #F08BC0, 0 0 22px rgba(57,224,122,.55); }

@@ -50,6 +50,7 @@
     return { g, put, ell, has };
   }
   function drawHat(put, hat, hxR, ht) {
+    if (SPECIAL_HATS && SPECIAL_HATS[hat.t]) hat = { t: SPECIAL_HATS[hat.t].lo[0], c: SPECIAL_HATS[hat.t].lo[1] };
     const c = hat.c, c2 = shade(c, c === '#2B2340' ? 2.2 : .7), t = hat.t;
     if (t === 'top') { for (let x = -3; x <= 3; x++) put(hxR + x, ht, c); for (let y = 1; y <= 4; y++) for (let x = -2; x <= 2; x++) put(hxR + x, ht - y, y === 1 ? c2 : c); }
     if (t === 'beret') { for (let x = -3; x <= 2; x++) put(hxR + x, ht, c); for (let x = -2; x <= 2; x++) put(hxR + x, ht - 1, c); put(hxR, ht - 2, c2); }
@@ -127,6 +128,8 @@
     if (item === 'key') { for (let i = 0; i < 4; i++) P(i, 0, '#E9C14A'); P(3, 1, '#E9C14A'); P(4, -1, '#E9C14A'); P(4, 0, '#E9C14A'); P(4, 1, '#E9C14A'); P(5, 0, '#E9C14A'); }
     if (item === 'pizza') { for (let dy = 0; dy < 4; dy++) for (let dx = 0; dx <= 3 - dy; dx++) P(dx, dy - 1, dy === 0 ? '#C98A3E' : '#F5C842'); P(1, 0, '#D84A3A'); P(0, 1, '#D84A3A'); }
     if (item === 'cherry') { P(0, -2, '#3E8E4F'); P(1, -1, '#3E8E4F'); P(0, -1, '#3E8E4F'); P(0, 0, '#D8203A'); P(1, 0, '#D8203A'); P(0, 1, '#D8203A'); P(1, 1, '#A81428'); P(0, 0, '#FF8A9A'); }
+    const LO = { gamepad: '#3A3550', coin: '#F5D547', sword: '#C8CCD8', mushroom: '#E0443A', wand: '#F5D547', crystal: '#9B7FE0', star: '#F5D547', lollipop: '#F08BC0', minipumpkin: '#E8792B', candycane: '#D8283A', giftbox: '#D8283A', ornament: '#4A7BD8', snowflake: '#DDEEFF', heart: '#E0243A', rose: '#D8203A', letter: '#FFFDF8', icecream: '#F7A8C4', mapleleaf: '#E8792B' };
+    if (LO[item]) { P(0, 0, LO[item]); P(1, 0, LO[item]); P(0, 1, LO[item]); P(1, 1, shade(LO[item], .8)); }
     if (item === 'spoon') { for (let i = 0; i < 3; i++) P(i, 0, '#D0D4E0'); P(3, -1, '#E8EBF2'); P(3, 0, '#E8EBF2'); P(4, -1, '#E8EBF2'); P(4, 0, '#E8EBF2'); P(3, 1, '#B8BCC8'); }
   }
 
@@ -189,7 +192,39 @@
     party: ['....ww....', '...wwww...', '....cc....', '...cccc...', '...bbbb...', '..cccccc..', '..bbbbbb..', '.cccccccc.', '.bbbbbbbb.', 'cccccccccc'],
     crown: ['c....c....c', 'cc..cwc..cc', 'ccc.ccc.ccc', 'ccccccccccc', 'crccbccrccc', 'ddddddddddd'],
   };
+  // тематические шапки: свой рисунок и цвета (значение подарка — просто имя, например «wizard»)
+  const SPECIAL_HATS = {
+    wizard: { r: ['......cc....', '.....ccc....', '.....cscc...', '....cccc....', '....ccccc...', '...ccsccc...', '...cccccc...', '..bbbbbbbb..', 'cccccccccccc', '.dddddddddd.'], p: { c: '#5B3FA8', d: '#3E2A78', s: '#F5D547', b: '#E9A93B' }, lo: ['party', '#5B3FA8'] },
+    witch: { r: ['.......k....', '......kk....', '.....kkk....', '....kkkk....', '....kkkkk...', '...pppyppp..', 'kkkkkkkkkkkk', '.KKKKKKKKKK.'], p: { k: '#2A2433', K: '#4A4258', p: '#9B5DE5', y: '#E9C14A' }, lo: ['top', '#2B2340'] },
+    pumpkin: { r: ['.....g....', '....gg....', '..oOoooo..', '.ookookoo.', 'oooooooooo', 'oookkkkooo', '.oooooooo.'], p: { o: '#E8792B', O: '#F5A25D', g: '#4C9A5B', k: '#2A1A10' }, lo: ['crown', '#E9A93B'] },
+    santa: { r: ['..........ww', '.......rrrww', '.....rrrrr..', '....rrrrrr..', '...rrrrrrr..', '..rrrrrrrr..', '.wwwwwwwwww.', 'wwwwwwwwwwww'], p: { r: '#D8283A', w: '#FFFFFF' }, lo: ['party', '#E0443A'] },
+    antlers: { r: ['b.b....b.b', 'bbb....bbb', '.b......b.', '.bb....bb.', '..b....b..', '..hhhhhh..'], p: { b: '#8B5A2B', h: '#C0392B' }, lo: ['crown', '#E9A93B'] },
+    beanie: { r: ['....ww....', '...wwww...', '..bbbbbb..', '.bbbbbbbb.', '.wwwwwwww.', 'bbbbbbbbbb', 'dddddddddd'], p: { b: '#4A7BD8', d: '#2C4F96', w: '#FFFFFF' }, lo: ['beret', '#4A7BD8'] },
+    heartband: { r: ['.rr.rr......', 'rRrrrrr.....', 'rrrrrrr.....', '.rrrrr......', '..rrr.......', '...r........', 'hhhhhhhhhhhh'], p: { r: '#E0243A', R: '#FF9AA8', h: '#F08BC0' }, lo: ['bow', '#F08BC0'] },
+    wreath: { r: ['.p...y...p.', 'pyp.gyg.pyp', 'gpgygpgygpg', 'ggggggggggg'], p: { p: '#F08BC0', y: '#F5D547', g: '#4C9A5B' }, lo: ['crown', '#4CC38A'] },
+    strawhat: { r: ['...ssssss...', '..ssssssss..', '..rrrrrrrr..', 'ssssssssssss', '.dddddddddd.'], p: { s: '#E9C46A', d: '#C9A040', r: '#E0443A' }, lo: ['beret', '#E9A93B'] },
+    headset: { r: ['...kkkkkk...', '..k......k..', '.k........k.', 'gk........kg', 'gk........kg', 'gk........kg', '.k.......mm.'], p: { k: '#2A2433', g: '#39E07A', m: '#39E07A' }, lo: ['cap', '#4CC38A'] },
+    leafcrown: { r: ['o..r..y..o.', 'oo.rr.yy.oo', 'orryyoorryo', 'ddddddddddd'], p: { o: '#E8792B', r: '#C0392B', y: '#E9C14A', d: '#8B5A2B' }, lo: ['crown', '#E0443A'] },
+  };
   const HD_ITEMS = {
+    wand: { r: ['.......y.', '......yyy', '.......y.', '......k..', '.....k...', '....k....', '...k.....', '..w......'], p: { y: '#F5D547', k: '#2A2433', w: '#FFFFFF' }, dy: -7 },
+    crystal: { r: ['.ppp.', 'pwppp', 'ppppp', '.ppp.', 'ddddd'], p: { p: '#9B7FE0', w: '#E8E0FF', d: '#8B5A2B' }, dy: -2 },
+    star: { r: ['..y..', '.yyy.', 'yyyyy', '.yyy.', '.y.y.'], p: { y: '#F5D547' }, dy: -2 },
+    lollipop: { r: ['...ppp', '..pwpp', '..pppp', '...pp.', '..w...', '.w....', 'w.....'], p: { p: '#F08BC0', w: '#FFFFFF' }, dy: -6 },
+    minipumpkin: { r: ['..g..', '.ooo.', 'okoko', 'ooooo', '.ooo.'], p: { o: '#E8792B', g: '#4C9A5B', k: '#2A1A10' }, dy: -2 },
+    candycane: { r: ['.wrw.', 'r...r', 'w....', 'r....', 'w....', 'r....'], p: { r: '#D8283A', w: '#FFFFFF' }, dy: -5 },
+    giftbox: { r: ['..y.y..', '...y...', 'rrryrrr', 'rrryrrr', 'rrryrrr'], p: { r: '#D8283A', y: '#F5D547' }, dy: -2 },
+    ornament: { r: ['..y..', '.bbb.', 'bwbbb', 'bbbbb', '.bbb.'], p: { b: '#4A7BD8', w: '#CFE0FF', y: '#E9C14A' }, dy: -2 },
+    snowflake: { r: ['.w.w.', '..w..', 'wwwww', '..w..', '.w.w.'], p: { w: '#DDEEFF' }, dy: -2 },
+    heart: { r: ['.rr.rr.', 'rRrrrrr', 'rrrrrrr', '.rrrrr.', '..rrr..', '...r...'], p: { r: '#E0243A', R: '#FF9AA8' }, dy: -2 },
+    rose: { r: ['..rr.', '.rRrr', '..rr.', '..g..', '.gg..', '..g..', '..g..'], p: { r: '#D8203A', R: '#FF8A9A', g: '#3E8E4F' }, dy: -6 },
+    letter: { r: ['wwwwwww', 'wpwwwpw', 'wwprpww', 'wwwpwww', 'wwwwwww'], p: { w: '#FFFDF8', p: '#CFC7E8', r: '#E0243A' }, dy: -2 },
+    icecream: { r: ['.ppp.', 'ppwpp', '.ppp.', '.oooo', '..oo.', '..o..'], p: { p: '#F7A8C4', w: '#FFFFFF', o: '#D9A441' }, dy: -3 },
+    gamepad: { r: ['.kkkkkkk.', 'kkwkkkrkk', 'kwwwkbkgk', 'kkwkkkykk', '.kk...kk.'], p: { k: '#3A3550', w: '#FFFFFF', r: '#E0443A', b: '#4A7BD8', g: '#4CC38A', y: '#F5D547' }, dy: -2 },
+    coin: { r: ['.yyy.', 'yYddy', 'yYdyy', 'yYddy', '.yyy.'], p: { y: '#F5D547', Y: '#FFF1A8', d: '#C9921F' }, dy: -2 },
+    sword: { r: ['.......ss', '......sws', '.....sws.', '....sws..', '.y.sws...', '..yss....', '..bb.....', '.b..y....'], p: { s: '#C8CCD8', w: '#FFFFFF', y: '#E9C14A', b: '#8B5A2B' }, dy: -7 },
+    mushroom: { r: ['.rrrr.', 'rwrrwr', 'rrrrrr', '..ww..', '..ww..'], p: { r: '#E0443A', w: '#FFFFFF' }, dy: -3 },
+    mapleleaf: { r: ['..o..', 'o.o.o', 'ooooo', '.ooo.', '..d..'], p: { o: '#E8792B', d: '#8B5A2B' }, dy: -2 },
     pizza: { r: ['ooooooooo', 'oOOOOOOOo', '.yyrryyy.', '.yrryyry.', '..yyyrr..', '..yyyyy..', '...ryy...', '...yyy...', '....y....'], p: { y: '#FFD966', r: '#D84A3A', o: '#B8743A', O: '#E0A060' }, dy: -1 }, // кусочек висит из клюва, держится за корочку
     cherry: { r: ['....gG.', '...gGG.', '..g.g..', '.g...g.', 'rr..rr.', 'rRr.rRr', 'rrr.rrr', '.r...r.'], p: { g: '#3E8E4F', G: '#5FC46F', r: '#D8203A', R: '#FF8A9A' }, dy: -1 },
     cheese: { r: ['..yy...', 'yyyyy..', 'yhyyyyy', 'yyyyhyy', 'ddddddd'], p: { y: '#F5C842', h: '#D9A72A', d: '#C9921F' }, dy: -2 },
@@ -201,6 +236,7 @@
     spoon: { r: ['......sss', 'ggggggsws', '......sss'], p: { g: '#B8BCC8', s: '#D0D4E0', w: '#FFFFFF' }, dy: -1 },
   };
   function hdHat(put, hat, cx, bottom) {
+    if (SPECIAL_HATS[hat.t]) { const h = SPECIAL_HATS[hat.t]; stamp(put, h.r, Math.round(cx - h.r[0].length / 2), bottom - h.r.length + 1, h.p); return; }
     const rows = HD_HATS[hat.t]; if (!rows) return;
     const c = hat.c, dark = c === '#2B2340';
     const pal = { c, d: shade(c, dark ? 1.6 : .7), l: shade(c, dark ? 2.2 : 1.3), b: hat.t === 'party' ? '#FFFFFF' : dark ? '#E0443A' : shade(c, .55), w: '#FFFFFF', r: '#E0443A' };
@@ -279,12 +315,12 @@
   // ---------- подарки-семечки для аватара (выдаёт админ): фон, обувь, головной убор, анимация, рамка ----------
   // значение подарка — короткая строка: hat «crown:1» (вид:цвет), shoes «boots:3», bg «#F5C4B3», anim «bounce», frame «gold»
   const GIFTS = {
-    bg: ['#F5C4B3', '#FBE3A1', '#CDEBD8', '#BFD7F5', '#E2D3F7', '#F7C6DA', '#FFFDF8', '#2B1A51', '#1D6B4F', '#D85A30'],
-    hat: HATS.flatMap(h => HAT_C.map((c, i) => h + ':' + i)),
+    bg: ['#F5C4B3', '#FBE3A1', '#CDEBD8', '#BFD7F5', '#E2D3F7', '#F7C6DA', '#FFFDF8', '#2B1A51', '#1D6B4F', '#D85A30', '#1B1035', '#E8F4FF', '#FFD6E0', '#F2C27B', '#0F0F2D'],
+    hat: ['wizard', 'witch', 'pumpkin', 'santa', 'antlers', 'beanie', 'heartband', 'wreath', 'strawhat', 'leafcrown', 'headset', ...HATS.flatMap(h => HAT_C.map((c, i) => h + ':' + i))],
     shoes: SHOES.flatMap(h => SHOE_C.map((c, i) => h + ':' + i)),
     anim: ['bounce', 'wiggle', 'float', 'spin', 'sparkle', 'heart'],
-    frame: ['gold', 'rainbow', 'stars', 'hearts', 'leaves', 'dotted'],
-    item: ['pizza', 'cherry', 'cheese', 'ring', 'pearl', 'ruby', 'sapphire', 'key', 'spoon'],
+    frame: ['gold', 'rainbow', 'stars', 'hearts', 'leaves', 'dotted', 'snow', 'magic', 'spooky', 'neon'],
+    item: ['pizza', 'cherry', 'wand', 'crystal', 'star', 'lollipop', 'minipumpkin', 'candycane', 'giftbox', 'ornament', 'snowflake', 'heart', 'rose', 'letter', 'icecream', 'mapleleaf', 'gamepad', 'coin', 'sword', 'mushroom', 'cheese', 'ring', 'pearl', 'ruby', 'sapphire', 'key', 'spoon'],
     scarf: ['#E0443A', '#E9A93B', '#4CC38A', '#4A7BD8', '#F08BC0', '#9B5DE5', '#FFFFFF', '#2B2340', '#5FA8A0', '#D85A30'],
   };
   const pair = (v, list, cols) => { const [t, i] = String(v || '').split(':'); return list.includes(t) && cols[+i] ? { t, c: cols[+i] } : null; };
@@ -292,7 +328,7 @@
   function dress(lk, av) {
     if (!av) return lk;
     const d = Object.assign({}, lk);
-    if (av.hat) d.hat = pair(av.hat, HATS, HAT_C) || d.hat;
+    if (av.hat) d.hat = SPECIAL_HATS[av.hat] ? { t: av.hat } : pair(av.hat, HATS, HAT_C) || d.hat;
     if (av.shoes) d.shoe = pair(av.shoes, SHOES, SHOE_C) || d.shoe;
     if (GIFTS.item.includes(av.item)) d.item = av.item;         // в клюве / в зубках
     if (/^#[0-9a-f]{6}$/i.test(av.scarf || '')) d.scarf = av.scarf;
