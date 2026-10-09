@@ -66,8 +66,22 @@ async function sitePage(req, env, url) {
   const lang = (url.pathname.match(/^\/(ru|lv)\//) || [])[1] || 'en';
   const hidden = new Set(rows.filter(r => r.lang === '*' && r.hidden).map(r => r.id));
   const html = new Map(rows.filter(r => r.lang === lang && r.html != null).map(r => [r.id, r.html]));
-  if (!hidden.size && !html.size) return out;
-  return new HTMLRewriter().on('[data-ppb]', {
+  // устройство страницы: порядок блоков и новые блоки, добавленные админом (одно на все языки)
+  let struct = null;
+  const pg = rows.find(r => r.lang === '*' && r.id === 'page:' + url.pathname.replace(/^\/(ru|lv)(?=\/)/, ''));
+  try { struct = pg && pg.html ? JSON.parse(pg.html) : null; } catch (e) { struct = null; }
+  if (!hidden.size && !html.size && !struct) return out;
+  const anyLang = id => html.get(id) ?? (rows.find(r => r.id === id && r.html != null && ['en', 'ru', 'lv'].includes(r.lang)) || {}).html;
+  const rw = new HTMLRewriter();
+  if (struct) {
+    if (Array.isArray(struct.order) && struct.order.length) {
+      const css = 'main#main{display:flex;flex-direction:column}main#main>*{order:-1}main#main>[data-ppb]{order:999}' + struct.order.map((id, i) => `main#main>[data-ppb="${String(id).replace(/[^a-z0-9.-]/g, '')}"]{order:${i}}`).join('');
+      rw.on('head', { element(el) { el.append(`<style id="pp-order">${css}</style>`, { html: true }); } });
+    }
+    const custom = (struct.custom || []).filter(id => /^custom-[a-z0-9]{4,20}$/.test(id) && !hidden.has(id));
+    if (custom.length) rw.on('main#main', { element(el) { for (const id of custom) el.append(`<section class="pp-custom" data-ppb="${id}" data-ppb-edited>${anyLang(id) || ''}</section>`, { html: true }); } });
+  }
+  return rw.on('[data-ppb]', {
     element(el) {
       const id = el.getAttribute('data-ppb');
       if (hidden.has(id)) el.setAttribute('data-ppb-hidden', ''); // скрыт: админ видит его в режиме правки и может вернуть
@@ -418,8 +432,11 @@ async function route(req, env, url) {
     if (m === 'POST') {
       const b = await req.json().catch(() => ({}));
       const id = String(b.id || ''), lang = String(b.lang || '');
-      if (!/^[a-z0-9.-]{1,80}$/.test(id) || !['en', 'ru', 'lv', '*'].includes(lang)) fail(400, 'bad');
-      if (lang === '*') {
+      if (!(/^[a-z0-9.-]{1,80}$/.test(id) || /^page:\/[a-z0-9\/-]{0,80}$/.test(id)) || !['en', 'ru', 'lv', '*'].includes(lang)) fail(400, 'bad');
+      if (id.startsWith('page:')) { // порядок блоков и список новых блоков страницы
+        if (b.html == null) await env.DB.prepare("DELETE FROM site_blocks WHERE id = ? AND lang = '*'").bind(id).run();
+        else await env.DB.prepare("INSERT INTO site_blocks (id, lang, html, hidden, page, updated_at) VALUES (?, '*', ?, 0, ?, ?) ON CONFLICT(id, lang) DO UPDATE SET html = excluded.html, updated_at = excluded.updated_at").bind(id, String(b.html).slice(0, 20000), String(b.page || '').slice(0, 200), now()).run();
+      } else if (lang === '*') {
         if (b.hidden) await env.DB.prepare('INSERT INTO site_blocks (id, lang, hidden, page, updated_at) VALUES (?, ?, 1, ?, ?) ON CONFLICT(id, lang) DO UPDATE SET hidden = 1, page = excluded.page, updated_at = excluded.updated_at').bind(id, '*', String(b.page || '').slice(0, 200), now()).run();
         else await env.DB.prepare("DELETE FROM site_blocks WHERE id = ? AND lang = '*'").bind(id).run();
       } else if (b.html == null) await env.DB.prepare('DELETE FROM site_blocks WHERE id = ? AND lang = ?').bind(id, lang).run(); // «вернуть как было»

@@ -2625,3 +2625,25 @@ html.sb-hide { --sb: 0px; }
 .sw-pv-works { margin-top: 14px; clear: both; }
 .be-dtabs .be-vl { margin-left: auto; padding: 6px 10px; border-radius: 12px; background: #FFF7E6; border: 1px solid #F2D9A6; }
 .be-dtabs { flex-wrap: wrap; align-items: center; }
+/* режим правки: новые блоки, кнопки картинок */
+.pp-add { position: relative; }
+.pp-add > summary { list-style: none; cursor: pointer; }
+.pp-add > summary::-webkit-details-marker { display: none; }
+.pp-add > div { position: absolute; bottom: 130%; left: 0; display: grid; gap: 4px; min-width: 220px; padding: 8px; border-radius: 12px; background: #fff; box-shadow: 0 8px 24px rgba(0,0,0,.25); }
+.pp-add > div button { text-align: left; border: 0; background: #F3EEFB; color: #2B1A51; border-radius: 8px; padding: 7px 10px; font: 600 14px var(--sans); cursor: pointer; }
+.pp-img-btns { display: flex; flex-wrap: wrap; gap: 6px; margin: 4px 0 6px; }
+.pp-img-btns .pp-btn { padding: 5px 10px; font-size: 12px; cursor: pointer; }
+.pp-del { color: #B3261E; border-color: #F2B8B5; }
+/* новые блоки, добавленные на страницу */
+.pp-custom { padding: 32px var(--gutter); }
+.pp-c { max-width: 1100px; margin: 0 auto; }
+.pp-c-text h2 { margin: 0 0 12px; }
+.pp-c-img { text-align: center; }
+.pp-c-img img { max-width: 100%; max-height: 70vh; border-radius: 16px; }
+.pp-c-img figcaption, .pp-c-grid figcaption { margin-top: 8px; color: var(--muted); font-size: 15px; }
+.pp-c-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 16px; }
+.pp-c-grid figure { margin: 0; }
+.pp-c-grid img { width: 100%; aspect-ratio: 4 / 3; object-fit: cover; border-radius: 12px; display: block; }
+.pp-c-quote { border-left: 4px solid var(--peach); padding: 8px 0 8px 22px; font: italic 22px/1.5 var(--serif); }
+.pp-c-quote cite { display: block; margin-top: 8px; font: 500 15px var(--sans); color: var(--muted); }
+.pp-c-btn { text-align: center; }

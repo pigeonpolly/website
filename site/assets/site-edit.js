@@ -27,6 +27,70 @@
   const origOf = async (id, l = lang) => { const o = (await rawDoc(l)).querySelector(`[data-ppb="${CSS.escape(id)}"]`); return o ? o.innerHTML : null; };
   const override = (id, l = lang) => server.find(x => x.id === id && x.lang === l && x.html != null);
   const isHidden = id => server.some(x => x.id === id && x.lang === '*' && x.hidden);
+  // устройство страницы: порядок блоков и новые блоки (одно на все языки)
+  const pageId = 'page:' + basePath;
+  const struct = () => { const r = server.find(x => x.id === pageId && x.lang === '*'); try { return r && r.html ? JSON.parse(r.html) : { order: [], custom: [] }; } catch (e) { return { order: [], custom: [] }; } };
+  const blocks = () => [...document.querySelectorAll('#main > [data-ppb]')].map((el, i) => ({ el, i, o: +(getComputedStyle(el).order || 0) })).sort((a, b) => a.o - b.o || a.i - b.i).map(x => x.el);
+  function applyOrder(ids) {
+    const main = document.getElementById('main'); main.style.display = 'flex'; main.style.flexDirection = 'column';
+    [...main.children].forEach(el => { el.style.order = el.dataset.ppb ? (ids.includes(el.dataset.ppb) ? ids.indexOf(el.dataset.ppb) : 999) : -1; });
+  }
+  async function saveStruct(st) {
+    await api('admin/blocks', { id: pageId, lang: '*', html: JSON.stringify(st), page: basePath });
+    await load();
+  }
+  async function move(b, dir) {
+    const list = blocks().map(x => x.dataset.ppb), i = list.indexOf(b.dataset.ppb), j = i + dir;
+    if (i < 0 || j < 0 || j >= list.length) return;
+    [list[i], list[j]] = [list[j], list[i]];
+    applyOrder(list); b.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    const st = struct(); st.order = list; await saveStruct(st);
+  }
+  // шаблоны новых блоков
+  const TPL = {
+    text: ['📝 Текст', '<div class="pp-c pp-c-text"><h2>Заголовок</h2><p>Новый текст. Нажмите «Текст» в панели справа и напишите своё.</p></div>'],
+    image: ['🖼 Картинка с подписью', '<figure class="pp-c pp-c-img"><img src="/images/home/first-pigeon-polly.jpg" alt=""><figcaption>Подпись к картинке</figcaption></figure>'],
+    gallery: ['🖼🖼 Галерея', '<div class="pp-c pp-c-gal"><h2>Галерея</h2><div class="pp-c-grid"><figure><a href="/images/home/first-pigeon-polly.jpg" data-lightbox><img src="/images/home/first-pigeon-polly.jpg" alt=""></a><figcaption>Подпись</figcaption></figure><figure><a href="/images/home/first-pigeon-polly.jpg" data-lightbox><img src="/images/home/first-pigeon-polly.jpg" alt=""></a><figcaption>Подпись</figcaption></figure><figure><a href="/images/home/first-pigeon-polly.jpg" data-lightbox><img src="/images/home/first-pigeon-polly.jpg" alt=""></a><figcaption>Подпись</figcaption></figure></div></div>'],
+    quote: ['❝ Цитата', '<blockquote class="pp-c pp-c-quote"><p>Текст цитаты</p><cite>— автор</cite></blockquote>'],
+    button: ['🔘 Кнопка-ссылка', '<div class="pp-c pp-c-btn"><a class="pill-btn pill-fill" href="/">Текст кнопки</a></div>'],
+  };
+  async function addBlock(kind, after) {
+    const id = 'custom-' + Math.random().toString(36).slice(2, 10);
+    const el = document.createElement('section'); el.className = 'pp-custom'; el.dataset.ppb = id; el.innerHTML = TPL[kind][1];
+    const list = blocks().map(x => x.dataset.ppb);
+    const pos = after ? list.indexOf(after.dataset.ppb) + 1 : list.length;
+    list.splice(pos, 0, id);
+    document.getElementById('main').appendChild(el); applyOrder(list); label();
+    const st = struct(); st.custom = [...(st.custom || []), id]; st.order = list;
+    await api('admin/blocks', { id, lang, html: TPL[kind][1], page: basePath });
+    await saveStruct(st);
+    el.scrollIntoView({ behavior: 'smooth', block: 'center' }); open(el);
+  }
+  async function removeBlock(b) {
+    const id = b.dataset.ppb;
+    if (!confirm('Удалить этот новый блок совсем (на всех языках)?')) return;
+    const st = struct(); st.custom = (st.custom || []).filter(x => x !== id); st.order = (st.order || []).filter(x => x !== id);
+    for (const l of Object.keys(PRE)) if (override(id, l)) await api('admin/blocks', { id, lang: l, html: null });
+    await saveStruct(st);
+    close(true); b.remove();
+  }
+  // загрузка картинки в хранилище сайта (большие уменьшаем до 2000px)
+  async function upload(file) {
+    let f = file;
+    if (file.type !== 'image/gif' && file.size > 900000) {
+      try {
+        const bmp = await createImageBitmap(file), k = Math.min(1, 2000 / Math.max(bmp.width, bmp.height));
+        const c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k);
+        c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height);
+        f = await new Promise(r => c.toBlob(r, 'image/jpeg', .88));
+      } catch (e) { /* как есть */ }
+    }
+    const fd = new FormData(); fd.append('file', f, 'image.jpg');
+    const r = await fetch('/api/blog/admin/upload', { method: 'POST', credentials: 'same-origin', body: fd });
+    const d = await r.json().catch(() => ({}));
+    if (!r.ok || !d.url) throw new Error(d.error || r.status);
+    return d.url;
+  }
   const nameOf = b => { const h = b.querySelector('h1, h2, h3'); return (h ? h.textContent.trim().replace(/\s+/g, ' ').slice(0, 50) : '') || b.dataset.ppb; };
   // вставить HTML в блок и заново запустить его скрипты (карусели, переключатели)
   function setInner(b, html) {
@@ -45,7 +109,9 @@
     const mine = server.filter(x => x.page === basePath && (x.lang === lang || x.lang === '*'));
     bar.innerHTML = `<span>✏️ <b>Режим правки</b> · нажмите на любой блок</span>
       ${mine.length ? `<details class="pp-changed"><summary>Изменено здесь: ${mine.length}</summary><div>${mine.map(x => `<button type="button" data-go="${esc(x.id)}">${x.lang === '*' ? '🙈 скрыт' : '✎ ' + x.lang.toUpperCase()} · ${esc(nameOf(document.querySelector(`[data-ppb="${CSS.escape(x.id)}"]`) || { dataset: { ppb: x.id }, querySelector: () => null }))}</button>`).join('')}</div></details>` : ''}
+      <details class="pp-add"><summary class="pp-btn">＋ Новый блок</summary><div>${Object.entries(TPL).map(([k, [n]]) => `<button type="button" data-add="${k}">${n}</button>`).join('')}</div></details>
       <button type="button" class="pp-btn" data-exit>Выйти из режима</button>`;
+    bar.querySelectorAll('[data-add]').forEach(x => x.onclick = () => { x.closest('details').open = false; addBlock(x.dataset.add, cur && cur.b); });
     bar.querySelector('[data-exit]').onclick = toggle;
     bar.querySelectorAll('[data-go]').forEach(g => g.onclick = () => { const b = document.querySelector(`[data-ppb="${CSS.escape(g.dataset.go)}"]`); if (b) { b.scrollIntoView({ behavior: 'smooth', block: 'center' }); open(b); } });
   }
@@ -95,7 +161,9 @@
     panel.innerHTML = `<header><div><b>${esc(nameOf(c.b))}</b><small>${esc(c.id)} · ${lang.toUpperCase()}</small></div><button type="button" class="pp-x" data-close aria-label="Закрыть">✕</button></header>
       <p class="pp-state">${edited ? '✎ Блок изменён на этом языке' : 'Как в коде сайта'}${hid ? ' · <b>🙈 скрыт от посетителей</b>' : ''}</p>
       <div class="pp-row"><button type="button" class="pp-btn" data-hide>${hid ? '👁 Показать блок' : '🙈 Скрыть блок'}</button>
-        ${edited ? '<button type="button" class="pp-btn" data-revert>↺ Вернуть как было</button>' : ''}</div>
+        ${edited && !c.id.startsWith('custom-') ? '<button type="button" class="pp-btn" data-revert>↺ Вернуть как было</button>' : ''}
+        <button type="button" class="pp-btn" data-mv="-1" title="Переставить блок выше">↑ Выше</button><button type="button" class="pp-btn" data-mv="1" title="Переставить блок ниже">↓ Ниже</button>
+        ${c.id.startsWith('custom-') ? '<button type="button" class="pp-btn pp-del" data-delblk>🗑 Удалить блок</button>' : ''}</div>
       <div class="pp-tabs" role="tablist">${[['text', 'Текст'], ['colors', 'Цвета'], ['code', 'Код']].map(([k, n]) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${c.tab === k}">${n}</button>`).join('')}</div>
       <div class="pp-body"></div>
       <footer>${Object.keys(c.colorMap).length ? `<label class="pp-all"><input type="checkbox" id="pp-allc" checked> цвета — сразу на всех языках</label>` : ''}
@@ -117,6 +185,8 @@
       await load(); draw();
     });
     panel.querySelector('[data-save]').onclick = save;
+    panel.querySelectorAll('[data-mv]').forEach(x => x.onclick = () => move(c.b, +x.dataset.mv));
+    const db = panel.querySelector('[data-delblk]'); if (db) db.onclick = () => removeBlock(c.b);
     const body = panel.querySelector('.pp-body');
     ({ text: drawText, colors: drawColors, code: drawCode })[c.tab](body);
   }
@@ -132,12 +202,29 @@
     const imgs = [...t.content.querySelectorAll('img[src]')].filter(i => !skip(i));
     body.innerHTML = `${texts.length ? `<p class="pp-note">Пишите прямо в полях — блок на странице меняется сразу.</p>${texts.map((el, i) => `<div class="pp-f"><span>${el.tagName.toLowerCase()}</span><div class="pp-ce" contenteditable="true" data-t="${i}">${el.innerHTML}</div></div>`).join('')}` : '<p class="pp-note">В этом блоке нет текста — смотрите вкладки «Цвета» и «Код».</p>'}
       ${links.length ? `<h4>Ссылки</h4>${links.map((a, i) => `<label class="pp-f"><span>${esc(a.textContent.trim().slice(0, 40) || 'ссылка')}</span><input type="text" data-l="${i}" value="${esc(a.getAttribute('href'))}"></label>`).join('')}` : ''}
-      ${imgs.length ? `<h4>Картинки</h4>${imgs.map((im, i) => `<div class="pp-f pp-img"><img src="${esc(im.getAttribute('src'))}" alt=""><label>адрес <input type="text" data-i="${i}" value="${esc(im.getAttribute('src'))}"></label><label>описание <input type="text" data-a="${i}" value="${esc(im.getAttribute('alt') || '')}"></label></div>`).join('')}` : ''}`;
+      ${imgs.length ? `<h4>Картинки</h4>${imgs.map((im, i) => `<div class="pp-f pp-img"><img src="${esc(im.getAttribute('src'))}" alt="">
+        <div class="pp-img-btns"><label class="pp-btn">⬆ Заменить файлом<input type="file" accept="image/*" data-up="${i}" hidden></label><button type="button" class="pp-btn" data-dup="${i}">＋ Добавить ещё картинку рядом</button><button type="button" class="pp-btn" data-rmimg="${i}">✕ Убрать</button></div>
+        <label>адрес <input type="text" data-i="${i}" value="${esc(im.getAttribute('src'))}"></label><label>описание <input type="text" data-a="${i}" value="${esc(im.getAttribute('alt') || '')}"></label></div>`).join('')}` : ''}`;
     const sync = () => { c.work = t.innerHTML; changed(); };
     body.querySelectorAll('[data-t]').forEach(f => f.oninput = () => { texts[+f.dataset.t].innerHTML = f.innerHTML; sync(); });
     body.querySelectorAll('[data-l]').forEach(f => f.oninput = () => { links[+f.dataset.l].setAttribute('href', f.value.trim()); sync(); });
     body.querySelectorAll('[data-i]').forEach(f => f.oninput = () => { imgs[+f.dataset.i].setAttribute('src', f.value.trim()); f.closest('.pp-img').querySelector('img').src = f.value.trim(); sync(); });
     body.querySelectorAll('[data-a]').forEach(f => f.oninput = () => { imgs[+f.dataset.a].setAttribute('alt', f.value); sync(); });
+    // картинка: целиком (с подписью и ссылкой на крупную) — ближайший figure / ссылка / пункт списка
+    const unit = im => im.closest('figure, li, .wall-item') || im.closest('a') || im;
+    const setImg = (im, url) => { im.setAttribute('src', url); im.removeAttribute('srcset'); const a = im.closest('a[data-lightbox], a[href$=".jpg"], a[href$=".png"], a[href$=".webp"]'); if (a) a.setAttribute('href', url); };
+    body.querySelectorAll('[data-up]').forEach(inp => inp.onchange = async () => {
+      const f = inp.files[0]; if (!f) return;
+      const lbl = inp.closest('label'); lbl.firstChild.textContent = 'Загружаю…';
+      try { setImg(imgs[+inp.dataset.up], await upload(f)); sync(); drawText(body); } catch (e) { alert('Не получилось загрузить: ' + e.message); lbl.firstChild.textContent = '⬆ Заменить файлом'; }
+    });
+    body.querySelectorAll('[data-dup]').forEach(x => x.onclick = () => {
+      const u = unit(imgs[+x.dataset.dup]), copy = u.cloneNode(true); u.after(copy);
+      const pick = document.createElement('input'); pick.type = 'file'; pick.accept = 'image/*';
+      pick.onchange = async () => { const f = pick.files[0]; if (f) { try { setImg(copy.matches('img') ? copy : copy.querySelector('img'), await upload(f)); } catch (e) { alert('Не получилось загрузить: ' + e.message); } } sync(); drawText(body); };
+      sync(); drawText(body); pick.click();
+    });
+    body.querySelectorAll('[data-rmimg]').forEach(x => x.onclick = () => { if (!confirm('Убрать эту картинку из блока?')) return; unit(imgs[+x.dataset.rmimg]).remove(); sync(); drawText(body); });
   }
 
   // Цвета: все цвета блока (#rrggbb в стилях и картинках); меняется цвет — меняется везде в блоке
@@ -175,7 +262,7 @@
     const c = cur, msg = panel.querySelector('.pp-msg'), btn = panel.querySelector('[data-save]');
     btn.disabled = true; msg.textContent = 'Сохраняю…';
     try {
-      await api('admin/blocks', { id: c.id, lang, html: c.work === c.orig ? null : c.work, page: basePath });
+      await api('admin/blocks', { id: c.id, lang, html: c.work === c.orig && !c.id.startsWith('custom-') ? null : c.work, page: basePath }); // у нового блока правка — это и есть его содержимое
       const all = panel.querySelector('#pp-allc');
       if (all && all.checked && Object.keys(c.colorMap).length) {
         for (const l of Object.keys(PRE).filter(x => x !== lang)) {
