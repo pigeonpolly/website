@@ -38,6 +38,7 @@ export default {
     ctx.waitUntil((async () => {
       if (!(await getMeta(env, 'buttons_backfill'))) await backfillButtons(env).catch(e => console.error('backfill', e)); // разовое начисление пуговок за прошлое
       await migrateToR2(env); await cleanupInactive(env);
+      await env.DB.prepare('DELETE FROM visits WHERE ts < ?').bind(now() - 400 * 86400).run().catch(() => {}); // статистику храним ~13 месяцев
     })());
   },
 };
@@ -142,6 +143,10 @@ async function ensureSchema(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS site_blocks (id TEXT NOT NULL, lang TEXT NOT NULL, html TEXT, hidden INTEGER DEFAULT 0, page TEXT, updated_at INTEGER, PRIMARY KEY (id, lang))`),
     // пуговки: журнал начислений и трат (одно начисление на (кто, за что, ref) — повторно не дать); магазин: цена и сколько осталось
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS button_log (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, kind TEXT NOT NULL, ref TEXT NOT NULL, amount INTEGER NOT NULL, day TEXT, created_at INTEGER, UNIQUE (user_id, kind, ref))`),
+    // посетители сайта (своя статистика без cookie): одна строка = один просмотр страницы; vid — хеш (IP + браузер + соль), меняется каждые сутки, сам IP не храним
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS visits (id INTEGER PRIMARY KEY AUTOINCREMENT, day TEXT NOT NULL, ts INTEGER, vid TEXT, entry INTEGER DEFAULT 0, path TEXT, lang TEXT,
+      src TEXT, ref TEXT, campaign TEXT, device TEXT, os TEXT, browser TEXT, country TEXT)`),
+    env.DB.prepare(`CREATE INDEX IF NOT EXISTS visits_day ON visits(day)`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS shop (kind TEXT NOT NULL, item TEXT NOT NULL, price INTEGER DEFAULT 0, stock INTEGER DEFAULT 0, PRIMARY KEY (kind, item))`),
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
@@ -233,6 +238,87 @@ const randomHex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b
 async function sha256(s) {
   const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
   return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+
+// ---------- посетители (своя статистика вместо непонятной Cloudflare) ----------
+// страница сама шлёт POST /api/hit {p: путь, r: откуда пришли, u: utm-метки, w: ширина экрана, t: сенсорный экран}; без cookie, IP не сохраняем
+const BOT_RE = /bot|crawl|spider|slurp|headless|lighthouse|preview|externalhit|python|curl|wget|httpclient|monitor|scan/i;
+const SOURCES = [ // [название, регулярка по адресу сайта-источника или utm_source]
+  ['Google', /(^|\.)google\./], ['Bing', /(^|\.)bing\.com$/], ['Yandex', /(^|\.)ya(ndex)?\.(ru|com|lv|by|kz)$/], ['DuckDuckGo', /duckduckgo/], ['Другие поисковики', /ecosia|yahoo|qwant|brave\.com|startpage|search\./],
+  ['Instagram', /instagram|^ig$/], ['Facebook', /facebook|^fb$|fb\.me/], ['Pinterest', /pinterest|pin\.it/], ['TikTok', /tiktok/], ['Threads', /threads\.(net|com)/],
+  ['LinkedIn', /linkedin|lnkd\.in/], ['Telegram', /telegram|^t\.me$/], ['YouTube', /youtube|youtu\.be/], ['Patreon', /patreon/], ['X (Twitter)', /^(x\.com|t\.co|twitter\.com)$/],
+  ['VK', /(^|\.)vk\.(com|ru)$/], ['Reddit', /reddit/], ['ChatGPT и др. ИИ', /chatgpt|openai|perplexity|claude\.ai|gemini\.google|copilot/], ['Почта', /mail\.|outlook|gmail/],
+];
+const sourceOf = host => (SOURCES.find(([, re]) => re.test(host)) || ['Другие сайты'])[0];
+function uaInfo(ua, w, touch) {
+  const os = /iPhone|iPod/.test(ua) ? 'iPhone (iOS)' : /iPad/.test(ua) || (/Macintosh/.test(ua) && touch) ? 'iPad' : /Android/.test(ua) ? 'Android' : /Windows/.test(ua) ? 'Windows'
+    : /CrOS/.test(ua) ? 'ChromeOS' : /Macintosh|Mac OS X/.test(ua) ? 'Mac' : /Linux/.test(ua) ? 'Linux' : 'Другое';
+  const tablet = os === 'iPad' || (/Android/.test(ua) && !/Mobile/.test(ua)) || /Tablet/.test(ua);
+  const device = tablet ? 'Планшет' : /Mobi|iPhone|Android/.test(ua) || (touch && w && w < 800) ? 'Телефон' : 'Компьютер';
+  const browser = /Instagram/.test(ua) ? 'Instagram (внутри приложения)' : /FBAN|FBAV|FB_IAB/.test(ua) ? 'Facebook (внутри приложения)' : /Pinterest/i.test(ua) ? 'Pinterest (внутри приложения)'
+    : /musical_ly|BytedanceWebview|TikTok/i.test(ua) ? 'TikTok (внутри приложения)' : /Telegram/i.test(ua) ? 'Telegram (внутри приложения)' : /LinkedInApp/.test(ua) ? 'LinkedIn (внутри приложения)'
+    : /Edg\//.test(ua) ? 'Edge' : /OPR\/|Opera/.test(ua) ? 'Opera' : /SamsungBrowser/.test(ua) ? 'Samsung Internet' : /YaBrowser/.test(ua) ? 'Яндекс Браузер'
+    : /Firefox|FxiOS/.test(ua) ? 'Firefox' : /Chrome|CriOS/.test(ua) ? 'Chrome' : /Safari/.test(ua) ? 'Safari' : 'Другой';
+  return { os, device, browser };
+}
+async function hit(req, env) {
+  const ok = new Response(null, { status: 204 });
+  const ua = req.headers.get('user-agent') || '';
+  if (!ua || BOT_RE.test(ua)) return ok;
+  let b; try { b = JSON.parse(await req.text()); } catch (e) { return ok; }
+  const path = String(b.p || '/').slice(0, 200).split(/[?#]/)[0];
+  if (/^\/(admin|blog-editor)\b/.test(path)) return ok;
+  const u = await currentUser(req, env).catch(() => null);
+  if (u && await isAdmin(u, env)) return ok; // свои заходы Алины не считаем
+  const site = new URL(req.url).hostname.replace(/^www\./, '');
+  let ref = ''; try { ref = b.r ? new URL(String(b.r)).hostname.replace(/^www\./, '').toLowerCase() : ''; } catch (e) { /* не адрес */ }
+  if (ref === site || ref === 'pigeonpolly.com' || ref === 'localhost') ref = 'self';
+  const utm = b.u && typeof b.u === 'object' ? b.u : {};
+  const us = String(utm.source || '').toLowerCase().slice(0, 60), campaign = String(utm.campaign || '').slice(0, 80) || null;
+  const info = uaInfo(ua, Number(b.w) || 0, !!b.t);
+  // откуда пришёл: utm-метка → сайт-источник → приложение (Instagram и Facebook часто прячут адрес) → «напрямую»
+  let src = null, entry = 0;
+  if (us) { src = sourceOf(us); if (src === 'Другие сайты') src = us; entry = 1; }
+  else if (ref && ref !== 'self') { src = sourceOf(ref); entry = 1; }
+  else if (ref !== 'self') { const app = info.browser.match(/^(Instagram|Facebook|Pinterest|TikTok|Telegram|LinkedIn) \(/); src = app ? app[1] : 'Напрямую'; entry = 1; }
+  let salt = await getMeta(env, 'visit_salt');
+  if (!salt) { salt = randomHex(16); await setMeta(env, 'visit_salt', salt); }
+  const day = rigaDay();
+  const vid = (await sha256(salt + day + (req.headers.get('cf-connecting-ip') || '') + ua)).slice(0, 16);
+  const lang = /^\/ru(\/|$)/.test(path) ? 'RU' : /^\/lv(\/|$)/.test(path) ? 'LV' : 'EN';
+  await env.DB.prepare('INSERT INTO visits (day, ts, vid, entry, path, lang, src, ref, campaign, device, os, browser, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    .bind(day, now(), vid, entry, path, lang, src, ref && ref !== 'self' ? ref.slice(0, 80) : null, campaign, info.device, info.os, info.browser, (req.cf && req.cf.country) || null).run();
+  return ok;
+}
+async function visitStats(env, days) {
+  const dayAgo = n => new Date(Date.now() - n * 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
+  const from = dayAgo(days - 1), prevFrom = dayAgo(2 * days - 1);
+  const q = async (sql, ...a) => (await env.DB.prepare(sql).bind(...a).all()).results;
+  // люди = уникальные за каждые сутки (один человек за день считается один раз)
+  const people = async (where, ...a) => q(`SELECT COUNT(DISTINCT day || vid) AS n FROM visits WHERE ${where}`, ...a).then(r => r[0].n);
+  const totals = async (a, b) => ({
+    people: await people('day >= ? AND day <= ?', a, b),
+    views: (await q('SELECT COUNT(*) AS n FROM visits WHERE day >= ? AND day <= ?', a, b))[0].n,
+    visits: (await q('SELECT COUNT(*) AS n FROM visits WHERE entry = 1 AND day >= ? AND day <= ?', a, b))[0].n,
+  });
+  const today = dayAgo(0);
+  // разбивки: по людям (уникальным за сутки), а «откуда» — по визитам (каждый заход с другого сайта/приложения)
+  const by = col => q(`SELECT ${col} AS k, COUNT(DISTINCT day || vid) AS n FROM visits WHERE day >= ? AND ${col} IS NOT NULL GROUP BY ${col} ORDER BY n DESC LIMIT 30`, from);
+  const series = await q('SELECT day, COUNT(DISTINCT vid) AS people, COUNT(*) AS views FROM visits WHERE day >= ? GROUP BY day ORDER BY day', from);
+  return {
+    days, from, to: today, first: (await q('SELECT MIN(day) AS d FROM visits'))[0].d,
+    now: { ...(await totals(from, today)), mobile: (await q("SELECT COUNT(DISTINCT day || vid) AS n FROM visits WHERE day >= ? AND device = 'Телефон'", from))[0].n },
+    prev: await totals(prevFrom, dayAgo(days)),
+    online: (await q('SELECT COUNT(DISTINCT vid) AS n FROM visits WHERE ts > ?', now() - 300))[0].n,
+    series,
+    sources: await q('SELECT src AS k, COUNT(*) AS n FROM visits WHERE entry = 1 AND day >= ? GROUP BY src ORDER BY n DESC', from),
+    sourceDevices: await q('SELECT src AS k, device AS d, COUNT(*) AS n FROM visits WHERE entry = 1 AND day >= ? GROUP BY src, device', from),
+    refs: await q('SELECT ref AS k, COUNT(*) AS n FROM visits WHERE entry = 1 AND ref IS NOT NULL AND day >= ? GROUP BY ref ORDER BY n DESC LIMIT 30', from),
+    campaigns: await q('SELECT campaign AS k, src AS s, COUNT(*) AS n FROM visits WHERE entry = 1 AND campaign IS NOT NULL AND day >= ? GROUP BY campaign, src ORDER BY n DESC LIMIT 30', from),
+    landing: await q('SELECT path AS k, COUNT(*) AS n FROM visits WHERE entry = 1 AND day >= ? GROUP BY path ORDER BY n DESC LIMIT 20', from),
+    pages: await q('SELECT path AS k, COUNT(*) AS n, COUNT(DISTINCT day || vid) AS p FROM visits WHERE day >= ? GROUP BY path ORDER BY n DESC LIMIT 40', from),
+    devices: await by('device'), os: await by('os'), browsers: await by('browser'), countries: await by('country'), langs: await by('lang'),
+  };
 }
 
 // ---------- сессия ----------
@@ -544,6 +630,12 @@ async function route(req, env, url) {
     return json({ ok: true }); // одинаковый ответ, даже если адреса не было
   }
   // все птицы (аккаунты) для кабинета: ник, когда появились, когда заходили, сколько работ
+  if (m === 'POST' && p === '/api/hit') return await hit(req, env);
+  if (m === 'GET' && p === '/api/admin/visits') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    return json(await visitStats(env, Math.min(Math.max(Number(url.searchParams.get('days')) || 7, 1), 365)));
+  }
   if (m === 'GET' && p === '/api/admin/users') {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');

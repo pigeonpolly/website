@@ -168,3 +168,14 @@
     else fetch('/api/stats?v=2', { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(d => { if (!d) return; fill(d); try { sessionStorage.setItem('pp-stats2', JSON.stringify({ at: Date.now(), d })); } catch (e) { /* без памяти */ } }).catch(() => {});
   }
 })();
+
+// Своя статистика посетителей (видна в кабинете → «👥 Посетители»): одна отметка на просмотр страницы, без cookie
+(() => {
+  try {
+    if (navigator.webdriver || /^(localhost|127\.)/.test(location.hostname) && !/[?&]track=1/.test(location.search)) return;
+    const sp = new URLSearchParams(location.search), u = {};
+    ['source', 'campaign'].forEach(k => { const v = sp.get('utm_' + k); if (v) u[k] = v; });
+    const body = JSON.stringify({ p: location.pathname, r: document.referrer, u, w: screen.width, t: navigator.maxTouchPoints > 1 });
+    if (!(navigator.sendBeacon && navigator.sendBeacon('/api/hit', new Blob([body], { type: 'application/json' })))) fetch('/api/hit', { method: 'POST', body, keepalive: true, headers: { 'content-type': 'application/json' } }).catch(() => {});
+  } catch (e) { /* статистика не должна ломать сайт */ }
+})();

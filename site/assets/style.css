@@ -2830,3 +2830,28 @@ html.sb-hide { --sb: 0px; }
   .be-table.adm-birds td:first-child { grid-column: 1 / -1; font-size: 16px; }
   .be-table.adm-birds td[data-l]::before { content: attr(data-l); display: block; font: 700 11px var(--sans); color: #8A83A0; }
 }
+
+/* кабинет → «👥 Посетители» */
+.adm-filter { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 16px; }
+.adm-filter .pill-btn[aria-pressed="true"] { background: #2B1A51; color: #fff; border-color: #2B1A51; }
+.adm-live { margin-left: auto; font-size: 14px; color: #6B6290; }
+.adm-up { color: #2E7D4F; font-weight: 600; } .adm-down { color: #B23A48; font-weight: 600; }
+.adm-box h3 { margin: 18px 0 8px; font-size: 15px; color: #2B1A51; }
+.adm-bars { list-style: none; margin: 8px 0 0; padding: 0; display: grid; gap: 7px; }
+.adm-bars li { display: grid; grid-template-columns: minmax(0, 11em) minmax(40px, 1fr) auto 3.2em auto; align-items: center; gap: 8px; font-size: 14px; color: #2B1A51; }
+.adm-bl { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.adm-bt { height: 10px; border-radius: 5px; background: #F0ECF7; overflow: hidden; }
+.adm-bt i { display: block; height: 100%; border-radius: 0 4px 4px 0; background: #7A5BC7; }
+.adm-bars b { font-variant-numeric: tabular-nums; text-align: right; }
+.adm-bars small { color: #8A83A0; text-align: right; font-variant-numeric: tabular-nums; }
+.adm-bars em { font-style: normal; font-size: 12px; color: #6B6290; white-space: nowrap; }
+.adm-chart { display: flex; align-items: flex-end; gap: 2px; height: 160px; padding-top: 8px; border-bottom: 1px solid #E2DCEE; }
+.adm-col { flex: 1; height: 100%; display: flex; align-items: flex-end; cursor: pointer; outline: none; }
+.adm-col i { width: 100%; border-radius: 4px 4px 0 0; background: #7A5BC7; }
+.adm-col:hover i, .adm-col:focus i, .adm-col.on i { background: #2B1A51; }
+.adm-chart-x { display: flex; justify-content: space-between; gap: 8px; margin-top: 6px; font-size: 12px; color: #8A83A0; }
+.adm-chart-tip { color: #2B1A51; font-weight: 600; text-align: center; }
+.adm-utm { display: flex; flex-wrap: wrap; gap: 8px; margin: 8px 0; }
+.adm-utm input, .adm-utm select { padding: 8px 12px; border: 1px solid #D8D0EA; border-radius: 10px; font: inherit; min-width: 0; flex: 1 1 140px; }
+.adm-box code { word-break: break-all; }
+@media (max-width: 600px) { .adm-bars li { grid-template-columns: minmax(0, 1fr) auto 3em; } .adm-bt { grid-column: 1 / -1; grid-row: 2; } .adm-bars em { grid-column: 1 / -1; } .adm-live { margin-left: 0; width: 100%; } }
