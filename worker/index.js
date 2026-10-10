@@ -166,6 +166,16 @@ const surprise = async (env, req, uid, kind) => { const r = await surpriseKI(env
 // ---------- адвент-календарь (/advent/): окошки 1–31 декабря, сутки по Риге ----------
 const ADVENT_SPECIAL = [6, 12, 19, 24, 31];
 const ADVENT_LAST_JAN = 23; // до 23 января (включительно) можно открыть пропущенные окошки // особые окошки (31-е — легендарное); то же в site/assets/advent.js
+// бейдж «Коллекционер»: открыты все 31 окошко адвента одного года (пропущенные — до 23 января). true — только что получен
+async function adventCollector(env, uid, year) {
+  const n = (await env.DB.prepare('SELECT COUNT(*) AS n FROM advent_open WHERE user_id = ? AND year = ?').bind(uid, year).first()).n;
+  if (n < 31) return false;
+  const u = await env.DB.prepare('SELECT badges FROM users WHERE id = ?').bind(uid).first();
+  if (String(u && u.badges || '').split(',').includes('collector')) return false;
+  await addBadge(env, uid, 'collector');
+  await award(env, uid, 'badge', 'collector', BTN.badges.collector);
+  return true;
+}
 function adventNow(req, env) {
   // на локальной проверке (DEV_FAKE_LOGIN) дату можно подменить заголовком x-dev-date: 2026-12-05
   const dev = env.DEV_FAKE_LOGIN === '1' && /^\d{4}-\d\d-\d\d$/.test(req.headers.get('x-dev-date') || '') ? req.headers.get('x-dev-date') : null;
@@ -287,7 +297,7 @@ const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, p
   // бейджи: уровни по рекордной серии (дней) и особые достижения — пуговки один раз за каждый
   levels: { 1: 5, 3: 10, 7: 20, 14: 30, 30: 50, 60: 80, 100: 120, 365: 300 },
   badges: { bw: 5, extra: 15, bday: 15, early: 15, owl: 15, comeback: 15, ten: 20, weekend: 20, newyear: 20, halloween: 20,
-    monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, hundred: 100 } };
+    monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, collector: 50, hundred: 100 } };
 // легендарные вещи (как LEGEND в birds.js): в магазине по одной штуке на птичку, дарить нельзя; обычных — до трёх одинаковых
 const LEGEND = new Set(['hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass', 'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight']);
 const SHOP_MAX = 3;
@@ -807,12 +817,12 @@ async function route(req, env, url) {
     }
     if (got.length) {
       await env.DB.prepare('UPDATE advent_open SET kind = ?, item = ?, got = ? WHERE user_id = ? AND year = ? AND day = ?').bind(got[0][0], got[0][1], JSON.stringify(got), u.id, t.year, day).run();
-      return json({ ok: true, day, kind: got[0][0], item: got[0][1], got });
+      return json({ ok: true, day, kind: got[0][0], item: got[0][1], got, collector: await adventCollector(env, u.id, t.year) });
     }
     const n = ADVENT_SPECIAL.includes(day) ? 25 : 10;
     await award(env, u.id, 'advent', `${t.year}-${day}`, n);
     await env.DB.prepare('UPDATE advent_open SET buttons = ? WHERE user_id = ? AND year = ? AND day = ?').bind(n, u.id, t.year, day).run();
-    return json({ ok: true, day, buttons: n });
+    return json({ ok: true, day, buttons: n, collector: await adventCollector(env, u.id, t.year) });
   }
   if (m === 'POST' && p === '/api/admin/advent') { // Алина отмечает в «Коллекциях», какую вещь положить в какое окошко
     const u = await needUser(req, env);

@@ -163,6 +163,8 @@
       h: ['Upload a sketch on 31 December or 1 January', 'Загрузить рисунок 31 декабря или 1 января', 'Augšupielādēt skici 31. decembrī vai 1. janvārī'] },
     { k: 'halloween', s: 'pumpkin', bg: '#F7C9A3', n: ['Spooky sketch', 'Тыквенный скетч', 'Ķirbju skice'], f: ['Drew on Halloween and wasn’t even scared.', 'Рисовал(а) на Хеллоуин и даже не испугался(ась).', 'Zīmēji Helovīnā un pat nenobijies.'],
       h: ['Upload a sketch on 31 October', 'Загрузить рисунок 31 октября', 'Augšupielādēt skici 31. oktobrī'] },
+    { k: 'collector', s: 'collector', bg: '#F6D3CF', n: ['Collector', 'Коллекционер', 'Kolekcionārs'], f: ['Opened all 31 advent windows. Not a single gift escaped.', 'Открыл(а) все 31 окошко адвента. Ни один подарок не ускользнул.', 'Atvēri visus 31 adventes lodziņus. Neviena dāvana neizbēga.'],
+      h: ['Open all 31 windows of the advent calendar in December (missed ones can still be opened until 23 January)', 'Открыть все 31 окошко адвент-календаря в декабре (пропущенные можно открыть до 23 января)', 'Atvērt visus 31 adventes kalendāra lodziņus decembrī (izlaistos var atvērt līdz 23. janvārim)'] },
     { k: 'clock', f: ['Polly sets her watch by you.', 'Полли сверяет по вам часы.', 'Pollija pēc tevis regulē pulksteni.'], n: ['Like clockwork', 'Как по часам', 'Kā pulkstenis'], s: 'clock', bg: '#FBE3D6',
       h: ['Upload 10 sketches in a row at about the same time of day (within one hour)', 'Загрузить 10 рисунков подряд примерно в одно время суток (в пределах часа)', 'Augšupielādēt 10 skices pēc kārtas apmēram vienā laikā (vienas stundas robežās)'] },
   ];
@@ -200,6 +202,8 @@
     comeback: [[10, -3, 'pp.pp'], [10, -2, 'ppppp'], [11, -1, 'ppp'], [12, 0, 'p'], [0, 2, 'hh'], [0, 3, 'h'], [0, 4, 'hhh']],
     newyear: [[8, -3, '....w'], [5, -2, '.rrrrw'], [4, -1, 'rrrrr'], [3, 0, 'wwwwwww'], [0, 2, 'h.h'], [1, 3, 'h'], [0, 4, 'h.h']],
     pumpkin: [[1, 8, '.n.'], [0, 9, 'ooooo'], [0, 10, 'okoko'], [0, 11, 'ooooo'], [0, 12, 'okkko'], [1, 13, 'ooo']],
+    // коллекционер: подарок с бантом в лапах и звёздочка адвента над головой
+    collector: [[9, 7, '.m.m.'], [9, 8, '..m..'], [9, 9, 'rrmrr'], [9, 10, 'rrmrr'], [9, 11, 'mmmmm'], [9, 12, 'rrmrr'], [9, 13, 'rrmrr'], [5, -3, '..m..'], [5, -2, '.mlm.'], [5, -1, 'mmlmm'], [5, 0, '.m.m.'], [1, 1, 'l'], [12, 0, 'l']],
     medal: [[10, -3, '.m.'], [9, -2, 'mmm'], [10, -1, 'm.m'], [5, 8, 'r.r'], [5, 9, 'r.r'], [5, 10, 'mmm'], [4, 11, 'mmlmm'], [5, 12, 'mmm']],
   };
   const MONO = { b: '#D9D9D9', s: '#9A9A9A', o: '#6B6B6B' };
