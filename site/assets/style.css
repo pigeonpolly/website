@@ -2900,3 +2900,11 @@ html.sb-hide { --sb: 0px; }
 .pal-mk-out:empty { display: none; }
 .pal-mk-card { display: block; width: 100%; height: auto; border-radius: 16px; box-shadow: 0 10px 28px rgba(0, 0, 0, .25); }
 @media (max-width: 720px) { .pal-mk { grid-template-columns: 1fr; padding: 16px; } .pal-mk-opts input { min-width: 0; width: 100%; } .pal-mk-opts label { flex: 1 1 100%; } }
+.pal-mk-edit { margin-top: 18px; display: grid; gap: 10px; justify-items: start; }
+.pal-mk-edit[hidden] { display: none; }
+.pal-mk-tip { margin: 0; font-size: 14px; opacity: .85; }
+.pal-mk-photo { position: relative; display: inline-block; line-height: 0; touch-action: none; user-select: none; -webkit-user-select: none; }
+.pal-mk-photo img { display: block; max-width: 100%; max-height: 460px; border-radius: 14px; cursor: crosshair; }
+.pal-pin { position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px; padding: 0; border-radius: 50%; border: 3px solid #fff; background: var(--c); box-shadow: 0 0 0 2px rgba(0, 0, 0, .55), 0 3px 8px rgba(0, 0, 0, .35); color: #fff; font: 700 13px/28px 'Karla', sans-serif; text-shadow: 0 0 3px #000, 0 0 2px #000; cursor: grab; touch-action: none; }
+.pal-pin.on { width: 42px; height: 42px; margin: -21px 0 0 -21px; line-height: 36px; border-color: #F0A987; z-index: 1; }
+.pal-pin:active { cursor: grabbing; }

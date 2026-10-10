@@ -21,6 +21,9 @@
     mkSave: { en: '⬇ Download the card', ru: '⬇ Скачать карточку', lv: '⬇ Lejupielādēt kartīti' },
     mkWait: { en: 'Mixing colors…', ru: 'Смешиваю краски…', lv: 'Jaucu krāsas…' },
     mkErr: { en: 'Could not open this file, try a JPG or PNG.', ru: 'Не получилось открыть файл, попробуйте JPG или PNG.', lv: 'Neizdevās atvērt failu, pamēģini JPG vai PNG.' },
+    mkTip: { en: 'Drag a circle to take that color from another spot of the photo. Or tap a circle, then tap the photo.', ru: 'Перетащите кружок, чтобы взять цвет из другого места фото. Или нажмите на кружок, а потом на фото.', lv: 'Velc aplīti, lai paņemtu krāsu no citas foto vietas. Vai pieskaries aplītim un tad foto.' },
+    mkPin: { en: 'Color', ru: 'Цвет', lv: 'Krāsa' },
+    mkReset: { en: '↺ Back to automatic', ru: '↺ Вернуть как было', lv: '↺ Atjaunot automātiski' },
     kick: { en: 'Color palette', ru: 'Палитра', lv: 'Krāsu palete' },
     made: { en: 'made with Pigeon Polly', ru: 'сделано с Pigeon Polly', lv: 'veidots ar Pigeon Polly' },
   };
@@ -83,6 +86,7 @@
     const g = cv.getContext('2d'); g.drawImage(img, 0, 0, cv.width, cv.height);
     const d = g.getImageData(0, 0, cv.width, cv.height).data;
     let px = []; for (let i = 0; i < d.length; i += 4) px.push(toLab(d[i], d[i + 1], d[i + 2]));
+    const all = px, W = cv.width, H = cv.height;
     const nonPaper = px.filter(p => !(p[0] > 90 && chr(p) < 10));
     if (nonPaper.length > px.length * .08) px = nonPaper;
     const vivid = [];
@@ -107,18 +111,21 @@
     for (const [c] of order) { if (muted.length >= need) break; if (c[0] <= 95 && [...muted, ...vivid].every(m => dE(c, m) > 8)) muted.push(c); }
     for (const [c] of order) { if (muted.length >= need) break; if (![...muted, ...vivid].includes(c)) muted.push(c); } // совсем однотонное фото
     muted.sort((p, q) => p[0] - q[0]);
-    return [...vivid, ...muted].slice(0, 6).map(c => labHex(c));
+    // где на фото стоит пипетка каждого цвета — ближайший по цвету пиксель
+    return [...vivid, ...muted].slice(0, 6).map(c => {
+      let bi = 0, bd = Infinity; all.forEach((p, i) => { const e = dE(p, c); if (e < bd) { bd = e; bi = i; } });
+      return { hex: labHex(c), u: (bi % W + .5) / W, v: (Math.floor(bi / W) + .5) / H };
+    });
   }
   let NAMES = null;
   const loadNames = () => NAMES ? Promise.resolve(NAMES) : fetch('/assets/palette-names.json').then(r => r.json()).then(n => (NAMES = n.map(x => [x, hexLab(x[3])])));
-  function nameAll(hexes) {
-    const used = new Set();
-    return hexes.map(h => {
-      const l = hexLab(h); let best = null, bd = Infinity;
-      for (const [x, xl] of NAMES) if (!used.has(x[0])) { const d = dE(l, xl); if (d < bd) { bd = d; best = x; } }
-      used.add(best[0]); return { hex: h, n: best[gi] };
-    });
+  // название — ближайшее из словаря палитр Полли, без повторов внутри палитры
+  function nameOf(h, used) {
+    const l = hexLab(h); let best = null, bd = Infinity;
+    for (const [x, xl] of NAMES) if (!used.has(x[gi])) { const d = dE(l, xl); if (d < bd) { bd = d; best = x; } }
+    return best[gi];
   }
+  function nameAll(cols) { const used = new Set(); cols.forEach(c => { c.n = nameOf(c.hex, used); used.add(c.n); }); return cols; }
   // пиксельная Полли для плашки сайта (как в блоке «Тема дня»)
   const PP = ['......ddd.....', '.....dbbbd....', '....dbbwwbd...', '....dbbwkbdoo.', '....dbbbbbdo..', '...dbbbbbbd...', '..dbbsbbbbd...',
     '.dbbssbbbbd...', 'dbbssbbbbbd...', 'dbbbbbbbbd....', '.ddbbbbbdd....', '...ddddd......', '....o..o......', '...oo.oo......'];
@@ -161,19 +168,64 @@
     box.innerHTML = `<div class="pal-mk-txt"><h2>🎨 ${T.mkH[L]}</h2><p>${T.mkP[L]}</p>
       <label class="pill-btn pill-fill pal-mk-pick">${T.mkPick[L]}<input type="file" accept="image/*" hidden></label>
       <div class="pal-mk-opts" hidden><label>${T.mkName[L]} <input type="text" maxlength="40" value="${esc(T.mkDef[L])}"></label>
-      <button type="button" class="pill-btn pill-fill" data-save>${T.mkSave[L]}</button></div><p class="pal-mk-msg" aria-live="polite"></p></div>
+      <button type="button" class="pill-btn pill-fill" data-save>${T.mkSave[L]}</button></div><p class="pal-mk-msg" aria-live="polite"></p>
+      <div class="pal-mk-edit" hidden><p class="pal-mk-tip">${T.mkTip[L]}</p><div class="pal-mk-photo"></div><button type="button" class="pill-btn" data-reset>${T.mkReset[L]}</button></div></div>
       <div class="pal-mk-out"></div>`;
     const inp = box.querySelector('input[type=file]'), opts = box.querySelector('.pal-mk-opts'), name = box.querySelector('input[type=text]');
     const out = box.querySelector('.pal-mk-out'), msg = box.querySelector('.pal-mk-msg'), pick = box.querySelector('.pal-mk-pick');
-    let img = null, cols = null, canvas = null, timer = 0;
+    const edit = box.querySelector('.pal-mk-edit'), photo = box.querySelector('.pal-mk-photo');
+    let img = null, cols = null, auto = null, canvas = null, timer = 0, sample = null, cur = 0;
     const render = () => drawCard(img, cols, name.value.trim() || T.mkDef[L]).then(c => { canvas = c; c.className = 'pal-mk-card'; out.replaceChildren(c); });
-    name.oninput = () => { clearTimeout(timer); timer = setTimeout(render, 250); };
+    const later = () => { clearTimeout(timer); timer = setTimeout(render, 200); };
+    name.oninput = later;
+    // пипетки: фото с 6 кружками; тянем кружок (или выбираем его и тапаем по фото) — цвет берётся из этой точки
+    function pickAt(u, v) {
+      const { data, w, h } = sample, x0 = Math.min(w - 1, Math.max(0, Math.floor(u * w))), y0 = Math.min(h - 1, Math.max(0, Math.floor(v * h)));
+      let r = 0, g = 0, b = 0, n = 0;
+      for (let y = Math.max(0, y0 - 2); y <= Math.min(h - 1, y0 + 2); y++) for (let x = Math.max(0, x0 - 2); x <= Math.min(w - 1, x0 + 2); x++) { const i = (y * w + x) * 4; r += data[i]; g += data[i + 1]; b += data[i + 2]; n++; }
+      const hex = '#' + [r, g, b].map(c => Math.round(c / n).toString(16).padStart(2, '0')).join('').toUpperCase();
+      const c = cols[cur]; c.hex = hex; c.u = u; c.v = v;
+      c.n = nameOf(hex, new Set(cols.filter((_, i) => i !== cur).map(x => x.n)));
+      drawPins(); later();
+    }
+    function drawPins() {
+      photo.querySelectorAll('.pal-pin').forEach((el, i) => {
+        const c = cols[i]; el.style.left = c.u * 100 + '%'; el.style.top = c.v * 100 + '%'; el.style.setProperty('--c', c.hex);
+        el.classList.toggle('on', i === cur); el.title = `${c.n} ${c.hex}`;
+      });
+    }
+    function setupPhoto(im) {
+      const s = Math.min(1, 800 / Math.max(im.naturalWidth, im.naturalHeight)), cv = document.createElement('canvas');
+      cv.width = Math.max(1, Math.round(im.naturalWidth * s)); cv.height = Math.max(1, Math.round(im.naturalHeight * s));
+      const g = cv.getContext('2d'); g.drawImage(im, 0, 0, cv.width, cv.height);
+      sample = { data: g.getImageData(0, 0, cv.width, cv.height).data, w: cv.width, h: cv.height };
+      const view = new Image(); view.src = im.src; view.alt = ''; view.draggable = false;
+      photo.replaceChildren(view, ...cols.map((c, i) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'pal-pin'; b.textContent = i + 1; b.setAttribute('aria-label', T.mkPin[L] + ' ' + (i + 1)); return b; }));
+      cur = 0; drawPins();
+      const pos = e => { const r = view.getBoundingClientRect(); return [Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), Math.min(1, Math.max(0, (e.clientY - r.top) / r.height))]; };
+      let drag = false;
+      photo.onpointerdown = e => {
+        const pin = e.target.closest('.pal-pin');
+        if (pin) { cur = [...photo.querySelectorAll('.pal-pin')].indexOf(pin); drawPins(); drag = true; photo.setPointerCapture(e.pointerId); e.preventDefault(); return; }
+        if (e.target === view) { e.preventDefault(); pickAt(...pos(e)); drag = true; photo.setPointerCapture(e.pointerId); }
+      };
+      photo.onpointermove = e => { if (drag) pickAt(...pos(e)); };
+      photo.onpointerup = photo.onpointercancel = () => { drag = false; };
+      photo.onkeydown = e => { // стрелками двигаем выбранную пипетку
+        const k = { ArrowLeft: [-.01, 0], ArrowRight: [.01, 0], ArrowUp: [0, -.01], ArrowDown: [0, .01] }[e.key]; if (!k) return;
+        const pin = e.target.closest('.pal-pin'); if (!pin) return;
+        cur = [...photo.querySelectorAll('.pal-pin')].indexOf(pin); e.preventDefault();
+        pickAt(Math.min(1, Math.max(0, cols[cur].u + k[0])), Math.min(1, Math.max(0, cols[cur].v + k[1])));
+      };
+    }
+    box.querySelector('[data-reset]').onclick = () => { cols = auto.map(c => ({ ...c })); drawPins(); render(); };
     inp.onchange = () => {
       const f = inp.files[0]; if (!f) return;
       msg.textContent = T.mkWait[L];
       const url = URL.createObjectURL(f), im = new Image();
       im.onload = () => loadNames().then(() => {
-        img = im; cols = nameAll(extract(im));
+        img = im; auto = nameAll(extract(im)); cols = auto.map(c => ({ ...c }));
+        setupPhoto(im); edit.hidden = false; name.value = T.mkDef[L];
         const base = f.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
         if (base && !/^(img|dsc|photo|image|pxl|screenshot)\b/i.test(base) && !/^\d/.test(base)) name.value = base.slice(0, 40);
         opts.hidden = false; pick.firstChild.textContent = T.mkOther[L]; msg.textContent = '';
