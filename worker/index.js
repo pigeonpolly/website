@@ -133,7 +133,9 @@ function cleanRoom(room, own) {
     const key = it.k + '|' + it.v; if ((used[key] || 0) >= (own[key] || 0)) continue;
     used[key] = (used[key] || 0) + 1;
     const x = Math.max(-10, Math.min(200, Math.round(Number(it.x) || 0))), o = { k: it.k, v: String(it.v), x };
+    // украшения — всегда со своим y; мебель — если её поставили руками (иначе стоит на полу/на том, что под ней)
     if (it.k === 'deco') o.y = Math.max(0, Math.min(120, Math.round(Number(it.y) || 0)));
+    else if (it.y != null && Number.isFinite(Number(it.y))) o.y = Math.max(-60, Math.min(120, Math.round(Number(it.y))));
     if (it.f) o.f = 1;
     out.items.push(o);
   }

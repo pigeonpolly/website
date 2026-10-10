@@ -362,6 +362,61 @@
     snowmanorn: { n: N('Snowman ornament', 'Снеговичок на ёлку', 'Sniegavīriņš eglītei'), w: 6, h: 9, d: S(['.kkk..', '.www..', '.wkw..', '.wwwo.', 'wwwwww', 'wwkwww', 'wwwwww', '.wwww.'], { k: '#2B2340', w: '#FFFFFF', o: '#F08A3B' }) },
   });
 
+
+  // ---------- разнообразие: новые вещи с вариантами и перекраска старых (10.10.2026) ----------
+  const RUG_C = [['#C9463D', '#F4EBDD'], ['#4A7BD8', '#BFE3F5'], ['#4CC38A', '#F6D04D'], ['#9B5DE5', '#F28AB2'], ['#E9A93B', '#7A4A28'], ['#2B2340', '#E9C46A']];
+  const CUSH_C = [['#E5484D', '#F28AB2'], ['#4A7BD8', '#FFFFFF'], ['#F6D04D', '#F08A3B'], ['#4CC38A', '#FFFFFF'], ['#B79CF2', '#F6D04D'], ['#F4F0FA', '#E5484D']];
+  const CNAME = [['red', 'красный', 'sarkans'], ['blue', 'синий', 'zils'], ['yellow', 'жёлтый', 'dzeltens'], ['green', 'зелёный', 'zaļš'], ['lilac', 'сиреневый', 'ceriņu'], ['white', 'белый', 'balts']];
+  const named = (base, list) => i => base.map((b, l) => `${b} (${list[i][l]})`);
+  Object.assign(FURN, {
+    rug: { n: named(['Rug', 'Коврик', 'Paklājiņš'], [['striped', 'полосатый', 'strīpains'], ['blue', 'синий', 'zils'], ['sunny', 'солнечный', 'saulains'], ['magic', 'волшебный', 'burvju'], ['honey', 'медовый', 'medus'], ['royal', 'королевский', 'karalisks']]), v: 6, w: 44, h: 3, top: 0,
+      d: (p, t, i) => { const [a, b] = RUG_C[i]; p(1, 0, 42, 3, a); p(0, 1, 44, 1, a); for (let x = 3; x < 41; x += 4) p(x, 1, 2, 1, b); p(-1, 1, 1, 1, b); p(44, 1, 1, 1, b); } },
+    cushion: { n: named(['Cushion', 'Подушка', 'Spilvens'], CNAME), v: 6, w: 9, h: 5, top: 0, sit: true,
+      d: (p, t, i) => { const [a, b] = CUSH_C[i]; p(1, 0, 7, 5, a); p(0, 1, 9, 3, a); p(4, 2, 1, 1, b); p(2, 1, 1, 1, b); p(6, 3, 1, 1, b); } },
+    teddy: { n: N('Teddy bear', 'Плюшевый мишка', 'Plīša lācītis'), w: 10, h: 11, top: null, d: S(['bb....bb..', 'bbbbbbbb..', '.bkbbkb...', '.bbBBbb...', '..bbbb....', '.bbbbbbb..', 'bbbBBbbbb.', '.bbBBbbb..', '.bb..bb...'], { b: '#B9824A', B: '#D9A66B', k: '#2B2340' }) },
+    bunny: { n: N('Plush bunny', 'Плюшевый зайчик', 'Plīša zaķītis'), w: 9, h: 13, top: null, d: S(['.w...w...', '.wp..wp..', '.wp..wp..', '.wwwww...', 'wwkwkww..', 'wwwpwww..', '.wwwww...', 'wwwwwww..', 'wwwwwww..', '.ww.ww...'], { w: '#F4F0FA', p: '#F7B6C8', k: '#2B2340' }) },
+    whale: { n: N('Plush whale', 'Плюшевый кит', 'Plīša valis'), w: 16, h: 9, top: null, d: S(['............bb..', '..bbbbbbb..bb...', '.bbbbbbbbbbb....', 'bbkbbbbbbbbb....', 'bbbbbbbbbbbb....', 'wwwwwwwwwbb.....', '.wwwwwwww.......'], { b: '#4A7BD8', w: '#BFE3F5', k: '#2B2340' }) },
+    fern: { n: N('Fern', 'Папоротник', 'Paparde'), w: 16, h: 18, top: null, d: S(['......g.........', '..g...g..g......', '...g.ggg.g......', 'g..gggggg...g...', '.gggggGgggggg...', '..ggGGGGGggg....', 'gggggGGgggggg...', '...ggggggg......', '....pppppp......', '....pPpppp......', '....pppppp......', '.....pppp.......'], { g: '#5E9E45', G: '#3E8257', p: '#C66B4A', P: '#D9825F' }) },
+    snakeplant: { n: N('Snake plant', 'Сансевиерия', 'Sansevjēra'), w: 10, h: 18, top: null, d: S(['..g...g...', '..g..gg...', '.gg..gg.g.', '.gG.gGg.g.', '.gG.gGggg.', '.gGggGgGg.', '.gGgGGgGg.', '.gGgGgGGg.', '.gggGggGg.', '.wwwwwwww.', '.wWwwwwww.', '.wwwwwwww.', '..wwwwww..'], { g: '#3E8257', G: '#C9D86A', w: '#F4F0FA', W: '#FFFFFF' }) },
+    succulents: { n: N('Succulents', 'Суккуленты', 'Sukulenti'), w: 14, h: 7, top: null, d: S(['.gg..pp..gg...', 'gGgg.pPpgGgg..', '.gg..pp..gg...', 'tttttttttttt..', 'tTtttttttttt..', '.tttttttttt...'], { g: '#8DB596', G: '#B5D6BC', p: '#F7B6C8', P: '#F28AB2', t: '#E9C46A', T: '#F7DC8B' }) },
+    orchid: { n: N('Orchid', 'Орхидея', 'Orhideja'), w: 10, h: 18, top: null, d: S(['.pp.......', 'pyp.pp....', '.pp.pyp...', '..n..pp...', '..n.n.pp..', '..n.n.pyp.', '...nn..pp.', '....n.....', '....n.....', '..gggg....', '.gg..gg...', '.wwwwww...', '.wwwwww...', '..wwww....'], { p: '#E58CC8', y: '#F6D04D', n: '#5E9E45', g: '#3E8E5A', w: '#F4F0FA' }) },
+  });
+  const PIC = [['Mountain picture', 'Картина с горами', 'Glezna ar kalniem'], ['Cat portrait', 'Портрет кота', 'Kaķa portrets'], ['Flowers picture', 'Картина с цветами', 'Glezna ar ziediem'], ['Abstract art', 'Абстракция', 'Abstrakcija'], ['Sea picture', 'Картина с морем', 'Glezna ar jūru']];
+  Object.assign(DECO, {
+    picture: { n: i => PIC[i], v: 5, w: 18, h: 14, d: (p, t, i) => { p(0, 0, 18, 14, '#7A4A30'); p(1, 1, 16, 12, '#C9955E'); p(2, 2, 14, 10, '#F4EBDD');
+      if (i === 0) { p(2, 2, 14, 10, '#BFE3F5'); for (let k = 0; k < 6; k++) p(4 + k, 11 - k, 12 - 2 * k, 1, k > 3 ? '#FFFFFF' : '#7A8CA8'); p(2, 11, 14, 1, '#6FBF6A'); }
+      else if (i === 1) { p(2, 2, 14, 10, '#F7C6DA'); spr((a, b, w, h, c) => p(5 + a, 3 + b, w, h, c), ['o...o...', 'oo.oo...', 'ooooo...', 'okoko...', 'ooooo...', '.ooo....', 'ooooo...', 'ooooo...'], { o: '#F08A3B', k: '#2B2340' }); }
+      else if (i === 2) { p(2, 2, 14, 10, '#FFF4E0'); [[4, 4, '#E5484D'], [8, 3, '#F6D04D'], [12, 5, '#9B5DE5']].forEach(([x, y, c]) => { p(x, y, 3, 3, c); p(x + 1, y + 3, 1, 5, '#5E9E45'); }); p(4, 10, 10, 2, '#7FB3E8'); }
+      else if (i === 3) { p(2, 2, 7, 6, '#E5484D'); p(9, 2, 7, 10, '#F6D04D'); p(2, 8, 7, 4, '#4A7BD8'); p(8, 2, 1, 10, '#2B2340'); p(2, 7, 7, 1, '#2B2340'); }
+      else { p(2, 2, 14, 5, '#BFE3F5'); p(2, 7, 14, 5, '#3F8FC9'); p(11, 3, 3, 3, '#FFE08A'); p(4, 8, 4, 1, '#8EC8EC'); p(9, 10, 5, 1, '#8EC8EC'); p(5, 5, 3, 2, '#FFFFFF'); } } },
+  });
+  // перекраска: у вещи появляются варианты цвета (значения «armchair», «armchair:1», «armchair:2», «armchair:3» — первый остаётся как был)
+  const RECOLOR = {
+    armchair: [['Armchair', 'Кресло', 'Krēsls'], [['red', 'красное', 'sarkans'], { '#4A9BA8': '#C9463D', '#357782': '#A8382F', '#6FBAC5': '#E06A5E' }], [['mustard', 'горчичное', 'sinepju'], { '#4A9BA8': '#D9A33B', '#357782': '#B5832A', '#6FBAC5': '#EBC064' }], [['lilac', 'сиреневое', 'ceriņu'], { '#4A9BA8': '#9C80D0', '#357782': '#7F5FB8', '#6FBAC5': '#B9A3E3' }]],
+    beanbag: [['Beanbag', 'Кресло-мешок', 'Sēžammaiss'], [['blue', 'синий', 'zils'], { '#F08A3B': '#4A7BD8', '#E07A2E': '#3E68BD', '#C0651F': '#2F519A', '#F6A86A': '#7FA7E0' }], [['pink', 'розовый', 'rozā'], { '#F08A3B': '#F28AB2', '#E07A2E': '#E06A95', '#C0651F': '#C25579', '#F6A86A': '#F7B6C8' }], [['green', 'зелёный', 'zaļš'], { '#F08A3B': '#4CC38A', '#E07A2E': '#3EA874', '#C0651F': '#2E8A5E', '#F6A86A': '#8EE0B4' }]],
+    bed: [['Cozy bed', 'Уютная кровать', 'Mājīga gulta'], [['pink blanket', 'розовое одеяло', 'rozā sega'], { '#7FB3E8': '#F28AB2', '#9FCDEB': '#F7B6C8' }], [['green blanket', 'зелёное одеяло', 'zaļa sega'], { '#7FB3E8': '#8DB596', '#9FCDEB': '#A9CBB0' }], [['yellow blanket', 'жёлтое одеяло', 'dzeltena sega'], { '#7FB3E8': '#E9C46A', '#9FCDEB': '#F7DC8B' }]],
+    table: [['Table', 'Стол', 'Galds'], [['dark wood', 'тёмное дерево', 'tumšs koks'], { '#A0673C': '#5B3A2A', '#7A4A28': '#3E281C' }], [['white', 'белый', 'balts'], { '#A0673C': '#F4F0FA', '#7A4A28': '#C9CDD6' }], [['pink', 'розовый', 'rozā'], { '#A0673C': '#E58CA8', '#7A4A28': '#C46B88' }]],
+    lamp: [['Floor lamp', 'Торшер', 'Stāvlampa'], [['pink', 'розовый', 'rozā'], { '#F6D04D': '#F7B6C8', '#F6C445': '#F28AB2', '#D9A33B': '#C46B88' }], [['mint', 'мятный', 'piparmētru'], { '#F6D04D': '#A8E6CF', '#F6C445': '#8EE0B4', '#D9A33B': '#4CC38A' }], [['blue', 'голубой', 'zils'], { '#F6D04D': '#BFE3F5', '#F6C445': '#7FB3E8', '#D9A33B': '#4A7BD8' }]],
+    mug: [['Mug of cocoa', 'Кружка какао', 'Kakao krūze'], [['red', 'красная', 'sarkana'], { '#F4EBDD': '#E5484D' }], [['blue', 'синяя', 'zila'], { '#F4EBDD': '#4A7BD8' }], [['yellow', 'жёлтая', 'dzeltena'], { '#F4EBDD': '#F6D04D' }]],
+    vase: [['Flower vase', 'Ваза с цветами', 'Vāze ar ziediem'], [['pink', 'розовая', 'rozā'], { '#7FB3E8': '#F28AB2', '#BFE3F5': '#F7B6C8' }], [['yellow', 'жёлтая', 'dzeltena'], { '#7FB3E8': '#E9C46A', '#BFE3F5': '#F7DC8B' }], [['green', 'зелёная', 'zaļa'], { '#7FB3E8': '#4CC38A', '#BFE3F5': '#8EE0B4' }]],
+    plant: [['Monstera', 'Монстера', 'Monstera'], [['white pot', 'белый горшок', 'balts pods'], { '#C66B4A': '#F4F0FA', '#A8553A': '#C9CDD6', '#D9825F': '#FFFFFF' }], [['blue pot', 'синий горшок', 'zils pods'], { '#C66B4A': '#4A7BD8', '#A8553A': '#3E68BD', '#D9825F': '#7FA7E0' }], [['yellow pot', 'жёлтый горшок', 'dzeltens pods'], { '#C66B4A': '#E9C46A', '#A8553A': '#C99A2E', '#D9825F': '#F7DC8B' }]],
+    bookshelf: [['Bookshelf', 'Книжная полка', 'Grāmatu plaukts'], [['white', 'белая', 'balts'], { '#7A4A30': '#F4F0FA', '#4E2F1F': '#C9CDD6' }], [['black', 'чёрная', 'melns'], { '#7A4A30': '#2B2340', '#4E2F1F': '#1A1528' }], [['mint', 'мятная', 'piparmētru'], { '#7A4A30': '#8EE0B4', '#4E2F1F': '#4CC38A' }]],
+    nightstand: [['Nightstand', 'Тумбочка', 'Naktsgaldiņš'], [['white', 'белая', 'balts'], { '#A0673C': '#FFFFFF', '#8C5A3A': '#F4F0FA', '#6B4329': '#C9CDD6' }], [['pink', 'розовая', 'rozā'], { '#A0673C': '#F7B6C8', '#8C5A3A': '#F28AB2', '#6B4329': '#C46B88' }], [['blue', 'голубая', 'zils'], { '#A0673C': '#BFE3F5', '#8C5A3A': '#7FB3E8', '#6B4329': '#4A7BD8' }]],
+    fridge: [['Fridge', 'Холодильник', 'Ledusskapis'], [['mint', 'мятный', 'piparmētru'], { '#F4F0FA': '#A8E6CF' }], [['pink', 'розовый', 'rozā'], { '#F4F0FA': '#F7B6C8' }], [['retro red', 'ретро-красный', 'retro sarkans'], { '#F4F0FA': '#E5484D' }]],
+    gamingchair: [['Gaming chair', 'Игровое кресло', 'Spēļu krēsls'], [['blue', 'синее', 'zils'], { '#E5484D': '#4A7BD8' }], [['green', 'зелёное', 'zaļš'], { '#E5484D': '#4CC38A' }], [['pink', 'розовое', 'rozā'], { '#E5484D': '#F28AB2' }]],
+    guitar: [['Guitar', 'Гитара', 'Ģitāra'], [['red', 'красная', 'sarkana'], { '#E8812E': '#C9463D' }], [['blue', 'синяя', 'zila'], { '#E8812E': '#4A7BD8' }], [['black', 'чёрная', 'melna'], { '#E8812E': '#2B2340', '#2B2340': '#E9C46A' }]],
+    rubberduck: [['Giant rubber duck', 'Огромная резиновая уточка', 'Milzu gumijas pīlīte'], [['pink', 'розовая', 'rozā'], { '#F6D04D': '#F7B6C8', '#E9B23B': '#F28AB2' }], [['blue', 'голубая', 'zila'], { '#F6D04D': '#BFE3F5', '#E9B23B': '#7FB3E8' }], [['gold', 'золотая', 'zelta'], { '#F6D04D': '#E9C46A', '#E9B23B': '#C99A2E' }]],
+    cat: [['House cat', 'Домашний котик', 'Mājas kaķītis'], [['grey', 'серый', 'pelēks'], { '#F08A3B': '#9A96A8' }], [['white', 'белый', 'balts'], { '#F08A3B': '#F4F0FA' }], [['black', 'чёрный', 'melns'], { '#F08A3B': '#3A3448', '#2B2340': '#F6D04D' }]],
+    pouf: [['Knitted pouf', 'Вязаный пуф', 'Adīts pufs'], [['pink', 'розовый', 'rozā'], { '#E6D3B0': '#F7B6C8', '#CDB78F': '#E79AB0' }], [['mint', 'мятный', 'piparmētru'], { '#E6D3B0': '#A8E6CF', '#CDB78F': '#8ECDB4' }], [['grey', 'серый', 'pelēks'], { '#E6D3B0': '#C9CDD6', '#CDB78F': '#9A96A8' }]],
+  };
+  Object.entries(RECOLOR).forEach(([k, r]) => {
+    const d = FURN[k]; if (!d) return;
+    const base = d.n, draw = d.d;
+    d.rc = r.length - 1; // вариантов перекраски
+    d.n = i => i ? r[0].map((nm, l) => `${nm} (${r[i][0][l]})`) : base(0);
+    d.d = (p, t, i, room) => { const m = i ? r[i][1] : null; draw(m ? (x, y, w, h, c) => p(x, y, w, h, m[c] || c) : p, t, 0, room); };
+  });
+
   // ---------- легендарное и забавное (10.10.2026, Алина: «легендарных мало, сделай забавное») ----------
   Object.assign(WALL, {
     stainedglass: [['Stained glass', 'Витраж', 'Vitrāža'], g => { const c = ['#E5484D', '#4A7BD8', '#F6D04D', '#4CC38A', '#9B5DE5', '#F08A3B']; for (let y = 0; y < FY; y += 8) for (let x = 0; x < RW; x += 8) { R(g, x, y, 8, 8, '#2B2340'); R(g, x + 1, y + 1, 6, 6, c[(x / 8 * 7 + y / 8 * 3) % 6]); R(g, x + 2, y + 2, 2, 2, 'rgba(255,255,255,.35)'); } }],
@@ -412,7 +467,7 @@
   });
 
   // значения каталога: «sofa:2», «ornament:4»; у вещей без цветов — просто имя
-  const vals = o => Object.entries(o).flatMap(([k, d]) => d.v ? [...Array(d.v)].map((_, i) => k + ':' + i) : [k]);
+  const vals = o => Object.entries(o).flatMap(([k, d]) => d.v ? [...Array(d.v)].map((_, i) => k + ':' + i) : d.rc ? [k, ...[...Array(d.rc)].map((_, i) => k + ':' + (i + 1))] : [k]);
   const parse = v => { const [k, i] = String(v).split(':'); return [k, +i || 0]; };
   const defOf = (kind, v) => { const [k, i] = parse(v); const d = (kind === 'deco' ? DECO : FURN)[k]; return d ? { ...d, k, i } : null; };
   const ROOM_KINDS = { wall: WALL, floor: FLOOR, view: VIEW, curtain: CURT };
@@ -462,7 +517,7 @@
   B.GIFT_THEMES.push(['music', ['🎵 Music', '🎵 Музыка', '🎵 Mūzika'], ['furn|guitar', 'furn|piano', 'furn|drum', 'furn|speaker', 'furn|recordplayer', 'furn|gramophone', 'furn|radio', 'deco|discoball']]);
   B.GIFT_THEMES.push(['space', ['🚀 Space', '🚀 Космос', '🚀 Kosmoss'], ['furn|telescope', 'furn|rocket', 'furn|moonlamp', 'furn|helmet', 'view|space', 'view|aurora', 'wall|planets', 'wall|stars']]);
   B.GIFT_THEMES.push(['polly', ['🐦 Pigeon Polly', '🐦 Pigeon Polly', '🐦 Pigeon Polly'], ['furn|pollyplush', 'furn|seedbag', 'furn|fountain', 'furn|birdhouse', 'deco|poster', 'deco|painting', 'wall|pigeons', 'view|riga']]);
-  B.GIFT_THEMES.push(['home', ['🏠 Cozy room', '🏠 Уютная комната', '🏠 Mājīga istaba'], ['furn|bed', 'furn|nightstand', 'furn|cat', 'furn|catbed', 'furn|grandclock', 'furn|pouf', 'deco|mirror', 'wall|rainbow', 'floor|rainbowrug', 'floor|parquet', 'curtain|rainbow', 'curtain|golden', 'furn|sofa:0', 'furn|sofa:1', 'furn|armchair', 'furn|knitting', 'furn|yarn', 'furn|lamp', 'furn|plant', 'furn|books', 'furn|mug', 'furn|teapot', 'furn|gramophone', 'furn|radio', 'deco|clock', 'deco|painting', 'wall|wood', 'floor|bluerug', 'curtain|lace']]);
+  B.GIFT_THEMES.push(['home', ['🏠 Cozy room', '🏠 Уютная комната', '🏠 Mājīga istaba'], [...[0, 1, 2, 3, 4, 5].map(i => 'furn|rug:' + i), ...[0, 1, 2, 3, 4, 5].map(i => 'furn|cushion:' + i), ...[0, 1, 2, 3, 4].map(i => 'deco|picture:' + i), 'furn|teddy', 'furn|bunny', 'furn|whale', 'furn|fern', 'furn|snakeplant', 'furn|succulents', 'furn|orchid', 'furn|bed', 'furn|nightstand', 'furn|cat', 'furn|catbed', 'furn|grandclock', 'furn|pouf', 'deco|mirror', 'wall|rainbow', 'floor|rainbowrug', 'floor|parquet', 'curtain|rainbow', 'curtain|golden', 'furn|sofa:0', 'furn|sofa:1', 'furn|armchair', 'furn|knitting', 'furn|yarn', 'furn|lamp', 'furn|plant', 'furn|books', 'furn|mug', 'furn|teapot', 'furn|gramophone', 'furn|radio', 'deco|clock', 'deco|painting', 'wall|wood', 'floor|bluerug', 'curtain|lace']]);
   addTh('polly', ['furn|pollystatue', 'furn|wormchips', 'furn|nestbed', 'furn|mrchew', 'deco|wormposter', 'deco|birdorn']);
   // иконка вещи для комнаты
   function icon(kind, v, size) {
@@ -516,9 +571,9 @@
   const T = {
     edit: ['✏️ Decorate the room', '✏️ Обустроить комнату', '✏️ Iekārtot istabu'], done: ['✓ Done', '✓ Готово', '✓ Gatavs'],
     of: ['Room of @{n}', 'Комната @{n}', '@{n} istaba'], saved: ['Saved ✓', 'Сохранено ✓', 'Saglabāts ✓'], saving: ['Saving…', 'Сохраняю…', 'Saglabāju…'], err: ['Could not save', 'Не получилось сохранить', 'Neizdevās saglabāt'],
-    hint: ['Tap a thing below to put it in the room. Drag things around; they can stand on each other. Tap a thing in the room to turn it or put it back in the bag.', 'Нажмите на вещь внизу — она появится в комнате. Вещи можно двигать и ставить друг на друга. Нажмите на вещь в комнате, чтобы повернуть или убрать в сумку.', 'Pieskaries lietai apakšā — tā parādīsies istabā. Lietas var vilkt un likt vienu uz otras. Pieskaries lietai istabā, lai pagrieztu vai noliktu atpakaļ somā.'],
+    hint: ['Tap a thing below to put it in the room. Drag things anywhere: on the floor, on the wall, on top of each other. Near a shelf or table top a thing snaps onto it. Tap a thing to turn it, move it forward or back, or put it back in the bag. Arrow keys nudge it by a pixel.', 'Нажмите на вещь внизу — она появится в комнате. Вещи можно таскать куда угодно: по полу, на стену, друг на друга; у столешницы или полки вещь сама на неё встаёт. Нажмите на вещь, чтобы повернуть, переложить вперёд или назад или убрать в сумку. Стрелки на клавиатуре двигают её на пиксель.', 'Pieskaries lietai apakšā — tā parādīsies istabā. Lietas var vilkt jebkur: pa grīdu, uz sienas, vienu uz otras; pie galda vai plaukta virsmas lieta pati uz tās nostājas. Pieskaries lietai, lai pagrieztu, pārliktu uz priekšu vai atpakaļ vai noliktu somā. Bultiņas to pabīda par pikseli.'],
     empty: ['No room things in your bag yet. Buy them in the shop, get them as gifts or in the advent calendar.', 'В сумке пока нет вещей для комнаты. Их можно купить в магазине, получить в подарок или в адвент-календаре.', 'Somā vēl nav lietu istabai. Tās var nopirkt veikalā, saņemt dāvanā vai adventes kalendārā.'],
-    shop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'], flip: ['⇆ Turn', '⇆ Повернуть', '⇆ Pagriezt'], back: ['↩ To the bag', '↩ В сумку', '↩ Uz somu'],
+    shop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'], flip: ['⇆ Turn', '⇆ Повернуть', '⇆ Pagriezt'], front: ['⬆ Forward', '⬆ Вперёд', '⬆ Uz priekšu'], behind: ['⬇ Back', '⬇ Назад', '⬇ Atpakaļ'], top: ['⏫ On top', '⏫ Поверх всего', '⏫ Virs visa'], back: ['↩ To the bag', '↩ В сумку', '↩ Uz somu'],
     def: ['default', 'как было', 'kā bija'],
     tabs: { furn: ['Furniture', 'Мебель', 'Mēbeles'], deco: ['Decorations', 'Украшения', 'Rotājumi'], wall: ['Walls', 'Стены', 'Sienas'], floor: ['Floor', 'Пол', 'Grīda'], view: ['Window', 'Окно', 'Logs'], curtain: ['Curtains', 'Шторы', 'Aizkari'] },
   };
@@ -531,7 +586,7 @@
     box.classList.add('room');
     box.innerHTML = `<div class="room-stage"><canvas class="room-cv" width="${RW}" height="${RH}" aria-label="${t('of').replace('{n}', o.nick)}" role="img"></canvas></div>
       <div class="room-bar"><span class="room-cap">🏠 ${t('of').replace('{n}', o.nick)}</span>${o.mine ? `<span class="room-st" aria-live="polite"></span><button type="button" class="pill-btn room-edit">${t('edit')}</button>` : ''}</div>
-      <div class="room-sel" hidden><button type="button" class="pill-btn" data-flip>${t('flip')}</button><button type="button" class="pill-btn" data-back>${t('back')}</button></div>
+      <div class="room-sel" hidden><button type="button" class="pill-btn" data-flip>${t('flip')}</button><button type="button" class="pill-btn" data-z="1">${t('front')}</button><button type="button" class="pill-btn" data-z="-1">${t('behind')}</button><button type="button" class="pill-btn" data-z="top">${t('top')}</button><button type="button" class="pill-btn" data-back>${t('back')}</button></div>
       <div class="room-tray" hidden></div>`;
     const cv = box.querySelector('canvas'), stage = box.querySelector('.room-stage');
     const S = 4; cv.width = RW * S; cv.height = RH * S;
@@ -554,7 +609,9 @@
       room.items.forEach((it, idx) => {
         const d = defOf(it.k, it.v); if (!d) return;
         if (it.k === 'deco') { out.push({ it, d, idx, x: clampX(it.x, d.w), y: Math.max(0, Math.min(RH - d.h, it.y || 20)) }); return; }
-        const x = clampX(it.x, d.w); let base = GY;
+        const x = clampX(it.x, d.w);
+        if (it.y != null) { out.push({ it, d, idx, x, y: Math.max(-d.h + 4, Math.min(RH - 2, Math.round(it.y))) }); return; } // поставлена руками — где угодно
+        let base = GY;
         out.filter(q => q.it.k === 'furn' && q.d.top != null).forEach(q => {
           const ov = Math.min(x + d.w, q.x + q.d.w) - Math.max(x, q.x);
           if (ov >= Math.min(d.w, q.d.w) * .5) base = Math.min(base, q.y + q.d.top);
@@ -564,6 +621,38 @@
       return out;
     }
     const clampX = (x, w) => Math.max(0, Math.min(RW - w, Math.round(x || 0)));
+    // ---------- что птичка делает с вещами: подходит (или запрыгивает) и делает своё, над ней — частицы ----------
+    const ACTS = {
+      sleep: ['sofa', 'armchair', 'beanbag', 'throne', 'bed', 'pouf', 'nestbed', 'beachchair', 'gamingchair', 'catbed', 'giantpizza', 'flamingo'],
+      play: ['tv', 'console', 'computer', 'arcade', 'handheld', 'tamagotchi'],
+      music: ['piano', 'guitar', 'drum', 'speaker', 'recordplayer', 'gramophone', 'radio'],
+      read: ['books', 'bookshelf', 'spellbook', 'desk'],
+      eat: ['mug', 'teapot', 'cake', 'cookies', 'donuts', 'watermelon', 'pizzabox', 'breadbasket', 'applebasket', 'lemonade', 'wormchips', 'seedbag', 'candybowl', 'giantcoffee', 'gingerhouse', 'coffeemachine', 'stove', 'fridge', 'toaster'],
+      splash: ['fishbowl', 'bathtub', 'fountain', 'wateringcan', 'rubberduck'],
+      paint: ['easel', 'painttubes', 'brushjar', 'claypot'],
+      warm: ['fireplace', 'candle', 'skullcandle', 'phoenixnest', 'jacklantern'],
+      gaze: ['telescope', 'globe', 'orb', 'portal', 'snowglobe', 'lavalamp', 'moonlamp', 'lamp', 'treasure', 'chest', 'pollystatue', 'bust', 'cauldron', 'potionshelf', 'shipbottle', 'rocket', 'grandclock', 'tombstone', 'snowman'],
+      pet: ['cat', 'blackcat', 'pollyplush', 'mrchew', 'dragon', 'flytrap', 'cattower', 'robovac'],
+      unwrap: ['present', 'xmastree'],
+      knit: ['knitting', 'yarn', 'socks'],
+    };
+    const ACT_OF = {}; Object.entries(ACTS).forEach(([a, ks]) => ks.forEach(k => { ACT_OF[k] = a; }));
+    const PART = { // пиксельные частицы над птичкой
+      note: [['.xx', '.x.', 'xx.'], ['#F6D04D', '#F28AB2', '#7FB3E8']], heart: [['x.x', 'xxx', '.x.'], ['#E5484D', '#F28AB2']], star: [['.x.', 'xxx', '.x.'], ['#F6D04D', '#FFFFFF']],
+      crumb: [['x'], ['#D9A45B', '#8B5A3C', '#F4EBDD']], drop: [['x', 'x'], ['#7FB3E8', '#BFE3F5']], paint: [['xx', 'xx'], ['#E5484D', '#4A7BD8', '#F6D04D', '#4CC38A', '#B79CF2']],
+      spark: [['x'], ['#F6D04D', '#FFE08A', '#F08A3B']], yarn: [['xx', 'xx'], ['#F28AB2', '#7FB3E8']], paper: [['xx', 'x.'], ['#E5484D', '#4A7BD8', '#F6D04D', '#4CC38A']],
+    };
+    const ACT_PART = { play: 'star', music: 'note', read: 'star', eat: 'crumb', splash: 'drop', paint: 'paint', warm: 'spark', gaze: 'star', pet: 'heart', unwrap: 'paper', knit: 'yarn', deco: 'star' };
+    const parts = [];
+    const emit = (kind, x, y, n = 1, up = true) => { const pd = PART[kind]; if (!pd) return; for (let i = 0; i < n; i++) parts.push({ x: x + (Math.random() - .5) * 6, y, vx: (Math.random() - .5) * .02, vy: up ? -.012 - Math.random() * .012 : .01 + Math.random() * .02, t0: performance.now(), life: 1400 + Math.random() * 600, rows: pd[0], c: pd[1][Math.floor(Math.random() * pd[1].length)] }); };
+    function drawParts(now) {
+      for (let i = parts.length - 1; i >= 0; i--) {
+        const q = parts[i], age = now - q.t0; if (age > q.life) { parts.splice(i, 1); continue; }
+        const x = q.x + q.vx * age, y = q.y + q.vy * age; g.globalAlpha = 1 - age / q.life;
+        q.rows.forEach((r, yy) => [...r].forEach((ch, xx) => { if (ch === 'x') R(g, x + xx, y + yy, 1, 1, q.c); }));
+        g.globalAlpha = 1;
+      }
+    }
     // ---------- птичка ----------
     const lk = B.dress(B.looks(o.id), o.avatar || {});
     const FR = [0, 1, 2].map(f => B.sprite(lk, f));
@@ -572,13 +661,26 @@
     function think(now, lay) {
       if (now < bird.until) return;
       const sf = surfaces(lay), r = Math.random(), cur = sf.find(s => Math.abs(s.y - bird.y) < 1 && bird.x >= s.x0 - 2 && bird.x <= s.x1 + 2) || sf[0];
-      bird.zz = false;
-      const sofa = lay.find(q => q.d.sit), tv = has('tv') && has('console');
-      if (sofa && r < .15) { const s = sf.find(z => z.q === sofa); if (s) return hop(now, s.x0 + Math.random() * (s.x1 - s.x0), s.y, () => { bird.st = 'sleep'; bird.zz = true; bird.until = performance.now() + 5000 + Math.random() * 4000; }); }
-      if (tv && r < .3) { const q = lay.find(z => parse(z.it.v)[0] === 'tv'); return goFloor(now, Math.max(8, Math.min(RW - 8, q.x + q.d.w / 2 + 12)), () => { bird.dir = -1; bird.st = 'play'; bird.until = performance.now() + 4000; }); }
+      bird.zz = false; bird.act = null;
+      if (!sf.some(z => Math.abs(z.y - bird.y) < 2)) return hop(now, Math.max(8, Math.min(RW - 8, bird.x)), GY); // была в воздухе у украшения — вниз
+      // с вероятностью ~55% — заняться какой-нибудь вещью в комнате
+      const toys = lay.filter(q => ACT_OF[parse(q.it.v)[0]] || q.it.k === 'deco');
+      if (toys.length && r < .55) return useThing(now, toys[Math.floor(Math.random() * toys.length)], sf);
       if (r < .55) return walk(now, cur.x0 + Math.random() * (cur.x1 - cur.x0), cur.y);
       if (r < .85 && sf.length > 1) { const s = sf[Math.floor(Math.random() * sf.length)]; return hop(now, s.x0 + Math.random() * (s.x1 - s.x0), s.y); }
       bird.st = 'peck'; bird.until = now + 1200;
+    }
+    // подойти к вещи: на диван/кровать — запрыгнуть и уснуть; к украшению — подлететь; к остальному — встать рядом на ту же поверхность
+    function useThing(now, q, sf) {
+      const k = parse(q.it.v)[0], act = q.it.k === 'deco' ? 'deco' : ACT_OF[k];
+      const start = (st, ms) => () => { bird.st = st; bird.act = act; bird.actQ = q; bird.dir = q.x + q.d.w / 2 > bird.x ? 1 : -1; if (act === 'sleep') bird.zz = true; bird.until = performance.now() + ms; };
+      if (act === 'sleep' && q.d.top != null) { const s = sf.find(z => z.q === q); if (s) return hop(now, s.x0 + Math.random() * (s.x1 - s.x0), s.y, start('sleep', 5000 + Math.random() * 4000)); }
+      if (act === 'deco') return hop(now, Math.max(6, Math.min(RW - 6, q.x + q.d.w / 2 + (Math.random() < .5 ? -8 : 8))), Math.min(GY, q.y + q.d.h + 10), start('hover', 2200));
+      const base = q.y + q.d.h, s = sf.find(z => Math.abs(z.y - base) < 1 && q.x + q.d.w / 2 >= z.x0 - 4 && q.x + q.d.w / 2 <= z.x1 + 4) || sf[0];
+      const side = q.x + q.d.w + 6 < s.x1 ? q.x + q.d.w + 6 : Math.max(s.x0, q.x - 6);
+      const tx = Math.max(s.x0, Math.min(s.x1, side)), go = Math.abs(s.y - bird.y) > 1 ? hop : walk;
+      if (go === walk) { walk(now, tx, s.y); bird.to.then = start(act === 'warm' ? 'sleep' : 'use', 3500 + Math.random() * 2500); return; }
+      return hop(now, tx, s.y, start(act === 'warm' ? 'sleep' : 'use', 3500 + Math.random() * 2500));
     }
     const walk = (now, x, y) => { bird.st = 'walk'; bird.from = { x: bird.x, y: bird.y, t: now }; bird.to = { x, y }; bird.dir = x > bird.x ? 1 : -1; bird.until = now + Math.abs(x - bird.x) / .03; };
     const hop = (now, x, y, then) => { bird.st = 'hop'; bird.from = { x: bird.x, y: bird.y, t: now }; bird.to = { x, y, then }; bird.dir = x > bird.x ? 1 : -1; bird.until = now + 650; };
@@ -589,8 +691,14 @@
         bird.x = bird.from.x + (bird.to.x - bird.from.x) * k; bird.y = bird.from.y + (bird.to.y - bird.from.y) * k - (bird.st === 'hop' ? Math.sin(Math.PI * k) * 14 : 0);
         bird.frame = bird.st === 'walk' ? Math.floor(now / 160) % 2 : 0;
         if (k >= 1) { bird.x = bird.to.x; bird.y = bird.to.y; const th2 = bird.to.then; bird.st = 'idle'; bird.until = now + 600 + Math.random() * 1500; if (th2) th2(); }
-      } else if (bird.st === 'peck' || bird.st === 'play') bird.frame = Math.floor(now / 250) % 2 ? 2 : 0;
-      else bird.frame = 0;
+      } else if (bird.st === 'peck' || bird.st === 'play' || bird.st === 'use') {
+        bird.frame = Math.floor(now / 250) % 2 ? 2 : 0;
+        // частицы занятия: ноты, крошки, капли, краски, сердечки…
+        if (bird.act && Math.random() < (bird.act === 'eat' ? .06 : .035)) { const q = bird.actQ, kind = ACT_PART[bird.act]; if (kind) emit(kind, q ? q.x + q.d.w / 2 : bird.x, q ? q.y - 2 : bird.y - 22, 1, kind !== 'crumb'); }
+        if (bird.act === 'music' && Math.random() < .03) emit('note', bird.x, bird.y - 20);
+        if (bird.act === 'pet' && Math.random() < .03) emit('heart', bird.x, bird.y - 20);
+      } else if (bird.st === 'hover') { bird.frame = 0; bird.y += Math.sin(now / 120) * .15; if (Math.random() < .04) emit('star', bird.x, bird.y - 18); }
+      else { bird.frame = 0; if (bird.zz && bird.act === 'sleep' && Math.random() < .004) emit('heart', bird.x, bird.y - 20); }
     }
     function drawBird(now) {
       const c = FR[bird.frame] || FR[0], k = .75, w = c.width * k, h = c.height * k; // птичка в комнате чуть меньше, чем в стае
@@ -620,10 +728,23 @@
       });
       if (!edit) { think(now, lay); stepBird(now); }
       drawBird(now);
+      drawParts(now);
     }
     // ---------- хозяин: обустройство ----------
     const owned = () => { const m = {}; ((o.me && o.me.gifts) || []).forEach(x => { if (x.status === 'bag' && isRoom(x.kind)) m[x.kind + '|' + x.item] = (m[x.kind + '|' + x.item] || 0) + 1; }); return m; };
     const placed = key => room.items.filter(it => it.k + '|' + it.v === key).length;
+    // мебель, отпущенная рядом с полом или верхом другой вещи (±5px), встаёт на них; иначе висит, где оставили
+    let snapOn = -1; // на какую вещь встала перетаскиваемая (чтобы при отпускании оказаться поверх неё)
+    function snapY(it, idx) {
+      const d = defOf(it.k, it.v), x = clampX(it.x, d.w), bot = it.y + d.h;
+      let best = Math.abs(bot - GY) <= 5 ? GY : null; snapOn = -1;
+      layout().forEach(q => {
+        if (q.idx === idx || q.d.top == null || q.it.k !== 'furn') return;
+        const ov = Math.min(x + d.w, q.x + q.d.w) - Math.max(x, q.x), top = q.y + q.d.top;
+        if (ov >= Math.min(d.w, q.d.w) * .4 && Math.abs(bot - top) <= 5 && (best == null || Math.abs(bot - top) < Math.abs(bot - best))) { best = top; snapOn = q.idx; }
+      });
+      return best == null ? it.y : best - d.h;
+    }
     function save() {
       clearTimeout(saveT); if (st) st.textContent = t('saving');
       saveT = setTimeout(() => fetch('/api/room', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ room }) })
@@ -661,18 +782,54 @@
       cv.addEventListener('pointerdown', e => {
         if (!edit) return;
         const [px, py] = pt(e), lay = layout();
-        const hit = [...lay].sort((a, b) => (a.it.k === 'deco') - (b.it.k === 'deco') || a.idx - b.idx).reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h);
+        // берём самую верхнюю вещь под пальцем (рисуются по порядку списка: последняя — сверху)
+        const hit = [...lay].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h);
         if (!hit) { sel = -1; selBar.hidden = true; return; }
-        // взятая вещь — в конец списка: при отпускании встаёт поверх того, что под ней
-        const it = room.items.splice(hit.idx, 1)[0]; room.items.push(it); sel = room.items.length - 1; selBar.hidden = false;
-        drag = { dx: px - hit.x, dy: py - hit.y, moved: false }; cv.setPointerCapture(e.pointerId); e.preventDefault();
+        sel = hit.idx; selBar.hidden = false; box.focus({ preventScroll: true });
+        // закрепить всё на своих местах: дальше вещи двигаются только руками, ничего не «перепрыгивает»
+        lay.forEach(q => { if (q.it.y == null) { q.it.x = q.x; q.it.y = q.y; } });
+        // что стоит на взятой вещи (и на том, что на ней), едет вместе с ней
+        const riders = [], on = p => lay.forEach(q => {
+          if (q === p || riders.some(r => r.q === q) || q.it.k !== 'furn' || p.d.top == null) return;
+          const ov = Math.min(q.x + q.d.w, p.x + p.d.w) - Math.max(q.x, p.x);
+          if (ov > 0 && Math.abs(q.y + q.d.h - (p.y + p.d.top)) <= 1 && q.idx > p.idx) { riders.push({ q, dx: q.x - hit.x, dy: q.y - hit.y }); on(q); }
+        });
+        if (hit.it.k === 'furn') on(hit);
+        drag = { dx: px - hit.x, dy: py - hit.y, moved: false, riders, it: hit.it }; cv.setPointerCapture(e.pointerId); e.preventDefault();
       });
       cv.addEventListener('pointermove', e => {
         if (!drag || sel < 0) return;
         const [px, py] = pt(e), it = room.items[sel]; drag.moved = true;
-        it.x = Math.round(px - drag.dx); if (it.k === 'deco') it.y = Math.round(py - drag.dy);
+        it.x = Math.round(px - drag.dx); it.y = Math.round(py - drag.dy);
+        if (it.k === 'furn') it.y = snapY(it, sel);
+        drag.riders.forEach(r => { r.q.it.x = it.x + r.dx; r.q.it.y = it.y + r.dy; });
       });
-      const up = () => { if (drag && drag.moved) save(); drag = null; };
+      const up = () => {
+        if (drag && drag.moved) {
+          // встала на вещь, которая рисуется позже, — переложить сразу за ней, иначе окажется за столешницей
+          if (snapOn > sel && room.items[sel] && room.items[sel].k === 'furn') {
+            const target = room.items[snapOn], block = [sel, ...drag.riders.map(r => r.q.idx)].sort((x, y) => x - y).map(i => room.items[i]);
+            room.items = room.items.filter(x => !block.includes(x)); const at = room.items.indexOf(target) + 1;
+            room.items.splice(at, 0, ...block); sel = room.items.indexOf(drag.it);
+          }
+          save();
+        }
+        drag = null; snapOn = -1;
+      };
+      // слой: вперёд/назад на одну вещь или поверх всего
+      selBar.querySelectorAll('[data-z]').forEach(b => b.onclick = () => {
+        if (sel < 0) return; const z = b.dataset.z, to = z === 'top' ? room.items.length - 1 : Math.max(0, Math.min(room.items.length - 1, sel + Number(z)));
+        if (to === sel) return; const it = room.items.splice(sel, 1)[0]; room.items.splice(to, 0, it); sel = to; save();
+      });
+      // стрелки — сдвиг на пиксель (Shift — на 8)
+      box.tabIndex = -1;
+      box.addEventListener('keydown', e => {
+        if (!edit || sel < 0) return; const it = room.items[sel], d = defOf(it.k, it.v); if (!it || !d) return;
+        const st2 = e.shiftKey ? 8 : 1, dx = { ArrowLeft: -st2, ArrowRight: st2 }[e.key] || 0, dy = { ArrowUp: -st2, ArrowDown: st2 }[e.key] || 0;
+        if (e.key === 'Delete' || e.key === 'Backspace') { selBar.querySelector('[data-back]').click(); e.preventDefault(); return; }
+        if (!dx && !dy) return; e.preventDefault();
+        const q = layout().find(z => z.idx === sel); it.x = (q ? q.x : it.x) + dx; it.y = (q ? q.y : it.y || 0) + dy; save();
+      });
       cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
     }
     paintBg();
