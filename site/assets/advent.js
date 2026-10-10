@@ -11,10 +11,12 @@
     login: ['Sign in to open the windows and collect gifts', 'Войдите, чтобы открывать окошки и собирать подарки', 'Ienāc, lai atvērtu lodziņus un vāktu dāvanas'],
     signin: ['Sign in', 'Войти', 'Ienākt'],
     today: ['Today’s window is waiting!', 'Сегодняшнее окошко ждёт!', 'Šodienas lodziņš gaida!'],
-    missed: ['Each window opens only on its own day. Come back tomorrow!', 'Каждое окошко открывается только в свой день. Приходите завтра!', 'Katrs lodziņš atveras tikai savā dienā. Nāc rīt!'],
+    missed: ['See you tomorrow! Missed a day? Missed windows can be opened until January {j}.', 'До завтра! Пропустили день? Пропущенные окошки можно открыть до {j} января.', 'Līdz rītam! Izlaidi dienu? Izlaistos lodziņus var atvērt līdz {j}. janvārim.'],
+    catchUp: ['Didn’t make it? Until January {j} you can still open the windows you missed and take all their gifts.', 'Не успели? До {j} января ещё можно открыть пропущенные окошки и забрать все подарки.', 'Nepaguvi? Līdz {j}. janvārim vēl var atvērt izlaistos lodziņus un paņemt visas dāvanas.'],
     was: ['This window held:', 'В этом окошке было:', 'Šajā lodziņā bija:'], wasBtns: ['This window held buttons 🔘', 'В этом окошке были пуговки 🔘', 'Šajā lodziņā bija pogas 🔘'],
     youGot: ['✓ You got it', '✓ Ты это получил(а)', '✓ Tu to saņēmi'], missedIt: ['This day has passed: its window can no longer be opened.', 'Этот день прошёл: окошко больше не открыть.', 'Šī diena ir pagājusi: lodziņu vairs nevar atvērt.'],
-    todayOnly: ['Only today’s window can be opened.', 'Открыть можно только сегодняшнее окошко.', 'Var atvērt tikai šodienas lodziņu.'],
+    todayOnly: ['Missed windows can be opened until January {j}.', 'Пропущенные окошки можно открыть до {j} января.', 'Izlaistos lodziņus var atvērt līdz {j}. janvārim.'],
+    tooLate: ['Too late: missed windows could be opened until January {j}.', 'Уже поздно: пропущенные окошки можно было открыть до {j} января.', 'Par vēlu: izlaistos lodziņus varēja atvērt līdz {j}. janvārim.'],
     locked: ['Not yet! This window opens on December {d}.', 'Ещё рано! Это окошко откроется {d} декабря.', 'Vēl par agru! Šis lodziņš atvērsies {d}. decembrī.'],
     got: ['A gift for you:', 'Тебе подарок:', 'Dāvana tev:'],
     inBag: ['It is already in your bag 🎒', 'Он уже у тебя в сумке 🎒', 'Tā jau ir tavā somā 🎒'],
@@ -52,24 +54,27 @@
     if (!S) { app.innerHTML = ''; return; }
     const opened = Object.fromEntries((S.opened || []).map(o => [o.day, o]));
     const past = {}; (S.past || []).forEach(p => (past[p.day] = past[p.day] || []).push([p.kind, p.item]));
-    const isPast = d => d <= (S.shownTo || 0);
+    const claim = d => !!S.user && d <= (S.claimTo || 0) && !opened[d]; // можно открыть: сегодняшнее и пропущенные (до 23 января)
+    const isPast = d => d <= (S.shownTo || 0) && !claim(d);
     const plan = {}; (S.plan || []).forEach(p => (plan[p.day] = plan[p.day] || []).push(p));
     const before = !S.today && (Date.now() + skew) < S.startsAt;
     let head = '';
-    if (before) head = `<div class="adv-soon"><p>${t('soon')}</p><div class="adv-cd" role="timer"></div></div>`;
+    if (S.catchUp) head = `<div class="adv-soon"><p>${t('catchUp').replace('{j}', S.lastJan)}</p>${S.user ? '' : `<button type="button" class="pill-btn pill-fill" data-login>${t('signin')}</button>`}</div>`;
+    else if (before) head = `<div class="adv-soon"><p>${t('soon')}</p><div class="adv-cd" role="timer"></div></div>`;
+    else if (!S.today && S.catchUp) head = `<div class="adv-soon"><p>${t('catchUp').replace('{j}', S.lastJan)}</p>${S.user ? '' : `<button type="button" class="pill-btn pill-fill" data-login>${t('signin')}</button>`}</div>`;
     else if (!S.today) head = `<div class="adv-soon"><p>${t('over')}</p></div>`;
     else if (!S.user) head = `<div class="adv-soon"><p>${t('login')}</p><button type="button" class="pill-btn pill-fill" data-login>${t('signin')}</button></div>`;
-    else head = `<div class="adv-soon"><p>${opened[S.today] ? t('missed') : t('today')}</p><small>${t('todayOnly')}</small></div>`;
+    else head = `<div class="adv-soon"><p>${opened[S.today] ? t('missed').replace('{j}', S.lastJan) : t('today')}</p><small>${t('todayOnly').replace('{j}', S.lastJan)}</small></div>`;
     if (S.plan) head += `<p class="adv-adm">${t('adm')} <a href="/admin/#advent">${t('toColl')}</a></p>`;
     app.innerHTML = head + `<div class="adv-board">${ORDER.map(d => {
-      const o = opened[d], sp = S.special.includes(d), pd = isPast(d), can = S.today && d === S.today;
+      const o = opened[d], sp = S.special.includes(d), pd = isPast(d), can = claim(d) || (!S.user && d <= (S.claimTo || 0) && !pd);
       const cls = ['adv-win', sp ? 'sp' : '', d === 31 ? 'leg' : '', o || pd ? 'open' : '', pd ? 'past' : '', can && !o ? 'ready' : '', d === S.today ? 'today' : '', !can && !o && !pd ? 'lock' : ''].filter(Boolean).join(' ');
       return `<button type="button" class="${cls}" data-d="${d}" aria-label="${d}${sp ? ' — ' + t('special') : ''}"><span class="adv-in"></span><span class="adv-door l"></span><span class="adv-door r"></span><b>${d}</b>${sp ? '<i class="adv-star">★</i>' : ''}${S.plan && plan[d] ? `<em class="adv-n">${plan[d].length}</em>` : ''}</button>`;
     }).join('')}</div>`;
     // открытые окошки: внутри картинка подарка
     // открытые окошки: внутри картинка подарка (прошедшие дни — видны всем)
     app.querySelectorAll('.adv-win.open').forEach(b => { const d = +b.dataset.d, o = opened[d] || (past[d] ? { kind: past[d][0][0], item: past[d][0][1] } : { buttons: 1 }); b.querySelector('.adv-in').appendChild(prize(o, 40)); if ((past[d] || []).length > 1 || (o.got || []).length > 1) b.classList.add('many'); });
-    if (before) countdown(app.querySelector('.adv-cd'));
+    if (before && !S.catchUp) countdown(app.querySelector('.adv-cd'));
     const lg = app.querySelector('[data-login]'); if (lg) lg.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
     app.querySelectorAll('.adv-win').forEach(b => b.onclick = () => { const d = +b.dataset.d; if (!opened[d] && isPast(d)) return showPast(b, d, past[d] || []); tap(b, d, opened[d]); });
   }
@@ -81,7 +86,7 @@
   }
   function tap(btn, d, o) {
     if (o) return show(btn, o, false);
-    if (!S.today || d !== S.today) { toast(d < (S.today || 32) ? t('todayOnly') : t('locked').replace('{d}', d)); btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); return; }
+    if (d > (S.claimTo || 0)) { toast(S.today ? t('locked').replace('{d}', d) : t('tooLate').replace('{j}', S.lastJan)); btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); return; }
     if (!S.user) { window.PPAccount && window.PPAccount.openSignIn(); return; }
     if (btn.disabled) return;
     btn.disabled = true;

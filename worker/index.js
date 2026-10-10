@@ -141,13 +141,17 @@ function cleanRoom(room, own) {
 }
 
 // ---------- адвент-календарь (/advent/): окошки 1–31 декабря, сутки по Риге ----------
-const ADVENT_SPECIAL = [6, 12, 19, 24, 31]; // особые окошки (31-е — легендарное); то же в site/assets/advent.js
+const ADVENT_SPECIAL = [6, 12, 19, 24, 31];
+const ADVENT_LAST_JAN = 23; // до 23 января (включительно) можно открыть пропущенные окошки // особые окошки (31-е — легендарное); то же в site/assets/advent.js
 function adventNow(req, env) {
   // на локальной проверке (DEV_FAKE_LOGIN) дату можно подменить заголовком x-dev-date: 2026-12-05
   const dev = env.DEV_FAKE_LOGIN === '1' && /^\d{4}-\d\d-\d\d$/.test(req.headers.get('x-dev-date') || '') ? req.headers.get('x-dev-date') : null;
   const [y, m, d] = (dev || rigaDay()).split('-').map(Number);
-  // 1 декабря 00:00 по Риге (зимой UTC+2) = 30 ноября 22:00 UTC
-  return { year: y, day: m === 12 ? d : 0, startsAt: Date.UTC(y, 10, 30, 22), nowMs: dev ? Date.UTC(y, m - 1, d, 10) : Date.now() };
+  // 1 декабря 00:00 по Риге (зимой UTC+2) = 30 ноября 22:00 UTC. year — год адвента (в январе — прошлый декабрь).
+  // Пропущенные окошки можно открыть до 23 января включительно (claimTo — до какого дня декабря можно забрать)
+  const catchUp = m === 1 && d <= ADVENT_LAST_JAN;
+  return { year: m === 1 ? y - 1 : y, day: m === 12 ? d : 0, month: m, claimTo: m === 12 ? d : catchUp ? 31 : 0, catchUp,
+    startsAt: Date.UTC(y, 10, 30, 22), nowMs: dev ? Date.UTC(y, m - 1, d, 10) : Date.now() };
 }
 
 // ---------- картины с сайта и очередь палитр для дней ЭКСТРА ----------
@@ -757,16 +761,15 @@ async function route(req, env, url) {
     const opened = u ? (await env.DB.prepare('SELECT day, kind, item, buttons, got FROM advent_open WHERE user_id = ? AND year = ?').bind(u.id, t.year).all()).results.map(o => ({ ...o, got: parseJ(o.got, o.kind ? [[o.kind, o.item]] : []) })) : [];
     const all = (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results;
     // прошедшие окошки открыты для всех (и для гостей): в декабре — дни до сегодняшнего, в январе — все; будущее — секрет (целиком видит только админ)
-    const month = new Date(t.nowMs).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }).slice(5, 7);
-    const shownTo = t.day ? t.day - 1 : month === '01' ? 31 : 0;
-    return json({ year: t.year, today: t.day, startsAt: t.startsAt, now: t.nowMs, special: ADVENT_SPECIAL, user: u ? { id: u.id, nick: u.nick } : null, opened,
+    const shownTo = t.day ? t.day - 1 : t.month === 1 ? 31 : 0;
+    return json({ year: t.year, today: t.day, claimTo: t.claimTo, catchUp: t.catchUp, lastJan: ADVENT_LAST_JAN, startsAt: t.startsAt, now: t.nowMs, special: ADVENT_SPECIAL, user: u ? { id: u.id, nick: u.nick } : null, opened,
       past: all.filter(r => r.day <= shownTo), shownTo, plan: admin ? all : undefined }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/advent/open') {
     const u = await needUser(req, env);
     if (!u.nick) fail(400, 'nick');
     const t = adventNow(req, env), b = await req.json().catch(() => ({})), day = Math.floor(Number(b.day));
-    if (!t.day || day !== t.day) fail(403, 'locked'); // открыть можно только окошко сегодняшнего дня
+    if (!(day >= 1 && day <= t.claimTo)) fail(403, 'locked'); // сегодняшнее и пропущенные (до 23 января), будущие — нет
     const ins = await env.DB.prepare('INSERT OR IGNORE INTO advent_open (user_id, year, day, created_at) VALUES (?, ?, ?, ?)').bind(u.id, t.year, day, now()).run();
     if (!ins.meta.changes) { const o = await env.DB.prepare('SELECT day, kind, item, buttons, got FROM advent_open WHERE user_id = ? AND year = ? AND day = ?').bind(u.id, t.year, day).first(); return json({ ok: true, again: true, ...o, got: parseJ(o.got, o.kind ? [[o.kind, o.item]] : []) }); }
     // у всех одинаково: птичка получает все вещи окошка (кроме тех, которых у неё уже максимум); пустое окошко — пуговки
