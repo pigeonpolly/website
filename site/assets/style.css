@@ -3025,3 +3025,5 @@ html.sb-hide { --sb: 0px; }
 .fl-adv-row small { opacity: .6; }
 .fl-adv-it { position: relative; display: inline-grid; }
 .fl-adv-it button { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; border: 0; background: #E5484D; color: #fff; font-size: 11px; cursor: pointer; }
+/* шапка на ширине 1301–1560px: меню плотнее, чтобы длинные латышские/русские пункты и аватар помещались */
+@media (min-width: 1301px) and (max-width: 1560px) { .site-nav a, .sub-toggle { padding: 8px 7px; font-size: 14px; } .site-nav > ul { gap: 2px; } }
