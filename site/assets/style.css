@@ -3141,3 +3141,6 @@ html:not(.is-admin) .statbar { display: none; }
 .fl-adv-daydlg > * { flex-shrink: 0; }
 .fl-adv-daydlg .fl-adv-pick { flex: 1 1 auto; flex-shrink: 1; }
 .fl-adv-f { max-height: 120px; }
+/* подписи под заголовками страниц — шире (Алина: «не заполняют в длину, остаётся пустое место») */
+.page-head { max-width: none; }
+.page-head .lead, .section-lead, .fl-all-lead, .sw-lead { max-width: none; }

@@ -25,8 +25,8 @@
     err: ['Could not open, please try again.', 'Не получилось открыть, попробуйте ещё раз.', 'Neizdevās atvērt, mēģini vēlreiz.'],
     over: ['This year’s calendar is over. See you in December!', 'Календарь этого года закончился. До встречи в декабре!', 'Šī gada kalendārs ir beidzies. Tiekamies decembrī!'],
     count: ['Opened {n} of 31', 'Открыто {n} из 31', 'Atvērti {n} no 31'],
-    adm: ['🔒 You see this because you are the admin: how many gifts are in each window. Put things in windows in the Shop (📅 button).', '🔒 Видите только вы: сколько вещей лежит в каждом окошке. Класть вещи в окошки — в магазине (кнопка 📅).', '🔒 Redzi tikai tu: cik lietu ir katrā lodziņā. Lietas lodziņos liek veikalā (poga 📅).'],
-    toColl: ['Shop →', 'Магазин →', 'Veikals →'],
+    adm: ['🔒 You see this because you are the admin: how many gifts are in each window. Put things in windows in the admin panel.', '🔒 Видите только вы: сколько вещей лежит в каждом окошке. Класть вещи в окошки — в кабинете.', '🔒 Redzi tikai tu: cik lietu ir katrā lodziņā. Lietas lodziņos liek kabinetā.'],
+    toColl: ['🎄 Advent in the admin panel →', '🎄 Адвент в кабинете →', '🎄 Advente kabinetā →'],
   };
   const t = k => T[k][L];
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -60,7 +60,7 @@
     else if (!S.today) head = `<div class="adv-soon"><p>${t('over')}</p></div>`;
     else if (!S.user) head = `<div class="adv-soon"><p>${t('login')}</p><button type="button" class="pill-btn pill-fill" data-login>${t('signin')}</button></div>`;
     else head = `<div class="adv-soon"><p>${opened[S.today] ? t('missed') : t('today')}</p><small>${t('todayOnly')}</small></div>`;
-    if (S.plan) head += `<p class="adv-adm">${t('adm')} <a href="${pre}/shop/">${t('toColl')}</a></p>`;
+    if (S.plan) head += `<p class="adv-adm">${t('adm')} <a href="/admin/#advent">${t('toColl')}</a></p>`;
     app.innerHTML = head + `<div class="adv-board">${ORDER.map(d => {
       const o = opened[d], sp = S.special.includes(d), pd = isPast(d), can = S.today && d === S.today;
       const cls = ['adv-win', sp ? 'sp' : '', d === 31 ? 'leg' : '', o || pd ? 'open' : '', pd ? 'past' : '', can && !o ? 'ready' : '', d === S.today ? 'today' : '', !can && !o && !pd ? 'lock' : ''].filter(Boolean).join(' ');

@@ -1068,6 +1068,18 @@ async function route(req, env, url) {
     if (!(await isAdmin(u, env))) fail(403, 'admin');
     return json({ gifts: (await env.DB.prepare('SELECT kind, item, status FROM gifts WHERE user_id = ?').bind(Number(url.searchParams.get('uid'))).all()).results });
   }
+  // админ дарит вещь всем птичкам с ником (у кого уже максимум таких — пропускаем)
+  if (m === 'POST' && p === '/api/admin/gift-all') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({}));
+    if (!okItem(b.kind, b.item)) fail(400, 'bad');
+    const lim = LEGEND.has(b.kind + '|' + b.item) ? 1 : SHOP_MAX;
+    const r = await env.DB.prepare(`INSERT INTO gifts (user_id, kind, item, note, created_at) SELECT u.id, ?, ?, ?, ? FROM users u WHERE u.banned = 0 AND u.nick IS NOT NULL AND u.nick != ''
+      AND (SELECT COUNT(*) FROM gifts g WHERE g.user_id = u.id AND g.kind = ? AND g.item = ? AND g.status IN ('bag', 'new')) < ?`)
+      .bind(b.kind, String(b.item), String(b.note || '').slice(0, 200), now(), b.kind, String(b.item), lim).run();
+    return json({ ok: true, count: r.meta.changes || 0 });
+  }
   // админ дарит семечко
   if (m === 'POST' && p === '/api/admin/gift') {
     const u = await needUser(req, env);

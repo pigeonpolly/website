@@ -16,7 +16,7 @@
   const n = v => Number(v || 0).toLocaleString('ru-RU');
   const err = e => e.code === 401 || e.code === 'auth' || e.code === 'login' ? 'Войдите через Google (кнопка в шапке), чтобы открыть кабинет.' : e.code === 'admin' || e.code === 403 ? 'Этот кабинет только для админа.' : 'Не получилось загрузить: ' + esc(e.message);
 
-  const SECTIONS = { overview, visitors, comments, analytics, backup, subscribers, birds, shop, edits };
+  const SECTIONS = { overview, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent };
   function route() {
     const sec = (location.hash || '#overview').slice(1);
     document.querySelectorAll('.adm-nav [data-sec]').forEach(a => a.setAttribute('aria-current', a.dataset.sec === sec ? 'page' : 'false'));
@@ -228,16 +228,24 @@
     });
   }
 
+  // ---------- адвент-календарь: что в каком окошке (advent-admin.js) ----------
+  function advent() {
+    main.innerHTML = '<section class="adm-box"><h2>🎄 Адвент-календарь</h2><p class="be-note">Окошки открываются только в свой день (по Риге), каждая птичка получает все вещи окошка. Прошедшие дни видны всем. <a href="/ru/advent/" target="_blank">Открыть календарь ↗</a></p><div class="adm-adv"></div></section>';
+    if (window.PPAdventAdmin) window.PPAdventAdmin.mount(main.querySelector('.adm-adv'));
+    else main.querySelector('.adm-adv').innerHTML = '<p class="be-note">Не загрузился advent-admin.js.</p>';
+  }
+
   // ---------- подарить семечко: фон, обувь, головной убор, анимация, рамка ----------
   function giftDialog(u, done) {
     const B = window.PPBirds; if (!B) return;
+    const all = !u; if (all) u = { id: 2, nick: null, avatar: '{}' }; // «подарить всем»
     let av = {}; try { av = JSON.parse(u.avatar || '{}') || {}; } catch (e) { /* пусто */ }
     const KINDS = [['hat', '🎩 Головной убор'], ['shoes', '👟 Обувь'], ['item', '🍕 В клюв'], ['scarf', '🧣 Шарфик'], ['bg', '🎨 Фон'], ['frame', '⭕ Рамка'], ['anim', '✨ Анимация'], ...(B.GIFTS.furn ? [['furn', '🛋 Мебель'], ['deco', '🎄 Украшения'], ['wall', '🧱 Обои'], ['floor', '🟫 Пол'], ['view', '🪟 Вид из окна'], ['curtain', '🎀 Шторы']] : [])];
     const NAMES = { halo: 'нимб ★', unicorn: 'рог единорога ★', flamecrown: 'корона феникса ★', dragonegg: 'яйцо дракона ★', goldfeather: 'золотое перо ★', comet: 'комета ★', goldenapple: 'золотое яблоко ★', legend: 'легендарная ★', aurora: 'сияние ★', pirate: 'пиратская шляпа', chef: 'колпак повара', graduation: 'шапочка выпускника', paintbrush: 'кисточка', palette: 'палитра', pencil: 'карандаш', coffee: 'кофе', croissant: 'круассан', bounce: 'прыгает', wiggle: 'качается', float: 'парит', spin: 'кружится', sparkle: 'сияет', heart: 'сердечко', wizard: 'шляпа волшебника', witch: 'шляпа ведьмы', pumpkin: 'тыква', santa: 'колпак Санты', antlers: 'рожки оленя', beanie: 'зимняя шапка', heartband: 'ободок с сердцем', wreath: 'весенний венок', strawhat: 'летняя шляпа', leafcrown: 'осенний венок', wand: 'волшебная палочка', crystal: 'хрустальный шар', star: 'звёздочка', lollipop: 'леденец', minipumpkin: 'тыковка', candycane: 'карамельная трость', giftbox: 'подарок', ornament: 'ёлочный шар', snowflake: 'снежинка', heart: 'сердечко', rose: 'роза', letter: 'валентинка', icecream: 'мороженое', mapleleaf: 'кленовый лист', snow: 'снежинки', magic: 'волшебная', spooky: 'хеллоуин', headset: 'игровые наушники', gamepad: 'геймпад', coin: 'монетка', sword: 'пиксельный меч', mushroom: 'грибок', neon: 'неон', pizza: 'пицца', cherry: 'вишенка', cheese: 'сыр', ring: 'колечко', pearl: 'жемчужина', ruby: 'рубин', sapphire: 'сапфир', key: 'ключик', spoon: 'ложечка', gold: 'золотая', rainbow: 'радуга', stars: 'звёзды', hearts: 'сердечки', leaves: 'листики', dotted: 'пунктир' };
     let kind = 'hat', item = B.GIFTS.hat[0], owned = {};
-    api('admin/gifts?uid=' + u.id).then(r => { for (const g of r.gifts) owned[g.kind + '|' + g.item] = g.status; draw(); }).catch(() => {});
+    if (!all) api('admin/gifts?uid=' + u.id).then(r => { for (const g of r.gifts) owned[g.kind + '|' + g.item] = g.status; draw(); }).catch(() => {});
     const w = document.createElement('div'); w.className = 'adm-gift';
-    w.innerHTML = `<div class="adm-gift-card" role="dialog" aria-label="Подарок"><h3>🎁 Подарок для ${u.nick ? '@' + esc(u.nick) : 'птички без ника'}</h3>
+    w.innerHTML = `<div class="adm-gift-card" role="dialog" aria-label="Подарок"><h3>${all ? '🎁 Подарок всем птичкам' : `🎁 Подарок для ${u.nick ? '@' + esc(u.nick) : 'птички без ника'}`}</h3>${all ? '<p class="be-note">Получит каждая птичка с ником (кроме заблокированных). У кого такой вещи уже максимум (3, легендарной — 1), тому не придёт.</p>' : ''}
       <div class="adm-gift-kinds">${KINDS.map(([k, l]) => `<button type="button" class="pill-btn" data-k="${k}">${l}</button>`).join('')}
         <span class="adm-gift-br"></span>${(B.GIFT_THEMES || []).map(t => `<button type="button" class="pill-btn adm-th" data-th="${t[0]}">${t[1][1]}</button>`).join('')}</div>
       <div class="adm-gift-items"></div>
@@ -275,7 +283,9 @@
     w.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { theme = null; kind = b.dataset.k; item = B.GIFTS[kind][0]; draw(); });
     w.querySelector('[data-send]').onclick = async e => {
       e.target.disabled = true;
-      try { await api('admin/gift', { uid: u.id, kind, item, note: w.querySelector('input').value.trim() }); close(); alert('🎁 Подарок отправлен! Он появится у птички в профиле челленджа.'); done && done(); }
+      try {
+        if (all) { if (!confirm('Подарить «' + (B.giftName ? B.giftName(kind, item, 1) : item) + '» всем птичкам?')) { e.target.disabled = false; return; } const r = await api('admin/gift-all', { kind, item, note: w.querySelector('input').value.trim() }); close(); alert('🎁 Подарок отправлен ' + r.count + ' птичкам!'); done && done(); return; }
+        await api('admin/gift', { uid: u.id, kind, item, note: w.querySelector('input').value.trim() }); close(); alert('🎁 Подарок отправлен! Он появится у птички в профиле.'); done && done(); }
       catch (x) { e.target.disabled = false; alert(err(x)); }
     };
     draw();
@@ -334,14 +344,15 @@
       const th = (k, l) => `<th><button type="button" class="adm-sort" data-bsort="${k}" aria-pressed="${bSort === k}">${l}${bSort === k ? ' ↓' : ''}</button></th>`;
       main.innerHTML = `<section class="adm-box"><h2>🐦 Все птицы: ${d.users.length}</h2>
         <p class="be-note">Новых за неделю: <b>${week}</b>. Нажмите на ник, чтобы открыть профиль и работы.</p>
-        <p><button type="button" class="pill-btn" id="adm-backfill">🔘 Начислить всем за прошлые бейджи и рисунки</button> <small class="be-note">Повторно не начислит — каждая награда даётся один раз.</small></p>
+        <p><button type="button" class="pill-btn pill-fill" id="adm-giftall">🎁 Подарить всем</button> <button type="button" class="pill-btn" id="adm-backfill">🔘 Начислить всем за прошлые бейджи и рисунки</button> <small class="be-note">Повторно не начислит — каждая награда даётся один раз.</small></p>
         <div class="be-filters"><input type="search" id="adm-bq" placeholder="🔍 Найти по нику" value="${esc(bq)}"></div>
         <table class="be-table adm-table adm-birds"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}${th('buttons', '🔘 Пуговки')}${th('invited', '👥 Позвали')}<th>Подарки</th></tr></thead><tbody>
-        ${list.map(u => `<tr><td>${u.nick ? `<a href="/challenge/#@${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}${u.banned ? ' <small class="be-danger">заблокирована</small>' : ''}</td>
+        ${list.map(u => `<tr><td>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}${u.banned ? ' <small class="be-danger">заблокирована</small>' : ''}</td>
           <td data-l="Появилась">${fmt(u.created_at)}</td><td data-l="Заходила">${fmt(u.last_seen)}</td><td data-l="🎨 Работ">${n(u.works)}</td><td data-l="🔥 Рекорд">${n(u.best)}</td>
           <td data-l="🔘 Пуговки"><b>${n(u.buttons)}</b> <button type="button" class="adm-mini" data-btn="${u.id}" title="Добавить или забрать пуговки">±</button></td><td data-l="👥 Позвали">${n(u.invited)}</td>
           <td data-l="Подарки"><button type="button" class="pill-btn" data-gift="${u.id}" title="Подарить семечко для аватара">🎁${u.gifts ? ' ' + u.gifts : ''}</button></td></tr>`).join('')}</tbody></table></section>`;
       main.querySelectorAll('[data-gift]').forEach(b => b.onclick = () => giftDialog(d.users.find(u => u.id === +b.dataset.gift), birds));
+      main.querySelector('#adm-giftall').onclick = () => giftDialog(null, birds);
       main.querySelectorAll('[data-bsort]').forEach(b => b.onclick = () => { bSort = b.dataset.bsort; draw(); });
       main.querySelector('#adm-backfill').onclick = async e => {
         e.target.disabled = true; e.target.textContent = 'Считаю…';
