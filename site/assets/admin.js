@@ -334,7 +334,7 @@
         <p class="be-note">Здесь все вещи из «Коллекций». «Ценность» — цена при обычном запасе (10 шт., у легендарных — 3); её уже расставила по вещам, можно поменять. Покупатели видят «цену сейчас»: чем меньше осталось, тем дороже (до ×2.5), чем больше — тем дешевле (до ×0.75). Остаток 0 — «нет в наличии». Сейчас в продаже: <b>${onSale}</b> из ${all.length}. Сохраняется сразу.</p>
         <div class="be-filters"><input type="search" id="adm-sq" placeholder="🔍 Найти вещь" value="${esc(sq)}"></div>
         <section class="adm-stockbox"><h3>📦 Остаток по категориям</h3>
-          <p class="be-note">Сколько штук каждой вещи продаётся. Впишите число и нажмите «Поставить» — у всех вещей категории станет столько штук (легендарные не меняются). Нажмите на название категории, чтобы открыть её вещи и поменять по одной. Цена считается сама: меньше штук — дороже.</p>
+          <p class="be-note">Сколько штук каждой вещи продаётся. Впишите число и нажмите «Поставить» — у всех вещей категории станет столько штук (легендарные не меняются, кроме фильтров «Закончились» и «Скоро закончатся»). Нажмите на название категории, чтобы открыть её вещи и поменять по одной. Цена считается сама: меньше штук — дороже.</p>
           <div class="adm-sbar"><span class="adm-sl">Показать:</span>${[['all', 'Все'], ['empty', '✕ Закончились'], ['low', '⚠️ Скоро закончатся (1–3 шт.)']].map(([k, l]) => `<button type="button" class="pill-btn" data-only="${k}" aria-pressed="${sOnly === k}">${l}</button>`).join('')}</div>
           ${sOnly !== 'all' && !sum.some(r => r.hit) ? '<p class="be-note">Таких вещей нет 🎉</p>' : ''}
           <table class="be-table adm-table adm-stock"><thead><tr><th>Категория</th><th>Сейчас в продаже</th><th>Поставить всем вещам категории</th></tr></thead><tbody>
@@ -357,8 +357,8 @@
       // поставить остаток: категории (или всему магазину) — каждой вещи ровно столько штук
       const setStock = async (pairs, btn) => {
         const items = []; let what = [];
-        for (const [k, n] of pairs) { const xs = (k === '*' ? all : all.filter(x => x.kind === k)).filter(x => only(x) && !(B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item))); xs.forEach(x => items.push([x.kind, x.item, n])); what.push((k === '*' ? 'весь магазин' : (sum.find(r => r.k === k) || {}).name) + ' — по ' + n + ' шт. (' + xs.length + ')'); }
-        if (!items.length) return alert('Впишите остаток хотя бы для одной категории.');
+        for (const [k, n] of pairs) { const xs = (k === '*' ? all : all.filter(x => x.kind === k)).filter(x => only(x) && (sOnly !== 'all' || !(B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item)))); xs.forEach(x => items.push([x.kind, x.item, n])); what.push((k === '*' ? 'весь магазин' : (sum.find(r => r.k === k) || {}).name) + ' — по ' + n + ' шт. (' + xs.length + ')'); }
+        if (!items.length) return alert(pairs.length ? 'Здесь нечего менять: подходящих вещей нет.' : 'Впишите остаток хотя бы для одной категории.');
         if (!confirm('Поставить остаток:\n' + what.join('\n'))) return;
         if (btn) btn.disabled = true;
         try { const r = await api('admin/shop/restock', { items, set: true }); Object.keys(rows).forEach(k => delete rows[k]); r.items.forEach(x => { rows[x.kind + '|' + x.item] = x; }); draw(); }
