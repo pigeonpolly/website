@@ -86,7 +86,7 @@
   }
   function tap(btn, d, o) {
     if (o) return show(btn, o, false);
-    if (d > (S.claimTo || 0)) { toast(S.today ? t('locked').replace('{d}', d) : t('tooLate').replace('{j}', S.lastJan)); btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); return; }
+    if (d > (S.claimTo || 0)) { toast(S.month === 1 ? t('tooLate').replace('{j}', S.lastJan) : t('locked').replace('{d}', d)); btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); return; }
     if (!S.user) { window.PPAccount && window.PPAccount.openSignIn(); return; }
     if (btn.disabled) return;
     btn.disabled = true;
