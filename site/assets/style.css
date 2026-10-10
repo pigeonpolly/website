@@ -2937,3 +2937,18 @@ html.sb-hide { --sb: 0px; }
 .art-hid-list img { width: 120px; height: 90px; object-fit: cover; border-radius: 8px; opacity: .6; }
 .art-hid-list .pill-btn { font-size: 13px; padding: 5px 10px; }
 .gallery figure[data-src] { position: relative; }
+/* сезонные вещи Полли в подвале страницы (polly.js) */
+.site-footer.has-ground { position: relative; padding-bottom: 64px; }
+.polly-ground { position: absolute; left: 0; right: 0; bottom: 0; height: 0; pointer-events: none; }
+.polly-prop { position: absolute; bottom: 6px; pointer-events: none; image-rendering: pixelated; transform-origin: 50% 50%; filter: drop-shadow(0 2px 0 rgba(0, 0, 0, .22)); }
+.polly-prop.free { position: fixed; left: 0 !important; top: 0; bottom: auto; z-index: 61; }
+.polly-prop.wiggle { animation: polly-wiggle .35s ease-in-out infinite; }
+.polly-pet.diving { opacity: 0; transition: opacity .15s; }
+.polly-bit, .polly-petal { position: fixed; z-index: 61; pointer-events: none; }
+.polly-bit { animation: polly-bit .9s cubic-bezier(.2, .7, .4, 1) forwards; }
+.polly-petal { border-radius: 60% 0 60% 0; animation: polly-petal 3.2s ease-in forwards; }
+@keyframes polly-bit { to { transform: translate(var(--dx), var(--dy)) rotate(var(--r)); opacity: 0; } }
+@keyframes polly-petal { 0% { transform: translate(0, 0) rotate(0); opacity: 1; } 50% { transform: translate(var(--dx), calc(var(--fall) * .45)) rotate(160deg); } 100% { transform: translate(calc(var(--dx) * -.4), var(--fall)) rotate(320deg); opacity: 0; } }
+@keyframes polly-wiggle { 0%, 100% { translate: 0 0; } 25% { translate: -2px -1px; } 75% { translate: 2px 0; } }
+@media print { .polly-ground { display: none; } }
+@media (prefers-reduced-motion: reduce) { .polly-prop.wiggle { animation: none; } }
