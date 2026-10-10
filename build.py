@@ -97,6 +97,8 @@ SECTIONS = {
 }
 # страницы, у которых активна вкладка с другим адресом
 TAB_ALIAS = {}
+# вкладки, которых нет в выпадающем меню и карте сайта (они уже есть в другом пункте), но есть внутри раздела
+MENU_HIDE = {"world": {"art-portfolio/bird", "art-portfolio/snail", "art-portfolio/detective", "art-portfolio/halloween"}}
 NAV = [
     ("challenge", "Daily Challenge"),
     ("blog", "Blog"),
@@ -145,7 +147,7 @@ def nav_html(current):
         path, label = entry[0], entry[1]
         on = (len(entry) == 3 and entry[2] == key) or path == current
         cur_attr = ' aria-current="page"' if on else ""
-        subs = SECTIONS.get(entry[2], []) if len(entry) == 3 else []
+        subs = [t for t in SECTIONS.get(entry[2], []) if t[0] not in MENU_HIDE.get(entry[2], ())] if len(entry) == 3 else []
         if not subs:
             items.append(f'<li><a href="{href(path)}"{cur_attr}>{esc(label)}</a></li>')
             continue
@@ -162,7 +164,7 @@ def footer_html():
     cols = []
     for entry in NAV:
         path, label = entry[0], entry[1]
-        links = SECTIONS.get(entry[2], []) if len(entry) == 3 else []
+        links = [t for t in SECTIONS.get(entry[2], []) if t[0] not in MENU_HIDE.get(entry[2], ())] if len(entry) == 3 else []
         if path == "challenge":
             links = [("polly-helps", "Polly, help me draw")]
         if path == "blog":
