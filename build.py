@@ -7,6 +7,7 @@
 """
 import html
 import json
+import runpy
 import pathlib
 import re
 
@@ -518,6 +519,9 @@ def build():
     # палитры из артов (страница «Палитры» и кнопка 🎨 в челлендже); данные — content/palettes.json (tools/palettes.py)
     pals = json.loads((CONTENT / "palettes.json").read_text())
     (OUT / "assets" / "palettes.json").write_text(json.dumps(pals, ensure_ascii=False, separators=(",", ":")))
+    # названия цветов для «Палитры из своего фото» (palettes.js); список — tools/palette_names.py
+    names = runpy.run_path(str(ROOT / "tools" / "palette_names.py"))["NAMES"]
+    (OUT / "assets" / "palette-names.json").write_text(json.dumps([list(n) for n in names], ensure_ascii=False, separators=(",", ":")))
     # день ЭКСТРА в челлендже: палитра одной из картин (challenge-theme.js выбирает по месяцу, одинаково у всех)
     extra = [{"k": p["key"], "t": [p["title"][l] for l in ("en", "ru", "lv")], "th": p["thumb"],
               "c": [[c["hex"], c["en"], c["ru"], c["lv"]] for c in p["colors"]]} for p in sorted(pals, key=lambda p: p["key"])]

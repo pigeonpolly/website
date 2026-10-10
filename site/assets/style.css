@@ -2887,3 +2887,16 @@ html.sb-hide { --sb: 0px; }
 .pal-modal-box .pal-img img { aspect-ratio: 16 / 10; }
 .pal-x { position: sticky; top: 0; justify-self: end; margin: -6px -6px -42px 0; width: 38px; height: 38px; border-radius: 50%; border: 0; background: #2B1A51; color: #fff; font-size: 18px; cursor: pointer; z-index: 1; }
 .ch-pal-btn { cursor: pointer; }
+.pal-mk { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 340px); gap: 24px; align-items: start; margin-bottom: 30px; padding: 22px; border-radius: 22px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line, rgba(255, 255, 255, .15)); }
+.pal-mk h2 { margin: 0 0 8px; font: 600 clamp(22px, 2.4vw, 28px)/1.15 'Fraunces', serif; }
+.pal-mk-txt > p { margin: 0 0 14px; }
+.pal-mk-pick { display: inline-block; cursor: pointer; }
+.pal-mk-opts { display: flex; flex-wrap: wrap; gap: 10px; align-items: end; margin-top: 14px; }
+.pal-mk-opts[hidden] { display: none; }
+.pal-mk-opts label { display: grid; gap: 4px; font-size: 14px; }
+.pal-mk-opts input { padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line, #ccc); font: inherit; min-width: 200px; }
+.pal-mk-msg { margin: 10px 0 0; font-size: 14px; opacity: .85; }
+.pal-mk-msg:empty { display: none; }
+.pal-mk-out:empty { display: none; }
+.pal-mk-card { display: block; width: 100%; height: auto; border-radius: 16px; box-shadow: 0 10px 28px rgba(0, 0, 0, .25); }
+@media (max-width: 720px) { .pal-mk { grid-template-columns: 1fr; padding: 16px; } .pal-mk-opts input { min-width: 0; width: 100%; } .pal-mk-opts label { flex: 1 1 100%; } }
