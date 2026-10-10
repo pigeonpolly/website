@@ -233,7 +233,7 @@ async function ensureSchema(env) {
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
   for (const sql of ["ALTER TABLE users ADD COLUMN avatar TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
-    "ALTER TABLE users ADD COLUMN months TEXT DEFAULT ''", "ALTER TABLE users ADD COLUMN room TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN tod INTEGER',
+    "ALTER TABLE users ADD COLUMN months TEXT DEFAULT ''", 'ALTER TABLE advent_open ADD COLUMN got TEXT', "ALTER TABLE users ADD COLUMN room TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN tod INTEGER',
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
@@ -754,25 +754,31 @@ async function route(req, env, url) {
   }
   if (m === 'GET' && p === '/api/advent') {
     const t = adventNow(req, env), u = await currentUser(req, env), admin = await isAdmin(u, env);
-    const opened = u ? (await env.DB.prepare('SELECT day, kind, item, buttons FROM advent_open WHERE user_id = ? AND year = ?').bind(u.id, t.year).all()).results : [];
-    const plan = admin ? (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results : undefined;
-    return json({ year: t.year, today: t.day, startsAt: t.startsAt, now: t.nowMs, special: ADVENT_SPECIAL, user: u ? { id: u.id, nick: u.nick } : null, opened, plan }, 200, { 'cache-control': 'no-store' });
+    const opened = u ? (await env.DB.prepare('SELECT day, kind, item, buttons, got FROM advent_open WHERE user_id = ? AND year = ?').bind(u.id, t.year).all()).results.map(o => ({ ...o, got: parseJ(o.got, o.kind ? [[o.kind, o.item]] : []) })) : [];
+    const all = (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results;
+    // прошедшие окошки открыты для всех (и для гостей): в декабре — дни до сегодняшнего, в январе — все; будущее — секрет (целиком видит только админ)
+    const month = new Date(t.nowMs).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }).slice(5, 7);
+    const shownTo = t.day ? t.day - 1 : month === '01' ? 31 : 0;
+    return json({ year: t.year, today: t.day, startsAt: t.startsAt, now: t.nowMs, special: ADVENT_SPECIAL, user: u ? { id: u.id, nick: u.nick } : null, opened,
+      past: all.filter(r => r.day <= shownTo), shownTo, plan: admin ? all : undefined }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/advent/open') {
     const u = await needUser(req, env);
     if (!u.nick) fail(400, 'nick');
     const t = adventNow(req, env), b = await req.json().catch(() => ({})), day = Math.floor(Number(b.day));
-    if (!t.day || !(day >= 1 && day <= t.day)) fail(403, 'locked'); // открыть можно сегодняшнее и пропущенные, будущие — нет
+    if (!t.day || day !== t.day) fail(403, 'locked'); // открыть можно только окошко сегодняшнего дня
     const ins = await env.DB.prepare('INSERT OR IGNORE INTO advent_open (user_id, year, day, created_at) VALUES (?, ?, ?, ?)').bind(u.id, t.year, day, now()).run();
-    if (!ins.meta.changes) return json({ ok: true, again: true, ...(await env.DB.prepare('SELECT day, kind, item, buttons FROM advent_open WHERE user_id = ? AND year = ? AND day = ?').bind(u.id, t.year, day).first()) });
-    // одна из вещей окошка, которой у птички ещё не слишком много; если положить нечего — пуговки
-    const plan = (await env.DB.prepare('SELECT kind, item FROM advent_plan WHERE day = ?').bind(day).all()).results.sort(() => Math.random() - .5);
-    let got = null;
-    for (const r of plan) if (await copies(env, u.id, r.kind, r.item) < (LEGEND.has(r.kind + '|' + r.item) ? 1 : SHOP_MAX)) { got = r; break; }
-    if (got) {
-      await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'advent', 'bag', ?, ?)").bind(u.id, got.kind, got.item, now(), now()).run();
-      await env.DB.prepare('UPDATE advent_open SET kind = ?, item = ? WHERE user_id = ? AND year = ? AND day = ?').bind(got.kind, got.item, u.id, t.year, day).run();
-      return json({ ok: true, day, kind: got.kind, item: got.item });
+    if (!ins.meta.changes) { const o = await env.DB.prepare('SELECT day, kind, item, buttons, got FROM advent_open WHERE user_id = ? AND year = ? AND day = ?').bind(u.id, t.year, day).first(); return json({ ok: true, again: true, ...o, got: parseJ(o.got, o.kind ? [[o.kind, o.item]] : []) }); }
+    // у всех одинаково: птичка получает все вещи окошка (кроме тех, которых у неё уже максимум); пустое окошко — пуговки
+    const plan = (await env.DB.prepare('SELECT kind, item FROM advent_plan WHERE day = ?').bind(day).all()).results;
+    const got = [];
+    for (const r of plan) if (await copies(env, u.id, r.kind, r.item) < (LEGEND.has(r.kind + '|' + r.item) ? 1 : SHOP_MAX)) {
+      await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'advent', 'bag', ?, ?)").bind(u.id, r.kind, r.item, now(), now()).run();
+      got.push([r.kind, r.item]);
+    }
+    if (got.length) {
+      await env.DB.prepare('UPDATE advent_open SET kind = ?, item = ?, got = ? WHERE user_id = ? AND year = ? AND day = ?').bind(got[0][0], got[0][1], JSON.stringify(got), u.id, t.year, day).run();
+      return json({ ok: true, day, kind: got[0][0], item: got[0][1], got });
     }
     const n = ADVENT_SPECIAL.includes(day) ? 25 : 10;
     await award(env, u.id, 'advent', `${t.year}-${day}`, n);

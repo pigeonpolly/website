@@ -11,7 +11,10 @@
     login: ['Sign in to open the windows and collect gifts', 'Войдите, чтобы открывать окошки и собирать подарки', 'Ienāc, lai atvērtu lodziņus un vāktu dāvanas'],
     signin: ['Sign in', 'Войти', 'Ienākt'],
     today: ['Today’s window is waiting!', 'Сегодняшнее окошко ждёт!', 'Šodienas lodziņš gaida!'],
-    missed: ['Missed a day? Past windows can still be opened.', 'Пропустили день? Прошлые окошки тоже можно открыть.', 'Izlaidi dienu? Iepriekšējos lodziņus vēl var atvērt.'],
+    missed: ['Each window opens only on its own day. Come back tomorrow!', 'Каждое окошко открывается только в свой день. Приходите завтра!', 'Katrs lodziņš atveras tikai savā dienā. Nāc rīt!'],
+    was: ['This window held:', 'В этом окошке было:', 'Šajā lodziņā bija:'], wasBtns: ['This window held buttons 🔘', 'В этом окошке были пуговки 🔘', 'Šajā lodziņā bija pogas 🔘'],
+    youGot: ['✓ You got it', '✓ Ты это получил(а)', '✓ Tu to saņēmi'], missedIt: ['This day has passed: its window can no longer be opened.', 'Этот день прошёл: окошко больше не открыть.', 'Šī diena ir pagājusi: lodziņu vairs nevar atvērt.'],
+    todayOnly: ['Only today’s window can be opened.', 'Открыть можно только сегодняшнее окошко.', 'Var atvērt tikai šodienas lodziņu.'],
     locked: ['Not yet! This window opens on December {d}.', 'Ещё рано! Это окошко откроется {d} декабря.', 'Vēl par agru! Šis lodziņš atvērsies {d}. decembrī.'],
     got: ['A gift for you:', 'Тебе подарок:', 'Dāvana tev:'],
     inBag: ['It is already in your bag 🎒', 'Он уже у тебя в сумке 🎒', 'Tā jau ir tavā somā 🎒'],
@@ -48,24 +51,27 @@
   function draw() {
     if (!S) { app.innerHTML = ''; return; }
     const opened = Object.fromEntries((S.opened || []).map(o => [o.day, o]));
+    const past = {}; (S.past || []).forEach(p => (past[p.day] = past[p.day] || []).push([p.kind, p.item]));
+    const isPast = d => d <= (S.shownTo || 0);
     const plan = {}; (S.plan || []).forEach(p => (plan[p.day] = plan[p.day] || []).push(p));
     const before = !S.today && (Date.now() + skew) < S.startsAt;
     let head = '';
     if (before) head = `<div class="adv-soon"><p>${t('soon')}</p><div class="adv-cd" role="timer"></div></div>`;
     else if (!S.today) head = `<div class="adv-soon"><p>${t('over')}</p></div>`;
     else if (!S.user) head = `<div class="adv-soon"><p>${t('login')}</p><button type="button" class="pill-btn pill-fill" data-login>${t('signin')}</button></div>`;
-    else head = `<div class="adv-soon"><p>${opened[S.today] ? t('missed') : t('today')}</p><small>${t('count').replace('{n}', Object.keys(opened).length)}</small></div>`;
+    else head = `<div class="adv-soon"><p>${opened[S.today] ? t('missed') : t('today')}</p><small>${t('todayOnly')}</small></div>`;
     if (S.plan) head += `<p class="adv-adm">${t('adm')} <a href="${pre}/shop/">${t('toColl')}</a></p>`;
     app.innerHTML = head + `<div class="adv-board">${ORDER.map(d => {
-      const o = opened[d], sp = S.special.includes(d), can = S.today && d <= S.today;
-      const cls = ['adv-win', sp ? 'sp' : '', d === 31 ? 'leg' : '', o ? 'open' : '', can && !o ? 'ready' : '', d === S.today ? 'today' : '', !can ? 'lock' : ''].filter(Boolean).join(' ');
+      const o = opened[d], sp = S.special.includes(d), pd = isPast(d), can = S.today && d === S.today;
+      const cls = ['adv-win', sp ? 'sp' : '', d === 31 ? 'leg' : '', o || pd ? 'open' : '', pd ? 'past' : '', can && !o ? 'ready' : '', d === S.today ? 'today' : '', !can && !o && !pd ? 'lock' : ''].filter(Boolean).join(' ');
       return `<button type="button" class="${cls}" data-d="${d}" aria-label="${d}${sp ? ' — ' + t('special') : ''}"><span class="adv-in"></span><span class="adv-door l"></span><span class="adv-door r"></span><b>${d}</b>${sp ? '<i class="adv-star">★</i>' : ''}${S.plan && plan[d] ? `<em class="adv-n">${plan[d].length}</em>` : ''}</button>`;
     }).join('')}</div>`;
     // открытые окошки: внутри картинка подарка
-    app.querySelectorAll('.adv-win.open').forEach(b => { const o = opened[b.dataset.d]; b.querySelector('.adv-in').appendChild(prize(o, 40)); });
+    // открытые окошки: внутри картинка подарка (прошедшие дни — видны всем)
+    app.querySelectorAll('.adv-win.open').forEach(b => { const d = +b.dataset.d, o = opened[d] || (past[d] ? { kind: past[d][0][0], item: past[d][0][1] } : { buttons: 1 }); b.querySelector('.adv-in').appendChild(prize(o, 40)); if ((past[d] || []).length > 1 || (o.got || []).length > 1) b.classList.add('many'); });
     if (before) countdown(app.querySelector('.adv-cd'));
     const lg = app.querySelector('[data-login]'); if (lg) lg.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
-    app.querySelectorAll('.adv-win').forEach(b => b.onclick = () => tap(b, +b.dataset.d, opened[b.dataset.d]));
+    app.querySelectorAll('.adv-win').forEach(b => b.onclick = () => { const d = +b.dataset.d; if (!opened[d] && isPast(d)) return showPast(b, d, past[d] || []); tap(b, d, opened[d]); });
   }
   function prize(o, size) {
     const B = window.PPBirds, s = document.createElement('span'); s.className = 'adv-prize';
@@ -75,7 +81,7 @@
   }
   function tap(btn, d, o) {
     if (o) return show(btn, o, false);
-    if (!S.today || d > S.today) { toast(t('locked').replace('{d}', d)); btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); return; }
+    if (!S.today || d !== S.today) { toast(d < (S.today || 32) ? t('todayOnly') : t('locked').replace('{d}', d)); btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); return; }
     if (!S.user) { window.PPAccount && window.PPAccount.openSignIn(); return; }
     if (btn.disabled) return;
     btn.disabled = true;
@@ -85,6 +91,17 @@
       .catch(() => { btn.disabled = false; toast(t('err')); });
   }
   const toast = m => window.PPToast ? window.PPToast(m) : alert(m);
+  // прошедший день: что было в окошке (видно всем)
+  function showPast(btn, d, items) {
+    const B = window.PPBirds;
+    const dlg = document.createElement('div'); dlg.className = 'adv-modal'; dlg.setAttribute('role', 'dialog'); dlg.setAttribute('aria-modal', 'true');
+    dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button><p class="adv-kick">${d} · ${items.length ? t('was') : t('wasBtns')}</p><div class="adv-list"></div><p>${t('missedIt')}</p></div>`;
+    const list = dlg.querySelector('.adv-list');
+    items.forEach(([k, v]) => { const f = document.createElement('figure'); f.appendChild(B.itemIcon(k, v, 64, S.user ? S.user.id : 2)); const c = document.createElement('figcaption'); c.textContent = B.giftName(k, v, L); f.appendChild(c); list.appendChild(f); });
+    const close = () => dlg.remove();
+    dlg.querySelector('.adv-x').onclick = close; dlg.onclick = e => { if (e.target === dlg) close(); };
+    document.body.appendChild(dlg); dlg.querySelector('.adv-x').focus();
+  }
   // окно: птичка вылетает из окошка и приносит подарок
   function show(btn, o, fresh) {
     const B = window.PPBirds, leg = o.kind && B && B.LEGEND && B.LEGEND.has(o.kind + '|' + o.item);
@@ -93,9 +110,10 @@
     dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button>
       <div class="adv-stage"><div class="adv-bird"></div></div>
       <p class="adv-kick">${o.kind ? t('got') : t('btns').replace('{n}', o.buttons || 0)}</p>
-      ${o.kind ? `<h2>${esc(name)}</h2>${leg ? `<p class="adv-leg">${t('legend')}</p>` : ''}<p>${t('inBag')}</p>` : `<p>${t('btnsWhy')}</p>`}
+      ${o.kind ? `<h2>${esc(name)}</h2>${(o.got || []).length > 1 ? `<div class="adv-list">${o.got.slice(1).map(() => '<figure></figure>').join('')}</div>` : ''}${leg ? `<p class="adv-leg">${t('legend')}</p>` : ''}<p>${t('inBag')}</p>` : `<p>${t('btnsWhy')}</p>`}
       <div class="adv-act">${S.user && S.user.nick ? `<a class="pill-btn pill-fill" href="${pre}/bird/">${t('bag')}</a>` : ''}<a class="pill-btn" href="${pre}/shop/">${t('shop')}</a></div></div>`;
     const bird = dlg.querySelector('.adv-bird');
+    (o.got || []).slice(1).forEach(([k, v], i) => { const f = dlg.querySelectorAll('.adv-list figure')[i]; if (f && B) { f.appendChild(B.itemIcon(k, v, 56, S.user ? S.user.id : 2)); const c = document.createElement('figcaption'); c.textContent = B.giftName(k, v, L); f.appendChild(c); } });
     if (B) {
       const id = 5 + o.day * 37, lk = o.kind === 'item' ? B.dress(B.looks(id), { item: o.item }) : B.looks(id);
       const c = B.crop(B.spriteHD(lk, 0)); c.className = 'adv-bird-c'; c.style.width = c.width * 3 + 'px'; c.style.height = c.height * 3 + 'px'; bird.appendChild(c);

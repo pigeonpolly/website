@@ -3133,3 +3133,11 @@ html:not(.is-admin) .statbar { display: none; }
 .fl-adv-pick button[aria-pressed="true"] { background: #2B1A51; color: #fff; box-shadow: 0 0 0 3px #F0A987; }
 .fl-adv-pick small { font: 600 11px/1.2 'Karla', sans-serif; text-align: center; }
 .fl-adv-pick { align-content: start; grid-auto-rows: max-content; }
+.adv-list { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin: 8px 0 12px; }
+.adv-list figure { margin: 0; display: grid; justify-items: center; gap: 4px; max-width: 90px; }
+.adv-list figcaption { font-size: 12px; opacity: .9; text-align: center; }
+.adv-win.past { filter: saturate(.8); }
+.adv-win.many::before { content: '+'; position: absolute; right: 4px; bottom: 2px; z-index: 2; font: 700 14px 'Karla', sans-serif; color: #FFF6E5; }
+.fl-adv-daydlg > * { flex-shrink: 0; }
+.fl-adv-daydlg .fl-adv-pick { flex: 1 1 auto; flex-shrink: 1; }
+.fl-adv-f { max-height: 120px; }
