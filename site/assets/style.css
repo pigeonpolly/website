@@ -3171,3 +3171,6 @@ html:not(.is-admin) .statbar { display: none; }
 .adm-sl { font-size: 13px; color: var(--muted); align-self: center; margin-right: 2px; }
 .adm-sum { margin: 10px 0 12px; } .adm-sum summary { cursor: pointer; font-weight: 600; }
 .adm-sum table { margin-top: 8px; } .adm-link { background: none; border: 0; padding: 0; color: #F0A987; text-decoration: underline; cursor: pointer; font: inherit; }
+.adm-stockbox { margin: 10px 0 16px; padding: 12px 14px; border: 1px dashed rgba(233,169,59,.6); border-radius: 12px; }
+.adm-stockbox h3 { margin: 0 0 4px; } .adm-setst { white-space: nowrap; } .adm-setst input { width: 72px; margin-right: 6px; }
+.shop-up { color: #F0A987; font-weight: 600; } .shop-down { color: #7FD6A8; font-weight: 600; }

@@ -301,6 +301,23 @@ const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, p
 // легендарные вещи (как LEGEND в birds.js): в магазине по одной штуке на птичку, дарить нельзя; обычных — до трёх одинаковых
 const LEGEND = new Set(['hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass', 'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight']);
 const SHOP_MAX = 3;
+// цена от остатка: в shop.price — ценность вещи (при обычном запасе: 10 шт., у легендарных — 3);
+// меньше осталось — дороже (до ×2.5), больше — дешевле (до ×0.75). То же считает admin.js effPrice.
+function effPrice(base, stock, leg) {
+  if (!(base > 0)) return 0;
+  const f = Math.max(0.75, Math.min(2.5, Math.pow((leg ? 3 : 10) / Math.max(1, stock || 0), 0.4)));
+  return Math.max(5, Math.round(base * f / 5) * 5);
+}
+const shopRow = r => ({ kind: r.kind, item: r.item, base: r.price, stock: r.stock, price: effPrice(r.price, r.stock, LEGEND.has(r.kind + '|' + r.item) || r.item === 'legend') });
+// один раз: всем вещам — ценность из каталога (site/assets/catalog.json → prices, считает tools/catalog.js)
+async function ensurePrices(env, req) {
+  if (await env.DB.prepare("SELECT value FROM meta WHERE key = 'prices_v1'").first()) return;
+  const cat = await catalog(env, req), list = Object.entries(cat.prices || {});
+  if (!list.length) return;
+  const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, 0) ON CONFLICT(kind, item) DO UPDATE SET price = excluded.price');
+  for (let i = 0; i < list.length; i += 50) await env.DB.batch(list.slice(i, i + 50).map(([k, p]) => { const j = k.indexOf('|'); return st.bind(k.slice(0, j), k.slice(j + 1), p); }));
+  await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('prices_v1', ?)").bind(String(now())).run();
+}
 const copies = async (env, uid, kind, item) => (await env.DB.prepare("SELECT COUNT(*) AS n FROM gifts WHERE user_id = ? AND kind = ? AND item = ? AND status IN ('bag', 'new')").bind(uid, kind, item).first()).n;
 const rigaDay = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }); // сутки по Риге
 async function award(env, uid, kind, ref, amount) {
@@ -1003,8 +1020,9 @@ async function route(req, env, url) {
 
   // ---------- магазин: вещи из коллекций за пуговки; цену и остаток задаёт Алина в кабинете ----------
   if (m === 'GET' && p === '/api/shop') {
+    await ensurePrices(env, req);
     const rows = (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results;
-    return json({ items: rows }, 200, { 'cache-control': 'no-store' });
+    return json({ items: rows.map(shopRow) }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/shop/buy') {
     const u = await needUser(req, env);
@@ -1014,6 +1032,8 @@ async function route(req, env, url) {
     if (!GIFT_KINDS.includes(kind) || !item) fail(400, 'bad');
     const row = await env.DB.prepare('SELECT price, stock FROM shop WHERE kind = ? AND item = ?').bind(kind, item).first();
     if (!row || row.stock <= 0) fail(409, 'soldout');
+    row.price = effPrice(row.price, row.stock, LEGEND.has(kind + '|' + item) || item === 'legend'); // цена от остатка
+    if (b.price != null && Number(b.price) !== row.price) return json({ error: 'price', price: row.price }, 409); // пока смотрели — цена изменилась
     const sur = item === '?' || kind === 'any' ? await surpriseKI(env, req, u.id, kind, item) : null; // «🎲 Сюрприз» — случайная вещь, которой ещё нет
     if (sur === null && (item === '?' || kind === 'any')) fail(409, 'all');
     const gk = sur ? sur[0] : kind, got = sur ? sur[1] : item;
@@ -1034,11 +1054,18 @@ async function route(req, env, url) {
     if (!(await isAdmin(u, env))) fail(403, 'admin');
     const b = await req.json().catch(() => ({}));
     const add = Math.max(1, Math.min(10000, Math.floor(Number(b.add) || 0))), price = Math.max(0, Math.min(100000, Math.floor(Number(b.price) || 0)));
+    await ensurePrices(env, req); const cp = (await catalog(env, req)).prices || {}; // у вещи без цены — её ценность из каталога
     const list = (Array.isArray(b.items) ? b.items : []).slice(0, 2000).filter(x => Array.isArray(x) && GIFT_KINDS.includes(String(x[0])) && x[1] && String(x[1]).length <= 40);
-    if (!list.length || !(Number(b.add) > 0)) fail(400, 'bad');
+    if (!list.length || (!b.set && !(Number(b.add) > 0))) fail(400, 'bad');
+    if (b.set) { // поставить остаток ровно [kind, item, n]
+      await ensurePrices(env, req); const cp = (await catalog(env, req)).prices || {};
+      const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET stock = excluded.stock');
+      for (let i = 0; i < list.length; i += 50) await env.DB.batch(list.slice(i, i + 50).map(x => st.bind(String(x[0]), String(x[1]), cp[x[0] + '|' + x[1]] || 30, Math.max(0, Math.min(10000, Math.floor(Number(x[2]) || 0))))));
+      return json({ ok: true, count: list.length, items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results.map(shopRow) });
+    }
     const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET stock = MIN(100000, shop.stock + excluded.stock), price = CASE WHEN shop.price > 0 THEN shop.price ELSE excluded.price END');
-    for (let i = 0; i < list.length; i += 50) await env.DB.batch(list.slice(i, i + 50).map(x => st.bind(String(x[0]), String(x[1]), price, add)));
-    return json({ ok: true, count: list.length, items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results });
+    for (let i = 0; i < list.length; i += 50) await env.DB.batch(list.slice(i, i + 50).map(x => st.bind(String(x[0]), String(x[1]), cp[x[0] + '|' + x[1]] || price, add)));
+    return json({ ok: true, count: list.length, items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results.map(shopRow) });
   }
   if (p === '/api/admin/shop') {
     const u = await needUser(req, env);
@@ -1051,7 +1078,8 @@ async function route(req, env, url) {
       await env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET price = excluded.price, stock = excluded.stock').bind(kind, item, price, stock).run();
       return json({ ok: true, price, stock });
     }
-    return json({ items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results });
+    await ensurePrices(env, req);
+    return json({ items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results.map(shopRow), suggested: (await catalog(env, req)).prices || {} });
   }
   // подарить купленную в магазине вещь другой птичке: вещь уходит из сумки и приходит ей неоткрытым подарком
   if (m === 'POST' && p === '/api/gift/give') {

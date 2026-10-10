@@ -32,7 +32,10 @@
     fKind: ['What', 'Что', 'Kas'], allKinds: ['Any', 'Любое', 'Jebkas'], fTheme: ['Theme', 'Тема', 'Tēma'], anyTheme: ['Any theme', 'Любая тема', 'Jebkura tēma'], reset: ['✕ Reset filters', '✕ Сбросить фильтры', '✕ Notīrīt filtrus'],
     youHave: ['🎒 You have', '🎒 У вас есть', '🎒 Tev ir'], noneMine: ['You have nothing like this yet.', 'У вас пока нет таких вещей.', 'Tev vēl nav tādu lietu.'],
     noneHere: ['Nothing on sale with these filters. Try another theme or “Everything”.', 'С такими фильтрами ничего нет в продаже. Попробуйте другую тему или «Всё».', 'Ar šiem filtriem nekas netiek pārdots. Pamēģini citu tēmu vai “Visu”.'],
-    rule: ['You can buy up to 3 of the same thing (legendary ones: just 1).', 'Одну и ту же вещь можно купить до 3 штук (легендарные — только 1).', 'Vienu un to pašu lietu var nopirkt līdz 3 gab. (leģendārās — tikai 1).'],
+    up: ['▲ few left', '▲ осталось мало', '▲ maz palicis'], down: ['▼ plenty', '▼ много в наличии', '▼ daudz'],
+    upWhy: ['Few left, so the price went up', 'Осталось мало — поэтому дороже', 'Palicis maz — tāpēc dārgāk'], downWhy: ['Plenty in stock, so it is cheaper', 'Много в наличии — поэтому дешевле', 'Daudz noliktavā — tāpēc lētāk'],
+    changed: ['The price has just changed: now {p} 🔘. Take a look and buy again.', 'Цена только что изменилась: теперь {p} 🔘. Посмотрите и купите ещё раз.', 'Cena tikko mainījās: tagad {p} 🔘. Paskaties un pērc vēlreiz.'],
+    rule: ['You can buy up to 3 of the same thing (legendary ones: just 1). Prices follow the stock: the fewer left, the pricier; the more in stock, the cheaper.', 'Одну и ту же вещь можно купить до 3 штук (легендарные — только 1). Цена зависит от остатка: чем меньше осталось, тем дороже, чем больше — тем дешевле.', 'Vienu un to pašu lietu var nopirkt līdz 3 gab. (leģendārās — tikai 1). Cena atkarīga no atlikuma: jo mazāk palicis, jo dārgāk; jo vairāk, jo lētāk.'],
   };
   var bar = document.querySelector('.shop-bar'), box = document.querySelector('.shop-box'), meEl = document.querySelector('.shop-me');
   var me = null, owned = {}, shop = {};
@@ -70,7 +73,8 @@
     if (leg) { var lt = document.createElement('span'); lt.className = 'legend-tag'; lt.textContent = '★'; lt.title = T.legend[L]; t.appendChild(lt); }
     var c = document.createElement('figcaption'); c.textContent = B.giftName(k[0], v, L); t.appendChild(c);
     var info = document.createElement('p'); info.className = 'shop-price';
-    info.innerHTML = s.stock > 0 ? '<b>' + (s.price ? '🔘 ' + s.price : T.free[L]) + '</b><small>' + T.left[L].replace('{n}', s.stock) + '</small>' : '<small>' + T.sold[L] + '</small>';
+    var trend = s.base && s.price > s.base ? '<small class="shop-up" title="' + T.upWhy[L] + '">' + T.up[L] + '</small>' : s.base && s.price < s.base ? '<small class="shop-down" title="' + T.downWhy[L] + '">' + T.down[L] + '</small>' : '';
+    info.innerHTML = s.stock > 0 ? '<b>' + (s.price ? '🔘 ' + s.price : T.free[L]) + '</b>' + trend + '<small>' + T.left[L].replace('{n}', s.stock) + '</small>' : '<small>' + T.sold[L] + '</small>';
     t.appendChild(info);
     if (have) { var m = document.createElement('span'); m.className = 'fl-coll-mark'; m.textContent = have >= lim ? T.max[L] : T.count[L].replace('{n}', have).replace('{m}', lim); t.appendChild(m); }
     if (s.stock > 0 && me && have < lim) {
@@ -116,9 +120,10 @@
     var B = window.PPBirds;
     if (!confirm(T.sure[L].replace('{n}', B.giftName(kind, item, L)).replace('{p}', price))) return;
     b.disabled = true;
-    fetch('/api/shop/buy', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ kind: kind, item: item }) })
+    fetch('/api/shop/buy', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ kind: kind, item: item, price: price }) })
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (x) {
+        if (!x.ok && x.d.error === 'price') { alert(T.changed[L].replace('{p}', x.d.price)); return load(); }
         if (!x.ok) { alert(x.d.error === 'poor' ? T.poor[L] : x.d.error === 'soldout' ? T.sold[L] : x.d.error === 'limit' ? T.max[L] : T.err[L]); return load(); }
         if (window.PPToast) window.PPToast(item === '?' && x.d.item ? '🎲 ' + B.giftName(kind, x.d.item, L) + ' — ' + T.ok[L] : T.ok[L]);
         load();

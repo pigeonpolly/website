@@ -297,6 +297,8 @@
   }
 
   // ---------- магазин: цена и количество каждой вещи из коллекций ----------
+  // цена от остатка — как effPrice в worker/index.js: ценность × (10 / остаток)^0.4, от ×0.75 до ×2.5 (у легендарных обычный запас — 3)
+  const effPrice = (base, stock, leg) => base > 0 ? Math.max(5, Math.round(base * Math.max(0.75, Math.min(2.5, Math.pow((leg ? 3 : 10) / Math.max(1, stock || 0), 0.4))) / 5) * 5) : 0;
   let sFilter = 'all', sq = '', sStock = 'all', sSort = 'cat'; // вид/тема, поиск, сколько осталось, порядок
   async function shop() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
@@ -323,43 +325,44 @@
       const onSale = all.filter(x => (rows[x.kind + '|' + x.item] || {}).stock > 0).length;
       const fb = (k, l) => `<button type="button" class="pill-btn" data-sf="${k}" aria-pressed="${sFilter === k}">${l}</button>`;
       main.innerHTML = `<section class="adm-box"><h2>🛍 Магазин</h2>
-        <p class="be-note">Здесь все вещи из «Коллекций». Укажите цену в пуговках 🔘 и сколько штук продаётся — вещь появится в магазине как «в продаже». Количество 0 — «нет в наличии». Цена 0 — бесплатно. Сейчас в продаже: <b>${onSale}</b> из ${all.length}. Сохраняется сразу.</p>
+        <p class="be-note">Здесь все вещи из «Коллекций». «Ценность» — цена при обычном запасе (10 шт., у легендарных — 3); её уже расставила по вещам, можно поменять. Покупатели видят «цену сейчас»: чем меньше осталось, тем дороже (до ×2.5), чем больше — тем дешевле (до ×0.75). Остаток 0 — «нет в наличии». Сейчас в продаже: <b>${onSale}</b> из ${all.length}. Сохраняется сразу.</p>
         <div class="be-filters"><input type="search" id="adm-sq" placeholder="🔍 Найти вещь" value="${esc(sq)}"></div>
-        <details class="adm-sum"><summary>📊 Сколько чего в магазине</summary><table class="be-table adm-table"><thead><tr><th>Вид</th><th>В продаже</th><th>Штук всего</th><th>Мало (≤3)</th></tr></thead><tbody>
-          ${sum.map(r => `<tr><td><button type="button" class="adm-link" data-sf="kind:${r.k}">${esc(r.name)}</button></td><td>${r.on} из ${r.total}</td><td>${r.pcs}</td><td>${r.low || '—'}</td></tr>`).join('')}
-          <tr><td><b>Итого</b></td><td><b>${sum.reduce((a, r) => a + r.on, 0)} из ${all.length}</b></td><td><b>${sum.reduce((a, r) => a + r.pcs, 0)}</b></td><td><b>${sum.reduce((a, r) => a + r.low, 0)}</b></td></tr></tbody></table></details>
+        <section class="adm-stockbox"><h3>📦 Остаток по категориям</h3>
+          <p class="be-note">Впишите, сколько штук <b>каждой</b> вещи категории должно быть в продаже, и нажмите «Поставить» (или «Сохранить все» внизу). Пустое поле — не менять. 0 — убрать из продажи. Легендарные вещи здесь не меняются — им остаток ставится вручную в списке ниже. Цена сама зависит от остатка: меньше штук — дороже, больше — дешевле.</p>
+          <table class="be-table adm-table"><thead><tr><th>Вид</th><th>В продаже</th><th>Штук всего</th><th>Мало (≤3)</th><th>Остаток каждой</th></tr></thead><tbody>
+          ${sum.map(r => `<tr data-sk="${r.k}"><td><button type="button" class="adm-link" data-sf="kind:${r.k}">${esc(r.name)}</button></td><td>${r.on} из ${r.total}</td><td>${r.pcs}</td><td>${r.low || '—'}</td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток: ${esc(r.name)}"><button type="button" class="pill-btn" data-set="${r.k}">Поставить</button></td></tr>`).join('')}
+          <tr data-sk="*"><td><b>Весь магазин</b></td><td><b>${sum.reduce((a, r) => a + r.on, 0)} из ${all.length}</b></td><td><b>${sum.reduce((a, r) => a + r.pcs, 0)}</b></td><td><b>${sum.reduce((a, r) => a + r.low, 0)}</b></td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток всем"><button type="button" class="pill-btn" data-set="*">Поставить всем</button></td></tr></tbody></table>
+          <p><button type="button" class="pill-btn pill-fill" id="adm-set-all">💾 Сохранить все заполненные</button></p></section>
         <div class="adm-sbar"><span class="adm-sl">Сколько:</span>${[['all', 'Все'], ['stock', '🛍 В продаже'], ['low', '⚠️ Мало (1–3)'], ['none', '✕ Нет в наличии']].map(([k, l]) => `<button type="button" class="pill-btn" data-ss="${k}" aria-pressed="${sStock === k}">${l}</button>`).join('')}
           <label class="adm-sl">Порядок: <select id="adm-sort"><option value="cat">по видам</option><option value="few"${sSort === 'few' ? ' selected' : ''}>меньше всего сверху</option><option value="many"${sSort === 'many' ? ' selected' : ''}>больше всего сверху</option></select></label></div>
         <div class="adm-sbar"><span class="adm-sl">Что:</span>${fb('all', 'Все')}${B.GIFT_KINDS.map(k => fb('kind:' + k[0], k[1][1])).join('')}${B.GIFT_THEMES.map(t => fb('theme:' + t[0], t[1][1])).join('')}</div>
-        <div class="adm-restock"><b>📦 Пополнить то, что сейчас в списке ниже</b> <small class="be-note">(${list.length} ${list.length === 1 ? 'вещь' : 'вещей'} — выберите вид, тему или найдите вещи)</small><br>
-          <label>каждой вещи + <input type="number" id="adm-rs-add" min="1" max="10000" value="5"> шт.</label>
-          <label>цена 🔘 для тех, у кого цены ещё нет: <input type="number" id="adm-rs-price" min="0" max="100000" value="10"></label>
-          <button type="button" class="pill-btn pill-fill" id="adm-rs-go"${list.length ? '' : ' disabled'}>Пополнить список (${list.length})</button>
-          <button type="button" class="pill-btn" id="adm-rs-all">Пополнить весь магазин (${all.length})</button></div>
-        <table class="be-table adm-table adm-shop"><thead><tr><th>Вещь</th><th>Вид</th><th>Цена 🔘</th><th>Количество</th><th></th></tr></thead><tbody>
+        <table class="be-table adm-table adm-shop"><thead><tr><th>Вещь</th><th>Вид</th><th>Ценность 🔘</th><th>Остаток</th><th>Цена сейчас</th></tr></thead><tbody>
         ${list.map(x => { const r = rows[x.kind + '|' + x.item] || { price: 0, stock: 0 }; const leg = B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item); return `<tr data-k="${esc(x.kind)}" data-i="${esc(x.item)}"${leg ? ' class="adm-legend"' : ''}><td class="adm-shop-it"><span class="adm-shop-pic"></span>${esc(x.name)}${leg ? ' <span class="adm-leg-tag" title="Легендарная: 1 штука на птичку, дарить нельзя">★ легендарная</span>' : ''}</td><td>${esc(x.kindName)}</td>
-          <td data-l="Цена 🔘"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.price}" data-f="price" aria-label="Цена"></td><td data-l="Количество"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.stock}" data-f="stock" aria-label="Количество"></td><td class="adm-shop-st">${r.stock > 0 ? '🛍 в продаже' : '—'}</td></tr>`; }).join('')}</tbody></table></section>`;
+          <td data-l="Цена 🔘"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.base ?? r.price}" data-f="price" aria-label="Ценность" title="Цена при обычном запасе (10 шт., у легендарных — 3)"></td><td data-l="Количество"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.stock}" data-f="stock" aria-label="Количество"></td><td class="adm-shop-st">${r.stock > 0 ? '🔘 ' + r.price : '—'}</td></tr>`; }).join('')}</tbody></table></section>`;
       main.querySelectorAll('tr[data-k]').forEach(tr => { const pic = tr.querySelector('.adm-shop-pic'); try { pic.appendChild(B.giftPic(tr.dataset.k, tr.dataset.i, 2, 48)); } catch (e) {} });
       main.querySelectorAll('[data-sf]').forEach(b => b.onclick = () => { sFilter = b.dataset.sf; draw(); });
       main.querySelectorAll('[data-ss]').forEach(b => b.onclick = () => { sStock = b.dataset.ss; draw(); });
       main.querySelector('#adm-sort').onchange = e => { sSort = e.target.value; draw(); };
-      const restock = async (e, items) => {
-        const list = items, add = +main.querySelector('#adm-rs-add').value, price = +main.querySelector('#adm-rs-price').value;
-        if (!(add > 0)) return alert('Сколько штук добавить? Больше нуля.');
-        if (!confirm(`Добавить по ${add} шт. каждой из ${list.length} вещей?` + (price ? '' : '\nВещи без цены станут бесплатными (цена 0).'))) return;
-        e.target.disabled = true;
-        try { const r = await api('admin/shop/restock', { items: list.map(x => [x.kind, x.item]), add, price }); Object.keys(rows).forEach(k => delete rows[k]); r.items.forEach(x => { rows[x.kind + '|' + x.item] = x; }); draw(); alert(`📦 Пополнено: ${r.count} вещей, +${add} шт. каждой.`); }
-        catch (x) { e.target.disabled = false; alert(err(x)); }
+      // поставить остаток: категории (или всему магазину) — каждой вещи ровно столько штук
+      const setStock = async (pairs, btn) => {
+        const items = []; let what = [];
+        for (const [k, n] of pairs) { const xs = (k === '*' ? all : all.filter(x => x.kind === k)).filter(x => !(B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item))); xs.forEach(x => items.push([x.kind, x.item, n])); what.push((k === '*' ? 'весь магазин' : (sum.find(r => r.k === k) || {}).name) + ' — по ' + n + ' шт. (' + xs.length + ')'); }
+        if (!items.length) return alert('Впишите остаток хотя бы для одной категории.');
+        if (!confirm('Поставить остаток:\n' + what.join('\n'))) return;
+        if (btn) btn.disabled = true;
+        try { const r = await api('admin/shop/restock', { items, set: true }); Object.keys(rows).forEach(k => delete rows[k]); r.items.forEach(x => { rows[x.kind + '|' + x.item] = x; }); draw(); }
+        catch (x) { if (btn) btn.disabled = false; alert(err(x)); }
       };
-      main.querySelector('#adm-rs-go').onclick = e => restock(e, list);
-      main.querySelector('#adm-rs-all').onclick = e => restock(e, all);
+      const val = tr => { const v = tr.querySelector('input').value.trim(); return v === '' ? null : Math.max(0, Math.min(10000, Math.floor(+v) || 0)); };
+      main.querySelectorAll('[data-set]').forEach(b => b.onclick = () => { const n = val(b.closest('tr')); if (n == null) return alert('Впишите число.'); setStock([[b.dataset.set, n]], b); });
+      main.querySelector('#adm-set-all').onclick = e => setStock([...main.querySelectorAll('tr[data-sk]')].map(tr => [tr.dataset.sk, val(tr)]).filter(x => x[1] != null), e.target);
       const inp = main.querySelector('#adm-sq');
       inp.oninput = () => { sq = inp.value; draw(); const x = main.querySelector('#adm-sq'); x.focus(); x.setSelectionRange(x.value.length, x.value.length); };
       main.querySelectorAll('.adm-shop input').forEach(i => i.onchange = async () => {
         const tr = i.closest('tr'), kind = tr.dataset.k, item = tr.dataset.i;
         const price = tr.querySelector('[data-f="price"]').value, stock = tr.querySelector('[data-f="stock"]').value;
         tr.classList.remove('saved');
-        try { const r = await api('admin/shop', { kind, item, price, stock }); rows[kind + '|' + item] = { kind, item, price: r.price, stock: r.stock }; tr.classList.add('saved'); tr.querySelector('.adm-shop-st').textContent = r.stock > 0 ? '🛍 в продаже' : '—'; }
+        try { const r = await api('admin/shop', { kind, item, price, stock }), cur = effPrice(r.price, r.stock, B.LEGEND && B.LEGEND.has(kind + '|' + item)); rows[kind + '|' + item] = { kind, item, base: r.price, price: cur, stock: r.stock }; tr.classList.add('saved'); tr.querySelector('.adm-shop-st').textContent = r.stock > 0 ? '🔘 ' + cur : '—'; }
         catch (e) { alert(err(e)); }
       });
     };

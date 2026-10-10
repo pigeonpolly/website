@@ -860,5 +860,5 @@
     paintBg();
     raf = requestAnimationFrame(frame);
   }
-  window.PPRoom = { mount, icon, nameOf, isRoom, RW, RH };
+  window.PPRoom = { mount, icon, nameOf, isRoom, RW, RH, defOf, ROOM_KINDS }; // defOf и ROOM_KINDS — ещё и для tools/catalog.js (ценность вещей)
 })();
