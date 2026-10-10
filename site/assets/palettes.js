@@ -4,7 +4,6 @@
   const T = {
     copy: { en: 'Copied', ru: 'Скопировано', lv: 'Nokopēts' },
     copyAll: { en: 'Copy all HEX', ru: 'Скопировать все HEX', lv: 'Kopēt visus HEX' },
-    pin: { en: 'Save to Pinterest', ru: 'Сохранить в Pinterest', lv: 'Saglabāt Pinterest' },
     another: { en: '🎲 Another palette', ru: '🎲 Другая палитра', lv: '🎲 Cita palete' },
     all: { en: 'All palettes →', ru: 'Все палитры →', lv: 'Visas paletes →' },
     title: { en: 'Palette for inspiration', ru: 'Палитра для вдохновения', lv: 'Palete iedvesmai' },
@@ -28,7 +27,7 @@
     el.innerHTML = `<a class="pal-img" href="/${esc(p.img)}" target="_blank" rel="noopener"><img src="/${esc(p.thumb)}" alt="${esc(p.title[L])}" loading="lazy" width="${p.w}" height="${p.h}"></a>
       <div class="pal-body"><h3>${esc(p.title[L])}</h3><small>${esc(G[p.gallery] ? G[p.gallery][gi] : p.gallery)}</small>
       <ul class="pal-sw">${p.colors.map(c => `<li><button type="button" data-hex="${c.hex}" style="--c:${c.hex};--i:${ink(c.hex)}" title="${esc(c[L])} ${c.hex}"><i></i><b>${esc(c[L])}</b><code>${c.hex}</code></button></li>`).join('')}</ul>
-      <div class="pal-act"><button type="button" class="pill-btn" data-all>${T.copyAll[L]}</button>${big ? '' : `<a class="pill-btn" target="_blank" rel="noopener" href="https://www.pinterest.com/pin/create/button/?url=${encodeURIComponent(location.origin + pre + '/palettes/#' + p.key)}&media=${encodeURIComponent(location.origin + '/' + p.img)}&description=${encodeURIComponent(p.title.en + ' color palette by Pigeon Polly: ' + p.colors.map(c => c.en + ' ' + c.hex).join(', '))}">📌 ${T.pin[L]}</a>`}</div></div>`;
+      <div class="pal-act"><button type="button" class="pill-btn" data-all>${T.copyAll[L]}</button></div></div>`;
     el.querySelectorAll('[data-hex]').forEach(b => b.onclick = () => copy(b.dataset.hex));
     el.querySelector('[data-all]').onclick = () => copy(p.colors.map(c => c.hex).join(' '), T.copy[L] + ' ✓');
     return el;

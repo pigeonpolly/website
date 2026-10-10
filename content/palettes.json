@@ -13,40 +13,40 @@
 },
 "colors": [
 {
-"hex": "#674E2F",
-"en": "Bark",
-"ru": "Кора",
-"lv": "Miza"
+"hex": "#C9821E",
+"en": "Honey",
+"ru": "Мёд",
+"lv": "Medus"
 },
 {
-"hex": "#826C4C",
-"en": "Mushroom",
-"ru": "Грибной",
-"lv": "Sēņu"
+"hex": "#90AE2D",
+"en": "Potion Green",
+"ru": "Зелье",
+"lv": "Dzira"
 },
 {
-"hex": "#A48316",
-"en": "Ochre",
-"ru": "Охра",
-"lv": "Okers"
+"hex": "#8B4B81",
+"en": "Berry",
+"ru": "Ягода",
+"lv": "Oga"
 },
 {
-"hex": "#B39864",
-"en": "Biscuit",
-"ru": "Печенье",
-"lv": "Cepums"
+"hex": "#6B6B72",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
 },
 {
-"hex": "#97928E",
-"en": "Pigeon Grey",
-"ru": "Голубиный серый",
-"lv": "Baložpelēks"
+"hex": "#846C4A",
+"en": "Olive",
+"ru": "Олива",
+"lv": "Olīva"
 },
 {
-"hex": "#312E2A",
-"en": "Charcoal",
-"ru": "Уголь",
-"lv": "Ogle"
+"hex": "#B4B5B7",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
 }
 ]
 },
@@ -64,37 +64,37 @@
 },
 "colors": [
 {
-"hex": "#CA7824",
+"hex": "#DD852B",
 "en": "Tangerine",
 "ru": "Мандарин",
 "lv": "Mandarīns"
 },
 {
-"hex": "#6A77AD",
+"hex": "#6574B9",
 "en": "Cornflower",
 "ru": "Василёк",
 "lv": "Rudzupuķe"
 },
 {
-"hex": "#877476",
-"en": "Smoke",
-"ru": "Дым",
-"lv": "Dūmi"
+"hex": "#91653B",
+"en": "Toast",
+"ru": "Тост",
+"lv": "Grauzdiņš"
 },
 {
-"hex": "#504352",
-"en": "Storm Cloud",
-"ru": "Грозовая туча",
-"lv": "Negaisa mākonis"
+"hex": "#5F453E",
+"en": "Cocoa",
+"ru": "Какао",
+"lv": "Kakao"
 },
 {
-"hex": "#C4AB9F",
-"en": "Dusty Rose",
-"ru": "Пыльная роза",
-"lv": "Putekļainā roze"
+"hex": "#907A7C",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
 },
 {
-"hex": "#CCC8CC",
+"hex": "#C1BDC2",
 "en": "Fog",
 "ru": "Туман",
 "lv": "Migla"
@@ -115,40 +115,40 @@
 },
 "colors": [
 {
-"hex": "#EB6041",
+"hex": "#CD4F26",
 "en": "Poppy",
 "ru": "Мак",
 "lv": "Magone"
 },
 {
-"hex": "#6C4C39",
-"en": "Bark",
-"ru": "Кора",
-"lv": "Miza"
+"hex": "#DFA449",
+"en": "Honey",
+"ru": "Мёд",
+"lv": "Medus"
 },
 {
-"hex": "#8C6C53",
-"en": "Mushroom",
-"ru": "Грибной",
-"lv": "Sēņu"
+"hex": "#4B5FB8",
+"en": "Cobalt",
+"ru": "Кобальт",
+"lv": "Kobalts"
 },
 {
-"hex": "#271811",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
+"hex": "#513F3B",
+"en": "Cocoa",
+"ru": "Какао",
+"lv": "Kakao"
 },
 {
-"hex": "#D8AE81",
-"en": "Biscuit",
-"ru": "Печенье",
-"lv": "Cepums"
+"hex": "#BEC3CA",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
 },
 {
-"hex": "#CA3E12",
-"en": "Tomato",
-"ru": "Томат",
-"lv": "Tomāts"
+"hex": "#E6CDB4",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
 }
 ]
 },
@@ -166,40 +166,40 @@
 },
 "colors": [
 {
-"hex": "#A26C64",
-"en": "Mushroom",
-"ru": "Грибной",
-"lv": "Sēņu"
-},
-{
-"hex": "#89513C",
-"en": "Chestnut",
-"ru": "Каштан",
-"lv": "Kastanis"
-},
-{
-"hex": "#D89A78",
+"hex": "#DD9571",
 "en": "Clay",
 "ru": "Глина",
 "lv": "Māls"
 },
 {
-"hex": "#DCCFBE",
-"en": "Linen",
-"ru": "Лён",
-"lv": "Lins"
+"hex": "#974C67",
+"en": "Berry",
+"ru": "Ягода",
+"lv": "Oga"
 },
 {
-"hex": "#AEA59D",
-"en": "Driftwood",
-"ru": "Плавник",
-"lv": "Dreifkoks"
+"hex": "#E1A734",
+"en": "Marigold",
+"ru": "Бархатец",
+"lv": "Samtene"
 },
 {
-"hex": "#473441",
-"en": "Charcoal",
-"ru": "Уголь",
-"lv": "Ogle"
+"hex": "#927F5D",
+"en": "Latte",
+"ru": "Латте",
+"lv": "Late"
+},
+{
+"hex": "#8B8089",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
+},
+{
+"hex": "#CCC3B6",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
 }
 ]
 },
@@ -217,40 +217,40 @@
 },
 "colors": [
 {
-"hex": "#CAAB89",
-"en": "Sand",
-"ru": "Песок",
-"lv": "Smiltis"
+"hex": "#D29541",
+"en": "Honey",
+"ru": "Мёд",
+"lv": "Medus"
 },
 {
-"hex": "#8E7562",
-"en": "Mushroom",
-"ru": "Грибной",
-"lv": "Sēņu"
+"hex": "#C05971",
+"en": "Jelly Pink",
+"ru": "Желейный розовый",
+"lv": "Želejas rozā"
 },
 {
-"hex": "#3B2B2D",
-"en": "Charcoal",
-"ru": "Уголь",
-"lv": "Ogle"
-},
-{
-"hex": "#8F4731",
-"en": "Brick",
-"ru": "Кирпич",
-"lv": "Ķieģelis"
-},
-{
-"hex": "#3D6090",
+"hex": "#37629C",
 "en": "Denim",
 "ru": "Деним",
 "lv": "Džinss"
 },
 {
-"hex": "#D4974A",
-"en": "Honey",
-"ru": "Мёд",
-"lv": "Medus"
+"hex": "#645D5B",
+"en": "Slate",
+"ru": "Сланец",
+"lv": "Slāneklis"
+},
+{
+"hex": "#A2876F",
+"en": "Driftwood",
+"ru": "Плавник",
+"lv": "Dreifkoks"
+},
+{
+"hex": "#E4CFB4",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
 }
 ]
 },
@@ -268,40 +268,40 @@
 },
 "colors": [
 {
-"hex": "#CE752E",
+"hex": "#CF6D29",
 "en": "Pumpkin",
 "ru": "Тыква",
 "lv": "Ķirbis"
 },
 {
-"hex": "#22538B",
+"hex": "#355A98",
 "en": "Denim",
 "ru": "Деним",
 "lv": "Džinss"
 },
 {
-"hex": "#824D3C",
-"en": "Chestnut",
-"ru": "Каштан",
-"lv": "Kastanis"
-},
-{
-"hex": "#D2867F",
+"hex": "#E38A88",
 "en": "Salmon",
 "ru": "Лосось",
 "lv": "Lasis"
 },
 {
-"hex": "#AD6765",
-"en": "Clay",
-"ru": "Глина",
-"lv": "Māls"
+"hex": "#673727",
+"en": "Chestnut",
+"ru": "Каштан",
+"lv": "Kastanis"
 },
 {
-"hex": "#532720",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
+"hex": "#929399",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
+},
+{
+"hex": "#BBC8D6",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
 }
 ]
 },
@@ -370,40 +370,40 @@
 },
 "colors": [
 {
-"hex": "#50332A",
-"en": "Cocoa",
-"ru": "Какао",
-"lv": "Kakao"
+"hex": "#EAB33A",
+"en": "Marigold",
+"ru": "Бархатец",
+"lv": "Samtene"
 },
 {
-"hex": "#B16065",
+"hex": "#B36266",
 "en": "Jelly Pink",
 "ru": "Желейный розовый",
 "lv": "Želejas rozā"
 },
 {
-"hex": "#4B687C",
+"hex": "#688D28",
+"en": "Potion Green",
+"ru": "Зелье",
+"lv": "Dzira"
+},
+{
+"hex": "#342A3A",
+"en": "Night Train",
+"ru": "Ночной поезд",
+"lv": "Nakts vilciens"
+},
+{
+"hex": "#4D6678",
 "en": "Harbor",
 "ru": "Гавань",
 "lv": "Osta"
 },
 {
-"hex": "#805C4D",
-"en": "Bark",
-"ru": "Кора",
-"lv": "Miza"
-},
-{
-"hex": "#8D8022",
-"en": "Brass",
-"ru": "Латунь",
-"lv": "Misiņš"
-},
-{
-"hex": "#EBB020",
-"en": "Marigold",
-"ru": "Бархатец",
-"lv": "Samtene"
+"hex": "#CBB5A5",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
 }
 ]
 },
@@ -523,40 +523,40 @@
 },
 "colors": [
 {
-"hex": "#854418",
-"en": "Cinnamon",
-"ru": "Корица",
-"lv": "Kanēlis"
-},
-{
-"hex": "#B55316",
-"en": "Terracotta",
-"ru": "Терракота",
-"lv": "Terakota"
-},
-{
-"hex": "#E5A44D",
-"en": "Honey",
-"ru": "Мёд",
-"lv": "Medus"
-},
-{
-"hex": "#EA7814",
-"en": "Persimmon",
-"ru": "Хурма",
-"lv": "Hurma"
-},
-{
-"hex": "#F9B71A",
+"hex": "#F4B93E",
 "en": "Marigold",
 "ru": "Бархатец",
 "lv": "Samtene"
 },
 {
-"hex": "#C48E6D",
-"en": "Clay",
-"ru": "Глина",
-"lv": "Māls"
+"hex": "#CA5920",
+"en": "Pumpkin",
+"ru": "Тыква",
+"lv": "Ķirbis"
+},
+{
+"hex": "#D39960",
+"en": "Biscuit",
+"ru": "Печенье",
+"lv": "Cepums"
+},
+{
+"hex": "#120D0B",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#49301F",
+"en": "Coffee Bean",
+"ru": "Кофейное зерно",
+"lv": "Kafijas pupiņa"
+},
+{
+"hex": "#8C686B",
+"en": "Mauve",
+"ru": "Мальва",
+"lv": "Malva"
 }
 ]
 },
@@ -574,40 +574,40 @@
 },
 "colors": [
 {
-"hex": "#B15F65",
-"en": "Jelly Pink",
-"ru": "Желейный розовый",
-"lv": "Želejas rozā"
-},
-{
-"hex": "#4D2B28",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
-},
-{
-"hex": "#E1A01C",
+"hex": "#EDAE38",
 "en": "Marigold",
 "ru": "Бархатец",
 "lv": "Samtene"
 },
 {
-"hex": "#744933",
-"en": "Chestnut",
-"ru": "Каштан",
-"lv": "Kastanis"
+"hex": "#B46166",
+"en": "Jelly Pink",
+"ru": "Желейный розовый",
+"lv": "Želejas rozā"
 },
 {
-"hex": "#4C687B",
+"hex": "#765493",
+"en": "Pigeon Purple",
+"ru": "Голубиный фиолетовый",
+"lv": "Baložvioleta"
+},
+{
+"hex": "#3B3141",
+"en": "Night Train",
+"ru": "Ночной поезд",
+"lv": "Nakts vilciens"
+},
+{
+"hex": "#50677A",
 "en": "Harbor",
 "ru": "Гавань",
 "lv": "Osta"
 },
 {
-"hex": "#1D1317",
-"en": "Ink Black",
-"ru": "Чернила",
-"lv": "Tinte"
+"hex": "#7E6F67",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
 }
 ]
 },
@@ -625,40 +625,40 @@
 },
 "colors": [
 {
-"hex": "#040410",
+"hex": "#E4B034",
+"en": "Marigold",
+"ru": "Бархатец",
+"lv": "Samtene"
+},
+{
+"hex": "#A12F0F",
+"en": "Rust",
+"ru": "Ржавчина",
+"lv": "Rūsa"
+},
+{
+"hex": "#648818",
+"en": "Potion Green",
+"ru": "Зелье",
+"lv": "Dzira"
+},
+{
+"hex": "#060611",
 "en": "Ink Black",
 "ru": "Чернила",
 "lv": "Tinte"
 },
 {
-"hex": "#442D17",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
-},
-{
-"hex": "#988C78",
-"en": "Driftwood",
-"ru": "Плавник",
-"lv": "Dreifkoks"
-},
-{
-"hex": "#5B5450",
-"en": "Slate",
-"ru": "Сланец",
-"lv": "Slāneklis"
-},
-{
-"hex": "#CBC2BA",
-"en": "Fog",
-"ru": "Туман",
-"lv": "Migla"
-},
-{
-"hex": "#624523",
+"hex": "#595147",
 "en": "Bark",
 "ru": "Кора",
 "lv": "Miza"
+},
+{
+"hex": "#96908B",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
 }
 ]
 },
@@ -682,34 +682,34 @@
 "lv": "Medus"
 },
 {
-"hex": "#394866",
-"en": "Storm Cloud",
-"ru": "Грозовая туча",
-"lv": "Negaisa mākonis"
+"hex": "#C25D41",
+"en": "Terracotta",
+"ru": "Терракота",
+"lv": "Terakota"
 },
 {
-"hex": "#9E634A",
-"en": "Cinnamon",
-"ru": "Корица",
-"lv": "Kanēlis"
+"hex": "#39757B",
+"en": "Deep Teal",
+"ru": "Глубокая бирюза",
+"lv": "Dziļi tirkīzs"
 },
 {
-"hex": "#CDC3B1",
+"hex": "#7D6670",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
+},
+{
+"hex": "#2D8780",
+"en": "Teal",
+"ru": "Бирюза",
+"lv": "Zilganzaļš"
+},
+{
+"hex": "#CEC4B3",
 "en": "Oat Milk",
 "ru": "Овсяное молоко",
 "lv": "Auzu piens"
-},
-{
-"hex": "#848178",
-"en": "Mushroom",
-"ru": "Грибной",
-"lv": "Sēņu"
-},
-{
-"hex": "#D5AE79",
-"en": "Biscuit",
-"ru": "Печенье",
-"lv": "Cepums"
 }
 ]
 },
@@ -727,40 +727,40 @@
 },
 "colors": [
 {
-"hex": "#51180E",
-"en": "Burgundy",
-"ru": "Бордо",
-"lv": "Burgundietis"
+"hex": "#AE6B4A",
+"en": "Copper",
+"ru": "Медь",
+"lv": "Varš"
 },
 {
-"hex": "#84442F",
-"en": "Cinnamon",
-"ru": "Корица",
-"lv": "Kanēlis"
+"hex": "#7A3253",
+"en": "Plum Jam",
+"ru": "Сливовый джем",
+"lv": "Plūmju ievārījums"
 },
 {
-"hex": "#562C40",
-"en": "Aubergine",
-"ru": "Баклажан",
-"lv": "Baklažāns"
+"hex": "#796C91",
+"en": "Lilac",
+"ru": "Сирень",
+"lv": "Ceriņi"
 },
 {
-"hex": "#B4784D",
-"en": "Toast",
-"ru": "Тост",
-"lv": "Grauzdiņš"
+"hex": "#392121",
+"en": "Coffee Bean",
+"ru": "Кофейное зерно",
+"lv": "Kafijas pupiņa"
 },
 {
-"hex": "#BB9E88",
-"en": "Driftwood",
-"ru": "Плавник",
-"lv": "Dreifkoks"
+"hex": "#73504B",
+"en": "Cocoa",
+"ru": "Какао",
+"lv": "Kakao"
 },
 {
-"hex": "#856D7B",
-"en": "Mauve",
-"ru": "Мальва",
-"lv": "Malva"
+"hex": "#AD9FB1",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
 }
 ]
 },
@@ -778,40 +778,40 @@
 },
 "colors": [
 {
-"hex": "#CDBA92",
-"en": "Sand",
-"ru": "Песок",
-"lv": "Smiltis"
-},
-{
-"hex": "#5B3726",
-"en": "Cocoa",
-"ru": "Какао",
-"lv": "Kakao"
-},
-{
-"hex": "#968059",
-"en": "Latte",
-"ru": "Латте",
-"lv": "Late"
-},
-{
-"hex": "#435A68",
-"en": "Harbor",
-"ru": "Гавань",
-"lv": "Osta"
-},
-{
-"hex": "#A22E07",
+"hex": "#9A2E0D",
 "en": "Rust",
 "ru": "Ржавчина",
 "lv": "Rūsa"
 },
 {
-"hex": "#715F4E",
-"en": "Bark",
-"ru": "Кора",
-"lv": "Miza"
+"hex": "#E6B133",
+"en": "Marigold",
+"ru": "Бархатец",
+"lv": "Samtene"
+},
+{
+"hex": "#896829",
+"en": "Toast",
+"ru": "Тост",
+"lv": "Grauzdiņš"
+},
+{
+"hex": "#2B2323",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#485B6C",
+"en": "Harbor",
+"ru": "Гавань",
+"lv": "Osta"
+},
+{
+"hex": "#CEBA93",
+"en": "Sand",
+"ru": "Песок",
+"lv": "Smiltis"
 }
 ]
 },
@@ -1033,37 +1033,37 @@
 },
 "colors": [
 {
-"hex": "#3B2C1E",
+"hex": "#A52C19",
+"en": "Cherry",
+"ru": "Вишня",
+"lv": "Ķirsis"
+},
+{
+"hex": "#3A73DC",
+"en": "Cobalt",
+"ru": "Кобальт",
+"lv": "Kobalts"
+},
+{
+"hex": "#517C24",
+"en": "Moss",
+"ru": "Мох",
+"lv": "Sūna"
+},
+{
+"hex": "#2B241C",
 "en": "Coffee Bean",
 "ru": "Кофейное зерно",
 "lv": "Kafijas pupiņa"
 },
 {
-"hex": "#7D5A3A",
-"en": "Bark",
-"ru": "Кора",
-"lv": "Miza"
+"hex": "#A4A195",
+"en": "Driftwood",
+"ru": "Плавник",
+"lv": "Dreifkoks"
 },
 {
-"hex": "#AC886A",
-"en": "Latte",
-"ru": "Латте",
-"lv": "Late"
-},
-{
-"hex": "#3772B2",
-"en": "Denim",
-"ru": "Деним",
-"lv": "Džinss"
-},
-{
-"hex": "#B0A790",
-"en": "Lichen",
-"ru": "Лишайник",
-"lv": "Ķērpis"
-},
-{
-"hex": "#DCD8C1",
+"hex": "#DFDCC6",
 "en": "Linen",
 "ru": "Лён",
 "lv": "Lins"
@@ -1084,40 +1084,40 @@
 },
 "colors": [
 {
-"hex": "#956035",
+"hex": "#A5AC2C",
+"en": "Potion Green",
+"ru": "Зелье",
+"lv": "Dzira"
+},
+{
+"hex": "#975626",
 "en": "Cinnamon",
 "ru": "Корица",
 "lv": "Kanēlis"
 },
 {
-"hex": "#724028",
-"en": "Chestnut",
-"ru": "Каштан",
-"lv": "Kastanis"
+"hex": "#8889CE",
+"en": "Wisteria",
+"ru": "Глициния",
+"lv": "Glicīnija"
 },
 {
-"hex": "#B67B4E",
-"en": "Toast",
-"ru": "Тост",
-"lv": "Grauzdiņš"
+"hex": "#6A4235",
+"en": "Cocoa",
+"ru": "Какао",
+"lv": "Kakao"
 },
 {
-"hex": "#BABF20",
-"en": "Lime",
-"ru": "Лайм",
-"lv": "Laims"
+"hex": "#99989D",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
 },
 {
-"hex": "#8BBDD6",
-"en": "Sky",
-"ru": "Небо",
-"lv": "Debesis"
-},
-{
-"hex": "#6B80BB",
-"en": "Cornflower",
-"ru": "Василёк",
-"lv": "Rudzupuķe"
+"hex": "#D8D9DE",
+"en": "Ice",
+"ru": "Лёд",
+"lv": "Ledus"
 }
 ]
 },
@@ -1135,40 +1135,40 @@
 },
 "colors": [
 {
-"hex": "#E77A23",
-"en": "Pumpkin",
-"ru": "Тыква",
-"lv": "Ķirbis"
+"hex": "#EE9238",
+"en": "Tangerine",
+"ru": "Мандарин",
+"lv": "Mandarīns"
 },
 {
-"hex": "#BA4B1B",
-"en": "Poppy",
-"ru": "Мак",
-"lv": "Magone"
+"hex": "#9E3A16",
+"en": "Rust",
+"ru": "Ржавчина",
+"lv": "Rūsa"
 },
 {
-"hex": "#663615",
-"en": "Chestnut",
-"ru": "Каштан",
-"lv": "Kastanis"
+"hex": "#A0992A",
+"en": "Mustard",
+"ru": "Горчица",
+"lv": "Sinepes"
 },
 {
-"hex": "#C5A079",
-"en": "Biscuit",
-"ru": "Печенье",
-"lv": "Cepums"
+"hex": "#4A4750",
+"en": "Storm Cloud",
+"ru": "Грозовая туча",
+"lv": "Negaisa mākonis"
 },
 {
-"hex": "#E9CEB0",
-"en": "Oat Milk",
-"ru": "Овсяное молоко",
-"lv": "Auzu piens"
+"hex": "#787888",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
 },
 {
-"hex": "#7D7E8F",
-"en": "Pigeon Grey",
-"ru": "Голубиный серый",
-"lv": "Baložpelēks"
+"hex": "#ACACC0",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
 }
 ]
 },
@@ -1237,40 +1237,40 @@
 },
 "colors": [
 {
-"hex": "#E679BB",
-"en": "Fuchsia",
-"ru": "Фуксия",
-"lv": "Fuksija"
-},
-{
-"hex": "#EBCE18",
-"en": "Lemon",
-"ru": "Лимон",
-"lv": "Citrons"
-},
-{
-"hex": "#CE0D1D",
+"hex": "#D13B32",
 "en": "Tomato",
 "ru": "Томат",
 "lv": "Tomāts"
 },
 {
-"hex": "#AA7835",
-"en": "Toast",
-"ru": "Тост",
-"lv": "Grauzdiņš"
+"hex": "#E9CC45",
+"en": "Lemon",
+"ru": "Лимон",
+"lv": "Citrons"
 },
 {
-"hex": "#2B215B",
-"en": "Violet Ink",
-"ru": "Фиолетовые чернила",
-"lv": "Violetā tinte"
+"hex": "#D254AD",
+"en": "Fuchsia",
+"ru": "Фуксия",
+"lv": "Fuksija"
 },
 {
-"hex": "#D64372",
-"en": "Raspberry",
-"ru": "Малина",
-"lv": "Avene"
+"hex": "#7F7583",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
+},
+{
+"hex": "#A9C2E4",
+"en": "Sky",
+"ru": "Небо",
+"lv": "Debesis"
+},
+{
+"hex": "#E8C3DB",
+"en": "Blush",
+"ru": "Румянец",
+"lv": "Sārtums"
 }
 ]
 },
@@ -1288,40 +1288,40 @@
 },
 "colors": [
 {
-"hex": "#4A3A21",
-"en": "Bark",
-"ru": "Кора",
-"lv": "Miza"
-},
-{
-"hex": "#83401F",
-"en": "Cinnamon",
-"ru": "Корица",
-"lv": "Kanēlis"
-},
-{
-"hex": "#301213",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
-},
-{
-"hex": "#C9CE52",
+"hex": "#C5D256",
 "en": "Lime",
 "ru": "Лайм",
 "lv": "Laims"
 },
 {
-"hex": "#9EB044",
-"en": "Potion Green",
-"ru": "Зелье",
-"lv": "Dzira"
+"hex": "#893616",
+"en": "Rust",
+"ru": "Ржавчина",
+"lv": "Rūsa"
 },
 {
-"hex": "#A96C39",
-"en": "Copper",
-"ru": "Медь",
-"lv": "Varš"
+"hex": "#1C6B0E",
+"en": "Emerald",
+"ru": "Изумруд",
+"lv": "Smaragds"
+},
+{
+"hex": "#4B3728",
+"en": "Cocoa",
+"ru": "Какао",
+"lv": "Kakao"
+},
+{
+"hex": "#ABA1A2",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
+},
+{
+"hex": "#E3DAD7",
+"en": "Paper White",
+"ru": "Белая бумага",
+"lv": "Papīra balts"
 }
 ]
 },
@@ -1339,40 +1339,40 @@
 },
 "colors": [
 {
-"hex": "#A61510",
-"en": "Cherry",
-"ru": "Вишня",
-"lv": "Ķirsis"
-},
-{
-"hex": "#E02218",
+"hex": "#E14F36",
 "en": "Tomato",
 "ru": "Томат",
 "lv": "Tomāts"
 },
 {
-"hex": "#F54B31",
-"en": "Poppy",
-"ru": "Мак",
-"lv": "Magone"
+"hex": "#64862C",
+"en": "Potion Green",
+"ru": "Зелье",
+"lv": "Dzira"
 },
 {
-"hex": "#701D16",
-"en": "Burgundy",
-"ru": "Бордо",
-"lv": "Burgundietis"
+"hex": "#C28A34",
+"en": "Ochre",
+"ru": "Охра",
+"lv": "Okers"
 },
 {
-"hex": "#8D7D35",
-"en": "Brass",
-"ru": "Латунь",
-"lv": "Misiņš"
+"hex": "#5C4B50",
+"en": "Storm Cloud",
+"ru": "Грозовая туча",
+"lv": "Negaisa mākonis"
 },
 {
-"hex": "#13426C",
-"en": "Denim",
-"ru": "Деним",
-"lv": "Džinss"
+"hex": "#A39DA1",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
+},
+{
+"hex": "#D9D6D5",
+"en": "Ice",
+"ru": "Лёд",
+"lv": "Ledus"
 }
 ]
 },
@@ -1390,40 +1390,40 @@
 },
 "colors": [
 {
-"hex": "#B26124",
-"en": "Copper",
-"ru": "Медь",
-"lv": "Varš"
+"hex": "#CB6E23",
+"en": "Pumpkin",
+"ru": "Тыква",
+"lv": "Ķirbis"
 },
 {
-"hex": "#7E411C",
-"en": "Cinnamon",
-"ru": "Корица",
-"lv": "Kanēlis"
+"hex": "#9C2F4F",
+"en": "Raspberry",
+"ru": "Малина",
+"lv": "Avene"
 },
 {
-"hex": "#472518",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
+"hex": "#6A3B20",
+"en": "Chestnut",
+"ru": "Каштан",
+"lv": "Kastanis"
 },
 {
-"hex": "#DF8414",
-"en": "Tangerine",
-"ru": "Мандарин",
-"lv": "Mandarīns"
+"hex": "#675552",
+"en": "Bark",
+"ru": "Кора",
+"lv": "Miza"
 },
 {
-"hex": "#DB9046",
-"en": "Honey",
-"ru": "Мёд",
-"lv": "Medus"
+"hex": "#A79594",
+"en": "Dusty Rose",
+"ru": "Пыльная роза",
+"lv": "Putekļainā roze"
 },
 {
-"hex": "#C25281",
-"en": "Jelly Pink",
-"ru": "Желейный розовый",
-"lv": "Želejas rozā"
+"hex": "#E1D2CF",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
 }
 ]
 },
@@ -1492,40 +1492,40 @@
 },
 "colors": [
 {
-"hex": "#5C2A14",
-"en": "Chestnut",
-"ru": "Каштан",
-"lv": "Kastanis"
+"hex": "#C6511F",
+"en": "Poppy",
+"ru": "Мак",
+"lv": "Magone"
 },
 {
-"hex": "#2A0E07",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
+"hex": "#DBB536",
+"en": "Mustard",
+"ru": "Горчица",
+"lv": "Sinepes"
 },
 {
-"hex": "#B14712",
-"en": "Rust",
-"ru": "Ржавчина",
-"lv": "Rūsa"
-},
-{
-"hex": "#DE8F0E",
-"en": "Tangerine",
-"ru": "Мандарин",
-"lv": "Mandarīns"
-},
-{
-"hex": "#9E7142",
+"hex": "#9A6632",
 "en": "Toast",
 "ru": "Тост",
 "lv": "Grauzdiņš"
 },
 {
-"hex": "#6D5945",
-"en": "Bark",
-"ru": "Кора",
-"lv": "Miza"
+"hex": "#231008",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#817563",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
+},
+{
+"hex": "#C9BEA7",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
 }
 ]
 },
@@ -1543,40 +1543,40 @@
 },
 "colors": [
 {
-"hex": "#4D2B1F",
+"hex": "#AB4722",
+"en": "Rust",
+"ru": "Ржавчина",
+"lv": "Rūsa"
+},
+{
+"hex": "#DDCF62",
+"en": "Lemon",
+"ru": "Лимон",
+"lv": "Citrons"
+},
+{
+"hex": "#87773F",
+"en": "Olive",
+"ru": "Олива",
+"lv": "Olīva"
+},
+{
+"hex": "#493A2E",
 "en": "Coffee Bean",
 "ru": "Кофейное зерно",
 "lv": "Kafijas pupiņa"
 },
 {
-"hex": "#BA4A20",
-"en": "Poppy",
-"ru": "Мак",
-"lv": "Magone"
+"hex": "#9B8475",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
 },
 {
-"hex": "#6A573F",
-"en": "Bark",
-"ru": "Кора",
-"lv": "Miza"
-},
-{
-"hex": "#998B44",
-"en": "Brass",
-"ru": "Латунь",
-"lv": "Misiņš"
-},
-{
-"hex": "#D1B258",
-"en": "Golden Hour",
-"ru": "Золотой час",
-"lv": "Zelta stunda"
-},
-{
-"hex": "#D0C3B2",
-"en": "Oat Milk",
-"ru": "Овсяное молоко",
-"lv": "Auzu piens"
+"hex": "#E7DBCB",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
 }
 ]
 },
@@ -1594,40 +1594,40 @@
 },
 "colors": [
 {
+"hex": "#EEAE42",
+"en": "Marigold",
+"ru": "Бархатец",
+"lv": "Samtene"
+},
+{
+"hex": "#96A959",
+"en": "Pistachio",
+"ru": "Фисташка",
+"lv": "Pistācija"
+},
+{
+"hex": "#BE562D",
+"en": "Terracotta",
+"ru": "Терракота",
+"lv": "Terakota"
+},
+{
 "hex": "#1E272E",
 "en": "Charcoal",
 "ru": "Уголь",
 "lv": "Ogle"
 },
 {
-"hex": "#435E2E",
-"en": "Moss",
-"ru": "Мох",
-"lv": "Sūna"
+"hex": "#314124",
+"en": "Forest",
+"ru": "Лес",
+"lv": "Mežs"
 },
 {
-"hex": "#EDAD3F",
-"en": "Marigold",
-"ru": "Бархатец",
-"lv": "Samtene"
-},
-{
-"hex": "#AC6D31",
-"en": "Copper",
-"ru": "Медь",
-"lv": "Varš"
-},
-{
-"hex": "#9FAD5D",
-"en": "Pistachio",
-"ru": "Фисташка",
-"lv": "Pistācija"
-},
-{
-"hex": "#A2A7A9",
-"en": "Fog",
-"ru": "Туман",
-"lv": "Migla"
+"hex": "#9DA2A4",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
 }
 ]
 },
@@ -1645,40 +1645,40 @@
 },
 "colors": [
 {
-"hex": "#BB0505",
+"hex": "#DC4329",
 "en": "Tomato",
 "ru": "Томат",
 "lv": "Tomāts"
 },
 {
-"hex": "#EC0403",
-"en": "Poppy",
-"ru": "Мак",
-"lv": "Magone"
-},
-{
-"hex": "#7D0A0A",
+"hex": "#93120C",
 "en": "Cherry",
 "ru": "Вишня",
 "lv": "Ķirsis"
 },
 {
-"hex": "#C9A01D",
+"hex": "#C9A630",
 "en": "Mustard",
 "ru": "Горчица",
 "lv": "Sinepes"
 },
 {
-"hex": "#0F5A92",
-"en": "Denim",
-"ru": "Деним",
-"lv": "Džinss"
-},
-{
-"hex": "#160A0B",
+"hex": "#191212",
 "en": "Ink Black",
 "ru": "Чернила",
 "lv": "Tinte"
+},
+{
+"hex": "#696264",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
+},
+{
+"hex": "#A79C99",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
 }
 ]
 },
@@ -1696,40 +1696,40 @@
 },
 "colors": [
 {
-"hex": "#7BBED1",
-"en": "Sky",
-"ru": "Небо",
-"lv": "Debesis"
-},
-{
-"hex": "#52342A",
-"en": "Cocoa",
-"ru": "Какао",
-"lv": "Kakao"
-},
-{
-"hex": "#632276",
+"hex": "#661D7B",
 "en": "Violet Ink",
 "ru": "Фиолетовые чернила",
 "lv": "Violetā tinte"
 },
 {
-"hex": "#A8D2DF",
-"en": "Duck Egg",
-"ru": "Утиное яйцо",
-"lv": "Pīles ola"
+"hex": "#DC5F2A",
+"en": "Poppy",
+"ru": "Мак",
+"lv": "Magone"
 },
 {
-"hex": "#8B9FA7",
-"en": "Rain",
-"ru": "Дождь",
-"lv": "Lietus"
+"hex": "#86371F",
+"en": "Rust",
+"ru": "Ржавчина",
+"lv": "Rūsa"
 },
 {
-"hex": "#6B7075",
-"en": "Smoke",
-"ru": "Дым",
-"lv": "Dūmi"
+"hex": "#593C2D",
+"en": "Cocoa",
+"ru": "Какао",
+"lv": "Kakao"
+},
+{
+"hex": "#64696E",
+"en": "Slate",
+"ru": "Сланец",
+"lv": "Slāneklis"
+},
+{
+"hex": "#7BBED1",
+"en": "Sky",
+"ru": "Небо",
+"lv": "Debesis"
 }
 ]
 },
@@ -1747,40 +1747,40 @@
 },
 "colors": [
 {
-"hex": "#8D4B14",
+"hex": "#E3712A",
+"en": "Pumpkin",
+"ru": "Тыква",
+"lv": "Ķirbis"
+},
+{
+"hex": "#7F4617",
 "en": "Cinnamon",
 "ru": "Корица",
 "lv": "Kanēlis"
 },
 {
-"hex": "#E46C06",
-"en": "Persimmon",
-"ru": "Хурма",
-"lv": "Hurma"
-},
-{
-"hex": "#5E3F12",
-"en": "Chestnut",
-"ru": "Каштан",
-"lv": "Kastanis"
-},
-{
-"hex": "#857130",
+"hex": "#796B1C",
 "en": "Olive",
 "ru": "Олива",
 "lv": "Olīva"
 },
 {
-"hex": "#1A1813",
+"hex": "#191713",
 "en": "Ink Black",
 "ru": "Чернила",
 "lv": "Tinte"
 },
 {
-"hex": "#C7995E",
-"en": "Biscuit",
-"ru": "Печенье",
-"lv": "Cepums"
+"hex": "#66666A",
+"en": "Slate",
+"ru": "Сланец",
+"lv": "Slāneklis"
+},
+{
+"hex": "#AEACB0",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
 }
 ]
 },
@@ -1798,40 +1798,40 @@
 },
 "colors": [
 {
+"hex": "#F9B648",
+"en": "Marigold",
+"ru": "Бархатец",
+"lv": "Samtene"
+},
+{
+"hex": "#94541C",
+"en": "Cinnamon",
+"ru": "Корица",
+"lv": "Kanēlis"
+},
+{
+"hex": "#852824",
+"en": "Brick",
+"ru": "Кирпич",
+"lv": "Ķieģelis"
+},
+{
 "hex": "#1F1724",
 "en": "Ink Black",
 "ru": "Чернила",
 "lv": "Tinte"
 },
 {
-"hex": "#7F592C",
-"en": "Cinnamon",
-"ru": "Корица",
-"lv": "Kanēlis"
+"hex": "#60462E",
+"en": "Bark",
+"ru": "Кора",
+"lv": "Miza"
 },
 {
-"hex": "#ECA32B",
-"en": "Marigold",
-"ru": "Бархатец",
-"lv": "Samtene"
-},
-{
-"hex": "#75231D",
-"en": "Burgundy",
-"ru": "Бордо",
-"lv": "Burgundietis"
-},
-{
-"hex": "#284709",
-"en": "Pine",
-"ru": "Сосна",
-"lv": "Priede"
-},
-{
-"hex": "#383561",
-"en": "Twilight",
-"ru": "Сумерки",
-"lv": "Krēsla"
+"hex": "#7F8286",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
 }
 ]
 },
@@ -1849,40 +1849,40 @@
 },
 "colors": [
 {
-"hex": "#9D3D14",
-"en": "Rust",
-"ru": "Ржавчина",
-"lv": "Rūsa"
+"hex": "#BE4E1D",
+"en": "Poppy",
+"ru": "Мак",
+"lv": "Magone"
 },
 {
-"hex": "#C95A16",
-"en": "Pumpkin",
-"ru": "Тыква",
-"lv": "Ķirbis"
+"hex": "#E8C244",
+"en": "Lemon",
+"ru": "Лимон",
+"lv": "Citrons"
 },
 {
-"hex": "#442213",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
+"hex": "#6E3519",
+"en": "Chestnut",
+"ru": "Каштан",
+"lv": "Kastanis"
 },
 {
-"hex": "#E0AB28",
-"en": "Marigold",
-"ru": "Бархатец",
-"lv": "Samtene"
-},
-{
-"hex": "#11100D",
+"hex": "#141615",
 "en": "Ink Black",
 "ru": "Чернила",
 "lv": "Tinte"
 },
 {
-"hex": "#757966",
-"en": "Mushroom",
-"ru": "Грибной",
-"lv": "Sēņu"
+"hex": "#898F88",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
+},
+{
+"hex": "#D2D4CE",
+"en": "Duck Egg",
+"ru": "Утиное яйцо",
+"lv": "Pīles ola"
 }
 ]
 },
@@ -1900,40 +1900,40 @@
 },
 "colors": [
 {
-"hex": "#9A7E68",
-"en": "Mushroom",
-"ru": "Грибной",
-"lv": "Sēņu"
+"hex": "#76411E",
+"en": "Cinnamon",
+"ru": "Корица",
+"lv": "Kanēlis"
 },
 {
-"hex": "#5B412F",
-"en": "Bark",
-"ru": "Кора",
-"lv": "Miza"
+"hex": "#C8A587",
+"en": "Latte",
+"ru": "Латте",
+"lv": "Late"
 },
 {
-"hex": "#735E50",
-"en": "Cocoa",
-"ru": "Какао",
-"lv": "Kakao"
-},
-{
-"hex": "#020202",
+"hex": "#050304",
 "en": "Ink Black",
 "ru": "Чернила",
 "lv": "Tinte"
 },
 {
-"hex": "#B5A8A5",
+"hex": "#473D3F",
+"en": "Charcoal",
+"ru": "Уголь",
+"lv": "Ogle"
+},
+{
+"hex": "#968788",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
+},
+{
+"hex": "#D7D0D3",
 "en": "Fog",
 "ru": "Туман",
 "lv": "Migla"
-},
-{
-"hex": "#D2C8C9",
-"en": "Linen",
-"ru": "Лён",
-"lv": "Lins"
 }
 ]
 },
@@ -1951,37 +1951,37 @@
 },
 "colors": [
 {
-"hex": "#9B453D",
-"en": "Brick",
-"ru": "Кирпич",
-"lv": "Ķieģelis"
+"hex": "#B3382F",
+"en": "Cherry",
+"ru": "Вишня",
+"lv": "Ķirsis"
 },
 {
-"hex": "#7C1E1B",
-"en": "Burgundy",
-"ru": "Бордо",
-"lv": "Burgundietis"
+"hex": "#E3B75F",
+"en": "Golden Hour",
+"ru": "Золотой час",
+"lv": "Zelta stunda"
 },
 {
-"hex": "#BC665A",
-"en": "Salmon",
-"ru": "Лосось",
-"lv": "Lasis"
+"hex": "#E49E92",
+"en": "Blush",
+"ru": "Румянец",
+"lv": "Sārtums"
 },
 {
-"hex": "#BE9D95",
-"en": "Dusty Rose",
-"ru": "Пыльная роза",
-"lv": "Putekļainā roze"
-},
-{
-"hex": "#131015",
+"hex": "#141116",
 "en": "Ink Black",
 "ru": "Чернила",
 "lv": "Tinte"
 },
 {
-"hex": "#E4CEC5",
+"hex": "#99847D",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
+},
+{
+"hex": "#E7D6CC",
 "en": "Linen",
 "ru": "Лён",
 "lv": "Lins"
@@ -2002,37 +2002,37 @@
 },
 "colors": [
 {
-"hex": "#E2D0BE",
-"en": "Linen",
-"ru": "Лён",
-"lv": "Lins"
+"hex": "#842A47",
+"en": "Berry",
+"ru": "Ягода",
+"lv": "Oga"
 },
 {
-"hex": "#4E4C58",
+"hex": "#2D3E6E",
+"en": "Twilight",
+"ru": "Сумерки",
+"lv": "Krēsla"
+},
+{
+"hex": "#947748",
+"en": "Latte",
+"ru": "Латте",
+"lv": "Late"
+},
+{
+"hex": "#514F53",
 "en": "Storm Cloud",
 "ru": "Грозовая туча",
 "lv": "Negaisa mākonis"
 },
 {
-"hex": "#25262D",
-"en": "Charcoal",
-"ru": "Уголь",
-"lv": "Ogle"
+"hex": "#96959A",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
 },
 {
-"hex": "#847070",
-"en": "Mushroom",
-"ru": "Грибной",
-"lv": "Sēņu"
-},
-{
-"hex": "#9BBADC",
-"en": "Sky",
-"ru": "Небо",
-"lv": "Debesis"
-},
-{
-"hex": "#B8B3AD",
+"hex": "#D4D3D1",
 "en": "Fog",
 "ru": "Туман",
 "lv": "Migla"
@@ -2053,40 +2053,40 @@
 },
 "colors": [
 {
-"hex": "#BDD3E9",
-"en": "Ice",
-"ru": "Лёд",
-"lv": "Ledus"
-},
-{
-"hex": "#CDA77D",
-"en": "Biscuit",
-"ru": "Печенье",
-"lv": "Cepums"
-},
-{
-"hex": "#B71D31",
+"hex": "#B92730",
 "en": "Cherry",
 "ru": "Вишня",
 "lv": "Ķirsis"
 },
 {
-"hex": "#A58D75",
-"en": "Driftwood",
-"ru": "Плавник",
-"lv": "Dreifkoks"
+"hex": "#D09E6D",
+"en": "Biscuit",
+"ru": "Печенье",
+"lv": "Cepums"
 },
 {
-"hex": "#AEB2C6",
-"en": "Fog",
-"ru": "Туман",
-"lv": "Migla"
+"hex": "#B590A5",
+"en": "Mauve",
+"ru": "Мальва",
+"lv": "Malva"
 },
 {
-"hex": "#625C59",
-"en": "Slate",
-"ru": "Сланец",
-"lv": "Slāneklis"
+"hex": "#383737",
+"en": "Charcoal",
+"ru": "Уголь",
+"lv": "Ogle"
+},
+{
+"hex": "#8C7963",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
+},
+{
+"hex": "#B9D0E9",
+"en": "Sky",
+"ru": "Небо",
+"lv": "Debesis"
 }
 ]
 },
@@ -2104,40 +2104,40 @@
 },
 "colors": [
 {
-"hex": "#937B5D",
-"en": "Mushroom",
-"ru": "Грибной",
-"lv": "Sēņu"
+"hex": "#845406",
+"en": "Toast",
+"ru": "Тост",
+"lv": "Grauzdiņš"
 },
 {
-"hex": "#B1987D",
-"en": "Driftwood",
-"ru": "Плавник",
-"lv": "Dreifkoks"
+"hex": "#E8A98F",
+"en": "Peach",
+"ru": "Персик",
+"lv": "Persiks"
 },
 {
-"hex": "#624D38",
-"en": "Bark",
-"ru": "Кора",
-"lv": "Miza"
+"hex": "#723D30",
+"en": "Chestnut",
+"ru": "Каштан",
+"lv": "Kastanis"
 },
 {
-"hex": "#C7B1A2",
-"en": "Oat Milk",
-"ru": "Овсяное молоко",
-"lv": "Auzu piens"
-},
-{
-"hex": "#180B07",
+"hex": "#1E120F",
 "en": "Ink Black",
 "ru": "Чернила",
 "lv": "Tinte"
 },
 {
-"hex": "#7C510E",
-"en": "Cinnamon",
-"ru": "Корица",
-"lv": "Kanēlis"
+"hex": "#A48A6C",
+"en": "Latte",
+"ru": "Латте",
+"lv": "Late"
+},
+{
+"hex": "#E7DECA",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
 }
 ]
 },
@@ -2155,40 +2155,40 @@
 },
 "colors": [
 {
-"hex": "#1C130E",
+"hex": "#D94384",
+"en": "Fuchsia",
+"ru": "Фуксия",
+"lv": "Fuksija"
+},
+{
+"hex": "#DE9A35",
+"en": "Honey",
+"ru": "Мёд",
+"lv": "Medus"
+},
+{
+"hex": "#994F39",
+"en": "Brick",
+"ru": "Кирпич",
+"lv": "Ķieģelis"
+},
+{
+"hex": "#110C0A",
 "en": "Ink Black",
 "ru": "Чернила",
 "lv": "Tinte"
 },
 {
-"hex": "#CEB7A3",
-"en": "Oat Milk",
-"ru": "Овсяное молоко",
-"lv": "Auzu piens"
+"hex": "#B4A989",
+"en": "Lichen",
+"ru": "Лишайник",
+"lv": "Ķērpis"
 },
 {
-"hex": "#4E3735",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
-},
-{
-"hex": "#AB6F5E",
-"en": "Clay",
-"ru": "Глина",
-"lv": "Māls"
-},
-{
-"hex": "#AB9E8C",
-"en": "Driftwood",
-"ru": "Плавник",
-"lv": "Dreifkoks"
-},
-{
-"hex": "#D28575",
-"en": "Salmon",
-"ru": "Лосось",
-"lv": "Lasis"
+"hex": "#D1D1D1",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
 }
 ]
 },
@@ -2206,40 +2206,40 @@
 },
 "colors": [
 {
-"hex": "#251C12",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
+"hex": "#D79829",
+"en": "Honey",
+"ru": "Мёд",
+"lv": "Medus"
 },
 {
-"hex": "#B1A390",
+"hex": "#BA6B4E",
+"en": "Terracotta",
+"ru": "Терракота",
+"lv": "Terakota"
+},
+{
+"hex": "#DAC58B",
+"en": "Sand",
+"ru": "Песок",
+"lv": "Smiltis"
+},
+{
+"hex": "#050403",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#9B9688",
 "en": "Driftwood",
 "ru": "Плавник",
 "lv": "Dreifkoks"
 },
 {
-"hex": "#817E72",
-"en": "Mushroom",
-"ru": "Грибной",
-"lv": "Sēņu"
-},
-{
-"hex": "#E7DFD1",
+"hex": "#E0D7C9",
 "en": "Linen",
 "ru": "Лён",
 "lv": "Lins"
-},
-{
-"hex": "#B17C4E",
-"en": "Toast",
-"ru": "Тост",
-"lv": "Grauzdiņš"
-},
-{
-"hex": "#BAC8D5",
-"en": "Fog",
-"ru": "Туман",
-"lv": "Migla"
 }
 ]
 },
@@ -2257,40 +2257,40 @@
 },
 "colors": [
 {
-"hex": "#332218",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
-},
-{
-"hex": "#865B35",
+"hex": "#78371C",
 "en": "Cinnamon",
 "ru": "Корица",
 "lv": "Kanēlis"
 },
 {
-"hex": "#69A5C4",
-"en": "Summer Sky",
-"ru": "Летнее небо",
-"lv": "Vasaras debesis"
+"hex": "#937235",
+"en": "Toast",
+"ru": "Тост",
+"lv": "Grauzdiņš"
 },
 {
-"hex": "#817261",
-"en": "Mushroom",
-"ru": "Грибной",
-"lv": "Sēņu"
-},
-{
-"hex": "#4489AF",
+"hex": "#5095BB",
 "en": "Tile Blue",
 "ru": "Кафель",
 "lv": "Flīžu zils"
 },
 {
-"hex": "#9C8F7E",
-"en": "Driftwood",
-"ru": "Плавник",
-"lv": "Dreifkoks"
+"hex": "#271C16",
+"en": "Coffee Bean",
+"ru": "Кофейное зерно",
+"lv": "Kafijas pupiņa"
+},
+{
+"hex": "#706454",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
+},
+{
+"hex": "#CAD4DE",
+"en": "Ice",
+"ru": "Лёд",
+"lv": "Ledus"
 }
 ]
 },
@@ -2308,40 +2308,40 @@
 },
 "colors": [
 {
-"hex": "#403028",
+"hex": "#A15840",
+"en": "Brick",
+"ru": "Кирпич",
+"lv": "Ķieģelis"
+},
+{
+"hex": "#98AB34",
+"en": "Potion Green",
+"ru": "Зелье",
+"lv": "Dzira"
+},
+{
+"hex": "#E9C18E",
+"en": "Sand",
+"ru": "Песок",
+"lv": "Smiltis"
+},
+{
+"hex": "#443A31",
 "en": "Coffee Bean",
 "ru": "Кофейное зерно",
 "lv": "Kafijas pupiņa"
 },
 {
-"hex": "#A46B51",
-"en": "Clay",
-"ru": "Глина",
-"lv": "Māls"
-},
-{
-"hex": "#9F9888",
+"hex": "#A09888",
 "en": "Driftwood",
 "ru": "Плавник",
 "lv": "Dreifkoks"
 },
 {
-"hex": "#C68A6D",
-"en": "Latte",
-"ru": "Латте",
-"lv": "Late"
-},
-{
-"hex": "#C2BEB1",
-"en": "Oat Milk",
-"ru": "Овсяное молоко",
-"lv": "Auzu piens"
-},
-{
-"hex": "#645B52",
-"en": "Smoke",
-"ru": "Дым",
-"lv": "Dūmi"
+"hex": "#D3D4BE",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
 }
 ]
 },
@@ -2359,40 +2359,40 @@
 },
 "colors": [
 {
-"hex": "#1B150F",
-"en": "Ink Black",
-"ru": "Чернила",
-"lv": "Tinte"
+"hex": "#6740A0",
+"en": "Violet Ink",
+"ru": "Фиолетовые чернила",
+"lv": "Violetā tinte"
 },
 {
-"hex": "#CD7D55",
-"en": "Salmon",
-"ru": "Лосось",
-"lv": "Lasis"
+"hex": "#F16D51",
+"en": "Coral",
+"ru": "Коралл",
+"lv": "Korallis"
 },
 {
-"hex": "#ECA67F",
-"en": "Peach",
-"ru": "Персик",
-"lv": "Persiks"
+"hex": "#D79957",
+"en": "Ochre",
+"ru": "Охра",
+"lv": "Okers"
 },
 {
-"hex": "#6D645A",
-"en": "Mushroom",
-"ru": "Грибной",
-"lv": "Sēņu"
+"hex": "#616260",
+"en": "Slate",
+"ru": "Сланец",
+"lv": "Slāneklis"
 },
 {
-"hex": "#A09581",
-"en": "Driftwood",
-"ru": "Плавник",
-"lv": "Dreifkoks"
+"hex": "#8EA4B3",
+"en": "Rain",
+"ru": "Дождь",
+"lv": "Lietus"
 },
 {
-"hex": "#423D3B",
-"en": "Charcoal",
-"ru": "Уголь",
-"lv": "Ogle"
+"hex": "#E9E2CF",
+"en": "Ivory",
+"ru": "Слоновая кость",
+"lv": "Ziloņkauls"
 }
 ]
 },
@@ -2410,40 +2410,40 @@
 },
 "colors": [
 {
-"hex": "#5D4B45",
+"hex": "#BB8769",
+"en": "Clay",
+"ru": "Глина",
+"lv": "Māls"
+},
+{
+"hex": "#281D1A",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#524742",
 "en": "Cocoa",
 "ru": "Какао",
 "lv": "Kakao"
 },
 {
-"hex": "#2F231F",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
+"hex": "#6F3E2D",
+"en": "Chestnut",
+"ru": "Каштан",
+"lv": "Kastanis"
 },
 {
-"hex": "#B8886D",
-"en": "Latte",
-"ru": "Латте",
-"lv": "Late"
+"hex": "#95818B",
+"en": "Mauve",
+"ru": "Мальва",
+"lv": "Malva"
 },
 {
-"hex": "#7F6966",
-"en": "Mushroom",
-"ru": "Грибной",
-"lv": "Sēņu"
-},
-{
-"hex": "#DAD2C6",
+"hex": "#D3CCBD",
 "en": "Linen",
 "ru": "Лён",
 "lv": "Lins"
-},
-{
-"hex": "#D6B197",
-"en": "Blush",
-"ru": "Румянец",
-"lv": "Sārtums"
 }
 ]
 },
@@ -2461,40 +2461,40 @@
 },
 "colors": [
 {
-"hex": "#0B0405",
-"en": "Ink Black",
-"ru": "Чернила",
-"lv": "Tinte"
-},
-{
-"hex": "#CFB79C",
-"en": "Oat Milk",
-"ru": "Овсяное молоко",
-"lv": "Auzu piens"
-},
-{
-"hex": "#F8E7D4",
-"en": "Ivory",
-"ru": "Слоновая кость",
-"lv": "Ziloņkauls"
-},
-{
-"hex": "#AE2918",
+"hex": "#B02C17",
 "en": "Tomato",
 "ru": "Томат",
 "lv": "Tomāts"
 },
 {
-"hex": "#332534",
-"en": "Night Train",
-"ru": "Ночной поезд",
-"lv": "Nakts vilciens"
+"hex": "#603A74",
+"en": "Violet Ink",
+"ru": "Фиолетовые чернила",
+"lv": "Violetā tinte"
 },
 {
-"hex": "#544150",
-"en": "Storm Cloud",
-"ru": "Грозовая туча",
-"lv": "Negaisa mākonis"
+"hex": "#D2BA9B",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
+},
+{
+"hex": "#0F0708",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#9B8287",
+"en": "Mauve",
+"ru": "Мальва",
+"lv": "Malva"
+},
+{
+"hex": "#CFB8BF",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
 }
 ]
 },
@@ -2512,40 +2512,40 @@
 },
 "colors": [
 {
-"hex": "#B36D51",
-"en": "Copper",
-"ru": "Медь",
-"lv": "Varš"
-},
-{
-"hex": "#8C533E",
-"en": "Cinnamon",
-"ru": "Корица",
-"lv": "Kanēlis"
-},
-{
-"hex": "#E1AA71",
+"hex": "#CF935B",
 "en": "Biscuit",
 "ru": "Печенье",
 "lv": "Cepums"
 },
 {
-"hex": "#482B25",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
+"hex": "#A6524E",
+"en": "Brick",
+"ru": "Кирпич",
+"lv": "Ķieģelis"
 },
 {
-"hex": "#E4D4C6",
+"hex": "#584F58",
+"en": "Storm Cloud",
+"ru": "Грозовая туча",
+"lv": "Negaisa mākonis"
+},
+{
+"hex": "#837677",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
+},
+{
+"hex": "#A69D9A",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
+},
+{
+"hex": "#EDD6C0",
 "en": "Linen",
 "ru": "Лён",
 "lv": "Lins"
-},
-{
-"hex": "#BCAEA7",
-"en": "Fog",
-"ru": "Туман",
-"lv": "Migla"
 }
 ]
 },
@@ -2563,40 +2563,40 @@
 },
 "colors": [
 {
-"hex": "#CB8F4D",
-"en": "Ochre",
-"ru": "Охра",
-"lv": "Okers"
-},
-{
-"hex": "#1C1622",
-"en": "Ink Black",
-"ru": "Чернила",
-"lv": "Tinte"
-},
-{
-"hex": "#D6AD7B",
-"en": "Biscuit",
-"ru": "Печенье",
-"lv": "Cepums"
-},
-{
-"hex": "#EFCBA0",
-"en": "Sand",
-"ru": "Песок",
-"lv": "Smiltis"
-},
-{
-"hex": "#986C45",
+"hex": "#CC8C55",
 "en": "Toast",
 "ru": "Тост",
 "lv": "Grauzdiņš"
 },
 {
-"hex": "#AA8F7D",
-"en": "Driftwood",
-"ru": "Плавник",
-"lv": "Dreifkoks"
+"hex": "#B561B6",
+"en": "Orchid",
+"ru": "Орхидея",
+"lv": "Orhideja"
+},
+{
+"hex": "#1D161E",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#4A2F27",
+"en": "Coffee Bean",
+"ru": "Кофейное зерно",
+"lv": "Kafijas pupiņa"
+},
+{
+"hex": "#B1B8AD",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
+},
+{
+"hex": "#F3E0C4",
+"en": "Cream",
+"ru": "Сливки",
+"lv": "Krējums"
 }
 ]
 },
@@ -2614,40 +2614,40 @@
 },
 "colors": [
 {
-"hex": "#EE7D5F",
-"en": "Coral",
-"ru": "Коралл",
-"lv": "Korallis"
-},
-{
-"hex": "#5F630C",
+"hex": "#73721A",
 "en": "Olive",
 "ru": "Олива",
 "lv": "Olīva"
 },
 {
-"hex": "#DD5B43",
-"en": "Poppy",
-"ru": "Мак",
-"lv": "Magone"
+"hex": "#F27D5C",
+"en": "Coral",
+"ru": "Коралл",
+"lv": "Korallis"
 },
 {
-"hex": "#8F8626",
-"en": "Brass",
-"ru": "Латунь",
-"lv": "Misiņš"
+"hex": "#98525E",
+"en": "Plum Jam",
+"ru": "Сливовый джем",
+"lv": "Plūmju ievārījums"
 },
 {
-"hex": "#303114",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
-},
-{
-"hex": "#684941",
+"hex": "#593F37",
 "en": "Cocoa",
 "ru": "Какао",
 "lv": "Kakao"
+},
+{
+"hex": "#AA9B8E",
+"en": "Driftwood",
+"ru": "Плавник",
+"lv": "Dreifkoks"
+},
+{
+"hex": "#E5D6C7",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
 }
 ]
 },
@@ -2716,37 +2716,37 @@
 },
 "colors": [
 {
-"hex": "#1C2831",
-"en": "Charcoal",
-"ru": "Уголь",
-"lv": "Ogle"
-},
-{
-"hex": "#706B43",
+"hex": "#8C8B45",
 "en": "Olive",
 "ru": "Олива",
 "lv": "Olīva"
 },
 {
-"hex": "#8E8E67",
-"en": "Lichen",
-"ru": "Лишайник",
-"lv": "Ķērpis"
+"hex": "#9C112B",
+"en": "Cherry",
+"ru": "Вишня",
+"lv": "Ķirsis"
 },
 {
-"hex": "#465457",
-"en": "Storm Cloud",
-"ru": "Грозовая туча",
-"lv": "Negaisa mākonis"
+"hex": "#815235",
+"en": "Chestnut",
+"ru": "Каштан",
+"lv": "Kastanis"
 },
 {
-"hex": "#791926",
-"en": "Burgundy",
-"ru": "Бордо",
-"lv": "Burgundietis"
+"hex": "#505D60",
+"en": "Slate",
+"ru": "Сланец",
+"lv": "Slāneklis"
 },
 {
-"hex": "#B2BBA6",
+"hex": "#706C47",
+"en": "Moss",
+"ru": "Мох",
+"lv": "Sūna"
+},
+{
+"hex": "#8A978C",
 "en": "Sage",
 "ru": "Шалфей",
 "lv": "Salvija"
@@ -2818,40 +2818,40 @@
 },
 "colors": [
 {
-"hex": "#C07241",
-"en": "Copper",
-"ru": "Медь",
-"lv": "Varš"
-},
-{
-"hex": "#140F0B",
-"en": "Ink Black",
-"ru": "Чернила",
-"lv": "Tinte"
-},
-{
-"hex": "#9C492B",
-"en": "Brick",
-"ru": "Кирпич",
-"lv": "Ķieģelis"
-},
-{
-"hex": "#E3C47F",
-"en": "Lamp Light",
-"ru": "Свет лампы",
-"lv": "Lampas gaisma"
-},
-{
-"hex": "#748C30",
+"hex": "#718728",
 "en": "Potion Green",
 "ru": "Зелье",
 "lv": "Dzira"
 },
 {
-"hex": "#C99770",
-"en": "Clay",
-"ru": "Глина",
-"lv": "Māls"
+"hex": "#C87C55",
+"en": "Copper",
+"ru": "Медь",
+"lv": "Varš"
+},
+{
+"hex": "#D7A636",
+"en": "Mustard",
+"ru": "Горчица",
+"lv": "Sinepes"
+},
+{
+"hex": "#1C150F",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#746D5C",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
+},
+{
+"hex": "#E4D9B6",
+"en": "Cream",
+"ru": "Сливки",
+"lv": "Krējums"
 }
 ]
 },
@@ -2869,40 +2869,40 @@
 },
 "colors": [
 {
-"hex": "#110804",
-"en": "Ink Black",
-"ru": "Чернила",
-"lv": "Tinte"
+"hex": "#9E191B",
+"en": "Cherry",
+"ru": "Вишня",
+"lv": "Ķirsis"
 },
 {
-"hex": "#8F7C6B",
+"hex": "#C8871C",
+"en": "Honey",
+"ru": "Мёд",
+"lv": "Medus"
+},
+{
+"hex": "#BB326D",
+"en": "Raspberry",
+"ru": "Малина",
+"lv": "Avene"
+},
+{
+"hex": "#6E6C5F",
 "en": "Mushroom",
 "ru": "Грибной",
 "lv": "Sēņu"
 },
 {
-"hex": "#93A2BB",
+"hex": "#92A1BA",
 "en": "Rain",
 "ru": "Дождь",
 "lv": "Lietus"
 },
 {
-"hex": "#778295",
-"en": "Pigeon Grey",
-"ru": "Голубиный серый",
-"lv": "Baložpelēks"
-},
-{
-"hex": "#DBDCD3",
-"en": "Linen",
-"ru": "Лён",
-"lv": "Lins"
-},
-{
-"hex": "#453B3B",
-"en": "Charcoal",
-"ru": "Уголь",
-"lv": "Ogle"
+"hex": "#DCDED4",
+"en": "Paper White",
+"ru": "Белая бумага",
+"lv": "Papīra balts"
 }
 ]
 },
@@ -2920,40 +2920,40 @@
 },
 "colors": [
 {
-"hex": "#1B0F08",
+"hex": "#ED895E",
+"en": "Coral",
+"ru": "Коралл",
+"lv": "Korallis"
+},
+{
+"hex": "#D33977",
+"en": "Fuchsia",
+"ru": "Фуксия",
+"lv": "Fuksija"
+},
+{
+"hex": "#674735",
+"en": "Bark",
+"ru": "Кора",
+"lv": "Miza"
+},
+{
+"hex": "#1E130C",
 "en": "Ink Black",
 "ru": "Чернила",
 "lv": "Tinte"
 },
 {
-"hex": "#C7A48D",
-"en": "Driftwood",
-"ru": "Плавник",
-"lv": "Dreifkoks"
-},
-{
-"hex": "#8D7B68",
+"hex": "#8A7D69",
 "en": "Mushroom",
 "ru": "Грибной",
 "lv": "Sēņu"
 },
 {
-"hex": "#3B2C22",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
-},
-{
-"hex": "#C7705C",
-"en": "Salmon",
-"ru": "Лосось",
-"lv": "Lasis"
-},
-{
-"hex": "#584944",
-"en": "Cocoa",
-"ru": "Какао",
-"lv": "Kakao"
+"hex": "#E0CFBD",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
 }
 ]
 },
@@ -2971,40 +2971,40 @@
 },
 "colors": [
 {
-"hex": "#8B4F34",
-"en": "Cinnamon",
-"ru": "Корица",
-"lv": "Kanēlis"
+"hex": "#D47F2F",
+"en": "Tangerine",
+"ru": "Мандарин",
+"lv": "Mandarīns"
 },
 {
-"hex": "#473931",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
+"hex": "#B7454E",
+"en": "Raspberry",
+"ru": "Малина",
+"lv": "Avene"
 },
 {
-"hex": "#CE8E84",
-"en": "Clay",
-"ru": "Глина",
-"lv": "Māls"
+"hex": "#4085AA",
+"en": "Tile Blue",
+"ru": "Кафель",
+"lv": "Flīžu zils"
 },
 {
-"hex": "#BC784B",
-"en": "Copper",
-"ru": "Медь",
-"lv": "Varš"
-},
-{
-"hex": "#E6ABA7",
-"en": "Blush",
-"ru": "Румянец",
-"lv": "Sārtums"
-},
-{
-"hex": "#917977",
+"hex": "#827A74",
 "en": "Mushroom",
 "ru": "Грибной",
 "lv": "Sēņu"
+},
+{
+"hex": "#D88F91",
+"en": "Dusty Rose",
+"ru": "Пыльная роза",
+"lv": "Putekļainā roze"
+},
+{
+"hex": "#DAD4C1",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
 }
 ]
 },
@@ -3022,37 +3022,37 @@
 },
 "colors": [
 {
-"hex": "#6D2D15",
+"hex": "#D67733",
+"en": "Pumpkin",
+"ru": "Тыква",
+"lv": "Ķirbis"
+},
+{
+"hex": "#702D15",
 "en": "Chestnut",
 "ru": "Каштан",
 "lv": "Kastanis"
 },
 {
-"hex": "#6D6755",
-"en": "Mushroom",
-"ru": "Грибной",
-"lv": "Sēņu"
+"hex": "#7F7225",
+"en": "Olive",
+"ru": "Олива",
+"lv": "Olīva"
 },
 {
-"hex": "#A75223",
-"en": "Terracotta",
-"ru": "Терракота",
-"lv": "Terakota"
+"hex": "#131310",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
 },
 {
-"hex": "#DF8A42",
-"en": "Tangerine",
-"ru": "Мандарин",
-"lv": "Mandarīns"
+"hex": "#4B4A3E",
+"en": "Swamp",
+"ru": "Болото",
+"lv": "Purvs"
 },
 {
-"hex": "#2D2B24",
-"en": "Charcoal",
-"ru": "Уголь",
-"lv": "Ogle"
-},
-{
-"hex": "#DBDAC6",
+"hex": "#D1D3C4",
 "en": "Linen",
 "ru": "Лён",
 "lv": "Lins"
@@ -3073,40 +3073,40 @@
 },
 "colors": [
 {
-"hex": "#AB9278",
-"en": "Driftwood",
-"ru": "Плавник",
-"lv": "Dreifkoks"
-},
-{
-"hex": "#DC7641",
+"hex": "#E77740",
 "en": "Pumpkin",
 "ru": "Тыква",
 "lv": "Ķirbis"
 },
 {
-"hex": "#6E6354",
+"hex": "#6F3D25",
+"en": "Chestnut",
+"ru": "Каштан",
+"lv": "Kastanis"
+},
+{
+"hex": "#75C9C8",
+"en": "Sea Glass",
+"ru": "Морское стекло",
+"lv": "Jūras stikls"
+},
+{
+"hex": "#826E5A",
 "en": "Mushroom",
 "ru": "Грибной",
 "lv": "Sēņu"
 },
 {
-"hex": "#965131",
-"en": "Cinnamon",
-"ru": "Корица",
-"lv": "Kanēlis"
-},
-{
-"hex": "#F3A466",
-"en": "Peach",
-"ru": "Персик",
-"lv": "Persiks"
-},
-{
-"hex": "#687F81",
+"hex": "#6B8082",
 "en": "Rain",
 "ru": "Дождь",
 "lv": "Lietus"
+},
+{
+"hex": "#BCA185",
+"en": "Driftwood",
+"ru": "Плавник",
+"lv": "Dreifkoks"
 }
 ]
 },
@@ -3175,40 +3175,40 @@
 },
 "colors": [
 {
-"hex": "#9B3F25",
-"en": "Rust",
-"ru": "Ржавчина",
-"lv": "Rūsa"
-},
-{
-"hex": "#D2603D",
+"hex": "#DE6B45",
 "en": "Coral",
 "ru": "Коралл",
 "lv": "Korallis"
 },
 {
-"hex": "#E68662",
-"en": "Salmon",
-"ru": "Лосось",
-"lv": "Lasis"
+"hex": "#9E8242",
+"en": "Brass",
+"ru": "Латунь",
+"lv": "Misiņš"
 },
 {
-"hex": "#B7A887",
-"en": "Lichen",
-"ru": "Лишайник",
-"lv": "Ķērpis"
+"hex": "#261E1D",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
 },
 {
-"hex": "#9B885F",
-"en": "Latte",
-"ru": "Латте",
-"lv": "Late"
+"hex": "#5D4F48",
+"en": "Bark",
+"ru": "Кора",
+"lv": "Miza"
 },
 {
-"hex": "#553D35",
-"en": "Cocoa",
-"ru": "Какао",
-"lv": "Kakao"
+"hex": "#9A9698",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
+},
+{
+"hex": "#C3B597",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
 }
 ]
 },
@@ -3226,40 +3226,40 @@
 },
 "colors": [
 {
-"hex": "#EACB81",
+"hex": "#AA321E",
+"en": "Cherry",
+"ru": "Вишня",
+"lv": "Ķirsis"
+},
+{
+"hex": "#EACD88",
 "en": "Lamp Light",
 "ru": "Свет лампы",
 "lv": "Lampas gaisma"
 },
 {
-"hex": "#8281B3",
-"en": "Lilac",
-"ru": "Сирень",
-"lv": "Ceriņi"
+"hex": "#8081BF",
+"en": "Wisteria",
+"ru": "Глициния",
+"lv": "Glicīnija"
 },
 {
-"hex": "#7B5855",
-"en": "Bark",
-"ru": "Кора",
-"lv": "Miza"
+"hex": "#3D2D4C",
+"en": "Aubergine",
+"ru": "Баклажан",
+"lv": "Baklažāns"
 },
 {
-"hex": "#3C2639",
-"en": "Midnight Plum",
-"ru": "Полуночная слива",
-"lv": "Pusnakts plūme"
+"hex": "#6A5869",
+"en": "Storm Cloud",
+"ru": "Грозовая туча",
+"lv": "Negaisa mākonis"
 },
 {
-"hex": "#C9A87A",
-"en": "Biscuit",
-"ru": "Печенье",
-"lv": "Cepums"
-},
-{
-"hex": "#B83E21",
-"en": "Tomato",
-"ru": "Томат",
-"lv": "Tomāts"
+"hex": "#BFA179",
+"en": "Latte",
+"ru": "Латте",
+"lv": "Late"
 }
 ]
 },
@@ -3277,40 +3277,40 @@
 },
 "colors": [
 {
-"hex": "#E09607",
-"en": "Marigold",
-"ru": "Бархатец",
-"lv": "Samtene"
-},
-{
-"hex": "#CB5017",
+"hex": "#D9562C",
 "en": "Poppy",
 "ru": "Мак",
 "lv": "Magone"
 },
 {
-"hex": "#BD3FCC",
-"en": "Fuchsia",
-"ru": "Фуксия",
-"lv": "Fuksija"
+"hex": "#AC4AB9",
+"en": "Orchid",
+"ru": "Орхидея",
+"lv": "Orhideja"
 },
 {
-"hex": "#8D251A",
-"en": "Rust",
-"ru": "Ржавчина",
-"lv": "Rūsa"
+"hex": "#D99526",
+"en": "Honey",
+"ru": "Мёд",
+"lv": "Medus"
 },
 {
-"hex": "#603F31",
+"hex": "#252423",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#583B2D",
 "en": "Cocoa",
 "ru": "Какао",
 "lv": "Kakao"
 },
 {
-"hex": "#8F2C85",
-"en": "Berry",
-"ru": "Ягода",
-"lv": "Oga"
+"hex": "#9B938E",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
 }
 ]
 },
@@ -3328,40 +3328,40 @@
 },
 "colors": [
 {
-"hex": "#EB6309",
-"en": "Persimmon",
-"ru": "Хурма",
-"lv": "Hurma"
-},
-{
-"hex": "#B13B0E",
+"hex": "#D95F27",
 "en": "Poppy",
 "ru": "Мак",
 "lv": "Magone"
 },
 {
-"hex": "#F5B424",
+"hex": "#EAA93A",
 "en": "Marigold",
 "ru": "Бархатец",
 "lv": "Samtene"
 },
 {
-"hex": "#864925",
-"en": "Cinnamon",
-"ru": "Корица",
-"lv": "Kanēlis"
+"hex": "#892E22",
+"en": "Brick",
+"ru": "Кирпич",
+"lv": "Ķieģelis"
 },
 {
-"hex": "#EF131B",
-"en": "Tomato",
-"ru": "Томат",
-"lv": "Tomāts"
+"hex": "#232222",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
 },
 {
-"hex": "#B0793A",
-"en": "Toast",
-"ru": "Тост",
-"lv": "Grauzdiņš"
+"hex": "#622C27",
+"en": "Chestnut",
+"ru": "Каштан",
+"lv": "Kastanis"
+},
+{
+"hex": "#6E6563",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
 }
 ]
 },
@@ -3379,40 +3379,40 @@
 },
 "colors": [
 {
-"hex": "#E84417",
+"hex": "#DD572B",
 "en": "Poppy",
 "ru": "Мак",
 "lv": "Magone"
 },
 {
-"hex": "#9E32A9",
+"hex": "#E16EDB",
 "en": "Orchid",
 "ru": "Орхидея",
 "lv": "Orhideja"
 },
 {
-"hex": "#CD48C8",
-"en": "Fuchsia",
-"ru": "Фуксия",
-"lv": "Fuksija"
+"hex": "#832C6D",
+"en": "Berry",
+"ru": "Ягода",
+"lv": "Oga"
 },
 {
-"hex": "#F166EE",
-"en": "Jelly Pink",
-"ru": "Желейный розовый",
-"lv": "Želejas rozā"
+"hex": "#222222",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
 },
 {
-"hex": "#B53319",
-"en": "Tomato",
-"ru": "Томат",
-"lv": "Tomāts"
+"hex": "#444343",
+"en": "Charcoal",
+"ru": "Уголь",
+"lv": "Ogle"
 },
 {
-"hex": "#ED1804",
-"en": "Persimmon",
-"ru": "Хурма",
-"lv": "Hurma"
+"hex": "#676263",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
 }
 ]
 },
@@ -3430,40 +3430,40 @@
 },
 "colors": [
 {
-"hex": "#F6C21E",
+"hex": "#F7CB46",
 "en": "Lemon",
 "ru": "Лимон",
 "lv": "Citrons"
 },
 {
-"hex": "#735740",
-"en": "Bark",
-"ru": "Кора",
-"lv": "Miza"
-},
-{
-"hex": "#C38A32",
+"hex": "#B28746",
 "en": "Ochre",
 "ru": "Охра",
 "lv": "Okers"
 },
 {
-"hex": "#A1836C",
-"en": "Latte",
-"ru": "Латте",
-"lv": "Late"
+"hex": "#222222",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
 },
 {
-"hex": "#472E1D",
-"en": "Coffee Bean",
-"ru": "Кофейное зерно",
-"lv": "Kafijas pupiņa"
+"hex": "#785C46",
+"en": "Bark",
+"ru": "Кора",
+"lv": "Miza"
 },
 {
-"hex": "#AFA69C",
-"en": "Driftwood",
-"ru": "Плавник",
-"lv": "Dreifkoks"
+"hex": "#717674",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
+},
+{
+"hex": "#A6A49D",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
 }
 ]
 },
@@ -3481,40 +3481,40 @@
 },
 "colors": [
 {
-"hex": "#EC6D03",
-"en": "Persimmon",
-"ru": "Хурма",
-"lv": "Hurma"
+"hex": "#EB7B2E",
+"en": "Pumpkin",
+"ru": "Тыква",
+"lv": "Ķirbis"
 },
 {
-"hex": "#A64006",
-"en": "Rust",
-"ru": "Ржавчина",
-"lv": "Rūsa"
+"hex": "#827D1E",
+"en": "Brass",
+"ru": "Латунь",
+"lv": "Misiņš"
 },
 {
-"hex": "#A7790D",
-"en": "Ochre",
-"ru": "Охра",
-"lv": "Okers"
+"hex": "#7C4F13",
+"en": "Cinnamon",
+"ru": "Корица",
+"lv": "Kanēlis"
 },
 {
-"hex": "#5F3C13",
-"en": "Chestnut",
-"ru": "Каштан",
-"lv": "Kastanis"
-},
-{
-"hex": "#232322",
+"hex": "#222222",
 "en": "Ink Black",
 "ru": "Чернила",
 "lv": "Tinte"
 },
 {
-"hex": "#4A6862",
-"en": "Deep Teal",
-"ru": "Глубокая бирюза",
-"lv": "Dziļi tirkīzs"
+"hex": "#5D513B",
+"en": "Bark",
+"ru": "Кора",
+"lv": "Miza"
+},
+{
+"hex": "#50757A",
+"en": "Slate",
+"ru": "Сланец",
+"lv": "Slāneklis"
 }
 ]
 },
@@ -3532,40 +3532,40 @@
 },
 "colors": [
 {
-"hex": "#A18808",
-"en": "Mustard",
-"ru": "Горчица",
-"lv": "Sinepes"
-},
-{
-"hex": "#D0441D",
-"en": "Poppy",
-"ru": "Мак",
-"lv": "Magone"
-},
-{
-"hex": "#EFA203",
+"hex": "#EBA732",
 "en": "Marigold",
 "ru": "Бархатец",
 "lv": "Samtene"
 },
 {
-"hex": "#C0AE05",
-"en": "Lemon",
-"ru": "Лимон",
-"lv": "Citrons"
+"hex": "#CF4A2B",
+"en": "Tomato",
+"ru": "Томат",
+"lv": "Tomāts"
 },
 {
-"hex": "#8D5712",
-"en": "Copper",
-"ru": "Медь",
-"lv": "Varš"
+"hex": "#8F6814",
+"en": "Ochre",
+"ru": "Охра",
+"lv": "Okers"
 },
 {
 "hex": "#222222",
 "en": "Ink Black",
 "ru": "Чернила",
 "lv": "Tinte"
+},
+{
+"hex": "#50301E",
+"en": "Cocoa",
+"ru": "Какао",
+"lv": "Kakao"
+},
+{
+"hex": "#636363",
+"en": "Slate",
+"ru": "Сланец",
+"lv": "Slāneklis"
 }
 ]
 },
@@ -3583,40 +3583,40 @@
 },
 "colors": [
 {
-"hex": "#0F123B",
-"en": "Deep Navy",
-"ru": "Глубокий синий",
-"lv": "Dziļi zils"
-},
-{
-"hex": "#9A1B32",
-"en": "Cherry",
-"ru": "Вишня",
-"lv": "Ķirsis"
-},
-{
-"hex": "#DE1D39",
+"hex": "#DC3E41",
 "en": "Tomato",
 "ru": "Томат",
 "lv": "Tomāts"
 },
 {
-"hex": "#5B1829",
-"en": "Wine",
-"ru": "Вино",
-"lv": "Vīns"
-},
-{
-"hex": "#243D89",
+"hex": "#2E428D",
 "en": "Cobalt",
 "ru": "Кобальт",
 "lv": "Kobalts"
 },
 {
-"hex": "#EDD1B9",
-"en": "Oat Milk",
-"ru": "Овсяное молоко",
-"lv": "Auzu piens"
+"hex": "#793D85",
+"en": "Violet Ink",
+"ru": "Фиолетовые чернила",
+"lv": "Violetā tinte"
+},
+{
+"hex": "#1B161C",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#CAB6C6",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
+},
+{
+"hex": "#F2D8BF",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
 }
 ]
 }
