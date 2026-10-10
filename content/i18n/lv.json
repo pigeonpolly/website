@@ -306,7 +306,6 @@
   "\">🔍 Play the detective game</a>": "\">🔍 Spēlēt detektīvspēli</a>",
   "\">What is Wobbleland?</a>": "\">Kas ir Wobbleland?</a>",
   ">All birds<": ">Visi putni<",
-  ">Tap a bird to see its profile, badges and bag.<": ">Pieskaries putnam, lai redzētu tā profilu, nozīmītes un somu.<",
   "placeholder=\"🔍 Nickname\" aria-label=\"Nickname\"": "placeholder=\"🔍 Segvārds\" aria-label=\"Segvārds\"",
   ">My notes<": ">Manas piezīmes<",
   "Five themes I write about. Pick one and read along.": "Piecas tēmas, par kurām rakstu. Izvēlies savu un lasi.",
@@ -393,5 +392,8 @@
   "The Pigeon Polly advent calendar: from December 1 to 31 open a window a day and a pixel bird flies out with a gift for your profile.": "Pigeon Polly adventes kalendārs: no 1. līdz 31. decembrim atver pa lodziņam dienā — no tā izlidos pikseļu putniņš ar dāvanu tavam profilam.",
   ">Draw<": ">Zīmēt<",
   ">Play<": ">Spēlēt<",
-  "🐦 Join and get your bird": "🐦 Pievienoties un saņemt putniņu"
+  "🐦 Join and get your bird": "🐦 Pievienoties un saņemt putniņu",
+  "Bird profile": "Putniņa profils",
+  "A bird of the Pigeon Polly flock: its room, bag of gifts, achievements and sketches from the Daily Challenge.": "Pigeon Polly bara putniņš: tā istaba, dāvanu soma, sasniegumi un skices no izaicinājuma.",
+  ">Tap a bird to visit its profile: room, bag, achievements and sketches.<": ">Pieskaries putniņam, lai apmeklētu tā profilu: istaba, soma, sasniegumi un skices.<"
 }

@@ -2,12 +2,16 @@
 // Сервер — worker/index.js (/api/*). Пока сервер не подключён, показываем «Скоро».
 (() => {
   const app = document.getElementById('sw-app');
-  const profileOnly = !app; // на других страницах (например, «Стая») — только окно профиля птички
   const L = { en: 0, ru: 1, lv: 2 }[document.documentElement.lang] ?? 0;
   const locale = ['en-GB', 'ru-RU', 'lv-LV'][L];
   const T = {
     soon: ['The Sketch Wall opens very soon. Meanwhile, draw today’s theme on the Daily Challenge page!', 'Стена рисунков скоро откроется. А пока нарисуйте тему дня на странице челленджа!', 'Skiču siena drīz atvērsies. Pagaidām uzzīmē dienas tēmu izaicinājuma lapā!'],
     toChallenge: ['To the Daily Challenge', 'К челленджу', 'Uz izaicinājumu'],
+    myProfile: ['🐦 My profile', '🐦 Мой профиль', '🐦 Mans profils'],
+    tabBag: ['🎒 Bag', '🎒 Сумка', '🎒 Soma'], tabBadges: ['🏅 Achievements', '🏅 Достижения', '🏅 Sasniegumi'], tabWorks: ['🎨 Sketches', '🎨 Рисунки', '🎨 Skices'], tabBtns: ['🔘 Buttons', '🔘 Пуговки', '🔘 Pogas'],
+    pSign: ['Sign in and get your own pixel bird: a profile, a room, a bag for gifts and a place on the sketch wall.', 'Войдите и получите свою пиксельную птичку: профиль, комнату, сумку для подарков и место на стене рисунков.', 'Ienāc un saņem savu pikseļu putniņu: profilu, istabu, somu dāvanām un vietu skiču sienā.'],
+    pSignBtn: ['Sign in', 'Войти', 'Ienākt'], pNone: ['There is no bird with this nickname.', 'Птички с таким ником нет.', 'Putniņa ar tādu segvārdu nav.'],
+    pAll: ['All birds →', 'Все птицы →', 'Visi putniņi →'], pChallenge: ['🎨 Daily Challenge', '🎨 Челлендж', '🎨 Izaicinājums'],
     signTitle: ['Join the wall', 'Присоединяйтесь к стене', 'Pievienojies sienai'],
     signText: ['Sign in with Google to upload your daily sketch, keep your streak and collect badges. No passwords.', 'Войдите через Google, чтобы загружать рисунок дня, вести серию и собирать бейджи. Без паролей.', 'Ienāc ar Google, lai augšupielādētu dienas skici, turētu sēriju un krātu nozīmītes. Bez parolēm.'],
     devLogin: ['Dev login', 'Тестовый вход', 'Testa ieeja'],
@@ -254,6 +258,7 @@
     loadTop(); loadWall();
   }
   async function refresh(prev) {
+    if (!app) return page && renderPage(); // на странице профиля — перерисовать её
     try { me = (await api('me')).user; } catch (e) { me = null; }
     if (me && me.badgeEarned && me.badgeEarned.total && window.PPToast) window.PPToast(t('btnForBadges', me.badgeEarned.total));
     render(prev);
@@ -365,13 +370,13 @@
       catch (err) { st.textContent = err.code === 'bird' ? t('giveNo') : err.code === 'has' ? t('giveHas') : err.code === 'legend' ? t('giveLegend') : t('err'); }
     };
   }
-  function openBag() {
+  function openBag() { const m = modal(''); m.card.classList.add('bag-card'); bagInto(m.card, null, true); }
+  function bagInto(box, changed, inModal) {
     const items = bagItems();
-    const m = modal('');
-    m.card.classList.add('bag-card');
+    const m = { card: box };
     const draw = () => {
       const kinds = ['hat', 'item', 'shoes', 'scarf', 'bg', 'frame', 'anim'].filter(k => items.some(g => g.kind === k));
-      m.card.innerHTML = `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3><p class="sw-bv-how">${t('bagNote')}</p>
+      m.card.innerHTML = `${inModal ? `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3>` : ''}<p class="sw-bv-how">${t('bagNote')}</p>
         ${items.length ? kinds.map(k => `<h4>${esc(kindName(k))}</h4><div class="bag-grid">${items.filter(g => g.kind === k).map(g =>
           { const leg = window.PPBirds.LEGEND && window.PPBirds.LEGEND.has(g.kind + '|' + g.item), n = (me.gifts || []).filter(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item).length;
             const sh = !leg && (me.gifts || []).find(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item && x.note === 'shop');
@@ -382,7 +387,7 @@
         b.onclick = async () => {
           const on = me.avatar && me.avatar[b.dataset.k] === b.dataset.i;
           try { const r = await post('avatar', { kind: b.dataset.k, item: on ? null : b.dataset.i }); me.avatar = r.avatar; } catch (e) { alert(t('err')); return; }
-          draw(); renderProfile(); window.PPAccount && window.PPAccount.check();
+          draw(); if (app) renderProfile(); if (changed) changed(); window.PPAccount && window.PPAccount.check();
         };
       });
     };
@@ -401,6 +406,23 @@
       <li><span>🏅</span> ${esc(t('btnBadges'))}</li>${R.pick ? `<li><span>⭐</span> ${esc(t('btnPick', R.pick))}</li>` : ''}</ul>
       <p class="sw-btns-acts"><a class="pill-btn" href="${pre}/shop/">${t('btnShop')}</a><button type="button" class="pill-btn" id="sw-invite">${t('btnInvite')}</button></p></div>`;
   }
+  // бейдж крупно, с описанием и как получить
+  function showBadge(x, state, picks) {
+    const fun = state === 'past' && x.past ? x.past[L] : x.f[L];
+    const v = document.createElement('div');
+    v.className = 'sw-bv'; v.setAttribute('role', 'dialog');
+    v.innerHTML = `<div class="sw-bv-card"><button type="button" class="sw-bv-close" aria-label="Close">✕</button>${medal(x, state)}
+      <h3>${esc(x.n[L])}</h3><p class="sw-bv-fun">${esc(fun)}</p><p class="sw-bv-how">${esc(howTo(x))}${x.k === 'pick' && picks ? `<br>${esc(t('picked', picks))}` : ''}</p>
+      ${badgeReward(x) ? `<p class="sw-bv-btn">${esc(t('btnBadge', badgeReward(x)))}</p>` : ''}<span class="sw-bv-state${state === true ? ' ok' : ''}">${state === true ? t('have') : state === 'past' ? t('hadIt') : t('notYet')}</span></div>`;
+    const close = () => { v.remove(); document.removeEventListener('keydown', esc1); };
+    const esc1 = e => e.key === 'Escape' && close();
+    v.addEventListener('click', e => { if (e.target === v || e.target.closest('.sw-bv-close')) close(); });
+    document.addEventListener('keydown', esc1);
+    document.body.appendChild(v); v.querySelector('.sw-bv-close').focus();
+  }
+  const pre = L === 1 ? '/ru' : L === 2 ? '/lv' : '';
+  const profileUrl = nick => `${pre}/bird/?nick=${encodeURIComponent(nick)}`;
+  // челлендж: компактная карточка — птичка, серия, загрузка; всё остальное (сумка, бейджи, пуговки) — на странице профиля
   function renderProfile(prev) {
     const lv = levelOf(me.best), next = LEVELS.find(l => l.d > me.best);
     const upDate = dayAgo(upOff), upKey = keyOfD(upDate);
@@ -411,16 +433,14 @@
     const progress = next ? Math.round((me.best - base) / (next.d - base) * 100) : 100;
     const newGifts = (me.gifts || []).filter(g => g.status === 'new');
     app.innerHTML = `<div class="sw-grid">
-      <div class="sw-card sw-profile">
+      <div class="sw-card sw-profile sw-profile-mini">
         ${window.PPBirds && me.id ? '<span class="sw-ava-slot"></span>' : lv ? medal(lv, true, true) : `<span class="sw-medal big off" style="--bg:#F4F0FA">${spriteSvg('egg')}</span>`}
         <div class="sw-who"><h2><span class="sw-nickname${me.gold ? ' gold' : ''}">@${esc(me.nick)}</span></h2><p class="sw-level">${lv ? esc(lv.n[L]) : '—'}</p>
           <p class="sw-streak">🔥 ${t('streak', me.current)} · ${t('best', me.best)}</p>
           <div class="sw-bar"><i style="width:${progress}%"></i></div>
           <p class="sw-next">${next ? t('toNext', next.d - me.best, next.n[L]) : t('maxLevel')}</p></div>
-        ${me.id ? `<div class="sw-gifts">${newGifts.length ? `<button type="button" class="pill-btn sw-gift-btn" id="sw-gift">🎁 ${t('giftNew', newGifts.length)}</button>` : ''}<button type="button" class="pill-btn" id="sw-bag">🎒 ${t('bag')} (${bagItems().length})</button><button type="button" class="pill-btn sw-share-btn" id="sw-share">📤 ${t('shareBird')}</button></div>` : ''}
-        ${me.btn ? buttonsHtml(me.btn) : ''}
-        <div class="sw-badges"><h3>${t('badges')}</h3><div>${LEVELS.map(l => medal(l, me.best >= l.d, false, 'button')).join('')}${SPECIAL.map(s => medal(s, stateOf(s, got), false, 'button')).join('')}</div><p class="sw-how" id="sw-how">${t('tapBadge')}</p></div>
-        <p class="sw-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a>${me.admin ? ` · <b>admin</b> · ${t('storage')}: ${me.storage ?? 0}%${me.migration && me.migration.total ? ` · R2: ${me.migration.r2 + me.migration.missing >= me.migration.total ? `✓ ${me.migration.r2}/${me.migration.total}` : `${me.migration.r2}/${me.migration.total}…`}` : ''}` : ''}</p>
+        <div class="sw-gifts"><a class="pill-btn pill-fill" href="${profileUrl(me.nick)}">${t('myProfile')}</a>${newGifts.length ? `<button type="button" class="pill-btn sw-gift-btn" id="sw-gift">🎁 ${t('giftNew', newGifts.length)}</button>` : ''}</div>
+        ${me.admin ? `<p class="sw-acc"><b>admin</b> · ${t('storage')}: ${me.storage ?? 0}%${me.migration && me.migration.total ? ` · R2: ${me.migration.r2 + me.migration.missing >= me.migration.total ? `✓ ${me.migration.r2}/${me.migration.total}` : `${me.migration.r2}/${me.migration.total}…`}` : ''}</p>` : ''}
       </div>
       <form class="sw-card sw-upload" id="sw-up">
         <div class="ch-level sw-days" role="group">${dayBtns}</div>
@@ -432,35 +452,9 @@
         <button class="cta-btn" type="submit" disabled>${t('upload')}</button>
         <p class="sw-status" id="sw-status"></p>
       </form></div>`;
-    const slot = app.querySelector('.sw-ava-slot'); if (slot) slot.replaceWith(window.PPBirds.avatar(me.id, me.avatar, 120));
+    const slot = app.querySelector('.sw-ava-slot'); if (slot) { const av = window.PPBirds.avatar(me.id, me.avatar, 96); const a = document.createElement('a'); a.href = profileUrl(me.nick); a.className = 'sw-ava-link'; a.appendChild(av); slot.replaceWith(a); }
     const gb = document.getElementById('sw-gift'); if (gb) gb.onclick = () => openGift(newGifts[newGifts.length - 1]);
-    const bb = document.getElementById('sw-bag'); if (bb) bb.onclick = openBag;
-    const sb = document.getElementById('sw-share'); if (sb) sb.onclick = () => shareBird({ id: me.id, nick: me.nick, avatar: me.avatar, mine: true });
-    const inv = document.getElementById('sw-invite'); if (inv) inv.onclick = () => shareBird({ id: me.id, nick: me.nick, avatar: me.avatar, mine: true });
     if (prev) celebrate(prev, lv, got);
-    // по нажатию — бейдж крупно, с описанием
-    app.querySelectorAll('.sw-badges .sw-medal').forEach(b => b.onclick = () => {
-      const x = [...LEVELS, ...SPECIAL].find(v => (v.k || v.s) === b.dataset.badge);
-      const state = b.classList.contains('past') ? 'past' : !b.classList.contains('off');
-      const fun = state === 'past' && x.past ? x.past[L] : x.f[L];
-      const v = document.createElement('div');
-      v.className = 'sw-bv'; v.setAttribute('role', 'dialog');
-      v.innerHTML = `<div class="sw-bv-card"><button type="button" class="sw-bv-close" aria-label="Close">✕</button>${medal(x, state)}
-        <h3>${esc(x.n[L])}</h3><p class="sw-bv-fun">${esc(fun)}</p><p class="sw-bv-how">${esc(howTo(x))}${x.k === 'pick' && me.picks ? `<br>${esc(t('picked', me.picks))}` : ''}</p>
-        ${badgeReward(x) ? `<p class="sw-bv-btn">${esc(t('btnBadge', badgeReward(x)))}</p>` : ''}<span class="sw-bv-state${state === true ? ' ok' : ''}">${state === true ? t('have') : state === 'past' ? t('hadIt') : t('notYet')}</span></div>`;
-      const close = () => { v.remove(); document.removeEventListener('keydown', esc1); };
-      const esc1 = e => e.key === 'Escape' && close();
-      v.addEventListener('click', e => { if (e.target === v || e.target.closest('.sw-bv-close')) close(); });
-      document.addEventListener('keydown', esc1);
-      document.body.appendChild(v); v.querySelector('.sw-bv-close').focus();
-    });
-    document.getElementById('sw-out').onclick = async () => { await post('logout'); me = null; render(); loadWall(true); };
-    // «Удалить аккаунт» — в самом низу страницы, подальше от «Выйти»
-    document.getElementById('sw-danger').innerHTML = `<button type="button" class="sw-link danger" id="sw-delacc">${t('delAcc')}</button>`;
-    document.getElementById('sw-delacc').onclick = async () => {
-      if (!confirm(t('delAccAsk'))) return;
-      try { await post('delete-account'); me = null; render(); loadTop(); loadWall(true); } catch (e) { alert(t('err')); }
-    };
     app.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
       if (!confirm(t('delAsk'))) return;
       try { await post('delete-post', { id: b.dataset.del }); await refresh(); loadTop(); loadWall(true); } catch (e) { alert(t('err')); }
@@ -538,42 +532,75 @@
     if (window.PPBirdCard) return go();
     const s = document.createElement('script'); s.src = '/assets/bird-card.js'; s.onload = go; document.head.appendChild(s);
   }
-  async function openProfile(nick) {
-    let pr;
-    try { pr = await api('profile?nick=' + encodeURIComponent(nick)); } catch (e) { return; }
-    const got = new Set(pr.badges), lv = levelOf(pr.best);
-    const st = s => s.k === 'pick' ? (got.has('pick') ? true : got.has('pick_past') ? 'past' : false) : got.has(s.k);
-    const v = document.createElement('div');
-    v.className = 'sw-bv sw-pv'; v.setAttribute('role', 'dialog');
-    v.innerHTML = `<div class="sw-bv-card sw-pv-card"><button type="button" class="sw-bv-close" aria-label="Close">✕</button>
-      <div class="sw-pv-head">${window.PPBirds && pr.id ? '<span class="sw-ava-slot"></span>' : lv ? medal(lv, true, true) : `<span class="sw-medal big off" style="--bg:#F4F0FA">${spriteSvg('egg')}</span>`}
-        <div><h3><span class="sw-nickname${pr.gold ? ' gold' : ''}">@${esc(pr.nick)}</span></h3><p class="sw-level">${lv ? esc(lv.n[L]) : '—'}</p>
-        <p class="sw-pv-streak">🔥 ${t('streak', pr.current)} · ${t('best', pr.best)}${pr.buttons != null ? ` · ${t('btnOther', pr.buttons)}` : ''}</p>${window.PPBirds && pr.id ? `<button type="button" class="pill-btn sw-pv-share">📤 ${t('shareThis')}</button>` : ''}</div></div>
-      <div class="sw-pv-badges">${LEVELS.map(l => medal(l, pr.best >= l.d)).join('')}${SPECIAL.map(x => medal(x, st(x), false, 'span', pr.picks)).join('')}</div>
-      ${window.PPBirds && pr.id ? `<h4 class="sw-pv-bag-t">🎒 ${t('bag')}</h4><div class="sw-pv-bag">${'<span class="sw-pv-item sw-pv-wrap" title="🎁">🎁</span>'.repeat(Math.min(pr.unopened || 0, 12))}</div>${!(pr.bag || []).length && !pr.unopened ? `<p class="sw-pv-empty">${t('bagEmptyOther')}</p>` : ''}` : ''}
-      <div class="sw-pv-works">${pr.posts.map(p => `<a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"><span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></a>`).join('') || `<p class="sw-empty">${t('noWorks')}</p>`}</div>
-    </div>`;
-    if (window.PPBirds && pr.id) {
-      v.querySelector('.sw-pv-share').onclick = () => shareBird({ id: pr.id, nick: pr.nick, avatar: pr.avatar, mine: !!(me && me.id === pr.id) });
-      const slot = v.querySelector('.sw-ava-slot'); if (slot) slot.replaceWith(window.PPBirds.avatar(pr.id, pr.avatar, 110));
-      const bagEl = v.querySelector('.sw-pv-bag');
-      if (bagEl) for (const g of pr.bag || []) { const it = document.createElement('span'); it.className = 'sw-pv-item' + (pr.avatar && pr.avatar[g.kind] === g.item ? ' on' : ''); it.title = kindName(g.kind); it.appendChild(window.PPBirds.giftPic(g.kind, g.item, pr.id, 52, pr.avatar)); bagEl.appendChild(it); }
+  // профиль птички — отдельная страница /bird/?nick=… (клик по нику или птичке в любом месте сайта — site.js)
+  function openProfile(nick) { location.href = profileUrl(nick); }
+  // старые ссылки вида /challenge/#@ник ведут в профиль
+  const hashGo = () => { if (location.hash.startsWith('#@')) location.replace(profileUrl(decodeURIComponent(location.hash.slice(2)))); };
+  hashGo(); addEventListener('hashchange', hashGo);
+
+  // ---------- страница профиля (/bird/): птичка, комната, сумка, достижения, рисунки, пуговки ----------
+  const page = document.getElementById('bird-profile');
+  async function renderPage() {
+    const nick = (new URLSearchParams(location.search).get('nick') || '').replace(/^@/, '');
+    try { me = (await api('me')).user; } catch (e) { me = null; }
+    const who = nick || (me && me.nick);
+    if (!who) {
+      page.innerHTML = `<div class="bp-sign"><span class="sw-signin-polly">${spriteSvg('polly')}</span><p>${t('pSign')}</p><button type="button" class="cta-btn" id="bp-in">${t('pSignBtn')}</button></div>`;
+      document.getElementById('bp-in').onclick = () => window.PPAccount && window.PPAccount.openSignIn();
+      return;
     }
-    // Esc: если открыта картинка — закрывается только она (слушаем раньше просмотрщика, в фазе перехвата)
-    const close = () => { v.remove(); document.removeEventListener('keydown', k, true); };
-    const k = e => e.key === 'Escape' && !document.querySelector('.lightbox.open') && close();
-    v.addEventListener('click', e => { if (e.target === v || e.target.closest('.sw-bv-close')) close(); });
-    document.addEventListener('keydown', k, true);
-    document.body.appendChild(v); v.querySelector('.sw-bv-close').focus();
+    let pr;
+    try { pr = await api('profile?nick=' + encodeURIComponent(who)); } catch (e) { page.innerHTML = `<div class="bp-sign"><p>${t('pNone')}</p><a class="pill-btn" href="${pre}/flock/#all-birds">${t('pAll')}</a></div>`; return; }
+    const mine = !!(me && me.id === pr.id), lv = levelOf(pr.best), got = new Set(pr.badges);
+    const st = x => x.k === 'pick' ? (got.has('pick') ? true : got.has('pick_past') ? 'past' : false) : got.has(x.k);
+    const newGifts = mine ? (me.gifts || []).filter(g => g.status === 'new') : [];
+    document.title = '@' + pr.nick + ' · Pigeon Polly';
+    page.innerHTML = `<div class="bp-head">
+        <span class="sw-ava-slot"></span>
+        <div class="bp-who"><h1><span class="sw-nickname${pr.gold ? ' gold' : ''}">@${esc(pr.nick)}</span></h1>
+          <p class="bp-line">${lv ? esc(lv.n[L]) + ' · ' : ''}🔥 ${t('streak', pr.current)} · ${t('best', pr.best)} · ${t('btnOther', mine && me.btn ? me.btn.buttons : pr.buttons)}</p>
+          <div class="bp-acts">${newGifts.length ? `<button type="button" class="pill-btn pill-fill sw-gift-btn" id="bp-gift">🎁 ${t('giftNew', newGifts.length)}</button>` : ''}
+            <button type="button" class="pill-btn" id="bp-share">📤 ${t(mine ? 'shareBird' : 'shareThis')}</button>${mine ? `<a class="pill-btn" href="${pre}/challenge/">${t('pChallenge')}</a>` : ''}</div></div></div>
+      <div class="bp-room" id="bp-room" hidden></div>
+      <div class="bp-tabs" role="tablist">${[['bag', t('tabBag')], ['badges', t('tabBadges')], ['works', t('tabWorks') + ` (${pr.posts.length})`], ...(mine && me.btn ? [['btns', t('tabBtns')]] : [])]
+        .map(([k, n], i) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}">${n}</button>`).join('')}</div>
+      <div class="bp-panel" role="tabpanel"></div>
+      ${mine ? `<p class="sw-acc bp-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a> · <button type="button" class="sw-link danger" id="sw-delacc">${t('delAcc')}</button></p>` : ''}`;
+    page.querySelector('.sw-ava-slot').replaceWith(window.PPBirds ? window.PPBirds.avatar(pr.id, pr.avatar, 132) : document.createElement('span'));
+    const share = () => shareBird({ id: pr.id, nick: pr.nick, avatar: pr.avatar, mine });
+    page.querySelector('#bp-share').onclick = share;
+    const gb = page.querySelector('#bp-gift'); if (gb) gb.onclick = () => { openGift(newGifts[newGifts.length - 1]); };
+    // комната птички (room.js); пока его нет на странице — блок скрыт
+    if (window.PPRoom) { const rb = page.querySelector('#bp-room'); rb.hidden = false; window.PPRoom.mount(rb, { id: pr.id, nick: pr.nick, avatar: pr.avatar, room: pr.room, mine, me, onChange: () => renderPage() }); }
+    const panel = page.querySelector('.bp-panel');
+    const show = k => {
+      page.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === k)));
+      if (k === 'bag') {
+        if (mine) return bagInto(panel, () => renderPage());
+        panel.innerHTML = `<div class="sw-pv-bag">${'<span class="sw-pv-item sw-pv-wrap" title="🎁">🎁</span>'.repeat(Math.min(pr.unopened || 0, 12))}</div>${!(pr.bag || []).length && !pr.unopened ? `<p class="sw-pv-empty">${t('bagEmptyOther')}</p>` : ''}`;
+        const bagEl = panel.querySelector('.sw-pv-bag');
+        for (const g of pr.bag || []) { const it = document.createElement('span'); it.className = 'sw-pv-item' + (pr.avatar && pr.avatar[g.kind] === g.item ? ' on' : ''); it.title = window.PPBirds.giftName(g.kind, g.item, L); it.appendChild(window.PPBirds.giftPic(g.kind, g.item, pr.id, 56, pr.avatar)); bagEl.appendChild(it); }
+      } else if (k === 'badges') {
+        panel.innerHTML = `<div class="bp-badges">${LEVELS.map(l => medal(l, pr.best >= l.d, false, 'button')).join('')}${SPECIAL.map(x => medal(x, st(x), false, 'button', pr.picks)).join('')}</div><p class="sw-how">${t('tapBadge')}</p>`;
+        panel.querySelectorAll('.sw-medal').forEach(b => b.onclick = () => {
+          const x = [...LEVELS, ...SPECIAL].find(v => (v.k || v.s) === b.dataset.badge);
+          showBadge(x, b.classList.contains('past') ? 'past' : !b.classList.contains('off'), pr.picks);
+        });
+      } else if (k === 'works') {
+        panel.innerHTML = `<div class="sw-pv-works bp-works">${pr.posts.map(p => `<a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"><span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></a>`).join('') || `<p class="sw-empty">${t('noWorks')}</p>`}</div>`;
+      } else if (k === 'btns') {
+        panel.innerHTML = buttonsHtml(me.btn);
+        const inv = panel.querySelector('#sw-invite'); if (inv) inv.onclick = share;
+      }
+    };
+    page.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => show(b.dataset.tab));
+    show('bag');
+    if (mine) {
+      document.getElementById('sw-out').onclick = async () => { await post('logout'); location.reload(); };
+      document.getElementById('sw-delacc').onclick = async () => { if (!confirm(t('delAccAsk'))) return; try { await post('delete-account'); location.href = pre + '/'; } catch (e) { alert(t('err')); } };
+    }
   }
-  // ссылка вида /challenge/#@ник (например, из комментариев блога) сразу открывает профиль
-  if (location.hash.startsWith('#@')) setTimeout(() => openProfile(decodeURIComponent(location.hash.slice(2))), 400);
-  document.addEventListener('click', e => {
-    const b = e.target.closest('[data-profile]');
-    if (!b) return;
-    e.preventDefault(); e.stopPropagation();
-    openProfile(b.dataset.profile);
-  });
+  if (page) renderPage();
 
   // ---------- топ и стена ----------
   // парад над заголовком: впереди — «Выбор Полли» в короне, за ним — ники из топа
@@ -645,5 +672,5 @@
   });
 
   window.PPProfile = openProfile;
-  if (!profileOnly) start();
+  if (app) start();
 })();

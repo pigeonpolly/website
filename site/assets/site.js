@@ -101,6 +101,13 @@
     });
   }
 
+  // клик по нику или птичке (data-profile) в любом месте сайта — страница профиля /bird/?nick=…
+  document.addEventListener('click', e => {
+    const b = e.target.closest('[data-profile]');
+    if (!b || !b.dataset.profile || e.ctrlKey || e.metaKey) return;
+    e.preventDefault();
+    location.href = ({ ru: '/ru', lv: '/lv' }[document.documentElement.lang] || '') + '/bird/?nick=' + encodeURIComponent(b.dataset.profile);
+  });
   // Просмотр картинок: любые ссылки a[data-lightbox], в том числе догруженные позже (стена рисунков)
   let links = [];
   const box = document.createElement('div');

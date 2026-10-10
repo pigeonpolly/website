@@ -906,7 +906,7 @@ async function fullBackup(env) {
 // ---------- страницы ----------
 function commentHtml(c, lang) {
   const name = c.nick
-    ? `<a class="bc-nick" href="${PREFIX[lang]}/challenge/#@${encodeURIComponent(c.nick)}">@${esc(c.nick)}</a>`
+    ? `<a class="bc-nick" href="${PREFIX[lang]}/bird/?nick=${encodeURIComponent(c.nick)}">@${esc(c.nick)}</a>`
     : `<span class="bc-bird">🐦 ${esc(birdName(c.anon, lang))}</span>`;
   const body = esc(c.body).replace(/\n{2,}/g, '</p><p>').replace(/\n/g, '<br>');
   return `<li class="bc" id="c${c.id}" data-cid="${c.id}"><p class="bc-head">${name} <time>${fmtDate(c.created_at, lang)}</time></p><div class="bc-body"><p>${body}</p></div></li>`;

@@ -8,7 +8,7 @@
   const S = {
     signIn: ['Sign in', 'Войти', 'Ienākt'],
     why: ['One account for the Daily Challenge, blog comments and your own bird in the flock.', 'Один вход для челленджа, комментариев в блоге и своей птички в стае.', 'Viena ieeja izaicinājumam, bloga komentāriem un savam putniņam barā.'],
-    profile: ['My profile and works', 'Мой профиль и работы', 'Mans profils un darbi'],
+    profile: ['My profile', 'Мой профиль', 'Mans profils'],
     nick: ['Choose a nickname', 'Выбрать ник', 'Izvēlēties segvārdu'],
     noNick: ['no nickname yet', 'ник ещё не выбран', 'segvārds vēl nav izvēlēts'],
     out: ['Sign out', 'Выйти', 'Iziet'],
@@ -111,7 +111,7 @@
         <div class="acct-pop" hidden role="menu">
           <p class="acct-name">${u.nick ? '@' + esc(u.nick) : `<i>${t('noNick')}</i>`}${u.admin ? ` <span class="acct-badge">★ ${t('admin')}</span>` : ''}</p>
           ${u.nick ? `<p class="acct-btns">🔘 <b>${u.buttons || 0}</b> ${t('btns')}</p>` : ''}
-          <a role="menuitem" href="${pre}/challenge/${u.nick ? '#works' : ''}">${u.nick ? t('profile') : t('nick')}</a>
+          <a role="menuitem" href="${pre}${u.nick ? '/bird/' : '/challenge/'}">${u.nick ? t('profile') : t('nick')}</a>
           ${u.admin ? `<a role="menuitem" href="/admin/">${t('cabinet')}</a>${document.querySelector('[data-ppb]') ? '<button type="button" role="menuitem" data-edit>✏️ Править страницу</button>' : ''}` : ''}
           <button type="button" role="menuitem" data-out>${t('out')}</button>
         </div>`;

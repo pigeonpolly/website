@@ -306,7 +306,6 @@
   "\">🔍 Play the detective game</a>": "\">🔍 Сыграть в детектив</a>",
   "\">What is Wobbleland?</a>": "\">Что такое Wobbleland?</a>",
   ">All birds<": ">Все птицы<",
-  ">Tap a bird to see its profile, badges and bag.<": ">Нажмите на птичку, чтобы увидеть её профиль, бейджи и сумку.<",
   "placeholder=\"🔍 Nickname\" aria-label=\"Nickname\"": "placeholder=\"🔍 Ник\" aria-label=\"Ник\"",
   ">My notes<": ">Мои заметки<",
   "Five themes I write about. Pick one and read along.": "Пять тем, о которых я пишу. Выберите свою и читайте.",
@@ -393,5 +392,8 @@
   "The Pigeon Polly advent calendar: from December 1 to 31 open a window a day and a pixel bird flies out with a gift for your profile.": "Адвент-календарь Pigeon Polly: с 1 по 31 декабря открывайте по окошку в день — из него вылетит пиксельная птичка с подарком для вашего профиля.",
   ">Draw<": ">Рисовать<",
   ">Play<": ">Играть<",
-  "🐦 Join and get your bird": "🐦 Присоединиться и получить птичку"
+  "🐦 Join and get your bird": "🐦 Присоединиться и получить птичку",
+  "Bird profile": "Профиль птички",
+  "A bird of the Pigeon Polly flock: its room, bag of gifts, achievements and sketches from the Daily Challenge.": "Птичка из стаи Pigeon Polly: её комната, сумка с подарками, достижения и рисунки из челленджа.",
+  ">Tap a bird to visit its profile: room, bag, achievements and sketches.<": ">Нажмите на птичку, чтобы зайти в её профиль: комната, сумка, достижения и рисунки.<"
 }

@@ -24,12 +24,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=08264775">
+<link rel="stylesheet" href="/assets/style.css?v=fcd7bc46">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
-<script src="/assets/site.js?v=36ddfaeb" defer></script>
+<script src="/assets/site.js?v=21e5a681" defer></script>
 <script src="/assets/polly.js?v=4b77d0df" defer></script>
 <script src="/assets/birds.js?v=71711949" defer></script>
-<script src="/assets/account.js?v=0e5593d0" defer></script>
+<script src="/assets/account.js?v=4572bf12" defer></script>
 <script src="/assets/search.js?v=69d0c7a5" defer></script>
 </head>
 <body class="inner">
@@ -148,7 +148,7 @@
   <p class="fl-how">To get into the flock, just sign in with Google and pick a nickname.</p>
   <a class="pill-btn pill-fill fl-join" href="/challenge/">Get my bird →</a>
 </section>
-<script src="/assets/flock.js?v=4f54fdb2" defer></script>
+<script src="/assets/flock.js?v=cd587d74" defer></script>
 </div></div>
 <section data-ppb="flock.3" class="fl-all fl-coll" id="collections">
   <h2 class="section-title">Collections</h2>
@@ -159,7 +159,7 @@
 </section>
 <section data-ppb="flock.4" class="fl-all" id="all-birds">
   <h2 class="section-title">All birds</h2>
-  <p class="fl-all-lead">Tap a bird to see its profile, badges and bag.</p>
+  <p class="fl-all-lead">Tap a bird to visit its profile: room, bag, achievements and sketches.</p>
   <input type="search" class="fl-all-q" placeholder="🔍 Nickname" aria-label="Nickname">
   <div class="fl-all-grid" aria-live="polite"></div>
 </section>
@@ -172,7 +172,7 @@
     var f = q.value.trim().toLowerCase().replace(/^@/, '');
     box.innerHTML = '';
     list.filter(function (b) { return !f || b.nick.toLowerCase().indexOf(f) >= 0; }).forEach(function (b) {
-      var a = document.createElement('a'); a.className = 'fl-all-bird'; a.href = pre + '/challenge/#@' + encodeURIComponent(b.nick); a.dataset.profile = b.nick; // окно профиля открывается здесь же (sketch-wall.js)
+      var a = document.createElement('a'); a.className = 'fl-all-bird'; a.href = pre + '/bird/?nick=' + encodeURIComponent(b.nick); // страница профиля птички
       if (window.PPBirds) a.appendChild(window.PPBirds.avatar(b.id, b.avatar, 76));
       var n = document.createElement('span'); n.textContent = '@' + b.nick; a.appendChild(n);
       box.appendChild(a);
@@ -293,8 +293,6 @@
   }).catch(draw);
 })();
 </script>
-<script src="/assets/challenge-data.js?v=82b6cc88" defer></script>
-<script src="/assets/sketch-wall.js?v=895e7ed6" defer></script>
 
 </main>
 <dialog class="modal" id="contact" aria-labelledby="contact-t">

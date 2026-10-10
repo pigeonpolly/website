@@ -3039,3 +3039,26 @@ html:not(.is-admin) .statbar { display: none; }
 /* главная: одна главная кнопка «Присоединиться» — заметная */
 .hero .btn-join { background: #F0A987; border-color: #F0A987; color: #2B1A51; font-weight: 700; }
 .hero .btn-join:hover { background: #F5C4B3; border-color: #F5C4B3; }
+/* профиль птички (/bird/, sketch-wall.js renderPage) */
+.bp { max-width: 980px; margin: 0 auto; padding: 8px var(--gutter) 72px; display: grid; gap: 20px; }
+.bp-sign { display: grid; justify-items: center; gap: 14px; padding: 40px 20px; text-align: center; }
+.bp-sign p { max-width: 520px; margin: 0; font-size: 18px; }
+.bp-head { display: flex; flex-wrap: wrap; align-items: center; gap: 22px; }
+.bp-who h1 { margin: 0 0 6px; font: 600 clamp(28px, 4vw, 40px)/1.1 'Fraunces', serif; }
+.bp-line { margin: 0 0 12px; color: var(--muted); }
+.bp-acts { display: flex; flex-wrap: wrap; gap: 8px; }
+.bp-room { border-radius: 22px; overflow: hidden; }
+.bp-room[hidden] { display: none; }
+.bp-tabs { display: flex; flex-wrap: wrap; gap: 6px; border-bottom: 1px solid var(--line); padding-bottom: 10px; }
+.bp-tabs button { padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: inherit; font: 600 15px 'Karla', sans-serif; cursor: pointer; }
+.bp-tabs button[aria-selected="true"] { background: #F0A987; border-color: #F0A987; color: #2B1A51; }
+.bp-panel { min-height: 120px; }
+.bp-panel .bag-grid { display: flex; flex-wrap: wrap; gap: 10px; }
+.bp-badges { display: flex; flex-wrap: wrap; gap: 10px; }
+.bp-works { display: grid; grid-template-columns: repeat(auto-fill, minmax(150px, 1fr)); gap: 12px; }
+.bp-acc { font-size: 14px; opacity: .85; }
+.sw-profile-mini .sw-gifts { display: flex; flex-wrap: wrap; gap: 8px; }
+.sw-ava-link { display: inline-block; border-radius: 50%; }
+@media (max-width: 600px) { .bp-head { flex-direction: column; text-align: center; } .bp-acts { justify-content: center; } }
+.bp-panel .sw-bv-how { color: var(--muted); margin: 0 0 12px; }
+.bp-panel h4 { margin: 14px 0 8px; text-transform: capitalize; }

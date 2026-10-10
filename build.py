@@ -56,6 +56,8 @@ PAGES = [
      "Our flock of pixel birds: everyone who signs in gets one. Scatter seeds, call the wind or rain, throw a party and watch what happens."),
     ("shop", "Shop", "shop.html",
      "The Pigeon Polly shop: hats, scarves, frames and treasures for your pixel bird, paid for with buttons you earn on the site."),
+    ("bird", "Bird profile", "bird.html",
+     "A bird of the Pigeon Polly flock: its room, bag of gifts, achievements and sketches from the Daily Challenge."),
     ("advent", "Advent calendar", "advent.html",
      "The Pigeon Polly advent calendar: from December 1 to 31 open a window a day and a pixel bird flies out with a gift for your profile."),
     ("palettes", "Palettes", "palettes.html",

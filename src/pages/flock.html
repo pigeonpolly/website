@@ -14,7 +14,7 @@
 </section>
 <section class="fl-all" id="all-birds">
   <h2 class="section-title">All birds</h2>
-  <p class="fl-all-lead">Tap a bird to see its profile, badges and bag.</p>
+  <p class="fl-all-lead">Tap a bird to visit its profile: room, bag, achievements and sketches.</p>
   <input type="search" class="fl-all-q" placeholder="🔍 Nickname" aria-label="Nickname">
   <div class="fl-all-grid" aria-live="polite"></div>
 </section>
@@ -27,7 +27,7 @@
     var f = q.value.trim().toLowerCase().replace(/^@/, '');
     box.innerHTML = '';
     list.filter(function (b) { return !f || b.nick.toLowerCase().indexOf(f) >= 0; }).forEach(function (b) {
-      var a = document.createElement('a'); a.className = 'fl-all-bird'; a.href = pre + '/challenge/#@' + encodeURIComponent(b.nick); a.dataset.profile = b.nick; // окно профиля открывается здесь же (sketch-wall.js)
+      var a = document.createElement('a'); a.className = 'fl-all-bird'; a.href = pre + '/bird/?nick=' + encodeURIComponent(b.nick); // страница профиля птички
       if (window.PPBirds) a.appendChild(window.PPBirds.avatar(b.id, b.avatar, 76));
       var n = document.createElement('span'); n.textContent = '@' + b.nick; a.appendChild(n);
       box.appendChild(a);
@@ -148,5 +148,3 @@
   }).catch(draw);
 })();
 </script>
-<script src="/assets/challenge-data.js" defer></script>
-<script src="/assets/sketch-wall.js" defer></script>

@@ -94,7 +94,7 @@
       <div class="adv-stage"><div class="adv-bird"></div></div>
       <p class="adv-kick">${o.kind ? t('got') : t('btns').replace('{n}', o.buttons || 0)}</p>
       ${o.kind ? `<h2>${esc(name)}</h2>${leg ? `<p class="adv-leg">${t('legend')}</p>` : ''}<p>${t('inBag')}</p>` : `<p>${t('btnsWhy')}</p>`}
-      <div class="adv-act">${S.user && S.user.nick ? `<a class="pill-btn pill-fill" href="${pre}/challenge/#@${encodeURIComponent(S.user.nick)}">${t('bag')}</a>` : ''}<a class="pill-btn" href="${pre}/shop/">${t('shop')}</a></div></div>`;
+      <div class="adv-act">${S.user && S.user.nick ? `<a class="pill-btn pill-fill" href="${pre}/bird/">${t('bag')}</a>` : ''}<a class="pill-btn" href="${pre}/shop/">${t('shop')}</a></div></div>`;
     const bird = dlg.querySelector('.adv-bird');
     if (B) {
       const id = 5 + o.day * 37, lk = o.kind === 'item' ? B.dress(B.looks(id), { item: o.item }) : B.looks(id);
