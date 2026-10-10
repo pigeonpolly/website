@@ -8,6 +8,7 @@
     soon: ['The Sketch Wall opens very soon. Meanwhile, draw today’s theme on the Daily Challenge page!', 'Стена рисунков скоро откроется. А пока нарисуйте тему дня на странице челленджа!', 'Skiču siena drīz atvērsies. Pagaidām uzzīmē dienas tēmu izaicinājuma lapā!'],
     toChallenge: ['To the Daily Challenge', 'К челленджу', 'Uz izaicinājumu'],
     myProfile: ['🐦 My profile', '🐦 Мой профиль', '🐦 Mans profils'],
+    bagAll: ['All', 'Всё', 'Viss'], bagBird: ['🐦 For the bird', '🐦 Для птички', '🐦 Putniņam'], bagRoom: ['🏠 For the room', '🏠 Для комнаты', '🏠 Istabai'],
     toRoom: ['🏠 Put it in my room', '🏠 Поставить в комнату', '🏠 Ielikt istabā'],
     tabBag: ['🎒 Bag', '🎒 Сумка', '🎒 Soma'], tabBadges: ['🏅 Achievements', '🏅 Достижения', '🏅 Sasniegumi'], tabWorks: ['🎨 Sketches', '🎨 Рисунки', '🎨 Skices'], tabBtns: ['🔘 Buttons', '🔘 Пуговки', '🔘 Pogas'],
     pSign: ['Sign in and get your own pixel bird: a profile, a room, a bag for gifts and a place on the sketch wall.', 'Войдите и получите свою пиксельную птичку: профиль, комнату, сумку для подарков и место на стене рисунков.', 'Ienāc un saņem savu pikseļu putniņu: profilu, istabu, somu dāvanām un vietu skiču sienā.'],
@@ -377,14 +378,19 @@
   function bagInto(box, changed, inModal) {
     const items = bagItems();
     const m = { card: box };
+    let flt = 'all'; // фильтр сумки: всё / для птички / для комнаты / один вид
     const draw = () => {
       const isRoom = k => window.PPBirds.isRoomKind && window.PPBirds.isRoomKind(k);
-      const kinds = ['hat', 'item', 'shoes', 'scarf', 'bg', 'frame', 'anim', 'furn', 'deco', 'wall', 'floor', 'view', 'curtain'].filter(k => items.some(g => g.kind === k));
-      m.card.innerHTML = `${inModal ? `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3>` : ''}<p class="sw-bv-how">${t('bagNote')}</p>
+      const all = ['hat', 'item', 'shoes', 'scarf', 'bg', 'frame', 'anim', 'furn', 'deco', 'wall', 'floor', 'view', 'curtain'].filter(k => items.some(g => g.kind === k));
+      const kinds = all.filter(k => flt === 'all' || (flt === 'bird' && !isRoom(k)) || (flt === 'room' && isRoom(k)) || flt === k);
+      const fb = (k, label) => `<button type="button" data-bf="${k}" aria-pressed="${flt === k}">${esc(label)}</button>`;
+      const bar = all.length > 1 ? `<div class="bag-filter" role="toolbar">${fb('all', t('bagAll'))}${all.some(k => !isRoom(k)) && all.some(isRoom) ? fb('bird', t('bagBird')) + fb('room', t('bagRoom')) : ''}${all.map(k => fb(k, kindName(k))).join('')}</div>` : '';
+      m.card.innerHTML = `${inModal ? `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3>` : ''}<p class="sw-bv-how">${t('bagNote')}</p>${bar}
         ${items.length ? kinds.map(k => `<h4>${esc(kindName(k))}</h4><div class="bag-grid">${items.filter(g => g.kind === k).map(g =>
           { const leg = window.PPBirds.LEGEND && window.PPBirds.LEGEND.has(g.kind + '|' + g.item), n = (me.gifts || []).filter(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item).length;
             const sh = !leg && (me.gifts || []).find(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item && x.note === 'shop');
             return `<div class="bag-cell"><button type="button" class="bag-item${me.avatar && me.avatar[k] === g.item ? ' on' : ''}" data-k="${k}" data-i="${esc(g.item)}"><span class="bag-ava"></span>${me.avatar && me.avatar[k] === g.item ? t('wearing') : ''}${n > 1 ? `<span class="bag-n">×${n}</span>` : ''}</button>${sh ? `<button type="button" class="bag-give" data-gid="${sh.id}">${t('give')}</button>` : ''}</div>`; }).join('')}</div>`).join('') : `<p class="bag-empty">${t('bagEmpty')}</p>`}`;
+      m.card.querySelectorAll('[data-bf]').forEach(b => b.onclick = () => { flt = b.dataset.bf; draw(); });
       m.card.querySelectorAll('.bag-give').forEach(b => b.onclick = () => { const g = me.gifts.find(x => x.id === +b.dataset.gid); m.card.closest('.sw-bv') && m.card.closest('.sw-bv').remove(); giveDialog(g); });
       m.card.querySelectorAll('.bag-item').forEach(b => {
         b.querySelector('.bag-ava').appendChild(window.PPBirds.giftPic(b.dataset.k, b.dataset.i, me.id, 64, me.avatar));

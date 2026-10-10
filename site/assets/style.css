@@ -3115,3 +3115,6 @@ html:not(.is-admin) .statbar { display: none; }
 /* челлендж: в «Загрузить рисунок» — только загрузка, без карточки профиля (она в профиле) */
 .ch3 .sw-profile-mini { display: none !important; }
 .ch3 .sw-grid { grid-template-columns: minmax(0, 640px) !important; }
+.bag-filter { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.bag-filter button { padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line, rgba(127,127,127,.4)); background: transparent; color: inherit; font: 600 13px 'Karla', sans-serif; cursor: pointer; text-transform: capitalize; }
+.bag-filter button[aria-pressed="true"] { background: #F0A987; border-color: #F0A987; color: #2B1A51; }
