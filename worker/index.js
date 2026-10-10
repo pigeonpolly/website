@@ -117,6 +117,16 @@ async function sitePage(req, env, url) {
   }).transform(out);
 }
 
+// ---------- адвент-календарь (/advent/): окошки 1–31 декабря, сутки по Риге ----------
+const ADVENT_SPECIAL = [6, 12, 19, 24, 31]; // особые окошки (31-е — легендарное); то же в site/assets/advent.js
+function adventNow(req, env) {
+  // на локальной проверке (DEV_FAKE_LOGIN) дату можно подменить заголовком x-dev-date: 2026-12-05
+  const dev = env.DEV_FAKE_LOGIN === '1' && /^\d{4}-\d\d-\d\d$/.test(req.headers.get('x-dev-date') || '') ? req.headers.get('x-dev-date') : null;
+  const [y, m, d] = (dev || rigaDay()).split('-').map(Number);
+  // 1 декабря 00:00 по Риге (зимой UTC+2) = 30 ноября 22:00 UTC
+  return { year: y, day: m === 12 ? d : 0, startsAt: Date.UTC(y, 10, 30, 22), nowMs: dev ? Date.UTC(y, m - 1, d, 10) : Date.now() };
+}
+
 // ---------- картины с сайта и очередь палитр для дней ЭКСТРА ----------
 const ART_GALLERIES = ['sketchbook', 'anxiety', 'bird', 'snail', 'detective', 'halloween', 'ai-art', 'other'];
 const EXTRA0 = 2026 * 12 + 9; // октябрь 2026 — первый месяц очереди (индекс 0)
@@ -192,6 +202,9 @@ async function ensureSchema(env) {
       w INTEGER, h INTEGER, palette INTEGER DEFAULT 1, pos INTEGER, hidden INTEGER DEFAULT 0, created_at INTEGER, removed_at INTEGER)`),
     // картины из статики, скрытые Алиной в галереях «Мой скетчбук» (src = images/.../x.jpg); сервер вырезает их из страниц
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS art_hidden (src TEXT PRIMARY KEY, thumb TEXT, gallery TEXT, created_at INTEGER)`),
+    // адвент-календарь: что Алина положила в окошко дня (можно несколько — птичке достаётся одна из них) и кто что открыл
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS advent_plan (day INTEGER NOT NULL, kind TEXT NOT NULL, item TEXT NOT NULL, PRIMARY KEY (day, kind, item))`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS advent_open (user_id INTEGER NOT NULL, year INTEGER NOT NULL, day INTEGER NOT NULL, kind TEXT, item TEXT, buttons INTEGER DEFAULT 0, created_at INTEGER, PRIMARY KEY (user_id, year, day))`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS shop (kind TEXT NOT NULL, item TEXT NOT NULL, price INTEGER DEFAULT 0, stock INTEGER DEFAULT 0, PRIMARY KEY (kind, item))`),
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
@@ -706,6 +719,43 @@ async function route(req, env, url) {
     if (!path.startsWith('/') || !source || !campaign) fail(400, 'bad');
     await env.DB.prepare('INSERT OR IGNORE INTO utm_links (path, source, campaign, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(path, source, campaign, String(b.note || '').slice(0, 200) || null, now()).run();
     return json({ ok: true });
+  }
+  // ---------- адвент-календарь ----------
+  if (m === 'GET' && p === '/api/advent') {
+    const t = adventNow(req, env), u = await currentUser(req, env), admin = await isAdmin(u, env);
+    const opened = u ? (await env.DB.prepare('SELECT day, kind, item, buttons FROM advent_open WHERE user_id = ? AND year = ?').bind(u.id, t.year).all()).results : [];
+    const plan = admin ? (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results : undefined;
+    return json({ year: t.year, today: t.day, startsAt: t.startsAt, now: t.nowMs, special: ADVENT_SPECIAL, user: u ? { id: u.id, nick: u.nick } : null, opened, plan }, 200, { 'cache-control': 'no-store' });
+  }
+  if (m === 'POST' && p === '/api/advent/open') {
+    const u = await needUser(req, env);
+    if (!u.nick) fail(400, 'nick');
+    const t = adventNow(req, env), b = await req.json().catch(() => ({})), day = Math.floor(Number(b.day));
+    if (!t.day || !(day >= 1 && day <= t.day)) fail(403, 'locked'); // открыть можно сегодняшнее и пропущенные, будущие — нет
+    const ins = await env.DB.prepare('INSERT OR IGNORE INTO advent_open (user_id, year, day, created_at) VALUES (?, ?, ?, ?)').bind(u.id, t.year, day, now()).run();
+    if (!ins.meta.changes) return json({ ok: true, again: true, ...(await env.DB.prepare('SELECT day, kind, item, buttons FROM advent_open WHERE user_id = ? AND year = ? AND day = ?').bind(u.id, t.year, day).first()) });
+    // одна из вещей окошка, которой у птички ещё не слишком много; если положить нечего — пуговки
+    const plan = (await env.DB.prepare('SELECT kind, item FROM advent_plan WHERE day = ?').bind(day).all()).results.sort(() => Math.random() - .5);
+    let got = null;
+    for (const r of plan) if (await copies(env, u.id, r.kind, r.item) < (LEGEND.has(r.kind + '|' + r.item) ? 1 : SHOP_MAX)) { got = r; break; }
+    if (got) {
+      await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'advent', 'bag', ?, ?)").bind(u.id, got.kind, got.item, now(), now()).run();
+      await env.DB.prepare('UPDATE advent_open SET kind = ?, item = ? WHERE user_id = ? AND year = ? AND day = ?').bind(got.kind, got.item, u.id, t.year, day).run();
+      return json({ ok: true, day, kind: got.kind, item: got.item });
+    }
+    const n = ADVENT_SPECIAL.includes(day) ? 25 : 10;
+    await award(env, u.id, 'advent', `${t.year}-${day}`, n);
+    await env.DB.prepare('UPDATE advent_open SET buttons = ? WHERE user_id = ? AND year = ? AND day = ?').bind(n, u.id, t.year, day).run();
+    return json({ ok: true, day, buttons: n });
+  }
+  if (m === 'POST' && p === '/api/admin/advent') { // Алина отмечает в «Коллекциях», какую вещь положить в какое окошко
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({})), day = Math.floor(Number(b.day));
+    if (!(day >= 1 && day <= 31) || !okItem(b.kind, b.item)) fail(400, 'bad');
+    if (b.on === false) await env.DB.prepare('DELETE FROM advent_plan WHERE day = ? AND kind = ? AND item = ?').bind(day, b.kind, String(b.item)).run();
+    else await env.DB.prepare('INSERT OR IGNORE INTO advent_plan (day, kind, item) VALUES (?, ?, ?)').bind(day, b.kind, String(b.item)).run();
+    return json({ ok: true, plan: (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results });
   }
   // картины и палитры, добавленные с сайта (галереи «Мой скетчбук», раздел «Палитры», очередь дней ЭКСТРА)
   if (m === 'GET' && p === '/api/palettes') {

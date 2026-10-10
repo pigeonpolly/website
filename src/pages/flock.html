@@ -42,7 +42,13 @@
 // вошедшему видно, что у него уже есть (✓)
 (function () {
   var L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
-  var T = { got: ['You have {n} of {t}', 'У вас {n} из {t}', 'Tev ir {n} no {t}'], have: ['✓ yours', '✓ есть', '✓ ir'], gift: ['🎁 not opened', '🎁 не открыт', '🎁 nav atvērts'] };
+  var T = { got: ['You have {n} of {t}', 'У вас {n} из {t}', 'Tev ir {n} no {t}'], have: ['✓ yours', '✓ есть', '✓ ir'], gift: ['🎁 not opened', '🎁 не открыт', '🎁 nav atvērts'],
+    adv: ['📅 Advent', '📅 Адвент', '📅 Advente'], advT: ['Advent windows for “{n}”', 'Окошки адвента для «{n}»', 'Adventes lodziņi lietai “{n}”'],
+    advH: ['🔒 Only you see this. Tap the days this thing should be in. If a window has several things, each bird gets one of them at random; an empty window gives buttons. ★ — special windows, the 31st is the legendary one.',
+      '🔒 Видите только вы. Отметьте дни, в окошках которых будет эта вещь. Если в окошке несколько вещей, каждой птичке достанется одна из них; пустое окошко даёт пуговки. ★ — особые окошки, 31-е — легендарное.',
+      '🔒 Redzi tikai tu. Atzīmē dienas, kuru lodziņos būs šī lieta. Ja lodziņā ir vairākas lietas, katrs putniņš saņem vienu no tām; tukšs lodziņš dod pogas. ★ — īpašie lodziņi, 31. — leģendārais.'],
+    advEmpty: ['empty — buttons', 'пусто — пуговки', 'tukšs — pogas'], advDec: ['December {d}', '{d} декабря', '{d}. decembris'], done: ['Done', 'Готово', 'Gatavs'] };
+  var ADV_SP = [6, 12, 19, 24, 31], plan = null; // как ADVENT_SPECIAL в worker/index.js
   var box = document.querySelector('.fl-coll-box'), bar = document.querySelector('.fl-coll-bar'), me = null, owned = {}, filter = 'all';
   var ALL = ['All', 'Все', 'Visi'];
   function buttons() {
@@ -52,6 +58,45 @@
     B.GIFT_KINDS.forEach(function (k) { add('kind:' + k[0], k[1][L]); });
     var br = document.createElement('span'); br.className = 'fl-coll-br'; bar.appendChild(br);
     B.GIFT_THEMES.forEach(function (t) { add('theme:' + t[0], t[1][L], 'fl-theme'); });
+    if (plan) add('advent', T.adv[L], 'fl-adv');
+  }
+  var advKey = function (k, v) { return k + '|' + v; };
+  function advDays(k, v) { return (plan || []).filter(function (p) { return p.kind === k && p.item === v; }).map(function (p) { return p.day; }); }
+  function advSet(day, k, v, on) {
+    return fetch('/api/admin/advent', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ day: day, kind: k, item: v, on: on }) })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (x) { plan = x.plan; });
+  }
+  // окно выбора дней для вещи
+  function advPick(k, v) {
+    var B = window.PPBirds, d = document.createElement('dialog'); d.className = 'fl-adv-dlg';
+    var draw2 = function () {
+      var on = advDays(k, v);
+      d.innerHTML = '<h3>' + T.advT[L].replace('{n}', B.giftName(k, v, L)) + '</h3><p>' + T.advH[L] + '</p><div class="fl-adv-days">' +
+        Array.from({ length: 31 }, function (_, i) { var n = i + 1; return '<button type="button" data-d="' + n + '" aria-pressed="' + (on.indexOf(n) >= 0) + '" class="' + (ADV_SP.indexOf(n) >= 0 ? 'sp' : '') + (n === 31 ? ' leg' : '') + '">' + n + (ADV_SP.indexOf(n) >= 0 ? '★' : '') + '</button>'; }).join('') +
+        '</div><button type="button" class="pill-btn pill-fill" data-x>' + T.done[L] + '</button>';
+      d.querySelector('[data-x]').onclick = function () { d.close(); d.remove(); draw(); };
+      [].forEach.call(d.querySelectorAll('[data-d]'), function (b) { b.onclick = function () { b.disabled = true; advSet(+b.dataset.d, k, v, b.getAttribute('aria-pressed') !== 'true').then(draw2).catch(function () { b.disabled = false; }); }; });
+    };
+    draw2(); document.body.appendChild(d); d.showModal();
+    d.addEventListener('cancel', function () { d.remove(); draw(); });
+  }
+  // «📅 Адвент»: по датам — что лежит в каждом окошке (✕ убрать)
+  function advBoard() {
+    var B = window.PPBirds, id = me ? me.id : 2;
+    for (var n = 1; n <= 31; n++) {
+      var row = document.createElement('div'); row.className = 'fl-adv-row' + (ADV_SP.indexOf(n) >= 0 ? ' sp' : '') + (n === 31 ? ' leg' : '');
+      var h = document.createElement('b'); h.textContent = T.advDec[L].replace('{d}', n) + (ADV_SP.indexOf(n) >= 0 ? ' ★' : ''); row.appendChild(h);
+      var list = (plan || []).filter(function (p) { return p.day === n; });
+      if (!list.length) { var e = document.createElement('small'); e.textContent = T.advEmpty[L]; row.appendChild(e); }
+      list.forEach(function (p) {
+        var it = document.createElement('span'); it.className = 'fl-adv-it'; it.title = B.giftName(p.kind, p.item, L);
+        it.appendChild(B.itemIcon(p.kind, p.item, 44, id));
+        var x = document.createElement('button'); x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', '✕ ' + it.title);
+        x.onclick = function () { advSet(p.day, p.kind, p.item, false).then(draw); };
+        it.appendChild(x); row.appendChild(it);
+      });
+      box.appendChild(row);
+    }
   }
   function draw() {
     var B = window.PPBirds; if (!B) return;
@@ -60,6 +105,7 @@
     var id = me ? me.id : 2, total = 0, have = 0;
     var theme = filter.indexOf('theme:') === 0 ? B.GIFT_THEMES.filter(function (t) { return 'theme:' + t[0] === filter; })[0] : null;
     box.innerHTML = '';
+    if (filter === 'advent') { advBoard(); return; }
     B.GIFT_KINDS.forEach(function (k) {
       if (filter.indexOf('kind:') === 0 && filter !== 'kind:' + k[0]) return;
       var list = (B.GIFTS[k[0]] || []).filter(function (v) { return !theme || theme[2].indexOf(k[0] + '|' + v) >= 0; }); if (!list.length) return;
@@ -73,6 +119,11 @@
         if (leg) { var lt = document.createElement('span'); lt.className = 'legend-tag'; lt.textContent = '★'; lt.title = 'Legendary'; t.appendChild(lt); }
         var c = document.createElement('figcaption'); c.textContent = B.giftName(k[0], v, L); t.appendChild(c);
         if (st) { have++; var m = document.createElement('span'); m.className = 'fl-coll-mark'; m.textContent = st === 'new' ? T.gift[L] : T.have[L]; t.appendChild(m); }
+        if (plan) { // админ: в какие окошки адвента положена вещь
+          var ab = document.createElement('button'); ab.type = 'button'; ab.className = 'fl-adv-btn'; var ds = advDays(k[0], v);
+          ab.textContent = '📅' + (ds.length ? ' ' + ds.sort(function (a, b) { return a - b; }).join(', ') : ''); ab.classList.toggle('on', !!ds.length);
+          ab.onclick = (function (kk, vv) { return function () { advPick(kk, vv); }; })(k[0], v); t.appendChild(ab);
+        }
         g.appendChild(t);
       });
     });
@@ -81,6 +132,7 @@
   }
   fetch('/api/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
     if (d && d.user) { me = d.user; (d.user.gifts || []).forEach(function (g) { if (g.status === 'bag' || !owned[g.kind + '|' + g.item]) owned[g.kind + '|' + g.item] = g.status; }); }
+    if (me && me.admin) return fetch('/api/advent', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (a) { plan = a.plan || []; bar.innerHTML = ''; draw(); });
     draw();
   }).catch(draw);
 })();
