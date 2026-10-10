@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=c557a47e">
+<link rel="stylesheet" href="/assets/style.css?v=c89fe6be">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <script src="/assets/site.js?v=36ddfaeb" defer></script>
 <script src="/assets/polly.js?v=4b77d0df" defer></script>
@@ -194,6 +194,7 @@
     advH: ['🔒 Only you see this. Tap the days this thing should be in. If a window has several things, each bird gets one of them at random; an empty window gives buttons. ★ — special windows, the 31st is the legendary one.',
       '🔒 Видите только вы. Отметьте дни, в окошках которых будет эта вещь. Если в окошке несколько вещей, каждой птичке достанется одна из них; пустое окошко даёт пуговки. ★ — особые окошки, 31-е — легендарное.',
       '🔒 Redzi tikai tu. Atzīmē dienas, kuru lodziņos būs šī lieta. Ja lodziņā ir vairākas lietas, katrs putniņš saņem vienu no tām; tukšs lodziņš dod pogas. ★ — īpašie lodziņi, 31. — leģendārais.'],
+    advLegend: ['Inside each day you see what is already in that window. Dark — this thing is there.', 'В каждом дне видно, что уже лежит в этом окошке. Тёмный — там эта вещь.', 'Katrā dienā redzams, kas jau ir šajā lodziņā. Tumšs — tur ir šī lieta.'],
     advEmpty: ['empty — buttons', 'пусто — пуговки', 'tukšs — pogas'], advDec: ['December {d}', '{d} декабря', '{d}. decembris'], done: ['Done', 'Готово', 'Gatavs'] };
   var ADV_SP = [6, 12, 19, 24, 31], plan = null; // как ADVENT_SPECIAL в worker/index.js
   var box = document.querySelector('.fl-coll-box'), bar = document.querySelector('.fl-coll-bar'), me = null, owned = {}, filter = 'all';
@@ -218,10 +219,20 @@
     var B = window.PPBirds, d = document.createElement('dialog'); d.className = 'fl-adv-dlg';
     var draw2 = function () {
       var on = advDays(k, v);
-      d.innerHTML = '<h3>' + T.advT[L].replace('{n}', B.giftName(k, v, L)) + '</h3><p>' + T.advH[L] + '</p><div class="fl-adv-days">' +
+      d.innerHTML = '<h3>' + T.advT[L].replace('{n}', B.giftName(k, v, L)) + '</h3><p>' + T.advH[L] + ' ' + T.advLegend[L] + '</p><div class="fl-adv-days">' +
         Array.from({ length: 31 }, function (_, i) { var n = i + 1; return '<button type="button" data-d="' + n + '" aria-pressed="' + (on.indexOf(n) >= 0) + '" class="' + (ADV_SP.indexOf(n) >= 0 ? 'sp' : '') + (n === 31 ? ' leg' : '') + '">' + n + (ADV_SP.indexOf(n) >= 0 ? '★' : '') + '</button>'; }).join('') +
         '</div><button type="button" class="pill-btn pill-fill" data-x>' + T.done[L] + '</button>';
       d.querySelector('[data-x]').onclick = function () { d.close(); d.remove(); draw(); };
+      // в каждом дне — что уже лежит в этом окошке (картинки, при наведении — названия)
+      [].forEach.call(d.querySelectorAll('[data-d]'), function (b) {
+        var n = +b.dataset.d, inDay = (plan || []).filter(function (p) { return p.day === n; });
+        if (!inDay.length) return;
+        b.title = inDay.map(function (p) { return B.giftName(p.kind, p.item, L); }).join(', ');
+        var mini = document.createElement('span'); mini.className = 'fl-adv-mini';
+        inDay.slice(0, 3).forEach(function (p) { mini.appendChild(B.itemIcon(p.kind, p.item, 22, me ? me.id : 2)); });
+        if (inDay.length > 3) { var more = document.createElement('em'); more.textContent = '+' + (inDay.length - 3); mini.appendChild(more); }
+        b.appendChild(mini); b.classList.add('has');
+      });
       [].forEach.call(d.querySelectorAll('[data-d]'), function (b) { b.onclick = function () { b.disabled = true; advSet(+b.dataset.d, k, v, b.getAttribute('aria-pressed') !== 'true').then(draw2).catch(function () { b.disabled = false; }); }; });
     };
     draw2(); document.body.appendChild(d); d.showModal();

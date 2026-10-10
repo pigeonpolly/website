@@ -3015,7 +3015,14 @@ html.sb-hide { --sb: 0px; }
 .fl-adv-dlg h3 { margin: 0 0 8px; font: 600 22px/1.2 'Fraunces', serif; }
 .fl-adv-dlg p { margin: 0 0 12px; font-size: 14px; color: #5B5280; }
 .fl-adv-days { display: grid; grid-template-columns: repeat(7, 1fr); gap: 6px; margin-bottom: 14px; }
-.fl-adv-days button { aspect-ratio: 1; border-radius: 10px; border: 1px solid #CFC7E8; background: #fff; color: #2B1A51; font: 700 14px 'Karla', sans-serif; cursor: pointer; }
+.fl-adv-days button { aspect-ratio: 1; border-radius: 10px; border: 1px solid #CFC7E8; background: #fff; color: #2B1A51; font: 700 14px 'Karla', sans-serif; cursor: pointer; display: grid; place-items: center; align-content: center; gap: 2px; padding: 2px; overflow: hidden; }
+.fl-adv-days button.has { align-content: start; padding-top: 4px; font-size: 12px; }
+.fl-adv-mini { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 1px; pointer-events: none; }
+.fl-adv-mini > span { width: 20px; height: 20px; overflow: hidden; display: grid; place-items: center; border-radius: 50%; }
+.fl-adv-mini .pp-icon, .fl-adv-mini .pp-ava { --ic: 20px !important; --ava: 20px !important; width: 20px !important; height: 20px !important; }
+.fl-adv-mini canvas { width: auto !important; height: auto !important; max-width: 16px !important; max-height: 16px !important; }
+.fl-adv-mini em { font: 700 10px 'Karla', sans-serif; font-style: normal; }
+.fl-adv-days button[aria-pressed="true"] .fl-adv-mini { background: rgba(255, 255, 255, .85); border-radius: 6px; }
 .fl-adv-days button.sp { border-color: #E9A93B; }
 .fl-adv-days button.leg { background: #FFF3CC; }
 .fl-adv-days button[aria-pressed="true"] { background: #2B1A51; color: #fff; }
