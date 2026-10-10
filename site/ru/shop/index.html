@@ -29,7 +29,7 @@
 <script src="/assets/site.js?v=21e5a681" defer></script>
 <script src="/assets/polly.js?v=4b77d0df" defer></script>
 <script src="/assets/birds.js?v=71711949" defer></script>
-<script src="/assets/room.js?v=62f4f3c7" defer></script>
+<script src="/assets/room.js?v=aaab87c3" defer></script>
 <script src="/assets/account.js?v=4572bf12" defer></script>
 <script src="/assets/search.js?v=69d0c7a5" defer></script>
 </head>
@@ -144,7 +144,7 @@
       var n = 0;
       B.GIFT_KINDS.forEach(function (k) {
         if (filter.indexOf('kind:') === 0 && filter !== 'kind:' + k[0]) return;
-        var list = (B.GIFTS[k[0]] || []).filter(function (v) {
+        var list = (B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).filter(function (v) {
           if (theme && theme[2].indexOf(key(k[0], v)) < 0) return false;
           return ((shop[key(k[0], v)] || {}).stock > 0) === inStock;
         });
@@ -165,7 +165,7 @@
       .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
       .then(function (x) {
         if (!x.ok) { alert(x.d.error === 'poor' ? T.poor[L] : x.d.error === 'soldout' ? T.sold[L] : x.d.error === 'limit' ? T.max[L] : T.err[L]); return load(); }
-        if (window.PPToast) window.PPToast(T.ok[L]);
+        if (window.PPToast) window.PPToast(item === '?' && x.d.item ? '🎲 ' + B.giftName(kind, x.d.item, L) + ' — ' + T.ok[L] : T.ok[L]);
         load();
       }).catch(function () { alert(T.err[L]); b.disabled = false; });
   }

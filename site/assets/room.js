@@ -485,10 +485,22 @@
     box.appendChild(c); return box;
   }
   const isRoom = k => ['wall', 'floor', 'view', 'curtain', 'furn', 'deco'].includes(k);
+  // «🎲 Сюрприз» (значение '?'): случайная вещь этой категории, которой у птички ещё нет — выбирает сервер (worker `surprise`)
+  const SUR = ['Surprise', 'Сюрприз', 'Pārsteigums'];
+  const SUR_C = { hat: '#9B5DE5', item: '#F08A3B', shoes: '#4A7BD8', scarf: '#E5484D', frame: '#E9A93B', bg: '#4CC38A', anim: '#F28AB2', furn: '#B5543C', deco: '#E5484D', wall: '#7FB3E8', floor: '#A0673C', view: '#3F8FC9', curtain: '#B79CF2' };
+  function surpriseIcon(kind, size) {
+    const k = 4, c = document.createElement('canvas'), g = c.getContext('2d'); c.width = 16 * k; c.height = 16 * k; g.setTransform(k, 0, 0, k, 0, 0);
+    const col = SUR_C[kind] || '#9B5DE5', p = P(g, 1, 1);
+    spr(p, ['....yy..yy....', '.....yyyy.....', 'cccccccyccccc.', 'cccccccycccccc', 'CCCCCCCyCCCCCC', '.ccwwwwywwccc.', '.ccwccwycwwcc.', '.cccccwycwccc.', '.ccccwwyccccc.', '.ccccwcyccccc.', '.ccccccyccccc.', '.ccccwcyccccc.', '.ccccccyccccc.', '.CCCCCCyCCCCC.'], { y: '#F6D04D', c: col, C: 'rgba(0,0,0,.25)', w: '#FFFFFF' });
+    const box = document.createElement('span'); box.className = 'pp-icon pp-room-ic'; box.style.setProperty('--ic', (size || 80) + 'px');
+    c.style.width = (size || 80) * .7 + 'px'; box.appendChild(c); return box;
+  }
+  const kindLabel = (k, l) => { const e = B.GIFT_KINDS.find(x => x[0] === k); return e ? e[1][l] : k; };
   const oldName = B.giftName, oldIcon = B.itemIcon, oldPic = B.giftPic;
-  B.giftName = (k, v, l) => isRoom(k) ? nameOf(k, v, l == null ? L : l) : oldName(k, v, l);
-  B.itemIcon = (k, v, size, id) => isRoom(k) ? icon(k, v, size) : oldIcon(k, v, size, id);
-  B.giftPic = (k, v, id, size, av) => { if (!isRoom(k)) return oldPic(k, v, id, size, av); const w = document.createElement('span'); w.className = 'gift-pic'; w.appendChild(icon(k, v, size)); return w; };
+  B.giftName = (k, v, l) => v === '?' ? `🎲 ${SUR[l == null ? L : l]}: ${kindLabel(k, l == null ? L : l)}` : isRoom(k) ? nameOf(k, v, l == null ? L : l) : oldName(k, v, l);
+  B.itemIcon = (k, v, size, id) => v === '?' ? surpriseIcon(k, size) : isRoom(k) ? icon(k, v, size) : oldIcon(k, v, size, id);
+  B.giftPic = (k, v, id, size, av) => { if (!isRoom(k) && v !== '?') return oldPic(k, v, id, size, av); const w = document.createElement('span'); w.className = 'gift-pic'; w.appendChild(v === '?' ? surpriseIcon(k, size) : icon(k, v, size)); return w; };
+  B.withSurprise = k => ['?', ...(B.GIFTS[k] || [])]; // список для магазина, адвента и подарков: «🎲 Сюрприз» первым
   B.isRoomKind = isRoom;
 
   // ---------- комната ----------

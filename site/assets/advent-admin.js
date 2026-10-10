@@ -76,7 +76,7 @@
       var list = [];
       B.GIFT_KINDS.forEach(function (k) {
         if (f.indexOf('kind:') === 0 && f !== 'kind:' + k[0]) return;
-        (B.GIFTS[k[0]] || []).forEach(function (v) {
+        (B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).forEach(function (v) {
           if (th && th[2].indexOf(k[0] + '|' + v) < 0) return;
           if (f === 'in' && inDay.indexOf(k[0] + '|' + v) < 0) return;
           if (q && B.giftName(k[0], v, L).toLowerCase().indexOf(q) < 0) return;

@@ -531,6 +531,9 @@ def build():
     extra_json = json.dumps(extra, ensure_ascii=False, separators=(",", ":"))
     (OUT / "assets" / "extra-palettes.json").write_text(extra_json)
     (OUT / "assets" / "extra-palettes.js").write_text("// генерирует build.py: запасной список, если /api/extra-palettes.js недоступен\nwindow.EXTRA_PALETTES=" + extra_json + ";\n")
+    # каталог вещей для сервера («🎲 Сюрприз» выбирает случайную вещь категории) — из birds.js и room.js
+    import subprocess
+    subprocess.run(["node", str(ROOT / "tools" / "catalog.js"), str(ROOT)], check=True, stdout=subprocess.DEVNULL)
     # индекс для поиска по сайту (кнопка 🔍 в шапке; статьи блога ищутся отдельно на сервере)
     for lang, entries in search_index.items():
         (OUT / "assets" / f"search-{lang}.json").write_text(json.dumps(entries, ensure_ascii=False, separators=(",", ":")))

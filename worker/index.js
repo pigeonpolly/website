@@ -140,6 +140,20 @@ function cleanRoom(room, own) {
   return out;
 }
 
+// ---------- «🎲 Сюрприз»: вещь '?' любой категории → случайная вещь этой категории, которой у птички ещё нет (не легендарная) ----------
+let catalogCache = null;
+async function catalog(env, req) {
+  if (catalogCache) return catalogCache;
+  try { const r = await env.ASSETS.fetch(new Request(new URL('/assets/catalog.json', req.url))); if (r.ok) catalogCache = await r.json(); } catch (e) { /* нет каталога */ }
+  return catalogCache || { items: {}, legend: [] };
+}
+async function surprise(env, req, uid, kind) {
+  const cat = await catalog(env, req), leg = new Set(cat.legend || []);
+  const have = new Set((await env.DB.prepare("SELECT item FROM gifts WHERE user_id = ? AND kind = ? AND status IN ('bag', 'new')").bind(uid, kind).all()).results.map(r => r.item));
+  const list = (cat.items[kind] || []).filter(v => !leg.has(kind + '|' + v) && !have.has(v));
+  return list.length ? list[Math.floor(Math.random() * list.length)] : null;
+}
+
 // ---------- адвент-календарь (/advent/): окошки 1–31 декабря, сутки по Риге ----------
 const ADVENT_SPECIAL = [6, 12, 19, 24, 31];
 const ADVENT_LAST_JAN = 23; // до 23 января (включительно) можно открыть пропущенные окошки // особые окошки (31-е — легендарное); то же в site/assets/advent.js
@@ -185,7 +199,7 @@ async function extraQueue(env, req) {
 const GIFT_KINDS = ['bg', 'shoes', 'hat', 'anim', 'frame', 'item', 'scarf', 'wall', 'floor', 'view', 'curtain', 'furn', 'deco'];
 const ROOM_KINDS = ['wall', 'floor', 'view', 'curtain', 'furn', 'deco']; // вещи для комнаты (room.js), не надеваются
 const avatarOf = u => { try { const a = JSON.parse(u && u.avatar || '{}'); return a && typeof a === 'object' ? a : {}; } catch (e) { return {}; } };
-const okItem = (kind, item) => GIFT_KINDS.includes(kind) && /^[#a-z0-9:-]{1,24}$/i.test(String(item || ''));
+const okItem = (kind, item) => GIFT_KINDS.includes(kind) && (item === '?' || /^[#a-z0-9:-]{1,24}$/i.test(String(item || ''))); // '?' — «🎲 Сюрприз» этой категории
 
 // общие функции для worker/blog.js
 const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), awardComment: (uid, cid) => awardComment(env, uid, cid) });
@@ -775,9 +789,11 @@ async function route(req, env, url) {
     // у всех одинаково: птичка получает все вещи окошка (кроме тех, которых у неё уже максимум); пустое окошко — пуговки
     const plan = (await env.DB.prepare('SELECT kind, item FROM advent_plan WHERE day = ?').bind(day).all()).results;
     const got = [];
-    for (const r of plan) if (await copies(env, u.id, r.kind, r.item) < (LEGEND.has(r.kind + '|' + r.item) ? 1 : SHOP_MAX)) {
-      await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'advent', 'bag', ?, ?)").bind(u.id, r.kind, r.item, now(), now()).run();
-      got.push([r.kind, r.item]);
+    for (const r of plan) {
+      const item = r.item === '?' ? await surprise(env, req, u.id, r.kind) : r.item; // «🎲 Сюрприз» — своя случайная вещь каждой птичке
+      if (!item || (r.item !== '?' && await copies(env, u.id, r.kind, item) >= (LEGEND.has(r.kind + '|' + item) ? 1 : SHOP_MAX))) continue;
+      await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'advent', 'bag', ?, ?)").bind(u.id, r.kind, item, now(), now()).run();
+      got.push([r.kind, item]);
     }
     if (got.length) {
       await env.DB.prepare('UPDATE advent_open SET kind = ?, item = ?, got = ? WHERE user_id = ? AND year = ? AND day = ?').bind(got[0][0], got[0][1], JSON.stringify(got), u.id, t.year, day).run();
@@ -978,16 +994,18 @@ async function route(req, env, url) {
     if (!GIFT_KINDS.includes(kind) || !item) fail(400, 'bad');
     const row = await env.DB.prepare('SELECT price, stock FROM shop WHERE kind = ? AND item = ?').bind(kind, item).first();
     if (!row || row.stock <= 0) fail(409, 'soldout');
-    if (await copies(env, u.id, kind, item) >= (LEGEND.has(kind + '|' + item) ? 1 : SHOP_MAX)) fail(409, 'limit'); // обычных — до 3 одинаковых, легендарных — 1
+    const got = item === '?' ? await surprise(env, req, u.id, kind) : item; // «🎲 Сюрприз» — случайная вещь, которой ещё нет
+    if (!got) fail(409, 'all');
+    if (item !== '?' && await copies(env, u.id, kind, item) >= (LEGEND.has(kind + '|' + item) ? 1 : SHOP_MAX)) fail(409, 'limit'); // обычных — до 3 одинаковых, легендарных — 1
     if ((u.buttons || 0) < row.price) fail(402, 'poor');
     // остаток и пуговки списываем условно (если кто-то успел раньше — ничего не теряется)
     const s1 = await env.DB.prepare('UPDATE shop SET stock = stock - 1 WHERE kind = ? AND item = ? AND stock > 0').bind(kind, item).run();
     if (!s1.meta.changes) fail(409, 'soldout');
     const s2 = await env.DB.prepare('UPDATE users SET buttons = COALESCE(buttons, 0) - ? WHERE id = ? AND COALESCE(buttons, 0) >= ?').bind(row.price, u.id, row.price).run();
     if (!s2.meta.changes) { await env.DB.prepare('UPDATE shop SET stock = stock + 1 WHERE kind = ? AND item = ?').bind(kind, item).run(); fail(402, 'poor'); }
-    const g = await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'shop', 'bag', ?, ?)").bind(u.id, kind, item, now(), now()).run();
+    const g = await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'shop', 'bag', ?, ?)").bind(u.id, kind, got, now(), now()).run();
     await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(u.id, 'buy', String(g.meta.last_row_id), -row.price, rigaDay(), now()).run();
-    return json({ ok: true, buttons: (u.buttons || 0) - row.price });
+    return json({ ok: true, buttons: (u.buttons || 0) - row.price, kind, item: got });
   }
   if (p === '/api/admin/shop') {
     const u = await needUser(req, env);
@@ -1077,6 +1095,13 @@ async function route(req, env, url) {
     if (!(await isAdmin(u, env))) fail(403, 'admin');
     const b = await req.json().catch(() => ({}));
     if (!okItem(b.kind, b.item)) fail(400, 'bad');
+    if (b.item === '?') { // «🎲 Сюрприз»: каждой птичке своя случайная вещь, которой у неё ещё нет
+      const users = (await env.DB.prepare("SELECT id FROM users WHERE banned = 0 AND nick IS NOT NULL AND nick != ''").all()).results;
+      const stmts = [];
+      for (const x of users) { const it = await surprise(env, req, x.id, b.kind); if (it) stmts.push(env.DB.prepare('INSERT INTO gifts (user_id, kind, item, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(x.id, b.kind, it, String(b.note || '').slice(0, 200), now())); }
+      for (let i = 0; i < stmts.length; i += 50) await env.DB.batch(stmts.slice(i, i + 50));
+      return json({ ok: true, count: stmts.length });
+    }
     const lim = LEGEND.has(b.kind + '|' + b.item) ? 1 : SHOP_MAX;
     const r = await env.DB.prepare(`INSERT INTO gifts (user_id, kind, item, note, created_at) SELECT u.id, ?, ?, ?, ? FROM users u WHERE u.banned = 0 AND u.nick IS NOT NULL AND u.nick != ''
       AND (SELECT COUNT(*) FROM gifts g WHERE g.user_id = u.id AND g.kind = ? AND g.item = ? AND g.status IN ('bag', 'new')) < ?`)
@@ -1091,8 +1116,10 @@ async function route(req, env, url) {
     if (!okItem(b.kind, b.item)) fail(400, 'bad');
     const to = await env.DB.prepare('SELECT id FROM users WHERE id = ?').bind(Number(b.uid)).first();
     if (!to) fail(404, 'user');
-    await env.DB.prepare('INSERT INTO gifts (user_id, kind, item, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(to.id, b.kind, String(b.item), String(b.note || '').slice(0, 200), now()).run();
-    return json({ ok: true });
+    const item = b.item === '?' ? await surprise(env, req, to.id, b.kind) : String(b.item);
+    if (!item) fail(409, 'all');
+    await env.DB.prepare('INSERT INTO gifts (user_id, kind, item, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(to.id, b.kind, item, String(b.note || '').slice(0, 200), now()).run();
+    return json({ ok: true, item });
   }
   if (m === 'POST' && p === '/api/nick') {
     const u = await needUser(req, env);

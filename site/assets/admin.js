@@ -263,7 +263,7 @@
       w.querySelectorAll('[data-th]').forEach(b => b.classList.toggle('pill-fill', theme === b.dataset.th));
       const box = w.querySelector('.adm-gift-items'); box.innerHTML = '';
       const th = theme && B.GIFT_THEMES.find(t => t[0] === theme);
-      const list = th ? th[2].map(x => x.split('|')) : B.GIFTS[kind].map(v => [kind, v]);
+      const list = th ? th[2].map(x => x.split('|')) : (B.withSurprise ? B.withSurprise(kind) : B.GIFTS[kind]).map(v => [kind, v]);
       for (const [kd, v] of list) {
         const nm = NAMES[v] || (B.giftName ? B.giftName(kd, v, 1) : v);
         const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-pressed', String(v === item && kd === kind)); b.title = nm;
@@ -298,7 +298,7 @@
     let d; try { d = await api('admin/shop'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
     const B = window.PPBirds; if (!B) { main.innerHTML = '<p class="be-note">Не загрузился каталог вещей (birds.js).</p>'; return; }
     const rows = {}; d.items.forEach(r => { rows[r.kind + '|' + r.item] = r; });
-    const all = []; B.GIFT_KINDS.forEach(k => (B.GIFTS[k[0]] || []).forEach(v => all.push({ kind: k[0], kindName: k[1][1], item: v, name: B.giftName(k[0], v, 1) })));
+    const all = []; B.GIFT_KINDS.forEach(k => (B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).forEach(v => all.push({ kind: k[0], kindName: k[1][1], item: v, name: B.giftName(k[0], v, 1) })));
     const draw = () => {
       const theme = sFilter.startsWith('theme:') ? B.GIFT_THEMES.find(t => 'theme:' + t[0] === sFilter) : null, q = sq.trim().toLowerCase();
       const list = all.filter(x => {
