@@ -41,8 +41,6 @@ PAGES = [
     ("about-me", "About me", "about-me.html",
      "Alina Otkinska: learning experience designer, artist and author of Pigeon Polly. Portfolio, projects and how to work together."),
     ("art-portfolio", "My Sketchbook", "art-portfolio.html", "Art portfolio of Alina Otkinska: ecoline series, sketchbook pages and AI art."),
-    ("about-polly", "About Polly", "about-polly.html",
-     "Meet Pigeon Polly, an office clerk pigeon from Wobbleland, and her friends: Mr.Chew, Detective Titos and the Pumpkin Family."),
     ("blog", "Blog", "blog.html", "Notes on drawing, learning and creativity by Alina Otkinska and Pigeon Polly."),
     ("blog-editor", "Blog editor", "blog-editor.html", "Blog editor."),
     ("admin", "Admin", "admin.html", "Admin."),
@@ -95,7 +93,7 @@ SECTIONS = {
                    ("art-portfolio/bird", "Pigeon Polly"), ("art-portfolio/snail", "Mr.Chew"), ("art-portfolio/detective", "Mr.Titos"), ("art-portfolio/halloween", "Pumpkin Family"),
                    ("art-portfolio/ai-art", "AI Art")],
     "play": [("flock", "The Flock"), ("shop", "Shop"), ("advent", "Advent calendar"), ("detective-office", "Detective Titos"), ("polly-office", "Polly, Office Clerk"),
-             ("wobbleland", "Wobbleland"), ("about-polly", "About Polly")],
+             ("wobbleland", "Wobbleland")],
     "about": [("about-me", "About me"), ("on-walls-and-pages", "On Walls & Pages"),
               ("projects", "Learning & AI"), ("work-with-me", "Work with me")],
 }
@@ -103,12 +101,12 @@ SECTIONS = {
 TAB_ALIAS = {"bird": "flock"}
 # вкладки, которых нет в выпадающем меню и карте сайта (они уже есть в другом пункте), но есть внутри раздела
 MENU_HIDE = {}
-# меню (10.10.2026, «сайт перегружен»): 5 пунктов — Рисовать · Скетчбук · Играть · Блог · Обо мне
+# меню (10.10.2026, «сайт перегружен»): 5 пунктов — Рисовать · Играть · Блог · Мой скетчбук · Обо мне
 NAV = [
     ("challenge", "Draw", "draw"),
-    ("art-portfolio", "My Sketchbook", "sketchbook"),
     ("flock", "Play", "play"),
     ("blog", "Blog"),
+    ("art-portfolio", "My Sketchbook", "sketchbook"),
     ("about-me", "About me", "about"),
 ]
 
@@ -122,6 +120,7 @@ def section_of(path):
 
 
 def section_tabs(path):
+    return ""  # 10.10.2026: ряды кнопок-вкладок над страницами убраны («создают лишний шум»), подпункты — в выпадающем меню
     key, cur = section_of(path)
     if not key:
         return ""
