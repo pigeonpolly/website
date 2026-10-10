@@ -103,6 +103,7 @@
   try { const dn = new Intl.DisplayNames(['ru'], { type: 'region' }); regionName = c => { try { return dn.of(c); } catch (e) { return c; } }; } catch (e) {}
   const flag = c => /^[A-Z]{2}$/.test(c || '') ? String.fromCodePoint(...[...c].map(ch => 127397 + ch.charCodeAt(0))) : '🏳️';
   const pageName = p => p === '/' ? 'Главная' : p === '/ru/' ? 'Главная (RU)' : p === '/lv/' ? 'Главная (LV)' : p;
+  const utmUrl = (p, s, c) => `https://www.pigeonpolly.com${p}${p.includes('?') ? '&' : '?'}utm_source=${encodeURIComponent(s)}&utm_campaign=${encodeURIComponent(c)}`;
   const pct = (a, b) => b ? Math.round(a * 100 / b) : 0;
   const delta = (a, b) => { if (!b) return a ? '<small class="adm-up">новое</small>' : ''; const d = Math.round((a - b) * 100 / b); return `<small class="${d >= 0 ? 'adm-up' : 'adm-down'}">${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}% к прошлому периоду</small>`; };
   // горизонтальные полоски: подпись, полоска, число и доля
@@ -153,21 +154,39 @@
         <table class="be-table adm-table"><thead><tr><th>Страница</th><th>📄 Просмотры</th><th>👥 Люди</th></tr></thead>
         <tbody>${d.pages.map(r => `<tr><td data-l="Страница"><a href="${esc(r.k)}" target="_blank">${esc(pageName(r.k))}</a></td><td data-l="Просмотры">${n(r.n)}</td><td data-l="Люди">${n(r.p)}</td></tr>`).join('') || '<tr><td colspan="3">Пока нет данных.</td></tr>'}</tbody></table></section>
       <section class="adm-box"><h2>🏷 Ваши ссылки с метками</h2>
-        <p class="be-note">Чтобы точно знать, сколько людей пришло из конкретного поста или сторис, добавьте к ссылке метку: <code>?utm_source=instagram&amp;utm_campaign=название</code>. Например: <code>pigeonpolly.com/flock/?utm_source=instagram&amp;utm_campaign=stories-oct</code></p>
-        <div class="adm-utm"><input type="text" placeholder="Страница, например /flock/" data-utm-p value="/"><select data-utm-s>${['instagram', 'tiktok', 'pinterest', 'facebook', 'threads', 'telegram', 'linkedin', 'patreon', 'email'].map(x => `<option>${x}</option>`).join('')}</select><input type="text" placeholder="Название (stories-oct)" data-utm-c><button type="button" class="pill-btn pill-fill" data-utm-go>Скопировать ссылку</button></div>
+        <p class="be-note">Ставьте такую ссылку в пост, пин или сторис — и здесь будет видно, сколько людей пришло именно по ней. Заполните страницу сайта, где выложите ссылку, и название (например, <code>pin-001</code>) и нажмите «Сохранить».</p>
+        <div class="adm-utm"><input type="text" placeholder="Страница сайта, например /flock/" data-utm-p value="/"><select data-utm-s aria-label="Где выложите">${['pinterest', 'instagram', 'tiktok', 'facebook', 'threads', 'telegram', 'linkedin', 'patreon', 'email'].map(x => `<option>${x}</option>`).join('')}</select><input type="text" placeholder="Название (pin-001)" data-utm-c><input type="text" placeholder="Заметка (необязательно)" data-utm-n><button type="button" class="pill-btn pill-fill" data-utm-go>＋ Сохранить</button></div>
         <p class="be-note" data-utm-out></p>
-        ${d.campaigns.length ? bars(d.campaigns, r => `${esc(r.k)} <small>(${esc(r.s || '')})</small>`, sum(d.campaigns)) : '<p class="be-note">Заходов по ссылкам с метками пока не было.</p>'}</section>
+        ${d.links.length ? `<table class="be-table adm-table adm-links"><thead><tr><th>Ссылка</th><th>🚪 Заходов всего</th><th>👥 Людей</th><th>За период</th><th></th></tr></thead><tbody>
+        ${d.links.map(l => { const url = utmUrl(l.path, l.source, l.campaign); return `<tr><td data-l="Ссылка"><b>${esc(l.campaign)}</b> <small>· ${esc(l.source)} → ${esc(pageName(l.path))}</small>${l.note ? `<br><small>${esc(l.note)}</small>` : ''}<br><button type="button" class="bc-link" data-copy="${esc(url)}">📋 Скопировать ссылку</button></td>
+          <td data-l="Заходов всего"><b>${n(l.all)}</b></td><td data-l="Людей">${n(l.people)}</td><td data-l="За период">${n(l.period)}</td><td><button type="button" class="bc-link be-danger" data-del="${l.id}" title="Удалить">🗑</button></td></tr>`; }).join('')}</tbody></table>` : '<p class="be-note">Сохранённых ссылок пока нет.</p>'}
+        ${(() => { const other = d.campaigns.filter(r => !d.links.some(l => l.campaign === r.k)); return other.length ? `<h3>Другие метки (не сохранены)</h3>${bars(other, r => `${esc(r.k)} <small>(${esc(r.s || '')})</small>`, sum(other))}` : ''; })()}</section>
       <p class="be-note">Считается без cookie: один человек за сутки — один раз (по зашифрованному отпечатку, сам IP не сохраняется). Ваши собственные заходы (когда вы вошли как админ) и роботы не считаются. Статистика копится с ${esc(d.first || 'момента включения')}.</p>`;
     main.querySelectorAll('[data-days]').forEach(b => b.onclick = () => { vDays = Number(b.dataset.days); visitors(); });
     const tip = main.querySelector('.adm-chart-tip');
     main.querySelectorAll('.adm-col').forEach(c => { const show = () => { tip.textContent = c.dataset.tip; main.querySelectorAll('.adm-col.on').forEach(x => x.classList.remove('on')); c.classList.add('on'); }; c.onmouseenter = show; c.onfocus = show; c.onclick = show; });
-    const go = main.querySelector('[data-utm-go]');
-    go.onclick = () => {
-      let p = main.querySelector('[data-utm-p]').value.trim() || '/'; p = p.replace(/^https?:\/\/[^/]+/, ''); if (!p.startsWith('/')) p = '/' + p;
-      const c = main.querySelector('[data-utm-c]').value.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9а-яё_-]/gi, '') || 'post';
-      const link = `https://www.pigeonpolly.com${p}${p.includes('?') ? '&' : '?'}utm_source=${main.querySelector('[data-utm-s]').value}&utm_campaign=${encodeURIComponent(c)}`;
-      main.querySelector('[data-utm-out]').innerHTML = `<code>${esc(link)}</code>`;
-      (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(() => { go.textContent = '✓ Скопировано'; setTimeout(() => go.textContent = 'Скопировать ссылку', 1600); }).catch(() => {});
+    const copy = (link, btn, label) => (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(() => { btn.textContent = '✓ Скопировано'; setTimeout(() => btn.textContent = label, 1600); }).catch(() => prompt('Скопируйте ссылку:', link));
+    main.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => copy(b.dataset.copy, b, '📋 Скопировать ссылку'));
+    main.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+      if (!confirm('Удалить эту ссылку из списка? Заходы по ней останутся в общей статистике.')) return;
+      try { await api('admin/links', { delete: Number(b.dataset.del) }); visitors(); } catch (e) { alert(err(e)); }
+    });
+    const go = main.querySelector('[data-utm-go]'), out = main.querySelector('[data-utm-out]');
+    go.onclick = async () => {
+      let p = main.querySelector('[data-utm-p]').value.trim() || '/'; p = p.replace(/^https?:\/\/[^/]+/, '').split('#')[0]; if (!p.startsWith('/')) p = '/' + p;
+      if (!/[?.]/.test(p) && !p.endsWith('/')) p += '/';
+      const c = main.querySelector('[data-utm-c]').value.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9а-яё_-]/gi, '');
+      if (!c) { out.textContent = 'Напишите название ссылки, например pin-001.'; return; }
+      // проверяем, что такая страница есть на сайте
+      const ok = await fetch(p.split('?')[0], { method: 'HEAD' }).then(r => r.ok).catch(() => true);
+      if (!ok) { out.innerHTML = `Страницы <code>${esc(p)}</code> на сайте нет — проверьте адрес (например, <code>/flock/</code>, <code>/challenge/</code>, <code>/shop/</code>).`; return; }
+      go.disabled = true;
+      try { await api('admin/links', { path: p, source: main.querySelector('[data-utm-s]').value, campaign: c, note: main.querySelector('[data-utm-n]').value.trim() }); }
+      catch (e) { go.disabled = false; out.textContent = err(e); return; }
+      const link = utmUrl(p, main.querySelector('[data-utm-s]').value, c);
+      await visitors();
+      const o = main.querySelector('[data-utm-out]'); if (o) o.innerHTML = `Сохранено и скопировано: <code>${esc(link)}</code>`;
+      navigator.clipboard && navigator.clipboard.writeText(link).catch(() => {});
     };
   }
 

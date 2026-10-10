@@ -2855,3 +2855,4 @@ html.sb-hide { --sb: 0px; }
 .adm-utm input, .adm-utm select { padding: 8px 12px; border: 1px solid #D8D0EA; border-radius: 10px; font: inherit; min-width: 0; flex: 1 1 140px; }
 .adm-box code { word-break: break-all; }
 @media (max-width: 600px) { .adm-bars li { grid-template-columns: minmax(0, 1fr) auto 3em; } .adm-bt { grid-column: 1 / -1; grid-row: 2; } .adm-bars em { grid-column: 1 / -1; } .adm-live { margin-left: 0; width: 100%; } }
+.adm-links td small { display: inline; margin: 0; } .adm-links td .bc-link { margin-top: 4px; }

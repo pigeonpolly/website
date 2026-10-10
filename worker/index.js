@@ -147,6 +147,8 @@ async function ensureSchema(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS visits (id INTEGER PRIMARY KEY AUTOINCREMENT, day TEXT NOT NULL, ts INTEGER, vid TEXT, entry INTEGER DEFAULT 0, path TEXT, lang TEXT,
       src TEXT, ref TEXT, campaign TEXT, device TEXT, os TEXT, browser TEXT, country TEXT)`),
     env.DB.prepare(`CREATE INDEX IF NOT EXISTS visits_day ON visits(day)`),
+    // сохранённые ссылки с метками (кабинет → «Посетители»): по ним считаем заходы
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS utm_links (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT NOT NULL, source TEXT NOT NULL, campaign TEXT NOT NULL, note TEXT, created_at INTEGER, UNIQUE (path, source, campaign))`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS shop (kind TEXT NOT NULL, item TEXT NOT NULL, price INTEGER DEFAULT 0, stock INTEGER DEFAULT 0, PRIMARY KEY (kind, item))`),
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
@@ -250,6 +252,7 @@ const SOURCES = [ // [название, регулярка по адресу с�
   ['VK', /(^|\.)vk\.(com|ru)$/], ['Reddit', /reddit/], ['ChatGPT и др. ИИ', /chatgpt|openai|perplexity|claude\.ai|gemini\.google|copilot/], ['Почта', /mail\.|outlook|gmail/],
 ];
 const sourceOf = host => (SOURCES.find(([, re]) => re.test(host)) || ['Другие сайты'])[0];
+const utmSource = us => { const s = sourceOf(us); return s === 'Другие сайты' ? us : s; };
 function uaInfo(ua, w, touch) {
   const os = /iPhone|iPod/.test(ua) ? 'iPhone (iOS)' : /iPad/.test(ua) || (/Macintosh/.test(ua) && touch) ? 'iPad' : /Android/.test(ua) ? 'Android' : /Windows/.test(ua) ? 'Windows'
     : /CrOS/.test(ua) ? 'ChromeOS' : /Macintosh|Mac OS X/.test(ua) ? 'Mac' : /Linux/.test(ua) ? 'Linux' : 'Другое';
@@ -278,7 +281,7 @@ async function hit(req, env) {
   const info = uaInfo(ua, Number(b.w) || 0, !!b.t);
   // откуда пришёл: utm-метка → сайт-источник → приложение (Instagram и Facebook часто прячут адрес) → «напрямую»
   let src = null, entry = 0;
-  if (us) { src = sourceOf(us); if (src === 'Другие сайты') src = us; entry = 1; }
+  if (us) { src = utmSource(us); entry = 1; }
   else if (ref && ref !== 'self') { src = sourceOf(ref); entry = 1; }
   else if (ref !== 'self') { const app = info.browser.match(/^(Instagram|Facebook|Pinterest|TikTok|Telegram|LinkedIn) \(/); src = app ? app[1] : 'Напрямую'; entry = 1; }
   let salt = await getMeta(env, 'visit_salt');
@@ -315,6 +318,11 @@ async function visitStats(env, days) {
     sourceDevices: await q('SELECT src AS k, device AS d, COUNT(*) AS n FROM visits WHERE entry = 1 AND day >= ? GROUP BY src, device', from),
     refs: await q('SELECT ref AS k, COUNT(*) AS n FROM visits WHERE entry = 1 AND ref IS NOT NULL AND day >= ? GROUP BY ref ORDER BY n DESC LIMIT 30', from),
     campaigns: await q('SELECT campaign AS k, src AS s, COUNT(*) AS n FROM visits WHERE entry = 1 AND campaign IS NOT NULL AND day >= ? GROUP BY campaign, src ORDER BY n DESC LIMIT 30', from),
+    // сохранённые ссылки: заходы и люди всего и за выбранный период (заход засчитывается по utm_campaign + utm_source)
+    links: await Promise.all((await q('SELECT * FROM utm_links ORDER BY id DESC')).map(async l => {
+      const c = (await q("SELECT COUNT(*) AS n, COUNT(DISTINCT day || vid) AS p, SUM(day >= ?) AS np, COUNT(DISTINCT CASE WHEN day >= ? THEN day || vid END) AS pp FROM visits WHERE entry = 1 AND campaign = ? AND src = ?", from, from, l.campaign, utmSource(l.source)))[0];
+      return { ...l, all: c.n || 0, people: c.p || 0, period: c.np || 0, periodPeople: c.pp || 0 };
+    })),
     landing: await q('SELECT path AS k, COUNT(*) AS n FROM visits WHERE entry = 1 AND day >= ? GROUP BY path ORDER BY n DESC LIMIT 20', from),
     pages: await q('SELECT path AS k, COUNT(*) AS n, COUNT(DISTINCT day || vid) AS p FROM visits WHERE day >= ? GROUP BY path ORDER BY n DESC LIMIT 40', from),
     devices: await by('device'), os: await by('os'), browsers: await by('browser'), countries: await by('country'), langs: await by('lang'),
@@ -635,6 +643,16 @@ async function route(req, env, url) {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');
     return json(await visitStats(env, Math.min(Math.max(Number(url.searchParams.get('days')) || 7, 1), 365)));
+  }
+  if (m === 'POST' && p === '/api/admin/links') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({}));
+    if (b.delete) { await env.DB.prepare('DELETE FROM utm_links WHERE id = ?').bind(Number(b.delete)).run(); return json({ ok: true }); }
+    const path = String(b.path || '/').trim().slice(0, 200), source = String(b.source || '').trim().toLowerCase().slice(0, 60), campaign = String(b.campaign || '').trim().slice(0, 80);
+    if (!path.startsWith('/') || !source || !campaign) fail(400, 'bad');
+    await env.DB.prepare('INSERT OR IGNORE INTO utm_links (path, source, campaign, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(path, source, campaign, String(b.note || '').slice(0, 200) || null, now()).run();
+    return json({ ok: true });
   }
   if (m === 'GET' && p === '/api/admin/users') {
     const u = await needUser(req, env);
