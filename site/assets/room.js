@@ -162,7 +162,7 @@
   };
   // украшения: висят где угодно (координаты x, y), рисуются поверх мебели
   const DECO = {
-    ornament: { n: i => [['Red ornament', 'Красный шарик', 'Sarkana bumbiņa'], ['Gold ornament', 'Золотой шарик', 'Zelta bumbiņa'], ['Blue ornament', 'Синий шарик', 'Zila bumbiņa'], ['Silver ornament', 'Серебряный шарик', 'Sudraba bumbiņa'], ['Pink ornament', 'Розовый шарик', 'Rozā bumbiņa'], ['Green ornament', 'Зелёный шарик', 'Zaļa bumbiņa']][i], v: 6, w: 5, h: 7,
+    ornament: { n: i => [['Tree ball (red)', 'Ёлочный шарик (красный)', 'Eglītes bumbiņa (sarkana)'], ['Tree ball (gold)', 'Ёлочный шарик (золотой)', 'Eglītes bumbiņa (zelta)'], ['Tree ball (blue)', 'Ёлочный шарик (синий)', 'Eglītes bumbiņa (zila)'], ['Tree ball (silver)', 'Ёлочный шарик (серебряный)', 'Eglītes bumbiņa (sudraba)'], ['Tree ball (pink)', 'Ёлочный шарик (розовый)', 'Eglītes bumbiņa (rozā)'], ['Tree ball (green)', 'Ёлочный шарик (зелёный)', 'Eglītes bumbiņa (zaļa)']][i], v: 6, w: 5, h: 7,
       d: (p, t, i) => { const c = ORN_C[i]; p(2, 0, 1, 1, '#C9C9D6'); p(1, 1, 3, 1, '#E9C46A'); p(1, 2, 3, 1, c); p(0, 3, 5, 3, c); p(1, 6, 3, 1, c); p(1, 3, 1, 1, '#FFFFFF'); } },
     xmasstar: { n: () => ['Tree-top star', 'Звезда на ёлку', 'Zvaigzne eglei'], w: 9, h: 9,
       d: (p, t) => { spr(p, ['....s....', '....s....', '...sss...', 'sssssssss', '.sssssss.', '..sssss..', '.sss.sss.', '.ss...ss.', 's.......s'], { s: '#F6D04D' }); p(4, 4, 1, 1, '#FFF3B0'); if (Math.sin(t / 300) > .6) { p(-1, 0, 1, 1, '#FFFFFF'); p(9, 2, 1, 1, '#FFFFFF'); } } },
@@ -348,18 +348,81 @@
     discoball: { n: N('Disco ball', 'Диско-шар', 'Diskobumba'), w: 11, h: 14, d: (p, t) => { p(5, 0, 1, 3, '#C9C9D6'); for (let y = 0; y < 9; y++) for (let x = 0; x < 9; x++) { const dx = x - 4, dy = y - 4; if (dx * dx + dy * dy <= 18) p(1 + x, 3 + y, 1, 1, (x + y + Math.floor(t / 150)) % 4 === 0 ? '#FFFFFF' : (x + y) % 2 ? '#C9CDD6' : '#9A96A8'); } } },
   });
 
+
+
+  Object.assign(DECO, {
+    icicle: { n: N('Icicle ornament', 'Сосулька', 'Lāsteka'), w: 3, h: 10, d: (p, t) => { p(1, 0, 1, 1, '#C9C9D6'); p(0, 1, 3, 3, '#BFE3F5'); p(0, 4, 3, 2, '#D8EEF9'); p(1, 6, 1, 3, '#BFE3F5'); p(1, 9, 1, 1, '#FFFFFF'); if (Math.sin(t / 400) > .6) p(0, 2, 1, 1, '#FFFFFF'); } },
+    pinecone: { n: N('Pinecone ornament', 'Шишка', 'Čiekurs'), w: 5, h: 8, d: S(['..r..', '.bnb.', 'nbnbn', 'bnbnb', 'nbnbn', '.nbn.', '..n..'], { r: '#E5484D', n: '#8C5A30', b: '#B9824A' }) },
+    angel: { n: N('Little angel', 'Ангелочек', 'Eņģelītis'), w: 9, h: 10, d: S(['...yyy...', '...sss...', 'ww.sss.ww', 'wwwwwwwww', '.wwwwwww.', '..wwwww..', '..wwwww..', '.wwwwwww.', '.wwwwwww.'], { y: '#F6D04D', s: '#F5C9A8', w: '#FFFFFF' }) },
+    gingerorn: { n: N('Gingerbread ornament', 'Пряничный человечек', 'Piparkūku vīriņš'), w: 7, h: 9, d: S(['..ddd..', '..dwd..', 'ddddddd', '.dwdwd.', '..ddd..', '..dwd..', '.dd.dd.', '.d...d.'], { d: '#B9824A', w: '#FFFFFF' }) },
+    birdorn: { n: N('Polly ornament', 'Игрушка-Полли', 'Pollijas rotaļlieta'), w: 8, h: 9, d: S(['...g....', '..ddd...', '.dbwbd..', '.dbkbdo.', 'dbbbbd..', 'dbsbbd..', '.dddd...', '..o.o...'], { g: '#E9C46A', d: '#1a1528', b: '#9C9EDB', s: '#7F81BF', w: '#fff', k: '#1a1528', o: '#f2a73b' }) },
+    beads: { n: N('Bead garland', 'Бусы на ёлку', 'Krelles eglītei'), w: 30, h: 6, d: p => { const c = ['#E5484D', '#E9C46A', '#FFFFFF']; for (let x = 0; x < 30; x += 2) p(x, Math.round(Math.sin(x / 30 * Math.PI) * 4), 2, 2, c[(x / 2) % 3]); } },
+    staromini: { n: N('Little star ornament', 'Звёздочка на ёлку', 'Zvaigznīte eglītei'), w: 5, h: 6, d: (p, t) => { const c = Math.sin(t / 300) > 0 ? '#F6D04D' : '#E9C46A'; spr(p, ['..c..', '..c..', 'ccccc', '.ccc.', '.c.c.', 'c...c'], { c }); } },
+    candyorn: { n: N('Candy ornament', 'Конфетка на ёлку', 'Konfekte eglītei'), w: 9, h: 4, d: S(['p.rwrw.p.', 'pprwrwrpp', 'p.wrwr.p.'], { p: '#F28AB2', r: '#E5484D', w: '#FFFFFF' }) },
+    snowmanorn: { n: N('Snowman ornament', 'Снеговичок на ёлку', 'Sniegavīriņš eglītei'), w: 6, h: 9, d: S(['.kkk..', '.www..', '.wkw..', '.wwwo.', 'wwwwww', 'wwkwww', 'wwwwww', '.wwww.'], { k: '#2B2340', w: '#FFFFFF', o: '#F08A3B' }) },
+  });
+
+  // ---------- легендарное и забавное (10.10.2026, Алина: «легендарных мало, сделай забавное») ----------
+  Object.assign(WALL, {
+    stainedglass: [['Stained glass', 'Витраж', 'Vitrāža'], g => { const c = ['#E5484D', '#4A7BD8', '#F6D04D', '#4CC38A', '#9B5DE5', '#F08A3B']; for (let y = 0; y < FY; y += 8) for (let x = 0; x < RW; x += 8) { R(g, x, y, 8, 8, '#2B2340'); R(g, x + 1, y + 1, 6, 6, c[(x / 8 * 7 + y / 8 * 3) % 6]); R(g, x + 2, y + 2, 2, 2, 'rgba(255,255,255,.35)'); } }],
+  });
+  Object.assign(FLOOR, {
+    clouds: [['Walking on clouds', 'Пол из облаков', 'Mākoņu grīda'], g => { R(g, 0, FY, RW, RH - FY, '#BFE3F8'); const r = rngOf(12); for (let i = 0; i < 26; i++) { const x = r() * RW, y = FY + 2 + r() * 26, w = 10 + r() * 16; R(g, x, y, w, 3, '#FFFFFF'); R(g, x + 3, y - 2, w - 6, 2, '#FFFFFF'); } }],
+    goldtiles: [['Golden tiles', 'Золотая плитка', 'Zelta flīzes'], g => { R(g, 0, FY, RW, RH - FY, '#C99A2E'); for (let y = FY; y < RH; y += 8) for (let x = ((y - FY) / 8 % 2) * 4; x < RW; x += 8) { R(g, x, y, 7, 7, '#E9C46A'); R(g, x + 1, y + 1, 2, 1, '#F7DC8B'); } }],
+  });
+  Object.assign(VIEW, {
+    dragonsky: [['Dragon over the castle', 'Дракон над замком', 'Pūķis virs pils'], (g, x, y, t) => { sky(g, x, y, ['#F6A86A', '#F9C77E', '#FBE0A0']); R(g, x + 4, y + 22, 12, 20, '#7E7A8A'); R(g, x + 4, y + 18, 2, 4, '#7E7A8A'); R(g, x + 9, y + 18, 2, 4, '#7E7A8A'); R(g, x + 14, y + 18, 2, 4, '#7E7A8A'); R(g, x + 8, y + 30, 3, 5, '#2B2340'); R(g, x, y + WH - 4, WW, 4, '#6FA86A'); const dx = x + ((t / 40) % (WW + 16)) - 8, dy = y + 10 + Math.sin(t / 300) * 3, f = Math.floor(t / 200) % 2; R(g, dx, dy, 8, 3, '#C9463D'); R(g, dx + 7, dy - 1, 3, 2, '#C9463D'); R(g, dx + 2, dy - (f ? 3 : 0), 4, 3, '#A8382F'); R(g, dx - 3, dy + 1, 3, 1, '#C9463D'); if (f) R(g, dx + 10, dy - 1, 3, 1, '#F6C445'); }],
+  });
+  Object.assign(CURT, {
+    starlight: [['Starlight curtains', 'Шторы из звёздного света', 'Zvaigžņu gaismas aizkari'], ['#1B1E45', '#2B2F5A'], '#FFE9A8'],
+  });
+  Object.assign(FURN, {
+    // легендарные
+    dragon: { n: N('Baby dragon on gold', 'Дракончик на золоте', 'Pūķēns uz zelta'), w: 26, h: 18, top: null, d: (p, t) => { p(0, 12, 26, 6, '#E9C46A'); for (let x = 1; x < 25; x += 3) p(x, 11 + (x % 2), 2, 1, '#F7DC8B'); const br = Math.sin(t / 700) > 0 ? 1 : 0; spr((a, b, w, h, c) => p(4 + a, b + 1 - br, w, h, c), ['.........gg.....', '........gggg....', '..g....ggkggg...', '.ggg..gggggggo..', 'gggggggggggg....', '.ggGGGGGggg.....', '..gggggggg......', '...g..g.........'], { g: '#4CC38A', G: '#8EE0B4', k: '#2B2340', o: '#F6D04D' }); if (Math.floor(t / 900) % 3 === 0) { p(21, 2, 2, 1, 'rgba(200,200,210,.8)'); p(23, 0, 2, 1, 'rgba(200,200,210,.6)'); } if (Math.sin(t / 300) > .8) p(8, 10, 1, 1, '#FFFFFF'); } },
+    portal: { n: N('Magic portal', 'Волшебный портал', 'Burvju portāls'), w: 20, h: 30, top: null, glow: [10, 14], d: (p, t) => { p(1, 0, 18, 30, '#5B5670'); p(3, 2, 14, 26, '#1B1240'); for (let k = 0; k < 6; k++) { const a = t / 300 + k; p(10 + Math.round(Math.cos(a) * (6 - k)), 15 + Math.round(Math.sin(a) * (11 - k * 1.6)), 2, 2, ['#9B5DE5', '#4CE3A0', '#7FB3E8', '#F28AB2', '#F6D04D', '#FFFFFF'][k]); } p(0, 28, 20, 2, '#3E3550'); } },
+    treasure: { n: N('Pile of treasure', 'Гора сокровищ', 'Dārgumu kalns'), w: 22, h: 12, top: 4, d: (p, t) => { for (let y = 0; y < 12; y++) { const w = Math.round(22 * Math.sqrt(y / 12)); p(11 - w / 2, y, w, 1, y % 3 ? '#E9C46A' : '#C99A2E'); } p(9, 3, 2, 2, '#E5484D'); p(13, 6, 2, 2, '#4A7BD8'); p(5, 9, 2, 2, '#4CC38A'); const s = Math.floor(t / 250) % 4; p([10, 14, 6, 16][s], [2, 5, 8, 9][s], 1, 1, '#FFFFFF'); } },
+    phoenixnest: { n: N('Phoenix nest', 'Гнездо феникса', 'Fēniksa ligzda'), w: 20, h: 14, top: null, glow: [10, 4], d: (p, t) => { const f = Math.floor(t / 130) % 3; p(6 + f, 2, 3, 6, '#F08A3B'); p(9, 0 + f, 3, 8, '#F6C445'); p(12 - f, 3, 3, 5, '#E5484D'); p(9, 3, 2, 2, '#FFE08A'); p(0, 8, 20, 6, '#8C5A30'); for (let x = 0; x < 20; x += 3) p(x, 8 + (x % 2), 2, 1, '#B9824A'); p(7, 7, 3, 3, '#F7DC8B'); p(11, 7, 3, 3, '#F7DC8B'); } },
+    pollystatue: { n: N('Golden Polly statue', 'Золотая статуя Полли', 'Pollijas zelta statuja'), w: 14, h: 24, top: null, d: (p, t) => { spr((a, b, w, h, c) => p(1 + a, b, w, h, c), ['....ddd.....', '...dbbbd....', '..dbbwbd....', '..dbbkbdoo..', '..dbbbbbd...', '.dbbsbbbbd..', 'dbbssbbbbd..', 'dbbbbbbbbd..', '.ddddddddd..', '...o..o.....'], { d: '#C99A2E', b: '#E9C46A', s: '#F7DC8B', w: '#FFF3B0', k: '#8C6A1E', o: '#C99A2E' }); p(1, 10, 12, 2, '#9A96A8'); p(2, 12, 10, 10, '#C9CDD6'); p(1, 22, 12, 2, '#9A96A8'); p(4, 15, 6, 1, '#E9C46A'); if (Math.sin(t / 400) > .7) p(10, 1, 1, 1, '#FFFFFF'); } },
+    // забавные
+    giantpizza: { n: N('Giant pizza beanbag', 'Пуф-пицца', 'Picas pufs'), w: 22, h: 12, top: 4, sit: true, d: S(['kkkkkkkkkkkkkkkkkkkkkk', 'kyyryyyyyyyryyyygyyyk.', '.kyyyygyyyryyyyyyyyk..', '..kyyyyyyyyyyyryyyk...', '...kyryyyyyyyyyyyk....', '....kyyyyyygyyyyk.....', '.....kyyyryyyyyk......', '......kyyyyyyk........', '.......kyyyyk.........', '........kyyk..........'], { k: '#D9A45B', y: '#F6D04D', r: '#E5484D', g: '#4CC38A' }) },
+    rubberduck: { n: N('Giant rubber duck', 'Огромная резиновая уточка', 'Milzu gumijas pīlīte'), w: 18, h: 16, top: null, d: S(['.....yyyy.........', '....yyyyyy........', '....yykyyyoo......', '....yyyyyyooo.....', '.....yyyyyy.......', 'y...yyyyyyy.......', 'yy.yyyyyyyyyy.....', 'yyyyyyyyyyyyyyy...', 'yyyyyyyyyyyyyyyy..', '.yyyyyyYYYyyyyyy..', '.yyyyyyyyyyyyyy...', '..yyyyyyyyyyyy....', '....yyyyyyyy......'], { y: '#F6D04D', Y: '#E9B23B', k: '#2B2340', o: '#F08A3B' }) },
+    toaster: { n: N('Toaster', 'Тостер', 'Tosteris'), w: 13, h: 12, top: null, d: (p, t) => { const up = Math.floor(t / 1600) % 3 === 0 ? 4 : 0; p(3, 2 - up, 3, 4, '#D9A45B'); p(7, 2 - up, 3, 4, '#D9A45B'); p(0, 4, 13, 8, '#C9CDD6'); p(1, 5, 11, 1, '#E6E6EE'); p(3, 4, 3, 1, '#2B2340'); p(7, 4, 3, 1, '#2B2340'); p(12, 7, 1, 2, '#2B2340'); p(2, 9, 2, 1, '#E5484D'); } },
+    lavalamp: { n: N('Lava lamp', 'Лава-лампа', 'Lavas lampa'), w: 8, h: 18, top: null, glow: [4, 8], d: (p, t) => { p(2, 0, 4, 2, '#5B5670'); p(1, 2, 6, 12, 'rgba(155,93,229,.55)'); for (let k = 0; k < 3; k++) { const by = 3 + ((t / (400 + k * 150) + k * 3) % 9); p(2 + (k % 2) * 2, Math.round(by), 2 + (k === 1 ? 1 : 0), 2, '#F28AB2'); } p(0, 14, 8, 4, '#5B5670'); } },
+    cattower: { n: N('Cat tower', 'Кошачий домик', 'Kaķu tornis'), w: 18, h: 34, top: 0, d: p => { p(0, 0, 18, 3, '#D9C29A'); p(7, 3, 4, 10, '#B98236'); p(2, 13, 14, 9, '#D9C29A'); p(6, 16, 6, 6, '#2B2340'); p(7, 22, 4, 8, '#B98236'); p(0, 30, 18, 4, '#D9C29A'); p(14, 3, 1, 4, '#E5484D'); p(13, 7, 3, 3, '#E5484D'); } },
+    bathtub: { n: N('Bathtub with bubbles', 'Ванна с пеной', 'Vanna ar putām'), w: 34, h: 16, top: null, d: (p, t) => { p(0, 4, 34, 9, '#F4F0FA'); p(1, 5, 32, 1, '#BFE3F5'); for (let k = 0; k < 9; k++) { const o = Math.round(Math.sin(t / 400 + k) * 1); p(2 + k * 3.5, 1 + o, 4, 4, '#FFFFFF'); } spr((a, b, w, h, c) => p(22 + a, b - 2, w, h, c), ['.yy.', 'ykyo', 'yyy.'], { y: '#F6D04D', k: '#2B2340', o: '#F08A3B' }); p(3, 13, 3, 3, '#C9CDD6'); p(28, 13, 3, 3, '#C9CDD6'); p(32, 0, 2, 5, '#C9CDD6'); } },
+    mrchew: { n: N('Mr.Chew figurine', 'Фигурка Мистера Чу', 'Mr.Chew figūriņa'), w: 16, h: 13, top: null, d: S(['.k.k............', '.k.k....oooo....', '.ggg...ooOOoo...', 'gkgkg.ooOooOoo..', 'ggggg.oOooOOoo..', '.ggg..oOoooOoo..', '.ggggggoOOOooo..', 'gggggggggoooo...', 'ggggggggggggggg.', '.ggggggggggggg..'], { g: '#8EC27A', k: '#2B2340', o: '#C9955E', O: '#8C5A30' }) },
+    coatstand: { n: N('Detective’s coat stand', 'Вешалка детектива', 'Detektīva pakaramais'), w: 14, h: 36, top: null, d: S(['....kkkkk.....', '...kkkkkkk....', '..kkkkkkkkk...', '......n.......', '....tttttt....', '...tttTtttt...', '...ttttttttt..', '...tttTtttt...', '...ttttttttt..', '...tttTtttt...', '...tttttttt...', '...ttttttttt..', '......n.......', '......n.......', '......n.......', '......n.......', '......n.......', '......n.......', '......n.......', '......n.......', '......n.......', '......n.......', '......n.......', '....nnnnn.....'], { k: '#5B3A1E', n: '#3E281C', t: '#C9A35B', T: '#2B2340' }) },
+    wormchips: { n: N('Jar of worm chips', 'Банка червячковых чипсов', 'Tārpu čipsu burka'), w: 10, h: 12, top: null, d: S(['.rrrrrr...', '.rrrrrr...', 'wwwwwwww..', 'wpwwpwpw..', 'wwpppwww..', 'wwwwwpww..', 'wppwwwpw..', 'wwwpwwww..', 'wwwwwwww..', '.wwwwww...'], { r: '#E5484D', w: 'rgba(230,245,255,.85)', p: '#F28AB2' }) },
+    flytrap: { n: N('Hungry flytrap', 'Голодная мухоловка', 'Izsalkušā mušķērāja'), w: 12, h: 16, top: null, d: (p, t) => { const o = Math.floor(t / 500) % 2; p(3 - o, 0, 6, 3, '#4CC38A'); p(3 - o, 0, 6, 1, '#E5484D'); p(3 + o, 4, 6, 3, '#4CC38A'); p(3 + o, 6, 6, 1, '#E5484D'); for (let x = 4; x < 9; x += 2) { p(x - o, 3, 1, 1, '#FFFFFF'); } p(5, 7, 2, 4, '#3E8E5A'); p(2, 11, 8, 5, '#C66B4A'); p(1, 10, 10, 1, '#A8553A'); } },
+    robovac: { n: N('Robot vacuum', 'Робот-пылесос', 'Robotputekļsūcējs'), w: 30, h: 4, top: null, d: (p, t) => { const x = Math.round((Math.sin(t / 1500) + 1) * 9); p(x, 0, 12, 4, '#2B2340'); p(x + 1, 0, 10, 1, '#5B5670'); p(x + 5, 1, 2, 1, Math.floor(t / 300) % 2 ? '#4CC38A' : '#2B2340'); } },
+    socks: { n: N('Pile of lost socks', 'Куча потерянных носков', 'Pazudušo zeķu kaudze'), w: 16, h: 8, top: null, d: S(['....rr..bb......', '...rrr.bbbb.....', '..grrrrbbbyy....', '.ggggpppbyyyy...', 'ggggpppppyyyyy..', 'gggppppwwwyyyyy.'], { r: '#E5484D', b: '#4A7BD8', y: '#F6D04D', g: '#4CC38A', p: '#F28AB2', w: '#FFFFFF' }) },
+    tamagotchi: { n: N('Pocket pet', 'Тамагочи', 'Kabatas mīlulis'), w: 7, h: 8, top: null, d: (p, t) => { p(1, 0, 5, 1, '#F28AB2'); p(0, 1, 7, 7, '#F28AB2'); p(1, 2, 5, 3, '#BFE3C9'); p(2 + Math.floor(t / 500) % 2, 3, 2, 1, '#2B2340'); p(1, 6, 1, 1, '#FFFFFF'); p(3, 6, 1, 1, '#FFFFFF'); p(5, 6, 1, 1, '#FFFFFF'); } },
+    giantcoffee: { n: N('Giant coffee cup', 'Огромная чашка кофе', 'Milzu kafijas krūze'), w: 18, h: 16, top: 0, d: (p, t) => { p(0, 0, 14, 2, '#8B5A3C'); p(0, 2, 14, 12, '#F4F0FA'); p(14, 4, 4, 2, '#F4F0FA'); p(16, 6, 2, 4, '#F4F0FA'); p(14, 10, 4, 2, '#F4F0FA'); p(3, 6, 8, 4, '#E5484D'); p(5, 5, 4, 1, '#E5484D'); p(0, 14, 16, 2, '#C9CDD6'); if (Math.sin(t / 400) > 0) p(5, -3, 1, 2, '#FFFFFF'); else p(8, -4, 1, 2, '#FFFFFF'); } },
+    nestbed: { n: N('Nest bed', 'Кровать-гнездо', 'Ligzdas gulta'), w: 26, h: 10, top: 3, sit: true, d: p => { p(2, 0, 22, 4, '#F4EBDD'); p(5, 0, 6, 3, '#FFFFFF'); for (let y = 3; y < 10; y++) { const w = 26 - Math.abs(y - 6) * 2; p((26 - w) / 2, y, w, 1, y % 2 ? '#B9824A' : '#8C5A30'); } } },
+  });
+  Object.assign(DECO, {
+    rainbowarc: { n: N('Wall rainbow', 'Радуга на стене', 'Varavīksne pie sienas'), w: 30, h: 16, d: p => { const c = ['#E5484D', '#F08A3B', '#F6D04D', '#4CC38A', '#4A7BD8', '#9B5DE5']; for (let y = 0; y < 16; y++) for (let x = 0; x < 30; x++) { const d = Math.hypot(x - 14.5, y - 15.5), band = Math.floor(14.5 - d); if (band >= 0 && band < 6 && d <= 14.5) p(x, y, 1, 1, c[band]); } } },
+    constellation: { n: N('Living constellation', 'Живое созвездие', 'Dzīvs zvaigznājs'), w: 30, h: 16, d: (p, t) => { const pts = [[1, 12], [7, 6], [13, 9], [19, 2], [25, 7], [28, 14]]; pts.forEach(([x, y], i) => { const on = Math.sin(t / 400 + i) > -.3; p(x, y, 2, 2, on ? '#FFE9A8' : '#B9A86A'); if (on) { p(x - 1, y, 1, 1, 'rgba(255,233,168,.5)'); p(x + 2, y + 1, 1, 1, 'rgba(255,233,168,.5)'); } }); for (let i = 0; i < pts.length - 1; i++) { const [a, b] = pts[i], [c, d] = pts[i + 1]; for (let k = 1; k < 6; k++) p(Math.round(a + (c - a) * k / 6), Math.round(b + (d - b) * k / 6) + 1, 1, 1, 'rgba(255,233,168,.35)'); } } },
+    cuckoo: { n: N('Cuckoo clock', 'Часы с кукушкой', 'Dzeguzes pulkstenis'), w: 14, h: 18, d: (p, t) => { p(0, 2, 14, 2, '#5B3A1E'); p(2, 0, 10, 2, '#5B3A1E'); p(1, 4, 12, 11, '#8C5A30'); p(5, 5, 4, 3, '#2B2340'); if (Math.floor(t / 1200) % 4 === 0) { p(6, 5, 4, 3, '#F6D04D'); p(10, 6, 2, 1, '#F08A3B'); } p(4, 9, 6, 5, '#F4EBDD'); p(7, 10, 1, 3, '#2B2340'); p(7, 12, 2, 1, '#2B2340'); p(5, 15, 1, 3, '#C99A2E'); p(9, 15, 1, 2, '#C99A2E'); } },
+    moosehead: { n: N('Plush moose head', 'Плюшевая голова лося', 'Plīša aļņa galva'), w: 18, h: 14, d: S(['nn..........nn....', 'n.nn......nn.n....', 'nnnn......nnnn....', '...nn....nn.......', '....bbbbbb........', '...bbkbbkbb.......', '...bbbbbbbb.......', '....bbbbbb........', '....bBBBBb........', '.....BkBk.........', '....wwwwww........', '...wwwwwwww.......'], { n: '#D9C29A', b: '#8C5A30', B: '#B9824A', k: '#2B2340', w: '#7A4A30' }) },
+    crookedart: { n: N('Crooked painting', 'Кривая картина', 'Šķība glezna'), w: 20, h: 16, d: p => { for (let y = 0; y < 14; y++) { const o = Math.round(y / 4); p(o, y, 18, 1, y === 0 || y === 13 ? '#C99A2E' : '#C99A2E'); p(o + 2, y, 14, 1, y < 2 || y > 11 ? '#C99A2E' : y < 7 ? '#9FD3F5' : '#6FBF6A'); } p(9, 5, 3, 3, '#F6D04D'); p(6, 12, 1, 3, '#2B2340'); } },
+    ufo: { n: N('Toy UFO', 'Игрушечное НЛО', 'Rotaļu NLO'), w: 16, h: 12, d: (p, t) => { const o = Math.round(Math.sin(t / 500) * 2); p(8, 0, 1, 2 + o, '#C9C9D6'); p(5, 2 + o, 6, 3, 'rgba(160,220,250,.85)'); p(1, 5 + o, 14, 3, '#9A96A8'); p(0, 6 + o, 16, 1, '#C9CDD6'); for (let k = 0; k < 4; k++) p(2 + k * 4, 7 + o, 1, 1, Math.floor(t / 200 + k) % 2 ? '#F6D04D' : '#E5484D'); if (Math.floor(t / 700) % 2) p(5, 8 + o, 6, 3, 'rgba(76,227,160,.3)'); } },
+    balloons: { n: N('Balloons', 'Воздушные шарики', 'Baloni'), w: 14, h: 22, d: (p, t) => { const o = Math.round(Math.sin(t / 600)); [[1, 0, '#E5484D'], [6, 2, '#4A7BD8'], [10, 0, '#F6D04D']].forEach(([x, y, c]) => { p(x, y + o, 4, 5, c); p(x + 1, y + 5 + o, 2, 1, c); p(x + 1, y + 1 + o, 1, 1, '#FFFFFF'); }); for (let y = 7; y < 22; y++) { p(6 + Math.round(Math.sin(y / 3) * .6), y, 1, 1, '#9A96A8'); } } },
+    wormposter: { n: N('“Worm chips” poster', 'Постер «Червячковые чипсы»', 'Plakāts «Tārpu čipsi»'), w: 16, h: 20, d: p => { p(0, 0, 16, 20, '#F6D04D'); p(1, 1, 14, 3, '#E5484D'); p(3, 2, 10, 1, '#FFFFFF'); p(3, 6, 10, 10, '#E5484D'); p(4, 7, 8, 8, '#F7B6C8'); p(5, 9, 1, 1, '#2B2340'); p(9, 9, 1, 1, '#2B2340'); p(6, 12, 4, 1, '#2B2340'); p(2, 17, 12, 1, '#2B2340'); } },
+  });
+
   // значения каталога: «sofa:2», «ornament:4»; у вещей без цветов — просто имя
   const vals = o => Object.entries(o).flatMap(([k, d]) => d.v ? [...Array(d.v)].map((_, i) => k + ':' + i) : [k]);
   const parse = v => { const [k, i] = String(v).split(':'); return [k, +i || 0]; };
   const defOf = (kind, v) => { const [k, i] = parse(v); const d = (kind === 'deco' ? DECO : FURN)[k]; return d ? { ...d, k, i } : null; };
   const ROOM_KINDS = { wall: WALL, floor: FLOOR, view: VIEW, curtain: CURT };
-  const nameOf = (kind, v) => {
-    if (ROOM_KINDS[kind]) { const e = ROOM_KINDS[kind][v]; return e ? e[0][L] : v; }
-    const d = defOf(kind, v); return d ? d.n(d.i)[L] : v;
+  const nameOf = (kind, v, l = L) => {
+    if (ROOM_KINDS[kind]) { const e = ROOM_KINDS[kind][v]; return e ? e[0][l] : v; }
+    const d = defOf(kind, v); return d ? d.n(d.i)[l] : v;
   };
 
   // ---------- регистрация в каталоге подарков (коллекции, магазин, сумка, адвент, кабинет) ----------
-  const LEG = ['furn|throne', 'view|aurora', 'wall|gold', 'floor|marble']; // то же в worker/index.js LEGEND
+  const LEG = ['furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass', 'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight']; // то же в worker/index.js LEGEND
   Object.assign(B.GIFTS, { wall: Object.keys(WALL).filter(k => k !== '_'), floor: Object.keys(FLOOR).filter(k => k !== '_'), view: Object.keys(VIEW).filter(k => k !== '_'),
     curtain: Object.keys(CURT), furn: vals(FURN), deco: vals(DECO) });
   LEG.forEach(x => B.LEGEND.add(x));
@@ -391,10 +454,16 @@
   addTh('school', ['wall|library', 'wall|chalk', 'furn|computer']);
   addTh('valentine', ['wall|hearts', 'floor|fluffy']);
   addTh('legendary', []);
+  B.GIFT_THEMES.push(['tree', ['🎄 Tree decorations', '🎄 Украшения для ёлки', '🎄 Eglītes rotājumi'], ['deco|ornament:0', 'deco|ornament:1', 'deco|ornament:2', 'deco|ornament:3', 'deco|ornament:4', 'deco|ornament:5', 'deco|xmasstar', 'deco|staromini', 'deco|lights', 'deco|tinsel', 'deco|beads', 'deco|icicle', 'deco|pinecone', 'deco|angel', 'deco|gingerorn', 'deco|birdorn', 'deco|candyorn', 'deco|snowmanorn', 'deco|bell', 'deco|candycane', 'furn|xmastree']]);
+  addTh('newyear', ['deco|staromini', 'deco|beads', 'deco|icicle', 'deco|pinecone', 'deco|angel', 'deco|gingerorn', 'deco|birdorn', 'deco|candyorn', 'deco|snowmanorn']);
+  B.GIFT_THEMES.push(['fun', ['😂 Funny', '😂 Забавное', '😂 Jautri'], ['furn|giantpizza', 'furn|rubberduck', 'furn|toaster', 'furn|lavalamp', 'furn|cattower', 'furn|bathtub', 'furn|mrchew', 'furn|coatstand', 'furn|wormchips', 'furn|flytrap', 'furn|robovac', 'furn|socks', 'furn|tamagotchi', 'furn|giantcoffee', 'furn|nestbed', 'deco|cuckoo', 'deco|moosehead', 'deco|crookedart', 'deco|ufo', 'deco|balloons', 'deco|wormposter']]);
+  addTh('magic', ['furn|portal', 'furn|dragon', 'deco|constellation', 'curtain|starlight']);
+  addTh('pirate', ['furn|treasure']);
   B.GIFT_THEMES.push(['music', ['🎵 Music', '🎵 Музыка', '🎵 Mūzika'], ['furn|guitar', 'furn|piano', 'furn|drum', 'furn|speaker', 'furn|recordplayer', 'furn|gramophone', 'furn|radio', 'deco|discoball']]);
   B.GIFT_THEMES.push(['space', ['🚀 Space', '🚀 Космос', '🚀 Kosmoss'], ['furn|telescope', 'furn|rocket', 'furn|moonlamp', 'furn|helmet', 'view|space', 'view|aurora', 'wall|planets', 'wall|stars']]);
   B.GIFT_THEMES.push(['polly', ['🐦 Pigeon Polly', '🐦 Pigeon Polly', '🐦 Pigeon Polly'], ['furn|pollyplush', 'furn|seedbag', 'furn|fountain', 'furn|birdhouse', 'deco|poster', 'deco|painting', 'wall|pigeons', 'view|riga']]);
   B.GIFT_THEMES.push(['home', ['🏠 Cozy room', '🏠 Уютная комната', '🏠 Mājīga istaba'], ['furn|bed', 'furn|nightstand', 'furn|cat', 'furn|catbed', 'furn|grandclock', 'furn|pouf', 'deco|mirror', 'wall|rainbow', 'floor|rainbowrug', 'floor|parquet', 'curtain|rainbow', 'curtain|golden', 'furn|sofa:0', 'furn|sofa:1', 'furn|armchair', 'furn|knitting', 'furn|yarn', 'furn|lamp', 'furn|plant', 'furn|books', 'furn|mug', 'furn|teapot', 'furn|gramophone', 'furn|radio', 'deco|clock', 'deco|painting', 'wall|wood', 'floor|bluerug', 'curtain|lace']]);
+  addTh('polly', ['furn|pollystatue', 'furn|wormchips', 'furn|nestbed', 'furn|mrchew', 'deco|wormposter', 'deco|birdorn']);
   // иконка вещи для комнаты
   function icon(kind, v, size) {
     const s = 6, c = document.createElement('canvas'), g = c.getContext('2d');
@@ -417,7 +486,7 @@
   }
   const isRoom = k => ['wall', 'floor', 'view', 'curtain', 'furn', 'deco'].includes(k);
   const oldName = B.giftName, oldIcon = B.itemIcon, oldPic = B.giftPic;
-  B.giftName = (k, v, l) => isRoom(k) ? nameOf(k, v) : oldName(k, v, l);
+  B.giftName = (k, v, l) => isRoom(k) ? nameOf(k, v, l == null ? L : l) : oldName(k, v, l);
   B.itemIcon = (k, v, size, id) => isRoom(k) ? icon(k, v, size) : oldIcon(k, v, size, id);
   B.giftPic = (k, v, id, size, av) => { if (!isRoom(k)) return oldPic(k, v, id, size, av); const w = document.createElement('span'); w.className = 'gift-pic'; w.appendChild(icon(k, v, size)); return w; };
   B.isRoomKind = isRoom;

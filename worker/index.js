@@ -266,7 +266,7 @@ const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, p
   badges: { bw: 5, extra: 15, bday: 15, early: 15, owl: 15, comeback: 15, ten: 20, weekend: 20, newyear: 20, halloween: 20,
     monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, hundred: 100 } };
 // легендарные вещи (как LEGEND в birds.js): в магазине по одной штуке на птичку, дарить нельзя; обычных — до трёх одинаковых
-const LEGEND = new Set(['hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble']);
+const LEGEND = new Set(['hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass', 'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight']);
 const SHOP_MAX = 3;
 const copies = async (env, uid, kind, item) => (await env.DB.prepare("SELECT COUNT(*) AS n FROM gifts WHERE user_id = ? AND kind = ? AND item = ? AND status IN ('bag', 'new')").bind(uid, kind, item).first()).n;
 const rigaDay = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }); // сутки по Риге
