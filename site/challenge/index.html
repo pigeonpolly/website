@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=ba135d58">
+<link rel="stylesheet" href="/assets/style.css?v=1599a883">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <script src="/assets/site.js?v=21e5a681" defer></script>
 <script src="/assets/polly.js?v=4b77d0df" defer></script>
@@ -66,28 +66,71 @@
 </header>
 <main id="main">
 <div data-ppb="challenge.1" class="parade" id="parade" aria-hidden="true"></div>
-<section data-ppb="challenge.2" class="page-head ch-head ch-head2">
-  <div class="ch-head-text">
-  <p class="topics">daily sketch challenge</p>
+<section data-ppb="challenge.2" class="page-head ch-head ch-head3">
   <h1>Daily Challenge</h1>
-  <p class="lead">Every day Polly tears off a new page: one subject, three colours and a few minutes. Draw it, make a card and share your work with #dailypigeonpolly.</p>
-  <p class="lead ch-materials">Any materials are welcome: pencil, pen, markers, crayons, paint or digital.</p>
-  <div class="ch-news">
-    <span class="sw-quick" id="sw-quick"></span>
-    <a class="pill-btn ch-news-btn" href="#sw-wall">🖼 See everyone’s sketches</a>
-    <button type="button" class="pill-btn ch-news-btn ch-pal-btn" id="ch-pal-btn">🎨 Palette for inspiration</button>
-  </div>
+  <!-- кнопки: всё, кроме темы дня и работ участников, свёрнуто и открывается по нажатию (одна панель за раз) -->
+  <div class="ch-btns" role="toolbar" aria-label="Daily Challenge">
+    <a class="pill-btn" href="/bird/" id="ch-b-profile">🐦 My profile</a>
+    <button type="button" class="pill-btn" data-panel="up" aria-expanded="false">⬆ Upload my sketch</button>
+    <button type="button" class="pill-btn" data-panel="card" aria-expanded="false">📸 Make a card</button>
+    <button type="button" class="pill-btn" data-panel="cal" aria-expanded="false">📅 Month calendar</button>
+    <button type="button" class="pill-btn ch-tbtn" data-panel="timer" aria-expanded="false" id="ch-timer-box"><span aria-hidden="true">⏱</span> <b class="ch-tclock" id="ch-tclock"></b> <span>Timer</span></button>
+    <button type="button" class="pill-btn ch-pal-btn" id="ch-pal-btn">🎨 Palette for inspiration</button>
+    <a class="pill-btn" href="#sw-wall-box">🖼 See everyone’s sketches</a>
   </div>
 </section>
-<section data-ppb="challenge.3" class="ch ch2" id="challenge">
-  <!-- сверху: профиль и загрузка рисунка; справа — Ч/Б, отрывной листок дня, таймер и карточка кнопками -->
-  <div class="ch-top">
-    <div class="ch-me" id="works">
-      <p class="sw-lead">Sign in, upload your daily sketch, keep your streak going and collect Pigeon Polly badges. Every sketch counts, even a tiny pen doodle on a napkin.</p>
-      <div class="sw-app" id="sw-app" aria-live="polite"><p class="sw-loading">…</p></div>
+<section data-ppb="challenge.3" class="ch ch3" id="challenge">
+  <div class="ch-panels">
+    <div class="ch-panel" id="ch-p-up" hidden>
+      <div class="ch-me" id="works">
+        <p class="sw-lead">Sign in, upload your daily sketch, keep your streak going and collect Pigeon Polly badges. Every sketch counts, even a tiny pen doodle on a napkin.</p>
+        <div class="sw-app" id="sw-app" aria-live="polite"><p class="sw-loading">…</p></div>
+      </div>
     </div>
+    <div class="ch-panel" id="ch-p-card" hidden>
+      <div class="ch-card-box">
+        <div class="ch-actions">
+          <button class="pill-btn" type="button" id="ch-photo"></button>
+          <input type="file" id="ch-file" accept="image/*" hidden>
+        </div>
+        <div class="ch-thumb" id="ch-thumb"></div>
+        <p class="ch-note" id="ch-note">The photo is only used to make your card. Nothing is uploaded or saved.</p>
+        <button class="pill-btn" type="button" id="ch-share"></button>
+        <div class="ch-share-card" id="ch-card"></div>
+      </div>
+    </div>
+    <div class="ch-panel" id="ch-p-cal" hidden>
+      <div class="diary">
+        <div class="diary-head">
+          <h2 class="section-title">Calendar of themes</h2>
+          <p>Missed a day? Pick it here and draw its theme.</p>
+        </div>
+        <div class="diary-nav">
+          <button type="button" id="ch-prev">‹</button>
+          <span id="ch-month"></span>
+          <button type="button" id="ch-next">›</button>
+        </div>
+        <div class="diary-grid" id="ch-grid"></div>
+      </div>
+    </div>
+    <div class="ch-panel" id="ch-p-timer" hidden>
+      <div class="ch-card-box">
+        <div class="ch-level" id="ch-level" role="group" aria-label="Level"></div>
+        <div class="ch-clock" id="ch-clock" aria-live="off">00:00</div>
+        <div class="ch-bar" id="ch-bar"></div>
+        <p class="ch-stage" id="ch-stage"></p>
+        <p class="ch-hint" id="ch-hint"></p>
+        <div class="ch-actions">
+          <button class="cta-btn" type="button" id="ch-go">Start</button>
+          <button class="cta-link ch-reset" type="button" id="ch-reset">Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- всегда видно: слева тема дня с переключателем Ч/Б, справа работы участников -->
+  <div class="ch-main">
     <aside class="ch-today">
-  <div class="bw-pick" id="ch-bw-pick">
+      <div class="bw-pick" id="ch-bw-pick">
         <div class="bw-polly" id="ch-bw-polly" aria-hidden="true"></div>
         <div class="bw-body">
           <p class="bw-q" id="ch-bw-q"></p>
@@ -95,73 +138,45 @@
         </div>
       </div>
       <div id="ch-cal" class="ch-cal"></div>
-      <div class="ch-tools">
-        <details class="ch-tool" id="ch-timer-box">
-          <summary><span aria-hidden="true">⏱</span> <b class="ch-tclock" id="ch-tclock"></b> <span>Timer</span></summary>
-          <div class="ch-card-box">
-            <div class="ch-level" id="ch-level" role="group" aria-label="Level"></div>
-            <div class="ch-clock" id="ch-clock" aria-live="off">00:00</div>
-            <div class="ch-bar" id="ch-bar"></div>
-            <p class="ch-stage" id="ch-stage"></p>
-            <p class="ch-hint" id="ch-hint"></p>
-            <div class="ch-actions">
-              <button class="cta-btn" type="button" id="ch-go">Start</button>
-              <button class="cta-link ch-reset" type="button" id="ch-reset">Reset</button>
-            </div>
-          </div>
-        </details>
-        <details class="ch-tool">
-          <summary><span aria-hidden="true">📸</span> <span>Card for social media</span></summary>
-          <div class="ch-card-box">
-            <div class="ch-actions">
-              <button class="pill-btn" type="button" id="ch-photo"></button>
-              <input type="file" id="ch-file" accept="image/*" hidden>
-            </div>
-            <div class="ch-thumb" id="ch-thumb"></div>
-            <p class="ch-note" id="ch-note">The photo is only used to make your card. Nothing is uploaded or saved.</p>
-            <button class="pill-btn" type="button" id="ch-share"></button>
-            <div class="ch-share-card" id="ch-card"></div>
-          </div>
-        </details>
-      </div>
     </aside>
-  </div>
-  <div class="diary">
-    <div class="diary-head">
-      <h2 class="section-title">Calendar of themes</h2>
-      <p>Missed a day? Pick it here and draw its theme.</p>
-    </div>
-    <div class="diary-nav">
-      <button type="button" id="ch-prev">‹</button>
-      <span id="ch-month"></span>
-      <button type="button" id="ch-next">›</button>
-    </div>
-    <div class="diary-grid" id="ch-grid"></div>
-  </div>
-</section>
-<section data-ppb="challenge.4" class="sw-page sw-page2">
-  <div class="sw-cols">
-    <div class="sw-wall-box">
-      <h2 class="section-title">Fresh from the community</h2>
-      <div class="sw-wall" id="sw-wall"></div>
-      <p class="sw-more-row sw-pager"><button class="pill-btn" type="button" id="sw-newer" hidden>← Newer</button><span id="sw-page"></span><button class="pill-btn" type="button" id="sw-more" hidden>Older →</button></p>
-    </div>
-    <div class="sw-top-box">
-      <h2 class="section-title">Longest streaks</h2>
-      <ol class="sw-top" id="sw-top"></ol>
+    <div class="sw-cols ch-feed">
+      <div class="sw-wall-box" id="sw-wall-box">
+        <h2 class="section-title">Fresh from the community</h2>
+        <div class="sw-wall" id="sw-wall"></div>
+        <p class="sw-more-row sw-pager"><button class="pill-btn" type="button" id="sw-newer" hidden>← Newer</button><span id="sw-page"></span><button class="pill-btn" type="button" id="sw-more" hidden>Older →</button></p>
+      </div>
+      <ol class="sw-top" id="sw-top" hidden></ol>
     </div>
   </div>
-  <p class="sw-privacy">Sketches stay on the wall while you keep drawing. If you neither upload nor visit for 3 months, they may be removed when storage gets full, but your level and badges stay.</p>
-  <p class="sw-privacy">Your e-mail is only used to sign you in and is never shown. <a href="/privacy/">Privacy</a></p>
+  <p class="sw-privacy">Sketches stay on the wall while you keep drawing. If you neither upload nor visit for 3 months, they may be removed when storage gets full, but your level and badges stay. Your e-mail is only used to sign you in and is never shown. <a href="/privacy/">Privacy</a></p>
   <p class="sw-danger" id="sw-danger"></p>
 </section>
+<script>
+// кнопки челленджа: открывают свою панель (одна за раз), повторное нажатие — сворачивает
+(function () {
+  var pre = { ru: '/ru', lv: '/lv' }[document.documentElement.lang] || '';
+  document.getElementById('ch-b-profile').href = pre + '/bird/';
+  var btns = document.querySelectorAll('.ch-btns [data-panel]');
+  function open(k, scroll) {
+    [].forEach.call(btns, function (b) {
+      var on = b.dataset.panel === k && b.getAttribute('aria-expanded') !== 'true';
+      b.setAttribute('aria-expanded', String(on)); document.getElementById('ch-p-' + b.dataset.panel).hidden = !on;
+      if (on && scroll) document.getElementById('ch-p-' + k).scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+    });
+  }
+  [].forEach.call(btns, function (b) { b.addEventListener('click', function () { open(b.dataset.panel, true); }); });
+  // ссылки #works (вход, «загрузить») открывают панель загрузки
+  if (location.hash === '#works') open('up');
+  window.PPChallengeOpen = function (k) { var b = document.querySelector('.ch-btns [data-panel="' + k + '"]'); if (b && b.getAttribute('aria-expanded') !== 'true') open(k, true); };
+})();
+</script>
 <script src="/assets/challenge-data.js?v=82b6cc88" defer></script>
 <script src="/assets/extra-palettes.js?v=9167b08c" defer></script>
 <script src="/api/extra-palettes.js" defer></script>
 <script src="/assets/challenge-theme.js?v=c6196232" defer></script>
-<script src="/assets/challenge.js?v=db0d088a" defer></script>
+<script src="/assets/challenge.js?v=e22943f6" defer></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
-<script src="/assets/sketch-wall.js?v=1fe7f984" defer></script>
+<script src="/assets/sketch-wall.js?v=61b65bc7" defer></script>
 
 <script src="/assets/palettes.js?v=7878c1ec" defer></script>
 

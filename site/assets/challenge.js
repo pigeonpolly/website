@@ -96,7 +96,6 @@
       </div>
     </div>
     ${selKey !== todayKey ? `<p class="back-today"><button type="button" id="ch-today">${t('backToday')}</button></p>` : ''}
-    <p class="ph-open-wrap"><a class="ph-open" href="${L ? '/' + ['', 'ru', 'lv'][L] : ''}/polly-helps/#shapes">${t('help')}</a></p>
     <div class="tip"><b>${t('tip')}</b><p>${theme.tip}</p></div>`;
     const old = $('.page.old'); old && old.addEventListener('animationend', () => old.remove());
     const bt = $('#ch-today'); bt && bt.addEventListener('click', () => { view = new Date(today.getFullYear(), today.getMonth(), 1); selectDay(new Date(today)); });

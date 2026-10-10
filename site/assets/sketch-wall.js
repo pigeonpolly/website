@@ -311,7 +311,7 @@
     const st = document.getElementById('sw-status');
     try {
       await post('login', { credential }); window.PPAccount && window.PPAccount.check(); await refresh(); loadTop(); loadWall(true);
-      document.getElementById('works')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      if (window.PPChallengeOpen) window.PPChallengeOpen('up'); else document.getElementById('works')?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     }
     catch (e) { if (st) st.textContent = e.code === 'banned' ? t('banned') : t('err'); }
   }

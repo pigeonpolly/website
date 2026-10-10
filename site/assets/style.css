@@ -3087,3 +3087,28 @@ html:not(.is-admin) .statbar { display: none; }
 .pp-room-ic.sq canvas { border-radius: 10px; }
 .fl-all-bird { position: relative; }
 .fl-home { position: absolute; top: 2px; right: 6px; font-style: normal; font-size: 16px; }
+/* челлендж (10.10.2026): название, ряд кнопок, свёрнутые панели; ниже тема дня слева и работы участников справа */
+.ch-head3 { padding-bottom: 8px; }
+.ch-head3 h1 { margin-bottom: 18px; }
+.ch-btns { display: flex; flex-wrap: wrap; gap: 8px; }
+.ch-btns .pill-btn[aria-expanded="true"] { background: #F0A987; border-color: #F0A987; color: #2B1A51; }
+.ch-tbtn .ch-tclock:empty { display: none; }
+.ch-tbtn.run { box-shadow: 0 0 0 2px #4CC38A; }
+.ch3 { display: grid; gap: 22px; }
+.ch-panels:has(.ch-panel:not([hidden])) { padding: 18px; border-radius: 22px; background: rgba(255, 255, 255, .05); border: 1px solid var(--line); }
+.ch-panel[hidden] { display: none; }
+.ch-panel .ch-card-box { max-width: 560px; }
+.ch-main { display: grid; grid-template-columns: minmax(280px, 380px) minmax(0, 1fr); gap: 28px; align-items: start; }
+.ch-main .ch-today { display: grid; gap: 14px; position: sticky; top: calc(var(--header-h) + 16px); }
+.ch-feed { margin: 0; }
+.ch-feed .sw-wall-box { margin: 0; }
+.ch-feed .section-title { margin-top: 0; }
+.ch3 .sw-privacy { font-size: 13px; opacity: .7; }
+@media (max-width: 860px) { .ch-main { grid-template-columns: 1fr; } .ch-main .ch-today { position: static; } }
+.ch-head3, .ch-head3.page-head { display: block !important; }
+.ch-feed.sw-cols { display: block !important; }
+.ch-feed .sw-top { display: none !important; }
+.ch-feed .sw-wall-box { width: 100%; }
+.ch-feed .section-title { max-width: none; }
+.ch3 .sw-profile-mini .sw-gifts .pill-fill { display: none; } /* «Мой профиль» уже есть кнопкой сверху */
+@media (max-width: 600px) { .ch-btns { gap: 6px; } .ch-btns .pill-btn { font-size: 14px; padding: 7px 11px; } }
