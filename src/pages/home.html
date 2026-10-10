@@ -4,9 +4,7 @@
     <h1>A small lab for big imagination</h1>
     <p class="lead">Creative AI, learning that fits different minds, and illustrated worlds, all under one roof.</p>
     <div class="actions">
-      <a class="btn" href="/flock/">🐦 Join the flock</a>
-      <a class="btn" href="/detective-office/">🔍 Play the detective game</a>
-      <a class="btn" href="/wobbleland/">What is Wobbleland?</a>
+      <a class="btn btn-join" href="/flock/" data-join>🐦 Join and get your bird</a>
     </div>
   </div>
   <div class="art" tabindex="0">
@@ -20,12 +18,16 @@
 <script>
 // фото Алины под Полли: наведение на компьютере, касание на телефоне
 (function () { var a = document.querySelector('.hero .art'); if (a) a.addEventListener('click', function () { a.classList.toggle('on'); }); })();
+// «Присоединиться»: гостю — окно входа (регистрация = вход через Google), вошедшему — его профиль
+(function () {
+  var b = document.querySelector('[data-join]'); if (!b) return;
+  var pre = { ru: '/ru', lv: '/lv' }[document.documentElement.lang] || '';
+  b.addEventListener('click', function (e) {
+    if (window.PPAccount && window.PPAccount.signedIn()) { e.preventDefault(); location.href = pre + '/bird/'; return; }
+    if (window.PPAccount && window.PPAccount.openSignIn()) e.preventDefault();
+  });
+})();
 </script>
 {{block:home-blog}}
-{{block:today}}
 {{block:coming-soon}}
-{{block:patreon}}
-{{block:titos-case}}
-{{block:about}}
-{{block:shop-promo}}
 {{block:flock}}

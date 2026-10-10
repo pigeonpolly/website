@@ -2513,8 +2513,10 @@ tr[data-s] td:first-child .be-tr-in { width: calc(100% - 28px); }
 }
 
 /* ---------- полоска «в цифрах» над меню: тонкая, при прокрутке вниз прячется ---------- */
-:root { --sb-h: 26px; --sb: 26px; }
-html.sb-hide { --sb: 0px; }
+:root { --sb-h: 0px; --sb: 0px; } /* полоска цифр над шапкой — только админу (account.js ставит html.is-admin) */
+html.is-admin { --sb-h: 26px; --sb: 26px; }
+html.is-admin.sb-hide { --sb: 0px; }
+html:not(.is-admin) .statbar { display: none; }
 .statbar { position: fixed; top: 0; left: 0; right: 0; z-index: 51; height: var(--sb-h); background: #1E1240; color: rgba(255,255,255,.72); font: 500 12.5px/var(--sb-h) var(--sans); transform: translateY(calc(var(--sb) - var(--sb-h))); transition: transform .25s; }
 .statbar-in { display: flex; justify-content: center; gap: 22px; height: 100%; padding: 0 var(--gutter); overflow-x: auto; white-space: nowrap; scrollbar-width: none; }
 .statbar-in::-webkit-scrollbar { display: none; }
@@ -3034,3 +3036,6 @@ html.sb-hide { --sb: 0px; }
 .fl-adv-it button { position: absolute; top: -6px; right: -6px; width: 20px; height: 20px; border-radius: 50%; border: 0; background: #E5484D; color: #fff; font-size: 11px; cursor: pointer; }
 /* шапка на ширине 1301–1560px: меню плотнее, чтобы длинные латышские/русские пункты и аватар помещались */
 @media (min-width: 1301px) and (max-width: 1560px) { .site-nav a, .sub-toggle { padding: 8px 7px; font-size: 14px; } .site-nav > ul { gap: 2px; } }
+/* главная: одна главная кнопка «Присоединиться» — заметная */
+.hero .btn-join { background: #F0A987; border-color: #F0A987; color: #2B1A51; font-weight: 700; }
+.hero .btn-join:hover { background: #F5C4B3; border-color: #F5C4B3; }

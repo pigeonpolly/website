@@ -24,12 +24,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=c89fe6be">
+<link rel="stylesheet" href="/assets/style.css?v=08264775">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <script src="/assets/site.js?v=36ddfaeb" defer></script>
 <script src="/assets/polly.js?v=4b77d0df" defer></script>
 <script src="/assets/birds.js?v=71711949" defer></script>
-<script src="/assets/account.js?v=d9a3b485" defer></script>
+<script src="/assets/account.js?v=0e5593d0" defer></script>
 <script src="/assets/search.js?v=69d0c7a5" defer></script>
 </head>
 <body class="home">
@@ -55,12 +55,10 @@
   </button>
   <nav id="site-nav" class="site-nav" aria-label="Main">
     <ul>
-<li><a href="/ru/challenge/">Челлендж</a></li>
-<li><a href="/ru/blog/">Блог</a></li>
+<li class="has-sub"><a href="/ru/challenge/">Рисовать</a><button type="button" class="sub-toggle" aria-expanded="false" aria-label="Показать подменю"><span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/ru/challenge/">Челлендж</a></li><li><a href="/ru/palettes/">Палитры</a></li><li><a href="/ru/polly-helps/">Полли, помоги нарисовать</a></li><li><a href="/ru/e-books/">Книги</a></li></ul></li>
 <li class="has-sub"><a href="/ru/art-portfolio/">Мой скетчбук</a><button type="button" class="sub-toggle" aria-expanded="false" aria-label="Показать подменю"><span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/ru/art-portfolio/">Все серии</a></li><li><a href="/ru/art-portfolio/sketchbook/">Страницы скетчбука</a></li><li><a href="/ru/art-portfolio/anxiety/">Тревога</a></li><li><a href="/ru/art-portfolio/bird/">Голубь Полли</a></li><li><a href="/ru/art-portfolio/snail/">Mr.Chew</a></li><li><a href="/ru/art-portfolio/detective/">Mr.Titos</a></li><li><a href="/ru/art-portfolio/halloween/">Семья Тыквоголовых</a></li><li><a href="/ru/art-portfolio/ai-art/">AI-арт</a></li></ul></li>
-<li class="has-sub"><a href="/ru/detective-office/">Игры</a><button type="button" class="sub-toggle" aria-expanded="false" aria-label="Показать подменю"><span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/ru/detective-office/">Детектив Титос</a></li><li><a href="/ru/polly-office/">Полли, офисный клерк</a></li><li><a href="/ru/flock/">Стая</a></li><li><a href="/ru/shop/">Магазин</a></li><li><a href="/ru/advent/">Адвент-календарь</a></li></ul></li>
-<li class="has-sub"><a href="/ru/about-polly/">Мир Полли</a><button type="button" class="sub-toggle" aria-expanded="false" aria-label="Показать подменю"><span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/ru/about-polly/">О Полли</a></li><li><a href="/ru/wobbleland/">Wobbleland</a></li></ul></li>
-<li class="has-sub"><a href="/ru/e-books/">Книги и полезное</a><button type="button" class="sub-toggle" aria-expanded="false" aria-label="Показать подменю"><span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/ru/e-books/">Книги</a></li><li><a href="/ru/polly-helps/">Полли, помоги нарисовать</a></li><li><a href="/ru/palettes/">Палитры</a></li></ul></li>
+<li class="has-sub"><a href="/ru/flock/">Играть</a><button type="button" class="sub-toggle" aria-expanded="false" aria-label="Показать подменю"><span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/ru/flock/">Стая</a></li><li><a href="/ru/shop/">Магазин</a></li><li><a href="/ru/advent/">Адвент-календарь</a></li><li><a href="/ru/detective-office/">Детектив Титос</a></li><li><a href="/ru/polly-office/">Полли, офисный клерк</a></li><li><a href="/ru/wobbleland/">Wobbleland</a></li><li><a href="/ru/about-polly/">О Полли</a></li></ul></li>
+<li><a href="/ru/blog/">Блог</a></li>
 <li class="has-sub"><a href="/ru/about-me/">Обо мне</a><button type="button" class="sub-toggle" aria-expanded="false" aria-label="Показать подменю"><span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/ru/about-me/">Обо мне</a></li><li><a href="/ru/on-walls-and-pages/">На стенах и страницах</a></li><li><a href="/ru/projects/">Обучение и AI</a></li><li><a href="/ru/work-with-me/">Сотрудничество</a></li></ul></li>
     </ul>
   </nav>
@@ -72,9 +70,7 @@
     <h1>Маленькая лаборатория для большого воображения</h1>
     <p class="lead">Творческий AI, обучение, которое подходит разным людям, и иллюстрированные миры — всё под одной крышей.</p>
     <div class="actions">
-      <a class="btn" href="/ru/flock/">🐦 Присоединиться к стае</a>
-      <a class="btn" href="/ru/detective-office/">🔍 Сыграть в детектив</a>
-      <a class="btn" href="/ru/wobbleland/">Что такое Wobbleland?</a>
+      <a class="btn btn-join" href="/ru/flock/" data-join>🐦 Присоединиться и получить птичку</a>
     </div>
   </div>
   <div class="art" tabindex="0">
@@ -88,6 +84,15 @@
 <script>
 // фото Алины под Полли: наведение на компьютере, касание на телефоне
 (function () { var a = document.querySelector('.hero .art'); if (a) a.addEventListener('click', function () { a.classList.toggle('on'); }); })();
+// «Присоединиться»: гостю — окно входа (регистрация = вход через Google), вошедшему — его профиль
+(function () {
+  var b = document.querySelector('[data-join]'); if (!b) return;
+  var pre = { ru: '/ru', lv: '/lv' }[document.documentElement.lang] || '';
+  b.addEventListener('click', function (e) {
+    if (window.PPAccount && window.PPAccount.signedIn()) { e.preventDefault(); location.href = pre + '/bird/'; return; }
+    if (window.PPAccount && window.PPAccount.openSignIn()) e.preventDefault();
+  });
+})();
 </script>
 <div class="blk" id="blk-home-blog" data-ppb="blk-home-blog"><style>#blk-home-blog .hb { padding: 56px var(--gutter) 60px; background: #FFFDF8; color: #2B1A51; }
 #blk-home-blog .hb[hidden] { display: none; }
@@ -149,36 +154,6 @@
   <span class="hb-label" hidden data-read>Читать статью →</span>
 </section>
 <script src="/assets/home-blog.js?v=0579a5ee" defer></script>
-</div>
-<div class="blk" id="blk-today" data-ppb="blk-today"><style></style><section class="today-sec">
-  <div class="td-text">
-    <p class="topics">ежедневный скетч-челлендж</p>
-    <h2 class="td-title">Что вы нарисуете сегодня?</h2>
-    <p class="td-lead">Каждый день Полли приносит новую тему: один предмет, три цвета и несколько минут. Откройте конверт и узнайте сегодняшнюю.</p>
-    <p class="td-stats" hidden><span class="td-stat"><b data-n="works">0</b> <i data-l="works"></i></span><span class="td-stat"><b data-n="users">0</b> <i data-l="users"></i></span></p>
-    <div class="td-actions">
-      <button class="cta-btn td-open" type="button">Открыть конверт дня</button>
-      <a class="cta-btn td-go" href="/ru/challenge/">Рисовать сейчас →</a>
-      <a class="ph-open td-help" href="/ru/polly-helps/">🕊 Полли, помоги нарисовать</a>
-    </div>
-  </div>
-  <div class="td-stage" aria-live="polite">
-    <div class="td-env">
-      <div class="td-back"></div>
-      <div class="td-card"><span class="td-date"></span><b class="td-subj"></b><span class="td-cols"></span><span class="td-meta"></span></div>
-      <div class="td-front"></div>
-      <div class="td-flap"></div>
-      <button class="td-seal" type="button" aria-label="Открыть конверт дня"><svg viewBox="-56 -56 112 112" aria-hidden="true"><defs><radialGradient id="wx" cx="38%" cy="32%" r="75%"><stop offset="0" stop-color="#E0533F"/><stop offset=".55" stop-color="#B42A1F"/><stop offset="1" stop-color="#7A140F"/></radialGradient><radialGradient id="wi" cx="60%" cy="65%" r="70%"><stop offset="0" stop-color="#C8372A"/><stop offset="1" stop-color="#8F1D15"/></radialGradient></defs><path d="M41.3 -6.6 Q42.1 0.0 40.4 6.3 Q38.7 12.6 37.4 19.4 Q36.2 26.3 31.9 32.2 Q27.7 38.1 20.6 39.9 Q13.5 41.6 6.8 42.0 Q0.0 42.4 -6.2 40.2 Q-12.3 38.0 -19.0 36.6 Q-25.6 35.2 -28.9 29.3 Q-32.2 23.4 -36.5 18.3 Q-40.9 13.3 -40.5 6.6 Q-40.1 0.0 -42.5 -7.3 Q-44.9 -14.6 -39.8 -19.9 Q-34.7 -25.2 -30.9 -31.3 Q-27.1 -37.3 -19.8 -37.9 Q-12.5 -38.5 -6.3 -39.9 Q-0.0 -41.3 8.0 -45.1 Q15.9 -49.0 21.8 -43.5 Q27.7 -38.1 31.7 -32.0 Q35.7 -25.9 38.1 -19.6 Q40.6 -13.2 41.3 -6.6 Z" fill="url(#wx)"/><circle r="28" fill="url(#wi)"/><circle r="28" fill="none" stroke="#5E0E0A" stroke-opacity=".55" stroke-width="2.5"/><circle r="30.5" fill="none" stroke="#FF9A85" stroke-opacity=".35" stroke-width="1.5"/><path d="M0 -17 L5 -5 L17 0 L5 5 L0 17 L-5 5 L-17 0 L-5 -5 Z" transform="translate(1.2 1.2)" fill="#5E0E0A" fill-opacity=".55"/><path d="M0 -17 L5 -5 L17 0 L5 5 L0 17 L-5 5 L-17 0 L-5 -5 Z" fill="#D9473A"/><path d="M0 -17 L5 -5 L17 0 L5 5 L0 17 L-5 5 L-17 0 L-5 -5 Z" transform="translate(-.8 -.8) scale(.92)" fill="none" stroke="#FFB4A3" stroke-opacity=".5" stroke-width="1"/><ellipse cx="-18" cy="-24" rx="11" ry="5" transform="rotate(-35 -18 -24)" fill="#fff" fill-opacity=".28"/></svg></button>
-    </div>
-    <div class="td-polly" aria-hidden="true"></div>
-    <div class="td-spark" aria-hidden="true"></div>
-  </div>
-</section>
-<script src="/assets/challenge-data.js?v=82b6cc88" defer></script>
-<script src="/assets/extra-palettes.js?v=9167b08c" defer></script>
-<script src="/api/extra-palettes.js" defer></script>
-<script src="/assets/challenge-theme.js?v=c6196232" defer></script>
-<script src="/assets/today.js?v=38533181" defer></script>
 </div>
 <div class="blk" id="blk-coming-soon" data-ppb="blk-coming-soon"><style>#blk-coming-soon { margin: 0; background: #FFFFFF; }
 #blk-coming-soon .bk { box-sizing: border-box; padding: 64px 32px; font-family: 'Karla', sans-serif; color: #2B1A51; }
@@ -268,251 +243,6 @@ document.querySelectorAll('.bk-notify').forEach(function (f) {
     post('/api/unsubscribe', { email: em }).then(function () { say('bye'); }).catch(function () { say('err', true); });
   });
 });
-</script>
-</div>
-<div class="blk" id="blk-patreon" data-ppb="blk-patreon"><style>#blk-patreon { margin: 0; background: #FFFFFF; }
-#blk-patreon .pat { box-sizing: border-box; padding: 64px 32px; font-family: 'Karla', sans-serif; color: #2B1A51; text-align: center; }
-#blk-patreon .pat h2 { margin: 0 0 12px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(28px, 4vw, 44px); line-height: 1.1; }
-#blk-patreon .pat .sub { margin: 0 auto 48px; max-width: 44ch; font-size: 17px; line-height: 1.6; color: #5A4E78; }
-#blk-patreon .row { display: grid; grid-template-columns: repeat(6, minmax(0, 1fr)); gap: 28px; max-width: 1180px; margin: 0 auto; }
-#blk-patreon .item { display: flex; flex-direction: column; align-items: center; text-decoration: none; color: inherit; padding: 8px 4px; border-radius: 16px; }
-#blk-patreon .circle { width: 132px; height: 132px; border-radius: 50%; background: #2B1A51; display: flex; align-items: center; justify-content: center; margin-bottom: 20px; transition: transform .25s; }
-#blk-patreon .circle svg { width: 88px; height: 88px; }
-#blk-patreon .item:hover .circle { transform: translateY(-6px) rotate(-4deg); }
-#blk-patreon .item:focus-visible { outline: 3px solid #D85A30; outline-offset: 4px; }
-#blk-patreon .item h3 { margin: 0 0 8px; font-family: 'Fraunces', serif; font-weight: 600; font-size: 20px; line-height: 1.25; }
-#blk-patreon .item p { margin: 0; max-width: 24ch; font-size: 15px; line-height: 1.55; color: #5A4E78; }
-#blk-patreon .dots, #blk-patreon .swipe-hint { display: none; }
-@media (max-width: 760px) {#blk-patreon .pat { padding: 48px 0 40px; }
-#blk-patreon .pat h2, #blk-patreon .pat .sub { padding: 0 20px; }
-#blk-patreon .pat .sub { margin-bottom: 28px; }
-#blk-patreon .row {
-      display: flex; gap: 14px; overflow-x: auto; scroll-snap-type: x mandatory;
-      padding: 12px 17vw 20px; scrollbar-width: none; -webkit-overflow-scrolling: touch;
-    }
-#blk-patreon .row::-webkit-scrollbar { display: none; }
-#blk-patreon .item {
-      flex: 0 0 66vw; scroll-snap-align: center; scroll-snap-stop: always;
-      padding: 28px 18px 26px; border-radius: 24px; background: #F4F0FA;
-      box-shadow: 0 10px 24px rgba(43, 26, 81, .10);
-      opacity: .35; transform: scale(.9);
-      transition: opacity .3s, transform .3s;
-    }
-#blk-patreon .item.active { opacity: 1; transform: none; }
-#blk-patreon .item.active .circle { transform: rotate(-4deg); }
-#blk-patreon .item p { max-width: none; }
-#blk-patreon .dots { display: flex; justify-content: center; gap: 8px; margin-top: 6px; }
-#blk-patreon .dots button {
-      width: 9px; height: 9px; padding: 0; border: 0; border-radius: 999px;
-      background: #CFC7E8; cursor: pointer; transition: width .25s, background .25s;
-    }
-#blk-patreon .dots button[aria-current="true"] { width: 26px; background: #D85A30; }
-#blk-patreon .swipe-hint { display: block; margin: 12px 0 0; font-size: 13px; color: #8C7FB0; }}
-#blk-patreon .circle { position: relative; }
-#blk-patreon .circle { transition: transform .25s, background .4s; }
-#blk-patreon .circle svg { transition: filter .4s; }
-@media (prefers-reduced-motion: reduce) {#blk-patreon .circle { transition: none; }
-#blk-patreon .item:hover .circle { transform: none; }}</style><section class="pat">
-  <h2>Мои заметки</h2>
-  <p class="sub">Шесть тем, о которых я пишу. Выберите свою и читайте.</p>
-  <div class="row">
-    <a class="item" href="/ru/blog/?section=traditional-art">
-      <span class="circle"><svg viewBox="480 100 560 560" aria-hidden="true"><path d="M760 300 c-120 0 -190 80 -190 150 c0 60 50 90 110 90 h150 c90 0 150 -50 150 -120 c0 -70 -80 -120 -130 -85 c-30 20 -60 5 -45 -20 c10 -15 -10 -15 -45 -15z" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="665" cy="450" r="30" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="740" cy="400" r="24" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="880" cy="470" r="26" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="800" cy="485" r="22" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path transform="translate(900 230) scale(1)" d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/><line x1="560" y1="560" x2="960" y2="560" stroke="#D85A30" stroke-width="16" stroke-linecap="round"/><circle cx="560" cy="250" r="10" fill="#F5C4B3"/><circle cx="990" cy="330" r="8" fill="#F5C4B3"/></svg></span>
-      <h3>Традиционное искусство</h3>
-      <p>Акварель, тушь и страницы прямо из моего скетчбука.</p>
-    </a>
-    <a class="item" href="/ru/blog/?section=technologies">
-      <span class="circle"><svg viewBox="480 100 560 560" aria-hidden="true"><path d="M905 205 L760 395" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M760 395 c-40 -20 -85 5 -95 50 c-8 38 -30 60 -60 70 c55 30 130 25 165 -15 c30 -32 25 -80 -10 -105z" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M600 470 q-20 30 0 60" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round" opacity="0"/><rect x="820" y="440" width="34" height="34" rx="4" fill="#F5C4B3"/><rect x="880" y="405" width="24" height="24" rx="4" fill="#F5C4B3"/><rect x="900" y="480" width="20" height="20" rx="4" fill="#F5C4B3"/><rect x="955" y="445" width="14" height="14" rx="4" fill="#F5C4B3"/><path transform="translate(620 260) scale(1)" d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/><line x1="560" y1="560" x2="960" y2="560" stroke="#D85A30" stroke-width="16" stroke-linecap="round"/><circle cx="960" cy="300" r="10" fill="#F5C4B3"/><circle cx="540" cy="420" r="8" fill="#F5C4B3"/></svg></span>
-      <h3>Технологии</h3>
-      <p>Цифровое искусство, AI и инструменты, которые я пробую в творчестве.</p>
-    </a>
-    <a class="item" href="/ru/blog/?section=education">
-      <span class="circle"><svg viewBox="480 100 560 560" aria-hidden="true"><path d="M580 540 V330 q105 -40 180 10 q75 -50 180 -10 V540 q-105 -40 -180 10 q-75 -50 -180 -10z" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="760" y1="340" x2="760" y2="550" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M620 400 q55 -18 105 5" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M795 405 q50 -23 105 -5" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M620 450 q55 -18 105 5" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M795 455 q50 -23 105 -5" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M620 500 q55 -18 105 5" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path d="M795 505 q50 -23 105 -5" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><path transform="translate(760 230) scale(1)" d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/><line x1="560" y1="560" x2="960" y2="560" stroke="#D85A30" stroke-width="16" stroke-linecap="round"/><circle cx="540" cy="260" r="10" fill="#F5C4B3"/><circle cx="970" cy="470" r="8" fill="#F5C4B3"/></svg></span>
-      <h3>Обучение</h3>
-      <p>Дизайн обучения и то, что помогает людям учиться.</p>
-    </a>
-    <a class="item" href="/ru/blog/?section=pollys-life">
-      <span class="circle"><svg viewBox="480 100 560 560" aria-hidden="true"><rect x="600" y="240" width="320" height="300" rx="26" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="600" y1="320" x2="920" y2="320" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="680" y1="205" x2="680" y2="265" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="840" y1="205" x2="840" y2="265" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><circle cx="650" cy="375" r="9" fill="#F5C4B3"/><circle cx="705" cy="375" r="9" fill="#F5C4B3"/><circle cx="760" cy="375" r="9" fill="#F5C4B3"/><circle cx="815" cy="375" r="9" fill="#F5C4B3"/><circle cx="870" cy="375" r="9" fill="#F5C4B3"/><circle cx="650" cy="430" r="9" fill="#F5C4B3"/><circle cx="705" cy="430" r="9" fill="#F5C4B3"/><circle cx="815" cy="430" r="9" fill="#F5C4B3"/><circle cx="870" cy="430" r="9" fill="#F5C4B3"/><circle cx="650" cy="485" r="9" fill="#F5C4B3"/><circle cx="705" cy="485" r="9" fill="#F5C4B3"/><circle cx="760" cy="485" r="9" fill="#F5C4B3"/><circle cx="815" cy="485" r="9" fill="#F5C4B3"/><circle cx="870" cy="485" r="9" fill="#F5C4B3"/><path transform="translate(760 430) scale(0.8)" d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/><circle cx="760" cy="430" r="52" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="560" y1="560" x2="960" y2="560" stroke="#D85A30" stroke-width="16" stroke-linecap="round"/><circle cx="540" cy="260" r="10" fill="#F5C4B3"/><circle cx="975" cy="460" r="8" fill="#F5C4B3"/></svg></span>
-      <h3>Жизнь Полли</h3>
-      <p>Weekly Polly, заметки из моей жизни и закулисье.</p>
-    </a>
-    <a class="item" href="/ru/blog/?section=tips-guides">
-      <span class="circle"><svg viewBox="480 100 560 560" aria-hidden="true"><path d="M760 230 c-75 0 -125 55 -125 120 c0 45 25 75 50 100 c15 15 20 30 20 50 h110 c0 -20 5 -35 20 -50 c25 -25 50 -55 50 -100 c0 -65 -50 -120 -125 -120z" stroke="#D85A30" stroke-width="16" fill="none" stroke-linecap="round" stroke-linejoin="round"/><line x1="712" y1="530" x2="808" y2="530" stroke="#F5C4B3" stroke-width="10" stroke-linecap="round"/><line x1="725" y1="505" x2="795" y2="505" stroke="#F5C4B3" stroke-width="10" stroke-linecap="round"/><path d="M730 380 q30 -40 60 0" stroke="#F5C4B3" stroke-width="8" fill="none" stroke-linecap="round"/><path transform="translate(900 240) scale(0.8)" d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/><line x1="560" y1="560" x2="960" y2="560" stroke="#D85A30" stroke-width="16" stroke-linecap="round"/><circle cx="560" cy="270" r="10" fill="#F5C4B3"/><circle cx="975" cy="470" r="8" fill="#F5C4B3"/></svg></span>
-      <h3>Советы и полезное</h3>
-      <p>Гайды, книги, лайфхаки и другое полезное.</p>
-    </a>
-    <a class="item" href="/ru/blog/?section=stories">
-      <span class="circle"><svg viewBox="480 100 560 560" aria-hidden="true"><path d="M610 250 h250 q30 0 30 30 v240 q0 30 -30 30 h-250 q-30 0 -30 -30 v-240 q0 -30 30 -30z" stroke="#D85A30" stroke-width="16" fill="none" stroke-linejoin="round"/><line x1="630" y1="330" x2="780" y2="330" stroke="#F5C4B3" stroke-width="10" stroke-linecap="round"/><line x1="630" y1="380" x2="760" y2="380" stroke="#F5C4B3" stroke-width="10" stroke-linecap="round"/><line x1="630" y1="430" x2="730" y2="430" stroke="#F5C4B3" stroke-width="10" stroke-linecap="round"/><path d="M930 200 q-70 40 -120 150 l-20 60 l50 -40 q80 -70 90 -170z" stroke="#D85A30" stroke-width="14" fill="none" stroke-linejoin="round"/><line x1="790" y1="410" x2="770" y2="450" stroke="#D85A30" stroke-width="12" stroke-linecap="round"/><path transform="translate(640 210) scale(0.7)" d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/><line x1="560" y1="600" x2="960" y2="600" stroke="#D85A30" stroke-width="16" stroke-linecap="round"/><circle cx="545" cy="280" r="10" fill="#F5C4B3"/><circle cx="985" cy="470" r="8" fill="#F5C4B3"/></svg></span>
-      <h3>Новости сайта</h3>
-      <p>Что нового на сайте: игры, подарки, новые разделы и обновления.</p>
-    </a>
-  </div>
-  <div class="dots" role="tablist" aria-label="Blog themes"></div>
-  <p class="swipe-hint" aria-hidden="true">Листайте дальше →</p>
-</section>
-<script>
-(function () {
-  var root = document.currentScript.previousElementSibling;
-  var row = root.querySelector('.row'), items = [].slice.call(row.children), dotsBox = root.querySelector('.dots');
-  var dots = items.map(function (it, i) {
-    var b = document.createElement('button');
-    b.type = 'button';
-    b.setAttribute('aria-label', it.querySelector('h3').textContent);
-    b.addEventListener('click', function () { go(i); });
-    dotsBox.appendChild(b);
-    return b;
-  });
-  function go(i) {
-    var it = items[i];
-    row.scrollTo({ left: it.offsetLeft - (row.clientWidth - it.clientWidth) / 2, behavior: 'smooth' });
-  }
-  function update() {
-    var mid = row.scrollLeft + row.clientWidth / 2, best = 0, dist = Infinity;
-    items.forEach(function (it, i) {
-      var d = Math.abs(it.offsetLeft + it.clientWidth / 2 - mid);
-      if (d < dist) { dist = d; best = i; }
-    });
-    items.forEach(function (it, i) { it.classList.toggle('active', i === best); });
-    dots.forEach(function (d, i) { d.setAttribute('aria-current', i === best ? 'true' : 'false'); });
-  }
-  var t;
-  row.addEventListener('scroll', function () { cancelAnimationFrame(t); t = requestAnimationFrame(update); }, { passive: true });
-  addEventListener('resize', update);
-  update();
-})();
-</script>
-</div>
-<div class="blk" id="blk-titos-case" data-ppb="blk-titos-case"><style>#blk-titos-case .tc { box-sizing: border-box; padding: 64px 72px; background: #1A1528; color: #F3EFFA; display: grid; grid-template-columns: minmax(0, 6fr) minmax(0, 5fr); gap: 56px; align-items: center; }
-#blk-titos-case .tc-pic { position: relative; margin: 0; }
-#blk-titos-case .tc-pic img { display: block; width: 100%; height: auto; image-rendering: pixelated; box-shadow: 0 0 0 4px #0E0A18, 0 0 0 7px #D85A30, 0 24px 50px rgba(0, 0, 0, .5); border-radius: 6px; }
-#blk-titos-case .tc-stamp { position: absolute; right: -10px; top: -14px; padding: 6px 14px; border: 4px solid #E0443A; color: #E0443A; background: rgba(26, 21, 40, .85); font: 800 18px 'Karla', sans-serif; letter-spacing: .08em; transform: rotate(8deg); }
-#blk-titos-case .tc-kick { margin: 0 0 10px; font: italic 400 20px 'Fraunces', serif; color: #F0A987; }
-#blk-titos-case .tc h2 { margin: 0 0 16px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(28px, 3.6vw, 44px); line-height: 1.1; }
-#blk-titos-case .tc p { margin: 0 0 14px; font: 17px/1.65 'Karla', sans-serif; color: #D9D3F2; }
-#blk-titos-case .tc ul { margin: 0 0 24px; padding: 0; list-style: none; display: grid; gap: 6px; font: 600 15px 'Karla', sans-serif; color: #F3EFFA; }
-#blk-titos-case .tc a.tc-btn { display: inline-block; padding: 14px 26px; border-radius: 999px; background: #F0A987; color: #1A1528; font: 800 16px 'Karla', sans-serif; text-decoration: none; box-shadow: 0 6px 0 #B0573A; transition: transform .15s; }
-#blk-titos-case .tc a.tc-btn:hover { transform: translateY(-2px); }
-@media (max-width: 860px) {#blk-titos-case .tc { grid-template-columns: 1fr; padding: 48px 20px; gap: 32px; }
-#blk-titos-case .tc-stamp { right: 6px; }}</style><section class="tc">
-  <figure class="tc-pic">
-    <img src="/images/rooms/case2-scene.jpg" alt="Огурцы в кепках и цилиндрах на ночной улице и подозрительный тип в плаще у фонаря" width="1216" height="872" loading="lazy" style="image-rendering:auto">
-    <span class="tc-stamp">ДЕЛО № 2</span>
-  </figure>
-  <div class="tc-text">
-    <p class="tc-kick">Новое дело детектива Титоса</p>
-    <h2>Шпион среди огурцов</h2>
-    <p>С Огуречной тусовки пропали ценные бумаги, закладная на дом и красавица Помидорка Роза. Где-то среди огурцов прячется кактус из банды Колючих. Титосу нужен напарник.</p>
-    <ul>
-      <li>🖼 Изучите фото с места происшествия</li>
-      <li>🗣 Допросите трёх джентльменов в цилиндрах</li>
-      <li>🔍 Найдите восемь улик и разоблачите кактус</li>
-    </ul>
-    <a class="tc-btn" href="/ru/detective-office/">Взяться за дело →</a>
-  </div>
-</section>
-</div>
-<div class="blk" id="blk-about" data-ppb="blk-about"><style>#blk-about { margin: 0; background: #F4F0FA; }
-#blk-about .about {
-    box-sizing: border-box; padding: 56px 72px;
-    display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 7fr); gap: 72px; align-items: center;
-    font-family: 'Karla', sans-serif; color: #2B1A51;
-  }
-#blk-about .card {
-    position: relative; justify-self: center; width: min(100%, 460px);
-    background: #FFFFFF; padding: 14px 14px 16px; box-sizing: border-box;
-    transform: rotate(-3deg); box-shadow: 0 18px 40px rgba(43, 26, 81, .18);
-  }
-#blk-about .card img { display: block; width: 100%; aspect-ratio: 4 / 2.74; object-fit: cover; background: #CECBF6; }
-#blk-about .card p { margin: 14px 4px 0; line-height: 1.3; font-family: 'Fraunces', serif; font-style: italic; font-size: 18px; color: #2B1A51; }
-#blk-about .tape { position: absolute; top: -14px; left: 50%; width: 110px; height: 30px; background: #F5C4B3; opacity: .9; transform: translateX(-50%) rotate(5deg); }
-#blk-about .kicker { margin: 0 0 10px; font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; color: #D85A30; }
-#blk-about .about h2 { margin: 0 0 18px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(30px, 3.2vw, 44px); line-height: 1.1; }
-#blk-about .txt { margin: 0 0 12px; max-width: 52ch; font-size: 17px; line-height: 1.7; color: #4A3E68; }
-#blk-about .btn { display: inline-block; margin-top: 10px; padding: 12px 24px; border-radius: 999px; border: 1.5px solid #2B1A51; color: #2B1A51; font-size: 15px; font-weight: 500; text-decoration: none; transition: background-color .2s, color .2s; }
-#blk-about .btn:hover { background: #2B1A51; color: #F3EFFA; }
-#blk-about .about-actions { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 10px; }
-#blk-about .about-actions .btn { margin-top: 0; background: none; font-family: 'Karla', sans-serif; cursor: pointer; }
-#blk-about .about-actions .btn-solid { background: #2B1A51; color: #F3EFFA; }
-#blk-about .about-actions .btn-solid:hover { background: #3C2670; }
-#blk-about .about-actions .btn:not(.btn-solid):hover, #blk-about .about-actions .btn:not(.btn-solid):focus-visible { background: #2B1A51; color: #F3EFFA; }
-#blk-about .btn:focus-visible { outline: 3px solid #D85A30; outline-offset: 3px; }
-@media (max-width: 800px) {#blk-about .about { grid-template-columns: 1fr; gap: 48px; padding: 56px 28px; }
-#blk-about .card { width: min(88%, 360px); }
-#blk-about .card p { font-size: 16px; }}</style><section class="about">
-  <div class="card">
-    <span class="tape" aria-hidden="true"></span>
-    <!-- КАРТИНКА: ID файла с Google Диска после /d/ -->
-    <img src="/images/home/first-pigeon-polly.jpg" alt="Самый первый рисунок Pigeon Polly: Polly studying at a cozy desk, a watercolor illustration by Alina Otkinska">
-    <p>Самый первый рисунок Pigeon Polly</p>
-  </div>
-  <div>
-    <p class="kicker">Привет, я Алина</p>
-    <h2>Человек за Pigeon Polly</h2>
-    <p class="txt">Я дизайнер образовательного опыта, больше шести лет в цифровом образовании. Проектирую онлайн-курсы и встраиваю AI в обучение — от производства курсов до повседневной работы преподавателей.</p>
-    <p class="txt">И я рисую. Этот рисунок — самая первая Pigeon Polly, она появилась, пока я писала диплом. С тех пор учёба и рисование идут рука об руку, и эта лаборатория — место, где они встречаются.</p>
-    <div class="about-actions">
-      <button class="btn btn-solid" type="button" data-open="contact">Написать мне</button>
-      <a class="btn" href="/ru/work-with-me/">Сотрудничество</a>
-      <a class="btn" href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener">Связаться в LinkedIn</a>
-    </div>
-  </div>
-</section>
-</div>
-<div class="blk" id="blk-shop-promo" data-ppb="blk-shop-promo"><style>#blk-shop-promo .sp { position: relative; overflow: hidden; box-sizing: border-box; padding: 64px 32px; background: radial-gradient(ellipse at 50% 120%, #7A3A1E 0, #3A1F4E 55%, #24143F 100%); font-family: 'Karla', sans-serif; color: #FBF4E2; text-align: center; }
-#blk-shop-promo .sp-kick { margin: 0 0 8px; font-family: 'Fraunces', serif; font-style: italic; font-size: 22px; color: #F5A25D; }
-#blk-shop-promo .sp h2 { margin: 0 0 12px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(28px, 4vw, 44px); line-height: 1.1; }
-#blk-shop-promo .sp-sub { margin: 0 auto 32px; max-width: 48ch; font-size: 17px; line-height: 1.6; color: #E6D9F2; }
-#blk-shop-promo .sp-sub b { color: #F5D547; }
-#blk-shop-promo .sp-row { display: flex; flex-wrap: wrap; justify-content: center; gap: 18px; max-width: 980px; margin: 0 auto; }
-#blk-shop-promo .sp-it { margin: 0; width: 104px; }
-#blk-shop-promo .sp-it .gift-pic { border-radius: 50%; background: #FBF4E2; box-shadow: 0 0 0 3px #E8792B, 0 8px 18px rgba(0, 0, 0, .35); transition: transform .25s; }
-#blk-shop-promo .sp-it:hover .gift-pic { transform: translateY(-5px) rotate(-4deg); }
-#blk-shop-promo .sp-it figcaption { margin-top: 8px; font: 600 13px/1.3 'Karla', sans-serif; color: #FBF4E2; }
-#blk-shop-promo .sp-it small { display: block; margin-top: 2px; font: 700 12px 'Karla', sans-serif; color: #F5D547; }
-#blk-shop-promo .sp-btn { display: inline-block; margin-top: 36px; padding: 15px 34px; border-radius: 999px; background: #E8792B; color: #FFFFFF; font: 700 17px 'Karla', sans-serif; text-decoration: none; box-shadow: 0 6px 0 #9A4A18; transition: transform .2s, box-shadow .2s; }
-#blk-shop-promo .sp-btn:hover { transform: translateY(2px); box-shadow: 0 4px 0 #9A4A18; }
-#blk-shop-promo .sp-hurry { margin: 14px 0 0; font: 600 14px 'Karla', sans-serif; color: #F5A25D; }
-#blk-shop-promo .sp-deco { position: absolute; font-size: 34px; opacity: .55; pointer-events: none; animation: sp-sway 5s ease-in-out infinite; }
-@keyframes sp-sway { 50% { transform: translateY(10px) rotate(12deg); } }
-@media (prefers-reduced-motion: reduce) {#blk-shop-promo .sp-deco { animation: none; }
-#blk-shop-promo .sp-it .gift-pic { transition: none; }}
-@media (max-width: 760px) {#blk-shop-promo .sp { padding: 48px 12px; }
-#blk-shop-promo .sp-row { gap: 10px 6px; }
-#blk-shop-promo .sp-it { width: calc(25% - 6px); }
-#blk-shop-promo .sp-it .gift-pic { --ic: 64px; }
-#blk-shop-promo .sp-it figcaption { font-size: 11px; }
-#blk-shop-promo .sp-deco { font-size: 22px; opacity: .35; }}</style><section class="sp" id="season-shop">
-  <span class="sp-deco" style="left:5%;top:12%" aria-hidden="true">🍂</span>
-  <span class="sp-deco" style="right:6%;top:18%;animation-delay:-2s" aria-hidden="true">🎃</span>
-  <span class="sp-deco" style="left:9%;bottom:14%;animation-delay:-1s" aria-hidden="true">🦇</span>
-  <span class="sp-deco" style="right:10%;bottom:10%;animation-delay:-3s" aria-hidden="true">🍁</span>
-  <p class="sp-kick">Сезонный магазин</p>
-  <h2>Осенние и хеллоуинские вещи для птички</h2>
-  <p class="sp-sub">Шляпы ведьмы, тыквы, осенние венки и жуткие рамки уже в магазине. <b>Их совсем немного — поспешите!</b></p>
-  <div class="sp-row" data-sp-row></div>
-  <a class="sp-btn" href="/ru/shop/">🛍 В магазин →</a>
-  <p class="sp-hurry">Платите пуговками 🔘, которые копятся на сайте.</p>
-</section>
-<script>
-  // сезонные вещи (темы «Осень» и «Хеллоуин» из PPBirds.GIFT_THEMES) с ценой и остатком из магазина; наведение — примерка на птичку
-  addEventListener('load', () => {
-    const B = window.PPBirds, row = document.querySelector('[data-sp-row]');
-    if (!B || !row) return;
-    const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
-    const left = ['{n} left', 'осталось {n}', 'atlikuši {n}'][L];
-    const items = B.GIFT_THEMES.filter(t => t[0] === 'halloween' || t[0] === 'autumn').flatMap(t => t[2]);
-    fetch('/api/shop').then(r => r.ok ? r.json() : { items: [] }).catch(() => ({ items: [] })).then(d => {
-      const shop = {}; (d.items || []).forEach(x => { shop[x.kind + '|' + x.item] = x; });
-      // сначала то, что есть в наличии
-      items.sort((a, b) => ((shop[b] || {}).stock > 0) - ((shop[a] || {}).stock > 0)).forEach(k => {
-        const [kind, v] = k.split('|'), s = shop[k], f = document.createElement('figure'); f.className = 'sp-it';
-        try { f.appendChild(B.giftPic(kind, v, 8, matchMedia('(max-width: 760px)').matches ? 66 : 96)); } catch (e) { return; }
-        const c = document.createElement('figcaption'); c.textContent = B.giftName(kind, v, L);
-        if (s && s.stock > 0) { const m = document.createElement('small'); m.textContent = '🔘 ' + s.price + ' · ' + left.replace('{n}', s.stock); c.appendChild(m); }
-        f.appendChild(c); row.appendChild(f);
-      });
-    });
-  });
 </script>
 </div>
 <div class="blk" id="blk-flock" data-ppb="blk-flock"><style>#blk-flock .fl { padding: 56px var(--gutter) 64px; text-align: center; }
@@ -614,7 +344,7 @@ document.querySelectorAll('.bk-notify').forEach(function (f) {
   </form>
 </dialog>
 <footer class="site-footer">
-  <nav class="ft-map" aria-label="Site map"><div class="ft-col"><p class="ft-h"><a href="/ru/challenge/">Челлендж</a></p><ul><li><a href="/ru/polly-helps/">Полли, помоги нарисовать</a></li></ul></div><div class="ft-col"><p class="ft-h"><a href="/ru/blog/">Блог</a></p><ul></ul></div><div class="ft-col"><p class="ft-h"><a href="/ru/art-portfolio/">Мой скетчбук</a></p><ul><li><a href="/ru/art-portfolio/">Все серии</a></li><li><a href="/ru/art-portfolio/sketchbook/">Страницы скетчбука</a></li><li><a href="/ru/art-portfolio/anxiety/">Тревога</a></li><li><a href="/ru/art-portfolio/bird/">Голубь Полли</a></li><li><a href="/ru/art-portfolio/snail/">Mr.Chew</a></li><li><a href="/ru/art-portfolio/detective/">Mr.Titos</a></li><li><a href="/ru/art-portfolio/halloween/">Семья Тыквоголовых</a></li><li><a href="/ru/art-portfolio/ai-art/">AI-арт</a></li></ul></div><div class="ft-col"><p class="ft-h"><a href="/ru/detective-office/">Игры</a></p><ul><li><a href="/ru/detective-office/">Детектив Титос</a></li><li><a href="/ru/polly-office/">Полли, офисный клерк</a></li><li><a href="/ru/flock/">Стая</a></li><li><a href="/ru/shop/">Магазин</a></li><li><a href="/ru/advent/">Адвент-календарь</a></li></ul></div><div class="ft-col"><p class="ft-h"><a href="/ru/about-polly/">Мир Полли</a></p><ul><li><a href="/ru/about-polly/">О Полли</a></li><li><a href="/ru/wobbleland/">Wobbleland</a></li></ul></div><div class="ft-col"><p class="ft-h"><a href="/ru/e-books/">Книги и полезное</a></p><ul><li><a href="/ru/e-books/">Книги</a></li><li><a href="/ru/polly-helps/">Полли, помоги нарисовать</a></li><li><a href="/ru/palettes/">Палитры</a></li></ul></div><div class="ft-col"><p class="ft-h"><a href="/ru/about-me/">Обо мне</a></p><ul><li><a href="/ru/about-me/">Обо мне</a></li><li><a href="/ru/on-walls-and-pages/">На стенах и страницах</a></li><li><a href="/ru/projects/">Обучение и AI</a></li><li><a href="/ru/work-with-me/">Сотрудничество</a></li></ul></div></nav>
+  <nav class="ft-map" aria-label="Site map"><div class="ft-col"><p class="ft-h"><a href="/ru/challenge/">Рисовать</a></p><ul><li><a href="/ru/challenge/">Челлендж</a></li><li><a href="/ru/palettes/">Палитры</a></li><li><a href="/ru/polly-helps/">Полли, помоги нарисовать</a></li><li><a href="/ru/e-books/">Книги</a></li></ul></div><div class="ft-col"><p class="ft-h"><a href="/ru/art-portfolio/">Мой скетчбук</a></p><ul><li><a href="/ru/art-portfolio/">Все серии</a></li><li><a href="/ru/art-portfolio/sketchbook/">Страницы скетчбука</a></li><li><a href="/ru/art-portfolio/anxiety/">Тревога</a></li><li><a href="/ru/art-portfolio/bird/">Голубь Полли</a></li><li><a href="/ru/art-portfolio/snail/">Mr.Chew</a></li><li><a href="/ru/art-portfolio/detective/">Mr.Titos</a></li><li><a href="/ru/art-portfolio/halloween/">Семья Тыквоголовых</a></li><li><a href="/ru/art-portfolio/ai-art/">AI-арт</a></li></ul></div><div class="ft-col"><p class="ft-h"><a href="/ru/flock/">Играть</a></p><ul><li><a href="/ru/flock/">Стая</a></li><li><a href="/ru/shop/">Магазин</a></li><li><a href="/ru/advent/">Адвент-календарь</a></li><li><a href="/ru/detective-office/">Детектив Титос</a></li><li><a href="/ru/polly-office/">Полли, офисный клерк</a></li><li><a href="/ru/wobbleland/">Wobbleland</a></li><li><a href="/ru/about-polly/">О Полли</a></li></ul></div><div class="ft-col"><p class="ft-h"><a href="/ru/blog/">Блог</a></p><ul></ul></div><div class="ft-col"><p class="ft-h"><a href="/ru/about-me/">Обо мне</a></p><ul><li><a href="/ru/about-me/">Обо мне</a></li><li><a href="/ru/on-walls-and-pages/">На стенах и страницах</a></li><li><a href="/ru/projects/">Обучение и AI</a></li><li><a href="/ru/work-with-me/">Сотрудничество</a></li></ul></div></nav>
   <p>© Alina Otkinska · Pigeon Polly Art Lab</p>
   <p class="footer-links">
     <a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener">LinkedIn</a>

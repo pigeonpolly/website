@@ -47,6 +47,7 @@
     return fetch('/api/whoami', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => {
       if (!d) return;
       info = d; render();
+      document.documentElement.classList.toggle('is-admin', !!(d.user && d.user.admin)); // полоска цифр над шапкой — только Алине
       if (d.user && !d.user.nick) askNick(d.user);
       if (d.user && d.user.earned) toast(t('daily')(d.user.earned));
     }).catch(() => {});

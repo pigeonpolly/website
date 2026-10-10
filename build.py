@@ -88,27 +88,25 @@ SOCIAL = [
 ]
 # Разделы: пункт меню ведёт на первую вкладку, внутри раздела — ряд вкладок (section_tabs)
 SECTIONS = {
-    "games": [("detective-office", "Detective Titos"), ("polly-office", "Polly, Office Clerk"), ("flock", "The Flock"), ("shop", "Shop"), ("advent", "Advent calendar")],
-    "world": [("about-polly", "About Polly"), ("wobbleland", "Wobbleland"), ("art-portfolio/bird", "Pigeon Polly"),
-              ("art-portfolio/snail", "Mr.Chew"), ("art-portfolio/detective", "Mr.Titos"), ("art-portfolio/halloween", "Pumpkin Family")],
-    "books": [("e-books", "Books"), ("polly-helps", "Polly, help me draw"), ("palettes", "Palettes")],
+    "draw": [("challenge", "Daily Challenge"), ("palettes", "Palettes"), ("polly-helps", "Polly, help me draw"), ("e-books", "Books")],
     "sketchbook": [("art-portfolio", "All series"), ("art-portfolio/sketchbook", "Sketchbook Pages"), ("art-portfolio/anxiety", "Anxiety"),
                    ("art-portfolio/bird", "Pigeon Polly"), ("art-portfolio/snail", "Mr.Chew"), ("art-portfolio/detective", "Mr.Titos"), ("art-portfolio/halloween", "Pumpkin Family"),
                    ("art-portfolio/ai-art", "AI Art")],
+    "play": [("flock", "The Flock"), ("shop", "Shop"), ("advent", "Advent calendar"), ("detective-office", "Detective Titos"), ("polly-office", "Polly, Office Clerk"),
+             ("wobbleland", "Wobbleland"), ("about-polly", "About Polly")],
     "about": [("about-me", "About me"), ("on-walls-and-pages", "On Walls & Pages"),
               ("projects", "Learning & AI"), ("work-with-me", "Work with me")],
 }
-# страницы, у которых активна вкладка с другим адресом
-TAB_ALIAS = {}
+# страницы, у которых активна вкладка с другим адресом (профиль птички — в «Играть»)
+TAB_ALIAS = {"bird": "flock"}
 # вкладки, которых нет в выпадающем меню и карте сайта (они уже есть в другом пункте), но есть внутри раздела
-MENU_HIDE = {"world": {"art-portfolio/bird", "art-portfolio/snail", "art-portfolio/detective", "art-portfolio/halloween"}}
+MENU_HIDE = {}
+# меню (10.10.2026, «сайт перегружен»): 5 пунктов — Рисовать · Скетчбук · Играть · Блог · Обо мне
 NAV = [
-    ("challenge", "Daily Challenge"),
-    ("blog", "Blog"),
+    ("challenge", "Draw", "draw"),
     ("art-portfolio", "My Sketchbook", "sketchbook"),
-    ("detective-office", "Games", "games"),
-    ("about-polly", "Polly’s World", "world"),
-    ("e-books", "Books & Helpful", "books"),
+    ("flock", "Play", "play"),
+    ("blog", "Blog"),
     ("about-me", "About me", "about"),
 ]
 
@@ -168,8 +166,6 @@ def footer_html():
     for entry in NAV:
         path, label = entry[0], entry[1]
         links = [t for t in SECTIONS.get(entry[2], []) if t[0] not in MENU_HIDE.get(entry[2], ())] if len(entry) == 3 else []
-        if path == "challenge":
-            links = [("polly-helps", "Polly, help me draw")]
         if path == "blog":
             links = []
         lis = "".join(f'<li><a href="{href(p)}">{esc(l)}</a></li>' for p, l in links)
