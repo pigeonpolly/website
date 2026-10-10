@@ -1,0 +1,23 @@
+# [английское, русское, латышское, hex] — словарь «художественных» названий; ближайшее по цвету (в Lab) берётся для палитры
+NAMES = [
+('Ink Black','Чернила','Tinte','#1B1820'),('Midnight Plum','Полуночная слива','Pusnakts plūme','#2E1E33'),('Night Train','Ночной поезд','Nakts vilciens','#2A2433'),('Deep Navy','Глубокий синий','Dziļi zils','#1E2A44'),
+('Storm Cloud','Грозовая туча','Negaisa mākonis','#4A5060'),('Slate','Сланец','Slāneklis','#5E6670'),('Pigeon Grey','Голубиный серый','Baložpelēks','#8A8C99'),('Fog','Туман','Migla','#B9BCC2'),('Paper White','Белая бумага','Papīra balts','#F2EFE6'),
+('Linen','Лён','Lins','#E6DCC8'),('Oat Milk','Овсяное молоко','Auzu piens','#D9C9AE'),('Sand','Песок','Smiltis','#D8BE8E'),('Biscuit','Печенье','Cepums','#C9A06A'),('Toast','Тост','Grauzdiņš','#A8743F'),
+('Cinnamon','Корица','Kanēlis','#8E4E2A'),('Chestnut','Каштан','Kastanis','#6B3A24'),('Coffee Bean','Кофейное зерно','Kafijas pupiņa','#3F2A1E'),('Cocoa','Какао','Kakao','#5A3E2E'),('Latte','Латте','Late','#B08A68'),
+('Mushroom','Грибной','Sēņu','#8E7D6E'),('Driftwood','Плавник','Dreifkoks','#A8987F'),('Olive','Олива','Olīva','#6E6B3A'),('Moss','Мох','Sūna','#5B6B3A'),('Sage','Шалфей','Salvija','#9AAA8A'),
+('Pistachio','Фисташка','Pistācija','#A8C27A'),('Potion Green','Зелье','Dzira','#8FB33A'),('Fir Tree','Ель','Egle','#2F5A3E'),('Forest','Лес','Mežs','#24402F'),('Bottle Green','Бутылочный','Pudeļzaļš','#1F4A3A'),
+('Mint','Мята','Piparmētra','#9FD3C0'),('Sea Glass','Морское стекло','Jūras stikls','#7FB8A8'),('Teal','Бирюза','Zilganzaļš','#2E8A8A'),('Deep Teal','Глубокая бирюза','Dziļi tirkīzs','#1E5A5E'),('Duck Egg','Утиное яйцо','Pīles ola','#BFD9D6'),
+('Sky','Небо','Debesis','#8EC3E6'),('Summer Sky','Летнее небо','Vasaras debesis','#4AA8D8'),('Cornflower','Василёк','Rudzupuķe','#6A8FD0'),('Denim','Деним','Džinss','#3E5E8E'),('Cobalt','Кобальт','Kobalts','#2A4FA0'),
+('Tile Blue','Кафель','Flīžu zils','#4C84A8'),('Steel Blue','Стальной','Tērauda zils','#5D7A96'),('Ice','Лёд','Ledus','#D6E6EE'),('Lavender','Лаванда','Lavanda','#B8A8D8'),('Lilac','Сирень','Ceriņi','#9A86B8'),
+('Pigeon Purple','Голубиный фиолетовый','Baložvioleta','#6E5E9A'),('Violet Ink','Фиолетовые чернила','Violetā tinte','#4A3A7A'),('Aubergine','Баклажан','Baklažāns','#4A2A44'),('Mauve','Мальва','Malva','#9A7A8E'),('Dusty Rose','Пыльная роза','Putekļainā roze','#C8A0A0'),
+('Blush','Румянец','Sārtums','#E8B8B0'),('Peach','Персик','Persiks','#F2B48A'),('Salmon','Лосось','Lasis','#E08A70'),('Jelly Pink','Желейный розовый','Želejas rozā','#D87090'),('Raspberry','Малина','Avene','#B03050'),
+('Cherry','Вишня','Ķirsis','#A8202E'),('Tomato','Томат','Tomāts','#D8402A'),('Poppy','Мак','Magone','#E0502A'),('Brick','Кирпич','Ķieģelis','#9E4A34'),('Rust','Ржавчина','Rūsa','#8E3A14'),
+('Burgundy','Бордо','Burgundietis','#6A1E28'),('Pumpkin','Тыква','Ķirbis','#E8762A'),('Tangerine','Мандарин','Mandarīns','#F29030'),('Marigold','Бархатец','Samtene','#E8A82A'),('Honey','Мёд','Medus','#D89A3A'),
+('Mustard','Горчица','Sinepes','#C8A030'),('Lemon','Лимон','Citrons','#F2D04A'),('Butter','Масло','Sviests','#F2DE96'),('Ochre','Охра','Okers','#B88A3A'),('Golden Hour','Золотой час','Zelta stunda','#E8B860'),
+('Terracotta','Терракота','Terakota','#B8603A'),('Clay','Глина','Māls','#C88A6A'),('Persimmon','Хурма','Hurma','#F07A1A'),('Candle Glow','Свеча','Svece','#F2C878'),('Lamp Light','Свет лампы','Lampas gaisma','#F5D58E'),
+('Wine','Вино','Vīns','#5A1A2A'),('Plum Jam','Сливовый джем','Plūmju ievārījums','#6A2E4A'),('Berry','Ягода','Oga','#8A2A5A'),('Fuchsia','Фуксия','Fuksija','#D04A9A'),('Orchid','Орхидея','Orhideja','#B070C0'),
+('Emerald','Изумруд','Smaragds','#2A9A6A'),('Lime','Лайм','Laims','#B8D84A'),('Pine','Сосна','Priede','#3A5A3A'),('Swamp','Болото','Purvs','#4A5A40'),('Lichen','Лишайник','Ķērpis','#A8A88A'),
+('Charcoal','Уголь','Ogle','#33333A'),('Smoke','Дым','Dūmi','#707078'),('Cream','Сливки','Krējums','#F5E8C8'),('Vanilla','Ваниль','Vaniļa','#F2E2B0'),('Bark','Кора','Miza','#5E4430'),
+('Copper','Медь','Varš','#B06A3A'),('Brass','Латунь','Misiņš','#B89A4A'),('Ivory','Слоновая кость','Ziloņkauls','#EDE6D2'),('Bubblegum','Жвачка','Košļene','#F2A0C0'),('Coral','Коралл','Korallis','#F07860'),
+('Wisteria','Глициния','Glicīnija','#A090C8'),('Twilight','Сумерки','Krēsla','#5A4A7A'),('Harbor','Гавань','Osta','#3A5A6E'),('Rain','Дождь','Lietus','#7A8A9A'),('Snow','Снег','Sniegs','#F4F6F8'),
+]

@@ -30,7 +30,7 @@ PAGES = [
     ("on-walls-and-pages", "On Walls & Pages", "on-walls-and-pages.html",
      "Exhibitions and publications of Pigeon Polly art: on gallery walls and printed pages."),
     ("art-portfolio/anxiety", "Anxiety", "anxiety.html", "Anxiety, a series in ecolines."),
-    ("art-portfolio/sketchbook", "My Sketchbook", "sketchbook.html", "Pages from my sketchbook."),
+    ("art-portfolio/sketchbook", "Sketchbook Pages", "sketchbook.html", "Pages from my sketchbook."),
     ("art-portfolio/snail", "Mr.Chew", "snail.html", "Mr.Chew the snail, illustrations 2023–2025."),
     ("art-portfolio/bird", "Pigeon Polly", "bird.html", "Pigeon Polly illustrations 2019–2026."),
     ("art-portfolio/detective", "Mr.Titos", "detective.html", "Detective Mr.Titos."),
@@ -39,7 +39,7 @@ PAGES = [
     ("privacy", "Privacy", "privacy.html", "How pigeonpolly.com handles your data."),
     ("about-me", "About me", "about-me.html",
      "Alina Otkinska: learning experience designer, artist and author of Pigeon Polly. Portfolio, projects and how to work together."),
-    ("art-portfolio", "Art Portfolio", "art-portfolio.html", "Art portfolio of Alina Otkinska: ecoline series, sketchbook pages and AI art."),
+    ("art-portfolio", "My Sketchbook", "art-portfolio.html", "Art portfolio of Alina Otkinska: ecoline series, sketchbook pages and AI art."),
     ("about-polly", "About Polly", "about-polly.html",
      "Meet Pigeon Polly, an office clerk pigeon from Wobbleland, and her friends: Mr.Chew, Detective Titos and the Pumpkin Family."),
     ("blog", "Blog", "blog.html", "Notes on drawing, learning and creativity by Alina Otkinska and Pigeon Polly."),
@@ -55,6 +55,8 @@ PAGES = [
      "Our flock of pixel birds: everyone who signs in gets one. Scatter seeds, call the wind or rain, throw a party and watch what happens."),
     ("shop", "Shop", "shop.html",
      "The Pigeon Polly shop: hats, scarves, frames and treasures for your pixel bird, paid for with buttons you earn on the site."),
+    ("palettes", "Palettes", "palettes.html",
+     "Color palettes from Pigeon Polly watercolors and sketchbook pages: six colors with HEX codes from every artwork. Copy a color, pick a palette and draw."),
     ("wobbleland", "Wobbleland", "wobbleland.html",
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
@@ -64,7 +66,7 @@ UNLISTED = {"blog-editor", "admin"}
 
 PORTFOLIO = [
     ("art-portfolio/anxiety", "Anxiety"),
-    ("art-portfolio/sketchbook", "My Sketchbook"),
+    ("art-portfolio/sketchbook", "Sketchbook Pages"),
     ("art-portfolio/snail", "Mr.Chew"),
     ("art-portfolio/bird", "PigeonPolly"),
     ("art-portfolio/detective", "Mr.Titos"),
@@ -86,15 +88,17 @@ SECTIONS = {
     "games": [("detective-office", "Detective Titos"), ("polly-office", "Polly, Office Clerk"), ("flock", "The Flock"), ("shop", "Shop")],
     "world": [("about-polly", "About Polly"), ("wobbleland", "Wobbleland"), ("art-portfolio/bird", "Pigeon Polly"),
               ("art-portfolio/snail", "Mr.Chew"), ("art-portfolio/detective", "Mr.Titos"), ("art-portfolio/halloween", "Pumpkin Family")],
-    "books": [("e-books", "Books"), ("polly-helps", "Polly, help me draw")],
-    "about": [("about-me", "About me"), ("art-portfolio", "Art Portfolio"), ("on-walls-and-pages", "On Walls & Pages"),
+    "books": [("e-books", "Books"), ("polly-helps", "Polly, help me draw"), ("palettes", "Palettes")],
+    "sketchbook": [("art-portfolio", "All series"), ("art-portfolio/sketchbook", "Sketchbook Pages"), ("art-portfolio/anxiety", "Anxiety"), ("art-portfolio/ai-art", "AI Art")],
+    "about": [("about-me", "About me"), ("on-walls-and-pages", "On Walls & Pages"),
               ("projects", "Learning & AI"), ("work-with-me", "Work with me")],
 }
 # страницы, у которых активна вкладка с другим адресом
-TAB_ALIAS = {"art-portfolio/anxiety": "art-portfolio", "art-portfolio/sketchbook": "art-portfolio", "art-portfolio/ai-art": "art-portfolio"}
+TAB_ALIAS = {}
 NAV = [
     ("challenge", "Daily Challenge"),
     ("blog", "Blog"),
+    ("art-portfolio", "My Sketchbook", "sketchbook"),
     ("detective-office", "Games", "games"),
     ("about-polly", "Polly’s World", "world"),
     ("e-books", "Books & Helpful", "books"),
@@ -507,6 +511,8 @@ def build():
     # книги Алины для стаи (витрина в книжном: обложки кликабельные, птички их читают)
     books = [b for sec in json.loads((CONTENT / "ebooks.json").read_text())["sections"] for b in sec["books"]]
     (OUT / "assets" / "books.json").write_text(json.dumps([{"title": b["title"], "url": b["url"], "cover": "/" + b["cover"]} for b in books if b.get("cover")], ensure_ascii=False))
+    # палитры из артов (страница «Палитры» и кнопка 🎨 в челлендже); данные — content/palettes.json (tools/palettes.py)
+    (OUT / "assets" / "palettes.json").write_text(json.dumps(json.loads((CONTENT / "palettes.json").read_text()), ensure_ascii=False, separators=(",", ":")))
     # индекс для поиска по сайту (кнопка 🔍 в шапке; статьи блога ищутся отдельно на сервере)
     for lang, entries in search_index.items():
         (OUT / "assets" / f"search-{lang}.json").write_text(json.dumps(entries, ensure_ascii=False, separators=(",", ":")))
