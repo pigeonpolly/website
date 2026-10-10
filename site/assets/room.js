@@ -94,7 +94,11 @@
   // ---------- мебель и вещи: w, h, top (высота поверхности сверху, куда можно ставить; null — нельзя), d(g, x, y, t, room) ----------
   const SOFA_C = [['#7F5FB8', '#5E438F', '#9C80D0'], ['#3F7D5C', '#2D5C43', '#5C9C78'], ['#D9A33B', '#B5832A', '#EBC064'], ['#E58CA8', '#C46B88', '#F2AFC4']];
   const GIFT_C = [['#E5484D', '#F6D04D'], ['#4A7BD8', '#FFFFFF'], ['#4CC38A', '#E5484D'], ['#B79CF2', '#F6D04D']];
-  const ORN_C = ['#E5484D', '#E9C46A', '#4A7BD8', '#C9CDD6', '#F28AB2', '#4CC38A'];
+  // ёлочные шарики: цвет (+ узор для последних); порядок не менять — номер = значение «ornament:N»
+  const ORN_C = ['#E5484D', '#E9C46A', '#4A7BD8', '#C9CDD6', '#F28AB2', '#4CC38A', '#8E5BD8', '#F08A3B', '#F4F1EA', '#3CC7C0', '#9B2D3A', '#2B3E8C', '#E5484D', '#4A7BD8', '#E9C46A', '#B79CF2'];
+  const ORN_N = [['red', 'красный', 'sarkana'], ['gold', 'золотой', 'zelta'], ['blue', 'синий', 'zila'], ['silver', 'серебряный', 'sudraba'], ['pink', 'розовый', 'rozā'], ['green', 'зелёный', 'zaļa'],
+    ['purple', 'фиолетовый', 'violeta'], ['orange', 'оранжевый', 'oranža'], ['white', 'белый', 'balta'], ['turquoise', 'бирюзовый', 'tirkīza'], ['burgundy', 'бордовый', 'bordo'], ['navy', 'тёмно-синий', 'tumši zila'],
+    ['candy stripes', 'в полоску', 'svītraina'], ['snowflakes', 'со снежинками', 'ar sniegpārslām'], ['glitter', 'с блёстками', 'ar spīdumiem'], ['rainbow', 'радужный', 'varavīksnes']];
   const P = (g, x0, y0) => (x, y, w, h, c) => R(g, x0 + x, y0 + y, w, h, c);
   const spr = (p, rows, pal) => rows.forEach((r, y) => [...r].forEach((ch, x) => { if (pal[ch]) p(x, y, 1, 1, pal[ch]); }));
   const FURN = {
@@ -162,12 +166,32 @@
   };
   // украшения: висят где угодно (координаты x, y), рисуются поверх мебели
   const DECO = {
-    ornament: { n: i => [['Tree ball (red)', 'Ёлочный шарик (красный)', 'Eglītes bumbiņa (sarkana)'], ['Tree ball (gold)', 'Ёлочный шарик (золотой)', 'Eglītes bumbiņa (zelta)'], ['Tree ball (blue)', 'Ёлочный шарик (синий)', 'Eglītes bumbiņa (zila)'], ['Tree ball (silver)', 'Ёлочный шарик (серебряный)', 'Eglītes bumbiņa (sudraba)'], ['Tree ball (pink)', 'Ёлочный шарик (розовый)', 'Eglītes bumbiņa (rozā)'], ['Tree ball (green)', 'Ёлочный шарик (зелёный)', 'Eglītes bumbiņa (zaļa)']][i], v: 6, w: 5, h: 7,
-      d: (p, t, i) => { const c = ORN_C[i]; p(2, 0, 1, 1, '#C9C9D6'); p(1, 1, 3, 1, '#E9C46A'); p(1, 2, 3, 1, c); p(0, 3, 5, 3, c); p(1, 6, 3, 1, c); p(1, 3, 1, 1, '#FFFFFF'); } },
+    ornament: { n: i => { const c = ORN_N[i] || ORN_N[0]; return ['Tree ball (' + c[0] + ')', 'Ёлочный шарик (' + c[1] + ')', 'Eglītes bumbiņa (' + c[2] + ')']; }, v: ORN_C.length, w: 5, h: 7,
+      d: (p, t, i) => {
+        const c = ORN_C[i]; p(2, 0, 1, 1, '#C9C9D6'); p(1, 1, 3, 1, '#E9C46A'); p(1, 2, 3, 1, c); p(0, 3, 5, 3, c); p(1, 6, 3, 1, c);
+        if (i === 12) { p(0, 4, 5, 1, '#FFFFFF'); p(1, 2, 3, 1, '#FFFFFF'); p(1, 6, 3, 1, '#FFFFFF'); } // в полоску
+        if (i === 13) { p(1, 4, 1, 1, '#FFFFFF'); p(3, 3, 1, 1, '#FFFFFF'); p(3, 5, 1, 1, '#FFFFFF'); p(2, 6, 1, 1, '#BFE3F5'); } // снежинки
+        if (i === 14) { const k = Math.floor(t / 180) % 6; [[1, 4], [3, 3], [2, 5], [4, 4], [1, 2], [3, 6]].forEach(([x, y], n) => { if ((n + k) % 3 === 0) p(x, y, 1, 1, '#FFF3B0'); }); } // блёстки мерцают
+        if (i === 15) { p(1, 2, 3, 1, '#E5484D'); p(0, 3, 5, 1, '#F08A3B'); p(0, 4, 5, 1, '#F6D04D'); p(0, 5, 5, 1, '#4CC38A'); p(1, 6, 3, 1, '#4A7BD8'); } // радужный
+        p(1, 3, 1, 1, '#FFFFFF'); if (Math.sin(t / 700 + i * 2.3) > .93) p(3, 2, 1, 1, '#FFFFFF'); // блик иногда вспыхивает
+      } },
     xmasstar: { n: () => ['Tree-top star', 'Звезда на ёлку', 'Zvaigzne eglei'], w: 9, h: 9,
       d: (p, t) => { spr(p, ['....s....', '....s....', '...sss...', 'sssssssss', '.sssssss.', '..sssss..', '.sss.sss.', '.ss...ss.', 's.......s'], { s: '#F6D04D' }); p(4, 4, 1, 1, '#FFF3B0'); if (Math.sin(t / 300) > .6) { p(-1, 0, 1, 1, '#FFFFFF'); p(9, 2, 1, 1, '#FFFFFF'); } } },
     lights: { n: () => ['Fairy lights', 'Гирлянда-огоньки', 'Lampiņu virtene'], w: 32, h: 6,
       d: (p, t) => { const c = ['#E5484D', '#F6D04D', '#4CC38A', '#4A7BD8', '#F28AB2']; for (let x = 0; x < 32; x++) p(x, Math.round(Math.sin(x / 32 * Math.PI) * 3), 1, 1, '#2E4A2E'); for (let k = 0; k < 8; k++) { const x = 2 + k * 4, y = Math.round(Math.sin(x / 32 * Math.PI) * 3) + 1, on = Math.sin(t / 250 + k * 1.7) > -.3; p(x, y, 2, 2, on ? c[k % 5] : '#5B5670'); } } },
+    // ещё гирлянды — все мигают
+    lightswarm: { n: () => ['Warm white fairy lights', 'Гирлянда тёплая белая', 'Silti balta virtene'], w: 32, h: 6,
+      d: (p, t) => { for (let x = 0; x < 32; x++) p(x, Math.round(Math.sin(x / 32 * Math.PI) * 3), 1, 1, '#4A4458'); for (let k = 0; k < 11; k++) { const x = 1 + k * 3, y = Math.round(Math.sin(x / 32 * Math.PI) * 3) + 1, b = Math.sin(t / 400 + k * 2.1); p(x, y, 1, 1, b > .5 ? '#FFF3B0' : b > -.4 ? '#F6D04D' : '#B8954A'); } } },
+    lightsice: { n: () => ['Icicle lights', 'Гирлянда-сосульки', 'Lāsteku virtene'], w: 32, h: 10,
+      d: (p, t) => { p(0, 0, 32, 1, '#C9C9D6'); for (let k = 0; k < 8; k++) { const x = 1 + k * 4, len = 3 + (k * 5) % 6, drip = Math.floor(t / 120 + k * 3) % (len + 4); for (let y = 1; y <= len; y++) p(x, y, 1, 1, y === drip ? '#FFFFFF' : '#7FB3E8'); } } },
+    lightsrun: { n: () => ['Running lights', 'Гирлянда «бегущий огонь»', 'Skrejošā virtene'], w: 32, h: 6,
+      d: (p, t) => { const c = ['#E5484D', '#F6D04D', '#4CC38A', '#4A7BD8', '#B79CF2']; const head = Math.floor(t / 110) % 10; for (let x = 0; x < 32; x++) p(x, Math.round(Math.sin(x / 32 * Math.PI) * 3), 1, 1, '#2E4A2E'); for (let k = 0; k < 10; k++) { const x = 1 + k * 3, y = Math.round(Math.sin(x / 32 * Math.PI) * 3) + 1, d = (head - k + 10) % 10; p(x, y, 2, 2, d === 0 ? '#FFFFFF' : d < 3 ? c[k % 5] : '#5B5670'); } } },
+    lightsretro: { n: () => ['Big retro bulbs', 'Гирлянда с большими ретро-лампочками', 'Retro spuldžu virtene'], w: 32, h: 9,
+      d: (p, t) => { const c = ['#E5484D', '#4CC38A', '#F08A3B', '#4A7BD8', '#F6D04D']; for (let x = 0; x < 32; x++) p(x, Math.round(Math.sin(x / 32 * Math.PI) * 2), 1, 1, '#2E4A2E'); for (let k = 0; k < 6; k++) { const x = 2 + k * 5, y = Math.round(Math.sin(x / 32 * Math.PI) * 2) + 1, on = Math.floor(t / 700 + k) % 4 !== 0, col = on ? c[k % 5] : '#5B5670'; p(x, y, 2, 1, '#3A3550'); p(x - 1 + 1, y + 1, 2, 1, col); p(x - 1, y + 2, 4, 3, col); p(x, y + 5, 2, 1, col); if (on) p(x, y + 2, 1, 1, '#FFFFFF'); } } },
+    lightsstar: { n: () => ['Star lights', 'Гирлянда-звёздочки', 'Zvaigznīšu virtene'], w: 32, h: 7,
+      d: (p, t) => { for (let x = 0; x < 32; x++) p(x, Math.round(Math.sin(x / 32 * Math.PI) * 2), 1, 1, '#C9C9D6'); for (let k = 0; k < 6; k++) { const x = 2 + k * 5, y = Math.round(Math.sin(x / 32 * Math.PI) * 2) + 1, on = Math.sin(t / 300 + k * 1.3) > -.2, col = on ? '#F6D04D' : '#8A7A40'; p(x + 1, y, 1, 1, col); p(x, y + 1, 3, 1, col); p(x + 1, y + 2, 1, 1, col); if (on && Math.sin(t / 300 + k * 1.3) > .85) { p(x - 1, y + 1, 1, 1, '#FFF3B0'); p(x + 3, y + 1, 1, 1, '#FFF3B0'); } } } },
+    lightscurtain: { n: () => ['Curtain lights', 'Гирлянда-занавес', 'Aizkara virtene'], w: 30, h: 22, glow: [15, 10],
+      d: (p, t) => { p(0, 0, 30, 1, '#4A4458'); for (let k = 0; k < 8; k++) { const x = 1 + k * 4; for (let y = 2; y < 22; y += 3) { const b = Math.sin(t / 350 - y / 4 + k * .9); p(x, y, 1, 1, b > .3 ? '#FFF3B0' : b > -.5 ? '#E9C46A' : '#6B5A30'); } } } },
     tinsel: { n: () => ['Tinsel', 'Мишура', 'Spīguļvirtene'], w: 32, h: 4,
       d: (p, t) => { for (let x = 0; x < 32; x++) { const y = Math.round(Math.sin(x / 32 * Math.PI) * 2); p(x, y + (x % 2), 1, 2, (x + Math.floor(t / 150)) % 5 ? '#E9C46A' : '#FFF3B0'); } } },
     bell: { n: () => ['Golden bell', 'Колокольчик', 'Zvaniņš'], w: 7, h: 8,
@@ -484,9 +508,10 @@
   B.GIFT_KINDS.push(['furn', ['Furniture & things', 'Мебель и вещи', 'Mēbeles un lietas']], ['deco', ['Decorations', 'Украшения', 'Rotājumi']], ['wall', ['Wallpaper', 'Обои', 'Tapetes']],
     ['floor', ['Floors', 'Пол', 'Grīdas']], ['view', ['Window views', 'Вид из окна', 'Skats pa logu']], ['curtain', ['Curtains', 'Шторы', 'Aizkari']]);
   const th = id => B.GIFT_THEMES.find(t => t[0] === id);
+  const LIGHTS = ['deco|lightswarm', 'deco|lightsice', 'deco|lightsrun', 'deco|lightsretro', 'deco|lightsstar', 'deco|lightscurtain'];
   const addTh = (id, list) => { const t = th(id); if (t) t[2].push(...list); };
   addTh('legendary', LEG);
-  addTh('newyear', ['furn|xmastree', ...[0, 1, 2, 3].map(i => 'furn|present:' + i), 'furn|snowman', ...[0, 1, 2, 3, 4, 5].map(i => 'deco|ornament:' + i), 'deco|xmasstar', 'deco|lights', 'deco|tinsel', 'deco|bell', 'deco|candycane', 'deco|snowflake', 'wall|xmas', 'view|snow']);
+  addTh('newyear', ['furn|xmastree', ...[0, 1, 2, 3].map(i => 'furn|present:' + i), 'furn|snowman', ...ORN_C.map((_, i) => 'deco|ornament:' + i), 'deco|xmasstar', 'deco|lights', ...LIGHTS, 'deco|tinsel', 'deco|bell', 'deco|candycane', 'deco|snowflake', 'wall|xmas', 'view|snow']);
   addTh('autumn', ['wall|leaves', 'view|autumn', 'furn|pumpkin', 'curtain|mustard']);
   addTh('halloween', ['furn|pumpkin', 'furn|candle']);
   addTh('gaming', ['furn|tv', 'furn|console', 'furn|beanbag', 'view|space']);
@@ -509,7 +534,7 @@
   addTh('school', ['wall|library', 'wall|chalk', 'furn|computer']);
   addTh('valentine', ['wall|hearts', 'floor|fluffy']);
   addTh('legendary', []);
-  B.GIFT_THEMES.push(['tree', ['🎄 Tree decorations', '🎄 Украшения для ёлки', '🎄 Eglītes rotājumi'], ['deco|ornament:0', 'deco|ornament:1', 'deco|ornament:2', 'deco|ornament:3', 'deco|ornament:4', 'deco|ornament:5', 'deco|xmasstar', 'deco|staromini', 'deco|lights', 'deco|tinsel', 'deco|beads', 'deco|icicle', 'deco|pinecone', 'deco|angel', 'deco|gingerorn', 'deco|birdorn', 'deco|candyorn', 'deco|snowmanorn', 'deco|bell', 'deco|candycane', 'furn|xmastree']]);
+  B.GIFT_THEMES.push(['tree', ['🎄 Tree decorations', '🎄 Украшения для ёлки', '🎄 Eglītes rotājumi'], [...ORN_C.map((_, i) => 'deco|ornament:' + i), 'deco|xmasstar', 'deco|staromini', 'deco|lights', ...LIGHTS, 'deco|tinsel', 'deco|beads', 'deco|icicle', 'deco|pinecone', 'deco|angel', 'deco|gingerorn', 'deco|birdorn', 'deco|candyorn', 'deco|snowmanorn', 'deco|bell', 'deco|candycane', 'furn|xmastree']]);
   addTh('newyear', ['deco|staromini', 'deco|beads', 'deco|icicle', 'deco|pinecone', 'deco|angel', 'deco|gingerorn', 'deco|birdorn', 'deco|candyorn', 'deco|snowmanorn']);
   B.GIFT_THEMES.push(['fun', ['😂 Funny', '😂 Забавное', '😂 Jautri'], ['furn|giantpizza', 'furn|rubberduck', 'furn|toaster', 'furn|lavalamp', 'furn|cattower', 'furn|bathtub', 'furn|mrchew', 'furn|coatstand', 'furn|wormchips', 'furn|flytrap', 'furn|robovac', 'furn|socks', 'furn|tamagotchi', 'furn|giantcoffee', 'furn|nestbed', 'deco|cuckoo', 'deco|moosehead', 'deco|crookedart', 'deco|ufo', 'deco|balloons', 'deco|wormposter']]);
   addTh('magic', ['furn|portal', 'furn|dragon', 'deco|constellation', 'curtain|starlight']);
