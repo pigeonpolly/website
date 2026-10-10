@@ -23,8 +23,8 @@
     done: ['I drew it', 'Я нарисовал(а)', 'Es uzzīmēju'],
     doneYes: ['Drawn ✓', 'Нарисовано ✓', 'Uzzīmēts ✓'],
     backToday: ['← Back to today', '← Вернуться к сегодня', '← Atpakaļ uz šodienu'],
-    extra: ['EXTRA day! Add 1 extra art material in any colour.', 'День ЭКСТРА! Добавьте 1 дополнительный арт-материал любого цвета.', 'EKSTRA diena! Pievieno 1 papildu mākslas materiālu jebkurā krāsā.'],
-    extraBw: ['EXTRA day!', 'День ЭКСТРА!', 'EKSTRA diena!'],
+    extra: ['EXTRA day, a free day! Draw your own theme or your own reference. Nothing uploaded today? Your streak is safe, take a rest day.', 'День ЭКСТРА — день свободы! Рисуйте свою тему или по своему референсу. Ничего не загрузили сегодня? Серия не сгорит — можно взять выходной.', 'EKSTRA diena — brīvdiena! Zīmē savu tēmu vai pēc savas atsauces. Šodien neko neaugšupielādēji? Sērija nepazudīs — vari atpūsties.'],
+    extraBw: ['EXTRA free day!', 'День ЭКСТРА — день свободы!', 'EKSTRA brīvdiena!'],
     twist: ['Your twist', 'Особенность', 'Tavs pavērsiens'],
     modeColor: ['In colour', 'В цвете', 'Krāsās'],
     modeBw: ['Black & white', 'Ч/Б', 'Melnbalts'],
@@ -100,7 +100,7 @@
     const bt = $('#ch-today'); bt && bt.addEventListener('click', () => { view = new Date(today.getFullYear(), today.getMonth(), 1); selectDay(new Date(today)); });
     renderMin();
   }
-  function extraText(th) { return bw ? `${t('extraBw')} ${th.extraBw[0].toUpperCase() + th.extraBw.slice(1)}.` : t('extra'); }
+  function extraText(th) { return t('extra'); }
   // кляксы для Ч/Б листка: свои на каждый день, всегда по краям, под текстом
   function blot(r, x, y, R) {
     const n = 11 + Math.floor(r() * 5), pts = [];
@@ -239,9 +239,13 @@
   let view = new Date(today.getFullYear(), today.getMonth(), 1);
   const START = new Date(2026, 9, 1); // челлендж начался 1 октября 2026
   function streak() {
+    // день свободы (ЭКСТРА) без рисунка не прерывает серию
     let n = 0; const d = new Date(today);
     if (!diary[keyOf(d)]) d.setDate(d.getDate() - 1);
-    while (diary[keyOf(d)]) { n++; d.setDate(d.getDate() - 1); }
+    while (d >= START) {
+      if (diary[keyOf(d)]) n++; else if (!CT.isExtra(d)) break;
+      d.setDate(d.getDate() - 1);
+    }
     return n;
   }
   function renderDiary() {
@@ -262,7 +266,7 @@
     $('#ch-grid').innerHTML = html;
     let lg = $('#ch-legend');
     if (!lg) { lg = document.createElement('p'); lg.id = 'ch-legend'; lg.className = 'extra-legend'; $('#ch-grid').after(lg); }
-    lg.innerHTML = `<span aria-hidden="true">✦</span> ${bw ? t('extraBw') : t('extra')}`;
+    lg.innerHTML = `<span aria-hidden="true">✦</span> ${t('extra')}`;
     $('#ch-prev').disabled = view <= START;
   }
   $('#ch-grid').addEventListener('click', e => {

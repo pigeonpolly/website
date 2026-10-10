@@ -120,8 +120,8 @@
     { d: 365, n: ['Polly legend', 'Легенда Полли', 'Pollijas leģenda'], f: ['A whole year. Pigeons tell legends about you.', 'Целый год. Голуби слагают о вас легенды.', 'Vesels gads. Baloži par tevi stāsta leģendas.'], s: 'crown', bg: '#9C8FE0' },
   ];
   const SPECIAL = [
-    { k: 'extra', f: ['Took the extra challenge and didn’t even blink.', 'Взял(а) экстра-задание и даже не моргнул(а).', 'Paņēmi papildu uzdevumu un pat nesamirkšķināji.'], n: ['EXTRA day done', 'День ЭКСТРА пройден', 'EKSTRA diena paveikta'], s: 'sparkle', bg: '#F7E7A6',
-      h: ['Upload a sketch on the monthly EXTRA day (see the calendar on the Daily Challenge page)', 'Загрузить рисунок в день ЭКСТРА (раз в месяц, отмечен в календаре челленджа)', 'Augšupielādēt skici EKSTRA dienā (reizi mēnesī, atzīmēta izaicinājuma kalendārā)'] },
+    { k: 'extra', f: ['A free day, and you still drew. Just for joy.', 'День свободы, а вы всё равно рисовали. Просто для радости.', 'Brīvdiena, bet tu tik un tā zīmēji. Prieka pēc.'], n: ['Drew on a free day', 'Рисовал(а) в день свободы', 'Zīmēju brīvdienā'], s: 'sparkle', bg: '#F7E7A6',
+      h: ['Upload a sketch on the monthly EXTRA free day: your own theme or reference (marked ✦ in the Daily Challenge calendar)', 'Загрузить рисунок в день ЭКСТРА — день свободы: своя тема или свой референс (раз в месяц, ✦ в календаре челленджа)', 'Augšupielādēt skici EKSTRA brīvdienā: sava tēma vai sava atsauce (reizi mēnesī, ✦ izaicinājuma kalendārā)'] },
     { k: 'bw', f: ['Ink in the veins. Colours are overrated.', 'Тушь в венах. Цвета переоценены.', 'Tuša vēnās. Krāsas ir pārvērtētas.'], n: ['Ink mood: drew in B/W', 'Нарисовал(а) в Ч/Б', 'Zīmēju melnbalti'], s: 'ink', bg: '#F4F4F4',
       h: ['Upload a sketch with “Black & white” mode switched on on the Daily Challenge page', 'Загрузить рисунок, когда на странице челленджа включён режим «Ч/Б»', 'Augšupielādēt skici, kad izaicinājuma lapā ieslēgts “Melnbalts”'] },
     { k: 'bday', f: ['Came to Polly’s party with a drawing instead of a cake.', 'Пришёл(ла) к Полли на день рождения с рисунком вместо торта.', 'Atnāci uz Pollijas ballīti ar zīmējumu kūkas vietā.'], n: ['Polly’s birthday guest', 'Гость на дне рождения Полли', 'Pollijas dzimšanas dienas viesis'], s: 'party', bg: '#F9D3E3',
@@ -225,7 +225,7 @@
       const d = new Date(p.day + 'T12:00:00');
       if (p.bw) got.add('bw');
       if (d.getMonth() === 0 && d.getDate() === 23) got.add('bday');
-      if (window.ChallengeTheme && d.getDate() === window.ChallengeTheme.extraDay(d.getFullYear(), d.getMonth())) got.add('extra');
+      if (window.ChallengeTheme && (d.getDate() === window.ChallengeTheme.extraDay(d.getFullYear(), d.getMonth()) || p.day === '2026-10-02')) got.add('extra');
     }
     return got;
   }

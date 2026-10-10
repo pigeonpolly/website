@@ -11,13 +11,19 @@
     let a = h >>> 0;
     return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let x = Math.imul(a ^ a >>> 15, 1 | a); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296; };
   }
-  // день ЭКСТРА: свой случайный день каждый месяц, число не повторяет прошлый месяц
+  // день ЭКСТРА = день свободы: своя тема или свой референс; если ничего не загрузить, серия не сгорает.
+  // До сентября 2026 включительно — старая формула; октябрь 2026 — 12-е; дальше — случайный день не ближе 20 дней к прошлому.
   const extraMemo = {};
   function extraDay(y, m) {
     const key = y * 12 + m; if (extraMemo[key]) return extraMemo[key];
     const days = new Date(y, m + 1, 0).getDate(), rm = rngFor('extra-' + y + '-' + m);
     let v = 1 + Math.floor(rm() * days);
-    if (key > 2026 * 12 + 9) { const prev = extraDay(m ? y : y - 1, m ? m - 1 : 11); while (v === prev) v = 1 + Math.floor(rm() * days); }
+    if (key === 2026 * 12 + 9) v = 12;
+    else if (key > 2026 * 12 + 9) {
+      const py = m ? y : y - 1, pm = m ? m - 1 : 11, prev = extraDay(py, pm), pdays = new Date(py, pm + 1, 0).getDate();
+      const lo = Math.max(1, 20 - (pdays - prev));
+      v = lo + Math.floor(rm() * (days - lo + 1));
+    }
     return (extraMemo[key] = v);
   }
   const orders = {};
@@ -116,5 +122,6 @@
     const extraBw = D.extrasBw[orderOf('polly-extrabw', D.extrasBw.length)[mod(mi, D.extrasBw.length)]][L];
     return { subject: subject[L], colors: cols.slice(0, 3), twist, extraBw, time, extra, bday, tip: D.tips[day % D.tips.length][L] };
   }
-  window.ChallengeTheme = { themeFor, keyOf, rngFor, extraDay };
+  const isExtra = d => d.getDate() === extraDay(d.getFullYear(), d.getMonth());
+  window.ChallengeTheme = { themeFor, keyOf, rngFor, extraDay, isExtra };
 })();

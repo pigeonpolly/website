@@ -378,9 +378,9 @@ const utcToday = () => Math.floor(Date.now() / 864e5);
 function streaks(days) {
   const n = [...new Set(days.map(dayNum))].sort((a, b) => b - a);
   let best = 0, run = 0;
-  for (let i = 0; i < n.length; i++) { run = i && n[i - 1] - n[i] === 1 ? run + 1 : 1; best = Math.max(best, run); }
+  for (let i = 0; i < n.length; i++) { run = i && bridged(n[i - 1], n[i]) ? run + 1 : 1; best = Math.max(best, run); }
   let current = 0;
-  if (n.length && n[0] >= utcToday() - 1) { current = 1; while (current < n.length && n[current - 1] - n[current] === 1) current++; }
+  if (n.length && bridged(utcToday(), n[0])) { current = 1; while (current < n.length && bridged(n[current - 1], n[current])) current++; }
   return { current, best };
 }
 
@@ -391,21 +391,31 @@ function rngFor(str) {
   let a = h >>> 0;
   return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let x = Math.imul(a ^ a >>> 15, 1 | a); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296; };
 }
+// день ЭКСТРА = день свободы: своя тема или свой референс; если ничего не загрузить, серия не сгорает.
+// До сентября 2026 включительно — старая формула; октябрь 2026 — 12-е; дальше — случайный день не ближе 20 дней к прошлому.
 const extraMemo = {};
 function extraDay(y, m) {
   const key = y * 12 + m; if (extraMemo[key]) return extraMemo[key];
   const days = new Date(y, m + 1, 0).getDate(), rm = rngFor('extra-' + y + '-' + m);
   let v = 1 + Math.floor(rm() * days);
-  if (key > 2026 * 12 + 9) { const prev = extraDay(m ? y : y - 1, m ? m - 1 : 11); while (v === prev) v = 1 + Math.floor(rm() * days); }
+  if (key === 2026 * 12 + 9) v = 12;
+  else if (key > 2026 * 12 + 9) {
+    const py = m ? y : y - 1, pm = m ? m - 1 : 11, prev = extraDay(py, pm), pdays = new Date(py, pm + 1, 0).getDate();
+    const lo = Math.max(1, 20 - (pdays - prev));
+    v = lo + Math.floor(rm() * (days - lo + 1));
+  }
   return (extraMemo[key] = v);
 }
+// день свободы по номеру дня (dayNum): если в этот день ничего не загружено, серия не прерывается
+const isExtraNum = n => { const d = new Date(n * 864e5); return d.getUTCDate() === extraDay(d.getUTCFullYear(), d.getUTCMonth()); };
+const bridged = (a, b) => { for (let x = b + 1; x < a; x++) if (!isExtraNum(x)) return false; return true; }; // между днями b < a только дни свободы
 function badgesOf(posts, months = []) {
   const got = new Set();
   for (const p of posts) {
     const y = +p.day.slice(0, 4), m = +p.day.slice(5, 7) - 1, d = +p.day.slice(8, 10);
     if (p.bw) got.add('bw');
     if (m === 0 && d === 23) got.add('bday');
-    if (d === extraDay(y, m)) got.add('extra');
+    if (d === extraDay(y, m) || (y === 2026 && m === 9 && d === 2)) got.add('extra'); // 2.10.2026 — день ЭКСТРА до переноса на 12-е
   }
   const sorted = [...posts].sort((a, b) => a.day < b.day ? -1 : 1);
   // «Через денёк»: 15 загрузок подряд, каждая ровно через день (≈ месяц)

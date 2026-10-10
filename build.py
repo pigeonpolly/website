@@ -89,7 +89,9 @@ SECTIONS = {
     "world": [("about-polly", "About Polly"), ("wobbleland", "Wobbleland"), ("art-portfolio/bird", "Pigeon Polly"),
               ("art-portfolio/snail", "Mr.Chew"), ("art-portfolio/detective", "Mr.Titos"), ("art-portfolio/halloween", "Pumpkin Family")],
     "books": [("e-books", "Books"), ("polly-helps", "Polly, help me draw"), ("palettes", "Palettes")],
-    "sketchbook": [("art-portfolio", "All series"), ("art-portfolio/sketchbook", "Sketchbook Pages"), ("art-portfolio/anxiety", "Anxiety"), ("art-portfolio/ai-art", "AI Art")],
+    "sketchbook": [("art-portfolio", "All series"), ("art-portfolio/sketchbook", "Sketchbook Pages"), ("art-portfolio/anxiety", "Anxiety"),
+                   ("art-portfolio/bird", "Pigeon Polly"), ("art-portfolio/snail", "Mr.Chew"), ("art-portfolio/detective", "Mr.Titos"), ("art-portfolio/halloween", "Pumpkin Family"),
+                   ("art-portfolio/ai-art", "AI Art")],
     "about": [("about-me", "About me"), ("on-walls-and-pages", "On Walls & Pages"),
               ("projects", "Learning & AI"), ("work-with-me", "Work with me")],
 }
