@@ -3180,3 +3180,4 @@ html:not(.is-admin) .statbar { display: none; }
 .adm-sk-it { display: grid; grid-template-columns: 40px 1fr auto auto 54px; align-items: center; gap: 8px; font-size: 13px; padding: 3px 0; border-bottom: 1px solid rgba(0,0,0,.06); }
 .adm-sk-it.off { opacity: .6; } .adm-sk-it.saved { background: rgba(76,195,138,.15); }
 .adm-sk-it input { width: 62px; } .adm-sk-it label { white-space: nowrap; font-size: 12px; }
+.shop-afford { margin-left: 8px; } .shop-afford[aria-pressed="true"] { background: #4CC38A !important; border-color: #4CC38A !important; color: #10261B !important; }
