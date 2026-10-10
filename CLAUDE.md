@@ -221,3 +221,4 @@
 - `extraDay(y, m)` одинаковая в `site/assets/challenge-theme.js` и `worker/index.js`: до сентября 2026 — старая формула; октябрь 2026 — 12-е (было 2-е; бейдж за 2.10.2026 сохраняется); дальше случайный день не ближе 20 дней к прошлому дню свободы.
 - Серии: в воркере `streaks()` через `bridged(a, b)` — между днями загрузок могут быть только дни свободы (`isExtraNum`); на клиенте `challenge.js` `streak()` пропускает пустые дни свободы (`ChallengeTheme.isExtra`).
 - Меню «Мой скетчбук» включает и серии персонажей (Pigeon Polly, Mr.Chew, Mr.Titos, Pumpkin Family) — они же остаются в «Мире Полли» (вкладки на их страницах — от «Мира Полли», он первый в SECTIONS).
+- Картинки пинов для массовой загрузки в Pinterest (CSV «Bulk create Pins», колонка Media URL): `site/images/pins/pin-001…100.jpg`, `pin-m01…m30.jpg` (мемы), `pin-p01…p59.jpg` (палитры). Не удалять, пока пины висят в Pinterest.
