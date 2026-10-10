@@ -108,7 +108,12 @@ async function ensureBlogSchema(env) {
       env.DB.prepare("INSERT INTO meta (key, value) VALUES ('sections_v2', '1') ON CONFLICT(key) DO UPDATE SET value = '1'")]);
   }
   // раздел «Истории» (рассказы и короткие истории, про Полли и не только) — добавляется один раз, если его ещё нет
-  await env.DB.prepare("INSERT INTO blog_sections (slug, en, ru, lv, sort) VALUES ('stories', 'Stories', 'Истории', 'Stāsti', 6) ON CONFLICT(slug) DO NOTHING").run().catch(() => {});
+  await env.DB.prepare("INSERT INTO blog_sections (slug, en, ru, lv, sort) VALUES ('stories', 'Site news', 'Новости сайта', 'Vietnes jaunumi', 6) ON CONFLICT(slug) DO NOTHING").run().catch(() => {});
+  // 10.10.2026 «Истории» → «Новости сайта» (адрес раздела прежний, ?section=stories); один раз, чтобы потом можно было переименовать в редакторе
+  if (!(await env.DB.prepare("SELECT value FROM meta WHERE key = 'sections_news'").first().catch(() => null))) {
+    await env.DB.batch([env.DB.prepare("UPDATE blog_sections SET en = 'Site news', ru = 'Новости сайта', lv = 'Vietnes jaunumi' WHERE slug = 'stories'"),
+      env.DB.prepare("INSERT INTO meta (key, value) VALUES ('sections_news', '1') ON CONFLICT(key) DO UPDATE SET value = '1'")]).catch(() => {});
+  }
   for (const sql of ['ALTER TABLE blog_tags ADD COLUMN checked INTEGER DEFAULT 0', "ALTER TABLE blog_tags ADD COLUMN src TEXT DEFAULT ''", 'ALTER TABLE blog_tags ADD COLUMN created_at INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* уже есть */ }
   }
