@@ -117,6 +117,29 @@ async function sitePage(req, env, url) {
   }).transform(out);
 }
 
+// ---------- комната птички (room.js): обои, пол, вид, шторы — по одной; мебель и украшения — сколько есть в сумке ----------
+const roomOf = u => { try { const r = JSON.parse(u && u.room || '{}'); return r && typeof r === 'object' ? r : {}; } catch (e) { return {}; } };
+async function ownedRoom(env, uid) {
+  const m = {};
+  for (const r of (await env.DB.prepare(`SELECT kind, item, COUNT(*) AS n FROM gifts WHERE user_id = ? AND status = 'bag' AND kind IN ('wall', 'floor', 'view', 'curtain', 'furn', 'deco') GROUP BY kind, item`).bind(uid).all()).results) m[r.kind + '|' + r.item] = r.n;
+  return m;
+}
+function cleanRoom(room, own) {
+  const out = { items: [] };
+  for (const k of ['wall', 'floor', 'view', 'curtain']) if (typeof room[k] === 'string' && own[k + '|' + room[k]]) out[k] = room[k];
+  const used = {};
+  for (const it of Array.isArray(room.items) ? room.items.slice(0, 80) : []) {
+    if (!it || !['furn', 'deco'].includes(it.k) || !/^[a-z0-9:-]{1,24}$/i.test(String(it.v))) continue;
+    const key = it.k + '|' + it.v; if ((used[key] || 0) >= (own[key] || 0)) continue;
+    used[key] = (used[key] || 0) + 1;
+    const x = Math.max(-10, Math.min(200, Math.round(Number(it.x) || 0))), o = { k: it.k, v: String(it.v), x };
+    if (it.k === 'deco') o.y = Math.max(0, Math.min(120, Math.round(Number(it.y) || 0)));
+    if (it.f) o.f = 1;
+    out.items.push(o);
+  }
+  return out;
+}
+
 // ---------- адвент-календарь (/advent/): окошки 1–31 декабря, сутки по Риге ----------
 const ADVENT_SPECIAL = [6, 12, 19, 24, 31]; // особые окошки (31-е — легендарное); то же в site/assets/advent.js
 function adventNow(req, env) {
@@ -155,7 +178,8 @@ async function extraQueue(env, req) {
 }
 
 // ---------- аватар: что надето из подарков (фон, обувь, головной убор, анимация, рамка) ----------
-const GIFT_KINDS = ['bg', 'shoes', 'hat', 'anim', 'frame', 'item', 'scarf'];
+const GIFT_KINDS = ['bg', 'shoes', 'hat', 'anim', 'frame', 'item', 'scarf', 'wall', 'floor', 'view', 'curtain', 'furn', 'deco'];
+const ROOM_KINDS = ['wall', 'floor', 'view', 'curtain', 'furn', 'deco']; // вещи для комнаты (room.js), не надеваются
 const avatarOf = u => { try { const a = JSON.parse(u && u.avatar || '{}'); return a && typeof a === 'object' ? a : {}; } catch (e) { return {}; } };
 const okItem = (kind, item) => GIFT_KINDS.includes(kind) && /^[#a-z0-9:-]{1,24}$/i.test(String(item || ''));
 
@@ -209,7 +233,7 @@ async function ensureSchema(env) {
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
   for (const sql of ["ALTER TABLE users ADD COLUMN avatar TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
-    "ALTER TABLE users ADD COLUMN months TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN tod INTEGER',
+    "ALTER TABLE users ADD COLUMN months TEXT DEFAULT ''", "ALTER TABLE users ADD COLUMN room TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN tod INTEGER',
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
@@ -238,7 +262,7 @@ const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, p
   badges: { bw: 5, extra: 15, bday: 15, early: 15, owl: 15, comeback: 15, ten: 20, weekend: 20, newyear: 20, halloween: 20,
     monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, hundred: 100 } };
 // легендарные вещи (как LEGEND в birds.js): в магазине по одной штуке на птичку, дарить нельзя; обычных — до трёх одинаковых
-const LEGEND = new Set(['hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora']);
+const LEGEND = new Set(['hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble']);
 const SHOP_MAX = 3;
 const copies = async (env, uid, kind, item) => (await env.DB.prepare("SELECT COUNT(*) AS n FROM gifts WHERE user_id = ? AND kind = ? AND item = ? AND status IN ('bag', 'new')").bind(uid, kind, item).first()).n;
 const rigaDay = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }); // сутки по Риге
@@ -642,7 +666,7 @@ async function route(req, env, url) {
     if (pickUser === u.id) badges.push('pick');
     const bag = (await env.DB.prepare("SELECT DISTINCT kind, item FROM gifts WHERE user_id = ? AND status = 'bag'").bind(u.id).all()).results; // вещи в сумке — их видят все
     const unopened = (await env.DB.prepare("SELECT COUNT(*) AS n FROM gifts WHERE user_id = ? AND status = 'new'").bind(u.id).first()).n;
-    return json({ id: u.id, avatar: avatarOf(u), bag, unopened, buttons: u.buttons || 0, nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(rows.map(r => r.day)).current,
+    return json({ id: u.id, avatar: avatarOf(u), room: roomOf(u), bag, unopened, buttons: u.buttons || 0, nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(rows.map(r => r.day)).current,
       best: mergedBest(u, rows.map(r => r.day)), badges, posts: rows.filter(r => !r.hidden).map(({ id, day, theme, bw }) => ({ id, day, theme, bw })) });
   }
 
@@ -681,8 +705,8 @@ async function route(req, env, url) {
   }
   // все птицы с ником — для списка на странице «Стая»
   if (m === 'GET' && p === '/api/birds') {
-    const rows = (await env.DB.prepare("SELECT id, nick, avatar FROM users WHERE banned = 0 AND nick IS NOT NULL AND nick != '' ORDER BY created_at LIMIT 2000").all()).results;
-    return json({ birds: rows.map(r => ({ id: r.id, nick: r.nick, avatar: avatarOf(r) })) }, 200, { 'cache-control': 'public, max-age=60' });
+    const rows = (await env.DB.prepare("SELECT id, nick, avatar, room FROM users WHERE banned = 0 AND nick IS NOT NULL AND nick != '' ORDER BY created_at LIMIT 2000").all()).results;
+    return json({ birds: rows.map(r => { const rm = roomOf(r); return { id: r.id, nick: r.nick, avatar: avatarOf(r), home: !!((rm.items || []).length || rm.wall || rm.floor || rm.view || rm.curtain) }; }) }, 200, { 'cache-control': 'public, max-age=60' });
   }
   // «Найти птичку»: по нику (сначала точное совпадение, потом начало ника)
   // ---------- подписка на новость о книге ----------
@@ -721,6 +745,13 @@ async function route(req, env, url) {
     return json({ ok: true });
   }
   // ---------- адвент-календарь ----------
+  if (m === 'POST' && p === '/api/room') {
+    const u = await needUser(req, env);
+    const b = await req.json().catch(() => ({}));
+    const room = cleanRoom(b.room || {}, await ownedRoom(env, u.id));
+    await env.DB.prepare('UPDATE users SET room = ? WHERE id = ?').bind(JSON.stringify(room), u.id).run();
+    return json({ ok: true, room });
+  }
   if (m === 'GET' && p === '/api/advent') {
     const t = adventNow(req, env), u = await currentUser(req, env), admin = await isAdmin(u, env);
     const opened = u ? (await env.DB.prepare('SELECT day, kind, item, buttons FROM advent_open WHERE user_id = ? AND year = ?').bind(u.id, t.year).all()).results : [];
@@ -921,7 +952,7 @@ async function route(req, env, url) {
     const storage = admin ? Math.round(await storageUsed(env) * 1000) / 10 : undefined;
     const migration = admin && env.MEDIA ? await migrationStatus(env) : undefined;
     return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
-      best: mergedBest(u, rows.map(r => r.day)), keptBadges: kept, posts: rows, id: u.id, avatar: avatarOf(u), earned, badgeEarned: forBadges, btn: await buttonStatus(env, u),
+      best: mergedBest(u, rows.map(r => r.day)), keptBadges: kept, posts: rows, id: u.id, avatar: avatarOf(u), room: roomOf(u), earned, badgeEarned: forBadges, btn: await buttonStatus(env, u),
       gifts: (await env.DB.prepare('SELECT id, kind, item, note, status, created_at FROM gifts WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results } });
   }
 
@@ -979,6 +1010,7 @@ async function route(req, env, url) {
     if (a[g.kind] === g.item && !(await env.DB.prepare("SELECT 1 FROM gifts WHERE user_id = ? AND kind = ? AND item = ? AND status = 'bag'").bind(u.id, g.kind, g.item).first())) {
       delete a[g.kind]; await env.DB.prepare('UPDATE users SET avatar = ? WHERE id = ?').bind(JSON.stringify(a), u.id).run();
     }
+    if (ROOM_KINDS.includes(g.kind)) await env.DB.prepare('UPDATE users SET room = ? WHERE id = ?').bind(JSON.stringify(cleanRoom(roomOf(u), await ownedRoom(env, u.id))), u.id).run();
     return json({ ok: true, to: to.nick, avatar: a });
   }
   // админ: начислить всем за прошлые бейджи, рисунки и «Выбор Полли» (можно нажимать сколько угодно — повторно не начислит)
@@ -1006,14 +1038,14 @@ async function route(req, env, url) {
     const g = await env.DB.prepare('SELECT * FROM gifts WHERE id = ? AND user_id = ?').bind(Number(b.id), u.id).first();
     if (!g) fail(404, 'gift');
     await env.DB.prepare("UPDATE gifts SET status = 'bag', opened_at = COALESCE(opened_at, ?) WHERE id = ?").bind(now(), g.id).run();
-    if (b.use) { const a = avatarOf(u); a[g.kind] = g.item; await env.DB.prepare('UPDATE users SET avatar = ? WHERE id = ?').bind(JSON.stringify(a), u.id).run(); }
+    if (b.use && !ROOM_KINDS.includes(g.kind)) { const a = avatarOf(u); a[g.kind] = g.item; await env.DB.prepare('UPDATE users SET avatar = ? WHERE id = ?').bind(JSON.stringify(a), u.id).run(); }
     return json({ ok: true });
   }
   // надеть вещь из сумки (только свою) или снять (item: null)
   if (m === 'POST' && p === '/api/avatar') {
     const u = await needUser(req, env);
     const b = await req.json().catch(() => ({}));
-    if (!GIFT_KINDS.includes(b.kind)) fail(400, 'bad');
+    if (!GIFT_KINDS.includes(b.kind) || ROOM_KINDS.includes(b.kind)) fail(400, 'bad');
     const a = avatarOf(u);
     if (b.item == null) delete a[b.kind];
     else {

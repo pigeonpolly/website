@@ -8,6 +8,7 @@
     soon: ['The Sketch Wall opens very soon. Meanwhile, draw today’s theme on the Daily Challenge page!', 'Стена рисунков скоро откроется. А пока нарисуйте тему дня на странице челленджа!', 'Skiču siena drīz atvērsies. Pagaidām uzzīmē dienas tēmu izaicinājuma lapā!'],
     toChallenge: ['To the Daily Challenge', 'К челленджу', 'Uz izaicinājumu'],
     myProfile: ['🐦 My profile', '🐦 Мой профиль', '🐦 Mans profils'],
+    toRoom: ['🏠 Put it in my room', '🏠 Поставить в комнату', '🏠 Ielikt istabā'],
     tabBag: ['🎒 Bag', '🎒 Сумка', '🎒 Soma'], tabBadges: ['🏅 Achievements', '🏅 Достижения', '🏅 Sasniegumi'], tabWorks: ['🎨 Sketches', '🎨 Рисунки', '🎨 Skices'], tabBtns: ['🔘 Buttons', '🔘 Пуговки', '🔘 Pogas'],
     pSign: ['Sign in and get your own pixel bird: a profile, a room, a bag for gifts and a place on the sketch wall.', 'Войдите и получите свою пиксельную птичку: профиль, комнату, сумку для подарков и место на стене рисунков.', 'Ienāc un saņem savu pikseļu putniņu: profilu, istabu, somu dāvanām un vietu skiču sienā.'],
     pSignBtn: ['Sign in', 'Войти', 'Ienākt'], pNone: ['There is no bird with this nickname.', 'Птички с таким ником нет.', 'Putniņa ar tādu segvārdu nav.'],
@@ -95,7 +96,7 @@
     bagEmptyOther: ['The bag is empty for now.', 'Сумка пока пустая.', 'Soma pagaidām ir tukša.'],
     bagEmpty: ['Empty for now. Gifts from Alina will appear here.', 'Пока пусто. Здесь появятся подарки от Алины.', 'Pagaidām tukšs. Šeit parādīsies Alīnas dāvanas.'],
     wearing: ['on ✓', 'надето ✓', 'uzvilkts ✓'],
-    kinds: [{ bg: 'background', shoes: 'shoes', hat: 'hat', anim: 'animation', frame: 'frame', item: 'a treat to hold', scarf: 'scarf' }, { bg: 'фон', shoes: 'обувь', hat: 'головной убор', anim: 'анимация', frame: 'рамка', item: 'вкусняшка в клюв', scarf: 'шарфик' }, { bg: 'fons', shoes: 'apavi', hat: 'galvassega', anim: 'animācija', frame: 'rāmis', item: 'gardums knābī', scarf: 'šalle' }],
+    kinds: [{ bg: 'background', shoes: 'shoes', hat: 'hat', anim: 'animation', frame: 'frame', item: 'a treat to hold', scarf: 'scarf', furn: 'furniture & things', deco: 'decorations', wall: 'wallpaper', floor: 'floor', view: 'window view', curtain: 'curtains' }, { bg: 'фон', shoes: 'обувь', hat: 'головной убор', anim: 'анимация', frame: 'рамка', item: 'вкусняшка в клюв', scarf: 'шарфик', furn: 'мебель и вещи', deco: 'украшения', wall: 'обои', floor: 'пол', view: 'вид из окна', curtain: 'шторы' }, { bg: 'fons', shoes: 'apavi', hat: 'galvassega', anim: 'animācija', frame: 'rāmis', item: 'gardums knābī', scarf: 'šalle', furn: 'mēbeles un lietas', deco: 'rotājumi', wall: 'tapetes', floor: 'grīda', view: 'skats pa logu', curtain: 'aizkari' }],
     pageN: [n => `Page ${n}`, n => `Страница ${n}`, n => `Lapa ${n}`],
     hide: ['Hide', 'Скрыть', 'Paslēpt'], ban: ['Block', 'Блок', 'Bloķēt'],
     banAsk: ['Block this user? Their sketches disappear from the wall.', 'Заблокировать пользователя? Его рисунки пропадут со стены.', 'Bloķēt lietotāju? Viņa skices pazudīs no sienas.'],
@@ -345,12 +346,14 @@
       ${noteHtml(g)}<div class="gf-btns"><button type="button" class="cta-btn" data-open>${t('open')}</button></div></div>`);
     m.card.classList.add('gf-card');
     m.card.querySelector('[data-open]').onclick = () => {
-      const box = m.card.querySelector('.gf-card');
-      box.innerHTML = `<h3>🎁 ${esc(kindName(g.kind))}</h3><div class="gf-ava"></div>${noteHtml(g)}
-        <div class="gf-btns"><button type="button" class="cta-btn" data-use>${t('use')}</button><button type="button" class="pill-btn" data-later>${t('later')}</button></div>`;
-      const a = window.PPBirds.avatar(me.id, Object.assign({}, me.avatar, { [g.kind]: g.item }), 140); a.classList.add('gf-pop');
+      const box = m.card.querySelector('.gf-card'), room = window.PPBirds.isRoomKind && window.PPBirds.isRoomKind(g.kind);
+      box.innerHTML = `<h3>🎁 ${esc(room ? window.PPBirds.giftName(g.kind, g.item, L) : kindName(g.kind))}</h3><div class="gf-ava"></div>${noteHtml(g)}
+        <div class="gf-btns"><button type="button" class="cta-btn" data-use>${room ? t('toRoom') : t('use')}</button><button type="button" class="pill-btn" data-later>${t('later')}</button></div>`;
+      const a = room ? window.PPBirds.itemIcon(g.kind, g.item, 140) : window.PPBirds.avatar(me.id, Object.assign({}, me.avatar, { [g.kind]: g.item }), 140); a.classList.add('gf-pop');
       box.querySelector('.gf-ava').appendChild(a);
-      const act = async use => { try { await post('gift', { id: g.id, use }); } catch (e) { alert(t('err')); return; } m.close(); await refresh(); };
+      const act = async use => { try { await post('gift', { id: g.id, use: use && !room }); } catch (e) { alert(t('err')); return; } m.close();
+        if (room && use) { if (!document.getElementById('bp-room')) { location.href = profileUrl(me.nick); return; } await refresh(); setTimeout(() => { const eb = document.querySelector('#bp-room .room-edit'); if (eb) { eb.click(); eb.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 500); return; }
+        await refresh(); };
       box.querySelector('[data-use]').onclick = () => act(true);
       box.querySelector('[data-later]').onclick = () => act(false);
     };
@@ -375,7 +378,8 @@
     const items = bagItems();
     const m = { card: box };
     const draw = () => {
-      const kinds = ['hat', 'item', 'shoes', 'scarf', 'bg', 'frame', 'anim'].filter(k => items.some(g => g.kind === k));
+      const isRoom = k => window.PPBirds.isRoomKind && window.PPBirds.isRoomKind(k);
+      const kinds = ['hat', 'item', 'shoes', 'scarf', 'bg', 'frame', 'anim', 'furn', 'deco', 'wall', 'floor', 'view', 'curtain'].filter(k => items.some(g => g.kind === k));
       m.card.innerHTML = `${inModal ? `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3>` : ''}<p class="sw-bv-how">${t('bagNote')}</p>
         ${items.length ? kinds.map(k => `<h4>${esc(kindName(k))}</h4><div class="bag-grid">${items.filter(g => g.kind === k).map(g =>
           { const leg = window.PPBirds.LEGEND && window.PPBirds.LEGEND.has(g.kind + '|' + g.item), n = (me.gifts || []).filter(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item).length;
@@ -385,6 +389,12 @@
       m.card.querySelectorAll('.bag-item').forEach(b => {
         b.querySelector('.bag-ava').appendChild(window.PPBirds.giftPic(b.dataset.k, b.dataset.i, me.id, 64, me.avatar));
         b.onclick = async () => {
+          if (isRoom(b.dataset.k)) { // вещь для комнаты — открыть обустройство комнаты в профиле
+            const rb = document.getElementById('bp-room'), eb = rb && rb.querySelector('.room-edit');
+            if (eb) { if (!rb.classList.contains('editing')) eb.click(); rb.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+            else location.href = profileUrl(me.nick);
+            return;
+          }
           const on = me.avatar && me.avatar[b.dataset.k] === b.dataset.i;
           try { const r = await post('avatar', { kind: b.dataset.k, item: on ? null : b.dataset.i }); me.avatar = r.avatar; } catch (e) { alert(t('err')); return; }
           draw(); if (app) renderProfile(); if (changed) changed(); window.PPAccount && window.PPAccount.check();

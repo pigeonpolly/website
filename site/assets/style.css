@@ -3062,3 +3062,28 @@ html:not(.is-admin) .statbar { display: none; }
 @media (max-width: 600px) { .bp-head { flex-direction: column; text-align: center; } .bp-acts { justify-content: center; } }
 .bp-panel .sw-bv-how { color: var(--muted); margin: 0 0 12px; }
 .bp-panel h4 { margin: 14px 0 8px; text-transform: capitalize; }
+/* комната птички (room.js) */
+.room { display: grid; gap: 10px; }
+.room-stage { border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 3px #3A2670, 0 14px 30px rgba(0, 0, 0, .3); background: #2B1A51; }
+.room-cv { display: block; width: 100%; height: auto; aspect-ratio: 192 / 120; image-rendering: pixelated; touch-action: pan-y; }
+.room.editing .room-cv { touch-action: none; cursor: grab; box-shadow: inset 0 0 0 2px #F0A987; }
+.room-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; justify-content: space-between; }
+.room-cap { font: 600 16px 'Fraunces', serif; opacity: .9; }
+.room-st { font-size: 13px; opacity: .8; margin-left: auto; }
+.room-sel { display: flex; gap: 8px; }
+.room-sel[hidden], .room-tray[hidden] { display: none; }
+.room-tray { display: grid; gap: 10px; padding: 14px; border-radius: 16px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line); }
+.room-hint { margin: 0; font-size: 14px; opacity: .85; }
+.room-tabs { display: flex; flex-wrap: wrap; gap: 6px; }
+.room-tabs button { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--line); background: transparent; color: inherit; font: 600 14px 'Karla', sans-serif; cursor: pointer; }
+.room-tabs button[aria-pressed="true"] { background: #F0A987; border-color: #F0A987; color: #2B1A51; }
+.room-items { display: flex; flex-wrap: wrap; gap: 8px; }
+.room-it { position: relative; display: grid; place-items: center; min-width: 70px; min-height: 70px; padding: 4px; border-radius: 12px; border: 1px solid var(--line); background: rgba(255, 255, 255, .92); color: #2B1A51; font: 600 13px 'Karla', sans-serif; cursor: pointer; }
+.room-it.on { box-shadow: 0 0 0 3px #F0A987; }
+.room-it:disabled { opacity: .45; cursor: default; }
+.room-it em { position: absolute; right: 4px; bottom: 2px; font: 700 11px 'Karla', sans-serif; font-style: normal; }
+.pp-room-ic { display: inline-grid; place-items: center; width: var(--ic); height: var(--ic); }
+.pp-room-ic canvas { image-rendering: pixelated; }
+.pp-room-ic.sq canvas { border-radius: 10px; }
+.fl-all-bird { position: relative; }
+.fl-home { position: absolute; top: 2px; right: 6px; font-style: normal; font-size: 16px; }
