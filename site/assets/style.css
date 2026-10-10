@@ -3118,3 +3118,18 @@ html:not(.is-admin) .statbar { display: none; }
 .bag-filter { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
 .bag-filter button { padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line, rgba(127,127,127,.4)); background: transparent; color: inherit; font: 600 13px 'Karla', sans-serif; cursor: pointer; text-transform: capitalize; }
 .bag-filter button[aria-pressed="true"] { background: #F0A987; border-color: #F0A987; color: #2B1A51; }
+.fl-adv-day { cursor: pointer; }
+.fl-adv-day:hover { text-decoration: underline; }
+.fl-adv-add { margin-left: auto; padding: 5px 12px; border-radius: 999px; border: 1px dashed rgba(240, 169, 135, .8); background: transparent; color: inherit; font: 600 13px 'Karla', sans-serif; cursor: pointer; }
+.fl-adv-daydlg { width: min(860px, calc(100% - 24px)); max-height: calc(100dvh - 40px); display: flex; flex-direction: column; }
+.fl-adv-daydlg:not([open]) { display: none; }
+.fl-adv-q { width: 100%; padding: 8px 12px; margin-bottom: 8px; border-radius: 10px; border: 1px solid #CFC7E8; font: inherit; }
+.fl-adv-f { display: flex; flex-wrap: wrap; gap: 5px; margin-bottom: 10px; max-height: 92px; overflow: auto; }
+.fl-adv-f button { padding: 4px 10px; border-radius: 999px; border: 1px solid #CFC7E8; background: #fff; color: #2B1A51; font: 600 12px 'Karla', sans-serif; cursor: pointer; }
+.fl-adv-f button[aria-pressed="true"] { background: #2B1A51; color: #fff; border-color: #2B1A51; }
+.fl-adv-pick { flex: 1; min-height: 180px; overflow: auto; display: grid; grid-template-columns: repeat(auto-fill, minmax(86px, 1fr)); gap: 8px; margin-bottom: 12px; }
+.fl-adv-pick button { display: grid; justify-items: center; gap: 2px; padding: 6px 4px; border-radius: 12px; border: 1px solid #E2DCF0; background: #fff; color: #2B1A51; cursor: pointer; }
+.fl-adv-pick button.leg { border-color: #E9A93B; }
+.fl-adv-pick button[aria-pressed="true"] { background: #2B1A51; color: #fff; box-shadow: 0 0 0 3px #F0A987; }
+.fl-adv-pick small { font: 600 11px/1.2 'Karla', sans-serif; text-align: center; }
+.fl-adv-pick { align-content: start; grid-auto-rows: max-content; }
