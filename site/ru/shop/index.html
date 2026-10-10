@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=55466758">
+<link rel="stylesheet" href="/assets/style.css?v=4f7d4120">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <script src="/assets/site.js?v=21e5a681" defer></script>
 <script src="/assets/polly.js?v=4b77d0df" defer></script>
@@ -94,18 +94,36 @@
     onSale: ['🛍 In stock', '🛍 В наличии', '🛍 Pārdošanā'], gone: ['Out of stock', 'Нет в наличии', 'Nav pieejams'],
     count: ['You have {n} of {m}', 'У вас {n} из {m}', 'Tev ir {n} no {m}'], max: ['✓ You have the maximum', '✓ У вас максимум', '✓ Tev ir maksimums'],
     legend: ['★ Legendary: one per bird, cannot be gifted', '★ Легендарная: одна на птичку, дарить нельзя', '★ Leģendāra: viena putniņam, dāvināt nevar'],
+    fShow: ['Show', 'Показать', 'Rādīt'], sSale: ['🛍 On sale', '🛍 В продаже', '🛍 Pārdošanā'], sMine: ['🎒 What I have', '🎒 Что у меня есть', '🎒 Kas man ir'], sAll: ['Everything', 'Всё', 'Visu'],
+    fFor: ['For', 'Для кого', 'Kam'], gBird: ['🐦 For my bird', '🐦 Для птички', '🐦 Putniņam'], gRoom: ['🏠 For the room', '🏠 Для комнаты', '🏠 Istabai'], gAny: ['🎲 Surprises', '🎲 Сюрпризы', '🎲 Pārsteigumi'],
+    fKind: ['What', 'Что', 'Kas'], allKinds: ['Any', 'Любое', 'Jebkas'], fTheme: ['Theme', 'Тема', 'Tēma'], anyTheme: ['Any theme', 'Любая тема', 'Jebkura tēma'], reset: ['✕ Reset filters', '✕ Сбросить фильтры', '✕ Notīrīt filtrus'],
+    youHave: ['🎒 You have', '🎒 У вас есть', '🎒 Tev ir'], noneMine: ['You have nothing like this yet.', 'У вас пока нет таких вещей.', 'Tev vēl nav tādu lietu.'],
+    noneHere: ['Nothing on sale with these filters. Try another theme or “Everything”.', 'С такими фильтрами ничего нет в продаже. Попробуйте другую тему или «Всё».', 'Ar šiem filtriem nekas netiek pārdots. Pamēģini citu tēmu vai “Visu”.'],
     rule: ['You can buy up to 3 of the same thing (legendary ones: just 1).', 'Одну и ту же вещь можно купить до 3 штук (легендарные — только 1).', 'Vienu un to pašu lietu var nopirkt līdz 3 gab. (leģendārās — tikai 1).'],
   };
   var bar = document.querySelector('.shop-bar'), box = document.querySelector('.shop-box'), meEl = document.querySelector('.shop-me');
-  var me = null, owned = {}, shop = {}, filter = 'all';
+  var me = null, owned = {}, shop = {};
+  // фильтры: что показать (в продаже / моё / всё), для кого (птичке / комнате / сюрпризы), вид вещи, тема
+  var F = { show: 'sale', grp: 'all', kind: '', theme: '' };
+  try { var sv = JSON.parse(localStorage.getItem('pp-shop-f') || 'null'); if (sv) F = Object.assign(F, sv); } catch (e) { /* нет хранилища */ }
+  var saveF = function () { try { localStorage.setItem('pp-shop-f', JSON.stringify(F)); } catch (e) { /* ок */ } };
   function key(k, v) { return k + '|' + v; }
+  function grpOf(k) { var B = window.PPBirds; return k === 'any' ? 'any' : (B.ROOM_KINDS || []).indexOf(k) >= 0 ? 'room' : 'bird'; }
   function buttons() {
-    var B = window.PPBirds; if (!B || bar.children.length) return;
-    var add = function (k, label, cls) { var b = document.createElement('button'); b.type = 'button'; b.className = 'pill-btn ' + (cls || ''); b.dataset.f = k; b.textContent = label; b.onclick = function () { filter = k; draw(); }; bar.appendChild(b); };
-    add('all', T.all[L]);
-    B.GIFT_KINDS.forEach(function (k) { add('kind:' + k[0], k[1][L]); });
-    var br = document.createElement('span'); br.className = 'fl-coll-br'; bar.appendChild(br);
-    B.GIFT_THEMES.forEach(function (t) { add('theme:' + t[0], t[1][L], 'fl-theme'); });
+    var B = window.PPBirds; bar.innerHTML = '';
+    var row = function (label, cls) { var r = document.createElement('div'); r.className = 'shop-row' + (cls ? ' ' + cls : ''); if (label) { var l = document.createElement('span'); l.className = 'shop-lab'; l.textContent = label; r.appendChild(l); } var g = document.createElement('div'); g.className = 'shop-opts'; r.appendChild(g); bar.appendChild(r); return g; };
+    var pill = function (g, f, val, label) { var b = document.createElement('button'); b.type = 'button'; b.className = 'pill-btn'; b.textContent = label; b.setAttribute('aria-pressed', String(F[f] === val)); b.onclick = function () { F[f] = val; if (f === 'grp') F.kind = ''; saveF(); draw(); }; g.appendChild(b); };
+    var g1 = row(T.fShow[L], 'shop-seg'); pill(g1, 'show', 'sale', T.sSale[L]); pill(g1, 'show', 'mine', T.sMine[L]); pill(g1, 'show', 'all', T.sAll[L]);
+    var g2 = row(T.fFor[L], 'shop-seg'); pill(g2, 'grp', 'all', T.all[L]); pill(g2, 'grp', 'bird', T.gBird[L]); pill(g2, 'grp', 'room', T.gRoom[L]); pill(g2, 'grp', 'any', T.gAny[L]);
+    if (F.grp === 'bird' || F.grp === 'room') {
+      var g3 = row(T.fKind[L], 'shop-kinds'); pill(g3, 'kind', '', T.allKinds[L]);
+      B.GIFT_KINDS.forEach(function (k) { if (grpOf(k[0]) === F.grp) pill(g3, 'kind', k[0], k[1][L]); });
+    }
+    var g4 = row(T.fTheme[L]), sel = document.createElement('select'); sel.className = 'shop-theme';
+    sel.innerHTML = '<option value="">' + T.anyTheme[L] + '</option>' + B.GIFT_THEMES.filter(function (t) { return t[0] !== 'surprise'; }).map(function (t) { return '<option value="' + t[0] + '">' + t[1][L] + '</option>'; }).join('');
+    sel.value = F.theme; if (sel.value !== F.theme) F.theme = '';
+    sel.onchange = function () { F.theme = sel.value; saveF(); draw(); }; g4.appendChild(sel);
+    if (F.theme || F.kind || F.grp !== 'all') { var rs = document.createElement('button'); rs.type = 'button'; rs.className = 'shop-reset'; rs.textContent = T.reset[L]; rs.onclick = function () { F.grp = 'all'; F.kind = ''; F.theme = ''; saveF(); draw(); }; g4.appendChild(rs); }
   }
   function head() {
     meEl.innerHTML = '';
@@ -131,30 +149,34 @@
   }
   function draw() {
     var B = window.PPBirds; if (!B) return;
+    if (F.show === 'mine' && !me) F.show = 'sale';
     buttons(); head();
-    [].forEach.call(bar.children, function (b) { if (b.dataset) b.setAttribute('aria-pressed', String(b.dataset.f === filter)); });
     var id = me ? me.id : 2, money = me && me.btn ? me.btn.buttons : 0;
-    var theme = filter.indexOf('theme:') === 0 ? B.GIFT_THEMES.filter(function (t) { return 'theme:' + t[0] === filter; })[0] : null;
+    var theme = F.theme ? B.GIFT_THEMES.filter(function (t) { return t[0] === F.theme; })[0] : null;
+    var stock = function (k, v) { return (shop[key(k, v)] || {}).stock > 0; };
     box.innerHTML = '';
     var rule = document.createElement('p'); rule.className = 'fl-all-lead'; rule.textContent = T.rule[L]; box.appendChild(rule);
-    // сначала то, что есть в наличии, ниже — чего нет
-    [true, false].forEach(function (inStock) {
-      var sec = document.createElement('section'); sec.className = 'shop-block' + (inStock ? ' on' : ' off');
-      var h2 = document.createElement('h2'); h2.className = 'shop-block-h'; h2.textContent = inStock ? T.onSale[L] : T.gone[L]; sec.appendChild(h2);
+    // блоки: «В продаже», «У вас есть», «Всё» = в продаже + нет в наличии
+    var blocks = F.show === 'mine' ? [['mine', T.youHave[L]]] : F.show === 'sale' ? [['on', T.onSale[L]]] : [['on', T.onSale[L]], ['off', T.gone[L]]];
+    blocks.forEach(function (bl) {
+      var sec = document.createElement('section'); sec.className = 'shop-block ' + bl[0];
+      var h2 = document.createElement('h2'); h2.className = 'shop-block-h'; h2.textContent = bl[1]; sec.appendChild(h2);
       var n = 0;
       B.GIFT_KINDS.forEach(function (k) {
-        if (filter.indexOf('kind:') === 0 && filter !== 'kind:' + k[0]) return;
-        var list = (B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).filter(function (v) {
+        if (F.grp !== 'all' && grpOf(k[0]) !== F.grp) return;
+        if (F.kind && F.kind !== k[0]) return;
+        var list = (bl[0] === 'mine' ? B.GIFTS[k[0]] || [] : B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).filter(function (v) {
           if (theme && theme[2].indexOf(key(k[0], v)) < 0) return false;
-          return ((shop[key(k[0], v)] || {}).stock > 0) === inStock;
+          return bl[0] === 'mine' ? owned[key(k[0], v)] > 0 : stock(k[0], v) === (bl[0] === 'on');
         });
         if (!list.length) return;
         var h = document.createElement('h3'); h.textContent = k[1][L]; sec.appendChild(h);
         var g = document.createElement('div'); g.className = 'fl-coll-grid'; sec.appendChild(g);
         list.forEach(function (v) { n++; g.appendChild(item(k, v, id, money)); });
       });
-      if (!n && inStock) { var p = document.createElement('p'); p.className = 'fl-all-lead'; p.textContent = T.none[L]; sec.appendChild(p); }
-      if (n || inStock) box.appendChild(sec);
+      if (!n && bl[0] !== 'off') { var p = document.createElement('p'); p.className = 'fl-all-lead'; p.textContent = bl[0] === 'mine' ? T.noneMine[L] : (F.theme || F.kind || F.grp !== 'all') ? T.noneHere[L] : T.none[L]; sec.appendChild(p); }
+      else if (n) { var c = document.createElement('small'); c.className = 'shop-n'; c.textContent = ' · ' + n; h2.appendChild(c); }
+      if (n || bl[0] !== 'off') box.appendChild(sec);
     });
   }
   function buy(kind, item, price, b) {
