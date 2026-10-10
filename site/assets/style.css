@@ -3174,3 +3174,9 @@ html:not(.is-admin) .statbar { display: none; }
 .adm-stockbox { margin: 10px 0 16px; padding: 12px 14px; border: 1px dashed rgba(233,169,59,.6); border-radius: 12px; }
 .adm-stockbox h3 { margin: 0 0 4px; } .adm-setst { white-space: nowrap; } .adm-setst input { width: 72px; margin-right: 6px; }
 .shop-up { color: #F0A987; font-weight: 600; } .shop-down { color: #7FD6A8; font-weight: 600; }
+.adm-exp { background: none; border: 0; padding: 0; font: inherit; color: #D9733F; cursor: pointer; text-align: left; }
+.adm-sk-items > td { background: rgba(233,169,59,.07); }
+.adm-sk-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(330px, 1fr)); gap: 6px 14px; max-height: 520px; overflow: auto; }
+.adm-sk-it { display: grid; grid-template-columns: 40px 1fr auto auto 54px; align-items: center; gap: 8px; font-size: 13px; padding: 3px 0; border-bottom: 1px solid rgba(0,0,0,.06); }
+.adm-sk-it.off { opacity: .6; } .adm-sk-it.saved { background: rgba(76,195,138,.15); }
+.adm-sk-it input { width: 62px; } .adm-sk-it label { white-space: nowrap; font-size: 12px; }
