@@ -3160,3 +3160,14 @@ html:not(.is-admin) .statbar { display: none; }
 .fl-adv-f > div { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
 .fl-adv-f b { font: 700 12px 'Karla', sans-serif; margin-right: 2px; color: #5B5280; }
 .shop-box > .fl-all-lead:first-child { margin-top: 14px; }
+
+.adm-gift-sent { display: flex; flex-wrap: wrap; gap: 6px; margin: 10px 0 0; }
+.adm-gift-sent:empty { display: none; }
+.adm-gift-sent span { padding: 3px 10px; border-radius: 999px; background: rgba(76,195,138,.18); color: #9BE3BD; font: 13px var(--sans); }
+.adm-restock { margin: 12px 0; padding: 12px 14px; border: 1px dashed rgba(233,169,59,.6); border-radius: 12px; display: flex; flex-wrap: wrap; gap: 8px 14px; align-items: center; }
+.adm-restock > b, .adm-restock > small { flex-basis: auto; }
+.adm-restock br { flex-basis: 100%; content: ''; }
+.adm-restock input { width: 80px; }
+.adm-sl { font-size: 13px; color: var(--muted); align-self: center; margin-right: 2px; }
+.adm-sum { margin: 10px 0 12px; } .adm-sum summary { cursor: pointer; font-weight: 600; }
+.adm-sum table { margin-top: 8px; } .adm-link { background: none; border: 0; padding: 0; color: #F0A987; text-decoration: underline; cursor: pointer; font: inherit; }

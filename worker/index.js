@@ -1028,6 +1028,18 @@ async function route(req, env, url) {
     await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(u.id, 'buy', String(g.meta.last_row_id), -row.price, rigaDay(), now()).run();
     return json({ ok: true, buttons: (u.buttons || 0) - row.price, kind: gk, item: got });
   }
+  // пополнить сразу много вещей (категорию, тему, найденное): +add штук каждой; у вещей без цены — цена price
+  if (m === 'POST' && p === '/api/admin/shop/restock') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({}));
+    const add = Math.max(1, Math.min(10000, Math.floor(Number(b.add) || 0))), price = Math.max(0, Math.min(100000, Math.floor(Number(b.price) || 0)));
+    const list = (Array.isArray(b.items) ? b.items : []).slice(0, 2000).filter(x => Array.isArray(x) && GIFT_KINDS.includes(String(x[0])) && x[1] && String(x[1]).length <= 40);
+    if (!list.length || !(Number(b.add) > 0)) fail(400, 'bad');
+    const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET stock = MIN(100000, shop.stock + excluded.stock), price = CASE WHEN shop.price > 0 THEN shop.price ELSE excluded.price END');
+    for (let i = 0; i < list.length; i += 50) await env.DB.batch(list.slice(i, i + 50).map(x => st.bind(String(x[0]), String(x[1]), price, add)));
+    return json({ ok: true, count: list.length, items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results });
+  }
   if (p === '/api/admin/shop') {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');

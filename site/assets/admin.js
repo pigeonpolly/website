@@ -252,9 +252,12 @@
       <div class="adm-gift-prev"><figure><span class="gnow"></span><figcaption>Сейчас</figcaption></figure><span class="adm-gift-arrow">→</span><figure><span class="gp"></span><figcaption>С подарком</figcaption></figure>
         <p class="be-note">✓ — у птички это уже есть (в сумке), 🎁 — подарено, но ещё не открыто. Человек увидит «🎁 Тебе подарок!» в профиле челленджа.</p></div>
       <input type="text" maxlength="200" placeholder="Записка к подарку (необязательно), например: «За 7 дней подряд!»">
-      <div class="adm-quick" style="margin-top:12px"><button type="button" class="pill-btn pill-fill" data-send>Подарить</button><button type="button" class="pill-btn" data-x>Отмена</button></div></div>`;
+      <div class="adm-quick" style="margin-top:12px"><button type="button" class="pill-btn pill-fill" data-send>Подарить</button><button type="button" class="pill-btn" data-x>Готово</button></div><p class="adm-gift-sent" aria-live="polite"></p></div>`;
     document.body.appendChild(w);
-    const close = () => w.remove();
+    // окно не закрывается после подарка — можно подарить несколько вещей подряд; список подаренного — внизу
+    let sent = 0;
+    const close = () => { w.remove(); if (sent && done) done(); };
+    const sentNote = txt => { sent++; const p = w.querySelector('.adm-gift-sent'); p.insertAdjacentHTML('afterbegin', `<span>${esc(txt)}</span>`); };
     w.onclick = e => { if (e.target === w) close(); };
     w.querySelector('[data-x]').onclick = close;
     let theme = null; // выбрана тема/сезон: показываем вещи разных видов этой темы
@@ -284,15 +287,17 @@
     w.querySelector('[data-send]').onclick = async e => {
       e.target.disabled = true;
       try {
-        if (all) { if (!confirm('Подарить «' + (B.giftName ? B.giftName(kind, item, 1) : item) + '» всем птичкам?')) { e.target.disabled = false; return; } const r = await api('admin/gift-all', { kind, item, note: w.querySelector('input').value.trim() }); close(); alert('🎁 Подарок отправлен ' + r.count + ' птичкам!'); done && done(); return; }
-        await api('admin/gift', { uid: u.id, kind, item, note: w.querySelector('input').value.trim() }); close(); alert('🎁 Подарок отправлен! Он появится у птички в профиле.'); done && done(); }
+        if (all) { if (!confirm('Подарить «' + (B.giftName ? B.giftName(kind, item, 1) : item) + '» всем птичкам?')) { e.target.disabled = false; return; } const r = await api('admin/gift-all', { kind, item, note: w.querySelector('input').value.trim() }); sentNote('🎁 ' + (B.giftName ? B.giftName(kind, item, 1) : item) + ' — отправлено ' + r.count + ' птичкам'); e.target.disabled = false; return; }
+        const r = await api('admin/gift', { uid: u.id, kind, item, note: w.querySelector('input').value.trim() });
+        const gk = r && r.kind || kind, got = r && r.item || item; owned[gk + '|' + got] = 'new'; // у сюрприза сервер называет, что выпало
+        sentNote('🎁 ' + (B.giftName ? B.giftName(gk, got, 1) : got) + ' — подарено'); e.target.disabled = false; draw(); }
       catch (x) { e.target.disabled = false; alert(err(x)); }
     };
     draw();
   }
 
   // ---------- магазин: цена и количество каждой вещи из коллекций ----------
-  let sFilter = 'all', sq = '';
+  let sFilter = 'all', sq = '', sStock = 'all', sSort = 'cat'; // вид/тема, поиск, сколько осталось, порядок
   async function shop() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('admin/shop'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
@@ -303,22 +308,51 @@
       const theme = sFilter.startsWith('theme:') ? B.GIFT_THEMES.find(t => 'theme:' + t[0] === sFilter) : null, q = sq.trim().toLowerCase();
       const list = all.filter(x => {
         const r = rows[x.kind + '|' + x.item] || {};
-        if (sFilter === 'stock' && !(r.stock > 0)) return false;
+        const n = r.stock || 0;
+        if (sStock === 'stock' && !(n > 0)) return false;
+        if (sStock === 'low' && !(n > 0 && n <= 3)) return false;
+        if (sStock === 'none' && n > 0) return false;
         if (sFilter.startsWith('kind:') && sFilter !== 'kind:' + x.kind) return false;
         if (theme && !theme[2].includes(x.kind + '|' + x.item)) return false;
         return !q || x.name.toLowerCase().includes(q) || x.item.toLowerCase().includes(q);
       });
+      const cnt = x => (rows[x.kind + '|' + x.item] || {}).stock || 0;
+      if (sSort === 'few') list.sort((a, b) => cnt(a) - cnt(b)); else if (sSort === 'many') list.sort((a, b) => cnt(b) - cnt(a));
+      // сводка по видам: сколько вещей в продаже и сколько штук всего
+      const sum = B.GIFT_KINDS.map(k => { const xs = all.filter(x => x.kind === k[0]); const on = xs.filter(x => cnt(x) > 0); return { k: k[0], name: k[1][1], total: xs.length, on: on.length, pcs: on.reduce((a, x) => a + cnt(x), 0), low: on.filter(x => cnt(x) <= 3).length }; });
       const onSale = all.filter(x => (rows[x.kind + '|' + x.item] || {}).stock > 0).length;
       const fb = (k, l) => `<button type="button" class="pill-btn" data-sf="${k}" aria-pressed="${sFilter === k}">${l}</button>`;
       main.innerHTML = `<section class="adm-box"><h2>🛍 Магазин</h2>
         <p class="be-note">Здесь все вещи из «Коллекций». Укажите цену в пуговках 🔘 и сколько штук продаётся — вещь появится в магазине как «в продаже». Количество 0 — «нет в наличии». Цена 0 — бесплатно. Сейчас в продаже: <b>${onSale}</b> из ${all.length}. Сохраняется сразу.</p>
         <div class="be-filters"><input type="search" id="adm-sq" placeholder="🔍 Найти вещь" value="${esc(sq)}"></div>
-        <div class="adm-sbar">${fb('all', 'Все')}${fb('stock', '🛍 В продаже')}${B.GIFT_KINDS.map(k => fb('kind:' + k[0], k[1][1])).join('')}${B.GIFT_THEMES.map(t => fb('theme:' + t[0], t[1][1])).join('')}</div>
+        <details class="adm-sum"><summary>📊 Сколько чего в магазине</summary><table class="be-table adm-table"><thead><tr><th>Вид</th><th>В продаже</th><th>Штук всего</th><th>Мало (≤3)</th></tr></thead><tbody>
+          ${sum.map(r => `<tr><td><button type="button" class="adm-link" data-sf="kind:${r.k}">${esc(r.name)}</button></td><td>${r.on} из ${r.total}</td><td>${r.pcs}</td><td>${r.low || '—'}</td></tr>`).join('')}
+          <tr><td><b>Итого</b></td><td><b>${sum.reduce((a, r) => a + r.on, 0)} из ${all.length}</b></td><td><b>${sum.reduce((a, r) => a + r.pcs, 0)}</b></td><td><b>${sum.reduce((a, r) => a + r.low, 0)}</b></td></tr></tbody></table></details>
+        <div class="adm-sbar"><span class="adm-sl">Сколько:</span>${[['all', 'Все'], ['stock', '🛍 В продаже'], ['low', '⚠️ Мало (1–3)'], ['none', '✕ Нет в наличии']].map(([k, l]) => `<button type="button" class="pill-btn" data-ss="${k}" aria-pressed="${sStock === k}">${l}</button>`).join('')}
+          <label class="adm-sl">Порядок: <select id="adm-sort"><option value="cat">по видам</option><option value="few"${sSort === 'few' ? ' selected' : ''}>меньше всего сверху</option><option value="many"${sSort === 'many' ? ' selected' : ''}>больше всего сверху</option></select></label></div>
+        <div class="adm-sbar"><span class="adm-sl">Что:</span>${fb('all', 'Все')}${B.GIFT_KINDS.map(k => fb('kind:' + k[0], k[1][1])).join('')}${B.GIFT_THEMES.map(t => fb('theme:' + t[0], t[1][1])).join('')}</div>
+        <div class="adm-restock"><b>📦 Пополнить то, что сейчас в списке ниже</b> <small class="be-note">(${list.length} ${list.length === 1 ? 'вещь' : 'вещей'} — выберите вид, тему или найдите вещи)</small><br>
+          <label>каждой вещи + <input type="number" id="adm-rs-add" min="1" max="10000" value="5"> шт.</label>
+          <label>цена 🔘 для тех, у кого цены ещё нет: <input type="number" id="adm-rs-price" min="0" max="100000" value="10"></label>
+          <button type="button" class="pill-btn pill-fill" id="adm-rs-go"${list.length ? '' : ' disabled'}>Пополнить список (${list.length})</button>
+          <button type="button" class="pill-btn" id="adm-rs-all">Пополнить весь магазин (${all.length})</button></div>
         <table class="be-table adm-table adm-shop"><thead><tr><th>Вещь</th><th>Вид</th><th>Цена 🔘</th><th>Количество</th><th></th></tr></thead><tbody>
         ${list.map(x => { const r = rows[x.kind + '|' + x.item] || { price: 0, stock: 0 }; const leg = B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item); return `<tr data-k="${esc(x.kind)}" data-i="${esc(x.item)}"${leg ? ' class="adm-legend"' : ''}><td class="adm-shop-it"><span class="adm-shop-pic"></span>${esc(x.name)}${leg ? ' <span class="adm-leg-tag" title="Легендарная: 1 штука на птичку, дарить нельзя">★ легендарная</span>' : ''}</td><td>${esc(x.kindName)}</td>
           <td data-l="Цена 🔘"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.price}" data-f="price" aria-label="Цена"></td><td data-l="Количество"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.stock}" data-f="stock" aria-label="Количество"></td><td class="adm-shop-st">${r.stock > 0 ? '🛍 в продаже' : '—'}</td></tr>`; }).join('')}</tbody></table></section>`;
       main.querySelectorAll('tr[data-k]').forEach(tr => { const pic = tr.querySelector('.adm-shop-pic'); try { pic.appendChild(B.giftPic(tr.dataset.k, tr.dataset.i, 2, 48)); } catch (e) {} });
       main.querySelectorAll('[data-sf]').forEach(b => b.onclick = () => { sFilter = b.dataset.sf; draw(); });
+      main.querySelectorAll('[data-ss]').forEach(b => b.onclick = () => { sStock = b.dataset.ss; draw(); });
+      main.querySelector('#adm-sort').onchange = e => { sSort = e.target.value; draw(); };
+      const restock = async (e, items) => {
+        const list = items, add = +main.querySelector('#adm-rs-add').value, price = +main.querySelector('#adm-rs-price').value;
+        if (!(add > 0)) return alert('Сколько штук добавить? Больше нуля.');
+        if (!confirm(`Добавить по ${add} шт. каждой из ${list.length} вещей?` + (price ? '' : '\nВещи без цены станут бесплатными (цена 0).'))) return;
+        e.target.disabled = true;
+        try { const r = await api('admin/shop/restock', { items: list.map(x => [x.kind, x.item]), add, price }); Object.keys(rows).forEach(k => delete rows[k]); r.items.forEach(x => { rows[x.kind + '|' + x.item] = x; }); draw(); alert(`📦 Пополнено: ${r.count} вещей, +${add} шт. каждой.`); }
+        catch (x) { e.target.disabled = false; alert(err(x)); }
+      };
+      main.querySelector('#adm-rs-go').onclick = e => restock(e, list);
+      main.querySelector('#adm-rs-all').onclick = e => restock(e, all);
       const inp = main.querySelector('#adm-sq');
       inp.oninput = () => { sq = inp.value; draw(); const x = main.querySelector('#adm-sq'); x.focus(); x.setSelectionRange(x.value.length, x.value.length); };
       main.querySelectorAll('.adm-shop input').forEach(i => i.onchange = async () => {
