@@ -3181,3 +3181,6 @@ html:not(.is-admin) .statbar { display: none; }
 .adm-sk-it.off { opacity: .6; } .adm-sk-it.saved { background: rgba(76,195,138,.15); }
 .adm-sk-it input { width: 62px; } .adm-sk-it label { white-space: nowrap; font-size: 12px; }
 .shop-afford { margin-left: 8px; } .shop-afford[aria-pressed="true"] { background: #4CC38A !important; border-color: #4CC38A !important; color: #10261B !important; }
+.adm-sk-n { display: block; color: #8A8296; font-size: 12px; margin-left: 14px; } .adm-sk-0 { color: #C2553A; }
+.adm-stock .adm-exp { font-weight: 600; }
+.adm-empty { border-color: #C2553A; color: #C2553A; margin-left: 8px; }
