@@ -504,7 +504,7 @@ export async function blogApi(req, env, url, h) {
     if (m === 'GET' && a === 'export') {
       const all = q => env.DB.prepare(q).all().then(r => r.results);
       const media = [];
-      if (env.MEDIA) { let cursor; do { const r = await env.MEDIA.list({ prefix: 'blog/', cursor }); media.push(...r.objects.map(o => o.key)); cursor = r.truncated ? r.cursor : null; } while (cursor); }
+      if (env.MEDIA) for (const prefix of ['blog/', 'art/']) { let cursor; do { const r = await env.MEDIA.list({ prefix, cursor }); media.push(...r.objects.map(o => o.key)); cursor = r.truncated ? r.cursor : null; } while (cursor); } // art/ — картины, добавленные в галереи с сайта
       return json({ version: 1, site: SITE, exported_at: new Date().toISOString(), posts: await all('SELECT * FROM blog_posts'), tags: await all('SELECT * FROM blog_tags'),
         sections: await all('SELECT * FROM blog_sections'), comments: await all('SELECT c.*, p.slug FROM blog_comments c JOIN blog_posts p ON p.id = c.post_id'), media });
     }
@@ -890,6 +890,7 @@ async function fullBackup(env) {
     comments: await all('SELECT c.*, p.slug FROM blog_comments c JOIN blog_posts p ON p.id = c.post_id'), likes: await all('SELECT * FROM blog_likes'), media,
     subscribers: await all('SELECT * FROM subscribers').catch(() => []), // «сообщите, когда выйдет книга»
     site_blocks: await all('SELECT * FROM site_blocks').catch(() => []), // правки блоков сайта из режима «Править страницу»
+    art_added: await all('SELECT * FROM art_added').catch(() => []), // картины, добавленные в «Мой скетчбук»/«Палитры» с сайта (картинки — art/ в files)
     // челлендж: аккаунты (ник, e-mail, бейджи, серии) и работы на стене
     challenge: { users: await all('SELECT id, sub, email, nick, consent, banned, created_at, best, badges, months, mcount, picks, last_seen, avatar FROM users'), gifts: await all('SELECT * FROM gifts').catch(() => []), works, meta: await all('SELECT * FROM meta WHERE key NOT IN (\'backup_token\', \'blog_salt\', \'gemini_key\', \'visit_salt\')') },
     // все файлы, которые надо скачать вместе с копией

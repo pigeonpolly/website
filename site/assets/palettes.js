@@ -24,18 +24,45 @@
     mkTip: { en: 'Drag a circle to take that color from another spot of the photo. Or tap a circle, then tap the photo.', ru: 'Перетащите кружок, чтобы взять цвет из другого места фото. Или нажмите на кружок, а потом на фото.', lv: 'Velc aplīti, lai paņemtu krāsu no citas foto vietas. Vai pieskaries aplītim un tad foto.' },
     mkPin: { en: 'Color', ru: 'Цвет', lv: 'Krāsa' },
     mkReset: { en: '↺ Back to automatic', ru: '↺ Вернуть как было', lv: '↺ Atjaunot automātiski' },
+    adH: { en: '🔒 Add to the site (only you see this)', ru: '🔒 Добавить на сайт (видите только вы)', lv: '🔒 Pievienot vietnei (redzi tikai tu)' },
+    adSec: { en: 'Section', ru: 'Раздел', lv: 'Sadaļa' },
+    adT: { en: 'Title', ru: 'Название', lv: 'Nosaukums' },
+    adGo: { en: '➕ Add to the site', ru: '➕ Добавить на сайт', lv: '➕ Pievienot vietnei' },
+    adBusy: { en: 'Uploading…', ru: 'Загружаю…', lv: 'Augšupielādēju…' },
+    adOk: { en: 'Added! It is already in the section and in Palettes.', ru: 'Добавлено! Картина уже в разделе и в «Палитрах».', lv: 'Pievienots! Darbs jau ir sadaļā un «Paletēs».' },
+    adOkAi: { en: 'Added to the section.', ru: 'Добавлено в раздел.', lv: 'Pievienots sadaļai.' },
+    adExtra: { en: 'EXTRA day palette in the challenge:', ru: 'Палитра дня ЭКСТРА в челлендже:', lv: 'EKSTRA dienas palete izaicinājumā:' },
+    adErr: { en: 'Could not save, try again.', ru: 'Не получилось сохранить, попробуйте ещё раз.', lv: 'Neizdevās saglabāt, mēģini vēlreiz.' },
+    adNeedT: { en: 'Write a title.', ru: 'Напишите название.', lv: 'Uzraksti nosaukumu.' },
+    adAdd: { en: '➕ Add a picture to this section', ru: '➕ Добавить картину в этот раздел', lv: '➕ Pievienot darbu šai sadaļai' },
+    adDel: { en: 'Remove from the site', ru: 'Убрать с сайта', lv: 'Noņemt no vietnes' },
+    adDelQ: { en: 'Remove this picture from the site?', ru: 'Убрать эту картину с сайта?', lv: 'Noņemt šo darbu no vietnes?' },
+    adWhen: { en: '📅 EXTRA:', ru: '📅 ЭКСТРА:', lv: '📅 EKSTRA:' },
+    adWas: { en: '✓ was EXTRA:', ru: '✓ была ЭКСТРА:', lv: '✓ bija EKSTRA:' },
+    adHelp: { en: 'Choose a picture, move the circles if you want other colors, write the title and press “Add”. The picture goes to its section, the palette to Palettes and to the queue of EXTRA days.', ru: 'Выберите картину, при желании подвигайте кружки-пипетки, напишите название и нажмите «Добавить». Картина попадёт в свой раздел, палитра — в «Палитры» и в очередь дней ЭКСТРА.', lv: 'Izvēlies darbu, ja vajag, pakustini aplīšus, uzraksti nosaukumu un spied «Pievienot». Darbs nonāks savā sadaļā, palete — «Paletēs» un EKSTRA dienu rindā.' },
     kick: { en: 'Color palette', ru: 'Палитра', lv: 'Krāsu palete' },
     made: { en: 'made with Pigeon Polly', ru: 'сделано с Pigeon Polly', lv: 'veidots ar Pigeon Polly' },
   };
   const G = { bird: ['Pigeon Polly', 'Pigeon Polly', 'Pigeon Polly'], snail: ['Mr.Chew', 'Mr.Chew', 'Mr.Chew'], sketchbook: ['Sketchbook', 'Скетчбук', 'Skiču burtnīca'],
-    halloween: ['Pumpkin Family', 'Тыквенная семья', 'Ķirbju ģimene'], detective: ['Mr.Titos', 'Мистер Титос', 'Mr.Titos'], anxiety: ['Anxiety', 'Тревога', 'Trauksme'], challenge: ['Challenge', 'Челлендж', 'Izaicinājums'] };
+    halloween: ['Pumpkin Family', 'Тыквенная семья', 'Ķirbju ģimene'], detective: ['Mr.Titos', 'Мистер Титос', 'Mr.Titos'], anxiety: ['Anxiety', 'Тревога', 'Trauksme'], challenge: ['Challenge', 'Челлендж', 'Izaicinājums'],
+    'ai-art': ['AI Art', 'AI-арт', 'AI māksla'], other: ['Other', 'Другое', 'Citi'] };
+  const ADD_G = ['sketchbook', 'anxiety', 'bird', 'snail', 'detective', 'halloween', 'ai-art', 'other']; // куда админ может добавить картину (как ART_GALLERIES в worker)
   const gi = { en: 0, ru: 1, lv: 2 }[L], pre = L === 'en' ? '' : '/' + L;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const toast = m => window.PPToast ? window.PPToast(m) : null;
   const copy = (txt, msg) => (navigator.clipboard ? navigator.clipboard.writeText(txt) : Promise.reject()).then(() => toast(msg || T.copy[L] + ': ' + txt)).catch(() => prompt('', txt));
   const ink = h => { const n = parseInt(h.slice(1), 16), r = n >> 16, g = (n >> 8) & 255, b = n & 255; return (r * 299 + g * 587 + b * 114) / 1000 > 150 ? '#1B1820' : '#FFFFFF'; };
-  let data = null;
-  const load = () => data ? Promise.resolve(data) : fetch('/assets/palettes.json').then(r => r.json()).then(d => (data = d));
+  let data = null, extra = { added: [], queue: [], month: 0 };
+  const getAdded = () => fetch('/api/palettes', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(x => (x && (extra = x)) || extra).catch(() => extra);
+  // все палитры: добавленные с сайта (новые сверху) + из статики
+  const load = () => data ? Promise.resolve(data) : Promise.all([fetch('/assets/palettes.json').then(r => r.json()), getAdded()])
+    .then(([st, ad]) => (data = [...ad.added.filter(p => p.palette), ...st]));
+  let adminP = null;
+  const isAdmin = () => adminP || (adminP = fetch('/api/whoami', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => !!(d && d.user && d.user.admin)).catch(() => false));
+  const monthName = i => new Date(2026, 9 + i, 1).toLocaleDateString({ en: 'en-GB', ru: 'ru-RU', lv: 'lv-LV' }[L], { month: 'long', year: 'numeric' });
+  const delArt = (key, el) => { if (!confirm(T.adDelQ[L])) return;
+    fetch('/api/admin/art/delete', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ key }) })
+      .then(r => { if (!r.ok) throw 0; el.remove(); if (data) data = data.filter(p => p.key !== key); }).catch(() => alert(T.adErr[L])); };
   function card(p, big) {
     const el = document.createElement('article'); el.className = 'pal-card' + (big ? ' big' : ''); el.id = p.key;
     el.innerHTML = `<a class="pal-img" href="/${esc(p.img)}" target="_blank" rel="noopener"><img src="/${esc(p.thumb)}" alt="${esc(p.title[L])}" loading="lazy" width="${p.w}" height="${p.h}"></a>
@@ -44,6 +71,12 @@
       <div class="pal-act"><button type="button" class="pill-btn" data-all>${T.copyAll[L]}</button></div></div>`;
     el.querySelectorAll('[data-hex]').forEach(b => b.onclick = () => copy(b.dataset.hex));
     el.querySelector('[data-all]').onclick = () => copy(p.colors.map(c => c.hex).join(' '), T.copy[L] + ' ✓');
+    if (!big) isAdmin().then(a => {
+      if (!a) return;
+      const act = el.querySelector('.pal-act'), i = extra.queue.indexOf(p.key);
+      if (i >= 0) { const s = document.createElement('small'); s.className = 'pal-when'; s.textContent = (i < extra.month ? T.adWas[L] : T.adWhen[L]) + ' ' + monthName(i); act.appendChild(s); }
+      if (p.added) { const b = document.createElement('button'); b.type = 'button'; b.className = 'pill-btn'; b.textContent = '🗑'; b.title = T.adDel[L]; b.onclick = () => delArt(p.key, el); act.appendChild(b); }
+    });
     return el;
   }
   // ---------- «Палитра из вашего фото»: всё считается в браузере, фото никуда не отправляется ----------
@@ -123,9 +156,10 @@
   function nameOf(h, used) {
     const l = hexLab(h); let best = null, bd = Infinity;
     for (const [x, xl] of NAMES) if (!used.has(x[gi])) { const d = dE(l, xl); if (d < bd) { bd = d; best = x; } }
-    return best[gi];
+    return best; // [en, ru, lv, hex]
   }
-  function nameAll(cols) { const used = new Set(); cols.forEach(c => { c.n = nameOf(c.hex, used); used.add(c.n); }); return cols; }
+  const setName = (c, e) => { c.nm = e; c.n = e[gi]; };
+  function nameAll(cols) { const used = new Set(); cols.forEach(c => { setName(c, nameOf(c.hex, used)); used.add(c.n); }); return cols; }
   // пиксельная Полли для плашки сайта (как в блоке «Тема дня»)
   const PP = ['......ddd.....', '.....dbbbd....', '....dbbwwbd...', '....dbbwkbdoo.', '....dbbbbbdo..', '...dbbbbbbd...', '..dbbsbbbbd...',
     '.dbbssbbbbd...', 'dbbssbbbbbd...', 'dbbbbbbbbd....', '.ddbbbbbdd....', '...ddddd......', '....o..o......', '...oo.oo......'];
@@ -163,21 +197,56 @@
     g.fillStyle = '#2A1B1F'; g.fillText('pigeonpolly.com', bx + 30 + 42 + 14, by + 44);
     return c;
   }
-  function maker() {
-    const box = document.createElement('section'); box.className = 'pal-mk';
+  function maker(o = {}) {
+    const box = document.createElement('section'); box.className = 'pal-mk' + (o.adminOnly ? ' pal-mk-admin' : '');
     box.innerHTML = `<div class="pal-mk-txt"><h2>🎨 ${T.mkH[L]}</h2><p>${T.mkP[L]}</p>
       <label class="pill-btn pill-fill pal-mk-pick">${T.mkPick[L]}<input type="file" accept="image/*" hidden></label>
       <div class="pal-mk-opts" hidden><label>${T.mkName[L]} <input type="text" maxlength="40" value="${esc(T.mkDef[L])}"></label>
       <button type="button" class="pill-btn pill-fill" data-save>${T.mkSave[L]}</button></div><p class="pal-mk-msg" aria-live="polite"></p>
-      <div class="pal-mk-edit" hidden><p class="pal-mk-tip">${T.mkTip[L]}</p><div class="pal-mk-photo"></div><button type="button" class="pill-btn" data-reset>${T.mkReset[L]}</button></div></div>
+      <div class="pal-mk-edit" hidden><p class="pal-mk-tip">${T.mkTip[L]}</p><div class="pal-mk-photo"></div><button type="button" class="pill-btn" data-reset>${T.mkReset[L]}</button></div>
+      <div class="pal-mk-ad" hidden><h3>${T.adH[L]}</h3>
+        <label>${T.adSec[L]} <select data-g>${ADD_G.map(g => `<option value="${g}"${g === (o.gallery || 'sketchbook') ? ' selected' : ''}>${esc(G[g][gi])}</option>`).join('')}</select></label>
+        ${['en', 'ru', 'lv'].map(l => `<label>${T.adT[L]} ${l.toUpperCase()} <input type="text" maxlength="80" data-t="${l}"></label>`).join('')}
+        <button type="button" class="pill-btn pill-fill" data-add>${T.adGo[L]}</button><p class="pal-mk-admsg" aria-live="polite"></p></div></div>
       <div class="pal-mk-out"></div>`;
+    if (o.adminOnly) { box.querySelector('h2').textContent = '➕ ' + T.adAdd[L].replace(/^➕\s*/, ''); box.querySelector('.pal-mk-txt > p').textContent = T.adHelp[L]; }
     const inp = box.querySelector('input[type=file]'), opts = box.querySelector('.pal-mk-opts'), name = box.querySelector('input[type=text]');
     const out = box.querySelector('.pal-mk-out'), msg = box.querySelector('.pal-mk-msg'), pick = box.querySelector('.pal-mk-pick');
     const edit = box.querySelector('.pal-mk-edit'), photo = box.querySelector('.pal-mk-photo');
     let img = null, cols = null, auto = null, canvas = null, timer = 0, sample = null, cur = 0;
     const render = () => drawCard(img, cols, name.value.trim() || T.mkDef[L]).then(c => { canvas = c; c.className = 'pal-mk-card'; out.replaceChildren(c); });
     const later = () => { clearTimeout(timer); timer = setTimeout(render, 200); };
-    name.oninput = later;
+    const ad = box.querySelector('.pal-mk-ad'), adMsg = box.querySelector('.pal-mk-admsg'), tIn = l => ad.querySelector(`[data-t="${l}"]`);
+    let admin = false;
+    isAdmin().then(a => { admin = a; if (a && img) ad.hidden = false; });
+    // название на карточке = название на языке страницы (пока его не меняли вручную)
+    const syncTitle = () => { const t = tIn(L); if (!t.dataset.own) t.value = name.value.trim(); };
+    ['en', 'ru', 'lv'].forEach(l => tIn(l).addEventListener('input', e => { e.target.dataset.own = '1'; if (l === L) { name.value = e.target.value; later(); } }));
+    name.oninput = () => { syncTitle(); later(); };
+    const resized = (im, maxW, maxSide) => new Promise(res => {
+      const s = Math.min(1, maxW / im.naturalWidth, maxSide / Math.max(im.naturalWidth, im.naturalHeight)), c = document.createElement('canvas');
+      c.width = Math.round(im.naturalWidth * s); c.height = Math.round(im.naturalHeight * s); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+      c.toBlob(b => res([b, c.width, c.height]), 'image/jpeg', .9);
+    });
+    box.querySelector('[data-add]').onclick = async e => {
+      const t = ['en', 'ru', 'lv'].map(l => tIn(l).value.trim()), any = t.find(Boolean);
+      if (!any) { adMsg.textContent = T.adNeedT[L]; return; }
+      const btn = e.target; btn.disabled = true; adMsg.textContent = T.adBusy[L];
+      try {
+        const [full] = await resized(img, 2400, 2400), [thumb, w, h] = await resized(img, 800, 4000);
+        const fd = new FormData(), gal = ad.querySelector('[data-g]').value;
+        fd.append('full', full, 'full.jpg'); fd.append('thumb', thumb, 'thumb.jpg');
+        fd.append('meta', JSON.stringify({ gallery: gal, w, h, title: t.map(x => x || any), colors: cols.map(c => [c.hex, c.nm[0], c.nm[1], c.nm[2]]) }));
+        const r = await fetch('/api/admin/art', { method: 'POST', credentials: 'same-origin', body: fd });
+        if (!r.ok) throw 0;
+        const x = await r.json();
+        if (x.extraMonth != null) { extra.queue.splice(x.extraMonth, 0, x.item.key); }
+        adMsg.textContent = (x.item.palette ? T.adOk[L] : T.adOkAi[L]) + (x.extraMonth != null ? ` ${T.adExtra[L]} ${monthName(x.extraMonth)}`.replace(/\.?$/, '.') : '');
+        if (data && x.item.palette) data.unshift(x.item);
+        document.dispatchEvent(new CustomEvent('pp:art-added', { detail: x.item }));
+      } catch (err) { adMsg.textContent = T.adErr[L]; }
+      btn.disabled = false;
+    };
     // пипетки: фото с 6 кружками; тянем кружок (или выбираем его и тапаем по фото) — цвет берётся из этой точки
     function pickAt(u, v) {
       const { data, w, h } = sample, x0 = Math.min(w - 1, Math.max(0, Math.floor(u * w))), y0 = Math.min(h - 1, Math.max(0, Math.floor(v * h)));
@@ -185,7 +254,7 @@
       for (let y = Math.max(0, y0 - 2); y <= Math.min(h - 1, y0 + 2); y++) for (let x = Math.max(0, x0 - 2); x <= Math.min(w - 1, x0 + 2); x++) { const i = (y * w + x) * 4; r += data[i]; g += data[i + 1]; b += data[i + 2]; n++; }
       const hex = '#' + [r, g, b].map(c => Math.round(c / n).toString(16).padStart(2, '0')).join('').toUpperCase();
       const c = cols[cur]; c.hex = hex; c.u = u; c.v = v;
-      c.n = nameOf(hex, new Set(cols.filter((_, i) => i !== cur).map(x => x.n)));
+      setName(c, nameOf(hex, new Set(cols.filter((_, i) => i !== cur).map(x => x.n))));
       drawPins(); later();
     }
     function drawPins() {
@@ -229,6 +298,7 @@
         const base = f.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
         if (base && !/^(img|dsc|photo|image|pxl|screenshot)\b/i.test(base) && !/^\d/.test(base)) name.value = base.slice(0, 40);
         opts.hidden = false; pick.firstChild.textContent = T.mkOther[L]; msg.textContent = '';
+        ['en', 'ru', 'lv'].forEach(l => { tIn(l).value = ''; delete tIn(l).dataset.own; }); syncTitle(); adMsg.textContent = ''; if (admin) ad.hidden = false;
         return render();
       }).catch(() => { msg.textContent = T.mkErr[L]; });
       im.onerror = () => { msg.textContent = T.mkErr[L]; URL.revokeObjectURL(url); };
@@ -243,7 +313,8 @@
   }
   // страница «Палитры»
   const app = document.getElementById('pal-app');
-  if (app) load().then(d => {
+  if (app) load().then(d0 => {
+    let d = d0;
     const bar = document.createElement('div'); bar.className = 'pal-bar'; bar.setAttribute('role', 'toolbar');
     const grid = document.createElement('div'); grid.className = 'pal-grid';
     let f = 'all';
@@ -253,9 +324,31 @@
     bar.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { f = b.dataset.g; draw(); });
     bar.querySelector('[data-rnd]').onclick = () => { f = 'all'; draw(); const c = grid.children[Math.floor(Math.random() * grid.children.length)]; c.scrollIntoView({ behavior: 'smooth', block: 'center' }); c.classList.remove('flash'); void c.offsetWidth; c.classList.add('flash'); };
     app.append(maker(), bar, grid); draw();
+    document.addEventListener('pp:art-added', e => { if (e.detail.palette) { d = data; f = 'all'; draw(); } });
     const h = decodeURIComponent(location.hash.slice(1)), t = h && document.getElementById(h);
     if (t) setTimeout(() => { t.scrollIntoView({ block: 'center' }); t.classList.add('flash'); }, 60);
   });
+  // галереи «Мой скетчбук»: картины, добавленные с сайта (новые — первыми), и для админа — «➕ Добавить картину» и 🗑
+  const gal = document.querySelector('.gallery[data-gallery]');
+  if (gal && ADD_G.includes(gal.dataset.gallery)) {
+    const name = gal.dataset.gallery;
+    const fig = p => {
+      const f = document.createElement('figure'); f.dataset.added = p.key;
+      f.innerHTML = `<a href="/${esc(p.img)}" data-lightbox><img src="/${esc(p.thumb)}" width="${p.w}" height="${p.h}" alt="${esc(p.title[L])}" loading="lazy" decoding="async"></a><figcaption>${esc(p.title[L])}</figcaption>`;
+      isAdmin().then(a => { if (!a) return; const b = document.createElement('button'); b.type = 'button'; b.className = 'pal-del'; b.textContent = '🗑'; b.title = T.adDel[L]; b.onclick = () => delArt(p.key, f); f.appendChild(b); });
+      return f;
+    };
+    getAdded().then(x => x.added.filter(p => p.gallery === name).reverse().forEach(p => gal.prepend(fig(p))));
+    document.addEventListener('pp:art-added', e => { if (e.detail.gallery === name) gal.prepend(fig(e.detail)); });
+    isAdmin().then(a => {
+      if (!a) return;
+      const wrap = document.createElement('div'); wrap.className = 'pal-adm-wrap';
+      const open = document.createElement('button'); open.type = 'button'; open.className = 'pill-btn pill-fill'; open.textContent = T.adAdd[L];
+      let mk = null;
+      open.onclick = () => { if (!mk) { mk = maker({ adminOnly: true, gallery: name }); wrap.appendChild(mk); } else mk.hidden = !mk.hidden; };
+      wrap.appendChild(open); gal.before(wrap);
+    });
+  }
   // кнопка 🎨 в челлендже: случайная палитра в окне
   const btn = document.getElementById('ch-pal-btn');
   if (btn) btn.onclick = () => load().then(d => {

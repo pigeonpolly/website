@@ -2908,3 +2908,17 @@ html.sb-hide { --sb: 0px; }
 .pal-pin { position: absolute; width: 34px; height: 34px; margin: -17px 0 0 -17px; padding: 0; border-radius: 50%; border: 3px solid #fff; background: var(--c); box-shadow: 0 0 0 2px rgba(0, 0, 0, .55), 0 3px 8px rgba(0, 0, 0, .35); color: #fff; font: 700 13px/28px 'Karla', sans-serif; text-shadow: 0 0 3px #000, 0 0 2px #000; cursor: grab; touch-action: none; }
 .pal-pin.on { width: 42px; height: 42px; margin: -21px 0 0 -21px; line-height: 36px; border-color: #F0A987; z-index: 1; }
 .pal-pin:active { cursor: grabbing; }
+.pal-mk-ad { margin-top: 18px; padding: 14px; border-radius: 16px; border: 1px dashed rgba(240, 169, 135, .7); display: grid; gap: 10px; }
+.pal-mk-ad[hidden] { display: none; }
+.pal-mk-ad h3 { margin: 0; font: 700 16px 'Karla', sans-serif; }
+.pal-mk-ad label { display: grid; gap: 4px; font-size: 14px; }
+.pal-mk-ad input, .pal-mk-ad select { padding: 8px 12px; border-radius: 10px; border: 1px solid var(--line, #ccc); font: inherit; }
+.pal-mk-ad [data-add] { justify-self: start; }
+.pal-mk-admsg { margin: 0; font-size: 14px; }
+.pal-mk-admsg:empty { display: none; }
+.pal-when { align-self: center; font-size: 12.5px; color: #F0A987; }
+.pal-adm-wrap { display: grid; gap: 14px; margin-bottom: 20px; justify-items: start; }
+.pal-adm-wrap .pal-mk { width: 100%; margin-bottom: 0; }
+.pal-adm-wrap .pal-mk[hidden] { display: none; }
+.gallery figure[data-added] { position: relative; }
+.pal-del { position: absolute; top: 8px; right: 8px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(20, 10, 30, .75); color: #fff; font-size: 16px; cursor: pointer; }

@@ -122,8 +122,8 @@
     const extraBw = D.extrasBw[orderOf('polly-extrabw', D.extrasBw.length)[mod(mi, D.extrasBw.length)]][L];
     let colors = cols.slice(0, 3), pal = null;
     const P = window.EXTRA_PALETTES;
-    if (extra && P && P.length) { // палитры по кругу без повторов: каждый месяц — следующая из перемешанного списка
-      const p = P[orderOf('polly-extrapal', P.length)[mod(mi, P.length)]];
+    if (extra && P && P.length) { // очередь палитр (build.py + картины, добавленные с сайта): месяц N берёт N-ю, после конца — по кругу
+      const p = P[mod(mi, P.length)];
       pal = { key: p.k, title: p.t[L], thumb: p.th };
       colors = p.c.map(([hex, en, ru, lv]) => ({ hex, n: [en, ru, lv] }));
     }

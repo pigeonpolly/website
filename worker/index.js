@@ -107,6 +107,33 @@ async function sitePage(req, env, url) {
   }).transform(out);
 }
 
+// ---------- картины с сайта и очередь палитр для дней ЭКСТРА ----------
+const ART_GALLERIES = ['sketchbook', 'anxiety', 'bird', 'snail', 'detective', 'halloween', 'ai-art', 'other'];
+const EXTRA0 = 2026 * 12 + 9; // октябрь 2026 — первый месяц очереди (индекс 0)
+const extraMonth = (t = Date.now()) => { const d = new Date(t); return d.getUTCFullYear() * 12 + d.getUTCMonth() - EXTRA0; };
+const parseJ = (s, d) => { try { return JSON.parse(s); } catch (e) { return d; } };
+function artEntry(r) {
+  const t = parseJ(r.title, ['', '', '']);
+  return { key: r.key, gallery: r.gallery, img: `media/art/${r.key}.jpg`, thumb: `media/art/${r.key}-800.jpg`, w: r.w, h: r.h, added: true, palette: !!r.palette,
+    title: { en: t[0], ru: t[1] || t[0], lv: t[2] || t[0] }, colors: parseJ(r.colors, []).map(c => ({ hex: c[0], en: c[1], ru: c[2], lv: c[3] })) };
+}
+// очередь = палитры картин из статики (content/extra-order.json, порядок не меняется) + добавленные с сайта:
+// события «добавили» (вставка на сохранённое место pos) и «убрали» проигрываем по времени — так прошлые месяцы никогда не меняются
+async function extraQueue(env, req) {
+  let base = [];
+  try { const r = await env.ASSETS.fetch(new Request(new URL('/assets/extra-palettes.json', req.url))); if (r.ok) base = await r.json(); } catch (e) { base = []; }
+  const rows = (await env.DB.prepare('SELECT * FROM art_added ORDER BY id').all()).results;
+  const ev = [];
+  for (const r of rows.filter(r => r.palette)) { ev.push([r.created_at, 0, r]); if (r.removed_at) ev.push([r.removed_at, 1, r]); }
+  ev.sort((a, b) => a[0] - b[0] || a[1] - b[1] || a[2].id - b[2].id);
+  const q = base.slice();
+  for (const [, kind, r] of ev) {
+    if (kind === 0) q.splice(Math.min(r.pos ?? q.length, q.length), 0, { k: r.key, t: parseJ(r.title, ['', '', '']), th: `media/art/${r.key}-800.jpg`, c: parseJ(r.colors, []) });
+    else { const j = q.findIndex(x => x.k === r.key); if (j >= 0) q.splice(j, 1); }
+  }
+  return { q, rows };
+}
+
 // ---------- аватар: что надето из подарков (фон, обувь, головной убор, анимация, рамка) ----------
 const GIFT_KINDS = ['bg', 'shoes', 'hat', 'anim', 'frame', 'item', 'scarf'];
 const avatarOf = u => { try { const a = JSON.parse(u && u.avatar || '{}'); return a && typeof a === 'object' ? a : {}; } catch (e) { return {}; } };
@@ -149,6 +176,10 @@ async function ensureSchema(env) {
     env.DB.prepare(`CREATE INDEX IF NOT EXISTS visits_day ON visits(day)`),
     // сохранённые ссылки с метками (кабинет → «Посетители»): по ним считаем заходы
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS utm_links (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT NOT NULL, source TEXT NOT NULL, campaign TEXT NOT NULL, note TEXT, created_at INTEGER, UNIQUE (path, source, campaign))`),
+    // картины, добавленные Алиной с сайта (галереи «Мой скетчбук» + палитра): картинки в R2 art/<key>.jpg и art/<key>-800.jpg.
+    // pos — место в очереди палитр дней ЭКСТРА в момент добавления; hidden — убрана с сайта; removed_at — убрана и из очереди (ещё не была показана)
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS art_added (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT UNIQUE NOT NULL, gallery TEXT NOT NULL, title TEXT, colors TEXT,
+      w INTEGER, h INTEGER, palette INTEGER DEFAULT 1, pos INTEGER, hidden INTEGER DEFAULT 0, created_at INTEGER, removed_at INTEGER)`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS shop (kind TEXT NOT NULL, item TEXT NOT NULL, price INTEGER DEFAULT 0, stock INTEGER DEFAULT 0, PRIMARY KEY (kind, item))`),
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
@@ -662,6 +693,55 @@ async function route(req, env, url) {
     const path = String(b.path || '/').trim().slice(0, 200), source = String(b.source || '').trim().toLowerCase().slice(0, 60), campaign = String(b.campaign || '').trim().slice(0, 80);
     if (!path.startsWith('/') || !source || !campaign) fail(400, 'bad');
     await env.DB.prepare('INSERT OR IGNORE INTO utm_links (path, source, campaign, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(path, source, campaign, String(b.note || '').slice(0, 200) || null, now()).run();
+    return json({ ok: true });
+  }
+  // картины и палитры, добавленные с сайта (галереи «Мой скетчбук», раздел «Палитры», очередь дней ЭКСТРА)
+  if (m === 'GET' && p === '/api/palettes') {
+    const { q, rows } = await extraQueue(env, req);
+    return json({ added: rows.filter(r => !r.hidden).reverse().map(artEntry), queue: q.map(x => x.k), month: extraMonth() }, 200, { 'cache-control': 'no-cache' });
+  }
+  if (m === 'GET' && p === '/api/extra-palettes.js') {
+    const { q } = await extraQueue(env, req);
+    return new Response('window.EXTRA_PALETTES=' + JSON.stringify(q) + ';\n', { headers: { 'content-type': 'application/javascript; charset=utf-8', 'cache-control': 'public, max-age=300' } });
+  }
+  if (m === 'POST' && p === '/api/admin/art') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    if (!env.MEDIA) fail(503, 'storage');
+    const f = await req.formData(), full = f.get('full'), thumb = f.get('thumb');
+    let meta; try { meta = JSON.parse(String(f.get('meta') || '{}')); } catch (e) { fail(400, 'bad'); }
+    const gallery = String(meta.gallery || '');
+    if (!ART_GALLERIES.includes(gallery) || !full || !thumb || full.size > 6e6 || thumb.size > 2e6) fail(400, 'bad');
+    const title = [0, 1, 2].map(i => String((meta.title || [])[i] || (meta.title || [])[0] || '').trim().slice(0, 80));
+    const colors = (meta.colors || []).slice(0, 6).map(c => [String(c[0]).toUpperCase(), ...[1, 2, 3].map(i => String(c[i] || '').slice(0, 40))]);
+    if (!title[0] || colors.length !== 6 || !colors.every(c => /^#[0-9A-F]{6}$/.test(c[0]))) fail(400, 'bad');
+    const key = 'art-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
+    const meta2 = { httpMetadata: { contentType: 'image/jpeg' } };
+    await Promise.all([env.MEDIA.put(`art/${key}.jpg`, await full.arrayBuffer(), meta2), env.MEDIA.put(`art/${key}-800.jpg`, await thumb.arrayBuffer(), meta2)]);
+    // в очередь ЭКСТРА: сразу после текущего месяца и после уже ждущих добавленных (AI-арт — без палитры и без очереди)
+    const palette = gallery === 'ai-art' ? 0 : 1;
+    let pos = null;
+    if (palette) {
+      const { q, rows } = await extraQueue(env, req), mine = new Set(rows.map(r => r.key)), mi = extraMonth();
+      pos = Math.min(q.length, Math.max(0, mi + 1 + q.filter((x, j) => j > mi && mine.has(x.k)).length));
+    }
+    await env.DB.prepare('INSERT INTO art_added (key, gallery, title, colors, w, h, palette, pos, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .bind(key, gallery, JSON.stringify(title), JSON.stringify(colors), Math.round(Number(meta.w) || 800), Math.round(Number(meta.h) || 600), palette, pos, now()).run();
+    const row = await env.DB.prepare('SELECT * FROM art_added WHERE key = ?').bind(key).first();
+    return json({ ok: true, item: artEntry(row), extraMonth: pos });
+  }
+  if (m === 'POST' && p === '/api/admin/art/delete') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({}));
+    const row = await env.DB.prepare('SELECT * FROM art_added WHERE key = ?').bind(String(b.key || '')).first();
+    if (!row) fail(404, 'not_found');
+    // уже была палитрой дня ЭКСТРА (или идёт в этом месяце) — остаётся в очереди, чтобы прошлые месяцы не поменялись; иначе убираем и из очереди
+    const { q } = await extraQueue(env, req), j = q.findIndex(x => x.k === row.key);
+    if (j > extraMonth() || j < 0) {
+      await env.DB.prepare('UPDATE art_added SET hidden = 1, removed_at = ? WHERE id = ?').bind(now(), row.id).run();
+      if (env.MEDIA) await env.MEDIA.delete([`art/${row.key}.jpg`, `art/${row.key}-800.jpg`]);
+    } else await env.DB.prepare('UPDATE art_added SET hidden = 1 WHERE id = ?').bind(row.id).run();
     return json({ ok: true });
   }
   if (m === 'GET' && p === '/api/admin/users') {

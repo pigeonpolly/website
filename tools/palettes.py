@@ -101,4 +101,9 @@ for gal in ['bird', 'snail', 'sketchbook', 'halloween', 'detective', 'anxiety', 
         cols = [{'hex': h, 'en': e, 'ru': r, 'lv': l} for e, r, l, h in O[key]] if key in O else palette(W / 'site' / it['thumb'])
         out.append({'key': key, 'gallery': gal, 'img': it['full'], 'thumb': it['thumb'], 'w': it['w'], 'h': it['h'], 'title': dict(zip(['en', 'ru', 'lv'], T[key])), 'colors': cols})
 json.dump(out, open(W / 'content' / 'palettes.json', 'w'), ensure_ascii=False, indent=0)
+# очередь палитр для дней ЭКСТРА: порядок уже показанных не трогаем, новые картины — в конец
+eo = W / 'content' / 'extra-order.json'
+order = json.load(open(eo)) if eo.exists() else []
+order += [p['key'] for p in out if p['key'] not in order]
+eo.write_text('[' + ',\n'.join(json.dumps(k) for k in order) + ']\n')
 print(len(out))

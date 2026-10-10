@@ -229,7 +229,7 @@ def gallery_html(name):
             f'<figure><a href="/{it["full"]}" data-lightbox>'
             f'<img src="/{it["thumb"]}" width="{it["w"]}" height="{it["h"]}" alt="{alt}" loading="lazy" decoding="async"></a>'
             + (f"<figcaption>{cap}</figcaption>" if cap else "") + "</figure>")
-    return '<div class="gallery">' + "\n".join(out) + "</div>"
+    return f'<div class="gallery" data-gallery="{name}">' + "\n".join(out) + "</div>"
 
 
 _bust_cache = {}
@@ -522,10 +522,16 @@ def build():
     # названия цветов для «Палитры из своего фото» (palettes.js); список — tools/palette_names.py
     names = runpy.run_path(str(ROOT / "tools" / "palette_names.py"))["NAMES"]
     (OUT / "assets" / "palette-names.json").write_text(json.dumps([list(n) for n in names], ensure_ascii=False, separators=(",", ":")))
-    # день ЭКСТРА в челлендже: палитра одной из картин (challenge-theme.js выбирает по месяцу, одинаково у всех)
-    extra = [{"k": p["key"], "t": [p["title"][l] for l in ("en", "ru", "lv")], "th": p["thumb"],
-              "c": [[c["hex"], c["en"], c["ru"], c["lv"]] for c in p["colors"]]} for p in sorted(pals, key=lambda p: p["key"])]
-    (OUT / "assets" / "extra-palettes.js").write_text("// генерирует build.py из content/palettes.json\nwindow.EXTRA_PALETTES=" + json.dumps(extra, ensure_ascii=False, separators=(",", ":")) + ";\n")
+    # день ЭКСТРА в челлендже: очередь палитр картин, месяц N (октябрь 2026 = 0) берёт N-ю. Порядок — content/extra-order.json
+    # (не меняется; новые картины из tools/palettes.py дописываются в конец). Сервер (/api/extra-palettes.js) вставляет в неё картины, добавленные с сайта.
+    order = json.loads((CONTENT / "extra-order.json").read_text())
+    by_key = {p["key"]: p for p in pals}
+    keys = [k for k in order if k in by_key] + [p["key"] for p in pals if p["key"] not in order]
+    extra = [{"k": k, "t": [by_key[k]["title"][l] for l in ("en", "ru", "lv")], "th": by_key[k]["thumb"],
+              "c": [[c["hex"], c["en"], c["ru"], c["lv"]] for c in by_key[k]["colors"]]} for k in keys]
+    extra_json = json.dumps(extra, ensure_ascii=False, separators=(",", ":"))
+    (OUT / "assets" / "extra-palettes.json").write_text(extra_json)
+    (OUT / "assets" / "extra-palettes.js").write_text("// генерирует build.py: запасной список, если /api/extra-palettes.js недоступен\nwindow.EXTRA_PALETTES=" + extra_json + ";\n")
     # индекс для поиска по сайту (кнопка 🔍 в шапке; статьи блога ищутся отдельно на сервере)
     for lang, entries in search_index.items():
         (OUT / "assets" / f"search-{lang}.json").write_text(json.dumps(entries, ensure_ascii=False, separators=(",", ":")))
