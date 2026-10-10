@@ -618,6 +618,9 @@ html:not([lang="en"]) .hero h1 { white-space: normal; }
 .swatches { display: flex; justify-content: center; flex-wrap: wrap; gap: 10px 16px; margin: 8px 0 16px; }
 .sw { display: flex; align-items: center; gap: 7px; font-weight: 500; }
 .sw i { width: 22px; height: 22px; border-radius: 50%; box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .12); }
+.page-pal { display: flex; align-items: center; justify-content: center; gap: 10px; margin: 6px 0 2px; color: inherit; font-weight: 600; text-decoration: none; }
+.page-pal img { width: 64px; height: 48px; object-fit: cover; border-radius: 8px; box-shadow: 0 2px 6px rgba(0, 0, 0, .18); }
+.page-pal:hover span { text-decoration: underline; }
 .page-time b { font: 600 22px/1 var(--serif); margin-left: 6px; }
 .tip { max-width: 440px; margin: 22px auto 0; padding: 18px 20px; border-radius: 16px; border: 1.5px dashed var(--peach); }
 .tip b { color: var(--peach); font-size: 14px; letter-spacing: .04em; text-transform: uppercase; }

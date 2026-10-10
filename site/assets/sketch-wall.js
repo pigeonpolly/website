@@ -120,7 +120,7 @@
     { d: 365, n: ['Polly legend', 'Легенда Полли', 'Pollijas leģenda'], f: ['A whole year. Pigeons tell legends about you.', 'Целый год. Голуби слагают о вас легенды.', 'Vesels gads. Baloži par tevi stāsta leģendas.'], s: 'crown', bg: '#9C8FE0' },
   ];
   const SPECIAL = [
-    { k: 'extra', f: ['A free day, and you still drew. Just for joy.', 'День свободы, а вы всё равно рисовали. Просто для радости.', 'Brīvdiena, bet tu tik un tā zīmēji. Prieka pēc.'], n: ['Drew on a free day', 'Рисовал(а) в день свободы', 'Zīmēju brīvdienā'], s: 'sparkle', bg: '#F7E7A6',
+    { k: 'extra', f: ['You could have rested, but you drew with Polly’s palette.', 'Можно было отдохнуть, а вы рисовали палитрой Полли.', 'Varēja atpūsties, bet tu zīmēji ar Pollijas paleti.'], n: ['Drew on an EXTRA palette day', 'Рисовал(а) в день ЭКСТРА-палитры', 'Zīmēju EKSTRA paletes dienā'], s: 'sparkle', bg: '#F7E7A6',
       h: ['Upload a sketch on the monthly EXTRA free day: your own theme or reference (marked ✦ in the Daily Challenge calendar)', 'Загрузить рисунок в день ЭКСТРА — день свободы: своя тема или свой референс (раз в месяц, ✦ в календаре челленджа)', 'Augšupielādēt skici EKSTRA brīvdienā: sava tēma vai sava atsauce (reizi mēnesī, ✦ izaicinājuma kalendārā)'] },
     { k: 'bw', f: ['Ink in the veins. Colours are overrated.', 'Тушь в венах. Цвета переоценены.', 'Tuša vēnās. Krāsas ir pārvērtētas.'], n: ['Ink mood: drew in B/W', 'Нарисовал(а) в Ч/Б', 'Zīmēju melnbalti'], s: 'ink', bg: '#F4F4F4',
       h: ['Upload a sketch with “Black & white” mode switched on on the Daily Challenge page', 'Загрузить рисунок, когда на странице челленджа включён режим «Ч/Б»', 'Augšupielādēt skici, kad izaicinājuma lapā ieslēgts “Melnbalts”'] },

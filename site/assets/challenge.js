@@ -23,8 +23,9 @@
     done: ['I drew it', 'Я нарисовал(а)', 'Es uzzīmēju'],
     doneYes: ['Drawn ✓', 'Нарисовано ✓', 'Uzzīmēts ✓'],
     backToday: ['← Back to today', '← Вернуться к сегодня', '← Atpakaļ uz šodienu'],
-    extra: ['EXTRA day, a free day! Draw your own theme or your own reference. Nothing uploaded today? Your streak is safe, take a rest day.', 'День ЭКСТРА — день свободы! Рисуйте свою тему или по своему референсу. Ничего не загрузили сегодня? Серия не сгорит — можно взять выходной.', 'EKSTRA diena — brīvdiena! Zīmē savu tēmu vai pēc savas atsauces. Šodien neko neaugšupielādēji? Sērija nepazudīs — vari atpūsties.'],
-    extraBw: ['EXTRA free day!', 'День ЭКСТРА — день свободы!', 'EKSTRA brīvdiena!'],
+    extra: ['EXTRA day: a palette from my painting! Draw today’s theme in its colors, all six or just the ones you like. Nothing uploaded today? Your streak is safe, take a rest day.', 'День ЭКСТРА — палитра из моей картины! Нарисуйте тему дня её цветами: всеми шестью или теми, что нравятся. Ничего не загрузили сегодня? Серия не сгорит — можно взять выходной.', 'EKSTRA diena — palete no mana darba! Uzzīmē dienas tēmu tās krāsās: visās sešās vai tikai tajās, kas patīk. Šodien neko neaugšupielādēji? Sērija nepazudīs — vari atpūsties.'],
+    extraBw: ['EXTRA day!', 'День ЭКСТРА!', 'EKSTRA diena!'],
+    palFrom: ['Palette from my painting', 'Палитра из моей картины', 'Palete no mana darba'],
     twist: ['Your twist', 'Особенность', 'Tavs pavērsiens'],
     modeColor: ['In colour', 'В цвете', 'Krāsās'],
     modeBw: ['Black & white', 'Ч/Б', 'Melnbalts'],
@@ -86,7 +87,8 @@
         <div class="page-day">${sel.getDate()}</div>
         <div class="page-weekday">${weekday}</div>
         <div class="page-subject">${theme.subject}</div>
-        <div class="page-label">${bw ? t('twist') : t('colors')}</div>
+        <div class="page-label">${bw ? t('twist') : theme.pal ? t('palFrom') : t('colors')}</div>
+        ${!bw && theme.pal ? `<a class="page-pal" href="${L ? '/' + ['', 'ru', 'lv'][L] : ''}/palettes/#${theme.pal.key}"><img src="/${theme.pal.thumb}" alt="" loading="lazy"><span>«${theme.pal.title}»</span></a>` : ''}
         ${bw ? `<div class="page-twist">✒ ${theme.twist}</div>` : `<div class="swatches">${theme.colors.map(c => `<span class="sw"><i style="background:${c.hex}"></i>${c.n[L]}</span>`).join('')}</div>`}
         <div class="page-time"><span class="page-label">${t('time')}</span> <b id="ch-min"></b></div>
         ${theme.bday ? `<div class="page-extra page-bday">${t('bday')}</div>` : ''}
@@ -324,11 +326,11 @@
       wrapText(g, `✒ ${theme.twist} · ${minutes()} ${t('min')}`, 70, 1122, 760, 42);
     } else {
       theme.colors.forEach((col, i) => {
-        g.fillStyle = col.hex; g.beginPath(); g.arc(100 + i * 70, 1110, 26, 0, Math.PI * 2); g.fill();
+        g.fillStyle = col.hex; g.beginPath(); g.arc(100 + i * (theme.colors.length > 3 ? 62 : 70), 1110, 26, 0, Math.PI * 2); g.fill();
         g.strokeStyle = '#F3EFFA'; g.lineWidth = 4; g.stroke();
       });
       g.fillStyle = '#D9D3F2'; g.font = '500 34px Karla, sans-serif';
-      g.fillText(`${minutes()} ${t('min')}`, 330, 1122);
+      g.fillText(`${minutes()} ${t('min')}`, theme.colors.length > 3 ? 100 + theme.colors.length * 62 : 330, 1122);
     }
     if (theme.extra) { g.fillStyle = '#E9A93B'; g.font = '700 30px Karla, sans-serif'; wrapText(g, '✦ ' + extraText(theme), 70, 1185, 760, 36); }
     g.fillStyle = '#F0A987'; g.font = '700 40px Karla, sans-serif'; g.fillText('#dailypigeonpolly', 70, 1250);

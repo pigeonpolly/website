@@ -11,7 +11,7 @@
     let a = h >>> 0;
     return () => { a |= 0; a = a + 0x6D2B79F5 | 0; let x = Math.imul(a ^ a >>> 15, 1 | a); x = x + Math.imul(x ^ x >>> 7, 61 | x) ^ x; return ((x ^ x >>> 14) >>> 0) / 4294967296; };
   }
-  // день ЭКСТРА = день свободы: своя тема или свой референс; если ничего не загрузить, серия не сгорает.
+  // день ЭКСТРА = день палитры: тема дня рисуется 6 цветами одной из картин Алины (extra-palettes.js); если ничего не загрузить, серия не сгорает.
   // До сентября 2026 включительно — старая формула; октябрь 2026 — 12-е; дальше — случайный день не ближе 20 дней к прошлому.
   const extraMemo = {};
   function extraDay(y, m) {
@@ -120,7 +120,14 @@
     const twist = D.twists[orderOf('polly-twist', D.twists.length)[mod(n, D.twists.length)]][L];
     const mi = d.getFullYear() * 12 + d.getMonth() - (2026 * 12 + 9);
     const extraBw = D.extrasBw[orderOf('polly-extrabw', D.extrasBw.length)[mod(mi, D.extrasBw.length)]][L];
-    return { subject: subject[L], colors: cols.slice(0, 3), twist, extraBw, time, extra, bday, tip: D.tips[day % D.tips.length][L] };
+    let colors = cols.slice(0, 3), pal = null;
+    const P = window.EXTRA_PALETTES;
+    if (extra && P && P.length) { // палитры по кругу без повторов: каждый месяц — следующая из перемешанного списка
+      const p = P[orderOf('polly-extrapal', P.length)[mod(mi, P.length)]];
+      pal = { key: p.k, title: p.t[L], thumb: p.th };
+      colors = p.c.map(([hex, en, ru, lv]) => ({ hex, n: [en, ru, lv] }));
+    }
+    return { subject: subject[L], colors, pal, twist, extraBw, time, extra, bday, tip: D.tips[day % D.tips.length][L] };
   }
   const isExtra = d => d.getDate() === extraDay(d.getFullYear(), d.getMonth());
   window.ChallengeTheme = { themeFor, keyOf, rngFor, extraDay, isExtra };

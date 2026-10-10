@@ -5,7 +5,7 @@
   const L = { en: 0, ru: 1, lv: 2 }[document.documentElement.lang] ?? 0, locale = ['en-GB', 'ru-RU', 'lv-LV'][L];
   const T = {
     min: ['min', 'мин', 'min'],
-    extra: ['✦ EXTRA free day: your own theme', '✦ День свободы: своя тема', '✦ Brīvdiena: sava tēma'],
+    extra: ['✦ EXTRA: a palette from my painting', '✦ ЭКСТРА: палитра из моей картины', '✦ EKSTRA: palete no mana darba'],
     bday: ['🎂 My birthday!', '🎂 Мой день рождения!', '🎂 Mana dzimšanas diena!'],
   };
   const t = k => T[k][L], q = s => box.querySelector(s);

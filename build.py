@@ -516,7 +516,12 @@ def build():
     books = [b for sec in json.loads((CONTENT / "ebooks.json").read_text())["sections"] for b in sec["books"]]
     (OUT / "assets" / "books.json").write_text(json.dumps([{"title": b["title"], "url": b["url"], "cover": "/" + b["cover"]} for b in books if b.get("cover")], ensure_ascii=False))
     # палитры из артов (страница «Палитры» и кнопка 🎨 в челлендже); данные — content/palettes.json (tools/palettes.py)
-    (OUT / "assets" / "palettes.json").write_text(json.dumps(json.loads((CONTENT / "palettes.json").read_text()), ensure_ascii=False, separators=(",", ":")))
+    pals = json.loads((CONTENT / "palettes.json").read_text())
+    (OUT / "assets" / "palettes.json").write_text(json.dumps(pals, ensure_ascii=False, separators=(",", ":")))
+    # день ЭКСТРА в челлендже: палитра одной из картин (challenge-theme.js выбирает по месяцу, одинаково у всех)
+    extra = [{"k": p["key"], "t": [p["title"][l] for l in ("en", "ru", "lv")], "th": p["thumb"],
+              "c": [[c["hex"], c["en"], c["ru"], c["lv"]] for c in p["colors"]]} for p in sorted(pals, key=lambda p: p["key"])]
+    (OUT / "assets" / "extra-palettes.js").write_text("// генерирует build.py из content/palettes.json\nwindow.EXTRA_PALETTES=" + json.dumps(extra, ensure_ascii=False, separators=(",", ":")) + ";\n")
     # индекс для поиска по сайту (кнопка 🔍 в шапке; статьи блога ищутся отдельно на сервере)
     for lang, entries in search_index.items():
         (OUT / "assets" / f"search-{lang}.json").write_text(json.dumps(entries, ensure_ascii=False, separators=(",", ":")))
