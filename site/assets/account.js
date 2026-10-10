@@ -57,8 +57,8 @@
     const btn = el.querySelector('.acct-btn');
     if (!btn) return false;
     window.scrollTo({ top: 0, behavior: 'smooth' });
-    if (btn.getAttribute('aria-expanded') !== 'true') btn.click();
-    btn.focus({ preventScroll: true });
+    // открываем после текущего клика: иначе тот же клик долетает до «клик мимо окна — закрыть» и окно сразу закрывается
+    setTimeout(() => { if (btn.getAttribute('aria-expanded') !== 'true') btn.click(); btn.focus({ preventScroll: true }); }, 0);
     return true;
   }
   window.PPAccount = { check, openSignIn, signedIn: () => !!(info && info.user) };
