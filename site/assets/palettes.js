@@ -25,21 +25,24 @@
     mkPin: { en: 'Color', ru: 'Цвет', lv: 'Krāsa' },
     mkReset: { en: '↺ Back to automatic', ru: '↺ Вернуть как было', lv: '↺ Atjaunot automātiski' },
     adH: { en: '🔒 Add to the site (only you see this)', ru: '🔒 Добавить на сайт (видите только вы)', lv: '🔒 Pievienot vietnei (redzi tikai tu)' },
-    adSec: { en: 'Section', ru: 'Раздел', lv: 'Sadaļa' },
     adT: { en: 'Title', ru: 'Название', lv: 'Nosaukums' },
     adGo: { en: '➕ Add to the site', ru: '➕ Добавить на сайт', lv: '➕ Pievienot vietnei' },
     adBusy: { en: 'Uploading…', ru: 'Загружаю…', lv: 'Augšupielādēju…' },
-    adOk: { en: 'Added! It is already in the section and in Palettes.', ru: 'Добавлено! Картина уже в разделе и в «Палитрах».', lv: 'Pievienots! Darbs jau ir sadaļā un «Paletēs».' },
+    adOk: { en: 'Added to Palettes!', ru: 'Добавлено в «Палитры»!', lv: 'Pievienots «Paletēm»!' },
     adOkAi: { en: 'Added to the section.', ru: 'Добавлено в раздел.', lv: 'Pievienots sadaļai.' },
+    adSecP: { en: 'Series (label on the palette)', ru: 'Серия (подпись у палитры)', lv: 'Sērija (paraksts pie paletes)' },
     adExtra: { en: 'EXTRA day palette in the challenge:', ru: 'Палитра дня ЭКСТРА в челлендже:', lv: 'EKSTRA dienas palete izaicinājumā:' },
     adErr: { en: 'Could not save, try again.', ru: 'Не получилось сохранить, попробуйте ещё раз.', lv: 'Neizdevās saglabāt, mēģini vēlreiz.' },
     adNeedT: { en: 'Write a title.', ru: 'Напишите название.', lv: 'Uzraksti nosaukumu.' },
-    adAdd: { en: '➕ Add a picture to this section', ru: '➕ Добавить картину в этот раздел', lv: '➕ Pievienot darbu šai sadaļai' },
+    adAdd: { en: '➕ Add a picture', ru: '➕ Добавить картину', lv: '➕ Pievienot darbu' },
     adDel: { en: 'Remove from the site', ru: 'Убрать с сайта', lv: 'Noņemt no vietnes' },
     adDelQ: { en: 'Remove this picture from the site?', ru: 'Убрать эту картину с сайта?', lv: 'Noņemt šo darbu no vietnes?' },
+    adCap: { en: 'Caption', ru: 'Подпись', lv: 'Paraksts' },
+    adUp: { en: '⬆ Upload', ru: '⬆ Загрузить', lv: '⬆ Augšupielādēt' },
+    adHid: { en: 'Hidden pictures', ru: 'Скрытые картины', lv: 'Paslēptie darbi' },
+    adBack: { en: '↩ Show again', ru: '↩ Вернуть', lv: '↩ Atjaunot' },
     adWhen: { en: '📅 EXTRA:', ru: '📅 ЭКСТРА:', lv: '📅 EKSTRA:' },
     adWas: { en: '✓ was EXTRA:', ru: '✓ была ЭКСТРА:', lv: '✓ bija EKSTRA:' },
-    adHelp: { en: 'Choose a picture, move the circles if you want other colors, write the title and press “Add”. The picture goes to its section, the palette to Palettes and to the queue of EXTRA days.', ru: 'Выберите картину, при желании подвигайте кружки-пипетки, напишите название и нажмите «Добавить». Картина попадёт в свой раздел, палитра — в «Палитры» и в очередь дней ЭКСТРА.', lv: 'Izvēlies darbu, ja vajag, pakustini aplīšus, uzraksti nosaukumu un spied «Pievienot». Darbs nonāks savā sadaļā, palete — «Paletēs» un EKSTRA dienu rindā.' },
     kick: { en: 'Color palette', ru: 'Палитра', lv: 'Krāsu palete' },
     made: { en: 'made with Pigeon Polly', ru: 'сделано с Pigeon Polly', lv: 'veidots ar Pigeon Polly' },
   };
@@ -198,18 +201,17 @@
     return c;
   }
   function maker(o = {}) {
-    const box = document.createElement('section'); box.className = 'pal-mk' + (o.adminOnly ? ' pal-mk-admin' : '');
+    const box = document.createElement('section'); box.className = 'pal-mk';
     box.innerHTML = `<div class="pal-mk-txt"><h2>🎨 ${T.mkH[L]}</h2><p>${T.mkP[L]}</p>
       <label class="pill-btn pill-fill pal-mk-pick">${T.mkPick[L]}<input type="file" accept="image/*" hidden></label>
       <div class="pal-mk-opts" hidden><label>${T.mkName[L]} <input type="text" maxlength="40" value="${esc(T.mkDef[L])}"></label>
       <button type="button" class="pill-btn pill-fill" data-save>${T.mkSave[L]}</button></div><p class="pal-mk-msg" aria-live="polite"></p>
       <div class="pal-mk-edit" hidden><p class="pal-mk-tip">${T.mkTip[L]}</p><div class="pal-mk-photo"></div><button type="button" class="pill-btn" data-reset>${T.mkReset[L]}</button></div>
       <div class="pal-mk-ad" hidden><h3>${T.adH[L]}</h3>
-        <label>${T.adSec[L]} <select data-g>${ADD_G.map(g => `<option value="${g}"${g === (o.gallery || 'sketchbook') ? ' selected' : ''}>${esc(G[g][gi])}</option>`).join('')}</select></label>
+        <label>${T.adSecP[L]} <select data-g>${ADD_G.filter(g => g !== 'ai-art').map(g => `<option value="${g}"${g === (o.gallery || 'sketchbook') ? ' selected' : ''}>${esc(G[g][gi])}</option>`).join('')}</select></label>
         ${['en', 'ru', 'lv'].map(l => `<label>${T.adT[L]} ${l.toUpperCase()} <input type="text" maxlength="80" data-t="${l}"></label>`).join('')}
         <button type="button" class="pill-btn pill-fill" data-add>${T.adGo[L]}</button><p class="pal-mk-admsg" aria-live="polite"></p></div></div>
       <div class="pal-mk-out"></div>`;
-    if (o.adminOnly) { box.querySelector('h2').textContent = '➕ ' + T.adAdd[L].replace(/^➕\s*/, ''); box.querySelector('.pal-mk-txt > p').textContent = T.adHelp[L]; }
     const inp = box.querySelector('input[type=file]'), opts = box.querySelector('.pal-mk-opts'), name = box.querySelector('input[type=text]');
     const out = box.querySelector('.pal-mk-out'), msg = box.querySelector('.pal-mk-msg'), pick = box.querySelector('.pal-mk-pick');
     const edit = box.querySelector('.pal-mk-edit'), photo = box.querySelector('.pal-mk-photo');
@@ -328,25 +330,71 @@
     const h = decodeURIComponent(location.hash.slice(1)), t = h && document.getElementById(h);
     if (t) setTimeout(() => { t.scrollIntoView({ block: 'center' }); t.classList.add('flash'); }, 60);
   });
-  // галереи «Мой скетчбук»: картины, добавленные с сайта (новые — первыми), и для админа — «➕ Добавить картину» и 🗑
+  // галереи «Мой скетчбук»: картины, добавленные с сайта (новые — первыми). Админ: «➕ Добавить картину» (просто картина, без палитры и челленджа),
+  // 🗑 у каждой картины (добавленные удаляются, картины из статики скрываются — сервер вырезает их из страницы) и список скрытых с «↩ Вернуть»
   const gal = document.querySelector('.gallery[data-gallery]');
   if (gal && ADD_G.includes(gal.dataset.gallery)) {
     const name = gal.dataset.gallery;
+    const post = (url, body) => fetch(url, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }).then(r => { if (!r.ok) throw 0; });
+    const trash = (f, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'pal-del'; b.textContent = '🗑'; b.title = b.ariaLabel = T.adDel[L]; b.onclick = e => { e.preventDefault(); fn(); }; f.appendChild(b); };
     const fig = p => {
       const f = document.createElement('figure'); f.dataset.added = p.key;
-      f.innerHTML = `<a href="/${esc(p.img)}" data-lightbox><img src="/${esc(p.thumb)}" width="${p.w}" height="${p.h}" alt="${esc(p.title[L])}" loading="lazy" decoding="async"></a><figcaption>${esc(p.title[L])}</figcaption>`;
-      isAdmin().then(a => { if (!a) return; const b = document.createElement('button'); b.type = 'button'; b.className = 'pal-del'; b.textContent = '🗑'; b.title = T.adDel[L]; b.onclick = () => delArt(p.key, f); f.appendChild(b); });
+      const cap = p.title[L] || p.title.en || '';
+      f.innerHTML = `<a href="/${esc(p.img)}" data-lightbox><img src="/${esc(p.thumb)}" width="${p.w}" height="${p.h}" alt="${esc(cap || G[name][gi])}" loading="lazy" decoding="async"></a>${cap ? `<figcaption>${esc(cap)}</figcaption>` : ''}`;
+      isAdmin().then(a => a && trash(f, () => delArt(p.key, f)));
       return f;
     };
-    getAdded().then(x => x.added.filter(p => p.gallery === name).reverse().forEach(p => gal.prepend(fig(p))));
-    document.addEventListener('pp:art-added', e => { if (e.detail.gallery === name) gal.prepend(fig(e.detail)); });
-    isAdmin().then(a => {
+    getAdded().then(x => x.added.filter(p => p.gallery === name && !p.palette).reverse().forEach(p => gal.prepend(fig(p))));
+    isAdmin().then(async a => {
       if (!a) return;
+      const x = await getAdded();
       const wrap = document.createElement('div'); wrap.className = 'pal-adm-wrap';
-      const open = document.createElement('button'); open.type = 'button'; open.className = 'pill-btn pill-fill'; open.textContent = T.adAdd[L];
-      let mk = null;
-      open.onclick = () => { if (!mk) { mk = maker({ adminOnly: true, gallery: name }); wrap.appendChild(mk); } else mk.hidden = !mk.hidden; };
-      wrap.appendChild(open); gal.before(wrap);
+      wrap.innerHTML = `<label class="pill-btn pill-fill">${T.adAdd[L]}<input type="file" accept="image/*" hidden></label>
+        <div class="art-up" hidden><img class="art-up-prev" alt="">
+          <div class="art-up-f">${['en', 'ru', 'lv'].map(l => `<label>${T.adCap[L]} ${l.toUpperCase()} <input type="text" maxlength="80" data-t="${l}"></label>`).join('')}
+          <button type="button" class="pill-btn pill-fill" data-up>${T.adUp[L]}</button><p class="pal-mk-admsg" aria-live="polite"></p></div></div>
+        <details class="art-hid" hidden><summary></summary><div class="art-hid-list"></div></details>`;
+      gal.before(wrap);
+      const inp = wrap.querySelector('input[type=file]'), up = wrap.querySelector('.art-up'), prev = wrap.querySelector('.art-up-prev'), msg = wrap.querySelector('.pal-mk-admsg');
+      let im = null;
+      inp.onchange = () => {
+        const f = inp.files[0]; if (!f) return;
+        const i = new Image(); i.onload = () => { im = i; prev.src = i.src; up.hidden = false; msg.textContent = ''; wrap.querySelectorAll('[data-t]').forEach(t => t.value = ''); };
+        i.onerror = () => { up.hidden = false; msg.textContent = T.mkErr[L]; }; i.src = URL.createObjectURL(f); inp.value = '';
+      };
+      const resized = (maxW, maxSide) => new Promise(res => {
+        const k = Math.min(1, maxW / im.naturalWidth, maxSide / Math.max(im.naturalWidth, im.naturalHeight)), c = document.createElement('canvas');
+        c.width = Math.round(im.naturalWidth * k); c.height = Math.round(im.naturalHeight * k); c.getContext('2d').drawImage(im, 0, 0, c.width, c.height);
+        c.toBlob(b => res([b, c.width, c.height]), 'image/jpeg', .9);
+      });
+      wrap.querySelector('[data-up]').onclick = async e => {
+        if (!im) return;
+        const btn = e.target, t = ['en', 'ru', 'lv'].map(l => wrap.querySelector(`[data-t="${l}"]`).value.trim()), any = t.find(Boolean) || '';
+        btn.disabled = true; msg.textContent = T.adBusy[L];
+        try {
+          const [full] = await resized(2400, 2400), [thumb, w, h] = await resized(800, 4000), fd = new FormData();
+          fd.append('full', full, 'full.jpg'); fd.append('thumb', thumb, 'thumb.jpg');
+          fd.append('meta', JSON.stringify({ gallery: name, palette: false, w, h, title: t.map(v => v || any) }));
+          const r = await fetch('/api/admin/art', { method: 'POST', credentials: 'same-origin', body: fd });
+          if (!r.ok) throw 0;
+          gal.prepend(fig((await r.json()).item)); msg.textContent = T.adOkAi[L]; up.hidden = true; im = null;
+        } catch (err) { msg.textContent = T.adErr[L]; }
+        btn.disabled = false;
+      };
+      // картины из статики: 🗑 = скрыть; скрытые — списком с «↩ Вернуть»
+      const hid = wrap.querySelector('.art-hid'), list = wrap.querySelector('.art-hid-list');
+      const drawHidden = rows => {
+        hid.hidden = !rows.length; hid.querySelector('summary').textContent = `${T.adHid[L]} (${rows.length})`;
+        list.innerHTML = rows.map(r => `<figure><img src="/${esc(r.thumb)}" alt="" loading="lazy"><button type="button" class="pill-btn" data-src="${esc(r.src)}">${T.adBack[L]}</button></figure>`).join('');
+        list.querySelectorAll('[data-src]').forEach(b => b.onclick = () => post('/api/admin/art/hide', { src: b.dataset.src, hide: false }).then(() => location.reload()).catch(() => alert(T.adErr[L])));
+      };
+      let hiddenRows = x.hidden ? x.hidden.filter(r => r.gallery === name) : [];
+      drawHidden(hiddenRows);
+      gal.querySelectorAll('figure[data-src]').forEach(f => trash(f, () => {
+        if (!confirm(T.adDelQ[L])) return;
+        const src = f.dataset.src, thumb = (f.querySelector('img').getAttribute('src') || '').replace(/^\//, '');
+        post('/api/admin/art/hide', { src, thumb, gallery: name }).then(() => { f.remove(); hiddenRows = [{ src, thumb, gallery: name }, ...hiddenRows]; drawHidden(hiddenRows); }).catch(() => alert(T.adErr[L]));
+      }));
     });
   }
   // кнопка 🎨 в челлендже: случайная палитра в окне

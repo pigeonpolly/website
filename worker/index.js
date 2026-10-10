@@ -53,16 +53,24 @@ async function siteBlocks(env) {
   blocksCache = { at: Date.now(), rows };
   return rows;
 }
+let hiddenArtCache = { at: 0, rows: null };
+async function hiddenArt(env) {
+  if (hiddenArtCache.rows && Date.now() - hiddenArtCache.at < 20000) return hiddenArtCache.rows;
+  const rows = (await env.DB.prepare('SELECT src, created_at FROM art_hidden').all()).results;
+  hiddenArtCache = { at: Date.now(), rows };
+  return rows;
+}
 async function sitePage(req, env, url) {
   if (req.method !== 'GET' || !env.DB || url.searchParams.has('raw')) return env.ASSETS.fetch(req);
-  let rows;
+  let rows, hid = [];
   try { rows = await siteBlocks(env); } catch (e) { console.error(e); return env.ASSETS.fetch(req); }
+  if (/^\/(?:(?:ru|lv)\/)?art-portfolio\//.test(url.pathname)) hid = await hiddenArt(env).catch(() => []);
   // страницу просим целиком (без «If-None-Match»): ответ браузеру зависит ещё и от правок,
   // поэтому метка версии (ETag) = метка файла + версия правок
   const h = new Headers(req.headers); h.delete('if-none-match'); h.delete('if-modified-since');
   const res = await env.ASSETS.fetch(new Request(req, { headers: h }));
   if (res.status !== 200 || !(res.headers.get('content-type') || '').includes('text/html')) return res;
-  const ver = rows.length + '.' + rows.reduce((m, r) => Math.max(m, r.updated_at || 0), 0);
+  const ver = rows.length + '.' + rows.reduce((m, r) => Math.max(m, r.updated_at || 0), 0) + (hid.length ? '.h' + hid.length + '.' + hid.reduce((m, r) => Math.max(m, r.created_at || 0), 0) : '');
   const etag = `W/"${(res.headers.get('etag') || '').replace(/^W\/|"/g, '')}-${ver}"`;
   if ((req.headers.get('if-none-match') || '') === etag) return new Response(null, { status: 304, headers: { etag, 'cache-control': 'no-cache' } });
   const out = new Response(res.body, res);
@@ -77,9 +85,11 @@ async function sitePage(req, env, url) {
   // ссылка «моя птичка» (/flock/?bird=ник): в превью мессенджеров — карточка этой птички
   const bird = /^\/(?:(?:ru|lv)\/)?flock\/$/.test(url.pathname) ? String(url.searchParams.get('bird') || '').replace(/^@/, '') : '';
   const birdOk = /^[\p{L}\p{N}_.-]{2,24}$/u.test(bird);
-  if (!hidden.size && !html.size && !struct && !birdOk) return out;
+  if (!hidden.size && !html.size && !struct && !birdOk && !hid.length) return out;
   const anyLang = id => html.get(id) ?? (rows.find(r => r.id === id && r.html != null && ['en', 'ru', 'lv'].includes(r.lang)) || {}).html;
   const rw = new HTMLRewriter();
+  const hidSet = new Set(hid.map(r => r.src)); // картины, скрытые Алиной в галереях «Мой скетчбук» (вернуть — в самой галерее)
+  if (hidSet.size) rw.on('figure[data-src]', { element(el) { if (hidSet.has(el.getAttribute('data-src'))) el.remove(); } });
   if (birdOk) {
     const og = { en: [`@${bird} lives in the Pigeon Polly flock 🐦`, 'Everyone who signs in gets their own pixel bird. Get yours!'],
       ru: [`@${bird} живёт в стае Pigeon Polly 🐦`, 'Каждый, кто входит на сайт, получает свою пиксельную птичку. Заведи свою!'],
@@ -180,6 +190,8 @@ async function ensureSchema(env) {
     // pos — место в очереди палитр дней ЭКСТРА в момент добавления; hidden — убрана с сайта; removed_at — убрана и из очереди (ещё не была показана)
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS art_added (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT UNIQUE NOT NULL, gallery TEXT NOT NULL, title TEXT, colors TEXT,
       w INTEGER, h INTEGER, palette INTEGER DEFAULT 1, pos INTEGER, hidden INTEGER DEFAULT 0, created_at INTEGER, removed_at INTEGER)`),
+    // картины из статики, скрытые Алиной в галереях «Мой скетчбук» (src = images/.../x.jpg); сервер вырезает их из страниц
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS art_hidden (src TEXT PRIMARY KEY, thumb TEXT, gallery TEXT, created_at INTEGER)`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS shop (kind TEXT NOT NULL, item TEXT NOT NULL, price INTEGER DEFAULT 0, stock INTEGER DEFAULT 0, PRIMARY KEY (kind, item))`),
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
@@ -698,7 +710,8 @@ async function route(req, env, url) {
   // картины и палитры, добавленные с сайта (галереи «Мой скетчбук», раздел «Палитры», очередь дней ЭКСТРА)
   if (m === 'GET' && p === '/api/palettes') {
     const { q, rows } = await extraQueue(env, req);
-    return json({ added: rows.filter(r => !r.hidden).reverse().map(artEntry), queue: q.map(x => x.k), month: extraMonth() }, 200, { 'cache-control': 'no-cache' });
+    const hidden = (await env.DB.prepare('SELECT src, thumb, gallery FROM art_hidden ORDER BY created_at DESC').all()).results;
+    return json({ added: rows.filter(r => !r.hidden).reverse().map(artEntry), hidden, queue: q.map(x => x.k), month: extraMonth() }, 200, { 'cache-control': 'no-cache' });
   }
   if (m === 'GET' && p === '/api/extra-palettes.js') {
     const { q } = await extraQueue(env, req);
@@ -714,12 +727,13 @@ async function route(req, env, url) {
     if (!ART_GALLERIES.includes(gallery) || !full || !thumb || full.size > 6e6 || thumb.size > 2e6) fail(400, 'bad');
     const title = [0, 1, 2].map(i => String((meta.title || [])[i] || (meta.title || [])[0] || '').trim().slice(0, 80));
     const colors = (meta.colors || []).slice(0, 6).map(c => [String(c[0]).toUpperCase(), ...[1, 2, 3].map(i => String(c[i] || '').slice(0, 40))]);
-    if (!title[0] || colors.length !== 6 || !colors.every(c => /^#[0-9A-F]{6}$/.test(c[0]))) fail(400, 'bad');
+    // из галереи «Мой скетчбук» — просто картина (palette: false); со страницы «Палитры» — с палитрой и в очередь ЭКСТРА (AI-арт — никогда)
+    const palette = gallery !== 'ai-art' && meta.palette !== false ? 1 : 0;
+    if (palette && (!title[0] || colors.length !== 6 || !colors.every(c => /^#[0-9A-F]{6}$/.test(c[0])))) fail(400, 'bad');
     const key = 'art-' + Date.now().toString(36) + Math.random().toString(36).slice(2, 5);
     const meta2 = { httpMetadata: { contentType: 'image/jpeg' } };
     await Promise.all([env.MEDIA.put(`art/${key}.jpg`, await full.arrayBuffer(), meta2), env.MEDIA.put(`art/${key}-800.jpg`, await thumb.arrayBuffer(), meta2)]);
-    // в очередь ЭКСТРА: сразу после текущего месяца и после уже ждущих добавленных (AI-арт — без палитры и без очереди)
-    const palette = gallery === 'ai-art' ? 0 : 1;
+    // в очередь ЭКСТРА: сразу после текущего месяца и после уже ждущих добавленных
     let pos = null;
     if (palette) {
       const { q, rows } = await extraQueue(env, req), mine = new Set(rows.map(r => r.key)), mi = extraMonth();
@@ -729,6 +743,18 @@ async function route(req, env, url) {
       .bind(key, gallery, JSON.stringify(title), JSON.stringify(colors), Math.round(Number(meta.w) || 800), Math.round(Number(meta.h) || 600), palette, pos, now()).run();
     const row = await env.DB.prepare('SELECT * FROM art_added WHERE key = ?').bind(key).first();
     return json({ ok: true, item: artEntry(row), extraMonth: pos });
+  }
+  if (m === 'POST' && p === '/api/admin/art/hide') { // скрыть / вернуть картину из статики в галерее
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({}));
+    const src = String(b.src || ''), thumb = String(b.thumb || '');
+    if (!/^images\/[a-z0-9-]+\/[\w.-]+\.(?:jpe?g|png|webp)$/i.test(src)) fail(400, 'bad');
+    if (b.hide === false) await env.DB.prepare('DELETE FROM art_hidden WHERE src = ?').bind(src).run();
+    else await env.DB.prepare('INSERT OR REPLACE INTO art_hidden (src, thumb, gallery, created_at) VALUES (?, ?, ?, ?)')
+      .bind(src, /^images\/[\w./-]+$/.test(thumb) ? thumb : src, String(b.gallery || '').slice(0, 30), now()).run();
+    hiddenArtCache.at = 0;
+    return json({ ok: true });
   }
   if (m === 'POST' && p === '/api/admin/art/delete') {
     const u = await needUser(req, env);

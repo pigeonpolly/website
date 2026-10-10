@@ -226,7 +226,7 @@ def gallery_html(name):
         alt = esc(it.get("alt") or (f"{cap_txt} — {label} by Alina Otkinska" if cap_txt
                                      else f"{label} by Alina Otkinska, artwork {n + 1}"))
         out.append(
-            f'<figure><a href="/{it["full"]}" data-lightbox>'
+            f'<figure data-src="{esc(it["full"])}"><a href="/{it["full"]}" data-lightbox>'
             f'<img src="/{it["thumb"]}" width="{it["w"]}" height="{it["h"]}" alt="{alt}" loading="lazy" decoding="async"></a>'
             + (f"<figcaption>{cap}</figcaption>" if cap else "") + "</figure>")
     return f'<div class="gallery" data-gallery="{name}">' + "\n".join(out) + "</div>"
