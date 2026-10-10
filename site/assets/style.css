@@ -3112,3 +3112,6 @@ html:not(.is-admin) .statbar { display: none; }
 .ch-feed .section-title { max-width: none; }
 .ch3 .sw-profile-mini .sw-gifts .pill-fill { display: none; } /* «Мой профиль» уже есть кнопкой сверху */
 @media (max-width: 600px) { .ch-btns { gap: 6px; } .ch-btns .pill-btn { font-size: 14px; padding: 7px 11px; } }
+/* челлендж: в «Загрузить рисунок» — только загрузка, без карточки профиля (она в профиле) */
+.ch3 .sw-profile-mini { display: none !important; }
+.ch3 .sw-grid { grid-template-columns: minmax(0, 640px) !important; }

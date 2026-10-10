@@ -24,12 +24,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=1599a883">
+<link rel="stylesheet" href="/assets/style.css?v=58abcbcc">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <script src="/assets/site.js?v=21e5a681" defer></script>
 <script src="/assets/polly.js?v=4b77d0df" defer></script>
 <script src="/assets/birds.js?v=71711949" defer></script>
-<script src="/assets/room.js?v=43b14693" defer></script>
+<script src="/assets/room.js?v=9b540827" defer></script>
 <script src="/assets/account.js?v=4572bf12" defer></script>
 <script src="/assets/search.js?v=69d0c7a5" defer></script>
 </head>
@@ -69,7 +69,7 @@
   <p class="topics">pikseļu putniņi</p>
   <h1>Putnu bars</h1>
   <p class="lead">Ikviens, kas pieslēdzas vietnei, dzīvo šeit kā mazs pikseļu putniņš. Spied pogas un skaties, kas notiks.</p>
-  <div class="fl-top-btns"><a class="pill-btn pill-fill" href="#all-birds">🐦 Apskatīt visu baru</a><a class="pill-btn" href="#collections">🎒 Kolekcijas</a><a class="pill-btn" href="/lv/shop/">🛍 Veikals</a></div>
+  <div class="fl-top-btns"><a class="pill-btn pill-fill" href="#all-birds">🐦 Apskatīt visu baru</a><a class="pill-btn" href="/lv/shop/">🛍 Veikals</a></div>
 </section>
 <div data-ppb="flock.2" class="fl-full"><div class="blk" id="blk-flock" data-ppb="blk-flock"><style>#blk-flock .fl { padding: 56px var(--gutter) 64px; text-align: center; }
 #blk-flock .fl-kick { margin: 0 0 6px; font: italic 400 18px var(--serif); color: #F0A987; }
@@ -150,14 +150,7 @@
 </section>
 <script src="/assets/flock.js?v=cd587d74" defer></script>
 </div></div>
-<section data-ppb="flock.3" class="fl-all fl-coll" id="collections">
-  <h2 class="section-title">Kolekcijas</h2>
-  <p class="fl-all-lead">Viss, ko var savākt putniņš (kā arī kaķis vai vārna). Alīna to dāvina kā sēkliņas-dāvanas. Uzved uz lietas, lai redzētu putniņu ar to. ★ — leģendārās.</p>
-  <p class="fl-coll-me" hidden></p>
-  <div class="fl-coll-bar" role="toolbar" aria-label="Filter"></div>
-  <div class="fl-coll-box"></div>
-</section>
-<section data-ppb="flock.4" class="fl-all" id="all-birds">
+<section data-ppb="flock.3" class="fl-all" id="all-birds">
   <h2 class="section-title">Visi putni</h2>
   <p class="fl-all-lead">Pieskaries putniņam, lai apmeklētu tā profilu: istaba, soma, sasniegumi un skices.</p>
   <input type="search" class="fl-all-q" placeholder="🔍 Segvārds" aria-label="Segvārds">
@@ -181,117 +174,6 @@
   }
   q.addEventListener('input', draw);
   fetch('/api/birds').then(function (r) { return r.ok ? r.json() : { birds: [] }; }).then(function (d) { list = d.birds || []; draw(); }).catch(function () {});
-})();
-</script>
-<script>
-// «Коллекции»: все вещи из каталога подарков (PPBirds.GIFTS) — появляются здесь сами, когда добавляются новые;
-// вошедшему видно, что у него уже есть (✓)
-(function () {
-  var L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
-  var T = { got: ['You have {n} of {t}', 'У вас {n} из {t}', 'Tev ir {n} no {t}'], have: ['✓ yours', '✓ есть', '✓ ir'], gift: ['🎁 not opened', '🎁 не открыт', '🎁 nav atvērts'],
-    adv: ['📅 Advent', '📅 Адвент', '📅 Advente'], advT: ['Advent windows for “{n}”', 'Окошки адвента для «{n}»', 'Adventes lodziņi lietai “{n}”'],
-    advH: ['🔒 Only you see this. Tap the days this thing should be in. If a window has several things, each bird gets one of them at random; an empty window gives buttons. ★ — special windows, the 31st is the legendary one.',
-      '🔒 Видите только вы. Отметьте дни, в окошках которых будет эта вещь. Если в окошке несколько вещей, каждой птичке достанется одна из них; пустое окошко даёт пуговки. ★ — особые окошки, 31-е — легендарное.',
-      '🔒 Redzi tikai tu. Atzīmē dienas, kuru lodziņos būs šī lieta. Ja lodziņā ir vairākas lietas, katrs putniņš saņem vienu no tām; tukšs lodziņš dod pogas. ★ — īpašie lodziņi, 31. — leģendārais.'],
-    advLegend: ['Inside each day you see what is already in that window. Dark — this thing is there.', 'В каждом дне видно, что уже лежит в этом окошке. Тёмный — там эта вещь.', 'Katrā dienā redzams, kas jau ir šajā lodziņā. Tumšs — tur ir šī lieta.'],
-    advEmpty: ['empty — buttons', 'пусто — пуговки', 'tukšs — pogas'], advDec: ['December {d}', '{d} декабря', '{d}. decembris'], done: ['Done', 'Готово', 'Gatavs'] };
-  var ADV_SP = [6, 12, 19, 24, 31], plan = null; // как ADVENT_SPECIAL в worker/index.js
-  var box = document.querySelector('.fl-coll-box'), bar = document.querySelector('.fl-coll-bar'), me = null, owned = {}, filter = 'all';
-  var ALL = ['All', 'Все', 'Visi'];
-  function buttons() {
-    var B = window.PPBirds; if (!B || bar.children.length) return;
-    var add = function (key, label, cls) { var b = document.createElement('button'); b.type = 'button'; b.className = 'pill-btn ' + (cls || ''); b.dataset.f = key; b.textContent = label; b.onclick = function () { filter = key; draw(); }; bar.appendChild(b); };
-    add('all', ALL[L]);
-    B.GIFT_KINDS.forEach(function (k) { add('kind:' + k[0], k[1][L]); });
-    var br = document.createElement('span'); br.className = 'fl-coll-br'; bar.appendChild(br);
-    B.GIFT_THEMES.forEach(function (t) { add('theme:' + t[0], t[1][L], 'fl-theme'); });
-    if (plan) add('advent', T.adv[L], 'fl-adv');
-  }
-  var advKey = function (k, v) { return k + '|' + v; };
-  function advDays(k, v) { return (plan || []).filter(function (p) { return p.kind === k && p.item === v; }).map(function (p) { return p.day; }); }
-  function advSet(day, k, v, on) {
-    return fetch('/api/admin/advent', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ day: day, kind: k, item: v, on: on }) })
-      .then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (x) { plan = x.plan; });
-  }
-  // окно выбора дней для вещи
-  function advPick(k, v) {
-    var B = window.PPBirds, d = document.createElement('dialog'); d.className = 'fl-adv-dlg';
-    var draw2 = function () {
-      var on = advDays(k, v);
-      d.innerHTML = '<h3>' + T.advT[L].replace('{n}', B.giftName(k, v, L)) + '</h3><p>' + T.advH[L] + ' ' + T.advLegend[L] + '</p><div class="fl-adv-days">' +
-        Array.from({ length: 31 }, function (_, i) { var n = i + 1; return '<button type="button" data-d="' + n + '" aria-pressed="' + (on.indexOf(n) >= 0) + '" class="' + (ADV_SP.indexOf(n) >= 0 ? 'sp' : '') + (n === 31 ? ' leg' : '') + '">' + n + (ADV_SP.indexOf(n) >= 0 ? '★' : '') + '</button>'; }).join('') +
-        '</div><button type="button" class="pill-btn pill-fill" data-x>' + T.done[L] + '</button>';
-      d.querySelector('[data-x]').onclick = function () { d.close(); d.remove(); draw(); };
-      // в каждом дне — что уже лежит в этом окошке (картинки, при наведении — названия)
-      [].forEach.call(d.querySelectorAll('[data-d]'), function (b) {
-        var n = +b.dataset.d, inDay = (plan || []).filter(function (p) { return p.day === n; });
-        if (!inDay.length) return;
-        b.title = inDay.map(function (p) { return B.giftName(p.kind, p.item, L); }).join(', ');
-        var mini = document.createElement('span'); mini.className = 'fl-adv-mini';
-        inDay.slice(0, 3).forEach(function (p) { mini.appendChild(B.itemIcon(p.kind, p.item, 22, me ? me.id : 2)); });
-        if (inDay.length > 3) { var more = document.createElement('em'); more.textContent = '+' + (inDay.length - 3); mini.appendChild(more); }
-        b.appendChild(mini); b.classList.add('has');
-      });
-      [].forEach.call(d.querySelectorAll('[data-d]'), function (b) { b.onclick = function () { b.disabled = true; advSet(+b.dataset.d, k, v, b.getAttribute('aria-pressed') !== 'true').then(draw2).catch(function () { b.disabled = false; }); }; });
-    };
-    draw2(); document.body.appendChild(d); d.showModal();
-    d.addEventListener('cancel', function () { d.remove(); draw(); });
-  }
-  // «📅 Адвент»: по датам — что лежит в каждом окошке (✕ убрать)
-  function advBoard() {
-    var B = window.PPBirds, id = me ? me.id : 2;
-    for (var n = 1; n <= 31; n++) {
-      var row = document.createElement('div'); row.className = 'fl-adv-row' + (ADV_SP.indexOf(n) >= 0 ? ' sp' : '') + (n === 31 ? ' leg' : '');
-      var h = document.createElement('b'); h.textContent = T.advDec[L].replace('{d}', n) + (ADV_SP.indexOf(n) >= 0 ? ' ★' : ''); row.appendChild(h);
-      var list = (plan || []).filter(function (p) { return p.day === n; });
-      if (!list.length) { var e = document.createElement('small'); e.textContent = T.advEmpty[L]; row.appendChild(e); }
-      list.forEach(function (p) {
-        var it = document.createElement('span'); it.className = 'fl-adv-it'; it.title = B.giftName(p.kind, p.item, L);
-        it.appendChild(B.itemIcon(p.kind, p.item, 44, id));
-        var x = document.createElement('button'); x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', '✕ ' + it.title);
-        x.onclick = function () { advSet(p.day, p.kind, p.item, false).then(draw); };
-        it.appendChild(x); row.appendChild(it);
-      });
-      box.appendChild(row);
-    }
-  }
-  function draw() {
-    var B = window.PPBirds; if (!B) return;
-    buttons();
-    [].forEach.call(bar.children, function (b) { if (b.dataset) b.setAttribute('aria-pressed', String(b.dataset.f === filter)); });
-    var id = me ? me.id : 2, total = 0, have = 0;
-    var theme = filter.indexOf('theme:') === 0 ? B.GIFT_THEMES.filter(function (t) { return 'theme:' + t[0] === filter; })[0] : null;
-    box.innerHTML = '';
-    if (filter === 'advent') { advBoard(); return; }
-    B.GIFT_KINDS.forEach(function (k) {
-      if (filter.indexOf('kind:') === 0 && filter !== 'kind:' + k[0]) return;
-      var list = (B.GIFTS[k[0]] || []).filter(function (v) { return !theme || theme[2].indexOf(k[0] + '|' + v) >= 0; }); if (!list.length) return;
-      var h = document.createElement('h3'); h.textContent = k[1][L]; box.appendChild(h);
-      var g = document.createElement('div'); g.className = 'fl-coll-grid'; box.appendChild(g);
-      list.forEach(function (v) {
-        total++;
-        var st = owned[k[0] + '|' + v], t = document.createElement('figure'), leg = B.LEGEND && B.LEGEND.has(k[0] + '|' + v);
-        t.className = 'fl-coll-item' + (st ? ' got' : '') + (leg ? ' legend' : '');
-        t.appendChild(B.giftPic(k[0], v, id, 84, me && me.avatar));
-        if (leg) { var lt = document.createElement('span'); lt.className = 'legend-tag'; lt.textContent = '★'; lt.title = 'Legendary'; t.appendChild(lt); }
-        var c = document.createElement('figcaption'); c.textContent = B.giftName(k[0], v, L); t.appendChild(c);
-        if (st) { have++; var m = document.createElement('span'); m.className = 'fl-coll-mark'; m.textContent = st === 'new' ? T.gift[L] : T.have[L]; t.appendChild(m); }
-        if (plan) { // админ: в какие окошки адвента положена вещь
-          var ab = document.createElement('button'); ab.type = 'button'; ab.className = 'fl-adv-btn'; var ds = advDays(k[0], v);
-          ab.textContent = '📅' + (ds.length ? ' ' + ds.sort(function (a, b) { return a - b; }).join(', ') : ''); ab.classList.toggle('on', !!ds.length);
-          ab.onclick = (function (kk, vv) { return function () { advPick(kk, vv); }; })(k[0], v); t.appendChild(ab);
-        }
-        g.appendChild(t);
-      });
-    });
-    var mm = document.querySelector('.fl-coll-me');
-    if (me) { mm.hidden = false; mm.textContent = T.got[L].replace('{n}', have).replace('{t}', total); }
-  }
-  fetch('/api/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; }).then(function (d) {
-    if (d && d.user) { me = d.user; (d.user.gifts || []).forEach(function (g) { if (g.status === 'bag' || !owned[g.kind + '|' + g.item]) owned[g.kind + '|' + g.item] = g.status; }); }
-    if (me && me.admin) return fetch('/api/advent', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (a) { plan = a.plan || []; bar.innerHTML = ''; draw(); });
-    draw();
-  }).catch(draw);
 })();
 </script>
 

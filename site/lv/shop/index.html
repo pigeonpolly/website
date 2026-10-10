@@ -24,12 +24,12 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=1599a883">
+<link rel="stylesheet" href="/assets/style.css?v=58abcbcc">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <script src="/assets/site.js?v=21e5a681" defer></script>
 <script src="/assets/polly.js?v=4b77d0df" defer></script>
 <script src="/assets/birds.js?v=71711949" defer></script>
-<script src="/assets/room.js?v=43b14693" defer></script>
+<script src="/assets/room.js?v=9b540827" defer></script>
 <script src="/assets/account.js?v=4572bf12" defer></script>
 <script src="/assets/search.js?v=69d0c7a5" defer></script>
 </head>
@@ -94,10 +94,66 @@
     onSale: ['🛍 In stock', '🛍 В наличии', '🛍 Pārdošanā'], gone: ['Out of stock', 'Нет в наличии', 'Nav pieejams'],
     count: ['You have {n} of {m}', 'У вас {n} из {m}', 'Tev ir {n} no {m}'], max: ['✓ You have the maximum', '✓ У вас максимум', '✓ Tev ir maksimums'],
     legend: ['★ Legendary: one per bird, cannot be gifted', '★ Легендарная: одна на птичку, дарить нельзя', '★ Leģendāra: viena putniņam, dāvināt nevar'],
+    adv: ['📅 Advent', '📅 Адвент', '📅 Advente'], advT: ['Advent windows for “{n}”', 'Окошки адвента для «{n}»', 'Adventes lodziņi lietai “{n}”'],
+    advH: ['🔒 Only you see this. Tap the days this thing should be in. If a window has several things, each bird gets one of them at random; an empty window gives buttons. ★ — special windows, the 31st is the legendary one.',
+      '🔒 Видите только вы. Отметьте дни, в окошках которых будет эта вещь. Если в окошке несколько вещей, каждой птичке достанется одна из них; пустое окошко даёт пуговки. ★ — особые окошки, 31-е — легендарное.',
+      '🔒 Redzi tikai tu. Atzīmē dienas, kuru lodziņos būs šī lieta. Ja lodziņā ir vairākas lietas, katrs putniņš saņem vienu no tām; tukšs lodziņš dod pogas. ★ — īpašie lodziņi, 31. — leģendārais.'],
+    advLegend: ['Inside each day you see what is already in that window. Dark — this thing is there.', 'В каждом дне видно, что уже лежит в этом окошке. Тёмный — там эта вещь.', 'Katrā dienā redzams, kas jau ir šajā lodziņā. Tumšs — tur ir šī lieta.'],
+    advEmpty: ['empty — buttons', 'пусто — пуговки', 'tukšs — pogas'], advDec: ['December {d}', '{d} декабря', '{d}. decembris'], done: ['Done', 'Готово', 'Gatavs'],
     rule: ['You can buy up to 3 of the same thing (legendary ones: just 1).', 'Одну и ту же вещь можно купить до 3 штук (легендарные — только 1).', 'Vienu un to pašu lietu var nopirkt līdz 3 gab. (leģendārās — tikai 1).'],
   };
   var bar = document.querySelector('.shop-bar'), box = document.querySelector('.shop-box'), meEl = document.querySelector('.shop-me');
   var me = null, owned = {}, shop = {}, filter = 'all';
+  var ADV_SP = [6, 12, 19, 24, 31], plan = null; // админ: что в окошках адвента (как ADVENT_SPECIAL в worker/index.js)
+  var advKey = function (k, v) { return k + '|' + v; };
+  function advDays(k, v) { return (plan || []).filter(function (p) { return p.kind === k && p.item === v; }).map(function (p) { return p.day; }); }
+  function advSet(day, k, v, on) {
+    return fetch('/api/admin/advent', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ day: day, kind: k, item: v, on: on }) })
+      .then(function (r) { if (!r.ok) throw 0; return r.json(); }).then(function (x) { plan = x.plan; });
+  }
+  // окно выбора дней для вещи
+  function advPick(k, v) {
+    var B = window.PPBirds, d = document.createElement('dialog'); d.className = 'fl-adv-dlg';
+    var draw2 = function () {
+      var on = advDays(k, v);
+      d.innerHTML = '<h3>' + T.advT[L].replace('{n}', B.giftName(k, v, L)) + '</h3><p>' + T.advH[L] + ' ' + T.advLegend[L] + '</p><div class="fl-adv-days">' +
+        Array.from({ length: 31 }, function (_, i) { var n = i + 1; return '<button type="button" data-d="' + n + '" aria-pressed="' + (on.indexOf(n) >= 0) + '" class="' + (ADV_SP.indexOf(n) >= 0 ? 'sp' : '') + (n === 31 ? ' leg' : '') + '">' + n + (ADV_SP.indexOf(n) >= 0 ? '★' : '') + '</button>'; }).join('') +
+        '</div><button type="button" class="pill-btn pill-fill" data-x>' + T.done[L] + '</button>';
+      d.querySelector('[data-x]').onclick = function () { d.close(); d.remove(); draw(); };
+      // в каждом дне — что уже лежит в этом окошке (картинки, при наведении — названия)
+      [].forEach.call(d.querySelectorAll('[data-d]'), function (b) {
+        var n = +b.dataset.d, inDay = (plan || []).filter(function (p) { return p.day === n; });
+        if (!inDay.length) return;
+        b.title = inDay.map(function (p) { return B.giftName(p.kind, p.item, L); }).join(', ');
+        var mini = document.createElement('span'); mini.className = 'fl-adv-mini';
+        inDay.slice(0, 3).forEach(function (p) { mini.appendChild(B.itemIcon(p.kind, p.item, 22, me ? me.id : 2)); });
+        if (inDay.length > 3) { var more = document.createElement('em'); more.textContent = '+' + (inDay.length - 3); mini.appendChild(more); }
+        b.appendChild(mini); b.classList.add('has');
+      });
+      [].forEach.call(d.querySelectorAll('[data-d]'), function (b) { b.onclick = function () { b.disabled = true; advSet(+b.dataset.d, k, v, b.getAttribute('aria-pressed') !== 'true').then(draw2).catch(function () { b.disabled = false; }); }; });
+    };
+    draw2(); document.body.appendChild(d); d.showModal();
+    d.addEventListener('cancel', function () { d.remove(); draw(); });
+  }
+  // «📅 Адвент»: по датам — что лежит в каждом окошке (✕ убрать)
+  function advBoard() {
+    var B = window.PPBirds, id = me ? me.id : 2;
+    for (var n = 1; n <= 31; n++) {
+      var row = document.createElement('div'); row.className = 'fl-adv-row' + (ADV_SP.indexOf(n) >= 0 ? ' sp' : '') + (n === 31 ? ' leg' : '');
+      var h = document.createElement('b'); h.textContent = T.advDec[L].replace('{d}', n) + (ADV_SP.indexOf(n) >= 0 ? ' ★' : ''); row.appendChild(h);
+      var list = (plan || []).filter(function (p) { return p.day === n; });
+      if (!list.length) { var e = document.createElement('small'); e.textContent = T.advEmpty[L]; row.appendChild(e); }
+      list.forEach(function (p) {
+        var it = document.createElement('span'); it.className = 'fl-adv-it'; it.title = B.giftName(p.kind, p.item, L);
+        it.appendChild(B.itemIcon(p.kind, p.item, 44, id));
+        var x = document.createElement('button'); x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', '✕ ' + it.title);
+        x.onclick = function () { advSet(p.day, p.kind, p.item, false).then(draw); };
+        it.appendChild(x); row.appendChild(it);
+      });
+      box.appendChild(row);
+    }
+  }
+
   function key(k, v) { return k + '|' + v; }
   function buttons() {
     var B = window.PPBirds; if (!B || bar.children.length) return;
@@ -106,6 +162,7 @@
     B.GIFT_KINDS.forEach(function (k) { add('kind:' + k[0], k[1][L]); });
     var br = document.createElement('span'); br.className = 'fl-coll-br'; bar.appendChild(br);
     B.GIFT_THEMES.forEach(function (t) { add('theme:' + t[0], t[1][L], 'fl-theme'); });
+    if (plan) add('advent', T.adv[L], 'fl-adv');
   }
   function head() {
     meEl.innerHTML = '';
@@ -122,6 +179,11 @@
     info.innerHTML = s.stock > 0 ? '<b>' + (s.price ? '🔘 ' + s.price : T.free[L]) + '</b><small>' + T.left[L].replace('{n}', s.stock) + '</small>' : '<small>' + T.sold[L] + '</small>';
     t.appendChild(info);
     if (have) { var m = document.createElement('span'); m.className = 'fl-coll-mark'; m.textContent = have >= lim ? T.max[L] : T.count[L].replace('{n}', have).replace('{m}', lim); t.appendChild(m); }
+    if (plan) { // админ: в какие окошки адвента положена вещь
+      var ab = document.createElement('button'); ab.type = 'button'; ab.className = 'fl-adv-btn'; var ds = advDays(k[0], v);
+      ab.textContent = '📅' + (ds.length ? ' ' + ds.sort(function (a, b) { return a - b; }).join(', ') : ''); ab.classList.toggle('on', !!ds.length);
+      ab.onclick = function () { advPick(k[0], v); }; t.appendChild(ab);
+    }
     if (s.stock > 0 && me && have < lim) {
       var b = document.createElement('button'); b.type = 'button'; b.className = 'pill-btn shop-buy';
       b.textContent = money >= s.price ? T.buy[L] : T.poor[L]; b.disabled = money < s.price;
@@ -136,6 +198,7 @@
     var id = me ? me.id : 2, money = me && me.btn ? me.btn.buttons : 0;
     var theme = filter.indexOf('theme:') === 0 ? B.GIFT_THEMES.filter(function (t) { return 'theme:' + t[0] === filter; })[0] : null;
     box.innerHTML = '';
+    if (filter === 'advent') { advBoard(); return; }
     var rule = document.createElement('p'); rule.className = 'fl-all-lead'; rule.textContent = T.rule[L]; box.appendChild(rule);
     // сначала то, что есть в наличии, ниже — чего нет
     [true, false].forEach(function (inStock) {
@@ -177,6 +240,7 @@
       shop = {}; (a[0].items || []).forEach(function (r) { shop[key(r.kind, r.item)] = r; });
       me = a[1] && a[1].user ? a[1].user : null; owned = {};
       if (me) (me.gifts || []).forEach(function (g) { if (g.status === 'bag' || g.status === 'new') owned[key(g.kind, g.item)] = (owned[key(g.kind, g.item)] || 0) + 1; });
+      if (me && me.admin && !plan) return fetch('/api/advent', { credentials: 'same-origin' }).then(function (r) { return r.json(); }).then(function (x) { plan = x.plan || []; bar.innerHTML = ''; draw(); });
       draw();
     });
   }
