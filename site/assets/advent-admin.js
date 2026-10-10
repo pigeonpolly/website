@@ -84,9 +84,13 @@
         });
       });
       var fbtn = function (k, label) { return '<button type="button" data-f="' + k + '" aria-pressed="' + (f === k) + '">' + label + '</button>'; };
+      var RK = B.ROOM_KINDS || [], kb = function (pred) { return B.GIFT_KINDS.filter(function (k) { return pred(k[0]); }).map(function (k) { return fbtn('kind:' + k[0], k[1][L]); }).join(''); };
       d.innerHTML = '<h3>' + T.advDec[L].replace('{d}', day) + (ADV_SP.indexOf(day) >= 0 ? ' ★' : '') + '</h3><p>' + T.advDayH[L] + '</p>' +
         '<input type="search" class="fl-adv-q" placeholder="🔍" value="' + q.replace(/"/g, '') + '">' +
-        '<div class="fl-adv-f">' + fbtn('in', T.advIn[L] + ' (' + inDay.length + ')') + fbtn('all', T.all[L]) + B.GIFT_KINDS.map(function (k) { return fbtn('kind:' + k[0], k[1][L]); }).join('') + B.GIFT_THEMES.map(function (t) { return fbtn('theme:' + t[0], t[1][L]); }).join('') + '</div>' +
+        '<div class="fl-adv-f"><div>' + fbtn('in', T.advIn[L] + ' (' + inDay.length + ')') + fbtn('all', T.all[L]) + fbtn('theme:surprise', '🎲 Сюрпризы') + fbtn('theme:legendary', '★ Легендарные') + '</div>' +
+        '<div><b>🐦 Для птички:</b>' + kb(function (k) { return k !== 'any' && RK.indexOf(k) < 0; }) + '</div>' +
+        '<div><b>🏠 Для комнаты:</b>' + kb(function (k) { return RK.indexOf(k) >= 0; }) + '</div>' +
+        '<div><b>Темы:</b>' + B.GIFT_THEMES.filter(function (t) { return t[0] !== 'surprise' && t[0] !== 'legendary'; }).map(function (t) { return fbtn('theme:' + t[0], t[1][L]); }).join('') + '</div></div>' +
         '<div class="fl-adv-pick"></div><button type="button" class="pill-btn pill-fill" data-x>' + T.done[L] + '</button>';
       var g = d.querySelector('.fl-adv-pick');
       list.forEach(function (kv) {

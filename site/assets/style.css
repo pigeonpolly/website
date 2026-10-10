@@ -3144,3 +3144,7 @@ html:not(.is-admin) .statbar { display: none; }
 /* подписи под заголовками страниц — шире (Алина: «не заполняют в длину, остаётся пустое место») */
 .page-head { max-width: none; }
 .page-head .lead, .section-lead, .fl-all-lead, .sw-lead { max-width: none; }
+/* окно дня адвента: фильтры строками, все видны */
+.fl-adv-f { max-height: none !important; overflow: visible !important; display: grid !important; gap: 5px; }
+.fl-adv-f > div { display: flex; flex-wrap: wrap; gap: 5px; align-items: center; }
+.fl-adv-f b { font: 700 12px 'Karla', sans-serif; margin-right: 2px; color: #5B5280; }
