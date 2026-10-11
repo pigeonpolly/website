@@ -283,7 +283,7 @@
   function showOverlay() {
     ov.hidden = false;
     const payLine = info.on && info.per > 0 ? `<p class="rain-pay">${t('pay', info.per)}${info.max > 0 ? ' ' + t('cap', info.max) : ''}${info.me ? ` <b>${info.max > 0 ? t('today', info.today, info.max) : t('today0', info.today)}</b>` : ''}</p>` : `<p class="rain-pay">${t('payOff')}</p>`;
-    const extra = `${info.record > 0 && info.on ? `<p class="rain-pay">${t('recRule', info.record)}</p>` : ''}${info.avg ? `<p class="rain-pay">${t('index')}</p>` : ''}${info.every > 0 ? `<p class="rain-pay">${t('itemRule', info.every)}</p>` : ''}${info.king > 0 ? `<p class="rain-pay">${t('kingRule', info.king)}</p>` : ''}`;
+    const extra = `${info.record > 0 && info.on ? `<p class="rain-pay">${t('recRule', info.record)}</p>` : ''}${info.every > 0 ? `<p class="rain-pay">${t('itemRule', info.every)}</p>` : ''}${info.king > 0 ? `<p class="rain-pay">${t('kingRule', info.king)}</p>` : ''}`;
     const guest = info.me ? '' : `<p class="rain-guest">${t('guest')} <button type="button" class="pill-btn rain-in">${t('signin')}</button></p>`;
     if (state === 'menu') ov.innerHTML = `<div class="rain-card"><h2>🔘 ${t('title')}</h2><p>${t('how')}</p>${info.best ? `<p class="rain-best">${t('best', info.best)}</p>` : ''}<button type="button" class="pill-btn pill-fill rain-go">${t('play')}</button>${guest}<div class="rain-rules"><p>${t('levels')}</p>${payLine}${extra}</div></div>`;
     else if (state === 'pause') ov.innerHTML = `<div class="rain-card"><h2>${t('paused')}</h2><button type="button" class="pill-btn pill-fill rain-go">${t('resume')}</button></div>`;

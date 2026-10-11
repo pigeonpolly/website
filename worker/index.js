@@ -40,6 +40,7 @@ export default {
     await setMeta(env, 'cron_at', String(Date.now())).catch(() => {}); // для «🤖 Автопилота» в кабинете: расписание живо
     ctx.waitUntil((async () => {
       if (!(await getMeta(env, 'buttons_backfill'))) await backfillButtons(env).catch(e => console.error('backfill', e)); // разовое начисление пуговок за прошлое
+      await autoPrice(env).catch(e => console.error('price', e)); // раз в сутки: уровень цен под заработки птичек
       await autoRestock(env).catch(e => console.error('restock', e)); // раз в сутки (по Риге) пополнить магазин
       await migrateToR2(env); await cleanupInactive(env);
       await env.DB.prepare('DELETE FROM game_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {}); // старые забеги игр (started — в мс)
@@ -331,7 +332,7 @@ const RULE_DEFAULTS = {
   // «Зельеварня»: 🔘 за новое зелье по уровням (обычное / вкусное / вкус детства), за повторное, лимит в сутки; лабиринт быстрее potionMinSec с не засчитывается
   potionOn: true, potion1Pct: 4, potion2Pct: 12, potion3Pct: 35, potionAgainPct: 1, potionDayMaxPct: 60, potionMinSec: 8,
   potionSeason: 'auto', potionShelf: true, // сезон зельеварни (auto — по календарю) и бутылочка в комнату за новое зелье «Вкус детства» // «Пуговичный дождь»: 🔘 за пройденный уровень, не больше gameDayMax в сутки; уровень быстрее gameMinSec с — не засчитывается
-  indexOn: true, indexBase: 0, // индексация обычных пуговок по средней цене вещи (0 — стартовая цена = цена в день включения)
+  indexOn: false, indexBase: 0, priceDays: 4, catMult: {}, // indexOn: пуговки за цены — выключено: теперь цены сами следуют за пуговками; priceDays — за сколько дней обычной активности средняя птичка зарабатывает на среднюю вещь // индексация обычных пуговок по средней цене вещи (0 — стартовая цена = цена в день включения)
   restockOn: true, restockTo: 0, // раз в сутки: у всех вещей, кроме легендарных, остаток дотягивается до restockTo шт. (0 — до «обычного запаса») // продажа вещей обратно в магазин: одна цена за любую вещь
   // условия бейджей (числа из описаний «как получить»)
   cond: { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4,
@@ -341,7 +342,7 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120] };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120] };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -361,6 +362,7 @@ function cleanRules(r) {
   for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec']) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
+  out.catMult = {}; if (r.catMult && typeof r.catMult === 'object') for (const k of GIFT_KINDS) { const v = Number(r.catMult[k]); if (Number.isFinite(v) && v !== 100) out.catMult[k] = Math.max(10, Math.min(1000, Math.round(v))); }
   if (out.priceMin > out.priceMax) out.priceMin = out.priceMax;
   if (out.lowPct > out.normPct) out.lowPct = out.normPct;
   if (out.manyPct < out.normPct) out.manyPct = out.normPct;
@@ -372,13 +374,14 @@ async function loadRules(env) {
   RULES = cleanRules(parseJ(await getMeta(env, 'rules'), null));
   // пуговки — в общий объект BTN (по нему всё начисляется и показывается людям)
   try { const b = await env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE nick IS NOT NULL AND banned = 0').first(); STOCK = stockLevels(b ? b.n : 0); } catch (e) { STOCK = stockLevels(STOCK.birds); }
+  try { if (!CAT_P) CAT_P = (await catalog(env, new Request('https://pigeonpolly.com/'))).prices || {}; const pl = parseJ(await getMeta(env, 'price_level'), null); if (pl && pl.L > 0) PLEVEL = pl; else await autoPrice(env); } catch (e) { /* по умолчанию L = 1 */ }
   // индексация: все пуговки (заход, рисунок, комментарий, друг, «Выбор Полли», уровни, бейджи, адвент) × (средняя цена вещи сегодня ÷ стартовая цена);
   // стартовая — RULES.indexBase или (0) средняя цена в день включения (meta 'index_base'), поэтому сразу после включения ничего не меняется
   let avg = 0, base = 0;
   try { avg = (await gameUnit(env)).avg; base = RULES.indexBase > 0 ? RULES.indexBase : Number(await getMeta(env, 'index_base')) || 0; if (!base && avg) { base = avg; await setMeta(env, 'index_base', String(avg)); } } catch (e) { /* без индексации */ }
-  const k = RULES.indexOn && avg > 0 && base > 0 ? avg / base : 1, ix = n => n > 0 ? Math.max(1, Math.round(n * k)) : 0;
+  const k = 1, ix = n => n > 0 ? Math.max(1, Math.round(n * k)) : 0; // индексация отключена (11.10.2026): цены сами следуют за пуговками (autoPrice), иначе цены и пуговки разгоняли бы друг друга
   Object.assign(BTN, { daily: ix(RULES.daily), upload: ix(RULES.upload), comment: ix(RULES.comment), commentsPerDay: RULES.commentsPerDay, friend: ix(RULES.friend), pick: ix(RULES.pick),
-    advent: ix(RULES.adventButtons), adventSpecial: ix(RULES.adventSpecialButtons), index: { on: RULES.indexOn, k: Math.round(k * 100) / 100, avg, base } });
+    advent: ix(RULES.adventButtons), adventSpecial: ix(RULES.adventSpecialButtons), index: { on: false, k: 1, avg, base } });
   for (const [d, n] of Object.entries(RULES.levels)) BTN.levels[d] = ix(n);
   for (const [b, n] of Object.entries(RULES.badges)) BTN.badges[b] = ix(n);
   BTN.cond = RULES.cond; BTN.sell = RULES.sellOn ? RULES.sellPrice : null;  // цена продажи вещи в магазин (null — продажа выключена) // условия бейджей уходят людям вместе с наградами (описания «как получить» подставляют числа)
@@ -402,7 +405,53 @@ function effPrice(base, stock, leg) {
   const f = Math.max(RULES.priceMin, Math.min(RULES.priceMax, Math.pow((leg ? STOCK.normLeg : STOCK.norm) / Math.max(1, stock || 0), 0.4)));
   return Math.max(5, Math.round(base * f / 5) * 5);
 }
-const shopRow = r => ({ kind: r.kind, item: r.item, base: r.price, stock: r.stock, added: r.added_at || 0, price: effPrice(r.price, r.stock, LEGEND.has(r.kind + '|' + r.item) || r.item === 'legend') });
+// ---------- цены магазина: сами (11.10.2026, «хочу менять только % категорий и цены легендарных») ----------
+// обычная вещь: ценность из каталога × % категории (RULES.catMult) × уровень цен PLEVEL.L (сам подстраивается под заработки птичек, autoPrice) × остаток;
+// легендарная — ровно та цена, что поставила Алина (shop.price), без множителей
+let PLEVEL = { L: 1 }, CAT_P = null;
+const isLeg = (kind, item) => LEGEND.has(kind + '|' + item) || item === 'legend';
+const catMul = kind => ((RULES.catMult || {})[kind] || 100) / 100;
+function baseNow(kind, item, base) {
+  if (isLeg(kind, item)) return base > 0 ? base : 0;
+  const v = (CAT_P && CAT_P[kind + '|' + item]) || base;
+  return v > 0 ? Math.round(v * catMul(kind) * PLEVEL.L) : 0;
+}
+function priceNow(kind, item, base, stock) {
+  const b = baseNow(kind, item, base);
+  if (!(b > 0)) return 0;
+  return isLeg(kind, item) ? b : effPrice(b, stock, false); // легендарные — ровно как поставлено
+}
+const shopRow = r => ({ kind: r.kind, item: r.item, base: baseNow(r.kind, r.item, r.price), stock: r.stock, added: r.added_at || 0, price: priceNow(r.kind, r.item, r.price, r.stock), leg: isLeg(r.kind, r.item) });
+// уровень цен раз в сутки: медианный заработок активной птички (≥ 3 дней из 14) за день активности (без зарплаты, подарков админа и продаж) × RULES.priceDays = средняя цена вещи;
+// если птички много накопили (в среднем больше 10 средних вещей) — чуть дороже; меняется не больше чем на 10 % в день
+async function autoPrice(env, force = false) {
+  const day = rigaDay(), cur = parseJ(await getMeta(env, 'price_level'), null);
+  if (!force && cur && cur.day === day) return cur;
+  const cat = await catalog(env, new Request('https://pigeonpolly.com/')), cp = cat.prices || {}, leg = new Set(cat.legend || []);
+  const keys = Object.entries(cat.items || {}).flatMap(([k, vs]) => vs.map(v => k + '|' + v)).filter(x => !leg.has(x) && cp[x] > 0);
+  const avgVal = keys.length ? keys.reduce((a, x) => a + cp[x] * catMul(x.split('|')[0]), 0) / keys.length : 0;
+  let L = cur ? cur.L : 0;
+  if (!L) { // первый запуск: уровень такой, чтобы средняя цена осталась как была
+    const rows = (await env.DB.prepare('SELECT kind, item, price FROM shop WHERE price > 0').all()).results.filter(r => cp[r.kind + '|' + r.item] > 0 && !isLeg(r.kind, r.item));
+    const was = rows.length ? rows.reduce((a, r) => a + r.price, 0) / rows.length : 0, val = rows.length ? rows.reduce((a, r) => a + cp[r.kind + '|' + r.item], 0) / rows.length : 0;
+    L = was && val ? Math.max(0.2, Math.min(5, was / val)) : 1;
+  }
+  const since = now() - 14 * 86400;
+  // активная птичка — зарабатывала хотя бы 3 разных дня из 14; её заработок — за один день активности
+  const inc = (await env.DB.prepare("SELECT b.user_id, SUM(b.amount) AS s, COUNT(DISTINCT b.day) AS days, MAX(u.buttons) AS bal FROM button_log b JOIN users u ON u.id = b.user_id WHERE b.amount > 0 AND b.created_at >= ? AND b.kind NOT IN ('admin', 'salary', 'sell') AND u.banned = 0 GROUP BY b.user_id").bind(since).all()).results.filter(r => r.s > 0 && r.days >= 3);
+  let income = 0, target = 0, Lt = L;
+  if (inc.length >= 3 && avgVal > 0) {
+    const ss = inc.map(r => r.s / r.days).sort((a, b) => a - b); income = ss[ss.length >> 1];
+    target = income * RULES.priceDays;
+    const avgBal = inc.reduce((a, r) => a + (r.bal || 0), 0) / inc.length;
+    if (avgBal > 10 * avgVal * L) target *= 1.15;
+    Lt = Math.max(0.2, Math.min(5, target / avgVal));
+    L = L * Math.max(0.9, Math.min(1.1, Lt / L));
+  }
+  const out = { day, L: Math.round(L * 1000) / 1000, income: Math.round(income * 10) / 10, target: Math.round(target), active: inc.length, avg: Math.round(avgVal * L) };
+  await setMeta(env, 'price_level', JSON.stringify(out)); PLEVEL = out;
+  return out;
+}
 // один раз: всем вещам — ценность из каталога (site/assets/catalog.json → prices, считает tools/catalog.js)
 // ежедневное пополнение: только закончившиеся вещи (остаток 0 или ещё нет в магазине), кроме легендарных, — до цели; остальные не трогаем
 async function autoRestock(env, force = false) {
@@ -818,12 +867,9 @@ let UNIT = null;
 async function gameUnit(env, force = false) {
   const day = rigaDay();
   if (!force && UNIT && UNIT.day === day) return UNIT;
-  const saved = force ? null : parseJ(await getMeta(env, 'unit'), null);
-  if (saved && saved.day === day && saved.avg > 0) return (UNIT = saved);
-  const rows = (await env.DB.prepare("SELECT kind, item, price, stock FROM shop WHERE kind != 'any' AND item != '?'").all()).results.filter(r => !LEGEND.has(r.kind + '|' + r.item) && !gameOnly(r.kind, r.item) && r.price > 0);
-  const on = rows.filter(r => r.stock > 0), list = on.length ? on.map(r => effPrice(r.price, r.stock, false)) : rows.map(r => r.price);
-  const avg = list.length ? Math.round(list.reduce((a, b) => a + b, 0) / list.length) : 100;
-  UNIT = { day, avg }; await setMeta(env, 'unit', JSON.stringify(UNIT));
+  // теперь «ставка» постоянная (опорная цена — средняя цена в день, когда награды игр появились): награды стабильные, а цены сами подстраиваются под заработки
+  const ref = Number(await getMeta(env, 'index_base')) || (parseJ(await getMeta(env, 'unit'), null) || {}).avg || 50;
+  UNIT = { day, avg: ref };
   return UNIT;
 }
 const btnOf = (pct, unit) => pct > 0 ? Math.max(1, Math.round(pct * unit.avg / 100)) : 0;
@@ -841,10 +887,11 @@ async function autopilot(env, req) {
   const inStock = new Set((await env.DB.prepare('SELECT kind, item FROM shop WHERE stock > 0').all()).results.map(r => r.kind + '|' + r.item)), on = all.filter(x => inStock.has(x)).length;
   out.push({ ok: !all.length || on >= all.length * 0.5, t: 'Вещи в магазине', d: `в продаже ${on} из ${all.length} обычных вещей` + (all.length && on < all.length * 0.5 ? ' — пополнение должно это исправить за ночь' : '') });
   const unit = await gameUnit(env), eco = await env.DB.prepare('SELECT COALESCE(SUM(COALESCE(buttons, 0)), 0) AS total, COUNT(*) AS birds FROM users WHERE nick IS NOT NULL AND banned = 0').first();
-  out.push({ ok: true, t: 'Цены', d: `меняются сами от остатка; «мало / много» — от числа птичек (${STOCK.birds}); средняя цена вещи — ${unit.avg} 🔘` });
-  out.push(RULES.indexOn ? { ok: true, t: 'Пуговки и награды игр', d: `растут вместе с ценами: сейчас ×${BTN.index ? BTN.index.k : 1}` } : { ok: null, t: 'Индексация пуговок', d: 'выключена' });
+  out.push({ ok: true, t: 'Цены', d: `меняются сами от остатка; «мало / много» — от числа птичек (${STOCK.birds}); вы меняете только % категорий и цены легендарных (раздел «Магазин»)` });
+  const pl = parseJ(await getMeta(env, 'price_level'), null) || PLEVEL;
+  out.push({ ok: true, t: 'Уровень цен', d: `подстраивается сам под заработки птичек: ×${pl.L || 1}` + (pl.active >= 3 ? ` (активная птичка зарабатывает ~${pl.income} 🔘 в день — средняя вещь стоит ~${RULES.priceDays} дня)` : ' (пока мало данных — цены не трогаем)') });
   const avgBal = eco.birds ? Math.round(eco.total / eco.birds) : 0;
-  out.push({ ok: true, t: 'Кошельки птичек', d: `в среднем ${avgBal} 🔘 — хватит примерно на ${unit.avg ? String(Math.round(avgBal / unit.avg * 10) / 10).replace('.', ',') : 0} средней вещи` });
+  out.push({ ok: true, t: 'Кошельки птичек', d: `в среднем ${avgBal} 🔘 — хватит примерно на ${(pl.avg || unit.avg) ? String(Math.round(avgBal / (pl.avg || unit.avg) * 10) / 10).replace('.', ',') : 0} средней вещи` });
   const sn = { autumn: 'осень · Хеллоуин', winter: 'зима · Новый год', spring: 'весна', summer: 'лето' }[seasonNow()];
   out.push({ ok: true, t: 'Сезон зельеварни', d: sn + (RULES.potionSeason === 'auto' ? ' (по календарю)' : ' — выбран вручную') });
   return out;
@@ -1389,7 +1436,7 @@ async function route(req, env, url) {
     if (!GIFT_KINDS.includes(kind) || !item) fail(400, 'bad');
     const row = await env.DB.prepare('SELECT price, stock FROM shop WHERE kind = ? AND item = ?').bind(kind, item).first();
     if (!row || row.stock <= 0) fail(409, 'soldout');
-    row.price = effPrice(row.price, row.stock, LEGEND.has(kind + '|' + item) || item === 'legend'); // цена от остатка
+    row.price = priceNow(kind, item, row.price, row.stock); // цена сейчас (категория × уровень цен × остаток; легендарные — как поставила Алина)
     if (b.price != null && Number(b.price) !== row.price) return json({ error: 'price', price: row.price }, 409); // пока смотрели — цена изменилась
     const sur = item === '?' || kind === 'any' ? await surpriseKI(env, req, u.id, kind, item) : null; // «🎲 Сюрприз» — случайная вещь, которой ещё нет
     if (sur === null && (item === '?' || kind === 'any')) fail(409, 'all');
@@ -1406,6 +1453,15 @@ async function route(req, env, url) {
     return json({ ok: true, buttons: (u.buttons || 0) - row.price, kind: gk, item: got });
   }
   // ценность всех вещей: «выровнять» (вернуть рекомендуемую из каталога) или дороже/дешевле на pct %
+  // % категории: 100 — обычная цена; цены всех вещей категории сразу пересчитываются
+  if (m === 'POST' && p === '/api/admin/shop/cats') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({}));
+    const r = cleanRules({ ...RULES, catMult: { ...(RULES.catMult || {}), ...(b.mult || {}) } });
+    await setMeta(env, 'rules', JSON.stringify(r)); rulesAt = 0; await loadRules(env);
+    return json({ ok: true, catMult: RULES.catMult, items: (await env.DB.prepare('SELECT kind, item, price, stock, added_at FROM shop').all()).results.map(shopRow) });
+  }
   if (m === 'POST' && p === '/api/admin/shop/reprice') {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');
@@ -1447,12 +1503,16 @@ async function route(req, env, url) {
       const b = await req.json().catch(() => ({}));
       const kind = String(b.kind || ''), item = String(b.item || '');
       if (!GIFT_KINDS.includes(kind) || !item || item.length > 40) fail(400, 'bad');
-      const price = Math.max(0, Math.min(100000, Math.floor(Number(b.price) || 0))), stock = Math.max(0, Math.min(100000, Math.floor(Number(b.stock) || 0)));
+      const posted = Math.max(0, Math.min(100000, Math.floor(Number(b.price) || 0))), stock = Math.max(0, Math.min(100000, Math.floor(Number(b.stock) || 0)));
+      // цену задают только легендарным; у обычных ценность не меняется (цена считается сама)
+      const old = isLeg(kind, item) ? null : await env.DB.prepare('SELECT price FROM shop WHERE kind = ? AND item = ?').bind(kind, item).first();
+      const price = isLeg(kind, item) ? posted : old && old.price > 0 ? old.price : (CAT_P && CAT_P[kind + '|' + item]) || posted;
       await env.DB.prepare('INSERT INTO shop (kind, item, price, stock, added_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET added_at = CASE WHEN excluded.stock > shop.stock THEN excluded.added_at ELSE shop.added_at END, price = excluded.price, stock = excluded.stock').bind(kind, item, price, stock, now()).run();
-      return json({ ok: true, price, stock });
+      const row = shopRow({ kind, item, price, stock });
+      return json({ ok: true, price, stock, base: row.base, now: row.price });
     }
     await ensurePrices(env, req);
-    return json({ items: (await env.DB.prepare('SELECT kind, item, price, stock, added_at FROM shop').all()).results.map(shopRow), suggested: (await catalog(env, req)).prices || {}, economy: await env.DB.prepare('SELECT COALESCE(SUM(COALESCE(buttons, 0)), 0) AS total, COUNT(*) AS birds FROM users WHERE nick IS NOT NULL AND banned = 0').first(), pricing: { ...STOCK, priceMin: RULES.priceMin, priceMax: RULES.priceMax } });
+    return json({ items: (await env.DB.prepare('SELECT kind, item, price, stock, added_at FROM shop').all()).results.map(shopRow), suggested: (await catalog(env, req)).prices || {}, economy: await env.DB.prepare('SELECT COALESCE(SUM(COALESCE(buttons, 0)), 0) AS total, COUNT(*) AS birds FROM users WHERE nick IS NOT NULL AND banned = 0').first(), pricing: { ...STOCK, priceMin: RULES.priceMin, priceMax: RULES.priceMax }, level: PLEVEL, catMult: RULES.catMult || {} });
   }
   // подарить купленную в магазине вещь другой птичке: вещь уходит из сумки и приходит ей неоткрытым подарком
   if (m === 'POST' && p === '/api/gift/give') {

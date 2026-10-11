@@ -45,7 +45,7 @@
     fails: ['Did not work:', 'Не сработало:', 'Nenostrādāja:'],
     pay: (r) => [`New potion: +${r.p1} 🔘 ordinary, +${r.p2} 🔘 tasty, +${r.p3} 🔘 taste of childhood. Brewing a known one again: +${r.again} 🔘.${r.max ? ` Up to ${r.max} 🔘 a day.` : ''}`,
       `Новое зелье: обычное +${r.p1} 🔘, вкусное +${r.p2} 🔘, вкус детства +${r.p3} 🔘. Повторное: +${r.again} 🔘.${r.max ? ` До ${r.max} 🔘 в день.` : ''}`,
-      `Jauna dzira: parasta +${r.p1} 🔘, garšīga +${r.p2} 🔘, bērnības garša +${r.p3} 🔘. Atkārtota: +${r.again} 🔘.${r.max ? ` Līdz ${r.max} 🔘 dienā.` : ''}`][L] + ' ' + ['Rewards grow together with the prices in the shop.', 'Награды растут вместе с ценами в магазине.', 'Balvas aug kopā ar cenām veikalā.'][L],
+      `Jauna dzira: parasta +${r.p1} 🔘, garšīga +${r.p2} 🔘, bērnības garša +${r.p3} 🔘. Atkārtota: +${r.again} 🔘.${r.max ? ` Līdz ${r.max} 🔘 dienā.` : ''}`][L],
     today: [(n, m) => `Today: ${n} of ${m} 🔘`, (n, m) => `Сегодня: ${n} из ${m} 🔘`, (n, m) => `Šodien: ${n} no ${m} 🔘`],
     badge: [n => `🏅 New achievement: “${n}”`, n => `🏅 Новое достижение: «${n}»`, n => `🏅 Jauns sasniegums: “${n}”`],
     noMix: ['(seasons don’t mix in one cauldron)', '(сезоны в одном котле не смешиваются)', '(sezonas vienā katlā nejaucas)'],
