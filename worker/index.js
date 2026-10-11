@@ -287,7 +287,7 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
@@ -299,6 +299,14 @@ async function ensureSchema(env) {
       await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('pick_price_11', '1')").run();
     }
   } catch (e) { console.error('pick price', e); }
+  // 11.10.2026: зелья получаются чаще — из книги убрать «не сработало» у сочетаний, которые теперь работают (один раз)
+  try {
+    if (!(await env.DB.prepare("SELECT value FROM meta WHERE key = 'potfail_v2'").first())) {
+      const bad = (await env.DB.prepare('SELECT user_id, combo FROM potion_book WHERE tier = 0').all()).results.filter(r => potionOf(r.combo).tier > 0);
+      for (let i = 0; i < bad.length; i += 50) await env.DB.batch(bad.slice(i, i + 50).map(r => env.DB.prepare('DELETE FROM potion_book WHERE user_id = ? AND combo = ? AND tier = 0').bind(r.user_id, r.combo)));
+      await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('potfail_v2', '1')").run();
+    }
+  } catch (e) { console.error('potfail', e); }
   schemaReady = true;
 }
 
@@ -942,7 +950,7 @@ const comboSeason = combo => ING_SEASON[combo.split('+')[0]] || 'autumn';
 // рецепт: сработает или нет — «судьба» тройки (одинаковая у всех птичек); уровень зелья — по числу сладких
 function potionOf(combo) {
   const parts = combo.split('+'), sw = parts.filter(x => SWEET.has(x)).length, h = fnv('polly-cauldron|' + combo);
-  const ok = h % 100 < (sw === 3 ? 60 : sw === 2 ? 50 : 45);
+  const ok = h % 100 < (sw === 3 ? 80 : sw === 2 ? 75 : 70); // 11.10.2026: было 45–60 % — слишком часто «не получилось»
   const season = comboSeason(combo);
   return { tier: ok ? (sw === 3 ? 3 : sw === 2 ? 2 : 1) : 0, ix: COMBO_IX[season].get(combo), season };
 }
@@ -1186,10 +1194,18 @@ async function route(req, env, url) {
     for (const [x, n] of Object.entries(need)) if ((inv[x] || 0) < n) fail(409, 'inv');
     for (const [x, n] of Object.entries(need)) { inv[x] -= n; if (!inv[x]) delete inv[x]; }
     const combo = [...ings].sort((a, c) => ALL_ING.indexOf(a) - ALL_ING.indexOf(c)).join('+'), pot = potionOf(combo);
-    const was = await env.DB.prepare('SELECT n FROM potion_book WHERE user_id = ? AND combo = ?').bind(u.id, combo).first();
+    let was = await env.DB.prepare('SELECT n, tier FROM potion_book WHERE user_id = ? AND combo = ?').bind(u.id, combo).first();
+    // две неудачи подряд — третье зелье получается точно (уровень — по числу сладких); раньше не вышло, а теперь выходит — считается новым
+    const sw = ings.filter(x => SWEET.has(x)).length, pity = !pot.tier && (u.pot_fails || 0) >= 2;
+    if (pity) pot.tier = sw === 3 ? 3 : sw === 2 ? 2 : 1;
+    if (was && was.tier === 0 && pot.tier > 0) { await env.DB.prepare('DELETE FROM potion_book WHERE user_id = ? AND combo = ?').bind(u.id, combo).run(); was = null; }
+    // не получилось — один ингредиент уцелел и вернулся в сумку
+    let back = null;
+    if (!pot.tier) { back = ings[Math.floor(Math.random() * 3)]; inv[back] = Math.min(99, (inv[back] || 0) + 1); }
     await env.DB.batch([
       env.DB.prepare('UPDATE users SET inv = ? WHERE id = ?').bind(JSON.stringify(inv), u.id),
       env.DB.prepare('INSERT INTO potion_book (user_id, combo, tier, n, created_at) VALUES (?, ?, ?, 1, ?) ON CONFLICT(user_id, combo) DO UPDATE SET n = n + 1').bind(u.id, combo, pot.tier, now()),
+      env.DB.prepare('UPDATE users SET pot_fails = ? WHERE id = ?').bind(pot.tier ? 0 : (u.pot_fails || 0) + 1, u.id),
     ]);
     let got = 0; const badges = [];
     if (pot.tier > 0) {
@@ -1206,7 +1222,7 @@ async function route(req, env, url) {
       item = { kind: 'furn', item: 'kidpot:' + (pot.ix % 8) };
       await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, ?, 'bag', ?, ?)").bind(u.id, item.kind, item.item, 'potion:' + pot.season + ':' + pot.ix, now(), now()).run();
     }
-    return json({ ok: true, combo, tier: pot.tier, ix: pot.ix, season: pot.season, first: !was, got, inv, badges, item });
+    return json({ ok: true, combo, tier: pot.tier, ix: pot.ix, season: pot.season, first: !was, got, inv, badges, item, back, sure: !pot.tier && (u.pot_fails || 0) + 1 >= 2, pity });
   }
   if (m === 'GET' && p === '/api/advent') {
     const t = adventNow(req, env), u = await currentUser(req, env), admin = await isAdmin(u, env);

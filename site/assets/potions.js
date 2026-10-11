@@ -33,7 +33,7 @@
     pick3: ['Put three ingredients into the cauldron. Which ones work together? Nobody knows: try!', 'Положи в котёл три ингредиента. Какие сработают вместе — никто не знает: пробуй!', 'Ieliec katlā trīs sastāvdaļas. Kuras derēs kopā — neviens nezina: mēģini!'],
     hint: ['Rumour has it that sweet things make potions tastier…', 'Говорят, сладкое делает зелья вкуснее…', 'Runā, ka saldumi dziras padara garšīgākas…'],
     brew: ['🔥 Brew!', '🔥 Сварить!', '🔥 Vārīt!'], brewing: ['Bubbling…', 'Булькает…', 'Burbuļo…'],
-    knownOk: ['📖 You have brewed this before:', '📖 Это уже варили:', '📖 Šo jau vārīji:'], knownBad: ['✗ You tried this already: it does not work.', '✗ Это уже пробовали — не работает.', '✗ Šo jau mēģināji — nedarbojas.'],
+    knownOk: ['📖 You have brewed this before:', '📖 Это уже варили:', '📖 Šo jau vārīji:'], knownBad: ['✗ This did not work last time. Maybe try something else?', '✗ В прошлый раз это не сработало. Может, попробовать другое?', '✗ Pagājušoreiz tas nenostrādāja. Varbūt mēģini ko citu?'],
     tier: [['', 'Ordinary', 'Tasty', 'Taste of childhood'], ['', 'Обычное', 'Вкусное', 'Вкус детства'], ['', 'Parasta', 'Garšīga', 'Bērnības garša']],
     newPot: ['✨ New potion!', '✨ Новое зелье!', '✨ Jauna dzira!'], againPot: ['You brewed it again', 'Сварено ещё раз', 'Atkal izvārīta'],
     prop: ['Effect', 'Свойство', 'Īpašība'],
@@ -54,6 +54,9 @@
     giveBtn: ['🎁 Give', '🎁 Подарить', '🎁 Dāvināt'], cancel: ['Cancel', 'Отмена', 'Atcelt'], giveNo: ['There is no bird with this nickname.', 'Птички с таким ником нет.', 'Putniņa ar tādu segvārdu nav.'],
     given: [(e, n) => `${e} is on its way to @${n}!`, (e, n) => `${e} летит к @${n}!`, (e, n) => `${e} lido pie @${n}!`],
     gotGift: [(n, e) => `🎁 @${n} gave you ${e}`, (n, e) => `🎁 @${n} подарил(а) тебе ${e}`, (n, e) => `🎁 @${n} tev uzdāvināja ${e}`],
+    back: [e => `↩ ${e} survived and went back into your bag.`, e => `↩ ${e} уцелел(а) и вернулся(ась) в сумку.`, e => `↩ ${e} izdzīvoja un atgriezās somā.`],
+    sure: ['✨ Two misses in a row: the next potion will work for sure!', '✨ Две неудачи подряд — следующее зелье точно получится!', '✨ Divas neveiksmes pēc kārtas — nākamā dzira noteikti izdosies!'],
+    lucky: ['🍀 Luck is on your side!', '🍀 Удача на твоей стороне!', '🍀 Veiksme tavā pusē!'],
     pause: ['Pause', 'Пауза', 'Pauze'], resume: ['▶ Continue', '▶ Продолжить', '▶ Turpināt'],
   };
   const t = (k, ...a) => { const v = T[k][L]; return typeof v === 'function' ? v(...a) : v; };
@@ -392,10 +395,10 @@
       if (r.got) S.today += r.got;
       drawBar(); showBadges(r.badges);
       let html;
-      if (!r.tier) html = `<div class="pot-res fail"><h3>💨 ${t('fail')}</h3><p>${esc(FAILS[Math.floor(Math.random() * FAILS.length)][L2])}</p><p class="pot-rec">${ings.map(id => IG[id].e).join(' ')}</p><button type="button" class="pill-btn" data-a2="ok">${t('again')}</button></div>`;
+      if (!r.tier) html = `<div class="pot-res fail"><h3>💨 ${t('fail')}</h3><p>${esc(FAILS[Math.floor(Math.random() * FAILS.length)][L2])}</p><p class="pot-rec">${ings.map(id => IG[id].e).join(' ')}</p>${r.back ? `<p class="pot-back">${t('back', IG[r.back].e)}</p>` : ''}${r.sure ? `<p class="pot-sure">${t('sure')}</p>` : ''}<button type="button" class="pill-btn" data-a2="ok">${t('again')}</button></div>`;
       else {
         const pt = potion(r.ix, r.tier, r.season);
-        html = `<div class="pot-res t${r.tier}"><p class="pot-res-h">${r.first ? t('newPot') : t('againPot')}</p><span class="pot-res-b"></span><h3>${esc(pt.name)}</h3><p class="pot-tier t${r.tier}">${T.tier[L][r.tier]}</p>
+        html = `<div class="pot-res t${r.tier}"><p class="pot-res-h">${r.pity ? t('lucky') + ' ' : ''}${r.first ? t('newPot') : t('againPot')}</p><span class="pot-res-b"></span><h3>${esc(pt.name)}</h3><p class="pot-tier t${r.tier}">${T.tier[L][r.tier]}</p>
           <p><b>${t('prop')}:</b> ${esc(pt.eff)}</p><p class="pot-rec">${ings.map(id => IG[id].e).join(' ')}</p>${r.item ? `<p class="pot-shelf">${t('shelf')}</p>` : ''}${r.got ? `<p class="pot-plus">${t('plus', r.got)}</p>` : S.rules.on && S.rules.max > 0 && S.today >= S.rules.max ? `<p class="pot-cap">${t('cap')}</p>` : ''}<button type="button" class="pill-btn" data-a2="ok">${t('again')}</button></div>`;
       }
       drawPot(html);
