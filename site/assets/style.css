@@ -3250,3 +3250,25 @@ html:not(.is-admin) .statbar { display: none; }
 .adm-eco .adm-eco-btns span { font-size: 14px; } .adm-eco-btns input { padding: 3px 6px; border: 1px solid #DCD5EC; border-radius: 6px; }
 .shop-q { flex: 1 1 220px; min-width: 0; font: 15px var(--sans); padding: 7px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.35); background: #2B1A51; color: inherit; }
 .shop-q::placeholder { color: rgba(255,255,255,.55); }
+/* магазин на светлом фоне: всё, что ниже шапки страницы, — на белом листе */
+.shop.fl-all { background: #FFFDF8; color: #2B1A51; border-radius: 22px; padding: 22px 22px 30px; margin-top: 10px; --text: #2B1A51; --muted: #6D6380; }
+.shop .shop-bar { background: #F6F1FB; border-color: #E6DFF0; }
+.shop .shop-lab { color: #7A7090; }
+.shop .pill-btn { color: #2B1A51; border-color: #CFC6E0; background: #FFFFFF; }
+.shop .pill-btn:hover { border-color: #2B1A51; }
+.shop .pill-btn[aria-pressed="true"] { background: #E9A93B; border-color: #E9A93B; color: #2B1A51; }
+.shop .shop-theme, .shop .shop-q { background: #FFFFFF; color: #2B1A51; border-color: #CFC6E0; }
+.shop .shop-q::placeholder { color: #9A90AE; }
+.shop .shop-reset { color: #C2553A; }
+.shop .fl-all-lead { color: #5E5472; }
+.shop h3, .shop.fl-coll h3 { color: #C9621C; }
+.shop .shop-block-h { color: #2B1A51; } .shop .shop-block.off .shop-block-h { color: #8A8099; } .shop .shop-n { color: #8A8099; }
+.shop .fl-coll-item figcaption { color: #2B1A51; }
+.shop .shop-price b { color: #B5781F; } .shop .shop-price small { color: #6D6380; }
+.shop .shop-up { color: #C2553A; } .shop .shop-down { color: #2E8B5E; }
+.shop .shop-buy { background: #2B1A51; color: #FFFFFF; border-color: #2B1A51; }
+.shop .shop-buy:disabled { background: #FFFFFF; color: #8A8099; border-color: #CFC6E0; opacity: 1; }
+.shop .fl-coll-item.got { background: rgba(76, 195, 138, .12); }
+.shop .shop-afford[aria-pressed="true"] { background: #4CC38A !important; border-color: #4CC38A !important; color: #10261B !important; }
+.shop .legend-tag { text-shadow: none; color: #C9921B; }
+@media (max-width: 600px) { .shop.fl-all { padding: 14px 12px 22px; border-radius: 16px; } }
