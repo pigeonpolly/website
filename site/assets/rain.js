@@ -11,8 +11,15 @@
     how: ['Move your bird with your finger (or the arrow keys). Catch the falling buttons 🔘, a golden one counts as three. Dodge the ink blots: each one costs a heart. Let 5 buttons fall past you and you lose a heart too.',
       'Двигай птичку пальцем (или стрелками). Лови падающие пуговки 🔘, золотая считается за три. Уворачивайся от клякс: каждая — минус сердечко. Упустишь 5 пуговок — тоже минус сердечко.',
       'Kustini putniņu ar pirkstu (vai bultiņām). Ķer krītošās pogas 🔘, zelta poga skaitās par trim. Izvairies no tintes traipiem: katrs atņem sirsniņu. Palaidīsi garām 5 pogas — arī mīnus sirsniņa.'],
-    levels: ['Every level is a little faster. There is no last level.', 'Каждый уровень чуть быстрее. Последнего уровня нет.', 'Katrs līmenis ir mazliet ātrāks. Pēdējā līmeņa nav.'],
-    pay: [(p, m) => `Each level you pass gives +${p} 🔘, up to ${m} 🔘 a day.`, (p, m) => `За каждый пройденный уровень +${p} 🔘, до ${m} 🔘 в день.`, (p, m) => `Par katru pārvarēto līmeni +${p} 🔘, līdz ${m} 🔘 dienā.`],
+    levels: ['Every 10 levels it gets noticeably harder, and each level pays more. There is no last level.', 'Каждые 10 уровней становится заметно сложнее, а за уровень дают больше пуговок. Последнего уровня нет.', 'Ik pēc 10 līmeņiem kļūst manāmi grūtāk, un par līmeni dod vairāk pogu. Pēdējā līmeņa nav.'],
+    pay: [p => `Each level gives +${p} 🔘, from level 11 +${p * 2} 🔘, from 21 +${p * 3} 🔘 and so on. Every level pays once a day.`, p => `За каждый уровень +${p} 🔘, с 11-го +${p * 2} 🔘, с 21-го +${p * 3} 🔘 и так далее. Каждый уровень платит раз в день.`, p => `Par katru līmeni +${p} 🔘, no 11. +${p * 2} 🔘, no 21. +${p * 3} 🔘 un tā tālāk. Katrs līmenis maksā reizi dienā.`],
+    cap: [m => `Up to ${m} 🔘 a day.`, m => `До ${m} 🔘 в день.`, m => `Līdz ${m} 🔘 dienā.`],
+    today0: [n => `Today: +${n} 🔘`, n => `Сегодня: +${n} 🔘`, n => `Šodien: +${n} 🔘`],
+    itemRule: [n => `Every ${n} levels a thing from the shop falls from the sky, one you don’t have yet 🎁`, n => `Каждые ${n} уровней с неба падает вещь из магазина, которой у тебя ещё нет 🎁`, n => `Ik pēc ${n} līmeņiem no debesīm nokrīt lieta no veikala, kuras tev vēl nav 🎁`],
+    kingRule: [n => `👑 First place in the records: +${n} 🔘 every day you hold it and play.`, n => `👑 Первое место в рекордах: +${n} 🔘 каждый день, пока держишься и играешь.`, n => `👑 Pirmā vieta rekordos: +${n} 🔘 katru dienu, kamēr turies un spēlē.`],
+    kingGot: [n => `👑 You are first in the records: +${n} 🔘 for today!`, n => `👑 Ты на первом месте: +${n} 🔘 за сегодня!`, n => `👑 Tu esi pirmais: +${n} 🔘 par šodienu!`],
+    gotItem: [n => `🎁 A gift fell from the sky: ${n}! It is waiting in your profile.`, n => `🎁 С неба упал подарок: ${n}! Он ждёт в профиле.`, n => `🎁 No debesīm nokrita dāvana: ${n}! Tā gaida profilā.`],
+    harder: [(l, p) => `Level ${l}: harder now! +${p} 🔘 per level`, (l, p) => `Уровень ${l}: стало сложнее! +${p} 🔘 за уровень`, (l, p) => `${l}. līmenis: grūtāk! +${p} 🔘 par līmeni`],
     payOff: ['Buttons for the game are switched off for now: play for the record!', 'Пуговки за игру сейчас выключены: играем за рекорд!', 'Pogas par spēli pašlaik ir izslēgtas: spēlējam rekorda dēļ!'],
     today: [(n, m) => `Today: ${n} of ${m} 🔘`, (n, m) => `Сегодня: ${n} из ${m} 🔘`, (n, m) => `Šodien: ${n} no ${m} 🔘`],
     guest: ['Sign in to earn buttons and get into the record table.', 'Войдите, чтобы получать пуговки и попасть в таблицу рекордов.', 'Ienāc, lai saņemtu pogas un tiktu rekordu tabulā.'],
@@ -66,7 +73,7 @@
     info.top.forEach(r => {
       const li = document.createElement('li'); if (info.me && r.id === info.me.id) li.className = 'me';
       if (B) li.appendChild(B.avatar(r.id, r.avatar, 34));
-      li.insertAdjacentHTML('beforeend', `<a href="${['', '/ru', '/lv'][L]}/bird/?nick=${encodeURIComponent(r.nick)}">@${esc(r.nick)}</a><b>${r.best} ${t('lvShort')}</b>`);
+      li.insertAdjacentHTML('beforeend', `${ol.children.length === 0 ? '<span class="rain-crown" title="+' + (info.king || 0) + ' 🔘">👑</span>' : ''}<a href="${['', '/ru', '/lv'][L]}/bird/?nick=${encodeURIComponent(r.nick)}">@${esc(r.nick)}</a><b>${r.best} ${t('lvShort')}</b>`);
       ol.appendChild(li);
     });
   }
@@ -84,21 +91,24 @@
 
   // ---------- игра ----------
   let state = 'menu', level = 1, caught = 0, missed = 0, hearts = 3, items = [], fx = [], bx = W / 2, tx = W / 2, face = 1, walk = 0;
-  let spawnT = 0, time = 0, levelT = 0, shake = 0, hurt = 0, banner = null, run = null, queue = Promise.resolve(), runGot = 0, capShown = false, startBest = 0, keys = { l: 0, r: 0 };
-  const goal = lv => Math.min(30, 8 + 2 * lv);
+  let runItems = [], spawnT = 0, time = 0, levelT = 0, shake = 0, hurt = 0, banner = null, run = null, queue = Promise.resolve(), runGot = 0, capShown = false, startBest = 0, keys = { l: 0, r: 0 };
+  const goal = lv => Math.min(30, 10 + 2 * ((lv - 1) % 10) + 2 * tierOf(lv));
   const MISS = 5;
-  const P = lv => ({
-    speed: Math.min(430, 125 + 15 * (lv - 1)),
-    every: Math.max(0.34, 0.9 - 0.045 * (lv - 1)),
-    ink: Math.min(0.42, 0.16 + 0.03 * (lv - 1)),
-    wind: lv >= 5 ? Math.min(70, (lv - 4) * 9) : 0,
-    zig: lv >= 8 ? Math.min(0.5, (lv - 7) * 0.08) : 0,
-  });
+  // сложность растёт ступенями: каждые 10 уровней — заметный скачок (быстрее, чаще, больше клякс; с 11-го ветер, с 21-го зигзаг), внутри десятка — чуть-чуть
+  const tierOf = lv => Math.floor((lv - 1) / 10);
+  const P = lv => { const k = tierOf(lv), i = (lv - 1) % 10; return {
+    speed: Math.min(500, 130 + 7 * i + 75 * k),
+    every: Math.max(0.3, 0.86 - 0.016 * i - 0.12 * k),
+    ink: Math.min(0.46, 0.15 + 0.008 * i + 0.07 * k),
+    wind: k >= 1 ? Math.min(85, 22 * k + 2 * i) : 0,
+    zig: k >= 2 ? Math.min(0.5, 0.12 * (k - 1) + 0.01 * i) : 0,
+  }; };
+  const priceOf = lv => (info.per || 0) * (1 + tierOf(lv));
   const COLORS = [['#E2725B', '#B5523E'], ['#7F81BF', '#5B5D99'], ['#5FA88A', '#3F7F66'], ['#F0A987', '#C97F5E'], ['#6BA4D8', '#4A7FB0'], ['#C882B8', '#9E5D90']];
   const SKIES = [['#CFE8F6', '#F6EFE2'], ['#D9D3F2', '#F7EADF'], ['#F7DCCB', '#FBF1E4'], ['#CDEBDD', '#F4F1E2'], ['#F2D6E6', '#F8EEE6'], ['#2E2A5A', '#6C5B8E']];
 
   function start() {
-    level = 1; caught = 0; missed = 0; hearts = 3; items = []; fx = []; time = 0; levelT = 0; spawnT = 0.6; banner = { txt: t('lv') + ' 1', t: 1.2 }; runGot = 0; capShown = false; startBest = info.best || 0;
+    level = 1; caught = 0; missed = 0; hearts = 3; items = []; fx = []; time = 0; levelT = 0; spawnT = 0.6; banner = { txt: t('lv') + ' 1', t: 1.2 }; runGot = 0; runItems = []; capShown = false; startBest = info.best || 0;
     run = null; queue = Promise.resolve();
     if (info.me) queue = post('game/start').then(r => { run = r.run; }).catch(() => { run = null; });
     state = 'play'; ov.innerHTML = ''; ov.hidden = true; pauseBtn.hidden = false; document.documentElement.classList.add('rain-on');
@@ -124,11 +134,14 @@
     banner = { txt: t('passed', lv), t: 1.6 };
     if (lv % 5 === 0 && hearts < 3) { hearts++; pop(W - 40, 30, t('heart'), '#D85A30'); }
     level++; caught = 0; missed = 0; levelT = 0; spawnT = 1.4;
+    if ((level - 1) % 10 === 0) banner = { txt: t('harder', level, priceOf(level)), t: 2.6, small: true };
     if (info.me) queue = queue.then(() => run ? post('game/level', { run, level: lv }) : null).then(r => {
       if (!r) return;
       info.today = r.today; info.best = r.best;
       (r.badges || []).forEach((k, i) => setTimeout(() => window.PPToast && window.PPToast(t('badge', { rain1: ['Rain walker', 'Под дождём', 'Lietus gājējs'], rain2: ['Quick paws', 'Ловкие лапки', 'Veiklās ķepas'], rain3: ['Lord of the downpour', 'Повелитель ливня', 'Lietusgāzes valdnieks'] }[k][L])), 300 + i * 1600));
       if (r.got > 0) { runGot += r.got; pop(W / 2, 120, '+' + r.got + ' 🔘', '#6a3fb0'); }
+      if (r.item) { const B = window.PPBirds, nm = B && B.giftName ? B.giftName(r.item.kind, r.item.item, L) : r.item.item; runItems.push(nm); banner = { txt: t('gotItem', nm), t: 3, small: true }; }
+      if (r.king) { runGot += r.king; setTimeout(() => window.PPToast && window.PPToast(t('kingGot', r.king)), 600); }
       else if (info.on && info.max > 0 && r.today >= r.max && !capShown) { capShown = true; banner = { txt: t('capHit', r.max), t: 2.4, small: true }; }
     }).catch(() => {});
   }
@@ -266,11 +279,12 @@
   // ---------- экраны поверх поля ----------
   function showOverlay() {
     ov.hidden = false;
-    const payLine = info.on && info.per > 0 && info.max > 0 ? `<p class="rain-pay">${t('pay', info.per, info.max)}${info.me ? ` <b>${t('today', info.today, info.max)}</b>` : ''}</p>` : `<p class="rain-pay">${t('payOff')}</p>`;
+    const payLine = info.on && info.per > 0 ? `<p class="rain-pay">${t('pay', info.per)}${info.max > 0 ? ' ' + t('cap', info.max) : ''}${info.me ? ` <b>${info.max > 0 ? t('today', info.today, info.max) : t('today0', info.today)}</b>` : ''}</p>` : `<p class="rain-pay">${t('payOff')}</p>`;
+    const extra = `${info.every > 0 ? `<p class="rain-pay">${t('itemRule', info.every)}</p>` : ''}${info.king > 0 ? `<p class="rain-pay">${t('kingRule', info.king)}</p>` : ''}`;
     const guest = info.me ? '' : `<p class="rain-guest">${t('guest')} <button type="button" class="pill-btn rain-in">${t('signin')}</button></p>`;
-    if (state === 'menu') ov.innerHTML = `<div class="rain-card"><h2>🔘 ${t('title')}</h2><p>${t('how')}</p><p>${t('levels')}</p>${payLine}${guest}${info.best ? `<p class="rain-best">${t('best', info.best)}</p>` : ''}<button type="button" class="pill-btn pill-fill rain-go">${t('play')}</button></div>`;
+    if (state === 'menu') ov.innerHTML = `<div class="rain-card"><h2>🔘 ${t('title')}</h2><p>${t('how')}</p>${info.best ? `<p class="rain-best">${t('best', info.best)}</p>` : ''}<button type="button" class="pill-btn pill-fill rain-go">${t('play')}</button>${guest}<div class="rain-rules"><p>${t('levels')}</p>${payLine}${extra}</div></div>`;
     else if (state === 'pause') ov.innerHTML = `<div class="rain-card"><h2>${t('paused')}</h2><button type="button" class="pill-btn pill-fill rain-go">${t('resume')}</button></div>`;
-    else if (state === 'over') ov.innerHTML = `<div class="rain-card"><h2>${t('over')}</h2><p class="rain-big">${t('reached', level - 1)}</p>${info.me && level - 1 > startBest ? `<p class="rain-best">${t('newBest')}</p>` : info.best ? `<p class="rain-best">${t('best', info.best)}</p>` : ''}${runGot ? `<p class="rain-got">${t('earned', runGot)}</p>` : ''}${payLine}${guest}<button type="button" class="pill-btn pill-fill rain-go">${t('again')}</button></div>`;
+    else if (state === 'over') ov.innerHTML = `<div class="rain-card"><h2>${t('over')}</h2><p class="rain-big">${t('reached', level - 1)}</p>${info.me && level - 1 > startBest ? `<p class="rain-best">${t('newBest')}</p>` : info.best ? `<p class="rain-best">${t('best', info.best)}</p>` : ''}${runGot ? `<p class="rain-got">${t('earned', runGot)}</p>` : ''}${runItems.length ? `<p class="rain-got">🎁 ${runItems.map(esc).join(', ')}</p>` : ''}${payLine}${guest}<button type="button" class="pill-btn pill-fill rain-go">${t('again')}</button></div>`;
     const go = ov.querySelector('.rain-go'); if (go) go.onclick = () => state === 'pause' ? resume() : start();
     const si = ov.querySelector('.rain-in'); if (si) si.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
   }

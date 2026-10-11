@@ -3426,3 +3426,7 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 
 .pot-card .pill-btn:not(.pill-fill), .pot-res .pill-btn:not(.pill-fill) { color: #2b1f3d; border-color: #2b1f3d; background: #fff; }
 @media (max-width: 480px) { .pot-tabs { gap: 4px; flex-wrap: nowrap; } .pot-tabs button { padding: 6px 10px; font-size: .86rem; white-space: nowrap; } }
+.rain-crown { font-size: 1.2rem; margin-right: -4px; }
+.rain-rules { margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(43,31,61,.12); }
+.rain-rules p { font-size: .8rem !important; margin: 4px 0 !important; }
+.rain-card .rain-go { margin-bottom: 4px; }

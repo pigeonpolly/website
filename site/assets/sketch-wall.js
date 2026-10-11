@@ -96,6 +96,7 @@
     shareThis: ['Share', 'Поделиться', 'Dalīties'],
     seedOf: [k => `A seed: ${k}`, k => `Семечко: ${k}`, k => `Sēkla: ${k}`],
     fromAlina: ['— Alina', '— Алина', '— Alīna'],
+    fromRain: [n => `🌧 A reward from “Button Rain” for level ${n}`, n => `🌧 Награда «Пуговичного дождя» за ${n}-й уровень`, n => `🌧 Balva no “Pogu lietus” par ${n}. līmeni`],
     open: ['Open', 'Открыть', 'Atvērt'],
     use: ['✨ Use it', '✨ Использовать', '✨ Izmantot'],
     later: ['↩ Back (into the bag)', '↩ Вернуться (в сумку)', '↩ Atpakaļ (somā)'],
@@ -427,7 +428,7 @@
       box.querySelector('[data-later]').onclick = () => act(false);
     };
   }
-  const noteHtml = g => !g.note || g.note === 'shop' ? '' : g.note.startsWith('from:') ? `<p class="gf-note">${esc(t('fromBird', g.note.slice(5)))}</p>` : `<p class="gf-note">«${esc(g.note)}» ${t('fromAlina')}</p>`;
+  const noteHtml = g => !g.note || g.note === 'shop' ? '' : g.note.startsWith('from:') ? `<p class="gf-note">${esc(t('fromBird', g.note.slice(5)))}</p>` : g.note.startsWith('rain:') ? `<p class="gf-note">${esc(t('fromRain', g.note.slice(5)))}</p>` : `<p class="gf-note">«${esc(g.note)}» ${t('fromAlina')}</p>`;
   // подарить купленную вещь: ник птички (подсказки — из списка стаи)
   async function giveDialog(g, done) {
     const m = modal(''); m.card.classList.add('give-card');

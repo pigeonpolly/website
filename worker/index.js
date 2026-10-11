@@ -284,7 +284,7 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
@@ -322,7 +322,9 @@ const RULE_DEFAULTS = {
   adventLastJan: 23, adventButtons: 10, adventSpecialButtons: 25,
   aiStreak: true, aiUpload: true,
   sellOn: true, sellPrice: 5,
-  gameOn: true, gameLevel: 1, gameDayMax: 5, gameMinSec: 5,
+  // «Пуговичный дождь»: за уровень gameLevel 🔘 × (1 + ⌊(ур.−1)/10⌋) — каждый номер уровня раз в сутки; gameDayMax — лимит в сутки (0 — без лимита);
+  // каждые gameItemEvery уровней — вещь из магазина (0 — выкл.); первое место в рекордах — gameKing 🔘 в день, когда играет
+  gameOn: true, gameLevel: 1, gameDayMax: 0, gameMinSec: 5, gameItemEvery: 30, gameKing: 10,
   // «Зельеварня»: 🔘 за новое зелье по уровням (обычное / вкусное / вкус детства), за повторное, лимит в сутки; лабиринт быстрее potionMinSec с не засчитывается
   potionOn: true, potion1: 2, potion2: 5, potion3: 15, potionAgain: 1, potionDayMax: 15, potionMinSec: 8, // «Пуговичный дождь»: 🔘 за пройденный уровень, не больше gameDayMax в сутки; уровень быстрее gameMinSec с — не засчитывается
   restockOn: true, restockTo: 0, // раз в сутки: у всех вещей, кроме легендарных, остаток дотягивается до restockTo шт. (0 — до «обычного запаса») // продажа вещей обратно в магазин: одна цена за любую вещь
@@ -334,7 +336,7 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], gameLevel: [0, 100], gameDayMax: [0, 1000], gameMinSec: [1, 60], potion1: [0, 1000], potion2: [0, 1000], potion3: [0, 1000], potionAgain: [0, 1000], potionDayMax: [0, 10000], potionMinSec: [1, 120] };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], gameLevel: [0, 100], gameDayMax: [0, 100000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKing: [0, 1000], potion1: [0, 1000], potion2: [0, 1000], potion3: [0, 1000], potionAgain: [0, 1000], potionDayMax: [0, 10000], potionMinSec: [1, 120] };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -351,7 +353,7 @@ function cleanRules(r) {
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
   for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn']) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameLevel', 'gameDayMax', 'gameMinSec', 'potion1', 'potion2', 'potion3', 'potionAgain', 'potionDayMax', 'potionMinSec']) out[k] = Math.round(out[k]);
+  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameLevel', 'gameDayMax', 'gameMinSec', 'gameItemEvery', 'gameKing', 'potion1', 'potion2', 'potion3', 'potionAgain', 'potionDayMax', 'potionMinSec']) out[k] = Math.round(out[k]);
   if (out.priceMin > out.priceMax) out.priceMin = out.priceMax;
   if (out.lowPct > out.normPct) out.lowPct = out.normPct;
   if (out.manyPct < out.normPct) out.manyPct = out.normPct;
@@ -365,7 +367,7 @@ async function loadRules(env) {
   Object.assign(BTN, { daily: RULES.daily, upload: RULES.upload, comment: RULES.comment, commentsPerDay: RULES.commentsPerDay, friend: RULES.friend, pick: RULES.pick });
   Object.assign(BTN.levels, RULES.levels); Object.assign(BTN.badges, RULES.badges);
   try { const b = await env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE nick IS NOT NULL AND banned = 0').first(); STOCK = stockLevels(b ? b.n : 0); } catch (e) { STOCK = stockLevels(STOCK.birds); }
-  BTN.cond = RULES.cond; BTN.sell = RULES.sellOn ? RULES.sellPrice : null; BTN.game = { on: RULES.gameOn, per: RULES.gameLevel, max: RULES.gameDayMax }; // цена продажи вещи в магазин (null — продажа выключена) // условия бейджей уходят людям вместе с наградами (описания «как получить» подставляют числа)
+  BTN.cond = RULES.cond; BTN.sell = RULES.sellOn ? RULES.sellPrice : null; BTN.game = { on: RULES.gameOn, per: RULES.gameLevel, max: RULES.gameDayMax, every: RULES.gameItemEvery, king: RULES.gameKing }; // цена продажи вещи в магазин (null — продажа выключена) // условия бейджей уходят людям вместе с наградами (описания «как получить» подставляют числа)
   return RULES;
 }
 // цвета темы дня (site/assets/day-colors.json, собирает tools/daycolors.js): {"2026-10-11": "yp"} — для бейджей за цвета
@@ -795,6 +797,20 @@ async function bump(env, key, countSql) {
   const base = cur === null ? (await env.DB.prepare(countSql).first()).n - 1 : Number(cur);
   await setMeta(env, key, String(base + 1));
 }
+// вещь за 30 уровней «Пуговичного дождя»: из того, что есть в магазине (остаток −1), которой у птички нет, не легендарная;
+// если в магазине такого нет — любая такая вещь из каталога. Приходит неоткрытым подарком
+async function rainItem(env, req, uid, lv) {
+  const cat = await catalog(env, req), leg = new Set(cat.legend || []);
+  const have = new Set((await env.DB.prepare("SELECT kind, item FROM gifts WHERE user_id = ? AND status IN ('bag', 'new')").bind(uid).all()).results.map(r => r.kind + '|' + r.item));
+  const ok = (k, v) => k !== 'any' && v !== '?' && v !== 'legend' && !leg.has(k + '|' + v) && !LEGEND.has(k + '|' + v) && !have.has(k + '|' + v);
+  const inShop = (await env.DB.prepare('SELECT kind, item FROM shop WHERE stock > 0').all()).results.filter(r => ok(r.kind, r.item));
+  let pick = inShop.length ? inShop[Math.floor(Math.random() * inShop.length)] : null;
+  if (pick) await env.DB.prepare('UPDATE shop SET stock = MAX(0, stock - 1) WHERE kind = ? AND item = ?').bind(pick.kind, pick.item).run();
+  else { const all = Object.entries(cat.items || {}).flatMap(([k, vs]) => vs.map(v => ({ kind: k, item: v }))).filter(x => ok(x.kind, x.item)); pick = all.length ? all[Math.floor(Math.random() * all.length)] : null; }
+  if (!pick) return null;
+  await env.DB.prepare('INSERT INTO gifts (user_id, kind, item, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(uid, pick.kind, pick.item, 'rain:' + lv, now()).run();
+  return { kind: pick.kind, item: pick.item };
+}
 // бейдж за игру: один раз, пуговки — как за обычный бейдж (RULES.badges). true — только что получен
 async function gameBadge(env, u, k) {
   if (String(u.badges || '').split(',').includes(k)) return false;
@@ -941,8 +957,8 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/game') {
     const u = await currentUser(req, env);
     const today = u ? (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'game' AND day = ?").bind(u.id, rigaDay()).first()).n : 0;
-    const top = (await env.DB.prepare('SELECT id, nick, avatar, game_best FROM users WHERE game_best > 0 AND banned = 0 AND nick IS NOT NULL ORDER BY game_best DESC, id LIMIT 10').all()).results.map(r => ({ id: r.id, nick: r.nick, avatar: avatarOf(r), best: r.game_best }));
-    return json({ on: RULES.gameOn, per: RULES.gameLevel, max: RULES.gameDayMax, today, best: u ? u.game_best || 0 : 0, me: u && u.nick && !u.banned ? { id: u.id, nick: u.nick, avatar: avatarOf(u) } : null, top });
+    const top = (await env.DB.prepare('SELECT id, nick, avatar, game_best FROM users WHERE game_best > 0 AND banned = 0 AND nick IS NOT NULL ORDER BY game_best DESC, COALESCE(game_best_at, 0), id LIMIT 10').all()).results.map(r => ({ id: r.id, nick: r.nick, avatar: avatarOf(r), best: r.game_best }));
+    return json({ on: RULES.gameOn, per: RULES.gameLevel, max: RULES.gameDayMax, every: RULES.gameItemEvery, king: RULES.gameKing, today, best: u ? u.game_best || 0 : 0, me: u && u.nick && !u.banned ? { id: u.id, nick: u.nick, avatar: avatarOf(u) } : null, top });
   }
   if (m === 'POST' && p === '/api/game/start') {
     const u = await needUser(req, env);
@@ -960,13 +976,27 @@ async function route(req, env, url) {
     if (lv !== r.level + 1) fail(409, 'order');
     if (Date.now() - r.started < lv * RULES.gameMinSec * 1000) fail(429, 'fast');
     await env.DB.prepare('UPDATE game_runs SET level = ? WHERE id = ? AND level = ?').bind(lv, r.id, r.level).run();
-    if (lv > (u.game_best || 0)) await env.DB.prepare('UPDATE users SET game_best = ? WHERE id = ? AND COALESCE(game_best, 0) < ?').bind(lv, u.id, lv).run();
+    if (lv > (u.game_best || 0)) await env.DB.prepare('UPDATE users SET game_best = ?, game_best_at = ? WHERE id = ? AND COALESCE(game_best, 0) < ?').bind(lv, Date.now(), u.id, lv).run();
     const badges = [];
     for (const [k, c] of [['rain1', 'rainA'], ['rain2', 'rainB'], ['rain3', 'rainC']]) if (lv >= RULES.cond[c] && await gameBadge(env, u, k)) badges.push(k);
-    const today = (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'game' AND day = ?").bind(u.id, rigaDay()).first()).n;
-    const n = RULES.gameOn ? Math.max(0, Math.min(RULES.gameLevel, RULES.gameDayMax - today)) : 0;
-    const got = n > 0 ? await award(env, u.id, 'game', r.id + ':' + lv, n) : 0;
-    return json({ ok: true, got, today: today + got, max: RULES.gameDayMax, best: Math.max(lv, u.game_best || 0), badges });
+    const day = rigaDay(), today = (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'game' AND day = ?").bind(u.id, day).first()).n;
+    // каждый номер уровня платит раз в сутки (переигрывать первые уровни ради пуговок бесполезно); каждые 10 уровней — дороже
+    const price = RULES.gameLevel * (1 + Math.floor((lv - 1) / 10));
+    const n = RULES.gameOn ? (RULES.gameDayMax > 0 ? Math.max(0, Math.min(price, RULES.gameDayMax - today)) : price) : 0;
+    const got = n > 0 ? await award(env, u.id, 'game', day + ':' + lv, n) : 0;
+    // каждые gameItemEvery уровней — вещь из магазина, которой у птички нет (не легендарная); за один и тот же уровень — раз в сутки
+    let item = null;
+    if (RULES.gameItemEvery > 0 && lv % RULES.gameItemEvery === 0) {
+      const once = await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, 0, ?, ?)').bind(u.id, 'rainitem', day + ':' + lv, day, now()).run();
+      if (once.meta.changes) item = await rainItem(env, req, u.id, lv);
+    }
+    // первое место в рекордах: +gameKing 🔘 в каждый день, когда держится на первом месте и играет
+    let king = 0;
+    if (RULES.gameKing > 0) {
+      const first = await env.DB.prepare('SELECT id FROM users WHERE game_best > 0 AND banned = 0 AND nick IS NOT NULL ORDER BY game_best DESC, COALESCE(game_best_at, 0), id LIMIT 1').first();
+      if (first && first.id === u.id) king = await award(env, u.id, 'rainking', day, RULES.gameKing);
+    }
+    return json({ ok: true, got, today: today + got, max: RULES.gameDayMax, best: Math.max(lv, u.game_best || 0), badges, item, king });
   }
   if (m === 'GET' && p === '/api/potion') {
     const u = await currentUser(req, env);
