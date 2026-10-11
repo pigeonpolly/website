@@ -277,6 +277,7 @@ async function ensureSchema(env) {
     // «Зельеварня Полли»: забег по лабиринту (какие ингредиенты в нём лежат) и книга рецептов птички (tier 0 — не сработало)
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS maze_runs (id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, level INTEGER NOT NULL, seed INTEGER NOT NULL, items TEXT, started INTEGER NOT NULL, done INTEGER DEFAULT 0)`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS potion_book (user_id INTEGER NOT NULL, combo TEXT NOT NULL, tier INTEGER NOT NULL, n INTEGER DEFAULT 1, created_at INTEGER, PRIMARY KEY (user_id, combo))`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS potion_gifts (id INTEGER PRIMARY KEY AUTOINCREMENT, to_id INTEGER NOT NULL, from_nick TEXT, ing TEXT NOT NULL, n INTEGER NOT NULL, created_at INTEGER, seen INTEGER DEFAULT 0)`),
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
   for (const sql of ["ALTER TABLE users ADD COLUMN avatar TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
@@ -326,7 +327,8 @@ const RULE_DEFAULTS = {
   // каждые gameItemEvery уровней — вещь из магазина (0 — выкл.); первое место в рекордах — gameKing 🔘 в день, когда играет
   gameOn: true, gameLevel: 1, gameDayMax: 0, gameMinSec: 5, gameItemEvery: 30, gameKing: 10,
   // «Зельеварня»: 🔘 за новое зелье по уровням (обычное / вкусное / вкус детства), за повторное, лимит в сутки; лабиринт быстрее potionMinSec с не засчитывается
-  potionOn: true, potion1: 2, potion2: 5, potion3: 15, potionAgain: 1, potionDayMax: 15, potionMinSec: 8, // «Пуговичный дождь»: 🔘 за пройденный уровень, не больше gameDayMax в сутки; уровень быстрее gameMinSec с — не засчитывается
+  potionOn: true, potion1: 2, potion2: 5, potion3: 15, potionAgain: 1, potionDayMax: 15, potionMinSec: 8,
+  potionSeason: 'auto', potionShelf: true, // сезон зельеварни (auto — по календарю) и бутылочка в комнату за новое зелье «Вкус детства» // «Пуговичный дождь»: 🔘 за пройденный уровень, не больше gameDayMax в сутки; уровень быстрее gameMinSec с — не засчитывается
   restockOn: true, restockTo: 0, // раз в сутки: у всех вещей, кроме легендарных, остаток дотягивается до restockTo шт. (0 — до «обычного запаса») // продажа вещей обратно в магазин: одна цена за любую вещь
   // условия бейджей (числа из описаний «как получить»)
   cond: { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4,
@@ -351,9 +353,10 @@ function cleanRules(r) {
   if (!r || typeof r !== 'object') return out;
   for (const [k, [lo, hi]] of Object.entries(RULE_NUM)) if (r[k] != null && Number.isFinite(Number(r[k]))) out[k] = Math.max(lo, Math.min(hi, Number(r[k])));
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
-  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn']) if (typeof r[k] === 'boolean') out[k] = r[k];
+  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf']) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
   for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameLevel', 'gameDayMax', 'gameMinSec', 'gameItemEvery', 'gameKing', 'potion1', 'potion2', 'potion3', 'potionAgain', 'potionDayMax', 'potionMinSec']) out[k] = Math.round(out[k]);
+  if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
   if (out.priceMin > out.priceMax) out.priceMin = out.priceMax;
   if (out.lowPct > out.normPct) out.lowPct = out.normPct;
   if (out.manyPct < out.normPct) out.manyPct = out.normPct;
@@ -377,6 +380,7 @@ async function loadDayColors(env) {
   try { const r = await env.ASSETS.fetch(new Request('https://pigeonpolly.com/assets/day-colors.json')); DAYCOL = r.ok ? await r.json() : {}; } catch (e) { DAYCOL = {}; }
   return DAYCOL;
 }
+const gameOnly = (kind, item) => kind === 'furn' && String(item).startsWith('kidpot'); // вещи только из игр (бутылочка «Вкус детства»): в магазин не попадают
 const legMax = (kind, item) => LEGEND.has(kind + '|' + item) ? RULES.legendMax : RULES.shopMax;
 // дни для серии: работы с пометкой 🤖 считаются, если так разрешено в правилах
 const streakDays = rows => rows.filter(r => RULES.aiStreak || !(r.ai > 0)).map(r => r.day);
@@ -397,7 +401,7 @@ async function autoRestock(env, force = false) {
   const to = RULES.restockTo > 0 ? RULES.restockTo : STOCK.norm, keys = new Set();
   for (const [k, xs] of Object.entries(cat.items || {})) for (const v of xs) keys.add(k + '|' + v);
   for (const r of (await env.DB.prepare('SELECT kind, item FROM shop').all()).results) keys.add(r.kind + '|' + r.item);
-  const list = [...keys].filter(k => !LEGEND.has(k) && !k.endsWith('|legend')).map(k => k.split('|')).filter(([k, v]) => GIFT_KINDS.includes(k) && v);
+  const list = [...keys].filter(k => !LEGEND.has(k) && !k.endsWith('|legend') && !gameOnly(...k.split('|'))).map(k => k.split('|')).filter(([k, v]) => GIFT_KINDS.includes(k) && v);
   const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock, added_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET added_at = CASE WHEN shop.stock <= 0 THEN excluded.added_at ELSE shop.added_at END, stock = CASE WHEN shop.stock <= 0 THEN excluded.stock ELSE shop.stock END');
   const was = (await env.DB.prepare('SELECT COUNT(*) AS n FROM shop WHERE stock > 0').first()).n;
   for (let i = 0; i < list.length; i += 50) await env.DB.batch(list.slice(i, i + 50).map(([k, v]) => st.bind(k, v, cp[k + '|' + v] || 30, to, now())));
@@ -802,7 +806,7 @@ async function bump(env, key, countSql) {
 async function rainItem(env, req, uid, lv) {
   const cat = await catalog(env, req), leg = new Set(cat.legend || []);
   const have = new Set((await env.DB.prepare("SELECT kind, item FROM gifts WHERE user_id = ? AND status IN ('bag', 'new')").bind(uid).all()).results.map(r => r.kind + '|' + r.item));
-  const ok = (k, v) => k !== 'any' && v !== '?' && v !== 'legend' && !leg.has(k + '|' + v) && !LEGEND.has(k + '|' + v) && !have.has(k + '|' + v);
+  const ok = (k, v) => !gameOnly(k, v) && k !== 'any' && v !== '?' && v !== 'legend' && !leg.has(k + '|' + v) && !LEGEND.has(k + '|' + v) && !have.has(k + '|' + v);
   const inShop = (await env.DB.prepare('SELECT kind, item FROM shop WHERE stock > 0').all()).results.filter(r => ok(r.kind, r.item));
   let pick = inShop.length ? inShop[Math.floor(Math.random() * inShop.length)] : null;
   if (pick) await env.DB.prepare('UPDATE shop SET stock = MAX(0, stock - 1) WHERE kind = ? AND item = ?').bind(pick.kind, pick.item).run();
@@ -821,23 +825,38 @@ async function gameBadge(env, u, k) {
 // ---------- «Зельеварня Полли» (/potions/, site/assets/potions.js) ----------
 // ингредиенты (тот же список и порядок — в potions.js); sweet — «сладкие»: два в котле — «вкусное» зелье, три — «вкус детства»
 const ING = ['amanita', 'pumpkin', 'web', 'bat', 'eye', 'mandrake', 'moon', 'feather', 'bone', 'candle', 'garlic', 'pepper', 'frog', 'clover', 'star', 'apple', 'candy', 'choco', 'milk', 'honey', 'cookie'];
-const SWEET = new Set(['apple', 'candy', 'choco', 'milk', 'honey', 'cookie']);
+// сезоны (по 21 ингредиенту, последние 6 — сладкие; порядок — как в site/assets/potion-names.js): лабиринт даёт ингредиенты текущего сезона, рецепт — только из одного сезона
+const SEASON_ING = { autumn: ING,
+  winter: ['snow', 'icicle', 'pine', 'mitten', 'bell', 'scarf', 'snowman', 'tea', 'salt', 'log', 'tree', 'ribbon', 'deer', 'owlw', 'comet', 'tangerine', 'cupcake', 'hotcoco', 'lolly', 'pie', 'cake'],
+  spring: ['tulip', 'daisy', 'sakura', 'sprout', 'butterfly', 'ladybug', 'rainbow', 'drop', 'bee', 'snail', 'egg', 'nest', 'worm', 'kite', 'cloud', 'strawberry', 'cherry', 'pancake', 'waffle', 'pudding', 'croissant'],
+  summer: ['sun', 'shell', 'wave', 'crab', 'palm', 'cactus', 'sunflower', 'fish', 'coral', 'sand', 'compass', 'strawhat', 'shades', 'spark', 'dolphin', 'watermelon', 'icecream', 'peach', 'lemonade', 'sherbet', 'pineapple'] };
+const ALL_ING = Object.values(SEASON_ING).flat(), ING_SEASON = Object.fromEntries(Object.entries(SEASON_ING).flatMap(([s, l]) => l.map(x => [x, s])));
+const SWEET = new Set(Object.values(SEASON_ING).flatMap(l => l.slice(15)));
+// сезон по Риге: дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень (Хеллоуин); RULES.potionSeason — вручную
+function seasonNow() {
+  if (RULES.potionSeason && RULES.potionSeason !== 'auto') return RULES.potionSeason;
+  const m = +rigaDay().slice(5, 7);
+  return m === 12 || m <= 2 ? 'winter' : m <= 5 ? 'spring' : m <= 8 ? 'summer' : 'autumn';
+}
 const fnv = str => { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
 // все тройки ингредиентов (с повторами, по порядку ING) — номер тройки даёт зелью уникальное имя (у разных рецептов имена не совпадают)
-const COMBOS = (() => { const out = []; for (let a = 0; a < ING.length; a++) for (let b = a; b < ING.length; b++) for (let c = b; c < ING.length; c++) out.push([ING[a], ING[b], ING[c]].join('+')); return out; })();
-const COMBO_IX = new Map(COMBOS.map((c, i) => [c, i]));
+// номер тройки внутри сезона (0…1770) — по нему клиент даёт зелью имя; у осени номера те же, что были до сезонов
+const combosOf = L => { const out = []; for (let a = 0; a < L.length; a++) for (let b = a; b < L.length; b++) for (let c = b; c < L.length; c++) out.push([L[a], L[b], L[c]].join('+')); return out; };
+const COMBO_IX = Object.fromEntries(Object.entries(SEASON_ING).map(([s, l]) => [s, new Map(combosOf(l).map((c, i) => [c, i]))]));
+const comboSeason = combo => ING_SEASON[combo.split('+')[0]] || 'autumn';
 // рецепт: сработает или нет — «судьба» тройки (одинаковая у всех птичек); уровень зелья — по числу сладких
 function potionOf(combo) {
   const parts = combo.split('+'), sw = parts.filter(x => SWEET.has(x)).length, h = fnv('polly-cauldron|' + combo);
   const ok = h % 100 < (sw === 3 ? 60 : sw === 2 ? 50 : 45);
-  return { tier: ok ? (sw === 3 ? 3 : sw === 2 ? 2 : 1) : 0, ix: COMBO_IX.get(combo) };
+  const season = comboSeason(combo);
+  return { tier: ok ? (sw === 3 ? 3 : sw === 2 ? 2 : 1) : 0, ix: COMBO_IX[season].get(combo), season };
 }
-const invOf = u => { const o = parseJ(u.inv, {}) || {}; for (const k of Object.keys(o)) if (!ING.includes(k) || !(o[k] > 0)) delete o[k]; return o; };
+const invOf = u => { const o = parseJ(u.inv, {}) || {}; for (const k of Object.keys(o)) if (!ING_SEASON[k] || !(o[k] > 0)) delete o[k]; return o; };
 // что лежит в лабиринте уровня: 3…6 ингредиентов, сладкие попадаются реже
-function mazeItems(level) {
-  const n = Math.min(6, 3 + Math.floor(level / 4)), out = [];
+function mazeItems(level, season) {
+  const n = Math.min(6, 3 + Math.floor(level / 4)), out = [], L = SEASON_ING[season] || ING;
   for (let i = 0; i < n; i++) {
-    const sweet = Math.random() < 0.22, pool = ING.filter(x => SWEET.has(x) === sweet);
+    const sweet = Math.random() < 0.22, pool = L.filter(x => SWEET.has(x) === sweet);
     out.push(pool[Math.floor(Math.random() * pool.length)]);
   }
   return out;
@@ -1001,18 +1020,19 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/potion') {
     const u = await currentUser(req, env);
     const rules = { on: RULES.potionOn, p1: RULES.potion1, p2: RULES.potion2, p3: RULES.potion3, again: RULES.potionAgain, max: RULES.potionDayMax };
-    if (!u || !u.nick || u.banned) return json({ me: null, rules });
+    if (!u || !u.nick || u.banned) return json({ me: null, rules, season: seasonNow() });
     const today = (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'potion' AND day = ?").bind(u.id, rigaDay()).first()).n;
-    const book = (await env.DB.prepare('SELECT combo, tier, n, created_at FROM potion_book WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results.map(r => ({ ...r, ix: COMBO_IX.get(r.combo) }));
-    return json({ me: { id: u.id, nick: u.nick, avatar: avatarOf(u) }, level: u.maze_level || 1, inv: invOf(u), book, today, rules });
+    const book = (await env.DB.prepare('SELECT combo, tier, n, created_at FROM potion_book WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results.map(r => { const s = comboSeason(r.combo); return { ...r, season: s, ix: COMBO_IX[s].get(r.combo) }; });
+    const gifts = (await env.DB.prepare('SELECT from_nick AS "from", ing, n FROM potion_gifts WHERE to_id = ? AND seen = 0 ORDER BY id').bind(u.id).all()).results;
+    return json({ me: { id: u.id, nick: u.nick, avatar: avatarOf(u) }, level: u.maze_level || 1, inv: invOf(u), book, today, rules, season: seasonNow(), gifts });
   }
   // новый лабиринт текущего уровня: сервер решает, какие ингредиенты в нём лежат; seed — форма лабиринта, проклятия и бонусы (их считает potions.js)
   if (m === 'POST' && p === '/api/potion/level') {
     const u = await needUser(req, env);
     if (!u.nick || u.banned) fail(400, 'nick');
-    const level = u.maze_level || 1, id = randomHex(12), seed = Math.floor(Math.random() * 2 ** 31), items = mazeItems(level);
+    const level = u.maze_level || 1, id = randomHex(12), seed = Math.floor(Math.random() * 2 ** 31), season = seasonNow(), items = mazeItems(level, season);
     await env.DB.prepare('INSERT INTO maze_runs (id, user_id, level, seed, items, started) VALUES (?, ?, ?, ?, ?, ?)').bind(id, u.id, level, seed, JSON.stringify(items), Date.now()).run();
-    return json({ run: id, level, seed, items });
+    return json({ run: id, level, seed, items, season });
   }
   // дошла до выхода: собранные ингредиенты (номера из items) — в сумку зельевара, уровень +1
   if (m === 'POST' && p === '/api/potion/done') {
@@ -1030,18 +1050,43 @@ async function route(req, env, url) {
     const badges = r.level >= RULES.cond.mazeA && await gameBadge(env, u, 'maze') ? ['maze'] : [];
     return json({ ok: true, inv, level, got: got.map(i => items[i]), badges });
   }
+  // подарить ингредиенты другой птичке (до 10 штук за раз); получатель увидит «🎁 @ник подарил(а)…» на странице игры
+  if (m === 'POST' && p === '/api/potion/give') {
+    const u = await needUser(req, env);
+    if (!u.nick || u.banned) fail(400, 'nick');
+    const b = await req.json().catch(() => ({}));
+    const ing = String(b.ing || ''), n = Math.floor(Number(b.n) || 0);
+    if (!ING_SEASON[ing] || n < 1 || n > 10) fail(400, 'bad');
+    const to = await env.DB.prepare('SELECT id, nick, inv FROM users WHERE nick = ? AND banned = 0 AND id != ?').bind(String(b.to || '').trim().replace(/^@/, ''), u.id).first();
+    if (!to) fail(404, 'bird');
+    const inv = invOf(u); if ((inv[ing] || 0) < n) fail(409, 'inv');
+    inv[ing] -= n; if (!inv[ing]) delete inv[ing];
+    const tinv = invOf(to); tinv[ing] = Math.min(99, (tinv[ing] || 0) + n);
+    await env.DB.batch([
+      env.DB.prepare('UPDATE users SET inv = ? WHERE id = ?').bind(JSON.stringify(inv), u.id),
+      env.DB.prepare('UPDATE users SET inv = ? WHERE id = ?').bind(JSON.stringify(tinv), to.id),
+      env.DB.prepare('INSERT INTO potion_gifts (to_id, from_nick, ing, n, created_at) VALUES (?, ?, ?, ?, ?)').bind(to.id, u.nick, ing, n, now()),
+    ]);
+    return json({ ok: true, inv, to: to.nick, n });
+  }
+  if (m === 'POST' && p === '/api/potion/seen') {
+    const u = await needUser(req, env);
+    await env.DB.prepare('UPDATE potion_gifts SET seen = 1 WHERE to_id = ? AND seen = 0').bind(u.id).run();
+    return json({ ok: true });
+  }
   // сварить: три ингредиента из сумки; рецепт срабатывает или нет (это и узнают методом проб); новое зелье — пуговки по уровню
   if (m === 'POST' && p === '/api/potion/brew') {
     const u = await needUser(req, env);
     if (!u.nick || u.banned) fail(400, 'nick');
     const b = await req.json().catch(() => ({}));
     const ings = (Array.isArray(b.ings) ? b.ings : []).map(String);
-    if (ings.length !== 3 || !ings.every(x => ING.includes(x))) fail(400, 'bad');
+    if (ings.length !== 3 || !ings.every(x => ING_SEASON[x])) fail(400, 'bad');
+    if (new Set(ings.map(x => ING_SEASON[x])).size > 1) fail(400, 'mix'); // сезоны в одном котле не смешиваются
     const inv = invOf(u), need = {};
     for (const x of ings) need[x] = (need[x] || 0) + 1;
     for (const [x, n] of Object.entries(need)) if ((inv[x] || 0) < n) fail(409, 'inv');
     for (const [x, n] of Object.entries(need)) { inv[x] -= n; if (!inv[x]) delete inv[x]; }
-    const combo = [...ings].sort((a, c) => ING.indexOf(a) - ING.indexOf(c)).join('+'), pot = potionOf(combo);
+    const combo = [...ings].sort((a, c) => ALL_ING.indexOf(a) - ALL_ING.indexOf(c)).join('+'), pot = potionOf(combo);
     const was = await env.DB.prepare('SELECT n FROM potion_book WHERE user_id = ? AND combo = ?').bind(u.id, combo).first();
     await env.DB.batch([
       env.DB.prepare('UPDATE users SET inv = ? WHERE id = ?').bind(JSON.stringify(inv), u.id),
@@ -1056,7 +1101,13 @@ async function route(req, env, url) {
       const kinds = (await env.DB.prepare('SELECT COUNT(*) AS n FROM potion_book WHERE user_id = ? AND tier > 0').bind(u.id).first()).n;
       for (const [k, ok] of [['pot1', kinds >= 1], ['pot2', kinds >= RULES.cond.potA], ['pot3', kinds >= RULES.cond.potB], ['potkid', pot.tier === 3]]) if (ok && await gameBadge(env, u, k)) badges.push(k);
     }
-    return json({ ok: true, combo, tier: pot.tier, ix: pot.ix, first: !was, got, inv, badges });
+    // новое зелье «Вкус детства» — бутылочка в сумку, её можно поставить в комнату (вещь furn|kidpot:N, только из игры, в магазине её нет)
+    let item = null;
+    if (pot.tier === 3 && !was && RULES.potionShelf) {
+      item = { kind: 'furn', item: 'kidpot:' + (pot.ix % 8) };
+      await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, ?, 'bag', ?, ?)").bind(u.id, item.kind, item.item, 'potion:' + pot.season + ':' + pot.ix, now(), now()).run();
+    }
+    return json({ ok: true, combo, tier: pot.tier, ix: pot.ix, season: pot.season, first: !was, got, inv, badges, item });
   }
   if (m === 'GET' && p === '/api/advent') {
     const t = adventNow(req, env), u = await currentUser(req, env), admin = await isAdmin(u, env);
@@ -1380,7 +1431,7 @@ async function route(req, env, url) {
     if (!g) fail(404, 'gift');
     const del = await env.DB.prepare("DELETE FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag'").bind(g.id, u.id).run();
     if (!del.meta.changes) fail(404, 'gift');
-    await env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, 1) ON CONFLICT(kind, item) DO UPDATE SET stock = MIN(100000, shop.stock + 1)').bind(g.kind, g.item, ((await catalog(env, req)).prices || {})[g.kind + '|' + g.item] || 30).run();
+    if (!gameOnly(g.kind, g.item)) await env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, 1) ON CONFLICT(kind, item) DO UPDATE SET stock = MIN(100000, shop.stock + 1)').bind(g.kind, g.item, ((await catalog(env, req)).prices || {})[g.kind + '|' + g.item] || 30).run();
     const n = RULES.sellPrice;
     await env.DB.prepare('UPDATE users SET buttons = COALESCE(buttons, 0) + ? WHERE id = ?').bind(n, u.id).run();
     await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(u.id, 'sell', String(g.id), n, rigaDay(), now()).run();

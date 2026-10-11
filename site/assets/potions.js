@@ -7,7 +7,6 @@
   const app = document.getElementById('potions');
   if (!app) return;
   const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, pre = ['', '/ru', '/lv'][L];
-  const L2 = L === 1 ? 1 : 0; // имена зелий и свойства — по-русски или по-английски (латышской версии у генератора нет)
   const T = {
     title: ['Polly’s Potion Lab', 'Зельеварня Полли', 'Pollijas dziru virtuve'],
     tabMaze: ['🗺 Maze', '🗺 Лабиринт', '🗺 Labirints'], tabPot: ['🧪 Cauldron', '🧪 Котёл', '🧪 Katls'], tabBook: ['📖 Recipes', '📖 Рецепты', '📖 Receptes'],
@@ -49,6 +48,12 @@
       `Jauna dzira: parasta +${r.p1} 🔘, garšīga +${r.p2} 🔘, bērnības garša +${r.p3} 🔘. Atkārtota: +${r.again} 🔘. Līdz ${r.max} 🔘 dienā.`][L],
     today: [(n, m) => `Today: ${n} of ${m} 🔘`, (n, m) => `Сегодня: ${n} из ${m} 🔘`, (n, m) => `Šodien: ${n} no ${m} 🔘`],
     badge: [n => `🏅 New achievement: “${n}”`, n => `🏅 Новое достижение: «${n}»`, n => `🏅 Jauns sasniegums: “${n}”`],
+    noMix: ['(seasons don’t mix in one cauldron)', '(сезоны в одном котле не смешиваются)', '(sezonas vienā katlā nejaucas)'],
+    shelf: ['🏠 The bottle is waiting in your bag: put it on a shelf in your room!', '🏠 Бутылочка ждёт в сумке — поставь её на полку в комнате!', '🏠 Pudelīte gaida somā — noliec to plauktā savā istabā!'],
+    giveT: ['Give to a bird', 'Подарить птичке', 'Uzdāvināt putniņam'], giveN: ['How many', 'Сколько', 'Cik'], giveTo: ['To whom', 'Кому', 'Kam'], givePh: ['bird’s nickname', 'ник птички', 'putniņa segvārds'],
+    giveBtn: ['🎁 Give', '🎁 Подарить', '🎁 Dāvināt'], cancel: ['Cancel', 'Отмена', 'Atcelt'], giveNo: ['There is no bird with this nickname.', 'Птички с таким ником нет.', 'Putniņa ar tādu segvārdu nav.'],
+    given: [(e, n) => `${e} is on its way to @${n}!`, (e, n) => `${e} летит к @${n}!`, (e, n) => `${e} lido pie @${n}!`],
+    gotGift: [(n, e) => `🎁 @${n} gave you ${e}`, (n, e) => `🎁 @${n} подарил(а) тебе ${e}`, (n, e) => `🎁 @${n} tev uzdāvināja ${e}`],
     pause: ['Pause', 'Пауза', 'Pauze'], resume: ['▶ Continue', '▶ Продолжить', '▶ Turpināt'],
   };
   const t = (k, ...a) => { const v = T[k][L]; return typeof v === 'function' ? v(...a) : v; };
@@ -57,83 +62,9 @@
     .then(async r => r.ok ? r.json() : Promise.reject(r.status));
   const toast = m => window.PPToast ? window.PPToast(m) : null;
 
-  // ---------- ингредиенты (тот же порядок, что ING в worker/index.js) ----------
-  const ING = [
-    ['amanita', '🍄', 'Fly agaric', 'Мухомор', 'Mušmire'], ['pumpkin', '🎃', 'Pumpkin', 'Тыква', 'Ķirbis'], ['web', '🕸️', 'Spider web', 'Паутинка', 'Zirnekļtīkls'],
-    ['bat', '🦇', 'Bat wing', 'Крыло летучей мыши', 'Sikspārņa spārns'], ['eye', '👁️', 'Newt eye', 'Глаз тритона', 'Tritona acs'], ['mandrake', '🌿', 'Mandrake root', 'Корень мандрагоры', 'Mandragoras sakne'],
-    ['moon', '🌙', 'Moon dust', 'Лунная пыль', 'Mēness putekļi'], ['feather', '🪶', 'Owl feather', 'Совиное перо', 'Pūces spalva'], ['bone', '🦴', 'Old bone', 'Старая косточка', 'Vecs kauliņš'],
-    ['candle', '🕯️', 'Candle stub', 'Огарок свечи', 'Sveces galiņš'], ['garlic', '🧄', 'Garlic', 'Чеснок', 'Ķiploks'], ['pepper', '🌶️', 'Dragon pepper', 'Драконий перчик', 'Pūķa pipars'],
-    ['frog', '🐸', 'Frog spawn', 'Лягушачья икра', 'Vardes kurkuļi'], ['clover', '🍀', 'Four-leaf clover', 'Четырёхлистный клевер', 'Četrlapu āboliņš'], ['star', '⭐', 'Star dust', 'Звёздная пыль', 'Zvaigžņu putekļi'],
-    ['apple', '🍎', 'Candy apple', 'Яблоко в карамели', 'Karameles ābols'], ['candy', '🍬', 'Sweetie', 'Конфета', 'Konfekte'], ['choco', '🍫', 'Chocolate', 'Шоколадка', 'Šokolāde'],
-    ['milk', '🥛', 'Warm milk', 'Тёплое молоко', 'Silts piens'], ['honey', '🍯', 'Honey', 'Мёд', 'Medus'], ['cookie', '🍪', 'Grandma’s cookie', 'Бабушкино печенье', 'Vecmāmiņas cepums'],
-  ];
-  const IG = Object.fromEntries(ING.map(r => [r[0], { id: r[0], e: r[1], n: [r[2], r[3], r[4]][L] }]));
-  const SWEET = new Set(['apple', 'candy', 'choco', 'milk', 'honey', 'cookie']);
-
-  // ---------- имена и свойства зелий: номер рецепта (0…1770) → своё имя, у разных рецептов имена не совпадают ----------
-  const ADJ = [['Fizzy', 'Шипучее'], ['Grumpy', 'Ворчливое'], ['Sticky', 'Липкое'], ['Hiccupping', 'Икающее'], ['Sleepy', 'Сонное'], ['Bubbly', 'Пузырчатое'], ['Crunchy', 'Хрустящее'],
-    ['Suspicious', 'Подозрительное'], ['Squeaky', 'Скрипучее'], ['Purring', 'Мурлыкающее'], ['Giggling', 'Хихикающее'], ['Shy', 'Застенчивое'], ['Dancing', 'Танцующее'], ['Bitey', 'Кусачее'],
-    ['Glowing', 'Светящееся'], ['Invisible', 'Невидимое'], ['Yawning', 'Зевающее'], ['Tickly', 'Щекотное'], ['Wobbly', 'Дрожащее'], ['Mumbling', 'Бормочущее'], ['Sneezy', 'Чихающее'],
-    ['Fluffy', 'Пушистое'], ['Croaky', 'Квакающее'], ['Lazy', 'Ленивое'], ['Ruffled', 'Взъерошенное'], ['Mysterious', 'Загадочное'], ['Prickly', 'Колючее'], ['Boastful', 'Хвастливое'],
-    ['Gooey', 'Тягучее'], ['Stripy', 'Полосатое']];
-  const GEN = [['of the Loud Sneeze', 'громкого чиха'], ['of Grandma’s Socks', 'бабушкиных носков'], ['of Flying Slippers', 'летающих тапок'], ['of Sudden Courage', 'внезапной храбрости'],
-    ['of Pumpkin Happiness', 'тыквенного счастья'], ['of Moon Hiccups', 'лунной икоты'], ['of the Forgotten Umbrella', 'забытого зонтика'], ['of the Midnight Snack', 'полуночного перекуса'],
-    ['of the Grumpy Cat', 'ворчливого кота'], ['of Dancing Spoons', 'танцующих ложек'], ['of the Lost Sock', 'потерянного носка'], ['of Unlearned Lessons', 'невыученных уроков'],
-    ['of the Sleepy Owl', 'сонной совы'], ['of Crunchy Leaves', 'хрустящих листьев'], ['of the Warm Blanket', 'тёплого пледа'], ['of Brave Pigeons', 'храбрых голубей'],
-    ['of the Summer Storm', 'летней грозы'], ['of Whispering Pumpkins', 'шёпота тыкв'], ['of the Creaky Staircase', 'скрипучей лестницы'], ['of the Missing Key', 'пропавшего ключа'],
-    ['of Sudden Inspiration', 'внезапного вдохновения'], ['of Morning Laziness', 'утренней лени'], ['of the Funny Echo', 'смешного эха'], ['of the Crooked Broom', 'кривой метлы'],
-    ['of the Dusty Attic', 'пыльного чердака'], ['of the Eternal Monday', 'вечного понедельника'], ['of Fluffy Clouds', 'пушистых облаков'], ['of the Secret Library', 'тайной библиотеки'],
-    ['of the Chatty Raven', 'болтливого ворона'], ['of the Cheerful Skeleton', 'весёлого скелета'], ['of the Stuck Elevator', 'застрявшего лифта'], ['of the First Snow', 'первого снега'],
-    ['of Wet Boots', 'мокрых ботинок'], ['of the Midnight Fridge', 'ночного холодильника'], ['of the Talking Teapot', 'говорящего чайника'], ['of Tangled Shoelaces', 'перепутанных шнурков'],
-    ['of the Endless Friday', 'бесконечной пятницы'], ['of the Runaway Pie', 'сбежавшего пирога'], ['of the Smiling Moon', 'улыбчивой луны'], ['of Loud Purring', 'громкого мурчания'],
-    ['of the Sour Lemon', 'кислого лимона'], ['of Unruly Curls', 'непослушных кудряшек'], ['of the Old Gramophone', 'старого граммофона'], ['of the Lazy Dragon', 'ленивого дракона'],
-    ['of the Offended Ghost', 'обиженного привидения'], ['of Magic Crumbs', 'волшебных крошек'], ['of Friday Evening', 'пятничного вечера'], ['of Bouncing Pumpkins', 'прыгающих тыкв'],
-    ['of Shiny Buttons', 'блестящих пуговиц'], ['of Happy Little Spiders', 'весёлых паучков'], ['of the Broken Broom', 'сломанной метлы'], ['of the Snoring Troll', 'храпящего тролля'],
-    ['of Green Goosebumps', 'зелёных мурашек'], ['of Summer Holidays', 'летних каникул'], ['of Grandma’s Pies', 'бабушкиных пирожков'], ['of the Yard after Rain', 'двора после дождя'],
-    ['of the Snowy Slide', 'снежной горки'], ['of Soap Bubbles', 'мыльных пузырей'], ['of Blanket Forts', 'шалашей из одеял'], ['of Morning Cartoons', 'мультиков по утрам']];
-  const NOUN = [null, [['Potion', 'зелье'], ['Brew', 'варево'], ['Tonic', 'снадобье']], [['Jam', 'варенье'], ['Treat', 'лакомство'], ['Soufflé', 'суфле']], [['Cocoa', 'какао'], ['Ice Cream', 'мороженое'], ['Cookie', 'печенье']]];
-  const EFF = [['You can only whisper for three hours', 'Три часа говоришь только шёпотом'], ['Your ears turn warm and pink', 'Уши становятся тёплыми и розовыми'],
-    ['Every cat nearby starts to respect you', 'Все коты вокруг начинают тебя уважать'], ['Your hair stands on end, but stylishly', 'Волосы встают дыбом, но красиво'],
-    ['You hiccup soap bubbles', 'Икаешь мыльными пузырями'], ['Your feet keep dancing on their own', 'Ноги сами пританцовывают'], ['You start to understand pigeons', 'Начинаешь понимать язык голубей'],
-    ['Everything sweet tastes even sweeter', 'Всё сладкое кажется ещё слаще'], ['Your fingers glow in the dark', 'Пальцы светятся в темноте'], ['Your shadow walks half a step behind', 'Тень ходит на полшага позади'],
-    ['Your socks never get lost again', 'Носки больше никогда не теряются'], ['Every sneeze rings like a little bell', 'Каждый чих звенит, как колокольчик'],
-    ['You want to hug the nearest pillow', 'Хочется обнять ближайшую подушку'], ['You vanish for exactly one minute', 'Ровно на минуту исчезаешь'], ['Your voice sounds like a cartoon', 'Голос становится как в мультике'],
-    ['You draw perfect circles on the first try', 'Рисуешь ровные круги с первого раза'], ['All your buttons start to shine', 'Все пуговицы на одежде начинают сиять'],
-    ['You smell of cinnamon and adventure', 'Пахнешь корицей и приключениями'], ['You remember all your dreams from last week', 'Помнишь все сны за неделю'],
-    ['Pumpkins smile when you walk by', 'Тыквы улыбаются, когда ты проходишь мимо'], ['Your tea stays hot all day', 'Чай в кружке не остывает весь день'], ['It suddenly feels like Friday', 'Кажется, что сегодня пятница'],
-    ['You speak in rhyme until dinner', 'До самого ужина говоришь в рифму'], ['Spiders weave you compliments', 'Пауки плетут тебе комплименты'], ['Owls invite you to their night parties', 'Совы зовут на ночные посиделки'],
-    ['Your pencils stop breaking', 'Карандаши перестают ломаться'], ['You want to sing, even outside the shower', 'Хочется петь, даже не в душе'], ['The moon winks at you through the window', 'Луна подмигивает тебе в окно'],
-    ['Your shoelaces tie themselves', 'Шнурки завязываются сами'], ['Your reflection waves first', 'Отражение в зеркале машет первым'],
-    ['You float a couple of centimetres above the floor for an hour', 'Час паришь в паре сантиметров над полом'], ['Mosquitoes fly around you', 'Комары облетают тебя стороной'],
-    ['You smell like a mystery', 'Вокруг тебя пахнет загадкой'], ['You laugh at jokes nobody has made yet', 'Смеёшься над шутками, которые ещё не придумали'],
-    ['You remember where every lost thing is', 'Вспоминаешь, где лежат все потерянные вещи'], ['Houseplants start growing faster', 'Комнатные цветы начинают расти быстрее'],
-    ['You urgently need to build a blanket fort', 'Срочно хочется построить шалаш из одеял'], ['It smells like grandma’s kitchen', 'Пахнет бабушкиной кухней'],
-    ['You want summer holidays again', 'Снова хочется на каникулы'], ['Your knees stop being afraid of slides', 'Коленки перестают бояться горок']];
-  const FAILS = [['The cauldron sneezed and spat out a sock.', 'Котёл чихнул и выплюнул носок.'], ['A suspicious grey goo. Polly poured it into a plant, and the plant got offended.', 'Вышла подозрительная серая жижа. Полли вылила её в цветок — цветок обиделся.'],
-    ['Bloop… and nothing. Just a smell of old slippers.', 'Бульк… и ничего. Только запах старых тапок.'], ['The potion ran out of the cauldron and hid under the cupboard.', 'Зелье убежало из котла и спряталось под шкаф.'],
-    ['The steam spelled out “NO”.', 'Пар сложился в слово «НЕТ».'], ['The cauldron gurgled, offended, and turned away.', 'Котёл обиженно булькнул и отвернулся.'],
-    ['It turned into jelly. Just jelly.', 'Вышел кисель. Просто кисель.'], ['A bat flew out and asked you never to do that again.', 'Из котла вылетела летучая мышь и попросила больше так не делать.'],
-    ['The mix changed colour five times and got tired.', 'Смесь пять раз поменяла цвет и устала.'], ['Something crunchy came out. Better not taste it.', 'Получилось что-то хрустящее. Лучше не пробовать.'],
-    ['The pumpkin in the corner sighed loudly.', 'Тыква в углу громко вздохнула.'], ['The potion appeared and evaporated out of embarrassment.', 'Зелье появилось и тут же испарилось от смущения.']];
-  function potion(ix, tier) {
-    const k = (ix * 7919 + 17) % (ADJ.length * GEN.length), a = ADJ[k % ADJ.length], g = GEN[Math.floor(k / ADJ.length)], nn = NOUN[tier][ix % 3], e = EFF[(ix * 13 + 5) % EFF.length];
-    const name = L2 ? `${a[1]} ${nn[1]} ${g[1]}` : `${a[0]} ${nn[0]} ${g[0]}`;
-    return { name, eff: e[L2], hue: (ix * 137) % 360 };
-  }
-  // бутылочка зелья: форма по уровню, цвет — свой у каждого рецепта
-  function bottle(ix, tier, size = 40) {
-    const c = document.createElement('canvas'); c.width = c.height = 16; c.className = 'pot-bottle'; c.style.width = c.style.height = size + 'px';
-    const g = c.getContext('2d'), hue = tier ? (ix * 137) % 360 : 0, liq = tier ? `hsl(${hue},70%,55%)` : '#8a8478', glass = '#e8f1f7', d = '#2b1f3d';
-    const shapes = { 0: ['......dd......', '.....dggd.....', '....dggggd....', '...dllllllld..', '...dllllllld..', '....dllllld...', '.....ddddd....'],
-      1: ['......dd......', '.....dggd.....', '.....dggd.....', '...ddggggdd...', '..dgggggggggd.', '..dlllllllld..', '..dlllllllld..', '..dlllllllld..', '...dlllllld...', '....dddddd....'],
-      2: ['.....dddd.....', '.....dggd.....', '.....dggd.....', '....dggggd....', '....dllllld...', '....dllllld...', '....dllllld...', '....dllllld...', '....dllllld...', '....dddddd....'],
-      3: ['.....dddd.....', '.....dggd.....', '..dd.dggd.dd..', '.dllddllddlld.', '.dllllllllllld', '.dllllllllllld', '..dllllllllld.', '...dllllllld..', '....dllllld...', '.....dllld....', '......ddd.....'] };
-    const rows = shapes[tier] || shapes[0], y0 = 16 - rows.length - 1;
-    rows.forEach((r, y) => [...r].forEach((ch, x) => { if (ch === '.') return; g.fillStyle = ch === 'd' ? d : ch === 'g' ? glass : liq; g.fillRect(x + 1, y + y0, 1, 1); }));
-    if (tier) { g.fillStyle = 'rgba(255,255,255,.7)'; g.fillRect(5, y0 + rows.length - 4, 1, 2); }
-    if (tier === 3) { g.fillStyle = '#F2C94C'; g.fillRect(14, 1, 1, 1); g.fillRect(13, 2, 3, 1); g.fillRect(14, 3, 1, 1); }
-    return c;
-  }
+  // ингредиенты, имена зелий и бутылочки — в potion-names.js (window.PPPotion)
+  const { ING, IG, SEASON_INFO, FAILS, potion, bottle, L2 } = window.PPPotion;
+  const seasonOfCombo = c => IG[c.split('+')[0]].s;
 
   // ---------- состояние ----------
   let S = null, tab = 'maze';
@@ -150,7 +81,8 @@
   function drawBar() {
     if (!S || !S.me) { bar.innerHTML = ''; return; }
     const n = Object.values(S.inv).reduce((a, b) => a + b, 0);
-    bar.innerHTML = `<span>🗺 ${t('lv')} <b>${S.level}</b></span><span>🎒 <b>${n}</b></span>${S.rules.on && S.rules.max > 0 ? `<span>${t('today', S.today, S.rules.max)}</span>` : ''}`;
+    const si = SEASON_INFO[S.season] || SEASON_INFO.autumn;
+    bar.innerHTML = `<span>${si.e} ${si.n[L]}</span><span>🗺 ${t('lv')} <b>${S.level}</b></span><span>🎒 <b>${n}</b></span>${S.rules.on && S.rules.max > 0 ? `<span>${t('today', S.today, S.rules.max)}</span>` : ''}`;
   }
   function showTab(k) {
     tab = k;
@@ -253,7 +185,7 @@
 
   async function newLevel() {
     state = 'loading'; overlay(`<p>…</p>`);
-    try { const r = await post('potion/level'); run = r; M = build(r.level, r.seed, r.items); M.p.onCell = onPlayerCell; makeBird(); fit(); startCard(); }
+    try { const r = await post('potion/level'); run = r; M = build(r.level, r.seed, r.items); M.season = r.season || S.season; if (r.season && r.season !== S.season) { S.season = r.season; drawBar(); } M.p.onCell = onPlayerCell; makeBird(); fit(); startCard(); }
     catch (e) { overlay(`<p>${t('saveErr')}</p><button type="button" class="pill-btn pill-fill" data-a="retry">↻</button>`); }
   }
   function startCard() {
@@ -347,16 +279,17 @@
     if (!M) return;
     const c = cell, top = HUD(), w = c * M.cols, h = c * M.rows;
     ctx.save();
-    ctx.fillStyle = '#1E1530'; ctx.fillRect(0, 0, w, top + h);
+    const SI = SEASON_INFO[M.season] || SEASON_INFO.autumn;
+    ctx.fillStyle = SI.bg; ctx.fillRect(0, 0, w, top + h);
     if (M.shake > 0) ctx.translate((Math.random() - 0.5) * 6, (Math.random() - 0.5) * 6);
     ctx.translate(0, top);
     // пол — шахматка, стены — толстые линии
-    for (let y = 0; y < M.rows; y++) for (let x = 0; x < M.cols; x++) { ctx.fillStyle = (x + y) % 2 ? '#2A2046' : '#2E2350'; ctx.fillRect(x * c, y * c, c, c); }
+    for (let y = 0; y < M.rows; y++) for (let x = 0; x < M.cols; x++) { ctx.fillStyle = (x + y) % 2 ? SI.f1 : SI.f2; ctx.fillRect(x * c, y * c, c, c); }
     ctx.fillStyle = '#5a3f8a'; ctx.globalAlpha = 0.9;
     ctx.fillRect(M.ex[0] * c + 2, M.ex[1] * c + 2, c - 4, c - 4); ctx.globalAlpha = 1;
     emoji('🚪', M.ex[0] * c + c / 2, M.ex[1] * c + c / 2, c * 0.72);
     const lw = Math.max(3, Math.round(c / 7));
-    ctx.fillStyle = '#9C8FD0';
+    ctx.fillStyle = SI.wall;
     for (let y = 0; y < M.rows; y++) for (let x = 0; x < M.cols; x++) {
       const wl = M.W[y][x], X = x * c, Y = y * c;
       if (wl[0]) ctx.fillRect(X - lw / 2, Y - lw / 2, c + lw, lw); if (wl[3]) ctx.fillRect(X - lw / 2, Y - lw / 2, lw, c + lw);
@@ -433,17 +366,18 @@
     if (!S || !S.me) { v.innerHTML = `<p class="pot-login">${t('login')} <button type="button" class="pill-btn" data-a2="in">${t('signin')}</button></p>`; return; }
     const left = { ...S.inv }; slots.forEach(id => { left[id]--; });
     const items = ING.filter(r => S.inv[r[0]] > 0);
-    const known = slots.length === 3 ? S.book.find(b => b.combo === comboKey(slots)) : null;
+    const known = slots.length === 3 ? S.book.find(b => b.combo === comboKey(slots)) : null, slotSeason = slots.length ? IG[slots[0]].s : null;
     v.innerHTML = `<p class="pot-lead">${t('pick3')} <small>${t('hint')}</small></p>
       <div class="pot-cauldron${brewing ? ' brewing' : ''}"><div class="pot-slots">${[0, 1, 2].map(i => slots[i] ? `<button type="button" class="pot-slot on" data-slot="${i}" title="${esc(IG[slots[i]].n)}">${IG[slots[i]].e}</button>` : `<span class="pot-slot"></span>`).join('')}</div>
         <div class="pot-kettle" aria-hidden="true"><i></i><i></i><i></i></div></div>
-      ${known ? `<p class="pot-known">${known.tier ? `${t('knownOk')} <b>${esc(potion(known.ix, known.tier).name)}</b>` : t('knownBad')}</p>` : ''}
+      ${known ? `<p class="pot-known">${known.tier ? `${t('knownOk')} <b>${esc(potion(known.ix, known.tier, known.season).name)}</b>` : t('knownBad')}</p>` : ''}
       <p><button type="button" class="pill-btn pill-fill pot-brew" ${slots.length === 3 && !brewing ? '' : 'disabled'}>${brewing ? t('brewing') : t('brew')}</button></p>
       ${result || ''}
-      <h3>${t('bag')}</h3>${items.length ? `<div class="pot-inv">${items.map(r => `<button type="button" class="pot-ing" data-ing="${r[0]}" ${left[r[0]] > 0 && slots.length < 3 && !brewing ? '' : 'disabled'}><span>${r[1]}</span><small>${esc(IG[r[0]].n)}</small><b>×${left[r[0]]}</b></button>`).join('')}</div>` : `<p class="pot-empty">${t('bagEmpty')}</p>`}
+      <h3>${t('bag')}</h3>${items.length ? Object.keys(SEASON_INFO).filter(sn => items.some(r => r[5] === sn)).map(sn => `<p class="pot-sn">${SEASON_INFO[sn].e} ${SEASON_INFO[sn].n[L]}${slotSeason && slotSeason !== sn ? ` <small>${t('noMix')}</small>` : ''}</p><div class="pot-inv">${items.filter(r => r[5] === sn).map(r => `<div class="pot-ing-w"><button type="button" class="pot-ing" data-ing="${r[0]}" ${left[r[0]] > 0 && slots.length < 3 && !brewing && (!slotSeason || slotSeason === sn) ? '' : 'disabled'}><span>${r[1]}</span><small>${esc(IG[r[0]].n)}</small><b>×${left[r[0]]}</b></button>${left[r[0]] > 0 ? `<button type="button" class="pot-give" data-give="${r[0]}" title="${esc(t('giveT'))}" aria-label="${esc(t('giveT'))}">🎁</button>` : ''}</div>`).join('')}</div>`).join('') : `<p class="pot-empty">${t('bagEmpty')}</p>`}
       ${S.rules.on ? `<p class="pot-pay">${T.pay(S.rules)}</p>` : ''}`;
     v.querySelectorAll('[data-ing]').forEach(b => b.onclick = () => { if (slots.length < 3) { slots.push(b.dataset.ing); drawPot(); } });
     v.querySelectorAll('[data-slot]').forEach(b => b.onclick = () => { slots.splice(+b.dataset.slot, 1); drawPot(); });
+    v.querySelectorAll('[data-give]').forEach(b => b.onclick = () => giveIng(b.dataset.give, left[b.dataset.give]));
     const br = v.querySelector('.pot-brew'); if (br) br.onclick = brew;
     const ok = v.querySelector('[data-a2=ok]'); if (ok) ok.onclick = () => drawPot();
   }
@@ -454,20 +388,43 @@
     try {
       const [r] = await Promise.all([post('potion/brew', { ings }), new Promise(res => setTimeout(res, 1300))]);
       S.inv = r.inv; slots = []; brewing = false;
-      const b = S.book.find(x => x.combo === r.combo); if (b) b.n++; else S.book.unshift({ combo: r.combo, tier: r.tier, n: 1, ix: r.ix });
+      const b = S.book.find(x => x.combo === r.combo); if (b) b.n++; else S.book.unshift({ combo: r.combo, tier: r.tier, n: 1, ix: r.ix, season: r.season });
       if (r.got) S.today += r.got;
       drawBar(); showBadges(r.badges);
       let html;
       if (!r.tier) html = `<div class="pot-res fail"><h3>💨 ${t('fail')}</h3><p>${esc(FAILS[Math.floor(Math.random() * FAILS.length)][L2])}</p><p class="pot-rec">${ings.map(id => IG[id].e).join(' ')}</p><button type="button" class="pill-btn" data-a2="ok">${t('again')}</button></div>`;
       else {
-        const pt = potion(r.ix, r.tier);
+        const pt = potion(r.ix, r.tier, r.season);
         html = `<div class="pot-res t${r.tier}"><p class="pot-res-h">${r.first ? t('newPot') : t('againPot')}</p><span class="pot-res-b"></span><h3>${esc(pt.name)}</h3><p class="pot-tier t${r.tier}">${T.tier[L][r.tier]}</p>
-          <p><b>${t('prop')}:</b> ${esc(pt.eff)}</p><p class="pot-rec">${ings.map(id => IG[id].e).join(' ')}</p>${r.got ? `<p class="pot-plus">${t('plus', r.got)}</p>` : S.rules.on && S.today >= S.rules.max ? `<p class="pot-cap">${t('cap')}</p>` : ''}<button type="button" class="pill-btn" data-a2="ok">${t('again')}</button></div>`;
+          <p><b>${t('prop')}:</b> ${esc(pt.eff)}</p><p class="pot-rec">${ings.map(id => IG[id].e).join(' ')}</p>${r.item ? `<p class="pot-shelf">${t('shelf')}</p>` : ''}${r.got ? `<p class="pot-plus">${t('plus', r.got)}</p>` : S.rules.on && S.today >= S.rules.max ? `<p class="pot-cap">${t('cap')}</p>` : ''}<button type="button" class="pill-btn" data-a2="ok">${t('again')}</button></div>`;
       }
       drawPot(html);
-      if (r.tier) { const slot = app.querySelector('.pot-res-b'); if (slot) slot.appendChild(bottle(r.ix, r.tier, 64)); }
+      if (r.tier) { const slot = app.querySelector('.pot-res-b'); if (slot) slot.appendChild(bottle(r.ix, r.tier, 64, r.season)); }
       window.PPAccount && window.PPAccount.check && r.got && window.PPAccount.check();
     } catch (e) { brewing = false; drawPot(`<p class="pot-err">${t('saveErr')}</p>`); }
+  }
+
+  // подарить ингредиенты другой птичке
+  function giveIng(id, max) {
+    const d = document.createElement('dialog'); d.className = 'pot-dlg';
+    d.innerHTML = `<form method="dialog"><h3>${t('giveT')}</h3><p class="pot-dlg-e">${IG[id].e}</p><p>${esc(IG[id].n)}</p>
+      <label>${t('giveN')} <input name="n" type="number" min="1" max="${Math.min(10, max)}" value="1" inputmode="numeric"></label>
+      <label>${t('giveTo')} <input name="to" list="pot-birds" required maxlength="24" autocomplete="off" placeholder="${esc(t('givePh'))}"></label><datalist id="pot-birds"></datalist>
+      <p class="pot-dlg-st" role="status"></p><div class="pot-ov-btns"><button type="button" class="pill-btn" value="x">${t('cancel')}</button><button type="submit" class="pill-btn pill-fill">${t('giveBtn')}</button></div></form>`;
+    document.body.appendChild(d); d.showModal();
+    fetch('/api/birds').then(r => r.ok ? r.json() : { birds: [] }).then(x => { d.querySelector('#pot-birds').innerHTML = (x.birds || []).filter(b => b.nick && b.id !== S.me.id).map(b => `<option value="${esc(b.nick)}">`).join(''); }).catch(() => {});
+    const f = d.querySelector('form'), st = d.querySelector('.pot-dlg-st');
+    d.querySelector('[value=x]').onclick = () => { d.close(); d.remove(); };
+    f.onsubmit = async e => {
+      e.preventDefault();
+      try { const r = await post('potion/give', { ing: id, n: +f.n.value, to: f.to.value }); S.inv = r.inv; drawBar(); drawPot(); d.close(); d.remove(); toast(t('given', IG[id].e + '×' + r.n, r.to)); }
+      catch (x) { st.textContent = x === 404 ? t('giveNo') : t('saveErr'); }
+    };
+  }
+  function incoming(list) {
+    if (!list || !list.length) return;
+    list.forEach((g, i) => setTimeout(() => toast(t('gotGift', g.from, IG[g.ing] ? IG[g.ing].e + '×' + g.n : '')), 300 + i * 1500));
+    post('potion/seen').catch(() => {});
   }
 
   // ======================= КНИГА РЕЦЕПТОВ =======================
@@ -476,9 +433,9 @@
     if (!S || !S.me) { v.innerHTML = `<p class="pot-login">${t('login')}</p>`; return; }
     const okb = S.book.filter(b => b.tier > 0).sort((a, b) => b.tier - a.tier || a.ix - b.ix), bad = S.book.filter(b => !b.tier);
     v.innerHTML = !S.book.length ? `<p class="pot-empty">${t('bookEmpty')}</p>` : `<p class="pot-lead">${t('found', okb.length)}</p>
-      <div class="pot-list">${okb.map(b => { const pt = potion(b.ix, b.tier); return `<div class="pot-entry t${b.tier}" data-ix="${b.ix}" data-tier="${b.tier}"><span class="pot-ic"></span><div><b>${esc(pt.name)}</b> <span class="pot-tier t${b.tier}">${T.tier[L][b.tier]}</span><p>${esc(pt.eff)}</p><p class="pot-rec">${b.combo.split('+').map(id => `<span title="${esc(IG[id].n)}">${IG[id].e}</span>`).join(' ')}${b.n > 1 ? ` <small>×${b.n}</small>` : ''}</p></div></div>`; }).join('')}</div>
+      <div class="pot-list">${okb.map(b => { const pt = potion(b.ix, b.tier, b.season); return `<div class="pot-entry t${b.tier}" data-ix="${b.ix}" data-tier="${b.tier}" data-season="${b.season}"><span class="pot-ic"></span><div><b>${esc(pt.name)}</b> <span class="pot-tier t${b.tier}">${T.tier[L][b.tier]}</span><p>${esc(pt.eff)}</p><p class="pot-rec">${b.combo.split('+').map(id => `<span title="${esc(IG[id].n)}">${IG[id].e}</span>`).join(' ')}${b.n > 1 ? ` <small>×${b.n}</small>` : ''}</p></div></div>`; }).join('')}</div>
       ${bad.length ? `<h3>${t('fails')}</h3><p class="pot-bad">${bad.map(b => `<span>${b.combo.split('+').map(id => IG[id].e).join('')}</span>`).join('')}</p>` : ''}`;
-    v.querySelectorAll('.pot-entry').forEach(el => el.querySelector('.pot-ic').appendChild(bottle(+el.dataset.ix, +el.dataset.tier, 44)));
+    v.querySelectorAll('.pot-entry').forEach(el => el.querySelector('.pot-ic').appendChild(bottle(+el.dataset.ix, +el.dataset.tier, 44, el.dataset.season)));
   }
   app.addEventListener('click', e => { const a = e.target.closest('[data-a2=in]'); if (a) window.PPAccount && window.PPAccount.openSignIn(); });
 
@@ -486,7 +443,7 @@
   // только на локальном сервере: доступ для автотеста
   if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__pot = { s: () => M && ({ state, level: M.level, p: pos(M.p), ex: M.ex, things: M.things.map(o => ({ k: o.k, x: o.x, y: o.y, taken: !!o.taken })), W: M.W, got: M.got.length }), want: setWant, fog: v => { M.fog = v; draw(); } };
   fetch('/api/potion', { credentials: 'same-origin' }).then(r => r.json()).then(d => {
-    S = d; drawBar(); showTab('maze');
+    S = d; drawBar(); showTab('maze'); incoming(d.gifts);
     if (!S.me) { stage.style.width = '100%'; stage.style.height = '260px'; overlay(`<h2>🧪 ${t('title')}</h2><p>${t('login')}</p><button type="button" class="pill-btn pill-fill" data-a="in">${t('signin')}</button>`); app.querySelector('.pot-pad').hidden = true; return; }
     newLevel();
   }).catch(() => overlay(`<p>${t('saveErr')}</p>`));

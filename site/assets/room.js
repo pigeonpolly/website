@@ -268,6 +268,14 @@
   });
   const S = (rows, pal) => p => spr(p, rows, pal);
   const N = (en, ru, lv) => () => [en, ru, lv];
+  // зелье «Вкус детства» из «Зельеварни Полли»: бутылочка-сердечко 8 цветов; только из игры — в каталог (магазин, коллекции) не входит
+  const KID_C = [['#F28AB2', 'pink', 'розовое', 'rozā'], ['#F2C94C', 'golden', 'золотое', 'zelta'], ['#6BD3A0', 'mint', 'мятное', 'piparmētru'], ['#6BB8F0', 'sky-blue', 'небесное', 'debeszila'],
+    ['#B48CF0', 'lilac', 'сиреневое', 'ceriņu'], ['#F6A77A', 'peach', 'персиковое', 'persiku'], ['#E5484D', 'cherry', 'вишнёвое', 'ķiršu'], ['#F6E66A', 'lemon', 'лимонное', 'citronu']];
+  FURN.kidpot = { n: i => { const c = KID_C[i] || KID_C[0]; return [`Taste of childhood potion (${c[1]})`, `Зелье «Вкус детства» (${c[2]})`, `Dzira “Bērnības garša” (${c[3]})`]; }, v: KID_C.length, w: 9, h: 11, top: null, game: true,
+    d: (p, t, i) => { const c = (KID_C[i] || KID_C[0])[0], g = '#E8F1F7', d = '#2B2340';
+      p(3, 0, 3, 1, '#A8553A'); p(3, 1, 3, 2, g); p(1, 3, 3, 1, d); p(5, 3, 3, 1, d); p(0, 4, 9, 3, d); p(1, 4, 3, 3, c); p(5, 4, 3, 3, c); p(4, 5, 1, 2, c);
+      p(1, 7, 7, 1, d); p(2, 7, 5, 1, c); p(2, 8, 5, 1, d); p(3, 8, 3, 1, c); p(3, 9, 3, 1, d); p(4, 9, 1, 1, c); p(4, 10, 1, 1, d); p(2, 4, 1, 1, '#FFFFFF');
+      if (Math.sin(t / 500 + i) > 0.6) p(7, 1, 1, 1, '#FFF3B0'); } };
   Object.assign(FURN, {
     // Хеллоуин
     cauldron: { n: N('Bubbling cauldron', 'Котёл с зельем', 'Burbuļojošs katls'), w: 14, h: 12, top: null, d: (p, t) => { p(1, 3, 12, 2, '#4CE3A0'); p(0, 4, 14, 7, '#2B2340'); p(1, 5, 12, 5, '#3A3150'); p(2, 11, 2, 1, '#2B2340'); p(10, 11, 2, 1, '#2B2340'); for (let i = 0; i < 3; i++) { const by = 2 - ((t / 300 + i) % 4); p(3 + i * 4, Math.round(by), 2, 2, '#4CE3A0'); } } },
@@ -679,7 +687,7 @@
   // ---------- регистрация в каталоге подарков (коллекции, магазин, сумка, адвент, кабинет) ----------
   const LEG = ['furn|countcoffin', 'furn|crypt', 'furn|tieredcake', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass', 'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight']; // то же в worker/index.js LEGEND
   Object.assign(B.GIFTS, { wall: Object.keys(WALL).filter(k => k !== '_'), floor: Object.keys(FLOOR).filter(k => k !== '_'), view: Object.keys(VIEW).filter(k => k !== '_'),
-    curtain: Object.keys(CURT), furn: vals(FURN), deco: vals(DECO) });
+    curtain: Object.keys(CURT), furn: vals(FURN).filter(x => !FURN[parse(x)[0]].game), deco: vals(DECO) }); // game: true — вещи только из игр
   LEG.forEach(x => B.LEGEND.add(x));
   B.GIFT_KINDS.push(['furn', ['Furniture & things', 'Мебель и вещи', 'Mēbeles un lietas']], ['deco', ['Decorations', 'Украшения', 'Rotājumi']], ['wall', ['Wallpaper', 'Обои', 'Tapetes']],
     ['floor', ['Floors', 'Пол', 'Grīdas']], ['view', ['Window views', 'Вид из окна', 'Skats pa logu']], ['curtain', ['Curtains', 'Шторы', 'Aizkari']]);

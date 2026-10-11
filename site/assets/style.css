@@ -3430,3 +3430,17 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .rain-rules { margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(43,31,61,.12); }
 .rain-rules p { font-size: .8rem !important; margin: 4px 0 !important; }
 .rain-card .rain-go { margin-bottom: 4px; }
+.pot-sn { align-self: flex-start; margin: 6px 0 0; font-weight: 700; font-size: .92rem; }
+.pot-sn small { font-weight: 400; opacity: .7; }
+.pot-ing-w { position: relative; display: flex; }
+.pot-ing-w .pot-ing { flex: 1; }
+.pot-give { position: absolute; top: -6px; right: -6px; width: 28px; height: 28px; border-radius: 50%; border: 0; background: #F0A987; font-size: 14px; line-height: 28px; padding: 0; cursor: pointer; box-shadow: 0 2px 6px rgba(0,0,0,.3); }
+.pot-dlg { border: 0; border-radius: 18px; background: #fffaf2; color: #2b1f3d; padding: 18px 20px; max-width: min(340px, calc(100vw - 32px)); text-align: center; }
+.pot-dlg::backdrop { background: rgba(20, 12, 40, .6); }
+.pot-dlg h3 { margin: 0 0 6px; }
+.pot-dlg-e { font-size: 2.6rem; margin: 4px 0 !important; }
+.pot-dlg label { display: flex; flex-direction: column; gap: 4px; margin: 10px 0; font-size: .9rem; text-align: left; }
+.pot-dlg input { font: inherit; padding: 8px 10px; border-radius: 10px; border: 1px solid #c9bfd8; }
+.pot-dlg-st { color: #B5523E; min-height: 1em; font-size: .85rem; }
+.pot-dlg .pill-btn:not(.pill-fill) { color: #2b1f3d; border-color: #2b1f3d; background: #fff; }
+.pot-shelf { font-weight: 700; color: #9a5a00; }

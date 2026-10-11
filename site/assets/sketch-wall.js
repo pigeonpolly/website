@@ -428,7 +428,7 @@
       box.querySelector('[data-later]').onclick = () => act(false);
     };
   }
-  const noteHtml = g => !g.note || g.note === 'shop' ? '' : g.note.startsWith('from:') ? `<p class="gf-note">${esc(t('fromBird', g.note.slice(5)))}</p>` : g.note.startsWith('rain:') ? `<p class="gf-note">${esc(t('fromRain', g.note.slice(5)))}</p>` : `<p class="gf-note">«${esc(g.note)}» ${t('fromAlina')}</p>`;
+  const noteHtml = g => !g.note || g.note === 'shop' ? '' : g.note.startsWith('from:') ? `<p class="gf-note">${esc(t('fromBird', g.note.slice(5)))}</p>` : g.note.startsWith('potion:') && window.PPPotion ? `<p class="gf-note">🧪 ${esc(window.PPPotion.potion(+g.note.split(':')[2], 3, g.note.split(':')[1]).name)}</p>` : g.note.startsWith('rain:') ? `<p class="gf-note">${esc(t('fromRain', g.note.slice(5)))}</p>` : `<p class="gf-note">«${esc(g.note)}» ${t('fromAlina')}</p>`;
   // подарить купленную вещь: ник птички (подсказки — из списка стаи)
   async function giveDialog(g, done) {
     const m = modal(''); m.card.classList.add('give-card');
