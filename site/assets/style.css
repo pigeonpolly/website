@@ -956,7 +956,7 @@ button.sw-medal:hover, button.sw-medal.sel { transform: scale(1.12); box-shadow:
 .sw-tile a, .sw-tile img { display: block; width: 100%; height: 100%; }
 .sw-tile img { object-fit: cover; object-position: 50% 35%; transition: transform .3s; }
 .sw-tile:hover img { transform: scale(1.04); }
-.sw-tile figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 26px 10px 8px; background: linear-gradient(transparent, rgba(20, 12, 40, .85)); color: #fff; font-size: 12px; line-height: 1.3; display: flex; flex-direction: column; pointer-events: none; }
+.sw-tile figcaption { position: absolute; left: 0; right: 0; bottom: 0; padding: 40px 10px 9px; background: linear-gradient(transparent, rgba(20, 12, 40, .55) 35%, rgba(20, 12, 40, .92)); color: #fff; font-size: 12px; line-height: 1.3; display: flex; flex-direction: column; pointer-events: none; }
 .sw-tile figcaption b { font-size: 13px; }
 .sw-mod { position: absolute; top: 6px; right: 6px; z-index: 3; display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 4px; }
 .sw-tile:has(.sw-mod) .sw-stamp { top: auto; bottom: 52px; }
@@ -3221,5 +3221,14 @@ html:not(.is-admin) .statbar { display: none; }
 .sw-wf { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
 .sw-wf .pill-btn { padding: 5px 12px; font-size: 14px; }
 .sw-wf .pill-btn[aria-pressed="true"] { background: #E9A93B; border-color: #E9A93B; color: #2B1A51; }
-.sw-mod [data-ai].on { background: #4CC38A; color: #10261B; }
+.sw-mod [data-ai].on { background: #BFE3FF; color: #10264B; }
 .sw-ainote + .sw-ainote { margin-top: 6px; }
+/* стена: затемнение сверху, чтобы значки читались на любой картинке; кнопки админа — по наведению (на телефоне видны всегда) */
+.sw-tile:has(.sw-mod, .sw-aitag)::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 64px; z-index: 1; pointer-events: none; background: linear-gradient(rgba(20, 12, 40, .7), rgba(20, 12, 40, .25) 60%, transparent); }
+.sw-tile .sw-aitag { background: rgba(20, 12, 40, .55); box-shadow: none; }
+@media (hover: hover) {
+  .sw-tile .sw-mod { opacity: 0; transition: opacity .15s; }
+  .sw-tile:hover .sw-mod, .sw-tile:focus-within .sw-mod { opacity: 1; }
+  .sw-tile:has(.sw-mod):not(:has(.sw-aitag))::before { opacity: 0; transition: opacity .15s; }
+  .sw-tile:has(.sw-mod):hover::before, .sw-tile:has(.sw-mod):focus-within::before { opacity: 1; }
+}
