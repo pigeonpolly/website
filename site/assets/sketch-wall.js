@@ -99,6 +99,9 @@
     wearing: ['on ✓', 'надето ✓', 'uzvilkts ✓'],
     kinds: [{ bg: 'background', shoes: 'shoes', hat: 'hat', anim: 'animation', frame: 'frame', item: 'a treat to hold', scarf: 'scarf', furn: 'furniture & things', deco: 'decorations', wall: 'wallpaper', floor: 'floor', view: 'window view', curtain: 'curtains' }, { bg: 'фон', shoes: 'обувь', hat: 'головной убор', anim: 'анимация', frame: 'рамка', item: 'вкусняшка в клюв', scarf: 'шарфик', furn: 'мебель и вещи', deco: 'украшения', wall: 'обои', floor: 'пол', view: 'вид из окна', curtain: 'шторы' }, { bg: 'fons', shoes: 'apavi', hat: 'galvassega', anim: 'animācija', frame: 'rāmis', item: 'gardums knābī', scarf: 'šalle', furn: 'mēbeles un lietas', deco: 'rotājumi', wall: 'tapetes', floor: 'grīda', view: 'skats pa logu', curtain: 'aizkari' }],
     pageN: [n => `Page ${n}`, n => `Страница ${n}`, n => `Lapa ${n}`],
+    aiNote: ['We can’t control or check whether you upload AI-generated pictures instead of your own drawings. We can only say for sure: those who uploaded their own work have improved their drawing skills. You, most likely, have improved your prompting skills… or have you?',
+      'Мы не можем контролировать и влиять на то, загружаете ли вы ИИ-контент вместо своих рисунков. Мы лишь можем с уверенностью сказать, что те, кто загрузил свои работы, улучшили свой навык рисования. Вы же, вероятно, улучшили навык промптинга… или нет?',
+      'Mēs nevaram kontrolēt vai ietekmēt, vai jūs augšupielādējat MI ģenerētu saturu savu zīmējumu vietā. Varam tikai droši teikt: tie, kas augšupielādēja savus darbus, uzlaboja savas zīmēšanas prasmes. Jūs, visticamāk, uzlabojāt savas promptošanas prasmes… vai tomēr nē?'],
     hide: ['Hide', 'Скрыть', 'Paslēpt'], ban: ['Block', 'Блок', 'Bloķēt'],
     banAsk: ['Block this user? Their sketches disappear from the wall.', 'Заблокировать пользователя? Его рисунки пропадут со стены.', 'Bloķēt lietotāju? Viņa skices pazudīs no sienas.'],
   };
@@ -471,6 +474,7 @@
         ${me.consent ? '' : `<label class="sw-check"><input type="checkbox" name="consent" required> <span>${t('consent')} <a href="/privacy/">↗</a></span></label>`}
         <button class="cta-btn" type="submit" disabled>${t('upload')}</button>
         <p class="sw-status" id="sw-status"></p>
+        <p class="sw-ainote">🤖 ${t('aiNote')}</p>
       </form></div>`;
     const slot = app.querySelector('.sw-ava-slot'); if (slot) { const av = window.PPBirds.avatar(me.id, me.avatar, 96); const a = document.createElement('a'); a.href = profileUrl(me.nick); a.className = 'sw-ava-link'; a.appendChild(av); slot.replaceWith(a); }
     const gb = document.getElementById('sw-gift'); if (gb) gb.onclick = () => openGift(newGifts[newGifts.length - 1]);
