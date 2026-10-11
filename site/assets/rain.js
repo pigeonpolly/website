@@ -30,6 +30,7 @@
     earned: [n => `+${n} 🔘 this game`, n => `+${n} 🔘 за эту игру`, n => `+${n} 🔘 šajā spēlē`],
     top: ['🏆 Records', '🏆 Рекорды', '🏆 Rekordi'], topNone: ['No records yet: be the first!', 'Рекордов пока нет — будь первой птичкой!', 'Rekordu vēl nav — esi pirmais!'],
     lvShort: ['lvl', 'ур.', 'līm.'],
+    badge: [n => `🏅 New achievement: “${n}”`, n => `🏅 Новое достижение: «${n}»`, n => `🏅 Jauns sasniegums: “${n}”`],
     noSave: ['Could not save the level: buttons were not added.', 'Не получилось сохранить уровень: пуговки не начислены.', 'Neizdevās saglabāt līmeni: pogas netika pieskaitītas.'],
   };
   const t = (k, ...a) => { const v = T[k][L]; return typeof v === 'function' ? v(...a) : v; };
@@ -126,6 +127,7 @@
     if (info.me) queue = queue.then(() => run ? post('game/level', { run, level: lv }) : null).then(r => {
       if (!r) return;
       info.today = r.today; info.best = r.best;
+      (r.badges || []).forEach((k, i) => setTimeout(() => window.PPToast && window.PPToast(t('badge', { rain1: ['Rain walker', 'Под дождём', 'Lietus gājējs'], rain2: ['Quick paws', 'Ловкие лапки', 'Veiklās ķepas'], rain3: ['Lord of the downpour', 'Повелитель ливня', 'Lietusgāzes valdnieks'] }[k][L])), 300 + i * 1600));
       if (r.got > 0) { runGot += r.got; pop(W / 2, 120, '+' + r.got + ' 🔘', '#6a3fb0'); }
       else if (info.on && info.max > 0 && r.today >= r.max && !capShown) { capShown = true; banner = { txt: t('capHit', r.max), t: 2.4, small: true }; }
     }).catch(() => {});

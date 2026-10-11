@@ -41,7 +41,8 @@ export default {
       if (!(await getMeta(env, 'buttons_backfill'))) await backfillButtons(env).catch(e => console.error('backfill', e)); // разовое начисление пуговок за прошлое
       await autoRestock(env).catch(e => console.error('restock', e)); // раз в сутки (по Риге) пополнить магазин
       await migrateToR2(env); await cleanupInactive(env);
-      await env.DB.prepare('DELETE FROM game_runs WHERE started < ?').bind(now() - 2 * 86400).run().catch(() => {}); // старые забеги игры
+      await env.DB.prepare('DELETE FROM game_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {}); // старые забеги игр (started — в мс)
+      await env.DB.prepare('DELETE FROM maze_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {});
       await env.DB.prepare('DELETE FROM visits WHERE ts < ?').bind(now() - 400 * 86400).run().catch(() => {}); // статистику храним ~13 месяцев
     })());
   },
@@ -273,6 +274,9 @@ async function ensureSchema(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS shop (kind TEXT NOT NULL, item TEXT NOT NULL, price INTEGER DEFAULT 0, stock INTEGER DEFAULT 0, PRIMARY KEY (kind, item))`),
     // игра «Пуговичный дождь»: забег (run) — с какого времени и какой уровень пройден
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS game_runs (id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, started INTEGER NOT NULL, level INTEGER DEFAULT 0)`),
+    // «Зельеварня Полли»: забег по лабиринту (какие ингредиенты в нём лежат) и книга рецептов птички (tier 0 — не сработало)
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS maze_runs (id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, level INTEGER NOT NULL, seed INTEGER NOT NULL, items TEXT, started INTEGER NOT NULL, done INTEGER DEFAULT 0)`),
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS potion_book (user_id INTEGER NOT NULL, combo TEXT NOT NULL, tier INTEGER NOT NULL, n INTEGER DEFAULT 1, created_at INTEGER, PRIMARY KEY (user_id, combo))`),
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
   for (const sql of ["ALTER TABLE users ADD COLUMN avatar TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
@@ -280,7 +284,7 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
@@ -304,7 +308,8 @@ const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, p
   levels: { 1: 5, 3: 10, 7: 20, 14: 30, 30: 50, 60: 80, 100: 120, 365: 300 },
   badges: { bw: 5, extra: 15, bday: 15, early: 15, owl: 15, comeback: 15, ten: 20, weekend: 20, newyear: 20, halloween: 20,
     monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, collector: 50, hundred: 100, robot: 1,
-    cpurple: 20, cyellow: 20, cred: 20, cblue: 20, cgreen: 20 } }; // c* — N рисунков в дни, когда в теме дня был этот цвет // robot — загрузил работу с пометкой 🤖 «ИИ-генерация»
+    cpurple: 20, cyellow: 20, cred: 20, cblue: 20, cgreen: 20,
+    rain1: 10, rain2: 20, rain3: 40, pot1: 5, pot2: 15, pot3: 50, potkid: 20, maze: 20 } }; // игры: «Пуговичный дождь» (rain*) и «Зельеварня» (pot*, maze) // c* — N рисунков в дни, когда в теме дня был этот цвет // robot — загрузил работу с пометкой 🤖 «ИИ-генерация»
 // легендарные вещи (как LEGEND в birds.js): в магазине по одной штуке на птичку, дарить нельзя; обычных — до трёх одинаковых
 const LEGEND = new Set(['furn|countcoffin', 'furn|crypt', 'furn|tieredcake', 'hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass', 'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight']);
 // ---------- правила сайта, которые Алина меняет в кабинете (раздел «📜 Правила»): хранятся в meta 'rules', поверх значений по умолчанию ----------
@@ -317,16 +322,19 @@ const RULE_DEFAULTS = {
   adventLastJan: 23, adventButtons: 10, adventSpecialButtons: 25,
   aiStreak: true, aiUpload: true,
   sellOn: true, sellPrice: 5,
-  gameOn: true, gameLevel: 1, gameDayMax: 5, gameMinSec: 5, // «Пуговичный дождь»: 🔘 за пройденный уровень, не больше gameDayMax в сутки; уровень быстрее gameMinSec с — не засчитывается
+  gameOn: true, gameLevel: 1, gameDayMax: 5, gameMinSec: 5,
+  // «Зельеварня»: 🔘 за новое зелье по уровням (обычное / вкусное / вкус детства), за повторное, лимит в сутки; лабиринт быстрее potionMinSec с не засчитывается
+  potionOn: true, potion1: 2, potion2: 5, potion3: 15, potionAgain: 1, potionDayMax: 15, potionMinSec: 8, // «Пуговичный дождь»: 🔘 за пройденный уровень, не больше gameDayMax в сутки; уровень быстрее gameMinSec с — не засчитывается
   restockOn: true, restockTo: 0, // раз в сутки: у всех вещей, кроме легендарных, остаток дотягивается до restockTo шт. (0 — до «обычного запаса») // продажа вещей обратно в магазин: одна цена за любую вещь
   // условия бейджей (числа из описаний «как получить»)
   cond: { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4,
-    alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10 },
+    alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10,
+    rainA: 5, rainB: 15, rainC: 30, potA: 10, potB: 50, mazeA: 20 },
 };
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], gameLevel: [0, 100], gameDayMax: [0, 1000], gameMinSec: [1, 60] };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], gameLevel: [0, 100], gameDayMax: [0, 1000], gameMinSec: [1, 60], potion1: [0, 1000], potion2: [0, 1000], potion3: [0, 1000], potionAgain: [0, 1000], potionDayMax: [0, 10000], potionMinSec: [1, 120] };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -341,9 +349,9 @@ function cleanRules(r) {
   if (!r || typeof r !== 'object') return out;
   for (const [k, [lo, hi]] of Object.entries(RULE_NUM)) if (r[k] != null && Number.isFinite(Number(r[k]))) out[k] = Math.max(lo, Math.min(hi, Number(r[k])));
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
-  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn']) if (typeof r[k] === 'boolean') out[k] = r[k];
+  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn']) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameLevel', 'gameDayMax', 'gameMinSec']) out[k] = Math.round(out[k]);
+  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameLevel', 'gameDayMax', 'gameMinSec', 'potion1', 'potion2', 'potion3', 'potionAgain', 'potionDayMax', 'potionMinSec']) out[k] = Math.round(out[k]);
   if (out.priceMin > out.priceMax) out.priceMin = out.priceMax;
   if (out.lowPct > out.normPct) out.lowPct = out.normPct;
   if (out.manyPct < out.normPct) out.manyPct = out.normPct;
@@ -787,6 +795,37 @@ async function bump(env, key, countSql) {
   const base = cur === null ? (await env.DB.prepare(countSql).first()).n - 1 : Number(cur);
   await setMeta(env, key, String(base + 1));
 }
+// бейдж за игру: один раз, пуговки — как за обычный бейдж (RULES.badges). true — только что получен
+async function gameBadge(env, u, k) {
+  if (String(u.badges || '').split(',').includes(k)) return false;
+  await addBadge(env, u.id, k); u.badges = (u.badges ? u.badges + ',' : '') + k;
+  await award(env, u.id, 'badge', k, BTN.badges[k] || 0);
+  return true;
+}
+// ---------- «Зельеварня Полли» (/potions/, site/assets/potions.js) ----------
+// ингредиенты (тот же список и порядок — в potions.js); sweet — «сладкие»: два в котле — «вкусное» зелье, три — «вкус детства»
+const ING = ['amanita', 'pumpkin', 'web', 'bat', 'eye', 'mandrake', 'moon', 'feather', 'bone', 'candle', 'garlic', 'pepper', 'frog', 'clover', 'star', 'apple', 'candy', 'choco', 'milk', 'honey', 'cookie'];
+const SWEET = new Set(['apple', 'candy', 'choco', 'milk', 'honey', 'cookie']);
+const fnv = str => { let h = 2166136261; for (let i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
+// все тройки ингредиентов (с повторами, по порядку ING) — номер тройки даёт зелью уникальное имя (у разных рецептов имена не совпадают)
+const COMBOS = (() => { const out = []; for (let a = 0; a < ING.length; a++) for (let b = a; b < ING.length; b++) for (let c = b; c < ING.length; c++) out.push([ING[a], ING[b], ING[c]].join('+')); return out; })();
+const COMBO_IX = new Map(COMBOS.map((c, i) => [c, i]));
+// рецепт: сработает или нет — «судьба» тройки (одинаковая у всех птичек); уровень зелья — по числу сладких
+function potionOf(combo) {
+  const parts = combo.split('+'), sw = parts.filter(x => SWEET.has(x)).length, h = fnv('polly-cauldron|' + combo);
+  const ok = h % 100 < (sw === 3 ? 60 : sw === 2 ? 50 : 45);
+  return { tier: ok ? (sw === 3 ? 3 : sw === 2 ? 2 : 1) : 0, ix: COMBO_IX.get(combo) };
+}
+const invOf = u => { const o = parseJ(u.inv, {}) || {}; for (const k of Object.keys(o)) if (!ING.includes(k) || !(o[k] > 0)) delete o[k]; return o; };
+// что лежит в лабиринте уровня: 3…6 ингредиентов, сладкие попадаются реже
+function mazeItems(level) {
+  const n = Math.min(6, 3 + Math.floor(level / 4)), out = [];
+  for (let i = 0; i < n; i++) {
+    const sweet = Math.random() < 0.22, pool = ING.filter(x => SWEET.has(x) === sweet);
+    out.push(pool[Math.floor(Math.random() * pool.length)]);
+  }
+  return out;
+}
 async function addBadge(env, uid, badge) {
   const u = await env.DB.prepare('SELECT badges FROM users WHERE id = ?').bind(uid).first();
   if (!u) return;
@@ -922,10 +961,72 @@ async function route(req, env, url) {
     if (Date.now() - r.started < lv * RULES.gameMinSec * 1000) fail(429, 'fast');
     await env.DB.prepare('UPDATE game_runs SET level = ? WHERE id = ? AND level = ?').bind(lv, r.id, r.level).run();
     if (lv > (u.game_best || 0)) await env.DB.prepare('UPDATE users SET game_best = ? WHERE id = ? AND COALESCE(game_best, 0) < ?').bind(lv, u.id, lv).run();
+    const badges = [];
+    for (const [k, c] of [['rain1', 'rainA'], ['rain2', 'rainB'], ['rain3', 'rainC']]) if (lv >= RULES.cond[c] && await gameBadge(env, u, k)) badges.push(k);
     const today = (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'game' AND day = ?").bind(u.id, rigaDay()).first()).n;
     const n = RULES.gameOn ? Math.max(0, Math.min(RULES.gameLevel, RULES.gameDayMax - today)) : 0;
     const got = n > 0 ? await award(env, u.id, 'game', r.id + ':' + lv, n) : 0;
-    return json({ ok: true, got, today: today + got, max: RULES.gameDayMax, best: Math.max(lv, u.game_best || 0) });
+    return json({ ok: true, got, today: today + got, max: RULES.gameDayMax, best: Math.max(lv, u.game_best || 0), badges });
+  }
+  if (m === 'GET' && p === '/api/potion') {
+    const u = await currentUser(req, env);
+    const rules = { on: RULES.potionOn, p1: RULES.potion1, p2: RULES.potion2, p3: RULES.potion3, again: RULES.potionAgain, max: RULES.potionDayMax };
+    if (!u || !u.nick || u.banned) return json({ me: null, rules });
+    const today = (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'potion' AND day = ?").bind(u.id, rigaDay()).first()).n;
+    const book = (await env.DB.prepare('SELECT combo, tier, n, created_at FROM potion_book WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results.map(r => ({ ...r, ix: COMBO_IX.get(r.combo) }));
+    return json({ me: { id: u.id, nick: u.nick, avatar: avatarOf(u) }, level: u.maze_level || 1, inv: invOf(u), book, today, rules });
+  }
+  // новый лабиринт текущего уровня: сервер решает, какие ингредиенты в нём лежат; seed — форма лабиринта, проклятия и бонусы (их считает potions.js)
+  if (m === 'POST' && p === '/api/potion/level') {
+    const u = await needUser(req, env);
+    if (!u.nick || u.banned) fail(400, 'nick');
+    const level = u.maze_level || 1, id = randomHex(12), seed = Math.floor(Math.random() * 2 ** 31), items = mazeItems(level);
+    await env.DB.prepare('INSERT INTO maze_runs (id, user_id, level, seed, items, started) VALUES (?, ?, ?, ?, ?, ?)').bind(id, u.id, level, seed, JSON.stringify(items), Date.now()).run();
+    return json({ run: id, level, seed, items });
+  }
+  // дошла до выхода: собранные ингредиенты (номера из items) — в сумку зельевара, уровень +1
+  if (m === 'POST' && p === '/api/potion/done') {
+    const u = await needUser(req, env);
+    const b = await req.json().catch(() => ({}));
+    const r = await env.DB.prepare('SELECT * FROM maze_runs WHERE id = ? AND user_id = ? AND done = 0').bind(String(b.run || ''), u.id).first();
+    if (!r) fail(404, 'run');
+    if (Date.now() - r.started < RULES.potionMinSec * 1000) fail(429, 'fast');
+    const items = parseJ(r.items, []) || [], got = [...new Set((Array.isArray(b.got) ? b.got : []).map(Number).filter(i => Number.isInteger(i) && i >= 0 && i < items.length))];
+    const upd = await env.DB.prepare('UPDATE maze_runs SET done = 1 WHERE id = ? AND done = 0').bind(r.id).run();
+    if (!upd.meta.changes) fail(404, 'run');
+    const inv = invOf(u); for (const i of got) inv[items[i]] = Math.min(99, (inv[items[i]] || 0) + 1);
+    const level = Math.max(u.maze_level || 1, r.level + 1);
+    await env.DB.prepare('UPDATE users SET inv = ?, maze_level = ? WHERE id = ?').bind(JSON.stringify(inv), level, u.id).run();
+    const badges = r.level >= RULES.cond.mazeA && await gameBadge(env, u, 'maze') ? ['maze'] : [];
+    return json({ ok: true, inv, level, got: got.map(i => items[i]), badges });
+  }
+  // сварить: три ингредиента из сумки; рецепт срабатывает или нет (это и узнают методом проб); новое зелье — пуговки по уровню
+  if (m === 'POST' && p === '/api/potion/brew') {
+    const u = await needUser(req, env);
+    if (!u.nick || u.banned) fail(400, 'nick');
+    const b = await req.json().catch(() => ({}));
+    const ings = (Array.isArray(b.ings) ? b.ings : []).map(String);
+    if (ings.length !== 3 || !ings.every(x => ING.includes(x))) fail(400, 'bad');
+    const inv = invOf(u), need = {};
+    for (const x of ings) need[x] = (need[x] || 0) + 1;
+    for (const [x, n] of Object.entries(need)) if ((inv[x] || 0) < n) fail(409, 'inv');
+    for (const [x, n] of Object.entries(need)) { inv[x] -= n; if (!inv[x]) delete inv[x]; }
+    const combo = [...ings].sort((a, c) => ING.indexOf(a) - ING.indexOf(c)).join('+'), pot = potionOf(combo);
+    const was = await env.DB.prepare('SELECT n FROM potion_book WHERE user_id = ? AND combo = ?').bind(u.id, combo).first();
+    await env.DB.batch([
+      env.DB.prepare('UPDATE users SET inv = ? WHERE id = ?').bind(JSON.stringify(inv), u.id),
+      env.DB.prepare('INSERT INTO potion_book (user_id, combo, tier, n, created_at) VALUES (?, ?, ?, 1, ?) ON CONFLICT(user_id, combo) DO UPDATE SET n = n + 1').bind(u.id, combo, pot.tier, now()),
+    ]);
+    let got = 0; const badges = [];
+    if (pot.tier > 0) {
+      const today = (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'potion' AND day = ?").bind(u.id, rigaDay()).first()).n;
+      const price = was ? RULES.potionAgain : [0, RULES.potion1, RULES.potion2, RULES.potion3][pot.tier];
+      const n = RULES.potionOn ? Math.max(0, Math.min(price, RULES.potionDayMax - today)) : 0;
+      if (n > 0) got = await award(env, u.id, 'potion', combo + ':' + ((was ? was.n : 0) + 1), n);
+      const kinds = (await env.DB.prepare('SELECT COUNT(*) AS n FROM potion_book WHERE user_id = ? AND tier > 0').bind(u.id).first()).n;
+      for (const [k, ok] of [['pot1', kinds >= 1], ['pot2', kinds >= RULES.cond.potA], ['pot3', kinds >= RULES.cond.potB], ['potkid', pot.tier === 3]]) if (ok && await gameBadge(env, u, k)) badges.push(k);
+    }
+    return json({ ok: true, combo, tier: pot.tier, ix: pot.ix, first: !was, got, inv, badges });
   }
   if (m === 'GET' && p === '/api/advent') {
     const t = adventNow(req, env), u = await currentUser(req, env), admin = await isAdmin(u, env);

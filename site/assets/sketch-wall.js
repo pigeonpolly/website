@@ -190,6 +190,23 @@
     { k: 'cgreen', s: 'cgreen', bg: '#D8EFD9', n: ['Green thumb', 'Зелёные руки', 'Zaļie pirksti'], f: ['Everything you draw seems to grow.', 'Всё, что вы рисуете, будто растёт.', 'Viss, ko zīmē, šķiet, aug.'], h: ['Upload {n} sketches on days when the theme palette has green', 'Загрузить {n} рисунков в дни, когда в цветах темы дня есть зелёный', 'Augšupielādēt {n} skices dienās, kad dienas tēmas krāsās ir zaļā krāsa'] },
     { k: 'clock', f: ['Polly sets her watch by you.', 'Полли сверяет по вам часы.', 'Pollija pēc tevis regulē pulksteni.'], n: ['Like clockwork', 'Как по часам', 'Kā pulkstenis'], s: 'clock', bg: '#FBE3D6',
       h: ['Upload {n} sketches in a row at about the same time of day (within {w} minutes)', 'Загрузить {n} рисунков подряд примерно в одно время суток (в пределах {w} минут)', 'Augšupielādēt {n} skices pēc kārtas apmēram vienā laikā ({w} minūšu robežās)'] },
+    // игры: «Пуговичный дождь» (/rain/) и «Зельеварня Полли» (/potions/)
+    { k: 'rain1', s: 'rain1', bg: '#D6EAF7', n: ['Rain walker', 'Под дождём', 'Lietus gājējs'], f: ['A little rain never stopped a pigeon.', 'Голубя дождиком не напугать.', 'Baložus lietutiņš nebiedē.'],
+      h: ['Pass {n} levels in the game “Button Rain”', 'Пройти {n} уровней в игре «Пуговичный дождь»', 'Pārvarēt {n} līmeņus spēlē “Pogu lietus”'] },
+    { k: 'rain2', s: 'rain2', bg: '#E2DAF5', n: ['Quick paws', 'Ловкие лапки', 'Veiklās ķepas'], f: ['Not a single button hits the ground on your watch.', 'При вас ни одна пуговка не долетает до земли.', 'Tavā sardzē neviena poga nenokrīt zemē.'],
+      h: ['Pass {n} levels in the game “Button Rain”', 'Пройти {n} уровней в игре «Пуговичный дождь»', 'Pārvarēt {n} līmeņus spēlē “Pogu lietus”'] },
+    { k: 'rain3', s: 'rain3', bg: '#CFD6EA', n: ['Lord of the downpour', 'Повелитель ливня', 'Lietusgāzes valdnieks'], f: ['The clouds ask you before they rain.', 'Тучи спрашивают у вас разрешения, прежде чем пролиться.', 'Mākoņi jautā tev atļauju, pirms līst.'],
+      h: ['Pass {n} levels in the game “Button Rain”', 'Пройти {n} уровней в игре «Пуговичный дождь»', 'Pārvarēt {n} līmeņus spēlē “Pogu lietus”'] },
+    { k: 'pot1', s: 'pot1', bg: '#D8EFD9', n: ['First potion', 'Первое зелье', 'Pirmā dzira'], f: ['It bubbled, it smelled, it worked!', 'Булькало, пахло — и получилось!', 'Burbuļoja, smaržoja — un izdevās!'],
+      h: ['Brew your first potion in “Polly’s Potion Lab”', 'Сварить первое зелье в «Зельеварне Полли»', 'Izvārīt pirmo dziru “Pollijas dziru virtuvē”'] },
+    { k: 'pot2', s: 'pot2', bg: '#E6DAF5', n: ['Young alchemist', 'Юный алхимик', 'Jaunais alķīmiķis'], f: ['The witch’s hat fits you perfectly.', 'Шляпа ведьмы сидит на вас идеально.', 'Raganas cepure tev der ideāli.'],
+      h: ['Discover {n} different potions', 'Открыть {n} разных зелий', 'Atklāt {n} dažādas dziras'] },
+    { k: 'pot3', s: 'pot3', bg: '#CDEBD6', n: ['Cauldron master', 'Мастер котла', 'Katla meistars'], f: ['Even the cauldron listens to you now.', 'Теперь вас слушается даже котёл.', 'Tagad tevī klausās pat katls.'],
+      h: ['Discover {n} different potions', 'Открыть {n} разных зелий', 'Atklāt {n} dažādas dziras'] },
+    { k: 'potkid', s: 'potkid', bg: '#FBE3A1', n: ['Taste of childhood', 'Вкус детства', 'Bērnības garša'], f: ['Smells like summer holidays and grandma’s kitchen.', 'Пахнет летними каникулами и бабушкиной кухней.', 'Smaržo pēc vasaras brīvdienām un vecmāmiņas virtuves.'],
+      h: ['Brew a “Taste of childhood” potion (three sweet ingredients)', 'Сварить зелье «Вкус детства» (три сладких ингредиента)', 'Izvārīt dziru “Bērnības garša” (trīs saldas sastāvdaļas)'] },
+    { k: 'maze', s: 'maze', bg: '#F7C9A3', n: ['Maze walker', 'Лабиринтоход', 'Labirintu gājējs'], f: ['No dead end can stop you.', 'Вас не остановит ни один тупик.', 'Tevi neapturēs neviens strupceļš.'],
+      h: ['Pass maze level {n} in “Polly’s Potion Lab”', 'Пройти {n}-й уровень лабиринта в «Зельеварне Полли»', 'Pārvarēt {n}. labirinta līmeni “Pollijas dziru virtuvē”'] },
   ];
   const POLLY = ['......ddd.....', '.....dbbbd....', '....dbbwwbd...', '....dbbwkbdoo.', '....dbbbbbdo..', '...dbbbbbbd...', '..dbbsbbbbd...',
     '.dbbssbbbbd...', 'dbbssbbbbbd...', 'dbbbbbbbbd....', '.ddbbbbbdd....', '...ddddd......', '....o..o......', '...oo.oo......'];
@@ -236,6 +253,15 @@
     cred: [[11, 4, 'n'], [12, 3, 'n'], [12, 2, 'R'], [13, 1, 'R'], [0, 9, '.RRR.'], [0, 10, 'RRRRR'], [1, 11, 'RRR'], [2, 12, 'R'], [2, -2, 'R'], [12, -2, 'R']],
     cblue: [[11, 4, 'n'], [12, 3, 'n'], [12, 2, 'B'], [13, 1, 'B'], [0, 9, '.BBB.'], [0, 10, 'BBBBB'], [1, 11, 'BBB'], [2, 12, 'B'], [2, -2, 'B'], [12, -2, 'B']],
     cgreen: [[11, 4, 'n'], [12, 3, 'n'], [12, 2, 'G'], [13, 1, 'G'], [0, 9, '.GGG.'], [0, 10, 'GGGGG'], [1, 11, 'GGG'], [2, 12, 'G'], [2, -2, 'G'], [12, -2, 'G']],
+    // игры: зонтик и капли; пуговки; туча с молнией; колба; шляпа ведьмы; котёл; леденец; тыква-фонарь с ключом
+    rain1: [[3, -3, '...pppp'], [2, -2, '.pppppppp'], [1, -1, 'pppppppppp'], [6, 0, 'n'], [0, 3, 'h'], [13, 5, 'h'], [1, 8, 'h']],
+    rain2: [[0, 2, '.m.'], [0, 3, 'mlm'], [0, 4, '.m.'], [11, -2, '.P.'], [11, -1, 'PlP'], [11, 0, '.P.'], [12, 8, '.Y.'], [12, 9, 'YlY'], [12, 10, '.Y.'], [6, -3, 'h']],
+    rain3: [[2, -3, '.cccccc'], [1, -2, 'cccccccc'], [2, -1, 'cccccc'], [8, 0, 'Y'], [7, 1, 'YY'], [8, 2, 'Y'], [0, 4, 'h'], [13, 3, 'h']],
+    pot1: [[10, 7, '.h.'], [10, 8, '.h.'], [9, 9, 'hGh'], [9, 10, 'GGG'], [9, 11, 'GGG'], [10, 12, 'G'], [12, 5, 'l'], [8, 6, 'l']],
+    pot2: [[7, -3, '..P'], [6, -2, '.PPP'], [5, -1, 'PPPPP'], [3, 0, 'PPPPPPPPP'], [6, -1, 'Y'], [12, 2, 'l'], [1, 1, 'l']],
+    pot3: [[8, 9, 'dddddd'], [8, 10, 'dGGGGd'], [8, 11, 'dddddd'], [9, 12, 'dddd'], [9, 7, 'G.G'], [11, 6, 'G'], [12, 8, 'G']],
+    potkid: [[11, 3, '.pp'], [11, 4, 'pwp'], [11, 5, 'pp.'], [12, 6, 'n'], [12, 7, 'n'], [12, 8, 'n'], [1, 0, 'Y'], [3, -2, 'p']],
+    maze: [[0, 9, '.n.'], [0, 10, 'ooo'], [0, 11, 'oko'], [0, 12, 'ooo'], [10, 9, 'mmm'], [10, 10, 'm.m'], [10, 11, 'mmm'], [11, 12, 'm'], [11, 13, 'mm'], [5, -3, 'd.d.d'], [5, -2, 'ddddd']],
     medal: [[10, -3, '.m.'], [9, -2, 'mmm'], [10, -1, 'm.m'], [5, 8, 'r.r'], [5, 9, 'r.r'], [5, 10, 'mmm'], [4, 11, 'mmlmm'], [5, 12, 'mmm']],
   };
   const MONO = { b: '#D9D9D9', s: '#9A9A9A', o: '#6B6B6B' };
@@ -251,10 +277,10 @@
     return `<svg viewBox="0 0 14 17" shape-rendering="crispEdges">${px.map(([x, y, c]) => `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${c}"/>`).join('')}</svg>`;
   }
   // условия бейджей приходят с сервера (me.btn.rules.cond — их меняет Алина в «📜 Правилах»); числа подставляются в описания
-  const COND0 = { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4, alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10 };
+  const COND0 = { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4, alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10, rainA: 5, rainB: 15, rainC: 30, potA: 10, potB: 50, mazeA: 20 };
   const condVals = k => { const C = Object.assign({}, COND0, (me && me.btn && me.btn.rules && me.btn.rules.cond) || {});
     return ({ alt: { n: C.alt }, monthly: { n: C.monthly }, veteran: { n: C.veteranMonths, p: C.veteranPer }, early: { n: C.early, h: C.earlyBefore }, owl: { n: C.owl, a: C.owlFrom, b: C.owlTo },
-      weekend: { n: C.weekend }, ten: { n: C.ten }, fifty: { n: C.fifty }, hundred: { n: C.hundred }, inkmaster: { n: C.inkmaster }, comeback: { n: C.comeback }, collector: { n: C.collector }, clock: { n: C.clock, w: C.clockWin }, cpurple: { n: C.colors }, cyellow: { n: C.colors }, cred: { n: C.colors }, cblue: { n: C.colors }, cgreen: { n: C.colors } })[k] || {}; };
+      weekend: { n: C.weekend }, ten: { n: C.ten }, fifty: { n: C.fifty }, hundred: { n: C.hundred }, inkmaster: { n: C.inkmaster }, comeback: { n: C.comeback }, collector: { n: C.collector }, rain1: { n: C.rainA }, rain2: { n: C.rainB }, rain3: { n: C.rainC }, pot2: { n: C.potA }, pot3: { n: C.potB }, maze: { n: C.mazeA }, clock: { n: C.clock, w: C.clockWin }, cpurple: { n: C.colors }, cyellow: { n: C.colors }, cred: { n: C.colors }, cblue: { n: C.colors }, cgreen: { n: C.colors } })[k] || {}; };
   const howTo = lv => lv.h ? lv.h[L].replace(/\{(\w)\}/g, (m, x) => { const v = condVals(lv.k)[x]; return v == null ? m : v; }) : HOW_LEVEL[L](lv.d);
   // state: true — есть, false — нет, 'past' — был (чёрно-белый)
   const medal = (lv, on = true, big = false, tag = 'span', picks = me?.picks || 0) => {

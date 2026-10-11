@@ -3349,3 +3349,80 @@ html:not(.is-admin) .statbar { display: none; }
 .rain-list li.rain-none::before { content: none; }
 .rain-list a { flex: 1; color: inherit; }
 .rain-on .polly-pet { opacity: 0; } /* Полли не мешает, пока идёт игра */
+
+/* игра «Зельеварня Полли» (potions.js) */
+.pot { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 0 16px 40px; }
+.pot-bar { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px 18px; font-size: .95rem; }
+.pot-bar:empty { display: none; }
+.pot-tabs { display: flex; gap: 6px; flex-wrap: wrap; justify-content: center; }
+.pot-tabs button { border: 2px solid rgba(255,255,255,.35); background: transparent; color: inherit; border-radius: 999px; padding: 7px 16px; font: inherit; font-weight: 700; cursor: pointer; }
+.pot-tabs button[aria-selected="true"] { background: #F0A987; border-color: #F0A987; color: #2b1f3d; }
+.pot-view { width: 100%; max-width: 520px; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.pot-view[hidden] { display: none; }
+.pot-stage { position: relative; border-radius: 14px; overflow: hidden; box-shadow: 0 10px 30px rgba(10, 5, 25, .5); touch-action: none; user-select: none; -webkit-user-select: none; min-height: 120px; }
+.pot-cv { display: block; width: 100%; height: 100%; touch-action: none; }
+.pot-pause { position: absolute; top: 6px; right: 6px; width: 34px; height: 34px; border: 0; border-radius: 50%; background: rgba(255,255,255,.18); color: #fff; font-size: 12px; cursor: pointer; }
+.pot-ov { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 14px; background: rgba(20, 12, 40, .55); }
+.pot-ov[hidden] { display: none; }
+.pot-card { background: #fffaf2; color: #2b1f3d; border-radius: 16px; padding: 16px 18px 18px; text-align: center; max-height: 100%; overflow: auto; box-shadow: 0 8px 24px rgba(0,0,0,.3); max-width: 340px; }
+.pot-card h2 { margin: 0 0 8px; font-size: 1.3rem; }
+.pot-card p { margin: 6px 0; font-size: .92rem; line-height: 1.4; }
+.pot-mod { font-weight: 700; color: #6a3fb0; }
+.pot-how { font-size: .85rem !important; color: #6a5a7a; }
+.pot-got { font-size: 2rem !important; letter-spacing: 4px; }
+.pot-ov-btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; }
+.pot-card .pill-btn { margin-top: 8px; }
+.pot-pad { display: grid; grid-template-columns: repeat(3, 58px); grid-template-rows: repeat(2, 50px); gap: 6px; }
+.pot-pad button { border: 0; border-radius: 14px; background: rgba(255,255,255,.14); color: #fff; font-size: 20px; cursor: pointer; touch-action: none; }
+.pot-pad button:active { background: #F0A987; color: #2b1f3d; }
+.pot-pad [data-d="0,-1"] { grid-column: 2; grid-row: 1; } .pot-pad [data-d="-1,0"] { grid-column: 1; grid-row: 2; } .pot-pad [data-d="0,1"] { grid-column: 2; grid-row: 2; } .pot-pad [data-d="1,0"] { grid-column: 3; grid-row: 2; }
+@media (hover: hover) and (pointer: fine) { .pot-pad { opacity: .75; } }
+.pot-on .polly-pet { opacity: 0; }
+.pot-lead { text-align: center; margin: 0; }
+.pot-lead small { display: block; opacity: .75; margin-top: 4px; }
+.pot-cauldron { position: relative; width: 240px; height: 190px; }
+.pot-slots { position: absolute; top: 0; left: 0; right: 0; display: flex; justify-content: center; gap: 12px; z-index: 2; }
+.pot-slot { width: 56px; height: 56px; border-radius: 50%; border: 2px dashed rgba(255,255,255,.45); background: rgba(255,255,255,.06); display: grid; place-items: center; font-size: 30px; color: inherit; }
+button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; background: rgba(242,201,76,.15); }
+.pot-kettle { position: absolute; left: 50%; bottom: 0; width: 180px; height: 110px; margin-left: -90px; background: #1b1430; border-radius: 30px 30px 80px 80px; box-shadow: inset 0 -12px 0 rgba(0,0,0,.35), 0 4px 0 #0e0a1a; }
+.pot-kettle::before { content: ""; position: absolute; left: -8px; right: -8px; top: -6px; height: 18px; border-radius: 12px; background: #3a2d5c; }
+.pot-kettle::after { content: ""; position: absolute; left: 6px; right: 6px; top: 0; height: 12px; border-radius: 10px; background: #6BD38A; box-shadow: 0 0 14px #6BD38A; }
+.pot-kettle i { position: absolute; top: -10px; width: 12px; height: 12px; border-radius: 50%; background: #9BE7AE; opacity: 0; }
+.pot-kettle i:nth-child(1) { left: 40px; } .pot-kettle i:nth-child(2) { left: 84px; } .pot-kettle i:nth-child(3) { left: 128px; }
+.pot-cauldron.brewing .pot-kettle i { animation: pot-bub 1s ease-in infinite; }
+.pot-cauldron.brewing .pot-kettle i:nth-child(2) { animation-delay: .3s; } .pot-cauldron.brewing .pot-kettle i:nth-child(3) { animation-delay: .6s; }
+.pot-cauldron.brewing .pot-slot { animation: pot-drop 1.2s ease-in forwards; }
+@keyframes pot-bub { 0% { opacity: .9; transform: translateY(0) scale(.6); } 100% { opacity: 0; transform: translateY(-60px) scale(1.4); } }
+@keyframes pot-drop { to { transform: translateY(90px) scale(.3); opacity: 0; } }
+.pot-known { font-size: .9rem; margin: 0; text-align: center; }
+.pot-inv { display: grid; grid-template-columns: repeat(auto-fill, minmax(92px, 1fr)); gap: 8px; width: 100%; }
+.pot-ing { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; border-radius: 14px; border: 0; background: rgba(255,255,255,.1); color: inherit; font: inherit; cursor: pointer; }
+.pot-ing span { font-size: 28px; line-height: 1.1; } .pot-ing small { font-size: .72rem; line-height: 1.15; text-align: center; opacity: .85; } .pot-ing b { font-size: .8rem; }
+.pot-ing:disabled { opacity: .35; cursor: default; }
+.pot-view h3 { margin: 8px 0 0; font-size: 1.1rem; align-self: flex-start; }
+.pot-empty, .pot-login { text-align: center; opacity: .85; }
+.pot-pay { font-size: .82rem; opacity: .75; text-align: center; }
+.pot-res { background: #fffaf2; color: #2b1f3d; border-radius: 16px; padding: 14px 16px; text-align: center; width: 100%; animation: modal-in .3s ease; }
+.pot-res h3 { align-self: auto; margin: 4px 0; font-size: 1.15rem; }
+.pot-res p { margin: 5px 0; font-size: .92rem; }
+.pot-res-h { font-weight: 800; color: #6a3fb0; }
+.pot-res.t3 { box-shadow: 0 0 0 3px #F2C94C, 0 0 24px rgba(242,201,76,.6); }
+.pot-res.fail { background: #efe9f5; }
+.pot-res .pill-btn { margin-top: 6px; }
+.pot-tier { display: inline-block; font-size: .72rem !important; font-weight: 800; padding: 2px 8px; border-radius: 999px; background: #d9efe0; color: #2e6b45; vertical-align: middle; }
+.pot-tier.t2 { background: #fbd9e8; color: #9a2f63; } .pot-tier.t3 { background: #fbecb5; color: #8a5a00; }
+.pot-plus { font-size: 1.2rem !important; font-weight: 800; color: #6a3fb0; }
+.pot-cap { font-size: .82rem !important; color: #7a6a8a; }
+.pot-rec { font-size: 1.3rem !important; letter-spacing: 2px; }
+.pot-bottle { image-rendering: pixelated; display: inline-block; }
+.pot-list { display: flex; flex-direction: column; gap: 8px; width: 100%; }
+.pot-entry { display: flex; gap: 10px; align-items: flex-start; background: rgba(255,255,255,.08); border-radius: 14px; padding: 10px 12px; }
+.pot-entry.t3 { box-shadow: inset 0 0 0 2px rgba(242,201,76,.7); }
+.pot-entry p { margin: 3px 0; font-size: .86rem; opacity: .9; }
+.pot-entry .pot-rec { font-size: 1.05rem !important; }
+.pot-bad { display: flex; flex-wrap: wrap; gap: 6px; width: 100%; }
+.pot-bad span { background: rgba(255,255,255,.07); border-radius: 10px; padding: 3px 7px; opacity: .65; }
+.pot-err { color: #F0A987; }
+
+.pot-card .pill-btn:not(.pill-fill), .pot-res .pill-btn:not(.pill-fill) { color: #2b1f3d; border-color: #2b1f3d; background: #fff; }
+@media (max-width: 480px) { .pot-tabs { gap: 4px; flex-wrap: nowrap; } .pot-tabs button { padding: 6px 10px; font-size: .86rem; white-space: nowrap; } }
