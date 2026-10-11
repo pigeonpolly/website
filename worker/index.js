@@ -23,6 +23,7 @@ export default {
     if (!env.DB || !env.IMAGES || !env.GOOGLE_CLIENT_ID) return json({ ready: false }, 503);
     try {
       await ensureSchema(env);
+      await loadRules(env);
       if (p.startsWith('/api/blog/')) return await blogApi(req, env, url, helpers(env));
       return await route(req, env, url);
     } catch (e) {
@@ -35,6 +36,7 @@ export default {
   async scheduled(event, env, ctx) {
     if (!env.DB || !env.IMAGES) return;
     await ensureSchema(env);
+    await loadRules(env);
     ctx.waitUntil((async () => {
       if (!(await getMeta(env, 'buttons_backfill'))) await backfillButtons(env).catch(e => console.error('backfill', e)); // разовое начисление пуговок за прошлое
       await migrateToR2(env); await cleanupInactive(env);
@@ -165,11 +167,11 @@ const surprise = async (env, req, uid, kind) => { const r = await surpriseKI(env
 
 // ---------- адвент-календарь (/advent/): окошки 1–31 декабря, сутки по Риге ----------
 const ADVENT_SPECIAL = [6, 12, 19, 24, 31];
-const ADVENT_LAST_JAN = 23; // до 23 января (включительно) можно открыть пропущенные окошки // особые окошки (31-е — легендарное); то же в site/assets/advent.js
+const ADVENT_LAST_JAN_DEFAULT = 23; // теперь RULES.adventLastJan; // до 23 января (включительно) можно открыть пропущенные окошки // особые окошки (31-е — легендарное); то же в site/assets/advent.js
 // бейдж «Коллекционер»: открыты все 31 окошко адвента одного года (пропущенные — до 23 января). true — только что получен
 async function adventCollector(env, uid, year) {
   const n = (await env.DB.prepare('SELECT COUNT(*) AS n FROM advent_open WHERE user_id = ? AND year = ?').bind(uid, year).first()).n;
-  if (n < 31) return false;
+  if (n < RULES.cond.collector) return false;
   const u = await env.DB.prepare('SELECT badges FROM users WHERE id = ?').bind(uid).first();
   if (String(u && u.badges || '').split(',').includes('collector')) return false;
   await addBadge(env, uid, 'collector');
@@ -182,7 +184,7 @@ function adventNow(req, env) {
   const [y, m, d] = (dev || rigaDay()).split('-').map(Number);
   // 1 декабря 00:00 по Риге (зимой UTC+2) = 30 ноября 22:00 UTC. year — год адвента (в январе — прошлый декабрь).
   // Пропущенные окошки можно открыть до 23 января включительно (claimTo — до какого дня декабря можно забрать)
-  const catchUp = m === 1 && d <= ADVENT_LAST_JAN;
+  const catchUp = m === 1 && d <= RULES.adventLastJan;
   return { year: m === 1 ? y - 1 : y, day: m === 12 ? d : 0, month: m, claimTo: m === 12 ? d : catchUp ? 31 : 0, catchUp,
     startsAt: Date.UTC(y, 10, 30, 22), nowMs: dev ? Date.UTC(y, m - 1, d, 10) : Date.now() };
 }
@@ -300,12 +302,51 @@ const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, p
     monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, collector: 50, hundred: 100, robot: 1 } }; // robot — загрузил работу с пометкой 🤖 «ИИ-генерация»
 // легендарные вещи (как LEGEND в birds.js): в магазине по одной штуке на птичку, дарить нельзя; обычных — до трёх одинаковых
 const LEGEND = new Set(['hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass', 'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight']);
-const SHOP_MAX = 3;
+// ---------- правила сайта, которые Алина меняет в кабинете (раздел «📜 Правила»): хранятся в meta 'rules', поверх значений по умолчанию ----------
+const RULE_DEFAULTS = {
+  daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, pick: 11,
+  levels: { ...BTN.levels }, badges: { ...BTN.badges },
+  shopMax: 3, legendMax: 1, normStock: 10, normLegend: 3, priceMin: 0.75, priceMax: 2.5,
+  adventLastJan: 23, adventButtons: 10, adventSpecialButtons: 25,
+  aiStreak: true, aiUpload: true,
+  // условия бейджей (числа из описаний «как получить»)
+  cond: { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4,
+    alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31 },
+};
+const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
+const RULE_NUM = { daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
+  shopMax: [1, 99], legendMax: [1, 99], normStock: [1, 1000], normLegend: [1, 1000], priceMin: [0.1, 1], priceMax: [1, 10],
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000] };
+let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
+function cleanRules(r) {
+  const out = JSON.parse(JSON.stringify(RULE_DEFAULTS));
+  if (!r || typeof r !== 'object') return out;
+  for (const [k, [lo, hi]] of Object.entries(RULE_NUM)) if (r[k] != null && Number.isFinite(Number(r[k]))) out[k] = Math.max(lo, Math.min(hi, Number(r[k])));
+  for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
+  for (const k of ['aiStreak', 'aiUpload']) if (typeof r[k] === 'boolean') out[k] = r[k];
+  for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
+  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons']) out[k] = Math.round(out[k]);
+  if (out.priceMin > out.priceMax) out.priceMin = out.priceMax;
+  return out;
+}
+async function loadRules(env) {
+  if (Date.now() - rulesAt < 15000) return RULES;
+  rulesAt = Date.now();
+  RULES = cleanRules(parseJ(await getMeta(env, 'rules'), null));
+  // пуговки — в общий объект BTN (по нему всё начисляется и показывается людям)
+  Object.assign(BTN, { daily: RULES.daily, upload: RULES.upload, comment: RULES.comment, commentsPerDay: RULES.commentsPerDay, friend: RULES.friend, pick: RULES.pick });
+  Object.assign(BTN.levels, RULES.levels); Object.assign(BTN.badges, RULES.badges);
+  BTN.cond = RULES.cond; // условия бейджей уходят людям вместе с наградами (описания «как получить» подставляют числа)
+  return RULES;
+}
+const legMax = (kind, item) => LEGEND.has(kind + '|' + item) ? RULES.legendMax : RULES.shopMax;
+// дни для серии: работы с пометкой 🤖 считаются, если так разрешено в правилах
+const streakDays = rows => rows.filter(r => RULES.aiStreak || !(r.ai > 0)).map(r => r.day);
 // цена от остатка: в shop.price — ценность вещи (при обычном запасе: 10 шт., у легендарных — 3);
 // меньше осталось — дороже (до ×2.5), больше — дешевле (до ×0.75). То же считает admin.js effPrice.
 function effPrice(base, stock, leg) {
   if (!(base > 0)) return 0;
-  const f = Math.max(0.75, Math.min(2.5, Math.pow((leg ? 3 : 10) / Math.max(1, stock || 0), 0.4)));
+  const f = Math.max(RULES.priceMin, Math.min(RULES.priceMax, Math.pow((leg ? RULES.normLegend : RULES.normStock) / Math.max(1, stock || 0), 0.4)));
   return Math.max(5, Math.round(base * f / 5) * 5);
 }
 const shopRow = r => ({ kind: r.kind, item: r.item, base: r.price, stock: r.stock, price: effPrice(r.price, r.stock, LEGEND.has(r.kind + '|' + r.item) || r.item === 'legend') });
@@ -352,7 +393,7 @@ async function backfillButtons(env) {
   const add = (uid, kind, ref, amount) => ins.push(env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(uid, kind, String(ref), amount, day, t));
   for (const u of users) {
     const ps = byUser.get(u.id) || [];
-    const best = mergedBest(u, ps.map(x => x.day)), badges = mergedBadges(u, ps).filter(b => b !== 'pick_past' || pickUser !== u.id);
+    const best = mergedBest(u, streakDays(ps)), badges = mergedBadges(u, ps).filter(b => b !== 'pick_past' || pickUser !== u.id);
     for (const [d, n] of Object.entries(BTN.levels)) if (best >= +d) add(u.id, 'badge', 'lv' + d, n);
     for (const k of badges) if (BTN.badges[k]) add(u.id, 'badge', k, BTN.badges[k]);
     for (const x of ps) { add(u.id, 'upload', x.day, BTN.upload); if (x.picked) add(u.id, 'pick', x.id, BTN.pick); }
@@ -555,20 +596,21 @@ function badgesOf(posts, months = []) {
   const sorted = [...posts].sort((a, b) => a.day < b.day ? -1 : 1);
   // «Через денёк»: 15 загрузок подряд, каждая ровно через день (≈ месяц)
   const n = [...new Set(sorted.map(p => dayNum(p.day)))];
-  for (let i = 1, run = 1; i < n.length; i++) { run = n[i] - n[i - 1] === 2 ? run + 1 : 1; if (run >= 15) { got.add('alt'); break; } }
+  for (let i = 1, run = 1; i < n.length; i++) { run = n[i] - n[i - 1] === 2 ? run + 1 : 1; if (run >= RULES.cond.alt) { got.add('alt'); break; } }
   // «Как по часам»: 10 загрузок подряд в пределах одного часа (по кругу суток)
   const tods = sorted.map(p => p.tod);
-  for (let i = 0; i + 10 <= tods.length; i++) {
-    const w = tods.slice(i, i + 10);
+  const CL = RULES.cond.clock;
+  for (let i = 0; i + CL <= tods.length; i++) {
+    const w = tods.slice(i, i + CL);
     if (w.some(t => t == null)) continue;
     const s = [...w].sort((a, b) => a - b);
     let gap = s[0] + 1440 - s[s.length - 1];
     for (let j = 1; j < s.length; j++) gap = Math.max(gap, s[j] - s[j - 1]);
-    if (1440 - gap <= 60) { got.add('clock'); break; }
+    if (1440 - gap <= RULES.cond.clockWin) { got.add('clock'); break; }
   }
   // «Каждый месяц»: работы в 3 календарных месяцах подряд
   const ms = [...new Set([...months, ...posts.map(p => p.day.slice(0, 7))])].map(k => +k.slice(0, 4) * 12 + +k.slice(5, 7) - 1).sort((a, b) => a - b);
-  for (let i = 1, run = 1; i < ms.length; i++) { run = ms[i] - ms[i - 1] === 1 ? run + 1 : 1; if (run >= 3) { got.add('monthly'); break; } }
+  for (let i = 1, run = 1; i < ms.length; i++) { run = ms[i] - ms[i - 1] === 1 ? run + 1 : 1; if (run >= RULES.cond.monthly) { got.add('monthly'); break; } }
   return got;
 }
 // рекорд и бейджи пользователя: из его работ + сохранённое после прошлых очисток
@@ -579,24 +621,25 @@ const VETERAN_MONTHS = 36, VETERAN_PER_MONTH = 2;
 const mcountOf = u => Object.fromEntries(String(u.mcount || '').split(',').filter(Boolean).map(x => { const [k, n] = x.split(':'); return [k, +n || 0]; }));
 function isVeteran(u) {
   const mc = mcountOf(u);
-  const ok = Object.keys(mc).filter(k => mc[k] >= VETERAN_PER_MONTH).map(k => +k.slice(0, 4) * 12 + +k.slice(5, 7) - 1).sort((a, b) => a - b);
-  for (let i = 1, run = ok.length ? 1 : 0; i <= ok.length; i++) { if (run >= VETERAN_MONTHS) return true; run = ok[i] - ok[i - 1] === 1 ? run + 1 : 1; }
+  const ok = Object.keys(mc).filter(k => mc[k] >= RULES.cond.veteranPer).map(k => +k.slice(0, 4) * 12 + +k.slice(5, 7) - 1).sort((a, b) => a - b);
+  for (let i = 1, run = ok.length ? 1 : 0; i <= ok.length; i++) { if (run >= RULES.cond.veteranMonths) return true; run = ok[i] - ok[i - 1] === 1 ? run + 1 : 1; }
   return false;
 }
 // ещё 10 особых бейджей (октябрь 2026): время рисования, количество работ, праздники, выходные, возвращение
 function moreBadges(u, posts) {
   const got = new Set();
   const tods = posts.map(p => p.tod).filter(t => t != null);
-  if (tods.filter(t => t < 480).length >= 5) got.add('early');                 // 5 рисунков до 8 утра
-  if (tods.filter(t => t >= 1380 || t < 240).length >= 5) got.add('owl');      // 5 рисунков с 23:00 до 4:00
+  const C = RULES.cond, night = t => C.owlFrom > C.owlTo ? (t >= C.owlFrom * 60 || t < C.owlTo * 60) : (t >= C.owlFrom * 60 && t < C.owlTo * 60);
+  if (tods.filter(t => t < C.earlyBefore * 60).length >= C.early) got.add('early');   // 5 рисунков до 8 утра
+  if (tods.filter(night).length >= C.owl) got.add('owl');                            // 5 рисунков с 23:00 до 4:00
   const total = Math.max(posts.length, Object.values(mcountOf(u)).reduce((a, b) => a + b, 0));
-  if (total >= 10) got.add('ten'); if (total >= 50) got.add('fifty'); if (total >= 100) got.add('hundred');
-  if (posts.filter(p => p.bw).length >= 10) got.add('inkmaster');               // 10 рисунков в Ч/Б
+  if (total >= C.ten) got.add('ten'); if (total >= C.fifty) got.add('fifty'); if (total >= C.hundred) got.add('hundred');
+  if (posts.filter(p => p.bw).length >= C.inkmaster) got.add('inkmaster');               // 10 рисунков в Ч/Б
   const days = new Set(posts.map(p => p.day)), nums = [...new Set(posts.map(p => dayNum(p.day)))].sort((a, b) => a - b);
-  for (let i = 1; i < nums.length; i++) if (nums[i] - nums[i - 1] >= 30) { got.add('comeback'); break; } // вернулся после месяца перерыва
+  for (let i = 1; i < nums.length; i++) if (nums[i] - nums[i - 1] >= C.comeback) { got.add('comeback'); break; } // вернулся после месяца перерыва
   let weekends = 0;
   for (const d of days) { const dt = new Date(d + 'T12:00:00Z'); if (dt.getUTCDay() === 6) { dt.setUTCDate(dt.getUTCDate() + 1); if (days.has(dt.toISOString().slice(0, 10))) weekends++; } }
-  if (weekends >= 4) got.add('weekend');                                         // суббота и воскресенье — 4 выходных
+  if (weekends >= C.weekend) got.add('weekend');                                         // суббота и воскресенье — 4 выходных
   for (const d of days) { const md = d.slice(5); if (md === '12-31' || md === '01-01') got.add('newyear'); if (md === '10-31') got.add('halloween'); }
   return got;
 }
@@ -680,7 +723,7 @@ async function cleanupInactive(env, limit = KV_LIMIT) {
     const posts = (await env.DB.prepare('SELECT id, day, bw, ai, tod, bytes, store, kv FROM posts WHERE user_id = ?').bind(u.id).all()).results;
     if (report.deletes + posts.filter(x => x.kv !== 0).length * 2 > 900) break; // бесплатный лимит KV — 1000 удалений в сутки
     await env.DB.prepare('UPDATE users SET best = ?, badges = ? WHERE id = ?')
-      .bind(mergedBest(u, posts.map(p => p.day)), mergedBadges(u, posts).join(','), u.id).run();
+      .bind(mergedBest(u, streakDays(posts)), mergedBadges(u, posts).join(','), u.id).run();
     for (const p of posts) { report.deletes += await imgDelete(env, p); if (p.kv !== 0) kvUsed -= p.bytes || 0; if (p.store === 'r2') r2Used -= p.bytes || 0; }
     await env.DB.prepare('DELETE FROM posts WHERE user_id = ?').bind(u.id).run();
     report.users++;
@@ -721,8 +764,8 @@ async function route(req, env, url) {
     if (pickUser === u.id) badges.push('pick');
     const bag = (await env.DB.prepare("SELECT DISTINCT kind, item FROM gifts WHERE user_id = ? AND status = 'bag'").bind(u.id).all()).results; // вещи в сумке — их видят все
     const unopened = (await env.DB.prepare("SELECT COUNT(*) AS n FROM gifts WHERE user_id = ? AND status = 'new'").bind(u.id).first()).n;
-    return json({ id: u.id, avatar: avatarOf(u), room: roomOf(u), bag, unopened, buttons: u.buttons || 0, nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(rows.map(r => r.day)).current,
-      best: mergedBest(u, rows.map(r => r.day)), badges, posts: rows.filter(r => !r.hidden).map(({ id, day, theme, bw, ai }) => ({ id, day, theme, bw, ai })) });
+    return json({ id: u.id, avatar: avatarOf(u), room: roomOf(u), bag, unopened, buttons: u.buttons || 0, nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(streakDays(rows)).current,
+      best: mergedBest(u, streakDays(rows)), badges, posts: rows.filter(r => !r.hidden).map(({ id, day, theme, bw, ai }) => ({ id, day, theme, bw, ai })) });
   }
 
   // карточка птички для превью ссылки /flock/?bird=ник: картинку рисует браузер владельца (bird-card.js) и присылает сюда
@@ -813,7 +856,7 @@ async function route(req, env, url) {
     const all = (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results;
     // прошедшие окошки открыты для всех (и для гостей): в декабре — дни до сегодняшнего, в январе — все; будущее — секрет (целиком видит только админ)
     const shownTo = t.day ? t.day - 1 : t.month === 1 ? 31 : 0;
-    return json({ year: t.year, month: t.month, today: t.day, claimTo: t.claimTo, catchUp: t.catchUp, lastJan: ADVENT_LAST_JAN, startsAt: t.startsAt, now: t.nowMs, special: ADVENT_SPECIAL, user: u ? { id: u.id, nick: u.nick } : null, opened,
+    return json({ year: t.year, month: t.month, today: t.day, claimTo: t.claimTo, catchUp: t.catchUp, lastJan: RULES.adventLastJan, startsAt: t.startsAt, now: t.nowMs, special: ADVENT_SPECIAL, user: u ? { id: u.id, nick: u.nick } : null, opened,
       past: all.filter(r => r.day <= shownTo), shownTo, plan: admin ? all : undefined }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/advent/open') {
@@ -829,7 +872,7 @@ async function route(req, env, url) {
     for (const r of plan) {
       const isSur = r.item === '?' || r.kind === 'any';
       const ki = isSur ? await surpriseKI(env, req, u.id, r.kind, r.item) : [r.kind, r.item]; // «🎲 Сюрприз» — своя случайная вещь каждой птичке
-      if (!ki || (!isSur && await copies(env, u.id, ki[0], ki[1]) >= (LEGEND.has(ki[0] + '|' + ki[1]) ? 1 : SHOP_MAX))) continue;
+      if (!ki || (!isSur && await copies(env, u.id, ki[0], ki[1]) >= legMax(ki[0], ki[1]))) continue;
       await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'advent', 'bag', ?, ?)").bind(u.id, ki[0], ki[1], now(), now()).run();
       got.push(ki);
     }
@@ -837,7 +880,7 @@ async function route(req, env, url) {
       await env.DB.prepare('UPDATE advent_open SET kind = ?, item = ?, got = ? WHERE user_id = ? AND year = ? AND day = ?').bind(got[0][0], got[0][1], JSON.stringify(got), u.id, t.year, day).run();
       return json({ ok: true, day, kind: got[0][0], item: got[0][1], got, collector: await adventCollector(env, u.id, t.year) });
     }
-    const n = ADVENT_SPECIAL.includes(day) ? 25 : 10;
+    const n = ADVENT_SPECIAL.includes(day) ? RULES.adventSpecialButtons : RULES.adventButtons;
     await award(env, u.id, 'advent', `${t.year}-${day}`, n);
     await env.DB.prepare('UPDATE advent_open SET buttons = ? WHERE user_id = ? AND year = ? AND day = ?').bind(n, u.id, t.year, day).run();
     return json({ ok: true, day, buttons: n, collector: await adventCollector(env, u.id, t.year) });
@@ -1004,18 +1047,18 @@ async function route(req, env, url) {
     const earned = u.nick && !u.banned ? await award(env, u.id, 'daily', rigaDay(), BTN.daily) : 0; // +3 за первый заход за сутки
     if (earned) u.buttons = (u.buttons || 0) + earned;
     const rows = (await env.DB.prepare('SELECT id, day, theme, bw, ai, tod, hidden FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
-    const st = streaks(rows.map(r => r.day));
+    const st = streaks(streakDays(rows));
     const pickUser = Number(await getMeta(env, 'pick_user'));
     const kept = mergedBadges(u, rows).filter(b => b !== 'pick_past' || pickUser !== u.id);
     if (pickUser === u.id) kept.push('pick');
     const admin = await isAdmin(u, env);
-    const bestNow = mergedBest(u, rows.map(r => r.day));
+    const bestNow = mergedBest(u, streakDays(rows));
     const forBadges = u.nick && !u.banned ? await awardBadges(env, u.id, bestNow, kept) : { total: 0, got: [] };
     if (forBadges.total) u.buttons = (u.buttons || 0) + forBadges.total;
     const storage = admin ? Math.round(await storageUsed(env) * 1000) / 10 : undefined;
     const migration = admin && env.MEDIA ? await migrationStatus(env) : undefined;
     return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
-      best: mergedBest(u, rows.map(r => r.day)), keptBadges: kept, posts: rows, id: u.id, avatar: avatarOf(u), room: roomOf(u), earned, badgeEarned: forBadges, btn: await buttonStatus(env, u),
+      best: mergedBest(u, streakDays(rows)), keptBadges: kept, posts: rows, id: u.id, avatar: avatarOf(u), room: roomOf(u), earned, badgeEarned: forBadges, btn: await buttonStatus(env, u),
       gifts: (await env.DB.prepare('SELECT id, kind, item, note, status, created_at FROM gifts WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results } });
   }
 
@@ -1023,7 +1066,7 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/shop') {
     await ensurePrices(env, req);
     const rows = (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results;
-    return json({ items: rows.map(shopRow) }, 200, { 'cache-control': 'no-store' });
+    return json({ items: rows.map(shopRow), max: RULES.shopMax, legendMax: RULES.legendMax }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/shop/buy') {
     const u = await needUser(req, env);
@@ -1038,7 +1081,7 @@ async function route(req, env, url) {
     const sur = item === '?' || kind === 'any' ? await surpriseKI(env, req, u.id, kind, item) : null; // «🎲 Сюрприз» — случайная вещь, которой ещё нет
     if (sur === null && (item === '?' || kind === 'any')) fail(409, 'all');
     const gk = sur ? sur[0] : kind, got = sur ? sur[1] : item;
-    if (!sur && await copies(env, u.id, kind, item) >= (LEGEND.has(kind + '|' + item) ? 1 : SHOP_MAX)) fail(409, 'limit'); // обычных — до 3 одинаковых, легендарных — 1
+    if (!sur && await copies(env, u.id, kind, item) >= legMax(kind, item)) fail(409, 'limit'); // обычных — до 3 одинаковых, легендарных — 1
     if ((u.buttons || 0) < row.price) fail(402, 'poor');
     // остаток и пуговки списываем условно (если кто-то успел раньше — ничего не теряется)
     const s1 = await env.DB.prepare('UPDATE shop SET stock = stock - 1 WHERE kind = ? AND item = ? AND stock > 0').bind(kind, item).run();
@@ -1080,7 +1123,7 @@ async function route(req, env, url) {
       return json({ ok: true, price, stock });
     }
     await ensurePrices(env, req);
-    return json({ items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results.map(shopRow), suggested: (await catalog(env, req)).prices || {} });
+    return json({ items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results.map(shopRow), suggested: (await catalog(env, req)).prices || {}, pricing: { normStock: RULES.normStock, normLegend: RULES.normLegend, priceMin: RULES.priceMin, priceMax: RULES.priceMax } });
   }
   // подарить купленную в магазине вещь другой птичке: вещь уходит из сумки и приходит ей неоткрытым подарком
   if (m === 'POST' && p === '/api/gift/give') {
@@ -1092,7 +1135,7 @@ async function route(req, env, url) {
     if (LEGEND.has(g.kind + '|' + g.item)) fail(403, 'legend'); // легендарные не дарятся
     const to = await env.DB.prepare("SELECT id, nick FROM users WHERE nick = ? AND banned = 0 AND id != ?").bind(String(b.to || '').trim().replace(/^@/, ''), u.id).first();
     if (!to) fail(404, 'bird');
-    if (await copies(env, to.id, g.kind, g.item) >= SHOP_MAX) fail(409, 'has'); // у получателя уже три таких
+    if (await copies(env, to.id, g.kind, g.item) >= RULES.shopMax) fail(409, 'has'); // у получателя уже три таких
     await env.DB.prepare("UPDATE gifts SET user_id = ?, status = 'new', note = ?, created_at = ?, opened_at = NULL WHERE id = ?").bind(to.id, 'from:' + u.nick, now(), g.id).run();
     // если даритель носил эту вещь и другой такой у него нет — снять
     const a = avatarOf(u);
@@ -1164,7 +1207,7 @@ async function route(req, env, url) {
       for (let i = 0; i < stmts.length; i += 50) await env.DB.batch(stmts.slice(i, i + 50));
       return json({ ok: true, count: stmts.length });
     }
-    const lim = LEGEND.has(b.kind + '|' + b.item) ? 1 : SHOP_MAX;
+    const lim = legMax(b.kind, b.item);
     const r = await env.DB.prepare(`INSERT INTO gifts (user_id, kind, item, note, created_at) SELECT u.id, ?, ?, ?, ? FROM users u WHERE u.banned = 0 AND u.nick IS NOT NULL AND u.nick != ''
       AND (SELECT COUNT(*) FROM gifts g WHERE g.user_id = u.id AND g.kind = ? AND g.item = ? AND g.status IN ('bag', 'new')) < ?`)
       .bind(b.kind, String(b.item), String(b.note || '').slice(0, 200), now(), b.kind, String(b.item), lim).run();
@@ -1232,8 +1275,8 @@ async function route(req, env, url) {
     const all = (await env.DB.prepare('SELECT day, bw, ai, tod FROM posts WHERE user_id = ?').bind(u.id).all()).results;
     const uu = { ...u, months: months.join(','), mcount };
     await env.DB.prepare('UPDATE users SET months = ?, mcount = ?, best = ?, badges = ? WHERE id = ?')
-      .bind(uu.months, mcount, mergedBest(u, all.map(p => p.day)), mergedBadges(uu, all).join(','), u.id).run();
-    const earned = await award(env, u.id, 'upload', day, BTN.upload);
+      .bind(uu.months, mcount, mergedBest(u, streakDays(all)), mergedBadges(uu, all).join(','), u.id).run();
+    const earned = f.get('ai') === '1' && !RULES.aiUpload ? 0 : await award(env, u.id, 'upload', day, BTN.upload); // за работу с 🤖 — если разрешено в правилах
     return json({ ok: true, id, earned });
   }
 
@@ -1262,9 +1305,9 @@ async function route(req, env, url) {
       WHERE p.day >= ? AND u.banned = 0 AND u.nick IS NOT NULL`).bind(since).all()).results.map(r => r.user_id);
     const top = [];
     for (const uid of active.slice(0, 500)) {
-      const rows = (await env.DB.prepare('SELECT day FROM posts WHERE user_id = ?').bind(uid).all()).results;
+      const rows = (await env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(uid).all()).results;
       const u = await env.DB.prepare('SELECT nick, best, picks FROM users WHERE id = ?').bind(uid).first();
-      const days = rows.map(r => r.day);
+      const days = streakDays(rows);
       top.push({ nick: u.nick, current: streaks(days).current, best: mergedBest(u, days), gold: (u.picks || 0) >= GOLD_PICKS });
     }
     top.sort((a, b) => b.current - a.current || b.best - a.best);
@@ -1331,6 +1374,17 @@ async function route(req, env, url) {
     return json({ ok: true });
   }
 
+  // ---------- кабинет: правила сайта (читать и менять) ----------
+  if (p === '/api/admin/rules') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    if (m === 'POST') {
+      const b = await req.json().catch(() => ({}));
+      const r = b.reset ? cleanRules(null) : cleanRules(b.rules);
+      await setMeta(env, 'rules', JSON.stringify(r)); rulesAt = 0; await loadRules(env);
+    }
+    return json({ rules: RULES, defaults: RULE_DEFAULTS, special: ADVENT_SPECIAL, goldPicks: GOLD_PICKS });
+  }
   // Алина помечает чужую работу как ИИ (ai = 2) или снимает пометку; бейдж «Бип-буп» за это не даётся
   if (m === 'POST' && p === '/api/admin/ai') {
     const u = await needUser(req, env);

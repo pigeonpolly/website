@@ -3236,3 +3236,8 @@ html:not(.is-admin) .statbar { display: none; }
 .sw-tile .sw-aitog.on { background: #BFE3FF; }
 .sw-tile .sw-aitog:not(.on) { background: rgba(20, 12, 40, .45); filter: grayscale(1); opacity: .6; }
 .sw-tile .sw-aitog:not(.on):hover { opacity: .95; }
+.adm-rules h3 { margin: 0 0 8px; } .adm-rules h4 { margin: 14px 0 4px; } .adm-rules ul { margin: 0 0 6px; padding-left: 1.2em; } .adm-rules li { margin: 0 0 4px; line-height: 1.5; }
+.adm-rules input[type=number] { padding: 3px 6px; border: 1px solid #DCD5EC; border-radius: 6px; font: inherit; }
+.adm-rules input.adm-r-changed { border: 2px solid #E9A93B; background: #FFF7E3; }
+.adm-r-chk { display: inline-flex; gap: 8px; align-items: center; margin: 4px 0; }
+.adm-r-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }

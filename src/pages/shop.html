@@ -40,7 +40,7 @@
     rule: ['You can buy up to 3 of the same thing (legendary ones: just 1). Prices follow the stock: the fewer left, the pricier; the more in stock, the cheaper.', 'Одну и ту же вещь можно купить до 3 штук (легендарные — только 1). Цена зависит от остатка: чем меньше осталось, тем дороже, чем больше — тем дешевле.', 'Vienu un to pašu lietu var nopirkt līdz 3 gab. (leģendārās — tikai 1). Cena atkarīga no atlikuma: jo mazāk palicis, jo dārgāk; jo vairāk, jo lētāk.'],
   };
   var bar = document.querySelector('.shop-bar'), box = document.querySelector('.shop-box'), meEl = document.querySelector('.shop-me');
-  var me = null, owned = {}, shop = {};
+  var me = null, owned = {}, shop = {}, LIM = { max: 3, leg: 1 };
   // фильтры: что показать (в продаже / моё / всё), для кого (птичке / комнате / сюрпризы), вид вещи, тема
   var F = { show: 'sale', grp: 'all', kind: '', theme: '', afford: false };
   try { var sv = JSON.parse(localStorage.getItem('pp-shop-f') || 'null'); if (sv) F = Object.assign(F, sv); } catch (e) { /* нет хранилища */ }
@@ -70,7 +70,7 @@
     else meEl.textContent = T.login[L];
   }
   function item(k, v, id, money) {
-    var B = window.PPBirds, s = shop[key(k[0], v)] || { price: 0, stock: 0 }, have = owned[key(k[0], v)] || 0, leg = B.LEGEND && B.LEGEND.has(key(k[0], v)), lim = leg ? 1 : 3;
+    var B = window.PPBirds, s = shop[key(k[0], v)] || { price: 0, stock: 0 }, have = owned[key(k[0], v)] || 0, leg = B.LEGEND && B.LEGEND.has(key(k[0], v)), lim = leg ? LIM.leg : LIM.max;
     var t = document.createElement('figure'); t.className = 'fl-coll-item shop-item' + (s.stock > 0 ? '' : ' sold') + (have ? ' got' : '') + (leg ? ' legend' : '');
     t.appendChild(B.giftPic(k[0], v, id, 84, me && me.avatar));
     if (leg) { var lt = document.createElement('span'); lt.className = 'legend-tag'; lt.textContent = '★'; lt.title = T.legend[L]; t.appendChild(lt); }
@@ -95,7 +95,7 @@
     var theme = F.theme ? B.GIFT_THEMES.filter(function (t) { return t[0] === F.theme; })[0] : null;
     var stock = function (k, v) { return (shop[key(k, v)] || {}).stock > 0; };
     box.innerHTML = '';
-    var rule = document.createElement('p'); rule.className = 'fl-all-lead'; rule.textContent = T.rule[L]; box.appendChild(rule);
+    var rule = document.createElement('p'); rule.className = 'fl-all-lead'; rule.textContent = T.rule[L].replace(/\b3\b/, LIM.max).replace(/\b1\b/, LIM.leg); box.appendChild(rule);
     // блоки: «В продаже», «У вас есть», «Всё» = в продаже + нет в наличии
     var blocks = F.show === 'mine' ? [['mine', T.youHave[L]]] : F.show === 'sale' ? [['on', T.onSale[L]]] : [['on', T.onSale[L]], ['off', T.gone[L]]];
     blocks.forEach(function (bl) {
@@ -107,7 +107,7 @@
         if (F.kind && F.kind !== k[0]) return;
         var list = (bl[0] === 'mine' ? B.GIFTS[k[0]] || [] : B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).filter(function (v) {
           if (theme && theme[2].indexOf(key(k[0], v)) < 0) return false;
-          if (F.afford && me && bl[0] !== 'mine') { var sp = shop[key(k[0], v)] || {}, lim = B.LEGEND && B.LEGEND.has(key(k[0], v)) ? 1 : 3; if (!(sp.stock > 0 && sp.price <= money && (v === '?' || k[0] === 'any' || (owned[key(k[0], v)] || 0) < lim))) return false; } // хватает пуговок и ещё можно купить
+          if (F.afford && me && bl[0] !== 'mine') { var sp = shop[key(k[0], v)] || {}, lim = B.LEGEND && B.LEGEND.has(key(k[0], v)) ? LIM.leg : LIM.max; if (!(sp.stock > 0 && sp.price <= money && (v === '?' || k[0] === 'any' || (owned[key(k[0], v)] || 0) < lim))) return false; } // хватает пуговок и ещё можно купить
           return bl[0] === 'mine' ? owned[key(k[0], v)] > 0 : stock(k[0], v) === (bl[0] === 'on');
         });
         if (!list.length) return;
@@ -139,6 +139,7 @@
       fetch('/api/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }),
     ]).then(function (a) {
       shop = {}; (a[0].items || []).forEach(function (r) { shop[key(r.kind, r.item)] = r; });
+      LIM = { max: a[0].max || 3, leg: a[0].legendMax || 1 }; // лимиты из «📜 Правил» в кабинете
       me = a[1] && a[1].user ? a[1].user : null; owned = {};
       if (me) (me.gifts || []).forEach(function (g) { if (g.status === 'bag' || g.status === 'new') owned[key(g.kind, g.item)] = (owned[key(g.kind, g.item)] || 0) + 1; });
       draw();

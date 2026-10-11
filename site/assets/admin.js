@@ -16,7 +16,7 @@
   const n = v => Number(v || 0).toLocaleString('ru-RU');
   const err = e => e.code === 401 || e.code === 'auth' || e.code === 'login' ? 'Войдите через Google (кнопка в шапке), чтобы открыть кабинет.' : e.code === 'admin' || e.code === 403 ? 'Этот кабинет только для админа.' : 'Не получилось загрузить: ' + esc(e.message);
 
-  const SECTIONS = { overview, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent };
+  const SECTIONS = { overview, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules };
   function route() {
     const sec = (location.hash || '#overview').slice(1);
     document.querySelectorAll('.adm-nav [data-sec]').forEach(a => a.setAttribute('aria-current', a.dataset.sec === sec ? 'page' : 'false'));
@@ -235,6 +235,101 @@
     else main.querySelector('.adm-adv').innerHTML = '<p class="be-note">Не загрузился advent-admin.js.</p>';
   }
 
+  // ---------- 📜 правила сайта: что можно поменять (сохраняется в meta 'rules') + полный свод правил с текущими числами ----------
+  const BADGE_RU = { bw: 'Нарисовал(а) в Ч/Б', extra: 'День ЭКСТРА-палитры', bday: 'Гость на дне рождения Полли', early: 'Ранняя пташка', owl: 'Ночная сова', comeback: 'С возвращением',
+    ten: 'Первая десятка', weekend: 'Художник выходного дня', newyear: 'Новогодний скетч', halloween: 'Тыквенный скетч', monthly: 'Каждый месяц', inkmaster: 'Мастер туши', alt: 'Через денёк',
+    clock: 'Как по часам', veteran: 'Старожил', fifty: 'Полсотни', collector: 'Коллекционер (адвент)', hundred: 'Клуб сотни', robot: 'Бип-буп (ИИ-работа)' };
+  const LEVEL_RU = { 1: 'Яйцо', 3: 'Птенец', 7: 'Голубёнок', 14: 'Почтовый голубь', 30: 'Голубь-путешественник', 60: 'Голубь-художник', 100: 'Голубь-астронавт', 365: 'Легенда Полли' };
+  // условие бейджа: [ключ, подпись до, подпись после] — поля прямо в тексте условия
+  const BADGE_COND = {
+    early: [['early', 'Загрузить', 'рисунков'], ['earlyBefore', 'до', ':00 утра']], owl: [['owl', 'Загрузить', 'рисунков'], ['owlFrom', 'с', ':00'], ['owlTo', 'до', ':00']],
+    ten: [['ten', 'Всего', 'рисунков']], fifty: [['fifty', 'Всего', 'рисунков']], hundred: [['hundred', 'Всего', 'рисунков']], inkmaster: [['inkmaster', '', 'рисунков в Ч/Б']],
+    comeback: [['comeback', 'Вернуться после перерыва от', 'дней']], weekend: [['weekend', 'Суббота + воскресенье одних выходных —', 'раз(а)']],
+    alt: [['alt', '', 'рисунков подряд строго через день']], clock: [['clock', '', 'рисунков подряд в одно время'], ['clockWin', '± в пределах', 'минут']],
+    monthly: [['monthly', 'Рисунки в', 'месяцах подряд']], veteran: [['veteranPer', 'Хотя бы', 'рисунка в месяц'], ['veteranMonths', '', 'месяцев подряд']],
+    collector: [['collector', 'Открыть', 'окошек адвента']],
+  };
+  const BADGE_FIXED = { bw: 'Загрузить рисунок в режиме Ч/Б', extra: 'Загрузить рисунок в день ЭКСТРА (раз в месяц)', bday: 'Загрузить рисунок 23 января', newyear: 'Загрузить рисунок 31 декабря или 1 января', halloween: 'Загрузить рисунок 31 октября', robot: 'Загрузить работу и самому поставить галочку 🤖 (пометка админа не считается)' };
+  async function rules() {
+    main.innerHTML = '<p class="be-note">Загрузка…</p>';
+    let d; try { d = await api('admin/rules'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    const R = d.rules, D = d.defaults;
+    const num = (path, v, def, step = 1, w = 70) => `<input type="number" step="${step}" data-r="${path}" value="${v}" style="width:${w}px" title="По умолчанию: ${def}"${String(v) !== String(def) ? ' class="adm-r-changed"' : ''}>`;
+    const row = (label, inner, def, note = '') => `<tr><td>${label}${note ? `<br><small class="be-note">${note}</small>` : ''}</td><td>${inner}</td><td class="be-note">${def}</td></tr>`;
+    const box = (h, rows, lead = '') => `<section class="adm-box adm-rules"><h3>${h}</h3>${lead ? `<p class="be-note">${lead}</p>` : ''}<table class="be-table adm-table"><thead><tr><th>Что</th><th>Сейчас</th><th>По умолчанию</th></tr></thead><tbody>${rows.join('')}</tbody></table></section>`;
+    const btnRows = [['daily', 'Первый заход за сутки'], ['upload', 'Рисунок в челлендж (раз в день)'], ['comment', 'Комментарий'], ['commentsPerDay', 'Сколько комментариев в день приносят пуговки', ''], ['friend', 'Друг указал тебя при регистрации'], ['pick', '«★ Выбор Полли» (за каждую выбранную работу)']]
+      .map(([k, l]) => row(l, num(k, R[k], D[k]) + (k === 'commentsPerDay' ? ' шт.' : ' 🔘'), D[k]));
+    const lvRows = Object.keys(D.levels).map(k => row(`${LEVEL_RU[k] || ''} — рекорд ${k} ${k === '1' ? 'день' : 'дней'} подряд`, num('levels.' + k, R.levels[k], D.levels[k]) + ' 🔘', D.levels[k]));
+    const bRows = Object.keys(D.badges).map(k => {
+      const cond = BADGE_COND[k] ? BADGE_COND[k].map(([ck, a, b]) => `${a} ${num('cond.' + ck, R.cond[ck], D.cond[ck], 1, 60)} ${b}`).join(' · ') : (BADGE_FIXED[k] || '');
+      return `<tr><td><b>${BADGE_RU[k] || k}</b><br><small>${cond}</small></td><td>${num('badges.' + k, R.badges[k], D.badges[k])} 🔘</td><td class="be-note">${D.badges[k]} 🔘${BADGE_COND[k] ? '<br>' + BADGE_COND[k].map(([ck]) => D.cond[ck]).join(' / ') : ''}</td></tr>`;
+    });
+    const shopRows = [
+      row('Сколько одинаковых обычных вещей можно иметь', num('shopMax', R.shopMax, D.shopMax) + ' шт.', D.shopMax, 'и купить, и получить в подарок'),
+      row('Сколько одинаковых легендарных', num('legendMax', R.legendMax, D.legendMax) + ' шт.', D.legendMax),
+      row('Обычный запас (при нём цена = ценности)', num('normStock', R.normStock, D.normStock) + ' шт.', D.normStock, 'меньше штук — дороже, больше — дешевле'),
+      row('Обычный запас легендарных', num('normLegend', R.normLegend, D.normLegend) + ' шт.', D.normLegend),
+      row('Самая низкая цена (доля от ценности)', '×' + num('priceMin', R.priceMin, D.priceMin, 0.05), '×' + D.priceMin, 'когда штук очень много'),
+      row('Самая высокая цена (во сколько раз дороже)', '×' + num('priceMax', R.priceMax, D.priceMax, 0.1), '×' + D.priceMax, 'когда осталась 1 штука'),
+    ];
+    const advRows = [
+      row('Пропущенные окошки можно открыть до … января', num('adventLastJan', R.adventLastJan, D.adventLastJan) + ' января', D.adventLastJan, '0 — в январе уже нельзя'),
+      row('Пуговки в окошке без вещей', num('adventButtons', R.adventButtons, D.adventButtons) + ' 🔘', D.adventButtons),
+      row(`Пуговки в особом пустом окошке (${d.special.join(', ')} декабря)`, num('adventSpecialButtons', R.adventSpecialButtons, D.adventSpecialButtons) + ' 🔘', D.adventSpecialButtons),
+    ];
+    const chk = (k, l, note) => `<label class="adm-r-chk"><input type="checkbox" data-r="${k}"${R[k] ? ' checked' : ''}> ${l}${note ? ` <small class="be-note">${note}</small>` : ''}</label>`;
+    main.innerHTML = `<section class="adm-box"><h2>📜 Правила</h2>
+      <p class="be-note">Здесь можно поменять пуговки, бейджи, магазин, адвент и ИИ-работы. Изменения действуют сразу после «Сохранить» (до минуты на всех страницах). Поле с жёлтой рамкой отличается от значения по умолчанию. Уже полученные бейджи и пуговки при изменениях не отнимаются; если снизить условие бейджа, птички, которые ему уже соответствуют, получат его при следующем заходе.</p>
+      <p class="adm-r-bar"><button type="button" class="pill-btn pill-fill" id="adm-r-save">💾 Сохранить правила</button> <button type="button" class="pill-btn" id="adm-r-reset">↺ Вернуть всё по умолчанию</button> <span class="be-note" id="adm-r-st"></span></p></section>
+      ${box('🔘 Пуговки', btnRows)}
+      ${box('🥚 Уровни (рекордная серия) — пуговки один раз за уровень', lvRows)}
+      ${box('🏅 Бейджи — награда и условия', bRows, 'Числа в условиях можно менять прямо в тексте. Описание «как получить» у птичек подстраивается само.')}
+      ${box('🛍 Магазин', shopRows)}
+      ${box('🎄 Адвент', advRows)}
+      <section class="adm-box adm-rules"><h3>🤖 ИИ-работы</h3>${chk('aiStreak', 'Работа с пометкой 🤖 засчитывается в серию', '(выключить — такие дни не продлевают серию)')}<br>${chk('aiUpload', 'За работу с пометкой 🤖 дают пуговки за загрузку')}</section>
+      <section class="adm-box adm-rules" id="adm-rules-all"></section>`;
+    // полный свод правил — обычным текстом, с текущими числами
+    const pc = n => n + ' 🔘';
+    main.querySelector('#adm-rules-all').innerHTML = `<h3>📖 Все правила сайта</h3>
+      <h4>Челлендж</h4><ul>
+        <li>Каждый день — тема дня. Рисунок можно загрузить за сегодня, вчера и позавчера (одна работа на день; новая заменяет старую).</li>
+        <li>Раз в месяц — день ЭКСТРА (день свободы: своя тема или свой референс). Если в этот день ничего не загружено, серия не прерывается.</li>
+        <li>Серия — сколько дней подряд есть рисунки; рекорд серии даёт уровни. ${R.aiStreak ? 'Работы с пометкой 🤖 тоже засчитываются в серию.' : 'Работы с пометкой 🤖 в серию <b>не</b> засчитываются.'}</li>
+        <li>Галочка «Ч/Б» — рисунок в чёрно-белом режиме (бейджи «Нарисовал(а) в Ч/Б» и «Мастер туши»).</li>
+        <li>Галочка 🤖 «ИИ-генерация» ставит значок робота на работе. Админ тоже может пометить работу 🤖 (голова робота в углу работы). На стене каждый выбирает: все работы, работы людей или работы роботов.</li>
+        <li>«★ Выбор Полли» — одна работа на всём сайте; ставит и снимает админ. Каждые 5 выборов — звезда на бейдже, 3 звезды (${d.goldPicks} выборов) — золотой ник. Если снять выбор, бейдж становится чёрно-белым, пуговки и счётчик остаются.</li>
+        <li>Админ может скрыть работу со стены и заблокировать птичку (её работы пропадают со стены).</li></ul>
+      <h4>Пуговки 🔘</h4><ul>
+        <li>Первый заход за сутки — ${pc(R.daily)}; рисунок — ${pc(R.upload)} (за день один раз)${R.aiUpload ? '' : ', за работу с 🤖 — 0'}; комментарий — ${pc(R.comment)} (первые ${R.commentsPerDay} в день); друг указал тебя при регистрации — ${pc(R.friend)}; «Выбор Полли» — ${pc(R.pick)}.</li>
+        <li>Уровни: ${Object.keys(R.levels).map(k => `${LEVEL_RU[k]} (${k}) — ${R.levels[k]}`).join(', ')}.</li>
+        <li>Бейджи: ${Object.keys(R.badges).map(k => `${BADGE_RU[k] || k} — ${R.badges[k]}`).join(', ')}. За каждый бейдж и уровень пуговки дают один раз.</li></ul>
+      <h4>Магазин</h4><ul>
+        <li>Одинаковых обычных вещей — до ${R.shopMax} шт., легендарных — до ${R.legendMax}. Легендарные дарить нельзя.</li>
+        <li>У каждой вещи есть ценность (цена при запасе ${R.normStock} шт., у легендарных — ${R.normLegend}). Цена сейчас = ценность × (обычный запас ÷ остаток)^0.4, от ×${R.priceMin} до ×${R.priceMax}, округление до 5.</li>
+        <li>«🎲 Сюрприз» — случайная вещь категории, которой у птички ещё нет; если всё есть — любая вещь, которой нет.</li>
+        <li>Купленную вещь можно подарить другой птичке (если у неё ещё нет максимума).</li></ul>
+      <h4>Адвент-календарь</h4><ul>
+        <li>1–31 декабря, окошко открывается в свой день (по Риге); у всех одинаковые вещи. Прошедшие окошки видны всем, и гостям.</li>
+        <li>Пропущенные окошки можно открыть ${R.adventLastJan ? `до ${R.adventLastJan} января` : 'только в декабре'}, даже если птичка зарегистрировалась позже.</li>
+        <li>Окошко без вещей — ${pc(R.adventButtons)}, особое (${d.special.join(', ')}) — ${pc(R.adventSpecialButtons)}. Открыть ${R.cond.collector} окошек — бейдж «Коллекционер».</li></ul>
+      <h4>Комната птички</h4><ul><li>Вещи для комнаты — из сумки (покупки, подарки, адвент). Подарил вещь — она уходит из комнаты.</li></ul>
+      <h4>Блог</h4><ul><li>Комментарии: аноним («птица + номер») или под ником из челленджа. Комментарий со ссылкой ждёт проверки в кабинете.</li></ul>`;
+    const st = main.querySelector('#adm-r-st');
+    main.querySelector('#adm-r-save').onclick = async e => {
+      const r = JSON.parse(JSON.stringify(R));
+      main.querySelectorAll('[data-r]').forEach(i => {
+        const path = i.dataset.r.split('.'); const v = i.type === 'checkbox' ? i.checked : Number(i.value);
+        if (path.length === 2) r[path[0]][path[1]] = v; else r[path[0]] = v;
+      });
+      e.target.disabled = true; st.textContent = 'Сохраняю…';
+      try { await api('admin/rules', { rules: r }); st.textContent = '✓ Сохранено'; rules(); } catch (x) { e.target.disabled = false; st.textContent = '⚠ ' + err(x); }
+    };
+    main.querySelector('#adm-r-reset').onclick = async () => {
+      if (!confirm('Вернуть все правила к значениям по умолчанию?')) return;
+      try { await api('admin/rules', { reset: true }); rules(); } catch (x) { alert(err(x)); }
+    };
+  }
+
   // ---------- подарить семечко: фон, обувь, головной убор, анимация, рамка ----------
   function giftDialog(u, done) {
     const B = window.PPBirds; if (!B) return;
@@ -298,11 +393,13 @@
 
   // ---------- магазин: цена и количество каждой вещи из коллекций ----------
   // цена от остатка — как effPrice в worker/index.js: ценность × (10 / остаток)^0.4, от ×0.75 до ×2.5 (у легендарных обычный запас — 3)
-  const effPrice = (base, stock, leg) => base > 0 ? Math.max(5, Math.round(base * Math.max(0.75, Math.min(2.5, Math.pow((leg ? 3 : 10) / Math.max(1, stock || 0), 0.4))) / 5) * 5) : 0;
+  let PR = { normStock: 10, normLegend: 3, priceMin: 0.75, priceMax: 2.5 }; // формула цены — из «📜 Правил» (приходит с admin/shop)
+  const effPrice = (base, stock, leg) => base > 0 ? Math.max(5, Math.round(base * Math.max(PR.priceMin, Math.min(PR.priceMax, Math.pow((leg ? PR.normLegend : PR.normStock) / Math.max(1, stock || 0), 0.4))) / 5) * 5) : 0;
   let sFilter = 'all', sq = '', sStock = 'all', sSort = 'cat'; const sOpen = new Set(); // фильтр «Закончились / Скоро закончатся» — общий для таблицы остатков и списка вещей (sStock)
   async function shop() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('admin/shop'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    if (d.pricing) PR = d.pricing;
     const B = window.PPBirds; if (!B) { main.innerHTML = '<p class="be-note">Не загрузился каталог вещей (birds.js).</p>'; return; }
     const rows = {}; d.items.forEach(r => { rows[r.kind + '|' + r.item] = r; });
     const all = []; B.GIFT_KINDS.forEach(k => (B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).forEach(v => all.push({ kind: k[0], kindName: k[1][1], item: v, name: B.giftName(k[0], v, 1) })));

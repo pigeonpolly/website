@@ -141,43 +141,43 @@
     { k: 'bday', f: ['Came to Polly’s party with a drawing instead of a cake.', 'Пришёл(ла) к Полли на день рождения с рисунком вместо торта.', 'Atnāci uz Pollijas ballīti ar zīmējumu kūkas vietā.'], n: ['Polly’s birthday guest', 'Гость на дне рождения Полли', 'Pollijas dzimšanas dienas viesis'], s: 'party', bg: '#F9D3E3',
       h: ['Upload a sketch on 23 January', 'Загрузить рисунок 23 января', 'Augšupielādēt skici 23. janvārī'] },
     { k: 'alt', f: ['Draws every other day, rests like a pro.', 'Рисует через день, отдыхает как профи.', 'Zīmē katru otro dienu, atpūšas kā profesionālis.'], n: ['Every other day', 'Через денёк', 'Katru otro dienu'], s: 'sleepy', bg: '#CDE7F7',
-      h: ['Upload 15 sketches in a row, each exactly every other day (about a month)', 'Загрузить 15 рисунков подряд строго через день (примерно месяц)', 'Augšupielādēt 15 skices pēc kārtas, katru otro dienu (apmēram mēnesis)'] },
+      h: ['Upload {n} sketches in a row, each exactly every other day', 'Загрузить {n} рисунков подряд строго через день', 'Augšupielādēt {n} skices pēc kārtas, katru otro dienu'] },
     { k: 'monthly', f: ['Drops in once a month, like a full moon.', 'Заглядывает раз в месяц, как полнолуние.', 'Ienāk reizi mēnesī kā pilnmēness.'], n: ['Monthly regular', 'Каждый месяц', 'Ik mēnesi'], s: 'moon', bg: '#D9D3F2',
-      h: ['Upload at least one sketch in 3 calendar months in a row', 'Загрузить хотя бы один рисунок в 3 календарных месяцах подряд', 'Augšupielādēt vismaz vienu skici 3 kalendāra mēnešos pēc kārtas'] },
+      h: ['Upload at least one sketch in {n} calendar months in a row', 'Загрузить хотя бы один рисунок в {n} календарных месяцах подряд', 'Augšupielādēt vismaz vienu skici {n} kalendāra mēnešos pēc kārtas'] },
     { k: 'pick', n: ['Polly’s pick', 'Выбор Полли', 'Pollijas izvēle'], s: 'medal', bg: '#F0A987',
       f: ['Polly pecked your sketch with approval. The highest honour.', 'Полли одобрительно клюнула ваш рисунок. Высшая награда.', 'Pollija atzinīgi noknābāja tavu skici. Augstākais gods.'],
       past: ['Once Polly’s pick. Forever in history.', 'Когда-то — выбор Полли. Навсегда в истории.', 'Reiz Pollijas izvēle. Uz visiem laikiem vēsturē.'],
       h: ['Polly picks one sketch she loves. Only one owner at a time: when she picks another, yours turns black & white. Every 5 picks earn a star; 3 stars give you a golden nickname.', 'Полли выбирает один рисунок, который ей особенно понравился. Владелец только один: когда она выберет другой, ваш бейдж станет чёрно-белым. Каждые 5 выборов — звезда, 3 звезды — золотой ник.', 'Pollija izvēlas vienu skici, kas viņai īpaši patīk. Īpašnieks tikai viens: kad viņa izvēlas citu, tava nozīmīte kļūst melnbalta. Katras 5 izvēles — zvaigzne, 3 zvaigznes — zelta segvārds.'] },
     { k: 'veteran', f: ['Here since the dinosaurs. Well, almost three years.', 'Здесь со времён динозавров. Ну, почти три года.', 'Šeit kopš dinozauru laikiem. Nu, gandrīz trīs gadus.'],
       n: ['Old-timer', 'Старожил', 'Vecais draugs'], s: 'wise', bg: '#EADFC8',
-      h: ['Upload at least 2 sketches every month for 36 months in a row (3 years). No daily streak needed.', 'Загружать хотя бы 2 рисунка в каждом месяце 36 месяцев подряд (3 года). Ежедневная серия не нужна.', 'Augšupielādēt vismaz 2 skices katru mēnesi 36 mēnešus pēc kārtas (3 gadus). Ikdienas sērija nav vajadzīga.'] },
+      h: ['Upload at least {p} sketches every month for {n} months in a row. No daily streak needed.', 'Загружать хотя бы {p} рисунка в каждом месяце {n} месяцев подряд. Ежедневная серия не нужна.', 'Augšupielādēt vismaz {p} skices katru mēnesi {n} mēnešus pēc kārtas. Ikdienas sērija nav vajadzīga.'] },
     { k: 'early', s: 'early', bg: '#FBE3A1', n: ['Early bird', 'Ранняя пташка', 'Agrais putniņš'], f: ['Draws before the coffee is ready.', 'Рисует раньше, чем сварится кофе.', 'Zīmē, pirms kafija gatava.'],
-      h: ['Upload 5 sketches before 8 in the morning', 'Загрузить 5 рисунков до 8 утра', 'Augšupielādēt 5 skices pirms 8 rītā'] },
+      h: ['Upload {n} sketches before {h}:00 in the morning', 'Загрузить {n} рисунков до {h}:00 утра', 'Augšupielādēt {n} skices pirms {h}:00 rītā'] },
     { k: 'owl', s: 'owl', bg: '#C9C3EA', n: ['Night owl', 'Ночная сова', 'Nakts pūce'], f: ['The best ideas come after midnight.', 'Лучшие идеи приходят после полуночи.', 'Labākās idejas nāk pēc pusnakts.'],
-      h: ['Upload 5 sketches between 11 pm and 4 am', 'Загрузить 5 рисунков между 23:00 и 4:00', 'Augšupielādēt 5 skices no 23:00 līdz 4:00'] },
+      h: ['Upload {n} sketches between {a}:00 and {b}:00', 'Загрузить {n} рисунков между {a}:00 и {b}:00', 'Augšupielādēt {n} skices no {a}:00 līdz {b}:00'] },
     { k: 'weekend', s: 'weekend', bg: '#BFE3FF', n: ['Weekend artist', 'Художник выходного дня', 'Brīvdienu mākslinieks'], f: ['Saturday? Sunday? Sketchbook day.', 'Суббота? Воскресенье? День скетчбука.', 'Sestdiena? Svētdiena? Skiču dienas.'],
-      h: ['Draw on both Saturday and Sunday of the same weekend, 4 times', 'Нарисовать и в субботу, и в воскресенье одних выходных — 4 раза', 'Zīmēt gan sestdienā, gan svētdienā vienās brīvdienās — 4 reizes'] },
+      h: ['Draw on both Saturday and Sunday of the same weekend, {n} times', 'Нарисовать и в субботу, и в воскресенье одних выходных — {n} раза', 'Zīmēt gan sestdienā, gan svētdienā vienās brīvdienās — {n} reizes'] },
     { k: 'ten', s: 'ten', bg: '#E2D3F7', n: ['First ten', 'Первая десятка', 'Pirmais desmitnieks'], f: ['Ten sketches. The habit has a pulse.', 'Десять рисунков. У привычки появился пульс.', 'Desmit skices. Ieradumam ir pulss.'],
-      h: ['Upload 10 sketches in total', 'Загрузить всего 10 рисунков', 'Kopā augšupielādēt 10 skices'] },
+      h: ['Upload {n} sketches in total', 'Загрузить всего {n} рисунков', 'Kopā augšupielādēt {n} skices'] },
     { k: 'fifty', s: 'fifty', bg: '#CDEBD8', n: ['Half a hundred', 'Полсотни', 'Pussimts'], f: ['A whole stack of sketchbooks!', 'Целая стопка скетчбуков!', 'Vesela skiču bloku kaudze!'],
-      h: ['Upload 50 sketches in total', 'Загрузить всего 50 рисунков', 'Kopā augšupielādēt 50 skices'] },
+      h: ['Upload {n} sketches in total', 'Загрузить всего {n} рисунков', 'Kopā augšupielādēt {n} skices'] },
     { k: 'hundred', s: 'hundred', bg: '#FBE3A1', n: ['Hundred club', 'Клуб сотни', 'Simtnieku klubs'], f: ['One hundred sketches. Laurels well earned.', 'Сто рисунков. Лавры заслужены.', 'Simts skices. Lauri pelnīti.'],
-      h: ['Upload 100 sketches in total', 'Загрузить всего 100 рисунков', 'Kopā augšupielādēt 100 skices'] },
+      h: ['Upload {n} sketches in total', 'Загрузить всего {n} рисунков', 'Kopā augšupielādēt {n} skices'] },
     { k: 'inkmaster', s: 'inkpot', bg: '#E6E6E6', n: ['Ink master', 'Мастер туши', 'Tušas meistars'], f: ['Ten times in black and white. Ink runs in the family.', 'Десять раз в Ч/Б. Тушь — это семейное.', 'Desmit reizes melnbaltā. Tuša ir ģimenē.'],
-      h: ['Upload 10 sketches in “Black & white” mode', 'Загрузить 10 рисунков в режиме «Ч/Б»', 'Augšupielādēt 10 skices “Melnbaltā” režīmā'] },
+      h: ['Upload {n} sketches in “Black & white” mode', 'Загрузить {n} рисунков в режиме «Ч/Б»', 'Augšupielādēt {n} skices “Melnbaltā” režīmā'] },
     { k: 'comeback', s: 'comeback', bg: '#FBD3E3', n: ['Welcome back', 'С возвращением', 'Laipni atpakaļ'], f: ['Life happens. The sketchbook waited for you.', 'Жизнь бывает разной. Скетчбук вас дождался.', 'Dzīve notiek. Skiču bloks tevi gaidīja.'],
-      h: ['Come back and upload a sketch after a break of 30 days or more', 'Вернуться и загрузить рисунок после перерыва в 30 дней и больше', 'Atgriezties un augšupielādēt skici pēc 30 vai vairāk dienu pārtraukuma'] },
+      h: ['Come back and upload a sketch after a break of {n} days or more', 'Вернуться и загрузить рисунок после перерыва в {n} дней и больше', 'Atgriezties un augšupielādēt skici pēc {n} vai vairāk dienu pārtraukuma'] },
     { k: 'newyear', s: 'newyear', bg: '#CFE6F7', n: ['New Year sketch', 'Новогодний скетч', 'Jaungada skice'], f: ['Started the year with a pencil in hand.', 'Встретил(а) год с карандашом в руке.', 'Sagaidīji gadu ar zīmuli rokā.'],
       h: ['Upload a sketch on 31 December or 1 January', 'Загрузить рисунок 31 декабря или 1 января', 'Augšupielādēt skici 31. decembrī vai 1. janvārī'] },
     { k: 'halloween', s: 'pumpkin', bg: '#F7C9A3', n: ['Spooky sketch', 'Тыквенный скетч', 'Ķirbju skice'], f: ['Drew on Halloween and wasn’t even scared.', 'Рисовал(а) на Хеллоуин и даже не испугался(ась).', 'Zīmēji Helovīnā un pat nenobijies.'],
       h: ['Upload a sketch on 31 October', 'Загрузить рисунок 31 октября', 'Augšupielādēt skici 31. oktobrī'] },
     { k: 'collector', s: 'collector', bg: '#F6D3CF', n: ['Collector', 'Коллекционер', 'Kolekcionārs'], f: ['Opened all 31 advent windows. Not a single gift escaped.', 'Открыл(а) все 31 окошко адвента. Ни один подарок не ускользнул.', 'Atvēri visus 31 adventes lodziņus. Neviena dāvana neizbēga.'],
-      h: ['Open all 31 windows of the advent calendar in December (missed ones can still be opened until 23 January)', 'Открыть все 31 окошко адвент-календаря в декабре (пропущенные можно открыть до 23 января)', 'Atvērt visus 31 adventes kalendāra lodziņus decembrī (izlaistos var atvērt līdz 23. janvārim)'] },
+      h: ['Open {n} windows of the advent calendar in December (missed ones can still be opened in January)', 'Открыть {n} окошек адвент-календаря в декабре (пропущенные можно открыть ещё в январе)', 'Atvērt {n} adventes kalendāra lodziņus decembrī (izlaistos var atvērt arī janvārī)'] },
     { k: 'robot', s: 'robot', bg: '#D6E4F0', n: ['Beep-boop', 'Бип-буп', 'Bīp-būp'],
       f: ['We don’t know why you’re doing this, but since you are, let there be at least some reward for it too.', 'Мы не знаем, зачем вы это делаете, но раз уж вы это делаете, пусть за это тоже будет хотя бы какая-то награда.', 'Mēs nezinām, kāpēc jūs to darāt, bet, ja jau darāt, lai par to arī ir kaut kāda balva.'],
       h: ['Upload a work and tick 🤖 “AI-generated” yourself (once is enough). If the mark was added by the site admin, the badge is not given: only those who marked it themselves get it.', 'Загрузить работу и самому поставить галочку 🤖 «ИИ-генерация» (достаточно одного раза). Если пометку поставил админ сайта, бейдж не даётся: его получают только те, кто отметил сам.', 'Augšupielādēt darbu un pašam atzīmēt 🤖 “MI ģenerēts” (pietiek ar vienu reizi). Ja atzīmi pielika vietnes administrators, nozīmīti nedod: to saņem tikai tie, kas atzīmēja paši.'] },
     { k: 'clock', f: ['Polly sets her watch by you.', 'Полли сверяет по вам часы.', 'Pollija pēc tevis regulē pulksteni.'], n: ['Like clockwork', 'Как по часам', 'Kā pulkstenis'], s: 'clock', bg: '#FBE3D6',
-      h: ['Upload 10 sketches in a row at about the same time of day (within one hour)', 'Загрузить 10 рисунков подряд примерно в одно время суток (в пределах часа)', 'Augšupielādēt 10 skices pēc kārtas apmēram vienā laikā (vienas stundas robežās)'] },
+      h: ['Upload {n} sketches in a row at about the same time of day (within {w} minutes)', 'Загрузить {n} рисунков подряд примерно в одно время суток (в пределах {w} минут)', 'Augšupielādēt {n} skices pēc kārtas apmēram vienā laikā ({w} minūšu robežās)'] },
   ];
   const POLLY = ['......ddd.....', '.....dbbbd....', '....dbbwwbd...', '....dbbwkbdoo.', '....dbbbbbdo..', '...dbbbbbbd...', '..dbbsbbbbd...',
     '.dbbssbbbbd...', 'dbbssbbbbbd...', 'dbbbbbbbbd....', '.ddbbbbbdd....', '...ddddd......', '....o..o......', '...oo.oo......'];
@@ -231,7 +231,12 @@
     }
     return `<svg viewBox="0 0 14 17" shape-rendering="crispEdges">${px.map(([x, y, c]) => `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${c}"/>`).join('')}</svg>`;
   }
-  const howTo = lv => lv.h ? lv.h[L] : HOW_LEVEL[L](lv.d);
+  // условия бейджей приходят с сервера (me.btn.rules.cond — их меняет Алина в «📜 Правилах»); числа подставляются в описания
+  const COND0 = { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4, alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31 };
+  const condVals = k => { const C = Object.assign({}, COND0, (me && me.btn && me.btn.rules && me.btn.rules.cond) || {});
+    return ({ alt: { n: C.alt }, monthly: { n: C.monthly }, veteran: { n: C.veteranMonths, p: C.veteranPer }, early: { n: C.early, h: C.earlyBefore }, owl: { n: C.owl, a: C.owlFrom, b: C.owlTo },
+      weekend: { n: C.weekend }, ten: { n: C.ten }, fifty: { n: C.fifty }, hundred: { n: C.hundred }, inkmaster: { n: C.inkmaster }, comeback: { n: C.comeback }, collector: { n: C.collector }, clock: { n: C.clock, w: C.clockWin } })[k] || {}; };
+  const howTo = lv => lv.h ? lv.h[L].replace(/\{(\w)\}/g, (m, x) => { const v = condVals(lv.k)[x]; return v == null ? m : v; }) : HOW_LEVEL[L](lv.d);
   // state: true — есть, false — нет, 'past' — был (чёрно-белый)
   const medal = (lv, on = true, big = false, tag = 'span', picks = me?.picks || 0) => {
     const fun = on === 'past' && lv.past ? lv.past[L] : lv.f[L];
