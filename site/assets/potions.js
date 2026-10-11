@@ -57,6 +57,7 @@
     back: [e => `↩ ${e} survived and went back into your bag.`, e => `↩ ${e} уцелел(а) и вернулся(ась) в сумку.`, e => `↩ ${e} izdzīvoja un atgriezās somā.`],
     sure: ['✨ Two misses in a row: the next potion will work for sure!', '✨ Две неудачи подряд — следующее зелье точно получится!', '✨ Divas neveiksmes pēc kārtas — nākamā dzira noteikti izdosies!'],
     lucky: ['🍀 Luck is on your side!', '🍀 Удача на твоей стороне!', '🍀 Veiksme tavā pusē!'],
+    ingsN: ['Ingredients:', 'Ингредиентов:', 'Sastāvdaļas:'], potsN: ['Potions:', 'Зелий:', 'Dziras:'],
     pause: ['Pause', 'Пауза', 'Pauze'], resume: ['▶ Continue', '▶ Продолжить', '▶ Turpināt'],
   };
   const t = (k, ...a) => { const v = T[k][L]; return typeof v === 'function' ? v(...a) : v; };
@@ -85,7 +86,8 @@
     if (!S || !S.me) { bar.innerHTML = ''; return; }
     const n = Object.values(S.inv).reduce((a, b) => a + b, 0);
     const si = SEASON_INFO[S.season] || SEASON_INFO.autumn;
-    bar.innerHTML = `<span>${si.e} ${si.n[L]}</span><span>🗺 ${t('lv')} <b>${S.level}</b></span><span>🎒 <b>${n}</b></span>${S.rules.on && S.rules.max > 0 ? `<span>${t('today', S.today, S.rules.max)}</span>` : ''}`;
+    bar.onclick = e => { const g = e.target.closest('[data-go]'); if (!g) return; showTab(g.dataset.go); const el = app.querySelector(g.dataset.go === 'pot' ? '.pot-pot h3' : '.pot-book'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
+    bar.innerHTML = `<span>${si.e} ${si.n[L]}</span><span>🗺 ${t('lv')} <b>${S.level}</b></span><button type="button" class="pot-bar-b" data-go="pot">🧺 ${t('ingsN')} <b>${n}</b></button><button type="button" class="pot-bar-b" data-go="book">🧪 ${t('potsN')} <b>${S.book.filter(b => b.tier > 0).length}</b></button>${S.rules.on && S.rules.max > 0 ? `<span>${t('today', S.today, S.rules.max)}</span>` : ''}`;
   }
   function showTab(k) {
     tab = k;

@@ -3464,3 +3464,4 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .adm-cat small { opacity: .7; }
 .pot-back { font-weight: 700; }
 .pot-sure { font-weight: 800; color: #6a3fb0; }
+.pot-bar-b { border: 0; background: rgba(255,255,255,.1); color: inherit; font: inherit; padding: 3px 10px; border-radius: 999px; cursor: pointer; }
