@@ -375,7 +375,7 @@ function effPrice(base, stock, leg) {
 }
 const shopRow = r => ({ kind: r.kind, item: r.item, base: r.price, stock: r.stock, added: r.added_at || 0, price: effPrice(r.price, r.stock, LEGEND.has(r.kind + '|' + r.item) || r.item === 'legend') });
 // один раз: всем вещам — ценность из каталога (site/assets/catalog.json → prices, считает tools/catalog.js)
-// ежедневное пополнение: всем вещам из каталога (и уже заведённым в магазине), кроме легендарных, остаток до цели, если меньше; больше — не трогаем
+// ежедневное пополнение: только закончившиеся вещи (остаток 0 или ещё нет в магазине), кроме легендарных, — до цели; остальные не трогаем
 async function autoRestock(env, force = false) {
   if (!force && (!RULES.restockOn || (await getMeta(env, 'restock_day')) === rigaDay())) return null;
   const req = new Request('https://pigeonpolly.com/'), cat = await catalog(env, req), cp = cat.prices || {};
@@ -384,11 +384,12 @@ async function autoRestock(env, force = false) {
   for (const [k, xs] of Object.entries(cat.items || {})) for (const v of xs) keys.add(k + '|' + v);
   for (const r of (await env.DB.prepare('SELECT kind, item FROM shop').all()).results) keys.add(r.kind + '|' + r.item);
   const list = [...keys].filter(k => !LEGEND.has(k) && !k.endsWith('|legend')).map(k => k.split('|')).filter(([k, v]) => GIFT_KINDS.includes(k) && v);
-  const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock, added_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET added_at = CASE WHEN shop.stock < excluded.stock THEN excluded.added_at ELSE shop.added_at END, stock = MAX(shop.stock, excluded.stock)');
-  let n = 0;
-  for (let i = 0; i < list.length; i += 50) { const rs = await env.DB.batch(list.slice(i, i + 50).map(([k, v]) => st.bind(k, v, cp[k + '|' + v] || 30, to, now()))); n += rs.length; }
-  await setMeta(env, 'restock_day', rigaDay()); await setMeta(env, 'restock_last', JSON.stringify({ day: rigaDay(), at: now(), to, items: list.length }));
-  return { to, items: list.length };
+  const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock, added_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET added_at = CASE WHEN shop.stock <= 0 THEN excluded.added_at ELSE shop.added_at END, stock = CASE WHEN shop.stock <= 0 THEN excluded.stock ELSE shop.stock END');
+  const was = (await env.DB.prepare('SELECT COUNT(*) AS n FROM shop WHERE stock > 0').first()).n;
+  for (let i = 0; i < list.length; i += 50) await env.DB.batch(list.slice(i, i + 50).map(([k, v]) => st.bind(k, v, cp[k + '|' + v] || 30, to, now())));
+  const filled = (await env.DB.prepare('SELECT COUNT(*) AS n FROM shop WHERE stock > 0').first()).n - was;
+  await setMeta(env, 'restock_day', rigaDay()); await setMeta(env, 'restock_last', JSON.stringify({ day: rigaDay(), at: now(), to, items: filled }));
+  return { to, items: filled };
 }
 async function ensurePrices(env, req) {
   if (await env.DB.prepare("SELECT value FROM meta WHERE key = 'prices_v1'").first()) return;

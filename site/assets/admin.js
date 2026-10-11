@@ -274,7 +274,7 @@
       row('Легендарных — … % от этих чисел', num('legendPct', R.legendPct, D.legendPct) + ` % → сейчас мало 1–${S.lowLeg}, обычно ${S.normLeg}, много от ${S.manyLeg}`, D.legendPct + ' %'),
       row('Самая низкая цена (доля от ценности)', '×' + num('priceMin', R.priceMin, D.priceMin, 0.05), '×' + D.priceMin, 'когда штук очень много'),
       row('Самая высокая цена (во сколько раз дороже)', '×' + num('priceMax', R.priceMax, D.priceMax, 0.1), '×' + D.priceMax, 'когда осталась 1 штука'),
-      row(`<label class="adm-r-chk"><input type="checkbox" data-r="restockOn"${R.restockOn ? ' checked' : ''}> Каждый день пополнять магазин (кроме легендарных)</label>`, 'до ' + num('restockTo', R.restockTo, D.restockTo) + ` шт. <small class="be-note">0 — до обычного запаса (сейчас ${S.norm} шт.)</small><br><button type="button" class="pill-btn" id="adm-restock-now">↻ Пополнить сейчас</button>`, 'вкл, до обычного запаса', `раз в сутки (ночью по Риге) у каждой вещи, где меньше — станет столько; где больше — не трогаем.${d.restockLast ? ` Последний раз: ${d.restockLast.day}, до ${d.restockLast.to} шт.` : ''}`),
+      row(`<label class="adm-r-chk"><input type="checkbox" data-r="restockOn"${R.restockOn ? ' checked' : ''}> Каждый день пополнять закончившиеся вещи (кроме легендарных)</label>`, 'до ' + num('restockTo', R.restockTo, D.restockTo) + ` шт. <small class="be-note">0 — до обычного запаса (сейчас ${S.norm} шт.)</small><br><button type="button" class="pill-btn" id="adm-restock-now">↻ Пополнить сейчас</button>`, 'вкл, до обычного запаса', `раз в сутки (ночью по Риге): вещи с остатком 0 получают столько штук; у остальных остаток не меняется.${d.restockLast ? ` Последний раз: ${d.restockLast.day}, пополнено ${d.restockLast.items} вещей по ${d.restockLast.to} шт.` : ''}`),
       row(`<label class="adm-r-chk"><input type="checkbox" data-r="sellOn"${R.sellOn ? ' checked' : ''}> Птички могут продавать вещи обратно в магазин</label>`, 'за ' + num('sellPrice', R.sellPrice, D.sellPrice) + ' 🔘', D.sellPrice + ' 🔘', 'одна цена за любую вещь; проданная вещь возвращается в магазин (+1 шт.)'),
     ];
     const advRows = [
@@ -314,7 +314,7 @@
         <li>У каждой вещи есть ценность — цена при обычном запасе. Цена сейчас = ценность × (обычный запас ÷ остаток)^0.4, от ×${R.priceMin} до ×${R.priceMax}, округление до 5.</li>
         <li>«🎲 Сюрприз» — случайная вещь категории, которой у птички ещё нет; если всё есть — любая вещь, которой нет.</li>
         <li>Любую вещь из сумки, кроме легендарных, можно подарить другой птичке (если у неё ещё нет максимума). Админ может дарить что угодно.</li>
-        <li>${R.restockOn ? `Каждый день (ночью по Риге) магазин пополняется сам: у всех вещей, кроме легендарных, остаток дотягивается до ${R.restockTo > 0 ? R.restockTo + ' шт.' : 'обычного запаса (' + S.norm + ' шт.)'}; где больше — не трогается.` : 'Ежедневное пополнение магазина выключено.'}</li>
+        <li>${R.restockOn ? `Каждый день (ночью по Риге) закончившиеся вещи (кроме легендарных) пополняются сами — по ${R.restockTo > 0 ? R.restockTo + ' шт.' : 'обычному запасу (' + S.norm + ' шт.)'}; у остальных остаток не меняется.` : 'Ежедневное пополнение магазина выключено.'}</li>
         <li>${R.sellOn ? `Любую вещь можно продать обратно в магазин за ${pc(R.sellPrice)} — она снова появится в продаже.` : 'Продажа вещей обратно в магазин выключена.'}</li></ul>
       <h4>Адвент-календарь</h4><ul>
         <li>1–31 декабря, окошко открывается в свой день (по Риге); у всех одинаковые вещи. Прошедшие окошки видны всем, и гостям.</li>
@@ -334,9 +334,9 @@
     };
     main.querySelector('#adm-restock-now').onclick = async e => {
       const to = +main.querySelector('[data-r=restockTo]').value > 0 ? +main.querySelector('[data-r=restockTo]').value : S.norm;
-      if (!confirm(`Пополнить магазин сейчас: у всех вещей, кроме легендарных, где меньше ${R.restockTo > 0 ? R.restockTo : S.norm} шт. — станет столько?` + (to !== (R.restockTo > 0 ? R.restockTo : S.norm) ? '\n(Новое число в поле сначала сохраните кнопкой «Сохранить».)' : ''))) return;
+      if (!confirm(`Пополнить сейчас все ЗАКОНЧИВШИЕСЯ вещи (кроме легендарных) — по ${R.restockTo > 0 ? R.restockTo : S.norm} шт.?` + (to !== (R.restockTo > 0 ? R.restockTo : S.norm) ? '\n(Новое число в поле сначала сохраните кнопкой «Сохранить».)' : ''))) return;
       e.target.disabled = true;
-      try { const r = await api('admin/shop/autorestock', {}); alert(`↻ Готово: ${r.items} вещей пополнено до ${r.to} шт. (где было меньше).`); rules(); } catch (x) { e.target.disabled = false; alert(err(x)); }
+      try { const r = await api('admin/shop/autorestock', {}); alert(`↻ Готово: пополнено ${r.items} закончившихся вещей, по ${r.to} шт.`); rules(); } catch (x) { e.target.disabled = false; alert(err(x)); }
     };
     main.querySelector('#adm-r-reset').onclick = async () => {
       if (!confirm('Вернуть все правила к значениям по умолчанию?')) return;
