@@ -3214,3 +3214,7 @@ html:not(.is-admin) .statbar { display: none; }
 .be-linkpop[hidden] { display: none; }
 .be-linkpop input { width: 240px; padding: 5px 8px; border-radius: 6px; border: 0; font: 14px var(--sans); }
 .be-linkpop button, .be-linkpop a { background: #3A2A66; color: #fff; border: 0; border-radius: 6px; padding: 5px 9px; cursor: pointer; font: 13px var(--sans); text-decoration: none; }
+.sw-aicheck span { font-size: 14px; }
+.sw-tile { position: relative; }
+.sw-aitag { position: absolute; top: 6px; left: 6px; z-index: 2; font-size: 15px; line-height: 1; padding: 3px 4px; border-radius: 8px; background: rgba(255,255,255,.88); font-style: normal; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
+.bp-works a { position: relative; }

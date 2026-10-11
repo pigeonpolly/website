@@ -70,7 +70,7 @@
     btnToday: ['done today', 'сегодня уже', 'šodien jau'],
     btnBadges: ['New badges: from +5 to +300 for each (tap a badge to see how much)', 'Новые бейджи: от +5 до +300 за каждый (нажмите на бейдж — там видно, сколько)', 'Jaunas nozīmītes: no +5 līdz +300 par katru (spied uz nozīmītes, lai redzētu, cik)'],
     btnPick: [n => `Polly’s Choice for your drawing: +${n}`, n => `«Выбор Полли» для вашего рисунка: +${n}`, n => `“Pollijas izvēle” tavam zīmējumam: +${n}`],
-    btnBadge: [n => `🔘 +${n} buttons for this badge`, n => `🔘 +${n} пуговок за этот бейдж`, n => `🔘 +${n} pogas par šo nozīmīti`],
+    btnBadge: [n => `🔘 +${n} button${n === 1 ? '' : 's'} for this badge`, n => `🔘 +${n} ${pl(n, 'пуговка', 'пуговки', 'пуговок')} за этот бейдж`, n => `🔘 +${n} ${n % 10 === 1 && n % 100 !== 11 ? 'poga' : 'pogas'} par šo nozīmīti`],
     btnForBadges: [n => `+${n} 🔘 buttons for your badges!`, n => `+${n} 🔘 пуговок за достижения!`, n => `+${n} 🔘 pogas par sasniegumiem!`],
     give: ['🎁 Gift', '🎁 Подарить', '🎁 Uzdāvināt'],
     giveT: ['Gift it to another bird', 'Подарить другой птичке', 'Uzdāvināt citam putniņam'],
@@ -102,6 +102,7 @@
     aiNote: ['We can’t control or check whether you upload AI-generated pictures instead of your own drawings. We can only say for sure: those who uploaded their own work have improved their drawing skills. You, most likely, have improved your prompting skills… or have you?',
       'Мы не можем контролировать и влиять на то, загружаете ли вы ИИ-контент вместо своих рисунков. Мы лишь можем с уверенностью сказать, что те, кто загрузил свои работы, улучшили свой навык рисования. Вы же, вероятно, улучшили навык промптинга… или нет?',
       'Mēs nevaram kontrolēt vai ietekmēt, vai jūs augšupielādējat MI ģenerētu saturu savu zīmējumu vietā. Varam tikai droši teikt: tie, kas augšupielādēja savus darbus, uzlaboja savas zīmēšanas prasmes. Jūs, visticamāk, uzlabojāt savas promptošanas prasmes… vai tomēr nē?'],
+    aiMark: ['This is AI-generated', 'Это ИИ-генерация', 'Tas ir MI ģenerēts'], aiTag: ['AI-generated', 'ИИ-генерация', 'MI ģenerēts'],
     hide: ['Hide', 'Скрыть', 'Paslēpt'], ban: ['Block', 'Блок', 'Bloķēt'],
     banAsk: ['Block this user? Their sketches disappear from the wall.', 'Заблокировать пользователя? Его рисунки пропадут со стены.', 'Bloķēt lietotāju? Viņa skices pazudīs no sienas.'],
   };
@@ -168,6 +169,9 @@
       h: ['Upload a sketch on 31 October', 'Загрузить рисунок 31 октября', 'Augšupielādēt skici 31. oktobrī'] },
     { k: 'collector', s: 'collector', bg: '#F6D3CF', n: ['Collector', 'Коллекционер', 'Kolekcionārs'], f: ['Opened all 31 advent windows. Not a single gift escaped.', 'Открыл(а) все 31 окошко адвента. Ни один подарок не ускользнул.', 'Atvēri visus 31 adventes lodziņus. Neviena dāvana neizbēga.'],
       h: ['Open all 31 windows of the advent calendar in December (missed ones can still be opened until 23 January)', 'Открыть все 31 окошко адвент-календаря в декабре (пропущенные можно открыть до 23 января)', 'Atvērt visus 31 adventes kalendāra lodziņus decembrī (izlaistos var atvērt līdz 23. janvārim)'] },
+    { k: 'robot', s: 'robot', bg: '#D6E4F0', n: ['Beep-boop', 'Бип-буп', 'Bīp-būp'],
+      f: ['We don’t know why you’re doing this, but since you are, let there be at least some reward for it too.', 'Мы не знаем, зачем вы это делаете, но раз уж вы это делаете, пусть за это тоже будет хотя бы какая-то награда.', 'Mēs nezinām, kāpēc jūs to darāt, bet, ja jau darāt, lai par to arī ir kaut kāda balva.'],
+      h: ['Upload a work marked 🤖 “AI-generated” (once is enough)', 'Загрузить работу с пометкой 🤖 «ИИ-генерация» (достаточно одного раза)', 'Augšupielādēt darbu ar atzīmi 🤖 “MI ģenerēts” (pietiek ar vienu reizi)'] },
     { k: 'clock', f: ['Polly sets her watch by you.', 'Полли сверяет по вам часы.', 'Pollija pēc tevis regulē pulksteni.'], n: ['Like clockwork', 'Как по часам', 'Kā pulkstenis'], s: 'clock', bg: '#FBE3D6',
       h: ['Upload 10 sketches in a row at about the same time of day (within one hour)', 'Загрузить 10 рисунков подряд примерно в одно время суток (в пределах часа)', 'Augšupielādēt 10 skices pēc kārtas apmēram vienā laikā (vienas stundas robežās)'] },
   ];
@@ -207,6 +211,8 @@
     pumpkin: [[1, 8, '.n.'], [0, 9, 'ooooo'], [0, 10, 'okoko'], [0, 11, 'ooooo'], [0, 12, 'okkko'], [1, 13, 'ooo']],
     // коллекционер: подарок с бантом в лапах и звёздочка адвента над головой
     collector: [[9, 7, '.m.m.'], [9, 8, '..m..'], [9, 9, 'rrmrr'], [9, 10, 'rrmrr'], [9, 11, 'mmmmm'], [9, 12, 'rrmrr'], [9, 13, 'rrmrr'], [5, -3, '..m..'], [5, -2, '.mlm.'], [5, -1, 'mmlmm'], [5, 0, '.m.m.'], [1, 1, 'l'], [12, 0, 'l']],
+    // бип-буп: антенна с лампочкой, красный глаз-сенсор и заклёпки
+    robot: [[7, -3, 'r'], [7, -2, 'h'], [7, -1, 'h'], [6, 2, 'hhhh'], [7, 3, 'rr'], [6, 4, 'hhhh'], [3, 7, 'h.h'], [2, 9, 'h.h'], [11, 6, 'hh'], [12, 5, 'h'], [12, 7, 'h']],
     medal: [[10, -3, '.m.'], [9, -2, 'mmm'], [10, -1, 'm.m'], [5, 8, 'r.r'], [5, 9, 'r.r'], [5, 10, 'mmm'], [4, 11, 'mmlmm'], [5, 12, 'mmm']],
   };
   const MONO = { b: '#D9D9D9', s: '#9A9A9A', o: '#6B6B6B' };
@@ -237,6 +243,7 @@
     for (const p of posts) {
       const d = new Date(p.day + 'T12:00:00');
       if (p.bw) got.add('bw');
+      if (p.ai) got.add('robot');
       if (d.getMonth() === 0 && d.getDate() === 23) got.add('bday');
       if (window.ChallengeTheme && (d.getDate() === window.ChallengeTheme.extraDay(d.getFullYear(), d.getMonth()) || p.day === '2026-10-02')) got.add('extra');
     }
@@ -471,6 +478,7 @@
         ${mine ? `<div class="sw-mine"><img src="/api/img/${mine.id}?t=1" alt=""><div><p>${t('posted')}</p><button type="button" class="sw-link danger" data-del="${mine.id}">${t('del')}</button></div></div>` : ''}
         <label class="pill-btn sw-file">${mine ? t('replace') : t('pick')}<input type="file" accept="image/*" name="file" hidden></label>
         <div class="sw-prev" hidden><img alt=""></div>
+        <label class="sw-check sw-aicheck"><input type="checkbox" name="ai"> <span>🤖 ${t('aiMark')}</span></label>
         ${me.consent ? '' : `<label class="sw-check"><input type="checkbox" name="consent" required> <span>${t('consent')} <a href="/privacy/">↗</a></span></label>`}
         <button class="cta-btn" type="submit" disabled>${t('upload')}</button>
         <p class="sw-status" id="sw-status"></p>
@@ -523,6 +531,7 @@
       fd.append('theme', th ? window.ChallengeTheme.themeFor(upDate, 0).subject : '');
       let bw = false; try { bw = localStorage.getItem('ch-bw') === '1'; } catch (err) { /* без памяти */ }
       fd.append('bw', bw ? '1' : '0');
+      fd.append('ai', form.ai && form.ai.checked ? '1' : '0'); // пометка 🤖 «ИИ-генерация»
       if (form.consent) fd.append('consent', form.consent.checked ? 'yes' : '');
       try {
         const up = await api('upload', { method: 'POST', body: fd });
@@ -611,7 +620,7 @@
           showBadge(x, b.classList.contains('past') ? 'past' : !b.classList.contains('off'), pr.picks);
         });
       } else if (k === 'works') {
-        panel.innerHTML = `<div class="sw-pv-works bp-works">${pr.posts.map(p => `<a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"><span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></a>`).join('') || `<p class="sw-empty">${t('noWorks')}</p>`}</div>`;
+        panel.innerHTML = `<div class="sw-pv-works bp-works">${pr.posts.map(p => `<a href="/api/img/${p.id}" data-lightbox>${p.ai ? `<i class="sw-aitag" title="${esc(t('aiTag'))}">🤖</i>` : ''}<img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"><span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></a>`).join('') || `<p class="sw-empty">${t('noWorks')}</p>`}</div>`;
       } else if (k === 'btns') {
         panel.innerHTML = buttonsHtml(me.btn);
         const inv = panel.querySelector('#sw-invite'); if (inv) inv.onclick = share;
@@ -670,7 +679,7 @@
     const cursor = pageCursors[pageIdx];
     try {
       const { posts, pick } = await api('wall' + (cursor ? `?before=${cursor}` : ''));
-      el.innerHTML = posts.length ? posts.map(p => `<figure class="sw-tile${p.bw ? ' bw' : ''}${p.id === pick ? ' pick' : ''}" data-id="${p.id}">
+      el.innerHTML = posts.length ? posts.map(p => `<figure class="sw-tile${p.bw ? ' bw' : ''}${p.id === pick ? ' pick' : ''}" data-id="${p.id}">${p.ai ? `<span class="sw-aitag" title="${esc(t('aiTag'))}" aria-label="${esc(t('aiTag'))}">🤖</span>` : ''}
         ${p.id === pick ? `<span class="sw-stamp">★ ${esc(SPECIAL.find(x => x.k === 'pick').n[L])}</span>` : ''}
         <a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"></a>
         <figcaption><button type="button" class="sw-nickname sw-plink${p.gold ? ' gold' : ''}" data-profile="${esc(p.nick)}">@${esc(p.nick)}</button> <span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></figcaption>

@@ -274,7 +274,7 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
@@ -297,7 +297,7 @@ const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, p
   // бейджи: уровни по рекордной серии (дней) и особые достижения — пуговки один раз за каждый
   levels: { 1: 5, 3: 10, 7: 20, 14: 30, 30: 50, 60: 80, 100: 120, 365: 300 },
   badges: { bw: 5, extra: 15, bday: 15, early: 15, owl: 15, comeback: 15, ten: 20, weekend: 20, newyear: 20, halloween: 20,
-    monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, collector: 50, hundred: 100 } };
+    monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, collector: 50, hundred: 100, robot: 1 } }; // robot — загрузил работу с пометкой 🤖 «ИИ-генерация»
 // легендарные вещи (как LEGEND в birds.js): в магазине по одной штуке на птичку, дарить нельзя; обычных — до трёх одинаковых
 const LEGEND = new Set(['hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass', 'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight']);
 const SHOP_MAX = 3;
@@ -345,7 +345,7 @@ async function awardBadges(env, uid, best, badges) {
 // Считается в памяти из трёх запросов, записи — пачками (INSERT OR IGNORE: повторно не начислит), баланс = сумма журнала.
 async function backfillButtons(env) {
   const users = (await env.DB.prepare("SELECT * FROM users WHERE banned = 0 AND nick IS NOT NULL AND nick != ''").all()).results;
-  const posts = (await env.DB.prepare('SELECT user_id, id, day, bw, tod, picked FROM posts').all()).results;
+  const posts = (await env.DB.prepare('SELECT user_id, id, day, bw, ai, tod, picked FROM posts').all()).results;
   const byUser = new Map(); for (const x of posts) (byUser.get(x.user_id) || byUser.set(x.user_id, []).get(x.user_id)).push(x);
   const pickUser = Number(await getMeta(env, 'pick_user'));
   const day = rigaDay(), t = now(), ins = [];
@@ -548,6 +548,7 @@ function badgesOf(posts, months = []) {
   for (const p of posts) {
     const y = +p.day.slice(0, 4), m = +p.day.slice(5, 7) - 1, d = +p.day.slice(8, 10);
     if (p.bw) got.add('bw');
+    if (p.ai) got.add('robot');
     if (m === 0 && d === 23) got.add('bday');
     if (d === extraDay(y, m) || (y === 2026 && m === 9 && d === 2)) got.add('extra'); // 2.10.2026 — день ЭКСТРА до переноса на 12-е
   }
@@ -676,7 +677,7 @@ async function cleanupInactive(env, limit = KV_LIMIT) {
   for (const u of users) {
     if (frac() < CLEAN_STOP) break;
     if (await isAdmin(u, env)) continue; // работы Алины не удаляются, пока она сама их не удалит
-    const posts = (await env.DB.prepare('SELECT id, day, bw, tod, bytes, store, kv FROM posts WHERE user_id = ?').bind(u.id).all()).results;
+    const posts = (await env.DB.prepare('SELECT id, day, bw, ai, tod, bytes, store, kv FROM posts WHERE user_id = ?').bind(u.id).all()).results;
     if (report.deletes + posts.filter(x => x.kv !== 0).length * 2 > 900) break; // бесплатный лимит KV — 1000 удалений в сутки
     await env.DB.prepare('UPDATE users SET best = ?, badges = ? WHERE id = ?')
       .bind(mergedBest(u, posts.map(p => p.day)), mergedBadges(u, posts).join(','), u.id).run();
@@ -714,14 +715,14 @@ async function route(req, env, url) {
     const nick = String(url.searchParams.get('nick') || '').replace(/^@/, '');
     const u = await env.DB.prepare('SELECT * FROM users WHERE nick = ? AND banned = 0').bind(nick).first();
     if (!u) fail(404, 'user');
-    const rows = (await env.DB.prepare('SELECT id, day, theme, bw, tod, hidden FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
+    const rows = (await env.DB.prepare('SELECT id, day, theme, bw, ai, tod, hidden FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
     const pickUser = Number(await getMeta(env, 'pick_user'));
     const badges = mergedBadges(u, rows).filter(b => b !== 'pick_past' || pickUser !== u.id);
     if (pickUser === u.id) badges.push('pick');
     const bag = (await env.DB.prepare("SELECT DISTINCT kind, item FROM gifts WHERE user_id = ? AND status = 'bag'").bind(u.id).all()).results; // вещи в сумке — их видят все
     const unopened = (await env.DB.prepare("SELECT COUNT(*) AS n FROM gifts WHERE user_id = ? AND status = 'new'").bind(u.id).first()).n;
     return json({ id: u.id, avatar: avatarOf(u), room: roomOf(u), bag, unopened, buttons: u.buttons || 0, nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(rows.map(r => r.day)).current,
-      best: mergedBest(u, rows.map(r => r.day)), badges, posts: rows.filter(r => !r.hidden).map(({ id, day, theme, bw }) => ({ id, day, theme, bw })) });
+      best: mergedBest(u, rows.map(r => r.day)), badges, posts: rows.filter(r => !r.hidden).map(({ id, day, theme, bw, ai }) => ({ id, day, theme, bw, ai })) });
   }
 
   // карточка птички для превью ссылки /flock/?bird=ник: картинку рисует браузер владельца (bird-card.js) и присылает сюда
@@ -1002,7 +1003,7 @@ async function route(req, env, url) {
     if (!u) return json({ user: null });
     const earned = u.nick && !u.banned ? await award(env, u.id, 'daily', rigaDay(), BTN.daily) : 0; // +3 за первый заход за сутки
     if (earned) u.buttons = (u.buttons || 0) + earned;
-    const rows = (await env.DB.prepare('SELECT id, day, theme, bw, tod, hidden FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
+    const rows = (await env.DB.prepare('SELECT id, day, theme, bw, ai, tod, hidden FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
     const st = streaks(rows.map(r => r.day));
     const pickUser = Number(await getMeta(env, 'pick_user'));
     const kept = mergedBadges(u, rows).filter(b => b !== 'pick_past' || pickUser !== u.id);
@@ -1220,15 +1221,15 @@ async function route(req, env, url) {
     }
     if (!old) await bump(env, 'works_total', 'SELECT COUNT(*) + 1 AS n FROM posts'); // замена работы дня не считается
     const tod = Number(f.get('tod'));
-    await env.DB.prepare('INSERT INTO posts (id, user_id, day, theme, bw, tod, bytes, created_at, store, kv) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-      .bind(id, u.id, day, String(f.get('theme') || '').slice(0, 120), f.get('bw') === '1' ? 1 : 0,
+    await env.DB.prepare('INSERT INTO posts (id, user_id, day, theme, bw, ai, tod, bytes, created_at, store, kv) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .bind(id, u.id, day, String(f.get('theme') || '').slice(0, 120), f.get('bw') === '1' ? 1 : 0, f.get('ai') === '1' ? 1 : 0,
         Number.isInteger(tod) && tod >= 0 && tod < 1440 ? tod : null, fb.byteLength + tb.byteLength, now(), where.store, where.kv).run();
     // бейджи и рекорд записываем сразу — их не отнимет ни очистка, ни пропуск
     const months = [...new Set([...monthsOf(u), day.slice(0, 7)])].sort().slice(-24);
     const mc = mcountOf(u);
     if (!old) mc[day.slice(0, 7)] = (mc[day.slice(0, 7)] || 0) + 1; // замена работы дня не считается
     const mcount = Object.keys(mc).sort().slice(-48).map(k => `${k}:${mc[k]}`).join(',');
-    const all = (await env.DB.prepare('SELECT day, bw, tod FROM posts WHERE user_id = ?').bind(u.id).all()).results;
+    const all = (await env.DB.prepare('SELECT day, bw, ai, tod FROM posts WHERE user_id = ?').bind(u.id).all()).results;
     const uu = { ...u, months: months.join(','), mcount };
     await env.DB.prepare('UPDATE users SET months = ?, mcount = ?, best = ?, badges = ? WHERE id = ?')
       .bind(uu.months, mcount, mergedBest(u, all.map(p => p.day)), mergedBadges(uu, all).join(','), u.id).run();
@@ -1248,7 +1249,7 @@ async function route(req, env, url) {
 
   if (m === 'GET' && p === '/api/wall') {
     const before = Number(url.searchParams.get('before')) || 9e12;
-    const rows = (await env.DB.prepare(`SELECT p.id, p.day, p.theme, p.bw, p.created_at, u.nick, u.id AS uid, (COALESCE(u.picks, 0) >= ${GOLD_PICKS}) AS gold FROM posts p JOIN users u ON u.id = p.user_id
+    const rows = (await env.DB.prepare(`SELECT p.id, p.day, p.theme, p.bw, p.ai, p.created_at, u.nick, u.id AS uid, (COALESCE(u.picks, 0) >= ${GOLD_PICKS}) AS gold FROM posts p JOIN users u ON u.id = p.user_id
       WHERE p.hidden = 0 AND u.banned = 0 AND u.nick IS NOT NULL AND p.created_at < ? ORDER BY p.created_at DESC LIMIT 24`).bind(before).all()).results;
     return json({ posts: rows, pick: await getMeta(env, 'pick_post') });
   }
@@ -1280,7 +1281,7 @@ async function route(req, env, url) {
   // ---------- GDPR: экспорт и удаление ----------
   if (m === 'GET' && p === '/api/export') {
     const u = await needUser(req, env);
-    const posts = (await env.DB.prepare('SELECT id, day, theme, bw, created_at, hidden FROM posts WHERE user_id = ?').bind(u.id).all()).results;
+    const posts = (await env.DB.prepare('SELECT id, day, theme, bw, ai, created_at, hidden FROM posts WHERE user_id = ?').bind(u.id).all()).results;
     const data = {
       exported_at: new Date().toISOString(),
       account: { nick: u.nick, email: u.email, google_account_id: u.sub, consent_to_publish: !!u.consent, created_at: new Date(u.created_at * 1000).toISOString() },
