@@ -3241,3 +3241,10 @@ html:not(.is-admin) .statbar { display: none; }
 .adm-rules input.adm-r-changed { border: 2px solid #E9A93B; background: #FFF7E3; }
 .adm-r-chk { display: inline-flex; gap: 8px; align-items: center; margin: 4px 0; }
 .adm-r-bar { display: flex; gap: 8px; align-items: center; flex-wrap: wrap; }
+.adm-eco { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; margin: 10px 0 14px; }
+.adm-eco > div { padding: 10px 12px; border-radius: 12px; background: #F6F1FB; display: flex; flex-direction: column; gap: 2px; }
+.adm-eco b { font-size: 20px; } .adm-eco span { font-size: 13px; color: #6D6380; }
+.adm-eco .adm-eco-v { grid-column: span 2; background: #FFF7E3; } .adm-eco .adm-eco-v span b { font-size: inherit; }
+@media (max-width: 600px) { .adm-eco .adm-eco-v { grid-column: auto; } }
+.adm-eco .adm-eco-btns { grid-column: 1 / -1; background: none; padding: 0; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; }
+.adm-eco .adm-eco-btns span { font-size: 14px; } .adm-eco-btns input { padding: 3px 6px; border: 1px solid #DCD5EC; border-radius: 6px; }

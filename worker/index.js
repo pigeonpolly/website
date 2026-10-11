@@ -1092,6 +1092,21 @@ async function route(req, env, url) {
     await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(u.id, 'buy', String(g.meta.last_row_id), -row.price, rigaDay(), now()).run();
     return json({ ok: true, buttons: (u.buttons || 0) - row.price, kind: gk, item: got });
   }
+  // ценность всех вещей: «выровнять» (вернуть рекомендуемую из каталога) или дороже/дешевле на pct %
+  if (m === 'POST' && p === '/api/admin/shop/reprice') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({}));
+    if (b.mode === 'reset') {
+      const list = Object.entries((await catalog(env, req)).prices || {});
+      const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, 0) ON CONFLICT(kind, item) DO UPDATE SET price = excluded.price');
+      for (let i = 0; i < list.length; i += 50) await env.DB.batch(list.slice(i, i + 50).map(([k, pr]) => { const j = k.indexOf('|'); return st.bind(k.slice(0, j), k.slice(j + 1), pr); }));
+    } else if (b.mode === 'up' || b.mode === 'down') {
+      const pct = Math.max(1, Math.min(90, Math.round(Number(b.pct) || 10))), f = b.mode === 'up' ? 1 + pct / 100 : 1 - pct / 100;
+      await env.DB.prepare('UPDATE shop SET price = MAX(5, CAST(ROUND(price * ? / 5.0) AS INTEGER) * 5) WHERE price > 0').bind(f).run();
+    } else fail(400, 'bad');
+    return json({ ok: true });
+  }
   // пополнить сразу много вещей (категорию, тему, найденное): +add штук каждой; у вещей без цены — цена price
   if (m === 'POST' && p === '/api/admin/shop/restock') {
     const u = await needUser(req, env);
@@ -1123,7 +1138,7 @@ async function route(req, env, url) {
       return json({ ok: true, price, stock });
     }
     await ensurePrices(env, req);
-    return json({ items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results.map(shopRow), suggested: (await catalog(env, req)).prices || {}, pricing: { normStock: RULES.normStock, normLegend: RULES.normLegend, priceMin: RULES.priceMin, priceMax: RULES.priceMax } });
+    return json({ items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results.map(shopRow), suggested: (await catalog(env, req)).prices || {}, economy: await env.DB.prepare('SELECT COALESCE(SUM(COALESCE(buttons, 0)), 0) AS total, COUNT(*) AS birds FROM users WHERE nick IS NOT NULL AND banned = 0').first(), pricing: { normStock: RULES.normStock, normLegend: RULES.normLegend, priceMin: RULES.priceMin, priceMax: RULES.priceMax } });
   }
   // подарить купленную в магазине вещь другой птичке: вещь уходит из сумки и приходит ей неоткрытым подарком
   if (m === 'POST' && p === '/api/gift/give') {
