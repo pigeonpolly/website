@@ -102,6 +102,9 @@
     aiNote: ['We can’t control or check whether you upload AI-generated pictures instead of your own drawings. We can only say for sure: those who uploaded their own work have improved their drawing skills. You, most likely, have improved your prompting skills… or have you?',
       'Мы не можем контролировать и влиять на то, загружаете ли вы ИИ-контент вместо своих рисунков. Мы лишь можем с уверенностью сказать, что те, кто загрузил свои работы, улучшили свой навык рисования. Вы же, вероятно, улучшили навык промптинга… или нет?',
       'Mēs nevaram kontrolēt vai ietekmēt, vai jūs augšupielādējat MI ģenerētu saturu savu zīmējumu vietā. Varam tikai droši teikt: tie, kas augšupielādēja savus darbus, uzlaboja savas zīmēšanas prasmes. Jūs, visticamāk, uzlabojāt savas promptošanas prasmes… vai tomēr nē?'],
+    wfLabel: ['Show works', 'Какие работы показывать', 'Kādus darbus rādīt'], wfAll: ['All works', 'Все работы', 'Visi darbi'], wfHuman: ['🎨 By people', '🎨 Работы людей', '🎨 Cilvēku darbi'], wfAi: ['🤖 By robots', '🤖 Работы роботов', '🤖 Robotu darbi'],
+    emptyAi: ['No robot works here yet.', 'Здесь пока нет работ роботов.', 'Šeit vēl nav robotu darbu.'], emptyHuman: ['No works by people yet.', 'Здесь пока нет работ людей.', 'Šeit vēl nav cilvēku darbu.'],
+    aiMarkAdm: ['Mark as AI-generated', 'Пометить как ИИ-генерацию', 'Atzīmēt kā MI ģenerētu'], aiUnmark: ['Remove the AI mark', 'Снять пометку ИИ', 'Noņemt MI atzīmi'],
     aiMark: ['This is AI-generated', 'Это ИИ-генерация', 'Tas ir MI ģenerēts'], aiTag: ['AI-generated', 'ИИ-генерация', 'MI ģenerēts'],
     hide: ['Hide', 'Скрыть', 'Paslēpt'], ban: ['Block', 'Блок', 'Bloķēt'],
     banAsk: ['Block this user? Their sketches disappear from the wall.', 'Заблокировать пользователя? Его рисунки пропадут со стены.', 'Bloķēt lietotāju? Viņa skices pazudīs no sienas.'],
@@ -171,7 +174,7 @@
       h: ['Open all 31 windows of the advent calendar in December (missed ones can still be opened until 23 January)', 'Открыть все 31 окошко адвент-календаря в декабре (пропущенные можно открыть до 23 января)', 'Atvērt visus 31 adventes kalendāra lodziņus decembrī (izlaistos var atvērt līdz 23. janvārim)'] },
     { k: 'robot', s: 'robot', bg: '#D6E4F0', n: ['Beep-boop', 'Бип-буп', 'Bīp-būp'],
       f: ['We don’t know why you’re doing this, but since you are, let there be at least some reward for it too.', 'Мы не знаем, зачем вы это делаете, но раз уж вы это делаете, пусть за это тоже будет хотя бы какая-то награда.', 'Mēs nezinām, kāpēc jūs to darāt, bet, ja jau darāt, lai par to arī ir kaut kāda balva.'],
-      h: ['Upload a work marked 🤖 “AI-generated” (once is enough)', 'Загрузить работу с пометкой 🤖 «ИИ-генерация» (достаточно одного раза)', 'Augšupielādēt darbu ar atzīmi 🤖 “MI ģenerēts” (pietiek ar vienu reizi)'] },
+      h: ['Upload a work and tick 🤖 “AI-generated” yourself (once is enough). If the mark was added by the site admin, the badge is not given: only those who marked it themselves get it.', 'Загрузить работу и самому поставить галочку 🤖 «ИИ-генерация» (достаточно одного раза). Если пометку поставил админ сайта, бейдж не даётся: его получают только те, кто отметил сам.', 'Augšupielādēt darbu un pašam atzīmēt 🤖 “MI ģenerēts” (pietiek ar vienu reizi). Ja atzīmi pielika vietnes administrators, nozīmīti nedod: to saņem tikai tie, kas atzīmēja paši.'] },
     { k: 'clock', f: ['Polly sets her watch by you.', 'Полли сверяет по вам часы.', 'Pollija pēc tevis regulē pulksteni.'], n: ['Like clockwork', 'Как по часам', 'Kā pulkstenis'], s: 'clock', bg: '#FBE3D6',
       h: ['Upload 10 sketches in a row at about the same time of day (within one hour)', 'Загрузить 10 рисунков подряд примерно в одно время суток (в пределах часа)', 'Augšupielādēt 10 skices pēc kārtas apmēram vienā laikā (vienas stundas robežās)'] },
   ];
@@ -678,25 +681,36 @@
     if (reset) { pageCursors = [null]; pageIdx = 0; }
     const cursor = pageCursors[pageIdx];
     try {
-      const { posts, pick } = await api('wall' + (cursor ? `?before=${cursor}` : ''));
+      wallFilterBar(el);
+      const qs = [cursor ? `before=${cursor}` : '', wf !== 'all' ? `f=${wf}` : ''].filter(Boolean).join('&');
+      const { posts, pick } = await api('wall' + (qs ? '?' + qs : ''));
       el.innerHTML = posts.length ? posts.map(p => `<figure class="sw-tile${p.bw ? ' bw' : ''}${p.id === pick ? ' pick' : ''}" data-id="${p.id}">${p.ai ? `<span class="sw-aitag" title="${esc(t('aiTag'))}" aria-label="${esc(t('aiTag'))}">🤖</span>` : ''}
         ${p.id === pick ? `<span class="sw-stamp">★ ${esc(SPECIAL.find(x => x.k === 'pick').n[L])}</span>` : ''}
         <a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"></a>
         <figcaption><button type="button" class="sw-nickname sw-plink${p.gold ? ' gold' : ''}" data-profile="${esc(p.nick)}">@${esc(p.nick)}</button> <span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></figcaption>
-        ${me && me.admin ? `<div class="sw-mod">${p.id === pick ? `<button type="button" data-unpick="1">☆ ${t('unpick')}</button>` : `<button type="button" data-pick="${p.id}" title="${esc(SPECIAL.find(x => x.k === 'pick').n[L])}">★</button>`}<button type="button" data-hide="${p.id}">${t('hide')}</button><button type="button" data-ban="${p.uid}">${t('ban')}</button></div>` : ''}
-      </figure>`).join('') : `<p class="sw-empty">${t('emptyWall')}</p>`;
+        ${me && me.admin ? `<div class="sw-mod">${p.id === pick ? `<button type="button" data-unpick="1">☆ ${t('unpick')}</button>` : `<button type="button" data-pick="${p.id}" title="${esc(SPECIAL.find(x => x.k === 'pick').n[L])}">★</button>`}<button type="button" data-ai="${p.id}" data-on="${p.ai ? 0 : 1}" class="${p.ai ? 'on' : ''}" title="${esc(p.ai ? t('aiUnmark') : t('aiMarkAdm'))}">🤖</button><button type="button" data-hide="${p.id}">${t('hide')}</button><button type="button" data-ban="${p.uid}">${t('ban')}</button></div>` : ''}
+      </figure>`).join('') : `<p class="sw-empty">${wf === 'ai' ? t('emptyAi') : wf === 'human' ? t('emptyHuman') : t('emptyWall')}</p>`;
       if (posts.length) pageCursors[pageIdx + 1] = posts[posts.length - 1].created_at;
       if (more) more.hidden = posts.length < 24;
       if (newer) newer.hidden = pageIdx === 0;
       if (pg) pg.textContent = more && more.hidden && !pageIdx ? '' : t('pageN', pageIdx + 1);
     } catch (e) { if (more) more.hidden = true; }
   }
+  // фильтр стены: все работы / работы людей / работы роботов — каждый выбирает себе (запоминается в браузере)
+  let wf = 'all'; try { wf = localStorage.getItem('pp-wall-f') || 'all'; } catch (e) { /* без хранилища — все */ }
+  function wallFilterBar(el) {
+    let bar = document.getElementById('sw-wf');
+    if (!bar) { bar = document.createElement('div'); bar.id = 'sw-wf'; bar.className = 'sw-wf'; bar.setAttribute('role', 'group'); bar.setAttribute('aria-label', t('wfLabel')); el.before(bar); }
+    bar.innerHTML = [['all', t('wfAll')], ['human', t('wfHuman')], ['ai', t('wfAi')]].map(([k, l]) => `<button type="button" class="pill-btn" data-wf="${k}" aria-pressed="${wf === k}">${l}</button>`).join('');
+    bar.querySelectorAll('[data-wf]').forEach(b => b.onclick = () => { wf = b.dataset.wf; try { localStorage.setItem('pp-wall-f', wf); } catch (e) { /* ок */ } loadWall(true); });
+  }
   const toPage = d => { pageIdx = Math.max(0, pageIdx + d); loadWall().then(() => document.getElementById('sw-wall')?.closest('.sw-wall-box')?.scrollIntoView({ behavior: 'smooth', block: 'start' })); };
   document.getElementById('sw-more')?.addEventListener('click', () => toPage(1));
   document.getElementById('sw-newer')?.addEventListener('click', () => toPage(-1));
   document.getElementById('sw-wall')?.addEventListener('click', async e => {
-    const h = e.target.closest('[data-hide]'), b = e.target.closest('[data-ban]'), pk = e.target.closest('[data-pick]');
+    const h = e.target.closest('[data-hide]'), b = e.target.closest('[data-ban]'), pk = e.target.closest('[data-pick]'), ai = e.target.closest('[data-ai]');
     try {
+      if (ai) { await post('admin/ai', { id: ai.dataset.ai, ai: ai.dataset.on === '1' }); loadWall(); }
       if (pk) { await post('admin/pick', { id: pk.dataset.pick }); loadWall(true); refresh(); }
       if (e.target.closest('[data-unpick]')) { await post('admin/pick', { undo: true }); loadWall(true); refresh(); }
       if (h) { await post('admin/hide', { id: h.dataset.hide }); h.closest('.sw-tile').remove(); }

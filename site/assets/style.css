@@ -3218,3 +3218,7 @@ html:not(.is-admin) .statbar { display: none; }
 .sw-tile { position: relative; }
 .sw-aitag { position: absolute; top: 6px; left: 6px; z-index: 2; font-size: 15px; line-height: 1; padding: 3px 4px; border-radius: 8px; background: rgba(255,255,255,.88); font-style: normal; box-shadow: 0 1px 4px rgba(0,0,0,.2); }
 .bp-works a { position: relative; }
+.sw-wf { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
+.sw-wf .pill-btn { padding: 5px 12px; font-size: 14px; }
+.sw-wf .pill-btn[aria-pressed="true"] { background: #E9A93B; border-color: #E9A93B; color: #2B1A51; }
+.sw-mod [data-ai].on { background: #4CC38A; color: #10261B; }

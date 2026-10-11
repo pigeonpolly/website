@@ -582,12 +582,16 @@
       const empty = n => n.nodeType === 3 ? !n.textContent.trim() : n.nodeType !== 1;
       qs.forEach(q => {
         // абзац считается выделенным, только если в нём выделен хоть какой-то текст (тройной клик задевает начало следующего)
-        const touched = n => { if (empty(n) || !r.intersectsNode(n)) return false; const x = document.createRange(); x.selectNodeContents(n);
+        const touched = n => { if (empty(n) || !r.intersectsNode(n)) return false;
+          if (n.nodeType === 1 && (n.tagName === 'HR' || n.querySelector('hr, img, iframe')) && !n.textContent.trim()) return true; // разделитель ✦ ✦ ✦, картинка без текста
+          const x = document.createRange(); x.selectNodeContents(n);
           if (r.compareBoundaryPoints(Range.START_TO_START, x) > 0) x.setStart(r.startContainer, r.startOffset);
           if (r.compareBoundaryPoints(Range.END_TO_END, x) < 0) x.setEnd(r.endContainer, r.endOffset);
           return !!x.toString().trim() || !!x.cloneContents().querySelector('img'); };
         // цитата без абзацев внутри (просто текст) — целиком становится абзацем
         if (![...q.childNodes].some(isBlock)) { if ([...q.childNodes].some(touched)) { const p = document.createElement('p'); while (q.firstChild) p.appendChild(q.firstChild); q.replaceWith(p); } return; }
+        // в цитате нет текста (только разделитель или пустые строки) — снимаем цитату целиком
+        if (!q.textContent.trim()) { const frag = document.createDocumentFragment(); [...q.childNodes].forEach(n => { if (!empty(n)) frag.appendChild(n); }); q.replaceWith(frag); return; }
         const kids = [...q.childNodes], hit = kids.map(touched);
         const a = hit.indexOf(true), z = hit.lastIndexOf(true); if (a < 0) return;
         const frag = document.createDocumentFragment();
@@ -607,7 +611,7 @@
         const body = b.closest('.be-pane').querySelector('.be-body');
         restore(body);
         const c = b.dataset.cmd;
-        if (c === 'p') { unquote(body); document.execCommand('formatBlock', false, 'p'); }          // «¶» — обычный текст: и из цитаты тоже вынимает
+        if (c === 'p') { if (!unquote(body)) document.execCommand('formatBlock', false, 'p'); } // вынутое из цитаты уже абзацы — второй раз не трогаем (браузер портит разделители)          // «¶» — обычный текст: и из цитаты тоже вынимает
         else if (c === 'h2' || c === 'h3') { unquote(body); document.execCommand('formatBlock', false, c); }
         else if (c === 'quote') { if (!unquote(body)) document.execCommand('formatBlock', false, 'blockquote'); } // «❝» второй раз — убирает цитату
         else if (c === 'bold' || c === 'italic' || c === 'underline') document.execCommand(c);
@@ -625,7 +629,7 @@
         else if (c === 'ol') document.execCommand('insertOrderedList');
         else if (c === 'hr') document.execCommand('insertHorizontalRule');
         else if (c === 'imgs') { mergeImages(body); return; }
-        else if (c === 'clear') { document.execCommand('removeFormat'); document.execCommand('unlink'); unquote(body); document.execCommand('formatBlock', false, 'p'); }
+        else if (c === 'clear') { document.execCommand('removeFormat'); document.execCommand('unlink'); if (!unquote(body)) document.execCommand('formatBlock', false, 'p'); }
         else if (c === 'fn') {
           // сноска: в месте курсора — циферка, а текст пишется сразу в списке под статьёй
           const sel = getSelection(); if (sel.rangeCount && !sel.isCollapsed) sel.collapseToEnd();

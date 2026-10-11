@@ -548,7 +548,7 @@ function badgesOf(posts, months = []) {
   for (const p of posts) {
     const y = +p.day.slice(0, 4), m = +p.day.slice(5, 7) - 1, d = +p.day.slice(8, 10);
     if (p.bw) got.add('bw');
-    if (p.ai) got.add('robot');
+    if (p.ai === 1) got.add('robot'); // 1 — пометил сам автор (2 — пометила Алина, бейджа за это нет)
     if (m === 0 && d === 23) got.add('bday');
     if (d === extraDay(y, m) || (y === 2026 && m === 9 && d === 2)) got.add('extra'); // 2.10.2026 — день ЭКСТРА до переноса на 12-е
   }
@@ -1249,8 +1249,10 @@ async function route(req, env, url) {
 
   if (m === 'GET' && p === '/api/wall') {
     const before = Number(url.searchParams.get('before')) || 9e12;
+    // фильтр стены (каждый выбирает себе): human — работы людей, ai — работы с пометкой 🤖, иначе все
+    const wf = url.searchParams.get('f'), aiCond = wf === 'human' ? ' AND COALESCE(p.ai, 0) = 0' : wf === 'ai' ? ' AND p.ai > 0' : '';
     const rows = (await env.DB.prepare(`SELECT p.id, p.day, p.theme, p.bw, p.ai, p.created_at, u.nick, u.id AS uid, (COALESCE(u.picks, 0) >= ${GOLD_PICKS}) AS gold FROM posts p JOIN users u ON u.id = p.user_id
-      WHERE p.hidden = 0 AND u.banned = 0 AND u.nick IS NOT NULL AND p.created_at < ? ORDER BY p.created_at DESC LIMIT 24`).bind(before).all()).results;
+      WHERE p.hidden = 0${aiCond} AND u.banned = 0 AND u.nick IS NOT NULL AND p.created_at < ? ORDER BY p.created_at DESC LIMIT 24`).bind(before).all()).results;
     return json({ posts: rows, pick: await getMeta(env, 'pick_post') });
   }
 
@@ -1329,6 +1331,14 @@ async function route(req, env, url) {
     return json({ ok: true });
   }
 
+  // Алина помечает чужую работу как ИИ (ai = 2) или снимает пометку; бейдж «Бип-буп» за это не даётся
+  if (m === 'POST' && p === '/api/admin/ai') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const { id, ai } = await req.json().catch(() => ({}));
+    await env.DB.prepare('UPDATE posts SET ai = CASE WHEN ? THEN (CASE WHEN ai = 1 THEN 1 ELSE 2 END) ELSE 0 END WHERE id = ?').bind(ai ? 1 : 0, String(id)).run();
+    return json({ ok: true });
+  }
   if (m === 'POST' && (p === '/api/admin/hide' || p === '/api/admin/ban')) {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');
