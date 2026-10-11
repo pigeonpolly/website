@@ -25,12 +25,16 @@
   addEventListener('hashchange', route);
 
   // ---------- обзор ----------
+  // «🤖 Автопилот»: что работает само; зелёное — всё хорошо, красное — нужно внимание
+  const autoCard = list => { const bad = list.filter(x => x.ok === false); return `<section class="adm-box adm-auto${bad.length ? ' warn' : ''}"><h3>🤖 Автопилот: ${bad.length ? `нужно внимание (${bad.length})` : 'всё работает само ✓'}</h3>
+    <p class="be-note">${bad.length ? 'Ниже красным — что не так. Остальное по-прежнему работает само.' : 'Магазин пополняется, цены и награды подстраиваются, сезоны меняются — ничего настраивать не нужно.'}</p>
+    <ul>${list.map(x => `<li class="${x.ok === false ? 'bad' : x.ok === null ? 'off' : 'ok'}"><b>${x.ok === false ? '⚠️' : x.ok === null ? '⏸' : '✓'} ${esc(x.t)}</b> — ${esc(x.d)}</li>`).join('')}</ul></section>`; };
   async function overview() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('blog/admin/overview'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
     pend(d.comments.pending);
     const card = (icon, label, big, small) => `<div class="adm-card"><span class="adm-ic">${icon}</span><b>${big}</b><span>${label}</span>${small ? `<small>${small}</small>` : ''}</div>`;
-    main.innerHTML = `
+    main.innerHTML = `<div id="adm-auto-slot"></div>
       <div class="adm-quick">
         <a class="pill-btn pill-fill" href="/blog-editor/#new">＋ Новая статья</a>
         <a class="pill-btn" href="#comments">💬 Комментарии${d.comments.pending ? ` — ждут проверки: ${d.comments.pending}` : ''}</a>
@@ -50,6 +54,7 @@
       ${backupBox()}
       <section class="adm-box"><h2>Новые работы в челлендже</h2>${d.newWorks.length ? `<div class="adm-works">${d.newWorks.map(w => `<a href="/api/img/${w.id}" target="_blank" title="@${esc(w.nick)} · ${esc(w.theme || '')} · ${esc(w.day)}"><img src="/api/img/${w.id}?t=1" alt="" loading="lazy"><span>@${esc(w.nick)}</span></a>`).join('')}</div>` : '<p class="be-note">Пока нет работ.</p>'}</section>`;
     wireBackup();
+    api('admin/autopilot').then(r => { const sl = main.querySelector('#adm-auto-slot'); if (sl) sl.innerHTML = autoCard(r.auto || []); }).catch(() => {});
   }
   function pend(k) { const b = document.getElementById('adm-pend'); if (b) { b.hidden = !k; b.textContent = k || ''; } }
 
@@ -254,6 +259,7 @@
   };
   const BADGE_FIXED = { bw: 'Загрузить рисунок в режиме Ч/Б', extra: 'Загрузить рисунок в день ЭКСТРА (раз в месяц)', bday: 'Загрузить рисунок 23 января', newyear: 'Загрузить рисунок 31 декабря или 1 января', halloween: 'Загрузить рисунок 31 октября', robot: 'Загрузить работу и самому поставить галочку 🤖 (пометка админа не считается)' , pot1: 'Сварить первое зелье (любое удачное)', potkid: 'Сварить зелье «Вкус детства»' };
   async function rules() {
+    // всё, что можно настраивать, — под свёрнутым блоком «Тонкая настройка»; сверху — только «🤖 Автопилот»
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('admin/rules'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
     const R = d.rules, D = d.defaults, S = d.stock || {}, G = d.gamePrices || {}, IX = (d.btn && d.btn.index) || { on: false, k: 1, avg: 0, base: 0 };
@@ -287,7 +293,7 @@
       row(`Пуговки в особом пустом окошке (${d.special.join(', ')} декабря)`, num('adventSpecialButtons', R.adventSpecialButtons, D.adventSpecialButtons) + ' 🔘', D.adventSpecialButtons),
     ];
     const chk = (k, l, note) => `<label class="adm-r-chk"><input type="checkbox" data-r="${k}"${R[k] ? ' checked' : ''}> ${l}${note ? ` <small class="be-note">${note}</small>` : ''}</label>`;
-    main.innerHTML = `<section class="adm-box"><h2>📜 Правила</h2>
+    main.innerHTML = `${autoCard(d.auto || [])}<details class="adm-fine"${sessionStorage.getItem('pp-fine') ? ' open' : ''}><summary>⚙️ Тонкая настройка — можно не трогать</summary><section class="adm-box"><h2>📜 Правила</h2>
       <p class="be-note">Здесь можно поменять пуговки, бейджи, магазин, адвент и ИИ-работы. Изменения действуют сразу после «Сохранить» (до минуты на всех страницах). Поле с жёлтой рамкой отличается от значения по умолчанию. Уже полученные бейджи и пуговки при изменениях не отнимаются; если снизить условие бейджа, птички, которые ему уже соответствуют, получат его при следующем заходе.</p>
       <p class="adm-r-bar"><button type="button" class="pill-btn pill-fill" id="adm-r-save">💾 Сохранить правила</button> <button type="button" class="pill-btn" id="adm-r-reset">↺ Вернуть всё по умолчанию</button> <span class="be-note" id="adm-r-st"></span></p></section>
       ${box('🔘 Пуговки', btnRows)}
@@ -316,7 +322,8 @@
       ], '<a href="/ru/potions/">Открыть игру →</a>')}
       ${box('🎄 Адвент', advRows)}
       <section class="adm-box adm-rules"><h3>🤖 ИИ-работы</h3>${chk('aiStreak', 'Работа с пометкой 🤖 засчитывается в серию', '(выключить — такие дни не продлевают серию)')}<br>${chk('aiUpload', 'За работу с пометкой 🤖 дают пуговки за загрузку')}</section>
-      <section class="adm-box adm-rules" id="adm-rules-all"></section>`;
+      </details><section class="adm-box adm-rules" id="adm-rules-all"></section>`;
+    const fine = main.querySelector('.adm-fine'); fine.addEventListener('toggle', () => { try { fine.open ? sessionStorage.setItem('pp-fine', '1') : sessionStorage.removeItem('pp-fine'); } catch (e) {} });
     // полный свод правил — обычным текстом, с текущими числами
     const pc = n => n + ' 🔘';
     main.querySelector('#adm-rules-all').innerHTML = `<h3>📖 Все правила сайта</h3>

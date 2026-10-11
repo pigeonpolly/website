@@ -37,6 +37,7 @@ export default {
     if (!env.DB || !env.IMAGES) return;
     await ensureSchema(env);
     await loadRules(env); await loadDayColors(env);
+    await setMeta(env, 'cron_at', String(Date.now())).catch(() => {}); // для «🤖 Автопилота» в кабинете: расписание живо
     ctx.waitUntil((async () => {
       if (!(await getMeta(env, 'buttons_backfill'))) await backfillButtons(env).catch(e => console.error('backfill', e)); // разовое начисление пуговок за прошлое
       await autoRestock(env).catch(e => console.error('restock', e)); // раз в сутки (по Риге) пополнить магазин
@@ -829,6 +830,25 @@ const btnOf = (pct, unit) => pct > 0 ? Math.max(1, Math.round(pct * unit.avg / 1
 // цены наград игр сейчас (для страниц игр и кабинета)
 const gamePrices = unit => ({ avg: unit.avg, level: btnOf(RULES.gameLevelPct, unit), record: btnOf(RULES.gameRecordPct, unit), king: btnOf(RULES.gameKingPct, unit), max: btnOf(RULES.gameDayMaxPct, unit),
   p1: btnOf(RULES.potion1Pct, unit), p2: btnOf(RULES.potion2Pct, unit), p3: btnOf(RULES.potion3Pct, unit), again: btnOf(RULES.potionAgainPct, unit), pmax: btnOf(RULES.potionDayMaxPct, unit) });
+// «🤖 Автопилот» в кабинете: что работает само и всё ли в порядке (ok: true — зелёное, false — нужно внимание, null — выключено)
+async function autopilot(env, req) {
+  const out = [], day = rigaDay(), y = new Date(Date.now() - 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
+  const cron = Number(await getMeta(env, 'cron_at')) || 0, mins = cron ? Math.round((Date.now() - cron) / 60000) : null;
+  out.push({ ok: mins != null && mins < 180, t: 'Расписание (раз в час)', d: mins == null ? 'ещё не запускалось — на сайте это должно случиться в течение часа после выкладки' : mins < 180 ? `последний запуск ${mins} мин назад` : `не запускалось ${Math.round(mins / 60)} ч — напишите Claude` });
+  const rl = parseJ(await getMeta(env, 'restock_last'), null);
+  out.push(!RULES.restockOn ? { ok: null, t: 'Пополнение магазина', d: 'выключено в правилах' } : { ok: !!rl && (rl.day === day || rl.day === y) || mins == null, t: 'Пополнение магазина каждую ночь', d: rl ? `последний раз ${rl.day}: закончившиеся вещи (${rl.items}) — по ${rl.to} шт.` : 'ещё не было' });
+  const cat = await catalog(env, req), leg = new Set(cat.legend || []), all = Object.entries(cat.items || {}).flatMap(([k, vs]) => vs.map(v => k + '|' + v)).filter(x => !leg.has(x));
+  const inStock = new Set((await env.DB.prepare('SELECT kind, item FROM shop WHERE stock > 0').all()).results.map(r => r.kind + '|' + r.item)), on = all.filter(x => inStock.has(x)).length;
+  out.push({ ok: !all.length || on >= all.length * 0.5, t: 'Вещи в магазине', d: `в продаже ${on} из ${all.length} обычных вещей` + (all.length && on < all.length * 0.5 ? ' — пополнение должно это исправить за ночь' : '') });
+  const unit = await gameUnit(env), eco = await env.DB.prepare('SELECT COALESCE(SUM(COALESCE(buttons, 0)), 0) AS total, COUNT(*) AS birds FROM users WHERE nick IS NOT NULL AND banned = 0').first();
+  out.push({ ok: true, t: 'Цены', d: `меняются сами от остатка; «мало / много» — от числа птичек (${STOCK.birds}); средняя цена вещи — ${unit.avg} 🔘` });
+  out.push(RULES.indexOn ? { ok: true, t: 'Пуговки и награды игр', d: `растут вместе с ценами: сейчас ×${BTN.index ? BTN.index.k : 1}` } : { ok: null, t: 'Индексация пуговок', d: 'выключена' });
+  const avgBal = eco.birds ? Math.round(eco.total / eco.birds) : 0;
+  out.push({ ok: true, t: 'Кошельки птичек', d: `в среднем ${avgBal} 🔘 — хватит примерно на ${unit.avg ? String(Math.round(avgBal / unit.avg * 10) / 10).replace('.', ',') : 0} средней вещи` });
+  const sn = { autumn: 'осень · Хеллоуин', winter: 'зима · Новый год', spring: 'весна', summer: 'лето' }[seasonNow()];
+  out.push({ ok: true, t: 'Сезон зельеварни', d: sn + (RULES.potionSeason === 'auto' ? ' (по календарю)' : ' — выбран вручную') });
+  return out;
+}
 // вещь за 30 уровней «Пуговичного дождя»: из того, что есть в магазине (остаток −1), которой у птички нет, не легендарная;
 // если в магазине такого нет — любая такая вещь из каталога. Приходит неоткрытым подарком
 async function rainItem(env, req, uid, lv) {
@@ -1169,12 +1189,12 @@ async function route(req, env, url) {
     }
     if (got.length) {
       await env.DB.prepare('UPDATE advent_open SET kind = ?, item = ?, got = ? WHERE user_id = ? AND year = ? AND day = ?').bind(got[0][0], got[0][1], JSON.stringify(got), u.id, t.year, day).run();
-      return json({ ok: true, day, kind: got[0][0], item: got[0][1], got, collector: await adventCollector(env, u.id, t.year) });
+      return json({ ok: true, day, kind: got[0][0], item: got[0][1], got, collector: await adventCollector(env, u.id, t.year), collectorBtns: BTN.badges.collector });
     }
     const n = ADVENT_SPECIAL.includes(day) ? BTN.adventSpecial : BTN.advent;
     await award(env, u.id, 'advent', `${t.year}-${day}`, n);
     await env.DB.prepare('UPDATE advent_open SET buttons = ? WHERE user_id = ? AND year = ? AND day = ?').bind(n, u.id, t.year, day).run();
-    return json({ ok: true, day, buttons: n, collector: await adventCollector(env, u.id, t.year) });
+    return json({ ok: true, day, buttons: n, collector: await adventCollector(env, u.id, t.year), collectorBtns: BTN.badges.collector });
   }
   if (m === 'POST' && p === '/api/admin/advent') { // Алина отмечает в «Коллекциях», какую вещь положить в какое окошко
     const u = await needUser(req, env);
@@ -1300,7 +1320,7 @@ async function route(req, env, url) {
     const earned = u && u.nick && !u.banned ? await award(env, u.id, 'daily', rigaDay(), BTN.daily) : 0; // +3 пуговки за первый заход за сутки (шапка спрашивает на каждой странице)
     // зарплата от «администрации Воббленда»: пуговки уже начислены, а конвертик ещё не открыт (seen = 0)
     const salary = u && u.nick && !u.banned ? (await env.DB.prepare("SELECT id, amount FROM button_log WHERE user_id = ? AND kind = 'salary' AND seen = 0").bind(u.id).all()).results : [];
-    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), avatar: avatarOf(u), buttons: (u.buttons || 0) + earned, earned, salary } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
+    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), avatar: avatarOf(u), buttons: (u.buttons || 0) + earned, earned, salary, friendBtns: BTN.friend } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
   }
   if (m === 'GET' && p === '/api/config') return json({ ready: true, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
 
@@ -1732,6 +1752,11 @@ async function route(req, env, url) {
     if (!(await isAdmin(u, env))) fail(403, 'admin');
     return json({ ok: true, ...(await autoRestock(env, true)) });
   }
+  if (m === 'GET' && p === '/api/admin/autopilot') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    return json({ auto: await autopilot(env, req) });
+  }
   if (p === '/api/admin/rules') {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');
@@ -1740,7 +1765,7 @@ async function route(req, env, url) {
       const r = b.reset ? cleanRules(null) : cleanRules(b.rules);
       await setMeta(env, 'rules', JSON.stringify(r)); rulesAt = 0; await loadRules(env);
     }
-    return json({ rules: RULES, defaults: RULE_DEFAULTS, stock: STOCK, gamePrices: gamePrices(await gameUnit(env)), btn: BTN, restockLast: parseJ(await getMeta(env, 'restock_last'), null), special: ADVENT_SPECIAL, goldPicks: GOLD_PICKS });
+    return json({ rules: RULES, defaults: RULE_DEFAULTS, stock: STOCK, gamePrices: gamePrices(await gameUnit(env)), btn: BTN, auto: await autopilot(env, req), restockLast: parseJ(await getMeta(env, 'restock_last'), null), special: ADVENT_SPECIAL, goldPicks: GOLD_PICKS });
   }
   // Алина помечает чужую работу как ИИ (ai = 2) или снимает пометку; бейдж «Бип-буп» за это не даётся
   if (m === 'POST' && p === '/api/admin/ai') {

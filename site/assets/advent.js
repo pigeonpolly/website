@@ -117,7 +117,7 @@
       <div class="adv-stage"><div class="adv-bird"></div></div>
       <p class="adv-kick">${o.kind ? t('got') : t('btns').replace('{n}', o.buttons || 0)}</p>
       ${o.kind ? `<h2>${esc(name)}</h2>${(o.got || []).length > 1 ? `<div class="adv-list">${o.got.slice(1).map(() => '<figure></figure>').join('')}</div>` : ''}${leg ? `<p class="adv-leg">${t('legend')}</p>` : ''}<p>${t('inBag')}</p>` : `<p>${t('btnsWhy')}</p>`}
-      ${o.collector ? `<p class="adv-leg adv-coll">${t('collector')}</p>` : ''}
+      ${o.collector ? `<p class="adv-leg adv-coll">${t('collector').replace(/\(\+\d+ 🔘\)/, o.collectorBtns ? `(+${o.collectorBtns} 🔘)` : '').trim()}</p>` : ''}
       <div class="adv-act">${S.user && S.user.nick ? `<a class="pill-btn pill-fill" href="${pre}/bird/">${t('bag')}</a>` : ''}<a class="pill-btn" href="${pre}/shop/">${t('shop')}</a></div></div>`;
     const bird = dlg.querySelector('.adv-bird');
     (o.got || []).slice(1).forEach(([k, v], i) => { const f = dlg.querySelectorAll('.adv-list figure')[i]; if (f && B) { f.appendChild(B.itemIcon(k, v, 56, S.user ? S.user.id : 2)); const c = document.createElement('figcaption'); c.textContent = B.giftName(k, v, L); f.appendChild(c); } });

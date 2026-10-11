@@ -31,7 +31,7 @@
     termsMore: ['Privacy rules', 'Правила конфиденциальности', 'Privātuma noteikumi'],
     refL: ['Who invited you? (optional)', 'Кто тебя пригласил? (необязательно)', 'Kurš tevi uzaicināja? (nav obligāti)'],
     refP: ['friend’s nickname', 'ник друга', 'drauga segvārds'],
-    refHint: ['Your friend gets 20 buttons 🔘', 'Другу достанется 20 пуговок 🔘', 'Draugs saņems 20 pogas 🔘'],
+    refHint: ['Your friend gets {n} buttons 🔘', 'Другу достанется {n} пуговок 🔘', 'Draugs saņems {n} pogas 🔘'], // {n} — текущая сумма с сервера (растёт вместе с ценами)
     refBad: ['There is no bird with this nickname. Pick one from the list or leave it empty.', 'Птички с таким ником нет. Выбери из списка или оставь пустым.', 'Putniņa ar tādu segvārdu nav. Izvēlies no saraksta vai atstāj tukšu.'],
     btns: ['buttons', 'пуговок', 'pogas'],
     salTitle: ['A letter for you!', 'Тебе письмо!', 'Tev vēstule!'],
@@ -105,7 +105,7 @@
     d.innerHTML = `<form method="dialog"><canvas width="${window.PPBirds ? window.PPBirds.SW : 28}" height="26" aria-hidden="true"></canvas>
       <h2>${t(kind === 'cat' ? 'nTitleCat' : kind === 'crow' ? 'nTitleCrow' : 'nTitle')}</h2><p>${t('nText')}</p>
       <input name="nick" required minlength="2" maxlength="24" autocomplete="nickname" placeholder="${t('nPlace')}">
-      <label class="acct-ref">${t('refL')}<input name="ref" maxlength="24" list="acct-ref-list" autocomplete="off" placeholder="${t('refP')}"><small>${t('refHint')}</small></label><datalist id="acct-ref-list"></datalist>
+      <label class="acct-ref">${t('refL')}<input name="ref" maxlength="24" list="acct-ref-list" autocomplete="off" placeholder="${t('refP')}"><small>${t('refHint').replace('{n}', u.friendBtns || 20)}</small></label><datalist id="acct-ref-list"></datalist>
       <p class="acct-terms">${t('pub')} <a href="${pre}/privacy/" target="_blank">${t('termsMore')} ↗</a></p>
       <p class="acct-nick-st" role="status" aria-live="polite"></p>
       <button class="pill-btn pill-fill" type="submit">${t('nSave')}</button>
