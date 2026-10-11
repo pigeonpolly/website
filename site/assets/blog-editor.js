@@ -572,14 +572,44 @@
       body.focus();
       if (lastRange && body.contains(lastRange.startContainer)) { const s = getSelection(); s.removeAllRanges(); s.addRange(lastRange); }
     };
+    // вынуть выделенные абзацы из цитаты: цитата делится на части «до» и «после», выделенное становится обычными абзацами
+    function unquote(body) {
+      const sel = getSelection(); if (!sel.rangeCount) return false;
+      const r = sel.getRangeAt(0), qs = [...body.querySelectorAll('blockquote')].filter(q => r.intersectsNode(q));
+      if (!qs.length) return false;
+      const keep = r.cloneRange();
+      const isBlock = n => n.nodeType === 1 && /^(P|H2|H3|UL|OL|FIGURE|HR)$/.test(n.tagName);
+      const empty = n => n.nodeType === 3 ? !n.textContent.trim() : n.nodeType !== 1;
+      qs.forEach(q => {
+        // абзац считается выделенным, только если в нём выделен хоть какой-то текст (тройной клик задевает начало следующего)
+        const touched = n => { if (empty(n) || !r.intersectsNode(n)) return false; const x = document.createRange(); x.selectNodeContents(n);
+          if (r.compareBoundaryPoints(Range.START_TO_START, x) > 0) x.setStart(r.startContainer, r.startOffset);
+          if (r.compareBoundaryPoints(Range.END_TO_END, x) < 0) x.setEnd(r.endContainer, r.endOffset);
+          return !!x.toString().trim() || !!x.cloneContents().querySelector('img'); };
+        // цитата без абзацев внутри (просто текст) — целиком становится абзацем
+        if (![...q.childNodes].some(isBlock)) { if ([...q.childNodes].some(touched)) { const p = document.createElement('p'); while (q.firstChild) p.appendChild(q.firstChild); q.replaceWith(p); } return; }
+        const kids = [...q.childNodes], hit = kids.map(touched);
+        const a = hit.indexOf(true), z = hit.lastIndexOf(true); if (a < 0) return;
+        const frag = document.createDocumentFragment();
+        const part = list => { if (!list.some(n => !empty(n))) return; const b2 = document.createElement('blockquote'); list.forEach(n => b2.appendChild(n)); frag.appendChild(b2); };
+        part(kids.slice(0, a));
+        kids.slice(a, z + 1).forEach(n => { if (empty(n)) return; if (isBlock(n)) frag.appendChild(n); else { const p = document.createElement('p'); p.appendChild(n); frag.appendChild(p); } });
+        part(kids.slice(z + 1));
+        q.replaceWith(frag);
+      });
+      try { sel.removeAllRanges(); sel.addRange(keep); } catch (e) { /* выделение потерялось — не страшно */ }
+      touch();
+      return true;
+    }
     app.querySelectorAll('.be-tools button').forEach(b => {
       b.addEventListener('mousedown', e => e.preventDefault());
       b.addEventListener('click', () => {
         const body = b.closest('.be-pane').querySelector('.be-body');
         restore(body);
         const c = b.dataset.cmd;
-        if (c === 'h2' || c === 'h3' || c === 'p') document.execCommand('formatBlock', false, c);
-        else if (c === 'quote') document.execCommand('formatBlock', false, 'blockquote');
+        if (c === 'p') { unquote(body); document.execCommand('formatBlock', false, 'p'); }          // «¶» — обычный текст: и из цитаты тоже вынимает
+        else if (c === 'h2' || c === 'h3') { unquote(body); document.execCommand('formatBlock', false, c); }
+        else if (c === 'quote') { if (!unquote(body)) document.execCommand('formatBlock', false, 'blockquote'); } // «❝» второй раз — убирает цитату
         else if (c === 'bold' || c === 'italic' || c === 'underline') document.execCommand(c);
         else if (c === 'strike') document.execCommand('strikeThrough');
         else if (c === 'color' || c === 'mark') { const sw = b.closest('.be-bubble').querySelector(`[data-sw="${c}"]`), was = !sw.hidden; b.closest('.be-bubble').querySelectorAll('.be-swatches').forEach(x => { x.hidden = true; }); sw.hidden = was; return; }
@@ -595,7 +625,7 @@
         else if (c === 'ol') document.execCommand('insertOrderedList');
         else if (c === 'hr') document.execCommand('insertHorizontalRule');
         else if (c === 'imgs') { mergeImages(body); return; }
-        else if (c === 'clear') { document.execCommand('removeFormat'); document.execCommand('unlink'); document.execCommand('formatBlock', false, 'p'); }
+        else if (c === 'clear') { document.execCommand('removeFormat'); document.execCommand('unlink'); unquote(body); document.execCommand('formatBlock', false, 'p'); }
         else if (c === 'fn') {
           // сноска: в месте курсора — циферка, а текст пишется сразу в списке под статьёй
           const sel = getSelection(); if (sel.rangeCount && !sel.isCollapsed) sel.collapseToEnd();
