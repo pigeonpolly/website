@@ -3232,3 +3232,7 @@ html:not(.is-admin) .statbar { display: none; }
   .sw-tile:has(.sw-mod):not(:has(.sw-aitag))::before { opacity: 0; transition: opacity .15s; }
   .sw-tile:has(.sw-mod):hover::before, .sw-tile:has(.sw-mod):focus-within::before { opacity: 1; }
 }
+/* у админа не две головы робота: когда видны кнопки, значок 🤖 прячется — пометку показывает голубая кнопка */
+.sw-tile .sw-aitag { transition: opacity .15s; }
+@media (hover: hover) { .sw-tile:has(.sw-mod):hover .sw-aitag, .sw-tile:has(.sw-mod):focus-within .sw-aitag { opacity: 0; } }
+@media (hover: none) { .sw-tile:has(.sw-mod) .sw-aitag { display: none; } }
