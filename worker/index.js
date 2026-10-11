@@ -23,7 +23,7 @@ export default {
     if (!env.DB || !env.IMAGES || !env.GOOGLE_CLIENT_ID) return json({ ready: false }, 503);
     try {
       await ensureSchema(env);
-      await loadRules(env);
+      await loadRules(env); await loadDayColors(env);
       if (p.startsWith('/api/blog/')) return await blogApi(req, env, url, helpers(env));
       return await route(req, env, url);
     } catch (e) {
@@ -36,7 +36,7 @@ export default {
   async scheduled(event, env, ctx) {
     if (!env.DB || !env.IMAGES) return;
     await ensureSchema(env);
-    await loadRules(env);
+    await loadRules(env); await loadDayColors(env);
     ctx.waitUntil((async () => {
       if (!(await getMeta(env, 'buttons_backfill'))) await backfillButtons(env).catch(e => console.error('backfill', e)); // разовое начисление пуговок за прошлое
       await migrateToR2(env); await cleanupInactive(env);
@@ -299,7 +299,8 @@ const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, p
   // бейджи: уровни по рекордной серии (дней) и особые достижения — пуговки один раз за каждый
   levels: { 1: 5, 3: 10, 7: 20, 14: 30, 30: 50, 60: 80, 100: 120, 365: 300 },
   badges: { bw: 5, extra: 15, bday: 15, early: 15, owl: 15, comeback: 15, ten: 20, weekend: 20, newyear: 20, halloween: 20,
-    monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, collector: 50, hundred: 100, robot: 1 } }; // robot — загрузил работу с пометкой 🤖 «ИИ-генерация»
+    monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, collector: 50, hundred: 100, robot: 1,
+    cpurple: 20, cyellow: 20, cred: 20, cblue: 20, cgreen: 20 } }; // c* — N рисунков в дни, когда в теме дня был этот цвет // robot — загрузил работу с пометкой 🤖 «ИИ-генерация»
 // легендарные вещи (как LEGEND в birds.js): в магазине по одной штуке на птичку, дарить нельзя; обычных — до трёх одинаковых
 const LEGEND = new Set(['furn|countcoffin', 'furn|crypt', 'furn|tieredcake', 'hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass', 'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight']);
 // ---------- правила сайта, которые Алина меняет в кабинете (раздел «📜 Правила»): хранятся в meta 'rules', поверх значений по умолчанию ----------
@@ -311,7 +312,7 @@ const RULE_DEFAULTS = {
   aiStreak: true, aiUpload: true,
   // условия бейджей (числа из описаний «как получить»)
   cond: { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4,
-    alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31 },
+    alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10 },
 };
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
@@ -338,6 +339,13 @@ async function loadRules(env) {
   Object.assign(BTN.levels, RULES.levels); Object.assign(BTN.badges, RULES.badges);
   BTN.cond = RULES.cond; // условия бейджей уходят людям вместе с наградами (описания «как получить» подставляют числа)
   return RULES;
+}
+// цвета темы дня (site/assets/day-colors.json, собирает tools/daycolors.js): {"2026-10-11": "yp"} — для бейджей за цвета
+let DAYCOL = null;
+async function loadDayColors(env) {
+  if (DAYCOL) return DAYCOL;
+  try { const r = await env.ASSETS.fetch(new Request('https://pigeonpolly.com/assets/day-colors.json')); DAYCOL = r.ok ? await r.json() : {}; } catch (e) { DAYCOL = {}; }
+  return DAYCOL;
 }
 const legMax = (kind, item) => LEGEND.has(kind + '|' + item) ? RULES.legendMax : RULES.shopMax;
 // дни для серии: работы с пометкой 🤖 считаются, если так разрешено в правилах
@@ -641,6 +649,8 @@ function moreBadges(u, posts) {
   for (const d of days) { const dt = new Date(d + 'T12:00:00Z'); if (dt.getUTCDay() === 6) { dt.setUTCDate(dt.getUTCDate() + 1); if (days.has(dt.toISOString().slice(0, 10))) weekends++; } }
   if (weekends >= C.weekend) got.add('weekend');                                         // суббота и воскресенье — 4 выходных
   for (const d of days) { const md = d.slice(5); if (md === '12-31' || md === '01-01') got.add('newyear'); if (md === '10-31') got.add('halloween'); }
+  // за цвета: N рисунков в дни, когда в теме дня был фиолетовый / жёлтый / красный / синий / зелёный
+  if (DAYCOL) for (const [f, k] of [['p', 'cpurple'], ['y', 'cyellow'], ['r', 'cred'], ['b', 'cblue'], ['g', 'cgreen']]) if ([...days].filter(d => (DAYCOL[d] || '').includes(f)).length >= C.colors) got.add(k);
   return got;
 }
 const mergedBadges = (u, posts) => [...new Set([...String(u.badges || '').split(',').filter(Boolean), ...badgesOf(posts, monthsOf(u)), ...moreBadges(u, posts), ...(isVeteran(u) ? ['veteran'] : [])])];

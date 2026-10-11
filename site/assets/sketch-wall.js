@@ -180,6 +180,11 @@
     { k: 'robot', s: 'robot', bg: '#D6E4F0', n: ['Beep-boop', 'Бип-буп', 'Bīp-būp'],
       f: ['We don’t know why you’re doing this, but since you are, let there be at least some reward for it too.', 'Мы не знаем, зачем вы это делаете, но раз уж вы это делаете, пусть за это тоже будет хотя бы какая-то награда.', 'Mēs nezinām, kāpēc jūs to darāt, bet, ja jau darāt, lai par to arī ir kaut kāda balva.'],
       h: ['Upload a work and tick 🤖 “AI-generated” yourself (once is enough). If the mark was added by the site admin, the badge is not given: only those who marked it themselves get it.', 'Загрузить работу и самому поставить галочку 🤖 «ИИ-генерация» (достаточно одного раза). Если пометку поставил админ сайта, бейдж не даётся: его получают только те, кто отметил сам.', 'Augšupielādēt darbu un pašam atzīmēt 🤖 “MI ģenerēts” (pietiek ar vienu reizi). Ja atzīmi pielika vietnes administrators, nozīmīti nedod: to saņem tikai tie, kas atzīmēja paši.'] },
+    { k: 'cpurple', s: 'cpurple', bg: '#E6DAF5', n: ['Purple mood', 'Фиолетовое настроение', 'Violeta noskaņa'], f: ['Purple suits you. Royally.', 'Фиолетовый вам к лицу. По-королевски.', 'Violetā tev piestāv. Karaliski.'], h: ['Upload {n} sketches on days when the theme palette has purple', 'Загрузить {n} рисунков в дни, когда в цветах темы дня есть фиолетовый', 'Augšupielādēt {n} skices dienās, kad dienas tēmas krāsās ir violetā krāsa'] },
+    { k: 'cyellow', s: 'cyellow', bg: '#FFF1C2', n: ['Sunny streak', 'Солнечная серия', 'Saulainā sērija'], f: ['You carry sunshine in your pencil case.', 'Вы носите солнце в пенале.', 'Tu nēsā sauli penālī.'], h: ['Upload {n} sketches on days when the theme palette has yellow', 'Загрузить {n} рисунков в дни, когда в цветах темы дня есть жёлтый', 'Augšupielādēt {n} skices dienās, kad dienas tēmas krāsās ir dzeltenā krāsa'] },
+    { k: 'cred', s: 'cred', bg: '#FBD9D5', n: ['Red alert', 'Красная тревога', 'Sarkanā trauksme'], f: ['Bold, bright and a little dramatic.', 'Смело, ярко и чуть-чуть драматично.', 'Drosmīgi, spilgti un mazliet dramatiski.'], h: ['Upload {n} sketches on days when the theme palette has red', 'Загрузить {n} рисунков в дни, когда в цветах темы дня есть красный', 'Augšupielādēt {n} skices dienās, kad dienas tēmas krāsās ir sarkanā krāsa'] },
+    { k: 'cblue', s: 'cblue', bg: '#D6E4F7', n: ['Feeling blue (the good kind)', 'Синее настроение (хорошее)', 'Zilā noskaņa (labā)'], f: ['Calm as a deep sea, sharp as a summer sky.', 'Спокойно, как море, ясно, как летнее небо.', 'Mierīgi kā jūra, skaidri kā vasaras debesis.'], h: ['Upload {n} sketches on days when the theme palette has blue', 'Загрузить {n} рисунков в дни, когда в цветах темы дня есть синий', 'Augšupielādēt {n} skices dienās, kad dienas tēmas krāsās ir zilā krāsa'] },
+    { k: 'cgreen', s: 'cgreen', bg: '#D8EFD9', n: ['Green thumb', 'Зелёные руки', 'Zaļie pirksti'], f: ['Everything you draw seems to grow.', 'Всё, что вы рисуете, будто растёт.', 'Viss, ko zīmē, šķiet, aug.'], h: ['Upload {n} sketches on days when the theme palette has green', 'Загрузить {n} рисунков в дни, когда в цветах темы дня есть зелёный', 'Augšupielādēt {n} skices dienās, kad dienas tēmas krāsās ir zaļā krāsa'] },
     { k: 'clock', f: ['Polly sets her watch by you.', 'Полли сверяет по вам часы.', 'Pollija pēc tevis regulē pulksteni.'], n: ['Like clockwork', 'Как по часам', 'Kā pulkstenis'], s: 'clock', bg: '#FBE3D6',
       h: ['Upload {n} sketches in a row at about the same time of day (within {w} minutes)', 'Загрузить {n} рисунков подряд примерно в одно время суток (в пределах {w} минут)', 'Augšupielādēt {n} skices pēc kārtas apmēram vienā laikā ({w} minūšu robežās)'] },
   ];
@@ -192,7 +197,8 @@
       '.dyyyyyyyyyd..', '.dwdwdwdwdwd..', '.dwwwwwwwwwd..', '..dwwwwwwwd...', '...ddddddd....', '..............', '..............'],
   };
   const COL = { d: '#1a1528', b: '#7f81bf', s: '#5e5a9c', w: '#ffffff', k: '#1a1528', o: '#f2a73b', y: '#F2C230', e: '#FFFDF8', r: '#D9372B',
-    n: '#8A5A3C', g: '#E9A93B', h: '#BFE3FF', c: '#c9b8e8', p: '#EE7DB0', l: '#FFF3B0', m: '#F7D774' };
+    n: '#8A5A3C', g: '#E9A93B', h: '#BFE3FF', c: '#c9b8e8', p: '#EE7DB0', l: '#FFF3B0', m: '#F7D774',
+    P: '#7B4FB8', Y: '#F2C230', R: '#D9372B', B: '#2F6FC0', G: '#3E9B4F' };
   const EXTRA_PIX = {
     post: [[10, 6, 'eeee'], [10, 7, 'eree'], [10, 8, 'eeee']],
     travel: [[10, 9, '.nn.'], [9, 10, 'nnnnn'], [9, 11, 'nggnn'], [9, 12, 'nnnnn']],
@@ -221,6 +227,12 @@
     collector: [[9, 7, '.m.m.'], [9, 8, '..m..'], [9, 9, 'rrmrr'], [9, 10, 'rrmrr'], [9, 11, 'mmmmm'], [9, 12, 'rrmrr'], [9, 13, 'rrmrr'], [5, -3, '..m..'], [5, -2, '.mlm.'], [5, -1, 'mmlmm'], [5, 0, '.m.m.'], [1, 1, 'l'], [12, 0, 'l']],
     // бип-буп: антенна с лампочкой, красный глаз-сенсор и заклёпки
     robot: [[7, -3, 'r'], [7, -2, 'h'], [7, -1, 'h'], [6, 2, 'hhhh'], [7, 3, 'rr'], [6, 4, 'hhhh'], [3, 7, 'h.h'], [2, 9, 'h.h'], [11, 6, 'hh'], [12, 5, 'h'], [12, 7, 'h']],
+    // бейджи за цвета: кисточка с краской и мазок нужного цвета
+    cpurple: [[11, 4, 'n'], [12, 3, 'n'], [12, 2, 'P'], [13, 1, 'P'], [0, 9, '.PPP.'], [0, 10, 'PPPPP'], [1, 11, 'PPP'], [2, 12, 'P'], [2, -2, 'P'], [12, -2, 'P']],
+    cyellow: [[11, 4, 'n'], [12, 3, 'n'], [12, 2, 'Y'], [13, 1, 'Y'], [0, 9, '.YYY.'], [0, 10, 'YYYYY'], [1, 11, 'YYY'], [2, 12, 'Y'], [2, -2, 'Y'], [12, -2, 'Y']],
+    cred: [[11, 4, 'n'], [12, 3, 'n'], [12, 2, 'R'], [13, 1, 'R'], [0, 9, '.RRR.'], [0, 10, 'RRRRR'], [1, 11, 'RRR'], [2, 12, 'R'], [2, -2, 'R'], [12, -2, 'R']],
+    cblue: [[11, 4, 'n'], [12, 3, 'n'], [12, 2, 'B'], [13, 1, 'B'], [0, 9, '.BBB.'], [0, 10, 'BBBBB'], [1, 11, 'BBB'], [2, 12, 'B'], [2, -2, 'B'], [12, -2, 'B']],
+    cgreen: [[11, 4, 'n'], [12, 3, 'n'], [12, 2, 'G'], [13, 1, 'G'], [0, 9, '.GGG.'], [0, 10, 'GGGGG'], [1, 11, 'GGG'], [2, 12, 'G'], [2, -2, 'G'], [12, -2, 'G']],
     medal: [[10, -3, '.m.'], [9, -2, 'mmm'], [10, -1, 'm.m'], [5, 8, 'r.r'], [5, 9, 'r.r'], [5, 10, 'mmm'], [4, 11, 'mmlmm'], [5, 12, 'mmm']],
   };
   const MONO = { b: '#D9D9D9', s: '#9A9A9A', o: '#6B6B6B' };
@@ -236,10 +248,10 @@
     return `<svg viewBox="0 0 14 17" shape-rendering="crispEdges">${px.map(([x, y, c]) => `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${c}"/>`).join('')}</svg>`;
   }
   // условия бейджей приходят с сервера (me.btn.rules.cond — их меняет Алина в «📜 Правилах»); числа подставляются в описания
-  const COND0 = { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4, alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31 };
+  const COND0 = { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4, alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10 };
   const condVals = k => { const C = Object.assign({}, COND0, (me && me.btn && me.btn.rules && me.btn.rules.cond) || {});
     return ({ alt: { n: C.alt }, monthly: { n: C.monthly }, veteran: { n: C.veteranMonths, p: C.veteranPer }, early: { n: C.early, h: C.earlyBefore }, owl: { n: C.owl, a: C.owlFrom, b: C.owlTo },
-      weekend: { n: C.weekend }, ten: { n: C.ten }, fifty: { n: C.fifty }, hundred: { n: C.hundred }, inkmaster: { n: C.inkmaster }, comeback: { n: C.comeback }, collector: { n: C.collector }, clock: { n: C.clock, w: C.clockWin } })[k] || {}; };
+      weekend: { n: C.weekend }, ten: { n: C.ten }, fifty: { n: C.fifty }, hundred: { n: C.hundred }, inkmaster: { n: C.inkmaster }, comeback: { n: C.comeback }, collector: { n: C.collector }, clock: { n: C.clock, w: C.clockWin }, cpurple: { n: C.colors }, cyellow: { n: C.colors }, cred: { n: C.colors }, cblue: { n: C.colors }, cgreen: { n: C.colors } })[k] || {}; };
   const howTo = lv => lv.h ? lv.h[L].replace(/\{(\w)\}/g, (m, x) => { const v = condVals(lv.k)[x]; return v == null ? m : v; }) : HOW_LEVEL[L](lv.d);
   // state: true — есть, false — нет, 'past' — был (чёрно-белый)
   const medal = (lv, on = true, big = false, tag = 'span', picks = me?.picks || 0) => {
