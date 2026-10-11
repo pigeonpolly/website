@@ -3287,3 +3287,10 @@ html:not(.is-admin) .statbar { display: none; }
 .bp-panel h4, #bp-bag h4 { color: #C9621C; text-transform: uppercase; letter-spacing: .05em; font: 700 13px var(--sans); margin: 16px 0 8px; }
 .bp-panel .sw-bv-how { color: #5E5472; }
 @media (max-width: 600px) { .bag-row > span { flex-basis: 100%; } .bp-panel .bag-grid, .bag-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); } }
+.bag-filter .bag-bykind { margin-left: auto; padding: 5px 12px; border-radius: 999px; border: 1px dashed #B9AECF; background: #fff; color: #2B1A51; font: 600 13px var(--sans); cursor: pointer; }
+.bag-filter .bag-bykind[aria-pressed="true"] { background: #2B1A51; color: #fff; border-style: solid; }
+.room-stage { position: relative; }
+.room-tip { position: absolute; z-index: 5; transform: translate(-50%, -100%); padding: 4px 10px; border-radius: 8px; background: rgba(20, 12, 40, .88); color: #fff; font: 600 13px var(--sans); white-space: nowrap; pointer-events: none; }
+.room-tip[hidden] { display: none; }
+.bp-tab-shop { padding: 8px 14px; border-radius: 999px; border: 1px solid #E9A93B; color: inherit; font: 600 15px 'Karla', sans-serif; text-decoration: none; }
+.bp-tab-shop:hover { background: #E9A93B; color: #2B1A51; }

@@ -916,6 +916,28 @@
       });
       cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
     }
+    // ---------- название вещи при наведении (видно всем, и гостям): мебель/украшение, иначе окно, шторы, пол, стены ----------
+    const tip = document.createElement('div'); tip.className = 'room-tip'; tip.hidden = true; stage.appendChild(tip);
+    const nameAt = (px, py) => {
+      const hit = [...layout()].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h);
+      if (hit) return nameOf(hit.it.k, hit.it.v);
+      if (room.view && px >= WX && px <= WX + WW && py >= WY && py <= WY + WH) return nameOf('view', room.view);
+      if (room.curtain && py >= WY - 8 && py <= WY + WH + 12 && ((px >= WX - 16 && px < WX) || (px > WX + WW && px <= WX + WW + 16))) return nameOf('curtain', room.curtain);
+      if (room.floor && py >= FY) return nameOf('floor', room.floor);
+      if (room.wall && py < FY) return nameOf('wall', room.wall);
+      return '';
+    };
+    const showTip = e => {
+      const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH;
+      const nm = e.buttons ? '' : nameAt(px, py); // пока тащат вещь — без подсказки
+      if (!nm) { tip.hidden = true; return; }
+      tip.textContent = nm; tip.hidden = false;
+      const sr = stage.getBoundingClientRect();
+      tip.style.left = Math.min(sr.width - 10, Math.max(10, e.clientX - sr.left)) + 'px'; tip.style.top = (e.clientY - sr.top - 14) + 'px';
+    };
+    cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') showTip(e); });
+    cv.addEventListener('pointerleave', () => { tip.hidden = true; });
+    cv.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') { showTip(e); clearTimeout(tip._t); tip._t = setTimeout(() => { tip.hidden = true; }, 1800); } }); // на телефоне — по касанию
     paintBg();
     raf = requestAnimationFrame(frame);
   }

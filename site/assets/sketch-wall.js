@@ -8,13 +8,13 @@
     soon: ['The Sketch Wall opens very soon. Meanwhile, draw today’s theme on the Daily Challenge page!', 'Стена рисунков скоро откроется. А пока нарисуйте тему дня на странице челленджа!', 'Skiču siena drīz atvērsies. Pagaidām uzzīmē dienas tēmu izaicinājuma lapā!'],
     toChallenge: ['To the Daily Challenge', 'К челленджу', 'Uz izaicinājumu'],
     myProfile: ['🐦 My profile', '🐦 Мой профиль', '🐦 Mans profils'],
-    bagShow: ['Show', 'Показать', 'Rādīt'], bagFor: ['For', 'Для кого', 'Kam'], bagWhat: ['What', 'Что', 'Kas'],
+    bagShow: ['Show', 'Показать', 'Rādīt'], bagByKind: ['By category', 'По категориям', 'Pa kategorijām'], bagFor: ['For', 'Для кого', 'Kam'], bagWhat: ['What', 'Что', 'Kas'],
     bagFree: ['🆓 Not in use', '🆓 Не используется', '🆓 Netiek lietots'], bagUsed: ['✓ Worn or in the room', '✓ Надето или в комнате', '✓ Uzvilkts vai istabā'],
     bagNone: ['Nothing like this in the bag.', 'Таких вещей в сумке нет.', 'Somā tādu lietu nav.'], inRoom: ['in the room ✓', 'в комнате ✓', 'istabā ✓'],
     bagOnTip: ['Put it on', 'Надеть', 'Uzvilkt'], bagOffTip: ['Take it off', 'Снять', 'Novilkt'], bagRoomTip: ['Place it in the room', 'Поставить в комнату', 'Novietot istabā'],
     bagAll: ['All', 'Всё', 'Viss'], bagBird: ['🐦 For the bird', '🐦 Для птички', '🐦 Putniņam'], bagRoom: ['🏠 For the room', '🏠 Для комнаты', '🏠 Istabai'],
     toRoom: ['🏠 Put it in my room', '🏠 Поставить в комнату', '🏠 Ielikt istabā'],
-    tabBag: ['🎒 Bag', '🎒 Сумка', '🎒 Soma'], tabBadges: ['🏅 Achievements', '🏅 Достижения', '🏅 Sasniegumi'], tabWorks: ['🎨 Sketches', '🎨 Рисунки', '🎨 Skices'], tabBtns: ['🔘 Buttons', '🔘 Пуговки', '🔘 Pogas'],
+    tabBag: ['🎒 Bag', '🎒 Сумка', '🎒 Soma'], tabBadges: ['🏅 Achievements', '🏅 Достижения', '🏅 Sasniegumi'], tabWorks: ['🎨 Sketches', '🎨 Рисунки', '🎨 Skices'], tabBtns: ['🔘 Buttons', '🔘 Пуговки', '🔘 Pogas'], tabShop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'],
     pSign: ['Sign in and get your own pixel bird: a profile, a room, a bag for gifts and a place on the sketch wall.', 'Войдите и получите свою пиксельную птичку: профиль, комнату, сумку для подарков и место на стене рисунков.', 'Ienāc un saņem savu pikseļu putniņu: profilu, istabu, somu dāvanām un vietu skiču sienā.'],
     pSignBtn: ['Sign in', 'Войти', 'Ienākt'], pNone: ['There is no bird with this nickname.', 'Птички с таким ником нет.', 'Putniņa ar tādu segvārdu nav.'],
     pAll: ['All birds →', 'Все птицы →', 'Visi putniņi →'], pChallenge: ['🎨 Daily Challenge', '🎨 Челлендж', '🎨 Izaicinājums'],
@@ -418,7 +418,7 @@
     const items = bagItems();
     const m = { card: box };
     // фильтры сумки: что показать (всё / не используется / надето или в комнате), для кого, вид вещи
-    const BF = bagInto.f || (bagInto.f = { show: 'all', grp: 'all', kind: '' });
+    const BF = bagInto.f || (bagInto.f = { show: 'all', grp: 'all', kind: '', byKind: false }); // byKind — разложить по видам (по умолчанию — один общий список)
     const draw = () => {
       const B = window.PPBirds, isRoom = k => B.isRoomKind && B.isRoomKind(k);
       const room = me.room || {}, placed = key => (room.items || []).filter(it => it.k + '|' + it.v === key).length;
@@ -430,16 +430,18 @@
       const pill = (f, v, label) => `<button type="button" data-bf="${f}" data-v="${v}" aria-pressed="${BF[f] === v}">${esc(label)}</button>`;
       const kindsRow = BF.grp !== 'all' ? `<div class="bag-row"><span>${t('bagWhat')}</span>${pill('kind', '', t('bagAll'))}${all.filter(k => (BF.grp === 'room') === !!isRoom(k)).map(k => pill('kind', k, kindName(k))).join('')}</div>` : '';
       const bar = items.length ? `<div class="bag-filter" role="toolbar">
-        <div class="bag-row"><span>${t('bagShow')}</span>${pill('show', 'all', t('bagAll'))}${pill('show', 'free', t('bagFree'))}${pill('show', 'used', t('bagUsed'))}</div>
+        <div class="bag-row"><span>${t('bagShow')}</span>${pill('show', 'all', t('bagAll'))}${pill('show', 'free', t('bagFree'))}${pill('show', 'used', t('bagUsed'))}<button type="button" class="bag-bykind" data-bk aria-pressed="${!!BF.byKind}">🗂 ${t('bagByKind')}</button></div>
         <div class="bag-row"><span>${t('bagFor')}</span>${pill('grp', 'all', t('bagAll'))}${pill('grp', 'bird', t('bagBird'))}${pill('grp', 'room', t('bagRoom'))}</div>${kindsRow}</div>` : '';
       const kinds = all.filter(k => items.some(g => g.kind === k && ok(g)));
-      m.card.innerHTML = `${inModal ? `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3>` : ''}<p class="sw-bv-how">${t('bagNote')}</p>${bar}
-        ${!items.length ? `<p class="bag-empty">${t('bagEmpty')}</p>` : !kinds.length ? `<p class="bag-empty">${t('bagNone')}</p>` : kinds.map(k => `<h4>${esc(kindName(k))}</h4><div class="bag-grid">${items.filter(g => g.kind === k && ok(g)).map(g => {
+      const cellHtml = g => { const k = g.kind;
           const leg = B.LEGEND && B.LEGEND.has(g.kind + '|' + g.item), n = owned(g), u = used(g);
           const sh = !leg && (me.gifts || []).find(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item && x.note === 'shop');
           const st = u ? (isRoom(k) ? t('inRoom') + (n > 1 && !['wall', 'floor', 'view', 'curtain'].includes(k) ? ` ${u}/${n}` : '') : t('wearing')) : '';
-          return `<div class="bag-cell"><button type="button" class="bag-item${u ? ' on' : ''}${leg ? ' legend' : ''}" data-k="${k}" data-i="${esc(g.item)}" title="${esc(isRoom(k) ? t('bagRoomTip') : u ? t('bagOffTip') : t('bagOnTip'))}"><span class="bag-ava"></span><span class="bag-name">${leg ? '★ ' : ''}${esc(B.giftName(k, g.item, L))}</span>${st ? `<span class="bag-st">${st}</span>` : ''}${n > 1 ? `<span class="bag-n">×${n}</span>` : ''}</button>${sh ? `<button type="button" class="bag-give" data-gid="${sh.id}">${t('give')}</button>` : ''}</div>`; }).join('')}</div>`).join('')}`;
+          return `<div class="bag-cell"><button type="button" class="bag-item${u ? ' on' : ''}${leg ? ' legend' : ''}" data-k="${k}" data-i="${esc(g.item)}" title="${esc(isRoom(k) ? t('bagRoomTip') : u ? t('bagOffTip') : t('bagOnTip'))}"><span class="bag-ava"></span><span class="bag-name">${leg ? '★ ' : ''}${esc(B.giftName(k, g.item, L))}</span>${st ? `<span class="bag-st">${st}</span>` : ''}${n > 1 ? `<span class="bag-n">×${n}</span>` : ''}</button>${sh ? `<button type="button" class="bag-give" data-gid="${sh.id}">${t('give')}</button>` : ''}</div>`; };
+      m.card.innerHTML = `${inModal ? `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3>` : ''}<p class="sw-bv-how">${t('bagNote')}</p>${bar}
+        ${!items.length ? `<p class="bag-empty">${t('bagEmpty')}</p>` : !kinds.length ? `<p class="bag-empty">${t('bagNone')}</p>` : BF.byKind ? kinds.map(k => `<h4>${esc(kindName(k))}</h4><div class="bag-grid">${items.filter(g => g.kind === k && ok(g)).map(cellHtml).join('')}</div>`).join('') : `<div class="bag-grid">${kinds.flatMap(k => items.filter(g => g.kind === k && ok(g))).map(cellHtml).join('')}</div>`}`;
       m.card.querySelectorAll('[data-bf]').forEach(b => b.onclick = () => { BF[b.dataset.bf] = b.dataset.v; if (b.dataset.bf === 'grp') BF.kind = ''; draw(); });
+      const bk = m.card.querySelector('[data-bk]'); if (bk) bk.onclick = () => { BF.byKind = !BF.byKind; draw(); };
       m.card.querySelectorAll('.bag-give').forEach(b => b.onclick = () => { const g = me.gifts.find(x => x.id === +b.dataset.gid); m.card.closest('.sw-bv') && m.card.closest('.sw-bv').remove(); giveDialog(g); });
       m.card.querySelectorAll('.bag-item').forEach(b => {
         b.querySelector('.bag-ava').appendChild(window.PPBirds.giftPic(b.dataset.k, b.dataset.i, me.id, 76, me.avatar));
@@ -632,7 +634,7 @@
             <button type="button" class="pill-btn" id="bp-share">📤 ${t(mine ? 'shareBird' : 'shareThis')}</button>${mine ? `<a class="pill-btn" href="${pre}/challenge/">${t('pChallenge')}</a>` : ''}</div></div></div>
       <div class="bp-room" id="bp-room" hidden></div>
       <div class="bp-tabs" role="tablist">${[['bag', t('tabBag')], ['badges', t('tabBadges')], ['works', t('tabWorks') + ` (${pr.posts.length})`], ...(mine && me.btn ? [['btns', t('tabBtns')]] : [])]
-        .map(([k, n], i) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}">${n}</button>`).join('')}</div>
+        .map(([k, n], i) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}">${n}</button>`).join('')}<a class="bp-tab-shop" href="${L === 1 ? '/ru' : L === 2 ? '/lv' : ''}/shop/">${t('tabShop')}</a></div>
       <div class="bp-panel" role="tabpanel"></div>
       ${mine ? `<p class="sw-acc bp-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a> · <button type="button" class="sw-link danger" id="sw-delacc">${t('delAcc')}</button></p>` : ''}`;
     page.querySelector('.sw-ava-slot').replaceWith(window.PPBirds ? window.PPBirds.avatar(pr.id, pr.avatar, 132) : document.createElement('span'));
