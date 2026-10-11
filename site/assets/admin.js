@@ -256,13 +256,14 @@
   async function rules() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('admin/rules'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    const R = d.rules, D = d.defaults, S = d.stock || {}, G = d.gamePrices || {};
+    const R = d.rules, D = d.defaults, S = d.stock || {}, G = d.gamePrices || {}, IX = (d.btn && d.btn.index) || { on: false, k: 1, avg: 0, base: 0 };
     const pct = k => num(k, R[k], D[k], 0.5, 64) + ' %'; // награды игр — в % от средней цены вещи
     const num = (path, v, def, step = 1, w = 70) => `<input type="number" step="${step}" data-r="${path}" value="${v}" style="width:${w}px" title="По умолчанию: ${def}"${String(v) !== String(def) ? ' class="adm-r-changed"' : ''}>`;
     const row = (label, inner, def, note = '') => `<tr><td>${label}${note ? `<br><small class="be-note">${note}</small>` : ''}</td><td>${inner}</td><td class="be-note">${def}</td></tr>`;
     const box = (h, rows, lead = '') => `<section class="adm-box adm-rules"><h3>${h}</h3>${lead ? `<p class="be-note">${lead}</p>` : ''}<table class="be-table adm-table"><thead><tr><th>Что</th><th>Сейчас</th><th>По умолчанию</th></tr></thead><tbody>${rows.join('')}</tbody></table></section>`;
     const btnRows = [['daily', 'Первый заход за сутки'], ['upload', 'Рисунок в челлендж (раз в день)'], ['comment', 'Комментарий'], ['commentsPerDay', 'Сколько комментариев в день приносят пуговки', ''], ['friend', 'Друг указал тебя при регистрации'], ['pick', '«★ Выбор Полли» (за каждую выбранную работу)']]
-      .map(([k, l]) => row(l, num(k, R[k], D[k]) + (k === 'commentsPerDay' ? ' шт.' : ' 🔘'), D[k]));
+      .map(([k, l]) => row(l, num(k, R[k], D[k]) + (k === 'commentsPerDay' ? ' шт.' : ' 🔘' + (IX.on && IX.k !== 1 && d.btn ? ` <small class="be-note">→ сейчас ${d.btn[k]} 🔘</small>` : '')), D[k]));
+    btnRows.unshift(row(`<label class="adm-r-chk"><input type="checkbox" data-r="indexOn"${R.indexOn ? ' checked' : ''}> Индексация: пуговки растут вместе с ценами</label>`, 'стартовая цена ' + num('indexBase', R.indexBase || IX.base || 0, D.indexBase, 1, 80) + ' 🔘', 'вкл', `все суммы ниже (а также уровни, бейджи и адвент) × (средняя цена вещи сегодня ÷ стартовая цена). Сейчас: ${IX.avg} ÷ ${IX.base} = <b>×${IX.k}</b>. Чтобы «обнулить» рост — впишите стартовой сегодняшнюю цену (${IX.avg})`));
     const lvRows = Object.keys(D.levels).map(k => row(`${LEVEL_RU[k] || ''} — рекорд ${k} ${k === '1' ? 'день' : 'дней'} подряд`, num('levels.' + k, R.levels[k], D.levels[k]) + ' 🔘', D.levels[k]));
     const bRows = Object.keys(D.badges).map(k => {
       const cond = BADGE_COND[k] ? BADGE_COND[k].map(([ck, a, b]) => `${a} ${num('cond.' + ck, R.cond[ck], D.cond[ck], 1, 60)} ${b}`).join(' · ') : (BADGE_FIXED[k] || '');
@@ -328,6 +329,7 @@
         <li>«★ Выбор Полли» — одна работа на всём сайте; ставит и снимает админ. Каждые 5 выборов — звезда на бейдже, 3 звезды (${d.goldPicks} выборов) — золотой ник. Если снять выбор, бейдж становится чёрно-белым, пуговки и счётчик остаются.</li>
         <li>Админ может скрыть работу со стены и заблокировать птичку (её работы пропадают со стены).</li></ul>
       <h4>Пуговки 🔘</h4><ul>
+        <li>${IX.on ? `Индексация: все суммы в этом разделе умножаются на (средняя цена вещи сегодня ÷ стартовая цена) — сейчас ×${IX.k} (${IX.avg} ÷ ${IX.base}). Ниже — базовые суммы.` : 'Индексация выключена: суммы ниже — как есть.'}</li>
         <li>Первый заход за сутки — ${pc(R.daily)}; рисунок — ${pc(R.upload)} (за день один раз)${R.aiUpload ? '' : ', за работу с 🤖 — 0'}; комментарий — ${pc(R.comment)} (первые ${R.commentsPerDay} в день); друг указал тебя при регистрации — ${pc(R.friend)}; «Выбор Полли» — ${pc(R.pick)}.</li>
         <li>Уровни: ${Object.keys(R.levels).map(k => `${LEVEL_RU[k]} (${k}) — ${R.levels[k]}`).join(', ')}.</li>
         <li>Бейджи: ${Object.keys(R.badges).map(k => `${BADGE_RU[k] || k} — ${R.badges[k]}`).join(', ')}. За каждый бейдж и уровень пуговки дают один раз.</li></ul>

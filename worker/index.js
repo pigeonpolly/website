@@ -330,6 +330,7 @@ const RULE_DEFAULTS = {
   // «Зельеварня»: 🔘 за новое зелье по уровням (обычное / вкусное / вкус детства), за повторное, лимит в сутки; лабиринт быстрее potionMinSec с не засчитывается
   potionOn: true, potion1Pct: 4, potion2Pct: 12, potion3Pct: 35, potionAgainPct: 1, potionDayMaxPct: 60, potionMinSec: 8,
   potionSeason: 'auto', potionShelf: true, // сезон зельеварни (auto — по календарю) и бутылочка в комнату за новое зелье «Вкус детства» // «Пуговичный дождь»: 🔘 за пройденный уровень, не больше gameDayMax в сутки; уровень быстрее gameMinSec с — не засчитывается
+  indexOn: true, indexBase: 0, // индексация обычных пуговок по средней цене вещи (0 — стартовая цена = цена в день включения)
   restockOn: true, restockTo: 0, // раз в сутки: у всех вещей, кроме легендарных, остаток дотягивается до restockTo шт. (0 — до «обычного запаса») // продажа вещей обратно в магазин: одна цена за любую вещь
   // условия бейджей (числа из описаний «как получить»)
   cond: { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4,
@@ -339,7 +340,7 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120] };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120] };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -354,7 +355,7 @@ function cleanRules(r) {
   if (!r || typeof r !== 'object') return out;
   for (const [k, [lo, hi]] of Object.entries(RULE_NUM)) if (r[k] != null && Number.isFinite(Number(r[k]))) out[k] = Math.max(lo, Math.min(hi, Number(r[k])));
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
-  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf']) if (typeof r[k] === 'boolean') out[k] = r[k];
+  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn']) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
   for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec']) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
@@ -369,9 +370,16 @@ async function loadRules(env) {
   rulesAt = Date.now();
   RULES = cleanRules(parseJ(await getMeta(env, 'rules'), null));
   // пуговки — в общий объект BTN (по нему всё начисляется и показывается людям)
-  Object.assign(BTN, { daily: RULES.daily, upload: RULES.upload, comment: RULES.comment, commentsPerDay: RULES.commentsPerDay, friend: RULES.friend, pick: RULES.pick });
-  Object.assign(BTN.levels, RULES.levels); Object.assign(BTN.badges, RULES.badges);
   try { const b = await env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE nick IS NOT NULL AND banned = 0').first(); STOCK = stockLevels(b ? b.n : 0); } catch (e) { STOCK = stockLevels(STOCK.birds); }
+  // индексация: все пуговки (заход, рисунок, комментарий, друг, «Выбор Полли», уровни, бейджи, адвент) × (средняя цена вещи сегодня ÷ стартовая цена);
+  // стартовая — RULES.indexBase или (0) средняя цена в день включения (meta 'index_base'), поэтому сразу после включения ничего не меняется
+  let avg = 0, base = 0;
+  try { avg = (await gameUnit(env)).avg; base = RULES.indexBase > 0 ? RULES.indexBase : Number(await getMeta(env, 'index_base')) || 0; if (!base && avg) { base = avg; await setMeta(env, 'index_base', String(avg)); } } catch (e) { /* без индексации */ }
+  const k = RULES.indexOn && avg > 0 && base > 0 ? avg / base : 1, ix = n => n > 0 ? Math.max(1, Math.round(n * k)) : 0;
+  Object.assign(BTN, { daily: ix(RULES.daily), upload: ix(RULES.upload), comment: ix(RULES.comment), commentsPerDay: RULES.commentsPerDay, friend: ix(RULES.friend), pick: ix(RULES.pick),
+    advent: ix(RULES.adventButtons), adventSpecial: ix(RULES.adventSpecialButtons), index: { on: RULES.indexOn, k: Math.round(k * 100) / 100, avg, base } });
+  for (const [d, n] of Object.entries(RULES.levels)) BTN.levels[d] = ix(n);
+  for (const [b, n] of Object.entries(RULES.badges)) BTN.badges[b] = ix(n);
   BTN.cond = RULES.cond; BTN.sell = RULES.sellOn ? RULES.sellPrice : null;  // цена продажи вещи в магазин (null — продажа выключена) // условия бейджей уходят людям вместе с наградами (описания «как получить» подставляют числа)
   return RULES;
 }
@@ -1163,7 +1171,7 @@ async function route(req, env, url) {
       await env.DB.prepare('UPDATE advent_open SET kind = ?, item = ?, got = ? WHERE user_id = ? AND year = ? AND day = ?').bind(got[0][0], got[0][1], JSON.stringify(got), u.id, t.year, day).run();
       return json({ ok: true, day, kind: got[0][0], item: got[0][1], got, collector: await adventCollector(env, u.id, t.year) });
     }
-    const n = ADVENT_SPECIAL.includes(day) ? RULES.adventSpecialButtons : RULES.adventButtons;
+    const n = ADVENT_SPECIAL.includes(day) ? BTN.adventSpecial : BTN.advent;
     await award(env, u.id, 'advent', `${t.year}-${day}`, n);
     await env.DB.prepare('UPDATE advent_open SET buttons = ? WHERE user_id = ? AND year = ? AND day = ?').bind(n, u.id, t.year, day).run();
     return json({ ok: true, day, buttons: n, collector: await adventCollector(env, u.id, t.year) });
@@ -1732,7 +1740,7 @@ async function route(req, env, url) {
       const r = b.reset ? cleanRules(null) : cleanRules(b.rules);
       await setMeta(env, 'rules', JSON.stringify(r)); rulesAt = 0; await loadRules(env);
     }
-    return json({ rules: RULES, defaults: RULE_DEFAULTS, stock: STOCK, gamePrices: gamePrices(await gameUnit(env)), restockLast: parseJ(await getMeta(env, 'restock_last'), null), special: ADVENT_SPECIAL, goldPicks: GOLD_PICKS });
+    return json({ rules: RULES, defaults: RULE_DEFAULTS, stock: STOCK, gamePrices: gamePrices(await gameUnit(env)), btn: BTN, restockLast: parseJ(await getMeta(env, 'restock_last'), null), special: ADVENT_SPECIAL, goldPicks: GOLD_PICKS });
   }
   // Алина помечает чужую работу как ИИ (ai = 2) или снимает пометку; бейдж «Бип-буп» за это не даётся
   if (m === 'POST' && p === '/api/admin/ai') {
