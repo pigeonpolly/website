@@ -71,7 +71,21 @@ async function loadTags(env) {
   for (const r of (await env.DB.prepare('SELECT en, ru, lv, checked, src, created_at FROM blog_tags').all()).results) TAGMAP[r.en] = r;
   SECTIONS = (await env.DB.prepare('SELECT * FROM blog_sections ORDER BY sort, en').all()).results;
 }
-const stripTags = s => String(s || '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim();
+const stripTags = s => String(s || '').replace(/\[\[[\s\S]*?\]\]/g, '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(); // сноски [[…]] в выдержки не попадают
+// ---------- сноски: в тексте статьи [[пояснение или источник]] → циферка ¹, а внизу свёрнутый список «Источники и примечания» ----------
+const FN = { en: ['Sources and notes', 'Note'], ru: ['Источники и примечания', 'Сноска'], lv: ['Avoti un piezīmes', 'Piezīme'] };
+const FN_RE = /\[\[((?:(?!\]\]|<\/?(?:p|h2|h3|li|ul|ol|blockquote|figure)\b)[\s\S]){1,3000}?)\]\]/g;
+function footnotes(html, lang) {
+  const notes = [];
+  const body = String(html || '').replace(FN_RE, (m, inner) => {
+    notes.push(inner.trim()); const n = notes.length, tip = stripTags(inner).replace(/"/g, '&quot;').slice(0, 300);
+    return `<sup class="fn-ref"><a href="#fn-${n}" id="fnref-${n}" title="${tip}" aria-label="${FN[lang][1]} ${n}">${n}</a></sup>`;
+  });
+  if (!notes.length) return body;
+  // голые адреса в сносках — ссылками (если внутри уже есть <a>, не трогаем)
+  const link = x => /<a\s/i.test(x) ? x : x.replace(/https?:\/\/[^\s<]+/g, u => { const tail = (u.match(/[.,;:!?)»]+$/) || [''])[0], url = u.slice(0, u.length - tail.length); return `<a href="${url}" target="_blank" rel="noopener">${url.replace(/^https?:\/\/(www\.)?/, '').slice(0, 60)}${url.length > 70 ? '…' : ''}</a>${tail}`; });
+  return body + `<details class="bp-fns" id="notes"><summary>${FN[lang][0]} <span>(${notes.length})</span></summary><ol>${notes.map((x, i) => `<li id="fn-${i + 1}">${link(x)} <a href="#fnref-${i + 1}" class="fn-back" aria-label="↑">↩</a></li>`).join('')}</ol></details>`;
+}
 const fmtDate = (ts, lang) => { const d = new Date(ts * 1000); return `${d.getUTCDate()} ${T[lang].months[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
 const blogUrl = (lang, slug, q = '') => `${PREFIX[lang]}/blog/${slug ? slug + '/' : ''}${q}`;
 
@@ -1081,7 +1095,7 @@ export async function blogPage(req, env, url, h) {
         ${tags.length ? ' · ' + tags.map(g => `<a class="bl-tag" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}">#${esc(tagLabel(g, lang))}</a>`).join(' ') : ''}</p>
     </header>
     ${post.cover ? `<figure class="bp-cover"><img src="${esc(post.cover)}" alt=""></figure>` : ''}
-    <div class="bp-body"${textLang !== lang ? ` lang="${textLang}"` : ''}>${field(post, 'b', lang)}${post.src_lang && post.src_lang !== textLang && post['t_' + post.src_lang]
+    <div class="bp-body"${textLang !== lang ? ` lang="${textLang}"` : ''}>${footnotes(field(post, 'b', lang), lang)}${post.src_lang && post.src_lang !== textLang && post['t_' + post.src_lang]
       ? `<p class="bp-tr-note">${TR_NOTE[lang](post.src_lang, blogUrl(post.src_lang, post.slug))}</p>` : ''}</div>
     <div class="bp-actions"><button type="button" class="bp-like" aria-pressed="false"><span class="bp-heart">♥</span> <span class="bp-likes">${post.likes || 0}</span></button>
       <div class="bp-share-wrap"><button type="button" class="bp-share" aria-expanded="false" data-url="${SITE + blogUrl(lang, post.slug)}" data-title="${esc(title)}" data-img="${esc(post.cover ? (post.cover.startsWith('/') ? SITE + post.cover : post.cover) : '')}"

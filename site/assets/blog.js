@@ -17,6 +17,10 @@
     logout: ['Sign out', 'Выйти', 'Iziet'],
   };
   const t = k => S[k][L];
+  // сноски: нажали на циферку — раскрыть список «Источники и примечания» (по умолчанию свёрнут) и подсветить нужную
+  const openFn = id => { const li = id && document.getElementById(id); const d = document.querySelector('.bp-fns'); if (!li || !d) return; d.open = true; li.classList.remove('fn-hit'); void li.offsetWidth; li.classList.add('fn-hit'); };
+  document.addEventListener('click', e => { const a = e.target.closest('.fn-ref a'); if (a) openFn(a.getAttribute('href').slice(1)); });
+  if (/^#fn-\d+$/.test(location.hash)) setTimeout(() => { openFn(location.hash.slice(1)); const li = document.getElementById(location.hash.slice(1)); if (li) li.scrollIntoView({ block: 'center' }); }, 50);
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const api = async (path, body) => {
     const r = await fetch('/api/' + path, body ? { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) } : { credentials: 'same-origin' });
