@@ -254,7 +254,7 @@
   async function rules() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('admin/rules'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    const R = d.rules, D = d.defaults;
+    const R = d.rules, D = d.defaults, S = d.stock || {};
     const num = (path, v, def, step = 1, w = 70) => `<input type="number" step="${step}" data-r="${path}" value="${v}" style="width:${w}px" title="По умолчанию: ${def}"${String(v) !== String(def) ? ' class="adm-r-changed"' : ''}>`;
     const row = (label, inner, def, note = '') => `<tr><td>${label}${note ? `<br><small class="be-note">${note}</small>` : ''}</td><td>${inner}</td><td class="be-note">${def}</td></tr>`;
     const box = (h, rows, lead = '') => `<section class="adm-box adm-rules"><h3>${h}</h3>${lead ? `<p class="be-note">${lead}</p>` : ''}<table class="be-table adm-table"><thead><tr><th>Что</th><th>Сейчас</th><th>По умолчанию</th></tr></thead><tbody>${rows.join('')}</tbody></table></section>`;
@@ -268,8 +268,10 @@
     const shopRows = [
       row('Сколько одинаковых обычных вещей можно иметь', num('shopMax', R.shopMax, D.shopMax) + ' шт.', D.shopMax, 'и купить, и получить в подарок'),
       row('Сколько одинаковых легендарных', num('legendMax', R.legendMax, D.legendMax) + ' шт.', D.legendMax),
-      row('Обычный запас (при нём цена = ценности)', num('normStock', R.normStock, D.normStock) + ' шт.', D.normStock, 'меньше штук — дороже, больше — дешевле'),
-      row('Обычный запас легендарных', num('normLegend', R.normLegend, D.normLegend) + ' шт.', D.normLegend),
+      row('<b>«Мало»</b> — не больше … % от числа птичек', num('lowPct', R.lowPct, D.lowPct, 0.5) + ` % → сейчас <b>1–${S.low} шт.</b>`, D.lowPct + ' %', 'фильтр «Мало» в магазине; цена выше ценности'),
+      row('<b>Обычный запас</b> — … % от числа птичек', num('normPct', R.normPct, D.normPct, 0.5) + ` % → сейчас <b>${S.norm} шт.</b>`, D.normPct + ' %', 'при нём цена = ценности; меньше штук — дороже, больше — дешевле'),
+      row('<b>«Много»</b> — от … % от числа птичек', num('manyPct', R.manyPct, D.manyPct, 1) + ` % → сейчас <b>от ${S.many} шт.</b>`, D.manyPct + ' %', 'фильтр «Много»; цена ниже ценности'),
+      row('Легендарных — … % от этих чисел', num('legendPct', R.legendPct, D.legendPct) + ` % → сейчас мало 1–${S.lowLeg}, обычно ${S.normLeg}, много от ${S.manyLeg}`, D.legendPct + ' %'),
       row('Самая низкая цена (доля от ценности)', '×' + num('priceMin', R.priceMin, D.priceMin, 0.05), '×' + D.priceMin, 'когда штук очень много'),
       row('Самая высокая цена (во сколько раз дороже)', '×' + num('priceMax', R.priceMax, D.priceMax, 0.1), '×' + D.priceMax, 'когда осталась 1 штука'),
       row(`<label class="adm-r-chk"><input type="checkbox" data-r="sellOn"${R.sellOn ? ' checked' : ''}> Птички могут продавать вещи обратно в магазин</label>`, 'за ' + num('sellPrice', R.sellPrice, D.sellPrice) + ' 🔘', D.sellPrice + ' 🔘', 'одна цена за любую вещь; проданная вещь возвращается в магазин (+1 шт.)'),
@@ -307,7 +309,8 @@
         <li>Бейджи: ${Object.keys(R.badges).map(k => `${BADGE_RU[k] || k} — ${R.badges[k]}`).join(', ')}. За каждый бейдж и уровень пуговки дают один раз.</li></ul>
       <h4>Магазин</h4><ul>
         <li>Одинаковых обычных вещей — до ${R.shopMax} шт., легендарных — до ${R.legendMax}. Легендарные дарить нельзя.</li>
-        <li>У каждой вещи есть ценность (цена при запасе ${R.normStock} шт., у легендарных — ${R.normLegend}). Цена сейчас = ценность × (обычный запас ÷ остаток)^0.4, от ×${R.priceMin} до ×${R.priceMax}, округление до 5.</li>
+        <li>«Мало», «обычно» и «много» считаются от числа птичек с ником (сейчас ${S.birds}): мало — до ${R.lowPct} % (1–${S.low} шт.), обычный запас — ${R.normPct} % (${S.norm} шт.), много — от ${R.manyPct} % (${S.many} шт.); у легендарных — ${R.legendPct} % от этих чисел (1–${S.lowLeg} / ${S.normLeg} / от ${S.manyLeg}). Птичек становится больше — числа растут сами.</li>
+        <li>У каждой вещи есть ценность — цена при обычном запасе. Цена сейчас = ценность × (обычный запас ÷ остаток)^0.4, от ×${R.priceMin} до ×${R.priceMax}, округление до 5.</li>
         <li>«🎲 Сюрприз» — случайная вещь категории, которой у птички ещё нет; если всё есть — любая вещь, которой нет.</li>
         <li>Любую вещь из сумки, кроме легендарных, можно подарить другой птичке (если у неё ещё нет максимума). Админ может дарить что угодно.</li>
         <li>${R.sellOn ? `Любую вещь можно продать обратно в магазин за ${pc(R.sellPrice)} — она снова появится в продаже.` : 'Продажа вещей обратно в магазин выключена.'}</li></ul>
@@ -395,9 +398,9 @@
   }
 
   // ---------- магазин: цена и количество каждой вещи из коллекций ----------
-  // цена от остатка — как effPrice в worker/index.js: ценность × (10 / остаток)^0.4, от ×0.75 до ×2.5 (у легендарных обычный запас — 3)
-  let PR = { normStock: 10, normLegend: 3, priceMin: 0.75, priceMax: 2.5 }; // формула цены — из «📜 Правил» (приходит с admin/shop)
-  const effPrice = (base, stock, leg) => base > 0 ? Math.max(5, Math.round(base * Math.max(PR.priceMin, Math.min(PR.priceMax, Math.pow((leg ? PR.normLegend : PR.normStock) / Math.max(1, stock || 0), 0.4))) / 5) * 5) : 0;
+  // цена от остатка — как effPrice в worker/index.js: ценность × (обычный запас / остаток)^0.4, от ×0.75 до ×2.5; «мало / обычно / много» — от числа птичек (STOCK на сервере)
+  let PR = { birds: 0, low: 3, norm: 10, many: 25, lowLeg: 1, normLeg: 3, manyLeg: 7, priceMin: 0.75, priceMax: 2.5 }; // формула цены — из «📜 Правил» (приходит с admin/shop)
+  const effPrice = (base, stock, leg) => base > 0 ? Math.max(5, Math.round(base * Math.max(PR.priceMin, Math.min(PR.priceMax, Math.pow((leg ? PR.normLeg : PR.norm) / Math.max(1, stock || 0), 0.4))) / 5) * 5) : 0;
   let sFilter = 'all', sq = '', sStock = 'all', sSort = 'cat'; const sOpen = new Set(); // фильтр «Закончились / Скоро закончатся» — общий для таблицы остатков и списка вещей (sStock)
   async function shop() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
@@ -407,13 +410,15 @@
     const B = window.PPBirds; if (!B) { main.innerHTML = '<p class="be-note">Не загрузился каталог вещей (birds.js).</p>'; return; }
     const rows = {}; d.items.forEach(r => { rows[r.kind + '|' + r.item] = r; });
     const all = []; B.GIFT_KINDS.forEach(k => (B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).forEach(v => all.push({ kind: k[0], kindName: k[1][1], item: v, name: B.giftName(k[0], v, 1) })));
+    const isLeg = x => !!(B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item)), lowN = x => isLeg(x) ? PR.lowLeg : PR.low, manyN = x => isLeg(x) ? PR.manyLeg : PR.many;
     const draw = () => {
       const theme = sFilter.startsWith('theme:') ? B.GIFT_THEMES.find(t => 'theme:' + t[0] === sFilter) : null, q = sq.trim().toLowerCase();
       const list = all.filter(x => {
         const r = rows[x.kind + '|' + x.item] || {};
         const n = r.stock || 0;
         if (sStock === 'stock' && !(n > 0)) return false;
-        if (sStock === 'low' && !(n > 0 && n <= 3)) return false;
+        if (sStock === 'low' && !(n > 0 && n <= lowN(x))) return false;
+        if (sStock === 'many' && !(n >= manyN(x))) return false;
         if (sStock === 'none' && n > 0) return false;
         if (sFilter.startsWith('kind:') && sFilter !== 'kind:' + x.kind) return false;
         if (theme && !theme[2].includes(x.kind + '|' + x.item)) return false;
@@ -427,13 +432,13 @@
       const stockTxt = xs => { const ns = xs.map(cnt), mn = Math.min(...ns), mx = Math.max(...ns), zero = ns.filter(n => !n).length;
         if (!mx) return '<span class="adm-sk-0">нет в продаже</span>'; const t = mn === mx ? 'по ' + mx + ' шт.' : 'от ' + mn + ' до ' + mx + ' шт.';
         return t + (zero ? ` <span class="adm-sk-0">· ${zero} закончились</span>` : ''); };
-      const sOnly = sStock === 'none' ? 'empty' : sStock === 'low' ? 'low' : 'all';
-      const only = x => sOnly === 'empty' ? cnt(x) === 0 : sOnly === 'low' ? cnt(x) > 0 && cnt(x) <= 3 : true;
-      const sum = B.GIFT_KINDS.map(k => { const xs = all.filter(x => x.kind === k[0]); const on = xs.filter(x => cnt(x) > 0); return { k: k[0], name: k[1][1], total: xs.length, on: on.length, pcs: on.reduce((a, x) => a + cnt(x), 0), low: on.filter(x => cnt(x) <= 3).length, txt: stockTxt(xs), hit: xs.filter(only).length, value: xs.reduce((a, x) => a + cnt(x) * ((rows[x.kind + '|' + x.item] || {}).price || 0), 0), each: (ns => ns.length ? (Math.min(...ns) === Math.max(...ns) ? String(ns[0]) : Math.min(...ns) + '–' + Math.max(...ns)) : '—')(xs.filter(x => !(B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item))).map(cnt)) }; });
+      const sOnly = sStock === 'none' ? 'empty' : sStock === 'low' ? 'low' : sStock === 'many' ? 'many' : 'all';
+      const only = x => sOnly === 'empty' ? cnt(x) === 0 : sOnly === 'low' ? cnt(x) > 0 && cnt(x) <= lowN(x) : sOnly === 'many' ? cnt(x) >= manyN(x) : true;
+      const sum = B.GIFT_KINDS.map(k => { const xs = all.filter(x => x.kind === k[0]); const on = xs.filter(x => cnt(x) > 0); return { k: k[0], name: k[1][1], total: xs.length, on: on.length, pcs: on.reduce((a, x) => a + cnt(x), 0), low: on.filter(x => cnt(x) <= lowN(x)).length, txt: stockTxt(xs), hit: xs.filter(only).length, value: xs.reduce((a, x) => a + cnt(x) * ((rows[x.kind + '|' + x.item] || {}).price || 0), 0), each: (ns => ns.length ? (Math.min(...ns) === Math.max(...ns) ? String(ns[0]) : Math.min(...ns) + '–' + Math.max(...ns)) : '—')(xs.filter(x => !(B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item))).map(cnt)) }; });
       const onSale = all.filter(x => (rows[x.kind + '|' + x.item] || {}).stock > 0).length;
       const fb = (k, l) => `<button type="button" class="pill-btn" data-sf="${k}" aria-pressed="${sFilter === k}">${l}</button>`;
       main.innerHTML = `<section class="adm-box"><h2>🛍 Магазин</h2>
-        <p class="be-note">Здесь все вещи из «Коллекций». «Ценность» — цена при обычном запасе (10 шт., у легендарных — 3); её уже расставила по вещам, можно поменять. Покупатели видят «цену сейчас»: чем меньше осталось, тем дороже (до ×2.5), чем больше — тем дешевле (до ×0.75). Остаток 0 — «нет в наличии». Сейчас в продаже: <b>${onSale}</b> из ${all.length}. Сохраняется сразу.</p>
+        <p class="be-note">Здесь все вещи из «Коллекций». «Ценность» — цена при обычном запасе; её уже расставила по вещам, можно поменять. <b>Мало / обычно / много</b> считается от числа птичек с ником (сейчас ${n(PR.birds)}): мало — 1–${PR.low} шт., обычный запас — ${PR.norm} шт., много — от ${PR.many} шт. (легендарных: 1–${PR.lowLeg} / ${PR.normLeg} / от ${PR.manyLeg}); проценты меняются в «📜 Правилах». Покупатели видят «цену сейчас»: чем меньше осталось, тем дороже (до ×2.5), чем больше — тем дешевле (до ×0.75). Остаток 0 — «нет в наличии». Сейчас в продаже: <b>${onSale}</b> из ${all.length}. Сохраняется сразу.</p>
         <div class="be-filters"><input type="search" id="adm-sq" placeholder="🔍 Найти вещь" value="${esc(sq)}"></div>
         ${(() => {
           // экономика: пуговки у птичек и насколько сейчас дороги вещи (цена сейчас ÷ ценность, по вещам в продаже)
@@ -447,18 +452,19 @@
               <label>на <input type="number" id="adm-rp-pct" min="1" max="90" value="10" style="width:56px"> %</label></div></section>`;
         })()}
         <section class="adm-stockbox"><h3>📦 Остаток по категориям</h3>
-          <p class="be-note">Сколько штук каждой вещи продаётся. Впишите число и нажмите «Поставить» — у всех вещей категории станет столько штук (легендарные не меняются, кроме фильтров «Закончились» и «Скоро закончатся»). Нажмите на название категории, чтобы открыть её вещи и поменять по одной. Цена считается сама: меньше штук — дороже.</p>
-          <div class="adm-sbar"><span class="adm-sl">Показать:</span>${[['all', 'Все'], ['empty', '✕ Закончились'], ['low', '⚠️ Скоро закончатся (1–3 шт.)']].map(([k, l]) => `<button type="button" class="pill-btn" data-only="${k}" aria-pressed="${sOnly === k}">${l}</button>`).join('')}</div>
+          <p class="be-note">Сколько штук каждой вещи продаётся. Впишите число и нажмите «Поставить» — у всех вещей категории станет столько штук (легендарные не меняются, кроме фильтров «Закончились», «Мало» и «Много»). Нажмите на название категории, чтобы открыть её вещи и поменять по одной. Цена считается сама: меньше штук — дороже.</p>
+          <div class="adm-sbar"><span class="adm-sl">Показать:</span>${[['all', 'Все'], ['empty', '✕ Закончились'], ['low', `⚠️ Мало (1–${PR.low} шт.)`], ['many', `📦 Много (от ${PR.many} шт.)`]].map(([k, l]) => `<button type="button" class="pill-btn" data-only="${k}" aria-pressed="${sOnly === k}">${l}</button>`).join('')}</div>
           ${sOnly !== 'all' && !sum.some(r => r.hit) ? '<p class="be-note">Таких вещей нет 🎉</p>' : ''}
           <table class="be-table adm-table adm-stock"><thead><tr><th>Категория</th><th>Сейчас в продаже</th><th title="Сколько пуговок нужно, чтобы купить всё, что сейчас есть в продаже (по сегодняшним ценам)">Всё вместе стоит</th><th>Поставить всем вещам категории</th></tr></thead><tbody>
-          ${sum.filter(r => sOnly === 'all' || r.hit).map(r => `<tr data-sk="${r.k}"><td><button type="button" class="adm-exp" data-exp="${r.k}" aria-expanded="${sOpen.has(r.k)}">${sOpen.has(r.k) ? '▾' : '▸'} ${esc(r.name)}</button><small class="adm-sk-n">${r.total} ${pl1(r.total)}</small></td><td>${sOnly === 'all' ? r.txt : `<span class="adm-sk-0">${r.hit} ${pl1(r.hit)} ${sOnly === 'empty' ? 'закончились' : 'скоро закончатся'}</span><br><small>${r.txt}</small>`}</td><td>${r.value ? '🔘 ' + n(r.value) : '—'}</td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток: ${esc(r.name)}"><button type="button" class="pill-btn" data-set="${r.k}">${sOnly === 'all' ? 'Поставить' : 'Пополнить'}</button></td></tr>${sOpen.has(r.k) ? `<tr class="adm-sk-items"><td colspan="4"><div class="adm-sk-grid">${all.filter(x => x.kind === r.k && only(x)).map(x => { const w = rows[x.kind + '|' + x.item] || { price: 0, base: (d.suggested || {})[x.kind + '|' + x.item] || 0, stock: 0 }, leg = B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item); return `<div class="adm-sk-it${leg ? ' adm-legend' : ''}${(w.stock || 0) > 0 ? '' : ' off'}" data-k="${esc(x.kind)}" data-i="${esc(x.item)}"><span class="adm-shop-pic"></span><span class="adm-sk-nm">${esc(x.name)}${leg && !x.name.includes('★') ? ' ★' : ''}</span><label>Остаток <input type="number" min="0" max="100000" inputmode="numeric" value="${w.stock || 0}" data-f="stock"></label><label>Ценность <input type="number" min="0" max="100000" inputmode="numeric" value="${w.base ?? w.price ?? 0}" data-f="price"></label><small class="adm-shop-st">${w.stock > 0 ? '🔘 ' + w.price : '—'}</small></div>`; }).join('')}</div></td></tr>` : ''}`).join('')}
+          ${sum.filter(r => sOnly === 'all' || r.hit).map(r => `<tr data-sk="${r.k}"><td><button type="button" class="adm-exp" data-exp="${r.k}" aria-expanded="${sOpen.has(r.k)}">${sOpen.has(r.k) ? '▾' : '▸'} ${esc(r.name)}</button><small class="adm-sk-n">${r.total} ${pl1(r.total)}</small></td><td>${sOnly === 'all' ? r.txt : `<span class="adm-sk-0">${r.hit} ${pl1(r.hit)} ${sOnly === 'empty' ? 'закончились' : sOnly === 'low' ? 'мало' : 'много'}</span><br><small>${r.txt}</small>`}</td><td>${r.value ? '🔘 ' + n(r.value) : '—'}</td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток: ${esc(r.name)}"><button type="button" class="pill-btn" data-set="${r.k}">${sOnly === 'all' ? 'Поставить' : 'Пополнить'}</button></td></tr>${sOpen.has(r.k) ? `<tr class="adm-sk-items"><td colspan="4"><div class="adm-sk-grid">${all.filter(x => x.kind === r.k && only(x)).map(x => { const w = rows[x.kind + '|' + x.item] || { price: 0, base: (d.suggested || {})[x.kind + '|' + x.item] || 0, stock: 0 }, leg = B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item); return `<div class="adm-sk-it${leg ? ' adm-legend' : ''}${(w.stock || 0) > 0 ? '' : ' off'}" data-k="${esc(x.kind)}" data-i="${esc(x.item)}"><span class="adm-shop-pic"></span><span class="adm-sk-nm">${esc(x.name)}${leg && !x.name.includes('★') ? ' ★' : ''}</span><label>Остаток <input type="number" min="0" max="100000" inputmode="numeric" value="${w.stock || 0}" data-f="stock"></label><label>Ценность <input type="number" min="0" max="100000" inputmode="numeric" value="${w.base ?? w.price ?? 0}" data-f="price"></label><small class="adm-shop-st">${w.stock > 0 ? '🔘 ' + w.price : '—'}</small></div>`; }).join('')}</div></td></tr>` : ''}`).join('')}
           <tr data-sk="*"><td><b>Весь магазин</b><small class="adm-sk-n">каждой вещи станет ровно столько штук</small><small class="adm-sk-n">${all.length} ${pl1(all.length)}</small></td><td>${sum.reduce((a, r) => a + r.on, 0)} в продаже, ${sum.reduce((a, r) => a + r.pcs, 0)} шт. всего</td><td><b>🔘 ${n(sum.reduce((a, r) => a + r.value, 0))}</b></td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток всем"><button type="button" class="pill-btn" data-set="*">${sOnly === 'all' ? 'Поставить всем, кроме легендарных' : 'Пополнить все найденные'}</button></td></tr></tbody></table>
+          <p class="adm-refill">↻ Пополнить <b>все закончившиеся, кроме легендарных</b> (сейчас ${all.filter(x => !isLeg(x) && cnt(x) === 0).length} ${pl1(all.filter(x => !isLeg(x) && cnt(x) === 0).length)}) — по <input type="number" id="adm-refill-n" min="1" max="10000" inputmode="numeric" value="${PR.norm}" style="width:70px"> шт. <button type="button" class="pill-btn" id="adm-refill">Пополнить</button> <small class="be-note">обычный запас сейчас — ${PR.norm} шт.</small></p>
           <p><button type="button" class="pill-btn pill-fill" id="adm-set-all">💾 Сохранить все заполненные</button> <button type="button" class="pill-btn adm-empty" id="adm-empty-all">🧹 Опустошить полки</button></p></section>
         <div class="adm-sbar"><label class="adm-sl">Порядок: <select id="adm-sort"><option value="cat">по видам</option><option value="few"${sSort === 'few' ? ' selected' : ''}>меньше всего сверху</option><option value="many"${sSort === 'many' ? ' selected' : ''}>больше всего сверху</option></select></label></div>
         <div class="adm-sbar"><span class="adm-sl">Что:</span>${fb('all', 'Все')}${B.GIFT_KINDS.map(k => fb('kind:' + k[0], k[1][1])).join('')}${B.GIFT_THEMES.map(t => fb('theme:' + t[0], t[1][1])).join('')}</div>
         <table class="be-table adm-table adm-shop"><thead><tr><th>Вещь</th><th>Вид</th><th>Ценность 🔘</th><th>Остаток</th><th>Цена сейчас</th></tr></thead><tbody>
         ${list.map(x => { const r = rows[x.kind + '|' + x.item] || { price: 0, base: (d.suggested || {})[x.kind + '|' + x.item] || 0, stock: 0 }; const leg = B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item); return `<tr data-k="${esc(x.kind)}" data-i="${esc(x.item)}"${leg ? ' class="adm-legend"' : ''}><td class="adm-shop-it"><span class="adm-shop-pic"></span>${esc(x.name)}${leg ? ' <span class="adm-leg-tag" title="Легендарная: 1 штука на птичку, дарить нельзя">★ легендарная</span>' : ''}</td><td>${esc(x.kindName)}</td>
-          <td data-l="Цена 🔘"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.base ?? r.price}" data-f="price" aria-label="Ценность" title="Цена при обычном запасе (10 шт., у легендарных — 3)"></td><td data-l="Количество"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.stock}" data-f="stock" aria-label="Количество"></td><td class="adm-shop-st">${r.stock > 0 ? '🔘 ' + r.price : '—'}</td></tr>`; }).join('')}</tbody></table></section>`;
+          <td data-l="Цена 🔘"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.base ?? r.price}" data-f="price" aria-label="Ценность" title="Цена при обычном запасе (${leg ? PR.normLeg : PR.norm} шт.)"></td><td data-l="Количество"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.stock}" data-f="stock" aria-label="Количество"></td><td class="adm-shop-st">${r.stock > 0 ? '🔘 ' + r.price : '—'}</td></tr>`; }).join('')}</tbody></table></section>`;
       main.querySelectorAll('[data-rp]').forEach(b => b.onclick = async () => {
         const mode = b.dataset.rp, pct = +main.querySelector('#adm-rp-pct').value || 10;
         const ask = mode === 'reset' ? 'Вернуть всем вещам рекомендуемую ценность? Ваши ручные цены заменятся.' : `Сделать все вещи ${mode === 'up' ? 'дороже' : 'дешевле'} на ${pct}%? (меняется ценность; цена сейчас по-прежнему зависит от остатка)`;
@@ -466,7 +472,16 @@
         b.disabled = true;
         try { await api('admin/shop/reprice', { mode, pct }); shop(); } catch (x) { b.disabled = false; alert(err(x)); }
       });
-      main.querySelectorAll('[data-only]').forEach(b => b.onclick = () => { sStock = { all: 'all', empty: 'none', low: 'low' }[b.dataset.only]; draw(); });
+      main.querySelectorAll('[data-only]').forEach(b => b.onclick = () => { sStock = { all: 'all', empty: 'none', low: 'low', many: 'many' }[b.dataset.only]; draw(); });
+      // пополнить все закончившиеся (остаток 0), кроме легендарных, — не зависит от фильтров
+      main.querySelector('#adm-refill').onclick = async e => {
+        const k = Math.max(1, Math.min(10000, Math.floor(+main.querySelector('#adm-refill-n').value) || 0)), xs = all.filter(x => !isLeg(x) && cnt(x) === 0);
+        if (!xs.length) return alert('Закончившихся обычных вещей нет 🎉');
+        if (!confirm(`Пополнить ${xs.length} ${pl1(xs.length)}, которые закончились (кроме легендарных), — по ${k} шт.?`)) return;
+        e.target.disabled = true;
+        try { const r = await api('admin/shop/restock', { items: xs.map(x => [x.kind, x.item, k]), set: true }); Object.keys(rows).forEach(q => delete rows[q]); r.items.forEach(x => { rows[x.kind + '|' + x.item] = x; }); draw(); }
+        catch (x) { e.target.disabled = false; alert(err(x)); }
+      };
       main.querySelectorAll('[data-exp]').forEach(b => b.onclick = () => { const k = b.dataset.exp; sOpen.has(k) ? sOpen.delete(k) : sOpen.add(k); draw(); });
       main.querySelectorAll('.adm-sk-it').forEach(el => { try { el.querySelector('.adm-shop-pic').appendChild(B.giftPic(el.dataset.k, el.dataset.i, 2, 40)); } catch (e) {} });
       main.querySelectorAll('tr[data-k]').forEach(tr => { const pic = tr.querySelector('.adm-shop-pic'); try { pic.appendChild(B.giftPic(tr.dataset.k, tr.dataset.i, 2, 48)); } catch (e) {} });
@@ -478,7 +493,7 @@
         const items = []; let what = [];
         for (const [k, n] of pairs) { const xs = (k === '*' ? all : all.filter(x => x.kind === k)).filter(x => only(x) && (sOnly !== 'all' || !(B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item)))); xs.forEach(x => items.push([x.kind, x.item, n])); what.push((k === '*' ? 'весь магазин' : (sum.find(r => r.k === k) || {}).name) + ' — по ' + n + ' шт. (' + xs.length + ')'); }
         if (!items.length) return alert(pairs.length ? 'Здесь нечего менять: подходящих вещей нет.' : 'Впишите остаток хотя бы для одной категории.');
-        if (!confirm((sOnly === 'empty' ? 'Пополнить только ЗАКОНЧИВШИЕСЯ вещи:\n' : sOnly === 'low' ? 'Пополнить только вещи, которые СКОРО ЗАКОНЧАТСЯ:\n' : 'Поставить остаток ВСЕМ вещам:\n') + what.join('\n'))) return;
+        if (!confirm((sOnly === 'empty' ? 'Пополнить только ЗАКОНЧИВШИЕСЯ вещи:\n' : sOnly === 'low' ? 'Пополнить только вещи, которых МАЛО:\n' : sOnly === 'many' ? 'Поставить остаток только вещам, которых МНОГО:\n' : 'Поставить остаток ВСЕМ вещам:\n') + what.join('\n'))) return;
         if (btn) btn.disabled = true;
         try { const r = await api('admin/shop/restock', { items, set: true }); Object.keys(rows).forEach(k => delete rows[k]); r.items.forEach(x => { rows[x.kind + '|' + x.item] = x; }); draw(); }
         catch (x) { if (btn) btn.disabled = false; alert(err(x)); }

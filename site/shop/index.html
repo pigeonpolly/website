@@ -84,7 +84,7 @@
     how: ['How to earn buttons →', 'Как получить пуговки →', 'Kā nopelnīt pogas →'],
     login: ['Sign in to collect buttons and shop.', 'Войдите, чтобы копить пуговки и покупать.', 'Ienāc, lai krātu pogas un iepirktos.'],
     all: ['All', 'Все', 'Visi'], inStock: ['🛍 In stock', '🛍 В продаже', '🛍 Pārdošanā'],
-    left: ['{n} left', 'осталось {n}', 'atlikuši {n}'], sold: ['Sold out', 'Нет в наличии', 'Izpārdots'],
+    left: ['{n} left', 'осталось {n}', 'atlikuši {n}'], few: ['few left', 'мало', 'maz'], lots: ['plenty', 'много', 'daudz'], sold: ['Sold out', 'Нет в наличии', 'Izpārdots'],
     buy: ['Buy', 'Купить', 'Pirkt'], free: ['Free', 'Бесплатно', 'Bez maksas'], mine: ['✓ yours', '✓ уже есть', '✓ jau ir'],
     poor: ['Not enough buttons', 'Не хватает пуговок', 'Nepietiek pogu'],
     ok: ['Bought! It is in your bag 🎒', 'Куплено! Вещь уже в сумке 🎒', 'Nopirkts! Lieta jau ir somā 🎒'],
@@ -108,7 +108,7 @@
     rule: ['You can buy up to 3 of the same thing (legendary ones: just 1). Prices follow the stock: the fewer left, the pricier; the more in stock, the cheaper.', 'Одну и ту же вещь можно купить до 3 штук (легендарные — только 1). Цена зависит от остатка: чем меньше осталось, тем дороже, чем больше — тем дешевле.', 'Vienu un to pašu lietu var nopirkt līdz 3 gab. (leģendārās — tikai 1). Cena atkarīga no atlikuma: jo mazāk palicis, jo dārgāk; jo vairāk, jo lētāk.'],
   };
   var bar = document.querySelector('.shop-bar'), box = document.querySelector('.shop-box'), meEl = document.querySelector('.shop-me');
-  var me = null, owned = {}, shop = {}, LIM = { max: 3, leg: 1 };
+  var me = null, owned = {}, shop = {}, LIM = { max: 3, leg: 1 }, LVL = null;
   // фильтры: что показать (в продаже / моё / всё), для кого (птичке / комнате / сюрпризы), вид вещи, тема
   var F = { show: 'sale', grp: 'all', kind: '', theme: '', afford: false, price: '', sort: 'kind' };
   try { var sv = JSON.parse(localStorage.getItem('pp-shop-f') || 'null'); if (sv) F = Object.assign(F, sv); } catch (e) { /* нет хранилища */ }
@@ -158,7 +158,7 @@
     var c = document.createElement('figcaption'); c.textContent = B.giftName(k[0], v, L); t.appendChild(c);
     var info = document.createElement('p'); info.className = 'shop-price';
     var trend = s.base && s.price > s.base ? '<small class="shop-up" title="' + T.upWhy[L] + '">' + T.up[L] + '</small>' : s.base && s.price < s.base ? '<small class="shop-down" title="' + T.downWhy[L] + '">' + T.down[L] + '</small>' : '';
-    info.innerHTML = s.stock > 0 ? '<b>' + (s.price ? '🔘 ' + s.price : T.free[L]) + '</b>' + trend + '<small>' + T.left[L].replace('{n}', s.stock) + '</small>' : '<small>' + T.sold[L] + '</small>';
+    info.innerHTML = s.stock > 0 ? '<b>' + (s.price ? '🔘 ' + s.price : T.free[L]) + '</b>' + trend + '<small>' + T.left[L].replace('{n}', s.stock) + (LVL && s.stock <= (leg ? LVL.lowLeg : LVL.low) ? ' · ' + T.few[L] : LVL && s.stock >= (leg ? LVL.manyLeg : LVL.many) ? ' · ' + T.lots[L] : '') + '</small>' : '<small>' + T.sold[L] + '</small>';
     t.appendChild(info);
     if (have) { var m = document.createElement('span'); m.className = 'fl-coll-mark'; m.textContent = have >= lim ? T.max[L] : T.count[L].replace('{n}', have).replace('{m}', lim); t.appendChild(m); }
     if (s.stock > 0 && me && have < lim) {
@@ -236,7 +236,7 @@
       fetch('/api/me', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : {}; }).catch(function () { return {}; }),
     ]).then(function (a) {
       shop = {}; (a[0].items || []).forEach(function (r) { shop[key(r.kind, r.item)] = r; });
-      LIM = { max: a[0].max || 3, leg: a[0].legendMax || 1 }; // лимиты из «📜 Правил» в кабинете
+      LIM = { max: a[0].max || 3, leg: a[0].legendMax || 1 }; LVL = a[0].lvl || null; // «мало / много» — от числа птичек // лимиты из «📜 Правил» в кабинете
       me = a[1] && a[1].user ? a[1].user : null; owned = {};
       if (me) (me.gifts || []).forEach(function (g) { if (g.status === 'bag' || g.status === 'new') owned[key(g.kind, g.item)] = (owned[key(g.kind, g.item)] || 0) + 1; });
       draw();

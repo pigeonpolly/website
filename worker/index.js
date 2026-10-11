@@ -307,7 +307,9 @@ const LEGEND = new Set(['furn|countcoffin', 'furn|crypt', 'furn|tieredcake', 'ha
 const RULE_DEFAULTS = {
   daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, pick: 11,
   levels: { ...BTN.levels }, badges: { ...BTN.badges },
-  shopMax: 3, legendMax: 1, normStock: 10, normLegend: 3, priceMin: 0.75, priceMax: 2.5,
+  shopMax: 3, legendMax: 1, priceMin: 0.75, priceMax: 2.5,
+  // «мало / обычно / много» штук в магазине — в % от числа птичек (с ником, не заблокированных); у легендарных — legendPct % от этих чисел
+  lowPct: 5, normPct: 20, manyPct: 50, legendPct: 25,
   adventLastJan: 23, adventButtons: 10, adventSpecialButtons: 25,
   aiStreak: true, aiUpload: true,
   sellOn: true, sellPrice: 5, // продажа вещей обратно в магазин: одна цена за любую вещь
@@ -317,9 +319,17 @@ const RULE_DEFAULTS = {
 };
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
-  shopMax: [1, 99], legendMax: [1, 99], normStock: [1, 1000], normLegend: [1, 1000], priceMin: [0.1, 1], priceMax: [1, 10],
+  shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
   adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000] };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
+// сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
+function stockLevels(birds) {
+  const n = (pct, k = 1) => Math.max(1, Math.round(birds * pct / 100 * k)), lg = RULES.legendPct / 100;
+  const o = { birds, low: n(RULES.lowPct), norm: n(RULES.normPct), many: n(RULES.manyPct), lowLeg: n(RULES.lowPct, lg), normLeg: n(RULES.normPct, lg), manyLeg: n(RULES.manyPct, lg) };
+  o.low = Math.min(o.low, o.norm); o.lowLeg = Math.min(o.lowLeg, o.normLeg); o.many = Math.max(o.many, o.norm + 1); o.manyLeg = Math.max(o.manyLeg, o.normLeg + 1);
+  return o;
+}
+let STOCK = stockLevels(50);
 function cleanRules(r) {
   const out = JSON.parse(JSON.stringify(RULE_DEFAULTS));
   if (!r || typeof r !== 'object') return out;
@@ -329,6 +339,8 @@ function cleanRules(r) {
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
   for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice']) out[k] = Math.round(out[k]);
   if (out.priceMin > out.priceMax) out.priceMin = out.priceMax;
+  if (out.lowPct > out.normPct) out.lowPct = out.normPct;
+  if (out.manyPct < out.normPct) out.manyPct = out.normPct;
   return out;
 }
 async function loadRules(env) {
@@ -338,6 +350,7 @@ async function loadRules(env) {
   // пуговки — в общий объект BTN (по нему всё начисляется и показывается людям)
   Object.assign(BTN, { daily: RULES.daily, upload: RULES.upload, comment: RULES.comment, commentsPerDay: RULES.commentsPerDay, friend: RULES.friend, pick: RULES.pick });
   Object.assign(BTN.levels, RULES.levels); Object.assign(BTN.badges, RULES.badges);
+  try { const b = await env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE nick IS NOT NULL AND banned = 0').first(); STOCK = stockLevels(b ? b.n : 0); } catch (e) { STOCK = stockLevels(STOCK.birds); }
   BTN.cond = RULES.cond; BTN.sell = RULES.sellOn ? RULES.sellPrice : null; // цена продажи вещи в магазин (null — продажа выключена) // условия бейджей уходят людям вместе с наградами (описания «как получить» подставляют числа)
   return RULES;
 }
@@ -351,11 +364,11 @@ async function loadDayColors(env) {
 const legMax = (kind, item) => LEGEND.has(kind + '|' + item) ? RULES.legendMax : RULES.shopMax;
 // дни для серии: работы с пометкой 🤖 считаются, если так разрешено в правилах
 const streakDays = rows => rows.filter(r => RULES.aiStreak || !(r.ai > 0)).map(r => r.day);
-// цена от остатка: в shop.price — ценность вещи (при обычном запасе: 10 шт., у легендарных — 3);
+// цена от остатка: в shop.price — ценность вещи (цена при обычном запасе STOCK.norm, у легендарных — STOCK.normLeg);
 // меньше осталось — дороже (до ×2.5), больше — дешевле (до ×0.75). То же считает admin.js effPrice.
 function effPrice(base, stock, leg) {
   if (!(base > 0)) return 0;
-  const f = Math.max(RULES.priceMin, Math.min(RULES.priceMax, Math.pow((leg ? RULES.normLegend : RULES.normStock) / Math.max(1, stock || 0), 0.4)));
+  const f = Math.max(RULES.priceMin, Math.min(RULES.priceMax, Math.pow((leg ? STOCK.normLeg : STOCK.norm) / Math.max(1, stock || 0), 0.4)));
   return Math.max(5, Math.round(base * f / 5) * 5);
 }
 const shopRow = r => ({ kind: r.kind, item: r.item, base: r.price, stock: r.stock, added: r.added_at || 0, price: effPrice(r.price, r.stock, LEGEND.has(r.kind + '|' + r.item) || r.item === 'legend') });
@@ -1077,7 +1090,7 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/shop') {
     await ensurePrices(env, req);
     const rows = (await env.DB.prepare('SELECT kind, item, price, stock, added_at FROM shop').all()).results;
-    return json({ items: rows.map(shopRow), max: RULES.shopMax, legendMax: RULES.legendMax }, 200, { 'cache-control': 'no-store' });
+    return json({ items: rows.map(shopRow), max: RULES.shopMax, legendMax: RULES.legendMax, lvl: { low: STOCK.low, many: STOCK.many, lowLeg: STOCK.lowLeg, manyLeg: STOCK.manyLeg } }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/shop/buy') {
     const u = await needUser(req, env);
@@ -1149,7 +1162,7 @@ async function route(req, env, url) {
       return json({ ok: true, price, stock });
     }
     await ensurePrices(env, req);
-    return json({ items: (await env.DB.prepare('SELECT kind, item, price, stock, added_at FROM shop').all()).results.map(shopRow), suggested: (await catalog(env, req)).prices || {}, economy: await env.DB.prepare('SELECT COALESCE(SUM(COALESCE(buttons, 0)), 0) AS total, COUNT(*) AS birds FROM users WHERE nick IS NOT NULL AND banned = 0').first(), pricing: { normStock: RULES.normStock, normLegend: RULES.normLegend, priceMin: RULES.priceMin, priceMax: RULES.priceMax } });
+    return json({ items: (await env.DB.prepare('SELECT kind, item, price, stock, added_at FROM shop').all()).results.map(shopRow), suggested: (await catalog(env, req)).prices || {}, economy: await env.DB.prepare('SELECT COALESCE(SUM(COALESCE(buttons, 0)), 0) AS total, COUNT(*) AS birds FROM users WHERE nick IS NOT NULL AND banned = 0').first(), pricing: { ...STOCK, priceMin: RULES.priceMin, priceMax: RULES.priceMax } });
   }
   // подарить купленную в магазине вещь другой птичке: вещь уходит из сумки и приходит ей неоткрытым подарком
   if (m === 'POST' && p === '/api/gift/give') {
@@ -1431,7 +1444,7 @@ async function route(req, env, url) {
       const r = b.reset ? cleanRules(null) : cleanRules(b.rules);
       await setMeta(env, 'rules', JSON.stringify(r)); rulesAt = 0; await loadRules(env);
     }
-    return json({ rules: RULES, defaults: RULE_DEFAULTS, special: ADVENT_SPECIAL, goldPicks: GOLD_PICKS });
+    return json({ rules: RULES, defaults: RULE_DEFAULTS, stock: STOCK, special: ADVENT_SPECIAL, goldPicks: GOLD_PICKS });
   }
   // Алина помечает чужую работу как ИИ (ai = 2) или снимает пометку; бейдж «Бип-буп» за это не даётся
   if (m === 'POST' && p === '/api/admin/ai') {
