@@ -8,6 +8,9 @@
     soon: ['The Sketch Wall opens very soon. Meanwhile, draw today’s theme on the Daily Challenge page!', 'Стена рисунков скоро откроется. А пока нарисуйте тему дня на странице челленджа!', 'Skiču siena drīz atvērsies. Pagaidām uzzīmē dienas tēmu izaicinājuma lapā!'],
     toChallenge: ['To the Daily Challenge', 'К челленджу', 'Uz izaicinājumu'],
     myProfile: ['🐦 My profile', '🐦 Мой профиль', '🐦 Mans profils'],
+    sell: [n => `💰 Sell · ${n} 🔘`, n => `💰 Продать · ${n} 🔘`, n => `💰 Pārdot · ${n} 🔘`], sellTip: ['Sell back to the shop', 'Продать обратно в магазин', 'Pārdot atpakaļ veikalam'],
+    sellAsk: [(nm, n) => `Sell “${nm}” back to the shop for ${n} 🔘? It will go back on sale.`, (nm, n) => `Продать «${nm}» обратно в магазин за ${n} 🔘? Вещь снова появится в продаже.`, (nm, n) => `Pārdot “${nm}” atpakaļ veikalam par ${n} 🔘? Lieta atkal būs pārdošanā.`],
+    sold: [n => `Sold! +${n} 🔘`, n => `Продано! +${n} 🔘`, n => `Pārdots! +${n} 🔘`],
     bagShow: ['Show', 'Показать', 'Rādīt'], bagByKind: ['By category', 'По категориям', 'Pa kategorijām'], bagFor: ['For', 'Для кого', 'Kam'], bagWhat: ['What', 'Что', 'Kas'],
     bagFree: ['🆓 Not in use', '🆓 Не используется', '🆓 Netiek lietots'], bagUsed: ['✓ Worn or in the room', '✓ Надето или в комнате', '✓ Uzvilkts vai istabā'],
     bagNone: ['Nothing like this in the bag.', 'Таких вещей в сумке нет.', 'Somā tādu lietu nav.'], inRoom: ['in the room ✓', 'в комнате ✓', 'istabā ✓'],
@@ -435,13 +438,22 @@
       const kinds = all.filter(k => items.some(g => g.kind === k && ok(g)));
       const cellHtml = g => { const k = g.kind;
           const leg = B.LEGEND && B.LEGEND.has(g.kind + '|' + g.item), n = owned(g), u = used(g);
-          const sh = !leg && (me.gifts || []).find(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item && x.note === 'shop');
+          const sh = (me.gifts || []).find(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item), sellP = me.btn && me.btn.rules ? me.btn.rules.sell : null; // подарить можно любую, кроме легендарных; продать — любую
           const st = u ? (isRoom(k) ? t('inRoom') + (n > 1 && !['wall', 'floor', 'view', 'curtain'].includes(k) ? ` ${u}/${n}` : '') : t('wearing')) : '';
-          return `<div class="bag-cell"><button type="button" class="bag-item${u ? ' on' : ''}${leg ? ' legend' : ''}" data-k="${k}" data-i="${esc(g.item)}" title="${esc(isRoom(k) ? t('bagRoomTip') : u ? t('bagOffTip') : t('bagOnTip'))}"><span class="bag-ava"></span><span class="bag-name">${leg ? '★ ' : ''}${esc(B.giftName(k, g.item, L))}</span>${st ? `<span class="bag-st">${st}</span>` : ''}${n > 1 ? `<span class="bag-n">×${n}</span>` : ''}</button>${sh ? `<button type="button" class="bag-give" data-gid="${sh.id}">${t('give')}</button>` : ''}</div>`; };
+          return `<div class="bag-cell"><button type="button" class="bag-item${u ? ' on' : ''}${leg ? ' legend' : ''}" data-k="${k}" data-i="${esc(g.item)}" title="${esc(isRoom(k) ? t('bagRoomTip') : u ? t('bagOffTip') : t('bagOnTip'))}"><span class="bag-ava"></span><span class="bag-name">${leg ? '★ ' : ''}${esc(B.giftName(k, g.item, L))}</span>${st ? `<span class="bag-st">${st}</span>` : ''}${n > 1 ? `<span class="bag-n">×${n}</span>` : ''}</button>${sh && (!leg || sellP != null) ? `<div class="bag-acts">${!leg ? `<button type="button" class="bag-give" data-gid="${sh.id}">${t('give')}</button>` : ''}${sellP != null ? `<button type="button" class="bag-sell" data-sid="${sh.id}" title="${esc(t('sellTip'))}">${t('sell', sellP)}</button>` : ''}</div>` : ''}</div>`; };
       m.card.innerHTML = `${inModal ? `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3>` : ''}<p class="sw-bv-how">${t('bagNote')}</p>${bar}
         ${!items.length ? `<p class="bag-empty">${t('bagEmpty')}</p>` : !kinds.length ? `<p class="bag-empty">${t('bagNone')}</p>` : BF.byKind ? kinds.map(k => `<h4>${esc(kindName(k))}</h4><div class="bag-grid">${items.filter(g => g.kind === k && ok(g)).map(cellHtml).join('')}</div>`).join('') : `<div class="bag-grid">${kinds.flatMap(k => items.filter(g => g.kind === k && ok(g))).map(cellHtml).join('')}</div>`}`;
       m.card.querySelectorAll('[data-bf]').forEach(b => b.onclick = () => { BF[b.dataset.bf] = b.dataset.v; if (b.dataset.bf === 'grp') BF.kind = ''; draw(); });
       const bk = m.card.querySelector('[data-bk]'); if (bk) bk.onclick = () => { BF.byKind = !BF.byKind; draw(); };
+      m.card.querySelectorAll('.bag-sell').forEach(b => b.onclick = async () => {
+        const g = me.gifts.find(x => x.id === +b.dataset.sid), price = me.btn.rules.sell;
+        if (!g || !confirm(t('sellAsk', window.PPBirds.giftName(g.kind, g.item, L), price))) return;
+        b.disabled = true;
+        try { const r = await post('gift/sell', { id: g.id }); me.gifts = me.gifts.filter(x => x.id !== g.id); if (me.btn) me.btn.buttons = r.buttons; me.avatar = r.avatar;
+          if (window.PPToast) window.PPToast(t('sold', r.got)); if (window.PPBirds.isRoomKind && window.PPBirds.isRoomKind(g.kind)) { location.reload(); return; }
+          draw(); if (changed) changed(); window.PPAccount && window.PPAccount.check(); }
+        catch (e) { b.disabled = false; alert(t('err')); }
+      });
       m.card.querySelectorAll('.bag-give').forEach(b => b.onclick = () => { const g = me.gifts.find(x => x.id === +b.dataset.gid); m.card.closest('.sw-bv') && m.card.closest('.sw-bv').remove(); giveDialog(g); });
       m.card.querySelectorAll('.bag-item').forEach(b => {
         b.querySelector('.bag-ava').appendChild(window.PPBirds.giftPic(b.dataset.k, b.dataset.i, me.id, 76, me.avatar));

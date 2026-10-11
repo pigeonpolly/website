@@ -3294,3 +3294,6 @@ html:not(.is-admin) .statbar { display: none; }
 .room-tip[hidden] { display: none; }
 .bp-tab-shop { padding: 8px 14px; border-radius: 999px; border: 1px solid #E9A93B; color: inherit; font: 600 15px 'Karla', sans-serif; text-decoration: none; }
 .bp-tab-shop:hover { background: #E9A93B; color: #2B1A51; }
+.bag-acts { display: flex; flex-wrap: wrap; gap: 4px; justify-content: center; }
+.bag-sell { padding: 3px 10px; border: 1.5px solid #4CC38A; border-radius: 999px; background: transparent; color: #2B1A51; font: 700 12px var(--sans); cursor: pointer; }
+.bag-sell:hover { background: #4CC38A; }

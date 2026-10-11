@@ -310,6 +310,7 @@ const RULE_DEFAULTS = {
   shopMax: 3, legendMax: 1, normStock: 10, normLegend: 3, priceMin: 0.75, priceMax: 2.5,
   adventLastJan: 23, adventButtons: 10, adventSpecialButtons: 25,
   aiStreak: true, aiUpload: true,
+  sellOn: true, sellPrice: 5, // продажа вещей обратно в магазин: одна цена за любую вещь
   // условия бейджей (числа из описаний «как получить»)
   cond: { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4,
     alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10 },
@@ -317,16 +318,16 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], normStock: [1, 1000], normLegend: [1, 1000], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000] };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000] };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 function cleanRules(r) {
   const out = JSON.parse(JSON.stringify(RULE_DEFAULTS));
   if (!r || typeof r !== 'object') return out;
   for (const [k, [lo, hi]] of Object.entries(RULE_NUM)) if (r[k] != null && Number.isFinite(Number(r[k]))) out[k] = Math.max(lo, Math.min(hi, Number(r[k])));
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
-  for (const k of ['aiStreak', 'aiUpload']) if (typeof r[k] === 'boolean') out[k] = r[k];
+  for (const k of ['aiStreak', 'aiUpload', 'sellOn']) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons']) out[k] = Math.round(out[k]);
+  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice']) out[k] = Math.round(out[k]);
   if (out.priceMin > out.priceMax) out.priceMin = out.priceMax;
   return out;
 }
@@ -337,7 +338,7 @@ async function loadRules(env) {
   // пуговки — в общий объект BTN (по нему всё начисляется и показывается людям)
   Object.assign(BTN, { daily: RULES.daily, upload: RULES.upload, comment: RULES.comment, commentsPerDay: RULES.commentsPerDay, friend: RULES.friend, pick: RULES.pick });
   Object.assign(BTN.levels, RULES.levels); Object.assign(BTN.badges, RULES.badges);
-  BTN.cond = RULES.cond; // условия бейджей уходят людям вместе с наградами (описания «как получить» подставляют числа)
+  BTN.cond = RULES.cond; BTN.sell = RULES.sellOn ? RULES.sellPrice : null; // цена продажи вещи в магазин (null — продажа выключена) // условия бейджей уходят людям вместе с наградами (описания «как получить» подставляют числа)
   return RULES;
 }
 // цвета темы дня (site/assets/day-colors.json, собирает tools/daycolors.js): {"2026-10-11": "yp"} — для бейджей за цвета
@@ -1155,7 +1156,7 @@ async function route(req, env, url) {
     const u = await needUser(req, env);
     if (!u.nick) fail(400, 'nick');
     const b = await req.json().catch(() => ({}));
-    const g = await env.DB.prepare("SELECT * FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag' AND note = 'shop'").bind(Number(b.id), u.id).first();
+    const g = await env.DB.prepare("SELECT * FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag'").bind(Number(b.id), u.id).first(); // любую вещь из сумки (раньше — только купленные)
     if (!g) fail(404, 'gift');
     if (LEGEND.has(g.kind + '|' + g.item)) fail(403, 'legend'); // легендарные не дарятся
     const to = await env.DB.prepare("SELECT id, nick FROM users WHERE nick = ? AND banned = 0 AND id != ?").bind(String(b.to || '').trim().replace(/^@/, ''), u.id).first();
@@ -1169,6 +1170,28 @@ async function route(req, env, url) {
     }
     if (ROOM_KINDS.includes(g.kind)) await env.DB.prepare('UPDATE users SET room = ? WHERE id = ?').bind(JSON.stringify(cleanRoom(roomOf(u), await ownedRoom(env, u.id))), u.id).run();
     return json({ ok: true, to: to.nick, avatar: a });
+  }
+  // продать вещь обратно в магазин: цена одна для всех вещей (RULES.sellPrice), вещь возвращается в магазин (+1 к остатку); легендарные тоже можно
+  if (m === 'POST' && p === '/api/gift/sell') {
+    const u = await needUser(req, env);
+    if (!u.nick) fail(400, 'nick');
+    if (!RULES.sellOn) fail(403, 'off');
+    const b = await req.json().catch(() => ({}));
+    const g = await env.DB.prepare("SELECT * FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag'").bind(Number(b.id), u.id).first();
+    if (!g) fail(404, 'gift');
+    const del = await env.DB.prepare("DELETE FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag'").bind(g.id, u.id).run();
+    if (!del.meta.changes) fail(404, 'gift');
+    await env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, 1) ON CONFLICT(kind, item) DO UPDATE SET stock = MIN(100000, shop.stock + 1)').bind(g.kind, g.item, ((await catalog(env, req)).prices || {})[g.kind + '|' + g.item] || 30).run();
+    const n = RULES.sellPrice;
+    await env.DB.prepare('UPDATE users SET buttons = COALESCE(buttons, 0) + ? WHERE id = ?').bind(n, u.id).run();
+    await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(u.id, 'sell', String(g.id), n, rigaDay(), now()).run();
+    // если продал то, что было надето или стояло в комнате, и такой больше нет — снять/убрать
+    const a = avatarOf(u);
+    if (a[g.kind] === g.item && !(await env.DB.prepare("SELECT 1 FROM gifts WHERE user_id = ? AND kind = ? AND item = ? AND status = 'bag'").bind(u.id, g.kind, g.item).first())) {
+      delete a[g.kind]; await env.DB.prepare('UPDATE users SET avatar = ? WHERE id = ?').bind(JSON.stringify(a), u.id).run();
+    }
+    if (ROOM_KINDS.includes(g.kind)) await env.DB.prepare('UPDATE users SET room = ? WHERE id = ?').bind(JSON.stringify(cleanRoom(roomOf(u), await ownedRoom(env, u.id))), u.id).run();
+    return json({ ok: true, buttons: (u.buttons || 0) + n, avatar: a, got: n });
   }
   // админ: начислить всем за прошлые бейджи, рисунки и «Выбор Полли» (можно нажимать сколько угодно — повторно не начислит)
   if (m === 'POST' && p === '/api/admin/buttons-backfill') {
