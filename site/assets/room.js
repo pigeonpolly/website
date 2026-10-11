@@ -615,12 +615,12 @@
       else { R(tg, 0, 0, RW, RH, '#C9BBA0'); R(tg, WX, WY, WW, WH, '#BDE3F8'); drawCurtains(tg, v); g.drawImage(t, WX - 18, WY - 10, 26, 30, 0, 0, c.width * 26 / 28, c.height * 30 / 28 > c.height ? c.height : c.height * 30 / 28); }
     } else {
       const d = defOf(kind, v); if (!d) return document.createElement('span');
-      const pad = 4, k = Math.max(1, Math.floor(Math.min(64 / (d.w + pad * 2), 64 / (d.h + pad * 2)))) || 1;
+      const pad = 1, k = Math.max(1, Math.floor(Math.min(64 / (d.w + pad * 2), 64 / (d.h + pad * 2)))) || 1;
       c.width = (d.w + pad * 2) * k; c.height = (d.h + pad * 2) * k; g.setTransform(k, 0, 0, k, 0, 0); g.imageSmoothingEnabled = false;
       d.d(P(g, pad, pad), 0, d.i, { has: () => false });
     }
     const box = document.createElement('span'); box.className = 'pp-icon pp-room-ic' + (ROOM_KINDS[kind] ? ' sq' : ''); box.style.setProperty('--ic', (size || 80) + 'px');
-    const z = (size || 80) * .78; c.style.width = c.style.height = ''; if (c.width >= c.height) c.style.width = z + 'px'; else c.style.height = z + 'px';
+    const z = (size || 80) * (ROOM_KINDS[kind] ? .78 : .7); c.style.width = c.style.height = ''; if (c.width >= c.height) c.style.width = z + 'px'; else c.style.height = z + 'px';
     box.appendChild(c); return box;
   }
   const isRoom = k => ['wall', 'floor', 'view', 'curtain', 'furn', 'deco'].includes(k);

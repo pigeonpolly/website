@@ -388,8 +388,9 @@
     else if (kind === 'shoes') { const sh = pair(v, SHOES, SHOE_C); if (sh) { hdShoe(put, sh, 12); hdShoe(put, sh, 22); } }
     else if (kind === 'scarf') hdScarf(put, v, 10, 26, 30, 10);
     const c = crop(finish(g, HW, HH));
-    const k = Math.max(2, Math.floor((size || 80) * .62 / Math.max(c.width, c.height)));
-    c.style.width = c.width * k + 'px'; c.style.height = c.height * k + 'px';
+    // вещь занимает почти весь кружок (раньше — только целые увеличения, и мелкие вещи были крошечными)
+    const k = (size || 80) * (kind === 'shoes' || kind === 'scarf' ? .74 : .68) / Math.max(c.width, c.height);
+    c.style.width = Math.round(c.width * k) + 'px'; c.style.height = Math.round(c.height * k) + 'px';
     box.appendChild(c); return box;
   }
 
