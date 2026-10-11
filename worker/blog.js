@@ -77,7 +77,7 @@ const FN = { en: ['Sources and notes', 'Note'], ru: ['Источники и пр
 const FN_RE = /\[\[((?:(?!\]\]|<\/?(?:p|h2|h3|li|ul|ol|blockquote|figure)\b)[\s\S]){1,3000}?)\]\]/g;
 function footnotes(html, lang) {
   const notes = [];
-  const body = String(html || '').replace(FN_RE, (m, inner) => {
+  const body = String(html || '').replace(/(\S)(?:\s|&nbsp;)+(?=\[\[)/g, '$1').replace(FN_RE, (m, inner) => {
     notes.push(inner.trim()); const n = notes.length, tip = stripTags(inner).replace(/"/g, '&quot;').slice(0, 300);
     return `<sup class="fn-ref"><a href="#fn-${n}" id="fnref-${n}" title="${tip}" aria-label="${FN[lang][1]} ${n}">${n}</a></sup>`;
   });

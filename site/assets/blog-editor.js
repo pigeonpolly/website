@@ -1005,7 +1005,10 @@
   // делим статью на кусочки для переводчика и собираем обратно
   function splitForTranslation(ru, from) {
     const texts = [ru['t_' + from], ru['d_' + from], '']; // теги не переводим здесь — у них общий словарь
-    const box = document.createElement('div'); box.innerHTML = ru['b_' + from];
+    // сноски [[…]] переводчик ломает (путает скобки с цифрами) — в тексте заменяем их метками «не переводить», а сами сноски переводим отдельно
+    const notes = [];
+    const box = document.createElement('div');
+    box.innerHTML = String(ru['b_' + from] || '').replace(FN_RE, (m, inner) => { notes.push(inner.trim()); return ` <span class="notranslate" translate="no" data-fnp="${notes.length - 1}">#${notes.length}</span>`; }); // пробел перед меткой — чтобы переводчик не «приклеил» её к слову
     const slots = [];
     const walk = el => {
       for (const ch of el.children) {
@@ -1019,13 +1022,21 @@
     walk(box);
     // описание картинок (alt) тоже переводим — его читают поисковики и незрячие (картинка в абзаце переводится вместе с абзацем)
     box.querySelectorAll('img[alt]').forEach(i => { if (i.alt.trim() && !i.parentElement.closest('p, li, h2, h3, h4, blockquote')) { slots.push({ set: v => { i.alt = plainText(v); } }); texts.push(i.alt); } });
+    const doneNotes = notes.slice();
+    notes.forEach((n, k) => { slots.push({ set: v => { doneNotes[k] = String(v || n).replace(/\[\[|\]\]/g, '').trim() || n; } }); texts.push(n); });
     return {
       texts,
       rebuild(out) {
         slots.forEach((el, i) => { if (el.set) el.set(out[3 + i]); else el.innerHTML = out[3 + i]; });
         // название и описание — обычный текст: Google в режиме HTML отдаёт кавычки как &quot; — раскодируем
         const plain = v => { const x = document.createElement('textarea'); x.innerHTML = String(v || ''); return x.value; };
-        return { t: plain(out[0]), d: plain(out[1]), tags: out[2], b: box.innerHTML };
+        // метки → обратно [[переведённая сноска]]; потерянные переводчиком — в конец последнего абзаца, чтобы ничего не пропало
+        const used = new Set();
+        let b = box.innerHTML.replace(/\s*<span[^>]*data-fnp="(\d+)"[^>]*>[\s\S]*?<\/span>/g, (m, k) => { used.add(+k); return '[[' + doneNotes[+k] + ']]'; });
+        b = b.replace(/\]\](?:\s|&nbsp;)+([,.;:!?)»…])/g, ']]$1'); // переводчик ставит пробел между сноской и запятой
+        const lost = doneNotes.filter((x, k) => !used.has(k)).map(x => '[[' + x + ']]').join('');
+        if (lost) b = /<\/p>\s*$/.test(b) ? b.replace(/<\/p>\s*$/, lost + '</p>') : b + lost;
+        return { t: plain(out[0]), d: plain(out[1]), tags: out[2], b };
       },
     };
   }
