@@ -3272,3 +3272,18 @@ html:not(.is-admin) .statbar { display: none; }
 .shop .shop-afford[aria-pressed="true"] { background: #4CC38A !important; border-color: #4CC38A !important; color: #10261B !important; }
 .shop .legend-tag { text-shadow: none; color: #C9921B; }
 @media (max-width: 600px) { .shop.fl-all { padding: 14px 12px 22px; border-radius: 16px; } }
+/* сумка: светлый лист, фильтры строками, у вещи — название и где она сейчас */
+.bp-panel:has(.bag-filter, .bag-empty) { background: #FFFDF8; color: #2B1A51; border-radius: 18px; padding: 16px 18px 20px; }
+.bag-filter { display: grid; gap: 8px; padding: 10px 12px; margin: 0 0 14px; border-radius: 14px; background: #F6F1FB; border: 1px solid #E6DFF0; }
+.bag-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.bag-row > span { flex: 0 0 80px; font: 700 12px var(--sans); text-transform: uppercase; letter-spacing: .04em; color: #7A7090; }
+.bag-filter .bag-row button { padding: 5px 12px; border-radius: 999px; border: 1px solid #CFC6E0; background: #fff; color: #2B1A51; font: 600 13px var(--sans); cursor: pointer; text-transform: none; }
+.bag-filter .bag-row button[aria-pressed="true"] { background: #E9A93B; border-color: #E9A93B; }
+.bp-panel .bag-grid, .bag-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); gap: 10px; }
+.bag-item { width: 100%; min-height: 150px; justify-content: flex-start; color: #2B1A51; }
+.bag-name { font: 700 12.5px/1.25 var(--sans); text-align: center; }
+.bag-st { font: 700 11px var(--sans); color: #2E8B5E; background: #E3F5EC; padding: 1px 8px; border-radius: 999px; }
+.bag-item.legend { box-shadow: inset 0 0 0 2px #F5D547; }
+.bp-panel h4, #bp-bag h4 { color: #C9621C; text-transform: uppercase; letter-spacing: .05em; font: 700 13px var(--sans); margin: 16px 0 8px; }
+.bp-panel .sw-bv-how { color: #5E5472; }
+@media (max-width: 600px) { .bag-row > span { flex-basis: 100%; } .bp-panel .bag-grid, .bag-grid { grid-template-columns: repeat(auto-fill, minmax(104px, 1fr)); } }
