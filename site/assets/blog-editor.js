@@ -5,6 +5,13 @@
   const LANGS = [['ru', 'RU'], ['en', 'EN'], ['lv', 'LV']];
   const PANE_NAME = { ru: '🇷🇺 Русская версия', en: '🇬🇧 English version', lv: '🇱🇻 Latviešu versija' };
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  // ---------- сноски: в базе это [[текст]] (так их понимает сайт), а в редакторе — циферка-«фишка» в тексте и поле в списке под текстом ----------
+  const FN_RE = /\[\[((?:(?!\]\]|<\/?(?:p|h2|h3|li|ul|ol|blockquote|figure)\b)[\s\S]){0,3000}?)\]\]/g;
+  const fnChip = inner => `<sup class="be-fn" contenteditable="false" data-fn="${esc(inner.trim())}" title="Сноска — текст правится в списке под статьёй"></sup>`;
+  const fnToChips = html => String(html || '').replace(FN_RE, (m, inner) => fnChip(inner));
+  // клон тела статьи → фишки обратно в [[…]] (пустые сноски выбрасываем)
+  const chipsToFn = c => { const notes = []; c.querySelectorAll('sup.be-fn').forEach(s => { const v = (s.dataset.fn || '').trim(); if (!v) { s.remove(); return; } notes.push(v); s.replaceWith(document.createTextNode('⟦FN' + (notes.length - 1) + '⟧')); });
+    return c.innerHTML.replace(/⟦FN(\d+)⟧/g, (m, i) => '[[' + notes[+i].replace(/\]\]/g, '] ]') + ']]'); };
   const api = async (path, body, raw) => {
     const opt = { credentials: 'same-origin' };
     if (raw) Object.assign(opt, { method: 'POST', body: raw });
@@ -402,7 +409,8 @@
             <div class="be-swatches" data-sw="mark" hidden>${MARKS.map(c => `<button type="button" data-cmd="bg" data-v="${c}" style="background:${c}" title="маркер"></button>`).join('')}<button type="button" data-cmd="bg" data-v="" title="Без маркера">✕</button></div></div>
           <button type="button" class="be-plus" hidden title="Вставить: картинку, видео, цитату, разделитель" aria-label="Вставить">＋</button>
           <div class="be-tools be-plusmenu" hidden>${INSERTS.map(([c, title, label]) => `<button type="button" data-cmd="${c}" title="${title}">${label}</button>`).join('')}</div>
-          <div class="be-body bp-body" contenteditable="true" data-k="b_${l}" data-ph="Начните писать… Картинки можно перетащить прямо сюда.">${post['b_' + l]}</div>
+          <div class="be-body bp-body" contenteditable="true" data-k="b_${l}" data-ph="Начните писать… Картинки можно перетащить прямо сюда.">${fnToChips(post['b_' + l])}</div>
+          <div class="be-fns bp-fns" data-fns="${l}" hidden><p class="be-fns-h">Источники и примечания <span></span> <small>— так они будут внизу статьи (на сайте этот список свёрнут)</small></p><ol></ol></div>
         </div></section>`).join('')}
       <aside class="be-drawer" id="be-drawer" aria-label="Настройки публикации"><div class="be-drawer-head"><b>⚙ Настройки публикации</b><button type="button" class="be-x" data-drawer-close aria-label="Закрыть">✕</button></div>
       <section class="be-card be-common">
@@ -451,7 +459,7 @@
           if (img && txt) img.setAttribute('alt', txt); // подпись = описание картинки для Google и незрячих (на языке вкладки)
           if (cap && !txt) cap.remove();                                         // пустая подпись в статью не попадает
         });
-        d[el.dataset.k] = c.innerHTML;
+        d[el.dataset.k] = chipsToFn(c);
       });
       return d;
     };
@@ -521,6 +529,7 @@
     // подсказка, если язык текста не совпадает с вкладкой
     function guessLang(l) {
       const [t, d, b] = fieldsOf(l);
+      if (!t || !d || !b) return null; // редактор уже закрыт (проверка по таймеру после сохранения)
       const txt = (t.value + ' ' + d.value + ' ' + b.innerText).slice(0, 3000);
       const cyr = (txt.match(/[а-яё]/gi) || []).length, lat = (txt.match(/[a-zāčēģīķļņšūž]/gi) || []).length, lvd = (txt.match(/[āčēģīķļņšūž]/gi) || []).length;
       if (cyr + lat < 25) return null;
@@ -530,6 +539,7 @@
     function checkLang() {
       for (const [l] of LANGS) {
         const w = app.querySelector(`[data-pane="${l}"] .be-langwarn`), g = guessLang(l);
+        if (!w) continue;
         if (g && g !== l) { w.hidden = false; w.innerHTML = `⚠ Похоже, здесь текст на <b>${g.toUpperCase()}</b>, а это вкладка <b>${l.toUpperCase()}</b>. <button type="button" class="pill-btn" data-fix="${g}">Перенести во вкладку ${g.toUpperCase()}</button>`; w.querySelector('[data-fix]').onclick = () => moveLang(l, g); }
         else w.hidden = true;
       }
@@ -587,11 +597,12 @@
         else if (c === 'imgs') { mergeImages(body); return; }
         else if (c === 'clear') { document.execCommand('removeFormat'); document.execCommand('unlink'); document.execCommand('formatBlock', false, 'p'); }
         else if (c === 'fn') {
-          // сноска хранится прямо в тексте как [[…]]: на сайте это циферка, а текст уходит вниз статьи в свёрнутый список
+          // сноска: в месте курсора — циферка, а текст пишется сразу в списке под статьёй
           const sel = getSelection(); if (sel.rangeCount && !sel.isCollapsed) sel.collapseToEnd();
-          const v = prompt('Текст сноски — пояснение или источник. Ссылку можно вставить прямо сюда (https://…).\nНа сайте в этом месте будет маленькая циферка, а сам текст — внизу статьи.', '');
-          if (!v || !v.trim()) return;
-          document.execCommand('insertText', false, '[[' + v.trim().replace(/\]\]/g, '] ]') + ']]');
+          const body = b.closest('.be-pane').querySelector('.be-body');
+          document.execCommand('insertHTML', false, fnChip('').replace('<sup ', '<sup data-new="1" '));
+          const chip = body.querySelector('sup.be-fn[data-new]'); if (chip) chip.removeAttribute('data-new');
+          syncFns(body); focusFn(body, chip); touch();
         }
         else if (c === 'link') {
           const u = prompt('Адрес ссылки (https://…). Пусто — убрать ссылку.', 'https://');
@@ -725,6 +736,52 @@
       b.addEventListener('focus', () => { if (!b.innerHTML.trim()) { b.innerHTML = '<p><br></p>'; const r = document.createRange(); r.setStart(b.firstChild, 0); r.collapse(true); getSelection().removeAllRanges(); getSelection().addRange(r); } });
     });
     bodies.forEach(b => new MutationObserver(() => addCaptions(b)).observe(b, { childList: true }));
+    // ---------- список сносок под текстом: тот же порядок, что циферки в тексте; правится сразу ----------
+    function syncFns(body) {
+      const box = body.parentElement.querySelector('.be-fns'); if (!box) return;
+      const chips = [...body.querySelectorAll('sup.be-fn')], ol = box.querySelector('ol'), items = [...ol.children];
+      box.hidden = !chips.length; box.querySelector('.be-fns-h span').textContent = chips.length ? '(' + chips.length + ')' : '';
+      if (items.length === chips.length && items.every((li, i) => li._chip === chips[i])) return; // ничего не поменялось
+      ol.innerHTML = '';
+      chips.forEach((chip, i) => {
+        const li = document.createElement('li'); li._chip = chip;
+        li.innerHTML = `<button type="button" class="be-fn-n" title="Показать место в тексте">${i + 1}</button><div class="be-fn-t" contenteditable="true" data-ph="Пояснение или источник. Адрес https://… сам станет ссылкой"></div><button type="button" class="be-fn-x" title="Удалить сноску">✕</button>`;
+        const t = li.querySelector('.be-fn-t'); t.innerHTML = chip.dataset.fn || '';
+        t.addEventListener('input', () => { chip.dataset.fn = t.innerHTML.replace(/<\/?(div|p)[^>]*>|<br\s*\/?>/gi, ' ').replace(/&nbsp;/g, ' ').replace(/\s+/g, ' ').trim(); touch(); });
+        t.addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); t.blur(); } });
+        li.querySelector('.be-fn-n').onclick = () => { chip.scrollIntoView({ block: 'center', behavior: 'smooth' }); flashEl(chip); };
+        li.querySelector('.be-fn-x').onclick = () => { chip.remove(); syncFns(body); touch(); };
+        ol.appendChild(li);
+      });
+    }
+    const flashEl = el => { el.classList.remove('be-flash'); void el.offsetWidth; el.classList.add('be-flash'); };
+    function focusFn(body, chip) {
+      const li = [...body.parentElement.querySelectorAll('.be-fns li')].find(x => x._chip === chip); if (!li) return;
+      li.scrollIntoView({ block: 'center', behavior: 'smooth' }); flashEl(li); const t = li.querySelector('.be-fn-t'); setTimeout(() => t.focus(), 250);
+    }
+    bodies.forEach(b => {
+      syncFns(b);
+      new MutationObserver(() => syncFns(b)).observe(b, { childList: true, subtree: true });
+      // нажали на циферку в тексте — перейти к её полю в списке
+      b.addEventListener('click', e => { const chip = e.target.closest('sup.be-fn'); if (chip) { e.preventDefault(); focusFn(b, chip); } });
+    });
+    // ---------- обычная ссылка в тексте: нажали — маленькое окошко с адресом (поправить, открыть, убрать) ----------
+    const linkPop = document.createElement('div'); linkPop.className = 'be-linkpop'; linkPop.hidden = true;
+    linkPop.innerHTML = '<input type="url" aria-label="Адрес ссылки"><button type="button" data-lp="ok" title="Сохранить">✓</button><a target="_blank" rel="noopener" title="Открыть в новой вкладке">↗</a><button type="button" data-lp="rm" title="Убрать ссылку (текст останется)">Убрать</button>';
+    document.body.appendChild(linkPop);
+    let linkEl = null;
+    const closePop = () => { linkPop.hidden = true; linkEl = null; };
+    bodies.forEach(b => b.addEventListener('click', e => {
+      const a = e.target.closest('a'); if (!a || !b.contains(a)) { closePop(); return; }
+      e.preventDefault(); linkEl = a; const r = a.getBoundingClientRect();
+      linkPop.style.top = (scrollY + r.bottom + 6) + 'px'; linkPop.style.left = Math.max(8, Math.min(scrollX + r.left, scrollX + innerWidth - 380)) + 'px';
+      const inp = linkPop.querySelector('input'); inp.value = a.getAttribute('href') || ''; linkPop.querySelector('a').href = a.href; linkPop.hidden = false;
+    }));
+    const saveLink = () => { if (!linkEl) return; const v = linkPop.querySelector('input').value.trim(); if (v) linkEl.setAttribute('href', v); else linkEl.replaceWith(...linkEl.childNodes); touch(); closePop(); };
+    linkPop.querySelector('[data-lp="ok"]').onclick = saveLink;
+    linkPop.querySelector('input').addEventListener('keydown', e => { if (e.key === 'Enter') { e.preventDefault(); saveLink(); } if (e.key === 'Escape') closePop(); });
+    linkPop.querySelector('[data-lp="rm"]').onclick = () => { if (linkEl) { linkEl.replaceWith(...linkEl.childNodes); touch(); } closePop(); };
+    document.addEventListener('mousedown', e => { if (!linkPop.hidden && !linkPop.contains(e.target) && !e.target.closest('.be-body a')) closePop(); });
     async function upload(file) {
       status('Загружаю картинку…');
       const blob = await shrink(file);
@@ -878,7 +935,7 @@
           const res = rebuild(out);
           app.querySelector(`[data-k="t_${l}"]`).value = res.t;
           app.querySelector(`[data-k="d_${l}"]`).value = res.d;
-          app.querySelector(`[data-k="b_${l}"]`).innerHTML = res.b;
+          app.querySelector(`[data-k="b_${l}"]`).innerHTML = fnToChips(res.b); syncFns(app.querySelector(`[data-k="b_${l}"]`));
           autoSlug();
         }
         $('#be-src').value = from; // запоминаем язык оригинала — для пометки под переводом

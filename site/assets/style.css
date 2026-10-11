@@ -3194,3 +3194,23 @@ html:not(.is-admin) .statbar { display: none; }
 .bp-fns li.fn-hit { animation: fnHit 2s ease; } @keyframes fnHit { 0%, 40% { background: rgba(240,169,135,.25); } 100% { background: transparent; } }
 .bp-fns .fn-back { text-decoration: none; margin-left: 4px; }
 .bp-fns a { color: #D9733F; }
+/* редактор блога: сноски — циферки в тексте и список под текстом (как на сайте) */
+.be-body { counter-reset: befn; }
+.be-body sup.be-fn { counter-increment: befn; cursor: pointer; font-size: .7em; font-weight: 700; color: #D9733F; padding: 0 .15em; border-radius: 4px; user-select: none; }
+.be-body sup.be-fn::after { content: counter(befn); }
+.be-body sup.be-fn:hover { background: #FBE3D6; }
+.be-body sup.be-fn[data-fn=""] { background: #FFE6A8; }
+.be-fns { margin: 0; border: 1px solid #DCD5EC; border-top: 0; border-radius: 0 0 12px 12px; background: #FBF8F3; color: #2B1A51; padding: 12px 22px 14px; font-size: 15px; }
+.be-bodywrap .be-body.bp-body:has(+ .be-fns:not([hidden])) { border-radius: 0; }
+.be-fns-h { margin: 0 0 8px; font-weight: 700; } .be-fns-h span { color: #8A8296; font-weight: 400; } .be-fns-h small { color: #8A8296; font-weight: 400; }
+.be-fns ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 6px; }
+.be-fns li { display: grid; grid-template-columns: 28px 1fr 28px; gap: 8px; align-items: start; border-radius: 8px; padding: 2px; }
+.be-fn-n { border: 0; background: #FBE3D6; color: #D9733F; font-weight: 700; border-radius: 6px; height: 26px; cursor: pointer; }
+.be-fn-t { min-height: 26px; padding: 3px 8px; border: 1px solid #E6DFF0; border-radius: 6px; background: #fff; outline: none; line-height: 1.45; word-break: break-word; }
+.be-fn-t:focus { border-color: #D9733F; } .be-fn-t:empty::before { content: attr(data-ph); color: #A79FB5; }
+.be-fn-x { border: 0; background: none; color: #A79FB5; cursor: pointer; height: 26px; } .be-fn-x:hover { color: #C2553A; }
+.be-flash { animation: beFlash 1.6s ease; } @keyframes beFlash { 0%, 40% { background: #FBD3BE; } 100% { background: transparent; } }
+.be-linkpop { position: absolute; z-index: 60; display: flex; gap: 6px; align-items: center; padding: 6px; background: #2B1A51; border-radius: 10px; box-shadow: 0 6px 20px rgba(0,0,0,.3); }
+.be-linkpop[hidden] { display: none; }
+.be-linkpop input { width: 240px; padding: 5px 8px; border-radius: 6px; border: 0; font: 14px var(--sans); }
+.be-linkpop button, .be-linkpop a { background: #3A2A66; color: #fff; border: 0; border-radius: 6px; padding: 5px 9px; cursor: pointer; font: 13px var(--sans); text-decoration: none; }
