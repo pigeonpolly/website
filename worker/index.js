@@ -39,6 +39,7 @@ export default {
     await loadRules(env); await loadDayColors(env);
     ctx.waitUntil((async () => {
       if (!(await getMeta(env, 'buttons_backfill'))) await backfillButtons(env).catch(e => console.error('backfill', e)); // разовое начисление пуговок за прошлое
+      await autoRestock(env).catch(e => console.error('restock', e)); // раз в сутки (по Риге) пополнить магазин
       await migrateToR2(env); await cleanupInactive(env);
       await env.DB.prepare('DELETE FROM visits WHERE ts < ?').bind(now() - 400 * 86400).run().catch(() => {}); // статистику храним ~13 месяцев
     })());
@@ -312,7 +313,8 @@ const RULE_DEFAULTS = {
   lowPct: 5, normPct: 20, manyPct: 50, legendPct: 25,
   adventLastJan: 23, adventButtons: 10, adventSpecialButtons: 25,
   aiStreak: true, aiUpload: true,
-  sellOn: true, sellPrice: 5, // продажа вещей обратно в магазин: одна цена за любую вещь
+  sellOn: true, sellPrice: 5,
+  restockOn: true, restockTo: 0, // раз в сутки: у всех вещей, кроме легендарных, остаток дотягивается до restockTo шт. (0 — до «обычного запаса») // продажа вещей обратно в магазин: одна цена за любую вещь
   // условия бейджей (числа из описаний «как получить»)
   cond: { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4,
     alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10 },
@@ -320,7 +322,7 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000] };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000] };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -335,9 +337,9 @@ function cleanRules(r) {
   if (!r || typeof r !== 'object') return out;
   for (const [k, [lo, hi]] of Object.entries(RULE_NUM)) if (r[k] != null && Number.isFinite(Number(r[k]))) out[k] = Math.max(lo, Math.min(hi, Number(r[k])));
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
-  for (const k of ['aiStreak', 'aiUpload', 'sellOn']) if (typeof r[k] === 'boolean') out[k] = r[k];
+  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn']) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice']) out[k] = Math.round(out[k]);
+  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo']) out[k] = Math.round(out[k]);
   if (out.priceMin > out.priceMax) out.priceMin = out.priceMax;
   if (out.lowPct > out.normPct) out.lowPct = out.normPct;
   if (out.manyPct < out.normPct) out.manyPct = out.normPct;
@@ -373,6 +375,21 @@ function effPrice(base, stock, leg) {
 }
 const shopRow = r => ({ kind: r.kind, item: r.item, base: r.price, stock: r.stock, added: r.added_at || 0, price: effPrice(r.price, r.stock, LEGEND.has(r.kind + '|' + r.item) || r.item === 'legend') });
 // один раз: всем вещам — ценность из каталога (site/assets/catalog.json → prices, считает tools/catalog.js)
+// ежедневное пополнение: всем вещам из каталога (и уже заведённым в магазине), кроме легендарных, остаток до цели, если меньше; больше — не трогаем
+async function autoRestock(env, force = false) {
+  if (!force && (!RULES.restockOn || (await getMeta(env, 'restock_day')) === rigaDay())) return null;
+  const req = new Request('https://pigeonpolly.com/'), cat = await catalog(env, req), cp = cat.prices || {};
+  await ensurePrices(env, req);
+  const to = RULES.restockTo > 0 ? RULES.restockTo : STOCK.norm, keys = new Set();
+  for (const [k, xs] of Object.entries(cat.items || {})) for (const v of xs) keys.add(k + '|' + v);
+  for (const r of (await env.DB.prepare('SELECT kind, item FROM shop').all()).results) keys.add(r.kind + '|' + r.item);
+  const list = [...keys].filter(k => !LEGEND.has(k) && !k.endsWith('|legend')).map(k => k.split('|')).filter(([k, v]) => GIFT_KINDS.includes(k) && v);
+  const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock, added_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET added_at = CASE WHEN shop.stock < excluded.stock THEN excluded.added_at ELSE shop.added_at END, stock = MAX(shop.stock, excluded.stock)');
+  let n = 0;
+  for (let i = 0; i < list.length; i += 50) { const rs = await env.DB.batch(list.slice(i, i + 50).map(([k, v]) => st.bind(k, v, cp[k + '|' + v] || 30, to, now()))); n += rs.length; }
+  await setMeta(env, 'restock_day', rigaDay()); await setMeta(env, 'restock_last', JSON.stringify({ day: rigaDay(), at: now(), to, items: list.length }));
+  return { to, items: list.length };
+}
 async function ensurePrices(env, req) {
   if (await env.DB.prepare("SELECT value FROM meta WHERE key = 'prices_v1'").first()) return;
   const cat = await catalog(env, req), list = Object.entries(cat.prices || {});
@@ -1458,6 +1475,12 @@ async function route(req, env, url) {
   }
 
   // ---------- кабинет: правила сайта (читать и менять) ----------
+  // кнопка «Пополнить сейчас» — то же, что ежедневное пополнение
+  if (m === 'POST' && p === '/api/admin/shop/autorestock') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    return json({ ok: true, ...(await autoRestock(env, true)) });
+  }
   if (p === '/api/admin/rules') {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');
@@ -1466,7 +1489,7 @@ async function route(req, env, url) {
       const r = b.reset ? cleanRules(null) : cleanRules(b.rules);
       await setMeta(env, 'rules', JSON.stringify(r)); rulesAt = 0; await loadRules(env);
     }
-    return json({ rules: RULES, defaults: RULE_DEFAULTS, stock: STOCK, special: ADVENT_SPECIAL, goldPicks: GOLD_PICKS });
+    return json({ rules: RULES, defaults: RULE_DEFAULTS, stock: STOCK, restockLast: parseJ(await getMeta(env, 'restock_last'), null), special: ADVENT_SPECIAL, goldPicks: GOLD_PICKS });
   }
   // Алина помечает чужую работу как ИИ (ai = 2) или снимает пометку; бейдж «Бип-буп» за это не даётся
   if (m === 'POST' && p === '/api/admin/ai') {
