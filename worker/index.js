@@ -276,7 +276,7 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
@@ -1031,7 +1031,9 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/whoami') {
     const u = await currentUser(req, env);
     const earned = u && u.nick && !u.banned ? await award(env, u.id, 'daily', rigaDay(), BTN.daily) : 0; // +3 пуговки за первый заход за сутки (шапка спрашивает на каждой странице)
-    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), avatar: avatarOf(u), buttons: (u.buttons || 0) + earned, earned } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
+    // зарплата от «администрации Воббленда»: пуговки уже начислены, а конвертик ещё не открыт (seen = 0)
+    const salary = u && u.nick && !u.banned ? (await env.DB.prepare("SELECT id, amount FROM button_log WHERE user_id = ? AND kind = 'salary' AND seen = 0").bind(u.id).all()).results : [];
+    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), avatar: avatarOf(u), buttons: (u.buttons || 0) + earned, earned, salary } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
   }
   if (m === 'GET' && p === '/api/config') return json({ ready: true, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
 
@@ -1205,6 +1207,26 @@ async function route(req, env, url) {
     }
     if (ROOM_KINDS.includes(g.kind)) await env.DB.prepare('UPDATE users SET room = ? WHERE id = ?').bind(JSON.stringify(cleanRoom(roomOf(u), await ownedRoom(env, u.id))), u.id).run();
     return json({ ok: true, buttons: (u.buttons || 0) + n, avatar: a, got: n });
+  }
+  // птичка открыла конвертик с зарплатой — больше не показывать
+  if (m === 'POST' && p === '/api/salary/seen') {
+    const u = await needUser(req, env);
+    await env.DB.prepare("UPDATE button_log SET seen = 1 WHERE user_id = ? AND kind = 'salary' AND seen = 0").bind(u.id).run();
+    return json({ ok: true });
+  }
+  // админ: выдать зарплату всем птичкам (с ником, не заблокированным) — пуговки сразу на счёт, птичке при заходе — конвертик
+  if (m === 'POST' && p === '/api/admin/salary') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({}));
+    const n = Math.floor(Number(b.amount) || 0);
+    if (n < 1 || n > 10000) fail(400, 'bad');
+    const ref = 'sal' + Date.now() + randomHex(2), who = 'nick IS NOT NULL AND banned = 0';
+    const [ins] = await env.DB.batch([
+      env.DB.prepare(`INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at, seen) SELECT id, 'salary', ?, ?, ?, ?, 0 FROM users WHERE ${who}`).bind(ref, n, rigaDay(), now()),
+      env.DB.prepare(`UPDATE users SET buttons = COALESCE(buttons, 0) + ? WHERE ${who} AND id IN (SELECT user_id FROM button_log WHERE kind = 'salary' AND ref = ?)`).bind(n, ref),
+    ]);
+    return json({ ok: true, count: ins.meta.changes, amount: n });
   }
   // админ: начислить всем за прошлые бейджи, рисунки и «Выбор Полли» (можно нажимать сколько угодно — повторно не начислит)
   if (m === 'POST' && p === '/api/admin/buttons-backfill') {
