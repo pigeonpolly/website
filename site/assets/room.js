@@ -99,7 +99,8 @@
   const ORN_N = [['red', 'красный', 'sarkana'], ['gold', 'золотой', 'zelta'], ['blue', 'синий', 'zila'], ['silver', 'серебряный', 'sudraba'], ['pink', 'розовый', 'rozā'], ['green', 'зелёный', 'zaļa'],
     ['purple', 'фиолетовый', 'violeta'], ['orange', 'оранжевый', 'oranža'], ['white', 'белый', 'balta'], ['turquoise', 'бирюзовый', 'tirkīza'], ['burgundy', 'бордовый', 'bordo'], ['navy', 'тёмно-синий', 'tumši zila'],
     ['candy stripes', 'в полоску', 'svītraina'], ['snowflakes', 'со снежинками', 'ar sniegpārslām'], ['glitter', 'с блёстками', 'ar spīdumiem'], ['rainbow', 'радужный', 'varavīksnes']];
-  const P = (g, x0, y0) => (x, y, w, h, c) => R(g, x0 + x, y0 + y, w, h, c);
+  // положение вещи округляем, а детали внутри — нет: так вещи можно рисовать «полупикселями» (вдвое подробнее; в комнате ×4, в значках ×2+)
+  const P = (g, x0, y0) => { const bx = Math.round(x0), by = Math.round(y0); return (x, y, w, h, c) => { g.fillStyle = c; g.fillRect(bx + x, by + y, w, h); }; };
   const spr = (p, rows, pal) => rows.forEach((r, y) => [...r].forEach((ch, x) => { if (pal[ch]) p(x, y, 1, 1, pal[ch]); }));
   const FURN = {
     sofa: { n: i => [['Purple sofa', 'Сиреневый диван', 'Violets dīvāns'], ['Green velvet sofa', 'Зелёный бархатный диван', 'Zaļš samta dīvāns'], ['Mustard sofa', 'Горчичный диван', 'Sinepju dīvāns'], ['Pink sofa', 'Розовый диван', 'Rozā dīvāns']][i], v: 4, w: 48, h: 22, top: 10, sit: true,
@@ -471,6 +472,68 @@
   });
   // привидение из склепа (рисуется поверх двери)
   function g2(p, x, y) { spr((a, b, w, h, c) => p(x + a, y + b, w, h, c), ['.www.', 'wkwkw', 'wwwww', 'w.w.w'], { w: '#F4F0FA', k: '#2B2340' }); }
+  // ---------- подробные (HD) версии основных вещей: полупиксели, контур, блики и тени; размеры прежние ----------
+  const OUT = '#2B1A3A';
+  // скруглённый прямоугольник с контуром (r — скругление в полупикселях)
+  const rbox = (p, x, y, w, h, fill, out = OUT, r = 1) => { p(x + r, y, w - 2 * r, h, out); p(x, y + r, w, h - 2 * r, out); if (r >= 1) p(x + .5, y + .5, w - 1, h - 1, out); if (fill) { p(x + r, y + .5, w - 2 * r, h - 1, fill); p(x + .5, y + r, w - 1, h - 2 * r, fill); p(x + 1, y + 1, w - 2, h - 2, fill); } };
+  const HD = {
+    sofa: (p, t, i) => { const [c, d, l] = SOFA_C[i];
+      rbox(p, 1, 0, 46, 12, c, OUT, 1.5); p(2.5, .5, 43, .5, l);
+      [5, 25].forEach(x => { rbox(p, x, 2, 18, 9, l, d, 1); p(x + 1, 2.5, 16, .5, '#FFFFFF33'); p(x + 1, 9.5, 16, .5, d); [x + 4.5, x + 8.5, x + 12.5].forEach(bx => p(bx, 5.5, .5, .5, d)); });
+      rbox(p, 5, 9.5, 38, 6.5, l, OUT, 1); p(6, 10, 36, .5, '#FFFFFF55'); p(23.75, 10, .5, 5.5, d); p(6, 14.5, 36, 1, d);
+      [0, 41].forEach(x => { rbox(p, x, 5, 7, 15, c, OUT, 1.5); p(x + 1, 5.5, 5, 1, l); p(x + 1, 7, 5, .5, d); p(x + 1.5, 12, 4, 6.5, d); });
+      p(6.5, 15.5, 35, 4, d); p(6.5, 19, 35, .5, OUT); p(7, 16, 34, .5, c);
+      [4, 41].forEach(x => { p(x, 19.5, 3, 2.5, OUT); p(x + .5, 19.5, 2, 2, '#7A4E2A'); p(x + .5, 19.5, .5, 2, '#9C6A3C'); }); },
+    armchair: p => { const c = '#4A9BA8', d = '#357782', l = '#6FBAC5';
+      rbox(p, 3, 0, 20, 12, c, OUT, 1.5); p(4.5, .5, 17, .5, l); rbox(p, 6, 2, 14, 8, l, d, 1); [9.5, 12.75, 16].forEach(x => p(x, 5.5, .5, .5, d));
+      rbox(p, 4, 9.5, 18, 6.5, l, OUT, 1); p(5, 10, 16, .5, '#FFFFFF55'); p(5, 14.5, 16, 1, d);
+      [0, 21].forEach(x => { rbox(p, x, 5, 5, 15, c, OUT, 1.5); p(x + 1, 5.5, 3, 1, l); p(x + 1, 12, 3, 6.5, d); });
+      p(4.5, 15.5, 17, 4, d); p(4.5, 19, 17, .5, OUT);
+      [4, 19].forEach(x => { p(x, 19.5, 3, 2.5, OUT); p(x + .5, 19.5, 2, 2, '#7A4E2A'); }); },
+    table: p => { const w = '#A0673C', d = '#7A4A28', l = '#C08454';
+      rbox(p, 0, 0, 32, 3.5, w, OUT, 1); p(1, .5, 30, .5, l); for (let x = 4; x < 30; x += 7) p(x, 1.5, 3, .5, d);
+      [2, 27].forEach(x => { p(x, 3.5, 3, 14.5, OUT); p(x + .5, 3.5, 2, 14, d); p(x + .5, 3.5, .5, 14, w); });
+      p(5, 6, 22, 1.5, OUT); p(5, 6.5, 22, .5, d); },
+    bed: p => { const wd = '#7A4A30', wl = '#9C6A44';
+      rbox(p, 0, 0, 5, 20, wd, OUT, 1); p(1, 1, 1, 18, wl); p(2.5, 3, .5, 14, '#5E3826');
+      rbox(p, 41, 4, 5, 16, wd, OUT, 1); p(42, 5, 1, 14, wl);
+      rbox(p, 4, 6, 38, 8.5, '#F4EBDD', OUT, .5);
+      rbox(p, 5, 2.5, 11, 6.5, '#FFFFFF', OUT, 1.5); p(6.5, 7.5, 8, .5, '#E2DCCF'); p(10, 4, 1, 3, '#EEE8DC');
+      rbox(p, 14, 6.5, 28, 8, '#7FB3E8', OUT, 1); for (let x = 17; x < 41; x += 4) p(x, 8, 2, 5, '#9FCDEB'); p(14.5, 7, 27, .5, '#BFE3F5'); p(14.5, 13.5, 27, .5, '#5E92C8');
+      p(4, 14, 38, 3.5, OUT); p(4.5, 14.5, 37, 2.5, wd); p(4.5, 14.5, 37, .5, wl);
+      [5, 39].forEach(x => { p(x, 17, 2.5, 3, OUT); p(x + .5, 17, 1.5, 2.5, '#5E3826'); }); },
+    bookshelf: p => { const w = '#7A4A30', d = '#4E2F1F', l = '#9C6A44';
+      rbox(p, 0, 0, 26, 40, w, OUT, 1); p(1, .5, 24, .5, l); p(2, 2, 22, 36, d);
+      [13, 26].forEach(y => { p(2, y, 22, 2, w); p(2, y, 22, .5, l); p(2, y + 2, 22, .5, '#3A2216'); });
+      const c = [['#E5484D', '#B83A32'], ['#4A7BD8', '#3A62B0'], ['#E9C46A', '#C99A2E'], ['#4CC38A', '#3A9A6C'], ['#B79CF2', '#9478D6'], ['#F08A3B', '#C96A26'], ['#F4EBDD', '#D6CCB8']];
+      [[2, 13], [15, 26], [28, 38]].forEach(([y0, y1], s) => { let x = 2.5, k = s * 3;
+        while (x < 22.5) { const w2 = 2 + (k % 2) * .5 + (k % 3 === 0 ? .5 : 0), h = (y1 - y0) - 2 - (k % 3) * .5, [cc, cd] = c[k % c.length];
+          if (k % 7 === 5 && x < 20) { p(x, y1 - h + 1, w2 + 1.5, h - 1, OUT); p(x + .5, y1 - h + 1.5, w2 + .5, h - 1.5, cc); x += w2 + 2; k++; continue; } // наклонённая книга
+          p(x, y1 - h, w2, h, OUT); p(x + .5, y1 - h + .5, w2 - 1, h - .5, cc); p(x + .5, y1 - h + 2, w2 - 1, .5, cd); p(x + .5, y1 - 2, w2 - 1, .5, cd); x += w2 + (k % 4 === 0 ? .5 : 0); k++; } }); },
+    lamp: p => { const sh = '#F6D04D', sd = '#D9A33B', sl = '#FFF0A8';
+      p(3, 0, 6, .5, OUT); p(2.5, .5, 7, 2, OUT); p(1, 2, 10, 5.5, OUT); p(3.5, .5, 5, 1.5, sh); p(1.5, 2, 9, 5, sh); p(2, 2.5, 3, 4, sl); p(1.5, 6, 9, 1, sd); for (let x = 3; x < 10; x += 2) p(x, 2.5, .5, 4, '#E9B83A');
+      p(5.5, 7.5, 1, 27, OUT); p(5.75, 7.5, .5, 26.5, '#5B5670'); p(5, 20, 2, 1, OUT);
+      p(2, 33.5, 8, 4.5, OUT); p(2.5, 34, 7, 3.5, '#3A3550'); p(2.5, 34, 7, .5, '#5B5670'); },
+    plant: p => { const g1 = '#3E8E5A', g2 = '#2E6B47', g3 = '#5BAE74', pot = '#C66B4A', pd = '#A8553A', pl = '#D9825F';
+      const leaf = (x, y, w, h, c, flip) => { rbox(p, x, y, w, h, c, '#1F4A33', 1.5); p(x + w / 2 - .25, y + 1, .5, h - 2, '#1F4A33'); for (let k = 1; k < h - 2; k += 1.5) p(flip ? x + .5 : x + w - 1, y + k, .5, .5, '#1F4A33'); p(x + 1, y + 1, 1, .5, g3); };
+      p(7.5, 6, 1, 14, '#1F4A33'); p(7.75, 6, .5, 14, g2);
+      leaf(9, 0, 6.5, 6.5, g2, 0); leaf(1.5, 2, 6.5, 5.5, g1, 1); leaf(9, 7, 7, 6, g1, 0); leaf(0, 8, 7, 5.5, g2, 1); leaf(4, 13, 8, 5.5, g1, 0);
+      p(3, 19, 10, 2.5, OUT); p(3.5, 19.5, 9, 1.5, pd); p(3.5, 19.5, 9, .5, pl);
+      p(4, 21, 8, 7, OUT); p(4.5, 21, 7, 6.5, pot); p(5, 21.5, 1.5, 5.5, pl); p(10.5, 21.5, .5, 5.5, pd); },
+    books: p => { const bk = (y, x, w, c, d) => { p(x, y, w, 3, OUT); p(x + .5, y + .5, w - 1, 2, c); p(x + .5, y + 1.25, w - 1, .5, d); p(x + w - 1.5, y + .5, 1, 2, '#F4EBDD'); };
+      bk(5, 0, 12, '#C9463D', '#9E3229'); bk(2.5, 1, 10, '#4A7BD8', '#3A62B0'); bk(0, 2, 9, '#4CC38A', '#3A9A6C'); },
+    mug: (p, t) => { p(0, 0, 4.5, 5, OUT); p(.5, .5, 3.5, 4.5, '#F4EBDD'); p(.5, .5, 3.5, 1, '#6B3E26'); p(1, .75, 1, .5, '#8B5A3C'); p(.5, 4, 3.5, .5, '#D6CCB8'); p(4.5, 1, 1.5, 3, OUT); p(4.5, 1.5, 1, 2, '#F4EBDD'); p(1, 2.5, 2.5, .5, '#E5484D');
+      const k = Math.floor(t / 300) % 3; p(1 + k * .5, -1.5 - k * .5, .5, 1, '#FFFFFFCC'); p(2.5 - k * .5, -2.5 + k * .5, .5, 1, '#FFFFFF99'); },
+    cake: (p, t) => { p(5.5, 0, 1, 1, Math.sin(t / 150) > 0 ? '#F6C445' : '#F08A3B'); p(5.75, -.5, .5, .5, '#FFF3B0'); p(5.5, 1, 1, 2, '#F28AB2'); p(5.5, 1.5, 1, .5, '#FFFFFF');
+      p(1, 3, 10, 6.5, OUT); p(1.5, 3.5, 9, 2.5, '#F7B6C8'); p(1.5, 6, 9, 3, '#FFF4E0'); p(1.5, 5.5, 9, 1, '#E5484D'); [2.5, 4.5, 6.5, 8.5].forEach(x => p(x, 6.5, .5, 1, '#F7B6C8')); p(2, 3.5, 2, .5, '#FFFFFF');
+      p(0, 9, 12, 2, OUT); p(.5, 9.5, 11, 1, '#E6E6EE'); p(.5, 9.5, 11, .5, '#FFFFFF'); },
+    tv: (p, t, i, room) => { rbox(p, 0, 0, 26, 17, '#2B2340', '#140E22', 1.5); p(1, 1, 24, .5, '#4A4260'); p(2, 2, 22, 13, '#10213A');
+      if (room.has('console')) { p(2, 12, 22, 3, '#3E8257'); const jx = 4 + Math.floor((t / 120) % 16), jy = 9 - Math.abs(Math.sin(t / 300)) * 5; p(jx, jy, 2, 3, '#F6D04D'); p(18 - Math.floor((t / 200) % 12), 10, 2, 2, '#E5484D'); }
+      else { p(2, 2, 22, 13, '#3E7BC6'); const cx = 2 + Math.floor((t / 160) % 26) - 4; p(Math.max(2, cx), 5, Math.min(6, 24 - cx), 2, '#FFFFFF'); p(2, 12, 22, 3, '#6FBF6A'); }
+      for (let y = 2; y < 15; y += 1.5) p(2, y, 22, .25, '#00000022'); p(2.5, 2.5, 4, .5, '#FFFFFF44'); p(22, 15.5, 1, .5, '#E5484D'); p(19, 15.5, 2, .5, '#5B5670');
+      p(9, 17, 8, 3, OUT); p(9.5, 17, 7, 2.5, '#1A1528'); p(5, 19.5, 16, .5, OUT); },
+  };
+  Object.entries(HD).forEach(([k, d]) => { if (FURN[k]) FURN[k].d = d; });
   const RECOLOR = {
     armchair: [['Armchair', 'Кресло', 'Krēsls'], [['red', 'красное', 'sarkans'], { '#4A9BA8': '#C9463D', '#357782': '#A8382F', '#6FBAC5': '#E06A5E' }], [['mustard', 'горчичное', 'sinepju'], { '#4A9BA8': '#D9A33B', '#357782': '#B5832A', '#6FBAC5': '#EBC064' }], [['lilac', 'сиреневое', 'ceriņu'], { '#4A9BA8': '#9C80D0', '#357782': '#7F5FB8', '#6FBAC5': '#B9A3E3' }]],
     beanbag: [['Beanbag', 'Кресло-мешок', 'Sēžammaiss'], [['blue', 'синий', 'zils'], { '#F08A3B': '#4A7BD8', '#E07A2E': '#3E68BD', '#C0651F': '#2F519A', '#F6A86A': '#7FA7E0' }], [['pink', 'розовый', 'rozā'], { '#F08A3B': '#F28AB2', '#E07A2E': '#E06A95', '#C0651F': '#C25579', '#F6A86A': '#F7B6C8' }], [['green', 'зелёный', 'zaļš'], { '#F08A3B': '#4CC38A', '#E07A2E': '#3EA874', '#C0651F': '#2E8A5E', '#F6A86A': '#8EE0B4' }]],
@@ -615,7 +678,7 @@
       else { R(tg, 0, 0, RW, RH, '#C9BBA0'); R(tg, WX, WY, WW, WH, '#BDE3F8'); drawCurtains(tg, v); g.drawImage(t, WX - 18, WY - 10, 26, 30, 0, 0, c.width * 26 / 28, c.height * 30 / 28 > c.height ? c.height : c.height * 30 / 28); }
     } else {
       const d = defOf(kind, v); if (!d) return document.createElement('span');
-      const pad = 1, k = Math.max(1, Math.floor(Math.min(64 / (d.w + pad * 2), 64 / (d.h + pad * 2)))) || 1;
+      const pad = 1, k = 2 * Math.max(1, Math.floor(Math.min(128 / (d.w + pad * 2), 128 / (d.h + pad * 2)) / 2)); // чётный масштаб — полупиксели чёткие
       c.width = (d.w + pad * 2) * k; c.height = (d.h + pad * 2) * k; g.setTransform(k, 0, 0, k, 0, 0); g.imageSmoothingEnabled = false;
       d.d(P(g, pad, pad), 0, d.i, { has: () => false });
     }
