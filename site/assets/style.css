@@ -3222,3 +3222,4 @@ html:not(.is-admin) .statbar { display: none; }
 .sw-wf .pill-btn { padding: 5px 12px; font-size: 14px; }
 .sw-wf .pill-btn[aria-pressed="true"] { background: #E9A93B; border-color: #E9A93B; color: #2B1A51; }
 .sw-mod [data-ai].on { background: #4CC38A; color: #10261B; }
+.sw-ainote + .sw-ainote { margin-top: 6px; }

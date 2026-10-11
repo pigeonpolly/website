@@ -104,6 +104,7 @@
       'Mēs nevaram kontrolēt vai ietekmēt, vai jūs augšupielādējat MI ģenerētu saturu savu zīmējumu vietā. Varam tikai droši teikt: tie, kas augšupielādēja savus darbus, uzlaboja savas zīmēšanas prasmes. Jūs, visticamāk, uzlabojāt savas promptošanas prasmes… vai tomēr nē?'],
     wfLabel: ['Show works', 'Какие работы показывать', 'Kādus darbus rādīt'], wfAll: ['All works', 'Все работы', 'Visi darbi'], wfHuman: ['🎨 By people', '🎨 Работы людей', '🎨 Cilvēku darbi'], wfAi: ['🤖 By robots', '🤖 Работы роботов', '🤖 Robotu darbi'],
     emptyAi: ['No robot works here yet.', 'Здесь пока нет работ роботов.', 'Šeit vēl nav robotu darbu.'], emptyHuman: ['No works by people yet.', 'Здесь пока нет работ людей.', 'Šeit vēl nav cilvēku darbu.'],
+    aiAdmin: ['The site author reserves the right to mark your work as AI content if they suspect it. But they can be wrong, so please don’t take offence 🙂', 'Автор сайта оставляет за собой право пометить вашу работу как ИИ-контент, если заподозрит его. Но может и ошибиться — так что не обижайтесь 🙂', 'Vietnes autors patur tiesības atzīmēt jūsu darbu kā MI saturu, ja tam radīsies aizdomas. Taču var arī kļūdīties, tāpēc neapvainojieties 🙂'],
     aiMarkAdm: ['Mark as AI-generated', 'Пометить как ИИ-генерацию', 'Atzīmēt kā MI ģenerētu'], aiUnmark: ['Remove the AI mark', 'Снять пометку ИИ', 'Noņemt MI atzīmi'],
     aiMark: ['This is AI-generated', 'Это ИИ-генерация', 'Tas ir MI ģenerēts'], aiTag: ['AI-generated', 'ИИ-генерация', 'MI ģenerēts'],
     hide: ['Hide', 'Скрыть', 'Paslēpt'], ban: ['Block', 'Блок', 'Bloķēt'],
@@ -486,6 +487,7 @@
         <button class="cta-btn" type="submit" disabled>${t('upload')}</button>
         <p class="sw-status" id="sw-status"></p>
         <p class="sw-ainote">🤖 ${t('aiNote')}</p>
+        <p class="sw-ainote">${t('aiAdmin')}</p>
       </form></div>`;
     const slot = app.querySelector('.sw-ava-slot'); if (slot) { const av = window.PPBirds.avatar(me.id, me.avatar, 96); const a = document.createElement('a'); a.href = profileUrl(me.nick); a.className = 'sw-ava-link'; a.appendChild(av); slot.replaceWith(a); }
     const gb = document.getElementById('sw-gift'); if (gb) gb.onclick = () => openGift(newGifts[newGifts.length - 1]);
