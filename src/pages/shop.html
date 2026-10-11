@@ -27,6 +27,7 @@
     onSale: ['🛍 In stock', '🛍 В наличии', '🛍 Pārdošanā'], gone: ['Out of stock', 'Нет в наличии', 'Nav pieejams'],
     count: ['You have {n} of {m}', 'У вас {n} из {m}', 'Tev ir {n} no {m}'], max: ['✓ You have the maximum', '✓ У вас максимум', '✓ Tev ir maksimums'],
     legend: ['★ Legendary: one per bird, cannot be gifted', '★ Легендарная: одна на птичку, дарить нельзя', '★ Leģendāra: viena putniņam, dāvināt nevar'],
+    fFind: ['Find', 'Найти', 'Meklēt'], findPh: ['Search by name…', 'Поиск по названию…', 'Meklēt pēc nosaukuma…'], fPrice: ['Price', 'Цена', 'Cena'], fSort: ['Order', 'Порядок', 'Secība'],
     fShow: ['Show', 'Показать', 'Rādīt'], sSale: ['🛍 On sale', '🛍 В продаже', '🛍 Pārdošanā'], sMine: ['🎒 What I have', '🎒 Что у меня есть', '🎒 Kas man ir'], sAll: ['Everything', 'Всё', 'Visu'],
     fFor: ['For', 'Для кого', 'Kam'], gBird: ['🐦 For my bird', '🐦 Для птички', '🐦 Putniņam'], gRoom: ['🏠 For the room', '🏠 Для комнаты', '🏠 Istabai'], gAny: ['🎲 Surprises', '🎲 Сюрпризы', '🎲 Pārsteigumi'],
     fKind: ['What', 'Что', 'Kas'], allKinds: ['Any', 'Любое', 'Jebkas'], fTheme: ['Theme', 'Тема', 'Tēma'], anyTheme: ['Any theme', 'Любая тема', 'Jebkura tēma'], reset: ['✕ Reset filters', '✕ Сбросить фильтры', '✕ Notīrīt filtrus'],
@@ -42,10 +43,14 @@
   var bar = document.querySelector('.shop-bar'), box = document.querySelector('.shop-box'), meEl = document.querySelector('.shop-me');
   var me = null, owned = {}, shop = {}, LIM = { max: 3, leg: 1 };
   // фильтры: что показать (в продаже / моё / всё), для кого (птичке / комнате / сюрпризы), вид вещи, тема
-  var F = { show: 'sale', grp: 'all', kind: '', theme: '', afford: false };
+  var F = { show: 'sale', grp: 'all', kind: '', theme: '', afford: false, price: '', sort: 'kind' };
   try { var sv = JSON.parse(localStorage.getItem('pp-shop-f') || 'null'); if (sv) F = Object.assign(F, sv); } catch (e) { /* нет хранилища */ }
+  var Q = ''; // поиск по названию — не запоминаем
   var saveF = function () { try { localStorage.setItem('pp-shop-f', JSON.stringify(F)); } catch (e) { /* ок */ } };
   function key(k, v) { return k + '|' + v; }
+  // цена: [значение, подпись, от, до (не включая)]
+  var PRICES = [['', ['Any price', 'Любая цена', 'Jebkura cena'], 0, 1e9], ['0-30', ['up to 30 🔘', 'до 30 🔘', 'līdz 30 🔘'], 0, 31], ['30-60', ['30–60 🔘', '30–60 🔘', '30–60 🔘'], 30, 61], ['60-120', ['60–120 🔘', '60–120 🔘', '60–120 🔘'], 60, 121], ['120-300', ['120–300 🔘', '120–300 🔘', '120–300 🔘'], 120, 301], ['300-', ['300 🔘 and more', 'от 300 🔘', 'no 300 🔘'], 300, 1e9]];
+  var SORTS = [['kind', ['By category', 'По видам', 'Pēc veida']], ['new', ['Newest first', 'Сначала новые', 'Jaunākās vispirms']], ['cheap', ['Cheapest first', 'Сначала дешёвые', 'Lētākās vispirms']], ['dear', ['Most expensive first', 'Сначала дорогие', 'Dārgākās vispirms']]];
   function grpOf(k) { var B = window.PPBirds; return k === 'any' ? 'any' : (B.ROOM_KINDS || []).indexOf(k) >= 0 ? 'room' : 'bird'; }
   function buttons() {
     var B = window.PPBirds; bar.innerHTML = '';
@@ -62,7 +67,16 @@
     sel.innerHTML = '<option value="">' + T.anyTheme[L] + '</option>' + B.GIFT_THEMES.filter(function (t) { return t[0] !== 'surprise'; }).map(function (t) { return '<option value="' + t[0] + '">' + t[1][L] + '</option>'; }).join('');
     sel.value = F.theme; if (sel.value !== F.theme) F.theme = '';
     sel.onchange = function () { F.theme = sel.value; saveF(); draw(); }; g4.appendChild(sel);
-    if (F.theme || F.kind || F.grp !== 'all') { var rs = document.createElement('button'); rs.type = 'button'; rs.className = 'shop-reset'; rs.textContent = T.reset[L]; rs.onclick = function () { F.grp = 'all'; F.kind = ''; F.theme = ''; saveF(); draw(); }; g4.appendChild(rs); }
+    // поиск, цена и порядок
+    var g5 = row(T.fFind[L], 'shop-find'), q = document.createElement('input'); q.type = 'search'; q.className = 'shop-q'; q.placeholder = T.findPh[L]; q.value = Q;
+    q.oninput = function () { Q = q.value; drawList(); }; g5.appendChild(q);
+    var ps = document.createElement('select'); ps.className = 'shop-theme shop-price-sel'; ps.setAttribute('aria-label', T.fPrice[L]);
+    ps.innerHTML = PRICES.map(function (r) { return '<option value="' + r[0] + '">' + r[1][L] + '</option>'; }).join(''); ps.value = F.price;
+    ps.onchange = function () { F.price = ps.value; saveF(); draw(); }; g5.appendChild(ps);
+    var so = document.createElement('select'); so.className = 'shop-theme shop-sort'; so.setAttribute('aria-label', T.fSort[L]);
+    so.innerHTML = SORTS.map(function (r) { return '<option value="' + r[0] + '">' + r[1][L] + '</option>'; }).join(''); so.value = F.sort;
+    so.onchange = function () { F.sort = so.value; saveF(); draw(); }; g5.appendChild(so);
+    if (F.theme || F.kind || F.grp !== 'all' || F.price || F.sort !== 'kind') { var rs = document.createElement('button'); rs.type = 'button'; rs.className = 'shop-reset'; rs.textContent = T.reset[L]; rs.onclick = function () { F.grp = 'all'; F.kind = ''; F.theme = ''; F.price = ''; F.sort = 'kind'; Q = ''; saveF(); draw(); }; g5.appendChild(rs); }
   }
   function head() {
     meEl.innerHTML = '';
@@ -90,8 +104,14 @@
   function draw() {
     var B = window.PPBirds; if (!B) return;
     if (F.show === 'mine' && !me) F.show = 'sale';
-    buttons(); head();
+    buttons(); head(); drawList();
+  }
+  // список вещей (без перерисовки фильтров — чтобы поиск не терял курсор)
+  function drawList() {
+    var B = window.PPBirds; if (!B) return;
     var id = me ? me.id : 2, money = me && me.btn ? me.btn.buttons : 0;
+    var q = Q.trim().toLowerCase(), pr = (PRICES.filter(function (r) { return r[0] === F.price; })[0] || PRICES[0]);
+    var order = {}; var oi = 0; B.GIFT_KINDS.forEach(function (k) { (B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).forEach(function (v) { order[key(k[0], v)] = oi++; }); });
     var theme = F.theme ? B.GIFT_THEMES.filter(function (t) { return t[0] === F.theme; })[0] : null;
     var stock = function (k, v) { return (shop[key(k, v)] || {}).stock > 0; };
     box.innerHTML = '';
@@ -101,21 +121,31 @@
     blocks.forEach(function (bl) {
       var sec = document.createElement('section'); sec.className = 'shop-block ' + bl[0];
       var h2 = document.createElement('h2'); h2.className = 'shop-block-h'; h2.textContent = bl[1]; sec.appendChild(h2);
-      var n = 0;
+      var n = 0, flat = [];
       B.GIFT_KINDS.forEach(function (k) {
         if (F.grp !== 'all' && grpOf(k[0]) !== F.grp) return;
         if (F.kind && F.kind !== k[0]) return;
         var list = (bl[0] === 'mine' ? B.GIFTS[k[0]] || [] : B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).filter(function (v) {
           if (theme && theme[2].indexOf(key(k[0], v)) < 0) return false;
+          if (q && B.giftName(k[0], v, L).toLowerCase().indexOf(q) < 0 && k[1][L].toLowerCase().indexOf(q) < 0) return false;
+          var cp = (shop[key(k[0], v)] || {}).price; if (F.price && (cp == null || cp < pr[2] || cp >= pr[3])) return false;
           if (F.afford && me && bl[0] !== 'mine') { var sp = shop[key(k[0], v)] || {}, lim = B.LEGEND && B.LEGEND.has(key(k[0], v)) ? LIM.leg : LIM.max; if (!(sp.stock > 0 && sp.price <= money && (v === '?' || k[0] === 'any' || (owned[key(k[0], v)] || 0) < lim))) return false; } // хватает пуговок и ещё можно купить
           return bl[0] === 'mine' ? owned[key(k[0], v)] > 0 : stock(k[0], v) === (bl[0] === 'on');
         });
         if (!list.length) return;
+        if (F.sort !== 'kind') { list.forEach(function (v) { flat.push([k, v]); }); return; } // общий список — отсортируем ниже
         var h = document.createElement('h3'); h.textContent = k[1][L]; sec.appendChild(h);
         var g = document.createElement('div'); g.className = 'fl-coll-grid'; sec.appendChild(g);
         list.forEach(function (v) { n++; g.appendChild(item(k, v, id, money)); });
       });
-      if (!n && bl[0] !== 'off') { var p = document.createElement('p'); p.className = 'fl-all-lead'; p.textContent = bl[0] === 'mine' ? T.noneMine[L] : F.afford ? T.noAfford[L] : (F.theme || F.kind || F.grp !== 'all') ? T.noneHere[L] : T.none[L]; sec.appendChild(p); }
+      if (F.sort !== 'kind' && flat.length) {
+        var pc = function (x) { return (shop[key(x[0][0], x[1])] || {}).price || 0; }, ad = function (x) { return (shop[key(x[0][0], x[1])] || {}).added || 0; };
+        flat.sort(F.sort === 'cheap' ? function (a, b) { return pc(a) - pc(b); } : F.sort === 'dear' ? function (a, b) { return pc(b) - pc(a); }
+          : function (a, b) { return ad(b) - ad(a) || order[key(b[0][0], b[1])] - order[key(a[0][0], a[1])]; }); // новые: недавно пополненные, потом — добавленные в каталог позже
+        var g2 = document.createElement('div'); g2.className = 'fl-coll-grid'; sec.appendChild(g2);
+        flat.forEach(function (x) { n++; g2.appendChild(item(x[0], x[1], id, money)); });
+      }
+      if (!n && bl[0] !== 'off') { var p = document.createElement('p'); p.className = 'fl-all-lead'; p.textContent = bl[0] === 'mine' ? T.noneMine[L] : F.afford ? T.noAfford[L] : (F.theme || F.kind || F.grp !== 'all' || F.price || q) ? T.noneHere[L] : T.none[L]; sec.appendChild(p); }
       else if (n) { var c = document.createElement('small'); c.className = 'shop-n'; c.textContent = ' · ' + n; h2.appendChild(c); }
       if (n || bl[0] !== 'off') box.appendChild(sec);
     });

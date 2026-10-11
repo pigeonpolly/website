@@ -3248,3 +3248,5 @@ html:not(.is-admin) .statbar { display: none; }
 @media (max-width: 600px) { .adm-eco .adm-eco-v { grid-column: auto; } }
 .adm-eco .adm-eco-btns { grid-column: 1 / -1; background: none; padding: 0; flex-direction: row; flex-wrap: wrap; align-items: center; gap: 8px; }
 .adm-eco .adm-eco-btns span { font-size: 14px; } .adm-eco-btns input { padding: 3px 6px; border: 1px solid #DCD5EC; border-radius: 6px; }
+.shop-q { flex: 1 1 220px; min-width: 0; font: 15px var(--sans); padding: 7px 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.35); background: #2B1A51; color: inherit; }
+.shop-q::placeholder { color: rgba(255,255,255,.55); }

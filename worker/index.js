@@ -276,7 +276,7 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
@@ -349,7 +349,7 @@ function effPrice(base, stock, leg) {
   const f = Math.max(RULES.priceMin, Math.min(RULES.priceMax, Math.pow((leg ? RULES.normLegend : RULES.normStock) / Math.max(1, stock || 0), 0.4)));
   return Math.max(5, Math.round(base * f / 5) * 5);
 }
-const shopRow = r => ({ kind: r.kind, item: r.item, base: r.price, stock: r.stock, price: effPrice(r.price, r.stock, LEGEND.has(r.kind + '|' + r.item) || r.item === 'legend') });
+const shopRow = r => ({ kind: r.kind, item: r.item, base: r.price, stock: r.stock, added: r.added_at || 0, price: effPrice(r.price, r.stock, LEGEND.has(r.kind + '|' + r.item) || r.item === 'legend') });
 // один раз: всем вещам — ценность из каталога (site/assets/catalog.json → prices, считает tools/catalog.js)
 async function ensurePrices(env, req) {
   if (await env.DB.prepare("SELECT value FROM meta WHERE key = 'prices_v1'").first()) return;
@@ -1065,7 +1065,7 @@ async function route(req, env, url) {
   // ---------- магазин: вещи из коллекций за пуговки; цену и остаток задаёт Алина в кабинете ----------
   if (m === 'GET' && p === '/api/shop') {
     await ensurePrices(env, req);
-    const rows = (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results;
+    const rows = (await env.DB.prepare('SELECT kind, item, price, stock, added_at FROM shop').all()).results;
     return json({ items: rows.map(shopRow), max: RULES.shopMax, legendMax: RULES.legendMax }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/shop/buy') {
@@ -1118,13 +1118,13 @@ async function route(req, env, url) {
     if (!list.length || (!b.set && !(Number(b.add) > 0))) fail(400, 'bad');
     if (b.set) { // поставить остаток ровно [kind, item, n]
       await ensurePrices(env, req); const cp = (await catalog(env, req)).prices || {};
-      const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET stock = excluded.stock');
-      for (let i = 0; i < list.length; i += 50) await env.DB.batch(list.slice(i, i + 50).map(x => st.bind(String(x[0]), String(x[1]), cp[x[0] + '|' + x[1]] || 30, Math.max(0, Math.min(10000, Math.floor(Number(x[2]) || 0))))));
-      return json({ ok: true, count: list.length, items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results.map(shopRow) });
+      const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock, added_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET added_at = CASE WHEN excluded.stock > shop.stock THEN excluded.added_at ELSE shop.added_at END, stock = excluded.stock'); // added_at — когда пополнили (для «сначала новые»)
+      for (let i = 0; i < list.length; i += 50) await env.DB.batch(list.slice(i, i + 50).map(x => st.bind(String(x[0]), String(x[1]), cp[x[0] + '|' + x[1]] || 30, Math.max(0, Math.min(10000, Math.floor(Number(x[2]) || 0))), now())));
+      return json({ ok: true, count: list.length, items: (await env.DB.prepare('SELECT kind, item, price, stock, added_at FROM shop').all()).results.map(shopRow) });
     }
-    const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET stock = MIN(100000, shop.stock + excluded.stock), price = CASE WHEN shop.price > 0 THEN shop.price ELSE excluded.price END');
-    for (let i = 0; i < list.length; i += 50) await env.DB.batch(list.slice(i, i + 50).map(x => st.bind(String(x[0]), String(x[1]), cp[x[0] + '|' + x[1]] || price, add)));
-    return json({ ok: true, count: list.length, items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results.map(shopRow) });
+    const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock, added_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET added_at = excluded.added_at, stock = MIN(100000, shop.stock + excluded.stock), price = CASE WHEN shop.price > 0 THEN shop.price ELSE excluded.price END');
+    for (let i = 0; i < list.length; i += 50) await env.DB.batch(list.slice(i, i + 50).map(x => st.bind(String(x[0]), String(x[1]), cp[x[0] + '|' + x[1]] || price, add, now())));
+    return json({ ok: true, count: list.length, items: (await env.DB.prepare('SELECT kind, item, price, stock, added_at FROM shop').all()).results.map(shopRow) });
   }
   if (p === '/api/admin/shop') {
     const u = await needUser(req, env);
@@ -1134,11 +1134,11 @@ async function route(req, env, url) {
       const kind = String(b.kind || ''), item = String(b.item || '');
       if (!GIFT_KINDS.includes(kind) || !item || item.length > 40) fail(400, 'bad');
       const price = Math.max(0, Math.min(100000, Math.floor(Number(b.price) || 0))), stock = Math.max(0, Math.min(100000, Math.floor(Number(b.stock) || 0)));
-      await env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET price = excluded.price, stock = excluded.stock').bind(kind, item, price, stock).run();
+      await env.DB.prepare('INSERT INTO shop (kind, item, price, stock, added_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET added_at = CASE WHEN excluded.stock > shop.stock THEN excluded.added_at ELSE shop.added_at END, price = excluded.price, stock = excluded.stock').bind(kind, item, price, stock, now()).run();
       return json({ ok: true, price, stock });
     }
     await ensurePrices(env, req);
-    return json({ items: (await env.DB.prepare('SELECT kind, item, price, stock FROM shop').all()).results.map(shopRow), suggested: (await catalog(env, req)).prices || {}, economy: await env.DB.prepare('SELECT COALESCE(SUM(COALESCE(buttons, 0)), 0) AS total, COUNT(*) AS birds FROM users WHERE nick IS NOT NULL AND banned = 0').first(), pricing: { normStock: RULES.normStock, normLegend: RULES.normLegend, priceMin: RULES.priceMin, priceMax: RULES.priceMax } });
+    return json({ items: (await env.DB.prepare('SELECT kind, item, price, stock, added_at FROM shop').all()).results.map(shopRow), suggested: (await catalog(env, req)).prices || {}, economy: await env.DB.prepare('SELECT COALESCE(SUM(COALESCE(buttons, 0)), 0) AS total, COUNT(*) AS birds FROM users WHERE nick IS NOT NULL AND banned = 0').first(), pricing: { normStock: RULES.normStock, normLegend: RULES.normLegend, priceMin: RULES.priceMin, priceMax: RULES.priceMax } });
   }
   // подарить купленную в магазине вещь другой птичке: вещь уходит из сумки и приходит ей неоткрытым подарком
   if (m === 'POST' && p === '/api/gift/give') {
