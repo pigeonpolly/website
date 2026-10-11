@@ -3321,3 +3321,31 @@ html:not(.is-admin) .statbar { display: none; }
 .sal-btn { min-width: 200px; }
 @keyframes sal-wob { 0%, 100% { transform: rotate(0); } 20% { transform: rotate(-3deg); } 40% { transform: rotate(3deg); } 60% { transform: rotate(-1.5deg); } }
 @media (prefers-reduced-motion: reduce) { .sal-env { animation: none; } .sal-flap, .sal-letter { transition: none; } }
+
+/* игра «Пуговичный дождь» (rain.js) */
+.rain { display: flex; flex-direction: column; align-items: center; gap: 22px; padding: 0 16px 40px; }
+.rain-stage { position: relative; margin: 0 auto; border-radius: 18px; overflow: hidden; box-shadow: 0 10px 30px rgba(30, 15, 50, .35); touch-action: none; user-select: none; -webkit-user-select: none; }
+.rain-cv { display: block; width: 100%; height: 100%; touch-action: none; cursor: pointer; }
+.rain-pause { position: absolute; top: 50px; right: 8px; width: 38px; height: 38px; border: 0; border-radius: 50%; background: rgba(43, 31, 61, .6); color: #fff; font-size: 13px; cursor: pointer; }
+.rain-ov { position: absolute; inset: 0; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(43, 31, 61, .45); }
+.rain-ov[hidden] { display: none; }
+.rain-card { background: #fffaf2; color: #2b1f3d; border-radius: 16px; padding: 18px 18px 20px; text-align: center; max-height: 100%; overflow: auto; box-shadow: 0 8px 24px rgba(0, 0, 0, .25); }
+.rain-card h2 { margin: 0 0 8px; font-size: 1.35rem; }
+.rain-card p { margin: 6px 0; font-size: .92rem; line-height: 1.4; }
+.rain-pay { color: #6a3fb0; }
+.rain-guest { font-size: .85rem !important; color: #7a6a8a; }
+.rain-guest .pill-btn { margin-left: 4px; padding: 4px 12px; }
+.rain-best { font-weight: 700; }
+.rain-big { font-size: 1.15rem !important; font-weight: 700; }
+.rain-got { font-size: 1.1rem !important; font-weight: 800; color: #6a3fb0; }
+.rain-go { margin-top: 10px; min-width: 180px; font-size: 1.05rem; }
+.rain-top { width: 100%; max-width: 440px; }
+.rain-top h2 { font-size: 1.2rem; margin: 0 0 8px; }
+.rain-list { list-style: none; margin: 0; padding: 0; counter-reset: rk; }
+.rain-list li { counter-increment: rk; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 12px; }
+.rain-list li::before { content: counter(rk); width: 1.4em; text-align: right; font-weight: 700; opacity: .6; }
+.rain-list li.me { background: rgba(240, 169, 135, .18); }
+.rain-list li.rain-none { counter-increment: none; opacity: .75; }
+.rain-list li.rain-none::before { content: none; }
+.rain-list a { flex: 1; color: inherit; }
+.rain-on .polly-pet { opacity: 0; } /* Полли не мешает, пока идёт игра */
