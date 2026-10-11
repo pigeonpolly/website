@@ -3221,7 +3221,6 @@ html:not(.is-admin) .statbar { display: none; }
 .sw-wf { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
 .sw-wf .pill-btn { padding: 5px 12px; font-size: 14px; }
 .sw-wf .pill-btn[aria-pressed="true"] { background: #E9A93B; border-color: #E9A93B; color: #2B1A51; }
-.sw-mod [data-ai].on { background: #BFE3FF; color: #10264B; }
 .sw-ainote + .sw-ainote { margin-top: 6px; }
 /* стена: затемнение сверху, чтобы значки читались на любой картинке; кнопки админа — по наведению (на телефоне видны всегда) */
 .sw-tile:has(.sw-mod, .sw-aitag)::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 64px; z-index: 1; pointer-events: none; background: linear-gradient(rgba(20, 12, 40, .7), rgba(20, 12, 40, .25) 60%, transparent); }
@@ -3232,7 +3231,8 @@ html:not(.is-admin) .statbar { display: none; }
   .sw-tile:has(.sw-mod):not(:has(.sw-aitag))::before { opacity: 0; transition: opacity .15s; }
   .sw-tile:has(.sw-mod):hover::before, .sw-tile:has(.sw-mod):focus-within::before { opacity: 1; }
 }
-/* у админа не две головы робота: когда видны кнопки, значок 🤖 прячется — пометку показывает голубая кнопка */
-.sw-tile .sw-aitag { transition: opacity .15s; }
-@media (hover: hover) { .sw-tile:has(.sw-mod):hover .sw-aitag, .sw-tile:has(.sw-mod):focus-within .sw-aitag { opacity: 0; } }
-@media (hover: none) { .sw-tile:has(.sw-mod) .sw-aitag { display: none; } }
+/* у админа голова робота — кнопка в углу: голубая — помечено как ИИ (видят все), серая — не помечено (видит только админ) */
+.sw-aitog { border: 0; cursor: pointer; font-family: inherit; }
+.sw-tile .sw-aitog.on { background: #BFE3FF; }
+.sw-tile .sw-aitog:not(.on) { background: rgba(20, 12, 40, .45); filter: grayscale(1); opacity: .6; }
+.sw-tile .sw-aitog:not(.on):hover { opacity: .95; }

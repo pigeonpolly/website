@@ -686,11 +686,11 @@
       wallFilterBar(el);
       const qs = [cursor ? `before=${cursor}` : '', wf !== 'all' ? `f=${wf}` : ''].filter(Boolean).join('&');
       const { posts, pick } = await api('wall' + (qs ? '?' + qs : ''));
-      el.innerHTML = posts.length ? posts.map(p => `<figure class="sw-tile${p.bw ? ' bw' : ''}${p.id === pick ? ' pick' : ''}" data-id="${p.id}">${p.ai ? `<span class="sw-aitag" title="${esc(t('aiTag'))}" aria-label="${esc(t('aiTag'))}">🤖</span>` : ''}
+      el.innerHTML = posts.length ? posts.map(p => `<figure class="sw-tile${p.bw ? ' bw' : ''}${p.id === pick ? ' pick' : ''}" data-id="${p.id}">${me && me.admin ? `<button type="button" class="sw-aitag sw-aitog${p.ai ? ' on' : ''}" data-ai="${p.id}" data-on="${p.ai ? 0 : 1}" aria-pressed="${!!p.ai}" title="${esc(p.ai ? t('aiUnmark') : t('aiMarkAdm'))}">🤖</button>` : p.ai ? `<span class="sw-aitag" title="${esc(t('aiTag'))}" aria-label="${esc(t('aiTag'))}">🤖</span>` : ''}
         ${p.id === pick ? `<span class="sw-stamp">★ ${esc(SPECIAL.find(x => x.k === 'pick').n[L])}</span>` : ''}
         <a href="/api/img/${p.id}" data-lightbox><img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"></a>
         <figcaption><button type="button" class="sw-nickname sw-plink${p.gold ? ' gold' : ''}" data-profile="${esc(p.nick)}">@${esc(p.nick)}</button> <span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></figcaption>
-        ${me && me.admin ? `<div class="sw-mod">${p.id === pick ? `<button type="button" data-unpick="1">☆ ${t('unpick')}</button>` : `<button type="button" data-pick="${p.id}" title="${esc(SPECIAL.find(x => x.k === 'pick').n[L])}">★</button>`}<button type="button" data-ai="${p.id}" data-on="${p.ai ? 0 : 1}" class="${p.ai ? 'on' : ''}" title="${esc(p.ai ? t('aiUnmark') : t('aiMarkAdm'))}">🤖</button><button type="button" data-hide="${p.id}">${t('hide')}</button><button type="button" data-ban="${p.uid}">${t('ban')}</button></div>` : ''}
+        ${me && me.admin ? `<div class="sw-mod">${p.id === pick ? `<button type="button" data-unpick="1">☆ ${t('unpick')}</button>` : `<button type="button" data-pick="${p.id}" title="${esc(SPECIAL.find(x => x.k === 'pick').n[L])}">★</button>`}<button type="button" data-hide="${p.id}">${t('hide')}</button><button type="button" data-ban="${p.uid}">${t('ban')}</button></div>` : ''}
       </figure>`).join('') : `<p class="sw-empty">${wf === 'ai' ? t('emptyAi') : wf === 'human' ? t('emptyHuman') : t('emptyWall')}</p>`;
       if (posts.length) pageCursors[pageIdx + 1] = posts[posts.length - 1].created_at;
       if (more) more.hidden = posts.length < 24;
