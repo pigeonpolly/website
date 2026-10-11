@@ -325,9 +325,10 @@ const RULE_DEFAULTS = {
   sellOn: true, sellPrice: 5,
   // «Пуговичный дождь»: за уровень gameLevel 🔘 × (1 + ⌊(ур.−1)/10⌋) — каждый номер уровня раз в сутки; gameDayMax — лимит в сутки (0 — без лимита);
   // каждые gameItemEvery уровней — вещь из магазина (0 — выкл.); первое место в рекордах — gameKing 🔘 в день, когда играет
-  gameOn: true, gameLevel: 1, gameDayMax: 0, gameMinSec: 5, gameItemEvery: 30, gameKing: 10,
+  // НАГРАДЫ ИГР — в % от средней цены обычной вещи в магазине (пересчёт раз в сутки, `gameUnit`): цены растут — растут и награды
+  gameOn: true, gameLevelPct: 2, gameRecordPct: 4, gameDayMaxPct: 0, gameMinSec: 5, gameItemEvery: 30, gameKingPct: 10,
   // «Зельеварня»: 🔘 за новое зелье по уровням (обычное / вкусное / вкус детства), за повторное, лимит в сутки; лабиринт быстрее potionMinSec с не засчитывается
-  potionOn: true, potion1: 2, potion2: 5, potion3: 15, potionAgain: 1, potionDayMax: 15, potionMinSec: 8,
+  potionOn: true, potion1Pct: 4, potion2Pct: 12, potion3Pct: 35, potionAgainPct: 1, potionDayMaxPct: 60, potionMinSec: 8,
   potionSeason: 'auto', potionShelf: true, // сезон зельеварни (auto — по календарю) и бутылочка в комнату за новое зелье «Вкус детства» // «Пуговичный дождь»: 🔘 за пройденный уровень, не больше gameDayMax в сутки; уровень быстрее gameMinSec с — не засчитывается
   restockOn: true, restockTo: 0, // раз в сутки: у всех вещей, кроме легендарных, остаток дотягивается до restockTo шт. (0 — до «обычного запаса») // продажа вещей обратно в магазин: одна цена за любую вещь
   // условия бейджей (числа из описаний «как получить»)
@@ -338,7 +339,7 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], gameLevel: [0, 100], gameDayMax: [0, 100000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKing: [0, 1000], potion1: [0, 1000], potion2: [0, 1000], potion3: [0, 1000], potionAgain: [0, 1000], potionDayMax: [0, 10000], potionMinSec: [1, 120] };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120] };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -355,7 +356,8 @@ function cleanRules(r) {
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
   for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf']) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameLevel', 'gameDayMax', 'gameMinSec', 'gameItemEvery', 'gameKing', 'potion1', 'potion2', 'potion3', 'potionAgain', 'potionDayMax', 'potionMinSec']) out[k] = Math.round(out[k]);
+  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec']) out[k] = Math.round(out[k]);
+  for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
   if (out.priceMin > out.priceMax) out.priceMin = out.priceMax;
   if (out.lowPct > out.normPct) out.lowPct = out.normPct;
@@ -370,7 +372,7 @@ async function loadRules(env) {
   Object.assign(BTN, { daily: RULES.daily, upload: RULES.upload, comment: RULES.comment, commentsPerDay: RULES.commentsPerDay, friend: RULES.friend, pick: RULES.pick });
   Object.assign(BTN.levels, RULES.levels); Object.assign(BTN.badges, RULES.badges);
   try { const b = await env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE nick IS NOT NULL AND banned = 0').first(); STOCK = stockLevels(b ? b.n : 0); } catch (e) { STOCK = stockLevels(STOCK.birds); }
-  BTN.cond = RULES.cond; BTN.sell = RULES.sellOn ? RULES.sellPrice : null; BTN.game = { on: RULES.gameOn, per: RULES.gameLevel, max: RULES.gameDayMax, every: RULES.gameItemEvery, king: RULES.gameKing }; // цена продажи вещи в магазин (null — продажа выключена) // условия бейджей уходят людям вместе с наградами (описания «как получить» подставляют числа)
+  BTN.cond = RULES.cond; BTN.sell = RULES.sellOn ? RULES.sellPrice : null;  // цена продажи вещи в магазин (null — продажа выключена) // условия бейджей уходят людям вместе с наградами (описания «как получить» подставляют числа)
   return RULES;
 }
 // цвета темы дня (site/assets/day-colors.json, собирает tools/daycolors.js): {"2026-10-11": "yp"} — для бейджей за цвета
@@ -801,6 +803,24 @@ async function bump(env, key, countSql) {
   const base = cur === null ? (await env.DB.prepare(countSql).first()).n - 1 : Number(cur);
   await setMeta(env, key, String(base + 1));
 }
+// «ставка» для наград игр: средняя цена обычной вещи в продаже (без легендарных и игровых), фиксируется на сутки (meta 'unit');
+// btnOf(pct) — сколько пуговок это pct % от неё (минимум 1, если pct > 0). Сбрасывается, когда Алина меняет цены в магазине
+let UNIT = null;
+async function gameUnit(env, force = false) {
+  const day = rigaDay();
+  if (!force && UNIT && UNIT.day === day) return UNIT;
+  const saved = force ? null : parseJ(await getMeta(env, 'unit'), null);
+  if (saved && saved.day === day && saved.avg > 0) return (UNIT = saved);
+  const rows = (await env.DB.prepare("SELECT kind, item, price, stock FROM shop WHERE kind != 'any' AND item != '?'").all()).results.filter(r => !LEGEND.has(r.kind + '|' + r.item) && !gameOnly(r.kind, r.item) && r.price > 0);
+  const on = rows.filter(r => r.stock > 0), list = on.length ? on.map(r => effPrice(r.price, r.stock, false)) : rows.map(r => r.price);
+  const avg = list.length ? Math.round(list.reduce((a, b) => a + b, 0) / list.length) : 100;
+  UNIT = { day, avg }; await setMeta(env, 'unit', JSON.stringify(UNIT));
+  return UNIT;
+}
+const btnOf = (pct, unit) => pct > 0 ? Math.max(1, Math.round(pct * unit.avg / 100)) : 0;
+// цены наград игр сейчас (для страниц игр и кабинета)
+const gamePrices = unit => ({ avg: unit.avg, level: btnOf(RULES.gameLevelPct, unit), record: btnOf(RULES.gameRecordPct, unit), king: btnOf(RULES.gameKingPct, unit), max: btnOf(RULES.gameDayMaxPct, unit),
+  p1: btnOf(RULES.potion1Pct, unit), p2: btnOf(RULES.potion2Pct, unit), p3: btnOf(RULES.potion3Pct, unit), again: btnOf(RULES.potionAgainPct, unit), pmax: btnOf(RULES.potionDayMaxPct, unit) });
 // вещь за 30 уровней «Пуговичного дождя»: из того, что есть в магазине (остаток −1), которой у птички нет, не легендарная;
 // если в магазине такого нет — любая такая вещь из каталога. Приходит неоткрытым подарком
 async function rainItem(env, req, uid, lv) {
@@ -977,7 +997,8 @@ async function route(req, env, url) {
     const u = await currentUser(req, env);
     const today = u ? (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'game' AND day = ?").bind(u.id, rigaDay()).first()).n : 0;
     const top = (await env.DB.prepare('SELECT id, nick, avatar, game_best FROM users WHERE game_best > 0 AND banned = 0 AND nick IS NOT NULL ORDER BY game_best DESC, COALESCE(game_best_at, 0), id LIMIT 10').all()).results.map(r => ({ id: r.id, nick: r.nick, avatar: avatarOf(r), best: r.game_best }));
-    return json({ on: RULES.gameOn, per: RULES.gameLevel, max: RULES.gameDayMax, every: RULES.gameItemEvery, king: RULES.gameKing, today, best: u ? u.game_best || 0 : 0, me: u && u.nick && !u.banned ? { id: u.id, nick: u.nick, avatar: avatarOf(u) } : null, top });
+    const gp = gamePrices(await gameUnit(env));
+    return json({ on: RULES.gameOn, per: gp.level, record: gp.record, max: gp.max, every: RULES.gameItemEvery, king: gp.king, avg: gp.avg, today, best: u ? u.game_best || 0 : 0, me: u && u.nick && !u.banned ? { id: u.id, nick: u.nick, avatar: avatarOf(u) } : null, top });
   }
   if (m === 'POST' && p === '/api/game/start') {
     const u = await needUser(req, env);
@@ -995,14 +1016,17 @@ async function route(req, env, url) {
     if (lv !== r.level + 1) fail(409, 'order');
     if (Date.now() - r.started < lv * RULES.gameMinSec * 1000) fail(429, 'fast');
     await env.DB.prepare('UPDATE game_runs SET level = ? WHERE id = ? AND level = ?').bind(lv, r.id, r.level).run();
-    if (lv > (u.game_best || 0)) await env.DB.prepare('UPDATE users SET game_best = ?, game_best_at = ? WHERE id = ? AND COALESCE(game_best, 0) < ?').bind(lv, Date.now(), u.id, lv).run();
+    const oldBest = u.game_best || 0, unit = await gameUnit(env);
+    if (lv > oldBest) await env.DB.prepare('UPDATE users SET game_best = ?, game_best_at = ? WHERE id = ? AND COALESCE(game_best, 0) < ?').bind(lv, Date.now(), u.id, lv).run();
     const badges = [];
     for (const [k, c] of [['rain1', 'rainA'], ['rain2', 'rainB'], ['rain3', 'rainC']]) if (lv >= RULES.cond[c] && await gameBadge(env, u, k)) badges.push(k);
     const day = rigaDay(), today = (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'game' AND day = ?").bind(u.id, day).first()).n;
     // каждый номер уровня платит раз в сутки (переигрывать первые уровни ради пуговок бесполезно); каждые 10 уровней — дороже
-    const price = RULES.gameLevel * (1 + Math.floor((lv - 1) / 10));
-    const n = RULES.gameOn ? (RULES.gameDayMax > 0 ? Math.max(0, Math.min(price, RULES.gameDayMax - today)) : price) : 0;
+    const price = btnOf(RULES.gameLevelPct, unit) * (1 + Math.floor((lv - 1) / 10)), cap = btnOf(RULES.gameDayMaxPct, unit);
+    const n = RULES.gameOn ? (cap > 0 ? Math.max(0, Math.min(price, cap - today)) : price) : 0;
     const got = n > 0 ? await award(env, u.id, 'game', day + ':' + lv, n) : 0;
+    // новый личный рекорд: бонус за каждый уровень выше прежнего рекорда (один раз навсегда) — хочется расти, а не переигрывать
+    const rec = RULES.gameOn && lv > oldBest && RULES.gameRecordPct > 0 ? await award(env, u.id, 'gamerec', String(lv), btnOf(RULES.gameRecordPct, unit)) : 0;
     // каждые gameItemEvery уровней — вещь из магазина, которой у птички нет (не легендарная); за один и тот же уровень — раз в сутки
     let item = null;
     if (RULES.gameItemEvery > 0 && lv % RULES.gameItemEvery === 0) {
@@ -1011,15 +1035,15 @@ async function route(req, env, url) {
     }
     // первое место в рекордах: +gameKing 🔘 в каждый день, когда держится на первом месте и играет
     let king = 0;
-    if (RULES.gameKing > 0) {
+    if (RULES.gameKingPct > 0) {
       const first = await env.DB.prepare('SELECT id FROM users WHERE game_best > 0 AND banned = 0 AND nick IS NOT NULL ORDER BY game_best DESC, COALESCE(game_best_at, 0), id LIMIT 1').first();
-      if (first && first.id === u.id) king = await award(env, u.id, 'rainking', day, RULES.gameKing);
+      if (first && first.id === u.id) king = await award(env, u.id, 'rainking', day, btnOf(RULES.gameKingPct, unit));
     }
-    return json({ ok: true, got, today: today + got, max: RULES.gameDayMax, best: Math.max(lv, u.game_best || 0), badges, item, king });
+    return json({ ok: true, got, rec, today: today + got, max: cap, best: Math.max(lv, oldBest), badges, item, king });
   }
   if (m === 'GET' && p === '/api/potion') {
     const u = await currentUser(req, env);
-    const rules = { on: RULES.potionOn, p1: RULES.potion1, p2: RULES.potion2, p3: RULES.potion3, again: RULES.potionAgain, max: RULES.potionDayMax };
+    const gp = gamePrices(await gameUnit(env)), rules = { on: RULES.potionOn, p1: gp.p1, p2: gp.p2, p3: gp.p3, again: gp.again, max: gp.pmax, avg: gp.avg };
     if (!u || !u.nick || u.banned) return json({ me: null, rules, season: seasonNow() });
     const today = (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'potion' AND day = ?").bind(u.id, rigaDay()).first()).n;
     const book = (await env.DB.prepare('SELECT combo, tier, n, created_at FROM potion_book WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results.map(r => { const s = comboSeason(r.combo); return { ...r, season: s, ix: COMBO_IX[s].get(r.combo) }; });
@@ -1095,8 +1119,8 @@ async function route(req, env, url) {
     let got = 0; const badges = [];
     if (pot.tier > 0) {
       const today = (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'potion' AND day = ?").bind(u.id, rigaDay()).first()).n;
-      const price = was ? RULES.potionAgain : [0, RULES.potion1, RULES.potion2, RULES.potion3][pot.tier];
-      const n = RULES.potionOn ? Math.max(0, Math.min(price, RULES.potionDayMax - today)) : 0;
+      const gp = gamePrices(await gameUnit(env)), price = was ? gp.again : [0, gp.p1, gp.p2, gp.p3][pot.tier];
+      const n = RULES.potionOn ? (gp.pmax > 0 ? Math.max(0, Math.min(price, gp.pmax - today)) : price) : 0;
       if (n > 0) got = await award(env, u.id, 'potion', combo + ':' + ((was ? was.n : 0) + 1), n);
       const kinds = (await env.DB.prepare('SELECT COUNT(*) AS n FROM potion_book WHERE user_id = ? AND tier > 0').bind(u.id).first()).n;
       for (const [k, ok] of [['pot1', kinds >= 1], ['pot2', kinds >= RULES.cond.potA], ['pot3', kinds >= RULES.cond.potB], ['potkid', pot.tier === 3]]) if (ok && await gameBadge(env, u, k)) badges.push(k);
@@ -1366,6 +1390,7 @@ async function route(req, env, url) {
       const pct = Math.max(1, Math.min(90, Math.round(Number(b.pct) || 10))), f = b.mode === 'up' ? 1 + pct / 100 : 1 - pct / 100;
       await env.DB.prepare('UPDATE shop SET price = MAX(5, CAST(ROUND(price * ? / 5.0) AS INTEGER) * 5) WHERE price > 0').bind(f).run();
     } else fail(400, 'bad');
+    await gameUnit(env, true); // цены поменялись — награды игр пересчитать сразу
     return json({ ok: true });
   }
   // пополнить сразу много вещей (категорию, тему, найденное): +add штук каждой; у вещей без цены — цена price
@@ -1707,7 +1732,7 @@ async function route(req, env, url) {
       const r = b.reset ? cleanRules(null) : cleanRules(b.rules);
       await setMeta(env, 'rules', JSON.stringify(r)); rulesAt = 0; await loadRules(env);
     }
-    return json({ rules: RULES, defaults: RULE_DEFAULTS, stock: STOCK, restockLast: parseJ(await getMeta(env, 'restock_last'), null), special: ADVENT_SPECIAL, goldPicks: GOLD_PICKS });
+    return json({ rules: RULES, defaults: RULE_DEFAULTS, stock: STOCK, gamePrices: gamePrices(await gameUnit(env)), restockLast: parseJ(await getMeta(env, 'restock_last'), null), special: ADVENT_SPECIAL, goldPicks: GOLD_PICKS });
   }
   // Алина помечает чужую работу как ИИ (ai = 2) или снимает пометку; бейдж «Бип-буп» за это не даётся
   if (m === 'POST' && p === '/api/admin/ai') {

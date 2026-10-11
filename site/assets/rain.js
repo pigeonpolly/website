@@ -13,6 +13,8 @@
       'Kustini putniņu ar pirkstu (vai bultiņām). Ķer krītošās pogas 🔘, zelta poga skaitās par trim. Izvairies no tintes traipiem: katrs atņem sirsniņu. Palaidīsi garām 5 pogas — arī mīnus sirsniņa.'],
     levels: ['Every 10 levels it gets noticeably harder, and each level pays more. There is no last level.', 'Каждые 10 уровней становится заметно сложнее, а за уровень дают больше пуговок. Последнего уровня нет.', 'Ik pēc 10 līmeņiem kļūst manāmi grūtāk, un par līmeni dod vairāk pogu. Pēdējā līmeņa nav.'],
     pay: [p => `Each level gives +${p} 🔘, from level 11 +${p * 2} 🔘, from 21 +${p * 3} 🔘 and so on. Every level pays once a day.`, p => `За каждый уровень +${p} 🔘, с 11-го +${p * 2} 🔘, с 21-го +${p * 3} 🔘 и так далее. Каждый уровень платит раз в день.`, p => `Par katru līmeni +${p} 🔘, no 11. +${p * 2} 🔘, no 21. +${p * 3} 🔘 un tā tālāk. Katrs līmenis maksā reizi dienā.`],
+    recRule: [n => `🏆 New personal record: +${n} 🔘 more for every level above your old one.`, n => `🏆 Новый личный рекорд: ещё +${n} 🔘 за каждый уровень выше прежнего.`, n => `🏆 Jauns personīgais rekords: vēl +${n} 🔘 par katru līmeni virs iepriekšējā.`],
+    index: ['Rewards grow together with the prices in the shop.', 'Награды растут вместе с ценами в магазине.', 'Balvas aug kopā ar cenām veikalā.'],
     cap: [m => `Up to ${m} 🔘 a day.`, m => `До ${m} 🔘 в день.`, m => `Līdz ${m} 🔘 dienā.`],
     today0: [n => `Today: +${n} 🔘`, n => `Сегодня: +${n} 🔘`, n => `Šodien: +${n} 🔘`],
     itemRule: [n => `Every ${n} levels a thing from the shop falls from the sky, one you don’t have yet 🎁`, n => `Каждые ${n} уровней с неба падает вещь из магазина, которой у тебя ещё нет 🎁`, n => `Ik pēc ${n} līmeņiem no debesīm nokrīt lieta no veikala, kuras tev vēl nav 🎁`],
@@ -140,6 +142,7 @@
       info.today = r.today; info.best = r.best;
       (r.badges || []).forEach((k, i) => setTimeout(() => window.PPToast && window.PPToast(t('badge', { rain1: ['Rain walker', 'Под дождём', 'Lietus gājējs'], rain2: ['Quick paws', 'Ловкие лапки', 'Veiklās ķepas'], rain3: ['Lord of the downpour', 'Повелитель ливня', 'Lietusgāzes valdnieks'] }[k][L])), 300 + i * 1600));
       if (r.got > 0) { runGot += r.got; pop(W / 2, 120, '+' + r.got + ' 🔘', '#6a3fb0'); }
+      if (r.rec > 0) { runGot += r.rec; pop(W / 2, 148, '🏆 +' + r.rec + ' 🔘', '#C8961E'); }
       if (r.item) { const B = window.PPBirds, nm = B && B.giftName ? B.giftName(r.item.kind, r.item.item, L) : r.item.item; runItems.push(nm); banner = { txt: t('gotItem', nm), t: 3, small: true }; }
       if (r.king) { runGot += r.king; setTimeout(() => window.PPToast && window.PPToast(t('kingGot', r.king)), 600); }
       else if (info.on && info.max > 0 && r.today >= r.max && !capShown) { capShown = true; banner = { txt: t('capHit', r.max), t: 2.4, small: true }; }
@@ -280,7 +283,7 @@
   function showOverlay() {
     ov.hidden = false;
     const payLine = info.on && info.per > 0 ? `<p class="rain-pay">${t('pay', info.per)}${info.max > 0 ? ' ' + t('cap', info.max) : ''}${info.me ? ` <b>${info.max > 0 ? t('today', info.today, info.max) : t('today0', info.today)}</b>` : ''}</p>` : `<p class="rain-pay">${t('payOff')}</p>`;
-    const extra = `${info.every > 0 ? `<p class="rain-pay">${t('itemRule', info.every)}</p>` : ''}${info.king > 0 ? `<p class="rain-pay">${t('kingRule', info.king)}</p>` : ''}`;
+    const extra = `${info.record > 0 && info.on ? `<p class="rain-pay">${t('recRule', info.record)}</p>` : ''}${info.avg ? `<p class="rain-pay">${t('index')}</p>` : ''}${info.every > 0 ? `<p class="rain-pay">${t('itemRule', info.every)}</p>` : ''}${info.king > 0 ? `<p class="rain-pay">${t('kingRule', info.king)}</p>` : ''}`;
     const guest = info.me ? '' : `<p class="rain-guest">${t('guest')} <button type="button" class="pill-btn rain-in">${t('signin')}</button></p>`;
     if (state === 'menu') ov.innerHTML = `<div class="rain-card"><h2>🔘 ${t('title')}</h2><p>${t('how')}</p>${info.best ? `<p class="rain-best">${t('best', info.best)}</p>` : ''}<button type="button" class="pill-btn pill-fill rain-go">${t('play')}</button>${guest}<div class="rain-rules"><p>${t('levels')}</p>${payLine}${extra}</div></div>`;
     else if (state === 'pause') ov.innerHTML = `<div class="rain-card"><h2>${t('paused')}</h2><button type="button" class="pill-btn pill-fill rain-go">${t('resume')}</button></div>`;

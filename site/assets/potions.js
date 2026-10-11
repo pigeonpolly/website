@@ -43,9 +43,9 @@
     bookEmpty: ['The recipe book is empty. Brew something!', 'Книга рецептов пока пустая. Свари что-нибудь!', 'Recepšu grāmata ir tukša. Izvāri kaut ko!'],
     found: [n => `Potions discovered: ${n}`, n => `Открыто зелий: ${n}`, n => `Atklātas dziras: ${n}`],
     fails: ['Did not work:', 'Не сработало:', 'Nenostrādāja:'],
-    pay: (r) => [`New potion: +${r.p1} 🔘 ordinary, +${r.p2} 🔘 tasty, +${r.p3} 🔘 taste of childhood. Brewing a known one again: +${r.again} 🔘. Up to ${r.max} 🔘 a day.`,
-      `Новое зелье: обычное +${r.p1} 🔘, вкусное +${r.p2} 🔘, вкус детства +${r.p3} 🔘. Повторное: +${r.again} 🔘. До ${r.max} 🔘 в день.`,
-      `Jauna dzira: parasta +${r.p1} 🔘, garšīga +${r.p2} 🔘, bērnības garša +${r.p3} 🔘. Atkārtota: +${r.again} 🔘. Līdz ${r.max} 🔘 dienā.`][L],
+    pay: (r) => [`New potion: +${r.p1} 🔘 ordinary, +${r.p2} 🔘 tasty, +${r.p3} 🔘 taste of childhood. Brewing a known one again: +${r.again} 🔘.${r.max ? ` Up to ${r.max} 🔘 a day.` : ''}`,
+      `Новое зелье: обычное +${r.p1} 🔘, вкусное +${r.p2} 🔘, вкус детства +${r.p3} 🔘. Повторное: +${r.again} 🔘.${r.max ? ` До ${r.max} 🔘 в день.` : ''}`,
+      `Jauna dzira: parasta +${r.p1} 🔘, garšīga +${r.p2} 🔘, bērnības garša +${r.p3} 🔘. Atkārtota: +${r.again} 🔘.${r.max ? ` Līdz ${r.max} 🔘 dienā.` : ''}`][L] + ' ' + ['Rewards grow together with the prices in the shop.', 'Награды растут вместе с ценами в магазине.', 'Balvas aug kopā ar cenām veikalā.'][L],
     today: [(n, m) => `Today: ${n} of ${m} 🔘`, (n, m) => `Сегодня: ${n} из ${m} 🔘`, (n, m) => `Šodien: ${n} no ${m} 🔘`],
     badge: [n => `🏅 New achievement: “${n}”`, n => `🏅 Новое достижение: «${n}»`, n => `🏅 Jauns sasniegums: “${n}”`],
     noMix: ['(seasons don’t mix in one cauldron)', '(сезоны в одном котле не смешиваются)', '(sezonas vienā katlā nejaucas)'],
@@ -396,7 +396,7 @@
       else {
         const pt = potion(r.ix, r.tier, r.season);
         html = `<div class="pot-res t${r.tier}"><p class="pot-res-h">${r.first ? t('newPot') : t('againPot')}</p><span class="pot-res-b"></span><h3>${esc(pt.name)}</h3><p class="pot-tier t${r.tier}">${T.tier[L][r.tier]}</p>
-          <p><b>${t('prop')}:</b> ${esc(pt.eff)}</p><p class="pot-rec">${ings.map(id => IG[id].e).join(' ')}</p>${r.item ? `<p class="pot-shelf">${t('shelf')}</p>` : ''}${r.got ? `<p class="pot-plus">${t('plus', r.got)}</p>` : S.rules.on && S.today >= S.rules.max ? `<p class="pot-cap">${t('cap')}</p>` : ''}<button type="button" class="pill-btn" data-a2="ok">${t('again')}</button></div>`;
+          <p><b>${t('prop')}:</b> ${esc(pt.eff)}</p><p class="pot-rec">${ings.map(id => IG[id].e).join(' ')}</p>${r.item ? `<p class="pot-shelf">${t('shelf')}</p>` : ''}${r.got ? `<p class="pot-plus">${t('plus', r.got)}</p>` : S.rules.on && S.rules.max > 0 && S.today >= S.rules.max ? `<p class="pot-cap">${t('cap')}</p>` : ''}<button type="button" class="pill-btn" data-a2="ok">${t('again')}</button></div>`;
       }
       drawPot(html);
       if (r.tier) { const slot = app.querySelector('.pot-res-b'); if (slot) slot.appendChild(bottle(r.ix, r.tier, 64, r.season)); }
