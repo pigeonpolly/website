@@ -401,7 +401,7 @@
   // цена от остатка — как effPrice в worker/index.js: ценность × (обычный запас / остаток)^0.4, от ×0.75 до ×2.5; «мало / обычно / много» — от числа птичек (STOCK на сервере)
   let PR = { birds: 0, low: 3, norm: 10, many: 25, lowLeg: 1, normLeg: 3, manyLeg: 7, priceMin: 0.75, priceMax: 2.5 }; // формула цены — из «📜 Правил» (приходит с admin/shop)
   const effPrice = (base, stock, leg) => base > 0 ? Math.max(5, Math.round(base * Math.max(PR.priceMin, Math.min(PR.priceMax, Math.pow((leg ? PR.normLeg : PR.norm) / Math.max(1, stock || 0), 0.4))) / 5) * 5) : 0;
-  let sFilter = 'all', sq = '', sStock = 'all', sSort = 'cat'; const sOpen = new Set(); // фильтр «Закончились / Скоро закончатся» — общий для таблицы остатков и списка вещей (sStock)
+  let sFilter = 'all', sq = '', sStock = 'all', sSort = 'cat', redrawT = 0; const sOpen = new Set(); // фильтр «Закончились / Скоро закончатся» — общий для таблицы остатков и списка вещей (sStock)
   async function shop() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('admin/shop'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
@@ -492,7 +492,7 @@
       const setStock = async (pairs, btn) => {
         const items = []; let what = [];
         for (const [k, n] of pairs) { const xs = (k === '*' ? all : all.filter(x => x.kind === k)).filter(x => only(x) && (sOnly !== 'all' || !(B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item)))); xs.forEach(x => items.push([x.kind, x.item, n])); what.push((k === '*' ? 'весь магазин' : (sum.find(r => r.k === k) || {}).name) + ' — по ' + n + ' шт. (' + xs.length + ')'); }
-        if (!items.length) return alert(pairs.length ? 'Здесь нечего менять: подходящих вещей нет.' : 'Впишите остаток хотя бы для одной категории.');
+        if (!items.length) return alert(pairs.length ? (sOnly === 'all' ? 'Здесь нечего менять: в категории только легендарные (их меняют по одной или с фильтром).' : 'Под этот фильтр («' + { empty: 'Закончились', low: 'Мало', many: 'Много' }[sOnly] + '») в категории сейчас нет вещей — возможно, вы их уже пополнили. Нажмите «Все», чтобы поставить остаток всей категории.') : 'Впишите остаток хотя бы для одной категории.');
         if (!confirm((sOnly === 'empty' ? 'Пополнить только ЗАКОНЧИВШИЕСЯ вещи:\n' : sOnly === 'low' ? 'Пополнить только вещи, которых МАЛО:\n' : sOnly === 'many' ? 'Поставить остаток только вещам, которых МНОГО:\n' : 'Поставить остаток ВСЕМ вещам:\n') + what.join('\n'))) return;
         if (btn) btn.disabled = true;
         try { const r = await api('admin/shop/restock', { items, set: true }); Object.keys(rows).forEach(k => delete rows[k]); r.items.forEach(x => { rows[x.kind + '|' + x.item] = x; }); draw(); }
@@ -515,9 +515,11 @@
         const tr = i.closest('[data-i]'), kind = tr.dataset.k, item = tr.dataset.i;
         const price = tr.querySelector('[data-f="price"]').value, stock = tr.querySelector('[data-f="stock"]').value;
         tr.classList.remove('saved');
-        try { const r = await api('admin/shop', { kind, item, price, stock }), cur = effPrice(r.price, r.stock, B.LEGEND && B.LEGEND.has(kind + '|' + item)); rows[kind + '|' + item] = { kind, item, base: r.price, price: cur, stock: r.stock }; tr.classList.add('saved'); tr.querySelector('.adm-shop-st').textContent = r.stock > 0 ? '🔘 ' + cur : '—'; }
+        try { const r = await api('admin/shop', { kind, item, price, stock }), cur = effPrice(r.price, r.stock, B.LEGEND && B.LEGEND.has(kind + '|' + item)); rows[kind + '|' + item] = { kind, item, base: r.price, price: cur, stock: r.stock }; tr.classList.add('saved'); tr.classList.toggle('off', tr.classList.contains('adm-sk-it') && !(r.stock > 0)); tr.querySelector('.adm-shop-st').textContent = r.stock > 0 ? '🔘 ' + cur : '—'; later(); }
         catch (e) { alert(err(e)); }
       });
+      // после правки одной вещи — пересчитать сводку и фильтры (когда курсор ушёл из полей остатка/ценности)
+      const later = () => { clearTimeout(redrawT); redrawT = setTimeout(() => { const a = document.activeElement; if (a && a.matches && a.matches('.adm-shop input, .adm-sk-it input')) return later(); if (main.querySelector('.adm-stockbox')) draw(); }, 900); };
     };
     draw();
   }
