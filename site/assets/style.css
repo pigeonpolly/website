@@ -3465,3 +3465,8 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .pot-back { font-weight: 700; }
 .pot-sure { font-weight: 800; color: #6a3fb0; }
 .pot-bar-b { border: 0; background: rgba(255,255,255,.1); color: inherit; font: inherit; padding: 3px 10px; border-radius: 999px; cursor: pointer; }
+/* блок «Палитра из вашего фото» — на белом фоне (12.10.2026) */
+.pal-mk { background: #FFFDF8; color: #2B1A51; border-color: transparent; box-shadow: 0 10px 30px rgba(10, 5, 30, .25); }
+.pal-mk h2, .pal-mk h3, .pal-mk p, .pal-mk label { color: #2B1A51; }
+.pal-mk .pill-btn:not(.pill-fill) { color: #2B1A51; border-color: #2B1A51; }
+.pal-mk-ad { border-color: #F0A987; }
