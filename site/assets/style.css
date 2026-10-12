@@ -3670,3 +3670,8 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .ch-car-card .pill-btn:not(.pill-fill) { color: #2B1A51; border-color: #CFC7E8; background: #fff; }
 .ch-car-card select { color: #2B1A51; background: #fff; }
 .rq-head .rq-pick { white-space: nowrap; }
+/* сохранение карточки на телефоне */
+.rq-save { position: fixed; inset: 0; z-index: 500; background: rgba(15, 8, 35, .75); display: grid; place-items: center; padding: 16px; }
+.rq-save-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: min(420px, 100%); }
+.rq-save-card img { max-width: 100%; max-height: 70vh; border-radius: 14px; box-shadow: 0 10px 30px rgba(0, 0, 0, .4); }
+.rq-save-x { position: absolute; top: -10px; right: -6px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: #fff; color: #2B1A51; cursor: pointer; }

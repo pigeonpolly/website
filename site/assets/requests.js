@@ -228,8 +228,24 @@
     g.textAlign = 'left';
     g.font = `400 ${34 * u}px Karla, system-ui, sans-serif`; g.fillStyle = '#7F81BF'; g.fillText(db, sx + 28 * u, sy + 44 * u);
     g.font = `700 ${34 * u}px Karla, system-ui, sans-serif`; g.fillStyle = '#2B1A51'; g.fillText(site, sx + 28 * u + dw, sy + 44 * u);
-    c.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `pigeonpolly-request-${r.id}.jpg`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); }, 'image/jpeg', .92);
+    c.toBlob(b => saveImg(b, `pigeonpolly-request-${r.id}.jpg`), 'image/jpeg', .92);
   }
 
+  // сохранить картинку: на телефоне — через «Поделиться» (там «Сохранить изображение» → в Фото); если браузер не дал открыть
+  // окно сразу (картинка готовилась дольше, чем живёт нажатие), — показываем её с кнопкой «📲 Сохранить» (новое нажатие); на компьютере — скачивание
+  const mobile = /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent);
+  function download(b, name) { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = name; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); }
+  async function saveImg(b, name) {
+    const f = new File([b], name, { type: 'image/jpeg' });
+    const can = mobile && navigator.canShare && navigator.canShare({ files: [f] });
+    if (!can) return download(b, name);
+    try { await navigator.share({ files: [f] }); return; } catch (e) { if (e && e.name === 'AbortError') return; }
+    const w = document.createElement('div'); w.className = 'rq-save';
+    w.innerHTML = `<div class="rq-save-card"><img alt=""><button type="button" class="pill-btn pill-fill">📲 ${['Save', 'Сохранить', 'Saglabāt'][L]}</button><button type="button" class="rq-save-x" aria-label="${esc(t('close'))}">✕</button></div>`;
+    const url = URL.createObjectURL(b); w.querySelector('img').src = url; document.body.appendChild(w);
+    const close = () => { w.remove(); URL.revokeObjectURL(url); };
+    w.querySelector('.rq-save-x').onclick = close; w.onclick = e => { if (e.target === w) close(); };
+    w.querySelector('.pill-fill').onclick = async () => { try { await navigator.share({ files: [f] }); close(); } catch (e) { if (e && e.name === 'AbortError') return; download(b, name); } };
+  }
   load().catch(() => { app.innerHTML = `<p class="rq-none">${T.err.x[L]}</p>`; });
 })();
