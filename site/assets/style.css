@@ -3470,3 +3470,9 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .pal-mk h2, .pal-mk h3, .pal-mk p, .pal-mk label { color: #2B1A51; }
 .pal-mk .pill-btn:not(.pill-fill) { color: #2B1A51; border-color: #2B1A51; }
 .pal-mk-ad { border-color: #F0A987; }
+
+/* главная: аккуратный разделитель между блогом и книгой — тонкие линии и звёздочка */
+.home-sep { display: flex; align-items: center; justify-content: center; gap: 18px; padding: 6px var(--gutter, 24px); background: linear-gradient(#FFFDF8, #FFFFFF); }
+.home-sep::before, .home-sep::after { content: ''; flex: 0 1 220px; height: 1px; background: linear-gradient(90deg, transparent, rgba(43, 26, 81, .32)); }
+.home-sep::after { background: linear-gradient(90deg, rgba(43, 26, 81, .32), transparent); }
+.home-sep svg { width: 18px; height: 18px; fill: #E9A93B; flex: none; }
