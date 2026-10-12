@@ -64,10 +64,12 @@
         ${shut ? `<p class="rq-closed">${t('closedMsg')}</p>` : `<form class="rq-form"><div class="rq-bar"><input type="text" name="text" maxlength="120" required autocomplete="off" placeholder="${esc(t('askP'))}" aria-label="${esc(t('ask'))}"><span class="rq-cnt"></span><button type="submit" class="rq-go" aria-label="${esc(t('send').replace('✏️ ', ''))}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 11.5 20.5 4l-7.5 17.5-2.2-7.8z" fill="currentColor"/></svg></button></div>
         <input type="text" name="website" class="rq-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
         <p class="rq-who">${esc(S.me ? '@' + S.me.nick : S.anon)} · ${S.me ? t('giftS') : `<button type="button" class="rq-in">${t('signin')}</button> ${t('giftA')}`}</p><p class="rq-st" role="status"></p></form>`}
-        ${S.admin ? `<p class="rq-pause">${S.closed ? `<span>${t('pausedAdm')}</span>` : ''}<button type="button" class="pill-btn rq-tog">${S.closed ? t('resume') : t('pause')}</button></p>` : ''}</section>
-      <div class="rq-tools"><input type="search" class="rq-search" placeholder="${esc(t('search'))}" value="${esc(Q)}" aria-label="${esc(t('search'))}"><select class="rq-sort" aria-label="${esc(t('sortL'))}">${[['queue', t('sQueue')], ['new', t('sNew')], ['top', t('sTop')]].map(([k, l]) => `<option value="${k}"${SORT === k ? ' selected' : ''}>${l}</option>`).join('')}</select>${S.admin && S.open.length ? `<button type="button" class="pill-btn pill-fill rq-pick">${t('pick')}</button>` : ''}</div>
+        ${S.admin && S.closed ? `<p class="rq-pause">${t('pausedAdm')}</p>` : ''}</section>
       <div class="rq-lists"></div>`;
-    const tog = app.querySelector('.rq-tog'); if (tog) tog.onclick = async () => {
+    // кнопки — в шапке справа от заголовка: пауза (админ), «Выбор Полли» (админ), порядок, поиск
+    const head = document.getElementById('rq-tools') || app.insertBefore(Object.assign(document.createElement('div'), { className: 'rq-tools' }), app.querySelector('.rq-lists'));
+    head.innerHTML = `${S.admin ? `<button type="button" class="rq-tog${S.closed ? ' on' : ''}" title="${esc(S.closed ? t('resume') : t('pause'))}" aria-label="${esc(S.closed ? t('resume') : t('pause'))}">${S.closed ? '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><path d="M7 4.5v15l13-7.5z" fill="currentColor"/></svg>' : '<svg viewBox="0 0 24 24" width="16" height="16" aria-hidden="true"><rect x="6" y="4.5" width="4" height="15" rx="1.2" fill="currentColor"/><rect x="14" y="4.5" width="4" height="15" rx="1.2" fill="currentColor"/></svg>'}</button>` : ''}${S.admin && S.open.length ? `<button type="button" class="pill-btn pill-fill rq-pick">${t('pick')}</button>` : ''}<select class="rq-sort" aria-label="${esc(t('sortL'))}">${[['queue', t('sQueue')], ['new', t('sNew')], ['top', t('sTop')]].map(([k, l]) => `<option value="${k}"${SORT === k ? ' selected' : ''}>${l}</option>`).join('')}</select><input type="search" class="rq-search" placeholder="${esc(t('search'))}" value="${esc(Q)}" aria-label="${esc(t('search'))}">`;
+    const tog = head.querySelector('.rq-tog'); if (tog) tog.onclick = async () => {
       tog.disabled = true; const r = await fetch('/api/admin/requests/closed', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ closed: !S.closed }) }).then(r => r.json()).catch(() => null);
       if (r && r.ok) S.closed = r.closed; draw();
     };
@@ -86,9 +88,9 @@
     };
     const si = app.querySelector('.rq-in'); if (si) si.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
     }
-    const sq = app.querySelector('.rq-search'); sq.oninput = () => { Q = sq.value; openN = 30; doneN = 24; lists(); };
-    const so = app.querySelector('.rq-sort'); so.onchange = () => { SORT = so.value; lists(); };
-    const pk = app.querySelector('.rq-pick'); if (pk) pk.onclick = pollyPick;
+    const sq = head.querySelector('.rq-search'); sq.oninput = () => { Q = sq.value; openN = 30; doneN = 24; lists(); };
+    const so = head.querySelector('.rq-sort'); so.onchange = () => { SORT = so.value; lists(); };
+    const pk = head.querySelector('.rq-pick'); if (pk) pk.onclick = pollyPick;
     lists();
   }
   function lists() {

@@ -3605,3 +3605,18 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .rq-hidden { opacity: .8; }
 .rq-hidden summary { cursor: pointer; font-weight: 700; color: #B9AED6; margin-bottom: 10px; }
 .rq-hidden .rq-back { padding: 4px 10px; font-size: .8rem; cursor: pointer; }
+/* /requests/: пауза, «Выбор Полли», порядок и поиск — в шапке справа от заголовка (12.10.2026) */
+.rq-page-head { max-width: none; }
+.rq-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px 24px; margin-bottom: 16px; }
+.rq-head h1 { margin: 0 !important; }
+.rq-head .rq-tools { flex-wrap: wrap; justify-content: flex-end; gap: 8px; }
+.rq-head .rq-search { flex: 0 1 260px; padding: 8px 14px; font-size: .92rem; }
+.rq-head .rq-sort { padding: 7px 10px; font-size: .92rem; }
+.rq-head .rq-pick { padding: 7px 14px; font-size: .92rem; }
+.rq-tog { width: 38px; height: 38px; border-radius: 50%; border: 2px solid rgba(255,255,255,.25); background: none; color: #fff; font-size: 14px; cursor: pointer; display: grid; place-items: center; padding: 0; }
+.rq-tog:hover { border-color: #F0A987; }
+.rq-tog.on { background: #F0A987; border-color: #F0A987; color: #2B1A51; }
+@media (max-width: 760px) { .rq-head .rq-tools { justify-content: flex-start; width: 100%; } .rq-head .rq-search { flex: 1 1 200px; } }
+.rq-head .rq-tools { flex: 1 1 520px; flex-wrap: nowrap; min-width: 0; }
+.rq-head .rq-search { min-width: 140px; }
+@media (max-width: 760px) { .rq-head .rq-tools { flex-wrap: wrap; } }
