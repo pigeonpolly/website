@@ -50,7 +50,7 @@ const TR_NOTE = {
   ru: (src, url) => `Перевод с ${{ en: 'английского', lv: 'латышского', ru: 'русского' }[src]} сделан с помощью онлайн-инструментов и может быть немного неточным. <a href="${url}">Оригинал</a>.`,
   lv: (src, url) => `Tulkots no ${{ en: 'angļu', ru: 'krievu', lv: 'latviešu' }[src]} valodas ar tiešsaistes rīkiem, tāpēc iespējamas nelielas neprecizitātes. <a href="${url}">Oriģināls</a>.`,
 };
-const birdName = (code, lang) => { const [i, n] = String(code || '0:10').split(':'); return `${BIRDS[lang][+i % 20]} ${n}`; };
+export const birdName = (code, lang) => { const [i, n] = String(code || '0:10').split(':'); return `${BIRDS[lang][+i % 20]} ${n}`; };
 
 const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 // текст на языке читателя, а если перевода нет — на любом заполненном
@@ -193,13 +193,13 @@ const slugify = s => String(s || '').toLowerCase()
 // ---------- анонимный посетитель: cookie pp_a (случайный id браузера) ----------
 const randomHex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, '0')).join('');
 async function sha(s) { const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s)); return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join(''); }
-function visitor(req, cookie) {
+export function visitor(req, cookie) {
   const v = cookie(req, 'pp_a');
   if (v && /^[0-9a-f]{32}$/.test(v)) return { id: v, set: null };
   const id = randomHex(16);
   return { id, set: `pp_a=${id}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${400 * 86400}` };
 }
-async function anonCode(id) { const h = await sha('bird:' + id); return `${parseInt(h.slice(0, 6), 16) % 20}:${10 + parseInt(h.slice(6, 12), 16) % 90}`; }
+export async function anonCode(id) { const h = await sha('bird:' + id); return `${parseInt(h.slice(0, 6), 16) % 20}:${10 + parseInt(h.slice(6, 12), 16) % 90}`; }
 // IP храним только как хеш с секретной солью (сам адрес не сохраняется)
 async function ipHash(req, h) {
   let salt = await h.getMeta('blog_salt');

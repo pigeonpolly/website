@@ -56,6 +56,8 @@ PAGES = [
      "The Pigeon Polly shop: hats, scarves, frames and treasures for your pixel bird, paid for with buttons you earn on the site."),
     ("bird", "Bird profile", "bird.html",
      "A bird of the Pigeon Polly flock: its room, bag of gifts, achievements and sketches from the Daily Challenge."),
+    ("requests", "Draw this for me", "requests.html",
+     "Draw this for me: suggest anything for Alina to draw, see every idea turned into a sketchbook drawing, and get a gift for your pixel bird when yours is drawn."),
     ("rain", "Button Rain", "rain.html",
      "Button Rain: a little Pigeon Polly game. Catch falling buttons with your pixel bird, dodge the ink blots and earn buttons for the shop. Endless levels."),
     ("potions", "Polly’s Potion Lab", "potions.html",
@@ -92,7 +94,7 @@ SOCIAL = [
 ]
 # Разделы: пункт меню ведёт на первую вкладку, внутри раздела — ряд вкладок (section_tabs)
 SECTIONS = {
-    "draw": [("challenge", "Daily Challenge"), ("palettes", "Palettes"), ("polly-helps", "Polly, help me draw"), ("e-books", "Books")],
+    "draw": [("challenge", "Daily Challenge"), ("requests", "Draw this for me"), ("palettes", "Palettes"), ("polly-helps", "Polly, help me draw"), ("e-books", "Books")],
     "sketchbook": [("art-portfolio", "All series"), ("art-portfolio/sketchbook", "Sketchbook Pages"), ("art-portfolio/anxiety", "Anxiety"),
                    ("art-portfolio/bird", "Pigeon Polly"), ("art-portfolio/snail", "Mr.Chew"), ("art-portfolio/detective", "Mr.Titos"), ("art-portfolio/halloween", "Pumpkin Family"),
                    ("art-portfolio/ai-art", "AI Art")],

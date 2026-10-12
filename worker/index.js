@@ -1,7 +1,7 @@
 // Сервер сайта: отдаёт статические файлы из site/ и обслуживает /api/* для «Стены рисунков»:
 // вход через Google, ник, загрузка работы дня, серии, стена, топ, модерация, GDPR (экспорт и удаление).
 // Данные — Cloudflare D1 (env.DB), картинки челленджа — R2 (env.MEDIA, папка challenge/), старые ещё и в KV (env.IMAGES), пока идёт перенос. Блог — worker/blog.js (картинки блога в R2, env.MEDIA).
-import { blogApi, blogPage } from './blog.js';
+import { blogApi, blogPage, visitor, anonCode, birdName } from './blog.js';
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
 const ADMIN_HASHES = ['80ac2786b60d61a30d6691a3d40de5d784cdefc580717add788821a7bf900118'];
@@ -279,6 +279,8 @@ async function ensureSchema(env) {
     // «Зельеварня Полли»: забег по лабиринту (какие ингредиенты в нём лежат) и книга рецептов птички (tier 0 — не сработало)
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS maze_runs (id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, level INTEGER NOT NULL, seed INTEGER NOT NULL, items TEXT, started INTEGER NOT NULL, done INTEGER DEFAULT 0)`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS potion_book (user_id INTEGER NOT NULL, combo TEXT NOT NULL, tier INTEGER NOT NULL, n INTEGER DEFAULT 1, created_at INTEGER, PRIMARY KEY (user_id, combo))`),
+    // «Нарисуй мне» (/requests/): темы от посетителей и ответы Алины (img — id картинки, как у работ челленджа: /api/img/…)
+    env.DB.prepare(`CREATE TABLE IF NOT EXISTS draw_requests (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, anon TEXT, text TEXT NOT NULL, lang TEXT, who TEXT, status TEXT DEFAULT 'open', img TEXT, gift TEXT, created_at INTEGER, answered_at INTEGER)`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS potion_gifts (id INTEGER PRIMARY KEY AUTOINCREMENT, to_id INTEGER NOT NULL, from_nick TEXT, ing TEXT NOT NULL, n INTEGER NOT NULL, created_at INTEGER, seen INTEGER DEFAULT 0)`),
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
@@ -287,7 +289,7 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
@@ -918,6 +920,25 @@ async function rainItem(env, req, uid, lv) {
   await env.DB.prepare('INSERT INTO gifts (user_id, kind, item, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(uid, pick.kind, pick.item, 'rain:' + lv, now()).run();
   return { kind: pick.kind, item: pick.item };
 }
+// подарок за нарисованную тему: вещь, которой у птички нет (не легендарная, не игровая), из самой дешёвой трети каталога;
+// раз в 20–30 нарисованных тем этой птички (users.req_mid) — из средней трети. Приходит неоткрытым подарком с note 'req:<id>'
+async function reqReward(env, req, uid, rid) {
+  const u = await env.DB.prepare('SELECT req_n, req_mid FROM users WHERE id = ? AND banned = 0').bind(uid).first();
+  if (!u) return null;
+  const n = (u.req_n || 0) + 1, need = u.req_mid || (20 + Math.floor(Math.random() * 11)), mid = n >= need;
+  const cat = await catalog(env, req), cp = cat.prices || {}, leg = new Set(cat.legend || []);
+  const all = Object.entries(cat.items || {}).flatMap(([k, vs]) => vs.map(v => [k, v])).filter(([k, v]) => k !== 'any' && v !== '?' && v !== 'legend' && !leg.has(k + '|' + v) && !LEGEND.has(k + '|' + v) && !gameOnly(k, v) && cp[k + '|' + v] > 0);
+  const vals = all.map(([k, v]) => cp[k + '|' + v]).sort((a, b) => a - b), t1 = vals[Math.floor(vals.length / 3)] || 0, t2 = vals[Math.floor(vals.length * 2 / 3)] || 0;
+  const have = new Set((await env.DB.prepare("SELECT kind, item FROM gifts WHERE user_id = ? AND status IN ('bag', 'new')").bind(uid).all()).results.map(r => r.kind + '|' + r.item));
+  const free = all.filter(([k, v]) => !have.has(k + '|' + v)), price = ([k, v]) => cp[k + '|' + v];
+  let pool = free.filter(x => mid ? price(x) > t1 && price(x) <= t2 : price(x) <= t1);
+  if (!pool.length) pool = free.slice().sort((a, b) => price(a) - price(b)).slice(0, 30); // всё дешёвое уже есть — самое дешёвое из оставшегося
+  await env.DB.prepare('UPDATE users SET req_n = ?, req_mid = ? WHERE id = ?').bind(mid ? 0 : n, mid ? 20 + Math.floor(Math.random() * 11) : need, uid).run();
+  if (!pool.length) return null;
+  const [kind, item] = pool[Math.floor(Math.random() * pool.length)];
+  await env.DB.prepare('INSERT INTO gifts (user_id, kind, item, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(uid, kind, item, 'req:' + rid, now()).run();
+  return { kind, item, mid };
+}
 // бейдж за игру: один раз, пуговки — как за обычный бейдж (RULES.badges). true — только что получен
 async function gameBadge(env, u, k) {
   if (String(u.badges || '').split(',').includes(k)) return false;
@@ -1223,6 +1244,55 @@ async function route(req, env, url) {
       await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, ?, 'bag', ?, ?)").bind(u.id, item.kind, item.item, 'potion:' + pot.season + ':' + pot.ix, now(), now()).run();
     }
     return json({ ok: true, combo, tier: pot.tier, ix: pot.ix, season: pot.season, first: !was, got, inv, badges, item, back, sure: !pot.tier && (u.pot_fails || 0) + 1 >= 2, pity });
+  }
+  // ---------- «Нарисуй мне» ----------
+  if (m === 'GET' && p === '/api/requests') {
+    const u = await currentUser(req, env), lang = ['en', 'ru', 'lv'].includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
+    const v = visitor(req, cookie), adm = u ? await isAdmin(u, env) : false;
+    const rows = (await env.DB.prepare(`SELECT r.id, r.text, r.anon, r.status, r.img, r.created_at, r.answered_at, r.user_id, u.nick FROM draw_requests r LEFT JOIN users u ON u.id = r.user_id
+      WHERE r.status IN ('open', 'done') ORDER BY COALESCE(r.answered_at, r.created_at) DESC LIMIT 400`).all()).results
+      .map(r => ({ id: r.id, text: r.text, status: r.status, img: r.img, at: r.answered_at || r.created_at, name: r.nick ? '@' + r.nick : birdName(r.anon, lang), named: !!r.nick, mine: !!(u && r.user_id === u.id) }));
+    const res = json({ open: rows.filter(r => r.status === 'open').sort((a, b) => a.at - b.at), done: rows.filter(r => r.status === 'done'), admin: adm,
+      me: u && u.nick && !u.banned ? { nick: u.nick } : null, anon: birdName(await anonCode(v.id), lang) });
+    if (v.set) res.headers.append('set-cookie', v.set);
+    return res;
+  }
+  if (m === 'POST' && p === '/api/requests') {
+    const u = await currentUser(req, env), v = visitor(req, cookie);
+    const b = await req.json().catch(() => ({}));
+    const text = String(b.text || '').replace(/\s+/g, ' ').trim().slice(0, 200);
+    if (text.length < 3) fail(400, 'short');
+    if (/https?:|www\.|\.(com|net|org|ru|lv|io)\b/i.test(text)) fail(400, 'link'); // без ссылок
+    const named = u && u.nick && !u.banned, who = named ? 'u' + u.id : 'v' + v.id;
+    const today = (await env.DB.prepare('SELECT COUNT(*) AS n FROM draw_requests WHERE who = ? AND created_at > ?').bind(who, now() - 86400).first()).n;
+    if (today >= 5) fail(429, 'many'); // не больше 5 тем в сутки от одного человека
+    const anon = named ? null : await anonCode(v.id), lang = ['en', 'ru', 'lv'].includes(b.lang) ? b.lang : 'en';
+    const r = await env.DB.prepare('INSERT INTO draw_requests (user_id, anon, text, lang, who, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(named ? u.id : null, anon, text, lang, who, now()).run();
+    const res = json({ ok: true, id: r.meta.last_row_id, name: named ? '@' + u.nick : birdName(anon, lang) });
+    if (v.set) res.headers.append('set-cookie', v.set);
+    return res;
+  }
+  // Алина загружает рисунок-ответ (полная + превью, как в челлендже); автору с ником — подарок
+  if (m === 'POST' && p === '/api/admin/requests/answer') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const f = await req.formData(), rid = Number(f.get('id')), full = f.get('full'), thumb = f.get('thumb');
+    const r = await env.DB.prepare('SELECT * FROM draw_requests WHERE id = ?').bind(rid).first();
+    if (!r) fail(404, 'req');
+    if (!full || !thumb || full.size > 6e6) fail(400, 'img');
+    const id = randomHex(12); await imgPut(env, id, await full.arrayBuffer(), await thumb.arrayBuffer());
+    const first = r.status !== 'done';
+    await env.DB.prepare("UPDATE draw_requests SET status = 'done', img = ?, answered_at = ? WHERE id = ?").bind(id, now(), rid).run();
+    const gift = first && r.user_id ? await reqReward(env, req, r.user_id, rid) : null;
+    if (gift) await env.DB.prepare('UPDATE draw_requests SET gift = ? WHERE id = ?').bind(gift.kind + '|' + gift.item, rid).run();
+    return json({ ok: true, img: id, gift });
+  }
+  if (m === 'POST' && p === '/api/admin/requests/hide') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({}));
+    await env.DB.prepare("UPDATE draw_requests SET status = 'hidden' WHERE id = ?").bind(Number(b.id)).run();
+    return json({ ok: true });
   }
   if (m === 'GET' && p === '/api/advent') {
     const t = adventNow(req, env), u = await currentUser(req, env), admin = await isAdmin(u, env);

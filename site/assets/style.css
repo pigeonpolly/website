@@ -3484,3 +3484,41 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .adm-car-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; }
 .adm-car-row img { width: 180px; height: 225px; flex: none; border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,.18); cursor: pointer; }
 .adm-car-out > .pill-btn { margin: 8px 0; }
+
+/* «Нарисуй мне» (requests.js) */
+.rq { display: flex; flex-direction: column; gap: 34px; padding: 0 var(--gutter, 16px) 50px; max-width: 1200px; margin: 0 auto; }
+.rq h2 { font: 600 clamp(24px, 3vw, 32px)/1.15 'Fraunces', serif; margin: 0 0 14px; }
+.rq-ask { background: #FFFDF8; color: #2B1A51; border-radius: 22px; padding: 22px 24px; box-shadow: 0 10px 30px rgba(10, 5, 30, .25); }
+.rq-form textarea { width: 100%; box-sizing: border-box; font: inherit; font-size: 1.05rem; padding: 14px 16px; border-radius: 14px; border: 2px solid #E3DAF0; resize: vertical; background: #fff; color: #2B1A51; }
+.rq-form textarea:focus { outline: none; border-color: #F0A987; }
+.rq-row { display: flex; flex-wrap: wrap; gap: 10px 16px; align-items: center; margin-top: 10px; }
+.rq-who { font-size: .9rem; color: #6a5a7a; }
+.rq-gift { margin: 10px 0 0; font-size: .92rem; color: #6a3fb0; }
+.rq-in { border: 0; background: none; color: #B5523E; font: inherit; font-weight: 700; text-decoration: underline; cursor: pointer; padding: 0; }
+.rq-st { margin: 8px 0 0; font-weight: 700; }
+.rq-st:empty { display: none; }
+.rq-list { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(240px, 1fr)); gap: 12px; }
+.rq-list li { display: flex; flex-direction: column; gap: 6px; padding: 14px 16px; border-radius: 16px; background: rgba(255, 255, 255, .08); border: 1px dashed rgba(255, 255, 255, .25); }
+.rq-list li.mine { border-color: #F0A987; }
+.rq-q { font: 500 1.05rem/1.35 'Fraunces', serif; }
+.rq-by { font-size: .85rem; opacity: .75; }
+.rq-adm { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 6px; }
+.rq-adm .pill-btn { padding: 5px 12px; font-size: .85rem; cursor: pointer; }
+.rq-upl.busy { opacity: .6; pointer-events: none; }
+.rq-none { opacity: .8; }
+.rq-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 18px; }
+.rq-grid figure { margin: 0; background: #FFFDF8; color: #2B1A51; border-radius: 18px; overflow: hidden; box-shadow: 0 6px 18px rgba(10, 5, 30, .25); display: flex; flex-direction: column; }
+.rq-pic { display: block; border: 0; padding: 0; background: #fff; cursor: zoom-in; overflow: hidden; aspect-ratio: 1; }
+.rq-pic img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .35s ease; }
+.rq-grid figure:hover .rq-pic img, .rq-pic:focus-visible img { transform: scale(1.06); }
+.rq-grid figure { transition: transform .25s ease, box-shadow .25s ease; }
+.rq-grid figure:hover { transform: translateY(-4px) rotate(-.4deg); box-shadow: 0 14px 30px rgba(10, 5, 30, .35); }
+.rq-grid figcaption { padding: 12px 14px 4px; display: flex; flex-direction: column; gap: 4px; }
+.rq-grid .rq-adm { padding: 0 14px 12px; }
+.rq-grid .rq-adm .pill-btn:not(.pill-fill) { color: #2B1A51; border-color: #2B1A51; }
+.rq-lb { position: fixed; inset: 0; z-index: 400; background: rgba(15, 8, 30, .92); display: flex; align-items: center; justify-content: center; padding: 20px; animation: modal-in .2s ease; }
+.rq-lb figure { margin: 0; max-width: min(1100px, 100%); max-height: 100%; display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.rq-lb img { max-width: 100%; max-height: calc(100vh - 160px); border-radius: 12px; box-shadow: 0 20px 60px rgba(0, 0, 0, .5); }
+.rq-lb figcaption { color: #fff; text-align: center; display: flex; flex-direction: column; gap: 4px; }
+.rq-lb-x, .rq-lb-p, .rq-lb-n { position: absolute; border: 0; background: rgba(255, 255, 255, .15); color: #fff; border-radius: 50%; width: 46px; height: 46px; font-size: 26px; cursor: pointer; }
+.rq-lb-x { top: 16px; right: 16px; font-size: 20px; } .rq-lb-p { left: 16px; top: 50%; } .rq-lb-n { right: 16px; top: 50%; }
