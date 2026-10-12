@@ -16,13 +16,68 @@
   const n = v => Number(v || 0).toLocaleString('ru-RU');
   const err = e => e.code === 401 || e.code === 'auth' || e.code === 'login' ? 'Войдите через Google (кнопка в шапке), чтобы открыть кабинет.' : e.code === 'admin' || e.code === 403 ? 'Этот кабинет только для админа.' : 'Не получилось загрузить: ' + esc(e.message);
 
-  const SECTIONS = { overview, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
+  const SECTIONS = { security, overview, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
   function route() {
     const sec = (location.hash || '#overview').slice(1);
     document.querySelectorAll('.adm-nav [data-sec]').forEach(a => a.setAttribute('aria-current', a.dataset.sec === sec ? 'page' : 'false'));
     (SECTIONS[sec] || overview)();
   }
   addEventListener('hashchange', route);
+
+  // ---------- 🔐 защита (12.10.2026): PIN админа и код восстановления ----------
+  // Не админ, но открыл кабинет — может ввести код восстановления (если потеряла доступ к старому Google).
+  function recoverForm() {
+    return `<section class="adm-box"><h2>🔑 Вход по коду восстановления</h2>
+      <p class="be-note">Если старый Google-аккаунт потерян или его забрали: войди на сайт любым другим аккаунтом Google и введи код с бумажки. Этот аккаунт станет админом, старый — перестанет.</p>
+      <form class="adm-sec-f" id="rc-f"><input type="text" autocomplete="off" placeholder="XXXXX-XXXXX-XXXXX-XXXXX" maxlength="40" required><button class="pill-btn pill-fill">Войти как админ</button></form><p class="be-note" id="rc-st" role="status"></p></section>`;
+  }
+  function wireRecover() {
+    const f = document.getElementById('rc-f'); if (!f) return;
+    f.onsubmit = async e => { e.preventDefault(); const st = document.getElementById('rc-st'); st.textContent = '…';
+      try { await api('recover', { code: f.querySelector('input').value }); st.textContent = '✓ Готово! Теперь ты админ. Задай новый PIN и новый код восстановления.'; setTimeout(() => { location.hash = '#security'; location.reload(); }, 1200); }
+      catch (x) { st.textContent = x.code === 'locked' ? 'Слишком много попыток — подожди час.' : x.code === 'login' ? 'Сначала войди через Google (кнопка в шапке).' : 'Код не подошёл.'; } };
+  }
+  function pinForm(note) {
+    return `<section class="adm-box"><h2>🔐 Введи PIN админа</h2><p class="be-note">${note || 'На этом устройстве админские права включатся после PIN — один раз.'}</p>
+      <form class="adm-sec-f" id="pin-f"><input type="password" inputmode="numeric" autocomplete="off" maxlength="12" required placeholder="PIN"><button class="pill-btn pill-fill">OK</button></form><p class="be-note" id="pin-st" role="status"></p></section>`;
+  }
+  function wirePin() {
+    const f = document.getElementById('pin-f'); if (!f) return;
+    f.onsubmit = async e => { e.preventDefault(); const st = document.getElementById('pin-st'); st.textContent = '…';
+      try { await api('admin/pin/verify', { pin: f.querySelector('input').value }); location.reload(); }
+      catch (x) { st.textContent = x.code === 'locked' ? 'Слишком много попыток — подожди час.' : 'Не тот PIN.'; f.querySelector('input').value = ''; } };
+  }
+  async function security() {
+    main.innerHTML = '<p class="be-note">Загрузка…</p>';
+    let s; try { s = await api('admin/sec'); } catch (e) { main.innerHTML = e.code === 'admin' || e.code === 403 ? recoverForm() : `<p class="be-note">${err(e)}</p>`; wireRecover(); return; }
+    if (s.pinSet && !s.pinOk) { main.innerHTML = pinForm(); wirePin(); return; }
+    main.innerHTML = `<section class="adm-box"><h2>🔐 PIN админа</h2>
+      <p class="be-note">${s.pinSet ? '✓ PIN задан. Даже если кто-то войдёт в твой Google, без PIN он будет обычной птичкой. На каждом новом устройстве PIN нужно ввести один раз.' : '⚠️ PIN не задан: сейчас админом становится любой, кто войдёт в твой Google.'}</p>
+      <form class="adm-sec-f" id="pin-set"><input type="password" inputmode="numeric" autocomplete="new-password" minlength="4" maxlength="12" pattern="\\d{4,12}" placeholder="${s.pinSet ? 'Новый PIN' : 'PIN: 4–12 цифр'}" required><input type="password" inputmode="numeric" autocomplete="new-password" maxlength="12" placeholder="Ещё раз" required><button class="pill-btn pill-fill">${s.pinSet ? 'Сменить PIN' : 'Задать PIN'}</button></form>
+      ${s.pinSet ? '<button type="button" class="pill-btn" id="pin-off">Убрать PIN</button>' : ''}<p class="be-note" id="pin-set-st" role="status"></p>
+      <p class="be-note">PIN не связан с Google — не используй тот же, что от телефона или банка. После 5 неверных попыток ввод закрывается на час.</p></section>
+      <section class="adm-box"><h2>🔑 Код восстановления</h2>
+      <p class="be-note">${s.recoverySet ? `✓ Код создан ${fmt(s.recoveryAt)}. Если потеряешь доступ к Google — войди другим аккаунтом Google, открой кабинет и введи этот код.` : '⚠️ Кода ещё нет. Если потеряешь доступ к Google, вернуть админку будет нечем.'}</p>
+      ${s.pinSet ? `<button type="button" class="pill-btn pill-fill" id="rc-new">${s.recoverySet ? 'Сделать новый код (старый перестанет работать)' : 'Создать код'}</button>` : '<p class="be-note">Сначала задай PIN — без него код мог бы перевыпустить тот, кто забрал Google.</p>'}
+      <div id="rc-out"></div></section>`;
+    const f = document.getElementById('pin-set'), st = document.getElementById('pin-set-st');
+    f.onsubmit = async e => { e.preventDefault(); const [a, b] = f.querySelectorAll('input');
+      if (!/^\d{4,12}$/.test(a.value)) { st.textContent = 'PIN — от 4 до 12 цифр.'; return; }
+      if (a.value !== b.value) { st.textContent = 'PIN не совпадает.'; return; }
+      try { await api('admin/pin/set', { pin: a.value }); security(); } catch (x) { st.textContent = 'Не получилось: ' + esc(x.code); } };
+    const off = document.getElementById('pin-off'); if (off) off.onclick = async () => { if (!confirm('Убрать PIN? Тогда админом снова станет любой, кто войдёт в твой Google.')) return; await api('admin/pin/set', { pin: '' }); security(); };
+    const nb = document.getElementById('rc-new'); if (nb) nb.onclick = async () => {
+      if (s.recoverySet && !confirm('Сделать новый код? Старый перестанет работать.')) return;
+      let d; try { d = await api('admin/recovery/new', {}); } catch (x) { alert('Не получилось: ' + x.code); return; }
+      const txt = `Pigeon Polly — код восстановления админки\n\n${d.code}\n\nКак использовать: войди на pigeonpolly.com любым аккаунтом Google, открой pigeonpolly.com/admin/#security и введи код.\nКод одноразовый. Создан: ${new Date().toLocaleString('ru-RU')}\n`;
+      document.getElementById('rc-out').innerHTML = `<div class="adm-rc"><p><b>Запиши этот код на бумагу и спрячь.</b> Сайт показывает его один раз и сам не хранит.</p><code>${esc(d.code)}</code>
+        <p><button type="button" class="pill-btn" id="rc-dl">⬇ Скачать .txt</button> <button type="button" class="pill-btn" id="rc-pr">🖨 Распечатать</button></p>
+        <p class="be-note">Не храни его в Google Диске или Gmail — если Google заберут, заберут и код.</p></div>`;
+      document.getElementById('rc-dl').onclick = () => { const a = document.createElement('a'); a.href = URL.createObjectURL(new Blob([txt], { type: 'text/plain' })); a.download = 'pigeonpolly-recovery-code.txt'; a.click(); };
+      document.getElementById('rc-pr').onclick = () => { const w = open('', '_blank'); if (!w) return; w.document.write(`<pre style="font:20px/1.5 monospace;padding:40px">${esc(txt)}</pre>`); w.document.close(); w.print(); };
+      nb.remove();
+    };
+  }
 
   // ---------- обзор ----------
   // «🤖 Автопилот»: что работает само; зелёное — всё хорошо, красное — нужно внимание
@@ -671,5 +726,10 @@
   }
   function backup() { main.innerHTML = backupBox(); wireBackup(); }
 
-  route();
+  // сначала проверка: не админ → «Этот кабинет только для админа» + вход по коду восстановления; админ без PIN на этом устройстве → PIN
+  (async () => {
+    try { const g = await api('admin/sec'); if (g.pinSet && !g.pinOk) { main.innerHTML = pinForm(); wirePin(); return; } }
+    catch (e) { if (e.code === 'admin' || e.code === 403) { main.innerHTML = `<p class="be-note">Этот кабинет только для админа.</p>${recoverForm()}`; wireRecover(); return; } }
+    route();
+  })();
 })();

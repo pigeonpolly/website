@@ -59,7 +59,25 @@
       if (d.user && !d.user.nick) askNick(d.user);
       if (d.user && d.user.earned) toast(t('daily')(d.user.earned));
       if (d.user && d.user.nick && d.user.salary && d.user.salary.length) salary(d.user);
+      if (d.user && d.user.pin) pinAsk();
     }).catch(() => {});
+  }
+  // защита админки: вход через Google — это ещё не админ; на этом устройстве нужно один раз ввести PIN
+  function pinAsk() {
+    try { if (sessionStorage.getItem('pp-pin-later')) return; } catch (e) {}
+    if (document.querySelector('.pp-pin')) return;
+    const box = document.createElement('form'); box.className = 'pp-pin';
+    box.innerHTML = `<b>🔐 PIN админа</b><input type="password" inputmode="numeric" autocomplete="off" maxlength="12" aria-label="PIN"><button type="submit" class="pill-btn pill-fill">OK</button><button type="button" class="pp-pin-x" aria-label="Позже">✕</button><span class="pp-pin-st" role="status"></span>`;
+    document.body.appendChild(box);
+    const inp = box.querySelector('input'), st = box.querySelector('.pp-pin-st');
+    box.querySelector('.pp-pin-x').onclick = () => { try { sessionStorage.setItem('pp-pin-later', '1'); } catch (e) {} box.remove(); };
+    box.onsubmit = async e => {
+      e.preventDefault(); st.textContent = '…';
+      const r = await fetch('/api/admin/pin/verify', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pin: inp.value }) }).catch(() => null);
+      const j = r ? await r.json().catch(() => ({})) : {};
+      if (r && r.ok) { st.textContent = '✓'; setTimeout(() => location.reload(), 400); return; }
+      st.textContent = j.error === 'locked' ? `Слишком много попыток — подожди ${j.minutes} мин.` : 'Не тот PIN'; inp.value = ''; inp.focus();
+    };
   }
   // открыть окно входа из любого места страницы (кнопка «Хочу свою птичку» в стае)
   function openSignIn() {

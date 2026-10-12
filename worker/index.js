@@ -292,7 +292,7 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
@@ -644,7 +644,7 @@ const sessionCookie = (token, maxAge) => `pp_s=${token}; Path=/; HttpOnly; Secur
 async function currentUser(req, env) {
   const token = cookie(req, 'pp_s');
   if (!token || !/^[0-9a-f]{64}$/.test(token)) return null;
-  const u = await env.DB.prepare(`SELECT u.* FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ? AND s.expires > ?`)
+  const u = await env.DB.prepare(`SELECT u.*, s.token AS _tok, s.pin_ok AS _pin_ok FROM sessions s JOIN users u ON u.id = s.user_id WHERE s.token = ? AND s.expires > ?`)
     .bind(token, now()).first();
   // «был недавно» для стаи на главной: обновляем не чаще раза в 10 минут
   if (u && (u.last_seen || 0) < now() - 600) await env.DB.prepare('UPDATE users SET last_seen = ? WHERE id = ?').bind(now(), u.id).run();
@@ -656,7 +656,40 @@ async function needUser(req, env) {
   if (u.banned) fail(403, 'banned');
   return u;
 }
-const isAdmin = async (u, env) => !!u && ((env.DEV_FAKE_LOGIN === '1' && u.sub === 'dev:admin') || (!!u.email && ADMIN_HASHES.includes(await sha256(u.email.toLowerCase()))));
+// ---------- защита админки (12.10.2026) ----------
+// Админ = почта из ADMIN_HASHES (если её не отключил код восстановления) или id из meta admin_ids (кто вошёл кодом восстановления).
+// Если задан PIN (meta admin_pin), админские права работают только в сессии, где PIN введён (sessions.pin_ok = 1).
+let SEC = { at: 0, pin: '', ids: [], emailOff: false };
+async function loadSec(env, force) {
+  if (!force && Date.now() - SEC.at < 15000) return SEC;
+  const [pin, ids, off] = await Promise.all(['admin_pin', 'admin_ids', 'admin_email_off'].map(k => getMeta(env, k).catch(() => null)));
+  SEC = { at: Date.now(), pin: pin || '', ids: parseJ(ids, []) || [], emailOff: off === '1' };
+  return SEC;
+}
+async function adminIdentity(u, env) { // «это Алина» — без учёта PIN
+  if (!u) return false;
+  if (env.DEV_FAKE_LOGIN === '1' && u.sub === 'dev:admin') return true;
+  const sec = await loadSec(env);
+  if (sec.ids.includes(u.id)) return true;
+  return !sec.emailOff && !!u.email && ADMIN_HASHES.includes(await sha256(u.email.toLowerCase()));
+}
+// для пользователя из сессии (есть _tok) нужен ещё введённый PIN; для чужих записей users — только «кто это»
+const isAdmin = async (u, env) => {
+  if (!(await adminIdentity(u, env))) return false;
+  if (u._tok === undefined) return true;
+  return !(await loadSec(env)).pin || u._pin_ok === 1;
+};
+// PIN хранится как PBKDF2 (соль + 150 000 итераций)
+async function pinHash(pin, salt) {
+  const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveBits']);
+  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: new TextEncoder().encode(salt), iterations: 150000 }, key, 256);
+  return [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2, '0')).join('');
+}
+// неудачные попытки (PIN, код восстановления): 5 подряд — замок на час
+async function secLocked(env, k) { const f = parseJ(await getMeta(env, k), null); return f && f.n >= 5 && Date.now() - f.at < 3600000 ? Math.ceil((3600000 - (Date.now() - f.at)) / 60000) : 0; }
+async function secFail(env, k) { const f = parseJ(await getMeta(env, k), null) || { n: 0, at: 0 }; const n = Date.now() - f.at > 3600000 ? 1 : f.n + 1; await setMeta(env, k, JSON.stringify({ n, at: Date.now() })); }
+const RC_ABC = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; // без похожих 0/O, 1/I
+const rcNorm = c => String(c || '').toUpperCase().replace(/[^A-Z0-9]/g, '');
 
 // ---------- Google ID token ----------
 let jwks = null, jwksAt = 0;
@@ -1563,12 +1596,72 @@ async function route(req, env, url) {
     return json({ birds: rows.map(r => ({ id: r.id, nick: r.nick })) });
   }
   // шапка сайта: кто вошёл (для кнопки входа и птички-аватара)
+  // ---------- PIN админа и код восстановления ----------
+  if (m === 'GET' && p === '/api/admin/sec') {
+    const u = await needUser(req, env), sec = await loadSec(env, true);
+    if (!(await adminIdentity(u, env))) fail(403, 'admin');
+    return json({ pinSet: !!sec.pin, pinOk: await isAdmin(u, env), recoverySet: !!(await getMeta(env, 'recovery_hash')), recoveryAt: Number(await getMeta(env, 'recovery_at')) || 0, locked: await secLocked(env, 'pin_fail') }, 200, { 'cache-control': 'no-store' });
+  }
+  if (m === 'POST' && p === '/api/admin/pin/verify') {
+    const u = await needUser(req, env), sec = await loadSec(env, true);
+    if (!(await adminIdentity(u, env))) fail(403, 'admin');
+    if (!sec.pin) return json({ ok: true });
+    const lock = await secLocked(env, 'pin_fail'); if (lock) return json({ error: 'locked', minutes: lock }, 429);
+    const b = await req.json().catch(() => ({})), [salt, hash] = sec.pin.split(':');
+    if (await pinHash(String(b.pin || ''), salt) !== hash) { await secFail(env, 'pin_fail'); fail(403, 'pin'); }
+    await setMeta(env, 'pin_fail', '');
+    await env.DB.prepare('UPDATE sessions SET pin_ok = 1 WHERE token = ?').bind(u._tok).run();
+    return json({ ok: true });
+  }
+  // задать / сменить / убрать PIN (только админ с уже введённым PIN); {pin: ''} — убрать
+  if (m === 'POST' && p === '/api/admin/pin/set') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({})), pin = String(b.pin || '');
+    if (pin && !/^\d{4,12}$/.test(pin)) fail(400, 'pin_format'); // 4–12 цифр
+    if (pin) { const salt = randomHex(16); await setMeta(env, 'admin_pin', salt + ':' + await pinHash(pin, salt)); } else await setMeta(env, 'admin_pin', '');
+    await env.DB.prepare('UPDATE sessions SET pin_ok = 0 WHERE user_id = ? AND token != ?').bind(u.id, u._tok).run(); // другие устройства — ввести PIN заново
+    await env.DB.prepare('UPDATE sessions SET pin_ok = 1 WHERE token = ?').bind(u._tok).run();
+    await loadSec(env, true);
+    return json({ ok: true, pinSet: !!pin });
+  }
+  // новый код восстановления: показывается один раз, на сайте — только его sha256; старый перестаёт работать
+  if (m === 'POST' && p === '/api/admin/recovery/new') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    if (!(await loadSec(env, true)).pin) fail(400, 'pin_first'); // без PIN код мог бы перевыпустить тот, кто забрал Google
+    const raw = [...crypto.getRandomValues(new Uint8Array(20))].map(x => RC_ABC[x % 32]).join(''); // 20 знаков × 5 бит = 100 бит
+    await setMeta(env, 'recovery_hash', await sha256('rc:' + raw)); await setMeta(env, 'recovery_at', String(now()));
+    return json({ code: raw.match(/.{5}/g).join('-') });
+  }
+  // вход по коду восстановления: любой вошедший через Google аккаунт становится админом, прежний — нет
+  if (m === 'POST' && p === '/api/recover') {
+    const u = await needUser(req, env);
+    const rk = 'rc_fail:' + u.id, lock = await secLocked(env, rk); if (lock) return json({ error: 'locked', minutes: lock }, 429);
+    const b = await req.json().catch(() => ({})), want = await getMeta(env, 'recovery_hash');
+    if (!want || await sha256('rc:' + rcNorm(b.code)) !== want) { await secFail(env, rk); fail(403, 'code'); }
+    await setMeta(env, rk, '');
+    const old = (await loadSec(env, true)).ids;
+    // прежние админы (по почте и по id) выходят отовсюду
+    const admins = (await env.DB.prepare('SELECT id, email FROM users WHERE email IS NOT NULL').all()).results;
+    const oldIds = [...old];
+    for (const a of admins) if (a.email && ADMIN_HASHES.includes(await sha256(a.email.toLowerCase()))) oldIds.push(a.id);
+    for (const id of oldIds.filter(id => id !== u.id)) await env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(id).run();
+    await setMeta(env, 'admin_ids', JSON.stringify([u.id]));
+    await setMeta(env, 'admin_email_off', '1');
+    await setMeta(env, 'admin_pin', ''); // PIN мог знать тот, кто забрал аккаунт, — задать новый
+    await setMeta(env, 'recovery_hash', ''); // код одноразовый
+    await setMeta(env, 'backup_token', randomHex(24)); // старый ключ автокопии больше не работает
+    await env.DB.prepare('UPDATE sessions SET pin_ok = 1 WHERE token = ?').bind(u._tok).run();
+    await loadSec(env, true);
+    return json({ ok: true });
+  }
   if (m === 'GET' && p === '/api/whoami') {
     const u = await currentUser(req, env);
     const earned = u && u.nick && !u.banned ? await award(env, u.id, 'daily', rigaDay(), BTN.daily) : 0; // +3 пуговки за первый заход за сутки (шапка спрашивает на каждой странице)
     // зарплата от «администрации Воббленда»: пуговки уже начислены, а конвертик ещё не открыт (seen = 0)
     const salary = u && u.nick && !u.banned ? (await env.DB.prepare("SELECT id, amount FROM button_log WHERE user_id = ? AND kind = 'salary' AND seen = 0").bind(u.id).all()).results : [];
-    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), avatar: avatarOf(u), buttons: (u.buttons || 0) + earned, earned, salary, friendBtns: BTN.friend } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
+    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), pin: !(await isAdmin(u, env)) && await adminIdentity(u, env) ? 1 : 0, avatar: avatarOf(u), buttons: (u.buttons || 0) + earned, earned, salary, friendBtns: BTN.friend } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
   }
   if (m === 'GET' && p === '/api/config') return json({ ready: true, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
 

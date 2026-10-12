@@ -911,7 +911,7 @@ async function fullBackup(env) {
     site_blocks: await all('SELECT * FROM site_blocks').catch(() => []), // правки блоков сайта из режима «Править страницу»
     art_added: await all('SELECT * FROM art_added').catch(() => []), // картины, добавленные в «Мой скетчбук»/«Палитры» с сайта (картинки — art/ в files)
     // челлендж: аккаунты (ник, e-mail, бейджи, серии) и работы на стене
-    challenge: { users: await all('SELECT id, sub, email, nick, consent, banned, created_at, best, badges, months, mcount, picks, last_seen, avatar FROM users'), gifts: await all('SELECT * FROM gifts').catch(() => []), works, meta: await all('SELECT * FROM meta WHERE key NOT IN (\'backup_token\', \'blog_salt\', \'gemini_key\', \'visit_salt\')') },
+    challenge: { users: await all('SELECT id, sub, email, nick, consent, banned, created_at, best, badges, months, mcount, picks, last_seen, avatar FROM users'), gifts: await all('SELECT * FROM gifts').catch(() => []), works, meta: await all('SELECT * FROM meta WHERE key NOT IN (\'backup_token\', \'blog_salt\', \'gemini_key\', \'visit_salt\', \'admin_pin\', \'recovery_hash\', \'pin_fail\') AND key NOT LIKE \'rc_fail:%\'') }, // секреты и защита админки в копию не попадают
     // все файлы, которые надо скачать вместе с копией
     files: [...media.map(k => ({ path: 'media/' + k, url: '/media/' + k })), ...works.map(w => ({ path: `challenge/works/${w.day}-${w.id}.jpg`, url: '/api/img/' + w.id }))],
   };
