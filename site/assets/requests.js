@@ -59,11 +59,12 @@
   async function translateRest() {
     if (trBusy) return; trBusy = true;
     try {
-      for (let round = 0; round < 20; round++) {
-        const j = await fetch(`/api/requests/tr?lang=${lang}`, { method: 'POST', credentials: 'same-origin' }).then(r => r.json()).catch(() => null);
+      for (let round = 0; round < 40; round++) {
+        const ids = [...app.querySelectorAll('[data-id]')].map(e => +e.dataset.id).filter(id => { const r = [...S.open, ...S.done].find(x => x.id === id); return r && !r.loc && !r.tried; }).slice(0, 30); // сначала то, что видно
+        const j = await fetch(`/api/requests/tr?lang=${lang}`, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ids }) }).then(r => r.json()).catch(() => null);
         if (!j || !j.tr) break;
         const by = new Map(j.tr.map(x => [x.id, x]));
-        for (const r of [...S.open, ...S.done, ...(S.hidden || [])]) { const x = by.get(r.id); if (x) { r.loc = x.loc; r.en = x.en; } }
+        for (const r of [...S.open, ...S.done, ...(S.hidden || [])]) { const x = by.get(r.id); if (x) { r.loc = x.loc; r.en = x.en || r.en; r.tried = true; } }
         if (j.tr.length && app.querySelector('.rq-lists')) lists();
         if (!j.left || j.failed || !j.tr.some(x => x.loc || x.en)) break;
       }

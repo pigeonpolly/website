@@ -945,12 +945,13 @@ async function reqFill(env, rows, to, ms) {
   const groups = {};
   for (const r of need.filter(r => !r[col])) (groups[guessLang(r.text)] ||= []).push(r);
   // пачки по PACK тем, по CONC запросов одновременно
-  const PACK = 30, CONC = 1;
+  const PACK = 10, CONC = 3;
+  const fastEnv = Object.assign(Object.create(env), { GEMINI_MODEL: env.GEMINI_FAST || 'gemini-flash-lite-latest' }); // короткие темы — самой быстрой моделью (остальные — запасные)
   const parts = Object.entries(groups).flatMap(([from, list]) => Array.from({ length: Math.ceil(list.length / PACK) }, (_, k) => [from, list.slice(k * PACK, k * PACK + PACK)]));
   for (let k = 0; k < parts.length && Date.now() < end - 1000; k += CONC) {
     await Promise.all(parts.slice(k, k + CONC).map(async ([from, part]) => {
       try {
-        const res = await Promise.race([translateAll(env, part.map(r => r.text), from, to), new Promise(res => setTimeout(() => res(null), Math.max(1000, end - Date.now())))]);
+        const res = await Promise.race([translateAll(fastEnv, part.map(r => r.text), from, to), new Promise(res => setTimeout(() => res(null), Math.max(1000, end - Date.now())))]);
         if (!res || !res.texts || res.texts.length !== part.length) { REQ_FAIL = Date.now(); return; }
         part.forEach((r, n) => { const x = String(res.texts[n] || '').trim().slice(0, 200); if (x) { r[col] = x; ups.push([x, r.id]); } });
       } catch (e) { REQ_FAIL = Date.now(); }
@@ -1313,18 +1314,21 @@ async function route(req, env, url) {
       const r = byId.get(l.rid); if (r && (r.status === 'done') === (l.kind === 'd')) { r.likes = l.n; r.liked = !!l.mine; }
     }
     const res = json({ open: rows.filter(r => r.status === 'open').sort((a, b) => a.at - b.at), done: rows.filter(r => r.status === 'done'), admin: adm,
-      untr: raw.filter(r => !r[REQ_COL[lang]] || !r.text_en).length, // сколько тем ещё без перевода — страница сразу попросит /api/requests/tr
+      untr: raw.filter(r => !r[REQ_COL[lang]]).length, // сколько тем ещё без перевода — страница сразу попросит /api/requests/tr
       hidden: adm ? rows.filter(r => r.status === 'hidden') : undefined, // скрытые темы видит только Алина — чтобы можно было вернуть
       me: u && u.nick && !u.banned ? { nick: u.nick } : null, anon: birdName(await anonCode(v.id), lang), closed: (await getMeta(env, 'req_closed')) === '1' });
     if (v.set) res.headers.append('set-cookie', v.set);
     return res;
   }
-  // перевести темы, у которых ещё нет перевода на язык страницы (и на английский — для карточек); страница зовёт сразу после загрузки
+  // перевести темы, у которых ещё нет перевода на язык страницы; страница зовёт сразу после загрузки
   if (m === 'POST' && p === '/api/requests/tr') {
     const lang = ['en', 'ru', 'lv'].includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en', col = REQ_COL[lang];
-    const raw = (await env.DB.prepare(`SELECT id, text, text_en, text_ru, text_lv FROM draw_requests WHERE status IN ('open', 'done', 'hidden') AND (${col} IS NULL OR text_en IS NULL) ORDER BY id DESC LIMIT 64`).all()).results;
-    await reqFill(env, raw, lang, 20000); if (lang !== 'en') await reqFill(env, raw, 'en', 8000);
-    const left = (await env.DB.prepare(`SELECT COUNT(*) AS n FROM draw_requests WHERE status IN ('open', 'done', 'hidden') AND (${col} IS NULL OR text_en IS NULL)`).first()).n;
+    // сначала — темы, которые сейчас видны на странице (ids), потом остальные; язык страницы и английский — параллельно
+    const b = await req.json().catch(() => ({})), want = new Set((Array.isArray(b.ids) ? b.ids : []).slice(0, 80).map(Number));
+    const all = (await env.DB.prepare(`SELECT id, text, text_en, text_ru, text_lv FROM draw_requests WHERE status IN ('open', 'done', 'hidden') AND ${col} IS NULL ORDER BY id DESC LIMIT 500`).all()).results;
+    const raw = [...all.filter(r => want.has(r.id)), ...all.filter(r => !want.has(r.id))].slice(0, want.size ? Math.min(30, want.size) : 30); // по 30 за запрос — ответ за ~1 с, страница просит следующую порцию сама
+    await reqFill(env, raw, lang, 8000); // английский для карточек дописывается при загрузке рисунка и cron'ом
+    const left = (await env.DB.prepare(`SELECT COUNT(*) AS n FROM draw_requests WHERE status IN ('open', 'done', 'hidden') AND ${col} IS NULL`).first()).n;
     return json({ tr: raw.map(r => ({ id: r.id, loc: r[col] && r[col] !== r.text ? r[col] : null, en: r.text_en && r.text_en !== r.text ? r.text_en : null })), left, failed: Date.now() - REQ_FAIL < 30000 });
   }
   if (m === 'POST' && p === '/api/requests') {
@@ -1351,7 +1355,7 @@ async function route(req, env, url) {
         .some(r => r.text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim() === key);
       if (dup) fail(409, 'dup'); // такая тема уже есть
     }
-    const anon = named ? null : await anonCode(v.id), lang = ['en', 'ru', 'lv'].includes(b.lang) ? b.lang : 'en', tr = await reqTranslate(env, text); // сразу на все языки сайта
+    const anon = named ? null : await anonCode(v.id), lang = ['en', 'ru', 'lv'].includes(b.lang) ? b.lang : 'en', tr = { en: null, ru: null, lv: null }; tr[guessLang(text)] = text; // переводы — сразу после, страница зовёт /api/requests/tr (не задерживаем отправку)
     const r = await env.DB.prepare('INSERT INTO draw_requests (user_id, anon, text, text_en, text_ru, text_lv, lang, who, ip, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(named ? u.id : null, anon, text, tr.en, tr.ru, tr.lv, lang, who, ip, now()).run();
     const res = json({ ok: true, id: r.meta.last_row_id, name: named ? '@' + u.nick : birdName(anon, lang) });
     if (v.set) res.headers.append('set-cookie', v.set);
