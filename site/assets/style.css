@@ -3580,3 +3580,20 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .fl-room-lb-in { position: relative; width: min(1000px, 100%); display: flex; flex-direction: column; align-items: center; gap: 12px; }
 .fl-room-live { width: 100%; }
 .fl-room-x { position: absolute; top: -8px; right: -8px; z-index: 3; width: 42px; height: 42px; border-radius: 50%; border: 0; background: #FFFDF8; color: #2B1A51; font-size: 18px; cursor: pointer; }
+/* «Нарисуй мне»: только аккуратная строка ввода как поиск Google, без подложки; отправка — стрелочка справа (12.10.2026) */
+.rq-ask { background: none; box-shadow: none; padding: 0; color: inherit; }
+.rq-ask h2 { text-align: center; }
+.rq-bar { display: flex; align-items: center; gap: 8px; max-width: 640px; margin: 0 auto; padding: 5px 5px 5px 20px; background: #fff; border: 1px solid #DFE1E5; border-radius: 999px; box-shadow: 0 1px 6px rgba(10, 5, 30, .2); transition: box-shadow .2s; }
+.rq-bar:hover, .rq-bar:focus-within { box-shadow: 0 3px 16px rgba(10, 5, 30, .4); }
+.rq-bar input { flex: 1; min-width: 0; border: 0; outline: none; background: transparent; font: inherit; font-size: 1rem; color: #2B1A51; padding: 9px 0; }
+.rq-bar .rq-cnt { position: static; transform: none; white-space: nowrap; }
+.rq-go { flex: none; display: grid; place-items: center; width: 40px; height: 40px; border: 0; border-radius: 50%; background: none; color: #B5523E; cursor: pointer; padding: 0; transition: background .15s; }
+.rq-go:hover { background: #FBEDE6; }
+.rq-go:disabled { opacity: .5; cursor: default; }
+.rq-ask .rq-who { text-align: center; margin: 8px auto 0; max-width: 640px; font-size: .8rem; color: #B9AED6; }
+.rq-ask .rq-in { color: #F0A987; }
+.rq-ask .rq-st { text-align: center; color: #F6E7FF; }
+.rq-hp { position: absolute !important; left: -9999px; width: 1px; height: 1px; opacity: 0; }
+.rq-closed { max-width: 640px; margin: 0 auto; text-align: center; color: #2B1A51; background: #F6F0FF; border-radius: 18px; padding: 14px 18px; }
+.rq-pause { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 12px; margin: 14px 0 0; font-size: .85rem; color: #F0A987; }
+@media (max-width: 520px) { .rq-bar { padding-left: 16px; } }

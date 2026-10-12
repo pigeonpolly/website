@@ -13,10 +13,17 @@
     as: [n => `You’ll appear as ${n}.`, n => `Ты будешь подписан(а) как ${n}.`, n => `Tu būsi parakstīts kā ${n}.`],
     gift: ['🎁 Sign in and get a gift for your pixel bird for every drawing of your idea.', '🎁 Войди — и за каждый рисунок по твоей теме твоя пиксельная птичка получит подарок.', '🎁 Ienāc — un par katru zīmējumu pēc tavas tēmas tavs pikseļu putniņš saņems dāvanu.'],
     giftIn: ['🎁 For every drawing of your idea your bird gets a gift.', '🎁 За каждый рисунок по твоей теме твоя птичка получит подарок.', '🎁 Par katru zīmējumu pēc tavas tēmas tavs putniņš saņems dāvanu.'],
+    giftS: ['🎁 a gift for your bird for every drawing', '🎁 подарок птичке за каждый рисунок', '🎁 dāvana putniņam par katru zīmējumu'],
+    giftA: ['for a 🎁 for your bird', '— и птичка получит 🎁', 'un putniņš saņems 🎁'],
     signin: ['Sign in', 'Войти', 'Ienākt'],
     thanks: ['Thank you! Your idea is in the queue ✨', 'Спасибо! Тема в очереди ✨', 'Paldies! Tēma ir rindā ✨'],
     err: { short: ['A few more words, please.', 'Напиши чуть подробнее.', 'Uzraksti mazliet vairāk.'], link: ['Please, no links.', 'Без ссылок, пожалуйста.', 'Bez saitēm, lūdzu.'],
-      many: ['That’s enough ideas for today: come back tomorrow!', 'На сегодня хватит идей — приходи завтра!', 'Šodienai idejām pietiek — nāc rīt!'], x: ['Something went wrong, try again.', 'Что-то пошло не так, попробуй ещё раз.', 'Kaut kas nogāja greizi, mēģini vēlreiz.'] },
+      many: ['That’s enough ideas for today: come back tomorrow!', 'На сегодня хватит идей — приходи завтра!', 'Šodienai idejām pietiek — nāc rīt!'],
+      wait: ['Just a moment before the next idea.', 'Подожди немного перед следующей темой.', 'Pagaidi mirkli pirms nākamās tēmas.'],
+      fast: ['Oops, too fast! Try again in a second.', 'Ой, слишком быстро! Попробуй ещё раз через секунду.', 'Ups, pārāk ātri! Mēģini pēc sekundes.'],
+      busy: ['So many ideas right now! Try again in an hour.', 'Сейчас очень много тем! Попробуй через час.', 'Šobrīd ļoti daudz tēmu! Mēģini pēc stundas.'],
+      dup: ['This idea is already in the list: give it a ♡ instead!', 'Такая тема уже есть в списке — поставь ей ♡!', 'Šī tēma jau ir sarakstā — iedod tai ♡!'],
+      closed: ['I’m not taking new ideas right now.', 'Сейчас я не принимаю новые темы.', 'Šobrīd jaunas tēmas nepieņemu.'], x: ['Something went wrong, try again.', 'Что-то пошло не так, попробуй ещё раз.', 'Kaut kas nogāja greizi, mēģini vēlreiz.'] },
     waiting: n => [`Waiting to be drawn (${n})`, `Ждут своей очереди (${n})`, `Gaida savu kārtu (${n})`][L],
     drawn: n => [`Drawn (${n})`, `Нарисовано (${n})`, `Uzzīmēts (${n})`][L],
     none: ['No ideas yet. Be the first!', 'Пока нет тем. Будь первым!', 'Vēl nav tēmu. Esi pirmais!'],
@@ -30,6 +37,9 @@
     sQueue: ['🕒 In order', '🕒 По очереди', '🕒 Pēc kārtas'], sNew: ['✨ Newest', '✨ Сначала новые', '✨ Jaunākās'], sTop: ['❤️ Most liked', '❤️ Больше лайков', '❤️ Populārākās'],
     search: ['🔍 Search by nickname or idea', '🔍 Поиск по нику или теме', '🔍 Meklēt pēc segvārda vai tēmas'], nothing: ['Nothing found.', 'Ничего не нашлось.', 'Nekas netika atrasts.'],
     moreOpen: n => [`Show all (+${n})`, `Показать все (+${n})`, `Rādīt visas (+${n})`][L], moreDone: n => [`Show ${n} more`, `Показать ещё ${n}`, `Rādīt vēl ${n}`][L],
+    closedMsg: ['🌙 I’m drawing the ideas I already have, so new ones are paused for now. Come back a bit later, and meanwhile ♡ the ideas you like!', '🌙 Сейчас я рисую уже предложенные темы, поэтому приём новых на паузе. Загляни чуть позже, а пока поставь ♡ темам, которые нравятся!', '🌙 Šobrīd zīmēju jau ieteiktās tēmas, tāpēc jaunu pieņemšana ir pauzē. Ieskaties vēlāk, un pa to laiku iedod ♡ tēmām, kas patīk!'],
+    pause: ['⏸ Stop taking ideas', '⏸ Временно не принимать темы', '⏸ Pagaidām nepieņemt tēmas'], resume: ['▶ Take ideas again', '▶ Снова принимать темы', '▶ Atkal pieņemt tēmas'],
+    pausedAdm: ['New ideas are paused: visitors see a note instead of the form.', 'Приём тем на паузе: посетители видят записку вместо поля.', 'Tēmu pieņemšana ir pauzē: apmeklētāji redz zīmīti formas vietā.'],
     pick: ['🐦 Polly’s pick', '🐦 Выбор Полли', '🐦 Pollijas izvēle'], pickH: ['Polly brought you this one:', 'Полли принесла тебе:', 'Pollija tev atnesa:'], again: ['🐦 Again', '🐦 Ещё раз', '🐦 Vēlreiz'],
   };
   const t = (k, ...a) => { const v = T[k]; const x = Array.isArray(v) ? v[L] : v; return typeof x === 'function' ? x(...a) : x; };
@@ -47,24 +57,33 @@
   const heart = r => `<button type="button" class="rq-like${r.liked ? ' on' : ''}" data-like="${r.id}" aria-pressed="${r.liked}" title="${esc(t('like'))}">${r.liked ? '♥' : '♡'}<b>${r.likes || ''}</b></button>`;
   const match = r => { const q = Q.trim().toLowerCase().replace(/^@/, ''); return !q || r.name.toLowerCase().replace(/^@/, '').includes(q) || r.text.toLowerCase().includes(q); };
   function draw() {
+    const shut = S.closed && !S.admin; // пауза: посетителям — записка вместо поля, Алине — поле и пометка
     app.innerHTML = `<section class="rq-ask"><h2>${t('ask')}</h2>
-        <form class="rq-form"><div class="rq-inp"><input type="text" name="text" maxlength="120" required autocomplete="off" placeholder="${esc(t('askP'))}"><span class="rq-cnt">0/120</span></div>
-        <div class="rq-row"><button type="submit" class="pill-btn pill-fill">${t('send')}</button><span class="rq-who">${esc(t('as', S.me ? '@' + S.me.nick : S.anon))}</span></div>
-        <p class="rq-gift">${S.me ? t('giftIn') : `${t('gift')} <button type="button" class="rq-in">${t('signin')}</button>`}</p><p class="rq-st" role="status"></p></form></section>
+        ${shut ? `<p class="rq-closed">${t('closedMsg')}</p>` : `<form class="rq-form"><div class="rq-bar"><input type="text" name="text" maxlength="120" required autocomplete="off" placeholder="${esc(t('askP'))}" aria-label="${esc(t('ask'))}"><span class="rq-cnt"></span><button type="submit" class="rq-go" aria-label="${esc(t('send').replace('✏️ ', ''))}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 11.5 20.5 4l-7.5 17.5-2.2-7.8z" fill="currentColor"/></svg></button></div>
+        <input type="text" name="website" class="rq-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
+        <p class="rq-who">${esc(S.me ? '@' + S.me.nick : S.anon)} · ${S.me ? t('giftS') : `<button type="button" class="rq-in">${t('signin')}</button> ${t('giftA')}`}</p><p class="rq-st" role="status"></p></form>`}
+        ${S.admin ? `<p class="rq-pause">${S.closed ? `<span>${t('pausedAdm')}</span>` : ''}<button type="button" class="pill-btn rq-tog">${S.closed ? t('resume') : t('pause')}</button></p>` : ''}</section>
       <div class="rq-tools"><input type="search" class="rq-search" placeholder="${esc(t('search'))}" value="${esc(Q)}" aria-label="${esc(t('search'))}"><select class="rq-sort" aria-label="${esc(t('sortL'))}">${[['queue', t('sQueue')], ['new', t('sNew')], ['top', t('sTop')]].map(([k, l]) => `<option value="${k}"${SORT === k ? ' selected' : ''}>${l}</option>`).join('')}</select>${S.admin && S.open.length ? `<button type="button" class="pill-btn pill-fill rq-pick">${t('pick')}</button>` : ''}</div>
       <div class="rq-lists"></div>`;
-    const f = app.querySelector('.rq-form'), st = app.querySelector('.rq-st'), cnt = app.querySelector('.rq-cnt');
-    f.text.oninput = () => { cnt.textContent = `${f.text.value.length}/120`; cnt.classList.toggle('near', f.text.value.length > 100); };
+    const tog = app.querySelector('.rq-tog'); if (tog) tog.onclick = async () => {
+      tog.disabled = true; const r = await fetch('/api/admin/requests/closed', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ closed: !S.closed }) }).then(r => r.json()).catch(() => null);
+      if (r && r.ok) S.closed = r.closed; draw();
+    };
+    const f = app.querySelector('.rq-form');
+    if (f) {
+    const st = app.querySelector('.rq-st'), cnt = app.querySelector('.rq-cnt'), t0 = Date.now();
+    f.text.oninput = () => { const n = f.text.value.length; cnt.textContent = n > 80 ? `${n}/120` : ''; cnt.classList.toggle('near', n > 100); };
     f.onsubmit = async e => {
       e.preventDefault(); const b = f.querySelector('button[type=submit]'); b.disabled = true;
       try {
-        const r = await fetch('/api/requests', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: f.text.value, lang }) });
+        const r = await fetch('/api/requests', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text: f.text.value, lang, hp: f.website.value, ms: Date.now() - t0 }) });
         const j = await r.json().catch(() => ({}));
-        if (!r.ok) { st.textContent = (T.err[j.error] || T.err.x)[L]; b.disabled = false; return; }
+        if (!r.ok) { st.textContent = (T.err[j.error] || T.err.x)[L]; b.disabled = false; if (j.error === 'closed') { S.closed = true; setTimeout(draw, 2500); } return; }
         await load(); const s2 = app.querySelector('.rq-st'); if (s2) s2.textContent = t('thanks');
       } catch (x) { st.textContent = T.err.x[L]; b.disabled = false; }
     };
     const si = app.querySelector('.rq-in'); if (si) si.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
+    }
     const sq = app.querySelector('.rq-search'); sq.oninput = () => { Q = sq.value; openN = 30; doneN = 24; lists(); };
     const so = app.querySelector('.rq-sort'); so.onchange = () => { SORT = so.value; lists(); };
     const pk = app.querySelector('.rq-pick'); if (pk) pk.onclick = pollyPick;

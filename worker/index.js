@@ -291,7 +291,7 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
@@ -1278,7 +1278,7 @@ async function route(req, env, url) {
       const r = byId.get(l.rid); if (r && (r.status === 'done') === (l.kind === 'd')) { r.likes = l.n; r.liked = !!l.mine; }
     }
     const res = json({ open: rows.filter(r => r.status === 'open').sort((a, b) => a.at - b.at), done: rows.filter(r => r.status === 'done'), admin: adm,
-      me: u && u.nick && !u.banned ? { nick: u.nick } : null, anon: birdName(await anonCode(v.id), lang) });
+      me: u && u.nick && !u.banned ? { nick: u.nick } : null, anon: birdName(await anonCode(v.id), lang), closed: (await getMeta(env, 'req_closed')) === '1' });
     if (v.set) res.headers.append('set-cookie', v.set);
     return res;
   }
@@ -1288,11 +1288,26 @@ async function route(req, env, url) {
     const text = String(b.text || '').replace(/\s+/g, ' ').trim().slice(0, 120); // тема — одна строка, до 120 символов
     if (text.length < 3) fail(400, 'short');
     if (/https?:|www\.|\.(com|net|org|ru|lv|io)\b/i.test(text)) fail(400, 'link'); // без ссылок
-    const named = u && u.nick && !u.banned, who = named ? 'u' + u.id : 'v' + v.id;
-    const today = (await env.DB.prepare('SELECT COUNT(*) AS n FROM draw_requests WHERE who = ? AND created_at > ?').bind(who, now() - 86400).first()).n;
-    if (today >= 5) fail(429, 'many'); // не больше 5 тем в сутки от одного человека
+    const named = u && u.nick && !u.banned, who = named ? 'u' + u.id : 'v' + v.id, adm = u ? await isAdmin(u, env) : false;
+    // защита от спама (12.10.2026): пауза приёма, «ловушка» для ботов, слишком быстрая отправка, лимиты на человека / IP / весь сайт, повторы
+    if (!adm && (await getMeta(env, 'req_closed')) === '1') fail(403, 'closed');
+    if (b.hp) return json({ ok: true, id: 0 }); // скрытое поле заполняют только боты — делаем вид, что всё хорошо
+    if (!adm && !(Number(b.ms) >= 2500)) fail(400, 'fast'); // человек не успеет открыть страницу и написать тему быстрее 2,5 с
+    let salt = await getMeta(env, 'blog_salt'); if (!salt) { salt = randomHex(16); await setMeta(env, 'blog_salt', salt); }
+    const ip = (await sha256(salt + (req.headers.get('cf-connecting-ip') || '0'))).slice(0, 24); // сам адрес не храним — только хеш с солью
+    if (!adm) {
+      const c = await env.DB.prepare('SELECT SUM(who = ? AND created_at > ?) AS me, SUM(who = ? AND created_at > ?) AS burst, SUM(ip = ? AND created_at > ?) AS ip, SUM(created_at > ?) AS hour FROM draw_requests')
+        .bind(who, now() - 86400, who, now() - 30, ip, now() - 86400, now() - 3600).first();
+      if ((c.burst || 0) > 0) fail(429, 'wait'); // не чаще раза в 30 секунд
+      if ((c.me || 0) >= 5 || (c.ip || 0) >= 10) fail(429, 'many'); // 5 тем в сутки от человека, 10 — с одного адреса (семья, кафе)
+      if ((c.hour || 0) >= 60) fail(429, 'busy'); // наплыв: больше 60 тем за час со всего сайта
+      const key = text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim();
+      const dup = (await env.DB.prepare("SELECT text FROM draw_requests WHERE status = 'open' OR created_at > ?").bind(now() - 30 * 86400).all()).results
+        .some(r => r.text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim() === key);
+      if (dup) fail(409, 'dup'); // такая тема уже есть
+    }
     const anon = named ? null : await anonCode(v.id), lang = ['en', 'ru', 'lv'].includes(b.lang) ? b.lang : 'en';
-    const r = await env.DB.prepare('INSERT INTO draw_requests (user_id, anon, text, text_en, lang, who, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(named ? u.id : null, anon, text, await reqEnglish(env, text), lang, who, now()).run();
+    const r = await env.DB.prepare('INSERT INTO draw_requests (user_id, anon, text, text_en, lang, who, ip, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(named ? u.id : null, anon, text, await reqEnglish(env, text), lang, who, ip, now()).run();
     const res = json({ ok: true, id: r.meta.last_row_id, name: named ? '@' + u.nick : birdName(anon, lang) });
     if (v.set) res.headers.append('set-cookie', v.set);
     return res;
@@ -1327,6 +1342,14 @@ async function route(req, env, url) {
     const gift = first && r.user_id ? await reqReward(env, req, r.user_id, rid) : null;
     if (gift) await env.DB.prepare('UPDATE draw_requests SET gift = ? WHERE id = ?').bind(gift.kind + '|' + gift.item, rid).run();
     return json({ ok: true, img: id, gift });
+  }
+  // пауза приёма тем: {closed: true|false}; темы и рисунки остаются видны, лайкать можно
+  if (m === 'POST' && p === '/api/admin/requests/closed') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({}));
+    await setMeta(env, 'req_closed', b.closed ? '1' : '0');
+    return json({ ok: true, closed: !!b.closed });
   }
   if (m === 'POST' && p === '/api/admin/requests/hide') {
     const u = await needUser(req, env);
