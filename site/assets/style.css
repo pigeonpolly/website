@@ -3597,3 +3597,7 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .rq-closed { max-width: 640px; margin: 0 auto; text-align: center; color: #2B1A51; background: #F6F0FF; border-radius: 18px; padding: 14px 18px; }
 .rq-pause { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px 12px; margin: 14px 0 0; font-size: .85rem; color: #F0A987; }
 @media (max-width: 520px) { .rq-bar { padding-left: 16px; } }
+/* темы-плашки: тема сверху, автор мелко отдельной строкой под ней — чтобы ник не читался как часть темы (12.10.2026) */
+.rq-list li { align-items: center !important; gap: 10px !important; padding: 7px 10px 7px 14px !important; border-radius: 16px !important; }
+.rq-txt { display: flex; flex-direction: column; min-width: 0; line-height: 1.2; }
+.rq-list .rq-by { font-size: .72rem; opacity: .55; margin-top: 2px; }
