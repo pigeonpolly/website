@@ -3620,3 +3620,8 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .rq-head .rq-tools { flex: 1 1 520px; flex-wrap: nowrap; min-width: 0; }
 .rq-head .rq-search { min-width: 140px; }
 @media (max-width: 760px) { .rq-head .rq-tools { flex-wrap: wrap; } }
+/* /requests/: между темами и рисунками — тонкая линия со звёздочкой вместо заголовка (12.10.2026) */
+.rq-sep { display: flex; align-items: center; gap: 14px; color: #F0A987; font-size: 13px; margin: -6px 0; }
+.rq-sep::before, .rq-sep::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .28)); }
+.rq-sep::after { background: linear-gradient(90deg, rgba(255, 255, 255, .28), transparent); }
+.rq-count { display: inline-flex; gap: 12px; font-size: .9rem; color: #D9CFF0; white-space: nowrap; margin-right: 4px; cursor: default; }
