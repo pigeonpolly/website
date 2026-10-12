@@ -3625,3 +3625,16 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .rq-sep::before, .rq-sep::after { content: ''; flex: 1; height: 1px; background: linear-gradient(90deg, transparent, rgba(255, 255, 255, .28)); }
 .rq-sep::after { background: linear-gradient(90deg, rgba(255, 255, 255, .28), transparent); }
 .rq-count { display: inline-flex; gap: 12px; font-size: .9rem; color: #D9CFF0; white-space: nowrap; margin-right: 4px; cursor: default; }
+/* шапка ужимается, только если не влезает (класс ставит site.js) */
+.site-header.c1 .brand em { display: none; }
+.site-header.c2 { gap: 6px; }
+.site-header.c2 .brand { font-size: 16px; gap: 6px; }
+.site-header.c2 .lang-switch { margin-right: 0; }
+.site-header.c2 .lang-switch a { padding: 6px 5px; }
+.site-header.c2 .search-btn + .lang-switch { margin-left: 2px; }
+.site-header.c3 .search-btn { width: 34px; height: 34px; }
+.site-header.c3 .menu-toggle { width: 38px; height: 38px; padding: 9px 8px; }
+.site-header.c3 .acct > * { transform: scale(.88); transform-origin: center; }
+.site-header.c3 .lang-switch a { padding: 5px 4px; font-size: 11.5px; }
+.site-header.c3 .brand { font-size: 15px; }
+.site-header.c4 .brand > span { display: none; }

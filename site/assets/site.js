@@ -186,3 +186,26 @@
     if (!(navigator.sendBeacon && navigator.sendBeacon('/api/hit', new Blob([body], { type: 'application/json' })))) fetch('/api/hit', { method: 'POST', body, keepalive: true, headers: { 'content-type': 'application/json' } }).catch(() => {});
   } catch (e) { /* статистика не должна ломать сайт */ }
 })();
+
+// шапка всегда влезает в экран (12.10.2026): ширина телефонов, размер шрифта в браузере, кнопка аккаунта — у всех разные,
+// поэтому не угадываем по ширине экрана, а проверяем: не влезает — ужимаем по шагам (c1 — без «Art Lab», c2 — плотнее, c3 — кнопки меньше, c4 — только звёздочка)
+(() => {
+  const h = document.querySelector('.site-header');
+  if (!h) return;
+  const over = () => {
+    let m = 0; const pad = parseFloat(getComputedStyle(h).paddingRight) || 0;
+    for (const c of h.children) { const st = getComputedStyle(c); if (st.position === 'fixed' || st.position === 'absolute' || st.display === 'none') continue; const r = c.getBoundingClientRect(); if (r.width) m = Math.max(m, r.right); } // меню-панель (fixed) не считаем
+    return m > h.clientWidth - pad + 1;
+  };
+  let busy = false;
+  const fit = () => {
+    if (busy) return; busy = true;
+    h.classList.remove('c1', 'c2', 'c3', 'c4');
+    for (const c of ['c1', 'c2', 'c3', 'c4']) { if (!over()) break; h.classList.add(c); }
+    busy = false;
+  };
+  fit();
+  addEventListener('resize', fit);
+  if (window.ResizeObserver) { const ro = new ResizeObserver(() => requestAnimationFrame(fit)); for (const c of h.children) ro.observe(c); new MutationObserver(() => { for (const c of h.children) ro.observe(c); fit(); }).observe(h, { childList: true }); }
+  if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
+})();
