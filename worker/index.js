@@ -935,13 +935,33 @@ async function reqTranslate(env, text, have = {}) {
   }));
   return out;
 }
-// раз в час: темам без перевода на какой-то язык — перевести (до 30 тем за раз)
-async function reqBackfill(env) {
-  const rows = (await env.DB.prepare("SELECT id, text, text_en, text_ru, text_lv FROM draw_requests WHERE status IN ('open', 'done') AND (text_en IS NULL OR text_ru IS NULL OR text_lv IS NULL) ORDER BY id DESC LIMIT 30").all()).results;
-  for (const r of rows) {
-    const t = await reqTranslate(env, r.text, { en: r.text_en, ru: r.text_ru, lv: r.text_lv });
-    await env.DB.prepare('UPDATE draw_requests SET text_en = ?, text_ru = ?, text_lv = ? WHERE id = ?').bind(t.en, t.ru, t.lv, r.id).run();
+// темам без перевода на язык `to` — перевести пачками (одним запросом на 25 тем одного языка), пока не кончится время `ms`;
+// строки rows ({id, text, text_en, text_ru, text_lv}) дополняются на месте, в базу пишется сразу
+let REQ_FAIL = 0; // когда переводчик последний раз не ответил
+async function reqFill(env, rows, to, ms) {
+  const col = REQ_COL[to], end = Date.now() + ms, ups = [];
+  const need = rows.filter(r => !r[col]);
+  for (const r of need.filter(r => guessLang(r.text) === to)) { r[col] = r.text; ups.push([r.text, r.id]); } // уже на этом языке
+  const groups = {};
+  for (const r of need.filter(r => !r[col])) (groups[guessLang(r.text)] ||= []).push(r);
+  // пачки по PACK тем, по CONC запросов одновременно
+  const PACK = 30, CONC = 1;
+  const parts = Object.entries(groups).flatMap(([from, list]) => Array.from({ length: Math.ceil(list.length / PACK) }, (_, k) => [from, list.slice(k * PACK, k * PACK + PACK)]));
+  for (let k = 0; k < parts.length && Date.now() < end - 1000; k += CONC) {
+    await Promise.all(parts.slice(k, k + CONC).map(async ([from, part]) => {
+      try {
+        const res = await Promise.race([translateAll(env, part.map(r => r.text), from, to), new Promise(res => setTimeout(() => res(null), Math.max(1000, end - Date.now())))]);
+        if (!res || !res.texts || res.texts.length !== part.length) { REQ_FAIL = Date.now(); return; }
+        part.forEach((r, n) => { const x = String(res.texts[n] || '').trim().slice(0, 200); if (x) { r[col] = x; ups.push([x, r.id]); } });
+      } catch (e) { REQ_FAIL = Date.now(); }
+    }));
   }
+  if (ups.length) await env.DB.batch(ups.map(([x, id]) => env.DB.prepare(`UPDATE draw_requests SET ${col} = ? WHERE id = ?`).bind(x, id))).catch(e => console.error('req fill', e));
+}
+// раз в час (подстраховка): всё, что ещё не переведено, на все языки сайта
+async function reqBackfill(env) {
+  const rows = (await env.DB.prepare("SELECT id, text, text_en, text_ru, text_lv FROM draw_requests WHERE status IN ('open', 'done', 'hidden') AND (text_en IS NULL OR text_ru IS NULL OR text_lv IS NULL) ORDER BY id DESC LIMIT 500").all()).results;
+  for (const l of ['en', 'ru', 'lv']) await reqFill(env, rows, l, 20000);
 }
 // подарок за нарисованную тему: вещь, которой у птички нет (не легендарная, не игровая), из самой дешёвой трети каталога;
 // раз в 20–30 нарисованных тем этой птички (users.req_mid) — из средней трети. Приходит неоткрытым подарком с note 'req:<id>'
@@ -1283,8 +1303,9 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/requests') {
     const u = await currentUser(req, env), lang = ['en', 'ru', 'lv'].includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
     const v = visitor(req, cookie), adm = u ? await isAdmin(u, env) : false;
-    const rows = (await env.DB.prepare(`SELECT r.id, r.text, r.text_en, r.text_ru, r.text_lv, r.anon, r.status, r.img, r.created_at, r.answered_at, r.user_id, u.nick FROM draw_requests r LEFT JOIN users u ON u.id = r.user_id
-      WHERE r.status IN ('open', 'done'${adm ? ", 'hidden'" : ''}) ORDER BY COALESCE(r.answered_at, r.created_at) DESC LIMIT 5000`).all()).results
+    const raw = (await env.DB.prepare(`SELECT r.id, r.text, r.text_en, r.text_ru, r.text_lv, r.anon, r.status, r.img, r.created_at, r.answered_at, r.user_id, u.nick FROM draw_requests r LEFT JOIN users u ON u.id = r.user_id
+      WHERE r.status IN ('open', 'done'${adm ? ", 'hidden'" : ''}) ORDER BY COALESCE(r.answered_at, r.created_at) DESC LIMIT 5000`).all()).results;
+    const rows = raw
       .map(r => ({ id: r.id, text: r.text, en: r.text_en && r.text_en !== r.text ? r.text_en : null, loc: (x => x && x !== r.text ? x : null)(r[REQ_COL[lang]]), status: r.status, img: r.img, at: r.answered_at || r.created_at, name: r.nick ? '@' + r.nick : birdName(r.anon, lang), named: !!r.nick, mine: !!(u && r.user_id === u.id), likes: 0, liked: false }));
     // лайки: у темы — 't', у нарисованного — 'd'
     const me = u && u.nick && !u.banned ? 'u' + u.id : 'v' + v.id, byId = new Map(rows.map(r => [r.id, r]));
@@ -1292,10 +1313,19 @@ async function route(req, env, url) {
       const r = byId.get(l.rid); if (r && (r.status === 'done') === (l.kind === 'd')) { r.likes = l.n; r.liked = !!l.mine; }
     }
     const res = json({ open: rows.filter(r => r.status === 'open').sort((a, b) => a.at - b.at), done: rows.filter(r => r.status === 'done'), admin: adm,
+      untr: raw.filter(r => !r[REQ_COL[lang]] || !r.text_en).length, // сколько тем ещё без перевода — страница сразу попросит /api/requests/tr
       hidden: adm ? rows.filter(r => r.status === 'hidden') : undefined, // скрытые темы видит только Алина — чтобы можно было вернуть
       me: u && u.nick && !u.banned ? { nick: u.nick } : null, anon: birdName(await anonCode(v.id), lang), closed: (await getMeta(env, 'req_closed')) === '1' });
     if (v.set) res.headers.append('set-cookie', v.set);
     return res;
+  }
+  // перевести темы, у которых ещё нет перевода на язык страницы (и на английский — для карточек); страница зовёт сразу после загрузки
+  if (m === 'POST' && p === '/api/requests/tr') {
+    const lang = ['en', 'ru', 'lv'].includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en', col = REQ_COL[lang];
+    const raw = (await env.DB.prepare(`SELECT id, text, text_en, text_ru, text_lv FROM draw_requests WHERE status IN ('open', 'done', 'hidden') AND (${col} IS NULL OR text_en IS NULL) ORDER BY id DESC LIMIT 64`).all()).results;
+    await reqFill(env, raw, lang, 20000); if (lang !== 'en') await reqFill(env, raw, 'en', 8000);
+    const left = (await env.DB.prepare(`SELECT COUNT(*) AS n FROM draw_requests WHERE status IN ('open', 'done', 'hidden') AND (${col} IS NULL OR text_en IS NULL)`).first()).n;
+    return json({ tr: raw.map(r => ({ id: r.id, loc: r[col] && r[col] !== r.text ? r[col] : null, en: r.text_en && r.text_en !== r.text ? r.text_en : null })), left, failed: Date.now() - REQ_FAIL < 30000 });
   }
   if (m === 'POST' && p === '/api/requests') {
     const u = await currentUser(req, env), v = visitor(req, cookie);

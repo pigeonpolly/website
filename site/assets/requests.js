@@ -52,6 +52,22 @@
   async function load() {
     S = await fetch(`/api/requests?lang=${lang}`, { credentials: 'same-origin' }).then(r => r.json());
     draw();
+    if (S.untr) translateRest();
+  }
+  // темы без перевода: страница показывает оригинал и сразу просит сервер перевести; переводы подставляются на месте
+  let trBusy = false;
+  async function translateRest() {
+    if (trBusy) return; trBusy = true;
+    try {
+      for (let round = 0; round < 20; round++) {
+        const j = await fetch(`/api/requests/tr?lang=${lang}`, { method: 'POST', credentials: 'same-origin' }).then(r => r.json()).catch(() => null);
+        if (!j || !j.tr) break;
+        const by = new Map(j.tr.map(x => [x.id, x]));
+        for (const r of [...S.open, ...S.done, ...(S.hidden || [])]) { const x = by.get(r.id); if (x) { r.loc = x.loc; r.en = x.en; } }
+        if (j.tr.length && app.querySelector('.rq-lists')) lists();
+        if (!j.left || j.failed || !j.tr.some(x => x.loc || x.en)) break;
+      }
+    } finally { trBusy = false; }
   }
   // поиск (по нику и по тексту темы — сразу в обоих списках) и показ частями: тем — 30, рисунков — 24, дальше «Показать ещё»
   let HID = false; // открыт ли список скрытых (только у Алины)
