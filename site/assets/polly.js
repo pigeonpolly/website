@@ -320,34 +320,15 @@
   const goFloor = () => { spot = 'floor'; perch = null; return flyTo(Math.max(10, Math.min(innerWidth - W - 10, x)), floorY()); };
 
   const DEBUG = location.search.includes('pollydebug');
+  // 12.10.2026 (Алина: «чтобы птичка не прыгала по экрану, а сидела слева внизу»): Полли всегда сидит в левом нижнем углу
+  // и только клюёт, оглядывается и иногда засыпает; никуда не летает и не ходит
+  const HOME_X = 16;
   async function act() {
-    const my = token;
+    if (x !== HOME_X || spot !== 'floor') { spot = 'floor'; perch = null; x = HOME_X; y = floorY(); place(); }
     const roll = Math.random();
-    if (DEBUG) console.log('polly act', roll.toFixed(2), spot);
-    if (spot === 'button' && perch) {
-      const r = perch.getBoundingClientRect();
-      if (r.top < header.getBoundingClientRect().bottom || r.bottom > innerHeight) return goFloor();
-    }
-    if (groundSeen() && props.length && (spot === 'floor' || spot === 'footer') && Math.random() < 0.6 && await seasonal()) return;
-    if (spot === 'footer') return goFloor();
-    if (roll < 0.22 && spot === 'floor') {
-      await walkTo(10 + Math.random() * Math.min(innerWidth - W - 20, 520));
-      if (my === token) await peck(1 + Math.floor(Math.random() * 3));
-    } else if (roll < 0.36) {
-      const s = headerSpot();
-      if (s) { spot = 'header'; perch = null; await flyTo(s.x, s.y); if (my === token) await peck(2); }
-    } else if (roll < 0.58) {
-      const s = buttonSpot();
-      if (s) { spot = 'button'; perch = s.el; await flyTo(s.x, s.y); if (my === token) await peck(2 + Math.floor(Math.random() * 3), s.el); }
-    } else if (roll < 0.70 && spot !== 'button') {
-      await sleep();
-    } else if (roll < 0.82) {
-      face(-dir); await wait(700); face(-dir); await wait(500);
-    } else if (spot !== 'floor') {
-      await goFloor();
-    } else {
-      await peck(2);
-    }
+    if (roll < 0.35) await peck(1 + Math.floor(Math.random() * 3));
+    else if (roll < 0.65) { face(-dir); await wait(700); face(-dir); }
+    else if (roll < 0.8) await sleep();
   }
 
   async function sleep() {
@@ -384,9 +365,7 @@
     show('a');
     if (wasSleeping) { body.classList.add('startle'); setTimeout(() => body.classList.remove('startle'), 400); }
     await say(wasSleeping ? pick(TXT.wake) : pick(TXT.say));
-    const s = Math.random() < 0.5 ? headerSpot() : buttonSpot();
-    if (s) { spot = s.el ? 'button' : 'header'; perch = s.el || null; await flyTo(s.x, s.y); }
-    else { spot = 'floor'; perch = null; await flyTo(20 + Math.random() * (innerWidth * 0.6), floorY()); }
+    await peck(1); // остаётся на месте
     busy = false;
   });
 
@@ -394,21 +373,17 @@
   let st;
   const reset = () => {
     if (ground) layoutProps();
-    if (spot === 'pumpkin' || spot === 'footer') { token++; pet.classList.remove('diving'); goFloor(); return; }
-    if (spot === 'floor' && !body.classList.contains('sleeping')) { y = floorY(); x = Math.min(x, innerWidth - W - 10); place(); return; }
-    clearTimeout(st);
-    st = setTimeout(() => {
-      if (spot === 'button' || spot === 'header' && innerWidth < 1281) { token++; body.classList.remove('sleeping'); zzz.classList.remove('show'); goFloor(); }
-      if (spot === 'floor') { y = floorY(); place(); }
-    }, 150);
+    spot = 'floor'; perch = null; x = HOME_X; y = floorY(); place();
   };
-  addEventListener('scroll', () => { if (spot === 'button' || spot === 'footer' || spot === 'pumpkin') reset(); }, { passive: true });
+
   addEventListener('resize', reset);
 
   // Полли сама прилетает клевать печать конверта на главной (today.js)
   window.PollyPet = {
     play: () => { token++; busy = false; return seasonal(); }, // проверка сезонных игр из консоли
     async visit(el) {
+      return false; // Полли больше не перелетает к конверту — конверт открывается своей анимацией
+      // eslint-disable-next-line no-unreachable
       if (pet.classList.contains('hidden') || reduce) return false;
       busy = true; token++;
       body.classList.remove('sleeping', 'peck', 'flap'); zzz.classList.remove('show'); show('a');
@@ -432,6 +407,6 @@
     },
   };
 
-  y = floorY(); place();
+  x = HOME_X; y = floorY(); place();
   life();
 })();
