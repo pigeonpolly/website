@@ -2612,9 +2612,10 @@ html:not(.is-admin) .statbar { display: none; }
 .adm-own { position: absolute; top: 2px; right: 4px; font: 700 12px var(--sans); color: #2E7D4F; }
 /* окно подарка — широкое: слева вещи, справа превью, записка и кнопки */
 @media (min-width: 761px) {
-  .adm-gift-card { width: min(1120px, calc(100vw - 48px)); max-height: calc(100vh - 48px); display: grid; grid-template-columns: minmax(0, 1fr) 320px; grid-template-areas: "t t" "k k" "i p" "i n" "i b" "i ."; grid-template-rows: auto auto auto auto auto 1fr; gap: 0 24px; align-items: start; }
+  .adm-gift-card { width: min(1120px, calc(100vw - 48px)); max-height: calc(100vh - 48px); display: grid; grid-template-columns: minmax(0, 1fr) 320px; grid-template-areas: "t t" "w w" "k k" "i p" "i n" "i b" "i ."; grid-template-rows: auto auto auto auto auto auto 1fr; gap: 0 24px; align-items: start; }
   .adm-gift-card h3 { grid-area: t; }
-  .adm-gift-kinds { grid-area: k; }
+  .adm-gift-kinds, .adm-gift-bar { grid-area: k; }
+  .adm-gift-card > .be-note { grid-area: w; }
   .adm-gift-items { grid-area: i; max-height: calc(100vh - 240px); grid-template-columns: repeat(auto-fill, minmax(84px, 1fr)); }
   .adm-gift-prev { grid-area: p; flex-wrap: wrap; justify-content: center; margin-top: 0; }
   .adm-gift-prev .be-note { flex: 1 1 100%; font-size: 13px; }
@@ -3649,3 +3650,9 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .pp-pin-x { border: 0; background: none; cursor: pointer; font-size: 15px; color: #6a5a7a; }
 .pp-pin-st { flex-basis: 100%; font-size: .82rem; color: #B5523E; }
 .pp-pin-st:empty { display: none; }
+/* окно подарка: одна строка фильтров вместо рядов кнопок (12.10.2026) */
+.adm-gift-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin: 4px 0 12px; }
+.adm-gift-bar input[type=search] { flex: 1 1 220px; font: inherit; padding: 8px 14px; border-radius: 999px; border: 1.5px solid #D9CCEA; background: #fff; color: #2B1A51; }
+.adm-gift-bar select { font: inherit; padding: 7px 10px; border-radius: 999px; border: 1.5px solid #D9CCEA; background: #fff; color: #2B1A51; max-width: 220px; }
+.adm-gh { display: inline-flex; align-items: center; gap: 6px; font-size: .9rem; color: #4a3a66; cursor: pointer; }
+.adm-gn { font-size: .85rem; color: #8a7aa6; margin-left: auto; }

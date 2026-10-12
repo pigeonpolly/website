@@ -679,10 +679,10 @@ const isAdmin = async (u, env) => {
   if (u._tok === undefined) return true;
   return !(await loadSec(env)).pin || u._pin_ok === 1;
 };
-// PIN хранится как PBKDF2 (соль + 150 000 итераций)
+// PIN хранится как PBKDF2 (соль + 100 000 итераций — больше Cloudflare Workers не разрешает)
 async function pinHash(pin, salt) {
   const key = await crypto.subtle.importKey('raw', new TextEncoder().encode(pin), 'PBKDF2', false, ['deriveBits']);
-  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: new TextEncoder().encode(salt), iterations: 150000 }, key, 256);
+  const bits = await crypto.subtle.deriveBits({ name: 'PBKDF2', hash: 'SHA-256', salt: new TextEncoder().encode(salt), iterations: 100000 }, key, 256);
   return [...new Uint8Array(bits)].map(b => b.toString(16).padStart(2, '0')).join('');
 }
 // неудачные попытки (PIN, код восстановления): 5 подряд — замок на час

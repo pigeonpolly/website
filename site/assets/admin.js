@@ -451,8 +451,10 @@
     if (!all) api('admin/gifts?uid=' + u.id).then(r => { for (const g of r.gifts) owned[g.kind + '|' + g.item] = g.status; draw(); }).catch(() => {});
     const w = document.createElement('div'); w.className = 'adm-gift';
     w.innerHTML = `<div class="adm-gift-card" role="dialog" aria-label="Подарок"><h3>${all ? '🎁 Подарок всем птичкам' : `🎁 Подарок для ${u.nick ? '@' + esc(u.nick) : 'птички без ника'}`}</h3>${all ? '<p class="be-note">Получит каждая птичка с ником (кроме заблокированных). У кого такой вещи уже максимум (3, легендарной — 1), тому не придёт.</p>' : ''}
-      <div class="adm-gift-kinds">${KINDS.map(([k, l]) => `<button type="button" class="pill-btn" data-k="${k}">${l}</button>`).join('')}
-        <span class="adm-gift-br"></span>${(B.GIFT_THEMES || []).map(t => `<button type="button" class="pill-btn adm-th" data-th="${t[0]}">${t[1][1]}</button>`).join('')}</div>
+      <div class="adm-gift-bar"><input type="search" class="adm-gq" placeholder="🔍 Найти вещь" aria-label="Найти вещь">
+        <select class="adm-gk" aria-label="Вид"><option value="">Все виды</option>${KINDS.map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select>
+        <select class="adm-gt" aria-label="Тема"><option value="">Все темы</option>${(B.GIFT_THEMES || []).map(t => `<option value="${t[0]}">${t[1][1]}</option>`).join('')}</select>
+        ${all ? '' : '<label class="adm-gh"><input type="checkbox"> скрыть то, что уже есть</label>'}<span class="adm-gn"></span></div>
       <div class="adm-gift-items"></div>
       <div class="adm-gift-prev"><figure><span class="gnow"></span><figcaption>Сейчас</figcaption></figure><span class="adm-gift-arrow">→</span><figure><span class="gp"></span><figcaption>С подарком</figcaption></figure>
         <p class="be-note">✓ — у птички это уже есть (в сумке), 🎁 — подарено, но ещё не открыто. Человек увидит «🎁 Тебе подарок!» в профиле челленджа.</p></div>
@@ -465,19 +467,24 @@
     const sentNote = txt => { sent++; const p = w.querySelector('.adm-gift-sent'); p.insertAdjacentHTML('afterbegin', `<span>${esc(txt)}</span>`); };
     w.onclick = e => { if (e.target === w) close(); };
     w.querySelector('[data-x]').onclick = close;
-    let theme = null; // выбрана тема/сезон: показываем вещи разных видов этой темы
+    // фильтр (12.10.2026): поиск по названию + вид + тема + «скрыть то, что уже есть»; всё вместе
+    let fq = '', fk = 'hat', ft = '', fhide = false;
+    w.querySelector('.adm-gk').value = fk;
+    const ALL = KINDS.flatMap(([k]) => (B.withSurprise ? B.withSurprise(k) : B.GIFTS[k] || []).map(v => [k, v]));
+    const THEME = new Map((B.GIFT_THEMES || []).map(t => [t[0], new Set(t[2])]));
+    const nameOf = (kd, v) => NAMES[v] || (B.giftName ? B.giftName(kd, v, 1) : v);
     const draw = () => {
-      w.querySelectorAll('[data-k]').forEach(b => b.classList.toggle('pill-fill', !theme && b.dataset.k === kind));
-      w.querySelectorAll('[data-th]').forEach(b => b.classList.toggle('pill-fill', theme === b.dataset.th));
-      const box = w.querySelector('.adm-gift-items'); box.innerHTML = '';
-      const th = theme && B.GIFT_THEMES.find(t => t[0] === theme);
-      const list = th ? th[2].map(x => x.split('|')) : (B.withSurprise ? B.withSurprise(kind) : B.GIFTS[kind]).map(v => [kind, v]);
-      for (const [kd, v] of list) {
-        const nm = NAMES[v] || (B.giftName ? B.giftName(kd, v, 1) : v);
+      const q = fq.trim().toLowerCase(), th = ft && THEME.get(ft);
+      const list = ALL.filter(([kd, v]) => (!fk || kd === fk) && (!th || th.has(kd + '|' + v)) && (!q || nameOf(kd, v).toLowerCase().includes(q) || v.toLowerCase().includes(q)) && !(fhide && owned[kd + '|' + v]));
+      w.querySelector('.adm-gn').textContent = list.length + ' шт.';
+      const box = w.querySelector('.adm-gift-items'); box.innerHTML = list.length ? '' : '<p class="be-note">Ничего не нашлось.</p>';
+      const labels = !fk || th || q; // в смешанном списке подписываем все вещи
+      for (const [kd, v] of list.slice(0, 300)) {
+        const nm = nameOf(kd, v);
         const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-pressed', String(v === item && kd === kind)); b.title = nm;
         b.appendChild(B.giftPic ? B.giftPic(kd, v, u.id, 56, av) : B.avatar(u.id, Object.assign({}, av, { [kd]: v }), 48));
         if (B.LEGEND && B.LEGEND.has(kd + '|' + v)) b.insertAdjacentHTML('beforeend', '<span class="legend-tag">★</span>');
-        if (NAMES[v] || th) b.insertAdjacentHTML('beforeend', `<small>${esc(nm)}</small>`);
+        if (NAMES[v] || labels) b.insertAdjacentHTML('beforeend', `<small>${esc(nm)}</small>`);
         const st = owned[kd + '|' + v];
         if (st) { b.classList.add('owned'); b.insertAdjacentHTML('beforeend', `<span class="adm-own">${st === 'new' ? '🎁' : '✓'}</span>`); }
         if (av[kd] === v) b.classList.add('worn');
@@ -487,8 +494,10 @@
       const gn = w.querySelector('.gnow'); if (!gn.firstChild) gn.appendChild(B.avatar(u.id, av, 96));
       const gp = w.querySelector('.gp'); gp.innerHTML = ''; gp.appendChild(B.avatar(u.id, Object.assign({}, av, { [kind]: item }), 96));
     };
-    w.querySelectorAll('[data-th]').forEach(b => b.onclick = () => { theme = b.dataset.th; const first = B.GIFT_THEMES.find(t => t[0] === theme)[2][0].split('|'); kind = first[0]; item = first[1]; draw(); });
-    w.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { theme = null; kind = b.dataset.k; item = B.GIFTS[kind][0]; draw(); });
+    w.querySelector('.adm-gq').oninput = e => { fq = e.target.value; draw(); };
+    w.querySelector('.adm-gk').onchange = e => { fk = e.target.value; draw(); };
+    w.querySelector('.adm-gt').onchange = e => { ft = e.target.value; if (ft) { fk = ''; w.querySelector('.adm-gk').value = ''; } draw(); };
+    const hd = w.querySelector('.adm-gh input'); if (hd) hd.onchange = () => { fhide = hd.checked; draw(); };
     w.querySelector('[data-send]').onclick = async e => {
       e.target.disabled = true;
       try {
