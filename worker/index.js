@@ -42,6 +42,7 @@ export default {
       if (!(await getMeta(env, 'buttons_backfill'))) await backfillButtons(env).catch(e => console.error('backfill', e)); // разовое начисление пуговок за прошлое
       await autoPrice(env).catch(e => console.error('price', e)); // раз в сутки: уровень цен под заработки птичек
       await autoRestock(env).catch(e => console.error('restock', e)); // раз в сутки (по Риге) пополнить магазин
+      await reqBackfill(env).catch(e => console.error('req tr', e)); // «Нарисуй мне»: переводы тем на все языки сайта
       await migrateToR2(env); await cleanupInactive(env);
       await env.DB.prepare('DELETE FROM game_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {}); // старые забеги игр (started — в мс)
       await env.DB.prepare('DELETE FROM maze_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {});
@@ -291,7 +292,7 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
@@ -924,10 +925,23 @@ async function rainItem(env, req, uid, lv) {
 }
 // тема не на английском → английский перевод (для карточек и подписи под рисунком); язык угадываем по буквам
 const guessLang = t => /[а-яё]/i.test(t) ? 'ru' : /[āčēģīķļņšūž]/i.test(t) ? 'lv' : 'en';
-async function reqEnglish(env, text) {
-  const from = guessLang(text);
-  if (from === 'en') return null;
-  try { const r = await Promise.race([translateAll(env, [text], from, 'en'), new Promise(res => setTimeout(() => res(null), 5000))]); const e = r && String(r.texts[0] || '').trim(); return e && e !== text ? e.slice(0, 200) : null; } catch (e) { return null; }
+// тема на всех языках сайта (12.10.2026): {en, ru, lv}; язык оригинала — сам текст, остальные — перевод (не успел за 5 с — null, догонит cron)
+const REQ_COL = { en: 'text_en', ru: 'text_ru', lv: 'text_lv' };
+async function reqTranslate(env, text, have = {}) {
+  const from = guessLang(text), out = { en: have.en || null, ru: have.ru || null, lv: have.lv || null };
+  out[from] = text;
+  await Promise.all(['en', 'ru', 'lv'].filter(l => !out[l]).map(async l => {
+    try { const r = await Promise.race([translateAll(env, [text], from, l), new Promise(res => setTimeout(() => res(null), 5000))]); const x = r && String(r.texts[0] || '').trim(); if (x) out[l] = x.slice(0, 200); } catch (e) { /* позже */ }
+  }));
+  return out;
+}
+// раз в час: темам без перевода на какой-то язык — перевести (до 30 тем за раз)
+async function reqBackfill(env) {
+  const rows = (await env.DB.prepare("SELECT id, text, text_en, text_ru, text_lv FROM draw_requests WHERE status IN ('open', 'done') AND (text_en IS NULL OR text_ru IS NULL OR text_lv IS NULL) ORDER BY id DESC LIMIT 30").all()).results;
+  for (const r of rows) {
+    const t = await reqTranslate(env, r.text, { en: r.text_en, ru: r.text_ru, lv: r.text_lv });
+    await env.DB.prepare('UPDATE draw_requests SET text_en = ?, text_ru = ?, text_lv = ? WHERE id = ?').bind(t.en, t.ru, t.lv, r.id).run();
+  }
 }
 // подарок за нарисованную тему: вещь, которой у птички нет (не легендарная, не игровая), из самой дешёвой трети каталога;
 // раз в 20–30 нарисованных тем этой птички (users.req_mid) — из средней трети. Приходит неоткрытым подарком с note 'req:<id>'
@@ -1269,9 +1283,9 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/requests') {
     const u = await currentUser(req, env), lang = ['en', 'ru', 'lv'].includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
     const v = visitor(req, cookie), adm = u ? await isAdmin(u, env) : false;
-    const rows = (await env.DB.prepare(`SELECT r.id, r.text, r.text_en, r.anon, r.status, r.img, r.created_at, r.answered_at, r.user_id, u.nick FROM draw_requests r LEFT JOIN users u ON u.id = r.user_id
+    const rows = (await env.DB.prepare(`SELECT r.id, r.text, r.text_en, r.text_ru, r.text_lv, r.anon, r.status, r.img, r.created_at, r.answered_at, r.user_id, u.nick FROM draw_requests r LEFT JOIN users u ON u.id = r.user_id
       WHERE r.status IN ('open', 'done'${adm ? ", 'hidden'" : ''}) ORDER BY COALESCE(r.answered_at, r.created_at) DESC LIMIT 5000`).all()).results
-      .map(r => ({ id: r.id, text: r.text, en: r.text_en || null, status: r.status, img: r.img, at: r.answered_at || r.created_at, name: r.nick ? '@' + r.nick : birdName(r.anon, lang), named: !!r.nick, mine: !!(u && r.user_id === u.id), likes: 0, liked: false }));
+      .map(r => ({ id: r.id, text: r.text, en: r.text_en && r.text_en !== r.text ? r.text_en : null, loc: (x => x && x !== r.text ? x : null)(r[REQ_COL[lang]]), status: r.status, img: r.img, at: r.answered_at || r.created_at, name: r.nick ? '@' + r.nick : birdName(r.anon, lang), named: !!r.nick, mine: !!(u && r.user_id === u.id), likes: 0, liked: false }));
     // лайки: у темы — 't', у нарисованного — 'd'
     const me = u && u.nick && !u.banned ? 'u' + u.id : 'v' + v.id, byId = new Map(rows.map(r => [r.id, r]));
     for (const l of (await env.DB.prepare('SELECT rid, kind, COUNT(*) AS n, MAX(who = ?) AS mine FROM draw_likes GROUP BY rid, kind').bind(me).all()).results) {
@@ -1307,8 +1321,8 @@ async function route(req, env, url) {
         .some(r => r.text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim() === key);
       if (dup) fail(409, 'dup'); // такая тема уже есть
     }
-    const anon = named ? null : await anonCode(v.id), lang = ['en', 'ru', 'lv'].includes(b.lang) ? b.lang : 'en';
-    const r = await env.DB.prepare('INSERT INTO draw_requests (user_id, anon, text, text_en, lang, who, ip, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(named ? u.id : null, anon, text, await reqEnglish(env, text), lang, who, ip, now()).run();
+    const anon = named ? null : await anonCode(v.id), lang = ['en', 'ru', 'lv'].includes(b.lang) ? b.lang : 'en', tr = await reqTranslate(env, text); // сразу на все языки сайта
+    const r = await env.DB.prepare('INSERT INTO draw_requests (user_id, anon, text, text_en, text_ru, text_lv, lang, who, ip, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(named ? u.id : null, anon, text, tr.en, tr.ru, tr.lv, lang, who, ip, now()).run();
     const res = json({ ok: true, id: r.meta.last_row_id, name: named ? '@' + u.nick : birdName(anon, lang) });
     if (v.set) res.headers.append('set-cookie', v.set);
     return res;
@@ -1337,7 +1351,7 @@ async function route(req, env, url) {
     if (!full || !thumb || full.size > 6e6) fail(400, 'img');
     const id = randomHex(12); await imgPut(env, id, await full.arrayBuffer(), await thumb.arrayBuffer());
     const first = r.status !== 'done';
-    if (!r.text_en && guessLang(r.text) !== 'en') { const en = await reqEnglish(env, r.text); if (en) await env.DB.prepare('UPDATE draw_requests SET text_en = ? WHERE id = ?').bind(en, rid).run(); } // перевод не успел при отправке — ещё раз
+    if (!r.text_en || !r.text_ru || !r.text_lv) { const t = await reqTranslate(env, r.text, { en: r.text_en, ru: r.text_ru, lv: r.text_lv }); await env.DB.prepare('UPDATE draw_requests SET text_en = ?, text_ru = ?, text_lv = ? WHERE id = ?').bind(t.en, t.ru, t.lv, rid).run(); } // перевод не успел при отправке — ещё раз
     await env.DB.prepare("UPDATE draw_requests SET status = 'done', img = ?, answered_at = ? WHERE id = ?").bind(id, now(), rid).run();
     if (first) await env.DB.prepare("DELETE FROM draw_likes WHERE rid = ? AND kind = 't'").bind(rid).run(); // нарисовано — лайки темы сбрасываются, рисунок собирает свои
     const gift = first && r.user_id ? await reqReward(env, req, r.user_id, rid) : null;
