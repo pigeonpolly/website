@@ -94,9 +94,15 @@
   const toBlob = (c, type = 'image/jpeg') => new Promise(r => c.toBlob(r, type, .92));
 
   // ---------- экран в кабинете ----------
+  // сохранить картинки: где можно — через «Поделиться» (на iPhone/Android так они попадают в Фото/Галерею), иначе — обычное скачивание
+  const canShare = (() => { try { return !!(navigator.canShare && navigator.canShare({ files: [new File([new Blob(['x'], { type: 'image/jpeg' })], 'x.jpg', { type: 'image/jpeg' })] }) && /Mobi|Android|iPhone|iPad/i.test(navigator.userAgent)); } catch (e) { return false; } })();
+  async function keep(files) {
+    if (canShare) { try { await navigator.share({ files }); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
+    files.forEach((f, i) => setTimeout(() => save(f, f.name), i * 350));
+  }
   window.PPCarousel = async function (main) {
     main.innerHTML = `<section class="adm-box adm-car"><h2>📸 Карусели из челленджа</h2>
-      <p class="be-note">Слайды 1080×1350 (4:5 — подходят и для Instagram, и для фото-карусели в TikTok): обложка с веером работ, по одной работе на слайд с темой дня и ником автора, последний слайд — приглашение на сайт. В одной карусели до 10 слайдов (обложка + 8 работ + приглашение); если работ больше — получится несколько каруселей. Всё собирается здесь, в браузере, и скачивается архивом.</p>
+      <p class="be-note">Слайды 1080×1350 (4:5 — подходят и для Instagram, и для фото-карусели в TikTok): обложка с веером работ, по одной работе на слайд с темой дня и ником автора, последний слайд — приглашение на сайт. В одной карусели до 10 слайдов (обложка + 8 работ + приглашение); если работ больше — получится несколько каруселей. Всё собирается здесь, в браузере. На телефоне слайды сохраняются прямо в Фото, на компьютере — архивом или по одному.</p>
       <p class="be-note">💛 Это работы других людей: отмечайте авторов (галочка «Подписывать ники») и, если можно, напишите им, что их рисунок попал в пост — обычно это очень радует.</p>
       <div class="adm-car-opts">
         <label>Какие работы <select data-o="period"><option value="7">за последние 7 дней</option><option value="30" selected>за последние 30 дней</option><option value="0">все</option></select></label>
@@ -135,21 +141,42 @@
           const total = z - a + 2, slides = [cover(L, pics.slice(a, z), works.slice(a, z), total)];
           for (let i = a; i < z; i++) slides.push(work(L, pics[i], works[i], i - a + 2, total, opt));
           slides.push(cta(L, total, bird));
+          const setFiles = [];
           const sec = document.createElement('div'); sec.className = 'adm-car-set'; sec.innerHTML = `<h3>Карусель ${gi + 1}${groups.length > 1 ? ` из ${groups.length}` : ''} · ${slides.length} слайдов</h3><div class="adm-car-row"></div>`;
           out.appendChild(sec); const row = sec.querySelector('.adm-car-row');
           for (const [si, c] of slides.entries()) {
             const blob = await toBlob(c), name = `carousel-${String(gi + 1).padStart(2, '0')}/slide-${String(si + 1).padStart(2, '0')}.jpg`;
             files.push({ name, data: new Uint8Array(await blob.arrayBuffer()) });
-            const im = document.createElement('img'); im.src = URL.createObjectURL(blob); im.alt = name; im.title = 'Нажмите, чтобы скачать этот слайд'; im.onclick = () => save(blob, name.replace('/', '-')); row.appendChild(im);
+            const im = document.createElement('img'); im.src = URL.createObjectURL(blob); im.alt = name; im.title = 'Нажмите, чтобы сохранить этот слайд'; im.onclick = () => keep([new File([blob], name.replace('/', '-'), { type: 'image/jpeg' })]); row.appendChild(im);
+            setFiles.push(new File([blob], name.replace('/', '-'), { type: 'image/jpeg' }));
           }
+          // телефон: «Сохранить в Фото» — системное окно «Поделиться» (там «Сохранить N изображений»); компьютер — по одному файлу
+          const sb = document.createElement('button'); sb.type = 'button'; sb.className = 'pill-btn pill-fill adm-car-save';
+          sb.textContent = canShare ? `📲 Сохранить в Фото (${setFiles.length})` : `⬇ Скачать эту карусель (${setFiles.length})`;
+          const mine = setFiles.slice(); sb.onclick = () => keep(mine); sec.querySelector('h3').after(sb);
           st.textContent = `Собрано каруселей: ${gi + 1} из ${groups.length}…`;
         }
-        st.innerHTML = `Готово: ${groups.length} ${groups.length === 1 ? 'карусель' : 'каруселей'}, ${works.length} работ. Нажмите на слайд, чтобы скачать его, или скачайте всё сразу.`;
+        st.innerHTML = `Готово: ${groups.length} ${groups.length === 1 ? 'карусель' : 'каруселей'}, ${works.length} работ. ${canShare ? 'Нажмите «📲 Сохранить в Фото» у карусели — в открывшемся окне выберите «Сохранить изображения». Или нажмите на один слайд.' : 'Нажмите на слайд, чтобы скачать его, или скачайте всё сразу.'}`;
         const dl = document.createElement('button'); dl.type = 'button'; dl.className = 'pill-btn pill-fill'; dl.textContent = '⬇ Скачать все слайды (zip)';
         dl.onclick = () => save(zip(files), `pigeonpolly-carousels-${new Date().toISOString().slice(0, 10)}.zip`);
-        out.prepend(dl);
+        if (!canShare) out.prepend(dl); // на телефоне zip неудобен — там «Сохранить в Фото»
       } catch (x) { st.textContent = 'Не получилось: ' + (x && x.message || x); }
       e.target.disabled = false;
     };
   };
+
+  // ---------- кнопка «📸 Карусели» на странице челленджа (видна только Алине: account.js ставит html.is-admin) ----------
+  const cb = document.getElementById('ch-car');
+  if (cb) {
+    const show = () => { cb.hidden = !document.documentElement.classList.contains('is-admin'); };
+    show(); new MutationObserver(show).observe(document.documentElement, { attributes: true, attributeFilter: ['class'] });
+    cb.onclick = () => {
+      const w = document.createElement('div'); w.className = 'ch-car-modal';
+      w.innerHTML = '<div class="ch-car-card" role="dialog" aria-label="Карусели"><button type="button" class="ch-car-x" aria-label="Закрыть">✕</button><div class="ch-car-main"></div></div>';
+      document.body.appendChild(w); document.documentElement.style.overflow = 'hidden';
+      const close = () => { w.remove(); document.documentElement.style.overflow = ''; };
+      w.querySelector('.ch-car-x').onclick = close; w.onclick = e => { if (e.target === w) close(); };
+      window.PPCarousel(w.querySelector('.ch-car-main'));
+    };
+  }
 })();

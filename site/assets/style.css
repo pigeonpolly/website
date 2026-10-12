@@ -3658,3 +3658,14 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .adm-gn { font-size: .85rem; color: #8a7aa6; margin-left: auto; }
 .adm-gift-items button { position: relative; }
 .adm-gprice { display: block; font: 700 11px var(--sans); color: #8a5a2b; margin-top: 2px; }
+/* карусели — со страницы челленджа (кнопка только у Алины) */
+.ch-car-modal { position: fixed; inset: 0; z-index: 400; background: rgba(15, 8, 35, .7); display: flex; align-items: flex-start; justify-content: center; overflow: auto; padding: 24px 12px; }
+.ch-car-card { position: relative; width: min(1100px, 100%); background: #FFFDF8; color: #2B1A51; border-radius: 20px; padding: 8px; }
+.ch-car-card .adm-box { margin: 0; box-shadow: none; }
+.ch-car-x { position: absolute; top: 10px; right: 12px; z-index: 2; width: 36px; height: 36px; border-radius: 50%; border: 0; background: #F0E9FA; color: #2B1A51; font-size: 16px; cursor: pointer; }
+.adm-car-save { margin: 0 0 10px; }
+.ch-car-btn[hidden], html:not(.is-admin) .ch-car-btn { display: none !important; }
+.ch-car-card .be-note { color: #5A4E78; }
+.ch-car-card .pill-btn.pill-fill { background: #F0A987; border-color: #F0A987; color: #2B1A51; }
+.ch-car-card .pill-btn:not(.pill-fill) { color: #2B1A51; border-color: #CFC7E8; background: #fff; }
+.ch-car-card select { color: #2B1A51; background: #fff; }
