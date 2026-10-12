@@ -60,7 +60,7 @@
   const match = r => { const q = Q.trim().toLowerCase().replace(/^@/, ''); return !q || r.name.toLowerCase().replace(/^@/, '').includes(q) || r.text.toLowerCase().includes(q); };
   function draw() {
     const shut = S.closed && !S.admin; // пауза: посетителям — записка вместо поля, Алине — поле и пометка
-    app.innerHTML = `<section class="rq-ask"><h2>${t('ask')}</h2>
+    app.innerHTML = `<section class="rq-ask" aria-label="${esc(t('ask'))}">
         ${shut ? `<p class="rq-closed">${t('closedMsg')}</p>` : `<form class="rq-form"><div class="rq-bar"><input type="text" name="text" maxlength="120" required autocomplete="off" placeholder="${esc(t('askP'))}" aria-label="${esc(t('ask'))}"><span class="rq-cnt"></span><button type="submit" class="rq-go" aria-label="${esc(t('send').replace('✏️ ', ''))}"><svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M3 11.5 20.5 4l-7.5 17.5-2.2-7.8z" fill="currentColor"/></svg></button></div>
         <input type="text" name="website" class="rq-hp" tabindex="-1" autocomplete="off" aria-hidden="true">
         <p class="rq-who">${esc(S.me ? '@' + S.me.nick : S.anon)} · ${S.me ? t('giftS') : `<button type="button" class="rq-in">${t('signin')}</button> ${t('giftA')}`}</p><p class="rq-st" role="status"></p></form>`}
