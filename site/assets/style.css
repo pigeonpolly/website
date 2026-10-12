@@ -3669,3 +3669,4 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .ch-car-card .pill-btn.pill-fill { background: #F0A987; border-color: #F0A987; color: #2B1A51; }
 .ch-car-card .pill-btn:not(.pill-fill) { color: #2B1A51; border-color: #CFC7E8; background: #fff; }
 .ch-car-card select { color: #2B1A51; background: #fff; }
+.rq-head .rq-pick { white-space: nowrap; }
