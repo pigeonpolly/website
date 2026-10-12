@@ -923,7 +923,7 @@
     // ---------- кадр ----------
     let raf = 0;
     function frame(now) {
-      raf = requestAnimationFrame(frame);
+      if (!o.still) raf = requestAnimationFrame(frame); // o.still — один кадр без анимации (снимок для галереи комнат)
       if (!box.isConnected) { cancelAnimationFrame(raf); return; }
       const lay = layout();
       g.setTransform(S, 0, 0, S, 0, 0); g.imageSmoothingEnabled = false;

@@ -291,7 +291,7 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
@@ -1100,8 +1100,19 @@ async function route(req, env, url) {
     const u = await needUser(req, env);
     const b = await req.json().catch(() => ({}));
     const room = cleanRoom(b.room || {}, await ownedRoom(env, u.id));
-    await env.DB.prepare('UPDATE users SET room = ? WHERE id = ?').bind(JSON.stringify(room), u.id).run();
+    // галерея комнат в «Стае» сортируется по тому, когда в комнату что-то добавили (новая вещь, обои, пол, вид, шторы) — перестановка не считается
+    const old = roomOf(u), cnt = r => { const m = {}; (r.items || []).forEach(it => { m[it.k + '|' + it.v] = (m[it.k + '|' + it.v] || 0) + 1; }); return m; }, oc = cnt(old);
+    const added = Object.entries(cnt(room)).some(([k, n]) => n > (oc[k] || 0)) || ['wall', 'floor', 'view', 'curtain'].some(k => room[k] && room[k] !== old[k]);
+    await env.DB.prepare(`UPDATE users SET room = ?${added ? ', room_at = ?' : ''} WHERE id = ?`).bind(...(added ? [JSON.stringify(room), now(), u.id] : [JSON.stringify(room), u.id])).run();
     return json({ ok: true, room });
+  }
+  // галерея комнат (внизу «Стаи»): обустроенные комнаты, свежие изменения первыми; по 24, дальше — offset
+  if (m === 'GET' && p === '/api/rooms') {
+    const off = Math.max(0, Math.floor(Number(url.searchParams.get('offset')) || 0));
+    const rows = (await env.DB.prepare(`SELECT id, nick, avatar, room, room_at FROM users WHERE banned = 0 AND nick IS NOT NULL AND room IS NOT NULL AND room NOT IN ('', '{}', '{"items":[]}')
+      ORDER BY COALESCE(room_at, 0) DESC, id DESC LIMIT 25 OFFSET ?`).bind(off).all()).results;
+    const list = rows.map(r => ({ id: r.id, nick: r.nick, avatar: avatarOf(r), room: roomOf(r), at: r.room_at || 0 })).filter(r => (r.room.items || []).length || r.room.wall || r.room.floor || r.room.view || r.room.curtain);
+    return json({ rooms: list.slice(0, 24), more: rows.length > 24 }, 200, { 'cache-control': 'no-store' });
   }
   // ---------- игра «Пуговичный дождь» (/rain/, site/assets/rain.js) ----------
   // пуговки — за каждый пройденный уровень (RULES.gameLevel), не больше RULES.gameDayMax в сутки; уровни подтверждаются по одному,

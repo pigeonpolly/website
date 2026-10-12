@@ -3565,3 +3565,18 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .rq-orig { font-size: .8rem; color: #8a7fa8; font-style: italic; }
 .rq-lb .rq-orig { color: rgba(255,255,255,.65); }
 .rq-pp-en { margin: -2px 0 8px; color: #8a7fa8; font-style: italic; }
+/* «Стая» → галерея комнат */
+.fl-rooms { padding: 40px var(--gutter, 16px) 60px; max-width: 1200px; margin: 0 auto; }
+.fl-rooms-lead { opacity: .8; margin: -6px 0 18px; }
+.fl-rooms-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(220px, 1fr)); gap: 16px; }
+.fl-room { margin: 0; }
+.fl-room-btn { display: block; width: 100%; padding: 0; border: 0; background: none; cursor: zoom-in; border-radius: 14px; overflow: hidden; box-shadow: 0 6px 18px rgba(10, 5, 30, .3); transition: transform .25s ease, box-shadow .25s ease; }
+.fl-room-btn:hover, .fl-room-btn:focus-visible { transform: scale(1.07); box-shadow: 0 16px 34px rgba(10, 5, 30, .45); position: relative; z-index: 2; }
+.fl-room-btn .room-bar, .fl-room-btn .room-sel, .fl-room-btn .room-tray, .fl-room-btn .room-tip { display: none !important; }
+.fl-room-btn .room-stage, .fl-room-btn canvas { display: block; width: 100%; height: auto; pointer-events: none; }
+.fl-room figcaption { margin-top: 6px; font-size: .9rem; opacity: .85; text-align: center; }
+.fl-rooms-more { margin-top: 18px; }
+.fl-room-lb { position: fixed; inset: 0; z-index: 400; background: rgba(15, 8, 30, .9); display: flex; align-items: center; justify-content: center; padding: 16px; animation: modal-in .2s ease; }
+.fl-room-lb-in { position: relative; width: min(1000px, 100%); display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.fl-room-live { width: 100%; }
+.fl-room-x { position: absolute; top: -8px; right: -8px; z-index: 3; width: 42px; height: 42px; border-radius: 50%; border: 0; background: #FFFDF8; color: #2B1A51; font-size: 18px; cursor: pointer; }
