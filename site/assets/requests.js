@@ -26,6 +26,11 @@
     gave: ['🎁 Gift sent to', '🎁 Подарок отправлен:', '🎁 Dāvana nosūtīta:'], redo: ['📤 Replace', '📤 Заменить', '📤 Aizstāt'],
     cardIdea: ['Idea by', 'Тема от', 'Ideja no'], cardCta: ['Suggest yours:', 'Предложи свою:', 'Iesaki savu:'],
     close: ['Close', 'Закрыть', 'Aizvērt'], mine: ['your idea', 'твоя тема', 'tava tēma'],
+    like: ['Like', 'Нравится', 'Patīk'], sortL: ['Sort', 'Порядок', 'Kārtība'],
+    sQueue: ['🕒 In order', '🕒 По очереди', '🕒 Pēc kārtas'], sNew: ['✨ Newest', '✨ Сначала новые', '✨ Jaunākās'], sTop: ['❤️ Most liked', '❤️ Больше лайков', '❤️ Populārākās'],
+    search: ['🔍 Search by nickname or idea', '🔍 Поиск по нику или теме', '🔍 Meklēt pēc segvārda vai tēmas'], nothing: ['Nothing found.', 'Ничего не нашлось.', 'Nekas netika atrasts.'],
+    moreOpen: n => [`Show all (+${n})`, `Показать все (+${n})`, `Rādīt visas (+${n})`][L], moreDone: n => [`Show ${n} more`, `Показать ещё ${n}`, `Rādīt vēl ${n}`][L],
+    pick: ['🐦 Polly’s pick', '🐦 Выбор Полли', '🐦 Pollijas izvēle'], pickH: ['Polly brought you this one:', 'Полли принесла тебе:', 'Pollija tev atnesa:'], again: ['🐦 Again', '🐦 Ещё раз', '🐦 Vēlreiz'],
   };
   const t = (k, ...a) => { const v = T[k]; const x = Array.isArray(v) ? v[L] : v; return typeof x === 'function' ? x(...a) : x; };
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -36,16 +41,20 @@
     S = await fetch(`/api/requests?lang=${lang}`, { credentials: 'same-origin' }).then(r => r.json());
     draw();
   }
+  // поиск (по нику и по тексту темы — сразу в обоих списках) и показ частями: тем — 30, рисунков — 24, дальше «Показать ещё»
+  let Q = '', openN = 30, doneN = 24, SORT = 'queue'; // queue — темы по очереди (старые первыми), рисунки — новые; new — новые; top — по лайкам
+  const sorted = (list, isOpen) => { const a = list.slice(); if (SORT === 'top') a.sort((x, y) => y.likes - x.likes || y.at - x.at); else if (SORT === 'new' || !isOpen) a.sort((x, y) => y.at - x.at); else a.sort((x, y) => x.at - y.at); return a; };
+  const heart = r => `<button type="button" class="rq-like${r.liked ? ' on' : ''}" data-like="${r.id}" aria-pressed="${r.liked}" title="${esc(t('like'))}">${r.liked ? '♥' : '♡'}<b>${r.likes || ''}</b></button>`;
+  const match = r => { const q = Q.trim().toLowerCase().replace(/^@/, ''); return !q || r.name.toLowerCase().replace(/^@/, '').includes(q) || r.text.toLowerCase().includes(q); };
   function draw() {
-    const adm = S.admin;
     app.innerHTML = `<section class="rq-ask"><h2>${t('ask')}</h2>
-        <form class="rq-form"><textarea name="text" maxlength="200" rows="3" required placeholder="${esc(t('askP'))}"></textarea>
+        <form class="rq-form"><div class="rq-inp"><input type="text" name="text" maxlength="120" required autocomplete="off" placeholder="${esc(t('askP'))}"><span class="rq-cnt">0/120</span></div>
         <div class="rq-row"><button type="submit" class="pill-btn pill-fill">${t('send')}</button><span class="rq-who">${esc(t('as', S.me ? '@' + S.me.nick : S.anon))}</span></div>
         <p class="rq-gift">${S.me ? t('giftIn') : `${t('gift')} <button type="button" class="rq-in">${t('signin')}</button>`}</p><p class="rq-st" role="status"></p></form></section>
-      <section class="rq-wait"><h2>${t('waiting', S.open.length)}</h2>${S.open.length ? `<ul class="rq-list">${S.open.map(r => `<li data-id="${r.id}"${r.mine ? ' class="mine"' : ''}><span class="rq-q">“${esc(r.text)}”</span><span class="rq-by">${esc(r.name)}${r.mine ? ` · ${t('mine')}` : ''}</span>${adm ? `<span class="rq-adm"><label class="pill-btn pill-fill rq-upl">${t('up')}<input type="file" accept="image/*" hidden></label><button type="button" class="pill-btn rq-hide">${t('hide')}</button></span>` : ''}</li>`).join('')}</ul>` : `<p class="rq-none">${t('none')}</p>`}</section>
-      <section class="rq-done"><h2>${t('drawn', S.done.length)}</h2>${S.done.length ? `<div class="rq-grid">${S.done.map(r => `<figure data-id="${r.id}"><button type="button" class="rq-pic" aria-label="${esc(r.text)}"><img src="${imgUrl(r.img, 1)}" alt="${esc(r.text)}" loading="lazy"></button>
-        <figcaption><span class="rq-q">“${esc(r.text)}”</span><span class="rq-by">${esc(r.name)}</span></figcaption>${adm ? `<div class="rq-adm"><button type="button" class="pill-btn pill-fill rq-card">${t('card')}</button><label class="pill-btn rq-upl">${t('redo')}<input type="file" accept="image/*" hidden></label></div>` : ''}</figure>`).join('')}</div>` : `<p class="rq-none">${t('noneDone')}</p>`}</section>`;
-    const f = app.querySelector('.rq-form'), st = app.querySelector('.rq-st');
+      <div class="rq-tools"><input type="search" class="rq-search" placeholder="${esc(t('search'))}" value="${esc(Q)}" aria-label="${esc(t('search'))}"><select class="rq-sort" aria-label="${esc(t('sortL'))}">${[['queue', t('sQueue')], ['new', t('sNew')], ['top', t('sTop')]].map(([k, l]) => `<option value="${k}"${SORT === k ? ' selected' : ''}>${l}</option>`).join('')}</select>${S.admin && S.open.length ? `<button type="button" class="pill-btn pill-fill rq-pick">${t('pick')}</button>` : ''}</div>
+      <div class="rq-lists"></div>`;
+    const f = app.querySelector('.rq-form'), st = app.querySelector('.rq-st'), cnt = app.querySelector('.rq-cnt');
+    f.text.oninput = () => { cnt.textContent = `${f.text.value.length}/120`; cnt.classList.toggle('near', f.text.value.length > 100); };
     f.onsubmit = async e => {
       e.preventDefault(); const b = f.querySelector('button[type=submit]'); b.disabled = true;
       try {
@@ -56,11 +65,57 @@
       } catch (x) { st.textContent = T.err.x[L]; b.disabled = false; }
     };
     const si = app.querySelector('.rq-in'); if (si) si.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
-    app.querySelectorAll('.rq-pic').forEach(b => b.onclick = () => open(+b.closest('figure').dataset.id));
+    const sq = app.querySelector('.rq-search'); sq.oninput = () => { Q = sq.value; openN = 30; doneN = 24; lists(); };
+    const so = app.querySelector('.rq-sort'); so.onchange = () => { SORT = so.value; lists(); };
+    const pk = app.querySelector('.rq-pick'); if (pk) pk.onclick = pollyPick;
+    lists();
+  }
+  function lists() {
+    const adm = S.admin, op = sorted(S.open.filter(match), true), dn = sorted(S.done.filter(match), false), box = app.querySelector('.rq-lists');
+    box.innerHTML = `<section class="rq-wait"><h2>${t('waiting', op.length)}</h2>${op.length ? `<ul class="rq-list">${op.slice(0, openN).map(r => `<li data-id="${r.id}"${r.mine ? ' class="mine"' : ''}><span class="rq-q" title="${esc(r.text)}${r.en ? ' · ' + esc(r.en) : ''}">${esc(r.text)}</span><span class="rq-by">${esc(r.name)}</span>${heart(r)}${adm ? `<span class="rq-adm"><label class="rq-ic rq-upl" title="${esc(t('up'))}">📤<input type="file" accept="image/*" hidden></label><button type="button" class="rq-ic rq-hide" title="${esc(t('hide'))}">🙈</button></span>` : ''}</li>`).join('')}</ul>${op.length > openN ? `<button type="button" class="pill-btn rq-more" data-more="open">${t('moreOpen', op.length - openN)}</button>` : ''}` : `<p class="rq-none">${Q ? t('nothing') : t('none')}</p>`}</section>
+      <section class="rq-done"><h2>${t('drawn', dn.length)}</h2>${dn.length ? `<div class="rq-grid">${dn.slice(0, doneN).map(r => `<figure data-id="${r.id}"><button type="button" class="rq-pic" aria-label="${esc(r.text)}"><img src="${imgUrl(r.img, 1)}" alt="${esc(r.text)}" loading="lazy" decoding="async"></button>
+        <figcaption><span class="rq-q">${esc(r.en || r.text)}</span>${r.en ? `<span class="rq-orig">${esc(r.text)}</span>` : ''}<span class="rq-cap-row"><span class="rq-by">${esc(r.name)}</span>${heart(r)}</span></figcaption>${adm ? `<div class="rq-adm"><button type="button" class="pill-btn pill-fill rq-card">${t('card')}</button><label class="pill-btn rq-upl">${t('redo')}<input type="file" accept="image/*" hidden></label></div>` : ''}</figure>`).join('')}</div>${dn.length > doneN ? `<button type="button" class="pill-btn rq-more" data-more="done">${t('moreDone', Math.min(24, dn.length - doneN))}</button>` : ''}` : `<p class="rq-none">${Q ? t('nothing') : t('noneDone')}</p>`}</section>`;
+    box.querySelectorAll('[data-more]').forEach(b => b.onclick = () => { if (b.dataset.more === 'open') openN = 1e9; else doneN += 24; lists(); });
+    box.querySelectorAll('.rq-pic').forEach(b => b.onclick = () => open(+b.closest('figure').dataset.id, dn));
+    box.querySelectorAll('[data-like]').forEach(b => b.onclick = async () => {
+      const id = +b.dataset.like, r = S.open.concat(S.done).find(x => x.id === id); if (!r || b.disabled) return;
+      b.disabled = true; r.liked = !r.liked; r.likes += r.liked ? 1 : -1; b.classList.toggle('on', r.liked); b.innerHTML = `${r.liked ? '♥' : '♡'}<b>${r.likes || ''}</b>`; // сразу, не дожидаясь сервера
+      try { const j = await fetch('/api/requests/like', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id }) }).then(x => x.json()); r.liked = j.liked; r.likes = j.likes; } catch (e) {}
+      lists();
+    });
     if (!adm) return;
-    app.querySelectorAll('.rq-upl input').forEach(i => i.onchange = () => upload(+i.closest('[data-id]').dataset.id, i.files[0], i.closest('label')));
-    app.querySelectorAll('.rq-hide').forEach(b => b.onclick = async () => { if (!confirm(t('hideAsk'))) return; await fetch('/api/admin/requests/hide', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: +b.closest('[data-id]').dataset.id }) }); load(); });
-    app.querySelectorAll('.rq-card').forEach(b => b.onclick = () => card(S.done.find(r => r.id === +b.closest('[data-id]').dataset.id)));
+    box.querySelectorAll('.rq-upl input').forEach(i => i.onchange = () => upload(+i.closest('[data-id]').dataset.id, i.files[0], i.closest('label')));
+    box.querySelectorAll('.rq-hide').forEach(b => b.onclick = async () => { if (!confirm(t('hideAsk'))) return; await fetch('/api/admin/requests/hide', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: +b.closest('[data-id]').dataset.id }) }); load(); });
+    box.querySelectorAll('.rq-card').forEach(b => b.onclick = () => card(S.done.find(r => r.id === +b.closest('[data-id]').dataset.id)));
+  }
+
+  // ---------- «🐦 Выбор Полли» (только для Алины, ни на что не влияет): Полли прилетает из угла с запиской в клюве ----------
+  async function pollyPick() {
+    const list = S.open.length ? S.open : S.done; if (!list.length) return;
+    const r = list[Math.floor(Math.random() * list.length)], pp = window.PollyPet, fr = pp && pp.frames ? pp.frames() : null;
+    const ov = document.createElement('div'); ov.className = 'rq-pp'; document.body.appendChild(ov); document.body.classList.add('modal-open');
+    const close = () => { ov.remove(); document.body.classList.remove('modal-open'); pp && pp.away && pp.away(false); document.removeEventListener('keydown', key); };
+    const key = e => { if (e.key === 'Escape') close(); };
+    document.addEventListener('keydown', key);
+    ov.addEventListener('click', e => { if (e.target === ov || e.target.closest('[data-x]')) close(); if (e.target.closest('[data-again]')) { close(); pollyPick(); } });
+    const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    const cardHtml = `<div class="rq-pp-card"><p class="rq-pp-h">${t('pickH')}</p><p class="rq-pp-q">“${esc(r.text)}”</p>${r.en ? `<p class="rq-pp-en">${esc(r.en)}</p>` : ''}<p class="rq-pp-by">${esc(r.name)}${r.status === 'done' ? ' · ✓' : ''}</p><div class="rq-pp-b"><button type="button" class="pill-btn" data-x>${t('close')}</button><button type="button" class="pill-btn pill-fill" data-again>${t('again')}</button></div></div>`;
+    if (!fr || reduce) { ov.innerHTML = cardHtml; return; }
+    // птичка (крупнее, чем в углу) с запиской летит из угла в центр
+    const k = 3, bird = document.createElement('div'); bird.className = 'rq-pp-bird';
+    const cv = document.createElement('canvas'); cv.width = fr.w; cv.height = fr.h; cv.style.width = fr.w * k + 'px'; cv.style.height = fr.h * k + 'px'; bird.appendChild(cv);
+    const note = document.createElement('span'); note.className = 'rq-pp-note'; note.textContent = '📜'; bird.appendChild(note);
+    ov.appendChild(bird);
+    const g = cv.getContext('2d'), frame = f => { g.clearRect(0, 0, fr.w, fr.h); g.imageSmoothingEnabled = false; g.drawImage(fr[f], 0, 0); };
+    const from = pp.where(), sx = from.left, sy = from.top, tx = innerWidth / 2 - fr.w * k / 2, ty = innerHeight / 2 - fr.h * k / 2 - 40;
+    pp.away(true);
+    const t0 = performance.now(), dur = 1300;
+    await new Promise(res => { const step = now => { const q = Math.min(1, (now - t0) / dur), e = q < .5 ? 2 * q * q : 1 - Math.pow(-2 * q + 2, 2) / 2;
+      const x = sx + (tx - sx) * e, y = sy + (ty - sy) * e - Math.sin(Math.PI * q) * 160, sc = 1 / k + (1 - 1 / k) * e;
+      bird.style.transform = `translate(${x}px, ${y}px) scale(${sc})`; frame(Math.floor(q * 14) % 2 ? 'fly' : 'a'); q < 1 ? requestAnimationFrame(step) : res(); }; requestAnimationFrame(step); });
+    frame('a'); note.classList.add('drop'); await new Promise(res => setTimeout(res, 450));
+    const holder = document.createElement('div'); holder.innerHTML = cardHtml; const cd = holder.firstChild; ov.appendChild(cd);
+    bird.classList.add('done');
   }
 
   // ---------- загрузка ответа (как в челлендже: полная до 1600 px и превью 500 px) ----------
@@ -81,11 +136,11 @@
   }
 
   // ---------- на весь экран ----------
-  function open(id) {
-    const list = S.done; let i = list.findIndex(r => r.id === id);
+  function open(id, from) {
+    const list = from || S.done; let i = list.findIndex(r => r.id === id);
     const d = document.createElement('div'); d.className = 'rq-lb'; d.setAttribute('role', 'dialog'); d.setAttribute('aria-modal', 'true');
     const show = () => { const r = list[i]; d.innerHTML = `<button type="button" class="rq-lb-x" aria-label="${t('close')}">✕</button>${list.length > 1 ? '<button type="button" class="rq-lb-p" aria-label="←">‹</button><button type="button" class="rq-lb-n" aria-label="→">›</button>' : ''}
-      <figure><img src="${imgUrl(r.img)}" alt="${esc(r.text)}"><figcaption><span class="rq-q">“${esc(r.text)}”</span><span class="rq-by">${esc(r.name)}</span></figcaption></figure>`; };
+      <figure><img src="${imgUrl(r.img)}" alt="${esc(r.text)}"><figcaption><span class="rq-q">“${esc(r.en || r.text)}”</span>${r.en ? `<span class="rq-orig">${esc(r.text)}</span>` : ''}<span class="rq-by">${esc(r.name)}</span></figcaption></figure>`; };
     const close = () => { d.remove(); document.removeEventListener('keydown', key); document.body.classList.remove('modal-open'); };
     const key = e => { if (e.key === 'Escape') close(); if (e.key === 'ArrowRight') { i = (i + 1) % list.length; show(); } if (e.key === 'ArrowLeft') { i = (i - 1 + list.length) % list.length; show(); } };
     d.addEventListener('click', e => { if (e.target.closest('.rq-lb-x') || e.target === d) close(); else if (e.target.closest('.rq-lb-n')) { i = (i + 1) % list.length; show(); } else if (e.target.closest('.rq-lb-p')) { i = (i - 1 + list.length) % list.length; show(); } });
@@ -105,7 +160,7 @@
     // сообщение: ник сверху, тема ниже; ширина — по тексту, но не шире 82 % карточки
     const pad = 40 * u, maxW = W * 0.82 - pad * 2, fs = Math.round(H > W * 1.4 ? 56 : 50) * u;
     g.font = `600 ${fs}px Fraunces, Georgia, serif`;
-    const lines = []; let cur = ''; for (const w of r.text.split(' ')) { const tt = cur ? cur + ' ' + w : w; if (g.measureText(tt).width > maxW && cur) { lines.push(cur); cur = w; } else cur = tt; } lines.push(cur);
+    const lines = []; let cur = ''; for (const w of (r.en || r.text).split(' ')) { const tt = cur ? cur + ' ' + w : w; if (g.measureText(tt).width > maxW && cur) { lines.push(cur); cur = w; } else cur = tt; } lines.push(cur);
     const ls = lines.slice(0, 5), tw = Math.max(...ls.map(l => g.measureText(l).width));
     g.font = `700 ${32 * u}px Karla, system-ui, sans-serif`; const nw = g.measureText(r.name).width;
     const bw = Math.max(tw, nw) + pad * 2, lh = fs * 1.18, bh = pad + 36 * u + 14 * u + ls.length * lh + pad * 0.7, bx = 48 * u, by = 48 * u;

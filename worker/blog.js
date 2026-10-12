@@ -780,7 +780,7 @@ ${JSON.stringify(texts)}`;
 }
 
 // strict: только Gemini (для статей) — если не вышло, ошибка, а не слабый перевод
-async function translateAll(env, texts, from, to, strict = false) {
+export async function translateAll(env, texts, from, to, strict = false) {
   const out = [];
   const key = await geminiKey(env);
   const err = code => Object.assign(new Error(code), { code, status: code === 'ai_limit' ? 429 : code === 'no_key' || code === 'bad_key' ? 400 : 502 });

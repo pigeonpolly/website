@@ -416,6 +416,10 @@
   window.PollyPet = {
     play: () => { token++; busy = false; return seasonal(); }, // проверка сезонных игр из консоли
     corner: () => cornerPlay(), // проверка игры в уголке (?season=winter и т. п.)
+    // для «Выбора Полли» на странице «Нарисуй мне»: кадры спрайта (стоит / в полёте), где она сидит, спрятать/показать
+    frames: () => ({ a: F.a, b: F.b, fly: F.fly, w: W, h: H }),
+    where: () => pet.getBoundingClientRect(),
+    away: v => { pet.style.visibility = v ? 'hidden' : ''; },
     async visit(el) {
       return false; // Полли больше не перелетает к конверту — конверт открывается своей анимацией
       // eslint-disable-next-line no-unreachable
