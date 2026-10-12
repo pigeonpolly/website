@@ -33,7 +33,7 @@ PAGES = [
     ("art-portfolio/anxiety", "Anxiety", "anxiety.html", "Anxiety, a series in ecolines."),
     ("art-portfolio/sketchbook", "Sketchbook Pages", "sketchbook.html", "Pages from my sketchbook."),
     ("art-portfolio/snail", "Mr.Chew", "snail.html", "Mr.Chew the snail, illustrations 2023–2025."),
-    ("art-portfolio/bird", "Pigeon Polly", "bird.html", "Pigeon Polly illustrations 2019–2026."),
+    ("art-portfolio/bird", "Pigeon Polly", "pigeon-polly.html", "Pigeon Polly illustrations 2019–2026."),  # галерея; bird.html — профиль птички (/bird/)
     ("art-portfolio/detective", "Mr.Titos", "detective.html", "Detective Mr.Titos."),
     ("art-portfolio/halloween", "Pumpkin Family", "halloween.html", "Welcome to the Pumpkin-Heads family."),
     ("art-portfolio/ai-art", "AI Art", "ai-art.html", "AI art based on the Pigeon Polly traditional art style."),
