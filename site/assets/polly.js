@@ -248,9 +248,9 @@
       d.addEventListener('animationend', () => d.remove()); document.body.appendChild(d);
     }
   }
-  function petal(px, py) {
+  function petal(px, py, cols) {
     const d = document.createElement('i'); d.className = 'polly-petal'; d.setAttribute('aria-hidden', 'true');
-    d.style.cssText = `left:${px}px;top:${py}px;width:${PX + 1}px;height:${PX}px;background:${pick(['#F7B6C8', '#FCE1E8', '#F28AB2', '#FFFFFF'])};--dx:${Math.round((Math.random() - .5) * 60)}px;--fall:${Math.round(Math.min(260, innerHeight - py))}px`;
+    d.style.cssText = `left:${px}px;top:${py}px;width:${PX + 1}px;height:${PX}px;background:${pick(cols || ['#F7B6C8', '#FCE1E8', '#F28AB2', '#FFFFFF'])};--dx:${Math.round((Math.random() - .5) * 60)}px;--fall:${Math.round(Math.min(260, innerHeight - py))}px`;
     d.addEventListener('animationend', () => d.remove()); document.body.appendChild(d);
   }
   const near = kind => { const list = props.filter(p => p.kind === kind && p !== carry && p !== push); return list.length ? pick(list) : null; };
@@ -323,11 +323,45 @@
   // 12.10.2026 (Алина: «чтобы птичка не прыгала по экрану, а сидела слева внизу»): Полли всегда сидит в левом нижнем углу
   // и только клюёт, оглядывается и иногда засыпает; никуда не летает и не ходит
   const HOME_X = 16;
+  // уголок: сезонная вещица лежит рядом с Полли (справа, на «полу» экрана), и Полли играет с ней, не сходя с места
+  const CORNER = (() => {
+    const mk = SEASON === 'october' ? (Math.random() < .5 ? SPR.pumpkin() : dome(14, 5, LEAF_C)) : SEASON === 'autumn' ? dome(14, 5, LEAF_C)
+      : SEASON === 'winter' ? dome(14, 5, ['#F4F7FB', '#E6EEF7', '#FFFFFF', '#D3DFEC']) : SEASON === 'summer' ? (Math.random() < .5 ? SPR.icecream() : SPR.flower()) : null;
+    if (!mk) return null;
+    mk.className = 'polly-prop free'; mk.setAttribute('aria-hidden', 'true'); document.body.appendChild(mk);
+    return { el: mk, w: mk.width, h: mk.height, free: true, x: 0, y: 0 };
+  })();
+  const cornerPlace = () => { if (!CORNER) return; CORNER.x = HOME_X + W + 2; CORNER.y = innerHeight - 8 - CORNER.h; putProp(CORNER); };
+  async function cornerPlay() {
+    const cx = HOME_X + W + 2, top = innerHeight - 8;
+    if (SEASON === 'spring') { // лепестки сыплются сверху, Полли хлопает крыльями
+      for (let i = 0; i < 8; i++) petal(HOME_X + Math.random() * (W + 30), top - H - 60 - Math.random() * 40);
+      for (let i = 0; i < 4; i++) { body.classList.add('flap'); await wait(160); body.classList.remove('flap'); await wait(160); }
+      return;
+    }
+    if (!CORNER) return;
+    face(1);
+    const mid = cx + CORNER.w / 2, ty = top - CORNER.h + 2;
+    if (SEASON === 'winter' && Math.random() < .4) { // снежинки падают на Полли
+      for (let i = 0; i < 10; i++) petal(HOME_X + Math.random() * (W + 30), top - H - 70 - Math.random() * 40, ['#FFFFFF', '#E6EEF7', '#D3DFEC']);
+      await wait(900); await peck(1); return;
+    }
+    if ((SEASON === 'autumn' || SEASON === 'october') && Math.random() < .35) { // листик падает сверху
+      for (let i = 0; i < 3; i++) petal(HOME_X + Math.random() * (W + 20), top - H - 60 - Math.random() * 30, LEAF_C);
+      await wait(800); await peck(2); return;
+    }
+    CORNER.el.classList.add('wiggle'); await peck(2 + Math.floor(Math.random() * 2));
+    const cols = SEASON === 'winter' ? ['#FFFFFF', '#E6EEF7', '#D3DFEC'] : SEASON === 'summer' ? ['#F28AB2', '#E5484D', '#F6C445'] : LEAF_C;
+    burst(mid, ty, cols, SEASON === 'summer' ? 4 : 10, SEASON === 'summer' ? .4 : .7);
+    await wait(400); CORNER.el.classList.remove('wiggle');
+  }
   async function act() {
     if (x !== HOME_X || spot !== 'floor') { spot = 'floor'; perch = null; x = HOME_X; y = floorY(); place(); }
+    cornerPlace();
     const roll = Math.random();
-    if (roll < 0.35) await peck(1 + Math.floor(Math.random() * 3));
-    else if (roll < 0.65) { face(-dir); await wait(700); face(-dir); }
+    if (roll < 0.35 && (CORNER || SEASON === 'spring')) await cornerPlay();
+    else if (roll < 0.5) await peck(1 + Math.floor(Math.random() * 3));
+    else if (roll < 0.7) { face(-dir); await wait(700); face(-dir); }
     else if (roll < 0.8) await sleep();
   }
 
@@ -347,7 +381,7 @@
     await wait(2500);
     for (;;) {
       const blocked = document.body.classList.contains('modal-open') || document.querySelector('.lightbox.open') || document.body.classList.contains('menu-open');
-      pet.classList.toggle('hidden', !!blocked);
+      pet.classList.toggle('hidden', !!blocked); if (CORNER) CORNER.el.style.visibility = blocked ? 'hidden' : '';
       if (!busy && !blocked && !document.hidden) await act();
       await wait(1500 + Math.random() * 3500);
     }
@@ -373,7 +407,7 @@
   let st;
   const reset = () => {
     if (ground) layoutProps();
-    spot = 'floor'; perch = null; x = HOME_X; y = floorY(); place();
+    spot = 'floor'; perch = null; x = HOME_X; y = floorY(); place(); cornerPlace();
   };
 
   addEventListener('resize', reset);
@@ -381,6 +415,7 @@
   // Полли сама прилетает клевать печать конверта на главной (today.js)
   window.PollyPet = {
     play: () => { token++; busy = false; return seasonal(); }, // проверка сезонных игр из консоли
+    corner: () => cornerPlay(), // проверка игры в уголке (?season=winter и т. п.)
     async visit(el) {
       return false; // Полли больше не перелетает к конверту — конверт открывается своей анимацией
       // eslint-disable-next-line no-unreachable
@@ -407,6 +442,6 @@
     },
   };
 
-  x = HOME_X; y = floorY(); place();
+  x = HOME_X; y = floorY(); place(); cornerPlace();
   life();
 })();
