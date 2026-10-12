@@ -93,29 +93,35 @@
     document.addEventListener('keydown', key); document.body.classList.add('modal-open'); show(); document.body.appendChild(d);
   }
 
-  // ---------- карточка для соцсетей: рисунок + тема в облачке + приглашение ----------
+  // ---------- карточка для соцсетей (12.10.2026): фото Алины целиком, без рамки и без обрезки; поверх — белое «сообщение»
+  // с предложенной темой и ником автора (как в чате); внизу — pigeonpolly.com ----------
   async function card(r) {
-    const W = 1080, H = 1350, c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
     try { await Promise.all(['600 60px Fraunces', '700 34px Karla'].map(f => document.fonts.load(f))); } catch (e) {}
     const img = await new Promise((res, rej) => { const i = new Image(); i.onload = () => res(i); i.onerror = rej; i.src = imgUrl(r.img); });
-    g.fillStyle = '#FFFDF8'; g.fillRect(0, 0, W, H);
+    const W = 1080, H = Math.round(W * img.height / img.width), u = W / 1080; // размер — как у фото
+    const c = document.createElement('canvas'); c.width = W; c.height = H; const g = c.getContext('2d');
+    g.drawImage(img, 0, 0, W, H);
     const rr = (x, y, w, h, rad) => { g.beginPath(); g.moveTo(x + rad, y); g.arcTo(x + w, y, x + w, y + h, rad); g.arcTo(x + w, y + h, x, y + h, rad); g.arcTo(x, y + h, x, y, rad); g.arcTo(x, y, x + w, y, rad); g.closePath(); };
-    // облачко с темой
-    g.font = `600 50px Fraunces, Georgia, serif`;
-    const lines = []; let cur = ''; for (const w of `“${r.text}”`.split(' ')) { const tt = cur ? cur + ' ' + w : w; if (g.measureText(tt).width > W - 220 && cur) { lines.push(cur); cur = w; } else cur = tt; } lines.push(cur);
-    const ls = lines.slice(0, 4), bh = 70 + ls.length * 62 + 50;
-    rr(70, 60, W - 140, bh, 36); g.fillStyle = '#2B1A51'; g.fill();
-    g.beginPath(); g.moveTo(170, 60 + bh - 2); g.lineTo(230, 60 + bh + 40); g.lineTo(260, 60 + bh - 2); g.fill();
-    g.fillStyle = '#fff'; g.textBaseline = 'alphabetic'; ls.forEach((ln, i) => g.fillText(ln, 110, 60 + 80 + i * 62));
-    g.font = `700 32px Karla, system-ui, sans-serif`; g.fillStyle = '#F0A987'; g.fillText(`${t('cardIdea')} ${r.name}`, 110, 60 + bh - 34);
-    // рисунок
-    const top = 60 + bh + 70, maxH = H - top - 150, k = Math.min((W - 140) / img.width, maxH / img.height), iw = img.width * k, ih = img.height * k, ix = (W - iw) / 2;
-    g.save(); g.shadowColor = 'rgba(43,26,81,.25)'; g.shadowBlur = 36; g.shadowOffsetY = 12; rr(ix, top, iw, ih, 22); g.fillStyle = '#fff'; g.fill(); g.restore();
-    g.save(); rr(ix, top, iw, ih, 22); g.clip(); g.drawImage(img, ix, top, iw, ih); g.restore();
-    // подвал
-    g.font = `700 34px Karla, system-ui, sans-serif`; g.textAlign = 'center'; g.fillStyle = '#2B1A51';
-    g.fillText(`${t('cardCta')} pigeonpolly.com/requests`, W / 2, H - 70);
-    g.save(); g.translate(W / 2 - g.measureText(`${t('cardCta')} pigeonpolly.com/requests`).width / 2 - 34, H - 82); g.fillStyle = '#E9A93B'; g.beginPath(); [[0, -16], [5, -5], [16, 0], [5, 5], [0, 16], [-5, 5], [-16, 0], [-5, -5]].forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.fill(); g.restore();
+    // сообщение: ник сверху, тема ниже; ширина — по тексту, но не шире 82 % карточки
+    const pad = 40 * u, maxW = W * 0.82 - pad * 2, fs = Math.round(H > W * 1.4 ? 56 : 50) * u;
+    g.font = `600 ${fs}px Fraunces, Georgia, serif`;
+    const lines = []; let cur = ''; for (const w of r.text.split(' ')) { const tt = cur ? cur + ' ' + w : w; if (g.measureText(tt).width > maxW && cur) { lines.push(cur); cur = w; } else cur = tt; } lines.push(cur);
+    const ls = lines.slice(0, 5), tw = Math.max(...ls.map(l => g.measureText(l).width));
+    g.font = `700 ${32 * u}px Karla, system-ui, sans-serif`; const nw = g.measureText(r.name).width;
+    const bw = Math.max(tw, nw) + pad * 2, lh = fs * 1.18, bh = pad + 36 * u + 14 * u + ls.length * lh + pad * 0.7, bx = 48 * u, by = 48 * u;
+    g.save(); g.shadowColor = 'rgba(0,0,0,.28)'; g.shadowBlur = 30 * u; g.shadowOffsetY = 8 * u;
+    rr(bx, by, bw, bh, 34 * u); g.fillStyle = '#FFFFFF'; g.fill();
+    g.beginPath(); g.moveTo(bx + 46 * u, by + bh - 4); g.lineTo(bx + 30 * u, by + bh + 34 * u); g.lineTo(bx + 96 * u, by + bh - 4); g.closePath(); g.fill(); // «хвостик» сообщения
+    g.restore();
+    g.textBaseline = 'alphabetic'; g.textAlign = 'left';
+    g.font = `700 ${32 * u}px Karla, system-ui, sans-serif`; g.fillStyle = '#7F81BF'; g.fillText(r.name, bx + pad, by + pad + 26 * u);
+    g.font = `600 ${fs}px Fraunces, Georgia, serif`; g.fillStyle = '#2B1A51';
+    ls.forEach((ln, i) => g.fillText(ln, bx + pad, by + pad + 36 * u + 14 * u + fs * 0.92 + i * lh));
+    // адрес сайта внизу
+    g.font = `700 ${34 * u}px Karla, system-ui, sans-serif`; g.textAlign = 'center';
+    const site = 'pigeonpolly.com', sw = g.measureText(site).width + 56 * u, sx = (W - sw) / 2, sy = H - 48 * u - 64 * u;
+    g.save(); g.shadowColor = 'rgba(0,0,0,.25)'; g.shadowBlur = 20 * u; rr(sx, sy, sw, 64 * u, 32 * u); g.fillStyle = 'rgba(255,255,255,.92)'; g.fill(); g.restore();
+    g.fillStyle = '#2B1A51'; g.fillText(site, W / 2, sy + 44 * u);
     c.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `pigeonpolly-request-${r.id}.jpg`; document.body.appendChild(a); a.click(); setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1500); }, 'image/jpeg', .92);
   }
 
