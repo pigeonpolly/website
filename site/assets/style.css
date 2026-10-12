@@ -3476,3 +3476,11 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .home-sep::before, .home-sep::after { content: ''; flex: 0 1 220px; height: 1px; background: linear-gradient(90deg, transparent, rgba(43, 26, 81, .32)); }
 .home-sep::after { background: linear-gradient(90deg, rgba(43, 26, 81, .32), transparent); }
 .home-sep svg { width: 18px; height: 18px; fill: #E9A93B; flex: none; }
+/* кабинет → «📸 Карусели» */
+.adm-car-opts { display: flex; flex-wrap: wrap; gap: 12px 18px; align-items: end; margin: 12px 0; }
+.adm-car-opts label { display: grid; gap: 4px; font-size: 14px; }
+.adm-car-opts select { padding: 6px 10px; border-radius: 10px; font: inherit; }
+.adm-car-set h3 { margin: 18px 0 8px; }
+.adm-car-row { display: flex; gap: 10px; overflow-x: auto; padding-bottom: 8px; }
+.adm-car-row img { width: 180px; height: 225px; flex: none; border-radius: 10px; box-shadow: 0 4px 14px rgba(0,0,0,.18); cursor: pointer; }
+.adm-car-out > .pill-btn { margin: 8px 0; }
