@@ -1270,7 +1270,7 @@ async function route(req, env, url) {
     const u = await currentUser(req, env), lang = ['en', 'ru', 'lv'].includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
     const v = visitor(req, cookie), adm = u ? await isAdmin(u, env) : false;
     const rows = (await env.DB.prepare(`SELECT r.id, r.text, r.text_en, r.anon, r.status, r.img, r.created_at, r.answered_at, r.user_id, u.nick FROM draw_requests r LEFT JOIN users u ON u.id = r.user_id
-      WHERE r.status IN ('open', 'done') ORDER BY COALESCE(r.answered_at, r.created_at) DESC LIMIT 5000`).all()).results
+      WHERE r.status IN ('open', 'done'${adm ? ", 'hidden'" : ''}) ORDER BY COALESCE(r.answered_at, r.created_at) DESC LIMIT 5000`).all()).results
       .map(r => ({ id: r.id, text: r.text, en: r.text_en || null, status: r.status, img: r.img, at: r.answered_at || r.created_at, name: r.nick ? '@' + r.nick : birdName(r.anon, lang), named: !!r.nick, mine: !!(u && r.user_id === u.id), likes: 0, liked: false }));
     // лайки: у темы — 't', у нарисованного — 'd'
     const me = u && u.nick && !u.banned ? 'u' + u.id : 'v' + v.id, byId = new Map(rows.map(r => [r.id, r]));
@@ -1278,6 +1278,7 @@ async function route(req, env, url) {
       const r = byId.get(l.rid); if (r && (r.status === 'done') === (l.kind === 'd')) { r.likes = l.n; r.liked = !!l.mine; }
     }
     const res = json({ open: rows.filter(r => r.status === 'open').sort((a, b) => a.at - b.at), done: rows.filter(r => r.status === 'done'), admin: adm,
+      hidden: adm ? rows.filter(r => r.status === 'hidden') : undefined, // скрытые темы видит только Алина — чтобы можно было вернуть
       me: u && u.nick && !u.banned ? { nick: u.nick } : null, anon: birdName(await anonCode(v.id), lang), closed: (await getMeta(env, 'req_closed')) === '1' });
     if (v.set) res.headers.append('set-cookie', v.set);
     return res;
@@ -1355,7 +1356,9 @@ async function route(req, env, url) {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');
     const b = await req.json().catch(() => ({}));
-    await env.DB.prepare("UPDATE draw_requests SET status = 'hidden' WHERE id = ?").bind(Number(b.id)).run();
+    // {id} — скрыть; {id, back: true} — вернуть (с рисунком — в «Нарисовано», без — в очередь)
+    if (b.back) await env.DB.prepare("UPDATE draw_requests SET status = CASE WHEN img IS NOT NULL AND img != '' THEN 'done' ELSE 'open' END WHERE id = ? AND status = 'hidden'").bind(Number(b.id)).run();
+    else await env.DB.prepare("UPDATE draw_requests SET status = 'hidden' WHERE id = ?").bind(Number(b.id)).run();
     return json({ ok: true });
   }
   if (m === 'GET' && p === '/api/advent') {

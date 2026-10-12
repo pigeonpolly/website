@@ -40,6 +40,7 @@
     closedMsg: ['🌙 I’m drawing the ideas I already have, so new ones are paused for now. Come back a bit later, and meanwhile ♡ the ideas you like!', '🌙 Сейчас я рисую уже предложенные темы, поэтому приём новых на паузе. Загляни чуть позже, а пока поставь ♡ темам, которые нравятся!', '🌙 Šobrīd zīmēju jau ieteiktās tēmas, tāpēc jaunu pieņemšana ir pauzē. Ieskaties vēlāk, un pa to laiku iedod ♡ tēmām, kas patīk!'],
     pause: ['⏸ Stop taking ideas', '⏸ Временно не принимать темы', '⏸ Pagaidām nepieņemt tēmas'], resume: ['▶ Take ideas again', '▶ Снова принимать темы', '▶ Atkal pieņemt tēmas'],
     pausedAdm: ['New ideas are paused: visitors see a note instead of the form.', 'Приём тем на паузе: посетители видят записку вместо поля.', 'Tēmu pieņemšana ir pauzē: apmeklētāji redz zīmīti formas vietā.'],
+    hidden: n => [`🙈 Hidden (${n})`, `🙈 Скрытые (${n})`, `🙈 Paslēptās (${n})`][L], back: ['↩ Bring back', '↩ Вернуть', '↩ Atgriezt'],
     pick: ['🐦 Polly’s pick', '🐦 Выбор Полли', '🐦 Pollijas izvēle'], pickH: ['Polly brought you this one:', 'Полли принесла тебе:', 'Pollija tev atnesa:'], again: ['🐦 Again', '🐦 Ещё раз', '🐦 Vēlreiz'],
   };
   const t = (k, ...a) => { const v = T[k]; const x = Array.isArray(v) ? v[L] : v; return typeof x === 'function' ? x(...a) : x; };
@@ -52,6 +53,7 @@
     draw();
   }
   // поиск (по нику и по тексту темы — сразу в обоих списках) и показ частями: тем — 30, рисунков — 24, дальше «Показать ещё»
+  let HID = false; // открыт ли список скрытых (только у Алины)
   let Q = '', openN = 30, doneN = 24, SORT = 'queue'; // queue — темы по очереди (старые первыми), рисунки — новые; new — новые; top — по лайкам
   const sorted = (list, isOpen) => { const a = list.slice(); if (SORT === 'top') a.sort((x, y) => y.likes - x.likes || y.at - x.at); else if (SORT === 'new' || !isOpen) a.sort((x, y) => y.at - x.at); else a.sort((x, y) => x.at - y.at); return a; };
   const heart = r => `<button type="button" class="rq-like${r.liked ? ' on' : ''}" data-like="${r.id}" aria-pressed="${r.liked}" title="${esc(t('like'))}">${r.liked ? '♥' : '♡'}<b>${r.likes || ''}</b></button>`;
@@ -93,7 +95,8 @@
     const adm = S.admin, op = sorted(S.open.filter(match), true), dn = sorted(S.done.filter(match), false), box = app.querySelector('.rq-lists');
     box.innerHTML = `<section class="rq-wait"><h2>${t('waiting', op.length)}</h2>${op.length ? `<ul class="rq-list">${op.slice(0, openN).map(r => `<li data-id="${r.id}"${r.mine ? ' class="mine"' : ''}><span class="rq-txt"><span class="rq-q" title="${esc(r.text)}${r.en ? ' · ' + esc(r.en) : ''}">${esc(r.text)}</span><span class="rq-by">${esc(r.name)}</span></span>${heart(r)}${adm ? `<span class="rq-adm"><label class="rq-ic rq-upl" title="${esc(t('up'))}">📤<input type="file" accept="image/*" hidden></label><button type="button" class="rq-ic rq-hide" title="${esc(t('hide'))}">🙈</button></span>` : ''}</li>`).join('')}</ul>${op.length > openN ? `<button type="button" class="pill-btn rq-more" data-more="open">${t('moreOpen', op.length - openN)}</button>` : ''}` : `<p class="rq-none">${Q ? t('nothing') : t('none')}</p>`}</section>
       <section class="rq-done"><h2>${t('drawn', dn.length)}</h2>${dn.length ? `<div class="rq-grid">${dn.slice(0, doneN).map(r => `<figure data-id="${r.id}"><button type="button" class="rq-pic" aria-label="${esc(r.text)}"><img src="${imgUrl(r.img, 1)}" alt="${esc(r.text)}" loading="lazy" decoding="async"></button>
-        <figcaption><span class="rq-q">${esc(r.en || r.text)}</span>${r.en ? `<span class="rq-orig">${esc(r.text)}</span>` : ''}<span class="rq-cap-row"><span class="rq-by">${esc(r.name)}</span>${heart(r)}</span></figcaption>${adm ? `<div class="rq-adm"><button type="button" class="pill-btn pill-fill rq-card">${t('card')}</button><label class="pill-btn rq-upl">${t('redo')}<input type="file" accept="image/*" hidden></label></div>` : ''}</figure>`).join('')}</div>${dn.length > doneN ? `<button type="button" class="pill-btn rq-more" data-more="done">${t('moreDone', Math.min(24, dn.length - doneN))}</button>` : ''}` : `<p class="rq-none">${Q ? t('nothing') : t('noneDone')}</p>`}</section>`;
+        <figcaption><span class="rq-q">${esc(r.en || r.text)}</span>${r.en ? `<span class="rq-orig">${esc(r.text)}</span>` : ''}<span class="rq-cap-row"><span class="rq-by">${esc(r.name)}</span>${heart(r)}</span></figcaption>${adm ? `<div class="rq-adm"><button type="button" class="pill-btn pill-fill rq-card">${t('card')}</button><label class="pill-btn rq-upl">${t('redo')}<input type="file" accept="image/*" hidden></label></div>` : ''}</figure>`).join('')}</div>${dn.length > doneN ? `<button type="button" class="pill-btn rq-more" data-more="done">${t('moreDone', Math.min(24, dn.length - doneN))}</button>` : ''}` : `<p class="rq-none">${Q ? t('nothing') : t('noneDone')}</p>`}</section>${adm && S.hidden && S.hidden.length ? `
+      <details class="rq-hidden"${HID ? ' open' : ''}><summary>${t('hidden', S.hidden.length)}</summary><ul class="rq-list">${S.hidden.map(r => `<li data-id="${r.id}"><span class="rq-txt"><span class="rq-q" title="${esc(r.text)}">${esc(r.text)}</span><span class="rq-by">${esc(r.name)}</span></span><button type="button" class="pill-btn rq-back">${t('back')}</button></li>`).join('')}</ul></details>` : ''}`;
     box.querySelectorAll('[data-more]').forEach(b => b.onclick = () => { if (b.dataset.more === 'open') openN = 1e9; else doneN += 24; lists(); });
     box.querySelectorAll('.rq-pic').forEach(b => b.onclick = () => open(+b.closest('figure').dataset.id, dn));
     box.querySelectorAll('[data-like]').forEach(b => b.onclick = async () => {
@@ -104,6 +107,8 @@
     });
     if (!adm) return;
     box.querySelectorAll('.rq-upl input').forEach(i => i.onchange = () => upload(+i.closest('[data-id]').dataset.id, i.files[0], i.closest('label')));
+    const hd = box.querySelector('.rq-hidden'); if (hd) hd.ontoggle = () => { HID = hd.open; };
+    box.querySelectorAll('.rq-back').forEach(b => b.onclick = async () => { b.disabled = true; await fetch('/api/admin/requests/hide', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: +b.closest('[data-id]').dataset.id, back: true }) }); load(); });
     box.querySelectorAll('.rq-hide').forEach(b => b.onclick = async () => { if (!confirm(t('hideAsk'))) return; await fetch('/api/admin/requests/hide', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: +b.closest('[data-id]').dataset.id }) }); load(); });
     box.querySelectorAll('.rq-card').forEach(b => b.onclick = () => card(S.done.find(r => r.id === +b.closest('[data-id]').dataset.id)));
   }
