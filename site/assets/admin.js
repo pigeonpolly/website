@@ -448,6 +448,10 @@
     const KINDS = [['any', '🎲 Сюрпризы'], ['hat', '🎩 Головной убор'], ['shoes', '👟 Обувь'], ['item', '🍕 В клюв'], ['scarf', '🧣 Шарфик'], ['bg', '🎨 Фон'], ['frame', '⭕ Рамка'], ['anim', '✨ Анимация'], ...(B.GIFTS.furn ? [['furn', '🛋 Мебель'], ['deco', '🎄 Украшения'], ['wall', '🧱 Обои'], ['floor', '🟫 Пол'], ['view', '🪟 Вид из окна'], ['curtain', '🎀 Шторы']] : [])];
     const NAMES = { halo: 'нимб ★', unicorn: 'рог единорога ★', flamecrown: 'корона феникса ★', dragonegg: 'яйцо дракона ★', goldfeather: 'золотое перо ★', comet: 'комета ★', goldenapple: 'золотое яблоко ★', legend: 'легендарная ★', aurora: 'сияние ★', pirate: 'пиратская шляпа', chef: 'колпак повара', graduation: 'шапочка выпускника', paintbrush: 'кисточка', palette: 'палитра', pencil: 'карандаш', coffee: 'кофе', croissant: 'круассан', bounce: 'прыгает', wiggle: 'качается', float: 'парит', spin: 'кружится', sparkle: 'сияет', heart: 'сердечко', wizard: 'шляпа волшебника', witch: 'шляпа ведьмы', pumpkin: 'тыква', santa: 'колпак Санты', antlers: 'рожки оленя', beanie: 'зимняя шапка', heartband: 'ободок с сердцем', wreath: 'весенний венок', strawhat: 'летняя шляпа', leafcrown: 'осенний венок', wand: 'волшебная палочка', crystal: 'хрустальный шар', star: 'звёздочка', lollipop: 'леденец', minipumpkin: 'тыковка', candycane: 'карамельная трость', giftbox: 'подарок', ornament: 'ёлочный шар', snowflake: 'снежинка', heart: 'сердечко', rose: 'роза', letter: 'валентинка', icecream: 'мороженое', mapleleaf: 'кленовый лист', snow: 'снежинки', magic: 'волшебная', spooky: 'хеллоуин', headset: 'игровые наушники', gamepad: 'геймпад', coin: 'монетка', sword: 'пиксельный меч', mushroom: 'грибок', neon: 'неон', pizza: 'пицца', cherry: 'вишенка', cheese: 'сыр', ring: 'колечко', pearl: 'жемчужина', ruby: 'рубин', sapphire: 'сапфир', key: 'ключик', spoon: 'ложечка', gold: 'золотая', rainbow: 'радуга', stars: 'звёзды', hearts: 'сердечки', leaves: 'листики', dotted: 'пунктир' };
     let kind = 'hat', item = B.GIFTS.hat[0], owned = {};
+    // цены: как сейчас в магазине (с учётом остатка); у вещей не из магазина — ценность (base)
+    let price = {};
+    api('admin/shop').then(r => { for (const x of r.items || []) price[x.kind + '|' + x.item] = x.price || x.base || 0; for (const [k, v] of Object.entries(r.suggested || {})) if (!price[k]) price[k] = v; draw(); }).catch(() => {});
+    const priceOf = (kd, v) => price[kd + '|' + v] || 0;
     if (!all) api('admin/gifts?uid=' + u.id).then(r => { for (const g of r.gifts) owned[g.kind + '|' + g.item] = g.status; draw(); }).catch(() => {});
     const w = document.createElement('div'); w.className = 'adm-gift';
     w.innerHTML = `<div class="adm-gift-card" role="dialog" aria-label="Подарок"><h3>${all ? '🎁 Подарок всем птичкам' : `🎁 Подарок для ${u.nick ? '@' + esc(u.nick) : 'птички без ника'}`}</h3>${all ? '<p class="be-note">Получит каждая птичка с ником (кроме заблокированных). У кого такой вещи уже максимум (3, легендарной — 1), тому не придёт.</p>' : ''}
@@ -488,11 +492,14 @@
         const st = owned[kd + '|' + v];
         if (st) { b.classList.add('owned'); b.insertAdjacentHTML('beforeend', `<span class="adm-own">${st === 'new' ? '🎁' : '✓'}</span>`); }
         if (av[kd] === v) b.classList.add('worn');
+        const pr = priceOf(kd, v); if (pr) b.insertAdjacentHTML('beforeend', `<span class="adm-gprice">🔘 ${pr}</span>`);
         b.onclick = () => { item = v; kind = kd; draw(); };
         box.appendChild(b);
       }
       const gn = w.querySelector('.gnow'); if (!gn.firstChild) gn.appendChild(B.avatar(u.id, av, 96));
       const gp = w.querySelector('.gp'); gp.innerHTML = ''; gp.appendChild(B.avatar(u.id, Object.assign({}, av, { [kind]: item }), 96));
+      const sp = priceOf(kind, item), send = w.querySelector('[data-send]');
+      send.textContent = sp ? `Подарить · 🔘 ${sp}${all ? ' каждой' : ''}` : 'Подарить';
     };
     w.querySelector('.adm-gq').oninput = e => { fq = e.target.value; draw(); };
     w.querySelector('.adm-gk').onchange = e => { fk = e.target.value; draw(); };

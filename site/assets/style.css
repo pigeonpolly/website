@@ -3656,3 +3656,5 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .adm-gift-bar select { font: inherit; padding: 7px 10px; border-radius: 999px; border: 1.5px solid #D9CCEA; background: #fff; color: #2B1A51; max-width: 220px; }
 .adm-gh { display: inline-flex; align-items: center; gap: 6px; font-size: .9rem; color: #4a3a66; cursor: pointer; }
 .adm-gn { font-size: .85rem; color: #8a7aa6; margin-left: auto; }
+.adm-gift-items button { position: relative; }
+.adm-gprice { display: block; font: 700 11px var(--sans); color: #8a5a2b; margin-top: 2px; }
