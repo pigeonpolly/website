@@ -3675,3 +3675,19 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .rq-save-card { position: relative; display: flex; flex-direction: column; align-items: center; gap: 12px; max-width: min(420px, 100%); }
 .rq-save-card img { max-width: 100%; max-height: 70vh; border-radius: 14px; box-shadow: 0 10px 30px rgba(0, 0, 0, .4); }
 .rq-save-x { position: absolute; top: -10px; right: -6px; width: 34px; height: 34px; border-radius: 50%; border: 0; background: #fff; color: #2B1A51; cursor: pointer; }
+/* новые рамки и анимации аватара (13.10.2026) */
+.pp-ava.fr-pearls { box-shadow: 0 0 0 4px #F4F0EA, 0 0 0 6px #C8C2D8, 0 6px 16px rgba(0,0,0,.3); outline: 4px dotted #FFFFFF; outline-offset: 0; }
+.pp-ava.fr-ribbon { box-shadow: 0 0 0 4px #F08BC0, 0 0 0 7px #FFFFFF, 0 0 0 9px #F08BC0, 0 6px 16px rgba(0,0,0,.3); }
+.pp-ava.fr-ice { box-shadow: 0 0 0 4px #BFE3F5, 0 0 0 7px #E8F4FF, 0 0 16px 4px rgba(127,200,248,.75); }
+.pp-ava.fr-sunset { border: calc(var(--ava) * .06) solid transparent; box-sizing: border-box; box-shadow: 0 6px 16px rgba(0,0,0,.3);
+  background: radial-gradient(circle at 35% 30%, rgba(255,255,255,.5), transparent 60%) padding-box, linear-gradient(var(--ava-bg), var(--ava-bg)) padding-box, conic-gradient(#F6D04D, #F08A3B, #E5484D, #9B5DE5, #E5484D, #F08A3B, #F6D04D) border-box; }
+.pp-ava.fr-ocean { box-shadow: 0 0 0 4px #3F8FC9, 0 0 0 7px #8EC8EC, 0 0 0 9px #1F5F8F, 0 6px 16px rgba(0,0,0,.3); }
+.pp-ava.fr-berry { box-shadow: 0 0 0 5px #8E1F2E, 0 0 0 8px #F7A8C4, 0 6px 16px rgba(0,0,0,.3); }
+.pp-ava.an-jelly i { animation: ava-jelly 1.4s ease-in-out infinite; transform-origin: 50% 90%; }
+.pp-ava.an-nod i { animation: ava-nod 1.6s ease-in-out infinite; transform-origin: 50% 90%; }
+.pp-ava.an-swing i { animation: ava-swing 2.2s ease-in-out infinite; transform-origin: 50% 0; }
+.pp-ava.an-disco i { animation: ava-disco 3s linear infinite; }
+@keyframes ava-jelly { 30% { transform: scale(1.12, .88); } 50% { transform: scale(.92, 1.08); } 70% { transform: scale(1.04, .96); } }
+@keyframes ava-nod { 50% { transform: translateY(3%) rotate(5deg); } }
+@keyframes ava-swing { 0%, 100% { transform: rotate(-9deg); } 50% { transform: rotate(9deg); } }
+@keyframes ava-disco { to { filter: hue-rotate(360deg) saturate(1.3); } }

@@ -13,9 +13,9 @@ const out = { kinds: real, items: Object.fromEntries(real.map(k => [k, B.GIFTS[k
 // ориентир: птичка, которая рисует каждый день, получает ~400 🔘 в месяц (вход 3, рисунок 10, комментарии, бейджи)
 const R = window.PPRoom, r5 = n => Math.max(5, Math.round(n / 5) * 5);
 const hash = s => { let h = 7; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 1000; return h / 1000; }; // небольшой разброс, чтобы не всё по одной цене
-const SPECIAL_HATS = ['wizard', 'witch', 'pumpkin', 'santa', 'antlers', 'wreath', 'pirate', 'chef', 'graduation', 'headset', 'leafcrown', 'strawhat', 'heartband', 'beanie'];
+const SPECIAL_HATS = ['wizard', 'witch', 'pumpkin', 'santa', 'antlers', 'wreath', 'pirate', 'chef', 'graduation', 'headset', 'leafcrown', 'strawhat', 'heartband', 'beanie', 'cowboy', 'tiara', 'frog', 'viking', 'kittyears', 'bunnyears', 'propeller', 'sunflowers'];
 const GEMS = ['crystal', 'ring', 'pearl', 'ruby', 'sapphire', 'key', 'sword', 'wand', 'star', 'coin'];
-const FOOD = ['coffee', 'croissant', 'pizza', 'cherry', 'lollipop', 'candycane', 'icecream', 'cheese', 'mushroom', 'minipumpkin', 'spoon'];
+const FOOD = ['coffee', 'croissant', 'pizza', 'cherry', 'lollipop', 'candycane', 'icecream', 'cheese', 'mushroom', 'minipumpkin', 'spoon', 'donut', 'cookie', 'apple', 'carrot', 'cupcake', 'bubbletea'];
 const animated = d => d && typeof d.d === 'function' && /\bt\b/.test(String(d.d).split('=>')[0]); // рисунок зависит от времени — шевелится
 function value(kind, v) {
   const key = kind + '|' + v, leg = B.LEGEND.has(key), base = v.split(':')[0];
@@ -27,7 +27,7 @@ function value(kind, v) {
     case 'item': return GEMS.includes(base) ? 35 : FOOD.includes(base) ? 15 : 20;
     case 'bg': return v.startsWith('#') ? 20 : 50;
     case 'frame': return v === 'dotted' ? 30 : /^[a-z]+$/.test(v) && ['web', 'candycorn', 'bats', 'autumnwreath', 'mushrooms', 'flowers', 'canestripe', 'lights', 'pixel', 'catears', 'bubbles', 'sunrays', 'clouds', 'jewels'].includes(v) ? 60 : 45;
-    case 'anim': return ['sparkle', 'heart'].includes(v) ? 100 : 80;
+    case 'anim': return ['sparkle', 'heart', 'disco'].includes(v) ? 100 : 80;
     case 'wall': return 70; case 'floor': return 60; case 'curtain': return v === 'rainbow' ? 70 : 45;
     case 'view': return ['night', 'sea', 'snow', 'space', 'aurora'].includes(v) ? 120 : 85;
   }
