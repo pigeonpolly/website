@@ -3372,6 +3372,7 @@ html:not(.is-admin) .statbar { display: none; }
 .pot-how { font-size: .85rem !important; color: #6a5a7a; }
 .pot-got { font-size: 2rem !important; letter-spacing: 4px; }
 .pot-ov-btns { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 10px; }
+.pot-mod.pot-eye { color: #a0661a; }
 .pot-card .pill-btn { margin-top: 8px; }
 .pot-pad { display: grid; grid-template-columns: repeat(3, 58px); grid-template-rows: repeat(2, 50px); gap: 6px; }
 .pot-pad button { border: 0; border-radius: 14px; background: rgba(255,255,255,.14); color: #fff; font-size: 20px; cursor: pointer; touch-action: none; }
@@ -3428,6 +3429,7 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .pot-err { color: #F0A987; }
 
 .pot-card .pill-btn:not(.pill-fill), .pot-res .pill-btn:not(.pill-fill) { color: #2b1f3d; border-color: #2b1f3d; background: #fff; }
+.pot-card .pill-btn.pot-eye-btn { background: #ffe9a8; color: #5a3a00; border-color: #d49a2a; }
 @media (max-width: 480px) { .pot-tabs { gap: 4px; flex-wrap: nowrap; } .pot-tabs button { padding: 6px 10px; font-size: .86rem; white-space: nowrap; } }
 .rain-crown { font-size: 1.2rem; margin-right: -4px; }
 .rain-rules { margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(43,31,61,.12); }

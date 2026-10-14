@@ -1,7 +1,8 @@
 // «Зельеварня Полли» (/potions/, вкладка в «Играть»): Полли готовится к Хеллоуину. Птичка проходит лабиринты и собирает
 // ингредиенты, потом варит из трёх ингредиентов зелья — рецепты открываются методом проб и ошибок.
 // Лабиринт: бесконечные уровни (растёт размер, привидения, проклятия). Проклятие тумана — видно только рядом с собой;
-// бонусы: 🏮 фонарь (туман уходит), 👢 сапоги (быстрее), 🧲 магнит (ингредиенты сами летят), 🧿 оберег (привидения не трогают).
+// бонусы: 🏮 фонарь (туман уходит), 👢 сапоги (быстрее), 🧲 магнит (ингредиенты сами летят), 🛡️ оберег (привидения не трогают).
+// 🧿 глаз спасения: раз в 5–10 уровней лежит в лабиринте (решает сервер), копится; потратить перед уровнем — лабиринт без привидений, черепов и тумана.
 // Сервер (worker/index.js, /api/potion*) решает, какие ингредиенты в лабиринте, хранит сумку и книгу рецептов, платит пуговки.
 (() => {
   const app = document.getElementById('potions');
@@ -28,7 +29,7 @@
     boo: ['Boo!', 'Бу!', 'Bū!'],
     cursed: ['🌫 Cursed! Fog…', '🌫 Проклятие! Туман…', '🌫 Lāsts! Migla…'],
     buff: { lantern: ['🏮 Lantern: the fog is gone', '🏮 Фонарь: туман рассеялся', '🏮 Laterna: migla izklīda'], boots: ['👢 Fast boots!', '👢 Сапоги-скороходы!', '👢 Ātrie zābaki!'],
-      magnet: ['🧲 Magnet: ingredients fly to you', '🧲 Магнит: ингредиенты летят к тебе', '🧲 Magnēts: sastāvdaļas lido pie tevis'], amulet: ['🧿 Amulet: ghosts can’t touch you', '🧿 Оберег: привидения не трогают', '🧿 Amulets: spoki tev netiek klāt'] },
+      magnet: ['🧲 Magnet: ingredients fly to you', '🧲 Магнит: ингредиенты летят к тебе', '🧲 Magnēts: sastāvdaļas lido pie tevis'], amulet: ['🛡️ Amulet: ghosts can’t touch you', '🛡️ Оберег: привидения не трогают', '🛡️ Amulets: spoki tev netiek klāt'] },
     bag: ['Your ingredients', 'Твои ингредиенты', 'Tavas sastāvdaļas'], bagEmpty: ['No ingredients yet: walk a maze!', 'Ингредиентов пока нет — пройди лабиринт!', 'Sastāvdaļu vēl nav — izej labirintu!'],
     pick3: ['Put three ingredients into the cauldron. Which ones work together? Nobody knows: try!', 'Положи в котёл три ингредиента. Какие сработают вместе — никто не знает: пробуй!', 'Ieliec katlā trīs sastāvdaļas. Kuras derēs kopā — neviens nezina: mēģini!'],
     hint: ['Rumour has it that sweet things make potions tastier…', 'Говорят, сладкое делает зелья вкуснее…', 'Runā, ka saldumi dziras padara garšīgākas…'],
@@ -57,6 +58,12 @@
     back: [e => `↩ ${e} survived and went back into your bag.`, e => `↩ ${e} уцелел(а) и вернулся(ась) в сумку.`, e => `↩ ${e} izdzīvoja un atgriezās somā.`],
     sure: ['✨ Two misses in a row: the next potion will work for sure!', '✨ Две неудачи подряд — следующее зелье точно получится!', '✨ Divas neveiksmes pēc kārtas — nākamā dzira noteikti izdosies!'],
     lucky: ['🍀 Luck is on your side!', '🍀 Удача на твоей стороне!', '🍀 Veiksme tavā pusē!'],
+    eyeIn: ['🧿 An eye of rescue is hidden in this maze: grab it!', '🧿 В этом лабиринте спрятан глаз спасения — подбери его!', '🧿 Šajā labirintā paslēpta glābšanas acs — paņem to!'],
+    eyeGot: ['🧿 Eye of rescue!', '🧿 Глаз спасения!', '🧿 Glābšanas acs!'],
+    eyeWon: ['🧿 +1 eye of rescue! Use it before a hard maze: no ghosts, skulls or fog.', '🧿 +1 глаз спасения! Используй его перед трудным лабиринтом — не будет привидений, черепов и тумана.', '🧿 +1 glābšanas acs! Izmanto to pirms grūta labirinta — nebūs spoku, galvaskausu un miglas.'],
+    eyeUse: [n => `🧿 Use the eye of rescue (${n})`, n => `🧿 Использовать глаз спасения (${n})`, n => `🧿 Izmantot glābšanas aci (${n})`],
+    eyeOn: ['🧿 The eye of rescue is watching: no ghosts, skulls or fog in this maze.', '🧿 Глаз спасения смотрит за тобой: в этом лабиринте нет привидений, черепов и тумана.', '🧿 Glābšanas acs tevi sargā: šajā labirintā nav spoku, galvaskausu un miglas.'],
+    eyesN: ['Eyes of rescue', 'Глаза спасения', 'Glābšanas acis'],
     ingsN: ['Ingredients:', 'Ингредиентов:', 'Sastāvdaļas:'], potsN: ['Potions:', 'Зелий:', 'Dziras:'],
     pause: ['Pause', 'Пауза', 'Pauze'], resume: ['▶ Continue', '▶ Продолжить', '▶ Turpināt'],
   };
@@ -87,7 +94,7 @@
     const n = Object.values(S.inv).reduce((a, b) => a + b, 0);
     const si = SEASON_INFO[S.season] || SEASON_INFO.autumn;
     bar.onclick = e => { const g = e.target.closest('[data-go]'); if (!g) return; showTab(g.dataset.go); const el = app.querySelector(g.dataset.go === 'pot' ? '.pot-pot h3' : '.pot-book'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
-    bar.innerHTML = `<span>${si.e} ${si.n[L]}</span><span>🗺 ${t('lv')} <b>${S.level}</b></span><button type="button" class="pot-bar-b" data-go="pot">🧺 ${t('ingsN')} <b>${n}</b></button><button type="button" class="pot-bar-b" data-go="book">🧪 ${t('potsN')} <b>${S.book.filter(b => b.tier > 0).length}</b></button>${S.rules.on && S.rules.max > 0 ? `<span>${t('today', S.today, S.rules.max)}</span>` : ''}`;
+    bar.innerHTML = `<span>${si.e} ${si.n[L]}</span><span>🗺 ${t('lv')} <b>${S.level}</b></span><button type="button" class="pot-bar-b" data-go="pot">🧺 ${t('ingsN')} <b>${n}</b></button><button type="button" class="pot-bar-b" data-go="book">🧪 ${t('potsN')} <b>${S.book.filter(b => b.tier > 0).length}</b></button>${S.eyes ? `<span title="${t('eyesN')}">🧿 <b>${S.eyes}</b></span>` : ''}${S.rules.on && S.rules.max > 0 ? `<span>${t('today', S.today, S.rules.max)}</span>` : ''}`;
   }
   function showTab(k) {
     tab = k;
@@ -104,7 +111,7 @@
   let M = null, state = 'idle', run = null, last = 0, scale = 1, cell = 30, frames = [], fx = [];
   const VW = 360, VH = 520;
   // уровень → лабиринт (размер, стены), привидения, проклятие, бонусы; всё из seed — одинаково при каждом построении
-  function build(level, seed, items) {
+  function build(level, seed, items, eye) {
     const r = rngOf(seed), cols = Math.min(13, 5 + Math.floor((level + 1) / 2)), rows = Math.min(18, cols + 2 + Math.floor(level / 4));
     const W = []; for (let y = 0; y < rows; y++) { W.push([]); for (let x = 0; x < cols; x++) W[y].push([1, 1, 1, 1]); } // стены: верх, право, низ, лево
     const seen = W.map(row => row.map(() => false)), st = [[0, rows - 1]]; seen[rows - 1][0] = true;
@@ -135,6 +142,7 @@
     const ng = level >= 3 ? Math.min(4, 1 + Math.floor((level - 3) / 4)) : 0, ghosts = [];
     const farCells = []; for (let y = 0; y < rows; y++) for (let x = 0; x < cols; x++) if (dist[y][x] >= Math.min(6, far - 1)) farCells.push([x, y]);
     for (let i = 0; i < ng; i++) { const [x, y] = farCells[Math.floor(r() * farCells.length)] || ex; const gs = Math.min(4.2, 2.2 + 0.08 * level); ghosts.push(Object.assign(mover(x, y, gs), { base: gs })); }
+    if (eye) { const [x, y] = take(); things.push({ k: 'eye', x, y }); }
     return { level, cols, rows, W, ex, things, fog, ghosts, r, p: mover(0, rows - 1, 4.6), got: [], buffs: {}, stun: 0, time: 0, want: null, ns };
   }
   function bfs(W, cols, rows, sx, sy) {
@@ -182,6 +190,7 @@
       if (o.taken || o.x !== x || o.y !== y) continue;
       if (o.k === 'ing') take(o);
       else if (o.k === 'buff') { o.taken = true; M.buffs[o.id] = o.id === 'lantern' ? 1e9 : o.id === 'boots' ? 8 : o.id === 'magnet' ? 12 : 10; if (o.id === 'lantern') M.fog = false; banner(T.buff[o.id][L]); }
+      else if (o.k === 'eye') { o.taken = true; M.eyeGot = true; banner(t('eyeGot')); fxPop(x, y, '🧿'); }
       else if (o.k === 'skull' && !M.buffs.lantern) { o.taken = true; M.fog = true; banner(t('cursed')); M.shake = 0.3; }
     }
     if (x === M.ex[0] && y === M.ex[1]) finish();
@@ -192,13 +201,24 @@
 
   async function newLevel() {
     state = 'loading'; overlay(`<p>…</p>`);
-    try { const r = await post('potion/level'); run = r; M = build(r.level, r.seed, r.items); M.season = r.season || S.season; if (r.season && r.season !== S.season) { S.season = r.season; drawBar(); } M.p.onCell = onPlayerCell; makeBird(); fit(); startCard(); }
+    try { const r = await post('potion/level'); run = r; M = build(r.level, r.seed, r.items, r.eye); S.eyes = r.eyes || 0; drawBar(); if (r.safe) makeSafe(); M.season = r.season || S.season; if (r.season && r.season !== S.season) { S.season = r.season; drawBar(); } M.p.onCell = onPlayerCell; makeBird(); fit(); startCard(); }
     catch (e) { overlay(`<p>${t('saveErr')}</p><button type="button" class="pill-btn pill-fill" data-a="retry">↻</button>`); }
   }
   function startCard() {
     state = 'ready'; draw();
     const ng = M.ghosts.length, mods = [M.fog ? t('fog') : '', ng ? t('ghosts', ng) : '', M.ns ? t('skulls') : ''].filter(Boolean);
-    overlay(`<h2>${t('lv')} ${M.level}</h2><p>${t('items', M.things.filter(o => o.k === 'ing').length)}</p>${mods.map(m => `<p class="pot-mod">${m}</p>`).join('')}<p class="pot-how">${t('how')}</p><button type="button" class="pill-btn pill-fill" data-a="go">${t('go')}</button>`);
+    const eyeIn = M.things.some(o => o.k === 'eye') ? `<p class="pot-mod pot-eye">${t('eyeIn')}</p>` : '';
+    const useEye = mods.length && S.eyes > 0 ? `<button type="button" class="pill-btn pot-eye-btn" data-a="eye">${t('eyeUse', S.eyes)}</button>` : '';
+    overlay(`<h2>${t('lv')} ${M.level}</h2><p>${t('items', M.things.filter(o => o.k === 'ing').length)}</p>${M.safe ? `<p class="pot-mod pot-eye">${t('eyeOn')}</p>` : mods.map(m => `<p class="pot-mod">${m}</p>`).join('')}${eyeIn}<p class="pot-how">${t('how')}</p><div class="pot-ov-btns">${useEye}<button type="button" class="pill-btn pill-fill" data-a="go">${t('go')}</button></div>`);
+  }
+  // глаз спасения: убираем всё, что усложняет лабиринт
+  function makeSafe() { M.safe = true; M.fog = false; M.ghosts = []; M.ns = 0; M.things = M.things.filter(o => o.k !== 'skull'); }
+  async function useEye() {
+    if (state !== 'ready' || !M || M.safe) return;
+    state = 'loading';
+    try { const r = await post('potion/eye', { run: run.run }); S.eyes = r.eyes; drawBar(); makeSafe(); fxPop(M.p.tx, M.p.ty, '🧿'); }
+    catch (e) { toast(t('saveErr')); }
+    startCard();
   }
   function play() {
     state = 'play'; ov.hidden = true; pauseBtn.hidden = false; document.documentElement.classList.add('pot-on');
@@ -213,11 +233,11 @@
     overlay(`<p>${t('checking')}</p>`);
     for (let k = 0; k < 8; k++) {
       try {
-        const r = await post('potion/done', { run: run.run, got });
-        S.inv = r.inv; S.level = r.level; drawBar(); showBadges(r.badges);
+        const r = await post('potion/done', { run: run.run, got, eye: !!M.eyeGot });
+        S.inv = r.inv; S.level = r.level; if (r.eyes != null) S.eyes = r.eyes; drawBar(); showBadges(r.badges);
         const list = r.got.length ? `<p class="pot-got">${r.got.map(id => `<span title="${esc(IG[id].n)}">${IG[id].e}</span>`).join('')}</p>` : `<p>${t('gotNone')}</p>`;
         state = 'done';
-        overlay(`<h2>${t('done', M.level)}</h2>${r.got.length ? `<p>${t('gotIngs')}</p>` : ''}${list}<div class="pot-ov-btns"><button type="button" class="pill-btn" data-a="pot">${t('toPot')}</button><button type="button" class="pill-btn pill-fill" data-a="next">${t('next')}</button></div>`);
+        overlay(`<h2>${t('done', M.level)}</h2>${r.got.length ? `<p>${t('gotIngs')}</p>` : ''}${list}${r.eye ? `<p class="pot-mod pot-eye">${t('eyeWon')}</p>` : ''}<div class="pot-ov-btns"><button type="button" class="pill-btn" data-a="pot">${t('toPot')}</button><button type="button" class="pill-btn pill-fill" data-a="next">${t('next')}</button></div>`);
         return;
       } catch (e) { if (e === 429) { await new Promise(r => setTimeout(r, 1500)); continue; } break; }
     }
@@ -227,7 +247,7 @@
   ov.addEventListener('click', e => {
     const a = e.target.closest('[data-a]'); if (!a) return;
     const k = a.dataset.a;
-    if (k === 'go') play(); else if (k === 'resume') { state = 'play'; ov.hidden = true; document.documentElement.classList.add('pot-on'); last = performance.now(); requestAnimationFrame(loop); }
+    if (k === 'go') play(); else if (k === 'eye') useEye(); else if (k === 'resume') { state = 'play'; ov.hidden = true; document.documentElement.classList.add('pot-on'); last = performance.now(); requestAnimationFrame(loop); }
     else if (k === 'next' || k === 'retry') newLevel(); else if (k === 'pot') { newLevel(); showTab('pot'); } else if (k === 'in') window.PPAccount && window.PPAccount.openSignIn();
   });
 
@@ -307,7 +327,8 @@
       if (o.taken) continue;
       const X = o.x * c + c / 2, Y = o.y * c + c / 2;
       if (o.k === 'ing') { ctx.fillStyle = 'rgba(242,201,76,.18)'; ctx.beginPath(); ctx.arc(X, Y, c * 0.42, 0, 7); ctx.fill(); emoji(IG[o.id].e, X, Y + bob, c * 0.62); }
-      else if (o.k === 'buff') { ctx.fillStyle = 'rgba(127,200,255,.22)'; ctx.beginPath(); ctx.arc(X, Y, c * 0.42, 0, 7); ctx.fill(); emoji({ lantern: '🏮', boots: '👢', magnet: '🧲', amulet: '🧿' }[o.id], X, Y - bob, c * 0.6); }
+      else if (o.k === 'buff') { ctx.fillStyle = 'rgba(127,200,255,.22)'; ctx.beginPath(); ctx.arc(X, Y, c * 0.42, 0, 7); ctx.fill(); emoji({ lantern: '🏮', boots: '👢', magnet: '🧲', amulet: '🛡️' }[o.id], X, Y - bob, c * 0.6); }
+      else if (o.k === 'eye') { const g = ctx.createRadialGradient(X, Y, 0, X, Y, c * 0.55); g.addColorStop(0, 'rgba(255,224,120,.75)'); g.addColorStop(1, 'rgba(255,224,120,0)'); ctx.fillStyle = g; ctx.beginPath(); ctx.arc(X, Y, c * 0.55, 0, 7); ctx.fill(); emoji('🧿', X, Y - bob, c * 0.62); }
       else emoji('💀', X, Y, c * 0.55);
     }
     // птичка
@@ -326,6 +347,8 @@
       ctx.fillStyle = 'rgba(14,9,26,.97)'; ctx.beginPath(); ctx.rect(-10, -10, w + 20, h + 20); ctx.moveTo(cx + R, cy); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.fill('evenodd');
       const g = ctx.createRadialGradient(cx, cy, R * 0.55, cx, cy, R); g.addColorStop(0, 'rgba(14,9,26,0)'); g.addColorStop(1, 'rgba(14,9,26,.95)');
       ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R + 1, 0, 7); ctx.fill();
+      // глаз спасения светится и сквозь туман
+      for (const o of M.things) if (o.k === 'eye' && !o.taken) { const X = o.x * c + c / 2, Y = o.y * c + c / 2; ctx.globalAlpha = 0.75 + 0.25 * Math.sin(M.time * 3); emoji('🧿', X, Y - bob, c * 0.5); ctx.globalAlpha = 1; }
     }
     ctx.textBaseline = 'alphabetic';
     for (const e of fx) { ctx.globalAlpha = Math.min(1, e.t * 1.6); emoji(e.txt, e.x * c, e.y * c, c * 0.8); } ctx.globalAlpha = 1;
@@ -335,7 +358,7 @@
     ctx.fillStyle = '#fff'; ctx.font = `700 ${Math.round(top * 0.36)}px system-ui, sans-serif`; ctx.textAlign = 'left'; ctx.textBaseline = 'middle'; ctx.fillText(t('lv') + ' ' + M.level, 8, top / 2);
     const ings = M.things.filter(o => o.k === 'ing'), es = Math.min(top * 0.5, (w * 0.62 - ctx.measureText(t('lv') + ' ' + M.level).width - 24) / Math.max(1, ings.length) / 1.1), x0 = ctx.measureText(t('lv') + ' ' + M.level).width + 16 + es / 2;
     ings.forEach((o, i) => { ctx.globalAlpha = M.got.includes(o.i) ? 1 : 0.28; emoji(IG[o.id].e, x0 + i * es * 1.1, top / 2, es); }); ctx.globalAlpha = 1;
-    const bs = Object.keys(M.buffs).map(k => ({ lantern: '🏮', boots: '👢', magnet: '🧲', amulet: '🧿' }[k])).concat(M.fog ? ['🌫'] : []), bz = top * 0.45;
+    const bs = Object.keys(M.buffs).map(k => ({ lantern: '🏮', boots: '👢', magnet: '🧲', amulet: '🛡️' }[k])).concat(M.fog ? ['🌫'] : []), bz = top * 0.45;
     bs.forEach((e, i) => emoji(e, w - 54 - i * bz * 1.1, top / 2, bz));
     if (ban) {
       ctx.globalAlpha = Math.min(1, ban.t * 2); let fs = Math.round(Math.max(14, c * 0.55)); ctx.font = `800 ${fs}px system-ui, sans-serif`;
@@ -454,7 +477,7 @@
 
   // ======================= старт =======================
   // только на локальном сервере: доступ для автотеста
-  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__pot = { s: () => M && ({ state, level: M.level, p: pos(M.p), ex: M.ex, things: M.things.map(o => ({ k: o.k, x: o.x, y: o.y, taken: !!o.taken })), W: M.W, got: M.got.length }), want: setWant, fog: v => { M.fog = v; draw(); } };
+  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__pot = { s: () => M && ({ state, level: M.level, p: pos(M.p), ex: M.ex, things: M.things.map(o => ({ k: o.k, x: o.x, y: o.y, taken: !!o.taken })), W: M.W, got: M.got.length, ghosts: M.ghosts.length, fog: M.fog, safe: !!M.safe }), want: setWant, fog: v => { M.fog = v; draw(); } };
   fetch('/api/potion', { credentials: 'same-origin' }).then(r => r.json()).then(d => {
     S = d; drawBar(); showTab('maze'); incoming(d.gifts);
     if (!S.me) { stage.style.width = '100%'; stage.style.height = '260px'; overlay(`<h2>🧪 ${t('title')}</h2><p>${t('login')}</p><button type="button" class="pill-btn pill-fill" data-a="in">${t('signin')}</button>`); app.querySelector('.pot-pad').hidden = true; return; }

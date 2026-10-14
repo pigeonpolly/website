@@ -292,7 +292,7 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
@@ -1240,15 +1240,21 @@ async function route(req, env, url) {
     const today = (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'potion' AND day = ?").bind(u.id, rigaDay()).first()).n;
     const book = (await env.DB.prepare('SELECT combo, tier, n, created_at FROM potion_book WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results.map(r => { const s = comboSeason(r.combo); return { ...r, season: s, ix: COMBO_IX[s].get(r.combo) }; });
     const gifts = (await env.DB.prepare('SELECT from_nick AS "from", ing, n FROM potion_gifts WHERE to_id = ? AND seen = 0 ORDER BY id').bind(u.id).all()).results;
-    return json({ me: { id: u.id, nick: u.nick, avatar: avatarOf(u) }, level: u.maze_level || 1, inv: invOf(u), book, today, rules, season: seasonNow(), gifts });
+    return json({ me: { id: u.id, nick: u.nick, avatar: avatarOf(u) }, level: u.maze_level || 1, inv: invOf(u), eyes: u.eyes || 0, book, today, rules, season: seasonNow(), gifts });
   }
   // новый лабиринт текущего уровня: сервер решает, какие ингредиенты в нём лежат; seed — форма лабиринта, проклятия и бонусы (их считает potions.js)
   if (m === 'POST' && p === '/api/potion/level') {
     const u = await needUser(req, env);
     if (!u.nick || u.banned) fail(400, 'nick');
     const level = u.maze_level || 1, id = randomHex(12), seed = Math.floor(Math.random() * 2 ** 31), season = seasonNow(), items = mazeItems(level, season);
-    await env.DB.prepare('INSERT INTO maze_runs (id, user_id, level, seed, items, started) VALUES (?, ?, ?, ?, ?, ?)').bind(id, u.id, level, seed, JSON.stringify(items), Date.now()).run();
-    return json({ run: id, level, seed, items, season });
+    // 👁 глаз спасения: лежит в лабиринте раз в 5–10 уровней (users.eye_next — с какого уровня; не подобрала — будет и на следующем)
+    let next = u.eye_next || 0;
+    if (!next) { next = Math.max(4, level + 2 + Math.floor(Math.random() * 3)); await env.DB.prepare('UPDATE users SET eye_next = ? WHERE id = ?').bind(next, u.id).run(); }
+    const eye = level >= next && (u.eyes || 0) < 9 ? 1 : 0;
+    // глаз уже потрачен на этот уровень, а лабиринт не пройден (перезагрузили страницу) — уровень остаётся без помех
+    const safe = (await env.DB.prepare('SELECT 1 FROM maze_runs WHERE user_id = ? AND level = ? AND done = 0 AND safe = 1 LIMIT 1').bind(u.id, level).first()) ? 1 : 0;
+    await env.DB.prepare('INSERT INTO maze_runs (id, user_id, level, seed, items, started, eye, safe) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(id, u.id, level, seed, JSON.stringify(items), Date.now(), eye, safe).run();
+    return json({ run: id, level, seed, items, season, eye: !!eye, eyes: u.eyes || 0, safe: !!safe });
   }
   // дошла до выхода: собранные ингредиенты (номера из items) — в сумку зельевара, уровень +1
   if (m === 'POST' && p === '/api/potion/done') {
@@ -1263,8 +1269,22 @@ async function route(req, env, url) {
     const inv = invOf(u); for (const i of got) inv[items[i]] = Math.min(99, (inv[items[i]] || 0) + 1);
     const level = Math.max(u.maze_level || 1, r.level + 1);
     await env.DB.prepare('UPDATE users SET inv = ?, maze_level = ? WHERE id = ?').bind(JSON.stringify(inv), level, u.id).run();
+    let eyes = u.eyes || 0, eye = false;
+    if (r.eye && b.eye && eyes < 9) { eyes++; eye = true; await env.DB.prepare('UPDATE users SET eyes = ?, eye_next = ? WHERE id = ?').bind(eyes, r.level + 5 + Math.floor(Math.random() * 6), u.id).run(); }
     const badges = r.level >= RULES.cond.mazeA && await gameBadge(env, u, 'maze') ? ['maze'] : [];
-    return json({ ok: true, inv, level, got: got.map(i => items[i]), badges });
+    return json({ ok: true, inv, level, got: got.map(i => items[i]), badges, eye, eyes });
+  }
+  // потратить глаз спасения: этот лабиринт — без привидений, черепов и тумана (их убирает potions.js)
+  if (m === 'POST' && p === '/api/potion/eye') {
+    const u = await needUser(req, env);
+    const b = await req.json().catch(() => ({}));
+    const r = await env.DB.prepare('SELECT id, safe FROM maze_runs WHERE id = ? AND user_id = ? AND done = 0').bind(String(b.run || ''), u.id).first();
+    if (!r) fail(404, 'run');
+    if (r.safe) return json({ ok: true, eyes: u.eyes || 0 });
+    const upd = await env.DB.prepare('UPDATE users SET eyes = eyes - 1 WHERE id = ? AND eyes > 0').bind(u.id).run();
+    if (!upd.meta.changes) fail(400, 'none');
+    await env.DB.prepare('UPDATE maze_runs SET safe = 1 WHERE id = ?').bind(r.id).run();
+    return json({ ok: true, eyes: (u.eyes || 1) - 1 });
   }
   // подарить ингредиенты другой птичке (до 10 штук за раз); получатель увидит «🎁 @ник подарил(а)…» на странице игры
   if (m === 'POST' && p === '/api/potion/give') {
