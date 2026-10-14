@@ -32,6 +32,7 @@ function value(kind, v) {
     case 'view': return ['night', 'sea', 'snow', 'space', 'aurora'].includes(v) ? 120 : 85;
   }
   const d = R && R.defOf(kind, v); if (!d) return 30;
+  if (d.wall) return 30 + Math.round(d.w / 4) + (animated(d) ? 10 : 0); // полки на стену: доска — недорого
   const area = (d.w || 10) * (d.h || 10);
   let p = kind === 'deco' ? (area < 40 ? 15 : area < 150 ? 25 : 45) : (area < 60 ? 20 : area < 150 ? 35 : area < 300 ? 55 : area < 500 ? 75 : 95);
   if (animated(d)) p += kind === 'deco' ? 10 : 15; // мигает, светится, шевелится

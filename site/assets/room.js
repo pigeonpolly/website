@@ -731,6 +731,25 @@
     cherrydots: [['Cherry-dot curtains', 'Шторы в вишенку', 'Ķiršu aizkari'], ['#FCE4E8', '#F2CBD3'], '#D8283A'],
     sunny: [['Sunny yellow curtains', 'Солнечные шторы', 'Saulaini aizkari'], ['#F6D04D', '#E2B63A'], '#FFFFFF'],
   });
+  // ---------- полки на стену (14.10.2026): это мебель с верхом (top) — на них можно ставить вещи, птичка на них запрыгивает;
+  // wall: true — из сумки сразу вешается на стену (а не встаёт на пол), дальше двигается как любая вещь ----------
+  const SHELF_C = [['#C8955E', '#A3733F', '#D9AC78'], ['#6B4430', '#553424', '#7E5642'], ['#F4F0EA', '#D6D0C4', '#FFFFFF'], ['#34303D', '#211E28', '#4E4958'], ['#7FB8A6', '#5E9A88', '#A3D2C2'], ['#F2A8B4', '#D98A98', '#F7C6D0']];
+  const SHELF_N = [['oak', 'дубовая', 'ozola'], ['walnut', 'ореховая', 'riekstkoka'], ['white', 'белая', 'balta'], ['black', 'чёрная', 'melna'], ['mint', 'мятная', 'piparmētru'], ['pink', 'розовая', 'rozā']];
+  const brk = (p, x, c) => { p(x, 4, 1, 5, c); p(x, 4, 3, 1, c); p(x + 1, 5, 1, 1, c); }; // кронштейн-уголок
+  Object.assign(FURN, {
+    wshelf: { n: i => ['Wall shelf (' + SHELF_N[i][0] + ')', 'Полка на стену (' + SHELF_N[i][1] + ')', 'Sienas plaukts (' + SHELF_N[i][2] + ')'], v: 6, wall: true, w: 32, h: 9, top: 0,
+      d: (p, t, i) => { const [c, d, l] = SHELF_C[i]; p(0, 0, 32, 4, c); p(0, 0, 32, .5, l); p(0, 3.5, 32, .5, d); brk(p, 4, '#5E5A68'); brk(p, 25, '#5E5A68'); } },
+    longshelf: { n: N('Long wall shelf', 'Длинная полка', 'Garš sienas plaukts'), wall: true, w: 60, h: 9, top: 0,
+      d: p => { p(0, 0, 60, 4, '#C8955E'); p(0, 0, 60, .5, '#D9AC78'); p(0, 3.5, 60, .5, '#A3733F'); for (let x = 0; x < 60; x += 9) p(x, 1.5, 3, .5, '#B8854F'); brk(p, 6, '#3A3550'); brk(p, 29, '#3A3550'); brk(p, 51, '#3A3550'); } },
+    ropeshelf: { n: N('Rope shelf', 'Полка на верёвках', 'Plaukts uz virvēm'), wall: true, w: 30, h: 18, top: 13,
+      d: p => { p(14, 0, 2, 2, '#8A8696'); for (let k = 0; k < 13; k++) { p(14 - k, 1 + k, 1, 1, '#C9A97A'); p(15 + k, 1 + k, 1, 1, '#C9A97A'); } p(0, 13, 30, 4, '#A3733F'); p(0, 13, 30, .5, '#C8955E'); p(0, 16.5, 30, .5, '#7A4E2A'); p(1, 14, 1, 3, '#C9A97A'); p(28, 14, 1, 3, '#C9A97A'); } },
+    cubby: { n: i => ['Cube shelf (' + SHELF_N[i][0] + ')', 'Полка-куб (' + SHELF_N[i][1] + ')', 'Kuba plaukts (' + SHELF_N[i][2] + ')'], v: 6, wall: true, w: 18, h: 18, top: 0,
+      d: (p, t, i) => { const [c, d, l] = SHELF_C[i]; p(0, 0, 18, 18, c); p(2, 2, 14, 14, d); p(2, 2, 14, 1, 'rgba(0,0,0,.18)'); p(0, 0, 18, .5, l); p(2, 9, 14, 2, c); p(2, 9, 14, .5, l); } },
+    cornershelf: { n: N('Three little shelves', 'Три полочки лесенкой', 'Trīs plauktiņi'), wall: true, w: 34, h: 30, top: 0,
+      d: p => { [[0, 0], [10, 11], [20, 22]].forEach(([x, y]) => { p(x, y, 14, 3, '#F4F0EA'); p(x, y, 14, .5, '#FFFFFF'); p(x, y + 2.5, 14, .5, '#C9C2B6'); p(x + 6, y + 3, 2, 2, '#C9C2B6'); }); } },
+    plantledge: { n: N('Shelf with trailing plants', 'Полка с вьющимися растениями', 'Plaukts ar vijīgiem augiem'), wall: true, w: 34, h: 22, top: 0,
+      d: (p, t) => { p(0, 0, 34, 4, '#A3733F'); p(0, 0, 34, .5, '#C8955E'); p(0, 3.5, 34, .5, '#7A4E2A'); const o = Math.round(Math.sin(t / 900)); [[3, 14], [12, 9], [22, 17], [30, 11]].forEach(([x, len], i) => { for (let k = 0; k < len; k++) { p(x + (k % 4 === 0 ? o : 0), 4 + k, 1, 1, '#3E8E4F'); if (k % 3 === 1) p(x + 1 + (i % 2 ? -2 : 0), 4 + k, 2, 1, '#6CC27E'); } }); } },
+  });
   // значения каталога: «sofa:2», «ornament:4»; у вещей без цветов — просто имя
   const vals = o => Object.entries(o).flatMap(([k, d]) => d.v ? [...Array(d.v)].map((_, i) => k + ':' + i) : d.rc ? [k, ...[...Array(d.rc)].map((_, i) => k + ':' + (i + 1))] : [k]);
   const parse = v => { const [k, i] = String(v).split(':'); return [k, +i || 0]; };
@@ -757,6 +776,7 @@
   addTh('autumn', ['view|wheat', 'floor|cherrywood', 'wall|navyplaid', 'furn|rockingchair', 'furn|radiator']);
   addTh('spring', ['view|tulipfield', 'curtain|cherrydots', 'wall|polka', 'deco|wallshelf']);
   addTh('magic', ['deco|dreamcatcher', 'deco|moonphases']);
+  addTh('home', ['furn|wshelf:0', 'furn|wshelf:1', 'furn|wshelf:2', 'furn|wshelf:3', 'furn|longshelf', 'furn|ropeshelf', 'furn|cubby:0', 'furn|cubby:2', 'furn|cornershelf', 'furn|plantledge']);
   addTh('newyear', ['furn|xmastree', ...[0, 1, 2, 3].map(i => 'furn|present:' + i), 'furn|snowman', ...ORN_C.map((_, i) => 'deco|ornament:' + i), 'deco|xmasstar', 'deco|lights', ...LIGHTS, 'deco|tinsel', 'deco|bell', 'deco|candycane', 'deco|snowflake', 'wall|xmas', 'view|snow']);
   addTh('autumn', ['wall|leaves', 'view|autumn', 'furn|pumpkin', 'curtain|mustard']);
   addTh('halloween', ['furn|pumpkin', 'furn|candle']);
@@ -886,6 +906,7 @@
         if (it.k === 'deco') { out.push({ it, d, idx, x: clampX(it.x, d.w), y: Math.max(0, Math.min(RH - d.h, it.y || 20)) }); return; }
         const x = clampX(it.x, d.w);
         if (it.y != null) { out.push({ it, d, idx, x, y: Math.max(-d.h + 4, Math.min(RH - 2, Math.round(it.y))) }); return; } // поставлена руками — где угодно
+        if (d.wall) { out.push({ it, d, idx, x, y: 40 - d.h }); return; } // полка без координат — на стене
         let base = GY;
         out.filter(q => q.it.k === 'furn' && q.d.top != null).forEach(q => {
           const ov = Math.min(x + d.w, q.x + q.d.w) - Math.max(x, q.x);
@@ -1042,7 +1063,7 @@
         if (ROOM_KINDS[tab]) { b.classList.toggle('on', room[tab] === v); b.onclick = () => { room[tab] = v; paintBg(); save(); drawTray(); }; }
         else {
           const left = own[key] - placed(key); const n = document.createElement('em'); n.textContent = '×' + left; b.appendChild(n); b.disabled = left <= 0;
-          b.onclick = () => { if (own[key] - placed(key) <= 0) return; const d = defOf(tab, v); room.items.push(tab === 'deco' ? { k: tab, v, x: Math.round(RW / 2 - d.w / 2 - 20), y: 24 } : { k: tab, v, x: Math.round(RW / 2 - d.w / 2 - 20) }); sel = room.items.length - 1; selBar.hidden = false; save(); drawTray(); };
+          b.onclick = () => { if (own[key] - placed(key) <= 0) return; const d = defOf(tab, v); room.items.push(tab === 'deco' ? { k: tab, v, x: Math.round(RW / 2 - d.w / 2 - 20), y: 24 } : d.wall ? { k: tab, v, x: Math.round(RW / 2 - d.w / 2 - 20), y: 40 - d.h } : { k: tab, v, x: Math.round(RW / 2 - d.w / 2 - 20) }); /* полка (wall) — сразу на стену */ sel = room.items.length - 1; selBar.hidden = false; save(); drawTray(); };
         }
         list.appendChild(b);
       });
