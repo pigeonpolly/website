@@ -166,6 +166,8 @@
     if (!M || state !== 'play') return;
     M.want = d; const p = M.p;
     if (p.dir != null && d === (p.dir + 2) % 4) reverse(p); // развернуться можно сразу, посреди коридора
+    // поворот «с запасом»: птичка только что проскочила развилку (меньше половины клетки) — возвращаем её туда, и она сразу поворачивает
+    else if (p.dir != null && d !== p.dir && p.t < 0.5 && open(p.fx, p.fy, d)) { p.tx = p.fx; p.ty = p.fy; p.t = 1; }
   }
   // привидение: бродит, на развилках иногда поворачивает к птичке
   function chooseGhost(g) {
@@ -203,7 +205,7 @@
     const r = stage.getBoundingClientRect(); if (r.top < 60 || r.bottom > innerHeight) stage.scrollIntoView({ block: 'center' });
     last = performance.now(); requestAnimationFrame(loop);
   }
-  function pause() { if (state !== 'play') return; state = 'pause'; overlay(`<h2>${t('pause')}</h2><button type="button" class="pill-btn pill-fill" data-a="resume">${t('resume')}</button>`); }
+  function pause() { if (state !== 'play') return; state = 'pause'; document.documentElement.classList.remove('pot-on'); overlay(`<h2>${t('pause')}</h2><button type="button" class="pill-btn pill-fill" data-a="resume">${t('resume')}</button>`); }
   async function finish() {
     if (state !== 'play') return;
     state = 'saving'; pauseBtn.hidden = true; document.documentElement.classList.remove('pot-on');
@@ -225,7 +227,7 @@
   ov.addEventListener('click', e => {
     const a = e.target.closest('[data-a]'); if (!a) return;
     const k = a.dataset.a;
-    if (k === 'go') play(); else if (k === 'resume') { state = 'play'; ov.hidden = true; last = performance.now(); requestAnimationFrame(loop); }
+    if (k === 'go') play(); else if (k === 'resume') { state = 'play'; ov.hidden = true; document.documentElement.classList.add('pot-on'); last = performance.now(); requestAnimationFrame(loop); }
     else if (k === 'next' || k === 'retry') newLevel(); else if (k === 'pot') { newLevel(); showTab('pot'); } else if (k === 'in') window.PPAccount && window.PPAccount.openSignIn();
   });
 
@@ -346,13 +348,19 @@
   // ---------- управление: свайп по полю, касание (в сторону от птички), стрелки, кнопки ----------
   const dirOf = (dx, dy) => Math.abs(dx) > Math.abs(dy) ? (dx > 0 ? 1 : 3) : (dy > 0 ? 2 : 0);
   let sw = null;
-  cv.addEventListener('pointerdown', e => { if (state !== 'play') return; sw = { x: e.clientX, y: e.clientY, moved: false }; try { cv.setPointerCapture(e.pointerId); } catch (x) {} });
-  cv.addEventListener('pointermove', e => { if (!sw || state !== 'play') return; const dx = e.clientX - sw.x, dy = e.clientY - sw.y; if (Math.hypot(dx, dy) > 18) { setWant(dirOf(dx, dy)); sw = { x: e.clientX, y: e.clientY, moved: true }; } });
-  cv.addEventListener('pointerup', e => {
-    if (!sw || state !== 'play') { sw = null; return; }
-    if (!sw.moved) { const r = cv.getBoundingClientRect(), [px, py] = pos(M.p); setWant(dirOf(e.clientX - r.left - (px + 0.5) * cell, e.clientY - r.top - HUD() - (py + 0.5) * cell)); }
+  const maze = app.querySelector('.pot-maze'), playing = () => state === 'play' && tab === 'maze';
+  // свайпы ловим на всём поле с крестовиной, а не только на холсте; кнопки (пауза, крестовина) работают сами
+  maze.addEventListener('pointerdown', e => { if (!playing() || e.target.closest('button')) return; sw = { x: e.clientX, y: e.clientY, moved: false }; try { maze.setPointerCapture(e.pointerId); } catch (x) {} });
+  maze.addEventListener('pointermove', e => { if (!sw || !playing()) return; const dx = e.clientX - sw.x, dy = e.clientY - sw.y; if (Math.hypot(dx, dy) > 14) { setWant(dirOf(dx, dy)); sw = { x: e.clientX, y: e.clientY, moved: true }; } });
+  const swEnd = e => {
+    if (!sw || !playing()) { sw = null; return; }
+    if (!sw.moved && e.type === 'pointerup' && e.target === cv) { const r = cv.getBoundingClientRect(), [px, py] = pos(M.p); setWant(dirOf(e.clientX - r.left - (px + 0.5) * cell, e.clientY - r.top - HUD() - (py + 0.5) * cell)); }
     sw = null;
-  });
+  };
+  maze.addEventListener('pointerup', swEnd); maze.addEventListener('pointercancel', swEnd);
+  // на телефоне во время игры браузер не должен листать страницу или уходить «назад» свайпом
+  const noScroll = e => { if (playing() && !e.target.closest('.pot-pause')) e.preventDefault(); };
+  maze.addEventListener('touchstart', noScroll, { passive: false }); maze.addEventListener('touchmove', noScroll, { passive: false });
   addEventListener('keydown', e => {
     const k = { ArrowUp: 0, KeyW: 0, ArrowRight: 1, KeyD: 1, ArrowDown: 2, KeyS: 2, ArrowLeft: 3, KeyA: 3 }[e.code];
     if (k != null && state === 'play' && tab === 'maze') { setWant(k); e.preventDefault(); }

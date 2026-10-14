@@ -3379,6 +3379,8 @@ html:not(.is-admin) .statbar { display: none; }
 .pot-pad [data-d="0,-1"] { grid-column: 2; grid-row: 1; } .pot-pad [data-d="-1,0"] { grid-column: 1; grid-row: 2; } .pot-pad [data-d="0,1"] { grid-column: 2; grid-row: 2; } .pot-pad [data-d="1,0"] { grid-column: 3; grid-row: 2; }
 @media (hover: hover) and (pointer: fine) { .pot-pad { opacity: .75; } }
 .pot-on .polly-pet { opacity: 0; }
+html.pot-on, html.pot-on body { overscroll-behavior: none; }
+.pot-on .pot-maze { touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
 .pot-lead { text-align: center; margin: 0; }
 .pot-lead small { display: block; opacity: .75; margin-top: 4px; }
 .pot-cauldron { position: relative; width: 240px; height: 190px; }
