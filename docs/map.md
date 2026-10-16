@@ -25,6 +25,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/extra-palettes.js` (34K) — палитры ЭКСТРА (build.py): EXTRA_PALETTES
 - `site/assets/flock.js` (142K) — стая: сцена canvas, локации, действия, предметы: PPFlockDebug, TREE, EVENTS, ORN_C, rnd
 - `site/assets/home-blog.js` (2K) — блок блога на главной: pic
+- `site/assets/news.js` (13K) — «конвертик»: 🔔, конвертик, лента новостей: PPNews, KINDS
 - `site/assets/palettes.js` (38K) — страница /palettes/, палитра из фото, добавление палитр админом: NAMES, ADD_G, isAdmin, hue, monthName
 - `site/assets/polly-help.js` (17K) — «Полли, помоги нарисовать»: гайды /polly-helps/: guide, map
 - `site/assets/polly.js` (26K) — Полли-питомец в левом нижнем углу (`PollyPet`): PollyPet, SEASON, CORNER, HOME_X, addProp
@@ -111,3 +112,6 @@ _правка — кабинет → 📜 Правила (meta `rules`)_
 ## Общее
 
 _Сюда следующие этапы дописывают общие сведения о коде._
+
+- Новости птички: `NEWS_KINDS` (worker) → `news` в /api/whoami, /api/news; news.js `KINDS`. Новый вид — по записи там и тут.
+- account.js: `PPDevH()` — заголовок x-dev-date для ?devdate=; `PPWho` + событие `pp:whoami`. worker: `rigaMs()` — время по Риге → мс.
