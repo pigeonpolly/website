@@ -29,7 +29,7 @@
 | Меню, шапка, главная | docs/site.md |
 | Устаревшее | docs/history.md |
 
-Помощники: `tools/sec.py файл "заголовок"`; `tools/i18n_add.py`; `tools/shots.py URL селектор [--w 390,1440] [--login dev:ник] [--check]`. Сверка docs (пока есть docs/_claude-old.md): `tools/docs/check_split.py`.
+Помощники: `tools/sec.py файл "заголовок"`; `tools/i18n_add.py`; `tools/shots.py URL селектор [--w 390,1440] [--login dev:ник] [--check]`.
 
 ## Как выполнять этап
 - **Начало.** docs/plan-status.md, потом только разделы из строки «Читай» — через tools/sec.py, docs/map.md, для базы — docs/db.md. history.md — только если что-то не сходится. Перед работой — «Общее» в map.md, готовое заново не делать; новые общие модули — строкой туда же.
