@@ -541,6 +541,7 @@ def build():
     import subprocess
     subprocess.run(["node", str(ROOT / "tools" / "catalog.js"), str(ROOT)], check=True, stdout=subprocess.DEVNULL)
     subprocess.run(["node", str(ROOT / "tools" / "daycolors.js"), str(ROOT)], check=True, stdout=subprocess.DEVNULL)  # цвета темы дня → бейджи за цвета
+    subprocess.run(["node", str(ROOT / "tools" / "challenge_items.js"), str(ROOT)], check=True, stdout=subprocess.DEVNULL)  # предметы + теги → подбор тем на сервере (worker/challenge-plan.js)
     # коллекции карточек из репозитория: site/assets/cards/<коллекция>.json → список для импорта на сервере (worker/cards.js, docs/cards.md)
     cards_dir = OUT / "assets" / "cards"
     cards_dir.mkdir(exist_ok=True)
