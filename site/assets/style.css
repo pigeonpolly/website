@@ -3357,6 +3357,7 @@ html:not(.is-admin) .statbar { display: none; }
 .room-tip[hidden] { display: none; }
 .bp-tab-shop { padding: 8px 14px; border-radius: 999px; border: 1px solid #E9A93B; color: inherit; font: 600 15px 'Karla', sans-serif; text-decoration: none; }
 .bp-tab-shop:hover { background: #E9A93B; color: #2B1A51; }
+.bp-tab-album { background: none; cursor: pointer; }
 
 /* конвертик с зарплатой (account.js salary) */
 /* зарплата — карточка в ленте новостей (news.js, #acct-sal): конверт качается, клапан откидывается, письмо выезжает */
@@ -3869,6 +3870,42 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
   .pc-dlg-in { grid-template-columns: 1fr; gap: 18px; }
   .pc-dlg-in > .pc-card { width: min(260px, 78%); margin: 0 auto; }
   .pc-info h3 { font-size: 24px; margin-right: 0; }
+}
+/* альбом карточек (этап 7, cards-ui.js album): разворот в переплёте, по 6 уголков на странице, пустые — бледные рамки */
+.pc-alb { width: min(980px, calc(100% - 24px)); padding: 22px 22px 16px; }
+.pc-alb-h { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; margin: 0 48px 14px 4px; }
+.pc-alb-h h3 { margin: 0; font: 600 26px/1.15 var(--serif, 'Fraunces', serif); }
+.pc-alb-n { color: #6D6380; font: 15px var(--sans); }
+.pc-book { display: grid; grid-template-columns: 1fr 1fr; padding: 12px; border-radius: 16px; background: linear-gradient(160deg, #C4544A, #8E2F29); box-shadow: inset 0 0 0 2px rgba(255,255,255,.18), 0 10px 26px rgba(60,20,20,.35); position: relative; touch-action: pan-y; }
+.pc-book::after { content: ''; position: absolute; top: 12px; bottom: 12px; left: 50%; width: 26px; transform: translateX(-50%); background: linear-gradient(90deg, transparent, rgba(60,30,20,.22) 45%, rgba(60,30,20,.3) 50%, rgba(60,30,20,.22) 55%, transparent); pointer-events: none; }
+.pc-book-one { grid-template-columns: 1fr; } .pc-book-one::after { display: none; }
+.pc-page { position: relative; background: #F7F1E4; padding: 14px 16px 26px; min-height: 100%; }
+.pc-page:first-child { border-radius: 8px 2px 2px 8px; } .pc-page:last-child { border-radius: 2px 8px 8px 2px; } .pc-book-one .pc-page { border-radius: 8px; }
+.pc-page-blank { background: #EFE6D3; }
+.pc-page-h { margin: 0 0 10px; font: 700 13px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: #8A7A62; }
+.pc-pg-unique .pc-page-h { color: #A8741C; } .pc-pg-rare .pc-page-h { color: #3F7FA0; } .pc-pg-common .pc-page-h { color: #534AB7; }
+.pc-slots { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 14px 12px; }
+.pc-slot { --cc: #534AB7; position: relative; aspect-ratio: 50 / 67; border-radius: 9px; } /* как .pc-card: картинка 5:7 + поля 7% */
+.pc-slot-rare { --cc: #4C8FB0; } .pc-slot-unique { --cc: #C99A2E; }
+.pc-slot .pc-open { display: block; width: 100%; height: 100%; padding: 0; border: 0; background: none; cursor: pointer; }
+/* уголки: четыре треугольника поверх карточки */
+.pc-slot::after { content: ''; position: absolute; inset: -3px; pointer-events: none; z-index: 1; background:
+  linear-gradient(135deg, var(--cc) 11px, transparent 11px) top left / 50% 50% no-repeat, linear-gradient(225deg, var(--cc) 11px, transparent 11px) top right / 50% 50% no-repeat,
+  linear-gradient(45deg, var(--cc) 11px, transparent 11px) bottom left / 50% 50% no-repeat, linear-gradient(315deg, var(--cc) 11px, transparent 11px) bottom right / 50% 50% no-repeat; }
+.pc-slot-empty { border: 2px dashed color-mix(in srgb, var(--cc) 28%, transparent); background: color-mix(in srgb, var(--cc) 5%, transparent); }
+.pc-slot-empty::after { opacity: .3; inset: -2px; }
+.pc-page-n { position: absolute; bottom: 6px; left: 0; right: 0; text-align: center; color: #A89A80; font: 12px var(--sans); }
+.pc-alb-nav { display: flex; justify-content: center; align-items: center; gap: 14px; margin-top: 12px; }
+.pc-alb-nav .pill-btn { min-width: 46px; font-size: 20px; padding: 4px 12px; background: #FFFFFF; color: #2B1A51; border: 1px solid #CFC6E0; cursor: pointer; }
+.pc-alb-nav .pill-btn:disabled { opacity: .35; cursor: default; }
+.pc-alb-pg { color: #6D6380; font: 15px var(--sans); min-width: 70px; text-align: center; }
+.pc-alb-empty { margin: 12px 4px 0; color: #6D6380; font: 15px/1.5 var(--sans); }
+.pc-flip-r .pc-page { animation: pc-flip-r .32s ease-out; } .pc-flip-l .pc-page { animation: pc-flip-l .32s ease-out; }
+@keyframes pc-flip-r { from { opacity: .3; transform: translateX(18px); } } @keyframes pc-flip-l { from { opacity: .3; transform: translateX(-18px); } }
+@media (prefers-reduced-motion: reduce) { .pc-flip-r .pc-page, .pc-flip-l .pc-page { animation: none; } }
+@media (max-width: 700px) {
+  .pc-alb { padding: 18px 12px 12px; } .pc-alb-h h3 { font-size: 22px; }
+  .pc-book { padding: 8px; } .pc-page { padding: 12px 12px 24px; } .pc-slots { gap: 12px 10px; }
 }
 /* кабинет → 🃏 Карточки (cards-admin.js) */
 .adm-pc .pc-grid { margin-top: 14px; grid-template-columns: repeat(auto-fill, minmax(124px, 1fr)); }

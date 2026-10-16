@@ -1,6 +1,6 @@
 // Коллекционные карточки (docs/cards.md): плитка, окно карточки и раздел «🃏 Карточки» в магазине. Один модуль на магазин, альбом и кабинет.
 // Рамка, номер и пометка (🤖 / «нарисовала Алина») — CSS (.pc-* в style.css), в картинке только рисунок. Обычные — пиксель-арт 120×168 с image-rendering: pixelated.
-// window.PPCards: card(c) — сама карточка; tile(c, o) — карточка + подпись + «Купить» или ник владельца; open(c, o) — окно; buy(c, o); mount(el) — раздел магазина;
+// window.PPCards: card(c) — сама карточка; tile(c, o) — карточка + подпись + «Купить» или ник владельца; open(c, o) — окно; buy(c, o); album(nick) — разворот альбома; mount(el) — раздел магазина;
 // обмен (этап 7 В): trade(c, o) — окно «что хочу / что отдаю» с проверкой схемы на лету (tradeCheck); profile(el, {nick, mine}) — вкладка «🃏 Карточки» в профиле: обмены + карточки птички.
 (function () {
   var L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, LANG = ['en', 'ru', 'lv'][L], pre = ['', '/ru', '/lv'][L];
@@ -320,6 +320,71 @@
     load();
     return { reload: load };
   }
+  // альбом птички (этап 7): разворот — две страницы (на телефоне одна, листание свайпом); по 6 уголков на странице:
+  // сначала уникальные, потом редкие, потом обычные (по номеру), пустые места — бледные рамки. Нажатие на карточку — окно open().
+  var TA = {
+    album: ['🃏 Album of @{n}', '🃏 Альбом @{n}', '🃏 @{n} albums'], count: ['{n} cards', 'Карточек: {n}', 'Kartītes: {n}'],
+    prev: ['Previous page', 'Предыдущая страница', 'Iepriekšējā lapa'], next: ['Next page', 'Следующая страница', 'Nākamā lapa'],
+    empty: ['No cards yet — they are in the shop.', 'Карточек пока нет — они есть в магазине.', 'Kartīšu vēl nav — tās ir veikalā.'], shop: ['🃏 To the cards in the shop', '🃏 К карточкам в магазине', '🃏 Uz kartītēm veikalā'],
+  };
+  var PER = 6;
+  function albumPages(cards) {
+    var pages = [];
+    ['unique', 'rare', 'common'].forEach(function (r) {
+      var cs = cards.filter(function (c) { return c.rarity === r; }), n = Math.max(PER, Math.ceil(cs.length / PER) * PER);
+      for (var i = 0; i < n; i += PER) pages.push({ r: r, slots: Array.apply(null, Array(PER)).map(function (_, j) { return cs[i + j] || null; }) });
+    });
+    return pages;
+  }
+  function album(nick, o) {
+    o = o || {};
+    var d = el('dialog', 'pc-dlg pc-alb'), x = el('button', 'pc-x', '✕'); x.type = 'button'; x.title = T.close[L]; x.onclick = function () { d.close(); };
+    var head = el('div', 'pc-alb-h'); head.appendChild(el('h3', '', TA.album[L].replace('{n}', nick))); var cnt = el('span', 'pc-alb-n', '…'); head.appendChild(cnt);
+    var book = el('div', 'pc-book'), nav = el('div', 'pc-alb-nav');
+    var bp = el('button', 'pill-btn', '‹'), pn = el('span', 'pc-alb-pg'), bn = el('button', 'pill-btn', '›');
+    bp.type = bn.type = 'button'; bp.setAttribute('aria-label', TA.prev[L]); bn.setAttribute('aria-label', TA.next[L]);
+    nav.appendChild(bp); nav.appendChild(pn); nav.appendChild(bn);
+    d.appendChild(x); d.appendChild(head); d.appendChild(book); d.appendChild(nav);
+    d.addEventListener('close', function () { d.remove(); removeEventListener('resize', draw); });
+    d.addEventListener('click', function (e) { if (e.target === d) d.close(); });
+    document.body.appendChild(d); d.showModal();
+    var pages = [], at = 0, data = null;
+    var one = function () { return matchMedia('(max-width: 700px)').matches; };
+    function page(pg, i) {
+      var p = el('section', 'pc-page pc-pg-' + pg.r);
+      p.appendChild(el('h4', 'pc-page-h', T[pg.r + 's'][L]));
+      var g = el('div', 'pc-slots');
+      pg.slots.forEach(function (c) {
+        var s = el('div', 'pc-slot pc-slot-' + pg.r + (c ? '' : ' pc-slot-empty'));
+        if (c) { var b = el('button', 'pc-open'); b.type = 'button'; b.title = c.title || ''; b.appendChild(card(c)); b.onclick = function () { open(c, Object.assign({ me: data && data.me }, o)); }; s.appendChild(b); }
+        g.appendChild(s);
+      });
+      p.appendChild(g); p.appendChild(el('span', 'pc-page-n', String(i + 1)));
+      return p;
+    }
+    function draw() {
+      if (!pages.length) return;
+      var step = one() ? 1 : 2; at = Math.max(0, Math.min(at - at % step, pages.length - 1));
+      book.innerHTML = ''; book.classList.toggle('pc-book-one', step === 1);
+      for (var i = at; i < at + step; i++) book.appendChild(pages[i] ? page(pages[i], i) : el('section', 'pc-page pc-page-blank'));
+      pn.textContent = (step === 2 && pages[at + 1] ? (at + 1) + '–' + (at + 2) : String(at + 1)) + ' / ' + pages.length;
+      bp.disabled = at === 0; bn.disabled = at + step >= pages.length;
+    }
+    var go = function (dir) { var step = one() ? 1 : 2, to = at + dir * step; if (to < 0 || to >= pages.length) return; at = to; draw(); book.classList.remove('pc-flip-l', 'pc-flip-r'); void book.offsetWidth; book.classList.add(dir > 0 ? 'pc-flip-r' : 'pc-flip-l'); };
+    bp.onclick = function () { go(-1); }; bn.onclick = function () { go(1); };
+    d.addEventListener('keydown', function (e) { if (e.key === 'ArrowLeft') go(-1); if (e.key === 'ArrowRight') go(1); });
+    // свайп: тянуть влево — следующая страница
+    var sx = null, sy = 0;
+    book.addEventListener('touchstart', function (e) { sx = e.touches[0].clientX; sy = e.touches[0].clientY; }, { passive: true });
+    book.addEventListener('touchend', function (e) { if (sx == null) return; var dx = e.changedTouches[0].clientX - sx, dy = e.changedTouches[0].clientY - sy; sx = null; if (Math.abs(dx) > 40 && Math.abs(dx) > Math.abs(dy)) go(dx < 0 ? 1 : -1); });
+    addEventListener('resize', draw);
+    fetch('/api/cards?lang=' + LANG + '&order=album&owner=' + encodeURIComponent(nick), { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (dd) {
+      data = dd || { cards: [] }; cnt.textContent = TA.count[L].replace('{n}', data.cards.length);
+      pages = albumPages(data.cards); draw();
+      if (!data.cards.length && data.me && data.me.nick === nick) { var a = el('a', 'pill-btn pc-alb-shop', TA.shop[L]); a.href = pre + '/shop/#cards'; var p = el('p', 'pc-alb-empty', TA.empty[L] + ' '); p.appendChild(a); d.insertBefore(p, nav); }
+    }).catch(function () { cnt.textContent = '—'; });
+    return d;
+  }
 
   // раздел магазина: фильтры коллекция · редкость · все / свободные / купленные / мои
   function mount(root) {
@@ -365,7 +430,7 @@
     load();
     return { reload: load };
   }
-  window.PPCards = { card: card, tile: tile, open: open, buy: buy, mount: mount, trade: trade, tradeCheck: tradeCheck, profile: profile, T: T, L: L };
+  window.PPCards = { card: card, tile: tile, open: open, buy: buy, mount: mount, album: album, trade: trade, tradeCheck: tradeCheck, profile: profile, T: T, L: L };
   var auto = document.querySelector('[data-pp-cards]');
   if (auto) mount(auto);
 })();
