@@ -178,6 +178,9 @@
       h: ['Come back and upload a sketch after a break of {n} days or more', 'Вернуться и загрузить рисунок после перерыва в {n} дней и больше', 'Atgriezties un augšupielādēt skici pēc {n} vai vairāk dienu pārtraukuma'] },
     { k: 'newyear', s: 'newyear', bg: '#CFE6F7', n: ['New Year sketch', 'Новогодний скетч', 'Jaungada skice'], f: ['Started the year with a pencil in hand.', 'Встретил(а) год с карандашом в руке.', 'Sagaidīji gadu ar zīmuli rokā.'],
       h: ['Upload a sketch on 31 December or 1 January', 'Загрузить рисунок 31 декабря или 1 января', 'Augšupielādēt skici 31. decembrī vai 1. janvārī'] },
+    { k: 'triple', s: 'triple', bg: '#FCE7C8', n: ['Three in one', 'Три в одном', 'Trīs vienā'],
+      f: ['The day before yesterday, yesterday and today — all in one evening. Time is just a convention.', 'Позавчера, вчера и сегодня — за один вечер. Время — всего лишь условность.', 'Aizvakar, vakar un šodien — vienā vakarā. Laiks ir tikai nosacījums.'],
+      h: ['Upload sketches for the day before yesterday, yesterday and today on the same day', 'Загрузить за один день работы за позавчера, вчера и сегодня', 'Vienā dienā augšupielādēt skices par aizvakardienu, vakardienu un šodienu'] },
     { k: 'halloween', s: 'pumpkin', bg: '#F7C9A3', n: ['Spooky sketch', 'Тыквенный скетч', 'Ķirbju skice'], f: ['Drew on Halloween and wasn’t even scared.', 'Рисовал(а) на Хеллоуин и даже не испугался(ась).', 'Zīmēji Helovīnā un pat nenobijies.'],
       h: ['Upload a sketch on 31 October', 'Загрузить рисунок 31 октября', 'Augšupielādēt skici 31. oktobrī'] },
     { k: 'collector', s: 'collector', bg: '#F6D3CF', n: ['Collector', 'Коллекционер', 'Kolekcionārs'], f: ['Opened all 31 advent windows. Not a single gift escaped.', 'Открыл(а) все 31 окошко адвента. Ни один подарок не ускользнул.', 'Atvēri visus 31 adventes lodziņus. Neviena dāvana neizbēga.'],
@@ -237,6 +240,7 @@
     wise: [[7, 1, 'mm'], [6, 2, 'm'], [9, 2, 'm'], [6, 3, 'm'], [9, 3, 'm'], [7, 4, 'mm'], [5, 2, 'm'], [3, -1, '.c.'], [4, 0, 'c'], [12, 6, 'nn'], [12, 7, '.n'], [12, 8, '.n'], [12, 9, '.n'], [12, 10, '.n'], [12, 11, '.n'], [12, 12, '.n'], [13, 13, 'd']],
     early: [[0, -3, 'm.m.m'], [1, -2, 'mmm'], [0, -1, 'mmlmm'], [1, 0, 'mmm'], [0, 1, 'm.m.m']],
     owl: [[5, -3, '...c'], [4, -2, '..ccc'], [3, -1, '.ccccl'], [3, 0, 'cccccc'], [12, -3, 'l'], [1, -2, 'l'], [0, 3, 'l'], [13, 2, 'l']],
+    triple: [[0, -3, 'eee.eee.eee'], [0, -2, 'ere.ege.ePe'], [0, -1, 'eee.eee.eee']], // три листка над головой: позавчера, вчера, сегодня
     weekend: [[6, 2, 'kkk.kk'], [6, 3, 'kkkkkk'], [7, 4, 'k..k'], [12, 8, 'h'], [11, 9, 'hhh'], [12, 10, 'p'], [12, 11, 'd']],
     ten: [[0, 3, 'g.ggg'], [0, 4, 'g.g.g'], [0, 5, 'g.g.g'], [0, 6, 'g.g.g'], [0, 7, 'g.ggg']],
     fifty: [[9, 9, 'rrrrr'], [9, 10, 'nnnnn'], [9, 11, 'hhhhh'], [9, 12, 'ppppp'], [10, 8, 'eee']],

@@ -384,7 +384,7 @@ const now = () => Math.floor(Date.now() / 1000);
 const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, pick: 11,
   // бейджи: уровни по рекордной серии (дней) и особые достижения — пуговки один раз за каждый
   levels: { 1: 5, 3: 10, 7: 20, 14: 30, 30: 50, 60: 80, 100: 120, 365: 300 },
-  badges: { bw: 5, extra: 15, bday: 15, early: 15, owl: 15, comeback: 15, ten: 20, weekend: 20, newyear: 20, halloween: 20,
+  badges: { bw: 5, extra: 15, bday: 15, triple: 15, early: 15, owl: 15, comeback: 15, ten: 20, weekend: 20, newyear: 20, halloween: 20,
     monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, collector: 50, hundred: 100, robot: 1,
     cpurple: 20, cyellow: 20, cred: 20, cblue: 20, cgreen: 20,
     rain1: 10, rain2: 20, rain3: 40, pot1: 5, pot2: 15, pot3: 50, potkid: 20, maze: 20 } }; // игры: «Пуговичный дождь» (rain*) и «Зельеварня» (pot*, maze) // c* — N рисунков в дни, когда в теме дня был этот цвет // robot — загрузил работу с пометкой 🤖 «ИИ-генерация»
@@ -584,7 +584,7 @@ async function awardBadges(env, uid, best, badges) {
 // Считается в памяти из трёх запросов, записи — пачками (INSERT OR IGNORE: повторно не начислит), баланс = сумма журнала.
 async function backfillButtons(env) {
   const users = (await env.DB.prepare("SELECT * FROM users WHERE banned = 0 AND nick IS NOT NULL AND nick != ''").all()).results;
-  const posts = (await env.DB.prepare('SELECT user_id, id, day, bw, ai, tod, picked FROM posts').all()).results;
+  const posts = (await env.DB.prepare('SELECT user_id, id, day, bw, ai, tod, picked, created_at FROM posts').all()).results;
   const byUser = new Map(); for (const x of posts) (byUser.get(x.user_id) || byUser.set(x.user_id, []).get(x.user_id)).push(x);
   const pickUser = Number(await getMeta(env, 'pick_user'));
   const day = rigaDay(), t = now(), ins = [];
@@ -872,6 +872,11 @@ function moreBadges(u, posts) {
   for (const d of days) { const dt = new Date(d + 'T12:00:00Z'); if (dt.getUTCDay() === 6) { dt.setUTCDate(dt.getUTCDate() + 1); if (days.has(dt.toISOString().slice(0, 10))) weekends++; } }
   if (weekends >= C.weekend) got.add('weekend');                                         // суббота и воскресенье — 4 выходных
   for (const d of days) { const md = d.slice(5); if (md === '12-31' || md === '01-01') got.add('newyear'); if (md === '10-31') got.add('halloween'); }
+  // «Три в одном»: в один день по Риге загружены работы за позавчера, вчера и сегодня (этот день)
+  const upOn = {};
+  for (const p of posts) if (p.created_at) { const r = new Date(p.created_at * 1000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }); (upOn[r] = upOn[r] || new Set()).add(p.day); }
+  const back = (k, n) => { const t = new Date(k + 'T12:00:00Z'); t.setUTCDate(t.getUTCDate() - n); return t.toISOString().slice(0, 10); };
+  for (const [r, s] of Object.entries(upOn)) if (s.has(r) && s.has(back(r, 1)) && s.has(back(r, 2))) { got.add('triple'); break; }
   // за цвета: N рисунков в дни, когда в теме дня был фиолетовый / жёлтый / красный / синий / зелёный
   if (DAYCOL) for (const [f, k] of [['p', 'cpurple'], ['y', 'cyellow'], ['r', 'cred'], ['b', 'cblue'], ['g', 'cgreen']]) if ([...days].filter(d => (DAYCOL[d] || '').includes(f)).length >= C.colors) got.add(k);
   return got;
@@ -953,7 +958,7 @@ async function cleanupInactive(env, limit = KV_LIMIT) {
   for (const u of users) {
     if (frac() < CLEAN_STOP) break;
     if (await isAdmin(u, env)) continue; // работы Алины не удаляются, пока она сама их не удалит
-    const posts = (await env.DB.prepare('SELECT id, day, bw, ai, tod, bytes, store, kv FROM posts WHERE user_id = ?').bind(u.id).all()).results;
+    const posts = (await env.DB.prepare('SELECT id, day, bw, ai, tod, bytes, store, kv, created_at FROM posts WHERE user_id = ?').bind(u.id).all()).results;
     if (report.deletes + posts.filter(x => x.kv !== 0).length * 2 > 900) break; // бесплатный лимит KV — 1000 удалений в сутки
     await env.DB.prepare('UPDATE users SET best = ?, badges = ? WHERE id = ?')
       .bind(mergedBest(u, streakDays(posts)), mergedBadges(u, posts).join(','), u.id).run();
@@ -1165,7 +1170,7 @@ async function route(req, env, url) {
     const nick = String(url.searchParams.get('nick') || '').replace(/^@/, '');
     const u = await env.DB.prepare('SELECT * FROM users WHERE nick = ? AND banned = 0').bind(nick).first();
     if (!u) fail(404, 'user');
-    const rows = (await env.DB.prepare('SELECT id, day, theme, bw, ai, tod, hidden FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
+    const rows = (await env.DB.prepare('SELECT id, day, theme, bw, ai, tod, hidden, created_at FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
     const pickUser = Number(await getMeta(env, 'pick_user'));
     const badges = mergedBadges(u, rows).filter(b => b !== 'pick_past' || pickUser !== u.id);
     if (pickUser === u.id) badges.push('pick');
@@ -1807,7 +1812,7 @@ async function route(req, env, url) {
     if (!u) return json({ user: null });
     const earned = u.nick && !u.banned ? await award(env, u.id, 'daily', rigaDay(), BTN.daily) : 0; // +3 за первый заход за сутки
     if (earned) u.buttons = (u.buttons || 0) + earned;
-    const rows = (await env.DB.prepare('SELECT id, day, theme, bw, ai, tod, hidden FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
+    const rows = (await env.DB.prepare('SELECT id, day, theme, bw, ai, tod, hidden, created_at FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
     const st = streaks(streakDays(rows));
     const pickUser = Number(await getMeta(env, 'pick_user'));
     const kept = mergedBadges(u, rows).filter(b => b !== 'pick_past' || pickUser !== u.id);
@@ -2104,7 +2109,7 @@ async function route(req, env, url) {
     const mc = mcountOf(u);
     if (!old) mc[day.slice(0, 7)] = (mc[day.slice(0, 7)] || 0) + 1; // замена работы дня не считается
     const mcount = Object.keys(mc).sort().slice(-48).map(k => `${k}:${mc[k]}`).join(',');
-    const all = (await env.DB.prepare('SELECT day, bw, ai, tod FROM posts WHERE user_id = ?').bind(u.id).all()).results;
+    const all = (await env.DB.prepare('SELECT day, bw, ai, tod, created_at FROM posts WHERE user_id = ?').bind(u.id).all()).results;
     const uu = { ...u, months: months.join(','), mcount };
     await env.DB.prepare('UPDATE users SET months = ?, mcount = ?, best = ?, badges = ? WHERE id = ?')
       .bind(uu.months, mcount, mergedBest(u, streakDays(all)), mergedBadges(uu, all).join(','), u.id).run();
