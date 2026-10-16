@@ -91,7 +91,7 @@
 
   // ---------- режим «сумка» ----------
   // o = { items: [{kind, item, n, u, legend, gid}], id, state, sell (цена или null), cards (число или null — вкладка появится с карточками),
-  //       onUse(g), onGive(g), onSell(g), onMore(g), cardsInto(box), empty, top,
+  //       onUse(g), onGive(g), onSell(g), onMore(g), cardsInto(box), onCards() — вкладка «Карточки» открывает альбом, empty, top,
   //       undo: { can(), run() } — кнопка «↶ Отменить»; shopUrl(tab, kind) — плитка «＋ в магазин»; shopCount(kind) — сколько таких вещей в продаже (для пустого вида) }
   function bag(box, o) {
     const S = o.state || (o.state = {});
@@ -107,7 +107,7 @@
       const tl = [{ v: 'all', label: tr(['All', 'Всё', 'Viss']), n: all.length }, { v: 'bird', label: tr(['For the bird', 'Птичке', 'Putniņam']), n: bird.length }, { v: 'room', label: tr(['For the room', 'Комнате', 'Istabai']), n: room.length }];
       if (o.cards != null) tl.push({ v: 'cards', label: tr(['Cards', 'Карточки', 'Kartītes']), n: o.cards });
       if (!tl.some(x => x.v === S.tab)) S.tab = 'all';
-      head.appendChild(tabs(tl, S.tab, v => { S.tab = v; S.kind = ''; draw(); }));
+      head.appendChild(tabs(tl, S.tab, v => { if (v === 'cards' && o.onCards) return o.onCards(); S.tab = v; S.kind = ''; draw(); })); // o.onCards — «Карточки» открывают альбом
       if (S.tab !== 'cards') head.appendChild(toggle(tr(['Only unused', 'Только неиспользуемые', 'Tikai neizmantotās']), !!S.free, v => { S.free = v; draw(); }));
       if (o.undo) { // последнее «надеть / поставить» — назад
         const u = document.createElement('button'); u.type = 'button'; u.className = 'cat-undo'; u.textContent = '↶ ' + tr(['Undo', 'Отменить', 'Atsaukt']);
@@ -146,8 +146,9 @@
       for (const [g, list] of grids) for (const it of list) {
         const mark = it.u > 0 ? (it.n > 1 ? `✓ ${it.u}/${it.n}` : '✓') : it.n > 1 ? `×${it.n}` : '';
         const menu = [];
-        if (!it.legend && o.onGive) menu.push({ label: '🎁 ' + tr(['Give', 'Подарить', 'Uzdāvināt']), on: () => o.onGive(it) });
-        if (o.sell != null && o.onSell) menu.push({ label: '💰 ' + tr([`Sell for ${o.sell} 🔘`, `Продать за ${o.sell} 🔘`, `Pārdot par ${o.sell} 🔘`]), on: () => o.onSell(it) });
+        const can = window.PPCanDo ? window.PPCanDo(it.kind, it.item) : { gift: !it.legend, sell: true }; // что можно с вещью (can-do.js)
+        if (can.gift && o.onGive) menu.push({ label: '🎁 ' + tr(['Give', 'Подарить', 'Uzdāvināt']), on: () => o.onGive(it) });
+        if (can.sell && o.sell != null && o.onSell) menu.push({ label: '💰 ' + tr([`Sell for ${o.sell} 🔘`, `Продать за ${o.sell} 🔘`, `Pārdot par ${o.sell} 🔘`]), on: () => o.onSell(it) });
         if (o.onMore) menu.push({ label: 'ℹ️ ' + tr(['Details', 'Подробнее', 'Sīkāk']), on: () => o.onMore(it) });
         const used = it.u > 0, room = isRoom(it.kind);
         g.appendChild(tile({ kind: it.kind, item: it.item, name: B.giftName(it.kind, it.item, L), legend: it.legend, mark, markOn: used, menu, id: o.id, size,

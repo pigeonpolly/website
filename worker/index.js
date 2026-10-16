@@ -5,6 +5,8 @@ import { blogApi, blogPage, visitor, anonCode, birdName } from './blog.js';
 import { translateAll, translateTo, ABOUT } from './translate.js';
 import { challengeApi, challengeCron, planDayColors, CHALLENGE_TABLES } from './challenge-days.js'; // план тем челленджа (docs/challenge.md «Подбор тем»)
 import { CH_DEFAULTS, CH_RANGE } from './challenge-plan.js';
+import '../site/assets/can-do.js'; // PPCanDo — что можно с вещью (этап 7)
+const PPCanDo = globalThis.PPCanDo;
 import { cardsApi, importCards, myCards, CARD_TABLES } from './cards.js'; // коллекционные карточки (docs/cards.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
@@ -144,7 +146,7 @@ function cleanRoom(room, own) {
   const used = {};
   for (const it of Array.isArray(room.items) ? room.items.slice(0, 80) : []) {
     if (!it || !['furn', 'deco'].includes(it.k) || !/^[a-z0-9:-]{1,24}$/i.test(String(it.v))) continue;
-    const key = it.k + '|' + it.v; if ((used[key] || 0) >= (own[key] || 0)) continue;
+    const key = it.k + '|' + it.v; if ((used[key] || 0) >= (PPCanDo.isAlbum(it.k, it.v) ? 1 : own[key] || 0)) continue; // альбом карточек — в каждой комнате сам, один
     used[key] = (used[key] || 0) + 1;
     const x = Math.max(-10, Math.min(200, Math.round(Number(it.x) || 0))), o = { k: it.k, v: String(it.v), x };
     // украшения — всегда со своим y; мебель — если её поставили руками (иначе стоит на полу/на том, что под ней)
@@ -281,7 +283,7 @@ const okItem = (kind, item) => GIFT_KINDS.includes(kind) && (kind === 'any' ? ['
 // общие функции для worker/blog.js
 // карточкам: средняя «цена сейчас» обычной вещи в продаже (без легендарных, сюрпризов и игровых), правила, лента событий стаи
 async function avgItemPrice(env) {
-  const rows = (await env.DB.prepare('SELECT kind, item, price, stock FROM shop WHERE stock > 0').all()).results.filter(r => !isLeg(r.kind, r.item) && r.item !== '?' && r.kind !== 'any' && !gameOnly(r.kind, r.item));
+  const rows = (await env.DB.prepare('SELECT kind, item, price, stock FROM shop WHERE stock > 0').all()).results.filter(r => !isLeg(r.kind, r.item) && r.item !== '?' && r.kind !== 'any' && PPCanDo(r.kind, r.item).shop);
   const ps = rows.map(r => priceNow(r.kind, r.item, r.price, r.stock)).filter(v => v > 0);
   return ps.length ? ps.reduce((a, b) => a + b, 0) / ps.length : PLEVEL.avg || (await gameUnit(env)).avg || 50;
 }
@@ -389,7 +391,7 @@ const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, p
     cpurple: 20, cyellow: 20, cred: 20, cblue: 20, cgreen: 20,
     rain1: 10, rain2: 20, rain3: 40, pot1: 5, pot2: 15, pot3: 50, potkid: 20, maze: 20 } }; // игры: «Пуговичный дождь» (rain*) и «Зельеварня» (pot*, maze) // c* — N рисунков в дни, когда в теме дня был этот цвет // robot — загрузил работу с пометкой 🤖 «ИИ-генерация»
 // легендарные вещи (как LEGEND в birds.js): в магазине по одной штуке на птичку, дарить нельзя; обычных — до трёх одинаковых
-const LEGEND = new Set(['furn|countcoffin', 'furn|crypt', 'furn|tieredcake', 'hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass', 'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight']);
+const LEGEND = PPCanDo.LEGEND; // список — в site/assets/can-do.js (один на сервер и браузер)
 // ---------- правила сайта, которые Алина меняет в кабинете (раздел «📜 Правила»): хранятся в meta 'rules', поверх значений по умолчанию ----------
 const RULE_DEFAULTS = {
   daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, pick: 11,
@@ -474,7 +476,6 @@ async function loadDayColors(env) {
   DAYCOL = { ...DAYCOL_FILE, ...plan };
   return DAYCOL;
 }
-const gameOnly = (kind, item) => kind === 'furn' && String(item).startsWith('kidpot'); // вещи только из игр (бутылочка «Вкус детства»): в магазин не попадают
 const legMax = (kind, item) => LEGEND.has(kind + '|' + item) ? RULES.legendMax : RULES.shopMax;
 // дни для серии: работы с пометкой 🤖 считаются, если так разрешено в правилах
 const streakDays = rows => rows.filter(r => RULES.aiStreak || !(r.ai > 0)).map(r => r.day);
@@ -541,7 +542,7 @@ async function autoRestock(env, force = false) {
   const to = RULES.restockTo > 0 ? RULES.restockTo : STOCK.norm, keys = new Set();
   for (const [k, xs] of Object.entries(cat.items || {})) for (const v of xs) keys.add(k + '|' + v);
   for (const r of (await env.DB.prepare('SELECT kind, item FROM shop').all()).results) keys.add(r.kind + '|' + r.item);
-  const list = [...keys].filter(k => !LEGEND.has(k) && !k.endsWith('|legend') && !gameOnly(...k.split('|'))).map(k => k.split('|')).filter(([k, v]) => GIFT_KINDS.includes(k) && v);
+  const list = [...keys].filter(k => !LEGEND.has(k) && !k.endsWith('|legend') && PPCanDo(...k.split('|')).shop).map(k => k.split('|')).filter(([k, v]) => GIFT_KINDS.includes(k) && v);
   const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock, added_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET added_at = CASE WHEN shop.stock <= 0 THEN excluded.added_at ELSE shop.added_at END, stock = CASE WHEN shop.stock <= 0 THEN excluded.stock ELSE shop.stock END');
   const was = (await env.DB.prepare('SELECT COUNT(*) AS n FROM shop WHERE stock > 0').first()).n;
   for (let i = 0; i < list.length; i += 50) await env.DB.batch(list.slice(i, i + 50).map(([k, v]) => st.bind(k, v, cp[k + '|' + v] || 30, to, now())));
@@ -1024,7 +1025,7 @@ async function autopilot(env, req) {
 async function rainItem(env, req, uid, lv) {
   const cat = await catalog(env, req), leg = new Set(cat.legend || []);
   const have = new Set((await env.DB.prepare("SELECT kind, item FROM gifts WHERE user_id = ? AND status IN ('bag', 'new')").bind(uid).all()).results.map(r => r.kind + '|' + r.item));
-  const ok = (k, v) => !gameOnly(k, v) && k !== 'any' && v !== '?' && v !== 'legend' && !leg.has(k + '|' + v) && !LEGEND.has(k + '|' + v) && !have.has(k + '|' + v);
+  const ok = (k, v) => PPCanDo(k, v).shop && k !== 'any' && v !== '?' && v !== 'legend' && !leg.has(k + '|' + v) && !LEGEND.has(k + '|' + v) && !have.has(k + '|' + v);
   const inShop = (await env.DB.prepare('SELECT kind, item FROM shop WHERE stock > 0').all()).results.filter(r => ok(r.kind, r.item));
   let pick = inShop.length ? inShop[Math.floor(Math.random() * inShop.length)] : null;
   if (pick) await env.DB.prepare('UPDATE shop SET stock = MAX(0, stock - 1) WHERE kind = ? AND item = ?').bind(pick.kind, pick.item).run();
@@ -1081,7 +1082,7 @@ async function reqReward(env, req, uid, rid) {
   if (!u) return null;
   const n = (u.req_n || 0) + 1, need = u.req_mid || (20 + Math.floor(Math.random() * 11)), mid = n >= need;
   const cat = await catalog(env, req), cp = cat.prices || {}, leg = new Set(cat.legend || []);
-  const all = Object.entries(cat.items || {}).flatMap(([k, vs]) => vs.map(v => [k, v])).filter(([k, v]) => k !== 'any' && v !== '?' && v !== 'legend' && !leg.has(k + '|' + v) && !LEGEND.has(k + '|' + v) && !gameOnly(k, v) && cp[k + '|' + v] > 0);
+  const all = Object.entries(cat.items || {}).flatMap(([k, vs]) => vs.map(v => [k, v])).filter(([k, v]) => k !== 'any' && v !== '?' && v !== 'legend' && !leg.has(k + '|' + v) && !LEGEND.has(k + '|' + v) && PPCanDo(k, v).shop && cp[k + '|' + v] > 0);
   const vals = all.map(([k, v]) => cp[k + '|' + v]).sort((a, b) => a - b), t1 = vals[Math.floor(vals.length / 3)] || 0, t2 = vals[Math.floor(vals.length * 2 / 3)] || 0;
   const have = new Set((await env.DB.prepare("SELECT kind, item FROM gifts WHERE user_id = ? AND status IN ('bag', 'new')").bind(uid).all()).results.map(r => r.kind + '|' + r.item));
   const free = all.filter(([k, v]) => !have.has(k + '|' + v)), price = ([k, v]) => cp[k + '|' + v];
@@ -1941,7 +1942,7 @@ async function route(req, env, url) {
     const b = await req.json().catch(() => ({}));
     const g = await env.DB.prepare("SELECT * FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag'").bind(Number(b.id), u.id).first(); // любую вещь из сумки (раньше — только купленные)
     if (!g) fail(404, 'gift');
-    if (LEGEND.has(g.kind + '|' + g.item)) fail(403, 'legend'); // легендарные не дарятся
+    if (!PPCanDo(g.kind, g.item).gift) fail(403, 'legend'); // легендарные не дарятся (PPCanDo)
     const to = await env.DB.prepare("SELECT id, nick FROM users WHERE nick = ? AND banned = 0 AND id != ?").bind(String(b.to || '').trim().replace(/^@/, ''), u.id).first();
     if (!to) fail(404, 'bird');
     if (await copies(env, to.id, g.kind, g.item) >= RULES.shopMax) fail(409, 'has'); // у получателя уже три таких
@@ -1964,7 +1965,7 @@ async function route(req, env, url) {
     if (!g) fail(404, 'gift');
     const del = await env.DB.prepare("DELETE FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag'").bind(g.id, u.id).run();
     if (!del.meta.changes) fail(404, 'gift');
-    if (!gameOnly(g.kind, g.item)) await env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, 1) ON CONFLICT(kind, item) DO UPDATE SET stock = MIN(100000, shop.stock + 1)').bind(g.kind, g.item, ((await catalog(env, req)).prices || {})[g.kind + '|' + g.item] || 30).run();
+    if (PPCanDo(g.kind, g.item).shop) await env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, 1) ON CONFLICT(kind, item) DO UPDATE SET stock = MIN(100000, shop.stock + 1)').bind(g.kind, g.item, ((await catalog(env, req)).prices || {})[g.kind + '|' + g.item] || 30).run();
     const n = RULES.sellPrice;
     await env.DB.prepare('UPDATE users SET buttons = COALESCE(buttons, 0) + ? WHERE id = ?').bind(n, u.id).run();
     await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(u.id, 'sell', String(g.id), n, rigaDay(), now()).run();

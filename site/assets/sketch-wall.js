@@ -451,8 +451,10 @@
     const order = [...C.BIRD_KINDS, ...C.ROOM_KINDS], sortK = list => order.flatMap(k => list.filter(g => g.kind === k));
     const S = bagInto.f || (bagInto.f = {}); // вкладка, вид, «только неиспользуемые» — до перезагрузки
     const redraw = () => ui.draw();
+    // вкладка «Карточки» (открывает альбом) — когда узнаем, сколько карточек
+    if (bagInto.cn == null && me.nick) fetch('/api/cards?show=mine', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => { if (!d) return; bagInto.cn = d.cards.length; if (box.isConnected) redraw(); }).catch(() => {});
     const ui = C.bag(box, {
-      get items() { return sortK(items()); }, id: me.id, state: S, sell: me.btn && me.btn.rules ? me.btn.rules.sell : null, empty: t('bagEmpty'),
+      get items() { return sortK(items()); }, get cards() { return bagInto.cn; }, onCards: () => window.PPRoom && window.PPRoom.albumOf(me.nick), id: me.id, state: S, sell: me.btn && me.btn.rules ? me.btn.rules.sell : null, empty: t('bagEmpty'),
       top: inModal ? `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3>` : '',
       onUse: async g => {
         if (isRoom(g.kind)) { if (inModal) box.closest('.sw-bv') && box.closest('.sw-bv').remove(); await useItem(g.kind, g.item); return; }
@@ -664,12 +666,13 @@
             <button type="button" class="pill-btn" id="bp-share">📤 ${t(mine ? 'shareBird' : 'shareThis')}</button>${mine ? `<a class="pill-btn" href="${pre}/challenge/">${t('pChallenge')}</a>` : ''}</div></div></div>
       <div class="bp-room" id="bp-room" hidden></div>
       <div class="bp-tabs" role="tablist">${[['bag', t('tabBag')], ['badges', t('tabBadges')], ['works', t('tabWorks') + ` (${pr.posts.length})`], ...(mine && me.btn ? [['btns', t('tabBtns')]] : [])]
-        .map(([k, n], i) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}">${n}</button>`).join('')}<a class="bp-tab-shop" href="${L === 1 ? '/ru' : L === 2 ? '/lv' : ''}/shop/">${t('tabShop')}</a></div>
+        .map(([k, n], i) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}">${n}</button>`).join('')}<button type="button" class="bp-tab-shop bp-tab-album" id="bp-album">${['🃏 Album', '🃏 Альбом', '🃏 Albums'][L]}</button><a class="bp-tab-shop" href="${L === 1 ? '/ru' : L === 2 ? '/lv' : ''}/shop/">${t('tabShop')}</a></div>
       <div class="bp-panel" role="tabpanel"></div>
       ${mine ? `<p class="sw-acc bp-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a> · <button type="button" class="sw-link danger" id="sw-delacc">${t('delAcc')}</button></p>` : ''}`;
     page.querySelector('.sw-ava-slot').replaceWith(window.PPBirds ? window.PPBirds.avatar(pr.id, pr.avatar, 132) : document.createElement('span'));
     const share = () => shareBird({ id: pr.id, nick: pr.nick, avatar: pr.avatar, mine });
     page.querySelector('#bp-share').onclick = share;
+    page.querySelector('#bp-album').onclick = () => window.PPRoom && window.PPRoom.albumOf(pr.nick);
     const gb = page.querySelector('#bp-gift'); if (gb) gb.onclick = () => { openGift(newGifts[newGifts.length - 1]); };
     if (gb && location.hash === '#gift') { history.replaceState(null, '', location.pathname + location.search); gb.click(); } // /bird/#gift — «Открыть подарок» из новостей (news.js)
     // комната птички (room.js); пока его нет на странице — блок скрыт

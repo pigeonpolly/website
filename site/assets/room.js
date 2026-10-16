@@ -276,6 +276,14 @@
       p(3, 0, 3, 1, '#A8553A'); p(3, 1, 3, 2, g); p(1, 3, 3, 1, d); p(5, 3, 3, 1, d); p(0, 4, 9, 3, d); p(1, 4, 3, 3, c); p(5, 4, 3, 3, c); p(4, 5, 1, 2, c);
       p(1, 7, 7, 1, d); p(2, 7, 5, 1, c); p(2, 8, 5, 1, d); p(3, 8, 3, 1, c); p(3, 9, 3, 1, d); p(4, 9, 1, 1, c); p(4, 10, 1, 1, d); p(2, 4, 1, 1, '#FFFFFF');
       if (Math.sin(t / 500 + i) > 0.6) p(7, 1, 1, 1, '#FFF3B0'); } };
+  // альбом карточек (этап 7): есть в каждой комнате сам, двигается как мебель; в сумку, магазин и каталог не попадает (fixed, PPCanDo); нажатие — разворот альбома
+  FURN.album = { n: N('Card album', 'Альбом карточек', 'Kartīšu albums'), w: 18, h: 22, top: null, fixed: true,
+    d: (p, t) => { const w = '#7A4A30', d = '#5E3826', c = '#B8423A', pg = '#F7F1E4', fr = '#D8CCB4';
+      p(4, 20, 10, 2, d); p(8, 11, 2, 9, w); p(6, 19, 6, 1, w); p(1, 10, 16, 2, w); p(1, 10, 16, 1, '#9C6A44');
+      p(0, 1, 18, 9, c); p(1, 2, 7.5, 7.5, pg); p(9.5, 2, 7.5, 7.5, pg); p(8.5, 1, 1, 9, '#8E2F29');
+      p(2, 3, 2.5, 3, '#E9C46A'); p(5, 3, 2.5, 3, '#9B5DE5'); p(2, 6.5, 2.5, 2.5, '#7FB3E8'); p(5, 6.5, 2.5, 2.5, fr);
+      p(10.5, 3, 2.5, 3, fr); p(13.5, 3, 2.5, 3, fr); p(10.5, 6.5, 2.5, 2.5, fr); p(13.5, 6.5, 2.5, 2.5, fr);
+      if (Math.sin(t / 700) > .7) p(3, 3.5, 1, 1, '#FFFFFF'); } };
   Object.assign(FURN, {
     // Хеллоуин
     cauldron: { n: N('Bubbling cauldron', 'Котёл с зельем', 'Burbuļojošs katls'), w: 14, h: 12, top: null, d: (p, t) => { p(1, 3, 12, 2, '#4CE3A0'); p(0, 4, 14, 7, '#2B2340'); p(1, 5, 12, 5, '#3A3150'); p(2, 11, 2, 1, '#2B2340'); p(10, 11, 2, 1, '#2B2340'); for (let i = 0; i < 3; i++) { const by = 2 - ((t / 300 + i) % 4); p(3 + i * 4, Math.round(by), 2, 2, '#4CE3A0'); } } },
@@ -763,7 +771,7 @@
   // ---------- регистрация в каталоге подарков (коллекции, магазин, сумка, адвент, кабинет) ----------
   const LEG = ['furn|countcoffin', 'furn|crypt', 'furn|tieredcake', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass', 'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight']; // то же в worker/index.js LEGEND
   Object.assign(B.GIFTS, { wall: Object.keys(WALL).filter(k => k !== '_'), floor: Object.keys(FLOOR).filter(k => k !== '_'), view: Object.keys(VIEW).filter(k => k !== '_'),
-    curtain: Object.keys(CURT), furn: vals(FURN).filter(x => !FURN[parse(x)[0]].game), deco: vals(DECO) }); // game: true — вещи только из игр
+    curtain: Object.keys(CURT), furn: vals(FURN).filter(x => !FURN[parse(x)[0]].game && !FURN[parse(x)[0]].fixed), deco: vals(DECO) }); // game: true — вещи только из игр; fixed — альбом, он в комнате сам
   LEG.forEach(x => B.LEGEND.add(x));
   B.GIFT_KINDS.push(['furn', ['Furniture & things', 'Мебель и вещи', 'Mēbeles un lietas']], ['deco', ['Decorations', 'Украшения', 'Rotājumi']], ['wall', ['Wallpaper', 'Обои', 'Tapetes']],
     ['floor', ['Floors', 'Пол', 'Grīdas']], ['view', ['Window views', 'Вид из окна', 'Skats pa logu']], ['curtain', ['Curtains', 'Шторы', 'Aizkari']]);
@@ -894,6 +902,9 @@
   }
 
 
+  // разворот альбома карточек птички (cards-ui.js; где его нет на странице — подгружаем)
+  function albumOf(nick) { const go = () => window.PPCards.album(nick); if (window.PPCards) return go(); const s = document.createElement('script'); s.src = '/assets/cards-ui.js'; s.onload = go; document.head.appendChild(s); }
+
   function mount(box, o) {
     let room = Object.assign({ items: [] }, o.room || {}); room.items = (room.items || []).filter(it => defOf(it.k, it.v));
     const edit = !!o.mine; // своя комната правится всегда прямо на месте (этап 5 Б), у гостей — только смотреть
@@ -939,6 +950,10 @@
       return out;
     }
     const clampX = (x, w) => Math.max(0, Math.min(RW - w, Math.round(x || 0)));
+    // альбом карточек есть в каждой комнате сам: нет — ставим на свободное место (сохранится при первой правке)
+    const isAlbum = it => it.k === 'furn' && parse(it.v)[0] === 'album';
+    if (!room.items.some(isAlbum)) room.items.unshift({ k: 'furn', v: 'album', x: freeSpot(layout(), defOf('furn', 'album'), 'furn').x });
+    const openAlbum = () => albumOf(o.nick);
     // ---------- что птичка делает с вещами: подходит (или запрыгивает) и делает своё, над ней — частицы ----------
     const ACTS = {
       sleep: ['coffin', 'countcoffin', 'gothicchair', 'sofa', 'armchair', 'beanbag', 'throne', 'bed', 'pouf', 'nestbed', 'beachchair', 'gamingchair', 'catbed', 'giantpizza', 'flamingo'],
@@ -1080,7 +1095,7 @@
       if (!o.mine) return;
       const q = sel >= 0 && lay.find(z => z.idx === sel);
       if (!q) { selBar.hidden = true; return; }
-      selBar.hidden = false;
+      selBar.hidden = false; selBar.querySelector('[data-back]').hidden = isAlbum(q.it); // альбом в сумку не убрать
       const below = q.y / RH * stage.clientHeight < 58, cx = Math.max(14, Math.min(86, (q.x + q.d.w / 2) / RW * 100));
       selBar.style.left = cx + '%'; selBar.style.top = ((below ? q.y + q.d.h : q.y) / RH * 100) + '%';
       selBar.classList.toggle('below', below);
@@ -1113,7 +1128,7 @@
     if (o.mine) { window.PPRoom.live = api; box.classList.add('editing'); }
     if (o.mine) {
       selBar.querySelector('[data-flip]').onclick = () => { const it = room.items[sel]; if (it) { it.f = it.f ? 0 : 1; save(); } };
-      selBar.querySelector('[data-back]').onclick = () => { if (sel < 0) return; room.items.splice(sel, 1); sel = -1; selBar.hidden = true; save(); changed(); };
+      selBar.querySelector('[data-back]').onclick = () => { if (sel < 0 || isAlbum(room.items[sel])) return; room.items.splice(sel, 1); sel = -1; selBar.hidden = true; save(); changed(); };
       const pt = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * RW, (e.clientY - r.top) / r.height * RH]; };
       cv.addEventListener('pointerdown', e => {
         if (!edit) return;
@@ -1150,7 +1165,7 @@
           }
           save();
         }
-        drag = null; snapOn = -1;
+        moved = !!(drag && drag.moved); drag = null; snapOn = -1;
       };
       // слой: вперёд/назад на одну вещь или поверх всего
       selBar.querySelectorAll('[data-z]').forEach(b => b.onclick = () => {
@@ -1169,6 +1184,11 @@
       });
       cv.addEventListener('pointerup', up); cv.addEventListener('pointercancel', up);
     }
+    // ---------- нажатие на альбом (хозяин и гости) — разворот альбома; хозяин, потащив альбом, его не открывает ----------
+    let moved = false;
+    const albumAt = e => { const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH; const hit = [...layout()].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h); return hit && isAlbum(hit.it); };
+    cv.addEventListener('click', e => { if (moved) { moved = false; return; } if (!o.preview && !o.still && albumAt(e)) openAlbum(); });
+    cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' && !o.mine) cv.style.cursor = albumAt(e) ? 'pointer' : ''; });
     // ---------- название вещи при наведении (видно всем, и гостям): мебель/украшение, иначе окно, шторы, пол, стены ----------
     const tip = document.createElement('div'); tip.className = 'room-tip'; tip.hidden = true; stage.appendChild(tip);
     const nameAt = (px, py) => {
@@ -1195,5 +1215,5 @@
     raf = requestAnimationFrame(frame);
     return api;
   }
-  window.PPRoom = { mount, icon, nameOf, isRoom, RW, RH, defOf, ROOM_KINDS, freeSpot, live: null }; // live — своя комната на странице (для useItem) // defOf и ROOM_KINDS — ещё и для tools/catalog.js (ценность вещей)
+  window.PPRoom = { mount, albumOf, icon, nameOf, isRoom, RW, RH, defOf, ROOM_KINDS, freeSpot, live: null }; // live — своя комната на странице (для useItem) // defOf и ROOM_KINDS — ещё и для tools/catalog.js (ценность вещей)
 })();
