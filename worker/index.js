@@ -3,6 +3,8 @@
 // Данные — Cloudflare D1 (env.DB), картинки челленджа — R2 (env.MEDIA, папка challenge/), старые ещё и в KV (env.IMAGES), пока идёт перенос. Блог — worker/blog.js (картинки блога в R2, env.MEDIA).
 import { blogApi, blogPage, visitor, anonCode, birdName } from './blog.js';
 import { translateAll, translateTo, ABOUT } from './translate.js';
+import { challengeApi, challengeCron, planDayColors, CHALLENGE_TABLES } from './challenge-days.js'; // план тем челленджа (docs/challenge.md «Подбор тем»)
+import { CH_DEFAULTS, CH_RANGE } from './challenge-plan.js';
 import { cardsApi, importCards, myCards, CARD_TABLES } from './cards.js'; // коллекционные карточки (docs/cards.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
@@ -46,6 +48,7 @@ export default {
       await autoRestock(env).catch(e => console.error('restock', e)); // раз в сутки (по Риге) пополнить магазин
       await reqBackfill(env).catch(e => console.error('req tr', e)); // «Нарисуй мне»: переводы тем на все языки сайта
       await importCards(env, new URL('https://www.pigeonpolly.com/')).catch(e => console.error('cards', e)); // новые коллекции карточек из репозитория (один раз)
+      await challengeCron(env, RULES).catch(e => console.error('challenge plan', e)); // темы челленджа: с 20-го — план следующего месяца
       await migrateToR2(env); await cleanupInactive(env);
       await env.DB.prepare('DELETE FROM game_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {}); // старые забеги игр (started — в мс)
       await env.DB.prepare('DELETE FROM maze_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {});
@@ -342,6 +345,7 @@ async function ensureSchema(env) {
     // лайки «Нарисуй мне»: kind 't' — тема (пока не нарисована), 'd' — рисунок; who — 'u'+id или 'v'+cookie
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS draw_likes (rid INTEGER NOT NULL, kind TEXT NOT NULL, who TEXT NOT NULL, created_at INTEGER, PRIMARY KEY (rid, kind, who))`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS potion_gifts (id INTEGER PRIMARY KEY AUTOINCREMENT, to_id INTEGER NOT NULL, from_nick TEXT, ing TEXT NOT NULL, n INTEGER NOT NULL, created_at INTEGER, seen INTEGER DEFAULT 0)`),
+    ...CHALLENGE_TABLES.map(sql => env.DB.prepare(sql)), // план тем челленджа: challenge_days (worker/challenge-days.js)
     ...CARD_TABLES.map(sql => env.DB.prepare(sql)), // карточки: cards, card_sets, card_owner (worker/cards.js)
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
@@ -410,11 +414,12 @@ const RULE_DEFAULTS = {
   cond: { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4,
     alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10,
     rainA: 5, rainB: 15, rainC: 30, potA: 10, potB: 50, mazeA: 20 },
+  ...CH_DEFAULTS, // подбор тем челленджа: семья не ближе N дней, категории, колода сложности, доля сезона (worker/challenge-plan.js)
 };
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000] };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], ...CH_RANGE };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -431,7 +436,7 @@ function cleanRules(r) {
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
   for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn']) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'cardMult', 'cardsFirstDay']) out[k] = Math.round(out[k]);
+  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'cardMult', 'cardsFirstDay', ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
   out.catMult = {}; if (r.catMult && typeof r.catMult === 'object') for (const k of GIFT_KINDS) { const v = Number(r.catMult[k]); if (Number.isFinite(v) && v !== 100) out.catMult[k] = Math.max(10, Math.min(1000, Math.round(v))); }
@@ -459,11 +464,14 @@ async function loadRules(env) {
   BTN.cond = RULES.cond; BTN.sell = RULES.sellOn ? RULES.sellPrice : null;  // цена продажи вещи в магазин (null — продажа выключена) // условия бейджей уходят людям вместе с наградами (описания «как получить» подставляют числа)
   return RULES;
 }
-// цвета темы дня (site/assets/day-colors.json, собирает tools/daycolors.js): {"2026-10-11": "yp"} — для бейджей за цвета
-let DAYCOL = null;
+// цвета темы дня: {"2026-10-11": "yp"} — для бейджей за цвета. До 1.11.2026 — site/assets/day-colors.json (tools/daycolors.js), дальше — план в D1 (challenge_days, раз в 5 мин)
+let DAYCOL = null, DAYCOL_FILE = null, daycolAt = 0;
 async function loadDayColors(env) {
-  if (DAYCOL) return DAYCOL;
-  try { const r = await env.ASSETS.fetch(new Request('https://pigeonpolly.com/assets/day-colors.json')); DAYCOL = r.ok ? await r.json() : {}; } catch (e) { DAYCOL = {}; }
+  if (DAYCOL && Date.now() - daycolAt < 300000) return DAYCOL;
+  if (!DAYCOL_FILE) try { const r = await env.ASSETS.fetch(new Request('https://pigeonpolly.com/assets/day-colors.json')); DAYCOL_FILE = r.ok ? await r.json() : {}; } catch (e) { DAYCOL_FILE = {}; }
+  daycolAt = Date.now();
+  let plan = {}; try { plan = await planDayColors(env); } catch (e) { console.error('daycol', e); }
+  DAYCOL = { ...DAYCOL_FILE, ...plan };
   return DAYCOL;
 }
 const gameOnly = (kind, item) => kind === 'furn' && String(item).startsWith('kidpot'); // вещи только из игр (бутылочка «Вкус детства»): в магазин не попадают
@@ -1137,6 +1145,7 @@ async function addBadge(env, uid, badge) {
 async function route(req, env, url) {
   const p = url.pathname, m = req.method;
   if (p.startsWith('/api/cards') || p.startsWith('/api/admin/cards')) { const r = await cardsApi(req, env, url, cardHelpers(env)); if (r) return r; }
+  if (p.startsWith('/api/challenge/') || p.startsWith('/api/admin/challenge')) { const r = await challengeApi(req, env, url, cardHelpers(env)); if (r) return r; }
   // «🌐 Перевести» в кабинете — одна кнопка на все разделы (site/assets/translate-btn.js): тексты с языка from на языки to (Gemini, worker/translate.js)
   if (m === 'POST' && p === '/api/admin/translate') {
     const u = await needUser(req, env);
