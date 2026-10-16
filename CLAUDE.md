@@ -23,6 +23,7 @@
 | Комнаты, квесты | docs/rooms.md |
 | Wobbleland | docs/wobbleland.md |
 | Палитры | docs/palettes.md |
+| Коллекционные карточки | docs/cards.md |
 | Кабинет, статистика | docs/admin.md |
 | Полли-питомец | docs/polly-pet.md |
 | «Нарисуй мне» | docs/requests.md |
