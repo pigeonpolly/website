@@ -439,25 +439,9 @@
       catch (err) { st.textContent = err.code === 'bird' ? t('giveNo') : err.code === 'has' ? t('giveHas') : err.code === 'legend' ? t('giveLegend') : t('err'); }
     };
   }
-  // «Нажал — появилось» (этап 5 Б): одна функция для сумки, окна подарка, потом — тоста после покупки, наград, подарка новичку.
-  // Вещь для комнаты — в свою комнату на странице (PPRoom.live; нет её — в профиль с #use=), вещь птички — надеть / снять. Тост с «Отменить» (5 с).
-  async function useItem(kind, item, after) {
-    const B = window.PPBirds, tr = a => a[L];
-    const say = (msg, undo) => window.PPToast && window.PPToast(msg, undo ? { action: tr(['Undo', 'Отменить', 'Atsaukt']), onAction: undo, ms: 5000 } : {});
-    if (B.isRoomKind && B.isRoomKind(kind)) {
-      const R = window.PPRoom && window.PPRoom.live;
-      if (!R || !R.box.isConnected) { location.href = profileUrl(me.nick) + '#use=' + encodeURIComponent(kind + '|' + item); return; }
-      const own = (me.gifts || []).filter(x => x.status === 'bag' && x.kind === kind && x.item === item).length;
-      const r = R.use(kind, item, own); if (!r) return;
-      const bx = R.box.getBoundingClientRect(); if (bx.bottom < 80 || bx.top > innerHeight - 120) R.box.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      if (r.done === 'there') return say(tr(['Already in the room — here it is', 'Уже в комнате — вот она', 'Jau istabā — lūk, tā']));
-      return say(r.done === 'off' ? tr(['Back to the old one', 'Вернули прежнее', 'Atgriezts iepriekšējais']) : tr(['Placed', 'Поставлено', 'Novietots']), r.undo);
-    }
-    const prev = (me.avatar || {})[kind] || null, on = prev === item;
-    const set = async v => { const r = await post('avatar', { kind, item: v }); me.avatar = r.avatar; window.PPAccount && window.PPAccount.check(); if (after) after(); };
-    try { await set(on ? null : item); } catch (e) { alert(t('err')); return; }
-    say(on ? tr(['Taken off', 'Снято', 'Novilkts']) : tr(['Put on', 'Надето', 'Uzvilkts']), () => set(prev).catch(() => alert(t('err'))));
-  }
+  // «Нажал — появилось» (этап 5 Б): одна функция для сумки, окна подарка, тоста после покупки — сама она в catalog-ui.js (PPCatalog.use, этап 6)
+  const useItem = (kind, item, after) => window.PPCatalog.use(kind, item, { me, after });
+  let shopN = null; // сколько вещей каждого вида в продаже — для пустого вида в сумке
   let curBag = null; // сумка на странице — пересчитать ✓, когда меняется комната
   function openBag() { const m = modal(''); m.card.classList.add('bag-card'); bagInto(m.card, null, true); }
   function bagInto(box, changed, inModal) {
@@ -484,7 +468,11 @@
         catch (e) { alert(t('err')); }
       },
       onMore: g => bagMore(g),
+      undo: { can: () => !!C.lastUndo, run: async () => { const u = C.lastUndo; C.lastUndo = null; if (u) await u(); if (app) renderProfile(); if (changed) changed(); } },
+      shopUrl: (tab, kind) => `${pre}/shop/#${tab}${kind ? ':' + kind : ''}`,
+      shopCount: k => shopN ? shopN[k] || 0 : null,
     });
+    if (!shopN) fetch('/api/shop', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(x => { if (!x) return; shopN = {}; (x.items || []).forEach(r => { if (r.stock > 0 && r.item !== '?') shopN[r.kind] = (shopN[r.kind] || 0) + 1; }); if (box.isConnected) ui.draw(); }).catch(() => {});
     if (!inModal) curBag = ui;
     return ui;
   }

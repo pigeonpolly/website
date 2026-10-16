@@ -66,46 +66,27 @@
       box.appendChild(row);
     }
   }
-  // окно дня: весь каталог с фильтрами и поиском, нажатие кладёт вещь в окошко или убирает
+  // окно дня: общий каталог (catalog-ui.js, режим выбора, несколько вещей) — нажатие кладёт вещь в окошко или убирает
+  var dayState = {}; // вкладка и фильтры — до перезагрузки
   function advDayPick(day) {
-    var B = window.PPBirds, d = document.createElement('dialog'), f = 'all', q = '';
+    var C = window.PPCatalog, d = document.createElement('dialog');
     d.className = 'fl-adv-dlg fl-adv-daydlg';
-    var render = function () {
-      var inDay = (plan || []).filter(function (p) { return p.day === day; }).map(function (p) { return p.kind + '|' + p.item; });
-      var th = f.indexOf('theme:') === 0 ? B.GIFT_THEMES.filter(function (t) { return 'theme:' + t[0] === f; })[0] : null;
-      var list = [];
-      B.GIFT_KINDS.forEach(function (k) {
-        if (f.indexOf('kind:') === 0 && f !== 'kind:' + k[0]) return;
-        (B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).forEach(function (v) {
-          if (th && th[2].indexOf(k[0] + '|' + v) < 0) return;
-          if (f === 'in' && inDay.indexOf(k[0] + '|' + v) < 0) return;
-          if (q && B.giftName(k[0], v, L).toLowerCase().indexOf(q) < 0) return;
-          list.push([k[0], v]);
-        });
-      });
-      var fbtn = function (k, label) { return '<button type="button" data-f="' + k + '" aria-pressed="' + (f === k) + '">' + label + '</button>'; };
-      var RK = B.ROOM_KINDS || [], kb = function (pred) { return B.GIFT_KINDS.filter(function (k) { return pred(k[0]); }).map(function (k) { return fbtn('kind:' + k[0], k[1][L]); }).join(''); };
-      d.innerHTML = '<h3>' + T.advDec[L].replace('{d}', day) + (ADV_SP.indexOf(day) >= 0 ? ' ★' : '') + '</h3><p>' + T.advDayH[L] + '</p>' +
-        '<input type="search" class="fl-adv-q" placeholder="🔍" value="' + q.replace(/"/g, '') + '">' +
-        '<div class="fl-adv-f"><div>' + fbtn('in', T.advIn[L] + ' (' + inDay.length + ')') + fbtn('all', T.all[L]) + fbtn('theme:surprise', '🎲 Сюрпризы') + fbtn('theme:legendary', '★ Легендарные') + '</div>' +
-        '<div><b>🐦 Для птички:</b>' + kb(function (k) { return k !== 'any' && RK.indexOf(k) < 0; }) + '</div>' +
-        '<div><b>🏠 Для комнаты:</b>' + kb(function (k) { return RK.indexOf(k) >= 0; }) + '</div>' +
-        '<div><b>Темы:</b>' + B.GIFT_THEMES.filter(function (t) { return t[0] !== 'surprise' && t[0] !== 'legendary'; }).map(function (t) { return fbtn('theme:' + t[0], t[1][L]); }).join('') + '</div></div>' +
-        '<div class="fl-adv-pick"></div><button type="button" class="pill-btn pill-fill" data-x>' + T.done[L] + '</button>';
-      var g = d.querySelector('.fl-adv-pick');
-      list.forEach(function (kv) {
-        var b = document.createElement('button'); b.type = 'button'; b.title = B.giftName(kv[0], kv[1], L); b.setAttribute('aria-pressed', String(inDay.indexOf(kv[0] + '|' + kv[1]) >= 0));
-        if (B.LEGEND && B.LEGEND.has(kv[0] + '|' + kv[1])) b.classList.add('leg');
-        b.appendChild(B.itemIcon(kv[0], kv[1], 52, me ? me.id : 2));
-        var c = document.createElement('small'); c.textContent = b.title; b.appendChild(c);
-        b.onclick = function () { b.disabled = true; advSet(day, kv[0], kv[1], b.getAttribute('aria-pressed') !== 'true').then(function () { var y = g.scrollTop; render(); d.querySelector('.fl-adv-pick').scrollTop = y; }).catch(function () { b.disabled = false; }); };
-        g.appendChild(b);
-      });
-      [].forEach.call(d.querySelectorAll('.fl-adv-f [data-f]'), function (b) { b.onclick = function () { f = b.dataset.f; render(); }; });
-      var qi = d.querySelector('.fl-adv-q'); qi.oninput = function () { q = qi.value.trim().toLowerCase(); var pos = qi.selectionStart; render(); var n = d.querySelector('.fl-adv-q'); n.focus(); n.setSelectionRange(pos, pos); };
-      d.querySelector('[data-x]').onclick = function () { d.close(); d.remove(); draw(); };
-    };
-    render(); document.body.appendChild(d); d.showModal();
+    var has = function (k, v) { return (plan || []).some(function (p) { return p.day === day && p.kind === k && p.item === v; }); };
+    var cnt = function () { return (plan || []).filter(function (p) { return p.day === day; }).length; };
+    d.innerHTML = '<h3>' + T.advDec[L].replace('{d}', day) + (ADV_SP.indexOf(day) >= 0 ? ' ★' : '') + ' · <span class="fl-adv-n"></span></h3><p>' + T.advDayH[L] + '</p>' +
+      '<div class="fl-adv-cat"></div><button type="button" class="pill-btn pill-fill" data-x>' + T.done[L] + '</button>';
+    var n = d.querySelector('.fl-adv-n'), upd = function () { n.textContent = T.advIn[L] + ': ' + cnt(); };
+    upd(); document.body.appendChild(d); d.showModal();
+    C.browse(d.querySelector('.fl-adv-cat'), {
+      mode: 'pick', state: dayState, id: me ? me.id : 2,
+      mine: has, mineLabel: T.advIn[L],
+      pick: { multi: true, has: has },
+      onOpen: function (k, v, t) {
+        var on = !has(k, v); C.mark(t, on); t.classList.add('busy');
+        advSet(day, k, v, on).then(function () { t.classList.remove('busy'); upd(); }).catch(function () { t.classList.remove('busy'); C.mark(t, !on); });
+      },
+    });
+    d.querySelector('[data-x]').onclick = function () { d.close(); d.remove(); draw(); };
     d.addEventListener('cancel', function () { d.remove(); draw(); });
   }
 

@@ -1070,6 +1070,7 @@
       return best == null ? it.y : best - d.h;
     }
     function save() {
+      if (o.preview) return; // примерка в окне вещи (магазин) — ничего не сохраняем
       clearTimeout(saveT); if (st) st.textContent = t('saving');
       saveT = setTimeout(() => fetch('/api/room', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ room }) })
         .then(r => { if (!r.ok) throw 0; if (st) st.textContent = t('saved'); }).catch(() => { if (st) st.textContent = t('err'); }), 500);

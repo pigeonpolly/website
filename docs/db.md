@@ -37,7 +37,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **draw_likes** (worker/index.js): `rid` int nn, `kind` text nn, `who` text nn, `created_at` int; PRIMARY KEY (rid, kind, who)
 - **potion_gifts** (worker/index.js): `id` int PK auto, `to_id` int nn, `from_nick` text, `ing` text nn, `n` int nn, `created_at` int, `seen` int =0
 
-## Ключи meta (33)
+## Ключи meta (34)
 
 Таблица `meta (key, value)`. Ключ → где используется.
 
@@ -54,6 +54,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `gemini_key` — worker/blog.js, worker/translate.js
 - `inbox_subs_seen` — worker/index.js
 - `index_base` — worker/index.js
+- `new_seen` — worker/index.js
 - `pick_post` — worker/index.js
 - `pick_price_11` — worker/index.js
 - `pick_user` — worker/index.js

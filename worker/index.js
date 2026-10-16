@@ -1834,6 +1834,20 @@ async function route(req, env, url) {
     const rows = (await env.DB.prepare('SELECT kind, item, price, stock, added_at FROM shop').all()).results;
     return json({ items: rows.map(shopRow), max: RULES.shopMax, legendMax: RULES.legendMax, lvl: { low: STOCK.low, many: STOCK.many, lowLeg: STOCK.lowLeg, manyLeg: STOCK.manyLeg } }, 200, { 'cache-control': 'no-store' });
   }
+  // «Новое в магазине» (этап 6): что и когда появилось — вещи каталога (первое появление пишется в meta new_seen; при первом запуске — shop.added_at) и коллекции карточек, за 30 дней
+  if (m === 'GET' && p === '/api/new') {
+    const cat = await catalog(env, req), keys = Object.entries(cat.items || {}).flatMap(([k, vs]) => vs.map(v => k + '|' + v));
+    let seen = null; try { seen = JSON.parse(await getMeta(env, 'new_seen') || 'null'); } catch (e) { /* заново */ }
+    let dirty = false;
+    if (!seen) { seen = {}; dirty = true; for (const r of (await env.DB.prepare('SELECT kind, item, added_at FROM shop').all()).results) seen[r.kind + '|' + r.item] = r.added_at || 0; for (const x of keys) if (seen[x] == null) seen[x] = 0; }
+    for (const x of keys) if (seen[x] == null) { seen[x] = now(); dirty = true; }
+    if (dirty && keys.length) await setMeta(env, 'new_seen', JSON.stringify(seen));
+    const since = now() - 30 * 86400, has = new Set(keys);
+    const items = Object.entries(seen).filter(([x, at]) => at > since && has.has(x)).sort((a, b) => b[1] - a[1]).slice(0, 24).map(([x, at]) => { const [kind, item] = x.split('|'); return { kind, item, at }; });
+    const cards = (await env.DB.prepare('SELECT s.slug, s.en, s.ru, s.lv, s.created_at AS at, COUNT(c.id) AS n FROM card_sets s LEFT JOIN cards c ON c.collection = s.slug AND COALESCE(c.hidden, 0) = 0 WHERE s.created_at > ? GROUP BY s.slug ORDER BY s.created_at DESC').bind(since).all().catch(() => ({ results: [] }))).results
+      .filter(s => s.n > 0).map(s => ({ slug: s.slug, title: { en: s.en, ru: s.ru, lv: s.lv }, at: s.at, n: s.n }));
+    return json({ items, cards }, 200, { 'cache-control': 'no-store' });
+  }
   if (m === 'POST' && p === '/api/shop/buy') {
     const u = await needUser(req, env);
     if (!u.nick) fail(400, 'nick');

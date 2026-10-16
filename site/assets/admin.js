@@ -560,26 +560,19 @@
 
   // ---------- подарить семечко: фон, обувь, головной убор, анимация, рамка ----------
   function giftDialog(u, done) {
-    const B = window.PPBirds; if (!B) return;
+    const B = window.PPBirds, C = window.PPCatalog; if (!B || !C) return;
     const all = !u; if (all) u = { id: 2, nick: null, avatar: '{}' }; // «подарить всем»
     let av = {}; try { av = JSON.parse(u.avatar || '{}') || {}; } catch (e) { /* пусто */ }
-    const KINDS = [['any', '🎲 Сюрпризы'], ['hat', '🎩 Головной убор'], ['shoes', '👟 Обувь'], ['item', '🍕 В клюв'], ['scarf', '🧣 Шарфик'], ['bg', '🎨 Фон'], ['frame', '⭕ Рамка'], ['anim', '✨ Анимация'], ...(B.GIFTS.furn ? [['furn', '🛋 Мебель'], ['deco', '🎄 Украшения'], ['wall', '🧱 Обои'], ['floor', '🟫 Пол'], ['view', '🪟 Вид из окна'], ['curtain', '🎀 Шторы']] : [])];
     const NAMES = { halo: 'нимб ★', unicorn: 'рог единорога ★', flamecrown: 'корона феникса ★', dragonegg: 'яйцо дракона ★', goldfeather: 'золотое перо ★', comet: 'комета ★', goldenapple: 'золотое яблоко ★', legend: 'легендарная ★', aurora: 'сияние ★', pirate: 'пиратская шляпа', chef: 'колпак повара', graduation: 'шапочка выпускника', paintbrush: 'кисточка', palette: 'палитра', pencil: 'карандаш', coffee: 'кофе', croissant: 'круассан', bounce: 'прыгает', wiggle: 'качается', float: 'парит', spin: 'кружится', sparkle: 'сияет', heart: 'сердечко', wizard: 'шляпа волшебника', witch: 'шляпа ведьмы', pumpkin: 'тыква', santa: 'колпак Санты', antlers: 'рожки оленя', beanie: 'зимняя шапка', heartband: 'ободок с сердцем', wreath: 'весенний венок', strawhat: 'летняя шляпа', leafcrown: 'осенний венок', wand: 'волшебная палочка', crystal: 'хрустальный шар', star: 'звёздочка', lollipop: 'леденец', minipumpkin: 'тыковка', candycane: 'карамельная трость', giftbox: 'подарок', ornament: 'ёлочный шар', snowflake: 'снежинка', heart: 'сердечко', rose: 'роза', letter: 'валентинка', icecream: 'мороженое', mapleleaf: 'кленовый лист', snow: 'снежинки', magic: 'волшебная', spooky: 'хеллоуин', headset: 'игровые наушники', gamepad: 'геймпад', coin: 'монетка', sword: 'пиксельный меч', mushroom: 'грибок', neon: 'неон', pizza: 'пицца', cherry: 'вишенка', cheese: 'сыр', ring: 'колечко', pearl: 'жемчужина', ruby: 'рубин', sapphire: 'сапфир', key: 'ключик', spoon: 'ложечка', gold: 'золотая', rainbow: 'радуга', stars: 'звёзды', hearts: 'сердечки', leaves: 'листики', dotted: 'пунктир' };
-    let kind = 'hat', item = B.GIFTS.hat[0], owned = {};
+    let kind = 'hat', item = B.GIFTS.hat[0], owned = {}, copies = {};
     // цены: как сейчас в магазине (с учётом остатка); у вещей не из магазина — ценность (base)
-    let price = {};
-    api('admin/shop').then(r => { for (const x of r.items || []) price[x.kind + '|' + x.item] = x.price || x.base || 0; for (const [k, v] of Object.entries(r.suggested || {})) if (!price[k]) price[k] = v; draw(); }).catch(() => {});
+    let price = {}, LIM = { max: 3, leg: 1 };
     const priceOf = (kd, v) => price[kd + '|' + v] || 0;
-    if (!all) api('admin/gifts?uid=' + u.id).then(r => { for (const g of r.gifts) owned[g.kind + '|' + g.item] = g.status; draw(); }).catch(() => {});
     const w = document.createElement('div'); w.className = 'adm-gift';
     w.innerHTML = `<div class="adm-gift-card" role="dialog" aria-label="Подарок"><h3>${all ? '🎁 Подарок всем птичкам' : `🎁 Подарок для ${u.nick ? '@' + esc(u.nick) : 'птички без ника'}`}</h3>${all ? '<p class="be-note">Получит каждая птичка с ником (кроме заблокированных). У кого такой вещи уже максимум (3, легендарной — 1), тому не придёт.</p>' : ''}
-      <div class="adm-gift-bar"><input type="search" class="adm-gq" placeholder="🔍 Найти вещь" aria-label="Найти вещь">
-        <select class="adm-gk" aria-label="Вид"><option value="">Все виды</option>${KINDS.map(([k, l]) => `<option value="${k}">${l}</option>`).join('')}</select>
-        <select class="adm-gt" aria-label="Тема"><option value="">Все темы</option>${(B.GIFT_THEMES || []).map(t => `<option value="${t[0]}">${t[1][1]}</option>`).join('')}</select>
-        ${all ? '' : '<label class="adm-gh"><input type="checkbox"> скрыть то, что уже есть</label>'}<span class="adm-gn"></span></div>
-      <div class="adm-gift-items"></div>
+      <div class="adm-gift-cat"></div>
       <div class="adm-gift-prev"><figure><span class="gnow"></span><figcaption>Сейчас</figcaption></figure><span class="adm-gift-arrow">→</span><figure><span class="gp"></span><figcaption>С подарком</figcaption></figure>
-        <p class="be-note">✓ — у птички это уже есть (в сумке), 🎁 — подарено, но ещё не открыто. Человек увидит «🎁 Тебе подарок!» в профиле челленджа.</p></div>
+        <p class="be-note">✓ — у птички это уже есть (в сумке), 🎁 — подарено, но ещё не открыто. Вещи, которых у птички уже максимум, скрыты («Фильтры» → «Показать то, что нельзя»). Человек увидит «🎁 Тебе подарок!» в профиле челленджа.</p></div>
       <input type="text" maxlength="200" placeholder="Записка к подарку (необязательно), например: «За 7 дней подряд!»">
       <div class="adm-quick" style="margin-top:12px"><button type="button" class="pill-btn pill-fill" data-send>Подарить</button><button type="button" class="pill-btn" data-x>Готово</button></div><p class="adm-gift-sent" aria-live="polite"></p></div>`;
     document.body.appendChild(w);
@@ -589,50 +582,38 @@
     const sentNote = txt => { sent++; const p = w.querySelector('.adm-gift-sent'); p.insertAdjacentHTML('afterbegin', `<span>${esc(txt)}</span>`); };
     w.onclick = e => { if (e.target === w) close(); };
     w.querySelector('[data-x]').onclick = close;
-    // фильтр (12.10.2026): поиск по названию + вид + тема + «скрыть то, что уже есть»; всё вместе
-    let fq = '', fk = 'hat', ft = '', fhide = false;
-    w.querySelector('.adm-gk').value = fk;
-    const ALL = KINDS.flatMap(([k]) => (B.withSurprise ? B.withSurprise(k) : B.GIFTS[k] || []).map(v => [k, v]));
-    const THEME = new Map((B.GIFT_THEMES || []).map(t => [t[0], new Set(t[2])]));
     const nameOf = (kd, v) => NAMES[v] || (B.giftName ? B.giftName(kd, v, 1) : v);
-    const draw = () => {
-      const q = fq.trim().toLowerCase(), th = ft && THEME.get(ft);
-      const list = ALL.filter(([kd, v]) => (!fk || kd === fk) && (!th || th.has(kd + '|' + v)) && (!q || nameOf(kd, v).toLowerCase().includes(q) || v.toLowerCase().includes(q)) && !(fhide && owned[kd + '|' + v]));
-      w.querySelector('.adm-gn').textContent = list.length + ' шт.';
-      const box = w.querySelector('.adm-gift-items'); box.innerHTML = list.length ? '' : '<p class="be-note">Ничего не нашлось.</p>';
-      const labels = !fk || th || q; // в смешанном списке подписываем все вещи
-      for (const [kd, v] of list.slice(0, 300)) {
-        const nm = nameOf(kd, v);
-        const b = document.createElement('button'); b.type = 'button'; b.setAttribute('aria-pressed', String(v === item && kd === kind)); b.title = nm;
-        b.appendChild(B.giftPic ? B.giftPic(kd, v, u.id, 56, av) : B.avatar(u.id, Object.assign({}, av, { [kd]: v }), 48));
-        if (B.LEGEND && B.LEGEND.has(kd + '|' + v)) b.insertAdjacentHTML('beforeend', '<span class="legend-tag">★</span>');
-        if (NAMES[v] || labels) b.insertAdjacentHTML('beforeend', `<small>${esc(nm)}</small>`);
-        const st = owned[kd + '|' + v];
-        if (st) { b.classList.add('owned'); b.insertAdjacentHTML('beforeend', `<span class="adm-own">${st === 'new' ? '🎁' : '✓'}</span>`); }
-        if (av[kd] === v) b.classList.add('worn');
-        const pr = priceOf(kd, v); if (pr) b.insertAdjacentHTML('beforeend', `<span class="adm-gprice">🔘 ${pr}</span>`);
-        b.onclick = () => { item = v; kind = kd; draw(); };
-        box.appendChild(b);
-      }
+    const isLeg = (kd, v) => !!(B.LEGEND && B.LEGEND.has(kd + '|' + v));
+    // общий каталог (catalog-ui.js), режим выбора одной вещи; «что нельзя» — у птички уже максимум таких
+    const S = giftDialog.f || (giftDialog.f = {}); // вкладка и фильтры — до перезагрузки
+    const ui = C.browse(w.querySelector('.adm-gift-cat'), {
+      mode: 'pick', state: S, id: u.id,
+      tile: (kd, v) => { const st = owned[kd + '|' + v], pr = priceOf(kd, v); return { name: nameOf(kd, v), price: pr ? '🔘 ' + pr : '', badges: st ? [[st === 'new' ? '🎁' : '✓' + (copies[kd + '|' + v] > 1 ? ' ×' + copies[kd + '|' + v] : ''), 'have']] : [], markOn: av[kd] === v }; },
+      price: (kd, v) => priceOf(kd, v) || null,
+      mine: all ? null : (kd, v) => !!owned[kd + '|' + v], mineLabel: '✓ Что уже есть', notMineLabel: 'Чего ещё нет',
+      cant: all ? null : (kd, v) => v !== '?' && kd !== 'any' && (copies[kd + '|' + v] || 0) >= (isLeg(kd, v) ? LIM.leg : LIM.max) ? 'У птички уже максимум таких' : '',
+      pick: { has: (kd, v) => kd === kind && v === item },
+      onOpen: (kd, v, t) => { kind = kd; item = v; C.mark(t, true, true); prev(); },
+    });
+    const prev = () => {
       const gn = w.querySelector('.gnow'); if (!gn.firstChild) gn.appendChild(B.avatar(u.id, av, 96));
-      const gp = w.querySelector('.gp'); gp.innerHTML = ''; gp.appendChild(B.avatar(u.id, Object.assign({}, av, { [kind]: item }), 96));
+      const gp = w.querySelector('.gp'); gp.innerHTML = '';
+      gp.appendChild(B.isRoomKind && B.isRoomKind(kind) || kind === 'any' || item === '?' ? B.itemIcon(kind, item, 96, u.id) : B.avatar(u.id, Object.assign({}, av, { [kind]: item }), 96));
       const sp = priceOf(kind, item), send = w.querySelector('[data-send]');
       send.textContent = sp ? `Подарить · 🔘 ${sp}${all ? ' каждой' : ''}` : 'Подарить';
     };
-    w.querySelector('.adm-gq').oninput = e => { fq = e.target.value; draw(); };
-    w.querySelector('.adm-gk').onchange = e => { fk = e.target.value; draw(); };
-    w.querySelector('.adm-gt').onchange = e => { ft = e.target.value; if (ft) { fk = ''; w.querySelector('.adm-gk').value = ''; } draw(); };
-    const hd = w.querySelector('.adm-gh input'); if (hd) hd.onchange = () => { fhide = hd.checked; draw(); };
+    api('admin/shop').then(r => { for (const x of r.items || []) price[x.kind + '|' + x.item] = x.price || x.base || 0; for (const [k, v] of Object.entries(r.suggested || {})) if (!price[k]) price[k] = v; if (r.rules) LIM = { max: r.rules.shopMax || 3, leg: r.rules.legendMax || 1 }; ui.drawList(); prev(); }).catch(() => {});
+    if (!all) api('admin/gifts?uid=' + u.id).then(r => { for (const g of r.gifts) { const k = g.kind + '|' + g.item; owned[k] = owned[k] === 'bag' ? 'bag' : g.status; copies[k] = (copies[k] || 0) + 1; } ui.drawList(); }).catch(() => {});
     w.querySelector('[data-send]').onclick = async e => {
       e.target.disabled = true;
       try {
         if (all) { if (!confirm('Подарить «' + (B.giftName ? B.giftName(kind, item, 1) : item) + '» всем птичкам?')) { e.target.disabled = false; return; } const r = await api('admin/gift-all', { kind, item, note: w.querySelector('input').value.trim() }); sentNote('🎁 ' + (B.giftName ? B.giftName(kind, item, 1) : item) + ' — отправлено ' + r.count + ' птичкам'); e.target.disabled = false; return; }
         const r = await api('admin/gift', { uid: u.id, kind, item, note: w.querySelector('input').value.trim() });
-        const gk = r && r.kind || kind, got = r && r.item || item; owned[gk + '|' + got] = 'new'; // у сюрприза сервер называет, что выпало
-        sentNote('🎁 ' + (B.giftName ? B.giftName(gk, got, 1) : got) + ' — подарено'); e.target.disabled = false; draw(); }
+        const gk = r && r.kind || kind, got = r && r.item || item; owned[gk + '|' + got] = owned[gk + '|' + got] || 'new'; copies[gk + '|' + got] = (copies[gk + '|' + got] || 0) + 1; // у сюрприза сервер называет, что выпало
+        sentNote('🎁 ' + (B.giftName ? B.giftName(gk, got, 1) : got) + ' — подарено'); e.target.disabled = false; ui.drawList(); }
       catch (x) { e.target.disabled = false; alert(err(x)); }
     };
-    draw();
+    prev();
   }
 
   // ---------- магазин: цена и количество каждой вещи из коллекций ----------

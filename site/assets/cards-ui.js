@@ -11,7 +11,7 @@
     robot: ['🤖 drawn by AI', '🤖 нарисовал ИИ', '🤖 zīmējis MI'], alina: ['✎ drawn by Alina', '✎ нарисовала Алина', '✎ zīmējusi Alīna'],
     fColl: ['Collection', 'Коллекция', 'Kolekcija'], allColl: ['All collections', 'Все коллекции', 'Visas kolekcijas'], fRar: ['Rarity', 'Редкость', 'Retums'], any: ['Any', 'Любая', 'Jebkura'],
     fShow: ['Show', 'Показать', 'Rādīt'], sAll: ['All', 'Все', 'Visas'], sFree: ['Free', 'Свободные', 'Brīvās'], sSold: ['Bought', 'Купленные', 'Nopirktās'], sMine: ['Mine', 'Мои', 'Manas'],
-    buy: ['Buy', 'Купить', 'Pirkt'], poor: ['Not enough buttons', 'Не хватает пуговок', 'Nepietiek pogu'], signin: ['Sign in to buy', 'Войдите, чтобы купить', 'Ienāc, lai nopirktu'],
+    buy: ['Buy', 'Купить', 'Pirkt'], poor: ['Not enough buttons', 'Не хватает пуговок', 'Nepietiek pogu'], signin: ['Hatch a bird to shop', 'Вылупи птичку, чтобы покупать', 'Izperi putniņu, lai iepirktos'],
     mine: ['✓ Yours', '✓ Ваша', '✓ Tava'], owner: ['Owner', 'Владелец', 'Īpašnieks'], free: ['free', 'свободна', 'brīva'], number: ['Number', 'Номер', 'Numurs'], rarity: ['Rarity', 'Редкость', 'Retums'],
     sure: ['Buy the card “{n}” for {p} 🔘? It will be yours only: you cannot sell or gift it, only trade.', 'Купить карточку «{n}» за {p} 🔘? Она будет только у вас: продать или подарить её нельзя, только обменять.', 'Pirkt kartīti “{n}” par {p} 🔘? Tā būs tikai tev: to nevar pārdot vai uzdāvināt, tikai apmainīt.'],
     ok: ['The card is yours! 🃏', 'Карточка ваша! 🃏', 'Kartīte ir tava! 🃏'],

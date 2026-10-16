@@ -16,15 +16,19 @@
   .ss-btn { display: inline-block; margin-top: 18px; padding: 12px 26px; border-radius: 999px; background: #D85A30; color: #fff; font: 700 16px 'Karla', sans-serif; text-decoration: none; box-shadow: 0 5px 0 #8E3519; transition: transform .2s, box-shadow .2s; }
   .ss-btn:hover { transform: translateY(2px); box-shadow: 0 3px 0 #8E3519; }
   .ss-snow { position: absolute; width: 4px; height: 4px; background: #fff; opacity: .5; pointer-events: none; animation: ss-fall linear infinite; }
+  .ss-shelf { flex: none; display: grid; grid-template-columns: repeat(3, 72px); gap: 8px; }
+  .ss-shelf span { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 14px; background: #FFFDF8; box-shadow: 0 4px 0 rgba(0, 0, 0, .25); }
+  .ss-shelf canvas, .ss-shelf .pp-icon { max-width: 60px; max-height: 60px; background: none; box-shadow: none; }
   @keyframes ss-glow { 50% { fill: #FFF6C2; } }
   @keyframes ss-fall { from { transform: translateY(-20px); } to { transform: translateY(260px); } }
   @media (prefers-reduced-motion: reduce) { .ss-win-today, .ss-snow { animation: none; } }
-  @media (max-width: 700px) { .ss { padding: 28px 16px; } .ss-in { flex-direction: column; gap: 18px; text-align: center; } .ss-house { width: 200px; } }
+  @media (max-width: 700px) { .ss { padding: 28px 16px; } .ss-in { flex-direction: column; gap: 18px; text-align: center; } .ss-house { width: 200px; } .ss-shelf { grid-template-columns: repeat(3, 60px); } .ss-shelf span { width: 60px; height: 60px; } .ss-shelf canvas, .ss-shelf .pp-icon { max-width: 50px; max-height: 50px; } }
 </style>
 
 <section class="ss" id="season" hidden aria-live="polite"></section>
 <script>
   // сезонный блок под приветствием (этап 4 Б): 1.10–30.11 — домик адвента с отсчётом; 1–31.12 — окошко дня; 1–23.01 — пропущенные; иначе пусто.
+  // Этап 6: когда адвента нет (кроме ноября–января), а идёт сезон (SEASONS) — витрина «🎃 Хеллоуин · ещё N дней · все вещи →» (магазин с этой темой). Блок и на главной, и в магазине.
   // Данные — /api/advent (startsAt, now, nextAt, date, opened); ?devdate= — проверка дат на локальном сервере (account.js, PPDevH)
   document.addEventListener('DOMContentLoaded', () => {
     const box = document.getElementById('season');
@@ -44,6 +48,10 @@
       next: [c => `the next one in ${c}`, c => `следующее через ${c}`, c => `nākamais pēc ${c}`],
       last: ['that was the last one!', 'это было последнее!', 'tas bija pēdējais!'],
       miss: [n => `+${n} missed — you can still take ${n === 1 ? 'it' : 'them'}`, n => `+${n} ${n % 10 === 1 && n % 100 !== 11 ? 'пропущенное' : 'пропущенных'} — тоже можно забрать`, n => `+${n} ${n % 10 === 1 && n % 100 !== 11 ? 'izlaists' : 'izlaisti'} — arī var paņemt`],
+      shopKick: ['Season in the shop', 'Сезон в магазине', 'Sezona veikalā'],
+      left: [n => n ? `${n} more day${n === 1 ? '' : 's'}` : 'last day', n => n ? `ещё ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'день' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'дня' : 'дней'}` : 'последний день', n => n ? `vēl ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'diena' : 'dienas'}` : 'pēdējā diena'],
+      shopSub: [n => `${n} things for the season — while they last`, n => `Вещей к сезону: ${n} — пока не разобрали`, n => `Sezonas lietas: ${n} — kamēr vēl ir`],
+      allThings: ['All the things →', 'Все вещи →', 'Visas lietas →'],
       jan: [(j, n) => `You can still take the missed windows — until January ${j}${n ? ` (${n})` : ''}`, (j, n) => `Ещё можно забрать пропущенные окошки — до ${j} января${n ? ` (${n} шт.)` : ''}`, (j, n) => `Izlaistos lodziņus vēl var paņemt — līdz ${j}. janvārim${n ? ` (${n} gab.)` : ''}`],
     };
     const t = k => T[k][L];
@@ -72,6 +80,24 @@
       }
       return `<svg viewBox="0 0 64 52" shape-rendering="crispEdges" role="img" aria-label="${t('kick')}">${s}</svg>`;
     }
+    // сезоны магазина: тема (PPBirds.GIFT_THEMES), с какого и по какое число (ММ-ДД)
+    const SEASONS = [['halloween', '10-01', '10-31'], ['valentine', '02-01', '02-14'], ['spring', '03-01', '05-31'], ['summer', '06-01', '08-31'], ['autumn', '09-01', '09-30']];
+    function seasonNow() {
+      const ymd = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Riga' }).format(new Date(now())), md = ymd.slice(5), y = +ymd.slice(0, 4);
+      const s = SEASONS.find(x => md >= x[1] && md <= x[2]), B = window.PPBirds, th = s && B && B.GIFT_THEMES.find(x => x[0] === s[0]);
+      if (!th) return null;
+      const days = Math.round((Date.UTC(y, +s[2].slice(0, 2) - 1, +s[2].slice(3)) - Date.UTC(y, +md.slice(0, 2) - 1, +md.slice(3))) / 864e5);
+      return { th, days };
+    }
+    function showcase(sn) {
+      const B = window.PPBirds, list = sn.th[2].filter(x => !x.endsWith('|?') && !(B.LEGEND && B.LEGEND.has(x))), pics = list.filter(x => !/^(bg|frame|anim)\|/.test(x)), step = Math.max(1, Math.floor(pics.length / 6));
+      box.innerHTML = `<div class="ss-in"><div class="ss-shelf" aria-hidden="true"></div><div class="ss-tx"><p class="ss-kick">🛍 ${t('shopKick')}</p>
+        <p class="ss-main">${sn.th[1][L]} · <b>${T.left[L](sn.days)}</b></p><p class="ss-sub">${T.shopSub[L](list.length)}</p>
+        <a class="ss-btn" href="${pre}/shop/#theme:${sn.th[0]}">${t('allThings')}</a></div></div>`;
+      const sh = box.querySelector('.ss-shelf');
+      for (let i = 0; i < 6 && i * step < pics.length; i++) { const [k, v] = pics[i * step].split('|'), c = document.createElement('span'); try { c.appendChild(B.itemIcon(k, v, 60, 2)); } catch (e) { continue; } sh.appendChild(c); }
+      box.hidden = false;
+    }
     const snow = () => [...Array(14)].map((_, i) => `<i class="ss-snow" aria-hidden="true" style="left:${(i * 37) % 100}%;top:${-10 - (i * 13) % 30}px;animation-duration:${6 + (i % 5)}s;animation-delay:-${(i * 1.3) % 6}s"></i>`).join('');
 
     function load() {
@@ -82,6 +108,8 @@
       const guest = !S.user || !S.user.nick, opened = new Set((S.opened || []).map(o => o.day));
       const guestLine = guest ? `<p class="ss-guest"><button type="button" data-in>${t('guest')}</button>${t('guestTail')}</p>` : '';
       let st = () => 'shut', html = '', live = null, star = false;
+      const sn = S.month !== 11 && S.month !== 12 && !S.catchUp && seasonNow(); // адвента нет — витрина сезона
+      if (sn) { showcase(sn); if (S.nextAt) { const ms = S.nextAt - now(); if (ms > 0 && ms < 2e9) wake = setTimeout(load, ms + 1500); } return; }
       if (S.month === 10 || S.month === 11) { // до 1 декабря: отсчёт
         html = `<p class="ss-main">${T.soon[L]('<b data-cd></b>')}</p><p class="ss-sub">${t('soonSub')}</p><a class="ss-btn" href="${pre}/advent/">${t('peek')}</a>${guestLine}`;
         live = el => { const ms = S.startsAt - now(); el.textContent = cd(ms); if (ms <= 0) { clearInterval(tick); setTimeout(load, 1200); } };
