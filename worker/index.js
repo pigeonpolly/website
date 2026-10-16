@@ -1,7 +1,9 @@
 // Сервер сайта: отдаёт статические файлы из site/ и обслуживает /api/* для «Стены рисунков»:
 // вход через Google, ник, загрузка работы дня, серии, стена, топ, модерация, GDPR (экспорт и удаление).
 // Данные — Cloudflare D1 (env.DB), картинки челленджа — R2 (env.MEDIA, папка challenge/), старые ещё и в KV (env.IMAGES), пока идёт перенос. Блог — worker/blog.js (картинки блога в R2, env.MEDIA).
-import { blogApi, blogPage, visitor, anonCode, birdName, translateAll } from './blog.js';
+import { blogApi, blogPage, visitor, anonCode, birdName } from './blog.js';
+import { translateAll, translateTo, ABOUT } from './translate.js';
+import { cardsApi, importCards, myCards, CARD_TABLES } from './cards.js'; // коллекционные карточки (docs/cards.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
 const ADMIN_HASHES = ['80ac2786b60d61a30d6691a3d40de5d784cdefc580717add788821a7bf900118'];
@@ -43,6 +45,7 @@ export default {
       await autoPrice(env).catch(e => console.error('price', e)); // раз в сутки: уровень цен под заработки птичек
       await autoRestock(env).catch(e => console.error('restock', e)); // раз в сутки (по Риге) пополнить магазин
       await reqBackfill(env).catch(e => console.error('req tr', e)); // «Нарисуй мне»: переводы тем на все языки сайта
+      await importCards(env, new URL('https://www.pigeonpolly.com/')).catch(e => console.error('cards', e)); // новые коллекции карточек из репозитория (один раз)
       await migrateToR2(env); await cleanupInactive(env);
       await env.DB.prepare('DELETE FROM game_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {}); // старые забеги игр (started — в мс)
       await env.DB.prepare('DELETE FROM maze_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {});
@@ -229,6 +232,16 @@ const avatarOf = u => { try { const a = JSON.parse(u && u.avatar || '{}'); retur
 const okItem = (kind, item) => GIFT_KINDS.includes(kind) && (kind === 'any' ? ['?', 'legend'].includes(item) : item === '?' || /^[#a-z0-9:-]{1,24}$/i.test(String(item || ''))); // '?' — «🎲 Сюрприз» этой категории
 
 // общие функции для worker/blog.js
+// карточкам: средняя «цена сейчас» обычной вещи в продаже (без легендарных, сюрпризов и игровых), правила, лента событий стаи
+async function avgItemPrice(env) {
+  const rows = (await env.DB.prepare('SELECT kind, item, price, stock FROM shop WHERE stock > 0').all()).results.filter(r => !isLeg(r.kind, r.item) && r.item !== '?' && r.kind !== 'any' && !gameOnly(r.kind, r.item));
+  const ps = rows.map(r => priceNow(r.kind, r.item, r.price, r.stock)).filter(v => v > 0);
+  return ps.length ? ps.reduce((a, b) => a + b, 0) / ps.length : PLEVEL.avg || (await gameUnit(env)).avg || 50;
+}
+async function setRules(env, patch) { const r = cleanRules({ ...RULES, ...patch }); await setMeta(env, 'rules', JSON.stringify(r)); rulesAt = 0; await loadRules(env); return RULES; }
+// события стаи (кто что купил, обменял, нашёл): пока пустая — лента появится на следующих этапах
+async function flockEvent(kind, bird, data) { /* kind: 'card' — купил карточку; bird — птичка (users), data — подробности */ }
+const cardHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, rules: () => RULES, avgItemPrice: () => avgItemPrice(env), setRules: patch => setRules(env, patch), flockEvent });
 const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), awardComment: (uid, cid) => awardComment(env, uid, cid) });
 
 class HttpError extends Error { constructor(status, code) { super(code); this.status = status; this.code = code; } }
@@ -285,6 +298,7 @@ async function ensureSchema(env) {
     // лайки «Нарисуй мне»: kind 't' — тема (пока не нарисована), 'd' — рисунок; who — 'u'+id или 'v'+cookie
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS draw_likes (rid INTEGER NOT NULL, kind TEXT NOT NULL, who TEXT NOT NULL, created_at INTEGER, PRIMARY KEY (rid, kind, who))`),
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS potion_gifts (id INTEGER PRIMARY KEY AUTOINCREMENT, to_id INTEGER NOT NULL, from_nick TEXT, ing TEXT NOT NULL, n INTEGER NOT NULL, created_at INTEGER, seen INTEGER DEFAULT 0)`),
+    ...CARD_TABLES.map(sql => env.DB.prepare(sql)), // карточки: cards, card_sets, card_owner (worker/cards.js)
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
   for (const sql of ["ALTER TABLE users ADD COLUMN avatar TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
@@ -346,6 +360,7 @@ const RULE_DEFAULTS = {
   potionOn: true, potion1Pct: 4, potion2Pct: 12, potion3Pct: 35, potionAgainPct: 1, potionDayMaxPct: 60, potionMinSec: 8,
   potionSeason: 'auto', potionShelf: true, // сезон зельеварни (auto — по календарю) и бутылочка в комнату за новое зелье «Вкус детства» // «Пуговичный дождь»: 🔘 за пройденный уровень, не больше gameDayMax в сутки; уровень быстрее gameMinSec с — не засчитывается
   indexOn: false, indexBase: 0, priceDays: 4, catMult: {}, // indexOn: пуговки за цены — выключено: теперь цены сами следуют за пуговками; priceDays — за сколько дней обычной активности средняя птичка зарабатывает на среднюю вещь // индексация обычных пуговок по средней цене вещи (0 — стартовая цена = цена в день включения)
+  cardMult: 100, cardsFirstDay: 0, // карточки: цена обычной = средняя цена вещи × cardMult %; сколько карточек одной коллекции в одни руки в первые сутки (0 — без лимита)
   restockOn: true, restockTo: 0, // раз в сутки: у всех вещей, кроме легендарных, остаток дотягивается до restockTo шт. (0 — до «обычного запаса») // продажа вещей обратно в магазин: одна цена за любую вещь
   // условия бейджей (числа из описаний «как получить»)
   cond: { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4,
@@ -355,7 +370,7 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120] };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000] };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -372,7 +387,7 @@ function cleanRules(r) {
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
   for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn']) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec']) out[k] = Math.round(out[k]);
+  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'cardMult', 'cardsFirstDay']) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
   out.catMult = {}; if (r.catMult && typeof r.catMult === 'object') for (const k of GIFT_KINDS) { const v = Number(r.catMult[k]); if (Number.isFinite(v) && v !== 100) out.catMult[k] = Math.max(10, Math.min(1000, Math.round(v))); }
@@ -1072,6 +1087,19 @@ async function addBadge(env, uid, badge) {
 // ---------- маршруты ----------
 async function route(req, env, url) {
   const p = url.pathname, m = req.method;
+  if (p.startsWith('/api/cards') || p.startsWith('/api/admin/cards')) { const r = await cardsApi(req, env, url, cardHelpers(env)); if (r) return r; }
+  // «🌐 Перевести» в кабинете — одна кнопка на все разделы (site/assets/translate-btn.js): тексты с языка from на языки to (Gemini, worker/translate.js)
+  if (m === 'POST' && p === '/api/admin/translate') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({}));
+    const langs = ['en', 'ru', 'lv'], from = langs.includes(b.from) ? b.from : null;
+    if (!from || !Array.isArray(b.texts) || !b.texts.length) fail(400, 'bad');
+    const to = (Array.isArray(b.to) ? b.to : langs).filter(l => langs.includes(l) && l !== from);
+    const r = await translateTo(env, b.texts.slice(0, 100).map(x => String(x ?? '').slice(0, 4000)), from, to, ABOUT[b.about] || ABOUT.short);
+    if (!Object.keys(r.tr).length) { const c = Object.values(r.errors)[0] || 'ai'; fail(c === 'ai_limit' ? 429 : c === 'no_key' || c === 'bad_key' ? 400 : 502, c); }
+    return json(r);
+  }
   if (m === 'POST' && p === '/api/dev/migrate' && env.DEV_FAKE_LOGIN === '1') return json({ ...(await migrateToR2(env, Number(url.searchParams.get('batch')) || 100)), status: await migrationStatus(env) });
   if (m === 'POST' && p === '/api/dev/cleanup' && env.DEV_FAKE_LOGIN === '1') return json(await cleanupInactive(env, Number(url.searchParams.get('limit')) || KV_LIMIT));
   // публичный профиль: ник, серия, рекорд, бейджи и работы на стене (e-mail не отдаём)
@@ -2076,6 +2104,7 @@ async function route(req, env, url) {
       exported_at: new Date().toISOString(),
       account: { nick: u.nick, email: u.email, google_account_id: u.sub, consent_to_publish: !!u.consent, created_at: new Date(u.created_at * 1000).toISOString() },
       posts: posts.map(x => ({ ...x, image: `${url.origin}/api/img/${x.id}`, created_at: new Date(x.created_at * 1000).toISOString() })),
+      cards: await myCards(env, u.id), // коллекционные карточки птички
     };
     return new Response(JSON.stringify(data, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8', 'content-disposition': 'attachment; filename="pigeonpolly-my-data.json"', 'cache-control': 'no-store' } });
   }
@@ -2090,6 +2119,7 @@ async function route(req, env, url) {
       env.DB.prepare('DELETE FROM posts WHERE user_id = ?').bind(u.id),
       env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(u.id),
       env.DB.prepare('DELETE FROM button_log WHERE user_id = ?').bind(u.id),
+      env.DB.prepare('DELETE FROM card_owner WHERE user_id = ?').bind(u.id), // карточки снова свободны
       env.DB.prepare('DELETE FROM users WHERE id = ?').bind(u.id),
     ]);
     return json({ ok: true }, 200, { 'set-cookie': sessionCookie('', 0) });

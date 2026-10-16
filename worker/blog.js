@@ -1,6 +1,7 @@
 // Блог: страницы /blog/ и /blog/<slug>/ собираются на сервере из шаблона site/blog/index.html (между <!--BLOG--> и <!--/BLOG-->),
 // API /api/blog/* — лайки, комментарии, редактор (только админ), перевод через Workers AI, картинки в R2 (/media/*).
 // Данные — таблицы blog_* в той же D1.
+import { translateAll, gemini, geminiKey } from './translate.js'; // общий перевод (Gemini, запасной — Workers AI)
 
 const SITE = 'https://www.pigeonpolly.com';
 const LANGS = ['en', 'ru', 'lv'];
@@ -535,7 +536,7 @@ export async function blogApi(req, env, url, h) {
     if (m === 'POST' && a === 'restore-media') {
       if (!env.MEDIA) fail(503, 'media');
       const form = await req.formData(), file = form.get('file'), key = String(form.get('key') || '');
-      if (!(file instanceof File) || !/^blog\/[\w\/.-]+$/.test(key)) fail(400, 'bad');
+      if (!(file instanceof File) || !/^(blog|cards)\/[\w\/.-]+$/.test(key)) fail(400, 'bad');
       if (!(await env.MEDIA.head(key))) await env.MEDIA.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: file.type || 'image/jpeg', cacheControl: 'public, max-age=31536000, immutable' } });
       return json({ ok: true });
     }
@@ -704,111 +705,6 @@ async function rehostOne(env, src, moved) {
   } catch (e) { return null; }
 }
 
-// перевод: Workers AI (m2m100). Теги внутри абзаца прячем за метками ⟦1⟧; если метки потерялись — переводим чистый текст.
-async function translateOne(env, text, from, to) {
-  if (!text.trim()) return text;
-  const run = async s => {
-    if (!env.AI) {
-      if (env.DEV_FAKE_LOGIN === '1') return `[${to}] ${s}`;
-      throw Object.assign(new Error('ai'), { code: 'ai' });
-    }
-    try {
-      const r = await env.AI.run('@cf/meta/m2m100-1.2b', { text: s, source_lang: from, target_lang: to });
-      return r.translated_text || '';
-    } catch (e) {
-      const msg = String(e && e.message || e);
-      throw Object.assign(new Error(msg), { code: /limit|quota|429|4006|neuron/i.test(msg) ? 'ai_limit' : 'ai' });
-    }
-  };
-  // m2m100 обрезает длинные куски — длинный абзац переводим по предложениям (оформление внутри него теряется, но текст целый)
-  if (text.length > 380) {
-    const plain = stripTags(text), parts = [];
-    let cur = '';
-    for (const sent of plain.match(/[^.!?…]+[.!?…]+["»”')]*\s*|[^.!?…]+$/g) || [plain]) {
-      if ((cur + sent).length > 350 && cur) { parts.push(cur); cur = ''; }
-      cur += sent;
-    }
-    if (cur) parts.push(cur);
-    const out = [];
-    for (const part of parts) out.push(await run(part.trim()));
-    return out.join(' ');
-  }
-  const tags = [];
-  const masked = text.replace(/<[^>]+>/g, t => { tags.push(t); return `⟦${tags.length}⟧`; });
-  if (!tags.length) return run(text);
-  const out = await run(masked);
-  if (tags.every((_, i) => out.includes(`⟦${i + 1}⟧`))) return out.replace(/⟦(\d+)⟧/g, (_, n) => tags[n - 1]);
-  return run(stripTags(text));
-}
-// Gemini (ключ GEMINI_KEY в Cloudflare): переводит по смыслу и держит HTML. Модели по очереди — если одна перегружена, берём следующую.
-const LANG_NAME = { ru: 'Russian', en: 'English', lv: 'Latvian' };
-// Flash-Lite — быстрые (30 абзацев ≈ 8 с) и реже перегружены; полная Flash — запасная
-const GEMINI_MODELS = ['gemini-3.1-flash-lite', 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.5-flash'];
-// ключ Gemini: из Cloudflare (GEMINI_KEY) или из настроек редактора (meta.gemini_key)
-async function geminiKey(env) {
-  if (env.GEMINI_KEY) return env.GEMINI_KEY;
-  const r = await env.DB.prepare("SELECT value FROM meta WHERE key = 'gemini_key'").first().catch(() => null);
-  return r && r.value || '';
-}
-async function gemini(env, texts, from, to, key) {
-  const prompt = `You are a careful professional translator. Translate every string in the JSON array below from ${LANG_NAME[from]} to ${LANG_NAME[to]}.
-The strings are consecutive parts of one blog post written by an illustrator about drawing.
-Rules:
-- Translate faithfully and accurately. Do not add, remove, soften or change any facts, opinions, numbers or details. Do not add your own jokes, idioms or explanations.
-- Make it read naturally and fluently in ${LANG_NAME[to]}, keeping the author's tone (personal, friendly), but stay close to the original meaning sentence by sentence.
-- Keep every HTML tag and attribute exactly as it is, in the same places; translate only the human-readable text between tags.
-- Keep brand, product and personal names (e.g. Moleskine, Talens, SM*LT, Pigeon Polly), numbers and units unchanged.
-- If a string is a comma-separated list of short tags, return a comma-separated list of lowercase tags. Empty strings stay empty.
-Return only a JSON array of exactly ${texts.length} strings in the same order.
-
-${JSON.stringify(texts)}`;
-  const models = env.GEMINI_MODEL ? [env.GEMINI_MODEL, ...GEMINI_MODELS] : GEMINI_MODELS;
-  let lastErr = 'ai';
-  for (let attempt = 0; attempt < 2; attempt++) {
-    if (attempt) await new Promise(res => setTimeout(res, 8000)); // все заняты — ждём и пробуем ещё раз
-  for (const model of models) {
-    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-      method: 'POST', headers: { 'x-goog-api-key': key, 'content-type': 'application/json' },
-      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.2, responseMimeType: 'application/json', responseSchema: { type: 'ARRAY', items: { type: 'STRING' } } } }),
-    });
-    if (r.status === 400 || r.status === 401 || r.status === 403) { const t = await r.text(); if (/API key|PERMISSION|UNAUTHENTICATED|API_KEY/i.test(t)) throw Object.assign(new Error('bad_key'), { code: 'bad_key' }); }
-    if (!r.ok) { lastErr = r.status === 429 ? 'ai_limit' : 'ai'; continue; } // 404 (модель закрыли), 503 (перегружена), 429 (лимит) — пробуем следующую
-    try {
-      const d = await r.json();
-      const out = JSON.parse(d.candidates[0].content.parts.map(p => p.text || '').join(''));
-      if (Array.isArray(out) && out.length === texts.length) return out.map(x => String(x ?? ''));
-    } catch (e) { /* ответ не разобрался — следующая модель */ }
-  }
-  }
-  throw Object.assign(new Error(lastErr), { code: lastErr });
-}
-
-// strict: только Gemini (для статей) — если не вышло, ошибка, а не слабый перевод
-export async function translateAll(env, texts, from, to, strict = false) {
-  const out = [];
-  const key = await geminiKey(env);
-  const err = code => Object.assign(new Error(code), { code, status: code === 'ai_limit' ? 429 : code === 'no_key' || code === 'bad_key' ? 400 : 502 });
-  if (strict && !key) throw err('no_key');
-  if (key) {
-    try {
-      const res = await gemini(env, texts, from, to, key);
-      // пустой ответ на непустой абзац — этот абзац переводим запасным переводчиком
-      for (let i = 0; i < res.length; i++) {
-        if (texts[i].trim() && !res[i].trim()) {
-          try { res[i] = await translateOne(env, texts[i], from, to); } catch (e) { res[i] = texts[i]; }
-        }
-      }
-      return { texts: res, engine: 'gemini' };
-    } catch (e) { if (strict) throw err(e.code || 'ai'); /* иначе — запасной вариант ниже */ }
-  }
-  try {
-    for (let i = 0; i < texts.length; i += 4) out.push(...await Promise.all(texts.slice(i, i + 4).map(s => translateOne(env, s, from, to))));
-  } catch (e) {
-    const err = new Error(e.code || 'ai'); err.status = e.code === 'ai_limit' ? 429 : 502; err.code = e.code || 'ai'; throw err;
-  }
-  return { texts: out, engine: 'cloudflare' };
-}
-
 // частые теги про рисование — готовый перевод без машинного переводчика (RU/LV)
 const GLOSSARY = {
   'watercolor': ['акварель', 'akvarelis'],
@@ -904,7 +800,7 @@ async function syncTagColumns(env) {
 async function fullBackup(env) {
   const all = q => env.DB.prepare(q).all().then(r => r.results);
   const media = [];
-  if (env.MEDIA) { let cursor; do { const r = await env.MEDIA.list({ prefix: 'blog/', cursor }); media.push(...r.objects.map(o => o.key)); cursor = r.truncated ? r.cursor : null; } while (cursor); }
+  if (env.MEDIA) for (const prefix of ['blog/', 'cards/']) { let cursor; do { const r = await env.MEDIA.list({ prefix, cursor }); media.push(...r.objects.map(o => o.key)); cursor = r.truncated ? r.cursor : null; } while (cursor); } // cards/ — картинки карточек Алины
   const works = await all('SELECT * FROM posts');
   return {
     version: 2, site: SITE, exported_at: new Date().toISOString(),
@@ -913,7 +809,9 @@ async function fullBackup(env) {
     comments: await all('SELECT c.*, p.slug FROM blog_comments c JOIN blog_posts p ON p.id = c.post_id'), likes: await all('SELECT * FROM blog_likes'), media,
     subscribers: await all('SELECT * FROM subscribers').catch(() => []), // «сообщите, когда выйдет книга»
     site_blocks: await all('SELECT * FROM site_blocks').catch(() => []), // правки блоков сайта из режима «Править страницу»
-    art_added: await all('SELECT * FROM art_added').catch(() => []), // картины, добавленные в «Мой скетчбук»/«Палитры» с сайта (картинки — art/ в files)
+    art_added: await all('SELECT * FROM art_added').catch(() => []),
+    // коллекционные карточки: сами карточки, коллекции и владельцы (user_id — как в challenge.users)
+    cards: { cards: await all('SELECT * FROM cards').catch(() => []), sets: await all('SELECT * FROM card_sets').catch(() => []), owners: await all('SELECT card_id, user_id, price, bought_at FROM card_owner').catch(() => []) }, // картины, добавленные в «Мой скетчбук»/«Палитры» с сайта (картинки — art/ в files)
     // челлендж: аккаунты (ник, e-mail, бейджи, серии) и работы на стене
     challenge: { users: await all('SELECT id, sub, email, nick, consent, banned, created_at, best, badges, months, mcount, picks, last_seen, avatar FROM users'), gifts: await all('SELECT * FROM gifts').catch(() => []), works, meta: await all('SELECT * FROM meta WHERE key NOT IN (\'backup_token\', \'blog_salt\', \'gemini_key\', \'visit_salt\', \'admin_pin\', \'recovery_hash\', \'pin_fail\') AND key NOT LIKE \'rc_fail:%\'') }, // секреты и защита админки в копию не попадают
     // все файлы, которые надо скачать вместе с копией

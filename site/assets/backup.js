@@ -16,8 +16,9 @@
 
 data.json — всё содержимое базы:
   • блог: статьи (RU/EN/LV), теги, разделы, комментарии, лайки;
-  • челлендж: аккаунты (ник, e-mail, серии, бейджи) и список работ.
-media/ — картинки статей блога.
+  • челлендж: аккаунты (ник, e-mail, серии, бейджи) и список работ;
+  • карточки: все карточки, коллекции и чьи они (cards).
+media/ — картинки статей блога (blog/) и карточек Алины (cards/).
 challenge/works/ — рисунки участников челленджа.
 posts/ — статьи как обычные HTML-файлы (открываются в браузере без сайта).
 
@@ -137,7 +138,7 @@ function backup() {
       try {
         const JSZip = await loadZip(), zip = await JSZip.loadAsync(f);
         const data = JSON.parse(await zip.file('data.json').async('string'));
-        const media = zip.file(/^media\/blog\//);
+        const media = zip.file(/^media\/(blog|cards)\//);
         let n = 0;
         for (const m of media) {
           lbl.firstChild.textContent = `Картинки: ${++n} из ${media.length}…`;

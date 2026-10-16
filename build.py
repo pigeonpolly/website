@@ -541,6 +541,10 @@ def build():
     import subprocess
     subprocess.run(["node", str(ROOT / "tools" / "catalog.js"), str(ROOT)], check=True, stdout=subprocess.DEVNULL)
     subprocess.run(["node", str(ROOT / "tools" / "daycolors.js"), str(ROOT)], check=True, stdout=subprocess.DEVNULL)  # цвета темы дня → бейджи за цвета
+    # коллекции карточек из репозитория: site/assets/cards/<коллекция>.json → список для импорта на сервере (worker/cards.js, docs/cards.md)
+    cards_dir = OUT / "assets" / "cards"
+    cards_dir.mkdir(exist_ok=True)
+    (cards_dir / "index.json").write_text(json.dumps(sorted(f.stem for f in cards_dir.glob("*.json") if f.stem != "index")) + "\n")
     # индекс для поиска по сайту (кнопка 🔍 в шапке; статьи блога ищутся отдельно на сервере)
     for lang, entries in search_index.items():
         (OUT / "assets" / f"search-{lang}.json").write_text(json.dumps(entries, ensure_ascii=False, separators=(",", ":")))
