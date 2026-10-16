@@ -2,7 +2,7 @@
 # Рамка, номер и пометка 🤖 — в CSS сайта (site/assets/cards-ui.js), в картинке только сам рисунок.
 # Персонажи — как на сайте: Полли — из спрайта polly.js (тот же силуэт и цвета, только крупнее), Титос — из tools/rooms/detective.py,
 # Голова Тыквы и Мистер Чу — по картинам Алины (галереи Pumpkin Family и Mr.Chew).
-# Запуск: python3 tools/cards/halloween.py [папка] — по умолчанию site/images/cards/halloween-2026/ (01.png … 10.png) + лист sheet.png рядом.
+# Запуск: python3 tools/cards/halloween.py [папка] — по умолчанию site/images/cards/halloween-2026/ (01.png … 10.png); с папкой — ещё лист sheet.png для просмотра.
 import sys, os, math, random
 sys.path.insert(0, os.path.join(os.path.dirname(__file__), '../rooms'))
 import kit
@@ -625,5 +625,5 @@ if __name__ == '__main__':
     for i, f in enumerate(CARDS):
         im = f().convert('RGB'); assert im.size == (CW, CH)
         im.save(os.path.join(OUT, '%02d.png' % (i + 1)), optimize=True); ims.append(im)
-    sheet(ims, os.path.join(OUT, 'sheet.png') if len(sys.argv) > 1 else os.path.join(os.path.dirname(__file__), 'halloween-2026-sheet.png'))
+    if len(sys.argv) > 1: sheet(ims, os.path.join(OUT, 'sheet.png'))  # лист для просмотра — только при своей папке, в сайт не кладём
     print('ok', len(ims))
