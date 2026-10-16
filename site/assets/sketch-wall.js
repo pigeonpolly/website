@@ -417,9 +417,9 @@
         <div class="gf-btns"><button type="button" class="cta-btn" data-use>${room ? t('toRoom') : t('use')}</button><button type="button" class="pill-btn" data-later>${t('later')}</button></div>`;
       const a = room ? window.PPBirds.itemIcon(g.kind, g.item, 140) : window.PPBirds.avatar(me.id, Object.assign({}, me.avatar, { [g.kind]: g.item }), 140); a.classList.add('gf-pop');
       box.querySelector('.gf-ava').appendChild(a);
-      const act = async use => { try { await post('gift', { id: g.id, use: use && !room }); } catch (e) { alert(t('err')); return; } m.close(); if (window.PPNews) window.PPNews.refresh();
-        if (room && use) { if (!document.getElementById('bp-room')) { location.href = profileUrl(me.nick); return; } await refresh(); setTimeout(() => { const eb = document.querySelector('#bp-room .room-edit'); if (eb) { eb.click(); eb.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 500); return; }
-        await refresh(); };
+      // «Надеть» / «🏠 Поставить в комнату» — подарок в сумку и сразу useItem
+      const act = async use => { try { await post('gift', { id: g.id, use: false }); } catch (e) { alert(t('err')); return; } m.close(); if (window.PPNews) window.PPNews.refresh();
+        await refresh(); if (use) await useItem(g.kind, g.item, () => refresh()); };
       box.querySelector('[data-use]').onclick = () => act(true);
       box.querySelector('[data-later]').onclick = () => act(false);
     };
@@ -439,6 +439,26 @@
       catch (err) { st.textContent = err.code === 'bird' ? t('giveNo') : err.code === 'has' ? t('giveHas') : err.code === 'legend' ? t('giveLegend') : t('err'); }
     };
   }
+  // «Нажал — появилось» (этап 5 Б): одна функция для сумки, окна подарка, потом — тоста после покупки, наград, подарка новичку.
+  // Вещь для комнаты — в свою комнату на странице (PPRoom.live; нет её — в профиль с #use=), вещь птички — надеть / снять. Тост с «Отменить» (5 с).
+  async function useItem(kind, item, after) {
+    const B = window.PPBirds, tr = a => a[L];
+    const say = (msg, undo) => window.PPToast && window.PPToast(msg, undo ? { action: tr(['Undo', 'Отменить', 'Atsaukt']), onAction: undo, ms: 5000 } : {});
+    if (B.isRoomKind && B.isRoomKind(kind)) {
+      const R = window.PPRoom && window.PPRoom.live;
+      if (!R || !R.box.isConnected) { location.href = profileUrl(me.nick) + '#use=' + encodeURIComponent(kind + '|' + item); return; }
+      const own = (me.gifts || []).filter(x => x.status === 'bag' && x.kind === kind && x.item === item).length;
+      const r = R.use(kind, item, own); if (!r) return;
+      const bx = R.box.getBoundingClientRect(); if (bx.bottom < 80 || bx.top > innerHeight - 120) R.box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (r.done === 'there') return say(tr(['Already in the room — here it is', 'Уже в комнате — вот она', 'Jau istabā — lūk, tā']));
+      return say(r.done === 'off' ? tr(['Back to the old one', 'Вернули прежнее', 'Atgriezts iepriekšējais']) : tr(['Placed', 'Поставлено', 'Novietots']), r.undo);
+    }
+    const prev = (me.avatar || {})[kind] || null, on = prev === item;
+    const set = async v => { const r = await post('avatar', { kind, item: v }); me.avatar = r.avatar; window.PPAccount && window.PPAccount.check(); if (after) after(); };
+    try { await set(on ? null : item); } catch (e) { alert(t('err')); return; }
+    say(on ? tr(['Taken off', 'Снято', 'Novilkts']) : tr(['Put on', 'Надето', 'Uzvilkts']), () => set(prev).catch(() => alert(t('err'))));
+  }
+  let curBag = null; // сумка на странице — пересчитать ✓, когда меняется комната
   function openBag() { const m = modal(''); m.card.classList.add('bag-card'); bagInto(m.card, null, true); }
   function bagInto(box, changed, inModal) {
     const B = window.PPBirds, C = window.PPCatalog, isRoom = k => B.isRoomKind && B.isRoomKind(k);
@@ -451,15 +471,8 @@
       get items() { return sortK(items()); }, id: me.id, state: S, sell: me.btn && me.btn.rules ? me.btn.rules.sell : null, empty: t('bagEmpty'),
       top: inModal ? `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3>` : '',
       onUse: async g => {
-        if (isRoom(g.kind)) { // вещь для комнаты — открыть обустройство комнаты в профиле
-          const rb = document.getElementById('bp-room'), eb = rb && rb.querySelector('.room-edit');
-          if (eb) { if (!rb.classList.contains('editing')) eb.click(); rb.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-          else location.href = profileUrl(me.nick);
-          return;
-        }
-        const on = me.avatar && me.avatar[g.kind] === g.item;
-        try { const r = await post('avatar', { kind: g.kind, item: on ? null : g.item }); me.avatar = r.avatar; } catch (e) { alert(t('err')); return; }
-        redraw(); if (app) renderProfile(); if (changed) changed(); window.PPAccount && window.PPAccount.check();
+        if (isRoom(g.kind)) { if (inModal) box.closest('.sw-bv') && box.closest('.sw-bv').remove(); await useItem(g.kind, g.item); return; }
+        await useItem(g.kind, g.item, () => { redraw(); if (app) renderProfile(); if (changed) changed(); });
       },
       onGive: g => { const x = me.gifts.find(y => y.id === g.gid); box.closest('.sw-bv') && box.closest('.sw-bv').remove(); giveDialog(x); },
       onSell: async g => {
@@ -472,6 +485,8 @@
       },
       onMore: g => bagMore(g),
     });
+    if (!inModal) curBag = ui;
+    return ui;
   }
   // «Подробнее» из меню «⋯»: вещь крупно, вид, сколько штук и где
   function bagMore(g) {
@@ -670,11 +685,14 @@
     const gb = page.querySelector('#bp-gift'); if (gb) gb.onclick = () => { openGift(newGifts[newGifts.length - 1]); };
     if (gb && location.hash === '#gift') { history.replaceState(null, '', location.pathname + location.search); gb.click(); } // /bird/#gift — «Открыть подарок» из новостей (news.js)
     // комната птички (room.js); пока его нет на странице — блок скрыт
-    if (window.PPRoom) { const rb = page.querySelector('#bp-room'); rb.hidden = false; window.PPRoom.mount(rb, { id: pr.id, nick: pr.nick, avatar: pr.avatar, room: pr.room, mine, me, onChange: () => renderPage() }); }
+    if (window.PPRoom) { const rb = page.querySelector('#bp-room'); rb.hidden = false; window.PPRoom.mount(rb, { id: pr.id, nick: pr.nick, avatar: pr.avatar, room: pr.room, mine, me, onRoom: room => { me.room = room; if (curBag && curBag.box && curBag.box.isConnected) curBag.draw(); } });
+      const h = mine && (location.hash.match(/^#use=(.+)$/) || [])[1]; // пришли из сумки на другой странице: поставить вещь
+      if (h) { history.replaceState(null, '', location.pathname + location.search); const [k, v] = decodeURIComponent(h).split('|'); setTimeout(() => useItem(k, v), 400); } }
     const panel = page.querySelector('.bp-panel');
     const show = k => {
       page.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === k)));
       panel.classList.remove('cat-bag');
+      const rbx = page.querySelector('#bp-room'); if (rbx) rbx.classList.toggle('bag-open', mine && k === 'bag'); // телефон: комната прилипает сверху
       if (k === 'bag') {
         if (mine) return bagInto(panel, () => renderPage());
         panel.innerHTML = `<div class="sw-pv-bag">${'<span class="sw-pv-item sw-pv-wrap" title="🎁">🎁</span>'.repeat(Math.min(pr.unopened || 0, 12))}</div>${!(pr.bag || []).length && !pr.unopened ? `<p class="sw-pv-empty">${t('bagEmptyOther')}</p>` : ''}`;

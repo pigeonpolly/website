@@ -2,7 +2,7 @@
 // мебель и вещи (ставятся на пол или друг на друга), украшения (висят где угодно: на ёлке, на стене). Птичка в комнате гуляет,
 // запрыгивает на мебель, спит на диване, играет в приставку. Вещи для комнаты — подарки того же каталога, что и для птички
 // (PPBirds.GIFTS: wall, floor, view, curtain, furn, deco) — их можно купить, подарить, получить в адвенте.
-// Хозяин комнаты: «✏️ Обустроить» — снизу вещи из сумки, нажать — поставить; тянуть — двигать; ⇆ — повернуть; ↩ — убрать в сумку.
+// Хозяин комнаты правит её всегда на месте: вещь из сумки ставит useItem (sketch-wall.js) → PPRoom.live.use; тянуть — двигать; над выбранной ⇆ ⬆ ⬇ ↩.
 (() => {
   const B = window.PPBirds;
   if (!B) return;
@@ -864,29 +864,51 @@
 
   // ---------- комната ----------
   const T = {
-    edit: ['✏️ Decorate the room', '✏️ Обустроить комнату', '✏️ Iekārtot istabu'], done: ['✓ Done', '✓ Готово', '✓ Gatavs'],
     of: ['Room of @{n}', 'Комната @{n}', '@{n} istaba'], saved: ['Saved ✓', 'Сохранено ✓', 'Saglabāts ✓'], saving: ['Saving…', 'Сохраняю…', 'Saglabāju…'], err: ['Could not save', 'Не получилось сохранить', 'Neizdevās saglabāt'],
-    hint: ['Tap a thing below to put it in the room. Drag things anywhere: on the floor, on the wall, on top of each other. Near a shelf or table top a thing snaps onto it. Tap a thing to turn it, move it forward or back, or put it back in the bag. Arrow keys nudge it by a pixel.', 'Нажмите на вещь внизу — она появится в комнате. Вещи можно таскать куда угодно: по полу, на стену, друг на друга; у столешницы или полки вещь сама на неё встаёт. Нажмите на вещь, чтобы повернуть, переложить вперёд или назад или убрать в сумку. Стрелки на клавиатуре двигают её на пиксель.', 'Pieskaries lietai apakšā — tā parādīsies istabā. Lietas var vilkt jebkur: pa grīdu, uz sienas, vienu uz otras; pie galda vai plaukta virsmas lieta pati uz tās nostājas. Pieskaries lietai, lai pagrieztu, pārliktu uz priekšu vai atpakaļ vai noliktu somā. Bultiņas to pabīda par pikseli.'],
-    empty: ['No room things in your bag yet. Buy them in the shop, get them as gifts or in the advent calendar.', 'В сумке пока нет вещей для комнаты. Их можно купить в магазине, получить в подарок или в адвент-календаре.', 'Somā vēl nav lietu istabai. Tās var nopirkt veikalā, saņemt dāvanā vai adventes kalendārā.'],
-    shop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'], flip: ['⇆ Turn', '⇆ Повернуть', '⇆ Pagriezt'], front: ['⬆ Forward', '⬆ Вперёд', '⬆ Uz priekšu'], behind: ['⬇ Back', '⬇ Назад', '⬇ Atpakaļ'], top: ['⏫ On top', '⏫ Поверх всего', '⏫ Virs visa'], back: ['↩ To the bag', '↩ В сумку', '↩ Uz somu'],
-    def: ['default', 'как было', 'kā bija'],
-    tabs: { furn: ['Furniture', 'Мебель', 'Mēbeles'], deco: ['Decorations', 'Украшения', 'Rotājumi'], wall: ['Walls', 'Стены', 'Sienas'], floor: ['Floor', 'Пол', 'Grīda'], view: ['Window', 'Окно', 'Logs'], curtain: ['Curtains', 'Шторы', 'Aizkari'] },
+    hint: ['Drag things around · tap one for ⇆ ⬆ ⬇ ↩', 'Вещи можно двигать · нажатие на вещь — ⇆ ⬆ ⬇ ↩', 'Lietas var pārvietot · pieskaries lietai — ⇆ ⬆ ⬇ ↩'],
+    flip: ['Turn', 'Повернуть', 'Pagriezt'], front: ['Forward', 'Вперёд', 'Uz priekšu'], behind: ['Back', 'Назад', 'Atpakaļ'], back: ['To the bag', 'В сумку', 'Uz somu'],
   };
   const t = k => T[k][L];
-  const pre = ['', '/ru', '/lv'][L];
+  // свободное место для новой вещи (этап 5 Б): мебель — на пол ближе к центру, украшения и полки — на стену мимо окна и штор.
+  // lay — раскладка комнаты (layout() внутри mount), d — defOf вещи; возвращает { x, y }
+  function freeSpot(lay, d, k) {
+    const ov = (ax, ay, aw, ah, b) => Math.max(0, Math.min(ax + aw, b.x + b.w) - Math.max(ax, b.x)) * Math.max(0, Math.min(ay + ah, b.y + b.h) - Math.max(ay, b.y));
+    const boxes = lay.map(q => ({ x: q.x, y: q.y, w: q.d.w, h: q.d.h, flat: q.d.h <= 4, wall: q.it.k === 'deco' || q.d.wall }));
+    let best = null;
+    if (k === 'deco' || d.wall) {
+      const win = { x: WX - 17, y: WY - 9, w: WW + 34, h: WH + 22 }, px = Math.max(0, (WX - 17) / 2 - d.w / 2), py = d.wall ? 40 - d.h : 22;
+      for (let y = 2; y <= Math.max(2, FY - d.h - 2); y += 2) for (let x = 0; x <= RW - d.w; x += 2) {
+        const hit = ov(x, y, d.w, d.h, win) + boxes.reduce((a, b) => a + ov(x, y, d.w, d.h, b), 0);
+        const sc = hit * 100 + Math.abs(x - px) + Math.abs(y - py) * 2;
+        if (!best || sc < best.sc) best = { x, y, sc };
+      }
+      return { x: best.x, y: best.y };
+    }
+    const y = GY - d.h, floor = boxes.filter(b => !b.wall && !b.flat && Math.abs(b.y + b.h - GY) <= 2);
+    for (let x = 0; x <= RW - d.w; x += 2) {
+      const hit = d.h <= 4 ? 0 : floor.reduce((a, b) => a + Math.max(0, Math.min(x + d.w, b.x + b.w) - Math.max(x, b.x)), 0);
+      const sc = hit * 1000 + Math.abs(x + d.w / 2 - RW / 2);
+      if (!best || sc < best.sc) best = { x, sc };
+    }
+    return { x: best.x, y };
+  }
+
 
   function mount(box, o) {
     let room = Object.assign({ items: [] }, o.room || {}); room.items = (room.items || []).filter(it => defOf(it.k, it.v));
-    let edit = false, sel = -1, saveT = 0;
+    const edit = !!o.mine; // своя комната правится всегда прямо на месте (этап 5 Б), у гостей — только смотреть
+    let sel = -1, saveT = 0, drag = null, flash = 0;
+    const pops = new Map(); // вещь → когда «плюхнулась» (подскок)
     box.classList.add('room');
     box.innerHTML = `<div class="room-stage"><canvas class="room-cv" width="${RW}" height="${RH}" aria-label="${t('of').replace('{n}', o.nick)}" role="img"></canvas></div>
-      <div class="room-bar"><span class="room-cap">🏠 ${t('of').replace('{n}', o.nick)}</span>${o.mine ? `<span class="room-st" aria-live="polite"></span><button type="button" class="pill-btn room-edit">${t('edit')}</button>` : ''}</div>
-      <div class="room-sel" hidden><button type="button" class="pill-btn" data-flip>${t('flip')}</button><button type="button" class="pill-btn" data-z="1">${t('front')}</button><button type="button" class="pill-btn" data-z="-1">${t('behind')}</button><button type="button" class="pill-btn" data-z="top">${t('top')}</button><button type="button" class="pill-btn" data-back>${t('back')}</button></div>
-      <div class="room-tray" hidden></div>`;
+      <div class="room-bar"><span class="room-cap">🏠 ${t('of').replace('{n}', o.nick)}</span>${o.mine ? `<span class="room-hint">${t('hint')}</span><span class="room-st" aria-live="polite"></span>` : ''}</div>`;
     const cv = box.querySelector('canvas'), stage = box.querySelector('.room-stage');
     const S = 4; cv.width = RW * S; cv.height = RH * S;
     const g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
-    const st = box.querySelector('.room-st'), tray = box.querySelector('.room-tray'), selBar = box.querySelector('.room-sel');
+    const st = box.querySelector('.room-st');
+    // панель над выбранной вещью: ⇆ ⬆ ⬇ ↩
+    const selBar = document.createElement('div'); selBar.className = 'room-sel'; selBar.hidden = true;
+    if (o.mine) { selBar.innerHTML = [['flip', '⇆', 'data-flip'], ['front', '⬆', 'data-z="1"'], ['behind', '⬇', 'data-z="-1"'], ['back', '↩', 'data-back']].map(([k, ic, at]) => `<button type="button" ${at} title="${t(k)}" aria-label="${t(k)}">${ic}</button>`).join(''); stage.appendChild(selBar); }
     // статичный фон (стены, пол, окно) — рисуется один раз
     let bg = null;
     const paintBg = () => {
@@ -936,7 +958,7 @@
     const PART = { // пиксельные частицы над птичкой
       note: [['.xx', '.x.', 'xx.'], ['#F6D04D', '#F28AB2', '#7FB3E8']], heart: [['x.x', 'xxx', '.x.'], ['#E5484D', '#F28AB2']], star: [['.x.', 'xxx', '.x.'], ['#F6D04D', '#FFFFFF']],
       crumb: [['x'], ['#D9A45B', '#8B5A3C', '#F4EBDD']], drop: [['x', 'x'], ['#7FB3E8', '#BFE3F5']], paint: [['xx', 'xx'], ['#E5484D', '#4A7BD8', '#F6D04D', '#4CC38A', '#B79CF2']],
-      spark: [['x'], ['#F6D04D', '#FFE08A', '#F08A3B']], yarn: [['xx', 'xx'], ['#F28AB2', '#7FB3E8']], paper: [['xx', 'x.'], ['#E5484D', '#4A7BD8', '#F6D04D', '#4CC38A']],
+      spark: [['x'], ['#F6D04D', '#FFE08A', '#F08A3B']], dust: [['x'], ['#E8DFD0', '#FFFFFF', '#C9BCA6']], yarn: [['xx', 'xx'], ['#F28AB2', '#7FB3E8']], paper: [['xx', 'x.'], ['#E5484D', '#4A7BD8', '#F6D04D', '#4CC38A']],
     };
     const ACT_PART = { play: 'star', music: 'note', read: 'star', eat: 'crumb', splash: 'drop', paint: 'paint', warm: 'spark', gaze: 'star', pet: 'heart', unwrap: 'paper', knit: 'yarn', deco: 'star' };
     const parts = [];
@@ -951,7 +973,7 @@
     }
     // ---------- птичка ----------
     const lk = B.dress(B.looks(o.id), o.avatar || {});
-    const FR = [0, 1, 2].map(f => B.sprite(lk, f));
+    let FR = [0, 1, 2].map(f => B.sprite(lk, f));
     const bird = { x: 40, y: GY, dir: 1, st: 'idle', t0: 0, until: 0, from: null, to: null, frame: 0, zz: false };
     const surfaces = lay => { const s = [{ x0: 8, x1: RW - 8, y: GY }]; lay.forEach(q => { if (q.it.k === 'furn' && q.d.top != null && q.d.w >= 10) s.push({ x0: q.x + 4, x1: q.x + q.d.w - 4, y: q.y + q.d.top, q }); }); return s; };
     function think(now, lay) {
@@ -1017,12 +1039,18 @@
       drawCurtains(g, room.curtain);
       const ctx = { has };
       lay.forEach(q => {
+        const pp = pops.get(q.it); let oy = 0;
+        if (pp != null) { const a = now - pp; if (a > 560) pops.delete(q.it); else oy = a < 240 ? -18 * (1 - (a / 240) ** 2) : -4 * Math.sin(Math.PI * (a - 240) / 320); } // падает и подпрыгивает
         if (q.d.glow) { g.fillStyle = 'rgba(255,214,120,.13)'; g.beginPath(); g.arc(q.x + q.d.glow[0], q.y + q.d.glow[1], 26, 0, Math.PI * 2); g.fill(); }
-        if (q.it.f) { g.save(); g.translate((q.x * 2 + q.d.w), 0); g.scale(-1, 1); q.d.d(P(g, q.x, q.y), now, q.d.i, ctx); g.restore(); }
-        else q.d.d(P(g, q.x, q.y), now, q.d.i, ctx);
-        if (edit && q.idx === sel) { g.strokeStyle = '#F0A987'; g.lineWidth = .6; g.setLineDash([1.5, 1]); g.strokeRect(q.x - 1.5, q.y - 1.5, q.d.w + 3, q.d.h + 3); g.setLineDash([]); }
+        if (q.it.f) { g.save(); g.translate((q.x * 2 + q.d.w), 0); g.scale(-1, 1); q.d.d(P(g, q.x, q.y + oy), now, q.d.i, ctx); g.restore(); }
+        else q.d.d(P(g, q.x, q.y + oy), now, q.d.i, ctx);
+        if (edit && q.idx === sel) {
+          const fl = now - flash < 1400 && Math.floor((now - flash) / 200) % 2 === 0; // «уже в комнате» — мигает
+          g.strokeStyle = fl ? '#F5D547' : '#F0A987'; g.lineWidth = fl ? 1.2 : .6; g.setLineDash([1.5, 1]); g.strokeRect(q.x - 1.5, q.y - 1.5, q.d.w + 3, q.d.h + 3); g.setLineDash([]);
+        }
       });
-      if (!edit) { think(now, lay); stepBird(now); }
+      placeSel(lay);
+      think(now, lay); stepBird(now);
       drawBird(now);
       drawParts(now);
     }
@@ -1046,35 +1074,46 @@
       saveT = setTimeout(() => fetch('/api/room', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ room }) })
         .then(r => { if (!r.ok) throw 0; if (st) st.textContent = t('saved'); }).catch(() => { if (st) st.textContent = t('err'); }), 500);
     }
-    let tab = 'furn';
-    function drawTray() {
-      const own = owned(), keys = Object.keys(own);
-      if (!keys.length) { tray.innerHTML = `<p class="room-hint">${t('empty')}</p><a class="pill-btn" href="${pre}/shop/">${t('shop')}</a>`; return; }
-      const kinds = ['furn', 'deco', 'wall', 'floor', 'view', 'curtain'].filter(k => keys.some(x => x.startsWith(k + '|')));
-      if (!kinds.includes(tab)) tab = kinds[0];
-      tray.innerHTML = `<p class="room-hint">${t('hint')}</p><div class="room-tabs">${kinds.map(k => `<button type="button" data-k="${k}" aria-pressed="${k === tab}">${T.tabs[k][L]}</button>`).join('')}</div><div class="room-items"></div>`;
-      const list = tray.querySelector('.room-items');
-      if (ROOM_KINDS[tab]) {
-        const b = document.createElement('button'); b.type = 'button'; b.className = 'room-it' + (!room[tab] ? ' on' : ''); b.textContent = t('def'); b.onclick = () => { delete room[tab]; paintBg(); save(); drawTray(); }; list.appendChild(b);
-      }
-      keys.filter(x => x.startsWith(tab + '|')).forEach(key => {
-        const v = key.slice(tab.length + 1), b = document.createElement('button'); b.type = 'button'; b.className = 'room-it'; b.title = nameOf(tab, v);
-        b.appendChild(icon(tab, v, 58));
-        if (ROOM_KINDS[tab]) { b.classList.toggle('on', room[tab] === v); b.onclick = () => { room[tab] = v; paintBg(); save(); drawTray(); }; }
-        else {
-          const left = own[key] - placed(key); const n = document.createElement('em'); n.textContent = '×' + left; b.appendChild(n); b.disabled = left <= 0;
-          b.onclick = () => { if (own[key] - placed(key) <= 0) return; const d = defOf(tab, v); room.items.push(tab === 'deco' ? { k: tab, v, x: Math.round(RW / 2 - d.w / 2 - 20), y: 24 } : d.wall ? { k: tab, v, x: Math.round(RW / 2 - d.w / 2 - 20), y: 40 - d.h } : { k: tab, v, x: Math.round(RW / 2 - d.w / 2 - 20) }); /* полка (wall) — сразу на стену */ sel = room.items.length - 1; selBar.hidden = false; save(); drawTray(); };
-        }
-        list.appendChild(b);
-      });
-      tray.querySelectorAll('[data-k]').forEach(b => b.onclick = () => { tab = b.dataset.k; drawTray(); });
+    const changed = () => { if (o.me) o.me.room = room; if (o.onRoom) o.onRoom(room); }; // сумка пересчитывает ✓
+    function placeSel(lay) {
+      if (!o.mine) return;
+      const q = sel >= 0 && lay.find(z => z.idx === sel);
+      if (!q) { selBar.hidden = true; return; }
+      selBar.hidden = false;
+      const below = q.y / RH * stage.clientHeight < 58, cx = Math.max(14, Math.min(86, (q.x + q.d.w / 2) / RW * 100));
+      selBar.style.left = cx + '%'; selBar.style.top = ((below ? q.y + q.d.h : q.y) / RH * 100) + '%';
+      selBar.classList.toggle('below', below);
     }
+    // птичка подбегает посмотреть на новую вещь
+    function lookAt(it) {
+      const q = layout().find(z => z.it === it); if (!q) return;
+      const cx = q.x + q.d.w / 2, side = bird.x < cx ? -1 : 1, tx = Math.max(8, Math.min(RW - 8, cx + side * (q.d.w / 2 + 6)));
+      bird.zz = false; bird.act = null;
+      goFloor(performance.now(), tx, () => { bird.st = 'use'; bird.act = 'gaze'; bird.actQ = q; bird.dir = cx > bird.x ? 1 : -1; bird.until = performance.now() + 2400; });
+    }
+    // useItem для комнаты: own — сколько таких штук в сумке. Возвращает { done: 'put' | 'on' | 'off' | 'there', undo }
+    function use(kind, v, own) {
+      if (ROOM_KINDS[kind]) { // обои, пол, вид, шторы — сразу; повторное нажатие — как было
+        const prev = room[kind]; if (prev === v) delete room[kind]; else room[kind] = v;
+        paintBg(); save(); changed();
+        return { done: prev === v ? 'off' : 'on', undo: () => { if (prev == null) delete room[kind]; else room[kind] = prev; paintBg(); save(); changed(); } };
+      }
+      const key = kind + '|' + v, d = defOf(kind, v); if (!d) return null;
+      if (own == null) own = owned()[key] || 0;
+      if (placed(key) >= own) { const q = [...layout()].reverse().find(z => z.it.k + '|' + z.it.v === key); if (q) { sel = q.idx; flash = performance.now(); } return { done: 'there' }; }
+      const sp = freeSpot(layout(), d, kind), it = { k: kind, v, x: sp.x, y: sp.y };
+      room.items.push(it); sel = room.items.length - 1; pops.set(it, performance.now());
+      setTimeout(() => { for (let i = 0; i < 7; i++) emit('dust', it.x + Math.random() * d.w, it.y + d.h - 1, 1, true); }, 240); // пылинки при «плюх»
+      setTimeout(() => lookAt(it), 300);
+      save(); changed();
+      return { done: 'put', undo: () => { const i = room.items.indexOf(it); if (i < 0) return; room.items.splice(i, 1); sel = sel === i ? -1 : sel > i ? sel - 1 : sel; save(); changed(); } };
+    }
+    const api = { use, mine: !!o.mine, box, dress: av => { FR = [0, 1, 2].map(f => B.sprite(B.dress(B.looks(o.id), av || {}), f)); } };
+    if (o.mine) { window.PPRoom.live = api; box.classList.add('editing'); }
     if (o.mine) {
-      box.querySelector('.room-edit').onclick = e => { edit = !edit; e.target.textContent = edit ? t('done') : t('edit'); tray.hidden = !edit; box.classList.toggle('editing', edit); sel = -1; selBar.hidden = true; if (edit) drawTray(); };
       selBar.querySelector('[data-flip]').onclick = () => { const it = room.items[sel]; if (it) { it.f = it.f ? 0 : 1; save(); } };
-      selBar.querySelector('[data-back]').onclick = () => { if (sel < 0) return; room.items.splice(sel, 1); sel = -1; selBar.hidden = true; save(); drawTray(); };
+      selBar.querySelector('[data-back]').onclick = () => { if (sel < 0) return; room.items.splice(sel, 1); sel = -1; selBar.hidden = true; save(); changed(); };
       const pt = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * RW, (e.clientY - r.top) / r.height * RH]; };
-      let drag = null;
       cv.addEventListener('pointerdown', e => {
         if (!edit) return;
         const [px, py] = pt(e), lay = layout();
@@ -1122,6 +1161,7 @@
       box.addEventListener('keydown', e => {
         if (!edit || sel < 0) return; const it = room.items[sel], d = defOf(it.k, it.v); if (!it || !d) return;
         const st2 = e.shiftKey ? 8 : 1, dx = { ArrowLeft: -st2, ArrowRight: st2 }[e.key] || 0, dy = { ArrowUp: -st2, ArrowDown: st2 }[e.key] || 0;
+        if (e.key === 'Escape') { sel = -1; return; }
         if (e.key === 'Delete' || e.key === 'Backspace') { selBar.querySelector('[data-back]').click(); e.preventDefault(); return; }
         if (!dx && !dy) return; e.preventDefault();
         const q = layout().find(z => z.idx === sel); it.x = (q ? q.x : it.x) + dx; it.y = (q ? q.y : it.y || 0) + dy; save();
@@ -1152,6 +1192,7 @@
     cv.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') { showTip(e); clearTimeout(tip._t); tip._t = setTimeout(() => { tip.hidden = true; }, 1800); } }); // на телефоне — по касанию
     paintBg();
     raf = requestAnimationFrame(frame);
+    return api;
   }
-  window.PPRoom = { mount, icon, nameOf, isRoom, RW, RH, defOf, ROOM_KINDS }; // defOf и ROOM_KINDS — ещё и для tools/catalog.js (ценность вещей)
+  window.PPRoom = { mount, icon, nameOf, isRoom, RW, RH, defOf, ROOM_KINDS, freeSpot, live: null }; // live — своя комната на странице (для useItem) // defOf и ROOM_KINDS — ещё и для tools/catalog.js (ценность вещей)
 })();

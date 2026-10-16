@@ -31,11 +31,14 @@
   const closeMenu = () => { if (openMenu) { openMenu.remove(); openMenu = null; } };
   document.addEventListener('click', e => { if (openMenu && !e.target.closest('.cat-menu, .cat-more')) closeMenu(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') closeMenu(); });
+  window.addEventListener('scroll', closeMenu, { passive: true }); // на прокрутке меню не висит над комнатой
   function showMenu(tile, items) {
     closeMenu();
     const m = document.createElement('div'); m.className = 'cat-menu'; m.setAttribute('role', 'menu');
     items.forEach(it => { const b = document.createElement('button'); b.type = 'button'; b.setAttribute('role', 'menuitem'); b.textContent = it.label; b.onclick = e => { e.stopPropagation(); closeMenu(); it.on(); }; m.appendChild(b); });
-    tile.appendChild(m); openMenu = m; m.querySelector('button').focus();
+    tile.appendChild(m); openMenu = m;
+    if (m.getBoundingClientRect().left < 8) m.classList.add('left'); // крайняя левая плитка — меню вправо, не за край экрана
+    m.querySelector('button').focus({ preventScroll: true });
   }
 
   // плитка: картинка, название (≤ 2 строки), вид; отметка слева сверху, «⋯» справа сверху
@@ -144,7 +147,7 @@
         '✓ uzvilkts vai istabā · 1/3 — cik izmanto · ×2 — kopijas · ★ leģendāra · ⋯ dāvināt, pārdot, sīkāk']))}</p>`);
     };
     draw();
-    return { draw };
+    return { draw, box };
   }
 
   // где вещь сейчас: надета / стоит в комнате (сколько штук), сколько всего — для сумки

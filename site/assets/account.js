@@ -40,8 +40,7 @@
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   let info = null;
   try { const q = new URLSearchParams(location.search), r = (q.get('ref') || q.get('bird') || '').replace(/^@/, ''); if (/^[\p{L}\p{N}_.-]{2,24}$/u.test(r)) localStorage.setItem('pp-ref', r); } catch (e) {}
-  const toast = msg => { const d = document.createElement('div'); d.className = 'pp-toast'; d.textContent = msg; document.body.appendChild(d); setTimeout(() => d.classList.add('off'), 3800); setTimeout(() => d.remove(), 4400); };
-  window.PPToast = toast;
+  const toast = msg => window.PPToast && window.PPToast(msg); // toast.js
 
   // проверка дат на локальном сервере (DEV_FAKE_LOGIN): ?devdate=2026-11-30T23:59:50 (по Риге) запоминается на вкладку, часы идут дальше;
   // ?devdate=off — забыть. Сервер без DEV_FAKE_LOGIN заголовок не слушает. Зовут адвент, блок сезона и новости: window.PPDevH()

@@ -2776,6 +2776,8 @@ html:not(.is-admin) .statbar { display: none; }
 /* 🔘 пуговки: уведомление, меню, профиль, магазин, кабинет */
 .pp-toast { position: fixed; left: 50%; bottom: 24px; z-index: 2000; transform: translateX(-50%); padding: 12px 20px; border-radius: 999px; background: #2B1A51; color: #F5D547; font: 700 15px var(--sans); box-shadow: 0 0 0 2px #F5D547, 0 12px 30px rgba(0, 0, 0, .4); animation: wl-pop .3s ease-out; transition: opacity .5s, transform .5s; white-space: nowrap; }
 .pp-toast.off { opacity: 0; transform: translate(-50%, 12px); }
+.pp-toast-btn { padding: 0; border: 0; background: none; color: #fff; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
+.pp-toast-btn:hover, .pp-toast-btn:focus-visible { color: #F5D547; }
 .acct-btns { margin: -4px 0 6px; font: 600 14px var(--sans); color: var(--muted); }
 .acct-btns b { color: #F5D547; }
 .acct-ref { display: grid; gap: 4px; margin: 10px 0 0; font: 600 14px var(--sans); text-align: left; }
@@ -3103,7 +3105,14 @@ html:not(.is-admin) .statbar { display: none; }
 .room-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; justify-content: space-between; }
 .room-cap { font: 600 16px 'Fraunces', serif; opacity: .9; }
 .room-st { font-size: 13px; opacity: .8; margin-left: auto; }
-.room-sel { display: flex; gap: 8px; }
+.room-sel { position: absolute; z-index: 6; display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: #2B1A51; box-shadow: 0 0 0 2px #F0A987, 0 8px 18px rgba(0, 0, 0, .35); transform: translate(-50%, calc(-100% - 8px)); }
+.room-sel.below { transform: translate(-50%, 8px); }
+.room-sel button { width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .1); color: #fff; font: 700 17px var(--sans); cursor: pointer; }
+.room-sel button:hover, .room-sel button:focus-visible { background: #F0A987; color: #2B1A51; }
+.room-bar .room-hint { flex-basis: 100%; order: 3; font-size: 13px; opacity: .75; }
+/* телефон: пока открыта сумка, своя комната прилипает сверху */
+.bp-room .room-bar { padding: 0 12px 6px; }
+@media (max-width: 760px) { .bp-room.bag-open { position: sticky; top: var(--header-h); z-index: 15; padding-top: 6px; border-radius: 0 0 22px 22px; background: var(--bg); } }
 .room-sel[hidden], .room-tray[hidden] { display: none; }
 .room-tray { display: grid; gap: 10px; padding: 14px; border-radius: 16px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line); }
 .room-hint { margin: 0; font-size: 14px; opacity: .85; }
@@ -3337,6 +3346,7 @@ html:not(.is-admin) .statbar { display: none; }
 .cat-more { position: absolute; top: 3px; right: 3px; width: 26px; height: 22px; padding: 0; border: 0; border-radius: 8px; background: rgba(255, 255, 255, .85); color: #5E5472; font: 700 16px/1 var(--sans); cursor: pointer; }
 .cat-more:hover, .cat-more:focus-visible { background: #2B1A51; color: #fff; }
 .cat-menu { position: absolute; z-index: 20; top: 28px; right: 3px; display: grid; min-width: 160px; padding: 4px; border-radius: 12px; background: #fff; border: 1px solid #E6DFF0; box-shadow: 0 8px 24px rgba(43, 26, 81, .18); }
+.cat-menu.left { right: auto; left: 3px; }
 .cat-menu button { padding: 8px 10px; border: 0; border-radius: 8px; background: none; color: #2B1A51; font: 600 13px var(--sans); text-align: left; cursor: pointer; white-space: nowrap; }
 .cat-menu button:hover, .cat-menu button:focus-visible { background: #F1ECF8; outline: none; }
 .cat-legend { margin: 14px 0 0; color: #8C7FB0; font: 500 12px/1.5 var(--sans); }
