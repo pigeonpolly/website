@@ -3886,3 +3886,10 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .nw-empty { margin: 8px 0 4px; text-align: center; color: #6E5F80; }
 @media (max-width: 480px) { .nw-row { flex-wrap: wrap; } .nw-tx { flex: 1 1 calc(100% - 56px); } .nw-act { margin-left: 56px; } }
 @media (prefers-reduced-motion: reduce) { .nw-env, .nw-pix, .nw-bub, .bell.has svg { animation: none; } }
+/* вкладки магазина: 🐦 для птички / 🏠 для комнаты / 🎲 сюрпризы / 🃏 карточки (src/pages/shop.html `tabs`) */
+.shop-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 1280px; margin: 14px auto 0; }
+.shop-tab { font: 600 17px var(--sans); padding: 13px 10px; border-radius: 16px; border: 2px solid rgba(255,255,255,.28); background: rgba(255,255,255,.06); color: inherit; cursor: pointer; }
+.shop-tab:hover { border-color: rgba(255,255,255,.7); }
+.shop-tab[aria-selected="true"] { background: #FFFDF8; border-color: #E9A93B; color: #2B1A51; box-shadow: inset 0 -4px 0 #E9A93B; }
+.shop-off { display: none !important; }
+@media (max-width: 600px) { .shop-tabs { grid-template-columns: 1fr 1fr; padding: 0 10px; } .shop-tab { font-size: 15px; padding: 11px 6px; } }
