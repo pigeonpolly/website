@@ -63,6 +63,15 @@
     eyeWon: ['🧿 +1 eye of rescue! Use it before a hard maze: no ghosts, skulls or fog.', '🧿 +1 глаз спасения! Используй его перед трудным лабиринтом — не будет привидений, черепов и тумана.', '🧿 +1 glābšanas acs! Izmanto to pirms grūta labirinta — nebūs spoku, galvaskausu un miglas.'],
     eyeUse: [n => `🧿 Use the eye of rescue (${n})`, n => `🧿 Использовать глаз спасения (${n})`, n => `🧿 Izmantot glābšanas aci (${n})`],
     eyeOn: ['🧿 The eye of rescue is watching: no ghosts, skulls or fog in this maze.', '🧿 Глаз спасения смотрит за тобой: в этом лабиринте нет привидений, черепов и тумана.', '🧿 Glābšanas acs tevi sargā: šajā labirintā nav spoku, galvaskausu un miglas.'],
+    hint: ['🔦 Hint', '🔦 Подсказка', '🔦 Padoms'],
+    hintOn: ['🔦 A glowing path shows the way: to the nearest ingredient, then to the door.', '🔦 Светящаяся дорожка ведёт к ближайшему ингредиенту, потом к двери.', '🔦 Mirdzošs celiņš ved uz tuvāko sastāvdaļu, pēc tam uz durvīm.'],
+    hintH: ['🔦 A hint for this level', '🔦 Подсказка на этот уровень', '🔦 Padoms šim līmenim'],
+    hintLead: ['Give one thing from your bag: it goes back to the shop (no buttons for it). Until the end of the level a glowing path will lead you to the ingredients and the door — even in the fog.', 'Отдай одну вещь из сумки: она вернётся в магазин (пуговок за неё не будет). До конца уровня светящаяся дорожка поведёт к ингредиентам и к двери — даже в тумане.', 'Atdod vienu lietu no somas: tā atgriezīsies veikalā (pogas par to nebūs). Līdz līmeņa beigām mirdzošs celiņš vedīs pie sastāvdaļām un durvīm — pat miglā.'],
+    hintPick: ['Choose a thing', 'Выбери вещь', 'Izvēlies lietu'],
+    hintGive: [n => `🔦 Give «${n}» for a hint`, n => `🔦 Отдать «${n}» за подсказку`, n => `🔦 Atdot «${n}» par padomu`],
+    hintNone: ['There is nothing in your bag you could give. Legendary things, game prizes and the card album can’t be given.', 'В сумке нет вещей, которые можно отдать. Легендарные вещи, призы из игр и альбом карточек отдать нельзя.', 'Somā nav lietu, ko varētu atdot. Leģendāras lietas, spēļu balvas un kartīšu albumu atdot nevar.'],
+    hintGone: [n => `🔦 «${n}» went back to the shop. Follow the glowing path!`, n => `🔦 «${n}» — снова в магазине. Иди по светящейся дорожке!`, n => `🔦 «${n}» atkal veikalā. Ej pa mirdzošo celiņu!`],
+    worn: ['worn', 'надето', 'uzvilkts'],
     eyesN: ['Eyes of rescue', 'Глаза спасения', 'Glābšanas acis'],
     ingsN: ['Ingredients:', 'Ингредиентов:', 'Sastāvdaļas:'], potsN: ['Potions:', 'Зелий:', 'Dziras:'],
     pause: ['Pause', 'Пауза', 'Pauze'], resume: ['▶ Continue', '▶ Продолжить', '▶ Turpināt'],
@@ -80,10 +89,10 @@
   // ---------- состояние ----------
   let S = null, tab = 'maze';
   app.innerHTML = `<div class="pot-bar"></div><div class="pot-tabs" role="tablist">${['maze', 'pot', 'book'].map(k => `<button type="button" role="tab" data-tab="${k}">${t({ maze: 'tabMaze', pot: 'tabPot', book: 'tabBook' }[k])}</button>`).join('')}</div>
-    <div class="pot-view pot-maze"><div class="pot-stage"><canvas class="pot-cv"></canvas><button type="button" class="pot-pause" hidden>❚❚</button><div class="pot-ov"></div></div>
+    <div class="pot-view pot-maze"><div class="pot-stage"><canvas class="pot-cv"></canvas><button type="button" class="pot-pause" hidden>❚❚</button><button type="button" class="pot-hintb" hidden title="${t('hint')}" aria-label="${t('hint')}">🔦</button><div class="pot-ov"></div></div>
       <div class="pot-pad" aria-hidden="true"><button type="button" data-d="0,-1">▲</button><button type="button" data-d="-1,0">◀</button><button type="button" data-d="0,1">▼</button><button type="button" data-d="1,0">▶</button></div></div>
     <div class="pot-view pot-pot" hidden></div><div class="pot-view pot-book" hidden></div>`;
-  const bar = app.querySelector('.pot-bar'), cv = app.querySelector('.pot-cv'), ov = app.querySelector('.pot-ov'), stage = app.querySelector('.pot-stage'), pauseBtn = app.querySelector('.pot-pause');
+  const bar = app.querySelector('.pot-bar'), cv = app.querySelector('.pot-cv'), ov = app.querySelector('.pot-ov'), stage = app.querySelector('.pot-stage'), pauseBtn = app.querySelector('.pot-pause'), hintBtn = app.querySelector('.pot-hintb');
   const ctx = cv.getContext('2d');
   const badgeName = k => ({ maze: ['Maze walker', 'Лабиринтоход', 'Labirintu gājējs'], pot1: ['First potion', 'Первое зелье', 'Pirmā dzira'], pot2: ['Young alchemist', 'Юный алхимик', 'Jaunais alķīmiķis'],
     pot3: ['Cauldron master', 'Мастер котла', 'Katla meistars'], potkid: ['Taste of childhood', 'Вкус детства', 'Bērnības garša'] }[k] || [k, k, k])[L];
@@ -201,7 +210,7 @@
 
   async function newLevel() {
     state = 'loading'; overlay(`<p>…</p>`);
-    try { const r = await post('potion/level'); run = r; M = build(r.level, r.seed, r.items, r.eye); S.eyes = r.eyes || 0; drawBar(); if (r.safe) makeSafe(); M.season = r.season || S.season; if (r.season && r.season !== S.season) { S.season = r.season; drawBar(); } M.p.onCell = onPlayerCell; makeBird(); fit(); startCard(); }
+    try { const r = await post('potion/level'); run = r; M = build(r.level, r.seed, r.items, r.eye); M.hint = !!r.hint; S.eyes = r.eyes || 0; drawBar(); if (r.safe) makeSafe(); M.season = r.season || S.season; if (r.season && r.season !== S.season) { S.season = r.season; drawBar(); } M.p.onCell = onPlayerCell; makeBird(); fit(); startCard(); }
     catch (e) { overlay(`<p>${t('saveErr')}</p><button type="button" class="pill-btn pill-fill" data-a="retry">↻</button>`); }
   }
   function startCard() {
@@ -209,7 +218,8 @@
     const ng = M.ghosts.length, mods = [M.fog ? t('fog') : '', ng ? t('ghosts', ng) : '', M.ns ? t('skulls') : ''].filter(Boolean);
     const eyeIn = M.things.some(o => o.k === 'eye') ? `<p class="pot-mod pot-eye">${t('eyeIn')}</p>` : '';
     const useEye = mods.length && S.eyes > 0 ? `<button type="button" class="pill-btn pot-eye-btn" data-a="eye">${t('eyeUse', S.eyes)}</button>` : '';
-    overlay(`<h2>${t('lv')} ${M.level}</h2><p>${t('items', M.things.filter(o => o.k === 'ing').length)}</p>${M.safe ? `<p class="pot-mod pot-eye">${t('eyeOn')}</p>` : mods.map(m => `<p class="pot-mod">${m}</p>`).join('')}${eyeIn}<p class="pot-how">${t('how')}</p><div class="pot-ov-btns">${useEye}<button type="button" class="pill-btn pill-fill" data-a="go">${t('go')}</button></div>`);
+    const hint = M.hint ? `<p class="pot-mod pot-hint">${t('hintOn')}</p>` : '', hintB = M.hint ? '' : `<button type="button" class="pill-btn pot-hint-btn" data-a="hint">${t('hint')}</button>`;
+    overlay(`<h2>${t('lv')} ${M.level}</h2><p>${t('items', M.things.filter(o => o.k === 'ing').length)}</p>${M.safe ? `<p class="pot-mod pot-eye">${t('eyeOn')}</p>` : mods.map(m => `<p class="pot-mod">${m}</p>`).join('')}${eyeIn}${hint}<p class="pot-how">${t('how')}</p><div class="pot-ov-btns">${useEye}${hintB}<button type="button" class="pill-btn pill-fill" data-a="go">${t('go')}</button></div>`);
   }
   // глаз спасения: убираем всё, что усложняет лабиринт
   function makeSafe() { M.safe = true; M.fog = false; M.ghosts = []; M.ns = 0; M.things = M.things.filter(o => o.k !== 'skull'); }
@@ -220,15 +230,70 @@
     catch (e) { toast(t('saveErr')); }
     startCard();
   }
+  // 🔦 подсказка: окно выбора вещи из сумки (catalog-ui.js, режим выбора); вещь уходит в магазин, до конца уровня — дорожка
+  async function askHint() {
+    if (!M || M.hint || !run || !['ready', 'play', 'pause'].includes(state)) return;
+    const C = window.PPCatalog, B = window.PPBirds; if (!C || !B) return;
+    const back = state; if (state === 'play') pause();
+    let bag; try { bag = await fetch('/api/potion/bag', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : Promise.reject(r.status)); } catch (e) { toast(t('saveErr')); return; }
+    const ids = {}; for (const g of bag.items) (ids[g.kind + '|' + g.item] = ids[g.kind + '|' + g.item] || []).push(g.id);
+    const av = bag.avatar || {}, name = (k, v) => B.giftName(k, v, L);
+    const d = C.dialog('pot-hint-dlg', `<h3>${t('hintH')}</h3><p class="pot-hint-lead">${t('hintLead')}</p>${bag.items.length ? '<div class="pot-hint-cat"></div><div class="pot-hint-foot"><button type="button" class="cta-btn" disabled></button></div>' : `<p class="bag-empty">${t('hintNone')}</p>`}`);
+    if (!bag.items.length) return;
+    const btn = d.querySelector('.pot-hint-foot button'); btn.textContent = t('hintPick');
+    let pick = null;
+    const ui = C.browse(d.querySelector('.pot-hint-cat'), {
+      mode: 'pick', state: askHint.f || (askHint.f = {}), id: S.me.id,
+      entries: () => Object.keys(ids).map(k => { const i = k.indexOf('|'); return [k.slice(0, i), k.slice(i + 1)]; }),
+      tile: (k, v) => { const n = ids[k + '|' + v].length; return { badges: [...(av[k] === v ? [['✓ ' + t('worn'), 'have']] : []), ...(n > 1 ? [['×' + n, 'have']] : [])] }; },
+      pick: { has: (k, v) => !!pick && pick[0] === k && pick[1] === v },
+      onOpen: (k, v) => { pick = [k, v]; ui.drawList(); btn.disabled = false; btn.textContent = t('hintGive', name(k, v)); },
+    });
+    btn.onclick = async () => {
+      if (!pick) return; btn.disabled = true;
+      const gift = ids[pick[0] + '|' + pick[1]][0];
+      try {
+        const r = await post('potion/hint', { run: run.run, gift });
+        M.hint = true; d.close(); toast(t('hintGone', name(pick[0], pick[1])));
+        if (window.PPAccount && window.PPAccount.check) window.PPAccount.check();
+        if (back === 'ready') startCard(); else { state = 'play'; pause(); }
+      } catch (e) { btn.disabled = false; toast(t('saveErr')); }
+    };
+  }
+  // путь по клеткам от (sx, sy) до ближайшей из целей (по шагам); [] — некуда
+  function route(sx, sy, goals) {
+    const d = bfs(M.W, M.cols, M.rows, sx, sy);
+    let best = null; for (const [x, y] of goals) if (d[y][x] >= 0 && (!best || d[y][x] < d[best[1]][best[0]])) best = [x, y];
+    if (!best) return [];
+    const out = [best]; let [x, y] = best;
+    while (d[y][x] > 0) { const i = [0, 1, 2, 3].find(i => !M.W[y][x][i] && d[y + DIRS[i][1]] && d[y + DIRS[i][1]][x + DIRS[i][0]] === d[y][x] - 1); x += DIRS[i][0]; y += DIRS[i][1]; out.push([x, y]); }
+    return out.reverse();
+  }
+  // светящаяся дорожка 🔦: от птички к ближайшему несобранному ингредиенту, когда все собраны — к двери; рисуется поверх тумана
+  function drawHint(c, px, py) {
+    const ings = M.things.filter(o => o.k === 'ing' && !o.taken).map(o => [o.x, o.y]);
+    const sx = Math.round(px), sy = Math.round(py), path = route(sx, sy, ings.length ? ings : [M.ex]);
+    if (!path.length) return;
+    const pts = [[px, py], ...path.slice(1)].map(([x, y]) => [x * c + c / 2, y * c + c / 2]);
+    ctx.save(); ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.shadowColor = 'rgba(255,214,90,.95)'; ctx.shadowBlur = c * 0.5;
+    ctx.strokeStyle = 'rgba(255,214,90,.35)'; ctx.lineWidth = c * 0.34;
+    ctx.beginPath(); pts.forEach(([x, y], i) => i ? ctx.lineTo(x, y) : ctx.moveTo(x, y)); ctx.stroke();
+    ctx.shadowBlur = c * 0.25; ctx.strokeStyle = 'rgba(255,240,170,.95)'; ctx.lineWidth = Math.max(2, c * 0.1);
+    ctx.setLineDash([c * 0.12, c * 0.26]); ctx.lineDashOffset = -M.time * c * 1.2; ctx.stroke(); ctx.setLineDash([]);
+    const [gx, gy] = pts[pts.length - 1]; ctx.globalAlpha = 0.6 + 0.4 * Math.sin(M.time * 4);
+    ctx.fillStyle = 'rgba(255,224,120,.9)'; ctx.beginPath(); ctx.arc(gx, gy, c * 0.2, 0, 7); ctx.fill();
+    ctx.restore();
+  }
   function play() {
-    state = 'play'; ov.hidden = true; pauseBtn.hidden = false; document.documentElement.classList.add('pot-on');
+    state = 'play'; ov.hidden = true; pauseBtn.hidden = false; hintBtn.hidden = !!M.hint; document.documentElement.classList.add('pot-on');
     const r = stage.getBoundingClientRect(); if (r.top < 60 || r.bottom > innerHeight) stage.scrollIntoView({ block: 'center' });
     last = performance.now(); requestAnimationFrame(loop);
   }
-  function pause() { if (state !== 'play') return; state = 'pause'; document.documentElement.classList.remove('pot-on'); overlay(`<h2>${t('pause')}</h2><button type="button" class="pill-btn pill-fill" data-a="resume">${t('resume')}</button>`); }
+  function pause() { if (state !== 'play') return; state = 'pause'; hintBtn.hidden = true; document.documentElement.classList.remove('pot-on'); overlay(`<h2>${t('pause')}</h2><div class="pot-ov-btns">${M.hint ? '' : `<button type="button" class="pill-btn pot-hint-btn" data-a="hint">${t('hint')}</button>`}<button type="button" class="pill-btn pill-fill" data-a="resume">${t('resume')}</button></div>`); }
   async function finish() {
     if (state !== 'play') return;
-    state = 'saving'; pauseBtn.hidden = true; document.documentElement.classList.remove('pot-on');
+    state = 'saving'; pauseBtn.hidden = true; hintBtn.hidden = true; document.documentElement.classList.remove('pot-on');
     const got = M.got.slice();
     overlay(`<p>${t('checking')}</p>`);
     for (let k = 0; k < 8; k++) {
@@ -247,7 +312,7 @@
   ov.addEventListener('click', e => {
     const a = e.target.closest('[data-a]'); if (!a) return;
     const k = a.dataset.a;
-    if (k === 'go') play(); else if (k === 'eye') useEye(); else if (k === 'resume') { state = 'play'; ov.hidden = true; document.documentElement.classList.add('pot-on'); last = performance.now(); requestAnimationFrame(loop); }
+    if (k === 'go') play(); else if (k === 'eye') useEye(); else if (k === 'hint') askHint(); else if (k === 'resume') { state = 'play'; ov.hidden = true; hintBtn.hidden = !!M.hint; document.documentElement.classList.add('pot-on'); last = performance.now(); requestAnimationFrame(loop); }
     else if (k === 'next' || k === 'retry') newLevel(); else if (k === 'pot') { newLevel(); showTab('pot'); } else if (k === 'in') window.PPAccount && window.PPAccount.openSignIn();
   });
 
@@ -350,6 +415,7 @@
       // глаз спасения светится и сквозь туман
       for (const o of M.things) if (o.k === 'eye' && !o.taken) { const X = o.x * c + c / 2, Y = o.y * c + c / 2; ctx.globalAlpha = 0.75 + 0.25 * Math.sin(M.time * 3); emoji('🧿', X, Y - bob, c * 0.5); ctx.globalAlpha = 1; }
     }
+    if (M.hint) drawHint(c, px, py);
     ctx.textBaseline = 'alphabetic';
     for (const e of fx) { ctx.globalAlpha = Math.min(1, e.t * 1.6); emoji(e.txt, e.x * c, e.y * c, c * 0.8); } ctx.globalAlpha = 1;
     ctx.restore();
@@ -359,7 +425,7 @@
     const ings = M.things.filter(o => o.k === 'ing'), es = Math.min(top * 0.5, (w * 0.62 - ctx.measureText(t('lv') + ' ' + M.level).width - 24) / Math.max(1, ings.length) / 1.1), x0 = ctx.measureText(t('lv') + ' ' + M.level).width + 16 + es / 2;
     ings.forEach((o, i) => { ctx.globalAlpha = M.got.includes(o.i) ? 1 : 0.28; emoji(IG[o.id].e, x0 + i * es * 1.1, top / 2, es); }); ctx.globalAlpha = 1;
     const bs = Object.keys(M.buffs).map(k => ({ lantern: '🏮', boots: '👢', magnet: '🧲', amulet: '🛡️' }[k])).concat(M.fog ? ['🌫'] : []), bz = top * 0.45;
-    bs.forEach((e, i) => emoji(e, w - 54 - i * bz * 1.1, top / 2, bz));
+    bs.forEach((e, i) => emoji(e, w - 94 - i * bz * 1.1, top / 2, bz));
     if (ban) {
       ctx.globalAlpha = Math.min(1, ban.t * 2); let fs = Math.round(Math.max(14, c * 0.55)); ctx.font = `800 ${fs}px system-ui, sans-serif`;
       while (fs > 10 && ctx.measureText(ban.txt).width > w - 30) { fs--; ctx.font = `800 ${fs}px system-ui, sans-serif`; } ctx.textAlign = 'center';
@@ -382,7 +448,7 @@
   };
   maze.addEventListener('pointerup', swEnd); maze.addEventListener('pointercancel', swEnd);
   // на телефоне во время игры браузер не должен листать страницу или уходить «назад» свайпом
-  const noScroll = e => { if (playing() && !e.target.closest('.pot-pause')) e.preventDefault(); };
+  const noScroll = e => { if (playing() && !e.target.closest('.pot-pause, .pot-hintb')) e.preventDefault(); };
   maze.addEventListener('touchstart', noScroll, { passive: false }); maze.addEventListener('touchmove', noScroll, { passive: false });
   addEventListener('keydown', e => {
     const k = { ArrowUp: 0, KeyW: 0, ArrowRight: 1, KeyD: 1, ArrowDown: 2, KeyS: 2, ArrowLeft: 3, KeyA: 3 }[e.code];
@@ -390,7 +456,7 @@
     if ((e.code === 'Escape' || e.code === 'Space') && tab === 'maze' && !e.target.closest('input, textarea')) { if (state === 'play') { pause(); e.preventDefault(); } else if (state === 'pause') { e.preventDefault(); ov.querySelector('[data-a=resume]').click(); } }
   });
   app.querySelectorAll('.pot-pad [data-d]').forEach(b => b.addEventListener('pointerdown', e => { e.preventDefault(); const [dx, dy] = b.dataset.d.split(',').map(Number); setWant(dirOf(dx, dy)); }));
-  pauseBtn.onclick = pause;
+  pauseBtn.onclick = pause; hintBtn.onclick = askHint;
   document.addEventListener('visibilitychange', () => { if (document.hidden) pause(); });
   addEventListener('resize', () => { if (tab === 'maze') fit(); });
 

@@ -355,7 +355,7 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
@@ -476,6 +476,20 @@ async function loadDayColors(env) {
   return DAYCOL;
 }
 const gameOnly = (kind, item) => kind === 'furn' && String(item).startsWith('kidpot'); // вещи только из игр (бутылочка «Вкус детства»): в магазин не попадают
+// вещь из сумки — обратно в магазин (+1 к остатку): продажа и 🔦 подсказка в зельеварне. Надетое или стоявшее в комнате, если такой больше нет, — снять/убрать. → avatar
+async function toShop(env, req, u, g) {
+  const del = await env.DB.prepare("DELETE FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag'").bind(g.id, u.id).run();
+  if (!del.meta.changes) fail(404, 'gift');
+  if (!gameOnly(g.kind, g.item)) await env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, 1) ON CONFLICT(kind, item) DO UPDATE SET stock = MIN(100000, shop.stock + 1)').bind(g.kind, g.item, ((await catalog(env, req)).prices || {})[g.kind + '|' + g.item] || 30).run();
+  const a = avatarOf(u);
+  if (a[g.kind] === g.item && !(await env.DB.prepare("SELECT 1 FROM gifts WHERE user_id = ? AND kind = ? AND item = ? AND status = 'bag'").bind(u.id, g.kind, g.item).first())) {
+    delete a[g.kind]; await env.DB.prepare('UPDATE users SET avatar = ? WHERE id = ?').bind(JSON.stringify(a), u.id).run();
+  }
+  if (ROOM_KINDS.includes(g.kind)) await env.DB.prepare('UPDATE users SET room = ? WHERE id = ?').bind(JSON.stringify(cleanRoom(roomOf(u), await ownedRoom(env, u.id))), u.id).run();
+  return a;
+}
+// 🔦 подсказка: чем можно заплатить — не легендарные, не игровые, не альбом карточек (и не сюрпризы)
+const hintOk = (kind, item) => !isLeg(kind, item) && !gameOnly(kind, item) && !(kind === 'furn' && item === 'album') && kind !== 'any' && item !== '?';
 const legMax = (kind, item) => LEGEND.has(kind + '|' + item) ? RULES.legendMax : RULES.shopMax;
 // дни для серии: работы с пометкой 🤖 считаются, если так разрешено в правилах
 const streakDays = rows => rows.filter(r => RULES.aiStreak || !(r.ai > 0)).map(r => r.day);
@@ -1344,9 +1358,11 @@ async function route(req, env, url) {
     if (!next) { next = Math.max(4, level + 2 + Math.floor(Math.random() * 3)); await env.DB.prepare('UPDATE users SET eye_next = ? WHERE id = ?').bind(next, u.id).run(); }
     const eye = level >= next && (u.eyes || 0) < 9 ? 1 : 0;
     // глаз уже потрачен на этот уровень, а лабиринт не пройден (перезагрузили страницу) — уровень остаётся без помех
-    const safe = (await env.DB.prepare('SELECT 1 FROM maze_runs WHERE user_id = ? AND level = ? AND done = 0 AND safe = 1 LIMIT 1').bind(u.id, level).first()) ? 1 : 0;
-    await env.DB.prepare('INSERT INTO maze_runs (id, user_id, level, seed, items, started, eye, safe) VALUES (?, ?, ?, ?, ?, ?, ?, ?)').bind(id, u.id, level, seed, JSON.stringify(items), Date.now(), eye, safe).run();
-    return json({ run: id, level, seed, items, season, eye: !!eye, eyes: u.eyes || 0, safe: !!safe });
+    // так же и 🔦 подсказка: уже отдана вещь за этот уровень — дорожка будет и в новом лабиринте
+    const was = await env.DB.prepare('SELECT MAX(safe) AS safe, MAX(hint) AS hint FROM maze_runs WHERE user_id = ? AND level = ? AND done = 0').bind(u.id, level).first() || {};
+    const safe = was.safe ? 1 : 0, hint = was.hint ? 1 : 0;
+    await env.DB.prepare('INSERT INTO maze_runs (id, user_id, level, seed, items, started, eye, safe, hint) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(id, u.id, level, seed, JSON.stringify(items), Date.now(), eye, safe, hint).run();
+    return json({ run: id, level, seed, items, season, eye: !!eye, eyes: u.eyes || 0, safe: !!safe, hint: !!hint });
   }
   // дошла до выхода: собранные ингредиенты (номера из items) — в сумку зельевара, уровень +1
   if (m === 'POST' && p === '/api/potion/done') {
@@ -1377,6 +1393,30 @@ async function route(req, env, url) {
     if (!upd.meta.changes) fail(400, 'none');
     await env.DB.prepare('UPDATE maze_runs SET safe = 1 WHERE id = ?').bind(r.id).run();
     return json({ ok: true, eyes: (u.eyes || 1) - 1 });
+  }
+  // 🔦 подсказка: вещи из сумки, которыми можно заплатить (окно выбора)
+  if (m === 'GET' && p === '/api/potion/bag') {
+    const u = await needUser(req, env);
+    const rows = (await env.DB.prepare("SELECT id, kind, item FROM gifts WHERE user_id = ? AND status = 'bag' ORDER BY created_at DESC").bind(u.id).all()).results;
+    return json({ items: rows.filter(g => hintOk(g.kind, g.item)), avatar: avatarOf(u), room: roomOf(u) });
+  }
+  // 🔦 подсказка: вещь из сумки уходит в магазин (+1 к остатку, пуговок нет), до конца уровня видна дорожка (её рисует potions.js). Один раз на уровень, перезагрузка не сжигает
+  if (m === 'POST' && p === '/api/potion/hint') {
+    const u = await needUser(req, env);
+    if (!u.nick || u.banned) fail(400, 'nick');
+    const b = await req.json().catch(() => ({}));
+    const r = await env.DB.prepare('SELECT id, level, hint FROM maze_runs WHERE id = ? AND user_id = ? AND done = 0').bind(String(b.run || ''), u.id).first();
+    if (!r) fail(404, 'run');
+    if (r.hint) return json({ ok: true, avatar: avatarOf(u) });
+    const g = await env.DB.prepare("SELECT * FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag'").bind(Number(b.gift), u.id).first();
+    if (!g) fail(404, 'gift');
+    if (!hintOk(g.kind, g.item)) fail(400, 'cant');
+    // сначала отметить уровень (два нажатия подряд не возьмут две вещи), не вышло с вещью — отметку снять
+    const upd = await env.DB.prepare('UPDATE maze_runs SET hint = 1 WHERE id = ? AND hint = 0').bind(r.id).run();
+    if (!upd.meta.changes) return json({ ok: true, avatar: avatarOf(u) });
+    let a;
+    try { a = await toShop(env, req, u, g); } catch (e) { await env.DB.prepare('UPDATE maze_runs SET hint = 0 WHERE id = ?').bind(r.id).run(); throw e; }
+    return json({ ok: true, avatar: a, gone: { kind: g.kind, item: g.item } });
   }
   // подарить ингредиенты другой птичке (до 10 штук за раз); получатель увидит «🎁 @ник подарил(а)…» на странице игры
   if (m === 'POST' && p === '/api/potion/give') {
@@ -1963,18 +2003,10 @@ async function route(req, env, url) {
     const b = await req.json().catch(() => ({}));
     const g = await env.DB.prepare("SELECT * FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag'").bind(Number(b.id), u.id).first();
     if (!g) fail(404, 'gift');
-    const del = await env.DB.prepare("DELETE FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag'").bind(g.id, u.id).run();
-    if (!del.meta.changes) fail(404, 'gift');
-    if (!gameOnly(g.kind, g.item)) await env.DB.prepare('INSERT INTO shop (kind, item, price, stock) VALUES (?, ?, ?, 1) ON CONFLICT(kind, item) DO UPDATE SET stock = MIN(100000, shop.stock + 1)').bind(g.kind, g.item, ((await catalog(env, req)).prices || {})[g.kind + '|' + g.item] || 30).run();
+    const a = await toShop(env, req, u, g);
     const n = RULES.sellPrice;
     await env.DB.prepare('UPDATE users SET buttons = COALESCE(buttons, 0) + ? WHERE id = ?').bind(n, u.id).run();
     await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(u.id, 'sell', String(g.id), n, rigaDay(), now()).run();
-    // если продал то, что было надето или стояло в комнате, и такой больше нет — снять/убрать
-    const a = avatarOf(u);
-    if (a[g.kind] === g.item && !(await env.DB.prepare("SELECT 1 FROM gifts WHERE user_id = ? AND kind = ? AND item = ? AND status = 'bag'").bind(u.id, g.kind, g.item).first())) {
-      delete a[g.kind]; await env.DB.prepare('UPDATE users SET avatar = ? WHERE id = ?').bind(JSON.stringify(a), u.id).run();
-    }
-    if (ROOM_KINDS.includes(g.kind)) await env.DB.prepare('UPDATE users SET room = ? WHERE id = ?').bind(JSON.stringify(cleanRoom(roomOf(u), await ownedRoom(env, u.id))), u.id).run();
     return json({ ok: true, buttons: (u.buttons || 0) + n, avatar: a, got: n });
   }
   // птичка открыла конвертик с зарплатой — больше не показывать

@@ -32,7 +32,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **advent_open** (worker/index.js): `user_id` int nn, `year` int nn, `day` int nn, `kind` text, `item` text, `buttons` int =0, `created_at` int; + `got` text; PRIMARY KEY (user_id, year, day)
 - **shop** (worker/index.js): `kind` text nn, `item` text nn, `price` int =0, `stock` int =0; + `added_at` int; PRIMARY KEY (kind, item)
 - **game_runs** (worker/index.js): `id` text PK, `user_id` int nn, `started` int nn, `level` int =0
-- **maze_runs** (worker/index.js): `id` text PK, `user_id` int nn, `level` int nn, `seed` int nn, `items` text, `started` int nn, `done` int =0; + `eye` int =0, `safe` int =0
+- **maze_runs** (worker/index.js): `id` text PK, `user_id` int nn, `level` int nn, `seed` int nn, `items` text, `started` int nn, `done` int =0; + `eye` int =0, `safe` int =0, `hint` int =0
 - **potion_book** (worker/index.js): `user_id` int nn, `combo` text nn, `tier` int nn, `n` int =1, `created_at` int; PRIMARY KEY (user_id, combo)
 - **draw_requests** (worker/index.js): `id` int PK auto, `user_id` int, `anon` text, `text` text nn, `lang` text, `who` text, `status` text ='open', `img` text, `gift` text, `created_at` int, `answered_at` int; + `text_en` text, `ip` text, `text_ru` text, `text_lv` text
 - **draw_likes** (worker/index.js): `rid` int nn, `kind` text nn, `who` text nn, `created_at` int; PRIMARY KEY (rid, kind, who)
