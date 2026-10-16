@@ -34,14 +34,6 @@
     refHint: ['Your friend gets {n} buttons 🔘', 'Другу достанется {n} пуговок 🔘', 'Draugs saņems {n} pogas 🔘'], // {n} — текущая сумма с сервера (растёт вместе с ценами)
     refBad: ['There is no bird with this nickname. Pick one from the list or leave it empty.', 'Птички с таким ником нет. Выбери из списка или оставь пустым.', 'Putniņa ar tādu segvārdu nav. Izvēlies no saraksta vai atstāj tukšu.'],
     btns: ['buttons', 'пуговок', 'pogas'],
-    salTitle: ['A letter for you!', 'Тебе письмо!', 'Tev vēstule!'],
-    salOpen: ['Open the envelope', 'Открыть конвертик', 'Atvērt aploksni'],
-    salHi: [n => `Hi, @${n}!`, n => `Привет, @${n}!`, n => `Sveiks, @${n}!`],
-    salText: ['The Wobbleland Administration takes care of its birds and every now and then pays them a salary.', 'Администрация Воббленда проводит социальную поддержку птичек и иногда выдаёт им зарплату.', 'Wobbleland administrācija rūpējas par saviem putniņiem un šad tad izmaksā tiem algu.'],
-    salGot: [n => `Your salary: +${n} 🔘`, n => `Твоя зарплата: +${n} 🔘`, n => `Tava alga: +${n} 🔘`],
-    salNote: ['The buttons are already in your pocket.', 'Пуговки уже у тебя в кармане.', 'Pogas jau ir tavā kabatā.'],
-    salSign: ['— The Wobbleland Administration', '— Администрация Воббленда', '— Wobbleland administrācija'],
-    salOk: ['Thank you!', 'Спасибо!', 'Paldies!'],
     daily: [n => `+${n} 🔘 buttons for visiting today!`, n => `+${n} 🔘 пуговки за заход сегодня!`, n => `+${n} 🔘 pogas par šodienas apmeklējumu!`],
   };
   const t = k => S[k][L];
@@ -51,15 +43,31 @@
   const toast = msg => { const d = document.createElement('div'); d.className = 'pp-toast'; d.textContent = msg; document.body.appendChild(d); setTimeout(() => d.classList.add('off'), 3800); setTimeout(() => d.remove(), 4400); };
   window.PPToast = toast;
 
+  // проверка дат на локальном сервере (DEV_FAKE_LOGIN): ?devdate=2026-11-30T23:59:50 (по Риге) запоминается на вкладку, часы идут дальше;
+  // ?devdate=off — забыть. Сервер без DEV_FAKE_LOGIN заголовок не слушает. Зовут адвент, блок сезона и новости: window.PPDevH()
+  try { // один раз при заходе на страницу
+    const q = (location.search.match(/[?&]devdate=([\dT:-]+|off)/) || [])[1];
+    if (q === 'off') sessionStorage.removeItem('pp-devdate');
+    else if (q) sessionStorage.setItem('pp-devdate', JSON.stringify({ base: q, at: Date.now() }));
+  } catch (e) {}
+  function devH() {
+    let v = null;
+    try { v = JSON.parse(sessionStorage.getItem('pp-devdate') || 'null'); } catch (e) {}
+    if (!v || !/^\d{4}-\d\d-\d\d/.test(v.base)) return {};
+    if (v.base.length === 10) return { 'x-dev-date': v.base };
+    const [y, mo, d, h, mi, se] = v.base.split(/\D/).map(Number), t = new Date(Date.UTC(y, mo - 1, d, h, mi, se || 0) + Date.now() - v.at);
+    return { 'x-dev-date': t.toISOString().slice(0, 19) };
+  }
+  window.PPDevH = devH;
   function check() {
-    return fetch('/api/whoami', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => {
+    return fetch('/api/whoami', { credentials: 'same-origin', headers: devH() }).then(r => r.ok ? r.json() : null).then(d => {
       if (!d) return;
       info = d; render();
       document.documentElement.classList.toggle('is-admin', !!(d.user && d.user.admin)); // полоска цифр над шапкой — только Алине
       if (d.user && d.user.admin) adminStrip();
       if (d.user && !d.user.nick) askNick(d.user);
       if (d.user && d.user.earned) toast(t('daily')(d.user.earned));
-      if (d.user && d.user.nick && d.user.salary && d.user.salary.length) salary(d.user);
+      window.PPWho = d; document.dispatchEvent(new CustomEvent('pp:whoami', { detail: d })); // новости птички — «конвертик» (news.js); зарплата теперь там
       if (d.user && d.user.pin) pinAsk();
     }).catch(() => {});
   }
@@ -91,29 +99,6 @@
   }
   window.PPAccount = { check, openSignIn, signedIn: () => !!(info && info.user) };
   check();
-
-  // конвертик с зарплатой: пуговки уже начислены сервером, здесь — только открыть письмо (анимация) и отметить прочитанным
-  function salary(u) {
-    if (document.getElementById('acct-sal')) return;
-    const n = u.salary.reduce((a, x) => a + x.amount, 0);
-    const d = document.createElement('dialog');
-    d.id = 'acct-sal'; d.className = 'acct-sal';
-    d.innerHTML = `<div class="sal-box"><h2>${t('salTitle')}</h2>
-      <div class="sal-env"><div class="sal-back"></div><div class="sal-letter"><b>${esc(t('salHi')(u.nick))}</b><p>${t('salText')}</p><p class="sal-sum">${t('salGot')(n)}</p><p class="sal-note">${t('salNote')}</p><i>${t('salSign')}</i></div><div class="sal-front"></div><div class="sal-flap"></div><div class="sal-seal">W</div></div>
-      <button class="pill-btn pill-fill sal-btn" type="button">${t('salOpen')}</button></div>`;
-    document.body.appendChild(d); d.showModal();
-    const btn = d.querySelector('.sal-btn');
-    const done = () => { d.close(); d.remove(); };
-    btn.onclick = () => {
-      if (!d.classList.contains('open')) {
-        d.classList.add('open'); btn.textContent = t('salOk');
-        fetch('/api/salary/seen', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: '{}' }).catch(() => {});
-        return;
-      }
-      done();
-    };
-    d.addEventListener('cancel', e => { if (!d.classList.contains('open')) e.preventDefault(); });
-  }
 
   // ник обязателен: окно сразу после первого входа, закрыть можно только выбрав ник (или выйдя)
   function askNick(u) {

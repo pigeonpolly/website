@@ -32,6 +32,7 @@
 <script src="/assets/room.js" defer></script>
 <script src="/assets/potion-names.js" defer></script>
 <script src="/assets/account.js" defer></script>
+<script src="/assets/news.js" defer></script>
 <script src="/assets/search.js" defer></script>
 </head>
 <body class="{{body_class}}">
@@ -51,6 +52,7 @@
   </a>
   <button type="button" class="search-btn" aria-label="Search the site"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
   {{lang_switch}}
+  <button type="button" class="bell" id="pp-bell" hidden aria-label="News"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 21h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><b class="bell-n" hidden></b></button>
   <div class="acct" id="acct"></div>
   <button class="menu-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
     <span></span><span></span><span></span>

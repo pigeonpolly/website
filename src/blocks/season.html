@@ -1,0 +1,120 @@
+<style>
+  .ss { position: relative; overflow: hidden; box-sizing: border-box; padding: 34px 32px; background: radial-gradient(ellipse at 20% 0%, #3E2A7A 0, #24163F 60%, #1B1030 100%); font-family: 'Karla', sans-serif; color: #F3EFFA; }
+  .ss[hidden] { display: none; }
+  .ss-in { display: flex; align-items: center; justify-content: center; gap: 36px; max-width: 980px; margin: 0 auto; }
+  .ss-house { flex: none; width: 240px; }
+  .ss-house svg { display: block; width: 100%; height: auto; image-rendering: pixelated; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, .45)); }
+  .ss-win-today { animation: ss-glow 1.6s ease-in-out infinite; }
+  .ss-tx { flex: 1; min-width: 0; max-width: 560px; }
+  .ss-kick { margin: 0 0 6px; font-family: 'Fraunces', serif; font-style: italic; font-size: 19px; color: #F0A987; }
+  .ss-main { margin: 0; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(22px, 3vw, 30px); line-height: 1.2; }
+  .ss-main b, .ss-sub b { font-variant-numeric: tabular-nums; color: #F5D547; white-space: nowrap; }
+  .ss-sub { margin: 8px 0 0; font-size: 17px; line-height: 1.5; color: #D9D3F2; }
+  .ss-miss { margin: 8px 0 0; font-size: 16px; color: #F5C4B3; }
+  .ss-guest { margin: 10px 0 0; font-size: 15px; color: #D9D3F2; }
+  .ss-guest button { padding: 0; border: 0; background: none; color: #F0A987; font: 700 15px 'Karla', sans-serif; text-decoration: underline; cursor: pointer; }
+  .ss-btn { display: inline-block; margin-top: 18px; padding: 12px 26px; border-radius: 999px; background: #D85A30; color: #fff; font: 700 16px 'Karla', sans-serif; text-decoration: none; box-shadow: 0 5px 0 #8E3519; transition: transform .2s, box-shadow .2s; }
+  .ss-btn:hover { transform: translateY(2px); box-shadow: 0 3px 0 #8E3519; }
+  .ss-snow { position: absolute; width: 4px; height: 4px; background: #fff; opacity: .5; pointer-events: none; animation: ss-fall linear infinite; }
+  @keyframes ss-glow { 50% { fill: #FFF6C2; } }
+  @keyframes ss-fall { from { transform: translateY(-20px); } to { transform: translateY(260px); } }
+  @media (prefers-reduced-motion: reduce) { .ss-win-today, .ss-snow { animation: none; } }
+  @media (max-width: 700px) { .ss { padding: 28px 16px; } .ss-in { flex-direction: column; gap: 18px; text-align: center; } .ss-house { width: 200px; } }
+</style>
+
+<section class="ss" id="season" hidden aria-live="polite"></section>
+<script>
+  // сезонный блок под приветствием (этап 4 Б): 1.10–30.11 — домик адвента с отсчётом; 1–31.12 — окошко дня; 1–23.01 — пропущенные; иначе пусто.
+  // Данные — /api/advent (startsAt, now, nextAt, date, opened); ?devdate= — проверка дат на локальном сервере (account.js, PPDevH)
+  document.addEventListener('DOMContentLoaded', () => {
+    const box = document.getElementById('season');
+    if (!box) return;
+    const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, pre = ['', '/ru', '/lv'][L];
+    const T = {
+      kick: ['Advent calendar', 'Адвент-календарь', 'Adventes kalendārs'],
+      soon: [c => `The advent calendar opens in ${c}`, c => `Адвент-календарь откроется через ${c}`, c => `Adventes kalendārs atvērsies pēc ${c}`],
+      soonSub: ['31 windows with gifts for your bird', '31 окошко с подарками для птички', '31 lodziņš ar dāvanām putniņam'],
+      d: ['d', 'дн.', 'd.'],
+      peek: ['Peek inside →', 'Заглянуть →', 'Ieskatīties →'],
+      guest: ['Hatch a bird', 'Вылупи птичку', 'Izperi putniņu'], guestTail: [' to open the windows', ', чтобы открывать окошки', ', lai atvērtu lodziņus'],
+      today: [n => `Window №${n} is open!`, n => `Окошко №${n} открылось!`, n => `Lodziņš Nr. ${n} ir atvēries!`],
+      todaySub: ['A gift for your bird is waiting inside.', 'Внутри ждёт подарок для птички.', 'Iekšā gaida dāvana putniņam.'],
+      open: ['Open →', 'Открыть →', 'Atvērt →'],
+      done: [n => `Window №${n} is opened ✓`, n => `Окошко №${n} открыто ✓`, n => `Lodziņš Nr. ${n} atvērts ✓`],
+      next: [c => `the next one in ${c}`, c => `следующее через ${c}`, c => `nākamais pēc ${c}`],
+      last: ['that was the last one!', 'это было последнее!', 'tas bija pēdējais!'],
+      miss: [n => `+${n} missed — you can still take ${n === 1 ? 'it' : 'them'}`, n => `+${n} ${n % 10 === 1 && n % 100 !== 11 ? 'пропущенное' : 'пропущенных'} — тоже можно забрать`, n => `+${n} ${n % 10 === 1 && n % 100 !== 11 ? 'izlaists' : 'izlaisti'} — arī var paņemt`],
+      jan: [(j, n) => `You can still take the missed windows — until January ${j}${n ? ` (${n})` : ''}`, (j, n) => `Ещё можно забрать пропущенные окошки — до ${j} января${n ? ` (${n} шт.)` : ''}`, (j, n) => `Izlaistos lodziņus vēl var paņemt — līdz ${j}. janvārim${n ? ` (${n} gab.)` : ''}`],
+    };
+    const t = k => T[k][L];
+    const H = () => (window.PPDevH ? window.PPDevH() : {});
+    let S = null, skew = 0, tick = 0, wake = 0; // после полуночи (новое окошко) — и новости в 🔔 спросить заново
+    const two = n => String(n).padStart(2, '0');
+    const clock = ms => { const s = Math.max(0, Math.floor(ms / 1000)); return `${two(Math.floor(s / 3600) % 24)}:${two(Math.floor(s / 60) % 60)}:${two(s % 60)}`; };
+    const cd = ms => `${Math.floor(Math.max(0, ms) / 864e5)} ${t('d')} ${clock(ms)}`;
+    const now = () => Date.now() + skew;
+
+    // пиксельный домик-календарь: 31 окошко (8 × 4, одно место — дверь), крыша со снегом и труба. st(d) → 'shut' | 'open' | 'today' | 'miss'
+    function house(st, star) {
+      const r = (x, y, w, h, c, cls) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"${cls ? ` class="${cls}"` : ''}/>`;
+      let s = r(0, 49, 64, 3, '#F3EFFA') + r(44, 6, 5, 10, '#7A2E1E') + r(43, 5, 7, 2, '#FFFFFF');
+      for (let k = 0; k < 7; k++) { const x = 3 + k * 4, w = 58 - k * 8; s += r(x, 19 - k * 2, w, 2, k % 2 ? '#5A2E6E' : '#4A2560') + r(x, 19 - k * 2, 2, 1, '#FFFFFF') + r(x + w - 2, 19 - k * 2, 2, 1, '#FFFFFF'); }
+      s += r(29, 5, 6, 1, '#FFFFFF');
+      if (star) s += r(31, 0, 2, 5, '#F5D547') + r(29.5, 1.5, 5, 2, '#F5D547');
+      s += r(5, 21, 54, 28, '#7A2E1E') + r(6, 21, 52, 27, '#C0563A');
+      const C = { shut: '#2B1A51', open: '#F0A987', today: '#F5D547', miss: '#8E7BD6' };
+      let day = 1;
+      for (let row = 0; row < 4; row++) for (let col = 0; col < 8; col++) {
+        const x = 8.5 + col * 6, y = 23.5 + row * 6;
+        if (row === 3 && col === 4) { s += r(x - .5, y - 1, 5, 7, '#5A2E1A') + r(x + .5, y, 3, 6, '#8E4A2A') + r(x + 2.5, y + 3, .8, .8, '#F5D547'); continue; } // дверь
+        const k = st(day++);
+        s += r(x, y, 4, 4, '#FBF4E2') + r(x + .5, y + .5, 3, 3, C[k], k === 'today' ? 'ss-win-today' : '');
+      }
+      return `<svg viewBox="0 0 64 52" shape-rendering="crispEdges" role="img" aria-label="${t('kick')}">${s}</svg>`;
+    }
+    const snow = () => [...Array(14)].map((_, i) => `<i class="ss-snow" aria-hidden="true" style="left:${(i * 37) % 100}%;top:${-10 - (i * 13) % 30}px;animation-duration:${6 + (i % 5)}s;animation-delay:-${(i * 1.3) % 6}s"></i>`).join('');
+
+    function load() {
+      return fetch('/api/advent', { credentials: 'same-origin', headers: H() }).then(r => r.ok ? r.json() : null).then(d => { if (d) { const turn = S && (S.date !== d.date || S.month !== d.month); S = d; skew = d.now - Date.now(); draw(); if (turn && window.PPNews) window.PPNews.refresh(); } }).catch(() => {});
+    }
+    function draw() {
+      clearInterval(tick); clearTimeout(wake);
+      const guest = !S.user || !S.user.nick, opened = new Set((S.opened || []).map(o => o.day));
+      const guestLine = guest ? `<p class="ss-guest"><button type="button" data-in>${t('guest')}</button>${t('guestTail')}</p>` : '';
+      let st = () => 'shut', html = '', live = null, star = false;
+      if (S.month === 10 || S.month === 11) { // до 1 декабря: отсчёт
+        html = `<p class="ss-main">${T.soon[L]('<b data-cd></b>')}</p><p class="ss-sub">${t('soonSub')}</p><a class="ss-btn" href="${pre}/advent/">${t('peek')}</a>${guestLine}`;
+        live = el => { const ms = S.startsAt - now(); el.textContent = cd(ms); if (ms <= 0) { clearInterval(tick); setTimeout(load, 1200); } };
+      } else if (S.month === 12 && S.today) { // декабрь: окошко дня
+        const d = S.today, done = !guest && opened.has(d);
+        let miss = 0; if (!guest) for (let i = 1; i < d; i++) if (!opened.has(i)) miss++;
+        st = i => i === d ? (done ? 'open' : 'today') : opened.has(i) ? 'open' : i < d ? (guest ? 'open' : 'miss') : 'shut'; star = true;
+        html = done
+          ? `<p class="ss-main">${T.done[L](d)}</p><p class="ss-sub">${d < 31 ? T.next[L]('<b data-cd></b>') : t('last')}</p>`
+          : `<p class="ss-main">${T.today[L](d)}</p><p class="ss-sub">${t('todaySub')}</p>`;
+        if (miss) html += `<p class="ss-miss">${T.miss[L](miss)}</p>`;
+        const first = done ? [...Array(d - 1)].map((_, i) => i + 1).find(i => !opened.has(i)) : d;
+        html += `<a class="ss-btn" href="${pre}/advent/${first ? '#d=' + first : ''}">${done && !first ? t('peek') : t('open')}</a>${guestLine}`;
+        if (done && d < 31) live = el => { const ms = S.nextAt - now(); el.textContent = clock(ms); if (ms <= 0) { clearInterval(tick); setTimeout(load, 1200); } };
+      } else if (S.catchUp) { // 1–23 января: пропущенные
+        const left = 31 - opened.size;
+        if (!guest && !left) { box.hidden = true; return; }
+        const first = [...Array(31)].map((_, i) => i + 1).find(i => !opened.has(i));
+        st = i => opened.has(i) ? 'open' : 'miss'; star = true;
+        html = `<p class="ss-main">${T.jan[L](S.lastJan, guest ? 0 : left)}</p><a class="ss-btn" href="${pre}/advent/${!guest && first ? '#d=' + first : ''}">${t('open')}</a>${guestLine}`;
+      } else { // 24 января – 30 сентября: блок пустой
+        box.hidden = true; box.innerHTML = '';
+        if (S.nextAt) { const ms = S.nextAt - now(); if (ms > 0 && ms < 2e9) wake = setTimeout(load, ms + 1500); }
+        return;
+      }
+      box.innerHTML = `${snow()}<div class="ss-in"><div class="ss-house">${house(st, star)}</div><div class="ss-tx"><p class="ss-kick">🎄 ${t('kick')}</p>${html}</div></div>`;
+      box.hidden = false;
+      const lg = box.querySelector('[data-in]'); if (lg) lg.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
+      const el = box.querySelector('[data-cd]');
+      if (el && live) { live(el); tick = setInterval(() => live(el), 1000); }
+      // в полночь по Риге — новое окошко (или новая фаза)
+      if (S.nextAt) { const ms = S.nextAt - now(); if (ms > 0 && ms < 2e9) wake = setTimeout(load, ms + 1500); }
+    }
+    load();
+  });
+</script>

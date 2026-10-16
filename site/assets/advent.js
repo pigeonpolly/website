@@ -33,14 +33,19 @@
   };
   const t = k => T[k][L];
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const devDate = (location.search.match(/[?&]devdate=(\d{4}-\d\d-\d\d)/) || [])[1]; // проверка на локальном сервере (DEV_FAKE_LOGIN)
-  const H = devDate ? { 'x-dev-date': devDate } : {};
-  let S = null, skew = 0, timer = 0;
+  const H = () => (window.PPDevH ? window.PPDevH() : {}); // ?devdate= — проверка на локальном сервере (DEV_FAKE_LOGIN), см. account.js
+  let S = null, skew = 0, timer = 0, midnight = 0, wantDay = +((location.hash.match(/^#d=(\d+)$/) || [])[1] || 0); // /advent/#d=5 — сразу на 5-м окошке (из блока на главной и новостей)
   // окошки вперемешку (одинаково у всех), особые — золотые
   const ORDER = (() => { const o = [...Array(31)].map((_, i) => i + 1); let a = 20261201; const r = () => (a = (a * 1103515245 + 12345) % 2147483648) / 2147483648; for (let i = o.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [o[i], o[j]] = [o[j], o[i]]; } return o; })();
 
   function load() {
-    return fetch('/api/advent', { credentials: 'same-origin', headers: H }).then(r => r.ok ? r.json() : null).then(d => { if (d) { S = d; skew = d.now - Date.now(); } draw(); }).catch(draw);
+    return fetch('/api/advent', { credentials: 'same-origin', headers: H() }).then(r => r.ok ? r.json() : null).then(d => {
+      if (d) { S = d; skew = d.now - Date.now(); }
+      draw(); goTo();
+      // окошки открываются сами по дате (Рига): в полночь — заново спросить сервер
+      clearTimeout(midnight);
+      if (S && S.nextAt && (S.month >= 10 || S.catchUp)) { const ms = S.nextAt - (Date.now() + skew); if (ms > 0 && ms < 2e9) midnight = setTimeout(load, ms + 1500); }
+    }).catch(draw);
   }
   function countdown(box) {
     const tick = () => {
@@ -79,6 +84,14 @@
     const lg = app.querySelector('[data-login]'); if (lg) lg.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
     app.querySelectorAll('.adv-win').forEach(b => b.onclick = () => { const d = +b.dataset.d; if (!opened[d] && isPast(d)) return showPast(b, d, past[d] || []); tap(b, d, opened[d]); });
   }
+  // /advent/#d=N: прокрутить к окошку N и, если его можно открыть, открыть (один раз)
+  function goTo() {
+    if (!wantDay || !S) return;
+    const b = app.querySelector(`.adv-win[data-d="${wantDay}"]`), d = wantDay; wantDay = 0;
+    if (!b) return;
+    b.scrollIntoView({ block: 'center', behavior: 'smooth' }); b.classList.add('pulse');
+    if (S.user && S.user.nick && b.classList.contains('ready')) setTimeout(() => tap(b, d, null), 700);
+  }
   function prize(o, size) {
     const B = window.PPBirds, s = document.createElement('span'); s.className = 'adv-prize';
     if (o && o.kind && B) s.appendChild(B.itemIcon(o.kind, o.item, size, S.user ? S.user.id : 2));
@@ -91,9 +104,9 @@
     if (!S.user) { window.PPAccount && window.PPAccount.openSignIn(); return; }
     if (btn.disabled) return;
     btn.disabled = true;
-    fetch('/api/advent/open', { method: 'POST', credentials: 'same-origin', headers: Object.assign({ 'content-type': 'application/json' }, H), body: JSON.stringify({ day: d }) })
+    fetch('/api/advent/open', { method: 'POST', credentials: 'same-origin', headers: Object.assign({ 'content-type': 'application/json' }, H()), body: JSON.stringify({ day: d }) })
       .then(r => { if (!r.ok) throw 0; return r.json(); })
-      .then(x => { S.opened = (S.opened || []).filter(q => q.day !== d).concat([x]); btn.classList.add('opening'); setTimeout(() => show(btn, x, true), 650); })
+      .then(x => { S.opened = (S.opened || []).filter(q => q.day !== d).concat([x]); btn.classList.add('opening'); setTimeout(() => show(btn, x, true), 650); if (window.PPNews) window.PPNews.refresh(); })
       .catch(() => { btn.disabled = false; toast(t('err')); });
   }
   const toast = m => window.PPToast ? window.PPToast(m) : alert(m);
