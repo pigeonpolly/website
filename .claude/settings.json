@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(docs/_claude-old.md)",
+      "Read(./docs/_claude-old.md)",
+      "Read(**/docs/_claude-old.md)"
+    ]
+  }
+}
