@@ -32,6 +32,7 @@
     { id: 'comments', ic: '💬', name: 'Комментарии', group: 'birds', about: 'Комментарии к статьям блога: одобрить, ответить, удалить.', count: 'comments' },
     { id: 'subscribers', ic: '📬', name: 'Подписчики', group: 'birds', about: 'Адреса людей, которые ждут письма о новой книге.', count: 'subs' },
     { id: 'shop', ic: '🛍', name: 'Магазин', group: 'shop', about: 'Что продаётся в магазине и сколько штук; цены считаются сами.' },
+    { id: 'cards', ic: '🃏', name: 'Карточки', group: 'shop', about: 'Коллекционные карточки: каждая — в одном экземпляре. Новая карточка, правка, номер, скрыть, удалить; цена обычных; импорт коллекций с сайта.' },
     { id: 'advent', ic: '🎄', name: 'Адвент', group: 'shop', about: 'Что лежит в каком окошке адвент-календаря.', count: 'advent' },
     { id: 'games', ic: '🎮', name: 'Награды игр', group: 'shop', open: 'rules', focus: rulesBox(/Пуговичный дождь/), about: 'Сколько пуговок дают игры «Пуговичный дождь» и «Зельеварня».' },
     { id: 'visitors', ic: '👥', name: 'Посетители', group: 'stats', about: 'Сколько людей заходит на сайт, откуда и с каких устройств.' },
@@ -45,6 +46,7 @@
     { id: 'security', ic: '🔐', name: 'Защита', group: 'service', about: 'PIN админа и код восстановления на случай, если потеряете Google.' },
   ];
   const SECTIONS = { inbox, security, overview: inbox, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art, challenge: () => statsView('challenge'), flock: () => statsView('flock'),
+    cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
     carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
   const secOf = id => ADMIN_SECTIONS.find(x => x.id === id);
   const nav = document.getElementById('adm-nav');
@@ -443,6 +445,7 @@
       row('Самая низкая цена (доля от ценности)', '×' + num('priceMin', R.priceMin, D.priceMin, 0.05), '×' + D.priceMin, 'когда штук очень много'),
       row('Самая высокая цена (во сколько раз дороже)', '×' + num('priceMax', R.priceMax, D.priceMax, 0.1), '×' + D.priceMax, 'когда осталась 1 штука'),
       row(`<label class="adm-r-chk"><input type="checkbox" data-r="restockOn"${R.restockOn ? ' checked' : ''}> Каждый день пополнять закончившиеся вещи (кроме легендарных)</label>`, 'до ' + num('restockTo', R.restockTo, D.restockTo) + ` шт. <small class="be-note">0 — до обычного запаса (сейчас ${S.norm} шт.)</small><br><button type="button" class="pill-btn" id="adm-restock-now">↻ Пополнить сейчас</button>`, 'вкл, до обычного запаса', `раз в сутки (ночью по Риге): вещи с остатком 0 получают столько штук; у остальных остаток не меняется.${d.restockLast ? ` Последний раз: ${d.restockLast.day}, пополнено ${d.restockLast.items} вещей по ${d.restockLast.to} шт.` : ''}`),
+      row('🃏 Карточек одной коллекции в одни руки в первые сутки', num('cardsFirstDay', R.cardsFirstDay, D.cardsFirstDay) + ' шт.', D.cardsFirstDay ? D.cardsFirstDay + ' шт.' : 'без лимита', '0 — без лимита; сутки — с появления первой карточки коллекции'),
       row(`<label class="adm-r-chk"><input type="checkbox" data-r="sellOn"${R.sellOn ? ' checked' : ''}> Птички могут продавать вещи обратно в магазин</label>`, 'за ' + num('sellPrice', R.sellPrice, D.sellPrice) + ' 🔘', D.sellPrice + ' 🔘', 'одна цена за любую вещь; проданная вещь возвращается в магазин (+1 шт.)'),
     ];
     const advRows = [
