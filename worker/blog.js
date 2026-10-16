@@ -374,7 +374,9 @@ export async function blogApi(req, env, url, h) {
       if (b.auto && old && old.status === 'published') status = 'published'; // автосохранение никогда не снимает статью с публикации
       // дату можно поменять в редакторе (b.published_at — секунды); иначе первая публикация
       const custom = Number(b.published_at) > 0 && Number(b.published_at) < t + 366 * 86400 ? Math.floor(Number(b.published_at)) : null;
-      const published = custom || (status === 'published' ? (old?.published_at || t) : old?.published_at || null);
+      // «Опубликовать сейчас» (b.now): сейчас, или прошедшая дата, выбранная руками. Старая дата черновика (в т. ч. будущая) не мешает
+      const published = status === 'published' && b.now ? (custom && custom <= t ? custom : t)
+        : custom || (status === 'published' ? (old?.published_at || t) : old?.published_at || null);
       const cols = Object.keys(f);
       if (old) {
         await env.DB.prepare(`UPDATE blog_posts SET ${cols.map(c => c + ' = ?').join(', ')}, slug = ?, cover = ?, status = ?, featured = ?, updated_at = ?, published_at = ? WHERE id = ?`)
@@ -389,7 +391,7 @@ export async function blogApi(req, env, url, h) {
         if (b.pinned) await env.DB.batch([env.DB.prepare('UPDATE blog_posts SET pinned = 0'), env.DB.prepare('UPDATE blog_posts SET pinned = 1 WHERE id = ?').bind(id)]);
         else await env.DB.prepare('UPDATE blog_posts SET pinned = 0 WHERE id = ?').bind(id).run();
       }
-      return json({ ok: true, id, slug, status });
+      return json({ ok: true, id, slug, status, published_at: published });
     }
     if (m === 'POST' && a === 'delete') {
       const { id } = await body();
@@ -455,7 +457,9 @@ export async function blogApi(req, env, url, h) {
       }
       else if (b.action === 'date') { const ts = Math.floor(Number(b.value)); if (!(ts > 0)) fail(400, 'bad'); st = q('UPDATE blog_posts SET published_at = ? WHERE id = ?', ts); }
       else if (b.action === 'feature' || b.action === 'unfeature') st = q('UPDATE blog_posts SET featured = ? WHERE id = ?', b.action === 'feature' ? 1 : 0);
-      else if (b.action === 'publish') st = q("UPDATE blog_posts SET status = 'published', published_at = COALESCE(published_at, ?) WHERE id = ?", h.now());
+      // черновик → сейчас; дата раньше создания статьи (поставлена руками «задним числом») сохраняется
+      else if (b.action === 'publish') st = q("UPDATE blog_posts SET status = 'published', published_at = CASE WHEN published_at IS NOT NULL AND published_at <= ?1 AND published_at < COALESCE(created_at, 0) THEN published_at ELSE ?1 END WHERE id = ?2", h.now());
+      else if (b.action === 'now') st = q("UPDATE blog_posts SET published_at = ?1 WHERE id = ?2 AND status = 'published' AND published_at > ?1", h.now()); // запланированные — выпустить сейчас
       else if (b.action === 'draft') st = q("UPDATE blog_posts SET status = 'draft' WHERE id = ?");
       else if (b.action === 'delete') st = ids.flatMap(id => [
         env.DB.prepare('DELETE FROM blog_comments WHERE post_id = ?').bind(id),

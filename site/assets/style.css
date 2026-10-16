@@ -2366,6 +2366,10 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .be-favf[aria-pressed="true"] span { color: #2B1A51; }
 .be-sum { margin: 0 0 12px; font: 15px var(--sans); color: #5A4E78; }
 .be-dupes { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 16px; padding: 12px 18px; border-radius: 14px; background: #FFF3D6; border: 1.5px solid #E9A93B; font: 15px var(--sans); color: #2B1A51; }
+.be-waiting { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 0 0 16px; padding: 12px 18px; border-radius: 14px; background: #EEF0FF; border: 1.5px solid #8C84D9; font: 15px var(--sans); color: #2B1A51; }
+.be-schedmark { color: #534AB7; font: 700 13px var(--sans); }
+.be-save .be-schedmark { flex-basis: 100%; margin: 0; font-size: 14px; }
+.be-save .be-schedbtn[hidden] { display: none; }
 .be-app .be-sort { border: 0; background: none; padding: 0; font: inherit; color: inherit; cursor: pointer; white-space: nowrap; }
 .be-app .be-sort[aria-pressed="true"] { color: #5B47C2; }
 .be-views span { display: inline-block; min-width: 2.2em; padding: 1px 6px; border-radius: 6px; background: linear-gradient(90deg, #E4DCFA var(--w), transparent var(--w)); }

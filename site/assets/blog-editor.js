@@ -96,7 +96,11 @@
     try { [state, tagDict, sections] = await Promise.all([api('blog/admin/posts'), api('blog/admin/tags').then(r => r.tags).catch(() => []), api('blog/admin/sections').then(r => r.sections).catch(() => [])]); } catch (e) { app.innerHTML = `<p class="be-note">${errText(e)}</p>`; return; }
     }
     const pend = state.pending;
-    const pub = state.posts.filter(p => p.status === 'published'), drafts = state.posts.filter(p => p.status !== 'published');
+    // опубликованные делятся на вышедшие и запланированные (дата в будущем: на сайте их ещё нет)
+    const nowS = Date.now() / 1000, isSched = p => p.status === 'published' && (p.published_at || 0) > nowS;
+    const pub = state.posts.filter(p => p.status === 'published' && !isSched(p)), sched = state.posts.filter(isSched), drafts = state.posts.filter(p => p.status !== 'published');
+    const TABS = { published: pub, scheduled: sched, draft: drafts };
+    if (dashTab === 'scheduled' && !sched.length) dashTab = 'published';
     // копии одной статьи (одинаковые заголовки на всех языках) — от повторных сохранений
     const dupKey = p => ['t_ru', 't_en', 't_lv'].map(k => String(p[k] || '').toLowerCase().replace(/\s+/g, ' ').trim()).join('|');
     const dupN = (() => { const c = new Map(); for (const p of state.posts) { const k = dupKey(p); if (k.replace(/\|/g, '')) c.set(k, (c.get(k) || 0) + 1); } return [...c.values()].reduce((n, v) => n + v - 1, 0); })();
@@ -121,8 +125,9 @@
       };
       list = list.filter(match);
       // то же самое в другой вкладке (опубликованные ↔ черновики) — чтобы статья не «пропадала» при поиске
-      const otherTab = dashTab === 'draft' ? 'published' : 'draft', otherN = (lf.q || lf.fav || lf.sec) && !tagFilter ? (otherTab === 'draft' ? drafts : pub).filter(match).length : 0;
-      const otherNote = otherN ? `<p class="be-filter">Ещё <b>${otherN}</b> ${otherTab === 'draft' ? 'в черновиках' : 'среди опубликованных'} · <button type="button" class="bc-link" data-dtab="${otherTab}">показать</button></p>` : '';
+      const TAB_IN = { published: 'среди опубликованных', scheduled: 'в запланированных', draft: 'в черновиках' };
+      const otherNote = (lf.q || lf.fav || lf.sec) && !tagFilter ? Object.keys(TABS).filter(k => k !== dashTab).map(k => [k, TABS[k].filter(match).length]).filter(([, c]) => c)
+        .map(([k, c]) => `<p class="be-filter">Ещё <b>${c}</b> ${TAB_IN[k]} · <button type="button" class="bc-link" data-dtab="${k}">показать</button></p>`).join('') : '';
       const SORT = { date: p => p.published_at || p.updated_at || 0, likes: p => p.likes || 0, views: p => p.views || 0, comments: p => p.comments || 0, title: p => ptitle(p).toLowerCase() };
       list = [...list].sort((a, b) => { const x = SORT[lf.sort](a), y = SORT[lf.sort](b); return (x > y ? 1 : x < y ? -1 : 0) * lf.dir; });
       const months = [...new Set(state.posts.map(day).map(d => d.slice(0, 7)))].sort().reverse();
@@ -133,7 +138,7 @@
         <select id="be-fsec" aria-label="Раздел"><option value="">Все разделы</option>${sections.map(x => `<option value="${esc(x.slug)}"${lf.sec === x.slug ? ' selected' : ''}>${esc(sname(x))}</option>`).join('')}<option value="-"${lf.sec === '-' ? ' selected' : ''}>— без раздела —</option></select>
         <select id="be-fmonth" aria-label="Месяц"><option value="">Любой месяц</option>${months.map(m => { const a = m + '-01', b = m + '-31'; return `<option value="${m}"${lf.from === a && lf.to === b ? ' selected' : ''}>${MN[+m.slice(5) - 1]} ${m.slice(0, 4)}</option>`; }).join('')}</select>
         <span class="be-period"><label>с <input type="date" id="be-from" value="${lf.from}"></label><label>по <input type="date" id="be-to" value="${lf.to}"></label></span>
-        <button type="button" class="be-favf" id="be-fav" aria-pressed="${lf.fav}" title="Только статьи, отмеченные звёздочкой">★ Избранные <span>${state.posts.filter(p => p.featured && (dashTab === 'draft' ? p.status !== 'published' : p.status === 'published')).length}</span></button>
+        <button type="button" class="be-favf" id="be-fav" aria-pressed="${lf.fav}" title="Только статьи, отмеченные звёздочкой">★ Избранные <span>${(TABS[dashTab] || pub).filter(p => p.featured).length}</span></button>
         ${active ? '<button type="button" class="bc-link" id="be-freset">✕ сбросить</button>' : ''}</div>`;
       const sum = (k) => list.reduce((n, p) => n + (p[k] || 0), 0);
       const stats = list.length ? `<p class="be-sum">Найдено: <b>${list.length}</b> · 👁 ${sum('views')} просмотров · ♥ ${sum('likes')} · 💬 ${sum('comments')}${list.length > 1 ? ` · в среднем 👁 ${Math.round(sum('views') / list.length)} на статью` : ''}</p>` : '';
@@ -145,7 +150,7 @@
       const bar = base.length ? `<div class="be-seg" role="group" aria-label="Переводы">${LF.map(([k, n, f]) =>
         `<button type="button" data-lf="${k}" aria-pressed="${langFilter === k}">${n} <span>${base.filter(f).length}</span></button>`).join('')}</div>` : '';
       const head = filters + bar + stats + otherNote + (tagFilter ? `<p class="be-filter">Статьи с тегом <b>#${esc(tagFilter.t)}</b> · <button type="button" class="bc-link" data-unfilter>показать все</button></p>` : '');
-      if (!list.length) return head + `<p class="be-note">${active ? 'Ничего не нашлось — попробуйте изменить фильтры.' : langFilter === 'part' ? 'Все статьи переведены 🎉' : langFilter === 'full' ? 'Полностью переведённых статей пока нет.' : dashTab === 'draft' ? 'Черновиков нет.' : 'Опубликованных статей пока нет.'}</p>`;
+      if (!list.length) return head + `<p class="be-note">${active ? 'Ничего не нашлось — попробуйте изменить фильтры.' : langFilter === 'part' ? 'Все статьи переведены 🎉' : langFilter === 'full' ? 'Полностью переведённых статей пока нет.' : dashTab === 'draft' ? 'Черновиков нет.' : dashTab === 'scheduled' ? 'Запланированных статей нет.' : 'Опубликованных статей пока нет.'}</p>`;
       // галочки слева → действия с выбранными; раздел меняется прямо в строке; остальное — в меню «⋯»
       const ids = new Set(list.map(p => p.id));
       for (const id of [...picked]) if (!ids.has(id)) picked.delete(id);
@@ -157,12 +162,12 @@
           <optgroup label="Убрать из раздела">${sections.map(x => `<option value="rmsection:${esc(x.slug)}">− ${esc(sname(x))}</option>`).join('')}</optgroup>
           <optgroup label="Только в одном разделе">${sections.map(x => `<option value="section:${esc(x.slug)}">→ ${esc(sname(x))}</option>`).join('')}<option value="section:">→ без раздела</option></optgroup>` : ''}
           <optgroup label="Избранное"><option value="feature">★ Добавить в избранное</option><option value="unfeature">☆ Убрать из избранного</option></optgroup>
-          <optgroup label="Статус">${dashTab === 'draft' ? '<option value="publish">Опубликовать</option>' : '<option value="draft">Снять с публикации (в черновики)</option>'}</optgroup>
+          <optgroup label="Статус">${dashTab === 'draft' ? '<option value="publish">Опубликовать сейчас</option>' : dashTab === 'scheduled' ? '<option value="now">Опубликовать сейчас</option><option value="draft">Снять с публикации (в черновики)</option>' : '<option value="draft">Снять с публикации (в черновики)</option>'}</optgroup>
           <optgroup label="Опасно"><option value="delete">🗑 Удалить</option></optgroup></select>
           <button type="button" class="bc-link" data-unpick>снять выбор</button>` : ''}</div>`;
       return head + bulk + `<table class="be-table be-posts"><thead><tr><th class="be-ck"><input type="checkbox" id="be-pickall" aria-label="Выбрать все" ${n && n === list.length ? 'checked' : ''}></th>${th('title', 'Статья')}<th>Языки</th><th>Разделы</th>${th('date', 'Дата')}${th('likes', '♥', 'лайки')}${th('views', '👁', 'просмотры')}${th('comments', '💬', 'комментарии')}<th></th></tr></thead><tbody>
         ${list.map(p => `<tr data-id="${p.id}"${picked.has(p.id) ? ' class="picked"' : ''}><td class="be-ck"><input type="checkbox" data-pick ${picked.has(p.id) ? 'checked' : ''} aria-label="Выбрать"></td>
-          <td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(ptitle(p) || '(без названия)')}${ptitle(p) && !p['t_' + vl] ? ` <small class="be-nolang">(нет на ${vl.toUpperCase()})</small>` : ''}</b></a></td>
+          <td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(ptitle(p) || '(без названия)')}${ptitle(p) && !p['t_' + vl] ? ` <small class="be-nolang">(нет на ${vl.toUpperCase()})</small>` : ''}</b></a>${isSched(p) ? `<br><small class="be-schedmark">⏰ Запланирована на ${schedText(p.published_at)}</small>` : ''}</td>
           <td><span class="be-langs">${['ru', 'en', 'lv'].map(l => p['t_' + l] ? `<i class="on" title="Есть на ${l.toUpperCase()}">✓ ${l.toUpperCase()}</i>` : `<i title="Нет перевода на ${l.toUpperCase()}">${l.toUpperCase()}</i>`).join('')}</span></td>
           <td><details class="be-rowsecs" data-rowsecs><summary>${secsOf(p).length ? secsOf(p).map(x => `<i>${esc(sname(sections.find(r => r.slug === x) || { en: x }))}</i>`).join('') : '<span>— без раздела —</span>'}</summary>
             <div>${sections.map(x => `<label><input type="checkbox" value="${esc(x.slug)}" ${secsOf(p).includes(x.slug) ? 'checked' : ''}> ${esc(sname(x))}</label>`).join('')}</div></details></td>
@@ -208,11 +213,12 @@
         <li data-cid="${c.id}"><p><b>${esc(c.name)}</b> → <a href="/ru/blog/${esc(c.slug)}/#comments" target="_blank">${esc(c.t_ru)}</a> · ${fmt(c.created_at)}</p>
         <p class="be-ctext">${esc(c.body)}</p><p><button class="pill-btn" data-ok>Одобрить</button> <button class="pill-btn be-danger" data-del>Удалить</button></p></li>`).join('')}</ol></section>` : ''}
       ${dupN ? `<p class="be-dupes">⚠ Найдены копии статей (одинаковые заголовки): <b>${dupN}</b> ${dupN === 1 ? 'лишняя' : 'лишних'} · <button type="button" class="pill-btn" id="be-dedupe">🧹 Убрать дубли</button></p>` : ''}
+      ${sched.length && ['published', 'scheduled', 'draft'].includes(dashTab) ? `<p class="be-waiting"><span>⏰ <b>${sched.length}</b> ${plural(sched.length, 'статья ждёт', 'статьи ждут', 'статей ждут')} публикации ·</span> <button type="button" class="pill-btn pill-fill" id="be-pubnow">Опубликовать сейчас</button>${dashTab === 'scheduled' ? '' : ' <button type="button" class="bc-link" data-dtab="scheduled">посмотреть</button>'}</p>` : ''}
       <section class="be-card">
-        <div class="be-dtabs" role="tablist">${[['published', 'Опубликованные', pub.length], ['draft', 'Черновики', drafts.length], ['sections', 'Разделы', sections.length], ['tags', 'Теги', tagCount]].map(([k, n, c]) =>
+        <div class="be-dtabs" role="tablist">${[['published', 'Опубликованные', pub.length], ['scheduled', '⏰ Запланированные', sched.length], ['draft', 'Черновики', drafts.length], ['sections', 'Разделы', sections.length], ['tags', 'Теги', tagCount]].filter(([k, , c]) => k !== 'scheduled' || c).map(([k, n, c]) =>
           `<button type="button" role="tab" data-dtab="${k}" aria-selected="${dashTab === k}">${n} <span>${c}</span></button>`).join('')}
           <span class="be-vl" role="group" aria-label="Язык названий">🌐 Названия статей и разделов на: ${['ru', 'en', 'lv'].map(l => `<button type="button" data-vl="${l}" aria-pressed="${vl === l}">${l.toUpperCase()}</button>`).join('')}</span></div>
-        ${dashTab === 'tags' ? tagsHtml() : dashTab === 'sections' ? sectionsHtml() : postsHtml(dashTab === 'draft' ? drafts : pub)}
+        ${dashTab === 'tags' ? tagsHtml() : dashTab === 'sections' ? sectionsHtml() : postsHtml(TABS[dashTab] || pub)}
       </section>
       ${state.media ? '' : '<p class="be-note">⚠ Хранилище картинок (R2) не подключено — загрузка картинок не заработает.</p>'}`;
     const dd = app.querySelector('#be-dedupe');
@@ -306,6 +312,13 @@
       dashboard();
     });
     app.querySelector('#be-gkey').addEventListener('click', () => geminiPanel());
+    // «застрявшие» запланированные статьи — выпустить все сразу
+    const pn = app.querySelector('#be-pubnow');
+    pn && pn.addEventListener('click', async () => {
+      if (!confirm(`Опубликовать сейчас ${sched.length} ${plural(sched.length, 'статью', 'статьи', 'статей')}?\n\n${sched.map(p => '• ' + ptitle(p) + ' (стояла на ' + schedText(p.published_at) + ')').join('\n')}`)) return;
+      pn.disabled = true;
+      try { await api('blog/admin/bulk', { ids: sched.map(p => p.id), action: 'now' }); flash = `✓ Опубликовано: ${sched.length}. Теперь они на сайте.`; dashTab = 'published'; dashboard(); } catch (e) { pn.disabled = false; alert(errText(e)); }
+    });
     app.querySelectorAll('.be-pend [data-ok], .be-pend [data-del]').forEach(b => b.addEventListener('click', async () => {
       const li = b.closest('li');
       if (b.hasAttribute('data-del') && !confirm('Удалить комментарий?')) return;
@@ -421,7 +434,7 @@
             ${post.cover ? '<button type="button" class="bc-link" id="be-cover-rm">убрать обложку</button>' : ''}</div></div></div>
         <label class="be-f be-srclang"><span>Язык оригинала <small>(на остальных языках внизу статьи появится маленькая пометка «перевод сделан онлайн-инструментами» со ссылкой на оригинал; кнопка «Перевести» ставит его сама)</small></span>
           <select id="be-src"><option value="">— не указан (пометки не будет) —</option>${LANGS.map(([l, n]) => `<option value="${l}"${post.src_lang === l ? ' selected' : ''}>${n}</option>`).join('')}</select></label>
-        <div class="be-f be-date"><span>Дата и время публикации <small>(статьи идут по дате — от новых к старым. Пусто — сейчас. Если поставить будущее время, статья выйдет сама в этот момент)</small></span>
+        <div class="be-f be-date"><span>Дата и время публикации <small>(статьи идут по дате — от новых к старым. Пусто — в момент публикации. Если выбрать будущее время, появится кнопка «⏰ Запланировать»: статья выйдет сама в этот момент)</small></span>
           <div class="be-dt"><input type="date" id="be-date" value="${post.published_at ? localDate(post.published_at) : ''}"><input type="time" id="be-time" value="${post.published_at ? localTime(post.published_at) : ''}"></div></div>
         <div class="be-f"><span>Разделы <small>(как коллекции на Patreon: отметьте один или несколько — статья будет в каждом из них, это одна и та же статья)</small></span>
           <div class="be-secs" id="be-secs">${sections.map(r => `<label><input type="checkbox" value="${esc(r.slug)}" ${secsOf(post).includes(r.slug) ? 'checked' : ''}> ${esc(sname(r))}</label>`).join('')}</div>
@@ -434,8 +447,11 @@
         <label class="be-f"><span>Адрес статьи <small id="be-slug-note">${post.status === 'published' ? '(статья опубликована — адрес лучше не менять, иначе старые ссылки перестанут работать)' : '(заполняется сам из заголовка; можно поправить)'}</small></span><div class="be-slug"><span>pigeonpolly.com/blog/</span><input type="text" id="be-slug" value="${esc(post.slug)}" spellcheck="false"><span>/</span></div></label>
       </section></aside><div class="be-shade" id="be-shade" hidden></div>
       <div class="be-save">
+        ${schedOf(post) ? `<p class="be-schedmark">⏰ Запланирована на ${schedText(post.published_at)} — до этого её видите только вы</p>` : ''}
         <button type="button" class="pill-btn" data-save="draft">${post.status === 'published' ? 'Снять с публикации' : 'Сохранить черновик'}</button>
-        <button type="button" class="pill-btn pill-fill" data-save="published">${post.status === 'published' ? 'Сохранить изменения' : 'Опубликовать'}</button>
+        ${post.status === 'published' ? `<button type="button" class="pill-btn${schedOf(post) ? '' : ' pill-fill'}" data-save="published">${schedOf(post) ? '💾 Сохранить (выйдет по плану)' : 'Сохранить изменения'}</button>` : ''}
+        ${post.status !== 'published' || schedOf(post) ? '<button type="button" class="pill-btn pill-fill" data-save="published" data-now>Опубликовать сейчас</button>' : ''}
+        <button type="button" class="pill-btn pill-fill be-schedbtn" data-save="published" data-sched hidden></button>
         ${post.id ? `<a class="pill-btn" href="/ru/blog/${esc(post.slug)}/" target="_blank">Посмотреть ↗</a>` : ''}
         <p class="be-status" role="status" aria-live="polite"></p>
         <span class="be-meta"><span class="be-auto" id="be-auto"></span><span class="be-words" id="be-words"></span></span>
@@ -444,13 +460,14 @@
     const $ = s => app.querySelector(s);
     const status = msg => { $('.be-status').innerHTML = msg; };
     let cover = post.cover, active = 'ru', fileTarget = null;
+    let dateTouched = false; // дату/время выбрали руками в этот раз (старая дата черновика ничего не планирует)
     const bodies = [...app.querySelectorAll('.be-body')];
     document.execCommand('defaultParagraphSeparator', false, 'p');
 
     // метка этой новой статьи: если ответ на сохранение потерялся, повторное сохранение обновит ту же статью, а не создаст копию
     if (!post.id && !post.key) post.key = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
     const collect = () => {
-      const d = { id: post.id, client_key: post.key, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value, published_at: dateToTs($('#be-date').value, $('#be-time').value, post.published_at), section: [...app.querySelectorAll('#be-secs input:checked')].map(i => i.value) };
+      const d = { id: post.id, client_key: post.key, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value, published_at: dateTouched || post.status === 'published' ? dateToTs($('#be-date').value, $('#be-time').value, post.published_at) : undefined, section: [...app.querySelectorAll('#be-secs input:checked')].map(i => i.value) };
       app.querySelectorAll('[data-k]').forEach(el => {
         if (!el.isContentEditable) { d[el.dataset.k] = el.value; return; }
         const c = el.cloneNode(true);
@@ -706,12 +723,21 @@
       $('#be-words').textContent = n ? `${n.toLocaleString('ru-RU')} слов · ~${Math.max(1, Math.round(n / 200))} мин чтения` : '';
     };
     // ---- кнопка публикации: «Запланировать», если выбрано будущее время ----
-    const pubBtn = app.querySelector('[data-save="published"]'), pubLabel = pubBtn.textContent;
+    // «Опубликовать сейчас» есть всегда; «⏰ Запланировать» — только если будущее время выбрали руками
+    const pubBtn = app.querySelector('[data-save]'), schedBtn = $('[data-sched]');
     const schedLabel = () => {
-      const ts = dateToTs($('#be-date').value, $('#be-time').value, post.published_at);
-      pubBtn.textContent = ts && ts > Date.now() / 1000 + 60 ? `⏰ Запланировать на ${new Date(ts * 1000).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' })}` : pubLabel;
+      const ts = dateTouched && dateToTs($('#be-date').value, $('#be-time').value, post.published_at);
+      const fut = ts && ts > Date.now() / 1000 + 60;
+      schedBtn.hidden = !fut; if (fut) schedBtn.textContent = `⏰ Запланировать на ${schedText(ts)}`;
     };
-    $('#be-date').addEventListener('change', schedLabel); $('#be-time').addEventListener('change', schedLabel); schedLabel();
+    // выбрали день без времени — подставляем время сразу и видно: сегодня — «сейчас», другой день — 12:00 (раньше молча ставилось 12:00, и утром статья «планировалась»)
+    $('#be-date').addEventListener('change', () => {
+      dateTouched = true; const dv = $('#be-date').value, tv = $('#be-time');
+      if (!dv) tv.value = '';
+      else if (!tv.value) { const n = new Date(); tv.value = dv === localDate(n / 1000) ? localTime(n / 1000) : '12:00'; }
+      schedLabel();
+    });
+    $('#be-time').addEventListener('change', () => { dateTouched = true; schedLabel(); }); schedLabel();
     // ---- автосохранение черновика (у опубликованной статьи — только напоминание) ----
     let autoTimer = 0, saving = false, savingP = null, left = false;
     const autoMark = t => { $('#be-auto').textContent = t; };
@@ -986,6 +1012,7 @@
       clearTimeout(autoTimer);
       if (saving && savingP) { status('Сохраняю…'); await savingP; } // дождаться автосохранения: у статьи уже будет номер
       const d = collect(); d.status = b.dataset.save;
+      if (b.hasAttribute('data-now')) { d.now = true; if (!(d.published_at && d.published_at <= Date.now() / 1000)) delete d.published_at; } // сейчас (или прошедшая дата, выбранная руками)
       if (!d.t_ru.trim() && !d.t_en.trim() && !d.t_lv.trim()) { status(ERR.title); return; }
       const empty = LANGS.map(x => x[0]).filter(l => !d['t_' + l].trim());
       if (d.status === 'published' && empty.length && !confirm(`Нет версии ${empty.map(x => x.toUpperCase()).join(' и ')} — там будет показан текст на другом языке. Всё равно опубликовать?`)) return;
@@ -995,12 +1022,14 @@
         const r = await api('blog/admin/save', d);
         if (!r || !r.id) throw Object.assign(new Error('save'), { code: 'save' });
         post.id = r.id; post.status = r.status; dirty = false; left = true; clearTimeout(autoTimer);
+        const later = r.status === 'published' && (r.published_at || 0) > Date.now() / 1000;
         // после сохранения — сразу к списку статей, на нужную вкладку, с отметкой «сохранено»
         const title = d.t_ru || d.t_en || d.t_lv;
-        flash = r.status === 'published'
+        flash = later ? `⏰ «${esc(title)}» запланирована на ${schedText(r.published_at)} — выйдет сама. Она во вкладке «⏰ Запланированные».`
+          : r.status === 'published'
           ? `✓ «${esc(title)}» опубликована. <a href="/ru/blog/${esc(r.slug)}/" target="_blank">Открыть статью ↗</a>`
           : `✓ Черновик «${esc(title)}» сохранён (его видите только вы).`;
-        dashTab = r.status === 'published' ? 'published' : 'draft'; tagFilter = null;
+        dashTab = later ? 'scheduled' : r.status === 'published' ? 'published' : 'draft'; tagFilter = null;
         if (location.hash) location.hash = ''; else dashboard();
         window.scrollTo(0, 0);
       } catch (e) {
@@ -1177,6 +1206,9 @@
     return Math.floor(new Date(y, m - 1, d, hh, mm).getTime() / 1000);
   };
   const stripHtml = s => String(s || '').replace(/<[^>]*>/g, '').trim();
+  const schedOf = p => p.status === 'published' && (p.published_at || 0) > Date.now() / 1000;
+  const schedText = ts => { const d = new Date(ts * 1000); return `${pad2(d.getDate())}.${pad2(d.getMonth() + 1)} ${pad2(d.getHours())}:${pad2(d.getMinutes())}`; }; // «16.10 12:00»
+  const plural = (n, one, few, many) => n % 10 === 1 && n % 100 !== 11 ? one : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? few : many;
 
   start();
 })();
