@@ -60,6 +60,13 @@
       act: ['Look', 'Посмотреть', 'Apskatīt'],
       go: () => pre + '/potions/',
     },
+    trade: { // предложения обмена карточками (этап 7 В); гаснет, когда список открыт в профиле
+      icon: '🔁',
+      title: x => x.n > 1 ? [`${x.n} trade offers`, `Предложения обмена: ${x.n}`, `Maiņas piedāvājumi: ${x.n}`][L] : ['A trade offer', 'Предложение обмена', 'Maiņas piedāvājums'][L],
+      text: x => (x.from || []).map(n => '@' + n).join(', ') + ' · ' + ((x.from || []).length > 1 ? ['want to trade cards with you', 'хотят обменяться карточками', 'grib mainīties ar kartītēm'] : ['wants to trade cards with you', 'хочет обменяться карточками', 'grib mainīties ar kartītēm'])[L],
+      act: ['Look', 'Посмотреть', 'Apskatīt'],
+      go: () => pre + '/bird/#trades',
+    },
   };
 
   let news = [], me = null, flown = false;

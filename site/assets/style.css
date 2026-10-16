@@ -3808,6 +3808,52 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .pc-meta dt { color: #7A7090; } .pc-meta dd { margin: 0; font-weight: 700; }
 .pc-dlg .pc-buy { background: #2B1A51; color: #FFFFFF; border-color: #2B1A51; padding: 9px 18px; font-size: 16px; } .pc-dlg .pc-buy:disabled { background: #FFFFFF; color: #8A8099; border-color: #CFC6E0; }
 .pc-rule { margin: 0; color: #6D6380; font: 14px/1.45 var(--sans); }
+/* обмен карточками (этап 7 В): кнопка, окно «что хочу / что отдаю», список в профиле */
+.pc-trade { padding: 5px 12px; font-size: 14px; }
+.shop .pc-trade, .pc-dlg .pc-trade, .pc-prof .pc-trade { background: #FFFFFF; color: #2B1A51; border-color: #CFC6E0; } .pc-dlg .pc-info .pc-trade { padding: 9px 18px; font-size: 16px; margin: 0 0 12px; }
+.pc-tr { padding: 0; width: min(880px, calc(100% - 24px)); }
+.pc-tr-in { padding: 24px 26px 8px; }
+.pc-tr-h { margin: 0 40px 6px 0; font: 600 26px/1.15 var(--serif); }
+.pc-tr-sec h4 { margin: 18px 0 10px; font: 700 15px var(--sans); color: #6B52C8; }
+.pc-tr-grid { grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 12px 10px; }
+.pc-tr-grid .pc-t { display: flex; align-items: flex-start; gap: 4px; font-size: 13px; }
+.pc-pk .pc-open { position: relative; }
+.pc-pk.sel .pc-card { box-shadow: 0 0 0 2px #1a1528, 0 0 0 5px #E9A93B, 0 6px 14px rgba(43,26,81,.28); }
+.pc-pk.sel .pc-open::after { content: '✓'; position: absolute; top: -6px; right: -6px; width: 24px; height: 24px; border-radius: 50%; background: #E9A93B; color: #FFFFFF; font: 700 14px/24px var(--sans); text-align: center; box-shadow: 0 0 0 2px #FFFDF8; z-index: 1; }
+.pc-pk:not(.sel) .pc-card { opacity: .82; }
+.pc-i { flex: none; margin-left: auto; padding: 0 2px; border: 0; background: none; color: #8A8099; font: 15px/1 var(--sans); cursor: pointer; }
+.pc-tr-foot { position: sticky; bottom: 0; display: flex; flex-wrap: wrap; align-items: center; gap: 10px 16px; padding: 14px 26px; background: #FFFDF8; border-top: 1px solid #E6DFF0; }
+.pc-tr-hint { flex: 1 1 260px; margin: 0; padding: 8px 12px; border-radius: 12px; background: #FFF1DC; color: #8A4B0F; font: 700 15px/1.35 var(--sans); }
+.pc-tr-hint.ok { background: #E3F5EA; color: #1F6B45; }
+.pc-tr-send:disabled { cursor: not-allowed; }
+.bp-panel:has(.pc-prof) { background: #FFFDF8; color: #2B1A51; border-radius: 18px; padding: 16px 18px 20px; }
+.pc-ph { margin: 6px 0 12px; font: 600 22px/1.2 var(--serif); }
+.pc-trades { margin-bottom: 26px; display: grid; gap: 12px; }
+.pc-trades .pc-ph { margin-bottom: 0; }
+.pc-trow { padding: 12px 14px; border: 1px solid #E6DFF0; border-radius: 16px; background: #FFFFFF; }
+.pc-trow.fresh { border-color: #E9A93B; box-shadow: 0 0 0 2px #FCE3B5; }
+.pc-trow.done { opacity: .75; }
+.pc-trow-h { display: flex; flex-wrap: wrap; align-items: baseline; gap: 4px 8px; margin: 0 0 10px; font: 700 15px var(--sans); }
+.pc-trow-h small { margin-left: auto; color: #7A7090; font-weight: 400; }
+.pc-new { padding: 1px 8px; border-radius: 999px; background: #E9A93B; color: #FFFFFF; font-size: 12px; }
+.pc-trow-x { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 14px; }
+.pc-trow-s { display: grid; gap: 6px; }
+.pc-trow-l { color: #7A7090; font: 13px var(--sans); }
+.pc-trow-arr { font-size: 22px; color: #6B52C8; }
+.pc-minis { display: flex; flex-wrap: wrap; gap: 6px; }
+.pc-mini { width: 54px; padding: 0; border: 0; background: none; cursor: pointer; }
+.pc-mini .pc-card { padding: 5%; box-shadow: 0 0 0 1.5px #1a1528; } .pc-mini .pc-n, .pc-mini .pc-mark { display: none; }
+.pc-trow-act { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.pc-trow-act .pc-acc { background: #2B1A51; color: #FFFFFF; border-color: #2B1A51; }
+.pc-trow-act .pill-btn:not(.pc-acc) { background: #FFFFFF; color: #2B1A51; border-color: #CFC6E0; }
+.pc-past summary { cursor: pointer; color: #6D6380; font: 700 14px var(--sans); margin: 4px 0 10px; }
+.pc-past .pc-trow { margin-bottom: 10px; }
+.pc-prof .pc-t { color: #2B1A51; }
+@media (max-width: 600px) {
+  .pc-tr-in { padding: 18px 16px 6px; } .pc-tr-foot { padding: 12px 16px; } .pc-tr-h { font-size: 22px; }
+  .pc-tr-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
+  .pc-trow-arr { transform: rotate(90deg); }
+}
 @media (max-width: 600px) {
   .pc-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px 12px; }
   .pc-dlg { padding: 20px 16px; }

@@ -11,7 +11,7 @@
     sellAsk: [(nm, n) => `Sell “${nm}” back to the shop for ${n} 🔘? It will go back on sale.`, (nm, n) => `Продать «${nm}» обратно в магазин за ${n} 🔘? Вещь снова появится в продаже.`, (nm, n) => `Pārdot “${nm}” atpakaļ veikalam par ${n} 🔘? Lieta atkal būs pārdošanā.`],
     sold: [n => `Sold! +${n} 🔘`, n => `Продано! +${n} 🔘`, n => `Pārdots! +${n} 🔘`],
     toRoom: ['🏠 Put it in my room', '🏠 Поставить в комнату', '🏠 Ielikt istabā'],
-    tabBag: ['🎒 Bag', '🎒 Сумка', '🎒 Soma'], tabBadges: ['🏅 Achievements', '🏅 Достижения', '🏅 Sasniegumi'], tabWorks: ['🎨 Sketches', '🎨 Рисунки', '🎨 Skices'], tabBtns: ['🔘 Buttons', '🔘 Пуговки', '🔘 Pogas'], tabShop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'],
+    tabBag: ['🎒 Bag', '🎒 Сумка', '🎒 Soma'], tabBadges: ['🏅 Achievements', '🏅 Достижения', '🏅 Sasniegumi'], tabWorks: ['🎨 Sketches', '🎨 Рисунки', '🎨 Skices'], tabBtns: ['🔘 Buttons', '🔘 Пуговки', '🔘 Pogas'], tabCards: ['🃏 Cards', '🃏 Карточки', '🃏 Kartītes'], tabShop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'],
     pSign: ['Sign in and get your own pixel bird: a profile, a room, a bag for gifts and a place on the sketch wall.', 'Войдите и получите свою пиксельную птичку: профиль, комнату, сумку для подарков и место на стене рисунков.', 'Ienāc un saņem savu pikseļu putniņu: profilu, istabu, somu dāvanām un vietu skiču sienā.'],
     pSignBtn: ['Sign in', 'Войти', 'Ienākt'], pNone: ['There is no bird with this nickname.', 'Птички с таким ником нет.', 'Putniņa ar tādu segvārdu nav.'],
     pAll: ['All birds →', 'Все птицы →', 'Visi putniņi →'], pChallenge: ['🎨 Daily Challenge', '🎨 Челлендж', '🎨 Izaicinājums'],
@@ -663,7 +663,7 @@
           <div class="bp-acts">${newGifts.length ? `<button type="button" class="pill-btn pill-fill sw-gift-btn" id="bp-gift">🎁 ${t('giftNew', newGifts.length)}</button>` : ''}
             <button type="button" class="pill-btn" id="bp-share">📤 ${t(mine ? 'shareBird' : 'shareThis')}</button>${mine ? `<a class="pill-btn" href="${pre}/challenge/">${t('pChallenge')}</a>` : ''}</div></div></div>
       <div class="bp-room" id="bp-room" hidden></div>
-      <div class="bp-tabs" role="tablist">${[['bag', t('tabBag')], ['badges', t('tabBadges')], ['works', t('tabWorks') + ` (${pr.posts.length})`], ...(mine && me.btn ? [['btns', t('tabBtns')]] : [])]
+      <div class="bp-tabs" role="tablist">${[['bag', t('tabBag')], ['badges', t('tabBadges')], ['works', t('tabWorks') + ` (${pr.posts.length})`], ...(window.PPCards ? [['cards', t('tabCards')]] : []), ...(mine && me.btn ? [['btns', t('tabBtns')]] : [])]
         .map(([k, n], i) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}">${n}</button>`).join('')}<a class="bp-tab-shop" href="${L === 1 ? '/ru' : L === 2 ? '/lv' : ''}/shop/">${t('tabShop')}</a></div>
       <div class="bp-panel" role="tabpanel"></div>
       ${mine ? `<p class="sw-acc bp-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a> · <button type="button" class="sw-link danger" id="sw-delacc">${t('delAcc')}</button></p>` : ''}`;
@@ -694,13 +694,17 @@
         });
       } else if (k === 'works') {
         panel.innerHTML = `<div class="sw-pv-works bp-works">${pr.posts.map(p => `<a href="/api/img/${p.id}" data-lightbox>${p.ai ? `<i class="sw-aitag" title="${esc(t('aiTag'))}">🤖</i>` : ''}<img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"><span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></a>`).join('') || `<p class="sw-empty">${t('noWorks')}</p>`}</div>`;
+      } else if (k === 'cards') { // карточки птички и, в своём профиле, предложения обмена (cards-ui.js, этап 7 В)
+        window.PPCards.profile(panel, { nick: pr.nick, mine, scroll: trades }); trades = false;
       } else if (k === 'btns') {
         panel.innerHTML = buttonsHtml(me.btn);
         const inv = panel.querySelector('#sw-invite'); if (inv) inv.onclick = share;
       }
     };
     page.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => show(b.dataset.tab));
-    show('bag');
+    let trades = mine && location.hash === '#trades' && !!window.PPCards; // /bird/#trades — «Посмотреть» в новости trade (news.js)
+    if (trades) history.replaceState(null, '', location.pathname + location.search);
+    show(trades ? 'cards' : 'bag');
     if (mine) {
       document.getElementById('sw-out').onclick = async () => { await post('logout'); location.reload(); };
       document.getElementById('sw-delacc').onclick = async () => { if (!confirm(t('delAccAsk'))) return; try { await post('delete-account'); location.href = pre + '/'; } catch (e) { alert(t('err')); } };

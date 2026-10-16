@@ -13,7 +13,23 @@ export const CARD_TABLES = [
   // ref — метка покупки: по ней в той же транзакции списываются пуговки и пишется журнал
   `CREATE TABLE IF NOT EXISTS card_owner (card_id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, price INTEGER DEFAULT 0, bought_at INTEGER, ref TEXT)`,
   `CREATE INDEX IF NOT EXISTS card_owner_user ON card_owner(user_id)`,
+  // обмен (этап 7 В): give — карточки from (id, JSON), take — карточки to; status open → accepted / declined / cancelled / stale (карточки уже не у тех) / expired (RULES.tradeDays);
+  // seen — получатель видел предложение (новость trade в конвертике); ref — метка принятия: по ней в той же транзакции переходят карточки
+  `CREATE TABLE IF NOT EXISTS card_trades (id INTEGER PRIMARY KEY AUTOINCREMENT, from_id INTEGER NOT NULL, to_id INTEGER NOT NULL, give TEXT NOT NULL, take TEXT NOT NULL,
+    status TEXT NOT NULL DEFAULT 'open', created_at INTEGER, done_at INTEGER, seen INTEGER DEFAULT 0, ref TEXT)`,
+  `CREATE INDEX IF NOT EXISTS card_trades_to ON card_trades(to_id, status)`,
+  `CREATE INDEX IF NOT EXISTS card_trades_from ON card_trades(from_id, status)`,
 ];
+// обмен — ровно 5 схем, одна схема на обмен: 1↔1 одной редкости, 5 обычных ↔ 1 редкая, 10 обычных ↔ 1 уникальная (то же — tradeCheck в site/assets/cards-ui.js)
+export const TRADE_N = { rare: 5, unique: 10 };
+export function tradeScheme(give, take) { // массивы редкостей → 'common' | 'rare' | 'unique' | 'rare5' | 'unique10' | null
+  const one = (a, b) => a.length === 1 && b.length === 1 && a[0] === b[0];
+  if (one(give, take)) return give[0];
+  for (const [big, many] of [[give, take], [take, give]]) {
+    if (big.length === 1 && TRADE_N[big[0]] && many.length === TRADE_N[big[0]] && many.every(r => r === 'common')) return big[0] + TRADE_N[big[0]];
+  }
+  return null;
+}
 const DAY = 86400;
 const now = () => Math.floor(Date.now() / 1000);
 const randomHex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, '0')).join('');
@@ -75,7 +91,7 @@ export async function cardsApi(req, env, url, h) {
     return json({
       cards: rows.map(c => pub(c, lang, byS[c.collection], common, me && me.id)),
       sets: ss.filter(s => used.has(s.slug)).map(s => ({ slug: s.slug, name: setName(s, lang) })),
-      common, firstDay: h.rules().cardsFirstDay || 0,
+      common, firstDay: h.rules().cardsFirstDay || 0, tradeDays: tradeDays(h),
       me: me && me.nick && !me.banned ? { id: me.id, nick: me.nick, buttons: me.buttons || 0 } : null,
     }, 200, { 'cache-control': 'no-store' });
   }
@@ -117,6 +133,86 @@ export async function cardsApi(req, env, url, h) {
     }
     await h.flockEvent('card', u, { card: c.id, n: c.n, collection: c.collection, rarity: c.rarity, price });
     return json({ ok: true, buttons: (u.buttons || 0) - price, card: c.id, owner: u.nick });
+  }
+
+  // ---------- обмен (этап 7 В) ----------
+  // предложить: give — мои карточки, take — карточки одной другой птички; схема проверяется здесь же (tradeScheme)
+  if (m === 'POST' && p === '/api/cards/trade') {
+    const u = await h.needUser(req, env);
+    if (!u.nick) fail(400, 'nick');
+    if (u.banned) fail(403, 'banned');
+    const b = await body();
+    const ids = a => [...new Set((Array.isArray(a) ? a : []).map(Number).filter(n => n > 0 && Number.isInteger(n)))].sort((x, y) => x - y).slice(0, 11);
+    const give = ids(b.give), take = ids(b.take);
+    if (!take.length) fail(400, 'take');
+    if (!give.length) fail(400, 'give');
+    const rows = (await env.DB.prepare('SELECT c.id, c.rarity, o.user_id FROM cards c JOIN card_owner o ON o.card_id = c.id WHERE c.id IN (SELECT value FROM json_each(?))').bind(JSON.stringify([...give, ...take])).all()).results;
+    const byId = Object.fromEntries(rows.map(r => [r.id, r]));
+    if (give.some(id => !byId[id] || byId[id].user_id !== u.id)) return json({ error: 'notmine' }, 409);
+    const to = take.length && byId[take[0]] ? byId[take[0]].user_id : 0;
+    if (!to || to === u.id || take.some(id => !byId[id] || byId[id].user_id !== to)) return json({ error: 'owner' }, 409); // уже не у этой птички
+    if (!tradeScheme(give.map(id => byId[id].rarity), take.map(id => byId[id].rarity))) return json({ error: 'scheme' }, 409);
+    const days = tradeDays(h), t = now(), G = JSON.stringify(give), K = JSON.stringify(take);
+    const dup = await env.DB.prepare("SELECT id FROM card_trades WHERE from_id = ? AND to_id = ? AND give = ? AND take = ? AND status = 'open' AND created_at > ?").bind(u.id, to, G, K, t - days * DAY).first();
+    if (dup) return json({ ok: true, id: dup.id, dup: true });
+    const many = await env.DB.prepare("SELECT COUNT(*) AS n FROM card_trades WHERE from_id = ? AND status = 'open' AND created_at > ?").bind(u.id, t - days * DAY).first();
+    if (many && many.n >= 30) return json({ error: 'many' }, 429);
+    const r = await env.DB.prepare('INSERT INTO card_trades (from_id, to_id, give, take, status, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(u.id, to, G, K, 'open', t).run();
+    return json({ ok: true, id: r.meta.last_row_id });
+  }
+  // мои обмены: входящие и исходящие открытые + завершённые за 30 дней; открытие списка = входящие просмотрены (новость trade гаснет)
+  if (m === 'GET' && p === '/api/cards/trades') {
+    const u = await h.needUser(req, env);
+    const lang = LANGS.includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
+    await tradeSweep(env, h, u.id);
+    const days = tradeDays(h), t = now();
+    const list = (await env.DB.prepare(`SELECT tr.*, a.nick AS from_nick, b.nick AS to_nick FROM card_trades tr LEFT JOIN users a ON a.id = tr.from_id LEFT JOIN users b ON b.id = tr.to_id
+      WHERE (tr.from_id = ? OR tr.to_id = ?) AND (tr.status = 'open' OR tr.done_at > ?) ORDER BY tr.created_at DESC LIMIT 60`).bind(u.id, u.id, t - 30 * DAY).all()).results;
+    const all = [...new Set(list.flatMap(x => [...parseJ(x.give, []), ...parseJ(x.take, [])]))];
+    const cs = all.length ? (await env.DB.prepare(`${SEL} WHERE c.id IN (SELECT value FROM json_each(?))`).bind(JSON.stringify(all)).all()).results : [];
+    const byS = Object.fromEntries((await sets(env)).map(s => [s.slug, s]));
+    const C = Object.fromEntries(cs.map(c => [c.id, pub(c, lang, byS[c.collection], 0, u.id)]));
+    const out = list.map(x => {
+      const dir = x.from_id === u.id ? 'out' : 'in';
+      return { id: x.id, dir, status: x.status, created: x.created_at, expires: x.created_at + days * DAY, done: x.done_at || 0, fresh: dir === 'in' && !x.seen,
+        who: { nick: (dir === 'out' ? x.to_nick : x.from_nick) || null }, give: parseJ(x.give, []).map(id => C[id]).filter(Boolean), take: parseJ(x.take, []).map(id => C[id]).filter(Boolean) };
+    });
+    await env.DB.prepare("UPDATE card_trades SET seen = 1 WHERE to_id = ? AND status = 'open' AND seen = 0").bind(u.id).run();
+    return json({ trades: out, days }, 200, { 'cache-control': 'no-store' });
+  }
+  // принять — одна транзакция: предложение открыто и не истекло, все карточки всё ещё у тех же владельцев; иначе «обмен устарел»
+  if (m === 'POST' && p === '/api/cards/trade/accept') {
+    const u = await h.needUser(req, env);
+    if (u.banned) fail(403, 'banned');
+    const b = await body();
+    const tr = await env.DB.prepare("SELECT * FROM card_trades WHERE id = ? AND to_id = ?").bind(Number(b.id) || 0, u.id).first();
+    if (!tr) fail(404, 'trade');
+    if (tr.status !== 'open') return json({ error: tr.status }, 409);
+    const days = tradeDays(h), t = now(), ref = randomHex(8), nG = parseJ(tr.give, []).length, nK = parseJ(tr.take, []).length;
+    const own = 'SELECT COUNT(*) FROM card_owner WHERE user_id = ? AND card_id IN (SELECT value FROM json_each(?))', did = 'EXISTS (SELECT 1 FROM card_trades WHERE id = ? AND ref = ?)';
+    const res = await env.DB.batch([
+      env.DB.prepare(`UPDATE card_trades SET status = 'accepted', done_at = ?, seen = 1, ref = ? WHERE id = ? AND to_id = ? AND status = 'open' AND created_at > ? AND (${own}) = ? AND (${own}) = ?`)
+        .bind(t, ref, tr.id, u.id, t - days * DAY, tr.from_id, tr.give, nG, tr.to_id, tr.take, nK),
+      env.DB.prepare(`UPDATE card_owner SET user_id = ?, ref = ? WHERE card_id IN (SELECT value FROM json_each(?)) AND ${did}`).bind(tr.to_id, 'trade:' + tr.id, tr.give, tr.id, ref),
+      env.DB.prepare(`UPDATE card_owner SET user_id = ?, ref = ? WHERE card_id IN (SELECT value FROM json_each(?)) AND ${did}`).bind(tr.from_id, 'trade:' + tr.id, tr.take, tr.id, ref),
+    ]);
+    if (!res[0].meta.changes) {
+      const cur = await env.DB.prepare('SELECT status, created_at FROM card_trades WHERE id = ?').bind(tr.id).first();
+      if (!cur || cur.status !== 'open') return json({ error: cur ? cur.status : 'gone' }, 409);
+      const why = cur.created_at <= t - days * DAY ? 'expired' : 'stale';
+      await env.DB.prepare("UPDATE card_trades SET status = ?, done_at = ? WHERE id = ? AND status = 'open'").bind(why, t, tr.id).run();
+      return json({ error: why }, 409);
+    }
+    await tradeSweep(env, h, tr.from_id); await tradeSweep(env, h, tr.to_id); // другие предложения с этими карточками устарели
+    return json({ ok: true });
+  }
+  // отклонить (получатель) / отменить (кто предложил)
+  if (m === 'POST' && (p === '/api/cards/trade/decline' || p === '/api/cards/trade/cancel')) {
+    const u = await h.needUser(req, env);
+    const b = await body(), dec = p.endsWith('decline');
+    const r = await env.DB.prepare(`UPDATE card_trades SET status = ?, done_at = ?, seen = 1 WHERE id = ? AND ${dec ? 'to_id' : 'from_id'} = ? AND status = 'open'`).bind(dec ? 'declined' : 'cancelled', now(), Number(b.id) || 0, u.id).run();
+    if (!r.meta.changes) return json({ error: 'gone' }, 409);
+    return json({ ok: true });
   }
 
   // ---------- кабинет (только админ) ----------
@@ -315,6 +411,26 @@ async function translateMissing(env) {
     for (const l of Object.keys(tr)) await env.DB.prepare(`UPDATE card_sets SET ${l} = ? WHERE slug = ?`).bind(String(tr[l][0] || '').slice(0, 60), s.slug).run();
   }
   return { translatedCards: n };
+}
+
+// ---------- обмен: сроки, «устарел», новость ----------
+const tradeDays = h => Math.max(1, h.rules().tradeDays || 7);
+// открытые предложения птички: истёкшие → expired; карточки уже не у тех владельцев → stale
+export async function tradeSweep(env, h, uid) {
+  const t = now();
+  await env.DB.prepare("UPDATE card_trades SET status = 'expired', done_at = ? WHERE status = 'open' AND created_at <= ? AND (from_id = ? OR to_id = ?)").bind(t, t - tradeDays(h) * DAY, uid, uid).run();
+  const open = (await env.DB.prepare("SELECT id, from_id, to_id, give, take FROM card_trades WHERE status = 'open' AND (from_id = ? OR to_id = ?)").bind(uid, uid).all()).results;
+  if (!open.length) return;
+  const all = [...new Set(open.flatMap(x => [...parseJ(x.give, []), ...parseJ(x.take, [])]))];
+  const own = Object.fromEntries((await env.DB.prepare('SELECT card_id, user_id FROM card_owner WHERE card_id IN (SELECT value FROM json_each(?))').bind(JSON.stringify(all)).all()).results.map(r => [r.card_id, r.user_id]));
+  const bad = open.filter(x => !parseJ(x.give, []).every(id => own[id] === x.from_id) || !parseJ(x.take, []).every(id => own[id] === x.to_id)).map(x => x.id);
+  if (bad.length) await env.DB.prepare("UPDATE card_trades SET status = 'stale', done_at = ? WHERE status = 'open' AND id IN (SELECT value FROM json_each(?))").bind(t, JSON.stringify(bad)).run();
+}
+// новость trade (NEWS_KINDS в worker/index.js): новые входящие предложения, которые птичка ещё не видела
+export async function tradeNews(env, uid, days) {
+  const r = (await env.DB.prepare("SELECT u.nick FROM card_trades tr LEFT JOIN users u ON u.id = tr.from_id WHERE tr.to_id = ? AND tr.status = 'open' AND tr.seen = 0 AND tr.created_at > ?")
+    .bind(uid, now() - Math.max(1, days || 7) * DAY).all()).results;
+  return r.length ? { n: r.length, from: [...new Set(r.map(x => x.nick).filter(Boolean))].slice(0, 3) } : null;
 }
 
 // «Мои данные» и удаление аккаунта
