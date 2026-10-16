@@ -2195,6 +2195,27 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .be-app .adm-nav a { display: flex; align-items: center; justify-content: space-between; gap: 8px; padding: 10px 14px; border-radius: 12px; color: #2B1A51; font: 600 15px var(--sans); text-decoration: none; }
 .be-app .adm-nav a:hover { background: #F3EEFB; color: #2B1A51; }
 .be-app .adm-nav a[aria-current="page"] { background: #2B1A51; color: #fff; }
+.adm-nav { gap: 10px; }
+.adm-nav-grp { display: grid; gap: 2px; }
+.adm-nav-g { margin: 0; padding: 6px 14px 2px; font: 700 12px var(--sans); letter-spacing: .02em; color: #8A83A0; }
+.be-app .adm-nav a { padding: 8px 14px; }
+.be-app .adm-nav a.adm-ext > span:first-child::after { content: ' ↗'; color: #B4ADC8; font-weight: 400; }
+.adm-about { margin: 0 0 16px; }
+.adm-about h2 { margin: 0 0 4px; font: 700 24px var(--serif); color: #2B1A51; }
+.adm-about p { margin: 0; color: #6B6290; font: 15px var(--sans); }
+.adm-inbox { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 10px; }
+.adm-inbox li { display: grid; grid-template-columns: 32px 52px minmax(0, 1fr) auto; align-items: center; gap: 12px; padding: 14px 16px; border-radius: 16px; background: #fff; border: 1.5px solid #E2DCEE; }
+.adm-in-ic { font-size: 24px; }
+.adm-in-n { font: 700 26px/1 var(--serif); color: #C2553A; text-align: center; }
+.adm-in-t { display: grid; gap: 3px; } .adm-in-t b { font: 700 16px var(--sans); color: #2B1A51; } .adm-in-t small { font: 13px/1.4 var(--sans); color: #6B6290; }
+.adm-calm { margin: 0 0 18px; padding: 28px 20px; border-radius: 18px; background: #EAF7EF; border: 2px solid #8fd1a4; color: #1E5E3A; font: 700 26px var(--serif); text-align: center; }
+.adm-calm small { display: block; margin-top: 6px; font: 400 14px var(--sans); color: #3F7A55; }
+.adm-danger { margin: 28px 0 16px; padding: 14px 18px; border-radius: 16px; border: 2px solid #E0443A; background: #FFF5F3; }
+.adm-danger h3 { margin: 0 0 10px; font: 700 15px var(--sans); color: #B5452A; }
+.adm-danger .be-note { margin: 8px 0 0; }
+.adm-danger .adm-empty { margin-left: 0; }
+.adm-focus { animation: admFocus 2.2s ease; } @keyframes admFocus { 0%, 50% { box-shadow: 0 0 0 4px #E9A93B; } 100% { box-shadow: 0 0 0 0 transparent; } }
+@media (max-width: 640px) { .adm-inbox li { grid-template-columns: 28px 40px minmax(0, 1fr); } .adm-inbox li .pill-btn { grid-column: 1 / -1; justify-self: start; } }
 .adm-count { min-width: 22px; padding: 1px 7px; border-radius: 99px; background: #E0443A; color: #fff; font-size: 12px; text-align: center; }
 .adm-quick { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 18px; }
 .adm-cards { display: grid; grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); gap: 12px; margin-bottom: 18px; }
@@ -2527,6 +2548,9 @@ html:not(.is-admin) .statbar { display: none; }
 .statbar a { color: inherit; text-decoration: none; display: inline-flex; gap: 5px; align-items: center; }
 .statbar a:hover { color: #fff; }
 .statbar b { color: #F5C4B3; font-weight: 700; font-variant-numeric: tabular-nums; }
+.sb-adm { display: inline-flex; gap: 14px; align-items: center; padding-right: 18px; border-right: 1px solid rgba(255,255,255,.2); }
+.statbar .sb-adm a, .sb-adm button { color: #F0A987; font: 700 12.5px/var(--sb-h) var(--sans); background: none; border: 0; padding: 0; cursor: pointer; white-space: nowrap; }
+.statbar .sb-adm a:hover, .sb-adm button:hover { color: #fff; }
 .site-header { top: var(--sb); transition: top .25s; }
 @media (max-width: 1300px) { .site-nav { inset: calc(var(--header-h) + var(--sb)) 0 0 0; } }
 @media (max-width: 480px) { .acct-pop { top: calc(var(--header-h) + var(--sb) + 8px); } }
@@ -2819,8 +2843,10 @@ html:not(.is-admin) .statbar { display: none; }
 @media (max-width: 800px) {
   .adm.be-app { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .adm-main { min-width: 0; }
-  .adm-nav { display: flex; gap: 6px; overflow-x: auto; padding-bottom: 4px; scrollbar-width: none; }
-  .adm-nav::-webkit-scrollbar { display: none; }
+  .adm-nav { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
+  .adm-nav-grp { display: flex; align-items: center; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; } /* на телефоне: группа — строка с прокруткой вбок */
+  .adm-nav-grp::-webkit-scrollbar { display: none; }
+  .adm-nav-g { flex: none; padding: 0 4px 0 0; }
   .adm-nav a { flex: none; white-space: nowrap; }
   .adm-box { overflow-x: auto; }
   .adm-shop thead { display: none; }

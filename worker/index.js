@@ -2126,6 +2126,36 @@ async function route(req, env, url) {
     if (!(await isAdmin(u, env))) fail(403, 'admin');
     return json({ ok: true, ...(await autoRestock(env, true)) });
   }
+  // «📥 Входящие» в кабинете: только то, что ждёт Алину, со счётчиками (docs/admin.md)
+  if (p === '/api/admin/inbox' || p === '/api/admin/inbox/seen') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    if (m === 'POST') { // «посмотрела» — счётчик новых подписчиков обнуляется
+      const b = await req.json().catch(() => ({}));
+      if (b.k === 'subs') await setMeta(env, 'inbox_subs_seen', String(now()));
+      return json({ ok: true });
+    }
+    const cnt = async (sql, ...v) => { try { return Number((await env.DB.prepare(sql).bind(...v).first())?.n) || 0; } catch (e) { return 0; } };
+    const t = now(), subsSeen = Number(await getMeta(env, 'inbox_subs_seen')) || 0;
+    const sched = await env.DB.prepare("SELECT id, t_ru, t_en, t_lv, published_at FROM blog_posts WHERE status = 'published' AND published_at > ? ORDER BY published_at").bind(t).all().then(r => r.results).catch(() => []);
+    // адвент: пустые окошки, которые ещё откроются (с октября по декабрь)
+    const [ry, rm, rd] = rigaDay().split('-').map(Number);
+    let advent = null;
+    if (rm >= 10) {
+      const filled = new Set((await env.DB.prepare('SELECT DISTINCT day FROM advent_plan').all().catch(() => ({ results: [] }))).results.map(r => r.day));
+      const days = []; for (let d = rm === 12 ? rd : 1; d <= 31; d++) if (!filled.has(d)) days.push(d);
+      advent = days;
+    }
+    const auto = (await autopilot(env, req).catch(() => [])).filter(x => x.ok === false).map(x => ({ t: x.t, d: x.d }));
+    return json({
+      comments: await cnt("SELECT COUNT(*) AS n FROM blog_comments WHERE status = 'pending'"),
+      requests: await cnt("SELECT COUNT(*) AS n FROM draw_requests WHERE status = 'open'"),
+      subs: await cnt('SELECT COUNT(*) AS n FROM subscribers WHERE created_at > ?', subsSeen), subsSeen,
+      auto, advent, adventYear: ry,
+      edits: await cnt("SELECT COUNT(*) AS n FROM site_blocks WHERE lang != '*' AND html IS NOT NULL AND id NOT LIKE 'custom-%'"), // свой текст поверх блока из кода
+      scheduled: sched,
+    }, 200, { 'cache-control': 'no-store' });
+  }
   if (m === 'GET' && p === '/api/admin/autopilot') {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');

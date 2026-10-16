@@ -56,6 +56,7 @@
       if (!d) return;
       info = d; render();
       document.documentElement.classList.toggle('is-admin', !!(d.user && d.user.admin)); // полоска цифр над шапкой — только Алине
+      if (d.user && d.user.admin) adminStrip();
       if (d.user && !d.user.nick) askNick(d.user);
       if (d.user && d.user.earned) toast(t('daily')(d.user.earned));
       if (d.user && d.user.nick && d.user.salary && d.user.salary.length) salary(d.user);
@@ -167,11 +168,7 @@
         </div>`;
       // админ: режим правки блоков страницы (site-edit.js грузится только для админа)
       const ed = el.querySelector('[data-edit]');
-      if (ed) ed.addEventListener('click', () => {
-        el.querySelector('.acct-pop').hidden = true;
-        const go = () => window.PPEdit && window.PPEdit.toggle();
-        if (window.PPEdit) go(); else { const sc = document.createElement('script'); sc.src = '/assets/site-edit.js'; sc.onload = go; document.head.appendChild(sc); }
-      });
+      if (ed) ed.addEventListener('click', () => { el.querySelector('.acct-pop').hidden = true; editPage(); });
       if (u.admin && document.querySelector('[data-ppb-hidden]')) document.documentElement.classList.add('pp-admin');
       if (window.PPBirds) el.querySelector('canvas').getContext('2d').drawImage(window.PPBirds.spriteHD(window.PPBirds.dress(window.PPBirds.looks(u.id), u.avatar), 0), -8, -2); // детальная птичка
     }
@@ -192,6 +189,25 @@
       await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' });
       location.reload();
     });
+  }
+
+  function editPage() {
+    const go = () => window.PPEdit && window.PPEdit.toggle();
+    if (window.PPEdit) go(); else { const sc = document.createElement('script'); sc.src = '/assets/site-edit.js'; sc.onload = go; document.head.appendChild(sc); }
+  }
+  // админ-полоска (в полоске цифр над шапкой, её видит только админ): «✏️ Править страницу» и «⚙ В кабинете: …» — нужный раздел для этой страницы
+  function adminStrip() {
+    const bar = document.querySelector('.statbar-in');
+    if (!bar || bar.querySelector('.sb-adm') || /^\/admin\//.test(location.pathname)) return;
+    const path = location.pathname.replace(/^\/(ru|lv)(?=\/)/, ''), post = document.querySelector('article.bp[data-post-id]');
+    const [href, name] = post ? ['/blog-editor/#' + post.dataset.postId, 'редактор этой статьи']
+      : [[/^\/shop\//, '#shop', 'Магазин'], [/^\/(art-portfolio|palettes)\//, '#art', 'Картины'], [/^\/challenge\//, '#challenge', 'Челлендж'], [/^\/advent\//, '#advent', 'Адвент'],
+        [/^\/flock\//, '#flock', 'Стая'], [/^\/(rain|potions)\//, '#games', 'Награды игр'], [/^\/bird\//, '#birds', 'Все птицы'], [/^\/blog(-editor)?\//, '/blog-editor/', 'Блог']]
+        .map(([re, h, n]) => re.test(path) && [h[0] === '#' ? '/admin/' + h : h, n]).find(Boolean) || ['/admin/', 'Входящие'];
+    const box = document.createElement('span'); box.className = 'sb-adm';
+    box.innerHTML = `${document.querySelector('[data-ppb]') ? '<button type="button" data-sb-edit>✏️ Править страницу</button>' : ''}<a href="${href}">⚙ В кабинете: ${esc(name)}</a>`;
+    bar.prepend(box);
+    const b = box.querySelector('[data-sb-edit]'); if (b) b.addEventListener('click', editPage);
   }
 
   async function login(credential) {

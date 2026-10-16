@@ -16,13 +16,95 @@
   const n = v => Number(v || 0).toLocaleString('ru-RU');
   const err = e => e.code === 401 || e.code === 'auth' || e.code === 'login' ? 'Войдите через Google (кнопка в шапке), чтобы открыть кабинет.' : e.code === 'admin' || e.code === 403 ? 'Этот кабинет только для админа.' : 'Не получилось загрузить: ' + esc(e.message);
 
-  const SECTIONS = { security, overview, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
-  function route() {
-    const sec = (location.hash || '#overview').slice(1);
-    document.querySelectorAll('.adm-nav [data-sec]').forEach(a => a.setAttribute('aria-current', a.dataset.sec === sec ? 'page' : 'false'));
-    (SECTIONS[sec] || overview)();
+  // ---------- разделы кабинета: меню строится из этого списка — новый раздел = одна строка (docs/admin.md) ----------
+  // id — адрес /admin/#id · open — какой экран показать (если не тот же id) · href — раздел живёт на другой странице
+  // focus — к чему прокрутить экран (свёрнутое раскроется) · about — одна строка «что здесь делается» · count — счётчик из «Входящих»
+  const ADMIN_GROUPS = { pub: '✍️ Публиковать', birds: '🐦 Птицы', shop: '🛍 Магазин и игры', stats: '📊 Статистика', service: '⚙️ Сервис' };
+  const rulesBox = re => m => [...m.querySelectorAll('.adm-rules h3')].find(h => re.test(h.textContent));
+  const ADMIN_SECTIONS = [
+    { id: 'inbox', ic: '📥', name: 'Входящие', about: 'Только то, что ждёт вас. Пусто — значит, всё спокойно; статистика сайта — ниже, свёрнута.', count: 'total' },
+    { id: 'blog', ic: '✍️', name: 'Блог', group: 'pub', href: '/blog-editor/', count: 'scheduled' },
+    { id: 'requests', ic: '🖍', name: 'Нарисуй мне', group: 'pub', href: '/ru/requests/', count: 'requests' },
+    { id: 'art', ic: '🎨', name: 'Картины и палитры', group: 'pub', about: 'Картины, добавленные с сайта, скрытые картины и очередь палитр дня ЭКСТРА.' },
+    { id: 'edits', ic: '🧩', name: 'Правки страниц', group: 'pub', about: 'Блоки, которые вы поменяли или скрыли прямо на сайте («✏️ Править страницу»), — здесь их можно вернуть как было.', count: 'edits' },
+    { id: 'birds', ic: '🐦', name: 'Все птицы', group: 'birds', about: 'Все птички стаи: когда пришли, сколько нарисовали, пуговки, подарки.' },
+    { id: 'gifts', ic: '🎁', name: 'Подарки и зарплата', group: 'birds', open: 'birds', focus: '#adm-giftall', about: 'Подарить вещь одной птичке или всем, выдать зарплату пуговками.' },
+    { id: 'comments', ic: '💬', name: 'Комментарии', group: 'birds', about: 'Комментарии к статьям блога: одобрить, ответить, удалить.', count: 'comments' },
+    { id: 'subscribers', ic: '📬', name: 'Подписчики', group: 'birds', about: 'Адреса людей, которые ждут письма о новой книге.', count: 'subs' },
+    { id: 'shop', ic: '🛍', name: 'Магазин', group: 'shop', about: 'Что продаётся в магазине и сколько штук; цены считаются сами.' },
+    { id: 'advent', ic: '🎄', name: 'Адвент', group: 'shop', about: 'Что лежит в каком окошке адвент-календаря.', count: 'advent' },
+    { id: 'games', ic: '🎮', name: 'Награды игр', group: 'shop', open: 'rules', focus: rulesBox(/Пуговичный дождь/), about: 'Сколько пуговок дают игры «Пуговичный дождь» и «Зельеварня».' },
+    { id: 'visitors', ic: '👥', name: 'Посетители', group: 'stats', about: 'Сколько людей заходит на сайт, откуда и с каких устройств.' },
+    { id: 'analytics', ic: '📈', name: 'Статьи', group: 'stats', about: 'Просмотры, лайки и комментарии каждой статьи.' },
+    { id: 'challenge', ic: '🖌', name: 'Челлендж', group: 'stats', about: 'Сколько работ в челлендже и новые работы.' },
+    { id: 'flock', ic: '🪺', name: 'Стая', group: 'stats', about: 'Сколько птичек в стае, кто пришёл недавно.' },
+    { id: 'backup', ic: '💾', name: 'Копии', group: 'service', about: 'Полная копия сайта: скачать, настроить автокопию, восстановить.' },
+    { id: 'rules', ic: '📜', name: 'Все правила', group: 'service', about: 'Автопилот и все правила сайта; числа можно поменять в тонкой настройке.' },
+    { id: 'gemini', ic: '🔑', name: 'Ключ Gemini', group: 'service', href: '/blog-editor/#gemini' },
+    { id: 'strict', ic: '🛡', name: 'Строгий режим', group: 'service', open: 'comments', focus: '#adm-strict', about: 'Строгий режим комментариев: не больше одного комментария в час с одного адреса.' },
+    { id: 'security', ic: '🔐', name: 'Защита', group: 'service', about: 'PIN админа и код восстановления на случай, если потеряете Google.' },
+  ];
+  const SECTIONS = { inbox, security, overview: inbox, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art, challenge: () => statsView('challenge'), flock: () => statsView('flock'),
+    carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
+  const secOf = id => ADMIN_SECTIONS.find(x => x.id === id);
+  const nav = document.getElementById('adm-nav');
+  const navLink = x => `<a href="${x.href || '#' + x.id}" data-sec="${x.id}"${x.href ? ' class="adm-ext" title="Откроется на своей странице"' : ''}><span>${x.ic} ${x.name}</span>${x.count ? `<span class="adm-count" data-count="${x.count}"${x.count === 'comments' ? ' id="adm-pend"' : ''} hidden></span>` : ''}</a>`;
+  if (nav) nav.innerHTML = [['', ''], ...Object.entries(ADMIN_GROUPS)].map(([g, name]) =>
+    `<div class="adm-nav-grp">${name ? `<p class="adm-nav-g">${name}</p>` : ''}${ADMIN_SECTIONS.filter(x => (x.group || '') === g).map(navLink).join('')}</div>`).join('');
+  // экран: строка «что здесь делается» сверху, потом сам раздел; focus — прокрутить к нужному месту
+  async function route() {
+    const id = (location.hash || '#inbox').slice(1), x = secOf(id) || (SECTIONS[id] ? { id } : secOf('inbox'));
+    document.querySelectorAll('.adm-nav [data-sec]').forEach(a => a.setAttribute('aria-current', a.dataset.sec === x.id ? 'page' : 'false'));
+    const about = document.getElementById('adm-about');
+    if (about) about.innerHTML = x.name ? `<h2>${x.ic} ${x.name}</h2>${x.about ? `<p>${x.about}</p>` : ''}` : '';
+    if (x.id === 'subscribers') api('admin/inbox/seen', { k: 'subs' }).then(() => counts()).catch(() => {}); // открыла — новые уже не новые
+    await (SECTIONS[x.open || x.id] || inbox)();
+    const f = typeof x.focus === 'function' ? x.focus(main) : x.focus ? main.querySelector(x.focus) : null;
+    if (f) {
+      for (let d = f.closest('details'); d; d = d.parentElement && d.parentElement.closest('details')) d.open = true;
+      const box = f.closest('.adm-box, section, label, p') || f;
+      box.scrollIntoView({ behavior: 'smooth', block: 'center' }); box.classList.remove('adm-focus'); void box.offsetWidth; box.classList.add('adm-focus');
+    }
   }
   addEventListener('hashchange', route);
+
+  // ---------- 📥 входящие: только то, что ждёт Алину ----------
+  let inboxData = null;
+  function badges(d) {
+    const v = { ...d, comments: d.comments, requests: d.requests, subs: d.subs, edits: d.edits, advent: (d.advent || []).length, scheduled: (d.scheduled || []).length };
+    v.total = inboxItems(d).length; // сколько разных дел ждёт
+    document.querySelectorAll('.adm-nav [data-count]').forEach(b => { const k = v[b.dataset.count] || 0; b.hidden = !k; b.textContent = k || ''; });
+  }
+  const counts = () => api('admin/inbox').then(d => { inboxData = d; badges(d); return d; });
+  const plural = (k, one, few, many) => k % 10 === 1 && k % 100 !== 11 ? one : [2, 3, 4].includes(k % 10) && ![12, 13, 14].includes(k % 100) ? few : many;
+  const dm = ts => { const d = new Date(ts * 1000), p = v => String(v).padStart(2, '0'); return `${p(d.getDate())}.${p(d.getMonth() + 1)} ${p(d.getHours())}:${p(d.getMinutes())}`; };
+  function inboxItems(d) {
+    const out = [], adv = d.advent || [], sch = d.scheduled || [];
+    if (d.comments) out.push({ ic: '💬', n: d.comments, t: `${plural(d.comments, 'комментарий ждёт', 'комментария ждут', 'комментариев ждут')} проверки`, d: 'в них есть ссылки — одобрить или удалить', href: '#comments', cf: 'pending', go: 'Проверить' });
+    if (d.requests) out.push({ ic: '🖍', n: d.requests, t: `${plural(d.requests, 'заявка', 'заявки', 'заявок')} «Нарисуй мне»`, d: 'темы, которые ещё не нарисованы', href: '/ru/requests/', go: 'Открыть ↗' });
+    if (d.subs) out.push({ ic: '📬', n: d.subs, t: `${plural(d.subs, 'новый подписчик', 'новых подписчика', 'новых подписчиков')}`, d: 'ждут письма о книге', href: '#subscribers', go: 'Посмотреть' });
+    if ((d.auto || []).length) out.push({ ic: '🤖', n: d.auto.length, t: 'автопилот: нужно внимание', d: d.auto.map(a => `${esc(a.t)} — ${esc(a.d)}`).join('<br>'), href: '#rules', go: 'Открыть', raw: 1 });
+    if (adv.length) out.push({ ic: '🎄', n: adv.length, t: `${plural(adv.length, 'окошко', 'окошка', 'окошек')} адвента ${plural(adv.length, 'пустое', 'пустые', 'пустые')}`, d: `декабрь: ${adv.length > 12 ? adv.slice(0, 12).join(', ') + '…' : adv.join(', ')} — в пустом окошке будут только пуговки`, href: '#advent', go: 'Заполнить' });
+    if (d.edits) out.push({ ic: '🧩', n: d.edits, t: `${plural(d.edits, 'правка', 'правки', 'правок')} сайта поверх кода`, d: 'ваш текст закрывает блок из кода: если блок обновят в коде, на сайте всё равно будет ваша правка', href: '#edits', go: 'Проверить' });
+    if (sch.length) out.push({ ic: '⏰', n: sch.length, t: `${plural(sch.length, 'статья запланирована', 'статьи запланированы', 'статей запланировано')}`, d: sch.slice(0, 5).map(p => `«${esc(title(p))}» — ${dm(p.published_at)}`).join('<br>'), href: '/blog-editor/#scheduled', go: 'Открыть', raw: 1 });
+    return out;
+  }
+  async function inbox() {
+    main.innerHTML = '<p class="be-note">Загрузка…</p>';
+    let d; try { d = await counts(); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    const items = inboxItems(d);
+    let open = false; try { open = !!sessionStorage.getItem('pp-stats'); } catch (e) {}
+    main.innerHTML = `<div class="adm-quick"><a class="pill-btn pill-fill" href="/blog-editor/#new">＋ Новая статья</a></div>
+      ${items.length ? `<ul class="adm-inbox">${items.map(it => `<li><span class="adm-in-ic">${it.ic}</span><span class="adm-in-n">${n(it.n)}</span>
+        <span class="adm-in-t"><b>${it.t}</b><small>${it.raw ? it.d : esc(it.d)}</small></span><a class="pill-btn" href="${it.href}"${it.cf ? ` data-cf-go="${it.cf}"` : ''}>${it.go}</a></li>`).join('')}</ul>`
+        : '<p class="adm-calm">Всё спокойно ✓<small>Ничего не ждёт: комментарии проверены, заявок и новых подписчиков нет, автопилот работает.</small></p>'}
+      <details class="adm-fine adm-stats"${open ? ' open' : ''}><summary>📊 Статистика сайта</summary><div id="adm-stats"></div></details>`;
+    main.querySelectorAll('[data-cf-go]').forEach(a => a.addEventListener('click', () => { cFilter = a.dataset.cfGo; }));
+    const det = main.querySelector('.adm-stats'), box = main.querySelector('#adm-stats');
+    const load = () => { if (!box.dataset.done) { box.dataset.done = '1'; overview(box); } };
+    det.addEventListener('toggle', () => { try { det.open ? sessionStorage.setItem('pp-stats', '1') : sessionStorage.removeItem('pp-stats'); } catch (e) {} if (det.open) load(); });
+    if (open) load();
+  }
 
   // ---------- 🔐 защита (12.10.2026): PIN админа и код восстановления ----------
   // Не админ, но открыл кабинет — может ввести код восстановления (если потеряла доступ к старому Google).
@@ -54,12 +136,13 @@
     main.innerHTML = `<section class="adm-box"><h2>🔐 PIN админа</h2>
       <p class="be-note">${s.pinSet ? '✓ PIN задан. Даже если кто-то войдёт в твой Google, без PIN он будет обычной птичкой. На каждом новом устройстве PIN нужно ввести один раз.' : '⚠️ PIN не задан: сейчас админом становится любой, кто войдёт в твой Google.'}</p>
       <form class="adm-sec-f" id="pin-set"><input type="password" inputmode="numeric" autocomplete="new-password" minlength="4" maxlength="12" pattern="\\d{4,12}" placeholder="${s.pinSet ? 'Новый PIN' : 'PIN: 4–12 цифр'}" required><input type="password" inputmode="numeric" autocomplete="new-password" maxlength="12" placeholder="Ещё раз" required><button class="pill-btn pill-fill">${s.pinSet ? 'Сменить PIN' : 'Задать PIN'}</button></form>
-      ${s.pinSet ? '<button type="button" class="pill-btn" id="pin-off">Убрать PIN</button>' : ''}<p class="be-note" id="pin-set-st" role="status"></p>
+      <p class="be-note" id="pin-set-st" role="status"></p>
       <p class="be-note">PIN не связан с Google — не используй тот же, что от телефона или банка. После 5 неверных попыток ввод закрывается на час.</p></section>
       <section class="adm-box"><h2>🔑 Код восстановления</h2>
       <p class="be-note">${s.recoverySet ? `✓ Код создан ${fmt(s.recoveryAt)}. Если потеряешь доступ к Google — войди другим аккаунтом Google, открой кабинет и введи этот код.` : '⚠️ Кода ещё нет. Если потеряешь доступ к Google, вернуть админку будет нечем.'}</p>
       ${s.pinSet ? `<button type="button" class="pill-btn pill-fill" id="rc-new">${s.recoverySet ? 'Сделать новый код (старый перестанет работать)' : 'Создать код'}</button>` : '<p class="be-note">Сначала задай PIN — без него код мог бы перевыпустить тот, кто забрал Google.</p>'}
-      <div id="rc-out"></div></section>`;
+      <div id="rc-out"></div></section>
+      ${s.pinSet ? '<section class="adm-danger"><h3>⚠️ Осторожно</h3><button type="button" class="pill-btn be-danger" id="pin-off">Убрать PIN</button><p class="be-note">Без PIN админом станет любой, кто войдёт в ваш Google.</p></section>' : ''}`;
     const f = document.getElementById('pin-set'), st = document.getElementById('pin-set-st');
     f.onsubmit = async e => { e.preventDefault(); const [a, b] = f.querySelectorAll('input');
       if (!/^\d{4,12}$/.test(a.value)) { st.textContent = 'PIN — от 4 до 12 цифр.'; return; }
@@ -84,17 +167,12 @@
   const autoCard = list => { const bad = list.filter(x => x.ok === false); return `<section class="adm-box adm-auto${bad.length ? ' warn' : ''}"><h3>🤖 Автопилот: ${bad.length ? `нужно внимание (${bad.length})` : 'всё работает само ✓'}</h3>
     <p class="be-note">${bad.length ? 'Ниже красным — что не так. Остальное по-прежнему работает само.' : 'Магазин пополняется, цены и награды подстраиваются, сезоны меняются — ничего настраивать не нужно.'}</p>
     <ul>${list.map(x => `<li class="${x.ok === false ? 'bad' : x.ok === null ? 'off' : 'ok'}"><b>${x.ok === false ? '⚠️' : x.ok === null ? '⏸' : '✓'} ${esc(x.t)}</b> — ${esc(x.d)}</li>`).join('')}</ul></section>`; };
-  async function overview() {
-    main.innerHTML = '<p class="be-note">Загрузка…</p>';
-    let d; try { d = await api('blog/admin/overview'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    pend(d.comments.pending);
+  async function overview(el = main) {
+    el.innerHTML = '<p class="be-note">Загрузка…</p>';
+    let d; try { d = await api('blog/admin/overview'); } catch (e) { el.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
     const card = (icon, label, big, small) => `<div class="adm-card"><span class="adm-ic">${icon}</span><b>${big}</b><span>${label}</span>${small ? `<small>${small}</small>` : ''}</div>`;
-    main.innerHTML = `<div id="adm-auto-slot"></div>
-      <div class="adm-quick">
-        <a class="pill-btn pill-fill" href="/blog-editor/#new">＋ Новая статья</a>
-        <a class="pill-btn" href="#comments">💬 Комментарии${d.comments.pending ? ` — ждут проверки: ${d.comments.pending}` : ''}</a>
-        <a class="pill-btn" href="#visitors">👥 Посетители: откуда и с чего</a>
-      </div>
+    el.innerHTML = `<div id="adm-auto-slot"></div>
+      <div class="adm-quick"><a class="pill-btn" href="#visitors">👥 Посетители: откуда и с чего</a></div>
       <div class="adm-cards">
         ${card('📝', 'статей опубликовано', n(d.posts.pub), d.posts.draft ? `черновиков: ${n(d.posts.draft)}` : '')}
         ${card('👁', 'просмотров статей', n(d.posts.views), `лайков: ${n(d.posts.likes)}`)}
@@ -106,12 +184,37 @@
         <section class="adm-box"><h2>Популярные статьи</h2>${d.top.length ? `<ol class="adm-top">${d.top.map(p => `<li><a href="/ru/blog/${esc(p.slug)}/" target="_blank">${esc(title(p))}</a><span>👁 ${n(p.views)} · ♥ ${n(p.likes)} · 💬 ${n(p.comments)}</span><a class="adm-edit" href="/blog-editor/#${p.id}" title="Редактировать">✎</a></li>`).join('')}</ol>` : '<p class="be-note">Пока нет опубликованных статей.</p>'}</section>
         <section class="adm-box"><h2>Новые птицы <a class="adm-all" href="#birds">все →</a></h2>${d.newUsers.length ? `<ul class="adm-list">${d.newUsers.map(u => `<li>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}<span>${fmt(u.created_at)}</span></li>`).join('')}</ul>` : '<p class="be-note">Пока никого.</p>'}</section>
       </div>
-      ${backupBox()}
       <section class="adm-box"><h2>Новые работы в челлендже</h2>${d.newWorks.length ? `<div class="adm-works">${d.newWorks.map(w => `<a href="/api/img/${w.id}" target="_blank" title="@${esc(w.nick)} · ${esc(w.theme || '')} · ${esc(w.day)}"><img src="/api/img/${w.id}?t=1" alt="" loading="lazy"><span>@${esc(w.nick)}</span></a>`).join('')}</div>` : '<p class="be-note">Пока нет работ.</p>'}</section>`;
-    wireBackup();
-    api('admin/autopilot').then(r => { const sl = main.querySelector('#adm-auto-slot'); if (sl) sl.innerHTML = autoCard(r.auto || []); }).catch(() => {});
+    api('admin/autopilot').then(r => { const sl = el.querySelector('#adm-auto-slot'); if (sl) sl.innerHTML = autoCard(r.auto || []); }).catch(() => {});
   }
   function pend(k) { const b = document.getElementById('adm-pend'); if (b) { b.hidden = !k; b.textContent = k || ''; } }
+
+  // ---------- статистика: челлендж и стая (те же цифры, что в «📊 Статистике сайта» на «Входящих») ----------
+  async function statsView(kind) {
+    main.innerHTML = '<p class="be-note">Загрузка…</p>';
+    let d; try { d = await api('blog/admin/overview'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    const card = (icon, label, big, small) => `<div class="adm-card"><span class="adm-ic">${icon}</span><b>${big}</b><span>${label}</span>${small ? `<small>${small}</small>` : ''}</div>`;
+    main.innerHTML = kind === 'challenge'
+      ? `<div class="adm-quick"><a class="pill-btn pill-fill" href="/ru/challenge/">Открыть челлендж ↗</a></div>
+        <div class="adm-cards">${card('🎨', 'работ в челлендже', n(d.totals.works), `за неделю: ${n(d.works.week)}`)}</div>
+        <section class="adm-box"><h2>Новые работы</h2>${d.newWorks.length ? `<div class="adm-works">${d.newWorks.map(w => `<a href="/api/img/${w.id}" target="_blank" title="@${esc(w.nick)} · ${esc(w.theme || '')} · ${esc(w.day)}"><img src="/api/img/${w.id}?t=1" alt="" loading="lazy"><span>@${esc(w.nick)}</span></a>`).join('')}</div>` : '<p class="be-note">Пока нет работ.</p>'}</section>`
+      : `<div class="adm-quick"><a class="pill-btn pill-fill" href="/ru/flock/">Открыть стаю ↗</a> <a class="pill-btn" href="#birds">🐦 Все птицы</a></div>
+        <div class="adm-cards">${card('🐦', 'птиц в стае', n(d.totals.users), `новых за неделю: ${n(d.users.week)}`)}${card('👀', 'заходили за неделю', n(d.users.active))}</div>
+        <section class="adm-box"><h2>Новые птицы</h2>${d.newUsers.length ? `<ul class="adm-list">${d.newUsers.map(u => `<li>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}<span>${fmt(u.created_at)}</span></li>`).join('')}</ul>` : '<p class="be-note">Пока никого.</p>'}</section>`;
+  }
+
+  // ---------- 🎨 картины и палитры, добавленные с сайта (/api/palettes; добавляют и скрывают их на страницах галерей) ----------
+  async function art() {
+    main.innerHTML = '<p class="be-note">Загрузка…</p>';
+    let d; try { d = await fetch('/api/palettes', { credentials: 'same-origin' }).then(r => r.json()); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    const added = d.added || [], hidden = d.hidden || [];
+    main.innerHTML = `<div class="adm-quick"><a class="pill-btn pill-fill" href="/ru/palettes/">🎨 Палитры: добавить картину ↗</a> <a class="pill-btn" href="/ru/art-portfolio/sketchbook/">Мой скетчбук ↗</a></div>
+      <p class="be-note">Добавлять и скрывать картины — прямо на страницах галерей: кнопки видны только вам.</p>
+      <div class="adm-cards"><div class="adm-card"><span class="adm-ic">🖼</span><b>${n(added.length)}</b><span>картин добавлено с сайта</span></div>
+        <div class="adm-card"><span class="adm-ic">🎨</span><b>${n((d.queue || []).length)}</b><span>палитр в очереди дня ЭКСТРА</span></div>
+        <div class="adm-card"><span class="adm-ic">🙈</span><b>${n(hidden.length)}</b><span>картин скрыто</span></div></div>
+      <section class="adm-box"><h2>Добавлены с сайта</h2>${added.length ? `<div class="adm-works">${added.slice().reverse().map(a => `<a href="/${esc(a.img)}" target="_blank" title="${esc(a.title.ru || a.title.en || '')}"><img src="/${esc(a.thumb)}" alt="" loading="lazy"><span>${esc(a.gallery)}${a.palette ? ' · 🎨' : ''}</span></a>`).join('')}</div>` : '<p class="be-note">Пока ничего.</p>'}</section>`;
+  }
 
   // ---------- комментарии ----------
   let cFilter = 'all';
@@ -350,7 +453,7 @@
     const chk = (k, l, note) => `<label class="adm-r-chk"><input type="checkbox" data-r="${k}"${R[k] ? ' checked' : ''}> ${l}${note ? ` <small class="be-note">${note}</small>` : ''}</label>`;
     main.innerHTML = `${autoCard(d.auto || [])}<details class="adm-fine"${sessionStorage.getItem('pp-fine') ? ' open' : ''}><summary>⚙️ Тонкая настройка — можно не трогать</summary><section class="adm-box"><h2>📜 Правила</h2>
       <p class="be-note">Здесь можно поменять пуговки, бейджи, магазин, адвент и ИИ-работы. Изменения действуют сразу после «Сохранить» (до минуты на всех страницах). Поле с жёлтой рамкой отличается от значения по умолчанию. Уже полученные бейджи и пуговки при изменениях не отнимаются; если снизить условие бейджа, птички, которые ему уже соответствуют, получат его при следующем заходе.</p>
-      <p class="adm-r-bar"><button type="button" class="pill-btn pill-fill" id="adm-r-save">💾 Сохранить правила</button> <button type="button" class="pill-btn" id="adm-r-reset">↺ Вернуть всё по умолчанию</button> <span class="be-note" id="adm-r-st"></span></p></section>
+      <p class="adm-r-bar"><button type="button" class="pill-btn pill-fill" id="adm-r-save">💾 Сохранить правила</button> <span class="be-note" id="adm-r-st"></span></p></section>
       ${box('🔘 Пуговки', btnRows)}
       ${box('🥚 Уровни (рекордная серия) — пуговки один раз за уровень', lvRows)}
       ${box('🏅 Бейджи — награда и условия', bRows, 'Числа в условиях можно менять прямо в тексте. Описание «как получить» у птичек подстраивается само.')}
@@ -377,7 +480,8 @@
       ], '<a href="/ru/potions/">Открыть игру →</a>')}
       ${box('🎄 Адвент', advRows)}
       <section class="adm-box adm-rules"><h3>🤖 ИИ-работы</h3>${chk('aiStreak', 'Работа с пометкой 🤖 засчитывается в серию', '(выключить — такие дни не продлевают серию)')}<br>${chk('aiUpload', 'За работу с пометкой 🤖 дают пуговки за загрузку')}</section>
-      </details><section class="adm-box adm-rules" id="adm-rules-all"></section>`;
+      </details><section class="adm-box adm-rules" id="adm-rules-all"></section>
+      <section class="adm-danger"><h3>⚠️ Осторожно</h3><button type="button" class="pill-btn be-danger" id="adm-r-reset">↺ Вернуть все правила по умолчанию</button><p class="be-note">Все числа в тонкой настройке станут такими, как были сначала.</p></section>`;
     const fine = main.querySelector('.adm-fine'); fine.addEventListener('toggle', () => { try { fine.open ? sessionStorage.setItem('pp-fine', '1') : sessionStorage.removeItem('pp-fine'); } catch (e) {} });
     // полный свод правил — обычным текстом, с текущими числами
     const pc = n => n + ' 🔘';
@@ -566,7 +670,8 @@
       const fb = (k, l) => `<button type="button" class="pill-btn" data-sf="${k}" aria-pressed="${sFilter === k}">${l}</button>`;
       main.innerHTML = `<section class="adm-box"><h2>🛍 Магазин</h2>
         <p class="be-note">Цены считаются сами: <b>ценность вещи × % категории × уровень цен</b> (он сам подстраивается под то, сколько птички зарабатывают и копят — сейчас ×${(d.level && d.level.L) || 1}), а ещё дороже, когда штук мало, и дешевле, когда много. Вы меняете только <b>% категорий</b> и <b>цены легендарных</b> — они ниже. Остаток меняется сам (пополнение каждую ночь), но его можно поставить и вручную. Сейчас в продаже: <b>${onSale}</b> из ${all.length}.</p>
-        ${catBox()}${legBox()}
+        <p class="adm-refill">↻ Пополнить <b>все закончившиеся, кроме легендарных</b> (сейчас ${all.filter(x => !isLeg(x) && cnt(x) === 0).length} ${pl1(all.filter(x => !isLeg(x) && cnt(x) === 0).length)}) — по <input type="number" id="adm-refill-n" min="1" max="10000" inputmode="numeric" value="${PR.norm}" style="width:70px"> шт. <button type="button" class="pill-btn pill-fill" id="adm-refill">Пополнить</button> <small class="be-note">обычный запас сейчас — ${PR.norm} шт.</small></p>
+        <details class="adm-fine"><summary>⚙️ Тонкая настройка цен — можно не трогать</summary>${catBox()}${legBox()}</details>
         <div class="be-filters"><input type="search" id="adm-sq" placeholder="🔍 Найти вещь" value="${esc(sq)}"></div>
         ${(() => {
           // экономика: пуговки у птичек и насколько сейчас дороги вещи (цена сейчас ÷ ценность, по вещам в продаже)
@@ -584,13 +689,13 @@
           <table class="be-table adm-table adm-stock"><thead><tr><th>Категория</th><th>Сейчас в продаже</th><th title="Сколько пуговок нужно, чтобы купить всё, что сейчас есть в продаже (по сегодняшним ценам)">Всё вместе стоит</th><th>Поставить всем вещам категории</th></tr></thead><tbody>
           ${sum.filter(r => sOnly === 'all' || r.hit).map(r => `<tr data-sk="${r.k}"><td><button type="button" class="adm-exp" data-exp="${r.k}" aria-expanded="${sOpen.has(r.k)}">${sOpen.has(r.k) ? '▾' : '▸'} ${esc(r.name)}</button><small class="adm-sk-n">${r.total} ${pl1(r.total)}</small></td><td>${sOnly === 'all' ? r.txt : `<span class="adm-sk-0">${r.hit} ${pl1(r.hit)} ${sOnly === 'empty' ? 'закончились' : sOnly === 'low' ? 'мало' : 'много'}</span><br><small>${r.txt}</small>`}</td><td>${r.value ? '🔘 ' + n(r.value) : '—'}</td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток: ${esc(r.name)}"><button type="button" class="pill-btn" data-set="${r.k}">${sOnly === 'all' ? 'Поставить' : 'Пополнить'}</button></td></tr>${sOpen.has(r.k) ? `<tr class="adm-sk-items"><td colspan="4"><div class="adm-sk-grid">${all.filter(x => x.kind === r.k && only(x)).map(x => { const w = rows[x.kind + '|' + x.item] || { price: 0, base: (d.suggested || {})[x.kind + '|' + x.item] || 0, stock: 0 }, leg = B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item); return `<div class="adm-sk-it${leg ? ' adm-legend' : ''}${(w.stock || 0) > 0 ? '' : ' off'}" data-k="${esc(x.kind)}" data-i="${esc(x.item)}"><span class="adm-shop-pic"></span><span class="adm-sk-nm">${esc(x.name)}${leg && !x.name.includes('★') ? ' ★' : ''}</span><label>Остаток <input type="number" min="0" max="100000" inputmode="numeric" value="${w.stock || 0}" data-f="stock"></label>${leg ? `<label>Цена <input type="number" min="0" max="100000" inputmode="numeric" value="${w.base ?? w.price ?? 0}" data-f="price"></label>` : ''}<small class="adm-shop-st">${w.stock > 0 ? '🔘 ' + w.price : '—'}</small></div>`; }).join('')}</div></td></tr>` : ''}`).join('')}
           <tr data-sk="*"><td><b>Весь магазин</b><small class="adm-sk-n">каждой вещи станет ровно столько штук</small><small class="adm-sk-n">${all.length} ${pl1(all.length)}</small></td><td>${sum.reduce((a, r) => a + r.on, 0)} в продаже, ${sum.reduce((a, r) => a + r.pcs, 0)} шт. всего</td><td><b>🔘 ${n(sum.reduce((a, r) => a + r.value, 0))}</b></td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток всем"><button type="button" class="pill-btn" data-set="*">${sOnly === 'all' ? 'Поставить всем, кроме легендарных' : 'Пополнить все найденные'}</button></td></tr></tbody></table>
-          <p class="adm-refill">↻ Пополнить <b>все закончившиеся, кроме легендарных</b> (сейчас ${all.filter(x => !isLeg(x) && cnt(x) === 0).length} ${pl1(all.filter(x => !isLeg(x) && cnt(x) === 0).length)}) — по <input type="number" id="adm-refill-n" min="1" max="10000" inputmode="numeric" value="${PR.norm}" style="width:70px"> шт. <button type="button" class="pill-btn" id="adm-refill">Пополнить</button> <small class="be-note">обычный запас сейчас — ${PR.norm} шт.</small></p>
-          <p><button type="button" class="pill-btn pill-fill" id="adm-set-all">💾 Сохранить все заполненные</button> <button type="button" class="pill-btn adm-empty" id="adm-empty-all">🧹 Опустошить полки</button></p></section>
+          <p><button type="button" class="pill-btn pill-fill" id="adm-set-all">💾 Сохранить все заполненные</button></p></section>
         <div class="adm-sbar"><label class="adm-sl">Порядок: <select id="adm-sort"><option value="cat">по видам</option><option value="few"${sSort === 'few' ? ' selected' : ''}>меньше всего сверху</option><option value="many"${sSort === 'many' ? ' selected' : ''}>больше всего сверху</option></select></label></div>
         <div class="adm-sbar"><span class="adm-sl">Что:</span>${fb('all', 'Все')}${B.GIFT_KINDS.map(k => fb('kind:' + k[0], k[1][1])).join('')}${B.GIFT_THEMES.map(t => fb('theme:' + t[0], t[1][1])).join('')}</div>
         <table class="be-table adm-table adm-shop"><thead><tr><th>Вещь</th><th>Вид</th><th>Ценность 🔘</th><th>Остаток</th><th>Цена сейчас</th></tr></thead><tbody>
         ${list.map(x => { const r = rows[x.kind + '|' + x.item] || { price: 0, base: (d.suggested || {})[x.kind + '|' + x.item] || 0, stock: 0 }; const leg = B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item); return `<tr data-k="${esc(x.kind)}" data-i="${esc(x.item)}"${leg ? ' class="adm-legend"' : ''}><td class="adm-shop-it"><span class="adm-shop-pic"></span>${esc(x.name)}${leg ? ' <span class="adm-leg-tag" title="Легендарная: 1 штука на птичку, дарить нельзя">★ легендарная</span>' : ''}</td><td>${esc(x.kindName)}</td>
-          <td data-l="Цена 🔘">${leg ? `<input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.base ?? r.price}" data-f="price" aria-label="Цена легендарной">` : `<span class="be-note" title="ценность × % категории × уровень цен">${r.base || '—'}</span>`}</td><td data-l="Количество"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.stock}" data-f="stock" aria-label="Количество"></td><td class="adm-shop-st">${r.stock > 0 ? '🔘 ' + r.price : '—'}</td></tr>`; }).join('')}</tbody></table></section>`;
+          <td data-l="Цена 🔘">${leg ? `<input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.base ?? r.price}" data-f="price" aria-label="Цена легендарной">` : `<span class="be-note" title="ценность × % категории × уровень цен">${r.base || '—'}</span>`}</td><td data-l="Количество"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.stock}" data-f="stock" aria-label="Количество"></td><td class="adm-shop-st">${r.stock > 0 ? '🔘 ' + r.price : '—'}</td></tr>`; }).join('')}</tbody></table></section>
+        <section class="adm-danger"><h3>⚠️ Осторожно</h3><button type="button" class="pill-btn be-danger adm-empty" id="adm-empty-all">🧹 Опустошить полки</button><p class="be-note">У всех вещей (и легендарных) остаток станет 0 — в магазине ничего не будет в продаже.</p></section>`;
       main.querySelectorAll('[data-cat]').forEach(i => i.onchange = async () => {
         const v = Math.max(10, Math.min(1000, Math.round(+i.value) || 100)); i.disabled = true;
         try { const r = await api('admin/shop/cats', { mult: { [i.dataset.cat]: v } }); d.catMult = r.catMult; Object.keys(rows).forEach(k => delete rows[k]); r.items.forEach(x => { rows[x.kind + '|' + x.item] = x; }); draw(); }
@@ -733,7 +838,8 @@
       <p class="be-note">Полная копия — два архива: данные (статьи, комментарии, челлендж, все картинки) и код сайта с GitHub. Автокопия кладёт их в ваш Google Drive каждый понедельник.</p>
       <div class="adm-quick"><button type="button" class="pill-btn pill-fill" data-bk="download">💾 Скачать полную копию</button>
         <button type="button" class="pill-btn" data-bk="auto">🔁 Автокопия в Google Drive</button>
-        <label class="pill-btn adm-restore">♻ Восстановить из копии<input type="file" accept=".zip" hidden data-bk="restore"></label></div></section>`;
+</div></section>
+      <section class="adm-danger"><h3>⚠️ Осторожно</h3><label class="pill-btn adm-restore">♻ Восстановить из копии<input type="file" accept=".zip" hidden data-bk="restore"></label><p class="be-note">Восстановление заменяет данные сайта данными из архива копии.</p></section>`;
   function wireBackup() {
     const B = window.PPBackup; if (!B) return;
     main.querySelectorAll('[data-bk="download"]').forEach(b => b.onclick = () => B.download(b));

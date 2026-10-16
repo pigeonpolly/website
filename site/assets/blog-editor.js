@@ -83,6 +83,8 @@
     const h = location.hash.slice(1);
     if (h === 'new') return editor(null);
     if (/^\d+$/.test(h)) return editor(Number(h));
+    if (h === 'scheduled') { dashTab = 'scheduled'; history.replaceState(null, '', location.pathname); } // из кабинета: «⏰ Запланированные»
+    if (h === 'gemini') { history.replaceState(null, '', location.pathname); return dashboard().then(() => geminiPanel()); } // из кабинета: «🔑 Ключ Gemini»
     return dashboard();
   }
 

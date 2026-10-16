@@ -3,22 +3,9 @@
   <h1>Кабинет</h1>
 </section>
 <div class="adm be-app" id="adm">
-  <nav class="adm-nav" aria-label="Кабинет">
-    <a href="#overview" data-sec="overview">📊 Обзор</a>
-    <a href="#visitors" data-sec="visitors">👥 Посетители</a>
-    <a href="#comments" data-sec="comments">💬 Комментарии <span class="adm-count" id="adm-pend" hidden></span></a>
-    <a href="/blog-editor/">✍️ Блог: статьи</a>
-    <a href="#birds" data-sec="birds">🐦 Птицы</a>
-    <a href="#shop" data-sec="shop">🛍 Магазин</a>
-    <a href="#advent" data-sec="advent">🎄 Адвент</a>
-    <a href="#rules" data-sec="rules">📜 Правила</a>
-    <a href="#subscribers" data-sec="subscribers">📬 Подписчики</a>
-    <a href="#analytics" data-sec="analytics">📈 Статьи: просмотры</a>
-    <a href="#edits" data-sec="edits">🧩 Правки сайта</a>
-    <a href="#backup" data-sec="backup">💾 Копии сайта</a>
-    <a href="#security" data-sec="security">🔐 Защита</a>
-  </nav>
-  <div class="adm-main" id="adm-main"><p class="be-note">Загрузка…</p></div>
+  <nav class="adm-nav" id="adm-nav" aria-label="Кабинет"></nav><!-- меню строится из ADMIN_SECTIONS в admin.js -->
+  <div class="adm-screen"><header class="adm-about" id="adm-about"></header>
+  <div class="adm-main" id="adm-main"><p class="be-note">Загрузка…</p></div></div>
 </div>
 <script src="/assets/backup.js" defer></script>
 <script src="/assets/advent-admin.js" defer></script>
