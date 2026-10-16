@@ -422,7 +422,7 @@
         <div class="gf-btns"><button type="button" class="cta-btn" data-use>${room ? t('toRoom') : t('use')}</button><button type="button" class="pill-btn" data-later>${t('later')}</button></div>`;
       const a = room ? window.PPBirds.itemIcon(g.kind, g.item, 140) : window.PPBirds.avatar(me.id, Object.assign({}, me.avatar, { [g.kind]: g.item }), 140); a.classList.add('gf-pop');
       box.querySelector('.gf-ava').appendChild(a);
-      const act = async use => { try { await post('gift', { id: g.id, use: use && !room }); } catch (e) { alert(t('err')); return; } m.close();
+      const act = async use => { try { await post('gift', { id: g.id, use: use && !room }); } catch (e) { alert(t('err')); return; } m.close(); if (window.PPNews) window.PPNews.refresh();
         if (room && use) { if (!document.getElementById('bp-room')) { location.href = profileUrl(me.nick); return; } await refresh(); setTimeout(() => { const eb = document.querySelector('#bp-room .room-edit'); if (eb) { eb.click(); eb.scrollIntoView({ behavior: 'smooth', block: 'center' }); } }, 500); return; }
         await refresh(); };
       box.querySelector('[data-use]').onclick = () => act(true);
@@ -681,6 +681,7 @@
     const share = () => shareBird({ id: pr.id, nick: pr.nick, avatar: pr.avatar, mine });
     page.querySelector('#bp-share').onclick = share;
     const gb = page.querySelector('#bp-gift'); if (gb) gb.onclick = () => { openGift(newGifts[newGifts.length - 1]); };
+    if (gb && location.hash === '#gift') { history.replaceState(null, '', location.pathname + location.search); gb.click(); } // /bird/#gift — «Открыть подарок» из новостей (news.js)
     // комната птички (room.js); пока его нет на странице — блок скрыт
     if (window.PPRoom) { const rb = page.querySelector('#bp-room'); rb.hidden = false; window.PPRoom.mount(rb, { id: pr.id, nick: pr.nick, avatar: pr.avatar, room: pr.room, mine, me, onChange: () => renderPage() }); }
     const panel = page.querySelector('.bp-panel');

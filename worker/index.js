@@ -187,15 +187,59 @@ async function adventCollector(env, uid, year) {
   await award(env, uid, 'badge', 'collector', BTN.badges.collector);
   return true;
 }
+// часы по Риге → миллисекунды (зимой UTC+2, летом UTC+3)
+function rigaMs(y, m, d, hh = 0, mm = 0, ss = 0) {
+  const wall = Date.UTC(y, m - 1, d, hh, mm, ss);
+  const off = t => { const p = new Date(t).toLocaleString('sv-SE', { timeZone: 'Europe/Riga' }).split(/\D+/).map(Number); return Date.UTC(p[0], p[1] - 1, p[2], p[3], p[4], p[5]) - Math.floor(t / 1000) * 1000; };
+  return wall - off(wall - 2 * 3600e3);
+}
 function adventNow(req, env) {
-  // на локальной проверке (DEV_FAKE_LOGIN) дату можно подменить заголовком x-dev-date: 2026-12-05
-  const dev = env.DEV_FAKE_LOGIN === '1' && /^\d{4}-\d\d-\d\d$/.test(req.headers.get('x-dev-date') || '') ? req.headers.get('x-dev-date') : null;
-  const [y, m, d] = (dev || rigaDay()).split('-').map(Number);
+  // на локальной проверке (DEV_FAKE_LOGIN) дату можно подменить заголовком x-dev-date: 2026-12-05 или 2026-11-30T23:59:50 (время — по Риге);
+  // в браузере — ?devdate=… в адресе (account.js запоминает её на вкладку и шлёт этот заголовок, часы идут дальше)
+  const h = req.headers.get('x-dev-date') || '';
+  const dev = env.DEV_FAKE_LOGIN === '1' && /^\d{4}-\d\d-\d\d(T\d\d:\d\d(:\d\d)?)?$/.test(h) ? h : null;
+  const [y, m, d] = (dev ? dev.slice(0, 10) : rigaDay()).split('-').map(Number);
+  const tm = dev && dev.length > 10 ? dev.slice(11).split(':').map(Number) : null;
   // 1 декабря 00:00 по Риге (зимой UTC+2) = 30 ноября 22:00 UTC. year — год адвента (в январе — прошлый декабрь).
   // Пропущенные окошки можно открыть до 23 января включительно (claimTo — до какого дня декабря можно забрать)
   const catchUp = m === 1 && d <= RULES.adventLastJan;
-  return { year: m === 1 ? y - 1 : y, day: m === 12 ? d : 0, month: m, claimTo: m === 12 ? d : catchUp ? 31 : 0, catchUp,
-    startsAt: Date.UTC(y, 10, 30, 22), nowMs: dev ? Date.UTC(y, m - 1, d, 10) : Date.now() };
+  return { year: m === 1 ? y - 1 : y, day: m === 12 ? d : 0, month: m, dom: d, date: `${y}-${String(m).padStart(2, '0')}-${String(d).padStart(2, '0')}`, claimTo: m === 12 ? d : catchUp ? 31 : 0, catchUp,
+    startsAt: Date.UTC(y, 10, 30, 22), nowMs: dev ? (tm ? rigaMs(y, m, d, tm[0], tm[1], tm[2] || 0) : Date.UTC(y, m - 1, d, 10)) : Date.now(),
+    nextAt: rigaMs(y, m, d + 1) }; // следующая полночь по Риге — тогда откроется следующее окошко
+}
+
+// ---------- «конвертик»: очередь новостей птички (/api/whoami и /api/news → news: [{kind, n, …}]) ----------
+// Новый вид новости = одна запись здесь и одна в site/assets/news.js (KINDS). Запись: вид → что показать (null — новости нет).
+// reply (ответ на комментарий) — когда у комментариев появятся ответы и они будут связаны с птичкой; сейчас ответов нет — вид пропущен.
+const NEWS_KINDS = [
+  ['gift', async (env, req, u) => { // неоткрытые подарки
+    const r = await env.DB.prepare("SELECT COUNT(*) AS n, MAX(id) AS last FROM gifts WHERE user_id = ? AND status = 'new'").bind(u.id).first();
+    if (!r || !r.n) return null;
+    const g = await env.DB.prepare('SELECT kind, item, note FROM gifts WHERE id = ?').bind(r.last).first();
+    return { n: r.n, from: g && /^from:/.test(g.note || '') ? g.note.slice(5) : null };
+  }],
+  ['salary', async (env, req, u) => { // зарплата: пуговки уже начислены, конвертик ещё не открыт
+    const r = (await env.DB.prepare("SELECT amount FROM button_log WHERE user_id = ? AND kind = 'salary' AND seen = 0").bind(u.id).all()).results;
+    return r.length ? { n: r.length, sum: r.reduce((a, x) => a + (x.amount || 0), 0) } : null;
+  }],
+  ['advent', async (env, req, u) => { // 1–31 декабря, пока сегодняшнее окошко не открыто; после открытия в этот день не показываем
+    const t = adventNow(req, env);
+    if (!t.day) return null;
+    const open = new Set((await env.DB.prepare('SELECT day FROM advent_open WHERE user_id = ? AND year = ?').bind(u.id, t.year).all()).results.map(r => r.day));
+    if (open.has(t.day)) return null;
+    let n = 0; for (let d = 1; d <= t.day; d++) if (!open.has(d)) n++;
+    return { n, day: t.day };
+  }],
+  ['potion', async (env, req, u) => { // ингредиенты от друзей (зельеварня)
+    const r = (await env.DB.prepare('SELECT from_nick, n FROM potion_gifts WHERE to_id = ? AND seen = 0').bind(u.id).all()).results;
+    return r.length ? { n: r.length, from: [...new Set(r.map(x => x.from_nick).filter(Boolean))].slice(0, 3) } : null;
+  }],
+];
+async function newsOf(env, req, u) {
+  if (!u || !u.nick || u.banned) return [];
+  const out = [];
+  for (const [kind, f] of NEWS_KINDS) { try { const x = await f(env, req, u); if (x) out.push({ kind, ...x }); } catch (e) {} }
+  return out;
 }
 
 // ---------- картины с сайта и очередь палитр для дней ЭКСТРА ----------
@@ -953,6 +997,11 @@ async function autopilot(env, req) {
   out.push({ ok: true, t: 'Уровень цен', d: `подстраивается сам под заработки птичек: ×${pl.L || 1}` + (pl.active >= 3 ? ` (активная птичка зарабатывает ~${pl.income} 🔘 в день — средняя вещь стоит ~${RULES.priceDays} дня)` : ' (пока мало данных — цены не трогаем)') });
   const avgBal = eco.birds ? Math.round(eco.total / eco.birds) : 0;
   out.push({ ok: true, t: 'Кошельки птичек', d: `в среднем ${avgBal} 🔘 — хватит примерно на ${(pl.avg || unit.avg) ? String(Math.round(avgBal / (pl.avg || unit.avg) * 10) / 10).replace('.', ',') : 0} средней вещи` });
+  const at = adventNow(req, env); // с 15 ноября до конца декабря: сколько окошек адвента заполнено (меньше 31 — жёлтая)
+  if ((at.month === 11 && at.dom >= 15) || at.month === 12) {
+    const filled = (await env.DB.prepare('SELECT COUNT(DISTINCT day) AS n FROM advent_plan').first()).n || 0;
+    out.push({ ok: true, warn: filled < 31, t: 'Адвент', d: `заполнено ${filled} из 31 окошек` + (filled < 31 ? ' — пустые окошки дадут пуговки; положить вещи: кабинет → «Адвент»' : '') });
+  }
   const sn = { autumn: 'осень · Хеллоуин', winter: 'зима · Новый год', spring: 'весна', summer: 'лето' }[seasonNow()];
   out.push({ ok: true, t: 'Сезон зельеварни', d: sn + (RULES.potionSeason === 'auto' ? ' (по календарю)' : ' — выбран вручную') });
   return out;
@@ -1496,7 +1545,7 @@ async function route(req, env, url) {
     const all = (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results;
     // прошедшие окошки открыты для всех (и для гостей): в декабре — дни до сегодняшнего, в январе — все; будущее — секрет (целиком видит только админ)
     const shownTo = t.day ? t.day - 1 : t.month === 1 ? 31 : 0;
-    return json({ year: t.year, month: t.month, today: t.day, claimTo: t.claimTo, catchUp: t.catchUp, lastJan: RULES.adventLastJan, startsAt: t.startsAt, now: t.nowMs, special: ADVENT_SPECIAL, user: u ? { id: u.id, nick: u.nick } : null, opened,
+    return json({ year: t.year, month: t.month, today: t.day, claimTo: t.claimTo, catchUp: t.catchUp, lastJan: RULES.adventLastJan, startsAt: t.startsAt, now: t.nowMs, nextAt: t.nextAt, date: t.date, special: ADVENT_SPECIAL, user: u ? { id: u.id, nick: u.nick } : null, opened,
       past: all.filter(r => r.day <= shownTo), shownTo, plan: admin ? all : undefined }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/advent/open') {
@@ -1708,9 +1757,10 @@ async function route(req, env, url) {
     const u = await currentUser(req, env);
     const earned = u && u.nick && !u.banned ? await award(env, u.id, 'daily', rigaDay(), BTN.daily) : 0; // +3 пуговки за первый заход за сутки (шапка спрашивает на каждой странице)
     // зарплата от «администрации Воббленда»: пуговки уже начислены, а конвертик ещё не открыт (seen = 0)
-    const salary = u && u.nick && !u.banned ? (await env.DB.prepare("SELECT id, amount FROM button_log WHERE user_id = ? AND kind = 'salary' AND seen = 0").bind(u.id).all()).results : [];
-    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), pin: !(await isAdmin(u, env)) && await adminIdentity(u, env) ? 1 : 0, avatar: avatarOf(u), buttons: (u.buttons || 0) + earned, earned, salary, friendBtns: BTN.friend } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
+    const news = await newsOf(env, req, u); // «конвертик»: зарплата, подарки, адвент… (site/assets/news.js)
+    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), pin: !(await isAdmin(u, env)) && await adminIdentity(u, env) ? 1 : 0, avatar: avatarOf(u), buttons: (u.buttons || 0) + earned, earned, news, friendBtns: BTN.friend } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
   }
+  if (m === 'GET' && p === '/api/news') return json({ news: await newsOf(env, req, await currentUser(req, env)) }, 200, { 'cache-control': 'no-store' });
   if (m === 'GET' && p === '/api/config') return json({ ready: true, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
 
   if (m === 'POST' && p === '/api/login') {

@@ -4,7 +4,8 @@
   if (!main) return;
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const api = async (path, body) => {
-    const r = await fetch('/api/' + path, body ? { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) } : { credentials: 'same-origin' });
+    const dev = window.PPDevH ? window.PPDevH() : {}; // ?devdate= на локальном сервере — например, строка «Адвент» в автопилоте с 15 ноября
+    const r = await fetch('/api/' + path, body ? { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json', ...dev }, body: JSON.stringify(body) } : { credentials: 'same-origin', headers: dev });
     const d = await r.json().catch(() => ({}));
     if (!r.ok) { const e = new Error(d.error || r.status); e.code = d.error || r.status; throw e; }
     return d;
@@ -165,10 +166,10 @@
   }
 
   // ---------- обзор ----------
-  // «🤖 Автопилот»: что работает само; зелёное — всё хорошо, красное — нужно внимание
+  // «🤖 Автопилот»: что работает само; зелёное — всё хорошо, жёлтое (warn) — стоит заглянуть, красное — нужно внимание
   const autoCard = list => { const bad = list.filter(x => x.ok === false); return `<section class="adm-box adm-auto${bad.length ? ' warn' : ''}"><h3>🤖 Автопилот: ${bad.length ? `нужно внимание (${bad.length})` : 'всё работает само ✓'}</h3>
     <p class="be-note">${bad.length ? 'Ниже красным — что не так. Остальное по-прежнему работает само.' : 'Магазин пополняется, цены и награды подстраиваются, сезоны меняются — ничего настраивать не нужно.'}</p>
-    <ul>${list.map(x => `<li class="${x.ok === false ? 'bad' : x.ok === null ? 'off' : 'ok'}"><b>${x.ok === false ? '⚠️' : x.ok === null ? '⏸' : '✓'} ${esc(x.t)}</b> — ${esc(x.d)}</li>`).join('')}</ul></section>`; };
+    <ul>${list.map(x => `<li class="${x.ok === false ? 'bad' : x.ok === null ? 'off' : x.warn ? 'warn' : 'ok'}"><b>${x.ok === false ? '⚠️' : x.ok === null ? '⏸' : x.warn ? '🟡' : '✓'} ${esc(x.t)}</b> — ${esc(x.d)}</li>`).join('')}</ul></section>`; };
   async function overview(el = main) {
     el.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('blog/admin/overview'); } catch (e) { el.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
