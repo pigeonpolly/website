@@ -8,14 +8,8 @@
     soon: ['The Sketch Wall opens very soon. Meanwhile, draw today’s theme on the Daily Challenge page!', 'Стена рисунков скоро откроется. А пока нарисуйте тему дня на странице челленджа!', 'Skiču siena drīz atvērsies. Pagaidām uzzīmē dienas tēmu izaicinājuma lapā!'],
     toChallenge: ['To the Daily Challenge', 'К челленджу', 'Uz izaicinājumu'],
     myProfile: ['🐦 My profile', '🐦 Мой профиль', '🐦 Mans profils'],
-    sell: [n => `💰 Sell · ${n} 🔘`, n => `💰 Продать · ${n} 🔘`, n => `💰 Pārdot · ${n} 🔘`], sellTip: ['Sell back to the shop', 'Продать обратно в магазин', 'Pārdot atpakaļ veikalam'],
     sellAsk: [(nm, n) => `Sell “${nm}” back to the shop for ${n} 🔘? It will go back on sale.`, (nm, n) => `Продать «${nm}» обратно в магазин за ${n} 🔘? Вещь снова появится в продаже.`, (nm, n) => `Pārdot “${nm}” atpakaļ veikalam par ${n} 🔘? Lieta atkal būs pārdošanā.`],
     sold: [n => `Sold! +${n} 🔘`, n => `Продано! +${n} 🔘`, n => `Pārdots! +${n} 🔘`],
-    bagShow: ['Show', 'Показать', 'Rādīt'], bagByKind: ['By category', 'По категориям', 'Pa kategorijām'], bagFor: ['For', 'Для кого', 'Kam'], bagWhat: ['What', 'Что', 'Kas'],
-    bagFree: ['🆓 Not in use', '🆓 Не используется', '🆓 Netiek lietots'], bagUsed: ['✓ Worn or in the room', '✓ Надето или в комнате', '✓ Uzvilkts vai istabā'],
-    bagNone: ['Nothing like this in the bag.', 'Таких вещей в сумке нет.', 'Somā tādu lietu nav.'], inRoom: ['in the room ✓', 'в комнате ✓', 'istabā ✓'],
-    bagOnTip: ['Put it on', 'Надеть', 'Uzvilkt'], bagOffTip: ['Take it off', 'Снять', 'Novilkt'], bagRoomTip: ['Place it in the room', 'Поставить в комнату', 'Novietot istabā'],
-    bagAll: ['All', 'Всё', 'Viss'], bagBird: ['🐦 For the bird', '🐦 Для птички', '🐦 Putniņam'], bagRoom: ['🏠 For the room', '🏠 Для комнаты', '🏠 Istabai'],
     toRoom: ['🏠 Put it in my room', '🏠 Поставить в комнату', '🏠 Ielikt istabā'],
     tabBag: ['🎒 Bag', '🎒 Сумка', '🎒 Soma'], tabBadges: ['🏅 Achievements', '🏅 Достижения', '🏅 Sasniegumi'], tabWorks: ['🎨 Sketches', '🎨 Рисунки', '🎨 Skices'], tabBtns: ['🔘 Buttons', '🔘 Пуговки', '🔘 Pogas'], tabShop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'],
     pSign: ['Sign in and get your own pixel bird: a profile, a room, a bag for gifts and a place on the sketch wall.', 'Войдите и получите свою пиксельную птичку: профиль, комнату, сумку для подарков и место на стене рисунков.', 'Ienāc un saņem savu pikseļu putniņu: profilu, istabu, somu dāvanām un vietu skiču sienā.'],
@@ -79,7 +73,6 @@
     btnPick: [n => `Polly’s Choice for your drawing: +${n}`, n => `«Выбор Полли» для вашего рисунка: +${n}`, n => `“Pollijas izvēle” tavam zīmējumam: +${n}`],
     btnBadge: [n => `🔘 +${n} button${n === 1 ? '' : 's'} for this badge`, n => `🔘 +${n} ${pl(n, 'пуговка', 'пуговки', 'пуговок')} за этот бейдж`, n => `🔘 +${n} ${n % 10 === 1 && n % 100 !== 11 ? 'poga' : 'pogas'} par šo nozīmīti`],
     btnForBadges: [n => `+${n} 🔘 buttons for your badges!`, n => `+${n} 🔘 пуговок за достижения!`, n => `+${n} 🔘 pogas par sasniegumiem!`],
-    give: ['🎁 Gift', '🎁 Подарить', '🎁 Uzdāvināt'],
     giveT: ['Gift it to another bird', 'Подарить другой птичке', 'Uzdāvināt citam putniņam'],
     giveText: ['The thing leaves your bag and arrives as an unopened gift. Only things bought in the shop can be gifted, except legendary ones.', 'Вещь уйдёт из вашей сумки и придёт птичке неоткрытым подарком. Дарить можно только купленное в магазине, кроме легендарных вещей.', 'Lieta pazudīs no tavas somas un pienāks putniņam kā neatvērta dāvana. Dāvināt var tikai veikalā pirktās lietas, izņemot leģendārās.'],
     givePh: ['bird’s nickname', 'ник птички', 'putniņa segvārds'],
@@ -102,10 +95,8 @@
     use: ['✨ Use it', '✨ Использовать', '✨ Izmantot'],
     later: ['↩ Back (into the bag)', '↩ Вернуться (в сумку)', '↩ Atpakaļ (somā)'],
     bagTitle: ['Your bag', 'Твоя сумка', 'Tava soma'],
-    bagNote: ['Everything you get stays here forever. Tap a thing to put it on or take it off.', 'Всё, что ты получаешь, остаётся здесь навсегда. Нажми на вещь, чтобы надеть или снять.', 'Viss, ko saņem, paliek šeit uz visiem laikiem. Pieskaries lietai, lai to uzvilktu vai novilktu.'],
     bagEmptyOther: ['The bag is empty for now.', 'Сумка пока пустая.', 'Soma pagaidām ir tukša.'],
     bagEmpty: ['Empty for now. Gifts from Alina will appear here.', 'Пока пусто. Здесь появятся подарки от Алины.', 'Pagaidām tukšs. Šeit parādīsies Alīnas dāvanas.'],
-    wearing: ['on ✓', 'надето ✓', 'uzvilkts ✓'],
     kinds: [{ bg: 'background', shoes: 'shoes', hat: 'hat', anim: 'animation', frame: 'frame', item: 'a treat to hold', scarf: 'scarf', furn: 'furniture & things', deco: 'decorations', wall: 'wallpaper', floor: 'floor', view: 'window view', curtain: 'curtains' }, { bg: 'фон', shoes: 'обувь', hat: 'головной убор', anim: 'анимация', frame: 'рамка', item: 'вкусняшка в клюв', scarf: 'шарфик', furn: 'мебель и вещи', deco: 'украшения', wall: 'обои', floor: 'пол', view: 'вид из окна', curtain: 'шторы' }, { bg: 'fons', shoes: 'apavi', hat: 'galvassega', anim: 'animācija', frame: 'rāmis', item: 'gardums knābī', scarf: 'šalle', furn: 'mēbeles un lietas', deco: 'rotājumi', wall: 'tapetes', floor: 'grīda', view: 'skats pa logu', curtain: 'aizkari' }],
     pageN: [n => `Page ${n}`, n => `Страница ${n}`, n => `Lapa ${n}`],
     aiNote: ['We can’t control or check whether you upload AI-generated pictures instead of your own drawings. We can only say for sure: those who uploaded their own work have improved their drawing skills. You, most likely, have improved your prompting skills… or have you?',
@@ -450,59 +441,45 @@
   }
   function openBag() { const m = modal(''); m.card.classList.add('bag-card'); bagInto(m.card, null, true); }
   function bagInto(box, changed, inModal) {
-    const items = bagItems();
-    const m = { card: box };
-    // фильтры сумки: что показать (всё / не используется / надето или в комнате), для кого, вид вещи
-    const BF = bagInto.f || (bagInto.f = { show: 'all', grp: 'all', kind: '', byKind: false }); // byKind — разложить по видам (по умолчанию — один общий список)
-    const draw = () => {
-      const B = window.PPBirds, isRoom = k => B.isRoomKind && B.isRoomKind(k);
-      const room = me.room || {}, placed = key => (room.items || []).filter(it => it.k + '|' + it.v === key).length;
-      const owned = g => (me.gifts || []).filter(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item).length;
-      // где вещь сейчас: надета на птичку / стоит в комнате (сколько штук из скольких)
-      const used = g => isRoom(g.kind) ? (['wall', 'floor', 'view', 'curtain'].includes(g.kind) ? (room[g.kind] === g.item ? owned(g) : 0) : placed(g.kind + '|' + g.item)) : (me.avatar && me.avatar[g.kind] === g.item ? owned(g) : 0);
-      const all = ['hat', 'item', 'shoes', 'scarf', 'bg', 'frame', 'anim', 'furn', 'deco', 'wall', 'floor', 'view', 'curtain'].filter(k => items.some(g => g.kind === k));
-      const ok = g => (BF.show === 'all' || (BF.show === 'free' ? used(g) < owned(g) : used(g) > 0)) && (BF.grp === 'all' || (BF.grp === 'room') === !!isRoom(g.kind)) && (!BF.kind || BF.kind === g.kind);
-      const pill = (f, v, label) => `<button type="button" data-bf="${f}" data-v="${v}" aria-pressed="${BF[f] === v}">${esc(label)}</button>`;
-      const kindsRow = BF.grp !== 'all' ? `<div class="bag-row"><span>${t('bagWhat')}</span>${pill('kind', '', t('bagAll'))}${all.filter(k => (BF.grp === 'room') === !!isRoom(k)).map(k => pill('kind', k, kindName(k))).join('')}</div>` : '';
-      const bar = items.length ? `<div class="bag-filter" role="toolbar">
-        <div class="bag-row"><span>${t('bagShow')}</span>${pill('show', 'all', t('bagAll'))}${pill('show', 'free', t('bagFree'))}${pill('show', 'used', t('bagUsed'))}<button type="button" class="bag-bykind" data-bk aria-pressed="${!!BF.byKind}">🗂 ${t('bagByKind')}</button></div>
-        <div class="bag-row"><span>${t('bagFor')}</span>${pill('grp', 'all', t('bagAll'))}${pill('grp', 'bird', t('bagBird'))}${pill('grp', 'room', t('bagRoom'))}</div>${kindsRow}</div>` : '';
-      const kinds = all.filter(k => items.some(g => g.kind === k && ok(g)));
-      const cellHtml = g => { const k = g.kind;
-          const leg = B.LEGEND && B.LEGEND.has(g.kind + '|' + g.item), n = owned(g), u = used(g);
-          const sh = (me.gifts || []).find(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item), sellP = me.btn && me.btn.rules ? me.btn.rules.sell : null; // подарить можно любую, кроме легендарных; продать — любую
-          const st = u ? (isRoom(k) ? t('inRoom') + (n > 1 && !['wall', 'floor', 'view', 'curtain'].includes(k) ? ` ${u}/${n}` : '') : t('wearing')) : '';
-          return `<div class="bag-cell"><button type="button" class="bag-item${u ? ' on' : ''}${leg ? ' legend' : ''}" data-k="${k}" data-i="${esc(g.item)}" title="${esc(isRoom(k) ? t('bagRoomTip') : u ? t('bagOffTip') : t('bagOnTip'))}"><span class="bag-ava"></span><span class="bag-name">${leg ? '★ ' : ''}${esc(B.giftName(k, g.item, L))}</span>${st ? `<span class="bag-st">${st}</span>` : ''}${n > 1 ? `<span class="bag-n">×${n}</span>` : ''}</button>${sh && (!leg || sellP != null) ? `<div class="bag-acts">${!leg ? `<button type="button" class="bag-give" data-gid="${sh.id}">${t('give')}</button>` : ''}${sellP != null ? `<button type="button" class="bag-sell" data-sid="${sh.id}" title="${esc(t('sellTip'))}">${t('sell', sellP)}</button>` : ''}</div>` : ''}</div>`; };
-      m.card.innerHTML = `${inModal ? `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3>` : ''}<p class="sw-bv-how">${t('bagNote')}</p>${bar}
-        ${!items.length ? `<p class="bag-empty">${t('bagEmpty')}</p>` : !kinds.length ? `<p class="bag-empty">${t('bagNone')}</p>` : BF.byKind ? kinds.map(k => `<h4>${esc(kindName(k))}</h4><div class="bag-grid">${items.filter(g => g.kind === k && ok(g)).map(cellHtml).join('')}</div>`).join('') : `<div class="bag-grid">${kinds.flatMap(k => items.filter(g => g.kind === k && ok(g))).map(cellHtml).join('')}</div>`}`;
-      m.card.querySelectorAll('[data-bf]').forEach(b => b.onclick = () => { BF[b.dataset.bf] = b.dataset.v; if (b.dataset.bf === 'grp') BF.kind = ''; draw(); });
-      const bk = m.card.querySelector('[data-bk]'); if (bk) bk.onclick = () => { BF.byKind = !BF.byKind; draw(); };
-      m.card.querySelectorAll('.bag-sell').forEach(b => b.onclick = async () => {
-        const g = me.gifts.find(x => x.id === +b.dataset.sid), price = me.btn.rules.sell;
-        if (!g || !confirm(t('sellAsk', window.PPBirds.giftName(g.kind, g.item, L), price))) return;
-        b.disabled = true;
-        try { const r = await post('gift/sell', { id: g.id }); me.gifts = me.gifts.filter(x => x.id !== g.id); if (me.btn) me.btn.buttons = r.buttons; me.avatar = r.avatar;
-          if (window.PPToast) window.PPToast(t('sold', r.got)); if (window.PPBirds.isRoomKind && window.PPBirds.isRoomKind(g.kind)) { location.reload(); return; }
-          draw(); if (changed) changed(); window.PPAccount && window.PPAccount.check(); }
-        catch (e) { b.disabled = false; alert(t('err')); }
-      });
-      m.card.querySelectorAll('.bag-give').forEach(b => b.onclick = () => { const g = me.gifts.find(x => x.id === +b.dataset.gid); m.card.closest('.sw-bv') && m.card.closest('.sw-bv').remove(); giveDialog(g); });
-      m.card.querySelectorAll('.bag-item').forEach(b => {
-        b.querySelector('.bag-ava').appendChild(window.PPBirds.giftPic(b.dataset.k, b.dataset.i, me.id, 76, me.avatar));
-        b.onclick = async () => {
-          if (isRoom(b.dataset.k)) { // вещь для комнаты — открыть обустройство комнаты в профиле
-            const rb = document.getElementById('bp-room'), eb = rb && rb.querySelector('.room-edit');
-            if (eb) { if (!rb.classList.contains('editing')) eb.click(); rb.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
-            else location.href = profileUrl(me.nick);
-            return;
-          }
-          const on = me.avatar && me.avatar[b.dataset.k] === b.dataset.i;
-          try { const r = await post('avatar', { kind: b.dataset.k, item: on ? null : b.dataset.i }); me.avatar = r.avatar; } catch (e) { alert(t('err')); return; }
-          draw(); if (app) renderProfile(); if (changed) changed(); window.PPAccount && window.PPAccount.check();
-        };
-      });
-    };
-    draw();
+    const B = window.PPBirds, C = window.PPCatalog, isRoom = k => B.isRoomKind && B.isRoomKind(k);
+    const items = () => bagItems().map(g => { const n = (me.gifts || []).filter(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item).length;
+      return { kind: g.kind, item: g.item, n, u: C.usage(g.kind, g.item, n, me.avatar, me.room), legend: !!(B.LEGEND && B.LEGEND.has(g.kind + '|' + g.item)), gid: g.id }; });
+    const order = [...C.BIRD_KINDS, ...C.ROOM_KINDS], sortK = list => order.flatMap(k => list.filter(g => g.kind === k));
+    const S = bagInto.f || (bagInto.f = {}); // вкладка, вид, «только неиспользуемые» — до перезагрузки
+    const redraw = () => ui.draw();
+    const ui = C.bag(box, {
+      get items() { return sortK(items()); }, id: me.id, state: S, sell: me.btn && me.btn.rules ? me.btn.rules.sell : null, empty: t('bagEmpty'),
+      top: inModal ? `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>🎒 ${t('bagTitle')}</h3>` : '',
+      onUse: async g => {
+        if (isRoom(g.kind)) { // вещь для комнаты — открыть обустройство комнаты в профиле
+          const rb = document.getElementById('bp-room'), eb = rb && rb.querySelector('.room-edit');
+          if (eb) { if (!rb.classList.contains('editing')) eb.click(); rb.scrollIntoView({ behavior: 'smooth', block: 'center' }); }
+          else location.href = profileUrl(me.nick);
+          return;
+        }
+        const on = me.avatar && me.avatar[g.kind] === g.item;
+        try { const r = await post('avatar', { kind: g.kind, item: on ? null : g.item }); me.avatar = r.avatar; } catch (e) { alert(t('err')); return; }
+        redraw(); if (app) renderProfile(); if (changed) changed(); window.PPAccount && window.PPAccount.check();
+      },
+      onGive: g => { const x = me.gifts.find(y => y.id === g.gid); box.closest('.sw-bv') && box.closest('.sw-bv').remove(); giveDialog(x); },
+      onSell: async g => {
+        const x = me.gifts.find(y => y.id === g.gid), price = me.btn.rules.sell;
+        if (!x || !confirm(t('sellAsk', B.giftName(x.kind, x.item, L), price))) return;
+        try { const r = await post('gift/sell', { id: x.id }); me.gifts = me.gifts.filter(y => y.id !== x.id); if (me.btn) me.btn.buttons = r.buttons; me.avatar = r.avatar;
+          if (window.PPToast) window.PPToast(t('sold', r.got)); if (isRoom(x.kind)) { location.reload(); return; }
+          redraw(); if (changed) changed(); window.PPAccount && window.PPAccount.check(); }
+        catch (e) { alert(t('err')); }
+      },
+      onMore: g => bagMore(g),
+    });
+  }
+  // «Подробнее» из меню «⋯»: вещь крупно, вид, сколько штук и где
+  function bagMore(g) {
+    const B = window.PPBirds, C = window.PPCatalog, room = B.isRoomKind && B.isRoomKind(g.kind);
+    const where = g.u ? (room ? ['In the room', 'В комнате', 'Istabā'] : ['Worn', 'Надето', 'Uzvilkts'])[L] + (g.n > 1 ? ` · ${g.u}/${g.n}` : '') : ['Not used yet', 'Пока не используется', 'Vēl netiek izmantots'][L];
+    const m = modal(`<h3>${g.legend ? '★ ' : ''}${esc(B.giftName(g.kind, g.item, L))}</h3><div class="bag-more-pic"></div>
+      <p class="bag-more-kind">${esc(C.kindLabel(g.kind))}</p><p class="sw-bv-how">${esc(where)}${g.n > 1 ? ` · ×${g.n}` : ''}${g.legend ? ' · ' + ['legendary', 'легендарная', 'leģendāra'][L] : ''}</p>`);
+    m.card.querySelector('.bag-more-pic').appendChild(room ? B.itemIcon(g.kind, g.item, 140) : B.avatar(me.id, Object.assign({}, me.avatar, { [g.kind]: g.item }), 140));
   }
 
   const badgeReward = x => { const R = me && me.btn && me.btn.rules; if (!R) return 0; return x.d ? (R.levels || {})[x.d] || 0 : x.k === 'pick' ? R.pick || 0 : (R.badges || {})[x.k] || 0; };
@@ -697,6 +674,7 @@
     const panel = page.querySelector('.bp-panel');
     const show = k => {
       page.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === k)));
+      panel.classList.remove('cat-bag');
       if (k === 'bag') {
         if (mine) return bagInto(panel, () => renderPage());
         panel.innerHTML = `<div class="sw-pv-bag">${'<span class="sw-pv-item sw-pv-wrap" title="🎁">🎁</span>'.repeat(Math.min(pr.unopened || 0, 12))}</div>${!(pr.bag || []).length && !pr.unopened ? `<p class="sw-pv-empty">${t('bagEmptyOther')}</p>` : ''}`;

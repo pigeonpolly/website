@@ -115,4 +115,5 @@ _Сюда следующие этапы дописывают общие свед
 
 - Новости птички: `NEWS_KINDS` (worker) → `news` в /api/whoami, /api/news; news.js `KINDS`. Новый вид — по записи там и тут.
 - Тема дня челленджа: всегда `ChallengeTheme.themeFor(d, L)` (план месяца из D1, `theme.loading`, событие `pp:chplan`); подбор и план — worker/challenge-plan.js + challenge-days.js.
+- catalog-ui.js `PPCatalog`: плитка вещи `tile`, `tabs`, `chips`, `toggle`, `grid`, картинка `pic`, режим «сумка» `bag`, `usage` (где вещь), `kindLabel` — для сумки, потом магазина и карточек. Подключён на /bird/ и /challenge/ перед sketch-wall.js.
 - account.js: `PPDevH()` — заголовок x-dev-date для ?devdate=; `PPWho` + событие `pp:whoami`. worker: `rigaMs()` — время по Риге → мс.
