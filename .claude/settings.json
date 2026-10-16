@@ -1,0 +1,18 @@
+{
+  "permissions": {
+    "deny": [
+      "Read(./docs/_claude-old.md)",
+      "Read(./site/**/*.html)",
+      "Read(./site/assets/catalog.json)",
+      "Read(./site/assets/search-*.json)",
+      "Read(./site/assets/day-colors.json)",
+      "Read(./site/assets/rooms-data.js)",
+      "Read(./site/assets/wobbleland-data.*.js)",
+      "Read(./site/assets/extra-palettes.*)",
+      "Read(./site/assets/challenge-data.js)",
+      "Read(./content/i18n/*.json)",
+      "Read(./content/wobbleland.json)",
+      "Read(./content/palettes.json)"
+    ]
+  }
+}
