@@ -214,9 +214,11 @@
       var h2 = document.createElement('h2'); h2.className = 'shop-block-h'; h2.textContent = bl[1]; sec.appendChild(h2);
       var n = 0, flat = [];
       B.GIFT_KINDS.forEach(function (k) {
-        if (grpOf(k[0]) !== F.grp) return;
+        var sur = F.grp === 'any'; // «Сюрпризы»: «🎲 Сюрприз» каждой категории + категория any
+        if (!sur && grpOf(k[0]) !== F.grp) return;
         if (F.kind && F.kind !== k[0]) return;
         var list = (bl[0] === 'mine' ? B.GIFTS[k[0]] || [] : B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).filter(function (v) {
+          if (sur && k[0] !== 'any' && v !== '?') return false;
           if (theme && theme[2].indexOf(key(k[0], v)) < 0) return false;
           if (q && B.giftName(k[0], v, L).toLowerCase().indexOf(q) < 0 && k[1][L].toLowerCase().indexOf(q) < 0) return false;
           var cp = (shop[key(k[0], v)] || {}).price; if (F.price && (cp == null || cp < pr[2] || cp >= pr[3])) return false;
@@ -224,14 +226,14 @@
           return bl[0] === 'mine' ? owned[key(k[0], v)] > 0 : stock(k[0], v) === (bl[0] === 'on');
         });
         if (!list.length) return;
-        if (F.sort !== 'kind') { list.forEach(function (v) { flat.push([k, v]); }); return; } // общий список — отсортируем ниже
+        if (F.sort !== 'kind' || sur) { list.forEach(function (v) { flat.push([k, v]); }); return; } // общий список — отсортируем ниже
         var h = document.createElement('h3'); h.textContent = k[1][L]; sec.appendChild(h);
         var g = document.createElement('div'); g.className = 'fl-coll-grid'; sec.appendChild(g);
         list.forEach(function (v) { n++; g.appendChild(item(k, v, id, money)); });
       });
-      if (F.sort !== 'kind' && flat.length) {
+      if (flat.length) {
         var pc = function (x) { return (shop[key(x[0][0], x[1])] || {}).price || 0; }, ad = function (x) { return (shop[key(x[0][0], x[1])] || {}).added || 0; };
-        flat.sort(F.sort === 'cheap' ? function (a, b) { return pc(a) - pc(b); } : F.sort === 'dear' ? function (a, b) { return pc(b) - pc(a); }
+        if (F.sort !== 'kind') flat.sort(F.sort === 'cheap' ? function (a, b) { return pc(a) - pc(b); } : F.sort === 'dear' ? function (a, b) { return pc(b) - pc(a); }
           : function (a, b) { return ad(b) - ad(a) || order[key(b[0][0], b[1])] - order[key(a[0][0], a[1])]; }); // новые: недавно пополненные, потом — добавленные в каталог позже
         var g2 = document.createElement('div'); g2.className = 'fl-coll-grid'; sec.appendChild(g2);
         flat.forEach(function (x) { n++; g2.appendChild(item(x[0], x[1], id, money)); });
