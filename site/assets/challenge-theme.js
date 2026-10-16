@@ -1,5 +1,7 @@
 // Тема дня для Daily Challenge: одинаковая у всех в один день. Нужен challenge-data.js.
-// Используется на странице /challenge и в блоке «Тема дня» на главной.
+// Используется на странице /challenge, в блоке «Тема дня» на главной и на стене.
+// С октября 2026 тема — из плана месяца (GET /api/challenge/month, кабинет «🎨 Темы челленджа»; ответ хранится в localStorage).
+// Плана ещё нет: до 1.11.2026 — формула ниже, с 1.11 — «тема загружается…» (theme.loading). Пришёл новый план — событие 'pp:chplan' на document.
 (() => {
   const D = window.CHALLENGE_DATA;
   if (!D) return;
@@ -102,17 +104,17 @@
     return o.slice(0, 3);
   }
   const balancedColors = n => colorBlock(Math.floor(n / 8))[n % 8];
-  function themeFor(d, L) {
+  function themeFor(d, L, light) { // light — только ЭКСТРА, именины, палитра и Ч/Б-условие (предмет и цвета — из плана)
     const r = rngFor('polly-' + keyOf(d));
     // до 5 октября 2026 — старая формула (первые 98 тем), дальше все темы по кругу без повторов
     const legacy = Math.floor(r() * 98);
     const n = Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 9, 5)) / 864e5);
     const bday = d.getMonth() === 0 && d.getDate() === 23;
-    const subject = n < 0 ? D.subjects[legacy] : bday ? D.subjects[birthdayIdx(d.getFullYear())] : D.subjects[planFor(n)];
+    const subject = light ? ['', '', ''] : n < 0 ? D.subjects[legacy] : bday ? D.subjects[birthdayIdx(d.getFullYear())] : D.subjects[planFor(n)];
     const cols = D.colors.slice();
     for (let i = cols.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [cols[i], cols[j]] = [cols[j], cols[i]]; }
     const n2 = Math.round((Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) - Date.UTC(2026, 9, 9)) / 864e5);
-    if (n2 >= 0) { const pick = balancedColors(n2); cols.splice(0, 3, ...pick.map(i => D.colors[i])); }
+    if (n2 >= 0 && !light) { const pick = balancedColors(n2); cols.splice(0, 3, ...pick.map(i => D.colors[i])); }
     const time = D.times[Math.floor(r() * D.times.length)];
     const day = Math.floor(Date.UTC(d.getFullYear(), d.getMonth(), d.getDate()) / 864e5);
     // раз в месяц — день ЭКСТРА (свой случайный день для каждого месяца)
@@ -129,6 +131,34 @@
     }
     return { subject: subject[L], colors, pal, twist, extraBw, time, extra, bday, tip: D.tips[day % D.tips.length][L] };
   }
+  // ---------- план месяца с сервера ----------
+  const PLAN_FIRST = '2026-10', PLAN_FROM = '2026-11-01';
+  const LOADING = ['the theme is loading…', 'тема загружается…', 'tēma ielādējas…'];
+  const plans = {}, asked = {};
+  function planOf(ym) {
+    if (!(ym in plans)) { let v = null; try { v = JSON.parse(localStorage.getItem('ch-plan-' + ym) || 'null'); } catch (e) { /* без памяти */ } plans[ym] = v && v.days ? v : null; }
+    if (!asked[ym] && typeof fetch === 'function' && typeof location !== 'undefined' && /^https?:/.test(location.protocol)) {
+      asked[ym] = 1;
+      fetch('/api/challenge/month?m=' + ym).then(r => r.ok ? r.json() : null).then(j => {
+        if (!j || !Array.isArray(j.days)) return;
+        const v = { days: Object.fromEntries(j.days.map(r => [r.day, r])) }, str = JSON.stringify(v);
+        if (plans[ym] && JSON.stringify(plans[ym]) === str) return;
+        plans[ym] = v; try { localStorage.setItem('ch-plan-' + ym, str); } catch (e) { /* без памяти */ }
+        document.dispatchEvent(new CustomEvent('pp:chplan', { detail: ym }));
+      }).catch(() => {});
+    }
+    return plans[ym];
+  }
+  function themeOf(d, L) {
+    const key = keyOf(d), ym = key.slice(0, 7);
+    if (ym < PLAN_FIRST) return themeFor(d, L);
+    const plan = planOf(ym), row = plan && plan.days[key];
+    if (!row && key < PLAN_FROM) return themeFor(d, L);
+    const old = themeFor(d, L, true); // день ЭКСТРА, именины, палитра — по формуле, как у сервера
+    if (!row) return { ...old, loading: true, subject: LOADING[L], colors: [], twist: '', extraBw: '', tip: '', time: 10 };
+    return { ...old, subject: row.subject[L] || row.subject[0], tip: row.tip[L] || row.tip[0], twist: row.twist[L] || row.twist[0], time: row.time,
+      extraBw: row.extra ? row.extra[L] || row.extra[0] : old.extraBw, colors: old.pal ? old.colors : row.colors.map(i => D.colors[i]).filter(Boolean) };
+  }
   const isExtra = d => d.getDate() === extraDay(d.getFullYear(), d.getMonth());
-  window.ChallengeTheme = { themeFor, keyOf, rngFor, extraDay, isExtra };
+  window.ChallengeTheme = { themeFor: themeOf, formulaFor: themeFor, keyOf, rngFor, extraDay, isExtra };
 })();

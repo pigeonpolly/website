@@ -384,6 +384,8 @@
   });
 
   renderToday(); renderDiary();
+  // пришёл план месяца с сервера (challenge-theme.js) — перерисовать листок и календарь
+  document.addEventListener('pp:chplan', () => { theme = themeFor(sel); renderCal(false); renderDiary(); if (!running) resetTimer(); });
   // таймер свёрнут в кнопку «⏱ 10:00 Таймер»: время на кнопке повторяет большие часы, во время рисования кнопка подсвечена
   const tclock = document.getElementById('ch-tclock'), clockEl = $('#ch-clock'), tbox = document.getElementById('ch-timer-box');
   if (tclock && clockEl) {

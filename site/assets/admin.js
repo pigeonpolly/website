@@ -27,6 +27,7 @@
     { id: 'blog', ic: '✍️', name: 'Блог', group: 'pub', href: '/blog-editor/', count: 'scheduled' },
     { id: 'requests', ic: '🖍', name: 'Нарисуй мне', group: 'pub', href: '/ru/requests/', count: 'requests' },
     { id: 'art', ic: '🎨', name: 'Картины и палитры', group: 'pub', about: 'Картины, добавленные с сайта, скрытые картины и очередь палитр дня ЭКСТРА.' },
+    { id: 'themes', ic: '🎨', name: 'Темы челленджа', group: 'pub', about: 'Темы челленджа на этот и следующий месяц: поправить предмет, совет, цвета, время; поменять дни местами.' },
     { id: 'edits', ic: '🧩', name: 'Правки страниц', group: 'pub', about: 'Блоки, которые вы поменяли или скрыли прямо на сайте («✏️ Править страницу»), — здесь их можно вернуть как было.', count: 'edits' },
     { id: 'birds', ic: '🐦', name: 'Все птицы', group: 'birds', about: 'Все птички стаи: когда пришли, сколько нарисовали, пуговки, подарки.' },
     { id: 'gifts', ic: '🎁', name: 'Подарки и зарплата', group: 'birds', open: 'birds', focus: '#adm-giftall', about: 'Подарить вещь одной птичке или всем, выдать зарплату пуговками.' },
@@ -47,6 +48,7 @@
     { id: 'security', ic: '🔐', name: 'Защита', group: 'service', about: 'PIN админа и код восстановления на случай, если потеряете Google.' },
   ];
   const SECTIONS = { inbox, security, overview: inbox, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art, challenge: () => statsView('challenge'), flock: () => statsView('flock'),
+    themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
     cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
     carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
   const secOf = id => ADMIN_SECTIONS.find(x => x.id === id);
@@ -483,6 +485,13 @@
         row('Лабиринт не засчитывается, если пройден быстрее', num('potionMinSec', R.potionMinSec, D.potionMinSec) + ' с', D.potionMinSec + ' с', 'защита от подделки (если быстрее — игра чуть подождёт)'),
       ], '<a href="/ru/potions/">Открыть игру →</a>')}
       ${box('🎄 Адвент', advRows)}
+      ${box('🎨 Темы челленджа — подбор плана месяца', [
+        row('Одна семья предметов (яблоко, корзина яблок…) — не ближе', num('chFamilyGap', R.chFamilyGap, D.chFamilyGap) + ' дн.', D.chFamilyGap + ' дн.', 'и никогда дважды в одном месяце'),
+        row('В любые … дней подряд', num('chCatWindow', R.chCatWindow, D.chCatWindow) + ' дн.', D.chCatWindow + ' дн.', 'одна категория (еда, дом, птица…) — никогда два дня подряд'),
+        row('… не меньше разных категорий', num('chCatMin', R.chCatMin, D.chCatMin) + ' шт.', D.chCatMin + ' шт.'),
+        row('Колода сложности: простых · средних · сложных', num('chEasy', R.chEasy, D.chEasy, 1, 50) + ' · ' + num('chMid', R.chMid, D.chMid, 1, 50) + ' · ' + num('chHard', R.chHard, D.chHard, 1, 50), `${D.chEasy} · ${D.chMid} · ${D.chHard}`, 'на каждые (сумма) дней подряд; сложный — сцена, место, персонаж в действии'),
+        row('Дней с предметами сезона', num('chSeasonPct', R.chSeasonPct, D.chSeasonPct) + ' %', D.chSeasonPct + ' %', '66 % — ровно 2/3 дней месяца'),
+      ], 'Действует на месяцы, которые ещё не созданы (следующий создаётся 20-го). Уже созданный месяц правится в ✍️ Публиковать → 🎨 Темы челленджа.')}
       <section class="adm-box adm-rules"><h3>🤖 ИИ-работы</h3>${chk('aiStreak', 'Работа с пометкой 🤖 засчитывается в серию', '(выключить — такие дни не продлевают серию)')}<br>${chk('aiUpload', 'За работу с пометкой 🤖 дают пуговки за загрузку')}</section>
       </details><section class="adm-box adm-rules" id="adm-rules-all"></section>
       <section class="adm-danger"><h3>⚠️ Осторожно</h3><button type="button" class="pill-btn be-danger" id="adm-r-reset">↺ Вернуть все правила по умолчанию</button><p class="be-note">Все числа в тонкой настройке станут такими, как были сначала.</p></section>`;
@@ -493,6 +502,7 @@
       <h4>Челлендж</h4><ul>
         <li>Каждый день — тема дня. Рисунок можно загрузить за сегодня, вчера и позавчера (одна работа на день; новая заменяет старую).</li>
         <li>Раз в месяц — день ЭКСТРА (день свободы: своя тема или свой референс). Если в этот день ничего не загружено, серия не прерывается.</li>
+        <li>Темы на месяц подбираются сами (20-го — на следующий месяц): одна семья предметов — не ближе ${R.chFamilyGap} дней и никогда дважды в месяце; одна категория — не два дня подряд, в любые ${R.chCatWindow} дней — не меньше ${R.chCatMin} разных; сложность «колодой»: ${R.chEasy} простых, ${R.chMid} средних, ${R.chHard} сложный на ${R.chEasy + R.chMid + R.chHard} дней; ${R.chSeasonPct} % дней — предметы сезона. Любой день можно поправить в «🎨 Темы челленджа».</li>
         <li>Серия — сколько дней подряд есть рисунки; рекорд серии даёт уровни. ${R.aiStreak ? 'Работы с пометкой 🤖 тоже засчитываются в серию.' : 'Работы с пометкой 🤖 в серию <b>не</b> засчитываются.'}</li>
         <li>Галочка «Ч/Б» — рисунок в чёрно-белом режиме (бейджи «Нарисовал(а) в Ч/Б» и «Мастер туши»).</li>
         <li>Галочка 🤖 «ИИ-генерация» ставит значок робота на работе. Админ тоже может пометить работу 🤖 (голова робота в углу работы). На стене каждый выбирает: все работы, работы людей или работы роботов.</li>

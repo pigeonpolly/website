@@ -1,7 +1,9 @@
 #!/usr/bin/env python3
 """Снимки элемента страницы на нескольких ширинах (Playwright, Chromium из /opt/pw-browsers).
 
-  tools/shots.py URL селектор [--w 390,1440] [--login dev:ник] [--check] [--base http://localhost:8787]
+  tools/shots.py URL селектор [--w 390,1440] [--login dev:ник] [--check] [--base http://localhost:8787] [--offline]
+
+--offline — не ходить на внешние адреса (шрифты, Google): в песочнице без сети страница иначе не дожидается загрузки.
 
 URL — полный адрес или путь от --base (по умолчанию $SHOTS_BASE или http://localhost:8787, wrangler dev).
 Текстом печатает: ошибки консоли и страницы, горизонтальную прокрутку, элементы, вылезающие за край
@@ -55,6 +57,7 @@ def main():
     ap.add_argument('--login')
     ap.add_argument('--check', action='store_true')
     ap.add_argument('--base', default=os.environ.get('SHOTS_BASE', 'http://localhost:8787'))
+    ap.add_argument('--offline', action='store_true')
     a = ap.parse_args()
     url = a.url if re.match(r'https?://', a.url) else a.base.rstrip('/') + '/' + a.url.lstrip('/')
     widths = [int(x) for x in a.w.split(',') if x.strip()]
@@ -70,18 +73,28 @@ def main():
             ctx = br.new_context(viewport={'width': w, 'height': 900}, device_scale_factor=1)
             page = ctx.new_page()
             errs = []
+            if a.offline:
+                host = re.match(r'https?://[^/]+', url).group(0)
+                ctx.route(lambda u: not u.startswith(host), lambda r: r.abort())
             page.on('console', lambda m: m.type == 'error' and not m.text.startswith('Failed to load resource')
                     and errs.append('console: ' + m.text[:200]))
             page.on('response', lambda r: r.status >= 400 and errs.append(f'HTTP {r.status}: {r.url[:120]}'))
             page.on('pageerror', lambda e: errs.append('pageerror: ' + str(e)[:200]))
-            page.on('requestfailed', lambda r: errs.append(f'request failed: {r.url[:120]} {r.failure}'))
+            page.on('requestfailed', lambda r: (not a.offline or r.url.startswith(host)) and errs.append(f'request failed: {r.url[:120]} {r.failure}'))
             if a.login:
                 page.goto(url, wait_until='domcontentloaded')
                 st = page.evaluate("""c => fetch('/api/login', {method: 'POST', credentials: 'include',
                     headers: {'content-type': 'application/json'}, body: JSON.stringify({credential: c})}).then(r => r.status)""", a.login)
                 if st != 200:
                     errs.append(f'login {a.login}: HTTP {st}')
-            page.goto(url, wait_until='networkidle')
+                errs.clear() if st == 200 else None  # 401 до входа — не ошибки
+                page.reload(wait_until='load')  # goto на тот же адрес с #… страницу не перезагрузит
+            else:
+                page.goto(url, wait_until='load')
+            try:
+                page.wait_for_load_state('networkidle', timeout=6000)
+            except Exception:
+                pass  # страница что-то опрашивает постоянно — снимаем как есть
             page.wait_for_timeout(500)
             info = page.evaluate(PROBE, a.selector)
             print(f'— {w}px {url} {a.selector}')

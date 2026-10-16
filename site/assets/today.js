@@ -9,14 +9,18 @@
     bday: ['🎂 My birthday!', '🎂 Мой день рождения!', '🎂 Mana dzimšanas diena!'],
   };
   const t = k => T[k][L], q = s => box.querySelector(s);
-  const now = new Date(), th = CT.themeFor(now, L);
+  const now = new Date();
   let bw = false; try { bw = localStorage.getItem('ch-bw') === '1'; } catch (e) { /* без памяти */ }
 
-  // листок с темой
-  q('.td-date').textContent = now.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
-  q('.td-subj').textContent = th.subject;
-  q('.td-cols').innerHTML = bw ? `✒ ${th.twist}` : th.colors.map(c => `<i style="background:${c.hex}" title="${c.n[L]}"></i>`).join('');
-  q('.td-meta').textContent = `${th.time + 5} ${t('min')}` + (th.bday ? ` · ${t('bday')}` : th.extra ? ` · ${t('extra')}` : '');
+  // листок с темой (план месяца пришёл с сервера позже — перерисовать)
+  function fill() {
+    const th = CT.themeFor(now, L);
+    q('.td-date').textContent = now.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
+    q('.td-subj').textContent = th.subject;
+    q('.td-cols').innerHTML = bw ? `✒ ${th.twist}` : th.colors.map(c => `<i style="background:${c.hex}" title="${c.n[L]}"></i>`).join('');
+    q('.td-meta').textContent = th.loading ? '' : `${th.time + 5} ${t('min')}` + (th.bday ? ` · ${t('bday')}` : th.extra ? ` · ${t('extra')}` : '');
+  }
+  fill(); document.addEventListener('pp:chplan', fill);
   if (bw) box.classList.add('bw');
 
   // пиксельная Полли

@@ -530,6 +530,11 @@
   const pre = L === 1 ? '/ru' : L === 2 ? '/lv' : '';
   const profileUrl = nick => `${pre}/bird/?nick=${encodeURIComponent(nick)}`;
   // челлендж: компактная карточка — птичка, серия, загрузка; всё остальное (сумка, бейджи, пуговки) — на странице профиля
+  // пришёл план месяца (challenge-theme.js) — обновить тему над загрузкой
+  document.addEventListener('pp:chplan', () => {
+    const h = app && app.querySelector('#sw-up h2'); if (!h || !me || !window.ChallengeTheme) return;
+    h.textContent = window.ChallengeTheme.themeFor(dayAgo(upOff), L).subject;
+  });
   function renderProfile(prev) {
     const lv = levelOf(me.best), next = LEVELS.find(l => l.d > me.best);
     const upDate = dayAgo(upOff), upKey = keyOfD(upDate);
@@ -606,7 +611,8 @@
       fd.append('day', upKey);
       // время суток — только для сегодняшней работы (для бейджа «Как по часам»)
       if (upKey === todayKey()) { const nowD = new Date(); fd.append('tod', String(nowD.getHours() * 60 + nowD.getMinutes())); }
-      fd.append('theme', th ? window.ChallengeTheme.themeFor(upDate, 0).subject : '');
+      const th0 = th ? window.ChallengeTheme.themeFor(upDate, 0) : null; // план ещё не пришёл — тему не пишем
+      fd.append('theme', th0 && !th0.loading ? th0.subject : '');
       let bw = false; try { bw = localStorage.getItem('ch-bw') === '1'; } catch (err) { /* без памяти */ }
       fd.append('bw', bw ? '1' : '0');
       fd.append('ai', form.ai && form.ai.checked ? '1' : '0'); // пометка 🤖 «ИИ-генерация»

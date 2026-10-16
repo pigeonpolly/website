@@ -3805,6 +3805,41 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .adm-card-dlg .pill-btn[aria-pressed="true"] { background: #E9A93B; border-color: #E9A93B; color: #2B1A51; }
 @media (max-width: 640px) { .adm-card-ed { grid-template-columns: 1fr; } .adm-card-pv { max-width: 220px; margin: 0 auto; } }
 
+/* кабинет → 🎨 Темы челленджа (challenge-admin.js) */
+.chadm .ch-level { background: #F1ECF7; }
+.chadm .ch-level button { color: #6B6290; }
+.chadm .ch-level button[aria-pressed="true"] { background: #2B1A51; color: #fff; }
+.chadm-bar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; margin-bottom: 14px; }
+.chadm-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
+.chadm-dow { font: 700 12px var(--sans); color: #6B6290; text-align: center; text-transform: uppercase; }
+.chadm-day { display: flex; flex-direction: column; gap: 4px; min-height: 96px; padding: 7px; border: 1px solid #E2DCEE; border-radius: 12px; background: #FFFDF8; color: #2B1A51; font: 13px/1.25 var(--sans); text-align: left; cursor: pointer; overflow: hidden; }
+.chadm-day:hover { border-color: #2B1A51; }
+.chadm-day.past { background: #F6F3FA; }
+.chadm-day.today { box-shadow: 0 0 0 2px #E9A93B; }
+.chadm-day.edited { border-color: #9A7BD0; }
+.chadm-day.extra { background: #FFF4DE; }
+.chadm-day.warn { border-color: #D85A30; border-style: dashed; }
+.chadm-n { font: 700 13px var(--sans); }
+.chadm-s { flex: 1; overflow-wrap: break-word; hyphens: auto; }
+.chadm-c { display: flex; flex-wrap: wrap; gap: 3px; font-size: 11px; color: #6B6290; }
+.chadm-c i, .chadm-pal i { width: 14px; height: 14px; border-radius: 50%; display: inline-block; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15); }
+.chadm-w { font: 700 11px var(--sans); color: #C0582F; }
+.chadm-dlg .chadm-f { border: 1px solid #E2DCEE; border-radius: 12px; padding: 8px 12px 12px; margin: 0; display: grid; gap: 6px; }
+.chadm-dlg .chadm-f legend { font: 700 14px var(--sans); padding: 0 4px; }
+.chadm-dlg .chadm-f label { display: grid; grid-template-columns: 28px 1fr; align-items: center; gap: 8px; font: 600 12px var(--sans); color: #6B6290; }
+.chadm-dlg textarea { font: 15px var(--sans); background: #fff; }
+.chadm-acts { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin: 0; }
+.chadm-acts select { font: 14px var(--sans); padding: 6px 10px; border-radius: 999px; border: 1px solid #CFC6E0; background: #fff; color: #2B1A51; max-width: 100%; }
+.chadm-cols { display: flex; flex-wrap: wrap; gap: 6px; }
+.chadm-cols button { display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px 5px 6px; border: 1px solid #CFC6E0; border-radius: 999px; background: #fff; color: #2B1A51; font: 13px var(--sans); cursor: pointer; }
+.chadm-cols button i { width: 18px; height: 18px; border-radius: 50%; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15); }
+.chadm-cols button[aria-pressed="true"] { border-color: #2B1A51; box-shadow: 0 0 0 2px #2B1A51; font-weight: 700; }
+.chadm-time { display: flex !important; flex-wrap: wrap; align-items: center; gap: 8px; }
+.chadm-time select { font: 15px var(--sans); padding: 6px 10px; border-radius: 10px; border: 1px solid #CFC7E2; background: #fff; color: #2B1A51; }
+.chadm-pal { display: grid; gap: 6px; font: 14px var(--sans); } .chadm-pal span { display: flex; gap: 4px; }
+.chadm-warn { color: #B4441E; font-weight: 700; }
+@media (max-width: 640px) { .chadm-grid { gap: 3px; } .chadm-day { min-height: 70px; padding: 4px 3px; font-size: 10px; line-height: 1.15; } .chadm-c i { width: 9px; height: 9px; } .chadm-w { font-size: 9px; } }
+
 /* ---------- «Конвертик»: новости птички (news.js) ---------- */
 .bell { order: 2; flex: none; position: relative; width: 40px; height: 40px; display: grid; place-items: center; padding: 0; border: 1.5px solid var(--muted); border-radius: 50%; background: none; color: #F3EFFA; cursor: pointer; }
 .bell[hidden] { display: none; }
