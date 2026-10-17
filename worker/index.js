@@ -10,6 +10,7 @@ const PPCanDo = globalThis.PPCanDo;
 import { cardsApi, importCards, translateMissing, myCards, tradeNews, CARD_TABLES } from './cards.js'; // коллекционные карточки (docs/cards.md)
 import { authApi, googleLink, funnelStep, mailOn, adventMail, adventAsk, AUTH_TABLES, AUTH_ALTER } from './auth.js'; // вход с паролем, письма, воронки (этап 12)
 import { flockApi, featherNews, FLOCK_TABLES, FLOCK_ALTER } from './flock.js'; // «Все птички» и пёрышки (этап 13 Б+В, docs/flock.md)
+import { flockNewsApi, flockEvent as flockEventDb, roomEvent, flockNewsCron, FLOCK_NEWS_TABLES, FLOCK_NEWS_ALTER } from './flock-news.js'; // новости стаи (этап 13 Г, docs/flock.md)
 import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
@@ -57,6 +58,7 @@ export default {
       await importTitos(env, new URL('https://www.pigeonpolly.com/')).catch(e => console.error('titos', e)); // дела Титоса: новый titos-cases.json — в D1 и перевести (один раз на хэш)
       await challengeCron(env, RULES).catch(e => console.error('challenge plan', e)); // темы челленджа: с 20-го — план следующего месяца
       await adventMail(env, authHelpers(env)).catch(e => console.error('advent mail', e)); // 1 декабря: письмо «адвент открылся» тем, кто отметил галочку
+      await flockNewsCron(env).catch(e => console.error('flock news', e)); // новости стаи — 30 дней
       await migrateToR2(env); await cleanupInactive(env);
       await env.DB.prepare('DELETE FROM game_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {}); // старые забеги игр (started — в мс)
       await env.DB.prepare('DELETE FROM maze_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {});
@@ -332,11 +334,12 @@ async function avgItemPrice(env) {
   return ps.length ? ps.reduce((a, b) => a + b, 0) / ps.length : PLEVEL.avg || (await gameUnit(env)).avg || 50;
 }
 async function setRules(env, patch) { const r = cleanRules({ ...RULES, ...patch }); await setMeta(env, 'rules', JSON.stringify(r)); rulesAt = 0; await loadRules(env); return RULES; }
-// события стаи (кто что купил, обменял, нашёл): пока пустая — лента появится на следующих этапах
-async function flockEvent(kind, bird, data) { /* kind: 'card' — купил карточку, 'titos' — раскрыл дело №10, 20, 30…, 'titosreward' — награда Титоса за уровень 30/50/90/100; bird — птичка (users), data — подробности */ }
-const cardHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, rules: () => RULES, avgItemPrice: () => avgItemPrice(env), setRules: patch => setRules(env, patch), flockEvent });
+// новости стаи (worker/flock-news.js): kind — new, drawing, room, badge, card, legend, titos, pick, feathers; bird — птичка (users), data — подробности; другие виды не пишутся
+const flockEvent = env => (kind, bird, data) => flockEventDb(env, kind, bird, data);
+const cardHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, rules: () => RULES, avgItemPrice: () => avgItemPrice(env), setRules: patch => setRules(env, patch), flockEvent: flockEvent(env) });
 const titosHelpers = env => ({ ...cardHelpers(env), unit: () => gameUnit(env), btnOf, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), stamp: (uid, task) => stamp(env, uid, task) });
-const flockHelpers = env => ({ json, fail, currentUser, needUser, rigaDay, flockEvent, streakOf: rows => streaks(streakDays(rows)).current });
+const flockHelpers = env => ({ json, fail, currentUser, needUser, rigaDay, flockEvent: flockEvent(env), streakOf: rows => streaks(streakDays(rows)).current });
+const newsHelpers = env => ({ json, fail, needUser, isAdmin, rigaMs, getMeta: k => getMeta(env, k) });
 const authHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, sessionCookie, sessionDays: SESSION_DAYS, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), bump: (k, sql) => bump(env, k, sql) });
 const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), awardComment: (uid, cid) => awardComment(env, uid, cid) });
 
@@ -397,6 +400,7 @@ async function ensureSchema(env) {
     ...CHALLENGE_TABLES.map(sql => env.DB.prepare(sql)), // план тем челленджа: challenge_days (worker/challenge-days.js)
     ...CARD_TABLES.map(sql => env.DB.prepare(sql)), // карточки: cards, card_sets, card_owner (worker/cards.js)
     ...TITOS_TABLES.map(sql => env.DB.prepare(sql)), // детектив Титос: titos, titos_cases (worker/titos.js)
+    ...FLOCK_NEWS_TABLES.map(sql => env.DB.prepare(sql)), // новости стаи: flock_events (worker/flock-news.js)
     ...FLOCK_TABLES.map(sql => env.DB.prepare(sql)), // пёрышки и гости комнат: room_guests, feathers (worker/flock.js)
     ...AUTH_TABLES.map(sql => env.DB.prepare(sql)), // вход с паролем: login_fail, pw_reset, funnel (worker/auth.js)
   ]);
@@ -408,7 +412,7 @@ async function ensureSchema(env) {
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER,
-    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER]) {
+    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER]) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   // «Выбор Полли» подешевел с 50 до 11 пуговок: уже начисленные записи пересчитать один раз, баланс = сумма журнала
@@ -1280,6 +1284,7 @@ async function addBadge(env, uid, badge) {
 async function route(req, env, url) {
   const p = url.pathname, m = req.method;
   if (p.startsWith('/api/pw/') || p === '/api/funnel' || p === '/api/admin/pw-reset' || p === '/api/admin/funnels') { const r = await authApi(req, env, url, authHelpers(env)); if (r) return r; }
+  if (p === '/api/flock/news' || p === '/api/news-off' || p === '/api/admin/flock-notes') { const r = await flockNewsApi(req, env, url, newsHelpers(env)); if (r) return r; }
   if (p === '/api/birds' || p === '/api/feathers' || p === '/api/feather') { const r = await flockApi(req, env, url, flockHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/titos') || p.startsWith('/api/admin/titos')) { const r = await titosApi(req, env, url, titosHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/cards') || p.startsWith('/api/admin/cards')) { const r = await cardsApi(req, env, url, cardHelpers(env)); if (r) return r; }
@@ -1389,8 +1394,10 @@ async function route(req, env, url) {
     const room = cleanRoom(b.room || {}, await ownedRoom(env, u.id));
     // галерея комнат в «Стае» сортируется по тому, когда в комнату что-то добавили (новая вещь, обои, пол, вид, шторы) — перестановка не считается
     const old = roomOf(u), cnt = r => { const m = {}; (r.items || []).forEach(it => { m[it.k + '|' + it.v] = (m[it.k + '|' + it.v] || 0) + 1; }); return m; }, oc = cnt(old);
-    const added = Object.entries(cnt(room)).some(([k, n]) => n > (oc[k] || 0)) || ['wall', 'floor', 'view', 'curtain'].some(k => room[k] && room[k] !== old[k]);
+    const newItems = Object.entries(cnt(room)).reduce((a, [k, n]) => a + Math.max(0, n - (oc[k] || 0)), 0);
+    const added = newItems > 0 || ['wall', 'floor', 'view', 'curtain'].some(k => room[k] && room[k] !== old[k]);
     await env.DB.prepare(`UPDATE users SET room = ?${added ? ', room_at = ?' : ''} WHERE id = ?`).bind(...(added ? [JSON.stringify(room), now(), u.id] : [JSON.stringify(room), u.id])).run();
+    if (newItems) await roomEvent(env, u, newItems, rigaDay()); // новости стаи: «новоселье» — от 3 новых вещей за сутки, одна строка в сутки
     return json({ ok: true, room });
   }
   // коробка при регистрации: первый раз — выдать выбранную, потом — поменять на другую (та же стоит на том же месте, вещи внутри остаются)
@@ -1755,7 +1762,8 @@ async function route(req, env, url) {
       const isSur = r.item === '?' || r.kind === 'any';
       const ki = isSur ? await surpriseKI(env, req, u.id, r.kind, r.item) : [r.kind, r.item]; // «🎲 Сюрприз» — своя случайная вещь каждой птичке
       if (!ki || (!isSur && await copies(env, u.id, ki[0], ki[1]) >= legMax(ki[0], ki[1]))) continue;
-      await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'advent', 'bag', ?, ?)").bind(u.id, ki[0], ki[1], now(), now()).run();
+      const ag = await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'advent', 'bag', ?, ?)").bind(u.id, ki[0], ki[1], now(), now()).run();
+      if (isLeg(ki[0], ki[1])) await flockEventDb(env, 'legend', u, { kind: ki[0], item: ki[1], key: 'g' + ag.meta.last_row_id });
       got.push(ki);
     }
     if (got.length) {
@@ -2008,9 +2016,10 @@ async function route(req, env, url) {
     const bestNow = mergedBest(u, streakDays(rows));
     const forBadges = u.nick && !u.banned ? await awardBadges(env, u.id, bestNow, kept) : { total: 0, got: [] };
     if (forBadges.total) u.buttons = (u.buttons || 0) + forBadges.total;
+    for (const b of forBadges.got) await flockEventDb(env, 'badge', u, { badge: b }); // новости стаи: «У @ник новый бейдж»
     const storage = admin ? Math.round(await storageUsed(env) * 1000) / 10 : undefined;
     const migration = admin && env.MEDIA ? await migrationStatus(env) : undefined;
-    return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, pw: !!u.pw, mail: mailOn(env), email: !!u.email, adventMail: !!u.advent_mail, adventAsk: adventAsk(rigaDay()), consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
+    return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, pw: !!u.pw, mail: mailOn(env), email: !!u.email, adventMail: !!u.advent_mail, newsOff: !!u.news_off, adventAsk: adventAsk(rigaDay()), consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
       best: mergedBest(u, streakDays(rows)), keptBadges: kept, posts: rows, id: u.id, avatar: avatarOf(u), room: roomOf(u), earned, badgeEarned: forBadges, btn: await buttonStatus(env, u),
       gifts: (await env.DB.prepare('SELECT id, kind, item, note, status, created_at FROM gifts WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results } });
   }
@@ -2057,6 +2066,7 @@ async function route(req, env, url) {
     if (!s2.meta.changes) { await env.DB.prepare('UPDATE shop SET stock = stock + 1 WHERE kind = ? AND item = ?').bind(kind, item).run(); fail(402, 'poor'); }
     const g = await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'shop', 'bag', ?, ?)").bind(u.id, gk, got, now(), now()).run();
     await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(u.id, 'buy', String(g.meta.last_row_id), -row.price, rigaDay(), now()).run();
+    if (isLeg(gk, got)) await flockEventDb(env, 'legend', u, { kind: gk, item: got, key: 'g' + g.meta.last_row_id }); // новости стаи: легендарная вещь ★
     return json({ ok: true, buttons: (u.buttons || 0) - row.price, kind: gk, item: got });
   }
   // ценность всех вещей: «выровнять» (вернуть рекомендуемую из каталога) или дороже/дешевле на pct %
@@ -2290,6 +2300,7 @@ async function route(req, env, url) {
     if (first && rn && !friend) fail(400, 'ref');
     await env.DB.prepare('UPDATE users SET nick = ?, referrer = COALESCE(referrer, ?) WHERE id = ?').bind(n, friend ? friend.id : null, u.id).run();
     if (friend) await award(env, friend.id, 'friend', u.id, BTN.friend);
+    if (!u.nick) await flockEventDb(env, 'new', { ...u, nick: n }); // новости стаи: «В стае новенькая — птичка @ник!»
     return json({ ok: true, nick: n });
   }
 
@@ -2328,6 +2339,7 @@ async function route(req, env, url) {
     await env.DB.prepare('UPDATE users SET months = ?, mcount = ?, best = ?, badges = ? WHERE id = ?')
       .bind(uu.months, mcount, mergedBest(u, streakDays(all)), mergedBadges(uu, all).join(','), u.id).run();
     const earned = f.get('ai') === '1' && !RULES.aiUpload ? 0 : await award(env, u.id, 'upload', day, BTN.upload); // за работу с 🤖 — если разрешено в правилах
+    if (!old) await flockEventDb(env, 'drawing', u, { day }); // новости стаи; скрытая потом работа в ленте не показывается
     return json({ ok: true, id, earned });
   }
 
@@ -2429,6 +2441,7 @@ async function route(req, env, url) {
     if (prev && prev !== post.user_id) await addBadge(env, prev, 'pick_past');
     await setMeta(env, 'pick_post', post.id);
     await setMeta(env, 'pick_user', String(post.user_id));
+    if (!post.picked) await flockEventDb(env, 'pick', await env.DB.prepare('SELECT id, nick, banned FROM users WHERE id = ?').bind(post.user_id).first(), { post: post.id }); // новости стаи
     await award(env, post.user_id, 'pick', post.id, BTN.pick); // +11 пуговок за «Выбор Полли» (один раз за каждую выбранную работу; снятие и передача их не отнимают)
     return json({ ok: true });
   }

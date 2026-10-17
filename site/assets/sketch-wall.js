@@ -42,6 +42,7 @@
     delAcc: ['Delete my account', 'Удалить аккаунт', 'Dzēst kontu'],
     pwSet: ['Change password', 'Сменить пароль', 'Mainīt paroli'], pwAdd: ['Add a password', 'Добавить пароль', 'Pievienot paroli'], // этап 12 (окна — account.js)
     outAll: ['Sign out on all devices', 'Выйти на всех устройствах', 'Iziet visās ierīcēs'],
+    newsOff: ['🙈 Don’t show me in the flock news', '🙈 Не показывать меня в новостях стаи', '🙈 Nerādīt mani bara ziņās'],
     advMail: ['🎄 Remind me by email when the advent calendar opens', '🎄 Напомнить письмом, когда откроется адвент', '🎄 Atgādināt e-pastā, kad atvērsies adventes kalendārs'],
     delAccAsk: ['Delete your account, all your sketches and your streak? This can’t be undone.', 'Удалить аккаунт, все ваши рисунки и серию? Это нельзя отменить.', 'Dzēst kontu, visas tavas skices un sēriju? To nevarēs atsaukt.'],
     err: ['Something went wrong. Please try again.', 'Что-то пошло не так. Попробуйте ещё раз.', 'Kaut kas nogāja greizi. Pamēģini vēlreiz.'],
@@ -653,7 +654,7 @@
       <div class="bp-tabs" role="tablist">${[['bag', t('tabBag')], ['badges', t('tabBadges')], ['works', t('tabWorks') + ` (${pr.posts.length})`], ...(window.PPCards ? [['cards', t('tabCards')]] : [])]
         .map(([k, n], i) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}">${n}</button>`).join('')}<button type="button" class="bp-tab-shop bp-tab-album" id="bp-album">${['🃏 Album', '🃏 Альбом', '🃏 Albums'][L]}</button><a class="bp-tab-shop" href="${L === 1 ? '/ru' : L === 2 ? '/lv' : ''}/shop/">${t('tabShop')}</a></div>
       <div class="bp-panel" role="tabpanel"></div>
-      ${mine ? `<p class="sw-acc bp-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <button type="button" class="sw-link" id="sw-outall">${t('outAll')}</button> · <button type="button" class="sw-link" id="sw-pw">🔑 ${t(me.pw ? 'pwSet' : 'pwAdd')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a> · <button type="button" class="sw-link danger" id="sw-delacc">${t('delAcc')}</button></p>${me.mail && me.email && me.adventAsk ? `<label class="sw-advmail"><input type="checkbox" id="sw-advmail"${me.adventMail ? ' checked' : ''}> ${t('advMail')}</label>` : ''}` : ''}`;
+      ${mine ? `<p class="sw-acc bp-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <button type="button" class="sw-link" id="sw-outall">${t('outAll')}</button> · <button type="button" class="sw-link" id="sw-pw">🔑 ${t(me.pw ? 'pwSet' : 'pwAdd')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a> · <button type="button" class="sw-link danger" id="sw-delacc">${t('delAcc')}</button></p>${me.mail && me.email && me.adventAsk ? `<label class="sw-advmail"><input type="checkbox" id="sw-advmail"${me.adventMail ? ' checked' : ''}> ${t('advMail')}</label>` : ''}<label class="sw-advmail"><input type="checkbox" id="sw-newsoff"${me.newsOff ? ' checked' : ''}> ${t('newsOff')}</label>` : ''}`;
     page.querySelector('.sw-ava-slot').replaceWith(window.PPBirds ? window.PPBirds.avatar(pr.id, pr.avatar, 132) : document.createElement('span'));
     const share = () => shareBird({ id: pr.id, nick: pr.nick, avatar: pr.avatar, mine });
     page.querySelector('#bp-share').onclick = share;
@@ -695,6 +696,8 @@
     show(trades ? 'cards' : 'bag');
     if (mine) {
       document.getElementById('sw-out').onclick = async () => { await post('logout'); location.reload(); };
+      const noff = document.getElementById('sw-newsoff'); // новости стаи /flock/news/ (worker/flock-news.js)
+      if (noff) noff.onchange = async () => { try { await post('news-off', { off: noff.checked }); me.newsOff = noff.checked; } catch (e) { noff.checked = !noff.checked; alert(t('err')); } };
       const adv = document.getElementById('sw-advmail'); // одно письмо 1 декабря (worker/auth.js adventMail)
       if (adv) adv.onchange = async () => { try { await post('pw/advent-mail', { on: adv.checked, lang: document.documentElement.lang }); me.adventMail = adv.checked; } catch (e) { adv.checked = !adv.checked; alert(t('err')); } };
       document.getElementById('sw-outall').onclick = () => window.PPAccount && window.PPAccount.logoutAll();

@@ -28,6 +28,7 @@
     { id: 'requests', ic: '🖍', name: 'Нарисуй мне', group: 'pub', href: '/ru/requests/', count: 'requests' },
     { id: 'art', ic: '🎨', name: 'Картины и палитры', group: 'pub', about: 'Картины, добавленные с сайта, скрытые картины и очередь палитр дня ЭКСТРА.' },
     { id: 'themes', ic: '🎨', name: 'Темы челленджа', group: 'pub', about: 'Темы челленджа на этот и следующий месяц: поправить предмет, совет, цвета, время; поменять дни местами.' },
+    { id: 'notes', ic: '📣', name: 'Объявления', group: 'pub', about: 'Объявления в «Новостях стаи» (/flock/news/): закреплены сверху до выбранной даты, потом — обычной строкой «от Полли».' },
     { id: 'edits', ic: '🧩', name: 'Правки страниц', group: 'pub', about: 'Блоки, которые вы поменяли или скрыли прямо на сайте («✏️ Править страницу»), — здесь их можно вернуть как было.', count: 'edits' },
     { id: 'birds', ic: '🐦', name: 'Все птицы', group: 'birds', about: 'Все птички стаи: когда пришли, сколько нарисовали, пуговки, подарки.' },
     { id: 'gifts', ic: '🎁', name: 'Подарки и зарплата', group: 'birds', open: 'birds', focus: '#adm-giftall', about: 'Подарить вещь одной птичке или всем, выдать зарплату пуговками.' },
@@ -49,7 +50,7 @@
     { id: 'strict', ic: '🛡', name: 'Строгий режим', group: 'service', open: 'comments', focus: '#adm-strict', about: 'Строгий режим комментариев: не больше одного комментария в час с одного адреса.' },
     { id: 'security', ic: '🔐', name: 'Защита', group: 'service', about: 'PIN админа и код восстановления на случай, если потеряете Google.' },
   ];
-  const SECTIONS = { titos, inbox, security, overview: inbox, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art, challenge: () => statsView('challenge'), flock: () => statsView('flock'),
+  const SECTIONS = { notes, titos, inbox, security, overview: inbox, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art, challenge: () => statsView('challenge'), flock: () => statsView('flock'),
     themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
     cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
     carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
@@ -426,6 +427,34 @@
       const tr = btn.closest('tr'), id = tr.dataset.id, l = tr.dataset.lang;
       if (!confirm(l === '*' ? 'Снова показать этот блок посетителям?' : 'Убрать правку и вернуть оригинал этого блока?')) return;
       try { await api('admin/blocks', id.startsWith('page:') ? { id, lang: '*', html: null } : l === '*' ? { id, lang: '*', hidden: false } : { id, lang: l, html: null }); edits(); } catch (e) { alert(err(e)); }
+    });
+  }
+
+  // ---------- 📣 объявления в «Новостях стаи» (worker/flock-news.js, /api/admin/flock-notes) ----------
+  async function notes(edit) {
+    main.innerHTML = '<p class="be-note">Загрузка…</p>';
+    let d; try { d = await api('admin/flock-notes'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    const cur = edit || { src: 'ru', ru: '', en: '', lv: '', until: '' }, today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
+    main.innerHTML = `<section class="adm-box"><h2>📣 ${cur.id ? 'Править объявление' : 'Новое объявление'}</h2>
+      <p class="be-note">Текст — на одном языке, остальные — кнопкой «Перевести» (перевод можно поправить). До выбранной даты объявление висит сверху ленты, потом — обычной строкой ещё 30 дней.</p>
+      <form class="adm-note-f">${['ru', 'en', 'lv'].map(l => `<label>${l.toUpperCase()} <textarea name="${l}" rows="2" maxlength="400">${esc(cur[l])}</textarea></label>`).join('')}
+        <label>Закрепить сверху до <input type="date" name="until" value="${esc(cur.until)}" min="${today}"></label>
+        <p class="adm-note-btns"><span class="adm-note-tr"></span><button class="pill-btn" type="submit">Опубликовать</button>${cur.id ? ' <button type="button" class="bc-link" data-cancel>Отмена</button>' : ''}</p></form></section>
+      <section class="adm-box"><h2>Все объявления: ${d.notes.length}</h2>${d.notes.length ? `<table class="be-table adm-table"><thead><tr><th>Текст</th><th>Сверху до</th><th>Когда</th><th></th></tr></thead><tbody>
+      ${d.notes.map(n => `<tr data-id="${n.id}"><td>${esc(n.ru || n[n.src] || n.en)}</td><td>${n.until ? esc(n.until) + (n.until >= today ? ' 📌' : '') : '—'}</td><td>${new Date(n.ts * 1000).toLocaleDateString('ru-RU')}</td>
+        <td><button type="button" class="bc-link" data-edit>Править</button> <button type="button" class="bc-link be-danger" data-del>Удалить</button></td></tr>`).join('')}</tbody></table>` : '<p class="be-note">Объявлений пока нет.</p>'}</section>`;
+    const f = main.querySelector('.adm-note-f');
+    const src = () => ['ru', 'en', 'lv'].find(l => f[l].value.trim()) || 'ru';
+    if (window.PPTranslateBtn) main.querySelector('.adm-note-tr').appendChild(window.PPTranslateBtn({ from: src, texts: () => [f[src()].value], fill: (l, t) => { f[l].value = t[0] || ''; }, about: 'short' }));
+    f.onsubmit = async e => {
+      e.preventDefault();
+      try { await api('admin/flock-notes', { id: cur.id, src: src(), ru: f.ru.value, en: f.en.value, lv: f.lv.value, until: f.until.value }); notes(); } catch (x) { alert(err(x)); }
+    };
+    const cancel = main.querySelector('[data-cancel]'); if (cancel) cancel.onclick = () => notes();
+    main.querySelectorAll('[data-edit]').forEach(b => b.onclick = () => notes(d.notes.find(n => n.id === Number(b.closest('tr').dataset.id))));
+    main.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+      if (!confirm('Удалить объявление из новостей стаи?')) return;
+      try { await api('admin/flock-notes', { del: Number(b.closest('tr').dataset.id) }); notes(); } catch (x) { alert(err(x)); }
     });
   }
 

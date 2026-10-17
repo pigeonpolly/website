@@ -4325,3 +4325,37 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .fe-last a:hover { text-decoration: underline; }
 .fe-fall { position: absolute; z-index: 5; top: -10%; left: 50%; font-size: 34px; pointer-events: none; animation: fe-fall 2.5s ease-in forwards; }
 @keyframes fe-fall { 0% { transform: translate(-50%, 0) rotate(-20deg); opacity: 0; } 15% { opacity: 1; } 35% { transform: translate(-20%, 120%) rotate(15deg); } 60% { transform: translate(-70%, 230%) rotate(-15deg); } 100% { transform: translate(-40%, 380%) rotate(10deg); opacity: 0; } }
+
+/* ---------- Новости стаи (этап 13 Г): /flock/news/ и 3 строки на главной (flock-news.js) ---------- */
+.fn-page { padding: 8px var(--gutter) 56px; max-width: 860px; margin: 0 auto; }
+.fn-home { max-width: 860px; margin: 0 auto; padding: 8px var(--gutter) 20px; }
+.fn-h { font: 600 22px var(--serif); margin: 0 0 8px; }
+.fn-day { font: 700 13px var(--sans); letter-spacing: .08em; text-transform: uppercase; color: var(--peach); margin: 22px 0 6px; }
+.fn-list { list-style: none; margin: 0; padding: 0; display: flex; flex-direction: column; gap: 8px; }
+.fn-row { display: flex; align-items: center; flex-wrap: wrap; gap: 8px 12px; padding: 10px 14px; border-radius: 16px; background: var(--bg-card); border: 1px solid var(--line); }
+.fn-ava { flex: 0 0 40px; width: 40px; height: 40px; display: grid; place-items: center; border-radius: 50%; background: rgba(255,255,255,.08); font-size: 22px; overflow: hidden; }
+.fn-ava canvas, .fn-ava img, .fn-ava svg { max-width: 40px; max-height: 40px; }
+.fn-txt { flex: 1 1 220px; margin: 0; font: 500 15px/1.45 var(--sans); color: var(--text); }
+.fn-txt a { color: #F5D547; font-weight: 700; text-decoration: none; }
+.fn-txt a:hover { text-decoration: underline; }
+.fn-txt time { margin-left: 8px; color: var(--muted); opacity: .75; font-size: 13px; white-space: nowrap; }
+.fn-plus { display: inline-block; padding: 0 7px; border-radius: 99px; background: rgba(255,255,255,.12); font-size: 12px; }
+.fn-pic img { display: block; width: 52px; height: 52px; object-fit: cover; border-radius: 10px; }
+.fn-strip { display: flex; gap: 4px; flex-wrap: wrap; flex-basis: 100%; padding-left: 52px; }
+.fn-strip img { display: block; width: 44px; height: 44px; object-fit: cover; border-radius: 8px; }
+.fn-btn { padding: 6px 14px; border-radius: 99px; background: var(--orange); color: #fff; font: 700 13px var(--sans); text-decoration: none; white-space: nowrap; }
+.fn-btn:hover { background: #F5D547; color: var(--bg); }
+.fn-polly .fn-ava { background: #F5D547; }
+.fn-pinned { margin: 0 0 12px; padding: 12px 16px; border-radius: 16px; background: #F5D547; color: #2B1A51; font: 500 15px/1.5 var(--sans); }
+.fn-msg { color: var(--muted); }
+.fn-more { display: block; margin: 20px auto 0; }
+.fn-more[hidden] { display: none; }
+.fn-all { display: inline-block; margin-top: 10px; color: var(--peach); font: 700 14px var(--sans); }
+@media (max-width: 600px) {
+  .fn-row { padding: 10px; }
+  .fn-strip { padding-left: 0; }
+  .fn-txt { flex-basis: calc(100% - 100px); }
+}
+.adm-note-f label { display: block; margin: 0 0 10px; font-weight: 600; }
+.adm-note-f textarea { display: block; width: 100%; margin-top: 4px; font: 15px/1.4 var(--sans); padding: 8px 10px; box-sizing: border-box; }
+.adm-note-btns { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
