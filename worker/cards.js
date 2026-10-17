@@ -340,9 +340,12 @@ async function repoFiles(env, url) {
 export async function importCards(env, url) {
   const list = await asset(env, url, '/assets/cards/index.json').catch(() => null);
   const done = [], skipped = [], errors = [];
+  const removed = await dedupe(env);
   for (const slug of Array.isArray(list) ? list : []) {
     if (!/^[a-z0-9-]{1,40}$/.test(slug)) continue;
     const key = 'cards_' + slug;
+    // метка «importing:» старше 15 минут — запуск оборвался посередине, пробуем снова (уже занесённые карточки не повторятся)
+    await env.DB.prepare("DELETE FROM meta WHERE key = ? AND value LIKE 'importing:%' AND CAST(substr(value, 11) AS INTEGER) < ?").bind(key, now() - 900).run();
     if (await env.DB.prepare('SELECT value FROM meta WHERE key = ?').bind(key).first()) { skipped.push(slug); continue; }
     // ставим метку сразу (INSERT OR IGNORE) — два одновременных запуска не занесут коллекцию дважды
     const lock = await env.DB.prepare('INSERT OR IGNORE INTO meta (key, value) VALUES (?, ?)').bind(key, 'importing:' + now()).run();
@@ -362,11 +365,14 @@ export async function importCards(env, url) {
       const setNames = Object.fromEntries(LANGS.map(l => [l, L(l, 0).slice(0, 60)]));
       await env.DB.prepare('INSERT INTO card_sets (slug, en, ru, lv, src_lang, created_at) VALUES (?, ?, ?, ?, ?, ?) ON CONFLICT(slug) DO NOTHING').bind(slug, setNames.en, setNames.ru, setNames.lv, src, now()).run();
       const t = now();
+      let added = 0;
       for (const [i, x] of items.entries()) {
         const stats = (x.stats || []).slice(0, 3).map(s => {
           const nm = String(s.name || s[0] || '').trim(), j = 1 + 2 * nI + statNames.indexOf(nm);
           return { ...Object.fromEntries(LANGS.map(l => [l, L(l, j).slice(0, 30)])), v: Math.max(1, Math.min(10, Math.round(Number(s.v ?? s[1]) || 1))) };
         });
+        // уже есть (прошлый запуск оборвался после части карточек) — не заносим второй раз
+        if (await env.DB.prepare('SELECT 1 FROM cards WHERE collection = ? AND (img = ? AND img != \'\' OR t_' + src + ' = ?)').bind(slug, x.img || '', String(x.title).trim().slice(0, 80)).first()) continue;
         const want = Math.floor(Number(x.n) || 0);
         const free = want > 0 && !(await env.DB.prepare('SELECT 1 FROM cards WHERE n = ?').bind(want).first());
         const rarity = RARITY.includes(x.rarity) ? x.rarity : 'common';
@@ -376,22 +382,33 @@ export async function importCards(env, url) {
           VALUES (${free ? '?' : '(SELECT COALESCE(MAX(n), 0) + 1 + 0 * ? FROM cards)'}, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
           .bind(want, slug, rarity, Math.max(0, Math.floor(Number(x.price) || 0)), img, src,
             ...['en', 'ru', 'lv'].map(l => L(l, 1 + i).slice(0, 80)), ...['en', 'ru', 'lv'].map(l => L(l, 1 + nI + i).slice(0, DESC)), JSON.stringify(stats), game, t, t).run();
+        added++;
       }
       if (!(await env.DB.prepare('SELECT COUNT(*) AS n FROM cards WHERE collection = ?').bind(slug).first()).n) throw new Error('not_saved');
       await env.DB.prepare('UPDATE meta SET value = ? WHERE key = ?').bind(String(t), key).run();
-      done.push({ slug, cards: items.length, translated: Object.keys(tr), errors: te });
+      done.push({ slug, cards: added, translated: Object.keys(tr), errors: te });
     } catch (e) {
       await env.DB.prepare('DELETE FROM meta WHERE key = ?').bind(key).run(); // не вышло — попробуем ещё раз
       errors.push({ slug, error: String(e.message || e) });
     }
   }
-  return { imported: done, skipped, errors };
+  return { imported: done, skipped, errors, removed };
+}
+// двойники импортированной карточки (та же коллекция и картинка из репозитория): оставляем купленную или первую, остальные без владельца удаляем
+async function dedupe(env) {
+  const r = await env.DB.prepare(`DELETE FROM cards WHERE id IN (
+    SELECT c.id FROM cards c WHERE NOT EXISTS (SELECT 1 FROM card_owner o WHERE o.card_id = c.id)
+      AND EXISTS (SELECT 1 FROM cards d WHERE d.id != c.id AND d.collection = c.collection
+        AND c.img LIKE '/images/cards/%' AND d.img = c.img
+        AND (EXISTS (SELECT 1 FROM card_owner o2 WHERE o2.card_id = d.id) OR d.id < c.id)))`).run();
+  return r.meta.changes || 0;
 }
 // пустые переводы (например, не было ключа Gemini во время импорта) — перевести сейчас
-async function translateMissing(env) {
+export async function translateMissing(env, limit = 15) {
   const rows = (await env.DB.prepare('SELECT * FROM cards').all()).results;
   let n = 0;
   for (const c of rows) {
+    if (n >= limit) break; // за раз — порция (лимит времени запроса); остальное — следующим нажатием или по расписанию
     const src = c.src_lang || 'ru', miss = LANGS.filter(l => l !== src && (!c['t_' + l] || (c['d_' + src] && !c['d_' + l]) || statsOf(c).some(s => !s[l])));
     if (!miss.length) continue;
     const st = statsOf(c), texts = [c['t_' + src] || '', c['d_' + src] || '', ...st.map(s => s[src] || '')];

@@ -62,6 +62,7 @@
       const r = await api('/import', {}); D = r; draw();
       const s = main.querySelector('[data-st]');
       s.textContent = r.imported.length ? '✓ Занесено: ' + r.imported.map(x => `${x.slug} (${x.cards} карт.${x.translated.length < 2 ? ', перевод не на все языки' : ', с переводом'})`).join(', ') : r.errors.length ? 'Ошибка: ' + r.errors.map(x => x.slug + ' — ' + x.error).join(', ') : 'Новых коллекций нет — всё уже занесено.';
+      if (r.removed) s.textContent += ` Убраны повторы: ${r.removed} карт.`;
     });
     const tm = main.querySelector('[data-a="trmiss"]');
     if (tm) tm.onclick = e => run(e.target, async () => { st.textContent = 'Перевожу…'; D = await api('/translate-missing', {}); draw(); });

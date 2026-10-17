@@ -7,7 +7,7 @@ import { challengeApi, challengeCron, planDayColors, CHALLENGE_TABLES } from './
 import { CH_DEFAULTS, CH_RANGE } from './challenge-plan.js';
 import '../site/assets/can-do.js'; // PPCanDo — что можно с вещью (этап 7)
 const PPCanDo = globalThis.PPCanDo;
-import { cardsApi, importCards, myCards, tradeNews, CARD_TABLES } from './cards.js'; // коллекционные карточки (docs/cards.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
+import { cardsApi, importCards, translateMissing, myCards, tradeNews, CARD_TABLES } from './cards.js'; // коллекционные карточки (docs/cards.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
 const ADMIN_HASHES = ['80ac2786b60d61a30d6691a3d40de5d784cdefc580717add788821a7bf900118'];
@@ -50,6 +50,7 @@ export default {
       await autoRestock(env).catch(e => console.error('restock', e)); // раз в сутки (по Риге) пополнить магазин
       await reqBackfill(env).catch(e => console.error('req tr', e)); // «Нарисуй мне»: переводы тем на все языки сайта
       await importCards(env, new URL('https://www.pigeonpolly.com/')).catch(e => console.error('cards', e)); // новые коллекции карточек из репозитория (один раз)
+      await translateMissing(env, 5).catch(e => console.error('cards tr', e)); // карточки без перевода (Gemini не успел при импорте) — по 5 в час
       await challengeCron(env, RULES).catch(e => console.error('challenge plan', e)); // темы челленджа: с 20-го — план следующего месяца
       await migrateToR2(env); await cleanupInactive(env);
       await env.DB.prepare('DELETE FROM game_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {}); // старые забеги игр (started — в мс)
