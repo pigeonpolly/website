@@ -11,7 +11,7 @@
     sellAsk: [(nm, n) => `Sell “${nm}” back to the shop for ${n} 🔘? It will go back on sale.`, (nm, n) => `Продать «${nm}» обратно в магазин за ${n} 🔘? Вещь снова появится в продаже.`, (nm, n) => `Pārdot “${nm}” atpakaļ veikalam par ${n} 🔘? Lieta atkal būs pārdošanā.`],
     sold: [n => `Sold! +${n} 🔘`, n => `Продано! +${n} 🔘`, n => `Pārdots! +${n} 🔘`],
     toRoom: ['🏠 Put it in my room', '🏠 Поставить в комнату', '🏠 Ielikt istabā'],
-    tabBag: ['🎒 Bag', '🎒 Сумка', '🎒 Soma'], tabBadges: ['🏅 Achievements', '🏅 Достижения', '🏅 Sasniegumi'], tabWorks: ['🎨 Sketches', '🎨 Рисунки', '🎨 Skices'], tabBtns: ['🔘 Buttons', '🔘 Пуговки', '🔘 Pogas'], tabCards: ['🃏 Cards', '🃏 Карточки', '🃏 Kartītes'], tabShop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'],
+    tabBag: ['🎒 Bag', '🎒 Сумка', '🎒 Soma'], tabBadges: ['🏅 Achievements', '🏅 Достижения', '🏅 Sasniegumi'], tabWorks: ['🎨 Sketches', '🎨 Рисунки', '🎨 Skices'], tabCards: ['🃏 Cards', '🃏 Карточки', '🃏 Kartītes'], tabShop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'],
     pSign: ['Sign in and get your own pixel bird: a profile, a room, a bag for gifts and a place on the sketch wall.', 'Войдите и получите свою пиксельную птичку: профиль, комнату, сумку для подарков и место на стене рисунков.', 'Ienāc un saņem savu pikseļu putniņu: profilu, istabu, somu dāvanām un vietu skiču sienā.'],
     pSignBtn: ['Sign in', 'Войти', 'Ienākt'], pNone: ['There is no bird with this nickname.', 'Птички с таким ником нет.', 'Putniņa ar tādu segvārdu nav.'],
     pAll: ['All birds →', 'Все птицы →', 'Visi putniņi →'], pChallenge: ['🎨 Daily Challenge', '🎨 Челлендж', '🎨 Izaicinājums'],
@@ -64,16 +64,7 @@
     giftNew: [n => `A gift for you!${n > 1 ? ' (' + n + ')' : ''}`, n => `Тебе подарок!${n > 1 ? ' (' + n + ')' : ''}`, n => `Tev dāvana!${n > 1 ? ' (' + n + ')' : ''}`],
     bag: ['Bag', 'Сумка', 'Soma'],
     shareBird: ['Share my bird', 'Поделиться птичкой', 'Dalīties ar putniņu'],
-    btnT: ['🔘 Buttons', '🔘 Пуговки', '🔘 Pogas'],
     btnHave: [n => `You have ${n}`, n => `У вас ${n}`, n => `Tev ir ${n}`],
-    btnHow: ['How to earn buttons', 'Как получить пуговки', 'Kā nopelnīt pogas'],
-    btnDaily: [n => `Visit the site: +${n} once a day`, n => `Зайти на сайт: +${n} раз в сутки`, n => `Apmeklē vietni: +${n} reizi dienā`],
-    btnUpload: [n => `Upload a drawing to the challenge: +${n}`, n => `Загрузить рисунок в челлендж: +${n}`, n => `Augšupielādē zīmējumu izaicinājumā: +${n}`],
-    btnComment: [(n, k, m) => `Comment on any blog post: +${n} each, ${m} times a day (today ${k}/${m})`, (n, k, m) => `Комментарий под любым постом: +${n}, до ${m} раз в сутки (сегодня ${k}/${m})`, (n, k, m) => `Komentārs zem jebkura ieraksta: +${n}, līdz ${m} reizēm dienā (šodien ${k}/${m})`],
-    btnFriend: [(n, k) => `A friend signs up and picks you as the one who invited them: +${n} for each (friends: ${k})`, (n, k) => `Друг регистрируется и выбирает тебя как пригласившего: +${n} за каждого (друзей: ${k})`, (n, k) => `Draugs reģistrējas un izvēlas tevi kā uzaicinātāju: +${n} par katru (draugi: ${k})`],
-    btnToday: ['done today', 'сегодня уже', 'šodien jau'],
-    btnBadges: ['New badges: from +5 to +300 for each (tap a badge to see how much)', 'Новые бейджи: от +5 до +300 за каждый (нажмите на бейдж — там видно, сколько)', 'Jaunas nozīmītes: no +5 līdz +300 par katru (spied uz nozīmītes, lai redzētu, cik)'],
-    btnPick: [n => `Polly’s Choice for your drawing: +${n}`, n => `«Выбор Полли» для вашего рисунка: +${n}`, n => `“Pollijas izvēle” tavam zīmējumam: +${n}`],
     btnBadge: [n => `🔘 +${n} button${n === 1 ? '' : 's'} for this badge`, n => `🔘 +${n} ${pl(n, 'пуговка', 'пуговки', 'пуговок')} за этот бейдж`, n => `🔘 +${n} ${n % 10 === 1 && n % 100 !== 11 ? 'poga' : 'pogas'} par šo nozīmīti`],
     btnForBadges: [n => `+${n} 🔘 buttons for your badges!`, n => `+${n} 🔘 пуговок за достижения!`, n => `+${n} 🔘 pogas par sasniegumiem!`],
     giveT: ['Gift it to another bird', 'Подарить другой птичке', 'Uzdāvināt citam putniņam'],
@@ -85,8 +76,6 @@
     giveHas: ['This bird already has three of these.', 'У этой птички уже три такие вещи.', 'Šim putniņam jau ir trīs tādas lietas.'],
     giveLegend: ['Legendary things cannot be gifted.', 'Легендарные вещи дарить нельзя.', 'Leģendārās lietas nevar dāvināt.'],
     fromBird: [n => `🎁 A gift from @${n}`, n => `🎁 Подарок от @${n}`, n => `🎁 Dāvana no @${n}`],
-    btnShop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'],
-    btnInvite: ['📤 Invite a friend', '📤 Позвать друга', '📤 Uzaicināt draugu'],
     btnEarned: [n => `+${n} 🔘 buttons!`, n => `+${n} 🔘 пуговок!`, n => `+${n} 🔘 pogas!`],
     btnOther: [n => `🔘 ${n} buttons`, n => `🔘 ${n} пуговок`, n => `🔘 ${n} pogas`],
     shareThis: ['Share', 'Поделиться', 'Dalīties'],
@@ -494,17 +483,6 @@
   }
 
   const badgeReward = x => { const R = me && me.btn && me.btn.rules; if (!R) return 0; return x.d ? (R.levels || {})[x.d] || 0 : x.k === 'pick' ? R.pick || 0 : (R.badges || {})[x.k] || 0; };
-  // 🔘 пуговки: сколько есть и что можно получить сегодня (✅ — уже получено)
-  function buttonsHtml(b) {
-    const R = b.rules, pre = L === 1 ? '/ru' : L === 2 ? '/lv' : '';
-    const row = (done, text) => `<li class="${done ? 'done' : ''}"><span>${done ? '✅' : '⬜'}</span> ${esc(text)}${done ? ` <em>${t('btnToday')}</em>` : ''}</li>`;
-    return `<div class="sw-btns"><h3>${t('btnT')} <b>${b.buttons}</b></h3>
-      <p class="sw-btns-how">${t('btnHow')}:</p><ul>
-      ${row(b.daily, t('btnDaily', R.daily))}${row(b.upload, t('btnUpload', R.upload))}${row(b.comments >= R.commentsPerDay, t('btnComment', R.comment, b.comments, R.commentsPerDay))}
-      <li class="sw-btns-friend"><span>👥</span> ${esc(t('btnFriend', R.friend, b.invited))}</li>
-      <li><span>🏅</span> ${esc(t('btnBadges'))}</li>${R.pick ? `<li><span>⭐</span> ${esc(t('btnPick', R.pick))}</li>` : ''}</ul>
-      <p class="sw-btns-acts"><a class="pill-btn" href="${pre}/shop/">${t('btnShop')}</a><button type="button" class="pill-btn" id="sw-invite">${t('btnInvite')}</button></p></div>`;
-  }
   // бейдж крупно, с описанием и как получить
   function showBadge(x, state, picks) {
     const fun = state === 'past' && x.past ? x.past[L] : x.f[L];
@@ -656,6 +634,7 @@
     if (!who) {
       page.innerHTML = `<div class="bp-sign"><span class="sw-signin-polly">${spriteSvg('polly')}</span><p>${t('pSign')}</p><button type="button" class="cta-btn" id="bp-in">${t('pSignBtn')}</button></div>`;
       document.getElementById('bp-in').onclick = () => window.PPAccount && window.PPAccount.openSignIn();
+      if (window.PPDay) { const dc = document.createElement('div'); dc.className = 'bp-day'; page.appendChild(dc); window.PPDay.mount(dc); } // серая карточка дня
       return;
     }
     let pr;
@@ -670,14 +649,15 @@
           <p class="bp-line">${lv ? esc(lv.n[L]) + ' · ' : ''}🔥 ${t('streak', pr.current)} · ${t('best', pr.best)} · ${t('btnOther', mine && me.btn ? me.btn.buttons : pr.buttons)}</p>
           <div class="bp-acts">${newGifts.length ? `<button type="button" class="pill-btn pill-fill sw-gift-btn" id="bp-gift">🎁 ${t('giftNew', newGifts.length)}</button>` : ''}
             <button type="button" class="pill-btn" id="bp-share">📤 ${t(mine ? 'shareBird' : 'shareThis')}</button>${mine ? `<a class="pill-btn" href="${pre}/challenge/">${t('pChallenge')}</a>` : ''}</div></div></div>
-      <div class="bp-room" id="bp-room" hidden></div>
-      <div class="bp-tabs" role="tablist">${[['bag', t('tabBag')], ['badges', t('tabBadges')], ['works', t('tabWorks') + ` (${pr.posts.length})`], ...(window.PPCards ? [['cards', t('tabCards')]] : []), ...(mine && me.btn ? [['btns', t('tabBtns')]] : [])]
+      ${mine ? '<div class="bp-day" id="bp-day"></div>' : ''}<div class="bp-room" id="bp-room" hidden></div>
+      <div class="bp-tabs" role="tablist">${[['bag', t('tabBag')], ['badges', t('tabBadges')], ['works', t('tabWorks') + ` (${pr.posts.length})`], ...(window.PPCards ? [['cards', t('tabCards')]] : [])]
         .map(([k, n], i) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}">${n}</button>`).join('')}<button type="button" class="bp-tab-shop bp-tab-album" id="bp-album">${['🃏 Album', '🃏 Альбом', '🃏 Albums'][L]}</button><a class="bp-tab-shop" href="${L === 1 ? '/ru' : L === 2 ? '/lv' : ''}/shop/">${t('tabShop')}</a></div>
       <div class="bp-panel" role="tabpanel"></div>
       ${mine ? `<p class="sw-acc bp-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <button type="button" class="sw-link" id="sw-outall">${t('outAll')}</button> · <button type="button" class="sw-link" id="sw-pw">🔑 ${t(me.pw ? 'pwSet' : 'pwAdd')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a> · <button type="button" class="sw-link danger" id="sw-delacc">${t('delAcc')}</button></p>${me.mail && me.email && me.adventAsk ? `<label class="sw-advmail"><input type="checkbox" id="sw-advmail"${me.adventMail ? ' checked' : ''}> ${t('advMail')}</label>` : ''}` : ''}`;
     page.querySelector('.sw-ava-slot').replaceWith(window.PPBirds ? window.PPBirds.avatar(pr.id, pr.avatar, 132) : document.createElement('span'));
     const share = () => shareBird({ id: pr.id, nick: pr.nick, avatar: pr.avatar, mine });
     page.querySelector('#bp-share').onclick = share;
+    if (mine && window.PPDay) window.PPDay.mount(page.querySelector('#bp-day'), { log: true, onInvite: share }); // карточка дня и история пуговок (day-card.js)
     page.querySelector('#bp-album').onclick = () => window.PPRoom && window.PPRoom.albumOf(pr.nick);
     const gb = page.querySelector('#bp-gift'); if (gb) gb.onclick = () => { openGift(newGifts[newGifts.length - 1]); };
     if (gb && location.hash === '#gift') { history.replaceState(null, '', location.pathname + location.search); gb.click(); } // /bird/#gift — «Открыть подарок» из новостей (news.js)
@@ -705,9 +685,6 @@
         panel.innerHTML = `<div class="sw-pv-works bp-works">${pr.posts.map(p => `<a href="/api/img/${p.id}" data-lightbox>${p.ai ? `<i class="sw-aitag" title="${esc(t('aiTag'))}">🤖</i>` : ''}<img src="/api/img/${p.id}?t=1" alt="${esc(themeLocal(p.theme))}" loading="lazy"><span>${esc(themeLocal(p.theme))} · ${fmtDay(p.day)}</span></a>`).join('') || `<p class="sw-empty">${t('noWorks')}</p>`}</div>`;
       } else if (k === 'cards') { // карточки птички и, в своём профиле, предложения обмена (cards-ui.js, этап 7 В)
         window.PPCards.profile(panel, { nick: pr.nick, mine, scroll: trades }); trades = false;
-      } else if (k === 'btns') {
-        panel.innerHTML = buttonsHtml(me.btn);
-        const inv = panel.querySelector('#sw-invite'); if (inv) inv.onclick = share;
       }
     };
     page.querySelectorAll('[data-tab]').forEach(b => b.onclick = () => show(b.dataset.tab));

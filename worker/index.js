@@ -333,7 +333,7 @@ async function setRules(env, patch) { const r = cleanRules({ ...RULES, ...patch 
 // события стаи (кто что купил, обменял, нашёл): пока пустая — лента появится на следующих этапах
 async function flockEvent(kind, bird, data) { /* kind: 'card' — купил карточку, 'titos' — раскрыл дело №10, 20, 30…, 'titosreward' — награда Титоса за уровень 30/50/90/100; bird — птичка (users), data — подробности */ }
 const cardHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, rules: () => RULES, avgItemPrice: () => avgItemPrice(env), setRules: patch => setRules(env, patch), flockEvent });
-const titosHelpers = env => ({ ...cardHelpers(env), unit: () => gameUnit(env), btnOf, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) });
+const titosHelpers = env => ({ ...cardHelpers(env), unit: () => gameUnit(env), btnOf, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), stamp: (uid, task) => stamp(env, uid, task) });
 const authHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, sessionCookie, sessionDays: SESSION_DAYS, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), bump: (k, sql) => bump(env, k, sql) });
 const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), awardComment: (uid, cid) => awardComment(env, uid, cid) });
 
@@ -454,6 +454,7 @@ const RULE_DEFAULTS = {
   // «мало / обычно / много» штук в магазине — в % от числа птичек (с ником, не заблокированных); у легендарных — legendPct % от этих чисел
   lowPct: 5, normPct: 20, manyPct: 50, legendPct: 25,
   adventLastJan: 23, adventButtons: 10, adventSpecialButtons: 25,
+  dayBonusNeed: 5, dayBonusOf: 7, dayBonusPct: 10, // карточка дня: бонус за dayBonusNeed штампов (из dayBonusOf) — dayBonusPct % опорной цены, раз в сутки
   aiStreak: true, aiUpload: true,
   sellOn: true, sellPrice: 5,
   // «Пуговичный дождь»: за уровень gameLevel 🔘 × (1 + ⌊(ур.−1)/10⌋) — каждый номер уровня раз в сутки; gameDayMax — лимит в сутки (0 — без лимита);
@@ -476,7 +477,7 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], ...TITOS_RANGE, ...CH_RANGE };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...CH_RANGE };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -493,7 +494,7 @@ function cleanRules(r) {
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
   for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn']) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', ...TITOS_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
+  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
   out.catMult = {}; if (r.catMult && typeof r.catMult === 'object') for (const k of GIFT_KINDS) { const v = Number(r.catMult[k]); if (Number.isFinite(v) && v !== 100) out.catMult[k] = Math.max(10, Math.min(1000, Math.round(v))); }
@@ -678,6 +679,60 @@ async function buttonStatus(env, u) {
   const got = Object.fromEntries(rows.map(r => [r.kind, r.n]));
   const invited = (await env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE referrer = ?').bind(u.id).first()).n;
   return { buttons: u.buttons || 0, daily: !!got.daily, upload: !!got.upload, comments: got.comment || 0, invited, rules: BTN };
+}
+// ---------- карточка дня (этап 13 А): задания на сегодня, штампы, бонус за dayBonusNeed штампов ----------
+// задание: id, название [en, ru, lv], ссылка, вкл. ли сейчас. Сделано ли — по журналу пуговок за сутки (button_log.day) или по штампу (kind 'stamp', ref 'день:id')
+const TASKS = [
+  { id: 'daily', n: ['Visit the site', 'Зайти на сайт', 'Ienākt vietnē'], url: '/' },
+  { id: 'draw', n: ['Drawing of the day', 'Рисунок дня', 'Dienas zīmējums'], url: '/challenge/' },
+  { id: 'comment', n: ['Comment in the blog', 'Комментарий в блоге', 'Komentārs blogā'], url: '/blog/' },
+  { id: 'rain', n: ['Button Rain', 'Пуговичный дождь', 'Pogu lietus'], url: '/rain/', on: () => RULES.gameOn },
+  { id: 'potion', n: ['Brew a potion', 'Сварить зелье', 'Izvārīt dziru'], url: '/potions/', on: () => RULES.potionOn },
+  { id: 'titos', n: ['Solve a Titos case', 'Раскрыть дело Титоса', 'Atrisināt Tito lietu'], url: '/titos/' },
+  { id: 'bugs', n: ['Catch the bugs', 'Поймать жуков', 'Noķert blaktis'], url: '/titos/#bugs' },
+  { id: 'advent', n: ['Advent window', 'Окошко адвента', 'Adventes lodziņš'], url: '/advent/', on: (t) => t.month === 12 },
+];
+// штамп за то, что не платит пуговками («Жуки», дело Титоса): одна запись на (птичка, день, задание)
+async function stamp(env, uid, task) {
+  await env.DB.prepare("INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, 'stamp', ?, 0, ?, ?)").bind(uid, rigaDay() + ':' + task, rigaDay(), now()).run();
+}
+async function dayCard(env, req, u, L, withLog) {
+  const day = rigaDay(), t = adventNow(req, env), gp = gamePrices(await gameUnit(env)), unit = await gameUnit(env);
+  const rows = (await env.DB.prepare('SELECT kind, ref, amount, created_at FROM button_log WHERE user_id = ? AND day = ?').bind(u.id, day).all()).results;
+  const cnt = k => rows.filter(r => r.kind === k).length, stamped = k => rows.some(r => r.kind === 'stamp' && r.ref === day + ':' + k);
+  // когда поставлен штамп (сек): по нему браузер узнаёт свежие штампы и показывает тост «Штамп!»
+  const at = (...ks) => Math.min(...rows.filter(r => ks.includes(r.kind) || r.kind === 'stamp' && ks.some(k => r.ref === day + ':' + k)).map(r => r.created_at || 0), Infinity);
+  const tr = await env.DB.prepare('SELECT * FROM titos WHERE user_id = ?').bind(u.id).first().catch(() => null);
+  const ts = titosState(tr, RULES, { rigaDay }), cases = (await env.DB.prepare('SELECT COUNT(*) AS n FROM titos_cases').first().catch(() => null) || {}).n || 0;
+  const [y, m, d] = day.split('-').map(Number), tomorrow = rigaMs(y, m, d + 1);
+  const adv = t.day ? (await env.DB.prepare('SELECT created_at FROM advent_open WHERE user_id = ? AND year = ? AND day = ?').bind(u.id, t.year, t.day).first()) : null;
+  const tl = (ts.level || 0) + 1, cmt = cnt('comment');
+  const st = {
+    daily: { done: cnt('daily') > 0, reward: BTN.daily, at: at('daily') },
+    draw: { done: cnt('upload') > 0, reward: BTN.upload, at: at('upload') },
+    comment: { done: cmt > 0, reward: BTN.comment, at: at('comment'), prog: [Math.min(cmt, BTN.commentsPerDay), BTN.commentsPerDay] },
+    rain: { done: cnt('game') > 0, reward: gp.level, at: at('game') },
+    potion: { done: cnt('potion') > 0, reward: gp.p1, at: at('potion') },
+    // дело: новое раскрытое за сутки; ждёт — нет кофе на старт (до следующей чашки) или все дела раскрыты (новое появится само)
+    titos: { done: stamped('titos') || cnt('titos') > 0, at: at('titos'), reward: RULES.titosOn ? btnOf(RULES.titosLevelPct, unit) * (1 + Math.floor((tl - 1) / 10)) : 0,
+      wait: ts.level >= cases && cases ? -1 : !ts.run && ts.coffee < RULES.titosStartCups ? ts.next : null },
+    bugs: { done: stamped('bugs'), at: at('bugs'), coffee: RULES.titosBugsCups, wait: ts.bugsLeft ? null : ts.bugsNext },
+    advent: { done: !!adv, at: adv ? adv.created_at : 0, reward: ADVENT_SPECIAL.includes(t.day) ? BTN.adventSpecial : BTN.advent },
+  };
+  const pre = ['', '/ru', '/lv'][L];
+  const tasks = TASKS.filter(x => !x.on || x.on(t)).map(x => ({ id: x.id, name: x.n[L], url: pre + x.url, ...st[x.id], at: st[x.id].done && st[x.id].at < Infinity ? st[x.id].at : 0, wait: st[x.id].done ? tomorrow : st[x.id].wait || null }));
+  const done = tasks.filter(x => x.done).length, need = Math.min(RULES.dayBonusNeed, tasks.length), amount = btnOf(RULES.dayBonusPct, unit);
+  // бонус: раз в сутки, когда штампов набралось dayBonusNeed (ref = день — второй раз не начислится)
+  let got = cnt('daybonus') > 0, just = 0;
+  if (!got && done >= need && amount > 0 && u.nick && !u.banned) { just = await award(env, u.id, 'daybonus', day, amount); got = true; }
+  const earned = rows.filter(r => r.amount > 0 && !['admin', 'salary', 'sell'].includes(r.kind)).reduce((a, r) => a + r.amount, 0) + just;
+  // ближайший бейдж: следующий уровень серии (по рекорду), сколько дней текущей серии до него
+  const posts = (await env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(u.id).all()).results, days = streakDays(posts);
+  const best = mergedBest(u, days), cur = streaks(days).current, nd = Object.keys(BTN.levels).map(Number).sort((a, b) => a - b).find(x => x > best);
+  const out = { day, tasks, done, bonus: { need, of: RULES.dayBonusOf, amount, got, just }, earned, buttons: (u.buttons || 0) + just, nextAt: tomorrow, now: Date.now(),
+    friend: BTN.friend, badge: nd ? { d: nd, left: Math.max(1, nd - cur), reward: BTN.levels[nd] } : null };
+  if (withLog) out.log = (await env.DB.prepare("SELECT kind, ref, amount, created_at FROM button_log WHERE user_id = ? AND amount != 0 ORDER BY id DESC LIMIT 40").bind(u.id).all()).results;
+  return out;
 }
 const randomHex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, '0')).join('');
 async function sha256(s) {
@@ -1933,6 +1988,12 @@ async function route(req, env, url) {
     return json({ ok: true }, 200, { 'set-cookie': sessionCookie('', 0) });
   }
 
+  if (m === 'GET' && p === '/api/today') { // карточка дня (site/assets/day-card.js); ?log=1 — и история пуговок
+    const u = await currentUser(req, env);
+    if (!u || !u.nick || u.banned) return json({ guest: true }, 200, { 'cache-control': 'no-store' });
+    const L = Math.max(0, ['en', 'ru', 'lv'].indexOf(url.searchParams.get('lang')));
+    return json(await dayCard(env, req, u, L, url.searchParams.get('log') === '1'), 200, { 'cache-control': 'no-store' });
+  }
   if (m === 'GET' && p === '/api/me') {
     const u = await currentUser(req, env);
     if (!u) return json({ user: null });

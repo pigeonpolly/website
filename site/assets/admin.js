@@ -465,6 +465,8 @@
     const box = (h, rows, lead = '') => `<section class="adm-box adm-rules"><h3>${h}</h3>${lead ? `<p class="be-note">${lead}</p>` : ''}<table class="be-table adm-table"><thead><tr><th>Что</th><th>Сейчас</th><th>По умолчанию</th></tr></thead><tbody>${rows.join('')}</tbody></table></section>`;
     const btnRows = [['daily', 'Первый заход за сутки'], ['upload', 'Рисунок в челлендж (раз в день)'], ['comment', 'Комментарий'], ['commentsPerDay', 'Сколько комментариев в день приносят пуговки', ''], ['friend', 'Друг указал тебя при регистрации'], ['pick', '«★ Выбор Полли» (за каждую выбранную работу)']]
       .map(([k, l]) => row(l, num(k, R[k], D[k]) + (k === 'commentsPerDay' ? ' шт.' : ' 🔘'), D[k]));
+    btnRows.push(row('📮 Карточка дня: бонус за … штампов', num('dayBonusNeed', R.dayBonusNeed, D.dayBonusNeed) + ' из ' + num('dayBonusOf', R.dayBonusOf, D.dayBonusOf), D.dayBonusNeed + ' из ' + D.dayBonusOf, 'штамп — задание дня (заход, рисунок, комментарий, игры, Титос, адвент); бонус раз в сутки'),
+      row('📮 Бонус карточки дня', pct('dayBonusPct') + (G.avg && R.dayBonusPct > 0 ? ` → сейчас <b>${Math.max(1, Math.round(R.dayBonusPct * G.avg / 100))} 🔘</b>` : ''), D.dayBonusPct + ' %', 'от опорной цены вещи'));
     const lvRows = Object.keys(D.levels).map(k => row(`${LEVEL_RU[k] || ''} — рекорд ${k} ${k === '1' ? 'день' : 'дней'} подряд`, num('levels.' + k, R.levels[k], D.levels[k]) + ' 🔘', D.levels[k]));
     const bRows = Object.keys(D.badges).map(k => {
       const cond = BADGE_COND[k] ? BADGE_COND[k].map(([ck, a, b]) => `${a} ${num('cond.' + ck, R.cond[ck], D.cond[ck], 1, 60)} ${b}`).join(' · ') : (BADGE_FIXED[k] || '');
