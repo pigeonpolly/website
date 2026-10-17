@@ -175,7 +175,7 @@ function cleanRoom(room, own) {
 
 // ---------- коробка при регистрации (как альбом): птичка выбирает одну из коробок в окне (news.js), потом может поменять ----------
 // gifts.note = 'starter' — эта коробка; её нельзя продать, подарить и отдать за подсказку. users.box0 — какая выбрана ('' — ещё не выбрана),
-// users.box_mail = 1 — непрочитанное письмо о коробках (новость boxes, тем, кто был до коробок)
+// users.box_mail = 1 — непрочитанное письмо о коробках (новость boxes: старым птичкам и новым после выбора)
 const STARTER_BOXES = ['cardbox', 'crate', 'hatbox', 'trunkbox', 'giftbox'];
 // место на полу для коробки: где меньше всего мебели (ширину чужих вещей сервер не знает — считаем 24)
 function boxSpot(room) {
@@ -277,7 +277,7 @@ const NEWS_KINDS = [
   }],
   ['trade', (env, req, u) => tradeNews(env, u.id, RULES.tradeDays)], // новые предложения обмена карточками (worker/cards.js)
   ['reward', (env, req, u) => rewardNews(env, u.id)], // награда Титоса за уровень (worker/titos.js) — «Поставить» в ленте
-  ['boxes', (env, req, u) => u.box_mail ? { n: 1, box: u.box0 || 'cardbox' } : null], // письмо о коробках и бардаке (тем, кто был до коробок)
+  ['boxes', (env, req, u) => u.box_mail ? { n: 1, box: u.box0 || 'cardbox' } : null], // письмо о коробках и бардаке (старым птичкам и новым после выбора коробки)
 ];
 async function newsOf(env, req, u) {
   if (!u || !u.nick || u.banned) return [];
@@ -1340,7 +1340,7 @@ async function route(req, env, url) {
     if (!STARTER_BOXES.includes(box)) fail(400, 'box');
     if (!u.box0) {
       const r = await env.DB.prepare("UPDATE users SET box0 = ? WHERE id = ? AND COALESCE(box0, '') = ''").bind(box, u.id).run(); // два нажатия подряд — одна коробка
-      if (r.meta.changes) await env.DB.batch(starterBoxSql(env, u, box));
+      if (r.meta.changes) await env.DB.batch(starterBoxSql(env, u, box, 1)); // и письмо о коробках и бардаке — как старым птичкам
     } else if (box !== u.box0) {
       const g = await env.DB.prepare("SELECT id, item FROM gifts WHERE user_id = ? AND kind = 'furn' AND note = 'starter' AND status = 'bag'").bind(u.id).first();
       if (!g) fail(404, 'gone');

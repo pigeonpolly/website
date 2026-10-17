@@ -74,7 +74,7 @@
       act: ['Place it', 'Поставить', 'Novietot'],
       open: reward,
     },
-    boxes: { // письмо о коробках и бардаке — тем, кто был до коробок (worker: users.box_mail)
+    boxes: { // письмо о коробках и бардаке — старым птичкам и новым после выбора коробки (worker: users.box_mail)
       icon: '📦',
       title: () => ['A letter for you!', 'Тебе письмо!', 'Tev vēstule!'][L],
       text: () => ['A box for your room — and a word about mess', 'Коробка для комнаты — и пара слов о бардаке', 'Kaste tavai istabai — un pāris vārdu par nekārtību'][L],
@@ -134,6 +134,7 @@
           if (window.PPRoom && PPRoom.live && PPRoom.live.box.isConnected) { location.reload(); return; } // своя комната на странице — показать коробку сразу
           const href = `${pre}/bird/?nick=${encodeURIComponent(me.nick)}`;
           if (window.PPToast) PPToast(BX.done[L](boxName(b)), { action: BX.look[L], onAction: () => { location.href = href; }, ms: 6000 });
+          if (!cur) refresh().then(() => { flown = false; fly(); }); // пришло письмо о коробках — конвертик
         } catch (e) { grid.querySelectorAll('button').forEach(x => { x.disabled = false; }); alert(BX.err[L]); }
       };
       grid.appendChild(btn);
