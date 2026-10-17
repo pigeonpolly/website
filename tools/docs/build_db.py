@@ -54,7 +54,7 @@ def col(defn):
 
 def main():
     tables, where = {}, {}
-    meta = {}
+    meta, alters = {}, []
     for f in SRCS:
         src = f.read_text(encoding='utf-8')
         rel = f.relative_to(ROOT).as_posix()
@@ -65,10 +65,7 @@ def main():
             keys = [re.sub(r'\s+', ' ', p) for p in parts if CONSTRAINT.match(p)]
             tables[t] = {'cols': cols, 'keys': keys, 'added': []}
             where[t] = rel
-        for m in ALTER.finditer(src):
-            t, c, typ, rest = m.group(1), m.group(2), m.group(3) or '', (m.group(4) or '').strip()
-            if t in tables and not any(x.startswith(f'`{c}`') for x in tables[t]['cols'] + tables[t]['added']):
-                tables[t]['added'].append(col(f'{c} {typ} {rest}'))
+        alters += [(m, rel) for m in ALTER.finditer(src)]  # после всех CREATE: файл с ALTER может идти раньше файла с таблицей
         found = set()
         for m in META_CALL.finditer(src):
             found.add(m.group(1))
@@ -84,6 +81,10 @@ def main():
                 found.add(prefix + '*')
         for k in found:
             meta.setdefault(k, set()).add(rel)
+    for m, rel in alters:
+        t, c, typ, rest = m.group(1), m.group(2), m.group(3) or '', (m.group(4) or '').strip()
+        if t in tables and not any(x.startswith(f'`{c}`') for x in tables[t]['cols'] + tables[t]['added']):
+            tables[t]['added'].append(col(f'{c} {typ} {rest}'))
     out = ['# База D1 и ключи meta', '',
            '_Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TABLE / ALTER TABLE и обращений к meta в worker/*.js. Руками не править._', '',
            f'## Таблицы ({len(tables)})', '',

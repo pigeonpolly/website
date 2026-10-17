@@ -74,6 +74,13 @@
       act: ['Place it', 'Поставить', 'Novietot'],
       open: reward,
     },
+    feathers: { // пёрышки комнате — сводка раз в сутки (worker/flock.js featherNews); гаснет, когда хозяин открыл свой профиль
+      icon: '🪶',
+      title: x => [`${x.n} ${x.n === 1 ? 'feather' : 'feathers'} for your room`, `Комнате оставили ${x.n} ${pl(x.n, [0, ['пёрышко', 'пёрышка', 'пёрышек']])}`, `Istabai ${x.n} ${pl(x.n, [0, 0, ['spalviņa', 'spalviņas']])}`][L],
+      text: x => (x.from || []).map(n => '@' + n).join(', ') + ' · ' + ['dropped by and liked it', 'заглянули в гости, и им понравилось', 'ieskatījās ciemos, un viņiem patika'][L],
+      act: ['Look', 'Посмотреть', 'Apskatīt'],
+      go: () => pre + '/bird/#feathers',
+    },
     boxes: { // письмо о коробках и бардаке — старым птичкам и новым после выбора коробки (worker: users.box_mail)
       icon: '📦',
       title: () => ['A letter for you!', 'Тебе письмо!', 'Tev vēstule!'][L],

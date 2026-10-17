@@ -514,7 +514,7 @@
       <label>${t('giveTo')} <input name="to" list="pot-birds" required maxlength="24" autocomplete="off" placeholder="${esc(t('givePh'))}"></label><datalist id="pot-birds"></datalist>
       <p class="pot-dlg-st" role="status"></p><div class="pot-ov-btns"><button type="button" class="pill-btn" value="x">${t('cancel')}</button><button type="submit" class="pill-btn pill-fill">${t('giveBtn')}</button></div></form>`;
     document.body.appendChild(d); d.showModal();
-    fetch('/api/birds').then(r => r.ok ? r.json() : { birds: [] }).then(x => { d.querySelector('#pot-birds').innerHTML = (x.birds || []).filter(b => b.nick && b.id !== S.me.id).map(b => `<option value="${esc(b.nick)}">`).join(''); }).catch(() => {});
+    fetch('/api/birds?names=1').then(r => r.ok ? r.json() : { birds: [] }).then(x => { d.querySelector('#pot-birds').innerHTML = (x.birds || []).filter(b => b.nick && b.id !== S.me.id).map(b => `<option value="${esc(b.nick)}">`).join(''); }).catch(() => {});
     const f = d.querySelector('form'), st = d.querySelector('.pot-dlg-st');
     d.querySelector('[value=x]').onclick = () => { d.close(); d.remove(); };
     f.onsubmit = async e => {

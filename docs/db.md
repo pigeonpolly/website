@@ -2,7 +2,7 @@
 
 _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TABLE / ALTER TABLE и обращений к meta в worker/*.js. Руками не править._
 
-## Таблицы (36)
+## Таблицы (38)
 
 Обозначения: PK — первичный ключ, nn — NOT NULL, =x — DEFAULT x; «+» — столбцы, добавленные ALTER TABLE.
 
@@ -19,7 +19,9 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **card_owner** (worker/cards.js): `card_id` int PK, `user_id` int nn, `price` int =0, `bought_at` int, `ref` text
 - **card_trades** (worker/cards.js): `id` int PK auto, `from_id` int nn, `to_id` int nn, `give` text nn, `take` text nn, `status` text nn ='open', `created_at` int, `done_at` int, `seen` int =0, `ref` text
 - **challenge_days** (worker/challenge-days.js): `day` text PK, `item` int, `subject_en` text, `subject_ru` text, `subject_lv` text, `tip_en` text, `tip_ru` text, `tip_lv` text, `colors` text, `time` int, `twist_en` text, `twist_ru` text, `twist_lv` text, `extra_en` text, `extra_ru` text, `extra_lv` text, `edited` int =0, `orig` text, `updated_at` int
-- **users** (worker/index.js): `id` int PK auto, `sub` text UNIQUE nn, `email` text, `nick` text UNIQUE COLLATE NOCASE, `consent` int =0, `banned` int =0, `created_at` int; + `avatar` text ='', `best` int =0, `badges` text ='', `months` text ='', `room` text ='', `picks` int =0, `mcount` text ='', `last_seen` int, `game_best` int =0, `game_best_at` int, `maze_level` int =1, `inv` text ='', `pot_fails` int =0, `eyes` int =0, `eye_next` int =0, `room_at` int, `req_n` int =0, `req_mid` int =0, `buttons` int =0, `referrer` int, `box0` text ='', `box_mail` int =0
+- **room_guests** (worker/flock.js): `owner_id` int nn, `guest_id` int nn, `first_at` int, `last_at` int; PRIMARY KEY (owner_id, guest_id)
+- **feathers** (worker/flock.js): `owner_id` int nn, `from_id` int nn, `day` text nn, `created_at` int, `seen` int =0; PRIMARY KEY (owner_id, from_id, day)
+- **users** (worker/index.js): `id` int PK auto, `sub` text UNIQUE nn, `email` text, `nick` text UNIQUE COLLATE NOCASE, `consent` int =0, `banned` int =0, `created_at` int; + `pw` text, `pw_temp` int =0, `email_ok` int =0, `privacy_at` int, `advent_mail` text ='', `advent_sent` int =0'], `feathers` int =0, `feather_day` text ='', `avatar` text ='', `best` int =0, `badges` text ='', `months` text ='', `room` text ='', `picks` int =0, `mcount` text ='', `last_seen` int, `game_best` int =0, `game_best_at` int, `maze_level` int =1, `inv` text ='', `pot_fails` int =0, `eyes` int =0, `eye_next` int =0, `room_at` int, `req_n` int =0, `req_mid` int =0, `buttons` int =0, `referrer` int, `box0` text ='', `box_mail` int =0
 - **sessions** (worker/index.js): `token` text PK, `user_id` int nn, `expires` int nn; + `pin_ok` int =0
 - **posts** (worker/index.js): `id` text PK, `user_id` int nn, `day` text nn, `theme` text, `bw` int =0, `created_at` int, `hidden` int =0; + `tod` int, `picked` int =0, `bytes` int, `store` text, `ai` int =0, `kv` int =1; UNIQUE(user_id, day)
 - **meta** (worker/index.js): `key` text PK, `value` text
@@ -43,13 +45,14 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **titos** (worker/titos.js): `user_id` int PK, `level` int =0, `coffee` int =10, `coffee_at` int =0, `drink_at` int =0, `sleep` int =0, `run` int =0, `found` text ='[]', `started` int =0, `bugs` text ='[]', `sell_day` text ='', `sell_n` int =0, `legacy` int =0; + `sort_lv` int =0, `sort_run` text ='', `bugs_run` int =0']
 - **titos_cases** (worker/titos.js): `n` int PK, `data` text nn, `tr` text ='{}', `hash` text, `updated_at` int
 
-## Ключи meta (37)
+## Ключи meta (38)
 
 Таблица `meta (key, value)`. Ключ → где используется.
 
 - `admin_email_off` — worker/index.js
 - `admin_ids` — worker/index.js
 - `admin_pin` — worker/blog.js, worker/index.js
+- `advent_mail_n:` — worker/auth.js
 - `backup_token` — worker/blog.js, worker/index.js
 - `blog_salt` — worker/blog.js, worker/index.js
 - `blog_strict` — worker/blog.js

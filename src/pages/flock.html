@@ -1,39 +1,7 @@
 <section class="page-head fl-page-head">
   <p class="topics">pixel birds</p>
-  <h1>The Flock</h1>
-  <p class="lead">Everyone who signs in on this site lives here as a little pixel bird. Press the buttons and see what happens.</p>
-  <div class="fl-top-btns"><a class="pill-btn pill-fill" href="#all-birds">🐦 See the whole flock</a><a class="pill-btn" href="/shop/">🛍 Shop</a></div>
+  <h1>All birds</h1>
+  <p class="lead">Everyone who signs in here gets a little pixel bird with its own room. Tap a bird to visit its room, bag, achievements and sketches, and leave it a feather.</p>
 </section>
-<div class="fl-full">{{block:flock}}</div>
-<section class="fl-all" id="all-birds">
-  <h2 class="section-title">All birds</h2>
-  <p class="fl-all-lead">Tap a bird to visit its profile: room, bag, achievements and sketches.</p>
-  <input type="search" class="fl-all-q" placeholder="🔍 Nickname" aria-label="Nickname">
-  <div class="fl-all-grid" aria-live="polite"></div>
-</section>
-<section class="fl-rooms" id="rooms">
-  <h2 class="section-title">Bird rooms</h2>
-  <p class="fl-rooms-lead">Rooms of the flock: the ones where something new appeared most recently come first.</p>
-  <div class="fl-rooms-grid"></div>
-</section>
-<script src="/assets/rooms-gallery.js" defer></script>
-<script>
-// все птицы стаи: аватар (с подарками) и ник; нажатие — профиль на странице челленджа (бейджи, сумка, работы)
-(function () {
-  var box = document.querySelector('.fl-all-grid'), q = document.querySelector('.fl-all-q'), list = [];
-  var pre = { ru: '/ru', lv: '/lv' }[document.documentElement.lang] || '';
-  function draw() {
-    var f = q.value.trim().toLowerCase().replace(/^@/, '');
-    box.innerHTML = '';
-    list.filter(function (b) { return !f || b.nick.toLowerCase().indexOf(f) >= 0; }).forEach(function (b) {
-      var a = document.createElement('a'); a.className = 'fl-all-bird'; a.href = pre + '/bird/?nick=' + encodeURIComponent(b.nick); // страница профиля птички
-      if (window.PPBirds) a.appendChild(window.PPBirds.avatar(b.id, b.avatar, 76));
-      var n = document.createElement('span'); n.textContent = '@' + b.nick; a.appendChild(n);
-      if (b.home) { var h = document.createElement('i'); h.className = 'fl-home'; h.textContent = '🏠'; h.title = 'Room'; a.appendChild(h); } // у птички обустроена комната
-      box.appendChild(a);
-    });
-  }
-  q.addEventListener('input', draw);
-  fetch('/api/birds').then(function (r) { return r.ok ? r.json() : { birds: [] }; }).then(function (d) { list = d.birds || []; draw(); }).catch(function () {});
-})();
-</script>
+<section class="fl-all" id="all-birds"><div class="fl-list"><p class="sw-loading">…</p></div></section>
+<script src="/assets/flock-list.js" defer></script>

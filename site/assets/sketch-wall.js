@@ -14,7 +14,7 @@
     tabBag: ['🎒 Bag', '🎒 Сумка', '🎒 Soma'], tabBadges: ['🏅 Achievements', '🏅 Достижения', '🏅 Sasniegumi'], tabWorks: ['🎨 Sketches', '🎨 Рисунки', '🎨 Skices'], tabCards: ['🃏 Cards', '🃏 Карточки', '🃏 Kartītes'], tabShop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'],
     pSign: ['Sign in and get your own pixel bird: a profile, a room, a bag for gifts and a place on the sketch wall.', 'Войдите и получите свою пиксельную птичку: профиль, комнату, сумку для подарков и место на стене рисунков.', 'Ienāc un saņem savu pikseļu putniņu: profilu, istabu, somu dāvanām un vietu skiču sienā.'],
     pSignBtn: ['Sign in', 'Войти', 'Ienākt'], pNone: ['There is no bird with this nickname.', 'Птички с таким ником нет.', 'Putniņa ar tādu segvārdu nav.'],
-    pAll: ['All birds →', 'Все птицы →', 'Visi putniņi →'], pChallenge: ['🎨 Daily Challenge', '🎨 Челлендж', '🎨 Izaicinājums'],
+    pAll: ['To the flock →', 'В стаю →', 'Uz baru →'], pChallenge: ['🎨 Daily Challenge', '🎨 Челлендж', '🎨 Izaicinājums'],
     signTitle: ['Join the wall', 'Присоединяйтесь к стене', 'Pievienojies sienai'],
     signText: ['Sign in with Google to upload your daily sketch, keep your streak and collect badges. No passwords.', 'Войдите через Google, чтобы загружать рисунок дня, вести серию и собирать бейджи. Без паролей.', 'Ienāc ar Google, lai augšupielādētu dienas skici, turētu sēriju un krātu nozīmītes. Bez parolēm.'],
     devLogin: ['Dev login', 'Тестовый вход', 'Testa ieeja'],
@@ -423,7 +423,7 @@
     m.card.innerHTML = `<button type="button" class="sw-bv-close" aria-label="Close">✕</button><h3>${t('giveT')}</h3><div class="give-pic"></div><p class="sw-bv-how">${t('giveText')}</p>
       <form class="give-f"><input name="to" list="give-list" required maxlength="24" autocomplete="off" placeholder="${t('givePh')}"><datalist id="give-list"></datalist><button type="submit" class="cta-btn">${t('giveGo')}</button></form><p class="give-st" role="status"></p>`;
     m.card.querySelector('.give-pic').appendChild(window.PPBirds.giftPic(g.kind, g.item, me.id, 84));
-    fetch('/api/birds').then(r => r.ok ? r.json() : { birds: [] }).then(x => { const dl = m.card.querySelector('#give-list'); if (dl) dl.innerHTML = (x.birds || []).filter(b => b.nick && b.id !== me.id).map(b => `<option value="${esc(b.nick)}">`).join(''); }).catch(() => {});
+    fetch('/api/birds?names=1').then(r => r.ok ? r.json() : { birds: [] }).then(x => { const dl = m.card.querySelector('#give-list'); if (dl) dl.innerHTML = (x.birds || []).filter(b => b.nick && b.id !== me.id).map(b => `<option value="${esc(b.nick)}">`).join(''); }).catch(() => {});
     const f = m.card.querySelector('.give-f'), st = m.card.querySelector('.give-st');
     f.onsubmit = async e => {
       e.preventDefault();
@@ -638,7 +638,7 @@
       return;
     }
     let pr;
-    try { pr = await api('profile?nick=' + encodeURIComponent(who)); } catch (e) { page.innerHTML = `<div class="bp-sign"><p>${t('pNone')}</p><a class="pill-btn" href="${pre}/flock/#all-birds">${t('pAll')}</a></div>`; return; }
+    try { pr = await api('profile?nick=' + encodeURIComponent(who)); } catch (e) { page.innerHTML = `<div class="bp-sign"><p>${t('pNone')}</p><a class="pill-btn" href="${pre}/flock/">${t('pAll')}</a></div>`; return; }
     const mine = !!(me && me.id === pr.id), lv = levelOf(pr.best), got = new Set(pr.badges);
     const st = x => x.k === 'pick' ? (got.has('pick') ? true : got.has('pick_past') ? 'past' : false) : got.has(x.k);
     const newGifts = mine ? (me.gifts || []).filter(g => g.status === 'new') : [];
@@ -649,7 +649,7 @@
           <p class="bp-line">${lv ? esc(lv.n[L]) + ' · ' : ''}🔥 ${t('streak', pr.current)} · ${t('best', pr.best)} · ${t('btnOther', mine && me.btn ? me.btn.buttons : pr.buttons)}</p>
           <div class="bp-acts">${newGifts.length ? `<button type="button" class="pill-btn pill-fill sw-gift-btn" id="bp-gift">🎁 ${t('giftNew', newGifts.length)}</button>` : ''}
             <button type="button" class="pill-btn" id="bp-share">📤 ${t(mine ? 'shareBird' : 'shareThis')}</button>${mine ? `<a class="pill-btn" href="${pre}/challenge/">${t('pChallenge')}</a>` : ''}</div></div></div>
-      ${mine ? '<div class="bp-day" id="bp-day"></div>' : ''}<div class="bp-room" id="bp-room" hidden></div>
+      ${mine ? '<div class="bp-day" id="bp-day"></div>' : ''}<div class="bp-room" id="bp-room" hidden></div><div class="bp-feathers" id="bp-feathers" hidden></div>
       <div class="bp-tabs" role="tablist">${[['bag', t('tabBag')], ['badges', t('tabBadges')], ['works', t('tabWorks') + ` (${pr.posts.length})`], ...(window.PPCards ? [['cards', t('tabCards')]] : [])]
         .map(([k, n], i) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}">${n}</button>`).join('')}<button type="button" class="bp-tab-shop bp-tab-album" id="bp-album">${['🃏 Album', '🃏 Альбом', '🃏 Albums'][L]}</button><a class="bp-tab-shop" href="${L === 1 ? '/ru' : L === 2 ? '/lv' : ''}/shop/">${t('tabShop')}</a></div>
       <div class="bp-panel" role="tabpanel"></div>
@@ -663,6 +663,8 @@
     if (gb && location.hash === '#gift') { history.replaceState(null, '', location.pathname + location.search); gb.click(); } // /bird/#gift — «Открыть подарок» из новостей (news.js)
     // комната птички (room.js); пока его нет на странице — блок скрыт
     if (window.PPRoom) { const rb = page.querySelector('#bp-room'); rb.hidden = false; window.PPRoom.mount(rb, { id: pr.id, nick: pr.nick, avatar: pr.avatar, room: pr.room, mine, me, onRoom: room => { me.room = room; if (curBag && curBag.box && curBag.box.isConnected) curBag.draw(); } });
+      const fe = page.querySelector('#bp-feathers'); // пёрышки комнаты (feathers.js, этап 13 В)
+      if (window.PPFeathers) { fe.hidden = false; window.PPFeathers.mount(fe, { nick: pr.nick, room: rb, signedIn: !!(me && me.nick), onShare: share }); if (mine && location.hash === '#feathers') { history.replaceState(null, '', location.pathname + location.search); setTimeout(() => fe.scrollIntoView({ behavior: 'smooth', block: 'center' }), 300); } }
       const h = mine && (location.hash.match(/^#use=(.+)$/) || [])[1]; // пришли из сумки на другой странице: поставить вещь
       if (h) { history.replaceState(null, '', location.pathname + location.search); const [k, v] = decodeURIComponent(h).split('|'); setTimeout(() => useItem(k, v), 400); } }
     const panel = page.querySelector('.bp-panel');

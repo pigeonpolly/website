@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=05fdd8a7">
+<link rel="stylesheet" href="/assets/style.css?v=2f6bcb73">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <script src="/assets/site.js?v=20ab1a8a" defer></script>
 <script src="/assets/polly.js?v=573aaaf7" defer></script>
@@ -34,8 +34,8 @@
 <script src="/assets/potion-names.js?v=faed4153" defer></script>
 <script src="/assets/toast.js?v=38636fa7" defer></script>
 <script src="/assets/day-card.js?v=28549fef" defer></script>
-<script src="/assets/account.js?v=d59936aa" defer></script>
-<script src="/assets/news.js?v=2490d1f0" defer></script>
+<script src="/assets/account.js?v=aa1957bd" defer></script>
+<script src="/assets/news.js?v=0808da11" defer></script>
 <script src="/assets/search.js?v=69d0c7a5" defer></script>
 </head>
 <body class="inner">
@@ -73,121 +73,11 @@
 <main id="main">
 <section data-ppb="flock.1" class="page-head fl-page-head">
   <p class="topics">pikseļu putniņi</p>
-  <h1>Putnu bars</h1>
-  <p class="lead">Ikviens, kas pieslēdzas vietnei, dzīvo šeit kā mazs pikseļu putniņš. Spied pogas un skaties, kas notiks.</p>
-  <div class="fl-top-btns"><a class="pill-btn pill-fill" href="#all-birds">🐦 Apskatīt visu baru</a><a class="pill-btn" href="/lv/shop/">🛍 Veikals</a></div>
+  <h1>Visi putniņi</h1>
+  <p class="lead">Katrs, kas ienāk vietnē, saņem mazu pikseļu putniņu ar savu istabu. Pieskaries putniņam — apskatīsi tā istabu, somu, sasniegumus un skices un varēsi atstāt spalviņu.</p>
 </section>
-<div data-ppb="flock.2" class="fl-full"><div class="blk" id="blk-flock" data-ppb="blk-flock"><style>#blk-flock .fl { padding: 56px var(--gutter) 64px; text-align: center; }
-#blk-flock .fl-kick { margin: 0 0 6px; font: italic 400 18px var(--serif); color: #F0A987; }
-#blk-flock .fl h2 { margin: 0 0 10px; font: 600 clamp(28px, 3.2vw, 40px)/1.1 var(--serif); }
-#blk-flock .fl-sub { margin: 0 auto 8px; max-width: 58ch; font-size: 16px; line-height: 1.6; color: #D9D3F2; }
-#blk-flock .fl-count { margin: 0 0 20px; font-size: 14px; font-weight: 700; color: #E9A93B; min-height: 1.2em; }
-#blk-flock .fl-stage { position: relative; max-width: 1200px; margin: 0 auto; border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 3px #1a1528, 0 18px 40px rgba(0, 0, 0, .35); cursor: pointer; }
-#blk-flock .fl-stage canvas { display: block; width: 100%; image-rendering: pixelated; }
-#blk-flock .fl-labels { position: absolute; inset: 0; pointer-events: none; }
-#blk-flock .fl-nick { position: absolute; left: 0; top: 0; padding: 1px 6px; border-radius: 99px; background: rgba(26, 21, 40, .72); color: #F3EFFA; font: 700 11px/1.4 var(--sans); white-space: nowrap; text-decoration: none; pointer-events: auto; will-change: transform; }
-#blk-flock .fl-nick:hover { background: #F0A987; color: #2B1A51; z-index: 2; }
-#blk-flock .fl-nick.me { background: #E9A93B; color: #2B1A51; z-index: 1; }
-#blk-flock .fl-join { display: inline-block; margin-top: 12px; }
-#blk-flock .fl-how { margin: 22px 0 0; font-size: 15px; color: #F3EFFA; font-weight: 700; }
-#blk-flock .fl-tools { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 1000px; margin: 0 auto 14px; }
-#blk-flock .fl-tools button { padding: 6px 12px; border-radius: 99px; border: 1.5px solid rgba(243, 239, 250, .35); background: rgba(255, 255, 255, .06); color: #F3EFFA; font: 700 13px var(--sans); cursor: pointer; transition: background .15s, transform .15s; }
-#blk-flock .fl-tools button:hover { background: rgba(240, 169, 135, .25); border-color: #F0A987; }
-#blk-flock .fl-tools button[aria-pressed="true"] { background: #E9A93B; border-color: #E9A93B; color: #2B1A51; }
-#blk-flock .fl-tools button.pop { animation: fl-pop .35s; }
-@keyframes fl-pop { 40% { transform: scale(1.12); } }
-#blk-flock .fl-tools .fl-reset { border-color: #4CC38A; color: #BFF0D6; }
-#blk-flock .fl-tools .fl-reset:hover { background: rgba(76, 195, 138, .25); border-color: #4CC38A; }
-#blk-flock .fl-open { padding: 6px 12px; border-radius: 99px; border: 1.5px solid #F0A987; background: #F0A987; color: #2B1A51; font: 700 13px var(--sans); text-decoration: none; }
-#blk-flock .fl-open:hover { background: #F7C6A9; color: #2B1A51; }
-#blk-flock .fl-labels.hide-nicks .fl-nick:not(.me):not(.found) { display: none; }
-#blk-flock .fl-nick.found { background: #E9A93B; color: #2B1A51; z-index: 3; box-shadow: 0 0 0 2px #FFFDF5; }
-#blk-flock .fl-find { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin: 0 auto 14px; }
-#blk-flock .fl-find input { width: min(260px, 60vw); padding: 7px 14px; border-radius: 99px; border: 1.5px solid rgba(243, 239, 250, .35); background: rgba(255, 255, 255, .08); color: #F3EFFA; font: 600 14px var(--sans); }
-#blk-flock .fl-find input::placeholder { color: #B9B0D6; }
-#blk-flock .fl-find input:focus { outline: none; border-color: #E9A93B; }
-#blk-flock .fl-find button { padding: 7px 14px; border-radius: 99px; border: 0; background: #E9A93B; color: #2B1A51; font: 700 13px var(--sans); cursor: pointer; }
-#blk-flock .fl-find-msg { min-width: 1em; font-size: 14px; font-weight: 700; color: #E9A93B; }
-#blk-flock .fl-seedhint { margin: -6px 0 12px; font-size: 14px; color: #E9A93B; font-weight: 700; }
-#blk-flock .fl-stage.seeding { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Ctext y='22' font-size='22'%3E%F0%9F%8C%BE%3C/text%3E%3C/svg%3E") 6 22, crosshair; touch-action: none; }
-#blk-flock .fl-stage.seeding .fl-nick { pointer-events: none; }
-@media (max-width: 600px) {#blk-flock .fl-tools button { font-size: 12px; padding: 5px 9px; }
-#blk-flock .fl-nick { font-size: 10px; padding: 0 4px; }}
-#blk-flock .fl-menu { position: relative; }
-#blk-flock .fl-menu > summary { list-style: none; cursor: pointer; padding: 6px 14px; border-radius: 99px; border: 1.5px solid #E9A93B; background: rgba(233, 169, 59, .15); color: #F3EFFA; font: 700 13px var(--sans); }
-#blk-flock .fl-menu > summary::-webkit-details-marker { display: none; }
-#blk-flock .fl-menu > summary::after { content: ' ▾'; }
-#blk-flock .fl-menu[open] > summary { background: #E9A93B; color: #2B1A51; }
-#blk-flock .fl-menu[open] > summary::after { content: ' ▴'; }
-#blk-flock .fl-menu-in { position: absolute; z-index: 30; top: calc(100% + 6px); left: 50%; transform: translateX(-50%); display: grid; grid-template-columns: repeat(2, max-content); gap: 6px; padding: 10px; border-radius: 16px; background: #2B1A51; box-shadow: 0 14px 32px rgba(0,0,0,.45), 0 0 0 1.5px rgba(243,239,250,.25); }
-#blk-flock .fl-menu-in button { text-align: left; }
-#blk-flock .fl-tools { position: relative; }
-@media (max-width: 600px) {#blk-flock .fl-menu { position: static; }
-#blk-flock .fl-menu-in { left: 0; right: 0; transform: none; grid-template-columns: 1fr 1fr; }}
-#blk-flock .fl-book { position: absolute; left: 0; top: 0; display: grid; place-items: center; padding: 0; border: 0; border-radius: 2px 3px 3px 2px; background: var(--tc); box-shadow: inset 3px 0 0 rgba(0,0,0,.25), inset 0 0 0 2px rgba(255,255,255,.25), 0 2px 6px rgba(0,0,0,.4); font-size: 15px; cursor: pointer; pointer-events: auto; transition: filter .15s; will-change: transform; animation: fl-glow 2.4s ease-in-out infinite; }
-#blk-flock .fl-spine { border-radius: 1px; box-shadow: inset 0 3px 0 rgba(255,255,255,.35); }
-#blk-flock .fl-spine::after { content: '✨'; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 11px; pointer-events: none; }
-#blk-flock .fl-book:hover, #blk-flock .fl-book:focus-visible { filter: brightness(1.25); outline: 2px solid #F5D547; z-index: 4; }
-@keyframes fl-glow { 50% { box-shadow: inset 3px 0 0 rgba(0,0,0,.25), 0 0 10px 2px rgba(245,213,71,.75); } }
-@media (prefers-reduced-motion: reduce) {#blk-flock .fl-book { animation: none; }}
-#blk-flock .fl-tale { max-width: min(520px, calc(100vw - 32px)); padding: 0; border: 0; border-radius: 18px; background: #FFFDF5; color: #2B1A51; box-shadow: 0 20px 50px rgba(0,0,0,.45); }
-#blk-flock .fl-tale::backdrop { background: rgba(20,12,40,.6); }
-#blk-flock .fl-tale article { text-align: left; padding: 22px 24px 20px; border-top: 10px solid var(--tc); }
-#blk-flock .fl-tale-kick { margin: 0 0 4px; font: 700 12px/1.4 var(--sans); text-transform: uppercase; letter-spacing: .06em; opacity: .7; }
-#blk-flock .fl-tale h3 { margin: 0 0 12px; font-size: 1.35rem; }
-#blk-flock .fl-tale p { margin: 0 0 16px; line-height: 1.6; }
-#blk-flock .fl-tale button { padding: 8px 18px; border: 0; border-radius: 99px; background: #2B1A51; color: #fff; font: 700 14px var(--sans); cursor: pointer; }
-#blk-flock .fl-reading { position: absolute; left: 0; top: 0; padding: 2px 8px; border: 0; cursor: pointer; border-radius: 99px; background: #FFFDF5; color: #2B1A51; font: 700 11px/1.4 var(--sans); white-space: nowrap; text-decoration: none; pointer-events: auto; box-shadow: 0 3px 8px rgba(0,0,0,.3); z-index: 3; }
-#blk-flock .fl-reading:hover { background: #F5D547; }
-#blk-flock .fl-menu-in button[hidden] { display: none; }
-#blk-flock .fl-invite { margin: 0 auto 14px; padding: 10px 16px; max-width: 620px; border-radius: 18px; background: #F5D547; color: #2B1A51; font: 500 15px/1.5 var(--sans); text-align: center; }
-#blk-flock .fl-invite button { margin-left: 6px; padding: 5px 14px; border: 0; border-radius: 99px; background: #D85A30; color: #fff; font: 700 14px var(--sans); cursor: pointer; }
-#blk-flock .fl-invite button:hover { background: #2B1A51; }</style><section class="fl" id="flock" aria-labelledby="fl-title">
-  <p class="fl-kick">Katrs, kurš pieslēdzas, saņem putniņu</p>
-  <h2 id="fl-title">Mūsu bars</h2>
-  <p class="fl-sub">Šeit dzīvo visi, kas kaut reizi ir pieslēgušies vietnei, — katrs kā mazs pikseļu putniņš. Divu vienādu nav: dažādas formas, cepures un ļoti modernas kurpes. Katrs 10. viesis ir draudzīgs kaķītis, katrs 11. — vārna ar dārgumu knābī. Noklikšķiniet uz segvārda, lai atvērtu profilu.</p>
-  <p class="fl-count" data-tpl="Putni barā: {n}" data-recent="· redzami tie, kas nesen ienāca"></p>
-  <div class="fl-tools" role="toolbar" aria-label="Paspēlējies ar baru"><details class="fl-menu"><summary><span aria-hidden="true">🎮</span> Spēlēt</summary><div class="fl-menu-in"><button type="button" data-act="seed" aria-pressed="false"><span aria-hidden="true">🌾</span> Graudiņi</button><button type="button" data-act="party" aria-pressed="false"><span aria-hidden="true">🎉</span> Svētki</button><button type="button" data-act="wind"><span aria-hidden="true">💨</span> Vējš</button><button type="button" data-act="rain"><span aria-hidden="true">🌧</span> Lietus</button><button type="button" data-act="football"><span aria-hidden="true">⚽</span> Futbols</button><button type="button" data-act="dance"><span aria-hidden="true">🪩</span> Diskotēka</button><button type="button" data-act="nap"><span aria-hidden="true">🌙</span> Nakts</button><button type="button" data-act="coffee"><span aria-hidden="true">☕</span> Kafija</button><button type="button" data-act="tug"><span aria-hidden="true">🥖</span> Bagete</button><button type="button" data-act="plane"><span aria-hidden="true">✈️</span> Lidmašīnīte</button><button type="button" data-act="bookclub"><span aria-hidden="true">📖</span> Grāmatu klubs</button><button type="button" data-act="box"><span aria-hidden="true">📦</span> Kaste</button><button type="button" data-act="delivery"><span aria-hidden="true">🪂</span> Piegāde</button><button type="button" data-act="milkshake"><span aria-hidden="true">🥤</span> Kokteiļi</button><button type="button" data-act="pancakes"><span aria-hidden="true">🥞</span> Pankūkas</button><button type="button" data-act="reading"><span aria-hidden="true">📖</span> Lasīšanas stunda</button><button type="button" data-act="booktower"><span aria-hidden="true">🗼</span> Grāmatu tornis</button><button type="button" data-act="hideseek"><span aria-hidden="true">🫣</span> Paslēpes</button><button type="button" data-act="spooky"><span aria-hidden="true">👻</span> Spoki</button><button type="button" data-act="decorate"><span aria-hidden="true">🎄</span> Izrotāt eglīti</button><button type="button" data-act="presents"><span aria-hidden="true">🎁</span> Atvērt dāvanas</button><button type="button" data-act="khorovod"><span aria-hidden="true">💃</span> Riņķa deja</button><button type="button" data-act="tidy"><span aria-hidden="true">🧹</span> Kārtība</button></div></details><details class="fl-menu"><summary><span aria-hidden="true">📍</span> Kur ir bars</summary><div class="fl-menu-in"><button type="button" data-act="loc-park" aria-pressed="true"><span aria-hidden="true">🌳</span> Skvērs</button><button type="button" data-act="loc-diner" aria-pressed="false"><span aria-hidden="true">🍽</span> Ēstuve</button><button type="button" data-act="loc-books" aria-pressed="false"><span aria-hidden="true">📚</span> Grāmatnīca</button><button type="button" data-act="loc-pumpkins" aria-pressed="false"><span aria-hidden="true">🎃</span> Ķirbju lauks</button><button type="button" data-act="loc-xmas" aria-pressed="false"><span aria-hidden="true">🎄</span> Jaungada egle</button></div></details><button type="button" data-act="nicks" aria-pressed="true"><span aria-hidden="true">🏷</span> Segvārdi</button><button type="button" data-act="reset" class="fl-reset"><span aria-hidden="true">↺</span> Kā bija</button><a class="fl-open" href="/lv/flock/" target="_blank"><span aria-hidden="true">⛶</span> Pa visu ekrānu</a></div>
-  <form class="fl-find" role="search"><input type="search" name="nick" placeholder="Atrast putniņu pēc segvārda" aria-label="Atrast putniņu pēc segvārda" maxlength="40" autocomplete="off"><button type="submit">🔍 Meklēt</button><span class="fl-find-msg" role="status" aria-live="polite"></span></form>
-  <p class="fl-seedhint" hidden>Turi nospiestu peles pogu (vai pirkstu) un vadi pa ainu — putniņi salidos pie graudiņiem.</p>
-  <div class="fl-stage"><canvas width="300" height="142" role="img" aria-label="Pikseļu putniņi dzīvo savu dzīvi pie soliņa: nēsā mantas, velk bageti, spēlē futbolu, lasa grāmatu un dzer kafiju"></canvas><div class="fl-labels"></div></div>
-  <p class="fl-how">Lai nokļūtu barā, vienkārši pieslēdzies ar Google un izvēlies segvārdu.</p>
-  <a class="pill-btn pill-fill fl-join" href="/lv/challenge/">Gribu savu putniņu →</a>
-</section>
-<script src="/assets/flock.js?v=cd587d74" defer></script>
-</div></div>
-<section data-ppb="flock.3" class="fl-all" id="all-birds">
-  <h2 class="section-title">Visi putni</h2>
-  <p class="fl-all-lead">Pieskaries putniņam, lai apmeklētu tā profilu: istaba, soma, sasniegumi un skices.</p>
-  <input type="search" class="fl-all-q" placeholder="🔍 Segvārds" aria-label="Segvārds">
-  <div class="fl-all-grid" aria-live="polite"></div>
-</section>
-<section data-ppb="flock.4" class="fl-rooms" id="rooms">
-  <h2 class="section-title">Putniņu istabas</h2>
-  <p class="fl-rooms-lead">Bara istabas: pirmās — tās, kurās nesen parādījās kaut kas jauns.</p>
-  <div class="fl-rooms-grid"></div>
-</section>
-<script src="/assets/rooms-gallery.js?v=909c054b" defer></script>
-<script>
-// все птицы стаи: аватар (с подарками) и ник; нажатие — профиль на странице челленджа (бейджи, сумка, работы)
-(function () {
-  var box = document.querySelector('.fl-all-grid'), q = document.querySelector('.fl-all-q'), list = [];
-  var pre = { ru: '/ru', lv: '/lv' }[document.documentElement.lang] || '';
-  function draw() {
-    var f = q.value.trim().toLowerCase().replace(/^@/, '');
-    box.innerHTML = '';
-    list.filter(function (b) { return !f || b.nick.toLowerCase().indexOf(f) >= 0; }).forEach(function (b) {
-      var a = document.createElement('a'); a.className = 'fl-all-bird'; a.href = pre + '/bird/?nick=' + encodeURIComponent(b.nick); // страница профиля птички
-      if (window.PPBirds) a.appendChild(window.PPBirds.avatar(b.id, b.avatar, 76));
-      var n = document.createElement('span'); n.textContent = '@' + b.nick; a.appendChild(n);
-      if (b.home) { var h = document.createElement('i'); h.className = 'fl-home'; h.textContent = '🏠'; h.title = 'Room'; a.appendChild(h); } // у птички обустроена комната
-      box.appendChild(a);
-    });
-  }
-  q.addEventListener('input', draw);
-  fetch('/api/birds').then(function (r) { return r.ok ? r.json() : { birds: [] }; }).then(function (d) { list = d.birds || []; draw(); }).catch(function () {});
-})();
-</script>
+<section data-ppb="flock.2" class="fl-all" id="all-birds"><div class="fl-list"><p class="sw-loading">…</p></div></section>
+<script src="/assets/flock-list.js?v=870b2f83" defer></script>
 
 </main>
 <dialog class="modal" id="contact" aria-labelledby="contact-t">

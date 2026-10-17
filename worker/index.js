@@ -9,6 +9,7 @@ import '../site/assets/can-do.js'; // PPCanDo — что можно с вещь�
 const PPCanDo = globalThis.PPCanDo;
 import { cardsApi, importCards, translateMissing, myCards, tradeNews, CARD_TABLES } from './cards.js'; // коллекционные карточки (docs/cards.md)
 import { authApi, googleLink, funnelStep, mailOn, adventMail, adventAsk, AUTH_TABLES, AUTH_ALTER } from './auth.js'; // вход с паролем, письма, воронки (этап 12)
+import { flockApi, featherNews, FLOCK_TABLES, FLOCK_ALTER } from './flock.js'; // «Все птички» и пёрышки (этап 13 Б+В, docs/flock.md)
 import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
@@ -280,6 +281,7 @@ const NEWS_KINDS = [
   }],
   ['trade', (env, req, u) => tradeNews(env, u.id, RULES.tradeDays)], // новые предложения обмена карточками (worker/cards.js)
   ['reward', (env, req, u) => rewardNews(env, u.id)], // награда Титоса за уровень (worker/titos.js) — «Поставить» в ленте
+  ['feathers', (env, req, u) => featherNews(env, u, rigaDay())], // пёрышки комнате — сводка раз в сутки (worker/flock.js)
   ['boxes', (env, req, u) => u.box_mail ? { n: 1, box: u.box0 || 'cardbox' } : null], // письмо о коробках и бардаке (старым птичкам и новым после выбора коробки)
 ];
 async function newsOf(env, req, u) {
@@ -334,6 +336,7 @@ async function setRules(env, patch) { const r = cleanRules({ ...RULES, ...patch 
 async function flockEvent(kind, bird, data) { /* kind: 'card' — купил карточку, 'titos' — раскрыл дело №10, 20, 30…, 'titosreward' — награда Титоса за уровень 30/50/90/100; bird — птичка (users), data — подробности */ }
 const cardHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, rules: () => RULES, avgItemPrice: () => avgItemPrice(env), setRules: patch => setRules(env, patch), flockEvent });
 const titosHelpers = env => ({ ...cardHelpers(env), unit: () => gameUnit(env), btnOf, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), stamp: (uid, task) => stamp(env, uid, task) });
+const flockHelpers = env => ({ json, fail, currentUser, needUser, rigaDay, flockEvent, streakOf: rows => streaks(streakDays(rows)).current });
 const authHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, sessionCookie, sessionDays: SESSION_DAYS, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), bump: (k, sql) => bump(env, k, sql) });
 const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), awardComment: (uid, cid) => awardComment(env, uid, cid) });
 
@@ -394,6 +397,7 @@ async function ensureSchema(env) {
     ...CHALLENGE_TABLES.map(sql => env.DB.prepare(sql)), // план тем челленджа: challenge_days (worker/challenge-days.js)
     ...CARD_TABLES.map(sql => env.DB.prepare(sql)), // карточки: cards, card_sets, card_owner (worker/cards.js)
     ...TITOS_TABLES.map(sql => env.DB.prepare(sql)), // детектив Титос: titos, titos_cases (worker/titos.js)
+    ...FLOCK_TABLES.map(sql => env.DB.prepare(sql)), // пёрышки и гости комнат: room_guests, feathers (worker/flock.js)
     ...AUTH_TABLES.map(sql => env.DB.prepare(sql)), // вход с паролем: login_fail, pw_reset, funnel (worker/auth.js)
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
@@ -404,7 +408,7 @@ async function ensureSchema(env) {
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER,
-    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', ...AUTH_ALTER]) {
+    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER]) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   // «Выбор Полли» подешевел с 50 до 11 пуговок: уже начисленные записи пересчитать один раз, баланс = сумма журнала
@@ -1276,6 +1280,7 @@ async function addBadge(env, uid, badge) {
 async function route(req, env, url) {
   const p = url.pathname, m = req.method;
   if (p.startsWith('/api/pw/') || p === '/api/funnel' || p === '/api/admin/pw-reset' || p === '/api/admin/funnels') { const r = await authApi(req, env, url, authHelpers(env)); if (r) return r; }
+  if (p === '/api/birds' || p === '/api/feathers' || p === '/api/feather') { const r = await flockApi(req, env, url, flockHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/titos') || p.startsWith('/api/admin/titos')) { const r = await titosApi(req, env, url, titosHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/cards') || p.startsWith('/api/admin/cards')) { const r = await cardsApi(req, env, url, cardHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/challenge/') || p.startsWith('/api/admin/challenge')) { const r = await challengeApi(req, env, url, cardHelpers(env)); if (r) return r; }
@@ -1340,11 +1345,6 @@ async function route(req, env, url) {
     let rows = (await env.DB.prepare(`SELECT id, nick, avatar FROM users WHERE banned = 0 ORDER BY COALESCE(last_seen, created_at) DESC LIMIT ?`).bind(LIMIT).all()).results;
     if (me && !me.banned && !rows.some(r => r.id === me.id)) rows = [{ id: me.id, nick: me.nick, avatar: me.avatar }, ...rows.slice(0, LIMIT - 1)];
     return json({ total, recent: total > LIMIT, birds: rows.map(r => ({ id: r.id, nick: r.nick || null, me: !!me && r.id === me.id, avatar: avatarOf(r) })) });
-  }
-  // все птицы с ником — для списка на странице «Стая»
-  if (m === 'GET' && p === '/api/birds') {
-    const rows = (await env.DB.prepare("SELECT id, nick, avatar, room FROM users WHERE banned = 0 AND nick IS NOT NULL AND nick != '' ORDER BY created_at LIMIT 2000").all()).results;
-    return json({ birds: rows.map(r => { const rm = roomOf(r); return { id: r.id, nick: r.nick, avatar: avatarOf(r), home: !!((rm.items || []).length || rm.wall || rm.floor || rm.view || rm.curtain) }; }) }, 200, { 'cache-control': 'public, max-age=60' });
   }
   // «Найти птичку»: по нику (сначала точное совпадение, потом начало ника)
   // ---------- подписка на новость о книге ----------
@@ -2401,6 +2401,9 @@ async function route(req, env, url) {
       env.DB.prepare('DELETE FROM button_log WHERE user_id = ?').bind(u.id),
       env.DB.prepare('DELETE FROM card_owner WHERE user_id = ?').bind(u.id), // карточки снова свободны
       env.DB.prepare('DELETE FROM card_trades WHERE from_id = ? OR to_id = ?').bind(u.id, u.id), // и предложения обмена
+      env.DB.prepare('UPDATE users SET feathers = MAX(0, COALESCE(feathers, 0) - (SELECT COUNT(*) FROM feathers f WHERE f.owner_id = users.id AND f.from_id = ?)) WHERE id IN (SELECT owner_id FROM feathers WHERE from_id = ?)').bind(u.id, u.id), // пёрышки этой птички
+      env.DB.prepare('DELETE FROM feathers WHERE owner_id = ? OR from_id = ?').bind(u.id, u.id),
+      env.DB.prepare('DELETE FROM room_guests WHERE owner_id = ? OR guest_id = ?').bind(u.id, u.id),
       env.DB.prepare('DELETE FROM users WHERE id = ?').bind(u.id),
     ]);
     return json({ ok: true }, 200, { 'set-cookie': sessionCookie('', 0) });

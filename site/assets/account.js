@@ -160,7 +160,7 @@
     d.addEventListener('cancel', e => e.preventDefault()); // Esc не закрывает
     const f = d.querySelector('form'), st = d.querySelector('.acct-nick-st');
     try { f.ref.value = localStorage.getItem('pp-ref') || ''; } catch (e) {}
-    fetch('/api/birds').then(r => r.ok ? r.json() : { birds: [] }).then(x => { d.querySelector('#acct-ref-list').innerHTML = (x.birds || []).filter(b => b.nick).map(b => `<option value="${esc(b.nick)}">`).join(''); }).catch(() => {});
+    fetch('/api/birds?names=1').then(r => r.ok ? r.json() : { birds: [] }).then(x => { d.querySelector('#acct-ref-list').innerHTML = (x.birds || []).filter(b => b.nick).map(b => `<option value="${esc(b.nick)}">`).join(''); }).catch(() => {});
     f.addEventListener('submit', async e => {
       e.preventDefault();
       const nick = f.nick.value.trim().replace(/^@/, '');

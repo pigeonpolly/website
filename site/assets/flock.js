@@ -1771,9 +1771,9 @@
       findForm.querySelector('input').value = invited.replace(/^@/, '');
       setTimeout(() => findForm.requestSubmit(), 900);
     }
-    // «На весь экран»: на главной открывает /flock/, на самой /flock/ — настоящий полноэкранный режим
+    // «На весь экран» — настоящий полноэкранный режим (на /flock/ сцены больше нет — этап 13 Б)
     const open = box.querySelector('.fl-open');
-    if (open && full) {
+    if (open) {
       if (!box.requestFullscreen) open.hidden = true;
       open.removeAttribute('target');
       open.addEventListener('click', e => { e.preventDefault(); if (document.fullscreenElement) document.exitFullscreen(); else box.requestFullscreen().catch(() => {}); });
