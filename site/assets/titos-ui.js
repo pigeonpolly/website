@@ -1,6 +1,6 @@
 // «Детектив Титос» /titos/ (docs/titos.md): кофейник (полный / половина / пустой — Титос спит) и 4 карточки-награды над игрой.
 // PPTitos.pot(el, s) и PPTitos.rewards(el, level) — общие, ими же будет пользоваться движок дел; s = { coffee, max, next (мс — следующая чашка) }.
-// Состояние берётся из /api/whoami → titos (titosState на сервере) или из события 'pp:titos' (detail = то же); пока сервера нет — локально.
+// Состояние — /api/whoami → user.titos (titosState, worker/titos.js) и событие 'pp:titos' (quest-titos.js шлёт его после каждого ответа /api/titos*); гость — по localStorage.
 (() => {
   const L = { en: 0, ru: 1, lv: 2 }[document.documentElement.lang] ?? 0;
   const t = a => a[L];
@@ -12,7 +12,9 @@
     next: ['next cup in', 'следующая чашка через', 'nākamā tase pēc'],
     min: ['min', 'мин', 'min'],
     refill: ['☕ Top up', '☕ Долить', '☕ Uzpildīt'],
-    soon: ['coming soon', 'скоро', 'drīzumā'],
+    soon: ['Sign in to top up', 'Войдите, чтобы долить', 'Ieej, lai uzpildītu'],
+    ask: [n => `Fill the coffee pot for ${n} 🔘?`, n => `Долить кофейник за ${n} 🔘?`, n => `Uzpildīt kafijas kannu par ${n} 🔘?`],
+    poor: ['Not enough buttons', 'Не хватает пуговок', 'Nepietiek pogu'],
     sleep: ['“I am not asleep. I am analysing with my eyes closed.”', '«Я не сплю. Я анализирую с закрытыми глазами.»', '“Es neguļu. Es analizēju ar aizvērtām acīm.”'],
     awake: ['“Coffee is not a drink. It is a method of investigation.”', '«Кофе — это не напиток. Это метод расследования.»', '“Kafija nav dzēriens. Tā ir izmeklēšanas metode.”'],
     rewards: ['Rewards for levels', 'Награды за уровни', 'Balvas par līmeņiem'],
@@ -73,14 +75,14 @@
   let css = false;
   const addCss = () => { if (css) return; css = true; const s = document.createElement('style'); s.textContent = CSS; document.head.appendChild(s); };
 
-  // кофейник: el — контейнер; o.onRefill — что делает «☕ Долить» (пока нет — кнопка «скоро»)
+  // кофейник: el — контейнер; o.onRefill — что делает «☕ Долить» (нет — кнопка неактивна); полный кофейник доливать нечего
   function pot(el, s, o = {}) {
     addCss();
     const st = stateOf(s), mins = s && s.next ? Math.max(1, Math.ceil((s.next - Date.now()) / 60000)) : 0;
     el.className = 'tt-pot is-' + st;
     el.innerHTML = `${potSvg(st)}<div class="tt-pot-i"><b>${t(T[st])}</b><small>☕ ${s.coffee}/${s.max} ${t(T.cups)}${mins && s.coffee < s.max ? ` · ${t(T.next)} ${mins} ${t(T.min)}` : ''}</small>
       <span class="tt-cups">${Array.from({ length: s.max }, (_, i) => `<i${i < s.coffee ? ' class="on"' : ''}></i>`).join('')}</span><q>${t(st === 'empty' ? T.sleep : T.awake)}</q></div>
-      <button type="button" class="pill-btn tt-refill"${o.onRefill ? '' : ` disabled title="${t(T.soon)}"`}>${t(T.refill)}</button>`;
+      <button type="button" class="pill-btn tt-refill"${o.onRefill && s.coffee < s.max ? '' : ' disabled'}${o.onRefill ? '' : ` title="${t(T.soon)}"`}>${t(T.refill)}${s.prices && s.prices.refill ? ` · ${s.prices.refill} 🔘` : ''}</button>`;
     if (o.onRefill) el.querySelector('.tt-refill').onclick = o.onRefill;
   }
   // 4 карточки-награды: пока уровень не пройден — силуэт
@@ -99,18 +101,29 @@
   const top = document.getElementById('titos-top'); if (!top) return;
   addCss(); top.className = 'tt-top';
   const rwEl = document.createElement('div'), potEl = document.createElement('div'); top.append(rwEl, potEl);
-  // до сервера (части 1–8): уровень — сколько дел раскрыто в этом браузере, кофейник полный
+  // гость: уровень — сколько дел раскрыто в этом браузере, кофейник полный
   const local = () => { let n = 0; for (const k of ['pp-titos-syrup-case', 'pp-titos-cucumber-case']) try { if (JSON.parse(localStorage.getItem(k) || '{}').solved) n++; } catch (e) {} return { level: n, coffee: 10, max: 10, next: 0 }; };
   let S = local();
   const qs = new URLSearchParams(location.search), q = qs.get('pot'), ql = Number(qs.get('lvl')) || 0; // ?pot=full|half|empty&lvl=50 — посмотреть кофейник и карточки (для проверки)
   const draw = () => {
     const s = q ? { ...S, coffee: { full: S.max, half: Math.ceil(S.max / 2) - 1, empty: 0 }[q] ?? S.coffee, next: Date.now() + 37 * 60000 } : { ...S };
     if (ql) s.level = ql;
-    rewards(rwEl, s.level, s); pot(potEl, s, { onRefill: window.PPTitos.onRefill });
+    rewards(rwEl, s.level, s); pot(potEl, s, { onRefill: window.PPWho && window.PPWho.user ? refill : null });
+  };
+  // «☕ Долить»: POST /api/titos/coffee {src: 'buy'} — пуговки titosRefillPct, кофейник полный
+  const refill = async () => {
+    if (S.prices && S.prices.refill && !confirm(t(T.ask)(S.prices.refill))) return;
+    try {
+      const r = await fetch('/api/titos/coffee', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ src: 'buy' }), credentials: 'same-origin' });
+      const j = await r.json().catch(() => ({}));
+      if (j.state) take(j.state); else if (r.status === 402) (window.PPToast || alert)(t(T.poor));
+      if (j.paid && window.PPAccount) window.PPAccount.check(); // пуговки в шапке
+    } catch (e) { /* сеть — кнопка останется */ }
   };
   const take = d => { if (d && typeof d.coffee === 'number') { S = { ...S, ...d }; draw(); } };
-  document.addEventListener('pp:whoami', e => take(e.detail && e.detail.titos));
+  const fromWho = d => d && d.user && d.user.titos;
+  document.addEventListener('pp:whoami', e => { take(fromWho(e.detail)); draw(); });
   document.addEventListener('pp:titos', e => take(e.detail));
-  if (window.PPWho) take(window.PPWho.titos);
+  take(fromWho(window.PPWho));
   draw(); setInterval(draw, 30000);
 })();

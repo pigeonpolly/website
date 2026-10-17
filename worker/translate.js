@@ -7,6 +7,7 @@ const BLOG = 'The strings are consecutive parts of one blog post written by an i
 export const ABOUT = {
   blog: BLOG,
   cards: 'The strings are short texts of collectible cards on an illustrator\'s website for kids and adults: card titles, funny descriptions and names of card stats. Keep the humour and wordplay, keep it short, keep character names (Polly, Titos, Mr.Chew, Pumpkin Head) in their usual form for the language.',
+  titos: 'The strings are parts of a funny detective case for kids and adults on an illustrator\'s website: Detective Titos (a sleepy detective who lives on coffee) investigates in Wobbleland. Keep the humour, the short sentences and the names of characters, towns and streets in their usual form for the language.',
   short: 'The strings are short interface texts and labels of an illustrator\'s website.',
 };
 // несколько языков сразу: { en: [...], lv: [...] }; не вышло для языка — его нет в ответе (поле можно перевести позже)

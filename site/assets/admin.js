@@ -36,8 +36,9 @@
     { id: 'shop', ic: '🛍', name: 'Магазин', group: 'shop', about: 'Что продаётся в магазине и сколько штук; цены считаются сами.' },
     { id: 'cards', ic: '🃏', name: 'Карточки', group: 'shop', about: 'Коллекционные карточки: каждая — в одном экземпляре. Новая карточка, правка, номер, скрыть, удалить; цена обычных; импорт коллекций с сайта.' },
     { id: 'advent', ic: '🎄', name: 'Адвент', group: 'shop', about: 'Что лежит в каком окошке адвент-календаря.', count: 'advent' },
+    { id: 'titos', ic: '🕵️', name: 'Дела', group: 'titos', about: 'Дела детектива Титоса: какие дела на сайте и переведены ли они. Новые дела — файлы content/titos/NNN.json (их пишет Claude), после выкладки они заносятся сами раз в час.' },
+    { id: 'titos-rules', ic: '📜', name: 'Правила Титоса', group: 'titos', open: 'rules', focus: rulesBox(/Детектив Титос/), about: 'Кофе детектива Титоса и пуговки за раскрытые дела.' },
     { id: 'games', ic: '🎮', name: 'Награды игр', group: 'shop', open: 'rules', focus: rulesBox(/Пуговичный дождь/), about: 'Сколько пуговок дают игры «Пуговичный дождь» и «Зельеварня».' },
-    { id: 'titos', ic: '📜', name: 'Правила Титоса', group: 'titos', open: 'rules', focus: rulesBox(/Детектив Титос/), about: 'Кофе детектива Титоса и пуговки за раскрытые дела.' },
     { id: 'visitors', ic: '👥', name: 'Посетители', group: 'stats', about: 'Сколько людей заходит на сайт, откуда и с каких устройств.' },
     { id: 'analytics', ic: '📈', name: 'Статьи', group: 'stats', about: 'Просмотры, лайки и комментарии каждой статьи.' },
     { id: 'challenge', ic: '🖌', name: 'Челлендж', group: 'stats', about: 'Сколько работ в челлендже и новые работы.' },
@@ -48,7 +49,7 @@
     { id: 'strict', ic: '🛡', name: 'Строгий режим', group: 'service', open: 'comments', focus: '#adm-strict', about: 'Строгий режим комментариев: не больше одного комментария в час с одного адреса.' },
     { id: 'security', ic: '🔐', name: 'Защита', group: 'service', about: 'PIN админа и код восстановления на случай, если потеряете Google.' },
   ];
-  const SECTIONS = { inbox, security, overview: inbox, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art, challenge: () => statsView('challenge'), flock: () => statsView('flock'),
+  const SECTIONS = { titos, inbox, security, overview: inbox, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art, challenge: () => statsView('challenge'), flock: () => statsView('flock'),
     themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
     cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
     carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
@@ -380,6 +381,20 @@
   }
 
   // ---------- правки блоков сайта (режим «✏️ Править страницу») ----------
+  // 🕵️ Титос: дела в базе (worker/titos.js), «⟳ Импортировать дела» — занести site/assets/titos-cases.json и перевести недостающее
+  async function titos(msg) {
+    main.innerHTML = '<p class="be-note">Загрузка…</p>';
+    let d; try { d = await api('admin/titos'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    main.innerHTML = `<section class="adm-box"><h2>🕵️ Дела: ${d.cases.length}</h2>
+      <p class="be-note">Играющих птичек: ${d.players.n}, дальше всех — уровень ${d.players.top}.${msg ? ' ' + esc(msg) : ''}</p>
+      <p><button type="button" class="pill-btn" id="adm-titos-imp">⟳ Импортировать дела</button></p>
+      ${d.cases.length ? `<table class="be-table adm-table"><thead><tr><th>№</th><th>Дело</th><th>Перевод</th></tr></thead><tbody>
+      ${d.cases.map(c => `<tr><td>${c.n}</td><td>${esc(c.title)}</td><td>${c.missing.en || c.missing.lv ? `нет EN: ${c.missing.en}, LV: ${c.missing.lv} — показывается RU` : '✓ EN, LV'}</td></tr>`).join('')}</tbody></table>` : '<p class="be-note">Дел в базе ещё нет — нажмите «Импортировать дела».</p>'}</section>`;
+    document.getElementById('adm-titos-imp').onclick = async e => {
+      e.target.disabled = true; e.target.textContent = 'Импортирую и перевожу…';
+      try { const r = await api('admin/titos/import', {}); titos(r.error ? 'Не вышло: ' + r.error : `Готово: дел ${r.imported}` + (r.errors && r.errors.length ? `, без перевода ${r.errors.length} (нет ключа Gemini?)` : '') + '.'); } catch (x) { alert(err(x)); titos(); }
+    };
+  }
   async function edits() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('admin/blocks'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
@@ -488,11 +503,11 @@
       ], '<a href="/ru/potions/">Открыть игру →</a>')}
       ${box('🕵️ Игра «Детектив Титос»', [
         row(`<label class="adm-r-chk"><input type="checkbox" data-r="titosOn"${R.titosOn ? ' checked' : ''}> Давать пуговки за дела</label>`, 'за уровень ' + pct('titosLevelPct') + ` → сейчас ${G.titosLevel} 🔘`, D.titosLevelPct + ' %', `уровни 1–10 — столько, 11–20 — вдвое (${G.titosLevel * 2}), 21–30 — втрое и т. д.; за каждый уровень один раз`),
-        row('Дело не засчитывается, если раскрыто быстрее', num('titosMinSec', R.titosMinSec, D.titosMinSec) + ' с', D.titosMinSec + ' с', 'защита от подделки'),
-        row('☕ Кофейник вмещает', num('titosPotMax', R.titosPotMax, D.titosPotMax) + ' чашек', D.titosPotMax),
-        row('Начать дело стоит', num('titosCaseCups', R.titosCaseCups, D.titosCaseCups) + ' чаш.', D.titosCaseCups, 'дальше Титос пьёт по чашке'),
+        row('Дело не засчитывается, если раскрыто быстрее, чем по … с на улику', num('titosClueSec', R.titosClueSec, D.titosClueSec) + ' с', D.titosClueSec + ' с', 'защита от подделки: 7 улик × 3 с = 21 с'),
+        row('☕ Кофейник вмещает', num('titosPot', R.titosPot, D.titosPot) + ' чашек', D.titosPot),
+        row('Начать дело стоит', num('titosStartCups', R.titosStartCups, D.titosStartCups) + ' чаш.', D.titosStartCups, 'дальше Титос пьёт по чашке'),
         row('Титос выпивает чашку каждые', num('titosCupMin', R.titosCupMin, D.titosCupMin) + ' мин', D.titosCupMin + ' мин', 'кофе кончился — Титос засыпает, дело ждёт на сервере'),
-        row('Кофейник сам наполняется: +1 чашка каждые', num('titosRefillMin', R.titosRefillMin, D.titosRefillMin) + ' мин', D.titosRefillMin + ' мин', 'до полного'),
+        row('Кофейник сам наполняется: +1 чашка каждые', num('titosRegenMin', R.titosRegenMin, D.titosRegenMin) + ' мин', D.titosRegenMin + ' мин', 'до полного'),
         row('«Разбери дела» — за уровень', num('titosSortCups', R.titosSortCups, D.titosSortCups) + ' чаш.', D.titosSortCups),
         row('«Жуки» — за игру', num('titosBugsCups', R.titosBugsCups, D.titosBugsCups) + ' чаш., не чаще ' + num('titosBugsPerHour', R.titosBugsPerHour, D.titosBugsPerHour, 1, 50) + ' раз в час', `${D.titosBugsCups} · ${D.titosBugsPerHour}`),
         row('«☕ Долить» полный кофейник', pct('titosRefillPct') + ` → сейчас ${G.titosRefill} 🔘`, D.titosRefillPct + ' %'),
@@ -547,7 +562,7 @@
         <li>${R.potionOn ? `Новое зелье: обычное — ${R.potion1Pct} % (${pc(G.p1)}), вкусное — ${R.potion2Pct} % (${pc(G.p2)}), вкус детства — ${R.potion3Pct} % (${pc(G.p3)}); повторное — ${R.potionAgainPct} % (${pc(G.again)})${G.pmax ? `; не больше ${pc(G.pmax)} в сутки` : ''}.` : 'Пуговки за зелья выключены.'}</li></ul>
       <h4>Игра «Детектив Титос»</h4><ul>
         <li>100 уровней-дел по порядку; дела 1–2 — прежние «Сироп» и «Шпион среди огурцов» (кто раскрыл их раньше, получает их засчитанными, без пуговок).</li>
-        <li>Кофейник — ${R.titosPotMax} чашек. Начать дело — ${R.titosCaseCups} чаш., дальше −1 каждые ${R.titosCupMin} мин; кофе кончился — Титос спит, дело ждёт. +1 чашка каждые ${R.titosRefillMin} мин до полного; «Разбери дела» — +${R.titosSortCups} за уровень, «Жуки» — +${R.titosBugsCups} (до ${R.titosBugsPerHour} раз в час); «☕ Долить» — ${pc(G.titosRefill)}; лишнее при полном — ${pc(G.titosSell)} за чашку, до ${R.titosSellDayMax} в сутки.</li>
+        <li>Кофейник — ${R.titosPot} чашек. Начать дело — ${R.titosStartCups} чаш., дальше −1 каждые ${R.titosCupMin} мин; кофе кончился — Титос спит, дело ждёт. +1 чашка каждые ${R.titosRegenMin} мин до полного; «Разбери дела» — +${R.titosSortCups} за уровень, «Жуки» — +${R.titosBugsCups} (до ${R.titosBugsPerHour} раз в час); «☕ Долить» — ${pc(G.titosRefill)}; лишнее при полном — ${pc(G.titosSell)} за чашку, до ${R.titosSellDayMax} в сутки.</li>
         <li>${R.titosOn ? `За уровень — ${R.titosLevelPct} % (сейчас ${pc(G.titosLevel)}) × (1 + каждый пройденный десяток), за каждый уровень один раз.` : 'Пуговки за дела выключены.'} Награды-вещи: 30 — ковёр с меловым силуэтом, 50 — кофейник детектива, 90 — доска улик, 100 — золотой значок в рамке.</li></ul>
       <h4>Адвент-календарь</h4><ul>
         <li>1–31 декабря, окошко открывается в свой день (по Риге); у всех одинаковые вещи. Прошедшие окошки видны всем, и гостям.</li>
