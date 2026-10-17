@@ -43,10 +43,12 @@
     wake: ['☕ Wake Titos (1 cup)', '☕ Разбудить Титоса (1 чашка)', '☕ Pamodināt Titosu (1 tase)'],
     loginMore: ['Sign in to open the next cases and earn buttons.', 'Войдите, чтобы открыть следующие дела и получать пуговки.', 'Ienāc, lai atvērtu nākamās lietas un saņemtu pogas.'],
     err: ['Something went wrong. Try again.', 'Что-то пошло не так. Попробуйте ещё раз.', 'Kaut kas nogāja greizi. Mēģini vēlreiz.'],
+    total: [(n, m) => `📁 Cases on the site: ${n} of ${m}`, (n, m) => `📁 Дел на сайте: ${n} из ${m}`, (n, m) => `📁 Lietas vietnē: ${n} no ${m}`],
+    allDone: ['That was the last case on the site so far. All solved! New cases are coming soon: they will open here on their own, and Titos is already brewing coffee for them.', 'Это последнее дело на сайте — пока. Всё раскрыто! Новые дела скоро появятся и откроются здесь сами, а Титос уже варит для них кофе.', 'Šī ir pēdējā lieta vietnē — pagaidām. Viss atrisināts! Jaunas lietas drīz parādīsies un atvērsies šeit pašas, un Titoss jau vāra tām kafiju.'],
     got: [n => `+${n} 🔘 for the case`, n => `+${n} 🔘 за дело`, n => `+${n} 🔘 par lietu`],
   };
   // ---------- дело с сервера (content/titos/NNN.json, язык страницы) → то, что рисует движок ----------
-  const LANG = ['en', 'ru', 'lv'][L];
+  const LANG = ['en', 'ru', 'lv'][L], LEVELS = 100; // всего уровней в игре (docs/titos.md)
   const OLD = { 1: 'pp-titos-syrup-case', 2: 'pp-titos-cucumber-case' }; // прогресс бывших «Дела №1» и «Дела №2» в localStorage
   const api = async (path, body) => {
     try {
@@ -76,7 +78,7 @@
   const start = async () => {
     const info = await api(`/api/titos?lang=${LANG}`);
     if (info.error) return;
-    const srv = { on: !!info.play && info.on !== false, state: info.state || {} };
+    const srv = { on: !!info.play && info.on !== false, state: info.state || {}, top: Math.max(0, ...(info.cases || []).map(c => c.n)) }; // top — последнее дело на сайте
     // кто раскрыл бывшие дела №1 и №2 раньше (localStorage) — засчитать без пуговок
     if (srv.on) {
       const solved = Object.entries(OLD).filter(([, k]) => load(k).solved).map(([n]) => +n);
@@ -161,7 +163,8 @@
     const mz = box.querySelector('.rm-hot[data-k="magnifier"]'); if (mz) mz.classList.toggle('q-want', hasLens && !st.mag && !st.solved);
     const done = n => srv.on ? (srv.state.level || 0) >= n : load(OLD[n] || 'pp-titos-case-' + n).solved;
     const cup = srv.on ? `<span class="q-stat" title="☕">☕ ${srv.state.coffee ?? '–'}/${srv.state.max || 10}</span>` : '';
-    banner.innerHTML = `<nav class="q-tabs">${CASES.map(c => `<button type="button" data-case="${c.n}" class="${c.n === K.no ? 'on' : ''}">${t(UI.caseNo)} ${c.n} · ${esc(c.title)}${done(c.n) ? ' ✅' : ''}</button>`).join('')}</nav>` + cup +
+    banner.innerHTML = `<nav class="q-tabs">${CASES.map(c => `<button type="button" data-case="${c.n}" class="${c.n === K.no ? 'on' : ''}">${t(UI.caseNo)} ${c.n} · ${esc(c.title)}${done(c.n) ? ' ✅' : ''}</button>`).join('')}${CASES.length && CASES[CASES.length - 1].n === srv.top && srv.top < LEVELS ? `<button type="button" class="q-soon" disabled>${t(UI.caseNo)} ${srv.top + 1} · ${t(UI.soon)}</button>` : ''}</nav>` +
+      `<span class="q-stat">${t(UI.total)(srv.top, LEVELS)}</span>` + cup +
       (st.solved ? `<span class="q-stat">✅ ${t(UI.solvedT)}</span><button type="button" data-q="again">${t(UI.again)}</button>`
       : `<span class="q-stat">${t(UI.clues)}: ${st.pinned.length}/${N}</span>${(K.scenes || []).map((s, i) => `<button type="button" data-q="scene" data-i="${i}">${t(UI.scene)}${K.scenes.length > 1 ? ' ' + (i + 1) : ''}</button>`).join('')}<button type="button" data-q="board">${t(UI.board)}</button>`) +
       (!srv.on && K.no >= 2 ? `<span class="q-m">${t(UI.loginMore)}</span>` : '');
@@ -235,7 +238,7 @@
       A.coffee.sip && setTimeout(() => A.coffee.sip(true), 900); return;
     }
     st.solved = true; save(); A.coffee.on = false; draw();
-    card(`<div class="q-stamp">${t(UI.solvedT)}</div><p class="q-verdict">${esc(r.text)}</p>${r.buttons ? `<p class="q-kick">${t(UI.got)(r.buttons)}</p>` : ''}`);
+    card(`<div class="q-stamp">${t(UI.solvedT)}</div><p class="q-verdict">${esc(r.text)}</p>${r.buttons ? `<p class="q-kick">${t(UI.got)(r.buttons)}</p>` : ''}${K.no >= srv.top && srv.top < LEVELS ? `<p class="q-m">${t(UI.allDone)}</p>` : ''}`);
     if (r.buttons && window.PPToast) PPToast(t(UI.got)(r.buttons));
     goHome();
   };

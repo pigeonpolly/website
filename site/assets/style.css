@@ -1463,6 +1463,7 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 .q-tabs button { padding: 7px 14px; border: 1.5px solid var(--line); border-radius: 10px 10px 4px 4px; background: rgba(255, 255, 255, .05); color: var(--muted); font: 700 13px var(--sans); cursor: pointer; }
 .q-tabs button.on { background: #FBF4E2; color: #2B1A51; border-color: #FBF4E2; }
 .q-tabs button:disabled { opacity: .55; cursor: default; }
+.q-tabs button.q-soon { border-style: dashed; } /* следующее дело — «скоро» */
 .q-stat { font: 700 14px var(--sans); color: var(--text); }
 .q-banner > button { padding: 7px 14px; border: 0; border-radius: 999px; background: var(--peach); color: var(--bg); font: 700 13px var(--sans); cursor: pointer; }
 .q-pockets { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; max-width: 1280px; margin: 12px auto 0; color: var(--muted); font-size: 14px; }
