@@ -114,3 +114,8 @@ build.py собирает все дела в site/assets/titos-cases.json.
 - content/titos/023–032.json: виновные и трюки — в content/titos/index.md; в каждом лупа (`lens` + `pre`) и 1 ложный след с `refutes`; 31–32 — 4 подозреваемых, 7 улик (уровни 31–60).
 - Вещи-награды — room.js блок «награды за дела Титоса»: tcstarter, tclabelbox, tcrake, tcmirror, tcmap, tcbuttonbox, tcphone, tccandle (пламя иногда гаснет), tcbook, tcdecaf.
 - Зона `magnifier` в кабинете — лупа, улики туда не класть.
+
+## Дела №33–42 (этап 10-4)
+- content/titos/033–042.json: виновные и трюки — в content/titos/index.md; у всех 4 подозреваемых, 6–7 улик, лупа (`lens` + `pre`), 1 ложный след с `refutes`, одна сцена с уликой и допросом виновного.
+- Вещи-награды — room.js блок «награды за дела Титоса»: tcmossjar, tcgoldacorn (блик), tchalfloaf, tcsleepsign (мигает «z»), tcwormletter (сердце бьётся), tcflowerclock, tcpumpkinphoto, tcrecipe, tcchestnuts (пар), tctrophy (блик).
+- Свободных виновных среди жителей titos-cast.md больше нет (кроме Полли и самого Титоса) — дальше виновные повторяются с новыми трюками или нужны новые жители.
