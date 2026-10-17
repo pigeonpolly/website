@@ -64,6 +64,65 @@
     st: { accepted: ['accepted', 'принят', 'pieņemta'], declined: ['declined', 'отклонён', 'noraidīta'], cancelled: ['cancelled', 'отменён', 'atsaukta'], stale: ['out of date', 'устарел', 'novecojusi'], expired: ['expired', 'истёк', 'beigusies'] },
     myCards: ['🃏 My cards', '🃏 Мои карточки', '🃏 Manas kartītes'], hisCards: ['🃏 Cards of @{n}', '🃏 Карточки @{n}', '🃏 @{n} kartītes'], noneHis: ['@{n} has no cards yet.', 'У @{n} пока нет карточек.', '@{n} vēl nav kartīšu.'],
   };
+  // игровые статы уникальных карточек Алины (c.game, docs/cards.md): персонаж — HP, слоты, 5 статов 0–5, особенности; предмет — слоты, эффект, что нужно
+  var G = {
+    hp: ['HP', 'HP', 'HP'], total: ['Total HP', 'Всего HP', 'Kopā HP'], slots: ['Tool slots', 'Слоты для предметов', 'Priekšmetu vietas'], take: ['Takes slots', 'Занимает слотов', 'Aizņem vietas'],
+    fx: ['Effect', 'Эффект', 'Efekts'], req: ['Needs', 'Нужно', 'Vajag'], traits: ['Traits', 'Особенности', 'Īpašības'], none: ['none', 'нет', 'nav'],
+    tool: ['🧰 Tool card', '🧰 Карточка-предмет', '🧰 Priekšmeta kartīte'], bonus: ['bonus: +{n} HP', 'бонус: +{n} HP', 'bonuss: +{n} HP'],
+    s: { snack: ['🧺', 'Snack Reserves', 'Запас перекусов', 'Uzkodu krājumi'], cook: ['🥕', 'Cooking Skill', 'Кулинария', 'Kulinārija'], coffee: ['☕', 'Caffeine Fuel', 'Кофеиновое топливо', 'Kofeīna degviela'],
+      mood: ['🙂', 'Mood', 'Настроение', 'Garastāvoklis'], cookie: ['🍪', 'Cookie Power', 'Печеньковая сила', 'Cepumu spēks'] },
+    t: { charisma: ['⭐', 'Bird Charisma', 'Птичья харизма', 'Putna harizma'], drama: ['🚪', 'Dramatic Exit', 'Драматичный уход', 'Dramatiska aiziešana'], night: ['🌙', 'Midnight Snacking', 'Полночные перекусы', 'Pusnakts uzkodas'],
+      dairy: ['🥛', 'Dairy Intolerance', 'Непереносимость молочного', 'Piena nepanesība'], phone: ['📞', 'Phone Call Panic', 'Паника от звонков', 'Zvanu panika'], yes: ['🙇', 'Can’t Say No', 'Не умеет отказывать', 'Nespēj atteikt'],
+      mirror: ['👻', 'Spooked by Reflection', 'Боится отражения', 'Baidās no atspulga'], guilt: ['😴', 'Rest Guilt Mode', 'Вина за отдых', 'Atpūtas vainas režīms'] },
+  };
+  var SK = ['snack', 'cook', 'coffee', 'mood', 'cookie'];
+  // строка эффекта или условия: {s, d} / {s, min} / {s, max} / {hp} / {add|del: особенность} / {t: {en, ru, lv}}
+  function gLine(x) {
+    var sg = function (d) { return (d > 0 ? '+' : '−') + Math.abs(d); };
+    if (x.t) return x.t[LANG] || x.t.en || '';
+    if (x.hp != null) return sg(x.hp) + ' HP';
+    if (x.s) { var s = G.s[x.s]; return s[0] + ' ' + s[1 + L] + ' ' + (x.d != null ? sg(x.d) : x.min != null ? '≥ ' + x.min : x.max != null ? '≤ ' + x.max : ''); }
+    var k = x.add || x.del || x.has, t = G.t[k]; if (!t) return '';
+    return (x.add ? '+ ' : x.del ? '✕ ' : '') + t[0] + ' ' + t[1 + L];
+  }
+  function game(g) {
+    var w = el('div', 'pc-game');
+    if (g.kind === 'tool') {
+      w.appendChild(el('p', 'pc-g-kind', G.tool[L]));
+      var dl = el('dl', 'pc-g-tool');
+      var row = function (k, v) { if (!v) return; dl.appendChild(el('dt', '', k)); dl.appendChild(el('dd', '', v)); };
+      row(G.take[L], g.take ? String(g.take) : '');
+      row(G.fx[L], (g.fx || []).map(gLine).join(' · '));
+      row(G.req[L], (g.req || []).map(gLine).join(' · '));
+      w.appendChild(dl);
+      return w;
+    }
+    var sum = (g.s || []).reduce(function (a, b) { return a + (b || 0); }, 0), cha = (g.tr || []).indexOf('charisma') >= 0;
+    var top = el('div', 'pc-g-top');
+    var chip = function (big, small) { var c = el('div', 'pc-g-chip'); c.appendChild(el('b', '', big)); c.appendChild(el('span', '', small)); top.appendChild(c); };
+    chip(g.hp + ' HP', G.hp[L]); chip(g.hp + (cha ? g.hp : 0) + sum + ' HP', G.total[L]); chip('🧰 ' + g.slots, G.slots[L]);
+    w.appendChild(top);
+    var ul = el('ul', 'pc-g-stats');
+    SK.forEach(function (k, i) {
+      var v = (g.s || [])[i] || 0, li = el('li');
+      li.appendChild(el('span', 'pc-g-ic', G.s[k][0])); li.appendChild(el('span', 'pc-sn', G.s[k][1 + L]));
+      var dots = el('span', 'pc-g-dots'); dots.setAttribute('aria-hidden', 'true');
+      for (var j = 0; j < 5; j++) dots.appendChild(el('i', j < v ? 'on' : ''));
+      li.appendChild(dots); li.appendChild(el('b', '', String(v))); ul.appendChild(li);
+    });
+    w.appendChild(ul);
+    w.appendChild(el('p', 'pc-g-h', G.traits[L]));
+    var tr = el('p', 'pc-g-traits');
+    (g.tr || []).forEach(function (k) {
+      var t = G.t[k]; if (!t) return;
+      var c = el('span', 'pc-g-tr' + (k === 'charisma' ? ' good' : ''), t[0] + ' ' + t[1 + L]);
+      if (k === 'charisma') c.title = G.bonus[L].replace('{n}', g.hp);
+      tr.appendChild(c);
+    });
+    if (!tr.childNodes.length) tr.appendChild(el('span', 'pc-g-none', G.none[L]));
+    w.appendChild(tr);
+    return w;
+  }
   var RAR = ['common', 'rare', 'unique'];
   var el = function (tag, cls, txt) { var e = document.createElement(tag); if (cls) e.className = cls; if (txt != null) e.textContent = txt; return e; };
   var birdUrl = function (nick) { return pre + '/bird/?nick=' + encodeURIComponent(nick); };
@@ -126,8 +185,9 @@
     info.appendChild(el('h3', '', c.title || ''));
     if (c.set) info.appendChild(el('p', 'pc-set', c.set));
     if (c.desc) info.appendChild(el('p', 'pc-desc', c.desc));
+    if (c.game && c.game.kind) info.appendChild(game(c.game));
     var st = el('ul', 'pc-stats');
-    (c.stats || []).forEach(function (s) {
+    (c.game && c.game.kind ? [] : c.stats || []).forEach(function (s) {
       var li = el('li'); li.appendChild(el('span', 'pc-sn', s.name));
       var bar = el('span', 'pc-bar'); bar.style.setProperty('--v', s.v); bar.setAttribute('aria-hidden', 'true'); li.appendChild(bar);
       li.appendChild(el('b', '', String(s.v) + '/10')); st.appendChild(li);
