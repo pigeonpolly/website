@@ -74,7 +74,89 @@
       act: ['Place it', 'Поставить', 'Novietot'],
       open: reward,
     },
+    boxes: { // письмо о коробках и бардаке — тем, кто был до коробок (worker: users.box_mail)
+      icon: '📦',
+      title: () => ['A letter for you!', 'Тебе письмо!', 'Tev vēstule!'][L],
+      text: () => ['A box for your room — and a word about mess', 'Коробка для комнаты — и пара слов о бардаке', 'Kaste tavai istabai — un pāris vārdu par nekārtību'][L],
+      act: ['Read', 'Прочитать', 'Izlasīt'],
+      open: boxLetter,
+    },
   };
+  // ---------- коробка при регистрации (как альбом): окно выбора, письмо ----------
+  const BOXES = ['cardbox', 'crate', 'hatbox', 'trunkbox', 'giftbox'];
+  const BX = {
+    hi: [n => `Hi, @${n}!`, n => `Привет, @${n}!`, n => `Sveiks, @${n}!`],
+    pickT: ['Gifts for your room', 'Подарки для комнаты', 'Dāvanas tavai istabai'],
+    pickAlbum: ['There is already a card album in your room — tap it to leaf through your cards.', 'В комнате уже лежит альбом для карточек — нажми на него, чтобы листать карточки.', 'Istabā jau ir kartīšu albums — pieskaries tam, lai šķirstītu kartītes.'],
+    pickBox: ['And every bird gets a box for little things. Which one would you like?', 'А ещё каждой птичке положена коробка для мелочей. Какую хочешь?', 'Un katram putniņam pienākas kaste sīkumiem. Kuru tu gribi?'],
+    swapT: ['Another box', 'Другая коробка', 'Cita kaste'],
+    swapText: ['Pick a different box. It stays where it is, and everything inside stays inside.', 'Выбери другую коробку. Она встанет на то же место, всё, что внутри, останется внутри.', 'Izvēlies citu kasti. Tā paliks turpat, un viss, kas iekšā, paliks iekšā.'],
+    rules: ['Small things go into a box, boxes stack on top of each other, but a box can’t go inside a box. You can change your box later.', 'Мелкие вещи кладутся в коробку, коробки ставятся друг на друга, а коробку в коробку положить нельзя. Коробку потом можно поменять.', 'Sīkas lietas liek kastē, kastes var likt vienu uz otras, bet kasti kastē ielikt nevar. Kasti vēlāk var nomainīt.'],
+    now: ['Current', 'Сейчас', 'Tagad'],
+    later: ['Later', 'Потом', 'Vēlāk'],
+    done: [b => `${b} is in your room!`, b => `${b} уже в комнате!`, b => `${b} jau ir istabā!`],
+    look: ['Look', 'Посмотреть', 'Apskatīt'],
+    err: ['Something went wrong. Try again.', 'Что-то пошло не так. Попробуй ещё раз.', 'Kaut kas nogāja greizi. Mēģini vēlreiz.'],
+    letter: [
+      ['The Wobbleland Administration has given every bird a box — it is already in your room.', 'Администрация Воббленда подарила каждой птичке коробку — она уже стоит в твоей комнате.', 'Wobbleland administrācija uzdāvināja katram putniņam kasti — tā jau stāv tavā istabā.'],
+      ['📦 Drag a small thing onto the box and it goes inside. The number on the box is how many things are in it (up to 30).', '📦 Перетащи мелкую вещь на коробку — и она спрячется внутрь. Число на коробке — сколько там вещей (до 30).', '📦 Uzvelc sīku lietu uz kastes — un tā paslēpsies iekšā. Skaitlis uz kastes — cik lietu tur ir (līdz 30).'],
+      ['🧱 Boxes stack on top of each other. But a box can’t go inside a box.', '🧱 Коробки можно ставить друг на друга. А вот коробку в коробку положить нельзя.', '🧱 Kastes var likt vienu uz otras. Bet kasti kastē ielikt nevar.'],
+      ['🌪️ Careful — mess! Hover over a box (on a phone — tap it), and everything inside jumps out and scatters around the room. Guests can do it too, but for them the mess is only on their screen.', '🌪️ Осторожно, бардак! Наведи на коробку (на телефоне — нажми), и всё, что внутри, выпрыгнет и разлетится по комнате. Гости тоже так могут, но у них бардак только на их экране.', '🌪️ Uzmanību — nekārtība! Uzved uz kastes (telefonā — pieskaries), un viss, kas iekšā, izlēks un izklīdīs pa istabu. Ciemiņi arī tā var, bet viņiem nekārtība ir tikai viņu ekrānā.'],
+      ['🧹 To tidy up, press «🧹 Tidy up» — your bird will carry every thing back to its box, one by one.', '🧹 Чтобы прибраться, нажми «🧹 Прибраться» — птичка сама разнесёт всё по коробкам, по одной вещи.', '🧹 Lai sakoptu, nospied «🧹 Sakopt» — putniņš pats aiznesīs visu atpakaļ uz kastēm, pa vienai lietai.'],
+      ['🔄 Don’t like your box? You can swap it for another one.', '🔄 Не нравится коробка? Её можно поменять на другую.', '🔄 Nepatīk kaste? To var nomainīt pret citu.'],
+    ],
+    sign: ['— The Wobbleland Administration', '— Администрация Воббленда', '— Wobbleland administrācija'],
+    swap: ['🔄 Another box', '🔄 Другая коробка', '🔄 Cita kaste'],
+    ok: ['Thank you!', 'Спасибо!', 'Paldies!'],
+  };
+  const boxName = b => window.PPBirds && PPBirds.giftName ? PPBirds.giftName('furn', b, L) : b;
+  // окно выбора: cur — какая коробка сейчас (нет — первый раз: ещё и про альбом)
+  function pickBox(cur) {
+    let d = document.getElementById('nw-box');
+    if (!d) { d = document.createElement('dialog'); d.id = 'nw-box'; d.className = 'nw-dlg nw-boxdlg'; d.setAttribute('aria-labelledby', 'nw-box-t'); document.body.appendChild(d); }
+    d.innerHTML = `<div class="nw-in"><div class="nw-head"><h2 id="nw-box-t">📦 ${BX[cur ? 'swapT' : 'pickT'][L]}</h2><button type="button" class="nw-x" aria-label="${t('close')}">✕</button></div>
+      ${cur ? `<p>${BX.swapText[L]}</p>` : `<p><b>${esc(BX.hi[L](me.nick))}</b> ${BX.pickAlbum[L]}</p><p>${BX.pickBox[L]}</p>`}
+      <div class="nw-boxgrid"></div><p class="nw-boxrule">${BX.rules[L]}</p>${cur ? '' : `<p class="nw-boxlater"><button type="button" class="pill-btn">${BX.later[L]}</button></p>`}</div>`;
+    const close = () => d.close();
+    d.querySelector('.nw-x').onclick = close; if (!cur) d.querySelector('.nw-boxlater button').onclick = close;
+    const grid = d.querySelector('.nw-boxgrid');
+    BOXES.forEach(b => {
+      const btn = document.createElement('button'); btn.type = 'button'; btn.className = 'nw-boxbtn' + (b === cur ? ' on' : ''); btn.dataset.box = b;
+      if (window.PPRoom && PPRoom.icon) { const ic = PPRoom.icon('furn', b); ic.setAttribute('aria-hidden', 'true'); btn.appendChild(ic); }
+      btn.insertAdjacentHTML('beforeend', `<span>${esc(boxName(b))}</span>${b === cur ? `<small>${BX.now[L]}</small>` : ''}`);
+      btn.onclick = async () => {
+        if (b === cur) return close();
+        grid.querySelectorAll('button').forEach(x => { x.disabled = true; });
+        try {
+          const r = await fetch('/api/box0', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json', ...(window.PPDevH ? PPDevH() : {}) }, body: JSON.stringify({ box: b }) });
+          if (!r.ok) throw new Error(r.status);
+          me.box0 = b; close();
+          if (window.PPRoom && PPRoom.live && PPRoom.live.box.isConnected) { location.reload(); return; } // своя комната на странице — показать коробку сразу
+          const href = `${pre}/bird/?nick=${encodeURIComponent(me.nick)}`;
+          if (window.PPToast) PPToast(BX.done[L](boxName(b)), { action: BX.look[L], onAction: () => { location.href = href; }, ms: 6000 });
+        } catch (e) { grid.querySelectorAll('button').forEach(x => { x.disabled = false; }); alert(BX.err[L]); }
+      };
+      grid.appendChild(btn);
+    });
+    if (!d.open) d.showModal();
+  }
+  // первый заход после регистрации: коробка ещё не выбрана — окно выбора (подождать, если открыто другое окно)
+  function askBox(tries = 0) {
+    if (!me || me.box0 !== '' || askBox.done) return;
+    if (document.querySelector('dialog[open], .adv-modal, .sw-bv')) { if (tries < 60) setTimeout(() => askBox(tries + 1), 1000); return; }
+    askBox.done = true; pickBox('');
+  }
+  // письмо о коробках: прочитать — отметить прочитанным
+  function boxLetter(card, x, btn) {
+    if (card.classList.contains('open')) return drop('boxes', card);
+    card.classList.add('open');
+    card.insertAdjacentHTML('beforeend', `<div class="nw-paper"><b>${esc(BX.hi[L](me.nick))}</b>${BX.letter.map(p => `<p>${esc(p[L])}</p>`).join('')}<i>${BX.sign[L]}</i>
+      <p class="nw-paper-act"><button type="button" class="pill-btn nw-swap">${BX.swap[L]}</button></p></div>`);
+    card.querySelector('.nw-swap').onclick = () => { const f = document.getElementById('nw-feed'); if (f) f.close(); drop('boxes'); pickBox(me.box0 || x.box); };
+    btn.textContent = BX.ok[L];
+    card.querySelector('.nw-paper').scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    fetch('/api/box0/seen', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: '{}' }).catch(() => {});
+  }
 
   let news = [], me = null, flown = false;
   const known = () => news.filter(x => KINDS[x.kind]);
@@ -173,7 +255,7 @@
   function set(d) {
     me = d && d.user && d.user.nick ? d.user : null;
     news = me ? (d.user.news || []) : [];
-    drawBell(); fly();
+    drawBell(); askBox(); fly();
   }
   // после действия на странице (открыто окошко, подарок…) — заново спросить сервер; конвертик второй раз не вылетает
   function refresh() {
@@ -181,7 +263,7 @@
     return fetch('/api/news', { credentials: 'same-origin', headers: window.PPDevH ? window.PPDevH() : {} }).then(r => r.ok ? r.json() : null)
       .then(j => { if (j) { news = j.news || []; drawBell(); } }).catch(() => {});
   }
-  window.PPNews = { refresh, open: feed, list: () => known().slice() };
+  window.PPNews = { refresh, open: feed, list: () => known().slice(), pickBox: () => me && pickBox(me.box0 || '') };
   if (window.PPWho) set(window.PPWho);
   document.addEventListener('pp:whoami', e => set(e.detail));
 })();

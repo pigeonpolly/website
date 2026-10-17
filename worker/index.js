@@ -173,6 +173,27 @@ function cleanRoom(room, own) {
   return out;
 }
 
+// ---------- коробка при регистрации (как альбом): птичка выбирает одну из коробок в окне (news.js), потом может поменять ----------
+// gifts.note = 'starter' — эта коробка; её нельзя продать, подарить и отдать за подсказку. users.box0 — какая выбрана ('' — ещё не выбрана),
+// users.box_mail = 1 — непрочитанное письмо о коробках (новость boxes, тем, кто был до коробок)
+const STARTER_BOXES = ['cardbox', 'crate', 'hatbox', 'trunkbox', 'giftbox'];
+// место на полу для коробки: где меньше всего мебели (ширину чужих вещей сервер не знает — считаем 24)
+function boxSpot(room) {
+  const floor = (room.items || []).filter(it => it.k === 'furn' && it.in == null && (it.y == null || it.y > 80));
+  let best = null;
+  for (let x = 0; x <= 172; x += 2) {
+    const hit = floor.reduce((a, it) => a + Math.max(0, Math.min(x + 20, it.x + 24) - Math.max(x, it.x)), 0), sc = hit * 1000 + Math.abs(x - 150);
+    if (!best || sc < best.sc) best = { x, sc };
+  }
+  return best.x;
+}
+function starterBoxSql(env, u, box, mail = 0) {
+  const room = roomOf(u); room.items = Array.isArray(room.items) ? room.items : [];
+  room.items.push({ k: 'furn', v: box, x: boxSpot(room), id: room.items.reduce((m, it) => Math.max(m, Number.isInteger(it.id) ? it.id : 0), 0) + 1 });
+  return [env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, 'furn', ?, 'starter', 'bag', ?, ?)").bind(u.id, box, now(), now()),
+    env.DB.prepare('UPDATE users SET box0 = ?, box_mail = ?, room = ? WHERE id = ?').bind(box, mail, JSON.stringify(room), u.id)];
+}
+
 // ---------- «🎲 Сюрприз»: вещь '?' любой категории → случайная вещь этой категории, которой у птички ещё нет (не легендарная) ----------
 let catalogCache = null;
 async function catalog(env, req) {
@@ -256,6 +277,7 @@ const NEWS_KINDS = [
   }],
   ['trade', (env, req, u) => tradeNews(env, u.id, RULES.tradeDays)], // новые предложения обмена карточками (worker/cards.js)
   ['reward', (env, req, u) => rewardNews(env, u.id)], // награда Титоса за уровень (worker/titos.js) — «Поставить» в ленте
+  ['boxes', (env, req, u) => u.box_mail ? { n: 1, box: u.box0 || 'cardbox' } : null], // письмо о коробках и бардаке (тем, кто был до коробок)
 ];
 async function newsOf(env, req, u) {
   if (!u || !u.nick || u.banned) return [];
@@ -376,7 +398,8 @@ async function ensureSchema(env) {
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
-    'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER]) {
+    'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER,
+    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0']) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   // «Выбор Полли» подешевел с 50 до 11 пуговок: уже начисленные записи пересчитать один раз, баланс = сумма журнала
@@ -395,6 +418,13 @@ async function ensureSchema(env) {
       await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('potfail_v2', '1')").run();
     }
   } catch (e) { console.error('potfail', e); }
+  // 17.10.2026: коробка при регистрации — птичкам, которые уже были, выдать картонную коробку и письмо о коробках (один раз)
+  try {
+    if ((await env.DB.prepare("INSERT OR IGNORE INTO meta (key, value) VALUES ('starter_box_v1', '1')").run()).meta.changes) {
+      const us = (await env.DB.prepare("SELECT id, room FROM users WHERE nick IS NOT NULL AND COALESCE(box0, '') = ''").all()).results;
+      for (let i = 0; i < us.length; i += 25) await env.DB.batch(us.slice(i, i + 25).flatMap(u => starterBoxSql(env, u, 'cardbox', 1)));
+    }
+  } catch (e) { console.error('starter box', e); }
   schemaReady = true;
 }
 
@@ -1302,6 +1332,31 @@ async function route(req, env, url) {
     await env.DB.prepare(`UPDATE users SET room = ?${added ? ', room_at = ?' : ''} WHERE id = ?`).bind(...(added ? [JSON.stringify(room), now(), u.id] : [JSON.stringify(room), u.id])).run();
     return json({ ok: true, room });
   }
+  // коробка при регистрации: первый раз — выдать выбранную, потом — поменять на другую (та же стоит на том же месте, вещи внутри остаются)
+  if (m === 'POST' && p === '/api/box0') {
+    const u = await needUser(req, env);
+    if (!u.nick || u.banned) fail(400, 'nick');
+    const b = await req.json().catch(() => ({})), box = String(b.box || '');
+    if (!STARTER_BOXES.includes(box)) fail(400, 'box');
+    if (!u.box0) {
+      const r = await env.DB.prepare("UPDATE users SET box0 = ? WHERE id = ? AND COALESCE(box0, '') = ''").bind(box, u.id).run(); // два нажатия подряд — одна коробка
+      if (r.meta.changes) await env.DB.batch(starterBoxSql(env, u, box));
+    } else if (box !== u.box0) {
+      const g = await env.DB.prepare("SELECT id, item FROM gifts WHERE user_id = ? AND kind = 'furn' AND note = 'starter' AND status = 'bag'").bind(u.id).first();
+      if (!g) fail(404, 'gone');
+      const room = roomOf(u), it = (room.items || []).find(x => x.k === 'furn' && x.v === g.item && x.id != null) || (room.items || []).find(x => x.k === 'furn' && x.v === g.item);
+      if (it) it.v = box;
+      await env.DB.prepare("UPDATE gifts SET item = ? WHERE id = ?").bind(box, g.id).run();
+      await env.DB.prepare('UPDATE users SET box0 = ?, room = ? WHERE id = ?').bind(box, JSON.stringify(cleanRoom(room, await ownedRoom(env, u.id))), u.id).run();
+    }
+    const v = await env.DB.prepare('SELECT room FROM users WHERE id = ?').bind(u.id).first();
+    return json({ ok: true, box, room: roomOf(v) });
+  }
+  if (m === 'POST' && p === '/api/box0/seen') {
+    const u = await needUser(req, env);
+    await env.DB.prepare('UPDATE users SET box_mail = 0 WHERE id = ?').bind(u.id).run();
+    return json({ ok: true });
+  }
   // галерея комнат (внизу «Стаи»): обустроенные комнаты, свежие изменения первыми; по 24, дальше — offset
   if (m === 'GET' && p === '/api/rooms') {
     const off = Math.max(0, Math.floor(Number(url.searchParams.get('offset')) || 0));
@@ -1419,8 +1474,8 @@ async function route(req, env, url) {
   // 🔦 подсказка: вещи из сумки, которыми можно заплатить (окно выбора)
   if (m === 'GET' && p === '/api/potion/bag') {
     const u = await needUser(req, env);
-    const rows = (await env.DB.prepare("SELECT id, kind, item FROM gifts WHERE user_id = ? AND status = 'bag' ORDER BY created_at DESC").bind(u.id).all()).results;
-    return json({ items: rows.filter(g => hintOk(g.kind, g.item)), avatar: avatarOf(u), room: roomOf(u) });
+    const rows = (await env.DB.prepare("SELECT id, kind, item, note FROM gifts WHERE user_id = ? AND status = 'bag' ORDER BY created_at DESC").bind(u.id).all()).results;
+    return json({ items: rows.filter(g => hintOk(g.kind, g.item) && g.note !== 'starter'), avatar: avatarOf(u), room: roomOf(u) });
   }
   // 🔦 подсказка: вещь из сумки уходит в магазин (+1 к остатку, пуговок нет), до конца уровня видна дорожка (её рисует potions.js). Один раз на уровень, перезагрузка не сжигает
   if (m === 'POST' && p === '/api/potion/hint') {
@@ -1432,7 +1487,7 @@ async function route(req, env, url) {
     if (r.hint) return json({ ok: true, avatar: avatarOf(u) });
     const g = await env.DB.prepare("SELECT * FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag'").bind(Number(b.gift), u.id).first();
     if (!g) fail(404, 'gift');
-    if (!hintOk(g.kind, g.item)) fail(400, 'cant');
+    if (!hintOk(g.kind, g.item) || g.note === 'starter') fail(400, 'cant');
     // сначала отметить уровень (два нажатия подряд не возьмут две вещи), не вышло с вещью — отметку снять
     const upd = await env.DB.prepare('UPDATE maze_runs SET hint = 1 WHERE id = ? AND hint = 0').bind(r.id).run();
     if (!upd.meta.changes) return json({ ok: true, avatar: avatarOf(u) });
@@ -1836,7 +1891,7 @@ async function route(req, env, url) {
     // зарплата от «администрации Воббленда»: пуговки уже начислены, а конвертик ещё не открыт (seen = 0)
     const news = await newsOf(env, req, u); // «конвертик»: зарплата, подарки, адвент… (site/assets/news.js)
     const titos = u && !u.banned ? titosState(await env.DB.prepare('SELECT * FROM titos WHERE user_id = ?').bind(u.id).first(), RULES, titosHelpers(env)) : null; // кофейник Титоса (worker/titos.js)
-    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), pin: !(await isAdmin(u, env)) && await adminIdentity(u, env) ? 1 : 0, avatar: avatarOf(u), buttons: (u.buttons || 0) + earned, earned, news, friendBtns: BTN.friend, titos } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
+    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), pin: !(await isAdmin(u, env)) && await adminIdentity(u, env) ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, news, friendBtns: BTN.friend, titos } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
   }
   if (m === 'GET' && p === '/api/news') return json({ news: await newsOf(env, req, await currentUser(req, env)) }, 200, { 'cache-control': 'no-store' });
   if (m === 'GET' && p === '/api/config') return json({ ready: true, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' });
@@ -2006,6 +2061,7 @@ async function route(req, env, url) {
     const g = await env.DB.prepare("SELECT * FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag'").bind(Number(b.id), u.id).first(); // любую вещь из сумки (раньше — только купленные)
     if (!g) fail(404, 'gift');
     if (!PPCanDo(g.kind, g.item).gift) fail(403, 'legend'); // легендарные не дарятся (PPCanDo)
+    if (g.note === 'starter') fail(403, 'starter'); // коробка при регистрации — только своя
     const to = await env.DB.prepare("SELECT id, nick FROM users WHERE nick = ? AND banned = 0 AND id != ?").bind(String(b.to || '').trim().replace(/^@/, ''), u.id).first();
     if (!to) fail(404, 'bird');
     if (await copies(env, to.id, g.kind, g.item) >= RULES.shopMax) fail(409, 'has'); // у получателя уже три таких
@@ -2026,6 +2082,7 @@ async function route(req, env, url) {
     const b = await req.json().catch(() => ({}));
     const g = await env.DB.prepare("SELECT * FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag'").bind(Number(b.id), u.id).first();
     if (!g) fail(404, 'gift');
+    if (g.note === 'starter') fail(403, 'starter');
     const a = await toShop(env, req, u, g);
     const n = RULES.sellPrice;
     await env.DB.prepare('UPDATE users SET buttons = COALESCE(buttons, 0) + ? WHERE id = ?').bind(n, u.id).run();

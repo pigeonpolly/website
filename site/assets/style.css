@@ -4061,6 +4061,23 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .nw-empty { margin: 8px 0 4px; text-align: center; color: #6E5F80; }
 @media (max-width: 480px) { .nw-row { flex-wrap: wrap; } .nw-tx { flex: 1 1 calc(100% - 56px); } .nw-act { margin-left: 56px; } }
 @media (prefers-reduced-motion: reduce) { .nw-env, .nw-pix, .nw-bub, .bell.has svg { animation: none; } }
+/* коробка при регистрации (news.js pickBox) и письмо о коробках */
+.nw-boxdlg p { margin: 0 0 10px; line-height: 1.4; }
+.nw-boxgrid { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; margin: 4px 0 12px; }
+.nw-boxbtn { display: grid; justify-items: center; align-content: start; gap: 4px; padding: 8px 4px; border: 0; border-radius: 14px; background: #fff; box-shadow: 0 0 0 1.5px #EADFF2; color: #2B1A51; font: 600 .78rem/1.2 var(--sans); cursor: pointer; }
+.nw-boxbtn:hover, .nw-boxbtn:focus-visible { box-shadow: 0 0 0 2.5px #E9A93B; }
+.nw-boxbtn.on { box-shadow: 0 0 0 2.5px #8B6BC8; background: #F4F0FA; }
+.nw-boxbtn:disabled { opacity: .6; cursor: wait; }
+.nw-boxbtn canvas { width: 100%; max-width: 64px; height: auto; image-rendering: pixelated; }
+.nw-boxbtn small { font-size: .7rem; color: #6a3fb0; }
+.nw-boxrule { font-size: .85rem; color: #6E5F80; }
+.nw-boxlater { text-align: center; margin: 0 !important; }
+.nw-paper { margin-top: 12px; padding: 12px 14px; border-radius: 10px; background: #fff8ec; box-shadow: inset 0 0 0 1.5px #F0DEC0; font-size: .9rem; line-height: 1.4; }
+.nw-paper p { margin: 8px 0; }
+.nw-paper i { display: block; margin-top: 8px; font-size: .82rem; color: #7a6a8a; text-align: right; }
+.nw-paper-act { text-align: center; margin-bottom: 0 !important; }
+.nw-boxlater .pill-btn, .nw-paper-act .pill-btn { color: #2B1A51; background: #fff; border: 1.5px solid #CDBFE0; }
+@media (max-width: 480px) { .nw-boxgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 /* вкладки магазина: 🐦 для птички / 🏠 для комнаты / 🎲 сюрпризы / 🃏 карточки (src/pages/shop.html `tabs`) */
 .shop-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 1280px; margin: 14px auto 0; }
 .shop-tab { font: 600 17px var(--sans); padding: 13px 10px; border-radius: 16px; border: 2px solid rgba(255,255,255,.28); background: rgba(255,255,255,.06); color: inherit; cursor: pointer; }

@@ -447,7 +447,9 @@
   function bagInto(box, changed, inModal) {
     const B = window.PPBirds, C = window.PPCatalog, isRoom = k => B.isRoomKind && B.isRoomKind(k);
     const items = () => bagItems().map(g => { const n = (me.gifts || []).filter(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item).length;
-      return { kind: g.kind, item: g.item, n, u: C.usage(g.kind, g.item, n, me.avatar, me.room), legend: !!(B.LEGEND && B.LEGEND.has(g.kind + '|' + g.item)), gid: g.id }; });
+      // starter — среди них коробка при регистрации (её можно поменять); fixed — других таких нет: не подарить и не продать
+      const st = (me.gifts || []).some(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item && x.note === 'starter'), free = (me.gifts || []).find(x => x.status === 'bag' && x.kind === g.kind && x.item === g.item && x.note !== 'starter');
+      return { kind: g.kind, item: g.item, n, u: C.usage(g.kind, g.item, n, me.avatar, me.room), legend: !!(B.LEGEND && B.LEGEND.has(g.kind + '|' + g.item)), gid: free ? free.id : g.id, starter: st, fixed: !free }; });
     const order = [...C.BIRD_KINDS, ...C.ROOM_KINDS], sortK = list => order.flatMap(k => list.filter(g => g.kind === k));
     const S = bagInto.f || (bagInto.f = {}); // вкладка, вид, «только неиспользуемые» — до перезагрузки
     const redraw = () => ui.draw();
@@ -470,6 +472,7 @@
         catch (e) { alert(t('err')); }
       },
       onMore: g => bagMore(g),
+      onSwap: () => { box.closest('.sw-bv') && box.closest('.sw-bv').remove(); window.PPNews && window.PPNews.pickBox(); }, // другая коробка при регистрации (news.js)
       undo: { can: () => !!C.lastUndo, run: async () => { const u = C.lastUndo; C.lastUndo = null; if (u) await u(); if (app) renderProfile(); if (changed) changed(); } },
       shopUrl: (tab, kind) => `${pre}/shop/#${tab}${kind ? ':' + kind : ''}`,
       shopCount: k => shopN ? shopN[k] || 0 : null,

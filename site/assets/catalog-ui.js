@@ -91,7 +91,7 @@
 
   // ---------- режим «сумка» ----------
   // o = { items: [{kind, item, n, u, legend, gid}], id, state, sell (цена или null), cards (число или null — вкладка появится с карточками),
-  //       onUse(g), onGive(g), onSell(g), onMore(g), cardsInto(box), onCards() — вкладка «Карточки» открывает альбом, empty, top,
+  //       onUse(g), onGive(g), onSell(g), onMore(g), onSwap(g) — другая коробка (у вещи starter: коробка при регистрации, fixed — только она), cardsInto(box), onCards() — вкладка «Карточки» открывает альбом, empty, top,
   //       undo: { can(), run() } — кнопка «↶ Отменить»; shopUrl(tab, kind) — плитка «＋ в магазин»; shopCount(kind) — сколько таких вещей в продаже (для пустого вида) }
   function bag(box, o) {
     const S = o.state || (o.state = {});
@@ -146,7 +146,9 @@
       for (const [g, list] of grids) for (const it of list) {
         const mark = it.u > 0 ? (it.n > 1 ? `✓ ${it.u}/${it.n}` : '✓') : it.n > 1 ? `×${it.n}` : '';
         const menu = [];
-        const can = window.PPCanDo ? window.PPCanDo(it.kind, it.item) : { gift: !it.legend, sell: true }; // что можно с вещью (can-do.js)
+        const can = Object.assign({}, window.PPCanDo ? window.PPCanDo(it.kind, it.item) : { gift: !it.legend, sell: true }); // что можно с вещью (can-do.js)
+        if (it.fixed) can.gift = can.sell = false; // коробка при регистрации — только своя
+        if (it.starter && o.onSwap) menu.push({ label: tr(['🔄 Another box', '🔄 Другая коробка', '🔄 Cita kaste']), on: () => o.onSwap(it) });
         if (can.gift && o.onGive) menu.push({ label: '🎁 ' + tr(['Give', 'Подарить', 'Uzdāvināt']), on: () => o.onGive(it) });
         if (can.sell && o.sell != null && o.onSell) menu.push({ label: '💰 ' + tr([`Sell for ${o.sell} 🔘`, `Продать за ${o.sell} 🔘`, `Pārdot par ${o.sell} 🔘`]), on: () => o.onSell(it) });
         if (o.onMore) menu.push({ label: 'ℹ️ ' + tr(['Details', 'Подробнее', 'Sīkāk']), on: () => o.onMore(it) });
