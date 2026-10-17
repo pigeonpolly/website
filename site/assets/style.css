@@ -1874,6 +1874,9 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .acct-st { min-height: 1.2em; color: #C0392B !important; font-weight: 600; font-size: 13.5px !important; }
 .acct-st:empty { min-height: 0; }
 .acct-f .pill-btn { width: 100%; margin: 0; justify-self: stretch; padding: 11px; font-size: 15px; }
+.acct-pop a.acct-mail { display: block; box-sizing: border-box; width: 100%; padding: 11px; border: 1px solid var(--peach); border-radius: 999px; background: var(--peach); text-align: center; color: #2B1A51; font-weight: 700; }
+.acct-pop a.acct-mail:hover { background: #2B1A51; border-color: #2B1A51; color: #fff; }
+.acct-mailto { margin: 0 !important; text-align: center; font-size: 13.5px !important; user-select: all; }
 .acct-link { justify-self: center; padding: 4px; border: 0; background: none; color: #5B4C8A; font: 14px var(--sans); text-decoration: underline; cursor: pointer; }
 .acct-pwd .acct-l, .acct-pwd .acct-pw { width: 100%; }
 .sw-advmail { display: flex; gap: 8px; align-items: center; justify-content: center; margin: 6px 0 0; font-size: 14px; color: inherit; cursor: pointer; }

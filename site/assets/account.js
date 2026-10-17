@@ -48,8 +48,9 @@
     fgText: ['Enter your email — we’ll send a link to choose a new password. It works for 1 hour.', 'Напиши почту — пришлём ссылку, чтобы придумать новый пароль. Она работает 1 час.', 'Ieraksti e-pastu — atsūtīsim saiti jaunas paroles izveidei. Tā darbojas 1 stundu.'],
     fgSend: ['Send link', 'Прислать ссылку', 'Sūtīt saiti'],
     fgSent: ['If there is an account with this email, the link is already on its way. Check your inbox and spam.', 'Если аккаунт с такой почтой есть, ссылка уже летит. Проверь входящие и спам.', 'Ja konts ar šo e-pastu ir, saite jau ceļā. Pārbaudi iesūtni un surogātpastu.'],
-    fgOff: ['Write to Alina: she will reset the password and send you a temporary one. When you sign in with it, you’ll choose a new password.', 'Напиши Алине: она сбросит пароль и пришлёт временный. При входе с ним придумаешь новый.', 'Uzraksti Alīnai: viņa atiestatīs paroli un atsūtīs pagaidu paroli. Ienākot ar to, izdomāsi jaunu.'],
+    fgOff: ['Email Alina: she will reset the password and send you a temporary one. When you sign in with it, you’ll choose a new password.', 'Напиши Алине на почту: она сбросит пароль и пришлёт временный. При входе с ним придумаешь новый.', 'Uzraksti Alīnai e-pastu: viņa atiestatīs paroli un atsūtīs pagaidu paroli. Ienākot ar to, izdomāsi jaunu.'],
     fgWrite: ['Write to Alina', 'Написать Алине', 'Rakstīt Alīnai'],
+    fgSubj: ['Forgot my password', 'Забыли пароль', 'Aizmirsu paroli'],
     fgMsg: ['Hi Alina! I forgot my password. My nickname / email on the site: ', 'Привет, Алина! Не помню пароль. Мой ник / почта на сайте: ', 'Sveika, Alīna! Aizmirsu paroli. Mans segvārds / e-pasts vietnē: '],
     back: ['← Back', '← Назад', '← Atpakaļ'],
     inApp: ['Signing in with Google may not work inside this app. Sign in with a password — or open the site in your browser (⋯ → Open in browser).', 'Вход через Google здесь может не сработать. Войди с паролем — или открой сайт в браузере (⋯ → «Открыть в браузере»).', 'Ieeja ar Google šeit var nedarboties. Ienāc ar paroli — vai atver vietni pārlūkā (⋯ → «Atvērt pārlūkā»).'],
@@ -221,6 +222,7 @@
   }
 
   // ---------- вход с паролем (этап 12) ----------
+  const ALINA_MAIL = 'lina.otkinska@gmail.com'; // забытый пароль — письмо Алине (писем с сайта нет, по её решению)
   const IN_APP = /Instagram|FBAN|FBAV|FB_IAB|FB4A|musical_ly|BytedanceWebview|TikTok|LinkedInApp|Pinterest|Snapchat|\bLine\//i.test(navigator.userAgent);
   let resetTok = '';
   try { const q = new URLSearchParams(location.search); resetTok = /^[0-9a-f]{64}$/.test(q.get('pwreset') || '') ? q.get('pwreset') : ''; if (q.has('pwreset')) { q.delete('pwreset'); history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash); } } catch (e) {}
@@ -247,7 +249,7 @@
         <p class="acct-st" role="status" aria-live="polite"></p><button class="pill-btn pill-fill" type="submit">${t('doUp')}</button></form>
       <form class="acct-f" data-f="forgot" hidden novalidate>${info.mail ? `<p>${t('fgText')}</p><label class="acct-l">${t('email')}<input type="email" name="email" autocomplete="username" required maxlength="254" autocapitalize="none" spellcheck="false"></label>${hp}
         <p class="acct-st" role="status" aria-live="polite"></p><button class="pill-btn pill-fill" type="submit">${t('fgSend')}</button>`
-        : `<p>${t('fgOff')}</p><button class="pill-btn pill-fill" type="button" data-write>✉️ ${t('fgWrite')}</button>`}<button type="button" class="acct-link" data-back>${t('back')}</button></form></div>`;
+        : `<p>${t('fgOff')}</p><a class="pill-btn pill-fill acct-mail" href="mailto:${ALINA_MAIL}" data-write>✉️ ${t('fgWrite')}</a><p class="acct-mailto">${ALINA_MAIL}</p>`}<button type="button" class="acct-link" data-back>${t('back')}</button></form></div>`;
   }
   function wireEyes(root) {
     root.querySelectorAll('.acct-eye').forEach(b => b.addEventListener('click', () => {
@@ -284,11 +286,8 @@
     forms.up.addEventListener('submit', send(forms.up, 'pw/register', f => ({ email: f.email.value.trim(), password: f.password.value, consent: f.consent.checked }), () => location.reload())); // дальше — окно ника, как после Google
     if (forms.forgot.email) forms.forgot.addEventListener('submit', send(forms.forgot, 'pw/forgot', f => ({ email: f.email.value.trim() }), (j, st) => { st.textContent = j.mail === false ? t('fgOff') : t('fgSent'); }));
     const w = box.querySelector('[data-write]');
-    if (w) w.addEventListener('click', () => { // «Напиши Алине» — окно письма из подвала сайта
-      const d = document.getElementById('contact'); if (!d) return;
-      const msg = d.querySelector('textarea'), v = forms.in.login.value.trim();
-      if (msg && !msg.value) msg.value = t('fgMsg') + v;
-      pop.hidden = true; d.showModal(); document.body.classList.add('modal-open');
+    if (w) w.addEventListener('click', () => { // «Напиши Алине» — письмо на её почту с темой и текстом; пароль она сбрасывает в кабинете
+      w.href = `mailto:${ALINA_MAIL}?subject=${encodeURIComponent('Pigeon Polly: ' + t('fgSubj'))}&body=${encodeURIComponent(t('fgMsg') + forms.in.login.value.trim())}`;
     });
   }
   // окно пароля: 'change' — сменить (нужен текущий), 'add' — добавить (Google-аккаунт), 'temp' — вместо временного (не закрыть), 'reset' — по ссылке из письма
