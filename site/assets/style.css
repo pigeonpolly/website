@@ -3197,9 +3197,7 @@ html:not(.is-admin) .statbar { display: none; }
 .room-sel button { width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .1); color: #fff; font: 700 17px var(--sans); cursor: pointer; }
 .room-sel button:hover, .room-sel button:focus-visible { background: #F0A987; color: #2B1A51; }
 .room-bar .room-hint { flex-basis: 100%; order: 3; font-size: 13px; opacity: .75; }
-/* телефон: пока открыта сумка, своя комната прилипает сверху */
 .bp-room .room-bar { padding: 0 12px 6px; }
-@media (max-width: 760px) { .bp-room.bag-open { position: sticky; top: var(--header-h); z-index: 15; padding-top: 6px; border-radius: 0 0 22px 22px; background: var(--bg); } }
 .room-sel[hidden], .room-tray[hidden] { display: none; }
 .room-tray { display: grid; gap: 10px; padding: 14px; border-radius: 16px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line); }
 .room-hint { margin: 0; font-size: 14px; opacity: .85; }

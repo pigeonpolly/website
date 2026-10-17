@@ -672,7 +672,6 @@
     const show = k => {
       page.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === k)));
       panel.classList.remove('cat-bag');
-      const rbx = page.querySelector('#bp-room'); if (rbx) rbx.classList.toggle('bag-open', mine && k === 'bag'); // телефон: комната прилипает сверху
       if (k === 'bag') {
         if (mine) return bagInto(panel, () => renderPage());
         panel.innerHTML = `<div class="sw-pv-bag">${'<span class="sw-pv-item sw-pv-wrap" title="🎁">🎁</span>'.repeat(Math.min(pr.unopened || 0, 12))}</div>${!(pr.bag || []).length && !pr.unopened ? `<p class="sw-pv-empty">${t('bagEmptyOther')}</p>` : ''}`;
