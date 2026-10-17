@@ -462,7 +462,7 @@ const RULE_DEFAULTS = {
   // «мало / обычно / много» штук в магазине — в % от числа птичек (с ником, не заблокированных); у легендарных — legendPct % от этих чисел
   lowPct: 5, normPct: 20, manyPct: 50, legendPct: 25,
   adventLastJan: 23, adventButtons: 10, adventSpecialButtons: 25,
-  welcomeItem: 'auto', welcomeBtn: -1, // подарок новичку после ника (этап 14): вещь 'kind|item' ('auto' — самая дешёвая шапка каталога) и пуговки (-1 — цена этой вещи)
+  welcomeBtn: -1, // подарок новичку после ника (этап 14): случайная дешёвая вещь (welcomeOf) и столько пуговок (-1 — цена этой вещи)
   dayBonusNeed: 5, dayBonusOf: 7, dayBonusPct: 10, // карточка дня: бонус за dayBonusNeed штампов (из dayBonusOf) — dayBonusPct % опорной цены, раз в сутки
   aiStreak: true, aiUpload: true,
   sellOn: true, sellPrice: 5,
@@ -506,7 +506,6 @@ function cleanRules(r) {
   for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
-  if (typeof r.welcomeItem === 'string' && /^(auto|[a-z]+\|[\w:.-]{1,40})$/.test(r.welcomeItem)) out.welcomeItem = r.welcomeItem;
   out.welcomeBtn = Math.round(out.welcomeBtn);
   out.catMult = {}; if (r.catMult && typeof r.catMult === 'object') for (const k of GIFT_KINDS) { const v = Number(r.catMult[k]); if (Number.isFinite(v) && v !== 100) out.catMult[k] = Math.max(10, Math.min(1000, Math.round(v))); }
   if (out.priceMin > out.priceMax) out.priceMin = out.priceMax;
@@ -583,19 +582,17 @@ function priceNow(kind, item, base, stock) {
   if (!(b > 0)) return 0;
   return isLeg(kind, item) ? b : effPrice(b, stock, false); // легендарные — ровно как поставлено
 }
-// вещи для подарка новичку в «📜 Правилах»: все не легендарные вещи птички (шапки, очки…) с ценой каталога
-async function welcomeChoices(env, req) {
+// подарок новичку (этап 14, Алина: «рандомный из дешёвых, не выбирать»): случайная не легендарная вещь птички (не для комнаты) с ценой каталога ≤ WELCOME_MAX;
+// пуговки — RULES.welcomeBtn или (−1) цена выпавшей вещи сейчас
+const WELCOME_MAX = 30;
+async function welcomeCheap(env, req) {
   const cat = await catalog(env, req), cp = cat.prices || {}, leg = new Set(cat.legend || []);
-  return Object.entries(cat.items || {}).filter(([k]) => !ROOM_KINDS.includes(k)).flatMap(([k, vs]) => vs.map(v => k + '|' + v)).filter(x => !leg.has(x) && cp[x] > 0).map(x => [x, cp[x]]);
+  return Object.entries(cat.items || {}).filter(([k]) => !ROOM_KINDS.includes(k)).flatMap(([k, vs]) => vs.map(v => k + '|' + v)).filter(x => !leg.has(x) && cp[x] > 0 && cp[x] <= WELCOME_MAX);
 }
-// подарок новичку (этап 14): RULES.welcomeItem или самая дешёвая не легендарная шапка каталога; пуговки — RULES.welcomeBtn или цена этой вещи сейчас
 async function welcomeOf(env, req) {
-  const cat = await catalog(env, req), cp = cat.prices || {}, leg = new Set(cat.legend || []);
-  let ki = RULES.welcomeItem !== 'auto' && cp[RULES.welcomeItem] > 0 ? RULES.welcomeItem : '';
-  if (!ki) for (const v of (cat.items || {}).hat || []) { const x = 'hat|' + v; if (!leg.has(x) && cp[x] > 0 && (!ki || cp[x] < cp[ki])) ki = x; }
-  if (!ki) return null;
-  const [kind, item] = ki.split('|');
-  return { kind, item, btn: RULES.welcomeBtn >= 0 ? RULES.welcomeBtn : baseNow(kind, item, cp[ki]) };
+  const list = await welcomeCheap(env, req); if (!list.length) return null;
+  const ki = list[Math.floor(Math.random() * list.length)], [kind, item] = ki.split('|');
+  return { kind, item, btn: RULES.welcomeBtn >= 0 ? RULES.welcomeBtn : baseNow(kind, item, ((await catalog(env, req)).prices || {})[ki]) };
 }
 const shopRow = r => ({ kind: r.kind, item: r.item, base: baseNow(r.kind, r.item, r.price), stock: r.stock, added: r.added_at || 0, price: priceNow(r.kind, r.item, r.price, r.stock), leg: isLeg(r.kind, r.item) });
 // уровень цен раз в сутки: медианный заработок активной птички (≥ 3 дней из 14) за день активности (без зарплаты, подарков админа и продаж) × RULES.priceDays = средняя цена вещи;
@@ -2523,7 +2520,7 @@ async function route(req, env, url) {
       const r = b.reset ? cleanRules(null) : cleanRules(b.rules);
       await setMeta(env, 'rules', JSON.stringify(r)); rulesAt = 0; await loadRules(env);
     }
-    return json({ rules: RULES, defaults: RULE_DEFAULTS, stock: STOCK, gamePrices: gamePrices(await gameUnit(env)), btn: BTN, auto: await autopilot(env, req), restockLast: parseJ(await getMeta(env, 'restock_last'), null), special: ADVENT_SPECIAL, goldPicks: GOLD_PICKS, welcome: await welcomeOf(env, req), welcomeChoices: await welcomeChoices(env, req) });
+    return json({ rules: RULES, defaults: RULE_DEFAULTS, stock: STOCK, gamePrices: gamePrices(await gameUnit(env)), btn: BTN, auto: await autopilot(env, req), restockLast: parseJ(await getMeta(env, 'restock_last'), null), special: ADVENT_SPECIAL, goldPicks: GOLD_PICKS, welcomeCount: (await welcomeCheap(env, req)).length, welcomeMax: WELCOME_MAX });
   }
   // Алина помечает чужую работу как ИИ (ai = 2) или снимает пометку; бейдж «Бип-буп» за это не даётся
   if (m === 'POST' && p === '/api/admin/ai') {
