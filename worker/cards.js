@@ -13,7 +13,8 @@ export const CARD_TABLES = [
   // game — игровые статы уникальных карточек Алины (JSON: персонаж {kind:'char', hp, slots, s:[5], tr} / предмет {kind:'tool', take, fx, req}); старые базы — ALTER в worker/index.js
   `CREATE TABLE IF NOT EXISTS card_sets (slug TEXT PRIMARY KEY, en TEXT DEFAULT '', ru TEXT DEFAULT '', lv TEXT DEFAULT '', src_lang TEXT DEFAULT 'ru', created_at INTEGER)`,
   // ref — метка покупки: по ней в той же транзакции списываются пуговки и пишется журнал
-  `CREATE TABLE IF NOT EXISTS card_owner (card_id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, price INTEGER DEFAULT 0, bought_at INTEGER, ref TEXT)`,
+  // gift — подарок из кабинета (записка, '' — без записки; NULL — куплена), seen = 0 — птичка ещё не видела новость «🃏 Тебе карточка!»
+  `CREATE TABLE IF NOT EXISTS card_owner (card_id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, price INTEGER DEFAULT 0, bought_at INTEGER, ref TEXT, gift TEXT, seen INTEGER DEFAULT 1)`,
   `CREATE INDEX IF NOT EXISTS card_owner_user ON card_owner(user_id)`,
   // обмен (этап 7 В): give — карточки from (id, JSON), take — карточки to; status open → accepted / declined / cancelled / stale (карточки уже не у тех) / expired (RULES.tradeDays);
   // seen — получатель видел предложение (новость trade в конвертике); ref — метка принятия: по ней в той же транзакции переходят карточки
@@ -22,6 +23,7 @@ export const CARD_TABLES = [
   `CREATE INDEX IF NOT EXISTS card_trades_to ON card_trades(to_id, status)`,
   `CREATE INDEX IF NOT EXISTS card_trades_from ON card_trades(from_id, status)`,
 ];
+export const CARD_ALTER = ['ALTER TABLE card_owner ADD COLUMN gift TEXT', 'ALTER TABLE card_owner ADD COLUMN seen INTEGER DEFAULT 1'];
 // обмен — ровно 5 схем, одна схема на обмен: 1↔1 одной редкости, 5 обычных ↔ 1 редкая, 10 обычных ↔ 1 уникальная (то же — tradeCheck в site/assets/cards-ui.js)
 export const TRADE_N = { rare: 5, unique: 10 };
 export function tradeScheme(give, take) { // массивы редкостей → 'common' | 'rare' | 'unique' | 'rare5' | 'unique10' | null
@@ -256,8 +258,8 @@ export async function cardsApi(req, env, url, h) {
     const res = await env.DB.batch([
       env.DB.prepare(`UPDATE card_trades SET status = 'accepted', done_at = ?, seen = 1, ref = ? WHERE id = ? AND to_id = ? AND status = 'open' AND created_at > ? AND (${own}) = ? AND (${own}) = ?`)
         .bind(t, ref, tr.id, u.id, t - days * DAY, tr.from_id, tr.give, nG, tr.to_id, tr.take, nK),
-      env.DB.prepare(`UPDATE card_owner SET user_id = ?, ref = ? WHERE card_id IN (SELECT value FROM json_each(?)) AND ${did}`).bind(tr.to_id, 'trade:' + tr.id, tr.give, tr.id, ref),
-      env.DB.prepare(`UPDATE card_owner SET user_id = ?, ref = ? WHERE card_id IN (SELECT value FROM json_each(?)) AND ${did}`).bind(tr.from_id, 'trade:' + tr.id, tr.take, tr.id, ref),
+      env.DB.prepare(`UPDATE card_owner SET user_id = ?, ref = ?, seen = 1 WHERE card_id IN (SELECT value FROM json_each(?)) AND ${did}`).bind(tr.to_id, 'trade:' + tr.id, tr.give, tr.id, ref),
+      env.DB.prepare(`UPDATE card_owner SET user_id = ?, ref = ?, seen = 1 WHERE card_id IN (SELECT value FROM json_each(?)) AND ${did}`).bind(tr.from_id, 'trade:' + tr.id, tr.take, tr.id, ref),
     ]);
     if (!res[0].meta.changes) {
       const cur = await env.DB.prepare('SELECT status, created_at FROM card_trades WHERE id = ?').bind(tr.id).first();
@@ -278,6 +280,13 @@ export async function cardsApi(req, env, url, h) {
     return json({ ok: true });
   }
 
+  // новость «🃏 Тебе карточка!» прочитана (открыли альбом из ленты)
+  if (m === 'POST' && p === '/api/cards/gift-seen') {
+    const u = await h.needUser(req, env);
+    await env.DB.prepare('UPDATE card_owner SET seen = 1 WHERE user_id = ? AND seen = 0').bind(u.id).run();
+    return json({ ok: true });
+  }
+
   // ---------- кабинет (только админ) ----------
   if (!p.startsWith('/api/admin/cards')) return null;
   const u = await h.needUser(req, env);
@@ -289,6 +298,40 @@ export async function cardsApi(req, env, url, h) {
     return { cards: rows.map(c => ({ ...c, stats: statsOf(c) })), sets: await sets(env), mult, avg: Math.round(avg), common: round5(avg * mult / 100), firstDay: h.rules().cardsFirstDay || 0, nextN: ((rows[rows.length - 1] || {}).n || 0) + 1, files: await repoFiles(env, url) };
   };
   if (m === 'GET' && a === '') return json(await listOut(), 200, { 'cache-control': 'no-store' });
+  // подарок из кабинета: {uid, id} — эта свободная карточка; {uid, rarity?, collection?} — случайная свободная (редкость '' — любая).
+  // Лимит «в первые сутки» и цена не важны; пуговки не списываются. Птичке — новость card (seen = 0)
+  const freeCards = (rarity, coll) => env.DB.prepare(`SELECT c.id FROM cards c LEFT JOIN card_owner o ON o.card_id = c.id
+    WHERE c.hidden = 0 AND o.user_id IS NULL AND (c.rarity = 'common' OR c.price > 0) AND (? = '' OR c.rarity = ?) AND (? = '' OR c.collection = ?)`).bind(rarity, rarity, coll, coll).all().then(r => r.results.map(x => x.id));
+  const giveSql = (cid, uid, note) => env.DB.prepare(`INSERT OR IGNORE INTO card_owner (card_id, user_id, price, bought_at, ref, gift, seen) SELECT ?, ?, 0, ?, ?, ?, 0
+    WHERE EXISTS (SELECT 1 FROM cards WHERE id = ? AND hidden = 0)`).bind(cid, uid, now(), 'gift:' + randomHex(6), note, cid);
+  const giftArgs = b => ({ rarity: RARITY.includes(b.rarity) ? b.rarity : '', coll: String(b.collection || ''), note: String(b.note || '').slice(0, 200) });
+  if (m === 'POST' && a === 'gift') {
+    const b = await body(), g = giftArgs(b);
+    const to = await env.DB.prepare('SELECT id FROM users WHERE id = ?').bind(Number(b.uid) || 0).first();
+    if (!to) fail(404, 'user');
+    const ids = b.id ? [Number(b.id) || 0] : await freeCards(g.rarity, g.coll);
+    for (let tries = 0; tries < 5 && ids.length; tries++) {
+      const cid = b.id ? ids[0] : ids.splice(Math.floor(Math.random() * ids.length), 1)[0];
+      if ((await giveSql(cid, to.id, g.note).run()).meta.changes) {
+        const c = await env.DB.prepare('SELECT id, n, rarity, t_ru, t_en FROM cards WHERE id = ?').bind(cid).first();
+        return json({ ok: true, card: { id: c.id, n: c.n, rarity: c.rarity, title: c.t_ru || c.t_en } });
+      }
+      if (b.id) break;
+    }
+    return json({ error: b.id ? 'sold' : 'none' }, 409);
+  }
+  // всем птичкам с ником (кроме заблокированных) — каждой своя случайная свободная карточка, пока карточки не кончатся
+  if (m === 'POST' && a === 'gift-all') {
+    const g = giftArgs(await body());
+    const users = (await env.DB.prepare("SELECT id FROM users WHERE banned = 0 AND nick IS NOT NULL AND nick != ''").all()).results.map(x => x.id);
+    const ids = await freeCards(g.rarity, g.coll);
+    const mix = arr => { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; };
+    mix(users); mix(ids);
+    const stmts = users.slice(0, ids.length).map((uid, i) => giveSql(ids[i], uid, g.note));
+    let count = 0;
+    for (let i = 0; i < stmts.length; i += 50) for (const r of await env.DB.batch(stmts.slice(i, i + 50))) count += r.meta.changes || 0;
+    return json({ ok: true, count, birds: users.length, left: ids.length - count });
+  }
   if (m === 'POST' && a === 'save') {
     const b = await body();
     const rarity = RARITY.includes(b.rarity) ? b.rarity : 'common';
@@ -512,6 +555,12 @@ export async function tradeNews(env, uid, days) {
   const r = (await env.DB.prepare("SELECT u.nick FROM card_trades tr LEFT JOIN users u ON u.id = tr.from_id WHERE tr.to_id = ? AND tr.status = 'open' AND tr.seen = 0 AND tr.created_at > ?")
     .bind(uid, now() - Math.max(1, days || 7) * DAY).all()).results;
   return r.length ? { n: r.length, from: [...new Set(r.map(x => x.nick).filter(Boolean))].slice(0, 3) } : null;
+}
+
+// новость card (NEWS_KINDS в worker/index.js): карточки, подаренные из кабинета, которые птичка ещё не видела
+export async function cardGiftNews(env, uid) {
+  const r = (await env.DB.prepare('SELECT gift FROM card_owner WHERE user_id = ? AND seen = 0 ORDER BY bought_at DESC').bind(uid).all()).results;
+  return r.length ? { n: r.length, note: (r.find(x => x.gift) || {}).gift || '' } : null;
 }
 
 // «Мои данные» и удаление аккаунта

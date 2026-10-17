@@ -718,7 +718,55 @@
       cant: all ? null : (kd, v) => v !== '?' && kd !== 'any' && (copies[kd + '|' + v] || 0) >= (isLeg(kd, v) ? LIM.leg : LIM.max) ? 'У птички уже максимум таких' : '',
       pick: { has: (kd, v) => kd === kind && v === item },
       onOpen: (kd, v, t) => { kind = kd; item = v; C.mark(t, true, true); prev(); },
+      cardsInto: window.PPCards ? box => giftCards(box) : null, onTab: v => w.classList.toggle('adm-gift-oncards', v === 'cards'),
     });
+    w.classList.toggle('adm-gift-oncards', S.tab === 'cards');
+    // вкладка «Карточки»: 🎲 случайная свободная (редкость, коллекция) — одной птичке или каждой своя; одной птичке — ещё и любая свободная по нажатию.
+    // Карточки единственные: всем одну и ту же нельзя, у кого карточки кончились — тому не придёт (worker/cards.js admin/cards/gift, gift-all)
+    const CS = giftDialog.c || (giftDialog.c = { rarity: '', coll: '' });
+    const RAR = [['', 'Любая'], ['common', 'Обычная 🤖'], ['rare', 'Редкая'], ['unique', 'Уникальная']];
+    function giftCards(box) {
+      box.innerHTML = '<p class="be-note">Загрузка карточек…</p>';
+      api('cards?show=free&lang=ru').then(d => {
+        const free = d.cards.filter(c => c.rarity === 'common' || c.price > 0); // как в сюрпризе магазина: редкие и уникальные без цены ещё не готовы
+        const left = () => free.filter(c => (!CS.rarity || c.rarity === CS.rarity) && (!CS.coll || c.collection === CS.coll)).length;
+        box.innerHTML = `<div class="adm-gc"><p class="be-note">Каждая карточка — одна на весь сайт: подаренная уходит из магазина к птичке в альбом. Пуговки не списываются, птичка увидит «🃏 Тебе карточка!» в новостях.</p>
+          <div class="adm-gc-row"><select data-r aria-label="Редкость">${RAR.map(r => `<option value="${r[0]}"${r[0] === CS.rarity ? ' selected' : ''}>${r[1]}</option>`).join('')}</select>
+          <select data-c aria-label="Коллекция"><option value="">Все коллекции</option>${d.sets.map(x => `<option value="${esc(x.slug)}"${x.slug === CS.coll ? ' selected' : ''}>${esc(x.name)}</option>`).join('')}</select></div>
+          <p class="adm-gc-left"></p><button type="button" class="pill-btn pill-fill" data-rnd></button>
+          ${all ? '' : '<h4>Или выберите карточку</h4><div class="pc-grid adm-gc-grid"></div>'}</div>`;
+        const rnd = box.querySelector('[data-rnd]'), grid = box.querySelector('.adm-gc-grid');
+        const draw = () => {
+          const n = left();
+          box.querySelector('.adm-gc-left').textContent = `Свободных карточек: ${n}` + (all && n ? ' — получат ' + n + ' птичек максимум' : '');
+          rnd.textContent = all ? '🎲 Каждой — своя случайная' : '🎲 Подарить случайную'; rnd.disabled = !n;
+          if (grid) { grid.innerHTML = ''; free.filter(c => (!CS.rarity || c.rarity === CS.rarity) && (!CS.coll || c.collection === CS.coll)).forEach(c => grid.appendChild(window.PPCards.tile(c, { admin: true, onOpen: give }))); }
+        };
+        const done1 = (c, r) => { const i = free.findIndex(x => x.id === (r.card || c).id); if (i >= 0) free.splice(i, 1); sentNote('🃏 №' + r.card.n + ' «' + r.card.title + '» — подарено'); draw(); };
+        const why = x => x.code === 'sold' ? 'Эту карточку уже кто-то купил.' : x.code === 'none' ? 'Свободных карточек не осталось.' : err(x);
+        async function give(c) {
+          if (!confirm(`Подарить №${c.n} «${c.title}» птичке ${u.nick ? '@' + u.nick : ''}?`)) return;
+          try { done1(c, await api('admin/cards/gift', { uid: u.id, id: c.id, note: w.querySelector('input').value.trim() })); } catch (x) { alert(why(x)); giftCards(box); }
+        }
+        box.querySelector('[data-r]').onchange = e => { CS.rarity = e.target.value; draw(); };
+        box.querySelector('[data-c]').onchange = e => { CS.coll = e.target.value; draw(); };
+        rnd.onclick = async () => {
+          const note = w.querySelector('input').value.trim(), what = (RAR.find(r => r[0] === CS.rarity) || RAR[0])[1].toLowerCase();
+          rnd.disabled = true;
+          try {
+            if (all) {
+              if (!confirm(`Подарить каждой птичке свою случайную карточку (${what})?`)) { rnd.disabled = false; return; }
+              const r = await api('admin/cards/gift-all', { rarity: CS.rarity, collection: CS.coll, note });
+              sentNote(`🃏 Случайная карточка — отправлено ${r.count} из ${r.birds} птичек` + (r.count < r.birds ? ' (карточки кончились)' : ''));
+              return giftCards(box);
+            }
+            const r = await api('admin/cards/gift', { uid: u.id, rarity: CS.rarity, collection: CS.coll, note });
+            done1(r.card, r);
+          } catch (x) { alert(why(x)); draw(); }
+        };
+        draw();
+      }).catch(x => { box.innerHTML = `<p class="be-note">${err(x)}</p>`; });
+    }
     const prev = () => {
       const gn = w.querySelector('.gnow'); if (!gn.firstChild) gn.appendChild(B.avatar(u.id, av, 96));
       const gp = w.querySelector('.gp'); gp.innerHTML = '';

@@ -2651,6 +2651,11 @@ html:not(.is-admin) .statbar { display: none; }
 .adm-gift-items button { display: grid; place-items: center; padding: 8px 4px; border: 2px solid #E2DCEE; border-radius: 12px; background: #fff; cursor: pointer; }
 .adm-gift-items button[aria-pressed="true"] { border-color: #E9A93B; background: #FFF7E6; }
 .adm-gift-prev { display: flex; align-items: center; gap: 16px; margin: 14px 0; }
+.adm-gift-oncards .adm-gift-prev, .adm-gift-oncards [data-send] { display: none; } /* вкладка «Карточки» — свои кнопки */
+.adm-gc-row { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0; }
+.adm-gc-row select { padding: 8px 10px; border: 1px solid #DCD5EC; border-radius: 10px; font: 15px var(--sans); background: #fff; color: #2B1A51; max-width: 100%; }
+.adm-gc-left { margin: 6px 0 10px; font-weight: 600; }
+.adm-gc h4 { margin: 20px 0 10px; }
 .adm-gift-card input[type=text] { width: 100%; box-sizing: border-box; padding: 9px 12px; border: 1px solid #DCD5EC; border-radius: 10px; font: 15px var(--sans); }
 .adm-gift-card .pill-btn:not(.pill-fill), .sw-bv-card .pill-btn { color: #2B1A51; border-color: #CFC7E8; background: #fff; }
 .adm-gift-card .pill-btn.pill-fill { color: #2B1A51; }

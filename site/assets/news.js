@@ -60,6 +60,13 @@
       act: ['Look', 'Посмотреть', 'Apskatīt'],
       go: () => pre + '/potions/',
     },
+    card: { // карточки, подаренные из кабинета (worker/cards.js cardGiftNews); гаснет после «Посмотреть» — открывается свой альбом
+      icon: '🃏',
+      title: x => x.n > 1 ? [`Cards for you! (${x.n})`, `Тебе карточки! (${x.n})`, `Tev kartītes! (${x.n})`][L] : ['A card for you!', 'Тебе карточка!', 'Tev kartīte!'][L],
+      text: x => x.note ? '«' + x.note + '»' : ['A gift from Polly — it is already in your album.', 'Подарок от Полли — уже в твоём альбоме.', 'Dāvana no Pollijas — tā jau ir tavā albumā.'][L],
+      act: ['Look', 'Посмотреть', 'Apskatīt'],
+      open: cardGift,
+    },
     trade: { // предложения обмена карточками (этап 7 В); гаснет, когда список открыт в профиле
       icon: '🔁',
       title: x => x.n > 1 ? [`${x.n} trade offers`, `Предложения обмена: ${x.n}`, `Maiņas piedāvājumi: ${x.n}`][L] : ['A trade offer', 'Предложение обмена', 'Maiņas piedāvājums'][L],
@@ -253,6 +260,13 @@
   }
 
   // награда: отметить прочитанной и поставить (своя комната на странице — сразу, иначе — профиль с #use=)
+  function cardGift(card) {
+    fetch('/api/cards/gift-seen', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: '{}' }).catch(() => {});
+    drop('card', card); const d = document.getElementById('nw-feed'); if (d) d.close();
+    const go = () => window.PPCards.album(me.nick);
+    if (window.PPCards) return go();
+    const s = document.createElement('script'); s.src = '/assets/cards-ui.js'; s.onload = go; s.onerror = () => { location.href = `${pre}/bird/?nick=${encodeURIComponent(me.nick)}`; }; document.head.appendChild(s);
+  }
   function reward(card, x) {
     const C = window.PPCatalog, live = window.PPRoom && PPRoom.live && PPRoom.live.box.isConnected;
     const done = () => fetch('/api/titos/reward/seen', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: '{}' }).catch(() => {});
