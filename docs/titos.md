@@ -104,3 +104,8 @@ build.py собирает все дела в site/assets/titos-cases.json.
 - «🪲 Жуки» — site/assets/titos-bugs.js: карточка под «Разбери дела» («осталось N из titosBugsPerHour в этот час» / «следующая игра через N мин» — `bugsLeft`, `bugsMax`, `bugsNext` из titosState), игра в окне .ts-* (кофейник — `PPTitos.kit` из titos-sort.js). 15 очков за 30 с: жук 1, жучок-прослушка 2, божья коровка −3 с. Проверка вида — `?bugs=demo`.
 - Сервер: `POST /api/titos/bugs/start` (лимит в час → 429 'bugs', ставит `bugs_run`), потом `POST /api/titos/coffee {src: 'bugs', sell}` — только после start (409 'run') и не быстрее titosBugsSec с (429 'fast'); `sell: false` — лишнее пропадает.
 - «☕ Долить» (titos-ui.js) — как было; любая ошибка, кроме «не хватает пуговок», — тост «Что-то пошло не так».
+
+## Дела №13–22 (этап 10-2)
+- content/titos/013–022.json: виновные и трюки — в content/titos/index.md; в каждом лупа (`lens` + `pre`), 1 ложный след с `refutes`, улика из допроса — только в деле 15 (свидетель — подозреваемый).
+- Вещи-награды — room.js блок «награды за дела Титоса»: tcredleaves, tcteacup, tcgiftbag, tcmilk, tcmacrame, tccarrot, tccan, tcsalt, tcclock, tcmetronome (маятник — отдельной строкой после блока, как хвост Милки).
+- Свидетель не из подозреваемых (`people`) получает имя только из своего `name` — build.py подставляет имя по `who` лишь подозреваемым.
