@@ -94,7 +94,7 @@
         <p class="adm-r-bar adm-card-tabs" role="tablist">${LANGS.map(l => `<button type="button" class="pill-btn" data-tab="${l}" aria-pressed="${tab === l}">${l.toUpperCase()}${S.src_lang === l ? ' ✎' : ''}</button>`).join('')}
           <span class="be-note">✎ — язык, на котором писали</span></p>
         <label>Название <input type="text" data-t="t" maxlength="80" value="${esc(field(tab, 't'))}" style="width:100%"></label>
-        <label>Описание <textarea data-t="d" maxlength="400" rows="3" style="width:100%">${esc(field(tab, 'd'))}</textarea></label>
+        <label>Описание <textarea data-t="d" maxlength="700" rows="3" style="width:100%">${esc(field(tab, 'd'))}</textarea></label>
         <div class="adm-card-stats">${S.stats.map((s, i) => `<label>Стат ${i + 1} <input type="text" data-sn="${i}" maxlength="30" value="${esc(s[tab] || '')}" placeholder="название"> <input type="number" min="1" max="10" data-sv="${i}" value="${s.v}" style="width:60px"> /10</label>`).join('')}</div>
         <p class="adm-r-bar" data-tr></p>
         <label class="adm-r-chk"><input type="checkbox" data-k="hidden"${S.hidden ? ' checked' : ''}> Скрыта (на сайте её не видно)</label>

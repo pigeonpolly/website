@@ -1,6 +1,6 @@
 # Фото карточек Алины (collectible_card_raw_*.JPEG) → ровная карточка 5:7.
 # Находит карточку на листе, выпрямляет перспективу, поворачивает вертикально, стирает старые номера (рамки из ERASE).
-# python3 tools/cards/unique_crop.py [имя ...] [--out папка] [--debug]
+# python3 tools/cards/unique_crop.py [имя ...] [--out папка] [--flat] [--debug]  → site/images/cards/<coll>/NN.jpg (список — unique_cards.json)
 import sys, os, glob, json
 import cv2, numpy as np
 
@@ -121,7 +121,11 @@ def erase(out, boxes):
         bw, bh = X1 - X0, Y1 - Y0
         m = np.zeros(g.shape, np.uint8); m[Y0:Y1, X0:X1] = 255
         m = cv2.dilate(m, np.ones((9, 9), np.uint8))
-        low = cv2.GaussianBlur(cv2.inpaint(out, m, 15, cv2.INPAINT_TELEA), (0, 0), 9).astype('float32')
+        # линии рядом (стенки значка, буквы) не тянем внутрь: в полосе вокруг рамки штрихи заменяем медианой
+        band = cv2.dilate(m, np.ones((41, 41), np.uint8)) > 0
+        ref = np.percentile(g[band], 60)
+        dark = cv2.dilate(((g < ref - 30) & band).astype(np.uint8) * 255, np.ones((7, 7), np.uint8))
+        low = cv2.GaussianBlur(cv2.inpaint(out, m | dark, 15, cv2.INPAINT_TELEA), (0, 0), 9).astype('float32')
         # донор: такой же кусок рядом с наименьшим числом штрихов
         best = None
         for dy in range(-3 * bh, 3 * bh + 1, max(4, bh // 4)):
@@ -149,18 +153,18 @@ def erase(out, boxes):
 
 def main():
     args = sys.argv[1:]
-    out_dir = os.path.join(ROOT, 'site/images/cards/unique')
+    out_dir = os.path.join(ROOT, 'site/images/cards')
     if '--out' in args:
         i = args.index('--out'); out_dir = args[i + 1]; del args[i:i + 2]
     debug = '--debug' in args
-    args = [a for a in args if a != '--debug']
+    args = [a for a in args if a not in ('--debug', '--flat')]
     cfg = json.load(open(os.path.join(os.path.dirname(__file__), 'unique_cards.json')))
     names = args or [c['raw'] for c in cfg['cards']]
     by = {c['raw']: c for c in cfg['cards']}
     os.makedirs(out_dir, exist_ok=True)
     for name in names:
         c = by.get(name, {'raw': name})
-        img = cv2.imread(os.path.join(ROOT, 'collectible_card_raw_%s.JPEG' % name))
+        img = cv2.imread(os.path.join(ROOT, c.get('file') or 'collectible_card_raw_%s.JPEG' % name))
         quad = np.array(c['quad'], 'float32') if c.get('quad') else find_card(img)
         if quad is None:
             print('!! не нашла карточку:', name); continue
@@ -172,7 +176,9 @@ def main():
         out = fix_corners(out)
         if c.get('erase'):  # [[x0,y0,x1,y1] в долях] — стираем только тёмные штрихи внутри рамки, акварельный фон остаётся
             out = erase(out, c['erase'])
-        fn = os.path.join(out_dir, (('%02d' % c['n']) if c.get('n') else name) + ('.jpg'))
+        sub = os.path.join(out_dir, c['coll']) if c.get('coll') and '--flat' not in sys.argv else out_dir
+        os.makedirs(sub, exist_ok=True)
+        fn = os.path.join(sub, (('%02d' % c['n']) if c.get('n') else name) + ('.jpg'))
         cv2.imwrite(fn, out, [cv2.IMWRITE_JPEG_QUALITY, 86, cv2.IMWRITE_JPEG_PROGRESSIVE, 1])
         if debug:
             dbg = img.copy(); cv2.polylines(dbg, [quad.astype(int)], True, (0, 0, 255), 12)

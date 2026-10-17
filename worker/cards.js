@@ -4,11 +4,13 @@
 // (список коллекций — site/assets/cards/index.json, собирает build.py), один раз на коллекцию (метка meta cards_<коллекция>).
 import { translateTo, ABOUT, LANGS } from './translate.js';
 
-export const RARITY = ['common', 'rare', 'unique']; // обычная 🤖 (нарисована ИИ) · редкая (пиксель-арт Алины) · уникальная (акварель Алины)
+export const RARITY = ['common', 'rare', 'unique'];
+const DESC = 700; // длина описания (у карточек Алины — до ~420 знаков на EN) // обычная 🤖 (нарисована ИИ) · редкая (пиксель-арт Алины) · уникальная (акварель Алины)
 export const CARD_TABLES = [
   `CREATE TABLE IF NOT EXISTS cards (id INTEGER PRIMARY KEY AUTOINCREMENT, n INTEGER UNIQUE NOT NULL, collection TEXT NOT NULL DEFAULT '', rarity TEXT NOT NULL DEFAULT 'common',
     price INTEGER DEFAULT 0, img TEXT, hidden INTEGER DEFAULT 0, src_lang TEXT DEFAULT 'ru', t_en TEXT DEFAULT '', t_ru TEXT DEFAULT '', t_lv TEXT DEFAULT '',
-    d_en TEXT DEFAULT '', d_ru TEXT DEFAULT '', d_lv TEXT DEFAULT '', stats TEXT DEFAULT '[]', created_at INTEGER, updated_at INTEGER)`,
+    d_en TEXT DEFAULT '', d_ru TEXT DEFAULT '', d_lv TEXT DEFAULT '', stats TEXT DEFAULT '[]', game TEXT, created_at INTEGER, updated_at INTEGER)`,
+  // game — игровые статы уникальных карточек Алины (JSON: персонаж {kind:'char', hp, slots, s:[5], tr} / предмет {kind:'tool', take, fx, req}); старые базы — ALTER в worker/index.js
   `CREATE TABLE IF NOT EXISTS card_sets (slug TEXT PRIMARY KEY, en TEXT DEFAULT '', ru TEXT DEFAULT '', lv TEXT DEFAULT '', src_lang TEXT DEFAULT 'ru', created_at INTEGER)`,
   // ref — метка покупки: по ней в той же транзакции списываются пуговки и пишется журнал
   `CREATE TABLE IF NOT EXISTS card_owner (card_id INTEGER PRIMARY KEY, user_id INTEGER NOT NULL, price INTEGER DEFAULT 0, bought_at INTEGER, ref TEXT)`,
@@ -59,7 +61,7 @@ function pub(c, lang, set, common, meId) {
   return {
     id: c.id, n: c.n, collection: c.collection, set: setName(set, lang), rarity: c.rarity, img: c.img || '',
     price: c.rarity === 'common' ? common : c.price || 0,
-    title: pick(c, 't', lang), desc: pick(c, 'd', lang), stats: statsOf(c).map(s => ({ name: statName(s, c, lang), v: Math.max(1, Math.min(10, Math.round(Number(s.v) || 1))) })),
+    title: pick(c, 't', lang), desc: pick(c, 'd', lang), game: parseJ(c.game, null) || undefined, stats: statsOf(c).map(s => ({ name: statName(s, c, lang), v: Math.max(1, Math.min(10, Math.round(Number(s.v) || 1))) })),
     owner: c.owner_id ? { nick: c.owner_nick || null } : null, mine: !!meId && c.owner_id === meId, since: c.created_at || 0,
   };
 }
@@ -231,7 +233,7 @@ export async function cardsApi(req, env, url, h) {
     const rarity = RARITY.includes(b.rarity) ? b.rarity : 'common';
     const src = LANGS.includes(b.src_lang) ? b.src_lang : 'ru';
     const T = (o, n) => Object.fromEntries(LANGS.map(l => [l, clip((o || {})[l], n)]));
-    const t = T(b.t, 80), d = T(b.d, 400);
+    const t = T(b.t, 80), d = T(b.d, DESC);
     if (!LANGS.some(l => t[l])) fail(400, 'title');
     const stats = (Array.isArray(b.stats) ? b.stats : []).slice(0, 3).map(s => ({ ...T(s, 30), v: Math.max(1, Math.min(10, Math.round(Number(s && s.v) || 1))) }));
     // коллекция: slug существующей или новое название (на языке карточки) — тогда создаём
@@ -369,10 +371,11 @@ export async function importCards(env, url) {
         const free = want > 0 && !(await env.DB.prepare('SELECT 1 FROM cards WHERE n = ?').bind(want).first());
         const rarity = RARITY.includes(x.rarity) ? x.rarity : 'common';
         const img = /^\/images\/cards\/[\w\/.-]+$/.test(x.img || '') ? x.img : '';
-        await env.DB.prepare(`INSERT INTO cards (n, collection, rarity, price, img, hidden, src_lang, t_en, t_ru, t_lv, d_en, d_ru, d_lv, stats, created_at, updated_at)
-          VALUES (${free ? '?' : '(SELECT COALESCE(MAX(n), 0) + 1 + 0 * ? FROM cards)'}, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
+        const game = x.game && typeof x.game === 'object' ? JSON.stringify(x.game).slice(0, 2000) : null; // игровые статы уникальных (docs/cards.md)
+        await env.DB.prepare(`INSERT INTO cards (n, collection, rarity, price, img, hidden, src_lang, t_en, t_ru, t_lv, d_en, d_ru, d_lv, stats, game, created_at, updated_at)
+          VALUES (${free ? '?' : '(SELECT COALESCE(MAX(n), 0) + 1 + 0 * ? FROM cards)'}, ?, ?, ?, ?, 0, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`)
           .bind(want, slug, rarity, Math.max(0, Math.floor(Number(x.price) || 0)), img, src,
-            ...['en', 'ru', 'lv'].map(l => L(l, 1 + i).slice(0, 80)), ...['en', 'ru', 'lv'].map(l => L(l, 1 + nI + i).slice(0, 400)), JSON.stringify(stats), t, t).run();
+            ...['en', 'ru', 'lv'].map(l => L(l, 1 + i).slice(0, 80)), ...['en', 'ru', 'lv'].map(l => L(l, 1 + nI + i).slice(0, DESC)), JSON.stringify(stats), game, t, t).run();
       }
       if (!(await env.DB.prepare('SELECT COUNT(*) AS n FROM cards WHERE collection = ?').bind(slug).first()).n) throw new Error('not_saved');
       await env.DB.prepare('UPDATE meta SET value = ? WHERE key = ?').bind(String(t), key).run();
@@ -396,7 +399,7 @@ async function translateMissing(env) {
     const upd = {};
     for (const l of Object.keys(tr)) {
       if (!c['t_' + l]) upd['t_' + l] = String(tr[l][0] || '').slice(0, 80);
-      if (!c['d_' + l]) upd['d_' + l] = String(tr[l][1] || '').slice(0, 400);
+      if (!c['d_' + l]) upd['d_' + l] = String(tr[l][1] || '').slice(0, DESC);
       st.forEach((s, i) => { if (!s[l]) s[l] = String(tr[l][2 + i] || '').slice(0, 30); });
     }
     if (!Object.keys(tr).length) continue;
