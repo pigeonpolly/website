@@ -789,11 +789,34 @@
       d: p => { p(14, 0, 2, 2, '#8A8696'); for (let k = 0; k < 13; k++) { p(14 - k, 1 + k, 1, 1, '#C9A97A'); p(15 + k, 1 + k, 1, 1, '#C9A97A'); } p(0, 13, 30, 4, '#A3733F'); p(0, 13, 30, .5, '#C8955E'); p(0, 16.5, 30, .5, '#7A4E2A'); p(1, 14, 1, 3, '#C9A97A'); p(28, 14, 1, 3, '#C9A97A'); } },
     cubby: { n: i => ['Cube shelf (' + SHELF_N[i][0] + ')', 'Полка-куб (' + SHELF_N[i][1] + ')', 'Kuba plaukts (' + SHELF_N[i][2] + ')'], v: 6, wall: true, w: 18, h: 18, top: 0,
       d: (p, t, i) => { const [c, d, l] = SHELF_C[i]; p(0, 0, 18, 18, c); p(2, 2, 14, 14, d); p(2, 2, 14, 1, 'rgba(0,0,0,.18)'); p(0, 0, 18, .5, l); p(2, 9, 14, 2, c); p(2, 9, 14, .5, l); } },
-    cornershelf: { n: N('Three little shelves', 'Три полочки лесенкой', 'Trīs plauktiņi'), wall: true, w: 34, h: 30, top: 0,
+    cornershelf: { n: N('Three little shelves', 'Три полочки лесенкой', 'Trīs plauktiņi'), wall: true, w: 34, h: 30, top: 0, tw: 14,
       d: p => { [[0, 0], [10, 11], [20, 22]].forEach(([x, y]) => { p(x, y, 14, 3, '#F4F0EA'); p(x, y, 14, .5, '#FFFFFF'); p(x, y + 2.5, 14, .5, '#C9C2B6'); p(x + 6, y + 3, 2, 2, '#C9C2B6'); }); } },
     plantledge: { n: N('Shelf with trailing plants', 'Полка с вьющимися растениями', 'Plaukts ar vijīgiem augiem'), wall: true, w: 34, h: 22, top: 0,
       d: (p, t) => { p(0, 0, 34, 4, '#A3733F'); p(0, 0, 34, .5, '#C8955E'); p(0, 3.5, 34, .5, '#7A4E2A'); const o = Math.round(Math.sin(t / 900)); [[3, 14], [12, 9], [22, 17], [30, 11]].forEach(([x, len], i) => { for (let k = 0; k < len; k++) { p(x + (k % 4 === 0 ? o : 0), 4 + k, 1, 1, '#3E8E4F'); if (k % 3 === 1) p(x + 1 + (i % 2 ? -2 : 0), 4 + k, 2, 1, '#6CC27E'); } }); } },
   });
+  // этап 11 В: угловая полка и полка-облачко
+  Object.assign(FURN, {
+    cornerwshelf: { n: N('Corner shelf', 'Угловая полка', 'Stūra plaukts'), wall: true, w: 22, h: 30, top: 0,
+      d: p => { p(0, 0, 2, 30, '#8A5A34'); p(0, 0, .5, 30, '#A3733F'); [[0, 22], [10, 17], [20, 12]].forEach(([y, w]) => { p(2, y, w - 2, 3, '#C8955E'); p(w - 1, y + .5, 1, 2, '#C8955E'); p(2, y, w - 2, .5, '#D9AC78'); p(2, y + 2.5, w - 2, .5, '#A3733F'); p(2, y + 3, 3, 1, '#A3733F'); p(2, y + 4, 1.5, 1, '#A3733F'); }); } },
+    cloudshelf: { n: N('Cloud shelf', 'Полка-облачко', 'Mākoņplaukts'), wall: true, w: 30, h: 12, top: 0,
+      d: (p, t) => { const o = Math.sin(t / 1400) * .5; p(1, 0, 28, 2.5, '#FFFFFF'); p(1, 2, 28, .5, '#DCEBF7');
+        blob(p, 7, 5 + o, 6, 4.5, (u, v) => v > .65 ? '#DCEBF7' : '#FFFFFF', '#A9C6DE'); blob(p, 15, 6.5, 7, 5.5, (u, v) => v > .65 ? '#DCEBF7' : '#FFFFFF', '#A9C6DE'); blob(p, 23.5, 5 - o, 6, 4.5, (u, v) => v > .65 ? '#DCEBF7' : '#FFFFFF', '#A9C6DE');
+        p(1, 0, 28, 2, '#FFFFFF'); p(1, 0, 28, .5, '#F4FAFF'); p(9, 6, 1, 1, '#F2A8B4'); p(20, 6, 1, 1, '#F2A8B4'); p(14, 7, 2, .5, '#5E5A68'); } },
+  });
+  // этап 11 В: мелкие вещи — только они встают на полки на стену (и в коробки, этап 11 Г). Награды Титоса небольшие — тоже мелкие
+  const SMALL = new Set(['mug', 'teapot', 'teaset', 'books', 'bookstack', 'spellbook', 'candle', 'skullcandle', 'candelabra', 'cake', 'cookies', 'donuts', 'pizzabox', 'candybowl', 'goblet', 'lemonade', 'watermelon', 'pancakes', 'souppot', 'mixer', 'toaster', 'breadbasket', 'applebasket', 'wormchips', 'coffeemachine',
+    'cactus', 'succulents', 'vase', 'tulips', 'orchid', 'snakeplant', 'claypot', 'flytrap', 'yarn', 'knitting', 'globe', 'fishbowl', 'radio', 'recordplayer', 'speaker', 'handheld', 'tamagotchi', 'console', 'pumpkin', 'jacklantern', 'snowglobe', 'gingerhouse',
+    'painttubes', 'brushjar', 'bust', 'rocket', 'moonlamp', 'lavalamp', 'helmet', 'orb', 'shipbottle', 'pollyplush', 'teddy', 'bunny', 'whale', 'cat', 'blackcat', 'raven', 'mrchew', 'ufo', 'eggbasket', 'wateringcan', 'boots', 'seedbag', 'chest']);
+  const isSmall = d => !!d && (SMALL.has(d.k) || (d.titos && d.w <= 16 && d.h <= 16));
+  // этап 11 Б: что светит, когда свет выключен: вещь → [цвет, радиус]; центр — d.glow, иначе середина вещи
+  const GLOW = {
+    lights: ['#FFD36B', 22], lightswarm: ['#FFE3A0', 22], lightsice: ['#CFEFFF', 20], lightsrun: ['#FFB45A', 22], lightsretro: ['#FFC86B', 24], lightsstar: ['#FFF0A0', 20], lightscurtain: ['#FFE3A0', 28], stars: ['#FFF0A0', 18], batgarland: ['#FFB45A', 16],
+    lavalamp: ['#C77DFF', 24], lamp: ['#FFD98A', 36], moonlamp: ['#FFF3C4', 22], neon: ['#FF5FA2', 24], discoball: ['#FFFFFF', 18],
+    fireplace: ['#FF9A3C', 42], candle: ['#FFC75A', 16], skullcandle: ['#FFC75A', 16], candelabra: ['#FFC75A', 24], phoenixnest: ['#FF7A3C', 26],
+    gravelantern: ['#FFD36B', 20], jacklantern: ['#FF9A3C', 18], tclantern: ['#FFC75A', 18],
+    orb: ['#B79CF2', 18], portal: ['#9B7BFF', 30], crypt: ['#BFE3FF', 22], spellbook: ['#B79CF2', 12], constellation: ['#CFE6FF', 20], countcoffin: ['#FFD36B', 18],
+    xmastree: ['#FFE08A', 30], aquarium: ['#7FD3F5', 18], fishbowl: ['#7FD3F5', 12], tv: ['#9FD3FF', 18], computer: ['#9FD3FF', 14], arcade: ['#FF7AD9', 20], ufo: ['#8CF5B0', 14],
+  };
   // значения каталога: «sofa:2», «ornament:4»; у вещей без цветов — просто имя
   const vals = o => Object.entries(o).flatMap(([k, d]) => d.v ? [...Array(d.v)].map((_, i) => k + ':' + i) : d.rc ? [k, ...[...Array(d.rc)].map((_, i) => k + ':' + (i + 1))] : [k]);
   const parse = v => { const [k, i] = String(v).split(':'); return [k, +i || 0]; };
@@ -820,7 +843,7 @@
   addTh('autumn', ['view|wheat', 'floor|cherrywood', 'wall|navyplaid', 'furn|rockingchair', 'furn|radiator']);
   addTh('spring', ['view|tulipfield', 'curtain|cherrydots', 'wall|polka', 'deco|wallshelf']);
   addTh('magic', ['deco|dreamcatcher', 'deco|moonphases']);
-  addTh('home', ['furn|wshelf:0', 'furn|wshelf:1', 'furn|wshelf:2', 'furn|wshelf:3', 'furn|longshelf', 'furn|ropeshelf', 'furn|cubby:0', 'furn|cubby:2', 'furn|cornershelf', 'furn|plantledge']);
+  addTh('home', ['furn|wshelf:0', 'furn|wshelf:1', 'furn|wshelf:2', 'furn|wshelf:3', 'furn|longshelf', 'furn|ropeshelf', 'furn|cubby:0', 'furn|cubby:2', 'furn|cornershelf', 'furn|plantledge', 'furn|cornerwshelf', 'furn|cloudshelf']);
   addTh('newyear', ['furn|xmastree', ...[0, 1, 2, 3].map(i => 'furn|present:' + i), 'furn|snowman', ...ORN_C.map((_, i) => 'deco|ornament:' + i), 'deco|xmasstar', 'deco|lights', ...LIGHTS, 'deco|tinsel', 'deco|bell', 'deco|candycane', 'deco|snowflake', 'wall|xmas', 'view|snow']);
   addTh('autumn', ['wall|leaves', 'view|autumn', 'furn|pumpkin', 'curtain|mustard']);
   addTh('halloween', ['furn|pumpkin', 'furn|candle']);
@@ -910,6 +933,7 @@
   const T = {
     of: ['Room of @{n}', 'Комната @{n}', '@{n} istaba'], saved: ['Saved ✓', 'Сохранено ✓', 'Saglabāts ✓'], saving: ['Saving…', 'Сохраняю…', 'Saglabāju…'], err: ['Could not save', 'Не получилось сохранить', 'Neizdevās saglabāt'],
     hint: ['Drag things around · tap one for ⇆ ⬆ ⬇ ↩', 'Вещи можно двигать · нажатие на вещь — ⇆ ⬆ ⬇ ↩', 'Lietas var pārvietot · pieskaries lietai — ⇆ ⬆ ⬇ ↩'],
+    lightOff: ['Turn the light off', 'Выключить свет', 'Izslēgt gaismu'], lightOn: ['Turn the light on', 'Включить свет', 'Ieslēgt gaismu'],
     flip: ['Turn', 'Повернуть', 'Pagriezt'], front: ['Forward', 'Вперёд', 'Uz priekšu'], behind: ['Back', 'Назад', 'Atpakaļ'], back: ['To the bag', 'В сумку', 'Uz somu'],
   };
   const t = k => T[k][L];
@@ -927,6 +951,11 @@
         if (!best || sc < best.sc) best = { x, y, sc };
       }
       return { x: best.x, y: best.y };
+    }
+    // мелкая вещь — на полку на стену, где есть место (этап 11 В)
+    if (isSmall(d)) for (const s of lay.filter(q => q.d.wall && q.d.top != null)) {
+      const top = s.y + s.d.top, on = lay.filter(q => q !== s && Math.abs(q.y + q.d.h - top) <= 1 && q.x < s.x + s.d.w && q.x + q.d.w > s.x);
+      for (let x = s.x + 1; x <= s.x + (s.d.tw || s.d.w) - d.w - 1; x++) if (!on.some(q => x < q.x + q.d.w + 1 && x + d.w + 1 > q.x)) return { x, y: top - d.h };
     }
     const y = GY - d.h, floor = boxes.filter(b => !b.wall && !b.flat && Math.abs(b.y + b.h - GY) <= 2);
     for (let x = 0; x <= RW - d.w; x += 2) {
@@ -948,7 +977,7 @@
     const pops = new Map(); // вещь → когда «плюхнулась» (подскок)
     box.classList.add('room');
     box.innerHTML = `<div class="room-stage"><canvas class="room-cv" width="${RW}" height="${RH}" aria-label="${t('of').replace('{n}', o.nick)}" role="img"></canvas></div>
-      <div class="room-bar"><span class="room-cap">🏠 ${t('of').replace('{n}', o.nick)}</span>${o.mine ? `<span class="room-hint">${t('hint')}</span><span class="room-st" aria-live="polite"></span>` : ''}</div>`;
+      <div class="room-bar"><span class="room-cap">🏠 ${t('of').replace('{n}', o.nick)}</span>${o.mine ? `<span class="room-hint">${t('hint')}</span><button type="button" class="room-light"></button><span class="room-st" aria-live="polite"></span>` : ''}</div>`;
     const cv = box.querySelector('canvas'), stage = box.querySelector('.room-stage');
     const S = 4; cv.width = RW * S; cv.height = RH * S;
     const g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
@@ -977,7 +1006,7 @@
         if (it.y != null) { out.push({ it, d, idx, x, y: Math.max(-d.h + 4, Math.min(RH - 2, Math.round(it.y))) }); return; } // поставлена руками — где угодно
         if (d.wall) { out.push({ it, d, idx, x, y: 40 - d.h }); return; } // полка без координат — на стене
         let base = GY;
-        out.filter(q => q.it.k === 'furn' && q.d.top != null).forEach(q => {
+        out.filter(q => q.it.k === 'furn' && q.d.top != null && (!q.d.wall || isSmall(d))).forEach(q => {
           const ov = Math.min(x + d.w, q.x + q.d.w) - Math.max(x, q.x);
           if (ov >= Math.min(d.w, q.d.w) * .5) base = Math.min(base, q.y + q.d.top);
         });
@@ -1032,6 +1061,8 @@
       const sf = surfaces(lay), r = Math.random(), cur = sf.find(s => Math.abs(s.y - bird.y) < 1 && bird.x >= s.x0 - 2 && bird.x <= s.x1 + 2) || sf[0];
       bird.zz = false; bird.act = null;
       if (!sf.some(z => Math.abs(z.y - bird.y) < 2)) return hop(now, Math.max(8, Math.min(RW - 8, bird.x)), GY); // была в воздухе у украшения — вниз
+      // в темноте птичка чаще спит: на диване/кровати, если есть, иначе где стоит
+      if (dark() && r < .6) { const beds = lay.filter(q => ACT_OF[parse(q.it.v)[0]] === 'sleep'); if (beds.length && r < .35) return useThing(now, beds[Math.floor(Math.random() * beds.length)], sf); bird.st = 'idle'; bird.zz = true; bird.act = 'sleep'; bird.until = now + 5000 + Math.random() * 5000; return; }
       // с вероятностью ~55% — заняться какой-нибудь вещью в комнате
       const toys = lay.filter(q => ACT_OF[parse(q.it.v)[0]] || q.it.k === 'deco');
       if (toys.length && r < .55) return useThing(now, toys[Math.floor(Math.random() * toys.length)], sf);
@@ -1104,7 +1135,29 @@
       think(now, lay); stepBird(now);
       drawBird(now);
       drawParts(now);
+      drawDark(lay, now);
     }
+    // ---------- свет (этап 11 Б): room.light === 0 — выключен; комната темнеет, вещи из GLOW светят ----------
+    const dark = () => room.light === 0;
+    let dkLv = dark() ? 1 : 0, dk = null;
+    function drawDark(lay, now) {
+      dkLv += ((dark() ? 1 : 0) - dkLv) * .12; if (dkLv < .01) { dkLv = 0; return; }
+      if (!dk) { dk = document.createElement('canvas'); dk.width = RW * 2; dk.height = RH * 2; }
+      const c = dk.getContext('2d'), src = [];
+      lay.forEach(q => { const gl = GLOW[q.d.k]; if (!gl) return; const [gx, gy] = q.d.glow || [q.d.w / 2, q.d.h / 2]; src.push([q.x + (q.it.f ? q.d.w - gx : gx), q.y + gy, gl[1] * (1 + .06 * Math.sin(now / 180 + q.idx * 1.7)), gl[0]]); });
+      c.setTransform(2, 0, 0, 2, 0, 0); c.globalCompositeOperation = 'source-over'; c.clearRect(0, 0, RW, RH);
+      c.fillStyle = 'rgba(10,12,34,' + (.74 * dkLv) + ')'; c.fillRect(0, 0, RW, RH);
+      c.globalCompositeOperation = 'destination-out';
+      c.fillStyle = 'rgba(0,0,0,.3)'; c.fillRect(WX, WY, WW, WH); // из окна — немного света
+      src.forEach(([x, y, r]) => { const gr = c.createRadialGradient(x, y, 0, x, y, r); gr.addColorStop(0, 'rgba(0,0,0,1)'); gr.addColorStop(.35, 'rgba(0,0,0,.8)'); gr.addColorStop(1, 'rgba(0,0,0,0)'); c.fillStyle = gr; c.fillRect(x - r, y - r, r * 2, r * 2); });
+      g.drawImage(dk, 0, 0, RW, RH);
+      g.save(); g.globalCompositeOperation = 'lighter';
+      src.forEach(([x, y, r, col]) => { const gr = g.createRadialGradient(x, y, 0, x, y, r * .8), a = Math.round(70 * dkLv).toString(16).padStart(2, '0'); gr.addColorStop(0, col + a); gr.addColorStop(1, col + '00'); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); });
+      g.restore();
+    }
+    const lightBtn = box.querySelector('.room-light');
+    const showLight = () => { if (!lightBtn) return; lightBtn.textContent = dark() ? '🌙' : '💡'; lightBtn.title = t(dark() ? 'lightOn' : 'lightOff'); lightBtn.setAttribute('aria-label', lightBtn.title); lightBtn.setAttribute('aria-pressed', String(dark())); };
+    if (lightBtn) { showLight(); lightBtn.onclick = () => { if (dark()) delete room.light; else room.light = 0; showLight(); save(); changed(); }; }
     // ---------- хозяин: обустройство ----------
     const owned = () => { const m = {}; ((o.me && o.me.gifts) || []).forEach(x => { if (x.status === 'bag' && isRoom(x.kind)) m[x.kind + '|' + x.item] = (m[x.kind + '|' + x.item] || 0) + 1; }); return m; };
     const placed = key => room.items.filter(it => it.k + '|' + it.v === key).length;
@@ -1114,7 +1167,7 @@
       const d = defOf(it.k, it.v), x = clampX(it.x, d.w), bot = it.y + d.h;
       let best = Math.abs(bot - GY) <= 5 ? GY : null; snapOn = -1;
       layout().forEach(q => {
-        if (q.idx === idx || q.d.top == null || q.it.k !== 'furn') return;
+        if (q.idx === idx || q.d.top == null || q.it.k !== 'furn' || (q.d.wall && !isSmall(d))) return; // на полку на стену — только мелкое
         const ov = Math.min(x + d.w, q.x + q.d.w) - Math.max(x, q.x), top = q.y + q.d.top;
         if (ov >= Math.min(d.w, q.d.w) * .4 && Math.abs(bot - top) <= 5 && (best == null || Math.abs(bot - top) < Math.abs(bot - best))) { best = top; snapOn = q.idx; }
       });
@@ -1251,5 +1304,5 @@
     raf = requestAnimationFrame(frame);
     return api;
   }
-  window.PPRoom = { mount, albumOf, icon, nameOf, isRoom, RW, RH, defOf, ROOM_KINDS, freeSpot, live: null }; // live — своя комната на странице (для useItem) // defOf и ROOM_KINDS — ещё и для tools/catalog.js (ценность вещей)
+  window.PPRoom = { mount, albumOf, icon, nameOf, isRoom, RW, RH, defOf, ROOM_KINDS, freeSpot, isSmall, GLOW, live: null }; // live — своя комната на странице (для useItem) // defOf и ROOM_KINDS — ещё и для tools/catalog.js (ценность вещей)
 })();

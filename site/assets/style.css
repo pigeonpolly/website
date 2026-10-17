@@ -3119,6 +3119,9 @@ html:not(.is-admin) .statbar { display: none; }
 .room-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; justify-content: space-between; }
 .room-cap { font: 600 16px 'Fraunces', serif; opacity: .9; }
 .room-st { font-size: 13px; opacity: .8; margin-left: auto; }
+.room-light { margin-left: auto; font-size: 16px; line-height: 1; padding: 4px 8px; border-radius: 999px; border: 1px solid rgba(0,0,0,.15); background: var(--card, #fff); cursor: pointer; }
+.room-light[aria-pressed="true"] { background: #2A2D4A; border-color: #2A2D4A; }
+.room-light + .room-st { margin-left: 0; }
 .room-sel { position: absolute; z-index: 6; display: flex; gap: 4px; padding: 4px; border-radius: 999px; background: #2B1A51; box-shadow: 0 0 0 2px #F0A987, 0 8px 18px rgba(0, 0, 0, .35); transform: translate(-50%, calc(-100% - 8px)); }
 .room-sel.below { transform: translate(-50%, 8px); }
 .room-sel button { width: 36px; height: 36px; border: 0; border-radius: 50%; background: rgba(255, 255, 255, .1); color: #fff; font: 700 17px var(--sans); cursor: pointer; }

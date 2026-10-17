@@ -146,6 +146,7 @@ async function ownedRoom(env, uid) {
 function cleanRoom(room, own) {
   const out = { items: [] };
   for (const k of ['wall', 'floor', 'view', 'curtain']) if (typeof room[k] === 'string' && own[k + '|' + room[k]]) out[k] = room[k];
+  if (room.light === 0) out.light = 0; // свет выключен (этап 11 Б); включён — поля нет
   const used = {};
   for (const it of Array.isArray(room.items) ? room.items.slice(0, 80) : []) {
     if (!it || !['furn', 'deco'].includes(it.k) || !/^[a-z0-9:-]{1,24}$/i.test(String(it.v))) continue;
