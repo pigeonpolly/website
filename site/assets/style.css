@@ -4366,7 +4366,7 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .hero-egg:hover, .hero-egg:focus-visible { animation-duration: .9s; outline: none; }
 @keyframes hatch-wob { 0%, 55%, 100% { transform: rotate(0); } 62% { transform: rotate(-9deg); } 70% { transform: rotate(8deg); } 78% { transform: rotate(-5deg); } 86% { transform: rotate(3deg); } }
 @media (prefers-reduced-motion: reduce) { .hero-egg { animation: none; } }
-@media (max-width: 860px) { .hatch-note { margin-left: auto; margin-right: auto; } .hero-egg { left: -62px; bottom: -24px; width: 100px; height: 93px; } }
+@media (max-width: 860px) { .hatch-note { margin-left: auto; margin-right: auto; } .hero-egg { left: -50px; bottom: -24px; width: 100px; height: 93px; } }
 .myday, .home-new { display: none; }
 html.me-in .hero { display: none; }
 html.me-in .myday { display: block; }
