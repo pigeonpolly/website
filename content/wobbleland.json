@@ -57,6 +57,38 @@
           "name": "Mr. Chew",
           "home": "Yesterday's Tomorrow Street 4",
           "note": "Originally from Snailhollow, Mossy Shell Lane 3."
+        },
+        {
+          "name": "Miss Peony",
+          "key": "miss-peony",
+          "home": "Seagull Square 3",
+          "job": "Bakery seller",
+          "trait": "Gives buns to anyone who looks sad.",
+          "card": "classic/13.jpg"
+        },
+        {
+          "name": "Professor Owlistair Tweed",
+          "key": "professor-owlistair-tweed",
+          "home": "Falling Up Rock Street 6",
+          "job": "Retired professor",
+          "trait": "Has been reading the same chapter since October and says he is only resting his eyes.",
+          "card": "autumn-cozy/79.png"
+        },
+        {
+          "name": "Mr. Crisper",
+          "key": "mr-crisper",
+          "home": "Yesterday's Tomorrow Street 8",
+          "job": "Keeper of the lost-and-found boxes at the train station",
+          "trait": "Labels everything and panics when lids get mixed up.",
+          "card": "classic/14.jpg"
+        },
+        {
+          "name": "Milka",
+          "key": "milka",
+          "home": "Yesterday's Tomorrow Street 9",
+          "job": "Unknown — lives in a box",
+          "trait": "Nobody has ever seen more than her tail.",
+          "card": "classic/15.jpg"
         }
       ],
       "neighbors": "Sits between LemonVale and Snailhollow, across the Ripple Tickle Sea from Noodleford."
@@ -110,7 +142,40 @@
           "desc": "Central square hosting the syrup fairs."
         }
       ],
-      "residents": [],
+      "residents": [
+        {
+          "name": "Buzzby Caramello",
+          "key": "buzzby-caramello",
+          "home": "Golden Sap Square 4",
+          "job": "Sweet delivery courier",
+          "trait": "Delivers to every door in four minutes, then forgets which street. Panics on the phone.",
+          "card": "halloween-remix/65.png"
+        },
+        {
+          "name": "Hedgewig Bramble",
+          "key": "hedgewig-bramble",
+          "home": "Golden Sap Square 9",
+          "job": "Collects fallen leaves in the park",
+          "trait": "Sorts her leaves by colour every evening, then naps and feels a little guilty.",
+          "card": "autumn-cozy/78.png"
+        },
+        {
+          "name": "Leafy Lou",
+          "key": "leafy-lou",
+          "home": "Golden Sap Square 15",
+          "job": "Leaf pile for jumping into at the syrup fair",
+          "trait": "Very ticklish; storms off in a swirl if anyone tries to rake him.",
+          "card": "autumn-cozy/89.png"
+        },
+        {
+          "name": "Tim Froggucion",
+          "key": "tim-froggucion",
+          "home": "Golden Sap Square 12",
+          "job": "Acorn collector",
+          "trait": "Autumn is his lifestyle; drinks frothy mosquito cappuccino.",
+          "card": "fall-2025/38.jpg"
+        }
+      ],
       "neighbors": "East of Noodleford and the Syrup Factory, at the far edge of the sea."
     },
     {
@@ -156,6 +221,38 @@
           "name": "Detective Titos",
           "home": "Slowstep Street 5",
           "work": "Snailhollow Police Department"
+        },
+        {
+          "name": "Mr. Dr. Fisher III",
+          "key": "mr-dr-fisher-iii",
+          "home": "Mossy Shell Lane 10",
+          "job": "Doctor of… something (the diploma is unreadable)",
+          "trait": "Afraid of his own reflection; gets upset if you forget to call him Doctor.",
+          "card": "classic/17.jpg"
+        },
+        {
+          "name": "Lady Slugworth",
+          "key": "lady-slugworth",
+          "home": "Mossy Shell Lane 7",
+          "job": "Society lady, leads the snail parade",
+          "trait": "Never arrives on time — she makes an entrance, and expects compliments for her sparkly trail.",
+          "card": "halloween-remix/64.png"
+        },
+        {
+          "name": "Toad Mortimer",
+          "key": "toad-mortimer",
+          "home": "Slowstep Street 9",
+          "job": "Retired grim reaper; swapped the scythe for a very large fork",
+          "trait": "Naps, feels guilty, then naps again to recover.",
+          "card": "halloween-remix/68.png"
+        },
+        {
+          "name": "Lord Croakstill",
+          "key": "lord-croakstill",
+          "home": "Slowstep Street 2",
+          "job": "Former leader of the Choir of Tragic Croaks; lives in a manor by the pond",
+          "trait": "Feels terribly guilty if he rests for more than ten minutes.",
+          "card": "halloween-2025/52.jpg"
         }
       ],
       "neighbors": "Wraps around Mossy Lake, just north of New Wobbleton and Jamshire."
@@ -216,7 +313,40 @@
           "desc": "Street of bakeries and pie shops."
         }
       ],
-      "residents": [],
+      "residents": [
+        {
+          "name": "Barnaby Burrows",
+          "key": "barnaby-burrows",
+          "home": "Crisp Crust Street 5",
+          "job": "Baker",
+          "trait": "Talks to his sourdough starter; ask for a slice and he hands you half a loaf.",
+          "card": "autumn-cozy/81.png"
+        },
+        {
+          "name": "Nutmeg Hazelton",
+          "key": "nutmeg-hazelton",
+          "home": "Pine Cone Alley 4",
+          "job": "Nut supplier for the pie shops",
+          "trait": "Hides hazelnuts everywhere and forgets half of them — that is how the forest grew.",
+          "card": "autumn-cozy/82.png"
+        },
+        {
+          "name": "Rusty Roamwell",
+          "key": "rusty-roamwell",
+          "home": "Pine Cone Alley 12",
+          "job": "Hiking guide",
+          "trait": "Holds the map upside down; never gets where he planned, always somewhere better.",
+          "card": "autumn-cozy/80.png"
+        },
+        {
+          "name": "Bramwell Bear",
+          "key": "bramwell-bear",
+          "home": "Crisp Crust Street 17",
+          "job": "Professional winter sleeper",
+          "trait": "Note on the door: “Do not wake until spring”. Midnight fridge visits do not count.",
+          "card": "autumn-cozy/87.png"
+        }
+      ],
       "neighbors": "Tucked into the Nut Forest, south of Cheddarford and west of Kettleford."
     },
     {
@@ -267,7 +397,40 @@
           "desc": "Walls said to be soaked in lemon scent."
         }
       ],
-      "residents": [],
+      "residents": [
+        {
+          "name": "Dr. Panicoli",
+          "key": "dr-panicoli",
+          "home": "Sourstone Alley 6",
+          "job": "PhD candidate",
+          "trait": "Jumps at every shadow and triple-checks his notes.",
+          "card": "classic/25.jpg"
+        },
+        {
+          "name": "Lady Puddle-Dip",
+          "key": "lady-puddle-dip",
+          "home": "Splash Street 2",
+          "job": "Gourmet",
+          "trait": "Saves every snack for a rainy day — then dips it in a fresh puddle.",
+          "card": "classic/23.jpg"
+        },
+        {
+          "name": "Sir Puddlesworth",
+          "key": "sir-puddlesworth",
+          "home": "Splash Street 3",
+          "job": "Puddle inspector",
+          "trait": "Jumps into the deepest puddle — and shrieks at the duck looking back. Every time.",
+          "card": "autumn-cozy/83.png"
+        },
+        {
+          "name": "Rowena Ghostclaw",
+          "key": "rowena-ghostclaw",
+          "home": "Zest Cellar Road 3",
+          "job": "Ghost food critic",
+          "trait": "Reviews cookies left on her grave — usually one star out of five.",
+          "card": "halloween-2025/51.jpg"
+        }
+      ],
       "neighbors": "The bright yellow valley between New Wobbleton and Buttonspire."
     },
     {
@@ -308,7 +471,40 @@
           "desc": "Main square, named for its patchwork-style paving."
         }
       ],
-      "residents": [],
+      "residents": [
+        {
+          "name": "Sew-Sew Patty",
+          "key": "sew-sew-patty",
+          "home": "Copper Button Alley 7",
+          "job": "Pincushion and seamstress; mends broken hearts",
+          "trait": "Moody; gossips with the buttons every evening.",
+          "card": "halloween-2025/55.jpg"
+        },
+        {
+          "name": "Spool Ghoul",
+          "key": "spool-ghoul",
+          "home": "Copper Button Alley 8",
+          "job": "Thread keeper, fixes things that come apart",
+          "trait": "Wound too tight in 1893; grumpy but surprisingly helpful.",
+          "card": "halloween-remix/71.png"
+        },
+        {
+          "name": "Bobby Bagster",
+          "key": "bobby-bagster",
+          "home": "Highway of Threads 2",
+          "job": "Bag connoisseur",
+          "trait": "“Borrows” grocery bags and hides inside gift bags.",
+          "card": "classic/22.jpg"
+        },
+        {
+          "name": "Mittens Mulligan",
+          "key": "mittens-mulligan",
+          "home": "Copper Button Alley 12",
+          "job": "Models hand-knitted sweaters",
+          "trait": "Claims the radiator from October to April. Loves milk; milk does not love her back.",
+          "card": "autumn-cozy/86.png"
+        }
+      ],
       "neighbors": "Below the Mountains of Buttons, just west of the Department of Reflection on the Deed."
     },
     {
@@ -366,7 +562,32 @@
           "desc": "Hosts the main festival."
         }
       ],
-      "residents": [],
+      "residents": [
+        {
+          "name": "Ghostina Gravy",
+          "key": "ghostina-gravy",
+          "home": "Brothpot Lane 3",
+          "job": "Ghost chef",
+          "trait": "Has been stirring the same Eternal Soup for 200 years — almost ready. Keeps the mirror covered: her reflection steals croutons.",
+          "card": "halloween-remix/67.png"
+        },
+        {
+          "name": "Sir Pickleknot",
+          "key": "sir-pickleknot",
+          "home": "Chopstick Street 5",
+          "job": "Knot master; ties the noodle lanterns",
+          "trait": "Obsessed with knots and macramé — calls it artistic expression.",
+          "card": "classic/24.jpg"
+        },
+        {
+          "name": "Chestnut Charlie",
+          "key": "chestnut-charlie",
+          "home": "Chopstick Street 2",
+          "job": "Roasted chestnut at the street market",
+          "trait": "Chats with everyone passing by; once you start listening, you need another one.",
+          "card": "autumn-cozy/85.png"
+        }
+      ],
       "neighbors": "Between Buttonspire, Kettleford, and Maplewink — the crossroads of the eastern isles."
     },
     {
@@ -429,7 +650,32 @@
           "desc": "Hosts the main festival."
         }
       ],
-      "residents": [],
+      "residents": [
+        {
+          "name": "Candice Creepleton",
+          "key": "candice-creepleton",
+          "home": "Strawberry Spoon Street 6",
+          "job": "Blogger (Life in the Sugar Lane)",
+          "trait": "Panics whenever a follower actually calls; checks the mirror every evening — sometimes it answers.",
+          "card": "halloween-2025/49.jpg"
+        },
+        {
+          "name": "Madame Teabite",
+          "key": "madame-teabite",
+          "home": "Strawberry Spoon Street 10",
+          "job": "Tea sommelier",
+          "trait": "Refuses to serve coffee on principle; judges guests by how they hold the saucer.",
+          "card": "halloween-remix/63.png"
+        },
+        {
+          "name": "Count Hopula",
+          "key": "count-hopula",
+          "home": "Strawberry Spoon Street 13",
+          "job": "Owner of a night carrot-juice bar",
+          "trait": "Drinks carrot juice at midnight sharp; faints from lactose.",
+          "card": "halloween-remix/66.png"
+        }
+      ],
       "neighbors": "Beside the Berry Fields, just south of Snailhollow and north of Cheddarford."
     },
     {
@@ -501,7 +747,32 @@
           "desc": "Site of the main festivals."
         }
       ],
-      "residents": [],
+      "residents": [
+        {
+          "name": "Baron von Worms",
+          "key": "baron-von-worms",
+          "home": "Melted Wheel Road 9",
+          "job": "Owner of a luxurious compost estate",
+          "trait": "Secretly in love with Miss Pumpkinella, but has not made a move — he has no legs.",
+          "card": "halloween-2025/48.jpg"
+        },
+        {
+          "name": "Wren Windlow",
+          "key": "wren-windlow",
+          "home": "Cheese Hole Street 3",
+          "job": "Counts raindrops on the windowsill",
+          "trait": "Never answers the phone during rain: rain is a meeting with herself.",
+          "card": "autumn-cozy/88.png"
+        },
+        {
+          "name": "Petunia Spookworth",
+          "key": "petunia-spookworth",
+          "home": "Cheese Hole Street 7",
+          "job": "Ghost gardener",
+          "trait": "Replants flowers so they bloom brighter; leaves a trail of petals.",
+          "card": "fall-2025/41.jpg"
+        }
+      ],
       "neighbors": "Straddles the river between Jamshire and Pinecrust."
     },
     {
@@ -559,6 +830,46 @@
         {
           "name": "The Pumpkin Family",
           "home": "Kettleford Square 11"
+        },
+        {
+          "name": "Dr. Dripsson",
+          "key": "dr-dripsson",
+          "home": "Copper Steam Street 4",
+          "job": "Spider barista, owner of the first web-based coffee bar",
+          "trait": "Ask for decaf and he lectures you on the meaning of life.",
+          "card": "halloween-2025/47.jpg"
+        },
+        {
+          "name": "Miss Pumpkinella",
+          "key": "miss-pumpkinella",
+          "home": "Kettleford Square 5",
+          "job": "Etiquette teacher for witches and ghosts",
+          "trait": "Collects ancient pie recipes; argues with her reflection, which always laughs first.",
+          "card": "halloween-2025/46.jpg"
+        },
+        {
+          "name": "Countfluffula",
+          "key": "countfluffula",
+          "home": "Kettleclock Avenue 3",
+          "job": "Hosts “No Bites, Just Desserts” soirées in a cloud castle above the pumpkin fields",
+          "trait": "Drinks strawberry smoothies; always enters out of a pink mist with bat fanfare.",
+          "card": "halloween-2025/50.jpg"
+        },
+        {
+          "name": "Sir Gourdon Squash",
+          "key": "sir-gourdon-squash",
+          "home": "Kettleford Square 8",
+          "job": "Gentleman, regular at the Autumn Ball",
+          "trait": "Polishes his monocle when a conversation turns awkward — which is always.",
+          "card": "halloween-remix/62.png"
+        },
+        {
+          "name": "Moss McCandle",
+          "key": "moss-mccandle",
+          "home": "Copper Steam Street 9",
+          "job": "Night light at the coffee roastery",
+          "trait": "Terrified of drafts; goes out with a theatrical sigh, then pretends nothing happened.",
+          "card": "autumn-cozy/84.png"
         }
       ],
       "neighbors": "South of Noodleford, across the water from Pinecrust and Maplewink."

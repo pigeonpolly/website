@@ -1,0 +1,110 @@
+{
+ "Украденный сироп": {
+  "en": "The stolen syrup",
+  "lv": "Nozagtais sīrups"
+ },
+ "Кто украл сироп?": {
+  "en": "Who stole the syrup?",
+  "lv": "Kurš nozaga sīrupu?"
+ },
+ "Не могу уснуть. Пропала бочка сиропа № 12, а у меня только кофе. Найдите улики — их семь, где-то в этом кабинете.": {
+  "en": "I can’t sleep. Barrel No. 12 of syrup is missing and I have only coffee. Find the clues, there are seven of them somewhere in this office.",
+  "lv": "Nevaru aizmigt. Pazudusi sīrupa muca Nr. 12, un man ir tikai kafija. Atrodi pierādījumus — tie ir septiņi, kaut kur šajā kabinetā."
+ },
+ "Верно! Перо, перепончатые следы в сиропе, крылья на крыше и билет на «Г…» до New Wobbleton. Густав сознался: хотел сироп для пирожков к Великому дню качки. Бочка № 12 вернулась в Maplewink.": {
+  "en": "Correct! The feather, the webbed prints in syrup, wings on the roof and a ticket for “G…” to New Wobbleton. Gustav confessed: he wanted syrup for the Great Wobble Day pastries. Barrel No. 12 is back in Maplewink.",
+  "lv": "Pareizi! Spalva, peldplēvju pēdas sīrupā, spārni uz jumta un biļete uz “G…” līdz New Wobbleton. Gustavs atzinās: gribēja sīrupu pīrādziņiem Lielajai šūpošanās dienai. Muca Nr. 12 ir atpakaļ Maplewink."
+ },
+ "Дело закрыто. Наконец-то. Домой, в кровать, без кофе. Спокойной ночи!": {
+  "en": "Case closed. Finally. Home, bed, no coffee. Good night!",
+  "lv": "Lieta slēgta. Beidzot. Mājās, gultā, bez kafijas. Ar labu nakti!"
+ },
+ "Бан, пекарь из Pinecrust": {
+  "en": "Bun, baker of Pinecrust",
+  "lv": "Bans, Pinecrust maiznieks"
+ },
+ "Печёт триста пирогов в день и тратит много сиропа. Ботинки 44-го размера, вечно в муке. Титос подозревает его в каждом деле. В каждом.": {
+  "en": "Bakes three hundred pies a day and uses a lot of syrup. Size 44 boots, always floury. Titos suspects him in every case. Every single one.",
+  "lv": "Cep trīssimt pīrāgus dienā un izlieto daudz sīrupa. 44. izmēra zābaki, vienmēr miltos. Titoss viņu tur aizdomās katrā lietā. Katrā."
+ },
+ "Мимо! Бан привёз хлеб в 18:00 — отсюда мучные следы, — а всю ночь был на Празднике тёплых печей. Настоящий вор улетел…": {
+  "en": "Wrong! Bun delivered the bread at 6 pm, that’s where the floury footprints came from, and he spent the whole night at the Festival of Warm Ovens. The real thief flew away…",
+  "lv": "Garām! Bans atveda maizi 18:00 — no turienes miltainās pēdas —, un visu nakti bija Silto krāšņu svētkos. Īstais zaglis aizlidoja…"
+ },
+ "Густав, чайка-страж из New Wobbleton": {
+  "en": "Gustav, Seagull Guardian of New Wobbleton",
+  "lv": "Gustavs, kaiju sargs no New Wobbleton"
+ },
+ "Охраняет площадь Чаек. Знаменит тем, что таскает пирожки. Сильные крылья: почти может поднять бочку. Ужасный сладкоежка.": {
+  "en": "Guards Seagull Square. Famous for snatching pastries. Strong wings: can almost lift a barrel. Has a terrible sweet tooth.",
+  "lv": "Sargā Kaiju laukumu. Slavens ar to, ka zog pīrādziņus. Spēcīgi spārni: gandrīz var pacelt mucu. Briesmīgs saldummīlis."
+ },
+ "Мосс, ночной сторож фабрики": {
+  "en": "Moss, night guard of the Syrup Factory",
+  "lv": "Moss, fabrikas nakts sargs"
+ },
+ "Улитка из Snailhollow, самый медленный сторож острова. Говорит, что не спал. Почти.": {
+  "en": "A snail from Snailhollow, the slowest guard on the island. Says he was awake. Mostly.",
+  "lv": "Gliemezis no Snailhollow, lēnākais sargs salā. Saka, ka negulēja. Gandrīz."
+ },
+ "Мимо! Мосс не поднимет и чашку, не то что бочку, а до поезда в 02:14 он полз бы до сих пор. Настоящий вор улетел…": {
+  "en": "Wrong! Moss can’t lift a teacup, let alone a barrel, and he would still be crawling to the 02:14 train today. The real thief flew away…",
+  "lv": "Garām! Moss nepaceltu pat tasi, kur nu mucu, un uz vilcienu 02:14 viņš rāpotu vēl šodien. Īstais zaglis aizlidoja…"
+ },
+ "Отчёт фабрики": {
+  "en": "Factory report",
+  "lv": "Fabrikas ziņojums"
+ },
+ "СИРОПНАЯ ФАБРИКА MAPLEWINK. Ночью пропала бочка № 12 золотого сиропа. Дверь не взломана, но открыт люк в крыше. Рядом с пустым местом найдены: мучные следы, перо, липкая крышка от банки.": {
+  "en": "MAPLEWINK SYRUP FACTORY. Barrel No. 12 of golden syrup vanished overnight. The door was not forced, but the skylight in the roof was open. Found next to the empty spot: floury footprints, a feather, a sticky jar lid.",
+  "lv": "MAPLEWINK SĪRUPA FABRIKA. Naktī pazuda zelta sīrupa muca Nr. 12. Durvis nav uzlauztas, bet jumta lūka bija vaļā. Blakus tukšajai vietai atrasti: miltaini pēdu nospiedumi, spalva, lipīgs burkas vāciņš."
+ },
+ "Фото: мучные следы": {
+  "en": "Photo: floury footprints",
+  "lv": "Foto: miltainas pēdas"
+ },
+ "Мучные следы ботинок прямо там, где стояла бочка № 12. Размер 44. Пекарь Бан носит 44-й… и вечно весь в муке.": {
+  "en": "Floury boot prints right next to where barrel No. 12 stood. Size 44. Bun the baker wears size 44… and is always covered in flour.",
+  "lv": "Miltaini zābaku nospiedumi tieši tur, kur stāvēja muca Nr. 12. Izmērs 44. Maiznieks Bans valkā 44. izmēru… un vienmēr ir miltos."
+ },
+ "Накладная пекарни": {
+  "en": "Bakery delivery note",
+  "lv": "Maiznīcas pavadzīme"
+ },
+ "ПЕКАРНЯ PINECRUST. Доставлено на сиропную фабрику: 40 буханок для ночной смены. Время: 18:00. После — сразу на Праздник тёплых печей, обратно на рассвете. Подпись: Бан.": {
+  "en": "PINECREST BAKERY. Delivered to the Syrup Factory: 40 loaves for the night shift. Time: 6 pm. After that — straight to the Festival of Warm Ovens, back at dawn. Signed: Bun.",
+  "lv": "PINECRUST MAIZNĪCA. Piegādāts sīrupa fabrikai: 40 klaipi nakts maiņai. Laiks: 18:00. Pēc tam — uzreiz uz Silto krāšņu svētkiem, atpakaļ rītausmā. Paraksts: Bans."
+ },
+ "Показания свидетеля": {
+  "en": "Witness statement",
+  "lv": "Liecinieka liecība"
+ },
+ "Диктофон, ночной сторож Мосс: «Я не спал. Почти. Около двух ночи на крыше хлопали большие крылья, и кто-то вопил: „ох… тяжёлая!“. Потом что-то покатилось к станции».": {
+  "en": "Dictaphone, night guard Moss: “I was awake. Mostly. Around two in the morning I heard big wings flapping on the roof and somebody squawking ‘so… heavy!’. Then something rolled towards the station.”",
+  "lv": "Diktofons, nakts sargs Moss: “Es negulēju. Gandrīz. Ap diviem naktī uz jumta plivinājās lieli spārni un kāds kliedza: ‘ak… smaga!’. Tad kaut kas aizripoja uz staciju.”"
+ },
+ "Перо": {
+  "en": "A feather",
+  "lv": "Spalva"
+ },
+ "Под лупой: серо-белое перо чайки, склеенное кленовым сиропом. В Wobbleland чайки живут в New Wobbleton.": {
+  "en": "Under the magnifier: a grey-and-white seagull feather, glued together with maple syrup. In Wobbleland, seagulls live in New Wobbleton.",
+  "lv": "Zem lupas: pelēkbalta kaijas spalva, salipusi ar kļavu sīrupu. Wobbleland kaijas dzīvo New Wobbleton."
+ },
+ "Липкая крышка": {
+  "en": "Sticky jar lid",
+  "lv": "Lipīgs vāciņš"
+ },
+ "Под лупой: это вовсе не отпечатки пальцев. Три длинных пальца с перепонками, отпечатаны в сиропе. Лапа птицы, а не рука.": {
+  "en": "Under the magnifier: these are not fingerprints at all. Three long toes with webbing, printed in syrup. A bird’s foot, not a hand.",
+  "lv": "Zem lupas: tie nemaz nav pirkstu nospiedumi. Trīs gari pirksti ar peldplēvēm, nospiesti sīrupā. Putna kāja, nevis roka."
+ },
+ "Билет на поезд": {
+  "en": "Train ticket",
+  "lv": "Vilciena biļete"
+ },
+ "Нашёлся в кармане плаща — Титос подобрал его на станции: «Ночной грузовой поезд, Maplewink → New Wobbleton, 02:14. Пассажир: Г… (дальше заляпано сиропом). Багаж: 1 бочка, очень липкая».": {
+  "en": "Found in the coat pocket, Titos picked it up at the station: “Night cargo train, Maplewink → New Wobbleton, 02:14. Passenger: G… (the rest is smudged with syrup). Luggage: 1 barrel, very sticky.”",
+  "lv": "Atrasta mēteļa kabatā — Titoss to pacēla stacijā: “Nakts kravas vilciens, Maplewink → New Wobbleton, 02:14. Pasažieris: G… (tālāk notraipīts ar sīrupu). Bagāža: 1 muca, ļoti lipīga.”"
+ }
+}

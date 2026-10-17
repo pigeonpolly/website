@@ -140,7 +140,7 @@
     const i = C.findIndex(x => x.key === key); if (i < 0) return;
     const c = C[i]; current = key;
     document.querySelectorAll('.wl-pin, .wl-chip').forEach(p => p.classList.toggle('active', p.dataset.key === key));
-    const res = r => `<li><b>${esc(r.name)}</b><span>${r.home ? `${t('home')}: ${esc(r.home)}. ` : ''}${r.work ? `${t('work')}: ${esc(r.work)}. ` : ''}${r.note ? esc(r.note) : ''}</span></li>`;
+    const res = r => `<li><b>${esc(r.name)}</b><span>${r.home ? `${t('home')}: ${esc(r.home)}. ` : ''}${r.work ? `${t('work')}: ${esc(r.work)}. ` : ''}${r.job ? `${esc(r.job)}. ` : ''}${r.trait ? esc(r.trait) + ' ' : ''}${r.note ? esc(r.note) : ''}</span></li>`;
     body.innerHTML = `
       <figure class="wl-view wl-view-px" style="${viewPos(c)}"><span class="wl-view-dot"></span></figure>
       <div class="wl-title"><img class="wl-crest" src="${img('crest', c.key)}" alt="${t('crest')} ${esc(c.name)}"><div><p class="wl-entry">${t('entry')} ${c.no}</p><h2>${esc(c.name)}</h2></div></div>
@@ -277,7 +277,8 @@
     let bub = null, bubT;
     const say = (el, k, name) => {
       if (bub) bub.remove();
-      const list = SAY[k][L], line = list[Math.floor(Math.random() * list.length)];
+      const r = typeof k === 'object' ? k : null; // житель из карточек — вместо реплики занятие и черта
+      const list = r ? [[r.job, r.trait].filter(Boolean).join('. ')] : SAY[k][L], line = list[Math.floor(Math.random() * list.length)];
       bub = document.createElement('div'); bub.className = 'wl-say';
       bub.style.left = el.style.left; bub.style.top = el.style.top;
       bub.innerHTML = `<span>${name ? `<b>${esc(name)}</b>` : ''}${esc(line)}</span>`;
@@ -287,10 +288,10 @@
     MP.chars.forEach(ch => {
       const city = C.find(c => c.key === ch.city), r = city && city.residents[ch.ri];
       const el = document.createElement('button');
-      el.type = 'button'; el.className = 'wl-char'; el.style.left = ch.at[0] + '%'; el.style.top = ch.at[1] + '%';
+      el.type = 'button'; el.className = 'wl-char' + (ch.sm ? ' sm' : ''); el.style.left = ch.at[0] + '%'; el.style.top = ch.at[1] + '%';
       el.title = r ? r.name : ''; el.setAttribute('aria-label', el.title);
       el.innerHTML = `<img src="/images/wobbleland/ch-${ch.who}.png" alt="">`;
-      el.addEventListener('click', e => { e.stopPropagation(); say(el, ch.who, r ? r.name : ''); });
+      el.addEventListener('click', e => { e.stopPropagation(); say(el, SAY[ch.who] ? ch.who : r, r ? r.name : ''); });
       stage.appendChild(el);
       if (r) who[ch.street + '|' + ch.no] = r.name;
     });

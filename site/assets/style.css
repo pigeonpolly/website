@@ -1229,6 +1229,8 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 .wl-char { position: absolute; z-index: 2; width: 0; height: 0; padding: 0; border: 0; background: none; cursor: pointer; }
 .wl-stage { container-type: inline-size; }
 .wl-char img { position: absolute; left: 0; bottom: 0; width: 2.3cqw; min-width: 18px; max-width: none; image-rendering: pixelated; transform: translate(-50%, -.4cqw); transform-origin: 50% 100%; filter: drop-shadow(0 2px 0 rgba(26, 21, 40, .4)); animation: wl-bob 2.6s ease-in-out infinite; }
+.wl-char.sm { z-index: 1; }
+.wl-char.sm img { width: 1.5cqw; min-width: 14px; animation-duration: 3.4s; } /* жители из карточек — медальоны поменьше */
 .wl-tip { position: absolute; z-index: 5; pointer-events: none; transform: translate(12px, 12px); padding: 6px 10px; background: #1A1528; color: #FFF6E4; font: 600 12.5px/1.45 var(--sans); box-shadow: 0 0 0 2px #FFF6E4; opacity: 0; transition: opacity .1s; max-width: 260px; }
 .wl-tip.on { opacity: 1; }
 .wl-tip b, .wl-tip span { display: block; }

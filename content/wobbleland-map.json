@@ -1872,6 +1872,462 @@
    "no": "11",
    "city": "kettleford",
    "ri": 0
+  },
+  {
+   "who": "miss-peony",
+   "at": [
+    46.33,
+    26.94
+   ],
+   "street": "seag",
+   "no": "3",
+   "city": "newwobbleton",
+   "ri": 2,
+   "sm": true
+  },
+  {
+   "who": "professor-owlistair-tweed",
+   "at": [
+    50.31,
+    32.54
+   ],
+   "street": "fall",
+   "no": "6",
+   "city": "newwobbleton",
+   "ri": 3,
+   "sm": true
+  },
+  {
+   "who": "mr-crisper",
+   "at": [
+    38.52,
+    20.58
+   ],
+   "street": "ytom",
+   "no": "8",
+   "city": "newwobbleton",
+   "ri": 4,
+   "sm": true
+  },
+  {
+   "who": "milka",
+   "at": [
+    38.91,
+    18.86
+   ],
+   "street": "ytom",
+   "no": "9",
+   "city": "newwobbleton",
+   "ri": 5,
+   "sm": true
+  },
+  {
+   "who": "mr-dr-fisher-iii",
+   "at": [
+    20.16,
+    18.32
+   ],
+   "street": "moss",
+   "no": "10",
+   "city": "snailhollow",
+   "ri": 1,
+   "sm": true
+  },
+  {
+   "who": "lady-slugworth",
+   "at": [
+    18.98,
+    23.38
+   ],
+   "street": "moss",
+   "no": "7",
+   "city": "snailhollow",
+   "ri": 2,
+   "sm": true
+  },
+  {
+   "who": "toad-mortimer",
+   "at": [
+    28.28,
+    12.39
+   ],
+   "street": "slow",
+   "no": "9",
+   "city": "snailhollow",
+   "ri": 3,
+   "sm": true
+  },
+  {
+   "who": "lord-croakstill",
+   "at": [
+    26.25,
+    26.4
+   ],
+   "street": "slow",
+   "no": "2",
+   "city": "snailhollow",
+   "ri": 4,
+   "sm": true
+  },
+  {
+   "who": "buzzby-caramello",
+   "at": [
+    95.31,
+    69.18
+   ],
+   "street": "gsap",
+   "no": "4",
+   "city": "maplewink",
+   "ri": 0,
+   "sm": true
+  },
+  {
+   "who": "hedgewig-bramble",
+   "at": [
+    94.92,
+    72.52
+   ],
+   "street": "gsap",
+   "no": "9",
+   "city": "maplewink",
+   "ri": 1,
+   "sm": true
+  },
+  {
+   "who": "leafy-lou",
+   "at": [
+    95.94,
+    73.6
+   ],
+   "street": "gsap",
+   "no": "15",
+   "city": "maplewink",
+   "ri": 2,
+   "sm": true
+  },
+  {
+   "who": "tim-froggucion",
+   "at": [
+    99.06,
+    67.67
+   ],
+   "street": "gsap",
+   "no": "12",
+   "city": "maplewink",
+   "ri": 3,
+   "sm": true
+  },
+  {
+   "who": "barnaby-burrows",
+   "at": [
+    28.52,
+    80.6
+   ],
+   "street": "cris",
+   "no": "5",
+   "city": "pinecrust",
+   "ri": 0,
+   "sm": true
+  },
+  {
+   "who": "nutmeg-hazelton",
+   "at": [
+    38.83,
+    84.38
+   ],
+   "street": "cone",
+   "no": "4",
+   "city": "pinecrust",
+   "ri": 1,
+   "sm": true
+  },
+  {
+   "who": "rusty-roamwell",
+   "at": [
+    44.77,
+    64.87
+   ],
+   "street": "cone",
+   "no": "12",
+   "city": "pinecrust",
+   "ri": 2,
+   "sm": true
+  },
+  {
+   "who": "bramwell-bear",
+   "at": [
+    26.8,
+    88.36
+   ],
+   "street": "cris",
+   "no": "17",
+   "city": "pinecrust",
+   "ri": 3,
+   "sm": true
+  },
+  {
+   "who": "dr-panicoli",
+   "at": [
+    65.39,
+    21.77
+   ],
+   "street": "sour",
+   "no": "6",
+   "city": "lemonvale",
+   "ri": 0,
+   "sm": true
+  },
+  {
+   "who": "lady-puddle-dip",
+   "at": [
+    65.0,
+    10.56
+   ],
+   "street": "spla",
+   "no": "2",
+   "city": "lemonvale",
+   "ri": 1,
+   "sm": true
+  },
+  {
+   "who": "sir-puddlesworth",
+   "at": [
+    65.78,
+    10.45
+   ],
+   "street": "spla",
+   "no": "3",
+   "city": "lemonvale",
+   "ri": 2,
+   "sm": true
+  },
+  {
+   "who": "rowena-ghostclaw",
+   "at": [
+    60.16,
+    8.62
+   ],
+   "street": "zest",
+   "no": "3",
+   "city": "lemonvale",
+   "ri": 3,
+   "sm": true
+  },
+  {
+   "who": "sew-sew-patty",
+   "at": [
+    87.27,
+    33.62
+   ],
+   "street": "cbtn",
+   "no": "7",
+   "city": "buttonspire",
+   "ri": 0,
+   "sm": true
+  },
+  {
+   "who": "spool-ghoul",
+   "at": [
+    74.77,
+    20.26
+   ],
+   "street": "cbtn",
+   "no": "8",
+   "city": "buttonspire",
+   "ri": 1,
+   "sm": true
+  },
+  {
+   "who": "bobby-bagster",
+   "at": [
+    90.39,
+    29.85
+   ],
+   "street": "thrd",
+   "no": "2",
+   "city": "buttonspire",
+   "ri": 2,
+   "sm": true
+  },
+  {
+   "who": "mittens-mulligan",
+   "at": [
+    75.55,
+    12.61
+   ],
+   "street": "cbtn",
+   "no": "12",
+   "city": "buttonspire",
+   "ri": 3,
+   "sm": true
+  },
+  {
+   "who": "ghostina-gravy",
+   "at": [
+    96.72,
+    36.31
+   ],
+   "street": "brot",
+   "no": "3",
+   "city": "noodleford",
+   "ri": 0,
+   "sm": true
+  },
+  {
+   "who": "sir-pickleknot",
+   "at": [
+    72.81,
+    37.18
+   ],
+   "street": "chop",
+   "no": "5",
+   "city": "noodleford",
+   "ri": 1,
+   "sm": true
+  },
+  {
+   "who": "chestnut-charlie",
+   "at": [
+    76.17,
+    44.5
+   ],
+   "street": "chop",
+   "no": "2",
+   "city": "noodleford",
+   "ri": 2,
+   "sm": true
+  },
+  {
+   "who": "candice-creepleton",
+   "at": [
+    17.34,
+    52.8
+   ],
+   "street": "straw",
+   "no": "6",
+   "city": "jamshire",
+   "ri": 0,
+   "sm": true
+  },
+  {
+   "who": "madame-teabite",
+   "at": [
+    21.56,
+    49.57
+   ],
+   "street": "straw",
+   "no": "10",
+   "city": "jamshire",
+   "ri": 1,
+   "sm": true
+  },
+  {
+   "who": "count-hopula",
+   "at": [
+    24.45,
+    53.12
+   ],
+   "street": "straw",
+   "no": "13",
+   "city": "jamshire",
+   "ri": 2,
+   "sm": true
+  },
+  {
+   "who": "baron-von-worms",
+   "at": [
+    12.27,
+    68.21
+   ],
+   "street": "melt",
+   "no": "9",
+   "city": "cheddarford",
+   "ri": 0,
+   "sm": true
+  },
+  {
+   "who": "wren-windlow",
+   "at": [
+    11.33,
+    96.66
+   ],
+   "street": "chee",
+   "no": "3",
+   "city": "cheddarford",
+   "ri": 1,
+   "sm": true
+  },
+  {
+   "who": "petunia-spookworth",
+   "at": [
+    17.03,
+    88.9
+   ],
+   "street": "chee",
+   "no": "7",
+   "city": "cheddarford",
+   "ri": 2,
+   "sm": true
+  },
+  {
+   "who": "dr-dripsson",
+   "at": [
+    52.97,
+    57.11
+   ],
+   "street": "copp",
+   "no": "4",
+   "city": "kettleford",
+   "ri": 1,
+   "sm": true
+  },
+  {
+   "who": "miss-pumpkinella",
+   "at": [
+    66.95,
+    57.33
+   ],
+   "street": "kett",
+   "no": "5",
+   "city": "kettleford",
+   "ri": 2,
+   "sm": true
+  },
+  {
+   "who": "countfluffula",
+   "at": [
+    78.12,
+    85.88
+   ],
+   "street": "kclk",
+   "no": "3",
+   "city": "kettleford",
+   "ri": 3,
+   "sm": true
+  },
+  {
+   "who": "sir-gourdon-squash",
+   "at": [
+    73.28,
+    56.36
+   ],
+   "street": "kett",
+   "no": "8",
+   "city": "kettleford",
+   "ri": 4,
+   "sm": true
+  },
+  {
+   "who": "moss-mccandle",
+   "at": [
+    61.56,
+    68.43
+   ],
+   "street": "copp",
+   "no": "9",
+   "city": "kettleford",
+   "ri": 5,
+   "sm": true
   }
  ],
  "works": [

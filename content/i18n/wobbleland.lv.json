@@ -49,6 +49,30 @@
         "name": "Misters Čū",
         "home": "Vakardienas Rītdienas iela 4",
         "note": "Nāk no Snailhollow, Sūnainās Gliemežnīcas šķērsiela 3."
+      },
+      {
+        "name": "Miss Peony",
+        "home": "Kaiju laukums 3",
+        "job": "Maiznīcas pārdevēja",
+        "trait": "Atdod bulciņas ikvienam, kurš izskatās bēdīgs."
+      },
+      {
+        "name": "Profesors Owlistair Tweed",
+        "home": "Augšup Krītošās Klints iela 6",
+        "job": "Profesors pensijā",
+        "trait": "Kopš oktobra lasa vienu un to pašu nodaļu un apgalvo, ka tikai atpūtina acis."
+      },
+      {
+        "name": "Misters Krispers",
+        "home": "Vakardienas Rītdienas iela 8",
+        "job": "Atrasto mantu kastu glabātājs stacijā",
+        "trait": "Visam uzlīmē etiķetes un krīt panikā, ja sajauc vākus."
+      },
+      {
+        "name": "Milka",
+        "home": "Vakardienas Rītdienas iela 9",
+        "job": "Nezināms — dzīvo kastē",
+        "trait": "Neviens nekad nav redzējis neko vairāk par viņas asti."
       }
     ]
   },
@@ -93,6 +117,32 @@
         "name": "Zelta Sulas laukums",
         "desc": "Centrālais laukums, kur notiek sīrupa tirdziņi."
       }
+    ],
+    "residents": [
+      {
+        "name": "Buzzby Caramello",
+        "home": "Zelta Sulas laukums 4",
+        "job": "Saldumu kurjers",
+        "trait": "Apstaigā visas durvis četrās minūtēs un pēc tam aizmirst, kurā ielā bija. Krīt panikā no telefona zvaniem."
+      },
+      {
+        "name": "Hedgewig Bramble",
+        "home": "Zelta Sulas laukums 9",
+        "job": "Parkā vāc kritušās lapas",
+        "trait": "Katru vakaru šķiro lapas pēc krāsas, pēc tam nosnaužas un mazliet kaunas."
+      },
+      {
+        "name": "Lapiņš Lū",
+        "home": "Zelta Sulas laukums 15",
+        "job": "Lapu kaudze lēkšanai sīrupa gadatirgū",
+        "trait": "Ļoti kutīgs; ja viņu mēģina sagrābt ar grābekli, aizvirpuļo prom."
+      },
+      {
+        "name": "Tims Froggucion",
+        "home": "Zelta Sulas laukums 12",
+        "job": "Vāc spīdīgas zīles",
+        "trait": "Rudens viņam ir dzīvesveids; dzer kapučīno ar odiem."
+      }
     ]
   },
   "snailhollow": {
@@ -131,6 +181,30 @@
         "name": "Detektīvs Titoss",
         "home": "Lēnā Soļa iela 5",
         "work": "Snailhollow policijas iecirknis"
+      },
+      {
+        "name": "Misters Dr. Fišers III",
+        "home": "Sūnainās Gliemežnīcas šķērsiela 10",
+        "job": "Kaut kādu zinātņu doktors (diplomu nevar izlasīt)",
+        "trait": "Baidās no sava atspulga un apvainojas, ja viņu nesauc par doktoru."
+      },
+      {
+        "name": "Lēdija Slugworth",
+        "home": "Sūnainās Gliemežnīcas šķērsiela 7",
+        "job": "Augstākās sabiedrības dāma, vada gliemežu parādi",
+        "trait": "Nekad neierodas laikā — viņa parādās. Un gaida komplimentus savām mirdzošajām pēdām."
+      },
+      {
+        "name": "Krupis Mortimers",
+        "home": "Lēnā Soļa iela 9",
+        "job": "Pensionēts nāves pļāvējs; izkapti nomainīja pret ļoti lielu dakšu",
+        "trait": "Nosnaužas, jūtas vainīgs un atkal nosnaužas, lai atgūtos."
+      },
+      {
+        "name": "Lords Croakstill",
+        "home": "Lēnā Soļa iela 2",
+        "job": "Bijušais Traģisko kurkstienu kora vadītājs, dzīvo muižā pie dīķa",
+        "trait": "Jūtas briesmīgi vainīgs, ja atpūšas ilgāk par desmit minūtēm."
       }
     ]
   },
@@ -182,6 +256,32 @@
         "name": "Kraukšķīgās Garozas iela",
         "desc": "Maizes ceptuvju un pīrāgu veikalu iela."
       }
+    ],
+    "residents": [
+      {
+        "name": "Barnabijs Burrows",
+        "home": "Kraukšķīgās Garozas iela 5",
+        "job": "Maiznieks",
+        "trait": "Runā ar savu ieraugu; palūdz šķēli — iedos pusklaipu."
+      },
+      {
+        "name": "Nutmeg Hazelton",
+        "home": "Čiekuru aleja 4",
+        "job": "Piegādā riekstus pīrāgu veikaliem",
+        "trait": "Slēpj riekstus visur un aizmirst pusi — tā izauga mežs."
+      },
+      {
+        "name": "Rusty Roamwell",
+        "home": "Čiekuru aleja 12",
+        "job": "Pārgājienu gids",
+        "trait": "Tur karti otrādi; nekad nenonāk tur, kur plānoja, bet vienmēr kaut kur labāk."
+      },
+      {
+        "name": "Lācis Bramvels",
+        "home": "Kraukšķīgās Garozas iela 17",
+        "job": "Profesionāli guļ visu ziemu",
+        "trait": "Uz durvīm zīmīte: “Nemodināt līdz pavasarim”. Nakts gājieni pie ledusskapja neskaitās."
+      }
     ]
   },
   "lemonvale": {
@@ -224,6 +324,32 @@
         "name": "Skābā Akmens aleja",
         "desc": "Saka, ka sienas šeit ir piesūkušās ar citronu smaržu."
       }
+    ],
+    "residents": [
+      {
+        "name": "Dr. Panikoli",
+        "home": "Skābā Akmens aleja 6",
+        "job": "Doktorants",
+        "trait": "Satrūkstas no katras ēnas un trīsreiz pārbauda savas piezīmes."
+      },
+      {
+        "name": "Lēdija Puddle-Dip",
+        "home": "Šļakatu iela 2",
+        "job": "Gardēde",
+        "trait": "Katru kārumu noglabā lietainai dienai — un tad iemērc svaigā peļķē."
+      },
+      {
+        "name": "Sers Puddlesworth",
+        "home": "Šļakatu iela 3",
+        "job": "Peļķu inspektors",
+        "trait": "Ielec dziļākajā peļķē — un iekliedzas, ieraugot pīli, kas skatās pretī. Katru reizi."
+      },
+      {
+        "name": "Rovena Ghostclaw",
+        "home": "Miziņu Pagraba ceļš 3",
+        "job": "Spoku restorānu kritiķe",
+        "trait": "Vērtē cepumus, kas atstāti uz viņas kapa, — parasti ar vienu zvaigzni no piecām."
+      }
     ]
   },
   "buttonspire": {
@@ -255,6 +381,32 @@
       {
         "name": "Ielāpu laukums",
         "desc": "Galvenais laukums, nosaukts par bruģi, kas atgādina ielāpu segu."
+      }
+    ],
+    "residents": [
+      {
+        "name": "Šuj-Šuj Patija",
+        "home": "Vara Pogas šķērsiela 7",
+        "job": "Adatu spilventiņš un šuvēja; sašuj salauztas sirdis",
+        "trait": "Kaprīza; katru vakaru tenko ar pogām."
+      },
+      {
+        "name": "Spole Kurnule",
+        "home": "Vara Pogas šķērsiela 8",
+        "job": "Diegu glabātāja, salabo visu, kas izirst",
+        "trait": "Pārāk cieši uztīta kopš 1893. gada; kurn, bet negaidīti palīdz."
+      },
+      {
+        "name": "Bobijs Bagsters",
+        "home": "Diegu šoseja 2",
+        "job": "Somu un maisiņu zinātājs",
+        "trait": "“Aizņemas” iepirkumu maisiņus un slēpjas dāvanu maisiņos."
+      },
+      {
+        "name": "Dūrainīte Mulligan",
+        "home": "Vara Pogas šķērsiela 12",
+        "job": "Pozē adītos džemperos",
+        "trait": "No oktobra līdz aprīlim aizņem radiatoru. Mīl pienu, bet piens viņu — ne."
       }
     ]
   },
@@ -304,6 +456,26 @@
       {
         "name": "Sapinušās Dakšas laukums",
         "desc": "Šeit notiek galvenie svētki."
+      }
+    ],
+    "residents": [
+      {
+        "name": "Ghostina Gravy",
+        "home": "Buljona Katla šķērsiela 3",
+        "job": "Spoku pavāre",
+        "trait": "200 gadus maisa Mūžīgo zupu — gandrīz gatava. Spogulis aizklāts: atspulgs zog grauzdiņus."
+      },
+      {
+        "name": "Sers Pickleknot",
+        "home": "Irbulīšu iela 5",
+        "job": "Mezglu meistars; sien nūdeļu laternas",
+        "trait": "Apsēsts ar mezgliem un makramē un sauc to par mākslu."
+      },
+      {
+        "name": "Kastanis Čārlijs",
+        "home": "Irbulīšu iela 2",
+        "job": "Cepts kastanis ielas tirgū",
+        "trait": "Pļāpā ar katru garāmgājēju; sāksi klausīties — gribēsies vēl."
       }
     ]
   },
@@ -358,6 +530,26 @@
       {
         "name": "Želejas Burciņas laukums",
         "desc": "Šeit notiek galvenie svētki."
+      }
+    ],
+    "residents": [
+      {
+        "name": "Kendisa Creepleton",
+        "home": "Zemeņu Karotes iela 6",
+        "job": "Blogere (“Dzīve cukura ielā”)",
+        "trait": "Krīt panikā, kad sekotāji tiešām zvana; katru vakaru pārbauda spoguli — dažreiz tas atbild."
+      },
+      {
+        "name": "Madāma Teabite",
+        "home": "Zemeņu Karotes iela 10",
+        "job": "Tējas someljē",
+        "trait": "Principā nepasniedz kafiju; vērtē viesus pēc tā, kā viņi tur apakštasīti."
+      },
+      {
+        "name": "Grāfs Hopula",
+        "home": "Zemeņu Karotes iela 13",
+        "job": "Nakts burkānu sulas bāra īpašnieks",
+        "trait": "Dzer burkānu sulu tieši pusnaktī; no laktozes noģībst."
       }
     ]
   },
@@ -422,6 +614,26 @@
         "name": "Zelta Kausējuma laukums",
         "desc": "Šeit notiek galvenie svētki."
       }
+    ],
+    "residents": [
+      {
+        "name": "Barons fon Vormss",
+        "home": "Kausētās Ripas ceļš 9",
+        "job": "Grezna komposta muižas īpašnieks",
+        "trait": "Slepeni iemīlējies Mis Pumpkinellā, bet soli nesper — viņam nav kāju."
+      },
+      {
+        "name": "Rena Windlow",
+        "home": "Siera Cauruma iela 3",
+        "job": "Skaita lietus lāses uz palodzes",
+        "trait": "Lietus laikā nekad neceļ telefonu: lietus ir tikšanās ar sevi."
+      },
+      {
+        "name": "Petūnija Spookworth",
+        "home": "Siera Cauruma iela 7",
+        "job": "Spoku dārzniece",
+        "trait": "Pārstāda puķes, lai tās ziedētu krāšņāk; atstāj ziedlapu taku."
+      }
     ]
   },
   "kettleford": {
@@ -472,6 +684,36 @@
       {
         "name": "Ķirbju ģimene",
         "home": "Kettleford laukums 11"
+      },
+      {
+        "name": "Dr. Dripsons",
+        "home": "Vara Tvaika iela 4",
+        "job": "Zirnekļbarista, pirmā tīmekļa kafijas bāra īpašnieks",
+        "trait": "Palūdz kafiju bez kofeīna — nolasīs lekciju par dzīves jēgu."
+      },
+      {
+        "name": "Mis Pumpkinella",
+        "home": "Kettleford laukums 5",
+        "job": "Māca etiķeti raganām un spokiem",
+        "trait": "Krāj senas pīrāgu receptes; strīdas ar savu atspulgu, kas vienmēr iesmejas pirmais."
+      },
+      {
+        "name": "Grāfs Pūkula",
+        "home": "Tējkannas Pulksteņa prospekts 3",
+        "job": "Rīko vakarus “Nekožam, tikai deserti” mākoņu pilī virs ķirbju laukiem",
+        "trait": "Dzer zemeņu smūtijus; vienmēr parādās no rozā miglas sikspārņu fanfaru pavadībā."
+      },
+      {
+        "name": "Sers Gourdons Squash",
+        "home": "Kettleford laukums 8",
+        "job": "Džentlmenis, Rudens balles pastāvīgais viesis",
+        "trait": "Spodrina monokli, kad saruna kļūst neveikla, — tas ir, vienmēr."
+      },
+      {
+        "name": "Moss McCandle",
+        "home": "Vara Tvaika iela 9",
+        "job": "Naktslampiņa kafijas grauzdētavā",
+        "trait": "Baidās no caurvēja; nodziest ar teatrālu nopūtu un tad izliekas, ka nekas nav noticis."
       }
     ]
   },
@@ -515,7 +757,8 @@
         "name": "Atbrīvošanas vārti",
         "desc": "Vienīgās durvis uz āru."
       }
-    ]
+    ],
+    "residents": []
   },
   "_map": {
     "Yesterday's Tomorrow Street": "Vakardienas Rītdienas iela",

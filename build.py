@@ -46,8 +46,8 @@ PAGES = [
     ("admin", "Admin", "admin.html", "Admin."),
     ("polly-office", "Polly, Office Clerk", "polly-office.html",
      "Polly's pixel office: old blinds, a water cooler and a desk you can click. Switch to evening and watch the light change."),
-    ("detective-office", "Detective Titos", "detective-office.html",
-     "Detective Titos' pixel office: boxes of cases, a board of clues and red string. Click anything and switch to the evening shift."),
+    ("titos", "Detective Titos", "titos.html",
+     "Help Detective Titos solve 100 cases in Wobbleland: find clues, question suspects and keep the coffee pot from running dry."),
     ("polly-helps", "Polly, help me draw", "polly-helps.html",
      "Polly's little drawing guides: build any object from simple shapes, and find ideas for what to draw with an association map."),
     ("flock", "The Flock", "flock.html",
@@ -98,7 +98,7 @@ SECTIONS = {
     "sketchbook": [("art-portfolio", "All series"), ("art-portfolio/sketchbook", "Sketchbook Pages"), ("art-portfolio/anxiety", "Anxiety"),
                    ("art-portfolio/bird", "Pigeon Polly"), ("art-portfolio/snail", "Mr.Chew"), ("art-portfolio/detective", "Mr.Titos"), ("art-portfolio/halloween", "Pumpkin Family"),
                    ("art-portfolio/ai-art", "AI Art")],
-    "play": [("flock", "The Flock"), ("shop", "Shop"), ("rain", "Button Rain"), ("potions", "Polly’s Potion Lab"), ("advent", "Advent calendar"), ("detective-office", "Detective Titos"), ("polly-office", "Polly, Office Clerk"),
+    "play": [("flock", "The Flock"), ("shop", "Shop"), ("rain", "Button Rain"), ("potions", "Polly’s Potion Lab"), ("advent", "Advent calendar"), ("titos", "Detective Titos"), ("polly-office", "Polly, Office Clerk"),
              ("wobbleland", "Wobbleland")],
     "about": [("about-me", "About me"), ("on-walls-and-pages", "On Walls & Pages"),
               ("projects", "Learning & AI"), ("work-with-me", "Work with me")],
@@ -474,9 +474,53 @@ def search_entry(page, lang, path):
     return {"u": pre + "/" + (path + "/" if path else ""), "t": title, "d": html.unescape(m.group(1)) if m else "", "x": text[:4000]}
 
 
+def titos_cases():
+    """Дела Титоса: content/titos/NNN.json (тексты RU) + готовые EN/LV старых дел из content/titos/tr/NNN.json → site/assets/titos-cases.json.
+    Worker импортирует файл по хэшу (meta titos_cases_<хэш>) и переводит недостающее (worker/titos.js, docs/titos.md)."""
+    import hashlib
+    import sys
+    sys.path.insert(0, str(ROOT / "tools"))
+    from titos_cast import slug
+    # имена жителей (who) на трёх языках — для подозреваемых без своего name
+    base = json.loads((CONTENT / "wobbleland.json").read_text())
+    trs = {lang: json.loads((CONTENT / "i18n" / f"wobbleland.{lang}.json").read_text()) for lang in ("ru", "lv") if (CONTENT / "i18n" / f"wobbleland.{lang}.json").exists()}
+    who = {}
+    for c in base["cities"]:
+        for i, r in enumerate(c.get("residents", [])):
+            names = {"en": r["name"]}
+            for lang, tr in trs.items():
+                rs = tr.get(c["key"], {}).get("residents", [])
+                names[lang] = (rs[i].get("name") if i < len(rs) else None) or r["name"]
+            who[r.get("key") or slug(r["name"])] = {"ru": names.get("ru", r["name"]), "en": names["en"], "lv": names.get("lv", r["name"])}
+    cases = []
+    for f in sorted((CONTENT / "titos").glob("[0-9][0-9][0-9].json")):
+        case = json.loads(f.read_text())
+        tr_file = CONTENT / "titos" / "tr" / f.name
+        tr = json.loads(tr_file.read_text()) if tr_file.exists() else {}
+
+        def merge(o):
+            if isinstance(o, dict):
+                if isinstance(o.get("ru"), str) and len(o) == 1:
+                    return {**o, **{k: v for k, v in tr.get(o["ru"], {}).items() if v}}
+                return {k: merge(v) for k, v in o.items()}
+            if isinstance(o, list):
+                return [merge(x) for x in o]
+            return o
+        case = merge(case)
+        for sp in case.get("suspects", []):
+            if not sp.get("name") and sp.get("who") in who:
+                sp["name"] = who[sp["who"]]
+        case["hash"] = hashlib.md5(json.dumps(case, ensure_ascii=False, sort_keys=True).encode()).hexdigest()[:12]
+        cases.append(case)
+    body = json.dumps(cases, ensure_ascii=False, separators=(",", ":"))
+    (OUT / "assets" / "titos-cases.json").write_text(
+        json.dumps({"hash": hashlib.md5(body.encode()).hexdigest()[:16], "cases": cases}, ensure_ascii=False, separators=(",", ":")) + "\n")
+
+
 def build():
     rooms_data()
     wobbleland_data()
+    titos_cases()
     layout = (SRC / "layout.html").read_text()
     search_index = {lang: [] for lang in LANGS}
     for path, title, file, desc in PAGES:
