@@ -57,6 +57,19 @@ async function firstDayLimit(env, h, collection) {
   return st && st.t && now() < st.t + DAY ? lim : 0;
 }
 
+// «🎲 Сюрприз» редкости: случайная свободная карточка (свободная = ни у кого нет, значит и у покупателя тоже).
+// Цена = средняя цена свободных карточек этой редкости × RULES.cardSurprisePct %, до 5.
+async function surpriseInfo(env, h, collection) {
+  const rows = (await env.DB.prepare(`SELECT c.rarity, COUNT(*) AS n, AVG(c.price) AS avg FROM cards c LEFT JOIN card_owner o ON o.card_id = c.id
+    WHERE c.hidden = 0 AND o.user_id IS NULL AND (c.rarity = 'common' OR c.price > 0) AND (? = '' OR c.collection = ?) GROUP BY c.rarity`).bind(collection, collection).all()).results;
+  const common = await h.avgItemPrice() * (h.rules().cardMult || 100) / 100, pct = (h.rules().cardSurprisePct || 100) / 100, out = {};
+  for (const r of RARITY) {
+    const x = rows.find(y => y.rarity === r);
+    out[r] = { left: x ? x.n : 0, price: x ? round5((r === 'common' ? common : x.avg) * pct) : 0 };
+  }
+  return out;
+}
+
 function pub(c, lang, set, common, meId) {
   return {
     id: c.id, n: c.n, collection: c.collection, set: setName(set, lang), rarity: c.rarity, img: c.img || '',
@@ -93,7 +106,7 @@ export async function cardsApi(req, env, url, h) {
     return json({
       cards: rows.map(c => pub(c, lang, byS[c.collection], common, me && me.id)),
       sets: ss.filter(s => used.has(s.slug)).map(s => ({ slug: s.slug, name: setName(s, lang) })),
-      common, firstDay: h.rules().cardsFirstDay || 0, tradeDays: tradeDays(h),
+      common, firstDay: h.rules().cardsFirstDay || 0, tradeDays: tradeDays(h), surprise: await surpriseInfo(env, h, q.collection),
       me: me && me.nick && !me.banned ? { id: me.id, nick: me.nick, buttons: me.buttons || 0 } : null,
     }, 200, { 'cache-control': 'no-store' });
   }
@@ -135,6 +148,54 @@ export async function cardsApi(req, env, url, h) {
     }
     await h.flockEvent('card', u, { card: c.id, n: c.n, collection: c.collection, rarity: c.rarity, price });
     return json({ ok: true, buttons: (u.buttons || 0) - price, card: c.id, owner: u.nick });
+  }
+
+  // сюрприз: {rarity, price, collection?} — случайная свободная карточка этой редкости (лимит «в первые сутки» учитывается);
+  // карточку перехватили — пробуем другую (до 5 раз)
+  if (m === 'POST' && p === '/api/cards/surprise') {
+    const u = await h.needUser(req, env);
+    if (!u.nick) fail(400, 'nick');
+    if (u.banned) fail(403, 'banned');
+    const b = await body(), rarity = String(b.rarity || ''), coll = String(b.collection || '');
+    if (!RARITY.includes(rarity)) fail(400, 'rarity');
+    for (let tries = 0; tries < 5; tries++) {
+      const info = (await surpriseInfo(env, h, coll))[rarity];
+      if (!info.left) return json({ error: 'none' }, 409);
+      const price = info.price;
+      if (b.price != null && Number(b.price) !== price) return json({ error: 'price', price }, 409);
+      if ((u.buttons || 0) < price) fail(402, 'poor');
+      const free = (await env.DB.prepare(`SELECT c.id, c.n, c.collection FROM cards c LEFT JOIN card_owner o ON o.card_id = c.id
+        WHERE c.hidden = 0 AND o.user_id IS NULL AND c.rarity = ? AND (c.rarity = 'common' OR c.price > 0) AND (? = '' OR c.collection = ?)`).bind(rarity, coll, coll).all()).results;
+      const lims = {};
+      for (const c of free) if (!(c.collection in lims)) lims[c.collection] = await firstDayLimit(env, h, c.collection);
+      // лимит «в одни руки в первые сутки» — коллекции, где он уже выбран, не участвуют
+      const mineBy = {};
+      for (const k of Object.keys(lims).filter(k => lims[k])) mineBy[k] = (await env.DB.prepare('SELECT COUNT(*) AS n FROM card_owner o JOIN cards k ON k.id = o.card_id WHERE o.user_id = ? AND k.collection = ?').bind(u.id, k).first()).n;
+      const pool = free.filter(c => !lims[c.collection] || mineBy[c.collection] < lims[c.collection]);
+      if (!pool.length) return json({ error: 'limit', limit: Math.max(...Object.values(lims)) }, 409);
+      const c = pool[Math.floor(Math.random() * pool.length)], lim = lims[c.collection];
+      const ref = randomHex(8), t = now(), mine = 'SELECT 1 FROM card_owner WHERE card_id = ? AND ref = ?';
+      const res = await env.DB.batch([
+        env.DB.prepare(`INSERT OR IGNORE INTO card_owner (card_id, user_id, price, bought_at, ref) SELECT ?, ?, ?, ?, ?
+          WHERE (SELECT COALESCE(buttons, 0) FROM users WHERE id = ?) >= ?
+            AND EXISTS (SELECT 1 FROM cards WHERE id = ? AND hidden = 0 AND rarity = ?)
+            AND (? = 0 OR (SELECT COUNT(*) FROM card_owner o JOIN cards k ON k.id = o.card_id WHERE o.user_id = ? AND k.collection = ?) < ?)`)
+          .bind(c.id, u.id, price, t, ref, u.id, price, c.id, rarity, lim, u.id, c.collection, lim),
+        env.DB.prepare(`UPDATE users SET buttons = COALESCE(buttons, 0) - ? WHERE id = ? AND EXISTS (${mine})`).bind(price, u.id, c.id, ref),
+        env.DB.prepare(`INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) SELECT ?, 'card', ?, ?, ?, ? WHERE EXISTS (${mine})`).bind(u.id, c.id + ':' + ref, -price, h.rigaDay(), t, c.id, ref),
+      ]);
+      if (!res[0].meta.changes) {
+        const bal = await env.DB.prepare('SELECT COALESCE(buttons, 0) AS b FROM users WHERE id = ?').bind(u.id).first();
+        if (!bal || bal.b < price) fail(402, 'poor');
+        continue; // карточку только что купили — другую
+      }
+      await h.flockEvent('card', u, { card: c.id, n: c.n, collection: c.collection, rarity, price, surprise: true });
+      const lang = LANGS.includes(b.lang) ? b.lang : 'en';
+      const row = await env.DB.prepare(`${SEL} WHERE c.id = ?`).bind(c.id).first();
+      const set = await env.DB.prepare('SELECT * FROM card_sets WHERE slug = ?').bind(c.collection).first();
+      return json({ ok: true, buttons: (u.buttons || 0) - price, card: pub(row, lang, set, price, u.id), owner: u.nick });
+    }
+    fail(409, 'busy');
   }
 
   // ---------- обмен (этап 7 В) ----------

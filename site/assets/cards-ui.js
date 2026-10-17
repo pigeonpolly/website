@@ -22,6 +22,13 @@
     err: ['Could not buy, please try again.', 'Не получилось купить, попробуйте ещё раз.', 'Neizdevās nopirkt, mēģini vēlreiz.'],
     have: ['You have {n} 🔘', 'У вас {n} 🔘', 'Tev ir {n} 🔘'], none: ['No cards here yet.', 'Здесь пока нет карточек.', 'Šeit vēl nav kartīšu.'], noneMine: ['You have no cards yet.', 'У вас пока нет карточек.', 'Tev vēl nav kartīšu.'],
     rule: ['Only trading is possible: common ↔ common, rare ↔ rare, unique ↔ unique, 5 common ↔ 1 rare, 10 common ↔ 1 unique.', 'Карточку можно только обменять: обычную на обычную, редкую на редкую, уникальную на уникальную, 5 обычных на 1 редкую, 10 обычных на 1 уникальную.', 'Kartīti var tikai apmainīt: parasto pret parasto, reto pret reto, unikālo pret unikālo, 5 parastās pret 1 reto, 10 parastās pret 1 unikālo.'],
+    // «🎲 Сюрприз» редкости
+    surH: ['🎲 Surprise card', '🎲 Карточка-сюрприз', '🎲 Pārsteiguma kartīte'],
+    surLead: ['A random free card of the chosen rarity. Every card is one of a kind, so you get one nobody has yet.', 'Случайная свободная карточка выбранной редкости. Все карточки единственные, поэтому выпадет та, которой ещё ни у кого нет.', 'Nejauša brīva izvēlētā retuma kartīte. Katra kartīte ir vienīgā, tāpēc tiks tāda, kuras vēl nav nevienam.'],
+    surT: ['🎲 Surprise: {r}', '🎲 Сюрприз: {r}', '🎲 Pārsteigums: {r}'],
+    surLeft: ['{n} left', 'осталось {n}', 'atlikušas {n}'], surNone: ['All taken', 'Все разобраны', 'Visas paņemtas'],
+    surSure: ['Buy a random {r} card for {p} 🔘? You get a free card nobody has. It will be yours only: you cannot sell or gift it, only trade.', 'Купить случайную карточку ({r}) за {p} 🔘? Выпадет свободная, которой ни у кого нет. Она будет только у вас: продать или подарить её нельзя, только обменять.', 'Pirkt nejaušu kartīti ({r}) par {p} 🔘? Tiks brīva, kuras nav nevienam. Tā būs tikai tev: to nevar pārdot vai uzdāvināt, tikai apmainīt.'],
+    surOk: ['Surprise! №{n} “{t}” is yours 🃏', 'Сюрприз! №{n} «{t}» — ваша 🃏', 'Pārsteigums! №{n} “{t}” ir tava 🃏'],
     close: ['Close', 'Закрыть', 'Aizvērt'], hidden: ['hidden', 'скрыта', 'paslēpta'],
     // обмен
     offer: ['🔁 Offer a trade', '🔁 Предложить обмен', '🔁 Piedāvāt maiņu'], offerShort: ['🔁 Trade', '🔁 Обмен', '🔁 Maiņa'],
@@ -175,6 +182,37 @@
         else alert(x.d.error === 'price' ? T.changed[L].replace('{p}', x.d.price) : x.d.error === 'sold' ? T.sold[L] : x.d.error === 'poor' ? T.poor[L] : x.d.error === 'limit' ? T.limit[L].replace('{n}', x.d.limit) : T.err[L]);
         if (o.onBuy) o.onBuy(x.ok, x.d);
       }).catch(function () { alert(T.err[L]); if (btn) btn.disabled = false; });
+  }
+  // «🎲 Сюрприз» редкости: рубашка карточки, остаток, «Купить» → случайная свободная (сервер), потом окно выпавшей
+  function surTile(r, x, o) {
+    var t = el('article', 'pc-tile pc-sur-t' + (x.left ? '' : ' sold'));
+    var f = el('div', 'pc-card pc-' + r + ' pc-back'), pic = el('div', 'pc-pic'); pic.appendChild(el('span', 'pc-q', '?')); f.appendChild(pic);
+    var mk = el('span', 'pc-mark', r === 'common' ? '🤖' : '✎'); f.appendChild(mk);
+    var b = el('div', 'pc-open'); b.appendChild(f); t.appendChild(b);
+    t.appendChild(el('p', 'pc-t', T.surT[L].replace('{r}', T[r][L].toLowerCase())));
+    var foot = el('p', 'pc-foot');
+    if (!x.left) foot.appendChild(el('span', 'pc-price', T.surNone[L]));
+    else {
+      var c = { title: T.surT[L].replace('{r}', T[r][L].toLowerCase()), price: x.price };
+      var bb = buyBtn(c, o); if (o.me && !bb.disabled) bb.onclick = function () { buySur(r, x, o, bb); };
+      foot.appendChild(bb); foot.appendChild(el('span', 'pc-price', T.surLeft[L].replace('{n}', x.left)));
+    }
+    t.appendChild(foot);
+    return t;
+  }
+  function buySur(r, x, o, btn) {
+    if (!confirm(T.surSure[L].replace('{r}', T[r][L].toLowerCase()).replace('{p}', x.price))) return;
+    btn.disabled = true;
+    fetch('/api/cards/surprise', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ rarity: r, price: x.price, collection: o.collection || '', lang: LANG }) })
+      .then(function (q) { return q.json().then(function (d) { return { ok: q.ok, d: d }; }); })
+      .then(function (y) {
+        if (y.ok) {
+          var c = y.d.card, msg = T.surOk[L].replace('{n}', c.n).replace('{t}', c.title);
+          if (window.PPToast) window.PPToast(msg);
+          open(c, { me: o.me });
+        } else alert(y.d.error === 'price' ? T.changed[L].replace('{p}', y.d.price) : y.d.error === 'none' ? T.surNone[L] : y.d.error === 'poor' ? T.poor[L] : y.d.error === 'limit' ? T.limit[L].replace('{n}', y.d.limit) : T.err[L]);
+        if (o.onBuy) o.onBuy(y.ok, y.d);
+      }).catch(function () { alert(T.err[L]); btn.disabled = false; });
   }
   // окно карточки: крупно слева, справа — название, описание, статы, номер, редкость, владелец (на телефоне — под картинкой)
   function open(c, o) {
@@ -456,8 +494,20 @@
     root.appendChild(el('p', 'fl-all-lead pc-lead', T.lead[L]));
     var meP = el('p', 'pc-me'); root.appendChild(meP);
     var bar = el('div', 'pc-filters'); bar.setAttribute('role', 'toolbar'); root.appendChild(bar);
+    var sur = el('section', 'pc-sur'); root.appendChild(sur);
     var grid = el('div', 'pc-grid'); root.appendChild(grid);
     var data = null;
+    function drawSur() {
+      sur.innerHTML = '';
+      var rs = RAR.filter(function (r) { return data.surprise && data.surprise[r] && (!F.rarity || F.rarity === r) && (data.surprise[r].left || data.surprise[r].price); });
+      sur.hidden = F.show === 'mine' || F.show === 'sold' || !rs.length;
+      if (sur.hidden) return;
+      sur.appendChild(el('h3', 'pc-sur-h', T.surH[L]));
+      sur.appendChild(el('p', 'pc-sur-lead', T.surLead[L]));
+      var g = el('div', 'pc-grid pc-sur-grid'); sur.appendChild(g);
+      var o = { me: data.me, collection: F.collection, onBuy: function () { load(); } };
+      rs.forEach(function (r) { g.appendChild(surTile(r, data.surprise[r], o)); });
+    }
     function filters() {
       bar.innerHTML = '';
       var row = function (label) { var r = el('div', 'shop-row shop-seg'); r.appendChild(el('span', 'shop-lab', label)); var g = el('div', 'shop-opts'); r.appendChild(g); bar.appendChild(r); return g; };
@@ -474,6 +524,7 @@
       if (F.show === 'mine' && !data.me) F.show = 'all';
       filters();
       meP.textContent = data.me ? T.have[L].replace('{n}', data.me.buttons) : '';
+      drawSur();
       grid.innerHTML = '';
       if (!data.cards.length) { grid.appendChild(el('p', 'fl-all-lead', F.show === 'mine' ? T.noneMine[L] : T.none[L])); return; }
       data.cards.forEach(function (c) { grid.appendChild(tile(c, { me: data.me, days: data.tradeDays, onBuy: function () { load(); }, onTrade: function () { load(); } })); });

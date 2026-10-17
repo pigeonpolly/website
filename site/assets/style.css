@@ -3801,6 +3801,19 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .pc-owner { font-weight: 700; color: #6B52C8; text-decoration: none; } .pc-owner:hover { text-decoration: underline; }
 .pc-yours { font-weight: 700; color: #2E8B5E; }
 .pc-price { color: #8A8099; font-size: 13px; }
+/* «🎲 Сюрприз» редкости — рубашка карточки с «?» */
+.pc-sur { margin: 0 0 22px; padding: 14px 16px 18px; border: 1px dashed #CFC6E0; border-radius: 16px; }
+.pc-sur-h { margin: 0 0 2px; font: 600 20px/1.25 var(--serif); }
+.pc-sur-lead { margin: 0 0 14px; font: 14px/1.4 var(--sans); color: #6B6280; }
+.pc-sur-grid { grid-template-columns: repeat(auto-fill, minmax(136px, 168px)); }
+.pc-back .pc-pic { display: grid; place-items: center; background: repeating-linear-gradient(45deg, #2B1A51 0 10px, #3A2868 10px 20px); }
+.pc-q { font: 700 46cqw/1 var(--serif); color: #FFF3B0; text-shadow: 0 3px 0 #1a1528; }
+.pc-sur-t .pc-open { cursor: default; } .pc-sur-t .pc-open:hover { transform: none; }
+@media (max-width: 700px) {
+  .pc-sur { padding: 12px 10px 14px; }
+  .pc-grid.pc-sur-grid { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px 8px; }
+  .pc-sur-t .pc-t { font-size: 13px; } .pc-sur-t .pc-buy { padding: 4px 8px; font-size: 12px; } .pc-sur-t .pc-price { font-size: 12px; }
+}
 .pc-tile.sold .pc-card { filter: grayscale(1) brightness(.92); opacity: .72; }
 .pc-tile.sold .pc-t { color: #8A8099; }
 .pc-tile.mine .pc-card { box-shadow: 0 0 0 2px #1a1528, 0 0 0 5px #6FCF97, 0 6px 14px rgba(43,26,81,.28); }
