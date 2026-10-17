@@ -560,8 +560,44 @@
     };
   }
 
+  // налог: списать N 🔘 или N % у всех / у не вернувшихся после регистрации (больше месяца) / у не заходивших дольше выбранного срока
+  function taxDialog(users, done) {
+    const w = document.createElement('div'); w.className = 'adm-gift';
+    w.innerHTML = `<div class="adm-tax-card" role="dialog" aria-label="Налог"><h3>🧾 Списать налог</h3>
+      <p class="adm-tax-row"><label>Сколько <input type="number" min="1" max="10000" value="10" data-n></label>
+        <label><input type="radio" name="tax-u" value="btn" checked> 🔘 пуговок</label><label><input type="radio" name="tax-u" value="pct"> % от пуговок</label></p>
+      <fieldset><legend>У кого</legend>
+        <label><input type="radio" name="tax-w" value="all" checked> у всех птичек</label>
+        <label><input type="radio" name="tax-w" value="never"> не заходили ни разу после регистрации (прошло больше месяца)</label>
+        <label><input type="radio" name="tax-w" value="idle"> не заходили дольше, чем <select data-days>${[[7, 'неделя'], [14, '2 недели'], [30, 'месяц'], [60, '2 месяца'], [90, '3 месяца'], [180, 'полгода'], [365, 'год']].map(([v, l]) => `<option value="${v}"${v === 30 ? ' selected' : ''}>${l}</option>`).join('')}</select></label></fieldset>
+      <p class="be-note">Пуговок не станет меньше нуля. Птичка письма не получит. Заблокированные и птички без ника не платят.</p>
+      <p class="adm-tax-sum" aria-live="polite"></p>
+      <div class="adm-quick"><button type="button" class="pill-btn pill-fill" data-go>Списать</button><button type="button" class="pill-btn" data-x>Отмена</button></div></div>`;
+    document.body.appendChild(w);
+    const q = s => w.querySelector(s), val = name => q(`[name=${name}]:checked`).value, t = Date.now() / 1000;
+    const pick = () => {
+      const pct = val('tax-u') === 'pct', n = Math.floor(+q('[data-n]').value) || 0, who = val('tax-w'), days = +q('[data-days]').value;
+      const list = users.filter(u => u.nick && !u.banned && u.buttons > 0).filter(u => {
+        const seen = u.last_seen || u.created_at || 0;
+        return who === 'all' || (who === 'never' ? u.created_at < t - 30 * 86400 && seen < (u.created_at || 0) + 86400 : seen < t - days * 86400);
+      }).map(u => Math.min(u.buttons, pct ? Math.floor(u.buttons * n / 100) : n)).filter(x => x > 0);
+      return { pct, n, who, days, list, ok: n >= 1 && n <= (pct ? 100 : 10000) };
+    };
+    const show = () => { const c = pick(); q('.adm-tax-sum').innerHTML = c.ok ? `Птичек заплатит: <b>${c.list.length}</b>, всего <b>${c.list.reduce((a, b) => a + b, 0)}</b> 🔘` : `Нужно число от 1 до ${c.pct ? 100 : 10000}.`; };
+    w.oninput = w.onchange = show; show();
+    const close = () => w.remove();
+    q('[data-x]').onclick = close; w.onclick = e => { if (e.target === w) close(); };
+    q('[data-go]').onclick = async e => {
+      const c = pick(); if (!c.ok) return;
+      if (!confirm(`Списать налог ${c.n}${c.pct ? ' %' : ' 🔘'}  — птичек: ${c.list.length}?`)) return;
+      e.target.disabled = true;
+      try { const r = await api('admin/tax', { amount: c.n, unit: c.pct ? 'pct' : 'btn', who: c.who, days: c.days }); alert(`🧾 Налог списан. Птичек: ${r.count}, всего ${r.total} 🔘`); close(); done(); } catch (x) { alert(err(x)); e.target.disabled = false; }
+    };
+  }
+
   // ---------- подарить семечко: фон, обувь, головной убор, анимация, рамка ----------
   function giftDialog(u, done) {
+
     const B = window.PPBirds, C = window.PPCatalog; if (!B || !C) return;
     const all = !u; if (all) u = { id: 2, nick: null, avatar: '{}' }; // «подарить всем»
     let av = {}; try { av = JSON.parse(u.avatar || '{}') || {}; } catch (e) { /* пусто */ }
@@ -769,7 +805,7 @@
       const th = (k, l) => `<th><button type="button" class="adm-sort" data-bsort="${k}" aria-pressed="${bSort === k}">${l}${bSort === k ? ' ↓' : ''}</button></th>`;
       main.innerHTML = `<section class="adm-box"><h2>🐦 Все птицы: ${d.users.length}</h2>
         <p class="be-note">Новых за неделю: <b>${week}</b>. Нажмите на ник, чтобы открыть профиль и работы.</p>
-        <p><button type="button" class="pill-btn pill-fill" id="adm-giftall">🎁 Подарить всем</button> <button type="button" class="pill-btn pill-fill" id="adm-salary" title="Пуговки сразу зачисляются всем птичкам с ником; при заходе на сайт птичка увидит конвертик от администрации Воббленда">💌 Выдать зарплату</button> <button type="button" class="pill-btn" id="adm-backfill">🔘 Начислить всем за прошлые бейджи и рисунки</button> <small class="be-note">Повторно не начислит — каждая награда даётся один раз.</small></p>
+        <p><button type="button" class="pill-btn pill-fill" id="adm-giftall">🎁 Подарить всем</button> <button type="button" class="pill-btn pill-fill" id="adm-salary" title="Пуговки сразу зачисляются всем птичкам с ником; при заходе на сайт птичка увидит конвертик от администрации Воббленда">💌 Выдать зарплату</button> <button type="button" class="pill-btn pill-fill" id="adm-tax" title="Списать пуговки у всех или только у тех, кто давно не заходит">🧾 Списать налог</button> <button type="button" class="pill-btn" id="adm-backfill">🔘 Начислить всем за прошлые бейджи и рисунки</button> <small class="be-note">Повторно не начислит — каждая награда даётся один раз.</small></p>
         <div class="be-filters"><input type="search" id="adm-bq" placeholder="🔍 Найти по нику" value="${esc(bq)}"></div>
         <table class="be-table adm-table adm-birds"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}${th('buttons', '🔘 Пуговки')}${th('invited', '👥 Позвали')}<th>Подарки</th></tr></thead><tbody>
         ${list.map(u => `<tr><td>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}${u.banned ? ' <small class="be-danger">заблокирована</small>' : ''}</td>
@@ -789,6 +825,7 @@
         try { const r = await api('admin/salary', { amount: n }); alert(`💌 Зарплата выдана: ${r.count} птичкам по ${r.amount} 🔘`); } catch (x) { alert(err(x)); }
         e.target.disabled = false;
       };
+      main.querySelector('#adm-tax').onclick = () => taxDialog(d.users, birds);
       main.querySelectorAll('[data-bsort]').forEach(b => b.onclick = () => { bSort = b.dataset.bsort; draw(); });
       main.querySelector('#adm-backfill').onclick = async e => {
         e.target.disabled = true; e.target.textContent = 'Считаю…';

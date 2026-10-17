@@ -2031,6 +2031,25 @@ async function route(req, env, url) {
     ]);
     return json({ ok: true, count: ins.meta.changes, amount: n });
   }
+  // админ: налог — списать пуговки (N 🔘 или N % от пуговок, не ниже нуля) у всех / у не вернувшихся после регистрации (больше месяца) / у не заходивших дольше days дней
+  if (m === 'POST' && p === '/api/admin/tax') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({}));
+    const pct = b.unit === 'pct', n = Math.floor(Number(b.amount) || 0), days = Math.floor(Number(b.days) || 0), t = now();
+    if (n < 1 || n > (pct ? 100 : 10000)) fail(400, 'bad');
+    const seen = 'COALESCE(last_seen, created_at, 0)';
+    const cond = b.who === 'never' ? ` AND created_at < ${t - 30 * 86400} AND ${seen} < COALESCE(created_at, 0) + 86400`
+      : b.who === 'idle' ? (days >= 1 && days <= 3650 ? ` AND ${seen} < ${t - days * 86400}` : fail(400, 'bad')) : b.who === 'all' ? '' : fail(400, 'bad');
+    const take = pct ? `CAST(COALESCE(buttons, 0) * ${n} / 100 AS INTEGER)` : `MIN(COALESCE(buttons, 0), ${n})`;
+    const ref = 'tax' + Date.now() + randomHex(2);
+    await env.DB.batch([
+      env.DB.prepare(`INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at, seen) SELECT id, 'tax', ?, -(${take}), ?, ?, 1 FROM users WHERE nick IS NOT NULL AND banned = 0${cond} AND ${take} > 0`).bind(ref, rigaDay(), t),
+      env.DB.prepare(`UPDATE users SET buttons = MAX(0, COALESCE(buttons, 0) + (SELECT amount FROM button_log l WHERE l.kind = 'tax' AND l.ref = ? AND l.user_id = users.id)) WHERE id IN (SELECT user_id FROM button_log WHERE kind = 'tax' AND ref = ?)`).bind(ref, ref),
+    ]);
+    const r = await env.DB.prepare("SELECT COUNT(*) AS c, -COALESCE(SUM(amount), 0) AS s FROM button_log WHERE kind = 'tax' AND ref = ?").bind(ref).first();
+    return json({ ok: true, count: r.c, total: r.s });
+  }
   // админ: начислить всем за прошлые бейджи, рисунки и «Выбор Полли» (можно нажимать сколько угодно — повторно не начислит)
   if (m === 'POST' && p === '/api/admin/buttons-backfill') {
     const u = await needUser(req, env);

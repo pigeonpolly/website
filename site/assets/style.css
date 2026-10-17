@@ -2614,6 +2614,17 @@ html:not(.is-admin) .statbar { display: none; }
 .adm-gift-card .pill-btn:not(.pill-fill), .sw-bv-card .pill-btn { color: #2B1A51; border-color: #CFC7E8; background: #fff; }
 .adm-gift-card .pill-btn.pill-fill { color: #2B1A51; }
 .adm-gift-card .be-note { color: #5A4E78; }
+.adm-tax-card { width: min(520px, calc(100vw - 32px)); max-height: 90vh; overflow: auto; box-sizing: border-box; padding: 22px; border-radius: 20px; background: #FFFDF8; color: #2B1A51; }
+.adm-tax-card h3 { margin: 0 0 12px; }
+.adm-tax-card .be-note { color: #5A4E78; }
+.adm-tax-card label { display: flex; align-items: center; gap: 8px; margin: 6px 0; }
+.adm-tax-row { display: flex; flex-wrap: wrap; gap: 4px 18px; align-items: center; }
+.adm-tax-card input[type=number] { width: 90px; padding: 7px 10px; border: 1px solid #DCD5EC; border-radius: 10px; font: 15px var(--sans); }
+.adm-tax-card select { padding: 5px 8px; border: 1px solid #DCD5EC; border-radius: 10px; font: 15px var(--sans); }
+.adm-tax-card fieldset { margin: 12px 0; padding: 8px 14px 10px; border: 1px solid #DCD5EC; border-radius: 14px; }
+.adm-tax-card legend { padding: 0 6px; font-weight: 600; }
+.adm-tax-card .pill-btn:not(.pill-fill) { color: #2B1A51; border-color: #CFC7E8; background: #fff; }
+.adm-tax-card .pill-btn.pill-fill { color: #2B1A51; }
 .adm-gift-items small { font-size: 11px; color: #5A4E78; margin-top: 4px; }
 .sw-pv-bag-t { margin: 14px 0 6px; font: 700 13px var(--sans); text-transform: uppercase; letter-spacing: .06em; color: #8C7FB0; text-align: left; }
 .sw-pv-bag { display: flex; flex-wrap: wrap; gap: 8px; }
