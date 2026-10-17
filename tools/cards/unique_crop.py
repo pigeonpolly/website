@@ -1,6 +1,6 @@
 # Фото карточек Алины (collectible_card_raw_*.JPEG) → ровная карточка 5:7.
-# Находит карточку на листе, выпрямляет перспективу, поворачивает вертикально, стирает старые номера (рамки из ERASE).
-# python3 tools/cards/unique_crop.py [имя ...] [--out папка] [--flat] [--debug]  → site/images/cards/<coll>/NN.jpg (список — unique_cards.json)
+# Находит карточку на листе, выпрямляет перспективу, поворачивает вертикально, стирает старые номера (рамки из ERASE), светлит и выравнивает цвет (tone).
+# python3 tools/cards/unique_crop.py [имя ...] [--out папка] [--flat] [--debug] [--raw — без цветокоррекции]  → site/images/cards/<coll>/NN.jpg (список — unique_cards.json)
 import sys, os, glob, json
 import cv2, numpy as np
 
@@ -151,13 +151,33 @@ def erase(out, boxes):
     return out
 
 
+def tone(out, paper=238, gamma=0.9, sat=1.08):
+    # фото темнее бумаги: белый баланс и уровни по бумаге (светлые и серые места), лёгкий контраст и цвет
+    f = out.astype('float32')
+    hsv = cv2.cvtColor(out, cv2.COLOR_BGR2HSV)
+    v, s = hsv[..., 2], hsv[..., 1]
+    m = (v >= np.percentile(v, 85)) & (s < np.percentile(s, 50))
+    if m.sum() < 500:
+        m = v >= np.percentile(v, 90)
+    wb = f[m].mean(0)
+    k = wb.mean() / wb
+    if (wb.max() - wb.min()) / wb.mean() < 0.25:  # фон цветной (охра, фиолет) — баланс не трогаем
+        f = f * np.clip(1 + (k - 1) * 0.6, 0.94, 1.06)  # желтизна фото → к нейтральному, мягко
+    lo, hi = np.percentile(f.mean(2), 0.5), f[m].mean()
+    f = np.clip((f - lo) / max(1, hi - lo), 0, 1.06) ** gamma * paper
+    # чуть насыщеннее, без пересвета
+    lab = cv2.cvtColor(np.clip(f, 0, 255).astype(np.uint8), cv2.COLOR_BGR2LAB).astype('float32')
+    lab[..., 1:] = (lab[..., 1:] - 128) * sat + 128
+    return cv2.cvtColor(np.clip(lab, 0, 255).astype(np.uint8), cv2.COLOR_LAB2BGR)
+
+
 def main():
     args = sys.argv[1:]
     out_dir = os.path.join(ROOT, 'site/images/cards')
     if '--out' in args:
         i = args.index('--out'); out_dir = args[i + 1]; del args[i:i + 2]
     debug = '--debug' in args
-    args = [a for a in args if a not in ('--debug', '--flat')]
+    args = [a for a in args if a not in ('--debug', '--flat', '--raw')]
     cfg = json.load(open(os.path.join(os.path.dirname(__file__), 'unique_cards.json')))
     names = args or [c['raw'] for c in cfg['cards']]
     by = {c['raw']: c for c in cfg['cards']}
@@ -176,6 +196,8 @@ def main():
         out = fix_corners(out)
         if c.get('erase'):  # [[x0,y0,x1,y1] в долях] — стираем только тёмные штрихи внутри рамки, акварельный фон остаётся
             out = erase(out, c['erase'])
+        if '--raw' not in sys.argv:
+            out = tone(out)
         sub = os.path.join(out_dir, c['coll']) if c.get('coll') and '--flat' not in sys.argv else out_dir
         os.makedirs(sub, exist_ok=True)
         fn = os.path.join(sub, (('%02d' % c['n']) if c.get('n') else name) + ('.jpg'))
