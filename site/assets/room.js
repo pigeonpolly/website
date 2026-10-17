@@ -1451,7 +1451,7 @@
           const lay = layout(), on = room.items[snapOn];
           const bq = (on && isBoxIt(on) && lay.find(q => q.it === on)) || [...lay].reverse().find(q => q.d.box && q.it !== it0 && drag.px >= q.x - 1 && drag.px <= q.x + q.d.w + 1 && drag.py >= q.y - 4 && drag.py <= q.y + q.d.h);
           if (bq) {
-            const t2 = performance.now(); it0.in = bq.it.id; delete it0.from; delete it0.y; lids.set(bq.it, { t: t2, open: 450 }); pops.set(bq.it, t2); hovB = bq.it;
+            const t2 = performance.now(); it0.in = bq.it.id; delete it0.from; delete it0.y; lids.set(bq.it, { t: t2, open: 450 }); pops.set(bq.it, t2);
             sel = -1; selBar.hidden = true; drag = null; snapOn = -1; moved = true; save(); changed(); showTidy(); return;
           }
         }
@@ -1486,13 +1486,15 @@
     // ---------- нажатие на альбом (хозяин и гости) — разворот альбома; хозяин, потащив альбом, его не открывает ----------
     let moved = false;
     const albumAt = e => { const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH; const hit = [...layout()].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h); return hit && isAlbum(hit.it); };
-    cv.addEventListener('click', e => { if (moved) { moved = false; return; } if (!o.preview && !o.still && albumAt(e)) openAlbum(); else if (ptype !== 'mouse' && !o.still && !edit) { const b = boxAt(e); if (b && inBox(b).length) spill(b); } });
-    // коробка: навести мышку (на телефоне — нажать) — вещи выпрыгивают (в ✏️ — нет, чтобы не мешать расставлять); hovB — над какой коробкой мышка уже была (не вываливать снова, пока не уйдёт)
-    let hovB = null, ptype = 'mouse';
+    cv.addEventListener('click', e => { if (moved) { moved = false; return; } if (!o.preview && !o.still && albumAt(e)) openAlbum(); else if (!o.still && !edit) knock(boxAt(e)); });
+    // коробка: нажать 3 раза подряд (мышкой или пальцем) — вещи выпрыгивают; на 1-м и 2-м нажатии крышка вздрагивает. В ✏️ — не открывается
+    let knocks = null;
+    const knock = b => {
+      if (!b || !inBox(b).length) { knocks = null; return; }
+      const now = performance.now(); knocks = knocks && knocks.b === b && now - knocks.t < 900 ? { b, n: knocks.n + 1, t: now } : { b, n: 1, t: now };
+      if (knocks.n >= 3) { knocks = null; spill(b); } else lids.set(b, { t: now, open: 140 });
+    };
     const boxAt = e => { const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH; const hit = [...layout()].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h); return hit && hit.d.box ? hit.it : null; };
-    cv.addEventListener('pointerdown', e => { ptype = e.pointerType; });
-    cv.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse' || e.buttons || drag || o.still) return; const b = edit ? null : boxAt(e); if (b && b !== hovB && inBox(b).length) spill(b); hovB = b; });
-    cv.addEventListener('pointerleave', () => { hovB = null; });
     cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' && !o.mine) cv.style.cursor = albumAt(e) ? 'pointer' : ''; });
     // ---------- название вещи при наведении (видно всем, и гостям): мебель/украшение, иначе окно, шторы, пол, стены ----------
     const tip = document.createElement('div'); tip.className = 'room-tip'; tip.hidden = true; stage.appendChild(tip);
