@@ -145,6 +145,8 @@
 @media (prefers-reduced-motion:reduce){.ts-coffee,.ts-crema{transition:none}.ts-win .ts-fly,.ts-doc .ts-cup{animation:none}}`;
   const st = document.createElement('style'); st.textContent = CSS; document.head.appendChild(st);
 
+  window.PPTitos = Object.assign(window.PPTitos || {}, { kit: { potSvg, setPot, esc } }); // «Жуки» (titos-bugs.js) — тот же кофейник и окно .ts-*
+
   // ---------- карточка игры под кабинетом ----------
   const sec = document.createElement('section'); sec.className = 'rm-sec ts-sec'; sec0.after(sec);
   let S = null; // состояние кофейника (titosState)

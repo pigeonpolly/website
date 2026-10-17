@@ -37,7 +37,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **draw_requests** (worker/index.js): `id` int PK auto, `user_id` int, `anon` text, `text` text nn, `lang` text, `who` text, `status` text ='open', `img` text, `gift` text, `created_at` int, `answered_at` int; + `text_en` text, `ip` text, `text_ru` text, `text_lv` text
 - **draw_likes** (worker/index.js): `rid` int nn, `kind` text nn, `who` text nn, `created_at` int; PRIMARY KEY (rid, kind, who)
 - **potion_gifts** (worker/index.js): `id` int PK auto, `to_id` int nn, `from_nick` text, `ing` text nn, `n` int nn, `created_at` int, `seen` int =0
-- **titos** (worker/titos.js): `user_id` int PK, `level` int =0, `coffee` int =10, `coffee_at` int =0, `drink_at` int =0, `sleep` int =0, `run` int =0, `found` text ='[]', `started` int =0, `bugs` text ='[]', `sell_day` text ='', `sell_n` int =0, `legacy` int =0; + `sort_lv` int =0, `sort_run` text =''
+- **titos** (worker/titos.js): `user_id` int PK, `level` int =0, `coffee` int =10, `coffee_at` int =0, `drink_at` int =0, `sleep` int =0, `run` int =0, `found` text ='[]', `started` int =0, `bugs` text ='[]', `sell_day` text ='', `sell_n` int =0, `legacy` int =0; + `sort_lv` int =0, `sort_run` text ='', `bugs_run` int =0 («Жуки»: начало открытой игры, мс)
 - **titos_cases** (worker/titos.js): `n` int PK, `data` text nn, `tr` text ='{}', `hash` text, `updated_at` int
 
 ## Ключи meta (34)

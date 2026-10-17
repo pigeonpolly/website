@@ -15,6 +15,7 @@
     soon: ['Sign in to top up', 'Войдите, чтобы долить', 'Ieej, lai uzpildītu'],
     ask: [n => `Fill the coffee pot for ${n} 🔘?`, n => `Долить кофейник за ${n} 🔘?`, n => `Uzpildīt kafijas kannu par ${n} 🔘?`],
     poor: ['Not enough buttons', 'Не хватает пуговок', 'Nepietiek pogu'],
+    err: ['Something went wrong. Try again.', 'Что-то пошло не так. Попробуйте ещё раз.', 'Kaut kas nogāja greizi. Mēģini vēlreiz.'],
     sleep: ['“I am not asleep. I am analysing with my eyes closed.”', '«Я не сплю. Я анализирую с закрытыми глазами.»', '“Es neguļu. Es analizēju ar aizvērtām acīm.”'],
     awake: ['“Coffee is not a drink. It is a method of investigation.”', '«Кофе — это не напиток. Это метод расследования.»', '“Kafija nav dzēriens. Tā ir izmeklēšanas metode.”'],
     rewards: ['Rewards for levels', 'Награды за уровни', 'Balvas par līmeņiem'],
@@ -116,7 +117,7 @@
     try {
       const r = await fetch('/api/titos/coffee', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ src: 'buy' }), credentials: 'same-origin' });
       const j = await r.json().catch(() => ({}));
-      if (j.state) take(j.state); else if (r.status === 402) (window.PPToast || alert)(t(T.poor));
+      if (j.state) take(j.state); else (window.PPToast || alert)(t(r.status === 402 ? T.poor : T.err));
       if (j.paid && window.PPAccount) window.PPAccount.check(); // пуговки в шапке
     } catch (e) { /* сеть — кнопка останется */ }
   };

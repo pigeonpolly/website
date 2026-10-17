@@ -513,6 +513,7 @@
         row('«Разбери дела»: уровень не засчитывается, если пройден быстрее, чем по … с на документ', num('titosSortSec', R.titosSortSec, D.titosSortSec) + ' с', D.titosSortSec + ' с', 'защита от подделки (если быстрее — игра чуть подождёт)'),
         row('«Разбери дела»: смыть кляксу', num('titosBlotBtn', R.titosBlotBtn, D.titosBlotBtn) + ' 🔘', D.titosBlotBtn + ' 🔘', '0 — кнопки «Смыть» нет, только угадать'),
         row('«Жуки» — за игру', num('titosBugsCups', R.titosBugsCups, D.titosBugsCups) + ' чаш., не чаще ' + num('titosBugsPerHour', R.titosBugsPerHour, D.titosBugsPerHour, 1, 50) + ' раз в час', `${D.titosBugsCups} · ${D.titosBugsPerHour}`),
+        row('«Жуки»: игра не засчитывается, если пройдена быстрее, чем за', num('titosBugsSec', R.titosBugsSec, D.titosBugsSec) + ' с', D.titosBugsSec + ' с', 'защита от подделки (если быстрее — игра чуть подождёт)'),
         row('«☕ Долить» полный кофейник', pct('titosRefillPct') + ` → сейчас ${G.titosRefill} 🔘`, D.titosRefillPct + ' %'),
         row('Лишний кофе (кофейник полный) — пуговки за чашку', pct('titosSellPct') + ` → сейчас ${G.titosSell} 🔘`, D.titosSellPct + ' %', 'не меньше 1 🔘'),
         row('…не больше чашек в сутки', num('titosSellDayMax', R.titosSellDayMax, D.titosSellDayMax) + ' чаш.', D.titosSellDayMax, '0 — лишний кофе не продаётся'),
