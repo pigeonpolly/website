@@ -1,15 +1,29 @@
-<!-- хаб «Играть» (этап 14 Б — пока список; часть В: баннер магазина, ряды карточек с миниатюрами, готовность из /api/today) -->
+<!-- хаб «Играть» (этап 14 В): магазин баннером, ряды карточек, готовность вошедшим из /api/today (games-hub.js) -->
 <section class="page-head">
   <p class="topics">games · buttons · shop</p>
   <h1>Games</h1>
   <p class="lead">Play, earn buttons 🔘 and spend them in the shop on things for your bird.</p>
 </section>
-<section class="gm-list">
-  <a class="gm-shop" href="/shop/"><i class="ns-i" aria-hidden="true">🛍</i><span class="ns-t">Shop</span><small class="ns-d">Hats, scarves and room things for buttons</small></a>
-  <a href="/rain/"><i class="ns-i" aria-hidden="true">🔘</i><span class="ns-t">Button Rain</span><small class="ns-d">Catch buttons, dodge ink blots</small></a>
-  <a href="/potions/"><i class="ns-i" aria-hidden="true">🧪</i><span class="ns-t">Potion Lab</span><small class="ns-d">A maze, ingredients and potions with silly names</small></a>
-  <a href="/titos/"><i class="ns-i" aria-hidden="true">🕵️</i><span class="ns-t">Detective Titos</span><small class="ns-d">100 cases and one very perky detective</small></a>
-  <a href="/polly-office/"><i class="ns-i" aria-hidden="true">📮</i><span class="ns-t">Polly’s Office</span><small class="ns-d">Help Polly with the Council of Towns’ mail</small></a>
-  <a href="/wobbleland/"><i class="ns-i" aria-hidden="true">🗺</i><span class="ns-t">Wobbleland</span><small class="ns-d">Map, holidays and recipes of eleven towns</small></a>
-  <a href="/advent/"><i class="ns-i" aria-hidden="true">🎄</i><span class="ns-t">Advent calendar</span><small class="ns-d">31 windows with gifts</small></a>
+<a class="gm-shop" href="/shop/"><img src="/images/games/shop.jpg" alt="" loading="lazy"><span class="gm-shop-txt"><b>🛍 Shop</b><i>Hats, scarves and room things for buttons</i><em>Go to the shop →</em></span></a>
+<section class="gm-row">
+  <h2 class="gm-h">Games for buttons</h2>
+  <div class="am-tiles gm-tiles">
+    <a class="am-tile gm-tile" href="/rain/" data-g="rain"><img src="/images/games/rain.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Button Rain</b><i>Catch buttons, dodge ink blots</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🔘</span></a>
+    <a class="am-tile gm-tile" href="/potions/" data-g="potion"><img src="/images/games/potions.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Potion Lab</b><i>A maze, ingredients and potions with silly names</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🧪</span></a>
+    <a class="am-tile gm-tile" href="/titos/" data-g="titos"><img src="/images/games/titos.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Detective Titos</b><i>100 cases and one very perky detective</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🕵️</span></a>
+  </div>
 </section>
+<section class="gm-row">
+  <h2 class="gm-h">Polly’s world</h2>
+  <div class="am-tiles gm-tiles">
+    <a class="am-tile gm-tile" href="/polly-office/"><img src="/images/games/polly-office.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Polly’s Office</b><i>Help Polly with the Council of Towns’ mail</i></span><span class="am-tile-ico" aria-hidden="true">📮</span></a>
+    <a class="am-tile gm-tile" href="/wobbleland/"><img src="/images/games/wobbleland.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Wobbleland</b><i>Map, holidays and recipes of eleven towns</i></span><span class="am-tile-ico" aria-hidden="true">🗺</span></a>
+  </div>
+</section>
+<section class="gm-row">
+  <h2 class="gm-h">Seasonal fun</h2>
+  <div class="am-tiles gm-tiles">
+    <a class="am-tile gm-tile" href="/advent/" data-g="advent"><img src="/images/games/advent.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Advent calendar</b><i>31 windows with gifts</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🎄</span></a>
+  </div>
+</section>
+<script src="/assets/games-hub.js" defer></script>

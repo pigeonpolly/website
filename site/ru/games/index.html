@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=6abc8bdb">
+<link rel="stylesheet" href="/assets/style.css?v=891bb2ea">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <script src="/assets/site.js?v=8d4eda6f" defer></script>
 <script src="/assets/polly.js?v=573aaaf7" defer></script>
@@ -74,21 +74,35 @@
   </nav>
 </header>
 <main id="main">
-<!-- хаб «Играть» (этап 14 Б — пока список; часть В: баннер магазина, ряды карточек с миниатюрами, готовность из /api/today) -->
+<!-- хаб «Играть» (этап 14 В): магазин баннером, ряды карточек, готовность вошедшим из /api/today (games-hub.js) -->
 <section data-ppb="games.1" class="page-head">
   <p class="topics">игры · пуговки · магазин</p>
   <h1>Игры</h1>
   <p class="lead">Играй, копи пуговки 🔘 и трать их в магазине на вещи для своей птички.</p>
 </section>
-<section data-ppb="games.2" class="gm-list">
-  <a class="gm-shop" href="/ru/shop/"><i class="ns-i" aria-hidden="true">🛍</i><span class="ns-t">Магазин</span><small class="ns-d">Шапки, шарфы и вещи для комнаты за пуговки</small></a>
-  <a href="/ru/rain/"><i class="ns-i" aria-hidden="true">🔘</i><span class="ns-t">Пуговичный дождь</span><small class="ns-d">Лови пуговки, уворачивайся от клякс</small></a>
-  <a href="/ru/potions/"><i class="ns-i" aria-hidden="true">🧪</i><span class="ns-t">Зельеварня</span><small class="ns-d">Лабиринт, ингредиенты и зелья с дурацкими именами</small></a>
-  <a href="/ru/titos/"><i class="ns-i" aria-hidden="true">🕵️</i><span class="ns-t">Детектив Титос</span><small class="ns-d">100 дел и один очень бодрый детектив</small></a>
-  <a href="/ru/polly-office/"><i class="ns-i" aria-hidden="true">📮</i><span class="ns-t">Офис Полли</span><small class="ns-d">Помоги Полли с почтой Совета городов</small></a>
-  <a href="/ru/wobbleland/"><i class="ns-i" aria-hidden="true">🗺</i><span class="ns-t">Воббленд</span><small class="ns-d">Карта, праздники и рецепты одиннадцати городов</small></a>
-  <a href="/ru/advent/"><i class="ns-i" aria-hidden="true">🎄</i><span class="ns-t">Адвент</span><small class="ns-d">31 окошко с подарками</small></a>
+<a class="gm-shop" href="/ru/shop/"><img src="/images/games/shop.jpg" alt="" loading="lazy"><span class="gm-shop-txt"><b>🛍 Магазин</b><i>Шапки, шарфы и вещи для комнаты за пуговки</i><em>В магазин →</em></span></a>
+<section data-ppb="games.2" class="gm-row">
+  <h2 class="gm-h">Игры за пуговки</h2>
+  <div class="am-tiles gm-tiles">
+    <a class="am-tile gm-tile" href="/ru/rain/" data-g="rain"><img src="/images/games/rain.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Пуговичный дождь</b><i>Лови пуговки, уворачивайся от клякс</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🔘</span></a>
+    <a class="am-tile gm-tile" href="/ru/potions/" data-g="potion"><img src="/images/games/potions.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Зельеварня</b><i>Лабиринт, ингредиенты и зелья с дурацкими именами</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🧪</span></a>
+    <a class="am-tile gm-tile" href="/ru/titos/" data-g="titos"><img src="/images/games/titos.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Детектив Титос</b><i>100 дел и один очень бодрый детектив</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🕵️</span></a>
+  </div>
 </section>
+<section data-ppb="games.3" class="gm-row">
+  <h2 class="gm-h">Мир Полли</h2>
+  <div class="am-tiles gm-tiles">
+    <a class="am-tile gm-tile" href="/ru/polly-office/"><img src="/images/games/polly-office.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Офис Полли</b><i>Помоги Полли с почтой Совета городов</i></span><span class="am-tile-ico" aria-hidden="true">📮</span></a>
+    <a class="am-tile gm-tile" href="/ru/wobbleland/"><img src="/images/games/wobbleland.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Воббленд</b><i>Карта, праздники и рецепты одиннадцати городов</i></span><span class="am-tile-ico" aria-hidden="true">🗺</span></a>
+  </div>
+</section>
+<section data-ppb="games.4" class="gm-row">
+  <h2 class="gm-h">Сезонное</h2>
+  <div class="am-tiles gm-tiles">
+    <a class="am-tile gm-tile" href="/ru/advent/" data-g="advent"><img src="/images/games/advent.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Адвент</b><i>31 окошко с подарками</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🎄</span></a>
+  </div>
+</section>
+<script src="/assets/games-hub.js?v=af4e1bb2" defer></script>
 
 </main>
 <dialog class="modal" id="contact" aria-labelledby="contact-t">

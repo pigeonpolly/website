@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=6abc8bdb">
+<link rel="stylesheet" href="/assets/style.css?v=891bb2ea">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <script src="/assets/site.js?v=8d4eda6f" defer></script>
 <script src="/assets/polly.js?v=573aaaf7" defer></script>
@@ -74,21 +74,35 @@
   </nav>
 </header>
 <main id="main">
-<!-- хаб «Играть» (этап 14 Б — пока список; часть В: баннер магазина, ряды карточек с миниатюрами, готовность из /api/today) -->
+<!-- хаб «Играть» (этап 14 В): магазин баннером, ряды карточек, готовность вошедшим из /api/today (games-hub.js) -->
 <section data-ppb="games.1" class="page-head">
   <p class="topics">spēles · pogas · veikals</p>
   <h1>Spēles</h1>
   <p class="lead">Spēlē, krāj pogas 🔘 un tērē tās veikalā lietām savam putniņam.</p>
 </section>
-<section data-ppb="games.2" class="gm-list">
-  <a class="gm-shop" href="/lv/shop/"><i class="ns-i" aria-hidden="true">🛍</i><span class="ns-t">Veikals</span><small class="ns-d">Cepures, šalles un istabas lietas par pogām</small></a>
-  <a href="/lv/rain/"><i class="ns-i" aria-hidden="true">🔘</i><span class="ns-t">Pogu lietus</span><small class="ns-d">Ķer pogas, izvairies no tintes traipiem</small></a>
-  <a href="/lv/potions/"><i class="ns-i" aria-hidden="true">🧪</i><span class="ns-t">Dziru virtuve</span><small class="ns-d">Labirints, sastāvdaļas un dziras ar dīvainiem nosaukumiem</small></a>
-  <a href="/lv/titos/"><i class="ns-i" aria-hidden="true">🕵️</i><span class="ns-t">Detektīvs Titoss</span><small class="ns-d">100 lietu un viens ļoti možs detektīvs</small></a>
-  <a href="/lv/polly-office/"><i class="ns-i" aria-hidden="true">📮</i><span class="ns-t">Pollijas birojs</span><small class="ns-d">Palīdzi Pollijai ar Pilsētu padomes pastu</small></a>
-  <a href="/lv/wobbleland/"><i class="ns-i" aria-hidden="true">🗺</i><span class="ns-t">Wobbleland</span><small class="ns-d">Vienpadsmit pilsētu karte, svētki un receptes</small></a>
-  <a href="/lv/advent/"><i class="ns-i" aria-hidden="true">🎄</i><span class="ns-t">Adventes kalendārs</span><small class="ns-d">31 lodziņš ar dāvanām</small></a>
+<a class="gm-shop" href="/lv/shop/"><img src="/images/games/shop.jpg" alt="" loading="lazy"><span class="gm-shop-txt"><b>🛍 Veikals</b><i>Cepures, šalles un istabas lietas par pogām</i><em>Uz veikalu →</em></span></a>
+<section data-ppb="games.2" class="gm-row">
+  <h2 class="gm-h">Spēles par pogām</h2>
+  <div class="am-tiles gm-tiles">
+    <a class="am-tile gm-tile" href="/lv/rain/" data-g="rain"><img src="/images/games/rain.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Pogu lietus</b><i>Ķer pogas, izvairies no tintes traipiem</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🔘</span></a>
+    <a class="am-tile gm-tile" href="/lv/potions/" data-g="potion"><img src="/images/games/potions.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Dziru virtuve</b><i>Labirints, sastāvdaļas un dziras ar dīvainiem nosaukumiem</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🧪</span></a>
+    <a class="am-tile gm-tile" href="/lv/titos/" data-g="titos"><img src="/images/games/titos.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Detektīvs Titoss</b><i>100 lietu un viens ļoti možs detektīvs</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🕵️</span></a>
+  </div>
 </section>
+<section data-ppb="games.3" class="gm-row">
+  <h2 class="gm-h">Pollijas pasaule</h2>
+  <div class="am-tiles gm-tiles">
+    <a class="am-tile gm-tile" href="/lv/polly-office/"><img src="/images/games/polly-office.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Pollijas birojs</b><i>Palīdzi Pollijai ar Pilsētu padomes pastu</i></span><span class="am-tile-ico" aria-hidden="true">📮</span></a>
+    <a class="am-tile gm-tile" href="/lv/wobbleland/"><img src="/images/games/wobbleland.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Wobbleland</b><i>Vienpadsmit pilsētu karte, svētki un receptes</i></span><span class="am-tile-ico" aria-hidden="true">🗺</span></a>
+  </div>
+</section>
+<section data-ppb="games.4" class="gm-row">
+  <h2 class="gm-h">Sezonas prieki</h2>
+  <div class="am-tiles gm-tiles">
+    <a class="am-tile gm-tile" href="/lv/advent/" data-g="advent"><img src="/images/games/advent.jpg" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Adventes kalendārs</b><i>31 lodziņš ar dāvanām</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🎄</span></a>
+  </div>
+</section>
+<script src="/assets/games-hub.js?v=af4e1bb2" defer></script>
 
 </main>
 <dialog class="modal" id="contact" aria-labelledby="contact-t">

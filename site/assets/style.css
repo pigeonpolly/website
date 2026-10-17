@@ -4504,11 +4504,24 @@ html.me-in .home-new:not([hidden]) { display: block; }
 @media (max-width: 900px) { .ft-map { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 @media (max-width: 520px) { .ft-map { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 /* /games/ — пока список (часть В заменит карточками) */
-.gm-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; max-width: 1100px; padding: 8px var(--gutter) 64px; }
-.gm-list a { display: grid; grid-template-columns: 34px 1fr; column-gap: 10px; padding: 16px; border-radius: 16px; background: var(--bg-card); color: var(--text); text-decoration: none; }
-.gm-list a:hover { background: #42306f; }
-.gm-list .ns-i { grid-row: span 2; font-style: normal; font-size: 24px; }
-.gm-list .ns-t { font: 700 17px var(--sans); }
-.gm-list .ns-d { color: var(--muted); font-size: 14px; }
-.gm-list .gm-shop { grid-column: 1 / -1; background: var(--peach); color: #2B1A51; }
-.gm-list .gm-shop .ns-d { color: #4A3F6B; }
+/* хаб «Играть» (этап 14 В): магазин баннером, ряды карточек как .am-tiles */
+.gm-shop { position: relative; display: block; max-width: calc(1200px - 2 * var(--gutter)); margin: 0 var(--gutter) 40px; min-height: 180px; border-radius: 20px; overflow: hidden; background: var(--peach); color: #2B1A51; text-decoration: none; box-shadow: 0 12px 30px rgba(0, 0, 0, .3); }
+.gm-shop img { position: absolute; right: 0; top: 0; width: 58%; height: 100%; object-fit: cover; object-position: left center; -webkit-mask-image: linear-gradient(to right, transparent, #000 40%); mask-image: linear-gradient(to right, transparent, #000 40%); }
+.gm-shop-txt { position: relative; display: grid; gap: 6px; max-width: 520px; padding: 32px; }
+.gm-shop-txt b { font: 600 30px/1.1 var(--serif); }
+.gm-shop-txt i { font-style: normal; font-size: 16px; color: #4A3F6B; }
+.gm-shop-txt em { justify-self: start; margin-top: 8px; padding: 9px 18px; border-radius: 99px; background: #2B1A51; color: #FFFDF8; font: 700 15px var(--sans); font-style: normal; }
+.gm-shop:hover { color: #2B1A51; } .gm-shop:hover em { background: #42306f; }
+.gm-row { max-width: 1200px; margin: 0 0 40px; }
+.gm-h { margin: 0 var(--gutter) 14px; font: 600 24px var(--serif); }
+.gm-tiles { grid-template-columns: repeat(3, minmax(0, 1fr)); margin: 0; }
+.gm-tile { aspect-ratio: 4 / 3; }
+.gm-tile .am-tile-txt b { font-family: var(--serif); }
+.gm-ready { justify-self: start; margin-top: 4px; padding: 3px 10px; border-radius: 99px; background: rgba(255, 253, 245, .92); color: #2B1A51; font: 700 13px var(--sans); font-style: normal; text-shadow: none; }
+.gm-ready.on { background: var(--peach); }
+@media (max-width: 900px) { .gm-tiles { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+@media (max-width: 600px) {
+  .gm-tiles { grid-template-columns: 1fr; }
+  .gm-shop { min-height: 0; } .gm-shop img { position: static; display: block; width: 100%; height: auto; aspect-ratio: 13 / 5; -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent); mask-image: linear-gradient(to bottom, #000 60%, transparent); }
+  .gm-shop-txt { padding: 4px 20px 22px; } .gm-shop-txt b { font-size: 26px; }
+}

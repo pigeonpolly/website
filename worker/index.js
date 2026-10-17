@@ -737,8 +737,8 @@ async function dayCard(env, req, u, L, withLog) {
     potion: { done: cnt('potion') > 0, reward: gp.p1, at: at('potion') },
     // дело: новое раскрытое за сутки; ждёт — нет кофе на старт (до следующей чашки) или все дела раскрыты (новое появится само)
     titos: { done: stamped('titos') || cnt('titos') > 0, at: at('titos'), reward: RULES.titosOn ? btnOf(RULES.titosLevelPct, unit) * (1 + Math.floor((tl - 1) / 10)) : 0,
-      wait: ts.level >= cases && cases ? -1 : !ts.run && ts.coffee < RULES.titosStartCups ? ts.next : null },
-    bugs: { done: stamped('bugs'), at: at('bugs'), coffee: RULES.titosBugsCups, wait: ts.bugsLeft ? null : ts.bugsNext },
+      wait: ts.level >= cases && cases ? -1 : !ts.run && ts.coffee < RULES.titosStartCups ? ts.next : null, cups: [ts.coffee, ts.max] }, // cups — для хаба /games/ («☕ 7/10»)
+    bugs: { done: stamped('bugs'), at: at('bugs'), coffee: RULES.titosBugsCups, wait: ts.bugsLeft ? null : ts.bugsNext, next: ts.bugsNext },
     advent: { done: !!adv, at: adv ? adv.created_at : 0, reward: ADVENT_SPECIAL.includes(t.day) ? BTN.adventSpecial : BTN.advent },
   };
   const pre = ['', '/ru', '/lv'][L];
