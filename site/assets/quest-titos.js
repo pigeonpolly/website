@@ -44,7 +44,8 @@
     loginMore: ['Sign in to open the next cases and earn buttons.', 'Войдите, чтобы открыть следующие дела и получать пуговки.', 'Ienāc, lai atvērtu nākamās lietas un saņemtu pogas.'],
     err: ['Something went wrong. Try again.', 'Что-то пошло не так. Попробуйте ещё раз.', 'Kaut kas nogāja greizi. Mēģini vēlreiz.'],
     total: [(n, m) => `📁 Cases on the site: ${n} of ${m}`, (n, m) => `📁 Дел на сайте: ${n} из ${m}`, (n, m) => `📁 Lietas vietnē: ${n} no ${m}`],
-    allDone: ['That was the last case on the site so far. All solved! New cases are coming soon: they will open here on their own, and Titos is already brewing coffee for them.', 'Это последнее дело на сайте — пока. Всё раскрыто! Новые дела скоро появятся и откроются здесь сами, а Титос уже варит для них кофе.', 'Šī ir pēdējā lieta vietnē — pagaidām. Viss atrisināts! Jaunas lietas drīz parādīsies un atvērsies šeit pašas, un Titoss jau vāra tām kafiju.'],
+    allDone: [(n, m) => `That was the last case on the site so far — you have solved them all! Cases ${n + 1}–${m} are still in development. They will open here on their own, and Titos is already brewing coffee for them.`, (n, m) => `Это последнее дело на сайте — пока. Всё раскрыто! Дела ${n + 1}–${m} ещё в разработке. Они откроются здесь сами, а Титос уже варит для них кофе.`, (n, m) => `Šī ir pēdējā lieta vietnē — pagaidām. Viss atrisināts! Lietas ${n + 1}–${m} vēl tiek izstrādātas. Tās atvērsies šeit pašas, un Titoss jau vāra tām kafiju.`],
+    devNote: [(n, m) => `🛠 All cases on the site are solved. Cases ${n + 1}–${m} are in development and will open here on their own.`, (n, m) => `🛠 Все дела на сайте раскрыты. Дела ${n + 1}–${m} в разработке — они откроются здесь сами.`, (n, m) => `🛠 Visas lietas vietnē ir atrisinātas. Lietas ${n + 1}–${m} tiek izstrādātas un atvērsies šeit pašas.`],
     got: [n => `+${n} 🔘 for the case`, n => `+${n} 🔘 за дело`, n => `+${n} 🔘 par lietu`],
   };
   // ---------- дело с сервера (content/titos/NNN.json, язык страницы) → то, что рисует движок ----------
@@ -167,7 +168,8 @@
       `<span class="q-stat">${t(UI.total)(srv.top, LEVELS)}</span>` + cup +
       (st.solved ? `<span class="q-stat">✅ ${t(UI.solvedT)}</span><button type="button" data-q="again">${t(UI.again)}</button>`
       : `<span class="q-stat">${t(UI.clues)}: ${st.pinned.length}/${N}</span>${(K.scenes || []).map((s, i) => `<button type="button" data-q="scene" data-i="${i}">${t(UI.scene)}${K.scenes.length > 1 ? ' ' + (i + 1) : ''}</button>`).join('')}<button type="button" data-q="board">${t(UI.board)}</button>`) +
-      (!srv.on && K.no >= 2 ? `<span class="q-m">${t(UI.loginMore)}</span>` : '');
+      (!srv.on && K.no >= 2 ? `<span class="q-m">${t(UI.loginMore)}</span>` : '') +
+      (srv.on && srv.top < LEVELS && (srv.state.level || 0) >= srv.top ? `<span class="q-m">${t(UI.devNote)(srv.top, LEVELS)}</span>` : ''); // дошли до последнего дела — остальные в разработке
     pockets.innerHTML = `<span>${t(UI.inv)}:</span>` + (st.mag ? '<img src="/images/rooms/prop-mag.png" alt="" title="🔍">' : '') +
       st.found.filter(id => !st.pinned.includes(id)).map(id => `<button type="button" data-open="${id}" title="${esc(t(C[id].title))}">${ico(id)}${esc(t(C[id].title))}</button>`).join('');
     ORDER.forEach(id => { const sp = sprites[id]; if (sp) sp.hidden = st.pinned.includes(id) || st.solved; });
@@ -238,7 +240,7 @@
       A.coffee.sip && setTimeout(() => A.coffee.sip(true), 900); return;
     }
     st.solved = true; save(); A.coffee.on = false; draw();
-    card(`<div class="q-stamp">${t(UI.solvedT)}</div><p class="q-verdict">${esc(r.text)}</p>${r.buttons ? `<p class="q-kick">${t(UI.got)(r.buttons)}</p>` : ''}${K.no >= srv.top && srv.top < LEVELS ? `<p class="q-m">${t(UI.allDone)}</p>` : ''}`);
+    card(`<div class="q-stamp">${t(UI.solvedT)}</div><p class="q-verdict">${esc(r.text)}</p>${r.buttons ? `<p class="q-kick">${t(UI.got)(r.buttons)}</p>` : ''}${K.no >= srv.top && srv.top < LEVELS ? `<p class="q-m">${t(UI.allDone)(srv.top, LEVELS)}</p>` : ''}`);
     if (r.buttons && window.PPToast) PPToast(t(UI.got)(r.buttons));
     goHome();
   };
