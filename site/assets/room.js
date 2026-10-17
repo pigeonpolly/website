@@ -966,6 +966,8 @@
   // ---------- комната ----------
   const T = {
     of: ['Room of @{n}', 'Комната @{n}', '@{n} istaba'], saved: ['Saved ✓', 'Сохранено ✓', 'Saglabāts ✓'], saving: ['Saving…', 'Сохраняю…', 'Saglabāju…'], err: ['Could not save', 'Не получилось сохранить', 'Neizdevās saglabāt'],
+    hintOff: ['Tap ✏️ to move things', 'Чтобы двигать вещи — нажать ✏️', 'Lai pārvietotu lietas — nospied ✏️'],
+    editOn: ['Arrange the room', 'Обустроить комнату', 'Iekārtot istabu'], editOff: ['Done', 'Готово', 'Gatavs'],
     hint: ['Drag things around · tap one for ⇆ ⬆ ⬇ ↩', 'Вещи можно двигать · нажатие на вещь — ⇆ ⬆ ⬇ ↩', 'Lietas var pārvietot · pieskaries lietai — ⇆ ⬆ ⬇ ↩'],
     tidy: ['🧹 Tidy up', '🧹 Прибраться', '🧹 Sakopt'],
     lightOff: ['Turn the light off', 'Выключить свет', 'Izslēgt gaismu'], lightOn: ['Turn the light on', 'Включить свет', 'Ieslēgt gaismu'],
@@ -1007,14 +1009,14 @@
 
   function mount(box, o) {
     let room = Object.assign({ items: [] }, o.room || {}); room.items = (room.items || []).filter(it => defOf(it.k, it.v));
-    const edit = !!o.mine; // своя комната правится всегда прямо на месте (этап 5 Б), у гостей — только смотреть
+    let edit = false; // своя комната правится после нажатия ✏️ (иначе случайное касание двигает вещи), у гостей — только смотреть
     let sel = -1, saveT = 0, drag = null, flash = 0;
     let tidy = null; // «🧹 Прибраться»: { carry } — птичка относит выпавшие вещи в их коробки (этап 11 Г)
     const jumps = new Map(), lids = new Map(); // вещь → полёт из коробки; коробка → когда приоткрыта крышка
     const pops = new Map(); // вещь → когда «плюхнулась» (подскок)
     box.classList.add('room');
     box.innerHTML = `<div class="room-stage"><canvas class="room-cv" width="${RW}" height="${RH}" aria-label="${t('of').replace('{n}', o.nick)}" role="img"></canvas></div>
-      <div class="room-bar"><span class="room-cap">🏠 ${t('of').replace('{n}', o.nick)}</span>${o.mine ? `<span class="room-hint">${t('hint')}</span><button type="button" class="room-tidy" hidden></button><button type="button" class="room-light"></button><span class="room-st" aria-live="polite"></span>` : ''}</div>`;
+      <div class="room-bar"><span class="room-cap">🏠 ${t('of').replace('{n}', o.nick)}</span>${o.mine ? `<span class="room-hint">${t('hintOff')}</span><button type="button" class="room-tidy" hidden></button><button type="button" class="room-edit" aria-pressed="false"></button><button type="button" class="room-light"></button><span class="room-st" aria-live="polite"></span>` : ''}</div>`;
     const cv = box.querySelector('canvas'), stage = box.querySelector('.room-stage');
     const S = 4; cv.width = RW * S; cv.height = RH * S;
     const g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
@@ -1274,6 +1276,15 @@
     const lightBtn = box.querySelector('.room-light');
     const showLight = () => { if (!lightBtn) return; lightBtn.textContent = dark() ? '🌙' : '💡'; lightBtn.title = t(dark() ? 'lightOn' : 'lightOff'); lightBtn.setAttribute('aria-label', lightBtn.title); lightBtn.setAttribute('aria-pressed', String(dark())); };
     if (lightBtn) { showLight(); lightBtn.onclick = () => { if (dark()) delete room.light; else room.light = 0; showLight(); save(); changed(); }; }
+    // ✏️ — режим обустройства: только в нём вещи тянутся и выбираются
+    const editBtn = box.querySelector('.room-edit'), hintEl = box.querySelector('.room-hint');
+    const setEdit = on => {
+      edit = !!on && !!o.mine; box.classList.toggle('editing', edit);
+      if (!edit) { sel = -1; drag = null; selBar.hidden = true; }
+      if (editBtn) { editBtn.textContent = edit ? '✓' : '✏️'; editBtn.title = t(edit ? 'editOff' : 'editOn'); editBtn.setAttribute('aria-label', editBtn.title); editBtn.setAttribute('aria-pressed', String(edit)); }
+      if (hintEl) hintEl.textContent = t(edit ? 'hint' : 'hintOff');
+    };
+    if (editBtn) { setEdit(false); editBtn.onclick = () => setEdit(!edit); }
     // ---------- хозяин: обустройство ----------
     const owned = () => { const m = {}; ((o.me && o.me.gifts) || []).forEach(x => { if (x.status === 'bag' && isRoom(x.kind)) m[x.kind + '|' + x.item] = (m[x.kind + '|' + x.item] || 0) + 1; }); return m; };
     const placed = key => room.items.filter(it => it.k + '|' + it.v === key).length;
@@ -1299,7 +1310,7 @@
     function placeSel(lay) {
       if (!o.mine) return;
       const q = sel >= 0 && lay.find(z => z.idx === sel);
-      if (!q) { selBar.hidden = true; return; }
+      if (!q || !edit) { selBar.hidden = true; return; }
       selBar.hidden = false; selBar.querySelector('[data-back]').hidden = isAlbum(q.it); // альбом в сумку не убрать
       const below = q.y / RH * stage.clientHeight < 58, cx = Math.max(14, Math.min(86, (q.x + q.d.w / 2) / RW * 100));
       selBar.style.left = cx + '%'; selBar.style.top = ((below ? q.y + q.d.h : q.y) / RH * 100) + '%';
@@ -1324,14 +1335,14 @@
       if (placed(key) >= own) { const q = [...layout()].reverse().find(z => z.it.k + '|' + z.it.v === key); if (q) { sel = q.idx; flash = performance.now(); } return { done: 'there' }; }
       const sp = freeSpot(layout(), d, kind), it = { k: kind, v, x: sp.x, y: sp.y };
       if (d.box) it.id = newId();
-      room.items.push(it); sel = room.items.length - 1; pops.set(it, performance.now());
+      room.items.push(it); if (o.mine && !o.preview) setEdit(true); sel = room.items.length - 1; pops.set(it, performance.now()); // новую вещь сразу можно подвинуть
       setTimeout(() => { for (let i = 0; i < 7; i++) emit('dust', it.x + Math.random() * d.w, it.y + d.h - 1, 1, true); }, 240); // пылинки при «плюх»
       setTimeout(() => lookAt(it), 300);
       save(); changed();
       return { done: 'put', undo: () => { const i = room.items.indexOf(it); if (i < 0) return; room.items.splice(i, 1); sel = sel === i ? -1 : sel > i ? sel - 1 : sel; save(); changed(); } };
     }
     const api = { use, mine: !!o.mine, box, dress: av => { FR = [0, 1, 2].map(f => B.sprite(B.dress(B.looks(o.id), av || {}), f)); } };
-    if (o.mine) { window.PPRoom.live = api; box.classList.add('editing'); }
+    if (o.mine) window.PPRoom.live = api;
     if (o.mine) {
       selBar.querySelector('[data-flip]').onclick = () => { const it = room.items[sel]; if (it) { it.f = it.f ? 0 : 1; save(); } };
       selBar.querySelector('[data-back]').onclick = () => { if (sel < 0 || isAlbum(room.items[sel])) return;
