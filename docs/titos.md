@@ -119,3 +119,7 @@ build.py собирает все дела в site/assets/titos-cases.json.
 - content/titos/033–042.json: виновные и трюки — в content/titos/index.md; у всех 4 подозреваемых, 6–7 улик, лупа (`lens` + `pre`), 1 ложный след с `refutes`, одна сцена с уликой и допросом виновного.
 - Вещи-награды — room.js блок «награды за дела Титоса»: tcmossjar, tcgoldacorn (блик), tchalfloaf, tcsleepsign (мигает «z»), tcwormletter (сердце бьётся), tcflowerclock, tcpumpkinphoto, tcrecipe, tcchestnuts (пар), tctrophy (блик).
 - Свободных виновных среди жителей titos-cast.md больше нет (кроме Полли и самого Титоса) — дальше виновные повторяются с новыми трюками или нужны новые жители.
+
+## Дела №43–52 (этап 10-5)
+- content/titos/043–052.json: второй круг виновных (решение Алины): жители снова виновны, но с новым трюком; titos_check.py — `ROUND1 = 42`, повтор виновного запрещён только внутри круга (3–42, 43+). У всех 4 подозреваемых, 6 улик, лупа, 1 ложный след с `refutes`, сцена с уликой и допросом виновного.
+- Вещи-награды — room.js блок «награды за дела Титоса»: tcsyrup, tcduck, tctrumpet, tctag, tcspool, tcleafmail, tcpaper, tcradiator, tchammock, tcraingauge.

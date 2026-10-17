@@ -23,6 +23,8 @@ CAST = {r["key"] for r in cast()}
 REWARDS = set(re.findall(r"^\s+(tc[a-z]+): TC\(", (ROOT / "site" / "assets" / "room.js").read_text(), re.M))
 TEXT_KEYS = {"title", "ask", "intro", "solved", "bye", "name", "alibi", "wrong", "text", "pre", "q", "a", "say"}
 # сложность по номеру: улик (от, до), подозреваемых (от, до), ложных следов (от, до), нужна ли лупа, нужны ли противоречия в показаниях
+# дела 3–42 — первый круг: каждый житель виновен один раз; с №43 — второй круг (Алина, этап 10-5): жители снова виновны, но с новым трюком и не дважды за круг
+ROUND1 = 42
 LEVELS = [
     (1, 10, (3, 4), (2, 2), (0, 0), False, False),
     (11, 30, (5, 6), (3, 3), (1, 1), False, False),
@@ -213,7 +215,7 @@ def main():
         for m, (who, trick) in idx.items():
             if m == n or not who:
                 continue
-            if who == culprit_name(c):
+            if who == culprit_name(c) and (m <= ROUND1) == (n <= ROUND1):
                 errs.append(f"виновный «{who}» уже был в деле №{m}")
             if difflib.SequenceMatcher(None, trick.lower(), str(c.get("trick", "")).lower()).ratio() > 0.8:
                 errs.append(f"трюк почти как в деле №{m}: «{trick}»")
