@@ -160,6 +160,9 @@ a:hover { color: var(--text); }
   .has-sub.open .sub-toggle span { transform: rotate(180deg); }
   .nav-sub a { font-size: 17px; padding: 11px 16px; }
   body.menu-open { overflow: hidden; }
+  /* закрытое меню не ловит нажатия: раскрытый подпункт (.open-cur) иначе оставался visible поверх страницы */
+  .site-nav:not(.open) { pointer-events: none; }
+  .site-nav:not(.open) .nav-sub { visibility: hidden !important; }
 }
 
 /* ---------- Главный баннер ---------- */

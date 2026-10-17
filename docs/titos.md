@@ -109,3 +109,8 @@ build.py собирает все дела в site/assets/titos-cases.json.
 - content/titos/013–022.json: виновные и трюки — в content/titos/index.md; в каждом лупа (`lens` + `pre`), 1 ложный след с `refutes`, улика из допроса — только в деле 15 (свидетель — подозреваемый).
 - Вещи-награды — room.js блок «награды за дела Титоса»: tcredleaves, tcteacup, tcgiftbag, tcmilk, tcmacrame, tccarrot, tccan, tcsalt, tcclock, tcmetronome (маятник — отдельной строкой после блока, как хвост Милки).
 - Свидетель не из подозреваемых (`people`) получает имя только из своего `name` — build.py подставляет имя по `who` лишь подозреваемым.
+
+## Дела №23–32 (этап 10-3)
+- content/titos/023–032.json: виновные и трюки — в content/titos/index.md; в каждом лупа (`lens` + `pre`) и 1 ложный след с `refutes`; 31–32 — 4 подозреваемых, 7 улик (уровни 31–60).
+- Вещи-награды — room.js блок «награды за дела Титоса»: tcstarter, tclabelbox, tcrake, tcmirror, tcmap, tcbuttonbox, tcphone, tccandle (пламя иногда гаснет), tcbook, tcdecaf.
+- Зона `magnifier` в кабинете — лупа, улики туда не класть.
