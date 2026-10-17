@@ -24,7 +24,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=04eac1ec">
+<link rel="stylesheet" href="/assets/style.css?v=7b1bc5ec">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <script src="/assets/site.js?v=20ab1a8a" defer></script>
 <script src="/assets/polly.js?v=573aaaf7" defer></script>
@@ -33,8 +33,9 @@
 <script src="/assets/room.js?v=b53b75f5" defer></script>
 <script src="/assets/potion-names.js?v=faed4153" defer></script>
 <script src="/assets/toast.js?v=38636fa7" defer></script>
-<script src="/assets/day-card.js?v=28549fef" defer></script>
-<script src="/assets/account.js?v=aa1957bd" defer></script>
+<script src="/assets/day-card.js?v=f680252e" defer></script>
+<script src="/assets/hatch.js?v=226b072d" defer></script>
+<script src="/assets/account.js?v=bfc9c224" defer></script>
 <script src="/assets/news.js?v=0808da11" defer></script>
 <script src="/assets/search.js?v=69d0c7a5" defer></script>
 </head>
@@ -71,15 +72,16 @@
   </nav>
 </header>
 <main id="main">
+<script>try { if (localStorage.getItem('pp-in')) document.documentElement.classList.add('me-in'); } catch (e) {}</script>
 <section data-ppb="home.1" class="hero">
   <div class="hero-text">
     <p class="topics">искусство &middot; творчество &middot; технологии</p>
     <h1>Маленькая лаборатория для большого воображения</h1>
     <p class="lead">Акварели, скетчбуки и нарисованные миры, ежедневные челленджи и немного технологической магии — всё под одной крышей.</p>
     <div class="actions">
-      <a class="btn btn-join" href="/ru/flock/" data-join>🐦 Присоединиться и получить птичку</a>
-      <a class="btn btn-req" href="/ru/requests/">🎨 Реши, что нарисует Полли</a>
+      <a class="btn btn-join" href="/ru/flock/" data-join>🥚 Вылупи свою птичку</a>
     </div>
+    <p class="hatch-note">Каждая птичка одна такая на сайте. Каждая 10‑я — котик, каждая 11‑я — ворона.</p>
   </div>
   <div class="art" tabindex="0">
     <div class="frame" role="img" aria-label="Pigeon Polly as an astronaut planting sunflowers, an illustration by Alina Otkinska"></div>
@@ -87,18 +89,43 @@
     <svg class="star" viewBox="-48 -48 96 96" aria-hidden="true"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z"/></svg>
     <span class="dot dot-1"></span>
     <span class="dot dot-2"></span>
+    <button type="button" class="hero-egg" data-join aria-label="Вылупи свою птичку"><canvas width="28" height="26"></canvas></button>
+  </div>
+</section>
+<section data-ppb="home.2" class="myday" aria-labelledby="md-title">
+  <div class="md-in">
+    <div class="md-me">
+      <p class="md-kick" id="md-title">Мой день</p>
+      <a class="md-bird" href="/ru/bird/" data-me-link><canvas width="64" height="56" aria-hidden="true"></canvas><b class="md-nick"></b></a>
+      <a class="md-btns" href="/ru/shop/">🔘 <b data-me-btns>0</b> <span>пуговок · магазин →</span></a>
+    </div>
+    <div class="md-card" data-day-card></div>
   </div>
 </section>
 <script>
-// фото Алины под Полли: наведение на компьютере, касание на телефоне
-(function () { var a = document.querySelector('.hero .art'); if (a) a.addEventListener('click', function () { a.classList.toggle('on'); }); })();
-// «Присоединиться»: гостю — окно входа (регистрация = вход через Google), вошедшему — его профиль
+// этап 14: гостю — яйцо и «🥚 Вылупи свою птичку» (окно входа, воронка hatch), вошедшему с ником — «Мой день» (html.me-in, hatch.js)
 (function () {
-  var b = document.querySelector('[data-join]'); if (!b) return;
+  var a = document.querySelector('.hero .art'); if (a) a.addEventListener('click', function (e) { if (!e.target.closest('.hero-egg')) a.classList.toggle('on'); });
   var pre = { ru: '/ru', lv: '/lv' }[document.documentElement.lang] || '';
-  b.addEventListener('click', function (e) {
-    if (window.PPAccount && window.PPAccount.signedIn()) { e.preventDefault(); location.href = pre + '/bird/'; return; }
-    if (window.PPAccount && window.PPAccount.openSignIn()) e.preventDefault();
+  document.querySelectorAll('[data-join]').forEach(function (b) {
+    b.addEventListener('click', function (e) {
+      if (window.PPAccount && window.PPAccount.signedIn()) { e.preventDefault(); location.href = pre + '/bird/'; return; }
+      if (window.PPHatch) window.PPHatch.click();
+      if (window.PPAccount && window.PPAccount.openSignIn()) e.preventDefault();
+    });
+  });
+  document.addEventListener('DOMContentLoaded', function () {
+    var eg = document.querySelector('.hero-egg canvas'); if (eg && window.PPHatch) window.PPHatch.egg(eg);
+  });
+  document.addEventListener('pp:whoami', function (e) {
+    var u = e.detail && e.detail.user; if (!u || !u.nick) return;
+    var B = window.PPBirds, cv = document.querySelector('.md-bird canvas');
+    if (B && cv) cv.getContext('2d').drawImage(B.spriteHD(B.dress(B.looks(u.id), u.avatar), 0), 0, 0);
+    document.querySelector('.md-nick').textContent = '@' + u.nick;
+    document.querySelector('[data-me-btns]').textContent = u.buttons || 0;
+    var card = document.querySelector('[data-day-card]');
+    if (card && window.PPDay && !card.dataset.on) { card.dataset.on = 1; window.PPDay.mount(card, { size: 'small' }); }
+    if (window.PPHomeNew) window.PPHomeNew();
   });
 })();
 </script>
@@ -252,6 +279,34 @@
   });
 </script>
 </div>
+<section data-ppb="home.3" class="home-new" aria-labelledby="hn-title" hidden>
+  <h2 id="hn-title">Новое на сайте</h2>
+  <ul class="hn-list"></ul>
+</section>
+<script>
+// «Новое» для вошедшего (этап 14): последняя статья (/api/blog/home), новые коллекции карточек и пополнение магазина (/api/new, 30 дней)
+window.PPHomeNew = function () {
+  window.PPHomeNew = null;
+  var box = document.querySelector('.home-new'); if (!box) return;
+  var lang = document.documentElement.lang || 'en', L = { ru: 1, lv: 2 }[lang] || 0, pre = ['', '/ru', '/lv'][L];
+  var tr = function (a) { return a[L]; }, esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var J = function (u) { return fetch(u, { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
+  Promise.all([J('/api/blog/home?lang=' + lang), J('/api/new')]).then(function (x) {
+    var b = x[0], n = x[1] || {}, li = [];
+    if (b && b.latest) li.push('<li><a href="' + esc(b.latest.url) + '"><span class="hn-ico">📝</span><span><small>' + tr(['New article', 'Новая статья', 'Jauns raksts']) + ' · ' + esc(b.latest.date) + '</small><b>' + esc(b.latest.title) + '</b></span></a></li>');
+    (n.cards || []).slice(0, 2).forEach(function (c) { li.push('<li><a href="' + pre + '/shop/#cards"><span class="hn-ico">🃏</span><span><small>' + tr(['New card collection', 'Новая коллекция карточек', 'Jauna kartīšu kolekcija']) + '</small><b>' + esc((c.title || {})[lang] || c.title.en || c.slug) + ' · ' + c.n + '</b></span></a></li>'); });
+    var items = n.items || [];
+    if (items.length) {
+      var B = window.PPBirds;
+      li.push('<li><a href="' + pre + '/shop/"><span class="hn-ico">🛍</span><span><small>' + tr(['Shop restock', 'Пополнение в магазине', 'Veikals papildināts']) + '</small><b>' + tr(['New things: ', 'Новых вещей: ', 'Jaunas lietas: ']) + items.length + '</b></span><span class="hn-pics"></span></a></li>');
+      box.querySelector('.hn-list').innerHTML = li.join('');
+      var pics = box.querySelector('.hn-pics');
+      if (B && pics) items.slice(0, 5).forEach(function (it) { try { pics.appendChild(B.giftPic(it.kind, it.item, 1, 36)); } catch (e) {} });
+    } else box.querySelector('.hn-list').innerHTML = li.join('');
+    box.hidden = !li.length;
+  });
+};
+</script>
 <div class="blk" id="blk-home-blog" data-ppb="blk-home-blog"><style>#blk-home-blog .hb { padding: 56px var(--gutter) 60px; background: #FFFDF8; color: #2B1A51; }
 #blk-home-blog .hb[hidden] { display: none; }
 #blk-home-blog .hb-top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
@@ -313,7 +368,7 @@
 </section>
 <script src="/assets/home-blog.js?v=0579a5ee" defer></script>
 </div>
-<div data-ppb="home.2" class="home-sep" aria-hidden="true"><svg viewBox="-48 -48 96 96"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z"/></svg></div>
+<div data-ppb="home.4" class="home-sep" aria-hidden="true"><svg viewBox="-48 -48 96 96"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z"/></svg></div>
 <div class="blk" id="blk-coming-soon" data-ppb="blk-coming-soon"><style>#blk-coming-soon { margin: 0; background: #FFFFFF; }
 #blk-coming-soon .bk { box-sizing: border-box; padding: 64px 32px; font-family: 'Karla', sans-serif; color: #2B1A51; }
 #blk-coming-soon .bk-in { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 56px; align-items: center; max-width: 1080px; margin: 0 auto; }
@@ -404,7 +459,12 @@ document.querySelectorAll('.bk-notify').forEach(function (f) {
 });
 </script>
 </div>
-<div data-ppb="home.3" class="fn-home" data-flock-news="3"></div>
+<section data-ppb="home.5" class="home-req">
+  <p class="hr-kick">Нарисуй мне</p>
+  <h2>Предложи идею — когда нарисую, твоей птичке подарок</h2>
+  <a class="pill-btn pill-fill" href="/ru/requests/">🎨 Предложить идею</a>
+</section>
+<div data-ppb="home.6" class="fn-home" data-flock-news="3"></div>
 <script src="/assets/flock-news.js?v=bfb3416b" defer></script>
 <div class="blk" id="blk-flock" data-ppb="blk-flock"><style>#blk-flock .fl { padding: 56px var(--gutter) 64px; text-align: center; }
 #blk-flock .fl-kick { margin: 0 0 6px; font: italic 400 18px var(--serif); color: #F0A987; }

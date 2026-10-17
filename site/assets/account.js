@@ -156,7 +156,9 @@
       <button class="pill-btn pill-fill" type="submit">${t('nSave')}</button>
       <button class="acct-nick-out" type="button">${t('nOut')}</button></form>`;
     document.body.appendChild(d);
-    if (window.PPBirds) d.querySelector('canvas').getContext('2d').drawImage(window.PPBirds.sprite(window.PPBirds.dress(window.PPBirds.looks(u.id), u.avatar), 0), 0, 0);
+    const bird = window.PPBirds && window.PPBirds.sprite(window.PPBirds.dress(window.PPBirds.looks(u.id), u.avatar), 0);
+    if (bird && window.PPHatch) { d.classList.add('hatching'); window.PPHatch.play(d.querySelector('canvas'), bird).then(() => { d.classList.remove('hatching'); f.nick.focus(); }); } // этап 14: яйцо трескается — птичка
+    else if (bird) d.querySelector('canvas').getContext('2d').drawImage(bird, 0, 0);
     d.addEventListener('cancel', e => e.preventDefault()); // Esc не закрывает
     const f = d.querySelector('form'), st = d.querySelector('.acct-nick-st');
     try { f.ref.value = localStorage.getItem('pp-ref') || ''; } catch (e) {}
@@ -168,7 +170,11 @@
       const ref = f.ref.value.trim().replace(/^@/, '');
       const r = await fetch('/api/nick', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ nick, ref }) });
       const j = await r.json().catch(() => ({}));
-      if (r.ok) { try { localStorage.removeItem('pp-ref'); } catch (e) {} location.reload(); return; }
+      if (r.ok) {
+        try { localStorage.removeItem('pp-ref'); } catch (e) {}
+        if (window.PPHatch) { window.PPHatch.nicked(); d.close(); d.remove(); await window.PPHatch.welcome({ nick: j.nick || nick, welcome: j.welcome, id: u.id, avatar: u.avatar }); } // «Добро пожаловать»
+        location.reload(); return;
+      }
       st.textContent = t(j.error === 'taken' ? 'nTaken' : j.error === 'nick' ? 'nBad' : j.error === 'ref' ? 'refBad' : 'nErr');
     });
     d.querySelector('.acct-nick-out').addEventListener('click', async () => { await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }); location.reload(); });

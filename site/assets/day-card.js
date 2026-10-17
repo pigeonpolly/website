@@ -35,7 +35,7 @@
     30: ['Travelling pigeon', 'Голубь-путешественник', 'Ceļotājs balodis'], 60: ['Artist pigeon', 'Голубь-художник', 'Mākslinieks balodis'], 100: ['Astronaut pigeon', 'Голубь-астронавт', 'Astronauts balodis'], 365: ['Polly legend', 'Легенда Полли', 'Pollijas leģenda'] };
   const ICON = { daily: '🚪', draw: '🎨', comment: '💬', rain: '🌧', potion: '🧪', titos: '🕵️', bugs: '🪲', advent: '🎄' };
   // история пуговок: за что
-  const KIND = { daily: ['Visit', 'Заход', 'Apmeklējums'], upload: ['Drawing', 'Рисунок', 'Zīmējums'], comment: ['Comment', 'Комментарий', 'Komentārs'], friend: ['Friend', 'Друг', 'Draugs'],
+  const KIND = { daily: ['Visit', 'Заход', 'Apmeklējums'], upload: ['Drawing', 'Рисунок', 'Zīmējums'], comment: ['Comment', 'Комментарий', 'Komentārs'], friend: ['Friend', 'Друг', 'Draugs'], welcome: ['Welcome gift', 'Подарок новичку', 'Dāvana jaunpienācējam'],
     pick: ['Polly’s pick', 'Выбор Полли', 'Pollijas izvēle'], badge: ['Badge', 'Бейдж', 'Nozīmīte'], game: ['Button Rain', 'Пуговичный дождь', 'Pogu lietus'], gamerec: ['Rain record', 'Рекорд дождя', 'Lietus rekords'],
     rainking: ['Rain king', 'Король дождя', 'Lietus karalis'], potion: ['Potion', 'Зелье', 'Dzira'], titos: ['Titos case', 'Дело Титоса', 'Tito lieta'], titossell: ['Titos coffee', 'Кофе Титоса', 'Tito kafija'],
     advent: ['Advent', 'Адвент', 'Advente'], buy: ['Shop', 'Покупка', 'Pirkums'], sell: ['Sold', 'Продажа', 'Pārdots'], card: ['Card', 'Карточка', 'Kartīte'], admin: ['From Polly', 'От Полли', 'No Pollijas'],

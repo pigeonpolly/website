@@ -20,6 +20,7 @@ export const AUTH_ALTER = ['ALTER TABLE users ADD COLUMN pw TEXT', 'ALTER TABLE 
 // воронки для «👥 Посетителей»: шаги по порядку; client — какие шаги может прислать браузер (остальные пишет сервер)
 export const FUNNELS = {
   login: { name: 'Вход на сайт', steps: [['open', 'Открыли окно входа'], ['google', 'Вошли через Google'], ['password', 'Вошли с паролем'], ['register', 'Зарегистрировались с паролем']], client: ['open'] },
+  hatch: { name: '🥚 Вылупи птичку (главная)', steps: [['click', 'Нажали «Вылупи»'], ['in', 'Вошли'], ['nick', 'Выбрали ник']], client: ['click', 'in', 'nick'] }, // этап 14: шаги шлёт hatch.js
 };
 
 const ITER = 100000, LOCK_N = 5, LOCK_SEC = 900, RESET_SEC = 3600;

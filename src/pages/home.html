@@ -1,12 +1,13 @@
+<script>try { if (localStorage.getItem('pp-in')) document.documentElement.classList.add('me-in'); } catch (e) {}</script>
 <section class="hero">
   <div class="hero-text">
     <p class="topics">art &middot; creativity &middot; technologies</p>
     <h1>A small lab for big imagination</h1>
     <p class="lead">Watercolors, sketchbooks and illustrated worlds, daily drawing challenges and a little bit of tech magic, all under one roof.</p>
     <div class="actions">
-      <a class="btn btn-join" href="/flock/" data-join>🐦 Join and get your bird</a>
-      <a class="btn btn-req" href="/requests/">🎨 Decide what Polly draws</a>
+      <a class="btn btn-join" href="/flock/" data-join>🥚 Hatch your bird</a>
     </div>
+    <p class="hatch-note">Every bird is one of a kind on this site. Every 10th is a cat, every 11th a crow.</p>
   </div>
   <div class="art" tabindex="0">
     <div class="frame" role="img" aria-label="Pigeon Polly as an astronaut planting sunflowers, an illustration by Alina Otkinska"></div>
@@ -14,25 +15,83 @@
     <svg class="star" viewBox="-48 -48 96 96" aria-hidden="true"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z"/></svg>
     <span class="dot dot-1"></span>
     <span class="dot dot-2"></span>
+    <button type="button" class="hero-egg" data-join aria-label="Hatch your bird"><canvas width="28" height="26"></canvas></button>
+  </div>
+</section>
+<section class="myday" aria-labelledby="md-title">
+  <div class="md-in">
+    <div class="md-me">
+      <p class="md-kick" id="md-title">My day</p>
+      <a class="md-bird" href="/bird/" data-me-link><canvas width="64" height="56" aria-hidden="true"></canvas><b class="md-nick"></b></a>
+      <a class="md-btns" href="/shop/">🔘 <b data-me-btns>0</b> <span>buttons · shop →</span></a>
+    </div>
+    <div class="md-card" data-day-card></div>
   </div>
 </section>
 <script>
-// фото Алины под Полли: наведение на компьютере, касание на телефоне
-(function () { var a = document.querySelector('.hero .art'); if (a) a.addEventListener('click', function () { a.classList.toggle('on'); }); })();
-// «Присоединиться»: гостю — окно входа (регистрация = вход через Google), вошедшему — его профиль
+// этап 14: гостю — яйцо и «🥚 Вылупи свою птичку» (окно входа, воронка hatch), вошедшему с ником — «Мой день» (html.me-in, hatch.js)
 (function () {
-  var b = document.querySelector('[data-join]'); if (!b) return;
+  var a = document.querySelector('.hero .art'); if (a) a.addEventListener('click', function (e) { if (!e.target.closest('.hero-egg')) a.classList.toggle('on'); });
   var pre = { ru: '/ru', lv: '/lv' }[document.documentElement.lang] || '';
-  b.addEventListener('click', function (e) {
-    if (window.PPAccount && window.PPAccount.signedIn()) { e.preventDefault(); location.href = pre + '/bird/'; return; }
-    if (window.PPAccount && window.PPAccount.openSignIn()) e.preventDefault();
+  document.querySelectorAll('[data-join]').forEach(function (b) {
+    b.addEventListener('click', function (e) {
+      if (window.PPAccount && window.PPAccount.signedIn()) { e.preventDefault(); location.href = pre + '/bird/'; return; }
+      if (window.PPHatch) window.PPHatch.click();
+      if (window.PPAccount && window.PPAccount.openSignIn()) e.preventDefault();
+    });
+  });
+  document.addEventListener('DOMContentLoaded', function () {
+    var eg = document.querySelector('.hero-egg canvas'); if (eg && window.PPHatch) window.PPHatch.egg(eg);
+  });
+  document.addEventListener('pp:whoami', function (e) {
+    var u = e.detail && e.detail.user; if (!u || !u.nick) return;
+    var B = window.PPBirds, cv = document.querySelector('.md-bird canvas');
+    if (B && cv) cv.getContext('2d').drawImage(B.spriteHD(B.dress(B.looks(u.id), u.avatar), 0), 0, 0);
+    document.querySelector('.md-nick').textContent = '@' + u.nick;
+    document.querySelector('[data-me-btns]').textContent = u.buttons || 0;
+    var card = document.querySelector('[data-day-card]');
+    if (card && window.PPDay && !card.dataset.on) { card.dataset.on = 1; window.PPDay.mount(card, { size: 'small' }); }
+    if (window.PPHomeNew) window.PPHomeNew();
   });
 })();
 </script>
 {{block:season}}
+<section class="home-new" aria-labelledby="hn-title" hidden>
+  <h2 id="hn-title">New on the site</h2>
+  <ul class="hn-list"></ul>
+</section>
+<script>
+// «Новое» для вошедшего (этап 14): последняя статья (/api/blog/home), новые коллекции карточек и пополнение магазина (/api/new, 30 дней)
+window.PPHomeNew = function () {
+  window.PPHomeNew = null;
+  var box = document.querySelector('.home-new'); if (!box) return;
+  var lang = document.documentElement.lang || 'en', L = { ru: 1, lv: 2 }[lang] || 0, pre = ['', '/ru', '/lv'][L];
+  var tr = function (a) { return a[L]; }, esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
+  var J = function (u) { return fetch(u, { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
+  Promise.all([J('/api/blog/home?lang=' + lang), J('/api/new')]).then(function (x) {
+    var b = x[0], n = x[1] || {}, li = [];
+    if (b && b.latest) li.push('<li><a href="' + esc(b.latest.url) + '"><span class="hn-ico">📝</span><span><small>' + tr(['New article', 'Новая статья', 'Jauns raksts']) + ' · ' + esc(b.latest.date) + '</small><b>' + esc(b.latest.title) + '</b></span></a></li>');
+    (n.cards || []).slice(0, 2).forEach(function (c) { li.push('<li><a href="' + pre + '/shop/#cards"><span class="hn-ico">🃏</span><span><small>' + tr(['New card collection', 'Новая коллекция карточек', 'Jauna kartīšu kolekcija']) + '</small><b>' + esc((c.title || {})[lang] || c.title.en || c.slug) + ' · ' + c.n + '</b></span></a></li>'); });
+    var items = n.items || [];
+    if (items.length) {
+      var B = window.PPBirds;
+      li.push('<li><a href="' + pre + '/shop/"><span class="hn-ico">🛍</span><span><small>' + tr(['Shop restock', 'Пополнение в магазине', 'Veikals papildināts']) + '</small><b>' + tr(['New things: ', 'Новых вещей: ', 'Jaunas lietas: ']) + items.length + '</b></span><span class="hn-pics"></span></a></li>');
+      box.querySelector('.hn-list').innerHTML = li.join('');
+      var pics = box.querySelector('.hn-pics');
+      if (B && pics) items.slice(0, 5).forEach(function (it) { try { pics.appendChild(B.giftPic(it.kind, it.item, 1, 36)); } catch (e) {} });
+    } else box.querySelector('.hn-list').innerHTML = li.join('');
+    box.hidden = !li.length;
+  });
+};
+</script>
 {{block:home-blog}}
 <div class="home-sep" aria-hidden="true"><svg viewBox="-48 -48 96 96"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z"/></svg></div>
 {{block:coming-soon}}
+<section class="home-req">
+  <p class="hr-kick">Draw me</p>
+  <h2>Suggest an idea — when I draw it, your bird gets a gift</h2>
+  <a class="pill-btn pill-fill" href="/requests/">🎨 Suggest an idea</a>
+</section>
 <div class="fn-home" data-flock-news="3"></div>
 <script src="/assets/flock-news.js" defer></script>
 {{block:flock}}
