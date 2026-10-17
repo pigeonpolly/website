@@ -2,10 +2,13 @@
 
 _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TABLE / ALTER TABLE и обращений к meta в worker/*.js. Руками не править._
 
-## Таблицы (33)
+## Таблицы (36)
 
 Обозначения: PK — первичный ключ, nn — NOT NULL, =x — DEFAULT x; «+» — столбцы, добавленные ALTER TABLE.
 
+- **login_fail** (worker/auth.js): `k` text PK, `n` int nn, `at` int nn
+- **pw_reset** (worker/auth.js): `hash` text PK, `user_id` int nn, `expires` int nn, `created_at` int
+- **funnel** (worker/auth.js): `day` text nn, `name` text nn, `step` text nn, `vid` text nn; PRIMARY KEY (day, name, step, vid)
 - **blog_posts** (worker/blog.js): `id` int PK auto, `slug` text UNIQUE nn, `status` text ='draft', `cover` text ='', `t_ru` text ='', `t_en` text ='', `t_lv` text ='', `d_ru` text ='', `d_en` text ='', `d_lv` text ='', `b_ru` text ='', `b_en` text ='', `b_lv` text ='', `tags_ru` text ='', `tags_en` text ='', `tags_lv` text ='', `views` int =0, `likes` int =0, `created_at` int, `updated_at` int, `published_at` int; + `featured` int =0').run(), `pinned` int =0').run(), `src_lang` text, `client_key` text, `section` text =''
 - **blog_likes** (worker/blog.js): `post_id` int nn, `who` text nn; PRIMARY KEY (post_id, who)
 - **blog_comments** (worker/blog.js): `id` int PK auto, `post_id` int nn, `user_id` int, `anon` text, `body` text nn, `ip` text, `status` text ='ok', `created_at` int
@@ -40,7 +43,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **titos** (worker/titos.js): `user_id` int PK, `level` int =0, `coffee` int =10, `coffee_at` int =0, `drink_at` int =0, `sleep` int =0, `run` int =0, `found` text ='[]', `started` int =0, `bugs` text ='[]', `sell_day` text ='', `sell_n` int =0, `legacy` int =0; + `sort_lv` int =0, `sort_run` text ='', `bugs_run` int =0']
 - **titos_cases** (worker/titos.js): `n` int PK, `data` text nn, `tr` text ='{}', `hash` text, `updated_at` int
 
-## Ключи meta (36)
+## Ключи meta (37)
 
 Таблица `meta (key, value)`. Ключ → где используется.
 
@@ -54,11 +57,11 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `buttons_backfill` — worker/index.js
 - `chplan_oct` — worker/challenge-days.js
 - `cron_at` — worker/index.js
+- `dev_last_mail` — worker/auth.js
 - `gemini_key` — worker/blog.js, worker/translate.js
 - `inbox_subs_seen` — worker/index.js
 - `index_base` — worker/index.js
 - `new_seen` — worker/index.js
-- `starter_box_v1` — worker/index.js (разовая выдача коробок старым птичкам)
 - `pick_post` — worker/index.js
 - `pick_price_11` — worker/index.js
 - `pick_user` — worker/index.js
@@ -75,8 +78,9 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `rules` — worker/index.js
 - `sections_news` — worker/blog.js
 - `sections_v2` — worker/blog.js
+- `starter_box_v1` — worker/index.js
 - `titos_pot_n` — worker/titos.js
 - `unit` — worker/index.js
-- `users_total` — worker/blog.js, worker/index.js
-- `visit_salt` — worker/blog.js, worker/index.js
+- `users_total` — worker/auth.js, worker/blog.js, worker/index.js
+- `visit_salt` — worker/auth.js, worker/blog.js, worker/index.js
 - `works_total` — worker/blog.js, worker/index.js

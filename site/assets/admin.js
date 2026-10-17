@@ -278,6 +278,21 @@
   const delta = (a, b) => { if (!b) return a ? '<small class="adm-up">новое</small>' : ''; const d = Math.round((a - b) * 100 / b); return `<small class="${d >= 0 ? 'adm-up' : 'adm-down'}">${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}% к прошлому периоду</small>`; };
   // горизонтальные полоски: подпись, полоска, число и доля
   const bars = (rows, label, total, extra) => rows.length ? `<ul class="adm-bars">${rows.map(r => `<li><span class="adm-bl">${label(r)}</span><span class="adm-bt"><i style="width:${Math.max(2, pct(r.n, rows[0].n))}%"></i></span><b>${n(r.n)}</b><small>${pct(r.n, total)}%</small>${extra ? extra(r) : ''}</li>`).join('')}</ul>` : '<p class="be-note">Пока нет данных.</p>';
+  // воронки (этап 12): один вид для любой воронки из worker/auth.js FUNNELS — шаги по дням, доля от первого шага
+  async function funnels(box, days) {
+    if (!box) return;
+    let d; try { d = await api('admin/funnels?days=' + days); } catch (e) { box.innerHTML = ''; return; }
+    box.innerHTML = d.funnels.map(f => {
+      const tot = {}; f.days.forEach(r => f.steps.forEach(s => { tot[s.k] = (tot[s.k] || 0) + (r.n[s.k] || 0); }));
+      const first = f.steps[0].k;
+      const cell = (row, s, i) => `<td data-l="${esc(s.label)}"><b>${n(row[s.k] || 0)}</b>${i && row[first] ? ` <small>${pct(row[s.k] || 0, row[first])}%</small>` : ''}</td>`;
+      return `<section class="adm-box adm-funnel"><h2>🔻 Воронка: ${esc(f.name)}</h2>
+        <p class="be-note">За ${d.days} дн. Один человек за сутки на каждом шаге считается один раз; % — от первого шага.</p>
+        ${f.days.length ? `<table class="be-table adm-table"><thead><tr><th>День</th>${f.steps.map(s => `<th>${esc(s.label)}</th>`).join('')}</tr></thead><tbody>
+          <tr class="adm-total"><td data-l="День"><b>Всего</b></td>${f.steps.map((s, i) => cell(tot, s, i)).join('')}</tr>
+          ${f.days.map(r => `<tr><td data-l="День">${new Date(r.day + 'T12:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', weekday: 'short' })}</td>${f.steps.map((s, i) => cell(r.n, s, i)).join('')}</tr>`).join('')}</tbody></table>` : '<p class="be-note">Пока нет данных.</p>'}</section>`;
+    }).join('');
+  }
   async function visitors() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('admin/visits?days=' + vDays); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
@@ -305,6 +320,7 @@
         <div class="adm-card"><span class="adm-ic">📱</span><b>${pct(N.mobile, N.people)}%</b><span>с телефона</span></div>
       </div>
       ${chart}
+      <div data-funnels></div>
       <div class="adm-cols">
         <section class="adm-box"><h2>Откуда пришли</h2><p class="be-note">Каждый заход на сайт: с какого сайта или приложения. «Напрямую» — набрали адрес, закладка или ссылка из мессенджера (WhatsApp, Viber не сообщают, откуда).</p>
           ${bars(d.sources, r => `${SRC_IC[r.k] || '🌐'} ${esc(r.k)}`, srcTotal, mob)}</section>
@@ -333,6 +349,7 @@
         ${(() => { const other = d.campaigns.filter(r => !d.links.some(l => l.campaign === r.k)); return other.length ? `<h3>Другие метки (не сохранены)</h3>${bars(other, r => `${esc(r.k)} <small>(${esc(r.s || '')})</small>`, sum(other))}` : ''; })()}</section>
       <p class="be-note">Считается без cookie: один человек за сутки — один раз (по зашифрованному отпечатку, сам IP не сохраняется). Ваши собственные заходы (когда вы вошли как админ) и роботы не считаются. Статистика копится с ${esc(d.first || 'момента включения')}.</p>`;
     main.querySelectorAll('[data-days]').forEach(b => b.onclick = () => { vDays = Number(b.dataset.days); visitors(); });
+    funnels(main.querySelector('[data-funnels]'), Math.max(vDays, 7));
     const tip = main.querySelector('.adm-chart-tip');
     main.querySelectorAll('.adm-col').forEach(c => { const show = () => { tip.textContent = c.dataset.tip; main.querySelectorAll('.adm-col.on').forEach(x => x.classList.remove('on')); c.classList.add('on'); }; c.onmouseenter = show; c.onfocus = show; c.onclick = show; });
     const copy = (link, btn, label) => (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(() => { btn.textContent = '✓ Скопировано'; setTimeout(() => btn.textContent = label, 1600); }).catch(() => prompt('Скопируйте ссылку:', link));
@@ -843,11 +860,12 @@
         <p class="be-note">Новых за неделю: <b>${week}</b>. Нажмите на ник, чтобы открыть профиль и работы.</p>
         <p><button type="button" class="pill-btn pill-fill" id="adm-giftall">🎁 Подарить всем</button> <button type="button" class="pill-btn pill-fill" id="adm-salary" title="Пуговки сразу зачисляются всем птичкам с ником; при заходе на сайт птичка увидит конвертик от администрации Воббленда">💌 Выдать зарплату</button> <button type="button" class="pill-btn pill-fill" id="adm-tax" title="Списать пуговки у всех или только у тех, кто давно не заходит">🧾 Списать налог</button> <button type="button" class="pill-btn" id="adm-backfill">🔘 Начислить всем за прошлые бейджи и рисунки</button> <small class="be-note">Повторно не начислит — каждая награда даётся один раз.</small></p>
         <div class="be-filters"><input type="search" id="adm-bq" placeholder="🔍 Найти по нику" value="${esc(bq)}"></div>
-        <table class="be-table adm-table adm-birds"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}${th('buttons', '🔘 Пуговки')}${th('invited', '👥 Позвали')}<th>Подарки</th></tr></thead><tbody>
+        <table class="be-table adm-table adm-birds"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}${th('buttons', '🔘 Пуговки')}${th('invited', '👥 Позвали')}<th>Подарки</th><th>Вход</th></tr></thead><tbody>
         ${list.map(u => `<tr><td>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}${u.banned ? ' <small class="be-danger">заблокирована</small>' : ''}</td>
           <td data-l="Появилась">${fmt(u.created_at)}</td><td data-l="Заходила">${fmt(u.last_seen)}</td><td data-l="🎨 Работ">${n(u.works)}</td><td data-l="🔥 Рекорд">${n(u.best)}</td>
           <td data-l="🔘 Пуговки"><b>${n(u.buttons)}</b> <button type="button" class="adm-mini" data-btn="${u.id}" title="Добавить или забрать пуговки">±</button></td><td data-l="👥 Позвали">${n(u.invited)}</td>
-          <td data-l="Подарки"><button type="button" class="pill-btn" data-gift="${u.id}" title="Подарить семечко для аватара">🎁${u.gifts ? ' ' + u.gifts : ''}</button></td></tr>`).join('')}</tbody></table></section>`;
+          <td data-l="Подарки"><button type="button" class="pill-btn" data-gift="${u.id}" title="Подарить семечко для аватара">🎁${u.gifts ? ' ' + u.gifts : ''}</button></td>
+          <td data-l="Вход"><small title="${u.via === 'g:' ? 'Входит через Google' : 'Входит с паролем'}">${u.via === 'g:' ? 'Google' : ''}${u.via === 'g:' && u.haspw ? ' + ' : ''}${u.haspw ? '🔑' : ''}${u.pw_temp ? ' (временный)' : ''}</small> <button type="button" class="adm-mini" data-pwreset="${u.id}" title="Временный пароль: птичка входит с ним и сразу придумывает свой">🔑 Сбросить пароль</button></td></tr>`).join('')}</tbody></table></section>`;
       main.querySelectorAll('[data-gift]').forEach(b => b.onclick = () => giftDialog(d.users.find(u => u.id === +b.dataset.gift), birds));
       main.querySelector('#adm-giftall').onclick = () => giftDialog(null, birds);
       // зарплата: всем птичкам с ником (кроме заблокированных) N пуговок сразу, у них — конвертик с анимацией (account.js)
@@ -862,6 +880,12 @@
         e.target.disabled = false;
       };
       main.querySelector('#adm-tax').onclick = () => taxDialog(d.users, birds);
+      // «🔑 Сбросить пароль» (этап 12): временный пароль показывается один раз — отправьте его птичке сами; при входе она придумает новый
+      main.querySelectorAll('[data-pwreset]').forEach(b => b.onclick = async () => {
+        const u = d.users.find(x => x.id === +b.dataset.pwreset);
+        if (!confirm(`Сбросить пароль @${u.nick || u.id}? Старый пароль перестанет работать, птичка выйдет на всех устройствах.`)) return;
+        try { const r = await api('admin/pw-reset', { uid: u.id }); u.haspw = 1; u.pw_temp = 1; draw(); prompt(`Временный пароль — отправьте птичке (показывается один раз).\nВход: ${r.login}\nПри входе она придумает новый пароль.`, r.password); } catch (e) { alert(err(e)); }
+      });
       main.querySelectorAll('[data-bsort]').forEach(b => b.onclick = () => { bSort = b.dataset.bsort; draw(); });
       main.querySelector('#adm-backfill').onclick = async e => {
         e.target.disabled = true; e.target.textContent = 'Считаю…';

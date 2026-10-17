@@ -35,6 +35,45 @@
     refBad: ['There is no bird with this nickname. Pick one from the list or leave it empty.', 'Птички с таким ником нет. Выбери из списка или оставь пустым.', 'Putniņa ar tādu segvārdu nav. Izvēlies no saraksta vai atstāj tukšu.'],
     btns: ['buttons', 'пуговок', 'pogas'],
     daily: [n => `+${n} 🔘 buttons for visiting today!`, n => `+${n} 🔘 пуговки за заход сегодня!`, n => `+${n} 🔘 pogas par šodienas apmeklējumu!`],
+    // вход с паролем (этап 12)
+    or: ['or', 'или', 'vai'],
+    tabIn: ['Sign in', 'Вход', 'Ieeja'], tabUp: ['Sign up', 'Регистрация', 'Reģistrācija'],
+    login: ['Email or nickname', 'Почта или ник', 'E-pasts vai segvārds'], email: ['Email', 'Почта', 'E-pasts'],
+    pw: ['Password', 'Пароль', 'Parole'], pwNew: ['New password', 'Новый пароль', 'Jaunā parole'], pwOld: ['Current password', 'Текущий пароль', 'Pašreizējā parole'],
+    pwHint: ['At least 8 characters. A phrase of a few words is easy to remember.', 'От 8 символов. Легко запомнить фразу из нескольких слов.', 'Vismaz 8 simboli. Frāzi no dažiem vārdiem ir viegli atcerēties.'],
+    show: ['Show password', 'Показать пароль', 'Rādīt paroli'], hide: ['Hide password', 'Скрыть пароль', 'Slēpt paroli'],
+    doIn: ['Sign in', 'Войти', 'Ienākt'], doUp: ['Create account', 'Зарегистрироваться', 'Reģistrēties'],
+    agree: ['I agree to the', 'Соглашаюсь с', 'Piekrītu'],
+    forgot: ['Forgot password?', 'Забыли пароль?', 'Aizmirsi paroli?'],
+    fgText: ['Enter your email — we’ll send a link to choose a new password. It works for 1 hour.', 'Напиши почту — пришлём ссылку, чтобы придумать новый пароль. Она работает 1 час.', 'Ieraksti e-pastu — atsūtīsim saiti jaunas paroles izveidei. Tā darbojas 1 stundu.'],
+    fgSend: ['Send link', 'Прислать ссылку', 'Sūtīt saiti'],
+    fgSent: ['If there is an account with this email, the link is already on its way. Check your inbox and spam.', 'Если аккаунт с такой почтой есть, ссылка уже летит. Проверь входящие и спам.', 'Ja konts ar šo e-pastu ir, saite jau ceļā. Pārbaudi iesūtni un surogātpastu.'],
+    fgOff: ['Write to Alina: she will reset the password and send you a temporary one. When you sign in with it, you’ll choose a new password.', 'Напиши Алине: она сбросит пароль и пришлёт временный. При входе с ним придумаешь новый.', 'Uzraksti Alīnai: viņa atiestatīs paroli un atsūtīs pagaidu paroli. Ienākot ar to, izdomāsi jaunu.'],
+    fgWrite: ['Write to Alina', 'Написать Алине', 'Rakstīt Alīnai'],
+    fgMsg: ['Hi Alina! I forgot my password. My nickname / email on the site: ', 'Привет, Алина! Не помню пароль. Мой ник / почта на сайте: ', 'Sveika, Alīna! Aizmirsu paroli. Mans segvārds / e-pasts vietnē: '],
+    back: ['← Back', '← Назад', '← Atpakaļ'],
+    inApp: ['Signing in with Google may not work inside this app. Sign in with a password — or open the site in your browser (⋯ → Open in browser).', 'Вход через Google здесь может не сработать. Войди с паролем — или открой сайт в браузере (⋯ → «Открыть в браузере»).', 'Ieeja ar Google šeit var nedarboties. Ienāc ar paroli — vai atver vietni pārlūkā (⋯ → «Atvērt pārlūkā»).'],
+    eWrong: ['Wrong email or password.', 'Неверная почта или пароль.', 'Nepareizs e-pasts vai parole.'],
+    eLocked: [n => `Too many attempts. Please wait ${n} minutes.`, n => `Слишком много попыток. Подожди ${n} минут.`, n => `Pārāk daudz mēģinājumu. Pagaidi ${n} minūtes.`],
+    eShort: ['The password needs at least 8 characters.', 'В пароле нужно от 8 символов.', 'Parolē vajag vismaz 8 simbolus.'],
+    eLong: ['This password is too long.', 'Пароль слишком длинный.', 'Parole ir pārāk gara.'],
+    eCommon: ['This password is too common — easy to guess. Try another one.', 'Этот пароль слишком частый — его легко угадать. Придумай другой.', 'Šī parole ir pārāk izplatīta — to viegli uzminēt. Izdomā citu.'],
+    eSame: ['The password must not be the same as your email or nickname.', 'Пароль не должен совпадать с почтой или ником.', 'Parole nedrīkst sakrist ar e-pastu vai segvārdu.'],
+    eEmail: ['Please check the email address.', 'Проверь адрес почты.', 'Pārbaudi e-pasta adresi.'],
+    eConsent: ['Please tick the box to agree to the privacy rules.', 'Отметь галочку согласия с правилами конфиденциальности.', 'Atzīmē piekrišanu privātuma noteikumiem.'],
+    eGoogle: ['This email is already linked to Google — sign in with Google. You can add a password later in your profile.', 'Эта почта уже привязана к Google — войди через Google. Пароль можно добавить потом в профиле.', 'Šis e-pasts jau piesaistīts Google — ienāc ar Google. Paroli vari pievienot vēlāk profilā.'],
+    eExists: ['This email is already registered — sign in.', 'Эта почта уже зарегистрирована — войди.', 'Šis e-pasts jau reģistrēts — ienāc.'],
+    eLink: ['The link is out of date or already used. Ask for a new one.', 'Ссылка устарела или уже использована. Попроси новую.', 'Saite ir novecojusi vai jau izmantota. Palūdz jaunu.'],
+    eBanned: ['This account is blocked.', 'Этот аккаунт заблокирован.', 'Šis konts ir bloķēts.'],
+    pwSet: ['Change password', 'Сменить пароль', 'Mainīt paroli'], pwAdd: ['Add a password', 'Добавить пароль', 'Pievienot paroli'],
+    pwAddText: ['Then you can sign in with your email or nickname and this password — e.g. inside Instagram or TikTok, where Google sign-in doesn’t work.', 'Тогда можно входить по почте или нику и этому паролю — например, внутри Instagram или TikTok, где вход через Google не работает.', 'Tad varēsi ienākt ar e-pastu vai segvārdu un šo paroli — piemēram, Instagram vai TikTok iekšienē, kur ieeja ar Google nedarbojas.'],
+    pwTempT: ['Choose a new password', 'Придумай новый пароль', 'Izdomā jaunu paroli'],
+    pwTempText: ['You signed in with a temporary password. Choose your own — the temporary one will stop working.', 'Вход — по временному паролю. Придумай свой, а временный перестанет работать.', 'Tu ienāci ar pagaidu paroli. Izdomā savu — pagaidu parole vairs nedarbosies.'],
+    pwResetT: ['New password', 'Новый пароль', 'Jaunā parole'],
+    pwSave: ['Save', 'Сохранить', 'Saglabāt'], cancel: ['Cancel', 'Отмена', 'Atcelt'],
+    pwDone: ['Password saved ✓ Other devices are signed out.', 'Пароль сохранён ✓ На других устройствах вход закрыт.', 'Parole saglabāta ✓ Citās ierīcēs ieeja aizvērta.'],
+    outAll: ['Sign out on all devices', 'Выйти на всех устройствах', 'Iziet visās ierīcēs'],
+    outAllAsk: ['Sign out on all devices, including this one?', 'Выйти на всех устройствах, и на этом тоже?', 'Iziet visās ierīcēs, arī šajā?'],
   };
   const t = k => S[k][L];
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -68,6 +107,8 @@
       if (d.user && d.user.earned) toast(t('daily')(d.user.earned));
       window.PPWho = d; document.dispatchEvent(new CustomEvent('pp:whoami', { detail: d })); // новости птички — «конвертик» (news.js); зарплата теперь там
       if (d.user && d.user.pin) pinAsk();
+      if (d.user && d.user.pwTemp) pwDialog('temp'); // вход по временному паролю из кабинета — придумать свой
+      else if (resetTok && !d.user) pwDialog('reset');
     }).catch(() => {});
   }
   // защита админки: вход через Google — это ещё не админ; на этом устройстве нужно один раз ввести PIN
@@ -96,7 +137,7 @@
     setTimeout(() => { if (btn.getAttribute('aria-expanded') !== 'true') btn.click(); btn.focus({ preventScroll: true }); }, 0);
     return true;
   }
-  window.PPAccount = { check, openSignIn, signedIn: () => !!(info && info.user) };
+  window.PPAccount = { check, openSignIn, signedIn: () => !!(info && info.user), pwDialog, logoutAll };
   check();
 
   // ник обязателен: окно сразу после первого входа, закрыть можно только выбрав ник (или выйдя)
@@ -137,8 +178,11 @@
   function render() {
     const u = info.user;
     if (!u) {
+      // окно входа: Google и вкладки «Вход» / «Регистрация»; во встроенном браузере (Instagram, TikTok, Facebook…) пароль — первым
+      const g = `<div class="acct-g"></div>`, or = `<p class="acct-or"><span>${t('or')}</span></p>`;
       el.innerHTML = `<button type="button" class="acct-btn acct-in" aria-expanded="false" aria-haspopup="dialog" aria-label="${t('signIn')}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span>${t('signIn')}</span></button>
-        <div class="acct-pop" hidden role="dialog" aria-label="${t('signIn')}"><p>${t('why')}</p><div class="acct-g"></div>
+        <div class="acct-pop acct-auth${IN_APP ? ' acct-inapp' : ''}" hidden role="dialog" aria-label="${t('signIn')}"><p>${t('why')}</p>
+        ${IN_APP ? `<p class="acct-warn">${t('inApp')}</p>${pwBox()}${or}${g}` : `${g}${or}${pwBox()}`}
         <p class="acct-terms">${t('pub')} ${t('terms')} <a href="${pre}/privacy/">${t('termsLink')}</a>.</p>
         ${info.dev ? '<button type="button" class="pill-btn" data-dev>dev login</button>' : ''}</div>`;
     } else {
@@ -162,10 +206,11 @@
       e.stopPropagation();
       const open = pop.hidden;
       pop.hidden = !open; btn.setAttribute('aria-expanded', String(open));
-      if (open && !u) google(el.querySelector('.acct-g'));
+      if (open && !u) { google(el.querySelector('.acct-g')); funnel('open'); loadPw(); }
     });
     document.addEventListener('click', e => { if (!el.contains(e.target)) close(); });
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !pop.hidden) { close(); btn.focus(); } });
+    if (!u) wireAuth(pop);
     const dev = el.querySelector('[data-dev]');
     dev && dev.addEventListener('click', () => login('dev:' + (prompt('nick?', 'tester') || 'tester')));
     const out = el.querySelector('[data-out]');
@@ -173,6 +218,117 @@
       await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' });
       location.reload();
     });
+  }
+
+  // ---------- вход с паролем (этап 12) ----------
+  const IN_APP = /Instagram|FBAN|FBAV|FB_IAB|FB4A|musical_ly|BytedanceWebview|TikTok|LinkedInApp|Pinterest|Snapchat|\bLine\//i.test(navigator.userAgent);
+  let resetTok = '';
+  try { const q = new URLSearchParams(location.search); resetTok = /^[0-9a-f]{64}$/.test(q.get('pwreset') || '') ? q.get('pwreset') : ''; if (q.has('pwreset')) { q.delete('pwreset'); history.replaceState(null, '', location.pathname + (q.toString() ? '?' + q : '') + location.hash); } } catch (e) {}
+  let funnelSent = {};
+  const funnel = s => { if (funnelSent[s]) return; funnelSent[s] = 1; fetch('/api/funnel', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ f: 'login', s }), keepalive: true }).catch(() => {}); };
+  const api = async (path, data) => {
+    const r = await fetch('/api/' + path, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify(data || {}) }).catch(() => null);
+    const j = r ? await r.json().catch(() => ({})) : { error: 'net' };
+    return { ok: !!(r && r.ok), ...j };
+  };
+  const EK = { wrong: 'eWrong', pw_short: 'eShort', pw_long: 'eLong', pw_common: 'eCommon', pw_same: 'eSame', email: 'eEmail', consent: 'eConsent', google: 'eGoogle', exists: 'eExists', link: 'eLink', banned: 'eBanned' };
+  const errText = j => j.error === 'locked' ? t('eLocked')(j.minutes || 15) : EK[j.error] ? t(EK[j.error]) : t('nErr');
+  const loadPw = () => { if (window.PPPw || document.querySelector('script[src="/assets/pw-rules.js"]')) return; const sc = document.createElement('script'); sc.src = '/assets/pw-rules.js'; document.head.appendChild(sc); }; // правила пароля — те же, что на сервере
+  const pwField = (name, ac, label, hint) => `<label class="acct-l">${label}<span class="acct-pw"><input type="password" name="${name}" autocomplete="${ac}" required maxlength="200"${ac === 'new-password' ? ' minlength="8"' : ''} autocapitalize="none" spellcheck="false"><button type="button" class="acct-eye" aria-label="${t('show')}" aria-pressed="false"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg></button></span>${hint ? `<small>${hint}</small>` : ''}</label>`;
+  const hp = '<input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">';
+  function pwBox() {
+    return `<div class="acct-pwbox"><div class="acct-tabs" role="tablist"><button type="button" role="tab" data-tab="in" aria-selected="true">${t('tabIn')}</button><button type="button" role="tab" data-tab="up" aria-selected="false">${t('tabUp')}</button></div>
+      <form class="acct-f" data-f="in" novalidate><label class="acct-l">${t('login')}<input name="login" autocomplete="username" required maxlength="254" autocapitalize="none" spellcheck="false"></label>
+        ${pwField('password', 'current-password', t('pw'))}${hp}<p class="acct-st" role="status" aria-live="polite"></p>
+        <button class="pill-btn pill-fill" type="submit">${t('doIn')}</button><button type="button" class="acct-link" data-forgot>${t('forgot')}</button></form>
+      <form class="acct-f" data-f="up" hidden novalidate><label class="acct-l">${t('email')}<input type="email" name="email" autocomplete="username" required maxlength="254" autocapitalize="none" spellcheck="false"></label>
+        ${pwField('password', 'new-password', t('pw'), t('pwHint'))}
+        <label class="acct-ok"><input type="checkbox" name="consent" required> <span>${t('agree')} <a href="${pre}/privacy/" target="_blank">${t('termsLink')} ↗</a></span></label>${hp}
+        <p class="acct-st" role="status" aria-live="polite"></p><button class="pill-btn pill-fill" type="submit">${t('doUp')}</button></form>
+      <form class="acct-f" data-f="forgot" hidden novalidate>${info.mail ? `<p>${t('fgText')}</p><label class="acct-l">${t('email')}<input type="email" name="email" autocomplete="username" required maxlength="254" autocapitalize="none" spellcheck="false"></label>${hp}
+        <p class="acct-st" role="status" aria-live="polite"></p><button class="pill-btn pill-fill" type="submit">${t('fgSend')}</button>`
+        : `<p>${t('fgOff')}</p><button class="pill-btn pill-fill" type="button" data-write>✉️ ${t('fgWrite')}</button>`}<button type="button" class="acct-link" data-back>${t('back')}</button></form></div>`;
+  }
+  function wireEyes(root) {
+    root.querySelectorAll('.acct-eye').forEach(b => b.addEventListener('click', () => {
+      const inp = b.previousElementSibling, on = inp.type === 'password';
+      inp.type = on ? 'text' : 'password'; b.setAttribute('aria-pressed', String(on)); b.setAttribute('aria-label', t(on ? 'hide' : 'show')); inp.focus();
+    }));
+  }
+  function wireAuth(pop) {
+    const box = pop.querySelector('.acct-pwbox'); if (!box) return;
+    const forms = Object.fromEntries([...box.querySelectorAll('form')].map(f => [f.dataset.f, f]));
+    const show = k => {
+      for (const [n, f] of Object.entries(forms)) f.hidden = n !== k;
+      box.querySelector('.acct-tabs').hidden = k === 'forgot';
+      box.querySelectorAll('[role=tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === k)));
+      const first = forms[k].querySelector('input:not(.hp), button'); if (first) first.focus();
+    };
+    box.querySelectorAll('[role=tab]').forEach(b => b.addEventListener('click', () => show(b.dataset.tab)));
+    box.querySelector('[data-forgot]').addEventListener('click', () => { const v = forms.in.login.value.trim(); show('forgot'); if (forms.forgot.email && v.includes('@')) forms.forgot.email.value = v; });
+    box.querySelector('[data-back]').addEventListener('click', () => show('in'));
+    wireEyes(box);
+    const send = (f, path, data, ok) => async e => {
+      e.preventDefault();
+      const st = f.querySelector('.acct-st'), btn = f.querySelector('[type=submit]');
+      const bad = [...f.querySelectorAll('input[required]')].find(i => i.type === 'checkbox' ? !i.checked : !i.value.trim());
+      if (bad) { st.textContent = bad.name === 'consent' ? t('eConsent') : bad.name === 'email' ? t('eEmail') : f.dataset.f === 'in' ? t('eWrong') : t('eShort'); bad.focus(); return; }
+      if (f.password && f.dataset.f === 'up') { const e2 = window.PPPw && window.PPPw.check(f.password.value, { email: f.email.value }); if (e2) { st.textContent = errText({ error: 'pw_' + e2 }); f.password.focus(); return; } }
+      btn.disabled = true; st.textContent = '…';
+      const j = await api(path, { ...data(f), website: f.website ? f.website.value : '', lang });
+      btn.disabled = false;
+      if (j.ok) return ok(j, st);
+      st.textContent = errText(j);
+    };
+    forms.in.addEventListener('submit', send(forms.in, 'pw/login', f => ({ login: f.login.value.trim(), password: f.password.value }), () => location.reload()));
+    forms.up.addEventListener('submit', send(forms.up, 'pw/register', f => ({ email: f.email.value.trim(), password: f.password.value, consent: f.consent.checked }), () => location.reload())); // дальше — окно ника, как после Google
+    if (forms.forgot.email) forms.forgot.addEventListener('submit', send(forms.forgot, 'pw/forgot', f => ({ email: f.email.value.trim() }), (j, st) => { st.textContent = j.mail === false ? t('fgOff') : t('fgSent'); }));
+    const w = box.querySelector('[data-write]');
+    if (w) w.addEventListener('click', () => { // «Напиши Алине» — окно письма из подвала сайта
+      const d = document.getElementById('contact'); if (!d) return;
+      const msg = d.querySelector('textarea'), v = forms.in.login.value.trim();
+      if (msg && !msg.value) msg.value = t('fgMsg') + v;
+      pop.hidden = true; d.showModal(); document.body.classList.add('modal-open');
+    });
+  }
+  // окно пароля: 'change' — сменить (нужен текущий), 'add' — добавить (Google-аккаунт), 'temp' — вместо временного (не закрыть), 'reset' — по ссылке из письма
+  function pwDialog(mode) {
+    if (document.getElementById('acct-pwd')) return;
+    if (!window.PPPw) { const sc = document.createElement('script'); sc.src = '/assets/pw-rules.js'; sc.onload = () => pwDialog(mode); document.head.appendChild(sc); return; }
+    const d = document.createElement('dialog'); d.id = 'acct-pwd'; d.className = 'acct-nick acct-pwd';
+    const title = { change: t('pwSet'), add: t('pwAdd'), temp: t('pwTempT'), reset: t('pwResetT') }[mode];
+    const text = { add: t('pwAddText'), temp: t('pwTempText') }[mode] || '';
+    const me = window.PPWho && window.PPWho.user;
+    d.innerHTML = `<form method="dialog" novalidate><h2>🔑 ${title}</h2>${text ? `<p>${text}</p>` : ''}
+      <input type="text" name="username" autocomplete="username" value="${esc(me && me.nick || '')}" hidden>
+      ${mode === 'change' ? pwField('old', 'current-password', t('pwOld')) : ''}${pwField('password', 'new-password', mode === 'change' ? t('pwNew') : t('pw'), t('pwHint'))}
+      <p class="acct-nick-st" role="status" aria-live="polite"></p>
+      <button class="pill-btn pill-fill" type="submit">${t('pwSave')}</button>
+      ${mode === 'temp' ? `<button class="acct-nick-out" type="button" data-out>${t('nOut')}</button>` : `<button class="acct-nick-out" type="button" data-x>${t('cancel')}</button>`}</form>`;
+    document.body.appendChild(d);
+    if (mode === 'temp') d.addEventListener('cancel', e => e.preventDefault()); // временный пароль — только придумать свой (или выйти)
+    d.addEventListener('close', () => d.remove());
+    const f = d.querySelector('form'), st = d.querySelector('.acct-nick-st');
+    wireEyes(d);
+    const x = d.querySelector('[data-x]'); if (x) x.addEventListener('click', () => d.close());
+    const o = d.querySelector('[data-out]'); if (o) o.addEventListener('click', async () => { await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }); location.reload(); });
+    f.addEventListener('submit', async e => {
+      e.preventDefault();
+      const e2 = window.PPPw.check(f.password.value, { nick: me && me.nick });
+      if (e2) { st.textContent = errText({ error: 'pw_' + e2 }); f.password.focus(); return; }
+      const j = mode === 'reset' ? await api('pw/reset', { token: resetTok, password: f.password.value }) : await api('pw/change', { old: f.old ? f.old.value : '', password: f.password.value });
+      if (!j.ok) { st.textContent = errText(j); return; }
+      if (mode === 'reset' || mode === 'temp') { location.reload(); return; }
+      d.close(); toast(t('pwDone'));
+      document.dispatchEvent(new CustomEvent('pp:pw'));
+    });
+    d.showModal();
+    (f.old || f.password).focus();
+  }
+  async function logoutAll() {
+    if (!confirm(t('outAllAsk'))) return;
+    await fetch('/api/pw/logout-all', { method: 'POST', credentials: 'same-origin' });
+    location.reload();
   }
 
   function editPage() {
