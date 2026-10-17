@@ -7,7 +7,7 @@ import { challengeApi, challengeCron, planDayColors, CHALLENGE_TABLES } from './
 import { CH_DEFAULTS, CH_RANGE } from './challenge-plan.js';
 import '../site/assets/can-do.js'; // PPCanDo — что можно с вещью (этап 7)
 const PPCanDo = globalThis.PPCanDo;
-import { cardsApi, importCards, translateMissing, myCards, tradeNews, CARD_TABLES } from './cards.js'; // коллекционные карточки (docs/cards.md)
+import { cardsApi, importCards, translateMissing, myCards, tradeNews, cardGiftNews, CARD_TABLES, CARD_ALTER } from './cards.js'; // коллекционные карточки (docs/cards.md)
 import { authApi, googleLink, funnelStep, mailOn, adventMail, adventAsk, AUTH_TABLES, AUTH_ALTER } from './auth.js'; // вход с паролем, письма, воронки (этап 12)
 import { flockApi, featherNews, FLOCK_TABLES, FLOCK_ALTER } from './flock.js'; // «Все птички» и пёрышки (этап 13 Б+В, docs/flock.md)
 import { flockNewsApi, flockEvent as flockEventDb, roomEvent, flockNewsCron, FLOCK_NEWS_TABLES, FLOCK_NEWS_ALTER } from './flock-news.js'; // новости стаи (этап 13 Г, docs/flock.md)
@@ -281,6 +281,7 @@ const NEWS_KINDS = [
     const r = (await env.DB.prepare('SELECT from_nick, n FROM potion_gifts WHERE to_id = ? AND seen = 0').bind(u.id).all()).results;
     return r.length ? { n: r.length, from: [...new Set(r.map(x => x.from_nick).filter(Boolean))].slice(0, 3) } : null;
   }],
+  ['card', (env, req, u) => cardGiftNews(env, u.id)], // карточки, подаренные из кабинета (worker/cards.js)
   ['trade', (env, req, u) => tradeNews(env, u.id, RULES.tradeDays)], // новые предложения обмена карточками (worker/cards.js)
   ['reward', (env, req, u) => rewardNews(env, u.id)], // награда Титоса за уровень (worker/titos.js) — «Поставить» в ленте
   ['feathers', (env, req, u) => featherNews(env, u, rigaDay())], // пёрышки комнате — сводка раз в сутки (worker/flock.js)
@@ -412,7 +413,7 @@ async function ensureSchema(env) {
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER,
-    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER]) {
+    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER]) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   // «Выбор Полли» подешевел с 50 до 11 пуговок: уже начисленные записи пересчитать один раз, баланс = сумма журнала

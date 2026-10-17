@@ -16,7 +16,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **blog_sections** (worker/blog.js): `slug` text PK, `en` text ='', `ru` text ='', `lv` text ='', `sort` int =0
 - **cards** (worker/cards.js): `id` int PK auto, `n` int UNIQUE nn, `collection` text nn ='', `rarity` text nn ='common', `price` int =0, `img` text, `hidden` int =0, `src_lang` text ='ru', `t_en` text ='', `t_ru` text ='', `t_lv` text ='', `d_en` text ='', `d_ru` text ='', `d_lv` text ='', `stats` text ='[]', `game` text, `created_at` int, `updated_at` int
 - **card_sets** (worker/cards.js): `slug` text PK, `en` text ='', `ru` text ='', `lv` text ='', `src_lang` text ='ru', `created_at` int
-- **card_owner** (worker/cards.js): `card_id` int PK, `user_id` int nn, `price` int =0, `bought_at` int, `ref` text
+- **card_owner** (worker/cards.js): `card_id` int PK, `user_id` int nn, `price` int =0, `bought_at` int, `ref` text, `gift` text (подарок из кабинета: записка, '' — без; NULL — куплена), `seen` int =1 (0 — новость «🃏 Тебе карточка!» не видели)
 - **card_trades** (worker/cards.js): `id` int PK auto, `from_id` int nn, `to_id` int nn, `give` text nn, `take` text nn, `status` text nn ='open', `created_at` int, `done_at` int, `seen` int =0, `ref` text
 - **challenge_days** (worker/challenge-days.js): `day` text PK, `item` int, `subject_en` text, `subject_ru` text, `subject_lv` text, `tip_en` text, `tip_ru` text, `tip_lv` text, `colors` text, `time` int, `twist_en` text, `twist_ru` text, `twist_lv` text, `extra_en` text, `extra_ru` text, `extra_lv` text, `edited` int =0, `orig` text, `updated_at` int
 - **flock_events** (worker/flock-news.js): `id` int PK auto, `ts` int nn, `user_id` int nn =0, `kind` text nn, `ref` text nn ='', `data` text ='{}'; UNIQUE (user_id, kind, ref)
