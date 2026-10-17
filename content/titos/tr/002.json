@@ -1,0 +1,222 @@
+{
+ "Шпион среди огурцов": {
+  "en": "Spy among the cucumbers",
+  "lv": "Spiegs starp gurķiem"
+ },
+ "Кто кактус из банды Колючих?": {
+  "en": "Who is the cactus from the Prickly gang?",
+  "lv": "Kurš ir kaktuss no Dzeloņaino bandas?"
+ },
+ "Новое дело. На Огуречной тусовке у лавки Green Grocer пропали ценные бумаги, закладная на дом и красивая Помидорка. Говорят, там прячется рецидивист банды Колючих — кактус, который выдаёт себя за огурца. Фото с места — в папках. Допросите трёх джентльменов и найдите все восемь улик.": {
+  "en": "New case. At the Cucumber Party by the Green Grocer, valuable papers, a house mortgage and a beautiful Tomato have vanished. They say a repeat offender of the Prickly gang is hiding there: a cactus pretending to be a cucumber. The photo from the scene is in the folders. Question the three gentlemen and find all eight clues.",
+  "lv": "Jauna lieta. Gurķu ballītē pie Green Grocer pazuduši vērtspapīri, mājas hipotēkas līgums un skaista Tomātiņa. Runā, ka tur slēpjas Dzeloņaino bandas recidīvists — kaktuss, kas uzdodas par gurķi. Foto no notikuma vietas ir mapēs. Nopratini trīs džentlmeņus un atrodi visus astoņus pierādījumus."
+ },
+ "Верно! Поддельное удостоверение, перчатка, проколотая изнутри, кактусовая иголка на ленточке Розы, ни капли воды и бегство от дождя. «Агент Пикль» — это Шип, рецидивист банды Колючих! Такси остановили на краю пустыни: бумаги и закладная вернулись к хозяевам, а Помидорка Роза — домой.": {
+  "en": "Correct! A fake police ID, a glove pierced from the inside, a cactus spine on Rosa’s ribbon, not a drop of water and running from the rain. “Agent Pickle” is Spike, repeat offender of the Prickly gang! The taxi was stopped at the edge of the desert: the papers and the mortgage are back with their owners, and Tomato Rosa is home safe.",
+  "lv": "Pareizi! Viltota policijas apliecība, no iekšpuses caurdurts cimds, kaktusa adata uz Rozas lentītes, ne pilītes ūdens un bēgšana no lietus. “Aģents Pikls” ir Dzelonis, Dzeloņaino bandas recidīvists! Taksi apturēja tuksneša malā: papīri un hipotēkas līgums atgriezti īpašniekiem, bet Tomātiņa Roza — mājās."
+ },
+ "Дело закрыто. Огурцы в безопасности, Помидорка дома. Пора спать — без кофе. Спокойной ночи!": {
+  "en": "Case closed. The cucumbers are safe, the Tomato is home. Time for bed, without coffee. Good night!",
+  "lv": "Lieta slēgta. Gurķi ir drošībā, Tomātiņa mājās. Laiks gulēt — bez kafijas. Ar labu nakti!"
+ },
+ "Человек в плаще («агент Пикль»)": {
+  "en": "The man in the trench coat (“Agent Pickle”)",
+  "lv": "Vīrs mētelī (“aģents Pikls”)"
+ },
+ "Тёмные очки, шляпа надвинута на глаза, наушник. Говорит, что он агент полиции под прикрытием. Весь вечер простоял у фонаря.": {
+  "en": "Dark glasses, hat pulled low, an earpiece. Says he is an undercover police agent. Stood by the lamp post all evening.",
+  "lv": "Tumšas brilles, cepure dziļi uz acīm, austiņa. Saka, ka ir slepenais policijas aģents. Visu vakaru nostāvēja pie laternas."
+ },
+ "Лорд Септимус Гринвич": {
+  "en": "Lord Septimus Greenwich",
+  "lv": "Lords Septims Grīnvičs"
+ },
+ "Монокль, бабочка, трость. Воду не пьёт — только лимонад. Очень важный и немного подозрительный.": {
+  "en": "Monocle, bow tie, cane. Never drinks water, only lemonade. Very posh, slightly suspicious.",
+  "lv": "Monoklis, tauriņš, spieķis. Ūdeni nedzer — tikai limonādi. Ļoti svarīgs un mazliet aizdomīgs."
+ },
+ "Мимо! Лимонад — тоже 95% воды, а перчатку Лорда прокололи снаружи, когда он пожал руку настоящему кактусу. А настоящий тем временем уезжает…": {
+  "en": "Wrong! Lemonade is 95% water too, and the Lord’s glove was pricked from the outside, when he shook hands with the real cactus. Meanwhile the real one is getting away…",
+  "lv": "Garām! Limonāde arī ir 95% ūdens, un Lorda cimdu sadūra no ārpuses, kad viņš paspieda roku īstajam kaktusam. Bet īstais tikmēr aizbrauc…"
+ },
+ "Барон фон Укроп": {
+  "en": "Baron von Dill",
+  "lv": "Barons fon Dille"
+ },
+ "Курит трубку и обходит фонтан стороной. Сидел за столиком с папкой закладной.": {
+  "en": "Smokes a pipe and keeps away from the fountain. Sat at the table with the mortgage folder.",
+  "lv": "Smēķē pīpi un apiet strūklaku. Sēdēja pie galdiņa ar hipotēkas mapi."
+ },
+ "Мимо! Барон выпил два кувшина воды — счёт это подтверждает, — а фонтан обходит, только чтобы не погасла трубка. А настоящий тем временем уезжает…": {
+  "en": "Wrong! The Baron drank two jugs of water, the bill proves it, and he only avoids the fountain to keep his pipe lit. Meanwhile the real one is getting away…",
+  "lv": "Garām! Barons izdzēra divas krūkas ūdens — rēķins to apliecina —, un strūklaku apiet tikai tāpēc, lai nenodzistu pīpe. Bet īstais tikmēr aizbrauc…"
+ },
+ "Вася Кепка, главарь Кепок": {
+  "en": "Vasya Flatcap, boss of the Flatcaps",
+  "lv": "Vasja Cepure, Cepuru bandas boss"
+ },
+ "Банда с Огуречной улицы: кепки, жилеты, тяжёлые ботинки. Шумные, толкаются, вечно трутся на вечеринках.": {
+  "en": "The gang from Cucumber Street: caps, waistcoats, heavy boots. Loud and pushy, always hanging around parties.",
+  "lv": "Banda no Gurķu ielas: cepures, vestes, smagi zābaki. Skaļi, grūstās, vienmēr grozās ballītēs."
+ },
+ "Мимо! Кепки весь вечер стояли у стены и шумно пили воду прямо из вёдер. Громкие, но ни капли не колючие. А настоящий тем временем уезжает…": {
+  "en": "Wrong! The Flatcaps stood by the wall all evening, loudly drinking water straight from buckets. Noisy, but not prickly in the least. Meanwhile the real one is getting away…",
+  "lv": "Garām! Cepures visu vakaru stāvēja pie sienas un skaļi dzēra ūdeni tieši no spaiņiem. Trokšņaini, bet nemaz ne dzeloņaini. Bet īstais tikmēr aizbrauc…"
+ },
+ "Газета «The Scon-icle»": {
+  "en": "Newspaper “The Scon-icle”",
+  "lv": "Avīze “The Scon-icle”"
+ },
+ "СНОВА БАНДА КОЛЮЧИХ? На Огуречной тусовке пропали пачка ценных бумаг, закладная на дом мадам Тыквы и красавица Помидорка Роза. Полиция предупреждает: рецидивист Колючих умеет выдавать себя за огурца. Приметы: не пьёт воду, прячется от дождя, носит перчатки, оставляет иголки.": {
+  "en": "PRICKLY GANG STRIKES AGAIN? At the Cucumber Party, a stack of valuable papers, Madam Pumpkin’s house mortgage and the lovely Tomato Rosa all vanished. Police warn: the Prickly gang’s repeat offender can pass for a cucumber. Signs: never drinks water, hides from the rain, wears gloves, leaves needles behind.",
+  "lv": "ATKAL DZELOŅAINIE? Gurķu ballītē pazuda vērtspapīru kaudze, kundzes Ķirbes mājas hipotēkas līgums un skaistā Tomātiņa Roza. Policija brīdina: Dzeloņaino bandas recidīvists prot uzdoties par gurķi. Pazīmes: nedzer ūdeni, slēpjas no lietus, valkā cimdus, atstāj adatas."
+ },
+ "Полицейское удостоверение": {
+  "en": "Police ID",
+  "lv": "Policijas apliecība"
+ },
+ "Человек в плаще показывает удостоверение: «Агент Пикль, Огуречная полиция. Проходите!» Печать какая-то странная, но мелко — не разглядеть.": {
+  "en": "The man in the trench coat flashes an ID: “Agent Pickle, Cucumber Police. Move along!” The stamp looks odd, but it is too small to see properly.",
+  "lv": "Vīrs mētelī parāda apliecību: “Aģents Pikls, Gurķu policija. Ejiet tālāk!” Zīmogs izskatās dīvains, bet tas ir pārāk sīks, lai saskatītu."
+ },
+ "Под лупой: печать нарисована фломастером, в слове «Огуречная» ошибка — «Агуречная», а фото приклеено поверх чужого. Подделка!": {
+  "en": "Under the magnifier: the stamp is drawn with a felt-tip pen, “Cucumber” is spelled “Cucumbre”, and the photo is glued over someone else’s. A fake!",
+  "lv": "Zem lupas: zīmogs uzzīmēts ar flomāsteru, vārdā “Gurķu” ir kļūda — “Gurku”, un foto uzlīmēts virsū kāda cita fotogrāfijai. Viltojums!"
+ },
+ "Перчатка у фонаря": {
+  "en": "Glove by the lamp post",
+  "lv": "Cimds pie laternas"
+ },
+ "У подножия фонаря лежит серая перчатка. С ней что-то не так. Невооружённым глазом не разглядеть.": {
+  "en": "A grey glove lies at the foot of the lamp post. Something is odd about it. Too small to see with the naked eye.",
+  "lv": "Pie laternas pamatnes guļ pelēks cimds. Ar to kaut kas nav kārtībā. Ar neapbruņotu aci neredz."
+ },
+ "Под лупой: десятки крошечных дырочек, проколотых изнутри, — будто в перчатке была колючая лапа. На ярлычке: «Размер: XL Колючий». Того же серого цвета, что и тот плащ.": {
+  "en": "Under the magnifier: dozens of tiny holes, pierced from the inside, as if a prickly hand had been in it. The label says “Size: XL Prickly”. Same grey as that trench coat.",
+  "lv": "Zem lupas: desmitiem sīku caurumiņu, caurdurti no iekšpuses, it kā cimdā būtu bijusi dzeloņaina roka. Uz etiķetes: “Izmērs: XL Dzeloņains”. Tādā pašā pelēkā tonī kā tas mētelis."
+ },
+ "Красная ленточка": {
+  "en": "Red ribbon",
+  "lv": "Sarkanā lentīte"
+ },
+ "На брусчатке — красная ленточка Помидорки Розы. В ней застряло что-то крошечное.": {
+  "en": "Tomato Rosa’s red hair ribbon lies on the cobblestones. Something tiny is stuck in it.",
+  "lv": "Uz bruģa guļ Tomātiņas Rozas sarkanā matu lentīte. Tajā iesprūdis kaut kas sīks."
+ },
+ "Под лупой: это не мягкий огуречный пупырышек, а настоящая кактусовая иголка с песчинкой пустыни на кончике. Огурцы колются понарошку, кактусы — всерьёз.": {
+  "en": "Under the magnifier: not a soft cucumber bump but a real cactus spine, with a grain of desert sand on the tip. Cucumbers prickle gently. Cacti mean it.",
+  "lv": "Zem lupas: tas nav mīksts gurķa pumpiņš, bet īsta kaktusa adata ar tuksneša smilšu graudiņu galā. Gurķi dzeļ pa jokam, kaktusi — pa īstam."
+ },
+ "Счёт из лавки Green Grocer": {
+  "en": "Green Grocer bill",
+  "lv": "Green Grocer rēķins"
+ },
+ "Заказы за вечер. Сэр Корнелиус: 3 кувшина воды. Барон фон Укроп: 2 кувшина воды и рассол. Лорд Гринвич: 3 лимонада («от воды запотевает монокль»). Господин в плаще у фонаря: ничего, ни единого стакана.": {
+  "en": "Evening orders. Sir Cornelius: 3 jugs of water. Baron von Dill: 2 jugs of water and a pickle brine. Lord Greenwich: 3 lemonades (“water fogs up my monocle”). Gentleman in the trench coat by the lamp post: nothing at all, not a single glass.",
+  "lv": "Vakara pasūtījumi. Sērs Kornēlijs: 3 krūkas ūdens. Barons fon Dille: 2 krūkas ūdens un sālījums. Lords Grīnvičs: 3 limonādes (“no ūdens aizsvīst monoklis”). Kungs mētelī pie laternas: neko, ne vienas glāzes."
+ },
+ "Показания: сэр Корнелиус": {
+  "en": "Statement: Sir Cornelius",
+  "lv": "Liecība: sērs Kornēlijs"
+ },
+ "Сэр Корнелиус: Помидорка Роза подошла к человеку в плаще, вскрикнула «Ой, колется!» и пропала. Весь вечер он писал в блокнот с надписью TOP SECRET.": {
+  "en": "Sir Cornelius: Tomato Rosa went up to the man in the trench coat, cried “Ouch, it prickles!” and vanished. He wrote in a notebook marked TOP SECRET all evening.",
+  "lv": "Sērs Kornēlijs: Tomātiņa Roza piegāja pie vīra mētelī, iesaucās “Ai, dur!” un pazuda. Visu vakaru viņš rakstīja grāmatiņā ar uzrakstu TOP SECRET."
+ },
+ "Показания: барон фон Укроп": {
+  "en": "Statement: Baron von Dill",
+  "lv": "Liecība: barons fon Dille"
+ },
+ "Барон фон Укроп: когда пошёл дождь, человек в плаще спрятался под фонарём с зонтиком, а папку с закладной забрал «как полицейскую улику».": {
+  "en": "Baron von Dill: when it rained, the man in the trench coat hid under the lamp post with an umbrella, and he took the mortgage folder “as police evidence”.",
+  "lv": "Barons fon Dille: kad sāka līt, vīrs mētelī paslēpās zem laternas ar lietussargu, un mapi ar hipotēkas līgumu paņēma “kā policijas pierādījumu”."
+ },
+ "Показания: лорд Гринвич": {
+  "en": "Statement: Lord Greenwich",
+  "lv": "Liecība: lords Grīnvičs"
+ },
+ "Лорд Гринвич: пожать руку человеку в плаще — «будто ёжику»; он уехал на такси «в пустыню, быстро» с тяжёлой папкой и очень красной пассажиркой.": {
+  "en": "Lord Greenwich: shaking hands with the man in the trench coat was “like a hedgehog”; he left by taxi “to the desert, quick” with a heavy folder and a very red passenger.",
+  "lv": "Lords Grīnvičs: paspiest roku vīram mētelī bija “kā ezim”; viņš aizbrauca ar taksi “uz tuksnesi, ātri” ar smagu mapi un ļoti sarkanu pasažieri."
+ },
+ "Сэр Корнелиус Корнишон": {
+  "en": "Sir Cornelius Gherkin",
+  "lv": "Sērs Kornēlijs Kornišons"
+ },
+ "Нажимайте на людей и вещи на фото.": {
+  "en": "Click the people and things in the photo.",
+  "lv": "Spied uz cilvēkiem un lietām foto."
+ },
+ "Кепки: «Мы ничего не видели! Ну… видели, как тип в плаще раскрыл зонтик под дождём. Странный тип».": {
+  "en": "Flatcaps: “We saw nothing! Well… we saw the bloke in the trench coat open an umbrella in the rain. Weird bloke.”",
+  "lv": "Cepures: “Mēs neko neredzējām! Nu… redzējām, kā tips mētelī lietū atvēra lietussargu. Dīvains tips.”"
+ },
+ "Где вы были весь вечер?": {
+  "en": "Where were you all evening?",
+  "lv": "Kur jūs bijāt visu vakaru?"
+ },
+ "У витрины Green Grocer, с друзьями. Вода, пирожки, светская беседа. Я огурец, мне нужны мои 95% воды!": {
+  "en": "By the Green Grocer window, with friends. Water, pies, polite conversation. I am a cucumber, I need my 95% water!",
+  "lv": "Pie Green Grocer skatloga, ar draugiem. Ūdens, pīrādziņi, pieklājīga saruna. Es esmu gurķis, man vajag savus 95% ūdens!"
+ },
+ "Вы видели Помидорку Розу?": {
+  "en": "Did you see Tomato Rosa?",
+  "lv": "Vai redzējāt Tomātiņu Rozu?"
+ },
+ "Она подошла спросить у господина в плаще, что он пишет. Потом пискнула «Ой, колется!» — и больше я её не видел.": {
+  "en": "She went to ask the gentleman in the trench coat what he was writing. Then she squeaked “Ouch, it prickles!” and I never saw her again.",
+  "lv": "Viņa piegāja pajautāt kungam mētelī, ko viņš raksta. Tad iepīkstējās “Ai, dur!” — un vairāk es viņu neredzēju."
+ },
+ "Что-нибудь ещё странное?": {
+  "en": "Anything else odd?",
+  "lv": "Vēl kaut kas dīvains?"
+ },
+ "Тот весь вечер стоял у фонаря и писал в блокнот с надписью TOP SECRET. Секретное ведь обычно не подписывают, правда?": {
+  "en": "That one stood by the lamp post all evening, writing in a notebook marked TOP SECRET. Secret things are not usually labelled, are they?",
+  "lv": "Tas visu vakaru stāvēja pie laternas un rakstīja grāmatiņā ar uzrakstu TOP SECRET. Slepenas lietas taču parasti neparaksta, vai ne?"
+ },
+ "Курил трубку у витрины. К фонтану не подхожу только потому, что брызги тушат трубку!": {
+  "en": "Smoking my pipe by the window. I keep away from the fountain only because the spray puts my pipe out!",
+  "lv": "Smēķēju pīpi pie skatloga. Pie strūklakas nenāku tikai tāpēc, ka šļakatas nodzēš pīpi!"
+ },
+ "Что было, когда пошёл дождь?": {
+  "en": "What happened when it rained?",
+  "lv": "Kas notika, kad sāka līt?"
+ },
+ "Мы, огурцы, все подставили лица — красота! Только тот, в плаще, спрятался под фонарём и раскрыл зонтик. Огурец боится дождя? Смешно.": {
+  "en": "All of us cucumbers turned our faces up, lovely! Only the one in the trench coat hid under the lamp post and opened an umbrella. A cucumber afraid of rain? Ridiculous.",
+  "lv": "Mēs, gurķi, visi pavērsām sejas pret lietu — skaisti! Tikai tas mētelī paslēpās zem laternas un atvēra lietussargu. Gurķis baidās no lietus? Smieklīgi."
+ },
+ "Кто был рядом с бумагами?": {
+  "en": "Who was near the papers?",
+  "lv": "Kurš bija pie papīriem?"
+ },
+ "Папка с закладной лежала на нашем столике. Господин в плаще сказал: «Полиция, изымаю как улику» — и забрал. Очень официально.": {
+  "en": "The folder with the mortgage lay on our table. The man in the trench coat said “Police, I’m taking this as evidence” and took it. Very official.",
+  "lv": "Mape ar hipotēkas līgumu stāvēja uz mūsu galdiņa. Kungs mētelī teica: “Policija, ņemu kā pierādījumu” — un paņēma. Ļoti oficiāli."
+ },
+ "Почему вы не пьёте воду?": {
+  "en": "Why don’t you drink water?",
+  "lv": "Kāpēc jūs nedzerat ūdeni?"
+ },
+ "От воды запотевает монокль, мой дорогой. Я пью лимонад, по три за вечер. Это всё равно 95% воды, спросите у лавочника.": {
+  "en": "Water fogs up my monocle, my dear. I drink lemonade, three a night. It is still 95% water, ask the grocer.",
+  "lv": "No ūdens aizsvīst monoklis, mans dārgais. Es dzeru limonādi, trīs vakarā. Tā tik un tā ir 95% ūdens, pajautājiet bodniekam."
+ },
+ "Кто-нибудь пожимал вам руку?": {
+  "en": "Did anyone shake your hand?",
+  "lv": "Vai kāds jums spieda roku?"
+ },
+ "Тип в плаще, через перчатку. Будто ёжику руку пожал. Пришлось штопать свою перчатку.": {
+  "en": "The trench coat fellow, through a glove. Like shaking hands with a hedgehog. I had to have my own glove darned.",
+  "lv": "Tas tips mētelī, caur cimdu. It kā ezim roku paspiestu. Nācās lāpīt savu cimdu."
+ },
+ "Куда он делся?": {
+  "en": "Where did he go?",
+  "lv": "Kur viņš palika?"
+ },
+ "Вызвал такси «в пустыню, быстро». С тяжёлой папкой и очень красной пассажиркой на заднем сиденье. Я думал, это полицейское дело.": {
+  "en": "Called a taxi, “to the desert, quick”. With a heavy folder and a very red passenger in the back. I thought it was a police matter.",
+  "lv": "Izsauca taksi “uz tuksnesi, ātri”. Ar smagu mapi un ļoti sarkanu pasažieri aizmugurē. Es domāju, ka tā ir policijas lieta."
+ }
+}

@@ -36,6 +36,7 @@
     { id: 'shop', ic: '🛍', name: 'Магазин', group: 'shop', about: 'Что продаётся в магазине и сколько штук; цены считаются сами.' },
     { id: 'cards', ic: '🃏', name: 'Карточки', group: 'shop', about: 'Коллекционные карточки: каждая — в одном экземпляре. Новая карточка, правка, номер, скрыть, удалить; цена обычных; импорт коллекций с сайта.' },
     { id: 'advent', ic: '🎄', name: 'Адвент', group: 'shop', about: 'Что лежит в каком окошке адвент-календаря.', count: 'advent' },
+    { id: 'titos', ic: '🕵️', name: 'Титос', group: 'shop', about: 'Дела детектива Титоса: какие дела на сайте и переведены ли они. Новые дела — файлы content/titos/NNN.json (их пишет Claude), после выкладки они заносятся сами раз в час.' },
     { id: 'games', ic: '🎮', name: 'Награды игр', group: 'shop', open: 'rules', focus: rulesBox(/Пуговичный дождь/), about: 'Сколько пуговок дают игры «Пуговичный дождь» и «Зельеварня».' },
     { id: 'visitors', ic: '👥', name: 'Посетители', group: 'stats', about: 'Сколько людей заходит на сайт, откуда и с каких устройств.' },
     { id: 'analytics', ic: '📈', name: 'Статьи', group: 'stats', about: 'Просмотры, лайки и комментарии каждой статьи.' },
@@ -47,7 +48,7 @@
     { id: 'strict', ic: '🛡', name: 'Строгий режим', group: 'service', open: 'comments', focus: '#adm-strict', about: 'Строгий режим комментариев: не больше одного комментария в час с одного адреса.' },
     { id: 'security', ic: '🔐', name: 'Защита', group: 'service', about: 'PIN админа и код восстановления на случай, если потеряете Google.' },
   ];
-  const SECTIONS = { inbox, security, overview: inbox, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art, challenge: () => statsView('challenge'), flock: () => statsView('flock'),
+  const SECTIONS = { titos, inbox, security, overview: inbox, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art, challenge: () => statsView('challenge'), flock: () => statsView('flock'),
     themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
     cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
     carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
@@ -379,6 +380,20 @@
   }
 
   // ---------- правки блоков сайта (режим «✏️ Править страницу») ----------
+  // 🕵️ Титос: дела в базе (worker/titos.js), «⟳ Импортировать дела» — занести site/assets/titos-cases.json и перевести недостающее
+  async function titos(msg) {
+    main.innerHTML = '<p class="be-note">Загрузка…</p>';
+    let d; try { d = await api('admin/titos'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    main.innerHTML = `<section class="adm-box"><h2>🕵️ Дела: ${d.cases.length}</h2>
+      <p class="be-note">Играющих птичек: ${d.players.n}, дальше всех — уровень ${d.players.top}.${msg ? ' ' + esc(msg) : ''}</p>
+      <p><button type="button" class="pill-btn" id="adm-titos-imp">⟳ Импортировать дела</button></p>
+      ${d.cases.length ? `<table class="be-table adm-table"><thead><tr><th>№</th><th>Дело</th><th>Перевод</th></tr></thead><tbody>
+      ${d.cases.map(c => `<tr><td>${c.n}</td><td>${esc(c.title)}</td><td>${c.missing.en || c.missing.lv ? `нет EN: ${c.missing.en}, LV: ${c.missing.lv} — показывается RU` : '✓ EN, LV'}</td></tr>`).join('')}</tbody></table>` : '<p class="be-note">Дел в базе ещё нет — нажмите «Импортировать дела».</p>'}</section>`;
+    document.getElementById('adm-titos-imp').onclick = async e => {
+      e.target.disabled = true; e.target.textContent = 'Импортирую и перевожу…';
+      try { const r = await api('admin/titos/import', {}); titos(r.error ? 'Не вышло: ' + r.error : `Готово: дел ${r.imported}` + (r.errors && r.errors.length ? `, без перевода ${r.errors.length} (нет ключа Gemini?)` : '') + '.'); } catch (x) { alert(err(x)); titos(); }
+    };
+  }
   async function edits() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('admin/blocks'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }

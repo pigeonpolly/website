@@ -21,6 +21,7 @@
 | Пуговки, магазин, цены, правила | docs/shop.md |
 | Игры | docs/games.md |
 | Комнаты, квесты | docs/rooms.md |
+| Детектив Титос: дела, кофе | docs/titos.md, docs/titos-cast.md, content/titos/index.md |
 | Wobbleland | docs/wobbleland.md |
 | Палитры | docs/palettes.md |
 | Коллекционные карточки | docs/cards.md |

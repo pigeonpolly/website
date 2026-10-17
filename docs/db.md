@@ -2,7 +2,7 @@
 
 _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TABLE / ALTER TABLE и обращений к meta в worker/*.js. Руками не править._
 
-## Таблицы (30)
+## Таблицы (33)
 
 Обозначения: PK — первичный ключ, nn — NOT NULL, =x — DEFAULT x; «+» — столбцы, добавленные ALTER TABLE.
 
@@ -13,8 +13,8 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **blog_sections** (worker/blog.js): `slug` text PK, `en` text ='', `ru` text ='', `lv` text ='', `sort` int =0
 - **cards** (worker/cards.js): `id` int PK auto, `n` int UNIQUE nn, `collection` text nn ='', `rarity` text nn ='common', `price` int =0, `img` text, `hidden` int =0, `src_lang` text ='ru', `t_en` text ='', `t_ru` text ='', `t_lv` text ='', `d_en` text ='', `d_ru` text ='', `d_lv` text ='', `stats` text ='[]', `created_at` int, `updated_at` int
 - **card_sets** (worker/cards.js): `slug` text PK, `en` text ='', `ru` text ='', `lv` text ='', `src_lang` text ='ru', `created_at` int
-- **card_owner** (worker/cards.js): `card_id` int PK, `user_id` int nn, `price` int =0, `bought_at` int, `ref` text (после обмена — `trade:<id>`)
-- **card_trades** (worker/cards.js, этап 7 В): `id` int PK auto, `from_id` int nn, `to_id` int nn, `give` text nn (JSON id карточек from), `take` text nn (JSON id карточек to), `status` text nn ='open' (accepted / declined / cancelled / stale / expired), `created_at` int, `done_at` int, `seen` int =0, `ref` text; индексы (to_id, status), (from_id, status)
+- **card_owner** (worker/cards.js): `card_id` int PK, `user_id` int nn, `price` int =0, `bought_at` int, `ref` text
+- **card_trades** (worker/cards.js): `id` int PK auto, `from_id` int nn, `to_id` int nn, `give` text nn, `take` text nn, `status` text nn ='open', `created_at` int, `done_at` int, `seen` int =0, `ref` text
 - **challenge_days** (worker/challenge-days.js): `day` text PK, `item` int, `subject_en` text, `subject_ru` text, `subject_lv` text, `tip_en` text, `tip_ru` text, `tip_lv` text, `colors` text, `time` int, `twist_en` text, `twist_ru` text, `twist_lv` text, `extra_en` text, `extra_ru` text, `extra_lv` text, `edited` int =0, `orig` text, `updated_at` int
 - **users** (worker/index.js): `id` int PK auto, `sub` text UNIQUE nn, `email` text, `nick` text UNIQUE COLLATE NOCASE, `consent` int =0, `banned` int =0, `created_at` int; + `avatar` text ='', `best` int =0, `badges` text ='', `months` text ='', `room` text ='', `picks` int =0, `mcount` text ='', `last_seen` int, `game_best` int =0, `game_best_at` int, `maze_level` int =1, `inv` text ='', `pot_fails` int =0, `eyes` int =0, `eye_next` int =0, `room_at` int, `req_n` int =0, `req_mid` int =0, `buttons` int =0, `referrer` int
 - **sessions** (worker/index.js): `token` text PK, `user_id` int nn, `expires` int nn; + `pin_ok` int =0
@@ -37,6 +37,8 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **draw_requests** (worker/index.js): `id` int PK auto, `user_id` int, `anon` text, `text` text nn, `lang` text, `who` text, `status` text ='open', `img` text, `gift` text, `created_at` int, `answered_at` int; + `text_en` text, `ip` text, `text_ru` text, `text_lv` text
 - **draw_likes** (worker/index.js): `rid` int nn, `kind` text nn, `who` text nn, `created_at` int; PRIMARY KEY (rid, kind, who)
 - **potion_gifts** (worker/index.js): `id` int PK auto, `to_id` int nn, `from_nick` text, `ing` text nn, `n` int nn, `created_at` int, `seen` int =0
+- **titos** (worker/titos.js): `user_id` int PK, `level` int =0, `coffee` int =10, `coffee_at` int =0, `drink_at` int =0, `sleep` int =0, `run` int =0, `found` text ='[]', `started` int =0, `bugs` text ='[]', `sell_day` text ='', `sell_n` int =0, `legacy` int =0
+- **titos_cases** (worker/titos.js): `n` int PK, `data` text nn, `tr` text ='{}', `hash` text, `updated_at` int
 
 ## Ключи meta (34)
 
