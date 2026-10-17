@@ -693,6 +693,19 @@
     let trades = mine && location.hash === '#trades' && !!window.PPCards; // /bird/#trades — «Посмотреть» в новости trade (news.js)
     if (trades) history.replaceState(null, '', location.pathname + location.search);
     show(trades ? 'cards' : 'bag');
+    // /bird/#room, #bag, #album — пункты меню аватара в шапке (этап 14 Б); на своей странице — по hashchange
+    const go = () => {
+      const k = mine && location.hash.slice(1);
+      if (!['room', 'bag', 'album'].includes(k) || !page.isConnected) return;
+      history.replaceState(null, '', location.pathname + location.search);
+      if (k === 'album') return page.querySelector('#bp-album').click();
+      if (k === 'bag') show('bag');
+      const el = k === 'room' ? page.querySelector('#bp-room') : page.querySelector('.bp-tabs');
+      setTimeout(() => el && el.scrollIntoView({ behavior: 'smooth', block: 'start' }), 300);
+    };
+    go();
+    if (mine && !window.__ppHashGo) { window.__ppHashGo = 1; addEventListener('hashchange', () => window.__ppHashFn && window.__ppHashFn()); }
+    window.__ppHashFn = go;
     if (mine) {
       document.getElementById('sw-out').onclick = async () => { await post('logout'); location.reload(); };
       const noff = document.getElementById('sw-newsoff'); // новости стаи /flock/news/ (worker/flock-news.js)

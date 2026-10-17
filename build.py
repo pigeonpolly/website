@@ -56,6 +56,8 @@ PAGES = [
      "Flock news: new pixel birds, drawings of the day, housewarmings, badges, collectible cards and news from Polly."),
     ("shop", "Shop", "shop.html",
      "The Pigeon Polly shop: hats, scarves, frames and treasures for your pixel bird, paid for with buttons you earn on the site."),
+    ("games", "Games", "games.html",
+     "Pigeon Polly games: Button Rain, Polly’s Potion Lab, Detective Titos, Polly’s Office, Wobbleland and the advent calendar. Earn buttons and spend them in the shop."),
     ("bird", "Bird profile", "bird.html",
      "A bird of the Pigeon Polly flock: its room, bag of gifts, achievements and sketches from the Daily Challenge."),
     ("requests", "Draw this for me", "requests.html",
@@ -94,52 +96,78 @@ SOCIAL = [
     ("https://www.patreon.com/cw/pigeon_polly", "Patreon"),
     ("https://www.pinterest.com/pigeonpollyart/", "Pinterest"),
 ]
-# Разделы: пункт меню ведёт на первую вкладку, внутри раздела — ряд вкладок (section_tabs)
+# Меню (этап 14 Б): 5 пунктов — Стая · Играть · Рисовать · Блог · Обо мне. Пункт ведёт на хаб раздела,
+# подпункт — (путь, название, значок, описание); путь с «#» — якорь на странице. Переводы — content/i18n (ключи с классами ns-t / ns-d / nm-t).
 SECTIONS = {
-    "draw": [("challenge", "Daily Challenge"), ("requests", "Draw this for me"), ("palettes", "Palettes"), ("polly-helps", "Polly, help me draw"), ("e-books", "Books")],
-    "sketchbook": [("art-portfolio", "All series"), ("art-portfolio/sketchbook", "Sketchbook Pages"), ("art-portfolio/anxiety", "Anxiety"),
-                   ("art-portfolio/bird", "Pigeon Polly"), ("art-portfolio/snail", "Mr.Chew"), ("art-portfolio/detective", "Mr.Titos"), ("art-portfolio/halloween", "Pumpkin Family"),
-                   ("art-portfolio/ai-art", "AI Art")],
-    "play": [("flock", "The Flock"), ("flock/news", "Flock news"),("shop", "Shop"), ("rain", "Button Rain"), ("potions", "Polly’s Potion Lab"), ("advent", "Advent calendar"), ("titos", "Detective Titos"), ("polly-office", "Polly, Office Clerk"),
-             ("wobbleland", "Wobbleland")],
-    "about": [("about-me", "About me"), ("on-walls-and-pages", "On Walls & Pages"),
-              ("projects", "Learning & AI"), ("work-with-me", "Work with me")],
+    "flock": [("flock", "All birds", "🐦", "Find any bird and pay a visit"),
+              ("challenge#sw-wall", "Flock drawings", "🎨", "What was drawn today and before"),
+              ("flock/news", "Flock news", "📰", "Who hatched, what was drawn, who had a housewarming")],
+    "play": [("advent", "Advent calendar", "🎄", "31 windows with gifts"),
+             ("rain", "Button Rain", "🔘", "Catch buttons, dodge ink blots"),
+             ("potions", "Potion Lab", "🧪", "A maze, ingredients and potions with silly names"),
+             ("titos", "Detective Titos", "🕵️", "100 cases and one very perky detective"),
+             ("polly-office", "Polly’s Office", "📮", "Help Polly with the Council of Towns’ mail"),
+             ("wobbleland", "Wobbleland", "🗺", "Map, holidays and recipes of eleven towns")],
+    "draw": [("challenge", "Daily Challenge", "✏️", "A theme, three colours and a timer — every day"),
+             ("requests", "Draw this for me", "💡", "Suggest an idea and I’ll draw it"),
+             ("palettes", "Palettes", "🎨", "Colours from my paintings and from your photos"),
+             ("polly-helps", "Polly, help me", "🕊", "How to draw anything from simple shapes"),
+             ("e-books", "Books", "📚", "My books about drawing")],
+    "about": [("art-portfolio", "Sketchbook", "📓", "Character series, sketchbook pages, AI art"),
+              ("on-walls-and-pages", "On Walls & Pages", "🖼", "Exhibitions and publications"),
+              ("projects", "Learning & AI", "🎓", "Projects about learning and technology"),
+              ("work-with-me", "Work with me", "🤝", "Illustrations, courses, collaboration")],
 }
-# страницы, у которых активна вкладка с другим адресом (профиль птички — в «Играть»)
-TAB_ALIAS = {"bird": "flock"}
-# вкладки, которых нет в выпадающем меню и карте сайта (они уже есть в другом пункте), но есть внутри раздела
+# внизу подменю, через линию — хаб раздела
+SECTION_HUB = {"play": ("games", "All games and the shop →"), "draw": ("challenge", "To today’s theme →"), "about": ("about-me", "About me →")}
+# страницы не из меню: в каком они разделе и какой подпункт подсвечен («Стая › Все птички» над заголовком)
+TAB_ALIAS = {"bird": "flock", "shop": "games", "games": "games"}
+# подпись над заголовком для страниц раздела, которых нет в подменю
+CRUMB_ONLY = {"shop": ("play", "Shop")}
+for _p in ("anxiety", "sketchbook", "snail", "bird", "detective", "halloween", "ai-art"):
+    TAB_ALIAS["art-portfolio/" + _p] = "art-portfolio"
+# подпункты, которых нет в выпадающем меню (а в подвале есть)
 MENU_HIDE = {}
-# меню (10.10.2026, «сайт перегружен»): 5 пунктов — Рисовать · Играть · Блог · Мой скетчбук · Обо мне
 NAV = [
+    ("flock", "The Flock", "flock"),
+    ("games", "Play", "play"),
     ("challenge", "Draw", "draw"),
-    ("flock", "Play", "play"),
     ("blog", "Blog"),
-    ("art-portfolio", "My Sketchbook", "sketchbook"),
     ("about-me", "About me", "about"),
 ]
+# адвент — первым в «Играть» и со счётчиком с 1.10 по 23.01 (site.js по дате)
+SEASONAL = {"advent"}
 
 
 def section_of(path):
     path = TAB_ALIAS.get(path, path)
     for key, tabs in SECTIONS.items():
-        if any(p == path for p, _ in tabs):
+        if any(t[0] == path for t in tabs):
+            return key, path
+    for key, (hub, _) in SECTION_HUB.items():
+        if hub == path:
             return key, path
     return None, path
 
 
 def section_tabs(path):
-    return ""  # 10.10.2026: ряды кнопок-вкладок над страницами убраны («создают лишний шум»), подпункты — в выпадающем меню
+    """Над заголовком страницы раздела: «Стая › Все птички» (раздел — ссылкой). Хабам без своего подпункта — ничего."""
     key, cur = section_of(path)
-    if not key:
+    sub = CRUMB_ONLY.get(path) or next((t for t in SECTIONS.get(key, []) if t[0] == cur), None)
+    key = CRUMB_ONLY.get(path, (key,))[0]
+    if not key or not sub:
         return ""
-    cur_attr = ' aria-current="page"'
-    links = "".join(f'<a href="{href(p)}"{cur_attr if p == cur else ""}>{esc(l)}</a>' for p, l in SECTIONS[key])
-    return f'<nav class="sec-tabs" aria-label="Section"><div class="sec-tabs-in">{links}</div></nav>\n'
+    top = next(e for e in NAV if len(e) == 3 and e[2] == key)
+    return (f'<nav class="crumbs" aria-label="Breadcrumb"><a href="{href(top[0])}"><span class="nm-t">{esc(top[1])}</span></a>'
+            f'<span aria-hidden="true">›</span><span aria-current="page" class="ns-t">{esc(sub[1])}</span></nav>\n')
 
 esc = html.escape
 
 
 def href(path):
+    if "#" in path:
+        base, frag = path.split("#", 1)
+        return href(base) + "#" + frag
     return path if path.startswith("http") else "/" + (path + "/" if path else "")
 
 
@@ -150,35 +178,43 @@ def nav_link(path, label, current):
     return f'<a href="{href(path)}"{cur}>{esc(label)}</a>'
 
 
+def nav_subs(key):
+    return [t for t in SECTIONS.get(key, []) if t[0] not in MENU_HIDE.get(key, ())]
+
+
 def nav_html(current):
     items = []
-    key, _ = section_of(current)
+    key, cur = section_of(current)
     for entry in NAV:
         path, label = entry[0], entry[1]
         on = (len(entry) == 3 and entry[2] == key) or path == current
         cur_attr = ' aria-current="page"' if on else ""
-        subs = [t for t in SECTIONS.get(entry[2], []) if t[0] not in MENU_HIDE.get(entry[2], ())] if len(entry) == 3 else []
+        top = f'<span class="nm-t">{esc(label)}</span>'
+        subs = nav_subs(entry[2]) if len(entry) == 3 else []
         if not subs:
-            items.append(f'<li><a href="{href(path)}"{cur_attr}>{esc(label)}</a></li>')
+            items.append(f'<li><a href="{href(path)}"{cur_attr}>{top}</a></li>')
             continue
-        # подменю: на компьютере выпадает при наведении, на телефоне раскрывается стрелкой (вкладки внутри страниц остаются)
-        sub = "".join(f'<li><a href="{href(p)}"{" aria-current=" + chr(34) + "page" + chr(34) if p == current else ""}>{esc(l)}</a></li>' for p, l in subs)
-        items.append(f'<li class="has-sub{" active" if on else ""}"><a href="{href(path)}"{cur_attr}>{esc(label)}</a>'
-                     f'<button type="button" class="sub-toggle" aria-expanded="false" aria-label="Show submenu"><span aria-hidden="true">▾</span></button>'
+        # подменю: на компьютере — светлая карточка при наведении, на телефоне — аккордеон (раздел текущей страницы раскрыт)
+        sub = "".join(f'<li{" data-adv" if p in SEASONAL else ""}><a href="{href(p)}"{" aria-current=" + chr(34) + "page" + chr(34) if p == cur else ""}>'
+                      f'<i class="ns-i" aria-hidden="true">{i}</i><span class="ns-t">{esc(l)}</span><small class="ns-d">{esc(d)}</small></a></li>'
+                      for p, l, i, d in subs)
+        hub = SECTION_HUB.get(entry[2])
+        if hub:
+            sub += f'<li class="ns-hub"><a href="{href(hub[0])}"><span class="ns-t">{esc(hub[1])}</span></a></li>'
+        items.append(f'<li class="has-sub{" active open-cur" if on else ""}"><a href="{href(path)}"{cur_attr}>{top}</a>'
+                     f'<button type="button" class="sub-toggle" aria-expanded="{"true" if on else "false"}" aria-label="Show submenu"><span aria-hidden="true">▾</span></button>'
                      f'<ul class="nav-sub">{sub}</ul></li>')
     return "\n".join(items)
 
 
 def footer_html():
-    """Карта сайта в подвале: колонка на каждый пункт меню, внутри — вкладки раздела."""
+    """Карта сайта в подвале: те же разделы, что в меню, колонками."""
     cols = []
     for entry in NAV:
         path, label = entry[0], entry[1]
-        links = [t for t in SECTIONS.get(entry[2], []) if t[0] not in MENU_HIDE.get(entry[2], ())] if len(entry) == 3 else []
-        if path == "blog":
-            links = []
-        lis = "".join(f'<li><a href="{href(p)}">{esc(l)}</a></li>' for p, l in links)
-        cols.append(f'<div class="ft-col"><p class="ft-h"><a href="{href(path)}">{esc(label)}</a></p><ul>{lis}</ul></div>')
+        links = nav_subs(entry[2]) if len(entry) == 3 else []
+        lis = "".join(f'<li><a href="{href(t[0])}"><span class="ns-t">{esc(t[1])}</span></a></li>' for t in links)
+        cols.append(f'<div class="ft-col"><p class="ft-h"><a href="{href(path)}"><span class="nm-t">{esc(label)}</span></a></p><ul>{lis}</ul></div>')
     return '<nav class="ft-map" aria-label="Site map">' + "".join(cols) + "</nav>"
 
 

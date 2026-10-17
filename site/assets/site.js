@@ -18,9 +18,24 @@
       btn.setAttribute('aria-expanded', open);
     });
   });
+  // телефон (☰ — аккордеон): раздел текущей страницы раскрыт (build.py ставит .open-cur)
+  const narrow = () => window.matchMedia('(max-width: 1300px)').matches;
+  if (narrow()) document.querySelectorAll('.has-sub.open-cur').forEach(li => li.classList.add('open'));
+  // адвент в «Играть»: с 1.10 по 23.01 — первым и со счётчиком (до 1.12 — сколько дней, в декабре — окошко дня, в январе — догнать пропущенное)
+  document.querySelectorAll('.nav-sub [data-adv]').forEach(li => {
+    const d = new Date(), m = d.getMonth() + 1, day = d.getDate(), L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
+    if (!(m >= 10 || (m === 1 && day <= 23))) return;
+    const left = Math.ceil((new Date(d.getFullYear(), 11, 1) - new Date(d.getFullYear(), m - 1, day)) / 864e5);
+    const txt = m === 12 ? [`window ${day} of 31`, `окошко ${day} из 31`, `lodziņš ${day} no 31`][L]
+      : m === 1 ? ['catch up till 23.01', 'догнать до 23.01', 'panākt līdz 23.01'][L]
+      : [`in ${left} days`, `через ${left} дн.`, `pēc ${left} d.`][L];
+    const b = document.createElement('b'); b.className = 'ns-c'; b.textContent = txt;
+    li.querySelector('a').appendChild(b);
+    li.parentElement.prepend(li);
+  });
   document.addEventListener('click', e => {
     document.querySelectorAll('.has-sub.open').forEach(li => {
-      if (!li.contains(e.target) && window.matchMedia('(min-width: 1281px)').matches) {
+      if (!li.contains(e.target) && !narrow()) {
         li.classList.remove('open');
         li.querySelector('.sub-toggle').setAttribute('aria-expanded', 'false');
       }

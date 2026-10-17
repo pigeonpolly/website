@@ -9,6 +9,10 @@
     signIn: ['Sign in', 'Войти', 'Ienākt'],
     why: ['One account for the Daily Challenge, blog comments and your own bird in the flock.', 'Один вход для челленджа, комментариев в блоге и своей птички в стае.', 'Viena ieeja izaicinājumam, bloga komentāriem un savam putniņam barā.'],
     profile: ['My profile', 'Мой профиль', 'Mans profils'],
+    getBird: ['Get a bird', 'Получить птичку', 'Saņem putniņu'],
+    streak: [n => `🔥 ${n}-day streak`, n => `🔥 серия ${n} дн.`, n => `🔥 sērija ${n} d.`],
+    room: ['My room', 'Моя комната', 'Mana istaba'], bag: ['Bag', 'Сумка', 'Soma'], album: ['Album', 'Альбом', 'Albums'],
+    shop: ['Shop', 'Магазин', 'Veikals'], env: ['Envelope', 'Конвертик', 'Aploksnīte'], edit: ['Edit page', 'Править страницу', 'Labot lapu'],
     nick: ['Choose a nickname', 'Выбрать ник', 'Izvēlēties segvārdu'],
     noNick: ['no nickname yet', 'ник ещё не выбран', 'segvārds vēl nav izvēlēts'],
     out: ['Sign out', 'Выйти', 'Iziet'],
@@ -138,7 +142,14 @@
     setTimeout(() => { if (btn.getAttribute('aria-expanded') !== 'true') btn.click(); btn.focus({ preventScroll: true }); }, 0);
     return true;
   }
-  window.PPAccount = { check, openSignIn, signedIn: () => !!(info && info.user), pwDialog, logoutAll };
+  // «🔘 N» в шапке (→ магазин), только у вошедших с ником; другие скрипты могут обновить число после покупки
+  function setButtons(n) {
+    const a = document.getElementById('hd-btns');
+    if (!a) return;
+    a.hidden = n == null;
+    if (n != null) { a.querySelector('b').textContent = n; a.href = pre + '/shop/'; }
+  }
+  window.PPAccount = { check, openSignIn, signedIn: () => !!(info && info.user), pwDialog, logoutAll, setButtons };
   check();
 
   // ник обязателен: окно сразу после первого входа, закрыть можно только выбрав ник (или выйдя)
@@ -187,7 +198,8 @@
     if (!u) {
       // окно входа: Google и вкладки «Вход» / «Регистрация»; во встроенном браузере (Instagram, TikTok, Facebook…) пароль — первым
       const g = `<div class="acct-g"></div>`, or = `<p class="acct-or"><span>${t('or')}</span></p>`;
-      el.innerHTML = `<button type="button" class="acct-btn acct-in" aria-expanded="false" aria-haspopup="dialog" aria-label="${t('signIn')}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span>${t('signIn')}</span></button>
+      // гостю (этап 14 Б): заметная «🥚 Получить птичку» и маленькое «Войти» — обе открывают окно входа
+      el.innerHTML = `<button type="button" class="acct-get" aria-label="${t('getBird')}"><span aria-hidden="true">🥚</span><span class="acct-get-t">${t('getBird')}</span></button><button type="button" class="acct-btn acct-in" aria-expanded="false" aria-haspopup="dialog" aria-label="${t('signIn')}"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="8" r="4"/><path d="M4 21c0-4.4 3.6-7 8-7s8 2.6 8 7"/></svg><span>${t('signIn')}</span></button>
         <div class="acct-pop acct-auth${IN_APP ? ' acct-inapp' : ''}" hidden role="dialog" aria-label="${t('signIn')}"><p>${t('why')}</p>
         ${IN_APP ? `<p class="acct-warn">${t('inApp')}</p>${pwBox()}${or}${g}` : `${g}${or}${pwBox()}`}
         <p class="acct-terms">${t('pub')} ${t('terms')} <a href="${pre}/privacy/">${t('termsLink')}</a>.</p>
@@ -196,17 +208,26 @@
       el.innerHTML = `<button type="button" class="acct-btn acct-me${u.admin ? ' acct-admin' : ''}" aria-expanded="false" aria-haspopup="menu" aria-label="${t('menu')}"><canvas width="40" height="52" aria-hidden="true"></canvas></button>
         <div class="acct-pop" hidden role="menu">
           <p class="acct-name">${u.nick ? '@' + esc(u.nick) : `<i>${t('noNick')}</i>`}${u.admin ? ` <span class="acct-badge">★ ${t('admin')}</span>` : ''}</p>
-          ${u.nick ? `<p class="acct-btns">🔘 <b>${u.buttons || 0}</b> ${t('btns')}</p>` : ''}
-          <a role="menuitem" href="${pre}${u.nick ? '/bird/' : '/challenge/'}">${u.nick ? t('profile') : t('nick')}</a>
-          ${u.admin ? `<a role="menuitem" href="/admin/">${t('cabinet')}</a>${document.querySelector('[data-ppb]') ? '<button type="button" role="menuitem" data-edit>✏️ Править страницу</button>' : ''}` : ''}
-          <button type="button" role="menuitem" data-out>${t('out')}</button>
+          ${u.nick ? `<p class="acct-btns">${u.streak ? `<span>${t('streak')(u.streak)}</span>` : ''}<span>🔘 <b>${u.buttons || 0}</b> ${t('btns')}</span></p>` : ''}
+          ${u.nick ? [['/bird/', '🐦', 'profile'], ['/bird/#room', '🏠', 'room'], ['/bird/#bag', '🎒', 'bag'], ['/bird/#album', '🃏', 'album'], ['/shop/', '🛍', 'shop']]
+            .map(([h, i, k]) => `<a role="menuitem" href="${pre}${h}"><i aria-hidden="true">${i}</i>${t(k)}</a>`).join('') + `<button type="button" role="menuitem" data-env><i aria-hidden="true">✉️</i>${t('env')}</button>`
+            : `<a role="menuitem" href="${pre}/challenge/">${t('nick')}</a>`}
+          ${u.admin ? `<hr><a role="menuitem" href="/admin/"><i aria-hidden="true">⚙</i>${t('cabinet')}</a>${document.querySelector('[data-ppb]') ? `<button type="button" role="menuitem" data-edit><i aria-hidden="true">✏️</i>${t('edit')}</button>` : ''}` : ''}
+          <hr><button type="button" role="menuitem" data-out>${t('out')}</button>
         </div>`;
       // админ: режим правки блоков страницы (site-edit.js грузится только для админа)
       const ed = el.querySelector('[data-edit]');
       if (ed) ed.addEventListener('click', () => { el.querySelector('.acct-pop').hidden = true; editPage(); });
       if (u.admin && document.querySelector('[data-ppb-hidden]')) document.documentElement.classList.add('pp-admin');
+      const env = el.querySelector('[data-env]'); // конвертик — лента новостей птички (news.js)
+      if (env) env.addEventListener('click', () => { el.querySelector('.acct-pop').hidden = true; if (window.PPNews) window.PPNews.open(); });
+      // своя страница профиля: /bird/#room и т.п. меняет только якорь — sketch-wall.js ловит hashchange
+      el.querySelectorAll('.acct-pop a[href*="/bird/#"]').forEach(a => a.addEventListener('click', () => { el.querySelector('.acct-pop').hidden = true; }));
       if (window.PPBirds) el.querySelector('canvas').getContext('2d').drawImage(window.PPBirds.spriteHD(window.PPBirds.dress(window.PPBirds.looks(u.id), u.avatar), 0), -8, -2); // детальная птичка
     }
+    setButtons(u && u.nick ? u.buttons || 0 : null);
+    const get = el.querySelector('.acct-get');
+    if (get) get.addEventListener('click', e => { e.stopPropagation(); if (window.PPHatch) window.PPHatch.click(); openSignIn(); });
     const btn = el.querySelector('.acct-btn'), pop = el.querySelector('.acct-pop');
     const close = () => { pop.hidden = true; btn.setAttribute('aria-expanded', 'false'); };
     btn.addEventListener('click', e => {

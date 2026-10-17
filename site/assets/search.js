@@ -55,7 +55,7 @@
       + block(t('pages'), pages, p => `<li><a href="${esc(p.u)}"><span class="search-ic">📄</span><span><b>${esc(p.t)}</b><small>${snippet(p.d + ' ' + p.x, words)}</small></span></a></li>`);
     out.innerHTML = html || (posts === null ? '<p class="search-hint">…</p>' : `<p class="search-hint">${t('none')}</p>`);
   }
-  btn.addEventListener('click', open);
+  document.querySelectorAll('.search-btn').forEach(b => b.addEventListener('click', open)); // в шапке и внизу меню на телефоне
   addEventListener('keydown', e => {
     if (e.key === '/' && !/input|textarea|select/i.test(document.activeElement.tagName) && !document.activeElement.isContentEditable) { e.preventDefault(); open(); }
   });

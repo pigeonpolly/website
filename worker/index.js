@@ -1976,8 +1976,10 @@ async function route(req, env, url) {
     const earned = u && u.nick && !u.banned ? await award(env, u.id, 'daily', rigaDay(), BTN.daily) : 0; // +3 пуговки за первый заход за сутки (шапка спрашивает на каждой странице)
     // зарплата от «администрации Воббленда»: пуговки уже начислены, а конвертик ещё не открыт (seen = 0)
     const news = await newsOf(env, req, u); // «конвертик»: зарплата, подарки, адвент… (site/assets/news.js)
+    // серия челленджа — для меню аватара в шапке (этап 14 Б)
+    const streak = u && u.nick && !u.banned ? streaks(streakDays((await env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(u.id).all()).results)).current : 0;
     const titos = u && !u.banned ? titosState(await env.DB.prepare('SELECT * FROM titos WHERE user_id = ?').bind(u.id).first(), RULES, titosHelpers(env)) : null; // кофейник Титоса (worker/titos.js)
-    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), pin: !(await isAdmin(u, env)) && await adminIdentity(u, env) ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, news, friendBtns: BTN.friend, titos, pwTemp: u.pw_temp ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
+    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), pin: !(await isAdmin(u, env)) && await adminIdentity(u, env) ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, streak, news, friendBtns: BTN.friend, titos, pwTemp: u.pw_temp ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
   }
   if (m === 'GET' && p === '/api/news') return json({ news: await newsOf(env, req, await currentUser(req, env)) }, 200, { 'cache-control': 'no-store' });
   if (m === 'GET' && p === '/api/config') return json({ ready: true, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });

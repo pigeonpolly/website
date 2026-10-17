@@ -4411,3 +4411,104 @@ html.me-in .home-new:not([hidden]) { display: block; }
 .hatch-hi a.pill-btn { box-sizing: border-box; text-decoration: none; }
 .hatch-hi .hh-btn { font-weight: 700; color: #8E5A0E !important; }
 .hatch-hi .hh-x { position: absolute; top: 10px; right: 12px; border: 0; background: none; font-size: 18px; color: #7A6F99; cursor: pointer; }
+
+/* ---------- Этап 14 Б: шапка и меню ----------
+   компьютер (≥1301): лого · меню · поиск · язык · 🔘 N · 🔔 · аватар; подменю — светлая карточка (значок, название, описание, внизу хаб раздела)
+   телефон и планшет (≤1300): лого · 🔘 N · 🔔 · аватар · ☰; в ☰ — аккордеон, внизу языки и поиск */
+.site-header .brand { order: 0; }
+.nav-foot { display: none; }
+.nm-t { font-family: var(--serif); font-weight: 600; }
+.hd-btns { order: 5; flex: none; display: inline-flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border-radius: 999px; background: rgba(243, 239, 250, .1); color: var(--text); font: 700 14px/1 var(--sans); text-decoration: none; white-space: nowrap; }
+.hd-btns[hidden] { display: none; }
+.hd-btns:hover { background: rgba(240, 169, 135, .25); }
+.site-header .bell { order: 6; }
+.site-header .acct { order: 7; display: flex; align-items: center; gap: 6px; }
+.site-header .menu-toggle { order: 8; }
+/* гость: заметная «🥚 Получить птичку» и маленькое «Войти» */
+.acct-get { display: inline-flex; align-items: center; gap: 6px; height: 38px; padding: 0 16px 0 12px; border: 0; border-radius: 999px; background: var(--peach); color: #2B1A51; font: 700 14px/1 var(--sans); white-space: nowrap; cursor: pointer; box-shadow: 0 3px 0 rgba(0, 0, 0, .18); }
+.acct-get > span:first-child { font-size: 17px; }
+.acct-get:hover { background: #F7C3A8; }
+.site-header .acct-in { width: auto; height: auto; display: inline-block; padding: 6px 4px; border: 0; border-radius: 6px; background: none; color: var(--muted); font: 600 13px/1 var(--sans); text-decoration: underline; text-underline-offset: 3px; }
+.site-header .acct-in:hover, .site-header .acct-in[aria-expanded="true"] { background: none; color: var(--text); }
+.site-header .acct-in svg { display: none; }
+.site-header .acct-in span { display: inline; }
+/* меню аватара: ник, серия, пуговки; пункты со значками */
+.acct-pop .acct-btns { display: flex; flex-wrap: wrap; gap: 4px 14px; margin: 0 0 8px; }
+.acct-pop a[role=menuitem], .acct-pop button[role=menuitem] { display: flex; align-items: center; gap: 10px; padding: 8px 10px; }
+.acct-pop [role=menuitem] i { width: 20px; font-style: normal; text-align: center; flex: none; }
+.acct-pop hr { width: 100%; margin: 4px 0; border: 0; border-top: 1px solid #ECE6F5; }
+
+@media (min-width: 1301px) {
+  .site-nav { order: 1; margin-left: auto; }
+  .site-header .search-btn { order: 3; margin-left: 6px; }
+  .site-header > .lang-switch { order: 4; margin: 0; }
+  .site-header .bell { margin-left: 0; }
+  .site-nav > ul > li > a { padding: 8px 12px; font-size: 16.5px; }
+  .site-nav > ul > li > a .nm-t { font-family: var(--serif); }
+  /* светлая карточка под пунктом */
+  .nav-sub { top: calc(100% + 10px); width: 330px; padding: 8px; background: #FFFDF8; border: 0; border-radius: 18px; box-shadow: 0 18px 44px rgba(10, 5, 30, .4); }
+  .nav-sub li + li { margin-top: 0; }
+  .nav-sub a { display: grid; grid-template-columns: 30px 1fr auto; column-gap: 8px; align-items: center; padding: 9px 10px; border-radius: 12px; color: #2B1A51; white-space: normal; font: 600 15px/1.25 var(--sans); }
+  .nav-sub a:hover, .nav-sub a:focus-visible { background: #F3EEFB; color: #2B1A51; }
+  .nav-sub a[aria-current="page"] { background: #FCE7DC; color: #2B1A51; }
+  .nav-sub .ns-i { grid-row: span 2; font-style: normal; font-size: 20px; text-align: center; }
+  .nav-sub .ns-t { grid-column: 2; }
+  .nav-sub .ns-d { grid-column: 2 / -1; font: 400 13px/1.35 var(--sans); color: #6B6290; }
+  .nav-sub .ns-c { grid-column: 3; grid-row: 1; padding: 2px 8px; border-radius: 99px; background: #D85A30; color: #fff; font: 700 11px/1.5 var(--sans); white-space: nowrap; }
+  .nav-sub .ns-hub { margin-top: 6px; padding-top: 6px; border-top: 1px solid #ECE6F5; }
+  .nav-sub .ns-hub a { display: block; color: #534AB7; font: 700 14px var(--sans); }
+  .has-sub.open:not(:hover):not(:focus-within) .nav-sub { visibility: hidden; opacity: 0; }
+}
+@media (max-width: 1300px) {
+  .site-header .search-btn:not(.nav-search), .site-header > .lang-switch { display: none; }
+  .hd-btns { margin-left: auto; }
+  .site-header .acct { margin-left: auto; }
+  .hd-btns:not([hidden]) ~ .acct { margin-left: 0; }
+  .site-nav > ul > li > a, .site-nav .has-sub > .sub-toggle { font-size: 22px; padding: 12px 8px; }
+  .site-nav > ul > li > a .nm-t { font-family: var(--serif); font-weight: 600; }
+  .site-nav .has-sub > .sub-toggle { color: var(--muted); }
+  .site-nav > ul > li { border-bottom: 1px solid var(--line); }
+  .site-nav > ul > li > a[aria-current="page"], .site-nav .has-sub.active > .sub-toggle { box-shadow: none; background: none; color: var(--peach); }
+  .site-nav .has-sub > .sub-toggle { box-shadow: none !important; background: none; }
+  /* подпункты: отступ, тонкая линия слева, мельче и приглушённее; описания не показываем */
+  .site-nav .has-sub > .nav-sub { margin: 0 0 12px 14px; padding: 2px 0 2px 14px; border-left: 1.5px solid var(--line); }
+  .nav-sub a { display: flex; gap: 10px; justify-content: flex-start; padding: 9px 8px; font-size: 16px; color: var(--muted); border-radius: 10px; white-space: normal; }
+  .nav-sub .ns-i { width: 22px; font-style: normal; text-align: center; flex: none; }
+  .nav-sub .ns-d { display: none; }
+  .nav-sub .ns-c { margin-left: auto; padding: 2px 8px; border-radius: 99px; background: #D85A30; color: #fff; font: 700 11px/1.5 var(--sans); white-space: nowrap; }
+  .nav-sub .ns-hub a { color: var(--peach); font-weight: 700; padding-left: 40px; }
+  .nav-sub a[aria-current="page"] { color: var(--text); background: rgba(240, 169, 135, .16); }
+  .nav-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; margin-top: 20px; padding-top: 4px; }
+  .nav-foot .lang-switch { margin: 0; order: 0; }
+  .nav-foot .lang-switch a { padding: 9px 14px; font-size: 15px; }
+  .nav-foot .nav-search { order: 0; margin: 0; width: auto; height: 44px; padding: 0 18px; gap: 8px; display: inline-flex; align-items: center; border-radius: 999px; font: 600 15px var(--sans); }
+  .nav-foot .nav-search svg { width: 18px; height: 18px; }
+}
+/* узкая шапка: «🥚 Получить птичку» короче, пуговки плотнее (классы c1–c4 ставит site.js) */
+.site-header.c2 .hd-btns { padding: 0 8px; gap: 3px; }
+.site-header.c2 .acct-get { padding: 0 12px 0 10px; }
+.site-header.c3 .acct-get { padding: 0 10px 0 8px; gap: 4px; }
+.site-header.c3 .acct-get-t { max-width: 70px; font-size: 11.5px; line-height: 1.1; white-space: normal; text-align: left; }
+.site-header.c4 .acct-get-t { display: none; }
+.site-header.c4 .acct-get { width: 38px; padding: 0; justify-content: center; }
+.site-header.c3 .hd-btns { height: 32px; font-size: 13px; }
+/* «Стая › Все птички» над заголовком страницы раздела */
+.crumbs { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; padding: 22px var(--gutter) 0; font: 500 14px/1.3 var(--sans); color: var(--muted); }
+.crumbs a { color: var(--peach); text-decoration: none; }
+.crumbs a:hover { text-decoration: underline; }
+.crumbs .nm-t { font-family: var(--sans); font-weight: 700; }
+.crumbs + .page-head { padding-top: 14px; }
+/* подвал: те же 5 разделов колонками */
+.ft-map { grid-template-columns: repeat(5, minmax(0, 1fr)); }
+.ft-h .nm-t { font-size: 17px; }
+@media (max-width: 900px) { .ft-map { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+@media (max-width: 520px) { .ft-map { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+/* /games/ — пока список (часть В заменит карточками) */
+.gm-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 12px; max-width: 1100px; padding: 8px var(--gutter) 64px; }
+.gm-list a { display: grid; grid-template-columns: 34px 1fr; column-gap: 10px; padding: 16px; border-radius: 16px; background: var(--bg-card); color: var(--text); text-decoration: none; }
+.gm-list a:hover { background: #42306f; }
+.gm-list .ns-i { grid-row: span 2; font-style: normal; font-size: 24px; }
+.gm-list .ns-t { font: 700 17px var(--sans); }
+.gm-list .ns-d { color: var(--muted); font-size: 14px; }
+.gm-list .gm-shop { grid-column: 1 / -1; background: var(--peach); color: #2B1A51; }
+.gm-list .gm-shop .ns-d { color: #4A3F6B; }
