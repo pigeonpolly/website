@@ -817,6 +817,40 @@
     orb: ['#B79CF2', 18], portal: ['#9B7BFF', 30], crypt: ['#BFE3FF', 22], spellbook: ['#B79CF2', 12], constellation: ['#CFE6FF', 20], countcoffin: ['#FFD36B', 18],
     xmastree: ['#FFE08A', 30], aquarium: ['#7FD3F5', 18], fishbowl: ['#7FD3F5', 12], tv: ['#9FD3FF', 18], computer: ['#9FD3FF', 14], arcade: ['#FF7AD9', 20], ufo: ['#8CF5B0', 14],
   };
+  // этап 11 Г: коробки — мебель с верхом (ставятся друг на друга), box: true; мелкую вещь, отпущенную на коробку, она прячет внутрь.
+  // c.lid (0…1) — крышка приоткрыта (вещи выпрыгивают / птичка кладёт обратно). Номер коробки — it.id, вещь внутри — it.in (PPCanDo.isBox, pack)
+  const lidUp = c => -3.5 * ((c && c.lid) || 0);
+  Object.assign(FURN, {
+    cardbox: { n: N('Cardboard box', 'Картонная коробка', 'Kartona kaste'), box: true, w: 20, h: 14, top: 0,
+      d: (p, _t, i, c) => { const o = lidUp(c);
+        rbox(p, 0, 3, 20, 11, '#C89A62', OUT, .5); p(1, 3.5, 18, 1, '#DDB47E'); p(1, 12.5, 18, 1, '#A57A45'); p(.5, 3.5, .5, 9, '#DDB47E');
+        p(3, 6.5, 6, .5, '#8A6236'); p(3, 7.5, 4, .5, '#8A6236'); p(3.5, 9, 2.5, 2, '#8A6236'); p(4, 9.5, 1.5, 1, '#C89A62'); // надпись и стрелка «верх»
+        p(12.5, 6, 5, 3.5, '#F4EBDD'); p(13, 7, 4, .5, '#C8B08A'); p(13, 8, 2.5, .5, '#C8B08A');
+        rbox(p, -.5, o, 21, 3.5, '#D7A86C', OUT, .5); p(0, .5 + o, 20, .5, '#E8C08A'); p(8.5, o, 3, 3.5, '#E8D2A6'); p(8.5, 3 + o, 3, .5, '#C8B08A'); } },
+    crate: { n: N('Wooden crate', 'Деревянный ящик', 'Koka kaste'), box: true, w: 20, h: 14, top: 0,
+      d: (p, _t, i, c) => { const o = lidUp(c);
+        rbox(p, 0, 3, 20, 11, '#B07A45', OUT, .5); [6, 9.5].forEach(y => p(.5, y, 19, .5, '#7A4E2A')); p(1, 3.5, 18, .5, '#C8955E');
+        for (let k = 0; k < 9; k++) p(2.5 + k * 1.7, 11.5 - k * .85, 2, 1, '#8C5A34'); // диагональная планка
+        p(.5, 3.5, 2, 10, '#9A6638'); p(17.5, 3.5, 2, 10, '#9A6638'); [[1.25, 5], [1.25, 11.5], [18.25, 5], [18.25, 11.5]].forEach(([x, y]) => p(x, y, .5, .5, '#3A3550'));
+        rbox(p, -.5, o, 21, 3.5, '#C08454', OUT, .5); p(0, .5 + o, 20, .5, '#D9AC78'); p(0, 2.5 + o, 20, .5, '#8C5A34'); [1, 18.5].forEach(x => p(x, 1.5 + o, .5, .5, '#3A3550')); } },
+    hatbox: { n: N('Hat box', 'Шляпная коробка', 'Cepuru kaste'), box: true, w: 18, h: 14, top: 0,
+      d: (p, _t, i, c) => { const o = lidUp(c);
+        rbox(p, .5, 3, 17, 11, '#F2A8B4', OUT, 1.5); for (let x = 2.5; x < 16; x += 3) p(x, 4, 1.5, 9, '#FFFFFF'); p(2, 12.5, 14, .5, '#D98A98');
+        rbox(p, -.5, .5 + o, 19, 3.5, '#E5484D', OUT, 1); p(1, 1 + o, 16, .5, '#F27A7E'); p(1, 3 + o, 16, .5, '#B5343A');
+        p(8, 4, 2, 9.5, '#F6D04D'); p(8, 4, .5, 9.5, '#FFE89A'); blob(p, 7, 1 + o, 2, 1.5, () => '#F6D04D'); blob(p, 11, 1 + o, 2, 1.5, () => '#F6D04D'); p(8.5, .5 + o, 1, 1.5, '#E2B63A'); } },
+    trunkbox: { n: N('Little trunk', 'Сундучок', 'Lādīte'), box: true, w: 20, h: 14, top: 0,
+      d: (p, _t, i, c) => { const o = lidUp(c);
+        rbox(p, 0, 5, 20, 9, '#8C4A2B', OUT, .5); p(1, 5.5, 18, .5, '#A8603A'); p(1, 12.5, 18, 1, '#6B3820');
+        rbox(p, 0, o, 20, 5.5, '#9C5530', OUT, 2); p(2, .5 + o, 16, .5, '#B86E44'); p(1, 4.5 + o, 18, .5, '#6B3820');
+        [3, 15.5].forEach(x => { p(x, o + .5, 1.5, 5, '#E9C46A'); p(x, 5, 1.5, 8.5, '#E9C46A'); p(x, 5, .5, 8.5, '#FFF3C4'); });
+        rbox(p, 8.5, 3.5, 3, 4, '#E9C46A', '#8A6A1E', .5); p(9.75, 5, .5, 1.5, '#3A2A10'); p(9, 4, .5, 1, '#FFF3C4'); } },
+    giftbox: { n: N('Gift box', 'Подарочная коробка', 'Dāvanu kaste'), box: true, w: 16, h: 15, top: 2,
+      d: (p, _t, i, c) => { const o = lidUp(c);
+        rbox(p, .5, 5, 15, 10, '#4A7BD8', OUT, .5); p(1, 5.5, 14, .5, '#7FA3E8'); p(1, 13.5, 14, 1, '#3A62B0'); p(7, 5, 2, 9.5, '#F6D04D'); p(7, 5, .5, 9.5, '#FFE89A');
+        [[3, 8.5], [11.5, 10], [4, 12]].forEach(([x, y]) => p(x, y, 1, 1, '#BFD3F5'));
+        rbox(p, -.5, 2 + o, 17, 3.5, '#5A8BE8', OUT, .5); p(0, 2.5 + o, 16, .5, '#8FB3F0'); p(7, 2 + o, 2, 3.5, '#F6D04D');
+        blob(p, 5.5, 1 + o, 2.5, 1.5, () => '#F6D04D'); blob(p, 10.5, 1 + o, 2.5, 1.5, () => '#F6D04D'); p(7.25, .5 + o, 1.5, 2, '#E2B63A'); } },
+  });
   // значения каталога: «sofa:2», «ornament:4»; у вещей без цветов — просто имя
   const vals = o => Object.entries(o).flatMap(([k, d]) => d.v ? [...Array(d.v)].map((_, i) => k + ':' + i) : d.rc ? [k, ...[...Array(d.rc)].map((_, i) => k + ':' + (i + 1))] : [k]);
   const parse = v => { const [k, i] = String(v).split(':'); return [k, +i || 0]; };
@@ -843,7 +877,7 @@
   addTh('autumn', ['view|wheat', 'floor|cherrywood', 'wall|navyplaid', 'furn|rockingchair', 'furn|radiator']);
   addTh('spring', ['view|tulipfield', 'curtain|cherrydots', 'wall|polka', 'deco|wallshelf']);
   addTh('magic', ['deco|dreamcatcher', 'deco|moonphases']);
-  addTh('home', ['furn|wshelf:0', 'furn|wshelf:1', 'furn|wshelf:2', 'furn|wshelf:3', 'furn|longshelf', 'furn|ropeshelf', 'furn|cubby:0', 'furn|cubby:2', 'furn|cornershelf', 'furn|plantledge', 'furn|cornerwshelf', 'furn|cloudshelf']);
+  addTh('home', ['furn|wshelf:0', 'furn|wshelf:1', 'furn|wshelf:2', 'furn|wshelf:3', 'furn|longshelf', 'furn|ropeshelf', 'furn|cubby:0', 'furn|cubby:2', 'furn|cornershelf', 'furn|plantledge', 'furn|cornerwshelf', 'furn|cloudshelf', 'furn|cardbox', 'furn|crate', 'furn|hatbox', 'furn|trunkbox', 'furn|giftbox']);
   addTh('newyear', ['furn|xmastree', ...[0, 1, 2, 3].map(i => 'furn|present:' + i), 'furn|snowman', ...ORN_C.map((_, i) => 'deco|ornament:' + i), 'deco|xmasstar', 'deco|lights', ...LIGHTS, 'deco|tinsel', 'deco|bell', 'deco|candycane', 'deco|snowflake', 'wall|xmas', 'view|snow']);
   addTh('autumn', ['wall|leaves', 'view|autumn', 'furn|pumpkin', 'curtain|mustard']);
   addTh('halloween', ['furn|pumpkin', 'furn|candle']);
@@ -933,6 +967,7 @@
   const T = {
     of: ['Room of @{n}', 'Комната @{n}', '@{n} istaba'], saved: ['Saved ✓', 'Сохранено ✓', 'Saglabāts ✓'], saving: ['Saving…', 'Сохраняю…', 'Saglabāju…'], err: ['Could not save', 'Не получилось сохранить', 'Neizdevās saglabāt'],
     hint: ['Drag things around · tap one for ⇆ ⬆ ⬇ ↩', 'Вещи можно двигать · нажатие на вещь — ⇆ ⬆ ⬇ ↩', 'Lietas var pārvietot · pieskaries lietai — ⇆ ⬆ ⬇ ↩'],
+    tidy: ['🧹 Tidy up', '🧹 Прибраться', '🧹 Sakopt'],
     lightOff: ['Turn the light off', 'Выключить свет', 'Izslēgt gaismu'], lightOn: ['Turn the light on', 'Включить свет', 'Ieslēgt gaismu'],
     flip: ['Turn', 'Повернуть', 'Pagriezt'], front: ['Forward', 'Вперёд', 'Uz priekšu'], behind: ['Back', 'Назад', 'Atpakaļ'], back: ['To the bag', 'В сумку', 'Uz somu'],
   };
@@ -974,10 +1009,12 @@
     let room = Object.assign({ items: [] }, o.room || {}); room.items = (room.items || []).filter(it => defOf(it.k, it.v));
     const edit = !!o.mine; // своя комната правится всегда прямо на месте (этап 5 Б), у гостей — только смотреть
     let sel = -1, saveT = 0, drag = null, flash = 0;
+    let tidy = null; // «🧹 Прибраться»: { carry } — птичка относит выпавшие вещи в их коробки (этап 11 Г)
+    const jumps = new Map(), lids = new Map(); // вещь → полёт из коробки; коробка → когда приоткрыта крышка
     const pops = new Map(); // вещь → когда «плюхнулась» (подскок)
     box.classList.add('room');
     box.innerHTML = `<div class="room-stage"><canvas class="room-cv" width="${RW}" height="${RH}" aria-label="${t('of').replace('{n}', o.nick)}" role="img"></canvas></div>
-      <div class="room-bar"><span class="room-cap">🏠 ${t('of').replace('{n}', o.nick)}</span>${o.mine ? `<span class="room-hint">${t('hint')}</span><button type="button" class="room-light"></button><span class="room-st" aria-live="polite"></span>` : ''}</div>`;
+      <div class="room-bar"><span class="room-cap">🏠 ${t('of').replace('{n}', o.nick)}</span>${o.mine ? `<span class="room-hint">${t('hint')}</span><button type="button" class="room-tidy" hidden></button><button type="button" class="room-light"></button><span class="room-st" aria-live="polite"></span>` : ''}</div>`;
     const cv = box.querySelector('canvas'), stage = box.querySelector('.room-stage');
     const S = 4; cv.width = RW * S; cv.height = RH * S;
     const g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
@@ -1000,7 +1037,7 @@
     function layout() {
       const out = [];
       room.items.forEach((it, idx) => {
-        const d = defOf(it.k, it.v); if (!d) return;
+        const d = defOf(it.k, it.v); if (!d || it.in != null || (tidy && tidy.carry === it)) return; // в коробке / у птички в лапках — не видно
         if (it.k === 'deco') { out.push({ it, d, idx, x: clampX(it.x, d.w), y: Math.max(0, Math.min(RH - d.h, it.y || 20)) }); return; }
         const x = clampX(it.x, d.w);
         if (it.y != null) { out.push({ it, d, idx, x, y: Math.max(-d.h + 4, Math.min(RH - 2, Math.round(it.y))) }); return; } // поставлена руками — где угодно
@@ -1019,6 +1056,41 @@
     const isAlbum = it => it.k === 'furn' && parse(it.v)[0] === 'album';
     if (!room.items.some(isAlbum)) room.items.unshift({ k: 'furn', v: 'album', x: freeSpot(layout(), defOf('furn', 'album'), 'furn').x });
     const openAlbum = () => albumOf(o.nick);
+    // ---------- коробки (этап 11 Г): it.id — номер коробки, it.in — вещь внутри, it.from — выпала из коробки ----------
+    const isBoxIt = it => it.k === 'furn' && !!(defOf(it.k, it.v) || {}).box;
+    const boxById = id => room.items.find(it => it.id === id && isBoxIt(it));
+    const inBox = b => room.items.filter(it => it.in != null && it.in === b.id);
+    const newId = () => room.items.reduce((m, it) => Math.max(m, it.id || 0), 0) + 1;
+    const canPack = (it, d) => it.k === 'furn' && isSmall(d) && (!window.PPCanDo || window.PPCanDo(it.k, it.v).pack);
+    room.items.forEach(it => { if (isBoxIt(it) && !it.id) it.id = newId(); });
+    room.items.forEach(it => { if (it.in != null && !boxById(it.in)) delete it.in; if (it.from != null && !boxById(it.from)) delete it.from; });
+    const lidOf = (b, now) => { const l = lids.get(b); if (!l) return 0; const a = now - l.t; if (a > l.open + 200) { lids.delete(b); return 0; } return a < 120 ? a / 120 : a < l.open ? 1 : 1 - (a - l.open) / 200; };
+    // куда выпрыгнуть: свободное место на полу или на столе/тумбочке недалеко от коробки (не на полках на стене и не на коробках)
+    function scatterSpot(lay, d, cx) {
+      const tx = cx + (Math.random() - .5) * 130, surf = [{ x0: 0, x1: RW, y: GY }];
+      lay.forEach(q => { if (q.it.k === 'furn' && q.d.top != null && !q.d.box && !q.d.wall && !isSmall(q.d) && q.d.w >= d.w + 2) surf.push({ x0: q.x, x1: q.x + q.d.w, y: q.y + q.d.top }); });
+      let best = null;
+      surf.forEach(sf => {
+        const on = lay.filter(q => q.it.k === 'furn' && q.d.h > 4 && Math.abs(q.y + q.d.h - sf.y) <= 2);
+        for (let x = Math.max(0, sf.x0); x <= Math.min(RW, sf.x1) - d.w; x += 2) {
+          const hit = on.reduce((a, q) => a + Math.max(0, Math.min(x + d.w, q.x + q.d.w) - Math.max(x, q.x)), 0);
+          const sc = hit * 1000 + Math.abs(x + d.w / 2 - tx) + (sf.y === GY ? 0 : 8);
+          if (!best || sc < best.sc) best = { x, y: sf.y - d.h, sc };
+        }
+      });
+      return best;
+    }
+    // вещи выпрыгивают из коробки (дуга, кувырок, отскок) и раскидываются; у хозяина бардак сохраняется, у гостя — только на его экране
+    function spill(b) {
+      const list = inBox(b), bq = layout().find(q => q.it === b); if (!bq || !list.length) return;
+      const now = performance.now(), cx = bq.x + bq.d.w / 2; lids.set(b, { t: now, open: 300 + list.length * 110 + 500 });
+      list.forEach((it, n) => {
+        const d = defOf(it.k, it.v), sp = scatterSpot(layout(), d, cx);
+        delete it.in; it.from = b.id; it.x = sp.x; it.y = sp.y;
+        jumps.set(it, { sx: cx - d.w / 2, sy: bq.y + bq.d.top + 2 - d.h, t0: now + 150 + n * 110, dur: 480 + Math.random() * 220, h: 14 + Math.random() * 14, spin: (Math.random() < .5 ? -1 : 1) * (Math.random() < .3 ? 2 : 1) });
+      });
+      showTidy(); if (o.mine) { save(); changed(); }
+    }
     // ---------- что птичка делает с вещами: подходит (или запрыгивает) и делает своё, над ней — частицы ----------
     const ACTS = {
       sleep: ['coffin', 'countcoffin', 'gothicchair', 'sofa', 'armchair', 'beanbag', 'throne', 'bed', 'pouf', 'nestbed', 'beachchair', 'gamingchair', 'catbed', 'giantpizza', 'flamingo'],
@@ -1057,7 +1129,8 @@
     const bird = { x: 40, y: GY, dir: 1, st: 'idle', t0: 0, until: 0, from: null, to: null, frame: 0, zz: false };
     const surfaces = lay => { const s = [{ x0: 8, x1: RW - 8, y: GY }]; lay.forEach(q => { if (q.it.k === 'furn' && q.d.top != null && q.d.w >= 10) s.push({ x0: q.x + 4, x1: q.x + q.d.w - 4, y: q.y + q.d.top, q }); }); return s; };
     function think(now, lay) {
-      if (now < bird.until) return;
+      if (now < bird.until || bird.st === 'walk' || bird.st === 'hop') return; // идёт/прыгает — сначала дойти (stepBird вызовет then)
+      if (tidy) return tidyStep(now, lay);
       const sf = surfaces(lay), r = Math.random(), cur = sf.find(s => Math.abs(s.y - bird.y) < 1 && bird.x >= s.x0 - 2 && bird.x <= s.x1 + 2) || sf[0];
       bird.zz = false; bird.act = null;
       if (!sf.some(z => Math.abs(z.y - bird.y) < 2)) return hop(now, Math.max(8, Math.min(RW - 8, bird.x)), GY); // была в воздухе у украшения — вниз
@@ -1082,8 +1155,27 @@
       if (go === walk) { walk(now, tx, s.y); bird.to.then = start(act === 'warm' ? 'sleep' : 'use', 3500 + Math.random() * 2500); return; }
       return hop(now, tx, s.y, start(act === 'warm' ? 'sleep' : 'use', 3500 + Math.random() * 2500));
     }
-    const walk = (now, x, y) => { bird.st = 'walk'; bird.from = { x: bird.x, y: bird.y, t: now }; bird.to = { x, y }; bird.dir = x > bird.x ? 1 : -1; bird.until = now + Math.abs(x - bird.x) / .03; };
+    const walk = (now, x, y, sp = .03) => { bird.st = 'walk'; bird.from = { x: bird.x, y: bird.y, t: now }; bird.to = { x, y }; bird.dir = x > bird.x ? 1 : -1; bird.until = now + Math.abs(x - bird.x) / sp; };
     const hop = (now, x, y, then) => { bird.st = 'hop'; bird.from = { x: bird.x, y: bird.y, t: now }; bird.to = { x, y, then }; bird.dir = x > bird.x ? 1 : -1; bird.until = now + 650; };
+    const go = (now, x, y, then) => { x = Math.max(6, Math.min(RW - 6, x)); if (Math.abs(y - bird.y) > 1) return hop(now, x, y, then); walk(now, x, y, .06); bird.to.then = then; };
+    // «🧹 Прибраться»: ближайшая выпавшая вещь → взять → на коробку → внутрь; так по одной, пока всё не уберёт
+    function tidyStep(now, lay) {
+      bird.zz = false; bird.act = null;
+      const c = tidy.carry, later = ms => { bird.until = performance.now() + ms; };
+      if (!c) {
+        const it = fallen().filter(x => lay.some(q => q.it === x)).sort((a, b) => Math.abs(a.x - bird.x) - Math.abs(b.x - bird.x))[0];
+        if (!it) { tidy = null; showTidy(); return; }
+        const q = lay.find(z => z.it === it);
+        return go(now, q.x + q.d.w / 2, q.y + q.d.h, () => { if (!tidy) return; if (room.items[sel] === it) sel = -1; tidy.carry = it; emit('dust', q.x + q.d.w / 2, q.y + q.d.h - 1, 3, true); later(250); });
+      }
+      const b = boxById(c.from), bq = b && lay.find(z => z.it === b);
+      if (!bq || !room.items.includes(c)) { tidy.carry = null; return; } // коробку убрали — вещь остаётся, где лежала
+      return go(now, bq.x + bq.d.w / 2, bq.y + bq.d.top, () => {
+        if (!tidy) return; const t2 = performance.now();
+        c.in = c.from; delete c.from; delete c.y; tidy.carry = null; lids.set(b, { t: t2, open: 450 }); pops.set(b, t2); emit('star', bq.x + bq.d.w / 2, bq.y - 2, 2);
+        save(); changed(); showTidy(); later(350);
+      });
+    }
     const goFloor = (now, x, then) => { if (Math.abs(bird.y - GY) > 1) return hop(now, x, GY, then); walk(now, x, GY); bird.to.then = then; };
     function stepBird(now) {
       if (bird.st === 'walk' || bird.st === 'hop') {
@@ -1123,9 +1215,21 @@
       lay.forEach(q => {
         const pp = pops.get(q.it); let oy = 0;
         if (pp != null) { const a = now - pp; if (a > 560) pops.delete(q.it); else oy = a < 240 ? -18 * (1 - (a / 240) ** 2) : -4 * Math.sin(Math.PI * (a - 240) / 320); } // падает и подпрыгивает
+        // выпрыгивает из коробки: дуга с кувырком, потом отскок и пылинки
+        const jp = jumps.get(q.it); let jx = 0, rot = 0;
+        if (jp) {
+          const a = now - jp.t0; if (a < 0) return; // ещё в коробке
+          if (a < jp.dur) { const k = a / jp.dur; jx = (jp.sx - q.x) * (1 - k); oy = (jp.sy - q.y) * (1 - k) - jp.h * Math.sin(Math.PI * k); rot = jp.spin * Math.PI * 2 * k; }
+          else if (a < jp.dur + 280) { oy = -3 * Math.sin(Math.PI * (a - jp.dur) / 280); if (!jp.dust) { jp.dust = 1; for (let i = 0; i < 4; i++) emit('dust', q.x + Math.random() * q.d.w, q.y + q.d.h - 1, 1, true); } }
+          else jumps.delete(q.it);
+        }
+        const X = q.x + jx, Y = q.y + oy;
+        ctx.lid = q.d.box ? lidOf(q.it, now) : 0;
         if (q.d.glow) { g.fillStyle = 'rgba(255,214,120,.13)'; g.beginPath(); g.arc(q.x + q.d.glow[0], q.y + q.d.glow[1], 26, 0, Math.PI * 2); g.fill(); }
-        if (q.it.f) { g.save(); g.translate((q.x * 2 + q.d.w), 0); g.scale(-1, 1); q.d.d(P(g, q.x, q.y + oy), now, q.d.i, ctx); g.restore(); }
-        else q.d.d(P(g, q.x, q.y + oy), now, q.d.i, ctx);
+        if (rot) { g.save(); g.translate(X + q.d.w / 2, Y + q.d.h / 2); g.rotate(rot); g.translate(-X - q.d.w / 2, -Y - q.d.h / 2); }
+        if (q.it.f) { g.save(); g.translate((X * 2 + q.d.w), 0); g.scale(-1, 1); q.d.d(P(g, X, Y), now, q.d.i, ctx); g.restore(); }
+        else q.d.d(P(g, X, Y), now, q.d.i, ctx);
+        if (rot) g.restore();
         if (edit && q.idx === sel) {
           const fl = now - flash < 1400 && Math.floor((now - flash) / 200) % 2 === 0; // «уже в комнате» — мигает
           g.strokeStyle = fl ? '#F5D547' : '#F0A987'; g.lineWidth = fl ? 1.2 : .6; g.setLineDash([1.5, 1]); g.strokeRect(q.x - 1.5, q.y - 1.5, q.d.w + 3, q.d.h + 3); g.setLineDash([]);
@@ -1134,8 +1238,16 @@
       placeSel(lay);
       think(now, lay); stepBird(now);
       drawBird(now);
+      if (tidy && tidy.carry) { const d = defOf(tidy.carry.k, tidy.carry.v); if (d) d.d(P(g, bird.x - d.w / 2, bird.y - FR[0].height * .75 - d.h + 3), now, d.i, ctx); } // несёт вещь над головой
       drawParts(now);
       drawDark(lay, now);
+      // сколько вещей в коробке — кружок «N» (поверх темноты, чтобы было видно)
+      lay.forEach(q => {
+        if (!q.d.box) return; const n = inBox(q.it).length; if (!n) return;
+        const bx = q.x + q.d.w - 1, by = q.y + q.d.top + 1;
+        g.fillStyle = '#E5484D'; g.beginPath(); g.arc(bx, by, 3.3, 0, Math.PI * 2); g.fill(); g.lineWidth = .6; g.strokeStyle = '#FFFFFF'; g.stroke();
+        g.fillStyle = '#FFFFFF'; g.font = 'bold 4.6px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; g.fillText(n > 9 ? '9+' : String(n), bx, by + .3);
+      });
     }
     // ---------- свет (этап 11 Б): room.light === 0 — выключен; комната темнеет, вещи из GLOW светят ----------
     const dark = () => room.light === 0;
@@ -1155,6 +1267,10 @@
       src.forEach(([x, y, r, col]) => { const gr = g.createRadialGradient(x, y, 0, x, y, r * .8), a = Math.round(70 * dkLv).toString(16).padStart(2, '0'); gr.addColorStop(0, col + a); gr.addColorStop(1, col + '00'); g.fillStyle = gr; g.fillRect(x - r, y - r, r * 2, r * 2); });
       g.restore();
     }
+    const tidyBtn = box.querySelector('.room-tidy');
+    const fallen = () => room.items.filter(it => it.from != null && it.in == null && boxById(it.from));
+    const showTidy = () => { if (!tidyBtn) return; tidyBtn.hidden = !tidy && !fallen().length; tidyBtn.disabled = !!tidy; tidyBtn.textContent = t('tidy'); };
+    if (tidyBtn) { showTidy(); tidyBtn.onclick = () => { if (tidy || !fallen().length) return; tidy = { carry: null }; bird.until = 0; if (bird.to) bird.to.then = null; showTidy(); }; } // бросает своё занятие и идёт убирать
     const lightBtn = box.querySelector('.room-light');
     const showLight = () => { if (!lightBtn) return; lightBtn.textContent = dark() ? '🌙' : '💡'; lightBtn.title = t(dark() ? 'lightOn' : 'lightOff'); lightBtn.setAttribute('aria-label', lightBtn.title); lightBtn.setAttribute('aria-pressed', String(dark())); };
     if (lightBtn) { showLight(); lightBtn.onclick = () => { if (dark()) delete room.light; else room.light = 0; showLight(); save(); changed(); }; }
@@ -1207,6 +1323,7 @@
       if (own == null) own = owned()[key] || 0;
       if (placed(key) >= own) { const q = [...layout()].reverse().find(z => z.it.k + '|' + z.it.v === key); if (q) { sel = q.idx; flash = performance.now(); } return { done: 'there' }; }
       const sp = freeSpot(layout(), d, kind), it = { k: kind, v, x: sp.x, y: sp.y };
+      if (d.box) it.id = newId();
       room.items.push(it); sel = room.items.length - 1; pops.set(it, performance.now());
       setTimeout(() => { for (let i = 0; i < 7; i++) emit('dust', it.x + Math.random() * d.w, it.y + d.h - 1, 1, true); }, 240); // пылинки при «плюх»
       setTimeout(() => lookAt(it), 300);
@@ -1217,7 +1334,9 @@
     if (o.mine) { window.PPRoom.live = api; box.classList.add('editing'); }
     if (o.mine) {
       selBar.querySelector('[data-flip]').onclick = () => { const it = room.items[sel]; if (it) { it.f = it.f ? 0 : 1; save(); } };
-      selBar.querySelector('[data-back]').onclick = () => { if (sel < 0 || isAlbum(room.items[sel])) return; room.items.splice(sel, 1); sel = -1; selBar.hidden = true; save(); changed(); };
+      selBar.querySelector('[data-back]').onclick = () => { if (sel < 0 || isAlbum(room.items[sel])) return;
+        const b = room.items[sel]; if (isBoxIt(b)) { spill(b); room.items.forEach(it => { if (it.from === b.id) delete it.from; }); } // коробку в сумку — вещи из неё остаются в комнате
+        room.items.splice(sel, 1); showTidy(); sel = -1; selBar.hidden = true; save(); changed(); };
       const pt = e => { const r = cv.getBoundingClientRect(); return [(e.clientX - r.left) / r.width * RW, (e.clientY - r.top) / r.height * RH]; };
       cv.addEventListener('pointerdown', e => {
         if (!edit) return;
@@ -1225,7 +1344,7 @@
         // берём самую верхнюю вещь под пальцем (рисуются по порядку списка: последняя — сверху)
         const hit = [...lay].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h);
         if (!hit) { sel = -1; selBar.hidden = true; return; }
-        sel = hit.idx; selBar.hidden = false; box.focus({ preventScroll: true });
+        sel = hit.idx; placeSel(lay); box.focus({ preventScroll: true }); // сразу на место: иначе до следующего кадра панель стоит в углу и касание попадает в «↩»
         // закрепить всё на своих местах: дальше вещи двигаются только руками, ничего не «перепрыгивает»
         lay.forEach(q => { if (q.it.y == null) { q.it.x = q.x; q.it.y = q.y; } });
         // что стоит на взятой вещи (и на том, что на ней), едет вместе с ней
@@ -1239,12 +1358,21 @@
       });
       cv.addEventListener('pointermove', e => {
         if (!drag || sel < 0) return;
-        const [px, py] = pt(e), it = room.items[sel]; drag.moved = true;
+        const [px, py] = pt(e), it = room.items[sel]; drag.moved = true; drag.px = px; drag.py = py;
         it.x = Math.round(px - drag.dx); it.y = Math.round(py - drag.dy);
         if (it.k === 'furn') it.y = snapY(it, sel);
         drag.riders.forEach(r => { r.q.it.x = it.x + r.dx; r.q.it.y = it.y + r.dy; });
       });
       const up = () => {
+        const it0 = drag && drag.moved && room.items[sel], d0 = it0 && defOf(it0.k, it0.v);
+        if (it0 && !drag.riders.length && canPack(it0, d0)) { // мелкую вещь отпустили на коробку — она уходит внутрь
+          const lay = layout(), on = room.items[snapOn];
+          const bq = (on && isBoxIt(on) && lay.find(q => q.it === on)) || [...lay].reverse().find(q => q.d.box && q.it !== it0 && drag.px >= q.x - 1 && drag.px <= q.x + q.d.w + 1 && drag.py >= q.y - 4 && drag.py <= q.y + q.d.h);
+          if (bq) {
+            const t2 = performance.now(); it0.in = bq.it.id; delete it0.from; delete it0.y; lids.set(bq.it, { t: t2, open: 450 }); pops.set(bq.it, t2); hovB = bq.it;
+            sel = -1; selBar.hidden = true; drag = null; snapOn = -1; moved = true; save(); changed(); showTidy(); return;
+          }
+        }
         if (drag && drag.moved) {
           // встала на вещь, которая рисуется позже, — переложить сразу за ней, иначе окажется за столешницей
           if (snapOn > sel && room.items[sel] && room.items[sel].k === 'furn') {
@@ -1276,7 +1404,13 @@
     // ---------- нажатие на альбом (хозяин и гости) — разворот альбома; хозяин, потащив альбом, его не открывает ----------
     let moved = false;
     const albumAt = e => { const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH; const hit = [...layout()].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h); return hit && isAlbum(hit.it); };
-    cv.addEventListener('click', e => { if (moved) { moved = false; return; } if (!o.preview && !o.still && albumAt(e)) openAlbum(); });
+    cv.addEventListener('click', e => { if (moved) { moved = false; return; } if (!o.preview && !o.still && albumAt(e)) openAlbum(); else if (ptype !== 'mouse' && !o.still) { const b = boxAt(e); if (b && inBox(b).length) spill(b); } });
+    // коробка: навести мышку (на телефоне — нажать) — вещи выпрыгивают; hovB — над какой коробкой мышка уже была (не вываливать снова, пока не уйдёт)
+    let hovB = null, ptype = 'mouse';
+    const boxAt = e => { const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH; const hit = [...layout()].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h); return hit && hit.d.box ? hit.it : null; };
+    cv.addEventListener('pointerdown', e => { ptype = e.pointerType; });
+    cv.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse' || e.buttons || drag || o.still) return; const b = boxAt(e); if (b && b !== hovB && inBox(b).length) spill(b); hovB = b; });
+    cv.addEventListener('pointerleave', () => { hovB = null; });
     cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' && !o.mine) cv.style.cursor = albumAt(e) ? 'pointer' : ''; });
     // ---------- название вещи при наведении (видно всем, и гостям): мебель/украшение, иначе окно, шторы, пол, стены ----------
     const tip = document.createElement('div'); tip.className = 'room-tip'; tip.hidden = true; stage.appendChild(tip);

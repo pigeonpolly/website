@@ -157,7 +157,18 @@ function cleanRoom(room, own) {
     if (it.k === 'deco') o.y = Math.max(0, Math.min(120, Math.round(Number(it.y) || 0)));
     else if (it.y != null && Number.isFinite(Number(it.y))) o.y = Math.max(-60, Math.min(120, Math.round(Number(it.y))));
     if (it.f) o.f = 1;
+    // коробки (этап 11 Г): у коробки свой номер id; in — в какой коробке лежит вещь, from — из какой выпала (для «🧹 Прибраться»)
+    if (PPCanDo.isBox(it.k, it.v) && Number.isInteger(it.id) && it.id > 0 && it.id < 1000) o.id = it.id;
+    if (Number.isInteger(it.in) && PPCanDo(it.k, it.v).pack) o.in = it.in;
+    else if (Number.isInteger(it.from)) o.from = it.from;
     out.items.push(o);
+  }
+  const ids = new Set(), per = {};
+  for (const o of out.items) if (o.id != null) { if (ids.has(o.id)) delete o.id; else ids.add(o.id); }
+  for (const o of out.items) {
+    if (o.in != null && (!ids.has(o.in) || (per[o.in] = (per[o.in] || 0) + 1) > 30)) delete o.in; // коробки нет или переполнена — вещь лежит в комнате
+    if (o.in != null) delete o.y;
+    if (o.from != null && !ids.has(o.from)) delete o.from;
   }
   return out;
 }
