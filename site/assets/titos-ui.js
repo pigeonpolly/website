@@ -11,7 +11,8 @@
     cups: ['cups', 'чашек', 'tases'],
     next: ['next cup in', 'следующая чашка через', 'nākamā tase pēc'],
     min: ['min', 'мин', 'min'],
-    refill: ['☕ Top up', '☕ Долить', '☕ Uzpildīt'],
+    refill: [n => `☕ Top up for ${n} 🔘`, n => `☕ Долить за ${n} 🔘`, n => `☕ Uzpildīt par ${n} 🔘`],
+    refill0: ['☕ Top up', '☕ Долить', '☕ Uzpildīt'],
     soon: ['Sign in to top up', 'Войдите, чтобы долить', 'Ieej, lai uzpildītu'],
     ask: [n => `Fill the coffee pot for ${n} 🔘?`, n => `Долить кофейник за ${n} 🔘?`, n => `Uzpildīt kafijas kannu par ${n} 🔘?`],
     poor: ['Not enough buttons', 'Не хватает пуговок', 'Nepietiek pogu'],
@@ -82,7 +83,7 @@
     el.className = 'tt-pot is-' + st;
     el.innerHTML = `${potSvg(st)}<div class="tt-pot-i"><b>${t(T[st])}</b><small>☕ ${s.coffee}/${s.max} ${t(T.cups)}${mins && s.coffee < s.max ? ` · ${t(T.next)} ${mins} ${t(T.min)}` : ''}</small>
       <span class="tt-cups">${Array.from({ length: s.max }, (_, i) => `<i${i < s.coffee ? ' class="on"' : ''}></i>`).join('')}</span><q>${t(st === 'empty' ? T.sleep : T.awake)}</q></div>
-      <button type="button" class="pill-btn tt-refill"${o.onRefill && s.coffee < s.max ? '' : ' disabled'}${o.onRefill ? '' : ` title="${t(T.soon)}"`}>${t(T.refill)}${s.prices && s.prices.refill ? ` · ${s.prices.refill} 🔘` : ''}</button>`;
+      <button type="button" class="pill-btn tt-refill"${o.onRefill && s.coffee < s.max ? '' : ' disabled'}${o.onRefill ? '' : ` title="${t(T.soon)}"`}>${s.prices && s.prices.refill ? t(T.refill)(s.prices.refill) : t(T.refill0)}</button>`;
     if (o.onRefill) el.querySelector('.tt-refill').onclick = o.onRefill;
   }
   // 4 карточки-награды: пока уровень не пройден — силуэт

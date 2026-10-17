@@ -1,7 +1,7 @@
 // Детектив Титос (docs/titos.md): 100 уровней-дел, кофе, пуговки за уровень.
 // Таблицы: titos (птичка: уровень, кофе, текущее дело), titos_cases (дела из content/titos/*.json и кэш переводов).
 // Дела собирает build.py → site/assets/titos-cases.json (RU); worker заносит их в D1 по метке meta titos_cases_<хэш> и переводит недостающее (translate.js).
-// API: GET /api/titos, GET /api/titos/case, POST /api/titos/{start,clue,accuse,coffee,legacy}; кабинет — /api/admin/titos/*.
+// API: GET /api/titos, GET /api/titos/case, POST /api/titos/{start,clue,accuse,coffee,legacy}, /api/titos/sort/*, /api/titos/bugs/{start,done}; кабинет — /api/admin/titos/*.
 import { translateTo, ABOUT, LANGS } from './translate.js';
 import { sortRound } from './titos-sort.js';
 
@@ -15,19 +15,19 @@ export const TITOS_TABLES = [
   // data — дело как в content/titos/NNN.json (тексты {"ru": …}, у старых дел и en/lv); tr — кэш переводов { "текст RU": { en, lv } }
   `CREATE TABLE IF NOT EXISTS titos_cases (n INTEGER PRIMARY KEY, data TEXT NOT NULL, tr TEXT DEFAULT '{}', hash TEXT, updated_at INTEGER)`,
 ];
-// «Разбери дела»: sort_lv — пройдено уровней; sort_run — открытый раунд {lv, at, n, secret (надписи под кляксами), washed}
-export const TITOS_ALTER = ['ALTER TABLE titos ADD COLUMN sort_lv INTEGER DEFAULT 0', "ALTER TABLE titos ADD COLUMN sort_run TEXT DEFAULT ''"];
+// «Разбери дела»: sort_lv — пройдено уровней; sort_run — открытый раунд {lv, at, n, secret (надписи под кляксами), washed}; «Жуки»: bugs_run — открытая игра {at, n, seed}
+export const TITOS_ALTER = ['ALTER TABLE titos ADD COLUMN sort_lv INTEGER DEFAULT 0', "ALTER TABLE titos ADD COLUMN sort_run TEXT DEFAULT ''", "ALTER TABLE titos ADD COLUMN bugs_run TEXT DEFAULT ''"];
 export const TITOS_RULES = {
   titosOn: true, titosLevelPct: 2.4, // пуговки за уровень: titosLevelPct % опорной цены × (1 + ⌊(ур−1)/10⌋), за каждый уровень один раз
   titosPot: 10, titosStartCups: 1, titosCupMin: 5, titosRegenMin: 60, // кофейник: вместимость; старт дела; −1 чашка каждые N мин; +1 чашка каждые N мин
   titosSortCups: 2, titosSortSec: 1, titosBlotBtn: 1, // «Разбери дела» — чашек за уровень; уровень быстрее (документов × N с) не засчитывается; смыть кляксу — N 🔘
-  titosBugsCups: 5, titosBugsPerHour: 2, // «Разбери дела» — чашек за уровень; «Жуки» — чашек и сколько раз в час
+  titosBugsCups: 5, titosBugsPerHour: 2, titosBugsSec: 2, // «Жуки» — чашек за игру; сколько раз в час; игра быстрее (жуков × N с) не засчитывается
   titosRefillPct: 20, titosSellPct: 1, titosSellDayMax: 20, // «Долить» полный кофейник; лишняя чашка → пуговки (не меньше 1), не больше N чашек в сутки
   titosClueSec: 3, // дело быстрее (число улик × N секунд) не засчитывается
 };
 export const TITOS_RANGE = { titosLevelPct: [0, 100], titosPot: [1, 50], titosStartCups: [0, 10], titosCupMin: [1, 120], titosRegenMin: [1, 1440], titosSortCups: [0, 50], titosSortSec: [0, 30], titosBlotBtn: [0, 100],
-  titosBugsCups: [0, 50], titosBugsPerHour: [0, 20], titosRefillPct: [0, 1000], titosSellPct: [0, 100], titosSellDayMax: [0, 1000], titosClueSec: [0, 60] };
-export const TITOS_INT = ['titosPot', 'titosStartCups', 'titosCupMin', 'titosRegenMin', 'titosSortCups', 'titosSortSec', 'titosBlotBtn', 'titosBugsCups', 'titosBugsPerHour', 'titosSellDayMax', 'titosClueSec'];
+  titosBugsCups: [0, 50], titosBugsPerHour: [0, 20], titosBugsSec: [0, 30], titosRefillPct: [0, 1000], titosSellPct: [0, 100], titosSellDayMax: [0, 1000], titosClueSec: [0, 60] };
+export const TITOS_INT = ['titosPot', 'titosStartCups', 'titosCupMin', 'titosRegenMin', 'titosSortCups', 'titosSortSec', 'titosBlotBtn', 'titosBugsCups', 'titosBugsPerHour', 'titosBugsSec', 'titosSellDayMax', 'titosClueSec'];
 export const TITOS_PRIZES = { 30: 'rug', 50: 'pot', 90: 'board', 100: 'badge' }; // награды-вещи для комнаты (карточки наверху /titos/)
 const OPEN = 2; // дела, которые можно смотреть без входа (бывшие «Дело №1» и «Дело №2»)
 const MIN = 60000;
@@ -158,7 +158,7 @@ export async function titosApi(req, env, url, h) {
       .map(x => { const d = parseJ(x.data, {}), tr = parseJ(x.tr, {}); return { n: x.n, title: resolve(d.title || { ru: '' }, lang, tr) }; });
     const unit = await h.unit();
     return json({ on: R.titosOn, state: titosState(r, R, h), cases: list, play: !!(u && u.nick && !u.banned), // play — сервер ведёт дело (вошла птичка с ником); иначе открытые дела без кофе и наград
-      prices: { level: h.btnOf(R.titosLevelPct, unit), refill: h.btnOf(R.titosRefillPct, unit), sell: Math.max(1, h.btnOf(R.titosSellPct, unit)), bugs: R.titosBugsCups, sort: R.titosSortCups, blot: R.titosBlotBtn },
+      prices: { level: h.btnOf(R.titosLevelPct, unit), refill: h.btnOf(R.titosRefillPct, unit), sell: Math.max(1, h.btnOf(R.titosSellPct, unit)), bugs: R.titosBugsCups, bugsHour: R.titosBugsPerHour, sort: R.titosSortCups, blot: R.titosBlotBtn },
       prizes: TITOS_PRIZES });
   }
   if (m === 'GET' && p === '/api/titos/case') {
@@ -267,9 +267,29 @@ export async function titosApi(req, env, url, h) {
     }
     fail(404, 'sort');
   }
-  if (m === 'POST' && p === '/api/titos/coffee') { // кофе из «Жуков» и «Долить»; «Разбери дела» — /api/titos/sort/done
+  // «Жуки на цветах» (site/assets/titos-bugs.js): start — новая игра (жуков n, раскладка по seed), если игр в этот час ещё не titosBugsPerHour; done {sell} — +titosBugsCups чашек
+  if (m === 'POST' && p.startsWith('/api/titos/bugs/')) {
+    const u = await h.needUser(req, env); if (!u.nick) fail(400, 'nick');
+    const b = await body(), r = await rowOf(env, u.id), keep = x => env.DB.prepare('UPDATE titos SET bugs_run = ? WHERE user_id = ?').bind(x ? JSON.stringify(x) : '', u.id).run();
+    const st = titosState(r, R, h);
+    if (!st.bugsLeft) fail(429, 'bugs');
+    if (p === '/api/titos/bugs/start') {
+      const n = 6 + Math.min(4, Math.floor((r.level || 0) / 20)) + Math.floor(Math.random() * 2), seed = (Math.random() * 2 ** 32) >>> 0;
+      await keep({ at: Date.now(), n, seed });
+      return out(r, { n, seed, cups: R.titosBugsCups, sec: R.titosBugsSec });
+    }
+    if (p === '/api/titos/bugs/done') {
+      const run = parseJ(r.bugs_run, null); if (!run) fail(409, 'run');
+      if (Date.now() - run.at < run.n * R.titosBugsSec * 1000) fail(429, 'fast');
+      const res = await addCoffee(env, h, r, 'bugs', 1, { noSell: !b.sell });
+      await saveRow(env, res.r); await keep(null);
+      return out(res.r, { gained: res.gained, sold: res.sold, buttons: res.buttons });
+    }
+    fail(404, 'bugs');
+  }
+  if (m === 'POST' && p === '/api/titos/coffee') { // «☕ Долить»; «Разбери дела» — /api/titos/sort/done, «Жуки» — /api/titos/bugs/done
     const u = await h.needUser(req, env), b = await body(), src = String(b.src || '');
-    if (!['bugs', 'buy'].includes(src)) fail(400, 'src');
+    if (src !== 'buy') fail(400, 'src');
     const res = await addCoffee(env, h, await rowOf(env, u.id), src, 1);
     await saveRow(env, res.r);
     return out(res.r, { gained: res.gained, sold: res.sold, buttons: res.buttons, paid: res.paid });

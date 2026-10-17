@@ -56,6 +56,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/site.js` (11K) — меню, шапка «влезает», лайтбокс галерей, /api/hit, `[data-profile]`: open, close, show, fit, over
 - `site/assets/sketch-wall.js` (94K) — стена работ, вход, загрузка, бейджи, профиль /bird/, сумка: PPProfile, LEVELS, SPECIAL, COL, loadWall
 - `site/assets/titos-sort.js` (34K) — «Разбери дела» на /titos/ (этап 9 А, docs/titos.md): у Титоса упали коробки — документы из: SAY, DEMO, BLOT, setPot, drawCard
+- `site/assets/titos-bugs.js` (20K) — «Жуки на цветах» на /titos/ (этап 9 Б, docs/titos.md): записка уборщицы, цветы, жуки: SAY, BUG, plantSvg, drawCard, open
 - `site/assets/titos-ui.js` (12K) — «Детектив Титос» /titos/ (docs/titos.md): кофейник (полный / половина / пустой — Титос спи: PPTitos, REWARDS, COL, CSS, pot
 - `site/assets/toast.js` (1K) — Тост внизу экрана (этап 5 Б) — один на всех: PPToast('Сохранено') или PPToast('Поставлено': PPToast, toast
 - `site/assets/today.js` (6K) — блок «Тема дня» (с главной убран): LBL, fill, open, wait

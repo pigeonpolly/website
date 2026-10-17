@@ -67,6 +67,7 @@
     el.querySelectorAll('.ts-coffee, .ts-crema').forEach(r => r.setAttribute('y', y));
     const n = el.closest('.ts-potbox'); if (n) n.querySelector('b').textContent = `${c}/${max}`;
   };
+  window.PPTitosPot = { potSvg, setPot }; // стеклянный кофейник — и для «Жуков» (titos-bugs.js)
   // клякса и шредер
   const BLOT = '<svg viewBox="0 0 60 24" class="ts-blot" aria-hidden="true"><path d="M8 12c-4-6 4-10 10-7 4-5 12-4 15 0 6-4 16-2 17 4 7 1 8 8 2 10-1 5-9 6-13 3-5 4-14 4-17 0-6 3-13 0-11-4-4 0-6-4-3-6z" fill="#1d1640"/><circle cx="54" cy="5" r="2.2" fill="#1d1640"/><circle cx="4" cy="20" r="1.6" fill="#1d1640"/></svg>';
   const SHRED = `<svg viewBox="0 0 40 36" aria-hidden="true"><rect x="3" y="4" width="34" height="10" rx="2" fill="#4a4a58"/><rect x="7" y="7" width="26" height="2" rx="1" fill="#16131f"/><rect x="5" y="14" width="30" height="20" rx="2" fill="#6b6b7d"/><path d="M10 18v12M15 18v12M20 18v12M25 18v12M30 18v12" stroke="#55556a" stroke-width="1.2"/><circle cx="32" cy="9" r="1.2" fill="#7bd88f"/></svg>`;
