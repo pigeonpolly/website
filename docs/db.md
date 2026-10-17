@@ -11,7 +11,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **blog_comments** (worker/blog.js): `id` int PK auto, `post_id` int nn, `user_id` int, `anon` text, `body` text nn, `ip` text, `status` text ='ok', `created_at` int
 - **blog_tags** (worker/blog.js): `en` text PK, `ru` text ='', `lv` text =''; + `checked` int =0, `src` text ='', `created_at` int
 - **blog_sections** (worker/blog.js): `slug` text PK, `en` text ='', `ru` text ='', `lv` text ='', `sort` int =0
-- **cards** (worker/cards.js): `id` int PK auto, `n` int UNIQUE nn, `collection` text nn ='', `rarity` text nn ='common', `price` int =0, `img` text, `hidden` int =0, `src_lang` text ='ru', `t_en` text ='', `t_ru` text ='', `t_lv` text ='', `d_en` text ='', `d_ru` text ='', `d_lv` text ='', `stats` text ='[]', `game` text (этап 8.2: JSON игровых статов уникальных — `{kind:'char', hp, slots, s:[5], tr}` / `{kind:'tool', take, fx, req}`), `created_at` int, `updated_at` int
+- **cards** (worker/cards.js): `id` int PK auto, `n` int UNIQUE nn, `collection` text nn ='', `rarity` text nn ='common', `price` int =0, `img` text, `hidden` int =0, `src_lang` text ='ru', `t_en` text ='', `t_ru` text ='', `t_lv` text ='', `d_en` text ='', `d_ru` text ='', `d_lv` text ='', `stats` text ='[]', `game` text, `created_at` int, `updated_at` int
 - **card_sets** (worker/cards.js): `slug` text PK, `en` text ='', `ru` text ='', `lv` text ='', `src_lang` text ='ru', `created_at` int
 - **card_owner** (worker/cards.js): `card_id` int PK, `user_id` int nn, `price` int =0, `bought_at` int, `ref` text
 - **card_trades** (worker/cards.js): `id` int PK auto, `from_id` int nn, `to_id` int nn, `give` text nn, `take` text nn, `status` text nn ='open', `created_at` int, `done_at` int, `seen` int =0, `ref` text
@@ -37,7 +37,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **draw_requests** (worker/index.js): `id` int PK auto, `user_id` int, `anon` text, `text` text nn, `lang` text, `who` text, `status` text ='open', `img` text, `gift` text, `created_at` int, `answered_at` int; + `text_en` text, `ip` text, `text_ru` text, `text_lv` text
 - **draw_likes** (worker/index.js): `rid` int nn, `kind` text nn, `who` text nn, `created_at` int; PRIMARY KEY (rid, kind, who)
 - **potion_gifts** (worker/index.js): `id` int PK auto, `to_id` int nn, `from_nick` text, `ing` text nn, `n` int nn, `created_at` int, `seen` int =0
-- **titos** (worker/titos.js): `user_id` int PK, `level` int =0, `coffee` int =10, `coffee_at` int =0, `drink_at` int =0, `sleep` int =0, `run` int =0, `found` text ='[]', `started` int =0, `bugs` text ='[]', `sell_day` text ='', `sell_n` int =0, `legacy` int =0
+- **titos** (worker/titos.js): `user_id` int PK, `level` int =0, `coffee` int =10, `coffee_at` int =0, `drink_at` int =0, `sleep` int =0, `run` int =0, `found` text ='[]', `started` int =0, `bugs` text ='[]', `sell_day` text ='', `sell_n` int =0, `legacy` int =0; + `sort_lv` int =0, `sort_run` text =''
 - **titos_cases** (worker/titos.js): `n` int PK, `data` text nn, `tr` text ='{}', `hash` text, `updated_at` int
 
 ## Ключи meta (34)

@@ -510,6 +510,8 @@
         row('Титос выпивает чашку каждые', num('titosCupMin', R.titosCupMin, D.titosCupMin) + ' мин', D.titosCupMin + ' мин', 'кофе кончился — Титос засыпает, дело ждёт на сервере'),
         row('Кофейник сам наполняется: +1 чашка каждые', num('titosRegenMin', R.titosRegenMin, D.titosRegenMin) + ' мин', D.titosRegenMin + ' мин', 'до полного'),
         row('«Разбери дела» — за уровень', num('titosSortCups', R.titosSortCups, D.titosSortCups) + ' чаш.', D.titosSortCups),
+        row('«Разбери дела»: уровень не засчитывается, если пройден быстрее, чем по … с на документ', num('titosSortSec', R.titosSortSec, D.titosSortSec) + ' с', D.titosSortSec + ' с', 'защита от подделки (если быстрее — игра чуть подождёт)'),
+        row('«Разбери дела»: смыть кляксу', num('titosBlotBtn', R.titosBlotBtn, D.titosBlotBtn) + ' 🔘', D.titosBlotBtn + ' 🔘', '0 — кнопки «Смыть» нет, только угадать'),
         row('«Жуки» — за игру', num('titosBugsCups', R.titosBugsCups, D.titosBugsCups) + ' чаш., не чаще ' + num('titosBugsPerHour', R.titosBugsPerHour, D.titosBugsPerHour, 1, 50) + ' раз в час', `${D.titosBugsCups} · ${D.titosBugsPerHour}`),
         row('«☕ Долить» полный кофейник', pct('titosRefillPct') + ` → сейчас ${G.titosRefill} 🔘`, D.titosRefillPct + ' %'),
         row('Лишний кофе (кофейник полный) — пуговки за чашку', pct('titosSellPct') + ` → сейчас ${G.titosSell} 🔘`, D.titosSellPct + ' %', 'не меньше 1 🔘'),
@@ -563,7 +565,7 @@
         <li>${R.potionOn ? `Новое зелье: обычное — ${R.potion1Pct} % (${pc(G.p1)}), вкусное — ${R.potion2Pct} % (${pc(G.p2)}), вкус детства — ${R.potion3Pct} % (${pc(G.p3)}); повторное — ${R.potionAgainPct} % (${pc(G.again)})${G.pmax ? `; не больше ${pc(G.pmax)} в сутки` : ''}.` : 'Пуговки за зелья выключены.'}</li></ul>
       <h4>Игра «Детектив Титос»</h4><ul>
         <li>100 уровней-дел по порядку; дела 1–2 — прежние «Сироп» и «Шпион среди огурцов» (кто раскрыл их раньше, получает их засчитанными, без пуговок).</li>
-        <li>Кофейник — ${R.titosPot} чашек. Начать дело — ${R.titosStartCups} чаш., дальше −1 каждые ${R.titosCupMin} мин; кофе кончился — Титос спит, дело ждёт. +1 чашка каждые ${R.titosRegenMin} мин до полного; «Разбери дела» — +${R.titosSortCups} за уровень, «Жуки» — +${R.titosBugsCups} (до ${R.titosBugsPerHour} раз в час); «☕ Долить» — ${pc(G.titosRefill)}; лишнее при полном — ${pc(G.titosSell)} за чашку, до ${R.titosSellDayMax} в сутки.</li>
+        <li>Кофейник — ${R.titosPot} чашек. Начать дело — ${R.titosStartCups} чаш., дальше −1 каждые ${R.titosCupMin} мин; кофе кончился — Титос спит, дело ждёт. +1 чашка каждые ${R.titosRegenMin} мин до полного; «Разбери дела» — +${R.titosSortCups} за уровень (клякса — смыть за ${R.titosBlotBtn} 🔘 или угадать), «Жуки» — +${R.titosBugsCups} (до ${R.titosBugsPerHour} раз в час); «☕ Долить» — ${pc(G.titosRefill)}; лишнее при полном — ${pc(G.titosSell)} за чашку, до ${R.titosSellDayMax} в сутки.</li>
         <li>${R.titosOn ? `За уровень — ${R.titosLevelPct} % (сейчас ${pc(G.titosLevel)}) × (1 + каждый пройденный десяток), за каждый уровень один раз.` : 'Пуговки за дела выключены.'} Награды-вещи: 30 — ковёр с меловым силуэтом, 50 — кофейник детектива, 90 — доска улик, 100 — золотой значок в рамке.</li></ul>
       <h4>Адвент-календарь</h4><ul>
         <li>1–31 декабря, окошко открывается в свой день (по Риге); у всех одинаковые вещи. Прошедшие окошки видны всем, и гостям.</li>
