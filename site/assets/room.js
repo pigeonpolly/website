@@ -643,6 +643,77 @@
     yarn: p => { blob(p, 3, 3, 3, 3, (u, v, x, y) => (Math.round((x - y) * 2) % 3 === 0) ? '#B83A32' : u + v < .6 ? '#F07C76' : '#E5484D'); p(5.5, 4.5, 3, .5, '#E5484D'); p(8, 4, .5, 1, '#E5484D'); },
   });
   Object.entries(HD).forEach(([k, d]) => { if (FURN[k]) FURN[k].d = d; });
+  // ---------- награды Титоса за уровни 30/50/90/100 (этап 11 А, docs/titos.md «Награды за уровни»): игровые (game) — нет в магазине и каталоге; PPCanDo.TITOS ----------
+  // кофейник: titospot:N — N-й полученный на сайте (счётчик в meta titos_pot_n), цвет кофе — оттенок по золотому углу и разная светлота
+  const hsl = (h, s, l) => { s /= 100; l /= 100; const f = n => { const k = (n + h / 30) % 12, c = l - s * Math.min(l, 1 - l) * Math.max(-1, Math.min(k - 3, 9 - k, 1)); return Math.round(c * 255).toString(16).padStart(2, '0'); }; return '#' + f(0) + f(8) + f(4); };
+  const potCoffee = i => hsl((25 + i * 137.508) % 360, 50 + (i * 7) % 25, [26, 34, 20, 42, 30][i % 5]);
+  const ABOUT = {
+    'furn|chalkrug': ['A black rug with a chalk outline. The outline insists it is just lying down for a rest.', 'Чёрный ковёр с меловым силуэтом. Силуэт уверяет, что просто прилёг отдохнуть.', 'Melns paklājs ar krīta siluetu. Siluets apgalvo, ka vienkārši prilēcis atpūsties.'],
+    'furn|titospot': ['The coffee in it sloshes all by itself — out of impatience.', 'Кофе в нём плещется сам по себе — от нетерпения.', 'Kafija tajā šļakstās pati no sevis — aiz nepacietības.'],
+    'deco|clueboard': ['Stare at it long enough and everything becomes clear. Or not.', 'Если долго смотреть, всё становится понятно. Или нет.', 'Ja ilgi skatās, viss kļūst skaidrs. Vai arī nē.'],
+    'deco|titosbadge': ['For those who solved all 100 cases. Titos personally polished it with his sleeve.', 'Для тех, кто раскрыл все 100 дел. Титос лично протёр его рукавом.', 'Tiem, kas atrisinājuši visas 100 lietas. Titoss to personīgi noslaucīja ar piedurkni.'],
+  };
+  Object.assign(FURN, {
+    chalkrug: { n: N('Rug “Somebody Was Here”', 'Ковёр «Здесь кто-то был»', 'Paklājs “Šeit kāds bija”'), w: 44, h: 8, top: 5, flat: true, game: true, titos: true, // flat — плоский, как коврики: на нём стоят
+      d: p => { const k = '#1E1A26', e = '#2E2838', c = '#F4F0FA', cd = '#B9B3C6';
+        for (let y = 0; y < 8; y += .5) { const ins = Math.round((2.5 - y * .3) * 2) / 2; p(ins, y, 44 - 2 * ins, .5, y < .5 ? e : y > 7 ? '#0E0C14' : k); } // ковёр в перспективе
+        for (let x = 1; x < 43.5; x += 1.5) p(x, 8, .5, .5, cd); // бахрома
+        // меловой силуэт птички лёжа: контур головы, клюва, тела и хвоста по полупикселям; крыло, глаз-крестик и лапки — линиями
+        const E = (x, y, cx, cy, rx, ry) => Math.pow((x - cx) / rx, 2) + Math.pow((y - cy) / ry, 2) <= 1;
+        const inS = (x, y) => E(x, y, 11, 3.5, 3.2, 2.2) || E(x, y, 21.5, 3.6, 8, 2.3) || E(x, y, 14, 3.5, 2, 1.5) || (x > 6 && x < 8.2 && Math.abs(y - 3.6) < (x - 6) * .6) || (x > 28 && x < 34 && Math.abs(y - 3.5) < (34 - x) * .4 + .3);
+        for (let y = .25; y < 8; y += .5) for (let x = 5.25; x < 35; x += .5) if (inS(x, y) && (!inS(x - .5, y) || !inS(x + .5, y) || !inS(x, y - .5) || !inS(x, y + .5))) p(x - .25, y - .25, .5, .5, c);
+        p(9.5, 2.5, .5, .5, c); p(10.5, 2.5, .5, .5, c); p(10, 3, .5, .5, c); p(9.5, 3.5, .5, .5, c); p(10.5, 3.5, .5, .5, c); p(11, .5, .5, .5, c); p(11.5, 0, .5, .5, c); p(12, .5, .5, .5, c); // глаз-крестик и хохолок
+        for (let x = 16; x < 25; x += .5) p(x, 3 + Math.abs(x - 20.5) * .25, .5, .5, cd); // крыло
+        [19, 23].forEach(x => { for (let k2 = 0; k2 < 2; k2++) p(x + k2 * .5, 6 + k2 * .5, .5, .5, c); p(x + 1, 7, .5, .5, c); p(x + 1.5, 6.5, .5, .5, c); p(x + 1.5, 7, 1, .5, c); }); // лапки
+        p(36, 2, 2.5, 1.5, '#E9C46A'); p(36.5, 2.5, 1.5, .5, k); p(4, 6, .5, .5, cd); p(39, 5, .5, .5, cd); p(33, 6.5, .5, .5, cd); } }, // жёлтый номерок улики и меловые крошки
+    titospot: { n: N('Detective’s coffee pot', 'Кофейник детектива', 'Detektīva kafijas kanna'), w: 13, h: 15, top: null, game: true, titos: true,
+      d: (p, t, i) => { const cf = potCoffee(i || 0), cl = lighter(cf, .35), en = '#B8423A', ed = '#8E2F29', el = '#E06A5E', cr = '#D8DDE6', cd = '#9AA3B5';
+        const tilt = Math.sin(t / 260) * .35, lvl = 8.25 + Math.sin(t / 410) * .4; // кофе плещется
+        p(1, 6, 1.5, .5, OUT); p(.5, 6.5, .5, 4, OUT); p(1, 10.5, 1.5, .5, OUT); p(1, 6.5, 1, 4, ed); // ручка
+        p(10.5, 7, 1, 1.5, OUT); p(11, 5.5, 1, 2, OUT); p(11.5, 4.5, 1.5, 1, OUT); p(11.5, 5.5, .5, 2.5, en); p(11.75, 4.75, .75, .5, cr); // носик
+        blob(p, 6.5, 9.5, 4.5, 5, (u, v, x, y) => {
+          if (u > .28 && u < .72 && v > .3 && v < .82) { // окошко: стекло и кофе
+            if (u < .32 || u > .68 || v < .34 || v > .78) return cd;
+            const top = lvl + (x - 6.5) * tilt; return y > top + .5 ? cf : y > top ? cl : '#C8DCE6';
+          }
+          return u < .25 && v < .5 ? el : v > .8 ? ed : en;
+        });
+        p(5, 12, 3, .5, en); // перемычка под окошком
+        rbox(p, 3.5, 2.5, 6, 2.5, cr, OUT, .5); p(4, 3, 5, .5, '#FFFFFF'); // крышка
+        p(5.5, 1, 2, 1.5, OUT); p(6, 1.25, 1, 1, '#E9C46A'); // шишечка
+        if (Math.sin(t / 700) > .75) { p(6.25, -.5, .5, .5, '#D9D3F2'); p(6.75, -1.25, .5, .5, '#D9D3F2'); } // пар
+        p(2.5, 14, 8, 1, OUT); p(3, 14, 7, .5, '#4B4466'); } },
+  });
+  Object.assign(DECO, {
+    clueboard: { n: N('Evidence board', 'Доска улик', 'Pierādījumu dēlis'), w: 28, h: 19, game: true, titos: true,
+      d: (p, t) => { const fr = '#6B4423', fl = '#8A5A2B', ck = '#C9955A', cs = '#B9844C', pa = '#F4F0FA', ph = '#2B2340', red = '#D33A2E';
+        rbox(p, 0, 0, 28, 19, fr, OUT, .5); p(.5, .5, 27, .5, fl); p(1.5, 1.5, 25, 16, ck); // рамка и пробка
+        for (let k = 0; k < 14; k++) p(2 + (k * 7.3) % 24, 2 + (k * 5.1) % 14, .5, .5, cs); // крапинки пробки
+        p(3, 2.5, 6, 5, pa); p(3.5, 3, 5, 3.5, '#5E7A9A'); blob(p, 6, 5, 1.25, 1.25, () => '#2B2340', '#2B2340'); p(5, 6, 2.5, .5, '#2B2340'); // фото с силуэтом
+        p(17, 2, 6, 4.5, '#F6D04D'); for (let y = 3; y < 6; y += 1) p(17.5, y, 4.5, .5, '#B5832A'); // жёлтый листок
+        p(10.5, 9.5, 5, 6, pa); p(11, 10, 4, 3, '#C9CDD6'); p(11.5, 13.5, 3, .5, ph); p(11.5, 14.5, 2, .5, ph); // фото подозреваемого
+        p(19.5, 9.5, 6, 4.5, pa); for (let y = 10.5; y < 14; y += 1) p(20, y, 5 - (y % 2), .5, '#9AA3B5'); // записка
+        p(3, 11, 5, 5, '#F28AB2'); p(3.5, 12, 3.5, .5, '#B8423A'); p(3.5, 13.5, 3, .5, '#B8423A'); p(4.5, 14.5, 1.5, 1.5, '#B8423A'); // розовый листок с вопросом
+        // красные нитки между кнопками (лёгкое покачивание)
+        const s = Math.sin(t / 900) * .25, line = (x1, y1, x2, y2) => { const n = Math.ceil(Math.hypot(x2 - x1, y2 - y1) * 2); for (let k = 0; k <= n; k++) { const q = k / n; p(x1 + (x2 - x1) * q, y1 + (y2 - y1) * q + Math.sin(q * Math.PI) * (.6 + s), .5, .5, red); } };
+        const pins = [[6, 2.5], [20, 2.25], [13, 9.5], [22.5, 9.5], [5.5, 11]];
+        line(6, 2.5, 13, 9.5); line(20, 2.25, 13, 9.5); line(13, 9.5, 22.5, 9.5); line(5.5, 11, 13, 9.5); line(6, 2.5, 20, 2.25);
+        pins.forEach(([x, y]) => { p(x - .5, y - .5, 1, 1, red); p(x - .5, y - .5, .5, .5, '#FF8A80'); });
+        p(24, 15, 2.5, 1.5, '#E9C46A'); p(24.5, 15.5, 1.5, .5, ph); } }, // номерок улики
+    titosbadge: { n: N('Detective Titos’ golden badge', 'Золотой значок детектива Титоса', 'Detektīva Titosa zelta nozīmīte'), w: 15, h: 17, game: true, titos: true,
+      d: (p, t) => { const fr = '#8A5A2B', fd = '#5E3A1A', fl = '#B07A44', vel = '#2B1A51', vd = '#1E1240', g = '#E9A93B', gd = '#B5781E', gl = '#FFE08A';
+        rbox(p, 0, 0, 15, 17, fr, OUT, .5); p(.5, .5, 14, .5, fl); p(.5, 16, 14, .5, fd); p(1.5, 1.5, 12, 14, fd); p(2, 2, 11, 13, vel); p(2, 14, 11, 1, vd); // рамка и бархат
+        // звезда-значок
+        const star = [[7.5, 3.5], [8.5, 6], [11.25, 6.25], [9.25, 8.25], [10, 11], [7.5, 9.5], [5, 11], [5.75, 8.25], [3.75, 6.25], [6.5, 6]];
+        const inS = (x, y) => { let c = false; for (let a = 0, b = star.length - 1; a < star.length; b = a++) { const [xa, ya] = star[a], [xb, yb] = star[b]; if ((ya > y) !== (yb > y) && x < (xb - xa) * (y - ya) / (yb - ya) + xa) c = !c; } return c; };
+        const sweep = ((t / 40) % 60) - 10; // блик пробегает раз в несколько секунд
+        for (let y = 3; y < 11.5; y += .5) for (let x = 3.5; x < 11.5; x += .5) { if (!inS(x + .25, y + .25)) continue;
+          const edge = !inS(x - .25, y + .25) || !inS(x + .75, y + .25) || !inS(x + .25, y - .25) || !inS(x + .25, y + .75);
+          const sh = Math.abs((x - 3.5) + (y - 3) - sweep) < 1; p(x, y, .5, .5, edge ? gd : sh ? '#FFFFFF' : x + y < 13 ? gl : g); }
+        blob(p, 7.5, 7.5, 1.25, 1.25, () => gd, gd); p(7.25, 7.25, .5, .5, gl); // серединка
+        p(4, 12.5, 7, 1.5, g); p(4.5, 13, 6, .5, gd); // табличка
+        if (Math.sin(t / 600) > .85) { p(11.5, 3, .5, 1.5, '#FFFFFF'); p(11, 3.5, 1.5, .5, '#FFFFFF'); } } }, // искорка
+  });
   const RECOLOR = {
     armchair: [['Armchair', 'Кресло', 'Krēsls'], [['red', 'красное', 'sarkans'], { '#4A9BA8': '#C9463D', '#357782': '#A8382F', '#6FBAC5': '#E06A5E' }], [['mustard', 'горчичное', 'sinepju'], { '#4A9BA8': '#D9A33B', '#357782': '#B5832A', '#6FBAC5': '#EBC064' }], [['lilac', 'сиреневое', 'ceriņu'], { '#4A9BA8': '#9C80D0', '#357782': '#7F5FB8', '#6FBAC5': '#B9A3E3' }]],
     beanbag: [['Beanbag', 'Кресло-мешок', 'Sēžammaiss'], [['blue', 'синий', 'zils'], { '#F08A3B': '#4A7BD8', '#E07A2E': '#3E68BD', '#C0651F': '#2F519A', '#F6A86A': '#7FA7E0' }], [['pink', 'розовый', 'rozā'], { '#F08A3B': '#F28AB2', '#E07A2E': '#E06A95', '#C0651F': '#C25579', '#F6A86A': '#F7B6C8' }], [['green', 'зелёный', 'zaļš'], { '#F08A3B': '#4CC38A', '#E07A2E': '#3EA874', '#C0651F': '#2E8A5E', '#F6A86A': '#8EE0B4' }]],
@@ -864,7 +935,7 @@
   // ---------- регистрация в каталоге подарков (коллекции, магазин, сумка, адвент, кабинет) ----------
   const LEG = ['furn|countcoffin', 'furn|crypt', 'furn|tieredcake', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass', 'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight']; // то же в worker/index.js LEGEND
   Object.assign(B.GIFTS, { wall: Object.keys(WALL).filter(k => k !== '_'), floor: Object.keys(FLOOR).filter(k => k !== '_'), view: Object.keys(VIEW).filter(k => k !== '_'),
-    curtain: Object.keys(CURT), furn: vals(FURN).filter(x => !FURN[parse(x)[0]].game && !FURN[parse(x)[0]].fixed), deco: vals(DECO) }); // game: true — вещи только из игр; fixed — альбом, он в комнате сам
+    curtain: Object.keys(CURT), furn: vals(FURN).filter(x => !FURN[parse(x)[0]].game && !FURN[parse(x)[0]].fixed), deco: vals(DECO).filter(x => !DECO[parse(x)[0]].game) }); // game: true — вещи только из игр; fixed — альбом, он в комнате сам
   LEG.forEach(x => B.LEGEND.add(x));
   B.GIFT_KINDS.push(['furn', ['Furniture & things', 'Мебель и вещи', 'Mēbeles un lietas']], ['deco', ['Decorations', 'Украшения', 'Rotājumi']], ['wall', ['Wallpaper', 'Обои', 'Tapetes']],
     ['floor', ['Floors', 'Пол', 'Grīdas']], ['view', ['Window views', 'Вид из окна', 'Skats pa logu']], ['curtain', ['Curtains', 'Шторы', 'Aizkari']]);
@@ -978,7 +1049,7 @@
   // lay — раскладка комнаты (layout() внутри mount), d — defOf вещи; возвращает { x, y }
   function freeSpot(lay, d, k) {
     const ov = (ax, ay, aw, ah, b) => Math.max(0, Math.min(ax + aw, b.x + b.w) - Math.max(ax, b.x)) * Math.max(0, Math.min(ay + ah, b.y + b.h) - Math.max(ay, b.y));
-    const boxes = lay.map(q => ({ x: q.x, y: q.y, w: q.d.w, h: q.d.h, flat: q.d.h <= 4, wall: q.it.k === 'deco' || q.d.wall }));
+    const boxes = lay.map(q => ({ x: q.x, y: q.y, w: q.d.w, h: q.d.h, flat: q.d.h <= 4 || q.d.flat, wall: q.it.k === 'deco' || q.d.wall }));
     let best = null;
     if (k === 'deco' || d.wall) {
       const win = { x: WX - 17, y: WY - 9, w: WW + 34, h: WH + 22 }, px = Math.max(0, (WX - 17) / 2 - d.w / 2), py = d.wall ? 40 - d.h : 22;
@@ -996,7 +1067,7 @@
     }
     const y = GY - d.h, floor = boxes.filter(b => !b.wall && !b.flat && Math.abs(b.y + b.h - GY) <= 2);
     for (let x = 0; x <= RW - d.w; x += 2) {
-      const hit = d.h <= 4 ? 0 : floor.reduce((a, b) => a + Math.max(0, Math.min(x + d.w, b.x + b.w) - Math.max(x, b.x)), 0);
+      const hit = d.h <= 4 || d.flat ? 0 : floor.reduce((a, b) => a + Math.max(0, Math.min(x + d.w, b.x + b.w) - Math.max(x, b.x)), 0);
       const sc = hit * 1000 + Math.abs(x + d.w / 2 - RW / 2);
       if (!best || sc < best.sc) best = { x, sc };
     }
@@ -1449,5 +1520,6 @@
     raf = requestAnimationFrame(frame);
     return api;
   }
-  window.PPRoom = { mount, albumOf, icon, nameOf, isRoom, RW, RH, defOf, ROOM_KINDS, freeSpot, isSmall, GLOW, live: null }; // live — своя комната на странице (для useItem) // defOf и ROOM_KINDS — ещё и для tools/catalog.js (ценность вещей)
+  const aboutOf = (kind, v, l = L) => { const a = ABOUT[kind + '|' + parse(v)[0]]; return a ? a[l] : ''; }; // описание вещи (пока у наград Титоса)
+  window.PPRoom = { mount, albumOf, icon, nameOf, aboutOf, potCoffee, isRoom, RW, RH, defOf, ROOM_KINDS, freeSpot, isSmall, GLOW, live: null }; // live — своя комната на странице (для useItem) // defOf и ROOM_KINDS — ещё и для tools/catalog.js (ценность вещей)
 })();

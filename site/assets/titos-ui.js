@@ -22,12 +22,12 @@
     locked: ['Solve case No. %', 'Раскройте дело №%', 'Atrisini lietu Nr. %'],
     got: ['In your bag', 'В сумке', 'Somā'],
   };
-  // награды за уровни — те же ключи, что TITOS_REWARDS в worker/index.js и PPCanDo.TITOS; картинки пока заглушки (простые SVG, не на силуэте — цветные)
+  // награды за уровни — те же ключи, что TITOS_ITEMS в worker/titos.js и PPCanDo.TITOS; картинки — из room.js (PPRoom.icon), без него — простые SVG
   const REWARDS = [
-    { lvl: 30, id: 'furn|chalkrug', ico: '<rect x="2" y="7" width="20" height="12" rx="1.5" fill="#9c3b2e"/><path d="M2 19v2M5 19v2M8 19v2M11 19v2M14 19v2M17 19v2M20 19v2" stroke="#9c3b2e"/><circle cx="7" cy="11" r="1.6" fill="none" stroke="#fff" stroke-width=".8"/><path d="M8.6 11.5l6 .5 3-2M14.6 12l3.4 3M11 11.7l-1 4M12.5 11.8l1.5 3.5" fill="none" stroke="#fff" stroke-width=".8"/>', name: ['Rug with a chalk outline', 'Ковёр с меловым силуэтом', 'Paklājs ar krīta siluetu'] },
+    { lvl: 30, id: 'furn|chalkrug', ico: '<rect x="2" y="7" width="20" height="12" rx="1.5" fill="#9c3b2e"/><path d="M2 19v2M5 19v2M8 19v2M11 19v2M14 19v2M17 19v2M20 19v2" stroke="#9c3b2e"/><circle cx="7" cy="11" r="1.6" fill="none" stroke="#fff" stroke-width=".8"/><path d="M8.6 11.5l6 .5 3-2M14.6 12l3.4 3M11 11.7l-1 4M12.5 11.8l1.5 3.5" fill="none" stroke="#fff" stroke-width=".8"/>', name: ['Rug “Somebody Was Here”', 'Ковёр «Здесь кто-то был»', 'Paklājs “Šeit kāds bija”'] },
     { lvl: 50, id: 'furn|titospot', ico: 'pot', name: ['Detective’s coffee pot', 'Кофейник детектива', 'Detektīva kafijas kanna'] },
     { lvl: 90, id: 'deco|clueboard', ico: '<rect x="2" y="3" width="20" height="16" rx="1" fill="#6b4423"/><rect x="3.5" y="4.5" width="17" height="13" fill="#c9955a"/><rect x="5" y="6" width="4" height="5" fill="#f4f0fa"/><rect x="14" y="6.5" width="5" height="4" fill="#f4f0fa"/><rect x="9.5" y="12" width="4" height="4.5" fill="#f4f0fa"/><path d="M7 6.5L16.5 7l-5 5.5z" fill="none" stroke="#d33" stroke-width=".6"/><circle cx="7" cy="6.5" r=".9" fill="#d33"/><circle cx="16.5" cy="7" r=".9" fill="#d33"/><circle cx="11.5" cy="12.5" r=".9" fill="#d33"/><path d="M4 19l-1 3M20 19l1 3" stroke="#6b4423" stroke-width="1.2"/>', name: ['Evidence board', 'Доска улик', 'Pierādījumu dēlis'] },
-    { lvl: 100, id: 'deco|titosbadge', ico: '<rect x="3" y="2" width="18" height="20" rx="1" fill="#8a5a2b"/><rect x="5" y="4" width="14" height="16" fill="#2b1a51"/><path d="M12 6l1.8 3.6 4 .6-2.9 2.8.7 4L12 15.1 8.4 17l.7-4-2.9-2.8 4-.6z" fill="#e9a93b" stroke="#fff3c4" stroke-width=".4"/>', name: ['Detective Titos’ gold badge in a wooden frame', 'Золотой значок детектива Титоса в деревянной рамке', 'Detektīva Titosa zelta nozīmīte koka rāmī'] },
+    { lvl: 100, id: 'deco|titosbadge', ico: '<rect x="3" y="2" width="18" height="20" rx="1" fill="#8a5a2b"/><rect x="5" y="4" width="14" height="16" fill="#2b1a51"/><path d="M12 6l1.8 3.6 4 .6-2.9 2.8.7 4L12 15.1 8.4 17l.7-4-2.9-2.8 4-.6z" fill="#e9a93b" stroke="#fff3c4" stroke-width=".4"/>', name: ['Detective Titos’ golden badge', 'Золотой значок детектива Титоса', 'Detektīva Titosa zelta nozīmīte'] },
   ];
   // кофейник — пиксели prop-pot.png из кабинета (A — контур, B — тень, C — стекло, D — кофе); кофе заполняет ряды 4–8 снизу
   const GRID = ['....AAAA......', '...ABBBBA.....', '..ABBBBBBA....', '.ACCCCCCCCA...', '.ACDDDDDDCBA..', 'ACDDDDDDDDCBA.', 'ACDDDDDDDDCABA', 'ACDDDDDDDDCBA.', '.ACDDDDDDCAA..', '..ACCCCCCA....', '.ABBBBBBBBA...', '..AAAAAAAA....'];
@@ -67,11 +67,12 @@
 .tt-cards{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:10px;max-width:760px}
 .tt-card{background:#f4f0fa;color:#2b1a51;border-radius:14px;padding:8px 6px 10px;text-align:center;min-width:0}
 .tt-card svg{display:block;width:64px;height:64px;margin:4px auto 6px}
-.tt-card.is-locked svg{filter:brightness(0);opacity:.22}
+.tt-card.is-locked svg,.tt-card.is-locked canvas{filter:brightness(0);opacity:.22}
+.tt-ic{display:flex;align-items:center;justify-content:center;height:64px;margin:4px auto 6px}.tt-ic .pp-icon{display:flex;align-items:center;justify-content:center;width:64px;height:64px}.tt-ic canvas{image-rendering:pixelated;max-width:64px;max-height:64px}
 .tt-card b{display:block;font-size:.8rem;line-height:1.2}
 .tt-card .tt-lv{display:inline-block;font-weight:700;font-size:.72rem;background:#2b1a51;color:#f3effa;border-radius:99px;padding:1px 8px}
 .tt-card.is-locked b{color:#8a7fae;letter-spacing:.1em}
-@media (max-width:560px){.tt-cards{gap:6px}.tt-card{padding:6px 3px 8px;border-radius:10px}.tt-card svg{width:44px;height:44px}.tt-card b{font-size:.68rem}.tt-card .tt-lv{font-size:.66rem;padding:1px 6px}.tt-pot{padding:10px 12px}.tt-pot svg{width:64px;height:69px}}
+@media (max-width:560px){.tt-ic,.tt-ic .pp-icon{height:44px}.tt-ic canvas{max-width:44px;max-height:44px}.tt-cards{gap:6px}.tt-card{padding:6px 3px 8px;border-radius:10px}.tt-card svg{width:44px;height:44px}.tt-card b{font-size:.68rem}.tt-card .tt-lv{font-size:.66rem;padding:1px 6px}.tt-pot{padding:10px 12px}.tt-pot svg{width:64px;height:69px}}
 @media (prefers-reduced-motion:reduce){.tt-steam,.tt-z{animation:none}}`;
   let css = false;
   const addCss = () => { if (css) return; css = true; const s = document.createElement('style'); s.textContent = CSS; document.head.appendChild(s); };
@@ -92,9 +93,11 @@
     el.className = 'tt-rw';
     el.innerHTML = `<h2>${t(T.rewards)}</h2><div class="tt-cards">${REWARDS.map(r => {
       const got = level >= r.lvl || (o.got || []).includes(r.id);
-      const pic = r.ico === 'pot' ? potSvg('full', true) : `<svg viewBox="0 0 24 24" aria-hidden="true">${r.ico}</svg>`;
-      return `<div class="tt-card${got ? '' : ' is-locked'}" data-id="${r.id}" title="${got ? t(r.name) + ' · ' + t(T.got) : t(T.locked).replace('%', r.lvl)}"><span class="tt-lv">${r.lvl}</span>${pic}<b>${got ? t(r.name) : '???'}</b></div>`;
+      const pic = window.PPRoom ? '<i class="tt-ic"></i>' : r.ico === 'pot' ? potSvg('full', true) : `<svg viewBox="0 0 24 24" aria-hidden="true">${r.ico}</svg>`; // те же картинки, что в комнате (room.js)
+      const about = window.PPRoom && PPRoom.aboutOf ? PPRoom.aboutOf(...r.id.split('|')) : '';
+      return `<div class="tt-card${got ? '' : ' is-locked'}" data-id="${r.id}" title="${got ? t(r.name) + ' · ' + t(T.got) + (about ? '\n' + about : '') : t(T.locked).replace('%', r.lvl)}"><span class="tt-lv">${r.lvl}</span>${pic}<b>${got ? t(r.name) : '???'}</b></div>`;
     }).join('')}</div>`;
+    if (window.PPRoom) el.querySelectorAll('.tt-card').forEach(c => { const [k, v] = c.dataset.id.split('|'); c.querySelector('.tt-ic').appendChild(PPRoom.icon(k, v, 64)); });
   }
   window.PPTitos = Object.assign(window.PPTitos || {}, { pot, rewards, REWARDS, stateOf });
 

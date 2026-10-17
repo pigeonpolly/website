@@ -72,10 +72,15 @@ build.py собирает все дела в site/assets/titos-cases.json.
 
 ## Верх страницы и правила (части 9–12)
 - Страница `/titos/` — `src/pages/titos.html` (+ `.ru.html`, `.lv.html`); `/detective-office/` → 301 в `site/_redirects`.
-- `#titos-top` — `site/assets/titos-ui.js`: `PPTitos.rewards(el, level)` — 4 награды (силуэт, пока уровень не пройден; картинки — SVG-заглушки), `PPTitos.pot(el, s, {onRefill})` — кофейник: полный (≥ ⅔), половина, пустой («Титос спит»), чашки, «следующая чашка через N мин», «☕ Долить · N 🔘» (POST /api/titos/coffee {src: 'buy'}; гостю и при полном — неактивна).
+- `#titos-top` — `site/assets/titos-ui.js`: `PPTitos.rewards(el, level)` — 4 награды (силуэт, пока уровень не пройден; картинки — `PPRoom.icon`, те же, что в комнате), `PPTitos.pot(el, s, {onRefill})` — кофейник: полный (≥ ⅔), половина, пустой («Титос спит»), чашки, «следующая чашка через N мин», «☕ Долить · N 🔘» (POST /api/titos/coffee {src: 'buy'}; гостю и при полном — неактивна).
 - Состояние: whoami `user.titos` и событие `pp:titos` — quest-titos.js шлёт его после каждого ответа с `state` (+ `prices`). Гость — уровень по localStorage дел 1–2. Проверка вида: `?pot=full|half|empty&lvl=50`.
 - Кабинет: группа «🕵️ Титос» — «🕵️ Дела» (`#titos`) и «📜 Правила Титоса» (`#titos-rules` → блок в 📜 Правилах + абзац в «Все правила»). Цены в 🔘 — `gamePrices`: `titosLevel`, `titosRefill`, `titosSell`.
-- Награды-вещи: ключи в `PPCanDo.TITOS` (`furn|chalkrug`, `furn|titospot`, `deco|clueboard`, `deco|titosbadge`) — не магазин, не подарок, не продажа; на сервере пока только `TITOS_PRIZES` (rug/pot/board/badge), в сумку ещё не кладутся — вещей в комнате нет.
+- Награды-вещи за уровни — см. «Награды за уровни (этап 11 А)».
+
+## Награды за уровни (этап 11 А)
+- 30 — `furn|chalkrug` «Ковёр „Здесь кто-то был“» (плоский `flat`, h 8, на нём стоят — `top: 5`), 50 — `furn|titospot:N` «Кофейник детектива» (кофе плещется; N — по порядку получения на сайте, meta `titos_pot_n`; цвет — room.js `potCoffee(N)`: оттенок по золотому углу от коричневого + 5 ступеней светлоты), 90 — `deco|clueboard` «Доска улик», 100 — `deco|titosbadge` «Золотой значок» (блик пробегает). Рисунки — room.js блок «награды Титоса за уровни», описания — `ABOUT` → `PPRoom.aboutOf` (окно вещи, подсказка карточки на /titos/).
+- Игровые (`game: true`): нет в B.GIFTS → нет в магазине, каталоге, адвенте, «Сюрпризах», «Дожде»; PPCanDo.TITOS — не подарить, не продать.
+- Выдача — worker/titos.js `TITOS_ITEMS` + `levelItem` в accuse при первом раскрытии дела 30/50/90/100: в сумку (gifts note `titoslv:N`, opened_at NULL, без двойников), `flockEvent('titosreward')`, ответ `reward`. Новость `reward` (`rewardNews`, news.js): «🏅 Награда!» + «Поставить» → `PPCatalog.use` (или профиль `#use=`), прочитана — POST /api/titos/reward/seen.
 
 ## Вещи-награды за дела (этап 10-1) — ВСЕГДА
 - **Правило Алины: каждое новое дело — со своей вещью-наградой и всем, что к ней нужно, даже если в задании про это не сказано.** Без неё titos_check.py не пропустит дело.

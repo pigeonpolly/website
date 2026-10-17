@@ -67,6 +67,13 @@
       act: ['Look', 'Посмотреть', 'Apskatīt'],
       go: () => pre + '/bird/#trades',
     },
+    reward: { // награда Титоса за уровень 30/50/90/100 (worker/titos.js rewardNews): «Поставить» — useItem в свою комнату
+      icon: '🏅',
+      title: () => ['A reward!', 'Награда!', 'Balva!'][L],
+      text: x => (window.PPBirds ? PPBirds.giftName(x.k, x.v, L) + ' · ' : '') + [`Detective Titos, case No. ${x.level}`, `Детектив Титос, дело №${x.level}`, `Detektīvs Titoss, lieta Nr. ${x.level}`][L],
+      act: ['Place it', 'Поставить', 'Novietot'],
+      open: reward,
+    },
   };
 
   let news = [], me = null, flown = false;
@@ -153,6 +160,14 @@
     card.classList.add('show'); btn.disabled = true;
     setTimeout(() => { card.classList.add('open'); btn.disabled = false; btn.textContent = t('salOk'); card.querySelector('.sal-env').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 900);
     fetch('/api/salary/seen', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: '{}' }).catch(() => {});
+  }
+
+  // награда: отметить прочитанной и поставить (своя комната на странице — сразу, иначе — профиль с #use=)
+  function reward(card, x) {
+    const C = window.PPCatalog, live = window.PPRoom && PPRoom.live && PPRoom.live.box.isConnected;
+    const done = () => fetch('/api/titos/reward/seen', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: '{}' }).catch(() => {});
+    if (C && C.use && live) { done(); drop('reward', card); const d = document.getElementById('nw-feed'); if (d) d.close(); C.use(x.k, x.v, { me: { nick: me.nick, gifts: [{ status: 'bag', kind: x.k, item: x.v }] } }); return; }
+    done().then(() => { location.href = `${pre}/bird/?nick=${encodeURIComponent(me.nick)}#use=${encodeURIComponent(x.k + '|' + x.v)}`; });
   }
 
   function set(d) {
