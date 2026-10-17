@@ -79,3 +79,8 @@
 - Выпадает случайная **свободная** карточка этой редкости (не скрытая, с ценой) — раз карточки единственные, у покупателя такой точно нет. Коллекции, где выбран лимит «в первые сутки», не участвуют.
 - Цена = средняя цена свободных карточек редкости × `RULES.cardSurprisePct` % (100; 📜 Правила → Магазин «🎲 Карточка-сюрприз стоит»), до 5; у обычных — их обычная цена × %.
 - Сервер (worker/cards.js): `surpriseInfo` → `GET /api/cards` отдаёт `surprise: {common|rare|unique: {left, price}}`; `POST /api/cards/surprise {rarity, price, collection, lang}` — та же транзакция, что у покупки (перехватили — другая карточка, до 5 раз); ответ — выпавшая карточка, ошибки `none` / `price` / `poor` / `limit`. Журнал — `kind = 'card'`, в `card_owner.price` — цена сюрприза. Витрина — cards-ui.js `surTile` / `buySur`: после покупки тост и окно выпавшей карточки.
+
+## Halloween Remix — обычные ремиксы карточек Алины (этап 8.2)
+
+- **16 обычных** (№62–77, коллекция `halloween-remix`, en → Gemini): по одной на каждую её акварель «Halloween 2025» — новый персонаж или предмет в той же теме (Sir Gourdon Squash ← Miss Pumpkinella … Ghost Thimble ← Ghost button). 7 персонажей и 9 предметов с игровыми статами `game` (слабее уникальных: HP 6–12, статы 1–4).
+- Картинки — `python3 tools/cards/halloween_remix.py` (Pillow, инструменты из halloween.py) → `site/images/cards/halloween-remix/NN.png` 120×168: пиксельная «акварельная заливка», тыква/капля в углу, у персонажей 5 кружков статов, у предметов — эффект (+N HP / ±1 GLITCH). Импорт — сам по метке `cards_halloween-remix`.
