@@ -290,7 +290,11 @@ async function avgItemPrice(env) {
 }
 async function setRules(env, patch) { const r = cleanRules({ ...RULES, ...patch }); await setMeta(env, 'rules', JSON.stringify(r)); rulesAt = 0; await loadRules(env); return RULES; }
 // события стаи (кто что купил, обменял, нашёл): пока пустая — лента появится на следующих этапах
-async function flockEvent(kind, bird, data) { /* kind: 'card' — купил карточку; bird — птичка (users), data — подробности */ }
+async function flockEvent(kind, bird, data) { /* kind: 'card' — купил карточку, 'titos' — раскрыл дело №10, 20, 30…; bird — птичка (users), data — подробности */ }
+// «Детектив Титос»: зовётся после засчитанного уровня (обвинение верное) — каждое 10-е дело попадает в события стаи
+const titosSolved = (bird, level) => level > 0 && level % 10 === 0 ? flockEvent('titos', bird, { level }) : null;
+// награды-вещи за уровни: только в сумку (не в магазине, не подарить, не продать — can-do.js); в комнате и на /titos/ пока заглушки (site/assets/titos-ui.js)
+const TITOS_REWARDS = { 30: 'furn|chalkrug', 50: 'furn|titospot', 90: 'deco|clueboard', 100: 'deco|titosbadge' }; // те же ключи — PPCanDo.TITOS
 const cardHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, rules: () => RULES, avgItemPrice: () => avgItemPrice(env), setRules: patch => setRules(env, patch), flockEvent });
 const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), awardComment: (uid, cid) => awardComment(env, uid, cid) });
 
@@ -411,6 +415,11 @@ const RULE_DEFAULTS = {
   potionOn: true, potion1Pct: 4, potion2Pct: 12, potion3Pct: 35, potionAgainPct: 1, potionDayMaxPct: 60, potionMinSec: 8,
   potionSeason: 'auto', potionShelf: true, // сезон зельеварни (auto — по календарю) и бутылочка в комнату за новое зелье «Вкус детства» // «Пуговичный дождь»: 🔘 за пройденный уровень, не больше gameDayMax в сутки; уровень быстрее gameMinSec с — не засчитывается
   indexOn: false, indexBase: 0, priceDays: 4, catMult: {}, // indexOn: пуговки за цены — выключено: теперь цены сами следуют за пуговками; priceDays — за сколько дней обычной активности средняя птичка зарабатывает на среднюю вещь // индексация обычных пуговок по средней цене вещи (0 — стартовая цена = цена в день включения)
+  // «Детектив Титос» (/titos/, docs/titos.md): кофейник titosPotMax чашек; старт дела −titosCaseCups, дальше −1 каждые titosCupMin мин; +1 чашка каждые titosRefillMin мин до полного;
+  // «Разбери дела» +titosSortCups за уровень, «Жуки» +titosBugsCups до titosBugsPerHour раз в час; «Долить» полный — titosRefillPct %; лишнее при полном → titosSellPct % за чашку (≥ 1 🔘), не больше titosSellDayMax чашек в сутки;
+  // за уровень titosLevelPct % × (1 + ⌊(ур.−1)/10⌋), один раз; уровень быстрее titosMinSec с не засчитывается; награды-вещи за уровни titosRewards (только в сумку: не в магазине, не подарить, не продать)
+  titosOn: true, titosPotMax: 10, titosCaseCups: 1, titosCupMin: 5, titosRefillMin: 60, titosSortCups: 2, titosBugsCups: 5, titosBugsPerHour: 2,
+  titosRefillPct: 20, titosSellPct: 1, titosSellDayMax: 20, titosLevelPct: 2.4, titosMinSec: 60,
   cardMult: 100, cardsFirstDay: 0, tradeDays: 7, // карточки: цена обычной = средняя цена вещи × cardMult %; сколько карточек одной коллекции в одни руки в первые сутки (0 — без лимита); сколько дней живёт предложение обмена
   restockOn: true, restockTo: 0, // раз в сутки: у всех вещей, кроме легендарных, остаток дотягивается до restockTo шт. (0 — до «обычного запаса») // продажа вещей обратно в магазин: одна цена за любую вещь
   // условия бейджей (числа из описаний «как получить»)
@@ -422,7 +431,8 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], ...CH_RANGE };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60],
+  titosPotMax: [1, 100], titosCaseCups: [0, 100], titosCupMin: [1, 120], titosRefillMin: [1, 1440], titosSortCups: [0, 100], titosBugsCups: [0, 100], titosBugsPerHour: [0, 60], titosRefillPct: [0, 1000], titosSellPct: [0, 100], titosSellDayMax: [0, 1000], titosLevelPct: [0, 100], titosMinSec: [0, 3600], ...CH_RANGE };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -437,9 +447,9 @@ function cleanRules(r) {
   if (!r || typeof r !== 'object') return out;
   for (const [k, [lo, hi]] of Object.entries(RULE_NUM)) if (r[k] != null && Number.isFinite(Number(r[k]))) out[k] = Math.max(lo, Math.min(hi, Number(r[k])));
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
-  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn']) if (typeof r[k] === 'boolean') out[k] = r[k];
+  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn']) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'cardMult', 'cardsFirstDay', 'tradeDays', ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
+  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'cardMult', 'cardsFirstDay', 'tradeDays', 'titosPotMax', 'titosCaseCups', 'titosCupMin', 'titosRefillMin', 'titosSortCups', 'titosBugsCups', 'titosBugsPerHour', 'titosSellDayMax', 'titosMinSec', ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
   out.catMult = {}; if (r.catMult && typeof r.catMult === 'object') for (const k of GIFT_KINDS) { const v = Number(r.catMult[k]); if (Number.isFinite(v) && v !== 100) out.catMult[k] = Math.max(10, Math.min(1000, Math.round(v))); }
@@ -1009,7 +1019,8 @@ async function gameUnit(env, force = false) {
 const btnOf = (pct, unit) => pct > 0 ? Math.max(1, Math.round(pct * unit.avg / 100)) : 0;
 // цены наград игр сейчас (для страниц игр и кабинета)
 const gamePrices = unit => ({ avg: unit.avg, level: btnOf(RULES.gameLevelPct, unit), record: btnOf(RULES.gameRecordPct, unit), king: btnOf(RULES.gameKingPct, unit), max: btnOf(RULES.gameDayMaxPct, unit),
-  p1: btnOf(RULES.potion1Pct, unit), p2: btnOf(RULES.potion2Pct, unit), p3: btnOf(RULES.potion3Pct, unit), again: btnOf(RULES.potionAgainPct, unit), pmax: btnOf(RULES.potionDayMaxPct, unit) });
+  p1: btnOf(RULES.potion1Pct, unit), p2: btnOf(RULES.potion2Pct, unit), p3: btnOf(RULES.potion3Pct, unit), again: btnOf(RULES.potionAgainPct, unit), pmax: btnOf(RULES.potionDayMaxPct, unit),
+  titosLevel: btnOf(RULES.titosLevelPct, unit), titosRefill: btnOf(RULES.titosRefillPct, unit), titosSell: btnOf(RULES.titosSellPct, unit) });
 // «🤖 Автопилот» в кабинете: что работает само и всё ли в порядке (ok: true — зелёное, false — нужно внимание, null — выключено)
 async function autopilot(env, req) {
   const out = [], day = rigaDay(), y = new Date(Date.now() - 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });

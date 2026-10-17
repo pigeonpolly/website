@@ -44,6 +44,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/site-edit.js` (24K) — режим «✏️ Править страницу» (админ): PPEdit, PRE, TPL, drawText, override
 - `site/assets/site.js` (11K) — меню, шапка «влезает», лайтбокс галерей, /api/hit, `[data-profile]`: open, close, show, fit, over
 - `site/assets/sketch-wall.js` (95K) — стена работ, вход, загрузка, бейджи, профиль /bird/, сумка: PPProfile, LEVELS, SPECIAL, COL, loadWall
+- `site/assets/titos-ui.js` (11K) — «Детектив Титос» /titos/: кофейник и 4 награды над игрой (`PPTitos`): pot, rewards, REWARDS, stateOf
 - `site/assets/today.js` (6K) — блок «Тема дня» (с главной убран): LBL, open, wait
 - `site/assets/wobbleland-data.en.js` (26K) — из content/wobbleland.json (build.py): WOBBLELAND
 - `site/assets/wobbleland-data.lv.js` (28K) — то же, LV: WOBBLELAND
@@ -122,3 +123,4 @@ _Сюда следующие этапы дописывают общие свед
 - Этап 7 Г: worker `toShop(env, req, u, g)` — вещь из сумки обратно в магазин (+1, снять/убрать из комнаты), её зовут продажа и 🔦 подсказка; `hintOk(kind, item)` — чем можно платить за подсказку. potions.js подключает catalog-ui.js.
 - Этап 7: `PPCanDo(kind, item)` (site/assets/can-do.js, сервер и браузер) — что можно с вещью {shop, gift, sell, bag, box}; новые запреты — только туда. Альбом карточек — `PPRoom.albumOf(nick)` / `PPCards.album(nick)`.
 - account.js: `PPDevH()` — заголовок x-dev-date для ?devdate=; `PPWho` + событие `pp:whoami`. worker: `rigaMs()` — время по Риге → мс.
+- Этап 8 (9–12): titos-ui.js `PPTitos.pot(el, s, {onRefill})` — кофейник, `PPTitos.rewards(el, level)` — 4 награды-силуэта; состояние — whoami `titos` или событие `pp:titos`. worker: `titosSolved(bird, level)` → `flockEvent('titos')` на №10, 20…; `TITOS_REWARDS` = `PPCanDo.TITOS`. docs/titos.md.

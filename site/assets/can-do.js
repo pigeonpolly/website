@@ -5,20 +5,24 @@
 //   gift — можно подарить другой птичке; sell — продать за пуговки; bag — убрать из комнаты в сумку; box — положить в адвент-окно и подарок из кабинета.
 // Легендарные: не дарятся. Игровые (бутылочка «Вкус детства» furn|kidpot:N): не в магазин и не в подарок из кабинета.
 // Альбом furn|album: есть в каждой комнате сам — ничего нельзя.
+// Награды Титоса (TITOS, за уровни 30/50/90/100, docs/titos.md): только своя — не в магазине, не подарить, не продать, не в подарок из кабинета.
 (function (g) {
   var LEGEND = ['furn|countcoffin', 'furn|crypt', 'furn|tieredcake', 'hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora',
     'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass',
     'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight'];
+  var TITOS = ['furn|chalkrug', 'furn|titospot', 'deco|clueboard', 'deco|titosbadge'];
   var base = function (item) { return String(item).split(':')[0]; };
   var isAlbum = function (kind, item) { return kind === 'furn' && base(item) === 'album'; };
   var isGame = function (kind, item) { return kind === 'furn' && base(item) === 'kidpot'; };
   function canDo(kind, item) {
     if (kind && typeof kind === 'object') { item = kind.item != null ? kind.item : kind.v; kind = kind.kind || kind.k; }
     if (isAlbum(kind, item)) return { shop: false, gift: false, sell: false, bag: false, box: false };
+    if (canDo.TITOS.has(kind + '|' + base(item))) return { shop: false, gift: false, sell: false, bag: true, box: false };
     var leg = canDo.LEGEND.has(kind + '|' + item) || item === 'legend', game = isGame(kind, item);
     return { shop: !game, gift: !leg, sell: true, bag: true, box: !game };
   }
   canDo.LEGEND = new Set(LEGEND);
+  canDo.TITOS = new Set(TITOS);
   canDo.isAlbum = isAlbum;
   canDo.isGame = isGame;
   // для подсказки в Зельеварне и похожего «потратить вещь»: можно только то, что возвращается в магазин и не легендарное
