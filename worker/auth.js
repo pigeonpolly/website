@@ -14,7 +14,8 @@ export const AUTH_TABLES = [
   `CREATE TABLE IF NOT EXISTS funnel (day TEXT NOT NULL, name TEXT NOT NULL, step TEXT NOT NULL, vid TEXT NOT NULL, PRIMARY KEY (day, name, step, vid))`,
 ];
 // pw — 'p1$соль$хеш'; pw_temp = 1 — временный пароль из кабинета (при входе придумать новый); email_ok — почта подтверждена (Google или ссылка из письма)
-export const AUTH_ALTER = ['ALTER TABLE users ADD COLUMN pw TEXT', 'ALTER TABLE users ADD COLUMN pw_temp INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN email_ok INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN privacy_at INTEGER'];
+export const AUTH_ALTER = ['ALTER TABLE users ADD COLUMN pw TEXT', 'ALTER TABLE users ADD COLUMN pw_temp INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN email_ok INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN privacy_at INTEGER',
+  "ALTER TABLE users ADD COLUMN advent_mail TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN advent_sent INTEGER DEFAULT 0']; // advent_mail — язык письма «адвент открылся» ('' — не надо), advent_sent — год, когда отправлено
 
 // воронки для «👥 Посетителей»: шаги по порядку; client — какие шаги может прислать браузер (остальные пишет сервер)
 export const FUNNELS = {
@@ -70,6 +71,32 @@ export async function sendMail(env, to, subject, text) {
   console.log('sendMail (заглушка):', to, subject, text);
   if (env.DEV_MAIL === '1') await env.DB.prepare("INSERT INTO meta (key, value) VALUES ('dev_last_mail', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(JSON.stringify({ to, subject, text })).run();
   return { ok: env.DEV_MAIL === '1', off: true };
+}
+
+// ---------- «Напомнить письмом, когда откроется адвент» ----------
+// галочка в профиле видна до 1 декабря (adventAsk); письмо — 1 декабря по Риге, раз в час порциями (Resend бесплатно: 100 в сутки),
+// если за сутки не успели — продолжает 2-го и дальше, до 7 декабря. Каждой птичке — одно письмо в год (advent_sent).
+export const adventAsk = day => day < day.slice(0, 4) + '-12-01';
+const ADVENT_DAY_MAX = 90;
+export async function adventMail(env, h) {
+  const day = h.rigaDay(), y = +day.slice(0, 4);
+  if (!mailOn(env) || day < y + '-12-01' || day > y + '-12-07') return;
+  const sent = Number(await h.getMeta('advent_mail_n:' + day)) || 0;
+  const rows = (await env.DB.prepare("SELECT id, email, advent_mail FROM users WHERE advent_mail != '' AND email IS NOT NULL AND banned = 0 AND COALESCE(advent_sent, 0) < ? ORDER BY id LIMIT ?").bind(y, Math.max(0, Math.min(30, ADVENT_DAY_MAX - sent))).all()).results;
+  let n = sent;
+  for (const u of rows) {
+    const L = ['ru', 'lv'].includes(u.advent_mail) ? u.advent_mail : 'en', link = `https://www.pigeonpolly.com${L === 'en' ? '' : '/' + L}/advent/`;
+    const T = {
+      en: ['🎄 The advent calendar is open!', `Hi!\n\nThe Pigeon Polly advent calendar is open: one window a day until Christmas, each with a little surprise for your bird.\n\n${link}\n\nYou asked for this reminder on pigeonpolly.com. This is the only one; you can untick it in your profile.\n\nAlina, Pigeon Polly Art Lab`],
+      ru: ['🎄 Адвент-календарь открылся!', `Привет!\n\nАдвент-календарь Pigeon Polly открыт: каждый день до Рождества — новое окошко с сюрпризом для птички.\n\n${link}\n\nЭто напоминание включено в профиле на pigeonpolly.com. Оно одно; галочку можно снять в профиле.\n\nАлина, Pigeon Polly Art Lab`],
+      lv: ['🎄 Adventes kalendārs ir atvērts!', `Sveiki!\n\nPigeon Polly adventes kalendārs ir atvērts: katru dienu līdz Ziemassvētkiem — jauns lodziņš ar pārsteigumu tavam putniņam.\n\n${link}\n\nŠo atgādinājumu ieslēdzi profilā vietnē pigeonpolly.com. Tas ir vienīgais; atzīmi vari noņemt profilā.\n\nAlīna, Pigeon Polly Art Lab`],
+    }[L];
+    const r = await sendMail(env, u.email, T[0], T[1]);
+    if (!r.ok) break; // лимит или ошибка — попробуем в следующий час
+    await env.DB.prepare('UPDATE users SET advent_sent = ? WHERE id = ?').bind(y, u.id).run();
+    n++;
+  }
+  if (n !== sent) await h.setMeta('advent_mail_n:' + day, String(n));
 }
 
 // ---------- воронки ----------
@@ -212,6 +239,12 @@ export async function authApi(req, env, url, h) {
     return login(u.id);
   }
 
+  if (m === 'POST' && p === '/api/pw/advent-mail') { // галочка в профиле: {on, lang}
+    const u = await h.needUser(req, env), b = await body();
+    if (b.on && (!mailOn(env) || !u.email)) h.fail(400, 'mail');
+    await env.DB.prepare('UPDATE users SET advent_mail = ? WHERE id = ?').bind(b.on ? (['ru', 'lv'].includes(b.lang) ? b.lang : 'en') : '', u.id).run();
+    return h.json({ ok: true });
+  }
   if (m === 'POST' && p === '/api/funnel') {
     const b = await body(), f = FUNNELS[b.f];
     if (f && f.client.includes(b.s) && !/bot|crawl|spider|headless/i.test(req.headers.get('user-agent') || '')) await funnelStep(env, req, b.f, b.s, h);

@@ -8,7 +8,7 @@ import { CH_DEFAULTS, CH_RANGE } from './challenge-plan.js';
 import '../site/assets/can-do.js'; // PPCanDo — что можно с вещью (этап 7)
 const PPCanDo = globalThis.PPCanDo;
 import { cardsApi, importCards, translateMissing, myCards, tradeNews, CARD_TABLES } from './cards.js'; // коллекционные карточки (docs/cards.md)
-import { authApi, googleLink, funnelStep, mailOn, AUTH_TABLES, AUTH_ALTER } from './auth.js'; // вход с паролем, письма, воронки (этап 12)
+import { authApi, googleLink, funnelStep, mailOn, adventMail, adventAsk, AUTH_TABLES, AUTH_ALTER } from './auth.js'; // вход с паролем, письма, воронки (этап 12)
 import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
@@ -55,6 +55,7 @@ export default {
       await translateMissing(env, 5).catch(e => console.error('cards tr', e)); // карточки без перевода (Gemini не успел при импорте) — по 5 в час
       await importTitos(env, new URL('https://www.pigeonpolly.com/')).catch(e => console.error('titos', e)); // дела Титоса: новый titos-cases.json — в D1 и перевести (один раз на хэш)
       await challengeCron(env, RULES).catch(e => console.error('challenge plan', e)); // темы челленджа: с 20-го — план следующего месяца
+      await adventMail(env, authHelpers(env)).catch(e => console.error('advent mail', e)); // 1 декабря: письмо «адвент открылся» тем, кто отметил галочку
       await migrateToR2(env); await cleanupInactive(env);
       await env.DB.prepare('DELETE FROM game_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {}); // старые забеги игр (started — в мс)
       await env.DB.prepare('DELETE FROM maze_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {});
@@ -1948,7 +1949,7 @@ async function route(req, env, url) {
     if (forBadges.total) u.buttons = (u.buttons || 0) + forBadges.total;
     const storage = admin ? Math.round(await storageUsed(env) * 1000) / 10 : undefined;
     const migration = admin && env.MEDIA ? await migrationStatus(env) : undefined;
-    return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, pw: !!u.pw, mail: mailOn(env), consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
+    return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, pw: !!u.pw, mail: mailOn(env), email: !!u.email, adventMail: !!u.advent_mail, adventAsk: adventAsk(rigaDay()), consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
       best: mergedBest(u, streakDays(rows)), keptBadges: kept, posts: rows, id: u.id, avatar: avatarOf(u), room: roomOf(u), earned, badgeEarned: forBadges, btn: await buttonStatus(env, u),
       gifts: (await env.DB.prepare('SELECT id, kind, item, note, status, created_at FROM gifts WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results } });
   }
