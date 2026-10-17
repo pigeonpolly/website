@@ -4,7 +4,8 @@
   python3 tools/titos_check.py            — все дела
   python3 tools/titos_check.py 3 7        — только дела №3 и №7
   python3 tools/titos_check.py --index    — ещё и переписать content/titos/index.md (№, название, виновный, трюк)
-Старые дела («legacy»: true — бывшие «Дело №1» и «Дело №2») не проверяются на диапазон сложности."""
+Старые дела («legacy»: true — бывшие «Дело №1» и «Дело №2») не проверяются на диапазон сложности и без вещи-награды.
+У каждого нового дела — вещь-награда `reward`: "furn|tc<имя>", нарисована в site/assets/room.js (блок «награды за дела Титоса»), у каждого дела своя."""
 import difflib
 import json
 import re
@@ -18,6 +19,8 @@ from titos_cast import cast  # noqa: E402
 
 ZONES = set(json.loads((ROOT / "tools" / "rooms" / "detective.json").read_text())["hot"])
 CAST = {r["key"] for r in cast()}
+# вещи-награды за дела: ключи tc<имя> из site/assets/room.js (FURN, «tcpie: TC(…»)
+REWARDS = set(re.findall(r"^\s+(tc[a-z]+): TC\(", (ROOT / "site" / "assets" / "room.js").read_text(), re.M))
 TEXT_KEYS = {"title", "ask", "intro", "solved", "bye", "name", "alibi", "wrong", "text", "pre", "q", "a", "say"}
 # сложность по номеру: улик (от, до), подозреваемых (от, до), ложных следов (от, до), нужна ли лупа, нужны ли противоречия в показаниях
 LEVELS = [
@@ -59,6 +62,13 @@ def check(c, f):
     for k in ("title", "trick", "intro", "solved", "suspects", "culprit", "clues"):
         if k not in c:
             e(f"нет поля «{k}»")
+    rw = c.get("reward")
+    if not c.get("legacy"):
+        m = re.fullmatch(r"furn\|(tc[a-z]+)", str(rw or ""))
+        if not m:
+            e("reward — вещь-награда «furn|tc<имя>» (docs/titos.md «Вещи-награды»)")
+        elif m[1] not in REWARDS:
+            e(f"reward «{rw}»: такой вещи нет в site/assets/room.js (блок «награды за дела Титоса»)")
     if not isinstance(c.get("trick"), str) or not c.get("trick", "").strip():
         e("trick — строка RU (главный трюк дела)")
     # тексты — только RU
@@ -187,8 +197,18 @@ def main():
             m = re.match(r"\|\s*(\d+)\s*\|([^|]*)\|([^|]*)\|([^|]*)\|", line)
             if m:
                 idx[int(m[1])] = (m[3].strip(), m[4].strip())
+    seen = {}
+    for f in DIR.glob("[0-9][0-9][0-9].json"):
+        try:
+            rw = json.loads(f.read_text()).get("reward")
+        except Exception:
+            continue
+        if rw:
+            seen.setdefault(rw, []).append(int(f.stem))
     for f, c in cases.items():
         errs = check(c, f)
+        if c.get("reward") and len(seen.get(c["reward"], [])) > 1:
+            errs.append(f"вещь-награда «{c['reward']}» уже в деле №{min(x for x in seen[c['reward']] if x != c.get('n'))}")
         n = c.get("n")
         for m, (who, trick) in idx.items():
             if m == n or not who:
@@ -202,9 +222,9 @@ def main():
         bad += bool(errs)
     if "--index" in sys.argv:
         all_cases = sorted((json.loads(f.read_text()) for f in DIR.glob("[0-9][0-9][0-9].json")), key=lambda c: c.get("n", 0))
-        lines = ["# Дела Титоса", "", "_`python3 tools/titos_check.py --index` — одна строка на дело. Новое дело не повторяет виновного и трюк._", "",
-                 "| № | Название | Виновный | Трюк |", "|---|---|---|---|"]
-        lines += [f"| {c['n']} | {c['title']['ru']} | {culprit_name(c)} | {c['trick']} |" for c in all_cases]
+        lines = ["# Дела Титоса", "", "_`python3 tools/titos_check.py --index` — одна строка на дело. Новое дело не повторяет виновного, трюк и вещь-награду._", "",
+                 "| № | Название | Виновный | Трюк | Награда |", "|---|---|---|---|---|"]
+        lines += [f"| {c['n']} | {c['title']['ru']} | {culprit_name(c)} | {c['trick']} | {c.get('reward') or '—'} |" for c in all_cases]
         (DIR / "index.md").write_text("\n".join(lines) + "\n")
     print(f"Итог: дел {len(cases)}, с ошибками {bad}" + ("" if bad else " — всё в порядке, бот прошёл все"))
     sys.exit(1 if bad else 0)

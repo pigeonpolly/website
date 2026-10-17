@@ -284,6 +284,42 @@
       p(2, 3, 2.5, 3, '#E9C46A'); p(5, 3, 2.5, 3, '#9B5DE5'); p(2, 6.5, 2.5, 2.5, '#7FB3E8'); p(5, 6.5, 2.5, 2.5, fr);
       p(10.5, 3, 2.5, 3, fr); p(13.5, 3, 2.5, 3, fr); p(10.5, 6.5, 2.5, 2.5, fr); p(13.5, 6.5, 2.5, 2.5, fr);
       if (Math.sin(t / 700) > .7) p(3, 3.5, 1, 1, '#FFFFFF'); } };
+  // награды за дела Титоса (этап 10, docs/titos.md «Вещи-награды»): furn|tc<имя>, по одной за дело — content/titos/NNN.json `reward`.
+  // Только из игры (game): в магазин и каталог не входят; PPCanDo — не подарить, не продать.
+  const TC = (en, ru, lv, w, h, rows, pal, more) => ({ n: N(en, ru, lv), w, h, top: null, game: true, titos: true, d: (p, t) => spr(p, rows, typeof pal === 'function' ? pal(t) : pal), ...more });
+  Object.assign(FURN, {
+    tcpie: TC('Miss Pumpkinella’s pie', 'Пирог мисс Тыквеллы', 'Mis Pumpkinellas pīrāgs', 14, 7,
+      ['...s....s.....', '..cccccccccc..', '.cCCoCCCCoCCc.', 'cCCCCCoCCCCCCc', 'cccccccccccccc', 'wwwwwwwwwwwwww', '.WWWWWWWWWWWW.'],
+      t => ({ s: Math.sin(t / 400) > 0 ? '#FFFFFF' : null, c: '#C98A4B', C: '#E0A86A', o: '#E8812E', w: '#F4F0FA', W: '#C9C3D6' })),
+    tclantern: TC('Noodle lantern', 'Лапшичный фонарик', 'Nūdeļu laterna', 9, 11,
+      ['....k....', '....k....', '..rrrrr..', '.rYYYYYr.', '.rYyYyYr.', '.rYYYYYr.', '.rYyYyYr.', '..rrrrr..', '...kkk...', '....k....', '...kkk...'],
+      t => ({ k: '#E9D8A6', r: '#D9433B', Y: Math.sin(t / 300) > -.4 ? '#FFD34D' : '#F6A84A', y: '#F2D27A' }), { glow: [4, 5] }),
+    tcjuice: TC('Midnight carrot juice', 'Полночный морковный сок', 'Pusnakts burkānu sula', 7, 11,
+      ['..ggg..', '...g...', '..WWW..', '..BBB..', '.BOOOB.', 'BOOOOOB', 'BOwwwOB', 'BOwkwOB', 'BOwwwOB', 'BOOOOOB', '.BBBBB.'],
+      { g: '#4E9E5A', W: '#B07A4A', B: '#E8F1F7', O: '#F08A3B', w: '#FFF3C4', k: '#2B2340' }),
+    tcladle: TC('Eternal Soup pot', 'Кастрюля Вечного супа', 'Mūžīgās zupas katls', 13, 10,
+      ['.........h...', '........h....', '.......h.....', '..ssss.h.ss..', '.KKKKKKhKKKK.', 'KGGGGGGhGGGGK', 'KkkkkkkkkkkkK', 'KkkkkkkkkkkkK', '.KkkkkkkkkkK.', '..KKKKKKKKK..'],
+      t => ({ h: '#DDE6F0', s: Math.sin(t / 350) > 0 ? 'rgba(255,255,255,.7)' : null, K: '#3A3550', G: Math.sin(t / 250) > .5 ? '#9AD88A' : '#7FBF6A', k: '#4B4466' })),
+    tcmilkabox: TC('Milka’s box', 'Коробка Милки', 'Milkas kaste', 14, 10,
+      ['..............', '..............', '..............', 'BBBBBBBBBBBBBB', 'bbbbbbbbbbbbbb', 'bbbbbLLLLbbbbb', 'bbbbbLkkLbbbbb', 'bbbbbLLLLbbbbb', 'bbbbbbbbbbbbbb', 'BBBBBBBBBBBBBB'],
+      { B: '#A8794A', b: '#C99A62', L: '#F4F0FA', k: '#5B3A1E' }),
+    tcsign: TC('“Do not wake until spring” sign', 'Табличка «Не будить до весны»', 'Zīme “Nemodināt līdz pavasarim”', 14, 12,
+      ['WWWWWWWWWWWWWW', 'WwwwwwwwwwwwwW', 'WwkkwkkkwkwkwW', 'WwwwwwwwwwwwwW', 'WwkkkwkkwkkkwW', 'WwwwwwwwwwwwwW', 'WWWWWWWWWWWWWW', '......WW......', '......WW......', '......WW......', '......WW......', '.nn..WWWW..n..'],
+      { W: '#6B4423', w: '#E2C08A', k: '#2B2340', n: '#8B5A2B' }),
+    tcnotes: TC('“Tragic Croak No. 9” sheet music', 'Ноты «Трагическое ква № 9»', 'Notis “Traģiskais kvaks Nr. 9”', 12, 15,
+      ['kkkkkkkkkkkk', 'kwwwwwwwwwwk', 'kwlllllllllk', 'kwwnwwwnwwwk', 'kwlllllnlllk', 'kwwwwnwwwwwk', 'kwllllllllgk', 'kwwwwwwwwwwk', 'kkkkkkkkkkkk', '.....kk.....', '.....kk.....', '.....kk.....', '.....kk.....', '...kk..kk...', '..kk....kk..'],
+      { k: '#2B2340', w: '#F7F1E4', l: '#9AA3B5', n: '#2B2340', g: '#6BAA4A' }),
+    tcdiploma: TC('Unreadable diploma', 'Нечитаемый диплом', 'Nesalasāms diploms', 14, 10,
+      ['FFFFFFFFFFFFFF', 'FppppppppppppF', 'Fpp~~~~~~~~ppF', 'FppppppppppppF', 'Fp~~~p~~~~~ppF', 'Fpp~~~~~p~~ppF', 'FppppppppppppF', 'Fppppppp~~~ppF', 'FpppppprrppppF', 'FFFFFFFFFFFFFF'],
+      { F: '#C9962E', p: '#F2E3C4', '~': '#5B3A1E', r: '#C0392B' }),
+    tcletter: TC('The Baron’s soggy love letter', 'Промокшее письмо барона', 'Barona samirkusī mīlestības vēstule', 12, 9,
+      ['eeeeeeeeeeee', 'eEeeeeeeeeEe', 'eeEeeeeeeEee', 'eeeEeeeeEeee', 'eeeeErrEeeee', 'eeeeerreeeee', 'eeeeeeeeeeee', '.dd......d..', 'dddd....ddd.'],
+      t => ({ e: '#F4E9D8', E: '#D8C9B0', r: '#C0392B', d: Math.sin(t / 500) > 0 ? '#7FB3E8' : '#9CC6EE' })),
+    tcmonocle: TC('Sir Gourdon’s monocle', 'Монокль сэра Гордона', 'Sera Gourdona monoklis', 13, 10,
+      ['....GGGG.....', '...GllllGg...', '...GlwllG.g..', '...GllllG..g.', '....GGGG...g.', '.vvvvvvvvvvv.', 'vVvvvvvvvvvVv', 'vvvvvvvvvvvvv', '.vvvvvvvvvvv.', '.V.........V.'],
+      t => ({ G: '#E9C46A', g: '#E9C46A', l: '#BFE3F5', w: Math.sin(t / 450) > .6 ? '#FFFFFF' : '#BFE3F5', v: '#8E2F5A', V: '#E9C46A' })),
+  });
+  { const box = FURN.tcmilkabox.d; FURN.tcmilkabox.d = (p, t) => { box(p, t); const x = Math.sin(t / 300) > 0 ? 9 : 11; p(10, 1, 1, 2, '#C8743A'); p(Math.min(x, 10), 0, Math.abs(x - 10) + 1, 1, '#C8743A'); p(x, 0, 1, 1, '#F4F0FA'); }; } // хвост Милки машет
   Object.assign(FURN, {
     // Хеллоуин
     cauldron: { n: N('Bubbling cauldron', 'Котёл с зельем', 'Burbuļojošs katls'), w: 14, h: 12, top: null, d: (p, t) => { p(1, 3, 12, 2, '#4CE3A0'); p(0, 4, 14, 7, '#2B2340'); p(1, 5, 12, 5, '#3A3150'); p(2, 11, 2, 1, '#2B2340'); p(10, 11, 2, 1, '#2B2340'); for (let i = 0; i < 3; i++) { const by = 2 - ((t / 300 + i) % 4); p(3 + i * 4, Math.round(by), 2, 2, '#4CE3A0'); } } },

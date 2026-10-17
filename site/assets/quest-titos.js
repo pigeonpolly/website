@@ -47,6 +47,8 @@
     allDone: [(n, m) => `That was the last case on the site so far — you have solved them all! Cases ${n + 1}–${m} are still in development. They will open here on their own, and Titos is already brewing coffee for them.`, (n, m) => `Это последнее дело на сайте — пока. Всё раскрыто! Дела ${n + 1}–${m} ещё в разработке. Они откроются здесь сами, а Титос уже варит для них кофе.`, (n, m) => `Šī ir pēdējā lieta vietnē — pagaidām. Viss atrisināts! Lietas ${n + 1}–${m} vēl tiek izstrādātas. Tās atvērsies šeit pašas, un Titoss jau vāra tām kafiju.`],
     devNote: [(n, m) => `🛠 All cases on the site are solved. Cases ${n + 1}–${m} are in development and will open here on their own.`, (n, m) => `🛠 Все дела на сайте раскрыты. Дела ${n + 1}–${m} в разработке — они откроются здесь сами.`, (n, m) => `🛠 Visas lietas vietnē ir atrisinātas. Lietas ${n + 1}–${m} tiek izstrādātas un atvērsies šeit pašas.`],
     got: [n => `+${n} 🔘 for the case`, n => `+${n} 🔘 за дело`, n => `+${n} 🔘 par lietu`],
+    prize: ['🎁 Case keepsake — already in your bag:', '🎁 Память о деле — уже в сумке:', '🎁 Lietas piemiņa — jau somā:'],
+    toRoom: ['🏠 To my room', '🏠 В мою комнату', '🏠 Uz manu istabu'],
   };
   // ---------- дело с сервера (content/titos/NNN.json, язык страницы) → то, что рисует движок ----------
   const LANG = ['en', 'ru', 'lv'][L], LEVELS = 100; // всего уровней в игре (docs/titos.md)
@@ -240,8 +242,9 @@
       A.coffee.sip && setTimeout(() => A.coffee.sip(true), 900); return;
     }
     st.solved = true; save(); A.coffee.on = false; draw();
-    card(`<div class="q-stamp">${t(UI.solvedT)}</div><p class="q-verdict">${esc(r.text)}</p>${r.buttons ? `<p class="q-kick">${t(UI.got)(r.buttons)}</p>` : ''}${K.no >= srv.top && srv.top < LEVELS ? `<p class="q-m">${t(UI.allDone)(srv.top, LEVELS)}</p>` : ''}`);
+    card(`<div class="q-stamp">${t(UI.solvedT)}</div><p class="q-verdict">${esc(r.text)}</p>${r.buttons ? `<p class="q-kick">${t(UI.got)(r.buttons)}</p>` : ''}${r.item && window.PPBirds ? `<p class="q-kick q-prize">${t(UI.prize)} <b>${esc(PPBirds.giftName(r.item.kind, r.item.item))}</b></p><p><a class="pill-btn" href="${L ? '/' + LANG : ''}/bird/">${t(UI.toRoom)}</a></p>` : ''}${K.no >= srv.top && srv.top < LEVELS ? `<p class="q-m">${t(UI.allDone)(srv.top, LEVELS)}</p>` : ''}`);
     if (r.buttons && window.PPToast) PPToast(t(UI.got)(r.buttons));
+    const pz = r.item && modal.querySelector('.q-prize'); if (pz && PPBirds.itemIcon) pz.prepend(PPBirds.itemIcon(r.item.kind, r.item.item, 48)); // картинка вещи-награды
     goHome();
   };
   const goHome = () => {

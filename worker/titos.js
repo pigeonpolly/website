@@ -229,7 +229,14 @@ export async function titosApi(req, env, url, h) {
     let buttons = 0;
     if (first && R.titosOn) buttons = await h.award(u.id, 'titos', String(n), h.btnOf(R.titosLevelPct, await h.unit()) * (1 + Math.floor((n - 1) / 10)));
     if (first && n % 10 === 0) await h.flockEvent('titos', u, { level: n });
-    return out(r, { right: true, text: resolve(c.solved || { ru: '' }, lang, tr), buttons, prize: first ? TITOS_PRIZES[n] || null : null });
+    // вещь-награда за дело (c.reward = 'furn|tc<имя>', room.js) — в сумку, один раз
+    let item = null;
+    if (first && /^furn\|tc[a-z]+$/.test(c.reward || '')) {
+      item = { kind: 'furn', item: c.reward.split('|')[1] };
+      await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) SELECT ?, ?, ?, ?, 'bag', ?, ? WHERE NOT EXISTS (SELECT 1 FROM gifts WHERE user_id = ? AND kind = ? AND item = ?)")
+        .bind(u.id, item.kind, item.item, 'titos:' + n, Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000), u.id, item.kind, item.item).run();
+    }
+    return out(r, { right: true, text: resolve(c.solved || { ru: '' }, lang, tr), buttons, prize: first ? TITOS_PRIZES[n] || null : null, item });
   }
   // «Разбери дела» (worker/titos-sort.js): start — новый раунд следующего уровня; blot {i} — смыть кляксу за titosBlotBtn 🔘; done {lv, sell} — +titosSortCups чашек
   if (m === 'POST' && p.startsWith('/api/titos/sort/')) {
