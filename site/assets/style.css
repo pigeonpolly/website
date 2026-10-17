@@ -4129,6 +4129,7 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .cat-item-badges { position: static; flex-direction: row; flex-wrap: wrap; margin: 0 0 10px; }
 .cat-item-lines { margin: 0 0 14px; padding: 0; list-style: none; font: 15px/1.6 var(--sans); }
 .cat-item-note { margin: 0 0 14px; padding: 8px 12px; border-radius: 12px; background: #FFF4CC; font: 14px var(--sans); }
+.cat-item-about { margin: 0 0 12px; font: italic 15px/1.45 var(--sans); color: #4A3D72; }
 .cat-item-btn { width: 100%; }
 .cat-item-btn:disabled { opacity: .55; cursor: not-allowed; }
 @media (max-width: 600px) { .cat-dlg { padding: 16px; } .cat-item-in { grid-template-columns: 1fr; gap: 14px; } .cat-item-tx h3 { font-size: 22px; } .cat-try-box { min-height: 160px; } }

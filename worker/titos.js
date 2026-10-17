@@ -30,6 +30,25 @@ export const TITOS_RANGE = { titosLevelPct: [0, 100], titosPot: [1, 50], titosSt
   titosBugsCups: [0, 50], titosBugsPerHour: [0, 20], titosBugsSec: [0, 60], titosRefillPct: [0, 1000], titosSellPct: [0, 100], titosSellDayMax: [0, 1000], titosClueSec: [0, 60] };
 export const TITOS_INT = ['titosPot', 'titosStartCups', 'titosCupMin', 'titosRegenMin', 'titosSortCups', 'titosSortSec', 'titosBlotBtn', 'titosBugsCups', 'titosBugsPerHour', 'titosBugsSec', 'titosSellDayMax', 'titosClueSec'];
 export const TITOS_PRIZES = { 30: 'rug', 50: 'pot', 90: 'board', 100: 'badge' }; // награды-вещи для комнаты (карточки наверху /titos/)
+// награды за уровни — вещи для комнаты (room.js, PPCanDo.TITOS): в сумку один раз + новость reward (gifts.note titoslv:N, opened_at NULL — не видена) + flockEvent
+export const TITOS_ITEMS = { 30: ['furn', 'chalkrug'], 50: ['furn', 'titospot'], 90: ['deco', 'clueboard'], 100: ['deco', 'titosbadge'] };
+async function levelItem(env, h, u, n) {
+  const [kind, base] = TITOS_ITEMS[n] || [];
+  if (!kind || await env.DB.prepare('SELECT 1 FROM gifts WHERE user_id = ? AND kind = ? AND (item = ? OR item LIKE ?)').bind(u.id, kind, base, base + ':%').first()) return null;
+  let item = base;
+  if (base === 'titospot') { // кофейник: N-й по счёту на сайте — свой цвет кофе (room.js potCoffee)
+    const r = await env.DB.prepare("INSERT INTO meta (key, value) VALUES ('titos_pot_n', '1') ON CONFLICT(key) DO UPDATE SET value = CAST(value AS INTEGER) + 1 RETURNING value").first();
+    item += ':' + Math.max(0, (Number(r && r.value) || 1) - 1);
+  }
+  await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, ?, 'bag', ?, NULL)").bind(u.id, kind, item, 'titoslv:' + n, Math.floor(Date.now() / 1000)).run();
+  await h.flockEvent('titosreward', u, { level: n, kind, item });
+  return { kind, item };
+}
+// новость «Награда!» (worker/index.js NEWS_KINDS → news.js reward): первая невиданная награда за уровень
+export async function rewardNews(env, uid) {
+  const g = await env.DB.prepare("SELECT kind, item, note FROM gifts WHERE user_id = ? AND status = 'bag' AND note LIKE 'titoslv:%' AND opened_at IS NULL ORDER BY id LIMIT 1").bind(uid).first();
+  return g ? { n: 1, k: g.kind, v: g.item, level: Number(g.note.slice(8)) || 0 } : null;
+}
 const OPEN = 2; // дела, которые можно смотреть без входа (бывшие «Дело №1» и «Дело №2»)
 const MIN = 60000;
 const parseJ = (s, d) => { try { return JSON.parse(s) ?? d; } catch (e) { return d; } };
@@ -206,6 +225,11 @@ export async function titosApi(req, env, url, h) {
     await saveRow(env, r);
     return out(r);
   }
+  if (m === 'POST' && p === '/api/titos/reward/seen') { // новость «Награда!» прочитана (нажали «Поставить»)
+    const u = await h.needUser(req, env);
+    await env.DB.prepare("UPDATE gifts SET opened_at = ? WHERE user_id = ? AND note LIKE 'titoslv:%' AND opened_at IS NULL").bind(Math.floor(Date.now() / 1000), u.id).run();
+    return json({ ok: true });
+  }
   if (m === 'POST' && p === '/api/titos/accuse') {
     const u = await h.currentUser(req, env), b = await body(), n = Math.floor(Number(b.n) || 0), who = String(b.who || '');
     if (!u || u.banned || !u.nick) { // без входа — только открытые дела и только ответ «верно / мимо»
@@ -236,7 +260,8 @@ export async function titosApi(req, env, url, h) {
       await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) SELECT ?, ?, ?, ?, 'bag', ?, ? WHERE NOT EXISTS (SELECT 1 FROM gifts WHERE user_id = ? AND kind = ? AND item = ?)")
         .bind(u.id, item.kind, item.item, 'titos:' + n, Math.floor(Date.now() / 1000), Math.floor(Date.now() / 1000), u.id, item.kind, item.item).run();
     }
-    return out(r, { right: true, text: resolve(c.solved || { ru: '' }, lang, tr), buttons, prize: first ? TITOS_PRIZES[n] || null : null, item });
+    const reward = first && TITOS_ITEMS[n] ? await levelItem(env, h, u, n) : null; // награда за уровень 30/50/90/100
+    return out(r, { right: true, text: resolve(c.solved || { ru: '' }, lang, tr), buttons, prize: first ? TITOS_PRIZES[n] || null : null, item, reward });
   }
   // «Разбери дела» (worker/titos-sort.js): start — новый раунд следующего уровня; blot {i} — смыть кляксу за titosBlotBtn 🔘; done {lv, sell} — +titosSortCups чашек
   if (m === 'POST' && p.startsWith('/api/titos/sort/')) {

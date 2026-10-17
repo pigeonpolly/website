@@ -230,6 +230,7 @@
       <div class="cat-item-tx"><h3>${o.legend ? '<span class="cat-item-star">★</span> ' : ''}${esc(B.giftName(o.kind, o.item, LANG))}</h3><p class="cat-item-kind">${esc(kindsLabel(o.kind))}</p>
       ${o.badges && o.badges.length ? `<p class="cat-badges cat-item-badges">${o.badges.map(b => `<span class="cat-badge ${esc(b[1] || '')}">${esc(b[0])}</span>`).join('')}</p>` : ''}
       <ul class="cat-item-lines">${(o.lines || []).filter(Boolean).map(l => `<li>${esc(l)}</li>`).join('')}</ul>
+      ${room && window.PPRoom && PPRoom.aboutOf && PPRoom.aboutOf(o.kind, o.item) ? `<p class="cat-item-about">${esc(PPRoom.aboutOf(o.kind, o.item))}</p>` : ''}
       ${o.note ? `<p class="cat-item-note">${esc(o.note)}</p>` : ''}<div class="cat-item-act"></div></div></div>`);
     const tb = d.querySelector('.cat-try-box'), cap = d.querySelector('.cat-try figcaption');
     if (sur) { tb.appendChild(pic(o.kind, o.item, me ? me.id : 2, 180)); cap.textContent = tr(['A random thing you don’t have yet', 'Случайная вещь, которой у тебя ещё нет', 'Nejauša lieta, kuras tev vēl nav']); }

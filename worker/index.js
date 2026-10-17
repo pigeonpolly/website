@@ -8,7 +8,7 @@ import { CH_DEFAULTS, CH_RANGE } from './challenge-plan.js';
 import '../site/assets/can-do.js'; // PPCanDo — что можно с вещью (этап 7)
 const PPCanDo = globalThis.PPCanDo;
 import { cardsApi, importCards, translateMissing, myCards, tradeNews, CARD_TABLES } from './cards.js'; // коллекционные карточки (docs/cards.md)
-import { titosApi, titosState, importTitos, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
+import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
 const ADMIN_HASHES = ['80ac2786b60d61a30d6691a3d40de5d784cdefc580717add788821a7bf900118'];
@@ -243,6 +243,7 @@ const NEWS_KINDS = [
     return r.length ? { n: r.length, from: [...new Set(r.map(x => x.from_nick).filter(Boolean))].slice(0, 3) } : null;
   }],
   ['trade', (env, req, u) => tradeNews(env, u.id, RULES.tradeDays)], // новые предложения обмена карточками (worker/cards.js)
+  ['reward', (env, req, u) => rewardNews(env, u.id)], // награда Титоса за уровень (worker/titos.js) — «Поставить» в ленте
 ];
 async function newsOf(env, req, u) {
   if (!u || !u.nick || u.banned) return [];
@@ -293,7 +294,7 @@ async function avgItemPrice(env) {
 }
 async function setRules(env, patch) { const r = cleanRules({ ...RULES, ...patch }); await setMeta(env, 'rules', JSON.stringify(r)); rulesAt = 0; await loadRules(env); return RULES; }
 // события стаи (кто что купил, обменял, нашёл): пока пустая — лента появится на следующих этапах
-async function flockEvent(kind, bird, data) { /* kind: 'card' — купил карточку, 'titos' — раскрыл дело №10, 20, 30…; bird — птичка (users), data — подробности */ }
+async function flockEvent(kind, bird, data) { /* kind: 'card' — купил карточку, 'titos' — раскрыл дело №10, 20, 30…, 'titosreward' — награда Титоса за уровень 30/50/90/100; bird — птичка (users), data — подробности */ }
 const cardHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, rules: () => RULES, avgItemPrice: () => avgItemPrice(env), setRules: patch => setRules(env, patch), flockEvent });
 const titosHelpers = env => ({ ...cardHelpers(env), unit: () => gameUnit(env), btnOf, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) });
 const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), awardComment: (uid, cid) => awardComment(env, uid, cid) });
