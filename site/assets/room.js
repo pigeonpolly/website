@@ -1134,7 +1134,7 @@
     const boxById = id => room.items.find(it => it.id === id && isBoxIt(it));
     const inBox = b => room.items.filter(it => it.in != null && it.in === b.id);
     const newId = () => room.items.reduce((m, it) => Math.max(m, it.id || 0), 0) + 1;
-    const canPack = (it, d) => it.k === 'furn' && isSmall(d) && (!window.PPCanDo || window.PPCanDo(it.k, it.v).pack);
+    const canPack = (it, d) => !!d && (it.k === 'furn' ? isSmall(d) : d.w <= 16 && d.h <= 16) && (!window.PPCanDo || window.PPCanDo(it.k, it.v).pack); // мелкая мебель и мелкие украшения (ёлочные игрушки)
     room.items.forEach(it => { if (isBoxIt(it) && !it.id) it.id = newId(); });
     room.items.forEach(it => { if (it.in != null && !boxById(it.in)) delete it.in; if (it.from != null && !boxById(it.from)) delete it.from; });
     const lidOf = (b, now) => { const l = lids.get(b); if (!l) return 0; const a = now - l.t; if (a > l.open + 200) { lids.delete(b); return 0; } return a < 120 ? a / 120 : a < l.open ? 1 : 1 - (a - l.open) / 200; };
@@ -1486,12 +1486,12 @@
     // ---------- нажатие на альбом (хозяин и гости) — разворот альбома; хозяин, потащив альбом, его не открывает ----------
     let moved = false;
     const albumAt = e => { const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH; const hit = [...layout()].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h); return hit && isAlbum(hit.it); };
-    cv.addEventListener('click', e => { if (moved) { moved = false; return; } if (!o.preview && !o.still && albumAt(e)) openAlbum(); else if (ptype !== 'mouse' && !o.still) { const b = boxAt(e); if (b && inBox(b).length) spill(b); } });
-    // коробка: навести мышку (на телефоне — нажать) — вещи выпрыгивают; hovB — над какой коробкой мышка уже была (не вываливать снова, пока не уйдёт)
+    cv.addEventListener('click', e => { if (moved) { moved = false; return; } if (!o.preview && !o.still && albumAt(e)) openAlbum(); else if (ptype !== 'mouse' && !o.still && !edit) { const b = boxAt(e); if (b && inBox(b).length) spill(b); } });
+    // коробка: навести мышку (на телефоне — нажать) — вещи выпрыгивают (в ✏️ — нет, чтобы не мешать расставлять); hovB — над какой коробкой мышка уже была (не вываливать снова, пока не уйдёт)
     let hovB = null, ptype = 'mouse';
     const boxAt = e => { const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH; const hit = [...layout()].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h); return hit && hit.d.box ? hit.it : null; };
     cv.addEventListener('pointerdown', e => { ptype = e.pointerType; });
-    cv.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse' || e.buttons || drag || o.still) return; const b = boxAt(e); if (b && b !== hovB && inBox(b).length) spill(b); hovB = b; });
+    cv.addEventListener('pointermove', e => { if (e.pointerType !== 'mouse' || e.buttons || drag || o.still) return; const b = edit ? null : boxAt(e); if (b && b !== hovB && inBox(b).length) spill(b); hovB = b; });
     cv.addEventListener('pointerleave', () => { hovB = null; });
     cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' && !o.mine) cv.style.cursor = albumAt(e) ? 'pointer' : ''; });
     // ---------- название вещи при наведении (видно всем, и гостям): мебель/украшение, иначе окно, шторы, пол, стены ----------
