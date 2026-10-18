@@ -4528,6 +4528,9 @@ html.me-in .home-new:not([hidden]) { display: block; }
 .gm-h { margin: 0 var(--gutter) 14px; font: 600 24px var(--serif); }
 .gm-tiles { grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 14px; margin: 0; }
 .gm-tile { aspect-ratio: 1 / 1; border-radius: 16px; }
+.gm-tile img { image-rendering: pixelated; }
+.gm-tile::after { background: linear-gradient(to top, rgba(26, 14, 56, .92) 0%, rgba(26, 14, 56, .6) 22%, rgba(26, 14, 56, 0) 42%); }
+.gm-tile .am-tile-txt { text-shadow: 0 1px 3px rgba(0, 0, 0, .6); }
 .gm-tile .am-tile-txt { left: 12px; right: 12px; bottom: 10px; gap: 2px; }
 .gm-tile .am-tile-txt b { font: 600 18px/1.15 var(--serif); }
 .gm-tile .am-tile-txt i { font-size: 13px; line-height: 1.3; }
