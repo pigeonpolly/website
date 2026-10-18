@@ -11,6 +11,7 @@ import { cardsApi, importCards, translateMissing, myCards, tradeNews, cardGiftNe
 import { authApi, googleLink, funnelStep, mailOn, adventMail, adventAsk, AUTH_TABLES, AUTH_ALTER } from './auth.js'; // вход с паролем, письма, воронки (этап 12)
 import { flockApi, featherNews, FLOCK_TABLES, FLOCK_ALTER } from './flock.js'; // «Все птички» и пёрышки (этап 13 Б+В, docs/flock.md)
 import { flockNewsApi, flockEvent as flockEventDb, roomEvent, flockNewsCron, FLOCK_NEWS_TABLES, FLOCK_NEWS_ALTER } from './flock-news.js'; // новости стаи (этап 13 Г, docs/flock.md)
+import { topApi, topScore, topCron, TOP_TABLES } from './top.js'; // доски топа игр (docs/games.md)
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
 import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
@@ -62,6 +63,7 @@ export default {
       await flockNewsCron(env).catch(e => console.error('flock news', e)); // новости стаи — 30 дней
       await migrateToR2(env); await cleanupInactive(env);
       await env.DB.prepare('DELETE FROM game_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {}); // старые забеги игр (started — в мс)
+      await topCron(env).catch(() => {}); // доски топа: недели старше 8
       await env.DB.prepare('DELETE FROM pan_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {});
       await env.DB.prepare('DELETE FROM maze_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {});
       await env.DB.prepare('DELETE FROM visits WHERE ts < ?').bind(now() - 400 * 86400).run().catch(() => {}); // статистику храним ~13 месяцев
@@ -340,7 +342,7 @@ async function setRules(env, patch) { const r = cleanRules({ ...RULES, ...patch 
 // новости стаи (worker/flock-news.js): kind — new, drawing, room, badge, card, legend, titos, pick, feathers; bird — птичка (users), data — подробности; другие виды не пишутся
 const flockEvent = env => (kind, bird, data) => flockEventDb(env, kind, bird, data);
 const cardHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, rules: () => RULES, avgItemPrice: () => avgItemPrice(env), setRules: patch => setRules(env, patch), flockEvent: flockEvent(env) });
-const titosHelpers = env => ({ ...cardHelpers(env), unit: () => gameUnit(env), btnOf, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), stamp: (uid, task) => stamp(env, uid, task) });
+const titosHelpers = env => ({ ...cardHelpers(env), unit: () => gameUnit(env), btnOf, top: (uid, n) => topScore(env, 'titos', uid, n), award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), stamp: (uid, task) => stamp(env, uid, task) });
 const flockHelpers = env => ({ json, fail, currentUser, needUser, rigaDay, flockEvent: flockEvent(env), streakOf: rows => streaks(streakDays(rows)).current });
 const newsHelpers = env => ({ json, fail, needUser, isAdmin, rigaMs, getMeta: k => getMeta(env, k) });
 const authHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, sessionCookie, sessionDays: SESSION_DAYS, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), bump: (k, sql) => bump(env, k, sql) });
@@ -402,6 +404,7 @@ async function ensureSchema(env) {
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS potion_gifts (id INTEGER PRIMARY KEY AUTOINCREMENT, to_id INTEGER NOT NULL, from_nick TEXT, ing TEXT NOT NULL, n INTEGER NOT NULL, created_at INTEGER, seen INTEGER DEFAULT 0)`),
     ...CHALLENGE_TABLES.map(sql => env.DB.prepare(sql)), // план тем челленджа: challenge_days (worker/challenge-days.js)
     ...CARD_TABLES.map(sql => env.DB.prepare(sql)), // карточки: cards, card_sets, card_owner (worker/cards.js)
+    ...TOP_TABLES.map(sql => env.DB.prepare(sql)), // доски топа игр: top_week (worker/top.js)
     ...PAN_TABLES.map(sql => env.DB.prepare(sql)), // «Блинная Полли»: pan_runs (worker/pancakes.js)
     ...TITOS_TABLES.map(sql => env.DB.prepare(sql)), // детектив Титос: titos, titos_cases (worker/titos.js)
     ...FLOCK_NEWS_TABLES.map(sql => env.DB.prepare(sql)), // новости стаи: flock_events (worker/flock-news.js)
@@ -1307,7 +1310,8 @@ async function route(req, env, url) {
   if (p.startsWith('/api/pw/') || p === '/api/funnel' || p === '/api/admin/pw-reset' || p === '/api/admin/funnels') { const r = await authApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p === '/api/flock/news' || p === '/api/news-off' || p === '/api/admin/flock-notes') { const r = await flockNewsApi(req, env, url, newsHelpers(env)); if (r) return r; }
   if (p === '/api/birds' || p === '/api/feathers' || p === '/api/feather') { const r = await flockApi(req, env, url, flockHelpers(env)); if (r) return r; }
-  if (p === '/api/pancakes' || p.startsWith('/api/pancakes/')) { const r = await pancakesApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now,
+  if (p === '/api/top') { const r = await topApi(req, env, url, { json, fail, currentUser, avatarOf }); if (r) return r; }
+  if (p === '/api/pancakes' || p.startsWith('/api/pancakes/')) { const r = await pancakesApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, top: (uid, n) => topScore(env, 'pan', uid, n),
     award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), item: (rq, uid, note) => rainItem(env, rq, uid, 0, note) }); if (r) return r; }
   if (p.startsWith('/api/titos') || p.startsWith('/api/admin/titos')) { const r = await titosApi(req, env, url, titosHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/cards') || p.startsWith('/api/admin/cards')) { const r = await cardsApi(req, env, url, cardHelpers(env)); if (r) return r; }
@@ -1484,6 +1488,7 @@ async function route(req, env, url) {
     await env.DB.prepare('UPDATE game_runs SET level = ? WHERE id = ? AND level = ?').bind(lv, r.id, r.level).run();
     const oldBest = u.game_best || 0, unit = await gameUnit(env);
     if (lv > oldBest) await env.DB.prepare('UPDATE users SET game_best = ?, game_best_at = ? WHERE id = ? AND COALESCE(game_best, 0) < ?').bind(lv, Date.now(), u.id, lv).run();
+    await topScore(env, 'rain', u.id, lv); // доска топа: лучший забег недели
     const badges = [];
     for (const [k, c] of [['rain1', 'rainA'], ['rain2', 'rainB'], ['rain3', 'rainC']]) if (lv >= RULES.cond[c] && await gameBadge(env, u, k)) badges.push(k);
     const day = rigaDay(), today = (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'game' AND day = ?").bind(u.id, day).first()).n;
@@ -1545,6 +1550,7 @@ async function route(req, env, url) {
     const inv = invOf(u); for (const i of got) inv[items[i]] = Math.min(99, (inv[items[i]] || 0) + 1);
     const level = Math.max(u.maze_level || 1, r.level + 1);
     await env.DB.prepare('UPDATE users SET inv = ?, maze_level = ? WHERE id = ?').bind(JSON.stringify(inv), level, u.id).run();
+    if (level > (u.maze_level || 1)) await topScore(env, 'maze', u.id, level - (u.maze_level || 1)); // доска топа: уровни лабиринта за неделю
     let eyes = u.eyes || 0, eye = false;
     if (r.eye && b.eye && eyes < 9) { eyes++; eye = true; await env.DB.prepare('UPDATE users SET eyes = ?, eye_next = ? WHERE id = ?').bind(eyes, r.level + 5 + Math.floor(Math.random() * 6), u.id).run(); }
     const badges = r.level >= RULES.cond.mazeA && await gameBadge(env, u, 'maze') ? ['maze'] : [];
@@ -1637,6 +1643,7 @@ async function route(req, env, url) {
       env.DB.prepare('UPDATE users SET pot_fails = ? WHERE id = ?').bind(pot.tier ? 0 : (u.pot_fails || 0) + 1, u.id),
     ]);
     let got = 0; const badges = [];
+    if (pot.tier > 0 && !was) await topScore(env, 'recipes', u.id, 1); // доска топа: новые рецепты за неделю
     if (pot.tier > 0) {
       const today = (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'potion' AND day = ?").bind(u.id, rigaDay()).first()).n;
       const gp = gamePrices(await gameUnit(env)), price = was ? gp.again : [0, gp.p1, gp.p2, gp.p3][pot.tier];

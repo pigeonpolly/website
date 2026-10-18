@@ -3492,14 +3492,32 @@ html:not(.is-admin) .statbar { display: none; }
 .rain-got { font-size: 1.1rem !important; font-weight: 800; color: #6a3fb0; }
 .rain-go { margin-top: 10px; min-width: 180px; font-size: 1.05rem; }
 .rain-top { width: 100%; max-width: 440px; }
-.rain-top h2 { font-size: 1.2rem; margin: 0 0 8px; }
-.rain-list { list-style: none; margin: 0; padding: 0; counter-reset: rk; }
-.rain-list li { counter-increment: rk; display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 12px; }
-.rain-list li::before { content: counter(rk); width: 1.4em; text-align: right; font-weight: 700; opacity: .6; }
-.rain-list li.me { background: rgba(240, 169, 135, .18); }
-.rain-list li.rain-none { counter-increment: none; opacity: .75; }
-.rain-list li.rain-none::before { content: none; }
-.rain-list a { flex: 1; color: inherit; }
+/* доска топа игр (top-board.js) — дождь, блины, зельеварня, Титос */
+.gtop { width: 100%; max-width: 480px; margin: 0 auto; padding: 14px 14px 10px; border: 1px solid var(--line); border-radius: 18px; background: var(--bg-card); }
+.gtop-sec { display: flex; justify-content: center; padding: 0 16px 40px; }
+.rm-sec.gtop-sec { padding-top: 0; }
+.gtop-head { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px; margin-bottom: 8px; }
+.gtop h2 { font-size: 1.2rem; margin: 0; }
+.gtop-tabs { display: flex; gap: 2px; padding: 3px; border-radius: 999px; background: rgba(255, 255, 255, .08); }
+.gtop-tab, .gtop-chip { font: inherit; font-size: .88rem; color: var(--muted); background: none; border: 0; border-radius: 999px; padding: 4px 12px; cursor: pointer; }
+.gtop-tab[aria-selected="true"] { background: var(--peach); color: #2B1A51; font-weight: 700; }
+.gtop-chips { display: flex; flex-wrap: wrap; gap: 6px; margin-bottom: 6px; }
+.gtop-chip { border: 1.5px solid var(--line); }
+.gtop-chip[aria-pressed="true"] { border-color: var(--peach); color: var(--text); font-weight: 700; }
+.gtop-sub { margin: 0 0 6px; font-size: .85rem; color: var(--muted); }
+.gtop-last { margin: 0 0 6px; font-size: .9rem; }
+.gtop-last a, .gtop-row a { color: inherit; text-decoration: none; }
+.gtop-last a:hover, .gtop-row a:hover { text-decoration: underline; }
+.gtop-list { list-style: none; margin: 0; padding: 0; }
+.gtop-row { display: flex; align-items: center; gap: 10px; padding: 5px 8px; border-radius: 12px; }
+.gtop-row:nth-child(-n+3) { font-weight: 700; }
+.gtop-row.me { background: rgba(240, 169, 135, .18); }
+.gtop-row a { flex: 1; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+.gtop-row i { font-style: normal; font-size: .8rem; color: var(--peach); }
+.gtop-row b { white-space: nowrap; }
+.gtop-place { width: 1.7em; text-align: center; font-weight: 700; opacity: .85; flex: none; }
+.gtop-gap { text-align: center; opacity: .5; line-height: 1; }
+.gtop-none, .gtop-note { opacity: .8; font-size: .92rem; padding: 6px 8px; margin: 0; }
 .rain-on .polly-pet { opacity: 0; } /* Полли не мешает, пока идёт игра */
 
 /* игра «Зельеварня Полли» (potions.js) */
@@ -3591,7 +3609,6 @@ button.pot-slot { cursor: pointer; border-style: solid; border-color: #F2C94C; b
 .pot-hint-foot { position: sticky; bottom: 0; padding-top: 12px; background: #FFFDF8; text-align: center; }
 .pot-hint-foot .cta-btn { max-width: 100%; white-space: normal; }
 @media (max-width: 480px) { .pot-tabs { gap: 4px; flex-wrap: nowrap; } .pot-tabs button { padding: 6px 10px; font-size: .86rem; white-space: nowrap; } }
-.rain-crown { font-size: 1.2rem; margin-right: -4px; }
 .rain-rules { margin-top: 12px; padding-top: 8px; border-top: 1px solid rgba(43,31,61,.12); }
 .rain-rules p { font-size: .8rem !important; margin: 4px 0 !important; }
 .rain-card .rain-go { margin-bottom: 4px; }
