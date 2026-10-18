@@ -414,7 +414,7 @@
     showOverlay();
   }
   function pause() { if (state !== 'play') return; state = 'pause'; pouring = false; showOverlay(); }
-  function resume() { if (state !== 'pause') return; state = 'play'; ov.hidden = true; last = performance.now(); requestAnimationFrame(loop); }
+  function resume() { if (state !== 'pause') return; state = 'play'; ov.hidden = true; renderBar(); last = performance.now(); requestAnimationFrame(loop); } // панель кнопок прячется на паузе — вернуть
   const pop = (x, y, txt, col) => fx.push({ x, y, txt, col, t: 1.1 });
 
   // ---------- мытьё сковородки ----------
