@@ -187,6 +187,17 @@ export function baseDay(data, key) {
 }
 
 // ---------- проверка предмета для дня ----------
+// значимые слова предмета (EN, в ед. числе): «a mug of tea» и «your favourite mug» — общее «mug», в соседние дни так нельзя
+const WSTOP = new Set('a an the of in on at by to for with and or from into under over your you yours my its it his her their our this that what who which is are be just one two three four five any all some last first next new old big little tiny small giant huge favourite favorite today today\'s todays right now away up out off full day night time thing things way'.split(' '));
+const wordsMemo = new WeakMap();
+function wordsOf(data, i) {
+  let M = wordsMemo.get(data); if (!M) wordsMemo.set(data, M = []);
+  if (M[i]) return M[i];
+  const w = String((data.subjects[i] || [''])[0]).toLowerCase().replace(/[’']s\b/g, '').split(/[^a-z]+/).filter(x => x.length > 2 && !WSTOP.has(x))
+    .map(x => x.endsWith('ies') ? x.slice(0, -3) + 'y' : /(ches|shes|xes)$/.test(x) ? x.slice(0, -2) : /[^s]s$/.test(x) ? x.slice(0, -1) : x);
+  return (M[i] = new Set(w));
+}
+const WORD_DAYS = 3;
 // plan: Map номер дня → индекс предмета (соседние дни с обеих сторон); rules — CH_DEFAULTS и правки из «📜 Правил»
 const deckOf = (rules, n) => { const len = rules.chEasy + rules.chMid + rules.chHard; return len ? Math.floor((n - N_FROM) / len) : 0; };
 const quotaOf = rules => ({ 1: rules.chEasy, 2: rules.chMid, 3: rules.chHard });
@@ -197,6 +208,8 @@ function around(data, rules, plan, n) {
   const fams = new Set(); // семьи, которые нельзя: были ближе chFamilyGap дней или в том же месяце
   for (const [x, it] of plan) if (x !== n && T[it] && (Math.abs(x - n) < rules.chFamilyGap || keyOfNum(x).slice(0, 7) === ym)) fams.add(T[it][0]);
   const nb = new Set([at(n - 1), at(n + 1)].filter(Boolean).map(t => t[1]));
+  const words = new Set(); // слова предметов в соседние WORD_DAYS дней
+  for (let x = n - WORD_DAYS; x <= n + WORD_DAYS; x++) if (x !== n && plan.has(x)) for (const w of wordsOf(data, plan.get(x))) words.add(w);
   const W = rules.chCatWindow, wins = [];
   for (let s = n - W + 1; s <= n; s++) {
     const cats = new Set(); let empty = 0;
@@ -205,7 +218,7 @@ function around(data, rules, plan, n) {
   }
   const len = rules.chEasy + rules.chMid + rules.chHard, used = { 1: 0, 2: 0, 3: 0 };
   if (len && n >= N_FROM) { const s0 = N_FROM + deckOf(rules, n) * len; for (let x = s0; x < s0 + len; x++) { const t = at(x); if (t) used[t[2]]++; } }
-  return { fams, nb, wins, used, deck: !!len && n >= N_FROM };
+  return { fams, nb, words, wins, used, deck: !!len && n >= N_FROM };
 }
 // что нарушит предмет item в день n (пустой список — подходит). skip — какие правила не проверять
 export function violations(data, rules, plan, n, item, skip = {}, ctx = null) {
@@ -213,6 +226,7 @@ export function violations(data, rules, plan, n, item, skip = {}, ctx = null) {
   const [f, c, dif] = data.tags[item] || [], out = [], min = Math.min(rules.chCatMin, rules.chCatWindow);
   if (!skip.family && ctx.fams.has(f)) out.push('family');
   if (!skip.cat && ctx.nb.has(c)) out.push('cat');
+  if (!skip.family && n >= N_NEW && [...wordsOf(data, item)].some(w => ctx.words.has(w))) out.push('word');
   if (!skip.window && ctx.wins.some(w => w.cats.size + (w.cats.has(c) ? 0 : 1) + w.empty < min)) out.push('window');
   if (!skip.deck && ctx.deck && ctx.used[dif] >= quotaOf(rules)[dif]) out.push('deck');
   return out;

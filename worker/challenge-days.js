@@ -55,16 +55,16 @@ async function importOct(env) {
   await env.DB.batch([...rows.map(d => insertSql(env, d)),
     env.DB.prepare("INSERT INTO meta (key, value) VALUES ('chplan_oct', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(String(now()))]);
 }
-// 18.10.2026 — новые темы, цвета 2–5 и Ч/Б-указания с 19.10 (NEW_FROM): будущие дни (не правленные Алиной) — один раз заново (метка meta 'chplan_v3'):
+// 18.10.2026 — новые темы, цвета 2–5 и Ч/Б-указания с 19.10 (NEW_FROM): будущие дни (не правленные Алиной) — один раз заново (метка meta 'chplan_v4'):
 // конец октября — из нового challenge-2026-10.json, ноябрь и дальше — генератор пересоберёт сам
 async function upgradeV2(env) {
-  if ((await env.DB.prepare("SELECT value FROM meta WHERE key = 'chplan_v3'").first())) return;
+  if ((await env.DB.prepare("SELECT value FROM meta WHERE key = 'chplan_v4'").first())) return;
   await importOct(env);
   const from = [NEW_FROM, keyOfNum(dayNum(rigaToday()) + 1)].sort()[1];
   const r = await env.ASSETS.fetch(new Request('https://pigeonpolly.com/assets/challenge-2026-10.json'));
   const oct = r.ok ? (await r.json()).filter(d => d.day >= from) : [];
   await env.DB.batch([env.DB.prepare('DELETE FROM challenge_days WHERE day >= ? AND edited = 0').bind(from), ...oct.map(d => insertSql(env, d)),
-    env.DB.prepare("INSERT INTO meta (key, value) VALUES ('chplan_v3', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(String(now()))]);
+    env.DB.prepare("INSERT INTO meta (key, value) VALUES ('chplan_v4', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(String(now()))]);
 }
 // месяц есть в базе? нет — создать по правилам (история — ~150 дней до него)
 export async function ensureMonth(env, rules, ym) {
