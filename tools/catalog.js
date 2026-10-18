@@ -13,9 +13,9 @@ const out = { kinds: real, items: Object.fromEntries(real.map(k => [k, B.GIFTS[k
 // ориентир: птичка, которая рисует каждый день, получает ~400 🔘 в месяц (вход 3, рисунок 10, комментарии, бейджи)
 const R = window.PPRoom, r5 = n => Math.max(5, Math.round(n / 5) * 5);
 const hash = s => { let h = 7; for (const c of s) h = (h * 31 + c.charCodeAt(0)) % 1000; return h / 1000; }; // небольшой разброс, чтобы не всё по одной цене
-const SPECIAL_HATS = ['wizard', 'witch', 'pumpkin', 'santa', 'antlers', 'wreath', 'pirate', 'chef', 'graduation', 'headset', 'leafcrown', 'strawhat', 'heartband', 'beanie', 'cowboy', 'tiara', 'frog', 'viking', 'kittyears', 'bunnyears', 'propeller', 'sunflowers'];
+const SPECIAL_HATS = ['wizard', 'witch', 'pumpkin', 'santa', 'antlers', 'wreath', 'pirate', 'chef', 'graduation', 'headset', 'leafcrown', 'strawhat', 'heartband', 'beanie', 'cowboy', 'tiara', 'frog', 'viking', 'kittyears', 'bunnyears', 'propeller', 'sunflowers', 'pancakehat'];
 const GEMS = ['crystal', 'ring', 'pearl', 'ruby', 'sapphire', 'key', 'sword', 'wand', 'star', 'coin'];
-const FOOD = ['coffee', 'croissant', 'pizza', 'cherry', 'lollipop', 'candycane', 'icecream', 'cheese', 'mushroom', 'minipumpkin', 'spoon', 'donut', 'cookie', 'apple', 'carrot', 'cupcake', 'bubbletea'];
+const FOOD = ['coffee', 'croissant', 'pizza', 'cherry', 'lollipop', 'candycane', 'icecream', 'cheese', 'mushroom', 'minipumpkin', 'spoon', 'donut', 'cookie', 'apple', 'carrot', 'cupcake', 'bubbletea', 'pancake', 'syrup'];
 const animated = d => d && typeof d.d === 'function' && /\bt\b/.test(String(d.d).split('=>')[0]); // рисунок зависит от времени — шевелится
 function value(kind, v) {
   const key = kind + '|' + v, leg = B.LEGEND.has(key), base = v.split(':')[0];

@@ -54,6 +54,7 @@ export default {
       if (!(await getMeta(env, 'buttons_backfill'))) await backfillButtons(env).catch(e => console.error('backfill', e)); // разовое начисление пуговок за прошлое
       await autoPrice(env).catch(e => console.error('price', e)); // раз в сутки: уровень цен под заработки птичек
       await autoRestock(env).catch(e => console.error('restock', e)); // раз в сутки (по Риге) пополнить магазин
+      await seedLegends(env, 'pan_leg_v1', ['furn|pancaketower', 'furn|magicpan', 'hat|pancakecrown', 'item|goldspatula']).catch(e => console.error('legends', e)); // ★ блинной темы — разово в продажу
       await reqBackfill(env).catch(e => console.error('req tr', e)); // «Нарисуй мне»: переводы тем на все языки сайта
       await importCards(env, new URL('https://www.pigeonpolly.com/')).catch(e => console.error('cards', e)); // новые коллекции карточек из репозитория (один раз)
       await translateMissing(env, 5).catch(e => console.error('cards tr', e)); // карточки без перевода (Gemini не успел при импорте) — по 5 в час
@@ -649,6 +650,14 @@ async function autoRestock(env, force = false) {
   const filled = (await env.DB.prepare('SELECT COUNT(*) AS n FROM shop WHERE stock > 0').first()).n - was;
   await setMeta(env, 'restock_day', rigaDay()); await setMeta(env, 'restock_last', JSON.stringify({ day: rigaDay(), at: now(), to, items: filled }));
   return { to, items: filled };
+}
+// новые легендарные (их autoRestock не пополняет) — один раз в продажу: обычный запас легендарных, цена из каталога; метка в meta
+async function seedLegends(env, tag, keys) {
+  if (await getMeta(env, tag)) return;
+  const cp = (await catalog(env, new Request('https://pigeonpolly.com/'))).prices || {};
+  const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock, added_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET stock = CASE WHEN shop.stock <= 0 THEN excluded.stock ELSE shop.stock END, added_at = excluded.added_at');
+  await env.DB.batch(keys.map(k => { const [a, b] = k.split('|'); return st.bind(a, b, cp[k] || 600, STOCK.normLeg, now()); }));
+  await setMeta(env, tag, String(now()));
 }
 async function ensurePrices(env, req) {
   if (await env.DB.prepare("SELECT value FROM meta WHERE key = 'prices_v1'").first()) return;

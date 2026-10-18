@@ -8,7 +8,7 @@
 // Альбом furn|album: есть в каждой комнате сам — ничего нельзя.
 // Награды Титоса (TITOS, за уровни 30/50/90/100, и вещи за дела furn|tc<имя> — isCase; docs/titos.md): только своя — не в магазине, не подарить, не продать, не в подарок из кабинета.
 (function (g) {
-  var LEGEND = ['furn|countcoffin', 'furn|crypt', 'furn|tieredcake', 'hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora',
+  var LEGEND = ['furn|countcoffin', 'furn|crypt', 'furn|tieredcake', 'furn|pancaketower', 'furn|magicpan', 'hat|pancakecrown', 'item|goldspatula', 'hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora',
     'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass',
     'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight'];
   var TITOS = ['furn|chalkrug', 'furn|titospot', 'deco|clueboard', 'deco|titosbadge'];
