@@ -1250,7 +1250,7 @@
     let bg = null;
     const paintBg = () => {
       bg = document.createElement('canvas'); bg.width = RW; bg.height = RH; const b = bg.getContext('2d');
-      (WALL[room.wall] || WALL._)[1](b); R(b, 0, FY - 3, RW, 3, '#6B4E3A'); R(b, 0, FY - 3, RW, 1, '#8C6A50');
+      (o.wallPaint || (WALL[room.wall] || WALL._)[1])(b); R(b, 0, FY - 3, RW, 3, '#6B4E3A'); R(b, 0, FY - 3, RW, 1, '#8C6A50');
       (FLOOR[room.floor] || FLOOR._)[1](b);
       R(b, WX - 3, WY - 3, WW + 6, WH + 6, '#EFE7DA'); R(b, WX - 3, WY - 3, WW + 6, 1, '#FFFFFF');
       R(b, WX - 6, WY + WH + 2, WW + 12, 3, '#E2D6C4'); R(b, WX - 6, WY + WH + 5, WW + 12, 1, '#B8AA94');

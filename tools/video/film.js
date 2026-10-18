@@ -3,7 +3,7 @@
 // ?lang=en|ru|lv — язык финальной надписи (остальные кадры у всех версий одинаковые).
 (() => {
   const B = window.PPBirds, RM = window.PPRoom;
-  const FPS = 30, VW = 1080, VH = 1920, S = 14, RW = RM.RW, RH = RM.RH, GY = 113;
+  const FPS = 30, VW = 1080, VH = 1920, S = 14, RW = RM.RW, RH = RM.RH, GY = 113, FY = 86;
   const VIEW = VW / S, ROOM_Y = (VH - RH * S) / 2;      // в кадре 77 из 192 пикселей комнаты, камера едет за птичкой
   const BG = '#2B1A51', OUT = '#1a1528';
   const LANG = new URLSearchParams(location.search).get('lang') || 'en';
@@ -51,7 +51,7 @@
   }
 
   // ---------- комната: кухня из темы «👩‍🍳 Поварское» ----------
-  const room = { wall: 'kitchentiles', floor: 'checker', curtain: 'polkadot', items: [
+  const room = { floor: 'walnut', view: 'spooky', curtain: 'polkadot', items: [
     { k: 'furn', v: 'album', x: 174 },
     { k: 'furn', v: 'baguettes', x: 128 },
     { k: 'furn', v: 'chefcounter', x: 70 },
@@ -104,13 +104,20 @@
   function drawDoor(g, t) {
     const a = doorOpen(t), { x, w, top } = DOOR, ix = x + 3, iw = w - 6, iy = top + 3;
     R(g, x, top, w, GY - top, '#7A4A30'); R(g, x + 1, top + 1, w - 2, 1, '#A0673C'); // коробка
-    if (a > 0) { // за дверью — солнечный двор
-      R(g, ix, iy, iw, GY - iy, '#BFE3F5'); R(g, ix, iy, iw, 10, '#A8D6F0');
-      R(g, ix + 12, iy + 4, 4, 4, '#FFF1A8');
-      R(g, ix, GY - 16, iw, 16, '#7FC28A'); R(g, ix, GY - 16, iw, 1, '#9AD4A2');
-      for (let i = 0; i < 5; i++) R(g, ix + 2 + i * 4, GY - 17 - (i % 2), 2, 2, '#5FA86B');
-      g.fillStyle = '#E8D9B5'; g.beginPath(); g.moveTo(ix + 7, GY - 16); g.lineTo(ix + 13, GY - 16); g.lineTo(ix + iw, GY); g.lineTo(ix, GY); g.fill();
-      g.fillStyle = `rgba(255,240,190,${.28 * a})`; g.beginPath(); g.moveTo(ix, GY); g.lineTo(ix + iw, GY); g.lineTo(ix + iw + 22, RH); g.lineTo(ix + 4, RH); g.fill(); // свет на полу
+    if (a > 0) { // за дверью — хеллоуинская ночь: луна, голое дерево, тыквы-фонарики у тропинки
+      R(g, ix, iy, iw, GY - iy, '#3A2258'); R(g, ix, iy, iw, 14, '#2B1A3F'); R(g, ix, iy + 14, iw, 8, '#4B2C6B');
+      R(g, ix + 12, iy + 4, 5, 5, '#F6E7B0'); R(g, ix + 13, iy + 5, 2, 1, '#E9D79A');
+      [[3, iy + 3], [8, iy + 9], [18, iy + 13]].forEach(([sx, sy]) => R(g, ix + sx, sy, .5, .5, '#FFF1A8'));
+      R(g, ix + 3, GY - 30, 1, 14, '#140B20'); R(g, ix + 1, GY - 27, 2, 1, '#140B20'); R(g, ix + 4, GY - 25, 3, 1, '#140B20'); R(g, ix + 6, GY - 27, 1, 2, '#140B20'); R(g, ix, GY - 29, 1, 2, '#140B20');
+      { const bx = ix + 8 + ((t * 6) % 10), by = iy + 12 + Math.sin(t * 4) * 1.5, w = Math.floor(t * 8) % 2; R(g, bx, by, 1, 1, '#140B20'); R(g, bx - 1.5, by - w * .5, 1.5, .5, '#140B20'); R(g, bx + 1, by - w * .5, 1.5, .5, '#140B20'); } // летучая мышь
+      R(g, ix, GY - 16, iw, 16, '#2E3A2A'); R(g, ix, GY - 16, iw, 1, '#3E5236');
+      g.fillStyle = '#5A4E6A'; g.beginPath(); g.moveTo(ix + 7, GY - 16); g.lineTo(ix + 13, GY - 16); g.lineTo(ix + iw, GY); g.lineTo(ix, GY); g.fill();
+      for (const [px, py, s2] of [[1, GY - 9, 1], [15, GY - 12, .8]]) { // тыквы со свечкой внутри
+        const fl = Math.sin(t * 9 + px) > -.4 ? '#F6C445' : '#F08A3B';
+        R(g, ix + px + 1.5 * s2, py - 1, 1, 1, '#4C9A5B'); R(g, ix + px, py, 4 * s2 + .5, 3, '#E8792B'); R(g, ix + px + .5, py - .5, 4 * s2 - .5, 4, '#E8792B');
+        R(g, ix + px + .5, py + 1, .5, .5, fl); R(g, ix + px + 4 * s2 - 1, py + 1, .5, .5, fl); R(g, ix + px + 1, py + 2, 4 * s2 - 1.5, .5, fl);
+      }
+      g.fillStyle = `rgba(190,170,255,${.16 * a})`; g.beginPath(); g.moveTo(ix, GY); g.lineTo(ix + iw, GY); g.lineTo(ix + iw + 22, RH); g.lineTo(ix + 4, RH); g.fill(); // свет на полу
     }
     const lw = Math.max(1.5, iw * Math.cos(a * Math.PI / 2 * .94)), grow = 3 * Math.sin(a * Math.PI / 2); // створка поворачивается к нам
     const ly = iy - grow, lh = GY - iy + grow * 1.4;
@@ -169,7 +176,7 @@
       const t0 = 8.2 + i * .1, life = 1.3, a = (t - t0) / life;
       if (a < 0 || a > 1 || t0 > 12.6) continue;
       const x = PAN.x + 2 + rnd(i) * 10 + Math.sin(a * 5 + i) * 2, y = PAN.y - 2 - a * 22, s = a < .3 ? 1.5 : a < .7 ? 2 : 2.5;
-      g.globalAlpha = .8 * (1 - a); R(g, Math.round(x * 2) / 2, Math.round(y * 2) / 2, s, s, '#FFFFFF');
+      g.globalAlpha = .8 * (1 - a); R(g, Math.round(x * 2) / 2, Math.round(y * 2) / 2, s, s, '#B8BED0');
     }
     g.globalAlpha = 1;
   }
@@ -205,7 +212,11 @@
 
   // ---------- кадр видео ----------
   const box = document.getElementById('room');
-  const api = RM.mount(box, { room, id: 27, nick: 'polly', film: (g, now) => film(g, now), scale: S });
+  const wallPaint = b => { // спокойные обои: кремовые в тонкую полоску, внизу панель с бордюром — вещи на них хорошо видно
+    R(b, 0, 0, RW, FY, '#F3E9D6'); for (let x = 4; x < RW; x += 10) R(b, x, 0, 1, FY, '#EADCC2');
+    R(b, 0, 64, RW, FY - 64, '#E2D2B4'); R(b, 0, 64, RW, 1.5, '#C9B48F'); R(b, 0, 65.5, RW, .5, '#FFF8EA');
+  };
+  const api = RM.mount(box, { room, wallPaint, id: 27, nick: 'polly', film: (g, now) => film(g, now), scale: S });
   const cv = box.querySelector('canvas'), vc = document.getElementById('video'), v = vc.getContext('2d');
   v.imageSmoothingEnabled = false;
   function stars(t) {
