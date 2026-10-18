@@ -49,6 +49,10 @@
     banned: ['This account is blocked.', 'Этот аккаунт заблокирован.', 'Šis konts ir bloķēts.'],
     big: ['This file is too big or isn’t a picture.', 'Файл слишком большой или это не картинка.', 'Fails ir par lielu vai nav attēls.'],
     emptyTop: ['No streaks yet. Be the first!', 'Серий пока нет. Будьте первым!', 'Sēriju vēl nav. Esi pirmais!'],
+    longT: ['Longest streaks', 'Самые длинные серии', 'Garākās sērijas'],
+    longS: ['A streak is days in a row with an uploaded sketch.', 'Серия — дни подряд, когда загружен рисунок.', 'Sērija — dienas pēc kārtas ar augšupielādētu skici.'],
+    longD: [n => `${n} ${n === 1 ? 'day' : 'days'}`, n => `${n} ${pl(n, 'день', 'дня', 'дней')}`, n => `${n} ${n % 10 === 1 && n % 100 !== 11 ? 'diena' : 'dienas'}`],
+    longNow: [n => `now 🔥 ${n}`, n => `сейчас 🔥 ${n}`, n => `tagad 🔥 ${n}`],
     emptyWall: ['The wall is waiting for the first sketch.', 'Стена ждёт первый рисунок.', 'Siena gaida pirmo skici.'],
     levelUp: ['New level!', 'Новый уровень!', 'Jauns līmenis!'],
     have: ['You have it ✓', 'Получен ✓', 'Iegūta ✓'],
@@ -765,13 +769,24 @@
   async function loadTop() {
     const el = document.getElementById('sw-top');
     try {
-      const { top, pick, pickGold } = await api('top');
+      const { top, longest, pick, pickGold } = await api('top');
       parade(top, pick, pickGold);
       el.innerHTML = top.length ? top.map((r, i) => {
         const lv = levelOf(r.best);
         return `<li><span class="sw-pos">${i + 1}</span>${lv ? medal(lv) : ''}<span class="sw-topnick"><button type="button" class="sw-nickname sw-plink${r.gold ? ' gold' : ''}" data-profile="${esc(r.nick)}">@${esc(r.nick)}</button></span><span class="sw-fire">🔥 ${r.current}</span></li>`;
       }).join('') : `<li class="sw-empty">${t('emptyTop')}</li>`;
+      longList(longest || []);
     } catch (e) { el.innerHTML = ''; }
+  }
+  // «Самые длинные серии» на /challenge/ — рекорд серии, сверху самый длинный; 🔥 — если серия идёт сейчас
+  function longList(rows) {
+    const el = document.getElementById('sw-long');
+    if (!el) return;
+    el.hidden = false;
+    el.innerHTML = `<h2 class="section-title">${t('longT')}</h2><p class="sw-long-sub">${t('longS')}</p><ol class="sw-long-list">${rows.length ? rows.map((r, i) => {
+      const lv = levelOf(r.best);
+      return `<li><span class="sw-pos">${i + 1}</span>${lv ? medal(lv) : ''}<span class="sw-topnick"><button type="button" class="sw-nickname sw-plink${r.gold ? ' gold' : ''}" data-profile="${esc(r.nick)}">@${esc(r.nick)}</button>${r.current ? `<small>${t('longNow', r.current)}</small>` : ''}</span><b class="sw-long-d">${t('longD', r.best)}</b></li>`;
+    }).join('') : `<li class="sw-empty">${t('emptyTop')}</li>`}</ol>`;
   }
   // работы участников — страницами по 24, первыми самые новые
   let pageCursors = [null], pageIdx = 0;
