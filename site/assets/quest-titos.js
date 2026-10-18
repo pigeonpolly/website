@@ -163,7 +163,9 @@
   };
   const draw = () => {
     drawGuide();
-    const mz = box.querySelector('.rm-hot[data-k="magnifier"]'); if (mz) mz.classList.toggle('q-want', hasLens && !st.mag && !st.solved);
+    const mz = box.querySelector('.rm-hot[data-k="magnifier"]'); if (mz) { mz.classList.toggle('q-want', hasLens && !st.mag && !st.solved); mz.classList.add('rm-detective-mag'); }
+    // место с ещё не приколотой уликой — поверх соседних зон (ящик с папками почти целиком закрыт ящиками drawer#0 и #1)
+    Object.entries(HOTS).forEach(([k, id]) => { const z = box.querySelector(`.rm-hot[data-k="${k}"]`); if (z) z.classList.toggle('q-has', !st.pinned.includes(id) && !st.solved); });
     const done = n => srv.on ? (srv.state.level || 0) >= n : load(OLD[n] || 'pp-titos-case-' + n).solved;
     const cup = srv.on ? `<span class="q-stat" title="☕">☕ ${srv.state.coffee ?? '–'}/${srv.state.max || 10}</span>` : '';
     banner.innerHTML = `<nav class="q-tabs">${CASES.map(c => `<button type="button" data-case="${c.n}" class="${c.n === K.no ? 'on' : ''}">${t(UI.caseNo)} ${c.n} · ${esc(c.title)}${done(c.n) ? ' ✅' : ''}</button>`).join('')}${CASES.length && CASES[CASES.length - 1].n === srv.top && srv.top < LEVELS ? `<button type="button" class="q-soon" disabled>${t(UI.caseNo)} ${srv.top + 1} · ${t(UI.soon)}</button>` : ''}</nav>` +

@@ -115,6 +115,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `tools/shots.py` (8K) — Снимки элемента страницы на нескольких ширинах (Playwright, Chromium из /opt/pw-browsers).: SHEET_W, OUT, ROOT, make_sheet, slug
 - `tools/titos_cast.py` (2K) — Жители Воббленда для дел Титоса → docs/titos-cast.md (одна строка на жителя: ключ, имя, го: ROOT, cast, slug
 - `tools/titos_check.py` (13K) — Проверка дел Титоса (content/titos/NNN.json, формат — docs/titos.md) и прохождение каждого: DIR, ROOT, ROUND1, texts, culprit_name
+- `tools/titos_clicks.py` — дела Титоса в браузере: каждая улика, лупа и место в сцене нажимаются (не закрыты другими зонами), 390 и 1440
 - `tools/video/apple.js` (21K) — Видео №2 для соцсетей (этап 15, docs/bird.md «Видео»): Полли рисует яблоко у мольберта, фо: FILM, SNAP, DRAW, APPLE, seg
 - `tools/video/film.js` (18K) — Видео для соцсетей (этап 15, docs/bird.md «Видео»): 1080×1920, 30 fps: FILM, PAN, PLATE, STOVE, seg
 - `tools/video/render.py` (5K) — Видео для соцсетей (этап 15): кадры рисует tools/video/film.js в Chromium → PNG → ffmpeg →: ROOT, FPS, CHROMIUM, video, png

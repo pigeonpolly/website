@@ -129,3 +129,8 @@ build.py собирает все дела в site/assets/titos-cases.json.
 - 61–62 (уровни 61–90): 8 улик, «противоречие» — улика `fake` из допроса (`talk[].clue`, `at: scene:s1`, у свидетеля место `talk` в сцене) опровергнута настоящей; в 62 ещё второй ложный след под лупой.
 - Вещи-награды — room.js блок «награды за дела Титоса»: tcsaucer, tcbell, tccookie, tcnoodlebow, tcsockclock, tcsmoothie, tcpaintleaf, tcbigspoon, tcwebcup, tcredcarpet.
 - Ещё свободны во втором круге: mr-chew, miss-peony, professor-owlistair-tweed, milka, tim-froggucion, mr-dr-fisher-iii, barnaby-burrows, nutmeg-hazelton, rusty-roamwell, lady-puddle-dip, sew-sew-patty, bobby-bagster, chestnut-charlie, candice-creepleton, baron-von-worms, petunia-spookworth, the-pumpkin-family, miss-pumpkinella, sir-gourdon-squash, moss-mccandle.
+
+## Улики, которые не нажать (исправлено 2026-10-18)
+- Жалоба: «не все улики прикрепляются». Причина: зоны кабинета перекрываются, сверху — меньшая. Улика в `folderdrawer` (дела 20, 32, 35, 42) на ¾ закрыта зонами `drawer#0`/`drawer#1` — нажатие открывало досье, а не улику.
+- Исправление: quest-titos.js даёт зоне с неприколотой уликой класс `q-has` (z-index 2), лупе — `rm-detective-mag` (тоже 2, она меньше — остаётся сверху).
+- **Как не повторить:** новое дело — `titos_check.py` (проверяет и перекрытия: зона улики не закрыта другими зонами с уликами или лупой, место в сцене с картинкой — следующими местами) и `tools/titos_clicks.py --w 390` / `--w 1440` (в браузере: каждая улика, лупа и место в сцене нажимаются хотя бы на 60 %). Бот titos_check.py клики не видит — только данные.

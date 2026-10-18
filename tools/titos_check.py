@@ -17,7 +17,15 @@ DIR = ROOT / "content" / "titos"
 sys.path.insert(0, str(ROOT / "tools"))
 from titos_cast import cast  # noqa: E402
 
-ZONES = set(json.loads((ROOT / "tools" / "rooms" / "detective.json").read_text())["hot"])
+HOT = json.loads((ROOT / "tools" / "rooms" / "detective.json").read_text())["hot"]
+ZONES = set(HOT)
+
+
+def covered(z, tops):
+    """доля зоны [x, y, w, h], закрытая зонами tops (сетка 10×10)"""
+    x, y, w, h = z
+    pts = [(x + w * (i + .5) / 10, y + h * (j + .5) / 10) for i in range(10) for j in range(10)]
+    return sum(any(a <= px <= a + c and b <= py <= b + d for a, b, c, d in tops) for px, py in pts) / len(pts)
 CAST = {r["key"] for r in cast()}
 # вещи-награды за дела: ключи tc<имя> из site/assets/room.js (FURN, «tcpie: TC(…»)
 REWARDS = set(re.findall(r"^\s+(tc[a-z]+): TC\(", (ROOT / "site" / "assets" / "room.js").read_text(), re.M))
@@ -171,6 +179,19 @@ def check(c, f):
                 reach.add(k)
         else:
             reach.add(k)
+    # улику можно нажать: зона в кабинете не закрыта другими (quest-titos.js поднимает зоны с уликами и лупу поверх остальных,
+    # среди них сверху — меньшая), место в сцене не закрыто следующими местами (позже в списке — выше)
+    room = {x.get("at") for x in clues.values() if x.get("at") in ZONES and not (x.get("spot") and x.get("icon"))}
+    area = lambda k: HOT[k][2] * HOT[k][3]
+    for k in sorted(room):
+        tops = [HOT[o] for o in room | {"magnifier"} if o != k and area(o) < area(k)]
+        if covered(HOT[k], tops) > .4:
+            e(f"улика в «{k}»: зона закрыта другими зонами с уликами или лупой — не нажать")
+    for sid, s in scenes.items():
+        sp = s.get("spots", []) if s.get("img") else []  # текстовая сцена — список кнопок, перекрытий нет
+        for j, z in enumerate(sp):
+            if covered([z.get(q, 0) for q in "xywh"], [[o.get(q, 0) for q in "xywh"] for o in sp[j + 1:]]) > .4:
+                e(f"сцена {sid}, место {j}: закрыто следующими местами — не нажать")
     for k in sorted(set(clues) - reach):
         e(f"бот: улику {k} не найти (нет ни в зоне, ни на месте в сцене, ни в допросе)")
     left = [s for s in sus if not any(s in real[k].get("clears", []) for k in real if k in reach)]
