@@ -4535,3 +4535,25 @@ html.me-in .home-new:not([hidden]) { display: block; }
   .gm-shop { min-height: 0; } .gm-shop img { position: static; display: block; width: 100%; height: auto; aspect-ratio: 13 / 5; -webkit-mask-image: linear-gradient(to bottom, #000 60%, transparent); mask-image: linear-gradient(to bottom, #000 60%, transparent); }
   .gm-shop-txt { padding: 4px 20px 22px; } .gm-shop-txt b { font-size: 26px; }
 }
+/* «Блинная Полли» (/pancakes/, pancakes.js): поле — как у «Пуговичного дождя» (.rain-*), ниже — кнопки хода */
+.pk-bar { position: absolute; left: 0; right: 0; bottom: 0; display: flex; flex-direction: column; align-items: stretch; justify-content: center; gap: 6px; padding: 6px 8px 8px; color: #fff; }
+.pk-bar[hidden] { display: none; }
+.pk-hint { margin: 0; text-align: center; font-size: .82rem; line-height: 1.25; }
+.pk-small { font-size: .72rem; opacity: .8; }
+.pk-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 5px; }
+.pk-tops { grid-template-columns: repeat(6, 1fr); gap: 4px; }
+.pk-row { display: flex; gap: 6px; }
+.pk-row .pk-big { flex: 1; font-size: .85rem; padding: 10px 6px; }
+.pk-btn { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 2px; min-height: 40px; padding: 3px 2px; border: 2px solid #1a1528; border-radius: 10px; background: #fffaf2; color: #2b1f3d; font: 600 .7rem/1.1 system-ui, sans-serif; cursor: pointer; touch-action: manipulation; }
+.pk-btn canvas { width: 24px; height: 24px; image-rendering: pixelated; }
+.pk-btn:active { transform: translateY(1px); }
+.pk-top i { font-style: normal; font-size: 1.3rem; line-height: 1; }
+.pk-top b { position: absolute; top: -6px; right: -4px; min-width: 20px; padding: 1px 4px; border-radius: 9px; background: #6a3fb0; color: #fff; font-size: .68rem; }
+.pk-top.on { background: #F3E7FF; }
+.pk-undo { font-size: 1.1rem; }
+.pk-serve { grid-column: span 2; background: #7CC47F; font-size: .85rem; font-weight: 800; }
+.pk-big { width: 100%; padding: 14px 10px; border: 2px solid #1a1528; border-radius: 14px; background: #F2C94C; color: #2b1f3d; font: 800 1.05rem/1.2 system-ui, sans-serif; cursor: pointer; touch-action: none; user-select: none; -webkit-user-select: none; -webkit-touch-callout: none; }
+.pk-big:disabled { opacity: .45; cursor: default; }
+.pk-hold:active { background: #E9A93B; }
+p.pk-big.pk-rub { margin: 0; text-align: center; background: #BFE3FF; cursor: default; }
+.pk-stage .rain-pause { top: calc(3px * var(--pk, 1)); width: 30px; height: 30px; font-size: 11px; background: rgba(255, 255, 255, .18); }

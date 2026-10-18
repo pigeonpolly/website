@@ -83,6 +83,7 @@
     seedOf: [k => `A seed: ${k}`, k => `Семечко: ${k}`, k => `Sēkla: ${k}`],
     fromAlina: ['— Alina', '— Алина', '— Alīna'],
     fromReq: ['🎨 A thank-you gift: Alina drew your idea! See it on the “Draw this for me” page.', '🎨 Спасибо за идею: Алина нарисовала твою тему! Рисунок — на странице «Нарисуй мне».', '🎨 Paldies par ideju: Alīna uzzīmēja tavu tēmu! Zīmējums — lapā “Uzzīmē man”.'],
+    fromPan: [n => `🥞 A gift from a grateful customer of “Polly’s Pancakes”, level ${n}`, n => `🥞 Подарок благодарного клиента «Блинной Полли», ${n}-й уровень`, n => `🥞 Pateicīga “Pollijas pankūku” klienta dāvana, ${n}. līmenis`],
     fromRain: [n => `🌧 A reward from “Button Rain” for level ${n}`, n => `🌧 Награда «Пуговичного дождя» за ${n}-й уровень`, n => `🌧 Balva no “Pogu lietus” par ${n}. līmeni`],
     open: ['Open', 'Открыть', 'Atvērt'],
     use: ['✨ Use it', '✨ Использовать', '✨ Izmantot'],
@@ -186,6 +187,17 @@
       h: ['Pass {n} levels in the game “Button Rain”', 'Пройти {n} уровней в игре «Пуговичный дождь»', 'Pārvarēt {n} līmeņus spēlē “Pogu lietus”'] },
     { k: 'rain3', s: 'rain3', bg: '#CFD6EA', n: ['Lord of the downpour', 'Повелитель ливня', 'Lietusgāzes valdnieks'], f: ['The clouds ask you before they rain.', 'Тучи спрашивают у вас разрешения, прежде чем пролиться.', 'Mākoņi jautā tev atļauju, pirms līst.'],
       h: ['Pass {n} levels in the game “Button Rain”', 'Пройти {n} уровней в игре «Пуговичный дождь»', 'Pārvarēt {n} līmeņus spēlē “Pogu lietus”'] },
+    // «Блинная Полли» (/pancakes/)
+    { k: 'pan1', s: 'pan1', bg: '#FBE3C2', n: ['Pancake apprentice', 'Блинный подмастерье', 'Pankūku māceklis'], f: ['The first pancake is never lumpy for you.', 'У вас и первый блин не комом.', 'Tev pat pirmā pankūka neizdodas šķība.'],
+      h: ['Pass {n} levels in “Polly’s Pancakes”', 'Пройти {n} уровней в «Блинной Полли»', 'Pārvarēt {n} līmeņus spēlē “Pollijas pankūkas”'] },
+    { k: 'pan2', s: 'pan2', bg: '#F7D6A8', n: ['Flip master', 'Мастер переворота', 'Apgriešanas meistars'], f: ['Pancakes flip themselves when they see you.', 'Блины переворачиваются сами, завидев вас.', 'Pankūkas apgriežas pašas, tevi ieraugot.'],
+      h: ['Pass {n} levels in “Polly’s Pancakes”', 'Пройти {n} уровней в «Блинной Полли»', 'Pārvarēt {n} līmeņus spēlē “Pollijas pankūkas”'] },
+    { k: 'pan3', s: 'pan3', bg: '#F2C98E', n: ['Pancake legend of Wobbleland', 'Блинная легенда Воббленда', 'Wobbleland pankūku leģenda'], f: ['The whole island queues at your window.', 'К вашему окошку стоит очередь со всего острова.', 'Pie tava lodziņa stāv rinda no visas salas.'],
+      h: ['Pass {n} levels in “Polly’s Pancakes”', 'Пройти {n} уровней в «Блинной Полли»', 'Pārvarēt {n} līmeņus spēlē “Pollijas pankūkas”'] },
+    { k: 'panstar', s: 'panstar', bg: '#FBD9E6', n: ['Everyone’s favourite', 'Всеобщая любимица', 'Visu mīlule'], f: ['Wobbleland residents say your name with a happy sigh.', 'Жители Воббленда произносят ваше имя со счастливым вздохом.', 'Wobbleland iedzīvotāji tavu vārdu izrunā ar laimīgu nopūtu.'],
+      h: ['Delight {n} customers in one game of “Polly’s Pancakes”', 'Привести в восторг {n} клиентов за одну игру в «Блинной Полли»', 'Sajūsmināt {n} klientus vienā “Pollijas pankūku” spēlē'] },
+    { k: 'panwash', s: 'panwash', bg: '#D6EAF7', n: ['Squeaky clean', 'Чисто до скрипа', 'Tīrs līdz čīkstēšanai'], f: ['Your pan shines brighter than the Buttonspire tower.', 'Ваша сковородка блестит ярче башни Баттонспайра.', 'Tava panna spīd spožāk par Buttonspire torni.'],
+      h: ['Wash the pan with washing-up liquid in “Polly’s Pancakes”', 'Помыть сковородку со средством в «Блинной Полли»', 'Nomazgāt pannu ar līdzekli spēlē “Pollijas pankūkas”'] },
     { k: 'pot1', s: 'pot1', bg: '#D8EFD9', n: ['First potion', 'Первое зелье', 'Pirmā dzira'], f: ['It bubbled, it smelled, it worked!', 'Булькало, пахло — и получилось!', 'Burbuļoja, smaržoja — un izdevās!'],
       h: ['Brew your first potion in “Polly’s Potion Lab”', 'Сварить первое зелье в «Зельеварне Полли»', 'Izvārīt pirmo dziru “Pollijas dziru virtuvē”'] },
     { k: 'pot2', s: 'pot2', bg: '#E6DAF5', n: ['Young alchemist', 'Юный алхимик', 'Jaunais alķīmiķis'], f: ['The witch’s hat fits you perfectly.', 'Шляпа ведьмы сидит на вас идеально.', 'Raganas cepure tev der ideāli.'],
@@ -252,6 +264,12 @@
     pot3: [[8, 9, 'dddddd'], [8, 10, 'dGGGGd'], [8, 11, 'dddddd'], [9, 12, 'dddd'], [9, 7, 'G.G'], [11, 6, 'G'], [12, 8, 'G']],
     potkid: [[11, 3, '.pp'], [11, 4, 'pwp'], [11, 5, 'pp.'], [12, 6, 'n'], [12, 7, 'n'], [12, 8, 'n'], [1, 0, 'Y'], [3, -2, 'p']],
     maze: [[0, 9, '.n.'], [0, 10, 'ooo'], [0, 11, 'oko'], [0, 12, 'ooo'], [10, 9, 'mmm'], [10, 10, 'm.m'], [10, 11, 'mmm'], [11, 12, 'm'], [11, 13, 'mm'], [5, -3, 'd.d.d'], [5, -2, 'ddddd']],
+    // блины: стопка; лопатка; корона из блинов; сердечко; мыльные пузыри
+    pan1: [[9, 9, '.nnnn.'], [9, 10, 'gggggg'], [9, 11, '.nnnn.'], [10, 8, 'll']],
+    pan2: [[10, -3, '.gggg'], [10, -2, 'gnnnng'], [11, -1, 'gggg'], [1, 2, 'h'], [12, 2, 'h'], [12, 4, 'k'], [12, 5, 'k'], [12, 6, 'k']],
+    pan3: [[4, -3, 'y.y.y'], [4, -2, 'yyyyy'], [9, 8, '.nnnn.'], [9, 9, 'gggggg'], [9, 10, '.nnnn.'], [9, 11, 'gggggg'], [10, 7, 'R.']],
+    panstar: [[10, -3, 'p.p'], [9, -2, 'ppppp'], [10, -1, 'ppp'], [11, 0, 'p'], [0, 0, 'Y'], [13, 4, 'Y']],
+    panwash: [[10, 8, 'nnnn'], [10, 9, 'nwwn'], [10, 10, 'nnnn'], [11, 6, 'h'], [13, 4, 'h'], [0, 1, 'h'], [2, -2, 'h']],
     medal: [[10, -3, '.m.'], [9, -2, 'mmm'], [10, -1, 'm.m'], [5, 8, 'r.r'], [5, 9, 'r.r'], [5, 10, 'mmm'], [4, 11, 'mmlmm'], [5, 12, 'mmm']],
   };
   const MONO = { b: '#D9D9D9', s: '#9A9A9A', o: '#6B6B6B' };
@@ -267,10 +285,10 @@
     return `<svg viewBox="0 0 14 17" shape-rendering="crispEdges">${px.map(([x, y, c]) => `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${c}"/>`).join('')}</svg>`;
   }
   // условия бейджей приходят с сервера (me.btn.rules.cond — их меняет Алина в «📜 Правилах»); числа подставляются в описания
-  const COND0 = { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4, alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10, rainA: 5, rainB: 15, rainC: 30, potA: 10, potB: 50, mazeA: 20 };
+  const COND0 = { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4, alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10, rainA: 5, rainB: 15, rainC: 30, potA: 10, potB: 50, mazeA: 20, panA: 5, panB: 15, panC: 30, panStar: 10 };
   const condVals = k => { const C = Object.assign({}, COND0, (me && me.btn && me.btn.rules && me.btn.rules.cond) || {});
     return ({ alt: { n: C.alt }, monthly: { n: C.monthly }, veteran: { n: C.veteranMonths, p: C.veteranPer }, early: { n: C.early, h: C.earlyBefore }, owl: { n: C.owl, a: C.owlFrom, b: C.owlTo },
-      weekend: { n: C.weekend }, ten: { n: C.ten }, fifty: { n: C.fifty }, hundred: { n: C.hundred }, inkmaster: { n: C.inkmaster }, comeback: { n: C.comeback }, collector: { n: C.collector }, rain1: { n: C.rainA }, rain2: { n: C.rainB }, rain3: { n: C.rainC }, pot2: { n: C.potA }, pot3: { n: C.potB }, maze: { n: C.mazeA }, clock: { n: C.clock, w: C.clockWin }, cpurple: { n: C.colors }, cyellow: { n: C.colors }, cred: { n: C.colors }, cblue: { n: C.colors }, cgreen: { n: C.colors } })[k] || {}; };
+      weekend: { n: C.weekend }, ten: { n: C.ten }, fifty: { n: C.fifty }, hundred: { n: C.hundred }, inkmaster: { n: C.inkmaster }, comeback: { n: C.comeback }, collector: { n: C.collector }, rain1: { n: C.rainA }, rain2: { n: C.rainB }, rain3: { n: C.rainC }, pot2: { n: C.potA }, pot3: { n: C.potB }, maze: { n: C.mazeA }, pan1: { n: C.panA }, pan2: { n: C.panB }, pan3: { n: C.panC }, panstar: { n: C.panStar }, clock: { n: C.clock, w: C.clockWin }, cpurple: { n: C.colors }, cyellow: { n: C.colors }, cred: { n: C.colors }, cblue: { n: C.colors }, cgreen: { n: C.colors } })[k] || {}; };
   const howTo = lv => lv.h ? lv.h[L].replace(/\{(\w)\}/g, (m, x) => { const v = condVals(lv.k)[x]; return v == null ? m : v; }) : HOW_LEVEL[L](lv.d);
   // state: true — есть, false — нет, 'past' — был (чёрно-белый)
   const medal = (lv, on = true, big = false, tag = 'span', picks = me?.picks || 0) => {
@@ -417,7 +435,7 @@
       box.querySelector('[data-later]').onclick = () => act(false);
     };
   }
-  const noteHtml = g => !g.note || g.note === 'shop' ? '' : g.note.startsWith('from:') ? `<p class="gf-note">${esc(t('fromBird', g.note.slice(5)))}</p>` : g.note.startsWith('potion:') && window.PPPotion ? `<p class="gf-note">🧪 ${esc(window.PPPotion.potion(+g.note.split(':')[2], 3, g.note.split(':')[1]).name)}</p>` : g.note.startsWith('req:') ? `<p class="gf-note">${esc(t('fromReq'))}</p>` : g.note.startsWith('rain:') ? `<p class="gf-note">${esc(t('fromRain', g.note.slice(5)))}</p>` : `<p class="gf-note">«${esc(g.note)}» ${t('fromAlina')}</p>`;
+  const noteHtml = g => !g.note || g.note === 'shop' ? '' : g.note.startsWith('from:') ? `<p class="gf-note">${esc(t('fromBird', g.note.slice(5)))}</p>` : g.note.startsWith('potion:') && window.PPPotion ? `<p class="gf-note">🧪 ${esc(window.PPPotion.potion(+g.note.split(':')[2], 3, g.note.split(':')[1]).name)}</p>` : g.note.startsWith('req:') ? `<p class="gf-note">${esc(t('fromReq'))}</p>` : g.note.startsWith('rain:') ? `<p class="gf-note">${esc(t('fromRain', g.note.slice(5)))}</p>` : g.note.startsWith('pan:') ? `<p class="gf-note">${esc(t('fromPan', g.note.slice(4)))}</p>` : `<p class="gf-note">«${esc(g.note)}» ${t('fromAlina')}</p>`;
   // подарить купленную вещь: ник птички (подсказки — из списка стаи)
   async function giveDialog(g, done) {
     const m = modal(''); m.card.classList.add('give-card');
