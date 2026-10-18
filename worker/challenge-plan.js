@@ -106,6 +106,15 @@ function hsl(hex) {
   const [r, g, b] = v, h = mx === r ? ((g - b) / dd + 6) % 6 : mx === g ? (b - r) / dd + 2 : (r - g) / dd + 4;
   return { h: h * 60, s: dd / (1 - Math.abs(2 * l - 1)), l };
 }
+// насколько два цвета различаются на глаз (ΔE в Lab): меньше MIN_DE — в одном дне не ставим (индиго и тёмно-синий, кремовый и бежевый…)
+function lab(hex) {
+  const v = [1, 3, 5].map(i => { const c = parseInt(hex.slice(i, i + 2), 16) / 255; return c > 0.04045 ? ((c + 0.055) / 1.055) ** 2.4 : c / 12.92; });
+  const xyz = [[0.4124, 0.3576, 0.1805], [0.2126, 0.7152, 0.0722], [0.0193, 0.1192, 0.9505]].map((r, k) => (r[0] * v[0] + r[1] * v[1] + r[2] * v[2]) / [0.9505, 1, 1.089][k]);
+  const f = t => t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116, [x, y, z] = xyz.map(f);
+  return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
+}
+const MIN_DE = 35;
+const dE = (a, b) => Math.hypot(a.lab[0] - b.lab[0], a.lab[1] - b.lab[1], a.lab[2] - b.lab[2]);
 const hueGap = (a, b) => { const x = Math.abs(a - b) % 360; return x > 180 ? 360 - x : x; };
 const SEASON_OF = m => SEASON[m];
 // насколько цвет подходит сезону (вес при выборе акцента)
@@ -117,41 +126,35 @@ function seasonW(c, season) {
   if (season === 'summer') return c.s > 0.6 && c.l > 0.45 ? 2.5 : 1;
   return 1;
 }
-// схемы: нейтральные + 1 акцент; соседние оттенки; дополнительные; главный + поддержка (5); тон в тон
-const SCHEMES = [['accent', 35], ['analog', 25], ['compl', 20], ['five', 12], ['tonal', 8]];
+// схемы: нейтральные + 1 акцент; соседние оттенки; дополнительные; главный + поддержка (5). Два ярких одного оттенка (голубой и индиго) — никогда
+const SCHEMES = [['accent', 38], ['analog', 27], ['compl', 22], ['five', 13]];
 function harmonyFor(data, key, avoid) {
-  const all = allColors(data).map((c, i) => ({ i, k: c.k, ...hsl(c.hex) }));
+  const all = allColors(data).map((c, i) => ({ i, k: c.k, lab: lab(c.hex), ...hsl(c.hex) }));
   const N = all.filter(c => c.k === 'n'), A = all.filter(c => c.k !== 'n' && !avoid.has(c.i));
   const season = SEASON_OF(+key.slice(5, 7) - 1), r = rngFor('harmony-' + key);
-  const pickW = (list, w) => { const tot = list.reduce((t, c) => t + w(c), 0); let x = r() * tot; for (const c of list) { x -= w(c); if (x <= 0) return c; } return list[list.length - 1]; };
-  const pickN = (k, from = N) => { const pool = from.slice(), out = []; while (out.length < k && pool.length) out.push(pool.splice(Math.floor(r() * pool.length), 1)[0]); return out; };
+  let out = [];
+  const far = list => list.filter(c => !out.includes(c) && out.every(o => dE(c, o) >= MIN_DE && (c.k === 'n' || o.k === 'n' || hueGap(c.h, o.h) >= 45))); // только заметно другие, чем уже выбранные
+  const pickW = (list0, w) => { const list = far(list0); if (!list.length) return null; const tot = list.reduce((t, c) => t + w(c), 0); let x = r() * tot; for (const c of list) { x -= w(c); if (x <= 0) return c; } return list[list.length - 1]; };
+  const pickN = (k, from = N) => { const got = []; for (let j = 0; j < k; j++) { const pool = far(from).filter(c => got.every(o => dE(c, o) >= MIN_DE) && !got.includes(c)); if (!pool.length) break; got.push(pool[Math.floor(r() * pool.length)]); } return got; };
   const sw = c => seasonW(c, season);
   let x = r() * 100, scheme = 'accent'; for (const [s2, w] of SCHEMES) { x -= w; if (x <= 0) { scheme = s2; break; } }
-  const a = pickW(A, sw);
-  let out = [a];
-  if (scheme === 'accent') out = pickN(r() < 0.3 ? 1 : r() < 0.6 ? 2 : 3).concat(out);
-  else if (scheme === 'analog') {
-    const near = A.filter(c => c !== a && hueGap(c.h, a.h) >= 12 && hueGap(c.h, a.h) <= 60);
-    const b = near.length ? pickW(near, sw) : null; if (b) out.push(b);
-    const near2 = near.filter(c => c !== b && b && hueGap(c.h, b.h) >= 12);
-    if (b && near2.length && r() < 0.5) out.push(pickW(near2, sw));
-    if (out.length < 3 || r() < 0.4) out = out.concat(pickN(1));
+  const add = c => { if (c) out.push(c); return c; }, addN = k => pickN(k).forEach(add);
+  const a = add(pickW(A, sw));
+  if (scheme === 'accent') addN(r() < 0.3 ? 1 : r() < 0.6 ? 2 : 3);
+  else if (scheme === 'analog') { // соседние по кругу, но заметно разные
+    const near = c => hueGap(c.h, a.h) >= 45 && hueGap(c.h, a.h) <= 100;
+    if (add(pickW(A.filter(near), sw)) && r() < 0.5) add(pickW(A.filter(near), sw));
+    if (out.length < 3 || r() < 0.4) addN(1);
   } else if (scheme === 'compl') {
-    const far = A.filter(c => hueGap(c.h, a.h) >= 150);
-    if (far.length) out.push(pickW(far, sw));
-    out = out.concat(pickN(r() < 0.3 ? 0 : r() < 0.7 ? 1 : 2));
+    add(pickW(A.filter(c => hueGap(c.h, a.h) >= 150), sw));
+    addN(r() < 0.3 ? 0 : r() < 0.7 ? 1 : 2);
   } else if (scheme === 'five') {
-    const near = A.filter(c => c !== a && hueGap(c.h, a.h) >= 12 && hueGap(c.h, a.h) <= 60), far = A.filter(c => hueGap(c.h, a.h) >= 150);
-    if (near.length) out.push(pickW(near, sw));
-    if (far.length) out.push(pickW(far, sw));
-    out = out.concat(pickN(5 - out.length));
-  } else {
-    const same = A.filter(c => c !== a && hueGap(c.h, a.h) <= 25 && Math.abs(c.l - a.l) >= 0.15);
-    if (same.length) out.push(pickW(same, sw));
-    out = out.concat(pickN(out.length < 2 ? 2 : 1));
+    add(pickW(A.filter(c => hueGap(c.h, a.h) >= 45 && hueGap(c.h, a.h) <= 100), sw));
+    add(pickW(A.filter(c => hueGap(c.h, a.h) >= 150), sw));
+    addN(5 - out.length);
   }
-  out = [...new Map(out.map(c => [c.i, c])).values()];
-  if (out.length < 2) out = out.concat(pickN(2 - out.length, N.filter(c => !out.includes(c))));
+  if (out.length < 2) addN(2 - out.length);
+  if (out.length < 2) add(pickW(A, sw));
   // по порядку: светлые → тёмные нейтральные, потом акценты
   return out.sort((p, q) => (p.k === 'n') === (q.k === 'n') ? q.l - p.l : p.k === 'n' ? -1 : 1).map(c => c.i);
 }

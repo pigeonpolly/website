@@ -1,6 +1,6 @@
 // Октябрь 2026 в план челленджа: темы, как их считает нынешний themeFor (challenge-theme.js) → site/assets/challenge-2026-10.json.
 // Worker один раз импортирует файл в D1 challenge_days (метка в meta 'chplan_oct'), с ноября темы — из плана по новым правилам.
-// С 19 октября (NEW_FROM, 18.10.2026) — уже по новым правилам: planMonth с 19-го числа поверх 1–18 (worker перезаписывает эти дни — метка 'chplan_v2').
+// С 19 октября (NEW_FROM, 18.10.2026) — уже по новым правилам: planMonth с 19-го числа поверх 1–18 (worker перезаписывает эти дни — метка 'chplan_v3').
 // Заодно сверяет, что worker/challenge-plan.js (baseDay) даёт те же цвета, время, совет и особенность. Запуск: node tools/challenge_oct.js
 const fs = require('fs'), path = require('path');
 const root = path.join(__dirname, '..');
