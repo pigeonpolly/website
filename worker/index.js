@@ -803,6 +803,8 @@ function uaInfo(ua, w, touch) {
     : /Firefox|FxiOS/.test(ua) ? 'Firefox' : /Chrome|CriOS/.test(ua) ? 'Chrome' : /Safari/.test(ua) ? 'Safari' : 'Другой';
   return { os, device, browser };
 }
+// страницы игр хаба /games/ — для «Игр» на главной (/api/games/top)
+const GAME_PATHS = ['/rain/', '/potions/', '/pancakes/', '/titos/', '/polly-office/', '/wobbleland/', '/advent/'];
 async function hit(req, env) {
   const ok = new Response(null, { status: 204 });
   const ua = req.headers.get('user-agent') || '';
@@ -2084,6 +2086,15 @@ async function route(req, env, url) {
     const cards = (await env.DB.prepare('SELECT s.slug, s.en, s.ru, s.lv, s.created_at AS at, COUNT(c.id) AS n FROM card_sets s LEFT JOIN cards c ON c.collection = s.slug AND COALESCE(c.hidden, 0) = 0 WHERE s.created_at > ? GROUP BY s.slug ORDER BY s.created_at DESC').bind(since).all().catch(() => ({ results: [] }))).results
       .filter(s => s.n > 0).map(s => ({ slug: s.slug, title: { en: s.en, ru: s.ru, lv: s.lv }, at: s.at, n: s.n }));
     return json({ items, cards }, 200, { 'cache-control': 'no-store' });
+  }
+  // Игры на главной: популярность за 30 дней — люди в день (visits) на страницах игр, языки вместе (GAME_PATHS)
+  if (m === 'GET' && p === '/api/games/top') {
+    const from = new Date(Date.now() - 29 * 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
+    const all = GAME_PATHS.flatMap(x => [x, '/ru' + x, '/lv' + x]);
+    const rows = (await env.DB.prepare(`SELECT path, COUNT(DISTINCT day || vid) AS n FROM visits WHERE day >= ? AND path IN (${all.map(() => '?').join(',')}) GROUP BY path`).bind(from, ...all).all().catch(() => ({ results: [] }))).results;
+    const top = {};
+    for (const r of rows) { const x = r.path.replace(/^\/(ru|lv)(?=\/)/, ''); top[x] = (top[x] || 0) + r.n; }
+    return json({ top }, 200, { 'cache-control': 'public, max-age=600' });
   }
   if (m === 'POST' && p === '/api/shop/buy') {
     const u = await needUser(req, env);
