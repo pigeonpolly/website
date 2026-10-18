@@ -223,7 +223,7 @@ const seasonsOf = new WeakMap(); // сезоны предмета — один �
 function inPool(data, i, p) {
   if (p === 'any') return true;
   let S = seasonsOf.get(data); if (!S) seasonsOf.set(data, S = data.subjects.map(r => String(r[3] || '').split(' ').filter(Boolean)));
-  if (!S[i].length && data.tags[i] && data.tags[i][1] === 'idea') return true; // слово-тема без сезона годится в любой день
+  if (!S[i].length && data.tags[i] && ['idea', 'life'].includes(data.tags[i][1])) return true; // слово-тема и тема «из жизни» без сезона годятся в любой день
   return p === 'none' ? !S[i].length : S[i].includes(p);
 }
 const isHalloween = (data, i) => String(data.subjects[i][3] || '').split(' ').includes('halloween');
@@ -237,14 +237,16 @@ function poolList(data, p) {
 // lastUse: Map предмет → номер дня, когда был; rnd — случайные числа
 function ranked(data, rules, plan, n, pool, lastUse, rnd, skip, wantD) {
   const out = [], ctx = around(data, rules, plan, n), oct = keyOfNum(n).slice(5, 7) === '10';
-  // слово-тема (категория idea, в духе Inktober 52) — первой, если её не было 3 дня (выходит ~2 раза в неделю)
-  const wantIdea = n >= N_FROM && [1, 2, 3].every(x => !plan.has(n - x) || (data.tags[plan.get(n - x)] || [])[1] !== 'idea');
+  // слово-тема (категория idea, в духе Inktober 52) — первой, если её не было 6 дней
+  // и так же тема «из жизни» (категория life: кадр из любимого фильма, ваш завтрак, вид из окна…)
+  const noneFor = (c, k) => n >= N_FROM && [...Array(k)].every((_, x) => !plan.has(n - x - 1) || (data.tags[plan.get(n - x - 1)] || [])[1] !== c);
+  const wantIdea = noneFor('idea', 6), wantLife = noneFor('life', 3); // слово — ~раз в неделю, «из жизни» — ~2 раза
   for (const i of poolList(data, pool)) {
     if (wantD && data.tags[i][2] !== wantD) continue;
     if (!oct && isHalloween(data, i)) continue; // хеллоуинские — только в октябре
     if (violations(data, rules, plan, n, i, skip, ctx).length) continue;
     const lu = lastUse.has(i) ? lastUse.get(i) : -1e9;
-    out.push([i, lu + rnd() * 30 - (i >= FRESH && lu < 0 ? 100 : 0) - (wantIdea && data.tags[i][1] === 'idea' ? 1e10 : 0)]); // разница в месяц — почти одно и то же; новые предметы, которых ещё не было, — первыми
+    out.push([i, lu + rnd() * 30 - (i >= FRESH && lu < 0 ? 100 : 0) - (wantIdea && data.tags[i][1] === 'idea' ? 1e10 : 0) - (wantLife && data.tags[i][1] === 'life' ? 2e10 : 0)]); // разница в месяц — почти одно и то же; новые предметы, которых ещё не было, — первыми
   }
   return out.sort((a, b) => a[1] - b[1]).map(x => x[0]);
 }
@@ -264,7 +266,8 @@ export function planMonth(data, rules, y, m, history) {
     const keys = [...Array(days)].map((_, i) => `${ym}-${pad(i + 1)}`);
     // 23 января — заранее, чтобы колода и категории учли именинный предмет
     for (const k of keys) if (poolOf(data, rules, k) === 'bday') plan.set(dayNum(k), birthdayIdx(data, y));
-    if (m === 11) plan.set(dayNum(`${y + 1}-01-23`), birthdayIdx(data, y + 1)); // в декабре — не брать семью январского именинного предмета
+    // ближайшее 23 января после месяца (в пределах chFamilyGap) — не брать семью именинного предмета
+    { const nb = dayNum(`${y + 1}-01-23`), end = dayNum(keys[keys.length - 1]); if (m > 0 && nb - end < rules.chFamilyGap) plan.set(nb, birthdayIdx(data, y + 1)); }
     for (const k of keys) {
       const n = dayNum(k), pool = poolOf(data, rules, k);
       if (pool === 'bday') continue;

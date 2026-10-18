@@ -32,7 +32,7 @@ const root = path.join(__dirname, '..'), months = +process.argv[2] || 24;
   for (const x of v) console.log(x.day, data.subjects[x.item][0], '—', x.rules.join(', '));
   // сезон: доля сезонных дней по месяцам — ровно chSeasonDaysPct
   let seasonBad = 0;
-  for (let n = from; n <= last; n++) { const k = P.keyOfNum(n), p = P.poolOf(data, R, k), s = data.subjects[plan.get(n)][3] || ''; if (p !== 'bday' && !(data.tags[plan.get(n)][1] === 'idea' && !s) && (p === 'none' ? !!s : !s.split(' ').includes(p))) seasonBad++; }
+  for (let n = from; n <= last; n++) { const k = P.keyOfNum(n), p = P.poolOf(data, R, k), s = data.subjects[plan.get(n)][3] || ''; if (p !== 'bday' && !(['idea', 'life'].includes(data.tags[plan.get(n)][1]) && !s) && (p === 'none' ? !!s : !s.split(' ').includes(p))) seasonBad++; }
   if (seasonBad) console.log('не тот сезон:', seasonBad, 'дн.');
   const d = { 1: 0, 2: 0, 3: 0 }; for (let n = from; n <= last; n++) d[data.tags[plan.get(n)][2]]++;
   console.log(`Итог: ${months} мес. (${last - from + 1} дн.), нарушений ${v.length + seasonBad}, ослаблено при подборе ${relaxed}; сложность 1/2/3 = ${d[1]}/${d[2]}/${d[3]}; ${((Date.now() - t0) / 1000).toFixed(1)} с`);
