@@ -253,6 +253,7 @@ export async function titosApi(req, env, url, h) {
     let buttons = 0;
     if (first && R.titosOn) buttons = await h.award(u.id, 'titos', String(n), h.btnOf(R.titosLevelPct, await h.unit()) * (1 + Math.floor((n - 1) / 10)));
     if (first) await h.stamp(u.id, 'titos'); // штамп в карточке дня
+    if (first) await h.top(u.id, 1); // доска топа: дела за неделю
     if (first && n % 10 === 0) await h.flockEvent('titos', u, { level: n });
     // вещь-награда за дело (c.reward = 'furn|tc<имя>', room.js) — в сумку, один раз
     let item = null;

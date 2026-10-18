@@ -242,6 +242,7 @@
       A.coffee.sip && setTimeout(() => A.coffee.sip(true), 900); return;
     }
     st.solved = true; save(); A.coffee.on = false; draw();
+    if (window.PPTop) PPTop.refresh(); // доска топа «Раскрыто дел»
     card(`<div class="q-stamp">${t(UI.solvedT)}</div><p class="q-verdict">${esc(r.text)}</p>${r.buttons ? `<p class="q-kick">${t(UI.got)(r.buttons)}</p>` : ''}${r.item && window.PPBirds ? `<p class="q-kick q-prize">${t(UI.prize)} <b>${esc(PPBirds.giftName(r.item.kind, r.item.item))}</b></p><p><a class="pill-btn" href="${L ? '/' + LANG : ''}/bird/">${t(UI.toRoom)}</a></p>` : ''}${K.no >= srv.top && srv.top < LEVELS ? `<p class="q-m">${t(UI.allDone)(srv.top, LEVELS)}</p>` : ''}`);
     if (r.buttons && window.PPToast) PPToast(t(UI.got)(r.buttons));
     if (r.reward && window.PPNews) PPNews.refresh(); // награда за уровень — новость «Награда!» в 🔔
