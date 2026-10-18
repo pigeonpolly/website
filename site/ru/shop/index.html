@@ -197,6 +197,7 @@
       const guestLine = guest ? `<p class="ss-guest"><button type="button" data-in>${t('guest')}</button>${t('guestTail')}</p>` : '';
       let st = () => 'shut', html = '', live = null, star = false;
       const sn = S.month !== 11 && S.month !== 12 && !S.catchUp && seasonNow(); // адвента нет — витрина сезона
+      if (sn && !/\/shop\/?$/.test(location.pathname)) { box.hidden = true; return; } // витрина сезона — только в магазине, не на главной
       if (sn) { showcase(sn); if (S.nextAt) { const ms = S.nextAt - now(); if (ms > 0 && ms < 2e9) wake = setTimeout(load, ms + 1500); } return; }
       if (S.month === 10 || S.month === 11) { // до 1 декабря: отсчёт
         html = `<p class="ss-main">${T.soon[L]('<b data-cd></b>')}</p><p class="ss-sub">${t('soonSub')}</p><a class="ss-btn" href="${pre}/advent/">${t('peek')}</a>${guestLine}`;
