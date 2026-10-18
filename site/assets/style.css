@@ -76,7 +76,8 @@ a:hover { color: var(--text); }
   white-space: nowrap;
 }
 .brand em { font-style: normal; color: var(--peach); }
-.brand-star { width: 32px; height: 32px; flex: none; image-rendering: pixelated; }
+.brand-star { width: 64px; height: 64px; margin: -12px 0; flex: none; image-rendering: pixelated; }
+@media (max-width: 480px) { .brand-star { width: 48px; height: 48px; margin: -6px 0; } }
 
 .site-nav ul { list-style: none; margin: 0; padding: 0; }
 .site-nav > ul { display: flex; align-items: center; gap: 4px; }

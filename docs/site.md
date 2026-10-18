@@ -21,7 +21,7 @@ _Пункты перенесены дословно из docs/_claude-old.md (э
 - Галерея «Pigeon Polly» (/art-portfolio/bird/) — src/pages/pigeon-polly.html. НЕ путать с src/pages/bird.html — это профиль птички (/bird/). 12.10.2026 галерея была случайно затёрта профилем (оба пути брали bird.html) — восстановлена из истории.
 
 ## Меню и шапка
-- Логотип (18.10.2026): пиксельная «Арка» — Полли из polly.js в оранжевой арке, 32×32 (`site/assets/logo.png` 2×, `.brand-star` 32px pixelated); фавикон `favicon.png` + `apple-touch-icon.png`. Исходники и концепты — site/images/logo/.
+- Логотип (18.10.2026): пиксельная «Арка» — Полли из polly.js в оранжевой арке, 32×32 (`site/assets/logo.png` 128px, `.brand-star` 64px (≤480px — 48px), отрицательный margin — шапка не растёт); фавикон `favicon.png` + `apple-touch-icon.png`. Исходники и концепты — site/images/logo/.
 - Меню в шапке (с 9.10.2026): у пунктов с разделами (`SECTIONS`) — выпадающее подменю (`.has-sub` → `.nav-sub`, при наведении на компьютере; на телефоне — стрелка `.sub-toggle` рядом с пунктом).
 - Поиск по сайту: кнопка 🔍 в шапке (`.search-btn`, клавиша «/») → `site/assets/search.js`. Страницы ищутся по индексу `site/assets/search-{en,ru,lv}.json` (build.py: `search_entry` — h1, description, видимый текст `<main>`; скрытые страницы не входят), статьи блога — `/api/blog/search?q=&lang=` (worker/blog.js, кэш 60 с).
 - Полоска «в цифрах» над меню (`.statbar` в src/layout.html): книги и игры — числа прямо в разметке (поменять там), птицы / рисунки / статьи — `GET /api/stats` (site.js, запоминается в sessionStorage на 1 минуту), дни — от 1 января 2019. Прячется при прокрутке вниз (класс `html.sb-hide`, переменная `--sb`; шапка стоит на `top: var(--sb)`).
