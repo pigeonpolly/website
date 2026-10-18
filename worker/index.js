@@ -1321,7 +1321,7 @@ async function route(req, env, url) {
   if (p.startsWith('/api/pw/') || p === '/api/funnel' || p === '/api/admin/pw-reset' || p === '/api/admin/funnels') { const r = await authApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p === '/api/flock/news' || p === '/api/news-off' || p === '/api/admin/flock-notes') { const r = await flockNewsApi(req, env, url, newsHelpers(env)); if (r) return r; }
   if (p === '/api/birds' || p === '/api/feathers' || p === '/api/feather') { const r = await flockApi(req, env, url, flockHelpers(env)); if (r) return r; }
-  if (p === '/api/top') { const r = await topApi(req, env, url, { json, fail, currentUser, avatarOf }); if (r) return r; }
+  if (p === '/api/top' && url.searchParams.get('g')) { const r = await topApi(req, env, url, { json, fail, currentUser, avatarOf }); if (r) return r; }
   if (p === '/api/pancakes' || p.startsWith('/api/pancakes/')) { const r = await pancakesApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, top: (uid, n) => topScore(env, 'pan', uid, n),
     award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), item: (rq, uid, note) => rainItem(env, rq, uid, 0, note) }); if (r) return r; }
   if (p.startsWith('/api/titos') || p.startsWith('/api/admin/titos')) { const r = await titosApi(req, env, url, titosHelpers(env)); if (r) return r; }
@@ -2438,7 +2438,15 @@ async function route(req, env, url) {
     top.sort((a, b) => b.current - a.current || b.best - a.best);
     const pickUser = Number(await getMeta(env, 'pick_user'));
     const pu = pickUser ? await env.DB.prepare('SELECT nick, picks FROM users WHERE id = ? AND banned = 0').bind(pickUser).first() : null;
-    return json({ top: top.slice(0, 10), pick: pu?.nick || null, pickGold: (pu?.picks || 0) >= GOLD_PICKS });
+    // «Самые длинные серии» — рекорд за всё время (users.best), сверху самый длинный
+    const longest = [];
+    for (const u of (await env.DB.prepare(`SELECT id, nick, best, picks FROM users WHERE banned = 0 AND nick IS NOT NULL AND COALESCE(best, 0) > 0
+      ORDER BY best DESC, id LIMIT 20`).all()).results) {
+      const days = streakDays((await env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(u.id).all()).results);
+      longest.push({ nick: u.nick, best: mergedBest(u, days), current: streaks(days).current, gold: (u.picks || 0) >= GOLD_PICKS });
+    }
+    longest.sort((a, b) => b.best - a.best || b.current - a.current);
+    return json({ top: top.slice(0, 10), longest, pick: pu?.nick || null, pickGold: (pu?.picks || 0) >= GOLD_PICKS });
   }
 
   const img = p.match(/^\/api\/img\/([0-9a-f]{24})$/);
