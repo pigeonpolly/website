@@ -225,7 +225,7 @@
     return d;
   }
   // окно вещи: примерка (на птичке или в комнате — вещь на свободном месте), строки о вещи, одна кнопка
-  // o = { kind, item, me, lines: [текст], note, badges: [[текст, класс]], action: { label, on(btn, d), disabled } }
+  // o = { kind, item, me, lines: [текст], note, badges: [[текст, класс]], action: { label, on(btn, d), disabled }, action2 — так же }
   function itemWindow(o) {
     const B = window.PPBirds, me = o.me || null, room = isRoom(o.kind), sur = o.item === '?' || o.kind === 'any';
     const d = dialog('cat-item', `<div class="cat-item-in"><figure class="cat-try"><div class="cat-try-box"></div><figcaption></figcaption></figure>
@@ -249,6 +249,10 @@
       const b = document.createElement('button'); b.type = 'button'; b.className = 'cta-btn cat-item-btn'; b.textContent = o.action.label; b.disabled = !!o.action.disabled;
       b.onclick = () => o.action.on(b, d); d.querySelector('.cat-item-act').appendChild(b);
       if (!b.disabled) setTimeout(() => b.focus(), 0);
+    }
+    if (o.action2) { // вторая кнопка под главной (магазин: «🛒 В корзину»)
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'cat-item-btn cat-item-btn2'; b.textContent = o.action2.label; b.disabled = !!o.action2.disabled;
+      b.onclick = () => o.action2.on(b, d); d.querySelector('.cat-item-act').appendChild(b);
     }
     return d;
   }

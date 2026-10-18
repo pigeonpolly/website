@@ -40,6 +40,15 @@
     rule: ['You can buy up to 3 of the same thing (legendary ones: just 1). Prices follow the stock: the fewer left, the pricier; the more in stock, the cheaper.', 'Одну и ту же вещь можно купить до 3 штук (легендарные — только 1). Цена зависит от остатка: чем меньше осталось, тем дороже, чем больше — тем дешевле.', 'Vienu un to pašu lietu var nopirkt līdz 3 gab. (leģendārās — tikai 1). Cena atkarīga no atlikuma: jo mazāk palicis, jo dārgāk; jo vairāk, jo lētāk.'],
     newH: ['✨ New in the shop', '✨ Новое в магазине', '✨ Jaunums veikalā'], newB: ['new', 'новое', 'jauns'],
     newCards: ['🃏 New card collections:', '🃏 Новые коллекции карточек:', '🃏 Jaunas kartīšu kolekcijas:'],
+    toCart: ['🛒 Add to cart', '🛒 В корзину', '🛒 Ielikt grozā'], moreCart: ['🛒 In the cart: {n} · add one more', '🛒 В корзине: {n} · ещё одну', '🛒 Grozā: {n} · vēl vienu'], fullCart: ['🛒 In the cart: {n}', '🛒 В корзине: {n}', '🛒 Grozā: {n}'],
+    inCart: ['In the cart 🛒 {n}', 'В корзине 🛒 {n}', 'Grozā 🛒 {n}'], openCart: ['Open the cart', 'Открыть корзину', 'Atvērt grozu'], cartBtn: ['🛒 Cart', '🛒 Корзина', '🛒 Grozs'],
+    cartH: ['🛒 Cart', '🛒 Корзина', '🛒 Grozs'], cartEmpty: ['The cart is empty. Open any item and press “🛒 Add to cart”.', 'Корзина пуста. Открой любую вещь и нажми «🛒 В корзину».', 'Grozs ir tukšs. Atver jebkuru lietu un spied “🛒 Ielikt grozā”.'],
+    cartSum: ['Items: {n} · total {p} 🔘', 'Вещей: {n} · всего {p} 🔘', 'Lietas: {n} · kopā {p} 🔘'], cartHave: ['You have {n} 🔘', 'У тебя {n} 🔘', 'Tev ir {n} 🔘'],
+    cartLack: ['{p} 🔘 short', 'не хватает {p} 🔘', 'pietrūkst {p} 🔘'], buyAll: ['Buy everything for {p} 🔘', 'Купить всё за {p} 🔘', 'Pirkt visu par {p} 🔘'],
+    buying: ['Buying…', 'Покупаю…', 'Pērku…'], cartClear: ['Empty the cart', 'Очистить корзину', 'Iztukšot grozu'], cartDel: ['Remove', 'Убрать', 'Izņemt'],
+    each: ['{p} 🔘 each', '{p} 🔘 за штуку', '{p} 🔘 gabalā'], cartOff: ['not available now, so not counted', 'сейчас нельзя купить — не считается', 'tagad nevar nopirkt — neskaitās'],
+    bought: ['Bought: {n} · in your bag 🎒', 'Куплено: {n} · в сумке 🎒', 'Nopirkts: {n} · somā 🎒'], cartRest: ['Some things were not bought and stayed in the cart.', 'Часть вещей не купилась и осталась в корзине.', 'Daļa lietu netika nopirkta un palika grozā.'],
+    toBag: ['Open the bag', 'Открыть сумку', 'Atvērt somu'], cartGo: ['Keep shopping', 'Выбрать ещё', 'Izvēlēties vēl'],
     soldH: ['Out of stock', 'Нет в наличии', 'Nav pieejams'], catH: ['🛍 Catalog', '🛍 Каталог', '🛍 Katalogs'],
   };
   var t = function (k) { return T[k][L]; };
@@ -67,14 +76,18 @@
   var lots = function (k, v, s) { return LVL && s.stock >= (isLeg(k, v) ? LVL.manyLeg : LVL.many); };
 
   function head() {
-    if (me) meEl.innerHTML = '<b>' + t('have').replace('{n}', money()) + '</b> · <a href="' + pre + '/challenge/#works">' + t('how') + '</a>';
-    else meEl.textContent = t('login');
+    if (me) {
+      var n = window.PPCart ? PPCart.count() : 0;
+      meEl.innerHTML = '<b>' + t('have').replace('{n}', money()) + '</b> · <a href="' + pre + '/challenge/#works">' + t('how') + '</a> <button type="button" class="shop-cart-btn' + (n ? ' has' : '') + '">' + t('cartBtn') + (n ? ' · ' + n : '') + '</button>';
+      meEl.querySelector('.shop-cart-btn').onclick = openCart;
+    } else meEl.textContent = t('login');
   }
   // плитка магазина: вместо отметки — цена; значки «мало», «новое», «у тебя N из 3» (★ легендарной рисует сама плитка)
   function tileOf(k, v) {
     var s = row(k, v), have = owned[key(k, v)] || 0, b = [];
     if (few(k, v, s)) b.push([t('few'), 'few']);
     if (NEW[key(k, v)]) b.push([t('newB'), 'new']);
+    if (me && window.PPCart && PPCart.has(k, v)) b.push(['🛒 ' + PPCart.has(k, v), 'cart']);
     if (have && !isSur(k, v)) b.push([have >= limOf(k, v) ? '✓ ' + have + '/' + limOf(k, v) : T.count[L].replace('{n}', have).replace('{m}', limOf(k, v)), 'have']);
     return { badges: b, price: s.stock > 0 ? (s.price ? '🔘 ' + s.price : t('free')) : t('sold'), dim: !(s.stock > 0) };
   }
@@ -94,7 +107,109 @@
     else if (!sur && have >= lim) act = { label: t('max'), disabled: true };
     else if (money() < s.price) act = { label: T.poorFor[L].replace('{p}', s.price), disabled: true };
     else act = { label: s.price ? T.buyFor[L].replace('{p}', s.price) : t('buyFree'), on: function (b, d) { buy(k, v, s.price, b, d); } };
-    window.PPCatalog.itemWindow({ kind: k, item: v, me: me, legend: leg, lines: lines, note: leg ? t('legend') : '', badges: tileOf(k, v).badges.filter(function (x) { return x[1] !== 'have'; }), action: act });
+    var inC = window.PPCart ? PPCart.has(k, v) : 0, cap = capOf(k, v), act2 = null;
+    if (me && window.PPCart && cap > 0) act2 = inC >= cap ? { label: t('fullCart').replace('{n}', inC), disabled: true } : { label: inC ? t('moreCart').replace('{n}', inC) : t('toCart'), on: function (b, d) { PPCart.add(k, v); d.close(); cartToast(); if (ui) ui.draw(); } };
+    window.PPCatalog.itemWindow({ kind: k, item: v, me: me, legend: leg, lines: lines, note: leg ? t('legend') : '', badges: tileOf(k, v).badges.filter(function (x) { return x[1] !== 'have' && x[1] !== 'cart'; }), action: act, action2: act2 });
+  }
+  // сколько штук можно положить в корзину: не больше остатка и (кроме сюрпризов) не больше, чем до «у тебя 3 из 3»
+  function capOf(k, v) {
+    var s = row(k, v);
+    if (!(s.stock > 0)) return 0;
+    return isSur(k, v) ? s.stock : Math.max(0, Math.min(s.stock, limOf(k, v) - (owned[key(k, v)] || 0)));
+  }
+  function cartToast() {
+    head();
+    if (window.PPToast) window.PPToast(t('inCart').replace('{n}', PPCart.count()), { action: t('openCart'), ms: 5000, onAction: openCart });
+  }
+  // окно корзины: вещи с картинкой, ценой и −/＋, сумма, «Купить всё за N» (покупки по одной через /api/shop/buy)
+  var cartDlg = null;
+  function openCart() {
+    if (!me) { if (window.PPAccount) PPAccount.openSignIn(); return; }
+    if (cartDlg && cartDlg.open) return drawCart();
+    cartDlg = window.PPCatalog.dialog('cat-cart', '<h2 class="cart-h">' + t('cartH') + '</h2><div class="cart-body"></div>');
+    cartDlg.addEventListener('close', function () { cartDlg = null; head(); if (ui) ui.draw(); if (location.hash === '#cart') try { history.replaceState(null, '', '#' + S.tab); } catch (e) { /* ок */ } });
+    drawCart();
+  }
+  function drawCart(msg) {
+    if (!cartDlg) return;
+    var B = window.PPBirds, C = window.PPCatalog, box = cartDlg.querySelector('.cart-body'), items = PPCart.list(), n = 0, sum = 0;
+    box.innerHTML = '';
+    if (msg) box.insertAdjacentHTML('beforeend', '<p class="cart-msg">' + msg + '</p>');
+    if (!items.length) {
+      box.insertAdjacentHTML('beforeend', '<p class="cart-empty">' + t('cartEmpty') + '</p>');
+    }
+    var ul = document.createElement('ul'); ul.className = 'cart-list';
+    items.forEach(function (x) {
+      var k = x.kind, v = x.item, s = row(k, v), cap = capOf(k, v), q = Math.min(x.n, cap);
+      n += q; sum += q * s.price;
+      var li = document.createElement('li'); li.className = 'cart-row' + (cap ? '' : ' off');
+      li.appendChild(C.pic(k, v, me.id, 56));
+      var tx = document.createElement('div'); tx.className = 'cart-tx';
+      tx.innerHTML = '<b></b><span></span>';
+      tx.querySelector('b').textContent = B.giftName(k, v, L);
+      tx.querySelector('span').textContent = cap ? (s.price ? t('each').replace('{p}', s.price) : t('free')) : (s.stock > 0 ? t('max') : t('sold')) + ' · ' + t('cartOff');
+      li.appendChild(tx);
+      var qb = document.createElement('div'); qb.className = 'cart-q';
+      var minus = document.createElement('button'), num = document.createElement('b'), plus = document.createElement('button'), del = document.createElement('button');
+      minus.type = plus.type = del.type = 'button'; minus.textContent = '−'; plus.textContent = '＋'; del.textContent = '✕';
+      minus.setAttribute('aria-label', '−1'); plus.setAttribute('aria-label', '+1'); del.setAttribute('aria-label', t('cartDel')); del.className = 'cart-del';
+      num.textContent = cap ? q : x.n;
+      minus.disabled = !cap || q <= 1; plus.disabled = !cap || q >= cap;
+      minus.onclick = function () { PPCart.set(k, v, q - 1); drawCart(); };
+      plus.onclick = function () { PPCart.set(k, v, q + 1); drawCart(); };
+      del.onclick = function () { PPCart.set(k, v, 0); drawCart(); };
+      if (cap) { qb.appendChild(minus); qb.appendChild(num); qb.appendChild(plus); }
+      qb.appendChild(del); li.appendChild(qb);
+      ul.appendChild(li);
+    });
+    if (items.length) box.appendChild(ul);
+    var foot = document.createElement('div'); foot.className = 'cart-foot';
+    if (n) foot.insertAdjacentHTML('beforeend', '<p class="cart-sum"><b>' + t('cartSum').replace('{n}', n).replace('{p}', sum) + '</b><span>' + t('cartHave').replace('{n}', money()) + (money() < sum ? ' · ' + t('cartLack').replace('{p}', sum - money()) : '') + '</span></p>');
+    var go = document.createElement('button'); go.type = 'button'; go.className = 'cta-btn cart-buy';
+    if (n) {
+      go.textContent = money() < sum ? T.poorFor[L].replace('{p}', sum) : t('buyAll').replace('{p}', sum);
+      go.disabled = !n || money() < sum;
+      go.onclick = function () { buyAll(go); };
+    } else { go.textContent = t('cartGo'); go.onclick = function () { cartDlg.close(); }; }
+    foot.appendChild(go);
+    if (items.length) {
+      var cl = document.createElement('button'); cl.type = 'button'; cl.className = 'cart-clear'; cl.textContent = t('cartClear');
+      cl.onclick = function () { PPCart.clear(); drawCart(); };
+      foot.appendChild(cl);
+    }
+    box.appendChild(foot);
+  }
+  // по одной вещи, по очереди; купленное убирается из корзины, некупленное остаётся
+  function buyAll(go) {
+    var queue = [], got = [], fail = false;
+    PPCart.list().forEach(function (x) { var q = Math.min(x.n, capOf(x.kind, x.item)); for (var i = 0; i < q; i++) queue.push(x); });
+    go.disabled = true; go.textContent = t('buying');
+    cartDlg.querySelectorAll('.cart-q button, .cart-clear').forEach(function (b) { b.disabled = true; });
+    function next() {
+      var x = queue.shift();
+      if (!x) return done();
+      var s = row(x.kind, x.item);
+      fetch('/api/shop/buy', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ kind: x.kind, item: x.item, price: s.price }) })
+        .then(function (r) { return r.json().then(function (d) { return { ok: r.ok, d: d }; }); })
+        .then(function (r) {
+          if (!r.ok) { fail = true; if (r.d.error === 'poor') queue = []; else queue = queue.filter(function (y) { return y !== x; }); return next(); }
+          me.btn.buttons = r.d.buttons; s.stock--;
+          var gk = r.d.kind || x.kind, gi = r.d.item || x.item;
+          (me.gifts = me.gifts || []).push({ kind: gk, item: gi, status: 'bag', note: 'shop' });
+          owned[key(gk, gi)] = (owned[key(gk, gi)] || 0) + 1;
+          PPCart.set(x.kind, x.item, PPCart.has(x.kind, x.item) - 1); got.push([gk, gi]);
+          next();
+        }).catch(function () { fail = true; done(); });
+    }
+    function done() {
+      if (window.PPAccount && PPAccount.setButtons) PPAccount.setButtons(money());
+      var msg = got.length ? t('bought').replace('{n}', got.length) : '';
+      if (fail) msg += (msg ? ' ' : '') + t('cartRest');
+      drawCart(msg);
+      if (got.length && window.PPToast) window.PPToast(t('bought').replace('{n}', got.length), { action: t('toBag'), ms: 7000, onAction: function () { location.href = pre + '/bird/#bag'; } });
+      load();
+    }
+    next();
   }
   function buy(kind, item, price, b, d) {
     var B = window.PPBirds; b.disabled = true;
@@ -166,9 +281,14 @@
       if (!me && S.show === 'mine') S.show = '';
       head(); drawNew();
       var y = scrollY; drawCat(); scrollTo(0, y); // после покупки список не прыгает
+      if (cartDlg) drawCart(cartDlg.querySelector('.cart-msg') ? cartDlg.querySelector('.cart-msg').textContent : '');
+      else if (location.hash === '#cart' && me) openCart();
     });
   }
-  addEventListener('hashchange', function () { if (fromHash() && ui) { saveF(); ui.draw(); catBox.scrollIntoView({ behavior: 'smooth' }); } });
+  var hdCart = document.getElementById('hd-cart');
+  if (hdCart) hdCart.addEventListener('click', function (e) { if (!me) return; e.preventDefault(); openCart(); });
+  addEventListener('pp-cart', function () { if (!cartDlg) head(); });
+  addEventListener('hashchange', function () { if (location.hash === '#cart' && me) return openCart(); if (fromHash() && ui) { saveF(); ui.draw(); catBox.scrollIntoView({ behavior: 'smooth' }); } });
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', load); else load();
 })();
 </script>

@@ -148,6 +148,8 @@
     if (!a) return;
     a.hidden = n == null;
     if (n != null) { a.querySelector('b').textContent = n; a.href = pre + '/shop/'; }
+    const c = document.getElementById('hd-cart'); // 🛒 корзина (cart.js) — рядом с пуговками
+    if (c) { c.hidden = n == null; c.href = pre + '/shop/#cart'; }
   }
   window.PPAccount = { check, openSignIn, signedIn: () => !!(info && info.user), pwDialog, logoutAll, setButtons };
   check();
