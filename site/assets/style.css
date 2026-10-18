@@ -4402,7 +4402,9 @@ html.me-in .home-new:not([hidden]) { display: block; }
 .hn-ico { flex: none; font-size: 26px; }
 .hn-list small { display: block; color: var(--peach); font-size: 13px; }
 .hn-list b { display: block; font-size: 16px; line-height: 1.35; }
-.hn-pics { display: flex; gap: 4px; margin-left: auto; }
+.hn-list a:has(.hn-pics) { flex-wrap: wrap; }
+.hn-pics { display: flex; flex-wrap: wrap; gap: 10px; flex-basis: 100%; padding-left: 38px; }
+.hn-list a:has(.hn-pics) > span:nth-child(2) { flex: 1; min-width: 0; }
 .hn-pics > * { width: 36px; height: 36px; }
 .home-req { margin: 40px var(--gutter); padding: 30px 24px; border-radius: 22px; background: var(--bg-card); border: 1.5px dashed var(--peach); text-align: center; }
 .home-req .hr-kick { margin: 0 0 4px; font: italic 400 18px var(--serif); color: var(--peach); }
