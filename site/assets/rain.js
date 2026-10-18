@@ -37,8 +37,6 @@
     reached: [n => `You passed ${n} ${n === 1 ? 'level' : 'levels'}`, n => `Пройдено уровней: ${n}`, n => `Pārvarēti līmeņi: ${n}`],
     newBest: ['🏆 New record!', '🏆 Новый рекорд!', '🏆 Jauns rekords!'],
     earned: [n => `+${n} 🔘 this game`, n => `+${n} 🔘 за эту игру`, n => `+${n} 🔘 šajā spēlē`],
-    top: ['🏆 Records', '🏆 Рекорды', '🏆 Rekordi'], topNone: ['No records yet: be the first!', 'Рекордов пока нет — будь первой птичкой!', 'Rekordu vēl nav — esi pirmais!'],
-    lvShort: ['lvl', 'ур.', 'līm.'],
     badge: [n => `🏅 New achievement: “${n}”`, n => `🏅 Новое достижение: «${n}»`, n => `🏅 Jauns sasniegums: “${n}”`],
     noSave: ['Could not save the level: buttons were not added.', 'Не получилось сохранить уровень: пуговки не начислены.', 'Neizdevās saglabāt līmeni: pogas netika pieskaitītas.'],
   };
@@ -50,7 +48,7 @@
   app.innerHTML = `<div class="rain-stage"><canvas class="rain-cv" aria-label="${esc(t('title'))}"></canvas>
     <button type="button" class="rain-pause" aria-label="${esc(t('pauseBtn'))}" hidden>❚❚</button>
     <div class="rain-ov"></div></div>
-    <section class="rain-top"><h2>${t('top')}</h2><ol class="rain-list"></ol></section>`;
+    <section class="rain-top" data-top="rain"></section>`;
   const cv = app.querySelector('.rain-cv'), ov = app.querySelector('.rain-ov'), pauseBtn = app.querySelector('.rain-pause'), stage = app.querySelector('.rain-stage');
   const ctx = cv.getContext('2d');
   const W = 360, H = 560, GROUND = H - 34, BY = GROUND - 26; // логический размер поля; BY — центр птички
@@ -69,16 +67,8 @@
   // ---------- данные с сервера ----------
   let info = { on: true, per: 1, max: 5, today: 0, best: 0, me: null, top: [] };
   const load = () => fetch('/api/game', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => { if (d) info = d; makeBird(); topList(); if (state === 'menu' || state === 'over') showOverlay(); }).catch(() => {});
-  function topList() {
-    const ol = app.querySelector('.rain-list'), B = window.PPBirds;
-    ol.innerHTML = info.top.length ? '' : `<li class="rain-none">${t('topNone')}</li>`;
-    info.top.forEach(r => {
-      const li = document.createElement('li'); if (info.me && r.id === info.me.id) li.className = 'me';
-      if (B) li.appendChild(B.avatar(r.id, r.avatar, 34));
-      li.insertAdjacentHTML('beforeend', `${ol.children.length === 0 ? '<span class="rain-crown" title="+' + (info.king || 0) + ' 🔘">👑</span>' : ''}<a href="${['', '/ru', '/lv'][L]}/bird/?nick=${encodeURIComponent(r.nick)}">@${esc(r.nick)}</a><b>${r.best} ${t('lvShort')}</b>`);
-      ol.appendChild(li);
-    });
-  }
+  // доска топа — top-board.js (PPTop); у первого места за всё время корона: +king 🔘 в день
+  function topList() { const el = app.querySelector('.rain-top'); if (!window.PPTop || !el) return; const fresh = !el.__top; window.PPTop.mount(el, { crown: info.king ? '+' + info.king + ' 🔘' : '' }); if (!fresh) window.PPTop.refresh(el); }
 
   // ---------- птичка: спрайт игрока (или случайной птички для гостя) ----------
   let frames = [], bw = 40, bh = 40;

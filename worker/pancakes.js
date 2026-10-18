@@ -22,7 +22,7 @@ export const PAN_COND = { panA: 5, panB: 15, panC: 30, panStar: 10 };
 
 const TOP = 'SELECT id, nick, avatar, pan_best FROM users WHERE pan_best > 0 AND banned = 0 AND nick IS NOT NULL ORDER BY pan_best DESC, COALESCE(pan_best_at, 0), id LIMIT ';
 
-// h: json, fail, currentUser, needUser, rules, rigaDay, unit, btnOf, award, avatarOf, badge(u, k), item(req, uid, note), randomHex, now
+// h: json, fail, currentUser, needUser, rules, rigaDay, unit, btnOf, award, avatarOf, top(uid, n), badge(u, k), item(req, uid, note), randomHex, now
 export async function pancakesApi(req, env, url, h) {
   const p = url.pathname, m = req.method, { json, fail } = h, R = h.rules();
   const price = (unit, lv) => h.btnOf(R.panLevelPct, unit) * (1 + Math.floor((lv - 1) / 10));
@@ -71,6 +71,7 @@ export async function pancakesApi(req, env, url, h) {
     const upd = await env.DB.prepare('UPDATE pan_runs SET level = ?, stars = ? WHERE id = ? AND level = ?').bind(lv, stars, r.id, r.level).run();
     if (!upd.meta.changes) fail(409, 'order');
     const oldBest = u.pan_best || 0, unit = await h.unit(), day = h.rigaDay();
+    await h.top(u.id, lv); // доска топа: лучший забег недели
     if (lv > oldBest) await env.DB.prepare('UPDATE users SET pan_best = ?, pan_best_at = ? WHERE id = ? AND COALESCE(pan_best, 0) < ?').bind(lv, Date.now(), u.id, lv).run();
     const badges = [];
     for (const [k, ok] of [['pan1', lv >= R.cond.panA], ['pan2', lv >= R.cond.panB], ['pan3', lv >= R.cond.panC], ['panstar', stars >= R.cond.panStar]]) if (ok && await h.badge(u, k)) badges.push(k);
