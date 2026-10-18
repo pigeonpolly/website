@@ -673,6 +673,27 @@
     garlic: { n: N('String of garlic', 'Связка чеснока', 'Ķiploku pīne'), w: 7, h: 15, d: p => { p(3, 0, 1, 15, '#C8B68A'); for (let i = 0; i < 4; i++) { const y = 2 + i * 3, x = i % 2 ? 4 : 0; p(x, y, 3, 3, '#F4F0EA'); p(x + 1, y - 1, 1, 1, '#E2DCCF'); p(x, y + 2, 3, 1, '#E2DCCF'); } } },
     menuboard: { n: N('Menu of the day', 'Меню дня', 'Dienas ēdienkarte'), w: 16, h: 14, d: p => { p(0, 0, 16, 14, '#8C5A3C'); p(1, 1, 14, 12, '#2E3A33'); p(3, 3, 10, 1, '#F4F0EA'); p(3, 6, 8, 1, '#E9C46A'); p(3, 8, 9, 1, '#F4F0EA'); p(3, 10, 6, 1, '#F4F0EA'); p(12, 10, 2, 1, '#F28AB2'); } },
   });
+  // ---------- тема «🥞 Блинная» (по игре «Блинная Полли», ★ — башня и волшебная сковородка) ----------
+  Object.assign(WALL, {
+    pancakewall: [['Pancake wallpaper', 'Обои с блинчиками', 'Pankūku tapetes'], tileWall('#FFF4DC', ['.bbb.', 'ooooo', 'yyyyy', 'ooooo'], { b: '#FFE08A', o: '#D99A4A', y: '#E9B86A' }, 12, 10, 6)],
+  });
+  Object.assign(CURT, {
+    butter: [['Butter-yellow curtains', 'Масляно-жёлтые шторы', 'Sviesta dzeltenie aizkari'], ['#F6D04D', '#E9B83A'], '#FFFFFF'],
+  });
+  Object.assign(FURN, {
+    pancakepan: { n: N('Frying pan with a pancake', 'Сковородка с блином', 'Panna ar pankūku'), w: 16, h: 8, top: null, d: (p, t) => { const ph = (t % 3000) / 3000, up = ph < .25 ? Math.round(Math.sin(ph / .25 * Math.PI) * 4) : 0; p(2, 4 - up, 7, 1, ph > .08 && ph < .17 ? '#E9B86A' : '#D99A4A'); p(3, 3 - up, 5, 1, '#E9B86A'); p(0, 5, 11, 1, '#3A3550'); p(1, 6, 9, 1, '#2B2340'); p(2, 7, 7, 1, '#2B2340'); p(11, 5, 4, 1, '#5B5670'); p(15, 4, 1, 2, '#8C5A3C'); } },
+    batterbowl: { n: N('Bowl of batter', 'Миска с тестом', 'Bļoda ar mīklu'), w: 11, h: 9, top: null, d: (p, t) => { const o = Math.floor(t / 200) % 2; p(0, 4, 11, 1, '#F4E3B5'); p(6 + o, 0, 1, 4, '#9A96A8'); p(5 + o, 3, 3, 2, '#C9CDD6'); p(0, 5, 11, 1, '#7FB3E8'); p(1, 6, 9, 1, '#7FB3E8'); p(2, 7, 7, 1, '#5E92C8'); p(3, 8, 5, 1, '#5E92C8'); p(2, 5, 2, 1, '#BFE3F5'); } },
+    jamjars: { n: N('Jars of jam', 'Баночки варенья', 'Ievārījuma burciņas'), w: 13, h: 8, top: null, d: p => { [[0, 2, '#E5484D', '#B83A32'], [5, 0, '#8E4FB8', '#6B3A8E'], [10, 2, '#F08A3B', '#C96A26']].forEach(([x, y, c, d]) => { p(x, y, 3, 1, '#F4F0EA'); p(x + 1, y, 1, 1, '#E5484D'); p(x, y + 1, 3, 7 - y - 1, c); p(x, 7, 3, 1, d); p(x, y + 2, 1, 2, 'rgba(255,255,255,.55)'); p(x, y + 4, 3, 1, '#F4F0EA'); }); } },
+    honeypot: { n: N('Honey pot', 'Горшочек мёда', 'Medus podiņš'), w: 9, h: 9, top: null, d: (p, t) => { const k = Math.floor(t / 250) % 4; p(1, 0, 7, 1, '#C8955E'); p(2, 1, 5, 1, '#8C5A3C'); p(0, 2, 9, 6, '#E9A93B'); p(1, 3, 2, 1, '#FFE08A'); p(1, 5, 7, 1, '#B5782E'); p(1, 8, 7, 1, '#B5782E'); p(2, 2, 1, 1 + k, '#F6C445'); p(6, 2, 1, 1 + ((k + 2) % 4), '#F6C445'); } },
+    pancakecart: { n: N('Wobbleland pancake cart', 'Блинная тележка Воббленда', 'Vobllendas pankūku ratiņi'), w: 34, h: 26, top: 10, d: p => { for (let i = 0; i < 34; i += 4) { p(i, 0, 2, 4, '#E5484D'); p(i + 2, 0, 2, 4, '#F4F0EA'); p(i, 4, 2, 1, '#B83A32'); } p(1, 5, 1, 5, '#8C5A3C'); p(32, 5, 1, 5, '#8C5A3C'); p(0, 10, 34, 2, '#C8955E'); p(0, 11, 34, 1, '#A0673C'); p(1, 12, 32, 10, '#F6D04D'); p(1, 12, 32, 1, '#E9B83A'); p(10, 14, 14, 6, '#F4F0EA'); p(15, 15, 4, 1, '#FFF3A8'); p(13, 16, 8, 1, '#E9B86A'); p(12, 17, 10, 1, '#D99A4A'); p(13, 18, 8, 1, '#E9B86A'); p(14, 16, 1, 2, '#8B4A20'); p(4, 22, 5, 4, '#2B2340'); p(5, 23, 3, 2, '#9A96A8'); p(25, 22, 5, 4, '#2B2340'); p(26, 23, 3, 2, '#9A96A8'); } },
+    // ★ легендарные
+    pancaketower: { n: N('Sky-high pancake tower', 'Блинная башня до потолка', 'Pankūku tornis līdz griestiem'), w: 18, h: 40, top: null, glow: [9, 2], d: (p, t) => { let o = 0; for (let i = 0; i < 17; i++) { const y = 36 - i * 2; o = Math.round(Math.sin(t / 700 + i * .5) * i / 10); p(2 + o, y, 14, 2, i % 2 ? '#E9B86A' : '#D99A4A'); p(2 + o, y + 1, 14, 1, i % 2 ? '#D99A4A' : '#C98A3E'); } const f = Math.floor(t / 90) % 36; p(4 + o, 3, 10, 1, '#8B4A20'); p(5 + o, 4, 1, Math.min(f, 32), '#8B4A20'); p(12 + o, 4, 1, Math.min((f + 15) % 36, 30), '#8B4A20'); p(7 + o, 1, 4, 2, '#FFF3A8'); p(8 + o, 1, 2, 1, '#FFFFFF'); p(9 + o, 0, 1, 1, '#E5484D'); p(0, 38, 18, 1, '#F4F0EA'); p(1, 39, 16, 1, '#C9CDD6'); if (Math.sin(t / 300) > .7) p(15 + o, 10, 1, 1, '#FFFFFF'); } },
+    magicpan: { n: N('Polly’s magic frying pan', 'Волшебная сковородка Полли', 'Pollijas burvju panna'), w: 20, h: 22, top: null, glow: [8, 15], d: (p, t) => { const ph = (t % 2400) / 2400, up = ph < .5 ? Math.round(Math.sin(ph / .5 * Math.PI) * 12) : 0, py = 16 + Math.round(Math.sin(t / 500)); for (let i = 0; i < 4; i++) p(3 + i * 4 + (Math.floor(t / 150) + i) % 2, 20 + (Math.floor(t / 200) + i) % 2, 1, 1, i % 2 ? '#F6D04D' : '#FFFFFF'); const cy = py - 1 - up, flip = ph > .15 && ph < .35; p(3, cy, 9, 1, flip ? '#FFF3A8' : '#E9B86A'); if (!flip) p(4, cy - 1, 7, 1, '#D99A4A'); if (up > 3) { p(2, cy + 3, 1, 1, '#FFFFFF'); p(12, cy + 5, 1, 1, '#F6D04D'); p(7, cy + 7, 1, 1, '#FFFFFF'); } p(1, py, 13, 1, '#E9C46A'); p(2, py + 1, 11, 1, '#C9A13B'); p(3, py + 2, 9, 1, '#A07E2A'); p(14, py, 4, 1, '#C9A13B'); p(18, py - 1, 2, 2, '#E5484D'); } },
+  });
+  Object.assign(DECO, {
+    pancakesign: { n: N('“Pancakes” sign', 'Вывеска «Блины»', 'Izkārtne «Pankūkas»'), w: 18, h: 10, d: p => { p(3, 0, 1, 2, '#8C5A3C'); p(14, 0, 1, 2, '#8C5A3C'); p(0, 2, 18, 8, '#8C5A3C'); p(1, 3, 16, 6, '#C8955E'); p(7, 4, 4, 1, '#FFF3A8'); p(5, 5, 8, 1, '#D99A4A'); p(5, 6, 8, 1, '#E9B86A'); p(5, 7, 8, 1, '#D99A4A'); p(6, 5, 1, 2, '#8B4A20'); p(11, 5, 1, 3, '#8B4A20'); } },
+    orderslips: { n: N('Orders on a string', 'Заказы на верёвочке', 'Pasūtījumi uz auklas'), w: 20, h: 9, d: (p, t) => { p(0, 0, 20, 1, '#C8B68A'); [1, 6, 11, 15].forEach((x, i) => { const o = Math.sin(t / 600 + i) > .3 ? 1 : 0; p(x + 1, 1, 1, 1, '#E5484D'); p(x + o, 2, 3, 6, '#FFFDF8'); p(x + o, 3, 3, 1, '#C9CDD6'); p(x + o, 5, 2, 1, '#C9CDD6'); p(x + o + 1, 7, 1, 1, ['#E5484D', '#E9C46A', '#4CC38A', '#8E4FB8'][i]); }); } },
+  });
   // привидение из склепа (рисуется поверх двери)
   function g2(p, x, y) { spr((a, b, w, h, c) => p(x + a, y + b, w, h, c), ['.www.', 'wkwkw', 'wwwww', 'w.w.w'], { w: '#F4F0FA', k: '#2B2340' }); }
   // ---------- подробные (HD) версии основных вещей: полупиксели, контур, блики и тени; размеры прежние ----------
@@ -1084,7 +1105,7 @@
   };
 
   // ---------- регистрация в каталоге подарков (коллекции, магазин, сумка, адвент, кабинет) ----------
-  const LEG = ['furn|countcoffin', 'furn|crypt', 'furn|tieredcake', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass', 'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight']; // то же в worker/index.js LEGEND
+  const LEG = ['furn|countcoffin', 'furn|crypt', 'furn|tieredcake', 'furn|pancaketower', 'furn|magicpan', 'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass', 'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight']; // то же в worker/index.js LEGEND
   Object.assign(B.GIFTS, { wall: Object.keys(WALL).filter(k => k !== '_'), floor: Object.keys(FLOOR).filter(k => k !== '_'), view: Object.keys(VIEW).filter(k => k !== '_'),
     curtain: Object.keys(CURT), furn: vals(FURN).filter(x => !FURN[parse(x)[0]].game && !FURN[parse(x)[0]].fixed), deco: vals(DECO).filter(x => !DECO[parse(x)[0]].game) }); // game: true — вещи только из игр; fixed — альбом, он в комнате сам
   LEG.forEach(x => B.LEGEND.add(x));
@@ -1129,6 +1150,7 @@
   B.GIFT_THEMES.push(['vampire', ['🧛 Vampire', '🧛 Вампирское', '🧛 Vampīru'], ['furn|countcoffin', 'furn|coffin', 'furn|candelabra', 'furn|gothicchair', 'furn|goblet', 'deco|hangingbat', 'deco|countportrait', 'deco|garlic', 'wall|gothic', 'floor|castlerug', 'view|castlemoon', 'curtain|crimson', 'curtain|velvet', 'wall|bats', 'deco|batgarland', 'furn|blackcat', 'furn|skullcandle']]);
   B.GIFT_THEMES.push(['graveyard', ['🪦 Graveyard', '🪦 Кладбищенское', '🪦 Kapsētas'], ['furn|crypt', 'furn|crossgrave', 'furn|graveangel', 'furn|gravelantern', 'furn|deadtree', 'furn|raven', 'furn|shovel', 'furn|tombstone', 'deco|fog', 'deco|ghost', 'deco|web', 'wall|mossbrick', 'floor|gravesoil', 'view|foggrave', 'view|spooky', 'curtain|ragged']]);
   B.GIFT_THEMES.push(['chef', ['👩‍🍳 Chef', '👩‍🍳 Поварское', '👩‍🍳 Pavāru'], ['furn|tieredcake', 'furn|chefcounter', 'furn|souppot', 'furn|pancakes', 'furn|mixer', 'furn|spicerack', 'furn|cuttingboard', 'furn|baguettes', 'deco|ladles', 'deco|garlic', 'deco|menuboard', 'wall|kitchentiles', 'floor|checker', 'curtain|polkadot', 'hat|chef', 'item|spoon', 'item|cheese', 'item|croissant', 'furn|stove', 'furn|fridge', 'furn|coffeemachine', 'furn|toaster', 'furn|breadbasket']]);
+  B.GIFT_THEMES.push(['pancake', ['🥞 Pancakes', '🥞 Блинная', '🥞 Pankūku'], ['furn|pancaketower', 'furn|magicpan', 'hat|pancakecrown', 'item|goldspatula', 'furn|pancakecart', 'furn|pancakepan', 'furn|batterbowl', 'furn|jamjars', 'furn|honeypot', 'furn|pancakes', 'deco|pancakesign', 'deco|orderslips', 'wall|pancakewall', 'curtain|butter', 'hat|pancakehat', 'item|spatula', 'item|pancake', 'item|syrup', 'hat|chef', 'furn|stove', 'furn|mixer', 'floor|checker']]);
   addTh('magic', ['furn|portal', 'furn|dragon', 'deco|constellation', 'curtain|starlight']);
   addTh('pirate', ['furn|treasure']);
   B.GIFT_THEMES.push(['music', ['🎵 Music', '🎵 Музыка', '🎵 Mūzika'], ['furn|guitar', 'furn|piano', 'furn|drum', 'furn|speaker', 'furn|recordplayer', 'furn|gramophone', 'furn|radio', 'deco|discoball']]);
@@ -1321,11 +1343,11 @@
       play: ['tv', 'console', 'computer', 'arcade', 'handheld', 'tamagotchi'],
       music: ['piano', 'guitar', 'drum', 'speaker', 'recordplayer', 'gramophone', 'radio'],
       read: ['books', 'bookshelf', 'spellbook', 'desk'],
-      eat: ['goblet', 'souppot', 'pancakes', 'baguettes', 'cuttingboard', 'tieredcake', 'mixer', 'mug', 'teapot', 'cake', 'cookies', 'donuts', 'watermelon', 'pizzabox', 'breadbasket', 'applebasket', 'lemonade', 'wormchips', 'seedbag', 'candybowl', 'giantcoffee', 'gingerhouse', 'coffeemachine', 'stove', 'fridge', 'toaster'],
+      eat: ['goblet', 'souppot', 'pancakes', 'pancakepan', 'batterbowl', 'jamjars', 'honeypot', 'pancaketower', 'baguettes', 'cuttingboard', 'tieredcake', 'mixer', 'mug', 'teapot', 'cake', 'cookies', 'donuts', 'watermelon', 'pizzabox', 'breadbasket', 'applebasket', 'lemonade', 'wormchips', 'seedbag', 'candybowl', 'giantcoffee', 'gingerhouse', 'coffeemachine', 'stove', 'fridge', 'toaster'],
       splash: ['fishbowl', 'bathtub', 'fountain', 'wateringcan', 'rubberduck'],
       paint: ['easel', 'painttubes', 'brushjar', 'claypot'],
       warm: ['candelabra', 'gravelantern', 'fireplace', 'candle', 'skullcandle', 'phoenixnest', 'jacklantern'],
-      gaze: ['crypt', 'graveangel', 'crossgrave', 'deadtree', 'spicerack', 'telescope', 'globe', 'orb', 'portal', 'snowglobe', 'lavalamp', 'moonlamp', 'lamp', 'treasure', 'chest', 'pollystatue', 'bust', 'cauldron', 'potionshelf', 'shipbottle', 'rocket', 'grandclock', 'tombstone', 'snowman'],
+      gaze: ['magicpan', 'pancakecart', 'crypt', 'graveangel', 'crossgrave', 'deadtree', 'spicerack', 'telescope', 'globe', 'orb', 'portal', 'snowglobe', 'lavalamp', 'moonlamp', 'lamp', 'treasure', 'chest', 'pollystatue', 'bust', 'cauldron', 'potionshelf', 'shipbottle', 'rocket', 'grandclock', 'tombstone', 'snowman'],
       pet: ['raven', 'cat', 'blackcat', 'pollyplush', 'mrchew', 'dragon', 'flytrap', 'cattower', 'robovac'],
       unwrap: ['present', 'xmastree'],
       knit: ['knitting', 'yarn', 'socks'],
