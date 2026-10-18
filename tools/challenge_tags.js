@@ -13,7 +13,7 @@ const S = window.CHALLENGE_DATA.subjects;
 const FIXES = path.join(root, 'content/challenge-tags-fixes.txt'), OUT = path.join(root, 'content/challenge-tags.json');
 const BATCH = 200;
 
-const CATS = ['food', 'drink', 'animal', 'bird', 'plant', 'home', 'clothes', 'transport', 'place', 'nature', 'weather', 'tool', 'toy', 'music', 'fantasy', 'person', 'holiday'];
+const CATS = ['food', 'drink', 'animal', 'bird', 'plant', 'home', 'clothes', 'transport', 'place', 'nature', 'weather', 'tool', 'toy', 'music', 'fantasy', 'person', 'holiday', 'idea', 'life'];
 const CONTAINERS = new Set(['basket', 'bowl', 'cup', 'jar', 'box', 'bag', 'plate', 'slice', 'piece', 'bunch', 'pile', 'stack', 'pair', 'bottle', 'glass', 'set']);
 const DISHES = new Set(['pie', 'jam', 'juice', 'tart', 'soup', 'salad', 'jelly', 'sauce', 'cake', 'muffin', 'pancake', 'crumble', 'compote', 'smoothie', 'milkshake', 'lemonade', 'ice', 'cream', 'bread', 'sandwich', 'chip', 'crisp', 'stew', 'puree', 'syrup', 'tea', 'oil', 'butter', 'seed', 'peel', 'core', 'leaf', 'blossom', 'flower', 'tree', 'bush', 'branch', 'slice', 'half']);
 const STOP = new Set(['a', 'an', 'the', 'your', 'some', 'my', 'two', 'three', 'one', 'few', 'little', 'tiny', 'big', 'old', 'small', 'new']);

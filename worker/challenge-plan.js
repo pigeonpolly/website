@@ -1,6 +1,6 @@
 // Подбор тем челленджа (этап 3, docs/challenge.md «Подбор тем»): план месяца по правилам.
 // Общий для worker (cron 20-го, кабинет «🎨 Темы челленджа») и tools/challenge_check.js / challenge_oct.js (node).
-// data — site/assets/challenge-items.json (собирает build.py): subjects [en, ru, lv, сезон], tags [семья, категория, сложность], colors, tips, twists, extrasBw, times.
+// data — site/assets/challenge-items.json (собирает build.py): subjects [en, ru, lv, сезон], tags [семья, категория, сложность], colors, moreColors, bw, off, tips, twists, extrasBw, times.
 
 // числа — в «📜 Правилах» (RULE_DEFAULTS в worker/index.js берёт их отсюда)
 export const CH_DEFAULTS = {
@@ -8,16 +8,18 @@ export const CH_DEFAULTS = {
   chCatWindow: 7,    // в любые chCatWindow дней подряд —
   chCatMin: 5,       // не меньше chCatMin разных категорий (и одна категория — не два дня подряд)
   chEasy: 3, chMid: 3, chHard: 1, // «колода» сложности: сколько простых / средних / сложных на каждые (chEasy + chMid + chHard) дней
-  chSeasonPct: 66,   // сколько % дней месяца — предметы сезона (66 → ровно 2/3 при 28–31 дне)
+  chSeasonDaysPct: 80, // сколько % дней месяца — предметы сезона (80 → 5–6 дней в неделю; до 18.10.2026 было chSeasonPct = 66)
 };
-export const CH_RANGE = { chFamilyGap: [0, 365], chCatWindow: [2, 14], chCatMin: [1, 14], chEasy: [0, 14], chMid: [0, 14], chHard: [0, 14], chSeasonPct: [0, 100] };
+export const CH_RANGE = { chFamilyGap: [0, 365], chCatWindow: [2, 14], chCatMin: [1, 14], chEasy: [0, 14], chMid: [0, 14], chHard: [0, 14], chSeasonDaysPct: [0, 100] };
 export const PLAN_FROM = '2026-11-01'; // с этого дня темы — из плана (раньше — формула challenge-theme.js)
+export const NEW_FROM = '2026-10-19'; // с этого дня — новые правила: цвета 2–5, Ч/Б-указания, слова-темы и «из жизни» (18.10.2026, по просьбе Алины)
 
 const pad = n => String(n).padStart(2, '0');
 const mod = (a, b) => ((a % b) + b) % b;
 export const dayNum = key => Math.round(Date.UTC(+key.slice(0, 4), +key.slice(5, 7) - 1, +key.slice(8, 10)) / 864e5);
 export const keyOfNum = n => new Date(n * 864e5).toISOString().slice(0, 10);
-const N_OCT5 = dayNum('2026-10-05'), N_OCT9 = dayNum('2026-10-09'), N_FROM = dayNum(PLAN_FROM);
+const N_OCT5 = dayNum('2026-10-05'), N_OCT9 = dayNum('2026-10-09'), N_FROM = dayNum(PLAN_FROM), N_NEW = dayNum(NEW_FROM);
+const FRESH = 1080; // предметы с этого индекса (18.10.2026, с маленькой историей) — первыми, пока не были
 
 // те же случайные числа, что в site/assets/challenge-theme.js
 export function rngFor(str) {
@@ -48,9 +50,9 @@ export function extraDay(y, m) {
   return (extraMemo[key] = v);
 }
 const SEASON = ['winter', 'winter', 'spring', 'spring', 'spring', 'summer', 'summer', 'summer', 'autumn', 'autumn', 'autumn', 'winter'];
-// какие дни месяца — сезонные: chSeasonPct % дней, выбор — как в challenge-theme.js
+// какие дни месяца — сезонные: chSeasonDaysPct % дней, выбор — как в challenge-theme.js
 const seasonMemo = {};
-export function seasonalDays(y, m, pct = CH_DEFAULTS.chSeasonPct) {
+export function seasonalDays(y, m, pct = CH_DEFAULTS.chSeasonDaysPct) {
   const mk = y + '-' + m + '-' + pct; if (seasonMemo[mk]) return seasonMemo[mk];
   const days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(), o = orderOf('season-' + y + '-' + m, days), n = Math.ceil(days * pct / 100);
   const out = new Set(); for (let i = 0; i < n; i++) out.add(o[i] + 1);
@@ -95,18 +97,91 @@ function colorBlock(data, b) {
   }
   return blocks[b];
 }
+// ---------- с 1.11.2026: гармоничные цвета (2–5) из colors + moreColors ----------
+// все цвета плана: индексы 0–9 — colors, 10+ — moreColors; k: 'n' — нейтральный, f — бейдж за цвет (иначе n[0])
+export const allColors = data => data.colors.concat(data.moreColors || []);
+function hsl(hex) {
+  const v = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255), mx = Math.max(...v), mn = Math.min(...v), l = (mx + mn) / 2, dd = mx - mn;
+  if (!dd) return { h: 0, s: 0, l };
+  const [r, g, b] = v, h = mx === r ? ((g - b) / dd + 6) % 6 : mx === g ? (b - r) / dd + 2 : (r - g) / dd + 4;
+  return { h: h * 60, s: dd / (1 - Math.abs(2 * l - 1)), l };
+}
+// насколько два цвета различаются на глаз (ΔE в Lab): меньше MIN_DE — в одном дне не ставим (индиго и тёмно-синий, кремовый и бежевый…)
+function lab(hex) {
+  const v = [1, 3, 5].map(i => { const c = parseInt(hex.slice(i, i + 2), 16) / 255; return c > 0.04045 ? ((c + 0.055) / 1.055) ** 2.4 : c / 12.92; });
+  const xyz = [[0.4124, 0.3576, 0.1805], [0.2126, 0.7152, 0.0722], [0.0193, 0.1192, 0.9505]].map((r, k) => (r[0] * v[0] + r[1] * v[1] + r[2] * v[2]) / [0.9505, 1, 1.089][k]);
+  const f = t => t > 0.008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116, [x, y, z] = xyz.map(f);
+  return [116 * y - 16, 500 * (x - y), 200 * (y - z)];
+}
+const MIN_DE = 35;
+const dE = (a, b) => Math.hypot(a.lab[0] - b.lab[0], a.lab[1] - b.lab[1], a.lab[2] - b.lab[2]);
+const hueGap = (a, b) => { const x = Math.abs(a - b) % 360; return x > 180 ? 360 - x : x; };
+const SEASON_OF = m => SEASON[m];
+// насколько цвет подходит сезону (вес при выборе акцента)
+function seasonW(c, season) {
+  const warm = c.h < 70 || c.h > 320;
+  if (season === 'autumn') return warm || (c.h < 100 && c.l < 0.5) ? 4 : c.l < 0.35 ? 2 : 0.6;
+  if (season === 'winter') return !warm || c.l < 0.35 ? 2 : 0.8;
+  if (season === 'spring') return c.l > 0.6 ? 2.5 : 1;
+  if (season === 'summer') return c.s > 0.6 && c.l > 0.45 ? 2.5 : 1;
+  return 1;
+}
+// схемы: нейтральные + 1 акцент; соседние оттенки; дополнительные; главный + поддержка (5). Два ярких одного оттенка (голубой и индиго) — никогда
+const SCHEMES = [['accent', 38], ['analog', 27], ['compl', 22], ['five', 13]];
+function harmonyFor(data, key, avoid) {
+  const all = allColors(data).map((c, i) => ({ i, k: c.k, lab: lab(c.hex), ...hsl(c.hex) }));
+  const N = all.filter(c => c.k === 'n'), A = all.filter(c => c.k !== 'n' && !avoid.has(c.i));
+  const season = SEASON_OF(+key.slice(5, 7) - 1), r = rngFor('harmony-' + key);
+  let out = [];
+  const far = list => list.filter(c => !out.includes(c) && out.every(o => dE(c, o) >= MIN_DE && (c.k === 'n' || o.k === 'n' || hueGap(c.h, o.h) >= 45))); // только заметно другие, чем уже выбранные
+  const pickW = (list0, w) => { const list = far(list0); if (!list.length) return null; const tot = list.reduce((t, c) => t + w(c), 0); let x = r() * tot; for (const c of list) { x -= w(c); if (x <= 0) return c; } return list[list.length - 1]; };
+  const pickN = (k, from = N) => { const got = []; for (let j = 0; j < k; j++) { const pool = far(from).filter(c => got.every(o => dE(c, o) >= MIN_DE) && !got.includes(c)); if (!pool.length) break; got.push(pool[Math.floor(r() * pool.length)]); } return got; };
+  const sw = c => seasonW(c, season);
+  let x = r() * 100, scheme = 'accent'; for (const [s2, w] of SCHEMES) { x -= w; if (x <= 0) { scheme = s2; break; } }
+  const add = c => { if (c) out.push(c); return c; }, addN = k => pickN(k).forEach(add);
+  const a = add(pickW(A, sw));
+  if (scheme === 'accent') addN(r() < 0.3 ? 1 : r() < 0.6 ? 2 : 3);
+  else if (scheme === 'analog') { // соседние по кругу, но заметно разные
+    const near = c => hueGap(c.h, a.h) >= 45 && hueGap(c.h, a.h) <= 100;
+    if (add(pickW(A.filter(near), sw)) && r() < 0.5) add(pickW(A.filter(near), sw));
+    if (out.length < 3 || r() < 0.4) addN(1);
+  } else if (scheme === 'compl') {
+    add(pickW(A.filter(c => hueGap(c.h, a.h) >= 150), sw));
+    addN(r() < 0.3 ? 0 : r() < 0.7 ? 1 : 2);
+  } else if (scheme === 'five') {
+    add(pickW(A.filter(c => hueGap(c.h, a.h) >= 45 && hueGap(c.h, a.h) <= 100), sw));
+    add(pickW(A.filter(c => hueGap(c.h, a.h) >= 150), sw));
+    addN(5 - out.length);
+  }
+  if (out.length < 2) addN(2 - out.length);
+  if (out.length < 2) add(pickW(A, sw));
+  // по порядку: светлые → тёмные нейтральные, потом акценты
+  return out.sort((p, q) => (p.k === 'n') === (q.k === 'n') ? q.l - p.l : p.k === 'n' ? -1 : 1).map(c => c.i);
+}
+// цвета дня с 1.11: акценты не повторяют вчерашние
+export function harmonyColors(data, key) {
+  const y = harmonyFor(data, keyOfNum(dayNum(key) - 1), new Set()), all = allColors(data);
+  return harmonyFor(data, key, new Set(y.filter(i => all[i].k !== 'n')));
+}
+// ---------- с 1.11.2026: Ч/Б-указание — одно в день, группы по очереди (раскадровка, линия и штриховка, размер, настроение) ----------
+const BW_GROUPS = ['frame', 'line', 'size', 'mood'];
+export function bwTwist(data, n) {
+  const k = n - N_NEW, g = BW_GROUPS[mod(k, BW_GROUPS.length)], L = data.bw[g];
+  // внутри группы — по кругу без повторов
+  return L[orderOf('bw-' + g, L.length)[mod(Math.floor(k / BW_GROUPS.length), L.length)]].slice(0, 3);
+}
 export function baseDay(data, key) {
   const n = dayNum(key), y = +key.slice(0, 4), m = +key.slice(5, 7) - 1, d = +key.slice(8, 10);
   const r = rngFor('polly-' + key); r();
   const cols = data.colors.map((c, i) => i);
   for (let i = cols.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [cols[i], cols[j]] = [cols[j], cols[i]]; }
-  const colors = n >= N_OCT9 ? colorBlock(data, Math.floor((n - N_OCT9) / 8))[(n - N_OCT9) % 8].slice() : cols.slice(0, 3);
+  const colors = n >= N_NEW && data.moreColors && data.moreColors.length ? harmonyColors(data, key) : n >= N_OCT9 ? colorBlock(data, Math.floor((n - N_OCT9) / 8))[(n - N_OCT9) % 8].slice() : cols.slice(0, 3);
   const time = data.times[Math.floor(r() * data.times.length)];
   const mi = y * 12 + m - (2026 * 12 + 9);
   const extra = d === extraDay(y, m);
   return {
     colors, time, tip: data.tips[n % data.tips.length].slice(0, 3),
-    twist: data.twists[orderOf('polly-twist', data.twists.length)[mod(n - N_OCT5, data.twists.length)]].slice(0, 3),
+    twist: n >= N_NEW && data.bw ? bwTwist(data, n) : data.twists[orderOf('polly-twist', data.twists.length)[mod(n - N_OCT5, data.twists.length)]].slice(0, 3),
     extra: extra ? data.extrasBw[orderOf('polly-extrabw', data.extrasBw.length)[mod(mi, data.extrasBw.length)]].slice(0, 3) : null,
   };
 }
@@ -146,28 +221,37 @@ export function violations(data, rules, plan, n, item, skip = {}, ctx = null) {
 export function poolOf(data, rules, key) {
   const y = +key.slice(0, 4), m = +key.slice(5, 7) - 1, d = +key.slice(8, 10);
   if (m === 0 && d === 23) return 'bday';
-  return seasonalDays(y, m, rules.chSeasonPct).has(d) ? SEASON[m] : 'none';
+  return seasonalDays(y, m, rules.chSeasonDaysPct).has(d) ? SEASON[m] : 'none';
 }
 const seasonsOf = new WeakMap(); // сезоны предмета — один раз на data
 function inPool(data, i, p) {
   if (p === 'any') return true;
   let S = seasonsOf.get(data); if (!S) seasonsOf.set(data, S = data.subjects.map(r => String(r[3] || '').split(' ').filter(Boolean)));
+  if (!S[i].length && data.tags[i] && ['idea', 'life'].includes(data.tags[i][1])) return true; // слово-тема и тема «из жизни» без сезона годятся в любой день
   return p === 'none' ? !S[i].length : S[i].includes(p);
 }
+const isHalloween = (data, i) => String(data.subjects[i][3] || '').split(' ').includes('halloween');
 const poolLists = new WeakMap(); // предметы пула (с тегами) — один раз на data
 function poolList(data, p) {
   let M = poolLists.get(data); if (!M) poolLists.set(data, M = {});
-  return M[p] || (M[p] = data.subjects.map((r, i) => i).filter(i => data.tags[i] && inPool(data, i, p)));
+  if (!M.off) M.off = new Set(data.off || []); // content/challenge-off.txt — скучные предметы генератор не берёт
+  return M[p] || (M[p] = data.subjects.map((r, i) => i).filter(i => data.tags[i] && !M.off.has(i) && inPool(data, i, p)));
 }
 // подходящие предметы для дня, лучшие первыми: давно не было (или не было никогда), потом — случайно
 // lastUse: Map предмет → номер дня, когда был; rnd — случайные числа
 function ranked(data, rules, plan, n, pool, lastUse, rnd, skip, wantD) {
-  const out = [], ctx = around(data, rules, plan, n);
+  const out = [], ctx = around(data, rules, plan, n), oct = keyOfNum(n).slice(5, 7) === '10', hw = keyOfNum(n).slice(5) === '10-31'; // 31 октября — хеллоуинская тема
+  // слово-тема (категория idea, в духе Inktober 52) — первой, если её не было 6 дней
+  // и так же тема «из жизни» (категория life: кадр из любимого фильма, ваш завтрак, вид из окна…)
+  const noneFor = (c, k) => n >= N_NEW && [...Array(k)].every((_, x) => !plan.has(n - x - 1) || (data.tags[plan.get(n - x - 1)] || [])[1] !== c);
+  const wantIdea = noneFor('idea', 6), wantLife = noneFor('life', 3); // слово — ~раз в неделю, «из жизни» — ~2 раза
   for (const i of poolList(data, pool)) {
     if (wantD && data.tags[i][2] !== wantD) continue;
+    if (!oct && isHalloween(data, i)) continue; // хеллоуинские — только в октябре
     if (violations(data, rules, plan, n, i, skip, ctx).length) continue;
     const lu = lastUse.has(i) ? lastUse.get(i) : -1e9;
-    out.push([i, lu + rnd() * 30]); // разница в месяц — почти одно и то же
+    const c = data.tags[i][1], special = c === 'idea' || c === 'life';
+    out.push([i, lu + rnd() * 30 - (i >= FRESH && lu < 0 && !special ? 100 : 0) - (wantIdea && c === 'idea' ? 1e10 : 0) - (wantLife && c === 'life' ? 2e10 : 0) - (hw && isHalloween(data, i) ? 3e10 : 0)]); // разница в месяц — почти одно и то же; новые предметы, которых ещё не было, — первыми
   }
   return out.sort((a, b) => a[1] - b[1]).map(x => x[0]);
 }
@@ -177,16 +261,19 @@ const RELAX = [{}, { window: 1 }, { window: 1, deck: 1 }, { window: 1, deck: 1, 
 // ---------- план месяца ----------
 // history: Map номер дня → предмет (что уже было до месяца, лучше ~120 дней; можно и дни после — если месяц пересобирается)
 // Возвращает { rows: [{day, item, subject, tip, colors, time, twist, extra}], broken: [{day, rules}] } — broken: где правила пришлось ослабить
-export function planMonth(data, rules, y, m, history) {
+// fromDay — с какого числа месяца подбирать (раньше — уже есть в history; так собран конец октября 2026)
+export function planMonth(data, rules, y, m, history, fromDay = 1) {
   rules = { ...CH_DEFAULTS, ...(rules || {}) };
   const days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(), ym = `${y}-${pad(m + 1)}`;
   let best = null;
   for (let attempt = 0; attempt < 12 && !(best && !best.broken.length); attempt++) {
     const rnd = rngFor(`plan-${ym}-${attempt}`), plan = new Map(history), lastUse = new Map(), broken = [];
     for (const [x, it] of [...history].sort((a, b) => a[0] - b[0])) lastUse.set(it, x);
-    const keys = [...Array(days)].map((_, i) => `${ym}-${pad(i + 1)}`);
+    const keys = [...Array(days)].map((_, i) => `${ym}-${pad(i + 1)}`).slice(fromDay - 1);
     // 23 января — заранее, чтобы колода и категории учли именинный предмет
     for (const k of keys) if (poolOf(data, rules, k) === 'bday') plan.set(dayNum(k), birthdayIdx(data, y));
+    // ближайшее 23 января после месяца (в пределах chFamilyGap) — не брать семью именинного предмета
+    { const nb = dayNum(`${y + 1}-01-23`), end = dayNum(keys[keys.length - 1]); if (m > 0 && nb - end < rules.chFamilyGap) plan.set(nb, birthdayIdx(data, y + 1)); }
     for (const k of keys) {
       const n = dayNum(k), pool = poolOf(data, rules, k);
       if (pool === 'bday') continue;

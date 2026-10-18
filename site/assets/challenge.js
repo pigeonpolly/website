@@ -7,7 +7,7 @@
   const locale = ['en-GB', 'ru-RU', 'lv-LV'][L];
   const UI = {
     min: ['min', 'мин', 'min'],
-    colors: ['Your 3 colours', 'Ваши 3 цвета', 'Tavas 3 krāsas'],
+    colors: ['Your colours', 'Ваши цвета', 'Tavas krāsas'],
     time: ['Time', 'Время', 'Laiks'],
     tip: ['Tip of the day', 'Совет дня', 'Dienas padoms'],
     help: ['🕊 Polly, help me draw', '🕊 Полли, помоги нарисовать', '🕊 Pollija, palīdzi uzzīmēt'],
@@ -16,7 +16,7 @@
     start: ['Start', 'Старт', 'Sākt'], pause: ['Pause', 'Пауза', 'Pauze'], resume: ['Resume', 'Продолжить', 'Turpināt'], reset: ['Reset', 'Сброс', 'No sākuma'],
     stages: [['Big shape', 'Большая форма', 'Lielā forma'], ['Colour blocks', 'Цветовые пятна', 'Krāsu laukumi'], ['Darkest accents & details', 'Тёмные акценты и детали', 'Tumšie akcenti un detaļas']],
     stageHints: [['Catch the silhouette. No details yet.', 'Поймайте силуэт. Пока без деталей.', 'Noķer siluetu. Vēl bez detaļām.'],
-      ['Lay in your three colours in big shapes.', 'Положите свои три цвета большими пятнами.', 'Uzklāj savas trīs krāsas lielos laukumos.'],
+      ['Lay in your colours in big shapes.', 'Положите свои цвета большими пятнами.', 'Uzklāj savas krāsas lielos laukumos.'],
       ['Only the darkest bits and a few details.', 'Только самые тёмные места и пара деталей.', 'Tikai tumšākās vietas un dažas detaļas.']],
     ready: ['Ready when you are', 'Начинайте, когда будете готовы', 'Sāc, kad esi gatavs'],
     timeUp: ['Time! Brush down, you did it.', 'Время! Кисть в сторону — вы справились.', 'Laiks! Ota malā — tu to izdarīji.'],
@@ -26,7 +26,7 @@
     extra: ['EXTRA day: a palette from my painting! Draw today’s theme in its colors, all six or just the ones you like. Nothing uploaded today? Your streak is safe, take a rest day.', 'День ЭКСТРА — палитра из моей картины! Нарисуйте тему дня её цветами: всеми шестью или теми, что нравятся. Ничего не загрузили сегодня? Серия не сгорит — можно взять выходной.', 'EKSTRA diena — palete no mana darba! Uzzīmē dienas tēmu tās krāsās: visās sešās vai tikai tajās, kas patīk. Šodien neko neaugšupielādēji? Sērija nepazudīs — vari atpūsties.'],
     extraBw: ['EXTRA day!', 'День ЭКСТРА!', 'EKSTRA diena!'],
     palFrom: ['Palette from my painting', 'Палитра из моей картины', 'Palete no mana darba'],
-    twist: ['Your twist', 'Особенность', 'Tavs pavērsiens'],
+    twist: ['How to draw it', 'Как рисовать', 'Kā zīmēt'],
     modeColor: ['In colour', 'В цвете', 'Krāsās'],
     modeBw: ['Black & white', 'Ч/Б', 'Melnbalts'],
     stage2Bw: ['Tones & textures', 'Тон и фактура', 'Toņi un faktūras'],
@@ -89,7 +89,7 @@
         <div class="page-subject">${theme.subject}</div>
         <div class="page-label">${bw ? t('twist') : theme.pal ? t('palFrom') : t('colors')}</div>
         ${!bw && theme.pal ? `<a class="page-pal" href="${L ? '/' + ['', 'ru', 'lv'][L] : ''}/palettes/#${theme.pal.key}"><img src="/${theme.pal.thumb}" alt="" loading="lazy"><span>«${theme.pal.title}»</span></a>` : ''}
-        ${bw ? `<div class="page-twist">✒ ${theme.twist}</div>` : `<div class="swatches">${theme.colors.map(c => `<span class="sw"><i style="background:${c.hex}"></i>${c.n[L]}</span>`).join('')}</div>`}
+        ${bw ? theme.twist.split(' · ').map(x => `<div class="page-twist">✒ ${x}</div>`).join('') : `<div class="swatches">${theme.colors.map(c => `<span class="sw"><i style="background:${c.hex}"></i>${c.n[L]}</span>`).join('')}</div>`}
         <div class="page-time"><span class="page-label">${t('time')}</span> <b id="ch-min"></b></div>
         ${theme.bday ? `<div class="page-extra page-bday">${t('bday')}</div>` : ''}
         ${theme.extra ? `<div class="page-extra">✦ ${extraText(theme)}</div>` : ''}

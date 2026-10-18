@@ -2,10 +2,10 @@
 // Подбор предметов — worker/challenge-plan.js; предметы с тегами — site/assets/challenge-items.json (build.py).
 // Октябрь 2026 — из site/assets/challenge-2026-10.json (tools/challenge_oct.js), один раз (метка meta 'chplan_oct'). Ноябрь и дальше — генератор:
 // cron с 20-го создаёт следующий месяц, текущий — если его почему-то нет. Созданный месяц сам не меняется, правит только Алина.
-import { planMonth, rowText, rerollDay, checkPlan, dayNum, keyOfNum, poolOf, PLAN_FROM } from './challenge-plan.js';
+import { planMonth, rowText, rerollDay, checkPlan, dayNum, keyOfNum, poolOf, allColors, PLAN_FROM, NEW_FROM } from './challenge-plan.js';
 
 export const CHALLENGE_TABLES = [
-  // день плана: item — индекс предмета в challenge-data.js; тексты — на трёх языках; colors — 3 индекса базовых цветов через запятую;
+  // день плана: item — индекс предмета в challenge-data.js; тексты — на трёх языках; colors — индексы цветов (colors + moreColors) через запятую: до 1.11.2026 — 3, дальше 2–5;
   // extra_* — Ч/Б-условие дня ЭКСТРА (есть только в день ЭКСТРА); edited — правила Алина; orig — как было при создании (JSON, для «↩ Вернуть как было»)
   `CREATE TABLE IF NOT EXISTS challenge_days (day TEXT PRIMARY KEY, item INTEGER, subject_en TEXT, subject_ru TEXT, subject_lv TEXT,
     tip_en TEXT, tip_ru TEXT, tip_lv TEXT, colors TEXT, time INTEGER, twist_en TEXT, twist_ru TEXT, twist_lv TEXT,
@@ -55,9 +55,21 @@ async function importOct(env) {
   await env.DB.batch([...rows.map(d => insertSql(env, d)),
     env.DB.prepare("INSERT INTO meta (key, value) VALUES ('chplan_oct', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(String(now()))]);
 }
+// 18.10.2026 — новые темы, цвета 2–5 и Ч/Б-указания с 19.10 (NEW_FROM): будущие дни (не правленные Алиной) — один раз заново (метка meta 'chplan_v3'):
+// конец октября — из нового challenge-2026-10.json, ноябрь и дальше — генератор пересоберёт сам
+async function upgradeV2(env) {
+  if ((await env.DB.prepare("SELECT value FROM meta WHERE key = 'chplan_v3'").first())) return;
+  await importOct(env);
+  const from = [NEW_FROM, keyOfNum(dayNum(rigaToday()) + 1)].sort()[1];
+  const r = await env.ASSETS.fetch(new Request('https://pigeonpolly.com/assets/challenge-2026-10.json'));
+  const oct = r.ok ? (await r.json()).filter(d => d.day >= from) : [];
+  await env.DB.batch([env.DB.prepare('DELETE FROM challenge_days WHERE day >= ? AND edited = 0').bind(from), ...oct.map(d => insertSql(env, d)),
+    env.DB.prepare("INSERT INTO meta (key, value) VALUES ('chplan_v3', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(String(now()))]);
+}
 // месяц есть в базе? нет — создать по правилам (история — ~150 дней до него)
 export async function ensureMonth(env, rules, ym) {
   if (ym < FIRST) return false;
+  await upgradeV2(env);
   if (ym === FIRST) { await importOct(env); return true; }
   const have = await env.DB.prepare('SELECT COUNT(*) AS n FROM challenge_days WHERE day >= ? AND day <= ?').bind(ym + '-01', ym + '-31').first();
   if (have && have.n >= daysIn(ym)) return true;
@@ -76,12 +88,13 @@ const openMonths = (today = rigaToday()) => { const ym = today.slice(0, 7); retu
 export async function challengeCron(env, rules) {
   for (const ym of openMonths()) await ensureMonth(env, rules, ym);
 }
-// цвета дней плана для бейджей за цвета (с PLAN_FROM; раньше — site/assets/day-colors.json): {"2026-11-03": "py"}
+// цвета дней плана для бейджей за цвета (с NEW_FROM; раньше — site/assets/day-colors.json): {"2026-11-03": "py"}
 const FAM = { purple: 'p', yellow: 'y', red: 'r', blue: 'b', green: 'g' };
 export async function planDayColors(env) {
   const data = await chItems(env), out = {};
-  const rows = (await env.DB.prepare('SELECT day, colors FROM challenge_days WHERE day >= ? AND extra_en IS NULL').bind(PLAN_FROM).all()).results;
-  for (const r of rows) { const s = String(r.colors || '').split(',').map(i => FAM[(data.colors[+i] || { n: [] }).n[0]] || '').join(''); if (s) out[r.day] = s; }
+  const rows = (await env.DB.prepare('SELECT day, colors FROM challenge_days WHERE day >= ? AND extra_en IS NULL').bind(NEW_FROM).all()).results;
+  const all = allColors(data);
+  for (const r of rows) { const s = [...new Set(String(r.colors || '').split(',').map(i => { const c = all[+i] || { n: [] }; return FAM[c.f || c.n[0]] || ''; }))].join(''); if (s) out[r.day] = s; }
   return out;
 }
 
@@ -113,7 +126,7 @@ export async function challengeApi(req, env, url, h) {
       broken = checkPlan(data, rules, plan, s, e).filter(x => x.day >= PLAN_FROM);
     }
     const tags = days.map(d => { const t = data.tags[d.item] || []; return { f: t[0] || '', c: t[1] || '', d: t[2] || 0, pool: poolOf(data, rules, d.day) }; });
-    return h.json({ m: ym, today: rigaToday(), days, tags, works, broken, colors: data.colors, times: data.times });
+    return h.json({ m: ym, today: rigaToday(), days, tags, works, broken, colors: allColors(data), times: data.times });
   }
   const b = await req.json().catch(() => ({}));
   const key = String(b.day || '');
@@ -124,14 +137,14 @@ export async function challengeApi(req, env, url, h) {
     await env.DB.prepare(`UPDATE challenge_days SET ${COLS.map(c => c + ' = ?').join(', ')}, edited = ?, updated_at = ? WHERE day = ?`).bind(...colVals(d), edited, now(), d.day).run();
   };
   const back = async () => h.json({ day: toRow(await env.DB.prepare('SELECT * FROM challenge_days WHERE day = ?').bind(key).first()) });
-  // правка дня: предмет, совет, 3 цвета, время, особенность, Ч/Б-условие ЭКСТРА
+  // правка дня: предмет, совет, 2–5 цветов, время, особенность, Ч/Б-условие ЭКСТРА
   if (m === 'POST' && p === '/api/admin/challenge/day') {
     const d = toRow(cur), t3 = (v, old) => Array.isArray(v) ? L3.map((l, i) => String(v[i] ?? '').trim().slice(0, 300)) : old;
     d.subject = t3(b.subject, d.subject); d.tip = t3(b.tip, d.tip); d.twist = t3(b.twist, d.twist);
     if (d.extra) d.extra = t3(b.extra, d.extra);
     if (Array.isArray(b.colors)) {
-      const c = [...new Set(b.colors.map(Number).filter(i => Number.isInteger(i) && i >= 0 && i < data.colors.length))];
-      if (c.length !== 3) h.fail(400, 'colors');
+      const c = [...new Set(b.colors.map(Number).filter(i => Number.isInteger(i) && i >= 0 && i < allColors(data).length))];
+      if (c.length < 2 || c.length > 5) h.fail(400, 'colors');
       d.colors = c;
     }
     if (b.time != null) { if (!data.times.includes(Number(b.time))) h.fail(400, 'time'); d.time = Number(b.time); }
