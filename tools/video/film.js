@@ -261,7 +261,7 @@
     }
   }
   window.FILM = {
-    frames: END * FPS, finaleFrom: Math.floor(16.3 * FPS),
+    frames: END * FPS, langFrom: Math.floor(16.3 * FPS), keys: [4.35, 9.95, 14.0, 18.0], // дверь и тапочки, блинчик летит, ест и сердечки, финал
     frame: n => { draw(n); return vc.toDataURL('image/png'); },
     ready: Promise.all([document.fonts.load('600 104px Fraunces'), document.fonts.load('700 60px Karla')]).catch(() => null).then(() => true),
   };
