@@ -643,8 +643,11 @@
     if (!cust) return;
     const k = phase === 'arrive' ? Math.min(1, phaseT / 0.6) : 1, cx = wx + ww / 2, cy = wy + 62 + (1 - k) * 80;
     ctx.save(); ctx.beginPath(); ctx.rect(wx, wy, ww, wh); ctx.clip();
-    const im = img('/images/wobbleland/ch-' + cust.img + '.png');
-    if (im.complete && im.naturalWidth) { const s = Math.floor(84 / Math.max(im.naturalWidth, im.naturalHeight)); ctx.drawImage(im, Math.round(cx - im.naturalWidth * s / 2), Math.round(cy - im.naturalHeight * s / 2), im.naturalWidth * s, im.naturalHeight * s); }
+    // портрет 48×48 из карточки (pt-*, ×2); у кого его нет — медальон ch-*
+    const pt = img('/images/wobbleland/pt-' + cust.img + '.png');
+    const im = pt.complete && !pt.naturalWidth ? img('/images/wobbleland/ch-' + cust.img + '.png') : pt;
+    if (im === pt && pt.complete) { const x = Math.round(cx - 48), y = Math.round(cy - 48); px(x - 2, y - 2, 100, 100, '#1a1528'); ctx.drawImage(pt, x, y, 96, 96); }
+    else if (im !== pt && im.complete && im.naturalWidth) { const s = Math.floor(84 / Math.max(im.naturalWidth, im.naturalHeight)); ctx.drawImage(im, Math.round(cx - im.naturalWidth * s / 2), Math.round(cy - im.naturalHeight * s / 2), im.naturalWidth * s, im.naturalHeight * s); }
     else { ctx.fillStyle = '#7F81BF'; ctx.beginPath(); ctx.arc(cx, cy, 34, 0, 7); ctx.fill(); }
     ctx.restore();
     const cr = img('/images/wobbleland/crest-' + cust.city + '.png');
