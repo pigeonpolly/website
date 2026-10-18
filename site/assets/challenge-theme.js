@@ -35,9 +35,9 @@
     for (let i = o.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [o[i], o[j]] = [o[j], o[i]]; }
     return (orders[name] = o);
   }
-  // 2/3 дней — предмет текущего сезона, остальные — любой другой; внутри каждой группы без повторов
+  // 2/3 дней — предмет текущего сезона, остальные — любой другой; внутри каждой группы без повторов (только первые 1080 предметов — новые идут только в план)
   const SEASON = ['winter', 'winter', 'spring', 'spring', 'spring', 'summer', 'summer', 'summer', 'autumn', 'autumn', 'autumn', 'winter'];
-  const pools = { none: [] }; D.subjects.forEach((r, i) => (r[3] || 'none').split(' ').forEach(t => (pools[t] = pools[t] || []).push(i)));
+  const pools = { none: [] }; D.subjects.slice(0, 1080).forEach((r, i) => (r[3] || 'none').split(' ').forEach(t => (pools[t] = pools[t] || []).push(i)));
   const plan = [], used = {};
   // ровно 2/3 дней каждого месяца — сезонные (какие именно — случайно, но одинаково у всех)
   function seasonalDay(d) {
@@ -132,6 +132,7 @@
     return { subject: subject[L], colors, pal, twist, extraBw, time, extra, bday, tip: D.tips[day % D.tips.length][L] };
   }
   // ---------- план месяца с сервера ----------
+  const ALLC = D.colors.concat(D.moreColors || []); // в плане цвета — индексы в colors + moreColors
   const PLAN_FIRST = '2026-10', PLAN_FROM = '2026-11-01';
   const LOADING = ['the theme is loading…', 'тема загружается…', 'tēma ielādējas…'];
   const plans = {}, asked = {};
@@ -157,7 +158,7 @@
     const old = themeFor(d, L, true); // день ЭКСТРА, именины, палитра — по формуле, как у сервера
     if (!row) return { ...old, loading: true, subject: LOADING[L], colors: [], twist: '', extraBw: '', tip: '', time: 10 };
     return { ...old, subject: row.subject[L] || row.subject[0], tip: row.tip[L] || row.tip[0], twist: row.twist[L] || row.twist[0], time: row.time,
-      extraBw: row.extra ? row.extra[L] || row.extra[0] : old.extraBw, colors: old.pal ? old.colors : row.colors.map(i => D.colors[i]).filter(Boolean) };
+      extraBw: row.extra ? row.extra[L] || row.extra[0] : old.extraBw, colors: old.pal ? old.colors : row.colors.map(i => ALLC[i]).filter(Boolean) };
   }
   const isExtra = d => d.getDate() === extraDay(d.getFullYear(), d.getMonth());
   window.ChallengeTheme = { themeFor: themeOf, formulaFor: themeFor, keyOf, rngFor, extraDay, isExtra };

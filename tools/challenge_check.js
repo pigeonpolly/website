@@ -15,10 +15,13 @@ const root = path.join(__dirname, '..'), months = +process.argv[2] || 24;
     const res = P.planMonth(data, R, y, m, hist);
     for (const r of res.rows) { plan.set(P.dayNum(r.day), r.item); last = P.dayNum(r.day); }
     relaxed += res.broken.length;
-    // остальное в строке дня: 3 разных цвета из 10, время, тексты на 3 языках; в день ЭКСТРА — Ч/Б-условие
+    // остальное в строке дня: 2–5 разных цветов из colors + moreColors, время, тексты на 3 языках; в день ЭКСТРА — Ч/Б-условие; скучные (off) — никогда
+    const nc = P.allColors(data).length, off = new Set(data.off || []);
     for (const r of res.rows) {
       const bad = [];
-      if (new Set(r.colors).size !== 3 || r.colors.some(c => !(c >= 0 && c < data.colors.length))) bad.push('colors');
+      if (new Set(r.colors).size !== r.colors.length || r.colors.length < 2 || r.colors.length > 5 || r.colors.some(c => !(c >= 0 && c < nc))) bad.push('colors');
+      if (off.has(r.item) && !r.day.endsWith('-01-23')) bad.push('off');
+      if (String(data.subjects[r.item][3] || '').includes('halloween') && r.day.slice(5, 7) !== '10') bad.push('halloween');
       if (!data.times.includes(r.time)) bad.push('time');
       for (const f of ['subject', 'tip', 'twist']) if (!(r[f] && r[f].length === 3 && r[f].every(Boolean))) bad.push(f);
       if ((+r.day.slice(8) === P.extraDay(y, m)) !== !!r.extra) bad.push('extra');
@@ -27,7 +30,7 @@ const root = path.join(__dirname, '..'), months = +process.argv[2] || 24;
   }
   const v = P.checkPlan(data, R, plan, from, last);
   for (const x of v) console.log(x.day, data.subjects[x.item][0], '—', x.rules.join(', '));
-  // сезон: доля сезонных дней по месяцам — ровно chSeasonPct
+  // сезон: доля сезонных дней по месяцам — ровно chSeasonDaysPct
   let seasonBad = 0;
   for (let n = from; n <= last; n++) { const k = P.keyOfNum(n), p = P.poolOf(data, R, k), s = data.subjects[plan.get(n)][3] || ''; if (p !== 'bday' && (p === 'none' ? !!s : !s.split(' ').includes(p))) seasonBad++; }
   if (seasonBad) console.log('не тот сезон:', seasonBad, 'дн.');

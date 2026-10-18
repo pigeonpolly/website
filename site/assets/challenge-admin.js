@@ -1,5 +1,5 @@
 // Кабинет → «🎨 Темы челленджа» (admin.js открывает PPChallengeAdmin.mount(main)): календарь текущего и следующего месяца, «В цвете / Ч/Б»;
-// окно дня — предмет, совет, 3 цвета, время, Ч/Б-особенность (EN/RU/LV), в день ЭКСТРА — палитра и Ч/Б-условие;
+// окно дня — предмет, совет, 2–5 цветов, время, Ч/Б-указание (EN/RU/LV), в день ЭКСТРА — палитра и Ч/Б-условие;
 // «🌐 Перевести», «🎲 Другой предмет», «⇄ Поменять с днём…», «↩ Вернуть как было». Сервер — /api/admin/challenge/* (worker/challenge-days.js), docs/challenge.md.
 (function () {
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -9,7 +9,7 @@
     if (!r.ok) throw Object.assign(new Error(d.error || r.status), { code: d.error || r.status });
     return d;
   };
-  const ERR = { none: 'Больше нет предметов, которые подходят по правилам.', colors: 'Нужно ровно 3 разных цвета.', subject: 'Впишите предмет хотя бы на одном языке.', orig: 'Нечего возвращать.', admin: 'Это может только админ.', auth: 'Войдите через Google.' };
+  const ERR = { none: 'Больше нет предметов, которые подходят по правилам.', colors: 'Нужно от 2 до 5 разных цветов.', subject: 'Впишите предмет хотя бы на одном языке.', orig: 'Нечего возвращать.', admin: 'Это может только админ.', auth: 'Войдите через Google.' };
   const errText = e => ERR[e.code] || 'Не получилось (' + (e.code || e.message) + ').';
   const L3 = ['en', 'ru', 'lv'], LI = { en: 0, ru: 1, lv: 2 };
   const CAT = { food: 'еда', drink: 'напиток', animal: 'животное', bird: 'птица', plant: 'растение', home: 'дом', clothes: 'одежда', transport: 'транспорт', place: 'место', nature: 'природа', weather: 'погода', tool: 'инструмент', toy: 'игрушка', music: 'музыка', fantasy: 'сказка', person: 'человек', holiday: 'праздник' };
@@ -81,9 +81,9 @@
         ${txt('tip', 'Совет дня', true)}
         ${d.extra ? `<div class="chadm-pal"><b>Палитра дня ЭКСТРА</b>${pal ? `<span>${pal.c.map(c => `<i style="background:${c[0]}" title="${esc(c[2])}"></i>`).join('')}</span><small>«${esc(pal.t[1])}» — очередь палитр: 🎨 Картины и палитры</small>` : '<small>очередь палитр: 🎨 Картины и палитры</small>'}</div>
           ${txt('extra', 'Ч/Б-условие дня ЭКСТРА')}`
-        : `<fieldset class="chadm-f"><legend>3 цвета (из 10 базовых)</legend><div class="chadm-cols">${D.colors.map((c, k) => `<button type="button" data-col="${k}" aria-pressed="false"><i style="background:${c.hex}"></i>${esc(c.n[1])}</button>`).join('')}</div></fieldset>`}
+        : `<fieldset class="chadm-f"><legend>Цвета дня: от 2 до 5</legend><div class="chadm-cols">${D.colors.map((c, k) => `<button type="button" data-col="${k}" aria-pressed="false"><i style="background:${c.hex}"></i>${esc(c.n[1])}</button>`).join('')}</div></fieldset>`}
         <label class="chadm-time">Время <select data-time>${D.times.map(x => `<option value="${x}">${x} мин</option>`).join('')}</select><small class="be-note">в режиме «Спокойно» — на 5 минут больше</small></label>
-        ${txt('twist', 'Ч/Б-особенность')}
+        ${txt('twist', 'Ч/Б-указание')}
       </div>
       <p class="be-dialog-acts"><button type="button" class="pill-btn pill-fill" data-a="save">💾 Сохранить</button><button type="button" class="pill-btn" data-a="close">Закрыть</button><span class="be-note" data-st role="status"></span></p>`;
     document.body.appendChild(dlg);
@@ -100,7 +100,7 @@
     function paintCols() { dlg.querySelectorAll('[data-col]').forEach(b => b.setAttribute('aria-pressed', cols.includes(+b.dataset.col))); }
     dlg.querySelectorAll('[data-col]').forEach(b => b.onclick = () => {
       const k = +b.dataset.col;
-      if (cols.includes(k)) cols = cols.filter(x => x !== k); else if (cols.length < 3) cols.push(k); else { cols.shift(); cols.push(k); }
+      if (cols.includes(k)) cols = cols.filter(x => x !== k); else if (cols.length < 5) cols.push(k); else { cols.shift(); cols.push(k); }
       paintCols();
     });
     const val = f => L3.map(l => (q(`[data-f="${f}"][data-l="${l}"]`) || {}).value || '');
@@ -117,7 +117,7 @@
     const tagsNow = () => { br.length = 0; br.push(...((D.broken.find(b => b.day === day) || {}).rules || [])); };
     const run = async (fn) => { st.textContent = '…'; dlg.querySelectorAll('button').forEach(b => b.disabled = true); try { await fn(); } catch (e) { st.textContent = '⚠ ' + errText(e); } dlg.querySelectorAll('button').forEach(b => b.disabled = false); };
     q('[data-a=save]').onclick = () => run(async () => {
-      if (!d.extra && cols.length !== 3) throw Object.assign(new Error('colors'), { code: 'colors' });
+      if (!d.extra && (cols.length < 2 || cols.length > 5)) throw Object.assign(new Error('colors'), { code: 'colors' });
       const body = { day, subject: val('subject'), tip: val('tip'), twist: val('twist'), time: +q('[data-time]').value };
       if (d.extra) body.extra = val('extra'); else body.colors = cols;
       await after(await api('/day', body));

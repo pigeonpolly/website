@@ -665,6 +665,7 @@ html:not([lang="en"]) .hero h1 { white-space: normal; }
   .bw-q { font-size: 16px; }
 }
 .page-twist { margin: 6px 0 4px; font: 600 22px/1.25 var(--serif); color: #D85A30; }
+.page-twist + .page-twist { margin-top: 2px; }
 .d-dots em { font-style: normal; font-size: 13px; color: var(--muted); line-height: 1; }
 .ch-level { display: inline-flex; padding: 4px; border-radius: 999px; background: rgba(0, 0, 0, .2); }
 .ch-level button { padding: 8px 16px; border: 0; border-radius: 999px; background: none; color: var(--muted); font: 500 14px/1 var(--sans); cursor: pointer; }
