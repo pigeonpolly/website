@@ -299,7 +299,7 @@
     for (let k = 0; k < 8; k++) {
       try {
         const r = await post('potion/done', { run: run.run, got, eye: !!M.eyeGot });
-        S.inv = r.inv; S.level = r.level; if (r.eyes != null) S.eyes = r.eyes; drawBar(); showBadges(r.badges);
+        S.inv = r.inv; S.level = r.level; if (r.eyes != null) S.eyes = r.eyes; drawBar(); showBadges(r.badges); window.PPTop && PPTop.refresh();
         const list = r.got.length ? `<p class="pot-got">${r.got.map(id => `<span title="${esc(IG[id].n)}">${IG[id].e}</span>`).join('')}</p>` : `<p>${t('gotNone')}</p>`;
         state = 'done';
         overlay(`<h2>${t('done', M.level)}</h2>${r.got.length ? `<p>${t('gotIngs')}</p>` : ''}${list}${r.eye ? `<p class="pot-mod pot-eye">${t('eyeWon')}</p>` : ''}<div class="pot-ov-btns"><button type="button" class="pill-btn" data-a="pot">${t('toPot')}</button><button type="button" class="pill-btn pill-fill" data-a="next">${t('next')}</button></div>`);
@@ -491,6 +491,7 @@
       const [r] = await Promise.all([post('potion/brew', { ings }), new Promise(res => setTimeout(res, 1300))]);
       S.inv = r.inv; slots = []; brewing = false;
       const b = S.book.find(x => x.combo === r.combo); if (b) b.n++; else S.book.unshift({ combo: r.combo, tier: r.tier, n: 1, ix: r.ix, season: r.season });
+      if (!b && r.tier > 0 && window.PPTop) PPTop.refresh(); // новое зелье — на доске «📖 Рецепты»
       if (r.got) S.today += r.got;
       drawBar(); showBadges(r.badges);
       let html;

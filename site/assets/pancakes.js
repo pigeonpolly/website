@@ -31,8 +31,6 @@
     reached: [n => `Customers served: ${n}`, n => `Накормлено жителей: ${n}`, n => `Pabaroti iedzīvotāji: ${n}`],
     newBest: ['🏆 New record!', '🏆 Новый рекорд!', '🏆 Jauns rekords!'],
     earned: [n => `+${n} 🔘 this game`, n => `+${n} 🔘 за эту игру`, n => `+${n} 🔘 šajā spēlē`],
-    top: ['🏆 Records', '🏆 Рекорды', '🏆 Rekordi'], topNone: ['No records yet: be the first!', 'Рекордов пока нет — будь первой птичкой!', 'Rekordu vēl nav — esi pirmais!'],
-    lvShort: ['lvl', 'ур.', 'līm.'],
     badge: [n => `🏅 New achievement: “${n}”`, n => `🏅 Новое достижение: «${n}»`, n => `🏅 Jauns sasniegums: “${n}”`],
     gotItem: [n => `🎁 The customer left a gift: ${n}! It is waiting in your profile.`, n => `🎁 Клиент оставил подарок: ${n}! Он ждёт в профиле.`, n => `🎁 Klients atstāja dāvanu: ${n}! Tā gaida profilā.`],
     // ход уровня
@@ -261,7 +259,7 @@
   app.innerHTML = `<div class="rain-stage pk-stage"><canvas class="rain-cv" aria-label="${esc(t('title'))}"></canvas>
     <button type="button" class="rain-pause" aria-label="${esc(t('pauseBtn'))}" hidden>❚❚</button>
     <div class="pk-bar" hidden></div><div class="rain-ov"></div></div>
-    <section class="rain-top"><h2>${t('top')}</h2><ol class="rain-list"></ol></section>`;
+    <section class="rain-top" data-top="pan"></section>`;
   const cv = app.querySelector('.rain-cv'), ov = app.querySelector('.rain-ov'), pauseBtn = app.querySelector('.rain-pause'), stage = app.querySelector('.rain-stage'), bar = app.querySelector('.pk-bar');
   const ctx = cv.getContext('2d');
   const W = 360, H = 560, BAR = 412; // логический размер поля; ниже BAR — кнопки
@@ -286,16 +284,8 @@
   // ---------- данные с сервера ----------
   let info = { on: true, per: 1, record: 0, every: 25, wash: 10, soap: 1, today: 0, best: 0, buttons: 0, me: null, top: [] };
   const load = () => fetch('/api/pancakes', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => { if (d) info = d; topList(); if (state === 'menu' || state === 'over') showOverlay(); }).catch(() => {});
-  function topList() {
-    const ol = app.querySelector('.rain-list'), B = window.PPBirds;
-    ol.innerHTML = info.top.length ? '' : `<li class="rain-none">${t('topNone')}</li>`;
-    info.top.forEach(r => {
-      const li = document.createElement('li'); if (info.me && r.id === info.me.id) li.className = 'me';
-      if (B) li.appendChild(B.avatar(r.id, r.avatar, 34));
-      li.insertAdjacentHTML('beforeend', `<a href="${['', '/ru', '/lv'][L]}/bird/?nick=${encodeURIComponent(r.nick)}">@${esc(r.nick)}</a><b>${r.best} ${t('lvShort')}</b>`);
-      ol.appendChild(li);
-    });
-  }
+  // доска топа — top-board.js (PPTop)
+  function topList() { const el = app.querySelector('.rain-top'); if (!window.PPTop || !el) return; const fresh = !el.__top; window.PPTop.mount(el); if (!fresh) window.PPTop.refresh(el); }
 
   // ---------- сложность ----------
   const tierOf = lv => Math.floor((lv - 1) / 10);
@@ -414,7 +404,7 @@
     showOverlay();
   }
   function pause() { if (state !== 'play') return; state = 'pause'; pouring = false; showOverlay(); }
-  function resume() { if (state !== 'pause') return; state = 'play'; ov.hidden = true; last = performance.now(); requestAnimationFrame(loop); }
+  function resume() { if (state !== 'pause') return; state = 'play'; ov.hidden = true; renderBar(); last = performance.now(); requestAnimationFrame(loop); } // панель кнопок прячется на паузе — вернуть
   const pop = (x, y, txt, col) => fx.push({ x, y, txt, col, t: 1.1 });
 
   // ---------- мытьё сковородки ----------

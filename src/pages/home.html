@@ -51,39 +51,39 @@
     document.querySelector('[data-me-btns]').textContent = u.buttons || 0;
     var card = document.querySelector('[data-day-card]');
     if (card && window.PPDay && !card.dataset.on) { card.dataset.on = 1; window.PPDay.mount(card, { size: 'small' }); }
-    if (window.PPHomeNew) window.PPHomeNew();
   });
 })();
 </script>
 {{block:season}}
-<section class="home-new" aria-labelledby="hn-title" hidden>
-  <h2 id="hn-title">New on the site</h2>
-  <ul class="hn-list"></ul>
+<section class="home-games" aria-labelledby="hg-title">
+  <h2 id="hg-title">Games</h2>
+  <div class="am-tiles gm-tiles">
+    <a class="am-tile gm-tile" href="/rain/" data-g="rain"><img src="/images/games/rain.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Button Rain</b><i>Catch the buttons!</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🔘</span></a>
+    <a class="am-tile gm-tile" href="/potions/" data-g="potion"><img src="/images/games/potions.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Potion Lab</b><i>Maze and potions</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🧪</span></a>
+    <a class="am-tile gm-tile" href="/pancakes/" data-added="2026-10-18" data-g="pan"><img src="/images/games/pancakes.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Polly’s Pancakes</b><i>Pancakes to order</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🥞</span></a>
+    <a class="am-tile gm-tile" href="/titos/" data-g="titos"><img src="/images/games/titos.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Detective Titos</b><i>100 detective cases</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🕵️</span></a>
+    <a class="am-tile gm-tile" href="/polly-office/"><img src="/images/games/polly-office.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Polly’s Office</b><i>Sort Polly’s mail</i></span><span class="am-tile-ico" aria-hidden="true">📮</span></a>
+    <a class="am-tile gm-tile" href="/wobbleland/"><img src="/images/games/wobbleland.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Wobbleland</b><i>Map of eleven towns</i></span><span class="am-tile-ico" aria-hidden="true">🗺</span></a>
+    <a class="am-tile gm-tile" href="/advent/" data-g="advent"><img src="/images/games/advent.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Advent calendar</b><i>31 windows with gifts</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🎄</span></a>
+  </div>
+  <p class="hg-all"><a href="/games/">All games and the shop →</a></p>
 </section>
 <script>
-// «Новое» для вошедшего (этап 14): последняя статья (/api/blog/home), новые коллекции карточек и пополнение магазина (/api/new, 30 дней)
-window.PPHomeNew = function () {
-  window.PPHomeNew = null;
-  var box = document.querySelector('.home-new'); if (!box) return;
-  var lang = document.documentElement.lang || 'en', L = { ru: 1, lv: 2 }[lang] || 0, pre = ['', '/ru', '/lv'][L];
-  var tr = function (a) { return a[L]; }, esc = function (s) { return String(s == null ? '' : s).replace(/[&<>"]/g, function (c) { return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]; }); };
-  var J = function (u) { return fetch(u, { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).catch(function () { return null; }); };
-  Promise.all([J('/api/blog/home?lang=' + lang), J('/api/new')]).then(function (x) {
-    var b = x[0], n = x[1] || {}, li = [];
-    if (b && b.latest) li.push('<li><a href="' + esc(b.latest.url) + '"><span class="hn-ico">📝</span><span><small>' + tr(['New article', 'Новая статья', 'Jauns raksts']) + ' · ' + esc(b.latest.date) + '</small><b>' + esc(b.latest.title) + '</b></span></a></li>');
-    (n.cards || []).slice(0, 2).forEach(function (c) { li.push('<li><a href="' + pre + '/shop/#cards"><span class="hn-ico">🃏</span><span><small>' + tr(['New card collection', 'Новая коллекция карточек', 'Jauna kartīšu kolekcija']) + '</small><b>' + esc((c.title || {})[lang] || c.title.en || c.slug) + ' · ' + c.n + '</b></span></a></li>'); });
-    var items = n.items || [];
-    if (items.length) {
-      var B = window.PPBirds;
-      li.push('<li><a href="' + pre + '/shop/"><span class="hn-ico">🛍</span><span><small>' + tr(['Shop restock', 'Пополнение в магазине', 'Veikals papildināts']) + '</small><b>' + tr(['New things: ', 'Новых вещей: ', 'Jaunas lietas: ']) + items.length + '</b></span><span class="hn-pics"></span></a></li>');
-      box.querySelector('.hn-list').innerHTML = li.join('');
-      var pics = box.querySelector('.hn-pics');
-      if (B && pics) items.slice(0, 5).forEach(function (it) { try { pics.appendChild(B.giftPic(it.kind, it.item, 1, 36)); } catch (e) {} });
-    } else box.querySelector('.hn-list').innerHTML = li.join('');
-    box.hidden = !li.length;
-  });
-};
+// Игры на главной (вместо «Новое на сайте»): первая — самая новая (data-added, новой игре — дата), дальше по популярности за 30 дней (GET /api/games/top), видно 4
+(function () {
+  var box = document.querySelector('.home-games .gm-tiles'); if (!box) return;
+  var all = [].slice.call(box.children), pathOf = function (a) { return a.getAttribute('href').replace(/^\/(ru|lv)(?=\/)/, ''); };
+  var show = function (top) {
+    top = top || {};
+    var newest = all.filter(function (a) { return a.dataset.added; }).sort(function (a, b) { return b.dataset.added < a.dataset.added ? -1 : 1; })[0];
+    var rest = all.filter(function (a) { return a !== newest; }).sort(function (a, b) { return (top[pathOf(b)] || 0) - (top[pathOf(a)] || 0); });
+    (newest ? [newest] : []).concat(rest).forEach(function (a, i) { a.hidden = i > 3; box.appendChild(a); });
+  };
+  show();
+  fetch('/api/games/top').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d) show(d.top); }).catch(function () {});
+})();
 </script>
+<script src="/assets/games-hub.js" defer></script>
 {{block:home-blog}}
 <div class="home-sep" aria-hidden="true"><svg viewBox="-48 -48 96 96"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z"/></svg></div>
 {{block:coming-soon}}
