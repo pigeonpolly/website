@@ -123,3 +123,9 @@ build.py собирает все дела в site/assets/titos-cases.json.
 ## Дела №43–52 (этап 10-5)
 - content/titos/043–052.json: второй круг виновных (решение Алины): жители снова виновны, но с новым трюком; titos_check.py — `ROUND1 = 42`, повтор виновного запрещён только внутри круга (3–42, 43+). У всех 4 подозреваемых, 6 улик, лупа, 1 ложный след с `refutes`, сцена с уликой и допросом виновного.
 - Вещи-награды — room.js блок «награды за дела Титоса»: tcsyrup, tcduck, tctrumpet, tctag, tcspool, tcleafmail, tcpaper, tcradiator, tchammock, tcraingauge.
+
+## Дела №53–62 (этап 10-6)
+- content/titos/053–062.json: второй круг виновных продолжается (index.md). 53–60 — 4 подозреваемых, 6 улик, лупа, 1 ложный след с `refutes`, сцена с уликой и допросом виновного.
+- 61–62 (уровни 61–90): 8 улик, «противоречие» — улика `fake` из допроса (`talk[].clue`, `at: scene:s1`, у свидетеля место `talk` в сцене) опровергнута настоящей; в 62 ещё второй ложный след под лупой.
+- Вещи-награды — room.js блок «награды за дела Титоса»: tcsaucer, tcbell, tccookie, tcnoodlebow, tcsockclock, tcsmoothie, tcpaintleaf, tcbigspoon, tcwebcup, tcredcarpet.
+- Ещё свободны во втором круге: mr-chew, miss-peony, professor-owlistair-tweed, milka, tim-froggucion, mr-dr-fisher-iii, barnaby-burrows, nutmeg-hazelton, rusty-roamwell, lady-puddle-dip, sew-sew-patty, bobby-bagster, chestnut-charlie, candice-creepleton, baron-von-worms, petunia-spookworth, the-pumpkin-family, miss-pumpkinella, sir-gourdon-squash, moss-mccandle.
