@@ -159,14 +159,12 @@ export function harmonyColors(data, key) {
   const y = harmonyFor(data, keyOfNum(dayNum(key) - 1), new Set()), all = allColors(data);
   return harmonyFor(data, key, new Set(y.filter(i => all[i].k !== 'n')));
 }
-// ---------- с 1.11.2026: Ч/Б-указание — два из разных групп (раскадровка, линия и штриховка, размер, настроение) ----------
-const BW_PAIRS = [['frame', 'line'], ['size', 'mood'], ['line', 'mood'], ['frame', 'mood'], ['line', 'size'], ['frame', 'size']];
+// ---------- с 1.11.2026: Ч/Б-указание — одно в день, группы по очереди (раскадровка, линия и штриховка, размер, настроение) ----------
+const BW_GROUPS = ['frame', 'line', 'size', 'mood'];
 export function bwTwist(data, n) {
-  const k = n - N_FROM, P = BW_PAIRS.length, pair = BW_PAIRS[mod(k, P)];
-  // сколько раз группа g была до дня k — внутри группы указания идут по кругу без повторов
-  const before = g => { let c = Math.floor(k / P) * BW_PAIRS.filter(p => p.includes(g)).length; for (let j = 0; j < mod(k, P); j++) if (BW_PAIRS[j].includes(g)) c++; return c; };
-  const parts = pair.map(g => { const L = data.bw[g]; return L[orderOf('bw-' + g, L.length)[mod(before(g), L.length)]]; });
-  return [0, 1, 2].map(l => parts.map(p => p[l]).join(' · '));
+  const k = n - N_FROM, g = BW_GROUPS[mod(k, BW_GROUPS.length)], L = data.bw[g];
+  // внутри группы — по кругу без повторов
+  return L[orderOf('bw-' + g, L.length)[mod(Math.floor(k / BW_GROUPS.length), L.length)]].slice(0, 3);
 }
 export function baseDay(data, key) {
   const n = dayNum(key), y = +key.slice(0, 4), m = +key.slice(5, 7) - 1, d = +key.slice(8, 10);
