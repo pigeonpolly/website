@@ -33,7 +33,7 @@
   // уровни серии — те же, что в sketch-wall.js LEVELS
   const LV = { 1: ['Egg', 'Яйцо', 'Ola'], 3: ['Chick', 'Птенец', 'Cālis'], 7: ['Little pigeon', 'Голубёнок', 'Balodītis'], 14: ['Carrier pigeon', 'Почтовый голубь', 'Pasta balodis'],
     30: ['Travelling pigeon', 'Голубь-путешественник', 'Ceļotājs balodis'], 60: ['Artist pigeon', 'Голубь-художник', 'Mākslinieks balodis'], 100: ['Astronaut pigeon', 'Голубь-астронавт', 'Astronauts balodis'], 365: ['Polly legend', 'Легенда Полли', 'Pollijas leģenda'] };
-  const ICON = { daily: '🚪', draw: '🎨', comment: '💬', rain: '🌧', potion: '🧪', titos: '🕵️', bugs: '🪲', advent: '🎄' };
+  const ICON = { daily: '🚪', draw: '🎨', comment: '💬', rain: '🌧', potion: '🧪', pan: '🥞', titos: '🕵️', bugs: '🪲', advent: '🎄' };
   // история пуговок: за что
   const KIND = { daily: ['Visit', 'Заход', 'Apmeklējums'], upload: ['Drawing', 'Рисунок', 'Zīmējums'], comment: ['Comment', 'Комментарий', 'Komentārs'], friend: ['Friend', 'Друг', 'Draugs'], welcome: ['Welcome gift', 'Подарок новичку', 'Dāvana jaunpienācējam'],
     pick: ['Polly’s pick', 'Выбор Полли', 'Pollijas izvēle'], badge: ['Badge', 'Бейдж', 'Nozīmīte'], game: ['Button Rain', 'Пуговичный дождь', 'Pogu lietus'], gamerec: ['Rain record', 'Рекорд дождя', 'Lietus rekords'],
