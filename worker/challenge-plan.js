@@ -12,12 +12,13 @@ export const CH_DEFAULTS = {
 };
 export const CH_RANGE = { chFamilyGap: [0, 365], chCatWindow: [2, 14], chCatMin: [1, 14], chEasy: [0, 14], chMid: [0, 14], chHard: [0, 14], chSeasonDaysPct: [0, 100] };
 export const PLAN_FROM = '2026-11-01'; // с этого дня темы — из плана (раньше — формула challenge-theme.js)
+export const NEW_FROM = '2026-10-19'; // с этого дня — новые правила: цвета 2–5, Ч/Б-указания, слова-темы и «из жизни» (18.10.2026, по просьбе Алины)
 
 const pad = n => String(n).padStart(2, '0');
 const mod = (a, b) => ((a % b) + b) % b;
 export const dayNum = key => Math.round(Date.UTC(+key.slice(0, 4), +key.slice(5, 7) - 1, +key.slice(8, 10)) / 864e5);
 export const keyOfNum = n => new Date(n * 864e5).toISOString().slice(0, 10);
-const N_OCT5 = dayNum('2026-10-05'), N_OCT9 = dayNum('2026-10-09'), N_FROM = dayNum(PLAN_FROM);
+const N_OCT5 = dayNum('2026-10-05'), N_OCT9 = dayNum('2026-10-09'), N_FROM = dayNum(PLAN_FROM), N_NEW = dayNum(NEW_FROM);
 const FRESH = 1080; // предметы с этого индекса (18.10.2026, с маленькой историей) — первыми, пока не были
 
 // те же случайные числа, что в site/assets/challenge-theme.js
@@ -162,7 +163,7 @@ export function harmonyColors(data, key) {
 // ---------- с 1.11.2026: Ч/Б-указание — одно в день, группы по очереди (раскадровка, линия и штриховка, размер, настроение) ----------
 const BW_GROUPS = ['frame', 'line', 'size', 'mood'];
 export function bwTwist(data, n) {
-  const k = n - N_FROM, g = BW_GROUPS[mod(k, BW_GROUPS.length)], L = data.bw[g];
+  const k = n - N_NEW, g = BW_GROUPS[mod(k, BW_GROUPS.length)], L = data.bw[g];
   // внутри группы — по кругу без повторов
   return L[orderOf('bw-' + g, L.length)[mod(Math.floor(k / BW_GROUPS.length), L.length)]].slice(0, 3);
 }
@@ -171,13 +172,13 @@ export function baseDay(data, key) {
   const r = rngFor('polly-' + key); r();
   const cols = data.colors.map((c, i) => i);
   for (let i = cols.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [cols[i], cols[j]] = [cols[j], cols[i]]; }
-  const colors = n >= N_FROM && data.moreColors && data.moreColors.length ? harmonyColors(data, key) : n >= N_OCT9 ? colorBlock(data, Math.floor((n - N_OCT9) / 8))[(n - N_OCT9) % 8].slice() : cols.slice(0, 3);
+  const colors = n >= N_NEW && data.moreColors && data.moreColors.length ? harmonyColors(data, key) : n >= N_OCT9 ? colorBlock(data, Math.floor((n - N_OCT9) / 8))[(n - N_OCT9) % 8].slice() : cols.slice(0, 3);
   const time = data.times[Math.floor(r() * data.times.length)];
   const mi = y * 12 + m - (2026 * 12 + 9);
   const extra = d === extraDay(y, m);
   return {
     colors, time, tip: data.tips[n % data.tips.length].slice(0, 3),
-    twist: n >= N_FROM && data.bw ? bwTwist(data, n) : data.twists[orderOf('polly-twist', data.twists.length)[mod(n - N_OCT5, data.twists.length)]].slice(0, 3),
+    twist: n >= N_NEW && data.bw ? bwTwist(data, n) : data.twists[orderOf('polly-twist', data.twists.length)[mod(n - N_OCT5, data.twists.length)]].slice(0, 3),
     extra: extra ? data.extrasBw[orderOf('polly-extrabw', data.extrasBw.length)[mod(mi, data.extrasBw.length)]].slice(0, 3) : null,
   };
 }
@@ -236,17 +237,18 @@ function poolList(data, p) {
 // подходящие предметы для дня, лучшие первыми: давно не было (или не было никогда), потом — случайно
 // lastUse: Map предмет → номер дня, когда был; rnd — случайные числа
 function ranked(data, rules, plan, n, pool, lastUse, rnd, skip, wantD) {
-  const out = [], ctx = around(data, rules, plan, n), oct = keyOfNum(n).slice(5, 7) === '10';
+  const out = [], ctx = around(data, rules, plan, n), oct = keyOfNum(n).slice(5, 7) === '10', hw = keyOfNum(n).slice(5) === '10-31'; // 31 октября — хеллоуинская тема
   // слово-тема (категория idea, в духе Inktober 52) — первой, если её не было 6 дней
   // и так же тема «из жизни» (категория life: кадр из любимого фильма, ваш завтрак, вид из окна…)
-  const noneFor = (c, k) => n >= N_FROM && [...Array(k)].every((_, x) => !plan.has(n - x - 1) || (data.tags[plan.get(n - x - 1)] || [])[1] !== c);
+  const noneFor = (c, k) => n >= N_NEW && [...Array(k)].every((_, x) => !plan.has(n - x - 1) || (data.tags[plan.get(n - x - 1)] || [])[1] !== c);
   const wantIdea = noneFor('idea', 6), wantLife = noneFor('life', 3); // слово — ~раз в неделю, «из жизни» — ~2 раза
   for (const i of poolList(data, pool)) {
     if (wantD && data.tags[i][2] !== wantD) continue;
     if (!oct && isHalloween(data, i)) continue; // хеллоуинские — только в октябре
     if (violations(data, rules, plan, n, i, skip, ctx).length) continue;
     const lu = lastUse.has(i) ? lastUse.get(i) : -1e9;
-    out.push([i, lu + rnd() * 30 - (i >= FRESH && lu < 0 ? 100 : 0) - (wantIdea && data.tags[i][1] === 'idea' ? 1e10 : 0) - (wantLife && data.tags[i][1] === 'life' ? 2e10 : 0)]); // разница в месяц — почти одно и то же; новые предметы, которых ещё не было, — первыми
+    const c = data.tags[i][1], special = c === 'idea' || c === 'life';
+    out.push([i, lu + rnd() * 30 - (i >= FRESH && lu < 0 && !special ? 100 : 0) - (wantIdea && c === 'idea' ? 1e10 : 0) - (wantLife && c === 'life' ? 2e10 : 0) - (hw && isHalloween(data, i) ? 3e10 : 0)]); // разница в месяц — почти одно и то же; новые предметы, которых ещё не было, — первыми
   }
   return out.sort((a, b) => a[1] - b[1]).map(x => x[0]);
 }
@@ -256,14 +258,15 @@ const RELAX = [{}, { window: 1 }, { window: 1, deck: 1 }, { window: 1, deck: 1, 
 // ---------- план месяца ----------
 // history: Map номер дня → предмет (что уже было до месяца, лучше ~120 дней; можно и дни после — если месяц пересобирается)
 // Возвращает { rows: [{day, item, subject, tip, colors, time, twist, extra}], broken: [{day, rules}] } — broken: где правила пришлось ослабить
-export function planMonth(data, rules, y, m, history) {
+// fromDay — с какого числа месяца подбирать (раньше — уже есть в history; так собран конец октября 2026)
+export function planMonth(data, rules, y, m, history, fromDay = 1) {
   rules = { ...CH_DEFAULTS, ...(rules || {}) };
   const days = new Date(Date.UTC(y, m + 1, 0)).getUTCDate(), ym = `${y}-${pad(m + 1)}`;
   let best = null;
   for (let attempt = 0; attempt < 12 && !(best && !best.broken.length); attempt++) {
     const rnd = rngFor(`plan-${ym}-${attempt}`), plan = new Map(history), lastUse = new Map(), broken = [];
     for (const [x, it] of [...history].sort((a, b) => a[0] - b[0])) lastUse.set(it, x);
-    const keys = [...Array(days)].map((_, i) => `${ym}-${pad(i + 1)}`);
+    const keys = [...Array(days)].map((_, i) => `${ym}-${pad(i + 1)}`).slice(fromDay - 1);
     // 23 января — заранее, чтобы колода и категории учли именинный предмет
     for (const k of keys) if (poolOf(data, rules, k) === 'bday') plan.set(dayNum(k), birthdayIdx(data, y));
     // ближайшее 23 января после месяца (в пределах chFamilyGap) — не брать семью именинного предмета

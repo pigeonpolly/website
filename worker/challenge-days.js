@@ -2,7 +2,7 @@
 // Подбор предметов — worker/challenge-plan.js; предметы с тегами — site/assets/challenge-items.json (build.py).
 // Октябрь 2026 — из site/assets/challenge-2026-10.json (tools/challenge_oct.js), один раз (метка meta 'chplan_oct'). Ноябрь и дальше — генератор:
 // cron с 20-го создаёт следующий месяц, текущий — если его почему-то нет. Созданный месяц сам не меняется, правит только Алина.
-import { planMonth, rowText, rerollDay, checkPlan, dayNum, keyOfNum, poolOf, allColors, PLAN_FROM } from './challenge-plan.js';
+import { planMonth, rowText, rerollDay, checkPlan, dayNum, keyOfNum, poolOf, allColors, PLAN_FROM, NEW_FROM } from './challenge-plan.js';
 
 export const CHALLENGE_TABLES = [
   // день плана: item — индекс предмета в challenge-data.js; тексты — на трёх языках; colors — индексы цветов (colors + moreColors) через запятую: до 1.11.2026 — 3, дальше 2–5;
@@ -55,18 +55,22 @@ async function importOct(env) {
   await env.DB.batch([...rows.map(d => insertSql(env, d)),
     env.DB.prepare("INSERT INTO meta (key, value) VALUES ('chplan_oct', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(String(now()))]);
 }
-// 18.10.2026 — новые темы, цвета 2–5 и Ч/Б-указания: уже созданные будущие дни (не правленные Алиной) — один раз заново (метка meta 'chplan_v2')
+// 18.10.2026 — новые темы, цвета 2–5 и Ч/Б-указания с 19.10 (NEW_FROM): будущие дни (не правленные Алиной) — один раз заново (метка meta 'chplan_v2'):
+// конец октября — из нового challenge-2026-10.json, ноябрь и дальше — генератор пересоберёт сам
 async function upgradeV2(env) {
   if ((await env.DB.prepare("SELECT value FROM meta WHERE key = 'chplan_v2'").first())) return;
-  const from = [PLAN_FROM, keyOfNum(dayNum(rigaToday()) + 1)].sort()[1];
-  await env.DB.batch([env.DB.prepare('DELETE FROM challenge_days WHERE day >= ? AND edited = 0').bind(from),
+  await importOct(env);
+  const from = [NEW_FROM, keyOfNum(dayNum(rigaToday()) + 1)].sort()[1];
+  const r = await env.ASSETS.fetch(new Request('https://pigeonpolly.com/assets/challenge-2026-10.json'));
+  const oct = r.ok ? (await r.json()).filter(d => d.day >= from) : [];
+  await env.DB.batch([env.DB.prepare('DELETE FROM challenge_days WHERE day >= ? AND edited = 0').bind(from), ...oct.map(d => insertSql(env, d)),
     env.DB.prepare("INSERT INTO meta (key, value) VALUES ('chplan_v2', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(String(now()))]);
 }
 // месяц есть в базе? нет — создать по правилам (история — ~150 дней до него)
 export async function ensureMonth(env, rules, ym) {
   if (ym < FIRST) return false;
-  if (ym === FIRST) { await importOct(env); return true; }
   await upgradeV2(env);
+  if (ym === FIRST) { await importOct(env); return true; }
   const have = await env.DB.prepare('SELECT COUNT(*) AS n FROM challenge_days WHERE day >= ? AND day <= ?').bind(ym + '-01', ym + '-31').first();
   if (have && have.n >= daysIn(ym)) return true;
   await importOct(env);
@@ -84,11 +88,11 @@ const openMonths = (today = rigaToday()) => { const ym = today.slice(0, 7); retu
 export async function challengeCron(env, rules) {
   for (const ym of openMonths()) await ensureMonth(env, rules, ym);
 }
-// цвета дней плана для бейджей за цвета (с PLAN_FROM; раньше — site/assets/day-colors.json): {"2026-11-03": "py"}
+// цвета дней плана для бейджей за цвета (с NEW_FROM; раньше — site/assets/day-colors.json): {"2026-11-03": "py"}
 const FAM = { purple: 'p', yellow: 'y', red: 'r', blue: 'b', green: 'g' };
 export async function planDayColors(env) {
   const data = await chItems(env), out = {};
-  const rows = (await env.DB.prepare('SELECT day, colors FROM challenge_days WHERE day >= ? AND extra_en IS NULL').bind(PLAN_FROM).all()).results;
+  const rows = (await env.DB.prepare('SELECT day, colors FROM challenge_days WHERE day >= ? AND extra_en IS NULL').bind(NEW_FROM).all()).results;
   const all = allColors(data);
   for (const r of rows) { const s = [...new Set(String(r.colors || '').split(',').map(i => { const c = all[+i] || { n: [] }; return FAM[c.f || c.n[0]] || ''; }))].join(''); if (s) out[r.day] = s; }
   return out;
