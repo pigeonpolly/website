@@ -25,7 +25,7 @@
     .then(r => r.ok ? r.json() : null).then(d => {
       if (!d || d.guest || !d.tasks) return;
       const now = d.now || Date.now(), task = id => d.tasks.find(x => x.id === id);
-      for (const g of ['rain', 'potion']) { const x = task(g); if (x) set(g, [x.done ? t('done') : t('stamp')], !x.done); }
+      for (const g of ['rain', 'potion', 'pan']) { const x = task(g); if (x) set(g, [x.done ? t('done') : t('stamp')], !x.done); }
       const ti = task('titos'), bu = task('bugs');
       if (ti) {
         const p = [];

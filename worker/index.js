@@ -467,7 +467,7 @@ const RULE_DEFAULTS = {
   lowPct: 5, normPct: 20, manyPct: 50, legendPct: 25,
   adventLastJan: 23, adventButtons: 10, adventSpecialButtons: 25,
   welcomeBtn: -1, // подарок новичку после ника (этап 14): случайная дешёвая вещь (welcomeOf) и столько пуговок (-1 — цена этой вещи)
-  dayBonusNeed: 5, dayBonusOf: 7, dayBonusPct: 10, // карточка дня: бонус за dayBonusNeed штампов (из dayBonusOf) — dayBonusPct % опорной цены, раз в сутки
+  dayBonusNeed: 5, dayBonusOf: 8, dayBonusPct: 10, // карточка дня: бонус за dayBonusNeed штампов (из dayBonusOf) — dayBonusPct % опорной цены, раз в сутки
   aiStreak: true, aiUpload: true,
   sellOn: true, sellPrice: 5,
   // «Пуговичный дождь»: за уровень gameLevel 🔘 × (1 + ⌊(ур.−1)/10⌋) — каждый номер уровня раз в сутки; gameDayMax — лимит в сутки (0 — без лимита);
@@ -715,6 +715,7 @@ const TASKS = [
   { id: 'comment', n: ['Comment in the blog', 'Комментарий в блоге', 'Komentārs blogā'], url: '/blog/' },
   { id: 'rain', n: ['Button Rain', 'Пуговичный дождь', 'Pogu lietus'], url: '/rain/', on: () => RULES.gameOn },
   { id: 'potion', n: ['Brew a potion', 'Сварить зелье', 'Izvārīt dziru'], url: '/potions/', on: () => RULES.potionOn },
+  { id: 'pan', n: ['Bake pancakes', 'Испечь блины', 'Izcept pankūkas'], url: '/pancakes/', on: () => RULES.panOn },
   { id: 'titos', n: ['Solve a Titos case', 'Раскрыть дело Титоса', 'Atrisināt Tito lietu'], url: '/titos/' },
   { id: 'bugs', n: ['Catch the bugs', 'Поймать жуков', 'Noķert blaktis'], url: '/titos/#bugs' },
   { id: 'advent', n: ['Advent window', 'Окошко адвента', 'Adventes lodziņš'], url: '/advent/', on: (t) => t.month === 12 },
@@ -740,6 +741,7 @@ async function dayCard(env, req, u, L, withLog) {
     comment: { done: cmt > 0, reward: BTN.comment, at: at('comment'), prog: [Math.min(cmt, BTN.commentsPerDay), BTN.commentsPerDay] },
     rain: { done: cnt('game') > 0, reward: gp.level, at: at('game') },
     potion: { done: cnt('potion') > 0, reward: gp.p1, at: at('potion') },
+    pan: { done: cnt('pan') > 0, reward: btnOf(RULES.panLevelPct, unit), at: at('pan') }, // «Блинная Полли»: хоть один пройденный уровень
     // дело: новое раскрытое за сутки; ждёт — нет кофе на старт (до следующей чашки) или все дела раскрыты (новое появится само)
     titos: { done: stamped('titos') || cnt('titos') > 0, at: at('titos'), reward: RULES.titosOn ? btnOf(RULES.titosLevelPct, unit) * (1 + Math.floor((tl - 1) / 10)) : 0,
       wait: ts.level >= cases && cases ? -1 : !ts.run && ts.coffee < RULES.titosStartCups ? ts.next : null, cups: [ts.coffee, ts.max] }, // cups — для хаба /games/ («☕ 7/10»)
@@ -756,7 +758,7 @@ async function dayCard(env, req, u, L, withLog) {
   // ближайший бейдж: следующий уровень серии (по рекорду), сколько дней текущей серии до него
   const posts = (await env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(u.id).all()).results, days = streakDays(posts);
   const best = mergedBest(u, days), cur = streaks(days).current, nd = Object.keys(BTN.levels).map(Number).sort((a, b) => a - b).find(x => x > best);
-  const out = { day, tasks, done, bonus: { need, of: RULES.dayBonusOf, amount, got, just }, earned, buttons: (u.buttons || 0) + just, nextAt: tomorrow, now: Date.now(),
+  const out = { day, tasks, done, bonus: { need, of: Math.max(RULES.dayBonusOf, tasks.length), amount, got, just }, earned, buttons: (u.buttons || 0) + just, nextAt: tomorrow, now: Date.now(),
     friend: BTN.friend, badge: nd ? { d: nd, left: Math.max(1, nd - cur), reward: BTN.levels[nd] } : null };
   if (withLog) out.log = (await env.DB.prepare("SELECT kind, ref, amount, created_at FROM button_log WHERE user_id = ? AND amount != 0 ORDER BY id DESC LIMIT 40").bind(u.id).all()).results;
   return out;
