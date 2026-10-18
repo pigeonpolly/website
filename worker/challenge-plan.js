@@ -223,6 +223,7 @@ const seasonsOf = new WeakMap(); // сезоны предмета — один �
 function inPool(data, i, p) {
   if (p === 'any') return true;
   let S = seasonsOf.get(data); if (!S) seasonsOf.set(data, S = data.subjects.map(r => String(r[3] || '').split(' ').filter(Boolean)));
+  if (!S[i].length && data.tags[i] && data.tags[i][1] === 'idea') return true; // слово-тема без сезона годится в любой день
   return p === 'none' ? !S[i].length : S[i].includes(p);
 }
 const isHalloween = (data, i) => String(data.subjects[i][3] || '').split(' ').includes('halloween');
@@ -236,12 +237,14 @@ function poolList(data, p) {
 // lastUse: Map предмет → номер дня, когда был; rnd — случайные числа
 function ranked(data, rules, plan, n, pool, lastUse, rnd, skip, wantD) {
   const out = [], ctx = around(data, rules, plan, n), oct = keyOfNum(n).slice(5, 7) === '10';
+  // слово-тема (категория idea, в духе Inktober 52) — первой, если её не было 3 дня (выходит ~2 раза в неделю)
+  const wantIdea = n >= N_FROM && [1, 2, 3].every(x => !plan.has(n - x) || (data.tags[plan.get(n - x)] || [])[1] !== 'idea');
   for (const i of poolList(data, pool)) {
     if (wantD && data.tags[i][2] !== wantD) continue;
     if (!oct && isHalloween(data, i)) continue; // хеллоуинские — только в октябре
     if (violations(data, rules, plan, n, i, skip, ctx).length) continue;
     const lu = lastUse.has(i) ? lastUse.get(i) : -1e9;
-    out.push([i, lu + rnd() * 30 - (i >= FRESH && lu < 0 ? 100 : 0)]); // разница в месяц — почти одно и то же; новые предметы, которых ещё не было, — первыми
+    out.push([i, lu + rnd() * 30 - (i >= FRESH && lu < 0 ? 100 : 0) - (wantIdea && data.tags[i][1] === 'idea' ? 1e10 : 0)]); // разница в месяц — почти одно и то же; новые предметы, которых ещё не было, — первыми
   }
   return out.sort((a, b) => a[1] - b[1]).map(x => x[0]);
 }
