@@ -1240,7 +1240,7 @@
     box.innerHTML = `<div class="room-stage"><canvas class="room-cv" width="${RW}" height="${RH}" aria-label="${t('of').replace('{n}', o.nick)}" role="img"></canvas></div>
       <div class="room-bar"><span class="room-cap">🏠 ${t('of').replace('{n}', o.nick)}</span>${o.mine ? `<span class="room-hint">${t('hintOff')}</span><button type="button" class="room-tidy" hidden></button><button type="button" class="room-edit" aria-pressed="false"></button><button type="button" class="room-light"></button><span class="room-st" aria-live="polite"></span>` : ''}</div>`;
     const cv = box.querySelector('canvas'), stage = box.querySelector('.room-stage');
-    const S = 4; cv.width = RW * S; cv.height = RH * S;
+    const S = o.scale || 4; cv.width = RW * S; cv.height = RH * S;
     const g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
     const st = box.querySelector('.room-st');
     // панель над выбранной вещью: ⇆ ⬆ ⬇ ↩
@@ -1427,7 +1427,7 @@
     // ---------- кадр ----------
     let raf = 0;
     function frame(now) {
-      if (!o.still) raf = requestAnimationFrame(frame); // o.still — один кадр без анимации (снимок для галереи комнат)
+      if (!o.still && !o.film) raf = requestAnimationFrame(frame); // o.still — один кадр без анимации (снимок для галереи комнат); o.film — кадры по api.frame(t) (видео, tools/video)
       if (!box.isConnected) { cancelAnimationFrame(raf); return; }
       const lay = layout();
       g.setTransform(S, 0, 0, S, 0, 0); g.imageSmoothingEnabled = false;
@@ -1460,8 +1460,7 @@
         }
       });
       placeSel(lay);
-      think(now, lay); stepBird(now);
-      drawBird(now);
+      if (o.film) o.film(g, now, lay); else { think(now, lay); stepBird(now); drawBird(now); } // в видео птичку и всё своё рисует сценарий
       if (tidy && tidy.carry) { const d = defOf(tidy.carry.k, tidy.carry.v); if (d) d.d(P(g, bird.x - d.w / 2, bird.y - FR[0].height * .75 - d.h + 3), now, d.i, ctx); } // несёт вещь над головой
       drawParts(now);
       drawDark(lay, now);
@@ -1563,7 +1562,7 @@
       save(); changed();
       return { done: 'put', undo: () => { const i = room.items.indexOf(it); if (i < 0) return; room.items.splice(i, 1); sel = sel === i ? -1 : sel > i ? sel - 1 : sel; save(); changed(); } };
     }
-    const api = { use, mine: !!o.mine, box, dress: av => { FR = [0, 1, 2].map(f => B.sprite(B.dress(B.looks(o.id), av || {}), f)); } };
+    const api = { use, frame, mine: !!o.mine, box, dress: av => { FR = [0, 1, 2].map(f => B.sprite(B.dress(B.looks(o.id), av || {}), f)); } };
     if (o.mine) window.PPRoom.live = api;
     if (o.mine) {
       selBar.querySelector('[data-flip]').onclick = () => { const it = room.items[sel]; if (it) { it.f = it.f ? 0 : 1; save(); } };
@@ -1670,7 +1669,7 @@
     cv.addEventListener('pointerleave', () => { tip.hidden = true; });
     cv.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') { showTip(e); clearTimeout(tip._t); tip._t = setTimeout(() => { tip.hidden = true; }, 1800); } }); // на телефоне — по касанию
     paintBg();
-    raf = requestAnimationFrame(frame);
+    if (!o.film) raf = requestAnimationFrame(frame);
     return api;
   }
   const aboutOf = (kind, v, l = L) => { const a = ABOUT[kind + '|' + parse(v)[0]]; return a ? a[l] : ''; }; // описание вещи (пока у наград Титоса)
