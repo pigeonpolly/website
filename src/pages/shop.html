@@ -39,7 +39,7 @@
     changed: ['The price has just changed: now {p} 🔘. Take a look and buy again.', 'Цена только что изменилась: теперь {p} 🔘. Посмотрите и купите ещё раз.', 'Cena tikko mainījās: tagad {p} 🔘. Paskaties un pērc vēlreiz.'],
     rule: ['You can buy up to 3 of the same thing (legendary ones: just 1). Prices follow the stock: the fewer left, the pricier; the more in stock, the cheaper.', 'Одну и ту же вещь можно купить до 3 штук (легендарные — только 1). Цена зависит от остатка: чем меньше осталось, тем дороже, чем больше — тем дешевле.', 'Vienu un to pašu lietu var nopirkt līdz 3 gab. (leģendārās — tikai 1). Cena atkarīga no atlikuma: jo mazāk palicis, jo dārgāk; jo vairāk, jo lētāk.'],
     newH: ['✨ New in the shop', '✨ Новое в магазине', '✨ Jaunums veikalā'], newB: ['new', 'новое', 'jauns'],
-    newCards: ['🃏 New collection “{t}” · {n} cards →', '🃏 Новая коллекция «{t}» · {n} карточек →', '🃏 Jauna kolekcija “{t}” · {n} kartītes →'],
+    newCards: ['🃏 New card collections:', '🃏 Новые коллекции карточек:', '🃏 Jaunas kartīšu kolekcijas:'],
     soldH: ['Out of stock', 'Нет в наличии', 'Nav pieejams'], catH: ['🛍 Catalog', '🛍 Каталог', '🛍 Katalogs'],
   };
   var t = function (k) { return T[k][L]; };
@@ -118,11 +118,14 @@
     if (!list.length && !newCards.length) { newBox.hidden = true; return; }
     newBox.hidden = false;
     newBox.insertAdjacentHTML('beforeend', '<h2 class="shop-block-h">' + t('newH') + '</h2>');
+    // коллекции — одной строкой: подпись и короткие кнопки «название · N», лишнее листается вбок
+    var cardsRow = document.createElement('div'); cardsRow.className = 'shop-new-cards-row';
+    if (newCards.length) { cardsRow.insertAdjacentHTML('beforeend', '<span class="shop-new-cards-l">' + t('newCards') + '</span>'); newBox.appendChild(cardsRow); }
     newCards.forEach(function (c) {
       var a = document.createElement('button'); a.type = 'button'; a.className = 'shop-new-cards';
-      a.textContent = T.newCards[L].replace('{t}', c.title[['en', 'ru', 'lv'][L]] || c.title.en || c.slug).replace('{n}', c.n);
+      a.textContent = (c.title[['en', 'ru', 'lv'][L]] || c.title.en || c.slug) + ' · ' + c.n;
       a.onclick = function () { try { var f = JSON.parse(localStorage.getItem('pp-cards-f') || '{}') || {}; f.collection = c.slug; localStorage.setItem('pp-cards-f', JSON.stringify(f)); } catch (e) { /* ок */ } ui.setTab('cards'); saveF(); catBox.scrollIntoView({ behavior: 'smooth' }); };
-      newBox.appendChild(a);
+      cardsRow.appendChild(a);
     });
     if (!list.length) return;
     var strip = document.createElement('div'); strip.className = 'shop-new-row';

@@ -4241,7 +4241,9 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .cat-shop .shop-new { margin: 0 0 26px; }
 .shop-new-row { display: grid; grid-auto-flow: column; grid-auto-columns: 132px; gap: 10px; overflow-x: auto; padding: 4px 2px 10px; scroll-snap-type: x proximity; }
 .shop-new-row .cat-tile { scroll-snap-align: start; }
-.shop-new-cards { display: inline-block; margin: 4px 8px 10px 0; padding: 10px 16px; border-radius: 14px; border: 1.5px solid #E5C04B; background: #FFF7E0; color: #2B1A51; font: 700 14px var(--sans); cursor: pointer; text-align: left; }
+.shop-new-cards-row { display: flex; align-items: center; gap: 6px; margin: 2px 0 10px; overflow-x: auto; white-space: nowrap; scrollbar-width: thin; }
+.shop-new-cards-l { flex: none; font: 700 14px var(--sans); color: #2B1A51; margin-right: 2px; }
+.shop-new-cards { flex: none; padding: 4px 12px; border-radius: 999px; border: 1.5px solid #E5C04B; background: #FFF7E0; color: #2B1A51; font: 600 13px var(--sans); cursor: pointer; }
 .shop-cat-h { margin: 0 0 12px; }
 .cat-shop .pc-sec { padding: 0; }
 @media (max-width: 600px) { .cat-tabs.cat-tabs-big button { padding: 9px 14px; font-size: 15px; } .shop-new-row { grid-auto-columns: 112px; } }
