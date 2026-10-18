@@ -76,7 +76,7 @@ a:hover { color: var(--text); }
   white-space: nowrap;
 }
 .brand em { font-style: normal; color: var(--peach); }
-.brand-star { width: 22px; height: 22px; fill: var(--star); flex: none; }
+.brand-star { width: 32px; height: 32px; flex: none; image-rendering: pixelated; }
 
 .site-nav ul { list-style: none; margin: 0; padding: 0; }
 .site-nav > ul { display: flex; align-items: center; gap: 4px; }
@@ -501,7 +501,6 @@ body.modal-open { overflow: hidden; }
 @media (max-width: 480px) {
   .site-header { gap: 10px; }
   .brand { font-size: 17px; gap: 8px; }
-  .brand-star { width: 18px; height: 18px; }
   .lang-switch { margin-right: 2px; }
   .lang-switch a { padding: 6px 7px; font-size: 12px; }
 }
