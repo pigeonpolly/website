@@ -16,6 +16,7 @@
     smeared: ['Something is smeared on it. Too small to see with the naked eye.', 'На этом что-то размазано. Невооружённым глазом не разглядеть.', 'Uz tā kaut kas ir nosmērēts. Ar neapbruņotu aci neredz.'],
     close: ['Close', 'Закрыть', 'Aizvērt'],
     suspects: ['Suspects', 'Подозреваемые', 'Aizdomās turamie'],
+    askBtn: ['Question', 'Допросить', 'Nopratināt'],
     noDoss: ['The suspects’ folders are in the filing cabinet drawer.', 'Папки подозреваемых — в ящике шкафа с документами.', 'Aizdomās turamo mapes ir dokumentu skapja atvilktnē.'],
     accuseBtn: ['Accuse', 'Обвинить', 'Apsūdzēt'],
     magGot: ['You take the magnifying glass. Now clues can be examined.', 'Вы берёте лупу. Теперь улики можно рассмотреть.', 'Tu paņem lupu. Tagad pierādījumus var apskatīt.'],
@@ -143,7 +144,7 @@
     if (roomN) list.push({ done: ORDER.filter(id => (C[id].hot || C[id].sprite) && st.found.includes(id)).length >= roomN, text: t(UI.gSearch)(st.found.length), act: 'show' });
     if (K.scene) list.push({ done: ORDER.filter(id => !C[id].hot && !C[id].sprite).every(id => st.found.includes(id) || C[id].kind === 'witness'), text: t(UI.gScene), act: 'scene' });
     const wits = Object.keys(K.W);
-    if (wits.length) { const wDone = wits.filter(w => (st.asked[w] || []).length >= K.W[w].qa.length).length; list.push({ done: wDone === wits.length, text: t(UI.gTalk)(wDone, wits.length), act: K.scene ? 'scene' : 'doss' }); }
+    if (wits.length) { const wDone = wits.filter(w => (st.asked[w] || []).length >= K.W[w].qa.length).length; list.push({ done: wDone === wits.length, text: t(UI.gTalk)(wDone, wits.length), act: K.scene && wits.every(w => K.scene.zones.some(z => z.wit === w)) ? 'scene' : 'doss' }); } // подозреваемого без места в сцене допрашивают в досье
     if (an.length) list.push({ done: anDone === an.length, text: t(UI.gExam)(anDone, an.length), act: K.scene ? 'scene' : 'show' });
     list.push({ done: pinned >= N, text: t(UI.gPin)(pinned, N), act: 'board' }, { done: st.dossiers, text: t(UI.gDoss), act: 'doss' }, { done: st.solved, text: t(UI.gAcc), act: 'board' });
     return list;
@@ -230,7 +231,7 @@
   };
   const openDossiers = () => {
     st.dossiers = true; save(); drawGuide();
-    card(`<p class="q-kick">🗂 ${t(UI.suspects)}</p><div class="q-doss">${Object.entries(S).map(([k, s]) => `<article>${K.sus(k) ? `<img src="${K.sus(k)}" alt="">` : '<b class="q-emo">❔</b>'}<h4>${esc(t(s.name))}</h4><p>${esc(t(s.text))}</p></article>`).join('')}</div>`);
+    card(`<p class="q-kick">🗂 ${t(UI.suspects)}</p><div class="q-doss">${Object.entries(S).map(([k, s]) => `<article>${K.sus(k) ? `<img src="${K.sus(k)}" alt="">` : '<b class="q-emo">❔</b>'}<h4>${esc(t(s.name))}</h4><p>${esc(t(s.text))}</p>${K.W[k] ? `<button type="button" class="q-ask" data-talk="${k}">🗣 ${t(UI.askBtn)}</button>` : ''}</article>`).join('')}</div>`);
   };
   const solve = async (k) => {
     if (srv.on && !(await go())) return;
@@ -289,6 +290,7 @@
       const id = witClue(w); if (id && list.length >= K.W[w].qa.length) { if (!st.found.includes(id)) st.found.push(id); save(); tell(id); }
       openWitness(w); return;
     }
+    const tk = e.target.closest('[data-talk]'); if (tk) { openWitness(tk.dataset.talk); return; }
     if (o) { openClue(o.dataset.open); return; }
     if (a && !a.disabled) { solve(a.dataset.acc); return; }
     if (!q) return;
