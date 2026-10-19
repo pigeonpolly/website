@@ -174,6 +174,7 @@ export async function titosApi(req, env, url, h) {
   if (m === 'GET' && p === '/api/titos') {
     const u = await h.currentUser(req, env), r = u && !u.banned ? await rowOf(env, u.id) : null;
     if (!(await caseCount(env)).n) await importTitos(env, url); // дел в базе ещё нет (первая выкладка) — занести сразу, не дожидаясь расписания
+    else if (!fresh) { fresh = true; await importTitos(env, url, false, 0).catch(() => null); } // новая выкладка — дела сразу (раз на копию worker), переводы догонит расписание
     const list = (await env.DB.prepare('SELECT n, data, tr FROM titos_cases ORDER BY n').all()).results
       .map(x => { const d = parseJ(x.data, {}), tr = parseJ(x.tr, {}); return { n: x.n, title: resolve(d.title || { ru: '' }, lang, tr) }; });
     const unit = await h.unit();
@@ -347,14 +348,15 @@ async function adminList(env) {
 // появляются без ожидания; потом недостающие переводы — не больше TR_BUDGET вызовов за запуск, остальное — в следующий час.
 // Метка: 'importing:<время>' (идёт; старше 15 мин — считается брошенной), 'partial' (переводы не все), время — готово.
 const TR_BUDGET = 20;
-export async function importTitos(env, url, force = false) {
+let fresh = false; // эта копия worker уже сверила дела с titos-cases.json
+export async function importTitos(env, url, force = false, budget = TR_BUDGET) { // budget 0 — только дела, без переводов
   const r = await env.ASSETS.fetch(new Request(new URL('/assets/titos-cases.json', url.origin || 'https://www.pigeonpolly.com').href)).catch(() => null);
   const file = r && r.ok ? await r.json().catch(() => null) : null;
   if (!file || !Array.isArray(file.cases)) return { imported: 0, error: 'no_file' };
   const key = 'titos_cases_' + String(file.hash || '').slice(0, 16), now = Date.now();
   const mark = await env.DB.prepare('SELECT value FROM meta WHERE key = ?').bind(key).first();
   const v = mark ? String(mark.value) : '';
-  if (!force && mark && v !== 'partial' && !(v.startsWith('importing:') && now - Number(v.slice(10)) > 15 * 60000)) return { imported: 0, skipped: true };
+  if (!force && mark && (v !== 'partial' || !budget) && !(v.startsWith('importing:') && now - Number(v.slice(10)) > 15 * 60000)) return { imported: 0, skipped: true };
   const lock = mark
     ? await env.DB.prepare('UPDATE meta SET value = ? WHERE key = ? AND value = ?').bind('importing:' + now, key, v).run()
     : await env.DB.prepare('INSERT OR IGNORE INTO meta (key, value) VALUES (?, ?)').bind(key, 'importing:' + now).run();
@@ -377,7 +379,7 @@ export async function importTitos(env, url, force = false) {
       for (const l of ['en', 'lv']) {
         const need = [...new Set(all.filter(o => !o[l] && !(tr[o.ru] || {})[l]).map(o => o.ru))];
         if (!need.length) continue;
-        if (calls >= TR_BUDGET) { left++; continue; }
+        if (calls >= budget) { left++; continue; }
         calls++;
         const res = await Promise.race([translateTo(env, need, 'ru', [l], ABOUT.titos), new Promise(x => setTimeout(() => x({ tr: {}, errors: { [l]: 'timeout' } }), 25000))]).catch(() => ({ tr: {}, errors: { [l]: 'ai' } }));
         if (res.tr[l]) { need.forEach((s, i) => { const v = String(res.tr[l][i] || '').trim(); if (v) (tr[s] = tr[s] || {})[l] = v; }); changed = true; }
