@@ -1854,6 +1854,13 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .acct-nick p { margin: 0; font-size: 14px; line-height: 1.5; color: #4A3F6B; }
 .acct-nick input { width: 100%; box-sizing: border-box; padding: 12px 16px; border-radius: 12px; border: 2px solid #C8C2D8; font: 600 18px var(--sans); color: #2B1A51; text-align: center; }
 .acct-nick input:focus { outline: none; border-color: #F0A987; }
+.acct-nick-in { position: relative; width: 100%; }
+.acct-nick .acct-nick-in input { padding: 12px 52px; }
+.acct-dice { position: absolute; right: 6px; top: 50%; transform: translateY(-50%); width: 40px; height: 40px; border: 0; border-radius: 10px; background: #F4EFE6; font-size: 22px; line-height: 1; cursor: pointer; }
+.acct-dice:hover, .acct-dice:focus-visible { background: #FBE3D6; outline: none; }
+.acct-dice.roll { animation: acct-roll .45s ease-out; }
+@keyframes acct-roll { from { transform: translateY(-50%) rotate(0); } to { transform: translateY(-50%) rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) { .acct-dice.roll { animation: none; } }
 .acct-nick .acct-nick-st { min-height: 1.3em; color: #C0392B; font-weight: 600; }
 .acct-nick .pill-btn { width: 100%; padding: 14px; font-size: 17px; }
 .acct-nick-out { border: 0; background: none; color: #7A6F99; font: 14px var(--sans); text-decoration: underline; cursor: pointer; }

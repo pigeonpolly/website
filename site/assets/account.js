@@ -24,6 +24,7 @@
     nTitleCrow: ['You are a crow with a treasure! Now pick a nickname', 'Ты ворона с сокровищем! Теперь выбери ник', 'Tu esi vārna ar dārgumu! Tagad izvēlies segvārdu'],
     nText: ['This name will be shown in the flock, on the Daily Challenge wall and in blog comments. 2–24 letters, numbers, dots, dashes or underscores.', 'Под этим ником тебя увидят в стае, на стене челленджа и в комментариях блога. 2–24 символа: буквы, цифры, точка, дефис или подчёркивание.', 'Ar šo vārdu tevi redzēs barā, izaicinājuma sienā un bloga komentāros. 2–24 simboli: burti, cipari, punkts, defise vai pasvītra.'],
     nPlace: ['your nickname', 'твой ник', 'tavs segvārds'],
+    nDice: ['Random nickname', 'Случайный ник', 'Nejaušs segvārds'],
     nSave: ['Done', 'Готово', 'Gatavs'],
     nTaken: ['This nickname is taken, try another one.', 'Этот ник уже занят, попробуй другой.', 'Šis segvārds jau aizņemts, mēģini citu.'],
     nBad: ['Use 2–24 letters, numbers, dots, dashes or underscores.', 'Нужно 2–24 символа: буквы, цифры, точка, дефис или подчёркивание.', 'Vajag 2–24 simbolus: burtus, ciparus, punktu, defisi vai pasvītru.'],
@@ -162,7 +163,7 @@
     d.id = 'acct-nick'; d.className = 'acct-nick';
     d.innerHTML = `<form method="dialog"><canvas width="${window.PPBirds ? window.PPBirds.SW : 28}" height="26" aria-hidden="true"></canvas>
       <h2>${t(kind === 'cat' ? 'nTitleCat' : kind === 'crow' ? 'nTitleCrow' : 'nTitle')}</h2><p>${t('nText')}</p>
-      <input name="nick" required minlength="2" maxlength="24" autocomplete="nickname" placeholder="${t('nPlace')}">
+      <div class="acct-nick-in"><input name="nick" required minlength="2" maxlength="24" autocomplete="nickname" placeholder="${t('nPlace')}"><button class="acct-dice" type="button" title="${t('nDice')}" aria-label="${t('nDice')}">🎲</button></div>
       <label class="acct-ref">${t('refL')}<input name="ref" maxlength="24" list="acct-ref-list" autocomplete="off" placeholder="${t('refP')}"><small>${t('refHint').replace('{n}', u.friendBtns || 20)}</small></label><datalist id="acct-ref-list"></datalist>
       <p class="acct-terms">${t('pub')} <a href="${pre}/privacy/" target="_blank">${t('termsMore')} ↗</a></p>
       <p class="acct-nick-st" role="status" aria-live="polite"></p>
@@ -176,6 +177,13 @@
     const f = d.querySelector('form'), st = d.querySelector('.acct-nick-st');
     try { f.ref.value = localStorage.getItem('pp-ref') || ''; } catch (e) {}
     fetch('/api/birds?names=1').then(r => r.ok ? r.json() : { birds: [] }).then(x => { d.querySelector('#acct-ref-list').innerHTML = (x.birds || []).filter(b => b.nick).map(b => `<option value="${esc(b.nick)}">`).join(''); }).catch(() => {});
+    const dice = d.querySelector('.acct-dice');
+    dice.addEventListener('click', async () => { // 🎲 случайный свободный ник: «цвет/характер + птичка + 10–99»
+      dice.classList.remove('roll'); void dice.offsetWidth; dice.classList.add('roll'); dice.disabled = true;
+      const j = await fetch('/api/nick/random').then(r => r.ok ? r.json() : {}).catch(() => ({}));
+      dice.disabled = false;
+      if (j.nick) { f.nick.value = j.nick; st.textContent = ''; f.nick.focus(); } else st.textContent = t('nErr');
+    });
     f.addEventListener('submit', async e => {
       e.preventDefault();
       const nick = f.nick.value.trim().replace(/^@/, '');

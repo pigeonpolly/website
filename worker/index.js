@@ -62,6 +62,7 @@ export default {
       await challengeCron(env, RULES).catch(e => console.error('challenge plan', e)); // темы челленджа: с 20-го — план следующего месяца
       await adventMail(env, authHelpers(env)).catch(e => console.error('advent mail', e)); // 1 декабря: письмо «адвент открылся» тем, кто отметил галочку
       await flockNewsCron(env).catch(e => console.error('flock news', e)); // новости стаи — 30 дней
+      await autoNicks(env).catch(e => console.error('auto nick', e)); // птички без ника — случайный ник
       await migrateToR2(env); await cleanupInactive(env);
       await env.DB.prepare('DELETE FROM game_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {}); // старые забеги игр (started — в мс)
       await topCron(env).catch(() => {}); // доски топа: недели старше 8
@@ -450,6 +451,22 @@ async function ensureSchema(env) {
 }
 
 const now = () => Math.floor(Date.now() / 1000);
+// случайный ник «цвет или характер + птичка + 10–99» (🎲 в окне ника и автоматический ник)
+const NICK_A = ['Coral', 'Mint', 'Golden', 'Lilac', 'Rusty', 'Sunny', 'Fluffy', 'Brave', 'Sleepy', 'Silver', 'Crimson', 'Azure', 'Velvet', 'Dusty', 'Rosy', 'Amber', 'Jolly', 'Cosmic', 'Misty', 'Peachy', 'Snowy', 'Lemon', 'Indigo', 'Cheeky', 'Witty', 'Tiny', 'Swift', 'Plum', 'Ruby', 'Olive', 'Teal', 'Curious', 'Happy', 'Clever', 'Bold', 'Gentle', 'Lucky', 'Dreamy', 'Sparkly', 'Cozy'];
+const NICK_B = ['Pigeon', 'Sparrow', 'Robin', 'Finch', 'Wren', 'Owl', 'Crow', 'Raven', 'Magpie', 'Swallow', 'Starling', 'Puffin', 'Parrot', 'Heron', 'Stork', 'Swan', 'Duck', 'Goose', 'Lark', 'Jay', 'Hawk', 'Falcon', 'Kestrel', 'Dove', 'Toucan', 'Pelican', 'Penguin', 'Flamingo', 'Kiwi', 'Hoopoe', 'Oriole', 'Warbler', 'Thrush', 'Nightingale', 'Woodpecker', 'Kingfisher', 'Bullfinch', 'Waxwing', 'Chickadee', 'Canary'];
+const pickOne = a => a[Math.floor(Math.random() * a.length)];
+async function freeNick(env) {
+  for (let i = 0; ; i++) {
+    const n = pickOne(NICK_A) + pickOne(NICK_B) + (10 + Math.floor(Math.random() * 90)) + (i > 8 ? String(i) : '');
+    if (!(await env.DB.prepare('SELECT 1 FROM users WHERE nick = ?').bind(n).first())) return n;
+  }
+}
+// птички без ника (вышли из окна ника или закрыли вкладку) — через час получают случайный ник сами
+async function autoNicks(env) {
+  const us = (await env.DB.prepare("SELECT id FROM users WHERE COALESCE(nick, '') = '' AND COALESCE(created_at, 0) < ? LIMIT 200").bind(now() - 3600).all()).results;
+  for (const u of us) await env.DB.prepare("UPDATE users SET nick = ? WHERE id = ? AND COALESCE(nick, '') = ''").bind(await freeNick(env), u.id).run().catch(() => {});
+  return us.length;
+}
 
 // ---------- пуговки (валюта сайта) ----------
 // сколько и за что: заход раз в день, рисунок в челлендж, до 3 комментариев в день, друг, указавший тебя при регистрации
@@ -2339,6 +2356,7 @@ async function route(req, env, url) {
     await env.DB.prepare('INSERT INTO gifts (user_id, kind, item, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(to.id, sur[0], sur[1], String(b.note || '').slice(0, 200), now()).run();
     return json({ ok: true, kind: sur[0], item: sur[1] });
   }
+  if (m === 'GET' && p === '/api/nick/random') return json({ nick: await freeNick(env) }); // 🎲 в окне ника
   if (m === 'POST' && p === '/api/nick') {
     const u = await needUser(req, env);
     const { nick, ref } = await req.json().catch(() => ({}));
