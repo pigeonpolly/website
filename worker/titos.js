@@ -343,38 +343,52 @@ async function adminList(env) {
 }
 
 // ---------- импорт из репозитория: site/assets/titos-cases.json ----------
-// по метке meta titos_cases_<хэш файла>: дело записывается заново, переводы — из кэша (тот же RU-текст не переводится второй раз), новое — translateTo
+// по метке meta titos_cases_<хэш файла>. Сначала все дела сразу пишутся в базу (RU + готовые переводы из кэша) — картинки и улики
+// появляются без ожидания; потом недостающие переводы — не больше TR_BUDGET вызовов за запуск, остальное — в следующий час.
+// Метка: 'importing:<время>' (идёт; старше 15 мин — считается брошенной), 'partial' (переводы не все), время — готово.
+const TR_BUDGET = 20;
 export async function importTitos(env, url, force = false) {
   const r = await env.ASSETS.fetch(new Request(new URL('/assets/titos-cases.json', url.origin || 'https://www.pigeonpolly.com').href)).catch(() => null);
   const file = r && r.ok ? await r.json().catch(() => null) : null;
   if (!file || !Array.isArray(file.cases)) return { imported: 0, error: 'no_file' };
-  const key = 'titos_cases_' + String(file.hash || '').slice(0, 16);
-  if (!force && await env.DB.prepare('SELECT value FROM meta WHERE key = ?').bind(key).first()) return { imported: 0, skipped: true };
-  const lock = await env.DB.prepare('INSERT OR IGNORE INTO meta (key, value) VALUES (?, ?)').bind(key, 'importing:' + Date.now()).run();
+  const key = 'titos_cases_' + String(file.hash || '').slice(0, 16), now = Date.now();
+  const mark = await env.DB.prepare('SELECT value FROM meta WHERE key = ?').bind(key).first();
+  const v = mark ? String(mark.value) : '';
+  if (!force && mark && v !== 'partial' && !(v.startsWith('importing:') && now - Number(v.slice(10)) > 15 * 60000)) return { imported: 0, skipped: true };
+  const lock = mark
+    ? await env.DB.prepare('UPDATE meta SET value = ? WHERE key = ? AND value = ?').bind('importing:' + now, key, v).run()
+    : await env.DB.prepare('INSERT OR IGNORE INTO meta (key, value) VALUES (?, ?)').bind(key, 'importing:' + now).run();
   if (!lock.meta.changes && !force) return { imported: 0, skipped: true };
-  let n = 0; const errors = [];
+  let n = 0, calls = 0, left = 0; const errors = [];
+  const save = (num, c, tr) => env.DB.prepare('INSERT INTO titos_cases (n, data, tr, hash, updated_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(n) DO UPDATE SET data = excluded.data, tr = excluded.tr, hash = excluded.hash, updated_at = excluded.updated_at')
+    .bind(num, JSON.stringify(c), JSON.stringify(tr), String(c.hash || ''), Date.now()).run();
   try {
-    for (const c of file.cases) {
+    const todo = [];
+    for (const c of file.cases) { // 1) все дела — в базу сразу
       const num = Math.floor(Number(c.n) || 0); if (num < 1 || num > 999) continue;
       const old = await caseOf(env, num), tr = parseJ(old && old.tr, {});
       const all = texts(c);
       for (const o of all) for (const l of ['en', 'lv']) if (o[l]) (tr[o.ru] = tr[o.ru] || {})[l] = o[l]; // готовые переводы (старые дела) — сразу в кэш
+      await save(num, c, tr); n++;
+      if (all.some(o => ['en', 'lv'].some(l => !o[l] && !(tr[o.ru] || {})[l]))) todo.push([num, c, tr, all]);
+    }
+    for (const [num, c, tr, all] of todo) { // 2) переводы — понемногу
+      let changed = false;
       for (const l of ['en', 'lv']) {
         const need = [...new Set(all.filter(o => !o[l] && !(tr[o.ru] || {})[l]).map(o => o.ru))];
         if (!need.length) continue;
+        if (calls >= TR_BUDGET) { left++; continue; }
+        calls++;
         const res = await Promise.race([translateTo(env, need, 'ru', [l], ABOUT.titos), new Promise(x => setTimeout(() => x({ tr: {}, errors: { [l]: 'timeout' } }), 25000))]).catch(() => ({ tr: {}, errors: { [l]: 'ai' } }));
-        if (res.tr[l]) need.forEach((s, i) => { const v = String(res.tr[l][i] || '').trim(); if (v) (tr[s] = tr[s] || {})[l] = v; });
-        else errors.push({ n: num, lang: l, error: (res.errors || {})[l] || 'ai' });
+        if (res.tr[l]) { need.forEach((s, i) => { const v = String(res.tr[l][i] || '').trim(); if (v) (tr[s] = tr[s] || {})[l] = v; }); changed = true; }
+        else { errors.push({ n: num, lang: l, error: (res.errors || {})[l] || 'ai' }); left++; }
       }
-      const hash = String(c.hash || '');
-      await env.DB.prepare('INSERT INTO titos_cases (n, data, tr, hash, updated_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(n) DO UPDATE SET data = excluded.data, tr = excluded.tr, hash = excluded.hash, updated_at = excluded.updated_at')
-        .bind(num, JSON.stringify(c), JSON.stringify(tr), hash, Date.now()).run();
-      n++;
+      if (changed) await save(num, c, tr);
     }
-    await env.DB.prepare('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)').bind(key, String(Date.now())).run();
+    await env.DB.prepare('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)').bind(key, left ? 'partial' : String(Date.now())).run();
   } catch (e) {
-    await env.DB.prepare('DELETE FROM meta WHERE key = ?').bind(key).run(); // не вышло — попробуем ещё раз
+    await env.DB.prepare('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)').bind(key, 'partial').run(); // не вышло — продолжим в следующий раз
     return { imported: n, error: String(e.message || e), errors };
   }
-  return { imported: n, errors };
+  return { imported: n, errors, left };
 }
