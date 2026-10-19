@@ -4460,7 +4460,7 @@ html.me-in .myday { display: block; }
 /* ---------- Этап 14 Б: шапка и меню ----------
    компьютер (≥1301): лого · меню · поиск · язык · 🔘 N · 🔔 · аватар; подменю — светлая карточка (значок, название, описание, внизу хаб раздела)
    телефон и планшет (≤1300): лого · 🔘 N · 🔔 · аватар · ☰; в ☰ — аккордеон, внизу языки и поиск */
-.site-header .brand { order: 0; }
+.site-header .brand { order: 0; flex: none; } /* не сжимать: в Safari надпись уезжала под кнопки (19.10.2026) */
 .nav-foot { display: none; }
 .nm-t { font-family: var(--serif); font-weight: 600; }
 .hd-btns { order: 5; flex: none; display: inline-flex; align-items: center; gap: 5px; height: 36px; padding: 0 12px; border-radius: 999px; background: rgba(243, 239, 250, .1); color: var(--text); font: 700 14px/1 var(--sans); text-decoration: none; white-space: nowrap; }

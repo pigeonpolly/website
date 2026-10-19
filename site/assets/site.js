@@ -209,7 +209,11 @@
   if (!h) return;
   const over = () => {
     let m = 0; const pad = parseFloat(getComputedStyle(h).paddingRight) || 0;
-    for (const c of h.children) { const st = getComputedStyle(c); if (st.position === 'fixed' || st.position === 'absolute' || st.display === 'none') continue; const r = c.getBoundingClientRect(); if (r.width) m = Math.max(m, r.right); } // меню-панель (fixed) не считаем
+    const rs = [];
+    for (const c of h.children) { const st = getComputedStyle(c); if (st.position === 'fixed' || st.position === 'absolute' || st.display === 'none') continue; const r = c.getBoundingClientRect(); if (r.width) { m = Math.max(m, r.right); rs.push(r); } } // меню-панель (fixed) не считаем
+    const b = h.querySelector('.brand'); if (b && b.scrollWidth > b.clientWidth + 1) return true; // надпись не влезла в сжатый логотип
+    rs.sort((a, b) => a.left - b.left);
+    for (let i = 1; i < rs.length; i++) if (rs[i].left < rs[i - 1].right - 1) return true; // наезжают друг на друга (iPhone, 19.10.2026)
     return m > h.clientWidth - pad + 1;
   };
   let busy = false;
