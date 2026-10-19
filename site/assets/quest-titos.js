@@ -211,7 +211,9 @@
     const z = sc.zones.map((z, j) => {
       const done = z.clue ? st.pinned.includes(z.clue) : z.wit ? st.pinned.includes(witClue(z.wit)) : false;
       const label = z.clue ? t(C[z.clue].title) : z.wit ? t(K.W[z.wit] ? K.W[z.wit].name : '') : '';
-      const seen = z.say ? st.heard : done;
+      const key = sceneI + ':' + j, heard = Array.isArray(st.heard) && st.heard.includes(key);
+      // мигает, пока не открыто: факт — пока не прочитан, свидетель — пока не заданы все вопросы, улика — пока не найдена
+      const seen = z.say ? heard : z.wit ? done || (st.asked[z.wit] || []).length >= (K.W[z.wit] ? K.W[z.wit].qa.length : 0) : done || st.found.includes(z.clue);
       return sc.img ? `<button type="button" class="q-zone${seen ? '' : ' spark'}${z.clue || z.wit ? '' : ' talk'}${z.h > 30 ? ' person' : ''}${done ? ' done' : ''}" style="left:${z.x}%;top:${z.y}%;width:${z.w}%;height:${z.h}%" data-zone="${j}" aria-label="${esc(label || '…')}"${label ? ` title="${esc(label)}"` : ''}></button>`
         : `<button type="button" class="q-spot${done ? ' done' : ''}" data-zone="${j}">${z.clue ? (done ? '✅ ' : '🔎 ') + esc(label) : z.wit ? '🗣 ' + esc(label) : '💬 …'}</button>`;
     }).join('');
@@ -283,7 +285,7 @@
     if (g) { const a = g.dataset.g; if (a === 'all') { guide.classList.toggle('open'); return; } if (a === 'mag') flash(['magnifier']); if (a === 'scene') openScene(null, 0); if (a === 'board') openBoard(); if (a === 'doss') openDossiers();
       if (a === 'show') flash(ORDER.filter(id => !st.found.includes(id) && (C[id].hot || C[id].sprite)).map(id => C[id].sprite ? id : C[id].hot)); return; }
     if (cs) { if (Number(cs.dataset.case) !== K.no) { try { localStorage.setItem('pp-titos-case', cs.dataset.case); } catch (x) {} location.reload(); } return; }
-    if (zn) { const z = K.scenes[sceneI].zones[zn.dataset.zone]; if (z.clue) openClue(z.clue); else if (z.wit) openWitness(z.wit); else { st.heard = true; save(); openScene(t(z.say)); } return; }
+    if (zn) { const z = K.scenes[sceneI].zones[zn.dataset.zone]; if (z.clue) openClue(z.clue); else if (z.wit) openWitness(z.wit); else { const k = sceneI + ':' + zn.dataset.zone; st.heard = Array.isArray(st.heard) ? st.heard : []; if (!st.heard.includes(k)) st.heard.push(k); save(); openScene(t(z.say)); } return; }
     if (ask) {
       if (!(await go())) return;
       const w = ask.dataset.ask, list = st.asked[w] || (st.asked[w] = []); if (!list.includes(+ask.dataset.i)) list.push(+ask.dataset.i); save();
