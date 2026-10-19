@@ -5,7 +5,7 @@
   python3 tools/titos_check.py 3 7        — только дела №3 и №7
   python3 tools/titos_check.py --index    — ещё и переписать content/titos/index.md (№, название, виновный, трюк)
 Старые дела («legacy»: true — бывшие «Дело №1» и «Дело №2») не проверяются на диапазон сложности и без вещи-награды.
-У каждого нового дела — вещь-награда `reward`: "furn|tc<имя>", нарисована в site/assets/room.js (блок «награды за дела Титоса»), у каждого дела своя."""
+У каждого нового дела — картинка места происшествия (важная улика + мелкий факт) и вещь-награда `reward`: "furn|tc<имя>", нарисована в site/assets/room.js (блок «награды за дела Титоса»), у каждого дела своя."""
 import difflib
 import json
 import re
@@ -79,6 +79,14 @@ def check(c, f):
             e("reward — вещь-награда «furn|tc<имя>» (docs/titos.md «Вещи-награды»)")
         elif m[1] not in REWARDS:
             e(f"reward «{rw}»: такой вещи нет в site/assets/room.js (блок «награды за дела Титоса»)")
+        # правило Алины: у каждого дела — картинка места происшествия с важной уликой (clue) и мелким фактом (say)
+        s0 = (c.get("scenes") or [{}])[0]
+        wit = {t["to"] for t in c.get("talk", []) if t.get("clue")}  # допрос с уликой — тоже важная улика
+        kinds = {k for z in s0.get("spots", []) for k in ("clue", "say") if k in z} | ({"clue"} if any(z.get("talk") in wit for z in s0.get("spots", [])) else set())
+        if not s0.get("img") or not ROOT.joinpath("site", s0["img"].lstrip("/")).exists():
+            e("сцена: нужна картинка места происшествия (scenes[0].img, рисует tools/rooms/scenes.py)")
+        elif not {"clue", "say"} <= kinds:
+            e("сцена: на картинке нужны важная улика (место clue) и мелкий факт (место say)")
     if not isinstance(c.get("trick"), str) or not c.get("trick", "").strip():
         e("trick — строка RU (главный трюк дела)")
     # тексты — только RU

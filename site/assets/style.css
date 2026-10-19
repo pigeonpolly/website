@@ -1496,11 +1496,12 @@ html:has(.q-modal:not([hidden])) { overflow: hidden; } /* пока открыт�
 .q-hint { margin: -4px 0 10px; font: 600 14px var(--sans); color: #8C6A40; }
 .q-scene { position: relative; display: inline-block; max-width: 100%; line-height: 0; box-shadow: 0 0 0 3px #1A1528; }
 .q-scene img { display: block; max-width: 100%; max-height: calc(100vh - 150px); width: auto; height: auto; }
+.q-scene img[src$=".png"] { image-rendering: pixelated; }
 .q-zone { position: absolute; padding: 0; border: 2px solid transparent; border-radius: 10px; background: transparent; cursor: zoom-in; transition: border-color .15s, background .15s; }
 .q-zone:hover, .q-zone:focus-visible { border-color: #F5D547; background: rgba(245, 213, 71, .14); outline: 0; }
 .q-zone.done::after { content: '📌'; position: absolute; top: -10px; right: -6px; font-size: 18px; line-height: 1; }
-.q-zone.spark::before { content: ''; position: absolute; left: 50%; top: 50%; width: 18px; height: 18px; margin: -9px; border-radius: 50%; background: #F5D547; box-shadow: 0 0 0 3px #2B1A51, 0 0 0 6px rgba(245, 213, 71, .55), 0 0 18px 6px rgba(245, 213, 71, .7); animation: q-glint 1.4s ease-in-out infinite; }
-.q-zone.spark.person::before { top: 26%; }
+.q-zone.spark::before { content: ''; position: absolute; right: -5px; top: -5px; width: 14px; height: 14px; border-radius: 50%; background: #F5D547; box-shadow: 0 0 0 3px #2B1A51, 0 0 0 5px rgba(245, 213, 71, .55), 0 0 10px 3px rgba(245, 213, 71, .7); animation: q-glint 1.4s ease-in-out infinite; }
+.q-zone.spark.person::before { top: 6%; right: 6%; }
 @keyframes q-glint { 50% { transform: scale(1.35); opacity: .75; } }
 @media (prefers-reduced-motion: reduce) { .q-zone.spark::before { animation: none; } }
 .q-say { margin: 12px 0 0; padding: 10px 14px; background: #E9D9B0; box-shadow: 3px 3px 0 #C9A86A; font: italic 15px/1.5 var(--serif); }
