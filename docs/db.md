@@ -2,7 +2,7 @@
 
 _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TABLE / ALTER TABLE и обращений к meta в worker/*.js. Руками не править._
 
-## Таблицы (41)
+## Таблицы (42)
 
 Обозначения: PK — первичный ключ, nn — NOT NULL, =x — DEFAULT x; «+» — столбцы, добавленные ALTER TABLE.
 
@@ -43,12 +43,13 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **draw_requests** (worker/index.js): `id` int PK auto, `user_id` int, `anon` text, `text` text nn, `lang` text, `who` text, `status` text ='open', `img` text, `gift` text, `created_at` int, `answered_at` int; + `text_en` text, `ip` text, `text_ru` text, `text_lv` text
 - **draw_likes** (worker/index.js): `rid` int nn, `kind` text nn, `who` text nn, `created_at` int; PRIMARY KEY (rid, kind, who)
 - **potion_gifts** (worker/index.js): `id` int PK auto, `to_id` int nn, `from_nick` text, `ing` text nn, `n` int nn, `created_at` int, `seen` int =0
+- **anon_names** (worker/index.js): `vid` text PK, `code` text UNIQUE nn, `created_at` int
 - **pan_runs** (worker/pancakes.js): `id` text PK, `user_id` int nn, `started` int nn, `level` int =0, `washed` int =0, `stars` int =0
 - **titos** (worker/titos.js): `user_id` int PK, `level` int =0, `coffee` int =10, `coffee_at` int =0, `drink_at` int =0, `sleep` int =0, `run` int =0, `found` text ='[]', `started` int =0, `bugs` text ='[]', `sell_day` text ='', `sell_n` int =0, `legacy` int =0; + `sort_lv` int =0, `sort_run` text ='', `bugs_run` int =0']
 - **titos_cases** (worker/titos.js): `n` int PK, `data` text nn, `tr` text ='{}', `hash` text, `updated_at` int
 - **top_week** (worker/top.js): `game` text nn, `week` text nn, `user_id` int nn, `score` int nn, `at` int; PRIMARY KEY (game, week, user_id)
 
-## Ключи meta (38)
+## Ключи meta (40)
 
 Таблица `meta (key, value)`. Ключ → где используется.
 
@@ -56,12 +57,14 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `admin_ids` — worker/index.js
 - `admin_pin` — worker/blog.js, worker/index.js
 - `advent_mail_n:` — worker/auth.js
+- `anon_names_v1` — worker/index.js
 - `backup_token` — worker/blog.js, worker/index.js
 - `blog_salt` — worker/blog.js, worker/index.js
 - `blog_strict` — worker/blog.js
 - `blog_tags_v1` — worker/blog.js
 - `buttons_backfill` — worker/index.js
 - `chplan_oct` — worker/challenge-days.js
+- `chplan_v4` — worker/challenge-days.js
 - `cron_at` — worker/index.js
 - `dev_last_mail` — worker/auth.js
 - `gemini_key` — worker/blog.js, worker/translate.js

@@ -200,7 +200,26 @@ export function visitor(req, cookie) {
   const id = randomHex(16);
   return { id, set: `pp_a=${id}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${400 * 86400}` };
 }
-export async function anonCode(id) { const h = await sha('bird:' + id); return `${parseInt(h.slice(0, 6), 16) % 20}:${10 + parseInt(h.slice(6, 12), 16) % 90}`; }
+// подпись анонима «птица + число» — у каждого посетителя своя и не повторяется (таблица anon_names, code UNIQUE);
+// keep — записать (комментарий, тема); без keep — только показать: свободная подпись по хешу не занимается
+export async function anonCode(id, env, keep) {
+  const mine = await env.DB.prepare('SELECT code FROM anon_names WHERE vid = ?').bind(id).first();
+  if (mine) return mine.code;
+  const h = await sha('bird:' + id), first = `${parseInt(h.slice(0, 6), 16) % 20}:${10 + parseInt(h.slice(6, 12), 16) % 90}`;
+  if (!keep && !(await env.DB.prepare('SELECT 1 FROM anon_names WHERE code = ?').bind(first).first())) return first;
+  return claimAnon(env, id, first);
+}
+// занять подпись: сначала по хешу, потом случайную (20 птиц × 10–99, когда тесно — 100–9999)
+export async function claimAnon(env, id, first) {
+  const rnd = (a, b) => a + Math.floor(Math.random() * (b - a + 1));
+  for (let i = 0; i < 60; i++) {
+    const code = i === 0 && first ? first : `${rnd(0, 19)}:${i < 20 ? rnd(10, 99) : i < 40 ? rnd(100, 999) : rnd(1000, 9999)}`;
+    if ((await env.DB.prepare('INSERT OR IGNORE INTO anon_names (vid, code, created_at) VALUES (?, ?, ?)').bind(id, code, Math.floor(Date.now() / 1000)).run()).meta.changes) return code;
+    const mine = await env.DB.prepare('SELECT code FROM anon_names WHERE vid = ?').bind(id).first();
+    if (mine) return mine.code; // этот посетитель успел занять в соседнем запросе
+  }
+  throw new Error('anon name');
+}
 // IP храним только как хеш с секретной солью (сам адрес не сохраняется)
 async function ipHash(req, h) {
   let salt = await h.getMeta('blog_salt');
@@ -226,7 +245,7 @@ export async function blogApi(req, env, url, h) {
     const post = await env.DB.prepare('SELECT likes FROM blog_posts WHERE id = ?').bind(id).first();
     const pending = isAdm ? (await env.DB.prepare(`SELECT c.id, c.body, c.anon, c.created_at, u.nick FROM blog_comments c LEFT JOIN users u ON u.id = c.user_id
       WHERE c.post_id = ? AND c.status = 'pending' ORDER BY c.created_at`).bind(id).all()).results.map(c => ({ ...c, name: c.nick ? '@' + c.nick : birdName(c.anon, lang) })) : [];
-    return json({ liked, likes: post?.likes || 0, user: u && !u.banned ? { nick: u.nick || null } : null, anon: birdName(await anonCode(v.id), lang),
+    return json({ liked, likes: post?.likes || 0, user: u && !u.banned ? { nick: u.nick || null } : null, anon: birdName(await anonCode(v.id, env), lang),
       admin: isAdm, pending, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1' }, 200, v.set ? { 'set-cookie': v.set } : {});
   }
 
@@ -267,7 +286,7 @@ export async function blogApi(req, env, url, h) {
     }
     const v = visitor(req, h.cookie);
     const named = u && u.nick;
-    const anon = named ? null : await anonCode(v.id);
+    const anon = named ? null : await anonCode(v.id, env, true);
     const hasLink = /(https?:\/\/|www\.|\b[a-z0-9-]+\.(com|ru|lv|net|org|io|info|xyz|top|site|online|shop|me|co)\b)/i.test(text);
     const status = hasLink && !isAdm ? 'pending' : 'ok';
     const r = await env.DB.prepare('INSERT INTO blog_comments (post_id, user_id, anon, body, ip, status, created_at) VALUES (?, ?, ?, ?, ?, ?, ?)')

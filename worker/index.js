@@ -1,7 +1,7 @@
 // Сервер сайта: отдаёт статические файлы из site/ и обслуживает /api/* для «Стены рисунков»:
 // вход через Google, ник, загрузка работы дня, серии, стена, топ, модерация, GDPR (экспорт и удаление).
 // Данные — Cloudflare D1 (env.DB), картинки челленджа — R2 (env.MEDIA, папка challenge/), старые ещё и в KV (env.IMAGES), пока идёт перенос. Блог — worker/blog.js (картинки блога в R2, env.MEDIA).
-import { blogApi, blogPage, visitor, anonCode, birdName } from './blog.js';
+import { blogApi, blogPage, visitor, anonCode, claimAnon, birdName } from './blog.js';
 import { translateAll, translateTo, ABOUT } from './translate.js';
 import { challengeApi, challengeCron, planDayColors, CHALLENGE_TABLES } from './challenge-days.js'; // план тем челленджа (docs/challenge.md «Подбор тем»)
 import { CH_DEFAULTS, CH_RANGE } from './challenge-plan.js';
@@ -440,6 +440,21 @@ async function ensureSchema(env) {
       await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('potfail_v2', '1')").run();
     }
   } catch (e) { console.error('potfail', e); }
+  // подписи анонимов не повторяются (19.10.2026): таблица anon_names; один раз — старые подписи из «Нарисуй мне» и комментариев блога
+  try {
+    await env.DB.prepare('CREATE TABLE IF NOT EXISTS anon_names (vid TEXT PRIMARY KEY, code TEXT UNIQUE NOT NULL, created_at INTEGER)').run();
+    if ((await env.DB.prepare("INSERT OR IGNORE INTO meta (key, value) VALUES ('anon_names_v1', '1')").run()).meta.changes) {
+      // темы: посетитель известен (who = 'v'+cookie) — первый с подписью её сохраняет, у совпавших позже — новая, и в их старых темах тоже
+      const rs = (await env.DB.prepare("SELECT substr(who, 2) AS vid, anon, MIN(created_at) AS t FROM draw_requests WHERE anon IS NOT NULL AND who LIKE 'v%' GROUP BY who, anon ORDER BY t").all()).results;
+      for (const r of rs) {
+        const code = await claimAnon(env, r.vid, r.anon);
+        if (code !== r.anon) await env.DB.prepare('UPDATE draw_requests SET anon = ? WHERE who = ? AND anon = ?').bind(code, 'v' + r.vid, r.anon).run();
+      }
+      // комментарии блога: посетитель не записан — подпись просто занята, новым её не дадут
+      const cs = (await env.DB.prepare('SELECT DISTINCT anon FROM blog_comments WHERE anon IS NOT NULL').all().catch(() => ({ results: [] }))).results;
+      for (const c of cs) await env.DB.prepare('INSERT OR IGNORE INTO anon_names (vid, code, created_at) VALUES (?, ?, ?)').bind('old:' + c.anon, c.anon, now()).run();
+    }
+  } catch (e) { console.error('anon names', e); }
   // 17.10.2026: коробка при регистрации — птичкам, которые уже были, выдать картонную коробку и письмо о коробках (один раз)
   try {
     if ((await env.DB.prepare("INSERT OR IGNORE INTO meta (key, value) VALUES ('starter_box_v1', '1')").run()).meta.changes) {
@@ -1704,7 +1719,7 @@ async function route(req, env, url) {
     const res = json({ open: rows.filter(r => r.status === 'open').sort((a, b) => a.at - b.at), done: rows.filter(r => r.status === 'done'), admin: adm,
       untr: raw.filter(r => !r[REQ_COL[lang]]).length, // сколько тем ещё без перевода — страница сразу попросит /api/requests/tr
       hidden: adm ? rows.filter(r => r.status === 'hidden') : undefined, // скрытые темы видит только Алина — чтобы можно было вернуть
-      me: u && u.nick && !u.banned ? { nick: u.nick } : null, anon: birdName(await anonCode(v.id), lang), closed: (await getMeta(env, 'req_closed')) === '1' });
+      me: u && u.nick && !u.banned ? { nick: u.nick } : null, anon: birdName(await anonCode(v.id, env), lang), closed: (await getMeta(env, 'req_closed')) === '1' });
     if (v.set) res.headers.append('set-cookie', v.set);
     return res;
   }
@@ -1743,7 +1758,7 @@ async function route(req, env, url) {
         .some(r => r.text.toLowerCase().replace(/[^\p{L}\p{N}]+/gu, ' ').trim() === key);
       if (dup) fail(409, 'dup'); // такая тема уже есть
     }
-    const anon = named ? null : await anonCode(v.id), lang = ['en', 'ru', 'lv'].includes(b.lang) ? b.lang : 'en', tr = { en: null, ru: null, lv: null }; tr[guessLang(text)] = text; // переводы — сразу после, страница зовёт /api/requests/tr (не задерживаем отправку)
+    const anon = named ? null : await anonCode(v.id, env, true), lang = ['en', 'ru', 'lv'].includes(b.lang) ? b.lang : 'en', tr = { en: null, ru: null, lv: null }; tr[guessLang(text)] = text; // переводы — сразу после, страница зовёт /api/requests/tr (не задерживаем отправку)
     const r = await env.DB.prepare('INSERT INTO draw_requests (user_id, anon, text, text_en, text_ru, text_lv, lang, who, ip, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)').bind(named ? u.id : null, anon, text, tr.en, tr.ru, tr.lv, lang, who, ip, now()).run();
     const res = json({ ok: true, id: r.meta.last_row_id, name: named ? '@' + u.nick : birdName(anon, lang) });
     if (v.set) res.headers.append('set-cookie', v.set);
