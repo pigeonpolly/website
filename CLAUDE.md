@@ -21,7 +21,7 @@
 | Пуговки, магазин, цены, правила | docs/shop.md |
 | Игры | docs/games.md |
 | Комнаты, квесты | docs/rooms.md |
-| Детектив Титос /titos/: дела, кофе. Новое дело — всегда с вещью-наградой; перед пушем — titos_check.py и tools/titos_clicks.py (все улики нажимаются) | docs/titos.md, docs/titos-cast.md, content/titos/index.md |
+| Детектив Титос /titos/: дела, кофе. Новое дело — всегда с вещью-наградой и картинкой места происшествия (важные улики — приколоть, мелочи — узнать); перед пушем — titos_check.py и tools/titos_clicks.py (все улики нажимаются) | docs/titos.md, docs/titos-cast.md, content/titos/index.md |
 | Wobbleland | docs/wobbleland.md |
 | Палитры | docs/palettes.md |
 | Коллекционные карточки | docs/cards.md |

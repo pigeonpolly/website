@@ -227,7 +227,7 @@
       : `<span class="q-slot" style="left:${pos[i][0]}%;top:${pos[i][1]}%">?</span>`).join('');
     const sus = st.dossiers ? `<div class="q-sus"><p>${esc(t(K.accuse))}</p>${Object.entries(S).map(([k, s]) => `<button type="button" data-acc="${k}"${st.pinned.length < N ? ' disabled' : ''}>${K.sus(k) ? `<img src="${K.sus(k)}" alt="">` : '<b class="q-emo">❔</b>'}${esc(t(s.name))}</button>`).join('')}${st.pinned.length < N ? `<em>${t(UI.needAll)(N)}</em>` : ''}</div>`
       : `<div class="q-sus"><em>${t(UI.noDoss)}</em></div>`;
-    card(`<h3>${t(UI.board)}</h3><div class="q-cork${K.big ? ' tall' : ''}"><svg viewBox="0 0 100 100" preserveAspectRatio="none">${lines}</svg>${slots}</div>${sus}`);
+    card(`<h3>${t(UI.board)}</h3>${K.intro ? `<p class="q-brief"><b>${esc(K.label)}</b>${esc(t(K.intro))}</p>` : ''}<div class="q-cork${K.big ? ' tall' : ''}"><svg viewBox="0 0 100 100" preserveAspectRatio="none">${lines}</svg>${slots}</div>${sus}`);
   };
   const openDossiers = () => {
     st.dossiers = true; save(); drawGuide();

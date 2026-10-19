@@ -1519,6 +1519,8 @@ html:has(.q-modal:not([hidden])) { overflow: hidden; } /* пока открыт�
 .q-doss article img[src$=".jpg"], .q-sus img[src$=".jpg"] { image-rendering: auto; object-fit: cover; height: 64px; }
 .q-sus img[src$=".jpg"] { height: 40px; }
 .q-slot img[src$=".jpg"] { width: 30px; height: 30px; object-fit: cover; image-rendering: auto; }
+.q-brief { margin: 0 0 14px; padding: 10px 14px; background: #FFFDF5; box-shadow: 3px 3px 0 #C9A86A; font-size: 15px; line-height: 1.5; color: #2B1A51; }
+.q-brief b { display: block; margin-bottom: 2px; font: 700 12px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: #B0573A; }
 .q-cork { position: relative; height: 300px; background: #C99A64; box-shadow: inset 0 0 0 6px #8E5E36; }
 .q-cork svg { position: absolute; inset: 0; width: 100%; height: 100%; }
 .q-cork line { stroke: #C21E2A; stroke-width: .6; }
