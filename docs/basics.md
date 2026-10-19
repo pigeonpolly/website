@@ -6,7 +6,7 @@
 - Статика без фреймворков; сборка `python3 build.py` (только stdlib).
 - `site/` публикуется, HTML в нём **генерируется**: править `src/`, `content/`. `site/assets/`, `site/images/`, `site/files/` — напрямую.
 - `src/layout.html` — шаблон (шапка, меню, подвал, «Write to me», мета, Person schema). `src/pages/*.html` — страницы: `{{gallery:имя}}`, `{{ebooks}}`, `{{projects}}`, `{{cv}}`, `{{block:имя}}`. `src/blocks/*.html` — блоки, их `<style>` ограничивается `#blk-имя`, `html, body` → на блок.
-- `content/galleries/*.json` (full, thumb, w, h, caption), `content/ebooks.json`, `content/projects.json` (полка проектов), `content/cv.json` (`"current": true` — мигающий кружок).
+- `content/galleries/*.json` (full, thumb, w, h, caption), `content/ebooks.json`, `content/projects.json` (полка проектов), `content/cv.json` (`"current": true` — мигающий кружок; переводы — `content/i18n/cv.<lang>.json`, английская строка → перевод).
 - `build.py`: `PAGES`, меню `NAV` + `SECTIONS`, `LANGS`.
 - Сервер `worker/index.js` (site/ через ASSETS + /api/*): D1 `pigeonpolly` (`DB`, таблицы создаются сами), KV `IMAGES`, `GOOGLE_CLIENT_ID` в `wrangler.jsonc` (`main`); 503 {ready:false} — пропала привязка. Стена — `site/assets/sketch-wall.js`.
 - Локально: wrangler dev, отдельный конфиг, `DEV_FAKE_LOGIN=1` («dev:ник», `dev:admin` = админ); в рабочем — НЕ ставить.

@@ -415,16 +415,24 @@ def projects_html(lang="en"):
             f'<div class="bookshelf">{"".join(books)}</div>' + "".join(dialogs))
 
 
-def cv_html():
+def cv_html(lang="en"):
     d = json.loads((CONTENT / "cv.json").read_text())
+    # переводы: content/i18n/cv.<lang>.json — английская строка → перевод
+    tr_file = CONTENT / "i18n" / f"cv.{lang}.json"
+    tr = json.loads(tr_file.read_text()) if lang != "en" and tr_file.exists() else {}
+    now = {"lv": "šobrīd", "ru": "сейчас"}.get(lang, "now")
+
+    def t(s):
+        return tr.get(s, s)
 
     def items(lst, key="years"):
         out = []
         for it in lst:
-            text = f'<p>{esc(it["text"])}</p>' if it.get("text") else ""
+            text = f'<p>{esc(t(it["text"]))}</p>' if it.get("text") else ""
             cls = ' class="current"' if it.get("current") else ""
-            out.append(f'<li{cls}><span class="when">{esc(it[key])}</span>'
-                       f'<h3>{esc(it["title"])}</h3><p class="org">{esc(it["org"])}</p>{text}</li>')
+            when = it[key].replace("now", now)
+            out.append(f'<li{cls}><span class="when">{esc(when)}</span>'
+                       f'<h3>{esc(t(it["title"]))}</h3><p class="org">{esc(t(it["org"]))}</p>{text}</li>')
         return "".join(out)
 
     return (
@@ -574,13 +582,13 @@ def build():
             start = body.index("{{block:")
             end = body.index("}}", start)
             body = body[:start] + block_html(body[start + 8:end]) + body[end + 2:]
-        body = body.replace("{{cv}}", cv_html() if "{{cv}}" in body else "")
 
         body = body.replace("{{ebooks}}", ebooks_html() if "{{ebooks}}" in body else "")
         full_title = title if not path else f"{title} · Pigeon Polly Art Lab"
         for lang, prefix in LANGS.items():
             canonical, hreflang, switch = lang_bits(path, lang)
             page_body = body.replace("{{projects}}", projects_html(lang)) if "{{projects}}" in body else body
+            page_body = page_body.replace("{{cv}}", cv_html(lang)) if "{{cv}}" in page_body else page_body
             # отдельный файл страницы для языка (длинные тексты): privacy.ru.html, privacy.lv.html
             alt = SRC / "pages" / f"{pathlib.Path(file).stem}.{lang}.html"
             if lang != "en" and alt.exists():
