@@ -54,7 +54,8 @@
     main.innerHTML = `<section class="adm-box chadm">
       <div class="chadm-bar"><div class="chadm-ym"><span class="chadm-year"><button type="button" class="pill-btn" data-y="${yr - 1}"${yr - 1 < minY ? ' disabled' : ''} aria-label="Предыдущий год">‹</button><b>${yr}</b><button type="button" class="pill-btn" data-y="${yr + 1}"${yr + 1 > maxY ? ' disabled' : ''} aria-label="Следующий год">›</button></span>
         <div class="ch-level chadm-months" role="group">${MON3.map((n, k) => { const m = `${yr}-${pad(k + 1)}`; return `<button type="button" data-m="${m}" aria-pressed="${m === ym}"${m < '2026-10' || m > maxM ? ' disabled' : ''}${m === thisMonth ? ' class="now"' : ''} title="${MON[k]} ${yr}">${n}</button>`; }).join('')}</div></div>
-        <button type="button" class="pill-btn" data-bank>📚 Банк тем</button></div>
+        <span class="chadm-tools"><button type="button" class="pill-btn" data-now${ym === thisMonth ? ' disabled' : ''}>📅 Сегодня</button>
+        <button type="button" class="pill-btn" data-bank>📚 Банк тем</button></span></div>
       ${D.last ? `<p class="be-note chadm-lastn">Последний изменённый: <button type="button" class="pill-btn" data-last>${new Date(+D.last.slice(0, 4), +D.last.slice(5, 7) - 1, +D.last.slice(8)).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</button></p>` : ''}
       ${D.days.length ? `<div class="chadm-grid" lang="ru">${['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'].map(x => `<span class="chadm-dow">${x}</span>`).join('')}${'<span></span>'.repeat(first)}${cells}</div>
       <p class="be-note">Нажмите на день, чтобы поправить тему. ✏️ — день правили вы, зелёный — последний изменённый, фиолетовый — сегодня, ✦ — день ЭКСТРА, ⚠ — день нарушает правило подбора (подробнее — в окне дня). ${D.broken.length ? `Нарушений в месяце: <b>${D.broken.length}</b>.` : 'Все дни подходят по правилам ✓'}</p>`
@@ -65,6 +66,7 @@
       const y = b.dataset.y; let m = `${y}-${ym.slice(5)}`; if (m < '2026-10') m = '2026-10'; if (m > maxM) m = maxM; load(m);
     });
     main.querySelector('[data-bank]').onclick = () => bankDialog();
+    main.querySelector('[data-now]').onclick = () => load(thisMonth); // назад к текущему месяцу
     main.querySelectorAll('[data-day]').forEach(b => b.onclick = () => dayDialog(b.dataset.day));
     const lb = main.querySelector('[data-last]'); if (lb) lb.onclick = () => D.last.slice(0, 7) === ym ? dayDialog(D.last) : load(D.last.slice(0, 7));
   }

@@ -4098,6 +4098,8 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .chadm .ch-level button[aria-pressed="true"] { background: #2B1A51; color: #fff; }
 .chadm .pill-btn { color: #2B1A51; border-color: #2B1A51; background: #fff; } .chadm .pill-btn:hover:not(:disabled) { background: #2B1A51; color: #fff; }
 .chadm .chadm-lastn { color: #6B6290; }
+.chadm .pill-btn:disabled { opacity: .4; cursor: default; }
+.chadm-bar { align-items: center; } .chadm-tools { display: flex; gap: 8px; align-items: center; } .chadm-tools .pill-btn { padding: 6px 14px; font-size: 14px; }
 .chadm-ym { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .chadm-year { display: inline-flex; align-items: center; gap: 6px; } .chadm-year b { font: 700 18px var(--sans); min-width: 46px; text-align: center; color: #2B1A51; }
 .chadm-year .pill-btn { padding: 4px 12px; font-size: 16px; } .chadm-year .pill-btn:disabled, .chadm-months button:disabled { opacity: .35; cursor: default; }
