@@ -467,7 +467,7 @@
         ${txt('subject', 'Тема')}
         <p class="chadm-acts"><button type="button" class="pill-btn" data-a="tr"></button><button type="button" class="pill-btn" data-a="bank">📚 Из банка</button><button type="button" class="pill-btn" data-a="reroll">🎲 Другая тема</button>
           <button type="button" class="pill-btn" data-a="swap">⇄ Поменять с днём…</button><select data-swap hidden><option value="">— какой день? —</option>${D.days.filter(x => x.day !== day).map(x => `<option value="${x.day}">${+x.day.slice(8)} — ${esc(x.subject[1] || x.subject[0] || 'пусто')}</option>`).join('')}</select>
-          <button type="button" class="pill-btn" data-a="revert"${d.edited ? '' : ' hidden'}>↩ Вернуть как было</button></p>
+          <button type="button" class="pill-btn" data-a="revert"${d.edited ? '' : ' hidden'}>↩ Вернуть как было</button><button type="button" class="pill-btn" data-a="clear" title="Стереть тему на всех языках${d.extra ? '' : ' и цвета'} — потом «Сохранить»">🧹 Очистить</button></p>
         ${d.extra ? `<fieldset class="chadm-f chadm-pal"><legend>Палитра дня ЭКСТРА</legend><select data-pal><option value="">По очереди${pal ? ` — «${esc(pal.t[1])}»` : ''}</option>${(window.EXTRA_PALETTES || []).map(x => `<option value="${esc(x.k)}">«${esc(x.t[1])}»</option>`).join('')}</select><span data-palsw></span><small>картины и палитры — «🎨 Картины и палитры»</small></fieldset>`
         : `<fieldset class="chadm-f"><legend>Цвета дня</legend>
           <div class="chadm-moderow"><div class="ch-level chadm-mode" role="group"><button type="button" data-mode="one">По одному</button><button type="button" data-mode="harm">Гармония на круге</button></div>
@@ -606,6 +606,11 @@
     q('[data-a=reroll]').onclick = () => run(async () => { const r = await api('/reroll', { day, exclude: tried }); tried.push(r.day.item); await after(r); });
     q('[data-a=swap]').onclick = () => { const s = q('[data-swap]'); s.hidden = false; s.focus(); };
     q('[data-swap]').onchange = e => { const w = e.target.value; if (!w) return; run(async () => { await after(await api('/swap', { day, with: w })); e.target.value = ''; e.target.hidden = true; }); };
+    q('[data-a=clear]').onclick = () => { // тема (3 языка) и цвета — пустые; сохранится по «💾 Сохранить»
+      dlg.querySelectorAll('[data-f="subject"]').forEach(inp => { inp.value = ''; });
+      if (!d.extra) { cols = []; mode = 'one'; paintCols(); }
+      st.textContent = day >= '2026-12-01' || d.extra ? '🧹 Очищено — нажмите «💾 Сохранить»' : '🧹 Тема стёрта — до 1 декабря нужен хотя бы один цвет, выберите и сохраните';
+    };
     q('[data-a=revert]').onclick = () => run(async () => { await after(await api('/revert', { day })); });
     q('[data-x]').onclick = () => dlg.close();
     dlg.addEventListener('close', () => dlg.remove());
