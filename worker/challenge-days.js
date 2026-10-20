@@ -13,6 +13,7 @@ export const CHALLENGE_TABLES = [
 ];
 const L3 = ['en', 'ru', 'lv'];
 const FIRST = '2026-10'; // раньше плана нет (темы — формулой challenge-theme.js)
+const AHEAD = 12; // кабинет: сколько месяцев вперёд можно открыть и править
 const pad = n => String(n).padStart(2, '0');
 const now = () => Math.floor(Date.now() / 1000);
 const parseJ = (s, d) => { try { return JSON.parse(s); } catch (e) { return d; } };
@@ -117,7 +118,9 @@ export async function challengeApi(req, env, url, h) {
   // календарь месяца для кабинета: дни плана, теги предметов, сколько уже работ, что нарушает правила
   if (m === 'GET' && p === '/api/admin/challenge') {
     const ym = /^\d{4}-\d\d$/.test(url.searchParams.get('m') || '') ? url.searchParams.get('m') : rigaToday().slice(0, 7);
-    if (ym >= FIRST && ym <= ymAdd(rigaToday().slice(0, 7), 1)) await ensureMonth(env, rules, ym); // следующий месяц в кабинете можно открыть и до 20-го
+    // в кабинете можно открыть план на год вперёд (AHEAD месяцев); месяцы создаются по порядку — генератору нужна история до месяца
+    const curM = rigaToday().slice(0, 7);
+    if (ym >= FIRST && ym <= ymAdd(curM, AHEAD)) for (let k = ym > curM ? curM : ym; k <= ym; k = ymAdd(k, 1)) await ensureMonth(env, rules, k);
     const days = await monthRows(env, ym);
     const works = Object.fromEntries((await env.DB.prepare('SELECT day, COUNT(*) AS n FROM posts WHERE day >= ? AND day <= ? GROUP BY day').bind(ym + '-01', ym + '-31').all()).results.map(r => [r.day, r.n]));
     let broken = [];
@@ -126,7 +129,7 @@ export async function challengeApi(req, env, url, h) {
       broken = checkPlan(data, rules, plan, s, e).filter(x => x.day >= PLAN_FROM);
     }
     const tags = days.map(d => { const t = data.tags[d.item] || []; return { f: t[0] || '', c: t[1] || '', d: t[2] || 0, pool: poolOf(data, rules, d.day) }; });
-    return h.json({ m: ym, today: rigaToday(), days, tags, works, broken, colors: allColors(data), times: data.times });
+    return h.json({ m: ym, today: rigaToday(), days, tags, works, broken, colors: allColors(data), base: data.colors.length, ahead: AHEAD, times: data.times });
   }
   const b = await req.json().catch(() => ({}));
   const key = String(b.day || '');

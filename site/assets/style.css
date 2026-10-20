@@ -3249,6 +3249,8 @@ html:not(.is-admin) .statbar { display: none; }
 /* челлендж (10.10.2026): название, ряд кнопок, свёрнутые панели; ниже тема дня слева и работы участников справа */
 .ch-head3 { padding-bottom: 8px; }
 .ch-head3 h1 { margin-bottom: 18px; }
+.ch-head3 h1:has(+ .ch-sub) { margin-bottom: 8px; }
+.ch-sub { margin: 0 0 18px; max-width: 680px; font: 16px/1.45 var(--sans); opacity: .85; }
 .ch-btns { display: flex; flex-wrap: wrap; gap: 8px; }
 .ch-btns .pill-btn[aria-expanded="true"] { background: #F0A987; border-color: #F0A987; color: #2B1A51; }
 .ch-tbtn .ch-tclock:empty { display: none; }
@@ -4094,6 +4096,7 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .chadm .ch-level { background: #F1ECF7; }
 .chadm .ch-level button { color: #6B6290; }
 .chadm .ch-level button[aria-pressed="true"] { background: #2B1A51; color: #fff; }
+.chadm-months { flex-wrap: wrap; } .chadm-months button { padding-left: 10px; padding-right: 10px; }
 .chadm-bar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; margin-bottom: 14px; }
 .chadm-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 .chadm-dow { font: 700 12px var(--sans); color: #6B6290; text-align: center; text-transform: uppercase; }
@@ -4123,6 +4126,24 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .chadm-time select { font: 15px var(--sans); padding: 6px 10px; border-radius: 10px; border: 1px solid #CFC7E2; background: #fff; color: #2B1A51; }
 .chadm-pal { display: grid; gap: 6px; font: 14px var(--sans); } .chadm-pal span { display: flex; gap: 4px; }
 .chadm-warn { color: #B4441E; font-weight: 700; }
+/* окно дня (20.10.2026): тема на 3 языках + базовые цвета, без прокрутки */
+.chadm-dlg { width: min(640px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); padding: 16px 20px; box-sizing: border-box; overflow: auto; }
+.chadm-dlg h2 { font-size: 18px; margin: 0 0 6px; }
+.chadm-dlg .adm-card-fields { gap: 8px; }
+.chadm-dlg .chadm-tags { margin: 0 0 6px; font-size: 12px; }
+.chadm-dlg .chadm-warn { margin: 0 0 6px; font-size: 13px; }
+.chadm-dlg .chadm-f { gap: 5px; padding: 6px 10px 10px; }
+.chadm-dlg .chadm-f input[type="text"] { padding: 6px 10px; }
+.chadm-dlg .chadm-acts .pill-btn { padding: 5px 12px; font-size: 13px; }
+.chadm-dlg .chadm-cols { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 6px; }
+.chadm-dlg .chadm-cols button { padding: 4px 6px; font-size: 12px; justify-content: flex-start; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; }
+.chadm-dlg .chadm-cols button i { flex: none; }
+.chadm-dlg details { font: 14px var(--sans); }
+.chadm-dlg details summary { cursor: pointer; color: #6B6290; font-weight: 600; }
+.chadm-dlg details > div { display: grid; gap: 8px; margin-top: 8px; }
+.chadm-dlg .be-dialog-acts { margin-top: 10px; align-items: center; }
+.chadm-dlg [data-st] { flex-basis: 100%; }
+@media (max-width: 480px) { .chadm-dlg .chadm-cols { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
 @media (max-width: 640px) { .chadm-grid { gap: 3px; } .chadm-day { min-height: 70px; padding: 4px 3px; font-size: 10px; line-height: 1.15; } .chadm-c i { width: 9px; height: 9px; } .chadm-w { font-size: 9px; } }
 
 /* ---------- «Конвертик»: новости птички (news.js) ---------- */
