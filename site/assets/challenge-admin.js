@@ -57,7 +57,7 @@
         <span class="chadm-tools"><button type="button" class="pill-btn" data-now${ym === thisMonth ? ' disabled' : ''}>📅 Сегодня</button>
         <button type="button" class="pill-btn" data-bank>📚 Банк тем</button><button type="button" class="pill-btn" data-fill title="Заполнить пустые дни месяца темами из банка">📚 Заполнить из банка</button><button type="button" class="pill-btn" data-clear>🧹 Стереть месяц</button></span></div>
       <div class="chadm-mt"><b title="Если вписать — у месяца появится бейдж «тема + год» за рисунки каждый день месяца">🏅 Тематика месяца</b>${['ru', 'en', 'lv'].map(l => `<label><span>${l.toUpperCase()}</span><input type="text" data-mt="${l}" value="${esc((D.mtheme || [])[LI[l]] || '')}" placeholder="${l === 'ru' ? 'пусто — без тематики' : ''}"></label>`).join('')}
-        <button type="button" class="pill-btn" data-mttr>🌐 Перевести</button><button type="button" class="pill-btn" data-mtsave>💾 Сохранить</button><span class="be-note" data-mtst>${(D.mtheme || []).some(Boolean) ? '🏅 бейдж месяца есть' : ''}</span></div>
+        <button type="button" class="pill-btn" data-mttr>🌐 Перевести</button><button type="button" class="pill-btn" data-mtsave>💾 Сохранить</button><button type="button" class="pill-btn chadm-mtb" data-mtbadge title="Пиксельный бейдж месяца"${(D.mtheme || []).some(Boolean) ? '' : ' hidden'}>${window.PPPixelBadge ? `<span class="sw-medal has-ring" style="--bg:${(window.PPPixelBadge.clean(D.mbadge) || window.PPPixelBadge.suggest((D.mtheme || []).join(' '), ym)).bg};--ring:${(window.PPPixelBadge.clean(D.mbadge) || {}).ring || '#C98A1E'}"><b>${window.PPPixelBadge.svg(window.PPPixelBadge.clean(D.mbadge) || window.PPPixelBadge.suggest((D.mtheme || []).join(' '), ym))}</b></span>` : ''} 🎨 Бейдж</button><span class="be-note" data-mtst>${(D.mtheme || []).some(Boolean) ? '🏅 бейдж месяца есть' : ''}</span></div>
       ${D.last ? `<p class="be-note chadm-lastn">Последний изменённый: <button type="button" class="pill-btn" data-last>${new Date(+D.last.slice(0, 4), +D.last.slice(5, 7) - 1, +D.last.slice(8)).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</button></p>` : ''}
       ${D.days.length ? `<div class="chadm-grid" lang="ru">${['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'].map(x => `<span class="chadm-dow">${x}</span>`).join('')}${'<span></span>'.repeat(first)}${cells}</div>
       <p class="be-note">Нажмите на день, чтобы поправить тему. ✏️ — день правили вы, зелёный — последний изменённый, фиолетовый — сегодня, ✦ — день ЭКСТРА, ⚠ — день нарушает правило подбора (подробнее — в окне дня). ${D.broken.length ? `Нарушений в месяце: <b>${D.broken.length}</b>.` : 'Все дни подходят по правилам ✓'}</p>`
@@ -77,8 +77,9 @@
       catch (er) { mst.textContent = '⚠ ' + (TR_ERR[er.code] || er.code || er.message); }
       e.target.disabled = false;
     };
+    main.querySelector('[data-mtbadge]').onclick = () => badgeDialog(ym, D.mtheme, D.mbadge, dz => { D.mbadge = dz; draw(); });
     main.querySelector('[data-mtsave]').onclick = async () => {
-      try { const r = await api('/mtheme', { m: ym, subject: L3.map(l => mv(l).value.trim()) }); D.mtheme = r.mtheme; mst.textContent = r.mtheme.some(Boolean) ? '✓ Сохранено — 🏅 бейдж месяца есть' : '✓ Тематика убрана — бейджа нет'; }
+      try { const r = await api('/mtheme', { m: ym, subject: L3.map(l => mv(l).value.trim()) }); D.mtheme = r.mtheme; main.querySelector('[data-mtbadge]').hidden = !r.mtheme.some(Boolean); mst.textContent = r.mtheme.some(Boolean) ? '✓ Сохранено — 🏅 бейдж месяца есть' : '✓ Тематика убрана — бейджа нет'; }
       catch (er) { mst.textContent = '⚠ ' + errText(er); }
     };
     main.querySelector('[data-now]').onclick = () => load(thisMonth); // назад к текущему месяцу
@@ -100,6 +101,74 @@
     };
     main.querySelectorAll('[data-day]').forEach(b => b.onclick = () => dayDialog(b.dataset.day));
     const lb = main.querySelector('[data-last]'); if (lb) lb.onclick = () => D.last.slice(0, 7) === ym ? dayDialog(D.last) : load(D.last.slice(0, 7));
+  }
+  // ---------- 🎨 редактор пиксельного бейджа тематики месяца (site/assets/pixel-badge.js) ----------
+  // шаблоны, цвета рисунка (поменять цвет — меняются все его пиксели), фон и обводка медали, контур рисунка, символ в углу, рисование по клеткам 16×16
+  const LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
+  const hsl = h => { const v = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255), mx = Math.max(...v), mn = Math.min(...v), l = (mx + mn) / 2, dd = mx - mn; if (!dd) return [0, 0, l];
+    const [r, g, b] = v, hh = mx === r ? ((g - b) / dd + 6) % 6 : mx === g ? (b - r) / dd + 2 : (r - g) / dd + 4; return [hh * 60, dd / (1 - Math.abs(2 * l - 1)), l]; };
+  const hex = (h, s, l) => { const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = n => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)); return '#' + [0, 8, 4].map(n => Math.round(f(n) * 255).toString(16).padStart(2, '0')).join(''); };
+  function badgeDialog(m, theme, design, onSaved) {
+    const B = window.PPPixelBadge; if (!B) { alert('Не загрузился pixel-badge.js'); return; }
+    let d = B.clean(design) || B.suggest((theme || []).join(' '), m), tool = 'pen', cur = Object.keys(d.pal)[0] || 'a';
+    const dlg = document.createElement('dialog'); dlg.className = 'be-dialog adm-card-dlg chadm-dlg chadm-bed';
+    const mon = new Date(+m.slice(0, 4), +m.slice(5, 7) - 1, 1).toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' }).replace(/\s*г\.$/, '');
+    dlg.innerHTML = `<button type="button" class="chadm-x" data-x aria-label="Закрыть без изменений">✕</button><h2>🎨 Бейдж «${esc(theme[1] || theme[0] || theme[2])} ${m.slice(0, 4)}» · ${mon}</h2>
+      <div class="bed-main"><div class="bed-left">
+        <div class="bed-prev" data-prev></div>
+        <div class="bed-grid" data-grid></div>
+        <p class="bed-tools">${[['pen', '✏️ Рисовать'], ['erase', '🧽 Стереть'], ['fill', '🪣 Заливка']].map(([k, n]) => `<button type="button" class="pill-btn" data-tool="${k}">${n}</button>`).join('')}<button type="button" class="pill-btn" data-clear>🗑 Очистить</button></p>
+      </div><div class="bed-right">
+        <b>Шаблоны</b><div class="bed-tpls">${Object.entries(B.TEMPLATES).map(([k, t]) => `<button type="button" data-tpl="${k}" title="${esc(t.n[1])}"><span class="sw-medal has-ring" style="--bg:${t.bg};--ring:#C98A1E"><b>${B.svg(B.fromTemplate(k))}</b></span></button>`).join('')}</div>
+        <b>Цвета рисунка</b> <small>— нажмите, чтобы рисовать этим цветом; круглая кнопка рядом — поменять цвет</small><div class="bed-pal" data-pal></div>
+        <div class="bed-row"><label>Фон медали <input type="color" data-bg></label><label>Обводка медали <input type="color" data-ring></label><label><input type="checkbox" data-ol> Контур рисунка <input type="color" data-olc></label></div>
+        <div class="bed-row"><label>Символ <select data-sym><option value="">нет</option>${Object.entries(B.GLYPH_N).map(([k, n]) => `<option value="${k}">${n}</option>`).join('')}<option value="text">свой знак…</option></select></label>
+          <input type="text" data-symt maxlength="2" placeholder="7" hidden><input type="color" data-symc><select data-symp><option value="tr">↗ сверху справа</option><option value="tl">↖ сверху слева</option><option value="br">↘ снизу справа</option><option value="bl">↙ снизу слева</option></select></div>
+        <p class="bed-tools"><button type="button" class="pill-btn" data-recolor>🎲 Другие цвета</button><button type="button" class="pill-btn" data-auto>✨ Под тему</button></p>
+      </div></div>
+      <p class="be-dialog-acts"><button type="button" class="pill-btn pill-fill" data-save>💾 Сохранить бейдж</button><span class="be-note" data-st></span></p>`;
+    document.body.appendChild(dlg); dlg.addEventListener('close', () => dlg.remove());
+    const q = s => dlg.querySelector(s), st = q('[data-st]');
+    const cells = []; for (let y = 0; y < B.N; y++) for (let x = 0; x < B.N; x++) { const c = document.createElement('i'); c.dataset.x = x; c.dataset.y = y; cells.push(c); q('[data-grid]').appendChild(c); }
+    const setCell = (x, y, ch) => { const r = d.rows[y].split(''); r[x] = ch; d.rows[y] = r.join(''); };
+    function paint() {
+      cells.forEach(c => { const ch = d.rows[c.dataset.y][c.dataset.x]; c.style.background = ch === '.' ? '' : d.pal[ch]; });
+      const md = (size, off) => `<span class="sw-medal${off ? ' off' : ' has-ring'}" style="--bg:${d.bg};--ring:${d.ring};width:${size}px;height:${size}px"><b>${B.svg(d)}</b></span>`;
+      q('[data-prev]').innerHTML = md(120) + md(62) + md(62, true);
+      q('[data-pal]').innerHTML = Object.entries(d.pal).map(([k, c]) => `<span class="bed-sw${k === cur ? ' on' : ''}"><button type="button" data-cur="${k}" style="background:${c}" title="рисовать этим цветом"></button><input type="color" value="${c}" data-pc="${k}" title="поменять цвет"></span>`).join('') + '<button type="button" class="bed-add" data-addc title="добавить цвет">＋</button>';
+      dlg.querySelectorAll('[data-tool]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.tool === tool)));
+      q('[data-bg]').value = d.bg; q('[data-ring]').value = d.ring; q('[data-ol]').checked = !!d.outline; q('[data-olc]').value = d.outline || '#2B1A51';
+      q('[data-sym]').value = d.sym ? (d.sym.g || 'text') : ''; q('[data-symt]').hidden = !(d.sym && !d.sym.g); q('[data-symt]').value = d.sym && d.sym.t || ''; q('[data-symc]').value = d.sym ? d.sym.c : '#F2C230'; q('[data-symp]').value = d.sym ? d.sym.p : 'tr';
+      dlg.querySelectorAll('[data-cur]').forEach(b => b.onclick = () => { cur = b.dataset.cur; if (tool === 'erase') tool = 'pen'; paint(); });
+      dlg.querySelectorAll('[data-pc]').forEach(inp => inp.oninput = () => { d.pal[inp.dataset.pc] = inp.value; cur = inp.dataset.pc; paintSoft(); });
+      q('[data-addc]').onclick = () => { const k = [...LETTERS].find(l => !d.pal[l]); if (!k) return; d.pal[k] = '#7B4FB8'; cur = k; tool = 'pen'; paint(); };
+    }
+    const paintSoft = () => { cells.forEach(c => { const ch = d.rows[c.dataset.y][c.dataset.x]; c.style.background = ch === '.' ? '' : d.pal[ch]; }); q('[data-prev]').querySelectorAll('b').forEach(b => { b.innerHTML = B.svg(d); }); };
+    function flood(x, y, to) { const from = d.rows[y][x]; if (from === to) return; const stack = [[x, y]];
+      while (stack.length) { const [a, b] = stack.pop(); if (a < 0 || b < 0 || a >= B.N || b >= B.N || d.rows[b][a] !== from) continue; setCell(a, b, to); stack.push([a + 1, b], [a - 1, b], [a, b + 1], [a, b - 1]); } }
+    let down = false;
+    const act = c => { const x = +c.dataset.x, y = +c.dataset.y; if (tool === 'fill') flood(x, y, cur); else setCell(x, y, tool === 'erase' ? '.' : cur); paintSoft(); };
+    q('[data-grid]').addEventListener('pointerdown', e => { const c = e.target.closest('i'); if (!c) return; e.preventDefault(); down = tool !== 'fill'; act(c); });
+    q('[data-grid]').addEventListener('pointerover', e => { const c = e.target.closest('i'); if (c && down) act(c); });
+    window.addEventListener('pointerup', () => { down = false; });
+    dlg.querySelectorAll('[data-tool]').forEach(b => b.onclick = () => { tool = b.dataset.tool; paint(); });
+    q('[data-clear]').onclick = () => { if (confirm('Стереть весь рисунок?')) { d.rows = B.blankRows(); paint(); } };
+    dlg.querySelectorAll('[data-tpl]').forEach(b => b.onclick = () => { const t = B.fromTemplate(b.dataset.tpl); d = { ...t, sym: d.sym }; cur = Object.keys(d.pal)[0]; paint(); });
+    q('[data-bg]').oninput = e => { d.bg = e.target.value; paintSoft(); paint(); };
+    q('[data-ring]').oninput = e => { d.ring = e.target.value; paint(); };
+    q('[data-ol]').onchange = () => { d.outline = q('[data-ol]').checked ? q('[data-olc]').value : ''; paint(); };
+    q('[data-olc]').oninput = e => { if (q('[data-ol]').checked) { d.outline = e.target.value; paint(); } };
+    const symNow = () => { const g = q('[data-sym]').value; d.sym = !g ? null : { g: g === 'text' ? '' : g, t: g === 'text' ? (q('[data-symt]').value || '★') : '', c: q('[data-symc]').value, p: q('[data-symp]').value }; paint(); };
+    ['[data-sym]', '[data-symc]', '[data-symp]'].forEach(s => { q(s).onchange = symNow; }); q('[data-symt]').oninput = symNow;
+    q('[data-recolor]').onclick = () => { const k = 40 + Math.random() * 280; for (const c of Object.keys(d.pal)) { const [h, s, l] = hsl(d.pal[c]); if (s > .15) d.pal[c] = hex((h + k) % 360, s, l); } const [h, s, l] = hsl(d.bg); d.bg = hex((h + k) % 360, s, l); paint(); };
+    q('[data-auto]').onclick = () => { d = B.suggest((theme || []).join(' '), m); cur = Object.keys(d.pal)[0]; paint(); };
+    q('[data-x]').onclick = () => dlg.close();
+    q('[data-save]').onclick = async () => {
+      st.textContent = '…';
+      try { await api('/mbadge', { m, design: B.clean(d) }); st.textContent = '✓ Сохранено'; if (onSaved) onSaved(B.clean(d)); setTimeout(() => dlg.close(), 400); }
+      catch (e) { st.textContent = '⚠ ' + (e.code === 'notheme' ? 'Сначала сохраните тематику месяца.' : errText(e)); }
+    };
+    paint(); dlg.showModal();
   }
   // ---------- банк тем: темы правленных дней (сервер держит банк за днями) + добавленные прямо в банк ----------
   const bankLoad = day => api('/bank' + (day ? '?day=' + day : '')).then(x => x.items);

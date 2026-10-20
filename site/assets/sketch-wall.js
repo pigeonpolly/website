@@ -300,7 +300,7 @@
     const cls = on === 'past' ? ' past' : on ? '' : ' off';
     const stars = lv.k === 'pick' && picks ? `<span class="sw-stars" aria-label="${Math.min(3, Math.floor(picks / 5))}/3">${[1, 2, 3].map(i => `<i class="${picks >= i * 5 ? 'on' : ''}">★</i>`).join('')}</span>` : '';
     const tip = lv.k === 'pick' && picks ? `${fun}&#10;${t('picked', picks)}` : esc(fun);
-    return `<${tag}${tag === 'button' ? ' type="button"' : ''} class="sw-medal${cls}${big ? ' big' : ''}" style="--bg:${lv.bg}" aria-label="${esc(lv.n[L])}" data-tip="${esc(lv.n[L])}&#10;${tip}" data-badge="${esc(lv.k || lv.s)}">${lv.s ? spriteSvg(lv.s) : `<b>${lv.icon}</b>`}${stars}</${tag}>`;
+    return `<${tag}${tag === 'button' ? ' type="button"' : ''} class="sw-medal${cls}${big ? ' big' : ''}${lv.ring && on ? ' has-ring' : ''}" style="--bg:${lv.bg}${lv.ring ? ';--ring:' + lv.ring : ''}" aria-label="${esc(lv.n[L])}" data-tip="${esc(lv.n[L])}&#10;${tip}" data-badge="${esc(lv.k || lv.s)}">${lv.s ? spriteSvg(lv.s) : `<b>${lv.icon}</b>`}${stars}</${tag}>`;
   };
   // ---------- бейджи тематик месяцев (кабинет → тематика месяца): 'mt2027-02', «тема + год»; значок — пиксельный листок календаря ----------
   // с золотой рамкой, полосой цвета сезона и номером месяца (не Полли, как у остальных бейджей — так видно, что это особый, «месячный»)
@@ -316,16 +316,44 @@
     return `<svg viewBox="0 0 14 17" shape-rendering="crispEdges">${px.map(([x, y, c]) => `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${c}"/>`).join('')}</svg>`;
   }
   const nowYm = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; };
-  fetch('/api/challenge/mthemes').then(r => r.ok ? r.json() : null).then(j => {
-    for (const it of (j && j.items) || []) {
+  // тематики месяцев → бейджи в SPECIAL (значок — пиксельный дизайн Алины, pixel-badge.js; нет его — листок календаря monthIcon)
+  let MTHEMES = [];
+  const pixelLib = () => window.PPPixelBadge ? Promise.resolve() : new Promise(res => { const sc = document.createElement('script'); sc.src = '/assets/pixel-badge.js'; sc.onload = sc.onerror = () => res(); document.head.appendChild(sc); });
+  Promise.all([fetch('/api/challenge/mthemes').then(r => r.ok ? r.json() : null).catch(() => null), pixelLib()]).then(([j]) => {
+    MTHEMES = (j && j.items) || [];
+    const PB = window.PPPixelBadge;
+    for (const it of MTHEMES) {
       if (SPECIAL.some(x => x.k === 'mt' + it.ym)) continue;
       const tt = l => it.t[l] || it.t[1] || it.t[0] || it.t[2], y = it.ym.slice(0, 4), mon = l => new Date(+y, +it.ym.slice(5, 7) - 1, 1).toLocaleDateString(['en-GB', 'ru-RU', 'lv-LV'][l], { month: 'long', year: 'numeric' }).replace(/\s*г\.$/, '');
-      SPECIAL.push({ k: 'mt' + it.ym, mt: it.ym, icon: monthIcon(it.ym), bg: '#FCE7C8',
+      const dz = PB ? (PB.clean(it.badge) || PB.suggest(it.t.join(' '), it.ym)) : null;
+      SPECIAL.push({ k: 'mt' + it.ym, mt: it.ym, icon: dz ? PB.svg(dz) : monthIcon(it.ym), bg: dz ? dz.bg : '#FCE7C8', ring: dz ? dz.ring : '',
         n: [0, 1, 2].map(l => `${tt(l)} ${y}`),
         f: [`A whole month of “${tt(0)}”, every single day!`, `Целый месяц «${tt(1)}» — каждый день!`, `Vesels mēnesis “${tt(2)}” — katru dienu!`],
         h: [`Draw every day of ${mon(0)} (theme of the month: “${tt(0)}”; the EXTRA day can be skipped)`, `Рисовать каждый день месяца: ${mon(1)} (тематика месяца — «${tt(1)}»; день ЭКСТРА можно пропустить)`, `Zīmēt katru dienu: ${mon(2)} (mēneša tēma — “${tt(2)}”; EKSTRA dienu var izlaist)`] });
     }
-  }).catch(() => {});
+    monthBar();
+  });
+  // шкала тематики месяца на /challenge/ (#ch-mbar): видна, пока идёт месяц с тематикой; в конце — силуэт бейджа (получен — цветной)
+  function monthBar() {
+    const box = document.getElementById('ch-mbar'); if (!box) return;
+    const ym = nowYm(), it = MTHEMES.find(x => x.ym === ym), x = SPECIAL.find(v => v.k === 'mt' + ym);
+    if (!it || !x) { box.hidden = true; return; }
+    const y = +ym.slice(0, 4), m = +ym.slice(5, 7) - 1, last = new Date(y, m + 1, 0).getDate();
+    const ex = window.ChallengeTheme ? window.ChallengeTheme.extraDay(y, m) : 0, need = last - (ex ? 1 : 0);
+    const days = new Set(((me && me.posts) || []).map(p => p.day).filter(d => d.startsWith(ym)));
+    const done = [...days].filter(d => +d.slice(8) !== ex).length, got = !!(me && (me.keptBadges || []).includes(x.k)) || done >= need;
+    const today = new Date().getDate(), lost = !got && !!me && [...Array(Math.max(0, today - 3))].some((_, i) => i + 1 !== ex && !days.has(`${ym}-${String(i + 1).padStart(2, '0')}`)); // загрузить можно за сегодня, вчера и позавчера
+    const tt = it.t[L] || it.t[1] || it.t[0];
+    const txt = got ? ['Badge earned! 🎉', 'Бейдж получен! 🎉', 'Nozīmīte iegūta! 🎉'][L]
+      : lost ? ['A day was missed — this badge can’t be earned this month, but keep drawing!', 'Пропущен день — этот бейдж в этом месяце уже не получить, но рисовать всё равно здорово!', 'Diena izlaista — šo nozīmīti šomēnes vairs neiegūt, bet zīmē tāpat!'][L]
+      : me ? [`${done} of ${need} days`, `${done} из ${need} дней`, `${done} no ${need} dienām`][L] : ['Sign in and draw every day of the month to earn the badge', 'Войдите и рисуйте каждый день месяца — получите бейдж', 'Pieslēdzies un zīmē katru mēneša dienu — iegūsi nozīmīti'][L];
+    box.hidden = false;
+    box.innerHTML = `<div class="chm-info"><b>🏅 ${['Theme of the month', 'Тематика месяца', 'Mēneša tēma'][L]}: «${esc(tt)}»</b><span>${esc(txt)}</span>
+      <div class="chm-bar${lost ? ' lost' : ''}" role="progressbar" aria-valuemin="0" aria-valuemax="${need}" aria-valuenow="${done}"><i style="width:${Math.min(100, Math.round(done / need * 100))}%"></i></div></div>${medal(x, got, false, 'button')}`;
+    box.querySelector('.sw-medal').onclick = () => showBadge(x, got);
+  }
+  // бейджи не за рисование (игры, адвент) — во вкладке «Остальное»
+  const NOT_DRAW = new Set(['collector', 'rain1', 'rain2', 'rain3', 'pan1', 'pan2', 'pan3', 'panstar', 'panwash', 'pot1', 'pot2', 'pot3', 'potkid', 'maze']);
   const stateOf = (s, got) => s.k === 'pick' ? (got.has('pick') ? true : got.has('pick_past') ? 'past' : false) : got.has(s.k);
   const levelOf = best => [...LEVELS].reverse().find(l => best >= l.d) || null;
   function specials(posts) {
@@ -372,6 +400,7 @@
 
   function render(prev) {
     const dz = document.getElementById('sw-danger'); if (dz) dz.innerHTML = '';
+    monthBar();
     renderQuick();
     if (!me) return renderSignIn();
     if (me.banned) { app.innerHTML = `<div class="sw-card"><p>${t('banned')}</p></div>`; return; }
@@ -724,7 +753,13 @@
         const bagEl = panel.querySelector('.sw-pv-bag');
         for (const g of pr.bag || []) { const it = document.createElement('span'); it.className = 'sw-pv-item' + (pr.avatar && pr.avatar[g.kind] === g.item ? ' on' : ''); it.title = window.PPBirds.giftName(g.kind, g.item, L); it.appendChild(window.PPBirds.giftPic(g.kind, g.item, pr.id, 56, pr.avatar)); bagEl.appendChild(it); }
       } else if (k === 'badges') {
-        panel.innerHTML = `<div class="bp-badges">${LEVELS.map(l => medal(l, pr.best >= l.d, false, 'button')).join('')}${SPECIAL.filter(x => !x.mt || st(x) || x.mt >= nowYm()).map(x => medal(x, st(x), false, 'button', pr.picks)).join('')}</div><p class="sw-how">${t('tapBadge')}</p>`;
+        const grp = (() => { try { return localStorage.getItem('pp-badge-grp') || 'draw'; } catch (e) { return 'draw'; } })();
+        const mts = SPECIAL.filter(x => x.mt), rest = SPECIAL.filter(x => !x.mt), isDraw = x => !NOT_DRAW.has(x.k);
+        panel.innerHTML = `<div class="ch-level bp-grp" role="group">${[['draw', ['🎨 Drawing', '🎨 Рисование', '🎨 Zīmēšana'][L]], ['other', ['✨ Everything else', '✨ Остальное', '✨ Pārējais'][L]]].map(([k, n]) => `<button type="button" data-grp="${k}" aria-pressed="${k === grp}">${n}</button>`).join('')}</div>
+          ${grp === 'draw' ? `${mts.length ? `<p class="bp-sub">🏅 ${['Themes of the month', 'Тематики месяцев', 'Mēnešu tēmas'][L]}</p><div class="bp-badges bp-mt">${mts.map(x => medal(x, st(x), false, 'button')).join('')}</div><p class="bp-sub">🔥 ${['Drawing streaks and challenge', 'Серии и челлендж', 'Sērijas un izaicinājums'][L]}</p>` : ''}
+            <div class="bp-badges">${LEVELS.map(l => medal(l, pr.best >= l.d, false, 'button')).join('')}${rest.filter(isDraw).map(x => medal(x, st(x), false, 'button', pr.picks)).join('')}</div>`
+          : `<div class="bp-badges">${rest.filter(x => !isDraw(x)).map(x => medal(x, st(x), false, 'button', pr.picks)).join('')}</div>`}<p class="sw-how">${t('tapBadge')}</p>`;
+        panel.querySelectorAll('[data-grp]').forEach(b => b.onclick = () => { try { localStorage.setItem('pp-badge-grp', b.dataset.grp); } catch (e) { /* без памяти */ } show('badges'); });
         panel.querySelectorAll('.sw-medal').forEach(b => b.onclick = () => {
           const x = [...LEVELS, ...SPECIAL].find(v => (v.k || v.s) === b.dataset.badge);
           showBadge(x, b.classList.contains('past') ? 'past' : !b.classList.contains('off'), pr.picks);
