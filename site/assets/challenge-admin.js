@@ -174,6 +174,10 @@
       </div><div class="bed-right">
         <b>Из картинки</b> <small>— фото или рисунок станет пиксельным 16×16, дальше можно править</small>
         <div class="bed-row bed-img"><label class="pill-btn">📷 Загрузить картинку<input type="file" accept="image/*" data-img hidden></label><label>Цветов <select data-imgn>${[3, 4, 6, 8, 12].map(n => `<option${n === 6 ? ' selected' : ''}>${n}</option>`).join('')}</select></label><label><input type="checkbox" data-imgbg checked> Убрать фон</label><label><input type="checkbox" data-imgfill> Заполнить квадрат (обрезать края)</label></div>
+        <div class="bed-row bed-img bed-imgt" data-imgt hidden><span class="bed-arr">${[['0,-1', '↑'], ['-1,0', '←'], ['1,0', '→'], ['0,1', '↓']].map(([v, n]) => `<button type="button" class="pill-btn" data-mv="${v}" aria-label="Сдвинуть">${n}</button>`).join('')}</span>
+          <label>Размер <input type="range" min="30" max="300" step="5" value="100" data-isc></label><label>Поворот <input type="range" min="-180" max="180" step="5" value="0" data-irot></label>
+          <button type="button" class="pill-btn" data-irot90>↻ 90°</button><button type="button" class="pill-btn" data-ireset>↺ Как было</button>
+          <small>Двигать можно и мышкой/пальцем по большому значку. Сдвиг, размер и поворот пересчитывают картинку — дорисовывать лучше в конце.</small></div>
         <b>Шаблоны</b><div class="bed-tpls">${Object.entries(B.TEMPLATES).map(([k, t]) => `<button type="button" data-tpl="${k}" title="${esc(t.n[1])}"><span class="sw-medal has-ring" style="--bg:${t.bg};--ring:#C98A1E"><b>${B.svg(B.fromTemplate(k))}</b></span></button>`).join('')}</div>
         <b>Цвета рисунка</b> <small>— нажмите, чтобы рисовать этим цветом; круглая кнопка рядом — поменять цвет</small><div class="bed-pal" data-pal></div>
         <div class="bed-row"><label>Фон медали <input type="color" data-bg></label><label>Обводка медали <input type="color" data-ring></label><label><input type="checkbox" data-ol> Контур рисунка <input type="color" data-olc></label></div>
@@ -218,12 +222,14 @@
     q('[data-recolor]').onclick = () => { const k = 40 + Math.random() * 280; for (const c of Object.keys(d.pal)) { const [h, s, l] = hsl(d.pal[c]); if (s > .15) d.pal[c] = hex((h + k) % 360, s, l); } const [h, s, l] = hsl(d.bg); d.bg = hex((h + k) % 360, s, l); paint(); };
     q('[data-auto]').onclick = () => { d = B.suggest((theme || []).join(' '), m); cur = Object.keys(d.pal)[0]; paint(); };
     // 📷 картинка → 16×16: вписать в квадрат, сжать, свести к N цветам (k-средних), фон (цвет по краям) — убрать; число цветов и фон можно переключать
-    let img = null;
+    let img = null, ox = 0, oy = 0, isc = 1, rot = 0; // сдвиг (в клетках 16×16), размер, поворот (°)
     const fromImg = () => {
       if (!img) return;
+      q('[data-imgt]').hidden = false; q('[data-isc]').value = Math.round(isc * 100); q('[data-irot]').value = rot;
       const big = document.createElement('canvas'), sm = document.createElement('canvas'); big.width = big.height = 128; sm.width = sm.height = B.N;
       const k = (q('[data-imgfill]').checked ? Math.max : Math.min)(128 / img.width, 128 / img.height), w = img.width * k, h = img.height * k, bx = big.getContext('2d', { willReadFrequently: true });
-      bx.imageSmoothingQuality = 'high'; bx.drawImage(img, (128 - w) / 2, (128 - h) / 2, w, h);
+      bx.imageSmoothingQuality = 'high';
+      bx.translate(64 + ox * 8, 64 + oy * 8); bx.rotate(rot * Math.PI / 180); bx.scale(isc, isc); bx.drawImage(img, -w / 2, -h / 2, w, h);
       const sx = sm.getContext('2d', { willReadFrequently: true }); sx.imageSmoothingQuality = 'high'; sx.drawImage(big, 0, 0, B.N, B.N);
       const px = sx.getImageData(0, 0, B.N, B.N).data, pts = [];
       for (let i = 0; i < B.N * B.N; i++) if (px[i * 4 + 3] >= 110) pts.push([px[i * 4], px[i * 4 + 1], px[i * 4 + 2], i]);
@@ -252,9 +258,19 @@
     };
     q('[data-img]').onchange = e => {
       const f = e.target.files[0]; if (!f) return; const url = URL.createObjectURL(f), im = new Image();
-      im.onload = () => { img = im; URL.revokeObjectURL(url); fromImg(); }; im.onerror = () => { st.textContent = '⚠ Не получилось открыть картинку.'; }; im.src = url; e.target.value = '';
+      im.onload = () => { img = im; ox = oy = rot = 0; isc = 1; URL.revokeObjectURL(url); fromImg(); }; im.onerror = () => { st.textContent = '⚠ Не получилось открыть картинку.'; }; im.src = url; e.target.value = '';
     };
     q('[data-imgn]').onchange = fromImg; q('[data-imgbg]').onchange = fromImg; q('[data-imgfill]').onchange = fromImg;
+    dlg.querySelectorAll('[data-mv]').forEach(b => b.onclick = () => { const [dx, dy] = b.dataset.mv.split(',').map(Number); ox += dx; oy += dy; fromImg(); });
+    q('[data-isc]').oninput = e => { isc = +e.target.value / 100; fromImg(); };
+    q('[data-irot]').oninput = e => { rot = +e.target.value; fromImg(); };
+    q('[data-irot90]').onclick = () => { rot = ((rot + 90 + 180) % 360) - 180; fromImg(); };
+    q('[data-ireset]').onclick = () => { ox = oy = rot = 0; isc = 1; fromImg(); };
+    // перетаскивание по большому значку: 1 клетка = 1/16 его ширины
+    let drag = null;
+    q('[data-prev]').addEventListener('pointerdown', e => { const md = e.target.closest('.sw-medal'); if (!img || !md) return; e.preventDefault(); drag = { x: e.clientX, y: e.clientY, ox, oy, cell: md.getBoundingClientRect().width / B.N }; md.setPointerCapture && md.setPointerCapture(e.pointerId); });
+    q('[data-prev]').addEventListener('pointermove', e => { if (!drag) return; const nx = drag.ox + Math.round((e.clientX - drag.x) / drag.cell), ny = drag.oy + Math.round((e.clientY - drag.y) / drag.cell); if (nx !== ox || ny !== oy) { ox = nx; oy = ny; fromImg(); } });
+    window.addEventListener('pointerup', () => { drag = null; });
     q('[data-x]').onclick = () => dlg.close();
     q('[data-save]').onclick = async () => {
       st.textContent = '…';
