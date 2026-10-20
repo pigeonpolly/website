@@ -253,7 +253,7 @@
     if (card.classList.contains('open')) return drop('salary', card);
     card.id = 'acct-sal';
     if (!card.querySelector('.sal-env')) card.insertAdjacentHTML('beforeend', `<div class="sal-env"><div class="sal-back"></div><div class="sal-letter"><b>${esc(T.salHi[L](me.nick))}</b><p>${t('salText')}</p>
-      <p class="sal-sum">${T.salGot[L](x.sum || 0)}</p><p class="sal-note">${t('salNote')}</p><i>${t('salSign')}</i></div><div class="sal-front"></div><div class="sal-flap"></div><div class="sal-seal">W</div></div>`);
+      <p class="sal-sum">${T.salGot[L](x.sum || 0)}</p><p class="sal-note">${t('salNote')}</p><p class="sal-note pp-sew">${esc(window.PPSew || '')}</p><i>${t('salSign')}</i></div><div class="sal-front"></div><div class="sal-flap"></div><div class="sal-seal">W</div></div>`);
     card.classList.add('show'); btn.disabled = true;
     setTimeout(() => { card.classList.add('open'); btn.disabled = false; btn.textContent = t('salOk'); card.querySelector('.sal-env').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); }, 900);
     fetch('/api/salary/seen', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: '{}' }).catch(() => {});

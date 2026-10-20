@@ -2929,6 +2929,9 @@ html:not(.is-admin) .statbar { display: none; }
 
 /* 🔘 пуговки: уведомление, меню, профиль, магазин, кабинет */
 .pp-toast { position: fixed; left: 50%; bottom: 24px; z-index: 2000; transform: translateX(-50%); padding: 12px 20px; border-radius: 999px; background: #2B1A51; color: #F5D547; font: 700 15px var(--sans); box-shadow: 0 0 0 2px #F5D547, 0 12px 30px rgba(0, 0, 0, .4); animation: wl-pop .3s ease-out; transition: opacity .5s, transform .5s; white-space: nowrap; }
+.pp-toast-2 { border-radius: 22px; text-align: center; }
+.pp-toast-sew { display: block; margin-top: 2px; color: #fff; font: 600 13px var(--sans); }
+.pp-sew { margin: 4px 0 0; font-size: .9em; font-style: italic; opacity: .85; }
 .pp-toast.off { opacity: 0; transform: translate(-50%, 12px); }
 .pp-toast-btn { padding: 0; border: 0; background: none; color: #fff; font: inherit; text-decoration: underline; text-underline-offset: 3px; cursor: pointer; }
 .pp-toast-btn:hover, .pp-toast-btn:focus-visible { color: #F5D547; }

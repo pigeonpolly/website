@@ -148,7 +148,7 @@
     const a = document.getElementById('hd-btns');
     if (!a) return;
     a.hidden = n == null;
-    if (n != null) { a.querySelector('b').textContent = n; a.href = pre + '/shop/'; }
+    if (n != null) { a.querySelector('b').textContent = n; a.href = pre + '/shop/'; a.title = window.PPSew || ''; }
     const c = document.getElementById('hd-cart'); // 🛒 корзина (cart.js) — рядом с пуговками
     if (c) { c.hidden = n == null; c.href = pre + '/shop/#cart'; }
   }
@@ -218,7 +218,7 @@
       el.innerHTML = `<button type="button" class="acct-btn acct-me${u.admin ? ' acct-admin' : ''}" aria-expanded="false" aria-haspopup="menu" aria-label="${t('menu')}"><canvas width="40" height="52" aria-hidden="true"></canvas></button>
         <div class="acct-pop" hidden role="menu">
           <p class="acct-name">${u.nick ? '@' + esc(u.nick) : `<i>${t('noNick')}</i>`}${u.admin ? ` <span class="acct-badge">★ ${t('admin')}</span>` : ''}</p>
-          ${u.nick ? `<p class="acct-btns">${u.streak ? `<span>${t('streak')(u.streak)}</span>` : ''}<span>🔘 <b>${u.buttons || 0}</b> ${t('btns')}</span></p>` : ''}
+          ${u.nick ? `<p class="acct-btns">${u.streak ? `<span>${t('streak')(u.streak)}</span>` : ''}<span title="${window.PPSew || ''}">🔘 <b>${u.buttons || 0}</b> ${t('btns')}</span></p>` : ''}
           ${u.nick ? [['/bird/', '🐦', 'profile'], ['/bird/#room', '🏠', 'room'], ['/bird/#bag', '🎒', 'bag'], ['/bird/#album', '🃏', 'album'], ['/shop/', '🛍', 'shop']]
             .map(([h, i, k]) => `<a role="menuitem" href="${pre}${h}"><i aria-hidden="true">${i}</i>${t(k)}</a>`).join('') + `<button type="button" role="menuitem" data-env><i aria-hidden="true">✉️</i>${t('env')}</button>`
             : `<a role="menuitem" href="${pre}/challenge/">${t('nick')}</a>`}

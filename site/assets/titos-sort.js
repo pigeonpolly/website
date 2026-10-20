@@ -311,7 +311,7 @@
       $('.ts-y').onclick = () => res(true); $('.ts-n').onclick = () => res(false);
     });
     const endCard = (j, c0, max) => {
-      const e = showEnd(`<span class="ts-potbox big">${potSvg()}<b></b></span><h3>${t(T.done)(R.lv)}</h3><p>${t(T.got)(j.gained || 0)}</p>${j.sold ? `<p>${t(T.sold)(j.sold, j.buttons || 0)}</p>` : ''}
+      const e = showEnd(`<span class="ts-potbox big">${potSvg()}<b></b></span><h3>${t(T.done)(R.lv)}</h3><p>${t(T.got)(j.gained || 0)}</p>${j.sold ? `<p>${t(T.sold)(j.sold, j.buttons || 0)}</p><p class="pp-sew">${window.PPSew || ""}</p>` : ''}
         <div class="ts-row"><button type="button" class="pill-btn ts-nx">${t(T.next)}</button><button type="button" class="pill-btn ts-c">${t(T.close)}</button></div>`);
       const pb = e.querySelector('.ts-potbox'); setPot(pb, c0, max);
       requestAnimationFrame(() => setTimeout(() => { setPot(pb, Math.min(max, c0 + (j.gained || 0)), max); setPot(potEl, Math.min(max, c0 + (j.gained || 0)), max); }, 200)); // видно, как наливается

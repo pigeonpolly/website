@@ -96,7 +96,7 @@
     d.innerHTML = `<form method="dialog"><canvas width="${B ? B.SW : 28}" height="26" aria-hidden="true"></canvas>
       <h2>${esc(t('hi', o.nick))}</h2><p>${t('best')}</p>
       ${w ? `<div class="hh-gift"><span class="hh-pic"></span><span class="hh-tx"><small>🎁 ${t('gift')}</small><b>${esc(B ? B.giftName(w.kind, w.item, L) : w.item)}</b></span><button type="button" class="pill-btn" data-wear>${t('wear')}</button></div>
-      ${w.btn > 0 ? `<p class="hh-btn">${t('btns', w.btn)}</p>` : ''}` : ''}
+      ${w.btn > 0 ? `<p class="hh-btn">${t('btns', w.btn)}</p><p class="pp-sew">${window.PPSew || ''}</p>` : ''}` : ''}
       <a class="pill-btn pill-fill" href="${pre}/shop/">${t('shop')}</a>
       <a class="pill-btn" href="${pre}/flock/?bird=${encodeURIComponent(o.nick)}">${t('flock')}</a>
       <button class="hh-x" type="submit" aria-label="OK">✕</button></form>`;

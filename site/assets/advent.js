@@ -128,7 +128,7 @@
     const name = o.kind && B ? B.giftName(o.kind, o.item, L) : '';
     dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button>
       <div class="adv-stage"><div class="adv-bird"></div></div>
-      <p class="adv-kick">${o.kind ? t('got') : t('btns').replace('{n}', o.buttons || 0)}</p>
+      <p class="adv-kick">${o.kind ? t('got') : t('btns').replace('{n}', o.buttons || 0)}</p>${o.kind ? '' : `<p class="pp-sew">${window.PPSew || ''}</p>`}
       ${o.kind ? `<h2>${esc(name)}</h2>${(o.got || []).length > 1 ? `<div class="adv-list">${o.got.slice(1).map(() => '<figure></figure>').join('')}</div>` : ''}${leg ? `<p class="adv-leg">${t('legend')}</p>` : ''}<p>${t('inBag')}</p>` : `<p>${t('btnsWhy')}</p>`}
       ${o.collector ? `<p class="adv-leg adv-coll">${t('collector').replace(/\(\+\d+ 🔘\)/, o.collectorBtns ? `(+${o.collectorBtns} 🔘)` : '').trim()}</p>` : ''}
       <div class="adv-act">${S.user && S.user.nick ? `<a class="pill-btn pill-fill" href="${pre}/bird/">${t('bag')}</a>` : ''}<a class="pill-btn" href="${pre}/shop/">${t('shop')}</a></div></div>`;
