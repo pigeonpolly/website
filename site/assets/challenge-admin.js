@@ -105,16 +105,34 @@
     const LENS = [[7, 'Неделя'], [10, '10 дней'], [14, '2 недели'], [30, '30 дней'], [100, '100 дней']];
     const dlg = document.createElement('dialog'); dlg.className = 'be-dialog adm-card-dlg chadm-dlg chadm-mtd';
     dlg.innerHTML = `<button type="button" class="chadm-x" data-x aria-label="Закрыть без изменений">✕</button><h2>🏅 ${x ? 'Тематика' : 'Новая тематика'}</h2>
-      <div class="chadm-mtdates"><label>С <input type="date" data-s></label><label>по <input type="date" data-e></label><b data-len></b></div>
+      <div class="chadm-mtdates"><label>С <button type="button" class="pill-btn" data-pick="s"></button></label><label>по <button type="button" class="pill-btn" data-pick="e"></button></label><b data-len></b></div>
+      <div class="chadm-cal" data-cal hidden></div>
       <p class="chadm-mtlens">${LENS.map(([n, t]) => `<button type="button" class="pill-btn" data-len-n="${n}">${t}</button>`).join('')}<button type="button" class="pill-btn" data-len-m>Месяц</button></p>
       ${['ru', 'en', 'lv'].map(l => `<label class="chadm-mtl"><span>${l.toUpperCase()}</span><input type="text" data-mt="${l}" maxlength="120" value="${esc(x ? x.t[LI[l]] : '')}"></label>`).join('')}
       <p class="be-note">За рисунок каждый день с первого по последний (дни ЭКСТРА можно пропустить) — бейдж «тема + год» и пуговки (📜 Правила → «Тематика месяца»). Полученные бейджи не отнимаются.</p>
       <p class="be-dialog-acts"><button type="button" class="pill-btn" data-tr>🌐 Перевести</button><button type="button" class="pill-btn pill-fill" data-save>💾 Сохранить</button>${x ? '<button type="button" class="pill-btn" data-badge>🎨 Бейдж</button><button type="button" class="pill-btn" data-del>🗑 Удалить</button>' : ''}<span class="be-note" data-st role="status"></span></p>`;
     document.body.appendChild(dlg); dlg.addEventListener('close', () => dlg.remove());
     const q = k => dlg.querySelector(k), st = q('[data-st]'), mv = l => q(`[data-mt="${l}"]`);
-    const show = () => { q('[data-s]').value = s; q('[data-e]').value = e; q('[data-len]').textContent = e >= s ? ruDays(lenOf(s, e)) : '⚠ конец раньше начала'; };
-    q('[data-s]').onchange = ev => { const n = e >= s ? lenOf(s, e) : 1; s = ev.target.value || s; e = addDays(s, n - 1); show(); }; // сдвиг начала — длина та же
-    q('[data-e]').onchange = ev => { e = ev.target.value || e; show(); };
+    // свой календарь (европейский, с понедельника): нажали «С» или «по» — под датами месяц, день — выбор; диапазон подсвечен
+    let pick = '', calM = '';
+    const fmtD = k => dOf(k).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }).replace(/\s*г\.$/, '');
+    const cal = () => {
+      const box = q('[data-cal]'); box.hidden = !pick; dlg.querySelectorAll('[data-pick]').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.pick === pick)));
+      if (!pick) return;
+      const y = +calM.slice(0, 4), m = +calM.slice(5, 7) - 1, first = (new Date(y, m, 1).getDay() + 6) % 7, n = new Date(y, m + 1, 0).getDate();
+      box.innerHTML = `<div class="chadm-calh"><button type="button" class="pill-btn" data-cm="-1" aria-label="Предыдущий месяц">‹</button><b>${MON[m]} ${y}</b><button type="button" class="pill-btn" data-cm="1" aria-label="Следующий месяц">›</button></div>
+        <div class="chadm-calg">${['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'].map(x => `<span>${x}</span>`).join('')}${'<i></i>'.repeat(first)}${Array.from({ length: n }, (_, k) => { const key = `${calM}-${pad(k + 1)}`;
+          return `<button type="button" data-cd="${key}" class="${[key === s || key === e ? 'on' : '', key > s && key < e ? 'in' : '', key === D.today ? 'today' : ''].filter(Boolean).join(' ')}">${k + 1}</button>`; }).join('')}</div>`;
+      box.querySelectorAll('[data-cm]').forEach(b => b.onclick = () => { calM = ymAdd(calM, +b.dataset.cm); cal(); });
+      box.querySelectorAll('[data-cd]').forEach(b => b.onclick = () => {
+        const k = b.dataset.cd;
+        if (pick === 's') { const n = e >= s ? lenOf(s, e) : 1; s = k; e = addDays(s, n - 1); pick = 'e'; calM = e.slice(0, 7); } // сдвиг начала — длина та же, дальше выбрать конец
+        else { if (k < s) s = k; else e = k; pick = ''; }
+        show();
+      });
+    };
+    const show = () => { q('[data-pick="s"]').textContent = fmtD(s); q('[data-pick="e"]').textContent = fmtD(e); q('[data-len]').textContent = e >= s ? ruDays(lenOf(s, e)) : '⚠ конец раньше начала'; cal(); };
+    dlg.querySelectorAll('[data-pick]').forEach(b => b.onclick = () => { pick = pick === b.dataset.pick ? '' : b.dataset.pick; calM = (pick === 'e' ? e : s).slice(0, 7); cal(); });
     dlg.querySelectorAll('[data-len-n]').forEach(b => b.onclick = () => { e = addDays(s, +b.dataset.lenN - 1); show(); });
     q('[data-len-m]').onclick = () => { const d = dOf(s); d.setMonth(d.getMonth() + 1, Math.min(d.getDate(), new Date(d.getFullYear(), d.getMonth() + 2, 0).getDate())); e = addDays(kOf(d), -1); show(); };
     q('[data-tr]').onclick = async ev => {

@@ -4161,6 +4161,11 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .chadm-mt .pill-btn { padding: 4px 12px; font-size: 13px; }
 .chadm-mtd { max-width: 520px; } .chadm-mtd > .be-note { font-size: 13px; line-height: 1.4; } .chadm-mtdates { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; margin: 0 0 8px; } .chadm-mtdates label { display: flex; align-items: center; gap: 6px; font: 600 13px var(--sans); }
 .chadm-mtdates input { font: 14px var(--sans); padding: 5px 8px; border-radius: 9px; border: 1px solid #CFC7E2; } .chadm-mtlens { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; } .chadm-mtlens .pill-btn { padding: 4px 12px; font-size: 13px; }
+.chadm-mtdates .pill-btn[aria-pressed="true"] { background: #2B1A51; color: #fff; }
+.chadm-cal { margin: 0 0 10px; padding: 10px; border: 1px solid #E9C98B; border-radius: 12px; background: #fff; max-width: 320px; } .chadm-calh { display: flex; align-items: center; justify-content: space-between; margin: 0 0 6px; font: 700 14px var(--sans); color: #2B1A51; } .chadm-calh .pill-btn { padding: 2px 12px; }
+.chadm-calg { display: grid; grid-template-columns: repeat(7, 1fr); gap: 3px; } .chadm-calg span { font: 700 11px var(--sans); color: #6B6290; text-align: center; text-transform: uppercase; }
+.chadm-calg button { font: 13px var(--sans); padding: 6px 0; border: 0; border-radius: 8px; background: transparent; color: #2B1A51; cursor: pointer; } .chadm-calg button:hover { background: #F1ECFA; }
+.chadm-calg button.in { background: #FCE7C8; } .chadm-calg button.on { background: #2B1A51; color: #fff; font-weight: 700; } .chadm-calg button.today { box-shadow: inset 0 0 0 2px #7B4FB8; }
 .chadm-mtl { display: flex; align-items: center; gap: 6px; margin: 0 0 6px; font: 600 11px var(--sans); color: #6B6290; } .chadm-mtl input { flex: 1; min-width: 0; font: 14px var(--sans); padding: 5px 9px; border-radius: 9px; border: 1px solid #CFC7E2; } .chadm-mt [data-mtst] { font-size: 12px; color: #6B6290; }
 .chadm-tools { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; } .chadm-tools .pill-btn { padding: 6px 14px; font-size: 14px; white-space: nowrap; }
 @media (max-width: 480px) { .chadm-tools { gap: 6px; } .chadm-tools .pill-btn { padding: 5px 10px; font-size: 12px; } }
