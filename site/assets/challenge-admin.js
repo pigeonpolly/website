@@ -47,7 +47,7 @@
       const t = D.tags[i], works = D.works[d.day] || 0, n = +d.day.slice(8);
       const cls = ['chadm-day', d.day === D.today ? 'today' : '', d.day < D.today ? 'past' : '', d.edited ? 'edited' : '', d.day === D.last ? 'last' : '', d.extra ? 'extra' : '', broken[d.day] ? 'warn' : ''].filter(Boolean).join(' ');
       return `<button type="button" class="${cls}" data-day="${d.day}"><span class="chadm-n">${n}${d.edited ? ' ✏️' : ''}${d.day === D.last ? ' <b class="chadm-lastb">последний</b>' : ''}${d.day === D.today ? ' <b class="chadm-todayb">сегодня</b>' : ''}${d.extra ? ' ✦' : ''}${t.pool === 'bday' ? ' 🎂' : ''}${broken[d.day] ? ' ⚠' : ''}</span>
-        <span class="chadm-s">${esc(d.subject[1] || d.subject[0])}</span>
+        <span class="chadm-s">${d.subject.some(x => x) ? esc(d.subject[1] || d.subject[0] || d.subject[2]) : '<i class="chadm-empty">пусто</i>'}</span>
         <span class="chadm-c">${bw ? '✒ Ч/Б' : d.extra ? '🎨 палитра' : d.colors.map(sw).join('')}</span>
         ${works ? `<span class="chadm-w">${works} раб.</span>` : ''}</button>`;
     }).join('');
@@ -57,7 +57,7 @@
       ${D.days.length ? `<div class="chadm-grid" lang="ru">${['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'].map(x => `<span class="chadm-dow">${x}</span>`).join('')}${'<span></span>'.repeat(first)}${cells}</div>
       <p class="be-note">Нажмите на день, чтобы поправить тему. ✏️ — день правили вы, зелёный — последний изменённый, фиолетовый — сегодня, ✦ — день ЭКСТРА, ⚠ — день нарушает правило подбора (подробнее — в окне дня). ${D.broken.length ? `Нарушений в месяце: <b>${D.broken.length}</b>.` : 'Все дни подходят по правилам ✓'}</p>`
         : '<p class="be-note">Плана на этот месяц пока нет.</p>'}
-      <p class="be-note">План следующего месяца создаётся сам 20-го числа; месяцы на год вперёд — когда вы их откроете здесь. Созданный месяц сам уже не меняется. Числа правил подбора — в «📜 Все правила» → «Тонкая настройка» → «🎨 Темы челленджа».</p></section>`;
+      <p class="be-note">С 1 декабря 2026 дни пустые — темы и цвета заполняете вы. Если к 23:00 (за час до начала дня) день остался пустым, тема и цвета подберутся сами по прежним правилам. Числа правил подбора — в «📜 Все правила» → «Тонкая настройка» → «🎨 Темы челленджа».</p></section>`;
     main.querySelectorAll('[data-m]').forEach(b => b.onclick = () => load(b.dataset.m));
     main.querySelectorAll('[data-day]').forEach(b => b.onclick = () => dayDialog(b.dataset.day));
     const lb = main.querySelector('[data-last]'); if (lb) lb.onclick = () => D.last.slice(0, 7) === ym ? dayDialog(D.last) : load(D.last.slice(0, 7));
@@ -156,7 +156,7 @@
       <div class="adm-card-fields">
         ${txt('subject', 'Тема')}
         <p class="chadm-acts"><button type="button" class="pill-btn" data-a="tr"></button><button type="button" class="pill-btn" data-a="reroll">🎲 Другая тема</button>
-          <button type="button" class="pill-btn" data-a="swap">⇄ Поменять с днём…</button><select data-swap hidden><option value="">— какой день? —</option>${D.days.filter(x => x.day !== day).map(x => `<option value="${x.day}">${+x.day.slice(8)} — ${esc(x.subject[1] || x.subject[0])}</option>`).join('')}</select>
+          <button type="button" class="pill-btn" data-a="swap">⇄ Поменять с днём…</button><select data-swap hidden><option value="">— какой день? —</option>${D.days.filter(x => x.day !== day).map(x => `<option value="${x.day}">${+x.day.slice(8)} — ${esc(x.subject[1] || x.subject[0] || 'пусто')}</option>`).join('')}</select>
           <button type="button" class="pill-btn" data-a="revert"${d.edited ? '' : ' hidden'}>↩ Вернуть как было</button></p>
         ${d.extra ? `<div class="chadm-pal"><b>Палитра дня ЭКСТРА</b>${pal ? `<span>${pal.c.map(c => `<i style="background:${c[0]}" title="${esc(c[2])}"></i>`).join('')}</span><small>«${esc(pal.t[1])}» — очередь палитр: 🎨 Картины и палитры</small>` : '<small>очередь палитр: 🎨 Картины и палитры</small>'}</div>`
         : `<fieldset class="chadm-f"><legend>Цвета дня</legend>
@@ -270,7 +270,7 @@
     const acts = () => dlg.querySelectorAll('button:not([data-a=tr]):not([data-x])');
     const run = async (fn) => { st.textContent = '…'; acts().forEach(b => b.disabled = true); try { await fn(); } catch (e) { st.textContent = '⚠ ' + errText(e); } acts().forEach(b => b.disabled = false); };
     q('[data-a=save]').onclick = () => run(async () => {
-      if (!d.extra && (cols.length < 1 || cols.length > 5)) throw Object.assign(new Error('colors'), { code: 'colors' });
+      if (!d.extra && (cols.length < (day >= '2026-12-01' ? 0 : 1) || cols.length > 5)) throw Object.assign(new Error('colors'), { code: 'colors' });
       const body = { day, subject: val('subject'), time: +q('[data-time]').value }; // Ч/Б — без условий (20.10.2026), twist/extra не правятся
       if (!d.extra) body.colors = cols;
       await api('/day', body);

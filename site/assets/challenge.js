@@ -27,7 +27,6 @@
     extraBw: ['EXTRA day!', 'День ЭКСТРА!', 'EKSTRA diena!'],
     palFrom: ['Palette from my painting', 'Палитра из моей картины', 'Palete no mana darba'],
     twist: ['How to draw it', 'Как рисовать', 'Kā zīmēt'],
-    bwJust: ['Just draw it in black & white', 'Просто рисуйте в чёрно-белом', 'Vienkārši zīmē melnbaltu'], // 20.10.2026: в Ч/Б — без дополнительных условий
     modeColor: ['In colour', 'В цвете', 'Krāsās'],
     modeBw: ['Black & white', 'Ч/Б', 'Melnbalts'],
     stage2Bw: ['Tones & textures', 'Тон и фактура', 'Toņi un faktūras'],
@@ -90,7 +89,7 @@
         <div class="page-subject">${theme.subject}</div>
         <div class="page-label">${bw ? t('modeBw') : theme.pal ? t('palFrom') : t('colors')}</div>
         ${!bw && theme.pal ? `<a class="page-pal" href="${L ? '/' + ['', 'ru', 'lv'][L] : ''}/palettes/#${theme.pal.key}"><img src="/${theme.pal.thumb}" alt="" loading="lazy"><span>«${theme.pal.title}»</span></a>` : ''}
-        ${bw ? `<div class="page-twist">✒ ${t('bwJust')}</div>` : `<div class="swatches">${theme.colors.map(c => `<span class="sw"><i style="background:${c.hex}"></i>${c.n[L]}</span>`).join('')}</div>`}
+        ${bw ? '' : `<div class="swatches">${theme.colors.map(c => `<span class="sw"><i style="background:${c.hex}"></i>${c.n[L]}</span>`).join('')}</div>`}
         <div class="page-time"><span class="page-label">${t('time')}</span> <b id="ch-min"></b></div>
         ${theme.bday ? `<div class="page-extra page-bday">${t('bday')}</div>` : ''}
         ${theme.extra ? `<div class="page-extra">✦ ${extraText(theme)}</div>` : ''}
@@ -323,7 +322,7 @@
     wrapText(g, theme.subject, 70, 1010, 760, 66);
     if (bw) {
       g.fillStyle = '#F0A987'; g.font = '500 36px Karla, sans-serif';
-      wrapText(g, `✒ ${t('bwJust')} · ${minutes()} ${t('min')}`, 70, 1122, 760, 42);
+      wrapText(g, `${t('modeBw')} · ${minutes()} ${t('min')}`, 70, 1122, 760, 42);
     } else {
       theme.colors.forEach((col, i) => {
         g.fillStyle = col.hex; g.beginPath(); g.arc(100 + i * (theme.colors.length > 3 ? 62 : 70), 1110, 26, 0, Math.PI * 2); g.fill();

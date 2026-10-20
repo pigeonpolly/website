@@ -2,7 +2,7 @@
 // Подбор предметов — worker/challenge-plan.js; предметы с тегами — site/assets/challenge-items.json (build.py).
 // Октябрь 2026 — из site/assets/challenge-2026-10.json (tools/challenge_oct.js), один раз (метка meta 'chplan_oct'). Ноябрь и дальше — генератор:
 // cron с 20-го создаёт следующий месяц, текущий — если его почему-то нет. Созданный месяц сам не меняется, правит только Алина.
-import { planMonth, rowText, rerollDay, checkPlan, dayNum, keyOfNum, poolOf, allColors, PLAN_FROM, NEW_FROM } from './challenge-plan.js';
+import { planMonth, rowText, rerollDay, checkPlan, dayNum, keyOfNum, poolOf, allColors, baseDay, birthdayIdx, PLAN_FROM, NEW_FROM } from './challenge-plan.js';
 
 export const CHALLENGE_TABLES = [
   // день плана: item — индекс предмета в challenge-data.js; тексты — на трёх языках; colors — индексы цветов (colors + moreColors) через запятую: до 1.11.2026 — 3, дальше 2–5;
@@ -14,6 +14,8 @@ export const CHALLENGE_TABLES = [
 const L3 = ['en', 'ru', 'lv'];
 const FIRST = '2026-10'; // раньше плана нет (темы — формулой challenge-theme.js)
 const AHEAD = 12; // кабинет: сколько месяцев вперёд можно открыть и править
+// с 1.12.2026 темы заполняет Алина: месяцы создаются пустыми, генератор берёт день, только если за час до его начала (с 23:00 по Риге) он ещё пустой
+const BLANK_FROM = '2026-12-01';
 const pad = n => String(n).padStart(2, '0');
 const now = () => Math.floor(Date.now() / 1000);
 const parseJ = (s, d) => { try { return JSON.parse(s); } catch (e) { return d; } };
@@ -67,15 +69,56 @@ async function upgradeV2(env) {
   await env.DB.batch([env.DB.prepare('DELETE FROM challenge_days WHERE day >= ? AND edited = 0').bind(from), ...oct.map(d => insertSql(env, d)),
     env.DB.prepare("INSERT INTO meta (key, value) VALUES ('chplan_v4', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(String(now()))]);
 }
-// месяц есть в базе? нет — создать по правилам (история — ~150 дней до него)
+// пустой день: без предмета и цветов; время, совет, Ч/Б и метка ЭКСТРА — как обычно
+const emptyRow = (data, key) => ({ ...rowText(data, key, -1), day: key, item: null, subject: ['', '', ''], colors: [] });
+// 20.10.2026: один раз (метка meta 'chplan_blank12') — все дни с BLANK_FROM удаляются, месяцы пересоздаются пустыми (ensureMonth)
+async function blankFrom(env) {
+  if ((await env.DB.prepare("SELECT value FROM meta WHERE key = 'chplan_blank12'").first())) return;
+  await env.DB.batch([env.DB.prepare('DELETE FROM challenge_days WHERE day >= ?').bind(BLANK_FROM),
+    env.DB.prepare("INSERT INTO meta (key, value) VALUES ('chplan_blank12', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(String(now()))]);
+}
+async function updateRow(env, d, edited) {
+  await env.DB.prepare(`UPDATE challenge_days SET ${COLS.map(c => c + ' = ?').join(', ')}, edited = ?, updated_at = ? WHERE day = ?`).bind(...colVals(d), edited, now(), d.day).run();
+}
+// день пустой (нет темы ни на одном языке; не ЭКСТРА — и нет цветов)? — дополнить по старым правилам: предмет — как «🎲 Другая тема», цвета — гармония генератора
+async function fillDay(env, rules, key) {
+  const row = await env.DB.prepare('SELECT * FROM challenge_days WHERE day = ?').bind(key).first();
+  if (!row) return;
+  const d = toRow(row), needSubj = !d.subject.some(x => x.trim()), needCols = !d.extra && !d.colors.length;
+  if (!needSubj && !needCols) return;
+  const data = await chItems(env);
+  if (needSubj) {
+    const n = dayNum(key);
+    const item = poolOf(data, rules, key) === 'bday' ? birthdayIdx(data, +key.slice(0, 4)) : rerollDay(data, rules, await planAround(env, n - 150, n + 150), key, []);
+    if (item == null) return;
+    d.item = item; d.subject = rowText(data, key, item).subject;
+  }
+  if (needCols) d.colors = baseDay(data, key).colors;
+  await updateRow(env, d, row.edited ? 1 : 0);
+}
+// сегодня (если вдруг пустой) и с 23:00 по Риге — завтра
+const rigaHour = () => +new Date().toLocaleString('en-GB', { timeZone: 'Europe/Riga', hour: '2-digit', hourCycle: 'h23' });
+async function autoFill(env, rules) {
+  const today = rigaToday(), keys = [today];
+  if (rigaHour() >= 23) keys.push(keyOfNum(dayNum(today) + 1));
+  for (const k of keys) if (k >= BLANK_FROM) { await ensureMonth(env, rules, k.slice(0, 7)); await fillDay(env, rules, k); }
+}
+// месяц есть в базе? нет — создать по правилам (история — ~150 дней до него); с BLANK_FROM — пустым
 export async function ensureMonth(env, rules, ym) {
   if (ym < FIRST) return false;
   await upgradeV2(env);
   if (ym === FIRST) { await importOct(env); return true; }
+  if (ym + '-01' >= BLANK_FROM) await blankFrom(env); // до проверки «месяц уже есть»: старые сгенерированные дни с декабря — стереть один раз
   const have = await env.DB.prepare('SELECT COUNT(*) AS n FROM challenge_days WHERE day >= ? AND day <= ?').bind(ym + '-01', ym + '-31').first();
   if (have && have.n >= daysIn(ym)) return true;
   await importOct(env);
-  const start = dayNum(ym + '-01'), data = await chItems(env);
+  const data = await chItems(env);
+  if (ym + '-01' >= BLANK_FROM) {
+    await blankFrom(env);
+    await env.DB.batch(Array.from({ length: daysIn(ym) }, (_, k) => insertSql(env, emptyRow(data, `${ym}-${pad(k + 1)}`))));
+    return true;
+  }
+  const start = dayNum(ym + '-01');
   const history = await planAround(env, start - 150, start - 1);
   const res = planMonth(data, rules, +ym.slice(0, 4), +ym.slice(5, 7) - 1, history);
   await env.DB.batch(res.rows.map(d => insertSql(env, d)));
@@ -88,6 +131,7 @@ const openMonths = (today = rigaToday()) => { const ym = today.slice(0, 7); retu
 // cron: текущий месяц (если нет) и с 20-го — следующий
 export async function challengeCron(env, rules) {
   for (const ym of openMonths()) await ensureMonth(env, rules, ym);
+  await autoFill(env, rules);
 }
 // цвета дней плана для бейджей за цвета (с NEW_FROM; раньше — site/assets/day-colors.json): {"2026-11-03": "py"}
 const FAM = { purple: 'p', yellow: 'y', red: 'r', blue: 'b', green: 'g' };
@@ -108,6 +152,7 @@ export async function challengeApi(req, env, url, h) {
     const ym = String(url.searchParams.get('m') || '');
     if (!/^\d{4}-\d\d$/.test(ym)) h.fail(400, 'bad');
     if (openMonths().includes(ym) || ym === FIRST) await ensureMonth(env, h.rules(), ym);
+    if (ym === rigaToday().slice(0, 7) || openMonths().includes(ym)) await autoFill(env, h.rules()); // не дождались cron — сегодняшний пустой день заполнится сейчас
     const days = ym < FIRST ? [] : (await monthRows(env, ym)).map(({ edited, ...d }) => d);
     return h.json({ m: ym, days }, 200, { 'cache-control': 'public, max-age=60' });
   }
@@ -137,9 +182,7 @@ export async function challengeApi(req, env, url, h) {
   if (!/^\d{4}-\d\d-\d\d$/.test(key)) h.fail(400, 'bad');
   const cur = await env.DB.prepare('SELECT * FROM challenge_days WHERE day = ?').bind(key).first();
   if (!cur) h.fail(404, 'day');
-  const save = async (d, edited = 1) => {
-    await env.DB.prepare(`UPDATE challenge_days SET ${COLS.map(c => c + ' = ?').join(', ')}, edited = ?, updated_at = ? WHERE day = ?`).bind(...colVals(d), edited, now(), d.day).run();
-  };
+  const save = (d, edited = 1) => updateRow(env, d, edited);
   const back = async () => h.json({ day: toRow(await env.DB.prepare('SELECT * FROM challenge_days WHERE day = ?').bind(key).first()) });
   // правка дня: предмет, совет, 1–5 цветов, время, особенность, Ч/Б-условие ЭКСТРА
   if (m === 'POST' && p === '/api/admin/challenge/day') {
@@ -148,7 +191,7 @@ export async function challengeApi(req, env, url, h) {
     if (d.extra) d.extra = t3(b.extra, d.extra);
     if (Array.isArray(b.colors)) {
       const c = [...new Set(b.colors.map(Number).filter(i => Number.isInteger(i) && i >= 0 && i < allColors(data).length))];
-      if (c.length < 1 || c.length > 5) h.fail(400, 'colors'); // 1 — монохромная гармония
+      if (c.length < (key >= BLANK_FROM ? 0 : 1) || c.length > 5) h.fail(400, 'colors'); // 1 — монохромная гармония; с BLANK_FROM можно без цветов — подберутся в 23:00
       d.colors = c;
     }
     if (b.time != null) { if (!data.times.includes(Number(b.time))) h.fail(400, 'time'); d.time = Number(b.time); }
