@@ -1,4 +1,4 @@
-// Кабинет → «🎨 Темы челленджа» (admin.js открывает PPChallengeAdmin.mount(main)): календарь на год вперёд (D.ahead месяцев);
+// Кабинет → «🎨 Темы челленджа» (admin.js открывает PPChallengeAdmin.mount(main)): календарь любого месяца до D.max (2095-12), «🧹 Стереть месяц», «📚 Заполнить месяц из банка»;
 // окно дня (без прокрутки) — тема RU/EN/LV, цвета: 1–5 базовых по одному или гармония на цветовом круге (можно поворачивать); время — под «Ещё» (Ч/Б — без условий, не правится); в день ЭКСТРА — палитра и Ч/Б-условие;
 // «🌐 Перевести», «🎲 Другой предмет», «⇄ Поменять с днём…», «↩ Вернуть как было». Сервер — /api/admin/challenge/* (worker/challenge-days.js), docs/challenge.md.
 (function () {
@@ -42,7 +42,7 @@
   function draw() {
     const first = (new Date(+ym.slice(0, 4), +ym.slice(5, 7) - 1, 1).getDay() + 6) % 7;
     const broken = Object.fromEntries(D.broken.map(b => [b.day, b.rules]));
-    const yr = +ym.slice(0, 4), maxM = ymAdd(thisMonth, D.ahead || 1), minY = 2026, maxY = +maxM.slice(0, 4);
+    const yr = +ym.slice(0, 4), maxM = D.max || '2095-12', minY = 2026, maxY = +maxM.slice(0, 4);
     const cells = D.days.map((d, i) => {
       const t = D.tags[i], works = D.works[d.day] || 0, n = +d.day.slice(8);
       const cls = ['chadm-day', d.day === D.today ? 'today' : '', d.day < D.today ? 'past' : '', d.edited ? 'edited' : '', d.day === D.last ? 'last' : '', d.extra ? 'extra' : '', broken[d.day] ? 'warn' : ''].filter(Boolean).join(' ');
@@ -55,7 +55,7 @@
       <div class="chadm-bar"><div class="chadm-ym"><select class="chadm-year" data-y aria-label="Год">${Array.from({ length: maxY - minY + 1 }, (_, k) => minY + k).map(y => `<option value="${y}"${y === yr ? ' selected' : ''}>${y}</option>`).join('')}</select>
         <div class="ch-level chadm-months" role="group">${MON3.map((n, k) => { const m = `${yr}-${pad(k + 1)}`; return `<button type="button" data-m="${m}" aria-pressed="${m === ym}"${m < '2026-10' || m > maxM ? ' disabled' : ''}${m === thisMonth ? ' class="now"' : ''} title="${MON[k]} ${yr}">${n}</button>`; }).join('')}</div></div>
         <span class="chadm-tools"><button type="button" class="pill-btn" data-now${ym === thisMonth ? ' disabled' : ''}>📅 Сегодня</button>
-        <button type="button" class="pill-btn" data-bank>📚 Банк тем</button><button type="button" class="pill-btn" data-fill>📚 Заполнить месяц из банка</button></span></div>
+        <button type="button" class="pill-btn" data-bank>📚 Банк тем</button><button type="button" class="pill-btn" data-fill title="Заполнить пустые дни месяца темами из банка">📚 Заполнить из банка</button><button type="button" class="pill-btn" data-clear>🧹 Стереть месяц</button></span></div>
       ${D.last ? `<p class="be-note chadm-lastn">Последний изменённый: <button type="button" class="pill-btn" data-last>${new Date(+D.last.slice(0, 4), +D.last.slice(5, 7) - 1, +D.last.slice(8)).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</button></p>` : ''}
       ${D.days.length ? `<div class="chadm-grid" lang="ru">${['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'].map(x => `<span class="chadm-dow">${x}</span>`).join('')}${'<span></span>'.repeat(first)}${cells}</div>
       <p class="be-note">Нажмите на день, чтобы поправить тему. ✏️ — день правили вы, зелёный — последний изменённый, фиолетовый — сегодня, ✦ — день ЭКСТРА, ⚠ — день нарушает правило подбора (подробнее — в окне дня). ${D.broken.length ? `Нарушений в месяце: <b>${D.broken.length}</b>.` : 'Все дни подходят по правилам ✓'}</p>`
@@ -67,6 +67,14 @@
     };
     main.querySelector('[data-bank]').onclick = () => bankDialog();
     main.querySelector('[data-now]').onclick = () => load(thisMonth); // назад к текущему месяцу
+    main.querySelector('[data-clear]').onclick = async e => { // темы и цвета обычных дней с завтрашнего; ЭКСТРА и прошедшие не трогаются
+      const n = D.days.filter(d => d.day > D.today && !d.extra && (d.subject.some(x => x) || d.colors.length)).length;
+      if (!n) { alert('Стирать нечего: прошедшие дни, сегодня и дни ЭКСТРА не стираются.'); return; }
+      if (!confirm(`Стереть темы и цвета ${n} дн. в месяце «${MON[+ym.slice(5) - 1]} ${ym.slice(0, 4)}»? Прошедшие дни, сегодня и дни ЭКСТРА останутся, темы сохранятся в банке.`)) return;
+      e.target.disabled = true;
+      try { const r = await api('/clearmonth', { m: ym }); await load(ym); alert(`Стёрто дней: ${r.cleared}. Если день останется пустым, за час до его начала тема и цвета подберутся сами.`); }
+      catch (er) { alert(errText(er)); e.target.disabled = false; }
+    };
     main.querySelector('[data-fill]').onclick = async e => { // пустые дни месяца (с сегодня) — темами из банка
       const n = D.days.filter(d => d.day >= D.today && !d.subject.some(x => x)).length;
       if (!n) { alert('В этом месяце нет пустых дней (прошедшие не заполняются).'); return; }
