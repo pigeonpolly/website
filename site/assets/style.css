@@ -4100,15 +4100,17 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .chadm-bar { display: flex; flex-wrap: wrap; gap: 10px; justify-content: space-between; margin-bottom: 14px; }
 .chadm-grid { display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 6px; }
 .chadm-dow { font: 700 12px var(--sans); color: #6B6290; text-align: center; text-transform: uppercase; }
-.chadm-day { display: flex; flex-direction: column; gap: 4px; min-height: 96px; padding: 7px; border: 1px solid #E2DCEE; border-radius: 12px; background: #FFFDF8; color: #2B1A51; font: 13px/1.25 var(--sans); text-align: left; cursor: pointer; overflow: hidden; }
+.chadm-day { display: flex; flex-direction: column; gap: 4px; min-height: 96px; padding: 7px; border: 1px solid #E2DCEE; border-radius: 12px; background: #fff; color: #2B1A51; font: 13px/1.25 var(--sans); text-align: left; cursor: pointer; overflow: hidden; }
 .chadm-day:hover { border-color: #2B1A51; }
-.chadm-day.past { background: #F6F3FA; }
-.chadm-day.today { box-shadow: 0 0 0 2px #E9A93B; }
-.chadm-day.edited { border-color: #9A7BD0; background: #F3EDFC; }
+
+.chadm-day.edited { border-color: #9A7BD0; }
 .chadm-grid .chadm-day.last { border: 2px solid #3E9B4F; background: #E6F5E9; box-shadow: 0 0 0 2px #3E9B4F33; }
 .chadm-lastb { display: inline-block; padding: 1px 6px; border-radius: 999px; background: #3E9B4F; color: #fff; font: 700 10px var(--sans); vertical-align: 1px; }
 .chadm-lastn { display: flex; align-items: center; gap: 8px; margin: 0 0 10px; } .chadm-lastn .pill-btn { white-space: nowrap; padding: 4px 12px; font-size: 13px; border-color: #3E9B4F; color: #2B1A51; background: #E6F5E9; }
-@media (max-width: 640px) { .chadm-lastb { font-size: 0; padding: 0; width: 8px; height: 8px; } }
+.chadm-grid .chadm-day.today { border: 2px solid #7B4FB8; background: #7B4FB8; color: #fff; }
+.chadm-grid .chadm-day.today .chadm-c { color: #F1ECF7; } .chadm-grid .chadm-day.today .chadm-w { color: #FFE2A8; }
+.chadm-todayb { display: inline-block; padding: 1px 6px; border-radius: 999px; background: #fff; color: #7B4FB8; font: 700 10px var(--sans); vertical-align: 1px; }
+@media (max-width: 640px) { .chadm-todayb { font-size: 0; padding: 0; width: 8px; height: 8px; } .chadm-lastb { font-size: 0; padding: 0; width: 8px; height: 8px; } }
 .chadm-day.extra { background: #FFF4DE; }
 .chadm-day.warn { border-color: #D85A30; border-style: dashed; }
 .chadm-n { font: 700 13px var(--sans); }

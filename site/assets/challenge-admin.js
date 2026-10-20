@@ -46,7 +46,7 @@
     const cells = D.days.map((d, i) => {
       const t = D.tags[i], works = D.works[d.day] || 0, n = +d.day.slice(8);
       const cls = ['chadm-day', d.day === D.today ? 'today' : '', d.day < D.today ? 'past' : '', d.edited ? 'edited' : '', d.day === D.last ? 'last' : '', d.extra ? 'extra' : '', broken[d.day] ? 'warn' : ''].filter(Boolean).join(' ');
-      return `<button type="button" class="${cls}" data-day="${d.day}"><span class="chadm-n">${n}${d.edited ? ' ✏️' : ''}${d.day === D.last ? ' <b class="chadm-lastb">последний</b>' : ''}${d.extra ? ' ✦' : ''}${t.pool === 'bday' ? ' 🎂' : ''}${broken[d.day] ? ' ⚠' : ''}</span>
+      return `<button type="button" class="${cls}" data-day="${d.day}"><span class="chadm-n">${n}${d.edited ? ' ✏️' : ''}${d.day === D.last ? ' <b class="chadm-lastb">последний</b>' : ''}${d.day === D.today ? ' <b class="chadm-todayb">сегодня</b>' : ''}${d.extra ? ' ✦' : ''}${t.pool === 'bday' ? ' 🎂' : ''}${broken[d.day] ? ' ⚠' : ''}</span>
         <span class="chadm-s">${esc(d.subject[1] || d.subject[0])}</span>
         <span class="chadm-c">${bw ? `✒ ${esc(d.twist[1] || d.twist[0])}` : d.extra ? '🎨 палитра' : d.colors.map(sw).join('')}</span>
         ${works ? `<span class="chadm-w">${works} раб.</span>` : ''}</button>`;
@@ -56,7 +56,7 @@
         <div class="ch-level" role="group"><button type="button" data-bw="0" aria-pressed="${!bw}">В цвете</button><button type="button" data-bw="1" aria-pressed="${bw}">Ч/Б</button></div></div>
       ${D.last ? `<p class="be-note chadm-lastn">Последний изменённый: <button type="button" class="pill-btn" data-last>${new Date(+D.last.slice(0, 4), +D.last.slice(5, 7) - 1, +D.last.slice(8)).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</button></p>` : ''}
       ${D.days.length ? `<div class="chadm-grid" lang="ru">${['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'].map(x => `<span class="chadm-dow">${x}</span>`).join('')}${'<span></span>'.repeat(first)}${cells}</div>
-      <p class="be-note">Нажмите на день, чтобы поправить тему. ✏️ — день правили вы (сиреневый), зелёный — последний изменённый, ✦ — день ЭКСТРА, ⚠ — день нарушает правило подбора (подробнее — в окне дня). ${D.broken.length ? `Нарушений в месяце: <b>${D.broken.length}</b>.` : 'Все дни подходят по правилам ✓'}</p>`
+      <p class="be-note">Нажмите на день, чтобы поправить тему. ✏️ — день правили вы, зелёный — последний изменённый, фиолетовый — сегодня, ✦ — день ЭКСТРА, ⚠ — день нарушает правило подбора (подробнее — в окне дня). ${D.broken.length ? `Нарушений в месяце: <b>${D.broken.length}</b>.` : 'Все дни подходят по правилам ✓'}</p>`
         : '<p class="be-note">Плана на этот месяц пока нет.</p>'}
       <p class="be-note">План следующего месяца создаётся сам 20-го числа; месяцы на год вперёд — когда вы их откроете здесь. Созданный месяц сам уже не меняется. Числа правил подбора — в «📜 Все правила» → «Тонкая настройка» → «🎨 Темы челленджа».</p></section>`;
     main.querySelectorAll('[data-m]').forEach(b => b.onclick = () => load(b.dataset.m));
