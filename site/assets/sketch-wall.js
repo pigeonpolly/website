@@ -58,7 +58,7 @@
     have: ['You have it ✓', 'Получен ✓', 'Iegūta ✓'],
     storage: ['storage', 'хранилище', 'krātuve'],
     noWorks: ['No sketches on the wall right now.', 'Сейчас работ на стене нет.', 'Šobrīd uz sienas nav skiču.'],
-    dToday: ['Today', 'Сегодня', 'Šodien'], dYesterday: ['Yesterday', 'Вчера', 'Vakar'], d2ago: ['2 days ago', 'Позавчера', 'Aizvakar'],
+    dTomorrow: ['Tomorrow', 'Завтра', 'Rīt'], dToday: ['Today', 'Сегодня', 'Šodien'], dYesterday: ['Yesterday', 'Вчера', 'Vakar'], d2ago: ['2 days ago', 'Позавчера', 'Aizvakar'],
     themeOf: ['Theme of', 'Тема за', 'Tēma par'],
     hadIt: ['You had it once', 'Был у вас', 'Tev tā bija'],
     notYet: ['Not yet', 'Ещё впереди', 'Vēl priekšā'],
@@ -372,7 +372,7 @@
     const row = (window.CHALLENGE_DATA?.subjects || []).find(r => r[0] === en);
     return row ? row[L] : en;
   }
-  // загрузка за сегодня, вчера или позавчера
+  // загрузка за завтра, сегодня, вчера или позавчера (upOff = -1…2)
   let upOff = 0;
   const dayAgo = n => { const d = new Date(); d.setHours(12, 0, 0, 0); d.setDate(d.getDate() - n); return d; };
   const keyOfD = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
@@ -586,7 +586,7 @@
     const upDate = dayAgo(upOff), upKey = keyOfD(upDate);
     const got = specials(me.posts), mine = me.posts.find(p => p.day === upKey);
     const th = window.ChallengeTheme ? window.ChallengeTheme.themeFor(upDate, L) : null;
-    const dayBtns = [0, 1, 2].map(n => `<button type="button" data-off="${n}" aria-pressed="${n === upOff}">${t(['dToday', 'dYesterday', 'd2ago'][n])}${me.posts.some(p => p.day === keyOfD(dayAgo(n))) ? ' ✓' : ''}</button>`).join('');
+    const dayBtns = [-1, 0, 1, 2].map(n => `<button type="button" data-off="${n}" aria-pressed="${n === upOff}">${t(['dTomorrow', 'dToday', 'dYesterday', 'd2ago'][n + 1])}${me.posts.some(p => p.day === keyOfD(dayAgo(n))) ? ' ✓' : ''}</button>`).join('');
     const base = (LEVELS.indexOf(next) > 0 ? LEVELS[LEVELS.indexOf(next) - 1].d : 0);
     const progress = next ? Math.round((me.best - base) / (next.d - base) * 100) : 100;
     const newGifts = (me.gifts || []).filter(g => g.status === 'new');
