@@ -381,6 +381,16 @@
   // все цвета (базовые, moreColors, круг) для «🎨 Все цвета»: сначала нейтральные от светлых к тёмным, потом по тону, внутри — от светлых
   const allSorted = () => D.colors.map((c, k) => { const [h, sat, l] = hslOf(c.hex); return { k, h, sat, l }; })
     .sort((a, b) => (a.sat < .18) !== (b.sat < .18) ? (a.sat < .18 ? -1 : 1) : a.sat < .18 ? b.l - a.l : Math.round(((a.h + 15) % 360) / 20) - Math.round(((b.h + 15) % 360) / 20) || b.l - a.l).map(x => x.k);
+  // «🎨 Все цвета» таблицей: столбцы — 24 тона круга (жёлтый → … → янтарный), строки — бледный, светлый, чистый, тёмный, глубокий;
+  // ниже — остальные: нейтральные от светлых к тёмным, потом цветные по тону
+  function allChart() {
+    const sw = k => `<button type="button" data-col="${k}" data-cn="${esc(D.colors[k].n.join(' ').toLowerCase())}" aria-pressed="false" title="${esc(D.colors[k].n[1])}" style="--c:${D.colors[k].hex}"><span>${esc(D.colors[k].n[1])}</span></button>`;
+    const g = grid('full'), inWheel = new Set(g.rings.flat());
+    const rest = D.colors.map((c, k) => k).filter(k => !inWheel.has(k)).map(k => { const [h, sat, l] = hslOf(D.colors[k].hex); return { k, h, sat, l }; });
+    const neu = rest.filter(x => x.sat < .2).sort((a, b) => b.l - a.l), chr = rest.filter(x => x.sat >= .2).sort((a, b) => ((a.h + 330) % 360) - ((b.h + 330) % 360) || b.l - a.l);
+    return `<div class="chadm-swg">${g.rings.map(r => r.map(k => k >= 0 ? sw(k) : '<i></i>').join('')).join('')}</div>
+      <p class="chadm-swl">Другие цвета</p><div class="chadm-swg chadm-swr">${[...neu, ...chr].map(x => sw(x.k)).join('')}</div>`;
+  }
   const hslOf = hx => { const v = rgb(hx).map(x => x / 255), mx = Math.max(...v), mn = Math.min(...v), l = (mx + mn) / 2, dd = mx - mn; if (!dd) return [0, 0, l];
     const [r, g, b] = v, h = mx === r ? ((g - b) / dd + 6) % 6 : mx === g ? (b - r) / dd + 2 : (r - g) / dd + 4; return [h * 60, dd / (1 - Math.abs(2 * l - 1)), l]; };
   const baseCols = list => [...new Set(list.map(toBase).filter(k => k >= 0))];
@@ -474,7 +484,7 @@
             <button type="button" class="pill-btn" data-rnd>🎲 Случайно</button></div>
           <div data-one><div class="chadm-cols">${D.colors.slice(0, D.base).map((c, k) => `<button type="button" data-col="${k}" aria-pressed="false"><i style="background:${c.hex}"></i>${esc(c.n[1])}</button>`).join('')}</div>
             <details class="chadm-allc" data-allc><summary>🎨 Все цвета (${D.colors.length}) — оттенки, пастель, тёмные</summary><input type="search" data-cq placeholder="найти: мятный, охра, бордо…">
-              <div class="chadm-swg">${allSorted().map(k => `<button type="button" data-col="${k}" data-cn="${esc(D.colors[k].n.join(' ').toLowerCase())}" aria-pressed="false" title="${esc(D.colors[k].n[1])}" style="--c:${D.colors[k].hex}"><i></i><span>${esc(D.colors[k].n[1])}</span></button>`).join('')}</div></details></div>
+              ${allChart()}</details></div>
           <div class="chadm-harm" data-harm hidden><div class="chadm-wheel"><div class="ch-level chadm-wt" role="group">${WT.map(([k, n, t]) => `<button type="button" data-wt="${k}" title="${t}">${n}</button>`).join('')}</div><div data-wheel title="Потяните, чтобы повернуть; нажмите на клетку — цвет или оттенок"></div>
             <p><button type="button" class="pill-btn" data-rot="-1" aria-label="Повернуть против часовой">⟲</button><button type="button" class="pill-btn" data-rot="1" aria-label="Повернуть по часовой">⟳</button></p></div>
             <div class="chadm-hlist">${HARM.map(([h, n]) => `<button type="button" data-h="${h}" aria-pressed="false">${n}</button>`).join('')}</div></div>

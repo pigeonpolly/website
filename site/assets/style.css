@@ -4170,8 +4170,10 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .chadm-ptop i, .chadm-fams i { display: inline-block; width: 11px; height: 11px; border-radius: 50%; margin-right: 4px; vertical-align: -1px; box-shadow: inset 0 0 0 1px rgba(0, 0, 0, .15); }
 .chadm-fams span { padding: 2px 8px; border-radius: 999px; background: #F5F2FB; } .chadm-fams span.few { background: #FFF1D6; } .chadm-fams span.none { background: #FDE2DF; color: #A3261C; }
 .chadm-allc { margin: 8px 0 0; } .chadm-allc summary { cursor: pointer; font: 600 13px var(--sans); color: #4A3D78; } .chadm-allc input { margin: 8px 0; width: 100%; max-width: 260px; font: 13px var(--sans); padding: 5px 9px; border-radius: 9px; border: 1px solid #CFC7E2; }
-.chadm-swg { display: grid; grid-template-columns: repeat(auto-fill, minmax(30px, 1fr)); gap: 4px; max-height: 230px; overflow-y: auto; padding: 2px; }
-.chadm-swg button { position: relative; aspect-ratio: 1; border: 0; padding: 0; border-radius: 8px; background: var(--c); cursor: pointer; box-shadow: inset 0 0 0 1px rgba(43, 26, 81, .15); } .chadm-swg button[hidden] { display: none; }
+.chadm-swg { display: grid; grid-template-columns: repeat(24, 1fr); gap: 2px; padding: 2px; } .chadm-swg > i { display: block; }
+.chadm-swr { grid-template-columns: repeat(auto-fill, minmax(22px, 1fr)); } .chadm-swg button { width: 100%; min-width: 0; }
+@media (max-width: 640px) { .chadm-swg:not(.chadm-swr) { grid-template-columns: repeat(5, 1fr); grid-template-rows: repeat(24, 20px); grid-auto-flow: column; } .chadm-swg:not(.chadm-swr) button { aspect-ratio: auto; height: 100%; } } .chadm-swl { margin: 8px 0 2px; font: 600 12px var(--sans); color: #6B6290; }
+.chadm-swg button { position: relative; aspect-ratio: 1; border: 0; padding: 0; border-radius: 4px; background: var(--c); cursor: pointer; box-shadow: inset 0 0 0 1px rgba(43, 26, 81, .15); } .chadm-swg button[hidden] { display: none; }
 .chadm-swg button span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); } .chadm-swg button:hover { transform: scale(1.12); z-index: 1; }
 .chadm-swg button[aria-pressed="true"] { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #2B1A51; z-index: 1; }
 .chadm-mtdates .pill-btn[aria-pressed="true"] { background: #2B1A51; color: #fff; }
