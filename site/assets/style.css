@@ -4134,6 +4134,7 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .chadm-ym { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; }
 .chadm-year { font: 700 16px var(--sans); color: #2B1A51; background: #fff; border: 1px solid #2B1A51; border-radius: 999px; padding: 6px 12px; cursor: pointer; }
 .chadm-badd { margin: 4px 0; }
+.chadm-bfind { display: flex; gap: 6px; align-items: center; } .chadm-bfind .chadm-bq { flex: 1; min-width: 0; } .chadm-bfind select { font: 14px var(--sans); padding: 7px 8px; border-radius: 10px; border: 1px solid #CFC7E2; background: #fff; color: #2B1A51; }
 .chadm-tags2 { display: flex; flex-wrap: wrap; gap: 4px; margin: 2px 0; } .chadm-tags2 button { padding: 2px 8px; border: 1px solid #CFC6E0; border-radius: 999px; background: #fff; color: #6B6290; font: 11px var(--sans); cursor: pointer; }
 .chadm-tags2 button[aria-pressed="true"] { background: #2B1A51; border-color: #2B1A51; color: #fff; }
 .chadm-dlg .chadm-pal select { font: 14px var(--sans); padding: 6px 10px; border-radius: 10px; border: 1px solid #CFC7E2; background: #fff; color: #2B1A51; max-width: 100%; }

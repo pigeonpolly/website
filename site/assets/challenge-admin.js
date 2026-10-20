@@ -112,12 +112,14 @@
       <p class="be-note">Сюда сами попадают темы всех дней, которые вы заполнили; поменяли или стёрли тему в дне — она уходит и отсюда. Взять тему в день — «📚 Из банка». Метки: сезон — тема только в этот сезон; ✦ — только в день ЭКСТРА; 🎂 — 23 января; 🎃 — октябрь; 🎄 — декабрь и 1–7 января.</p>
       <fieldset class="chadm-f chadm-badd"><legend>Добавить тему в банк</legend>${['ru', 'en', 'lv'].map(l => `<label><span>${l.toUpperCase()}</span><input type="text" data-n="${l}"></label>`).join('')}
         ${tagChips([], 'data-nt')}<p class="chadm-acts"><button type="button" class="pill-btn" data-ntr>🌐 Перевести</button><button type="button" class="pill-btn pill-fill" data-nadd>➕ Добавить</button><span class="be-note" data-nst></span></p></fieldset>
-      <input type="search" placeholder="Найти тему…" data-q class="chadm-bq"><div class="chadm-blist" data-list><p class="be-note">Загрузка…</p></div>`;
+      <div class="chadm-bfind"><input type="search" placeholder="Найти тему…" data-q class="chadm-bq"><select data-sort aria-label="Порядок"><option value="new">Сначала новые</option><option value="old">Сначала старые</option><option value="az">По алфавиту</option></select></div><div class="chadm-blist" data-list><p class="be-note">Загрузка…</p></div>`;
     document.body.appendChild(dlg); dlg.addEventListener('close', () => dlg.remove()); dlg.querySelector('[data-x]').onclick = () => dlg.close(); dlg.showModal();
     let items = [];
     const paint = () => {
       const f = dlg.querySelector('[data-q]').value.trim().toLowerCase();
-      const list = items.filter(r => !f || [r.ru, r.en, r.lv].some(x => String(x || '').toLowerCase().includes(f)));
+      const so = dlg.querySelector('[data-sort]').value, nm = r => String(r.ru || r.en || r.lv || '').toLowerCase();
+      const list = items.filter(r => !f || [r.ru, r.en, r.lv].some(x => String(x || '').toLowerCase().includes(f)))
+        .sort((a, b) => so === 'az' ? nm(a).localeCompare(nm(b), 'ru') : so === 'old' ? a.created_at - b.created_at || a.id - b.id : b.created_at - a.created_at || b.id - a.id); // по дате добавления в банк
       dlg.querySelector('[data-list]').innerHTML = list.length ? `<p class="be-note">Тем: <b>${list.length}</b></p>` + list.map(r => `<div class="chadm-bi" data-id="${r.id}"><div><b>${esc(r.ru || r.en || r.lv)}</b><small>${esc(r.en)} · ${esc(r.lv)}</small>${tagChips(r.tags || [], 'data-t')}
         <small>добавлена ${dShort(new Date(r.created_at * 1000).toLocaleDateString('sv-SE'))} · ${r.days.length ? 'стоит: ' + r.days.map(dShort).join(', ') : 'сейчас ни в одном дне'}</small></div><button type="button" class="pill-btn" data-del="${r.id}" title="Удалить из банка">🗑</button></div>`).join('')
         : `<p class="be-note">${items.length ? 'Ничего не нашлось.' : 'Пока пусто — впишите тему в любом дне и сохраните.'}</p>`;
@@ -133,6 +135,9 @@
       });
     };
     dlg.querySelector('[data-q]').oninput = paint;
+    const sortSel = dlg.querySelector('[data-sort]');
+    try { sortSel.value = localStorage.getItem('pp-chadm-bsort') || 'new'; } catch (e) { /* без памяти */ }
+    sortSel.onchange = () => { try { localStorage.setItem('pp-chadm-bsort', sortSel.value); } catch (e) { /* без памяти */ } paint(); };
     dlg.querySelectorAll('[data-nt]').forEach(b => b.onclick = () => b.setAttribute('aria-pressed', String(b.getAttribute('aria-pressed') !== 'true')));
     const nv = l => dlg.querySelector(`[data-n="${l}"]`), nst = dlg.querySelector('[data-nst]');
     dlg.querySelector('[data-ntr]').onclick = async e => { // с первого заполненного языка (RU, EN, LV) на остальные
