@@ -136,7 +136,7 @@
           <label class="chadm-time">Время <select data-time>${D.times.map(x => `<option value="${x}">${x} мин</option>`).join('')}</select><small class="be-note">в режиме «Спокойно» — на 5 минут больше</small></label>
           ${txt('twist', 'Ч/Б-указание')}${d.extra ? txt('extra', 'Ч/Б-условие дня ЭКСТРА') : ''}</div></details>
       </div>
-      <p class="be-dialog-acts"><button type="button" class="pill-btn pill-fill" data-a="save">💾 Сохранить</button><button type="button" class="pill-btn" data-a="close">Закрыть</button><span class="be-note" data-st role="status"></span></p>`;
+      <p class="be-dialog-acts"><button type="button" class="pill-btn pill-fill" data-a="save">💾 Сохранить</button><span class="be-note" data-st role="status"></span></p>`;
     document.body.appendChild(dlg);
     const q = s => dlg.querySelector(s), st = q('[data-st]'), trBtn = q('[data-a=tr]');
     let cols = [], from = 'ru', mode = 'one', harm = 'comp', rot = 0;
@@ -207,19 +207,19 @@
       return api('?m=' + ym).then(x => { D = x; d = D.days[i]; tagsNow(); fill(); draw(); });
     };
     const tagsNow = () => { br.length = 0; br.push(...((D.broken.find(b => b.day === day) || {}).rules || [])); };
-    const acts = () => dlg.querySelectorAll('button:not([data-a=tr]):not([data-a=close])');
+    const acts = () => dlg.querySelectorAll('button:not([data-a=tr])');
     const run = async (fn) => { st.textContent = '…'; acts().forEach(b => b.disabled = true); try { await fn(); } catch (e) { st.textContent = '⚠ ' + errText(e); } acts().forEach(b => b.disabled = false); };
     q('[data-a=save]').onclick = () => run(async () => {
       if (!d.extra && (cols.length < 1 || cols.length > 5)) throw Object.assign(new Error('colors'), { code: 'colors' });
       const body = { day, subject: val('subject'), twist: val('twist'), time: +q('[data-time]').value };
       if (d.extra) body.extra = val('extra'); else body.colors = cols;
-      await after(await api('/day', body));
+      await api('/day', body);
+      D = await api('?m=' + ym); draw(); dlg.close(); // сохранено — окно закрывается, календарь уже с новой темой
     });
     q('[data-a=reroll]').onclick = () => run(async () => { const r = await api('/reroll', { day, exclude: tried }); tried.push(r.day.item); await after(r); });
     q('[data-a=swap]').onclick = () => { const s = q('[data-swap]'); s.hidden = false; s.focus(); };
     q('[data-swap]').onchange = e => { const w = e.target.value; if (!w) return; run(async () => { await after(await api('/swap', { day, with: w })); e.target.value = ''; e.target.hidden = true; }); };
     q('[data-a=revert]').onclick = () => run(async () => { await after(await api('/revert', { day })); });
-    q('[data-a=close]').onclick = () => dlg.close();
     dlg.addEventListener('close', () => dlg.remove());
     fill(); dlg.showModal();
   }
