@@ -42,7 +42,7 @@
   function draw() {
     const first = (new Date(+ym.slice(0, 4), +ym.slice(5, 7) - 1, 1).getDay() + 6) % 7;
     const broken = Object.fromEntries(D.broken.map(b => [b.day, b.rules]));
-    const months = Array.from({ length: (D.ahead || 1) + 1 }, (_, k) => ymAdd(thisMonth, k));
+    const yr = +ym.slice(0, 4), maxM = ymAdd(thisMonth, D.ahead || 1), minY = 2026, maxY = +maxM.slice(0, 4);
     const cells = D.days.map((d, i) => {
       const t = D.tags[i], works = D.works[d.day] || 0, n = +d.day.slice(8);
       const cls = ['chadm-day', d.day === D.today ? 'today' : '', d.day < D.today ? 'past' : '', d.edited ? 'edited' : '', d.day === D.last ? 'last' : '', d.extra ? 'extra' : '', broken[d.day] ? 'warn' : ''].filter(Boolean).join(' ');
@@ -52,15 +52,45 @@
         ${works ? `<span class="chadm-w">${works} раб.</span>` : ''}</button>`;
     }).join('');
     main.innerHTML = `<section class="adm-box chadm">
-      <div class="chadm-bar"><div class="ch-level chadm-months" role="group">${months.map(m => `<button type="button" data-m="${m}" aria-pressed="${m === ym}" title="${MON[+m.slice(5) - 1]} ${m.slice(0, 4)}">${MON3[+m.slice(5) - 1]}${m.slice(5) === '01' || m === thisMonth ? ' ' + m.slice(2, 4) : ''}</button>`).join('')}</div></div>
+      <div class="chadm-bar"><div class="chadm-ym"><span class="chadm-year"><button type="button" class="pill-btn" data-y="${yr - 1}"${yr - 1 < minY ? ' disabled' : ''} aria-label="Предыдущий год">‹</button><b>${yr}</b><button type="button" class="pill-btn" data-y="${yr + 1}"${yr + 1 > maxY ? ' disabled' : ''} aria-label="Следующий год">›</button></span>
+        <div class="ch-level chadm-months" role="group">${MON3.map((n, k) => { const m = `${yr}-${pad(k + 1)}`; return `<button type="button" data-m="${m}" aria-pressed="${m === ym}"${m < '2026-10' || m > maxM ? ' disabled' : ''}${m === thisMonth ? ' class="now"' : ''} title="${MON[k]} ${yr}">${n}</button>`; }).join('')}</div></div>
+        <button type="button" class="pill-btn" data-bank>📚 Банк тем</button></div>
       ${D.last ? `<p class="be-note chadm-lastn">Последний изменённый: <button type="button" class="pill-btn" data-last>${new Date(+D.last.slice(0, 4), +D.last.slice(5, 7) - 1, +D.last.slice(8)).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</button></p>` : ''}
       ${D.days.length ? `<div class="chadm-grid" lang="ru">${['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'].map(x => `<span class="chadm-dow">${x}</span>`).join('')}${'<span></span>'.repeat(first)}${cells}</div>
       <p class="be-note">Нажмите на день, чтобы поправить тему. ✏️ — день правили вы, зелёный — последний изменённый, фиолетовый — сегодня, ✦ — день ЭКСТРА, ⚠ — день нарушает правило подбора (подробнее — в окне дня). ${D.broken.length ? `Нарушений в месяце: <b>${D.broken.length}</b>.` : 'Все дни подходят по правилам ✓'}</p>`
         : '<p class="be-note">Плана на этот месяц пока нет.</p>'}
       <p class="be-note">С 1 декабря 2026 дни пустые — темы и цвета заполняете вы. Если к 23:00 (за час до начала дня) день остался пустым, тема и цвета подберутся сами по прежним правилам. Числа правил подбора — в «📜 Все правила» → «Тонкая настройка» → «🎨 Темы челленджа».</p></section>`;
     main.querySelectorAll('[data-m]').forEach(b => b.onclick = () => load(b.dataset.m));
+    main.querySelectorAll('[data-y]').forEach(b => b.onclick = () => { // другой год — тот же месяц (в пределах, где можно)
+      const y = b.dataset.y; let m = `${y}-${ym.slice(5)}`; if (m < '2026-10') m = '2026-10'; if (m > maxM) m = maxM; load(m);
+    });
+    main.querySelector('[data-bank]').onclick = () => bankDialog();
     main.querySelectorAll('[data-day]').forEach(b => b.onclick = () => dayDialog(b.dataset.day));
     const lb = main.querySelector('[data-last]'); if (lb) lb.onclick = () => D.last.slice(0, 7) === ym ? dayDialog(D.last) : load(D.last.slice(0, 7));
+  }
+  // ---------- банк тем: всё, что вписано руками в окне дня ----------
+  const bankLoad = () => api('/bank').then(x => x.items);
+  const dShort = k => new Date(+k.slice(0, 4), +k.slice(5, 7) - 1, +k.slice(8)).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' });
+  async function bankDialog() {
+    const dlg = document.createElement('dialog'); dlg.className = 'be-dialog adm-card-dlg chadm-dlg chadm-bank';
+    dlg.innerHTML = `<button type="button" class="chadm-x" data-x aria-label="Закрыть">✕</button><h2>📚 Банк тем</h2>
+      <p class="be-note">Сюда сами попадают все темы, которые вы вписали в окне дня. Их можно взять в любой день кнопкой «📚 Из банка».</p>
+      <input type="search" placeholder="Найти тему…" data-q class="chadm-bq"><div class="chadm-blist" data-list><p class="be-note">Загрузка…</p></div>`;
+    document.body.appendChild(dlg); dlg.addEventListener('close', () => dlg.remove()); dlg.querySelector('[data-x]').onclick = () => dlg.close(); dlg.showModal();
+    let items = [];
+    const paint = () => {
+      const f = dlg.querySelector('[data-q]').value.trim().toLowerCase();
+      const list = items.filter(r => !f || [r.ru, r.en, r.lv].some(x => String(x || '').toLowerCase().includes(f)));
+      dlg.querySelector('[data-list]').innerHTML = list.length ? `<p class="be-note">Тем: <b>${list.length}</b></p>` + list.map(r => `<div class="chadm-bi"><div><b>${esc(r.ru || r.en || r.lv)}</b><small>${esc(r.en)} · ${esc(r.lv)}</small>
+        <small>${r.days.length ? 'стоит: ' + r.days.map(dShort).join(', ') : 'сейчас ни в одном дне'}</small></div><button type="button" class="pill-btn" data-del="${r.id}" title="Удалить из банка">🗑</button></div>`).join('')
+        : `<p class="be-note">${items.length ? 'Ничего не нашлось.' : 'Пока пусто — впишите тему в любом дне и сохраните.'}</p>`;
+      dlg.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
+        if (!confirm('Удалить тему из банка? В днях, где она стоит, она останется.')) return;
+        try { await api('/bank/delete', { id: +b.dataset.del }); items = items.filter(r => r.id !== +b.dataset.del); paint(); } catch (e) { alert(errText(e)); }
+      });
+    };
+    dlg.querySelector('[data-q]').oninput = paint;
+    try { items = await bankLoad(); paint(); } catch (e) { dlg.querySelector('[data-list]').innerHTML = `<p class="be-note">${errText(e)}</p>`; }
   }
   // ---------- окно дня ----------
   // базовые цвета — первые D.base (colors в challenge-data.js); оттенок из moreColors в окне показывается своим базовым (семья f или ближайший)
@@ -155,7 +185,7 @@
       <p class="be-note chadm-tags" data-tags></p>
       <div class="adm-card-fields">
         ${txt('subject', 'Тема')}
-        <p class="chadm-acts"><button type="button" class="pill-btn" data-a="tr"></button><button type="button" class="pill-btn" data-a="reroll">🎲 Другая тема</button>
+        <p class="chadm-acts"><button type="button" class="pill-btn" data-a="tr"></button><button type="button" class="pill-btn" data-a="bank">📚 Из банка</button><button type="button" class="pill-btn" data-a="reroll">🎲 Другая тема</button>
           <button type="button" class="pill-btn" data-a="swap">⇄ Поменять с днём…</button><select data-swap hidden><option value="">— какой день? —</option>${D.days.filter(x => x.day !== day).map(x => `<option value="${x.day}">${+x.day.slice(8)} — ${esc(x.subject[1] || x.subject[0] || 'пусто')}</option>`).join('')}</select>
           <button type="button" class="pill-btn" data-a="revert"${d.edited ? '' : ' hidden'}>↩ Вернуть как было</button></p>
         ${d.extra ? `<div class="chadm-pal"><b>Палитра дня ЭКСТРА</b>${pal ? `<span>${pal.c.map(c => `<i style="background:${c[0]}" title="${esc(c[2])}"></i>`).join('')}</span><small>«${esc(pal.t[1])}» — очередь палитр: 🎨 Картины и палитры</small>` : '<small>очередь палитр: 🎨 Картины и палитры</small>'}</div>`
@@ -276,6 +306,21 @@
       await api('/day', body);
       D = await api('?m=' + ym); draw(); dlg.close(); // сохранено — окно закрывается, календарь уже с новой темой
     });
+    // «📚 Из банка»: случайная тема из банка — сначала те, что дольше всего не ставились; каждое нажатие — другая
+    let bank = null; const bankSeen = new Set();
+    q('[data-a=bank]').onclick = async () => {
+      try { bank = bank || await bankLoad(); } catch (e) { st.textContent = '⚠ ' + errText(e); return; }
+      const curK = (val('subject')[1] || val('subject')[0]).trim().toLowerCase();
+      let pool = bank.filter(r => !bankSeen.has(r.id) && (r.ru || r.en || '').trim().toLowerCase() !== curK);
+      if (!pool.length) { bankSeen.clear(); pool = bank.filter(r => (r.ru || r.en || '').trim().toLowerCase() !== curK); }
+      if (!pool.length) { st.textContent = bank.length ? 'В банке больше нет других тем.' : 'Банк пока пуст — он заполняется темами, которые вы вписываете.'; return; }
+      const last = r => r.days.filter(x => x !== day).sort().pop() || '';
+      pool.sort((a, b) => last(a) < last(b) ? -1 : last(a) > last(b) ? 1 : 0);
+      const pick = pool.slice(0, Math.max(3, Math.ceil(pool.length / 3)))[Math.floor(Math.random() * Math.min(pool.length, Math.max(3, Math.ceil(pool.length / 3))))];
+      bankSeen.add(pick.id);
+      ['en', 'ru', 'lv'].forEach(l => { q(`[data-f="subject"][data-l="${l}"]`).value = pick[l] || ''; });
+      st.textContent = `📚 Из банка${pick.days.length ? ' · уже было: ' + pick.days.map(dShort).join(', ') : ''} — сохраните, если подходит`;
+    };
     q('[data-a=reroll]').onclick = () => run(async () => { const r = await api('/reroll', { day, exclude: tried }); tried.push(r.day.item); await after(r); });
     q('[data-a=swap]').onclick = () => { const s = q('[data-swap]'); s.hidden = false; s.focus(); };
     q('[data-swap]').onchange = e => { const w = e.target.value; if (!w) return; run(async () => { await after(await api('/swap', { day, with: w })); e.target.value = ''; e.target.hidden = true; }); };

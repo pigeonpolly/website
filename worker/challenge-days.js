@@ -10,10 +10,28 @@ export const CHALLENGE_TABLES = [
   `CREATE TABLE IF NOT EXISTS challenge_days (day TEXT PRIMARY KEY, item INTEGER, subject_en TEXT, subject_ru TEXT, subject_lv TEXT,
     tip_en TEXT, tip_ru TEXT, tip_lv TEXT, colors TEXT, time INTEGER, twist_en TEXT, twist_ru TEXT, twist_lv TEXT,
     extra_en TEXT, extra_ru TEXT, extra_lv TEXT, edited INTEGER DEFAULT 0, orig TEXT, updated_at INTEGER)`,
+  // банк тем Алины: каждая тема, вписанная руками в окне дня (k — ключ без регистра и пробелов по краям; days — дни, где стоит, через запятую)
+  `CREATE TABLE IF NOT EXISTS challenge_bank (id INTEGER PRIMARY KEY AUTOINCREMENT, k TEXT UNIQUE, en TEXT, ru TEXT, lv TEXT, days TEXT DEFAULT '', created_at INTEGER, updated_at INTEGER)`,
 ];
+const bankKey = s => s.map(x => String(x || '').trim().toLowerCase()).find(Boolean) || '';
+const bankKeyOf = s => bankKey([s[1], s[0], s[2]]); // по RU, нет — по EN, LV
+const dayList = s => String(s || '').split(',').filter(Boolean);
+// тема дня поменялась → день убрать из прежней темы банка, новую тему (если вписана руками, не из списка предметов) — в банк
+async function bankPut(env, key, subject, fromList) {
+  const k = bankKeyOf(subject);
+  const had = (await env.DB.prepare("SELECT id, k, days FROM challenge_bank WHERE ',' || days || ',' LIKE ?").bind('%,' + key + ',%').all()).results;
+  const q = had.filter(r => r.k !== k).map(r => env.DB.prepare('UPDATE challenge_bank SET days = ? WHERE id = ?').bind(dayList(r.days).filter(d => d !== key).join(','), r.id));
+  if (k && !fromList) {
+    const cur = await env.DB.prepare('SELECT days FROM challenge_bank WHERE k = ?').bind(k).first();
+    const days = [...new Set([...dayList(cur && cur.days), key])].sort().join(',');
+    q.push(env.DB.prepare(`INSERT INTO challenge_bank (k, en, ru, lv, days, created_at, updated_at) VALUES (?, ?, ?, ?, ?, ?, ?)
+      ON CONFLICT(k) DO UPDATE SET en = excluded.en, ru = excluded.ru, lv = excluded.lv, days = excluded.days, updated_at = excluded.updated_at`).bind(k, ...subject.map(x => String(x || '').trim()), days, now(), now()));
+  }
+  if (q.length) await env.DB.batch(q);
+}
 const L3 = ['en', 'ru', 'lv'];
 const FIRST = '2026-10'; // раньше плана нет (темы — формулой challenge-theme.js)
-const AHEAD = 12; // кабинет: сколько месяцев вперёд можно открыть и править
+const AHEAD = 60; // кабинет: сколько месяцев вперёд можно открыть и править (5 лет)
 // с 1.12.2026 темы заполняет Алина: месяцы создаются пустыми, генератор берёт день, только если за час до его начала (с 23:00 по Риге) он ещё пустой
 const BLANK_FROM = '2026-12-01';
 const pad = n => String(n).padStart(2, '0');
@@ -177,12 +195,23 @@ export async function challengeApi(req, env, url, h) {
     const tags = days.map(d => { const t = data.tags[d.item] || []; return { f: t[0] || '', c: t[1] || '', d: t[2] || 0, pool: poolOf(data, rules, d.day) }; });
     return h.json({ m: ym, today: rigaToday(), days, tags, works, broken, last, colors: allColors(data), base: data.colors.length, ahead: AHEAD, times: data.times });
   }
+  // банк тем: список (последние сверху) и удаление
+  if (m === 'GET' && p === '/api/admin/challenge/bank') {
+    const items = (await env.DB.prepare('SELECT id, en, ru, lv, days, created_at FROM challenge_bank ORDER BY updated_at DESC').all()).results.map(r => ({ ...r, days: dayList(r.days) }));
+    return h.json({ items });
+  }
   const b = await req.json().catch(() => ({}));
+  if (m === 'POST' && p === '/api/admin/challenge/bank/delete') {
+    await env.DB.prepare('DELETE FROM challenge_bank WHERE id = ?').bind(Number(b.id) || 0).run();
+    return h.json({ ok: true });
+  }
   const key = String(b.day || '');
   if (!/^\d{4}-\d\d-\d\d$/.test(key)) h.fail(400, 'bad');
   const cur = await env.DB.prepare('SELECT * FROM challenge_days WHERE day = ?').bind(key).first();
   if (!cur) h.fail(404, 'day');
   const save = (d, edited = 1) => updateRow(env, d, edited);
+  // банк тем: тема, вписанная руками (не из списка предметов), — в банк; день уходит из прежней темы банка
+  const track = (k, d) => { const gen = data.subjects[d.item]; return bankPut(env, k, d.subject, !!gen && bankKeyOf(gen) === bankKeyOf(d.subject)); };
   const back = async () => h.json({ day: toRow(await env.DB.prepare('SELECT * FROM challenge_days WHERE day = ?').bind(key).first()) });
   // правка дня: предмет, совет, 1–5 цветов, время, особенность, Ч/Б-условие ЭКСТРА
   if (m === 'POST' && p === '/api/admin/challenge/day') {
@@ -196,7 +225,7 @@ export async function challengeApi(req, env, url, h) {
     }
     if (b.time != null) { if (!data.times.includes(Number(b.time))) h.fail(400, 'time'); d.time = Number(b.time); }
     if (!d.subject[0] && !d.subject[1] && !d.subject[2]) h.fail(400, 'subject');
-    await save(d); return back();
+    await save(d); await track(key, d); return back();
   }
   // «🎲 Другой предмет»: следующий подходящий по правилам (кроме уже предложенных — exclude)
   if (m === 'POST' && p === '/api/admin/challenge/reroll') {
@@ -204,7 +233,7 @@ export async function challengeApi(req, env, url, h) {
     const item = rerollDay(data, rules, plan, key, (Array.isArray(b.exclude) ? b.exclude : []).map(Number).filter(Number.isInteger));
     if (item == null) h.fail(409, 'none');
     const d = toRow(cur); d.item = item; d.subject = rowText(data, key, item).subject;
-    await save(d); return back();
+    await save(d); await track(key, d); return back();
   }
   // «⇄ Поменять с днём…»: предметы двух дней меняются местами (цвета и остальное остаются у своих дней)
   if (m === 'POST' && p === '/api/admin/challenge/swap') {
@@ -212,14 +241,14 @@ export async function challengeApi(req, env, url, h) {
     if (!other || other.day === key) h.fail(404, 'day');
     const a = toRow(cur), c = toRow(other);
     [a.item, c.item, a.subject, c.subject] = [c.item, a.item, c.subject, a.subject];
-    await save(a); await save(c);
+    await save(a); await save(c); await track(key, a); await track(c.day, c);
     return h.json({ day: toRow(await env.DB.prepare('SELECT * FROM challenge_days WHERE day = ?').bind(key).first()), other: toRow(await env.DB.prepare('SELECT * FROM challenge_days WHERE day = ?').bind(other.day).first()) });
   }
   // «↩ Вернуть как было» — как при создании месяца
   if (m === 'POST' && p === '/api/admin/challenge/revert') {
     const o = parseJ(cur.orig, null);
     if (!o) h.fail(409, 'orig');
-    await save({ ...o, day: key }, 0); return back();
+    await save({ ...o, day: key }, 0); await track(key, o); return back();
   }
   return null;
 }

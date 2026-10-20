@@ -19,6 +19,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **card_owner** (worker/cards.js): `card_id` int PK, `user_id` int nn, `price` int =0, `bought_at` int, `ref` text, `gift` text, `seen` int =1
 - **card_trades** (worker/cards.js): `id` int PK auto, `from_id` int nn, `to_id` int nn, `give` text nn, `take` text nn, `status` text nn ='open', `created_at` int, `done_at` int, `seen` int =0, `ref` text
 - **challenge_days** (worker/challenge-days.js): `day` text PK, `item` int, `subject_en` text, `subject_ru` text, `subject_lv` text, `tip_en` text, `tip_ru` text, `tip_lv` text, `colors` text, `time` int, `twist_en` text, `twist_ru` text, `twist_lv` text, `extra_en` text, `extra_ru` text, `extra_lv` text, `edited` int =0, `orig` text, `updated_at` int
+- **challenge_bank** (worker/challenge-days.js): `id` int PK, `k` text UNIQUE (тема без регистра: RU, нет — EN, LV), `en` text, `ru` text, `lv` text, `days` text (дни через запятую), `created_at` int, `updated_at` int — банк тем, вписанных Алиной руками
 - **flock_events** (worker/flock-news.js): `id` int PK auto, `ts` int nn, `user_id` int nn =0, `kind` text nn, `ref` text nn ='', `data` text ='{}'; UNIQUE (user_id, kind, ref)
 - **room_guests** (worker/flock.js): `owner_id` int nn, `guest_id` int nn, `first_at` int, `last_at` int; PRIMARY KEY (owner_id, guest_id)
 - **feathers** (worker/flock.js): `owner_id` int nn, `from_id` int nn, `day` text nn, `created_at` int, `seen` int =0; PRIMARY KEY (owner_id, from_id, day)
