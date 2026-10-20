@@ -65,7 +65,8 @@ export async function geminiKey(env) {
   const r = await env.DB.prepare("SELECT value FROM meta WHERE key = 'gemini_key'").first().catch(() => null);
   return r && r.value || '';
 }
-export async function gemini(env, texts, from, to, key, about = BLOG) {
+// limit — сколько мс ждать Gemini всего (0 — без предела); короткие тексты кабинета: не дождались — запасной переводчик, а не «Перевожу…» минуту
+export async function gemini(env, texts, from, to, key, about = BLOG, limit = 0) {
   const prompt = `You are a careful professional translator. Translate every string in the JSON array below from ${LANG_NAME[from]} to ${LANG_NAME[to]}.
 ${about}
 Rules:
@@ -79,11 +80,13 @@ Return only a JSON array of exactly ${texts.length} strings in the same order.
 ${JSON.stringify(texts)}`;
   const models = env.GEMINI_MODEL ? [env.GEMINI_MODEL, ...GEMINI_MODELS] : GEMINI_MODELS;
   let lastErr = 'ai';
-  for (let attempt = 0; attempt < 2; attempt++) {
+  const t0 = Date.now(), left = () => limit - (Date.now() - t0);
+  for (let attempt = 0; attempt < (limit ? 1 : 2); attempt++) {
     if (attempt) await new Promise(res => setTimeout(res, 8000)); // все заняты — ждём и пробуем ещё раз
   for (const model of models) {
+    if (limit && left() < 1500) throw Object.assign(new Error('timeout'), { code: 'timeout' });
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-      method: 'POST', headers: { 'x-goog-api-key': key, 'content-type': 'application/json' },
+      method: 'POST', headers: { 'x-goog-api-key': key, 'content-type': 'application/json' }, ...(limit ? { signal: AbortSignal.timeout(left()) } : {}),
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.2, responseMimeType: 'application/json', responseSchema: { type: 'ARRAY', items: { type: 'STRING' } } } }),
     });
     if (r.status === 400 || r.status === 401 || r.status === 403) { const t = await r.text(); if (/API key|PERMISSION|UNAUTHENTICATED|API_KEY/i.test(t)) throw Object.assign(new Error('bad_key'), { code: 'bad_key' }); }
@@ -106,7 +109,8 @@ export async function translateAll(env, texts, from, to, strict = false, about =
   if (strict && !key) throw err('no_key');
   if (key) {
     try {
-      const res = await gemini(env, texts, from, to, key, about);
+      const short = texts.reduce((n, x) => n + String(x || '').length, 0) < 2000;
+      const res = await gemini(env, texts, from, to, key, about, short ? 15000 : 0);
       // пустой ответ на непустой абзац — этот абзац переводим запасным переводчиком
       for (let i = 0; i < res.length; i++) {
         if (texts[i].trim() && !res[i].trim()) {

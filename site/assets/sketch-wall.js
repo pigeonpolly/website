@@ -315,7 +315,8 @@
     [[12, 0], [11, 1], [12, 1], [13, 1], [12, 2]].forEach(([x, y]) => put(x, y, '#F2C230')); // звёздочка
     return `<svg viewBox="0 0 14 17" shape-rendering="crispEdges">${px.map(([x, y, c]) => `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${c}"/>`).join('')}</svg>`;
   }
-  const nowYm = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; };
+  const mtLen = it => Math.round((new Date(it.e + 'T12:00:00') - new Date(it.s + 'T12:00:00')) / 864e5) + 1;
+  const ruDays = n => n % 10 === 1 && n % 100 !== 11 ? 'день' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'дня' : 'дней';
   // тематики месяцев → бейджи в SPECIAL (значок — пиксельный дизайн Алины, pixel-badge.js; нет его — листок календаря monthIcon)
   let MTHEMES = [];
   const pixelLib = () => window.PPPixelBadge ? Promise.resolve() : new Promise(res => { const sc = document.createElement('script'); sc.src = '/assets/pixel-badge.js'; sc.onload = sc.onerror = () => res(); document.head.appendChild(sc); });
@@ -324,33 +325,43 @@
     const PB = window.PPPixelBadge;
     for (const it of MTHEMES) {
       if (SPECIAL.some(x => x.k === 'mt' + it.ym)) continue;
-      const tt = l => it.t[l] || it.t[1] || it.t[0] || it.t[2], y = it.ym.slice(0, 4), mon = l => new Date(+y, +it.ym.slice(5, 7) - 1, 1).toLocaleDateString(['en-GB', 'ru-RU', 'lv-LV'][l], { month: 'long', year: 'numeric' }).replace(/\s*г\.$/, '');
-      const dz = PB ? (PB.clean(it.badge) || PB.suggest(it.t.join(' '), it.ym)) : null;
-      SPECIAL.push({ k: 'mt' + it.ym, mt: it.ym, icon: dz ? PB.svg(dz) : monthIcon(it.ym), bg: dz ? dz.bg : '#FCE7C8', ring: dz ? dz.ring : '',
+      const tt = l => it.t[l] || it.t[1] || it.t[0] || it.t[2], s = it.s || it.ym.slice(0, 7) + '-01', y = s.slice(0, 4), mon = l => new Date(+y, +s.slice(5, 7) - 1, 1).toLocaleDateString(['en-GB', 'ru-RU', 'lv-LV'][l], { month: 'long', year: 'numeric' }).replace(/\s*г\.$/, '');
+      const dz = PB ? (PB.clean(it.badge) || PB.suggest(it.t.join(' '), s)) : null, whole = it.ym.length === 7, n = it.e ? mtLen(it) : 30;
+      const rng = l => `${new Date(it.s + 'T12:00:00').toLocaleDateString(['en-GB', 'ru-RU', 'lv-LV'][l], { day: 'numeric', month: 'long' })} – ${new Date(it.e + 'T12:00:00').toLocaleDateString(['en-GB', 'ru-RU', 'lv-LV'][l], { day: 'numeric', month: 'long', year: 'numeric' })}`.replace(/\s*г\.$/, '');
+      SPECIAL.push({ k: 'mt' + it.ym, mt: it.ym, icon: dz ? PB.svg(dz) : monthIcon(s), bg: dz ? dz.bg : '#FCE7C8', ring: dz ? dz.ring : '',
         n: [0, 1, 2].map(l => `${tt(l)} ${y}`),
-        f: [`A whole month of “${tt(0)}”, every single day!`, `Целый месяц «${tt(1)}» — каждый день!`, `Vesels mēnesis “${tt(2)}” — katru dienu!`],
-        h: [`Draw every day of ${mon(0)} (theme of the month: “${tt(0)}”; the EXTRA day can be skipped)`, `Рисовать каждый день месяца: ${mon(1)} (тематика месяца — «${tt(1)}»; день ЭКСТРА можно пропустить)`, `Zīmēt katru dienu: ${mon(2)} (mēneša tēma — “${tt(2)}”; EKSTRA dienu var izlaist)`] });
+        f: whole ? [`A whole month of “${tt(0)}”, every single day!`, `Целый месяц «${tt(1)}» — каждый день!`, `Vesels mēnesis “${tt(2)}” — katru dienu!`]
+          : [`${n} days of “${tt(0)}”, every single day!`, `«${tt(1)}»: ${n} ${ruDays(n)} — каждый день!`, `“${tt(2)}”: ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'diena' : 'dienas'} — katru dienu!`],
+        h: whole ? [`Draw every day of ${mon(0)} (theme of the month: “${tt(0)}”; the EXTRA day can be skipped)`, `Рисовать каждый день месяца: ${mon(1)} (тематика месяца — «${tt(1)}»; день ЭКСТРА можно пропустить)`, `Zīmēt katru dienu: ${mon(2)} (mēneša tēma — “${tt(2)}”; EKSTRA dienu var izlaist)`]
+          : [`Draw every day, ${rng(0)} (theme: “${tt(0)}”; EXTRA days can be skipped)`, `Рисовать каждый день: ${rng(1)} (тематика — «${tt(1)}»; день ЭКСТРА можно пропустить)`, `Zīmēt katru dienu: ${rng(2)} (tēma — “${tt(2)}”; EKSTRA dienu var izlaist)`] });
     }
     monthBar();
   });
-  // шкала тематики месяца на /challenge/ (#ch-mbar): видна, пока идёт месяц с тематикой; в конце — силуэт бейджа (получен — цветной)
+  // шкала тематики на /challenge/ (#ch-mbar): видна, пока идёт тематика (с первого по последний день; их может быть несколько); в конце — силуэт бейджа (получен — цветной)
   function monthBar() {
     const box = document.getElementById('ch-mbar'); if (!box) return;
-    const ym = nowYm(), it = MTHEMES.find(x => x.ym === ym), x = SPECIAL.find(v => v.k === 'mt' + ym);
-    if (!it || !x) { box.hidden = true; return; }
-    const y = +ym.slice(0, 4), m = +ym.slice(5, 7) - 1, last = new Date(y, m + 1, 0).getDate();
-    const ex = window.ChallengeTheme ? window.ChallengeTheme.extraDay(y, m) : 0, need = last - (ex ? 1 : 0);
-    const days = new Set(((me && me.posts) || []).map(p => p.day).filter(d => d.startsWith(ym)));
-    const done = [...days].filter(d => +d.slice(8) !== ex).length, got = !!(me && (me.keptBadges || []).includes(x.k)) || done >= need;
-    const today = new Date().getDate(), lost = !got && !!me && [...Array(Math.max(0, today - 3))].some((_, i) => i + 1 !== ex && !days.has(`${ym}-${String(i + 1).padStart(2, '0')}`)); // загрузить можно за сегодня, вчера и позавчера
-    const tt = it.t[L] || it.t[1] || it.t[0];
-    const txt = got ? ['Badge earned! 🎉', 'Бейдж получен! 🎉', 'Nozīmīte iegūta! 🎉'][L]
-      : lost ? ['A day was missed — this badge can’t be earned this month, but keep drawing!', 'Пропущен день — этот бейдж в этом месяце уже не получить, но рисовать всё равно здорово!', 'Diena izlaista — šo nozīmīti šomēnes vairs neiegūt, bet zīmē tāpat!'][L]
-      : me ? [`${done} of ${need} days`, `${done} из ${need} дней`, `${done} no ${need} dienām`][L] : ['Sign in and draw every day of the month to earn the badge', 'Войдите и рисуйте каждый день месяца — получите бейдж', 'Pieslēdzies un zīmē katru mēneša dienu — iegūsi nozīmīti'][L];
+    const now = todayKey(), on = MTHEMES.filter(it => it.s <= now && now <= it.e && SPECIAL.some(v => v.k === 'mt' + it.ym));
+    if (!on.length) { box.hidden = true; return; }
+    const isEx = k => window.ChallengeTheme && +k.slice(8) === window.ChallengeTheme.extraDay(+k.slice(0, 4), +k.slice(5, 7) - 1);
+    const posted = new Set(((me && me.posts) || []).map(p => p.day));
     box.hidden = false;
-    box.innerHTML = `<div class="chm-info"><b>🏅 ${['Theme of the month', 'Тематика месяца', 'Mēneša tēma'][L]}: «${esc(tt)}»</b><span>${esc(txt)}</span>
-      <div class="chm-bar${lost ? ' lost' : ''}" role="progressbar" aria-valuemin="0" aria-valuemax="${need}" aria-valuenow="${done}"><i style="width:${Math.min(100, Math.round(done / need * 100))}%"></i></div></div>${medal(x, got, false, 'button')}`;
-    box.querySelector('.sw-medal').onclick = () => showBadge(x, got);
+    box.innerHTML = on.map(it => {
+      const x = SPECIAL.find(v => v.k === 'mt' + it.ym), all = [];
+      for (let d = new Date(it.s + 'T12:00:00'); keyOfD(d) <= it.e; d.setDate(d.getDate() + 1)) all.push(keyOfD(d));
+      const need = all.filter(k => !isEx(k)).length, done = all.filter(k => !isEx(k) && posted.has(k)).length;
+      const got = !!(me && (me.keptBadges || []).includes(x.k)) || done >= need;
+      const lost = !got && !!me && all.some(k => k < keyOfD(dayAgo(2)) && !isEx(k) && !posted.has(k)); // загрузить можно за сегодня, вчера и позавчера
+      const tt = it.t[L] || it.t[1] || it.t[0], whole = it.ym.length === 7;
+      const txt = got ? ['Badge earned! 🎉', 'Бейдж получен! 🎉', 'Nozīmīte iegūta! 🎉'][L]
+        : lost ? ['A day was missed — this badge can’t be earned anymore, but keep drawing!', 'Пропущен день — этот бейдж уже не получить, но рисовать всё равно здорово!', 'Diena izlaista — šo nozīmīti vairs neiegūt, bet zīmē tāpat!'][L]
+        : me ? [`${done} of ${need} days`, `${done} из ${need} дней`, `${done} no ${need} dienām`][L]
+        : whole ? ['Sign in and draw every day of the month to earn the badge', 'Войдите и рисуйте каждый день месяца — получите бейдж', 'Pieslēdzies un zīmē katru mēneša dienu — iegūsi nozīmīti'][L]
+        : [`Sign in and draw every day until ${fmtDay(it.e)} to earn the badge`, `Войдите и рисуйте каждый день до ${fmtDay(it.e)} — получите бейдж`, `Pieslēdzies un zīmē katru dienu līdz ${fmtDay(it.e)} — iegūsi nozīmīti`][L];
+      const head = whole ? ['Theme of the month', 'Тематика месяца', 'Mēneša tēma'][L] : `${['Theme', 'Тематика', 'Tēma'][L]} ${fmtDay(it.s)} – ${fmtDay(it.e)}`;
+      return `<div class="chm-row" data-mt="${esc(x.k)}"><div class="chm-info"><b>🏅 ${esc(head)}: «${esc(tt)}»</b><span>${esc(txt)}</span>
+        <div class="chm-bar${lost ? ' lost' : ''}" role="progressbar" aria-valuemin="0" aria-valuemax="${need}" aria-valuenow="${done}"><i style="width:${Math.min(100, Math.round(done / need * 100))}%"></i></div></div>${medal(x, got, false, 'button')}</div>`;
+    }).join('');
+    box.querySelectorAll('.chm-row').forEach(r => { const x = SPECIAL.find(v => v.k === r.dataset.mt); r.querySelector('.sw-medal').onclick = () => showBadge(x, !r.querySelector('.sw-medal').classList.contains('off')); });
   }
   // бейджи не за рисование (игры, адвент) — во вкладке «Остальное»
   const NOT_DRAW = new Set(['collector', 'rain1', 'rain2', 'rain3', 'pan1', 'pan2', 'pan3', 'panstar', 'panwash', 'pot1', 'pot2', 'pot3', 'potkid', 'maze']);

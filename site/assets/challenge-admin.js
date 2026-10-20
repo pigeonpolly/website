@@ -46,7 +46,7 @@
     const cells = D.days.map((d, i) => {
       const t = D.tags[i], works = D.works[d.day] || 0, n = +d.day.slice(8);
       const cls = ['chadm-day', d.day === D.today ? 'today' : '', d.day < D.today ? 'past' : '', d.edited ? 'edited' : '', d.day === D.last ? 'last' : '', d.extra ? 'extra' : '', broken[d.day] ? 'warn' : ''].filter(Boolean).join(' ');
-      return `<button type="button" class="${cls}" data-day="${d.day}"><span class="chadm-n">${n}${d.edited ? ' ✏️' : ''}${d.day === D.last ? ' <b class="chadm-lastb">последний</b>' : ''}${d.day === D.today ? ' <b class="chadm-todayb">сегодня</b>' : ''}${d.extra ? ' ✦' : ''}${t.pool === 'bday' ? ' 🎂' : ''}${broken[d.day] ? ' ⚠' : ''}</span>
+      return `<button type="button" class="${cls}" data-day="${d.day}"><span class="chadm-n">${n}${d.edited ? ' ✏️' : ''}${d.day === D.last ? ' <b class="chadm-lastb">последний</b>' : ''}${d.day === D.today ? ' <b class="chadm-todayb">сегодня</b>' : ''}${d.extra ? ' ✦' : ''}${(D.mthemes || []).some(x => x.s <= d.day && d.day <= x.e) ? ' 🏅' : ''}${t.pool === 'bday' ? ' 🎂' : ''}${broken[d.day] ? ' ⚠' : ''}</span>
         <span class="chadm-s">${d.subject.some(x => x) ? esc(d.subject[1] || d.subject[0] || d.subject[2]) : '<i class="chadm-empty">пусто</i>'}</span>
         <span class="chadm-c">${bw ? '✒ Ч/Б' : d.extra ? '🎨 палитра' : d.colors.map(sw).join('')}</span>
         ${works ? `<span class="chadm-w">${works} раб.</span>` : ''}</button>`;
@@ -56,11 +56,10 @@
         <div class="ch-level chadm-months" role="group">${MON3.map((n, k) => { const m = `${yr}-${pad(k + 1)}`; return `<button type="button" data-m="${m}" aria-pressed="${m === ym}"${m < '2026-10' || m > maxM ? ' disabled' : ''}${m === thisMonth ? ' class="now"' : ''} title="${MON[k]} ${yr}">${n}</button>`; }).join('')}</div></div>
         <span class="chadm-tools"><button type="button" class="pill-btn" data-now${ym === thisMonth ? ' disabled' : ''}>📅 Сегодня</button>
         <button type="button" class="pill-btn" data-bank>📚 Банк тем</button><button type="button" class="pill-btn" data-fill title="Заполнить пустые дни месяца темами из банка">📚 Заполнить из банка</button><button type="button" class="pill-btn" data-clear>🧹 Стереть месяц</button></span></div>
-      <div class="chadm-mt"><b title="Если вписать — у месяца появится бейдж «тема + год» за рисунки каждый день месяца">🏅 Тематика месяца</b>${['ru', 'en', 'lv'].map(l => `<label><span>${l.toUpperCase()}</span><input type="text" data-mt="${l}" value="${esc((D.mtheme || [])[LI[l]] || '')}" placeholder="${l === 'ru' ? 'пусто — без тематики' : ''}"></label>`).join('')}
-        <button type="button" class="pill-btn" data-mttr>🌐 Перевести</button><button type="button" class="pill-btn" data-mtsave>💾 Сохранить</button><button type="button" class="pill-btn chadm-mtb" data-mtbadge title="Пиксельный бейдж месяца"${(D.mtheme || []).some(Boolean) ? '' : ' hidden'}>${window.PPPixelBadge ? `<span class="sw-medal has-ring" style="--bg:${(window.PPPixelBadge.clean(D.mbadge) || window.PPPixelBadge.suggest((D.mtheme || []).join(' '), ym)).bg};--ring:${(window.PPPixelBadge.clean(D.mbadge) || {}).ring || '#C98A1E'}"><b>${window.PPPixelBadge.svg(window.PPPixelBadge.clean(D.mbadge) || window.PPPixelBadge.suggest((D.mtheme || []).join(' '), ym))}</b></span>` : ''} 🎨 Бейдж</button><span class="be-note" data-mtst>${(D.mtheme || []).some(Boolean) ? '🏅 бейдж месяца есть' : ''}</span></div>
+      <div class="chadm-mt"><b title="Бейдж «тема + год» за рисунки каждый день тематики (день ЭКСТРА можно пропустить)">🏅 Тематики</b>${mtList()}<button type="button" class="pill-btn" data-mtnew>＋ Новая тематика</button></div>
       ${D.last ? `<p class="be-note chadm-lastn">Последний изменённый: <button type="button" class="pill-btn" data-last>${new Date(+D.last.slice(0, 4), +D.last.slice(5, 7) - 1, +D.last.slice(8)).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</button></p>` : ''}
       ${D.days.length ? `<div class="chadm-grid" lang="ru">${['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'].map(x => `<span class="chadm-dow">${x}</span>`).join('')}${'<span></span>'.repeat(first)}${cells}</div>
-      <p class="be-note">Нажмите на день, чтобы поправить тему. ✏️ — день правили вы, зелёный — последний изменённый, фиолетовый — сегодня, ✦ — день ЭКСТРА, ⚠ — день нарушает правило подбора (подробнее — в окне дня). ${D.broken.length ? `Нарушений в месяце: <b>${D.broken.length}</b>.` : 'Все дни подходят по правилам ✓'}</p>`
+      <p class="be-note">Нажмите на день, чтобы поправить тему. ✏️ — день правили вы, зелёный — последний изменённый, фиолетовый — сегодня, ✦ — день ЭКСТРА, 🏅 — день тематики, ⚠ — день нарушает правило подбора (подробнее — в окне дня). ${D.broken.length ? `Нарушений в месяце: <b>${D.broken.length}</b>.` : 'Все дни подходят по правилам ✓'}</p>`
         : '<p class="be-note">Плана на этот месяц пока нет.</p>'}
       <p class="be-note">С 1 декабря 2026 дни пустые — темы и цвета заполняете вы. Если к 23:00 (за час до начала дня) день остался пустым, тема и цвета подберутся сами по прежним правилам. Числа правил подбора — в «📜 Все правила» → «Тонкая настройка» → «🎨 Темы челленджа».</p></section>`;
     main.querySelectorAll('[data-m]').forEach(b => b.onclick = () => load(b.dataset.m));
@@ -68,20 +67,8 @@
       let m = `${e.target.value}-${ym.slice(5)}`; if (m < '2026-10') m = '2026-10'; if (m > maxM) m = maxM; load(m);
     };
     main.querySelector('[data-bank]').onclick = () => bankDialog();
-    // тематика месяца: перевод с первого заполненного языка, сохранение (пусто — тематики и бейджа нет)
-    const mv = l => main.querySelector(`[data-mt="${l}"]`), mst = main.querySelector('[data-mtst]');
-    main.querySelector('[data-mttr]').onclick = async e => {
-      const src = ['ru', 'en', 'lv'].find(l => mv(l).value.trim()); if (!src) { mst.textContent = 'Впишите тематику хотя бы на одном языке.'; return; }
-      e.target.disabled = true; mst.textContent = '🌐 Перевожу…';
-      try { const tr = await translate([mv(src).value], src); Object.keys(tr).forEach(l => { if (tr[l][0]) mv(l).value = tr[l][0]; }); mst.textContent = '✓ Переведено — сохраните'; }
-      catch (er) { mst.textContent = '⚠ ' + (TR_ERR[er.code] || er.code || er.message); }
-      e.target.disabled = false;
-    };
-    main.querySelector('[data-mtbadge]').onclick = () => badgeDialog(ym, D.mtheme, D.mbadge, dz => { D.mbadge = dz; draw(); });
-    main.querySelector('[data-mtsave]').onclick = async () => {
-      try { const r = await api('/mtheme', { m: ym, subject: L3.map(l => mv(l).value.trim()) }); D.mtheme = r.mtheme; main.querySelector('[data-mtbadge]').hidden = !r.mtheme.some(Boolean); mst.textContent = r.mtheme.some(Boolean) ? '✓ Сохранено — 🏅 бейдж месяца есть' : '✓ Тематика убрана — бейджа нет'; }
-      catch (er) { mst.textContent = '⚠ ' + errText(er); }
-    };
+    main.querySelectorAll('[data-mtid]').forEach(b => b.onclick = () => mthemeDialog(D.mthemes.find(x => x.ym === b.dataset.mtid)));
+    main.querySelector('[data-mtnew]').onclick = () => mthemeDialog(null);
     main.querySelector('[data-now]').onclick = () => load(thisMonth); // назад к текущему месяцу
     main.querySelector('[data-clear]').onclick = async e => { // темы и цвета обычных дней с завтрашнего; ЭКСТРА и прошедшие не трогаются
       const n = D.days.filter(d => d.day > D.today && !d.extra && (d.subject.some(x => x) || d.colors.length)).length;
@@ -102,17 +89,65 @@
     main.querySelectorAll('[data-day]').forEach(b => b.onclick = () => dayDialog(b.dataset.day));
     const lb = main.querySelector('[data-last]'); if (lb) lb.onclick = () => D.last.slice(0, 7) === ym ? dayDialog(D.last) : load(D.last.slice(0, 7));
   }
+  // ---------- 🏅 тематики с датами «с — по» (неделя, 10 дней, месяц, 100 дней…): бейдж «тема + год» за рисунок каждый день ----------
+  const dOf = k => new Date(+k.slice(0, 4), +k.slice(5, 7) - 1, +k.slice(8));
+  const kOf = d => `${d.getFullYear()}-${pad(d.getMonth() + 1)}-${pad(d.getDate())}`;
+  const addDays = (k, n) => { const d = dOf(k); d.setDate(d.getDate() + n); return kOf(d); };
+  const lenOf = (s, e) => Math.round((dOf(e) - dOf(s)) / 864e5) + 1;
+  const ruDays = n => `${n} ${n % 10 === 1 && n % 100 !== 11 ? 'день' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'дня' : 'дней'}`;
+  const fmtRange = (s, e) => { const o = { day: 'numeric', month: 'short' }, y = s.slice(0, 4) !== e.slice(0, 4) || s.slice(0, 4) !== D.today.slice(0, 4);
+    return `${dOf(s).toLocaleDateString('ru-RU', { ...o, ...(y ? { year: 'numeric' } : {}) })} — ${dOf(e).toLocaleDateString('ru-RU', { ...o, ...(y ? { year: 'numeric' } : {}) })}`; };
+  const medalOf = x => { const B = window.PPPixelBadge; if (!B) return ''; const dz = B.clean(x.badge) || B.suggest(x.t.join(' '), x.s); return `<span class="sw-medal has-ring" style="--bg:${dz.bg};--ring:${dz.ring || '#C98A1E'}"><b>${B.svg(dz)}</b></span>`; };
+  const mtList = () => (D.mthemes || []).map(x => `<button type="button" class="pill-btn chadm-mtb" data-mtid="${esc(x.ym)}" title="Изменить тематику, даты или бейдж">${medalOf(x)} «${esc(x.t[1] || x.t[0] || x.t[2])}» · ${fmtRange(x.s, x.e)} · ${ruDays(lenOf(x.s, x.e))}${x.e < D.today ? ' · прошла' : x.s <= D.today ? ' · идёт' : ''}</button>`).join('') || '<span class="be-note">нет — бейджа за тематику нет</span>';
+  function mthemeDialog(x) {
+    const mEnd = `${ym}-${pad(new Date(+ym.slice(0, 4), +ym.slice(5, 7), 0).getDate())}`;
+    let s = x ? x.s : ym + '-01', e = x ? x.e : mEnd; // новая — по умолчанию весь открытый месяц
+    const LENS = [[7, 'Неделя'], [10, '10 дней'], [14, '2 недели'], [30, '30 дней'], [100, '100 дней']];
+    const dlg = document.createElement('dialog'); dlg.className = 'be-dialog adm-card-dlg chadm-dlg chadm-mtd';
+    dlg.innerHTML = `<button type="button" class="chadm-x" data-x aria-label="Закрыть без изменений">✕</button><h2>🏅 ${x ? 'Тематика' : 'Новая тематика'}</h2>
+      <div class="chadm-mtdates"><label>С <input type="date" data-s></label><label>по <input type="date" data-e></label><b data-len></b></div>
+      <p class="chadm-mtlens">${LENS.map(([n, t]) => `<button type="button" class="pill-btn" data-len-n="${n}">${t}</button>`).join('')}<button type="button" class="pill-btn" data-len-m>Месяц</button></p>
+      ${['ru', 'en', 'lv'].map(l => `<label class="chadm-mtl"><span>${l.toUpperCase()}</span><input type="text" data-mt="${l}" maxlength="120" value="${esc(x ? x.t[LI[l]] : '')}"></label>`).join('')}
+      <p class="be-note">За рисунок каждый день с первого по последний (дни ЭКСТРА можно пропустить) — бейдж «тема + год» и пуговки (📜 Правила → «Тематика месяца»). Полученные бейджи не отнимаются.</p>
+      <p class="be-dialog-acts"><button type="button" class="pill-btn" data-tr>🌐 Перевести</button><button type="button" class="pill-btn pill-fill" data-save>💾 Сохранить</button>${x ? '<button type="button" class="pill-btn" data-badge>🎨 Бейдж</button><button type="button" class="pill-btn" data-del>🗑 Удалить</button>' : ''}<span class="be-note" data-st role="status"></span></p>`;
+    document.body.appendChild(dlg); dlg.addEventListener('close', () => dlg.remove());
+    const q = k => dlg.querySelector(k), st = q('[data-st]'), mv = l => q(`[data-mt="${l}"]`);
+    const show = () => { q('[data-s]').value = s; q('[data-e]').value = e; q('[data-len]').textContent = e >= s ? ruDays(lenOf(s, e)) : '⚠ конец раньше начала'; };
+    q('[data-s]').onchange = ev => { const n = e >= s ? lenOf(s, e) : 1; s = ev.target.value || s; e = addDays(s, n - 1); show(); }; // сдвиг начала — длина та же
+    q('[data-e]').onchange = ev => { e = ev.target.value || e; show(); };
+    dlg.querySelectorAll('[data-len-n]').forEach(b => b.onclick = () => { e = addDays(s, +b.dataset.lenN - 1); show(); });
+    q('[data-len-m]').onclick = () => { const d = dOf(s); d.setMonth(d.getMonth() + 1, Math.min(d.getDate(), new Date(d.getFullYear(), d.getMonth() + 2, 0).getDate())); e = addDays(kOf(d), -1); show(); };
+    q('[data-tr]').onclick = async ev => {
+      const src = ['ru', 'en', 'lv'].find(l => mv(l).value.trim()); if (!src) { st.textContent = 'Впишите тематику хотя бы на одном языке.'; return; }
+      ev.target.disabled = true; st.textContent = '🌐 Перевожу…';
+      try { const tr = await translate([mv(src).value], src); Object.keys(tr).forEach(l => { if (tr[l][0]) mv(l).value = tr[l][0]; }); st.textContent = '✓ Переведено — сохраните'; }
+      catch (er) { st.textContent = '⚠ ' + (TR_ERR[er.code] || er.code || er.message); }
+      ev.target.disabled = false;
+    };
+    const send = async body => {
+      st.textContent = '…';
+      try { await api('/mtheme', body); dlg.close(); await load(ym); }
+      catch (er) { st.textContent = '⚠ ' + ({ dates: 'Проверьте даты: конец не раньше начала.', long: 'Не длиннее 366 дней.', same: 'Тематика с такими датами уже есть.' }[er.code] || errText(er)); }
+    };
+    q('[data-save]').onclick = () => { const sub = L3.map(l => mv(l).value.trim()); if (!sub.some(Boolean)) { st.textContent = 'Впишите тематику хотя бы на одном языке.'; return; } send({ id: x ? x.ym : '', s, e, subject: sub }); };
+    if (x) {
+      q('[data-del]').onclick = () => confirm(`Удалить тематику «${x.t[1] || x.t[0]}»? Бейдж больше нельзя будет получить (у кого уже есть — останется).`) && send({ id: x.ym, del: 1 });
+      q('[data-badge]').onclick = () => { dlg.close(); badgeDialog(x.ym, x.t, x.badge, () => load(ym), x); };
+    }
+    q('[data-x]').onclick = () => dlg.close();
+    show(); dlg.showModal();
+  }
   // ---------- 🎨 редактор пиксельного бейджа тематики месяца (site/assets/pixel-badge.js) ----------
   // шаблоны, цвета рисунка (поменять цвет — меняются все его пиксели), фон и обводка медали, контур рисунка, символ в углу, рисование по клеткам 16×16
   const LETTERS = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
   const hsl = h => { const v = [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16) / 255), mx = Math.max(...v), mn = Math.min(...v), l = (mx + mn) / 2, dd = mx - mn; if (!dd) return [0, 0, l];
     const [r, g, b] = v, hh = mx === r ? ((g - b) / dd + 6) % 6 : mx === g ? (b - r) / dd + 2 : (r - g) / dd + 4; return [hh * 60, dd / (1 - Math.abs(2 * l - 1)), l]; };
   const hex = (h, s, l) => { const k = n => (n + h / 30) % 12, a = s * Math.min(l, 1 - l), f = n => l - a * Math.max(-1, Math.min(k(n) - 3, 9 - k(n), 1)); return '#' + [0, 8, 4].map(n => Math.round(f(n) * 255).toString(16).padStart(2, '0')).join(''); };
-  function badgeDialog(m, theme, design, onSaved) {
+  function badgeDialog(m, theme, design, onSaved, per) {
     const B = window.PPPixelBadge; if (!B) { alert('Не загрузился pixel-badge.js'); return; }
     let d = B.clean(design) || B.suggest((theme || []).join(' '), m), tool = 'pen', cur = Object.keys(d.pal)[0] || 'a';
     const dlg = document.createElement('dialog'); dlg.className = 'be-dialog adm-card-dlg chadm-dlg chadm-bed';
-    const mon = new Date(+m.slice(0, 4), +m.slice(5, 7) - 1, 1).toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' }).replace(/\s*г\.$/, '');
+    const mon = per ? fmtRange(per.s, per.e) : new Date(+m.slice(0, 4), +m.slice(5, 7) - 1, 1).toLocaleDateString('ru-RU', { month: 'long', year: 'numeric' }).replace(/\s*г\.$/, '');
     dlg.innerHTML = `<button type="button" class="chadm-x" data-x aria-label="Закрыть без изменений">✕</button><h2>🎨 Бейдж «${esc(theme[1] || theme[0] || theme[2])} ${m.slice(0, 4)}» · ${mon}</h2>
       <div class="bed-main"><div class="bed-left">
         <div class="bed-prev" data-prev></div>
@@ -166,7 +201,7 @@
     q('[data-save]').onclick = async () => {
       st.textContent = '…';
       try { await api('/mbadge', { m, design: B.clean(d) }); st.textContent = '✓ Сохранено'; if (onSaved) onSaved(B.clean(d)); setTimeout(() => dlg.close(), 400); }
-      catch (e) { st.textContent = '⚠ ' + (e.code === 'notheme' ? 'Сначала сохраните тематику месяца.' : errText(e)); }
+      catch (e) { st.textContent = '⚠ ' + (e.code === 'notheme' ? 'Сначала сохраните тематику.' : errText(e)); }
     };
     paint(); dlg.showModal();
   }

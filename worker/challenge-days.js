@@ -13,14 +13,16 @@ export const CHALLENGE_TABLES = [
   // банк тем Алины: темы дней, которые она правила (edited = 1), + добавленные прямо в банк (manual). k — ключ без регистра и пробелов по краям;
   // days — дни, где тема стоит сейчас, через запятую; hidden — удалена из банка, хотя ещё стоит в каком-то дне
   `CREATE TABLE IF NOT EXISTS challenge_bank (id INTEGER PRIMARY KEY AUTOINCREMENT, k TEXT UNIQUE, en TEXT, ru TEXT, lv TEXT, days TEXT DEFAULT '', created_at INTEGER, updated_at INTEGER, manual INTEGER DEFAULT 0, hidden INTEGER DEFAULT 0, tags TEXT DEFAULT '')`, // tags — для каких дней (BANK_TAGS)
-  // тематика месяца (кабинет): есть — у месяца бейдж «тема + год» за рисунки каждый день месяца (день ЭКСТРА можно пропустить)
-  `CREATE TABLE IF NOT EXISTS challenge_months (ym TEXT PRIMARY KEY, en TEXT, ru TEXT, lv TEXT, updated_at INTEGER, badge TEXT)`, // badge — пиксельный дизайн бейджа (JSON, site/assets/pixel-badge.js)
+  // тематика (кабинет): бейдж «тема + год» за рисунки каждый день с start_day по end_day (день ЭКСТРА можно пропустить); ym — ключ (бейдж 'mt' + ym):
+  // 'ГГГГ-ММ' — целый календарный месяц (старые строки без дат — тоже месяц), иначе 'ГГГГ-ММ-ДД_ГГГГ-ММ-ДД' — даты при создании (потом даты можно менять, ключ остаётся)
+  `CREATE TABLE IF NOT EXISTS challenge_months (ym TEXT PRIMARY KEY, en TEXT, ru TEXT, lv TEXT, updated_at INTEGER, badge TEXT, start_day TEXT, end_day TEXT)`, // badge — пиксельный дизайн бейджа (JSON, site/assets/pixel-badge.js)
 ];
 const bankKey = s => s.map(x => String(x || '').trim().toLowerCase()).find(Boolean) || '';
 const bankKeyOf = s => bankKey([s[1], s[0], s[2]]); // по RU, нет — по EN, LV
 const dayList = s => String(s || '').split(',').filter(Boolean);
 export const CHALLENGE_ALTER = ['ALTER TABLE challenge_bank ADD COLUMN manual INTEGER DEFAULT 0', 'ALTER TABLE challenge_bank ADD COLUMN hidden INTEGER DEFAULT 0',
-  "ALTER TABLE challenge_bank ADD COLUMN tags TEXT DEFAULT ''", 'ALTER TABLE challenge_days ADD COLUMN pal TEXT', 'ALTER TABLE challenge_months ADD COLUMN badge TEXT'];
+  "ALTER TABLE challenge_bank ADD COLUMN tags TEXT DEFAULT ''", 'ALTER TABLE challenge_days ADD COLUMN pal TEXT', 'ALTER TABLE challenge_months ADD COLUMN badge TEXT',
+  'ALTER TABLE challenge_months ADD COLUMN start_day TEXT', 'ALTER TABLE challenge_months ADD COLUMN end_day TEXT'];
 // метки темы банка: сезон (тема — только в этот сезон), extra — только в день ЭКСТРА, bday — 23 января, halloween — октябрь, xmas — декабрь и 1–7 января
 export const BANK_TAGS = ['winter', 'spring', 'summer', 'autumn', 'extra', 'bday', 'halloween', 'xmas'];
 const SEAS = ['winter', 'winter', 'spring', 'spring', 'spring', 'summer', 'summer', 'summer', 'autumn', 'autumn', 'autumn', 'winter'];
@@ -191,16 +193,21 @@ export async function planDayColors(env) {
   return out;
 }
 
-// бейджи тематик месяцев: 'mt2027-02' — у работ есть каждый день месяца с тематикой (кроме дня ЭКСТРА — он выходной); уже заработанные не отнимаются
+// даты тематики: строка без start_day/end_day — целый месяц ym
+const periodOf = r => ({ s: r.start_day || r.ym.slice(0, 7) + '-01', e: r.end_day || `${r.ym.slice(0, 7)}-${pad(daysIn(r.ym.slice(0, 7)))}` });
+const isExtra = k => +k.slice(8) === extraDay(+k.slice(0, 4), +k.slice(5, 7) - 1);
+const isDay = k => /^\d{4}-\d\d-\d\d$/.test(k) && keyOfNum(dayNum(k)) === k;
+const mthemeOut = r => ({ ym: r.ym, ...periodOf(r), t: [r.en || '', r.ru || '', r.lv || ''], badge: parseJ(r.badge, null) });
+// бейджи тематик: 'mt2027-02', 'mt2026-11-03_2026-11-12' — у работ есть каждый день тематики (кроме дней ЭКСТРА — они выходные); уже заработанные не отнимаются
 export async function monthThemeBadges(env, posts) {
-  const rows = (await env.DB.prepare('SELECT ym FROM challenge_months').all().catch(() => ({ results: [] }))).results;
+  const rows = (await env.DB.prepare('SELECT ym, start_day, end_day FROM challenge_months').all().catch(() => ({ results: [] }))).results;
   if (!rows.length) return [];
   const days = new Set(posts.map(p => p.day)), out = [];
-  for (const { ym } of rows) {
-    const y = +ym.slice(0, 4), m = +ym.slice(5, 7) - 1, ex = extraDay(y, m);
+  for (const r of rows) {
+    const { s, e } = periodOf(r);
     let ok = true;
-    for (let d = 1; d <= daysIn(ym) && ok; d++) if (d !== ex && !days.has(`${ym}-${pad(d)}`)) ok = false;
-    if (ok) out.push('mt' + ym);
+    for (let n = dayNum(s); n <= dayNum(e) && ok; n++) { const k = keyOfNum(n); if (!isExtra(k) && !days.has(k)) ok = false; }
+    if (ok) out.push('mt' + r.ym);
   }
   return out;
 }
@@ -218,9 +225,9 @@ export async function challengeApi(req, env, url, h) {
     const days = ym < FIRST ? [] : (await monthRows(env, ym)).map(({ edited, ...d }) => d);
     return h.json({ m: ym, days }, 200, { 'cache-control': 'public, max-age=60' });
   }
-  // тематики месяцев для сайта (названия бейджей): [{ym, t: [en, ru, lv]}]
+  // тематики для сайта (названия бейджей, шкала на /challenge/): [{ym — ключ, s, e — даты, t: [en, ru, lv], badge}]
   if (m === 'GET' && p === '/api/challenge/mthemes') {
-    const items = (await env.DB.prepare('SELECT ym, en, ru, lv, badge FROM challenge_months ORDER BY ym').all()).results.map(r => ({ ym: r.ym, t: [r.en || '', r.ru || '', r.lv || ''], badge: parseJ(r.badge, null) }));
+    const items = (await env.DB.prepare('SELECT * FROM challenge_months').all()).results.map(mthemeOut).sort((a, b) => a.s < b.s ? -1 : a.s > b.s ? 1 : 0);
     return h.json({ items }, 200, { 'cache-control': 'public, max-age=300' });
   }
   if (!p.startsWith('/api/admin/challenge')) return null;
@@ -242,8 +249,9 @@ export async function challengeApi(req, env, url, h) {
     }
     const last = ((await env.DB.prepare('SELECT day FROM challenge_days WHERE edited = 1 ORDER BY updated_at DESC LIMIT 1').first()) || {}).day || null; // последний правленный день — подсвечен в календаре
     const tags = days.map(d => { const t = data.tags[d.item] || []; return { f: t[0] || '', c: t[1] || '', d: t[2] || 0, pool: poolOf(data, rules, d.day) }; });
-    const mt = await env.DB.prepare('SELECT en, ru, lv, badge FROM challenge_months WHERE ym = ?').bind(ym).first();
-    return h.json({ m: ym, mtheme: mt ? [mt.en || '', mt.ru || '', mt.lv || ''] : ['', '', ''], mbadge: mt ? parseJ(mt.badge, null) : null, today: rigaToday(), days, tags, works, broken, last, colors: allColors(data), base: data.colors.length, max: LAST, times: data.times });
+    const mlast = `${ym}-${pad(daysIn(ym))}`; // тематики, которые задевают этот месяц
+    const mthemes = (await env.DB.prepare('SELECT * FROM challenge_months').all()).results.map(mthemeOut).filter(x => x.s <= mlast && x.e >= ym + '-01').sort((a, b) => a.s < b.s ? -1 : 1);
+    return h.json({ m: ym, mthemes, today: rigaToday(), days, tags, works, broken, last, colors: allColors(data), base: data.colors.length, max: LAST, times: data.times });
   }
   // банк тем: список (последние сверху) и удаление
   const bankItems = async () => (await env.DB.prepare('SELECT id, en, ru, lv, days, created_at, manual, tags FROM challenge_bank WHERE hidden = 0 ORDER BY created_at DESC, id DESC').all()).results.map(r => ({ ...r, days: dayList(r.days), tags: tagList(r.tags) }));
@@ -261,17 +269,24 @@ export async function challengeApi(req, env, url, h) {
     else await env.DB.prepare('DELETE FROM challenge_bank WHERE id = ?').bind(id).run();
     return bankList();
   }
-  // тематика месяца: вписана — у месяца появляется бейдж; пусто — тематики и бейджа нет
+  // тематика с датами {id?, s, e, subject}: новая — ключ из дат (целый месяц — 'ГГГГ-ММ'); пусто или del — тематики и бейджа нет
   if (m === 'POST' && p === '/api/admin/challenge/mtheme') {
-    const ym = String(b.m || ''); if (!/^\d{4}-\d\d$/.test(ym)) h.fail(400, 'bad');
+    const id = String(b.id || '');
+    if (id && !/^\d{4}-\d\d(-\d\d_\d{4}-\d\d-\d\d)?$/.test(id)) h.fail(400, 'bad');
     const sub = L3.map((l, i) => String((b.subject || [])[i] ?? '').trim().slice(0, 120));
-    if (sub.some(Boolean)) await env.DB.prepare('INSERT INTO challenge_months (ym, en, ru, lv, updated_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(ym) DO UPDATE SET en = excluded.en, ru = excluded.ru, lv = excluded.lv, updated_at = excluded.updated_at').bind(ym, ...sub, now()).run();
-    else await env.DB.prepare('DELETE FROM challenge_months WHERE ym = ?').bind(ym).run();
-    return h.json({ ok: true, mtheme: sub });
+    if (b.del || !sub.some(Boolean)) { if (id) await env.DB.prepare('DELETE FROM challenge_months WHERE ym = ?').bind(id).run(); return h.json({ ok: true, item: null }); }
+    const s = String(b.s || ''), e = String(b.e || '');
+    if (!isDay(s) || !isDay(e) || e < s) h.fail(400, 'dates');
+    if (dayNum(e) - dayNum(s) + 1 > 366) h.fail(400, 'long');
+    const whole = s.slice(8) === '01' && e === `${s.slice(0, 7)}-${pad(daysIn(s.slice(0, 7)))}`;
+    const key = id || (whole ? s.slice(0, 7) : `${s}_${e}`);
+    if (!id && await env.DB.prepare('SELECT 1 FROM challenge_months WHERE ym = ?').bind(key).first()) h.fail(409, 'same'); // такая же тематика с теми же датами уже есть
+    await env.DB.prepare('INSERT INTO challenge_months (ym, en, ru, lv, updated_at, start_day, end_day) VALUES (?, ?, ?, ?, ?, ?, ?) ON CONFLICT(ym) DO UPDATE SET en = excluded.en, ru = excluded.ru, lv = excluded.lv, updated_at = excluded.updated_at, start_day = excluded.start_day, end_day = excluded.end_day').bind(key, ...sub, now(), s, e).run();
+    return h.json({ ok: true, item: mthemeOut(await env.DB.prepare('SELECT * FROM challenge_months WHERE ym = ?').bind(key).first()) });
   }
   // пиксельный бейдж тематики месяца (редактор в кабинете): JSON дизайна, проверяет и рисует site/assets/pixel-badge.js
   if (m === 'POST' && p === '/api/admin/challenge/mbadge') {
-    const ym = String(b.m || ''); if (!/^\d{4}-\d\d$/.test(ym)) h.fail(400, 'bad');
+    const ym = String(b.m || ''); if (!/^\d{4}-\d\d(-\d\d_\d{4}-\d\d-\d\d)?$/.test(ym)) h.fail(400, 'bad');
     const js = JSON.stringify(b.design || null); if (js.length > 6000) h.fail(400, 'big');
     const r = await env.DB.prepare('UPDATE challenge_months SET badge = ?, updated_at = ? WHERE ym = ?').bind(js, now(), ym).run();
     if (!r.meta || !r.meta.changes) h.fail(409, 'notheme');

@@ -715,7 +715,7 @@ async function awardComment(env, uid, commentId) {
 // пуговки за бейджи: за каждый уровень серии и особый бейдж — один раз (в том числе за полученные раньше)
 async function awardBadges(env, uid, best, badges) {
   const want = [...Object.entries(BTN.levels).filter(([d]) => best >= +d).map(([d, n]) => ['lv' + d, n]),
-    ...badges.filter(k => BTN.badges[k]).map(k => [k, BTN.badges[k]]), ...badges.filter(k => /^mt\d{4}-\d\d$/.test(k)).map(k => [k, BTN.badges.mtheme])];
+    ...badges.filter(k => BTN.badges[k]).map(k => [k, BTN.badges[k]]), ...badges.filter(k => /^mt\d{4}-\d\d(-\d\d_\d{4}-\d\d-\d\d)?$/.test(k)).map(k => [k, BTN.badges.mtheme])];
   if (!want.length) return { total: 0, got: [] };
   const have = new Set((await env.DB.prepare("SELECT ref FROM button_log WHERE user_id = ? AND kind = 'badge'").bind(uid).all()).results.map(r => r.ref));
   let total = 0; const got = [];
