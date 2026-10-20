@@ -1,5 +1,5 @@
 // Кабинет → «🎨 Темы челленджа» (admin.js открывает PPChallengeAdmin.mount(main)): календарь на год вперёд (D.ahead месяцев), «В цвете / Ч/Б»;
-// окно дня (без прокрутки) — тема RU/EN/LV, 2–5 базовых цветов; время и Ч/Б-указание — под «Ещё»; в день ЭКСТРА — палитра и Ч/Б-условие;
+// окно дня (без прокрутки) — тема RU/EN/LV, цвета: 1–5 базовых по одному или гармония на цветовом круге (можно поворачивать); время и Ч/Б-указание — под «Ещё»; в день ЭКСТРА — палитра и Ч/Б-условие;
 // «🌐 Перевести», «🎲 Другой предмет», «⇄ Поменять с днём…», «↩ Вернуть как было». Сервер — /api/admin/challenge/* (worker/challenge-days.js), docs/challenge.md.
 (function () {
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -9,7 +9,7 @@
     if (!r.ok) throw Object.assign(new Error(d.error || r.status), { code: d.error || r.status });
     return d;
   };
-  const ERR = { none: 'Больше нет предметов, которые подходят по правилам.', colors: 'Нужно от 2 до 5 разных цветов.', subject: 'Впишите предмет хотя бы на одном языке.', orig: 'Нечего возвращать.', admin: 'Это может только админ.', auth: 'Войдите через Google.' };
+  const ERR = { none: 'Больше нет предметов, которые подходят по правилам.', colors: 'Нужно от 1 до 5 разных цветов.', subject: 'Впишите предмет хотя бы на одном языке.', orig: 'Нечего возвращать.', admin: 'Это может только админ.', auth: 'Войдите через Google.' };
   const errText = e => ERR[e.code] || 'Не получилось (' + (e.code || e.message) + ').';
   const L3 = ['en', 'ru', 'lv'], LI = { en: 0, ru: 1, lv: 2 };
   const CAT = { idea: 'слово-тема', life: 'из жизни', food: 'еда', drink: 'напиток', animal: 'животное', bird: 'птица', plant: 'растение', home: 'дом', clothes: 'одежда', transport: 'транспорт', place: 'место', nature: 'природа', weather: 'погода', tool: 'инструмент', toy: 'игрушка', music: 'музыка', fantasy: 'сказка', person: 'человек', holiday: 'праздник' };
@@ -76,6 +76,26 @@
     return best;
   }
   const baseCols = list => [...new Set(list.map(toBase).filter(k => k >= 0))];
+  // цветовой круг (12 секторов по часовой, жёлтый сверху): 6 базовых + 6 промежуточных из moreColors; гармонии — сдвиги от главного цвета
+  const WHEEL_N = ['yellow', 'olive', 'green', 'turquoise', 'blue', 'indigo', 'purple', 'fuchsia', 'red', 'coral', 'orange', 'ochre'];
+  const HARM = [['mono', 'Монохромная', [0]], ['comp', 'Комплементарная', [0, 6]], ['analog', 'Аналоговая', [-1, 0, 1]], ['acomp', 'Аналогово-комплементарная', [-1, 0, 1, 6]],
+    ['triad', 'Триада', [0, 4, 8]], ['split', 'Раздельно-комплементарная', [0, 5, 7]], ['tetrad', 'Тетрада', [0, 2, 6, 8]]];
+  const wheelIdx = () => WHEEL_N.map(n => D.colors.findIndex(c => c.n[0] === n));
+  const harmCols = (h, rot) => { const w = wheelIdx(); return (HARM.find(x => x[0] === h) || HARM[1])[2].map(o => w[((rot + o) % 12 + 12) % 12]); };
+  function findHarm(list) { // цвета дня — это гармония на круге? → [гармония, поворот]
+    const s = [...new Set(list)].sort().join();
+    for (const [h] of HARM) for (let r = 0; r < 12; r++) if ([...new Set(harmCols(h, r))].sort().join() === s) return [h, r];
+    return null;
+  }
+  // сектор кольца k (0 — сверху) и клин к центру для выбранных
+  const pt = (a, r) => [100 + r * Math.sin(a), 100 - r * Math.cos(a)].map(v => v.toFixed(1)).join(' ');
+  function wheelSvg(on, size) {
+    const w = wheelIdx(), st = Math.PI / 6, R = 96, r = 60;
+    const seg = k => { const a = k * st - st / 2, b = a + st; return `M${pt(a, R)} A${R} ${R} 0 0 1 ${pt(b, R)} L${pt(b, r)} A${r} ${r} 0 0 0 ${pt(a, r)}Z`; };
+    const wedge = k => { const a = k * st - st / 2 + .04, b = a + st - .08; return `M100 100 L${pt(a, r - 2)} A${r - 2} ${r - 2} 0 0 1 ${pt(b, r - 2)}Z`; };
+    return `<svg viewBox="0 0 200 200" width="${size}" height="${size}" aria-hidden="true">${w.map((ci, k) => `<path d="${seg(k)}" fill="${(D.colors[ci] || {}).hex || '#ccc'}" data-k="${k}"${on.has(k) ? ' class="on"' : ''}/>`).join('')}
+      ${[...on].map(k => `<path d="${wedge(k)}" fill="${(D.colors[w[k]] || {}).hex}" class="wg"/>`).join('')}</svg>`;
+  }
   // перевод темы: с того языка, который правили последним (или с первого заполненного), на два других
   async function translate(texts, from) {
     const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 45000);
@@ -105,7 +125,13 @@
           <button type="button" class="pill-btn" data-a="swap">⇄ Поменять с днём…</button><select data-swap hidden><option value="">— какой день? —</option>${D.days.filter(x => x.day !== day).map(x => `<option value="${x.day}">${+x.day.slice(8)} — ${esc(x.subject[1] || x.subject[0])}</option>`).join('')}</select>
           <button type="button" class="pill-btn" data-a="revert"${d.edited ? '' : ' hidden'}>↩ Вернуть как было</button></p>
         ${d.extra ? `<div class="chadm-pal"><b>Палитра дня ЭКСТРА</b>${pal ? `<span>${pal.c.map(c => `<i style="background:${c[0]}" title="${esc(c[2])}"></i>`).join('')}</span><small>«${esc(pal.t[1])}» — очередь палитр: 🎨 Картины и палитры</small>` : '<small>очередь палитр: 🎨 Картины и палитры</small>'}</div>`
-        : `<fieldset class="chadm-f"><legend>Цвета дня: от 2 до 5</legend><div class="chadm-cols">${D.colors.slice(0, D.base).map((c, k) => `<button type="button" data-col="${k}" aria-pressed="false"><i style="background:${c.hex}"></i>${esc(c.n[1])}</button>`).join('')}</div></fieldset>`}
+        : `<fieldset class="chadm-f"><legend>Цвета дня</legend>
+          <div class="ch-level chadm-mode" role="group"><button type="button" data-mode="one">По одному</button><button type="button" data-mode="harm">Гармония на круге</button></div>
+          <div class="chadm-cols" data-one>${D.colors.slice(0, D.base).map((c, k) => `<button type="button" data-col="${k}" aria-pressed="false"><i style="background:${c.hex}"></i>${esc(c.n[1])}</button>`).join('')}</div>
+          <div class="chadm-harm" data-harm hidden><div class="chadm-wheel"><div data-wheel title="Потяните или нажмите на цвет, чтобы повернуть"></div>
+            <p><button type="button" class="pill-btn" data-rot="-1" aria-label="Повернуть против часовой">⟲</button><button type="button" class="pill-btn" data-rot="1" aria-label="Повернуть по часовой">⟳</button></p></div>
+            <div class="chadm-hlist">${HARM.map(([h, n]) => `<button type="button" data-h="${h}" aria-pressed="false">${n}</button>`).join('')}</div></div>
+          <p class="chadm-picked" data-picked></p></fieldset>`}
         <details><summary>Ещё: время, Ч/Б-указание${d.extra ? ', Ч/Б-условие ЭКСТРА' : ''}</summary><div>
           <label class="chadm-time">Время <select data-time>${D.times.map(x => `<option value="${x}">${x} мин</option>`).join('')}</select><small class="be-note">в режиме «Спокойно» — на 5 минут больше</small></label>
           ${txt('twist', 'Ч/Б-указание')}${d.extra ? txt('extra', 'Ч/Б-условие дня ЭКСТРА') : ''}</div></details>
@@ -113,19 +139,48 @@
       <p class="be-dialog-acts"><button type="button" class="pill-btn pill-fill" data-a="save">💾 Сохранить</button><button type="button" class="pill-btn" data-a="close">Закрыть</button><span class="be-note" data-st role="status"></span></p>`;
     document.body.appendChild(dlg);
     const q = s => dlg.querySelector(s), st = q('[data-st]'), trBtn = q('[data-a=tr]');
-    let cols = [], from = 'ru';
+    let cols = [], from = 'ru', mode = 'one', harm = 'comp', rot = 0;
     const fs = ['subject']; // переводится только тема (Ч/Б-поля под «Ещё» правятся руками)
     const trLabel = () => { trBtn.textContent = `🌐 Перевести с ${from.toUpperCase()} на ${L3.filter(l => l !== from).map(l => l.toUpperCase()).join(' и ')}`; };
     function fill() {
       dlg.querySelectorAll('[data-f]').forEach(inp => { const v = d[inp.dataset.f]; inp.value = v ? v[LI[inp.dataset.l]] || '' : ''; });
-      cols = baseCols(d.colors); paintCols();
+      const fh = findHarm(d.colors);
+      if (fh) { mode = 'harm'; [harm, rot] = fh; cols = harmCols(harm, rot); } else { mode = 'one'; cols = baseCols(d.colors); }
+      paintCols();
       q('[data-time]').value = String(d.time);
       q('[data-a=revert]').hidden = !d.edited;
       from = 'ru'; trLabel();
       const tg = D.tags[i];
       q('[data-tags]').innerHTML = `${esc(POOL[tg.pool] || tg.pool)} · ${esc(CAT[tg.c] || tg.c)} · ${DIF[tg.d] || '—'} · семья «${esc(tg.f)}»${br.length ? `<br><span class="chadm-warn">⚠ ${br.map(r => RULE[r] || r).join('; ')}</span>` : ''}`;
     }
-    function paintCols() { dlg.querySelectorAll('[data-col]').forEach(b => b.setAttribute('aria-pressed', cols.includes(+b.dataset.col))); }
+    function paintCols() {
+      if (d.extra) return;
+      dlg.querySelectorAll('[data-mode]').forEach(b => b.setAttribute('aria-pressed', b.dataset.mode === mode));
+      q('[data-one]').hidden = mode !== 'one'; q('[data-harm]').hidden = mode !== 'harm';
+      dlg.querySelectorAll('[data-col]').forEach(b => b.setAttribute('aria-pressed', cols.includes(+b.dataset.col)));
+      dlg.querySelectorAll('[data-h]').forEach(b => b.setAttribute('aria-pressed', b.dataset.h === harm));
+      if (mode === 'harm') { const w = wheelIdx(); q('[data-wheel]').innerHTML = wheelSvg(new Set(cols.map(c => w.indexOf(c))), 150); }
+      q('[data-picked]').innerHTML = cols.length ? cols.map(c => `<span><i style="background:${D.colors[c].hex}"></i>${esc(D.colors[c].n[1])}</span>`).join('') : 'цвета не выбраны';
+    }
+    const setHarm = () => { cols = harmCols(harm, rot); paintCols(); };
+    dlg.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => {
+      if (b.dataset.mode === mode) return;
+      mode = b.dataset.mode;
+      if (mode === 'one') { cols = baseCols(cols); paintCols(); return; }
+      const k = wheelIdx().indexOf(cols[0]); if (k >= 0) rot = k; setHarm();
+    });
+    dlg.querySelectorAll('[data-h]').forEach(b => b.onclick = () => { harm = b.dataset.h; setHarm(); });
+    dlg.querySelectorAll('[data-rot]').forEach(b => b.onclick = () => { rot = (rot + +b.dataset.rot + 12) % 12; setHarm(); });
+    // круг можно тянуть: главный цвет гармонии встаёт в сектор под пальцем (второй выбранный цвет — со своим сдвигом)
+    const wh = q('[data-wheel]');
+    if (wh) {
+      let drag = null;
+      const sector = e => { const r = wh.getBoundingClientRect(), a = Math.atan2(e.clientX - r.left - r.width / 2, -(e.clientY - r.top - r.height / 2)); return ((Math.round(a / (Math.PI / 6)) % 12) + 12) % 12; };
+      wh.addEventListener('pointerdown', e => { e.preventDefault(); wh.setPointerCapture(e.pointerId); const k = sector(e); drag = { k, rot }; });
+      wh.addEventListener('pointermove', e => { if (!drag) return; const n = (drag.rot + sector(e) - drag.k + 12) % 12; if (n !== rot) { rot = n; setHarm(); } });
+      const end = e => { if (!drag) return; if (sector(e) === drag.k && rot === drag.rot) { rot = drag.k; setHarm(); } drag = null; };
+      wh.addEventListener('pointerup', end); wh.addEventListener('pointercancel', () => { drag = null; });
+    }
     dlg.querySelectorAll('[data-col]').forEach(b => b.onclick = () => {
       const k = +b.dataset.col;
       if (cols.includes(k)) cols = cols.filter(x => x !== k); else if (cols.length < 5) cols.push(k); else { cols.shift(); cols.push(k); }
@@ -155,7 +210,7 @@
     const acts = () => dlg.querySelectorAll('button:not([data-a=tr]):not([data-a=close])');
     const run = async (fn) => { st.textContent = '…'; acts().forEach(b => b.disabled = true); try { await fn(); } catch (e) { st.textContent = '⚠ ' + errText(e); } acts().forEach(b => b.disabled = false); };
     q('[data-a=save]').onclick = () => run(async () => {
-      if (!d.extra && (cols.length < 2 || cols.length > 5)) throw Object.assign(new Error('colors'), { code: 'colors' });
+      if (!d.extra && (cols.length < 1 || cols.length > 5)) throw Object.assign(new Error('colors'), { code: 'colors' });
       const body = { day, subject: val('subject'), twist: val('twist'), time: +q('[data-time]').value };
       if (d.extra) body.extra = val('extra'); else body.colors = cols;
       await after(await api('/day', body));

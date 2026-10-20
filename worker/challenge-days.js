@@ -140,14 +140,14 @@ export async function challengeApi(req, env, url, h) {
     await env.DB.prepare(`UPDATE challenge_days SET ${COLS.map(c => c + ' = ?').join(', ')}, edited = ?, updated_at = ? WHERE day = ?`).bind(...colVals(d), edited, now(), d.day).run();
   };
   const back = async () => h.json({ day: toRow(await env.DB.prepare('SELECT * FROM challenge_days WHERE day = ?').bind(key).first()) });
-  // правка дня: предмет, совет, 2–5 цветов, время, особенность, Ч/Б-условие ЭКСТРА
+  // правка дня: предмет, совет, 1–5 цветов, время, особенность, Ч/Б-условие ЭКСТРА
   if (m === 'POST' && p === '/api/admin/challenge/day') {
     const d = toRow(cur), t3 = (v, old) => Array.isArray(v) ? L3.map((l, i) => String(v[i] ?? '').trim().slice(0, 300)) : old;
     d.subject = t3(b.subject, d.subject); d.tip = t3(b.tip, d.tip); d.twist = t3(b.twist, d.twist);
     if (d.extra) d.extra = t3(b.extra, d.extra);
     if (Array.isArray(b.colors)) {
       const c = [...new Set(b.colors.map(Number).filter(i => Number.isInteger(i) && i >= 0 && i < allColors(data).length))];
-      if (c.length < 2 || c.length > 5) h.fail(400, 'colors');
+      if (c.length < 1 || c.length > 5) h.fail(400, 'colors'); // 1 — монохромная гармония
       d.colors = c;
     }
     if (b.time != null) { if (!data.times.includes(Number(b.time))) h.fail(400, 'time'); d.time = Number(b.time); }
