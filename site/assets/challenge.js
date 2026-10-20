@@ -33,6 +33,7 @@
     hint2Bw: ['Build up the darks with hatching, dots or solid fills.', 'Наберите тёмные места штриховкой, точками или заливкой.', 'Veido tumšās vietas ar svītrojumu, punktiem vai pilnu aizkrāsojumu.'],
     bday: ['Today is my birthday! Draw something festive with me 🎂', 'Сегодня мой день рождения! Нарисуйте со мной что-нибудь праздничное 🎂', 'Šodien ir mana dzimšanas diena! Uzzīmē ar mani kaut ko svētku 🎂'],
     today: ['Today', 'Сегодня', 'Šodien'],
+    week: ['Themes of the week', 'Темы недели', 'Nedēļas tēmas'], soon: ['coming soon', 'скоро', 'drīzumā'], // 20.10.2026: неделя пн–вс, темы, которые уже есть
     bwQ: ['Only a pen or ink today?', 'Сегодня только ручка или тушь?', 'Šodien tikai pildspalva vai tuša?'],
     saveShare: ['Save to photos or share', 'Сохранить в фото или поделиться', 'Saglabāt foto vai dalīties'],
     downloadFile: ['Download as a file', 'Скачать файлом', 'Lejupielādēt failu'],
@@ -75,6 +76,19 @@
 
   // ---------- календарь ----------
   const $ = s => root.querySelector(s);
+  // темы недели (пн–вс): уже вписанные видны и наперёд, пустые — «скоро»; прошедшие дни и сегодня можно открыть
+  function weekHtml() {
+    const mon = new Date(today.getFullYear(), today.getMonth(), today.getDate() - (today.getDay() + 6) % 7);
+    const rows = [...Array(7)].map((_, k) => {
+      const d = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + k), key = keyOf(d), th = themeFor(d), open = key <= todayKey;
+      const subj = th.loading || !th.subject ? `<i>${t('soon')}</i>` : th.subject;
+      const cols = !bw && !th.loading && th.subject && th.colors.length ? `<span class="chw-c">${th.colors.slice(0, 6).map(c => `<i style="background:${c.hex}"></i>`).join('')}</span>` : '';
+      const inner = `<span class="chw-d">${d.toLocaleDateString(locale, { weekday: 'short' })} ${d.getDate()}</span><span class="chw-s">${subj}</span>${cols}`;
+      const cls = `chw-row${key === todayKey ? ' now' : ''}${key === selKey ? ' sel' : ''}`;
+      return open ? `<button type="button" class="${cls}" data-wd="${key}">${inner}</button>` : `<div class="${cls}">${inner}</div>`;
+    }).join('');
+    return `<div class="ch-week"><b>${t('week')}</b>${rows}</div>`;
+  }
   function renderCal(anim) {
     const weekday = sel.toLocaleDateString(locale, { weekday: 'long' });
     const month = sel.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
@@ -96,7 +110,8 @@
       </div>
     </div>
     ${selKey !== todayKey ? `<p class="back-today"><button type="button" id="ch-today">${t('backToday')}</button></p>` : ''}
-    <div class="tip"><b>${t('tip')}</b><p>${theme.tip}</p></div>`;
+    <div class="tip"><b>${t('tip')}</b><p>${theme.tip}</p></div>${weekHtml()}`;
+    root.querySelectorAll('[data-wd]').forEach(b => b.addEventListener('click', () => selectDay(new Date(+b.dataset.wd.slice(0, 4), +b.dataset.wd.slice(5, 7) - 1, +b.dataset.wd.slice(8)))));
     const old = $('.page.old'); old && old.addEventListener('animationend', () => old.remove());
     const bt = $('#ch-today'); bt && bt.addEventListener('click', () => { view = new Date(today.getFullYear(), today.getMonth(), 1); selectDay(new Date(today)); });
     renderMin();

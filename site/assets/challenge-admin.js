@@ -52,31 +52,41 @@
         ${works ? `<span class="chadm-w">${works} раб.</span>` : ''}</button>`;
     }).join('');
     main.innerHTML = `<section class="adm-box chadm">
-      <div class="chadm-bar"><div class="chadm-ym"><span class="chadm-year"><button type="button" class="pill-btn" data-y="${yr - 1}"${yr - 1 < minY ? ' disabled' : ''} aria-label="Предыдущий год">‹</button><b>${yr}</b><button type="button" class="pill-btn" data-y="${yr + 1}"${yr + 1 > maxY ? ' disabled' : ''} aria-label="Следующий год">›</button></span>
+      <div class="chadm-bar"><div class="chadm-ym"><select class="chadm-year" data-y aria-label="Год">${Array.from({ length: maxY - minY + 1 }, (_, k) => minY + k).map(y => `<option value="${y}"${y === yr ? ' selected' : ''}>${y}</option>`).join('')}</select>
         <div class="ch-level chadm-months" role="group">${MON3.map((n, k) => { const m = `${yr}-${pad(k + 1)}`; return `<button type="button" data-m="${m}" aria-pressed="${m === ym}"${m < '2026-10' || m > maxM ? ' disabled' : ''}${m === thisMonth ? ' class="now"' : ''} title="${MON[k]} ${yr}">${n}</button>`; }).join('')}</div></div>
         <span class="chadm-tools"><button type="button" class="pill-btn" data-now${ym === thisMonth ? ' disabled' : ''}>📅 Сегодня</button>
-        <button type="button" class="pill-btn" data-bank>📚 Банк тем</button></span></div>
+        <button type="button" class="pill-btn" data-bank>📚 Банк тем</button><button type="button" class="pill-btn" data-fill>📚 Заполнить месяц из банка</button></span></div>
       ${D.last ? `<p class="be-note chadm-lastn">Последний изменённый: <button type="button" class="pill-btn" data-last>${new Date(+D.last.slice(0, 4), +D.last.slice(5, 7) - 1, +D.last.slice(8)).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</button></p>` : ''}
       ${D.days.length ? `<div class="chadm-grid" lang="ru">${['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'].map(x => `<span class="chadm-dow">${x}</span>`).join('')}${'<span></span>'.repeat(first)}${cells}</div>
       <p class="be-note">Нажмите на день, чтобы поправить тему. ✏️ — день правили вы, зелёный — последний изменённый, фиолетовый — сегодня, ✦ — день ЭКСТРА, ⚠ — день нарушает правило подбора (подробнее — в окне дня). ${D.broken.length ? `Нарушений в месяце: <b>${D.broken.length}</b>.` : 'Все дни подходят по правилам ✓'}</p>`
         : '<p class="be-note">Плана на этот месяц пока нет.</p>'}
       <p class="be-note">С 1 декабря 2026 дни пустые — темы и цвета заполняете вы. Если к 23:00 (за час до начала дня) день остался пустым, тема и цвета подберутся сами по прежним правилам. Числа правил подбора — в «📜 Все правила» → «Тонкая настройка» → «🎨 Темы челленджа».</p></section>`;
     main.querySelectorAll('[data-m]').forEach(b => b.onclick = () => load(b.dataset.m));
-    main.querySelectorAll('[data-y]').forEach(b => b.onclick = () => { // другой год — тот же месяц (в пределах, где можно)
-      const y = b.dataset.y; let m = `${y}-${ym.slice(5)}`; if (m < '2026-10') m = '2026-10'; if (m > maxM) m = maxM; load(m);
-    });
+    main.querySelector('[data-y]').onchange = e => { // другой год — тот же месяц (в пределах, где можно)
+      let m = `${e.target.value}-${ym.slice(5)}`; if (m < '2026-10') m = '2026-10'; if (m > maxM) m = maxM; load(m);
+    };
     main.querySelector('[data-bank]').onclick = () => bankDialog();
     main.querySelector('[data-now]').onclick = () => load(thisMonth); // назад к текущему месяцу
+    main.querySelector('[data-fill]').onclick = async e => { // пустые дни месяца (с сегодня) — темами из банка
+      const n = D.days.filter(d => d.day >= D.today && !d.subject.some(x => x)).length;
+      if (!n) { alert('В этом месяце нет пустых дней (прошедшие не заполняются).'); return; }
+      if (!confirm(`Заполнить пустые дни (${n}) темами из банка? Уже заполненные дни не изменятся, цвета можно выбрать потом.`)) return;
+      e.target.disabled = true;
+      try { const r = await api('/fillmonth', { m: ym }); await load(ym); alert(r.filled ? `Заполнено дней: ${r.filled}${r.filled < r.empty ? ` из ${r.empty} — в банке не хватило тем (тема не ставится ближе 60 дней к той же).` : '.'}` : 'В банке нет подходящих тем — добавьте их в «📚 Банк тем».'); }
+      catch (er) { alert(errText(er)); e.target.disabled = false; }
+    };
     main.querySelectorAll('[data-day]').forEach(b => b.onclick = () => dayDialog(b.dataset.day));
     const lb = main.querySelector('[data-last]'); if (lb) lb.onclick = () => D.last.slice(0, 7) === ym ? dayDialog(D.last) : load(D.last.slice(0, 7));
   }
-  // ---------- банк тем: всё, что вписано руками в окне дня ----------
+  // ---------- банк тем: темы правленных дней (сервер держит банк за днями) + добавленные прямо в банк ----------
   const bankLoad = () => api('/bank').then(x => x.items);
   const dShort = k => new Date(+k.slice(0, 4), +k.slice(5, 7) - 1, +k.slice(8)).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' });
   async function bankDialog() {
     const dlg = document.createElement('dialog'); dlg.className = 'be-dialog adm-card-dlg chadm-dlg chadm-bank';
     dlg.innerHTML = `<button type="button" class="chadm-x" data-x aria-label="Закрыть">✕</button><h2>📚 Банк тем</h2>
-      <p class="be-note">Сюда сами попадают все темы, которые вы вписали в окне дня. Их можно взять в любой день кнопкой «📚 Из банка».</p>
+      <p class="be-note">Сюда сами попадают темы всех дней, которые вы заполнили; поменяли или стёрли тему в дне — она уходит и отсюда. Взять тему в день — «📚 Из банка».</p>
+      <fieldset class="chadm-f chadm-badd"><legend>Добавить тему в банк</legend>${['ru', 'en', 'lv'].map(l => `<label><span>${l.toUpperCase()}</span><input type="text" data-n="${l}"></label>`).join('')}
+        <p class="chadm-acts"><button type="button" class="pill-btn" data-ntr>🌐 Перевести</button><button type="button" class="pill-btn pill-fill" data-nadd>➕ Добавить</button><span class="be-note" data-nst></span></p></fieldset>
       <input type="search" placeholder="Найти тему…" data-q class="chadm-bq"><div class="chadm-blist" data-list><p class="be-note">Загрузка…</p></div>`;
     document.body.appendChild(dlg); dlg.addEventListener('close', () => dlg.remove()); dlg.querySelector('[data-x]').onclick = () => dlg.close(); dlg.showModal();
     let items = [];
@@ -84,15 +94,34 @@
       const f = dlg.querySelector('[data-q]').value.trim().toLowerCase();
       const list = items.filter(r => !f || [r.ru, r.en, r.lv].some(x => String(x || '').toLowerCase().includes(f)));
       dlg.querySelector('[data-list]').innerHTML = list.length ? `<p class="be-note">Тем: <b>${list.length}</b></p>` + list.map(r => `<div class="chadm-bi"><div><b>${esc(r.ru || r.en || r.lv)}</b><small>${esc(r.en)} · ${esc(r.lv)}</small>
-        <small>${r.days.length ? 'стоит: ' + r.days.map(dShort).join(', ') : 'сейчас ни в одном дне'}</small></div><button type="button" class="pill-btn" data-del="${r.id}" title="Удалить из банка">🗑</button></div>`).join('')
+        <small>добавлена ${dShort(new Date(r.created_at * 1000).toLocaleDateString('sv-SE'))} · ${r.days.length ? 'стоит: ' + r.days.map(dShort).join(', ') : 'сейчас ни в одном дне'}</small></div><button type="button" class="pill-btn" data-del="${r.id}" title="Удалить из банка">🗑</button></div>`).join('')
         : `<p class="be-note">${items.length ? 'Ничего не нашлось.' : 'Пока пусто — впишите тему в любом дне и сохраните.'}</p>`;
       dlg.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
         if (!confirm('Удалить тему из банка? В днях, где она стоит, она останется.')) return;
-        try { await api('/bank/delete', { id: +b.dataset.del }); items = items.filter(r => r.id !== +b.dataset.del); paint(); } catch (e) { alert(errText(e)); }
+        try { items = (await api('/bank/delete', { id: +b.dataset.del })).items; paint(); } catch (e) { alert(errText(e)); }
       });
     };
     dlg.querySelector('[data-q]').oninput = paint;
+    const nv = l => dlg.querySelector(`[data-n="${l}"]`), nst = dlg.querySelector('[data-nst]');
+    dlg.querySelector('[data-ntr]').onclick = async e => { // с первого заполненного языка (RU, EN, LV) на остальные
+      const src = ['ru', 'en', 'lv'].find(l => nv(l).value.trim()); if (!src) { nst.textContent = 'Впишите тему хотя бы на одном языке.'; return; }
+      e.target.disabled = true; nst.textContent = '🌐 Перевожу…';
+      try { const tr = await translate([nv(src).value], src); Object.keys(tr).forEach(l => { if (tr[l][0] && !nv(l).value.trim()) nv(l).value = tr[l][0]; }); nst.textContent = '✓ Переведено'; }
+      catch (er) { nst.textContent = '⚠ ' + (TR_ERR[er.code] || er.code || er.message); }
+      e.target.disabled = false;
+    };
+    dlg.querySelector('[data-nadd]').onclick = async () => {
+      const sub = L3.map(l => nv(l).value.trim()); if (!sub.some(Boolean)) { nst.textContent = 'Впишите тему хотя бы на одном языке.'; return; }
+      try { items = (await api('/bank/add', { subject: sub })).items; L3.forEach(l => { nv(l).value = ''; }); nst.textContent = '✓ Добавлено'; paint(); } catch (er) { nst.textContent = '⚠ ' + errText(er); }
+    };
     try { items = await bankLoad(); paint(); } catch (e) { dlg.querySelector('[data-list]').innerHTML = `<p class="be-note">${errText(e)}</p>`; }
+  }
+  const dnum = k => Date.UTC(+k.slice(0, 4), +k.slice(5, 7) - 1, +k.slice(8)) / 864e5;
+  function bankOrder(items, day) {
+    const n = dnum(day), mo = day.slice(5, 7);
+    return items.filter(r => !r.days.some(x => x !== day && Math.abs(dnum(x) - n) < 60))
+      .map(r => ({ ...r, g: r.days.some(x => x.slice(5, 7) === mo && n - dnum(x) >= 300) ? 0 : r.days.length ? 2 : 1 }))
+      .sort((a, b) => a.g - b.g || a.created_at - b.created_at || a.id - b.id);
   }
   // ---------- окно дня ----------
   // базовые цвета — первые D.base (colors в challenge-data.js); оттенок из moreColors в окне показывается своим базовым (семья f или ближайший)
@@ -308,20 +337,17 @@
       await api('/day', body);
       D = await api('?m=' + ym); draw(); dlg.close(); // сохранено — окно закрывается, календарь уже с новой темой
     });
-    // «📚 Из банка»: случайная тема из банка — сначала те, что дольше всего не ставились; каждое нажатие — другая
-    let bank = null; const bankSeen = new Set();
+    // «📚 Из банка» — по очереди, каждое нажатие — следующая: сначала темы, стоявшие в этом же месяце в прошлые годы (год назад и раньше),
+    // потом ещё нигде не стоявшие, потом остальные; внутри — добавленные давнее всего. Темы, стоящие ближе 60 дней к этому дню, не предлагаются
+    let bank = null, bankI = 0;
     q('[data-a=bank]').onclick = async () => {
-      try { bank = bank || await bankLoad(); } catch (e) { st.textContent = '⚠ ' + errText(e); return; }
-      const curK = (val('subject')[1] || val('subject')[0]).trim().toLowerCase();
-      let pool = bank.filter(r => !bankSeen.has(r.id) && (r.ru || r.en || '').trim().toLowerCase() !== curK);
-      if (!pool.length) { bankSeen.clear(); pool = bank.filter(r => (r.ru || r.en || '').trim().toLowerCase() !== curK); }
-      if (!pool.length) { st.textContent = bank.length ? 'В банке больше нет других тем.' : 'Банк пока пуст — он заполняется темами, которые вы вписываете.'; return; }
-      const last = r => r.days.filter(x => x !== day).sort().pop() || '';
-      pool.sort((a, b) => last(a) < last(b) ? -1 : last(a) > last(b) ? 1 : 0);
-      const pick = pool.slice(0, Math.max(3, Math.ceil(pool.length / 3)))[Math.floor(Math.random() * Math.min(pool.length, Math.max(3, Math.ceil(pool.length / 3))))];
-      bankSeen.add(pick.id);
+      try { bank = bank || bankOrder(await bankLoad(), day); } catch (e) { st.textContent = '⚠ ' + errText(e); return; }
+      const curK = (val('subject')[1] || val('subject')[0] || val('subject')[2]).trim().toLowerCase();
+      const list = bank.filter(r => (r.ru || r.en || r.lv || '').trim().toLowerCase() !== curK);
+      if (!list.length) { st.textContent = 'В банке нет подходящих тем — добавьте: «📚 Банк тем».'; return; }
+      const pick = list[bankI++ % list.length];
       ['en', 'ru', 'lv'].forEach(l => { q(`[data-f="subject"][data-l="${l}"]`).value = pick[l] || ''; });
-      st.textContent = `📚 Из банка${pick.days.length ? ' · уже было: ' + pick.days.map(dShort).join(', ') : ''} — сохраните, если подходит`;
+      st.textContent = `📚 ${pick.g === 0 ? 'Тема этого месяца прошлых лет' : 'Из банка'} · добавлена ${dShort(new Date(pick.created_at * 1000).toLocaleDateString('sv-SE'))}${pick.days.length ? ' · стояла: ' + pick.days.map(dShort).join(', ') : ''} — сохраните, если подходит`;
     };
     q('[data-a=reroll]').onclick = () => run(async () => { const r = await api('/reroll', { day, exclude: tried }); tried.push(r.day.item); await after(r); });
     q('[data-a=swap]').onclick = () => { const s = q('[data-swap]'); s.hidden = false; s.focus(); };

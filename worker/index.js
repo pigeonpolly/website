@@ -3,7 +3,7 @@
 // Данные — Cloudflare D1 (env.DB), картинки челленджа — R2 (env.MEDIA, папка challenge/), старые ещё и в KV (env.IMAGES), пока идёт перенос. Блог — worker/blog.js (картинки блога в R2, env.MEDIA).
 import { blogApi, blogPage, visitor, anonCode, claimAnon, birdName } from './blog.js';
 import { translateAll, translateTo, ABOUT } from './translate.js';
-import { challengeApi, challengeCron, planDayColors, CHALLENGE_TABLES } from './challenge-days.js'; // план тем челленджа (docs/challenge.md «Подбор тем»)
+import { challengeApi, challengeCron, planDayColors, CHALLENGE_TABLES, CHALLENGE_ALTER } from './challenge-days.js'; // план тем челленджа (docs/challenge.md «Подбор тем»)
 import { CH_DEFAULTS, CH_RANGE } from './challenge-plan.js';
 import '../site/assets/can-do.js'; // PPCanDo — что можно с вещью (этап 7)
 const PPCanDo = globalThis.PPCanDo;
@@ -421,7 +421,7 @@ async function ensureSchema(env) {
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER,
-    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER]) {
+    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...CHALLENGE_ALTER]) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   // «Выбор Полли» подешевел с 50 до 11 пуговок: уже начисленные записи пересчитать один раз, баланс = сумма журнала
