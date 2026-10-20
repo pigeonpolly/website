@@ -172,6 +172,8 @@
         <div class="bed-grid" data-grid></div>
         <p class="bed-tools">${[['pen', '✏️ Рисовать'], ['erase', '🧽 Стереть'], ['fill', '🪣 Заливка']].map(([k, n]) => `<button type="button" class="pill-btn" data-tool="${k}">${n}</button>`).join('')}<button type="button" class="pill-btn" data-clear>🗑 Очистить</button></p>
       </div><div class="bed-right">
+        <b>Из картинки</b> <small>— фото или рисунок станет пиксельным 16×16, дальше можно править</small>
+        <div class="bed-row bed-img"><label class="pill-btn">📷 Загрузить картинку<input type="file" accept="image/*" data-img hidden></label><label>Цветов <select data-imgn>${[3, 4, 6, 8, 12].map(n => `<option${n === 6 ? ' selected' : ''}>${n}</option>`).join('')}</select></label><label><input type="checkbox" data-imgbg checked> Убрать фон</label><label><input type="checkbox" data-imgfill> Заполнить квадрат (обрезать края)</label></div>
         <b>Шаблоны</b><div class="bed-tpls">${Object.entries(B.TEMPLATES).map(([k, t]) => `<button type="button" data-tpl="${k}" title="${esc(t.n[1])}"><span class="sw-medal has-ring" style="--bg:${t.bg};--ring:#C98A1E"><b>${B.svg(B.fromTemplate(k))}</b></span></button>`).join('')}</div>
         <b>Цвета рисунка</b> <small>— нажмите, чтобы рисовать этим цветом; круглая кнопка рядом — поменять цвет</small><div class="bed-pal" data-pal></div>
         <div class="bed-row"><label>Фон медали <input type="color" data-bg></label><label>Обводка медали <input type="color" data-ring></label><label><input type="checkbox" data-ol> Контур рисунка <input type="color" data-olc></label></div>
@@ -215,6 +217,44 @@
     ['[data-sym]', '[data-symc]', '[data-symp]'].forEach(s => { q(s).onchange = symNow; }); q('[data-symt]').oninput = symNow;
     q('[data-recolor]').onclick = () => { const k = 40 + Math.random() * 280; for (const c of Object.keys(d.pal)) { const [h, s, l] = hsl(d.pal[c]); if (s > .15) d.pal[c] = hex((h + k) % 360, s, l); } const [h, s, l] = hsl(d.bg); d.bg = hex((h + k) % 360, s, l); paint(); };
     q('[data-auto]').onclick = () => { d = B.suggest((theme || []).join(' '), m); cur = Object.keys(d.pal)[0]; paint(); };
+    // 📷 картинка → 16×16: вписать в квадрат, сжать, свести к N цветам (k-средних), фон (цвет по краям) — убрать; число цветов и фон можно переключать
+    let img = null;
+    const fromImg = () => {
+      if (!img) return;
+      const big = document.createElement('canvas'), sm = document.createElement('canvas'); big.width = big.height = 128; sm.width = sm.height = B.N;
+      const k = (q('[data-imgfill]').checked ? Math.max : Math.min)(128 / img.width, 128 / img.height), w = img.width * k, h = img.height * k, bx = big.getContext('2d', { willReadFrequently: true });
+      bx.imageSmoothingQuality = 'high'; bx.drawImage(img, (128 - w) / 2, (128 - h) / 2, w, h);
+      const sx = sm.getContext('2d', { willReadFrequently: true }); sx.imageSmoothingQuality = 'high'; sx.drawImage(big, 0, 0, B.N, B.N);
+      const px = sx.getImageData(0, 0, B.N, B.N).data, pts = [];
+      for (let i = 0; i < B.N * B.N; i++) if (px[i * 4 + 3] >= 110) pts.push([px[i * 4], px[i * 4 + 1], px[i * 4 + 2], i]);
+      if (!pts.length) { st.textContent = '⚠ В картинке нет видимых пикселей.'; return; }
+      const n = Math.min(+q('[data-imgn]').value, pts.length), dist = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
+      const cs = [pts[0].slice(0, 3)]; // центры: каждый следующий — самый далёкий от уже выбранных
+      while (cs.length < n) { let best = pts[0], bd = -1; for (const p of pts) { const dd = Math.min(...cs.map(c => dist(p, c))); if (dd > bd) { bd = dd; best = p; } } cs.push(best.slice(0, 3)); }
+      const lab = new Map();
+      for (let it = 0; it < 12; it++) {
+        const sum = cs.map(() => [0, 0, 0, 0]);
+        for (const p of pts) { let bi = 0; cs.forEach((c, j) => { if (dist(p, c) < dist(p, cs[bi])) bi = j; }); lab.set(p[3], bi); sum[bi][0] += p[0]; sum[bi][1] += p[1]; sum[bi][2] += p[2]; sum[bi][3]++; }
+        sum.forEach((v, j) => { if (v[3]) cs[j] = [v[0] / v[3], v[1] / v[3], v[2] / v[3]]; });
+      }
+      const grid = Array.from({ length: B.N * B.N }, (_, i) => lab.has(i) ? lab.get(i) : -1);
+      if (q('[data-imgbg]').checked) { // фон — самый частый цвет по краям, убираем его заливкой от краёв
+        const edge = [], cnt = {}; for (let i = 0; i < B.N; i++) edge.push(i, (B.N - 1) * B.N + i, i * B.N, i * B.N + B.N - 1);
+        edge.forEach(i => { if (grid[i] >= 0) cnt[grid[i]] = (cnt[grid[i]] || 0) + 1; });
+        const bgc = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0];
+        if (bgc !== undefined && cnt[bgc] >= B.N) { const stack = edge.filter(i => grid[i] === +bgc); while (stack.length) { const i = stack.pop(); if (grid[i] !== +bgc) continue; grid[i] = -1; const x = i % B.N, y = (i - x) / B.N;
+          if (x > 0) stack.push(i - 1); if (x < B.N - 1) stack.push(i + 1); if (y > 0) stack.push(i - B.N); if (y < B.N - 1) stack.push(i + B.N); } }
+      }
+      const used = [...new Set(grid.filter(v => v >= 0))], pal = {}, key = {};
+      used.forEach((v, j) => { key[v] = LETTERS[j]; pal[LETTERS[j]] = '#' + cs[v].map(c => Math.round(c).toString(16).padStart(2, '0')).join(''); });
+      d = { ...d, tpl: 'img', pal, rows: Array.from({ length: B.N }, (_, y) => grid.slice(y * B.N, y * B.N + B.N).map(v => v >= 0 ? key[v] : '.').join('')), outline: '' };
+      cur = Object.keys(pal)[0] || 'a'; tool = 'pen'; st.textContent = '✓ Картинка стала пиксельной — можно дорисовать и сохранить'; paint();
+    };
+    q('[data-img]').onchange = e => {
+      const f = e.target.files[0]; if (!f) return; const url = URL.createObjectURL(f), im = new Image();
+      im.onload = () => { img = im; URL.revokeObjectURL(url); fromImg(); }; im.onerror = () => { st.textContent = '⚠ Не получилось открыть картинку.'; }; im.src = url; e.target.value = '';
+    };
+    q('[data-imgn]').onchange = fromImg; q('[data-imgbg]').onchange = fromImg; q('[data-imgfill]').onchange = fromImg;
     q('[data-x]').onclick = () => dlg.close();
     q('[data-save]').onclick = async () => {
       st.textContent = '…';
