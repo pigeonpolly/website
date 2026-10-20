@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=8a4c2411">
+<link rel="stylesheet" href="/assets/style.css?v=0cfa2dca">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <script src="/assets/site.js?v=2361f119" defer></script>
 <script src="/assets/polly.js?v=573aaaf7" defer></script>
@@ -87,7 +87,7 @@
     <a class="pill-btn" href="/bird/" id="ch-b-profile">🐦 My profile</a>
     <button type="button" class="pill-btn" data-panel="up" aria-expanded="false">⬆ Upload my sketch</button>
     <button type="button" class="pill-btn" data-panel="card" aria-expanded="false">📸 Make a card</button>
-    <button type="button" class="pill-btn" data-panel="cal" aria-expanded="false">📅 Month calendar</button>
+    <button type="button" class="pill-btn" id="ch-b-month" aria-pressed="false">📅 Month calendar</button>
     <button type="button" class="pill-btn ch-tbtn" data-panel="timer" aria-expanded="false" id="ch-timer-box"><span aria-hidden="true">⏱</span> <b class="ch-tclock" id="ch-tclock"></b> <span>Timer</span></button>
     <button type="button" class="pill-btn pill-fill ch-car-btn" id="ch-car" hidden>📸 Карусели</button>
   </div>
@@ -112,20 +112,6 @@
         <div class="ch-share-card" id="ch-card"></div>
       </div>
     </div>
-    <div class="ch-panel" id="ch-p-cal" hidden>
-      <div class="diary">
-        <div class="diary-head">
-          <h2 class="section-title">Calendar of themes</h2>
-          <p>Missed a day? Pick it here and draw its theme.</p>
-        </div>
-        <div class="diary-nav">
-          <button type="button" id="ch-prev">‹</button>
-          <span id="ch-month"></span>
-          <button type="button" id="ch-next">›</button>
-        </div>
-        <div class="diary-grid" id="ch-grid"></div>
-      </div>
-    </div>
     <div class="ch-panel" id="ch-p-timer" hidden>
       <div class="ch-card-box">
         <div class="ch-level" id="ch-level" role="group" aria-label="Level"></div>
@@ -138,6 +124,17 @@
           <button class="cta-link ch-reset" type="button" id="ch-reset">Reset</button>
         </div>
       </div>
+    </div>
+  </div>
+  <!-- календарь тем: всегда видна неделя (листается ˄ ˅), кнопка «Календарь на месяц» — весь месяц -->
+  <div class="ch-weekbox" id="ch-weekbox">
+    <div class="diary">
+      <div class="diary-nav">
+        <button type="button" id="ch-prev">‹</button>
+        <span id="ch-month"></span>
+        <button type="button" id="ch-next">›</button>
+      </div>
+      <div class="diary-grid" id="ch-grid"></div>
     </div>
   </div>
   <!-- всегда видно: слева тема дня с переключателем Ч/Б, справа работы участников -->
@@ -188,7 +185,7 @@
 <script src="/assets/extra-palettes.js?v=9167b08c" defer></script>
 <script src="/api/extra-palettes.js" defer></script>
 <script src="/assets/challenge-theme.js?v=62a47cd0" defer></script>
-<script src="/assets/challenge.js?v=002e997c" defer></script>
+<script src="/assets/challenge.js?v=d10c8789" defer></script>
 <script src="https://accounts.google.com/gsi/client" async defer></script>
 <script src="/assets/catalog-ui.js?v=7148ceca" defer></script>
 <script src="/assets/sketch-wall.js?v=44c4a4b0" defer></script>

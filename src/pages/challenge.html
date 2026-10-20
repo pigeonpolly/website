@@ -7,7 +7,7 @@
     <a class="pill-btn" href="/bird/" id="ch-b-profile">🐦 My profile</a>
     <button type="button" class="pill-btn" data-panel="up" aria-expanded="false">⬆ Upload my sketch</button>
     <button type="button" class="pill-btn" data-panel="card" aria-expanded="false">📸 Make a card</button>
-    <button type="button" class="pill-btn" data-panel="cal" aria-expanded="false">📅 Month calendar</button>
+    <button type="button" class="pill-btn" id="ch-b-month" aria-pressed="false">📅 Month calendar</button>
     <button type="button" class="pill-btn ch-tbtn" data-panel="timer" aria-expanded="false" id="ch-timer-box"><span aria-hidden="true">⏱</span> <b class="ch-tclock" id="ch-tclock"></b> <span>Timer</span></button>
     <button type="button" class="pill-btn pill-fill ch-car-btn" id="ch-car" hidden>📸 Карусели</button>
   </div>
@@ -32,20 +32,6 @@
         <div class="ch-share-card" id="ch-card"></div>
       </div>
     </div>
-    <div class="ch-panel" id="ch-p-cal" hidden>
-      <div class="diary">
-        <div class="diary-head">
-          <h2 class="section-title">Calendar of themes</h2>
-          <p>Missed a day? Pick it here and draw its theme.</p>
-        </div>
-        <div class="diary-nav">
-          <button type="button" id="ch-prev">‹</button>
-          <span id="ch-month"></span>
-          <button type="button" id="ch-next">›</button>
-        </div>
-        <div class="diary-grid" id="ch-grid"></div>
-      </div>
-    </div>
     <div class="ch-panel" id="ch-p-timer" hidden>
       <div class="ch-card-box">
         <div class="ch-level" id="ch-level" role="group" aria-label="Level"></div>
@@ -58,6 +44,17 @@
           <button class="cta-link ch-reset" type="button" id="ch-reset">Reset</button>
         </div>
       </div>
+    </div>
+  </div>
+  <!-- календарь тем: всегда видна неделя (листается ˄ ˅), кнопка «Календарь на месяц» — весь месяц -->
+  <div class="ch-weekbox" id="ch-weekbox">
+    <div class="diary">
+      <div class="diary-nav">
+        <button type="button" id="ch-prev">‹</button>
+        <span id="ch-month"></span>
+        <button type="button" id="ch-next">›</button>
+      </div>
+      <div class="diary-grid" id="ch-grid"></div>
     </div>
   </div>
   <!-- всегда видно: слева тема дня с переключателем Ч/Б, справа работы участников -->

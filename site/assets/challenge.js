@@ -33,7 +33,7 @@
     hint2Bw: ['Build up the darks with hatching, dots or solid fills.', 'Наберите тёмные места штриховкой, точками или заливкой.', 'Veido tumšās vietas ar svītrojumu, punktiem vai pilnu aizkrāsojumu.'],
     bday: ['Today is my birthday! Draw something festive with me 🎂', 'Сегодня мой день рождения! Нарисуйте со мной что-нибудь праздничное 🎂', 'Šodien ir mana dzimšanas diena! Uzzīmē ar mani kaut ko svētku 🎂'],
     today: ['Today', 'Сегодня', 'Šodien'],
-    week: ['Themes of the week', 'Темы недели', 'Nedēļas tēmas'], soon: ['coming soon', 'скоро', 'drīzumā'], // 20.10.2026: неделя пн–вс, темы, которые уже есть
+    prevWeek: ['Previous week', 'Предыдущая неделя', 'Iepriekšējā nedēļa'], nextWeek: ['Next week', 'Следующая неделя', 'Nākamā nedēļa'], // 20.10.2026: календарь — неделя всегда видна
     bwQ: ['Only a pen or ink today?', 'Сегодня только ручка или тушь?', 'Šodien tikai pildspalva vai tuša?'],
     saveShare: ['Save to photos or share', 'Сохранить в фото или поделиться', 'Saglabāt foto vai dalīties'],
     downloadFile: ['Download as a file', 'Скачать файлом', 'Lejupielādēt failu'],
@@ -76,19 +76,6 @@
 
   // ---------- календарь ----------
   const $ = s => root.querySelector(s);
-  // темы недели (пн–вс): уже вписанные видны и наперёд, пустые — «скоро»; прошедшие дни и сегодня можно открыть
-  function weekHtml() {
-    const mon = new Date(today.getFullYear(), today.getMonth(), today.getDate() - (today.getDay() + 6) % 7);
-    const rows = [...Array(7)].map((_, k) => {
-      const d = new Date(mon.getFullYear(), mon.getMonth(), mon.getDate() + k), key = keyOf(d), th = themeFor(d), open = key <= todayKey;
-      const subj = th.loading || !th.subject ? `<i>${t('soon')}</i>` : th.subject;
-      const cols = !bw && !th.loading && th.subject && th.colors.length ? `<span class="chw-c">${th.colors.slice(0, 6).map(c => `<i style="background:${c.hex}"></i>`).join('')}</span>` : '';
-      const inner = `<span class="chw-d">${d.toLocaleDateString(locale, { weekday: 'short' })} ${d.getDate()}</span><span class="chw-s">${subj}</span>${cols}`;
-      const cls = `chw-row${key === todayKey ? ' now' : ''}${key === selKey ? ' sel' : ''}`;
-      return open ? `<button type="button" class="${cls}" data-wd="${key}">${inner}</button>` : `<div class="${cls}">${inner}</div>`;
-    }).join('');
-    return `<div class="ch-week"><b>${t('week')}</b>${rows}</div>`;
-  }
   function renderCal(anim) {
     const weekday = sel.toLocaleDateString(locale, { weekday: 'long' });
     const month = sel.toLocaleDateString(locale, { month: 'long', year: 'numeric' });
@@ -110,8 +97,7 @@
       </div>
     </div>
     ${selKey !== todayKey ? `<p class="back-today"><button type="button" id="ch-today">${t('backToday')}</button></p>` : ''}
-    <div class="tip"><b>${t('tip')}</b><p>${theme.tip}</p></div>${weekHtml()}`;
-    root.querySelectorAll('[data-wd]').forEach(b => b.addEventListener('click', () => selectDay(new Date(+b.dataset.wd.slice(0, 4), +b.dataset.wd.slice(5, 7) - 1, +b.dataset.wd.slice(8)))));
+    <div class="tip"><b>${t('tip')}</b><p>${theme.tip}</p></div>`;
     const old = $('.page.old'); old && old.addEventListener('animationend', () => old.remove());
     const bt = $('#ch-today'); bt && bt.addEventListener('click', () => { view = new Date(today.getFullYear(), today.getMonth(), 1); selectDay(new Date(today)); });
     renderMin();
@@ -264,26 +250,46 @@
     }
     return n;
   }
+  // календарь тем: по умолчанию — неделя (пн–вс, листается ˄ ˅), «📅 Календарь на месяц» — весь месяц (‹ ›).
+  // Будущие дни: тема уже вписана — видна (нажать нельзя, 🔒 в углу), нет — только замок
+  let calMonth = false;
+  const mondayOf = d => new Date(d.getFullYear(), d.getMonth(), d.getDate() - (d.getDay() + 6) % 7);
+  let wk = mondayOf(today);
+  function dayCell(d, label) {
+    const k = keyOf(d), e = diary[k], i = d.getDate(), t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
+    if (d < START) return `<span class="day before"><b>${label}</b></span>`;
+    const th = themeFor(d), shown = !th.loading && th.subject;
+    const dots = `<span class="d-dots">${bw ? '<em>✒</em>' : th.colors.map(c => `<i style="background:${c.hex}"></i>`).join('')}</span>`;
+    if (d > t0) return shown
+      ? `<span class="day locked has${th.extra ? ' extra' : ''}${th.bday ? ' bday' : ''}" title="${t('locked')}"><b>${label}</b><span class="d-subj">${th.subject}</span>${dots}<i class="d-lock" aria-hidden="true">🔒</i></span>`
+      : `<span class="day locked${i === extraDay(d.getFullYear(), d.getMonth()) ? ' extra' : ''}${d.getMonth() === 0 && i === 23 ? ' bday' : ''}" title="${t('locked')}"><b>${label}</b><i aria-hidden="true">🔒</i></span>`;
+    return `<button type="button" class="day${th.extra ? ' extra' : ''}${th.bday ? ' bday' : ''}${k === todayKey ? ' today' : ''}${k === selKey ? ' sel' : ''}" data-k="${k}">`
+      + (e && e.img ? `<img src="${e.img}" alt="">` : '') + `<b>${label}</b><span class="d-subj">${th.subject}</span>${dots}</button>`;
+  }
   function renderDiary() {
-    $('#ch-month').textContent = view.toLocaleDateString(locale, { month: 'long', year: 'numeric' }).replace(/\s*г\.$/, '');
-    const first = (view.getDay() + 6) % 7, days = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
     const names = [...Array(7)].map((_, i) => new Date(2024, 0, 1 + i).toLocaleDateString(locale, { weekday: 'short' }));
-    let html = names.map(n => `<span class="dow">${n}</span>`).join('') + '<span></span>'.repeat(first);
-    const t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-    for (let i = 1; i <= days; i++) {
-      const d = new Date(view.getFullYear(), view.getMonth(), i), k = keyOf(d), e = diary[k];
-      if (d < START) { html += `<span class="day before"><b>${i}</b></span>`; continue; }
-      if (d > t0) { html += `<span class="day locked${i === extraDay(d.getFullYear(), d.getMonth()) ? ' extra' : ''}${d.getMonth() === 0 && i === 23 ? ' bday' : ''}" title="${t('locked')}"><b>${i}</b><i aria-hidden="true">🔒</i></span>`; continue; }
-      const th = themeFor(d);
-      html += `<button type="button" class="day${th.extra ? ' extra' : ''}${th.bday ? ' bday' : ''}${k === todayKey ? ' today' : ''}${k === selKey ? ' sel' : ''}" data-k="${k}">`
-        + (e && e.img ? `<img src="${e.img}" alt="">` : '')
-        + `<b>${i}</b><span class="d-subj">${th.subject}</span><span class="d-dots">${bw ? '<em>✒</em>' : th.colors.map(c => `<i style="background:${c.hex}"></i>`).join('')}</span></button>`;
+    let html = names.map(n => `<span class="dow">${n}</span>`).join('');
+    if (calMonth) {
+      $('#ch-month').textContent = view.toLocaleDateString(locale, { month: 'long', year: 'numeric' }).replace(/\s*г\.$/, '');
+      const first = (view.getDay() + 6) % 7, days = new Date(view.getFullYear(), view.getMonth() + 1, 0).getDate();
+      html += '<span></span>'.repeat(first);
+      for (let i = 1; i <= days; i++) html += dayCell(new Date(view.getFullYear(), view.getMonth(), i), i);
+    } else {
+      const end = new Date(wk.getFullYear(), wk.getMonth(), wk.getDate() + 6), o = { day: 'numeric', month: 'short' };
+      $('#ch-month').textContent = `${wk.toLocaleDateString(locale, o)} – ${end.toLocaleDateString(locale, { ...o, year: 'numeric' })}`.replace(/\s*г\.$/, '');
+      html = ''; // в неделе у каждого дня своя подпись «пн 19» (на телефоне неделя — списком)
+      for (let k = 0; k < 7; k++) { const d = new Date(wk.getFullYear(), wk.getMonth(), wk.getDate() + k); html += dayCell(d, `${names[k]} ${d.getDate()}`); }
     }
     $('#ch-grid').innerHTML = html;
+    $('#ch-weekbox').classList.toggle('month', calMonth);
+    $('#ch-prev').textContent = calMonth ? '‹' : '˄'; $('#ch-next').textContent = calMonth ? '›' : '˅';
+    $('#ch-prev').setAttribute('aria-label', t(calMonth ? 'prev' : 'prevWeek')); $('#ch-next').setAttribute('aria-label', t(calMonth ? 'next' : 'nextWeek'));
+    const mb = document.getElementById('ch-b-month'); if (mb) mb.setAttribute('aria-pressed', String(calMonth));
     let lg = $('#ch-legend');
     if (!lg) { lg = document.createElement('p'); lg.id = 'ch-legend'; lg.className = 'extra-legend'; $('#ch-grid').after(lg); }
     lg.innerHTML = `<span aria-hidden="true">✦</span> ${t('extra')}`;
-    $('#ch-prev').disabled = view <= START;
+    lg.hidden = !calMonth && !$('#ch-grid .day.extra'); // в неделе — только если в ней день ЭКСТРА
+    $('#ch-prev').disabled = calMonth ? view <= START : wk <= START;
   }
   $('#ch-grid').addEventListener('click', e => {
     const b = e.target.closest('button.day'); if (!b) return;
@@ -295,15 +301,23 @@
     sel = d; selKey = keyOf(d); theme = themeFor(d);
     renderCal(true); resetTimer(); $('#ch-card').innerHTML = ''; renderToday(); renderDiary();
   }
-  $('#ch-prev').addEventListener('click', () => { view.setMonth(view.getMonth() - 1); renderDiary(); });
-  $('#ch-next').addEventListener('click', () => { view.setMonth(view.getMonth() + 1); renderDiary(); });
+  const stepWeek = k => { wk = new Date(wk.getFullYear(), wk.getMonth(), wk.getDate() + 7 * k); renderDiary(); };
+  $('#ch-prev').addEventListener('click', () => { if (!calMonth) return stepWeek(-1); view.setMonth(view.getMonth() - 1); renderDiary(); });
+  $('#ch-next').addEventListener('click', () => { if (!calMonth) return stepWeek(1); view.setMonth(view.getMonth() + 1); renderDiary(); });
+  // «📅 Календарь на месяц»: весь месяц той недели, что видна; ещё раз — назад к неделе (той, где сегодня, если месяц сегодняшний)
+  const mbtn = document.getElementById('ch-b-month');
+  if (mbtn) mbtn.addEventListener('click', () => {
+    calMonth = !calMonth;
+    if (calMonth) { const th = new Date(wk.getFullYear(), wk.getMonth(), wk.getDate() + 3); view = new Date(th.getFullYear(), th.getMonth(), 1); } // месяц, где четверг недели
+    else wk = view.getFullYear() === today.getFullYear() && view.getMonth() === today.getMonth() ? mondayOf(today) : mondayOf(view);
+    renderDiary(); $('#ch-weekbox').scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+  });
   const tb = document.createElement('button'); tb.type = 'button'; tb.id = 'ch-goto-today'; tb.className = 'diary-today'; tb.textContent = t('today');
   $('#ch-next').after(tb);
   tb.addEventListener('click', () => {
-    view = new Date(today.getFullYear(), today.getMonth(), 1); selectDay(new Date(today));
+    view = new Date(today.getFullYear(), today.getMonth(), 1); wk = mondayOf(today); selectDay(new Date(today));
     root.scrollIntoView({ behavior: 'smooth', block: 'start' });
   });
-  $('#ch-prev').setAttribute('aria-label', t('prev')); $('#ch-next').setAttribute('aria-label', t('next'));
 
   // ---------- карточка «поделиться» ----------
   const POLLY = ['......ddd.....', '.....dbbbd....', '....dbbwwbd...', '....dbbwkbdoo.', '....dbbbbbdo..', '...dbbbbbbd...', '..dbbsbbbbd...',

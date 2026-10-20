@@ -728,6 +728,24 @@ button.day:hover { background: rgba(255, 255, 255, .12); transform: translateY(-
 .diary-grid .day.sel { background: rgba(240, 169, 135, .22); }
 .diary-grid .day.locked { background: repeating-linear-gradient(135deg, rgba(255,255,255,.04) 0 8px, rgba(255,255,255,.07) 8px 16px); align-items: center; justify-content: center; }
 .diary-grid .day.locked i { font-style: normal; font-size: 18px; opacity: .5; }
+.extra-legend[hidden] { display: none !important; }
+.diary-grid .day.locked.has { align-items: stretch; justify-content: space-between; } .diary-grid .day.locked .d-lock { position: absolute; right: 6px; top: 4px; font-size: 12px; }
+.diary-grid .day.locked.has .d-subj { opacity: .85; }
+/* календарь тем на /challenge/: всегда открыт; неделя — по умолчанию */
+.ch-weekbox { padding: 4px 18px 14px; border-radius: 22px; background: rgba(255, 255, 255, .05); border: 1px solid var(--line); }
+.ch-weekbox .diary { margin-top: 0; } .ch-weekbox #ch-month { text-transform: none; } .ch-weekbox .diary-nav { margin: 10px 0 10px; }
+.ch-weekbox:not(.month) .diary-grid .day { min-height: 84px; } .ch-weekbox:not(.month) .diary-grid .day b { text-transform: capitalize; }
+@media (max-width: 700px) {
+  .ch-weekbox { padding: 2px 10px 10px; min-width: 0; } .ch-weekbox .diary-nav { gap: 8px; font-size: 14px; } .ch-weekbox .diary-nav #ch-month { flex: 1; min-width: 0; text-transform: none; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+  .ch-weekbox .diary-nav button { flex: none; }
+  .ch-weekbox:not(.month) .diary-grid { grid-template-columns: 1fr; gap: 4px; }
+  .ch-weekbox:not(.month) .diary-grid .day { min-height: 0; padding: 7px 10px 7px 64px; flex-direction: row; align-items: center; justify-content: space-between; }
+  .ch-weekbox:not(.month) .diary-grid .day b { top: 50%; transform: translateY(-50%); left: 10px; font-size: 12px; }
+  .ch-weekbox:not(.month) .d-subj { display: block; }
+  .ch-weekbox:not(.month) .diary-grid .day.locked:not(.has) { justify-content: flex-end; }
+  .ch-weekbox:not(.month) .d-dots i { width: 10px; height: 10px; }
+  .ch-weekbox:not(.month) .diary-grid .day.locked .d-lock { position: static; margin-left: 6px; } .ch-weekbox:not(.month) .d-subj { flex: 1; }
+}
 .back-today { text-align: center; margin: 14px 0 0; }
 .back-today button { background: none; border: 0; color: var(--peach); font: 500 15px var(--sans); cursor: pointer; text-decoration: underline; }
 @media (max-width: 700px) {
