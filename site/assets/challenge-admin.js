@@ -80,7 +80,7 @@
   const baseCols = list => [...new Set(list.map(toBase).filter(k => k >= 0))];
   // цветовой круг (12 секторов по часовой, жёлтый сверху): 6 базовых + 6 промежуточных из moreColors; гармонии — сдвиги от главного цвета
   const WHEEL_N = ['yellow', 'olive', 'green', 'turquoise', 'blue', 'indigo', 'purple', 'fuchsia', 'red', 'coral', 'orange', 'ochre'];
-  const HARM = [['mono', 'Монохромная', [0]], ['comp', 'Комплементарная', [0, 6]], ['analog', 'Аналоговая', [-1, 0, 1]], ['acomp', 'Аналогово-комплементарная', [-1, 0, 1, 6]],
+  const HARM = [['mono', 'Монохромная', [0]], ['comp', 'Комплементарная', [0, 6]], ['analog', 'Аналоговая', [-1, 0, 1]], ['analog2', 'Аналоговая через один', [0, 2]], ['acomp', 'Аналогово-комплементарная', [-1, 0, 1, 6]],
     ['triad', 'Триада', [0, 4, 8]], ['split', 'Раздельно-комплементарная', [0, 5, 7]], ['tetrad', 'Тетрада', [0, 2, 6, 8]]];
   const wheelIdx = () => WHEEL_N.map(n => D.colors.findIndex(c => c.n[0] === n));
   const harmCols = (h, rot) => { const w = wheelIdx(); return (HARM.find(x => x[0] === h) || HARM[1])[2].map(o => w[((rot + o) % 12 + 12) % 12]); };
