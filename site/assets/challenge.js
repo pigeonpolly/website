@@ -251,14 +251,15 @@
     return n;
   }
   // календарь тем: по умолчанию — неделя (пн–вс, листается ˄ ˅), «📅 Календарь на месяц» — весь месяц (‹ ›).
-  // Будущие дни: тема уже вписана — видна (нажать нельзя, 🔒 в углу), нет — только замок
+  // Будущие дни текущей недели: тема уже вписана — видна (нажать нельзя, 🔒 в углу); дальше и пустые — только замок
   let calMonth = false;
   const mondayOf = d => new Date(d.getFullYear(), d.getMonth(), d.getDate() - (d.getDay() + 6) % 7);
   let wk = mondayOf(today);
   function dayCell(d, label) {
     const k = keyOf(d), e = diary[k], i = d.getDate(), t0 = new Date(today.getFullYear(), today.getMonth(), today.getDate());
     if (d < START) return `<span class="day before"><b>${label}</b></span>`;
-    const th = themeFor(d), shown = !th.loading && th.subject;
+    const w0 = mondayOf(today), w7 = new Date(w0.getFullYear(), w0.getMonth(), w0.getDate() + 7);
+    const th = themeFor(d), shown = !th.loading && th.subject && d < w7; // наперёд видны только темы текущей недели
     const dots = `<span class="d-dots">${bw ? '<em>✒</em>' : th.colors.map(c => `<i style="background:${c.hex}"></i>`).join('')}</span>`;
     if (d > t0) return shown
       ? `<span class="day locked has${th.extra ? ' extra' : ''}${th.bday ? ' bday' : ''}" title="${t('locked')}"><b>${label}</b><span class="d-subj">${th.subject}</span>${dots}<i class="d-lock" aria-hidden="true">🔒</i></span>`
