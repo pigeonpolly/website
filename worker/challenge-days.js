@@ -2,22 +2,41 @@
 // Подбор предметов — worker/challenge-plan.js; предметы с тегами — site/assets/challenge-items.json (build.py).
 // Октябрь 2026 — из site/assets/challenge-2026-10.json (tools/challenge_oct.js), один раз (метка meta 'chplan_oct'). Ноябрь и дальше — генератор:
 // cron с 20-го создаёт следующий месяц, текущий — если его почему-то нет. Созданный месяц сам не меняется, правит только Алина.
-import { planMonth, rowText, rerollDay, checkPlan, dayNum, keyOfNum, poolOf, allColors, baseDay, birthdayIdx, PLAN_FROM, NEW_FROM } from './challenge-plan.js';
+import { planMonth, rowText, rerollDay, checkPlan, dayNum, keyOfNum, poolOf, allColors, baseDay, birthdayIdx, extraDay, PLAN_FROM, NEW_FROM } from './challenge-plan.js';
 
 export const CHALLENGE_TABLES = [
   // день плана: item — индекс предмета в challenge-data.js; тексты — на трёх языках; colors — индексы цветов (colors + moreColors) через запятую: до 1.11.2026 — 3, дальше 2–5;
   // extra_* — Ч/Б-условие дня ЭКСТРА (есть только в день ЭКСТРА); edited — правила Алина; orig — как было при создании (JSON, для «↩ Вернуть как было»)
   `CREATE TABLE IF NOT EXISTS challenge_days (day TEXT PRIMARY KEY, item INTEGER, subject_en TEXT, subject_ru TEXT, subject_lv TEXT,
     tip_en TEXT, tip_ru TEXT, tip_lv TEXT, colors TEXT, time INTEGER, twist_en TEXT, twist_ru TEXT, twist_lv TEXT,
-    extra_en TEXT, extra_ru TEXT, extra_lv TEXT, edited INTEGER DEFAULT 0, orig TEXT, updated_at INTEGER)`,
+    extra_en TEXT, extra_ru TEXT, extra_lv TEXT, edited INTEGER DEFAULT 0, orig TEXT, updated_at INTEGER, pal TEXT)`, // pal — палитра дня ЭКСТРА, выбранная Алиной (ключ картины; нет — по очереди)
   // банк тем Алины: темы дней, которые она правила (edited = 1), + добавленные прямо в банк (manual). k — ключ без регистра и пробелов по краям;
   // days — дни, где тема стоит сейчас, через запятую; hidden — удалена из банка, хотя ещё стоит в каком-то дне
-  `CREATE TABLE IF NOT EXISTS challenge_bank (id INTEGER PRIMARY KEY AUTOINCREMENT, k TEXT UNIQUE, en TEXT, ru TEXT, lv TEXT, days TEXT DEFAULT '', created_at INTEGER, updated_at INTEGER, manual INTEGER DEFAULT 0, hidden INTEGER DEFAULT 0)`,
+  `CREATE TABLE IF NOT EXISTS challenge_bank (id INTEGER PRIMARY KEY AUTOINCREMENT, k TEXT UNIQUE, en TEXT, ru TEXT, lv TEXT, days TEXT DEFAULT '', created_at INTEGER, updated_at INTEGER, manual INTEGER DEFAULT 0, hidden INTEGER DEFAULT 0, tags TEXT DEFAULT '')`, // tags — для каких дней (BANK_TAGS)
 ];
 const bankKey = s => s.map(x => String(x || '').trim().toLowerCase()).find(Boolean) || '';
 const bankKeyOf = s => bankKey([s[1], s[0], s[2]]); // по RU, нет — по EN, LV
 const dayList = s => String(s || '').split(',').filter(Boolean);
-export const CHALLENGE_ALTER = ['ALTER TABLE challenge_bank ADD COLUMN manual INTEGER DEFAULT 0', 'ALTER TABLE challenge_bank ADD COLUMN hidden INTEGER DEFAULT 0'];
+export const CHALLENGE_ALTER = ['ALTER TABLE challenge_bank ADD COLUMN manual INTEGER DEFAULT 0', 'ALTER TABLE challenge_bank ADD COLUMN hidden INTEGER DEFAULT 0',
+  "ALTER TABLE challenge_bank ADD COLUMN tags TEXT DEFAULT ''", 'ALTER TABLE challenge_days ADD COLUMN pal TEXT'];
+// метки темы банка: сезон (тема — только в этот сезон), extra — только в день ЭКСТРА, bday — 23 января, halloween — октябрь, xmas — декабрь и 1–7 января
+export const BANK_TAGS = ['winter', 'spring', 'summer', 'autumn', 'extra', 'bday', 'halloween', 'xmas'];
+const SEAS = ['winter', 'winter', 'spring', 'spring', 'spring', 'summer', 'summer', 'summer', 'autumn', 'autumn', 'autumn', 'winter'];
+const dnOf = k => Date.UTC(+k.slice(0, 4), +k.slice(5, 7) - 1, +k.slice(8)) / 864e5;
+const tagList = s => String(s || '').split(',').filter(t => BANK_TAGS.includes(t));
+// порядок тем банка для дня (окно дня «📚 Из банка» и «Заполнить из банка»): метка этого дня (ЭКСТРА, именины, Хеллоуин, Новый год) →
+// добавленные прямо в банк и темы этого месяца прошлых лет (≥ 300 дней назад) → нигде не стоявшие → остальные; внутри — давно добавленные первыми.
+// Не предлагаются: стоящие ближе 60 дней к этому дню и те, чьи метки к дню не подходят
+export function bankOrder(items, day) {
+  const n = dnOf(day), mo = +day.slice(5, 7), d = +day.slice(8), extra = d === extraDay(+day.slice(0, 4), mo - 1);
+  const fits = t => { const se = t.filter(x => SEAS.includes(x));
+    return !(se.length && !se.includes(SEAS[mo - 1])) && !(t.includes('extra') && !extra) && !(t.includes('bday') && !(mo === 1 && d === 23))
+      && !(t.includes('halloween') && mo !== 10) && !(t.includes('xmas') && !(mo === 12 || (mo === 1 && d <= 7))); };
+  const special = t => (t.includes('extra') && extra) || (t.includes('bday') && mo === 1 && d === 23) || (t.includes('halloween') && mo === 10) || (t.includes('xmas') && (mo === 12 || (mo === 1 && d <= 7)));
+  return items.filter(r => fits(r.tags) && !r.days.some(x => x !== day && Math.abs(dnOf(x) - n) < 60))
+    .map(r => ({ ...r, g: special(r.tags) ? -1 : r.manual || r.days.some(x => x.slice(5, 7) === day.slice(5, 7) && n - dnOf(x) >= 300) ? 0 : r.days.length ? 2 : 1 }))
+    .sort((a, z) => a.g - z.g || a.created_at - z.created_at || a.id - z.id);
+}
 // банк = зеркало правленных дней: тема появилась — в банк (дата — когда день правили), тема ушла из всех дней — из банка (если не добавлена в банк руками)
 async function bankSync(env) {
   const rows = (await env.DB.prepare('SELECT day, subject_en, subject_ru, subject_lv, updated_at FROM challenge_days WHERE edited = 1').all()).results;
@@ -60,10 +79,10 @@ export async function chItems(env) {
 // строка базы ↔ объект плана {day, item, subject, tip, colors, time, twist, extra}
 const toRow = r => ({ day: r.day, item: r.item, subject: L3.map(l => r['subject_' + l] || ''), tip: L3.map(l => r['tip_' + l] || ''),
   colors: String(r.colors || '').split(',').filter(x => x !== '').map(Number), time: r.time, twist: L3.map(l => r['twist_' + l] || ''),
-  extra: r.extra_en || r.extra_ru || r.extra_lv ? L3.map(l => r['extra_' + l] || '') : null, edited: r.edited ? 1 : 0 });
-const COLS = ['item', ...['subject', 'tip', 'twist', 'extra'].flatMap(f => L3.map(l => f + '_' + l)), 'colors', 'time'];
-const colVals = d => [d.item, ...['subject', 'tip', 'twist', 'extra'].flatMap(f => L3.map((l, i) => (d[f] ? String(d[f][i] ?? '') : null) || (f === 'extra' ? null : ''))), (d.colors || []).join(','), d.time];
-const plain = d => ({ day: d.day, item: d.item, subject: d.subject, tip: d.tip, colors: d.colors, time: d.time, twist: d.twist, extra: d.extra });
+  extra: r.extra_en || r.extra_ru || r.extra_lv ? L3.map(l => r['extra_' + l] || '') : null, pal: r.pal || null, edited: r.edited ? 1 : 0 });
+const COLS = ['item', ...['subject', 'tip', 'twist', 'extra'].flatMap(f => L3.map(l => f + '_' + l)), 'colors', 'time', 'pal'];
+const colVals = d => [d.item, ...['subject', 'tip', 'twist', 'extra'].flatMap(f => L3.map((l, i) => (d[f] ? String(d[f][i] ?? '') : null) || (f === 'extra' ? null : ''))), (d.colors || []).join(','), d.time, d.pal || null];
+const plain = d => ({ day: d.day, item: d.item, subject: d.subject, tip: d.tip, colors: d.colors, time: d.time, twist: d.twist, extra: d.extra, pal: d.pal || null });
 function insertSql(env, d) {
   return env.DB.prepare(`INSERT OR IGNORE INTO challenge_days (day, ${COLS.join(', ')}, edited, orig, updated_at) VALUES (?, ${COLS.map(() => '?').join(', ')}, 0, ?, ?)`)
     .bind(d.day, ...colVals(d), JSON.stringify(plain(d)), now());
@@ -205,8 +224,13 @@ export async function challengeApi(req, env, url, h) {
     return h.json({ m: ym, today: rigaToday(), days, tags, works, broken, last, colors: allColors(data), base: data.colors.length, max: LAST, times: data.times });
   }
   // банк тем: список (последние сверху) и удаление
-  const bankList = async () => { await bankSync(env); return h.json({ items: (await env.DB.prepare('SELECT id, en, ru, lv, days, created_at, manual FROM challenge_bank WHERE hidden = 0 ORDER BY created_at DESC, id DESC').all()).results.map(r => ({ ...r, days: dayList(r.days) })) }); };
-  if (m === 'GET' && p === '/api/admin/challenge/bank') return bankList();
+  const bankItems = async () => (await env.DB.prepare('SELECT id, en, ru, lv, days, created_at, manual, tags FROM challenge_bank WHERE hidden = 0 ORDER BY created_at DESC, id DESC').all()).results.map(r => ({ ...r, days: dayList(r.days), tags: tagList(r.tags) }));
+  const bankList = async () => { await bankSync(env); return h.json({ items: await bankItems() }); };
+  if (m === 'GET' && p === '/api/admin/challenge/bank') {
+    const day = String(url.searchParams.get('day') || '');
+    if (/^\d{4}-\d\d-\d\d$/.test(day)) { await bankSync(env); return h.json({ items: bankOrder(await bankItems(), day) }); } // для дня — по порядку «📚 Из банка»
+    return bankList();
+  }
   const b = await req.json().catch(() => ({}));
   // удалить из банка: тема, которая ещё стоит в днях, только прячется (иначе банк вернёт её сам)
   if (m === 'POST' && p === '/api/admin/challenge/bank/delete') {
@@ -220,18 +244,14 @@ export async function challengeApi(req, env, url, h) {
   if (m === 'POST' && p === '/api/admin/challenge/fillmonth') {
     const ym = String(b.m || ''); if (!/^\d{4}-\d\d$/.test(ym)) h.fail(400, 'bad');
     await bankSync(env);
-    const items = (await env.DB.prepare('SELECT id, en, ru, lv, days, created_at FROM challenge_bank WHERE hidden = 0').all()).results.map(r => ({ ...r, days: dayList(r.days) }));
-    const dn = k => Date.UTC(+k.slice(0, 4), +k.slice(5, 7) - 1, +k.slice(8)) / 864e5, today = rigaToday();
+    const items = await bankItems(), today = rigaToday();
     const empty = (await monthRows(env, ym)).filter(d => d.day >= today && !d.subject.some(x => String(x || '').trim()));
     let filled = 0;
     for (const d of empty) {
-      const n = dn(d.day), mo = d.day.slice(5, 7);
-      const c = items.filter(r => !r.days.some(x => Math.abs(dn(x) - n) < 60))
-        .map(r => ({ r, g: r.days.some(x => x.slice(5, 7) === mo && n - dn(x) >= 300) ? 0 : r.days.length ? 2 : 1 }))
-        .sort((a, z) => a.g - z.g || a.r.created_at - z.r.created_at || a.r.id - z.r.id)[0];
-      if (!c) break;
-      d.subject = [c.r.en || '', c.r.ru || '', c.r.lv || '']; d.item = null;
-      await updateRow(env, d, 1); c.r.days.push(d.day); filled++;
+      const o = bankOrder(items, d.day)[0]; if (!o) continue;
+      const r = items.find(x => x.id === o.id);
+      d.subject = [r.en || '', r.ru || '', r.lv || '']; d.item = null;
+      await updateRow(env, d, 1); r.days.push(d.day); filled++;
     }
     await bankSync(env);
     return h.json({ filled, empty: empty.length });
@@ -246,13 +266,19 @@ export async function challengeApi(req, env, url, h) {
     await bankSync(env);
     return h.json({ cleared: days.length });
   }
-  // добавить тему прямо в банк
+  // добавить тему прямо в банк (с метками)
+  const tagsIn = v => (Array.isArray(v) ? v : []).filter(t => BANK_TAGS.includes(t)).join(',');
   if (m === 'POST' && p === '/api/admin/challenge/bank/add') {
     const sub = L3.map((l, i) => String((b.subject || [])[i] ?? '').trim().slice(0, 300)), k = bankKeyOf(sub);
     if (!k) h.fail(400, 'subject');
-    await env.DB.prepare(`INSERT INTO challenge_bank (k, en, ru, lv, days, created_at, updated_at, manual, hidden) VALUES (?, ?, ?, ?, '', ?, ?, 1, 0)
-      ON CONFLICT(k) DO UPDATE SET en = excluded.en, ru = excluded.ru, lv = excluded.lv, manual = 1, hidden = 0, updated_at = excluded.updated_at`).bind(k, ...sub, now(), now()).run();
+    await env.DB.prepare(`INSERT INTO challenge_bank (k, en, ru, lv, days, created_at, updated_at, manual, hidden, tags) VALUES (?, ?, ?, ?, '', ?, ?, 1, 0, ?)
+      ON CONFLICT(k) DO UPDATE SET en = excluded.en, ru = excluded.ru, lv = excluded.lv, manual = 1, hidden = 0, tags = excluded.tags, updated_at = excluded.updated_at`).bind(k, ...sub, now(), now(), tagsIn(b.tags)).run();
     return bankList();
+  }
+  // метки темы банка
+  if (m === 'POST' && p === '/api/admin/challenge/bank/tags') {
+    await env.DB.prepare('UPDATE challenge_bank SET tags = ? WHERE id = ?').bind(tagsIn(b.tags), Number(b.id) || 0).run();
+    return h.json({ items: await bankItems() });
   }
   const key = String(b.day || '');
   if (!/^\d{4}-\d\d-\d\d$/.test(key)) h.fail(400, 'bad');
@@ -266,6 +292,7 @@ export async function challengeApi(req, env, url, h) {
     const d = toRow(cur), t3 = (v, old) => Array.isArray(v) ? L3.map((l, i) => String(v[i] ?? '').trim().slice(0, 300)) : old;
     d.subject = t3(b.subject, d.subject); d.tip = t3(b.tip, d.tip); d.twist = t3(b.twist, d.twist);
     if (d.extra) d.extra = t3(b.extra, d.extra);
+    if (d.extra && 'pal' in b) d.pal = b.pal ? String(b.pal).slice(0, 80) : null; // палитра дня ЭКСТРА: ключ картины или по очереди
     if (Array.isArray(b.colors)) {
       const c = [...new Set(b.colors.map(Number).filter(i => Number.isInteger(i) && i >= 0 && i < allColors(data).length))];
       if (c.length < (key >= BLANK_FROM ? 0 : 1) || c.length > 5) h.fail(400, 'colors'); // 1 — монохромная гармония; с BLANK_FROM можно без цветов — подберутся в 23:00

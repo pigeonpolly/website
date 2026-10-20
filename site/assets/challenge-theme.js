@@ -157,8 +157,11 @@
     if (!row && key < PLAN_FROM) return themeFor(d, L);
     const old = themeFor(d, L, true); // день ЭКСТРА, именины, палитра — по формуле, как у сервера
     if (!row) return { ...old, loading: true, subject: LOADING[L], colors: [], twist: '', extraBw: '', tip: '', time: 10 };
-    return { ...old, subject: row.subject[L] || row.subject[0], tip: row.tip[L] || row.tip[0], twist: row.twist[L] || row.twist[0], time: row.time,
-      extraBw: row.extra ? row.extra[L] || row.extra[0] : old.extraBw, colors: old.pal ? old.colors : row.colors.map(i => ALLC[i]).filter(Boolean) };
+    // палитра дня ЭКСТРА, выбранная в кабинете (row.pal — ключ картины), вместо очереди
+    const P = window.EXTRA_PALETTES, pp = row.pal && old.extra && P ? P.find(x => x.k === row.pal) : null;
+    const pal = pp ? { key: pp.k, title: pp.t[L], thumb: pp.th } : old.pal, pcol = pp ? pp.c.map(([hex, en, ru, lv]) => ({ hex, n: [en, ru, lv] })) : old.colors;
+    return { ...old, pal, subject: row.subject[L] || row.subject[0], tip: row.tip[L] || row.tip[0], twist: row.twist[L] || row.twist[0], time: row.time,
+      extraBw: row.extra ? row.extra[L] || row.extra[0] : old.extraBw, colors: pal ? pcol : row.colors.map(i => ALLC[i]).filter(Boolean) };
   }
   const isExtra = d => d.getDate() === extraDay(d.getFullYear(), d.getMonth());
   window.ChallengeTheme = { themeFor: themeOf, formulaFor: themeFor, keyOf, rngFor, extraDay, isExtra };
