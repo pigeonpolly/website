@@ -128,8 +128,9 @@ export async function challengeApi(req, env, url, h) {
       const s = dayNum(ym + '-01'), e = s + days.length - 1, plan = await planAround(env, s - 150, e + 150);
       broken = checkPlan(data, rules, plan, s, e).filter(x => x.day >= PLAN_FROM);
     }
+    const last = ((await env.DB.prepare('SELECT day FROM challenge_days WHERE edited = 1 ORDER BY updated_at DESC LIMIT 1').first()) || {}).day || null; // последний правленный день — подсвечен в календаре
     const tags = days.map(d => { const t = data.tags[d.item] || []; return { f: t[0] || '', c: t[1] || '', d: t[2] || 0, pool: poolOf(data, rules, d.day) }; });
-    return h.json({ m: ym, today: rigaToday(), days, tags, works, broken, colors: allColors(data), base: data.colors.length, ahead: AHEAD, times: data.times });
+    return h.json({ m: ym, today: rigaToday(), days, tags, works, broken, last, colors: allColors(data), base: data.colors.length, ahead: AHEAD, times: data.times });
   }
   const b = await req.json().catch(() => ({}));
   const key = String(b.day || '');
