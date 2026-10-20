@@ -53,7 +53,7 @@
     }).join('');
     main.innerHTML = `<section class="adm-box chadm">
       <div class="chadm-bar"><div class="chadm-ym"><select class="chadm-year" data-y aria-label="Год">${Array.from({ length: maxY - minY + 1 }, (_, k) => minY + k).map(y => `<option value="${y}"${y === yr ? ' selected' : ''}>${y}</option>`).join('')}</select>
-        <div class="ch-level chadm-months" role="group">${MON3.map((n, k) => { const m = `${yr}-${pad(k + 1)}`; return `<button type="button" data-m="${m}" aria-pressed="${m === ym}"${m < '2026-10' || m > maxM ? ' disabled' : ''}${m === thisMonth ? ' class="now"' : ''} title="${MON[k]} ${yr}">${n}</button>`; }).join('')}</div></div>
+        <div class="ch-level chadm-months" role="group">${MON3.map((n, k) => { const m = `${yr}-${pad(k + 1)}`; return `<button type="button" data-m="${m}" aria-pressed="${m === ym}"${m < '2026-10' || m > maxM ? ' disabled' : ''}${m === thisMonth ? ' class="now"' : ''} title="${MON[k]} ${yr}${monTip(m)}">${n}${monMark(m)}</button>`; }).join('')}</div></div>
         <span class="chadm-tools"><button type="button" class="pill-btn" data-now${ym === thisMonth ? ' disabled' : ''}>📅 Сегодня</button>
         <button type="button" class="pill-btn" data-bank>📚 Банк тем</button><button type="button" class="pill-btn" data-fill title="Заполнить пустые дни месяца темами из банка">📚 Заполнить из банка</button><button type="button" class="pill-btn" data-clear>🧹 Стереть месяц</button></span></div>
       <div class="chadm-mt"><b title="Бейдж «тема + год» за рисунки каждый день тематики (день ЭКСТРА можно пропустить)">🏅 Тематики</b>${mtList()}<button type="button" class="pill-btn" data-mtnew>＋ Новая тематика</button></div>
@@ -61,6 +61,7 @@
       ${D.days.length ? `<div class="chadm-grid" lang="ru">${['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'].map(x => `<span class="chadm-dow">${x}</span>`).join('')}${'<span></span>'.repeat(first)}${cells}</div>
       <p class="be-note">Нажмите на день, чтобы поправить тему. ✏️ — день правили вы, зелёный — последний изменённый, фиолетовый — сегодня, ✦ — день ЭКСТРА, 🏅 — день тематики, ⚠ — день нарушает правило подбора (подробнее — в окне дня). ${D.broken.length ? `Нарушений в месяце: <b>${D.broken.length}</b>.` : 'Все дни подходят по правилам ✓'}</p>`
         : '<p class="be-note">Плана на этот месяц пока нет.</p>'}
+      ${monthPalette()}
       <p class="be-note">С 1 декабря 2026 дни пустые — темы и цвета заполняете вы. Если к 23:00 (за час до начала дня) день остался пустым, тема и цвета подберутся сами по прежним правилам. Числа правил подбора — в «📜 Все правила» → «Тонкая настройка» → «🎨 Темы челленджа».</p></section>`;
     main.querySelectorAll('[data-m]').forEach(b => b.onclick = () => load(b.dataset.m));
     main.querySelector('[data-y]').onchange = e => { // другой год — тот же месяц (в пределах, где можно)
@@ -88,6 +89,24 @@
     };
     main.querySelectorAll('[data-day]').forEach(b => b.onclick = () => dayDialog(b.dataset.day));
     const lb = main.querySelector('[data-last]'); if (lb) lb.onclick = () => D.last.slice(0, 7) === ym ? dayDialog(D.last) : load(D.last.slice(0, 7));
+  }
+  // ---------- счётчик цветов месяцев: у кнопки месяца — полоска семей цветов и ⚠ сколько семей нет; внизу — палитра месяца ----------
+  // семья = базовый цвет (toBase); «мало» — меньше 40 % от среднего на семью
+  const famStat = m => { const list = (D.ycols || {})[m] || [], c = Array(D.base).fill(0); list.forEach(k => { const b = toBase(k); if (b >= 0) c[b]++; });
+    const avg = list.length / D.base; return { list, c, none: c.map((n, j) => n ? -1 : j).filter(j => j >= 0), few: c.map((n, j) => n && n < avg * .4 ? j : -1).filter(j => j >= 0) }; };
+  const famName = j => D.colors[j].n[1];
+  const monTip = m => { const f = famStat(m); if (!f.list.length) return ''; return `\nцветов в днях: ${f.list.length}${f.none.length ? `\nнет: ${f.none.map(famName).join(', ')}` : ''}${f.few.length ? `\nмало: ${f.few.map(famName).join(', ')}` : ''}`; };
+  const monMark = m => { const f = famStat(m); if (!f.list.length) return '';
+    return `<span class="chadm-mstrip" aria-hidden="true">${f.c.map((n, j) => n ? `<i style="flex:${n};background:${D.colors[j].hex}"></i>` : '').join('')}</span>${f.none.length ? `<b class="chadm-mnone">${f.none.length}</b>` : ''}`; };
+  function monthPalette() {
+    const f = famStat(ym); if (!f.list.length) return '<section class="chadm-pal-m"><b>🎨 Цвета месяца</b><p class="be-note">В днях месяца пока нет цветов.</p></section>';
+    const cnt = {}; f.list.forEach(k => { cnt[k] = (cnt[k] || 0) + 1; });
+    const order = allSorted().filter(k => cnt[k]), top = Object.keys(cnt).map(Number).sort((a, b) => cnt[b] - cnt[a]).slice(0, 8);
+    return `<section class="chadm-pal-m"><b>🎨 Цвета месяца</b> <small>${f.list.length} цвет. в ${D.days.filter(d => !d.extra && d.colors.length).length} днях (без ЭКСТРА)</small>
+      <div class="chadm-pstrip">${order.map(k => `<i style="flex:${cnt[k]};background:${D.colors[k].hex}" title="${esc(D.colors[k].n[1])}: ${cnt[k]}"></i>`).join('')}</div>
+      <p class="chadm-ptop"><span>Чаще всего:</span>${top.map(k => `<span><i style="background:${D.colors[k].hex}"></i>${esc(D.colors[k].n[1])} ${cnt[k]}</span>`).join('')}</p>
+      <div class="chadm-fams">${f.c.map((n, j) => `<span class="${!n ? 'none' : f.few.includes(j) ? 'few' : ''}"><i style="background:${D.colors[j].hex}"></i>${esc(famName(j))} <b>${n || 'нет'}</b>${f.few.includes(j) ? ' · мало' : ''}</span>`).join('')}</div>
+      <p class="be-note">Семья — базовый цвет (оттенки считаются своим базовым). «Мало» — меньше 40 % от среднего на цвет. У кнопок месяцев — та же полоска, красное число — сколько цветов нет совсем.</p></section>`;
   }
   // ---------- 🏅 тематики с датами «с — по» (неделя, 10 дней, месяц, 100 дней…): бейдж «тема + год» за рисунок каждый день ----------
   const dOf = k => new Date(+k.slice(0, 4), +k.slice(5, 7) - 1, +k.slice(8));
@@ -345,14 +364,18 @@
   // ---------- окно дня ----------
   // базовые цвета — первые D.base (colors в challenge-data.js); оттенок из moreColors в окне показывается своим базовым (семья f или ближайший)
   const rgb = h => [1, 3, 5].map(k => parseInt(h.slice(k, k + 2), 16));
+  const NEUTRAL_FAM = { cream: 'grey', beige: 'brown', taupe: 'brown', graphite: 'black', sepia: 'brown', terracotta: 'orange', peach: 'orange', fuchsia: 'pink', 'dusty rose': 'pink' }; // цвета без семьи — к какому базовому
+  const lab = hx => { const [r, g, b] = rgb(hx).map(v => { v /= 255; return v > .04045 ? ((v + .055) / 1.055) ** 2.4 : v / 12.92; });
+    const f = t => t > .008856 ? Math.cbrt(t) : 7.787 * t + 16 / 116, X = f((r * .4124 + g * .3576 + b * .1805) / .9505), Y = f(r * .2126 + g * .7152 + b * .0722), Z = f((r * .0193 + g * .1192 + b * .9505) / 1.089);
+    return [116 * Y - 16, 500 * (X - Y), 200 * (Y - Z)]; };
   function toBase(k) {
     if (k < D.base) return k;
     const c = D.colors[k]; if (!c) return -1;
-    const f = D.colors.slice(0, D.base).findIndex(b => b.n[0] === c.f);
+    const f = D.colors.slice(0, D.base).findIndex(b => b.n[0] === (c.f || NEUTRAL_FAM[c.n[0]]));
     if (f >= 0) return f;
-    const [r, g, b] = rgb(c.hex);
+    const x = lab(c.hex); // ближайший на глаз (Lab): сепия — коричневый, а не чёрный
     let best = 0, bd = Infinity;
-    for (let j = 0; j < D.base; j++) { const [r2, g2, b2] = rgb(D.colors[j].hex), dd = (r - r2) ** 2 + (g - g2) ** 2 + (b - b2) ** 2; if (dd < bd) { bd = dd; best = j; } }
+    for (let j = 0; j < D.base; j++) { const y = lab(D.colors[j].hex), dd = (x[0] - y[0]) ** 2 + (x[1] - y[1]) ** 2 + (x[2] - y[2]) ** 2; if (dd < bd) { bd = dd; best = j; } }
     return best;
   }
   // все цвета (базовые, moreColors, круг) для «🎨 Все цвета»: сначала нейтральные от светлых к тёмным, потом по тону, внутри — от светлых

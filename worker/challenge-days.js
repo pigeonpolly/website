@@ -251,7 +251,11 @@ export async function challengeApi(req, env, url, h) {
     const tags = days.map(d => { const t = data.tags[d.item] || []; return { f: t[0] || '', c: t[1] || '', d: t[2] || 0, pool: poolOf(data, rules, d.day) }; });
     const mlast = `${ym}-${pad(daysIn(ym))}`; // тематики, которые задевают этот месяц
     const mthemes = (await env.DB.prepare('SELECT * FROM challenge_months').all()).results.map(mthemeOut).filter(x => x.s <= mlast && x.e >= ym + '-01').sort((a, b) => a.s < b.s ? -1 : 1);
-    return h.json({ m: ym, mthemes, today: rigaToday(), days, tags, works, broken, last, colors: allColors(data), base: data.colors.length, max: LAST, times: data.times });
+    // цвета всех месяцев года (без дней ЭКСТРА) — счётчик цветов у кнопок месяцев и палитра месяца в кабинете
+    const ycols = {};
+    for (const r of (await env.DB.prepare('SELECT day, colors FROM challenge_days WHERE day >= ? AND day <= ? AND extra_en IS NULL').bind(ym.slice(0, 4) + '-01-01', ym.slice(0, 4) + '-12-31').all()).results)
+      (ycols[r.day.slice(0, 7)] ||= []).push(...String(r.colors || '').split(',').filter(Boolean).map(Number));
+    return h.json({ m: ym, mthemes, ycols, today: rigaToday(), days, tags, works, broken, last, colors: allColors(data), base: data.colors.length, max: LAST, times: data.times });
   }
   // банк тем: список (последние сверху) и удаление
   const bankItems = async () => (await env.DB.prepare('SELECT id, en, ru, lv, days, created_at, manual, tags FROM challenge_bank WHERE hidden = 0 ORDER BY created_at DESC, id DESC').all()).results.map(r => ({ ...r, days: dayList(r.days), tags: tagList(r.tags) }));
