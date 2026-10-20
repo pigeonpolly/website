@@ -172,7 +172,9 @@
         <div class="bed-grid" data-grid></div>
         <p class="bed-tools">${[['pen', '✏️ Рисовать'], ['erase', '🧽 Стереть'], ['fill', '🪣 Заливка']].map(([k, n]) => `<button type="button" class="pill-btn" data-tool="${k}">${n}</button>`).join('')}<button type="button" class="pill-btn" data-clear>🗑 Очистить</button></p>
       </div><div class="bed-right">
-        <b>Из картинки</b> <small>— фото или рисунок станет пиксельным 16×16, дальше можно править</small>
+        <b>Детализация</b> <small>— клеток по стороне; рисунок растянется или сожмётся, картинка пересчитается</small>
+        <p class="bed-tools bed-size">${B.SIZES.map(n => `<button type="button" class="pill-btn" data-size="${n}">${n}×${n}</button>`).join('')}</p>
+        <b>Из картинки</b> <small>— фото или рисунок станет пиксельным, дальше можно править</small>
         <div class="bed-row bed-img"><label class="pill-btn">📷 Загрузить картинку<input type="file" accept="image/*" data-img hidden></label><label>Цветов <select data-imgn>${[3, 4, 6, 8, 12].map(n => `<option${n === 6 ? ' selected' : ''}>${n}</option>`).join('')}</select></label><label><input type="checkbox" data-imgbg checked> Убрать фон</label><label><input type="checkbox" data-imgfill> Заполнить квадрат (обрезать края)</label></div>
         <div class="bed-row bed-img bed-imgt" data-imgt hidden><span class="bed-arr">${[['0,-1', '↑'], ['-1,0', '←'], ['1,0', '→'], ['0,1', '↓']].map(([v, n]) => `<button type="button" class="pill-btn" data-mv="${v}" aria-label="Сдвинуть">${n}</button>`).join('')}</span>
           <label>Размер <input type="range" min="30" max="300" step="5" value="100" data-isc></label><label>Поворот <input type="range" min="-180" max="180" step="5" value="0" data-irot></label>
@@ -188,9 +190,16 @@
       <p class="be-dialog-acts"><button type="button" class="pill-btn pill-fill" data-save>💾 Сохранить бейдж</button><span class="be-note" data-st></span></p>`;
     document.body.appendChild(dlg); dlg.addEventListener('close', () => dlg.remove());
     const q = s => dlg.querySelector(s), st = q('[data-st]');
-    const cells = []; for (let y = 0; y < B.N; y++) for (let x = 0; x < B.N; x++) { const c = document.createElement('i'); c.dataset.x = x; c.dataset.y = y; cells.push(c); q('[data-grid]').appendChild(c); }
+    let cells = [];
+    const grid = () => { // клетки под детализацию d.n (поле ~304 px)
+      const g = q('[data-grid]'), px = Math.max(5, Math.floor(304 / d.n) - 1); g.innerHTML = ''; cells = [];
+      g.style.gridTemplateColumns = `repeat(${d.n}, ${px}px)`; g.style.gridAutoRows = px + 'px'; g.style.backgroundSize = ''; g.classList.toggle('fine', d.n > 24);
+      for (let y = 0; y < d.n; y++) for (let x = 0; x < d.n; x++) { const c = document.createElement('i'); c.dataset.x = x; c.dataset.y = y; cells.push(c); g.appendChild(c); }
+      dlg.querySelectorAll('[data-size]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.size === d.n)));
+    };
     const setCell = (x, y, ch) => { const r = d.rows[y].split(''); r[x] = ch; d.rows[y] = r.join(''); };
     function paint() {
+      if (cells.length !== d.n * d.n) grid();
       cells.forEach(c => { const ch = d.rows[c.dataset.y][c.dataset.x]; c.style.background = ch === '.' ? '' : d.pal[ch]; });
       const md = (size, off) => `<span class="sw-medal${off ? ' off' : ' has-ring'}" style="--bg:${d.bg};--ring:${d.ring};width:${size}px;height:${size}px"><b>${B.svg(d)}</b></span>`;
       q('[data-prev]').innerHTML = md(120) + md(62) + md(62, true);
@@ -204,15 +213,15 @@
     }
     const paintSoft = () => { cells.forEach(c => { const ch = d.rows[c.dataset.y][c.dataset.x]; c.style.background = ch === '.' ? '' : d.pal[ch]; }); q('[data-prev]').querySelectorAll('b').forEach(b => { b.innerHTML = B.svg(d); }); };
     function flood(x, y, to) { const from = d.rows[y][x]; if (from === to) return; const stack = [[x, y]];
-      while (stack.length) { const [a, b] = stack.pop(); if (a < 0 || b < 0 || a >= B.N || b >= B.N || d.rows[b][a] !== from) continue; setCell(a, b, to); stack.push([a + 1, b], [a - 1, b], [a, b + 1], [a, b - 1]); } }
+      while (stack.length) { const [a, b] = stack.pop(); if (a < 0 || b < 0 || a >= d.n || b >= d.n || d.rows[b][a] !== from) continue; setCell(a, b, to); stack.push([a + 1, b], [a - 1, b], [a, b + 1], [a, b - 1]); } }
     let down = false;
     const act = c => { const x = +c.dataset.x, y = +c.dataset.y; if (tool === 'fill') flood(x, y, cur); else setCell(x, y, tool === 'erase' ? '.' : cur); paintSoft(); };
     q('[data-grid]').addEventListener('pointerdown', e => { const c = e.target.closest('i'); if (!c) return; e.preventDefault(); down = tool !== 'fill'; act(c); });
     q('[data-grid]').addEventListener('pointerover', e => { const c = e.target.closest('i'); if (c && down) act(c); });
     window.addEventListener('pointerup', () => { down = false; });
     dlg.querySelectorAll('[data-tool]').forEach(b => b.onclick = () => { tool = b.dataset.tool; paint(); });
-    q('[data-clear]').onclick = () => { if (confirm('Стереть весь рисунок?')) { d.rows = B.blankRows(); paint(); } };
-    dlg.querySelectorAll('[data-tpl]').forEach(b => b.onclick = () => { const t = B.fromTemplate(b.dataset.tpl); d = { ...t, sym: d.sym }; cur = Object.keys(d.pal)[0]; paint(); });
+    q('[data-clear]').onclick = () => { if (confirm('Стереть весь рисунок?')) { d.rows = B.blankRows(d.n); paint(); } };
+    dlg.querySelectorAll('[data-tpl]').forEach(b => b.onclick = () => { const t = B.resize(B.fromTemplate(b.dataset.tpl), d.n); d = { ...t, sym: d.sym }; cur = Object.keys(d.pal)[0]; paint(); });
     q('[data-bg]').oninput = e => { d.bg = e.target.value; paintSoft(); paint(); };
     q('[data-ring]').oninput = e => { d.ring = e.target.value; paint(); };
     q('[data-ol]').onchange = () => { d.outline = q('[data-ol]').checked ? q('[data-olc]').value : ''; paint(); };
@@ -220,40 +229,40 @@
     const symNow = () => { const g = q('[data-sym]').value; d.sym = !g ? null : { g: g === 'text' ? '' : g, t: g === 'text' ? (q('[data-symt]').value || '★') : '', c: q('[data-symc]').value, p: q('[data-symp]').value }; paint(); };
     ['[data-sym]', '[data-symc]', '[data-symp]'].forEach(s => { q(s).onchange = symNow; }); q('[data-symt]').oninput = symNow;
     q('[data-recolor]').onclick = () => { const k = 40 + Math.random() * 280; for (const c of Object.keys(d.pal)) { const [h, s, l] = hsl(d.pal[c]); if (s > .15) d.pal[c] = hex((h + k) % 360, s, l); } const [h, s, l] = hsl(d.bg); d.bg = hex((h + k) % 360, s, l); paint(); };
-    q('[data-auto]').onclick = () => { d = B.suggest((theme || []).join(' '), m); cur = Object.keys(d.pal)[0]; paint(); };
+    q('[data-auto]').onclick = () => { d = B.resize(B.suggest((theme || []).join(' '), m), d.n); cur = Object.keys(d.pal)[0]; paint(); };
     // 📷 картинка → 16×16: вписать в квадрат, сжать, свести к N цветам (k-средних), фон (цвет по краям) — убрать; число цветов и фон можно переключать
     let img = null, ox = 0, oy = 0, isc = 1, rot = 0; // сдвиг (в клетках 16×16), размер, поворот (°)
     const fromImg = () => {
       if (!img) return;
       q('[data-imgt]').hidden = false; q('[data-isc]').value = Math.round(isc * 100); q('[data-irot]').value = rot;
-      const big = document.createElement('canvas'), sm = document.createElement('canvas'); big.width = big.height = 128; sm.width = sm.height = B.N;
-      const k = (q('[data-imgfill]').checked ? Math.max : Math.min)(128 / img.width, 128 / img.height), w = img.width * k, h = img.height * k, bx = big.getContext('2d', { willReadFrequently: true });
+      const n = d.n, S = n * 8, big = document.createElement('canvas'), sm = document.createElement('canvas'); big.width = big.height = S; sm.width = sm.height = n;
+      const k = (q('[data-imgfill]').checked ? Math.max : Math.min)(S / img.width, S / img.height), w = img.width * k, h = img.height * k, bx = big.getContext('2d', { willReadFrequently: true });
       bx.imageSmoothingQuality = 'high';
-      bx.translate(64 + ox * 8, 64 + oy * 8); bx.rotate(rot * Math.PI / 180); bx.scale(isc, isc); bx.drawImage(img, -w / 2, -h / 2, w, h);
-      const sx = sm.getContext('2d', { willReadFrequently: true }); sx.imageSmoothingQuality = 'high'; sx.drawImage(big, 0, 0, B.N, B.N);
-      const px = sx.getImageData(0, 0, B.N, B.N).data, pts = [];
-      for (let i = 0; i < B.N * B.N; i++) if (px[i * 4 + 3] >= 110) pts.push([px[i * 4], px[i * 4 + 1], px[i * 4 + 2], i]);
+      bx.translate(S / 2 + ox * S / 16, S / 2 + oy * S / 16); bx.rotate(rot * Math.PI / 180); bx.scale(isc, isc); bx.drawImage(img, -w / 2, -h / 2, w, h);
+      const sx = sm.getContext('2d', { willReadFrequently: true }); sx.imageSmoothingQuality = 'high'; sx.drawImage(big, 0, 0, n, n);
+      const px = sx.getImageData(0, 0, n, n).data, pts = [];
+      for (let i = 0; i < n * n; i++) if (px[i * 4 + 3] >= 110) pts.push([px[i * 4], px[i * 4 + 1], px[i * 4 + 2], i]);
       if (!pts.length) { st.textContent = '⚠ В картинке нет видимых пикселей.'; return; }
-      const n = Math.min(+q('[data-imgn]').value, pts.length), dist = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
+      const nc = Math.min(+q('[data-imgn]').value, pts.length), dist = (a, b) => (a[0] - b[0]) ** 2 + (a[1] - b[1]) ** 2 + (a[2] - b[2]) ** 2;
       const cs = [pts[0].slice(0, 3)]; // центры: каждый следующий — самый далёкий от уже выбранных
-      while (cs.length < n) { let best = pts[0], bd = -1; for (const p of pts) { const dd = Math.min(...cs.map(c => dist(p, c))); if (dd > bd) { bd = dd; best = p; } } cs.push(best.slice(0, 3)); }
+      while (cs.length < nc) { let best = pts[0], bd = -1; for (const p of pts) { const dd = Math.min(...cs.map(c => dist(p, c))); if (dd > bd) { bd = dd; best = p; } } cs.push(best.slice(0, 3)); }
       const lab = new Map();
       for (let it = 0; it < 12; it++) {
         const sum = cs.map(() => [0, 0, 0, 0]);
         for (const p of pts) { let bi = 0; cs.forEach((c, j) => { if (dist(p, c) < dist(p, cs[bi])) bi = j; }); lab.set(p[3], bi); sum[bi][0] += p[0]; sum[bi][1] += p[1]; sum[bi][2] += p[2]; sum[bi][3]++; }
         sum.forEach((v, j) => { if (v[3]) cs[j] = [v[0] / v[3], v[1] / v[3], v[2] / v[3]]; });
       }
-      const grid = Array.from({ length: B.N * B.N }, (_, i) => lab.has(i) ? lab.get(i) : -1);
+      const grid = Array.from({ length: n * n }, (_, i) => lab.has(i) ? lab.get(i) : -1);
       if (q('[data-imgbg]').checked) { // фон — самый частый цвет по краям, убираем его заливкой от краёв
-        const edge = [], cnt = {}; for (let i = 0; i < B.N; i++) edge.push(i, (B.N - 1) * B.N + i, i * B.N, i * B.N + B.N - 1);
+        const edge = [], cnt = {}; for (let i = 0; i < n; i++) edge.push(i, (n - 1) * n + i, i * n, i * n + n - 1);
         edge.forEach(i => { if (grid[i] >= 0) cnt[grid[i]] = (cnt[grid[i]] || 0) + 1; });
         const bgc = Object.keys(cnt).sort((a, b) => cnt[b] - cnt[a])[0];
-        if (bgc !== undefined && cnt[bgc] >= B.N) { const stack = edge.filter(i => grid[i] === +bgc); while (stack.length) { const i = stack.pop(); if (grid[i] !== +bgc) continue; grid[i] = -1; const x = i % B.N, y = (i - x) / B.N;
-          if (x > 0) stack.push(i - 1); if (x < B.N - 1) stack.push(i + 1); if (y > 0) stack.push(i - B.N); if (y < B.N - 1) stack.push(i + B.N); } }
+        if (bgc !== undefined && cnt[bgc] >= n) { const stack = edge.filter(i => grid[i] === +bgc); while (stack.length) { const i = stack.pop(); if (grid[i] !== +bgc) continue; grid[i] = -1; const x = i % n, y = (i - x) / n;
+          if (x > 0) stack.push(i - 1); if (x < n - 1) stack.push(i + 1); if (y > 0) stack.push(i - n); if (y < n - 1) stack.push(i + n); } }
       }
       const used = [...new Set(grid.filter(v => v >= 0))], pal = {}, key = {};
       used.forEach((v, j) => { key[v] = LETTERS[j]; pal[LETTERS[j]] = '#' + cs[v].map(c => Math.round(c).toString(16).padStart(2, '0')).join(''); });
-      d = { ...d, tpl: 'img', pal, rows: Array.from({ length: B.N }, (_, y) => grid.slice(y * B.N, y * B.N + B.N).map(v => v >= 0 ? key[v] : '.').join('')), outline: '' };
+      d = { ...d, tpl: 'img', pal, rows: Array.from({ length: n }, (_, y) => grid.slice(y * n, y * n + n).map(v => v >= 0 ? key[v] : '.').join('')), outline: '' };
       cur = Object.keys(pal)[0] || 'a'; tool = 'pen'; st.textContent = '✓ Картинка стала пиксельной — можно дорисовать и сохранить'; paint();
     };
     q('[data-img]').onchange = e => {
@@ -261,6 +270,7 @@
       im.onload = () => { img = im; ox = oy = rot = 0; isc = 1; URL.revokeObjectURL(url); fromImg(); }; im.onerror = () => { st.textContent = '⚠ Не получилось открыть картинку.'; }; im.src = url; e.target.value = '';
     };
     q('[data-imgn]').onchange = fromImg; q('[data-imgbg]').onchange = fromImg; q('[data-imgfill]').onchange = fromImg;
+    dlg.querySelectorAll('[data-size]').forEach(b => b.onclick = () => { const n = +b.dataset.size; if (n === d.n) return; d = B.resize(d, n); if (img) fromImg(); else paint(); });
     dlg.querySelectorAll('[data-mv]').forEach(b => b.onclick = () => { const [dx, dy] = b.dataset.mv.split(',').map(Number); ox += dx; oy += dy; fromImg(); });
     q('[data-isc]').oninput = e => { isc = +e.target.value / 100; fromImg(); };
     q('[data-irot]').oninput = e => { rot = +e.target.value; fromImg(); };
@@ -268,7 +278,7 @@
     q('[data-ireset]').onclick = () => { ox = oy = rot = 0; isc = 1; fromImg(); };
     // перетаскивание по большому значку: 1 клетка = 1/16 его ширины
     let drag = null;
-    q('[data-prev]').addEventListener('pointerdown', e => { const md = e.target.closest('.sw-medal'); if (!img || !md) return; e.preventDefault(); drag = { x: e.clientX, y: e.clientY, ox, oy, cell: md.getBoundingClientRect().width / B.N }; md.setPointerCapture && md.setPointerCapture(e.pointerId); });
+    q('[data-prev]').addEventListener('pointerdown', e => { const md = e.target.closest('.sw-medal'); if (!img || !md) return; e.preventDefault(); drag = { x: e.clientX, y: e.clientY, ox, oy, cell: md.getBoundingClientRect().width / 16 }; md.setPointerCapture && md.setPointerCapture(e.pointerId); });
     q('[data-prev]').addEventListener('pointermove', e => { if (!drag) return; const nx = drag.ox + Math.round((e.clientX - drag.x) / drag.cell), ny = drag.oy + Math.round((e.clientY - drag.y) / drag.cell); if (nx !== ox || ny !== oy) { ox = nx; oy = ny; fromImg(); } });
     window.addEventListener('pointerup', () => { drag = null; });
     q('[data-x]').onclick = () => dlg.close();

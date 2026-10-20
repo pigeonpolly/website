@@ -1,9 +1,9 @@
 // Пиксельные бейджи тематик месяцев (кабинет → «🏅 Тематика месяца» → «🎨 Бейдж»; показ — sketch-wall.js, шкала месяца на /challenge/).
-// Дизайн бейджа: { rows: 16 строк по 16 символов ('.' — пусто, буква — цвет из pal), pal: { буква: '#hex' }, bg — фон медали, ring — обводка медали,
+// Дизайн бейджа: { n — детализация (SIZES: 12…48 клеток, нет — 16), rows: n строк по n символов ('.' — пусто, буква — цвет из pal), pal: { буква: '#hex' }, bg — фон медали, ring — обводка медали,
 //   outline — контур вокруг рисунка ('' — нет), sym: { g: символ из GLYPHS или свой текст (t), c: цвет, p: 'tl' | 'tr' | 'bl' | 'br' } | null }.
 // PPPixelBadge.svg(design) → <svg> рисунка (фон и обводку медали рисует CSS .sw-medal), suggest(тема, 'ГГГГ-ММ') — шаблон под тему.
 (function () {
-  const N = 16;
+  const N = 16, SIZES = [12, 16, 24, 32, 48];
   // шаблоны: [названия en/ru/lv, рисунок, цвета, фон медали, ключевые слова тем (ru/en/lv, по началу слова)]
   const T = {
     rocket: [['Rocket', 'Ракета', 'Raķete'], ['.....r.....', '....rwr....', '....www....', '...wwbww...', '...wbbbw...', '...wwbww...', '...wwwww...', '..rwwwwwr..', '.rrwwwwwrr.', '.rr.www.rr.', '....o.o....', '...ooyoo...', '....yyy....'],
@@ -57,13 +57,13 @@
   const GLYPH_N = { star: '★ звезда', heart: '♥ сердце', spark: '✦ искра', crown: '♛ корона', plus: '+ плюс', dot: '● точка', moon: '☾ месяц', drop: '💧 капля' };
   const SEAS_T = ['snow', 'snow', 'flower', 'flower', 'flower', 'sun', 'sun', 'sun', 'leaf', 'leaf', 'pumpkin', 'tree'];
   const RING = '#C98A1E';
-  const blankRows = () => Array.from({ length: N }, () => '.'.repeat(N));
+  const blankRows = (n = N) => Array.from({ length: n }, () => '.'.repeat(n));
   // шаблон → дизайн 16×16 (рисунок по центру)
   function fromTemplate(key) {
     const t = TEMPLATES[key] || TEMPLATES.star, h = t.art.length, w = Math.max(...t.art.map(r => r.length));
     const y0 = Math.floor((N - h) / 2), x0 = Math.floor((N - w) / 2), rows = blankRows().map(r => r.split(''));
     t.art.forEach((r, y) => [...r].forEach((ch, x) => { if (ch !== '.') rows[y0 + y][x0 + x] = ch; }));
-    return { v: 1, tpl: key, rows: rows.map(r => r.join('')), pal: { ...t.pal }, bg: t.bg, ring: RING, outline: '#2B1A51', sym: null };
+    return { v: 1, n: N, tpl: key, rows: rows.map(r => r.join('')), pal: { ...t.pal }, bg: t.bg, ring: RING, outline: '#2B1A51', sym: null };
   }
   // шаблон под тему: по ключевым словам темы (ru/en/lv), иначе — по сезону месяца
   function suggest(text, ym) {
@@ -75,23 +75,31 @@
     if (!d || !Array.isArray(d.rows)) return null;
     const hex = c => /^#[0-9a-fA-F]{6}$/.test(String(c || '')) ? c : null;
     const pal = {}; for (const [k, v] of Object.entries(d.pal || {})) if (/^[a-zA-Z0-9]$/.test(k) && hex(v)) pal[k] = v;
-    const rows = Array.from({ length: N }, (_, y) => [...String(d.rows[y] || '').slice(0, N).padEnd(N, '.')].map(ch => pal[ch] ? ch : '.').join(''));
+    const n = SIZES.includes(+d.n) ? +d.n : N;
+    const rows = Array.from({ length: n }, (_, y) => [...String(d.rows[y] || '').slice(0, n).padEnd(n, '.')].map(ch => pal[ch] ? ch : '.').join(''));
     const sym = d.sym && (GLYPHS[d.sym.g] || d.sym.t) ? { g: GLYPHS[d.sym.g] ? d.sym.g : '', t: String(d.sym.t || '').slice(0, 2), c: hex(d.sym.c) || '#F2C230', p: ['tl', 'tr', 'bl', 'br'].includes(d.sym.p) ? d.sym.p : 'br' } : null;
-    return { v: 1, tpl: String(d.tpl || ''), rows, pal, bg: hex(d.bg) || '#FCE7C8', ring: hex(d.ring) || RING, outline: hex(d.outline) || '', sym };
+    return { v: 1, n, tpl: String(d.tpl || ''), rows, pal, bg: hex(d.bg) || '#FCE7C8', ring: hex(d.ring) || RING, outline: hex(d.outline) || '', sym };
   }
   const rect = (x, y, c) => `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${c}"/>`;
   function svg(d0) {
     const d = clean(d0); if (!d) return '';
-    const on = (x, y) => y >= 0 && y < N && x >= 0 && x < N && d.rows[y][x] !== '.';
+    const n = d.n, on = (x, y) => y >= 0 && y < n && x >= 0 && x < n && d.rows[y][x] !== '.';
     let out = '';
-    if (d.outline) for (let y = -1; y <= N; y++) for (let x = -1; x <= N; x++) if (!on(x, y) && (on(x - 1, y) || on(x + 1, y) || on(x, y - 1) || on(x, y + 1))) out += rect(x + 1, y + 1, d.outline);
+    if (d.outline) for (let y = -1; y <= n; y++) for (let x = -1; x <= n; x++) if (!on(x, y) && (on(x - 1, y) || on(x + 1, y) || on(x, y - 1) || on(x, y + 1))) out += rect(x + 1, y + 1, d.outline);
     d.rows.forEach((r, y) => [...r].forEach((ch, x) => { if (ch !== '.') out += rect(x + 1, y + 1, d.pal[ch]); }));
-    if (d.sym) {
+    if (d.sym) { // символ — в сетке 18×18 при любой детализации (масштаб группой)
+      out += `<g transform="scale(${(n + 2) / 18})">`;
       const [sx, sy] = { tl: [0, 0], tr: [13, 0], bl: [0, 13], br: [13, 13] }[d.sym.p];
       if (d.sym.g) GLYPHS[d.sym.g].forEach((r, y) => [...r].forEach((ch, x) => { if (ch === '#') out += rect(sx + x, sy + y, d.sym.c); }));
       else out += `<text x="${sx + 2.5}" y="${sy + 4.6}" font-size="5.4" text-anchor="middle" fill="${d.sym.c}" font-family="system-ui, sans-serif" font-weight="700">${String(d.sym.t).replace(/[<&>"]/g, '')}</text>`;
+      out += '</g>';
     }
-    return `<svg viewBox="0 0 18 18" shape-rendering="crispEdges">${out}</svg>`;
+    return `<svg viewBox="0 0 ${n + 2} ${n + 2}" shape-rendering="crispEdges">${out}</svg>`;
   }
-  window.PPPixelBadge = { N, TEMPLATES, GLYPHS, GLYPH_N, fromTemplate, suggest, clean, svg, blankRows };
+  // другая детализация: рисунок растягивается/сжимается по ближайшей клетке
+  function resize(d0, n) {
+    const d = clean(d0); if (!d || !SIZES.includes(n) || n === d.n) return d;
+    return { ...d, n, rows: Array.from({ length: n }, (_, y) => Array.from({ length: n }, (_, x) => d.rows[Math.floor((y + .5) * d.n / n)][Math.floor((x + .5) * d.n / n)]).join('')) };
+  }
+  window.PPPixelBadge = { N, SIZES, resize, TEMPLATES, GLYPHS, GLYPH_N, fromTemplate, suggest, clean, svg, blankRows };
 })();
