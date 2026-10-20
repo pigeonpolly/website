@@ -3,7 +3,7 @@
 // Данные — Cloudflare D1 (env.DB), картинки челленджа — R2 (env.MEDIA, папка challenge/), старые ещё и в KV (env.IMAGES), пока идёт перенос. Блог — worker/blog.js (картинки блога в R2, env.MEDIA).
 import { blogApi, blogPage, visitor, anonCode, claimAnon, birdName } from './blog.js';
 import { translateAll, translateTo, ABOUT } from './translate.js';
-import { challengeApi, challengeCron, planDayColors, CHALLENGE_TABLES, CHALLENGE_ALTER } from './challenge-days.js'; // план тем челленджа (docs/challenge.md «Подбор тем»)
+import { challengeApi, challengeCron, planDayColors, monthThemeBadges, CHALLENGE_TABLES, CHALLENGE_ALTER } from './challenge-days.js'; // план тем челленджа (docs/challenge.md «Подбор тем»)
 import { CH_DEFAULTS, CH_RANGE } from './challenge-plan.js';
 import '../site/assets/can-do.js'; // PPCanDo — что можно с вещью (этап 7)
 const PPCanDo = globalThis.PPCanDo;
@@ -489,7 +489,7 @@ const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, p
   // бейджи: уровни по рекордной серии (дней) и особые достижения — пуговки один раз за каждый
   levels: { 1: 5, 3: 10, 7: 20, 14: 30, 30: 50, 60: 80, 100: 120, 365: 300 },
   badges: { bw: 5, extra: 15, bday: 15, triple: 15, early: 15, owl: 15, comeback: 15, ten: 20, weekend: 20, newyear: 20, halloween: 20,
-    monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, collector: 50, hundred: 100, robot: 1,
+    monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, collector: 50, hundred: 100, robot: 1, mtheme: 50, // mtheme — каждый бейдж тематики месяца (mt2027-02)
     cpurple: 20, cyellow: 20, cred: 20, cblue: 20, cgreen: 20,
     rain1: 10, rain2: 20, rain3: 40, pot1: 5, pot2: 15, pot3: 50, potkid: 20, maze: 20, ...PAN_BADGES } }; // игры: «Пуговичный дождь» (rain*) и «Зельеварня» (pot*, maze) // c* — N рисунков в дни, когда в теме дня был этот цвет // robot — загрузил работу с пометкой 🤖 «ИИ-генерация»
 // легендарные вещи (как LEGEND в birds.js): в магазине по одной штуке на птичку, дарить нельзя; обычных — до трёх одинаковых
@@ -715,7 +715,7 @@ async function awardComment(env, uid, commentId) {
 // пуговки за бейджи: за каждый уровень серии и особый бейдж — один раз (в том числе за полученные раньше)
 async function awardBadges(env, uid, best, badges) {
   const want = [...Object.entries(BTN.levels).filter(([d]) => best >= +d).map(([d, n]) => ['lv' + d, n]),
-    ...badges.filter(k => BTN.badges[k]).map(k => [k, BTN.badges[k]])];
+    ...badges.filter(k => BTN.badges[k]).map(k => [k, BTN.badges[k]]), ...badges.filter(k => /^mt\d{4}-\d\d$/.test(k)).map(k => [k, BTN.badges.mtheme])];
   if (!want.length) return { total: 0, got: [] };
   const have = new Set((await env.DB.prepare("SELECT ref FROM button_log WHERE user_id = ? AND kind = 'badge'").bind(uid).all()).results.map(r => r.ref));
   let total = 0; const got = [];
@@ -2431,8 +2431,9 @@ async function route(req, env, url) {
     const mcount = Object.keys(mc).sort().slice(-48).map(k => `${k}:${mc[k]}`).join(',');
     const all = (await env.DB.prepare('SELECT day, bw, ai, tod, created_at FROM posts WHERE user_id = ?').bind(u.id).all()).results;
     const uu = { ...u, months: months.join(','), mcount };
+    const mtb = await monthThemeBadges(env, all); // тематика месяца: рисунок каждый день месяца — бейдж «тема + год»
     await env.DB.prepare('UPDATE users SET months = ?, mcount = ?, best = ?, badges = ? WHERE id = ?')
-      .bind(uu.months, mcount, mergedBest(u, streakDays(all)), mergedBadges(uu, all).join(','), u.id).run();
+      .bind(uu.months, mcount, mergedBest(u, streakDays(all)), [...new Set([...mergedBadges(uu, all), ...mtb])].join(','), u.id).run();
     const earned = f.get('ai') === '1' && !RULES.aiUpload ? 0 : await award(env, u.id, 'upload', day, BTN.upload); // за работу с 🤖 — если разрешено в правилах
     if (!old) await flockEventDb(env, 'drawing', u, { day }); // новости стаи; скрытая потом работа в ленте не показывается
     return json({ ok: true, id, earned });

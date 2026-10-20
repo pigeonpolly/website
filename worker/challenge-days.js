@@ -13,6 +13,8 @@ export const CHALLENGE_TABLES = [
   // банк тем Алины: темы дней, которые она правила (edited = 1), + добавленные прямо в банк (manual). k — ключ без регистра и пробелов по краям;
   // days — дни, где тема стоит сейчас, через запятую; hidden — удалена из банка, хотя ещё стоит в каком-то дне
   `CREATE TABLE IF NOT EXISTS challenge_bank (id INTEGER PRIMARY KEY AUTOINCREMENT, k TEXT UNIQUE, en TEXT, ru TEXT, lv TEXT, days TEXT DEFAULT '', created_at INTEGER, updated_at INTEGER, manual INTEGER DEFAULT 0, hidden INTEGER DEFAULT 0, tags TEXT DEFAULT '')`, // tags — для каких дней (BANK_TAGS)
+  // тематика месяца (кабинет): есть — у месяца бейдж «тема + год» за рисунки каждый день месяца (день ЭКСТРА можно пропустить)
+  `CREATE TABLE IF NOT EXISTS challenge_months (ym TEXT PRIMARY KEY, en TEXT, ru TEXT, lv TEXT, updated_at INTEGER)`,
 ];
 const bankKey = s => s.map(x => String(x || '').trim().toLowerCase()).find(Boolean) || '';
 const bankKeyOf = s => bankKey([s[1], s[0], s[2]]); // по RU, нет — по EN, LV
@@ -189,6 +191,20 @@ export async function planDayColors(env) {
   return out;
 }
 
+// бейджи тематик месяцев: 'mt2027-02' — у работ есть каждый день месяца с тематикой (кроме дня ЭКСТРА — он выходной); уже заработанные не отнимаются
+export async function monthThemeBadges(env, posts) {
+  const rows = (await env.DB.prepare('SELECT ym FROM challenge_months').all().catch(() => ({ results: [] }))).results;
+  if (!rows.length) return [];
+  const days = new Set(posts.map(p => p.day)), out = [];
+  for (const { ym } of rows) {
+    const y = +ym.slice(0, 4), m = +ym.slice(5, 7) - 1, ex = extraDay(y, m);
+    let ok = true;
+    for (let d = 1; d <= daysIn(ym) && ok; d++) if (d !== ex && !days.has(`${ym}-${pad(d)}`)) ok = false;
+    if (ok) out.push('mt' + ym);
+  }
+  return out;
+}
+
 // ---------- API ----------
 // h: { json, fail, needUser, isAdmin, rules }
 export async function challengeApi(req, env, url, h) {
@@ -201,6 +217,11 @@ export async function challengeApi(req, env, url, h) {
     if (ym === rigaToday().slice(0, 7) || openMonths().includes(ym)) await autoFill(env, h.rules()); // не дождались cron — сегодняшний пустой день заполнится сейчас
     const days = ym < FIRST ? [] : (await monthRows(env, ym)).map(({ edited, ...d }) => d);
     return h.json({ m: ym, days }, 200, { 'cache-control': 'public, max-age=60' });
+  }
+  // тематики месяцев для сайта (названия бейджей): [{ym, t: [en, ru, lv]}]
+  if (m === 'GET' && p === '/api/challenge/mthemes') {
+    const items = (await env.DB.prepare('SELECT ym, en, ru, lv FROM challenge_months ORDER BY ym').all()).results.map(r => ({ ym: r.ym, t: [r.en || '', r.ru || '', r.lv || ''] }));
+    return h.json({ items }, 200, { 'cache-control': 'public, max-age=300' });
   }
   if (!p.startsWith('/api/admin/challenge')) return null;
   const u = await h.needUser(req, env);
@@ -221,7 +242,8 @@ export async function challengeApi(req, env, url, h) {
     }
     const last = ((await env.DB.prepare('SELECT day FROM challenge_days WHERE edited = 1 ORDER BY updated_at DESC LIMIT 1').first()) || {}).day || null; // последний правленный день — подсвечен в календаре
     const tags = days.map(d => { const t = data.tags[d.item] || []; return { f: t[0] || '', c: t[1] || '', d: t[2] || 0, pool: poolOf(data, rules, d.day) }; });
-    return h.json({ m: ym, today: rigaToday(), days, tags, works, broken, last, colors: allColors(data), base: data.colors.length, max: LAST, times: data.times });
+    const mt = await env.DB.prepare('SELECT en, ru, lv FROM challenge_months WHERE ym = ?').bind(ym).first();
+    return h.json({ m: ym, mtheme: mt ? [mt.en || '', mt.ru || '', mt.lv || ''] : ['', '', ''], today: rigaToday(), days, tags, works, broken, last, colors: allColors(data), base: data.colors.length, max: LAST, times: data.times });
   }
   // банк тем: список (последние сверху) и удаление
   const bankItems = async () => (await env.DB.prepare('SELECT id, en, ru, lv, days, created_at, manual, tags FROM challenge_bank WHERE hidden = 0 ORDER BY created_at DESC, id DESC').all()).results.map(r => ({ ...r, days: dayList(r.days), tags: tagList(r.tags) }));
@@ -238,6 +260,14 @@ export async function challengeApi(req, env, url, h) {
     if (r && r.days) await env.DB.prepare('UPDATE challenge_bank SET hidden = 1, manual = 0 WHERE id = ?').bind(id).run();
     else await env.DB.prepare('DELETE FROM challenge_bank WHERE id = ?').bind(id).run();
     return bankList();
+  }
+  // тематика месяца: вписана — у месяца появляется бейдж; пусто — тематики и бейджа нет
+  if (m === 'POST' && p === '/api/admin/challenge/mtheme') {
+    const ym = String(b.m || ''); if (!/^\d{4}-\d\d$/.test(ym)) h.fail(400, 'bad');
+    const sub = L3.map((l, i) => String((b.subject || [])[i] ?? '').trim().slice(0, 120));
+    if (sub.some(Boolean)) await env.DB.prepare('INSERT INTO challenge_months (ym, en, ru, lv, updated_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(ym) DO UPDATE SET en = excluded.en, ru = excluded.ru, lv = excluded.lv, updated_at = excluded.updated_at').bind(ym, ...sub, now()).run();
+    else await env.DB.prepare('DELETE FROM challenge_months WHERE ym = ?').bind(ym).run();
+    return h.json({ ok: true, mtheme: sub });
   }
   // «📚 Заполнить месяц из банка»: пустые дни месяца (с сегодня) — темами банка в том же порядке, что «📚 Из банка» в окне дня
   // (этот месяц прошлых лет → нигде не стоявшие → остальные; давно добавленные — раньше; не ближе 60 дней к тому же дню); цвета не трогаются

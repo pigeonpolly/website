@@ -302,6 +302,30 @@
     const tip = lv.k === 'pick' && picks ? `${fun}&#10;${t('picked', picks)}` : esc(fun);
     return `<${tag}${tag === 'button' ? ' type="button"' : ''} class="sw-medal${cls}${big ? ' big' : ''}" style="--bg:${lv.bg}" aria-label="${esc(lv.n[L])}" data-tip="${esc(lv.n[L])}&#10;${tip}" data-badge="${esc(lv.k || lv.s)}">${lv.s ? spriteSvg(lv.s) : `<b>${lv.icon}</b>`}${stars}</${tag}>`;
   };
+  // ---------- бейджи тематик месяцев (кабинет → тематика месяца): 'mt2027-02', «тема + год»; значок — пиксельный листок календаря ----------
+  // с золотой рамкой, полосой цвета сезона и номером месяца (не Полли, как у остальных бейджей — так видно, что это особый, «месячный»)
+  const DIG = ['111101101101111', '010110010010111', '111001111100111', '111001111001111', '101101111001001', '111100111001111', '111100111101111', '111001001001001', '111101111101111', '111101111001111'];
+  const SEAS_C = ['#8EC5E8', '#8EC5E8', '#9ED9BE', '#9ED9BE', '#9ED9BE', '#F2C230', '#F2C230', '#F2C230', '#E8833A', '#E8833A', '#E8833A', '#8EC5E8'];
+  function monthIcon(ym) {
+    const m = +ym.slice(5, 7), px = [], put = (x, y, c) => px.push([x, y, c]);
+    for (let y = 3; y <= 15; y++) for (let x = 1; x <= 12; x++) put(x, y, x === 1 || x === 12 || y === 3 || y === 15 ? '#C98A1E' : y <= 6 ? SEAS_C[m - 1] : '#FFFDF8');
+    [[4, 2], [4, 1], [9, 2], [9, 1]].forEach(([x, y]) => put(x, y, '#2B1A51')); // кольца
+    const ds = String(m).split('').map(Number), w = ds.length * 4 - 1, x0 = Math.round((14 - w) / 2);
+    ds.forEach((dg, i) => [...DIG[dg]].forEach((b, k) => b === '1' && put(x0 + i * 4 + k % 3, 8 + Math.floor(k / 3), '#2B1A51')));
+    [[12, 0], [11, 1], [12, 1], [13, 1], [12, 2]].forEach(([x, y]) => put(x, y, '#F2C230')); // звёздочка
+    return `<svg viewBox="0 0 14 17" shape-rendering="crispEdges">${px.map(([x, y, c]) => `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${c}"/>`).join('')}</svg>`;
+  }
+  const nowYm = () => { const d = new Date(); return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}`; };
+  fetch('/api/challenge/mthemes').then(r => r.ok ? r.json() : null).then(j => {
+    for (const it of (j && j.items) || []) {
+      if (SPECIAL.some(x => x.k === 'mt' + it.ym)) continue;
+      const tt = l => it.t[l] || it.t[1] || it.t[0] || it.t[2], y = it.ym.slice(0, 4), mon = l => new Date(+y, +it.ym.slice(5, 7) - 1, 1).toLocaleDateString(['en-GB', 'ru-RU', 'lv-LV'][l], { month: 'long', year: 'numeric' }).replace(/\s*г\.$/, '');
+      SPECIAL.push({ k: 'mt' + it.ym, mt: it.ym, icon: monthIcon(it.ym), bg: '#FCE7C8',
+        n: [0, 1, 2].map(l => `${tt(l)} ${y}`),
+        f: [`A whole month of “${tt(0)}”, every single day!`, `Целый месяц «${tt(1)}» — каждый день!`, `Vesels mēnesis “${tt(2)}” — katru dienu!`],
+        h: [`Draw every day of ${mon(0)} (theme of the month: “${tt(0)}”; the EXTRA day can be skipped)`, `Рисовать каждый день месяца: ${mon(1)} (тематика месяца — «${tt(1)}»; день ЭКСТРА можно пропустить)`, `Zīmēt katru dienu: ${mon(2)} (mēneša tēma — “${tt(2)}”; EKSTRA dienu var izlaist)`] });
+    }
+  }).catch(() => {});
   const stateOf = (s, got) => s.k === 'pick' ? (got.has('pick') ? true : got.has('pick_past') ? 'past' : false) : got.has(s.k);
   const levelOf = best => [...LEVELS].reverse().find(l => best >= l.d) || null;
   function specials(posts) {
@@ -700,7 +724,7 @@
         const bagEl = panel.querySelector('.sw-pv-bag');
         for (const g of pr.bag || []) { const it = document.createElement('span'); it.className = 'sw-pv-item' + (pr.avatar && pr.avatar[g.kind] === g.item ? ' on' : ''); it.title = window.PPBirds.giftName(g.kind, g.item, L); it.appendChild(window.PPBirds.giftPic(g.kind, g.item, pr.id, 56, pr.avatar)); bagEl.appendChild(it); }
       } else if (k === 'badges') {
-        panel.innerHTML = `<div class="bp-badges">${LEVELS.map(l => medal(l, pr.best >= l.d, false, 'button')).join('')}${SPECIAL.map(x => medal(x, st(x), false, 'button', pr.picks)).join('')}</div><p class="sw-how">${t('tapBadge')}</p>`;
+        panel.innerHTML = `<div class="bp-badges">${LEVELS.map(l => medal(l, pr.best >= l.d, false, 'button')).join('')}${SPECIAL.filter(x => !x.mt || st(x) || x.mt >= nowYm()).map(x => medal(x, st(x), false, 'button', pr.picks)).join('')}</div><p class="sw-how">${t('tapBadge')}</p>`;
         panel.querySelectorAll('.sw-medal').forEach(b => b.onclick = () => {
           const x = [...LEVELS, ...SPECIAL].find(v => (v.k || v.s) === b.dataset.badge);
           showBadge(x, b.classList.contains('past') ? 'past' : !b.classList.contains('off'), pr.picks);

@@ -56,6 +56,8 @@
         <div class="ch-level chadm-months" role="group">${MON3.map((n, k) => { const m = `${yr}-${pad(k + 1)}`; return `<button type="button" data-m="${m}" aria-pressed="${m === ym}"${m < '2026-10' || m > maxM ? ' disabled' : ''}${m === thisMonth ? ' class="now"' : ''} title="${MON[k]} ${yr}">${n}</button>`; }).join('')}</div></div>
         <span class="chadm-tools"><button type="button" class="pill-btn" data-now${ym === thisMonth ? ' disabled' : ''}>📅 Сегодня</button>
         <button type="button" class="pill-btn" data-bank>📚 Банк тем</button><button type="button" class="pill-btn" data-fill title="Заполнить пустые дни месяца темами из банка">📚 Заполнить из банка</button><button type="button" class="pill-btn" data-clear>🧹 Стереть месяц</button></span></div>
+      <div class="chadm-mt"><b title="Если вписать — у месяца появится бейдж «тема + год» за рисунки каждый день месяца">🏅 Тематика месяца</b>${['ru', 'en', 'lv'].map(l => `<label><span>${l.toUpperCase()}</span><input type="text" data-mt="${l}" value="${esc((D.mtheme || [])[LI[l]] || '')}" placeholder="${l === 'ru' ? 'пусто — без тематики' : ''}"></label>`).join('')}
+        <button type="button" class="pill-btn" data-mttr>🌐 Перевести</button><button type="button" class="pill-btn" data-mtsave>💾 Сохранить</button><span class="be-note" data-mtst>${(D.mtheme || []).some(Boolean) ? '🏅 бейдж месяца есть' : ''}</span></div>
       ${D.last ? `<p class="be-note chadm-lastn">Последний изменённый: <button type="button" class="pill-btn" data-last>${new Date(+D.last.slice(0, 4), +D.last.slice(5, 7) - 1, +D.last.slice(8)).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</button></p>` : ''}
       ${D.days.length ? `<div class="chadm-grid" lang="ru">${['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'].map(x => `<span class="chadm-dow">${x}</span>`).join('')}${'<span></span>'.repeat(first)}${cells}</div>
       <p class="be-note">Нажмите на день, чтобы поправить тему. ✏️ — день правили вы, зелёный — последний изменённый, фиолетовый — сегодня, ✦ — день ЭКСТРА, ⚠ — день нарушает правило подбора (подробнее — в окне дня). ${D.broken.length ? `Нарушений в месяце: <b>${D.broken.length}</b>.` : 'Все дни подходят по правилам ✓'}</p>`
@@ -66,6 +68,19 @@
       let m = `${e.target.value}-${ym.slice(5)}`; if (m < '2026-10') m = '2026-10'; if (m > maxM) m = maxM; load(m);
     };
     main.querySelector('[data-bank]').onclick = () => bankDialog();
+    // тематика месяца: перевод с первого заполненного языка, сохранение (пусто — тематики и бейджа нет)
+    const mv = l => main.querySelector(`[data-mt="${l}"]`), mst = main.querySelector('[data-mtst]');
+    main.querySelector('[data-mttr]').onclick = async e => {
+      const src = ['ru', 'en', 'lv'].find(l => mv(l).value.trim()); if (!src) { mst.textContent = 'Впишите тематику хотя бы на одном языке.'; return; }
+      e.target.disabled = true; mst.textContent = '🌐 Перевожу…';
+      try { const tr = await translate([mv(src).value], src); Object.keys(tr).forEach(l => { if (tr[l][0]) mv(l).value = tr[l][0]; }); mst.textContent = '✓ Переведено — сохраните'; }
+      catch (er) { mst.textContent = '⚠ ' + (TR_ERR[er.code] || er.code || er.message); }
+      e.target.disabled = false;
+    };
+    main.querySelector('[data-mtsave]').onclick = async () => {
+      try { const r = await api('/mtheme', { m: ym, subject: L3.map(l => mv(l).value.trim()) }); D.mtheme = r.mtheme; mst.textContent = r.mtheme.some(Boolean) ? '✓ Сохранено — 🏅 бейдж месяца есть' : '✓ Тематика убрана — бейджа нет'; }
+      catch (er) { mst.textContent = '⚠ ' + errText(er); }
+    };
     main.querySelector('[data-now]').onclick = () => load(thisMonth); // назад к текущему месяцу
     main.querySelector('[data-clear]').onclick = async e => { // темы и цвета обычных дней с завтрашнего; ЭКСТРА и прошедшие не трогаются
       const n = D.days.filter(d => d.day > D.today && !d.extra && (d.subject.some(x => x) || d.colors.length)).length;
