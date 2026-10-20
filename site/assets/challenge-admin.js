@@ -355,10 +355,16 @@
     for (let j = 0; j < D.base; j++) { const [r2, g2, b2] = rgb(D.colors[j].hex), dd = (r - r2) ** 2 + (g - g2) ** 2 + (b - b2) ** 2; if (dd < bd) { bd = dd; best = j; } }
     return best;
   }
+  // все цвета (базовые, moreColors, круг) для «🎨 Все цвета»: сначала нейтральные от светлых к тёмным, потом по тону, внутри — от светлых
+  const allSorted = () => D.colors.map((c, k) => { const [h, sat, l] = hslOf(c.hex); return { k, h, sat, l }; })
+    .sort((a, b) => (a.sat < .18) !== (b.sat < .18) ? (a.sat < .18 ? -1 : 1) : a.sat < .18 ? b.l - a.l : Math.round(((a.h + 15) % 360) / 20) - Math.round(((b.h + 15) % 360) / 20) || b.l - a.l).map(x => x.k);
+  const hslOf = hx => { const v = rgb(hx).map(x => x / 255), mx = Math.max(...v), mn = Math.min(...v), l = (mx + mn) / 2, dd = mx - mn; if (!dd) return [0, 0, l];
+    const [r, g, b] = v, h = mx === r ? ((g - b) / dd + 6) % 6 : mx === g ? (b - r) / dd + 2 : (r - g) / dd + 4; return [h * 60, dd / (1 - Math.abs(2 * l - 1)), l]; };
   const baseCols = list => [...new Set(list.map(toBase).filter(k => k >= 0))];
   // цветовой круг, жёлтый сверху, по часовой. Три вида (переключатель в окне): '24x3' — 24 тона × светлый / чистый / тёмный (wheelColors, по умолчанию),
   // '24' — 24 чистых тона, '12' — 6 базовых + 6 промежуточных из moreColors. Гармонии — сдвиги от главного цвета в 12-шаговых долях круга
-  const WT = [['24x3', '24 × 3', '24 цвета × светлый, чистый, тёмный'], ['24', '24', '24 цвета'], ['12', '12', '12 цветов']];
+  // 'full' — полный: 24 тона × 5 (бледный, светлый, чистый, тёмный, глубокий; бледные и глубокие — wheelColors w: [тон, 3|4])
+  const WT = [['full', 'Полный', '24 цвета × 5 оттенков: бледный, светлый, чистый, тёмный, глубокий'], ['24x3', '24 × 3', '24 цвета × светлый, чистый, тёмный'], ['24', '24', '24 цвета'], ['12', '12', '12 цветов']];
   const WHEEL_N = ['yellow', 'olive', 'green', 'turquoise', 'blue', 'indigo', 'purple', 'fuchsia', 'red', 'coral', 'orange', 'ochre'];
   const HARM = [['mono', 'Монохромная', [0]], ['comp', 'Комплементарная', [0, 6]], ['analog', 'Аналоговая', [-1, 0, 1]], ['analog2', 'Аналоговая через один', [0, 2]], ['acomp', 'Аналогово-комплементарная', [-1, 0, 1, 6]],
     ['triad', 'Триада', [0, 4, 8]], ['split', 'Раздельно-комплементарная', [0, 5, 7]], ['tetrad', 'Тетрада', [0, 2, 6, 8]]];
@@ -370,6 +376,7 @@
     const pure = Array.from({ length: 24 }, (_, h) => PURE24[h] ? D.colors.findIndex((c, k) => k < D.base && c.n[0] === PURE24[h]) : byW(h, 1));
     return (GRIDS[wt] = wt === '12' ? { n: 12, rings: [WHEEL_N.map(n => D.colors.findIndex(c => c.n[0] === n))], pure: 0 }
       : wt === '24' ? { n: 24, rings: [pure], pure: 0 }
+      : wt === 'full' ? { n: 24, rings: [3, 0, 'p', 2, 4].map(r => r === 'p' ? pure : Array.from({ length: 24 }, (_, h) => byW(h, r))), pure: 2 }
       : { n: 24, rings: [Array.from({ length: 24 }, (_, h) => byW(h, 0)), pure, Array.from({ length: 24 }, (_, h) => byW(h, 2))], pure: 1 });
   }
   const offs = h => (HARM.find(x => x[0] === h) || HARM[1])[2];
@@ -408,7 +415,7 @@
     const r = rad.findIndex(([R, r0]) => d <= R && d > r0);
     return { s, r: r < 0 ? (d > rad[0][0] ? 0 : rad.length - 1) : r };
   };
-  let WT_NOW = '24x3';
+  let WT_NOW = 'full';
   try { WT_NOW = localStorage.getItem('pp-chadm-wt') || WT_NOW; } catch (e) { /* без памяти */ }
   // перевод темы: с того языка, который правили последним (или с первого заполненного), на два других
   async function translate(texts, from) {
@@ -442,7 +449,9 @@
         : `<fieldset class="chadm-f"><legend>Цвета дня</legend>
           <div class="chadm-moderow"><div class="ch-level chadm-mode" role="group"><button type="button" data-mode="one">По одному</button><button type="button" data-mode="harm">Гармония на круге</button></div>
             <button type="button" class="pill-btn" data-rnd>🎲 Случайно</button></div>
-          <div class="chadm-cols" data-one>${D.colors.slice(0, D.base).map((c, k) => `<button type="button" data-col="${k}" aria-pressed="false"><i style="background:${c.hex}"></i>${esc(c.n[1])}</button>`).join('')}</div>
+          <div data-one><div class="chadm-cols">${D.colors.slice(0, D.base).map((c, k) => `<button type="button" data-col="${k}" aria-pressed="false"><i style="background:${c.hex}"></i>${esc(c.n[1])}</button>`).join('')}</div>
+            <details class="chadm-allc" data-allc><summary>🎨 Все цвета (${D.colors.length}) — оттенки, пастель, тёмные</summary><input type="search" data-cq placeholder="найти: мятный, охра, бордо…">
+              <div class="chadm-swg">${allSorted().map(k => `<button type="button" data-col="${k}" data-cn="${esc(D.colors[k].n.join(' ').toLowerCase())}" aria-pressed="false" title="${esc(D.colors[k].n[1])}" style="--c:${D.colors[k].hex}"><i></i><span>${esc(D.colors[k].n[1])}</span></button>`).join('')}</div></details></div>
           <div class="chadm-harm" data-harm hidden><div class="chadm-wheel"><div class="ch-level chadm-wt" role="group">${WT.map(([k, n, t]) => `<button type="button" data-wt="${k}" title="${t}">${n}</button>`).join('')}</div><div data-wheel title="Потяните, чтобы повернуть; нажмите на клетку — цвет или оттенок"></div>
             <p><button type="button" class="pill-btn" data-rot="-1" aria-label="Повернуть против часовой">⟲</button><button type="button" class="pill-btn" data-rot="1" aria-label="Повернуть по часовой">⟳</button></p></div>
             <div class="chadm-hlist">${HARM.map(([h, n]) => `<button type="button" data-h="${h}" aria-pressed="false">${n}</button>`).join('')}</div></div>
@@ -460,7 +469,8 @@
     function fill() {
       dlg.querySelectorAll('[data-f]').forEach(inp => { const v = d[inp.dataset.f]; inp.value = v ? v[LI[inp.dataset.l]] || '' : ''; });
       const fh = findHarm(d.colors, WT_NOW);
-      if (fh) { mode = 'harm'; [harm, rot, wt, rg] = fh; cols = harmCols(harm, rot, wt, rg); } else { mode = 'one'; cols = baseCols(d.colors); }
+      if (fh) { mode = 'harm'; [harm, rot, wt, rg] = fh; cols = harmCols(harm, rot, wt, rg); } else { mode = 'one'; cols = [...d.colors]; }
+      const ac = q('[data-allc]'); if (ac) ac.open = cols.some(k => k >= D.base); // выбран не базовый — список всех цветов открыт
       paintCols();
       q('[data-time]').value = String(d.time);
       q('[data-a=revert]').hidden = !d.edited;
@@ -476,14 +486,14 @@
       dlg.querySelectorAll('[data-col]').forEach(b => b.setAttribute('aria-pressed', cols.includes(+b.dataset.col)));
       dlg.querySelectorAll('[data-h]').forEach(b => b.setAttribute('aria-pressed', b.dataset.h === harm));
       dlg.querySelectorAll('[data-wt]').forEach(b => b.setAttribute('aria-pressed', b.dataset.wt === wt));
-      if (mode === 'harm') { const g = grid(wt); q('[data-wheel]').innerHTML = wheelSvg(wt, sectors(harm, rot, wt).map((sc, j) => [sc, rg[j] ?? g.pure]), 170); }
+      if (mode === 'harm') { const g = grid(wt); q('[data-wheel]').innerHTML = wheelSvg(wt, sectors(harm, rot, wt).map((sc, j) => [sc, rg[j] ?? g.pure]), wt === 'full' ? 220 : 170); }
       q('[data-picked]').innerHTML = cols.length ? cols.map(c => `<span><i style="background:${D.colors[c].hex}"></i>${esc(D.colors[c].n[1])}</span>`).join('') : 'цвета не выбраны';
     }
     const setHarm = () => { cols = harmCols(harm, rot, wt, rg); paintCols(); };
     dlg.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => {
       if (b.dataset.mode === mode) return;
       mode = b.dataset.mode;
-      if (mode === 'one') { cols = baseCols(cols); paintCols(); return; }
+      if (mode === 'one') { paintCols(); return; } // цвета гармонии остаются как есть — их видно в «🎨 Все цвета»
       const g = grid(wt), k = g.rings[g.pure].indexOf(cols[0]); if (k >= 0) rot = k; rg = []; setHarm();
     });
     // вид круга: 24 × 3 / 24 / 12 — гармония та же, поворот пересчитывается, оттенки — чистые
@@ -523,10 +533,11 @@
       wh.addEventListener('pointerup', end); wh.addEventListener('pointercancel', () => { drag = null; });
     }
     if (q('[data-pal]')) q('[data-pal]').onchange = palSw;
+    const cq = q('[data-cq]'); if (cq) cq.oninput = () => { const t = cq.value.trim().toLowerCase(); dlg.querySelectorAll('[data-cn]').forEach(b => { b.hidden = !!t && !b.dataset.cn.includes(t); }); };
     dlg.querySelectorAll('[data-col]').forEach(b => b.onclick = () => {
       const k = +b.dataset.col;
       if (cols.includes(k)) cols = cols.filter(x => x !== k); else if (cols.length < 5) cols.push(k); else { cols.shift(); cols.push(k); }
-      paintCols();
+      mode = 'one'; paintCols();
     });
     // какой язык темы правили — с него и переводим
     dlg.querySelectorAll('[data-f="subject"]').forEach(inp => inp.addEventListener('input', () => { from = inp.dataset.l; trLabel(); }));
