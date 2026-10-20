@@ -4,6 +4,7 @@
   if (!box || !CT || !D) return;
   const L = { en: 0, ru: 1, lv: 2 }[document.documentElement.lang] ?? 0, locale = ['en-GB', 'ru-RU', 'lv-LV'][L];
   const T = {
+    bwJust: ['Just draw it in black & white', 'Просто рисуйте в чёрно-белом', 'Vienkārši zīmē melnbaltu'], // в Ч/Б — без дополнительных условий
     min: ['min', 'мин', 'min'],
     extra: ['✦ EXTRA: a palette from my painting', '✦ ЭКСТРА: палитра из моей картины', '✦ EKSTRA: palete no mana darba'],
     bday: ['🎂 My birthday!', '🎂 Мой день рождения!', '🎂 Mana dzimšanas diena!'],
@@ -17,7 +18,7 @@
     const th = CT.themeFor(now, L);
     q('.td-date').textContent = now.toLocaleDateString(locale, { weekday: 'long', day: 'numeric', month: 'long' });
     q('.td-subj').textContent = th.subject;
-    q('.td-cols').innerHTML = bw ? `✒ ${th.twist}` : th.colors.map(c => `<i style="background:${c.hex}" title="${c.n[L]}"></i>`).join('');
+    q('.td-cols').innerHTML = bw ? `✒ ${t('bwJust')}` : th.colors.map(c => `<i style="background:${c.hex}" title="${c.n[L]}"></i>`).join('');
     q('.td-meta').textContent = th.loading ? '' : `${th.time + 5} ${t('min')}` + (th.bday ? ` · ${t('bday')}` : th.extra ? ` · ${t('extra')}` : '');
   }
   fill(); document.addEventListener('pp:chplan', fill);

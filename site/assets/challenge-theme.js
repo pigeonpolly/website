@@ -132,7 +132,7 @@
     return { subject: subject[L], colors, pal, twist, extraBw, time, extra, bday, tip: D.tips[day % D.tips.length][L] };
   }
   // ---------- план месяца с сервера ----------
-  const ALLC = D.colors.concat(D.moreColors || []); // в плане цвета — индексы в colors + moreColors
+  const ALLC = D.colors.concat(D.moreColors || [], D.wheelColors || []); // в плане цвета — индексы в colors + moreColors + wheelColors
   const PLAN_FIRST = '2026-10', PLAN_FROM = '2026-11-01';
   const LOADING = ['the theme is loading…', 'тема загружается…', 'tēma ielādējas…'];
   const plans = {}, asked = {};

@@ -99,7 +99,8 @@ function colorBlock(data, b) {
 }
 // ---------- с 1.11.2026: гармоничные цвета (2–5) из colors + moreColors ----------
 // все цвета плана: индексы 0–9 — colors, 10+ — moreColors; k: 'n' — нейтральный, f — бейдж за цвет (иначе n[0])
-export const allColors = data => data.colors.concat(data.moreColors || []);
+export const allColors = data => data.colors.concat(data.moreColors || [], data.wheelColors || []); // wheelColors — только для правки в кабинете (цветовой круг)
+const genColors = data => data.colors.concat(data.moreColors || []); // из них подбирает генератор
 function hsl(hex) {
   const v = [1, 3, 5].map(i => parseInt(hex.slice(i, i + 2), 16) / 255), mx = Math.max(...v), mn = Math.min(...v), l = (mx + mn) / 2, dd = mx - mn;
   if (!dd) return { h: 0, s: 0, l };
@@ -129,7 +130,7 @@ function seasonW(c, season) {
 // схемы: нейтральные + 1 акцент; соседние оттенки; дополнительные; главный + поддержка (5). Два ярких одного оттенка (голубой и индиго) — никогда
 const SCHEMES = [['accent', 38], ['analog', 27], ['compl', 22], ['five', 13]];
 function harmonyFor(data, key, avoid) {
-  const all = allColors(data).map((c, i) => ({ i, k: c.k, lab: lab(c.hex), ...hsl(c.hex) }));
+  const all = genColors(data).map((c, i) => ({ i, k: c.k, lab: lab(c.hex), ...hsl(c.hex) }));
   const N = all.filter(c => c.k === 'n'), A = all.filter(c => c.k !== 'n' && !avoid.has(c.i));
   const season = SEASON_OF(+key.slice(5, 7) - 1), r = rngFor('harmony-' + key);
   let out = [];

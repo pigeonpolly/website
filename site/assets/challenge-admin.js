@@ -1,5 +1,5 @@
-// Кабинет → «🎨 Темы челленджа» (admin.js открывает PPChallengeAdmin.mount(main)): календарь на год вперёд (D.ahead месяцев), «В цвете / Ч/Б»;
-// окно дня (без прокрутки) — тема RU/EN/LV, цвета: 1–5 базовых по одному или гармония на цветовом круге (можно поворачивать); время и Ч/Б-указание — под «Ещё»; в день ЭКСТРА — палитра и Ч/Б-условие;
+// Кабинет → «🎨 Темы челленджа» (admin.js открывает PPChallengeAdmin.mount(main)): календарь на год вперёд (D.ahead месяцев);
+// окно дня (без прокрутки) — тема RU/EN/LV, цвета: 1–5 базовых по одному или гармония на цветовом круге (можно поворачивать); время — под «Ещё» (Ч/Б — без условий, не правится); в день ЭКСТРА — палитра и Ч/Б-условие;
 // «🌐 Перевести», «🎲 Другой предмет», «⇄ Поменять с днём…», «↩ Вернуть как было». Сервер — /api/admin/challenge/* (worker/challenge-days.js), docs/challenge.md.
 (function () {
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -21,7 +21,7 @@
   const pad = n => String(n).padStart(2, '0');
   const ymAdd = (ym, k) => { const t = +ym.slice(0, 4) * 12 + +ym.slice(5, 7) - 1 + k; return `${Math.floor(t / 12)}-${pad(t % 12 + 1)}`; };
   let main = null, D = null, ym = null, bw = false, thisMonth = null;
-  try { bw = sessionStorage.getItem('pp-chadm-bw') === '1'; } catch (e) { /* без памяти */ }
+  // Ч/Б с 20.10.2026 — без условий, в календаре кабинета смотреть нечего (переключатель убран)
 
   async function mount(el, m) {
     main = el; main.innerHTML = '<p class="be-note">Загрузка…</p>';
@@ -48,19 +48,17 @@
       const cls = ['chadm-day', d.day === D.today ? 'today' : '', d.day < D.today ? 'past' : '', d.edited ? 'edited' : '', d.day === D.last ? 'last' : '', d.extra ? 'extra' : '', broken[d.day] ? 'warn' : ''].filter(Boolean).join(' ');
       return `<button type="button" class="${cls}" data-day="${d.day}"><span class="chadm-n">${n}${d.edited ? ' ✏️' : ''}${d.day === D.last ? ' <b class="chadm-lastb">последний</b>' : ''}${d.day === D.today ? ' <b class="chadm-todayb">сегодня</b>' : ''}${d.extra ? ' ✦' : ''}${t.pool === 'bday' ? ' 🎂' : ''}${broken[d.day] ? ' ⚠' : ''}</span>
         <span class="chadm-s">${esc(d.subject[1] || d.subject[0])}</span>
-        <span class="chadm-c">${bw ? `✒ ${esc(d.twist[1] || d.twist[0])}` : d.extra ? '🎨 палитра' : d.colors.map(sw).join('')}</span>
+        <span class="chadm-c">${bw ? '✒ Ч/Б' : d.extra ? '🎨 палитра' : d.colors.map(sw).join('')}</span>
         ${works ? `<span class="chadm-w">${works} раб.</span>` : ''}</button>`;
     }).join('');
     main.innerHTML = `<section class="adm-box chadm">
-      <div class="chadm-bar"><div class="ch-level chadm-months" role="group">${months.map(m => `<button type="button" data-m="${m}" aria-pressed="${m === ym}" title="${MON[+m.slice(5) - 1]} ${m.slice(0, 4)}">${MON3[+m.slice(5) - 1]}${m.slice(5) === '01' || m === thisMonth ? ' ' + m.slice(2, 4) : ''}</button>`).join('')}</div>
-        <div class="ch-level" role="group"><button type="button" data-bw="0" aria-pressed="${!bw}">В цвете</button><button type="button" data-bw="1" aria-pressed="${bw}">Ч/Б</button></div></div>
+      <div class="chadm-bar"><div class="ch-level chadm-months" role="group">${months.map(m => `<button type="button" data-m="${m}" aria-pressed="${m === ym}" title="${MON[+m.slice(5) - 1]} ${m.slice(0, 4)}">${MON3[+m.slice(5) - 1]}${m.slice(5) === '01' || m === thisMonth ? ' ' + m.slice(2, 4) : ''}</button>`).join('')}</div></div>
       ${D.last ? `<p class="be-note chadm-lastn">Последний изменённый: <button type="button" class="pill-btn" data-last>${new Date(+D.last.slice(0, 4), +D.last.slice(5, 7) - 1, +D.last.slice(8)).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })}</button></p>` : ''}
       ${D.days.length ? `<div class="chadm-grid" lang="ru">${['пн', 'вт', 'ср', 'чт', 'пт', 'сб', 'вс'].map(x => `<span class="chadm-dow">${x}</span>`).join('')}${'<span></span>'.repeat(first)}${cells}</div>
       <p class="be-note">Нажмите на день, чтобы поправить тему. ✏️ — день правили вы, зелёный — последний изменённый, фиолетовый — сегодня, ✦ — день ЭКСТРА, ⚠ — день нарушает правило подбора (подробнее — в окне дня). ${D.broken.length ? `Нарушений в месяце: <b>${D.broken.length}</b>.` : 'Все дни подходят по правилам ✓'}</p>`
         : '<p class="be-note">Плана на этот месяц пока нет.</p>'}
       <p class="be-note">План следующего месяца создаётся сам 20-го числа; месяцы на год вперёд — когда вы их откроете здесь. Созданный месяц сам уже не меняется. Числа правил подбора — в «📜 Все правила» → «Тонкая настройка» → «🎨 Темы челленджа».</p></section>`;
     main.querySelectorAll('[data-m]').forEach(b => b.onclick = () => load(b.dataset.m));
-    main.querySelectorAll('[data-bw]').forEach(b => b.onclick = () => { bw = b.dataset.bw === '1'; try { sessionStorage.setItem('pp-chadm-bw', bw ? '1' : ''); } catch (e) { /* без памяти */ } draw(); });
     main.querySelectorAll('[data-day]').forEach(b => b.onclick = () => dayDialog(b.dataset.day));
     const lb = main.querySelector('[data-last]'); if (lb) lb.onclick = () => D.last.slice(0, 7) === ym ? dayDialog(D.last) : load(D.last.slice(0, 7));
   }
@@ -78,26 +76,60 @@
     return best;
   }
   const baseCols = list => [...new Set(list.map(toBase).filter(k => k >= 0))];
-  // цветовой круг (12 секторов по часовой, жёлтый сверху): 6 базовых + 6 промежуточных из moreColors; гармонии — сдвиги от главного цвета
+  // цветовой круг, жёлтый сверху, по часовой. Три вида (переключатель в окне): '24x3' — 24 тона × светлый / чистый / тёмный (wheelColors, по умолчанию),
+  // '24' — 24 чистых тона, '12' — 6 базовых + 6 промежуточных из moreColors. Гармонии — сдвиги от главного цвета в 12-шаговых долях круга
+  const WT = [['24x3', '24 × 3', '24 цвета × светлый, чистый, тёмный'], ['24', '24', '24 цвета'], ['12', '12', '12 цветов']];
   const WHEEL_N = ['yellow', 'olive', 'green', 'turquoise', 'blue', 'indigo', 'purple', 'fuchsia', 'red', 'coral', 'orange', 'ochre'];
   const HARM = [['mono', 'Монохромная', [0]], ['comp', 'Комплементарная', [0, 6]], ['analog', 'Аналоговая', [-1, 0, 1]], ['analog2', 'Аналоговая через один', [0, 2]], ['acomp', 'Аналогово-комплементарная', [-1, 0, 1, 6]],
     ['triad', 'Триада', [0, 4, 8]], ['split', 'Раздельно-комплементарная', [0, 5, 7]], ['tetrad', 'Тетрада', [0, 2, 6, 8]]];
-  const wheelIdx = () => WHEEL_N.map(n => D.colors.findIndex(c => c.n[0] === n));
-  const harmCols = (h, rot) => { const w = wheelIdx(); return (HARM.find(x => x[0] === h) || HARM[1])[2].map(o => w[((rot + o) % 12 + 12) % 12]); };
-  function findHarm(list) { // цвета дня — это гармония на круге? → [гармония, поворот]
-    const s = [...new Set(list)].sort().join();
-    for (const [h] of HARM) for (let r = 0; r < 12; r++) if ([...new Set(harmCols(h, r))].sort().join() === s) return [h, r];
+  const PURE24 = { 0: 'yellow', 4: 'green', 8: 'blue', 12: 'purple', 16: 'red', 20: 'orange' }; // чистые тона круга 24, которые уже есть в colors
+  const GRIDS = {};
+  function grid(wt) { // { n — секторов, rings — кольца снаружи внутрь: [[индекс цвета по сектору]], pure — какое кольцо «чистое» }
+    if (GRIDS[wt]) return GRIDS[wt];
+    const byW = (h, r) => D.colors.findIndex(c => c.w && c.w[0] === h && c.w[1] === r);
+    const pure = Array.from({ length: 24 }, (_, h) => PURE24[h] ? D.colors.findIndex((c, k) => k < D.base && c.n[0] === PURE24[h]) : byW(h, 1));
+    return (GRIDS[wt] = wt === '12' ? { n: 12, rings: [WHEEL_N.map(n => D.colors.findIndex(c => c.n[0] === n))], pure: 0 }
+      : wt === '24' ? { n: 24, rings: [pure], pure: 0 }
+      : { n: 24, rings: [Array.from({ length: 24 }, (_, h) => byW(h, 0)), pure, Array.from({ length: 24 }, (_, h) => byW(h, 2))], pure: 1 });
+  }
+  const offs = h => (HARM.find(x => x[0] === h) || HARM[1])[2];
+  const sectors = (h, rot, wt) => { const g = grid(wt), st = g.n / 12; return offs(h).map(o => ((rot + o * st) % g.n + g.n) % g.n); };
+  // rg — кольцо (оттенок) каждого цвета гармонии; нет — чистый
+  const harmCols = (h, rot, wt, rg = []) => { const g = grid(wt); return sectors(h, rot, wt).map((s, j) => g.rings[rg[j] ?? g.pure][s]); };
+  function findHarm(list, prefer) { // цвета дня — это гармония на круге? → [гармония, поворот, вид круга, оттенки]
+    const want = [...new Set(list)];
+    for (const wt of [prefer, ...WT.map(x => x[0])]) {
+      const g = grid(wt), at = new Map();
+      g.rings.forEach((ring, r) => ring.forEach((ci, s) => at.set(ci, [s, r])));
+      if (!want.every(c => at.has(c))) continue;
+      for (const [h] of HARM) for (let rot = 0; rot < g.n; rot++) {
+        const ss = sectors(h, rot, wt); if (ss.length !== want.length) continue;
+        const rg = ss.map(s => { const c = want.find(x => at.get(x)[0] === s); return c == null ? -1 : at.get(c)[1]; });
+        if (rg.every(r => r >= 0)) return [h, rot, wt, rg];
+      }
+    }
     return null;
   }
-  // сектор кольца k (0 — сверху) и клин к центру для выбранных
+  // кольца: снаружи внутрь от R до 30; выбранные клетки — с рамкой, к центру — клин цвета
   const pt = (a, r) => [100 + r * Math.sin(a), 100 - r * Math.cos(a)].map(v => v.toFixed(1)).join(' ');
-  function wheelSvg(on, size) {
-    const w = wheelIdx(), st = Math.PI / 6, R = 96, r = 60;
-    const seg = k => { const a = k * st - st / 2, b = a + st; return `M${pt(a, R)} A${R} ${R} 0 0 1 ${pt(b, R)} L${pt(b, r)} A${r} ${r} 0 0 0 ${pt(a, r)}Z`; };
-    const wedge = k => { const a = k * st - st / 2 + .04, b = a + st - .08; return `M100 100 L${pt(a, r - 2)} A${r - 2} ${r - 2} 0 0 1 ${pt(b, r - 2)}Z`; };
-    return `<svg viewBox="0 0 200 200" width="${size}" height="${size}" aria-hidden="true">${w.map((ci, k) => `<path d="${seg(k)}" fill="${(D.colors[ci] || {}).hex || '#ccc'}" data-k="${k}"${on.has(k) ? ' class="on"' : ''}/>`).join('')}
-      ${[...on].map(k => `<path d="${wedge(k)}" fill="${(D.colors[w[k]] || {}).hex}" class="wg"/>`).join('')}</svg>`;
+  const RAD = rings => { const R = 97, inner = rings > 1 ? 30 : 60, w = (R - inner) / rings; return Array.from({ length: rings }, (_, k) => [R - k * w, R - (k + 1) * w]); };
+  function wheelSvg(wt, on, size) { // on: [[сектор, кольцо]]
+    const g = grid(wt), st = 2 * Math.PI / g.n, rad = RAD(g.rings.length), inner = rad[rad.length - 1][1];
+    const seg = (k, R, r) => { const a = k * st - st / 2, b = a + st; return `M${pt(a, R)} A${R} ${R} 0 0 1 ${pt(b, R)} L${pt(b, r)} A${r} ${r} 0 0 0 ${pt(a, r)}Z`; };
+    const isOn = (k, r) => on.some(([s, rr]) => s === k && rr === r);
+    let cells = '', top = '';
+    g.rings.forEach((ring, r) => ring.forEach((ci, k) => { const p = `<path d="${seg(k, ...rad[r])}" fill="${(D.colors[ci] || {}).hex || '#ccc'}"${isOn(k, r) ? ' class="on"' : ''}/>`; if (isOn(k, r)) top += p; else cells += p; }));
+    const wedge = ([k, r]) => { const a = k * st - st / 2.4, b = k * st + st / 2.4, R = inner - 2; return `<path d="M100 100 L${pt(a, R)} A${R} ${R} 0 0 1 ${pt(b, R)}Z" fill="${(D.colors[g.rings[r][k]] || {}).hex}" class="wg"/>`; };
+    return `<svg viewBox="0 0 200 200" width="${size}" height="${size}" aria-hidden="true">${cells}${top}${on.map(wedge).join('')}</svg>`;
   }
+  const hitWheel = (el, e, wt) => { // сектор и кольцо под пальцем
+    const g = grid(wt), b = el.getBoundingClientRect(), x = (e.clientX - b.left) / b.width * 200 - 100, y = (e.clientY - b.top) / b.height * 200 - 100;
+    const s = ((Math.round(Math.atan2(x, -y) / (2 * Math.PI / g.n)) % g.n) + g.n) % g.n, d = Math.hypot(x, y), rad = RAD(g.rings.length);
+    const r = rad.findIndex(([R, r0]) => d <= R && d > r0);
+    return { s, r: r < 0 ? (d > rad[0][0] ? 0 : rad.length - 1) : r };
+  };
+  let WT_NOW = '24x3';
+  try { WT_NOW = localStorage.getItem('pp-chadm-wt') || WT_NOW; } catch (e) { /* без памяти */ }
   // перевод темы: с того языка, который правили последним (или с первого заполненного), на два других
   async function translate(texts, from) {
     const ctl = new AbortController(), timer = setTimeout(() => ctl.abort(), 45000);
@@ -131,24 +163,24 @@
           <div class="chadm-moderow"><div class="ch-level chadm-mode" role="group"><button type="button" data-mode="one">По одному</button><button type="button" data-mode="harm">Гармония на круге</button></div>
             <button type="button" class="pill-btn" data-rnd>🎲 Случайно</button></div>
           <div class="chadm-cols" data-one>${D.colors.slice(0, D.base).map((c, k) => `<button type="button" data-col="${k}" aria-pressed="false"><i style="background:${c.hex}"></i>${esc(c.n[1])}</button>`).join('')}</div>
-          <div class="chadm-harm" data-harm hidden><div class="chadm-wheel"><div data-wheel title="Потяните или нажмите на цвет, чтобы повернуть"></div>
+          <div class="chadm-harm" data-harm hidden><div class="chadm-wheel"><div class="ch-level chadm-wt" role="group">${WT.map(([k, n, t]) => `<button type="button" data-wt="${k}" title="${t}">${n}</button>`).join('')}</div><div data-wheel title="Потяните, чтобы повернуть; нажмите на клетку — цвет или оттенок"></div>
             <p><button type="button" class="pill-btn" data-rot="-1" aria-label="Повернуть против часовой">⟲</button><button type="button" class="pill-btn" data-rot="1" aria-label="Повернуть по часовой">⟳</button></p></div>
             <div class="chadm-hlist">${HARM.map(([h, n]) => `<button type="button" data-h="${h}" aria-pressed="false">${n}</button>`).join('')}</div></div>
           <p class="chadm-picked" data-picked></p></fieldset>`}
-        <details><summary>Ещё: время, Ч/Б-указание${d.extra ? ', Ч/Б-условие ЭКСТРА' : ''}</summary><div>
+        <details><summary>Ещё: время</summary><div>
           <label class="chadm-time">Время <select data-time>${D.times.map(x => `<option value="${x}">${x} мин</option>`).join('')}</select><small class="be-note">в режиме «Спокойно» — на 5 минут больше</small></label>
-          ${txt('twist', 'Ч/Б-указание')}${d.extra ? txt('extra', 'Ч/Б-условие дня ЭКСТРА') : ''}</div></details>
+          </div></details>
       </div>
       <p class="be-dialog-acts"><button type="button" class="pill-btn pill-fill" data-a="save">💾 Сохранить</button><span class="be-note" data-st role="status"></span></p>`;
     document.body.appendChild(dlg);
     const q = s => dlg.querySelector(s), st = q('[data-st]'), trBtn = q('[data-a=tr]');
-    let cols = [], from = 'ru', mode = 'one', harm = 'comp', rot = 0;
+    let cols = [], from = 'ru', mode = 'one', harm = 'comp', rot = 0, wt = WT_NOW, rg = [];
     const fs = ['subject']; // переводится только тема (Ч/Б-поля под «Ещё» правятся руками)
     const trLabel = () => { trBtn.textContent = `🌐 Перевести с ${from.toUpperCase()} на ${L3.filter(l => l !== from).map(l => l.toUpperCase()).join(' и ')}`; };
     function fill() {
       dlg.querySelectorAll('[data-f]').forEach(inp => { const v = d[inp.dataset.f]; inp.value = v ? v[LI[inp.dataset.l]] || '' : ''; });
-      const fh = findHarm(d.colors);
-      if (fh) { mode = 'harm'; [harm, rot] = fh; cols = harmCols(harm, rot); } else { mode = 'one'; cols = baseCols(d.colors); }
+      const fh = findHarm(d.colors, WT_NOW);
+      if (fh) { mode = 'harm'; [harm, rot, wt, rg] = fh; cols = harmCols(harm, rot, wt, rg); } else { mode = 'one'; cols = baseCols(d.colors); }
       paintCols();
       q('[data-time]').value = String(d.time);
       q('[data-a=revert]').hidden = !d.edited;
@@ -162,33 +194,51 @@
       q('[data-one]').hidden = mode !== 'one'; q('[data-harm]').hidden = mode !== 'harm';
       dlg.querySelectorAll('[data-col]').forEach(b => b.setAttribute('aria-pressed', cols.includes(+b.dataset.col)));
       dlg.querySelectorAll('[data-h]').forEach(b => b.setAttribute('aria-pressed', b.dataset.h === harm));
-      if (mode === 'harm') { const w = wheelIdx(); q('[data-wheel]').innerHTML = wheelSvg(new Set(cols.map(c => w.indexOf(c))), 150); }
+      dlg.querySelectorAll('[data-wt]').forEach(b => b.setAttribute('aria-pressed', b.dataset.wt === wt));
+      if (mode === 'harm') { const g = grid(wt); q('[data-wheel]').innerHTML = wheelSvg(wt, sectors(harm, rot, wt).map((sc, j) => [sc, rg[j] ?? g.pure]), 170); }
       q('[data-picked]').innerHTML = cols.length ? cols.map(c => `<span><i style="background:${D.colors[c].hex}"></i>${esc(D.colors[c].n[1])}</span>`).join('') : 'цвета не выбраны';
     }
-    const setHarm = () => { cols = harmCols(harm, rot); paintCols(); };
+    const setHarm = () => { cols = harmCols(harm, rot, wt, rg); paintCols(); };
     dlg.querySelectorAll('[data-mode]').forEach(b => b.onclick = () => {
       if (b.dataset.mode === mode) return;
       mode = b.dataset.mode;
       if (mode === 'one') { cols = baseCols(cols); paintCols(); return; }
-      const k = wheelIdx().indexOf(cols[0]); if (k >= 0) rot = k; setHarm();
+      const g = grid(wt), k = g.rings[g.pure].indexOf(cols[0]); if (k >= 0) rot = k; rg = []; setHarm();
     });
-    dlg.querySelectorAll('[data-h]').forEach(b => b.onclick = () => { harm = b.dataset.h; setHarm(); });
+    // вид круга: 24 × 3 / 24 / 12 — гармония та же, поворот пересчитывается, оттенки — чистые
+    dlg.querySelectorAll('[data-wt]').forEach(b => b.onclick = () => {
+      const nw = b.dataset.wt; if (nw === wt) return;
+      rot = Math.round(rot * grid(nw).n / grid(wt).n) % grid(nw).n; wt = WT_NOW = nw; rg = [];
+      try { localStorage.setItem('pp-chadm-wt', nw); } catch (e) { /* без памяти */ }
+      setHarm();
+    });
+    dlg.querySelectorAll('[data-h]').forEach(b => b.onclick = () => { harm = b.dataset.h; rg = []; setHarm(); });
     // «🎲 Случайно»: любая гармония с любым поворотом, каждый раз другие цвета
     const rnd = q('[data-rnd]');
     if (rnd) rnd.onclick = () => {
       const was = [...cols].sort().join();
-      do { harm = HARM[Math.floor(Math.random() * HARM.length)][0]; rot = Math.floor(Math.random() * 12); } while ([...harmCols(harm, rot)].sort().join() === was);
+      const g = grid(wt), rnd = n => Math.floor(Math.random() * n);
+      do { harm = HARM[rnd(HARM.length)][0]; rot = rnd(g.n); rg = offs(harm).map(() => g.rings.length > 1 ? rnd(g.rings.length) : 0); } while ([...harmCols(harm, rot, wt, rg)].sort().join() === was);
       mode = 'harm'; setHarm();
     };
-    dlg.querySelectorAll('[data-rot]').forEach(b => b.onclick = () => { rot = (rot + +b.dataset.rot + 12) % 12; setHarm(); });
-    // круг можно тянуть: главный цвет гармонии встаёт в сектор под пальцем (второй выбранный цвет — со своим сдвигом)
+    dlg.querySelectorAll('[data-rot]').forEach(b => b.onclick = () => { const n = grid(wt).n; rot = (rot + +b.dataset.rot + n) % n; setHarm(); });
+    // круг можно тянуть: главный цвет гармонии идёт за пальцем. Нажатие без движения: на выбранный сектор — взять оттенок этого кольца,
+    // на другой — главный цвет встаёт туда (с оттенком нажатого кольца)
     const wh = q('[data-wheel]');
     if (wh) {
       let drag = null;
-      const sector = e => { const r = wh.getBoundingClientRect(), a = Math.atan2(e.clientX - r.left - r.width / 2, -(e.clientY - r.top - r.height / 2)); return ((Math.round(a / (Math.PI / 6)) % 12) + 12) % 12; };
-      wh.addEventListener('pointerdown', e => { e.preventDefault(); wh.setPointerCapture(e.pointerId); const k = sector(e); drag = { k, rot }; });
-      wh.addEventListener('pointermove', e => { if (!drag) return; const n = (drag.rot + sector(e) - drag.k + 12) % 12; if (n !== rot) { rot = n; setHarm(); } });
-      const end = e => { if (!drag) return; if (sector(e) === drag.k && rot === drag.rot) { rot = drag.k; setHarm(); } drag = null; };
+      wh.addEventListener('pointerdown', e => { e.preventDefault(); wh.setPointerCapture(e.pointerId); drag = { ...hitWheel(wh, e, wt), rot }; });
+      wh.addEventListener('pointermove', e => { if (!drag) return; const n = grid(wt).n, x = (drag.rot + hitWheel(wh, e, wt).s - drag.s + n) % n; if (x !== rot) { rot = x; setHarm(); } });
+      const end = e => {
+        if (!drag) return; const hit = hitWheel(wh, e, wt), multi = grid(wt).rings.length > 1;
+        if (hit.s === drag.s && rot === drag.rot) {
+          const j = sectors(harm, rot, wt).indexOf(hit.s);
+          if (j >= 0) { if (multi) { rg = offs(harm).map((_, k) => rg[k] ?? grid(wt).pure); rg[j] = hit.r; } }
+          else { rot = (hit.s - offs(harm)[0] * grid(wt).n / 12 + grid(wt).n * 4) % grid(wt).n; if (multi) { rg = offs(harm).map((_, k) => rg[k] ?? grid(wt).pure); rg[0] = hit.r; } }
+          setHarm();
+        }
+        drag = null;
+      };
       wh.addEventListener('pointerup', end); wh.addEventListener('pointercancel', () => { drag = null; });
     }
     dlg.querySelectorAll('[data-col]').forEach(b => b.onclick = () => {
@@ -221,8 +271,8 @@
     const run = async (fn) => { st.textContent = '…'; acts().forEach(b => b.disabled = true); try { await fn(); } catch (e) { st.textContent = '⚠ ' + errText(e); } acts().forEach(b => b.disabled = false); };
     q('[data-a=save]').onclick = () => run(async () => {
       if (!d.extra && (cols.length < 1 || cols.length > 5)) throw Object.assign(new Error('colors'), { code: 'colors' });
-      const body = { day, subject: val('subject'), twist: val('twist'), time: +q('[data-time]').value };
-      if (d.extra) body.extra = val('extra'); else body.colors = cols;
+      const body = { day, subject: val('subject'), time: +q('[data-time]').value }; // Ч/Б — без условий (20.10.2026), twist/extra не правятся
+      if (!d.extra) body.colors = cols;
       await api('/day', body);
       D = await api('?m=' + ym); draw(); dlg.close(); // сохранено — окно закрывается, календарь уже с новой темой
     });

@@ -11,6 +11,6 @@ const miss = D.subjects.map((s, i) => T[i] ? null : i).filter(i => i != null);
 if (miss.length) console.error('challenge-items: нет тегов у предметов', miss.join(', '), '— запусти node tools/challenge_tags.js');
 // предметы, которые генератор не берёт (content/challenge-off.txt: «индекс  название»)
 const off = fs.readFileSync(path.join(root, 'content/challenge-off.txt'), 'utf8').split('\n').map(l => l.trim()).filter(l => /^\d/.test(l)).map(l => parseInt(l, 10));
-const out = { subjects: D.subjects, tags: D.subjects.map((s, i) => T[i] || null), colors: D.colors, moreColors: D.moreColors || [], bw: D.bw || null, off, tips: D.tips, twists: D.twists, extrasBw: D.extrasBw, times: D.times };
+const out = { subjects: D.subjects, tags: D.subjects.map((s, i) => T[i] || null), colors: D.colors, moreColors: D.moreColors || [], wheelColors: D.wheelColors || [], bw: D.bw || null, off, tips: D.tips, twists: D.twists, extrasBw: D.extrasBw, times: D.times };
 fs.writeFileSync(path.join(root, 'site/assets/challenge-items.json'), JSON.stringify(out));
 console.log('challenge-items', D.subjects.length);
