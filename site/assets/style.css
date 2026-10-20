@@ -4134,7 +4134,8 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .chadm-warn { color: #B4441E; font-weight: 700; }
 /* окно дня (20.10.2026): тема на 3 языках + базовые цвета, без прокрутки */
 .chadm-dlg { width: min(640px, calc(100vw - 24px)); max-height: calc(100dvh - 24px); padding: 16px 20px; box-sizing: border-box; overflow: auto; }
-.chadm-dlg h2 { font-size: 18px; margin: 0 0 6px; }
+.chadm-dlg h2 { font-size: 18px; margin: 0 0 6px; padding-right: 40px; }
+.chadm-x { position: absolute; top: 10px; right: 10px; width: 34px; height: 34px; border: 0; border-radius: 50%; background: #F1ECF7; color: #2B1A51; font: 700 16px/1 var(--sans); cursor: pointer; } .chadm-x:hover { background: #2B1A51; color: #fff; }
 .chadm-dlg .adm-card-fields { gap: 8px; }
 .chadm-dlg .chadm-tags { margin: 0 0 6px; font-size: 12px; }
 .chadm-dlg .chadm-warn { margin: 0 0 6px; font-size: 13px; }
@@ -4150,6 +4151,7 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .chadm-dlg .be-dialog-acts { margin-top: 10px; align-items: center; }
 .chadm-dlg [data-st] { flex-basis: 100%; }
 /* гармонии на цветовом круге */
+.chadm-moderow { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; } .chadm-moderow [data-rnd] { padding: 5px 12px; font-size: 13px; }
 .chadm-dlg .chadm-mode { background: #F1ECF7; justify-self: start; } .chadm-dlg .chadm-mode button { color: #6B6290; padding: 6px 12px; font-size: 13px; }
 .chadm-dlg .chadm-mode button[aria-pressed="true"] { background: #2B1A51; color: #fff; }
 .chadm-dlg .chadm-cols[hidden] { display: none; }

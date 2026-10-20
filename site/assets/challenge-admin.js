@@ -118,7 +118,7 @@
     const txt = (f, label) => `<fieldset class="chadm-f"><legend>${label}</legend>${['ru', 'en', 'lv'].map(l => `<label><span>${l.toUpperCase()}</span><input type="text" data-f="${f}" data-l="${l}"></label>`).join('')}</fieldset>`;
     const pal = d.extra ? palOf(day) : null;
     const dt = new Date(+day.slice(0, 4), +day.slice(5, 7) - 1, +day.slice(8));
-    dlg.innerHTML = `<h2>${dt.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long', year: day.slice(0, 4) === D.today.slice(0, 4) ? undefined : 'numeric' })}${d.extra ? ' · ✦ ЭКСТРА' : ''}${t.pool === 'bday' ? ' · 🎂' : ''}</h2>
+    dlg.innerHTML = `<button type="button" class="chadm-x" data-x aria-label="Закрыть без изменений" title="Закрыть без изменений">✕</button><h2>${dt.toLocaleDateString('ru-RU', { weekday: 'long', day: 'numeric', month: 'long', year: day.slice(0, 4) === D.today.slice(0, 4) ? undefined : 'numeric' })}${d.extra ? ' · ✦ ЭКСТРА' : ''}${t.pool === 'bday' ? ' · 🎂' : ''}</h2>
       ${works && day <= D.today ? `<p class="chadm-warn">⚠ Уже ${works} ${works % 10 === 1 && works % 100 !== 11 ? 'работа' : [2, 3, 4].includes(works % 10) && ![12, 13, 14].includes(works % 100) ? 'работы' : 'работ'} за этот день — у них тема поменяется.</p>` : ''}
       <p class="be-note chadm-tags" data-tags></p>
       <div class="adm-card-fields">
@@ -128,7 +128,8 @@
           <button type="button" class="pill-btn" data-a="revert"${d.edited ? '' : ' hidden'}>↩ Вернуть как было</button></p>
         ${d.extra ? `<div class="chadm-pal"><b>Палитра дня ЭКСТРА</b>${pal ? `<span>${pal.c.map(c => `<i style="background:${c[0]}" title="${esc(c[2])}"></i>`).join('')}</span><small>«${esc(pal.t[1])}» — очередь палитр: 🎨 Картины и палитры</small>` : '<small>очередь палитр: 🎨 Картины и палитры</small>'}</div>`
         : `<fieldset class="chadm-f"><legend>Цвета дня</legend>
-          <div class="ch-level chadm-mode" role="group"><button type="button" data-mode="one">По одному</button><button type="button" data-mode="harm">Гармония на круге</button></div>
+          <div class="chadm-moderow"><div class="ch-level chadm-mode" role="group"><button type="button" data-mode="one">По одному</button><button type="button" data-mode="harm">Гармония на круге</button></div>
+            <button type="button" class="pill-btn" data-rnd>🎲 Случайно</button></div>
           <div class="chadm-cols" data-one>${D.colors.slice(0, D.base).map((c, k) => `<button type="button" data-col="${k}" aria-pressed="false"><i style="background:${c.hex}"></i>${esc(c.n[1])}</button>`).join('')}</div>
           <div class="chadm-harm" data-harm hidden><div class="chadm-wheel"><div data-wheel title="Потяните или нажмите на цвет, чтобы повернуть"></div>
             <p><button type="button" class="pill-btn" data-rot="-1" aria-label="Повернуть против часовой">⟲</button><button type="button" class="pill-btn" data-rot="1" aria-label="Повернуть по часовой">⟳</button></p></div>
@@ -172,6 +173,13 @@
       const k = wheelIdx().indexOf(cols[0]); if (k >= 0) rot = k; setHarm();
     });
     dlg.querySelectorAll('[data-h]').forEach(b => b.onclick = () => { harm = b.dataset.h; setHarm(); });
+    // «🎲 Случайно»: любая гармония с любым поворотом, каждый раз другие цвета
+    const rnd = q('[data-rnd]');
+    if (rnd) rnd.onclick = () => {
+      const was = [...cols].sort().join();
+      do { harm = HARM[Math.floor(Math.random() * HARM.length)][0]; rot = Math.floor(Math.random() * 12); } while ([...harmCols(harm, rot)].sort().join() === was);
+      mode = 'harm'; setHarm();
+    };
     dlg.querySelectorAll('[data-rot]').forEach(b => b.onclick = () => { rot = (rot + +b.dataset.rot + 12) % 12; setHarm(); });
     // круг можно тянуть: главный цвет гармонии встаёт в сектор под пальцем (второй выбранный цвет — со своим сдвигом)
     const wh = q('[data-wheel]');
@@ -209,7 +217,7 @@
       return api('?m=' + ym).then(x => { D = x; d = D.days[i]; tagsNow(); fill(); draw(); });
     };
     const tagsNow = () => { br.length = 0; br.push(...((D.broken.find(b => b.day === day) || {}).rules || [])); };
-    const acts = () => dlg.querySelectorAll('button:not([data-a=tr])');
+    const acts = () => dlg.querySelectorAll('button:not([data-a=tr]):not([data-x])');
     const run = async (fn) => { st.textContent = '…'; acts().forEach(b => b.disabled = true); try { await fn(); } catch (e) { st.textContent = '⚠ ' + errText(e); } acts().forEach(b => b.disabled = false); };
     q('[data-a=save]').onclick = () => run(async () => {
       if (!d.extra && (cols.length < 1 || cols.length > 5)) throw Object.assign(new Error('colors'), { code: 'colors' });
@@ -222,6 +230,7 @@
     q('[data-a=swap]').onclick = () => { const s = q('[data-swap]'); s.hidden = false; s.focus(); };
     q('[data-swap]').onchange = e => { const w = e.target.value; if (!w) return; run(async () => { await after(await api('/swap', { day, with: w })); e.target.value = ''; e.target.hidden = true; }); };
     q('[data-a=revert]').onclick = () => run(async () => { await after(await api('/revert', { day })); });
+    q('[data-x]').onclick = () => dlg.close();
     dlg.addEventListener('close', () => dlg.remove());
     fill(); dlg.showModal();
   }
