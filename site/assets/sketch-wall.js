@@ -586,7 +586,7 @@
     const upDate = dayAgo(upOff), upKey = keyOfD(upDate);
     const got = specials(me.posts), mine = me.posts.find(p => p.day === upKey);
     const th = window.ChallengeTheme ? window.ChallengeTheme.themeFor(upDate, L) : null;
-    const dayBtns = [-1, 0, 1, 2].map(n => `<button type="button" data-off="${n}" aria-pressed="${n === upOff}">${t(['dTomorrow', 'dToday', 'dYesterday', 'd2ago'][n + 1])}${me.posts.some(p => p.day === keyOfD(dayAgo(n))) ? ' ✓' : ''}</button>`).join('');
+    const dayBtns = [2, 1, 0, -1].map(n => `<button type="button" data-off="${n}" aria-pressed="${n === upOff}">${t(['dTomorrow', 'dToday', 'dYesterday', 'd2ago'][n + 1])}${me.posts.some(p => p.day === keyOfD(dayAgo(n))) ? ' ✓' : ''}</button>`).join('');
     const base = (LEVELS.indexOf(next) > 0 ? LEVELS[LEVELS.indexOf(next) - 1].d : 0);
     const progress = next ? Math.round((me.best - base) / (next.d - base) * 100) : 100;
     const newGifts = (me.gifts || []).filter(g => g.status === 'new');
