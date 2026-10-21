@@ -1690,6 +1690,15 @@
     cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') showTip(e); });
     cv.addEventListener('pointerleave', () => { tip.hidden = true; });
     cv.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') { showTip(e); clearTimeout(tip._t); tip._t = setTimeout(() => { tip.hidden = true; }, 1800); } }); // на телефоне — по касанию
+// Дверь для переключения комнат
+    const doorBtn = document.createElement('button');
+    doorBtn.className = 'room-door-btn';
+    doorBtn.innerHTML = '🚪 Комната';
+    doorBtn.title = 'Перейти в другую комнату';
+    doorBtn.onclick = () => {
+      alert('Вторая комната пока на ремонте! Скоро откроется.');
+    };
+    stage.appendChild(doorBtn);
     paintBg();
     if (!o.film) raf = requestAnimationFrame(frame);
     return api;
