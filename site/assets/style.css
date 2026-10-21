@@ -4783,23 +4783,28 @@ p.pk-big.pk-rub { margin: 0; text-align: center; background: #BFE3FF; cursor: de
 .cart-msg { padding: 10px 12px; border-radius: 12px; background: #E3F4EA; color: #1F5E3F; }
 @media (max-width: 420px) { .cart-row { flex-wrap: wrap; } .cart-q { margin-left: auto; } }
 .site-header.c1 .hd-cart, .site-header.c2 .hd-cart, .site-header.c3 .hd-cart { width: 30px; }
-/* Кнопка перехода между комнатами */
+/* Кнопка перехода между комнатами (белый кружок с дверью) */
 .room-door-btn {
   position: absolute;
   right: 12px;
   bottom: 8px;
   z-index: 10;
-  background: #2B1A51;
-  border: 1px solid #F0A987;
-  border-radius: 8px;
-  padding: 4px 8px;
-  font-size: 13px;
-  font-weight: 600;
-  color: #fff;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #ffffff;
+  border: 1.5px solid #2B1A51;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 15px;
   cursor: pointer;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.35);
+  transition: transform 0.15s ease, background 0.15s ease;
+  padding: 0;
+  line-height: 1;
 }
 .room-door-btn:hover {
-  background: #F0A987;
-  color: #2B1A51;
+  transform: scale(1.12);
+  background: #FFF4E0;
 }

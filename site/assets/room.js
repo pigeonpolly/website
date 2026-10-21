@@ -1693,9 +1693,13 @@
 // Дверь для переключения комнат
     const doorBtn = document.createElement('button');
     doorBtn.className = 'room-door-btn';
-    doorBtn.innerHTML = '🚪 Комната';
-    doorBtn.title = 'Перейти в другую комнату';
+doorBtn.innerHTML = '🚪';
+    doorBtn.title = 'Room';
+    doorBtn.setAttribute('aria-label', 'Room');
     doorBtn.onclick = () => {
+      alert('Вторая комната пока на ремонте! Скоро откроется.');
+    };
+    stage.appendChild(doorBtn);    doorBtn.onclick = () => {
       alert('Вторая комната пока на ремонте! Скоро откроется.');
     };
     stage.appendChild(doorBtn);
