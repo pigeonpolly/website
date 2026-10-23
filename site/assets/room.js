@@ -276,6 +276,14 @@
       p(3, 0, 3, 1, '#A8553A'); p(3, 1, 3, 2, g); p(1, 3, 3, 1, d); p(5, 3, 3, 1, d); p(0, 4, 9, 3, d); p(1, 4, 3, 3, c); p(5, 4, 3, 3, c); p(4, 5, 1, 2, c);
       p(1, 7, 7, 1, d); p(2, 7, 5, 1, c); p(2, 8, 5, 1, d); p(3, 8, 3, 1, c); p(3, 9, 3, 1, d); p(4, 9, 1, 1, c); p(4, 10, 1, 1, d); p(2, 4, 1, 1, '#FFFFFF');
       if (Math.sin(t / 500 + i) > 0.6) p(7, 1, 1, 1, '#FFF3B0'); } };
+  // зелье оживления котика (этап 28, docs/games.md «Зельеварня»): за 3 дня подряд в игре; в ✏️ положить на котика — котик оживает, зелье пропадает (/api/potion/revive)
+  FURN.revive = { n: N('Cat revival potion', 'Зелье оживления котика', 'Kaķa atdzīvināšanas dzira'), w: 9, h: 13, top: null, game: true,
+    d: (p, t) => { const k = (Math.sin(t / 900) + 1) / 2, c = k > .5 ? '#5FD4B4' : '#8E7CF0', cl = k > .5 ? '#A8F0DC' : '#C2B6FA', d = '#2B2340', gl = '#E8F1F7';
+      p(3, 0, 3, 2, '#A8553A'); p(3, 0, 3, .5, '#C97A55'); p(3, 2, 3, 2, d); p(4, 2, 1, 2, gl);
+      p(1, 4, 7, 1, d); p(0, 5, 9, 7, d); p(1, 12, 7, 1, d); p(1, 5, 7, 7, c); p(1, 5, 7, 1, cl);
+      p(3, 7.5, 3, 2.5, d); p(3, 7, .75, .75, d); p(5.25, 7, .75, .75, d); p(3.5, 8.25, .5, .5, '#F6D04D'); p(5, 8.25, .5, .5, '#F6D04D'); // котик на этикетке
+      p(1.5, 5.5, .5, 2, '#FFFFFF99'); const b = (t / 60) % 7; p(6, 11 - b, .5, .5, '#FFFFFFAA'); p(2, 11 - (b + 3) % 7, .5, .5, '#FFFFFFAA'); // пузырьки
+      if (Math.sin(t / 400) > .5) { p(8, 0, 1, 1, '#FFF3B0'); p(7.5, .25, 2, .5, '#FFF3B0'); } } };
   // альбом карточек (этап 7): есть в каждой комнате сам, двигается как мебель; в сумку, магазин и каталог не попадает (fixed, PPCanDo); нажатие — разворот альбома
   FURN.album = { n: N('Card album', 'Альбом карточек', 'Kartīšu albums'), w: 18, h: 22, top: null, fixed: true,
     d: (p, t) => { const w = '#7A4A30', d = '#5E3826', c = '#B8423A', pg = '#F7F1E4', fr = '#D8CCB4';
@@ -823,6 +831,7 @@
     'furn|chalkrug': ['A black rug with a chalk outline. The outline insists it is just lying down for a rest.', 'Чёрный ковёр с меловым силуэтом. Силуэт уверяет, что просто прилёг отдохнуть.', 'Melns paklājs ar krīta siluetu. Siluets apgalvo, ka vienkārši prilēcis atpūsties.'],
     'furn|titospot': ['The coffee in it sloshes all by itself — out of impatience.', 'Кофе в нём плещется сам по себе — от нетерпения.', 'Kafija tajā šļakstās pati no sevis — aiz nepacietības.'],
     'deco|clueboard': ['Stare at it long enough and everything becomes clear. Or not.', 'Если долго смотреть, всё становится понятно. Или нет.', 'Ja ilgi skatās, viss kļūst skaidrs. Vai arī nē.'],
+    'furn|revive': ['Put it on the house cat in your room (✏️ and drag): the cat comes alive for ever.', 'Положи на котика в комнате (✏️ и перетащи): котик оживёт навсегда.', 'Noliec uz kaķīša istabā (✏️ un velc): kaķītis atdzīvosies uz visiem laikiem.'],
     'deco|titosbadge': ['For those who solved all 100 cases. Titos personally polished it with his sleeve.', 'Для тех, кто раскрыл все 100 дел. Титос лично протёр его рукавом.', 'Tiem, kas atrisinājuši visas 100 lietas. Titoss to personīgi noslaucīja ar piedurkni.'],
   };
   Object.assign(FURN, {
@@ -1214,6 +1223,7 @@
     editOn: ['Arrange the room', 'Обустроить комнату', 'Iekārtot istabu'], editOff: ['Done', 'Готово', 'Gatavs'],
     hint: ['Drag things around · tap one for ⇆ ⬆ ⬇ ↩', 'Вещи можно двигать · нажатие на вещь — ⇆ ⬆ ⬇ ↩', 'Lietas var pārvietot · pieskaries lietai — ⇆ ⬆ ⬇ ↩'],
     tidy: ['🧹 Tidy up', '🧹 Прибраться', '🧹 Sakopt'],
+    alive: ['🐈 The cat is alive!', '🐈 Котик ожил!', '🐈 Kaķītis atdzīvojās!'], aliveErr: ['The potion did not work — try again', 'Зелье не сработало — попробуй ещё раз', 'Dzira nesuvēja — mēģini vēlreiz'],
     lightOff: ['Turn the light off', 'Выключить свет', 'Izslēgt gaismu'], lightOn: ['Turn the light on', 'Включить свет', 'Ieslēgt gaismu'],
     flip: ['Turn', 'Повернуть', 'Pagriezt'], front: ['Forward', 'Вперёд', 'Uz priekšu'], behind: ['Back', 'Назад', 'Atpakaļ'], back: ['To the bag', 'В сумку', 'Uz somu'],
   };
@@ -1295,8 +1305,13 @@
         });
         out.push({ it, d, idx, x, y: base - d.h });
       });
+      if (!edit && room.cats) { const al = aliveCats(); out.forEach(q => { if (!al.includes(q.it)) return; let c = cats.get(q.it); if (!c) cats.set(q.it, c = { x: q.x, dir: -1, st: 'sit', until: 0 }); q.x = Math.round(c.x); q.y = GY - q.d.h; q.live = c; }); } // живой котик — там, где бегает
       return out;
     }
+    // ---------- живые котики (этап 28): первые room.cats котиков furn|cat (число даёт сервер) бегают по полу, потягиваются и дерут диван; в ✏️ стоят на месте ----------
+    const cats = new Map(); // вещь → { x, dir, st, until, from, to, then, sofa }
+    const isCat = it => it.k === 'furn' && parse(it.v)[0] === 'cat';
+    const aliveCats = () => room.items.filter(it => isCat(it) && it.in == null).slice(0, room.cats || 0);
     const clampX = (x, w) => Math.max(0, Math.min(RW - w, Math.round(x || 0)));
     // альбом карточек есть в каждой комнате сам: нет — ставим на свободное место (сохранится при первой правке)
     const isAlbum = it => it.k === 'furn' && parse(it.v)[0] === 'album';
@@ -1446,6 +1461,48 @@
       g.restore();
       if (bird.zz) { const z = Math.floor(now / 600) % 3; for (let i = 0; i <= z; i++) R(g, bird.x + 6 + i * 4, bird.y - h - 2 - i * 4, 3, 1, '#FFFFFF'); }
     }
+    // живой котик: сидит → бежит/идёт в случайное место → потягивается → идёт к дивану и дерёт его когтями (пух летит)
+    const SCRATCH = ['sofa', 'armchair', 'gothicchair', 'beanbag', 'pouf', 'cattower', 'throne', 'gamingchair'];
+    function catStep(q, now, lay) {
+      const c = q.live, w = q.d.w;
+      if (c.st === 'walk') {
+        const k = Math.min(1, (now - c.from.t) / Math.max(1, c.until - c.from.t)); c.x = c.from.x + (c.to - c.from.x) * k;
+        if (k >= 1) { c.st = 'sit'; c.until = now + 400 + Math.random() * 1200; const th = c.then; c.then = null; if (th) th(now); }
+        return;
+      }
+      if (c.st === 'scratch' && Math.random() < .08) { emit('dust', c.dir > 0 ? c.x + w - 1 : c.x + 1, GY - 6 - Math.random() * 4, 1, Math.random() < .5); }
+      if (now < c.until) return;
+      const go = (tx, run, then) => { tx = Math.max(0, Math.min(RW - w, tx)); c.st = 'walk'; c.run = run; c.from = { x: c.x, t: now }; c.to = tx; c.dir = tx > c.x ? 1 : -1; c.until = now + Math.abs(tx - c.x) / (run ? .07 : .025); c.then = then; };
+      const r = Math.random(), sofas = lay.filter(z => SCRATCH.includes(parse(z.it.v)[0]) && Math.abs(z.y + z.d.h - GY) <= 2);
+      if (c.st !== 'stretch' && r < .22) { c.st = 'stretch'; c.until = now + 1800; return; }
+      if (sofas.length && r < .45) { const z = sofas[Math.floor(Math.random() * sofas.length)], left = c.x + w / 2 < z.x + z.d.w / 2;
+        return go(left ? z.x - w + 3 : z.x + z.d.w - 3, false, t2 => { c.st = 'scratch'; c.dir = left ? 1 : -1; c.until = t2 + 2200 + Math.random() * 1600; }); }
+      if (r < .85) return go(4 + Math.random() * (RW - w - 8), Math.random() < .4);
+      c.st = 'sit'; c.until = now + 1500 + Math.random() * 3000;
+    }
+    // позы котика (сетка 12×9 как у furn|cat, мордой влево): шаги, потягушки, на задних лапах у дивана; цвет — по варианту перекраски
+    function catDraw(p, now, q) {
+      const c = q.live, i = q.d.i || 0, rc = i && RECOLOR.cat[i] ? RECOLOR.cat[i][1] : {}, o = rc['#F08A3B'] || '#F08A3B', d = darker(o, .8), l = lighter(o, .35), eye = rc['#2B2340'] || OUT;
+      const head = (x, y, shut) => { blob(p, x, y, 2.5, 2.25, (u, v) => v > .75 ? d : o); p(x - 2.25, y - 3.25, 1, 1.5, OUT); p(x - 2, y - 2.75, .5, 1, '#F7B6C8'); p(x + .75, y - 3.25, 1, 1.5, OUT); p(x + 1, y - 2.75, .5, 1, '#F7B6C8');
+        if (shut) { p(x - 1.5, y - .25, .75, .25, OUT); p(x + .75, y - .25, .75, .25, OUT); } else { p(x - 1.5, y - .5, .5, .75, eye); p(x + .75, y - .5, .5, .75, eye); } p(x - .25, y + .5, .5, .5, '#E5484D'); };
+      if (c.st === 'stretch') { // передние лапы вперёд, попа вверх, хвост трубой, глаза зажмурены
+        blob(p, 8.5, 4.5, 3, 2.25, (u, v) => v > .7 ? d : o); blob(p, 5, 6.25, 3, 1.5, (u, v) => v > .7 ? d : o);
+        p(-1.5, 7.75, 4, .75, o); p(-1.5, 8.5, 4, .25, OUT); p(8, 6.5, 1, 2.5, o); p(10, 6.5, 1, 2.5, o); p(8, 8.75, 1, .25, OUT); p(10, 8.75, 1, .25, OUT);
+        for (let k = 0; k < 5; k++) p(11 + (k > 3 ? .5 : 0), 3.5 - k, .5, 1, k === 4 ? OUT : o);
+        head(2.25, 5.5, true); p(1.75, 6.75, 1, .5, '#F7B6C8'); return; } // зевает
+      if (c.st === 'scratch') { // на задних лапах, передние — по дивану вверх-вниз
+        const a = Math.floor(now / 160) % 2 ? .75 : 0;
+        p(8, 8, 3, .75, o); p(10.5, 6.5, .75, 2, o); p(10.5, 6.25, .75, .5, OUT); // хвост по полу
+        blob(p, 6, 5, 2.25, 3.25, (u, v) => u > .7 ? d : u < .35 && v > .3 && v < .7 ? l : o);
+        p(5, 7.75, 1, 1.25, o); p(7, 7.75, 1, 1.25, o); p(5, 8.75, 1, .25, OUT); p(7, 8.75, 1, .25, OUT);
+        p(1.5, 2.5 + a, 3.5, .75, o); p(1.5, 4.25 - a, 3.5, .75, o); p(1, 2.5 + a, .5, .75, OUT); p(1, 4.25 - a, .5, .75, OUT); // лапы с когтями
+        head(5.25, 1.75); p(0, 2 + a * 2, .25, 2.5, '#FFFFFF77'); return; } // царапины
+      const f = c.st === 'walk' ? Math.floor(now / (c.run ? 90 : 160)) % 2 : 0, up = c.st === 'walk' && c.run ? (f ? -.5 : 0) : 0;
+      blob(p, 7.25, 5.75 + up, 4.5, 2.25, (u, v) => v > .7 ? d : u > .15 && u < .5 && v < .45 ? l : o);
+      const tail = c.st === 'walk' ? 0 : Math.floor(now / 400) % 2; for (let k = 0; k < 4; k++) p(11 + k * .25 * (tail ? 1 : -1), 4.5 - k + up, .5, 1, k === 3 ? OUT : o);
+      [[3, f], [5, 1 - f], [8.5, 1 - f], [10, f]].forEach(([x, s2]) => { const dx = c.st === 'walk' ? (s2 ? .5 : -.5) : 0; p(x + dx, 7.5 + up, 1, 1.5 - up, o); p(x + dx, 8.75, 1, .25, OUT); });
+      head(2.75, 3.5 + up);
+    }
     // ---------- кадр ----------
     let raf = 0;
     function frame(now) {
@@ -1459,6 +1516,7 @@
       drawCurtains(g, room.curtain);
       const ctx = { has };
       lay.forEach(q => {
+        if (q.live) return; // живых котиков — после всех вещей (стоят перед диваном)
         const pp = pops.get(q.it); let oy = 0;
         if (pp != null) { const a = now - pp; if (a > 560) pops.delete(q.it); else oy = a < 240 ? -18 * (1 - (a / 240) ** 2) : -4 * Math.sin(Math.PI * (a - 240) / 320); } // падает и подпрыгивает
         // выпрыгивает из коробки: дуга с кувырком, потом отскок и пылинки
@@ -1481,6 +1539,8 @@
           g.strokeStyle = fl ? '#F5D547' : '#F0A987'; g.lineWidth = fl ? 1.2 : .6; g.setLineDash([1.5, 1]); g.strokeRect(q.x - 1.5, q.y - 1.5, q.d.w + 3, q.d.h + 3); g.setLineDash([]);
         }
       });
+      lay.forEach(q => { if (!q.live) return; if (!o.film && !o.still) catStep(q, now, lay); const X = Math.round(q.live.x), Y = q.y, pp = pops.get(q.it), oy = pp != null && now - pp < 400 ? -10 * Math.sin(Math.PI * (now - pp) / 400) : 0;
+        if (q.live.dir > 0) { g.save(); g.translate(X * 2 + q.d.w, 0); g.scale(-1, 1); catDraw(P(g, X, Y + oy), now, q); g.restore(); } else catDraw(P(g, X, Y + oy), now, q); });
       placeSel(lay);
       if (o.film) o.film(g, now, lay); else { think(now, lay); stepBird(now); drawBird(now); } // в видео птичку и всё своё рисует сценарий
       if (tidy && tidy.carry) { const d = defOf(tidy.carry.k, tidy.carry.v); if (d) d.d(P(g, bird.x - d.w / 2, bird.y - FR[0].height * .75 - d.h + 3), now, d.i, ctx); } // несёт вещь над головой
@@ -1519,9 +1579,26 @@
     const lightBtn = box.querySelector('.room-light');
     const showLight = () => { if (!lightBtn) return; lightBtn.textContent = dark() ? '🌙' : '💡'; lightBtn.title = t(dark() ? 'lightOn' : 'lightOff'); lightBtn.setAttribute('aria-label', lightBtn.title); lightBtn.setAttribute('aria-pressed', String(dark())); };
     if (lightBtn) { showLight(); lightBtn.onclick = () => { if (dark()) delete room.light; else room.light = 0; showLight(); save(); changed(); }; }
+    // зелье на котике: сервер забирает зелье и считает котика живым (users.cats_alive); живые — первые room.cats котиков, поэтому этого ставим перед другими спящими
+    async function revive(pot, cat) {
+      const toast = m => window.PPToast && window.PPToast(m);
+      const al = aliveCats(), first = room.items.find(it => isCat(it) && it.in == null && !al.includes(it));
+      if (first && first !== cat) { room.items.splice(room.items.indexOf(cat), 1); room.items.splice(room.items.indexOf(first), 0, cat); }
+      sel = -1; selBar.hidden = true;
+      try {
+        const r = await fetch('/api/potion/revive', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ room }) }).then(x => x.ok ? x.json() : Promise.reject(x.status));
+        room.cats = r.room.cats || 0; const i = room.items.indexOf(pot); if (i >= 0) room.items.splice(i, 1);
+        if (o.me && Array.isArray(o.me.gifts)) o.me.gifts = o.me.gifts.filter(g2 => g2.id !== r.gone);
+        setEdit(false); const now = performance.now(), q = layout().find(z => z.it === cat);
+        if (q && q.live) { pops.set(cat, now); q.live.st = 'stretch'; q.live.until = now + 1800; emit('star', q.x + q.d.w / 2, q.y - 2, 6); setTimeout(() => emit('heart', q.x + q.d.w / 2, q.y - 2, 4), 300); }
+        changed(); toast(t('alive'));
+      } catch (e) { toast(t('aliveErr')); }
+    }
     // ✏️ — режим обустройства: только в нём вещи тянутся и выбираются
     const editBtn = box.querySelector('.room-edit'), hintEl = box.querySelector('.room-hint');
     const setEdit = on => {
+      if (!!on && !!o.mine && !edit) cats.forEach((c, it) => { it.x = Math.round(c.x); delete it.y; }); // живой котик замирает там, где был
+      cats.clear();
       edit = !!on && !!o.mine; box.classList.toggle('editing', edit);
       if (!edit) { sel = -1; drag = null; selBar.hidden = true; }
       if (editBtn) { editBtn.textContent = edit ? '✓' : '✏️'; editBtn.title = t(edit ? 'editOff' : 'editOn'); editBtn.setAttribute('aria-label', editBtn.title); editBtn.setAttribute('aria-pressed', String(edit)); }
@@ -1619,6 +1696,10 @@
       });
       const up = () => {
         const it0 = drag && drag.moved && room.items[sel], d0 = it0 && defOf(it0.k, it0.v);
+        if (it0 && it0.k === 'furn' && parse(it0.v)[0] === 'revive') { // зелье оживления отпустили на котика
+          const al = aliveCats(), cq = [...layout()].reverse().find(q => isCat(q.it) && !al.includes(q.it) && drag.px >= q.x - 3 && drag.px <= q.x + q.d.w + 3 && drag.py >= q.y - 6 && drag.py <= q.y + q.d.h + 3);
+          if (cq) { drag = null; snapOn = -1; moved = true; revive(it0, cq.it); return; }
+        }
         if (it0 && !drag.riders.length && canPack(it0, d0)) { // мелкую вещь отпустили на коробку — она уходит внутрь
           const lay = layout(), on = room.items[snapOn];
           const bq = (on && isBoxIt(on) && lay.find(q => q.it === on)) || [...lay].reverse().find(q => q.d.box && q.it !== it0 && drag.px >= q.x - 1 && drag.px <= q.x + q.d.w + 1 && drag.py >= q.y - 4 && drag.py <= q.y + q.d.h);

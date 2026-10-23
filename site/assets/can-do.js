@@ -4,7 +4,7 @@
 //   shop — бывает в магазине (продажа и подсказка возвращают её туда +1, автопополнение, «Пуговичный дождь»);
 //   gift — можно подарить другой птичке; sell — продать за пуговки; bag — убрать из комнаты в сумку; box — положить в адвент-окно и подарок из кабинета;
 //   pack — спрятать в коробку в комнате (этап 11 Г): коробку в коробку и альбом — нельзя (мелкая ли вещь — room.js isSmall).
-// Легендарные: не дарятся. Игровые (бутылочка «Вкус детства» furn|kidpot:N): не в магазин и не в подарок из кабинета.
+// Легендарные: не дарятся. Игровые (бутылочка «Вкус детства» furn|kidpot:N, зелье оживления котика furn|revive — этап 28): не в магазин и не в подарок из кабинета.
 // Альбом furn|album: есть в каждой комнате сам — ничего нельзя.
 // Награды Титоса (TITOS, за уровни 30/50/90/100, и вещи за дела furn|tc<имя> — isCase; docs/titos.md): только своя — не в магазине, не подарить, не продать, не в подарок из кабинета.
 (function (g) {
@@ -15,7 +15,7 @@
   var BOXES = ['cardbox', 'crate', 'hatbox', 'trunkbox', 'giftbox']; // коробки в комнате (furn), этап 11 Г
   var base = function (item) { return String(item).split(':')[0]; };
   var isAlbum = function (kind, item) { return kind === 'furn' && base(item) === 'album'; };
-  var isGame = function (kind, item) { return kind === 'furn' && base(item) === 'kidpot'; };
+  var isGame = function (kind, item) { return kind === 'furn' && (base(item) === 'kidpot' || base(item) === 'revive'); };
   var isBox = function (kind, item) { return kind === 'furn' && BOXES.indexOf(base(item)) >= 0; };
   var isCase = function (kind, item) { return kind === 'furn' && /^tc[a-z]+$/.test(base(item)); };
   function canDo(kind, item) {

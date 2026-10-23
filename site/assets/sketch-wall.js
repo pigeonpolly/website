@@ -87,6 +87,7 @@
     seedOf: [k => `A seed: ${k}`, k => `Семечко: ${k}`, k => `Sēkla: ${k}`],
     fromAlina: ['— Alina', '— Алина', '— Alīna'],
     fromReq: ['🎨 A thank-you gift: Alina drew your idea! See it on the “Draw this for me” page.', '🎨 Спасибо за идею: Алина нарисовала твою тему! Рисунок — на странице «Нарисуй мне».', '🎨 Paldies par ideju: Alīna uzzīmēja tavu tēmu! Zīmējums — lapā “Uzzīmē man”.'],
+    fromRevive: ['🧪 From “Polly’s Potion Lab” for 3 days in a row. Put it on the house cat in your room!', '🧪 Из «Зельеварни Полли» за 3 дня подряд. Положи на котика в комнате!', '🧪 No “Pollijas dziru virtuves” par 3 dienām pēc kārtas. Noliec uz kaķīša istabā!'],
     fromPan: [n => `🥞 A gift from a grateful customer of “Polly’s Pancakes”, level ${n}`, n => `🥞 Подарок благодарного клиента «Блинной Полли», ${n}-й уровень`, n => `🥞 Pateicīga “Pollijas pankūku” klienta dāvana, ${n}. līmenis`],
     fromRain: [n => `🌧 A reward from “Button Rain” for level ${n}`, n => `🌧 Награда «Пуговичного дождя» за ${n}-й уровень`, n => `🌧 Balva no “Pogu lietus” par ${n}. līmeni`],
     open: ['Open', 'Открыть', 'Atvērt'],
@@ -503,7 +504,7 @@
       box.querySelector('[data-later]').onclick = () => act(false);
     };
   }
-  const noteHtml = g => !g.note || g.note === 'shop' ? '' : g.note.startsWith('from:') ? `<p class="gf-note">${esc(t('fromBird', g.note.slice(5)))}</p>` : g.note.startsWith('potion:') && window.PPPotion ? `<p class="gf-note">🧪 ${esc(window.PPPotion.potion(+g.note.split(':')[2], 3, g.note.split(':')[1]).name)}</p>` : g.note.startsWith('req:') ? `<p class="gf-note">${esc(t('fromReq'))}</p>` : g.note.startsWith('rain:') ? `<p class="gf-note">${esc(t('fromRain', g.note.slice(5)))}</p>` : g.note.startsWith('pan:') ? `<p class="gf-note">${esc(t('fromPan', g.note.slice(4)))}</p>` : `<p class="gf-note">«${esc(g.note)}» ${t('fromAlina')}</p>`;
+  const noteHtml = g => !g.note || g.note === 'shop' ? '' : g.note.startsWith('from:') ? `<p class="gf-note">${esc(t('fromBird', g.note.slice(5)))}</p>` : g.note.startsWith('potion:') && window.PPPotion ? `<p class="gf-note">🧪 ${esc(window.PPPotion.potion(+g.note.split(':')[2], 3, g.note.split(':')[1]).name)}</p>` : g.note === 'revive' ? `<p class="gf-note">${esc(t('fromRevive'))}</p>`: g.note.startsWith('req:') ? `<p class="gf-note">${esc(t('fromReq'))}</p>` : g.note.startsWith('rain:') ? `<p class="gf-note">${esc(t('fromRain', g.note.slice(5)))}</p>` : g.note.startsWith('pan:') ? `<p class="gf-note">${esc(t('fromPan', g.note.slice(4)))}</p>` : `<p class="gf-note">«${esc(g.note)}» ${t('fromAlina')}</p>`;
   // подарить купленную вещь: ник птички (подсказки — из списка стаи)
   async function giveDialog(g, done) {
     const m = modal(''); m.card.classList.add('give-card');
