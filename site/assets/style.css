@@ -4843,3 +4843,38 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .gd-dlg::backdrop { background: rgba(10, 6, 24, .6); }
 .gd-dlg h3 { margin: 0 0 6px; font: 600 20px var(--serif); }
 @media (min-width: 900px) { .gd-panel { grid-template-columns: 1fr 1fr; } .gd-panel > .gd-row, .gd-panel > .gd-sel, .gd-panel > .gd-note { grid-column: 1 / -1; } }
+
+/* «Смена с Полли» /shift/ (этап 29, site/assets/shift.js) */
+.shift { max-width: 1100px; margin: 0 auto 48px; padding: 0 var(--gutter); }
+.sh-top { display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap; margin-bottom: 16px; }
+.sh-clock { flex: 0 0 auto; min-width: 190px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 12px 20px; border-radius: 14px; background: #1a1528; border: 3px solid #d8d0c0; box-shadow: inset 0 0 0 3px #20302a; }
+.sh-left { font: 700 44px/1.1 ui-monospace, 'Courier New', monospace; color: #8cf0a8; letter-spacing: 2px; font-variant-numeric: tabular-nums; }
+.sh-sub { color: var(--muted); font-size: 14px; }
+.sh-ctl { flex: 1 1 420px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.sh-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.sh-lbl { font-size: 14px; color: var(--muted); min-width: 92px; }
+.sh-chip { font: inherit; font-size: 15px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg-card); color: var(--text); cursor: pointer; white-space: nowrap; }
+.sh-chip.on { background: var(--star); border-color: var(--star); color: #2B1A51; font-weight: 700; }
+.sh-chip:disabled { opacity: .45; cursor: default; }
+.sh-own input { width: 54px; font: inherit; font-size: 15px; padding: 0 4px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+.sh-own.on input { background: #fff; color: #2B1A51; }
+.sh-vol { width: 110px; accent-color: var(--star); }
+.shift .btn { font: inherit; font-size: 17px; font-weight: 700; padding: 9px 20px; border-radius: 999px; border: 2px solid var(--star); background: var(--star); color: #2B1A51; cursor: pointer; }
+.shift .btn.ghost { background: transparent; color: var(--text); border-color: var(--line); font-weight: 400; }
+.shift .btn:hover { filter: brightness(1.08); }
+.sh-scene { border-radius: 14px; overflow: hidden; border: 3px solid #1a1528; background: #1a1528; line-height: 0; }
+.sh-scene canvas { width: 100%; height: auto; image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+.sh-cap { text-align: center; color: var(--muted); font-style: italic; margin: 10px 0 4px; min-height: 1.6em; }
+.sh-rank, .sh-done { text-align: center; }
+.sh-rank p { margin: 6px 0; }
+.sh-done { margin: 12px auto 0; max-width: 560px; padding: 14px 18px; border-radius: 14px; background: var(--bg-card); border: 1px solid var(--star); }
+.sh-done p { margin: 6px 0 0; }
+@media (max-width: 600px) {
+  .shift { display: flex; flex-direction: column; }
+  .sh-top { display: contents; }
+  .sh-clock { order: 0; margin-bottom: 12px; padding: 8px 16px; }
+  .sh-scene { order: 1; } .sh-cap { order: 2; } .sh-done { order: 3; margin-bottom: 12px; } .sh-ctl { order: 4; } .sh-rank { order: 5; margin-top: 12px; }
+  .sh-left { font-size: 38px; }
+  .sh-lbl { flex: 1 1 100%; min-width: 0; }
+  .sh-scene { margin: 0 calc(-1 * var(--gutter) + 8px); border-width: 2px; }
+}

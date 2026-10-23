@@ -13,6 +13,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/flock.js` (10K) — «Все птички» (/flock/) и пёрышки комнат (этап 13 Б+В, docs/flock.md).: BIRD, PER, COLS, SORTS, FLOCK_ALTER, FLOCK_TABLES, ownerOf, stateOf, featherNews, flockApi
 - `worker/index.js` (240K) — Worker: site/, страницы через HTMLRewriter, /api (кроме блога), cron: RULES, BTN, STOCK, GIFT_KINDS, PLEVEL, DAYCOL, btnOf, award, catalog, avatarOf, cnt, gameUnit
 - `worker/pancakes.js` (8K) — «Блинная Полли» (/pancakes/, site/assets/pancakes.js, docs/games.md): Полли печёт блины жи: TOP, PAN_ALTER, PAN_BADGES, PAN_COND, PAN_INT, PAN_RANGE, today, price, pancakesApi
+- `worker/shift.js` (3K) — «Смена с Полли» (/shift/, этап 29, docs/rooms.md): смены, минуты, повышения и 🔘 за час: SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_MIN, SHIFT_MAX, shiftApi
 - `worker/titos-sort.js` (13K) — «Разбери дела» (этап 9 А, docs/titos.md): у Титоса упали коробки: SORT_TWISTS, ARCHIVE, shuffle, rng, sortRound
 - `worker/titos.js` (30K) — Детектив Титос (docs/titos.md): 100 уровней-дел, кофе, пуговки за уровень.: MAX, MIN, TITOS_PRIZES, OPEN, TITOS_ITEMS, TITOS_ALTER, out, resolve, rowOf, saveRow, caseOf, settle
 - `worker/top.js` (5K) — Доски топа игр (docs/games.md § Доски топа): одна на каждую игру, вкладки «За всё время» и: GAMES, TOP_TABLES, topWeek, prevWeek, topScore, topApi, topCron
@@ -61,6 +62,8 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/requests.js` (32K) — «Нарисуй мне» /requests/: HID, lists, pollyPick, saveImg, translateRest
 - `site/assets/room.js` (258K) — комната птички: каталог мебели, расстановка, поведение (`PPRoom`): PPRoom, OUT, FURN, DECO, addTh
 - `site/assets/rooms-data.js` (5K) — зоны комнат (build.py): ROOMS
+- `site/assets/shift.js` (25K) — «Смена с Полли» /shift/: таймер, сцена canvas, дела Полли, финал, лестница должностей: RANKS, ACTS, DO, doFinale, deskTimer
+- `site/assets/shift-music.js` (8K) — три бесконечные ретро-мелодии и колыбельная на WebAudio (`PPShiftMusic`): TRACKS, LULL, play, stop, lullaby
 - `site/assets/rooms.js` (39K) — пиксельные комнаты (офис Полли, Титос): зоны, реплики, эффекты (`ROOM`): ROOM, API, IDX, pct, setEvening
 - `site/assets/scroll-nav.js` (2K) — стрелочки наверх/вниз: update
 - `site/assets/search.js` (5K) — поиск по сайту (🔍, «/»): run, build, open, render, snippet

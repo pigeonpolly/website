@@ -12,6 +12,7 @@ import { authApi, googleLink, funnelStep, mailOn, adventMail, adventAsk, AUTH_TA
 import { flockApi, featherNews, FLOCK_TABLES, FLOCK_ALTER } from './flock.js'; // «Все птички» и пёрышки (этап 13 Б+В, docs/flock.md)
 import { flockNewsApi, flockEvent as flockEventDb, roomEvent, flockNewsCron, FLOCK_NEWS_TABLES, FLOCK_NEWS_ALTER } from './flock-news.js'; // новости стаи (этап 13 Г, docs/flock.md)
 import { topApi, topScore, topCron, TOP_TABLES } from './top.js'; // доски топа игр (docs/games.md)
+import { shiftApi, SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_RANGE, SHIFT_INT } from './shift.js'; // «Смена с Полли» (этап 29, docs/rooms.md)
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
 import { gardenApi, GARDEN_TABLES, GARDEN_RULES, GARDEN_RANGE, GARDEN_INT, GARDEN_BOOL, GARDEN_SEASONS } from './garden.js'; // огород птички (этап 22, docs/bird.md «Огород»)
 import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
@@ -429,6 +430,7 @@ async function ensureSchema(env) {
     ...TOP_TABLES.map(sql => env.DB.prepare(sql)), // доски топа игр: top_week (worker/top.js)
     ...PAN_TABLES.map(sql => env.DB.prepare(sql)), // «Блинная Полли»: pan_runs (worker/pancakes.js)
     ...GARDEN_TABLES.map(sql => env.DB.prepare(sql)), // огород: garden (worker/garden.js)
+    ...SHIFT_TABLES.map(sql => env.DB.prepare(sql)), // «Смена с Полли»: shift_runs (worker/shift.js)
     ...TITOS_TABLES.map(sql => env.DB.prepare(sql)), // детектив Титос: titos, titos_cases (worker/titos.js)
     ...FLOCK_NEWS_TABLES.map(sql => env.DB.prepare(sql)), // новости стаи: flock_events (worker/flock-news.js)
     ...FLOCK_TABLES.map(sql => env.DB.prepare(sql)), // пёрышки и гости комнат: room_guests, feathers (worker/flock.js)
@@ -442,7 +444,7 @@ async function ensureSchema(env) {
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER,
-    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...CHALLENGE_ALTER]) {
+    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...SHIFT_ALTER, ...CHALLENGE_ALTER]) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   // «Выбор Полли» подешевел с 50 до 11 пуговок: уже начисленные записи пересчитать один раз, баланс = сумма журнала
@@ -544,6 +546,7 @@ const RULE_DEFAULTS = {
     alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10,
     rainA: 5, rainB: 15, rainC: 30, potA: 10, potB: 50, mazeA: 20, ...PAN_COND },
   ...GARDEN_RULES, // огород: грядки, полив, цены семян и урожая, жуки, погода (worker/garden.js)
+  ...SHIFT_RULES, // «Смена с Полли»: 🔘 за каждый отработанный час (worker/shift.js)
   ...PAN_RULES, // «Блинная Полли»: пуговки за уровень, рекорд, вещь, мытьё сковородки (worker/pancakes.js)
   ...TITOS_RULES, // детектив Титос: кофе, пуговки за уровень (worker/titos.js)
   ...CH_DEFAULTS, // подбор тем челленджа: семья не ближе N дней, категории, колода сложности, доля сезона (worker/challenge-plan.js)
@@ -551,7 +554,7 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { homeKitchen: [0, 1000], homeBedroom: [0, 1000], homeCrypt: [0, 1000], homeBath: [0, 1000], homeOffice: [0, 1], welcomeBtn: [-1, 10000], daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...GARDEN_RANGE, ...CH_RANGE };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...GARDEN_RANGE, ...SHIFT_RANGE, ...CH_RANGE };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -566,9 +569,9 @@ function cleanRules(r) {
   if (!r || typeof r !== 'object') return out;
   for (const [k, [lo, hi]] of Object.entries(RULE_NUM)) if (r[k] != null && Number.isFinite(Number(r[k]))) out[k] = Math.max(lo, Math.min(hi, Number(r[k])));
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
-  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn', 'panOn', ...GARDEN_BOOL]) if (typeof r[k] === 'boolean') out[k] = r[k];
+  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn', 'panOn', 'shiftOn', ...GARDEN_BOOL]) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['homeKitchen', 'homeBedroom', 'homeCrypt', 'homeBath', 'homeOffice', 'daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...GARDEN_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
+  for (const k of ['homeKitchen', 'homeBedroom', 'homeCrypt', 'homeBath', 'homeOffice', 'daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...GARDEN_INT, ...SHIFT_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
   if (GARDEN_SEASONS.includes(r.gardenSeason)) out.gardenSeason = r.gardenSeason;
@@ -1382,6 +1385,7 @@ async function route(req, env, url) {
   if (p === '/api/pancakes' || p.startsWith('/api/pancakes/')) { const r = await pancakesApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, top: (uid, n) => topScore(env, 'pan', uid, n),
     award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), item: (rq, uid, note) => rainItem(env, rq, uid, 0, note) }); if (r) return r; }
   if (p === '/api/garden' || p.startsWith('/api/garden/')) { const r = await gardenApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
+  if (p === '/api/shift' || p.startsWith('/api/shift/')) { const r = await shiftApi(req, env, url, { json, fail, currentUser, needUser, rules: () => RULES, randomHex, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p.startsWith('/api/titos') || p.startsWith('/api/admin/titos')) { const r = await titosApi(req, env, url, titosHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/cards') || p.startsWith('/api/admin/cards')) { const r = await cardsApi(req, env, url, cardHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/challenge/') || p.startsWith('/api/admin/challenge')) { const r = await challengeApi(req, env, url, cardHelpers(env)); if (r) return r; }

@@ -492,9 +492,66 @@ def advent():
     return cv
 
 
+def shift():
+    """«Смена с Полли»: стена кабинета, дипломы, Полли в галстуке за столом, таймер на столе, ноты."""
+    cv = Cv('#e2d2aa')
+    for y in range(0, 62, 2):
+        for x in range(0, 96, 7):
+            if (x * 3 + y * 5) % 11 == 0:
+                cv.put(x, y, '#d4c296')
+    cv.rect(0, 56, 96, 2, '#b89a70')
+    for i, (y, c) in enumerate(((6, '#7a5030'), (24, '#c8a040'))):
+        cv.rect(6, y, 16, 13, c)
+        cv.rect(7, y + 1, 14, 11, '#fcf6e4')
+        cv.hline(9, 18, y + 4, '#5a5068')
+        cv.hline(9, 16, y + 7, '#b4aaa0')
+        cv.disc(17, y + 9, 1.5, '#e0384a' if i == 0 else '#3c6ec8')
+    # окно с жалюзи справа
+    cv.rect(62, 6, 30, 30, '#f4f4ee')
+    cv.rect(64, 8, 26, 26, '#9ccbee')
+    for y in range(8, 22, 3):
+        cv.hline(64, 89, y, '#ece4c8')
+    # Полли (спрайт ×2) с красным галстуком
+    polly(cv, 30, 25)
+    cv.rect(41, 40, 2, 2, '#a01e30')
+    cv.rect(41, 42, 2, 6, '#d0303c')
+    cv.put(41, 44, '#f0c850')
+    # стол
+    cv.rect(0, 50, 96, 4, '#b07a4c')
+    cv.hline(0, 95, 50, '#c88e5c')
+    cv.rect(0, 54, 96, 42, '#8e5e38')
+    cv.rect(60, 60, 30, 9, '#a06a40')
+    cv.rect(60, 72, 30, 9, '#a06a40')
+    cv.hline(72, 78, 64, '#e0c890')
+    cv.hline(72, 78, 76, '#e0c890')
+    # ретро-таймер «20:00»
+    cv.rect(8, 37, 26, 14, '#1a1528')
+    cv.rect(9, 38, 24, 12, '#d8d0c0')
+    cv.rect(11, 40, 20, 8, '#20302a')
+    digits = {'2': '111001111100111', '0': '111101101101111', ':': '000010000010000'}
+    for i, ch in enumerate('20:00'):
+        f = digits[ch]
+        for j in range(15):
+            if f[j] == '1':
+                cv.put(12 + i * 4 + j % 3, 41 + j // 3, '#8cf0a8')
+    # кружка с кофе
+    cv.rect(52, 42, 6, 8, '#ffffff')
+    cv.rect(52, 42, 6, 1, '#784828')
+    cv.put(58, 45, '#ffffff')
+    cv.put(58, 46, '#ffffff')
+    for y in (36, 38):
+        cv.put(54, y, '#ffffff')
+        cv.put(55, y - 1, '#ffffff')
+    # ноты
+    note = ['..kk', '..k.', '..k.', 'kkk.', 'kkk.']
+    cv.sprite(note, {'k': '#3c2a6e'}, 70, 40)
+    cv.sprite(note, {'k': '#3c2a6e'}, 80, 30)
+    return cv
+
+
 SCENES = {'rain': rain, 'potions': potions, 'pancakes': pancakes, 'titos': titos,
-          'polly-office': office, 'wobbleland': wobbleland, 'advent': advent}
-LIFT = {'rain': 8, 'potions': 6, 'pancakes': 4, 'titos': 6, 'polly-office': 6, 'advent': 8}
+          'polly-office': office, 'shift': shift, 'wobbleland': wobbleland, 'advent': advent}
+LIFT = {'rain': 8, 'potions': 6, 'pancakes': 4, 'titos': 6, 'polly-office': 6, 'shift': 4, 'advent': 8}
 
 if __name__ == '__main__':
     names = sys.argv[1:] or list(SCENES)
