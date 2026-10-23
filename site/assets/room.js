@@ -1046,10 +1046,180 @@
         blob(p, 7, 5 + o, 6, 4.5, (u, v) => v > .65 ? '#DCEBF7' : '#FFFFFF', '#A9C6DE'); blob(p, 15, 6.5, 7, 5.5, (u, v) => v > .65 ? '#DCEBF7' : '#FFFFFF', '#A9C6DE'); blob(p, 23.5, 5 - o, 6, 4.5, (u, v) => v > .65 ? '#DCEBF7' : '#FFFFFF', '#A9C6DE');
         p(1, 0, 28, 2, '#FFFFFF'); p(1, 0, 28, .5, '#F4FAFF'); p(9, 6, 1, 1, '#F2A8B4'); p(20, 6, 1, 1, '#F2A8B4'); p(14, 7, 2, .5, '#5E5A68'); } },
   });
+  // ---------- этап 21: вещи для комнат дома (кухня, спальня, склеп, ванная, кабинет) ----------
+  Object.assign(FURN, {
+    // кухня
+    kitchensink: { n: N('Kitchen sink with dishes', 'Мойка с посудой', 'Izlietne ar traukiem'), w: 26, h: 26, top: 6,
+      d: (p, t) => { [3, 5.5, 8].forEach((x, k) => { p(x, 1 + k * .5, 1.5, 6, ['#FFFFFF', '#F7B6C8', '#BFE3F5'][k]); p(x + 1.5, 1 + k * .5, .5, 6, '#9AA3AE'); });
+        p(16, 0, 6, 1.5, '#A9B2BC'); p(16.5, 0, 5, .5, '#D5DCE3'); p(20.5, 1.5, 1.5, 5, '#A9B2BC'); p(16, 1.5, 1.5, 1.5, '#A9B2BC');
+        if (Math.floor(t / 2400) % 2) p(16.5, 3 + (t / 60) % 3, .5, 1, '#7FB3E8');
+        rbox(p, 0, 6, 26, 3, '#B9C2CC', OUT, .5); p(.5, 6.5, 25, .5, '#DCE3EA'); p(6, 6.5, 14, 1, '#6B7380');
+        rbox(p, 1, 9, 24, 17, '#F2EBDD', OUT, .5); p(12.75, 9.5, .5, 16, '#C9BFA9'); p(10.5, 14, 1, 3, '#8C7A5B'); p(14.5, 14, 1, 3, '#8C7A5B'); p(1.5, 24.5, 23, 1, '#C9BFA9'); } },
+    kettle: { n: N('Whistling kettle', 'Чайник со свистком', 'Tējkanna ar svilpi'), w: 11, h: 10, top: null,
+      d: (p, t) => { p(2.5, 1, 5, .5, OUT); p(2, 1.5, .5, 2, OUT); p(7.5, 1.5, .5, 2, OUT);
+        blob(p, 5, 6.5, 4.5, 3.5, (u, v) => v > .75 ? '#A8382F' : u < .35 && v < .45 ? '#F27A7E' : '#E5484D'); p(3.5, 2.5, 3, 1, '#C9463D'); p(4.5, 2, 1, .5, OUT);
+        p(8.5, 4.5, 1, 1, '#E5484D'); p(9.5, 3.5, 1, 1, '#E5484D'); p(10, 3, .5, .5, OUT); p(1, 9.5, 8, .5, OUT);
+        if (Math.sin(t / 500) > .2) { p(10, 1.5 - (t / 200) % 2, .5, 1, '#FFFFFF'); p(9.5, -.5 - (t / 200) % 2, .5, 1, '#FFFFFF'); } } },
+    cookiejar: { n: N('Cookie jar', 'Банка с печеньем', 'Cepumu burka'), w: 9, h: 11, top: null,
+      d: p => { rbox(p, .5, 2.5, 8, 8.5, '#DCEFF7', '#7FA6B8', 1.5); [[2.5, 5, '#C98A4B'], [5.5, 6, '#8B5A3C'], [3, 8, '#D9A45B'], [6, 8.5, '#C98A4B']].forEach(([x, y, c]) => { p(x - 1, y - 1, 2.5, 2.5, c); p(x - .5, y - .5, .5, .5, '#5B3A1E'); });
+        p(1.5, 3.5, .5, 5, '#FFFFFF'); rbox(p, 1, 0, 7, 2.5, '#E5484D', OUT, .5); p(3.5, -.5, 2, 1, '#E5484D'); p(1.5, .5, 6, .5, '#F27A7E'); } },
+    microwave: { n: N('Microwave', 'Микроволновка', 'Mikroviļņu krāsns'), w: 20, h: 12, top: 0,
+      d: (p, t) => { const on = Math.floor(t / 4000) % 3 !== 2; rbox(p, 0, 0, 20, 12, '#E6E6EE', OUT, .5); p(.5, .5, 19, .5, '#FFFFFF');
+        rbox(p, 1.5, 1.5, 12, 9, on ? '#F6E2A0' : '#3A3550', OUT, .5);
+        if (on) { const x = 7.5 + Math.sin(t / 400) * 3; p(3, 8, 9, .5, '#C9B98A'); p(x - 2, 6, 4, 2, '#F28AB2'); p(x - 1.5, 5.5, 3, .5, '#F7B6C8'); }
+        p(15, 2, 3.5, 2, '#10213A'); if (on) { p(15.5, 2.5, .5, 1, '#4CE3A0'); p(16.5, 2.5, .5, 1, '#4CE3A0'); p(17.5, 2.5, .5, 1, '#4CE3A0'); }
+        for (let y = 5; y < 10; y += 1.5) for (let x = 15; x < 18.5; x += 1.5) p(x, y, 1, 1, '#9A96A8'); p(1, 11.5, 18, .5, '#9A96A8'); } },
+    herbpots: { n: N('Herbs in pots', 'Травы в горшочках', 'Garšaugi podiņos'), w: 15, h: 10, top: null,
+      d: (p, t) => { const sw = Math.sin(t / 900) * .5;
+        [[2.5, '#3E8E5A', '#5BAE74'], [7.5, '#6B9E3A', '#8CC152'], [12.5, '#2E6B47', '#3E8E5A']].forEach(([cx, a, b], k) => {
+          if (k === 1) for (let i = 0; i < 4; i++) p(cx - 1.5 + i + sw, .5 + (i % 2), .5, 4.5, b);
+          else blob(p, cx + sw, 3, 2.5, 2.5, (u, v) => v < .4 ? b : a, darker(a));
+          rbox(p, cx - 2, 5, 4, 5, '#C66B4A', '#8A4530', .5); p(cx - 2.5, 5, 5, 1.5, '#D9805E'); p(cx - 2.5, 6, 5, .5, '#8A4530'); }); } },
+    fruitbowl: { n: N('Fruit bowl', 'Ваза с фруктами', 'Augļu bļoda'), w: 13, h: 8, top: null,
+      d: p => { blob(p, 4, 3, 2.25, 2.25, (u, v) => u < .4 && v < .4 ? '#F27A7E' : '#E5484D'); p(4, .5, .5, 1, '#5B3A1E');
+        blob(p, 9, 3, 2.25, 2.25, (u, v) => u < .4 && v < .4 ? '#FFC07A' : '#F08A3B'); [[6, 1], [7, 2], [6.5, 3]].forEach(([x, y]) => blob(p, x, y + 1, 1, 1, () => '#9B5DE5'));
+        for (let k = 0; k < 6; k++) p(2.5 + k * 1.3, 3.5 - Math.sin(k / 5 * Math.PI) * 2, 1.5, 1, '#F6D04D');
+        rbox(p, .5, 4.5, 12, 3.5, '#7FB3E8', OUT, 1.5); p(1.5, 5, 10, .5, '#BFE3F5'); p(3, 7.5, 7, .5, '#4A7BD8'); } },
+    // спальня
+    alarmclock: { n: N('Alarm clock', 'Будильник', 'Modinātājs'), w: 9, h: 10, top: null,
+      d: (p, t) => { const ring = (t % 9000) < 1200, o = ring ? (Math.floor(t / 50) % 2 ? .5 : -.5) : 0;
+        blob(p, 2 + o, 1.5, 1.5, 1.5, () => '#E9C46A'); blob(p, 7 + o, 1.5, 1.5, 1.5, () => '#E9C46A'); p(4 + o, 0, 1, 1.5, OUT);
+        blob(p, 4.5 + o, 5.5, 4, 4, (u, v) => u * u + v * v < .2 ? '#FFFFFF' : '#FFF8EC'); blob(p, 4.5 + o, 5.5, 3, 3, () => '#FFF8EC', '#E5484D');
+        p(4.25 + o, 3.5, .5, 2.5, OUT); p(4.5 + o, 5.5, 2, .5, OUT); p(1.5, 9, 1, 1, OUT); p(6.5, 9, 1, 1, OUT);
+        if (ring) { p(0, -.5, .5, 1.5, '#F6D04D'); p(8.5, -.5, .5, 1.5, '#F6D04D'); } } },
+    mushlamp: { n: N('Mushroom night light', 'Ночник-грибок', 'Sēnes naktslampiņa'), w: 9, h: 10, top: null, glow: [4.5, 3],
+      d: p => {
+        blob(p, 4.5, 4, 4.25, 3.5, (u, v) => v > .8 ? null : u < .4 && v < .4 ? '#FF8A8E' : '#E5484D'); p(.5, 4, 8, 1, '#A8382F');
+        [[2.5, 2], [5.5, 1.5], [6.5, 3.5], [3.5, 3.5]].forEach(([x, y]) => p(x, y, 1, 1, '#FFFFFF'));
+        rbox(p, 3, 5, 3, 4.5, '#FFF3D6', '#C9B98A', .5); p(1.5, 9.5, 6, .5, OUT); } },
+    slippers: { n: N('Fluffy slippers', 'Пушистые тапочки', 'Pūkainas čības'), w: 14, h: 4, top: null,
+      d: p => { [0, 7].forEach(x => { rbox(p, x, 1, 7, 3, '#F7B6C8', '#D98A98', 1); p(x + .5, 1.5, 6, .5, '#FFFFFF'); blob(p, x + 5, 1.25, 1.5, 1.25, () => '#FFFFFF', '#E2C6CF'); }); } },
+    vanity: { n: N('Vanity with a mirror', 'Туалетный столик с зеркалом', 'Tualetes galdiņš ar spoguli'), w: 24, h: 30, top: 14,
+      d: (p, t) => { blob(p, 12, 7, 7, 7, (u, v) => u > .25 && u < .45 && v > .2 && v < .5 ? '#FFFFFF' : v < .5 ? '#DDF1F7' : '#BFE3EE', '#C9A24A'); p(11.5, 13.5, 1, 1, '#C9A24A');
+        if ((t % 6000) < 600) p(9 + (t % 6000) / 100, 3, 1, 1, '#FFFFFF');
+        [7.5, 12, 16.5].forEach((x, k) => { p(x - .5, 11.5 - k % 2, 1.5, 2.5, ['#F28AB2', '#B79CF2', '#7FD3C9'][k]); p(x - .25, 11 - k % 2, 1, .5, '#E9C46A'); });
+        rbox(p, 0, 14, 24, 2.5, '#F4EFE5', OUT, .5); p(.5, 14.5, 23, .5, '#FFFFFF');
+        rbox(p, 1, 16.5, 9, 6, '#F7E3E8', OUT, .5); p(5, 19, 1.5, .5, '#C9A24A'); rbox(p, 14, 16.5, 9, 6, '#F7E3E8', OUT, .5); p(18, 19, 1.5, .5, '#C9A24A');
+        p(1.5, 22.5, 1.5, 7.5, OUT); p(21, 22.5, 1.5, 7.5, OUT); p(1.5, 22.5, 1, 7, '#E6D3C6'); p(21, 22.5, 1, 7, '#E6D3C6'); } },
+    pillowpile: { n: N('Pile of pillows', 'Гора подушек', 'Spilvenu kalns'), w: 24, h: 12, top: 3, sit: true,
+      d: p => { [[0, 6, 14, '#7FB3E8'], [10, 6, 14, '#F7B6C8'], [3, 3, 12, '#F6D04D'], [11, 2.5, 11, '#B79CF2'], [6, 0, 10, '#FFFFFF']].forEach(([x, y, w, c]) => { rbox(p, x, y, w, 6, c, OUT, 2); p(x + 2, y + .5, w - 4, .5, lighter(c)); p(x + 2, y + 5, w - 4, .5, darker(c, .85)); });
+        [[4, 8], [7, 8.5]].forEach(([x, y]) => p(x, y, .5, .5, '#4A7BD8')); p(15, 8.5, 1.5, .5, '#E5484D'); p(11, 2.5, 1, 1, '#E9C46A'); } },
+    sheepplush: { n: N('Plush sheep', 'Плюшевая овечка', 'Plīša aitiņa'), w: 11, h: 9, top: null,
+      d: p => { [[3, 3], [5.5, 2.5], [8, 3.5], [3.5, 5.5], [6.5, 5.5], [8.5, 6]].forEach(([x, y]) => blob(p, x, y, 2.25, 2, (u, v) => v < .4 ? '#FFFFFF' : '#F1ECE4', '#C9C0B2'));
+        blob(p, 1.75, 4.5, 1.75, 2, () => '#5E5470'); p(.75, 4, .5, .5, '#FFFFFF'); p(.5, 3, 1, .5, '#5E5470'); p(1, 5.5, .5, .5, '#F28AB2');
+        [3, 5, 7, 9].forEach(x => p(x, 7.5, 1, 1.5, '#5E5470')); } },
+    // склеп
+    gargoyle: { n: N('Gargoyle', 'Горгулья', 'Gargoils'), w: 16, h: 20, top: null,
+      d: (p, t) => { const s = '#8A8696', d = '#6B6772', l = '#A6A2B2', eye = (t % 7000) < 900 ? '#FF4040' : '#3A3550';
+        p(0, 2, 3, 6, d); p(1, 1, 2, 2, d); p(13, 2, 3, 6, d); p(13, 1, 2, 2, d); // крылья
+        blob(p, 8, 8.5, 5, 5, (u, v) => v > .7 ? d : u < .35 && v < .45 ? l : s); blob(p, 8, 4, 3.5, 3.25, (u, v) => v > .75 ? d : s);
+        p(5, .5, 1, 2, d); p(10, .5, 1, 2, d); p(6.5, 3.5, 1, 1, eye); p(8.5, 3.5, 1, 1, eye); p(6.5, 6, 3, .5, OUT); p(7, 6.5, .5, .5, '#FFFFFF'); p(8.5, 6.5, .5, .5, '#FFFFFF');
+        p(5, 12, 2, 2, d); p(9, 12, 2, 2, d); rbox(p, 2, 14, 12, 6, '#77738A', OUT, .5); p(2.5, 14.5, 11, .5, l); p(4, 17, 8, .5, '#5A5661'); } },
+    pipeorgan: { n: N('Pipe organ', 'Орган', 'Ērģeles'), w: 32, h: 36, top: null,
+      d: (p, t) => { [[2, 14], [5, 8], [8, 4], [11, 1], [14, 0], [17, 0], [20, 1], [23, 4], [26, 8], [29, 14]].forEach(([x, y], k) => { p(x, y, 2.5, 20 - y, OUT); p(x + .5, y + .5, 1.5, 19.5 - y, k % 2 ? '#C9A24A' : '#E9C46A'); p(x + .5, y + .5, .5, 19.5 - y, '#FFF3C4'); p(x + .5, y + 3, 1.5, .5, OUT); });
+        rbox(p, 0, 20, 32, 16, '#5B3348', OUT, .5); p(.5, 20.5, 31, .5, '#7A4A62'); rbox(p, 3, 23, 26, 4, '#FFF8EC', OUT, .5);
+        for (let x = 5; x < 28; x += 2.5) p(x, 23.5, 1, 2, OUT); p(3, 27, 26, 1, '#3A2230'); p(4, 29, 24, 6, '#3A2230'); p(13, 30, 6, 3, '#8E1F2E');
+        if (Math.sin(t / 700) > .3) p(15 + Math.sin(t / 300) * 6, -2 - (t / 200) % 3, 1, 1.5, '#F6D04D'); } },
+    tallcandle: { n: N('Iron candlestick', 'Кованый подсвечник', 'Kalts svečturis'), w: 9, h: 32, top: null, glow: [4.5, 2],
+      d: (p, t) => { const f = Math.sin(t / 90) + Math.sin(t / 37), h2 = f > .5 ? 3 : 2.5;
+        p(3.5, 2.5 - h2, 2, h2, '#FFB347'); p(4, 3 - h2, 1, h2 - .5, '#FFE9A8'); p(4.25, 2.5, .5, .5, OUT);
+        rbox(p, 3, 3, 3, 8, '#F4EBDD', '#C8B08A', .5); p(3.5, 3.5, .5, 3, '#FFFFFF'); p(5, 4, .5, 2, '#E6D9BC');
+        p(1, 11, 7, 1, '#2B272E'); p(.5, 10, 1, 1, '#2B272E'); p(7.5, 10, 1, 1, '#2B272E'); p(4, 12, 1, 16, '#2B272E'); p(3, 16, 3, 1, '#3A353D'); p(3, 22, 3, 1, '#3A353D');
+        p(1, 28, 7, 2, '#2B272E'); p(0, 30, 9, 2, '#2B272E'); p(1, 28, 7, .5, '#4E4A55'); } },
+    skeleton: { n: N('Friendly skeleton', 'Добрый скелет', 'Draudzīgs skelets'), w: 14, h: 32, top: null,
+      d: (p, t) => { const b = '#F4F0E6', s = '#C9C0B2', wave = Math.floor(t / 400) % 2, jaw = (t % 3000) < 600 && Math.floor(t / 150) % 2;
+        p(6.5, 0, 1, 1, OUT); blob(p, 7, 4, 3.5, 3.5, (u, v) => v > .75 ? s : b, s); p(5, 3, 1.5, 1.5, OUT); p(7.5, 3, 1.5, 1.5, OUT); p(6.5, 5, 1, .5, OUT);
+        p(5, 7 + (jaw ? .5 : 0), 4, 1, b); p(5.5, 7 + (jaw ? .5 : 0), .5, .5, s); p(7, 7 + (jaw ? .5 : 0), .5, .5, s);
+        p(6.5, 8, 1, 12, b); for (let y = 10; y < 17; y += 2) p(4, y, 6, 1, b);
+        p(3.5, 9, 1, 6, b); p(10, 9, 1, 2, b); if (wave) { p(11, 6, 1, 3, b); p(11.5, 4.5, 1.5, 1.5, b); } else { p(11, 8, 1.5, 1, b); p(12.5, 6, 1, 2, b); p(12.5, 4.5, 1.5, 1.5, b); }
+        p(4.5, 19, 5, 2, b); p(5, 21, 1, 9, b); p(8, 21, 1, 9, b); p(4, 30, 2.5, 1, b); p(7.5, 30, 2.5, 1, b); p(4, 31, 6, 1, '#2B272E'); } },
+    sarcophagus: { n: N('Stone sarcophagus', 'Каменный саркофаг', 'Akmens sarkofāgs'), w: 32, h: 13, top: 2, sit: true,
+      d: p => { rbox(p, 0, 4, 32, 9, '#77738A', OUT, .5); p(.5, 4.5, 31, .5, '#A6A2B2'); for (let x = 4; x < 30; x += 6) p(x, 7, 3, 3, '#5A5661');
+        rbox(p, 1, 1, 30, 3.5, '#8A8696', OUT, 1); p(2, 1.5, 28, .5, '#B8B4C4'); blob(p, 6, 1, 3, 2, (u, v) => v < .5 ? '#B8B4C4' : '#8A8696'); p(5, .5, .5, .5, OUT); p(6.5, .5, .5, .5, OUT);
+        p(10, 2, 18, 1, '#6B6772'); p(12, 1.5, 2, .5, '#4E7A3E'); p(23, 12, 4, 1, '#4E7A3E'); } },
+    oddjars: { n: N('Jars of oddities', 'Банки со странностями', 'Burkas ar dīvainībām'), w: 15, h: 10, top: null,
+      d: (p, t) => { const bob = Math.sin(t / 600) * .5;
+        rbox(p, 0, 3, 5, 7, 'rgba(140,220,120,.6)', '#5E7A5A', 1); p(.5, 2, 4, 1.5, '#8A6A3C'); blob(p, 2.5, 6 + bob, 1.5, 1.5, (u, v) => u > .3 && u < .7 && v > .3 && v < .7 ? '#2B6BD8' : '#FFFFFF', '#C9C0B2');
+        rbox(p, 5.5, 1, 4.5, 9, 'rgba(190,170,240,.6)', '#6B5E8A', 1); p(6, 0, 3.5, 1.5, '#5B5670'); p(6.5, 4 - bob, 2, 1.5, '#5E9E45'); p(6, 5.5 - bob, 1, 1, '#5E9E45'); p(8.5, 5.5 - bob, 1, 1, '#5E9E45'); p(7, 4.5 - bob, .5, .5, OUT);
+        rbox(p, 10.5, 4, 4.5, 6, 'rgba(240,160,90,.6)', '#8A5A30', 1); p(11, 3, 3.5, 1.5, '#8A6A3C'); for (let k = 0; k < 3; k++) p(11.5 + k, 8.5 - ((t / 300 + k * 2) % 4), .5, .5, '#FFF3B0'); } },
+    // ванная
+    washbasin: { n: N('Washbasin with a mirror', 'Раковина с зеркалом', 'Izlietne ar spoguli'), w: 18, h: 34, top: null,
+      d: (p, t) => { rbox(p, 3, 0, 12, 11, '#DDF1F7', '#9AA3AE', 1.5); p(5, 2, 1, 4, '#FFFFFF'); p(6.5, 2, .5, 2, '#FFFFFF');
+        p(8.5, 12, 1, 3, '#A9B2BC'); p(8.5, 12, 3, 1, '#A9B2BC'); if (Math.floor(t / 3000) % 3 === 0) p(11, 13 + (t / 50) % 2, .5, 1.5, '#7FB3E8');
+        rbox(p, 0, 15, 18, 4, '#FFFFFF', OUT, 1.5); p(2, 15.5, 14, .5, '#BFE3F5'); p(3, 19, 12, 1, '#E6E6EE');
+        rbox(p, 6, 19, 6, 13, '#F4F0FA', OUT, .5); p(7, 19.5, 1, 12, '#FFFFFF'); rbox(p, 4, 31, 10, 3, '#E6E6EE', OUT, .5);
+        p(13.5, 13.5, 3, 1.5, '#F28AB2'); p(14, 13, 2, .5, '#FFFFFF'); } },
+    toilet: { n: N('Toilet', 'Унитаз', 'Tualetes pods'), w: 15, h: 20, top: null,
+      d: (p, t) => { rbox(p, 8, 0, 7, 10, '#FFFFFF', OUT, 1); p(9, .5, 5, .5, '#E6E6EE'); p(12, 2, 2, 1, '#C9CDD6');
+        rbox(p, 0, 9, 13, 3, '#F4F0FA', OUT, 1.5); p(1.5, 9.5, 10, .5, '#FFFFFF');
+        blob(p, 6.5, 13, 6, 3.5, (u, v) => v < .3 ? null : '#FFFFFF'); rbox(p, 4, 15, 7, 5, '#F4F0FA', OUT, .5); p(5, 15.5, 1, 4, '#FFFFFF');
+        if ((t % 8000) < 1500) for (let k = 0; k < 3; k++) p(4 + k * 2.5, 8 - ((t % 8000) / 300 + k) % 4, .5, .5, '#7FB3E8'); } },
+    bathmat: { n: N('Fluffy bath mat', 'Пушистый коврик', 'Pūkains vannas paklājs'), w: 24, h: 3, top: 0, flat: true,
+      d: p => { rbox(p, 0, 0, 24, 3, '#7FD3C9', '#4FA89E', 1.5); for (let x = 2; x < 22; x += 2) p(x, 0, .5, .5, '#BFF0EA'); p(2, 1, 20, .5, '#A9E8E0'); } },
+    duckies: { n: N('Rubber duck family', 'Семейство уточек', 'Gumijas pīlīšu ģimene'), w: 15, h: 7, top: null,
+      d: (p, t) => { [[0, 1, 1], [7, 2.5, .75], [11.5, 3.5, .55]].forEach(([x, y, s], k) => { const o = Math.sin(t / 500 + k) * .4;
+        blob(p, x + 3 * s, y + 4 * s + o, 3 * s, 2 * s, (u, v) => v > .7 ? '#E2B63A' : '#F6D04D'); blob(p, x + 4.5 * s, y + 1.5 * s + o, 1.5 * s, 1.5 * s, () => '#F6D04D');
+        p(x + 5.5 * s, y + 1.5 * s + o, 1.5 * s, .5 + .5 * s, '#F08A3B'); p(x + 4.5 * s, y + 1 * s + o, .5, .5, OUT); }); } },
+    shampoos: { n: N('Shampoo bottles', 'Баночки шампуня', 'Šampūna pudeles'), w: 13, h: 10, top: null,
+      d: (p, t) => { [[0, 3, 4, '#F28AB2'], [4.5, 1, 4, '#7FB3E8'], [9, 4, 4, '#B9E07F']].forEach(([x, y, w, c]) => { rbox(p, x, y, w, 10 - y, c, OUT, 1); p(x + 1, y + 2, .5, 10 - y - 3, lighter(c)); p(x + 1, y + (10 - y) / 2, w - 2, 1.5, '#FFFFFF'); p(x + 1.25, y - 1, w - 2.5, 1, OUT); });
+        for (let k = 0; k < 2; k++) { const a = (t / 900 + k * .5) % 1; p(6 + k * 3, -a * 4, .5, .5, `rgba(191,227,245,${1 - a})`); } } },
+    laundry: { n: N('Laundry basket', 'Корзина для белья', 'Veļas grozs'), w: 15, h: 15, top: 2,
+      d: p => { p(2, 0, 4, 4, '#F28AB2'); p(6, 1, 5, 3, '#7FB3E8'); p(10, -1, 2, 5, '#F6D04D'); p(11, -1, 2, 1, '#F6D04D'); p(3, 1, 1, 1, '#FFFFFF');
+        rbox(p, 0, 3, 15, 12, '#D9B77A', OUT, 1); for (let y = 5; y < 14; y += 2) p(.5, y, 14, .5, '#B8945A'); for (let x = 2; x < 14; x += 3) p(x, 4, .5, 10, '#C8A468'); p(.5, 3.5, 14, 1, '#E9CC93'); } },
+    // кабинет
+    laptop: { n: N('Laptop', 'Ноутбук', 'Klēpjdators'), w: 16, h: 10, top: null,
+      d: (p, t) => { rbox(p, 2, 0, 12, 8, '#3A3550', OUT, .5); p(3, 1, 10, 5.5, '#2B4A7A'); p(3, 1, 10, .5, '#4A7BD8');
+        p(5, 3 + Math.round(Math.sin(t / 400)), 2, 1.5, '#F6D04D'); p(7, 3.5 + Math.round(Math.sin(t / 400)), .5, .5, '#F08A3B'); p(9, 4, 3, 2.5, '#4CC38A');
+        p(0, 8, 16, 1.5, '#C9CDD6'); p(0, 8, 16, .5, '#E6E6EE'); p(6, 9.5, 4, .5, '#9AA3AE'); for (let x = 1.5; x < 14.5; x += 1.5) p(x, 8.5, 1, .5, '#9AA3AE'); } },
+    officechair: { n: N('Office chair', 'Офисное кресло', 'Biroja krēsls'), w: 16, h: 24, top: 12, sit: true,
+      d: p => { rbox(p, 2, 0, 12, 12, '#3A3550', OUT, 2); p(4, 1, 8, .5, '#5B5670'); p(4, 3, 8, 7, '#4A4560');
+        rbox(p, 1, 11, 14, 3.5, '#3A3550', OUT, 1); p(2, 11.5, 12, .5, '#5B5670'); p(0, 9, 2, 1, '#2B2340'); p(14, 9, 2, 1, '#2B2340'); p(0, 9, 1, 3, '#2B2340'); p(15, 9, 1, 3, '#2B2340');
+        p(7, 14.5, 2, 5, '#9AA3AE'); p(2, 19.5, 12, 1.5, '#2B2340'); [1, 7, 13].forEach(x => { p(x, 21, 2, 2, OUT); p(x + .5, 21.5, 1, 1, '#5B5670'); }); } },
+    filecabinet: { n: N('Filing cabinet', 'Шкаф для бумаг', 'Dokumentu skapis'), w: 14, h: 30, top: 0,
+      d: p => { rbox(p, 0, 0, 14, 30, '#9AA3AE', OUT, .5); p(.5, .5, 13, .5, '#C9CDD6');
+        [1.5, 11, 20.5].forEach((y, k) => { rbox(p, 1.5, y, 11, 8, '#B9C2CC', '#6B7380', .5); p(4.5, y + 1.5, 5, 2, '#FFFFFF'); p(5, y + 2, 4, .5, '#9AA3AE'); p(5.5, y + 5, 3, 1, '#5B6370'); });
+        p(3, -1.5, 3, 2, '#F6D04D'); p(6, -1, 4, 1.5, '#FFFFFF'); } },
+    printer: { n: N('Printer', 'Принтер', 'Printeris'), w: 16, h: 10, top: 0,
+      d: (p, t) => { const k = (t % 6000) / 1500; p(4, -1, 8, 2, '#FFFFFF'); p(4, -1, 8, .5, '#E6E6EE');
+        rbox(p, 0, 1, 16, 7, '#E6E6EE', OUT, 1); p(1, 1.5, 14, .5, '#FFFFFF'); p(2, 3, 12, 1, '#3A3550'); p(12, 5, 1.5, 1, (t % 1000) < 500 ? '#4CC38A' : '#2E8A5A');
+        if (k < 1) { const out = 3 * k; p(4, 7 + out - 3, 8, 3, '#FFFFFF'); p(5, 7 + out - 2, 5, .5, '#9AA3AE'); p(5, 7 + out - 1, 4, .5, '#9AA3AE'); }
+        rbox(p, 2, 7.5, 12, 2.5, '#C9CDD6', OUT, .5); } },
+    watercooler: { n: N('Water cooler', 'Кулер с водой', 'Ūdens dzesētājs'), w: 12, h: 30, top: null,
+      d: (p, t) => { rbox(p, 2, 0, 8, 10, 'rgba(127,179,232,.75)', '#4A7BD8', 2); p(3.5, 2, 1, 6, '#DCEFF7'); p(4.5, 10, 3, 1.5, '#4A7BD8');
+        const gl = (t % 5000) < 700; if (gl) blob(p, 6 + Math.sin(t / 80), 8 - ((t % 5000) / 100), 1, 1, () => '#FFFFFF', '#BFE3F5');
+        rbox(p, 1, 11.5, 10, 18.5, '#F4F0FA', OUT, .5); p(1.5, 12, 9, .5, '#FFFFFF'); p(3, 15, 2, 1.5, '#5B6370'); p(7, 15, 2, 1.5, '#5B6370'); p(3.5, 15, 1, 1, '#4A7BD8'); p(7.5, 15, 1, 1, '#E5484D');
+        p(2.5, 18, 7, 2, '#C9CDD6'); p(5, 18.5, 2, 1.5, '#FFFFFF'); p(1.5, 29, 9, 1, '#C9CDD6'); } },
+    paperstack: { n: N('Stack of papers', 'Стопка бумаг', 'Papīru kaudze'), w: 11, h: 8, top: 0,
+      d: (p, t) => { for (let k = 0; k < 5; k++) { p(.5 + (k % 2) * .5, 7 - k * 1.5, 10, 1.5, k % 2 ? '#F4F0E6' : '#FFFFFF'); p(.5 + (k % 2) * .5, 8 - k * 1.5, 10, .5, '#C9C0B2'); }
+        const fl = Math.max(0, Math.sin(t / 700)) * 1.5; p(1, 1 - fl, 9, 1.5, '#FFF8C4'); p(2, 1.5 - fl, 6, .5, '#9AA3AE'); p(8.5, .5, 1, 2.5, '#9AA3AE'); } },
+  });
+  Object.assign(DECO, {
+    starmobile: { n: N('Star mobile', 'Мобиль со звёздами', 'Zvaigžņu mobilis'), w: 18, h: 18,
+      d: (p, t) => { const sw = Math.sin(t / 900) * 1.5; p(8.5, 0, 1, 4, '#C9C0B2'); p(1 + sw * .3, 4, 16, 1, '#C9A24A');
+        [[2, 6, '#F6D04D', 'star'], [7, 10, '#F7B6C8', 'moon'], [12, 7, '#BFE3F5', 'star'], [16, 11, '#F6D04D', 'star']].forEach(([x, y, c, f], k) => { const o = Math.sin(t / 600 + k) * 1;
+          const X = x + sw * .3 + o; p(X, 5, .5, y - 5, '#C9C0B2');
+          if (f === 'star') { p(X - 1.5, y + 1, 3.5, 1, c); p(X - .5, y, 1.5, 3, c); p(X - 1, y + 2.5, .75, .75, c); p(X + .75, y + 2.5, .75, .75, c); }
+          else blob(p, X, y + 2, 2, 2, (u, v) => u > .55 && v < .6 ? '#FFF3C4' : c, darker(c)); }); } },
+    cryptchandelier: { n: N('Cobweb chandelier', 'Люстра с паутиной', 'Lustra ar zirnekļtīklu'), w: 28, h: 18,
+      d: (p, t) => { p(13.5, 0, 1, 6, '#2B272E'); p(2, 10, 24, 1.5, '#2B272E'); p(4, 8, 20, 1, '#3A353D'); for (let k = 0; k < 4; k++) p(6 + k * 5, 6, .5, 4, '#3A353D');
+        [3, 9, 14, 19, 25].forEach((x, k) => { const f = Math.sin(t / 90 + k * 2) + Math.sin(t / 37 + k); p(x - .5, 6.5, 1.5, 3.5, '#F4EBDD'); p(x - .5, 4.5 - (f > .5 ? .5 : 0), 1.5, 2, '#FFB347'); p(x, 5 - (f > .5 ? .5 : 0), .5, 1.5, '#FFE9A8'); });
+        const c = 'rgba(226,226,236,.6)'; for (let k = 0; k < 8; k++) { p(2 + k * .5, 11.5 + k * .8, .5, .5, c); p(25.5 - k * .5, 11.5 + k * .8, .5, .5, c); } p(4, 15, 20, .5, c); p(7, 13, 14, .5, c);
+        const sp = 13 + Math.sin(t / 1300) * 3; p(sp, 11.5, .5, 3, c); p(sp - .5, 14.5, 1.5, 1, '#2B272E'); } },
+    towelrack: { n: N('Towels on hooks', 'Полотенца на крючках', 'Dvieļi uz āķiem'), w: 22, h: 16,
+      d: p => { p(0, 1, 22, 1.5, '#A9B2BC'); p(0, .5, 22, .5, '#D5DCE3'); [2, 12].forEach(x => p(x, 2, 1, 1.5, '#5B6370'));
+        rbox(p, .5, 3, 9, 12, '#F28AB2', '#C96A8A', .5); for (let y = 11; y < 14; y += 1.5) p(1, y, 8, .5, '#FFFFFF'); p(1.5, 3.5, 7, .5, '#F7B6C8');
+        rbox(p, 10.5, 3, 10, 10, '#7FB3E8', '#4A7BD8', .5); for (let x = 12; x < 20; x += 2) p(x, 3.5, 1, 9, '#9FCDEB'); p(11, 12, 9, .5, '#FFFFFF'); } },
+    corkboard: { n: N('Corkboard with notes', 'Пробковая доска с заметками', 'Korķa dēlis ar piezīmēm'), w: 24, h: 18,
+      d: p => { rbox(p, 0, 0, 24, 18, '#C8955E', '#7A4E2A', .5); p(1, 1, 22, 16, '#D9A86C'); const r = rngOf(77); for (let i = 0; i < 40; i++) p(1 + r() * 21, 1 + r() * 15, .5, .5, '#B98A55');
+        [[2, 2, '#FFF39A'], [9, 3, '#F7B6C8'], [16, 2, '#BFE3F5'], [3, 10, '#B9E07F']].forEach(([x, y, c]) => { p(x, y, 5, 5, c); p(x + 1, y + 2, 3, .5, '#7A6A5A'); p(x + 1, y + 3, 2, .5, '#7A6A5A'); p(x + 2, y - .5, 1, 1, '#E5484D'); });
+        p(14, 9, 7, 6, '#FFFFFF'); p(14.5, 9.5, 6, 4, '#7FB3E8'); p(15, 11.5, 2.5, 2, '#4CC38A'); blob(p, 18.5, 11, 1, 1, () => '#F6D04D', '#F6D04D'); p(17, 8.5, 1, 1, '#4A7BD8');
+        p(5, 7, 12, .25, '#E5484D'); p(16.75, 7, .25, 2, '#E5484D'); } },
+  });
   // этап 11 В: мелкие вещи — только они встают на полки на стену (и в коробки, этап 11 Г). Награды Титоса небольшие — тоже мелкие
   const SMALL = new Set(['mug', 'teapot', 'teaset', 'books', 'bookstack', 'spellbook', 'candle', 'skullcandle', 'candelabra', 'cake', 'cookies', 'donuts', 'pizzabox', 'candybowl', 'goblet', 'lemonade', 'watermelon', 'pancakes', 'souppot', 'mixer', 'toaster', 'breadbasket', 'applebasket', 'wormchips', 'coffeemachine',
     'cactus', 'succulents', 'vase', 'tulips', 'orchid', 'snakeplant', 'claypot', 'flytrap', 'yarn', 'knitting', 'globe', 'fishbowl', 'radio', 'recordplayer', 'speaker', 'handheld', 'tamagotchi', 'console', 'pumpkin', 'jacklantern', 'snowglobe', 'gingerhouse',
-    'painttubes', 'brushjar', 'bust', 'rocket', 'moonlamp', 'lavalamp', 'helmet', 'orb', 'shipbottle', 'pollyplush', 'teddy', 'bunny', 'whale', 'cat', 'blackcat', 'raven', 'mrchew', 'ufo', 'eggbasket', 'wateringcan', 'boots', 'seedbag', 'chest']);
+    'painttubes', 'brushjar', 'bust', 'rocket', 'moonlamp', 'lavalamp', 'helmet', 'orb', 'shipbottle', 'pollyplush', 'teddy', 'bunny', 'whale', 'cat', 'blackcat', 'raven', 'mrchew', 'ufo', 'eggbasket', 'wateringcan', 'boots', 'seedbag', 'chest',
+    'kettle', 'cookiejar', 'herbpots', 'fruitbowl', 'alarmclock', 'mushlamp', 'slippers', 'sheepplush', 'oddjars', 'duckies', 'shampoos', 'laptop', 'printer', 'paperstack']); // + этап 21
   const isSmall = d => !!d && (SMALL.has(d.k) || (d.titos && d.w <= 16 && d.h <= 16));
   // этап 11 Б: что светит, когда свет выключен: вещь → [цвет, радиус]; центр — d.glow, иначе середина вещи
   const GLOW = {
@@ -1059,6 +1229,7 @@
     gravelantern: ['#FFD36B', 20], jacklantern: ['#FF9A3C', 18], tclantern: ['#FFC75A', 18],
     orb: ['#B79CF2', 18], portal: ['#9B7BFF', 30], crypt: ['#BFE3FF', 22], spellbook: ['#B79CF2', 12], constellation: ['#CFE6FF', 20], countcoffin: ['#FFD36B', 18],
     xmastree: ['#FFE08A', 30], aquarium: ['#7FD3F5', 18], fishbowl: ['#7FD3F5', 12], tv: ['#9FD3FF', 18], computer: ['#9FD3FF', 14], arcade: ['#FF7AD9', 20], ufo: ['#8CF5B0', 14],
+    tallcandle: ['#FFC75A', 22], mushlamp: ['#FF9AB8', 18], cryptchandelier: ['#FFC75A', 32], laptop: ['#9FD3FF', 12], microwave: ['#FFE3A0', 10], // этап 21
   };
   // этап 11 Г: коробки — мебель с верхом (ставятся друг на друга), box: true; мелкую вещь, отпущенную на коробку, она прячет внутрь.
   // c.lid (0…1) — крышка приоткрыта (вещи выпрыгивают / птичка кладёт обратно). Номер коробки — it.id, вещь внутри — it.in (PPCanDo.isBox, pack)
@@ -1159,6 +1330,12 @@
   B.GIFT_THEMES.push(['home', ['🏠 Cozy room', '🏠 Уютная комната', '🏠 Mājīga istaba'], [...[0, 1, 2, 3, 4, 5].map(i => 'furn|rug:' + i), ...[0, 1, 2, 3, 4, 5].map(i => 'furn|cushion:' + i), ...[0, 1, 2, 3, 4].map(i => 'deco|picture:' + i), 'furn|teddy', 'furn|bunny', 'furn|whale', 'furn|fern', 'furn|snakeplant', 'furn|succulents', 'furn|orchid', 'furn|bed', 'furn|nightstand', 'furn|cat', 'furn|catbed', 'furn|grandclock', 'furn|pouf', 'deco|mirror', 'wall|rainbow', 'floor|rainbowrug', 'floor|parquet', 'curtain|rainbow', 'curtain|golden', 'furn|sofa:0', 'furn|sofa:1', 'furn|armchair', 'furn|knitting', 'furn|yarn', 'furn|lamp', 'furn|plant', 'furn|books', 'furn|mug', 'furn|teapot', 'furn|gramophone', 'furn|radio', 'deco|clock', 'deco|painting', 'wall|wood', 'floor|bluerug', 'curtain|lace']]);
   addTh('home', ['furn|sofa:4', 'furn|sofa:5', 'furn|rockingchair', 'furn|wardrobe', 'furn|dresser', 'furn|sidetable', 'furn|monstera', 'furn|hamster', 'furn|bookstack', 'furn|radiator', 'deco|macrame', 'deco|wallshelf', 'deco|polaroids', 'deco|pennants', 'wall|terrazzo', 'wall|chevron', 'floor|tatami', 'floor|pinkcarpet', 'floor|starrug', 'floor|mosaic', 'curtain|linen', 'curtain|blackout', 'curtain|teal', 'curtain|peach', 'view|waterfall']);
   addTh('polly', ['furn|pollystatue', 'furn|wormchips', 'furn|nestbed', 'furn|mrchew', 'deco|wormposter', 'deco|birdorn']);
+  // этап 21: темы комнат дома — новые вещи и подходящие старые
+  B.GIFT_THEMES.push(['h_kitchen', ['🍳 Kitchen', '🍳 Кухня', '🍳 Virtuve'], ['furn|kitchensink', 'furn|kettle', 'furn|cookiejar', 'furn|microwave', 'furn|herbpots', 'furn|fruitbowl', 'furn|stove', 'furn|fridge', 'furn|coffeemachine', 'furn|toaster', 'furn|chefcounter', 'wall|kitchentiles', 'floor|checker']]);
+  B.GIFT_THEMES.push(['h_bedroom', ['🛏 Bedroom', '🛏 Спальня', '🛏 Guļamistaba'], ['furn|alarmclock', 'furn|mushlamp', 'furn|slippers', 'furn|vanity', 'furn|pillowpile', 'furn|sheepplush', 'deco|starmobile', 'furn|bed', 'furn|nightstand', 'furn|wardrobe', 'furn|dresser', 'furn|nestbed']]);
+  B.GIFT_THEMES.push(['h_crypt', ['🕯 Crypt', '🕯 Склеп', '🕯 Kapenes'], ['furn|gargoyle', 'furn|pipeorgan', 'furn|tallcandle', 'furn|skeleton', 'furn|sarcophagus', 'furn|oddjars', 'deco|cryptchandelier', 'furn|coffin', 'furn|countcoffin', 'furn|candelabra', 'furn|gothicchair', 'deco|hangingbat', 'deco|web']]);
+  B.GIFT_THEMES.push(['h_bath', ['🛁 Bathroom', '🛁 Ванная', '🛁 Vannasistaba'], ['furn|washbasin', 'furn|toilet', 'furn|bathmat', 'furn|duckies', 'furn|shampoos', 'furn|laundry', 'deco|towelrack', 'furn|bathtub', 'furn|rubberduck', 'deco|mirror']]);
+  B.GIFT_THEMES.push(['h_office', ['💼 Study', '💼 Кабинет', '💼 Kabinets'], ['furn|laptop', 'furn|officechair', 'furn|filecabinet', 'furn|printer', 'furn|watercooler', 'furn|paperstack', 'deco|corkboard', 'furn|computer', 'furn|desk', 'furn|bookshelf', 'furn|globe']]);
   // иконка вещи для комнаты
   function icon(kind, v, size) {
     const s = 6, c = document.createElement('canvas'), g = c.getContext('2d');
@@ -1389,24 +1566,117 @@
     }
     // ---------- что птичка делает с вещами: подходит (или запрыгивает) и делает своё, над ней — частицы ----------
     const ACTS = {
-      sleep: ['coffin', 'countcoffin', 'gothicchair', 'sofa', 'armchair', 'beanbag', 'throne', 'bed', 'pouf', 'nestbed', 'beachchair', 'gamingchair', 'catbed', 'giantpizza', 'flamingo'],
-      play: ['tv', 'console', 'computer', 'arcade', 'handheld', 'tamagotchi'],
-      music: ['piano', 'guitar', 'drum', 'speaker', 'recordplayer', 'gramophone', 'radio'],
-      read: ['books', 'bookshelf', 'spellbook', 'desk'],
-      eat: ['goblet', 'souppot', 'pancakes', 'pancakepan', 'batterbowl', 'jamjars', 'honeypot', 'pancaketower', 'baguettes', 'cuttingboard', 'tieredcake', 'mixer', 'mug', 'teapot', 'cake', 'cookies', 'donuts', 'watermelon', 'pizzabox', 'breadbasket', 'applebasket', 'lemonade', 'wormchips', 'seedbag', 'candybowl', 'giantcoffee', 'gingerhouse', 'coffeemachine', 'stove', 'fridge', 'toaster'],
-      splash: ['fishbowl', 'bathtub', 'fountain', 'wateringcan', 'rubberduck'],
+      sleep: ['coffin', 'countcoffin', 'gothicchair', 'sofa', 'armchair', 'beanbag', 'throne', 'bed', 'pouf', 'nestbed', 'beachchair', 'gamingchair', 'catbed', 'giantpizza', 'flamingo', 'pillowpile', 'sarcophagus', 'officechair'],
+      play: ['tv', 'console', 'computer', 'laptop', 'arcade', 'handheld', 'tamagotchi'],
+      music: ['piano', 'guitar', 'drum', 'speaker', 'recordplayer', 'gramophone', 'radio', 'pipeorgan'],
+      read: ['books', 'bookshelf', 'spellbook', 'desk', 'paperstack', 'filecabinet'],
+      eat: ['goblet', 'souppot', 'pancakes', 'pancakepan', 'batterbowl', 'jamjars', 'honeypot', 'pancaketower', 'baguettes', 'cuttingboard', 'tieredcake', 'mixer', 'mug', 'teapot', 'cake', 'cookies', 'donuts', 'watermelon', 'pizzabox', 'breadbasket', 'applebasket', 'lemonade', 'wormchips', 'seedbag', 'candybowl', 'giantcoffee', 'gingerhouse', 'coffeemachine', 'stove', 'fridge', 'toaster', 'kettle', 'cookiejar', 'fruitbowl', 'microwave'],
+      splash: ['fishbowl', 'bathtub', 'fountain', 'wateringcan', 'rubberduck', 'kitchensink', 'washbasin', 'watercooler', 'duckies', 'shampoos'],
       paint: ['easel', 'painttubes', 'brushjar', 'claypot'],
-      warm: ['candelabra', 'gravelantern', 'fireplace', 'candle', 'skullcandle', 'phoenixnest', 'jacklantern'],
-      gaze: ['magicpan', 'pancakecart', 'crypt', 'graveangel', 'crossgrave', 'deadtree', 'spicerack', 'telescope', 'globe', 'orb', 'portal', 'snowglobe', 'lavalamp', 'moonlamp', 'lamp', 'treasure', 'chest', 'pollystatue', 'bust', 'cauldron', 'potionshelf', 'shipbottle', 'rocket', 'grandclock', 'tombstone', 'snowman'],
-      pet: ['raven', 'cat', 'blackcat', 'pollyplush', 'mrchew', 'dragon', 'flytrap', 'cattower', 'robovac'],
+      warm: ['tallcandle', 'candelabra', 'gravelantern', 'fireplace', 'candle', 'skullcandle', 'phoenixnest', 'jacklantern'],
+      gaze: ['magicpan', 'pancakecart', 'crypt', 'graveangel', 'crossgrave', 'deadtree', 'spicerack', 'telescope', 'globe', 'orb', 'portal', 'snowglobe', 'lavalamp', 'moonlamp', 'lamp', 'treasure', 'chest', 'pollystatue', 'bust', 'cauldron', 'potionshelf', 'shipbottle', 'rocket', 'grandclock', 'tombstone', 'snowman', 'gargoyle', 'skeleton', 'oddjars', 'alarmclock', 'mushlamp', 'vanity', 'printer', 'herbpots'],
+      pet: ['sheepplush', 'raven', 'cat', 'blackcat', 'pollyplush', 'mrchew', 'dragon', 'flytrap', 'cattower', 'robovac'],
       unwrap: ['present', 'xmastree'],
       knit: ['knitting', 'yarn', 'socks'],
     };
     const ACT_OF = {}; Object.entries(ACTS).forEach(([a, ks]) => ks.forEach(k => { ACT_OF[k] = a; }));
+    // ---------- сцены по нажатию (этап 21): кровать — спать, плита — блинчики, гроб — плащ графа и зеркало, ванна — пена и уточка, ноутбук — пицца и игра ----------
+    // bird.scene = { kind, it, mir, lx, ly, t0, dur }: lx/ly — где стоит птичка в координатах вещи; mir — сцена зеркальна (вещь повёрнута или справа нет места)
+    const SCENES = { bed: 'bed', stove: 'cook', coffin: 'count', countcoffin: 'count', bathtub: 'bath', laptop: 'game', computer: 'game' };
+    const SC_HINT = { bed: ['put to bed', 'уложить спать', 'nolikt gulēt'], cook: ['bake pancakes', 'испечь блинчики', 'izcept pankūkas'], count: ['become Count Dracula', 'стать графом Дракулой', 'kļūt par grāfu Drakulu'],
+      bath: ['take a bubble bath', 'искупаться в пене', 'izpeldēties putās'], game: ['pizza and a game', 'пицца и игра', 'pica un spēle'] };
+    const SC_DUR = { bed: 9000, cook: 10000, count: 8000, bath: 10000, game: 11000 };
+    const sceneOf = it => !!it && it.k === 'furn' && SCENES[parse(it.v)[0]];
+    // птичка в любом месте: (x, y) — низ посередине; rot — поворот вокруг этой точки
+    const birdPic = (x, y, dir, fr = 0, rot = 0) => { const c = FR[fr] || FR[0], w = c.width * .75, h = c.height * .75; g.save(); g.translate(x, y); if (rot) g.rotate(rot); if (dir < 0) g.scale(-1, 1); g.drawImage(c, -w / 2, -h + 1, w, h); g.restore(); };
+    function startScene(q) {
+      const kind = sceneOf(q.it); if (!kind || tidy || (bird.scene && bird.scene.it === q.it)) return;
+      const d = q.d, base = q.y + d.h, sf = surfaces(layout()), cx = q.x + d.w / 2;
+      const s = sf.find(z => Math.abs(z.y - base) < 1 && cx >= z.x0 - 4 && cx <= z.x1 + 4) || sf[0];
+      let mir = !!q.it.f, lx = d.w + 7, ly = d.h;
+      if (kind === 'bed') { lx = 24; ly = d.top; }
+      else if (kind === 'bath') { lx = 12; ly = 8; }
+      else { const need = kind === 'game' ? 26 : kind === 'count' ? 30 : 16; mir = q.x + d.w + need > Math.min(RW, s.x1 + 6) && q.x - need >= Math.max(0, s.x0 - 6); if (kind === 'game') lx = d.w + 6; }
+      const sc = { kind, it: q.it, mir, lx, ly, t0: 0, dur: SC_DUR[kind], bub: [] };
+      bird.scene = sc; bird.zz = false; bird.act = null; bird.until = 0; if (bird.to) bird.to.then = null;
+      const wx = mir ? q.x + d.w - lx : q.x + lx, wy = q.y + ly;
+      const begin = () => { if (bird.scene !== sc) return; bird.st = 'scene'; bird.x = wx; bird.y = wy; sc.t0 = performance.now(); bird.until = sc.t0 + sc.dur; };
+      const now = performance.now();
+      if (kind === 'bed' || kind === 'bath' || Math.abs(wy - bird.y) > 1) return hop(now, wx, wy, begin);
+      walk(now, wx, wy, .06); bird.to.then = begin;
+    }
+    function drawScene(now, lay) {
+      const sc = bird.scene, q = lay.find(z => z.it === sc.it);
+      if (!q) { bird.scene = null; bird.st = 'idle'; bird.until = 0; return; } // вещь убрали — сцена кончилась
+      const a = now - sc.t0, { lx, ly } = sc, d = q.d, W = x => sc.mir ? q.x + d.w - x : q.x + x; // локальное x → комната
+      g.save(); g.translate(q.x, q.y); if (sc.mir) { g.translate(d.w, 0); g.scale(-1, 1); }
+      const p = P(g, 0, 0);
+      if (sc.kind === 'bed') { // лечь под одеяло, голова на подушке, zZ
+        g.save(); g.beginPath(); g.rect(0, -20, d.w, 34); g.clip(); birdPic(lx - 6, ly, 1, 0, -Math.PI / 2); g.restore();
+        const br = Math.sin(a / 700) * .5;
+        rbox(p, 17, 3.5 + br, 25, 11 - br, '#7FB3E8', OUT, 2); for (let x = 20; x < 40; x += 4) p(x, 5 + br, 2, 8.5 - br, '#9FCDEB'); p(18, 4 + br, 23, .5, '#BFE3F5');
+        rbox(p, 16, 3 + br, 4, 11.5 - br, '#FFFFFF', OUT, 1); p(17, 4 + br, 2, .5, '#EEE8DC');
+        if (Math.random() < .02) emit('zee', W(10), q.y - 4);
+      } else if (sc.kind === 'cook') { // сковородка на плите, блинчик подлетает и переворачивается, потом летит на тарелку
+        const T = 1800, ph = a % T, n = Math.min(6, Math.floor(a / T));
+        p(-13, d.h - 1.5, 12, 1.5, OUT); p(-12.5, d.h - 1.5, 11, 1, '#FFFFFF'); p(-10, d.h - .5, 6, .5, '#C9CDD6');
+        for (let i = 0; i < n; i++) { p(-12, d.h - 2.5 - i * 1.3, 10, 1.3, '#C98A3A'); p(-11.5, d.h - 2.5 - i * 1.3, 9, .5, '#E8B465'); }
+        if (n >= 3) { p(-8, d.h - 3.5 - (n - 1) * 1.3, 2, 1, '#FFF3B0'); p(-11, d.h - 2.5 - (n - 1) * 1.3, 1, 2, '#8B4A1E'); }
+        if (Math.random() < .5) { p(15 + Math.random() * 6, 6, 1, 1, Math.random() < .5 ? '#F08A3B' : '#F6D04D'); }
+        let px = 17.5, py = 3.5, pw = 6;
+        if (ph < 900) { const k = ph / 900; py -= Math.sin(Math.PI * k) * 12; pw = 6 * Math.abs(Math.cos(Math.PI * 2 * k)) + .5; }
+        else if (ph > 1350) { const k = (ph - 1350) / 450; px = 17.5 + (-7 - 17.5) * k; py = 3.5 + (d.h - 4 - n * 1.3 - 3.5) * k - Math.sin(Math.PI * k) * 14; }
+        p(px - pw / 2, py, pw, 1.3, ph > 600 ? '#C98A3A' : '#E8C98A'); p(px - pw / 2, py, pw, .5, '#F2D9A8');
+        p(13, 4, 9, 2.5, OUT); p(13.5, 4.5, 8, 1.5, '#5B5670'); p(13.5, 4, 8, .5, '#9A96A8'); p(22, 4.5, 6, 1, '#8B5A3C');
+        birdPic(lx, ly, -1, ph < 250 || (ph > 850 && ph < 1000) ? 2 : 0);
+        if (Math.random() < .03) emit('dust', W(17), q.y + 1, 1, true);
+      } else if (sc.kind === 'count') { // плащ графа Дракулы, зеркало на ножках; отражение то есть, то нет — вампир же
+        const k = Math.min(1, a / 400), mk = Math.max(0, Math.min(1, (a - 500) / 500)), sw = Math.max(0, Math.sin(a / 330)) ** 4;
+        const cape = (x, y, dir, kk) => { const top = y - 13;
+          for (let yy = top; yy < y; yy += .5) { const f = (yy - top) / (y - top), hw = (2 + f * 6 * (1 + sw * .6)) * kk, wv = Math.sin(now / 160 + yy / 2) * f * .6;
+            p(x - dir * (hw + 1) + (dir < 0 ? -1 : 0) + wv, yy, hw + 3, .5, '#1A1020'); p(x - dir * (hw + 1) + (dir < 0 ? hw + 1.5 : 0) + wv, yy, .5, .5, '#8E1F2E'); }
+          p(x - dir * 4 - (dir < 0 ? 2 : 0), top - 5 * kk, 2, 6 * kk, '#8E1F2E'); p(x - dir * 4 - (dir < 0 ? 2 : 0) + (dir < 0 ? 1.5 : 0), top - 5 * kk, .5, 6 * kk, '#1A1020'); };
+        const mx = lx + 17, my = d.h - 12;
+        if (mk > 0) {
+          g.globalAlpha = mk; p(mx - .5, d.h - 4, 1, 4, '#8A6236'); p(mx - 4, d.h - .5, 8, .5, '#8A6236');
+          blob(p, mx, my, 5.5, 8.5, () => '#E9C46A', '#8A6A1E'); blob(p, mx, my, 4.5, 7.5, (u, v) => u > .2 && u < .35 && v > .2 && v < .5 ? '#FFFFFF' : '#C8D8E8', '#B8C8D8');
+          if (Math.sin(a / 600) > -.4) { g.save(); g.beginPath(); g.ellipse(mx, my, 4.3, 7.3, 0, 0, Math.PI * 2); g.clip(); g.globalAlpha = .55 * mk; cape(mx + 2, ly - 1, -1, 1); birdPic(mx + 2, ly - 1, -1); g.restore(); }
+          else if (Math.random() < .05) emit('star', W(mx), q.y + my - 4);
+          g.globalAlpha = 1;
+        }
+        cape(lx, ly, 1, k); birdPic(lx, ly, 1, sw > .5 ? 2 : 0); p(lx + 1, ly - 13, 1, 1, '#E9C46A');
+      } else if (sc.kind === 'bath') { // сидит в ванне по шею, пена, пузырьки, плавает уточка
+        g.save(); g.beginPath(); g.rect(-4, -30, d.w + 8, 34.5); g.clip(); birdPic(lx, ly, 1, Math.floor(a / 900) % 4 === 0 ? 2 : 0); g.restore();
+        for (let k2 = 0; k2 < 11; k2++) { const o = Math.sin(now / 350 + k2 * 1.3) * .8; blob(p, 2 + k2 * 3, 3.5 + o, 2.2, 1.8, (u, v) => v < .4 ? '#FFFFFF' : '#EAF4FA', '#C8E0EE'); }
+        blob(p, lx + 1, -5.5 + Math.sin(now / 500) * .3, 2.5, 1.5, (u, v) => v < .5 ? '#FFFFFF' : '#EAF4FA', '#C8E0EE');
+        const dx = 22 + Math.sin(a / 1400) * 7, dy = Math.sin(now / 300) * .5, df = Math.cos(a / 1400) > 0 ? 1 : -1;
+        g.save(); g.translate(dx, 0); g.scale(df, 1); const pd = P(g, 0, 0);
+        blob(pd, 0, 1.5 + dy, 3, 2, (u, v) => v > .7 ? '#E2B63A' : '#F6D04D'); blob(pd, 1.5, -1 + dy, 1.75, 1.75, () => '#F6D04D'); pd(2.75, -1.25 + dy, 1.75, 1, '#F08A3B'); pd(1.5, -1.75 + dy, .5, .5, OUT); g.restore();
+        if (Math.random() < .12) sc.bub.push({ x: 2 + Math.random() * 30, t0: now, r: .7 + Math.random() * 1.4, life: 900 + Math.random() * 1400, w: Math.random() * 6 });
+        g.lineWidth = .35;
+        sc.bub = sc.bub.filter(b => { const ag = now - b.t0; if (ag > b.life + 160) return false; const y = 2 - ag * .012, x = b.x + Math.sin(ag / 200 + b.w) * 1.2;
+          if (ag > b.life) { g.fillStyle = '#FFFFFF'; [[-1, 0], [1, 0], [0, -1], [0, 1]].forEach(([u, v]) => g.fillRect(x + u * b.r * 1.6, y + v * b.r * 1.6, .5, .5)); return true; }
+          g.strokeStyle = 'rgba(160,210,240,.95)'; g.beginPath(); g.arc(x, y, b.r, 0, Math.PI * 2); g.stroke(); g.fillStyle = '#FFFFFF'; g.fillRect(x - b.r * .5, y - b.r * .6, .5, .5); return true; });
+      } else if (sc.kind === 'game') { // на экране — игра про птичку; рядом открытая коробка пиццы, кусок за куском
+        const scr = parse(q.it.v)[0] === 'laptop' ? [3, 1, 10, 5.5] : [2, 1, 12, 7], [sx, sy, sw2, sh] = scr;
+        g.save(); g.beginPath(); g.rect(sx, sy, sw2, sh); g.clip(); p(sx, sy, sw2, sh, '#7FD3F5'); p(sx, sy + sh - 1, sw2, 1, '#8CC152');
+        for (let i = 0; i < 3; i++) { const x = sx + sw2 - ((a / 60 + i * 5) % (sw2 + 3)), gy = sy + 1 + ((i * 7 + Math.floor((a / 60 + i * 5) / (sw2 + 3)) * 3) % Math.max(1, sh - 4)); p(x, sy, 1.5, gy - sy, '#4CC38A'); p(x, gy + 2.5, 1.5, sh, '#4CC38A'); }
+        const by = sy + sh / 2 - .5 + Math.sin(a / 220) * (sh / 2 - 1.5); p(sx + 2, by, 1.5, 1, '#F6D04D'); p(sx + 3.5, by + .25, .5, .5, '#F08A3B'); g.restore();
+        const T = 2000, ph = a % T, eat = ph > 1300, n = Math.max(0, 6 - Math.floor(a / T)), bx = lx + 9;
+        rbox(p, bx, ly - 11, 12, 9, '#F4E6C8', '#B8945A', .5); p(bx + 4, ly - 8, 4, 2, '#E5484D'); p(bx + 5, ly - 7.5, 2, 1, '#FFFFFF');
+        p(bx, ly - 2, 12, 2, '#E6D3B0'); p(bx, ly - .5, 12, .5, '#B8945A');
+        for (let i = 0; i < n; i++) { p(bx + 1 + i * 1.7, ly - 3, 1.7, 1, '#F6D04D'); p(bx + 1 + i * 1.7, ly - 2.25, 1.7, .25, '#D9A45B'); if (i % 2 === 0) p(bx + 1.5 + i * 1.7, ly - 3, .75, .5, '#C9463D'); }
+        birdPic(lx, ly, eat ? 1 : -1, eat ? (Math.floor(a / 160) % 2 ? 2 : 0) : (Math.floor(a / 120) % 3 ? 0 : 2));
+        if (eat) { p(lx + 5, ly - 12, 3, 1, '#F6D04D'); p(lx + 5, ly - 12.5, 3, .5, '#D9A45B'); if (Math.random() < .12) emit('crumb', W(lx + 6), q.y + ly - 11, 1, false); }
+        else if (Math.random() < .01) emit('star', W(lx - 8), q.y + sy - 2);
+      }
+      g.restore();
+    }
     const PART = { // пиксельные частицы над птичкой
       note: [['.xx', '.x.', 'xx.'], ['#F6D04D', '#F28AB2', '#7FB3E8']], heart: [['x.x', 'xxx', '.x.'], ['#E5484D', '#F28AB2']], star: [['.x.', 'xxx', '.x.'], ['#F6D04D', '#FFFFFF']],
       crumb: [['x'], ['#D9A45B', '#8B5A3C', '#F4EBDD']], drop: [['x', 'x'], ['#7FB3E8', '#BFE3F5']], paint: [['xx', 'xx'], ['#E5484D', '#4A7BD8', '#F6D04D', '#4CC38A', '#B79CF2']],
       spark: [['x'], ['#F6D04D', '#FFE08A', '#F08A3B']], dust: [['x'], ['#E8DFD0', '#FFFFFF', '#C9BCA6']], yarn: [['xx', 'xx'], ['#F28AB2', '#7FB3E8']], paper: [['xx', 'x.'], ['#E5484D', '#4A7BD8', '#F6D04D', '#4CC38A']],
+      zee: [['xxx', '..x', '.x.', 'x..', 'xxx'], ['#FFFFFF', '#DCEBF7']],
     };
     const ACT_PART = { play: 'star', music: 'note', read: 'star', eat: 'crumb', splash: 'drop', paint: 'paint', warm: 'spark', gaze: 'star', pet: 'heart', unwrap: 'paper', knit: 'yarn', deco: 'star' };
     const parts = [];
@@ -1426,6 +1696,7 @@
     const surfaces = lay => { const s = [{ x0: 8, x1: RW - 8, y: GY }]; lay.forEach(q => { if (q.it.k === 'furn' && q.d.top != null && q.d.w >= 10) s.push({ x0: q.x + 4, x1: q.x + q.d.w - 4, y: q.y + q.d.top, q }); }); return s; };
     function think(now, lay) {
       if (now < bird.until || bird.st === 'walk' || bird.st === 'hop') return; // идёт/прыгает — сначала дойти (stepBird вызовет then)
+      if (bird.scene) { const was = bird.st === 'scene'; bird.scene = null; bird.st = 'idle'; if (was) { emit('heart', bird.x, bird.y - 22, 2); bird.until = now + 700; return; } } // сцена кончилась (или птичку отвлекли по дороге)
       if (tidy) return tidyStep(now, lay);
       const sf = surfaces(lay), r = Math.random(), cur = sf.find(s => Math.abs(s.y - bird.y) < 1 && bird.x >= s.x0 - 2 && bird.x <= s.x1 + 2) || sf[0];
       bird.zz = false; bird.act = null;
@@ -1485,10 +1756,12 @@
         if (bird.act && Math.random() < (bird.act === 'eat' ? .06 : .035)) { const q = bird.actQ, kind = ACT_PART[bird.act]; if (kind) emit(kind, q ? q.x + q.d.w / 2 : bird.x, q ? q.y - 2 : bird.y - 22, 1, kind !== 'crumb'); }
         if (bird.act === 'music' && Math.random() < .03) emit('note', bird.x, bird.y - 20);
         if (bird.act === 'pet' && Math.random() < .03) emit('heart', bird.x, bird.y - 20);
+      } else if (bird.st === 'scene') { bird.frame = 0;
       } else if (bird.st === 'hover') { bird.frame = 0; bird.y += Math.sin(now / 120) * .15; if (Math.random() < .04) emit('star', bird.x, bird.y - 18); }
       else { bird.frame = 0; if (bird.zz && bird.act === 'sleep' && Math.random() < .004) emit('heart', bird.x, bird.y - 20); }
     }
-    function drawBird(now) {
+    function drawBird(now, lay) {
+      if (bird.st === 'scene' && bird.scene) return drawScene(now, lay);
       const c = FR[bird.frame] || FR[0], k = .75, w = c.width * k, h = c.height * k; // птичка в комнате чуть меньше, чем в стае
       g.save();
       if (bird.dir < 0) { g.translate(Math.round(bird.x) * 2, 0); g.scale(-1, 1); }
@@ -1534,7 +1807,7 @@
         }
       });
       placeSel(lay);
-      if (o.film) o.film(g, now, lay); else { think(now, lay); stepBird(now); drawBird(now); } // в видео птичку и всё своё рисует сценарий
+      if (o.film) o.film(g, now, lay); else { think(now, lay); stepBird(now); drawBird(now, lay); } // в видео птичку и всё своё рисует сценарий
       if (tidy && tidy.carry) { const d = defOf(tidy.carry.k, tidy.carry.v); if (d) d.d(P(g, bird.x - d.w / 2, bird.y - FR[0].height * .75 - d.h + 3), now, d.i, ctx); } // несёт вещь над головой
       drawParts(now);
       drawDark(lay, now);
@@ -1721,7 +1994,7 @@
     // ---------- нажатие на альбом (хозяин и гости) — разворот альбома; хозяин, потащив альбом, его не открывает ----------
     let moved = false;
     const albumAt = e => { const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH; const hit = [...layout()].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h); return hit && isAlbum(hit.it); };
-    cv.addEventListener('click', e => { if (moved) { moved = false; return; } if (!o.preview && !o.still && albumAt(e)) openAlbum(); else if (!o.still && !edit) knock(boxAt(e)); });
+    cv.addEventListener('click', e => { if (moved) { moved = false; return; } if (!o.preview && !o.still && albumAt(e)) openAlbum(); else if (!o.still && !edit) { knock(boxAt(e)); const q = hitAt(e); if (q && sceneOf(q.it)) startScene(q); } }); // этап 21: кровать, плита, гроб, ванна, ноутбук — сцена
     // коробка: нажать 3 раза подряд (мышкой или пальцем) — вещи выпрыгивают; на 1-м и 2-м нажатии крышка вздрагивает. В ✏️ — не открывается
     let knocks = null;
     const knock = b => {
@@ -1729,13 +2002,14 @@
       const now = performance.now(); knocks = knocks && knocks.b === b && now - knocks.t < 900 ? { b, n: knocks.n + 1, t: now } : { b, n: 1, t: now };
       if (knocks.n >= 3) { knocks = null; spill(b); } else lids.set(b, { t: now, open: 140 });
     };
+    const hitAt = e => { const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH; return [...layout()].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h); };
     const boxAt = e => { const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH; const hit = [...layout()].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h); return hit && hit.d.box ? hit.it : null; };
-    cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' && !o.mine) cv.style.cursor = albumAt(e) ? 'pointer' : ''; });
+    cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse' && (!o.mine || !edit) && !o.still) { const q = hitAt(e); cv.style.cursor = q && (isAlbum(q.it) || sceneOf(q.it)) ? 'pointer' : ''; } });
     // ---------- название вещи при наведении (видно всем, и гостям): мебель/украшение, иначе окно, шторы, пол, стены ----------
     const tip = document.createElement('div'); tip.className = 'room-tip'; tip.hidden = true; stage.appendChild(tip);
     const nameAt = (px, py) => {
       const hit = [...layout()].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h);
-      if (hit) return nameOf(hit.it.k, hit.it.v);
+      if (hit) return nameOf(hit.it.k, hit.it.v) + (!edit && !o.still && sceneOf(hit.it) ? ' · 👆 ' + SC_HINT[sceneOf(hit.it)][L] : '');
       if (home().stone) return '';
       if (room.view && px >= WX && px <= WX + WW && py >= WY && py <= WY + WH) return nameOf('view', room.view);
       if (room.curtain && py >= WY - 8 && py <= WY + WH + 12 && ((px >= WX - 16 && px < WX) || (px > WX + WW && px <= WX + WW + 16))) return nameOf('curtain', room.curtain);
@@ -1763,7 +2037,7 @@
       showTidy(); showLight(); dkLv = dkTo(); paintBg();
       capEl.textContent = (id === 'living' ? '🏠 ' + t('of') : HOMES[id].ic + ' ' + HOMES[id].n[L] + ' · @{n}').replace('{n}', o.nick);
       // Полли прибегает из двери справа
-      Object.assign(bird, { x: RW + 8, y: GY, zz: false, act: null, actQ: null }); walk(performance.now(), 60 + Math.random() * 80, GY, .07);
+      Object.assign(bird, { x: RW + 8, y: GY, zz: false, act: null, actQ: null, scene: null }); walk(performance.now(), 60 + Math.random() * 80, GY, .07);
     }
     if (!o.still && !o.preview && !o.film) {
       const doors = o.doors || { open: {}, need: {}, have: {} }, isOpen = id => id === 'living' || !!(doors.open || {})[id];
