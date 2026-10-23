@@ -1215,6 +1215,7 @@
     hint: ['Drag things around · tap one for ⇆ ⬆ ⬇ ↩', 'Вещи можно двигать · нажатие на вещь — ⇆ ⬆ ⬇ ↩', 'Lietas var pārvietot · pieskaries lietai — ⇆ ⬆ ⬇ ↩'],
     tidy: ['🧹 Tidy up', '🧹 Прибраться', '🧹 Sakopt'],
     lightOff: ['Turn the light off', 'Выключить свет', 'Izslēgt gaismu'], lightOn: ['Turn the light on', 'Включить свет', 'Ieslēgt gaismu'],
+    door: ['Where to?', 'Куда пойти?', 'Kurp doties?'], living: ['Living room', 'Гостиная', 'Viesistaba'], here: ['you are here', 'ты здесь', 'tu esi šeit'], garden: ['Garden', 'Огород', 'Dārzs'],
     flip: ['Turn', 'Повернуть', 'Pagriezt'], front: ['Forward', 'Вперёд', 'Uz priekšu'], behind: ['Back', 'Назад', 'Atpakaļ'], back: ['To the bag', 'В сумку', 'Uz somu'],
   };
   const t = k => T[k][L];
@@ -1690,19 +1691,17 @@
     cv.addEventListener('pointermove', e => { if (e.pointerType === 'mouse') showTip(e); });
     cv.addEventListener('pointerleave', () => { tip.hidden = true; });
     cv.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') { showTip(e); clearTimeout(tip._t); tip._t = setTimeout(() => { tip.hidden = true; }, 1800); } }); // на телефоне — по касанию
-// Дверь для переключения комнат
-    const doorBtn = document.createElement('button');
-    doorBtn.className = 'room-door-btn';
-doorBtn.innerHTML = '🚪';
-    doorBtn.title = 'Room';
-    doorBtn.setAttribute('aria-label', 'Room');
-    doorBtn.onclick = () => {
-      alert('Вторая комната пока на ремонте! Скоро откроется.');
-    };
-    stage.appendChild(doorBtn);    doorBtn.onclick = () => {
-      alert('Вторая комната пока на ремонте! Скоро откроется.');
-    };
-    stage.appendChild(doorBtn);
+    // 🚪 дверь (справа внизу): куда пойти — гостиная (здесь) и огород (этап 22, /garden/); комнаты этапа 20 — строками в doorMenu
+    if (!o.film && !o.preview && !o.still) {
+      const pre = L === 1 ? '/ru' : L === 2 ? '/lv' : '';
+      const doorBtn = document.createElement('button'), doorMenu = document.createElement('div');
+      doorBtn.type = 'button'; doorBtn.className = 'room-door-btn'; doorBtn.textContent = '🚪'; doorBtn.title = t('door'); doorBtn.setAttribute('aria-label', t('door')); doorBtn.setAttribute('aria-expanded', 'false');
+      doorMenu.className = 'room-door-menu'; doorMenu.hidden = true;
+      doorMenu.innerHTML = `<b>${t('door')}</b><span class="room-door-here">🛋 ${t('living')} · ${t('here')}</span><a href="${pre}/garden/?nick=${encodeURIComponent(o.nick)}">🥕 ${t('garden')} →</a>`;
+      doorBtn.onclick = e => { e.stopPropagation(); doorMenu.hidden = !doorMenu.hidden; doorBtn.setAttribute('aria-expanded', String(!doorMenu.hidden)); };
+      document.addEventListener('click', e => { if (!doorMenu.hidden && !doorMenu.contains(e.target)) { doorMenu.hidden = true; doorBtn.setAttribute('aria-expanded', 'false'); } });
+      stage.append(doorBtn, doorMenu);
+    }
     paintBg();
     if (!o.film) raf = requestAnimationFrame(frame);
     return api;

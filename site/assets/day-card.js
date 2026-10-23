@@ -39,7 +39,8 @@
     pick: ['Polly’s pick', 'Выбор Полли', 'Pollijas izvēle'], badge: ['Badge', 'Бейдж', 'Nozīmīte'], game: ['Button Rain', 'Пуговичный дождь', 'Pogu lietus'], gamerec: ['Rain record', 'Рекорд дождя', 'Lietus rekords'],
     rainking: ['Rain king', 'Король дождя', 'Lietus karalis'], pan: ['Polly’s Pancakes', 'Блинная Полли', 'Pollijas pankūkas'], panrec: ['Pancake record', 'Блинный рекорд', 'Pankūku rekords'], pansoap: ['Washing-up liquid', 'Средство для мытья', 'Trauku līdzeklis'], potion: ['Potion', 'Зелье', 'Dzira'], titos: ['Titos case', 'Дело Титоса', 'Tito lieta'], titossell: ['Titos coffee', 'Кофе Титоса', 'Tito kafija'],
     advent: ['Advent', 'Адвент', 'Advente'], buy: ['Shop', 'Покупка', 'Pirkums'], sell: ['Sold', 'Продажа', 'Pārdots'], card: ['Card', 'Карточка', 'Kartīte'], admin: ['From Polly', 'От Полли', 'No Pollijas'],
-    salary: ['Salary', 'Зарплата', 'Alga'], tax: ['Tax', 'Налог', 'Nodoklis'], daybonus: ['Bonus of the day', 'Бонус дня', 'Dienas bonuss'] };
+    salary: ['Salary', 'Зарплата', 'Alga'], tax: ['Tax', 'Налог', 'Nodoklis'], daybonus: ['Bonus of the day', 'Бонус дня', 'Dienas bonuss'],
+    gsell: ['Harvest sold', 'Урожай продан', 'Raža pārdota'], gseed: ['Seeds', 'Семена', 'Sēklas'], gbug: ['Garden bug', 'Жук в огороде', 'Vabole dārzā'] };
 
   // пиксельная Полли (как в today.js) — одним цветом чернил
   const P = ['......ddd.....', '.....dbbbd....', '....dbbwwbd...', '....dbbwkbdoo.', '....dbbbbbdo..', '...dbbbbbbd...', '..dbbsbbbbd...',

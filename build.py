@@ -60,6 +60,8 @@ PAGES = [
      "Pigeon Polly games: Button Rain, Polly’s Potion Lab, Polly’s Pancakes, Detective Titos, Polly’s Office, Wobbleland and the advent calendar. Earn buttons and spend them in the shop."),
     ("bird", "Bird profile", "bird.html",
      "A bird of the Pigeon Polly flock: its room, bag of gifts, achievements and sketches from the Daily Challenge."),
+    ("garden", "Bird garden", "garden.html",
+     "The garden behind a pixel bird’s house: plant seeds, water them every day, catch bugs and sell the harvest for buttons. The weather follows the real season."),
     ("requests", "Draw this for me", "requests.html",
      "Draw this for me: suggest anything for Alina to draw, see every idea turned into a sketchbook drawing, and get a gift for your pixel bird when yours is drawn."),
     ("rain", "Button Rain", "rain.html",
@@ -76,7 +78,7 @@ PAGES = [
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
 # готовые, но пока не открытые страницы: не попадают в sitemap
-UNLISTED = {"blog-editor", "admin"}
+UNLISTED = {"blog-editor", "admin", "garden"}
 
 
 PORTFOLIO = [
@@ -124,7 +126,7 @@ SECTIONS = {
 # внизу подменю, через линию — хаб раздела
 SECTION_HUB = {"play": ("games", "All games and the shop →"), "draw": ("challenge", "To today’s theme →"), "about": ("about-me", "About me →")}
 # страницы не из меню: в каком они разделе и какой подпункт подсвечен («Стая › Все птички» над заголовком)
-TAB_ALIAS = {"bird": "flock", "shop": "games", "games": "games"}
+TAB_ALIAS = {"bird": "flock", "garden": "flock", "shop": "games", "games": "games"}
 # подпись над заголовком для страниц раздела, которых нет в подменю
 CRUMB_ONLY = {"shop": ("play", "Shop")}
 for _p in ("anxiety", "sketchbook", "snail", "bird", "detective", "halloween", "ai-art"):
