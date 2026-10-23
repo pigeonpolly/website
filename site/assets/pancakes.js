@@ -2,7 +2,9 @@
 // Ход уровня: выбрать сковородку (форма блина) → держать «Лить тесто» до зелёной полосы → перевернуть и снять вовремя (прожарка из заказа)
 // → добавить топпинги из заказа → подать. Ошибки не проваливают уровень, но клиент доволен меньше; совсем недовольный — минус сердечко (их 3).
 // Каждые info.wash уровней сковородку надо помыть пальцем: средство — info.soap 🔘 (сервер списывает), без него — водой, дольше.
-// Пуговки, рекорды, вещи и бейджи — сервер (worker/pancakes.js): /api/pancakes, /api/pancakes/{start,level,wash}.
+// Пуговки, рекорды, вещи и бейджи — сервер (worker/pancakes.js): /api/pancakes, /api/pancakes/{start,level,wash,up}.
+// Прокачка (этап 25): старт с пройденного рубежа и улучшения UPS за пуговки (info.ups). Клиенты (этап 26): постоянные гости захода (roster), характеры TRAITS,
+// Медведь-курьер с заляпанным заказом (BEAR, угадал — luck: трое следующих довольны). Топпинги (этап 27): пиксельные спрайты SPR — на блине, в карточках и в заказе.
 (() => {
   const app = document.getElementById('pancakes');
   if (!app) return;
@@ -60,6 +62,29 @@
     soapGuest: ['Washing-up liquid is for buttons: sign in', 'Средство — за пуговки: войди', 'Līdzeklis ir par pogām: ienāc'],
     rub: [n => `Rub the pan with your finger! ${n} %`, n => `Три сковородку пальцем! ${n} %`, n => `Berz pannu ar pirkstu! ${n} %`],
     clean: ['✨ Sparkling clean!', '✨ Блестит!', '✨ Spīd!'],
+    // прокачка
+    from: ['Start from level', 'Начать с уровня', 'Sākt no līmeņa'],
+    upsBtn: ['🛠 Upgrades', '🛠 Улучшения', '🛠 Uzlabojumi'],
+    upsTitle: ['🛠 Pancake shop upgrades', '🛠 Улучшения блинной', '🛠 Pankūku bodes uzlabojumi'],
+    upsHow: ['They stay forever and work in every game.', 'Остаются навсегда и работают в каждой игре.', 'Paliek uz visiem laikiem un darbojas katrā spēlē.'],
+    upsGuest: ['Upgrades are for buttons: sign in.', 'Улучшения — за пуговки: войди.', 'Uzlabojumi ir par pogām: ienāc.'],
+    have: [n => `You have: ${n} 🔘`, n => `У тебя: ${n} 🔘`, n => `Tev ir: ${n} 🔘`],
+    buy: [n => `${n} 🔘`, n => `${n} 🔘`, n => `${n} 🔘`],
+    maxed: ['✓ Max', '✓ Максимум', '✓ Maksimums'],
+    back: ['← Back', '← Назад', '← Atpakaļ'],
+    bought: ['✨ Upgrade bought!', '✨ Улучшение куплено!', '✨ Uzlabojums nopirkts!'],
+    spare: [n => `🍳 Spare pan (${n})`, n => `🍳 Запасная (${n})`, n => `🍳 Rezerves (${n})`],
+    spareOn: ['🍳 A clean pan!', '🍳 Чистая сковородка!', '🍳 Tīra panna!'],
+    // клиенты
+    trait: { hurry: ['⏱ in a hurry', '⏱ торопыга', '⏱ steidzas'], picky: ['🧐 picky', '🧐 привереда', '🧐 izvēlīgs'], chatty: ['💬 chatterbox', '💬 болтун', '💬 pļāpa'], same: ['🔁 a regular', '🔁 постоянный', '🔁 pastāvīgais'] },
+    sameT: ['🔁 Same as last time', '🔁 Как в прошлый раз', '🔁 Tāpat kā pagājušoreiz'],
+    sameHint: ['remember the order!', 'запомни заказ!', 'iegaumē pasūtījumu!'],
+    plain: ['nothing on top', 'ничего сверху', 'bez nekā virsū'],
+    toGo: ['🐻 TO GO', '🐻 НАВЫНОС', '🐻 LĪDZŅEMŠANAI'],
+    forWho: [n => `for: ${n}`, n => `для: ${n}`, n => `kam: ${n}`],
+    okGuess: ['guessed', 'угадано', 'uzminēts'], okLuck: ['🍯 bear’s luck', '🍯 удача медведя', '🍯 lāča veiksme'],
+    luck: ['🐻🍯 Bear’s luck: the next 3 customers will leave happy with any pancake!', '🐻🍯 Удача медведя: следующие 3 клиента уйдут довольными при любом блинчике!', '🐻🍯 Lāča veiksme: nākamie 3 klienti aizies apmierināti ar jebkuru pankūku!'],
+    noLuck: ['🐻 Not quite — but no heart lost', '🐻 Не угадано — но сердечко на месте', '🐻 Neuzminēts — bet sirsniņa paliek'],
     noSave: ['Could not save the level: buttons were not added.', 'Не получилось сохранить уровень: пуговки не начислены.', 'Neizdevās saglabāt līmeni: pogas netika pieskaitītas.'],
   };
   const t = (k, ...a) => { const v = T[k][L]; return typeof v === 'function' ? v(...a) : v; };
@@ -68,6 +93,7 @@
   const post = (path, body) => fetch('/api/' + path, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body || {}) }).then(r => r.ok ? r.json() : Promise.reject(r.status));
   const pick = a => a[Math.floor(Math.random() * a.length)];
   const clamp = (v, a = 0, b = 1) => Math.max(a, Math.min(b, v));
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
 
   // ---------- формы (сковородки): inside(u, v) в квадрате −1…1; from — с какого уровня есть ----------
   const inPoly = (pts, x, y) => { let c = false; for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const [xi, yi] = pts[i], [xj, yj] = pts[j]; if ((yi > y) !== (yj > y) && x < (xj - xi) * (y - yi) / (yj - yi) + xi) c = !c; } return c; };
@@ -94,26 +120,82 @@
     s.minOut = Math.min(...s.out.map(c => c[2]));
   }
 
-  // ---------- топпинги: from — с какого уровня есть; kind — как лежит на блине ----------
+  // ---------- топпинги: from — с какого уровня есть; k — как лежит на блине; c — палитра спрайта (o — контур, a — цвет, b — тень, h — блик, s, g — детали) ----------
+  // pieces — n штук спрайта sp; drizzle — пиксельная струйка (в карточке — банка jar или бутылка bottle); dust — посыпка (в карточке — сито); dollop — одна шапка спрайта sp
+  const O = '#1a1528';
   const TOPS = [
-    { id: 'berry', e: '🍓', from: 1, k: 'dots', c: ['#E2464E', '#A82632'], n: 3, s: 5, nm: ['strawberries', 'клубника', 'zemenes'] },
-    { id: 'honey', e: '🍯', from: 1, k: 'drizzle', c: ['#F2B33D', '#C98715'], nm: ['honey', 'мёд', 'medus'] },
-    { id: 'sour', e: '🥛', from: 1, k: 'dollop', c: ['#FFF8EC', '#E4DCCB'], nm: ['sour cream', 'сметана', 'krējums'] },
-    { id: 'choco', e: '🍫', from: 1, k: 'drizzle', c: ['#6A3B22', '#3E2113'], nm: ['chocolate', 'шоколад', 'šokolāde'] },
-    { id: 'banana', e: '🍌', from: 3, k: 'slices', c: ['#FBEFA6', '#D9C35A'], n: 3, s: 6, nm: ['banana', 'банан', 'banāns'] },
-    { id: 'sugar', e: '❄️', from: 5, k: 'dust', c: ['#FFFFFF', '#F1EEF7'], nm: ['icing sugar', 'сахарная пудра', 'pūdercukurs'] },
-    { id: 'jam', e: '🍒', from: 7, k: 'dollop', c: ['#B3243F', '#7E1129'], nm: ['cherry jam', 'вишнёвое варенье', 'ķiršu ievārījums'] },
-    { id: 'blue', e: '🫐', from: 9, k: 'dots', c: ['#5257B8', '#2F3378'], n: 5, s: 4, nm: ['blueberries', 'черника', 'mellenes'] },
-    { id: 'cream', e: '🍦', from: 11, k: 'dollop', c: ['#FFFFFF', '#E6E1F0'], big: 1, nm: ['whipped cream', 'взбитые сливки', 'putukrējums'] },
-    { id: 'maple', e: '🍁', from: 13, k: 'drizzle', c: ['#B8652A', '#7F3E14'], nm: ['maple syrup', 'кленовый сироп', 'kļavu sīrups'] },
-    { id: 'nuts', e: '🌰', from: 15, k: 'bits', c: ['#A8743F', '#6E4622'], n: 6, s: 4, nm: ['nuts', 'орехи', 'rieksti'] },
-    { id: 'lemon', e: '🍋', from: 17, k: 'slices', c: ['#F7E35A', '#C9A91A'], n: 2, s: 7, nm: ['lemon', 'лимон', 'citrons'] },
-    { id: 'cheese', e: '🧀', from: 19, k: 'bits', c: ['#F6CB4A', '#C7961A'], n: 4, s: 6, nm: ['cheese', 'сыр', 'siers'] },
-    { id: 'pumpkin', e: '🎃', from: 21, k: 'dollop', c: ['#F08A2E', '#B85A12'], nm: ['pumpkin cream', 'тыквенный крем', 'ķirbju krēms'] },
-    { id: 'caramel', e: '🍮', from: 23, k: 'drizzle', c: ['#D99443', '#9C5C1C'], nm: ['caramel', 'карамель', 'karamele'] },
-    { id: 'worm', e: '🪱', from: 25, k: 'bits', c: ['#D6967A', '#9C5A44'], n: 3, s: 7, nm: ['worm chips', 'червячковые чипсы', 'tārpu čipsi'] },
+    { id: 'berry', from: 1, k: 'pieces', n: 3, sp: 'berry', c: { o: O, a: '#E2464E', b: '#A82632', h: '#FF9A9A', s: '#FFE7A3', g: '#4E9A3F' }, nm: ['strawberries', 'клубника', 'zemenes'] },
+    { id: 'honey', from: 1, k: 'drizzle', box: 'jar', c: { o: O, a: '#F2B33D', b: '#C98715', h: '#FFE08A', l: '#8C5A3C' }, nm: ['honey', 'мёд', 'medus'] },
+    { id: 'sour', from: 1, k: 'dollop', sp: 'blob', c: { o: '#B9B0A0', a: '#FFF8EC', b: '#E4DCCB', h: '#FFFFFF' }, nm: ['sour cream', 'сметана', 'krējums'] },
+    { id: 'choco', from: 1, k: 'drizzle', box: 'bottle', c: { o: O, a: '#6A3B22', b: '#3E2113', h: '#9C6A48', l: '#E2725B', w: '#FFF6D8' }, nm: ['chocolate', 'шоколад', 'šokolāde'] },
+    { id: 'banana', from: 3, k: 'pieces', n: 3, sp: 'disc', c: { o: '#B8A040', a: '#FBEFA6', b: '#E8D77A', s: '#8C7A3A', h: '#FFF9D8' }, nm: ['banana', 'банан', 'banāns'] },
+    { id: 'rasp', from: 4, k: 'pieces', n: 4, sp: 'rasp', c: { o: O, a: '#E0457B', b: '#A9234F', h: '#FFA3C2', g: '#4E9A3F' }, nm: ['raspberries', 'малина', 'avenes'] },
+    { id: 'sugar', from: 5, k: 'dust', dc: ['#FFFFFF', '#F1EEF7'], c: { o: O, a: '#B9C2D0', b: '#8A93A3', h: '#E7ECF4', s: '#FFFFFF' }, nm: ['icing sugar', 'сахарная пудра', 'pūdercukurs'] },
+    { id: 'milk', from: 6, k: 'drizzle', box: 'bottle', c: { o: '#9C9484', a: '#FFF4DC', b: '#E6D9BC', h: '#FFFFFF', l: '#5B8FD1', w: '#5B8FD1' }, nm: ['condensed milk', 'сгущёнка', 'iebiezinātais piens'] },
+    { id: 'jam', from: 7, k: 'dollop', sp: 'jam', c: { o: O, a: '#B3243F', b: '#7E1129', h: '#F06A86', s: '#D8344F', g: '#4E9A3F' }, nm: ['cherry jam', 'вишнёвое варенье', 'ķiršu ievārījums'] },
+    { id: 'kiwi', from: 8, k: 'pieces', n: 2, sp: 'kiwi', c: { o: '#5A4A2A', a: '#6DB33F', b: '#A7D86A', h: '#F4F1C8', s: O }, nm: ['kiwi', 'киви', 'kivi'] },
+    { id: 'blue', from: 9, k: 'pieces', n: 5, sp: 'ball', c: { o: O, a: '#5257B8', b: '#2F3378', h: '#A9B0F0' }, nm: ['blueberries', 'черника', 'mellenes'] },
+    { id: 'apple', from: 10, k: 'pieces', n: 4, sp: 'cube', c: { o: '#8A6A3A', a: '#F3E3A8', b: '#D9BE72', h: '#FFF6D0', s: '#A0602A' }, nm: ['cinnamon apple', 'яблоко с корицей', 'ābols ar kanēli'] },
+    { id: 'cream', from: 11, k: 'dollop', sp: 'swirl', c: { o: '#B6AECB', a: '#FFFFFF', b: '#E6E1F0', h: '#FFFFFF' }, nm: ['whipped cream', 'взбитые сливки', 'putukrējums'] },
+    { id: 'sprink', from: 12, k: 'dust', dc: ['#F27BA8', '#F2C94C', '#6FB7E8', '#7CC47F', '#FFFFFF', '#B07CE0'], rods: 1, c: { o: O, a: '#F7D2E2', b: '#E2A3BF', h: '#FFFFFF', s: '#6FB7E8' }, nm: ['sprinkles', 'цветная посыпка', 'krāsainās kaisāmās'] },
+    { id: 'maple', from: 13, k: 'drizzle', box: 'bottle', c: { o: O, a: '#B8652A', b: '#7F3E14', h: '#E39A5A', l: '#C0392B', w: '#FFF6D8' }, nm: ['maple syrup', 'кленовый сироп', 'kļavu sīrups'] },
+    { id: 'lingon', from: 14, k: 'pieces', n: 7, sp: 'tiny', c: { o: '#5A0F1E', a: '#D0263B', b: '#8E1426', h: '#FF8A8A' }, nm: ['lingonberries', 'брусника', 'brūklenes'] },
+    { id: 'nuts', from: 15, k: 'pieces', n: 5, sp: 'nut', c: { o: O, a: '#A8743F', b: '#6E4622', h: '#D9A570' }, nm: ['nuts', 'орехи', 'rieksti'] },
+    { id: 'marsh', from: 16, k: 'pieces', n: 4, sp: 'marsh', c: { o: '#A89BB8', a: '#FFE3EE', b: '#F2B8CF', h: '#FFFFFF' }, nm: ['marshmallows', 'маршмеллоу', 'zefīri'] },
+    { id: 'lemon', from: 17, k: 'pieces', n: 2, sp: 'citrus', c: { o: '#9C8414', a: '#F7E35A', b: '#FFF6B0', h: '#FCEB80' }, nm: ['lemon', 'лимон', 'citrons'] },
+    { id: 'chips', from: 18, k: 'pieces', n: 8, sp: 'drop', c: { o: '#24130A', a: '#5A3019', b: '#3A1E0E', h: '#8C5A3C' }, nm: ['chocolate chips', 'шоколадная крошка', 'šokolādes skaidiņas'] },
+    { id: 'cheese', from: 19, k: 'pieces', n: 3, sp: 'wedge', c: { o: '#8C6510', a: '#F6CB4A', b: '#C7961A', h: '#FFE58A', s: '#D9A82A' }, nm: ['cheese', 'сыр', 'siers'] },
+    { id: 'ice', from: 20, k: 'dollop', sp: 'scoop', c: { o: '#9C7A6A', a: '#FFF1DC', b: '#EBD3B4', h: '#FFFFFF', s: '#5A3019' }, nm: ['ice cream', 'шарик мороженого', 'saldējuma bumba'] },
+    { id: 'pumpkin', from: 21, k: 'dollop', sp: 'swirl', c: { o: '#7A3A0A', a: '#F08A2E', b: '#B85A12', h: '#FFC07A' }, nm: ['pumpkin cream', 'тыквенный крем', 'ķirbju krēms'] },
+    { id: 'mint', from: 22, k: 'pieces', n: 3, sp: 'leaf', c: { o: '#1F5A2A', a: '#4CB860', b: '#2E8A44', h: '#A6E8A8' }, nm: ['mint', 'мята', 'piparmētra'] },
+    { id: 'caramel', from: 23, k: 'drizzle', box: 'jar', c: { o: O, a: '#D99443', b: '#9C5C1C', h: '#F4C27A', l: '#6A3FB0' }, nm: ['caramel', 'карамель', 'karamele'] },
+    { id: 'curd', from: 24, k: 'dollop', sp: 'curd', c: { o: '#A9A08C', a: '#FFFDF4', b: '#EAE3CF', h: '#FFFFFF' }, nm: ['cottage cheese', 'творог', 'biezpiens'] },
+    { id: 'worm', from: 25, k: 'pieces', n: 3, sp: 'worm', c: { o: '#5A2A1A', a: '#D6967A', b: '#9C5A44', h: '#F2C0A8' }, nm: ['worm chips', 'червячковые чипсы', 'tārpu čipsi'] },
   ];
   const TP = Object.fromEntries(TOPS.map(x => [x.id, x]));
+  // спрайты: строки пикселей, буква — цвет из палитры топпинга (точка — пусто)
+  const SPR = {
+    berry: ['..g..g..', '...gg...', '.oaaaao.', 'oahasaao', 'oasaaaso', 'oaaasabo', '.oasabo.', '..obbo..', '...oo...'],
+    rasp: ['..gg..', '.oaao.', 'oahaao', 'oaabao', 'oabaao', 'oaabao', '.obbo.', '..oo..'],
+    ball: ['.ooo.', 'ohaao', 'oaaao', 'oaabo', '.ooo.'],
+    tiny: ['.oo.', 'ohao', 'oabo', '.oo.'],
+    disc: ['..ooo..', '.oahao.', 'oaasaao', 'oasbsao', 'oaasaao', '.oaaao.', '..ooo..'],
+    kiwi: ['..oooo..', '.oaaaao.', 'oasbbsao', 'oabhhbao', 'oabhhbao', 'oasbbsao', '.oaaaao.', '..oooo..'],
+    citrus: ['..oooo..', '.oaaaao.', 'oabhhbao', 'oahbbhao', 'oahbbhao', 'oabhhbao', '.oaaaao.', '..oooo..'],
+    cube: ['.oooo.', 'ohhhho', 'oaasao', 'oasaao', 'oaaabo', '.oooo.'],
+    nut: ['.oo..', 'ohao.', 'oaabo', '.oabo', '..oo.'],
+    marsh: ['.oooo.', 'ohhhho', 'oaaaao', 'oahaao', 'oabbbo', '.oooo.'],
+    drop: ['.o..', 'oao.', 'oaho', '.oo.'],
+    wedge: ['o.....', 'ooo...', 'ohhoo.', 'oasaoo', 'oaaasb', 'oooooo'],
+    leaf: ['....oo.', '..ooao.', '.oahao.', 'oahbao.', 'oabao..', '.oo....', 'o......'],
+    worm: ['..oo.....', '.oaho.oo.', 'oabaoahao', '.oo.oabo.', '.....oo..'],
+    blob: ['...oooo...', '..ohhaao..', '.ohaaaaao.', 'oaaaaaaabo', 'oaaaaaabbo', '.oabbbbbo.', '..oooooo..'],
+    jam: ['....g.....', '....g.....', '...oso....', '..ooaooo..', '.ohhaaaao.', 'oahaaaaabo', 'oaaaaaabbo', '.oabbbbbo.', '..oooooo..'],
+    swirl: ['.....oo.....', '....ohao....', '...ohaaao...', '...oaaabo...', '..ohaaaaao..', '..oaaaabbo..', '.ohaaaaaaao.', '.oaaaaaabbo.', 'oaaaaaaaabbo', '.oooooooooo.'],
+    scoop: ['...oooo...', '..ohhaao..', '.ohaaaaao.', '.oaaaaaso.', 'oaasaaaabo', 'oaaaaasabo', '.obooobbo.', '..o..oo...'],
+    curd: ['..oo.oo...', '.ohaohao..', 'ohaaaaaoo.', 'oaahaaahao', 'oaaaaabaao', '.obaabbbo.', '..oooooo..'],
+    jar: ['..oooooooo..', '..ollllllo..', '..oooooooo..', '.oaaaaaaaao.', 'oahaaaaaaabo', 'oahaaaaaaabo', 'oahaaaaaaabo', 'oaaaaaaaabbo', '.oaaaaaabbo.', '..oooooooo..'],
+    bottle: ['...oo...', '...ll...', '..oooo..', '..oaao..', '.oaaaao.', 'oahaaaao', 'oahwwwao', 'oahwwwao', 'oahaaabo', 'oaaaaabo', '.oooooo.'],
+    sieve: ['.oooooooo.', 'ohhhhhhhho', 'oasasasaso', '.oooooooo.', '...o..o...', '....oo....', '...s..s...', '..s.s..s..', '...s.s....'],
+  };
+  // спрайт в точке (x, y — середина), z — размер пикселя, pal — палитра; flip — отразить
+  function sprite(g, name, x, y, z, pal, flip) {
+    const rows = SPR[name], w = rows[0].length, h = rows.length, x0 = Math.round(x - w * z / 2), y0 = Math.round(y - h * z / 2);
+    rows.forEach((r, j) => { for (let i = 0; i < w; i++) { const col = pal[r[i]]; if (col) { g.fillStyle = col; g.fillRect(x0 + (flip ? w - 1 - i : i) * z, y0 + j * z, z, z); } } });
+  }
+  // картинка топпинга для карточки и заказа (32×32, рисуется один раз)
+  const TICON = {};
+  function topIcon(id) {
+    if (TICON[id]) return TICON[id];
+    const c = document.createElement('canvas'); c.width = c.height = 32; const g = c.getContext('2d'), tp = TP[id];
+    if (tp.k === 'drizzle') { sprite(g, tp.box, 16, 17, tp.box === 'jar' ? 2 : 2, tp.c); g.fillStyle = tp.c.a; g.fillRect(tp.box === 'jar' ? 25 : 22, 22, 2, 6); g.fillRect(tp.box === 'jar' ? 24 : 21, 27, 4, 3); }
+    else if (tp.k === 'dust') { sprite(g, 'sieve', 16, 16, 3, tp.c); tp.dc.forEach((col, i) => { g.fillStyle = col; g.fillRect(7 + (i * 7) % 18, 26 + (i % 2) * 3, 2, 2); }); }
+    else if (tp.k === 'dollop') { const r = SPR[tp.sp], z = Math.max(1, Math.floor(30 / Math.max(r.length, r[0].length))); sprite(g, tp.sp, 16, 16, z, tp.c); }
+    else { const r = SPR[tp.sp], big = Math.max(r.length, r[0].length);
+      if (big >= 7) { sprite(g, tp.sp, 12, 13, 2, tp.c); sprite(g, tp.sp, 21, 19, 2, tp.c, true); }
+      else { const z = big >= 6 ? 2 : 3; sprite(g, tp.sp, 10, 11, z, tp.c); sprite(g, tp.sp, 22, 12, z, tp.c, true); sprite(g, tp.sp, 16, 22, z, tp.c); } }
+    return (TICON[id] = c);
+  }
 
   // ---------- жители Воббленда (медальоны /images/wobbleland/ch-*.png): любимые топпинги, форма, прожарка; hi — с чем пришёл, yum — когда в восторге ----------
   const C = (img, city, n, fav, shape, bake, hi, yum) => ({ img, city, n, fav, shape, bake, hi, yum });
@@ -244,15 +326,53 @@
   ];
   // общие ответы клиентов: 0 — расстроен, 1 — не очень доволен, 2 — доволен, 3 — в восторге; miss/extra — про топпинги (эмодзи вместо названия)
   const SAY = {
-    3: [['Best pancake in Wobbleland!', 'Лучший блин во всём Воббленде!', 'Labākā pankūka visā Wobbleland!'], ['I’ll tell the whole town about this!', 'Расскажу об этом всему городу!', 'Izstāstīšu par to visai pilsētai!'], ['Exactly how I dreamed it!', 'Прямо как в мечтах!', 'Tieši tāda, kā sapņoju!']],
-    2: [['Tasty! Thank you, Polly.', 'Вкусно! Спасибо, Полли.', 'Garšīgi! Paldies, Pollij.'], ['Good pancake. I’ll be back!', 'Хороший блин. Ещё приду!', 'Laba pankūka. Vēl atnākšu!'], ['Not bad at all!', 'Очень даже неплохо!', 'Nemaz nav slikti!']],
-    1: [['Hmm… it’s edible.', 'Хм… съедобно.', 'Hmm… ēdams.'], ['Not quite what I ordered.', 'Не совсем то, что было в заказе.', 'Ne gluži tas, ko pasūtīju.'], ['Well… thanks, I suppose.', 'Ну… спасибо, наверное.', 'Nu… paldies, laikam.']],
-    0: [['That’s not my order at all!', 'Это вообще не мой заказ!', 'Tas nemaz nav mans pasūtījums!'], ['Oh no. I’ll go to the noodle shop.', 'Ох. Пойду лучше в лапшичную.', 'Ak nē. Labāk iešu uz nūdeļu bodīti.'], ['*sighs and leaves*', '*вздыхает и уходит*', '*nopūšas un aiziet*']],
+    3: [['Best pancake in Wobbleland!', 'Лучший блин во всём Воббленде!', 'Labākā pankūka visā Wobbleland!'], ['I’ll tell the whole town about this!', 'Расскажу об этом всему городу!', 'Izstāstīšu par to visai pilsētai!'], ['Exactly how I dreamed it!', 'Прямо как в мечтах!', 'Tieši tāda, kā sapņoju!'],
+      ['I’ll frame this pancake. After I eat it.', 'Повешу этот блин в рамочку. Когда съем.', 'Šo pankūku ielikšu rāmītī. Kad apēdīšu.'], ['Polly, this is pancake magic!', 'Полли, да это блинное волшебство!', 'Pollij, tā ir pankūku burvība!']],
+    2: [['Tasty! Thank you, Polly.', 'Вкусно! Спасибо, Полли.', 'Garšīgi! Paldies, Pollij.'], ['Good pancake. I’ll be back!', 'Хороший блин. Ещё приду!', 'Laba pankūka. Vēl atnākšu!'], ['Not bad at all!', 'Очень даже неплохо!', 'Nemaz nav slikti!'],
+      ['Mmm, cosy. Like a blanket, but tasty.', 'Ммм, уютно. Как плед, только вкусный.', 'Mmm, omulīgi. Kā pleds, tikai garšīgs.'], ['Good! My tummy says thank you.', 'Хорошо! Животик говорит спасибо.', 'Labi! Vēderiņš saka paldies.']],
+    1: [['Hmm… it’s edible.', 'Хм… съедобно.', 'Hmm… ēdams.'], ['Not quite what I ordered.', 'Не совсем то, что было в заказе.', 'Ne gluži tas, ko pasūtīju.'], ['Well… thanks, I suppose.', 'Ну… спасибо, наверное.', 'Nu… paldies, laikam.'],
+      ['I’ll eat it… slowly.', 'Съем… медленно.', 'Apēdīšu… lēnām.'], ['Next time a little more careful, maybe?', 'В следующий раз, может, повнимательнее?', 'Nākamreiz varbūt mazliet uzmanīgāk?']],
+    0: [['That’s not my order at all!', 'Это вообще не мой заказ!', 'Tas nemaz nav mans pasūtījums!'], ['Oh no. I’ll go to the noodle shop.', 'Ох. Пойду лучше в лапшичную.', 'Ak nē. Labāk iešu uz nūdeļu bodīti.'], ['*sighs and leaves*', '*вздыхает и уходит*', '*nopūšas un aiziet*'],
+      ['Is this a pancake or a puddle?', 'Это блин или лужа?', 'Vai tā ir pankūka vai peļķe?'], ['I’ll just have tea, thanks.', 'Я, пожалуй, только чаю.', 'Es labāk iedzeršu tikai tēju.']],
     miss: [e => `Hmm, where is the ${e}?`, e => `Хм, а где ${e}?`, e => `Hmm, kur ir ${e}?`],
     extra: [e => `That wasn’t in my order: ${e}`, e => `Этого в заказе не было: ${e}`, e => `Tā nebija pasūtījumā: ${e}`],
+    plain: [['I asked for nothing on top!', 'В заказе же было: ничего сверху!', 'Es taču lūdzu neko virsū!']],
     shape: [['Wrong shape, but okay…', 'Форма не та, ну ладно…', 'Ne tā forma, nu labi…']],
     late: [['One more minute and I’d have been gone!', 'Ещё минутка — и меня бы тут не было!', 'Vēl minūte, un manis te vairs nebūtu!']],
   };
+
+  // характеры клиентов (с 3-го уровня): hurry — торопится (терпение и до 11-го), picky — строже оценка, chatty — болтает и терпеливее, same — «как в прошлый раз» (заказ виден 3 с)
+  const TRAITS = {
+    hurry: { pat: 0.65, hi: [['Quick, quick, I’m late!', 'Быстрее, быстрее, опаздываю!', 'Ātrāk, ātrāk, es kavēju!'], ['Just a pancake, I have a train to catch!', 'Мне только блин, у меня поезд!', 'Man tikai pankūku, man jāpaspēj uz vilcienu!'], ['Hurry, Polly, my tea is getting cold!', 'Скорее, Полли, у меня чай стынет!', 'Ātrāk, Pollij, man tēja atdziest!']],
+      ok: [['Just in time! Bye!', 'Как раз вовремя! Бегу!', 'Tieši laikā! Skrienu!']], bad: [['Too slow! I’ll eat it on the way…', 'Долго! Съем по дороге…', 'Par lēnu! Apēdīšu pa ceļam…']] },
+    picky: { hi: [['Exactly as written, please. I will check.', 'Строго как в заказе, пожалуйста. Я проверю.', 'Tieši kā pasūtījumā, lūdzu. Es pārbaudīšu.'], ['Last time the edge was a little too dark…', 'В прошлый раз краешек был темноват…', 'Pagājušoreiz maliņa bija par tumšu…'], ['I only eat perfect pancakes.', 'Я ем только идеальные блины.', 'Es ēdu tikai ideālas pankūkas.']],
+      ok: [['Hmm. Nothing to complain about. Rare!', 'Хм. Даже придраться не к чему. Редкость!', 'Hmm. Nav pie kā piesieties. Retums!']], bad: [['Close, but not perfect.', 'Почти, но не идеально.', 'Gandrīz, bet ne ideāli.']] },
+    chatty: { pat: 1.4, hi: [['Oh, Polly, you won’t believe what happened today!', 'Ой, Полли, ты не поверишь, что сегодня было!', 'Ak, Pollij, tu neticēsi, kas šodien notika!'], ['Hello, hello! Have I told you about my cousin?', 'Привет-привет! Про моего кузена уже слышала?', 'Sveiki, sveiki! Vai es stāstīju par savu brālēnu?']],
+      ok: [['…and that’s why I never trust a pumpkin. Thank you!', '…и поэтому я никогда не доверяю тыквам. Спасибо!', '…un tāpēc es nekad neuzticos ķirbjiem. Paldies!']], bad: [['Oh, I talked too much and you got distracted!', 'Ой, заболтали тебя совсем!', 'Ak, es tevi pavisam aizrunāju!']] },
+    same: { hi: [['The same as last time, Polly!', 'Как в прошлый раз, Полли!', 'Tāpat kā pagājušoreiz, Pollij!'], ['You remember what I like, right?', 'Ты же помнишь, что я люблю?', 'Tu taču atceries, ko es mīlu?'], ['My usual, please!', 'Мне как обычно!', 'Man kā parasti!']],
+      ok: [['You remembered! ♥', 'Помнишь! ♥', 'Tu atceries! ♥']], bad: [['That’s not what I had last time…', 'В прошлый раз было не так…', 'Pagājušoreiz bija citādi…']] },
+  };
+  // болтун болтает, пока печётся блин
+  const CHAT = [['My neighbour’s snail won a race. A race! Against another snail.', 'Улитка соседа выиграла забег. Забег! Против другой улитки.', 'Kaimiņa gliemezis uzvarēja sacīkstēs. Sacīkstēs! Pret citu gliemezi.'],
+    ['I knitted a scarf for my teapot. It looks very cosy now.', 'Шарф для чайника связан! Теперь ему очень уютно.', 'Noadīju šalli savai tējkannai. Tagad tai ir ļoti omulīgi.'],
+    ['The weather is so wobbly today, isn’t it?', 'Погода сегодня такая шаткая, правда?', 'Laiks šodien tik ļodzīgs, vai ne?'],
+    ['I saw a ghost in the library. He was reading my book!', 'В библиотеке привидение! Оно читало мою книгу!', 'Bibliotēkā redzēju spoku. Tas lasīja manu grāmatu!'],
+    ['My cousin says pancakes taste better on Tuesdays.', 'Кузен говорит, что по вторникам блины вкуснее.', 'Brālēns saka, ka otrdienās pankūkas garšo labāk.'],
+    ['Do you think the moon likes pancakes? It looks like one.', 'Как думаешь, луна любит блины? Она же на блин похожа.', 'Kā domā, vai mēness mīl pankūkas? Tas taču izskatās pēc pankūkas.'],
+    ['And then I said: no more jam! And then I had more jam.', 'И тогда говорю: хватит варенья! И беру ещё варенья.', 'Un tad es teicu: pietiek ievārījuma! Un paņēmu vēl ievārījumu.'],
+    ['Have you heard the frogs singing at night? Wonderful!', 'Слышала, как ночью поют лягушки? Чудесно!', 'Vai dzirdēji, kā naktī dzied vardes? Brīnišķīgi!']];
+  // особые просьбы: plain — ничего сверху, double — всего по двойной порции
+  const ASK = { plain: ['Just a pancake. Nothing on top, please!', 'Просто блин. Сверху — ничего!', 'Vienkārši pankūku. Virsū — neko!'], double: ['A double portion of everything, I’m starving!', 'Всего по двойной порции, голод просто волчий!', 'Visu dubultā porcijā, esmu izsalcis kā vilks!'] };
+  // Медведь-курьер (с 6-го уровня): заказ навынос для жителя, часть требований заляпана вареньем (jam: shape, bake, id топпинга) — угадать по любимому у жителя
+  const BEAR = { bear: true, img: 'bear', n: ['Bear the Courier', 'Медведь-курьер', 'Lācis kurjers'],
+    hi: [[n => `Delivery for ${n}! Sorry, a bit of jam got on the order…`, n => `Заказ навынос для: ${n}! Простите, чуть-чуть заляпал вареньем…`, n => `Līdzņemšanai: ${n}! Atvainojiet, mazliet notraipīju pasūtījumu ar ievārījumu…`],
+      [n => `Sticky paws, smudged order. It’s for ${n}, they know what they like!`, n => `Лапы липкие, заказ смазался. Это для: ${n}, там знают, что любят!`, n => `Lipīgas ķepas, nosmērēts pasūtījums. Tas ir priekš: ${n}, tur zina, ko mīl!`]],
+    win: ['You guessed it! I’ll tell everyone: Polly reads jam!', 'Угадано! Всем расскажу: Полли читает по варенью!', 'Uzminēts! Visiem pastāstīšu: Pollija lasa pa ievārījumu!'],
+    lose: ['Hmm, not quite… Never mind, it was my jam. No hard feelings!', 'Хм, не совсем… Ничего, варенье-то моё. Без обид!', 'Hmm, ne gluži… Nekas, ievārījums taču mans. Bez aizvainojuma!'] };
+  // медведь в кепке курьера: левая половина 10 пикселей, правая — зеркально
+  const BEAR_PX = ['..........', '......oooo', '....oocccc', '...ocrcccc', '...occccyy', '...occccyy', 'oo.ooooooo', 'oaoovvvvvv', 'oahooooooo', '.oaaaaaaaa', '.oahaaaaaa', '.oaawkaaaa',
+    '.oaakkaaaa', '.oaaaaaamm', '.oapaaamnn', '..oaaaammm', '..oaaaaamm', '...ooaaaaa', '...osooooo', '..ossssyss'].map(r => r + [...r].reverse().join(''));
+  const BEAR_COL = { o: O, a: '#8B5A2B', h: '#A87038', c: '#D84A3A', r: '#F07A6A', y: '#F2C94C', v: '#8E2A22', k: O, w: '#FFFFFF', m: '#D9B48A', n: '#2A1A12', p: '#E8957A', s: '#5B3A28' };
 
   // ---------- разметка ----------
   app.classList.add('rain');
@@ -282,7 +402,7 @@
   const img = src => IMG[src] || (IMG[src] = Object.assign(new Image(), { src, onload: () => { if (state !== 'play') draw(); } }));
 
   // ---------- данные с сервера ----------
-  let info = { on: true, per: 1, record: 0, every: 25, wash: 10, soap: 1, today: 0, best: 0, buttons: 0, me: null, top: [] };
+  let info = { on: true, per: 1, record: 0, every: 25, wash: 10, soap: 1, start: 10, up: {}, ups: null, today: 0, best: 0, buttons: 0, me: null, top: [] };
   const load = () => fetch('/api/pancakes', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => { if (d) info = d; topList(); if (state === 'menu' || state === 'over') showOverlay(); }).catch(() => {});
   // доска топа — top-board.js (PPTop)
   function topList() { const el = app.querySelector('.rain-top'); if (!window.PPTop || !el) return; const fresh = !el.__top; window.PPTop.mount(el); if (!fresh) window.PPTop.refresh(el); }
@@ -297,6 +417,16 @@
     patience: lv > 10 ? Math.max(0.6, 1 - 0.05 * (k - 1)) : 0, // множитель терпения (0 — не торопится)
   }; };
   const BAKE = { light: 0.4, gold: 0.58, crispy: 0.74 };
+  // улучшения (цены и сколько уровней — с сервера: info.up, купленное — info.ups): hot — сырое тесто печётся быстрее (+35 % за уровень), heart — +1 сердечко,
+  // pat — +20 % терпения, spare — запасная сковородка вместо мытья (раз за игру за уровень)
+  const UPS = {
+    hot: { e: '🔥', n: ['Hot stove', 'Горячая плита', 'Karstā plīts'], d: ['Raw batter bakes faster; near the goal — as usual', 'Сырое тесто печётся быстрее, у цели — как обычно', 'Jēlā mīkla cepas ātrāk, pie mērķa — kā parasti'] },
+    heart: { e: '❤️', n: ['Extra heart', 'Лишнее сердечко', 'Papildu sirsniņa'], d: ['+1 heart at the start of every game', '+1 сердечко в начале каждой игры', '+1 sirsniņa katras spēles sākumā'] },
+    pat: { e: '⏳', n: ['Patient customers', 'Терпеливые клиенты', 'Pacietīgi klienti'], d: ['+20 % patience for every customer', '+20 % терпения у каждого клиента', '+20 % pacietības katram klientam'] },
+    spare: { e: '🍳', n: ['Spare pan', 'Запасная сковородка', 'Rezerves panna'], d: ['A clean pan instead of washing: once per game for every level', 'Чистая вместо мытья: раз за игру за каждый уровень', 'Tīra panna mazgāšanas vietā: reizi spēlē par katru līmeni'] },
+  };
+  const up = k => (info.ups && info.ups[k]) || 0;
+  const CARDS = 14; // карточек топпингов за уровень: все из заказа и случайные остальные
   const COLS = [[0, '#F7E7B8'], [0.3, '#F3D48C'], [0.5, '#EBB65E'], [0.64, '#DB9640'], [0.78, '#B86A2C'], [0.9, '#7A4220'], [1.05, '#3A2216']];
   const hex = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
   function bakeCol(d, k = 1) {
@@ -309,39 +439,73 @@
   let state = 'menu', phase = '', level = 1, hearts = 3, order = null, cust = null, recent = [], made = [], cur = null, chosen = null, added = {}, addSeq = [];
   let phaseT = 0, patT = 0, late = false, pouring = false, flipT = 0, result = null, fx = [], banner = null, shake = 0, run = null, queue = Promise.resolve();
   let runGot = 0, runItems = [], startBest = 0, dirt = null, dirt0 = 0, soapOn = false, foam = [], walk = 0, last = 0, washBusy = false;
+  let startLv = 1, maxH = 3, spareLeft = 0, luck = 0, lastBear = -9, roster = [], hist = [], chatT = 0, fromSel = 0, upsOpen = false, forceNext = null;
 
-  function start() {
-    level = 1; hearts = 3; fx = []; banner = null; recent = []; runGot = 0; runItems = []; startBest = info.best || 0;
+  // from — сколько уровней «уже пройдено» (рубеж каждые info.start, не выше рекорда)
+  const froms = () => { const st = info.start || 0, a = []; if (info.me && st) for (let m = st; m <= (info.best || 0); m += st) a.push(m); return a; };
+  function start(from = 0) {
+    if (!froms().includes(from)) from = 0;
+    level = startLv = from + 1; maxH = hearts = 3 + up('heart'); spareLeft = up('spare'); luck = 0; lastBear = -9; hist = []; upsOpen = false;
+    roster = [PEOPLE[0], ...shuffle(PEOPLE.slice(1)).slice(0, 13)]; // постоянные гости этого захода (новые лица — изредка)
+    fx = []; banner = null; recent = []; runGot = 0; runItems = []; startBest = info.best || 0;
     run = null; queue = Promise.resolve();
-    if (info.me) queue = post('pancakes/start').then(r => { run = r.run; }).catch(() => { run = null; });
+    if (info.me) queue = post('pancakes/start', { from }).then(r => { run = (r.from || 0) === from ? r.run : null; }).catch(() => { run = null; });
     state = 'play'; ov.innerHTML = ''; ov.hidden = true; pauseBtn.hidden = false; document.documentElement.classList.add('rain-on');
     const r = stage.getBoundingClientRect(); if (r.top < 60 || r.bottom > innerHeight) stage.scrollIntoView({ block: 'center' });
     newCustomer();
     last = performance.now(); requestAnimationFrame(loop);
   }
-  // новый житель и его заказ
+  // новый житель и его заказ: иногда с характером (TRAITS), «как в прошлый раз» (из hist) или вместо жителя — Медведь-курьер
   function newCustomer() {
-    const lv = level, k = tierOf(lv);
-    const pool = PEOPLE.filter(p => !recent.includes(p.img));
-    cust = lv === 1 ? PEOPLE[0] : pick(pool.length ? pool : PEOPLE);
-    recent.push(cust.img); if (recent.length > 10) recent.shift();
+    const lv = level, k = tierOf(lv), f = forceNext || {}; forceNext = null;
     const shapes = SHAPES.filter(s => s.from <= lv), tops = TOPS.filter(x => x.from <= lv);
-    const shape = SH[cust.shape].from <= lv && Math.random() < 0.6 ? cust.shape : pick(shapes).id;
-    const n = lv < 4 ? 1 : lv < 12 ? (Math.random() < 0.4 ? 2 : 1) : lv < 25 ? 1 + Math.floor(Math.random() * 3) : 2 + Math.floor(Math.random() * (k >= 4 ? 3 : 2));
-    const bake = lv < 6 ? 'gold' : Math.random() < 0.6 ? cust.bake : pick(['light', 'gold', 'crispy']);
-    const types = lv < 3 ? 1 : lv < 8 ? 1 + (Math.random() < 0.5) : lv < 16 ? 2 + (Math.random() < 0.4) : 2 + Math.floor(Math.random() * 3);
-    const want = {};
-    const favs = cust.fav.filter(id => TP[id].from <= lv);
-    while (Object.keys(want).length < Math.min(types, tops.length)) {
-      const id = favs.length && Math.random() < 0.6 ? pick(favs) : pick(tops).id;
-      if (want[id]) continue;
-      want[id] = lv >= 25 && Math.random() < 0.2 ? 3 : lv >= 10 && Math.random() < 0.3 ? 2 : 1;
+    let trait = '', prev = null, who = null;
+    if (f.bear || (!f.trait && lv >= 6 && lv - lastBear >= 4 && lv > startLv && Math.random() < 0.14)) { who = pick(roster.filter(p => p.fav)); lastBear = lv; }
+    else if (f.trait === 'same' || (!f.trait && lv >= 5 && Math.random() < 0.16)) prev = pick(hist.filter(h => h.lv <= lv - 2 && !recent.includes(h.cust.img))) || null;
+    if (who) cust = BEAR;
+    else if (prev) { cust = prev.cust; trait = 'same'; }
+    else {
+      const pool = roster.filter(p => !recent.includes(p.img)), fresh = PEOPLE.filter(p => !roster.includes(p) && !recent.includes(p.img));
+      cust = lv === 1 ? PEOPLE[0] : fresh.length && Math.random() < 0.2 ? pick(fresh) : pick(pool.length ? pool : PEOPLE);
+      if (f.trait) trait = f.trait; else if (lv >= 3 && Math.random() < 0.42) trait = pick(['hurry', 'picky', 'chatty']);
     }
+    recent.push(cust.img); if (recent.length > 4) recent.shift();
+    const like = who || cust; // чьи вкусы: у медведя — того, кому заказ
+    let shape, n, bake, want = {}, ask = '';
+    if (prev) { ({ shape, n, bake } = prev.order); want = { ...prev.order.tops }; }
+    else {
+      shape = SH[like.shape].from <= lv && Math.random() < (who ? 0.8 : 0.6) ? like.shape : pick(shapes).id;
+      n = lv < 4 ? 1 : lv < 12 ? (Math.random() < 0.4 ? 2 : 1) : lv < 25 ? 1 + Math.floor(Math.random() * 3) : 2 + Math.floor(Math.random() * (k >= 4 ? 3 : 2));
+      bake = lv < 6 && !who ? 'gold' : Math.random() < (who ? 0.8 : 0.6) ? like.bake : pick(['light', 'gold', 'crispy']);
+      const types = lv < 3 ? 1 : lv < 8 ? 1 + (Math.random() < 0.5) : lv < 16 ? 2 + (Math.random() < 0.4) : 2 + Math.floor(Math.random() * 3);
+      const favs = like.fav.filter(id => TP[id].from <= lv);
+      while (Object.keys(want).length < Math.min(types, tops.length)) {
+        const id = favs.length && Math.random() < (who ? 0.8 : 0.6) ? pick(favs) : pick(tops).id;
+        if (want[id]) continue;
+        want[id] = lv >= 25 && Math.random() < 0.2 ? 3 : lv >= 10 && Math.random() < 0.3 ? 2 : 1;
+      }
+      if (!who && lv >= 4 && Math.random() < 0.06) { want = {}; ask = 'plain'; }
+      else if (!who && lv >= 10 && Math.random() < 0.07) { for (const id in want) want[id] = Math.min(4, want[id] * 2); ask = 'double'; }
+    }
+    // заляпано вареньем: 1 требование, с 15-го — 2 (чаще топпинги)
+    let jam = [];
+    if (who) { const c = shuffle(Object.keys(want)).concat(shuffle(['shape', 'bake'])); jam = c.slice(0, Math.min(c.length, lv >= 15 ? 2 : 1)); if (Math.random() < 0.3) jam[0] = pick(['shape', 'bake']); jam = [...new Set(jam)]; }
     const total = Object.values(want).reduce((a, b) => a + b, 0), p = P(lv);
-    order = { shape, n, bake, tops: want, pat: p.patience ? Math.round((22 + 11 * n + 3 * total) * p.patience) : 0 };
-    made = []; cur = null; chosen = null; added = {}; addSeq = []; result = null; late = false; patT = order.pat;
+    let mul = p.patience;
+    if (trait === 'hurry') mul = (mul || 1) * TRAITS.hurry.pat; else if (trait === 'chatty' && mul) mul *= TRAITS.chatty.pat;
+    if (mul) mul *= 1 + 0.2 * up('pat');
+    const say = who ? tr(pick(BEAR.hi))(tr(who.n)) : ask ? tr(ASK[ask]) : trait && (trait === 'same' || Math.random() < 0.7) ? tr(pick(TRAITS[trait].hi)) : tr(cust.hi);
+    order = { shape, n, bake, tops: want, pat: mul ? Math.round((22 + 11 * n + 3 * total) * mul) : 0, trait, ask, say, bear: who ? { who, jam } : null, memo: trait === 'same' ? 3.5 : null, cards: cardsOf(lv, want) };
+    if (!who) { hist.push({ cust, lv, order: { shape, n, bake, tops: { ...want } } }); if (hist.length > 12) hist.shift(); }
+    made = []; cur = null; chosen = null; added = {}; addSeq = []; result = null; late = false; patT = order.pat; chatT = 0;
     setPhase('arrive');
     if (lv > 1 && (lv - 1) % 10 === 0) banner = { txt: t('harder', lv), t: 2.4 };
+  }
+  // карточки топпингов уровня: все из заказа + случайные из открытых, всего CARDS, в порядке TOPS
+  function cardsOf(lv, want) {
+    const all = TOPS.filter(x => x.from <= lv), keep = new Set(Object.keys(want));
+    shuffle(all.filter(x => !keep.has(x.id))).slice(0, Math.max(0, CARDS - keep.size)).forEach(x => keep.add(x.id));
+    return all.filter(x => keep.has(x.id)).map(x => x.id);
   }
   function setPhase(ph) { phase = ph; phaseT = 0; pouring = false; renderBar(); }
   const isTimed = () => order && order.pat && ['pan', 'pour', 'cook1', 'flip', 'cook2', 'top'].includes(phase);
@@ -355,31 +519,42 @@
       const gp = grade(Math.abs(m.pour - 0.94), p.pw), g1 = grade(Math.abs(m.s1 - tgt), p.w), g2 = grade(Math.abs(m.s2 - tgt), p.w);
       pen += [0, 4, 10][gp] + [0, 6, 16][g1] + [0, 6, 16][g2]; bakeG = Math.max(bakeG, gp, g1, g2);
     }
-    let s = 100 - pen / Math.max(1, made.length);
-    const shapeOk = chosen === order.shape; if (!shapeOk) s -= 35;
+    const pk = order.trait === 'picky' ? 1.5 : 1, tr0 = order.trait; // привереда: ошибки стоят в 1,5 раза дороже
+    let s = 100 - pk * pen / Math.max(1, made.length);
+    const shapeOk = chosen === order.shape; if (!shapeOk) s -= 35 * pk;
     const miss = [], extra = [];
     for (const id of new Set([...Object.keys(order.tops), ...Object.keys(added)])) {
       const d = (added[id] || 0) - (order.tops[id] || 0);
-      if (d < 0) { s -= 14 * -d; miss.push(id); } else if (d > 0) { s -= 8 * d; extra.push(id); }
+      if (d < 0) { s -= pk * 14 * -d; miss.push(id); } else if (d > 0) { s -= pk * 8 * d; extra.push(id); }
     }
     if (late) s -= 15;
-    const mood = s >= 88 ? 3 : s >= 65 ? 2 : s >= 40 ? 1 : 0;
+    let mood = s >= (pk > 1 ? 92 : 88) ? 3 : s >= 65 ? 2 : s >= 40 ? 1 : 0;
+    // медведь: угадано, если всё заляпанное совпало; удача медведя — трое следующих довольны при любом блине
+    const guess = order.bear ? order.bear.jam.every(j => j === 'shape' ? shapeOk : j === 'bake' ? bakeG <= 1 : (added[j] || 0) === order.tops[j]) : null;
+    const lucky = !order.bear && luck > 0, raw = mood;
+    if (lucky) mood = Math.max(mood, 2);
+    const names = ids => ids.map(id => tr(TP[id].nm)).join(', '), traitSay = ok => tr(pick(TRAITS[tr0][ok ? 'ok' : 'bad']));
     let say;
-    if (mood === 3) say = Math.random() < 0.7 ? tr(cust.yum) : tr(pick(SAY[3]));
+    if (order.bear) say = tr(guess ? BEAR.win : BEAR.lose);
+    else if (mood === 3) say = tr0 && Math.random() < 0.6 ? traitSay(true) : Math.random() < 0.7 ? tr(cust.yum) : tr(pick(SAY[3]));
+    else if (lucky && raw < 2) say = tr(pick(SAY[2]));
     else if (mood === 0) say = tr(pick(SAY[0]));
-    else if (miss.length) say = SAY.miss[L](miss.map(id => TP[id].e).join(' '));
-    else if (extra.length) say = SAY.extra[L](extra.map(id => TP[id].e).join(' '));
+    else if (order.ask === 'plain' && extra.length) say = tr(SAY.plain[0]);
+    else if (miss.length) say = SAY.miss[L](names(miss));
+    else if (extra.length) say = SAY.extra[L](names(extra));
     else if (!shapeOk) say = tr(SAY.shape[0]);
-    else if (late) say = tr(SAY.late[0]);
-    else say = tr(pick(SAY[mood]));
-    return { mood, s: Math.round(s), shapeOk, bakeG, topsOk: !miss.length && !extra.length, say };
+    else if (late) say = tr0 === 'hurry' ? traitSay(false) : tr(SAY.late[0]);
+    else say = tr0 && Math.random() < 0.6 ? traitSay(mood === 2 && tr0 !== 'picky') : tr(pick(SAY[mood]));
+    return { mood, s: Math.round(s), shapeOk, bakeG, topsOk: !miss.length && !extra.length, say, guess, lucky };
   }
   function serve() {
     result = judge(); setPhase('react');
     const lv = level;
-    if (result.mood === 0) { hearts--; shake = 0.4; pop(W - 50, 30, '−❤️', '#D85A30'); }
+    if (result.lucky) luck--;
+    if (order.bear) { if (result.guess) { luck = 3; banner = { txt: t('luck'), t: 3.4 }; } else banner = { txt: t('noLuck'), t: 2.4 }; } // не угадано — сердечко не теряется
+    else if (result.mood === 0) { hearts--; shake = 0.4; pop(W - 50, 30, '−❤️', '#D85A30'); }
     if (hearts <= 0) { setTimeout(gameOver, 1800); return; }
-    if (lv % 5 === 0 && hearts < 3) { hearts++; pop(W - 50, 30, t('heartBack'), '#D85A30'); }
+    if (lv % 5 === 0 && hearts < maxH) { hearts++; pop(W - 50, 30, t('heartBack'), '#D85A30'); }
     if (info.me) queue = queue.then(() => run ? saveLevel(lv, result.mood, 0) : null).then(r => {
       if (!r) return;
       info.today = r.today; info.best = r.best;
@@ -423,6 +598,14 @@
   const dirtLeft = () => dirt ? dirt.reduce((a, d) => a + d.v, 0) / dirt0 : 0;
   function chooseWash(soap) {
     if (washBusy) return;
+    if (soap === 'spare') { // запасная сковородка (улучшение spare): без мытья
+      if (!spareLeft || !run) return;
+      washBusy = true;
+      queue = queue.then(() => post('pancakes/wash', { run, spare: true })).then(() => {
+        washBusy = false; spareLeft--; dirt.forEach(d => { d.v = 0; }); pop(PAN.x, PAN.y - 20, t('spareOn'), '#3E9B4F'); setPhase('clean');
+      }).catch(() => { washBusy = false; spareLeft = 0; renderBar(); });
+      return;
+    }
     const go = () => { soapOn = soap; setPhase('scrub'); };
     if (!info.me || !run) return go();
     washBusy = true;
@@ -458,8 +641,8 @@
       bar.innerHTML = `<p class="pk-hint">${t('cookHint')}: <b>${esc(tr(T.bake[order.bake]))}</b></p><button type="button" class="pk-big">${phase === 'cook1' ? t('flip') : t('off')}</button>`;
       bar.querySelector('.pk-big').onclick = cookAct;
     } else if (phase === 'top') {
-      bar.innerHTML = `<div class="pk-grid pk-tops">${TOPS.filter(x => x.from <= lv).map(x => `<button type="button" class="pk-btn pk-top" data-top="${x.id}" title="${esc(tr(x.nm))}"><i>${x.e}</i><b hidden></b></button>`).join('')}<button type="button" class="pk-btn pk-undo" aria-label="undo">${t('undo')}</button><button type="button" class="pk-btn pk-serve">${t('serve')}</button></div>`;
-      bar.querySelectorAll('[data-top]').forEach(b => { b.onclick = () => { const id = b.dataset.top; added[id] = (added[id] || 0) + 1; addSeq.push(id); topCounts(); }; });
+      bar.innerHTML = `<div class="pk-grid pk-tops">${order.cards.map(id => `<button type="button" class="pk-btn pk-top" data-top="${id}" title="${esc(tr(TP[id].nm))}" aria-label="${esc(tr(TP[id].nm))}"><canvas width="32" height="32"></canvas><b hidden></b></button>`).join('')}<button type="button" class="pk-btn pk-undo" aria-label="undo">${t('undo')}</button><button type="button" class="pk-btn pk-serve">${t('serve')}</button></div>`;
+      bar.querySelectorAll('[data-top]').forEach(b => { b.querySelector('canvas').getContext('2d').drawImage(topIcon(b.dataset.top), 0, 0); b.onclick = () => { const id = b.dataset.top; added[id] = (added[id] || 0) + 1; addSeq.push(id); topCounts(); }; });
       bar.querySelector('.pk-undo').onclick = () => { const id = addSeq.pop(); if (id) { added[id]--; if (!added[id]) delete added[id]; topCounts(); } };
       bar.querySelector('.pk-serve').onclick = serve;
       topCounts();
@@ -469,8 +652,10 @@
       bar.hidden = hearts <= 0;
     } else if (phase === 'wash') {
       const can = info.me && run && (info.buttons || 0) >= info.soap;
-      bar.innerHTML = `<div class="pk-row"><button type="button" class="pk-big pk-soap"${can ? '' : ' disabled'}>${t('soap', info.soap)}</button><button type="button" class="pk-big pk-water">${t('water')}</button></div>${can ? '' : `<p class="pk-hint pk-small">${info.me ? t('poor') : t('soapGuest')}</p>`}`;
+      const sp = spareLeft > 0 && info.me && run;
+      bar.innerHTML = `<div class="pk-row"><button type="button" class="pk-big pk-soap"${can ? '' : ' disabled'}>${t('soap', info.soap)}</button><button type="button" class="pk-big pk-water">${t('water')}</button></div>${sp ? `<button type="button" class="pk-big pk-spare">${t('spare', spareLeft)}</button>` : can ? '' : `<p class="pk-hint pk-small">${info.me ? t('poor') : t('soapGuest')}</p>`}`;
       bar.querySelector('.pk-soap').onclick = () => chooseWash(true);
+      if (sp) bar.querySelector('.pk-spare').onclick = () => chooseWash('spare');
       bar.querySelector('.pk-water').onclick = () => chooseWash(false);
     } else if (phase === 'scrub') {
       bar.innerHTML = `<p class="pk-big pk-rub">${t('rub', 0)}</p>`;
@@ -513,10 +698,15 @@
     if (isTimed() && !late) { patT -= dt; if (patT <= 0) { late = true; patT = 0; } }
     if (phase === 'arrive' && phaseT > 0.9) setPhase('pan');
     if (phase === 'pour' && pouring) { cur.fill += dt / p.pour; if (cur.fill >= 1.3) { cur.fill = 1.3; stopPour(); } }
-    if (phase === 'cook1') { cur.d1 += dt / p.cook; if (cur.d1 > 1.12) cookAct(); }
+    const hot = d => d < BAKE[order.bake] - 0.18 ? 1 + 0.35 * up('hot') : 1; // улучшение «Горячая плита»: до цели — быстрее
+    if (order && phase !== 'arrive' && phase !== 'react') {
+      if (order.memo != null && order.memo > 0) order.memo -= dt; // «как в прошлый раз»: заказ виден 3,5 с
+      if (order.trait === 'chatty' && (chatT += dt) > 3.6) { chatT = 0; order.say = tr(pick(CHAT)); }
+    }
+    if (phase === 'cook1') { cur.d1 += dt / p.cook * hot(cur.d1); if (cur.d1 > 1.12) cookAct(); }
     if (phase === 'cook1' && cur.d1 > BAKE[order.bake] - 0.2 && Math.random() < dt * 14) { const s = SH[chosen].cells; const c = s[Math.floor(Math.random() * s.length)]; if (c[2] <= cur.fill * SH[chosen].maxR) cur.bubbles.push(c); } // пузырьки — пора переворачивать
     if (phase === 'flip') { flipT += dt / 0.45; if (flipT >= 1) { cur.side = 2; setPhase('cook2'); } }
-    if (phase === 'cook2') { cur.d2 += dt / p.cook; if (cur.d2 > 1.12) cookAct(); }
+    if (phase === 'cook2') { cur.d2 += dt / p.cook * hot(cur.d2); if (cur.d2 > 1.12) cookAct(); }
     if (phase === 'clean' && phaseT > 1.3) { dirt = null; newCustomer(); }
   }
 
@@ -608,31 +798,58 @@
     const at = j => { const c = cells[Math.floor(rnd(j) * cells.length)]; return [cx - o + c[0] * CELL * 0.9, cy - o + c[1] * CELL * 0.9]; };
     addSeq.forEach((id, q) => {
       const tp = TP[id], base = q * 50 + TOPS.indexOf(tp) * 7;
-      if (tp.k === 'dots' || tp.k === 'bits' || tp.k === 'slices') for (let i = 0; i < tp.n; i++) {
-        const [x, y] = at(base + i), z = tp.s;
-        if (tp.k === 'slices') { ctx.fillStyle = tp.c[1]; ctx.beginPath(); ctx.arc(x, y, z, 0, 7); ctx.fill(); ctx.fillStyle = tp.c[0]; ctx.beginPath(); ctx.arc(x, y, z - 1.5, 0, 7); ctx.fill(); px(x - 1, y - 1, 2, 2, tp.c[1]); }
-        else if (tp.k === 'dots') { px(x - z / 2 - 1, y - z / 2 - 1, z + 2, z + 2, tp.c[1]); px(x - z / 2, y - z / 2, z, z, tp.c[0]); if (id === 'berry') px(x - 1, y - z / 2 - 2, 3, 2, '#4E9A3F'); }
-        else { px(x - z / 2, y - z / 3, z, z * 0.7, tp.c[1]); px(x - z / 2, y - z / 3, z - 1, z * 0.7 - 1, tp.c[0]); }
-      } else if (tp.k === 'drizzle') {
-        ctx.strokeStyle = tp.c[0]; ctx.lineWidth = 3; ctx.beginPath();
-        const y0 = cy - 30 + rnd(base) * 20; for (let i = 0; i <= 8; i++) { const x = cx - 44 + i * 11, y = y0 + (i % 2 ? 16 : 0) + rnd(base + i) * 10; i ? ctx.lineTo(x, y) : ctx.moveTo(x, y); }
-        ctx.stroke(); ctx.lineWidth = 1;
-      } else if (tp.k === 'dust') { for (let i = 0; i < 40; i++) { const [x, y] = at(base + i); px(x, y, 2, 2, '#FFFFFF'); } }
-      else { const [x, y] = at(base), r = tp.big ? 13 : 9; ctx.fillStyle = tp.c[1]; ctx.beginPath(); ctx.arc(x, y, r + 1.5, 0, 7); ctx.fill(); ctx.fillStyle = tp.c[0]; ctx.beginPath(); ctx.arc(x, y, r, 0, 7); ctx.fill(); ctx.beginPath(); ctx.arc(x - 3, y - 4, r * 0.55, 0, 7); ctx.fill(); px(x - 4, y - 5, 3, 3, 'rgba(255,255,255,.6)'); }
+      if (tp.k === 'pieces') for (let i = 0; i < tp.n; i++) { const [x, y] = at(base + i); sprite(ctx, tp.sp, x, y, 2, tp.c, rnd(base + i + 9) < 0.5); }
+      else if (tp.k === 'drizzle') drizzle(tp, base, cx, cy);
+      else if (tp.k === 'dust') for (let i = 0; i < (tp.rods ? 36 : 64); i++) {
+        const [x, y] = at(base + i), col = tp.dc[i % tp.dc.length], v = rnd(base + i + 3) < 0.5;
+        if (tp.rods) px(x, y, v ? 2 : 4, v ? 4 : 2, col); else px(x, y, v ? 2 : 1, v ? 2 : 1, col);
+      } else { const [x, y] = at(base); sprite(ctx, tp.sp, x, y - 4, 2, tp.c); }
     });
     if (n > 1) { ctx.fillStyle = '#2b1f3d'; ctx.font = '800 14px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.fillText('×' + n, cx + 74, cy + 86); }
+  }
+  // струйка сиропа пикселями: тень, цвет, блики и две капли
+  function drizzle(tp, base, cx, cy) {
+    const pts = [], dots = [], y0 = cy - 30 + rnd(base) * 20;
+    for (let i = 0; i <= 8; i++) pts.push([cx - 44 + i * 11, y0 + (i % 2 ? 16 : 0) + rnd(base + i) * 10]);
+    for (let i = 0; i < pts.length - 1; i++) { const [x1, y1] = pts[i], [x2, y2] = pts[i + 1], m = Math.ceil(Math.hypot(x2 - x1, y2 - y1) / 2); for (let j = 0; j < m; j++) dots.push([x1 + (x2 - x1) * j / m, y1 + (y2 - y1) * j / m]); }
+    for (const [x, y] of dots) px(x - 2, y - 1, 4, 5, tp.c.b);
+    for (const [x, y] of dots) px(x - 2, y - 2, 4, 4, tp.c.a);
+    dots.forEach(([x, y], i) => { if (i % 3 === 0) px(x - 1, y - 2, 2, 1, tp.c.h); });
+    for (let k = 0; k < 2; k++) { const [x, y] = dots[Math.floor(rnd(base + 20 + k) * dots.length)], l = 4 + Math.floor(rnd(base + 30 + k) * 6); px(x - 1, y, 3, l, tp.c.a); px(x - 2, y + l, 5, 3, tp.c.a); px(x - 1, y + l + 3, 3, 1, tp.c.b); px(x - 1, y + l, 1, 2, tp.c.h); }
+  }
+  // клякса варенья поверх заляпанного в заказе (x, y — левый верхний угол)
+  function jamBlot(x, y, w, h, seed) {
+    for (let j = 0; j < h; j += 2) for (let i = 0; i < w; i += 2) { const u = (i + 1 - w / 2) / (w / 2), v = (j + 1 - h / 2) / (h / 2), r = u * u + v * v; if (r < 0.72 + rnd(seed + i * 3 + j * 7) * 0.4) px(x + i, y + j, 2, 2, r > 0.62 ? '#7E1129' : '#A91E3E'); }
+    const dx = x + Math.round(w * (0.3 + rnd(seed) * 0.4)); px(dx, y + h - 2, 2, 5, '#A91E3E'); px(dx - 1, y + h + 3, 4, 3, '#A91E3E');
+    px(x + w * 0.28, y + h * 0.3, 3, 2, '#F06A86'); px(x + w * 0.28 + 4, y + h * 0.3 + 3, 1, 1, '#F06A86');
   }
   // заказ: листок под облачком
   function drawTicket(x, y, w) {
     px(x, y, w, 64, '#1a1528'); px(x + 1, y + 1, w - 2, 62, '#FFF6D8');
     for (let i = 0; i < w; i += 8) px(x + i, y + 62, 4, 2, '#FFF6D8');
-    ctx.textAlign = 'left'; ctx.fillStyle = '#7a6a8a'; ctx.font = '700 10px system-ui, sans-serif'; ctx.fillText(t('order').toUpperCase(), x + 8, y + 13);
-    const s = SH[order.shape], ic = 22, o = G / ic;
+    const jam = order.bear ? order.bear.jam : [], cut = (txt, mw) => { while (txt.length > 3 && ctx.measureText(txt).width > mw) txt = txt.slice(0, -2) + '…'; return txt; };
+    ctx.textAlign = 'left'; ctx.fillStyle = order.bear ? '#A91E3E' : '#7a6a8a'; ctx.font = '700 10px system-ui, sans-serif';
+    ctx.fillText(cut(order.bear ? t('toGo') + ' · ' + t('forWho', tr(order.bear.who.n)) : t('order').toUpperCase() + (order.trait ? ' · ' + tr(T.trait[order.trait]) : ''), w - 14), x + 8, y + 13);
+    if (order.memo != null) { // «как в прошлый раз»: сначала заказ виден (полоска убывает), потом прячется
+      if (order.memo <= 0) { ctx.fillStyle = '#2b1f3d'; ctx.font = '800 15px system-ui, sans-serif'; ctx.fillText(t('sameT'), x + 10, y + 42); return; }
+      px(x + 8, y + 58, (w - 16) * clamp(order.memo / 3.5), 2, '#6a3fb0');
+    }
+    const s = SH[order.shape], o = G / 22;
     ctx.fillStyle = bakeCol(BAKE[order.bake]); for (const c of s.cells) if (c[0] % 2 === 0 && c[1] % 2 === 0) ctx.fillRect(Math.floor(x + 8 + c[0] / o), Math.floor(y + 18 + c[1] / o), 2, 2);
     ctx.fillStyle = '#2b1f3d'; ctx.font = '700 12px system-ui, sans-serif';
-    ctx.fillText(`${tr(s.n)} ×${order.n} · ${tr(T.bake[order.bake])}`, x + 36, y + 32);
-    ctx.font = '15px system-ui, sans-serif';
-    ctx.fillText(Object.entries(order.tops).map(([id, n]) => TP[id].e + (n > 1 ? '×' + n : '')).join('  '), x + 36, y + 54);
+    const sn = tr(s.n), mid = ` ×${order.n} · `, bk = tr(T.bake[order.bake]), x1 = x + 36, x2 = x1 + ctx.measureText(sn).width, x3 = x2 + ctx.measureText(mid).width;
+    ctx.fillText(sn, x1, y + 32); ctx.fillText(mid, x2, y + 32); ctx.fillText(bk, x3, y + 32);
+    if (jam.includes('shape')) { jamBlot(x + 5, y + 16, 26, 24, 3); jamBlot(x1 - 2, y + 21, Math.ceil(x2 - x1) + 4, 14, 5); }
+    if (jam.includes('bake')) jamBlot(x3 - 2, y + 21, Math.ceil(ctx.measureText(bk).width) + 4, 14, 7);
+    let tx = x1;
+    const tops = Object.entries(order.tops);
+    if (!tops.length) { ctx.font = 'italic 600 12px system-ui, sans-serif'; ctx.fillText('— ' + t('plain'), tx, y + 52); }
+    tops.forEach(([id, n], i) => {
+      ctx.drawImage(topIcon(id), tx, y + 38, 20, 20);
+      if (jam.includes(id)) jamBlot(tx - 3, y + 35, 17, 16, 11 + i);
+      tx += 21; if (n > 1) { ctx.font = '800 12px system-ui, sans-serif'; ctx.fillStyle = '#2b1f3d'; ctx.fillText('×' + n, tx, y + 53); tx += ctx.measureText('×' + n).width + 2; }
+      tx += 6;
+    });
   }
   function drawCustomer() {
     // окошко раздачи
@@ -644,20 +861,21 @@
     const k = phase === 'arrive' ? Math.min(1, phaseT / 0.6) : 1, cx = wx + ww / 2, cy = wy + 62 + (1 - k) * 80;
     ctx.save(); ctx.beginPath(); ctx.rect(wx, wy, ww, wh); ctx.clip();
     // портрет 48×48 из карточки (pt-*, ×2); у кого его нет — медальон ch-*
-    const pt = img('/images/wobbleland/pt-' + cust.img + '.png');
-    const im = pt.complete && !pt.naturalWidth ? img('/images/wobbleland/ch-' + cust.img + '.png') : pt;
-    if (im === pt && pt.complete) { const x = Math.round(cx - 48), y = Math.round(cy - 48); px(x - 2, y - 2, 100, 100, '#1a1528'); ctx.drawImage(pt, x, y, 96, 96); }
+    const pt = cust.bear ? null : img('/images/wobbleland/pt-' + cust.img + '.png');
+    const im = pt && pt.complete && !pt.naturalWidth ? img('/images/wobbleland/ch-' + cust.img + '.png') : pt;
+    if (cust.bear) BEAR_PX.forEach((r, j) => [...r].forEach((ch, i) => { if (BEAR_COL[ch]) px(cx - 40 + i * 4, cy - 40 + j * 4, 4, 4, BEAR_COL[ch]); })); // медведь-курьер 20×20 ×4
+    else if (im === pt && pt.complete) { const x = Math.round(cx - 48), y = Math.round(cy - 48); px(x - 2, y - 2, 100, 100, '#1a1528'); ctx.drawImage(pt, x, y, 96, 96); }
     else if (im !== pt && im.complete && im.naturalWidth) { const s = Math.floor(84 / Math.max(im.naturalWidth, im.naturalHeight)); ctx.drawImage(im, Math.round(cx - im.naturalWidth * s / 2), Math.round(cy - im.naturalHeight * s / 2), im.naturalWidth * s, im.naturalHeight * s); }
     else { ctx.fillStyle = '#7F81BF'; ctx.beginPath(); ctx.arc(cx, cy, 34, 0, 7); ctx.fill(); }
     ctx.restore();
-    const cr = img('/images/wobbleland/crest-' + cust.city + '.png');
-    if (cr.complete && cr.naturalWidth) ctx.drawImage(cr, wx + ww - 22, wy + 4, 20, 23);
+    const cr = cust.city && img('/images/wobbleland/crest-' + cust.city + '.png');
+    if (cr && cr.complete && cr.naturalWidth) ctx.drawImage(cr, wx + ww - 22, wy + 4, 20, 23);
     ctx.textAlign = 'center'; ctx.fillStyle = '#2b1f3d'; ctx.font = '700 11px system-ui, sans-serif';
     const nm = tr(cust.n); ctx.fillText(nm.length > 24 ? nm.slice(0, 23) + '…' : nm, cx, wy + wh + 22);
     // терпение
     if (order && order.pat && phase !== 'react') { const f = clamp(patT / order.pat); px(wx, wy + wh + 28, ww, 5, 'rgba(43,31,61,.2)'); px(wx, wy + wh + 28, ww * f, 5, f > 0.35 ? '#7CC47F' : f > 0 ? '#E9A93B' : '#D85A30'); }
     // облачко
-    const say = phase === 'react' && result ? result.say : tr(cust.hi);
+    const say = phase === 'react' && result ? result.say : order ? order.say : tr(cust.hi);
     ctx.font = '600 12px system-ui, sans-serif'; const lines = wrap(say, 186).slice(0, 5), bh = 14 + lines.length * 15;
     const bx = 8, by = 50;
     if (k >= 1) {
@@ -668,12 +886,14 @@
     if (phase === 'react' && result) {
       ctx.font = '44px system-ui, sans-serif'; ctx.textAlign = 'center'; ctx.fillText(T.mood[result.mood], wx + 16, wy + 40);
       const y = by + bh + 12; ctx.textAlign = 'left';
-      px(bx, y, 202, 70, 'rgba(255,250,242,.94)');
+      const items = [[t('okShape'), result.shapeOk], [t('okBake'), result.bakeG], [t('okTops'), result.topsOk]];
+      if (order.pat) items.push([t('okTime'), !late]);
+      if (order.bear) items.push([t('okGuess'), result.guess]);
+      if (result.lucky) items.push([t('okLuck'), true]);
+      px(bx, y, 202, 30 + Math.ceil(items.length / 2) * 18, 'rgba(255,250,242,.94)');
       ctx.fillStyle = '#2b1f3d'; ctx.font = '800 14px system-ui, sans-serif'; ctx.fillText(T.moodName[L][result.mood], bx + 8, y + 18);
       ctx.font = '600 12px system-ui, sans-serif';
       const mark = ok => ok === true || ok === 0 ? '✓' : ok === 1 ? '≈' : '✗';
-      const items = [[t('okShape'), result.shapeOk], [t('okBake'), result.bakeG], [t('okTops'), result.topsOk]];
-      if (order.pat) items.push([t('okTime'), !late]);
       items.forEach(([n, ok], i) => { ctx.fillStyle = ok === true || ok === 0 ? '#3E9B4F' : ok === 1 ? '#C8961E' : '#D85A30'; ctx.fillText(mark(ok) + ' ' + n, bx + 8 + (i % 2) * 100, y + 38 + Math.floor(i / 2) * 18); });
     }
   }
@@ -711,8 +931,9 @@
     ctx.restore();
     // панель сверху: уровень, сердечки
     px(0, 0, W, 36, 'rgba(43,31,61,.88)');
-    ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.font = '700 15px system-ui, sans-serif'; ctx.fillText('🥞 ' + t('lv') + ' ' + level, 10, 24);
-    for (let i = 0; i < 3; i++) drawHeart(W - 130 + i * 28, 10, 3, i < hearts ? '#E2564B' : 'rgba(255,255,255,.25)');
+    ctx.fillStyle = '#fff'; ctx.textAlign = 'left'; ctx.font = '700 15px system-ui, sans-serif'; ctx.fillText('🥞 ' + (maxH > 3 && luck > 0 ? '' : t('lv') + ' ') + level, 10, 24); // при 4–5 сердечках и удаче медведя — без слова «Уровень»
+    for (let i = 0; i < maxH; i++) drawHeart(W - 74 - (maxH - 1 - i) * (maxH > 3 ? 25 : 28), 10, 3, i < hearts ? '#E2564B' : 'rgba(255,255,255,.25)');
+    if (luck > 0 && state === 'play') { ctx.font = '700 12px system-ui, sans-serif'; ctx.textAlign = 'right'; ctx.fillStyle = '#fff'; ctx.fillText('🍯' + luck, W - 80 - (maxH - 1) * (maxH > 3 ? 25 : 28), 23); }
     if (banner) {
       ctx.globalAlpha = Math.min(1, banner.t * 2); ctx.textAlign = 'center'; ctx.font = '800 15px system-ui, sans-serif';
       const lines = wrap(banner.txt, W - 60), h = lines.length * 21 + 20;
@@ -731,11 +952,36 @@
     const payLine = info.on && info.per > 0 ? `<p class="rain-pay">${t('pay', info.per)}${info.me ? ` <b>${t('today0', info.today)}</b>` : ''}</p>` : `<p class="rain-pay">${t('payOff')}</p>`;
     const extra = `${info.record > 0 && info.on ? `<p class="rain-pay">${t('recRule', info.record)}</p>` : ''}${info.every > 0 ? `<p class="rain-pay">${t('itemRule', info.every)}</p>` : ''}<p class="rain-pay">${t('washRule', info.wash, info.soap)}</p>`;
     const guest = info.me ? '' : `<p class="rain-guest">${t('guest')} <button type="button" class="pill-btn rain-in">${t('signin')}</button></p>`;
-    if (state === 'menu') ov.innerHTML = `<div class="rain-card"><h2>🥞 ${t('title')}</h2><p>${t('how')}</p>${info.best ? `<p class="rain-best">${t('best', info.best)}</p>` : ''}<button type="button" class="pill-btn pill-fill rain-go">${t('play')}</button>${guest}<div class="rain-rules"><p>${t('rules')}</p>${payLine}${extra}</div></div>`;
+    // старт с рубежа (последние 5) и кнопка улучшений
+    const f = froms().slice(-5);
+    const prep = `${f.length ? `<p class="pk-from"><span>${t('from')}:</span>${[0, ...f].map(m => `<button type="button" class="pk-chip${m === fromSel ? ' on' : ''}" data-from="${m}">${m + 1}</button>`).join('')}</p>` : ''}<p><button type="button" class="pill-btn pk-ups-btn">${t('upsBtn')}</button></p>`;
+    if (!f.includes(fromSel)) fromSel = 0;
+    if (upsOpen && state !== 'pause') {
+      const have = info.ups || {};
+      ov.innerHTML = `<div class="rain-card"><h2>${t('upsTitle')}</h2><p class="rain-pay">${t('upsHow')}</p>${info.me ? `<p class="rain-best">${t('have', info.buttons || 0)}</p>` : `<p class="rain-guest">${t('upsGuest')} <button type="button" class="pill-btn rain-in">${t('signin')}</button></p>`}<ul class="pk-ups">${Object.entries(UPS).map(([k, u]) => {
+        const x = (info.up || {})[k] || { max: 0, cost: 0 }, lv = have[k] || 0, cost = x.cost * (lv + 1), can = info.me && (info.buttons || 0) >= cost;
+        return `<li><i>${u.e}</i><div><b>${esc(tr(u.n))}</b> <span class="pk-pips">${'●'.repeat(lv)}${'○'.repeat(Math.max(0, x.max - lv))}</span><small>${esc(tr(u.d))}</small></div>${lv >= x.max ? `<em>${t('maxed')}</em>` : `<button type="button" class="pill-btn pill-fill" data-up="${k}"${can ? '' : ' disabled'}>${t('buy', cost)}</button>`}</li>`;
+      }).join('')}</ul><button type="button" class="pill-btn pk-back">${t('back')}</button></div>`;
+      ov.querySelector('.pk-back').onclick = () => { upsOpen = false; showOverlay(); };
+      ov.querySelectorAll('[data-up]').forEach(b => { b.onclick = () => { b.disabled = true; buyUp(b.dataset.up); }; });
+      const si = ov.querySelector('.rain-in'); if (si) si.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
+      return;
+    }
+    if (state === 'menu') ov.innerHTML = `<div class="rain-card"><h2>🥞 ${t('title')}</h2><p>${t('how')}</p>${info.best ? `<p class="rain-best">${t('best', info.best)}</p>` : ''}<button type="button" class="pill-btn pill-fill rain-go">${t('play')}</button>${prep}${guest}<div class="rain-rules"><p>${t('rules')}</p>${payLine}${extra}</div></div>`;
     else if (state === 'pause') ov.innerHTML = `<div class="rain-card"><h2>${t('paused')}</h2><button type="button" class="pill-btn pill-fill rain-go">${t('resume')}</button></div>`;
-    else if (state === 'over') ov.innerHTML = `<div class="rain-card"><h2>${t('over')}</h2><p class="rain-big">${t('reached', level - 1)}</p>${info.me && level - 1 > startBest ? `<p class="rain-best">${t('newBest')}</p>` : info.best ? `<p class="rain-best">${t('best', info.best)}</p>` : ''}${runGot ? `<p class="rain-got">${t('earned', runGot)}</p><p class="pp-sew">${window.PPSew || ''}</p>` : ''}${runItems.length ? `<p class="rain-got">🎁 ${runItems.map(esc).join(', ')}</p>` : ''}${payLine}${guest}<button type="button" class="pill-btn pill-fill rain-go">${t('again')}</button></div>`;
-    const go = ov.querySelector('.rain-go'); if (go) go.onclick = () => state === 'pause' ? resume() : start();
+    else if (state === 'over') ov.innerHTML = `<div class="rain-card"><h2>${t('over')}</h2><p class="rain-big">${t('reached', level - startLv)}</p>${info.me && level - 1 > startBest ? `<p class="rain-best">${t('newBest')}</p>` : info.best ? `<p class="rain-best">${t('best', info.best)}</p>` : ''}${runGot ? `<p class="rain-got">${t('earned', runGot)}</p><p class="pp-sew">${window.PPSew || ''}</p>` : ''}${runItems.length ? `<p class="rain-got">🎁 ${runItems.map(esc).join(', ')}</p>` : ''}${payLine}${guest}<button type="button" class="pill-btn pill-fill rain-go">${t('again')}</button>${prep}</div>`;
+    const go = ov.querySelector('.rain-go'); if (go) go.onclick = () => state === 'pause' ? resume() : start(fromSel);
+    ov.querySelectorAll('[data-from]').forEach(b => { b.onclick = () => { fromSel = +b.dataset.from; showOverlay(); }; });
+    const ub = ov.querySelector('.pk-ups-btn'); if (ub) ub.onclick = () => { upsOpen = true; showOverlay(); };
     const si = ov.querySelector('.rain-in'); if (si) si.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
+  }
+
+  // покупка улучшения: сервер списывает пуговки и возвращает новые уровни
+  function buyUp(k) {
+    post('pancakes/up', { k }).then(r => {
+      info.ups = r.ups; info.buttons = r.buttons; window.PPAccount && window.PPAccount.setButtons && window.PPAccount.setButtons(r.buttons);
+      window.PPToast && window.PPToast(t('bought')); showOverlay();
+    }).catch(() => { window.PPToast && window.PPToast(t('poor')); load(); });
   }
 
   // ---------- управление: мытьё пальцем по сковородке, пробел — лить тесто / действие ----------
@@ -763,8 +1009,8 @@
   addEventListener('resize', fit);
 
   // только на локальном сервере: доступ для автотеста
-  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__pan = { s: () => ({ state, phase, level, hearts, order, chosen, cur, made, added, result, dirt: dirtLeft(), cust: cust && cust.img }), P, BAKE,
-    set: o => { if ('fill' in o && cur) cur.fill = o.fill; if ('d' in o && cur) cur[phase === 'cook2' ? 'd2' : 'd1'] = o.d; if ('pat' in o) patT = o.pat; }, scrub, pan: id => { chosen = id; newPancake(); }, pour: () => setPhase('cook1'), act: cookAct, top: id => { added[id] = (added[id] || 0) + 1; addSeq.push(id); }, serve, next: () => nextLevel(), wash: chooseWash };
+  if (/^(localhost|127\.0\.0\.1)$/.test(location.hostname)) window.__pan = { s: () => ({ state, phase, level, hearts, maxH, luck, spareLeft, order, chosen, cur, made, added, result, dirt: dirtLeft(), cust: cust && cust.img }), P, BAKE, TOPS, start, info: o => { Object.assign(info, o); if (state !== 'play') showOverlay(); }, force: o => { forceNext = o; },
+    set: o => { if ('fill' in o && cur) cur.fill = o.fill; if ('d' in o && cur) cur[phase === 'cook2' ? 'd2' : 'd1'] = o.d; if ('pat' in o) patT = o.pat; if ('hearts' in o) hearts = o.hearts; }, scrub, pan: id => { chosen = id; newPancake(); }, pour: () => setPhase('cook1'), act: cookAct, top: id => { added[id] = (added[id] || 0) + 1; addSeq.push(id); }, serve, next: () => nextLevel(), wash: chooseWash };
   const ready = () => { fit(); showOverlay(); load(); };
   if (document.readyState === 'loading') addEventListener('DOMContentLoaded', ready); else ready();
 })();
