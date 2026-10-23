@@ -50,6 +50,23 @@
   };
   const ING = Object.entries(SEASONS).flatMap(([s, list]) => list.map(r => [...r, s]));
   const IG = Object.fromEntries(ING.map(r => [r[0], { id: r[0], e: r[1], n: [r[2], r[3], r[4]][L], s: r[5] }]));
+  // ---------- эмодзи новее 2020 года (🪶 совиное перо и др.) рисуются не на всех устройствах (старые Windows/Android — пустой квадрат): там — своя пиксельная картинка (этап 28) ----------
+  // IG[id].h — для HTML (эмодзи или <img>), IG[id].t — для текста тостов (эмодзи или название), emoImg(e) — картинка для canvas (или null)
+  const PIX = {
+    '🪶': ['..........oooo..........oowwlwo........owlbllbo.......owlbllblo......owlbllblo......owllbllbo......owlbllblo.......owbllblo.......owlbllbo........owllbwo.........olbwoo..........owwo...........oqoo............qo.............q...............................', { o: '#4A3826', w: '#F4E6CF', l: '#C9A27A', b: '#7A5236', q: '#6B4E3A' }],
+    '🪵': ['..................................................................ooooooooooo....obbdbbbbbdbooo.obbbbbdbbbbortroobdbbbbbbdboryroobbbbdbbbbbortroobbdbbbbdbbortro.obbbbbdbbbbooo...ooooooooooo...................................................................', { o: '#3E2A1C', b: '#8B5A3C', d: '#6B4329', r: '#D9A45B', t: '#B98236', y: '#F0C987' }],
+    '🪱': ['...........................................................oo.............oppo...........opkpko..........opppo....oo....oppdo....oppo..oppdo....oppdpooppdo.....opdoppppdo.......oo.opppo.............o.........................................................', { o: '#7A3B4A', p: '#F28AB2', d: '#D96C93', k: '#2B2340' }],
+    '🪺': ['.....................................................................oo..oo.........ocwoocwo........owwoowwo......oooooooooooo...obdbbdbbdbbdbo.obbbdbbdbbdbbbbo.obdbbdbbdbbdbo...obbbbdbbbbbo.....oooooooooo...................................................', { o: '#4E3424', b: '#A87A4E', d: '#7A5236', c: '#BFE3F5', w: '#E8F4FA' }],
+    '🪁': ['........o..............oro............orryo..........orrryyo........orrrryyyo......ooooooooooo......obbbbgggo........obbbggo..........obbgo............oo...............o..............o................o................o..............o.......................', { o: '#2B2340', r: '#E5484D', y: '#F6D04D', b: '#4A7BD8', g: '#4CC38A' }],
+    '🪸': ['..................o.....o....o...opo...opo..opo..opo.o.opo.opo....opoopopo.opo....oppopppoopo......oppppppppo.......oppppppo.........oppppo...........oppo............oppo..........oooooooo.......osssssssso...................................................', { o: '#8C2F3A', p: '#F08A8A', s: '#E9C46A' }],
+  };
+  const emoOk = e => { try { const c = document.createElement('canvas'); c.width = c.height = 24; const x = c.getContext('2d', { willReadFrequently: true }); x.font = '20px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif'; x.textBaseline = 'top'; x.fillText(e, 0, 0);
+    const d = x.getImageData(0, 0, 24, 24).data; for (let i = 0; i < d.length; i += 4) if (d[i + 3] > 40 && (Math.abs(d[i] - d[i + 1]) > 24 || Math.abs(d[i + 1] - d[i + 2]) > 24)) return true; return false; } catch (err) { return true; } }; // цветные точки — эмодзи есть; серый квадрат — нет
+  const FALL = {};
+  Object.entries(PIX).forEach(([e, [rows, pal]]) => { if (emoOk(e)) return; const c = document.createElement('canvas'); c.width = c.height = 16; const x = c.getContext('2d');
+    [...rows].forEach((ch, i) => { if (pal[ch]) { x.fillStyle = pal[ch]; x.fillRect(i % 16, Math.floor(i / 16), 1, 1); } }); const src = c.toDataURL(), im = new Image(); im.src = src; FALL[e] = { src, im }; });
+  const emoImg = e => FALL[e] ? FALL[e].im : null;
+  Object.values(IG).forEach(g => { const f = FALL[g.e]; g.h = f ? `<img class="pp-emo" src="${f.src}" alt="${g.n.replace(/"/g, '&quot;')}">` : g.e; g.t = f ? g.n : g.e; });
   const SWEET = new Set(Object.values(SEASONS).flatMap(list => list.slice(15).map(r => r[0]))); // в каждом сезоне последние 6 — сладкие
 
   // ---------- имена и свойства зелий: номер рецепта (0…1770) → своё имя, у разных рецептов имена не совпадают ----------
@@ -124,5 +141,5 @@
     return c;
   }
 
-  window.PPPotion = { ING, IG, SWEET, SEASONS, SEASON_INFO, FAILS, potion, bottle, L2 };
+  window.PPPotion = { ING, IG, emoImg, SWEET, SEASONS, SEASON_INFO, FAILS, potion, bottle, L2 };
 })();

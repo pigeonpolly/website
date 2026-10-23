@@ -560,6 +560,7 @@
         row('Новое зелье <b>«Вкус детства»</b>', pct('potion3Pct') + ` → сейчас ${G.p3} 🔘`, D.potion3Pct + ' %', 'три сладких ингредиента'),
         row('Повторное зелье (рецепт уже открыт)', pct('potionAgainPct') + ` → сейчас ${G.again} 🔘`, D.potionAgainPct + ' %', '0 — пуговки только за новые'),
         row('Лимит пуговок за зелья в сутки', pct('potionDayMaxPct') + (G.pmax ? ` → сейчас ${G.pmax} 🔘` : ''), D.potionDayMaxPct + ' %', '0 — без лимита'),
+        row('Зелье оживления котика — играть дней подряд', num('potionRevive', R.potionRevive, D.potionRevive) + ' дн.', D.potionRevive + ' дн.', 'лабиринт или котёл раз в сутки; зелье в сумку, его кладут на котика в комнате; 0 — выкл.'),
         row('Лабиринт не засчитывается, если пройден быстрее', num('potionMinSec', R.potionMinSec, D.potionMinSec) + ' с', D.potionMinSec + ' с', 'защита от подделки (если быстрее — игра чуть подождёт)'),
       ], '<a href="/ru/potions/">Открыть игру →</a>')}
       ${box('🕵️ Игра «Детектив Титос»', [
