@@ -1225,6 +1225,7 @@
     tidy: ['🧹 Tidy up', '🧹 Прибраться', '🧹 Sakopt'],
     alive: ['🐈 The cat is alive!', '🐈 Котик ожил!', '🐈 Kaķītis atdzīvojās!'], aliveLiving: ['Cats come alive only in the living room', 'Котики оживают только в гостиной', 'Kaķīši atdzīvojas tikai viesistabā'], aliveErr: ['The potion did not work — try again', 'Зелье не сработало — попробуй ещё раз', 'Dzira nesuvēja — mēģini vēlreiz'],
     lightOff: ['Turn the light off', 'Выключить свет', 'Izslēgt gaismu'], lightOn: ['Turn the light on', 'Включить свет', 'Ieslēgt gaismu'],
+    garden: ['Garden', 'Огород', 'Dārzs'], // огород (этап 22) — ссылкой в плане дома
     flip: ['Turn', 'Повернуть', 'Pagriezt'], front: ['Forward', 'Вперёд', 'Uz priekšu'], behind: ['Back', 'Назад', 'Atpakaļ'], back: ['To the bag', 'В сумку', 'Uz somu'],
     house: ['House', 'Дом', 'Māja'], locked: ['Locked', 'Закрыто', 'Slēgts'], closedFor: ['@{n} hasn’t opened this room yet', 'У @{n} эта комната ещё закрыта', '@{n} šī istaba vēl ir slēgta'],
     now: ['now', 'сейчас', 'tagad'], goTo: ['Go →', 'Перейти →', 'Doties →'],
@@ -1860,7 +1861,7 @@
       };
       const drawPlan = msg => {
         plan.innerHTML = `<div class="room-plan-in"><div class="room-plan-top"><b>🚪 ${t('house')}</b><button type="button" class="room-plan-x" aria-label="✕">✕</button></div>
-          <div class="room-plan-grid">${Object.keys(HOMES).map(id => `<button type="button" data-home="${id}" class="${id === cur ? 'on' : ''}${isOpen(id) ? '' : ' locked'}"${isOpen(id) ? '' : ` title="${t('locked')}"`}><span>${HOMES[id].ic}</span>${HOMES[id].n[L]}${isOpen(id) ? '' : '<i>🔒</i>'}</button>`).join('')}</div>
+          <div class="room-plan-grid">${Object.keys(HOMES).map(id => `<button type="button" data-home="${id}" class="${id === cur ? 'on' : ''}${isOpen(id) ? '' : ' locked'}"${isOpen(id) ? '' : ` title="${t('locked')}"`}><span>${HOMES[id].ic}</span>${HOMES[id].n[L]}${isOpen(id) ? '' : '<i>🔒</i>'}</button>`).join('')}<a class="room-plan-out" href="${pre}/garden/?nick=${encodeURIComponent(o.nick)}"><span>🥕</span>${t('garden')}</a></div>
           <p class="room-plan-msg" aria-live="polite">${msg || ''}</p></div>`;
         plan.querySelector('.room-plan-x').onclick = () => openPlan(false);
         plan.querySelectorAll('[data-home]').forEach(b => b.onclick = () => { const id = b.dataset.home; if (!isOpen(id)) return drawPlan(lockMsg(id)); switchTo(id); openPlan(false); });

@@ -46,6 +46,8 @@ PAGES = [
     ("admin", "Admin", "admin.html", "Admin."),
     ("polly-office", "Polly, Office Clerk", "polly-office.html",
      "Polly's pixel office: old blinds, a water cooler and a desk you can click. Switch to evening and watch the light change."),
+    ("shift", "Shift with Polly", "shift.html",
+     "Shift with Polly: a focus timer with a pixel office. Pick 20 minutes to 3 hours and a retro tune, and Polly works next to you. Every full hour brings a promotion and buttons."),
     ("titos", "Detective Titos", "titos.html",
      "Help Detective Titos solve 100 cases in Wobbleland: find clues, question suspects and keep the coffee pot from running dry."),
     ("polly-helps", "Polly, help me draw", "polly-helps.html",
@@ -60,6 +62,8 @@ PAGES = [
      "Pigeon Polly games: Button Rain, Polly’s Potion Lab, Polly’s Pancakes, Detective Titos, Polly’s Office, Wobbleland and the advent calendar. Earn buttons and spend them in the shop."),
     ("bird", "Bird profile", "bird.html",
      "A bird of the Pigeon Polly flock: its room, bag of gifts, achievements and sketches from the Daily Challenge."),
+    ("garden", "Bird garden", "garden.html",
+     "The garden behind a pixel bird’s house: plant seeds, water them every day, catch bugs and sell the harvest for buttons. The weather follows the real season."),
     ("requests", "Draw this for me", "requests.html",
      "Draw this for me: suggest anything for Alina to draw, see every idea turned into a sketchbook drawing, and get a gift for your pixel bird when yours is drawn."),
     ("rain", "Button Rain", "rain.html",
@@ -76,7 +80,7 @@ PAGES = [
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
 # готовые, но пока не открытые страницы: не попадают в sitemap
-UNLISTED = {"blog-editor", "admin"}
+UNLISTED = {"blog-editor", "admin", "garden"}
 
 
 PORTFOLIO = [
@@ -109,6 +113,7 @@ SECTIONS = {
              ("potions", "Potion Lab", "🧪", "A maze, ingredients and potions with silly names"),
              ("pancakes", "Polly’s Pancakes", "🥞", "Pancakes for Wobbleland, every customer is different"),
              ("titos", "Detective Titos", "🕵️", "100 cases and one very perky detective"),
+             ("shift", "Shift with Polly", "⏱", "A timer, retro music and Polly working next to you"),
              ("polly-office", "Polly’s Office", "📮", "Help Polly with the Council of Towns’ mail"),
              ("wobbleland", "Wobbleland", "🗺", "Map, holidays and recipes of eleven towns")],
     "draw": [("challenge", "Daily Challenge", "✏️", "A theme, a few colours and a timer — every day"),
@@ -124,7 +129,7 @@ SECTIONS = {
 # внизу подменю, через линию — хаб раздела
 SECTION_HUB = {"play": ("games", "All games and the shop →"), "draw": ("challenge", "To today’s theme →"), "about": ("about-me", "About me →")}
 # страницы не из меню: в каком они разделе и какой подпункт подсвечен («Стая › Все птички» над заголовком)
-TAB_ALIAS = {"bird": "flock", "shop": "games", "games": "games"}
+TAB_ALIAS = {"bird": "flock", "garden": "flock", "shop": "games", "games": "games"}
 # подпись над заголовком для страниц раздела, которых нет в подменю
 CRUMB_ONLY = {"shop": ("play", "Shop")}
 for _p in ("anxiety", "sketchbook", "snail", "bird", "detective", "halloween", "ai-art"):
