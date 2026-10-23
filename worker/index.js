@@ -156,11 +156,21 @@ async function ownedRoom(env, uid) {
   for (const r of (await env.DB.prepare(`SELECT kind, item, COUNT(*) AS n FROM gifts WHERE user_id = ? AND status = 'bag' AND kind IN ('wall', 'floor', 'view', 'curtain', 'furn', 'deco') GROUP BY kind, item`).bind(uid).all()).results) m[r.kind + '|' + r.item] = r.n;
   return m;
 }
+// дом птички (этап 20): room — гостиная, room.rooms.<id> — остальные комнаты того же вида; вещь из сумки стоит только в одной из них
+const HOME_ROOMS = ['kitchen', 'bedroom', 'crypt', 'bath', 'office'];
+const roomItems = r => [r, ...HOME_ROOMS.map(id => r && r.rooms && r.rooms[id]).filter(Boolean)].flatMap(x => Array.isArray(x.items) ? x.items : []);
 function cleanRoom(room, own) {
+  const used = {}, out = cleanOne(room || {}, own, used), rs = room && room.rooms;
+  if (rs && typeof rs === 'object') for (const id of HOME_ROOMS) if (rs[id] && typeof rs[id] === 'object') {
+    const r = cleanOne(rs[id], own, used, id === 'crypt'); // склеп — только каменный: без обоев, пола, окна
+    if (r.items.length || Object.keys(r).length > 1) (out.rooms = out.rooms || {})[id] = r;
+  }
+  return out;
+}
+function cleanOne(room, own, used, bare) {
   const out = { items: [] };
-  for (const k of ['wall', 'floor', 'view', 'curtain']) if (typeof room[k] === 'string' && own[k + '|' + room[k]]) out[k] = room[k];
-  if (room.light === 0) out.light = 0; // свет выключен (этап 11 Б); включён — поля нет
-  const used = {};
+  if (!bare) for (const k of ['wall', 'floor', 'view', 'curtain']) if (typeof room[k] === 'string' && own[k + '|' + room[k]]) out[k] = room[k];
+  if (room.light === 0 && !bare) out.light = 0; // свет выключен (этап 11 Б); включён — поля нет
   for (const it of Array.isArray(room.items) ? room.items.slice(0, 80) : []) {
     if (!it || !['furn', 'deco'].includes(it.k) || !/^[a-z0-9:-]{1,24}$/i.test(String(it.v))) continue;
     const key = it.k + '|' + it.v; if ((used[key] || 0) >= (PPCanDo.isAlbum(it.k, it.v) ? 1 : own[key] || 0)) continue; // альбом карточек — в каждой комнате сам, один
@@ -184,6 +194,15 @@ function cleanRoom(room, own) {
     if (o.from != null && !ids.has(o.from)) delete o.from;
   }
   return out;
+}
+
+// какие комнаты дома открыты: всё считается по уже сделанному (рекорды игр, пёрышки, дела Титоса), поэтому «выполнил раньше» — сразу открыто
+async function doorsOf(env, u) {
+  const R = RULES, n = async (sql, k) => { try { return Number(((await env.DB.prepare(sql).bind(u.id).first()) || {})[k]) || 0; } catch (e) { return 0; } }; // titos может ещё не быть
+  const have = { kitchen: u.pan_best || 0, bedroom: R.homeBedroom > 0 ? await n('SELECT COUNT(*) AS n FROM feathers WHERE from_id = ?', 'n') : 0,
+    crypt: R.homeCrypt > 0 ? await n('SELECT level FROM titos WHERE user_id = ?', 'level') : 0, bath: u.game_best || 0, office: u.office_task || 0 };
+  const need = { kitchen: R.homeKitchen, bedroom: R.homeBedroom, crypt: R.homeCrypt, bath: R.homeBath, office: R.homeOffice };
+  return { open: Object.fromEntries(HOME_ROOMS.map(id => [id, have[id] >= need[id]])), need, have };
 }
 
 // ---------- коробка при регистрации (как альбом): птичка выбирает одну из коробок в окне (news.js), потом может поменять ----------
@@ -423,7 +442,7 @@ async function ensureSchema(env) {
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER,
-    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...CHALLENGE_ALTER]) {
+    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...CHALLENGE_ALTER]) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   // «Выбор Полли» подешевел с 50 до 11 пуговок: уже начисленные записи пересчитать один раз, баланс = сумма журнала
@@ -506,6 +525,8 @@ const RULE_DEFAULTS = {
   adventLastJan: 23, adventButtons: 10, adventSpecialButtons: 25,
   welcomeBtn: -1, // подарок новичку после ника (этап 14): случайная дешёвая вещь (welcomeOf) и столько пуговок (-1 — цена этой вещи)
   dayBonusNeed: 5, dayBonusOf: 8, dayBonusPct: 10, // карточка дня: бонус за dayBonusNeed штампов (из dayBonusOf) — dayBonusPct % опорной цены, раз в сутки
+  // дом птички (этап 20): что открывает комнату — уровень в Блинной Полли, пёрышек в чужих комнатах, дел Титоса, уровень Пуговичного дождя, задача Оффис Полли (0 — открыта сразу)
+  homeKitchen: 10, homeBedroom: 1, homeCrypt: 2, homeBath: 10, homeOffice: 1,
   aiStreak: true, aiUpload: true,
   sellOn: true, sellPrice: 5,
   // «Пуговичный дождь»: за уровень gameLevel 🔘 × (1 + ⌊(ур.−1)/10⌋) — каждый номер уровня раз в сутки; gameDayMax — лимит в сутки (0 — без лимита);
@@ -528,7 +549,7 @@ const RULE_DEFAULTS = {
   ...CH_DEFAULTS, // подбор тем челленджа: семья не ближе N дней, категории, колода сложности, доля сезона (worker/challenge-plan.js)
 };
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
-const RULE_NUM = { welcomeBtn: [-1, 10000], daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
+const RULE_NUM = { homeKitchen: [0, 1000], homeBedroom: [0, 1000], homeCrypt: [0, 1000], homeBath: [0, 1000], homeOffice: [0, 1], welcomeBtn: [-1, 10000], daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
   adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...GARDEN_RANGE, ...CH_RANGE };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
@@ -547,7 +568,7 @@ function cleanRules(r) {
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
   for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn', 'panOn', ...GARDEN_BOOL]) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...GARDEN_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
+  for (const k of ['homeKitchen', 'homeBedroom', 'homeCrypt', 'homeBath', 'homeOffice', 'daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...GARDEN_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
   if (GARDEN_SEASONS.includes(r.gardenSeason)) out.gardenSeason = r.gardenSeason;
@@ -1389,7 +1410,7 @@ async function route(req, env, url) {
     if (pickUser === u.id) badges.push('pick');
     const bag = (await env.DB.prepare("SELECT DISTINCT kind, item FROM gifts WHERE user_id = ? AND status = 'bag'").bind(u.id).all()).results; // вещи в сумке — их видят все
     const unopened = (await env.DB.prepare("SELECT COUNT(*) AS n FROM gifts WHERE user_id = ? AND status = 'new'").bind(u.id).first()).n;
-    return json({ id: u.id, avatar: avatarOf(u), room: roomOf(u), bag, unopened, buttons: u.buttons || 0, nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(streakDays(rows)).current,
+    return json({ id: u.id, avatar: avatarOf(u), room: roomOf(u), doors: await doorsOf(env, u), bag, unopened, buttons: u.buttons || 0, nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(streakDays(rows)).current,
       best: mergedBest(u, streakDays(rows)), badges, posts: rows.filter(r => !r.hidden).map(({ id, day, theme, bw, ai }) => ({ id, day, theme, bw, ai })) });
   }
 
@@ -1463,12 +1484,18 @@ async function route(req, env, url) {
     return json({ ok: true });
   }
   // ---------- адвент-календарь ----------
+  // Оффис Полли (quest-polly.js): задача пройдена — открывает кабинет в доме птички
+  if (m === 'POST' && p === '/api/office/done') {
+    const u = await needUser(req, env), b = await req.json().catch(() => ({})), t = Math.max(0, Math.min(1, Math.round(Number(b.task) || 0)));
+    if (t) await env.DB.prepare('UPDATE users SET office_task = ? WHERE id = ? AND COALESCE(office_task, 0) < ?').bind(t, u.id, t).run();
+    return json({ ok: true });
+  }
   if (m === 'POST' && p === '/api/room') {
     const u = await needUser(req, env);
     const b = await req.json().catch(() => ({}));
     const room = cleanRoom(b.room || {}, await ownedRoom(env, u.id));
     // галерея комнат в «Стае» сортируется по тому, когда в комнату что-то добавили (новая вещь, обои, пол, вид, шторы) — перестановка не считается
-    const old = roomOf(u), cnt = r => { const m = {}; (r.items || []).forEach(it => { m[it.k + '|' + it.v] = (m[it.k + '|' + it.v] || 0) + 1; }); return m; }, oc = cnt(old);
+    const old = roomOf(u), cnt = r => { const m = {}; roomItems(r).forEach(it => { m[it.k + '|' + it.v] = (m[it.k + '|' + it.v] || 0) + 1; }); return m; }, oc = cnt(old);
     const newItems = Object.entries(cnt(room)).reduce((a, [k, n]) => a + Math.max(0, n - (oc[k] || 0)), 0);
     const added = newItems > 0 || ['wall', 'floor', 'view', 'curtain'].some(k => room[k] && room[k] !== old[k]);
     await env.DB.prepare(`UPDATE users SET room = ?${added ? ', room_at = ?' : ''} WHERE id = ?`).bind(...(added ? [JSON.stringify(room), now(), u.id] : [JSON.stringify(room), u.id])).run();
@@ -1487,7 +1514,7 @@ async function route(req, env, url) {
     } else if (box !== u.box0) {
       const g = await env.DB.prepare("SELECT id, item FROM gifts WHERE user_id = ? AND kind = 'furn' AND note = 'starter' AND status = 'bag'").bind(u.id).first();
       if (!g) fail(404, 'gone');
-      const room = roomOf(u), it = (room.items || []).find(x => x.k === 'furn' && x.v === g.item && x.id != null) || (room.items || []).find(x => x.k === 'furn' && x.v === g.item);
+      const room = roomOf(u), all = roomItems(room), it = all.find(x => x.k === 'furn' && x.v === g.item && x.id != null) || all.find(x => x.k === 'furn' && x.v === g.item);
       if (it) it.v = box;
       await env.DB.prepare("UPDATE gifts SET item = ? WHERE id = ?").bind(box, g.id).run();
       await env.DB.prepare('UPDATE users SET box0 = ?, room = ? WHERE id = ?').bind(box, JSON.stringify(cleanRoom(room, await ownedRoom(env, u.id))), u.id).run();
