@@ -176,8 +176,9 @@
   function usage(kind, item, n, avatar, room) {
     room = room || {};
     if (!isRoom(kind)) return avatar && avatar[kind] === item ? 1 : 0;
-    if (FIXED.includes(kind)) return room[kind] === item ? 1 : 0;
-    return Math.min(n, (room.items || []).filter(it => it.k === kind && it.v === item).length);
+    const all = [room, ...Object.values(room.rooms || {})]; // дом птички (этап 20): все комнаты
+    if (FIXED.includes(kind)) return all.some(r => r && r[kind] === item) ? 1 : 0;
+    return Math.min(n, all.reduce((a, r) => a + ((r && r.items) || []).filter(it => it.k === kind && it.v === item).length, 0));
   }
 
   // ---------- «нажал — появилось» (этап 5 Б; в этап 6 переехало сюда из sketch-wall.js — нужно и магазину) ----------
@@ -196,6 +197,7 @@
       const own = (me.gifts || []).filter(x => x.status === 'bag' && x.kind === kind && x.item === item).length;
       const r = R.use(kind, item, own); if (!r) return null;
       const bx = R.box.getBoundingClientRect(); if (bx.bottom < 80 || bx.top > innerHeight - 120) R.box.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      if (r.done === 'stone') { say(tr(['The crypt is stone only, no window', 'В склепе — только камень и нет окна', 'Kapenēs ir tikai akmens un nav loga'])); return null; }
       if (r.done === 'there') { say(tr(['Already in the room — here it is', 'Уже в комнате — вот она', 'Jau istabā — lūk, tā'])); return null; }
       const undo = () => { r.undo(); if (o.after) o.after(); };
       say(r.done === 'off' ? tr(['Back to the old one', 'Вернули прежнее', 'Atgriezts iepriekšējais']) : tr(['Placed', 'Поставлено', 'Novietots']), undo);
