@@ -79,7 +79,7 @@ CARDS = {
         "lv": ["vienkāršas formas · idejas", "Pollija,", "palīdzi uzzīmēt", "Kā uzzīmēt jebko no vienkāršām formām un kur atrast idejas."]}),
     "books": dict(img=["images/e-books/urban-sketching-digital-traveler.jpg", "images/e-books/ink-sketching.jpg", "images/e-books/watercolor-sketches.jpg", "images/e-books/coloring-book-world-breakfasts.jpg"], view="grid", t={
         "en": ["e-books · sketching · watercolor", "Books by", "Alina Otkinska", "Urban sketching, ink, watercolor and a colouring book."],
-        "ru": ["книги · скетчинг · акварель", "Книги", "Алины Откинска", "Городской скетчинг, линер, акварель и раскраска."],
+        "ru": ["книги · скетчинг · акварель", "Книги", "Алины Откинской", "Городской скетчинг, линер, акварель и раскраска."],
         "lv": ["e-grāmatas · skicēšana · akvarelis", "Alīnas Otkinskas", "grāmatas", "Pilsētas skicēšana, tinte, akvarelis un krāsojamā grāmata."]}),
     "about": dict(img="images/home/alina.jpg", t={
         "en": ["artist · illustrator · learning designer", "Alina", "Otkinska", "Author of Pigeon Polly. Art, books and learning design from Riga."],
@@ -103,7 +103,7 @@ CARDS = {
         "lv": ["ekolaini · skiču burtnīca · MI māksla", "Mana", "skiču burtnīca", "Tēlu sērijas, skiču burtnīcas lapas un eksperimenti."]}),
     "anxiety": dict(img="images/anxiety/anxiety-4.jpg", pos="50% 15%", zoom=1.3, t={
         "en": ["a series in ecolines", "Anxiety", "", "A series of drawings in ecolines by Alina Otkinska."],
-        "ru": ["серия эколайнами", "Тревога", "", "Серия рисунков эколайнами Алины Откинска."],
+        "ru": ["серия эколайнами", "Тревога", "", "Серия рисунков эколайнами Алины Откинской."],
         "lv": ["sērija ar ekolainiem", "Trauksme", "", "Alīnas Otkinskas zīmējumu sērija ar ekolainiem."]}),
     "snail": dict(img="images/snail/2023-mr-chew-coffee-passion.jpg", t={
         "en": ["illustrations 2023–2025", "Mr.Chew", "the snail", "An Australian postal snail and his small adventures."],
