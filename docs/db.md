@@ -2,10 +2,11 @@
 
 _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TABLE / ALTER TABLE и обращений к meta в worker/*.js. Руками не править._
 
-## Таблицы (42)
+## Таблицы (43)
 
 Обозначения: PK — первичный ключ, nn — NOT NULL, =x — DEFAULT x; «+» — столбцы, добавленные ALTER TABLE.
 
+- **garden** (worker/garden.js): `user_id` int PK, `beds` text ='[]' (JSON грядок {p, t, g, w} | null), `seeds` text ='{}', `crop` text ='{}' (урожай в корзинке), `bug_day` text ='', `bug_got` text ='[]' (пойманные сегодня жуки), `harvests` int =0, `bugs` int =0, `created_at` int
 - **login_fail** (worker/auth.js): `k` text PK, `n` int nn, `at` int nn
 - **pw_reset** (worker/auth.js): `hash` text PK, `user_id` int nn, `expires` int nn, `created_at` int
 - **funnel** (worker/auth.js): `day` text nn, `name` text nn, `step` text nn, `vid` text nn; PRIMARY KEY (day, name, step, vid)
@@ -24,7 +25,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **flock_events** (worker/flock-news.js): `id` int PK auto, `ts` int nn, `user_id` int nn =0, `kind` text nn, `ref` text nn ='', `data` text ='{}'; UNIQUE (user_id, kind, ref)
 - **room_guests** (worker/flock.js): `owner_id` int nn, `guest_id` int nn, `first_at` int, `last_at` int; PRIMARY KEY (owner_id, guest_id)
 - **feathers** (worker/flock.js): `owner_id` int nn, `from_id` int nn, `day` text nn, `created_at` int, `seen` int =0; PRIMARY KEY (owner_id, from_id, day)
-- **users** (worker/index.js): `id` int PK auto, `sub` text UNIQUE nn, `email` text, `nick` text UNIQUE COLLATE NOCASE, `consent` int =0, `banned` int =0, `created_at` int; + `pw` text, `pw_temp` int =0, `email_ok` int =0, `privacy_at` int, `advent_mail` text ='', `advent_sent` int =0'], `news_off` int =0'], `feathers` int =0, `feather_day` text ='', `avatar` text ='', `best` int =0, `badges` text ='', `months` text ='', `room` text ='', `picks` int =0, `mcount` text ='', `last_seen` int, `game_best` int =0, `game_best_at` int, `maze_level` int =1, `inv` text ='', `pot_fails` int =0, `eyes` int =0, `eye_next` int =0, `room_at` int, `req_n` int =0, `req_mid` int =0, `buttons` int =0, `referrer` int, `box0` text ='', `box_mail` int =0, `pan_best` int =0, `pan_best_at` int, `pan_washes` int =0', `office_task` int =0 (этап 20: пройденная задача Оффис Полли)]
+- **users** (worker/index.js): `id` int PK auto, `sub` text UNIQUE nn, `email` text, `nick` text UNIQUE COLLATE NOCASE, `consent` int =0, `banned` int =0, `created_at` int; + `pw` text, `pw_temp` int =0, `email_ok` int =0, `privacy_at` int, `advent_mail` text ='', `advent_sent` int =0'], `news_off` int =0'], `feathers` int =0, `feather_day` text ='', `avatar` text ='', `best` int =0, `badges` text ='', `months` text ='', `room` text ='', `picks` int =0, `mcount` text ='', `last_seen` int, `game_best` int =0, `game_best_at` int, `maze_level` int =1, `inv` text ='', `pot_fails` int =0, `pot_days` int =0, `pot_last` text, `cats_alive` int =0, `eyes` int =0, `eye_next` int =0, `room_at` int, `req_n` int =0, `req_mid` int =0, `buttons` int =0, `referrer` int, `box0` text ='', `box_mail` int =0, `pan_best` int =0, `pan_best_at` int, `pan_washes` int =0', `office_task` int =0 (этап 20: пройденная задача Оффис Полли)]
 - **sessions** (worker/index.js): `token` text PK, `user_id` int nn, `expires` int nn; + `pin_ok` int =0
 - **posts** (worker/index.js): `id` text PK, `user_id` int nn, `day` text nn, `theme` text, `bw` int =0, `created_at` int, `hidden` int =0; + `tod` int, `picked` int =0, `bytes` int, `store` text, `ai` int =0, `kv` int =1; UNIQUE(user_id, day)
 - **meta** (worker/index.js): `key` text PK, `value` text
@@ -46,7 +47,8 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **draw_likes** (worker/index.js): `rid` int nn, `kind` text nn, `who` text nn, `created_at` int; PRIMARY KEY (rid, kind, who)
 - **potion_gifts** (worker/index.js): `id` int PK auto, `to_id` int nn, `from_nick` text, `ing` text nn, `n` int nn, `created_at` int, `seen` int =0
 - **anon_names** (worker/index.js): `vid` text PK, `code` text UNIQUE nn, `created_at` int
-- **pan_runs** (worker/pancakes.js): `id` text PK, `user_id` int nn, `started` int nn, `level` int =0, `washed` int =0, `stars` int =0
+- **pan_runs** (worker/pancakes.js): `id` text PK, `user_id` int nn, `started` int nn, `level` int =0, `washed` int =0, `stars` int =0, `base` int =0 (старт с рубежа), `spare` int =0 (запасные сковородки); users.pan_up text — улучшения блинной JSON
+- **shift_runs** (worker/shift.js): `id` text PK, `user_id` int nn, `started` int nn, `min` int nn, `done` int =0 (1 — засчитана, 2 — отменена новым стартом); `users.shift_min` — сумма минут доигранных смен
 - **titos** (worker/titos.js): `user_id` int PK, `level` int =0, `coffee` int =10, `coffee_at` int =0, `drink_at` int =0, `sleep` int =0, `run` int =0, `found` text ='[]', `started` int =0, `bugs` text ='[]', `sell_day` text ='', `sell_n` int =0, `legacy` int =0; + `sort_lv` int =0, `sort_run` text ='', `bugs_run` int =0']
 - **titos_cases** (worker/titos.js): `n` int PK, `data` text nn, `tr` text ='{}', `hash` text, `updated_at` int
 - **top_week** (worker/top.js): `game` text nn, `week` text nn, `user_id` int nn, `score` int nn, `at` int; PRIMARY KEY (game, week, user_id)

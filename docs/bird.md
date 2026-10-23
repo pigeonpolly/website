@@ -81,3 +81,10 @@ _Пункты перенесены дословно из docs/_claude-old.md (э
 - Сценарий — `tools/video/film.js` (время в секундах: дверь, тапочки, блинчики, сердечки, финал с яйцом). Комната — `PPRoom.mount` с `o.film(g, now)` (птичку рисует сценарий, кадр — `api.frame(ms)`), `o.scale` (пикселей на пиксель комнаты), `o.wallPaint(ctx)` (свои обои).
 - Ролик №2 «Яблоко» — `tools/video/apple.js` (+ apple.html), `render.py --film apple` → `pigeonpolly-bird-apple-<lang>.mp4` (21 с): Полли (голубая, как талисман, в красном берете) рисует яблоко у мольберта, фото телефоном, «Повесить на стену», праздник «Новый уровень! Яйцо», радуется; финал — рисунок с медалькой, pigeonpolly.com, «Join the challenge and the community». Тексты на экране телефона — по ?lang (с кадра FILM.langFrom).
 - Сценарий отдаёт `FILM.keys` (секунды для листа `--keys`) и `FILM.langFrom` (с какого кадра кадры зависят от языка); новый ролик — строка в `FILMS` в render.py.
+
+## Огород (этап 22)
+- Вход — дверь 🚪 в комнате → план дома (этап 20) → «🥕 Огород» (room.js `.room-plan-out`, ссылка последней плиткой). Страница /garden/?nick= (src/pages/garden.html, site/assets/garden.js, UNLISTED), назад — «🚪 В дом» или дверь домика на сцене.
+- Сервер — worker/garden.js `gardenApi`, таблица `garden`, растения `CROPS` (дней роста; названия и рисунки — garden.js `CROP`, `drawPlant`). Полив — раз в сутки по Риге, земля влажная gardenWetH ч, растёт только по влажной (`grown`). Урожай → корзинка → продажа (`gsell`); семена при первом заходе (gardenStarter простых) и в «🛒 Лавке семян» (`gseed`); жуки дня — `bugsOf(uid, день)`, каждый вылезает в свой час, +gardenBugBtn (`gbug`).
+- Погода — сезон из правила gardenSeason (auto — по месяцу в Риге), вид дня из `weatherOf` (осень: листья/дождик/туман; зима: снег/мороз; весна: лепестки/дождь; лето: солнце/бабочки), с 19 до 7 — вечер со звёздами. Гость видит грядки, без жуков и кнопок.
+- Числа — «📜 Правила» → «🥕 Огород птички» (gardenOn, gardenBeds, gardenWetH, gardenSeedPct, gardenSellPct, gardenStarter, gardenBugMax, gardenBugChance, gardenBugBtn, gardenSeason).
+
