@@ -75,6 +75,39 @@ PAGES = [
     ("wobbleland", "Wobbleland", "wobbleland.html",
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
+# превью ссылок (og:image 1200×630): страница → карточка из tools/og_cards.py (site/assets/og/<ключ>-<язык>.jpg);
+# "flock" — общая картинка стаи site/assets/og-flock-<язык>.jpg. Заголовок и описание на RU/LV — content/meta.json
+OG = {"": "flock", "flock": "flock", "flock/news": "flock", "bird": "flock", "privacy": "flock", "admin": "flock", "blog-editor": "flock",
+      "challenge": "challenge", "games": "games", "shop": "shop", "rain": "rain", "pancakes": "pancakes", "potions": "potions",
+      "titos": "titos", "polly-office": "office", "wobbleland": "wobbleland", "advent": "advent", "blog": "blog", "requests": "requests",
+      "palettes": "palettes", "polly-helps": "helps", "e-books": "books", "about-me": "about", "projects": "projects",
+      "work-with-me": "work", "on-walls-and-pages": "walls", "art-portfolio": "sketchbook", "art-portfolio/sketchbook": "sketchbook",
+      "art-portfolio/anxiety": "anxiety", "art-portfolio/snail": "snail", "art-portfolio/bird": "pollyart",
+      "art-portfolio/detective": "detective", "art-portfolio/halloween": "halloween", "art-portfolio/ai-art": "aiart"}
+OG_LOCALE = {"en": "en_US", "ru": "ru_RU", "lv": "lv_LV"}
+FLOCK_ALT = {"en": "Get your own pixel bird: a flock of pixel birds around a bench at night",
+             "ru": "Заведи свою пиксельную птичку: стая пиксельных птичек у скамейки ночью",
+             "lv": "Iegūsti savu pikseļu putniņu: pikseļu putniņu bars pie soliņa naktī"}
+
+
+def og_bits(page, path, lang, meta, og_alt):
+    """Превью ссылки: картинка раздела на языке страницы, og:locale, а для RU/LV — заголовок и описание из content/meta.json."""
+    key = OG.get(path, "flock")
+    alt = FLOCK_ALT[lang] if key == "flock" else og_alt.get(key, {}).get(lang, FLOCK_ALT[lang])
+    img = f"{SITE_URL}/assets/og-flock-{lang}.jpg" if key == "flock" else f"{SITE_URL}/assets/og/{key}-{lang}.jpg"
+    alts = "".join(f'<meta property="og:locale:alternate" content="{v}">' for k, v in OG_LOCALE.items() if k != lang)
+    page = (page.replace("{{og_image}}", img).replace("{{og_alt}}", esc(alt))
+            .replace("{{og_locale}}", OG_LOCALE[lang]).replace("{{og_locale_alt}}", alts))
+    tr = meta.get(path, {}).get(lang)
+    if tr:
+        title = esc(tr[0] if not path else f"{tr[0]} · Pigeon Polly Art Lab")
+        desc = esc(tr[1])
+        page = re.sub(r"<title>[^<]*</title>", f"<title>{title}</title>", page, count=1)
+        page = re.sub(r'(<meta (?:name="description"|property="og:description") content=")[^"]*', lambda m: m.group(1) + desc, page)
+        page = re.sub(r'(<meta property="og:title" content=")[^"]*', lambda m: m.group(1) + title, page)
+    return page
+
+
 # готовые, но пока не открытые страницы: не попадают в sitemap
 UNLISTED = {"blog-editor", "admin"}
 
@@ -572,6 +605,9 @@ def build():
     titos_cases()
     layout = (SRC / "layout.html").read_text()
     search_index = {lang: [] for lang in LANGS}
+    meta = json.loads((CONTENT / "meta.json").read_text())
+    og_idx = OUT / "assets" / "og" / "index.json"
+    og_alt = json.loads(og_idx.read_text()) if og_idx.exists() else {}
     for path, title, file, desc in PAGES:
         body = (SRC / "pages" / file).read_text()
         while "{{gallery:" in body:
@@ -604,6 +640,7 @@ def build():
                     .replace("{{content}}", page_body))
             page = localize(page, lang)
             page = page.replace("{{hreflang}}", hreflang).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
+            page = og_bits(page, path, lang, meta, og_alt)
             page = bust(page)
             dest = OUT / prefix / path / "index.html"
             dest.parent.mkdir(parents=True, exist_ok=True)
@@ -646,7 +683,7 @@ def build():
     nf = layout.replace("{{title}}", "Page not found · Pigeon Polly Art Lab").replace("{{description}}", "")
     nf = nf.replace("{{canonical}}", SITE_URL + "/").replace("{{nav}}", nav_html("404")).replace("{{footer_map}}", footer_html()).replace("{{body_class}}", "inner")
     nf = nf.replace("{{content}}", (SRC / "pages" / "404.html").read_text())
-    nf = nf.replace("{{hreflang}}", "").replace("{{lang_switch}}", "")
+    nf = og_bits(nf.replace("{{hreflang}}", "").replace("{{lang_switch}}", ""), "404", "en", {}, {})
     (OUT / "404.html").write_text(bust(nf))
     # sitemap
     urls = "".join(f"<url><loc>{SITE_URL}/{(v + '/') if v else ''}{(p + '/') if p else ''}</loc></url>"

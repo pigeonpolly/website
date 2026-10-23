@@ -1,0 +1,131 @@
+{
+  "_": "Заголовок и описание страницы на RU/LV для <title>, description и превью ссылок (og:title, og:description). build.py ставит их поверх словаря i18n. EN — в build.py PAGES.",
+  "": {
+    "ru": ["Pigeon Polly Art Lab", "Заведи свою пиксельную птичку и стань частью стаи, попробуй ежедневный челлендж по рисованию и мини-игры и бесплатно поддержи художника. Книги и рисунки автора Pigeon Polly."],
+    "lv": ["Pigeon Polly Art Lab", "Iegūsti savu pikseļu putniņu un pievienojies baram, izmēģini ikdienas zīmēšanas izaicinājumu un mini spēles un bez maksas atbalsti mākslinieci. Grāmatas un māksla no Pigeon Polly autores."]
+  },
+  "projects": {
+    "ru": ["Обучение и ИИ", "Проекты Алины Откинской: дизайн обучения, EdTech и автоматизация с ИИ."],
+    "lv": ["Mācības un MI", "Alīnas Otkinskas projekti: mācību dizains, EdTech un automatizācija ar mākslīgo intelektu."]
+  },
+  "work-with-me": {
+    "ru": ["Сотрудничество", "Дизайн обучения, ИИ в образовании и мастер-классы по скетчингу с Алиной Откинской."],
+    "lv": ["Sadarbība", "Mācību dizains, MI izglītībā un skicēšanas darbnīcas ar Alīnu Otkinsku."]
+  },
+  "challenge": {
+    "ru": ["Челлендж", "Ежедневный челлендж по рисованию с Pigeon Polly: одна тема, несколько цветов, несколько минут."],
+    "lv": ["Izaicinājums", "Ikdienas zīmēšanas izaicinājums ar Pigeon Polly: viena tēma, dažas krāsas, dažas minūtes."]
+  },
+  "e-books": {
+    "ru": ["Книги", "Книги Алины Откинской о рисовании и творчестве."],
+    "lv": ["Grāmatas", "Alīnas Otkinskas grāmatas par zīmēšanu un radošumu."]
+  },
+  "on-walls-and-pages": {
+    "ru": ["На стенах и страницах", "Выставки и публикации рисунков Pigeon Polly: на стенах галерей и печатных страницах."],
+    "lv": ["Uz sienām un lapām", "Pigeon Polly mākslas izstādes un publikācijas: galeriju sienās un drukātās lappusēs."]
+  },
+  "art-portfolio/anxiety": {
+    "ru": ["Тревога", "«Тревога» — серия рисунков эколайнами."],
+    "lv": ["Trauksme", "„Trauksme” — zīmējumu sērija ar ekolainiem."]
+  },
+  "art-portfolio/sketchbook": {
+    "ru": ["Страницы скетчбука", "Страницы из моего скетчбука."],
+    "lv": ["Skiču lapas", "Lapas no manas skiču burtnīcas."]
+  },
+  "art-portfolio/snail": {
+    "ru": ["Мистер Чу", "Улитка Мистер Чу: иллюстрации 2023–2025."],
+    "lv": ["Misters Čū", "Gliemezis Misters Čū: ilustrācijas 2023–2025."]
+  },
+  "art-portfolio/bird": {
+    "ru": ["Pigeon Polly", "Иллюстрации Pigeon Polly 2019–2026."],
+    "lv": ["Pigeon Polly", "Pigeon Polly ilustrācijas 2019–2026."]
+  },
+  "art-portfolio/detective": {
+    "ru": ["Детектив Титос", "Детектив Мистер Титос: иллюстрации."],
+    "lv": ["Detektīvs Titoss", "Detektīvs Misters Titoss: ilustrācijas."]
+  },
+  "art-portfolio/halloween": {
+    "ru": ["Семья Тыквоголовых", "Добро пожаловать в семью Тыквоголовых."],
+    "lv": ["Ķirbju ģimene", "Laipni lūdzam Ķirbjgalvu ģimenē."]
+  },
+  "art-portfolio/ai-art": {
+    "ru": ["AI-арт", "AI-арт в стиле традиционных рисунков Pigeon Polly."],
+    "lv": ["MI māksla", "MI māksla Pigeon Polly tradicionālās mākslas stilā."]
+  },
+  "privacy": {
+    "ru": ["Конфиденциальность", "Как pigeonpolly.com обращается с вашими данными."],
+    "lv": ["Privātums", "Kā pigeonpolly.com rīkojas ar jūsu datiem."]
+  },
+  "about-me": {
+    "ru": ["Обо мне", "Алина Откинская: дизайнер обучения, художница и автор Pigeon Polly. Портфолио, проекты и как работать вместе."],
+    "lv": ["Par mani", "Alīna Otkinska: mācību pieredzes dizainere, māksliniece un Pigeon Polly autore. Portfolio, projekti un kā strādāt kopā."]
+  },
+  "art-portfolio": {
+    "ru": ["Мой скетчбук", "Портфолио Алины Откинской: серии эколайнами, страницы скетчбука и ИИ-арт."],
+    "lv": ["Skiču burtnīca", "Alīnas Otkinskas mākslas portfolio: ekolainu sērijas, skiču burtnīcas lapas un MI māksla."]
+  },
+  "blog": {
+    "ru": ["Блог", "Заметки о рисовании, обучении и творчестве от Алины Откинской и Pigeon Polly."],
+    "lv": ["Blogs", "Piezīmes par zīmēšanu, mācīšanos un radošumu no Alīnas Otkinskas un Pigeon Polly."]
+  },
+  "polly-office": {
+    "ru": ["Полли, офисный клерк", "Пиксельный офис Полли: старые жалюзи, кулер и стол, на который можно нажимать. Включи вечер и смотри, как меняется свет."],
+    "lv": ["Pollija, biroja klerke", "Pollijas pikseļu birojs: vecas žalūzijas, ūdens dzesētājs un galds, uz kura var klikšķināt. Ieslēdz vakaru un vēro, kā mainās gaisma."]
+  },
+  "titos": {
+    "ru": ["Детектив Титос", "Помоги детективу Титосу раскрыть 100 дел в Wobbleland: ищи улики, допрашивай подозреваемых и следи, чтобы кофейник не опустел."],
+    "lv": ["Detektīvs Titoss", "Palīdzi detektīvam Titosam atrisināt 100 lietas Wobbleland: meklē pierādījumus, nopratini aizdomās turamos un raugies, lai kafijas kanna neiztukšotos."]
+  },
+  "polly-helps": {
+    "ru": ["Полли, помоги нарисовать", "Маленькие подсказки Полли: как нарисовать любой предмет из простых фигур и где найти идею с картой ассоциаций."],
+    "lv": ["Pollija, palīdzi uzzīmēt", "Pollijas mazie zīmēšanas padomi: kā uzzīmēt jebkuru priekšmetu no vienkāršām formām un kā atrast ideju ar asociāciju karti."]
+  },
+  "flock": {
+    "ru": ["Стая", "Наша стая пиксельных птичек: каждый, кто входит на сайт, получает свою. Рассыпь зёрна, позови ветер или дождь, устрой вечеринку и смотри, что будет."],
+    "lv": ["Putnu bars", "Mūsu pikseļu putniņu bars: katrs, kurš ienāk vietnē, saņem savu. Izber graudus, sauc vēju vai lietu, sarīko ballīti un skaties, kas notiks."]
+  },
+  "flock/news": {
+    "ru": ["Новости стаи", "Новости стаи: новые птички, рисунки дня, новоселья, бейджи, коллекционные карточки и новости от Полли."],
+    "lv": ["Bara ziņas", "Bara ziņas: jauni putniņi, dienas zīmējumi, ievākšanās ballītes, nozīmītes, kolekcijas kārtis un ziņas no Pollijas."]
+  },
+  "shop": {
+    "ru": ["Магазин", "Магазин Pigeon Polly: шапки, шарфы, рамки и сокровища для пиксельной птички — за пуговки, которые зарабатываются на сайте."],
+    "lv": ["Veikals", "Pigeon Polly veikals: cepures, šalles, rāmji un dārgumi tavam pikseļu putniņam — par pogām, ko nopelni vietnē."]
+  },
+  "games": {
+    "ru": ["Игры", "Игры Pigeon Polly: Пуговичный дождь, Зельеварня Полли, Блинная Полли, Детектив Титос, Офис Полли, Wobbleland и адвент-календарь. Зарабатывай пуговки и трать их в магазине."],
+    "lv": ["Spēles", "Pigeon Polly spēles: Pogu lietus, Pollijas dziru virtuve, Pollijas pankūkas, Detektīvs Titoss, Pollijas birojs, Wobbleland un adventes kalendārs. Pelni pogas un tērē tās veikalā."]
+  },
+  "bird": {
+    "ru": ["Профиль птички", "Птичка из стаи Pigeon Polly: её комната, сумка с подарками, достижения и рисунки из ежедневного челленджа."],
+    "lv": ["Putniņa profils", "Putniņš no Pigeon Polly bara: tā istaba, dāvanu soma, sasniegumi un zīmējumi no ikdienas izaicinājuma."]
+  },
+  "requests": {
+    "ru": ["Нарисуй мне", "Нарисуй мне: предложи, что нарисовать Алине, смотри, как каждая идея становится рисунком в скетчбуке, и получи подарок для птички, когда нарисуют твою."],
+    "lv": ["Uzzīmē man", "Uzzīmē man: iesaki, ko Alīnai uzzīmēt, skaties, kā katra ideja kļūst par zīmējumu skiču burtnīcā, un saņem dāvanu putniņam, kad tavējā ir uzzīmēta."]
+  },
+  "rain": {
+    "ru": ["Пуговичный дождь", "Пуговичный дождь: маленькая игра Pigeon Polly. Лови падающие пуговки своей птичкой, уворачивайся от клякс и зарабатывай пуговки для магазина. Бесконечные уровни."],
+    "lv": ["Pogu lietus", "Pogu lietus: maza Pigeon Polly spēle. Ķer krītošās pogas ar savu putniņu, izvairies no tintes traipiem un pelni pogas veikalam. Bezgalīgi līmeņi."]
+  },
+  "pancakes": {
+    "ru": ["Блинная Полли", "Блинная Полли: маленькая игра Pigeon Polly. Пеки блинчики жителям Wobbleland: выбери сковородку, переверни вовремя, добавь топпинги и зарабатывай пуговки. Бесконечные уровни."],
+    "lv": ["Pollijas pankūkas", "Pollijas pankūkas: maza Pigeon Polly spēle. Cep pankūkas Wobbleland iedzīvotājiem: izvēlies pannu, apgriez īstajā brīdī, pievieno piedevas un pelni pogas. Bezgalīgi līmeņi."]
+  },
+  "potions": {
+    "ru": ["Зельеварня Полли", "Зельеварня Полли: игра на Хеллоуин. Броди по бесконечным лабиринтам с пиксельной птичкой, собирай ингредиенты, открывай рецепты зелий и зарабатывай пуговки."],
+    "lv": ["Pollijas dziru virtuve", "Pollijas dziru virtuve: Helovīna spēle. Staigā pa bezgalīgiem labirintiem ar savu pikseļu putniņu, vāc sastāvdaļas, atklāj dziru receptes un pelni pogas."]
+  },
+  "advent": {
+    "ru": ["Адвент-календарь", "Адвент-календарь Pigeon Polly: с 1 по 31 декабря открывай по окошку в день — оттуда вылетает пиксельная птичка с подарком для профиля."],
+    "lv": ["Adventes kalendārs", "Pigeon Polly adventes kalendārs: no 1. līdz 31. decembrim atver pa lodziņam dienā — no tā izlido pikseļu putniņš ar dāvanu tavam profilam."]
+  },
+  "palettes": {
+    "ru": ["Палитры", "Палитры из акварелей и скетчбука Pigeon Polly: шесть цветов с HEX-кодами из каждого рисунка. Скопируй цвет, выбери палитру и рисуй."],
+    "lv": ["Paletes", "Krāsu paletes no Pigeon Polly akvareļiem un skiču burtnīcas: sešas krāsas ar HEX kodiem no katra darba. Nokopē krāsu, izvēlies paleti un zīmē."]
+  },
+  "wobbleland": {
+    "ru": ["Wobbleland", "Wobbleland: остров из одиннадцати городов, нарисованный пикселями. Исследуй интерактивную карту и знакомься с каждым городом вместе с Полли."],
+    "lv": ["Wobbleland", "Wobbleland: vienpadsmit pilsētu sala, uzzīmēta pikseļos. Izpēti interaktīvo karti un iepazīsti katru pilsētu kopā ar Polliju."]
+  }
+}

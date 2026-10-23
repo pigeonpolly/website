@@ -33,7 +33,7 @@
   // уровни серии — те же, что в sketch-wall.js LEVELS
   const LV = { 1: ['Egg', 'Яйцо', 'Ola'], 3: ['Chick', 'Птенец', 'Cālis'], 7: ['Little pigeon', 'Голубёнок', 'Balodītis'], 14: ['Carrier pigeon', 'Почтовый голубь', 'Pasta balodis'],
     30: ['Travelling pigeon', 'Голубь-путешественник', 'Ceļotājs balodis'], 60: ['Artist pigeon', 'Голубь-художник', 'Mākslinieks balodis'], 100: ['Astronaut pigeon', 'Голубь-астронавт', 'Astronauts balodis'], 365: ['Polly legend', 'Легенда Полли', 'Pollijas leģenda'] };
-  const ICON = { daily: '🚪', draw: '🎨', comment: '💬', rain: '🌧', potion: '🧪', pan: '🥞', titos: '🕵️', bugs: '🪲', advent: '🎄' };
+  const ICON = { daily: '🚪', draw: '🎨', comment: '💬', rain: '🌧', potion: '🧪', pan: '🥞', titos: '🕵️', bugs: '<svg class="pd-bug" viewBox="0 0 40 32" aria-hidden="true"><path d="M14 9l-4-5M20 9l0-6M26 9l4-5M14 23l-4 5M20 23l0 6M26 23l4 5" stroke="#2a1b10" stroke-width="1.8" stroke-linecap="round" fill="none"/><ellipse cx="19" cy="16" rx="11" ry="8" fill="#5b3a1f"/><path d="M19 8v16" stroke="#2a1b10" stroke-width="1.2"/><circle cx="32" cy="16" r="4.5" fill="#2a1b10"/><path d="M35 13l4-3M35 19l4 3" stroke="#2a1b10" stroke-width="1.4" stroke-linecap="round"/></svg>', advent: '🎄' };
   // история пуговок: за что
   const KIND = { daily: ['Visit', 'Заход', 'Apmeklējums'], upload: ['Drawing', 'Рисунок', 'Zīmējums'], comment: ['Comment', 'Комментарий', 'Komentārs'], friend: ['Friend', 'Друг', 'Draugs'], welcome: ['Welcome gift', 'Подарок новичку', 'Dāvana jaunpienācējam'],
     pick: ['Polly’s pick', 'Выбор Полли', 'Pollijas izvēle'], badge: ['Badge', 'Бейдж', 'Nozīmīte'], game: ['Button Rain', 'Пуговичный дождь', 'Pogu lietus'], gamerec: ['Rain record', 'Рекорд дождя', 'Lietus rekords'],

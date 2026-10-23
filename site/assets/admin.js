@@ -50,9 +50,10 @@
     { id: 'strict', ic: '🛡', name: 'Строгий режим', group: 'service', open: 'comments', focus: '#adm-strict', about: 'Строгий режим комментариев: не больше одного комментария в час с одного адреса.' },
     { id: 'security', ic: '🔐', name: 'Защита', group: 'service', about: 'PIN админа и код восстановления на случай, если потеряете Google.' },
   ];
+  let cardOpen = null; // карточка, которую открыть сразу (из поиска)
   const SECTIONS = { notes, titos, inbox, security, overview: inbox, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art, challenge: () => statsView('challenge'), flock: () => statsView('flock'),
     themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
-    cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
+    cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main, { open: cardOpen, done: () => { cardOpen = null; } }) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
     carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
   const secOf = id => ADMIN_SECTIONS.find(x => x.id === id);
   const nav = document.getElementById('adm-nav');
@@ -67,7 +68,8 @@
     if (about) about.innerHTML = x.name ? `<h2>${x.ic} ${x.name}</h2>${x.about ? `<p>${x.about}</p>` : ''}` : '';
     if (x.id === 'subscribers') api('admin/inbox/seen', { k: 'subs' }).then(() => counts()).catch(() => {}); // открыла — новые уже не новые
     await (SECTIONS[x.open || x.id] || inbox)();
-    const f = typeof x.focus === 'function' ? x.focus(main) : x.focus ? main.querySelector(x.focus) : null;
+    const fx = findFocus || x.focus; findFocus = null;
+    const f = typeof fx === 'function' ? fx(main) : fx ? main.querySelector(fx) : null;
     if (f) {
       for (let d = f.closest('details'); d; d = d.parentElement && d.parentElement.closest('details')) d.open = true;
       const box = f.closest('.adm-box, section, label, p') || f;
@@ -75,6 +77,70 @@
     }
   }
   addEventListener('hashchange', route);
+
+  // ---------- 🔍 поиск по кабинету: разделы, птички (ник), вещи, карточки, статьи, правила ----------
+  // данные грузятся при первом вводе; результат открывает нужный экран с уже вписанным фильтром
+  let findFocus = null, findData = null;
+  const norm = v => String(v || '').toLowerCase().replace(/ё/g, 'е');
+  function goTo(hash, focus) { findFocus = focus || null; if (location.hash === hash) route(); else location.hash = hash; }
+  function findLoad() {
+    if (findData) return findData;
+    const cardsApi = fetch('/api/admin/cards', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : {});
+    return (findData = Promise.all([api('admin/users').catch(() => ({})), cardsApi.catch(() => ({})), api('blog/admin/posts').catch(() => ({}))])
+      .then(([u, c, b]) => {
+        const B = window.PPBirds, items = [];
+        if (B) B.GIFT_KINDS.forEach(k => (B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).forEach(v => { if (v !== '?') items.push({ kind: k[0], kindName: k[1][1], item: v, name: B.giftName(k[0], v, 1) }); }));
+        return { users: u.users || [], cards: c.cards || [], posts: b.posts || [], items };
+      }));
+  }
+  const find = document.getElementById('adm-find');
+  if (find) {
+    const inp = find.querySelector('input'), out = find.querySelector('.adm-find-res');
+    const hit = (q, ...vs) => vs.some(v => norm(v).includes(q));
+    const grp = (h, rows) => rows.length ? `<p class="adm-find-g">${h}</p>${rows.join('')}` : '';
+    const row = (a, ic, t, sub = '') => `<a href="${a.href || '#'}"${a.go ? ` data-go="${a.go}"` : ''}${a.href && a.href[0] === '/' ? ' target="_blank"' : ''}><span class="adm-find-ic">${ic}</span><span>${esc(t)}${sub ? `<small>${esc(sub)}</small>` : ''}</span></a>`;
+    let acts = [], seq = 0;
+    async function draw() {
+      const raw = inp.value.trim(), q = norm(raw).replace(/^[@№#]/, ''), my = ++seq;
+      if (!q) { out.hidden = true; out.innerHTML = ''; return; }
+      const secs = ADMIN_SECTIONS.filter(x => hit(q, x.name, x.about, ADMIN_GROUPS[x.group]));
+      acts = [];
+      const act = fn => { acts.push(fn); return 'a' + (acts.length - 1); };
+      const html0 = grp('Разделы', secs.slice(0, 6).map(x => row(x.href ? { href: x.href } : { go: act(() => goTo('#' + x.id)) }, x.ic, x.name, ADMIN_GROUPS[x.group] || '')));
+      out.hidden = false;
+      out.innerHTML = html0 + '<p class="be-note adm-find-wait">Ищу…</p>';
+      const D = await findLoad();
+      if (my !== seq) return;
+      const users = D.users.filter(u => u.nick && hit(q, u.nick)).slice(0, 6);
+      const items = D.items.filter(x => hit(q, x.name, x.item)).slice(0, 6);
+      const cards = D.cards.filter(c => String(c.n) === q || hit(q, c.t_ru, c.t_en, c.t_lv)).slice(0, 6);
+      const posts = D.posts.filter(p => hit(q, p.t_ru, p.t_en, p.t_lv, p.slug)).slice(0, 6);
+      const html = html0
+        + grp('Птички', users.map(u => row({ go: act(() => { bq = u.nick; goTo('#birds'); }) }, '🐦', '@' + u.nick, `🔘 ${n(u.buttons)} · рисунков ${n(u.works)}`)))
+        + grp('Вещи', items.map(x => row({ go: act(() => { sq = x.name; sFilter = 'all'; sStock = 'all'; goTo('#shop', m => m.querySelector(`.adm-shop tr[data-k="${x.kind}"][data-i="${CSS.escape(x.item)}"]`)); }) }, '🛍', x.name, x.kindName)))
+        + grp('Карточки', cards.map(c => row({ go: act(() => { cardOpen = c.id; goTo('#cards'); }) }, '🃏', `№${c.n} ${c.t_ru || c.t_en || c.t_lv || ''}`, c.owner_nick ? '@' + c.owner_nick : c.hidden ? 'скрыта' : '')))
+        + grp('Статьи', posts.map(p => row({ href: '/blog-editor/#' + p.id }, '✍️', title(p), p.status === 'published' ? 'опубликована' : p.status === 'scheduled' ? 'запланирована' : 'черновик')))
+        + grp('Правила и настройки', [row({ go: act(() => goTo('#rules', m => {
+          m.querySelectorAll('details').forEach(d => { d.open = true; });
+          return [...m.querySelectorAll('.adm-rules td:first-child, .adm-rules h3, .adm-box h3, label')].find(e => norm(e.textContent).includes(q));
+        })) }, '📜', `«${raw}» в 📜 Все правила`)]);
+      out.innerHTML = html;
+    }
+    let tm = 0;
+    inp.oninput = () => { clearTimeout(tm); tm = setTimeout(draw, 120); };
+    inp.onfocus = () => { findLoad(); if (inp.value.trim()) out.hidden = false; };
+    inp.onkeydown = e => {
+      if (e.key === 'Escape') { inp.value = ''; draw(); inp.blur(); }
+      if (e.key === 'Enter') { e.preventDefault(); const a = out.querySelector('a'); if (a) a.click(); }
+    };
+    out.onclick = e => {
+      const a = e.target.closest('a'); if (!a) return;
+      if (a.dataset.go) { e.preventDefault(); acts[+a.dataset.go.slice(1)](); }
+      out.hidden = true;
+    };
+    document.addEventListener('click', e => { if (!find.contains(e.target)) out.hidden = true; });
+    document.addEventListener('keydown', e => { if (e.key === '/' && !/INPUT|TEXTAREA|SELECT/.test(document.activeElement.tagName) && !document.activeElement.isContentEditable) { e.preventDefault(); inp.focus(); } });
+  }
 
   // ---------- 📥 входящие: только то, что ждёт Алину ----------
   let inboxData = null;

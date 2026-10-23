@@ -13,7 +13,7 @@ import { flockApi, featherNews, FLOCK_TABLES, FLOCK_ALTER } from './flock.js'; /
 import { flockNewsApi, flockEvent as flockEventDb, roomEvent, flockNewsCron, FLOCK_NEWS_TABLES, FLOCK_NEWS_ALTER } from './flock-news.js'; // новости стаи (этап 13 Г, docs/flock.md)
 import { topApi, topScore, topCron, TOP_TABLES } from './top.js'; // доски топа игр (docs/games.md)
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
-import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
+import { titosApi, titosState, importTitos, caseOg, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
 const ADMIN_HASHES = ['80ac2786b60d61a30d6691a3d40de5d784cdefc580717add788821a7bf900118'];
@@ -116,7 +116,10 @@ async function sitePage(req, env, url) {
   // ссылка «моя птичка» (/flock/?bird=ник): в превью мессенджеров — карточка этой птички
   const bird = /^\/(?:(?:ru|lv)\/)?flock\/$/.test(url.pathname) ? String(url.searchParams.get('bird') || '').replace(/^@/, '') : '';
   const birdOk = /^[\p{L}\p{N}_.-]{2,24}$/u.test(bird);
-  if (!hidden.size && !html.size && !struct && !birdOk && !hid.length) return out;
+  // ссылка на дело Титоса (/titos/?case=N): в превью — номер и название дела
+  const caseN = /^\/(?:(?:ru|lv)\/)?titos\/$/.test(url.pathname) ? Math.floor(Number(url.searchParams.get('case')) || 0) : 0;
+  const tog = caseN > 0 && caseN <= 1000 ? await caseOg(env, caseN, lang).catch(() => null) : null;
+  if (!hidden.size && !html.size && !struct && !birdOk && !hid.length && !tog) return out;
   const anyLang = id => html.get(id) ?? (rows.find(r => r.id === id && r.html != null && ['en', 'ru', 'lv'].includes(r.lang)) || {}).html;
   const rw = new HTMLRewriter();
   const hidSet = new Set(hid.map(r => r.src)); // картины, скрытые Алиной в галереях «Мой скетчбук» (вернуть — в самой галерее)
@@ -130,6 +133,11 @@ async function sitePage(req, env, url) {
       .on('meta[property="og:title"]', set(og[0])).on('meta[property="og:description"]', set(og[1])).on('meta[name="description"]', set(og[1]))
       .on('meta[property="og:url"]', set(url.href)).on('meta[property="og:image:alt"]', set(og[0]))
       .on('title', { element(el) { el.setInnerContent(og[0]); } });
+  }
+  if (tog) {
+    const set = v => ({ element(el) { el.setAttribute('content', v); } });
+    rw.on('meta[property="og:title"]', set(tog[0])).on('meta[property="og:description"]', set(tog[1])).on('meta[name="description"]', set(tog[1]))
+      .on('meta[property="og:url"]', set(url.origin + url.pathname + '?case=' + caseN)).on('title', { element(el) { el.setInnerContent(tog[0] + ' · Pigeon Polly Art Lab'); } });
   }
   if (struct) {
     if (Array.isArray(struct.order) && struct.order.length) {

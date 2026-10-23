@@ -22,6 +22,12 @@
 - Алина грузит через GitHub (Upload files) в корень: `polly_`, `chew_`, `titos_`, `pumpkin_`, `anxiety_`, `sketchbook_`, `aiart_`, `exhibition_`, `publication_`, подпись в имени (`polly_(2026) Pigeon Polly Fancy Life.jpg`) → `python3 tools/import_uploads.py` (ужимает, раскладывает, удаляет исходники) → `python3 build.py`.
 - Вручную: `python3 tools/add_images.py <галерея> файлы…` (ImageMagick).
 
+## Превью ссылок (этап 18)
+- Каждая страница: `og:image` 1200×630 своего раздела на языке страницы, `og:image:alt`, `og:locale` + `og:locale:alternate`, `twitter:card`. Страница → карточка — build.py `OG`; картинки — `python3 tools/og_cards.py [ключи] [--sheet]` (тексты на 3 языках в `CARDS`, рисует Chromium, шрифт tools/og/Lora-Bold.ttf) → site/assets/og/<ключ>-<язык>.jpg + index.json (подписи). Главная, стая, профиль, «Конфиденциальность» — og-flock-<язык>.jpg.
+- Заголовок и описание на RU/LV — content/meta.json (поверх словаря i18n), EN — build.py `PAGES`.
+- Свои превью: статья блога — обложка (worker/blog.js `fill`), птичка /flock/?bird=ник — её карточка (/api/birdcard), дело Титоса /titos/?case=N — «Дело №N · название» (worker/titos.js `caseOg`). Новый раздел = строка в `OG` + карточка в `CARDS` + перевод в meta.json.
+- После смены картинок — Facebook Sharing Debugger → Scrape Again.
+
 ## Дизайн
 - Фон `#2B1A51`, фиолетовый `#534AB7`, текст `#F3EFFA`, приглушённый `#D9D3F2`, персик `#F0A987`, оранжевый `#D85A30`, звезда `#E9A93B`, точки `#F5C4B3`, светлые карточки `#F4F0FA`.
 - Google Fonts: Fraunces 600 — заголовки, Karla 400/500/700 — текст. Кнопки-«пилюли». Герой — Полли-астронавт в арке с оранжевой рамкой.

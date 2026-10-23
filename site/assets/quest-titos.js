@@ -91,8 +91,10 @@
     const open = srv.on ? (srv.state.level || 0) + 1 : 2;
     const CASES = (info.cases || []).filter(c => c.n <= open);
     if (!CASES.length) return;
-    let pick = 0; try { pick = Number(localStorage.getItem('pp-titos-case')) || 0; } catch (e) {}
+    const qs = new URL(location.href); // ?case=N — ссылка на дело (превью в соцсетях — worker caseOg); в адресе всегда открытое дело
+    let pick = Number(qs.searchParams.get('case')) || 0; try { pick = pick || Number(localStorage.getItem('pp-titos-case')) || 0; } catch (e) {}
     if (!CASES.some(c => c.n === pick)) pick = srv.on ? CASES[CASES.length - 1].n : load(OLD[1]).solved ? Math.min(2, CASES.length) : 1; // по умолчанию — первое нераскрытое
+    qs.searchParams.set('case', pick); history.replaceState(history.state, '', qs.pathname + qs.search + qs.hash);
     const cd = await api(`/api/titos/case?n=${pick}&lang=${LANG}`);
     if (!cd.case) return;
     engine(fromData(cd.case), CASES, srv);

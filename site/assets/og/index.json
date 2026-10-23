@@ -1,0 +1,132 @@
+{
+ "games": {
+  "en": "Pigeon Polly games. Button Rain, pancakes, potions and Detective Titos. Earn buttons, spend them in the shop.",
+  "ru": "Игры Pigeon Polly. Пуговичный дождь, блинчики, зелья и детектив Титос. Зарабатывай пуговки и трать их в магазине.",
+  "lv": "Pigeon Polly spēles. Pogu lietus, pankūkas, dziras un detektīvs Titoss. Pelni pogas un tērē tās veikalā."
+ },
+ "shop": {
+  "en": "The Pigeon Polly shop. Dress up your pixel bird and furnish its room — with buttons earned on the site.",
+  "ru": "Магазин Pigeon Polly. Наряды для пиксельной птички и вещи для её комнаты — за пуговки, заработанные на сайте.",
+  "lv": "Pigeon Polly veikals. Apģērb savu pikseļu putniņu un iekārto tā istabu — par pogām, kas nopelnītas vietnē."
+ },
+ "rain": {
+  "en": "Button Rain. Catch falling buttons with your pixel bird and dodge the ink blots.",
+  "ru": "Пуговичный дождь. Лови падающие пуговки своей пиксельной птичкой и уворачивайся от клякс.",
+  "lv": "Pogu lietus. Ķer krītošās pogas ar savu pikseļu putniņu un izvairies no tintes traipiem."
+ },
+ "challenge": {
+  "en": "Daily drawing challenge. One theme, a few colours and a timer. Draw, upload and keep your streak.",
+  "ru": "Ежедневный челлендж. Одна тема, несколько цветов и таймер. Рисуй, загружай и держи серию.",
+  "lv": "Ikdienas izaicinājums. Viena tēma, dažas krāsas un taimeris. Zīmē, augšupielādē un turpini sēriju."
+ },
+ "pancakes": {
+  "en": "Polly’s Pancakes. Bake pancakes for the residents of Wobbleland — every customer wants something different.",
+  "ru": "Блинная Полли. Пеки блинчики жителям Wobbleland — каждому клиенту нужно своё.",
+  "lv": "Pollijas pankūkas. Cep pankūkas Wobbleland iedzīvotājiem — katram klientam vajag ko citu."
+ },
+ "potions": {
+  "en": "Polly’s Potion Lab. Walk endless mazes, collect ingredients and discover potions with silly names.",
+  "ru": "Зельеварня Полли. Бесконечные лабиринты, ингредиенты и зелья с забавными названиями.",
+  "lv": "Pollijas dziru virtuve. Bezgalīgi labirinti, sastāvdaļas un dziras ar smieklīgiem nosaukumiem."
+ },
+ "titos": {
+  "en": "Detective Titos. Find clues, question suspects and keep the coffee pot from running dry.",
+  "ru": "Детектив Титос. Ищи улики, допрашивай подозреваемых и следи, чтобы кофейник не опустел.",
+  "lv": "Detektīvs Titoss. Meklē pierādījumus, nopratini aizdomās turamos un neļauj kafijas kannai iztukšoties."
+ },
+ "office": {
+  "en": "Polly, Office Clerk. Help Polly with the mail of the Council of Towns. Click the desk, the cooler and the blinds.",
+  "ru": "Полли, офисный клерк. Помоги Полли с почтой Совета городов. Нажимай на стол, кулер и жалюзи.",
+  "lv": "Pollija, biroja klerke. Palīdzi Pollijai ar Pilsētu padomes pastu. Klikšķini uz galda, dzesētāja un žalūzijām."
+ },
+ "wobbleland": {
+  "en": "Welcome to Wobbleland. An interactive pixel map with holidays, recipes and residents of every town.",
+  "ru": "Добро пожаловать в Wobbleland. Интерактивная пиксельная карта: праздники, рецепты и жители каждого города.",
+  "lv": "Laipni lūdzam Wobbleland. Interaktīva pikseļu karte ar katras pilsētas svētkiem, receptēm un iedzīvotājiem."
+ },
+ "advent": {
+  "en": "Advent calendar. Open a window every day — a pixel bird flies out with a gift for your profile.",
+  "ru": "Адвент-календарь. Открывай по окошку в день — оттуда вылетает птичка с подарком для профиля.",
+  "lv": "Adventes kalendārs. Atver pa lodziņam katru dienu — izlido putniņš ar dāvanu tavam profilam."
+ },
+ "blog": {
+  "en": "Blog of Pigeon Polly. Drawing, learning and creativity: what I try, what works and what Polly thinks about it.",
+  "ru": "Блог Pigeon Polly. Рисование, обучение и творчество: что я пробую, что работает и что об этом думает Полли.",
+  "lv": "Pigeon Polly blogs. Zīmēšana, mācīšanās un radošums: ko es izmēģinu, kas strādā un ko par to domā Pollija."
+ },
+ "requests": {
+  "en": "Draw this for me. Suggest anything to draw — every idea becomes a sketchbook page.",
+  "ru": "Нарисуй мне. Предложи, что нарисовать, — каждая идея становится страницей скетчбука.",
+  "lv": "Uzzīmē man. Iesaki, ko uzzīmēt, — katra ideja kļūst par skiču burtnīcas lapu."
+ },
+ "palettes": {
+  "en": "Palettes from my paintings. Copy a colour, pick a palette and draw — or make one from your own photo.",
+  "ru": "Палитры из моих картин. Скопируй цвет, выбери палитру и рисуй — или собери свою из фото.",
+  "lv": "Paletes no maniem darbiem. Nokopē krāsu, izvēlies paleti un zīmē — vai izveido savu no foto."
+ },
+ "helps": {
+  "en": "Polly, help me draw. How to draw anything from simple shapes, and where to find ideas.",
+  "ru": "Полли, помоги нарисовать. Как нарисовать что угодно из простых фигур и где найти идею.",
+  "lv": "Pollija, palīdzi uzzīmēt. Kā uzzīmēt jebko no vienkāršām formām un kur atrast idejas."
+ },
+ "books": {
+  "en": "Books by Alina Otkinska. Urban sketching, ink, watercolor and a colouring book.",
+  "ru": "Книги Алины Откинской. Городской скетчинг, линер, акварель и раскраска.",
+  "lv": "Alīnas Otkinskas grāmatas. Pilsētas skicēšana, tinte, akvarelis un krāsojamā grāmata."
+ },
+ "about": {
+  "en": "Alina Otkinska. Author of Pigeon Polly. Art, books and learning design from Riga.",
+  "ru": "Алина Откинская. Автор Pigeon Polly. Рисунки, книги и дизайн обучения из Риги.",
+  "lv": "Alīna Otkinska. Pigeon Polly autore. Māksla, grāmatas un mācību dizains no Rīgas."
+ },
+ "projects": {
+  "en": "Learning & AI projects. Courses, tools and automation that help people learn.",
+  "ru": "Проекты: обучение и ИИ. Курсы, инструменты и автоматизация, которые помогают учиться.",
+  "lv": "Projekti: mācības un MI. Kursi, rīki un automatizācija, kas palīdz mācīties."
+ },
+ "work": {
+  "en": "Work with me. Learning design, AI in education and sketching workshops.",
+  "ru": "Работать вместе. Дизайн обучения, ИИ в образовании и мастер-классы по скетчингу.",
+  "lv": "Sadarbība ar mani. Mācību dizains, MI izglītībā un skicēšanas darbnīcas."
+ },
+ "walls": {
+  "en": "On walls & pages. Pigeon Polly art on gallery walls and printed pages.",
+  "ru": "На стенах и страницах. Рисунки Pigeon Polly на стенах галерей и печатных страницах.",
+  "lv": "Uz sienām un lapām. Pigeon Polly māksla galeriju sienās un drukātās lappusēs."
+ },
+ "sketchbook": {
+  "en": "My sketchbook. Character series, sketchbook pages and experiments.",
+  "ru": "Мой скетчбук. Серии персонажей, страницы скетчбука и эксперименты.",
+  "lv": "Mana skiču burtnīca. Tēlu sērijas, skiču burtnīcas lapas un eksperimenti."
+ },
+ "anxiety": {
+  "en": "Anxiety. A series of drawings in ecolines by Alina Otkinska.",
+  "ru": "Тревога. Серия рисунков эколайнами Алины Откинской.",
+  "lv": "Trauksme. Alīnas Otkinskas zīmējumu sērija ar ekolainiem."
+ },
+ "snail": {
+  "en": "Mr.Chew the snail. An Australian postal snail and his small adventures.",
+  "ru": "Улитка Мистер Чу. Австралийская почтовая улитка и её маленькие приключения.",
+  "lv": "Gliemezis Misters Čū. Austrālijas pasta gliemezis un viņa mazie piedzīvojumi."
+ },
+ "pollyart": {
+  "en": "Pigeon Polly. An office clerk pigeon from Wobbleland and her everyday life.",
+  "ru": "Pigeon Polly. Голубь Полли, офисный клерк из Wobbleland, и её будни.",
+  "lv": "Pigeon Polly. Balodis Pollija, biroja klerke no Wobbleland, un viņas ikdiena."
+ },
+ "detective": {
+  "en": "Detective Mr.Titos. Late nights in the office of the most perky detective of Wobbleland.",
+  "ru": "Детектив Мистер Титос. Поздний вечер в кабинете самого бодрого детектива Wobbleland.",
+  "lv": "Detektīvs Misters Titoss. Vēls vakars visenerģiskākā Wobbleland detektīva birojā."
+ },
+ "halloween": {
+  "en": "The Pumpkin Family. Welcome to the family of the Pumpkin-Heads.",
+  "ru": "Семья Тыквоголовых. Добро пожаловать в семью Тыквоголовых.",
+  "lv": "Ķirbju ģimene. Laipni lūdzam Ķirbjgalvu ģimenē."
+ },
+ "aiart": {
+  "en": "AI art. AI art based on the traditional Pigeon Polly art style.",
+  "ru": "AI-арт. AI-арт в стиле традиционных рисунков Pigeon Polly.",
+  "lv": "MI māksla. MI māksla Pigeon Polly tradicionālās mākslas stilā."
+ }
+}

@@ -160,6 +160,16 @@ function forClient(c, lang, tr) {
   x.clues = (x.clues || []).map(({ against, clears, refutes, fake, ...rest }) => rest);
   return x;
 }
+// превью ссылки /titos/?case=N: «Дело №N · название» на языке страницы (worker/index.js, этап 18); без завязки — чтобы не подсказывать
+export async function caseOg(env, n, lang) {
+  const c = n > 0 ? await caseOf(env, n) : null;
+  if (!c) return null;
+  const title = resolve(parseJ(c.data, {}).title || { ru: '' }, lang, parseJ(c.tr, {}));
+  return [{ en: `Case №${n} · ${title}`, ru: `Дело №${n} · ${title}`, lv: `Lieta Nr. ${n} · ${title}` }[lang],
+    { en: 'Help Detective Titos solve this case in Wobbleland: find clues, question suspects and name the culprit.',
+      ru: 'Помоги детективу Титосу раскрыть это дело в Wobbleland: найди улики, допроси подозреваемых и назови виновного.',
+      lv: 'Palīdzi detektīvam Titosam atrisināt šo lietu Wobbleland: atrodi pierādījumus, nopratini aizdomās turamos un nosauc vainīgo.' }[lang]];
+}
 async function caseOf(env, n) { return env.DB.prepare('SELECT * FROM titos_cases WHERE n = ?').bind(n).first(); }
 async function caseCount(env) { return (await env.DB.prepare('SELECT COUNT(*) AS n, COALESCE(MAX(n), 0) AS top FROM titos_cases').first()); }
 // улики, которые надо найти: все улики дела; «клик» по лупе — 'lens'

@@ -21,10 +21,13 @@
     stats: (c.stats || []).map(s => ({ name: s.ru || s[c.src_lang] || s.en || '', v: s.v })), owner: c.owner_id ? { nick: c.owner_nick } : null });
   const missing = c => LANGS.some(l => !c['t_' + l] || (pick(c, 'd', 'ru') && !c['d_' + l]) || (c.stats || []).some(s => !s[l]));
 
-  async function mount(el) {
+  async function mount(el, o = {}) {
     main = el; main.innerHTML = '<p class="be-note">Загрузка…</p>';
     try { D = await api(''); } catch (e) { main.innerHTML = `<p class="be-note">${errText(e)}</p>`; return; }
     draw();
+    const c = o.open && D.cards.find(x => x.id === o.open); // из поиска кабинета: сразу окно этой карточки
+    if (o.done) o.done();
+    if (c) edit(c);
   }
   function draw() {
     const P = window.PPCards;
