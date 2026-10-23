@@ -581,6 +581,13 @@
         row('Лишний кофе (кофейник полный) — пуговки за чашку', pct('titosSellPct') + ` → сейчас ${G.titosSell} 🔘`, D.titosSellPct + ' %', 'не меньше 1 🔘'),
         row('…не больше чашек в сутки', num('titosSellDayMax', R.titosSellDayMax, D.titosSellDayMax) + ' чаш.', D.titosSellDayMax, '0 — лишний кофе не продаётся'),
       ], 'Награды за уровни 30, 50, 90 и 100 — вещи для комнаты: их нет в магазине, подарить и продать нельзя. <a href="/ru/titos/">Открыть игру →</a>')}
+      ${box('🚪 Дом птички — что открывает комнату', [
+        row('🍳 Кухня: уровень в «Блинной Полли»', num('homeKitchen', R.homeKitchen, D.homeKitchen), D.homeKitchen, 'считается рекорд'),
+        row('🛏 Спальня: пёрышек в чужих комнатах', num('homeBedroom', R.homeBedroom, D.homeBedroom), D.homeBedroom),
+        row('🕯 Склеп: раскрытых дел Титоса', num('homeCrypt', R.homeCrypt, D.homeCrypt), D.homeCrypt),
+        row('🛁 Ванная: уровень в «Пуговичном дожде»', num('homeBath', R.homeBath, D.homeBath), D.homeBath, 'считается рекорд'),
+        row('💼 Кабинет: задача Оффис Полли', num('homeOffice', R.homeOffice, D.homeOffice), D.homeOffice, '1 — «Ответ Совету городов»'),
+      ], '0 — комната открыта сразу. Уже выполнившим условие раньше комната открыта сама.')}
       ${box('🎄 Адвент', advRows)}
       ${box('🎨 Темы челленджа — подбор плана месяца', [
         row('Одна семья предметов (яблоко, корзина яблок…) — не ближе', num('chFamilyGap', R.chFamilyGap, D.chFamilyGap) + ' дн.', D.chFamilyGap + ' дн.', 'и никогда дважды в одном месяце'),
