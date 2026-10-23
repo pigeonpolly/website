@@ -4800,3 +4800,99 @@ p.pk-big.pk-rub { margin: 0; text-align: center; background: #BFE3FF; cursor: de
 .site-header.c1 .hd-cart, .site-header.c2 .hd-cart, .site-header.c3 .hd-cart { width: 30px; }
 /* Кнопка перехода между комнатами (белый кружок с дверью) */
 .room-door-btn { position: absolute; right: 12px; bottom: 8px; z-index: 20; width: 44px; height: 44px; border-radius: 50%; background: #2B1A51; border: 4px solid #ffffff; display: flex; align-items: center; justify-content: center; font-size: 24px; cursor: pointer; box-shadow: 0 4px 14px rgba(0,0,0,0.5); transition: transform 0.15s ease, background 0.15s ease; padding: 0; line-height: 1; } .room-door-btn:hover { transform: scale(1.12); background: #432b7a; border-color: #F0A987; }
+/* дом птички (этап 20): план дома по двери в комнате (room.js) */
+.room-plan { position: absolute; inset: 0; z-index: 25; display: flex; align-items: center; justify-content: center; background: rgba(20, 12, 40, .55); padding: 10px; }
+.room-plan[hidden] { display: none; }
+.room-plan-in { background: #FFF8EE; color: #2B1A51; border: 3px solid #2B1A51; border-radius: 14px; padding: 10px 12px; width: min(420px, 100%); max-height: 100%; overflow: auto; box-shadow: 0 8px 24px rgba(0, 0, 0, .35); }
+.room-plan-top { display: flex; align-items: center; justify-content: space-between; margin-bottom: 8px; }
+.room-plan-x { border: 0; background: none; font-size: 18px; cursor: pointer; color: #2B1A51; padding: 2px 6px; }
+.room-plan-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 6px; }
+.room-plan-grid button { position: relative; display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; border: 2px solid #2B1A51; border-radius: 10px; background: #fff; color: #2B1A51; font: inherit; font-size: 13px; cursor: pointer; }
+.room-plan-grid button span { font-size: 22px; line-height: 1; }
+.room-plan-grid button:hover { background: #F6E9FF; }
+.room-plan-grid button.on { background: #F0A987; }
+.room-plan-grid button.locked { background: #E7E2EC; color: #6E6680; border-style: dashed; }
+.room-plan-grid button.locked span { filter: grayscale(1); opacity: .55; }
+.room-plan-grid button i { position: absolute; top: 3px; right: 5px; font-style: normal; font-size: 12px; }
+.room-plan-msg { margin: 8px 0 0; font-size: 13px; line-height: 1.35; min-height: 1em; }
+.room-plan-msg:empty { display: none; }
+@media (max-width: 430px) { .room-plan { padding: 4px; } .room-plan-in { padding: 6px 8px; } .room-plan-grid button { padding: 4px 2px; font-size: 12px; } .room-plan-grid button span { font-size: 18px; } .room-plan-msg { font-size: 12px; } }
+.room-plan-grid a.room-plan-out { display: flex; flex-direction: column; align-items: center; gap: 2px; padding: 8px 4px; border: 2px solid #4F8F2E; border-radius: 10px; background: #E9F6DF; color: #2B1A51; text-decoration: none; font: inherit; font-size: 13px; }
+.room-plan-grid a.room-plan-out span { font-size: 22px; line-height: 1; }
+.room-plan-grid a.room-plan-out:hover { background: #CDEBB8; }
+@media (max-width: 430px) { .room-plan-grid a.room-plan-out { padding: 4px 2px; font-size: 12px; } .room-plan-grid a.room-plan-out span { font-size: 18px; } }
+/* Огород (этап 22, garden.js) */
+.garden { display: grid; gap: 12px; max-width: 900px; margin: 0 auto 40px; }
+.gd-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 8px 14px; justify-content: space-between; }
+.gd-cap { font: 600 18px var(--serif); }
+.gd-wx { font: 14px var(--sans); opacity: .8; flex: 1; }
+.gd-home { padding: 8px 14px; font-size: 14px; }
+.gd-stage { position: relative; border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 3px #3A2670, 0 14px 30px rgba(0, 0, 0, .3); background: #2B1A51; }
+.gd-cv { display: block; width: 100%; height: auto; aspect-ratio: 192 / 120; image-rendering: pixelated; touch-action: manipulation; }
+.gd-float { position: absolute; left: 50%; top: 14px; transform: translateX(-50%); padding: 6px 14px; border-radius: 999px; background: rgba(20, 12, 40, .88); color: #fff; font: 600 15px var(--sans); opacity: 0; pointer-events: none; white-space: nowrap; }
+.gd-float.on { animation: gd-float 1.8s ease; }
+@keyframes gd-float { 0% { opacity: 0; transform: translate(-50%, 8px); } 15%, 70% { opacity: 1; transform: translate(-50%, 0); } 100% { opacity: 0; transform: translate(-50%, -6px); } }
+.gd-panel { display: grid; gap: 12px; }
+.gd-panel h3 { margin: 0 0 8px; font: 600 17px var(--serif); }
+.gd-panel p { margin: 0 0 6px; font: 15px/1.45 var(--sans); }
+.gd-row { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.gd-row:empty { display: none; }
+.gd-ok { font: 600 15px var(--sans); color: #8ED26A; }
+.gd-note { font: 14px/1.45 var(--sans); opacity: .78; margin: 0; }
+.gd-sel, .gd-box { padding: 14px 16px; border-radius: 16px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line); }
+.gd-sel { border-color: var(--peach); }
+.gd-info { display: flex; gap: 10px; align-items: center; margin-bottom: 8px; }
+.gd-info p { margin: 0; }
+.gd-ic { image-rendering: pixelated; flex: none; }
+.gd-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.gd-chip { display: inline-flex; align-items: center; gap: 6px; padding: 6px 12px 6px 6px; border-radius: 999px; border: 1.5px solid var(--muted); background: none; color: var(--text); font: 15px var(--sans); cursor: pointer; }
+button.gd-chip:hover { background: var(--peach); border-color: var(--peach); color: #2B1A51; }
+.gd-chip-s { cursor: default; border-style: dashed; }
+.gd-list { display: grid; gap: 8px; margin-bottom: 8px; }
+.gd-item { display: flex; align-items: center; gap: 10px; font: 15px var(--sans); }
+.gd-item > span { flex: 1; }
+.gd-item small { opacity: .75; }
+.gd-item .pill-btn { padding: 8px 14px; font-size: 14px; white-space: nowrap; }
+.gd-item .pill-btn:disabled { opacity: .45; cursor: not-allowed; }
+.gd-dlg { width: min(460px, calc(100vw - 32px)); padding: 20px; border: 0; border-radius: 18px; background: var(--bg); color: var(--text); }
+.gd-dlg::backdrop { background: rgba(10, 6, 24, .6); }
+.gd-dlg h3 { margin: 0 0 6px; font: 600 20px var(--serif); }
+@media (min-width: 900px) { .gd-panel { grid-template-columns: 1fr 1fr; } .gd-panel > .gd-row, .gd-panel > .gd-sel, .gd-panel > .gd-note { grid-column: 1 / -1; } }
+
+/* «Смена с Полли» /shift/ (этап 29, site/assets/shift.js) */
+.shift { max-width: 1100px; margin: 0 auto 48px; padding: 0 var(--gutter); }
+.sh-top { display: flex; gap: 20px; align-items: stretch; flex-wrap: wrap; margin-bottom: 16px; }
+.sh-clock { flex: 0 0 auto; min-width: 190px; display: flex; flex-direction: column; justify-content: center; align-items: center; padding: 12px 20px; border-radius: 14px; background: #1a1528; border: 3px solid #d8d0c0; box-shadow: inset 0 0 0 3px #20302a; }
+.sh-left { font: 700 44px/1.1 ui-monospace, 'Courier New', monospace; color: #8cf0a8; letter-spacing: 2px; font-variant-numeric: tabular-nums; }
+.sh-sub { color: var(--muted); font-size: 14px; }
+.sh-ctl { flex: 1 1 420px; display: flex; flex-direction: column; gap: 10px; min-width: 0; }
+.sh-row { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.sh-lbl { font-size: 14px; color: var(--muted); min-width: 92px; }
+.sh-chip { font: inherit; font-size: 15px; padding: 5px 12px; border-radius: 999px; border: 1px solid var(--line); background: var(--bg-card); color: var(--text); cursor: pointer; white-space: nowrap; }
+.sh-chip.on { background: var(--star); border-color: var(--star); color: #2B1A51; font-weight: 700; }
+.sh-chip:disabled { opacity: .45; cursor: default; }
+.sh-own input { width: 54px; font: inherit; font-size: 15px; padding: 0 4px; border-radius: 6px; border: 1px solid var(--line); background: var(--bg); color: var(--text); }
+.sh-own.on input { background: #fff; color: #2B1A51; }
+.sh-vol { width: 110px; accent-color: var(--star); }
+.shift .btn { font: inherit; font-size: 17px; font-weight: 700; padding: 9px 20px; border-radius: 999px; border: 2px solid var(--star); background: var(--star); color: #2B1A51; cursor: pointer; }
+.shift .btn.ghost { background: transparent; color: var(--text); border-color: var(--line); font-weight: 400; }
+.shift .btn:hover { filter: brightness(1.08); }
+.sh-scene { border-radius: 14px; overflow: hidden; border: 3px solid #1a1528; background: #1a1528; line-height: 0; }
+.sh-scene canvas { width: 100%; height: auto; image-rendering: pixelated; image-rendering: crisp-edges; display: block; }
+.sh-cap { text-align: center; color: var(--muted); font-style: italic; margin: 10px 0 4px; min-height: 1.6em; }
+.sh-rank, .sh-done { text-align: center; }
+.sh-rank p { margin: 6px 0; }
+.sh-done { margin: 12px auto 0; max-width: 560px; padding: 14px 18px; border-radius: 14px; background: var(--bg-card); border: 1px solid var(--star); }
+.sh-done p { margin: 6px 0 0; }
+@media (max-width: 600px) {
+  .shift { display: flex; flex-direction: column; }
+  .sh-top { display: contents; }
+  .sh-clock { order: 0; margin-bottom: 12px; padding: 8px 16px; }
+  .sh-scene { order: 1; } .sh-cap { order: 2; } .sh-done { order: 3; margin-bottom: 12px; } .sh-ctl { order: 4; } .sh-rank { order: 5; margin-top: 12px; }
+  .sh-left { font-size: 38px; }
+  .sh-lbl { flex: 1 1 100%; min-width: 0; }
+  .sh-scene { margin: 0 calc(-1 * var(--gutter) + 8px); border-width: 2px; }
+}
+/* Зельеварня: своя картинка вместо эмодзи (potion-names.js) и зелье оживления котика (этап 28) */
+.pp-emo { width: 1.15em; height: 1.15em; vertical-align: -.2em; image-rendering: pixelated; display: inline-block; }
+.pot-revive { background: #E8F7F1; color: #1f5c48; border-radius: 10px; padding: 6px 10px; font-weight: 600; }

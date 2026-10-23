@@ -50,6 +50,8 @@
     today: [(n, m) => `Today: ${n} of ${m} 🔘`, (n, m) => `Сегодня: ${n} из ${m} 🔘`, (n, m) => `Šodien: ${n} no ${m} 🔘`],
     badge: [n => `🏅 New achievement: “${n}”`, n => `🏅 Новое достижение: «${n}»`, n => `🏅 Jauns sasniegums: “${n}”`],
     noMix: ['(seasons don’t mix in one cauldron)', '(сезоны в одном котле не смешиваются)', '(sezonas vienā katlā nejaucas)'],
+    revive: ['🐈 You played 3 days in a row! A cat revival potion is in your bag: put it on the house cat in your room — the cat comes alive.', '🐈 Три дня подряд в игре! В сумке зелье оживления: положи его на котика в комнате — котик оживёт.', '🐈 Trīs dienas pēc kārtas spēlē! Somā ir atdzīvināšanas dzira: noliec to uz kaķīša istabā — kaķītis atdzīvosies.'],
+    reviveDays: ['Days in a row (for the cat revival potion)', 'Дней подряд (до зелья оживления котика)', 'Dienas pēc kārtas (līdz kaķa atdzīvināšanas dzirai)'],
     shelf: ['🏠 The bottle is waiting in your bag: put it on a shelf in your room!', '🏠 Бутылочка ждёт в сумке — поставь её на полку в комнате!', '🏠 Pudelīte gaida somā — noliec to plauktā savā istabā!'],
     giveT: ['Give to a bird', 'Подарить птичке', 'Uzdāvināt putniņam'], giveN: ['How many', 'Сколько', 'Cik'], giveTo: ['To whom', 'Кому', 'Kam'], givePh: ['bird’s nickname', 'ник птички', 'putniņa segvārds'],
     giveBtn: ['🎁 Give', '🎁 Подарить', '🎁 Dāvināt'], cancel: ['Cancel', 'Отмена', 'Atcelt'], giveNo: ['There is no bird with this nickname.', 'Птички с таким ником нет.', 'Putniņa ar tādu segvārdu nav.'],
@@ -83,7 +85,7 @@
   const toast = m => window.PPToast ? window.PPToast(m) : null;
 
   // ингредиенты, имена зелий и бутылочки — в potion-names.js (window.PPPotion)
-  const { ING, IG, SEASON_INFO, FAILS, potion, bottle, L2 } = window.PPPotion;
+  const { ING, IG, emoImg, SEASON_INFO, FAILS, potion, bottle, L2 } = window.PPPotion; // IG[id].h — значок для HTML, .t — для текста (новые эмодзи не везде есть — тогда картинка/название)
   const seasonOfCombo = c => IG[c.split('+')[0]].s;
 
   // ---------- состояние ----------
@@ -103,7 +105,7 @@
     const n = Object.values(S.inv).reduce((a, b) => a + b, 0);
     const si = SEASON_INFO[S.season] || SEASON_INFO.autumn;
     bar.onclick = e => { const g = e.target.closest('[data-go]'); if (!g) return; showTab(g.dataset.go); const el = app.querySelector(g.dataset.go === 'pot' ? '.pot-pot h3' : '.pot-book'); if (el) el.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
-    bar.innerHTML = `<span>${si.e} ${si.n[L]}</span><span>🗺 ${t('lv')} <b>${S.level}</b></span><button type="button" class="pot-bar-b" data-go="pot">🧺 ${t('ingsN')} <b>${n}</b></button><button type="button" class="pot-bar-b" data-go="book">🧪 ${t('potsN')} <b>${S.book.filter(b => b.tier > 0).length}</b></button>${S.eyes ? `<span title="${t('eyesN')}">🧿 <b>${S.eyes}</b></span>` : ''}${S.rules.on && S.rules.max > 0 ? `<span>${t('today', S.today, S.rules.max)}</span>` : ''}`;
+    bar.innerHTML = `<span>${si.e} ${si.n[L]}</span><span>🗺 ${t('lv')} <b>${S.level}</b></span><button type="button" class="pot-bar-b" data-go="pot">🧺 ${t('ingsN')} <b>${n}</b></button><button type="button" class="pot-bar-b" data-go="book">🧪 ${t('potsN')} <b>${S.book.filter(b => b.tier > 0).length}</b></button>${S.eyes ? `<span title="${t('eyesN')}">🧿 <b>${S.eyes}</b></span>` : ''}${S.revive && S.revive.need > 0 ? `<span title="${t('reviveDays')}">🐈 <b>${S.revive.today && !S.revive.days ? S.revive.need : S.revive.days}/${S.revive.need}</b>${S.revive.today ? ' ✓' : ''}</span>` : ''}${S.rules.on && S.rules.max > 0 ? `<span>${t('today', S.today, S.rules.max)}</span>` : ''}`;
   }
   function showTab(k) {
     tab = k;
@@ -299,15 +301,17 @@
     for (let k = 0; k < 8; k++) {
       try {
         const r = await post('potion/done', { run: run.run, got, eye: !!M.eyeGot });
-        S.inv = r.inv; S.level = r.level; if (r.eyes != null) S.eyes = r.eyes; drawBar(); showBadges(r.badges); window.PPTop && PPTop.refresh();
-        const list = r.got.length ? `<p class="pot-got">${r.got.map(id => `<span title="${esc(IG[id].n)}">${IG[id].e}</span>`).join('')}</p>` : `<p>${t('gotNone')}</p>`;
+        S.inv = r.inv; S.level = r.level; if (r.eyes != null) S.eyes = r.eyes; drawBar(); dayPlayed(r); showBadges(r.badges); window.PPTop && PPTop.refresh();
+        const list = r.got.length ? `<p class="pot-got">${r.got.map(id => `<span title="${esc(IG[id].n)}">${IG[id].h}</span>`).join('')}</p>` : `<p>${t('gotNone')}</p>`;
         state = 'done';
-        overlay(`<h2>${t('done', M.level)}</h2>${r.got.length ? `<p>${t('gotIngs')}</p>` : ''}${list}${r.eye ? `<p class="pot-mod pot-eye">${t('eyeWon')}</p>` : ''}<div class="pot-ov-btns"><button type="button" class="pill-btn" data-a="pot">${t('toPot')}</button><button type="button" class="pill-btn pill-fill" data-a="next">${t('next')}</button></div>`);
+        overlay(`<h2>${t('done', M.level)}</h2>${r.got.length ? `<p>${t('gotIngs')}</p>` : ''}${list}${r.eye ? `<p class="pot-mod pot-eye">${t('eyeWon')}</p>` : ''}${r.revive ? `<p class="pot-mod pot-revive">${t('revive')}</p>` : ''}<div class="pot-ov-btns"><button type="button" class="pill-btn" data-a="pot">${t('toPot')}</button><button type="button" class="pill-btn pill-fill" data-a="next">${t('next')}</button></div>`);
         return;
       } catch (e) { if (e === 429) { await new Promise(r => setTimeout(r, 1500)); continue; } break; }
     }
     state = 'done'; overlay(`<p>${t('saveErr')}</p><button type="button" class="pill-btn pill-fill" data-a="next">${t('next')}</button>`);
   }
+  // серия дней подряд (зелье оживления котика, этап 28): сервер уже посчитал, здесь — только показать в верхней строке
+  function dayPlayed(r) { const v = S.revive; if (!v || v.today) return; v.today = true; v.days = r.revive ? 0 : v.days + 1; drawBar(); }
   function overlay(html) { ov.hidden = false; ov.innerHTML = `<div class="pot-card">${html}</div>`; }
   ov.addEventListener('click', e => {
     const a = e.target.closest('[data-a]'); if (!a) return;
@@ -340,7 +344,7 @@
           M.stun = 0.7; M.shake = 0.3;
           const i = M.got.pop();
           if (i != null) { const o = M.things.find(z => z.k === 'ing' && z.i === i); const cells = []; for (let y = 0; y < M.rows; y++) for (let x = 0; x < M.cols; x++) if (Math.abs(x - px) + Math.abs(y - py) > 5) cells.push([x, y]);
-            const c = cells[Math.floor(M.r() * cells.length)] || [o.x, o.y]; o.x = c[0]; o.y = c[1]; o.taken = false; banner(t('stolen', IG[o.id].e)); }
+            const c = cells[Math.floor(M.r() * cells.length)] || [o.x, o.y]; o.x = c[0]; o.y = c[1]; o.taken = false; banner(t('stolen', IG[o.id].t)); }
           else banner(t('boo'), 1);
         }
         // привидение улетает в дальний угол
@@ -366,7 +370,7 @@
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0); ctx.imageSmoothingEnabled = false; draw();
   }
   const HUD = () => cell * 1.4;
-  function emoji(e, x, y, s) { ctx.font = `${Math.round(s)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(e, x, y + 1); }
+  function emoji(e, x, y, s) { const im = emoImg(e); if (im) { if (im.complete) ctx.drawImage(im, Math.round(x - s / 2), Math.round(y - s / 2), Math.round(s), Math.round(s)); return; } ctx.font = `${Math.round(s)}px "Apple Color Emoji","Segoe UI Emoji","Noto Color Emoji",sans-serif`; ctx.textAlign = 'center'; ctx.textBaseline = 'middle'; ctx.fillText(e, x, y + 1); }
   function draw() {
     if (!M) return;
     const c = cell, top = HUD(), w = c * M.cols, h = c * M.rows;
@@ -470,12 +474,12 @@
     const items = ING.filter(r => S.inv[r[0]] > 0);
     const known = slots.length === 3 ? S.book.find(b => b.combo === comboKey(slots)) : null, slotSeason = slots.length ? IG[slots[0]].s : null;
     v.innerHTML = `<p class="pot-lead">${t('pick3')} <small>${t('hint')}</small></p>
-      <div class="pot-cauldron${brewing ? ' brewing' : ''}"><div class="pot-slots">${[0, 1, 2].map(i => slots[i] ? `<button type="button" class="pot-slot on" data-slot="${i}" title="${esc(IG[slots[i]].n)}">${IG[slots[i]].e}</button>` : `<span class="pot-slot"></span>`).join('')}</div>
+      <div class="pot-cauldron${brewing ? ' brewing' : ''}"><div class="pot-slots">${[0, 1, 2].map(i => slots[i] ? `<button type="button" class="pot-slot on" data-slot="${i}" title="${esc(IG[slots[i]].n)}">${IG[slots[i]].h}</button>` : `<span class="pot-slot"></span>`).join('')}</div>
         <div class="pot-kettle" aria-hidden="true"><i></i><i></i><i></i></div></div>
       ${known ? `<p class="pot-known">${known.tier ? `${t('knownOk')} <b>${esc(potion(known.ix, known.tier, known.season).name)}</b>` : t('knownBad')}</p>` : ''}
       <p><button type="button" class="pill-btn pill-fill pot-brew" ${slots.length === 3 && !brewing ? '' : 'disabled'}>${brewing ? t('brewing') : t('brew')}</button></p>
       ${result || ''}
-      <h3>${t('bag')}</h3>${items.length ? Object.keys(SEASON_INFO).filter(sn => items.some(r => r[5] === sn)).map(sn => `<p class="pot-sn">${SEASON_INFO[sn].e} ${SEASON_INFO[sn].n[L]}${slotSeason && slotSeason !== sn ? ` <small>${t('noMix')}</small>` : ''}</p><div class="pot-inv">${items.filter(r => r[5] === sn).map(r => `<div class="pot-ing-w"><button type="button" class="pot-ing" data-ing="${r[0]}" ${left[r[0]] > 0 && slots.length < 3 && !brewing && (!slotSeason || slotSeason === sn) ? '' : 'disabled'}><span>${r[1]}</span><small>${esc(IG[r[0]].n)}</small><b>×${left[r[0]]}</b></button>${left[r[0]] > 0 ? `<button type="button" class="pot-give" data-give="${r[0]}" title="${esc(t('giveT'))}" aria-label="${esc(t('giveT'))}">🎁</button>` : ''}</div>`).join('')}</div>`).join('') : `<p class="pot-empty">${t('bagEmpty')}</p>`}
+      <h3>${t('bag')}</h3>${items.length ? Object.keys(SEASON_INFO).filter(sn => items.some(r => r[5] === sn)).map(sn => `<p class="pot-sn">${SEASON_INFO[sn].e} ${SEASON_INFO[sn].n[L]}${slotSeason && slotSeason !== sn ? ` <small>${t('noMix')}</small>` : ''}</p><div class="pot-inv">${items.filter(r => r[5] === sn).map(r => `<div class="pot-ing-w"><button type="button" class="pot-ing" data-ing="${r[0]}" ${left[r[0]] > 0 && slots.length < 3 && !brewing && (!slotSeason || slotSeason === sn) ? '' : 'disabled'}><span>${IG[r[0]].h}</span><small>${esc(IG[r[0]].n)}</small><b>×${left[r[0]]}</b></button>${left[r[0]] > 0 ? `<button type="button" class="pot-give" data-give="${r[0]}" title="${esc(t('giveT'))}" aria-label="${esc(t('giveT'))}">🎁</button>` : ''}</div>`).join('')}</div>`).join('') : `<p class="pot-empty">${t('bagEmpty')}</p>`}
       ${S.rules.on ? `<p class="pot-pay">${T.pay(S.rules)}</p>` : ''}`;
     v.querySelectorAll('[data-ing]').forEach(b => b.onclick = () => { if (slots.length < 3) { slots.push(b.dataset.ing); drawPot(); } });
     v.querySelectorAll('[data-slot]').forEach(b => b.onclick = () => { slots.splice(+b.dataset.slot, 1); drawPot(); });
@@ -493,15 +497,16 @@
       const b = S.book.find(x => x.combo === r.combo); if (b) b.n++; else S.book.unshift({ combo: r.combo, tier: r.tier, n: 1, ix: r.ix, season: r.season });
       if (!b && r.tier > 0 && window.PPTop) PPTop.refresh(); // новое зелье — на доске «📖 Рецепты»
       if (r.got) S.today += r.got;
-      drawBar(); showBadges(r.badges);
+      drawBar(); dayPlayed(r); showBadges(r.badges);
+      const rv = r.revive ? `<p class="pot-revive">${t('revive')}</p>` : '';
       let html;
-      if (!r.tier) html = `<div class="pot-res fail"><h3>💨 ${t('fail')}</h3><p>${esc(FAILS[Math.floor(Math.random() * FAILS.length)][L2])}</p><p class="pot-rec">${ings.map(id => IG[id].e).join(' ')}</p>${r.back ? `<p class="pot-back">${t('back', IG[r.back].e)}</p>` : ''}${r.sure ? `<p class="pot-sure">${t('sure')}</p>` : ''}<button type="button" class="pill-btn" data-a2="ok">${t('again')}</button></div>`;
+      if (!r.tier) html = `<div class="pot-res fail"><h3>💨 ${t('fail')}</h3><p>${esc(FAILS[Math.floor(Math.random() * FAILS.length)][L2])}</p><p class="pot-rec">${ings.map(id => IG[id].h).join(' ')}</p>${r.back ? `<p class="pot-back">${t('back', IG[r.back].h)}</p>` : ''}${r.sure ? `<p class="pot-sure">${t('sure')}</p>` : ''}<button type="button" class="pill-btn" data-a2="ok">${t('again')}</button></div>`;
       else {
         const pt = potion(r.ix, r.tier, r.season);
         html = `<div class="pot-res t${r.tier}"><p class="pot-res-h">${r.pity ? t('lucky') + ' ' : ''}${r.first ? t('newPot') : t('againPot')}</p><span class="pot-res-b"></span><h3>${esc(pt.name)}</h3><p class="pot-tier t${r.tier}">${T.tier[L][r.tier]}</p>
-          <p><b>${t('prop')}:</b> ${esc(pt.eff)}</p><p class="pot-rec">${ings.map(id => IG[id].e).join(' ')}</p>${r.item ? `<p class="pot-shelf">${t('shelf')}</p>` : ''}${r.got ? `<p class="pot-plus">${t('plus', r.got)}</p>` : S.rules.on && S.rules.max > 0 && S.today >= S.rules.max ? `<p class="pot-cap">${t('cap')}</p>` : ''}<button type="button" class="pill-btn" data-a2="ok">${t('again')}</button></div>`;
+          <p><b>${t('prop')}:</b> ${esc(pt.eff)}</p><p class="pot-rec">${ings.map(id => IG[id].h).join(' ')}</p>${r.item ? `<p class="pot-shelf">${t('shelf')}</p>` : ''}${r.got ? `<p class="pot-plus">${t('plus', r.got)}</p>` : S.rules.on && S.rules.max > 0 && S.today >= S.rules.max ? `<p class="pot-cap">${t('cap')}</p>` : ''}<button type="button" class="pill-btn" data-a2="ok">${t('again')}</button></div>`;
       }
-      drawPot(html);
+      drawPot(html.replace('<button type="button" class="pill-btn" data-a2="ok">', rv + '<button type="button" class="pill-btn" data-a2="ok">')); // зелье оживления — над «Ещё раз»
       if (r.tier) { const slot = app.querySelector('.pot-res-b'); if (slot) slot.appendChild(bottle(r.ix, r.tier, 64, r.season)); }
       window.PPAccount && window.PPAccount.check && r.got && window.PPAccount.check();
     } catch (e) { brewing = false; drawPot(`<p class="pot-err">${t('saveErr')}</p>`); }
@@ -510,7 +515,7 @@
   // подарить ингредиенты другой птичке
   function giveIng(id, max) {
     const d = document.createElement('dialog'); d.className = 'pot-dlg';
-    d.innerHTML = `<form method="dialog"><h3>${t('giveT')}</h3><p class="pot-dlg-e">${IG[id].e}</p><p>${esc(IG[id].n)}</p>
+    d.innerHTML = `<form method="dialog"><h3>${t('giveT')}</h3><p class="pot-dlg-e">${IG[id].h}</p><p>${esc(IG[id].n)}</p>
       <label>${t('giveN')} <input name="n" type="number" min="1" max="${Math.min(10, max)}" value="1" inputmode="numeric"></label>
       <label>${t('giveTo')} <input name="to" list="pot-birds" required maxlength="24" autocomplete="off" placeholder="${esc(t('givePh'))}"></label><datalist id="pot-birds"></datalist>
       <p class="pot-dlg-st" role="status"></p><div class="pot-ov-btns"><button type="button" class="pill-btn" value="x">${t('cancel')}</button><button type="submit" class="pill-btn pill-fill">${t('giveBtn')}</button></div></form>`;
@@ -520,13 +525,13 @@
     d.querySelector('[value=x]').onclick = () => { d.close(); d.remove(); };
     f.onsubmit = async e => {
       e.preventDefault();
-      try { const r = await post('potion/give', { ing: id, n: +f.n.value, to: f.to.value }); S.inv = r.inv; drawBar(); drawPot(); d.close(); d.remove(); toast(t('given', IG[id].e + '×' + r.n, r.to)); }
+      try { const r = await post('potion/give', { ing: id, n: +f.n.value, to: f.to.value }); S.inv = r.inv; drawBar(); drawPot(); d.close(); d.remove(); toast(t('given', IG[id].t + '×' + r.n, r.to)); }
       catch (x) { st.textContent = x === 404 ? t('giveNo') : t('saveErr'); }
     };
   }
   function incoming(list) {
     if (!list || !list.length) return;
-    list.forEach((g, i) => setTimeout(() => toast(t('gotGift', g.from, IG[g.ing] ? IG[g.ing].e + '×' + g.n : '')), 300 + i * 1500));
+    list.forEach((g, i) => setTimeout(() => toast(t('gotGift', g.from, IG[g.ing] ? IG[g.ing].t + '×' + g.n : '')), 300 + i * 1500));
     post('potion/seen').catch(() => {});
   }
 
@@ -536,8 +541,8 @@
     if (!S || !S.me) { v.innerHTML = `<p class="pot-login">${t('login')}</p>`; return; }
     const okb = S.book.filter(b => b.tier > 0).sort((a, b) => b.tier - a.tier || a.ix - b.ix), bad = S.book.filter(b => !b.tier);
     v.innerHTML = !S.book.length ? `<p class="pot-empty">${t('bookEmpty')}</p>` : `<p class="pot-lead">${t('found', okb.length)}</p>
-      <div class="pot-list">${okb.map(b => { const pt = potion(b.ix, b.tier, b.season); return `<div class="pot-entry t${b.tier}" data-ix="${b.ix}" data-tier="${b.tier}" data-season="${b.season}"><span class="pot-ic"></span><div><b>${esc(pt.name)}</b> <span class="pot-tier t${b.tier}">${T.tier[L][b.tier]}</span><p>${esc(pt.eff)}</p><p class="pot-rec">${b.combo.split('+').map(id => `<span title="${esc(IG[id].n)}">${IG[id].e}</span>`).join(' ')}${b.n > 1 ? ` <small>×${b.n}</small>` : ''}</p></div></div>`; }).join('')}</div>
-      ${bad.length ? `<h3>${t('fails')}</h3><p class="pot-bad">${bad.map(b => `<span>${b.combo.split('+').map(id => IG[id].e).join('')}</span>`).join('')}</p>` : ''}`;
+      <div class="pot-list">${okb.map(b => { const pt = potion(b.ix, b.tier, b.season); return `<div class="pot-entry t${b.tier}" data-ix="${b.ix}" data-tier="${b.tier}" data-season="${b.season}"><span class="pot-ic"></span><div><b>${esc(pt.name)}</b> <span class="pot-tier t${b.tier}">${T.tier[L][b.tier]}</span><p>${esc(pt.eff)}</p><p class="pot-rec">${b.combo.split('+').map(id => `<span title="${esc(IG[id].n)}">${IG[id].h}</span>`).join(' ')}${b.n > 1 ? ` <small>×${b.n}</small>` : ''}</p></div></div>`; }).join('')}</div>
+      ${bad.length ? `<h3>${t('fails')}</h3><p class="pot-bad">${bad.map(b => `<span>${b.combo.split('+').map(id => IG[id].h).join('')}</span>`).join('')}</p>` : ''}`;
     v.querySelectorAll('.pot-entry').forEach(el => el.querySelector('.pot-ic').appendChild(bottle(+el.dataset.ix, +el.dataset.tier, 44, el.dataset.season)));
   }
   app.addEventListener('click', e => { const a = e.target.closest('[data-a2=in]'); if (a) window.PPAccount && window.PPAccount.openSignIn(); });

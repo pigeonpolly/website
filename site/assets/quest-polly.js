@@ -6,6 +6,9 @@
   let st = { found: [], read: false, order: [], sent: false };
   try { st = Object.assign(st, JSON.parse(localStorage.getItem(KEY) || '{}')); } catch (e) {}
   const save = () => { try { localStorage.setItem(KEY, JSON.stringify(st)); } catch (e) {} };
+  // задача пройдена (и раньше, до входа) — сервер открывает кабинет в доме птички (этап 20); без входа запрос просто не пройдёт
+  const done = () => { if (st.sent) fetch('/api/office/done', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: '{"task":1}' }).catch(() => {}); };
+  done();
   // меню задач: новые добавлять сюда с номерами
   const TASKS = [{ no: 1, title: ['Reply to the Council', 'Ответ Совету городов', 'Atbilde Pilsētu padomei'] }, { no: 2, soon: true }];
   const UI = {
@@ -104,7 +107,7 @@
       const err = document.getElementById('q-err');
       if (st.order.length < 5) { err.textContent = t(UI.missing); return; }
       if (st.order.join() !== ORDER.join()) { err.textContent = t(UI.wrong); return; }
-      st.sent = true; save(); draw(); openMail();
+      st.sent = true; save(); done(); draw(); openMail();
       A.hero && (A.hero.classList.remove('hop'), void A.hero.offsetWidth, A.hero.classList.add('hop', 'q-dance'));
     }
     if (k === 'again') { localStorage.removeItem(KEY); location.reload(); }

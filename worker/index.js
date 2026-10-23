@@ -12,7 +12,9 @@ import { authApi, googleLink, funnelStep, mailOn, adventMail, adventAsk, AUTH_TA
 import { flockApi, featherNews, FLOCK_TABLES, FLOCK_ALTER } from './flock.js'; // «Все птички» и пёрышки (этап 13 Б+В, docs/flock.md)
 import { flockNewsApi, flockEvent as flockEventDb, roomEvent, flockNewsCron, FLOCK_NEWS_TABLES, FLOCK_NEWS_ALTER } from './flock-news.js'; // новости стаи (этап 13 Г, docs/flock.md)
 import { topApi, topScore, topCron, TOP_TABLES } from './top.js'; // доски топа игр (docs/games.md)
+import { shiftApi, SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_RANGE, SHIFT_INT } from './shift.js'; // «Смена с Полли» (этап 29, docs/rooms.md)
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
+import { gardenApi, GARDEN_TABLES, GARDEN_RULES, GARDEN_RANGE, GARDEN_INT, GARDEN_BOOL, GARDEN_SEASONS } from './garden.js'; // огород птички (этап 22, docs/bird.md «Огород»)
 import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
@@ -153,13 +155,25 @@ const roomOf = u => { try { const r = JSON.parse(u && u.room || '{}'); return r 
 async function ownedRoom(env, uid) {
   const m = {};
   for (const r of (await env.DB.prepare(`SELECT kind, item, COUNT(*) AS n FROM gifts WHERE user_id = ? AND status = 'bag' AND kind IN ('wall', 'floor', 'view', 'curtain', 'furn', 'deco') GROUP BY kind, item`).bind(uid).all()).results) m[r.kind + '|' + r.item] = r.n;
+  m._alive = ((await env.DB.prepare('SELECT cats_alive FROM users WHERE id = ?').bind(uid).first()) || {}).cats_alive || 0; // сколько котиков оживлено (этап 28)
   return m;
 }
+// дом птички (этап 20): room — гостиная, room.rooms.<id> — остальные комнаты того же вида; вещь из сумки стоит только в одной из них
+const HOME_ROOMS = ['kitchen', 'bedroom', 'crypt', 'bath', 'office'];
+const roomItems = r => [r, ...HOME_ROOMS.map(id => r && r.rooms && r.rooms[id]).filter(Boolean)].flatMap(x => Array.isArray(x.items) ? x.items : []);
 function cleanRoom(room, own) {
+  const used = {}, out = cleanOne(room || {}, own, used), rs = room && room.rooms;
+  if (rs && typeof rs === 'object') for (const id of HOME_ROOMS) if (rs[id] && typeof rs[id] === 'object') {
+    const r = cleanOne(rs[id], own, used, id === 'crypt'); // склеп — только каменный: без обоев, пола, окна
+    if (r.items.length || Object.keys(r).length > 1) (out.rooms = out.rooms || {})[id] = r;
+  }
+  return out;
+}
+function cleanOne(room, own, used, bare) {
   const out = { items: [] };
-  for (const k of ['wall', 'floor', 'view', 'curtain']) if (typeof room[k] === 'string' && own[k + '|' + room[k]]) out[k] = room[k];
-  if (room.light === 0) out.light = 0; // свет выключен (этап 11 Б); включён — поля нет
-  const used = {};
+  if (!bare) for (const k of ['wall', 'floor', 'view', 'curtain']) if (typeof room[k] === 'string' && own[k + '|' + room[k]]) out[k] = room[k];
+  if (room.light === 0 && !bare) out.light = 0; // свет выключен (этап 11 Б); включён — поля нет
+  if (own._alive > 0 && !used._cats) { used._cats = 1; out.cats = own._alive; } // живые котики (этап 28) — только в гостиной (первый вызов cleanOne): первые cats штук furn|cat бегают сами (room.js)
   for (const it of Array.isArray(room.items) ? room.items.slice(0, 80) : []) {
     if (!it || !['furn', 'deco'].includes(it.k) || !/^[a-z0-9:-]{1,24}$/i.test(String(it.v))) continue;
     const key = it.k + '|' + it.v; if ((used[key] || 0) >= (PPCanDo.isAlbum(it.k, it.v) ? 1 : own[key] || 0)) continue; // альбом карточек — в каждой комнате сам, один
@@ -183,6 +197,15 @@ function cleanRoom(room, own) {
     if (o.from != null && !ids.has(o.from)) delete o.from;
   }
   return out;
+}
+
+// какие комнаты дома открыты: всё считается по уже сделанному (рекорды игр, пёрышки, дела Титоса), поэтому «выполнил раньше» — сразу открыто
+async function doorsOf(env, u) {
+  const R = RULES, n = async (sql, k) => { try { return Number(((await env.DB.prepare(sql).bind(u.id).first()) || {})[k]) || 0; } catch (e) { return 0; } }; // titos может ещё не быть
+  const have = { kitchen: u.pan_best || 0, bedroom: R.homeBedroom > 0 ? await n('SELECT COUNT(*) AS n FROM feathers WHERE from_id = ?', 'n') : 0,
+    crypt: R.homeCrypt > 0 ? await n('SELECT level FROM titos WHERE user_id = ?', 'level') : 0, bath: u.game_best || 0, office: u.office_task || 0 };
+  const need = { kitchen: R.homeKitchen, bedroom: R.homeBedroom, crypt: R.homeCrypt, bath: R.homeBath, office: R.homeOffice };
+  return { open: Object.fromEntries(HOME_ROOMS.map(id => [id, have[id] >= need[id]])), need, have };
 }
 
 // ---------- коробка при регистрации (как альбом): птичка выбирает одну из коробок в окне (news.js), потом может поменять ----------
@@ -408,6 +431,8 @@ async function ensureSchema(env) {
     ...CARD_TABLES.map(sql => env.DB.prepare(sql)), // карточки: cards, card_sets, card_owner (worker/cards.js)
     ...TOP_TABLES.map(sql => env.DB.prepare(sql)), // доски топа игр: top_week (worker/top.js)
     ...PAN_TABLES.map(sql => env.DB.prepare(sql)), // «Блинная Полли»: pan_runs (worker/pancakes.js)
+    ...GARDEN_TABLES.map(sql => env.DB.prepare(sql)), // огород: garden (worker/garden.js)
+    ...SHIFT_TABLES.map(sql => env.DB.prepare(sql)), // «Смена с Полли»: shift_runs (worker/shift.js)
     ...TITOS_TABLES.map(sql => env.DB.prepare(sql)), // детектив Титос: titos, titos_cases (worker/titos.js)
     ...FLOCK_NEWS_TABLES.map(sql => env.DB.prepare(sql)), // новости стаи: flock_events (worker/flock-news.js)
     ...FLOCK_TABLES.map(sql => env.DB.prepare(sql)), // пёрышки и гости комнат: room_guests, feathers (worker/flock.js)
@@ -419,9 +444,9 @@ async function ensureSchema(env) {
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
-    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
+    'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_days INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_last TEXT', 'ALTER TABLE users ADD COLUMN cats_alive INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER,
-    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...CHALLENGE_ALTER]) {
+    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...SHIFT_ALTER, ...CHALLENGE_ALTER]) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   // «Выбор Полли» подешевел с 50 до 11 пуговок: уже начисленные записи пересчитать один раз, баланс = сумма журнала
@@ -504,6 +529,8 @@ const RULE_DEFAULTS = {
   adventLastJan: 23, adventButtons: 10, adventSpecialButtons: 25,
   welcomeBtn: -1, // подарок новичку после ника (этап 14): случайная дешёвая вещь (welcomeOf) и столько пуговок (-1 — цена этой вещи)
   dayBonusNeed: 5, dayBonusOf: 8, dayBonusPct: 10, // карточка дня: бонус за dayBonusNeed штампов (из dayBonusOf) — dayBonusPct % опорной цены, раз в сутки
+  // дом птички (этап 20): что открывает комнату — уровень в Блинной Полли, пёрышек в чужих комнатах, дел Титоса, уровень Пуговичного дождя, задача Оффис Полли (0 — открыта сразу)
+  homeKitchen: 10, homeBedroom: 1, homeCrypt: 2, homeBath: 10, homeOffice: 1,
   aiStreak: true, aiUpload: true,
   sellOn: true, sellPrice: 5,
   // «Пуговичный дождь»: за уровень gameLevel 🔘 × (1 + ⌊(ур.−1)/10⌋) — каждый номер уровня раз в сутки; gameDayMax — лимит в сутки (0 — без лимита);
@@ -511,7 +538,7 @@ const RULE_DEFAULTS = {
   // НАГРАДЫ ИГР — в % от средней цены обычной вещи в магазине (пересчёт раз в сутки, `gameUnit`): цены растут — растут и награды
   gameOn: true, gameLevelPct: 2, gameRecordPct: 4, gameDayMaxPct: 0, gameMinSec: 5, gameItemEvery: 30, gameKingPct: 10,
   // «Зельеварня»: 🔘 за новое зелье по уровням (обычное / вкусное / вкус детства), за повторное, лимит в сутки; лабиринт быстрее potionMinSec с не засчитывается
-  potionOn: true, potion1Pct: 4, potion2Pct: 12, potion3Pct: 35, potionAgainPct: 1, potionDayMaxPct: 60, potionMinSec: 8,
+  potionOn: true, potion1Pct: 4, potion2Pct: 12, potion3Pct: 35, potionAgainPct: 1, potionDayMaxPct: 60, potionMinSec: 8, potionRevive: 3, // potionRevive — сколько дней подряд играть, чтобы выпало зелье оживления котика (0 — выкл.)
   potionSeason: 'auto', potionShelf: true, // сезон зельеварни (auto — по календарю) и бутылочка в комнату за новое зелье «Вкус детства» // «Пуговичный дождь»: 🔘 за пройденный уровень, не больше gameDayMax в сутки; уровень быстрее gameMinSec с — не засчитывается
   indexOn: false, indexBase: 0, priceDays: 4, catMult: {}, // indexOn: пуговки за цены — выключено: теперь цены сами следуют за пуговками; priceDays — за сколько дней обычной активности средняя птичка зарабатывает на среднюю вещь // индексация обычных пуговок по средней цене вещи (0 — стартовая цена = цена в день включения)
   cardMult: 100, cardsFirstDay: 0, tradeDays: 7, cardSurprisePct: 100, // карточки: цена обычной = средняя цена вещи × cardMult %; сколько карточек одной коллекции в одни руки в первые сутки (0 — без лимита); сколько дней живёт предложение обмена; «🎲 Сюрприз» редкости = средняя цена свободных карточек × cardSurprisePct %
@@ -520,14 +547,16 @@ const RULE_DEFAULTS = {
   cond: { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4,
     alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10,
     rainA: 5, rainB: 15, rainC: 30, potA: 10, potB: 50, mazeA: 20, ...PAN_COND },
+  ...GARDEN_RULES, // огород: грядки, полив, цены семян и урожая, жуки, погода (worker/garden.js)
+  ...SHIFT_RULES, // «Смена с Полли»: 🔘 за каждый отработанный час (worker/shift.js)
   ...PAN_RULES, // «Блинная Полли»: пуговки за уровень, рекорд, вещь, мытьё сковородки (worker/pancakes.js)
   ...TITOS_RULES, // детектив Титос: кофе, пуговки за уровень (worker/titos.js)
   ...CH_DEFAULTS, // подбор тем челленджа: семья не ближе N дней, категории, колода сложности, доля сезона (worker/challenge-plan.js)
 };
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
-const RULE_NUM = { welcomeBtn: [-1, 10000], daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
+const RULE_NUM = { homeKitchen: [0, 1000], homeBedroom: [0, 1000], homeCrypt: [0, 1000], homeBath: [0, 1000], homeOffice: [0, 1], welcomeBtn: [-1, 10000], daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...CH_RANGE };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potionRevive: [0, 30], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...GARDEN_RANGE, ...SHIFT_RANGE, ...CH_RANGE };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -542,11 +571,12 @@ function cleanRules(r) {
   if (!r || typeof r !== 'object') return out;
   for (const [k, [lo, hi]] of Object.entries(RULE_NUM)) if (r[k] != null && Number.isFinite(Number(r[k]))) out[k] = Math.max(lo, Math.min(hi, Number(r[k])));
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
-  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn', 'panOn']) if (typeof r[k] === 'boolean') out[k] = r[k];
+  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn', 'panOn', 'shiftOn', ...GARDEN_BOOL]) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
+  for (const k of ['homeKitchen', 'homeBedroom', 'homeCrypt', 'homeBath', 'homeOffice', 'daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'potionRevive', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...GARDEN_INT, ...SHIFT_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
+  if (GARDEN_SEASONS.includes(r.gardenSeason)) out.gardenSeason = r.gardenSeason;
   out.welcomeBtn = Math.round(out.welcomeBtn);
   out.catMult = {}; if (r.catMult && typeof r.catMult === 'object') for (const k of GIFT_KINDS) { const v = Number(r.catMult[k]); if (Number.isFinite(v) && v !== 100) out.catMult[k] = Math.max(10, Math.min(1000, Math.round(v))); }
   if (out.priceMin > out.priceMax) out.priceMin = out.priceMax;
@@ -1302,6 +1332,20 @@ async function gameBadge(env, u, k) {
   return true;
 }
 // ---------- «Зельеварня Полли» (/potions/, site/assets/potions.js) ----------
+// зелье оживления котика (этап 28): кто играет RULES.potionRevive дней подряд (лабиринт или котёл), тому в сумку furn|revive; счёт — users.pot_days / pot_last, после зелья — заново
+async function potDay(env, u) {
+  const day = rigaDay(); if (u.pot_last === day) return false;
+  const yest = new Date(Date.now() - 864e5).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
+  let days = u.pot_last === yest ? (u.pot_days || 0) + 1 : 1, give = false;
+  if (RULES.potionRevive > 0 && days >= RULES.potionRevive) {
+    days = 0; // в сумке не больше 3 неиспользованных — иначе серия просто начинается заново
+    give = (await env.DB.prepare("SELECT COUNT(*) AS n FROM gifts WHERE user_id = ? AND kind = 'furn' AND item = 'revive' AND status IN ('bag', 'new')").bind(u.id).first()).n < 3;
+    if (give) await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, 'furn', 'revive', 'revive', 'bag', ?, ?)").bind(u.id, now(), now()).run();
+  }
+  await env.DB.prepare('UPDATE users SET pot_days = ?, pot_last = ? WHERE id = ?').bind(days, day, u.id).run();
+  u.pot_last = day; u.pot_days = days;
+  return give;
+}
 // ингредиенты (тот же список и порядок — в potions.js); sweet — «сладкие»: два в котле — «вкусное» зелье, три — «вкус детства»
 const ING = ['amanita', 'pumpkin', 'web', 'bat', 'eye', 'mandrake', 'moon', 'feather', 'bone', 'candle', 'garlic', 'pepper', 'frog', 'clover', 'star', 'apple', 'candy', 'choco', 'milk', 'honey', 'cookie'];
 // сезоны (по 21 ингредиенту, последние 6 — сладкие; порядок — как в site/assets/potion-names.js): лабиринт даёт ингредиенты текущего сезона, рецепт — только из одного сезона
@@ -1356,6 +1400,8 @@ async function route(req, env, url) {
   if (p === '/api/top' && url.searchParams.get('g')) { const r = await topApi(req, env, url, { json, fail, currentUser, avatarOf }); if (r) return r; }
   if (p === '/api/pancakes' || p.startsWith('/api/pancakes/')) { const r = await pancakesApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, top: (uid, n) => topScore(env, 'pan', uid, n),
     award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), item: (rq, uid, note) => rainItem(env, rq, uid, 0, note) }); if (r) return r; }
+  if (p === '/api/garden' || p.startsWith('/api/garden/')) { const r = await gardenApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
+  if (p === '/api/shift' || p.startsWith('/api/shift/')) { const r = await shiftApi(req, env, url, { json, fail, currentUser, needUser, rules: () => RULES, randomHex, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p.startsWith('/api/titos') || p.startsWith('/api/admin/titos')) { const r = await titosApi(req, env, url, titosHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/cards') || p.startsWith('/api/admin/cards')) { const r = await cardsApi(req, env, url, cardHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/challenge/') || p.startsWith('/api/admin/challenge')) { const r = await challengeApi(req, env, url, cardHelpers(env)); if (r) return r; }
@@ -1384,7 +1430,7 @@ async function route(req, env, url) {
     if (pickUser === u.id) badges.push('pick');
     const bag = (await env.DB.prepare("SELECT DISTINCT kind, item FROM gifts WHERE user_id = ? AND status = 'bag'").bind(u.id).all()).results; // вещи в сумке — их видят все
     const unopened = (await env.DB.prepare("SELECT COUNT(*) AS n FROM gifts WHERE user_id = ? AND status = 'new'").bind(u.id).first()).n;
-    return json({ id: u.id, avatar: avatarOf(u), room: roomOf(u), bag, unopened, buttons: u.buttons || 0, nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(streakDays(rows)).current,
+    return json({ id: u.id, avatar: avatarOf(u), room: roomOf(u), doors: await doorsOf(env, u), bag, unopened, buttons: u.buttons || 0, nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(streakDays(rows)).current,
       best: mergedBest(u, streakDays(rows)), badges, posts: rows.filter(r => !r.hidden).map(({ id, day, theme, bw, ai }) => ({ id, day, theme, bw, ai })) });
   }
 
@@ -1458,12 +1504,18 @@ async function route(req, env, url) {
     return json({ ok: true });
   }
   // ---------- адвент-календарь ----------
+  // Оффис Полли (quest-polly.js): задача пройдена — открывает кабинет в доме птички
+  if (m === 'POST' && p === '/api/office/done') {
+    const u = await needUser(req, env), b = await req.json().catch(() => ({})), t = Math.max(0, Math.min(1, Math.round(Number(b.task) || 0)));
+    if (t) await env.DB.prepare('UPDATE users SET office_task = ? WHERE id = ? AND COALESCE(office_task, 0) < ?').bind(t, u.id, t).run();
+    return json({ ok: true });
+  }
   if (m === 'POST' && p === '/api/room') {
     const u = await needUser(req, env);
     const b = await req.json().catch(() => ({}));
     const room = cleanRoom(b.room || {}, await ownedRoom(env, u.id));
     // галерея комнат в «Стае» сортируется по тому, когда в комнату что-то добавили (новая вещь, обои, пол, вид, шторы) — перестановка не считается
-    const old = roomOf(u), cnt = r => { const m = {}; (r.items || []).forEach(it => { m[it.k + '|' + it.v] = (m[it.k + '|' + it.v] || 0) + 1; }); return m; }, oc = cnt(old);
+    const old = roomOf(u), cnt = r => { const m = {}; roomItems(r).forEach(it => { m[it.k + '|' + it.v] = (m[it.k + '|' + it.v] || 0) + 1; }); return m; }, oc = cnt(old);
     const newItems = Object.entries(cnt(room)).reduce((a, [k, n]) => a + Math.max(0, n - (oc[k] || 0)), 0);
     const added = newItems > 0 || ['wall', 'floor', 'view', 'curtain'].some(k => room[k] && room[k] !== old[k]);
     await env.DB.prepare(`UPDATE users SET room = ?${added ? ', room_at = ?' : ''} WHERE id = ?`).bind(...(added ? [JSON.stringify(room), now(), u.id] : [JSON.stringify(room), u.id])).run();
@@ -1482,7 +1534,7 @@ async function route(req, env, url) {
     } else if (box !== u.box0) {
       const g = await env.DB.prepare("SELECT id, item FROM gifts WHERE user_id = ? AND kind = 'furn' AND note = 'starter' AND status = 'bag'").bind(u.id).first();
       if (!g) fail(404, 'gone');
-      const room = roomOf(u), it = (room.items || []).find(x => x.k === 'furn' && x.v === g.item && x.id != null) || (room.items || []).find(x => x.k === 'furn' && x.v === g.item);
+      const room = roomOf(u), all = roomItems(room), it = all.find(x => x.k === 'furn' && x.v === g.item && x.id != null) || all.find(x => x.k === 'furn' && x.v === g.item);
       if (it) it.v = box;
       await env.DB.prepare("UPDATE gifts SET item = ? WHERE id = ?").bind(box, g.id).run();
       await env.DB.prepare('UPDATE users SET box0 = ?, room = ? WHERE id = ?').bind(box, JSON.stringify(cleanRoom(room, await ownedRoom(env, u.id))), u.id).run();
@@ -1562,7 +1614,8 @@ async function route(req, env, url) {
     const today = (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'potion' AND day = ?").bind(u.id, rigaDay()).first()).n;
     const book = (await env.DB.prepare('SELECT combo, tier, n, created_at FROM potion_book WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results.map(r => { const s = comboSeason(r.combo); return { ...r, season: s, ix: COMBO_IX[s].get(r.combo) }; });
     const gifts = (await env.DB.prepare('SELECT from_nick AS "from", ing, n FROM potion_gifts WHERE to_id = ? AND seen = 0 ORDER BY id').bind(u.id).all()).results;
-    return json({ me: { id: u.id, nick: u.nick, avatar: avatarOf(u) }, level: u.maze_level || 1, inv: invOf(u), eyes: u.eyes || 0, book, today, rules, season: seasonNow(), gifts });
+    return json({ me: { id: u.id, nick: u.nick, avatar: avatarOf(u) }, level: u.maze_level || 1, inv: invOf(u), eyes: u.eyes || 0, book, today, rules, season: seasonNow(), gifts,
+      revive: { need: RULES.potionRevive, days: u.pot_last === rigaDay() || u.pot_last === new Date(Date.now() - 864e5).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }) ? u.pot_days || 0 : 0, today: u.pot_last === rigaDay() } });
   }
   // новый лабиринт текущего уровня: сервер решает, какие ингредиенты в нём лежат; seed — форма лабиринта, проклятия и бонусы (их считает potions.js)
   if (m === 'POST' && p === '/api/potion/level') {
@@ -1597,7 +1650,8 @@ async function route(req, env, url) {
     let eyes = u.eyes || 0, eye = false;
     if (r.eye && b.eye && eyes < 9) { eyes++; eye = true; await env.DB.prepare('UPDATE users SET eyes = ?, eye_next = ? WHERE id = ?').bind(eyes, r.level + 5 + Math.floor(Math.random() * 6), u.id).run(); }
     const badges = r.level >= RULES.cond.mazeA && await gameBadge(env, u, 'maze') ? ['maze'] : [];
-    return json({ ok: true, inv, level, got: got.map(i => items[i]), badges, eye, eyes });
+    const revive = await potDay(env, u);
+    return json({ ok: true, inv, level, got: got.map(i => items[i]), badges, eye, eyes, revive });
   }
   // потратить глаз спасения: этот лабиринт — без привидений, черепов и тумана (их убирает potions.js)
   if (m === 'POST' && p === '/api/potion/eye') {
@@ -1654,6 +1708,22 @@ async function route(req, env, url) {
     ]);
     return json({ ok: true, inv, to: to.nick, n });
   }
+  // зелье оживления положили на котика в комнате (этап 28): зелье пропадает, котик живой навсегда (users.cats_alive +1); room — комната с экрана (ещё могла не сохраниться)
+  if (m === 'POST' && p === '/api/potion/revive') {
+    const u = await needUser(req, env);
+    const b = await req.json().catch(() => ({}));
+    const g = await env.DB.prepare("SELECT id FROM gifts WHERE user_id = ? AND kind = 'furn' AND item = 'revive' AND status = 'bag' ORDER BY id LIMIT 1").bind(u.id).first();
+    if (!g) fail(404, 'gift');
+    const alive = u.cats_alive || 0, cats = cleanRoom(b.room || {}, await ownedRoom(env, u.id)).items.filter(it => it.k === 'furn' && String(it.v).split(':')[0] === 'cat').length;
+    if (cats <= alive) fail(400, 'nocat');
+    await env.DB.batch([
+      env.DB.prepare('DELETE FROM gifts WHERE id = ?').bind(g.id),
+      env.DB.prepare('UPDATE users SET cats_alive = ? WHERE id = ?').bind(alive + 1, u.id),
+    ]);
+    const room = cleanRoom(b.room || {}, await ownedRoom(env, u.id));
+    await env.DB.prepare('UPDATE users SET room = ? WHERE id = ?').bind(JSON.stringify(room), u.id).run();
+    return json({ ok: true, room, gone: g.id });
+  }
   if (m === 'POST' && p === '/api/potion/seen') {
     const u = await needUser(req, env);
     await env.DB.prepare('UPDATE potion_gifts SET seen = 1 WHERE to_id = ? AND seen = 0').bind(u.id).run();
@@ -1701,7 +1771,8 @@ async function route(req, env, url) {
       item = { kind: 'furn', item: 'kidpot:' + (pot.ix % 8) };
       await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, ?, 'bag', ?, ?)").bind(u.id, item.kind, item.item, 'potion:' + pot.season + ':' + pot.ix, now(), now()).run();
     }
-    return json({ ok: true, combo, tier: pot.tier, ix: pot.ix, season: pot.season, first: !was, got, inv, badges, item, back, sure: !pot.tier && (u.pot_fails || 0) + 1 >= 2, pity });
+    const revive = await potDay(env, u);
+    return json({ ok: true, combo, tier: pot.tier, ix: pot.ix, season: pot.season, first: !was, got, inv, badges, item, back, sure: !pot.tier && (u.pot_fails || 0) + 1 >= 2, pity, revive });
   }
   // ---------- «Нарисуй мне» ----------
   if (m === 'GET' && p === '/api/requests') {
