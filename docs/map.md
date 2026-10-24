@@ -60,6 +60,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/pancakes.js` (113K) — Игра «Блинная Полли» (/pancakes/, docs/games.md): Полли печёт блины жителям Воббленда: PAN, SAY, BAKE, setPhase, bakeCol
 - `site/assets/pixel-badge.js` (13K) — Пиксельные бейджи тематик месяцев (кабинет → «🏅 Тематика месяца» → «🎨 Бейдж»; показ — sket: PPPixelBadge, GLYPHS, TEMPLATES, RING, rect
 - `site/assets/polly-help.js` (17K) — «Полли, помоги нарисовать»: гайды /polly-helps/: guide, map
+- `site/assets/polly-school.js` (13K) — «Школа Полли» на /polly-helps/: уроки у мольберта, клиенты из Воббленда: LESSONS, S, LAMP, render
 - `site/assets/polly.js` (26K) — Полли-питомец в левом нижнем углу (`PollyPet`): PollyPet, SEASON, CORNER, HOME_X, addProp
 - `site/assets/posts-admin.js` (25K) — Кабинет → «📣 Посты» (admin.js открывает PPPostsAdmin.mount(main)): готовые картинки и подп: PPPostsAdmin, SERIF, LANGS, POSTS, titos
 - `site/assets/potion-names.js` (27K) — общие данные Зельеварни: ингредиенты, названия зелий (`PPPotion`): PPPotion, ADJ, FALL, ING, potion
