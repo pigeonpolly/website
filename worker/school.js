@@ -22,7 +22,9 @@ const last = rows => { const m = {}; for (const r of rows) m[r.lesson] = r; retu
 // новость ученику: вердикт Алины, который ещё не видел
 export async function schoolNews(env, uid) {
   const r = (await env.DB.prepare('SELECT lesson, status FROM school_works WHERE user_id = ? AND seen = 0 ORDER BY id DESC').bind(uid).all()).results;
-  return r.length ? { n: r.length, lesson: r[0].lesson, ok: r.filter(x => x.status === 'ok').length, redo: r.filter(x => x.status === 'redo').length } : null;
+  if (!r.length) return null;
+  const done = (await env.DB.prepare("SELECT COUNT(DISTINCT lesson) AS n FROM school_works WHERE user_id = ? AND status = 'ok'").bind(uid).first()).n;
+  return { n: r.length, lesson: r[0].lesson, ok: r.filter(x => x.status === 'ok').length, redo: r.filter(x => x.status === 'redo').length, diploma: done >= SCHOOL_LESSONS && r.some(x => x.status === 'ok') }; // 12-я печать — диплом
 }
 
 // h: json, fail, currentUser, needUser, isAdmin, imgPut, randomHex, now, translate(texts, from, langs) → { tr: {lang: [..]} }
@@ -36,7 +38,7 @@ export async function schoolApi(req, env, url, h) {
     const lang = LANGS.includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
     const works = Object.values(last(rows)).map(r => ({ lesson: r.lesson, status: r.status, comment: trOf(r)[lang] || r.comment || '', img: r.img, note: r.note || '', at: r.created_at, checked: r.checked_at, tries: tries[r.lesson], fresh: !r.seen }));
     if (rows.some(r => !r.seen)) await env.DB.prepare('UPDATE school_works SET seen = 1 WHERE user_id = ? AND seen = 0').bind(u.id).run(); // открыл школу — вердикты увидены
-    return json({ me: true, works }, 200, { 'cache-control': 'no-store' });
+    return json({ me: true, nick: u.nick, works }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/school/hand') {
     const u = await h.needUser(req, env);
