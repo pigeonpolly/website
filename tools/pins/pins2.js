@@ -437,7 +437,7 @@ const PINS = [
     kick: 'Free drawing lessons in your browser', title: '*Polly’s* Drawing School', h: 's',
     on: 'Pen, paper and twelve small lessons with a pixel pigeon teacher. Every lesson ends with a real client from Wobbleland.',
     chips: ['✏️ pen & paper', '📮 Polly checks your page', '🎓 pixel diploma'],
-    cta: 'Lesson 1 is open', link: LS('/polly-helps/'),
+    cta: '12 lessons · free', link: LS('/polly-helps/'),
     pt: 'Learn to Draw for Beginners: Free Drawing Lessons at Polly’s School',
     desc: 'Grab any paper and a pen, a napkin works too. Polly the pixel pigeon teaches drawing in twelve small lessons: shapes, lines, texture, volume, shadows and more. Each lesson ends with a client from Wobbleland, you hand in a photo of your page and Polly sends a stamp or a note.',
     alt: 'A drawing school web page with a pixel pigeon teacher in a beret next to an easel with circles, squares and triangles, and a path of twelve lessons.',
