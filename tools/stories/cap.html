@@ -1,0 +1,13 @@
+<!doctype html><html><head><meta charset="utf-8"><link rel="icon" href="data:,">
+<style>body{margin:0;background:#2B1A51}#room{width:768px}</style></head><body>
+<div id="room"></div>
+<script src="/site/assets/birds.js"></script>
+<script src="/site/assets/room.js"></script>
+<script>
+// снимки для сторис (tools/stories/make.py): птички и комната — те же birds.js и room.js, что на сайте
+window.CAP = {
+  bird(id, av) { const B = PPBirds; return B.crop(B.spriteHD(B.dress(B.looks(id), av || {}), 0)).toDataURL(); },
+  room(o) { const box = document.getElementById('room'); box.innerHTML = ''; PPRoom.mount(box, Object.assign({ nick: 'polly', still: true, scale: 6 }, o));
+    return new Promise(r => setTimeout(() => r(box.querySelector('canvas').toDataURL()), 600)); },
+};
+</script></body></html>
