@@ -45,6 +45,10 @@
     newsOff: ['🙈 Don’t show me in the flock news', '🙈 Не показывать меня в новостях стаи', '🙈 Nerādīt mani bara ziņās'],
     wlMail: ['🎉 Holiday emails from Wobbleland (a greeting and a gift for your bird)', '🎉 Письма к праздникам Воббленда (поздравление и подарок птичке)', '🎉 Vēstules Vobblendas svētkos (apsveikums un dāvana putniņam)'],
     fromWl: [(h, c) => `🎉 Holiday gift: “${h}”, ${c}`, (h, c) => `🎉 Подарок к празднику «${h}», ${c}`, (h, c) => `🎉 Svētku dāvana: “${h}”, ${c}`],
+    mailT: ['📮 E-mails from the site', '📮 Письма с сайта', '📮 Vēstules no vietnes'], // письма по согласию (worker/mail.js)
+    mailGames: ['🎮 Game notifications', '🎮 Уведомления из игр', '🎮 Paziņojumi no spēlēm'],
+    mailFeat: ['✨ New things on the site', '✨ Новые фишки на сайте', '✨ Jaunumi vietnē'],
+    mailNews: ['🐦 News from Polly', '🐦 Новости от Полли', '🐦 Ziņas no Pollijas'],
     advMail: ['🎄 Remind me by email when the advent calendar opens', '🎄 Напомнить письмом, когда откроется адвент', '🎄 Atgādināt e-pastā, kad atvērsies adventes kalendārs'],
     delAccAsk: ['Delete your account, all your sketches and your streak? This can’t be undone.', 'Удалить аккаунт, все ваши рисунки и серию? Это нельзя отменить.', 'Dzēst kontu, visas tavas skices un sēriju? To nevarēs atsaukt.'],
     err: ['Something went wrong. Please try again.', 'Что-то пошло не так. Попробуйте ещё раз.', 'Kaut kas nogāja greizi. Pamēģini vēlreiz.'],
@@ -743,7 +747,7 @@
       <div class="bp-tabs" role="tablist">${[['bag', t('tabBag')], ['badges', t('tabBadges')], ['works', t('tabWorks') + ` (${pr.posts.length})`], ...(window.PPCards ? [['cards', t('tabCards')]] : [])]
         .map(([k, n], i) => `<button type="button" role="tab" data-tab="${k}" aria-selected="${i === 0}">${n}</button>`).join('')}<button type="button" class="bp-tab-shop bp-tab-album" id="bp-album">${['🃏 Album', '🃏 Альбом', '🃏 Albums'][L]}</button><a class="bp-tab-shop" href="${L === 1 ? '/ru' : L === 2 ? '/lv' : ''}/shop/">${t('tabShop')}</a></div>
       <div class="bp-panel" role="tabpanel"></div>
-      ${mine ? `<p class="sw-acc bp-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <button type="button" class="sw-link" id="sw-outall">${t('outAll')}</button> · <button type="button" class="sw-link" id="sw-pw">🔑 ${t(me.pw ? 'pwSet' : 'pwAdd')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a> · <button type="button" class="sw-link danger" id="sw-delacc">${t('delAcc')}</button></p>${me.mail && me.email && me.adventAsk ? `<label class="sw-advmail"><input type="checkbox" id="sw-advmail"${me.adventMail ? ' checked' : ''}> ${t('advMail')}</label>` : ''}${me.mail && me.email ? `<label class="sw-advmail"><input type="checkbox" id="sw-wlmail"${me.wlMail ? ' checked' : ''}> ${t('wlMail')}</label>` : ''}<label class="sw-advmail"><input type="checkbox" id="sw-newsoff"${me.newsOff ? ' checked' : ''}> ${t('newsOff')}</label>` : ''}`;
+      ${mine ? `<p class="sw-acc bp-acc"><button type="button" class="sw-link" id="sw-out">${t('logout')}</button> · <button type="button" class="sw-link" id="sw-outall">${t('outAll')}</button> · <button type="button" class="sw-link" id="sw-pw">🔑 ${t(me.pw ? 'pwSet' : 'pwAdd')}</button> · <a class="sw-link" href="/api/export">${t('myData')}</a> · <button type="button" class="sw-link danger" id="sw-delacc">${t('delAcc')}</button></p>${me.mail && me.email && me.mailPrefs ? `<fieldset class="sw-mail" id="mail"><legend>${t('mailT')}</legend>${[['games', 'mailGames'], ['feat', 'mailFeat'], ['news', 'mailNews']].map(([k, l]) => `<label class="sw-advmail"><input type="checkbox" data-mail="${k}"${me.mailPrefs[k] ? ' checked' : ''}> ${t(l)}</label>` + (k === 'games' ? `<div class="sw-mailsub"${me.mailPrefs.games ? '' : ' hidden'}><label class="sw-advmail"><input type="checkbox" id="sw-wlmail"${me.wlMail ? ' checked' : ''}> ${t('wlMail')}</label></div>` : '')).join('')}${me.adventAsk ? `<label class="sw-advmail"><input type="checkbox" id="sw-advmail"${me.adventMail ? ' checked' : ''}> ${t('advMail')}</label>` : ''}</fieldset>` : ''}<label class="sw-advmail"><input type="checkbox" id="sw-newsoff"${me.newsOff ? ' checked' : ''}> ${t('newsOff')}</label>` : ''}`;
     page.querySelector('.sw-ava-slot').replaceWith(window.PPBirds ? window.PPBirds.avatar(pr.id, pr.avatar, 132) : document.createElement('span'));
     const share = () => shareBird({ id: pr.id, nick: pr.nick, avatar: pr.avatar, mine });
     page.querySelector('#bp-share').onclick = share;
@@ -809,6 +813,14 @@
       if (adv) adv.onchange = async () => { try { await post('pw/advent-mail', { on: adv.checked, lang: document.documentElement.lang }); me.adventMail = adv.checked; } catch (e) { adv.checked = !adv.checked; alert(t('err')); } };
       const wlm = document.getElementById('sw-wlmail'); // праздники Воббленда (worker/wl-holidays.js)
       if (wlm) wlm.onchange = async () => { try { await post('wl-mail', { on: wlm.checked, lang: document.documentElement.lang }); me.wlMail = wlm.checked; } catch (e) { wlm.checked = !wlm.checked; alert(t('err')); } };
+      const mailBox = document.getElementById('mail'); // письма с сайта: три вида (worker/mail.js, POST /api/mail/prefs)
+      if (mailBox) {
+        mailBox.querySelectorAll('[data-mail]').forEach(c => c.onchange = async () => {
+          const v = {}; mailBox.querySelectorAll('[data-mail]').forEach(x => { v[x.dataset.mail] = x.checked; });
+          try { await post('mail/prefs', { ...v, lang: document.documentElement.lang }); me.mailPrefs = v; const sub = mailBox.querySelector('.sw-mailsub'); if (sub) sub.hidden = !v.games; } catch (e) { c.checked = !c.checked; alert(t('err')); }
+        });
+        if (location.hash === '#mail') setTimeout(() => mailBox.scrollIntoView({ block: 'center', behavior: 'smooth' }), 300);
+      }
       document.getElementById('sw-outall').onclick = () => window.PPAccount && window.PPAccount.logoutAll();
       document.getElementById('sw-pw').onclick = () => { if (!window.PPAccount) return; window.PPAccount.pwDialog(me.pw ? 'change' : 'add'); document.addEventListener('pp:pw', () => { me.pw = true; document.getElementById('sw-pw').textContent = '🔑 ' + t('pwSet'); }, { once: true }); };
       document.getElementById('sw-delacc').onclick = async () => { if (!confirm(t('delAccAsk'))) return; try { await post('delete-account'); location.href = pre + '/'; } catch (e) { alert(t('err')); } };

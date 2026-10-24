@@ -179,6 +179,48 @@
     if (document.querySelector('dialog[open], .adv-modal, .sw-bv')) { if (tries < 60) setTimeout(() => askBox(tries + 1), 1000); return; }
     askBox.done = true; pickBox('');
   }
+  // письма по согласию (worker/mail.js): окно при первом входе — «Да, присылать всё», мелко «Выбрать» и «Не сейчас»; галочки не стоят заранее
+  const MT = {
+    t: ['📮 May Polly write to you?', '📮 Можно писать тебе на почту?', '📮 Vai Pollija drīkst tev rakstīt?'],
+    p: ['Now and then: a short letter about your bird, the games and what’s new on the site. Unsubscribe in one click from any letter.', 'Иногда — короткое письмо про птичку, игры и новое на сайте. Отписаться можно в один клик из любого письма.', 'Reizēm — īsa vēstule par putniņu, spēlēm un jaunumiem vietnē. Atrakstīties var ar vienu klikšķi no jebkuras vēstules.'],
+    games: ['🎮 Game notifications', '🎮 Уведомления из игр', '🎮 Paziņojumi no spēlēm'],
+    gamesD: ['your garden is drying out, a new case is open…', 'сохнут грядки, открылось новое дело…', 'izkalst dobes, atvērta jauna lieta…'],
+    feat: ['✨ New things on the site', '✨ Новые фишки на сайте', '✨ Jaunumi vietnē'],
+    news: ['🐦 News from Polly', '🐦 Новости от Полли', '🐦 Ziņas no Pollijas'],
+    all: ['✅ Yes, send me everything', '✅ Да, присылать всё', '✅ Jā, sūtīt visu'],
+    pick: ['Choose what to send', 'Выбрать, что присылать', 'Izvēlēties, ko sūtīt'],
+    save: ['Save', 'Сохранить', 'Saglabāt'],
+    later: ['Not now', 'Не сейчас', 'Ne tagad'],
+    priv: ['Privacy', 'Конфиденциальность', 'Privātums'],
+    done: ['📮 Done! You can change this in your profile.', '📮 Готово! Поменять можно в профиле.', '📮 Gatavs! To var mainīt profilā.'],
+  };
+  function askMail(tries = 0) {
+    if (!me || !me.mailAsk || askMail.done) return;
+    if (me.box0 === '' || document.querySelector('dialog[open], .adv-modal, .sw-bv')) { if (tries < 120) setTimeout(() => askMail(tries + 1), 1000); return; }
+    askMail.done = true;
+    const d = document.createElement('dialog'); d.id = 'nw-mail'; d.className = 'nw-dlg nw-maildlg'; d.setAttribute('aria-labelledby', 'nw-mail-t');
+    const box = k => `<label class="nw-mailck"><input type="checkbox" data-k="${k}"> <span>${MT[k][L]}${k === 'games' ? `<small>${MT.gamesD[L]}</small>` : ''}</span></label>`;
+    d.innerHTML = `<div class="nw-in"><div class="nw-head"><h2 id="nw-mail-t">${MT.t[L]}</h2><button type="button" class="nw-x" aria-label="${t('close')}">✕</button></div>
+      <p>${MT.p[L]}</p><ul class="nw-maillist"><li>${MT.games[L]} <small>${MT.gamesD[L]}</small></li><li>${MT.feat[L]}</li><li>${MT.news[L]}</li></ul>
+      <p class="nw-mailgo"><button type="button" class="pill-btn pill-fill nw-mailall">${MT.all[L]}</button></p>
+      <div class="nw-mailpick" hidden>${box('games')}${box('feat')}${box('news')}<p><button type="button" class="pill-btn nw-mailsave">${MT.save[L]}</button></p></div>
+      <p class="nw-mailsmall"><button type="button" class="sw-link nw-mailmore">${MT.pick[L]}</button> · <button type="button" class="sw-link nw-maillater">${MT.later[L]}</button> · <a href="${pre}/privacy/" target="_blank">${MT.priv[L]}</a></p></div>`;
+    document.body.appendChild(d);
+    const send = async (path, b) => {
+      d.querySelectorAll('button').forEach(x => { x.disabled = true; });
+      try { await fetch('/api/mail/' + path, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b || {}) }); } catch (e) { /* спросим в другой раз */ }
+      me.mailAsk = 0; d.close(); d.remove();
+      if (path === 'prefs' && (b.games || b.feat || b.news) && window.PPToast) PPToast(MT.done[L], { ms: 4000 });
+    };
+    const lang = document.documentElement.lang;
+    d.querySelector('.nw-mailall').onclick = () => send('prefs', { games: true, feat: true, news: true, lang });
+    d.querySelector('.nw-mailmore').onclick = () => { const pk = d.querySelector('.nw-mailpick'), open = pk.hidden; pk.hidden = !open; d.querySelector('.nw-maillist').hidden = open; d.querySelector('.nw-mailgo').hidden = open; };
+    d.querySelector('.nw-mailsave').onclick = () => { const v = { lang }; d.querySelectorAll('[data-k]').forEach(c => { v[c.dataset.k] = c.checked; }); send('prefs', v); };
+    const later = () => send('later');
+    d.querySelector('.nw-maillater').onclick = later; d.querySelector('.nw-x').onclick = later;
+    d.addEventListener('cancel', e => { e.preventDefault(); later(); });
+    d.showModal();
+  }
   // письмо о коробках: прочитать — отметить прочитанным
   // ---------- праздник Воббленда: письмо от жителей города, подарок и ссылка в Воббленд ----------
   // x.note — подарок-вещь ('wl:' + названия | города), иначе пуговки: x.city, x.md, x.btn — название из wl-holidays.json (уже загружен) или из списка в x.t
@@ -319,7 +361,7 @@
   function set(d) {
     me = d && d.user && d.user.nick ? d.user : null;
     news = me ? (d.user.news || []) : [];
-    drawBell(); askBox(); fly();
+    drawBell(); askBox(); askMail(); fly();
   }
   // после действия на странице (открыто окошко, подарок…) — заново спросить сервер; конвертик второй раз не вылетает
   function refresh() {

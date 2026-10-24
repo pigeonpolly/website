@@ -1,5 +1,5 @@
 // Праздники Воббленда (docs/wobbleland.md «Праздничные письма»): в день праздника (по Риге) каждой птичке с ником — тематическая вещь-подарок
-// в «конвертик» (gifts status 'new', note 'wl:…'), а у кого есть почта и письма не выключены — письмо-поздравление со ссылкой на /wobbleland/.
+// в «конвертик» (gifts status 'new', note 'wl:…'), а у кого есть почта, согласие на «Уведомления из игр» (users.mail_games, worker/mail.js) и праздничные письма не выключены — письмо-поздравление со ссылкой на /wobbleland/.
 // Данные — site/assets/wl-holidays.json (tools/catalog.js из content/wobbleland.json, поле holidays[].gift). Письма — sendMail (worker/auth.js):
 // пока нет секретов RESEND_KEY и MAIL_FROM, писем нет, подарки приходят всё равно.
 import { mailOn, sendMail } from './auth.js';
@@ -70,10 +70,10 @@ export async function wlHolidayCron(env, h, force) {
   let key = null, list = [];
   for (let n = 0; n < MAIL_DAYS && !key; n++) { const d = shift(day, -n), l = all.filter(x => x.md === d.slice(5)); if (l.length && await h.getMeta('wl_gift:' + d)) { key = d; list = l; } }
   if (!key) return;
-  const sent = Number(await h.getMeta('wl_mail_n:' + day)) || 0, adv = Number(await h.getMeta('advent_mail_n:' + day)) || 0;
+  const sent = Number(await h.getMeta('wl_mail_n:' + day)) || 0, adv = (Number(await h.getMeta('advent_mail_n:' + day)) || 0) + (Number(await h.getMeta('mail_n:' + day)) || 0); // + письма из кабинета (worker/mail.js)
   const lim = Math.max(0, Math.min(HOUR_MAX, DAY_MAX - sent - adv));
   if (!lim) return;
-  const rows = (await env.DB.prepare("SELECT id, email, nick, lang FROM users WHERE email IS NOT NULL AND email != '' AND banned = 0 AND nick IS NOT NULL AND nick != '' AND COALESCE(wl_mail_off, 0) = 0 AND COALESCE(wl_sent, '') < ? ORDER BY id LIMIT ?").bind(key, lim).all()).results;
+  const rows = (await env.DB.prepare("SELECT id, email, nick, lang FROM users WHERE email IS NOT NULL AND email != '' AND banned = 0 AND nick IS NOT NULL AND nick != '' AND COALESCE(wl_mail_off, 0) = 0 AND mail_games = 1 AND COALESCE(wl_sent, '') < ? ORDER BY id LIMIT ?").bind(key, lim).all()).results;
   let n = sent;
   for (const u of rows) {
     const L = langOf(u.lang), off = `${SITE}/api/wl-mail/off?u=${u.id}&t=${await unsubToken(env, h, u.id)}&l=${L}`;

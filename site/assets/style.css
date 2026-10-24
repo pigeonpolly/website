@@ -1934,6 +1934,11 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .acct-pwd .acct-l, .acct-pwd .acct-pw { width: 100%; }
 .sw-advmail { display: flex; gap: 8px; align-items: center; justify-content: center; margin: 6px 0 0; font-size: 14px; color: inherit; cursor: pointer; }
 .sw-advmail input { width: 18px; height: 18px; accent-color: #F0A987; }
+.sw-mail { border: 1px solid var(--line, #e6dff2); border-radius: 14px; padding: 6px 14px 10px; margin: 12px auto 4px; max-width: 360px; }
+.sw-mail legend { padding: 0 6px; font-size: 14px; font-weight: 600; }
+.sw-mail .sw-advmail { justify-content: flex-start; }
+.sw-mailsub { margin-left: 26px; font-size: 13px; }
+.sw-mailsub[hidden] { display: none; }
 .acct-pwd input { font-size: 16px; text-align: left; }
 @media (max-width: 480px) { .acct-auth { width: auto; max-height: calc(100vh - var(--header-h, 60px) - 20px); } }
 .acct-pop .acct-terms, .acct-nick .acct-terms { margin: 10px 0 0; font-size: 12.5px; line-height: 1.45; color: #7A6F99; }
@@ -4342,6 +4347,21 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .nw-paper-act .nw-wl-gift { background: var(--peach); border-color: var(--peach); font-weight: 700; }
 .nw-boxlater .pill-btn, .nw-paper-act .pill-btn { color: #2B1A51; background: #fff; border: 1.5px solid #CDBFE0; }
 @media (max-width: 480px) { .nw-boxgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
+/* письма по согласию (news.js askMail) */
+.nw-maildlg p { margin: 0 0 10px; line-height: 1.4; }
+.nw-maillist { margin: 0 0 14px; padding: 0; list-style: none; display: grid; gap: 6px; }
+.nw-maillist li { padding: 8px 12px; border-radius: 12px; background: #F4F0FA; font-weight: 600; }
+.nw-maillist small, .nw-mailck small { display: block; font-weight: 400; font-size: .82rem; color: #6E5F80; }
+.nw-mailgo { text-align: center; }
+.nw-mailgo .pill-btn { font-size: 1.05rem; padding: 12px 22px; }
+.nw-mailpick { margin: 0 0 10px; display: grid; gap: 6px; }
+.nw-mailpick p { text-align: center; margin: 4px 0 0; }
+.nw-mailpick[hidden], .nw-maildlg [hidden] { display: none; }
+.nw-mailpick .pill-btn { color: #2B1A51; background: #fff; border: 1.5px solid #CDBFE0; }
+.nw-mailck { display: flex; gap: 10px; align-items: flex-start; cursor: pointer; }
+.nw-mailck input { width: 18px; height: 18px; margin-top: 2px; accent-color: #8B6BC8; }
+.nw-mailsmall { text-align: center; font-size: .82rem; color: #6E5F80; margin: 0 !important; }
+.nw-mailsmall .sw-link, .nw-mailsmall a { color: #6E5F80; }
 /* вкладки магазина: 🐦 для птички / 🏠 для комнаты / 🎲 сюрпризы / 🃏 карточки (src/pages/shop.html `tabs`) */
 .shop-tabs { display: grid; grid-template-columns: repeat(4, 1fr); gap: 8px; max-width: 1280px; margin: 14px auto 0; }
 .shop-tab { font: 600 17px var(--sans); padding: 13px 10px; border-radius: 16px; border: 2px solid rgba(255,255,255,.28); background: rgba(255,255,255,.06); color: inherit; cursor: pointer; }

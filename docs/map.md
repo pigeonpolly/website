@@ -177,6 +177,8 @@ _правка — кабинет → 📜 Правила (meta `rules`)_
 
 _Сюда следующие этапы дописывают общие сведения о коде._
 
+- Письма птичкам на почту — только через согласие worker/mail.js: новое автоматическое письмо = проверка `users.mail_games` (или feat/news), подвал и отписка — `sendOne`, общий суточный лимит — `usedToday` (meta `mail_n:`, `advent_mail_n:`, `wl_mail_n:`). Рассылки Алины — кабинет ✉️ Письма (mail-admin.js `PPMailAdmin`).
+
 - Новости птички: `NEWS_KINDS` (worker) → `news` в /api/whoami, /api/news; news.js `KINDS`. Новый вид — по записи там и тут.
 - Тема дня челленджа: всегда `ChallengeTheme.themeFor(d, L)` (план месяца из D1, `theme.loading`, событие `pp:chplan`); подбор и план — worker/challenge-plan.js + challenge-days.js.
 - useItem (sketch-wall.js) — «нажал — появилось»: вещь птички надеть/снять, вещь комнаты → `PPRoom.live.use` (своя комната на странице; нет — профиль с #use=). Тост — toast.js `PPToast(msg, { action, onAction, ms })` (в layout перед account.js). Свободное место в комнате — room.js `PPRoom.freeSpot(lay, d, k)`. Мелкая ли вещь — `PPRoom.isSmall(d)` (полки, коробки); что светит в темноте — `PPRoom.GLOW`. Можно ли в коробку — `PPCanDo(kind, item).pack`, коробка ли — `PPCanDo.isBox`.

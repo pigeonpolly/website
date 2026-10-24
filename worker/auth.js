@@ -63,9 +63,10 @@ async function failAll(env, keys) {
 // Сейчас писем нет — заглушка. Включаются секретами RESEND_KEY и MAIL_FROM (Resend, бесплатно 3000 в месяц / 100 в сутки).
 // На локальной проверке DEV_MAIL=1 — письма «отправляются» в лог и в meta dev_last_mail.
 export const mailOn = env => !!(env.RESEND_KEY && env.MAIL_FROM) || env.DEV_MAIL === '1';
-export async function sendMail(env, to, subject, text) {
+// extra — дополнительные поля Resend: headers (List-Unsubscribe), reply_to (worker/mail.js)
+export async function sendMail(env, to, subject, text, extra) {
   if (env.RESEND_KEY && env.MAIL_FROM) {
-    const r = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { authorization: 'Bearer ' + env.RESEND_KEY, 'content-type': 'application/json' }, body: JSON.stringify({ from: env.MAIL_FROM, to: [to], subject, text }) }).catch(() => null);
+    const r = await fetch('https://api.resend.com/emails', { method: 'POST', headers: { authorization: 'Bearer ' + env.RESEND_KEY, 'content-type': 'application/json' }, body: JSON.stringify({ from: env.MAIL_FROM, to: [to], subject, text, ...(extra || {}) }) }).catch(() => null);
     if (!r || !r.ok) console.error('mail', r && r.status, r && await r.text().catch(() => ''));
     return { ok: !!(r && r.ok) };
   }
