@@ -42,6 +42,10 @@
     again2: ['Hand in again', 'Сдать заново', 'Iesniegt vēlreiz'],
     alina: ['Polly', 'Полли', 'Pollija'],
     soon: ['soon', 'скоро', 'drīz'],
+    task: ['📋 The order', '📋 Заказ', '📋 Pasūtījums'],
+    task1: ['On a sheet of paper, draw the two things you picked:', 'На листе бумаги нарисуй две выбранные вещи:', 'Uz papīra lapas uzzīmē divas izvēlētās lietas:'],
+    task2: ['First only big shapes (circle, rectangle, oval), then a couple of details — a handle, a label, a shadow.', 'Сначала только крупные фигуры (круг, прямоугольник, овал), потом пара деталей — ручка, этикетка, тень.', 'Vispirms tikai lielas figūras (aplis, taisnstūris, ovāls), tad pāris detaļu — rokturis, etiķete, ēna.'],
+    task3: ['Take a photo of the page and press “Hand in to Polly”.', 'Сфотографируй страницу и нажми «Сдать Полли».', 'Nofotografē lapu un nospied “Iesniegt Pollijai”.'],
     book: ['The pictures come from Alina’s book', 'Рисунки — из книги Алины', 'Zīmējumi ir no Alīnas grāmatas'],
     bookGo: ['More exercises inside →', 'Там ещё больше упражнений →', 'Tur vēl vairāk vingrinājumu →'],
   };
@@ -82,7 +86,7 @@
     { find: 1, say: ['Game time! This lamp hides three shapes. Tap all of them.', 'Игра! В этой лампе спрятаны три фигуры. Найди и нажми все.', 'Spēle! Šajā lampā paslēptas trīs figūras. Atrodi un pieskaries visām.'] },
     { img: 'l1-s1.png', paper: [['a mug', 'кружка', 'krūze'], ['a book', 'книга', 'grāmata'], ['a lamp', 'лампа', 'lampa'], ['a fruit', 'фрукт', 'auglis'], ['a bottle', 'бутылка', 'pudele']],
       say: ['Now on paper! Pick any two of these things and find them at home. First only shapes, then a couple of details. Tick the ones you draw.', 'Теперь на бумаге! Выбери любые две вещи из списка и найди их дома. Сначала только фигуры, потом пара деталей. Отметь те, что нарисованы.', 'Tagad uz papīra! Izvēlies jebkuras divas lietas no saraksta un atrodi tās mājās. Vispirms tikai figūras, tad pāris detaļu. Atzīmē uzzīmētās.'] },
-    { client: 'mr-crisper', name: ['Mr. Crisper', 'Мистер Криспер', 'Misters Krispers'], job: ['lost-and-found, Wobbleland station', 'бюро находок, вокзал Воббленда', 'atrasto mantu birojs, Vobllendas stacija'],
+    { client: 'mr-crisper', card: 'classic/14.jpg', name: ['Mr. Crisper', 'Мистер Криспер', 'Misters Krispers'], job: ['lost-and-found, Wobbleland station', 'бюро находок, вокзал Воббленда', 'atrasto mantu birojs, Vobllendas stacija'],
       say: ['Oh dear, oh dear! Things at the lost-and-found have no labels, and I can’t sleep. Draw me the two you picked in simple shapes, so I can label at least those boxes!', 'Ох-ох-ох! В бюро находок вещи без этикеток, и я не могу уснуть. Нарисуй мне те две, что выбраны, простыми фигурами — подпишу хоть эти коробки!', 'Ak vai, ak vai! Atrasto mantu birojā lietām nav etiķešu, un es nevaru aizmigt. Uzzīmē man tās divas, kuras izvēlējies, ar vienkāršām figūrām — uzlīmēšu etiķetes vismaz šīm kastēm!'] },
     { img: 'l1-c4.png', say: ['I look at every page myself: a stamp, or a note on what to try again. The answer comes to your envelope 💌. And I’m already preparing lesson 2!', 'Я смотрю каждую страницу сама: ставлю печать или пишу, что попробовать ещё раз. Ответ придёт в конвертик 💌. А урок 2 я уже готовлю!', 'Es katru lapu apskatu pati: uzlieku zīmogu vai uzrakstu, ko pamēģināt vēlreiz. Atbilde pienāks aploksnē 💌. Bet 2. nodarbību es jau gatavoju!'] },
   ];
@@ -93,7 +97,7 @@
   let view = st.step;
   const srv = { me: null, works: {} }; // с сервера: вошла ли птичка, последняя сдача по урокам
   const LESSON = 1;
-  const loadSrv = () => fetch('/api/school', { credentials: 'same-origin' }).then(r => r.json()).then(d => {
+  const loadSrv = () => fetch('/api/school?lang=' + ['en', 'ru', 'lv'][L], { credentials: 'same-origin' }).then(r => r.json()).then(d => {
     srv.me = !!d.me; srv.works = {}; for (const w of d.works || []) srv.works[w.lesson] = w;
     render();
   }).catch(() => { srv.me = false; });
@@ -110,7 +114,7 @@
   const easelArt = i => {
     const s = S[i];
     if (s.find) return lampSvg(st.find);
-    if (s.client) return `<img class="ps-client-pic" src="/images/wobbleland/pt-${s.client}.png" alt="">`;
+    if (s.client) return `<img class="ps-client-pic" src="/images/cards/${s.card}" alt="${esc(tr(s.name))}">`; // карточка жителя — акварель Алины, чётко
     return `<img src="${IMG}${s.img}" alt="">`;
   };
   const PAPER_MIN = 2; // из пяти вещей — любые две (решение Алины)
@@ -130,17 +134,19 @@
     if (s.find) return `<p class="ps-ans">${t('found')}: ${st.find.length} / ${LAMP.length}${st.find.length ? ' · ' + st.find.map(k => tr(LAMP.find(x => x[0] === k)[2])).join(', ') : ''}</p>`;
     if (s.paper) return `<div class="ps-paper">${s.paper.map((p, k) => `<label><input type="checkbox" data-p="${k}"${st.paper.includes(k) ? ' checked' : ''}> ${tr(p)}</label>`).join('')}</div>`;
     if (s.client) {
-      if (srv.me === null) return '';
-      if (!srv.me) return `<div class="ps-hand"><button type="button" class="ps-file ps-login">${t('signin')}</button><p class="ps-states">${t('signNote')}</p></div>`;
+      const picked = S.find(x => x.paper).paper.filter((_, k) => st.paper.includes(k)).map(tr);
+      const task = `<div class="ps-task"><b>${t('task')}</b><ol><li>${t('task1')} <b>${esc(picked.join(', ') || '—')}</b>.</li><li>${t('task2')}</li><li>${t('task3')}</li></ol></div>`;
+      if (srv.me === null) return task;
+      if (!srv.me) return task + `<div class="ps-hand"><button type="button" class="ps-file ps-login">${t('signin')}</button><p class="ps-states">${t('signNote')}</p></div>`;
       const w = srv.works[LESSON];
       if (w && w.status === 'ok') return `<p class="ps-ans">${t('ok')}</p>`;
-      return `${w && w.status === 'wait' ? verdict() : ''}<form class="ps-hand" onsubmit="return false"><label class="ps-file">${w && w.status === 'wait' ? t('swap') : t('upload')}<input type="file" accept="image/*" hidden></label><img class="ps-prev" alt="" hidden><textarea rows="2" placeholder="${esc(t('note'))}"></textarea><button type="button" class="ps-send">${w && w.status === 'redo' ? t('again2') : t('send')}</button><p class="ps-proto" role="status"></p></form>`;
+      return `${task}${w && w.status === 'wait' ? verdict() : ''}<form class="ps-hand" onsubmit="return false"><label class="ps-file">${w && w.status === 'wait' ? t('swap') : t('upload')}<input type="file" accept="image/*" hidden></label><img class="ps-prev" alt="" hidden><textarea rows="2" placeholder="${esc(t('note'))}"></textarea><button type="button" class="ps-send">${w && w.status === 'redo' ? t('again2') : t('send')}</button><p class="ps-proto" role="status"></p></form>`;
     }
     return '';
   };
   const bubble = i => {
     const s = S[i];
-    const who = s.client ? `<div class="ps-who"><img src="/images/wobbleland/ch-${s.client}.png" alt=""><b>${tr(s.name)}</b><span>${tr(s.job)}</span></div>` : '';
+    const who = s.client ? `<div class="ps-who"><img src="/images/cards/${s.card}" alt=""><b>${tr(s.name)}</b><span>${tr(s.job)}</span></div>` : '';
     return `<li class="ps-b${s.client ? ' client' : ''}${i === view ? ' cur' : ''}" data-i="${i}">${who}<p>${tr(s.say)}</p>${extra(i)}${i === view ? `<span class="ps-eye">👁 ${t('onEasel')}</span>` : ''}</li>`;
   };
 

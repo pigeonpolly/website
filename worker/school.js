@@ -10,6 +10,11 @@ export const SCHOOL_TABLES = [
   'CREATE INDEX IF NOT EXISTS school_works_u ON school_works (user_id, lesson)',
   'CREATE INDEX IF NOT EXISTS school_works_s ON school_works (status)',
 ];
+// комментарий Алины переводится при проверке на все языки сайта: comment_tr = {en, ru, lv} (оригинал — на своём языке)
+export const SCHOOL_ALTER = ['ALTER TABLE school_works ADD COLUMN comment_tr TEXT'];
+const LANGS = ['en', 'ru', 'lv'];
+const langOf = t => /[а-яё]/i.test(t) ? 'ru' : /[āēīūčšžņļķģ]/i.test(t) ? 'lv' : 'en'; // на каком языке написала Алина
+const trOf = r => { try { return JSON.parse(r.comment_tr || '{}'); } catch (e) { return {}; } };
 export const SCHOOL_LESSONS = 12, SCHOOL_DAY_MAX = 20; // уроков; сдач в сутки на птичку
 
 const last = rows => { const m = {}; for (const r of rows) m[r.lesson] = r; return m; }; // rows по id → последняя попытка урока
@@ -20,7 +25,7 @@ export async function schoolNews(env, uid) {
   return r.length ? { n: r.length, lesson: r[0].lesson, ok: r.filter(x => x.status === 'ok').length, redo: r.filter(x => x.status === 'redo').length } : null;
 }
 
-// h: json, fail, currentUser, needUser, isAdmin, imgPut, randomHex, now
+// h: json, fail, currentUser, needUser, isAdmin, imgPut, randomHex, now, translate(texts, from, langs) → { tr: {lang: [..]} }
 export async function schoolApi(req, env, url, h) {
   const p = url.pathname, m = req.method, { json, fail } = h;
   if (m === 'GET' && p === '/api/school') {
@@ -28,7 +33,8 @@ export async function schoolApi(req, env, url, h) {
     if (!u || !u.nick || u.banned) return json({ me: false, works: [] }, 200, { 'cache-control': 'no-store' });
     const rows = (await env.DB.prepare('SELECT * FROM school_works WHERE user_id = ? ORDER BY id').bind(u.id).all()).results;
     const tries = {}; for (const r of rows) tries[r.lesson] = (tries[r.lesson] || 0) + 1;
-    const works = Object.values(last(rows)).map(r => ({ lesson: r.lesson, status: r.status, comment: r.comment || '', img: r.img, note: r.note || '', at: r.created_at, checked: r.checked_at, tries: tries[r.lesson], fresh: !r.seen }));
+    const lang = LANGS.includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
+    const works = Object.values(last(rows)).map(r => ({ lesson: r.lesson, status: r.status, comment: trOf(r)[lang] || r.comment || '', img: r.img, note: r.note || '', at: r.created_at, checked: r.checked_at, tries: tries[r.lesson], fresh: !r.seen }));
     if (rows.some(r => !r.seen)) await env.DB.prepare('UPDATE school_works SET seen = 1 WHERE user_id = ? AND seen = 0').bind(u.id).run(); // открыл школу — вердикты увидены
     return json({ me: true, works }, 200, { 'cache-control': 'no-store' });
   }
@@ -59,7 +65,7 @@ export async function schoolApi(req, env, url, h) {
       const out = [];
       for (const r of rows) {
         const before = (await env.DB.prepare('SELECT img, comment, created_at FROM school_works WHERE user_id = ? AND lesson = ? AND id < ? ORDER BY id').bind(r.user_id, r.lesson, r.id).all()).results;
-        out.push({ id: r.id, nick: r.nick, user: r.user_id, lesson: r.lesson, img: r.img, note: r.note || '', status: r.status, comment: r.comment || '', at: r.created_at, checked: r.checked_at, before });
+        out.push({ id: r.id, nick: r.nick, user: r.user_id, lesson: r.lesson, img: r.img, note: r.note || '', status: r.status, comment: r.comment || '', tr: Object.keys(trOf(r)), at: r.created_at, checked: r.checked_at, before });
       }
       const n = (await env.DB.prepare(`SELECT status, COUNT(*) AS n FROM school_works w WHERE ${latest} GROUP BY status`).all()).results;
       return json({ works: out, counts: Object.fromEntries(n.map(x => [x.status, x.n])) }, 200, { 'cache-control': 'no-store' });
@@ -69,9 +75,13 @@ export async function schoolApi(req, env, url, h) {
       const status = b.status, comment = String(b.comment || '').trim().slice(0, 1000);
       if (!['ok', 'redo'].includes(status)) fail(400, 'status');
       if (status === 'redo' && !comment) fail(400, 'comment'); // на доработку — всегда с объяснением
-      const upd = await env.DB.prepare('UPDATE school_works SET status = ?, comment = ?, checked_at = ?, seen = 0 WHERE id = ?').bind(status, comment, h.now(), Number(b.id)).run();
-      if (!upd.meta.changes) fail(404, 'work');
-      return json({ ok: true });
+      const work = await env.DB.prepare('SELECT id FROM school_works WHERE id = ?').bind(Number(b.id)).first();
+      if (!work) fail(404, 'work');
+      // перевод комментария на все языки сайта (не вышло — ученик увидит оригинал; при следующей правке переведётся заново)
+      const from = langOf(comment), tr = comment ? { [from]: comment } : {};
+      if (comment) { try { const r = await h.translate([comment], from, LANGS); for (const l of LANGS) if (r.tr[l] && r.tr[l][0]) tr[l] = r.tr[l][0]; } catch (e) {} }
+      await env.DB.prepare('UPDATE school_works SET status = ?, comment = ?, comment_tr = ?, checked_at = ?, seen = 0 WHERE id = ?').bind(status, comment, JSON.stringify(tr), h.now(), work.id).run();
+      return json({ ok: true, tr: Object.keys(tr) });
     }
   }
   return null;

@@ -26,7 +26,7 @@
           <p class="sa-top"><a href="/bird/?nick=${encodeURIComponent(w.nick)}" target="_blank">@${esc(w.nick)}</a> · <b>Урок ${w.lesson} «${LESSONS[w.lesson - 1] || ''}»</b> · <small>${dm(w.at)}${w.before.length ? ` · попытка ${w.before.length + 1}` : ''}</small></p>
           ${w.note ? `<p class="sa-note">✉️ ${esc(w.note)}</p>` : ''}
           ${w.before.length ? `<div class="sa-before">${w.before.map(b => `<a href="/api/img/${b.img}" target="_blank" rel="noopener" title="${esc(b.comment)}"><img src="/api/img/${b.img}?t=1" alt=""><small>${esc((b.comment || '').slice(0, 60))}</small></a>`).join('')}</div>` : ''}
-          ${w.status !== 'wait' ? `<p class="sa-was">${w.status === 'ok' ? '✅ Печать' : '↩ На доработке'} · ${dm(w.checked)}${w.comment ? ` — «${esc(w.comment)}»` : ''}</p>` : ''}
+          ${w.status !== 'wait' ? `<p class="sa-was">${w.status === 'ok' ? '✅ Печать' : '↩ На доработке'} · ${dm(w.checked)}${w.comment ? ` — «${esc(w.comment)}» <small>🌐 ${w.tr.length >= 3 ? 'переведён на EN · RU · LV' : 'перевод не получился — ученик видит как написано'}</small>` : ''}</p>` : ''}
           <textarea rows="2" placeholder="Комментарий ученику (для «на доработку» — обязательно)">${esc(w.comment)}</textarea>
           <div class="sa-act"><button type="button" class="pill-btn pill-fill" data-v="ok">✅ Поставить печать</button><button type="button" class="pill-btn" data-v="redo">↩ На доработку</button><span class="sa-st" role="status"></span></div>
         </div></li>`).join('')}</ul>` : `<p class="adm-calm">${tab === 'wait' ? 'Новых работ нет ✓' : 'Пока пусто'}</p>`}</section>`;
@@ -35,8 +35,8 @@
       const li = b.closest('.sa-w'), st = li.querySelector('.sa-st');
       st.textContent = '…';
       try {
-        await api('admin/school/check', { id: +li.dataset.id, status: b.dataset.v, comment: li.querySelector('textarea').value });
-        st.textContent = b.dataset.v === 'ok' ? '✓ Печать стоит' : '✓ Вернули на доработку';
+        const r = await api('admin/school/check', { id: +li.dataset.id, status: b.dataset.v, comment: li.querySelector('textarea').value });
+        st.textContent = (b.dataset.v === 'ok' ? '✓ Печать стоит' : '✓ Вернули на доработку') + (li.querySelector('textarea').value.trim() ? ((r.tr || []).length >= 3 ? ' · комментарий переведён на EN, RU, LV' : ' · перевод не получился, ученик увидит как написано') : '');
         if (tab === 'wait') setTimeout(() => li.remove(), 700);
       } catch (e) { st.textContent = ERR[e.message] || e.message; }
     });
