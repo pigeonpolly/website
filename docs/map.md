@@ -15,6 +15,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/index.js` (260K) — Worker: site/, страницы через HTMLRewriter, /api (кроме блога), cron: RULES, BTN, STOCK, GIFT_KINDS, GOLD_PICKS, PLEVEL, award, btnOf, catalog, avatarOf, cnt, gameUnit
 - `worker/mail.js` (13K) — Письма с сайта по согласию (docs/bird.md «Письма»): три вида — games (уведомления из игр),: MAIL_CATS, MAIL_DAY_MAX, CAT, FOOT, LATER, PAGE, langOf, clean, dayKey, mailCron, pre, sendOne
 - `worker/pancakes.js` (12K) — «Блинная Полли» (/pancakes/, site/assets/pancakes.js, docs/games.md): Полли печёт блины жи: PAN_UPS, TOP, PAN_ALTER, PAN_BADGES, PAN_COND, PAN_INT, today, upsOf, price, pancakesApi
+- `worker/school.js` (6K) — «Школа Полли»: сдача работ, проверка Алиной (печать / на доработку), новость school: SCHOOL_TABLES, SCHOOL_LESSONS, schoolApi, schoolNews
 - `worker/shift.js` (4K) — «Смена с Полли» (/shift/, этап 29, site/assets/shift.js, docs/rooms.md): таймер работы вме: SHIFT_MIN, SHIFT_ALTER, SHIFT_INT, SHIFT_RANGE, SHIFT_RULES, SHIFT_TABLES, out, shiftApi
 - `worker/titos-sort.js` (13K) — «Разбери дела» (этап 9 А, docs/titos.md): у Титоса упали коробки: SORT_TWISTS, ARCHIVE, shuffle, rng, sortRound
 - `worker/titos.js` (31K) — Детектив Титос (docs/titos.md): 100 уровней-дел, кофе, пуговки за уровень.: MAX, MIN, TITOS_PRIZES, OPEN, TITOS_ITEMS, TR_BUDGET, out, resolve, rowOf, saveRow, caseOf, settle
@@ -60,6 +61,8 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/pancakes.js` (113K) — Игра «Блинная Полли» (/pancakes/, docs/games.md): Полли печёт блины жителям Воббленда: PAN, SAY, BAKE, setPhase, bakeCol
 - `site/assets/pixel-badge.js` (13K) — Пиксельные бейджи тематик месяцев (кабинет → «🏅 Тематика месяца» → «🎨 Бейдж»; показ — sket: PPPixelBadge, GLYPHS, TEMPLATES, RING, rect
 - `site/assets/polly-help.js` (17K) — «Полли, помоги нарисовать»: гайды /polly-helps/: guide, map
+- `site/assets/school-admin.js` (5K) — кабинет → 🎓 Школа Полли: работы учеников, печать / на доработку: PPSchoolAdmin
+- `site/assets/polly-school.js` (13K) — «Школа Полли» на /polly-helps/: уроки у мольберта, клиенты из Воббленда: LESSONS, S, LAMP, render
 - `site/assets/polly.js` (26K) — Полли-питомец в левом нижнем углу (`PollyPet`): PollyPet, SEASON, CORNER, HOME_X, addProp
 - `site/assets/posts-admin.js` (25K) — Кабинет → «📣 Посты» (admin.js открывает PPPostsAdmin.mount(main)): готовые картинки и подп: PPPostsAdmin, SERIF, LANGS, POSTS, titos
 - `site/assets/potion-names.js` (27K) — общие данные Зельеварни: ингредиенты, названия зелий (`PPPotion`): PPPotion, ADJ, FALL, ING, potion

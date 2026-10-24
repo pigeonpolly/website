@@ -15,6 +15,7 @@ import { flockNewsApi, flockEvent as flockEventDb, roomEvent, flockNewsCron, FLO
 import { topApi, topScore, topCron, TOP_TABLES } from './top.js'; // доски топа игр (docs/games.md)
 import { mailApi, mailCron, mailGamesCron, mailAsk, mailPrefs, MAIL_TABLES, MAIL_ALTER, MAIL_RULES, MAIL_RANGE, MAIL_INT } from './mail.js'; // письма по согласию: окно, отписка, рассылка из кабинета (docs/bird.md «Письма»)
 import { shiftApi, SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_RANGE, SHIFT_INT } from './shift.js'; // «Смена с Полли» (этап 29, docs/rooms.md)
+import { schoolApi, schoolNews, SCHOOL_TABLES } from './school.js'; // «Школа Полли»: сдача работ и проверка (docs/challenge.md)
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
 import { gardenApi, gardenDrop, gardenNews, GARDEN_TABLES, GARDEN_ALTER, GARDEN_RULES, GARDEN_RANGE, GARDEN_INT, GARDEN_BOOL, GARDEN_SEASONS } from './garden.js'; // огород птички (этап 22, docs/bird.md «Огород»)
 import { ideasApi } from './ideas.js'; // кабинет → «💡 Темы для блога» (docs/admin.md)
@@ -329,6 +330,7 @@ const NEWS_KINDS = [
   ['reward', (env, req, u) => rewardNews(env, u.id)], // награда Титоса за уровень (worker/titos.js) — «Поставить» в ленте
   ['feathers', (env, req, u) => featherNews(env, u, rigaDay())], // пёрышки комнате — сводка раз в сутки (worker/flock.js)
   ['seeds', (env, req, u) => gardenNews(env, u.id)], // семечко из игры, редкое или волшебное — пока птичка не зашла в огород (worker/garden.js)
+  ['school', (env, req, u) => schoolNews(env, u.id)], // «Школа Полли»: печать или «на доработку» от Алины, пока ученик не открыл /polly-helps/ (worker/school.js)
   ['boxes', (env, req, u) => u.box_mail ? { n: 1, box: u.box0 || 'cardbox' } : null], // письмо о коробках и бардаке (старым птичкам и новым после выбора коробки)
 ];
 async function newsOf(env, req, u) {
@@ -478,6 +480,7 @@ async function ensureSchema(env) {
     ...PAN_TABLES.map(sql => env.DB.prepare(sql)), // «Блинная Полли»: pan_runs (worker/pancakes.js)
     ...GARDEN_TABLES.map(sql => env.DB.prepare(sql)), // огород: garden (worker/garden.js)
     ...SHIFT_TABLES.map(sql => env.DB.prepare(sql)), // «Смена с Полли»: shift_runs (worker/shift.js)
+    ...SCHOOL_TABLES.map(sql => env.DB.prepare(sql)), // «Школа Полли»: school_works (worker/school.js)
     ...TITOS_TABLES.map(sql => env.DB.prepare(sql)), // детектив Титос: titos, titos_cases (worker/titos.js)
     ...FLOCK_NEWS_TABLES.map(sql => env.DB.prepare(sql)), // новости стаи: flock_events (worker/flock-news.js)
     ...FLOCK_TABLES.map(sql => env.DB.prepare(sql)), // пёрышки и гости комнат: room_guests, feathers (worker/flock.js)
@@ -1457,6 +1460,7 @@ async function route(req, env, url) {
   if (p === '/api/garden' || p.startsWith('/api/garden/')) { const r = await gardenApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p === '/api/admin/ideas') { const r = await ideasApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/mail/') || p.startsWith('/api/admin/mail')) { const r = await mailApi(req, env, url, authHelpers(env)); if (r) return r; }
+  if (p === '/api/school' || p.startsWith('/api/school/') || p === '/api/admin/school' || p === '/api/admin/school/check') { const r = await schoolApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, randomHex, now }); if (r) return r; }
   if (p === '/api/shift' || p.startsWith('/api/shift/')) { const r = await shiftApi(req, env, url, { json, fail, currentUser, needUser, rules: () => RULES, randomHex, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p.startsWith('/api/titos') || p.startsWith('/api/admin/titos')) { const r = await titosApi(req, env, url, titosHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/cards') || p.startsWith('/api/admin/cards')) { const r = await cardsApi(req, env, url, cardHelpers(env)); if (r) return r; }
@@ -2710,6 +2714,7 @@ async function route(req, env, url) {
     return json({
       comments: await cnt("SELECT COUNT(*) AS n FROM blog_comments WHERE status = 'pending'"),
       requests: await cnt("SELECT COUNT(*) AS n FROM draw_requests WHERE status = 'open'"),
+      school: await cnt("SELECT COUNT(*) AS n FROM school_works WHERE status = 'wait'"), // «Школа Полли»: работы ждут проверки
       subs: await cnt('SELECT COUNT(*) AS n FROM subscribers WHERE created_at > ?', subsSeen), subsSeen,
       auto, advent, adventYear: ry,
       edits: await cnt("SELECT COUNT(*) AS n FROM site_blocks WHERE lang != '*' AND html IS NOT NULL AND id NOT LIKE 'custom-%'"), // свой текст поверх блока из кода
