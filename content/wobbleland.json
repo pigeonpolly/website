@@ -15,12 +15,14 @@
         {
           "date": "Mar 12",
           "title": "The Great Wobble Day",
-          "desc": "Giant swaying platforms are built on Seagull Square; residents compete to stand longest holding a cup of coffee for the title of \"Wobble Master\"; seagulls march the main street and get bread treats."
+          "desc": "Giant swaying platforms are built on Seagull Square; residents compete to stand longest holding a cup of coffee for the title of \"Wobble Master\"; seagulls march the main street and get bread treats.",
+          "gift": "anim|wiggle"
         },
         {
           "date": "Dec 31",
           "title": "New Year",
-          "desc": "Taverns serve gooseberry wine; seagulls take places of honor at the tables; children share sweet pies with the birds by the bonfires."
+          "desc": "Taverns serve gooseberry wine; seagulls take places of honor at the tables; children share sweet pies with the birds by the bonfires.",
+          "gift": "hat|party:0"
         }
       ],
       "dishes": [
@@ -108,27 +110,32 @@
         {
           "date": "Mar 3",
           "title": "Hivekeeper's Eve",
-          "desc": "Residents leave wax candles by the beehives to thank the bees; a gift of homemade honey cookies is considered a blessing for the year."
+          "desc": "Residents leave wax candles by the beehives to thank the bees; a gift of homemade honey cookies is considered a blessing for the year.",
+          "gift": "furn|honeypot"
         },
         {
           "date": "Sep 17",
           "title": "The Great Wink Day",
-          "desc": "Everyone winks at their neighbor over maple coffee; a \"Winking Marathon\" is held; free syrup of unusual flavors is poured; evening street concerts."
+          "desc": "Everyone winks at their neighbor over maple coffee; a \"Winking Marathon\" is held; free syrup of unusual flavors is poured; evening street concerts.",
+          "gift": "item|syrup"
         },
         {
           "date": "Oct 21",
           "title": "The Fall of Leaves Festival",
-          "desc": "Leaf fights, a contest for the pancake that looks most like a fallen leaf, and a giant pancake filling the main square, drenched in syrup."
+          "desc": "Leaf fights, a contest for the pancake that looks most like a fallen leaf, and a giant pancake filling the main square, drenched in syrup.",
+          "gift": "item|mapleleaf"
         },
         {
           "date": "Dec 21",
           "title": "Snow Taffy Night",
-          "desc": "On the longest night of the year hot syrup is poured onto the snow on the main square to make taffy; whoever winks at the moon gets the sweetest piece, and lanterns are lit to call the sun back."
+          "desc": "On the longest night of the year hot syrup is poured onto the snow on the main square to make taffy; whoever winks at the moon gets the sweetest piece, and lanterns are lit to call the sun back.",
+          "gift": "deco|papermoon"
         },
         {
           "date": "Dec 25",
           "title": "Amber Night",
-          "desc": "The city is lit with amber lamps; residents drink hot mead and syrup drinks and tell tales of giant bees."
+          "desc": "The city is lit with amber lamps; residents drink hot mead and syrup drinks and tell tales of giant bees.",
+          "gift": "furn|lamp"
         }
       ],
       "dishes": [
@@ -198,7 +205,8 @@
         {
           "date": "Jun 1",
           "title": "Slowstep Festival",
-          "desc": "Residents compete to walk the length of a street as slowly as possible without stopping; herbalists and bakers offer honeyed snail teas; children decorate snails with ribbons for a parade."
+          "desc": "Residents compete to walk the length of a street as slowly as possible without stopping; herbalists and bakers offer honeyed snail teas; children decorate snails with ribbons for a parade.",
+          "gift": "furn|teapot"
         }
       ],
       "dishes": [
@@ -277,17 +285,20 @@
         {
           "date": "Aug 30",
           "title": "Festival of Pies Under the Pines",
-          "desc": "Long tables of pies fill the streets; tradition is to give the first slice to a neighbor or stranger; pie-shaped lanterns are lit at dusk."
+          "desc": "Long tables of pies fill the streets; tradition is to give the first slice to a neighbor or stranger; pie-shaped lanterns are lit at dusk.",
+          "gift": "furn|cake"
         },
         {
           "date": "Sep 28",
           "title": "Day of Squirrel Bakers",
-          "desc": "Children dress as squirrels and \"baked nuts\"; a contest for the best nut pie, winner gets a golden pinecone; legend says squirrels help bake that day."
+          "desc": "Children dress as squirrels and \"baked nuts\"; a contest for the best nut pie, winner gets a golden pinecone; legend says squirrels help bake that day.",
+          "gift": "deco|pinecone"
         },
         {
           "date": "Dec 15",
           "title": "Festival of Warm Ovens",
-          "desc": "Bakers compete to keep their pastries hot the longest; residents bring mittens to warm their hands; the evening ends with communal tea and icing-decorated pastries."
+          "desc": "Bakers compete to keep their pastries hot the longest; residents bring mittens to warm their hands; the evening ends with communal tea and icing-decorated pastries.",
+          "gift": "furn|gingerhouse"
         }
       ],
       "dishes": [
@@ -369,22 +380,26 @@
         {
           "date": "Mar 22",
           "title": "Festival of Lemon Drops",
-          "desc": "Lemon-drop candies are handed out on the square; children play \"Catch the Wedge\"; adults boil syrup."
+          "desc": "Lemon-drop candies are handed out on the square; children play \"Catch the Wedge\"; adults boil syrup.",
+          "gift": "item|lollipop"
         },
         {
           "date": "Sep 30",
           "title": "Festival of Lemon Lights",
-          "desc": "The city is decorated with candied lemon-peel garlands; a contest for \"sourest lemon.\""
+          "desc": "The city is decorated with candied lemon-peel garlands; a contest for \"sourest lemon.\"",
+          "gift": "wall|lemons"
         },
         {
           "date": "Oct 31",
           "title": "Lantern Lemon Night",
-          "desc": "Residents craft lanterns out of lemons; children go door to door for lemon pastries; families gather to tell spooky stories around the citrus lanterns."
+          "desc": "Residents craft lanterns out of lemons; children go door to door for lemon pastries; families gather to tell spooky stories around the citrus lanterns.",
+          "gift": "furn|jacklantern"
         },
         {
           "date": "Dec 29",
           "title": "Little Suns Day",
-          "desc": "Lemons are hidden in the snow all over the valley like tiny suns; children hunt for them, and the one who finds the most is called \"Little Sun\" and gets the first mug of hot honey lemonade."
+          "desc": "Lemons are hidden in the snow all over the valley like tiny suns; children hunt for them, and the one who finds the most is called \"Little Sun\" and gets the first mug of hot honey lemonade.",
+          "gift": "frame|sunrays"
         }
       ],
       "dishes": [
@@ -458,12 +473,14 @@
         {
           "date": "May 27",
           "title": "Festival of the Lost Button",
-          "desc": "Residents wear clothes with deliberately mismatched buttons all day; in the evening they trade found buttons; the brighter the button, the more luck it brings."
+          "desc": "Residents wear clothes with deliberately mismatched buttons all day; in the evening they trade found buttons; the brighter the button, the more luck it brings.",
+          "gift": "furn|knitting"
         },
         {
           "date": "Dec 25",
           "title": "Button Tree Night",
-          "desc": "A fir tree on the tower square is decorated with buttons only; everyone hangs a button found this year and takes another in return — a promise of a new friend in the year ahead."
+          "desc": "A fir tree on the tower square is decorated with buttons only; everyone hangs a button found this year and takes another in return — a promise of a new friend in the year ahead.",
+          "gift": "furn|xmastree"
         }
       ],
       "dishes": [
@@ -537,17 +554,20 @@
         {
           "date": "Apr 3",
           "title": "Tanglefork Parade",
-          "desc": "Giant figures made of noodles and sauce are paraded through the streets; residents throw fried noodles at each other like confetti."
+          "desc": "Giant figures made of noodles and sauce are paraded through the streets; residents throw fried noodles at each other like confetti.",
+          "gift": "deco|bunting"
         },
         {
           "date": "Nov 5",
           "title": "Golden Broth Week",
-          "desc": "Every street brews its own signature broth — mushroom, meat, vegetable, or spicy."
+          "desc": "Every street brews its own signature broth — mushroom, meat, vegetable, or spicy.",
+          "gift": "furn|souppot"
         },
         {
           "date": "Dec 23",
           "title": "Long Noodle Eve",
-          "desc": "One single noodle is stretched through every street of town as a wish for a long life; each household holds its own stretch, and whoever lets it break washes everyone's pots."
+          "desc": "One single noodle is stretched through every street of town as a wish for a long life; each household holds its own stretch, and whoever lets it break washes everyone's pots.",
+          "gift": "deco|ladles"
         }
       ],
       "dishes": [
@@ -625,22 +645,26 @@
         {
           "date": "Jun 10",
           "title": "Festival of Sticky Fingers",
-          "desc": "Children race to eat jam without a spoon; adults brew winter blends with cinnamon, clove, and orange."
+          "desc": "Children race to eat jam without a spoon; adults brew winter blends with cinnamon, clove, and orange.",
+          "gift": "item|cherry"
         },
         {
           "date": "Jul 7",
           "title": "Jam Jamboree",
-          "desc": "A massive communal jam-making session on the main square using fruit brought by every resident."
+          "desc": "A massive communal jam-making session on the main square using fruit brought by every resident.",
+          "gift": "furn|jamjars"
         },
         {
           "date": "Oct 1",
           "title": "Festival of Inkberries",
-          "desc": "Residents gather ink-berries to make ink and jam, then write short poems on leaves hung from the trees."
+          "desc": "Residents gather ink-berries to make ink and jam, then write short poems on leaves hung from the trees.",
+          "gift": "item|pencil"
         },
         {
           "date": "Dec 5",
           "title": "Jar Lantern Night",
-          "desc": "Empty jam jars become lanterns and line every cellar stair; each family opens its first winter jar, and whoever finds the darkest jam must tell a story by candlelight."
+          "desc": "Empty jam jars become lanterns and line every cellar stair; each family opens its first winter jar, and whoever finds the darkest jam must tell a story by candlelight.",
+          "gift": "furn|tallcandle"
         }
       ],
       "dishes": [
@@ -718,22 +742,26 @@
         {
           "date": "Jan 5",
           "title": "Golden Grid Night",
-          "desc": "Festive waffles with a golden cheese crust are baked; tradition is to count waffle squares instead of stars."
+          "desc": "Festive waffles with a golden cheese crust are baked; tradition is to count waffle squares instead of stars.",
+          "gift": "item|cheese"
         },
         {
           "date": "Feb 14",
           "title": "Bride & Bond Day",
-          "desc": "Townsfolk braid a giant cheese braid for luck; couples exchange small cheese braids tied with red ribbon and hide wish-notes inside."
+          "desc": "Townsfolk braid a giant cheese braid for luck; couples exchange small cheese braids tied with red ribbon and hide wish-notes inside.",
+          "gift": "item|heart"
         },
         {
           "date": "Nov 8",
           "title": "Aged Day",
-          "desc": "Each family opens its oldest wheel of cheese; elders tell stories; \"Century Secret\" pies hide different cheeses inside; the young give the old \"wisdom braids.\""
+          "desc": "Each family opens its oldest wheel of cheese; elders tell stories; \"Century Secret\" pies hide different cheeses inside; the young give the old \"wisdom braids.\"",
+          "gift": "furn|rockingchair"
         },
         {
           "date": "Dec 7",
           "title": "Golden Melt Festival",
-          "desc": "Everyone dips bread, vegetables, or fruit into melted cheese; a contest for the longest cheese-string pull; the evening ends with \"Melted Steps\" dancing."
+          "desc": "Everyone dips bread, vegetables, or fruit into melted cheese; a contest for the longest cheese-string pull; the evening ends with \"Melted Steps\" dancing.",
+          "gift": "anim|jelly"
         }
       ],
       "dishes": [
@@ -815,17 +843,20 @@
         {
           "date": "Feb 25",
           "title": "Great Whistle Day",
-          "desc": "The whole town boils its kettles at once; the louder the collective whistle, the luckier the year."
+          "desc": "The whole town boils its kettles at once; the louder the collective whistle, the luckier the year.",
+          "gift": "furn|kettle"
         },
         {
           "date": "Dec 19",
           "title": "Frosted Spout Day",
-          "desc": "Kettles are set on every windowsill to steam the glass; by morning the frost draws patterns on the windows, and the prettiest window wins a brand-new copper cezve."
+          "desc": "Kettles are set on every windowsill to steam the glass; by morning the frost draws patterns on the windows, and the prettiest window wins a brand-new copper cezve.",
+          "gift": "deco|icicle"
         },
         {
           "date": "Dec 30",
           "title": "Winter Brew Eve",
-          "desc": "The town's main winter holiday — residents brew one giant communal pot of spiced tea for anyone who stops by."
+          "desc": "The town's main winter holiday — residents brew one giant communal pot of spiced tea for anyone who stops by.",
+          "gift": "furn|teaset"
         }
       ],
       "dishes": [
@@ -919,12 +950,14 @@
         {
           "date": "Apr 1",
           "title": "Confession Day",
-          "desc": "Any inmate who writes a genuinely honest (or genuinely funny) confession gets a shot at early release; outside, islanders mail in mock \"confessions\" for their smallest sins, just for the joke of it."
+          "desc": "Any inmate who writes a genuinely honest (or genuinely funny) confession gets a shot at early release; outside, islanders mail in mock \"confessions\" for their smallest sins, just for the joke of it.",
+          "gift": "furn|paperstack"
         },
         {
           "date": "Dec 31",
           "title": "Day of Covering Tracks",
-          "desc": "All cases are tied up with string and carried to the archive until April 1; until then nobody is released and no old case is looked at again. The clerks sweep the footprints off the snow at the gate, and the whole Department pretends nothing ever happened."
+          "desc": "All cases are tied up with string and carried to the archive until April 1; until then nobody is released and no old case is looked at again. The clerks sweep the footprints off the snow at the gate, and the whole Department pretends nothing ever happened.",
+          "gift": "furn|broom"
         }
       ],
       "dishes": [

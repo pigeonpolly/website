@@ -49,3 +49,15 @@ for (const k of real) { const ps = B.GIFTS[k].filter(v => !B.LEGEND.has(k + '|' 
 out.prices['any|?'] = 60; out.prices['any|legend'] = 650;
 fs.writeFileSync(path.join(root, 'site/assets/catalog.json'), JSON.stringify(out));
 console.log(Object.entries(out.items).map(([k, v]) => k + ':' + v.length).join(' '), 'legend', out.legend.length);
+// праздники Воббленда (docs/wobbleland.md «Праздничные письма»): дата, город, название, описание и подарок на 3 языках → site/assets/wl-holidays.json (worker/wl-holidays.js)
+const WL = JSON.parse(fs.readFileSync(path.join(root, 'content/wobbleland.json'), 'utf8')), MON = ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'];
+const wlTr = ['ru', 'lv'].map(l => { try { return JSON.parse(fs.readFileSync(path.join(root, `content/i18n/wobbleland.${l}.json`), 'utf8')); } catch (e) { return {}; } });
+const wl = [];
+for (const c of WL.cities) c.holidays.forEach((h, i) => {
+  if (!h.gift) return;
+  const [m, d] = h.date.split(' '), tr = wlTr.map(t => ((t[c.key] || {}).holidays || [])[i] || {}), [k, v] = h.gift.split('|');
+  wl.push({ md: String(MON.indexOf(m.slice(0, 3)) + 1).padStart(2, '0') + '-' + String(+d).padStart(2, '0'), city: c.key, i,
+    town: [c.name, ...wlTr.map(t => (t[c.key] || {}).name || c.name)], title: [h.title, ...tr.map(t => t.title || h.title)], desc: [h.desc, ...tr.map(t => t.desc || h.desc)],
+    gift: h.gift, giftName: [0, 1, 2].map(L => B.giftName(k, v, L)) });
+});
+fs.writeFileSync(path.join(root, 'site/assets/wl-holidays.json'), JSON.stringify(wl.sort((a, b) => a.md < b.md ? -1 : 1), null, 0));

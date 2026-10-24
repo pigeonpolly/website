@@ -9,6 +9,7 @@ import '../site/assets/can-do.js'; // PPCanDo — что можно с вещь�
 const PPCanDo = globalThis.PPCanDo;
 import { cardsApi, importCards, translateMissing, myCards, tradeNews, cardGiftNews, CARD_TABLES, CARD_ALTER } from './cards.js'; // коллекционные карточки (docs/cards.md)
 import { authApi, googleLink, funnelStep, mailOn, adventMail, adventAsk, AUTH_TABLES, AUTH_ALTER } from './auth.js'; // вход с паролем, письма, воронки (этап 12)
+import { wlHolidayCron, wlMailApi, wlLang, WL_ALTER } from './wl-holidays.js'; // праздники Воббленда: подарки и письма (docs/wobbleland.md)
 import { flockApi, featherNews, FLOCK_TABLES, FLOCK_ALTER } from './flock.js'; // «Все птички» и пёрышки (этап 13 Б+В, docs/flock.md)
 import { flockNewsApi, flockEvent as flockEventDb, roomEvent, flockNewsCron, FLOCK_NEWS_TABLES, FLOCK_NEWS_ALTER } from './flock-news.js'; // новости стаи (этап 13 Г, docs/flock.md)
 import { topApi, topScore, topCron, TOP_TABLES } from './top.js'; // доски топа игр (docs/games.md)
@@ -65,6 +66,7 @@ export default {
       await importTitos(env, new URL('https://www.pigeonpolly.com/')).catch(e => console.error('titos', e)); // дела Титоса: новый titos-cases.json — в D1 и перевести (один раз на хэш)
       await challengeCron(env, RULES).catch(e => console.error('challenge plan', e)); // темы челленджа: с 20-го — план следующего месяца
       await adventMail(env, authHelpers(env)).catch(e => console.error('advent mail', e)); // 1 декабря: письмо «адвент открылся» тем, кто отметил галочку
+      await wlHolidayCron(env, authHelpers(env)).catch(e => console.error('wl holiday', e)); // праздник Воббленда: подарок всем птичкам и письмо-поздравление
       await flockNewsCron(env).catch(e => console.error('flock news', e)); // новости стаи — 30 дней
       await autoNicks(env).catch(e => console.error('auto nick', e)); // птички без ника — случайный ник
       await migrateToR2(env); await cleanupInactive(env);
@@ -449,7 +451,7 @@ async function ensureSchema(env) {
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_days INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_last TEXT', 'ALTER TABLE users ADD COLUMN cats_alive INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER,
-    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...SHIFT_ALTER, ...CHALLENGE_ALTER, ...GARDEN_ALTER]) {
+    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...SHIFT_ALTER, ...CHALLENGE_ALTER, ...GARDEN_ALTER, ...WL_ALTER]) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   // «Выбор Полли» подешевел с 50 до 11 пуговок: уже начисленные записи пересчитать один раз, баланс = сумма журнала
@@ -1404,6 +1406,7 @@ async function route(req, env, url) {
   const p = url.pathname, m = req.method;
   if (p.startsWith('/api/pw/') || p === '/api/funnel' || p === '/api/admin/pw-reset' || p === '/api/admin/funnels') { const r = await authApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p === '/api/flock/news' || p === '/api/news-off' || p === '/api/admin/flock-notes') { const r = await flockNewsApi(req, env, url, newsHelpers(env)); if (r) return r; }
+  if (p.startsWith('/api/wl-mail') || p === '/api/admin/wl-holiday') { const r = await wlMailApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p === '/api/birds' || p === '/api/feathers' || p === '/api/feather') { const r = await flockApi(req, env, url, flockHelpers(env)); if (r) return r; }
   if (p === '/api/top' && url.searchParams.get('g')) { const r = await topApi(req, env, url, { json, fail, currentUser, avatarOf }); if (r) return r; }
   if (p === '/api/pancakes' || p.startsWith('/api/pancakes/')) { const r = await pancakesApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, top: (uid, n) => topScore(env, 'pan', uid, n),
@@ -2110,6 +2113,7 @@ async function route(req, env, url) {
     const u = await currentUser(req, env);
     const earned = u && u.nick && !u.banned ? await award(env, u.id, 'daily', rigaDay(), BTN.daily) : 0; // +3 пуговки за первый заход за сутки (шапка спрашивает на каждой странице)
     // зарплата от «администрации Воббленда»: пуговки уже начислены, а конвертик ещё не открыт (seen = 0)
+    const wl = u && wlLang(req); if (wl && wl !== u.lang) await env.DB.prepare('UPDATE users SET lang = ? WHERE id = ?').bind(wl, u.id).run().catch(() => {}); // язык праздничных писем (worker/wl-holidays.js)
     const news = await newsOf(env, req, u); // «конвертик»: зарплата, подарки, адвент… (site/assets/news.js)
     // серия челленджа — для меню аватара в шапке (этап 14 Б)
     const streak = u && u.nick && !u.banned ? streaks(streakDays((await env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(u.id).all()).results)).current : 0;
@@ -2173,7 +2177,7 @@ async function route(req, env, url) {
     for (const b of forBadges.got) await flockEventDb(env, 'badge', u, { badge: b }); // новости стаи: «У @ник новый бейдж»
     const storage = admin ? Math.round(await storageUsed(env) * 1000) / 10 : undefined;
     const migration = admin && env.MEDIA ? await migrationStatus(env) : undefined;
-    return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, pw: !!u.pw, mail: mailOn(env), email: !!u.email, adventMail: !!u.advent_mail, newsOff: !!u.news_off, adventAsk: adventAsk(rigaDay()), consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
+    return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, pw: !!u.pw, mail: mailOn(env), email: !!u.email, adventMail: !!u.advent_mail, wlMail: !u.wl_mail_off, newsOff: !!u.news_off, adventAsk: adventAsk(rigaDay()), consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
       best: mergedBest(u, streakDays(rows)), keptBadges: kept, posts: rows, id: u.id, avatar: avatarOf(u), room: roomOf(u), earned, badgeEarned: forBadges, btn: await buttonStatus(env, u),
       gifts: (await env.DB.prepare('SELECT id, kind, item, note, status, created_at FROM gifts WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results } });
   }
