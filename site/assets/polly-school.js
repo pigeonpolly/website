@@ -53,6 +53,8 @@
     dipLine: ['12 lessons · 12 stamps · drawing on paper', '12 уроков · 12 печатей · рисунок на бумаге', '12 nodarbības · 12 zīmogi · zīmējums uz papīra'],
     dipMotto: ['Shapes first, details later — and never be afraid of a crooked line!', 'Сначала фигуры, потом детали — и никогда не бойся кривой линии!', 'Vispirms figūras, tad detaļas — un nekad nebaidies no šķības līnijas!'],
     dipSign: ['Teacher Polly', 'Учитель Полли', 'Skolotāja Pollija'],
+    dipTo: ['is awarded to', 'вручается', 'tiek pasniegts'],
+    dipDate: ['date', 'дата', 'datums'],
     dipCongrats: ['Congratulations! All twelve stamps are in. Here is your diploma — and the daily challenge is waiting for your drawings.', 'Поздравляю! Все двенадцать печатей стоят. Вот твой диплом — а челлендж ждёт твоих рисунков.', 'Apsveicu! Visi divpadsmit zīmogi ir uzlikti. Lūk, tavs diploms — un izaicinājums gaida tavus zīmējumus.'],
     dipSave: ['⬇ Save the diploma', '⬇ Скачать диплом', '⬇ Lejupielādēt diplomu'],
     toChallenge: ['✏️ To the challenge', '✏️ В челлендж', '✏️ Uz izaicinājumu'],
@@ -168,35 +170,59 @@
     const c = document.createElement('canvas'), W = 1200, H = 850, x = c.getContext('2d');
     c.width = W; c.height = H;
     x.imageSmoothingEnabled = false;
-    x.fillStyle = '#2B1A51'; x.fillRect(0, 0, W, H);
-    x.fillStyle = '#FBF4E2'; x.fillRect(40, 40, W - 80, H - 80);
-    // пиксельная рамка: клетки по краю
-    const px = 20, cols = ['#D85A30', '#F0A987', '#E9A93B', '#7f81bf'];
-    for (let i = 0; i * px < W - 80; i++) for (const y of [40, H - 60]) { x.fillStyle = cols[(i + (y > 100 ? 2 : 0)) % 4]; x.fillRect(40 + i * px, y, px, px); }
-    for (let j = 0; j * px < H - 80; j++) for (const xx of [40, W - 60]) { x.fillStyle = cols[(j + (xx > 100 ? 1 : 3)) % 4]; x.fillRect(xx, 40 + j * px, px, px); }
-    // Полли
-    const s = 14;
-    P.forEach((row, yy) => [...row].forEach((ch, xx) => { if (C[ch]) { x.fillStyle = C[ch]; x.fillRect(110 + xx * s, 430 + yy * s, s, s); } }));
-    x.textAlign = 'center'; x.fillStyle = '#2B1A51';
-    const serif = "600 {s}px Fraunces, Georgia, serif", sans = "{w} {s}px Karla, system-ui, sans-serif";
-    const f = (tpl, sz, w = 400) => tpl.replace('{s}', sz).replace('{w}', w);
-    x.font = f(serif, 92); x.fillText(t('dipTitle'), W / 2, 185);
-    x.fillStyle = '#D85A30'; x.font = f(sans, 34, 700); x.fillText(t('dipSchool'), W / 2, 240);
-    x.fillStyle = '#2B1A51'; x.font = f(serif, 64); x.fillText('@' + (srv.nick || '…'), W / 2, 345);
-    x.font = f(sans, 28); x.fillStyle = '#5A4E78'; x.fillText(t('dipLine'), W / 2, 400);
-    // 12 печатей
+    const INK = '#2B1A51', SOFT = '#6A5F86', GOLD = '#B8862E', RED = '#C2502A', PAPER = '#FBF4E2';
+    x.fillStyle = INK; x.fillRect(0, 0, W, H);
+    x.fillStyle = PAPER; x.fillRect(28, 28, W - 56, H - 56);
+    // зерно бумаги — редкие пиксели
+    let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
+    x.fillStyle = 'rgba(184,134,46,.10)'; for (let i = 0; i < 2600; i++) x.fillRect(28 + Math.floor(rnd() * (W - 56) / 4) * 4, 28 + Math.floor(rnd() * (H - 56) / 4) * 4, 4, 4);
+    // двойная золотая рамка и пиксельные уголки
+    x.strokeStyle = GOLD; x.lineWidth = 4; x.strokeRect(58, 58, W - 116, H - 116);
+    x.lineWidth = 2; x.strokeRect(70, 70, W - 140, H - 140);
+    const corner = (cx, cy, sx, sy) => { x.fillStyle = GOLD; for (const [i, j] of [[0, 0], [1, 0], [2, 0], [0, 1], [0, 2], [2, 2], [3, 3]]) x.fillRect(cx + sx * i * 8 - (sx < 0 ? 8 : 0), cy + sy * j * 8 - (sy < 0 ? 8 : 0), 8, 8); };
+    corner(84, 84, 1, 1); corner(W - 84, 84, -1, 1); corner(84, H - 84, 1, -1); corner(W - 84, H - 84, -1, -1);
+    const serif = (sz, it) => `${it ? 'italic 400' : '600'} ${sz}px Fraunces, Georgia, serif`, sans = (sz, w = 400) => `${w} ${sz}px Karla, system-ui, sans-serif`;
+    const spaced = (txt, y, gap) => { x.letterSpacing = gap + 'px'; x.fillText(txt, W / 2 + gap / 2, y); x.letterSpacing = '0px'; };
+    x.textAlign = 'center';
+    x.fillStyle = RED; x.font = sans(17, 700); spaced(t('dipSchool').toUpperCase() + '  ·  PIGEON POLLY ART LAB', 140, 5);
+    x.fillStyle = INK; x.font = serif(110, true); x.fillText(t('dipTitle'), W / 2, 252);
+    // ромбик-разделитель
+    x.fillStyle = GOLD; x.fillRect(W / 2 - 150, 284, 120, 2); x.fillRect(W / 2 + 30, 284, 120, 2);
+    x.save(); x.translate(W / 2, 285); x.rotate(Math.PI / 4); x.fillRect(-7, -7, 14, 14); x.restore();
+    x.fillStyle = SOFT; x.font = serif(26, true); x.fillText(t('dipTo'), W / 2, 338);
+    x.fillStyle = INK; x.font = serif(70); x.fillText('@' + (srv.nick || '…'), W / 2, 420);
+    x.fillStyle = SOFT; x.font = sans(16, 700); spaced(t('dipLine').toUpperCase(), 466, 3);
+    // 12 печатей в ряд: кружок-штемпель
     LS.forEach((l, i) => {
-      const cx = 400 + (i % 6) * 80, cy = 480 + Math.floor(i / 6) * 86;
-      x.fillStyle = '#5FA35A'; x.fillRect(cx - 30, cy - 30, 60, 60);
-      x.fillStyle = '#FBF4E2'; x.fillRect(cx - 24, cy - 24, 48, 48);
-      x.fillStyle = '#5FA35A'; x.font = f(sans, 28, 700); x.fillText(l.icon, cx, cy + 10);
-      x.fillStyle = '#5A4E78'; x.font = f(sans, 13, 700); x.fillText(String(i + 1), cx, cy + 46);
+      const cx = W / 2 + (i - 5.5) * 64, cy = 530;
+      x.strokeStyle = 'rgba(194,80,42,.85)'; x.lineWidth = 3; x.beginPath(); x.arc(cx, cy, 25, 0, 7); x.stroke();
+      x.lineWidth = 1; x.beginPath(); x.arc(cx, cy, 20, 0, 7); x.stroke();
+      x.fillStyle = RED; x.font = sans(20, 700); x.fillText(l.icon, cx, cy + 7);
     });
-    x.fillStyle = '#2B1A51'; x.font = 'italic ' + f(sans, 24); x.fillText(t('dipMotto'), W / 2, 700);
+    x.fillStyle = INK; x.font = serif(24, true); x.fillText('«' + t('dipMotto') + '»', W / 2, 618);
+    // низ: дата — печать — подпись
+    const ly = 712;
+    x.fillStyle = INK; x.fillRect(150, ly, 260, 2); x.fillRect(W - 410, ly, 260, 2);
     const last = Math.max(...Object.values(srv.works).map(w => w.checked || 0));
     const date = new Date((last || Date.now() / 1000) * 1000).toLocaleDateString(['en-GB', 'ru-RU', 'lv-LV'][L], { day: 'numeric', month: 'long', year: 'numeric' });
-    x.textAlign = 'left'; x.font = f(sans, 22); x.fillText(date, 110, 760);
-    x.textAlign = 'right'; x.font = f(serif, 30); x.fillText(t('dipSign') + ' 🕊', W - 110, 760);
+    x.font = sans(24, 500); x.fillText(date, 280, ly - 14);
+    x.fillStyle = SOFT; x.font = sans(13, 700); x.letterSpacing = '3px'; x.fillText(t('dipSign').toUpperCase(), W - 280 + 1.5, ly + 28); x.fillText(t('dipDate').toUpperCase(), 280 + 1.5, ly + 28); x.letterSpacing = '0px';
+    // подпись — отпечаток голубиной лапки (подушечки пальцев и коготки)
+    x.save(); x.translate(W - 280, ly - 34); x.rotate(-0.22); x.fillStyle = 'rgba(43,26,81,.88)';
+    const pad = (d, a, rx, ry) => { x.beginPath(); x.ellipse(d * Math.sin(a), -d * Math.cos(a), rx, ry, a, 0, 7); x.fill(); };
+    pad(0, 0, 10, 9);
+    for (const [a, n] of [[-0.75, 3], [0, 3], [0.75, 3], [Math.PI, 2]]) {
+      for (let i = 0; i < n; i++) pad(17 + i * 13, a, 5.5, 7);
+      const d = 17 + n * 13 - 1; x.beginPath(); x.moveTo((d - 4) * Math.sin(a) - 3 * Math.cos(a), -(d - 4) * Math.cos(a) - 3 * Math.sin(a)); x.lineTo((d - 4) * Math.sin(a) + 3 * Math.cos(a), -(d - 4) * Math.cos(a) + 3 * Math.sin(a)); x.lineTo((d + 6) * Math.sin(a), -(d + 6) * Math.cos(a)); x.fill();
+    }
+    x.restore();
+    // восковая печать с Полли
+    const sx = W / 2, sy = 702;
+    x.fillStyle = '#9E3A1E'; x.beginPath(); for (let k = 0; k < 24; k++) { const r = k % 2 ? 62 : 68, a = k / 24 * Math.PI * 2; x.lineTo(sx + r * Math.cos(a), sy + r * Math.sin(a)); } x.fill();
+    x.fillStyle = RED; x.beginPath(); x.arc(sx, sy, 54, 0, 7); x.fill();
+    x.strokeStyle = 'rgba(251,244,226,.55)'; x.lineWidth = 2; x.beginPath(); x.arc(sx, sy, 46, 0, 7); x.stroke();
+    const s = 5, ox = sx - 7 * s, oy = sy - 7.5 * s;
+    P.forEach((row, yy) => [...row].forEach((ch, xx) => { if (C[ch]) { x.fillStyle = ch === 'd' || ch === 'k' ? '#6E2410' : '#F6D7C6'; if (ch === 'w') x.fillStyle = RED; x.fillRect(ox + xx * s, oy + yy * s, s, s); } }));
     return c;
   }
   const diplomaView = () => {
@@ -211,7 +237,11 @@
       ${mode === 'dip' ? diplomaView() : lessonView()}
       <a class="ps-book" href="${['', '/ru', '/lv'][L]}/e-books/"><img src="${IMG}book-cover.jpg" alt=""><span>${t('book')} <b>Watercolor Sketches: Creative Guide</b><em>${t('bookGo')}</em></span></a>`;
     const pic = box.querySelector('.ps-dip-pic');
-    if (pic) { const c = diplomaCanvas(); c.className = 'ps-dip-canvas'; pic.append(c); }
+    if (pic) {
+      const c = diplomaCanvas(); c.className = 'ps-dip-canvas'; pic.append(c);
+      // шрифты сайта могут догрузиться позже — перерисовать
+      document.fonts && Promise.all(['600 70px Fraunces', 'italic 400 70px Fraunces', '700 20px Karla', '500 20px Karla'].map(f => document.fonts.load(f))).then(() => c.getContext('2d').drawImage(diplomaCanvas(), 0, 0)).catch(() => {});
+    }
   };
   const openLesson = n => { st.cur = n; mode = 'lesson'; view = Math.min(ls(n).step, stepsOf(n).length - 1); save(); render(); box.querySelector('.ps-class').scrollIntoView({ block: 'start', behavior: 'smooth' }); };
 

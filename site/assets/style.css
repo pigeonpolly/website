@@ -5176,7 +5176,7 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .ps-dipwait, .ps-dip { margin-top: 14px; padding: 28px; border-radius: 26px; background: #FBF4E2; color: #2B1A51; box-shadow: 0 0 0 4px #1A1528; text-align: center; }
 .ps-dipwait p { font-size: 18px; }
 .ps-dip-hi { margin: 0 0 16px; font: 600 clamp(18px, 1.6vw, 24px)/1.4 var(--serif); }
-.ps-dip-canvas { width: min(100%, 900px); height: auto; image-rendering: pixelated; border-radius: 6px; box-shadow: 0 10px 30px rgba(0, 0, 0, .25); }
+.ps-dip-canvas { width: min(100%, 900px); height: auto; border-radius: 6px; box-shadow: 0 10px 30px rgba(0, 0, 0, .25); }
 .ps-dip-act { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 16px; }
 .ps-dl, .ps-back { padding: 10px 20px; border: 0; border-radius: 999px; background: #D85A30; color: #fff; font: 700 15px var(--sans); cursor: pointer; text-decoration: none; }
 .ps-dl2 { background: #2B1A51; }
