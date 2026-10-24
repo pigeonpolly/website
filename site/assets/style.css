@@ -4660,6 +4660,7 @@ html.me-in .home-dash #blk-wl-holiday .wlh-cnt { justify-self: end; }
 .home-dash { align-items: stretch; }
 html.me-in .hd-news { position: relative; min-height: 320px; }
 .hd-news .hd-scroll { position: absolute; top: 46px; left: 0; right: 0; bottom: 0; overflow-y: auto; scrollbar-width: thin; padding-right: 4px; }
+.hd-scroll > .fn-msg { margin: 0 0 10px; }
 @media (max-width: 760px) { html.me-in .hd-news { min-height: 0; } .hd-news .hd-scroll { position: static; max-height: 420px; } }
 .nw-done { opacity: .55; background: transparent; border-style: dashed; }
 .nw-done .fn-ava { filter: grayscale(1); }

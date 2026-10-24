@@ -293,7 +293,7 @@
     const when = ms => new Date(ms).toLocaleDateString(['en-GB', 'ru-RU', 'lv-LV'][L], { day: 'numeric', month: 'short' });
     const opened = ['opened', 'открыто', 'atvērts'][L];
     els.forEach(el => {
-      el.innerHTML = `<h2 class="fn-h">🔔 ${t('title')}</h2>` + (items.length ? '' : `<p class="fn-msg">${t('empty')}</p>`) + '<div class="hd-scroll">' + (items.length || done.length ? `<ul class="fn-list">${items.map(x => {
+      el.innerHTML = `<h2 class="fn-h">🔔 ${t('title')}</h2>` + '<div class="hd-scroll">' + (items.length ? '' : `<p class="fn-msg">${t('empty')}</p>`) + (items.length || done.length ? `<ul class="fn-list">${items.map(x => {
         const k = KINDS[x.kind];
         return `<li class="fn-row nw-mini"><span class="fn-ava" aria-hidden="true">${k.icon}</span><p class="fn-txt"><b>${esc(k.title(x))}</b> ${esc(k.text(x))}</p><button type="button" class="fn-btn">${k.act[L]}</button></li>`;
       }).join('')}${done.map(l => `<li class="fn-row nw-mini nw-done"><span class="fn-ava" aria-hidden="true">${l.icon}</span><p class="fn-txt"><b>${esc(l.title)}</b> ${esc(l.text)}<time>✓ ${opened} · ${when(l.at)}</time></p>${l.go ? `<a class="nw-again" href="${esc(l.go)}">→</a>` : ''}</li>`).join('')}</ul>` : '') + '</div>'; // .hd-scroll: колонка не длиннее соседних, лишнее листается
