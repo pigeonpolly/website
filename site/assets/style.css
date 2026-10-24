@@ -4918,3 +4918,63 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 /* Зельеварня: своя картинка вместо эмодзи (potion-names.js) и зелье оживления котика (этап 28) */
 .pp-emo { width: 1.15em; height: 1.15em; vertical-align: -.2em; image-rendering: pixelated; display: inline-block; }
 .pot-revive { background: #E8F7F1; color: #1f5c48; border-radius: 10px; padding: 6px 10px; font-weight: 600; }
+
+/* Wobbleland: прогулка по городу (wl-town.js) */
+.wl-walk-p { margin-top: 0; }
+.wl-walk { border: 0; border-radius: 999px; padding: 10px 18px; background: #534AB7; color: #fff; font: 700 15px var(--sans); cursor: pointer; box-shadow: 0 3px 0 #2B1A51; }
+.wl-walk:hover { background: #2B1A51; }
+.wl-tw { position: fixed; inset: 0; z-index: 150; display: flex; align-items: center; justify-content: center; padding: 16px; background: rgba(20, 14, 40, .78); }
+.wl-tw[hidden] { display: none; }
+.wl-tw-box { width: min(1100px, 100%); max-height: 100%; display: flex; flex-direction: column; background: #FFFDF8; color: #2B1A51; border-radius: 18px; overflow: hidden; box-shadow: 0 20px 60px rgba(0, 0, 0, .45); }
+.wl-tw-head { display: flex; align-items: center; gap: 10px; padding: 10px 12px 10px 16px; background: #2B1A51; color: #F3EFFA; }
+.wl-tw-crest { width: 28px; height: 32px; image-rendering: pixelated; }
+.wl-tw-name { flex: 1; min-width: 0; display: flex; flex-direction: column; }
+.wl-tw-name b { font: 600 20px/1.1 var(--serif); }
+.wl-tw-name span { font: italic 13px var(--serif); opacity: .8; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.wl-tw-head button { border: 0; border-radius: 999px; background: rgba(255, 255, 255, .14); color: inherit; font: 600 14px var(--sans); padding: 8px 12px; cursor: pointer; }
+.wl-tw-head button:hover { background: rgba(255, 255, 255, .28); }
+.wl-tw-x { width: 36px; height: 36px; padding: 0 !important; }
+.wl-tw-stage { position: relative; height: clamp(240px, 56vh, 560px); background: #1B1B3A; overflow: hidden; }
+.wl-tw-stage canvas { display: block; width: 100%; height: 100%; image-rendering: pixelated; cursor: pointer; touch-action: manipulation; }
+.wl-tw-tag { position: absolute; left: 0; top: 0; pointer-events: none; opacity: 0; transition: opacity .15s; background: #FFFDF8; color: #2B1A51; border: 2px solid #2B1A51; border-radius: 8px; padding: 3px 9px; text-align: center; white-space: nowrap; box-shadow: 0 3px 0 rgba(43, 26, 81, .35); }
+.wl-tw-tag.on { opacity: 1; }
+.wl-tw-tag b { display: block; font: 700 13px var(--sans); }
+.wl-tw-tag span { display: block; font: 11px var(--sans); color: #534AB7; }
+.wl-tw-found { position: absolute; right: 10px; top: 10px; background: rgba(255, 253, 248, .92); border-radius: 999px; padding: 4px 10px; font: 700 13px var(--sans); color: #2B1A51; pointer-events: none; }
+.wl-tw-found.done { background: #F2C94C; }
+.wl-tw-say { min-height: 120px; max-height: 34vh; overflow-y: auto; padding: 14px 20px 18px; font: 15px/1.45 var(--sans); }
+.wl-tw-say p { margin: 0 0 8px; }
+.wl-tw-t { font: 600 19px/1.2 var(--serif) !important; }
+.wl-tw-sub { font-size: 13px; color: #6B5F8A; }
+.wl-tw-note { color: #534AB7; font-weight: 600; }
+.wl-tw-say .wl-tw-note { display: block; margin-top: 6px; }
+.wl-tw-who { display: flex; gap: 14px; align-items: flex-start; }
+.wl-tw-who img { width: 72px; height: 72px; flex: none; border-radius: 12px; border: 3px solid #2B1A51; image-rendering: pixelated; object-fit: contain; background: #F3EFFA; }
+.wl-tw-btn { border: 0; border-radius: 999px; padding: 8px 16px; background: #534AB7; color: #fff; font: 700 14px var(--sans); cursor: pointer; box-shadow: 0 3px 0 #2B1A51; }
+.wl-tw-btn:hover { background: #2B1A51; }
+.wl-tw-btn.sm { padding: 5px 12px; font-size: 13px; margin-top: 6px; }
+.wl-tw-btn.ghost { background: transparent; color: #534AB7; box-shadow: inset 0 0 0 2px #534AB7; }
+.wl-tw-dishes { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 12px; }
+.wl-tw-dish { display: flex; gap: 10px; align-items: flex-start; }
+.wl-tw-dish img { width: 72px; height: 60px; flex: none; image-rendering: pixelated; }
+.wl-tw-dish b { display: block; }
+.wl-tw-dish span { display: block; font-size: 13px; color: #6B5F8A; }
+.wl-tw-hol { list-style: none; margin: 0; padding: 0; }
+.wl-tw-hol li { display: flex; gap: 12px; padding: 8px 0; border-top: 1px solid #E6E0F2; }
+.wl-tw-hol li.next { background: #FFF6D2; border-radius: 10px; padding: 8px 10px; border-top: 0; }
+.wl-tw-hol li > span { flex: none; width: 56px; font-weight: 700; color: #C8473A; }
+.wl-tw-hol em { font-style: normal; font-size: 13px; color: #534AB7; }
+.wl-tw-hol p { margin: 2px 0 0 !important; font-size: 13px; color: #6B5F8A; }
+.wl-tw-go { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 10px; }
+.wl-tw-go button { display: inline-flex; align-items: center; gap: 6px; border: 2px solid #2B1A51; border-radius: 999px; background: #fff; color: #2B1A51; padding: 4px 12px 4px 6px; font: 600 14px var(--sans); cursor: pointer; }
+.wl-tw-go button:hover { background: #F3EFFA; }
+.wl-tw-go img { width: 18px; height: 21px; image-rendering: pixelated; }
+@media (max-width: 700px) {
+  .wl-tw { padding: 0; align-items: stretch; }
+  .wl-tw-box { border-radius: 0; max-height: none; height: 100%; }
+  .wl-tw-stage { height: 56vh; flex: none; }
+  .wl-tw-say { flex: 1; max-height: none; padding: 12px 16px 18px; }
+  .wl-tw-about { font-size: 13px !important; padding: 7px 10px !important; }
+  .wl-tw-name span { display: none; }
+  .wl-tw-name b { font-size: 17px; }
+}
