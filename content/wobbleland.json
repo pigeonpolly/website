@@ -121,6 +121,11 @@
           "desc": "Leaf fights, a contest for the pancake that looks most like a fallen leaf, and a giant pancake filling the main square, drenched in syrup."
         },
         {
+          "date": "Dec 21",
+          "title": "Snow Taffy Night",
+          "desc": "On the longest night of the year hot syrup is poured onto the snow on the main square to make taffy; whoever winks at the moon gets the sweetest piece, and lanterns are lit to call the sun back."
+        },
+        {
           "date": "Dec 25",
           "title": "Amber Night",
           "desc": "The city is lit with amber lamps; residents drink hot mead and syrup drinks and tell tales of giant bees."
@@ -375,6 +380,11 @@
           "date": "Oct 31",
           "title": "Lantern Lemon Night",
           "desc": "Residents craft lanterns out of lemons; children go door to door for lemon pastries; families gather to tell spooky stories around the citrus lanterns."
+        },
+        {
+          "date": "Dec 29",
+          "title": "Little Suns Day",
+          "desc": "Lemons are hidden in the snow all over the valley like tiny suns; children hunt for them, and the one who finds the most is called \"Little Sun\" and gets the first mug of hot honey lemonade."
         }
       ],
       "dishes": [
@@ -449,6 +459,11 @@
           "date": "May 27",
           "title": "Festival of the Lost Button",
           "desc": "Residents wear clothes with deliberately mismatched buttons all day; in the evening they trade found buttons; the brighter the button, the more luck it brings."
+        },
+        {
+          "date": "Dec 25",
+          "title": "Button Tree Night",
+          "desc": "A fir tree on the tower square is decorated with buttons only; everyone hangs a button found this year and takes another in return — a promise of a new friend in the year ahead."
         }
       ],
       "dishes": [
@@ -528,6 +543,11 @@
           "date": "Nov 5",
           "title": "Golden Broth Week",
           "desc": "Every street brews its own signature broth — mushroom, meat, vegetable, or spicy."
+        },
+        {
+          "date": "Dec 23",
+          "title": "Long Noodle Eve",
+          "desc": "One single noodle is stretched through every street of town as a wish for a long life; each household holds its own stretch, and whoever lets it break washes everyone's pots."
         }
       ],
       "dishes": [
@@ -616,6 +636,11 @@
           "date": "Oct 1",
           "title": "Festival of Inkberries",
           "desc": "Residents gather ink-berries to make ink and jam, then write short poems on leaves hung from the trees."
+        },
+        {
+          "date": "Dec 5",
+          "title": "Jar Lantern Night",
+          "desc": "Empty jam jars become lanterns and line every cellar stair; each family opens its first winter jar, and whoever finds the darkest jam must tell a story by candlelight."
         }
       ],
       "dishes": [
@@ -793,6 +818,11 @@
           "desc": "The whole town boils its kettles at once; the louder the collective whistle, the luckier the year."
         },
         {
+          "date": "Dec 19",
+          "title": "Frosted Spout Day",
+          "desc": "Kettles are set on every windowsill to steam the glass; by morning the frost draws patterns on the windows, and the prettiest window wins a brand-new copper cezve."
+        },
+        {
           "date": "Dec 30",
           "title": "Winter Brew Eve",
           "desc": "The town's main winter holiday — residents brew one giant communal pot of spiced tea for anyone who stops by."
@@ -890,6 +920,11 @@
           "date": "Apr 1",
           "title": "Confession Day",
           "desc": "Any inmate who writes a genuinely honest (or genuinely funny) confession gets a shot at early release; outside, islanders mail in mock \"confessions\" for their smallest sins, just for the joke of it."
+        },
+        {
+          "date": "Dec 31",
+          "title": "Day of Covering Tracks",
+          "desc": "All cases are tied up with string and carried to the archive until April 1; until then nobody is released and no old case is looked at again. The clerks sweep the footprints off the snow at the gate, and the whole Department pretends nothing ever happened."
         }
       ],
       "dishes": [

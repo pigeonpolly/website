@@ -97,6 +97,11 @@
         "desc": "Lapu kaujas, konkurss par pankūku, kas visvairāk līdzinās nokritušai lapai, un milzīga pankūka visa galvenā laukuma lielumā, pārlieta ar sīrupu."
       },
       {
+        "date": "21. dec.",
+        "title": "Sniega īrisa nakts",
+        "desc": "Gada garākajā naktī galvenajā laukumā karstu sīrupu lej tieši uz sniega — sanāk stiepīgs īriss; kas piemiedz mēnesim, tas saņem saldāko gabaliņu, un laternas iededz, lai sauktu sauli atpakaļ."
+      },
+      {
         "date": "25. dec.",
         "title": "Dzintara nakts",
         "desc": "Pilsētu izgaismo dzintara laternas; iedzīvotāji dzer karstu medalu un sīrupa dzērienus un stāsta nostāstus par milzu bitēm."
@@ -303,6 +308,11 @@
         "date": "31. okt.",
         "title": "Citronu laternu nakts",
         "desc": "Iedzīvotāji gatavo laterniņas no citroniem; bērni staigā pa mājām pēc citronu cepumiem; ģimenes pulcējas pie citrusu laternām un stāsta šausmu stāstus."
+      },
+      {
+        "date": "29. dec.",
+        "title": "Mazo saulīšu diena",
+        "desc": "Pa visu ieleju sniegā paslēpj citronus — kā sīkas saulītes; bērni tos meklē, un to, kurš atrod visvairāk, sauc par “Mazo saulīti” un cienā ar pirmo krūzi karstas medus limonādes."
       }
     ],
     "dishes": [
@@ -361,6 +371,11 @@
         "date": "27. maijs",
         "title": "Pazaudētās pogas svētki",
         "desc": "Visu dienu iedzīvotāji staigā drēbēs ar tīši dažādām pogām; vakarā maina atrastās pogas: jo spožāka poga, jo vairāk veiksmes tā nes."
+      },
+      {
+        "date": "25. dec.",
+        "title": "Pogu eglītes nakts",
+        "desc": "Egli laukumā pie torņa rotā tikai ar pogām: katrs piekar gada laikā atrastu podziņu un paņem pretī citu — solījumu par jaunu draugu nākamajā gadā."
       }
     ],
     "dishes": [
@@ -424,6 +439,11 @@
         "date": "5. nov.",
         "title": "Zelta buljona nedēļa",
         "desc": "Katra iela vāra savu firmas buljonu: sēņu, gaļas, dārzeņu vai aso."
+      },
+      {
+        "date": "23. dec.",
+        "title": "Garās nūdeles vakars",
+        "desc": "Cauri visām pilsētas ielām izstiepj vienu vienīgu nūdeli — garam mūžam; katra māja tur savu gabaliņu, un tas, kam tā pārtrūkst, mazgā katlus visu vietā."
       }
     ],
     "dishes": [
@@ -498,6 +518,11 @@
         "date": "1. okt.",
         "title": "Tintes ogu svētki",
         "desc": "Iedzīvotāji lasa tintes ogas tintei un ievārījumam, pēc tam raksta īsus dzejoļus uz lapām un pakar tās kokos."
+      },
+      {
+        "date": "5. dec.",
+        "title": "Burciņu laternu nakts",
+        "desc": "Tukšas ievārījuma burciņas kļūst par laternām un rindojas uz katra pagraba pakāpiena; katra ģimene atver pirmo ziemas burciņu, un tam, kam tiek tumšākais ievārījums, jāstāsta stāsts sveču gaismā."
       }
     ],
     "dishes": [
@@ -647,6 +672,11 @@
         "desc": "Visa pilsēta vienlaikus vāra tējkannas: jo skaļāks kopīgais svilpiens, jo veiksmīgāks būs gads."
       },
       {
+        "date": "19. dec.",
+        "title": "Salnainā snīpīša diena",
+        "desc": "Uz katras palodzes noliek tējkannu, lai tvaiks aprasina stiklu; līdz rītam sals uzzīmē logos rakstus, un par skaistāko logu dāvina pavisam jaunu vara džezvu."
+      },
+      {
         "date": "30. dec.",
         "title": "Ziemas uzlējuma vakars",
         "desc": "Pilsētas galvenie ziemas svētki: iedzīvotāji uzlej vienu milzīgu kopīgu katlu ar garšvielu tēju ikvienam, kas iegriežas."
@@ -728,6 +758,11 @@
         "date": "1. apr.",
         "title": "Atzīšanās diena",
         "desc": "Ikviens ieslodzītais, kas uzraksta patiesi godīgu (vai patiesi smieklīgu) atzīšanos, iegūst iespēju tikt atbrīvots pirms termiņa; bet ārpusē salinieki sūta jokainas “atzīšanās” par saviem sīkākajiem grēciņiem, vienkārši joka pēc."
+      },
+      {
+        "date": "31. dec.",
+        "title": "Pēdu slēpšanas diena",
+        "desc": "Visas lietas sasien ar auklu un aiznes uz arhīvu līdz 1. aprīlim; līdz tam nevienu neatbrīvo un nevienu vecu lietu neizskata. Rakstveži noslauka pēdas sniegā pie vārtiem, un viss Departaments izliekas, ka nekas nekad nav noticis."
       }
     ],
     "dishes": [
