@@ -28,6 +28,7 @@
     { id: 'requests', ic: '🖍', name: 'Нарисуй мне', group: 'pub', href: '/ru/requests/', count: 'requests' },
     { id: 'art', ic: '🎨', name: 'Картины и палитры', group: 'pub', about: 'Картины, добавленные с сайта, скрытые картины и очередь палитр дня ЭКСТРА.' },
     { id: 'themes', ic: '🎨', name: 'Темы челленджа', group: 'pub', about: 'Темы челленджа на любой месяц вперёд: тема на трёх языках, цвета, время; банк ваших тем.' },
+    { id: 'posts', ic: '📣', name: 'Посты', group: 'pub', about: 'Готовые картинки и тексты для соцсетей: тема дня, темы на месяц, палитра, загадка Титоса. Всё рисуется само из того, что сейчас на сайте.' },
     { id: 'notes', ic: '📣', name: 'Объявления', group: 'pub', about: 'Объявления в «Новостях стаи» (/flock/news/): закреплены сверху до выбранной даты, потом — обычной строкой «от Полли».' },
     { id: 'edits', ic: '🧩', name: 'Правки страниц', group: 'pub', about: 'Блоки, которые вы поменяли или скрыли прямо на сайте («✏️ Править страницу»), — здесь их можно вернуть как было.', count: 'edits' },
     { id: 'birds', ic: '🐦', name: 'Все птицы', group: 'birds', about: 'Все птички стаи: когда пришли, сколько нарисовали, пуговки, подарки.' },
@@ -54,6 +55,7 @@
   const SECTIONS = { notes, titos, inbox, security, overview: inbox, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art, challenge: () => statsView('challenge'), flock: () => statsView('flock'),
     themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
     cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
+    posts: () => window.PPPostsAdmin ? window.PPPostsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился posts-admin.js</p>'), // 📣 Посты (posts-admin.js)
     mail: () => window.PPMailAdmin ? window.PPMailAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился mail-admin.js</p>'), // ✉️ Письма (mail-admin.js)
     carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
   const secOf = id => ADMIN_SECTIONS.find(x => x.id === id);
