@@ -5,6 +5,7 @@
   tools/video/render.py --keys     — 4 ключевых кадра одним листом: _shots/video_keys.png
   tools/video/render.py --lang ru  — одна версия
   --film apple                     — второй ролик (Полли рисует яблоко, tools/video/apple.js); по умолчанию — блинчики (film.js)
+  --film school --lang en          — третий ролик «Школа Полли» (school.js) с музыкой tools/video/school_music.py
 
 Сайт не нужен: файлы отдаёт свой http-сервер из корня репозитория (птичка и комната — те же birds.js и room.js).
 """
@@ -24,6 +25,7 @@ ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 OUT = ROOT / '_held' / 'video'
 CHROMIUM = '/opt/pw-browsers/chromium'
 FPS = 30
+MUSIC = {'school': 'school_music.py'}  # ролик → скрипт, который пишет WAV (остальные ролики без звука)
 
 
 def serve():
@@ -36,7 +38,7 @@ def serve():
     return srv
 
 
-FILMS = {'pancakes': 'film.html', 'apple': 'apple.html'}  # ролик → страница; ключевые кадры и с какого кадра текст зависит от языка — FILM.keys, FILM.langFrom
+FILMS = {'pancakes': 'film.html', 'apple': 'apple.html', 'school': 'school.html'}  # ролик → страница; ключевые кадры и с какого кадра текст зависит от языка — FILM.keys, FILM.langFrom
 
 
 def open_film(br, port, lang, film):
@@ -87,8 +89,14 @@ def video(br, port, langs, film):
             for n in range(fin, total):
                 (d / f'{n:04d}.png').write_bytes(png(p, n))
             mp4 = OUT / f'pigeonpolly-bird-{film}-{lang}.mp4'
-            subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-framerate', str(FPS), '-i', str(d / '%04d.png'),
-                            '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', '-preset', 'slow', '-movflags', '+faststart', '-an', str(mp4)], check=True)
+            inp, enc = [], ['-an']
+            if film in MUSIC:
+                wav = tmp / 'music.wav'
+                if not wav.exists():
+                    subprocess.run(['python3', str(pathlib.Path(__file__).parent / MUSIC[film]), str(wav)], check=True)
+                inp, enc = ['-i', str(wav)], ['-c:a', 'aac', '-b:a', '192k', '-shortest']
+            subprocess.run(['ffmpeg', '-y', '-loglevel', 'error', '-framerate', str(FPS), '-i', str(d / '%04d.png'), *inp,
+                            '-c:v', 'libx264', '-pix_fmt', 'yuv420p', '-crf', '18', '-preset', 'slow', '-movflags', '+faststart', *enc, str(mp4)], check=True)
             print(f'{mp4.relative_to(ROOT)}: {total / FPS:.1f} с, {mp4.stat().st_size // 1024} КБ')
     finally:
         shutil.rmtree(tmp, ignore_errors=True)
