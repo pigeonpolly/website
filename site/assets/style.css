@@ -5073,7 +5073,7 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .ps-easel::after { right: 24%; transform: rotate(-8deg); transform-origin: top; }
 .ps-paperbox { position: relative; z-index: 1; display: flex; align-items: center; justify-content: center; aspect-ratio: 4 / 3; padding: 20px; border-radius: 4px; background: #fff; box-shadow: 0 0 0 4px #7A4A2A, 0 12px 0 -2px #A0673A, 4px 16px 22px rgba(0, 0, 0, .15); }
 .ps-paperbox img { max-width: 100%; max-height: 100%; object-fit: contain; }
-.ps-paperbox .ps-client-pic { image-rendering: pixelated; height: 100%; }
+.ps-paperbox .ps-client-pic { height: 100%; border-radius: 8px; box-shadow: 0 4px 12px rgba(0, 0, 0, .15); }
 .ps-polly { position: absolute; left: 0; bottom: 0; width: clamp(150px, 14vw, 230px); height: auto; z-index: 2; }
 .ps-tag { position: absolute; right: 2%; bottom: 14px; padding: 8px 16px; border-radius: 999px; background: #2B1A51; color: #FBF4E2; font: 700 15px var(--sans); }
 .ps-find g { cursor: pointer; fill: rgba(255, 255, 255, .01); stroke: #2B1A51; stroke-width: 3; stroke-linejoin: round; transition: fill .2s; }
@@ -5090,7 +5090,7 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .ps-eye { display: inline-block; margin-top: 6px; font-size: 12px; color: #534AB7; font-weight: 700; }
 .ps-b.client { background: #FDEBDD; border-radius: 14px 14px 4px 14px; }
 .ps-who { display: flex; align-items: center; gap: 8px; margin-bottom: 6px; }
-.ps-who img { width: 34px; height: 34px; image-rendering: pixelated; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px #D85A30; }
+.ps-who img { width: 44px; height: 44px; object-fit: cover; object-position: 50% 30%; border-radius: 50%; background: #fff; box-shadow: 0 0 0 2px #D85A30; }
 .ps-who b { font: 600 16px var(--serif); }
 .ps-who span { font-size: 12px; color: #8C6A5A; }
 .ps-quiz { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
@@ -5155,3 +5155,6 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .ps-school > .ps-verdict { max-width: 640px; }
 .ps-proto:empty { display: none; }
 .ps-prev[hidden] { display: none; }
+.ps-task { margin-top: 10px; padding: 10px 14px; border-radius: 12px; background: #fff; box-shadow: 0 0 0 2px #F0A987; font-size: .92em; }
+.ps-task ol { margin: 6px 0 0; padding-left: 22px; }
+.ps-task li { margin: 3px 0; }
