@@ -68,6 +68,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `blog_salt` — worker/blog.js, worker/index.js
 - `blog_strict` — worker/blog.js
 - `blog_tags_v1` — worker/blog.js
+- `blog_ideas` — worker/ideas.js: последний список «💡 Темы для блога» {at, note, ideas, sources}
 - `buttons_backfill` — worker/index.js
 - `chplan_oct` — worker/challenge-days.js
 - `chplan_v4` — worker/challenge-days.js

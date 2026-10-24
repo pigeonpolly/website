@@ -76,3 +76,4 @@
 ## Google (24.10.2026)
 - Search Console: старый ресурс удалён, добавлен «Доменный ресурс» pigeonpolly.com (подтверждён через Cloudflare). Sitemap — полным адресом: `https://www.pigeonpolly.com/sitemap.xml` и `…/sitemap-blog.xml`.
 - Причина «не находится в поиске»: Cloudflare «Managed rules» отвечали Googlebot 403 (в индексе было 3 страницы из 23). Исправлено в Cloudflare → Security rules: своё правило «Allow Google» — Known Bots (`cf.client.bot`) → Skip all managed rules. Предупреждение про php2shell — нормально (правило пускает только проверенных ботов).
+- Кабинет → «💡 Темы для блога» (24.10.2026): 10 тем статей по свежим подсказкам Google и Reddit (docs/admin.md).

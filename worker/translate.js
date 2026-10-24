@@ -58,7 +58,7 @@ async function translateOne(env, text, from, to) {
 // Gemini (ключ GEMINI_KEY в Cloudflare): переводит по смыслу и держит HTML. Модели по очереди — если одна перегружена, берём следующую.
 const LANG_NAME = { ru: 'Russian', en: 'English', lv: 'Latvian' };
 // Flash-Lite — быстрые (30 абзацев ≈ 8 с) и реже перегружены; полная Flash — запасная
-const GEMINI_MODELS = ['gemini-3.1-flash-lite', 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.5-flash'];
+export const GEMINI_MODELS = ['gemini-3.1-flash-lite', 'gemini-flash-lite-latest', 'gemini-3.5-flash-lite', 'gemini-3.5-flash'];
 // ключ Gemini: из Cloudflare (GEMINI_KEY) или из настроек редактора (meta.gemini_key)
 export async function geminiKey(env) {
   if (env.GEMINI_KEY) return env.GEMINI_KEY;
