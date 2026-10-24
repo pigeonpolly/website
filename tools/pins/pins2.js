@@ -420,7 +420,7 @@ const PINS = [
 ];
 // у игр описание для Notion — desc (если в шаблоне desc показан на картинке, текст для Pinterest — отдельный)
 const PIN_DESC = {
-  214: 'Detective Titos has a hundred cases and one coffee pot. Find the clues, pin them to the board, question the suspects and name the culprit before the coffee runs out: without coffee, Titos falls asleep. A cozy pixel mystery game, free on my site.',
+  214: 'Detective Titos has a pile of cases and one coffee pot. Find the clues, pin them to the board, question the suspects and name the culprit before the coffee runs out: without coffee, Titos falls asleep. A cozy pixel mystery game, free on my site.',
   215: 'A cozy focus timer for studying or working: set 20 minutes to 1.5 hours, pick a retro tune or rain on the window, and Polly the pigeon works next to you in her pixel office, typing, drinking coffee and watering the plant. Free on my site.',
   216: 'Polly got an urgent email from the Council and her report is scattered all over the office. Click anything in the pixel room, everything has something to say, and help her find the pages before the evening. A tiny cozy point-and-click game.',
   217: 'Wobbleland is my illustrated island of eleven slightly ridiculous towns. Zoom into the pixel map, open a town and read its motto, holidays and recipes, meet the residents at home. Polly the pigeon is your feathered guide.',
