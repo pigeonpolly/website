@@ -563,7 +563,7 @@
         row('Сезон огорода', `<select data-r="gardenSeason">${[['auto', 'по календарю'], ['autumn', '🍂 осень'], ['winter', '❄️ зима'], ['spring', '🌸 весна'], ['summer', '☀️ лето']].map(([k, l]) => `<option value="${k}"${R.gardenSeason === k ? ' selected' : ''}>${l}</option>`).join('')}</select>`, 'по календарю', 'погода и вид: дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень'),
       ], 'Вход — дверь 🚪 в комнате птички → «Огород» (/garden/)')}
       ${box('✉️ Уведомления из игр на почту', [
-        row(`<label class="adm-r-chk"><input type="checkbox" data-r="mailGamesOn"${R.mailGamesOn ? ' checked' : ''}> Присылать уведомления из игр</label>`, '', 'вкл', 'только птичкам, которые включили «🎮 Уведомления из игр»; одной птичке — не больше одного такого письма в сутки'),
+        row(`<label class="adm-r-chk"><input type="checkbox" data-r="mailGamesOn"${R.mailGamesOn ? ' checked' : ''}> Присылать уведомления из игр</label>`, '', 'вкл', 'только птичкам, которые включили «🎮 Уведомления из игр»; одной птичке — не больше одного письма в день вообще (любого: рассылка, праздник, адвент, уведомление); что не уместилось — завтра'),
         row('🔥 Серия сгорит сегодня — серия от', num('mailStreakMin', R.mailStreakMin, D.mailStreakMin) + ' дн.', D.mailStreakMin + ' дн.', 'если сегодня ещё нет рисунка и сегодня не день свободы'),
         row('🔥 …письмо о серии — с', num('mailStreakHour', R.mailStreakHour, D.mailStreakHour) + ' ч по Риге', D.mailStreakHour + ' ч'),
         row('🥕🌱 Огород — не чаще раза в', num('mailGardenDays', R.mailGardenDays, D.mailGardenDays) + ' дн.', D.mailGardenDays + ' дн.', 'урожай созрел или грядки сухие, а птичка не заходила больше суток'),
