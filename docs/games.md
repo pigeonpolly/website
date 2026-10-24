@@ -73,3 +73,9 @@ _Пункты перенесены дословно из docs/_claude-old.md (э
 - Доски: `rain` и `pan` — лучший уровень за игру (неделя — лучшая игра недели; у дождя первое место за всё время — 👑 с бонусом gameKing); на /potions/ две доски чипами — `maze` (уровней лабиринта) и `recipes` (разных зелий; неделя — новых зелий); /titos/ — `titos` (раскрыто дел). За всё время — из users (game_best, pan_best, maze_level − 1), potion_book, titos.level; неделя — таблица `top_week`, пишет `topScore(env, игра, uid, n)` (max или сумма), cron держит 8 недель.
 - Без доски: «Офис Полли» (прогресс только в браузере), адвент (не соревнование), Воббленд (карта). Ник обязателен, заблокированные не показываются.
 
+## Видео игр
+- `node tools/video/games.js pancakes|shift|garden|all` → `_held/video/pigeonpolly-game-<игра>-en.mp4` (1080×1920, 30 fps, со звуком); `--keys` — лист кадров `_shots/video_keys_<игра>.png`. Только EN (как ролики этапа 15).
+- Снимается настоящая страница из site/ (сначала `python3 build.py`): свой http-сервер, `page.clock` — кадр = 1/30 с игры (`v.speed` — быстрее, `clock.runFor/fastForward` — перемотка), CSS-анимации шагают так же (`__animStep`), Math.random с зерном. /api/* отвечает сценарий (`api()`), без базы.
+- Сценарий `tools/video/games/<игра>.js`: заголовок, `show` (что видно со страницы), `setup`, `step(v, t)` — `v.tap(селектор | точка)`, `v.hold/release`, `v.cap(подпись)`, финал — когда ставит `v.fin` (картинка — `cover` или `VID.setCover`).
+- Звук — треки `PPShiftMusic` в OfflineAudioContext → WAV → ffmpeg; `music: {i}` — трек сайта, `{track}` — свой в формате TRACKS, `audio: [{…, from}]` — смена музыки по ходу (в «Смене» с конца — колыбельная).
+
