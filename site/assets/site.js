@@ -228,3 +228,14 @@
   if (window.ResizeObserver) { const ro = new ResizeObserver(() => requestAnimationFrame(fit)); for (const c of h.children) ro.observe(c); new MutationObserver(() => { for (const c of h.children) ro.observe(c); fit(); }).observe(h, { childList: true }); }
   if (document.fonts && document.fonts.ready) document.fonts.ready.then(fit);
 })();
+
+// «★ Мои игры» на главной: заход вошедшей птички в игру — POST /api/games/visit, раз за сессию на игру (worker/my-games.js)
+(() => {
+  const x = location.pathname.replace(/^\/(ru|lv)(?=\/)/, '');
+  if (!['/rain/', '/potions/', '/pancakes/', '/titos/', '/shift/', '/polly-office/', '/wobbleland/', '/advent/'].includes(x)) return;
+  document.addEventListener('pp:whoami', e => {
+    const u = e.detail && e.detail.user; if (!u || !u.nick) return;
+    try { if (sessionStorage.getItem('pp-gv' + x)) return; sessionStorage.setItem('pp-gv' + x, '1'); } catch (er) {}
+    fetch('/api/games/visit', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ path: x }) }).catch(() => {});
+  });
+})();

@@ -126,6 +126,7 @@
       el.insertAdjacentHTML('beforeend', `<h2 class="fn-h">${v.title[L]}</h2>`);
       if (rows.length) el.appendChild(ul); else el.insertAdjacentHTML('beforeend', `<p class="fn-msg">${v.empty[L]}</p>`);
       if (v.all) el.insertAdjacentHTML('beforeend', `<a class="fn-all" href="${pre}/flock/news/">${v.all[L]}</a>`);
+      el.dispatchEvent(new CustomEvent('pp:fn', { bubbles: true, detail: { view: o.view, ts: rows.slice(0, o.limit).map(g => g.ts) } })); // главная: число новых на вкладке «Новое на сайте»
       return;
     }
     for (const p of d.pinned || []) el.insertAdjacentHTML('beforeend', `<p class="fn-pinned"><b>📣 ${T.pin[L]}</b> ${esc(p.text)}</p>`);

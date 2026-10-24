@@ -25,9 +25,9 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=560c7fb7">
+<link rel="stylesheet" href="/assets/style.css?v=23c036f0">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
-<script src="/assets/site.js?v=2361f119" defer></script>
+<script src="/assets/site.js?v=d00c935c" defer></script>
 <script src="/assets/polly.js?v=573aaaf7" defer></script>
 <script src="/assets/can-do.js?v=45f40bee" defer></script>
 <script src="/assets/birds.js?v=8b869e67" defer></script>
@@ -124,36 +124,6 @@
   });
 })();
 </script>
-<section data-ppb="home.2" class="home-games" aria-labelledby="hg-title">
-  <h2 id="hg-title">Games</h2>
-  <div class="am-tiles gm-tiles">
-    <a class="am-tile gm-tile" href="/rain/" data-g="rain"><img src="/images/games/rain.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Button Rain</b><i>Catch the buttons!</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🔘</span></a>
-    <a class="am-tile gm-tile" href="/potions/" data-g="potion"><img src="/images/games/potions.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Potion Lab</b><i>Maze and potions</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🧪</span></a>
-    <a class="am-tile gm-tile" href="/pancakes/" data-added="2026-10-18" data-g="pan"><img src="/images/games/pancakes.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Polly’s Pancakes</b><i>Pancakes to order</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🥞</span></a>
-    <a class="am-tile gm-tile" href="/titos/" data-g="titos"><img src="/images/games/titos.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Detective Titos</b><i>100 detective cases</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🕵️</span></a>
-    <a class="am-tile gm-tile" href="/shift/" data-added="2026-10-23"><img src="/images/games/shift.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Shift with Polly</b><i>Work together with Polly</i></span><span class="am-tile-ico" aria-hidden="true">⏱</span></a>
-    <a class="am-tile gm-tile" href="/polly-office/"><img src="/images/games/polly-office.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Polly’s Office</b><i>Sort Polly’s mail</i></span><span class="am-tile-ico" aria-hidden="true">📮</span></a>
-    <a class="am-tile gm-tile" href="/wobbleland/"><img src="/images/games/wobbleland.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Wobbleland</b><i>Map of eleven towns</i></span><span class="am-tile-ico" aria-hidden="true">🗺</span></a>
-    <a class="am-tile gm-tile" href="/advent/" data-g="advent"><img src="/images/games/advent.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Advent calendar</b><i>31 windows with gifts</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🎄</span></a>
-  </div>
-  <p class="hg-all"><a href="/games/">All games and the shop →</a></p>
-</section>
-<script>
-// Игры на главной (вместо «Новое на сайте»): первая — самая новая (data-added, новой игре — дата), дальше по популярности за 30 дней (GET /api/games/top), видны все
-(function () {
-  var box = document.querySelector('.home-games .gm-tiles'); if (!box) return;
-  var all = [].slice.call(box.children), pathOf = function (a) { return a.getAttribute('href').replace(/^\/(ru|lv)(?=\/)/, ''); };
-  var show = function (top) {
-    top = top || {};
-    var newest = all.filter(function (a) { return a.dataset.added; }).sort(function (a, b) { return b.dataset.added < a.dataset.added ? -1 : 1; })[0];
-    var rest = all.filter(function (a) { return a !== newest; }).sort(function (a, b) { return (top[pathOf(b)] || 0) - (top[pathOf(a)] || 0); });
-    (newest ? [newest] : []).concat(rest).forEach(function (a, i) { box.appendChild(a); });
-  };
-  show();
-  fetch('/api/games/top').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d) show(d.top); }).catch(function () {});
-})();
-</script>
-<script src="/assets/games-hub.js?v=b464d2b8" defer></script>
 <div class="blk" id="blk-season" data-ppb="blk-season"><style>#blk-season .ss { position: relative; overflow: hidden; box-sizing: border-box; padding: 34px 32px; background: radial-gradient(ellipse at 20% 0%, #3E2A7A 0, #24163F 60%, #1B1030 100%); font-family: 'Karla', sans-serif; color: #F3EFFA; }
 #blk-season .ss[hidden] { display: none; }
 #blk-season .ss-in { display: flex; align-items: center; justify-content: center; gap: 36px; max-width: 980px; margin: 0 auto; }
@@ -305,7 +275,8 @@
   });
 </script>
 </div>
-<div data-ppb="home.3" class="home-dash">
+<div data-ppb="home.2" class="home-dash" data-tab="day">
+<div data-ppb="home.3" class="hd-tabs" role="tablist"></div>
 <section data-ppb="home.4" class="myday hd-col" aria-labelledby="md-title">
   <div class="md-in">
     <div class="md-me">
@@ -400,8 +371,9 @@
 </div>
 <div data-ppb="home.8" class="hd-upd" data-flock-news="4" data-fn-view="site"></div>
 </div>
+<div data-ppb="home.9" class="hd-col hd-games" data-my-games></div>
 </div>
-<script src="/assets/flock-news.js?v=11364a45" defer></script>
+<script src="/assets/flock-news.js?v=5249c826" defer></script>
 <div class="blk" id="blk-home-blog" data-ppb="blk-home-blog"><style>#blk-home-blog .hb { padding: 56px var(--gutter) 60px; background: #FFFDF8; color: #2B1A51; }
 #blk-home-blog .hb[hidden] { display: none; }
 #blk-home-blog .hb-top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
@@ -463,7 +435,111 @@
 </section>
 <script src="/assets/home-blog.js?v=0579a5ee" defer></script>
 </div>
-<div data-ppb="home.9" class="home-sep" aria-hidden="true"><svg viewBox="-48 -48 96 96"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z"/></svg></div>
+<section data-ppb="home.10" class="home-games" aria-labelledby="hg-title">
+  <h2 id="hg-title">Games</h2>
+  <div class="am-tiles gm-tiles">
+    <a class="am-tile gm-tile" href="/rain/" data-g="rain"><img src="/images/games/rain.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Button Rain</b><i>Catch the buttons!</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🔘</span></a>
+    <a class="am-tile gm-tile" href="/potions/" data-g="potion"><img src="/images/games/potions.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Potion Lab</b><i>Maze and potions</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🧪</span></a>
+    <a class="am-tile gm-tile" href="/pancakes/" data-added="2026-10-18" data-g="pan"><img src="/images/games/pancakes.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Polly’s Pancakes</b><i>Pancakes to order</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🥞</span></a>
+    <a class="am-tile gm-tile" href="/titos/" data-g="titos"><img src="/images/games/titos.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Detective Titos</b><i>100 detective cases</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🕵️</span></a>
+    <a class="am-tile gm-tile" href="/shift/" data-added="2026-10-23"><img src="/images/games/shift.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Shift with Polly</b><i>Work together with Polly</i></span><span class="am-tile-ico" aria-hidden="true">⏱</span></a>
+    <a class="am-tile gm-tile" href="/polly-office/"><img src="/images/games/polly-office.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Polly’s Office</b><i>Sort Polly’s mail</i></span><span class="am-tile-ico" aria-hidden="true">📮</span></a>
+    <a class="am-tile gm-tile" href="/wobbleland/"><img src="/images/games/wobbleland.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Wobbleland</b><i>Map of eleven towns</i></span><span class="am-tile-ico" aria-hidden="true">🗺</span></a>
+    <a class="am-tile gm-tile" href="/advent/" data-g="advent"><img src="/images/games/advent.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Advent calendar</b><i>31 windows with gifts</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🎄</span></a>
+  </div>
+  <p class="hg-all"><a href="/games/">All games and the shop →</a></p>
+</section>
+<script>
+// Игры на главной — полосой между блогом и книгой (24.10.2026; раньше — сразу под приветствием): первая — самая новая (data-added, новой игре — дата), дальше по популярности за 30 дней (GET /api/games/top), видны все
+(function () {
+  var box = document.querySelector('.home-games .gm-tiles'); if (!box) return;
+  var all = [].slice.call(box.children), pathOf = function (a) { return a.getAttribute('href').replace(/^\/(ru|lv)(?=\/)/, ''); };
+  var show = function (top) {
+    top = top || {};
+    var newest = all.filter(function (a) { return a.dataset.added; }).sort(function (a, b) { return b.dataset.added < a.dataset.added ? -1 : 1; })[0];
+    var rest = all.filter(function (a) { return a !== newest; }).sort(function (a, b) { return (top[pathOf(b)] || 0) - (top[pathOf(a)] || 0); });
+    (newest ? [newest] : []).concat(rest).forEach(function (a, i) { box.appendChild(a); });
+  };
+  show();
+  fetch('/api/games/top').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d) show(d.top); }).catch(function () {});
+})();
+</script>
+<script src="/assets/games-hub.js?v=b464d2b8" defer></script>
+<script>
+// «Мой день» вошедшему — вкладками (24.10.2026, жалобы «перегружено»): Мой день · Письма · Новое на сайте · ★ Мои игры. Гостю — колонки как раньше.
+// Мои игры: до 3 закреплённых (☆ на плитке — тут или в полосе «Игр»), остальное место — игры, куда птичка заходит чаще (GET /api/games/mine, worker/my-games.js), потом — самые популярные.
+(function () {
+  var dash = document.querySelector('.home-dash'), bar = dash && dash.querySelector('.hd-tabs'), band = document.querySelector('.home-games .gm-tiles');
+  if (!dash || !bar || !band) return;
+  var L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
+  var T = {
+    day: ['My day', 'Мой день', 'Mana diena'], news: ['Letters', 'Письма', 'Vēstules'], site: ['New on the site', 'Новое на сайте', 'Jaunumi vietnē'], games: ['★ My games', '★ Мои игры', '★ Manas spēles'],
+    pin: ['Pin to “My games”', 'Закрепить в «Моих играх»', 'Piespraust “Manām spēlēm”'], unpin: ['Unpin', 'Открепить', 'Atspraust'],
+    hint: ['Tap ☆ on any game to pin it here — up to 3.', 'Нажми ☆ на любой игре — закрепится здесь, до 3.', 'Nospied ☆ uz jebkuras spēles — tā paliks šeit, līdz 3.'],
+    often: ['Not pinned yet — the games you open most often.', 'Пока ничего не закреплено — игры, куда заходишь чаще всего.', 'Vēl nekas nav piesprausts — spēles, kurās ieskaties visbiežāk.'],
+    all: ['All games ↓', 'Все игры ↓', 'Visas spēles ↓'],
+    swap: [function (n) { return '“' + n + '” unpinned — only 3 fit'; }, function (n) { return '«' + n + '» откреплена — помещается 3'; }, function (n) { return '“' + n + '” atsprausta — vietas ir 3'; }]
+  };
+  var TABS = ['day', 'news', 'site', 'games'], pins = [], visits = {}, me = false, seen = 0, siteTs = [];
+  try { seen = +localStorage.getItem('pp-hd-site') || 0; } catch (e) {}
+  bar.innerHTML = TABS.map(function (k) { return '<button type="button" role="tab" data-t="' + k + '">' + T[k][L] + ' <span class="hd-n" hidden></span></button>'; }).join('');
+  var n = function (k, v) { var s = bar.querySelector('[data-t="' + k + '"] .hd-n'); s.textContent = v || ''; s.hidden = !v; };
+  var open = function (k) {
+    dash.dataset.tab = k;
+    bar.querySelectorAll('[role=tab]').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.t === k ? 'true' : 'false'); });
+    try { localStorage.setItem('pp-hd-tab', k); } catch (e) {}
+    if (k === 'site' && siteTs.length) { seen = Math.max.apply(null, siteTs.concat(seen)); n('site', 0); try { localStorage.setItem('pp-hd-site', seen); } catch (e) {} }
+  };
+  bar.addEventListener('click', function (e) { var b = e.target.closest('[role=tab]'); if (b) open(b.dataset.t); });
+  var last = 'day'; try { last = localStorage.getItem('pp-hd-tab') || 'day'; } catch (e) {}
+  open(TABS.indexOf(last) >= 0 && last !== 'site' ? last : 'day');
+  // Письма: непрочитанные в колонке news.js (без «✓ открыто»)
+  var mine = dash.querySelector('[data-my-news]');
+  if (mine && window.MutationObserver) new MutationObserver(function () { n('news', mine.querySelectorAll('.fn-row:not(.nw-done)').length); }).observe(mine, { childList: true, subtree: true });
+  // Новое на сайте: строки новее, чем при последнем открытии вкладки
+  dash.addEventListener('pp:fn', function (e) { if (e.detail.view !== 'site') return; siteTs = e.detail.ts || []; n('site', dash.dataset.tab === 'site' ? 0 : siteTs.filter(function (t) { return t > seen; }).length); });
+
+  // ★ Мои игры
+  var pathOf = function (a) { return a.getAttribute('href').replace(/^\/(ru|lv)(?=\/)/, ''); };
+  var nameOf = function (x) { var a = [].slice.call(band.children).filter(function (t) { return pathOf(t) === x; })[0]; return a ? a.querySelector('.ns-t').textContent : x; };
+  var star = function (a) {
+    var s = a.querySelector('.gm-pin');
+    if (!s) { s = document.createElement('span'); s.className = 'gm-pin'; s.setAttribute('role', 'button'); s.tabIndex = 0; a.appendChild(s); }
+    var on = pins.indexOf(pathOf(a)) >= 0;
+    s.textContent = on ? '★' : '☆'; s.classList.toggle('on', on); s.title = (on ? T.unpin : T.pin)[L]; s.setAttribute('aria-label', s.title); s.setAttribute('aria-pressed', on ? 'true' : 'false');
+  };
+  var toggle = function (x) {
+    var i = pins.indexOf(x), out = null;
+    if (i >= 0) pins.splice(i, 1); else { pins.push(x); if (pins.length > 3) out = pins.shift(); }
+    if (out && window.PPToast) window.PPToast(T.swap[L](nameOf(out)));
+    fetch('/api/games/mine', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pins: pins }) }).catch(function () {});
+    draw();
+  };
+  var onStar = function (e) {
+    var s = e.target.closest('.gm-pin'); if (!s) return;
+    if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
+    e.preventDefault(); e.stopPropagation(); toggle(pathOf(s.closest('a')));
+  };
+  var pane = dash.querySelector('[data-my-games]'), busy = false;
+  var draw = function () {
+    if (!me) return; busy = true;
+    var tiles = [].slice.call(band.children), order = tiles.map(pathOf);
+    tiles.forEach(star);
+    var often = order.slice().sort(function (a, b) { return (visits[b] || 0) - (visits[a] || 0) || order.indexOf(a) - order.indexOf(b); });
+    var pick = pins.concat(often.filter(function (x) { return pins.indexOf(x) < 0; })).slice(0, 3);
+    pane.innerHTML = '<div class="am-tiles gm-tiles hd-gm"></div><p class="hd-gm-note">' + (pins.length ? T.hint : T.often)[L] + (pins.length ? '' : ' ' + T.hint[L]) + ' <a href="#hg-title">' + T.all[L] + '</a></p>';
+    pick.forEach(function (x) { var a = tiles[order.indexOf(x)].cloneNode(true); a.hidden = false; star(a); pane.firstChild.appendChild(a); });
+    setTimeout(function () { busy = false; });
+  };
+  band.addEventListener('click', onStar, true); band.addEventListener('keydown', onStar, true);
+  pane.addEventListener('click', onStar, true); pane.addEventListener('keydown', onStar, true);
+  if (window.MutationObserver) { var t; new MutationObserver(function () { if (busy) return; clearTimeout(t); t = setTimeout(draw, 80); }).observe(band, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden', 'class'] }); } // порядок по популярности, «готово» (games-hub.js)
+  document.addEventListener('pp:whoami', function (e) {
+    var u = e.detail && e.detail.user; if (!u || !u.nick || me) return; me = true;
+    fetch('/api/games/mine', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d) { pins = d.pins || []; visits = d.visits || {}; } draw(); }).catch(draw);
+  });
+})();
+</script>
 <div class="blk" id="blk-coming-soon" data-ppb="blk-coming-soon"><style>#blk-coming-soon { margin: 0; background: #FFFFFF; }
 #blk-coming-soon .bk { box-sizing: border-box; padding: 64px 32px; font-family: 'Karla', sans-serif; color: #2B1A51; }
 #blk-coming-soon .bk-in { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 56px; align-items: center; max-width: 1080px; margin: 0 auto; }
