@@ -103,12 +103,13 @@
             ['ci', '<circle cx="110" cy="115" r="45"/>', ['circle — in the middle', 'круг — посередине', 'aplis — vidū']],
             ['tr', '<polygon points="140,60 180,150 100,150"/>', ['triangle — in front', 'треугольник — впереди', 'trīsstūris — priekšā']]],
             deco: '' } },
-        { img: 'l4-a.png', say: ['On paper: let’s build a little house where the shapes overlap. Pick what it will have:', 'На бумаге: построим домик, где фигуры заходят друг за друга. Выбери, что у него будет:', 'Uz papīra: uzbūvēsim mājiņu, kur figūras pārklājas. Izvēlies, kas tai būs:'],
-          paper: { min: 3, opts: [['a round window', 'круглое окно', 'apaļš logs'], ['a triangle roof', 'крыша-треугольник', 'trīsstūra jumts'], ['a door', 'дверь', 'durvis'], ['a chimney', 'труба', 'skurstenis'], ['a fence', 'забор', 'žogs']] } },
-        { say: ['…(only a tail sticks out of the box) Meow. I’m tired of my box. Draw me a house made of shapes that overlap — a real one!', '…(из коробки торчит только хвост) Мяу. Надоела мне коробка. Нарисуй мне домик из фигур, которые заходят друг за друга, — настоящий!', '…(no kastes rēgojas tikai aste) Ņau. Man apnikusi kaste. Uzzīmē man mājiņu no figūrām, kas pārklājas, — īstu!'],
+        { img: 'l4-a.png', say: ['On paper: draw a little house and things that stand in front of it or behind it. Pick what will be there:', 'На бумаге: нарисуем домик и то, что стоит перед ним или за ним. Выбери, что там будет:', 'Uz papīra: uzzīmēsim mājiņu un to, kas stāv tās priekšā vai aiz tās. Izvēlies, kas tur būs:'],
+          paper: { min: 3, opts: [['a fence in front of the house', 'забор перед домиком', 'žogs mājiņas priekšā'], ['a tree behind the house', 'дерево за домиком', 'koks aiz mājiņas'], ['a bush in front of the wall', 'куст перед стеной', 'krūms sienas priekšā'], ['a chimney behind the roof', 'труба за крышей', 'skurstenis aiz jumta'], ['a cat in the window', 'кошка в окне', 'kaķis logā']] } },
+        { say: ['…(only a tail sticks out of the box) Meow. I’m tired of my box. Draw me a house with things in front of it and behind it — a real one!', '…(из коробки торчит только хвост) Мяу. Надоела мне коробка. Нарисуй мне домик, чтобы перед ним и за ним что-то было, — настоящий!', '…(no kastes rēgojas tikai aste) Ņau. Man apnikusi kaste. Uzzīmē man mājiņu, lai tās priekšā un aiz tās kaut kas būtu, — īstu!'],
           client: { card: 'classic/15.jpg', name: ['Milka', 'Милка', 'Milka'], job: ['lives in a box', 'живёт в коробке', 'dzīvo kastē'],
-            task: [['Draw a house where the shapes overlap. It must have: {picked}.', 'Нарисуй домик, где фигуры перекрывают друг друга. Обязательно: {picked}.', 'Uzzīmē mājiņu, kur figūras pārklājas. Obligāti: {picked}.'],
-              ['Mark hidden parts with a light dashed line.', 'Спрятанные части намечай лёгким пунктиром.', 'Paslēptās daļas iezīmē ar vieglu punktētu līniju.'], PHOTO] } },
+            task: [['Draw a house and, around it, what was picked: {picked}.', 'Нарисуй домик и рядом то, что выбрано: {picked}.', 'Uzzīmē mājiņu un blakus to, kas izvēlēts: {picked}.'],
+              ['What stands in front — draw it whole, it covers part of the house. What stands behind — draw only the part that peeks out.', 'Что стоит впереди — рисуй целиком, оно закрывает часть домика. Что сзади — рисуй только ту часть, что выглядывает.', 'Ko stāv priekšā — zīmē visu, tas aizsedz daļu mājiņas. Ko stāv aizmugurē — zīmē tikai to daļu, kas izspraucas.'],
+              ['You can mark the hidden parts with a light dashed line.', 'Спрятанные части можно наметить лёгким пунктиром.', 'Paslēptās daļas vari iezīmēt ar vieglu punktētu līniju.'], PHOTO] } },
       ] },
 
     { // 5 — Объём
