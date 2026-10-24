@@ -4337,6 +4337,9 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .nw-paper p { margin: 8px 0; }
 .nw-paper i { display: block; margin-top: 8px; font-size: .82rem; color: #7a6a8a; text-align: right; }
 .nw-paper-act { text-align: center; margin-bottom: 0 !important; }
+.nw-paper-act:has(a.pill-btn) { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; }
+.nw-paper-act .pill-btn { white-space: nowrap; text-decoration: none; }
+.nw-paper-act .nw-wl-gift { background: var(--peach); border-color: var(--peach); font-weight: 700; }
 .nw-boxlater .pill-btn, .nw-paper-act .pill-btn { color: #2B1A51; background: #fff; border: 1.5px solid #CDBFE0; }
 @media (max-width: 480px) { .nw-boxgrid { grid-template-columns: repeat(3, minmax(0, 1fr)); } }
 /* вкладки магазина: 🐦 для птички / 🏠 для комнаты / 🎲 сюрпризы / 🃏 карточки (src/pages/shop.html `tabs`) */

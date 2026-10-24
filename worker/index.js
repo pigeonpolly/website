@@ -9,6 +9,7 @@ import '../site/assets/can-do.js'; // PPCanDo — что можно с вещь�
 const PPCanDo = globalThis.PPCanDo;
 import { cardsApi, importCards, translateMissing, myCards, tradeNews, cardGiftNews, CARD_TABLES, CARD_ALTER } from './cards.js'; // коллекционные карточки (docs/cards.md)
 import { authApi, googleLink, funnelStep, mailOn, adventMail, adventAsk, AUTH_TABLES, AUTH_ALTER } from './auth.js'; // вход с паролем, письма, воронки (этап 12)
+import { wlHolidayCron, wlMailApi, wlLang, WL_ALTER } from './wl-holidays.js'; // праздники Воббленда: подарки и письма (docs/wobbleland.md)
 import { flockApi, featherNews, FLOCK_TABLES, FLOCK_ALTER } from './flock.js'; // «Все птички» и пёрышки (этап 13 Б+В, docs/flock.md)
 import { flockNewsApi, flockEvent as flockEventDb, roomEvent, flockNewsCron, FLOCK_NEWS_TABLES, FLOCK_NEWS_ALTER } from './flock-news.js'; // новости стаи (этап 13 Г, docs/flock.md)
 import { topApi, topScore, topCron, TOP_TABLES } from './top.js'; // доски топа игр (docs/games.md)
@@ -65,6 +66,7 @@ export default {
       await importTitos(env, new URL('https://www.pigeonpolly.com/')).catch(e => console.error('titos', e)); // дела Титоса: новый titos-cases.json — в D1 и перевести (один раз на хэш)
       await challengeCron(env, RULES).catch(e => console.error('challenge plan', e)); // темы челленджа: с 20-го — план следующего месяца
       await adventMail(env, authHelpers(env)).catch(e => console.error('advent mail', e)); // 1 декабря: письмо «адвент открылся» тем, кто отметил галочку
+      await wlHolidayCron(env, wlHelpers(env)).catch(e => console.error('wl holiday', e)); // праздник Воббленда: подарок всем птичкам и письмо-поздравление
       await flockNewsCron(env).catch(e => console.error('flock news', e)); // новости стаи — 30 дней
       await autoNicks(env).catch(e => console.error('auto nick', e)); // птички без ника — случайный ник
       await migrateToR2(env); await cleanupInactive(env);
@@ -291,7 +293,7 @@ function adventNow(req, env) {
 // reply (ответ на комментарий) — когда у комментариев появятся ответы и они будут связаны с птичкой; сейчас ответов нет — вид пропущен.
 const NEWS_KINDS = [
   ['gift', async (env, req, u) => { // неоткрытые подарки
-    const r = await env.DB.prepare("SELECT COUNT(*) AS n, MAX(id) AS last FROM gifts WHERE user_id = ? AND status = 'new'").bind(u.id).first();
+    const r = await env.DB.prepare("SELECT COUNT(*) AS n, MAX(id) AS last FROM gifts WHERE user_id = ? AND status = 'new' AND COALESCE(note, '') NOT LIKE 'wl:%'").bind(u.id).first(); // подарки к праздникам Воббленда — своим письмом (holiday)
     if (!r || !r.n) return null;
     const g = await env.DB.prepare('SELECT kind, item, note FROM gifts WHERE id = ?').bind(r.last).first();
     return { n: r.n, from: g && /^from:/.test(g.note || '') ? g.note.slice(5) : null };
@@ -314,6 +316,12 @@ const NEWS_KINDS = [
   }],
   ['card', (env, req, u) => cardGiftNews(env, u.id)], // карточки, подаренные из кабинета (worker/cards.js)
   ['trade', (env, req, u) => tradeNews(env, u.id, RULES.tradeDays)], // новые предложения обмена карточками (worker/cards.js)
+  ['holiday', async (env, req, u) => { // праздник Воббленда: письмо-поздравление с подарком (worker/wl-holidays.js), гаснет, когда подарок открыт
+    const g = await env.DB.prepare("SELECT kind, item, note FROM gifts WHERE user_id = ? AND status = 'new' AND note LIKE 'wl:%' ORDER BY id DESC LIMIT 1").bind(u.id).first();
+    if (g) return { k: g.kind, v: g.item, note: g.note };
+    const b = await env.DB.prepare("SELECT ref, amount FROM button_log WHERE user_id = ? AND kind = 'holiday' AND seen = 0 ORDER BY id DESC LIMIT 1").bind(u.id).first(); // вместо вещи — пуговки (ref «ГГГГ-ММ-ДД:город»); гаснет по POST /api/wl-mail/seen
+    return b ? { btn: b.amount, md: b.ref.slice(5, 10), city: b.ref.slice(11) } : null;
+  }],
   ['reward', (env, req, u) => rewardNews(env, u.id)], // награда Титоса за уровень (worker/titos.js) — «Поставить» в ленте
   ['feathers', (env, req, u) => featherNews(env, u, rigaDay())], // пёрышки комнате — сводка раз в сутки (worker/flock.js)
   ['seeds', (env, req, u) => gardenNews(env, u.id)], // семечко из игры, редкое или волшебное — пока птичка не зашла в огород (worker/garden.js)
@@ -373,6 +381,8 @@ const cardHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDa
 const titosHelpers = env => ({ ...cardHelpers(env), unit: () => gameUnit(env), btnOf, top: (uid, n) => topScore(env, 'titos', uid, n), award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), stamp: (uid, task) => stamp(env, uid, task) });
 const flockHelpers = env => ({ json, fail, currentUser, needUser, rigaDay, flockEvent: flockEvent(env), streakOf: rows => streaks(streakDays(rows)).current });
 const newsHelpers = env => ({ json, fail, needUser, isAdmin, rigaMs, getMeta: k => getMeta(env, k) });
+const wlHelpers = env => ({ ...authHelpers(env), surprise: (uid, kind) => surpriseKI(env, new Request('https://www.pigeonpolly.com/'), uid, kind),
+  award: async (uid, ref, n) => { const r = await award(env, uid, 'holiday', ref, n); if (r) await env.DB.prepare("UPDATE button_log SET seen = 0 WHERE user_id = ? AND kind = 'holiday' AND ref = ?").bind(uid, ref).run(); return r; }, btnFor: async (kind, item) => RULES.wlBtn >= 0 ? RULES.wlBtn : baseNow(kind, item, ((await catalog(env, new Request('https://www.pigeonpolly.com/'))).prices || {})[kind + '|' + item]) || 30 }); // праздники Воббленда: вещь уже есть — другая того же вида, вещей вида больше нет — пуговки
 const authHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, sessionCookie, sessionDays: SESSION_DAYS, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), bump: (k, sql) => bump(env, k, sql) });
 const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), awardComment: (uid, cid) => awardComment(env, uid, cid) });
 
@@ -449,7 +459,7 @@ async function ensureSchema(env) {
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_days INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_last TEXT', 'ALTER TABLE users ADD COLUMN cats_alive INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER,
-    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...SHIFT_ALTER, ...CHALLENGE_ALTER, ...GARDEN_ALTER]) {
+    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...SHIFT_ALTER, ...CHALLENGE_ALTER, ...GARDEN_ALTER, ...WL_ALTER]) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   // «Выбор Полли» подешевел с 50 до 11 пуговок: уже начисленные записи пересчитать один раз, баланс = сумма журнала
@@ -530,6 +540,7 @@ const RULE_DEFAULTS = {
   // «мало / обычно / много» штук в магазине — в % от числа птичек (с ником, не заблокированных); у легендарных — legendPct % от этих чисел
   lowPct: 5, normPct: 20, manyPct: 50, legendPct: 25,
   adventLastJan: 23, adventButtons: 10, adventSpecialButtons: 25,
+  wlBtn: -1, // праздник Воббленда, а вещей этого вида у птички уже все: столько пуговок (-1 — цена праздничной вещи), worker/wl-holidays.js
   welcomeBtn: -1, // подарок новичку после ника (этап 14): случайная дешёвая вещь (welcomeOf) и столько пуговок (-1 — цена этой вещи)
   dayBonusNeed: 5, dayBonusOf: 8, dayBonusPct: 10, // карточка дня: бонус за dayBonusNeed штампов (из dayBonusOf) — dayBonusPct % опорной цены, раз в сутки
   // дом птички (этап 20): что открывает комнату — уровень в Блинной Полли, пёрышек в чужих комнатах, дел Титоса, уровень Пуговичного дождя, задача Оффис Полли (0 — открыта сразу)
@@ -557,7 +568,7 @@ const RULE_DEFAULTS = {
   ...CH_DEFAULTS, // подбор тем челленджа: семья не ближе N дней, категории, колода сложности, доля сезона (worker/challenge-plan.js)
 };
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
-const RULE_NUM = { homeKitchen: [0, 1000], homeBedroom: [0, 1000], homeCrypt: [0, 1000], homeBath: [0, 1000], homeOffice: [0, 1], welcomeBtn: [-1, 10000], daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
+const RULE_NUM = { homeKitchen: [0, 1000], homeBedroom: [0, 1000], homeCrypt: [0, 1000], homeBath: [0, 1000], homeOffice: [0, 1], welcomeBtn: [-1, 10000], wlBtn: [-1, 10000], daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
   adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potionRevive: [0, 30], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...GARDEN_RANGE, ...SHIFT_RANGE, ...CH_RANGE };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
@@ -580,7 +591,7 @@ function cleanRules(r) {
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
   if (GARDEN_SEASONS.includes(r.gardenSeason)) out.gardenSeason = r.gardenSeason;
-  out.welcomeBtn = Math.round(out.welcomeBtn);
+  out.welcomeBtn = Math.round(out.welcomeBtn); out.wlBtn = Math.round(out.wlBtn);
   out.catMult = {}; if (r.catMult && typeof r.catMult === 'object') for (const k of GIFT_KINDS) { const v = Number(r.catMult[k]); if (Number.isFinite(v) && v !== 100) out.catMult[k] = Math.max(10, Math.min(1000, Math.round(v))); }
   if (out.priceMin > out.priceMax) out.priceMin = out.priceMax;
   if (out.lowPct > out.normPct) out.lowPct = out.normPct;
@@ -685,7 +696,7 @@ async function autoPrice(env, force = false) {
   }
   const since = now() - 14 * 86400;
   // активная птичка — зарабатывала хотя бы 3 разных дня из 14; её заработок — за один день активности
-  const inc = (await env.DB.prepare("SELECT b.user_id, SUM(b.amount) AS s, COUNT(DISTINCT b.day) AS days, MAX(u.buttons) AS bal FROM button_log b JOIN users u ON u.id = b.user_id WHERE b.amount > 0 AND b.created_at >= ? AND b.kind NOT IN ('admin', 'salary', 'sell', 'welcome') AND u.banned = 0 GROUP BY b.user_id").bind(since).all()).results.filter(r => r.s > 0 && r.days >= 3);
+  const inc = (await env.DB.prepare("SELECT b.user_id, SUM(b.amount) AS s, COUNT(DISTINCT b.day) AS days, MAX(u.buttons) AS bal FROM button_log b JOIN users u ON u.id = b.user_id WHERE b.amount > 0 AND b.created_at >= ? AND b.kind NOT IN ('admin', 'salary', 'sell', 'welcome', 'holiday') AND u.banned = 0 GROUP BY b.user_id").bind(since).all()).results.filter(r => r.s > 0 && r.days >= 3);
   let income = 0, target = 0, Lt = L;
   if (inc.length >= 3 && avgVal > 0) {
     const ss = inc.map(r => r.s / r.days).sort((a, b) => a - b); income = ss[ss.length >> 1];
@@ -1404,6 +1415,7 @@ async function route(req, env, url) {
   const p = url.pathname, m = req.method;
   if (p.startsWith('/api/pw/') || p === '/api/funnel' || p === '/api/admin/pw-reset' || p === '/api/admin/funnels') { const r = await authApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p === '/api/flock/news' || p === '/api/news-off' || p === '/api/admin/flock-notes') { const r = await flockNewsApi(req, env, url, newsHelpers(env)); if (r) return r; }
+  if (p.startsWith('/api/wl-mail') || p === '/api/admin/wl-holiday') { const r = await wlMailApi(req, env, url, wlHelpers(env)); if (r) return r; }
   if (p === '/api/birds' || p === '/api/feathers' || p === '/api/feather') { const r = await flockApi(req, env, url, flockHelpers(env)); if (r) return r; }
   if (p === '/api/top' && url.searchParams.get('g')) { const r = await topApi(req, env, url, { json, fail, currentUser, avatarOf }); if (r) return r; }
   if (p === '/api/pancakes' || p.startsWith('/api/pancakes/')) { const r = await pancakesApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, top: (uid, n) => topScore(env, 'pan', uid, n),
@@ -2110,6 +2122,7 @@ async function route(req, env, url) {
     const u = await currentUser(req, env);
     const earned = u && u.nick && !u.banned ? await award(env, u.id, 'daily', rigaDay(), BTN.daily) : 0; // +3 пуговки за первый заход за сутки (шапка спрашивает на каждой странице)
     // зарплата от «администрации Воббленда»: пуговки уже начислены, а конвертик ещё не открыт (seen = 0)
+    const wl = u && wlLang(req); if (wl && wl !== u.lang) await env.DB.prepare('UPDATE users SET lang = ? WHERE id = ?').bind(wl, u.id).run().catch(() => {}); // язык праздничных писем (worker/wl-holidays.js)
     const news = await newsOf(env, req, u); // «конвертик»: зарплата, подарки, адвент… (site/assets/news.js)
     // серия челленджа — для меню аватара в шапке (этап 14 Б)
     const streak = u && u.nick && !u.banned ? streaks(streakDays((await env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(u.id).all()).results)).current : 0;
@@ -2173,7 +2186,7 @@ async function route(req, env, url) {
     for (const b of forBadges.got) await flockEventDb(env, 'badge', u, { badge: b }); // новости стаи: «У @ник новый бейдж»
     const storage = admin ? Math.round(await storageUsed(env) * 1000) / 10 : undefined;
     const migration = admin && env.MEDIA ? await migrationStatus(env) : undefined;
-    return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, pw: !!u.pw, mail: mailOn(env), email: !!u.email, adventMail: !!u.advent_mail, newsOff: !!u.news_off, adventAsk: adventAsk(rigaDay()), consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
+    return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, pw: !!u.pw, mail: mailOn(env), email: !!u.email, adventMail: !!u.advent_mail, wlMail: !u.wl_mail_off, newsOff: !!u.news_off, adventAsk: adventAsk(rigaDay()), consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
       best: mergedBest(u, streakDays(rows)), keptBadges: kept, posts: rows, id: u.id, avatar: avatarOf(u), room: roomOf(u), earned, badgeEarned: forBadges, btn: await buttonStatus(env, u),
       gifts: (await env.DB.prepare('SELECT id, kind, item, note, status, created_at FROM gifts WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results } });
   }
