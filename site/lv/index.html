@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=b18ccd9e">
+<link rel="stylesheet" href="/assets/style.css?v=0fb5bd75">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <script src="/assets/site.js?v=2361f119" defer></script>
 <script src="/assets/polly.js?v=573aaaf7" defer></script>
@@ -115,8 +115,8 @@
   });
   document.addEventListener('pp:whoami', function (e) {
     var u = e.detail && e.detail.user; if (!u || !u.nick) return;
-    var B = window.PPBirds, cv = document.querySelector('.md-bird canvas');
-    if (B && cv) cv.getContext('2d').drawImage(B.spriteHD(B.dress(B.looks(u.id), u.avatar), 0), 0, 0);
+    var B = window.PPBirds, cv = document.querySelector('.md-bird canvas, .md-bird .pp-ava');
+    if (B && cv) cv.replaceWith(B.avatar(u.id, u.avatar, window.innerWidth > 760 ? 200 : 150)); // аватар как в профиле: свой фон, рамка, анимация
     document.querySelector('.md-nick').textContent = '@' + u.nick;
     document.querySelector('[data-me-btns]').textContent = u.buttons || 0;
     var card = document.querySelector('[data-day-card]');

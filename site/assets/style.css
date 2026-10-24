@@ -4621,14 +4621,14 @@ html.me-in .myday { display: block; }
 .md-me { display: grid; justify-items: center; gap: 6px; text-align: center; }
 .md-kick { margin: 0; font: italic 400 20px var(--serif); color: var(--peach); }
 .md-bird { display: grid; justify-items: center; gap: 4px; color: var(--text); text-decoration: none; }
-.md-bird canvas { width: 160px; height: 140px; image-rendering: pixelated; border-radius: 20px; background: #C9B79C; }
+.md-bird > canvas { width: 160px; height: 140px; image-rendering: pixelated; border-radius: 20px; background: #C9B79C; }
 .md-nick { font: 600 22px var(--serif); }
 .md-btns { padding: 7px 14px; border-radius: 99px; background: rgba(233, 169, 59, .16); color: var(--text); font-size: 15px; text-decoration: none; }
 .md-btns b { color: var(--star); }
 .md-btns span { color: var(--muted); }
 .md-btns:hover { background: rgba(233, 169, 59, .3); }
 .md-card { min-width: 0; }
-@media (max-width: 760px) { .md-in { grid-template-columns: 1fr; gap: 18px; } .md-bird canvas { width: 128px; height: 112px; } }
+@media (max-width: 760px) { .md-in { grid-template-columns: 1fr; gap: 18px; } .md-bird > canvas { width: 128px; height: 112px; } }
 .home-games { margin: 0 auto; padding: 30px 0 10px; }
 /* все игры одной строкой во всю ширину; не влезают — листаются вбок */
 .home-games .gm-tiles { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: minmax(150px, 1fr); max-width: none; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 var(--gutter); padding-bottom: 6px; scrollbar-width: thin; }

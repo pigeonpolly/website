@@ -35,8 +35,8 @@
   });
   document.addEventListener('pp:whoami', function (e) {
     var u = e.detail && e.detail.user; if (!u || !u.nick) return;
-    var B = window.PPBirds, cv = document.querySelector('.md-bird canvas');
-    if (B && cv) cv.getContext('2d').drawImage(B.spriteHD(B.dress(B.looks(u.id), u.avatar), 0), 0, 0);
+    var B = window.PPBirds, cv = document.querySelector('.md-bird canvas, .md-bird .pp-ava');
+    if (B && cv) cv.replaceWith(B.avatar(u.id, u.avatar, window.innerWidth > 760 ? 200 : 150)); // аватар как в профиле: свой фон, рамка, анимация
     document.querySelector('.md-nick').textContent = '@' + u.nick;
     document.querySelector('[data-me-btns]').textContent = u.buttons || 0;
     var card = document.querySelector('[data-day-card]');
