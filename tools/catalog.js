@@ -5,7 +5,7 @@ const root = process.argv[2];
 const stubEl = () => ({ style: { setProperty() {} }, classList: { add() {}, toggle() {} }, appendChild() {}, addEventListener() {}, getContext: () => new Proxy({}, { get: () => () => ({ data: [] }) }) });
 global.window = {}; global.document = { documentElement: { lang: 'en' }, createElement: stubEl, querySelector: () => null, addEventListener() {} };
 global.matchMedia = () => ({ matches: false });
-for (const f of ['birds.js', 'room.js']) new Function(fs.readFileSync(path.join(root, 'site/assets', f), 'utf8'))();
+for (const f of ['birds.js', 'room.js', 'garden-items.js']) new Function(fs.readFileSync(path.join(root, 'site/assets', f), 'utf8'))();
 const B = window.PPBirds;
 const real = B.GIFT_KINDS.map(k => k[0]).filter(k => k !== 'any'); // any — сами «Сюрпризы», в сумку не попадают
 const out = { kinds: real, items: Object.fromEntries(real.map(k => [k, B.GIFTS[k]])), legend: [...B.LEGEND].filter(x => !x.startsWith('any|')) };
@@ -19,7 +19,7 @@ const FOOD = ['coffee', 'croissant', 'pizza', 'cherry', 'lollipop', 'candycane',
 const animated = d => d && typeof d.d === 'function' && /\bt\b/.test(String(d.d).split('=>')[0]); // рисунок зависит от времени — шевелится
 function value(kind, v) {
   const key = kind + '|' + v, leg = B.LEGEND.has(key), base = v.split(':')[0];
-  if (leg) return ['furn', 'deco', 'wall', 'floor', 'view', 'curtain'].includes(kind) ? 600 : 500;
+  if (leg) return ['furn', 'deco', 'wall', 'floor', 'view', 'curtain', 'garden'].includes(kind) ? 600 : 500;
   switch (kind) {
     case 'hat': return SPECIAL_HATS.includes(base) ? 45 : 30;
     case 'shoes': return 30;
@@ -29,6 +29,7 @@ function value(kind, v) {
     case 'frame': return v === 'dotted' ? 30 : /^[a-z]+$/.test(v) && ['web', 'candycorn', 'bats', 'autumnwreath', 'mushrooms', 'flowers', 'canestripe', 'lights', 'pixel', 'catears', 'bubbles', 'sunrays', 'clouds', 'jewels'].includes(v) ? 60 : 45;
     case 'anim': return ['sparkle', 'heart', 'disco'].includes(v) ? 100 : 80;
     case 'wall': return 70; case 'floor': return 60; case 'curtain': return v === 'rainbow' ? 70 : 45;
+    case 'garden': return (window.PPGardenItems.ITEMS[v] || {}).p || 30; // вещи для огорода (garden-items.js)
     case 'view': return ['night', 'sea', 'snow', 'space', 'aurora'].includes(v) ? 120 : 85;
   }
   const d = R && R.defOf(kind, v); if (!d) return 30;

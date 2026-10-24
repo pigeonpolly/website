@@ -4,7 +4,7 @@
   const LANG = /\/admin\//.test(location.pathname) || document.documentElement.lang === 'ru' ? 1 : document.documentElement.lang === 'lv' ? 2 : 0; // кабинет — всегда по-русски
   const tr = a => a[LANG] != null ? a[LANG] : a[0];
   const esc = s => String(s == null ? '' : s).replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' })[c]);
-  const BIRD_KINDS = ['hat', 'item', 'shoes', 'scarf', 'bg', 'frame', 'anim'], ROOM_KINDS = ['furn', 'deco', 'wall', 'floor', 'view', 'curtain'];
+  const BIRD_KINDS = ['hat', 'item', 'shoes', 'scarf', 'bg', 'frame', 'anim'], ROOM_KINDS = ['furn', 'deco', 'wall', 'floor', 'view', 'curtain', 'garden']; // garden — вещи для огорода (garden-items.js), стоят в огороде сами
   const FIXED = ['wall', 'floor', 'view', 'curtain']; // в комнате по одной: выбранные обои, пол, вид, шторы
   // вид вещи одним словом — мелко под названием
   const KIND = {
@@ -12,6 +12,7 @@
     bg: ['background', 'фон', 'fons'], frame: ['frame', 'рамка', 'rāmis'], anim: ['animation', 'анимация', 'animācija'],
     furn: ['furniture', 'мебель', 'mēbele'], deco: ['decoration', 'украшение', 'rotājums'], wall: ['wallpaper', 'обои', 'tapetes'],
     any: ['surprise', 'сюрприз', 'pārsteigums'], floor: ['floor', 'пол', 'grīda'], view: ['window view', 'вид из окна', 'skats pa logu'], curtain: ['curtains', 'шторы', 'aizkari'],
+    garden: ['for the garden', 'для огорода', 'dārzam'],
   };
   const kindLabel = k => KIND[k] ? tr(KIND[k]) : k;
   const kindsLabel = k => { const e = window.PPBirds && window.PPBirds.GIFT_KINDS.find(x => x[0] === k); return e ? tr(e[1]) : kindLabel(k); };
@@ -154,7 +155,7 @@
         if (o.onMore) menu.push({ label: 'ℹ️ ' + tr(['Details', 'Подробнее', 'Sīkāk']), on: () => o.onMore(it) });
         const used = it.u > 0, room = isRoom(it.kind);
         g.appendChild(tile({ kind: it.kind, item: it.item, name: B.giftName(it.kind, it.item, L), legend: it.legend, mark, markOn: used, menu, id: o.id, size,
-          title: room ? tr(['Put it in the room', 'Поставить в комнату', 'Novietot istabā']) : used ? tr(['Take it off', 'Снять', 'Novilkt']) : tr(['Put it on', 'Надеть', 'Uzvilkt']),
+          title: it.kind === 'garden' ? tr(['See it in the garden', 'Посмотреть в огороде', 'Apskatīt dārzā']) : room ? tr(['Put it in the room', 'Поставить в комнату', 'Novietot istabā']) : used ? tr(['Take it off', 'Снять', 'Novilkt']) : tr(['Put it on', 'Надеть', 'Uzvilkt']),
           onUse: () => o.onUse && o.onUse(it) }));
       }
       // в конце ленты — «＋ в магазин» (магазин с этим видом)
@@ -176,6 +177,7 @@
   function usage(kind, item, n, avatar, room) {
     room = room || {};
     if (!isRoom(kind)) return avatar && avatar[kind] === item ? 1 : 0;
+    if (kind === 'garden') return n; // вещь для огорода стоит в огороде сама
     const all = [room, ...Object.values(room.rooms || {})]; // дом птички (этап 20): все комнаты
     if (FIXED.includes(kind)) return all.some(r => r && r[kind] === item) ? 1 : 0;
     return Math.min(n, all.reduce((a, r) => a + ((r && r.items) || []).filter(it => it.k === kind && it.v === item).length, 0));
@@ -191,6 +193,11 @@
     const B = window.PPBirds, me = o.me || {};
     const say = (msg, undo) => window.PPToast && window.PPToast(msg, undo ? { action: tr(['Undo', 'Отменить', 'Atsaukt']), onAction: undo, ms: 5000 } : {});
     const keep = undo => { api.lastUndo = undo || null; return undo || null; };
+    if (kind === 'garden') { // вещь для огорода уже стоит в огороде — туда и ведём
+      if (me.nick && !/\/garden\//.test(location.pathname)) location.href = `${pre}/garden/?nick=${encodeURIComponent(me.nick)}`;
+      else say(tr(['It is already in your garden', 'Уже стоит в огороде', 'Jau stāv dārzā']));
+      return null;
+    }
     if (isRoom(kind)) {
       const R = window.PPRoom && window.PPRoom.live;
       if (!R || !R.box.isConnected) { if (me.nick) location.href = profileUrl(me.nick) + '#use=' + encodeURIComponent(kind + '|' + item); return null; }
@@ -229,7 +236,7 @@
   // окно вещи: примерка (на птичке или в комнате — вещь на свободном месте), строки о вещи, одна кнопка
   // o = { kind, item, me, lines: [текст], note, badges: [[текст, класс]], action: { label, on(btn, d), disabled }, action2 — так же }
   function itemWindow(o) {
-    const B = window.PPBirds, me = o.me || null, room = isRoom(o.kind), sur = o.item === '?' || o.kind === 'any';
+    const B = window.PPBirds, me = o.me || null, room = isRoom(o.kind) && o.kind !== 'garden', sur = o.item === '?' || o.kind === 'any';
     const d = dialog('cat-item', `<div class="cat-item-in"><figure class="cat-try"><div class="cat-try-box"></div><figcaption></figcaption></figure>
       <div class="cat-item-tx"><h3>${o.legend ? '<span class="cat-item-star">★</span> ' : ''}${esc(B.giftName(o.kind, o.item, LANG))}</h3><p class="cat-item-kind">${esc(kindsLabel(o.kind))}</p>
       ${o.badges && o.badges.length ? `<p class="cat-badges cat-item-badges">${o.badges.map(b => `<span class="cat-badge ${esc(b[1] || '')}">${esc(b[0])}</span>`).join('')}</p>` : ''}
@@ -237,7 +244,8 @@
       ${room && window.PPRoom && PPRoom.aboutOf && PPRoom.aboutOf(o.kind, o.item) ? `<p class="cat-item-about">${esc(PPRoom.aboutOf(o.kind, o.item))}</p>` : ''}
       ${o.note ? `<p class="cat-item-note">${esc(o.note)}</p>` : ''}<div class="cat-item-act"></div></div></div>`);
     const tb = d.querySelector('.cat-try-box'), cap = d.querySelector('.cat-try figcaption');
-    if (sur) { tb.appendChild(pic(o.kind, o.item, me ? me.id : 2, 180)); cap.textContent = tr(['A random thing you don’t have yet', 'Случайная вещь, которой у тебя ещё нет', 'Nejauša lieta, kuras tev vēl nav']); }
+    if (o.kind === 'garden' && !sur) { tb.appendChild(pic(o.kind, o.item, me ? me.id : 2, 180)); cap.textContent = tr(['Stands in the garden by itself', 'Сама встанет в огороде', 'Pati nostāsies dārzā']); }
+    else if (sur) { tb.appendChild(pic(o.kind, o.item, me ? me.id : 2, 180)); cap.textContent = tr(['A random thing you don’t have yet', 'Случайная вещь, которой у тебя ещё нет', 'Nejauša lieta, kuras tev vēl nav']); }
     else if (room && window.PPRoom) { // своя комната (у гостя — пустая) с этой вещью на свободном месте
       tb.classList.add('room-try');
       const rm = JSON.parse(JSON.stringify((me && me.room) || {}));

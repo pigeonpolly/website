@@ -565,6 +565,12 @@
         row('🐞 Жуков в день — до', num('gardenBugMax', R.gardenBugMax, D.gardenBugMax), D.gardenBugMax, 'каждый вылезает в свой час между 7 и 21 по Риге'),
         row('Шанс, что жуки сегодня будут', num('gardenBugChance', R.gardenBugChance, D.gardenBugChance) + ' %', D.gardenBugChance + ' %', 'в остальные дни жуков нет'),
         row('🐞 Пуговок за жука', num('gardenBugBtn', R.gardenBugBtn, D.gardenBugBtn) + ' 🔘', D.gardenBugBtn + ' 🔘'),
+        row('🌱 Семечко в награду в игре', num('gardenDropPct', R.gardenDropPct, D.gardenDropPct) + ' %', D.gardenDropPct + ' %', 'шанс за каждую награду пуговками в Пуговичном дожде, Зельеварне, Блинной, у Титоса (дела и жуки) и в «Смене с Полли»; семечко простое, случайное'),
+        row('🌱 Семян из игр в сутки — до', num('gardenDropDay', R.gardenDropDay, D.gardenDropDay) + ' шт.', D.gardenDropDay + ' шт.'),
+        row('✨ Редкое семечко — дней подряд', num('gardenRareDays', R.gardenRareDays, D.gardenRareDays) + ' дн.', D.gardenRareDays + ' дн.', 'дни, когда в карточке дня собрано столько штампов, сколько нужно для бонуса дня; после награды серия считается заново. Радужная морковь, синяя роза, золотая тыква'),
+        row('🔮 Волшебное семечко — дней подряд', num('gardenMagicDays', R.gardenMagicDays, D.gardenMagicDays) + ' дн.', D.gardenMagicDays + ' дн.', 'дни, когда в огороде полита хоть одна грядка; после награды — заново. Звёздная ягода, лунный цветок, мандрагора'),
+        row('Урожай редких дороже в', num('gardenRareMul', R.gardenRareMul, D.gardenRareMul) + ' раз', D.gardenRareMul + ' раз'),
+        row('Урожай волшебных дороже в', num('gardenMagicMul', R.gardenMagicMul, D.gardenMagicMul) + ' раз', D.gardenMagicMul + ' раз'),
         row('Сезон огорода', `<select data-r="gardenSeason">${[['auto', 'по календарю'], ['autumn', '🍂 осень'], ['winter', '❄️ зима'], ['spring', '🌸 весна'], ['summer', '☀️ лето']].map(([k, l]) => `<option value="${k}"${R.gardenSeason === k ? ' selected' : ''}>${l}</option>`).join('')}</select>`, 'по календарю', 'погода и вид: дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень'),
       ], 'Вход — дверь 🚪 в комнате птички → «Огород» (/garden/)')}
       ${box('⏱ «Смена с Полли»', [
@@ -654,6 +660,8 @@
         <li>Вход — дверь 🚪 в комнате → «Огород». ${R.gardenBeds} грядок; посадить семечко, поливать каждый день (раз в сутки по Риге): растение растёт, только пока земля влажная (${R.gardenWetH} ч после полива).</li>
         <li>Семечко — ${R.gardenSeedPct} % (${pc(btnPct(R.gardenSeedPct))}) за каждый день роста, урожай — ${R.gardenSellPct} % (${pc(btnPct(R.gardenSellPct))}) за день${R.gardenOn ? '' : ' (продажа сейчас выключена)'}. При первом заходе — по ${R.gardenStarter} семян редиски, салата, моркови и тюльпана.</li>
         <li>Жуки: в ${R.gardenBugChance} % дней — от 1 до ${R.gardenBugMax}, вылезают в разное время днём; каждый — ${pc(R.gardenBugBtn)}.</li>
+        <li>Семена: простые — в лавке огорода и в магазине; в играх с шансом ${R.gardenDropPct} % за награду (до ${R.gardenDropDay} в сутки). Редкое — за ${R.gardenRareDays} дней подряд с бонусом карточки дня, волшебное — за ${R.gardenMagicDays} дней подряд с поливом; их урожай дороже в ${R.gardenRareMul} и ${R.gardenMagicMul} раз. Найденное семечко — новость 🌱 в конвертике.</li>
+        <li>Вещи для огорода (лейка, пугало, теплица, тачка…, ★ золотая лейка и оранжерея, «🎲 Сюрприз») — в магазине; купленная вещь сама стоит в огороде.</li>
         <li>Погода — ${R.gardenSeason === 'auto' ? 'по календарю' : 'вручную: ' + R.gardenSeason}: осенью листья, дождик или туман, зимой снег, весной лепестки, летом солнце и бабочки; вечером (с 19 до 7) — звёзды.</li></ul>
       <h4>«Смена с Полли»</h4><ul>
         <li>Таймер 20 мин – 3 ч, Полли работает рядом. Засчитывается только смена, доведённая до конца; минуты копятся: каждый полный час — повышение (новая должность, лестница бесконечная)${R.shiftOn && R.shiftBtn > 0 ? ` и ${pc(R.shiftBtn)}` : ''}.</li></ul>

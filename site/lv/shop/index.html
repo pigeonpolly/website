@@ -25,20 +25,21 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=1ff846fc">
+<link rel="stylesheet" href="/assets/style.css?v=a94a16c3">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <script src="/assets/site.js?v=2361f119" defer></script>
 <script src="/assets/polly.js?v=573aaaf7" defer></script>
-<script src="/assets/can-do.js?v=ed1d74bd" defer></script>
+<script src="/assets/can-do.js?v=45f40bee" defer></script>
 <script src="/assets/birds.js?v=8b869e67" defer></script>
 <script src="/assets/room.js?v=15b4a8e0" defer></script>
+<script src="/assets/garden-items.js?v=0e83e9e3" defer></script>
 <script src="/assets/potion-names.js?v=e02872fd" defer></script>
 <script src="/assets/toast.js?v=93392a35" defer></script>
 <script src="/assets/day-card.js?v=469606ad" defer></script>
 <script src="/assets/hatch.js?v=6d36422a" defer></script>
 <script src="/assets/cart.js?v=8f90c619" defer></script>
 <script src="/assets/account.js?v=7dbaafbc" defer></script>
-<script src="/assets/news.js?v=4ba45ab9" defer></script>
+<script src="/assets/news.js?v=42b47987" defer></script>
 <script src="/assets/search.js?v=fd80358d" defer></script>
 </head>
 <body class="inner">
@@ -239,9 +240,11 @@
 <!-- магазин (этап 6): «Новое в магазине», каталог на общем компоненте catalog-ui.js (вкладки Всё · Птичке · Комнате · Карточки · Сюрпризы, «Фильтры»), «Нет в наличии» внизу -->
 <section data-ppb="shop.2" class="fl-all shop cat-shop" id="shop">
   <div class="shop-new" hidden></div>
+  <div class="shop-seeds" id="seeds" hidden></div>
   <div class="shop-cat"></div>
 </section>
-<script src="/assets/catalog-ui.js?v=5663dcfc" defer></script>
+<script src="/assets/catalog-ui.js?v=26bb4249" defer></script>
+<script src="/assets/garden.js?v=ab5a065d" defer></script>
 <script src="/assets/cards-ui.js?v=ffdbec65" defer></script>
 <script>
 // Магазин: каталог вещей (PPBirds) с ценой и остатком из /api/shop; нажатие — окно вещи с примеркой и «Купить за N»; после покупки тост «В сумке · Надеть / Поставить сейчас»
@@ -280,6 +283,9 @@
     bought: ['Bought: {n} · in your bag 🎒', 'Куплено: {n} · в сумке 🎒', 'Nopirkts: {n} · somā 🎒'], cartRest: ['Some things were not bought and stayed in the cart.', 'Часть вещей не купилась и осталась в корзине.', 'Daļa lietu netika nopirkta un palika grozā.'],
     toBag: ['Open the bag', 'Открыть сумку', 'Atvērt somu'], cartGo: ['Keep shopping', 'Выбрать ещё', 'Izvēlēties vēl'],
     soldH: ['Out of stock', 'Нет в наличии', 'Nav pieejams'], catH: ['🛍 Catalog', '🛍 Каталог', '🛍 Katalogs'],
+    seedsH: ['🌱 Seeds for the garden', '🌱 Семена для огорода', '🌱 Sēklas dārzam'], seedsNote: ['One seed · how many days it grows · what the harvest sells for. Rare and magic seeds are not sold: they are earned.', 'Цена семечка · сколько дней растёт · за сколько продаётся урожай. Редкие и волшебные не продаются — их получают за серии.', 'Sēklas cena · cik dienas aug · par cik pārdod ražu. Retās un burvju sēklas nepārdod — tās nopelna.'],
+    seedBuy: ['+1 for {p} 🔘', '+1 за {p} 🔘', '+1 par {p} 🔘'], seedDays: ['{n} d', '{n} дн.', '{n} d.'], seedGot: ['🌱 +1 · plant it in the garden', '🌱 +1 · посади в огороде', '🌱 +1 · iestādi dārzā'],
+    toGarden: ['🥕 To the garden', '🥕 В огород', '🥕 Uz dārzu'], gardenThings: ['🪴 Things for the garden', '🪴 Вещи для огорода', '🪴 Lietas dārzam'],
   };
   var t = function (k) { return T[k][L]; };
   var meEl = document.querySelector('.shop-me'), newBox = document.querySelector('.shop-new'), catBox = document.querySelector('.shop-cat');
@@ -456,6 +462,29 @@
         load();
       }).catch(function () { alert(t('err')); b.disabled = false; });
   }
+  // «🌱 Семена для огорода» (этап 23): простые семена — тем же POST /api/garden/buy, что и лавка в огороде; рисунки — PPGardenPlants (garden.js)
+  var seedBox = document.querySelector('.shop-seeds'), G = null;
+  function drawSeeds() {
+    var GP = window.PPGardenPlants, P = (G && G.prices) || {}, list = Object.keys(P).filter(function (k) { return P[k].seed != null && GP && GP.CROP[k]; });
+    if (!me || !me.nick || !G || !G.owner || !list.length) { seedBox.hidden = true; return; }
+    seedBox.hidden = false;
+    seedBox.innerHTML = '<h2 class="shop-block-h">' + t('seedsH') + '</h2><p class="shop-seeds-note">' + t('seedsNote') + '</p><div class="shop-seeds-row"></div>'
+      + '<p class="shop-seeds-go"><a class="pill-btn" href="' + pre + '/garden/">' + t('toGarden') + '</a> <a class="pill-btn" href="#room:garden">' + t('gardenThings') + '</a></p>';
+    var row = seedBox.querySelector('.shop-seeds-row');
+    list.forEach(function (k) {
+      var x = P[k], have = (G.seeds || {})[k] || 0, d = document.createElement('div'); d.className = 'shop-seed';
+      d.innerHTML = '<img src="' + GP.icon(k) + '" alt="" width="40" height="45"><b>' + GP.name(k) + (have ? ' <small>×' + have + '</small>' : '') + '</b><small>' + t('seedDays').replace('{n}', x.days) + ' · → ' + x.sell + ' 🔘</small>';
+      var b = document.createElement('button'); b.type = 'button'; b.className = 'pill-btn'; b.textContent = x.seed > 0 ? t('seedBuy').replace('{p}', x.seed) : t('buyFree'); b.disabled = x.seed > money();
+      b.onclick = function () {
+        b.disabled = true;
+        fetch('/api/garden/buy', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ seed: k }) })
+          .then(function (r) { if (r.status === 402) throw 'poor'; if (!r.ok) throw 'err'; return r.json(); })
+          .then(function (r) { G = r; if (me.btn) me.btn.buttons = r.buttons; if (window.PPAccount && PPAccount.setButtons) PPAccount.setButtons(r.buttons); if (window.PPToast) window.PPToast(t('seedGot'), { action: t('toGarden'), onAction: function () { location.href = pre + '/garden/'; } }); head(); drawSeeds(); })
+          .catch(function (e) { alert(e === 'poor' ? t('poor') : t('err')); drawSeeds(); });
+      };
+      d.appendChild(b); row.appendChild(d);
+    });
+  }
   // «Новое в магазине» — GET /api/new: вещи в продаже и новые коллекции карточек
   function drawNew() {
     var B = window.PPBirds, C = window.PPCatalog, list = Object.keys(NEW).filter(function (x) { var p = x.split('|'); return row(p[0], p[1]).stock > 0; }).slice(0, 12);
@@ -510,6 +539,7 @@
       NEW = {}; (a[2].items || []).forEach(function (x) { NEW[key(x.kind, x.item)] = x.at; }); newCards = a[2].cards || [];
       if (!me && S.show === 'mine') S.show = '';
       head(); drawNew();
+      if (me && me.nick) fetch('/api/garden', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (g) { G = g; drawSeeds(); }).catch(function () {}); else drawSeeds();
       var y = scrollY; drawCat(); scrollTo(0, y); // после покупки список не прыгает
       if (cartDlg) drawCart(cartDlg.querySelector('.cart-msg') ? cartDlg.querySelector('.cart-msg').textContent : '');
       else if (location.hash === '#cart' && me) openCart();
