@@ -144,7 +144,27 @@ async function ensureBlogSchema(env) {
     }
     await env.DB.prepare("INSERT INTO meta (key, value) VALUES ('blog_tags_v1', '1') ON CONFLICT(key) DO UPDATE SET value = '1'").run().catch(() => {});
   }
+  await importDrafts(env).catch(() => {});
   ready = true;
+}
+
+// черновики, написанные Claude (доступа к D1 у него нет): site/assets/blog-drafts.json → в «Черновики» редактора, каждый один раз (meta blog_draft:<slug>)
+async function importDrafts(env) {
+  const r = await env.ASSETS.fetch(new Request(SITE + '/assets/blog-drafts.json'));
+  if (!r.ok) return;
+  const list = ((await r.json()).posts || []).filter(p => p && p.slug);
+  if (!list.length) return;
+  const done = new Set((await env.DB.prepare("SELECT key FROM meta WHERE key LIKE 'blog_draft:%'").all()).results.map(x => x.key));
+  const now = Math.floor(Date.now() / 1000);
+  for (const p of list) {
+    if (done.has('blog_draft:' + p.slug)) continue; // уже был (может, Алина его правила или удалила) — не трогаем
+    await env.DB.batch([
+      env.DB.prepare(`INSERT INTO blog_posts (slug, status, cover, t_ru, t_en, t_lv, d_ru, d_en, d_lv, b_ru, b_en, b_lv, tags_en, section, src_lang, created_at, updated_at)
+        VALUES (?, 'draft', ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?) ON CONFLICT(slug) DO NOTHING`)
+        .bind(p.slug, p.cover || '', p.t_ru || '', p.t_en || '', p.t_lv || '', p.d_ru || '', p.d_en || '', p.d_lv || '', await cleanHtml(p.b_ru || ''), await cleanHtml(p.b_en || ''), await cleanHtml(p.b_lv || ''),
+          splitTags(p.tags_en).join(', '), p.section || '', p.src_lang || 'ru', now, now),
+      env.DB.prepare("INSERT INTO meta (key, value) VALUES (?, '1') ON CONFLICT(key) DO NOTHING").bind('blog_draft:' + p.slug)]);
+  }
 }
 
 // ---------- очистка HTML статьи (пишет только админ, но всё равно оставляем только безопасные теги) ----------
