@@ -579,9 +579,9 @@
         row('Сезон огорода', `<select data-r="gardenSeason">${[['auto', 'по календарю'], ['autumn', '🍂 осень'], ['winter', '❄️ зима'], ['spring', '🌸 весна'], ['summer', '☀️ лето']].map(([k, l]) => `<option value="${k}"${R.gardenSeason === k ? ' selected' : ''}>${l}</option>`).join('')}</select>`, 'по календарю', 'погода и вид: дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень'),
       ], 'Вход — дверь 🚪 в комнате птички → «Огород» (/garden/)')}
       ${box('✉️ Уведомления из игр на почту', [
-        row(`<label class="adm-r-chk"><input type="checkbox" data-r="mailGamesOn"${R.mailGamesOn ? ' checked' : ''}> Присылать уведомления из игр</label>`, '', 'вкл', 'только птичкам, которые включили «🎮 Уведомления из игр»; одной птичке — не больше одного письма в день вообще (любого: рассылка, праздник, адвент, уведомление); что не уместилось — завтра'),
+        row(`<label class="adm-r-chk"><input type="checkbox" data-r="mailGamesOn"${R.mailGamesOn ? ' checked' : ''}> Присылать уведомления из игр</label>`, '', 'вкл', 'только птичкам, которые включили «🎮 Уведомления из игр»; одно письмо-сводка в день: всё, что ждёт птичку в играх; и вообще не больше одного письма в день (рассылка, праздник, адвент); что не уместилось — завтра'),
         row('🔥 Серия сгорит сегодня — серия от', num('mailStreakMin', R.mailStreakMin, D.mailStreakMin) + ' дн.', D.mailStreakMin + ' дн.', 'если сегодня ещё нет рисунка и сегодня не день свободы'),
-        row('🔥 …письмо о серии — с', num('mailStreakHour', R.mailStreakHour, D.mailStreakHour) + ' ч по Риге', D.mailStreakHour + ' ч'),
+        row('🕖 Письмо из игр — с', num('mailGamesHour', R.mailGamesHour, D.mailGamesHour) + ' ч по Риге', D.mailGamesHour + ' ч', 'всё, что ждёт птичку (серия, огород, Титос), — одним письмом; уходит с этого часа до 23'),
         row('🥕🌱 Огород — не чаще раза в', num('mailGardenDays', R.mailGardenDays, D.mailGardenDays) + ' дн.', D.mailGardenDays + ' дн.', 'урожай созрел или грядки сухие, а птичка не заходила больше суток'),
         row('🕵️ Титос ждёт — если птичка не заходила', num('mailTitosDays', R.mailTitosDays, D.mailTitosDays) + ' дн.', D.mailTitosDays + ' дн.', 'про каждое следующее дело — одно письмо'),
       ], 'Письма уходят сами раз в час, в пределах бесплатного лимита (90 в сутки вместе с остальными письмами). <a href="#mail">✉️ Письма →</a>')}
