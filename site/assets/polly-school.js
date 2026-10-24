@@ -18,6 +18,9 @@
     title: ['Polly’s Drawing School', 'Школа Полли', 'Pollijas zīmēšanas skola'],
     lead: ['Pen, paper and twelve small lessons. Every lesson ends with a real client from Wobbleland, and after twelve stamps you get a pixel diploma and buttons.', 'Ручка, бумага и двенадцать маленьких уроков. В конце каждого приходит настоящий клиент из Воббленда, а за двенадцать печатей — пиксельный диплом и пуговки.', 'Pildspalva, papīrs un divpadsmit mazas nodarbības. Katras beigās ierodas īsts klients no Vobllendas, bet par divpadsmit zīmogiem — pikseļu diploms un pogas.'],
     free: ['The daily challenge is open to everyone — school is just for courage.', 'Челлендж открыт всем — школа просто для смелости.', 'Izaicinājums ir atvērts visiem — skola ir tikai drosmei.'],
+    freeDip: ['The diploma is just for fun, not an official qualification.', 'Диплом — для радости, а не официальная квалификация.', 'Diploms ir priekam, nevis oficiāla kvalifikācija.'],
+    dipNote: ['Polly’s School is a friendly hobby course. The diploma is a keepsake for fun: it is not an official document, gives no academic credits or qualifications and is not recognised by any educational institution.', 'Школа Полли — дружеский курс для хобби. Диплом — памятная картинка для радости: это не официальный документ, он не даёт кредитных пунктов и квалификации и не признаётся учебными заведениями.', 'Pollijas skola ir draudzīgs hobija kurss. Diploms ir piemiņas attēls priekam: tas nav oficiāls dokuments, nedod kredītpunktus vai kvalifikāciju, un to neatzīst izglītības iestādes.'],
+    dipFine: ['A keepsake for fun — not an official document, no academic credits or qualification.', 'Памятный диплом для радости — не официальный документ, не даёт кредитных пунктов и квалификации.', 'Piemiņas diploms priekam — nav oficiāls dokuments, nedod kredītpunktus un kvalifikāciju.'],
     path: ['Student path', 'Тропинка ученика', 'Skolēna taka'],
     lesson: ['Lesson', 'Урок', 'Nodarbība'],
     diploma: ['Diploma', 'Диплом', 'Diploms'],
@@ -216,6 +219,8 @@
       const d = 17 + n * 13 - 1; x.beginPath(); x.moveTo((d - 4) * Math.sin(a) - 3 * Math.cos(a), -(d - 4) * Math.cos(a) - 3 * Math.sin(a)); x.lineTo((d - 4) * Math.sin(a) + 3 * Math.cos(a), -(d - 4) * Math.cos(a) + 3 * Math.sin(a)); x.lineTo((d + 6) * Math.sin(a), -(d + 6) * Math.cos(a)); x.fill();
     }
     x.restore();
+    // мелкая оговорка на тёмном поле снизу
+    x.fillStyle = 'rgba(251,244,226,.6)'; x.font = sans(13, 500); x.fillText(t('dipFine'), W / 2, H - 9);
     // восковая печать с Полли
     const sx = W / 2, sy = 702;
     x.fillStyle = '#9E3A1E'; x.beginPath(); for (let k = 0; k < 24; k++) { const r = k % 2 ? 62 : 68, a = k / 24 * Math.PI * 2; x.lineTo(sx + r * Math.cos(a), sy + r * Math.sin(a)); } x.fill();
@@ -228,11 +233,11 @@
   const diplomaView = () => {
     const k = stamps();
     if (k < N) return `<div class="ps-dipwait"><p>${t('dipWait')} <b>${k} / ${N}</b></p><button type="button" class="ps-back">${t('back')}</button></div>`;
-    return `<div class="ps-dip"><p class="ps-dip-hi">${t('dipCongrats')}${srv.btn ? ` <span class="ps-dip-btn">+${srv.btn} 🔘</span>` : ''}</p><div class="ps-dip-pic"></div><div class="ps-dip-act"><button type="button" class="ps-dl">${t('dipSave')}</button><a class="ps-dl ps-dl2" href="${['', '/ru', '/lv'][L]}/challenge/">${t('toChallenge')}</a><button type="button" class="ps-back">${t('back')}</button></div></div>`;
+    return `<div class="ps-dip"><p class="ps-dip-hi">${t('dipCongrats')}${srv.btn ? ` <span class="ps-dip-btn">+${srv.btn} 🔘</span>` : ''}</p><div class="ps-dip-pic"></div><div class="ps-dip-act"><button type="button" class="ps-dl">${t('dipSave')}</button><a class="ps-dl ps-dl2" href="${['', '/ru', '/lv'][L]}/challenge/">${t('toChallenge')}</a><button type="button" class="ps-back">${t('back')}</button></div><p class="ps-dip-note">${t('dipNote')}</p></div>`;
   };
 
   const render = () => {
-    box.innerHTML = `<div class="ps-head"><h1>${t('title')}</h1><p>${t('lead')}</p><p class="ps-free">${t('free')}</p></div>
+    box.innerHTML = `<div class="ps-head"><h1>${t('title')}</h1><p>${t('lead')}</p><p class="ps-free">${t('free')} ${t('freeDip')}</p></div>
       <h3 class="ps-h3">${t('path')}</h3>${path()}${mode === 'lesson' && srv.works[st.cur] && srv.works[st.cur].status !== 'wait' ? verdict(st.cur) : ''}
       ${mode === 'dip' ? diplomaView() : lessonView()}
       <a class="ps-book" href="${['', '/ru', '/lv'][L]}/e-books/"><img src="${IMG}book-cover.jpg" alt=""><span>${t('book')} <b>Watercolor Sketches: Creative Guide</b><em>${t('bookGo')}</em></span></a>`;
