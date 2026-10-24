@@ -501,6 +501,11 @@ def wobbleland_data():
             for v in mp[part].values():
                 v["name"] = names.get(v["name"], v["name"])
         data["map"] = mp
+        # праздники для поздравления на главной (src/blocks/wl-holiday.html) — маленький файл без карты
+        hol = [{"m": h["m"], "d": h["d"], "k": c["key"], "c": c.get("short") or c["name"], "t": h["title"],
+                "x": re.sub(r"(?<![.!?])[;,:]?$", ".", re.split(r"(?<=[.!?;])\s", h.get("desc", ""))[0], count=1) if h.get("desc") else ""}
+               for c in data["cities"] for h in c["holidays"]]
+        (OUT / "assets" / f"wl-holidays.{lang}.json").write_text(json.dumps(hol, ensure_ascii=False, separators=(",", ":")))
         (OUT / "assets" / f"wobbleland-data.{lang}.js").write_text(
             "// Сгенерировано build.py из content/wobbleland.json — не править руками\nwindow.WOBBLELAND = "
             + json.dumps(data, ensure_ascii=False) + ";\n")
