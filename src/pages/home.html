@@ -18,16 +18,6 @@
     <button type="button" class="hero-egg" data-join aria-label="Hatch your bird"><canvas width="28" height="26"></canvas></button>
   </div>
 </section>
-<section class="myday" aria-labelledby="md-title">
-  <div class="md-in">
-    <div class="md-me">
-      <p class="md-kick" id="md-title">My day</p>
-      <a class="md-bird" href="/bird/" data-me-link><canvas width="64" height="56" aria-hidden="true"></canvas><b class="md-nick"></b></a>
-      <a class="md-btns" href="/shop/">🔘 <b data-me-btns>0</b> <span>buttons · shop →</span></a>
-    </div>
-    <div class="md-card" data-day-card></div>
-  </div>
-</section>
 <script>
 // этап 14: гостю — яйцо и «🥚 Вылупи свою птичку» (окно входа, воронка hatch), вошедшему с ником — «Мой день» (html.me-in, hatch.js)
 (function () {
@@ -54,8 +44,6 @@
   });
 })();
 </script>
-{{block:season}}
-{{block:wl-holiday}}
 <section class="home-games" aria-labelledby="hg-title">
   <h2 id="hg-title">Games</h2>
   <div class="am-tiles gm-tiles">
@@ -71,7 +59,7 @@
   <p class="hg-all"><a href="/games/">All games and the shop →</a></p>
 </section>
 <script>
-// Игры на главной (вместо «Новое на сайте»): первая — самая новая (data-added, новой игре — дата), дальше по популярности за 30 дней (GET /api/games/top), видно 4
+// Игры на главной (вместо «Новое на сайте»): первая — самая новая (data-added, новой игре — дата), дальше по популярности за 30 дней (GET /api/games/top), видны все
 (function () {
   var box = document.querySelector('.home-games .gm-tiles'); if (!box) return;
   var all = [].slice.call(box.children), pathOf = function (a) { return a.getAttribute('href').replace(/^\/(ru|lv)(?=\/)/, ''); };
@@ -79,21 +67,34 @@
     top = top || {};
     var newest = all.filter(function (a) { return a.dataset.added; }).sort(function (a, b) { return b.dataset.added < a.dataset.added ? -1 : 1; })[0];
     var rest = all.filter(function (a) { return a !== newest; }).sort(function (a, b) { return (top[pathOf(b)] || 0) - (top[pathOf(a)] || 0); });
-    (newest ? [newest] : []).concat(rest).forEach(function (a, i) { a.hidden = i > 3; box.appendChild(a); });
+    (newest ? [newest] : []).concat(rest).forEach(function (a, i) { box.appendChild(a); });
   };
   show();
   fetch('/api/games/top').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d) show(d.top); }).catch(function () {});
 })();
 </script>
 <script src="/assets/games-hub.js" defer></script>
+{{block:season}}
+<div class="home-dash">
+<section class="myday hd-col" aria-labelledby="md-title">
+  <div class="md-in">
+    <div class="md-me">
+      <p class="md-kick" id="md-title">My day</p>
+      <a class="md-bird" href="/bird/" data-me-link><canvas width="64" height="56" aria-hidden="true"></canvas><b class="md-nick"></b></a>
+      <a class="md-btns" href="/shop/">🔘 <b data-me-btns>0</b> <span>buttons · shop →</span></a>
+    </div>
+    <div class="md-card" data-day-card></div>
+  </div>
+</section>
+<div class="hd-col hd-news" data-my-news></div>
+<div class="hd-col hd-rooms" data-flock-news="5" data-fn-view="rooms"></div>
+<div class="hd-col hd-side">
+{{block:wl-holiday}}
+<div class="hd-upd" data-flock-news="4" data-fn-view="site"></div>
+</div>
+</div>
+<script src="/assets/flock-news.js" defer></script>
 {{block:home-blog}}
 <div class="home-sep" aria-hidden="true"><svg viewBox="-48 -48 96 96"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z"/></svg></div>
 {{block:coming-soon}}
-<section class="home-req">
-  <p class="hr-kick">Draw me</p>
-  <h2>Suggest an idea — when I draw it, your bird gets a gift</h2>
-  <a class="pill-btn pill-fill" href="/requests/">🎨 Suggest an idea</a>
-</section>
-<div class="fn-home" data-flock-news="3"></div>
-<script src="/assets/flock-news.js" defer></script>
 {{block:flock}}

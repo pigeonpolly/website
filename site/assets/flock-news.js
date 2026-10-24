@@ -1,5 +1,5 @@
 // Новости стаи (этап 13 Г, docs/flock.md): лента /flock/news/ и 3 строки на главной над сценой.
-// PPFlockNews.mount(el, { limit }) — limit: сколько строк показать (главная — 3, без разделителей дней); без limit — вся лента по дням с «Показать ещё».
+// PPFlockNews.mount(el, { limit, view }) — view: 'rooms' | 'site' (колонки главной, VIEWS); — limit: сколько строк показать (главная — 3, без разделителей дней); без limit — вся лента по дням с «Показать ещё».
 // Данные — GET /api/flock/news (worker/flock-news.js). Однотипное за день — одной строкой; шаблон выбирается по id события (не прыгает при обновлении).
 (() => {
   const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, lang = ['en', 'ru', 'lv'][L], pre = ['', '/ru', '/lv'][L];
@@ -54,6 +54,13 @@
     visit: ['Visit', 'Зайти', 'Ieiet'], look: ['Look', 'Смотреть', 'Skatīt'], hello: ['Say hi', 'Поздороваться', 'Sasveicināties'],
     polly: ['Polly', 'Полли', 'Pollija'], pin: ['Announcement', 'Объявление', 'Paziņojums'],
   };
+  // виды для колонок главной (data-fn-view): только свои kind, свой заголовок; all — ссылка внизу (пусто — без ссылки)
+  const VIEWS = {
+    rooms: { kinds: ['room', 'feathers'], title: ['News from bird rooms', 'Новое в комнатах птичек', 'Jaunumi putniņu istabās'], all: T.all,
+      empty: ['The rooms are quiet for now.', 'В комнатах пока тихо.', 'Istabās pagaidām klusi.'] },
+    site: { kinds: ['polly'], title: ['New on the site', 'Новое на сайте', 'Jaunumi vietnē'], all: null,
+      empty: ['Nothing new yet.', 'Пока ничего нового.', 'Pagaidām nekā jauna.'] },
+  };
   const BTN = { new: 'hello', drawing: 'look', pick: 'look', card: 'look', polly: 'look' };
   const hash = s => { let h = 7; for (const c of String(s)) h = (h * 31 + c.charCodeAt(0)) >>> 0; return h; };
   const pickT = (list, id) => list[hash(id) % list.length];
@@ -92,7 +99,7 @@
     const tpl = pickT(TPL[g.kind][L], g.id);
     return fill(typeof tpl === 'function' ? tpl(g.n) : tpl, o) + (n > 1 ? ` <span class="fn-plus">+${n - 1}</span>` : '');
   }
-  function row(g) {
+  function row(g, today) {
     const li = document.createElement('li'); li.className = 'fn-row fn-' + g.kind;
     const who = g.kind === 'polly' || (g.kind === 'new' || g.kind === 'drawing') && g.more.length ? null : g.nick;
     const href = g.kind === 'polly' ? local(g.url || '') : g.kind === 'drawing' && g.more.length ? '' : prof(g.nick);
@@ -100,7 +107,7 @@
     const strip = g.kind === 'drawing' && g.more.length ? `<span class="fn-strip">${[g, ...g.more].slice(0, 8).map(x => `<a href="${prof(x.nick)}" title="@${esc(x.nick)}"><img src="${esc(x.img)}" alt="" loading="lazy"></a>`).join('')}</span>` : '';
     const pic = !strip && g.img ? `<a class="fn-pic" href="${esc(href || prof(g.nick))}"><img src="${esc(g.img)}" alt="" loading="lazy"></a>` : '';
     li.innerHTML = `<span class="fn-ava">${who ? '' : g.kind === 'polly' ? '🕊️' : g.kind === 'drawing' ? '🎨' : '🐣'}</span>
-      <p class="fn-txt">${text(g)}<time>${time(g.ts)}</time></p>${strip}${pic}${btn}`;
+      <p class="fn-txt">${text(g)}<time>${today && g.day !== today ? dayName(g.day, today) : time(g.ts)}</time></p>${strip}${pic}${btn}`;
     if (who && window.PPBirds) { const a = document.createElement('a'); a.href = prof(who); a.className = 'fn-ava'; a.title = '@' + who; a.appendChild(PPBirds.avatar(g.uid, g.avatar, 36)); li.querySelector('.fn-ava').replaceWith(a); }
     return li;
   }
@@ -110,14 +117,15 @@
     let d;
     try { d = await fetch('/api/flock/news?lang=' + lang).then(r => r.ok ? r.json() : Promise.reject()); }
     catch (e) { el.innerHTML = `<p class="fn-msg">${T.err[L]}</p>`; return; }
-    const rows = group(d.events || []);
+    const v = VIEWS[o.view] || { title: T.title, all: T.all, empty: T.empty };
+    const rows = group((d.events || []).filter(e => !v.kinds || v.kinds.includes(e.kind)));
     el.innerHTML = '';
     if (o.limit) {
       const ul = document.createElement('ul'); ul.className = 'fn-list';
-      rows.slice(0, o.limit).forEach(g => ul.appendChild(row(g)));
-      el.insertAdjacentHTML('beforeend', `<h2 class="fn-h">${T.title[L]}</h2>`);
-      if (rows.length) el.appendChild(ul); else el.insertAdjacentHTML('beforeend', `<p class="fn-msg">${T.empty[L]}</p>`);
-      el.insertAdjacentHTML('beforeend', `<a class="fn-all" href="${pre}/flock/news/">${T.all[L]}</a>`);
+      rows.slice(0, o.limit).forEach(g => ul.appendChild(row(g, v.kinds && d.today)));
+      el.insertAdjacentHTML('beforeend', `<h2 class="fn-h">${v.title[L]}</h2>`);
+      if (rows.length) el.appendChild(ul); else el.insertAdjacentHTML('beforeend', `<p class="fn-msg">${v.empty[L]}</p>`);
+      if (v.all) el.insertAdjacentHTML('beforeend', `<a class="fn-all" href="${pre}/flock/news/">${v.all[L]}</a>`);
       return;
     }
     for (const p of d.pinned || []) el.insertAdjacentHTML('beforeend', `<p class="fn-pinned"><b>📣 ${T.pin[L]}</b> ${esc(p.text)}</p>`);
@@ -138,6 +146,6 @@
     step();
   }
   window.PPFlockNews = { mount };
-  const go = () => document.querySelectorAll('[data-flock-news]').forEach(el => mount(el, { limit: Number(el.dataset.flockNews) || 0 }));
+  const go = () => document.querySelectorAll('[data-flock-news]').forEach(el => mount(el, { limit: Number(el.dataset.flockNews) || 0, view: el.dataset.fnView }));
   if (document.readyState === 'loading') document.addEventListener('DOMContentLoaded', go); else go();
 })();

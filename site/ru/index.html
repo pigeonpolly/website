@@ -25,7 +25,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=42c79949">
+<link rel="stylesheet" href="/assets/style.css?v=6042415a">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <script src="/assets/site.js?v=2361f119" defer></script>
 <script src="/assets/polly.js?v=573aaaf7" defer></script>
@@ -38,8 +38,8 @@
 <script src="/assets/day-card.js?v=abba4963" defer></script>
 <script src="/assets/hatch.js?v=6d36422a" defer></script>
 <script src="/assets/cart.js?v=8f90c619" defer></script>
-<script src="/assets/account.js?v=e0cf585f" defer></script>
-<script src="/assets/news.js?v=cb5d85fc" defer></script>
+<script src="/assets/account.js?v=ff7fcae7" defer></script>
+<script src="/assets/news.js?v=f9c6e825" defer></script>
 <script src="/assets/search.js?v=fd80358d" defer></script>
 </head>
 <body class="home">
@@ -98,16 +98,6 @@
     <button type="button" class="hero-egg" data-join aria-label="Вылупи свою птичку"><canvas width="28" height="26"></canvas></button>
   </div>
 </section>
-<section data-ppb="home.2" class="myday" aria-labelledby="md-title">
-  <div class="md-in">
-    <div class="md-me">
-      <p class="md-kick" id="md-title">Мой день</p>
-      <a class="md-bird" href="/ru/bird/" data-me-link><canvas width="64" height="56" aria-hidden="true"></canvas><b class="md-nick"></b></a>
-      <a class="md-btns" href="/ru/shop/">🔘 <b data-me-btns>0</b> <span>пуговок · магазин →</span></a>
-    </div>
-    <div class="md-card" data-day-card></div>
-  </div>
-</section>
 <script>
 // этап 14: гостю — яйцо и «🥚 Вылупи свою птичку» (окно входа, воронка hatch), вошедшему с ником — «Мой день» (html.me-in, hatch.js)
 (function () {
@@ -134,6 +124,36 @@
   });
 })();
 </script>
+<section data-ppb="home.2" class="home-games" aria-labelledby="hg-title">
+  <h2 id="hg-title">Игры</h2>
+  <div class="am-tiles gm-tiles">
+    <a class="am-tile gm-tile" href="/ru/rain/" data-g="rain"><img src="/images/games/rain.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Пуговичный дождь</b><i>Лови пуговки!</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🔘</span></a>
+    <a class="am-tile gm-tile" href="/ru/potions/" data-g="potion"><img src="/images/games/potions.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Зельеварня</b><i>Лабиринт и зелья</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🧪</span></a>
+    <a class="am-tile gm-tile" href="/ru/pancakes/" data-added="2026-10-18" data-g="pan"><img src="/images/games/pancakes.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Блинная Полли</b><i>Блины на заказ</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🥞</span></a>
+    <a class="am-tile gm-tile" href="/ru/titos/" data-g="titos"><img src="/images/games/titos.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Детектив Титос</b><i>100 детективных дел</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🕵️</span></a>
+    <a class="am-tile gm-tile" href="/ru/shift/" data-added="2026-10-23"><img src="/images/games/shift.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Смена с Полли</b><i>Работаем вместе с Полли</i></span><span class="am-tile-ico" aria-hidden="true">⏱</span></a>
+    <a class="am-tile gm-tile" href="/ru/polly-office/"><img src="/images/games/polly-office.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Офис Полли</b><i>Разбери почту Полли</i></span><span class="am-tile-ico" aria-hidden="true">📮</span></a>
+    <a class="am-tile gm-tile" href="/ru/wobbleland/"><img src="/images/games/wobbleland.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Воббленд</b><i>Карта одиннадцати городов</i></span><span class="am-tile-ico" aria-hidden="true">🗺</span></a>
+    <a class="am-tile gm-tile" href="/ru/advent/" data-g="advent"><img src="/images/games/advent.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Адвент</b><i>31 окошко с подарками</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🎄</span></a>
+  </div>
+  <p class="hg-all"><a href="/ru/games/">Все игры и магазин →</a></p>
+</section>
+<script>
+// Игры на главной (вместо «Новое на сайте»): первая — самая новая (data-added, новой игре — дата), дальше по популярности за 30 дней (GET /api/games/top), видны все
+(function () {
+  var box = document.querySelector('.home-games .gm-tiles'); if (!box) return;
+  var all = [].slice.call(box.children), pathOf = function (a) { return a.getAttribute('href').replace(/^\/(ru|lv)(?=\/)/, ''); };
+  var show = function (top) {
+    top = top || {};
+    var newest = all.filter(function (a) { return a.dataset.added; }).sort(function (a, b) { return b.dataset.added < a.dataset.added ? -1 : 1; })[0];
+    var rest = all.filter(function (a) { return a !== newest; }).sort(function (a, b) { return (top[pathOf(b)] || 0) - (top[pathOf(a)] || 0); });
+    (newest ? [newest] : []).concat(rest).forEach(function (a, i) { box.appendChild(a); });
+  };
+  show();
+  fetch('/api/games/top').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d) show(d.top); }).catch(function () {});
+})();
+</script>
+<script src="/assets/games-hub.js?v=c051a011" defer></script>
 <div class="blk" id="blk-season" data-ppb="blk-season"><style>#blk-season .ss { position: relative; overflow: hidden; box-sizing: border-box; padding: 34px 32px; background: radial-gradient(ellipse at 20% 0%, #3E2A7A 0, #24163F 60%, #1B1030 100%); font-family: 'Karla', sans-serif; color: #F3EFFA; }
 #blk-season .ss[hidden] { display: none; }
 #blk-season .ss-in { display: flex; align-items: center; justify-content: center; gap: 36px; max-width: 980px; margin: 0 auto; }
@@ -285,6 +305,20 @@
   });
 </script>
 </div>
+<div data-ppb="home.3" class="home-dash">
+<section data-ppb="home.4" class="myday hd-col" aria-labelledby="md-title">
+  <div class="md-in">
+    <div class="md-me">
+      <p class="md-kick" id="md-title">Мой день</p>
+      <a class="md-bird" href="/ru/bird/" data-me-link><canvas width="64" height="56" aria-hidden="true"></canvas><b class="md-nick"></b></a>
+      <a class="md-btns" href="/ru/shop/">🔘 <b data-me-btns>0</b> <span>пуговок · магазин →</span></a>
+    </div>
+    <div class="md-card" data-day-card></div>
+  </div>
+</section>
+<div data-ppb="home.5" class="hd-col hd-news" data-my-news></div>
+<div data-ppb="home.6" class="hd-col hd-rooms" data-flock-news="5" data-fn-view="rooms"></div>
+<div data-ppb="home.7" class="hd-col hd-side">
 <div class="blk" id="blk-wl-holiday" data-ppb="blk-wl-holiday"><style>#blk-wl-holiday .wlh { position: relative; max-width: 980px; margin: 18px auto 0; padding: 0 var(--gutter); }
 #blk-wl-holiday .wlh[hidden] { display: none; }
 #blk-wl-holiday .wlh-card { position: relative; overflow: hidden; display: flex; align-items: center; gap: 18px; padding: 26px 22px 18px 22px; border-radius: 18px; background: linear-gradient(135deg, #3B2668 0, #2F1E57 100%); border: 1px solid var(--line); box-shadow: 0 8px 22px rgba(0, 0, 0, .25); }
@@ -364,36 +398,10 @@
   });
 </script>
 </div>
-<section data-ppb="home.3" class="home-games" aria-labelledby="hg-title">
-  <h2 id="hg-title">Игры</h2>
-  <div class="am-tiles gm-tiles">
-    <a class="am-tile gm-tile" href="/ru/rain/" data-g="rain"><img src="/images/games/rain.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Пуговичный дождь</b><i>Лови пуговки!</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🔘</span></a>
-    <a class="am-tile gm-tile" href="/ru/potions/" data-g="potion"><img src="/images/games/potions.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Зельеварня</b><i>Лабиринт и зелья</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🧪</span></a>
-    <a class="am-tile gm-tile" href="/ru/pancakes/" data-added="2026-10-18" data-g="pan"><img src="/images/games/pancakes.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Блинная Полли</b><i>Блины на заказ</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🥞</span></a>
-    <a class="am-tile gm-tile" href="/ru/titos/" data-g="titos"><img src="/images/games/titos.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Детектив Титос</b><i>100 детективных дел</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🕵️</span></a>
-    <a class="am-tile gm-tile" href="/ru/shift/" data-added="2026-10-23"><img src="/images/games/shift.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Смена с Полли</b><i>Работаем вместе с Полли</i></span><span class="am-tile-ico" aria-hidden="true">⏱</span></a>
-    <a class="am-tile gm-tile" href="/ru/polly-office/"><img src="/images/games/polly-office.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Офис Полли</b><i>Разбери почту Полли</i></span><span class="am-tile-ico" aria-hidden="true">📮</span></a>
-    <a class="am-tile gm-tile" href="/ru/wobbleland/"><img src="/images/games/wobbleland.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Воббленд</b><i>Карта одиннадцати городов</i></span><span class="am-tile-ico" aria-hidden="true">🗺</span></a>
-    <a class="am-tile gm-tile" href="/ru/advent/" data-g="advent"><img src="/images/games/advent.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Адвент</b><i>31 окошко с подарками</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🎄</span></a>
-  </div>
-  <p class="hg-all"><a href="/ru/games/">Все игры и магазин →</a></p>
-</section>
-<script>
-// Игры на главной (вместо «Новое на сайте»): первая — самая новая (data-added, новой игре — дата), дальше по популярности за 30 дней (GET /api/games/top), видно 4
-(function () {
-  var box = document.querySelector('.home-games .gm-tiles'); if (!box) return;
-  var all = [].slice.call(box.children), pathOf = function (a) { return a.getAttribute('href').replace(/^\/(ru|lv)(?=\/)/, ''); };
-  var show = function (top) {
-    top = top || {};
-    var newest = all.filter(function (a) { return a.dataset.added; }).sort(function (a, b) { return b.dataset.added < a.dataset.added ? -1 : 1; })[0];
-    var rest = all.filter(function (a) { return a !== newest; }).sort(function (a, b) { return (top[pathOf(b)] || 0) - (top[pathOf(a)] || 0); });
-    (newest ? [newest] : []).concat(rest).forEach(function (a, i) { a.hidden = i > 3; box.appendChild(a); });
-  };
-  show();
-  fetch('/api/games/top').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d) show(d.top); }).catch(function () {});
-})();
-</script>
-<script src="/assets/games-hub.js?v=c051a011" defer></script>
+<div data-ppb="home.8" class="hd-upd" data-flock-news="4" data-fn-view="site"></div>
+</div>
+</div>
+<script src="/assets/flock-news.js?v=11364a45" defer></script>
 <div class="blk" id="blk-home-blog" data-ppb="blk-home-blog"><style>#blk-home-blog .hb { padding: 56px var(--gutter) 60px; background: #FFFDF8; color: #2B1A51; }
 #blk-home-blog .hb[hidden] { display: none; }
 #blk-home-blog .hb-top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
@@ -455,7 +463,7 @@
 </section>
 <script src="/assets/home-blog.js?v=0579a5ee" defer></script>
 </div>
-<div data-ppb="home.4" class="home-sep" aria-hidden="true"><svg viewBox="-48 -48 96 96"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z"/></svg></div>
+<div data-ppb="home.9" class="home-sep" aria-hidden="true"><svg viewBox="-48 -48 96 96"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z"/></svg></div>
 <div class="blk" id="blk-coming-soon" data-ppb="blk-coming-soon"><style>#blk-coming-soon { margin: 0; background: #FFFFFF; }
 #blk-coming-soon .bk { box-sizing: border-box; padding: 64px 32px; font-family: 'Karla', sans-serif; color: #2B1A51; }
 #blk-coming-soon .bk-in { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 56px; align-items: center; max-width: 1080px; margin: 0 auto; }
@@ -546,13 +554,6 @@ document.querySelectorAll('.bk-notify').forEach(function (f) {
 });
 </script>
 </div>
-<section data-ppb="home.5" class="home-req">
-  <p class="hr-kick">Нарисуй мне</p>
-  <h2>Предложи идею — когда нарисую, твоей птичке подарок</h2>
-  <a class="pill-btn pill-fill" href="/ru/requests/">🎨 Предложить идею</a>
-</section>
-<div data-ppb="home.6" class="fn-home" data-flock-news="3"></div>
-<script src="/assets/flock-news.js?v=a8db10be" defer></script>
 <div class="blk" id="blk-flock" data-ppb="blk-flock"><style>#blk-flock .fl { padding: 56px var(--gutter) 64px; text-align: center; }
 #blk-flock .fl-kick { margin: 0 0 6px; font: italic 400 18px var(--serif); color: #F0A987; }
 #blk-flock .fl h2 { margin: 0 0 10px; font: 600 clamp(28px, 3.2vw, 40px)/1.1 var(--serif); }

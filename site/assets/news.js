@@ -263,6 +263,7 @@
   // ---------- 🔔 в шапке ----------
   const bell = document.getElementById('pp-bell');
   function drawBell() {
+    inline();
     if (!bell) return;
     const n = known().length;
     bell.hidden = !me;
@@ -270,6 +271,17 @@
     bell.setAttribute('aria-label', t('bell') + (n ? ` (${n})` : ''));
     bell.querySelector('.bell-n').textContent = n ? String(n) : '';
     bell.querySelector('.bell-n').hidden = !n;
+  }
+  // колонка «Мои новости» на главной ([data-my-news]): те же карточки строками, кнопка открывает ленту — действия там
+  function inline() {
+    document.querySelectorAll('[data-my-news]').forEach(el => {
+      const items = known();
+      el.innerHTML = `<h2 class="fn-h">🔔 ${t('title')}</h2>` + (items.length ? `<ul class="fn-list">${items.map(x => {
+        const k = KINDS[x.kind];
+        return `<li class="fn-row nw-mini"><span class="fn-ava" aria-hidden="true">${k.icon}</span><p class="fn-txt"><b>${esc(k.title(x))}</b> ${esc(k.text(x))}</p><button type="button" class="fn-btn">${k.act[L]}</button></li>`;
+      }).join('')}</ul>` : `<p class="fn-msg">${t('empty')}</p>`);
+      el.querySelectorAll('.fn-btn').forEach(b => { b.onclick = () => feed(); });
+    });
   }
   if (bell) bell.addEventListener('click', () => feed());
 
