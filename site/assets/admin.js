@@ -499,6 +499,7 @@
     btnRows.push(row('📮 Карточка дня: бонус за … штампов', num('dayBonusNeed', R.dayBonusNeed, D.dayBonusNeed) + ' из ' + num('dayBonusOf', R.dayBonusOf, D.dayBonusOf), D.dayBonusNeed + ' из ' + D.dayBonusOf, 'штамп — задание дня (заход, рисунок, комментарий, игры, Титос, адвент); бонус раз в сутки'),
       row('🥚 Подарок новичку после ника', `случайная вещь для птички до ${d.welcomeMax || 30} 🔘 — сейчас таких <b>${d.welcomeCount || 0}</b>`, 'случайная', 'кладётся в сумку, в окне «Добро пожаловать» — кнопка «Надеть»'),
       row('🥚 Стартовые пуговки новичку', num('welcomeBtn', R.welcomeBtn, D.welcomeBtn) + ' 🔘', 'цена подарка', '−1 — столько, сколько стоит выпавший подарок; 0 — без пуговок'),
+      row('🎉 Праздник Воббленда: вещей нет — пуговки', num('wlBtn', R.wlBtn, D.wlBtn) + ' 🔘', 'цена вещи', '−1 — столько, сколько стоит праздничная вещь; когда у птички уже все вещи этого вида'),
       row('📮 Бонус карточки дня', pct('dayBonusPct') + (G.avg && R.dayBonusPct > 0 ? ` → сейчас <b>${Math.max(1, Math.round(R.dayBonusPct * G.avg / 100))} 🔘</b>` : ''), D.dayBonusPct + ' %', 'от опорной цены вещи'));
     const lvRows = Object.keys(D.levels).map(k => row(`${LEVEL_RU[k] || ''} — рекорд ${k} ${k === '1' ? 'день' : 'дней'} подряд`, num('levels.' + k, R.levels[k], D.levels[k]) + ' 🔘', D.levels[k]));
     const bRows = Object.keys(D.badges).map(k => {

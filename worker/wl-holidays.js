@@ -59,7 +59,8 @@ export async function wlHolidayCron(env, h, force) {
       const stmts = [];
       for (const id of birds) {
         const it = has.has(id) && h.surprise ? await h.surprise(id, k) : [k, v];
-        if (it) stmts.push(env.DB.prepare('INSERT INTO gifts (user_id, kind, item, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(id, it[0], it[1], note, t));
+        if (!it || it[0] !== k) { if (h.award) await h.award(id, day + ':' + x.city, await h.btnFor(k, v)); continue; } // вещей этого вида у птички уже все — пуговки
+        stmts.push(env.DB.prepare('INSERT INTO gifts (user_id, kind, item, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(id, it[0], it[1], note, t));
       }
       for (let i = 0; i < stmts.length; i += 50) await env.DB.batch(stmts.slice(i, i + 50));
     }
@@ -95,6 +96,11 @@ export async function wlMailApi(req, env, url, h) {
     const msg = ok ? ['Done — no more Wobbleland holiday emails. Holiday gifts will still come to your bird.', 'Готово — праздничных писем Воббленда больше не будет. Подарки к праздникам птичка всё равно получит.', 'Gatavs — Vobblendas svētku vēstules vairs nenāks. Svētku dāvanas putniņš saņems tik un tā.'][i]
       : ['This link does not work. You can untick holiday emails in your profile.', 'Ссылка не подошла. Праздничные письма можно выключить в профиле.', 'Saite neder. Svētku vēstules var izslēgt profilā.'][i];
     return new Response(`<!doctype html><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pigeon Polly</title><body style="font:18px/1.5 system-ui,sans-serif;max-width:32em;margin:3em auto;padding:0 16px;color:#2b2340;background:#fffdf8"><p>${msg}</p><p><a href="${SITE}${L === 'en' ? '' : '/' + L}/bird/">pigeonpolly.com</a></p>`, { headers: { 'content-type': 'text/html; charset=utf-8' } });
+  }
+  if (m === 'POST' && p === '/api/wl-mail/seen') { // письмо в конвертике с пуговками прочитано
+    const u = await h.needUser(req, env);
+    await env.DB.prepare("UPDATE button_log SET seen = 1 WHERE user_id = ? AND kind = 'holiday' AND seen = 0").bind(u.id).run();
+    return h.json({ ok: true });
   }
   if (m === 'POST' && p === '/api/wl-mail') {
     const u = await h.needUser(req, env), b = await req.json().catch(() => ({}));

@@ -77,7 +77,7 @@
     holiday: { // праздник Воббленда (worker/wl-holidays.js): письмо-поздравление с подарком; гаснет, когда подарок открыт
       icon: '🎉',
       title: () => ['A holiday letter!', 'Праздничное письмо!', 'Svētku vēstule!'][L],
-      text: x => { const n = wlNote(x.note); return [`“${n.title}” in ${n.town}`, `«${n.title}» · ${n.town}`, `“${n.title}” · ${n.town}`][L]; },
+      text: x => { const n = wlNote(x); return [`“${n.title}” in ${n.town}`, `«${n.title}» · ${n.town}`, `“${n.title}” · ${n.town}`][L]; },
       act: ['Open the envelope', 'Открыть конвертик', 'Atvērt aploksni'],
       open: holidayLetter,
     },
@@ -181,19 +181,24 @@
   }
   // письмо о коробках: прочитать — отметить прочитанным
   // ---------- праздник Воббленда: письмо от жителей города, подарок и ссылка в Воббленд ----------
-  const wlNote = note => { const a = String(note || '').slice(3).split('|'); return { title: a[L] || a[0] || '', town: a[3 + L] || a[3] || '' }; };
+  // x.note — подарок-вещь ('wl:' + названия | города), иначе пуговки: x.city, x.md, x.btn — название из wl-holidays.json (уже загружен) или из списка в x.t
   let wlDays = null;
+  const wlNote = x => { if (x.note) { const a = String(x.note).slice(3).split('|'); return { title: a[L] || a[0] || '', town: a[3 + L] || a[3] || '' }; }
+    const h = (wlDays || []).find(d => d.city === x.city && d.md === x.md); return h ? { title: h.title[L], town: h.town[L] } : { title: '', town: 'Wobbleland' }; };
+  fetch('/assets/wl-holidays.json').then(r => r.json()).then(d => { wlDays = d; }).catch(() => {});
   async function holidayLetter(card, x) {
     if (card.classList.contains('open')) return drop('holiday', card);
     card.classList.add('open');
-    const n = wlNote(x.note), en = String(x.note || '').slice(3).split('|')[0];
     if (!wlDays) wlDays = await fetch('/assets/wl-holidays.json').then(r => r.json()).catch(() => []);
-    const h = wlDays.find(d => d.title[0] === en), gift = window.PPBirds ? PPBirds.giftName(x.k, x.v, L) : '';
+    const n = wlNote(x), en = String(x.note || '').slice(3).split('|')[0];
+    const h = wlDays.find(d => x.note ? d.title[0] === en : d.city === x.city && d.md === x.md), gift = x.note ? (window.PPBirds ? PPBirds.giftName(x.k, x.v, L) : '') : '';
     card.insertAdjacentHTML('beforeend', `<div class="nw-paper"><b>${esc([`Hi, @${me.nick}!`, `Привет, @${me.nick}!`, `Sveiks, @${me.nick}!`][L])}</b>
       <p>${esc([`${n.town} celebrates “${n.title}”!`, `${n.town} празднует «${n.title}»!`, `${n.town} svin “${n.title}”!`][L])}</p>${h ? `<p>${esc(h.desc[L])}</p>` : ''}
-      <p>${esc(['The whole town sends your bird a holiday gift', 'Весь город шлёт твоей птичке праздничный подарок', 'Visa pilsēta sūta tavam putniņam svētku dāvanu'][L] + (gift ? ': ' + gift : '') + '.')}</p>
+      <p>${esc(x.note ? ['The whole town sends your bird a holiday gift', 'Весь город шлёт твоей птичке праздничный подарок', 'Visa pilsēta sūta tavam putniņam svētku dāvanu'][L] + (gift ? ': ' + gift : '') + '.'
+        : ['Your bird already has every gift like that, so the town sends buttons instead.', 'Таких подарков у твоей птички уже все, поэтому город шлёт пуговки.', 'Tādas dāvanas tavam putniņam jau ir visas, tāpēc pilsēta sūta pogas.'][L])}</p>${x.note ? '' : `<p class="sal-sum">+${x.btn} 🔘</p><p class="sal-note">${t('salNote')}</p>`}
       <i>${esc('— ' + n.town)}</i>
-      <p class="nw-paper-act"><button type="button" class="pill-btn pill-fill nw-wl-gift">🎁 ${esc(['Open the gift', 'Открыть подарок', 'Atvērt dāvanu'][L])}</button> <a class="pill-btn" href="${pre}/wobbleland/">🗺 ${esc(['Visit Wobbleland', 'Заглянуть в Воббленд', 'Ieskatīties Vobblendā'][L])}</a></p></div>`);
+      <p class="nw-paper-act">${x.note ? `<button type="button" class="pill-btn pill-fill nw-wl-gift">🎁 ${esc(['Open the gift', 'Открыть подарок', 'Atvērt dāvanu'][L])}</button> ` : ''}<a class="pill-btn" href="${pre}/wobbleland/">🗺 ${esc(['Visit Wobbleland', 'Заглянуть в Воббленд', 'Ieskatīties Vobblendā'][L])}</a></p></div>`);
+    if (!x.note) { fetch('/api/wl-mail/seen', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: '{}' }).catch(() => {}); return; }
     card.querySelector('.nw-wl-gift').onclick = () => {
       const gb = document.getElementById('bp-gift'), f = document.getElementById('nw-feed');
       if (gb) { if (f) f.close(); gb.click(); } else location.href = pre + '/bird/#gift';
