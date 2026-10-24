@@ -4661,6 +4661,11 @@ html.me-in .home-dash #blk-wl-holiday .wlh-cnt { justify-self: end; }
 html.me-in .hd-news { position: relative; min-height: 320px; }
 .hd-news .hd-scroll { position: absolute; top: 46px; left: 0; right: 0; bottom: 0; overflow-y: auto; scrollbar-width: thin; padding-right: 4px; }
 .hd-scroll > .fn-msg { margin: 0 0 10px; }
+.home-games .gm-tiles, .hd-news .hd-scroll { scrollbar-width: thin; scrollbar-color: rgba(240, 169, 135, .45) transparent; }
+.hd-news .hd-scroll::-webkit-scrollbar, .home-games .gm-tiles::-webkit-scrollbar { width: 6px; height: 6px; }
+.home-games .gm-tiles::-webkit-scrollbar-track, .hd-news .hd-scroll::-webkit-scrollbar-track { background: transparent; }
+.home-games .gm-tiles::-webkit-scrollbar-thumb, .hd-news .hd-scroll::-webkit-scrollbar-thumb { background: rgba(240, 169, 135, .45); border-radius: 99px; }
+.home-games .gm-tiles::-webkit-scrollbar-button, .hd-news .hd-scroll::-webkit-scrollbar-button { display: none; }
 @media (max-width: 760px) { html.me-in .hd-news { min-height: 0; } .hd-news .hd-scroll { position: static; max-height: 420px; } }
 .nw-done { opacity: .55; background: transparent; border-style: dashed; }
 .nw-done .fn-ava { filter: grayscale(1); }
