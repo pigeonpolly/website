@@ -1,7 +1,7 @@
 // «Школа Полли» (/polly-helps/, docs/challenge.md): Полли в фартуке у мольберта учит рисовать на бумаге.
 // Тропинка из 12 уроков по книге Алины «Watercolor Sketches: Creative Guide» → пиксельный диплом.
 // Урок = реплики Полли (остаются в ленте, по старой можно вернуть картинку на мольберт), мини-игра, задание на бумаге, клиент из Воббленда.
-// Прототип: прогресс — в браузере; сдача работы, печать, комментарий и «на доработку» от Алины — следующая часть (сервер).
+// Шаги урока — в браузере; сдача фото — worker/school.js. Проверяет Алина в кабинете «🎓 Школа», но ученику это — печать и записка от Полли.
 (() => {
   const box = document.getElementById('ps-school');
   if (!box) return;
@@ -28,11 +28,21 @@
     found: ['Found', 'Найдено', 'Atrasts'],
     done5: ['All five are drawn ✏️', 'Все пять нарисованы ✏️', 'Visi pieci uzzīmēti ✏️'],
     upload: ['📷 Photo of your page', '📷 Фото твоей страницы', '📷 Tavas lapas foto'],
-    note: ['A note for Alina (optional)', 'Записка Алине (можно пусто)', 'Zīmīte Alīnai (var tukšu)'],
-    send: ['Hand in to Alina', 'Сдать Алине', 'Iesniegt Alīnai'],
-    proto: ['Prototype: handing in will work in the next part. Lesson 2 opens right away, and the stamp comes from Alina.', 'Прототип: сдача заработает в следующей части. Урок 2 откроется сразу, а печать поставит Алина.', 'Prototips: iesniegšana strādās nākamajā daļā. 2. nodarbība atvērsies uzreiz, bet zīmogu uzliks Alīna.'],
-    states: ['⏳ with Alina · ✅ stamp · ↩ try again, with Alina’s comment', '⏳ у Алины · ✅ печать · ↩ на доработку, с комментарием Алины', '⏳ pie Alīnas · ✅ zīmogs · ↩ jāpapildina, ar Alīnas komentāru'],
-    book: ['These pictures come from my book', 'Эти рисунки — из моей книги', 'Šie zīmējumi ir no manas grāmatas'],
+    note: ['A note for Polly (optional)', 'Записка Полли (можно пусто)', 'Zīmīte Pollijai (var tukšu)'],
+    send: ['Hand in to Polly', 'Сдать Полли', 'Iesniegt Pollijai'],
+    sending: ['Sending…', 'Отправляю…', 'Sūtu…'],
+    noPic: ['First add a photo of your page.', 'Сначала добавь фото страницы.', 'Vispirms pievieno lapas foto.'],
+    fail: ['Could not send — try again in a minute.', 'Не получилось отправить — попробуй через минуту.', 'Neizdevās nosūtīt — mēģini pēc minūtes.'],
+    signin: ['Sign in to hand in your page', 'Войди, чтобы сдать страницу', 'Ienāc, lai iesniegtu lapu'],
+    signNote: ['Polly checks works of signed-in birds, so she can send you a stamp or a note.', 'Полли проверяет работы вошедших птичек — так она сможет прислать печать или записку.', 'Pollija pārbauda ienākušo putniņu darbus — tā viņa varēs atsūtīt zīmogu vai zīmīti.'],
+    wait: ['⏳ Your page is with Polly. You can still swap the photo.', '⏳ Страница у Полли. Фото пока можно заменить.', '⏳ Lapa ir pie Pollijas. Foto vēl var nomainīt.'],
+    swap: ['📷 Swap the photo', '📷 Заменить фото', '📷 Nomainīt foto'],
+    ok: ['✅ Stamp from Polly! Lesson done.', '✅ Печать от Полли! Урок пройден.', '✅ Zīmogs no Pollijas! Nodarbība pabeigta.'],
+    redo: ['↩ Polly asks to try once more', '↩ Полли просит попробовать ещё раз', '↩ Pollija lūdz pamēģināt vēlreiz'],
+    again2: ['Hand in again', 'Сдать заново', 'Iesniegt vēlreiz'],
+    alina: ['Polly', 'Полли', 'Pollija'],
+    soon: ['soon', 'скоро', 'drīz'],
+    book: ['The pictures come from Alina’s book', 'Рисунки — из книги Алины', 'Zīmējumi ir no Alīnas grāmatas'],
     bookGo: ['More exercises inside →', 'Там ещё больше упражнений →', 'Tur vēl vairāk vingrinājumu →'],
   };
   const t = k => tr(T[k]);
@@ -74,13 +84,28 @@
       say: ['Now on paper! Find five things at home. First only shapes, then a couple of details. Tick each one you draw.', 'Теперь на бумаге! Найди дома пять вещей. Сначала только фигуры, потом пара деталей. Отмечай каждую нарисованную.', 'Tagad uz papīra! Atrodi mājās piecas lietas. Vispirms tikai figūras, tad pāris detaļu. Atzīmē katru uzzīmēto.'] },
     { client: 'mr-crisper', name: ['Mr. Crisper', 'Мистер Криспер', 'Misters Krispers'], job: ['lost-and-found, Wobbleland station', 'бюро находок, вокзал Воббленда', 'atrasto mantu birojs, Vobllendas stacija'],
       say: ['Oh dear, oh dear! Five things at the lost-and-found have no labels, and I can’t sleep. Draw them for me in simple shapes, so I can label the boxes!', 'Ох-ох-ох! В бюро находок пять вещей без этикеток, и я не могу уснуть. Нарисуй их мне простыми фигурами, чтобы я подписал коробки!', 'Ak vai, ak vai! Atrasto mantu birojā piecām lietām nav etiķešu, un es nevaru aizmigt. Uzzīmē tās man ar vienkāršām figūrām, lai es varu uzlīmēt etiķetes kastēm!'] },
-    { img: 'l1-c4.png', say: ['Alina looks at every page herself: a stamp, or a note on what to try again. Lesson 2 is already waiting!', 'Алина смотрит каждую страницу сама: ставит печать или пишет, что попробовать ещё раз. А урок 2 уже ждёт!', 'Alīna katru lapu apskata pati: uzliek zīmogu vai uzraksta, ko pamēģināt vēlreiz. Bet 2. nodarbība jau gaida!'] },
+    { img: 'l1-c4.png', say: ['I look at every page myself: a stamp, or a note on what to try again. The answer comes to your envelope 💌. And I’m already preparing lesson 2!', 'Я смотрю каждую страницу сама: ставлю печать или пишу, что попробовать ещё раз. Ответ придёт в конвертик 💌. А урок 2 я уже готовлю!', 'Es katru lapu apskatu pati: uzlieku zīmogu vai uzrakstu, ko pamēģināt vēlreiz. Atbilde pienāks aploksnē 💌. Bet 2. nodarbību es jau gatavoju!'] },
   ];
 
   let st = load();
   st.step = Math.min(st.step || 0, S.length - 1);
   st.quiz = st.quiz ?? null; st.find = st.find || []; st.paper = st.paper || [];
   let view = st.step;
+  const srv = { me: null, works: {} }; // с сервера: вошла ли птичка, последняя сдача по урокам
+  const LESSON = 1;
+  const loadSrv = () => fetch('/api/school', { credentials: 'same-origin' }).then(r => r.json()).then(d => {
+    srv.me = !!d.me; srv.works = {}; for (const w of d.works || []) srv.works[w.lesson] = w;
+    render(box.querySelector('.ps-log') ? box.querySelector('.ps-log').scrollTop || 1 : 0);
+  }).catch(() => { srv.me = false; });
+  // фото → полная (1600) и превью (480) JPEG, как в челлендже
+  const jpeg = (bmp, max, q) => { const k = Math.min(1, max / Math.max(bmp.width, bmp.height)), c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k); c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height); return new Promise(r => c.toBlob(r, 'image/jpeg', q)); };
+  let picked = null;
+  const verdict = () => {
+    const w = srv.works[LESSON];
+    if (!w) return '';
+    const c = w.comment ? `<p class="ps-note"><b>${t('alina')}:</b> ${esc(w.comment)}</p>` : '';
+    return `<div class="ps-verdict ${w.status}"><img src="/api/img/${w.img}?t=1" alt=""><div><p>${t(w.status)}</p>${c}</div></div>`;
+  };
 
   const easelArt = i => {
     const s = S[i];
@@ -103,7 +128,13 @@
     }
     if (s.find) return `<p class="ps-ans">${t('found')}: ${st.find.length} / ${LAMP.length}${st.find.length ? ' · ' + st.find.map(k => tr(LAMP.find(x => x[0] === k)[2])).join(', ') : ''}</p>`;
     if (s.paper) return `<div class="ps-paper">${s.paper.map((p, k) => `<label><input type="checkbox" data-p="${k}"${st.paper.includes(k) ? ' checked' : ''}> ${tr(p)}</label>`).join('')}</div>`;
-    if (s.client) return `<form class="ps-hand" onsubmit="return false"><label class="ps-file">${t('upload')}<input type="file" accept="image/*" hidden></label><img class="ps-prev" alt="" hidden><textarea rows="2" placeholder="${esc(t('note'))}"></textarea><button type="button" class="ps-send">${t('send')}</button><p class="ps-proto" hidden>${t('proto')}</p><p class="ps-states">${t('states')}</p></form>`;
+    if (s.client) {
+      if (srv.me === null) return '';
+      if (!srv.me) return `<div class="ps-hand"><button type="button" class="ps-file ps-login">${t('signin')}</button><p class="ps-states">${t('signNote')}</p></div>`;
+      const w = srv.works[LESSON];
+      if (w && w.status === 'ok') return `<p class="ps-ans">${t('ok')}</p>`;
+      return `${w && w.status === 'wait' ? verdict() : ''}<form class="ps-hand" onsubmit="return false"><label class="ps-file">${w && w.status === 'wait' ? t('swap') : t('upload')}<input type="file" accept="image/*" hidden></label><img class="ps-prev" alt="" hidden><textarea rows="2" placeholder="${esc(t('note'))}"></textarea><button type="button" class="ps-send">${w && w.status === 'redo' ? t('again2') : t('send')}</button><p class="ps-proto" role="status"></p></form>`;
+    }
     return '';
   };
   const bubble = i => {
@@ -112,11 +143,12 @@
     return `<li class="ps-b${s.client ? ' client' : ''}${i === view ? ' cur' : ''}" data-i="${i}">${who}<p>${tr(s.say)}</p>${extra(i)}${i === view ? `<span class="ps-eye">👁 ${t('onEasel')}</span>` : ''}</li>`;
   };
 
-  const path = () => `<ol class="ps-path">${LESSONS.map((n, i) => `<li class="${i === 0 ? 'open cur' : 'lock'}" title="${i ? esc(t('locked')) : ''}"><span class="ps-dot">${i ? '🔒' : ICON[i]}</span><small>${i + 1}. ${tr(n)}</small></li>`).join('')}<li class="lock dip"><span class="ps-dot">📜</span><small>${t('diploma')}</small></li></ol>`;
+  const mark = { wait: '⏳', ok: '✅', redo: '↩' };
+  const path = () => `<ol class="ps-path">${LESSONS.map((n, i) => { const w = srv.works[i + 1], prevDone = i === 1 && srv.works[1]; return `<li class="${i === 0 ? 'open cur' : 'lock'}${w ? ' ' + w.status : ''}" title="${i ? esc(prevDone ? t('soon') : t('locked')) : ''}"><span class="ps-dot">${w ? mark[w.status] : i ? (prevDone ? '🕊' : '🔒') : ICON[i]}</span><small>${i + 1}. ${tr(n)}${prevDone ? ` · ${t('soon')}` : ''}</small></li>`; }).join('')}<li class="lock dip"><span class="ps-dot">📜</span><small>${t('diploma')}</small></li></ol>`;
 
   const render = (keep) => {
     box.innerHTML = `<div class="ps-head"><h2>${t('title')}</h2><p>${t('lead')}</p><p class="ps-free">${t('free')}</p></div>
-      <h3 class="ps-h3">${t('path')}</h3>${path()}
+      <h3 class="ps-h3">${t('path')}</h3>${path()}${srv.works[LESSON] && srv.works[LESSON].status !== 'wait' ? verdict() : ''}
       <div class="ps-class">
         <div class="ps-stage"><div class="ps-easel"><div class="ps-paperbox">${easelArt(view)}</div></div>${polly}<span class="ps-tag">${t('lesson')} 1 · ${tr(LESSONS[0])}</span></div>
         <div class="ps-chat"><p class="ps-hint">${t('log')}</p><ol class="ps-log">${S.slice(0, st.step + 1).map((_, i) => bubble(i)).join('')}</ol>
@@ -135,7 +167,8 @@
     if (q) { st.quiz = +q.dataset.q; save(st); render(); return; }
     const g = el.closest('.ps-find g[data-k]');
     if (g && S[view].find) { if (!st.find.includes(g.dataset.k)) st.find.push(g.dataset.k); save(st); render(box.querySelector('.ps-log').scrollTop || 1); return; }
-    if (el.closest('.ps-send')) { box.querySelector('.ps-proto').hidden = false; return; }
+    if (el.closest('.ps-login')) { window.PPAccount && window.PPAccount.openSignIn(); return; }
+    if (el.closest('.ps-send')) { send(el.closest('.ps-hand')); return; }
     if (el.closest('input, textarea, label, form')) return;
     const b = el.closest('.ps-b');
     if (b) { view = +b.dataset.i; render(box.querySelector('.ps-log').scrollTop || 1); }
@@ -144,7 +177,23 @@
     const p = e.target.closest('[data-p]');
     if (p) { const k = +p.dataset.p; st.paper = p.checked ? [...new Set([...st.paper, k])] : st.paper.filter(x => x !== k); save(st); box.querySelector('.ps-next') && (box.querySelector('.ps-next').disabled = blocked(st.step)); return; }
     const f = e.target.closest('.ps-file input');
-    if (f && f.files[0]) { const img = box.querySelector('.ps-prev'); img.src = URL.createObjectURL(f.files[0]); img.hidden = false; }
+    if (f && f.files[0]) { picked = f.files[0]; const img = box.querySelector('.ps-prev'); img.src = URL.createObjectURL(picked); img.hidden = false; }
   });
+  async function send(form) {
+    const msg = form.querySelector('.ps-proto'), btn = form.querySelector('.ps-send');
+    if (!picked) { msg.textContent = t('noPic'); return; }
+    btn.disabled = true; msg.textContent = t('sending');
+    try {
+      const bmp = await createImageBitmap(picked);
+      const fd = new FormData();
+      fd.append('lesson', LESSON); fd.append('note', form.querySelector('textarea').value);
+      fd.append('full', await jpeg(bmp, 1600, 0.85), 'full.jpg'); fd.append('thumb', await jpeg(bmp, 480, 0.8), 'thumb.jpg');
+      const r = await fetch('/api/school/hand', { method: 'POST', credentials: 'same-origin', body: fd });
+      if (!r.ok) throw new Error(r.status);
+      picked = null; await loadSrv();
+    } catch (e) { btn.disabled = false; msg.textContent = t('fail'); }
+  }
   render();
+  loadSrv();
+  if (location.hash === '#school') setTimeout(() => box.scrollIntoView(), 80);
 })();

@@ -5122,3 +5122,29 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
   .ps-polly { width: 100px; }
   .ps-log { max-height: 380px; }
 }
+/* кабинет → 🎓 Школа (school-admin.js) */
+.sa-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 10px 0 14px; }
+.sa-list { display: grid; gap: 14px; margin: 0; padding: 0; list-style: none; }
+.sa-w { display: grid; grid-template-columns: 200px minmax(0, 1fr); gap: 14px; padding: 12px; border-radius: 14px; background: #FAF7FD; box-shadow: 0 0 0 1px #E2DCEE; color: #2B1A51; }
+.sa-pic img { display: block; width: 100%; border-radius: 10px; background: #fff; }
+.sa-top { margin: 0 0 6px; } .sa-top a { color: #534AB7; font-weight: 700; }
+.sa-note { margin: 0 0 8px; padding: 8px 10px; border-radius: 10px; background: #FDEBDD; }
+.sa-before { display: flex; gap: 8px; flex-wrap: wrap; margin-bottom: 8px; }
+.sa-before a { width: 90px; color: #6B5AA8; text-decoration: none; font-size: 11px; line-height: 1.2; }
+.sa-before img { display: block; width: 90px; height: 70px; object-fit: cover; border-radius: 6px; opacity: .8; }
+.sa-was { margin: 0 0 8px; font-size: 14px; color: #5A4E78; }
+.sa-w textarea { width: 100%; box-sizing: border-box; padding: 8px 10px; border-radius: 10px; border: 1px solid #E2DCEE; background: #fff; color: #2B1A51; font: 14px var(--sans); }
+.sa-act { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-top: 8px; }
+.sa-st { font-size: 13px; color: #B0573A; font-weight: 700; }
+@media (max-width: 640px) { .sa-w { grid-template-columns: 1fr; } }
+.ps-verdict { display: flex; gap: 12px; align-items: flex-start; margin: 10px 0 0; padding: 10px 12px; border-radius: 14px; background: #fff; color: #2B1A51; box-shadow: 0 0 0 2px #E3D3AE; cursor: default; }
+.ps-verdict img { width: 72px; height: 72px; flex: none; object-fit: cover; border-radius: 8px; }
+.ps-verdict p { margin: 0; font-weight: 700; font-size: 15px; }
+.ps-verdict .ps-note { margin-top: 4px; font-weight: 400; font-size: 14px; line-height: 1.45; }
+.ps-verdict.ok { box-shadow: 0 0 0 2.5px #5FA35A; }
+.ps-verdict.redo { box-shadow: 0 0 0 2.5px #D85A30; background: #FFF6EF; }
+.ps-path .ok .ps-dot { background: #5FA35A; opacity: 1; }
+.ps-path .wait .ps-dot, .ps-path .redo .ps-dot { background: #F4F0FA; }
+.ps-school > .ps-verdict { max-width: 640px; }
+.ps-proto:empty { display: none; }
+.ps-prev[hidden] { display: none; }

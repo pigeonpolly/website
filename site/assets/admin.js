@@ -34,6 +34,7 @@
     { id: 'notes', ic: '📌', name: 'Объявления', group: 'pub', about: 'Объявления в «Новостях стаи» (/flock/news/): закреплены сверху до выбранной даты, потом — обычной строкой «от Полли».' },
     { id: 'birds', ic: '🐦', name: 'Птицы', group: 'birds', about: 'Все птички стаи: пуговки, подарки, зарплата. Нажмите на ник — откроется профиль.' },
     { id: 'gifts', hide: 1, ic: '🎁', name: 'Подарки и зарплата', open: 'birds', focus: '#adm-giftall', about: 'Подарить вещь одной птичке или всем, выдать зарплату пуговками.' },
+    { id: 'school', ic: '🎓', name: 'Школа Полли', group: 'birds', about: 'Работы учеников «Школы Полли»: поставить печать или вернуть на доработку с комментарием.', count: 'school' },
     { id: 'comments', ic: '💬', name: 'Комментарии', group: 'birds', about: 'Комментарии к статьям блога: одобрить, ответить, удалить.', count: 'comments' },
     { id: 'strict', hide: 1, ic: '🛡', name: 'Строгий режим', open: 'comments', focus: '#adm-strict', about: 'Строгий режим комментариев: не больше одного комментария в час с одного адреса.' },
     { id: 'mail', ic: '✉️', name: 'Письма', group: 'birds', about: 'Письма птичкам на почту — только тем, кто согласился: уведомления из игр, новые фишки, новости от Полли.' },
@@ -57,6 +58,7 @@
   ];
   const SECTIONS = { notes, titos, inbox, security, overview: () => overview(), visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art,
     themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
+    school: () => window.PPSchoolAdmin ? window.PPSchoolAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился school-admin.js</p>'), // 🎓 Школа Полли (school-admin.js)
     cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
     posts: () => window.PPPostsAdmin ? window.PPPostsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился posts-admin.js</p>'), // 📣 Посты (posts-admin.js)
     ideas: () => window.PPIdeasAdmin ? window.PPIdeasAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился ideas-admin.js</p>'), // 💡 Темы для блога (ideas-admin.js)
@@ -108,7 +110,7 @@
   // ---------- 📥 входящие: только то, что ждёт Алину ----------
   let inboxData = null;
   function badges(d) {
-    const v = { ...d, comments: d.comments, requests: d.requests, subs: d.subs, edits: d.edits, advent: (d.advent || []).length, scheduled: (d.scheduled || []).length };
+    const v = { ...d, comments: d.comments, requests: d.requests, school: d.school, subs: d.subs, edits: d.edits, advent: (d.advent || []).length, scheduled: (d.scheduled || []).length };
     v.total = inboxItems(d).length; // сколько разных дел ждёт
     document.querySelectorAll('#adm [data-count]').forEach(b => { const k = b.dataset.count.split(',').reduce((a, c) => a + (v[c] || 0), 0); b.hidden = !k; b.textContent = k || ''; });
   }
@@ -119,6 +121,7 @@
     const out = [], adv = d.advent || [], sch = d.scheduled || [];
     if (d.comments) out.push({ ic: '💬', n: d.comments, t: `${plural(d.comments, 'комментарий ждёт', 'комментария ждут', 'комментариев ждут')} проверки`, d: 'в них есть ссылки — одобрить или удалить', href: '#comments', cf: 'pending', go: 'Проверить' });
     if (d.requests) out.push({ ic: '🖍', n: d.requests, t: `${plural(d.requests, 'заявка', 'заявки', 'заявок')} «Нарисуй мне»`, d: 'темы, которые ещё не нарисованы', href: '/ru/requests/', go: 'Открыть ↗' });
+    if (d.school) out.push({ ic: '🎓', n: d.school, t: `${plural(d.school, 'работа ждёт', 'работы ждут', 'работ ждут')} проверки`, d: 'Школа Полли: печать или на доработку', href: '#school', go: 'Проверить' });
     if (d.subs) out.push({ ic: '📬', n: d.subs, t: `${plural(d.subs, 'новый подписчик', 'новых подписчика', 'новых подписчиков')}`, d: 'ждут письма о книге', href: '#subscribers', go: 'Посмотреть' });
     if ((d.auto || []).length) out.push({ ic: '🤖', n: d.auto.length, t: 'автопилот: нужно внимание', d: d.auto.map(a => `${esc(a.t)} — ${esc(a.d)}`).join('<br>'), href: '#rules', go: 'Открыть', raw: 1 });
     if (adv.length) out.push({ ic: '🎄', n: adv.length, t: `${plural(adv.length, 'окошко', 'окошка', 'окошек')} адвента ${plural(adv.length, 'пустое', 'пустые', 'пустые')}`, d: `декабрь: ${adv.length > 12 ? adv.slice(0, 12).join(', ') + '…' : adv.join(', ')} — в пустом окошке будут только пуговки`, href: '#advent', go: 'Заполнить' });
