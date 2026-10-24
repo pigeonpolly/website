@@ -20,6 +20,7 @@ export const SCHOOL_RULES = { schoolDiplomaBtn: 150 };
 export const SCHOOL_RANGE = { schoolDiplomaBtn: [0, 10000] };
 export const SCHOOL_INT = ['schoolDiplomaBtn'];
 export const SCHOOL_LESSONS = 12, SCHOOL_DAY_MAX = 20; // уроков; сдач в сутки на птичку
+export const SCHOOL_KEEP_DAYS = 365; // прежние попытки урока (не последняя) старше — удаляются с фото; последняя хранится всегда
 
 const last = rows => { const m = {}; for (const r of rows) m[r.lesson] = r; return m; }; // rows по id → последняя попытка урока
 
@@ -32,7 +33,14 @@ export async function schoolNews(env, uid) {
   return { btn: dip ? dip.amount : 0, n: r.length, lesson: r[0].lesson, ok: r.filter(x => x.status === 'ok').length, redo: r.filter(x => x.status === 'redo').length, diploma: done >= SCHOOL_LESSONS && r.some(x => x.status === 'ok') }; // 12-я печать — диплом
 }
 
-// h: json, fail, currentUser, needUser, isAdmin, imgPut, randomHex, now, rules(), award(uid, kind, ref, n), translate(texts, from, langs) → { tr: {lang: [..]} }
+// раз в час (scheduled): прежние попытки уроков старше SCHOOL_KEEP_DAYS — фото и строку прочь, порцией; imgDrop(id) — удалить фото
+export async function schoolCron(env, now, imgDrop) {
+  const rows = (await env.DB.prepare('SELECT id, img FROM school_works w WHERE created_at < ? AND id < (SELECT MAX(id) FROM school_works x WHERE x.user_id = w.user_id AND x.lesson = w.lesson) LIMIT 50').bind(now - SCHOOL_KEEP_DAYS * 86400).all()).results;
+  for (const r of rows) { await imgDrop(r.img).catch(() => {}); await env.DB.prepare('DELETE FROM school_works WHERE id = ?').bind(r.id).run(); }
+  return rows.length;
+}
+
+// h: json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop(id), randomHex, now, rules(), award(uid, kind, ref, n), translate(texts, from, langs) → { tr: {lang: [..]} }
 export async function schoolApi(req, env, url, h) {
   const p = url.pathname, m = req.method, { json, fail } = h;
   if (m === 'GET' && p === '/api/school') {
@@ -58,7 +66,10 @@ export async function schoolApi(req, env, url, h) {
     if (prev && prev.status === 'ok') fail(409, 'done');
     const img = h.randomHex(12);
     await h.imgPut(env, img, await full.arrayBuffer(), await thumb.arrayBuffer());
-    if (prev && prev.status === 'wait') await env.DB.prepare('UPDATE school_works SET img = ?, note = ?, created_at = ? WHERE id = ?').bind(img, note, h.now(), prev.id).run(); // ещё не проверена — заменяем
+    if (prev && prev.status === 'wait') { // ещё не проверена — заменяем, старое фото удаляем
+      await env.DB.prepare('UPDATE school_works SET img = ?, note = ?, created_at = ? WHERE id = ?').bind(img, note, h.now(), prev.id).run();
+      await h.imgDrop(prev.img).catch(() => {});
+    }
     else await env.DB.prepare('INSERT INTO school_works (user_id, lesson, img, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(u.id, lesson, img, note, h.now()).run();
     return json({ ok: true, lesson, status: 'wait', img });
   }
