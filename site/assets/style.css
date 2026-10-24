@@ -4938,3 +4938,8 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 /* Зельеварня: своя картинка вместо эмодзи (potion-names.js) и зелье оживления котика (этап 28) */
 .pp-emo { width: 1.15em; height: 1.15em; vertical-align: -.2em; image-rendering: pixelated; display: inline-block; }
 .pot-revive { background: #E8F7F1; color: #1f5c48; border-radius: 10px; padding: 6px 10px; font-weight: 600; }
+
+/* кабинет → 📣 Посты (posts-admin.js) */
+.pp-posts { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 16px; }
+.pp-post-cv { display: block; width: 100%; max-width: 420px; height: auto; margin: 8px auto; border-radius: 10px; box-shadow: 0 2px 10px rgba(43, 26, 81, .15); }
+.pp-post-tx { width: 100%; font-size: 13px; }

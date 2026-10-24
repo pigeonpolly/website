@@ -377,7 +377,7 @@
     const path = location.pathname.replace(/^\/(ru|lv)(?=\/)/, ''), post = document.querySelector('article.bp[data-post-id]');
     const [href, name] = post ? ['/blog-editor/#' + post.dataset.postId, 'редактор этой статьи']
       : [[/^\/shop\//, '#shop', 'Магазин'], [/^\/(art-portfolio|palettes)\//, '#art', 'Картины'], [/^\/challenge\//, '#themes', 'Темы челленджа'], [/^\/advent\//, '#advent', 'Адвент'],
-        [/^\/flock\//, '#flock', 'Стая'], [/^\/(rain|potions)\//, '#games', 'Награды игр'], [/^\/bird\//, '#birds', 'Все птицы'], [/^\/blog(-editor)?\//, '/blog-editor/', 'Блог']]
+        [/^\/flock\//, '#birds', 'Птицы'], [/^\/(rain|potions)\//, '#games', 'Правила игр'], [/^\/bird\//, '#birds', 'Птицы'], [/^\/blog(-editor)?\//, '/blog-editor/', 'Блог']]
         .map(([re, h, n]) => re.test(path) && [h[0] === '#' ? '/admin/' + h : h, n]).find(Boolean) || ['/admin/', 'Входящие'];
     const box = document.createElement('span'); box.className = 'sb-adm';
     box.innerHTML = `${document.querySelector('[data-ppb]') ? '<button type="button" data-sb-edit>✏️ Править страницу</button>' : ''}<a href="${href}">⚙ В кабинете: ${esc(name)}</a>`;
