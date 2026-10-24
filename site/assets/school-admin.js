@@ -21,7 +21,7 @@
       <p class="be-note">Работы учеников с бумаги. Печать — урок засчитан. «На доработку» — ученик увидит ваш комментарий под уроком и сможет сдать заново (прежние попытки видны здесь же). Ученику всё приходит от Полли: «Печать от Полли», «Полли: …».</p>
       <div class="sa-tabs">${TABS.map(([k, n]) => `<button type="button" class="pill-btn${k === tab ? ' pill-fill' : ''}" data-tab="${k}">${n} · ${c[k] || 0}</button>`).join('')}</div>
       ${d.works.length ? `<ul class="sa-list">${d.works.map(w => `<li class="sa-w" data-id="${w.id}">
-        <a class="sa-pic" href="/api/img/${w.img}" target="_blank" rel="noopener"><img src="/api/img/${w.img}?t=1" alt="" loading="lazy"></a>
+        ${w.img ? `<a class="sa-pic" href="/api/img/${w.img}" target="_blank" rel="noopener"><img src="/api/img/${w.img}?t=1" alt="" loading="lazy"></a>` : '<span class="sa-pic">🗑</span>'}
         <div class="sa-body">
           <p class="sa-top"><a href="/bird/?nick=${encodeURIComponent(w.nick)}" target="_blank">@${esc(w.nick)}</a> · <b>Урок ${w.lesson} «${LESSONS[w.lesson - 1] || ''}»</b> · <small>${dm(w.at)}${w.before.length ? ` · попытка ${w.before.length + 1}` : ''}</small></p>
           ${w.note ? `<p class="sa-note">✉️ ${esc(w.note)}</p>` : ''}

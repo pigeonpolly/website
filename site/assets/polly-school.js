@@ -108,7 +108,7 @@
     const w = srv.works[n];
     if (!w) return '';
     const c = w.comment ? `<p class="ps-note"><b>${t('polly')}:</b> ${esc(w.comment)}</p>` : '';
-    return `<div class="ps-verdict ${w.status}"><img src="/api/img/${w.img}?t=1" alt=""><div><p>${t(w.status)}</p>${c}</div></div>`;
+    return `<div class="ps-verdict ${w.status}">${w.img ? `<img src="/api/img/${w.img}?t=1" alt="">` : ''}<div><p>${t(w.status)}</p>${c}</div></div>`;
   };
 
   // мини-игра «найди»: части нажимаются

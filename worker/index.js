@@ -74,7 +74,7 @@ export default {
       await mailCron(env, authHelpers(env)).catch(e => console.error('mail', e)); // письма из кабинета — порциями до лимита в сутки
       await mailGamesCron(env, mailHelpers(env)).catch(e => console.error('mail games', e)); // уведомления из игр: серия, огород, Титос (worker/mail.js)
       await flockNewsCron(env).catch(e => console.error('flock news', e)); // новости стаи — 30 дней
-      await schoolCron(env, now(), id => imgDrop(env, id)).catch(e => console.error('school', e)); // «Школа Полли»: прежние попытки старше года
+      await schoolCron(env, now(), id => imgDrop(env, id)).catch(e => console.error('school', e)); // «Школа Полли»: фото работ — год после диплома
       await autoNicks(env).catch(e => console.error('auto nick', e)); // птички без ника — случайный ник
       await migrateToR2(env); await cleanupInactive(env);
       await env.DB.prepare('DELETE FROM game_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {}); // старые забеги игр (started — в мс)

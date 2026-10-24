@@ -20,7 +20,7 @@ export const SCHOOL_RULES = { schoolDiplomaBtn: 150 };
 export const SCHOOL_RANGE = { schoolDiplomaBtn: [0, 10000] };
 export const SCHOOL_INT = ['schoolDiplomaBtn'];
 export const SCHOOL_LESSONS = 12, SCHOOL_DAY_MAX = 20; // уроков; сдач в сутки на птичку
-export const SCHOOL_KEEP_DAYS = 365; // прежние попытки урока (не последняя) старше — удаляются с фото; последняя хранится всегда
+export const SCHOOL_KEEP_DAYS = 365; // фото работ хранятся год после диплома (12-й печати), потом удаляются (schoolCron)
 
 const last = rows => { const m = {}; for (const r of rows) m[r.lesson] = r; return m; }; // rows по id → последняя попытка урока
 
@@ -33,10 +33,15 @@ export async function schoolNews(env, uid) {
   return { btn: dip ? dip.amount : 0, n: r.length, lesson: r[0].lesson, ok: r.filter(x => x.status === 'ok').length, redo: r.filter(x => x.status === 'redo').length, diploma: done >= SCHOOL_LESSONS && r.some(x => x.status === 'ok') }; // 12-я печать — диплом
 }
 
-// раз в час (scheduled): прежние попытки уроков старше SCHOOL_KEEP_DAYS — фото и строку прочь, порцией; imgDrop(id) — удалить фото
+// раз в час (scheduled): у выпускников (12 печатей), чья последняя печать старше SCHOOL_KEEP_DAYS, удаляем фото всех работ.
+// Строки с печатями остаются (img = '') — тропинка и диплом у ученика на месте; прежние попытки удаляются целиком. imgDrop(id) — удалить фото
 export async function schoolCron(env, now, imgDrop) {
-  const rows = (await env.DB.prepare('SELECT id, img FROM school_works w WHERE created_at < ? AND id < (SELECT MAX(id) FROM school_works x WHERE x.user_id = w.user_id AND x.lesson = w.lesson) LIMIT 50').bind(now - SCHOOL_KEEP_DAYS * 86400).all()).results;
-  for (const r of rows) { await imgDrop(r.img).catch(() => {}); await env.DB.prepare('DELETE FROM school_works WHERE id = ?').bind(r.id).run(); }
+  const grads = `SELECT user_id FROM school_works WHERE status = 'ok' GROUP BY user_id HAVING COUNT(DISTINCT lesson) >= ${SCHOOL_LESSONS} AND MAX(checked_at) < ?`;
+  const rows = (await env.DB.prepare(`SELECT id, img, status FROM school_works WHERE img != '' AND user_id IN (${grads}) LIMIT 50`).bind(now - SCHOOL_KEEP_DAYS * 86400).all()).results;
+  for (const r of rows) {
+    await imgDrop(r.img).catch(() => {});
+    await env.DB.prepare(r.status === 'ok' ? "UPDATE school_works SET img = '' WHERE id = ?" : 'DELETE FROM school_works WHERE id = ?').bind(r.id).run();
+  }
   return rows.length;
 }
 
