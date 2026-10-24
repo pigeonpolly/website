@@ -337,6 +337,29 @@ async function newsOf(env, req, u) {
   return out;
 }
 
+// уже открытые новости (колонка «Новости птички» на главной, news.js): собираются из тех же таблиц, у аккаунта — одинаково на всех устройствах.
+// Подарки — открытые позже, чем пришли (opened_at > created_at; покупки и награды игр кладутся в сумку сразу, у них даты равны).
+async function newsHistory(env, u, limit = 12) {
+  if (!u || !u.nick || u.banned) return [];
+  const all = (sql, ...b) => env.DB.prepare(sql).bind(...b).all().then(r => r.results).catch(() => []);
+  const out = [];
+  for (const g of await all("SELECT kind, item, note, opened_at FROM gifts WHERE user_id = ? AND opened_at > created_at ORDER BY opened_at DESC LIMIT ?", u.id, limit)) {
+    const note = g.note || '';
+    if (note.startsWith('wl:')) out.push({ kind: 'holiday', k: g.kind, v: g.item, note, at: g.opened_at });
+    else if (note.startsWith('titoslv:')) out.push({ kind: 'reward', n: 1, k: g.kind, v: g.item, level: Number(note.slice(8)) || 0, at: g.opened_at });
+    else out.push({ kind: 'gift', n: 1, k: g.kind, v: g.item, from: /^from:/.test(note) ? note.slice(5) : null, at: g.opened_at });
+  }
+  for (const b of await all("SELECT kind, ref, amount, created_at FROM button_log WHERE user_id = ? AND kind IN ('salary', 'holiday') AND seen = 1 ORDER BY id DESC LIMIT ?", u.id, limit))
+    out.push(b.kind === 'salary' ? { kind: 'salary', n: 1, sum: b.amount, at: b.created_at } : { kind: 'holiday', btn: b.amount, md: b.ref.slice(5, 10), city: b.ref.slice(11), at: b.created_at });
+  for (const x of await all('SELECT from_nick, created_at FROM potion_gifts WHERE to_id = ? AND seen = 1 ORDER BY id DESC LIMIT ?', u.id, limit))
+    out.push({ kind: 'potion', n: 1, from: x.from_nick ? [x.from_nick] : [], at: x.created_at });
+  for (const x of await all('SELECT gift, bought_at FROM card_owner WHERE user_id = ? AND gift IS NOT NULL AND seen = 1 ORDER BY bought_at DESC LIMIT ?', u.id, limit))
+    out.push({ kind: 'card', n: 1, note: x.gift || '', at: x.bought_at });
+  for (const x of await all('SELECT u.nick, tr.created_at FROM card_trades tr LEFT JOIN users u ON u.id = tr.from_id WHERE tr.to_id = ? AND tr.seen = 1 ORDER BY tr.id DESC LIMIT ?', u.id, limit))
+    out.push({ kind: 'trade', n: 1, from: x.nick ? [x.nick] : [], at: x.created_at });
+  return out.filter(x => x.at).sort((a, b) => b.at - a.at).slice(0, limit);
+}
+
 // ---------- картины с сайта и очередь палитр для дней ЭКСТРА ----------
 const ART_GALLERIES = ['sketchbook', 'anxiety', 'bird', 'snail', 'detective', 'halloween', 'ai-art', 'other'];
 const EXTRA0 = 2026 * 12 + 9; // октябрь 2026 — первый месяц очереди (индекс 0)
@@ -2141,6 +2164,7 @@ async function route(req, env, url) {
     return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), pin: !(await isAdmin(u, env)) && await adminIdentity(u, env) ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, streak, news, friendBtns: BTN.friend, titos, pwTemp: u.pw_temp ? 1 : 0, mailAsk: mailAsk(env, u) ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
   }
   if (m === 'GET' && p === '/api/news') return json({ news: await newsOf(env, req, await currentUser(req, env)) }, 200, { 'cache-control': 'no-store' });
+  if (m === 'GET' && p === '/api/news/history') return json({ items: await newsHistory(env, await currentUser(req, env)) }, 200, { 'cache-control': 'no-store' });
   if (m === 'GET' && p === '/api/config') return json({ ready: true, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
 
   if (m === 'POST' && p === '/api/login') {

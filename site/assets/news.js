@@ -273,18 +273,23 @@
     bell.querySelector('.bell-n').hidden = !n;
   }
   // колонка «Мои новости» на главной ([data-my-news]): новые — с кнопкой (открывает ленту, действия там), ниже — уже открытые, бледные с «✓ открыто».
-  // Открытые помнит браузер (localStorage pp-news-log-<id>, последние 12): новость пропала из очереди — значит открыта.
+  // Открытые — GET /api/news/history (worker newsHistory: из подарков, зарплат и т. п. — у аккаунта одинаково на всех устройствах).
+  let hist = [], histT = 0;
+  function loadHist(wait = 0) {
+    if (!me || !document.querySelector('[data-my-news]')) return;
+    clearTimeout(histT);
+    histT = setTimeout(() => fetch('/api/news/history', { credentials: 'same-origin', headers: window.PPDevH ? window.PPDevH() : {} }).then(r => r.ok ? r.json() : null)
+      .then(j => { if (j) { hist = (j.items || []).filter(x => KINDS[x.kind]); inline(); } }).catch(() => {}), wait);
+  }
   function inline() {
     const els = document.querySelectorAll('[data-my-news]');
     if (!els.length || !me) return;
-    const key = 'pp-news-log-' + me.id, now = Date.now(), items = known();
-    let log = []; try { log = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) {}
-    const cur = items.map(x => ({ id: x.kind + '|' + JSON.stringify(x), x }));
-    for (const c of cur) if (!log.some(l => l.id === c.id)) { const k = KINDS[c.x.kind]; log.unshift({ id: c.id, icon: k.icon, title: k.title(c.x), text: k.text(c.x), go: k.go ? k.go(c.x) : '' }); }
-    for (const l of log) if (!l.at && !cur.some(c => c.id === l.id)) l.at = now;
-    log = log.filter(l => !l.at || now - l.at < 30 * 864e5).slice(0, 12 + cur.length);
-    try { localStorage.setItem(key, JSON.stringify(log)); } catch (e) {}
-    const done = log.filter(l => l.at).sort((p, q) => q.at - p.at).slice(0, 12);
+    const items = known();
+    const done = hist.map(x => { const k = KINDS[x.kind]; let go = ''; try { go = k.go ? k.go(x) : ''; } catch (e) {} let text = k.text(x);
+      if (x.kind === 'gift') text = [x.from ? ['From @', 'От @', 'No @'][L] + x.from : '', window.PPBirds && x.k ? PPBirds.giftName(x.k, x.v, L) : ''].filter(Boolean).join(' · '); // «ждёт нераскрытым» — уже не так
+      if (x.kind === 'gift') go = pre + '/bird/#room';
+      if (x.kind === 'salary' && x.sum) text = T.salGot[L](x.sum);
+      return { icon: k.icon, title: k.title(x), text, go, at: x.at * 1000 }; });
     const when = ms => new Date(ms).toLocaleDateString(['en-GB', 'ru-RU', 'lv-LV'][L], { day: 'numeric', month: 'short' });
     const opened = ['opened', 'открыто', 'atvērts'][L];
     els.forEach(el => {
@@ -352,7 +357,7 @@
   }
   // убрать карточку, когда новость прочитана
   function drop(kind, card) {
-    news = news.filter(x => x.kind !== kind); drawBell();
+    news = news.filter(x => x.kind !== kind); drawBell(); loadHist(1500);
     if (card) { card.classList.add('gone'); setTimeout(() => { card.remove(); const l = document.querySelector('#nw-feed .nw-list'); if (l && !l.children.length) l.innerHTML = `<p class="nw-empty">${t('empty')}</p>`; }, 350); }
   }
 
@@ -385,7 +390,7 @@
   function set(d) {
     me = d && d.user && d.user.nick ? d.user : null;
     news = me ? (d.user.news || []) : [];
-    drawBell(); askBox(); askMail(); fly();
+    drawBell(); askBox(); askMail(); fly(); loadHist();
   }
   // после действия на странице (открыто окошко, подарок…) — заново спросить сервер; конвертик второй раз не вылетает
   function refresh() {
