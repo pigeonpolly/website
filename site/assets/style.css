@@ -5161,7 +5161,7 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 
 /* Главная, 24.10.2026: «Мой день» вошедшему — вкладками (src/pages/home.html), «Игры» — полосой между блогом и книгой */
 .hd-tabs, .hd-games, .gm-pin { display: none; }
-html.me-in .home-dash { grid-template-columns: minmax(0, 250px) minmax(0, 1fr) minmax(0, 1fr); grid-template-rows: auto 1fr; column-gap: 32px; row-gap: 18px; max-width: 1320px; padding-top: 34px; align-items: start; }
+html.me-in .home-dash { grid-template-columns: minmax(0, 250px) minmax(0, 1fr) minmax(0, 1.4fr); grid-template-rows: auto 1fr; column-gap: 32px; row-gap: 18px; max-width: 1440px; padding-top: 34px; align-items: start; }
 html.me-in .home-dash .myday, html.me-in .home-dash .md-in, html.me-in .hd-side { display: contents; }
 html.me-in .home-dash .md-me { grid-column: 1; grid-row: 1 / span 3; align-self: start; }
 html.me-in .home-dash .md-kick { display: none; }
@@ -5188,8 +5188,8 @@ html.me-in .gm-pin { display: grid; position: absolute; top: 10px; right: 10px; 
 html.me-in .gm-pin.on { background: var(--star); color: #2B1A51; }
 .home-games { position: relative; padding: 46px 0 34px; background: var(--bg); }
 .home-games .hg-all { margin-bottom: 0; }
-@media (max-width: 1000px) {
-  html.me-in .home-dash { grid-template-columns: minmax(0, 200px) minmax(0, 1fr); }
+@media (max-width: 1360px) {
+  html.me-in .home-dash { grid-template-columns: minmax(0, 220px) minmax(0, 1fr); } /* праздник — под карточкой дня, иначе название переносится */
   html.me-in .home-dash #blk-wl-holiday { grid-column: 2; grid-row: 3; }
 }
 @media (max-width: 760px) {
