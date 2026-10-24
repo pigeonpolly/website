@@ -5211,6 +5211,14 @@ html.me-in .gm-pin { display: grid; position: absolute; top: 10px; right: 10px; 
 html.me-in .gm-pin.on { background: var(--star); color: #2B1A51; }
 .home-games { position: relative; padding: 46px 0 34px; background: var(--bg); }
 .home-games .hg-all { margin-bottom: 0; }
+@media (min-width: 901px) { /* 24.10.2026: на компьютере все игры в одну линию, без ползунка */
+  .home-games .gm-tiles { grid-auto-columns: minmax(0, 1fr); overflow: visible; scroll-snap-type: none; gap: 12px; }
+  .home-games .gm-tile .am-tile-txt { padding: 7px 9px 8px; }
+  .home-games .gm-tile .am-tile-txt b { font-size: clamp(13px, 1.05vw, 16px); }
+  .home-games .gm-tile .am-tile-txt i { font-size: clamp(10px, .8vw, 12px); }
+  .home-games .gm-tile .am-tile-ico { width: 28px; height: 28px; font-size: 14px; top: 8px; left: 8px; }
+  html.me-in .home-games .gm-pin { width: 30px; height: 30px; font-size: 16px; top: 8px; right: 8px; }
+}
 @media (max-width: 1360px) {
   html.me-in .home-dash { grid-template-columns: minmax(0, 220px) minmax(0, 1fr); } /* праздник — под карточкой дня, иначе название переносится */
   html.me-in .home-dash #blk-wl-holiday { grid-column: 2; grid-row: 3; }
