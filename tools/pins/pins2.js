@@ -160,8 +160,22 @@ const photoBody = `<div style="display:flex;gap:26px;margin-top:36px;align-items
 <div style="flex:1;display:flex;flex-direction:column;gap:12px">${nt.colors.map(c => `<div style="flex:1;border-radius:14px;background:${c.hex};display:flex;align-items:flex-end;padding:10px 14px;font:700 20px Karla;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,.5)">${esc(c.en)} · ${c.hex}</div>`).join('')}</div></div>
 <div class="list one" style="margin-top:22px">${['Pick any photo: your walk, your cat, your breakfast.', 'Move the 6 little droppers to the colours you love.', 'Download the palette card with names and HEX codes.'].map((s, i) => `<div class="li" style="padding:11px 0"><span class="n">${i + 1}</span><span>${s}</span></div>`).join('')}</div>`;
 
+// Школа Полли (№219+): картинки урока 1 из книги Алины, кадры — tools/pins/shots/school-*.png
+const sch = f => img('images/school/' + f);
+const shapesBody = `<div style="background:#fff;border-radius:22px;padding:26px 30px;margin-top:34px;box-shadow:0 10px 30px rgba(43,26,22,.12)"><img src="${sch('l1-s1.png')}" style="width:100%;display:block"></div>
+<div style="display:grid;grid-template-columns:1fr 40px 1fr;gap:16px;align-items:center;margin-top:26px">${[['l1-c1.png', 'l1-c2.png', 'a circle', 'a clock'], ['l1-c3.png', 'l1-c4.png', 'a lopsided circle', 'a frying pan']].map(([a, b, x, y]) => `<div style="background:#fff;border-radius:18px;height:300px;display:grid;place-items:center;box-shadow:0 10px 30px rgba(43,26,22,.12);position:relative"><img src="${sch(a)}" style="max-height:200px"><span style="position:absolute;bottom:14px;font:italic 400 26px Fraunces;color:#6E5A4E">${x}</span></div><div style="font:600 46px Fraunces;color:#D85A30;text-align:center">→</div><div style="background:#fff;border-radius:18px;height:300px;display:grid;place-items:center;box-shadow:0 10px 30px rgba(43,26,22,.12);position:relative"><img src="${sch(b)}" style="max-height:230px;max-width:90%"><span style="position:absolute;bottom:14px;font:italic 400 26px Fraunces;color:#D85A30">${y}</span></div>`).join('')}</div>`;
+// лампа = трапеция + прямоугольник + овал (как в мини-игре урока 1), с подписями
+const lampBody = `<div style="display:flex;gap:30px;align-items:center;margin-top:30px">
+<svg viewBox="0 0 200 190" style="width:560px;flex:none;background:#fff;border-radius:22px;box-shadow:0 10px 30px rgba(43,26,22,.12)"><g fill="#F0A987" stroke="#D85A30" stroke-width="3"><polygon points="70,30 130,30 150,92 50,92"/></g><g fill="#C9C1E6" stroke="#534AB7" stroke-width="3"><rect x="93" y="92" width="14" height="70"/></g><g fill="#F5C46B" stroke="#B5791B" stroke-width="3"><ellipse cx="100" cy="168" rx="42" ry="11"/></g><path d="M118 92 q6 18 -2 30" fill="none" stroke="#2B1A51" stroke-width="2"/><circle cx="116" cy="123" r="3" fill="#2B1A51"/></svg>
+<div style="display:flex;flex-direction:column;gap:26px">${[['#D85A30', 'Trapezoid', 'the shade: almost a triangle'], ['#534AB7', 'Rectangle', 'the stand'], ['#B5791B', 'Oval', 'the base, lying down']].map(([c, a, b]) => `<div><b style="display:block;font:600 40px Fraunces;color:${c}">${a}</b><span style="font:500 26px/1.3 Karla;color:#6E5A4E">${b}</span></div>`).join('')}</div></div>
+<div class="list one" style="margin-top:40px">${['Look at an object and name its big shapes.', 'Draw only those shapes, lightly.', 'Then add two details: a cord, a switch, a shadow.'].map((s, i) => `<div class="li" style="padding:20px 0;font-size:32px"><span class="n">${i + 1}</span><span>${s}</span></div>`).join('')}</div>`;
+// клиент из Воббленда: карточка Мистера Криспера + его заказ
+const clientBody = `<div style="display:flex;gap:30px;margin-top:34px;align-items:flex-start"><div class="art" style="flex:none;width:430px;transform:rotate(-3deg)"><img src="${img('images/cards/classic/14.jpg')}"></div>
+<div style="background:#FBEFE3;color:#2B1A16;border-radius:24px;padding:28px 30px;font:500 29px/1.35 Karla;position:relative">“Oh dear, oh dear! Things at the lost-and-found have no labels, and I can’t sleep. Draw me two of them in simple shapes, so I can label at least those boxes!”<b style="display:block;margin-top:16px;font:600 30px Fraunces;color:#D85A30">Mr. Crisper</b><span style="font:italic 400 24px Fraunces;color:#6E5A4E">lost-and-found, Wobbleland station</span></div></div>`;
+
 // ---------- пины ----------
 const L = (p) => SITE + p + UTM;
+const LS = (p) => SITE + p + '?utm_source=pinterest&utm_campaign=school';
 const PINS = [
   { n: 190, type: 'Полезный', theme: 'autumn', tpl: 'grid', art: img('images/bird/2025-pigeon-polly-romantizing-coffee-and-trains-in-autumn-vibes-800.jpg'), artH: 270, pos: '50% 30%',
     tag: '30-day drawing challenge', title: 'Cozy *November* drawing prompts', cols: 5,
@@ -417,6 +431,72 @@ const PINS = [
     pt: 'Lantern Lemon Night: a Cozy Fairy-Tale Halloween Idea',
     alt: 'A tear-off calendar page for October 31 with the holiday Lantern Lemon Night and the crest of LemonVale.',
     topics: 'Halloween ideas, Cozy Halloween, Fantasy world, Worldbuilding, Autumn' },
+
+  // ---------- Школа Полли ----------
+  { n: 219, type: 'Игра', theme: 'purple', tpl: 'game', shot: shot('school-top.png'),
+    kick: 'Free drawing lessons in your browser', title: '*Polly’s* Drawing School', h: 's',
+    on: 'Pen, paper and twelve small lessons with a pixel pigeon teacher. Every lesson ends with a real client from Wobbleland.',
+    chips: ['✏️ pen & paper', '📮 Polly checks your page', '🎓 pixel diploma'],
+    cta: '12 lessons · free', link: LS('/polly-helps/'),
+    pt: 'Learn to Draw for Beginners: Free Drawing Lessons at Polly’s School',
+    desc: 'Grab any paper and a pen, a napkin works too. Polly the pixel pigeon teaches drawing in twelve small lessons: shapes, lines, texture, volume, shadows and more. Each lesson ends with a client from Wobbleland, you hand in a photo of your page and Polly sends a stamp or a note.',
+    alt: 'A drawing school web page with a pixel pigeon teacher in a beret next to an easel with circles, squares and triangles, and a path of twelve lessons.',
+    topics: 'Learn to draw, Drawing for beginners, Drawing lessons, Art education, Sketching' },
+
+  { n: 220, type: 'Полезный', theme: 'paper', tpl: 'free', body: shapesBody, h: 's',
+    tag: 'Drawing for beginners', title: 'Everything is made of *a few shapes*',
+    sub: 'Shapes first, details later: that’s the whole trick.',
+    cta: 'Lesson 1 with Polly', link: LS('/polly-helps/'),
+    pt: 'Easy Drawing Trick for Beginners: Start Every Object with Simple Shapes',
+    desc: 'Circle, square, triangle and two ovals, one standing and one lying: almost everything around you is built from them. A loop and two hands turn a circle into a clock, a handle and an egg turn a lopsided circle into a frying pan. Lesson 1 of Polly’s free drawing school.',
+    alt: 'Hand-drawn basic shapes, a circle turning into a wall clock and a lopsided circle turning into a frying pan with a fried egg.',
+    topics: 'Drawing for beginners, Drawing tutorial, Basic shapes, Sketching tips, Learn to draw' },
+
+  { n: 221, type: 'Полезный', theme: 'paper', tpl: 'list', one: 1, art: sch('l1-s1.png'), artH: 292, h: 's',
+    tag: '10-minute warm-up', title: 'A drawing warm-up for *total beginners*',
+    items: [['Draw each shape five times', 'circle, square, triangle, a standing oval and a lying one'], ['Crooked ones count', 'a wobbly circle is still a circle, and much more alive'], ['Pick two things at home', 'a mug, a book, a lamp, a fruit, a bottle'], ['First only the big shapes', 'circle, rectangle, oval, drawn lightly'], ['Then a couple of details', 'a handle, a label, a shadow']],
+    cta: 'Show your page to Polly', link: LS('/polly-helps/'),
+    pt: 'Easy Drawing Warm-Up for Beginners: 5 Steps with Pen and Paper',
+    desc: 'Ten minutes, any paper and a pen. Draw each basic shape five times, crooked ones count, then pick two things at home, a mug, a lamp or a fruit, and draw them shapes first, details later. From lesson 1 of Polly’s free drawing school, where you can hand in your page.',
+    alt: 'A five-step drawing warm-up list for beginners under a row of hand-drawn circle, square, triangle and ovals.',
+    topics: 'Drawing exercises, Drawing for beginners, Sketchbook ideas, Learn to draw, Art practice' },
+
+  { n: 222, type: 'Игра', theme: 'purple', tpl: 'game', shot: shot('school-quiz.png'),
+    kick: 'Lesson 1 · Shapes', title: 'A lopsided circle. *Guess* what it becomes', h: 'xs',
+    on: 'Polly draws, you guess, and every word of hers stays in the lesson so you can go back to any picture.',
+    chips: ['🌙 the moon?', '🍳 a frying pan?', '🔘 a button?'],
+    cta: 'Find out at Polly’s school', link: LS('/polly-helps/'),
+    pt: 'Fun Drawing Lesson for Beginners: Guess What the Circle Becomes',
+    desc: 'The moon, a frying pan or a button? Polly the pixel pigeon turns simple circles into things right on her easel and asks you to guess. A playful first drawing lesson with a guessing game, a find-the-shapes game and a real task for your paper.',
+    alt: 'A drawing lesson on a web page: a pixel pigeon by an easel with a lopsided circle and three answer buttons, the moon, a frying pan and a button.',
+    topics: 'Drawing lessons, Drawing for kids, Learn to draw, Art games, Creative activities' },
+
+  { n: 223, type: 'Полезный', theme: 'paper', tpl: 'free', body: lampBody, h: 's',
+    tag: 'Drawing exercise', title: 'Find the *hidden shapes* in a lamp',
+    cta: 'Play it in lesson 1', link: LS('/polly-helps/'),
+    pt: 'How to Draw Any Object: Find the Hidden Shapes First',
+    desc: 'A lamp is just a trapezoid, a rectangle and an oval. Look at any object, name its big shapes, draw only those, lightly, then add two details. A simple exercise that makes drawing from life feel much less scary. Try the find-the-shapes game in Polly’s free drawing school.',
+    alt: 'A simple table lamp split into colored shapes: a trapezoid shade, a rectangle stand and an oval base, with three drawing steps.',
+    topics: 'How to draw, Drawing for beginners, Observational drawing, Drawing exercises, Art tutorials' },
+
+  { n: 224, type: 'Игра', theme: 'autumn', tpl: 'free', body: clientBody, h: 's',
+    tag: 'Polly’s Drawing School', title: 'Your first drawing *client* is a mouse',
+    sub: 'Every lesson ends with an order from a Wobbleland resident. Draw it on paper, hand in a photo, get a stamp from Polly.',
+    cta: 'Take the order', link: LS('/polly-helps/'),
+    pt: 'A Drawing Lesson with a Story: Draw for a Client from Wobbleland',
+    desc: 'Mr. Crisper runs the lost-and-found at Wobbleland station, and nothing there has a label. Draw two things for him in simple shapes, take a photo of your page and hand it in to Polly. She sends back a stamp or a note on what to try again. Free, in your browser.',
+    alt: 'A watercolor card of a mouse in glasses holding a box, next to his speech bubble asking for drawings of lost things.',
+    topics: 'Drawing prompts, Drawing lessons, Watercolor illustration, Cozy games, Storytelling' },
+
+  { n: 225, type: 'Полезный', theme: 'purple', tpl: 'list', h: 's', art: shot('school-top.png'), artH: 330, pos: '50% 0', listCss: 'margin-top:24px',
+    tag: 'Learn to draw step by step', title: '12 lessons from *shapes* to *collage*',
+    items: ['Shapes', 'Lines', 'Texture', 'Combinations', 'Volume', 'Shadows', 'Details', 'Cylinders', 'Ellipses', 'Pro secrets', 'Composition', 'Collage'],
+    sub: 'One small lesson at a time, with pen and paper. After twelve stamps: a pixel diploma.',
+    cta: 'Start with lesson 1', link: LS('/polly-helps/'),
+    pt: 'Learn to Draw Step by Step: a 12-Lesson Path for Beginners',
+    desc: 'A drawing path for beginners in twelve small steps: shapes, lines, texture, combinations, volume, shadows, details, cylinders, ellipses, pro secrets, composition and collage. Polly’s free drawing school follows it one lesson at a time, with exercises from my book Watercolor Sketches: Creative Guide.',
+    alt: 'A numbered list of twelve drawing lessons from shapes and lines to composition and collage.',
+    topics: 'Learn to draw, Drawing for beginners, Art curriculum, Sketching, Drawing practice' },
 ];
 // у игр описание для Notion — desc (если в шаблоне desc показан на картинке, текст для Pinterest — отдельный)
 const PIN_DESC = {
