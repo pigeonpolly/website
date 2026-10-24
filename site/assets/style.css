@@ -5065,8 +5065,8 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .ps-path .dip .ps-dot { background: #E9A93B; opacity: .6; }
 .ps-path small { display: block; margin-top: 8px; font-size: clamp(12px, .95vw, 14px); line-height: 1.25; color: #D9D3F2; }
 .ps-path .open small { color: #F3EFFA; font-weight: 700; }
-.ps-class { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; min-height: min(760px, calc(100vh - var(--header-h) - 60px)); margin-top: 14px; padding: 28px; border-radius: 26px; background: #FBF4E2; color: #2B1A51; box-shadow: 0 0 0 4px #1A1528; }
-.ps-stage { position: relative; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 6px; }
+.ps-class { display: grid; grid-template-columns: minmax(0, 1.25fr) minmax(0, 1fr); gap: 28px; align-items: start; min-height: min(760px, calc(100vh - var(--header-h) - 60px)); margin-top: 14px; padding: 28px; border-radius: 26px; background: #FBF4E2; color: #2B1A51; box-shadow: 0 0 0 4px #1A1528; }
+.ps-stage { position: sticky; top: calc(var(--header-h) + 16px); align-self: start; display: flex; flex-direction: column; align-items: center; justify-content: flex-start; padding-top: 6px; }
 .ps-easel { position: relative; width: min(100%, 720px); padding: 0 22px 170px; }
 .ps-easel::before, .ps-easel::after { content: ''; position: absolute; bottom: 0; width: 14px; height: 92%; background: #A0673A; border-radius: 5px; box-shadow: inset -4px 0 0 #7A4A2A; }
 .ps-easel::before { left: 24%; transform: rotate(8deg); transform-origin: top; }
@@ -5082,7 +5082,7 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .ps-find { width: 100%; height: 100%; }
 .ps-chat { display: flex; flex-direction: column; min-height: 0; }
 .ps-hint { margin: 0 0 10px; font-size: 14px; color: #8C7FB0; }
-.ps-log { flex: 1 1 0; min-height: 320px; max-height: min(640px, calc(100vh - var(--header-h) - 200px)); margin: 0; padding: 2px 6px 2px 2px; list-style: none; overflow-y: auto; display: flex; flex-direction: column; gap: 12px; }
+.ps-log { margin: 0; padding: 2px; list-style: none; display: flex; flex-direction: column; gap: 12px; }
 .ps-b { position: relative; padding: 14px 18px; border-radius: 16px 16px 16px 4px; background: #fff; box-shadow: 0 0 0 1.5px #E3D3AE; font-size: clamp(16px, 1.25vw, 19px); line-height: 1.5; cursor: pointer; }
 .ps-b p { margin: 0; }
 .ps-b.cur { box-shadow: 0 0 0 2.5px #534AB7; }
@@ -5107,7 +5107,7 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .ps-send { justify-self: start; }
 .ps-proto { margin: 0 !important; font-size: 13px; color: #534AB7; }
 .ps-states { margin: 0 !important; font-size: 12px; color: #8C6A5A; }
-.ps-bar { display: flex; justify-content: space-between; gap: 10px; margin-top: 12px; }
+.ps-bar { position: sticky; bottom: 0; z-index: 3; display: flex; justify-content: space-between; gap: 10px; margin-top: 12px; padding: 12px 0 14px; background: #FBF4E2; box-shadow: 0 -10px 12px -6px #FBF4E2; }
 .ps-bar .ps-again { background: transparent; color: #534AB7; box-shadow: inset 0 0 0 2px #B9AEE0; }
 .ps-bar .ps-next { padding: 10px 22px; background: #D85A30; font-size: 15px; }
 .ps-bar button:disabled { opacity: .4; cursor: default; }
@@ -5126,7 +5126,7 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
   .ps-class { grid-template-columns: 1fr; min-height: 0; padding: 14px; }
   .ps-easel { padding-bottom: 110px; }
   .ps-polly { width: 110px; }
-  .ps-log { flex: none; min-height: 0; max-height: 420px; }
+  .ps-stage { position: relative; top: 0; }
   .ps-dot { width: 50px; height: 50px; font-size: 20px; }
 }
 /* кабинет → 🎓 Школа (school-admin.js) */

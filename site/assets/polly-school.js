@@ -81,9 +81,9 @@
     { img: 'l1-c4.png', say: ['A frying pan with a fried egg! See? Shapes first, details later — that’s the whole trick.', 'Сковородка с яичницей! Видишь? Сначала фигуры, потом детали — вот и весь фокус.', 'Panna ar ceptu olu! Redzi? Vispirms figūras, pēc tam detaļas — tas ir viss triks.'] },
     { find: 1, say: ['Game time! This lamp hides three shapes. Tap all of them.', 'Игра! В этой лампе спрятаны три фигуры. Найди и нажми все.', 'Spēle! Šajā lampā paslēptas trīs figūras. Atrodi un pieskaries visām.'] },
     { img: 'l1-s1.png', paper: [['a mug', 'кружка', 'krūze'], ['a book', 'книга', 'grāmata'], ['a lamp', 'лампа', 'lampa'], ['a fruit', 'фрукт', 'auglis'], ['a bottle', 'бутылка', 'pudele']],
-      say: ['Now on paper! Find five things at home. First only shapes, then a couple of details. Tick each one you draw.', 'Теперь на бумаге! Найди дома пять вещей. Сначала только фигуры, потом пара деталей. Отмечай каждую нарисованную.', 'Tagad uz papīra! Atrodi mājās piecas lietas. Vispirms tikai figūras, tad pāris detaļu. Atzīmē katru uzzīmēto.'] },
+      say: ['Now on paper! Pick any two of these things and find them at home. First only shapes, then a couple of details. Tick the ones you draw.', 'Теперь на бумаге! Выбери любые две вещи из списка и найди их дома. Сначала только фигуры, потом пара деталей. Отметь те, что нарисованы.', 'Tagad uz papīra! Izvēlies jebkuras divas lietas no saraksta un atrodi tās mājās. Vispirms tikai figūras, tad pāris detaļu. Atzīmē uzzīmētās.'] },
     { client: 'mr-crisper', name: ['Mr. Crisper', 'Мистер Криспер', 'Misters Krispers'], job: ['lost-and-found, Wobbleland station', 'бюро находок, вокзал Воббленда', 'atrasto mantu birojs, Vobllendas stacija'],
-      say: ['Oh dear, oh dear! Five things at the lost-and-found have no labels, and I can’t sleep. Draw them for me in simple shapes, so I can label the boxes!', 'Ох-ох-ох! В бюро находок пять вещей без этикеток, и я не могу уснуть. Нарисуй их мне простыми фигурами, чтобы я подписал коробки!', 'Ak vai, ak vai! Atrasto mantu birojā piecām lietām nav etiķešu, un es nevaru aizmigt. Uzzīmē tās man ar vienkāršām figūrām, lai es varu uzlīmēt etiķetes kastēm!'] },
+      say: ['Oh dear, oh dear! Things at the lost-and-found have no labels, and I can’t sleep. Draw me the two you picked in simple shapes, so I can label at least those boxes!', 'Ох-ох-ох! В бюро находок вещи без этикеток, и я не могу уснуть. Нарисуй мне те две, что выбраны, простыми фигурами — подпишу хоть эти коробки!', 'Ak vai, ak vai! Atrasto mantu birojā lietām nav etiķešu, un es nevaru aizmigt. Uzzīmē man tās divas, kuras izvēlējies, ar vienkāršām figūrām — uzlīmēšu etiķetes vismaz šīm kastēm!'] },
     { img: 'l1-c4.png', say: ['I look at every page myself: a stamp, or a note on what to try again. The answer comes to your envelope 💌. And I’m already preparing lesson 2!', 'Я смотрю каждую страницу сама: ставлю печать или пишу, что попробовать ещё раз. Ответ придёт в конвертик 💌. А урок 2 я уже готовлю!', 'Es katru lapu apskatu pati: uzlieku zīmogu vai uzrakstu, ko pamēģināt vēlreiz. Atbilde pienāks aploksnē 💌. Bet 2. nodarbību es jau gatavoju!'] },
   ];
 
@@ -95,7 +95,7 @@
   const LESSON = 1;
   const loadSrv = () => fetch('/api/school', { credentials: 'same-origin' }).then(r => r.json()).then(d => {
     srv.me = !!d.me; srv.works = {}; for (const w of d.works || []) srv.works[w.lesson] = w;
-    render(box.querySelector('.ps-log') ? box.querySelector('.ps-log').scrollTop || 1 : 0);
+    render();
   }).catch(() => { srv.me = false; });
   // фото → полная (1600) и превью (480) JPEG, как в челлендже
   const jpeg = (bmp, max, q) => { const k = Math.min(1, max / Math.max(bmp.width, bmp.height)), c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k); c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height); return new Promise(r => c.toBlob(r, 'image/jpeg', q)); };
@@ -113,11 +113,12 @@
     if (s.client) return `<img class="ps-client-pic" src="/images/wobbleland/pt-${s.client}.png" alt="">`;
     return `<img src="${IMG}${s.img}" alt="">`;
   };
+  const PAPER_MIN = 2; // из пяти вещей — любые две (решение Алины)
   const blocked = i => {
     const s = S[i];
     if (s.quiz) return st.quiz === null;
     if (s.find) return st.find.length < LAMP.length;
-    if (s.paper) return st.paper.length < s.paper.length;
+    if (s.paper) return st.paper.length < PAPER_MIN;
     return false;
   };
   const extra = i => {
@@ -146,7 +147,7 @@
   const mark = { wait: '⏳', ok: '✅', redo: '↩' };
   const path = () => `<ol class="ps-path">${LESSONS.map((n, i) => { const w = srv.works[i + 1], prevDone = i === 1 && srv.works[1]; return `<li class="${i === 0 ? 'open cur' : 'lock'}${w ? ' ' + w.status : ''}" title="${i ? esc(prevDone ? t('soon') : t('locked')) : ''}"><span class="ps-dot">${w ? mark[w.status] : i ? (prevDone ? '🕊' : '🔒') : ICON[i]}</span><small>${i + 1}. ${tr(n)}${prevDone ? ` · ${t('soon')}` : ''}</small></li>`; }).join('')}<li class="lock dip"><span class="ps-dot">📜</span><small>${t('diploma')}</small></li></ol>`;
 
-  const render = (keep) => {
+  const render = () => {
     box.innerHTML = `<div class="ps-head"><h1>${t('title')}</h1><p>${t('lead')}</p><p class="ps-free">${t('free')}</p></div>
       <h3 class="ps-h3">${t('path')}</h3>${path()}${srv.works[LESSON] && srv.works[LESSON].status !== 'wait' ? verdict() : ''}
       <div class="ps-class">
@@ -155,23 +156,21 @@
           <div class="ps-bar"><button type="button" class="ps-again">${t('again')}</button>${st.step < S.length - 1 ? `<button type="button" class="ps-next"${blocked(st.step) ? ' disabled' : ''}>${t('next')}</button>` : ''}</div></div>
       </div>
       <a class="ps-book" href="/e-books/"><img src="${IMG}book-cover.jpg" alt=""><span>${t('book')} <b>Watercolor Sketches: Creative Guide</b><em>${t('bookGo')}</em></span></a>`;
-    const log = box.querySelector('.ps-log');
-    if (keep) log.scrollTop = keep; else log.scrollTop = log.scrollHeight;
   };
 
   box.addEventListener('click', e => {
     const el = e.target;
-    if (el.closest('.ps-next')) { st.step++; view = st.step; save(st); render(); return; }
+    if (el.closest('.ps-next')) { st.step++; view = st.step; save(st); render(); const nb = box.querySelector('.ps-log li:last-child'); nb && nb.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); return; }
     if (el.closest('.ps-again')) { st = { step: 0, quiz: null, find: [], paper: [] }; view = 0; save(st); render(); return; }
     const q = el.closest('[data-q]');
     if (q) { st.quiz = +q.dataset.q; save(st); render(); return; }
     const g = el.closest('.ps-find g[data-k]');
-    if (g && S[view].find) { if (!st.find.includes(g.dataset.k)) st.find.push(g.dataset.k); save(st); render(box.querySelector('.ps-log').scrollTop || 1); return; }
+    if (g && S[view].find) { if (!st.find.includes(g.dataset.k)) st.find.push(g.dataset.k); save(st); render(); return; }
     if (el.closest('.ps-login')) { window.PPAccount && window.PPAccount.openSignIn(); return; }
     if (el.closest('.ps-send')) { send(el.closest('.ps-hand')); return; }
     if (el.closest('input, textarea, label, form')) return;
     const b = el.closest('.ps-b');
-    if (b) { view = +b.dataset.i; render(box.querySelector('.ps-log').scrollTop || 1); }
+    if (b) { view = +b.dataset.i; render(); }
   });
   box.addEventListener('change', e => {
     const p = e.target.closest('[data-p]');
