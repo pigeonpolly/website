@@ -90,15 +90,17 @@
   const ls = n => (st.l[n] = st.l[n] || { step: 0, quiz: {}, find: {}, paper: [] });
   const srv = { me: null, nick: '', works: {} }; // с сервера: вошла ли птичка, последняя сдача по урокам
   const finished = n => ls(n).step >= clientAt(n);
-  const isOpen = n => n === 1 || !!srv.works[n - 1] || finished(n - 1);
+  // следующий урок — только после «Сдать Полли»; пока сервер не ответил, верим своему прогрессу
+  const isOpen = n => n === 1 || !!srv.works[n - 1] || (srv.me === null && finished(n - 1));
   const stamps = () => Object.values(srv.works).filter(w => w.status === 'ok').length;
   if (!(st.cur >= 1 && st.cur <= N) || !isOpen(st.cur)) st.cur = 1;
   let mode = 'lesson', view = Math.min(ls(st.cur).step, stepsOf(st.cur).length - 1);
 
   const loadSrv = () => fetch('/api/school?lang=' + ['en', 'ru', 'lv'][L], { credentials: 'same-origin' }).then(r => r.json()).then(d => {
     srv.me = !!d.me; srv.nick = d.nick || ''; srv.btn = d.diplomaBtn || 0; srv.works = {}; for (const w of d.works || []) srv.works[w.lesson] = w;
-    render();
-  }).catch(() => { srv.me = false; render(); });
+    fixCur(); render();
+  }).catch(() => { srv.me = false; fixCur(); render(); });
+  const fixCur = () => { if (isOpen(st.cur)) return; while (!isOpen(st.cur)) st.cur--; mode = 'lesson'; view = Math.min(ls(st.cur).step, stepsOf(st.cur).length - 1); save(); };
   // фото → полная (1600) и превью (480) JPEG, как в челлендже
   const jpeg = (bmp, max, q) => { const k = Math.min(1, max / Math.max(bmp.width, bmp.height)), c = document.createElement('canvas'); c.width = Math.round(bmp.width * k); c.height = Math.round(bmp.height * k); c.getContext('2d').drawImage(bmp, 0, 0, c.width, c.height); return new Promise(r => c.toBlob(r, 'image/jpeg', q)); };
   let picked = null;
@@ -123,6 +125,7 @@
     if (s.quiz) return p.quiz[i] == null;
     if (s.find) return (p.find[i] || []).length < s.find.parts.length;
     if (s.paper) return p.paper.length < s.paper.min;
+    if (s.client) return !srv.works[n];
     return false;
   };
   const pickedOf = n => { const ps = LS[n - 1].steps.find(x => x.paper); return ps ? ps.paper.opts.filter((_, k) => ls(n).paper.includes(k)).map(tr) : []; };
@@ -144,7 +147,7 @@
       if (w && w.status === 'ok') return `<p class="ps-ans ok">${t('ok')}</p>`;
       return `${task}${w && w.status === 'wait' ? verdict(n) : ''}<form class="ps-hand" onsubmit="return false"><label class="ps-file">${w && w.status === 'wait' ? t('swap') : t('upload')}<input type="file" accept="image/*" hidden></label><img class="ps-prev" alt="" hidden><textarea rows="2" placeholder="${esc(t('note'))}"></textarea><button type="button" class="ps-send">${w && w.status === 'redo' ? t('again2') : t('send')}</button><p class="ps-proto" role="status"></p></form>`;
     }
-    if (s.end && n < N) return `<div class="ps-quiz"><button type="button" data-go="${n + 1}">${t('goNext')} ${n + 1} →</button></div>`;
+    if (s.end && n < N && isOpen(n + 1)) return `<div class="ps-quiz"><button type="button" data-go="${n + 1}">${t('goNext')} ${n + 1} →</button></div>`;
     return '';
   };
   const bubble = (n, i) => {
