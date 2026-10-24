@@ -2,14 +2,14 @@
 (function () {
   const L = { en: 0, ru: 1, lv: 2 }[document.documentElement.lang] ?? 0;
   const T = {
-    stamp: ['📮 today’s stamp is waiting', '📮 штамп дня ждёт', '📮 dienas zīmogs gaida'],
-    done: ['✓ played today', '✓ сегодня сыграно', '✓ šodien spēlēts'],
-    solved: ['✓ case solved today', '✓ дело сегодня раскрыто', '✓ lieta šodien atrisināta'],
-    all: ['all cases solved', 'все дела раскрыты', 'visas lietas atrisinātas'],
-    bugsOk: ['🐞 bugs ready', '🐞 жуки готовы', '🐞 blaktis gatavas'],
-    bugsIn: ['🐞 bugs in ', '🐞 жуки через ', '🐞 blaktis pēc '],
-    advOpen: ['✓ window opened', '✓ окошко открыто', '✓ lodziņš atvērts'],
-    advWait: ['🎁 today’s window is waiting', '🎁 окошко дня ждёт', '🎁 dienas lodziņš gaida'],
+    stamp: ['📮 stamp', '📮 штамп', '📮 zīmogs'],
+    done: ['✓ played', '✓ сыграно', '✓ spēlēts'],
+    solved: ['✓ solved', '✓ раскрыто', '✓ atrisināts'],
+    all: ['✓ all', '✓ все', '✓ visas'],
+    bugsOk: ['🐞 ready', '🐞 готовы', '🐞 gatavas'],
+    bugsIn: ['🐞 ', '🐞 ', '🐞 '],
+    advOpen: ['✓ opened', '✓ открыто', '✓ atvērts'],
+    advWait: ['🎁 window', '🎁 окошко', '🎁 lodziņš'],
     min: [' min', ' мин', ' min'], h: [' h ', ' ч ', ' h '],
   };
   const t = k => T[k][L];
