@@ -73,14 +73,14 @@ export async function wlHolidayCron(env, h, force) {
   const sent = Number(await h.getMeta('wl_mail_n:' + day)) || 0, adv = (Number(await h.getMeta('advent_mail_n:' + day)) || 0) + (Number(await h.getMeta('mail_n:' + day)) || 0); // + письма из кабинета (worker/mail.js)
   const lim = Math.max(0, Math.min(HOUR_MAX, DAY_MAX - sent - adv));
   if (!lim) return;
-  const rows = (await env.DB.prepare("SELECT id, email, nick, lang FROM users WHERE email IS NOT NULL AND email != '' AND banned = 0 AND nick IS NOT NULL AND nick != '' AND COALESCE(wl_mail_off, 0) = 0 AND mail_games = 1 AND COALESCE(wl_sent, '') < ? ORDER BY id LIMIT ?").bind(key, lim).all()).results;
+  const rows = (await env.DB.prepare("SELECT id, email, nick, lang FROM users WHERE email IS NOT NULL AND email != '' AND banned = 0 AND nick IS NOT NULL AND nick != '' AND COALESCE(wl_mail_off, 0) = 0 AND mail_games = 1 AND COALESCE(mail_day, '') != ? AND COALESCE(wl_sent, '') < ? ORDER BY id LIMIT ?").bind(h.rigaDay(), key, lim).all()).results;
   let n = sent;
   for (const u of rows) {
     const L = langOf(u.lang), off = `${SITE}/api/wl-mail/off?u=${u.id}&t=${await unsubToken(env, h, u.id)}&l=${L}`;
     const [subj, text] = letter(list, L, u.nick, off);
     const r = await sendMail(env, u.email, subj, text);
     if (!r.ok) break; // лимит или ошибка — в следующий час
-    await env.DB.prepare('UPDATE users SET wl_sent = ? WHERE id = ?').bind(key, u.id).run();
+    await env.DB.prepare('UPDATE users SET wl_sent = ?, mail_day = ? WHERE id = ?').bind(key, h.rigaDay(), u.id).run(); // mail_day — одно письмо в день (worker/mail.js)
     n++;
   }
   if (n !== sent) await h.setMeta('wl_mail_n:' + day, String(n));

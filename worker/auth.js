@@ -84,7 +84,7 @@ export async function adventMail(env, h) {
   const day = h.rigaDay(), y = +day.slice(0, 4);
   if (!mailOn(env) || day < y + '-12-01' || day > y + '-12-07') return;
   const sent = Number(await h.getMeta('advent_mail_n:' + day)) || 0;
-  const rows = (await env.DB.prepare("SELECT id, email, advent_mail FROM users WHERE advent_mail != '' AND email IS NOT NULL AND banned = 0 AND COALESCE(advent_sent, 0) < ? ORDER BY id LIMIT ?").bind(y, Math.max(0, Math.min(30, ADVENT_DAY_MAX - sent))).all()).results;
+  const rows = (await env.DB.prepare("SELECT id, email, advent_mail FROM users WHERE advent_mail != '' AND email IS NOT NULL AND banned = 0 AND COALESCE(advent_sent, 0) < ? AND COALESCE(mail_day, '') != ? ORDER BY id LIMIT ?").bind(y, day, Math.max(0, Math.min(30, ADVENT_DAY_MAX - sent))).all()).results;
   let n = sent;
   for (const u of rows) {
     const L = ['ru', 'lv'].includes(u.advent_mail) ? u.advent_mail : 'en', link = `https://www.pigeonpolly.com${L === 'en' ? '' : '/' + L}/advent/`;
@@ -95,7 +95,7 @@ export async function adventMail(env, h) {
     }[L];
     const r = await sendMail(env, u.email, T[0], T[1]);
     if (!r.ok) break; // лимит или ошибка — попробуем в следующий час
-    await env.DB.prepare('UPDATE users SET advent_sent = ? WHERE id = ?').bind(y, u.id).run();
+    await env.DB.prepare('UPDATE users SET advent_sent = ?, mail_day = ? WHERE id = ?').bind(y, day, u.id).run(); // mail_day — одно письмо в день (worker/mail.js)
     n++;
   }
   if (n !== sent) await h.setMeta('advent_mail_n:' + day, String(n));
