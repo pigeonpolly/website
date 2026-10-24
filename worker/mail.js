@@ -19,9 +19,9 @@ export const MAIL_ALTER = ['ALTER TABLE users ADD COLUMN mail_games INTEGER DEFA
   "ALTER TABLE users ADD COLUMN mail_day TEXT DEFAULT ''", // день (по Риге) последнего письма: больше одного письма в день птичке нельзя (решение Алины) — mailFree/mailSent
   'ALTER TABLE users ADD COLUMN mail_g_at INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN mail_g_garden INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN mail_g_titos INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN mail_g_streak TEXT DEFAULT ''"];
 // числа уведомлений из игр — в «📜 Правилах» (кабинет → Все правила → ✉️ Уведомления из игр)
-export const MAIL_RULES = { mailGamesOn: true, mailStreakMin: 3, mailStreakHour: 19, mailGardenDays: 3, mailTitosDays: 4 };
-export const MAIL_RANGE = { mailStreakMin: [1, 365], mailStreakHour: [12, 22], mailGardenDays: [1, 30], mailTitosDays: [1, 60] };
-export const MAIL_INT = ['mailStreakMin', 'mailStreakHour', 'mailGardenDays', 'mailTitosDays'];
+export const MAIL_RULES = { mailGamesOn: true, mailStreakMin: 3, mailGamesHour: 19, mailGardenDays: 3, mailTitosDays: 4 };
+export const MAIL_RANGE = { mailStreakMin: [1, 365], mailGamesHour: [8, 22], mailGardenDays: [1, 30], mailTitosDays: [1, 60] };
+export const MAIL_INT = ['mailStreakMin', 'mailGamesHour', 'mailGardenDays', 'mailTitosDays'];
 export const MAIL_DAY_MAX = 90, MAIL_BATCH = 30;
 const LATER = 30 * 86400, SITE = 'https://www.pigeonpolly.com', REPLY = 'lina.otkinska@gmail.com'; // ответы на письма — Алине
 const now = () => Math.floor(Date.now() / 1000);
@@ -65,93 +65,92 @@ async function sendOne(env, h, u, cat, L) {
 }
 
 // ---------- уведомления из игр (вид games) ----------
-// Раз в час (cron): только с согласием mail_games = 1 и если сегодня птичке ещё не было никакого письма (mail_day).
-// 🔥 серия челленджа ≥ mailStreakMin дней сгорит сегодня (с mailStreakHour по Риге, сегодня ещё нет рисунка и не день свободы);
-// 🥕/🌱 огород: созрел урожай или грядки сухие — если птичка не заходила больше суток, не чаще раза в mailGardenDays дней;
+// Одно письмо-сводка в день: всё, что сейчас ждёт птичку в играх, — в одном письме (решение Алины). Раз в час с mailGamesHour по Риге до 23,
+// только с согласием mail_games = 1 и если сегодня птичке ещё не было никакого письма (mail_day). Пункты сводки:
+// 🔥 серия челленджа ≥ mailStreakMin дней сгорит сегодня (сегодня ещё нет рисунка и не день свободы);
+// 🥕/🌱 огород: созрел урожай или грядки сухие — птичка не заходила больше суток, этот пункт — не чаще раза в mailGardenDays дней;
 // 🕵️ Титос: следующее дело ждёт, а птичка не заходила mailTitosDays дней — один раз на каждое дело.
-// h.streakRisk(uid) → {current, risk} (worker/index.js), h.rules() → RULES.
+// Новый пункт = запрос кандидатов в mailGamesCron (items) + строки en/ru/lv в ITEM. h.streakRisk(uid) → {current, risk} (worker/index.js), h.rules() → RULES.
 const ruN = (n, f) => f[n % 10 === 1 && n % 100 !== 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : 2];
-const GAME = {
-  streak: (L, nick, n, link) => ({
-    en: [`🔥 Your ${n}-day streak ends tonight`, `Hi, ${nick}!\n\nYou’ve drawn ${n} days in a row — and today’s theme is still waiting. Even a quick 10-minute sketch keeps the streak going.\n\n${link}\n\nPolly 🐦`],
-    ru: [`🔥 Серия из ${n} ${ruN(n, ['дня', 'дней', 'дней'])} сгорит сегодня`, `Привет, ${nick}!\n\n${n} ${ruN(n, ['день', 'дня', 'дней'])} подряд с рисунком — а сегодняшняя тема ещё ждёт. Хватит даже быстрого скетча на 10 минут, чтобы серия не прервалась.\n\n${link}\n\nПолли 🐦`],
-    lv: [`🔥 Tava ${n} dienu sērija beigsies šovakar`, `Sveiki, ${nick}!\n\nTu zīmē jau ${n} dienas pēc kārtas — un šodienas tēma vēl gaida. Pietiks pat ar ātru 10 minūšu skici, lai sērija nepārtrūktu.\n\n${link}\n\nPollija 🐦`],
-  }[L]),
-  ripe: (L, nick, link) => ({
-    en: ['🥕 Your harvest is ready', `Hi, ${nick}!\n\nSomething has grown in your garden — come and pick it. The harvest sells for buttons 🔘.\n\n${link}\n\nPolly 🐦`],
-    ru: ['🥕 Урожай созрел', `Привет, ${nick}!\n\nВ огороде что-то выросло — приходи собрать. Урожай можно продать за пуговки 🔘.\n\n${link}\n\nПолли 🐦`],
-    lv: ['🥕 Raža ir gatava', `Sveiki, ${nick}!\n\nDārzā kaut kas ir izaudzis — nāc novākt. Ražu var pārdot par pogām 🔘.\n\n${link}\n\nPollija 🐦`],
-  }[L]),
-  dry: (L, nick, link) => ({
-    en: ['🌱 Your garden is drying out', `Hi, ${nick}!\n\nThe beds in your garden are dry, and plants only grow in wet soil. One watering is enough for today.\n\n${link}\n\nPolly 🐦`],
-    ru: ['🌱 Грядки сохнут', `Привет, ${nick}!\n\nГрядки в огороде высохли, а растения растут только во влажной земле. Одного полива на сегодня хватит.\n\n${link}\n\nПолли 🐦`],
-    lv: ['🌱 Dobes izkalst', `Sveiki, ${nick}!\n\nDārza dobes ir izžuvušas, un augi aug tikai mitrā zemē. Šodienai pietiks ar vienu laistīšanu.\n\n${link}\n\nPollija 🐦`],
-  }[L]),
-  titos: (L, nick, n, title, link) => ({
-    en: [`🕵️ Titos is waiting: case #${n}`, `Hi, ${nick}!\n\nDetective Titos can’t sleep: case #${n}${title ? ` “${title}”` : ''} is waiting on his desk. The coffee is hot ☕\n\n${link}\n\nPolly 🐦`],
-    ru: [`🕵️ Титос ждёт: дело №${n}`, `Привет, ${nick}!\n\nДетективу Титосу не спится: на столе ждёт дело №${n}${title ? ` «${title}»` : ''}. Кофе уже горячий ☕\n\n${link}\n\nПолли 🐦`],
-    lv: [`🕵️ Titoss gaida: lieta Nr. ${n}`, `Sveiki, ${nick}!\n\nDetektīvam Titosam nenāk miegs: uz galda gaida lieta Nr. ${n}${title ? ` “${title}”` : ''}. Kafija jau karsta ☕\n\n${link}\n\nPollija 🐦`],
-  }[L]),
-};
 const pageUrl = (L, path, kind) => `${SITE}${pre(L)}${path}?utm_source=email&utm_campaign=game-${kind}`;
 const parseJ = (s, d) => { try { return JSON.parse(s) || d; } catch (e) { return d; } };
+// пункт сводки: [короткое для темы, абзац письма]
+const ITEM = {
+  streak: (L, x) => ({
+    en: [`your ${x.n}-day streak`, `🔥 Your ${x.n}-day drawing streak ends tonight — today’s theme is still waiting. Even a quick 10-minute sketch keeps it going.\n${pageUrl(L, '/challenge/', 'streak')}`],
+    ru: [`серия ${x.n} ${ruN(x.n, ['день', 'дня', 'дней'])}`, `🔥 Серия из ${x.n} ${ruN(x.n, ['дня', 'дней', 'дней'])} с рисунком сгорит сегодня — а тема дня ещё ждёт. Хватит даже быстрого скетча на 10 минут.\n${pageUrl(L, '/challenge/', 'streak')}`],
+    lv: [`${x.n} dienu sērija`, `🔥 Tava ${x.n} dienu zīmēšanas sērija beigsies šovakar — dienas tēma vēl gaida. Pietiks pat ar ātru 10 minūšu skici.\n${pageUrl(L, '/challenge/', 'streak')}`],
+  }[L]),
+  garden: (L, x) => ({
+    en: [x.ripe ? 'harvest' : 'garden', x.ripe ? `🥕 Something has grown in your garden — come and pick it. The harvest sells for buttons 🔘.${x.dry ? ' And some beds are dry: plants only grow in wet soil.' : ''}\n${pageUrl(L, '/garden/', 'ripe')}` : `🌱 The beds in your garden are dry, and plants only grow in wet soil. One watering is enough for today.\n${pageUrl(L, '/garden/', 'dry')}`],
+    ru: [x.ripe ? 'урожай' : 'огород', x.ripe ? `🥕 В огороде что-то выросло — приходи собрать. Урожай можно продать за пуговки 🔘.${x.dry ? ' А некоторые грядки высохли: растения растут только во влажной земле.' : ''}\n${pageUrl(L, '/garden/', 'ripe')}` : `🌱 Грядки в огороде высохли, а растения растут только во влажной земле. Одного полива на сегодня хватит.\n${pageUrl(L, '/garden/', 'dry')}`],
+    lv: [x.ripe ? 'raža' : 'dārzs', x.ripe ? `🥕 Dārzā kaut kas ir izaudzis — nāc novākt. Ražu var pārdot par pogām 🔘.${x.dry ? ' Un dažas dobes ir izžuvušas: augi aug tikai mitrā zemē.' : ''}\n${pageUrl(L, '/garden/', 'ripe')}` : `🌱 Dārza dobes ir izžuvušas, un augi aug tikai mitrā zemē. Šodienai pietiks ar vienu laistīšanu.\n${pageUrl(L, '/garden/', 'dry')}`],
+  }[L]),
+  titos: (L, x) => ({
+    en: [`case #${x.n}`, `🕵️ Detective Titos can’t sleep: case #${x.n}${x.title ? ` “${x.title}”` : ''} is waiting on his desk. The coffee is hot ☕\n${pageUrl(L, '/titos/', 'case')}`],
+    ru: [`дело №${x.n}`, `🕵️ Детективу Титосу не спится: на столе ждёт дело №${x.n}${x.title ? ` «${x.title}»` : ''}. Кофе уже горячий ☕\n${pageUrl(L, '/titos/', 'case')}`],
+    lv: [`lieta Nr. ${x.n}`, `🕵️ Detektīvam Titosam nenāk miegs: uz galda gaida lieta Nr. ${x.n}${x.title ? ` “${x.title}”` : ''}. Kafija jau karsta ☕\n${pageUrl(L, '/titos/', 'case')}`],
+  }[L]),
+};
+const DIGEST = {
+  subj: { en: s => `🐦 Waiting for you: ${s}`, ru: s => `🐦 Тебя ждут: ${s}`, lv: s => `🐦 Tevi gaida: ${s}` },
+  hi: { en: n => `Hi, ${n}!`, ru: n => `Привет, ${n}!`, lv: n => `Sveiki, ${n}!` },
+  bye: { en: 'Polly 🐦', ru: 'Полли 🐦', lv: 'Pollija 🐦' },
+};
+const ORDER = ['streak', 'garden', 'titos'];
 
 export async function mailGamesCron(env, h) {
   const R = h.rules();
   if (!mailOn(env) || !R.mailGamesOn) return;
+  const hour = Number(new Date().toLocaleString('en-GB', { timeZone: 'Europe/Riga', hour: '2-digit', hour12: false }));
+  if (hour < R.mailGamesHour || hour >= 23) return;
   let left = Math.min(MAIL_BATCH, MAIL_DAY_MAX - await usedToday(h)), n = 0;
   if (left <= 0) return;
-  const t = now(), day = new Date().toISOString().slice(0, 10), base = `u.mail_games = 1 AND u.email IS NOT NULL AND u.email != '' AND u.banned = 0 AND u.nick IS NOT NULL AND u.nick != '' AND COALESCE(u.mail_day, '') != '${h.rigaDay()}'`; // одно письмо в день — любое
-  const send = async (u, T, set, ...args) => {
-    const L = langOf(u.mail_lang), [subject, text] = T;
-    const r = await sendOne(env, h, u, 'games', { [L]: { s: subject, t: text }, en: { s: subject, t: text } });
-    if (!r.ok) return false;
-    await env.DB.prepare(`UPDATE users SET mail_g_at = ?, mail_day = ?, ${set} WHERE id = ?`).bind(t, h.rigaDay(), ...args, u.id).run();
-    n++; left--; return true;
-  };
-  const hour = Number(new Date().toLocaleString('en-GB', { timeZone: 'Europe/Riga', hour: '2-digit', hour12: false }));
+  const t = now(), ms = Date.now(), day = new Date().toISOString().slice(0, 10), riga = h.rigaDay();
+  const base = `u.mail_games = 1 AND u.email IS NOT NULL AND u.email != '' AND u.banned = 0 AND u.nick IS NOT NULL AND u.nick != '' AND COALESCE(u.mail_day, '') != '${riga}'`; // одно письмо в день — любое
+  const birds = new Map(); // id → {u, items: {streak, garden, titos}}
+  const add = (u, k, x) => { const b = birds.get(u.id) || { u, items: {} }; b.items[k] = x; birds.set(u.id, b); };
 
   // 🔥 серия сгорит сегодня
-  if (hour >= R.mailStreakHour && hour < 23) {
-    const rows = (await env.DB.prepare(`SELECT u.id, u.email, u.nick, u.mail_lang FROM users u WHERE ${base} AND COALESCE(u.mail_g_streak, '') != ?
-      AND EXISTS (SELECT 1 FROM posts p WHERE p.user_id = u.id AND p.day >= ?) AND NOT EXISTS (SELECT 1 FROM posts p WHERE p.user_id = u.id AND p.day >= ?) LIMIT 60`)
-      .bind(day, new Date(Date.now() - 3 * 864e5).toISOString().slice(0, 10), day).all()).results;
-    for (const u of rows) {
-      if (left <= 0) break;
-      const s = await h.streakRisk(u.id);
-      if (!s.risk || s.current < R.mailStreakMin) continue;
-      const L = langOf(u.mail_lang);
-      if (!(await send(u, GAME.streak(L, u.nick, s.current, pageUrl(L, '/challenge/', 'streak')), 'mail_g_streak = ?', day))) return spend(h, n);
-    }
+  for (const u of (await env.DB.prepare(`SELECT u.id, u.email, u.nick, u.mail_lang FROM users u WHERE ${base} AND COALESCE(u.mail_g_streak, '') != ?
+    AND EXISTS (SELECT 1 FROM posts p WHERE p.user_id = u.id AND p.day >= ?) AND NOT EXISTS (SELECT 1 FROM posts p WHERE p.user_id = u.id AND p.day >= ?) LIMIT 100`)
+    .bind(day, new Date(ms - 3 * 864e5).toISOString().slice(0, 10), day).all()).results) {
+    const s = await h.streakRisk(u.id);
+    if (s.risk && s.current >= R.mailStreakMin) add(u, 'streak', { n: s.current });
   }
   // 🥕 / 🌱 огород
-  if (left > 0) {
-    const rows = (await env.DB.prepare(`SELECT u.id, u.email, u.nick, u.mail_lang, g.beds FROM users u JOIN garden g ON g.user_id = u.id WHERE ${base}
-      AND COALESCE(u.last_seen, 0) < ? AND COALESCE(u.mail_g_garden, 0) < ? AND g.beds LIKE '%"p"%' LIMIT 100`).bind(t - 86400, t - R.mailGardenDays * 86400).all().catch(() => ({ results: [] }))).results;
-    const ms = Date.now(), wet = (R.gardenWetH || 24) * 36e5;
-    for (const u of rows) {
-      if (left <= 0) break;
-      const beds = parseJ(u.beds, []).filter(b => b && CROPS[b.p]);
-      const ripe = beds.some(b => grown(b, ms, R.gardenWetH || 24) >= CROPS[b.p] * 864e5);
-      const dry = beds.some(b => grown(b, ms, R.gardenWetH || 24) < CROPS[b.p] * 864e5 && (!b.w || ms - b.w > wet + 6 * 36e5));
-      if (!ripe && !dry) continue;
-      const L = langOf(u.mail_lang), link = pageUrl(L, '/garden/', ripe ? 'ripe' : 'dry');
-      if (!(await send(u, ripe ? GAME.ripe(L, u.nick, link) : GAME.dry(L, u.nick, link), 'mail_g_garden = ?', t))) return spend(h, n);
-    }
+  const wetH = R.gardenWetH || 24;
+  for (const u of (await env.DB.prepare(`SELECT u.id, u.email, u.nick, u.mail_lang, g.beds FROM users u JOIN garden g ON g.user_id = u.id WHERE ${base}
+    AND COALESCE(u.last_seen, 0) < ? AND COALESCE(u.mail_g_garden, 0) < ? AND g.beds LIKE '%"p"%' LIMIT 200`).bind(t - 86400, t - R.mailGardenDays * 86400).all().catch(() => ({ results: [] }))).results) {
+    const beds = parseJ(u.beds, []).filter(b => b && CROPS[b.p]);
+    const ripe = beds.some(b => grown(b, ms, wetH) >= CROPS[b.p] * 864e5);
+    const dry = beds.some(b => grown(b, ms, wetH) < CROPS[b.p] * 864e5 && (!b.w || ms - b.w > (wetH + 6) * 36e5));
+    if (ripe || dry) add(u, 'garden', { ripe, dry });
   }
   // 🕵️ Титос: следующее дело ждёт
-  if (left > 0) {
-    const rows = (await env.DB.prepare(`SELECT u.id, u.email, u.nick, u.mail_lang, t.level FROM users u JOIN titos t ON t.user_id = u.id WHERE ${base}
-      AND t.level >= 2 AND t.level < (SELECT MAX(n) FROM titos_cases) AND COALESCE(u.mail_g_titos, 0) < t.level + 1 AND COALESCE(u.last_seen, 0) < ? LIMIT 60`)
-      .bind(t - R.mailTitosDays * 86400).all().catch(() => ({ results: [] }))).results;
-    for (const u of rows) {
-      if (left <= 0) break;
-      const c = u.level + 1, L = langOf(u.mail_lang);
-      const row = await env.DB.prepare('SELECT data, tr FROM titos_cases WHERE n = ?').bind(c).first();
-      const ti = row ? (parseJ(row.data, {}).title || {}) : {}, tr = row ? parseJ(row.tr, {}) : {};
-      const title = ti[L] || (L === 'ru' ? '' : (tr[ti.ru] || {})[L]) || (L === 'ru' ? ti.ru : '') || '';
-      if (!(await send(u, GAME.titos(L, u.nick, c, title, pageUrl(L, '/titos/', 'case')), 'mail_g_titos = ?', c))) return spend(h, n);
-    }
+  for (const u of (await env.DB.prepare(`SELECT u.id, u.email, u.nick, u.mail_lang, t.level FROM users u JOIN titos t ON t.user_id = u.id WHERE ${base}
+    AND t.level >= 2 AND t.level < (SELECT MAX(n) FROM titos_cases) AND COALESCE(u.mail_g_titos, 0) < t.level + 1 AND COALESCE(u.last_seen, 0) < ? LIMIT 100`)
+    .bind(t - R.mailTitosDays * 86400).all().catch(() => ({ results: [] }))).results) {
+    const c = u.level + 1, L = langOf(u.mail_lang);
+    const row = await env.DB.prepare('SELECT data, tr FROM titos_cases WHERE n = ?').bind(c).first();
+    const ti = row ? (parseJ(row.data, {}).title || {}) : {}, tr = row ? parseJ(row.tr, {}) : {};
+    add(u, 'titos', { n: c, title: ti[L] || (L === 'ru' ? ti.ru : (tr[ti.ru] || {})[L]) || '' });
+  }
+
+  // одно письмо на птичку со всеми пунктами
+  for (const { u, items } of birds.values()) {
+    if (left <= 0) break;
+    const L = langOf(u.mail_lang), ks = ORDER.filter(k => items[k]), parts = ks.map(k => ITEM[k](L, items[k]));
+    const subject = DIGEST.subj[L](parts.map(p => p[0]).join(', '));
+    const text = `${DIGEST.hi[L](u.nick)}\n\n${parts.map(p => p[1]).join('\n\n')}\n\n${DIGEST.bye[L]}`;
+    const r = await sendOne(env, h, u, 'games', { [L]: { s: subject, t: text }, en: { s: subject, t: text } });
+    if (!r.ok) break; // лимит Resend или ошибка — через час
+    const set = ['mail_g_at = ?', 'mail_day = ?'], vals = [t, riga];
+    if (items.streak) { set.push('mail_g_streak = ?'); vals.push(day); }
+    if (items.garden) { set.push('mail_g_garden = ?'); vals.push(t); }
+    if (items.titos) { set.push('mail_g_titos = ?'); vals.push(items.titos.n); }
+    await env.DB.prepare(`UPDATE users SET ${set.join(', ')} WHERE id = ?`).bind(...vals, u.id).run();
+    n++; left--;
   }
   await spend(h, n);
 }
