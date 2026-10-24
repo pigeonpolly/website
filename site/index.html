@@ -285,6 +285,85 @@
   });
 </script>
 </div>
+<div class="blk" id="blk-wl-holiday" data-ppb="blk-wl-holiday"><style>#blk-wl-holiday .wlh { position: relative; max-width: 980px; margin: 18px auto 0; padding: 0 var(--gutter); }
+#blk-wl-holiday .wlh[hidden] { display: none; }
+#blk-wl-holiday .wlh-card { position: relative; overflow: hidden; display: flex; align-items: center; gap: 18px; padding: 26px 22px 18px 22px; border-radius: 18px; background: linear-gradient(135deg, #3B2668 0, #2F1E57 100%); border: 1px solid var(--line); box-shadow: 0 8px 22px rgba(0, 0, 0, .25); }
+#blk-wl-holiday .wlh-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 12px; background:
+    conic-gradient(from 135deg at 50% 0, #F0A987 0 90deg, transparent 0) 0 0 / 28px 12px repeat-x,
+    conic-gradient(from 135deg at 50% 0, #F5D547 0 90deg, transparent 0) 14px 0 / 28px 12px repeat-x; opacity: .9; }
+#blk-wl-holiday .wlh-crests { flex: none; display: flex; gap: 6px; }
+#blk-wl-holiday .wlh-crests img { width: 40px; height: 46px; image-rendering: pixelated; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .4)); }
+#blk-wl-holiday .wlh.today .wlh-crests img { animation: wlh-bob 2.4s ease-in-out infinite; }
+#blk-wl-holiday .wlh.today .wlh-crests img + img { animation-delay: -1.2s; }
+#blk-wl-holiday .wlh-tx { flex: 1; min-width: 0; }
+#blk-wl-holiday .wlh-kick { margin: 0; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; color: var(--peach); }
+#blk-wl-holiday .wlh-t { margin: 2px 0 0; font-family: var(--serif); font-weight: 600; font-size: clamp(19px, 2.2vw, 24px); line-height: 1.25; }
+#blk-wl-holiday .wlh-t small { font: 400 15px var(--sans); color: var(--muted); }
+#blk-wl-holiday .wlh-x { margin: 4px 0 0; font-size: 15px; line-height: 1.45; color: var(--muted); }
+#blk-wl-holiday .wlh-go { display: inline-block; margin-top: 6px; color: #F5D547; font-weight: 700; font-size: 15px; text-decoration: none; }
+#blk-wl-holiday .wlh-go:hover { text-decoration: underline; }
+#blk-wl-holiday .wlh-cnt { flex: none; display: grid; place-items: center; align-content: center; min-width: 86px; padding: 8px 10px; border-radius: 14px; background: #FFFDF8; color: #2B1A51; text-align: center; box-shadow: 0 4px 0 rgba(0, 0, 0, .25); }
+#blk-wl-holiday .wlh-cnt b { font: 700 34px/1 var(--serif); font-variant-numeric: tabular-nums; color: #D85A30; }
+#blk-wl-holiday .wlh-cnt span { margin-top: 4px; font-size: 13px; line-height: 1.2; }
+#blk-wl-holiday .wlh-conf { position: absolute; width: 5px; height: 5px; pointer-events: none; opacity: .75; animation: wlh-fall linear infinite; }
+@keyframes wlh-bob { 50% { transform: translateY(-4px) rotate(-3deg); } }
+@keyframes wlh-fall { from { transform: translateY(-10px) rotate(0); } to { transform: translateY(170px) rotate(360deg); } }
+@media (prefers-reduced-motion: reduce) {#blk-wl-holiday .wlh.today .wlh-crests img, #blk-wl-holiday .wlh-conf { animation: none; display: none; }
+#blk-wl-holiday .wlh.today .wlh-crests img { display: block; }}
+@media (max-width: 600px) {#blk-wl-holiday .wlh-card { gap: 12px; padding: 24px 14px 14px; align-items: flex-start; }
+#blk-wl-holiday .wlh-cnt { min-width: 64px; padding: 6px 8px; }
+#blk-wl-holiday .wlh-cnt b { font-size: 26px; }
+#blk-wl-holiday .wlh-cnt span { font-size: 12px; }
+#blk-wl-holiday .wlh-crests img { width: 30px; height: 35px; }}</style><section class="wlh" id="wl-holiday" hidden aria-live="polite"></section>
+<script>
+  // ближайший праздник Wobbleland на главной: карточка видна всегда, справа — отсчёт дней; в день праздника — поздравление и конфетти.
+  // Данные — /assets/wl-holidays.<lang>.json (build.py из content/wobbleland.json), грузятся после загрузки страницы. ?devdate= (account.js) — проверка дат.
+  window.addEventListener('load', () => {
+    const box = document.getElementById('wl-holiday');
+    if (!box) return;
+    const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, lang = ['en', 'ru', 'lv'][L], pre = ['', '/ru', '/lv'][L];
+    const T = {
+      today: ['Today in Wobbleland', 'Сегодня в Wobbleland', 'Šodien Wobbleland'],
+      soon: ['Next holiday in Wobbleland', 'Ближайший праздник в Wobbleland', 'Tuvākie svētki Wobbleland'],
+      days: [n => n === 1 ? 'day left' : 'days left', n => n % 10 === 1 && n % 100 !== 11 ? 'день' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'дня' : 'дней', n => n % 10 === 1 && n % 100 !== 11 ? 'diena' : 'dienas'],
+      tomorrow: ['tomorrow!', 'завтра!', 'rīt!'], todayCnt: ['today!', 'сегодня!', 'šodien!'],
+      happy: ['Happy holiday!', 'С праздником!', 'Priecīgus svētkus!'],
+      prep: ['The town is getting ready.', 'Город уже готовится.', 'Pilsēta jau gatavojas.'],
+      go: ['Visit the town →', 'Заглянуть в город →', 'Ieskatīties pilsētā →'],
+    };
+    let now = new Date();
+    try { const dv = JSON.parse(sessionStorage.getItem('pp-devdate') || 'null'); if (dv && dv.base) now = new Date(dv.base.slice(0, 10) + 'T12:00:00'); } catch (e) {}
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const daysTo = h => { let d = new Date(today.getFullYear(), h.m - 1, h.d); if (d < today) d = new Date(today.getFullYear() + 1, h.m - 1, h.d); return Math.round((d - today) / 864e5); };
+    fetch(`/assets/wl-holidays.${lang}.json`).then(r => r.ok ? r.json() : []).then(all => {
+      const near = all.map(h => ({ ...h, n: daysTo(h) }));
+      if (!near.length) return;
+      const n = Math.min(...near.map(h => h.n)), hs = near.filter(h => h.n === n).slice(0, 3);
+      const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+      box.classList.toggle('today', n === 0);
+      box.innerHTML = `<div class="wlh-card">
+        <div class="wlh-crests">${hs.map(h => `<img src="/images/wobbleland/crest-${h.k}.png" alt="">`).join('')}</div>
+        <div class="wlh-tx">
+          <p class="wlh-kick">${n === 0 ? T.today[L] : T.soon[L]}</p>
+          ${hs.map(h => `<p class="wlh-t">${esc(h.t)} <small>· ${esc(h.c)}</small></p>`).join('')}
+          <p class="wlh-x">${n === 0 ? T.happy[L] + ' ' : ''}${hs.length === 1 && hs[0].x ? esc(hs[0].x) : (n > 0 && n <= 3 ? T.prep[L] : '')}</p>
+          <a class="wlh-go" href="${pre}/wobbleland/#town-${hs[0].k}">${T.go[L]}</a>
+        </div>
+        <div class="wlh-cnt">${n === 0 ? '<b>🎉</b><span>' + T.todayCnt[L] + '</span>' : `<b>${n}</b><span>${n === 1 ? T.tomorrow[L] : T.days[L](n)}</span>`}</div>
+      </div>`;
+      if (n === 0 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        const card = box.firstElementChild, cols = ['#F0A987', '#F5D547', '#AFA9EC', '#F5C4B3'];
+        for (let i = 0; i < 14; i++) {
+          const c = document.createElement('i'); c.className = 'wlh-conf';
+          c.style.cssText = `left:${Math.random() * 100}%;top:0;background:${cols[i % 4]};animation-duration:${4 + Math.random() * 4}s;animation-delay:${-Math.random() * 8}s`;
+          card.appendChild(c);
+        }
+      }
+      box.hidden = false;
+    }).catch(() => {});
+  });
+</script>
+</div>
 <section data-ppb="home.3" class="home-games" aria-labelledby="hg-title">
   <h2 id="hg-title">Games</h2>
   <div class="am-tiles gm-tiles">
