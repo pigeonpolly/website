@@ -272,14 +272,26 @@
     bell.querySelector('.bell-n').textContent = n ? String(n) : '';
     bell.querySelector('.bell-n').hidden = !n;
   }
-  // колонка «Мои новости» на главной ([data-my-news]): те же карточки строками, кнопка открывает ленту — действия там
+  // колонка «Мои новости» на главной ([data-my-news]): новые — с кнопкой (открывает ленту, действия там), ниже — уже открытые, бледные с «✓ открыто».
+  // Открытые помнит браузер (localStorage pp-news-log-<id>, последние 12): новость пропала из очереди — значит открыта.
   function inline() {
-    document.querySelectorAll('[data-my-news]').forEach(el => {
-      const items = known();
-      el.innerHTML = `<h2 class="fn-h">🔔 ${t('title')}</h2>` + (items.length ? `<ul class="fn-list">${items.map(x => {
+    const els = document.querySelectorAll('[data-my-news]');
+    if (!els.length || !me) return;
+    const key = 'pp-news-log-' + me.id, now = Date.now(), items = known();
+    let log = []; try { log = JSON.parse(localStorage.getItem(key) || '[]'); } catch (e) {}
+    const cur = items.map(x => ({ id: x.kind + '|' + JSON.stringify(x), x }));
+    for (const c of cur) if (!log.some(l => l.id === c.id)) { const k = KINDS[c.x.kind]; log.unshift({ id: c.id, icon: k.icon, title: k.title(c.x), text: k.text(c.x), go: k.go ? k.go(c.x) : '' }); }
+    for (const l of log) if (!l.at && !cur.some(c => c.id === l.id)) l.at = now;
+    log = log.filter(l => !l.at || now - l.at < 30 * 864e5).slice(0, 12 + cur.length);
+    try { localStorage.setItem(key, JSON.stringify(log)); } catch (e) {}
+    const done = log.filter(l => l.at).sort((p, q) => q.at - p.at).slice(0, 12);
+    const when = ms => new Date(ms).toLocaleDateString(['en-GB', 'ru-RU', 'lv-LV'][L], { day: 'numeric', month: 'short' });
+    const opened = ['opened', 'открыто', 'atvērts'][L];
+    els.forEach(el => {
+      el.innerHTML = `<h2 class="fn-h">🔔 ${t('title')}</h2>` + (items.length ? '' : `<p class="fn-msg">${t('empty')}</p>`) + (items.length || done.length ? `<ul class="fn-list">${items.map(x => {
         const k = KINDS[x.kind];
         return `<li class="fn-row nw-mini"><span class="fn-ava" aria-hidden="true">${k.icon}</span><p class="fn-txt"><b>${esc(k.title(x))}</b> ${esc(k.text(x))}</p><button type="button" class="fn-btn">${k.act[L]}</button></li>`;
-      }).join('')}</ul>` : `<p class="fn-msg">${t('empty')}</p>`);
+      }).join('')}${done.map(l => `<li class="fn-row nw-mini nw-done"><span class="fn-ava" aria-hidden="true">${l.icon}</span><p class="fn-txt"><b>${esc(l.title)}</b> ${esc(l.text)}<time>✓ ${opened} · ${when(l.at)}</time></p>${l.go ? `<a class="nw-again" href="${esc(l.go)}">→</a>` : ''}</li>`).join('')}</ul>` : '');
       el.querySelectorAll('.fn-btn').forEach(b => { b.onclick = () => feed(); });
     });
   }

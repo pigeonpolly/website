@@ -4655,6 +4655,10 @@ html.me-in .home-dash #blk-wl-holiday .wlh-cnt { justify-self: end; }
 .home-dash .fn-txt { font-size: 14px; }
 .nw-mini .fn-ava { display: grid; place-items: center; width: 36px; height: 36px; border-radius: 50%; background: rgba(233, 169, 59, .16); font-size: 20px; }
 .nw-mini .fn-btn { border: 0; cursor: pointer; }
+.nw-done { opacity: .55; background: transparent; border-style: dashed; }
+.nw-done .fn-ava { filter: grayscale(1); }
+.nw-done time { color: #4CC38A; opacity: 1; }
+.nw-again { color: var(--peach); font-weight: 700; text-decoration: none; padding: 0 6px; }
 @media (max-width: 1000px) { html.me-in .home-dash { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } html.me-in .hd-side { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; } }
 @media (max-width: 760px) { .home-dash, html.me-in .home-dash, html.me-in .hd-side { grid-template-columns: 1fr; } .hd-rooms { order: 2; } }
 .acct-nick.hatching form > :not(canvas) { opacity: 0; pointer-events: none; }
