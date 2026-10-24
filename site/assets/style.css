@@ -4638,7 +4638,7 @@ html.me-in .myday { display: block; }
 .hg-all { margin: 14px var(--gutter) 0; text-align: right; }
 .hg-all a { color: var(--peach); font-weight: 700; text-decoration: none; }
 /* главная под играми (24.10.2026): вошедшему — «Мой день» · мои новости · праздник + новое на сайте; гостю — новое в комнатах · праздник */
-.home-dash { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 22px; align-items: start; margin: 0 auto; padding: 26px var(--gutter) 10px; }
+.home-dash { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 22px; align-items: start; margin: 0 auto; padding: 26px var(--gutter) 56px; }
 html.me-in .home-dash { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr); }
 .hd-col { min-width: 0; }
 .hd-news, .hd-upd, html.me-in .hd-rooms { display: none; }
