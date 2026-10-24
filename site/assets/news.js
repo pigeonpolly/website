@@ -88,6 +88,17 @@
       act: ['Look', 'Посмотреть', 'Apskatīt'],
       go: () => pre + '/bird/#feathers',
     },
+    seeds: { // семечко из игры, редкое (серия карточки дня) или волшебное (серия полива) — worker/garden.js gardenNews; гаснет в огороде
+      icon: '🌱',
+      title: x => x.tier === 'magic' ? ['A magic seed!', 'Волшебное семечко!', 'Burvju sēkla!'][L] : x.tier === 'rare' ? ['A rare seed!', 'Редкое семечко!', 'Reta sēkla!'][L]
+        : x.n > 1 ? [`${x.n} new seeds`, `Новых семян: ${x.n}`, `Jaunas sēklas: ${x.n}`][L] : ['A seed for your garden', 'Семечко для огорода', 'Sēkla tavam dārzam'][L],
+      text: x => ({ game: ['Found in the Button Rain.', 'Нашлось в Пуговичном дожде.', 'Atrasta Pogu lietū.'], potion: ['Found in the potion shop.', 'Нашлось в Зельеварне.', 'Atrasta dziru darbnīcā.'],
+        pan: ['Found in Polly’s Pancakes.', 'Нашлось в Блинной Полли.', 'Atrasta Pollijas pankūkās.'], titos: ['Found at Titos’ office.', 'Нашлось у Титоса.', 'Atrasta pie Tito.'], bugs: ['Found while catching bugs for Titos.', 'Нашлось, пока ловились жуки для Титоса.', 'Atrasta, ķerot vaboles Tito.'],
+        shift: ['Found during the shift with Polly.', 'Нашлось на смене с Полли.', 'Atrasta maiņā ar Polliju.'], rare: ['For a whole week of stamps on the card of the day.', 'За неделю штампов в карточке дня.', 'Par veselu nedēļu zīmogu dienas kartītē.'],
+        magic: ['For watering the garden every day for a week.', 'За неделю полива каждый день.', 'Par dārza laistīšanu katru dienu nedēļas garumā.'] }[x.src] || ['It is waiting in your garden.', 'Оно ждёт в огороде.', 'Tā gaida dārzā.'])[L],
+      act: ['Plant it', 'Посадить', 'Iestādīt'],
+      go: () => pre + '/garden/',
+    },
     boxes: { // письмо о коробках и бардаке — старым птичкам и новым после выбора коробки (worker: users.box_mail)
       icon: '📦',
       title: () => ['A letter for you!', 'Тебе письмо!', 'Tev vēstule!'][L],

@@ -10,7 +10,7 @@
 (function (g) {
   var LEGEND = ['furn|countcoffin', 'furn|crypt', 'furn|tieredcake', 'furn|pancaketower', 'furn|magicpan', 'hat|pancakecrown', 'item|goldspatula', 'hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora',
     'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass',
-    'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight'];
+    'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight', 'garden|goldcan', 'garden|orangery'];
   var TITOS = ['furn|chalkrug', 'furn|titospot', 'deco|clueboard', 'deco|titosbadge'];
   var BOXES = ['cardbox', 'crate', 'hatbox', 'trunkbox', 'giftbox']; // коробки в комнате (furn), этап 11 Г
   var base = function (item) { return String(item).split(':')[0]; };

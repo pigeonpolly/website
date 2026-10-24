@@ -6,7 +6,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 
 Обозначения: PK — первичный ключ, nn — NOT NULL, =x — DEFAULT x; «+» — столбцы, добавленные ALTER TABLE.
 
-- **garden** (worker/garden.js): `user_id` int PK, `beds` text ='[]' (JSON грядок {p, t, g, w} | null), `seeds` text ='{}', `crop` text ='{}' (урожай в корзинке), `bug_day` text ='', `bug_got` text ='[]' (пойманные сегодня жуки), `harvests` int =0, `bugs` int =0, `created_at` int
+- **garden** (worker/garden.js): `user_id` int PK, `beds` text ='[]' (JSON грядок {p, t, g, w} | null), `seeds` text ='{}', `crop` text ='{}' (урожай в корзинке), `bug_day` text ='', `bug_got` text ='[]' (пойманные сегодня жуки), `harvests` int =0, `bugs` int =0, `created_at` int; этап 23 (GARDEN_ALTER): `found` text ='[]' (найденные семена для новости), `drop_day` text, `drop_n` int (семена из игр за сутки), `rare_day` / `magic_day` text (день прошлой награды), `water_days` text ='[]' (дни полива, 40), `hide` text ='[]' (спрятанные вещи огорода). В `button_log` — штамп `stamp` ref `день:five` (карточка дня набрала бонус)
 - **login_fail** (worker/auth.js): `k` text PK, `n` int nn, `at` int nn
 - **pw_reset** (worker/auth.js): `hash` text PK, `user_id` int nn, `expires` int nn, `created_at` int
 - **funnel** (worker/auth.js): `day` text nn, `name` text nn, `step` text nn, `vid` text nn; PRIMARY KEY (day, name, step, vid)

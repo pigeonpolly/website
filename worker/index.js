@@ -14,7 +14,7 @@ import { flockNewsApi, flockEvent as flockEventDb, roomEvent, flockNewsCron, FLO
 import { topApi, topScore, topCron, TOP_TABLES } from './top.js'; // доски топа игр (docs/games.md)
 import { shiftApi, SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_RANGE, SHIFT_INT } from './shift.js'; // «Смена с Полли» (этап 29, docs/rooms.md)
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
-import { gardenApi, GARDEN_TABLES, GARDEN_RULES, GARDEN_RANGE, GARDEN_INT, GARDEN_BOOL, GARDEN_SEASONS } from './garden.js'; // огород птички (этап 22, docs/bird.md «Огород»)
+import { gardenApi, gardenDrop, gardenNews, GARDEN_TABLES, GARDEN_ALTER, GARDEN_RULES, GARDEN_RANGE, GARDEN_INT, GARDEN_BOOL, GARDEN_SEASONS } from './garden.js'; // огород птички (этап 22, docs/bird.md «Огород»)
 import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
@@ -57,6 +57,8 @@ export default {
       await autoPrice(env).catch(e => console.error('price', e)); // раз в сутки: уровень цен под заработки птичек
       await autoRestock(env).catch(e => console.error('restock', e)); // раз в сутки (по Риге) пополнить магазин
       await seedLegends(env, 'pan_leg_v1', ['furn|pancaketower', 'furn|magicpan', 'hat|pancakecrown', 'item|goldspatula']).catch(e => console.error('legends', e)); // ★ блинной темы — разово в продажу
+      await seedLegends(env, 'garden_leg_v1', ['garden|goldcan', 'garden|orangery']).catch(e => console.error('legends', e)); // ★ вещи для огорода (этап 23)
+      await seedLegends(env, 'garden_items_v1', ['garden|?', ...['wcan', 'scarecrow', 'greenhouse', 'barrow', 'gnome', 'birdbath', 'beehive', 'lamp', 'sign', 'bench', 'pinwheel', 'flamingo', 'pond'].map(v => 'garden|' + v)], STOCK.norm).catch(e => console.error('garden items', e)); // вещи для огорода — сразу в продажу, не ждать пополнения
       await reqBackfill(env).catch(e => console.error('req tr', e)); // «Нарисуй мне»: переводы тем на все языки сайта
       await importCards(env, new URL('https://www.pigeonpolly.com/')).catch(e => console.error('cards', e)); // новые коллекции карточек из репозитория (один раз)
       await translateMissing(env, 5).catch(e => console.error('cards tr', e)); // карточки без перевода (Gemini не успел при импорте) — по 5 в час
@@ -314,6 +316,7 @@ const NEWS_KINDS = [
   ['trade', (env, req, u) => tradeNews(env, u.id, RULES.tradeDays)], // новые предложения обмена карточками (worker/cards.js)
   ['reward', (env, req, u) => rewardNews(env, u.id)], // награда Титоса за уровень (worker/titos.js) — «Поставить» в ленте
   ['feathers', (env, req, u) => featherNews(env, u, rigaDay())], // пёрышки комнате — сводка раз в сутки (worker/flock.js)
+  ['seeds', (env, req, u) => gardenNews(env, u.id)], // семечко из игры, редкое или волшебное — пока птичка не зашла в огород (worker/garden.js)
   ['boxes', (env, req, u) => u.box_mail ? { n: 1, box: u.box0 || 'cardbox' } : null], // письмо о коробках и бардаке (старым птичкам и новым после выбора коробки)
 ];
 async function newsOf(env, req, u) {
@@ -351,8 +354,8 @@ async function extraQueue(env, req) {
 }
 
 // ---------- аватар: что надето из подарков (фон, обувь, головной убор, анимация, рамка) ----------
-const GIFT_KINDS = ['bg', 'shoes', 'hat', 'anim', 'frame', 'item', 'scarf', 'wall', 'floor', 'view', 'curtain', 'furn', 'deco', 'any']; // any — «🎲 Сюрприз»: any|legend, any|? (в сумку попадает уже настоящая вещь)
-const ROOM_KINDS = ['wall', 'floor', 'view', 'curtain', 'furn', 'deco']; // вещи для комнаты (room.js), не надеваются
+const GIFT_KINDS = ['bg', 'shoes', 'hat', 'anim', 'frame', 'item', 'scarf', 'wall', 'floor', 'view', 'curtain', 'furn', 'deco', 'garden', 'any']; // any — «🎲 Сюрприз»: any|legend, any|? (в сумку попадает уже настоящая вещь)
+const ROOM_KINDS = ['wall', 'floor', 'view', 'curtain', 'furn', 'deco', 'garden']; // вещи для комнаты (room.js) и огорода (garden-items.js), не надеваются
 const avatarOf = u => { try { const a = JSON.parse(u && u.avatar || '{}'); return a && typeof a === 'object' ? a : {}; } catch (e) { return {}; } };
 const okItem = (kind, item) => GIFT_KINDS.includes(kind) && (kind === 'any' ? ['?', 'legend'].includes(item) : item === '?' || /^[#a-z0-9:-]{1,24}$/i.test(String(item || ''))); // '?' — «🎲 Сюрприз» этой категории
 
@@ -446,7 +449,7 @@ async function ensureSchema(env) {
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_days INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_last TEXT', 'ALTER TABLE users ADD COLUMN cats_alive INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER,
-    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...SHIFT_ALTER, ...CHALLENGE_ALTER]) {
+    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...SHIFT_ALTER, ...CHALLENGE_ALTER, ...GARDEN_ALTER]) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   // «Выбор Полли» подешевел с 50 до 11 пуговок: уже начисленные записи пересчитать один раз, баланс = сумма журнала
@@ -714,11 +717,11 @@ async function autoRestock(env, force = false) {
   return { to, items: filled };
 }
 // новые легендарные (их autoRestock не пополняет) — один раз в продажу: обычный запас легендарных, цена из каталога; метка в meta
-async function seedLegends(env, tag, keys) {
+async function seedLegends(env, tag, keys, n) { // n — сколько штук (обычные новые вещи — STOCK.norm), по умолчанию запас легендарных
   if (await getMeta(env, tag)) return;
   const cp = (await catalog(env, new Request('https://pigeonpolly.com/'))).prices || {};
   const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock, added_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET stock = CASE WHEN shop.stock <= 0 THEN excluded.stock ELSE shop.stock END, added_at = excluded.added_at');
-  await env.DB.batch(keys.map(k => { const [a, b] = k.split('|'); return st.bind(a, b, cp[k] || 600, STOCK.normLeg, now()); }));
+  await env.DB.batch(keys.map(k => { const [a, b] = k.split('|'); return st.bind(a, b, cp[k] || (n ? 30 : 600), n || STOCK.normLeg, now()); }));
   await setMeta(env, tag, String(now()));
 }
 async function ensurePrices(env, req) {
@@ -735,8 +738,10 @@ async function award(env, uid, kind, ref, amount) {
   const r = await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(uid, kind, String(ref), amount, rigaDay(), now()).run();
   if (!r.meta.changes) return 0;
   await env.DB.prepare('UPDATE users SET buttons = COALESCE(buttons, 0) + ? WHERE id = ?').bind(amount, uid).run();
+  if (amount > 0 && SEED_GAMES.includes(kind)) await gardenDrop(env, uid, kind, RULES, rigaDay()).catch(e => console.error('seed', e)); // иногда — семечко для огорода (этап 23)
   return amount;
 }
+const SEED_GAMES = ['game', 'potion', 'pan', 'titos', 'shift']; // награды игр, за которые может выпасть семечко (и жуки Титоса — в stamp)
 // комментарий: пуговки только за первые три в сутки
 async function awardComment(env, uid, commentId) {
   const n = (await env.DB.prepare("SELECT COUNT(*) AS n FROM button_log WHERE user_id = ? AND kind = 'comment' AND day = ?").bind(uid, rigaDay()).first()).n;
@@ -795,8 +800,10 @@ const TASKS = [
   { id: 'advent', n: ['Advent window', 'Окошко адвента', 'Adventes lodziņš'], url: '/advent/', on: (t) => t.month === 12 },
 ];
 // штамп за то, что не платит пуговками («Жуки», дело Титоса): одна запись на (птичка, день, задание)
+// five — день, когда штампов хватило на бонус дня (для редкого семечка огорода)
 async function stamp(env, uid, task) {
-  await env.DB.prepare("INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, 'stamp', ?, 0, ?, ?)").bind(uid, rigaDay() + ':' + task, rigaDay(), now()).run();
+  const r = await env.DB.prepare("INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, 'stamp', ?, 0, ?, ?)").bind(uid, rigaDay() + ':' + task, rigaDay(), now()).run();
+  if (r.meta.changes && task === 'bugs') await gardenDrop(env, uid, 'bugs', RULES, rigaDay()).catch(e => console.error('seed', e));
 }
 async function dayCard(env, req, u, L, withLog) {
   const day = rigaDay(), t = adventNow(req, env), gp = gamePrices(await gameUnit(env)), unit = await gameUnit(env);
@@ -827,6 +834,7 @@ async function dayCard(env, req, u, L, withLog) {
   const done = tasks.filter(x => x.done).length, need = Math.min(RULES.dayBonusNeed, tasks.length), amount = btnOf(RULES.dayBonusPct, unit);
   // бонус: раз в сутки, когда штампов набралось dayBonusNeed (ref = день — второй раз не начислится)
   let got = cnt('daybonus') > 0, just = 0;
+  if (done >= need && u.nick && !rows.some(r => r.kind === 'stamp' && r.ref === day + ':five')) await stamp(env, u.id, 'five');
   if (!got && done >= need && amount > 0 && u.nick && !u.banned) { just = await award(env, u.id, 'daybonus', day, amount); got = true; }
   const earned = rows.filter(r => r.amount > 0 && !['admin', 'salary', 'sell', 'welcome'].includes(r.kind)).reduce((a, r) => a + r.amount, 0) + just;
   // ближайший бейдж: следующий уровень серии (по рекорду), сколько дней текущей серии до него

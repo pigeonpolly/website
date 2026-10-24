@@ -1,9 +1,9 @@
 // Огород птички (этап 22, /garden/?nick=, docs/bird.md «Огород»): пиксельная сцена 192×120 (canvas ×4), грядки, птичка, жуки, погода по сезону.
 // Нажал грядку → панель под сценой: посадить (свои семена), полить (раз в сутки), собрать. Корзинка — продать урожай за пуговки; «🛒 Семена» — купить.
 // Всё считает сервер (worker/garden.js): GET /api/garden?nick=, POST /api/garden/{plant,water,harvest,sell,buy,bug}. Гость только смотрит.
+// Рисунки и названия растений — и для магазина (window.PPGardenPlants: icon, name — блок «🌱 Семена» в src/pages/shop.html); без #garden на странице — только это.
 (() => {
   const app = document.getElementById('garden');
-  if (!app) return;
   const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
   const pre = L === 1 ? '/ru' : L === 2 ? '/lv' : '';
   const T = {
@@ -52,6 +52,17 @@
     caught0: ['🐞 Caught!', '🐞 Пойман!', '🐞 Noķerta!'],
     sold: [n => `🧺 Sold! +${n} 🔘`, n => `🧺 Продано! +${n} 🔘`, n => `🧺 Pārdots! +${n} 🔘`],
     gotCrop: [n => `🧺 ${n} is in the basket`, n => `🧺 ${n} — в корзинке`, n => `🧺 ${n} — grozā`],
+    mandrake: ['🔮 Aaaah! The mandrake squeaked', '🔮 А-а-а! Мандрагора пискнула', '🔮 A-a-a! Mandragora iepīkstējās'],
+    found: [n => `🌱 New seeds: ${n}`, n => `🌱 Новые семена: ${n}`, n => `🌱 Jaunas sēklas: ${n}`],
+    specialHead: ['✨ Special seeds', '✨ Особые семена', '✨ Īpašās sēklas'],
+    rare: [(a, b) => `✨ Rare seed: ${a} of ${b} days in a row with the bonus of the card of the day`, (a, b) => `✨ Редкое семечко: ${a} из ${b} дней подряд с бонусом карточки дня`, (a, b) => `✨ Reta sēkla: ${a} no ${b} dienām pēc kārtas ar dienas kartītes bonusu`],
+    magic: [(a, b) => `🔮 Magic seed: ${a} of ${b} days in a row of watering`, (a, b) => `🔮 Волшебное семечко: ${a} из ${b} дней полива подряд`, (a, b) => `🔮 Burvju sēkla: ${a} no ${b} laistīšanas dienām pēc kārtas`],
+    gotSeed: [n => `🎁 Today: ${n}!`, n => `🎁 Сегодня: ${n}!`, n => `🎁 Šodien: ${n}!`],
+    specialNote: ['Simple seeds are sold in the stall and the shop and sometimes drop in games. Rare and magic ones are not sold.', 'Простые семена продаются в лавке и в магазине и иногда выпадают в играх. Редкие и волшебные не продаются.', 'Vienkāršās sēklas pārdod kioskā un veikalā, un tās dažreiz izkrīt spēlēs. Retās un burvju sēklas nepārdod.'],
+    itemsHead: ['🪴 Garden things', '🪴 Вещи огорода', '🪴 Dārza lietas'],
+    items0: ['Watering cans, a scarecrow, a greenhouse and more are in the shop — bought things stand in the garden by themselves.', 'Лейки, пугало, теплица и другое — в магазине; купленная вещь сама встанет в огороде.', 'Lejkannas, putnubiedēklis, siltumnīca un citas lietas ir veikalā — nopirktā lieta pati nostāsies dārzā.'],
+    itemsNote: ['Tap a thing to hide it or put it back.', 'Нажми на вещь — спрятать или вернуть.', 'Pieskaries lietai — paslēpt vai atgriezt.'],
+    itemsShop: ['🛒 Things for the garden', '🛒 Вещи для огорода', '🛒 Lietas dārzam'],
     how: ['Plant a seed, water it every day and it grows: plants grow only while the soil is damp. Harvest goes into the basket and sells for buttons 🔘.',
       'Посади семечко и поливай каждый день — растёт, только пока земля влажная. Урожай попадает в корзинку и продаётся за пуговки 🔘.',
       'Iestādi sēklu un laisti katru dienu — tā aug tikai, kamēr zeme ir mitra. Raža nonāk grozā un pārdodas par pogām 🔘.'],
@@ -69,7 +80,11 @@
   const CROP = {
     radish: ['Radish', 'Редиска', 'Redīss'], lettuce: ['Lettuce', 'Салат', 'Salāti'], carrot: ['Carrot', 'Морковь', 'Burkāns'], tulip: ['Tulip', 'Тюльпан', 'Tulpe'],
     strawberry: ['Strawberry', 'Клубника', 'Zemene'], sunflower: ['Sunflower', 'Подсолнух', 'Saulespuķe'], cabbage: ['Cabbage', 'Капуста', 'Kāposts'], pumpkin: ['Pumpkin', 'Тыква', 'Ķirbis'],
+    // этап 23: редкие (серия карточки дня) и волшебные (серия полива) — в лавке не продаются
+    rainbowcarrot: ['Rainbow carrot ✨', 'Радужная морковь ✨', 'Varavīksnes burkāns ✨'], bluerose: ['Blue rose ✨', 'Синяя роза ✨', 'Zilā roze ✨'], goldpumpkin: ['Golden pumpkin ✨', 'Золотая тыква ✨', 'Zelta ķirbis ✨'],
+    starberry: ['Starberry 🔮', 'Звёздная ягода 🔮', 'Zvaigžņoga 🔮'], moonflower: ['Moonflower 🔮', 'Лунный цветок 🔮', 'Mēnesszieds 🔮'], mandrake: ['Mandrake 🔮', 'Мандрагора 🔮', 'Mandragora 🔮'],
   };
+  const TALL = ['sunflower', 'moonflower'];
   const cname = k => CROP[k] ? CROP[k][L] : k;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
   const api = (path, body) => fetch('/api/garden' + path, body ? { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) } : { credentials: 'same-origin' })
@@ -79,6 +94,8 @@
   const fnv = s => { let h = 2166136261; for (let i = 0; i < s.length; i++) { h ^= s.charCodeAt(i); h = Math.imul(h, 16777619); } return h >>> 0; };
 
   // ---------- рисование ----------
+  let NIGHT_ON = false; // вечер (19–7): лунный цветок светится
+  const TIER_OF = { rainbowcarrot: 'rare', bluerose: 'rare', goldpumpkin: 'rare', starberry: 'magic', moonflower: 'magic', mandrake: 'magic' }; // то же в worker/garden.js TIER
   const W = 192, H = 120, K = 4;
   const R = (g, x, y, w, h, c) => { g.fillStyle = c; g.fillRect(x, y, w, h); };
   const SKY = { autumn: ['#F6C89A', '#F3B489', '#E9A07F'], winter: ['#CFE1F2', '#BCD3EA', '#AAC4E2'], spring: ['#BFE6F6', '#D4EEF6', '#E8F6F2'], summer: ['#7FC8F0', '#9CD6F4', '#BDE4F6'] };
@@ -157,10 +174,11 @@
     const sway = Math.sin(now / 900 + cx) > .6 ? .5 : 0;
     if (k < .25) { R(g, cx, by - 3, 1, 3, G2); R(g, cx - 2 + sway, by - 4, 2, 1, G3); R(g, cx + 1 + sway, by - 4, 2, 1, G3); return; } // росток
     if (k < 1) { // подрастает
-      const tall = p === 'sunflower' ? 12 : p === 'tulip' ? 8 : 5, h = Math.round(tall * (.5 + k / 2));
-      if (p === 'pumpkin' || p === 'cabbage' || p === 'lettuce' || p === 'strawberry') {
+      const tall = TALL.includes(p) ? 12 : p === 'tulip' || p === 'bluerose' ? 8 : 5, h = Math.round(tall * (.5 + k / 2));
+      if (['pumpkin', 'cabbage', 'lettuce', 'strawberry', 'goldpumpkin', 'starberry', 'mandrake'].includes(p)) {
         R(g, cx - 3, by - 3, 7, 2, G2); R(g, cx - 2 + sway, by - 5, 5, 2, G3); R(g, cx, by - 3, 1, 3, G1);
-        if (p === 'pumpkin' && k > .6) R(g, cx - 1, by - 2, 3, 2, '#9BC24A');
+        if ((p === 'pumpkin' || p === 'goldpumpkin') && k > .6) R(g, cx - 1, by - 2, 3, 2, p === 'goldpumpkin' ? '#D8C060' : '#9BC24A');
+        if (TIER_OF[p] === 'magic' && Math.floor(now / 300 + i) % 9 === 0) R(g, cx + 2, by - 6, 1, 1, '#E6D8FF'); // волшебное поблёскивает уже ростком
         return;
       }
       R(g, cx, by - h, 1, h, G1); R(g, cx - 2 + sway, by - h + 2, 2, 1, G2); R(g, cx + 1 + sway, by - h + 3, 2, 1, G2); R(g, cx - 1 + sway, by - h - 1, 3, 2, p === 'tulip' || p === 'sunflower' ? G2 : G3);
@@ -175,6 +193,12 @@
     else if (p === 'sunflower') { R(g, cx, by - 18, 1, 18, G1); R(g, cx - 3, by - 9, 3, 2, G2); R(g, cx + 1, by - 12, 3, 2, G2); const y = by - 24, x = cx - 3 + sway; R(g, x + 1, y, 5, 7, '#F7C531'); R(g, x, y + 1, 7, 5, '#F7C531'); R(g, x + 2, y + 2, 3, 3, '#7A4A1E'); R(g, x + 2, y + 2, 1, 1, '#9C6A34'); }
     else if (p === 'cabbage') { R(g, cx - 5, by - 3, 2, 3, '#6FAE5C'); R(g, cx + 4, by - 3, 2, 3, '#6FAE5C'); R(g, cx - 4, by - 6, 9, 6, '#9BD08A'); R(g, cx - 3, by - 7, 7, 1, '#9BD08A'); R(g, cx - 1, by - 5, 3, 2, '#C5E8B5'); R(g, cx, by - 6, 1, 5, '#7FBF6E'); }
     else if (p === 'pumpkin') { R(g, cx - 6, by - 3, 3, 2, G1); R(g, cx + 4, by - 2, 3, 2, G2); R(g, cx - 4, by - 5, 9, 5, '#E8771C'); R(g, cx - 3, by - 6, 7, 1, '#E8771C'); R(g, cx - 1, by - 5, 1, 5, '#C85E12'); R(g, cx + 2, by - 5, 1, 5, '#C85E12'); R(g, cx, by - 8, 1, 2, '#6B4A1E'); R(g, cx - 3, by - 4, 1, 2, '#F59A4A'); }
+    else if (p === 'rainbowcarrot') { R(g, cx - 2 + sway, by - 8, 1, 5, G2); R(g, cx + sway, by - 9, 1, 6, G3); R(g, cx + 2 + sway, by - 8, 1, 5, G2); R(g, cx - 2, by - 3, 5, 1, '#E8445A'); R(g, cx - 2, by - 2, 5, 1, '#F6C531'); R(g, cx - 1, by - 1, 3, 1, '#4CC38A'); R(g, cx - 1, by - 4, 3, 1, '#B57BE0'); }
+    else if (p === 'bluerose') { R(g, cx, by - 11, 1, 11, G1); R(g, cx - 2, by - 6, 2, 1, G2); R(g, cx + 1, by - 8, 2, 1, G2); R(g, cx - 2 + sway, by - 15, 5, 4, '#4A7BD8'); R(g, cx - 1 + sway, by - 16, 3, 1, '#4A7BD8'); R(g, cx - 1 + sway, by - 14, 3, 2, '#7FB3E8'); R(g, cx + sway, by - 14, 1, 1, '#2E4FA0'); }
+    else if (p === 'goldpumpkin') { R(g, cx - 6, by - 3, 3, 2, G1); R(g, cx + 4, by - 2, 3, 2, G2); R(g, cx - 4, by - 5, 9, 5, '#E9C46A'); R(g, cx - 3, by - 6, 7, 1, '#E9C46A'); R(g, cx - 1, by - 5, 1, 5, '#C9A040'); R(g, cx + 2, by - 5, 1, 5, '#C9A040'); R(g, cx, by - 8, 1, 2, '#6B4A1E'); R(g, cx - 3, by - 4, 1, 2, '#FFF2B0'); if (Math.floor(now / 250 + i) % 5 === 0) R(g, cx + 3, by - 6, 1, 1, '#FFFFFF'); }
+    else if (p === 'starberry') { R(g, cx - 4, by - 5, 9, 4, '#3F6F5A'); R(g, cx - 3, by - 6, 7, 1, '#4F8A6A'); for (const [x, y, j] of [[-3, -4, 0], [2, -5, 1], [0, -2, 2]]) { const on = Math.floor(now / 350 + i + j) % 3; R(g, cx + x, by + y, 1, 1, '#F7D774'); R(g, cx + x - 1, by + y, 3, 1, on ? '#F7D774' : '#FFF2B0'); R(g, cx + x, by + y - 1, 1, 3, on ? '#F7D774' : '#FFF2B0'); } }
+    else if (p === 'moonflower') { if (NIGHT_ON) { g.globalAlpha = .25; R(g, cx - 4, by - 22, 9, 8, '#E6F0FF'); g.globalAlpha = 1; } R(g, cx, by - 16, 1, 16, G1); R(g, cx - 3, by - 8, 3, 2, G2); R(g, cx + 1, by - 11, 3, 2, G2); const y = by - 21, x = cx - 3 + sway; R(g, x + 1, y, 5, 5, '#EAF2FF'); R(g, x, y + 1, 7, 3, '#EAF2FF'); R(g, x + 2, y + 1, 3, 3, '#B9CCF4'); R(g, x + 3, y + 2, 1, 1, '#F7F1D0'); }
+    else if (p === 'mandrake') { R(g, cx - 3 + sway, by - 9, 2, 4, G2); R(g, cx - 1 + sway, by - 10, 2, 5, G3); R(g, cx + 2 + sway, by - 9, 2, 4, G2); R(g, cx - 3, by - 5, 7, 4, '#C9A27A'); R(g, cx - 2, by - 6, 5, 1, '#C9A27A'); const bl = Math.floor(now / 1800 + i) % 6 === 0; R(g, cx - 2, by - 4, 1, bl ? .5 : 1, '#2B1A51'); R(g, cx + 2, by - 4, 1, bl ? .5 : 1, '#2B1A51'); R(g, cx, by - 2, 1, 1, '#7A4A3A'); }
     if (Math.floor(now / 400 + i) % 7 === 0) R(g, cx + 3, by - 10, 1, 1, '#FFFFFF'); // блик «готово»
   }
   function drawBug(g, x, y, now, i) {
@@ -188,7 +212,7 @@
   function icon(p) {
     if (icons[p]) return icons[p];
     const c = document.createElement('canvas'), k = 3; c.width = 16 * k; c.height = 18 * k;
-    const g = c.getContext('2d'); g.setTransform(k, 0, 0, k, 0, 0); drawPlant(g, p, 1, 8, p === 'sunflower' ? 17 : 15, 1, 0, true);
+    const g = c.getContext('2d'); g.setTransform(k, 0, 0, k, 0, 0); drawPlant(g, p, 1, 8, TALL.includes(p) ? 17 : 15, 1, 0, true);
     return (icons[p] = c.toDataURL());
   }
   const pic = p => `<img class="gd-ic" src="${icon(p)}" alt="" width="24" height="27">`;
@@ -209,6 +233,7 @@
   async function load() {
     try { D = await api(nick ? '?nick=' + encodeURIComponent(nick) : ''); } catch (e) { D = null; }
     render();
+    if (D && D.found && D.found.length) { const m = t('found', D.found.map(x => cname(x.p)).join(', ')); float(m); toast(m); if (window.PPNews && window.PPNews.refresh) window.PPNews.refresh(); } // семена из игр и за серии — новость «🌱» гаснет
   }
   let scene = null;
   function render() {
@@ -229,7 +254,7 @@
     const cv = app.querySelector('.gd-cv'), g = cv.getContext('2d');
     g.imageSmoothingEnabled = false;
     const season = D.season || 'autumn', wx = weatherOf(season, D.today || ''), hr = +new Date().toLocaleTimeString('en-GB', { timeZone: 'Europe/Riga', hour: '2-digit', hour12: false });
-    const night = hr >= 19 || hr < 7;
+    const night = hr >= 19 || hr < 7; NIGHT_ON = night;
     app.querySelector('.gd-wx').textContent = T.seasons[season][L] + ' · ' + T.weather[wx][L];
     const bg = bgLayer(season, night, wx), parts = particles(season, wx);
     let FR = null;
@@ -246,6 +271,8 @@
       if (now - last < 33) return; last = now;
       g.setTransform(K, 0, 0, K, 0, 0); g.imageSmoothingEnabled = false;
       g.drawImage(bg, 0, 0, W, H);
+      const GI = window.PPGardenItems; // вещи для огорода: вдоль забора и под домиком (garden-items.js)
+      if (GI) for (const it of GI.layout(shown())) GI.draw(g, it.v, it.x, it.y, now, { night });
       const rs = bedRects(D.beds.length);
       // птичка: гуляет по дорожкам между грядками, иногда клюёт
       if (bird.wait > 0) { bird.wait--; bird.frame = bird.peck > 0 && Math.floor(now / 200) % 2 ? 2 : 0; if (bird.peck > 0) bird.peck--; }
@@ -299,6 +326,7 @@
     });
     cv.addEventListener('pointermove', e => { const p = at(e); cv.style.cursor = (p.x >= 18 && p.x <= 29 && p.y >= 34 && p.y <= 55) || (D.mine && (hitBug(p.x, p.y) || bedRects(D.beds.length).some(r => p.x >= r.x - 3 && p.x <= r.x + r.w + 3 && p.y >= r.y - 18 && p.y <= r.y + r.h + 3))) ? 'pointer' : ''; });
   }
+  const shown = () => (D.items || []).filter(v => !(D.hide || []).includes(v)); // вещи огорода, которые стоят на сцене
   function float(msg) { const f = app.querySelector('.gd-float'); if (!f) return; f.textContent = msg; f.classList.remove('on'); void f.offsetWidth; f.classList.add('on'); }
   function setButtons(n) { if (n != null && window.PPAccount && window.PPAccount.setButtons) window.PPAccount.setButtons(n); }
   async function act(path, body, ok) {
@@ -340,27 +368,38 @@
     const seeds = Object.keys(CROP).filter(k => D.seeds[k] > 0);
     h += `<section class="gd-box"><h3>${t('seeds')}</h3>${seeds.length ? `<div class="gd-chips">${seeds.map(k => `<span class="gd-chip gd-chip-s">${pic(k)}<span>${esc(cname(k))}</span><b>×${D.seeds[k]}</b></span>`).join('')}</div>` : `<p class="gd-note">${t('seeds0')}</p>`}
       <button type="button" class="pill-btn gd-shop-btn">${t('shop')}</button></section>`;
+    // особые семена: серии до редкого и волшебного
+    const wk = D.week || {}, line = (k, w) => w ? `<li>${t(k, w.n, w.need)}${w.got ? ' ' + t('gotSeed', esc(cname(w.got))) : ''}<span class="gd-bar-p"><i style="width:${Math.round(100 * w.n / Math.max(1, w.need))}%"></i></span></li>` : '';
+    h += `<section class="gd-box"><h3>${t('specialHead')}</h3><ul class="gd-week">${line('rare', wk.rare)}${line('magic', wk.magic)}</ul><p class="gd-note">${t('specialNote')}</p></section>`;
+    // вещи огорода: спрятать / вернуть
+    const GI = window.PPGardenItems, its = (D.items || []).filter(v => GI && GI.ITEMS[v]);
+    h += `<section class="gd-box"><h3>${t('itemsHead')}</h3>${its.length ? `<div class="gd-chips gd-things">${its.map(v => `<button type="button" class="gd-chip${(D.hide || []).includes(v) ? ' off' : ''}" data-thing="${esc(v)}" aria-pressed="${!(D.hide || []).includes(v)}"><span class="gd-thing-ic" data-ic="${esc(v)}"></span><span>${esc(GI.name(v, L))}</span></button>`).join('')}</div><p class="gd-note">${t('itemsNote')}</p>` : `<p class="gd-note">${t('items0')}</p>`}
+      <a class="pill-btn" href="${pre}/shop/#room:garden">${t('itemsShop')}</a></section>`;
     h += `<p class="gd-note gd-how">${t('how')}</p>`;
     box.innerHTML = h;
     const on = (sel2, f) => box.querySelectorAll(sel2).forEach(b => { b.onclick = () => f(b); });
     on('.gd-water-all', () => act('water', { all: true }, r => float('💧 ×' + r.watered)));
     on('[data-water]', () => act('water', { bed: sel }, () => float('💧')));
-    on('[data-harvest]', () => { const p = D.beds[sel] && D.beds[sel].p; act('harvest', { bed: sel }, () => { const m = t('gotCrop', cname(p)); float(m); toast(m); }); });
+    on('[data-harvest]', () => { const p = D.beds[sel] && D.beds[sel].p; act('harvest', { bed: sel }, () => { const m = p === 'mandrake' ? t('mandrake') : t('gotCrop', cname(p)); float(m); toast(m); }); });
     on('[data-plant]', b => act('plant', { bed: sel, seed: b.dataset.plant }, () => float('🌱')));
     on('[data-sell]', b => act('sell', { crop: b.dataset.sell }, r => { const m = t('sold', r.got || 0); float(m); toast(m); }));
     on('.gd-shop-btn', shop);
+    box.querySelectorAll('[data-ic]').forEach(e => e.appendChild(GI.icon(e.dataset.ic, 28)));
+    on('[data-thing]', b => act('hide', { item: b.dataset.thing, on: !(D.hide || []).includes(b.dataset.thing) }));
   }
   function shop() {
     const P = D.prices || {}, dlg = document.createElement('dialog');
     dlg.className = 'gd-dlg';
     const draw = () => {
-      dlg.innerHTML = `<h3>${t('shopHead')}</h3><p class="gd-note">${t('shopNote')}</p><div class="gd-list">${Object.keys(CROP).filter(k => P[k]).map(k => `<div class="gd-item">${pic(k)}<span>${esc(cname(k))}<small> · ${t('days', P[k].days)} · → ${P[k].sell} 🔘${D.seeds[k] ? ` · ×${D.seeds[k]}` : ''}</small></span><button type="button" class="pill-btn" data-buy="${k}"${P[k].seed > (D.buttons || 0) ? ' disabled' : ''}>${P[k].seed ? t('buy', P[k].seed) : t('buyFree')}</button></div>`).join('')}</div>
+      dlg.innerHTML = `<h3>${t('shopHead')}</h3><p class="gd-note">${t('shopNote')}</p><div class="gd-list">${Object.keys(CROP).filter(k => P[k] && P[k].seed != null).map(k => `<div class="gd-item">${pic(k)}<span>${esc(cname(k))}<small> · ${t('days', P[k].days)} · → ${P[k].sell} 🔘${D.seeds[k] ? ` · ×${D.seeds[k]}` : ''}</small></span><button type="button" class="pill-btn" data-buy="${k}"${P[k].seed > (D.buttons || 0) ? ' disabled' : ''}>${P[k].seed ? t('buy', P[k].seed) : t('buyFree')}</button></div>`).join('')}</div>
         <p class="gd-note">🔘 ${D.buttons || 0}</p><button type="button" class="pill-btn gd-close">${t('close')}</button>`;
       dlg.querySelector('.gd-close').onclick = () => dlg.close();
       dlg.querySelectorAll('[data-buy]').forEach(b => { b.onclick = () => act('buy', { seed: b.dataset.buy }, () => float('🌱 +1')).then(draw); });
     };
     draw(); document.body.appendChild(dlg); dlg.addEventListener('close', () => dlg.remove()); dlg.showModal();
   }
+  window.PPGardenPlants = { icon, name: cname, CROP };
+  if (!app) return;
   load();
   setInterval(() => { if (!document.hidden && !busy && D && D.owner) api(nick ? '?nick=' + encodeURIComponent(nick) : '').then(d => { D = d; panel(); }).catch(() => {}); }, 60000); // жуки вылезают, таймеры тикают
 })();
