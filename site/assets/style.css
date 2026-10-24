@@ -5101,6 +5101,8 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .ps-paper { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; font-size: 14px; }
 .ps-paper label { display: inline-flex; gap: 5px; align-items: center; cursor: pointer; }
 .ps-paper input { width: 18px; height: 18px; accent-color: #D85A30; }
+.ps-paper.ok input { accent-color: #2E7D5B; }
+.ps-paper.ok label:has(input:checked) { color: #2E7D5B; font-weight: 700; }
 .ps-hand { display: grid; gap: 8px; margin-top: 10px; cursor: default; }
 .ps-file { justify-self: start; background: #D85A30; }
 .ps-prev { max-width: 160px; border-radius: 8px; box-shadow: 0 0 0 2px #E3D3AE; }

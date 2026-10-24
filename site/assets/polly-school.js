@@ -133,15 +133,15 @@
       if (a == null) return `<div class="ps-quiz">${s.quiz.opts.map(([q], k) => `<button type="button" data-q="${k}">${tr(q)}</button>`).join('')}</div>`;
       return `<p class="ps-ans${s.quiz.opts[a][1] ? ' ok' : ''}">${tr(s.quiz.opts[a][0])} — ${tr(s.quiz.opts[a][1] ? s.quiz.yes : s.quiz.no)}</p>`;
     }
-    if (s.find) { const got = p.find[i] || []; return `<p class="ps-ans">${t('found')}: ${got.length} / ${s.find.parts.length}${got.length ? ' · ' + got.map(k => tr(s.find.parts.find(x => x[0] === k)[2])).join(', ') : ''}</p>`; }
-    if (s.paper) return `<div class="ps-paper">${s.paper.opts.map((o, k) => `<label><input type="checkbox" data-p="${k}"${p.paper.includes(k) ? ' checked' : ''}> ${tr(o)}</label>`).join('')}</div>`;
+    if (s.find) { const got = p.find[i] || []; return `<p class="ps-ans${got.length >= s.find.parts.length ? ' ok' : ''}">${t('found')}: ${got.length} / ${s.find.parts.length}${got.length ? ' · ' + got.map(k => tr(s.find.parts.find(x => x[0] === k)[2])).join(', ') : ''}</p>`; }
+    if (s.paper) return `<div class="ps-paper${p.paper.length >= s.paper.min ? ' ok' : ''}">${s.paper.opts.map((o, k) => `<label><input type="checkbox" data-p="${k}"${p.paper.includes(k) ? ' checked' : ''}> ${tr(o)}</label>`).join('')}</div>`;
     if (s.client) {
       const pk = esc(pickedOf(n).join(', ') || '—');
       const task = `<div class="ps-task"><b>${t('task')}</b><ol>${s.client.task.map(x => `<li>${esc(tr(x)).replace('{picked}', `<b>${pk}</b>`)}</li>`).join('')}</ol></div>`;
       if (srv.me === null) return task;
       if (!srv.me) return task + `<div class="ps-hand"><button type="button" class="ps-file ps-login">${t('signin')}</button><p class="ps-states">${t('signNote')}</p></div>`;
       const w = srv.works[n];
-      if (w && w.status === 'ok') return `<p class="ps-ans">${t('ok')}</p>`;
+      if (w && w.status === 'ok') return `<p class="ps-ans ok">${t('ok')}</p>`;
       return `${task}${w && w.status === 'wait' ? verdict(n) : ''}<form class="ps-hand" onsubmit="return false"><label class="ps-file">${w && w.status === 'wait' ? t('swap') : t('upload')}<input type="file" accept="image/*" hidden></label><img class="ps-prev" alt="" hidden><textarea rows="2" placeholder="${esc(t('note'))}"></textarea><button type="button" class="ps-send">${w && w.status === 'redo' ? t('again2') : t('send')}</button><p class="ps-proto" role="status"></p></form>`;
     }
     if (s.end && n < N) return `<div class="ps-quiz"><button type="button" data-go="${n + 1}">${t('goNext')} ${n + 1} →</button></div>`;
