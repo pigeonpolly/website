@@ -14,6 +14,7 @@
     labeled: ['labeled', 'на карте подписан', 'kartē rakstīts'],
     prev: ['Previous town', 'Предыдущий город', 'Iepriekšējā pilsēta'], next: ['Next town', 'Следующий город', 'Nākamā pilsēta'],
     crest: ['Crest of', 'Герб:', 'Ģerbonis:'],
+    walk: ['🚶 Walk around town', '🚶 Прогуляться по городу', '🚶 Pastaigāties pa pilsētu'],
     view: ['detail from the Wobbleland map', 'фрагмент карты Wobbleland', 'Wobbleland kartes fragments'],
     // квиз
     qOf: [(i, n) => `Question ${i} of ${n}`, (i, n) => `Вопрос ${i} из ${n}`, (i, n) => `Jautājums ${i} no ${n}`],
@@ -128,7 +129,7 @@
   stage.addEventListener('click', e => {
     const pin = e.target.closest('.wl-pin');
     if (!pin || moved > 6) return;
-    openCity(pin.dataset.key);
+    if (window.PPWlTown) window.PPWlTown.open(pin.dataset.key); else openCity(pin.dataset.key); // прогулка по городу (wl-town.js)
   });
   addEventListener('resize', () => apply(false));
   apply(false);
@@ -145,6 +146,7 @@
       <figure class="wl-view wl-view-px" style="${viewPos(c)}"><span class="wl-view-dot"></span></figure>
       <div class="wl-title"><img class="wl-crest" src="${img('crest', c.key)}" alt="${t('crest')} ${esc(c.name)}"><div><p class="wl-entry">${t('entry')} ${c.no}</p><h2>${esc(c.name)}</h2></div></div>
       <p class="wl-motto">“${esc(c.motto)}”</p>
+      ${window.PPWlTown ? `<p class="wl-walk-p"><button type="button" class="wl-walk" data-walk="${c.key}">${t('walk')}</button></p>` : ''}
       <p class="wl-desc">${esc(c.desc)}</p>
       ${c.holidays.length ? `<h3>${t('holidays')}</h3>${c.holidays.map(h => `<div class="wl-hol"><span>${esc(h.date)}</span><div><b>${esc(h.title)}</b><p>${esc(h.desc)}</p></div></div>`).join('')}` : ''}
       ${c.dishes.length ? `<h3>${t('dishes')}</h3>${c.dishes.map(d => `<div class="wl-dish"><b>${esc(d.name)}</b><p>${esc(d.desc)}</p></div>`).join('')}` : ''}
@@ -153,6 +155,7 @@
       <p class="wl-nb">${esc(c.neighbors)}</p>
       <div class="wl-nav"><button type="button" data-go="${C[(i + C.length - 1) % C.length].key}">← ${esc(C[(i + C.length - 1) % C.length].name)}</button><button type="button" data-go="${C[(i + 1) % C.length].key}">${esc(C[(i + 1) % C.length].name)} →</button></div>`;
     body.querySelectorAll('[data-go]').forEach(b => b.onclick = () => openCity(b.dataset.go));
+    body.querySelectorAll('[data-walk]').forEach(b => b.onclick = () => { closePanel(); window.PPWlTown.open(b.dataset.walk); });
     panel.classList.add('open'); panel.setAttribute('aria-hidden', 'false'); scrim.classList.add('open');
     panel.scrollTop = 0;
     document.body.classList.add('modal-open');
@@ -177,6 +180,7 @@
     }
   });
   if (location.hash.startsWith('#town-')) openCity(location.hash.slice(6), true);
+  window.PPWl = { openCity, SAY: {} }; // для прогулки по городу (wl-town.js)
 
   // ---------- квиз «Из какого вы города?» ----------
   const Q = [
@@ -274,6 +278,7 @@
                 ['Привет от семьи Тыквиных! У нас чайник всегда горячий.', 'Заходите, заходите! Осторожно, ступенька скрипит.', 'Мы помахали вам из окна. Заметили?'],
                 ['Sveiciens no Ķirbju ģimenes! Mūsu tējkanna vienmēr ir karsta.', 'Nāc iekšā, nāc! Uzmanīgi, pakāpiens čīkst.', 'Mēs tev pamājām pa logu. Pamanīji?']],
     };
+    window.PPWl.SAY = SAY;
     let bub = null, bubT;
     const say = (el, k, name) => {
       if (bub) bub.remove();

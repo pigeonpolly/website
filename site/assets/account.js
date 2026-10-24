@@ -8,10 +8,9 @@
   const S = {
     signIn: ['Sign in', 'Войти', 'Ienākt'],
     why: ['One account for the Daily Challenge, blog comments and your own bird in the flock.', 'Один вход для челленджа, комментариев в блоге и своей птички в стае.', 'Viena ieeja izaicinājumam, bloga komentāriem un savam putniņam barā.'],
-    profile: ['My profile', 'Мой профиль', 'Mans profils'],
     getBird: ['Get a bird', 'Получить птичку', 'Saņem putniņu'],
     streak: [n => `🔥 ${n}-day streak`, n => `🔥 серия ${n} дн.`, n => `🔥 sērija ${n} d.`],
-    room: ['My room', 'Моя комната', 'Mana istaba'], bag: ['Bag', 'Сумка', 'Soma'], album: ['Album', 'Альбом', 'Albums'],
+    room: ['Bird’s room', 'Комната птички', 'Putniņa istaba'],
     shop: ['Shop', 'Магазин', 'Veikals'], env: ['Envelope', 'Конвертик', 'Aploksnīte'], edit: ['Edit page', 'Править страницу', 'Labot lapu'],
     nick: ['Choose a nickname', 'Выбрать ник', 'Izvēlēties segvārdu'],
     noNick: ['no nickname yet', 'ник ещё не выбран', 'segvārds vēl nav izvēlēts'],
@@ -219,7 +218,7 @@
         <div class="acct-pop" hidden role="menu">
           <p class="acct-name">${u.nick ? '@' + esc(u.nick) : `<i>${t('noNick')}</i>`}${u.admin ? ` <span class="acct-badge">★ ${t('admin')}</span>` : ''}</p>
           ${u.nick ? `<p class="acct-btns">${u.streak ? `<span>${t('streak')(u.streak)}</span>` : ''}<span title="${window.PPSew || ''}">🔘 <b>${u.buttons || 0}</b> ${t('btns')}</span></p>` : ''}
-          ${u.nick ? [['/bird/', '🐦', 'profile'], ['/bird/#room', '🏠', 'room'], ['/bird/#bag', '🎒', 'bag'], ['/bird/#album', '🃏', 'album'], ['/shop/', '🛍', 'shop']]
+          ${u.nick ? [['/bird/#room', '🏠', 'room'], ['/shop/', '🛍', 'shop']]
             .map(([h, i, k]) => `<a role="menuitem" href="${pre}${h}"><i aria-hidden="true">${i}</i>${t(k)}</a>`).join('') + `<button type="button" role="menuitem" data-env><i aria-hidden="true">✉️</i>${t('env')}</button>`
             : `<a role="menuitem" href="${pre}/challenge/">${t('nick')}</a>`}
           ${u.admin ? `<hr><a role="menuitem" href="/admin/"><i aria-hidden="true">⚙</i>${t('cabinet')}</a>${document.querySelector('[data-ppb]') ? `<button type="button" role="menuitem" data-edit><i aria-hidden="true">✏️</i>${t('edit')}</button>` : ''}` : ''}
@@ -378,7 +377,7 @@
     const path = location.pathname.replace(/^\/(ru|lv)(?=\/)/, ''), post = document.querySelector('article.bp[data-post-id]');
     const [href, name] = post ? ['/blog-editor/#' + post.dataset.postId, 'редактор этой статьи']
       : [[/^\/shop\//, '#shop', 'Магазин'], [/^\/(art-portfolio|palettes)\//, '#art', 'Картины'], [/^\/challenge\//, '#themes', 'Темы челленджа'], [/^\/advent\//, '#advent', 'Адвент'],
-        [/^\/flock\//, '#flock', 'Стая'], [/^\/(rain|potions)\//, '#games', 'Награды игр'], [/^\/bird\//, '#birds', 'Все птицы'], [/^\/blog(-editor)?\//, '/blog-editor/', 'Блог']]
+        [/^\/flock\//, '#birds', 'Птицы'], [/^\/(rain|potions)\//, '#games', 'Правила игр'], [/^\/bird\//, '#birds', 'Птицы'], [/^\/blog(-editor)?\//, '/blog-editor/', 'Блог']]
         .map(([re, h, n]) => re.test(path) && [h[0] === '#' ? '/admin/' + h : h, n]).find(Boolean) || ['/admin/', 'Входящие'];
     const box = document.createElement('span'); box.className = 'sb-adm';
     box.innerHTML = `${document.querySelector('[data-ppb]') ? '<button type="button" data-sb-edit>✏️ Править страницу</button>' : ''}<a href="${href}">⚙ В кабинете: ${esc(name)}</a>`;
