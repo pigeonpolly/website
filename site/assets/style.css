@@ -2297,7 +2297,13 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .adm-nav { gap: 10px; }
 .adm-nav-grp { display: grid; gap: 2px; }
 .adm-nav-g { margin: 0; padding: 6px 14px 2px; font: 700 12px var(--sans); letter-spacing: .02em; color: #8A83A0; }
-.be-app .adm-nav a { padding: 8px 14px; }
+.be-app .adm-nav a { padding: 12px 16px; font: 700 17px var(--sans); }
+/* разделы группы — вкладками над экраном */
+.adm-tabs { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 10px; }
+.be-app .adm-tabs a { display: inline-flex; align-items: center; gap: 6px; padding: 7px 14px; border-radius: 999px; border: 1.5px solid #E4DCF2; background: #fff; color: #2B1A51; font: 600 14px var(--sans); text-decoration: none; }
+.be-app .adm-tabs a:hover { background: #F3EEFB; color: #2B1A51; }
+.be-app .adm-tabs a[aria-current="page"] { background: #2B1A51; border-color: #2B1A51; color: #fff; }
+.be-app .adm-tabs a.adm-ext::after { content: '↗'; color: #B4ADC8; font-weight: 400; }
 .be-app .adm-nav a.adm-ext > span:first-child::after { content: ' ↗'; color: #B4ADC8; font-weight: 400; }
 .adm-about { margin: 0 0 16px; }
 .adm-about h2 { margin: 0 0 4px; font: 700 24px var(--serif); color: #2B1A51; }
@@ -2989,11 +2995,11 @@ html:not(.is-admin) .statbar { display: none; }
 @media (max-width: 800px) {
   .adm.be-app { grid-template-columns: minmax(0, 1fr); gap: 16px; }
   .adm-main { min-width: 0; }
-  .adm-nav { display: grid; grid-template-columns: minmax(0, 1fr); gap: 4px; }
-  .adm-nav-grp { display: flex; align-items: center; gap: 6px; overflow-x: auto; padding-bottom: 2px; scrollbar-width: none; } /* на телефоне: группа — строка с прокруткой вбок */
-  .adm-nav-grp::-webkit-scrollbar { display: none; }
-  .adm-nav-g { flex: none; padding: 0 4px 0 0; }
-  .adm-nav a { flex: none; white-space: nowrap; }
+  .adm-nav { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 4px; } /* на телефоне: 6 групп — две колонки */
+  .be-app .adm-nav a { padding: 10px 12px; font-size: 15px; }
+  .adm-tabs { flex-wrap: nowrap; overflow-x: auto; scrollbar-width: none; } /* вкладки — строкой с прокруткой вбок */
+  .adm-tabs::-webkit-scrollbar { display: none; }
+  .be-app .adm-tabs a { flex: none; white-space: nowrap; }
   .adm-box { overflow-x: auto; }
   .adm-shop thead { display: none; }
   .adm-shop, .adm-shop tbody { display: block; width: 100%; }

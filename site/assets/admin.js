@@ -62,15 +62,20 @@
     carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
   const secOf = id => ADMIN_SECTIONS.find(x => x.id === id);
   const nav = document.getElementById('adm-nav');
-  const navLink = x => `<a href="${x.href || '#' + x.id}" data-sec="${x.id}"${x.href ? ' class="adm-ext" title="Откроется на своей странице"' : ''}><span>${x.ic} ${x.name}</span>${x.count ? `<span class="adm-count" data-count="${x.count}"${x.count === 'comments' ? ' id="adm-pend"' : ''} hidden></span>` : ''}</a>`;
-  if (nav) nav.innerHTML = [['', ''], ...Object.entries(ADMIN_GROUPS)].map(([g, name]) =>
-    `<div class="adm-nav-grp">${name ? `<p class="adm-nav-g">${name}</p>` : ''}${ADMIN_SECTIONS.filter(x => !x.hide && (x.group || '') === g).map(navLink).join('')}</div>`).join('');
+  // меню слева — только группы (6 строк); разделы группы — вкладками над экраном
+  const inGroup = g => ADMIN_SECTIONS.filter(x => !x.hide && x.group === g);
+  const cnt = keys => keys.length ? `<span class="adm-count" data-count="${keys.join(',')}" hidden></span>` : '';
+  if (nav) nav.innerHTML = `<a href="#inbox" data-grp="">📥 Входящие${cnt(['total'])}</a>` + Object.entries(ADMIN_GROUPS).map(([g, name]) =>
+    `<a href="#${inGroup(g).find(x => !x.href).id}" data-grp="${g}">${name}${cnt(inGroup(g).filter(x => x.count && x.count !== 'total').map(x => x.count))}</a>`).join('');
+  const tabLink = (x, cur) => `<a href="${x.href || '#' + x.id}"${x.href ? ' class="adm-ext" title="Откроется на своей странице"' : ''}${x.id === cur ? ' aria-current="page"' : ''}>${x.ic} ${x.name}${x.count ? `<span class="adm-count" data-count="${x.count}"${x.count === 'comments' ? ' id="adm-pend"' : ''} hidden></span>` : ''}</a>`;
   // экран: строка «что здесь делается» сверху, потом сам раздел; focus — прокрутить к нужному месту
   async function route() {
     const id = (location.hash || '#inbox').slice(1), x = secOf(id) || (SECTIONS[id] ? { id } : secOf('inbox'));
-    document.querySelectorAll('.adm-nav [data-sec]').forEach(a => a.setAttribute('aria-current', a.dataset.sec === (x.hide ? x.open || x.id : x.id) ? 'page' : 'false'));
+    const cur = x.hide ? x.open || x.id : x.id, g = (secOf(cur) || x).group || '';
+    document.querySelectorAll('.adm-nav [data-grp]').forEach(a => a.setAttribute('aria-current', a.dataset.grp === g ? 'page' : 'false'));
     const about = document.getElementById('adm-about');
-    if (about) about.innerHTML = x.name ? `<h2>${x.ic} ${x.name}</h2>${x.about ? `<p>${x.about}</p>` : ''}` : '';
+    if (about) about.innerHTML = (g ? `<nav class="adm-tabs" aria-label="${esc(ADMIN_GROUPS[g])}">${inGroup(g).map(t => tabLink(t, cur)).join('')}</nav>` : x.name ? `<h2>${x.ic} ${x.name}</h2>` : '') + (x.about ? `<p>${x.about}</p>` : '');
+    if (inboxData) badges(inboxData);
     if (x.id === 'subscribers') api('admin/inbox/seen', { k: 'subs' }).then(() => counts()).catch(() => {}); // открыла — новые уже не новые
     await (SECTIONS[x.open || x.id] || inbox)();
     const f = typeof x.focus === 'function' ? x.focus(main) : x.focus ? main.querySelector(x.focus) : null;
@@ -87,7 +92,7 @@
   function badges(d) {
     const v = { ...d, comments: d.comments, requests: d.requests, subs: d.subs, edits: d.edits, advent: (d.advent || []).length, scheduled: (d.scheduled || []).length };
     v.total = inboxItems(d).length; // сколько разных дел ждёт
-    document.querySelectorAll('.adm-nav [data-count]').forEach(b => { const k = v[b.dataset.count] || 0; b.hidden = !k; b.textContent = k || ''; });
+    document.querySelectorAll('#adm [data-count]').forEach(b => { const k = b.dataset.count.split(',').reduce((a, c) => a + (v[c] || 0), 0); b.hidden = !k; b.textContent = k || ''; });
   }
   const counts = () => api('admin/inbox').then(d => { inboxData = d; badges(d); return d; });
   const plural = (k, one, few, many) => k % 10 === 1 && k % 100 !== 11 ? one : [2, 3, 4].includes(k % 10) && ![12, 13, 14].includes(k % 100) ? few : many;
@@ -557,6 +562,13 @@
         row('Урожай волшебных дороже в', num('gardenMagicMul', R.gardenMagicMul, D.gardenMagicMul) + ' раз', D.gardenMagicMul + ' раз'),
         row('Сезон огорода', `<select data-r="gardenSeason">${[['auto', 'по календарю'], ['autumn', '🍂 осень'], ['winter', '❄️ зима'], ['spring', '🌸 весна'], ['summer', '☀️ лето']].map(([k, l]) => `<option value="${k}"${R.gardenSeason === k ? ' selected' : ''}>${l}</option>`).join('')}</select>`, 'по календарю', 'погода и вид: дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень'),
       ], 'Вход — дверь 🚪 в комнате птички → «Огород» (/garden/)')}
+      ${box('✉️ Уведомления из игр на почту', [
+        row(`<label class="adm-r-chk"><input type="checkbox" data-r="mailGamesOn"${R.mailGamesOn ? ' checked' : ''}> Присылать уведомления из игр</label>`, '', 'вкл', 'только птичкам, которые включили «🎮 Уведомления из игр»; одной птичке — не больше одного такого письма в сутки'),
+        row('🔥 Серия сгорит сегодня — серия от', num('mailStreakMin', R.mailStreakMin, D.mailStreakMin) + ' дн.', D.mailStreakMin + ' дн.', 'если сегодня ещё нет рисунка и сегодня не день свободы'),
+        row('🔥 …письмо о серии — с', num('mailStreakHour', R.mailStreakHour, D.mailStreakHour) + ' ч по Риге', D.mailStreakHour + ' ч'),
+        row('🥕🌱 Огород — не чаще раза в', num('mailGardenDays', R.mailGardenDays, D.mailGardenDays) + ' дн.', D.mailGardenDays + ' дн.', 'урожай созрел или грядки сухие, а птичка не заходила больше суток'),
+        row('🕵️ Титос ждёт — если птичка не заходила', num('mailTitosDays', R.mailTitosDays, D.mailTitosDays) + ' дн.', D.mailTitosDays + ' дн.', 'про каждое следующее дело — одно письмо'),
+      ], 'Письма уходят сами раз в час, в пределах бесплатного лимита (90 в сутки вместе с остальными письмами). <a href="#mail">✉️ Письма →</a>')}
       ${box('⏱ «Смена с Полли»', [
         row(`<label class="adm-r-chk"><input type="checkbox" data-r="shiftOn"${R.shiftOn ? ' checked' : ''}> Давать пуговки за смены</label>`, num('shiftBtn', R.shiftBtn, D.shiftBtn) + ' 🔘 за час', D.shiftBtn + ' 🔘', 'минуты доигранных до конца смен копятся; каждый полный час — повышение и столько пуговок'),
       ], '<a href="/ru/shift/">Открыть страницу →</a>')}
