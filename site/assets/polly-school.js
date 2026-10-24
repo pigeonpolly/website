@@ -147,7 +147,7 @@
   const path = () => `<ol class="ps-path">${LESSONS.map((n, i) => { const w = srv.works[i + 1], prevDone = i === 1 && srv.works[1]; return `<li class="${i === 0 ? 'open cur' : 'lock'}${w ? ' ' + w.status : ''}" title="${i ? esc(prevDone ? t('soon') : t('locked')) : ''}"><span class="ps-dot">${w ? mark[w.status] : i ? (prevDone ? '🕊' : '🔒') : ICON[i]}</span><small>${i + 1}. ${tr(n)}${prevDone ? ` · ${t('soon')}` : ''}</small></li>`; }).join('')}<li class="lock dip"><span class="ps-dot">📜</span><small>${t('diploma')}</small></li></ol>`;
 
   const render = (keep) => {
-    box.innerHTML = `<div class="ps-head"><h2>${t('title')}</h2><p>${t('lead')}</p><p class="ps-free">${t('free')}</p></div>
+    box.innerHTML = `<div class="ps-head"><h1>${t('title')}</h1><p>${t('lead')}</p><p class="ps-free">${t('free')}</p></div>
       <h3 class="ps-h3">${t('path')}</h3>${path()}${srv.works[LESSON] && srv.works[LESSON].status !== 'wait' ? verdict() : ''}
       <div class="ps-class">
         <div class="ps-stage"><div class="ps-easel"><div class="ps-paperbox">${easelArt(view)}</div></div>${polly}<span class="ps-tag">${t('lesson')} 1 · ${tr(LESSONS[0])}</span></div>
@@ -161,7 +161,7 @@
 
   box.addEventListener('click', e => {
     const el = e.target;
-    if (el.closest('.ps-next')) { st.step++; view = st.step; save(st); render(); box.querySelector('.ps-log li:last-child').scrollIntoView({ block: 'nearest', behavior: 'smooth' }); return; }
+    if (el.closest('.ps-next')) { st.step++; view = st.step; save(st); render(); return; }
     if (el.closest('.ps-again')) { st = { step: 0, quiz: null, find: [], paper: [] }; view = 0; save(st); render(); return; }
     const q = el.closest('[data-q]');
     if (q) { st.quiz = +q.dataset.q; save(st); render(); return; }
