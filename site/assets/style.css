@@ -5158,3 +5158,26 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .ps-task { margin-top: 10px; padding: 10px 14px; border-radius: 12px; background: #fff; box-shadow: 0 0 0 2px #F0A987; font-size: .92em; }
 .ps-task ol { margin: 6px 0 0; padding-left: 22px; }
 .ps-task li { margin: 3px 0; }
+/* Школа Полли: уроки 2–12 (school-lessons.js) — части мини-игр и диплом */
+.ps-find .hit { fill: transparent; stroke: none; }
+.ps-find .ln, .ps-find g.on .ln { fill: none; }
+.ps-find .tx circle { fill: #2B1A51; stroke: none; }
+.ps-find .sh { fill: #2B1A51; stroke: none; opacity: .8; }
+.ps-find g.on { stroke: #D85A30; }
+.ps-find g.on .sh, .ps-find g.on .tx circle { fill: #D85A30; opacity: 1; }
+.ps-paperbox .ps-art { width: 100%; height: 100%; }
+.ps-path li.open { cursor: pointer; }
+.ps-path li.open:hover .ps-dot { transform: translateY(-2px); }
+.ps-path .ps-dot { transition: transform .15s; }
+.ps-path li.cur .ps-dot { background: var(--peach); color: #2B1A51; box-shadow: 0 0 0 3px #F3EFFA, 0 0 18px rgba(240, 169, 135, .6); opacity: 1; }
+.ps-path li.open:not(.cur) .ps-dot { background: #F4F0FA; color: #2B1A51; box-shadow: 0 0 0 2px var(--peach); }
+.ps-path li.ok:not(.cur) .ps-dot { background: #5FA35A; color: #fff; }
+.ps-path .dip.open .ps-dot { background: #E9A93B; opacity: 1; box-shadow: 0 0 0 3px #F3EFFA, 0 0 22px rgba(233, 169, 59, .8); }
+.ps-dipwait, .ps-dip { margin-top: 14px; padding: 28px; border-radius: 26px; background: #FBF4E2; color: #2B1A51; box-shadow: 0 0 0 4px #1A1528; text-align: center; }
+.ps-dipwait p { font-size: 18px; }
+.ps-dip-hi { margin: 0 0 16px; font: 600 clamp(18px, 1.6vw, 24px)/1.4 var(--serif); }
+.ps-dip-canvas { width: min(100%, 900px); height: auto; image-rendering: pixelated; border-radius: 6px; box-shadow: 0 10px 30px rgba(0, 0, 0, .25); }
+.ps-dip-act { display: flex; flex-wrap: wrap; justify-content: center; gap: 10px; margin-top: 16px; }
+.ps-dl, .ps-back { padding: 10px 20px; border: 0; border-radius: 999px; background: #D85A30; color: #fff; font: 700 15px var(--sans); cursor: pointer; text-decoration: none; }
+.ps-dl2 { background: #2B1A51; }
+.ps-back { background: transparent; color: #534AB7; box-shadow: inset 0 0 0 2px #B9AEE0; }

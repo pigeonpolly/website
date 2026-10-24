@@ -62,6 +62,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/pixel-badge.js` (13K) — Пиксельные бейджи тематик месяцев (кабинет → «🏅 Тематика месяца» → «🎨 Бейдж»; показ — sket: PPPixelBadge, GLYPHS, TEMPLATES, RING, rect
 - `site/assets/polly-help.js` (17K) — «Полли, помоги нарисовать»: гайды /polly-helps/: guide, map
 - `site/assets/school-admin.js` (5K) — кабинет → 🎓 Школа Полли: работы учеников, печать / на доработку: PPSchoolAdmin
+- `site/assets/school-lessons.js` (40K) — уроки «Школы Полли» (шаги, игры, клиенты): PP_SCHOOL_LESSONS
 - `site/assets/polly-school.js` (13K) — «Школа Полли» на /polly-helps/: уроки у мольберта, клиенты из Воббленда: LESSONS, S, LAMP, render
 - `site/assets/polly.js` (26K) — Полли-питомец в левом нижнем углу (`PollyPet`): PollyPet, SEASON, CORNER, HOME_X, addProp
 - `site/assets/posts-admin.js` (25K) — Кабинет → «📣 Посты» (admin.js открывает PPPostsAdmin.mount(main)): готовые картинки и подп: PPPostsAdmin, SERIF, LANGS, POSTS, titos
