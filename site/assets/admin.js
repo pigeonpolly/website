@@ -86,6 +86,22 @@
     }
   }
   addEventListener('hashchange', route);
+  // длинные таблицы и списки — первые 10 строк, остальное по кнопке «Показать все» (кроме таблицы остатков магазина: в ней кнопка «Поставить»)
+  const FOLD = 10;
+  function foldLong() {
+    main.querySelectorAll('table.be-table:not(.adm-stock):not([data-fold]), .adm-box > ol:not([data-fold]), .adm-box > ul:not([data-fold]), ol.adm-comments:not([data-fold]), ul.adm-bars:not([data-fold])').forEach(t => {
+      const rows = t.tBodies ? [...(t.tBodies[0] || t).rows] : [...t.children].filter(x => x.tagName === 'LI');
+      if (rows.length <= FOLD + 2) return;
+      t.dataset.fold = '1';
+      const hide = on => rows.slice(FOLD).forEach(r => r.classList.toggle('adm-fold-h', on));
+      const b = document.createElement('button'); b.type = 'button'; b.className = 'pill-btn adm-fold-b';
+      const set = on => { hide(on); b.textContent = on ? `▾ Показать все (${rows.length})` : '▴ Свернуть'; };
+      b.onclick = () => set(!rows[FOLD].classList.contains('adm-fold-h'));
+      set(true); t.after(b);
+    });
+  }
+  let foldT = 0;
+  new MutationObserver(() => { clearTimeout(foldT); foldT = setTimeout(foldLong, 50); }).observe(main, { childList: true, subtree: true });
 
   // ---------- 📥 входящие: только то, что ждёт Алину ----------
   let inboxData = null;
