@@ -2,7 +2,7 @@
 """Картинки для Instagram Stories (1080×1920) по всем разделам сайта, EN и RU, без кнопок.
 
   python3 tools/stories/cap.py    — снимки птичек, комнаты, огорода, челленджа и «Полли, помоги» → _held/stories/src/
-  python3 tools/stories/make.py [имя ...] — сторис → _held/stories/{en,ru}/№-имя.png (№ — с 190, продолжает «Pinterest pins» в Notion, тип «Сторис») и лист _held/stories/sheet-{en,ru}.jpg
+  python3 tools/stories/make.py [имя ...] — сторис → _held/stories/{en,ru}/№-имя.png (№ — с START (219), продолжает «Pinterest pins» в Notion, тип «Сторис») и лист _held/stories/sheet-{en,ru}.jpg
 
 Шрифты как на сайте (Fraunces, Karla); кириллицы в них нет — для RU сами подставляются Lora и Manrope.
 Тексты — из описаний страниц сайта и docs/*.md (факты не придумывать). Картинки — site/images и снимки cap.py.
@@ -19,6 +19,7 @@ from playwright.sync_api import sync_playwright
 
 ROOT = pathlib.Path(__file__).resolve().parent.parent.parent
 OUT = ROOT / '_held' / 'stories'
+START = 219  # первый номер: продолжает «Pinterest pins» в Notion (190–218 заняты пинами этапа 32)
 I = '/site/images/'
 SRC = '/_held/stories/src/'
 
@@ -227,6 +228,7 @@ body { font-family: 'Karla', 'Manrope', sans-serif; position: relative;
               linear-gradient(180deg, #2B1A51 0%, #24164A 60%, #1B1035 100%); }
 .st { position: absolute; inset: 0; padding: 150px 84px 120px; display: flex; flex-direction: column; }
 .brand { display: flex; align-items: center; gap: 20px; font: 600 38px 'Fraunces', 'Lora', serif; letter-spacing: .2px; }
+.num { margin-left: auto; font: 700 30px 'Karla', 'Manrope', sans-serif; color: var(--muted); opacity: .75; letter-spacing: 1px; }
 .brand img { width: 76px; height: 76px; image-rendering: pixelated; }
 .kick { margin-top: 64px; font: 700 30px 'Karla', 'Manrope', sans-serif; text-transform: uppercase; letter-spacing: 4px; color: var(--peach); }
 h1 { margin-top: 14px; font: 600 98px/1.02 'Fraunces', 'Lora', serif; letter-spacing: -1.5px; }
@@ -286,14 +288,14 @@ img { display: block; }
 STAR = '<svg viewBox="0 0 24 24"><path fill="currentColor" d="M12 0c1 7 5 11 12 12-7 1-11 5-12 12-1-7-5-11-12-12 7-1 11-5 12-12z"/></svg>'
 
 
-def page(st, lang):
+def page(st, lang, num):
     name, acc, tx, vis = st
     kick, h1, lead, facts = tx[lang]
     fl = ''.join(f'<li>{html.escape(f)}</li>' for f in facts)
     return f"""<!doctype html><html lang="{lang}"><head><meta charset="utf-8">
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Karla:wght@400;500;700&family=Lora:wght@600&family=Manrope:wght@400;500;700&display=swap" rel="stylesheet">
 <style>{CSS}</style></head><body style="--acc:{acc}"><div class="st">
-<div class="brand"><img src="/site/assets/logo.png">Pigeon Polly Art Lab</div>
+<div class="brand"><img src="/site/assets/logo.png">Pigeon Polly Art Lab<span class="num">№ {num}</span></div>
 <div class="kick">{html.escape(kick)}</div><h1>{html.escape(h1)}</h1><p class="lead">{html.escape(lead)}</p>
 <div class="vis">{vis(lang)}</div>
 {f'<ul class="facts">{fl}</ul>' if facts else ''}
@@ -325,13 +327,13 @@ def main():
                 if only and st[0] not in only:
                     continue
                 f = tmp / f'{st[0]}-{lang}.html'
-                f.write_text(page(st, lang))
+                f.write_text(page(st, lang, START + n - 1))
                 pg.goto(f'http://127.0.0.1:{srv.server_port}/_held/stories/_html/{f.name}')
                 pg.wait_for_load_state('networkidle'); pg.wait_for_selector('body[data-ready]')
                 over = pg.evaluate("(() => { const v = document.querySelector('.vis'), r = v.getBoundingClientRect(); return [...v.querySelectorAll('*')].filter(e => !e.closest('.clip')).some(e => { const b = e.getBoundingClientRect(); return b.bottom > r.bottom + 2 || b.top < r.top - 2; }) || document.querySelector('.foot').getBoundingClientRect().bottom > 1900; })()")
                 if over:
                     print('⚠ не влезает:', st[0], lang)
-                pg.screenshot(path=str(OUT / lang / f'{n + 189}-{st[0]}.png'))
+                pg.screenshot(path=str(OUT / lang / f'{START + n - 1}-{st[0]}.png'))
         b.close()
     sheet()
 
