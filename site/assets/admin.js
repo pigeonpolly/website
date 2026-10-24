@@ -20,37 +20,39 @@
   // ---------- разделы кабинета: меню строится из этого списка — новый раздел = одна строка (docs/admin.md) ----------
   // id — адрес /admin/#id · open — какой экран показать (если не тот же id) · href — раздел живёт на другой странице
   // focus — к чему прокрутить экран (свёрнутое раскроется) · about — одна строка «что здесь делается» · count — счётчик из «Входящих»
-  const ADMIN_GROUPS = { pub: '✍️ Публиковать', birds: '🐦 Птицы', shop: '🛍 Магазин и игры', titos: '🕵️ Титос', stats: '📊 Статистика', service: '⚙️ Сервис' };
+  // hide — старый адрес (ссылки на него работают), но в меню его нет: экран тот же, что у другого пункта
+  const ADMIN_GROUPS = { pub: '✍️ Публиковать', birds: '🐦 Птицы', shop: '🛍 Магазин и игры', stats: '📊 Статистика', service: '⚙️ Сервис' };
   const rulesBox = re => m => [...m.querySelectorAll('.adm-rules h3')].find(h => re.test(h.textContent));
   const ADMIN_SECTIONS = [
-    { id: 'inbox', ic: '📥', name: 'Входящие', about: 'Только то, что ждёт вас. Пусто — значит, всё спокойно; статистика сайта — ниже, свёрнута.', count: 'total' },
+    { id: 'inbox', ic: '📥', name: 'Входящие', about: 'Только то, что ждёт вас. Пусто — значит, всё спокойно.', count: 'total' },
     { id: 'blog', ic: '✍️', name: 'Блог', group: 'pub', href: '/blog-editor/', count: 'scheduled' },
     { id: 'requests', ic: '🖍', name: 'Нарисуй мне', group: 'pub', href: '/ru/requests/', count: 'requests' },
+    { id: 'themes', ic: '🗓', name: 'Темы челленджа', group: 'pub', about: 'Темы челленджа на любой месяц вперёд: тема на трёх языках, цвета, время; банк ваших тем.' },
     { id: 'art', ic: '🎨', name: 'Картины и палитры', group: 'pub', about: 'Картины, добавленные с сайта, скрытые картины и очередь палитр дня ЭКСТРА.' },
-    { id: 'themes', ic: '🎨', name: 'Темы челленджа', group: 'pub', about: 'Темы челленджа на любой месяц вперёд: тема на трёх языках, цвета, время; банк ваших тем.' },
     { id: 'notes', ic: '📣', name: 'Объявления', group: 'pub', about: 'Объявления в «Новостях стаи» (/flock/news/): закреплены сверху до выбранной даты, потом — обычной строкой «от Полли».' },
-    { id: 'edits', ic: '🧩', name: 'Правки страниц', group: 'pub', about: 'Блоки, которые вы поменяли или скрыли прямо на сайте («✏️ Править страницу»), — здесь их можно вернуть как было.', count: 'edits' },
-    { id: 'birds', ic: '🐦', name: 'Все птицы', group: 'birds', about: 'Все птички стаи: когда пришли, сколько нарисовали, пуговки, подарки.' },
-    { id: 'gifts', ic: '🎁', name: 'Подарки и зарплата', group: 'birds', open: 'birds', focus: '#adm-giftall', about: 'Подарить вещь одной птичке или всем, выдать зарплату пуговками.' },
+    { id: 'birds', ic: '🐦', name: 'Птицы', group: 'birds', about: 'Все птички стаи: пуговки, подарки, зарплата. Нажмите на ник — откроется профиль.' },
+    { id: 'gifts', hide: 1, ic: '🎁', name: 'Подарки и зарплата', open: 'birds', focus: '#adm-giftall', about: 'Подарить вещь одной птичке или всем, выдать зарплату пуговками.' },
     { id: 'comments', ic: '💬', name: 'Комментарии', group: 'birds', about: 'Комментарии к статьям блога: одобрить, ответить, удалить.', count: 'comments' },
+    { id: 'strict', hide: 1, ic: '🛡', name: 'Строгий режим', open: 'comments', focus: '#adm-strict', about: 'Строгий режим комментариев: не больше одного комментария в час с одного адреса.' },
     { id: 'subscribers', ic: '📬', name: 'Подписчики', group: 'birds', about: 'Адреса людей, которые ждут письма о новой книге.', count: 'subs' },
-    { id: 'shop', ic: '🛍', name: 'Магазин', group: 'shop', about: 'Что продаётся в магазине и сколько штук; цены считаются сами.' },
+    { id: 'shop', ic: '🛍', name: 'Магазин', group: 'shop', about: 'Сколько штук каждой вещи в продаже; цены считаются сами.' },
     { id: 'cards', ic: '🃏', name: 'Карточки', group: 'shop', about: 'Коллекционные карточки: каждая — в одном экземпляре. Новая карточка, правка, номер, скрыть, удалить; цена обычных; импорт коллекций с сайта.' },
     { id: 'advent', ic: '🎄', name: 'Адвент', group: 'shop', about: 'Что лежит в каком окошке адвент-календаря.', count: 'advent' },
-    { id: 'titos', ic: '🕵️', name: 'Дела', group: 'titos', about: 'Дела детектива Титоса: какие дела на сайте и переведены ли они. Новые дела — файлы content/titos/NNN.json (их пишет Claude), после выкладки они заносятся сами раз в час.' },
-    { id: 'titos-rules', ic: '📜', name: 'Правила Титоса', group: 'titos', open: 'rules', focus: rulesBox(/Детектив Титос/), about: 'Кофе детектива Титоса и пуговки за раскрытые дела.' },
-    { id: 'games', ic: '🎮', name: 'Награды игр', group: 'shop', open: 'rules', focus: rulesBox(/Пуговичный дождь/), about: 'Сколько пуговок дают игры «Пуговичный дождь» и «Зельеварня».' },
+    { id: 'titos', ic: '🕵️', name: 'Дела Титоса', group: 'shop', about: 'Какие дела детектива Титоса на сайте и переведены ли они. Новые дела заносятся сами раз в час после выкладки.' },
+    { id: 'titos-rules', hide: 1, ic: '📜', name: 'Правила Титоса', open: 'rules', focus: rulesBox(/Детектив Титос/), about: 'Кофе детектива Титоса и пуговки за раскрытые дела.' },
+    { id: 'games', hide: 1, ic: '🎮', name: 'Награды игр', open: 'rules', focus: rulesBox(/Пуговичный дождь/), about: 'Сколько пуговок дают игры.' },
+    { id: 'overview', ic: '📊', name: 'Обзор', group: 'stats', about: 'Главные цифры сайта: статьи, комментарии, птицы, работы в челлендже.' },
+    { id: 'challenge', hide: 1, ic: '📊', name: 'Обзор', open: 'overview', about: 'Главные цифры сайта: статьи, комментарии, птицы, работы в челлендже.' },
+    { id: 'flock', hide: 1, ic: '📊', name: 'Обзор', open: 'overview', about: 'Главные цифры сайта: статьи, комментарии, птицы, работы в челлендже.' },
     { id: 'visitors', ic: '👥', name: 'Посетители', group: 'stats', about: 'Сколько людей заходит на сайт, откуда и с каких устройств.' },
     { id: 'analytics', ic: '📈', name: 'Статьи', group: 'stats', about: 'Просмотры, лайки и комментарии каждой статьи.' },
-    { id: 'challenge', ic: '🖌', name: 'Челлендж', group: 'stats', about: 'Сколько работ в челлендже и новые работы.' },
-    { id: 'flock', ic: '🪺', name: 'Стая', group: 'stats', about: 'Сколько птичек в стае, кто пришёл недавно.' },
+    { id: 'rules', ic: '📜', name: 'Правила', group: 'service', about: 'Что сайт делает сам (автопилот) и все числа: пуговки, бейджи, игры.' },
     { id: 'backup', ic: '💾', name: 'Копии', group: 'service', about: 'Полная копия сайта: скачать, настроить автокопию, восстановить.' },
-    { id: 'rules', ic: '📜', name: 'Все правила', group: 'service', about: 'Автопилот и все правила сайта; числа можно поменять в тонкой настройке.' },
-    { id: 'gemini', ic: '🔑', name: 'Ключ Gemini', group: 'service', href: '/blog-editor/#gemini' },
-    { id: 'strict', ic: '🛡', name: 'Строгий режим', group: 'service', open: 'comments', focus: '#adm-strict', about: 'Строгий режим комментариев: не больше одного комментария в час с одного адреса.' },
     { id: 'security', ic: '🔐', name: 'Защита', group: 'service', about: 'PIN админа и код восстановления на случай, если потеряете Google.' },
+    { id: 'edits', ic: '🧩', name: 'Правки страниц', group: 'service', about: 'Блоки, которые вы поменяли или скрыли прямо на сайте («✏️ Править страницу»), — здесь их можно вернуть как было.', count: 'edits' },
+    { id: 'gemini', hide: 1, ic: '🔑', name: 'Ключ Gemini', href: '/blog-editor/#gemini' },
   ];
-  const SECTIONS = { notes, titos, inbox, security, overview: inbox, visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art, challenge: () => statsView('challenge'), flock: () => statsView('flock'),
+  const SECTIONS = { notes, titos, inbox, security, overview: () => overview(), visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art,
     themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
     cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
     carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
@@ -58,11 +60,11 @@
   const nav = document.getElementById('adm-nav');
   const navLink = x => `<a href="${x.href || '#' + x.id}" data-sec="${x.id}"${x.href ? ' class="adm-ext" title="Откроется на своей странице"' : ''}><span>${x.ic} ${x.name}</span>${x.count ? `<span class="adm-count" data-count="${x.count}"${x.count === 'comments' ? ' id="adm-pend"' : ''} hidden></span>` : ''}</a>`;
   if (nav) nav.innerHTML = [['', ''], ...Object.entries(ADMIN_GROUPS)].map(([g, name]) =>
-    `<div class="adm-nav-grp">${name ? `<p class="adm-nav-g">${name}</p>` : ''}${ADMIN_SECTIONS.filter(x => (x.group || '') === g).map(navLink).join('')}</div>`).join('');
+    `<div class="adm-nav-grp">${name ? `<p class="adm-nav-g">${name}</p>` : ''}${ADMIN_SECTIONS.filter(x => !x.hide && (x.group || '') === g).map(navLink).join('')}</div>`).join('');
   // экран: строка «что здесь делается» сверху, потом сам раздел; focus — прокрутить к нужному месту
   async function route() {
     const id = (location.hash || '#inbox').slice(1), x = secOf(id) || (SECTIONS[id] ? { id } : secOf('inbox'));
-    document.querySelectorAll('.adm-nav [data-sec]').forEach(a => a.setAttribute('aria-current', a.dataset.sec === x.id ? 'page' : 'false'));
+    document.querySelectorAll('.adm-nav [data-sec]').forEach(a => a.setAttribute('aria-current', a.dataset.sec === (x.hide ? x.open || x.id : x.id) ? 'page' : 'false'));
     const about = document.getElementById('adm-about');
     if (about) about.innerHTML = x.name ? `<h2>${x.ic} ${x.name}</h2>${x.about ? `<p>${x.about}</p>` : ''}` : '';
     if (x.id === 'subscribers') api('admin/inbox/seen', { k: 'subs' }).then(() => counts()).catch(() => {}); // открыла — новые уже не новые
@@ -101,17 +103,11 @@
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await counts(); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
     const items = inboxItems(d);
-    let open = false; try { open = !!sessionStorage.getItem('pp-stats'); } catch (e) {}
     main.innerHTML = `<div class="adm-quick"><a class="pill-btn pill-fill" href="/blog-editor/#new">＋ Новая статья</a></div>
       ${items.length ? `<ul class="adm-inbox">${items.map(it => `<li><span class="adm-in-ic">${it.ic}</span><span class="adm-in-n">${n(it.n)}</span>
         <span class="adm-in-t"><b>${it.t}</b><small>${it.raw ? it.d : esc(it.d)}</small></span><a class="pill-btn" href="${it.href}"${it.cf ? ` data-cf-go="${it.cf}"` : ''}>${it.go}</a></li>`).join('')}</ul>`
-        : '<p class="adm-calm">Всё спокойно ✓<small>Ничего не ждёт: комментарии проверены, заявок и новых подписчиков нет, автопилот работает.</small></p>'}
-      <details class="adm-fine adm-stats"${open ? ' open' : ''}><summary>📊 Статистика сайта</summary><div id="adm-stats"></div></details>`;
+        : '<p class="adm-calm">Всё спокойно ✓<small>Ничего не ждёт: комментарии проверены, заявок и новых подписчиков нет, автопилот работает.</small></p>'}`;
     main.querySelectorAll('[data-cf-go]').forEach(a => a.addEventListener('click', () => { cFilter = a.dataset.cfGo; }));
-    const det = main.querySelector('.adm-stats'), box = main.querySelector('#adm-stats');
-    const load = () => { if (!box.dataset.done) { box.dataset.done = '1'; overview(box); } };
-    det.addEventListener('toggle', () => { try { det.open ? sessionStorage.setItem('pp-stats', '1') : sessionStorage.removeItem('pp-stats'); } catch (e) {} if (det.open) load(); });
-    if (open) load();
   }
 
   // ---------- 🔐 защита (12.10.2026): PIN админа и код восстановления ----------
@@ -179,9 +175,7 @@
     el.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('blog/admin/overview'); } catch (e) { el.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
     const card = (icon, label, big, small) => `<div class="adm-card"><span class="adm-ic">${icon}</span><b>${big}</b><span>${label}</span>${small ? `<small>${small}</small>` : ''}</div>`;
-    el.innerHTML = `<div id="adm-auto-slot"></div>
-      <div class="adm-quick"><a class="pill-btn" href="#visitors">👥 Посетители: откуда и с чего</a></div>
-      <div class="adm-cards">
+    el.innerHTML = `<div class="adm-cards">
         ${card('📝', 'статей опубликовано', n(d.posts.pub), d.posts.draft ? `черновиков: ${n(d.posts.draft)}` : '')}
         ${card('👁', 'просмотров статей', n(d.posts.views), `лайков: ${n(d.posts.likes)}`)}
         ${card('💬', 'комментариев', n(d.comments.total), `за неделю: ${n(d.comments.week)}`)}
@@ -193,23 +187,8 @@
         <section class="adm-box"><h2>Новые птицы <a class="adm-all" href="#birds">все →</a></h2>${d.newUsers.length ? `<ul class="adm-list">${d.newUsers.map(u => `<li>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}<span>${fmt(u.created_at)}</span></li>`).join('')}</ul>` : '<p class="be-note">Пока никого.</p>'}</section>
       </div>
       <section class="adm-box"><h2>Новые работы в челлендже</h2>${d.newWorks.length ? `<div class="adm-works">${d.newWorks.map(w => `<a href="/api/img/${w.id}" target="_blank" title="@${esc(w.nick)} · ${esc(w.theme || '')} · ${esc(w.day)}"><img src="/api/img/${w.id}?t=1" alt="" loading="lazy"><span>@${esc(w.nick)}</span></a>`).join('')}</div>` : '<p class="be-note">Пока нет работ.</p>'}</section>`;
-    api('admin/autopilot').then(r => { const sl = el.querySelector('#adm-auto-slot'); if (sl) sl.innerHTML = autoCard(r.auto || []); }).catch(() => {});
   }
   function pend(k) { const b = document.getElementById('adm-pend'); if (b) { b.hidden = !k; b.textContent = k || ''; } }
-
-  // ---------- статистика: челлендж и стая (те же цифры, что в «📊 Статистике сайта» на «Входящих») ----------
-  async function statsView(kind) {
-    main.innerHTML = '<p class="be-note">Загрузка…</p>';
-    let d; try { d = await api('blog/admin/overview'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    const card = (icon, label, big, small) => `<div class="adm-card"><span class="adm-ic">${icon}</span><b>${big}</b><span>${label}</span>${small ? `<small>${small}</small>` : ''}</div>`;
-    main.innerHTML = kind === 'challenge'
-      ? `<div class="adm-quick"><a class="pill-btn pill-fill" href="/ru/challenge/">Открыть челлендж ↗</a></div>
-        <div class="adm-cards">${card('🎨', 'работ в челлендже', n(d.totals.works), `за неделю: ${n(d.works.week)}`)}</div>
-        <section class="adm-box"><h2>Новые работы</h2>${d.newWorks.length ? `<div class="adm-works">${d.newWorks.map(w => `<a href="/api/img/${w.id}" target="_blank" title="@${esc(w.nick)} · ${esc(w.theme || '')} · ${esc(w.day)}"><img src="/api/img/${w.id}?t=1" alt="" loading="lazy"><span>@${esc(w.nick)}</span></a>`).join('')}</div>` : '<p class="be-note">Пока нет работ.</p>'}</section>`
-      : `<div class="adm-quick"><a class="pill-btn pill-fill" href="/ru/flock/">Открыть стаю ↗</a> <a class="pill-btn" href="#birds">🐦 Все птицы</a></div>
-        <div class="adm-cards">${card('🐦', 'птиц в стае', n(d.totals.users), `новых за неделю: ${n(d.users.week)}`)}${card('👀', 'заходили за неделю', n(d.users.active))}</div>
-        <section class="adm-box"><h2>Новые птицы</h2>${d.newUsers.length ? `<ul class="adm-list">${d.newUsers.map(u => `<li>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}<span>${fmt(u.created_at)}</span></li>`).join('')}</ul>` : '<p class="be-note">Пока никого.</p>'}</section>`;
-  }
 
   // ---------- 🎨 картины и палитры, добавленные с сайта (/api/palettes; добавляют и скрывают их на страницах галерей) ----------
   async function art() {
@@ -621,12 +600,12 @@
         row('Дней с предметами сезона', num('chSeasonDaysPct', R.chSeasonDaysPct, D.chSeasonDaysPct) + ' %', D.chSeasonDaysPct + ' %', '80 % — 5–6 дней в неделю'),
       ], 'Действует на месяцы, которые ещё не созданы (следующий создаётся 20-го). Уже созданный месяц правится в ✍️ Публиковать → 🎨 Темы челленджа.')}
       <section class="adm-box adm-rules"><h3>🤖 ИИ-работы</h3>${chk('aiStreak', 'Работа с пометкой 🤖 засчитывается в серию', '(выключить — такие дни не продлевают серию)')}<br>${chk('aiUpload', 'За работу с пометкой 🤖 дают пуговки за загрузку')}</section>
-      </details><section class="adm-box adm-rules" id="adm-rules-all"></section>
+      </details><details class="adm-fine"><summary>📖 Как всё устроено — простыми словами</summary><section class="adm-box adm-rules" id="adm-rules-all"></section></details>
       <section class="adm-danger"><h3>⚠️ Осторожно</h3><button type="button" class="pill-btn be-danger" id="adm-r-reset">↺ Вернуть все правила по умолчанию</button><p class="be-note">Все числа в тонкой настройке станут такими, как были сначала.</p></section>`;
     const fine = main.querySelector('.adm-fine'); fine.addEventListener('toggle', () => { try { fine.open ? sessionStorage.setItem('pp-fine', '1') : sessionStorage.removeItem('pp-fine'); } catch (e) {} });
     // полный свод правил — обычным текстом, с текущими числами
     const pc = n => n + ' 🔘';
-    main.querySelector('#adm-rules-all').innerHTML = `<h3>📖 Все правила сайта</h3>
+    main.querySelector('#adm-rules-all').innerHTML = `
       <h4>Челлендж</h4><ul>
         <li>Каждый день — тема дня. Рисунок можно загрузить за завтра, сегодня, вчера и позавчера (одна работа на день; новая заменяет старую).</li>
         <li>Раз в месяц — день ЭКСТРА (день свободы: своя тема или свой референс). Если в этот день ничего не загружено, серия не прерывается.</li>
@@ -849,7 +828,7 @@
   // цена от остатка — как effPrice в worker/index.js: ценность × (обычный запас / остаток)^0.4, от ×0.75 до ×2.5; «мало / обычно / много» — от числа птичек (STOCK на сервере)
   let PR = { birds: 0, low: 3, norm: 10, many: 25, lowLeg: 1, normLeg: 3, manyLeg: 7, priceMin: 0.75, priceMax: 2.5 }; // формула цены — из «📜 Правил» (приходит с admin/shop)
   const effPrice = (base, stock, leg) => base > 0 ? Math.max(5, Math.round(base * Math.max(PR.priceMin, Math.min(PR.priceMax, Math.pow((leg ? PR.normLeg : PR.norm) / Math.max(1, stock || 0), 0.4))) / 5) * 5) : 0;
-  let sFilter = 'all', sq = '', sStock = 'all', sSort = 'cat', redrawT = 0; const sOpen = new Set(); // фильтр «Закончились / Скоро закончатся» — общий для таблицы остатков и списка вещей (sStock)
+  let sFilter = 'all', sq = '', sStock = 'all', sSort = 'cat', sList = false, redrawT = 0; const sOpen = new Set(); // фильтр «Закончились / Скоро закончатся» — общий для таблицы остатков и списка вещей (sStock)
   async function shop() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('admin/shop'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
@@ -896,7 +875,6 @@
         <p class="be-note">Цены считаются сами: <b>ценность вещи × % категории × уровень цен</b> (он сам подстраивается под то, сколько птички зарабатывают и копят — сейчас ×${(d.level && d.level.L) || 1}), а ещё дороже, когда штук мало, и дешевле, когда много. Вы меняете только <b>% категорий</b> и <b>цены легендарных</b> — они ниже. Остаток меняется сам (пополнение каждую ночь), но его можно поставить и вручную. Сейчас в продаже: <b>${onSale}</b> из ${all.length}.</p>
         <p class="adm-refill">↻ Пополнить <b>все закончившиеся, кроме легендарных</b> (сейчас ${all.filter(x => !isLeg(x) && cnt(x) === 0).length} ${pl1(all.filter(x => !isLeg(x) && cnt(x) === 0).length)}) — по <input type="number" id="adm-refill-n" min="1" max="10000" inputmode="numeric" value="${PR.norm}" style="width:70px"> шт. <button type="button" class="pill-btn pill-fill" id="adm-refill">Пополнить</button> <small class="be-note">обычный запас сейчас — ${PR.norm} шт.</small></p>
         <details class="adm-fine"><summary>⚙️ Тонкая настройка цен — можно не трогать</summary>${catBox()}${legBox()}</details>
-        <div class="be-filters"><input type="search" id="adm-sq" placeholder="🔍 Найти вещь" value="${esc(sq)}"></div>
         ${(() => {
           // экономика: пуговки у птичек и насколько сейчас дороги вещи (цена сейчас ÷ ценность, по вещам в продаже)
           const on = all.filter(x => cnt(x) > 0), sp = on.reduce((a, x) => a + ((rows[x.kind + '|' + x.item] || {}).price || 0), 0), sb = on.reduce((a, x) => a + ((rows[x.kind + '|' + x.item] || {}).base || 0), 0);
@@ -907,18 +885,21 @@
             </section>`;
         })()}
         <section class="adm-stockbox"><h3>📦 Остаток по категориям</h3>
-          <p class="be-note">Сколько штук каждой вещи продаётся. Впишите число и нажмите «Поставить» — у всех вещей категории станет столько штук (легендарные не меняются, кроме фильтров «Закончились», «Мало» и «Много»). Нажмите на название категории, чтобы открыть её вещи и поменять по одной. Цена считается сама: меньше штук — дороже.</p>
+          <p class="be-note">Сколько штук каждой вещи продаётся. Впишите число и нажмите «💾 Поставить» внизу — у всех вещей категории станет столько штук (легендарные не меняются, кроме фильтров «Закончились», «Мало» и «Много»). Нажмите на название категории, чтобы открыть её вещи и поменять по одной. Цена считается сама: меньше штук — дороже.</p>
           <div class="adm-sbar"><span class="adm-sl">Показать:</span>${[['all', 'Все'], ['empty', '✕ Закончились'], ['low', `⚠️ Мало (1–${PR.low} шт.)`], ['many', `📦 Много (от ${PR.many} шт.)`]].map(([k, l]) => `<button type="button" class="pill-btn" data-only="${k}" aria-pressed="${sOnly === k}">${l}</button>`).join('')}</div>
           ${sOnly !== 'all' && !sum.some(r => r.hit) ? '<p class="be-note">Таких вещей нет 🎉</p>' : ''}
-          <table class="be-table adm-table adm-stock"><thead><tr><th>Категория</th><th>Сейчас в продаже</th><th title="Сколько пуговок нужно, чтобы купить всё, что сейчас есть в продаже (по сегодняшним ценам)">Всё вместе стоит</th><th>Поставить всем вещам категории</th></tr></thead><tbody>
-          ${sum.filter(r => sOnly === 'all' || r.hit).map(r => `<tr data-sk="${r.k}"><td><button type="button" class="adm-exp" data-exp="${r.k}" aria-expanded="${sOpen.has(r.k)}">${sOpen.has(r.k) ? '▾' : '▸'} ${esc(r.name)}</button><small class="adm-sk-n">${r.total} ${pl1(r.total)}</small></td><td>${sOnly === 'all' ? r.txt : `<span class="adm-sk-0">${r.hit} ${pl1(r.hit)} ${sOnly === 'empty' ? 'закончились' : sOnly === 'low' ? 'мало' : 'много'}</span><br><small>${r.txt}</small>`}</td><td>${r.value ? '🔘 ' + n(r.value) : '—'}</td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток: ${esc(r.name)}"><button type="button" class="pill-btn" data-set="${r.k}">${sOnly === 'all' ? 'Поставить' : 'Пополнить'}</button></td></tr>${sOpen.has(r.k) ? `<tr class="adm-sk-items"><td colspan="4"><div class="adm-sk-grid">${all.filter(x => x.kind === r.k && only(x)).map(x => { const w = rows[x.kind + '|' + x.item] || { price: 0, base: (d.suggested || {})[x.kind + '|' + x.item] || 0, stock: 0 }, leg = B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item); return `<div class="adm-sk-it${leg ? ' adm-legend' : ''}${(w.stock || 0) > 0 ? '' : ' off'}" data-k="${esc(x.kind)}" data-i="${esc(x.item)}"><span class="adm-shop-pic"></span><span class="adm-sk-nm">${esc(x.name)}${leg && !x.name.includes('★') ? ' ★' : ''}</span><label>Остаток <input type="number" min="0" max="100000" inputmode="numeric" value="${w.stock || 0}" data-f="stock"></label>${leg ? `<label>Цена <input type="number" min="0" max="100000" inputmode="numeric" value="${w.base ?? w.price ?? 0}" data-f="price"></label>` : ''}<small class="adm-shop-st">${w.stock > 0 ? '🔘 ' + w.price : '—'}</small></div>`; }).join('')}</div></td></tr>` : ''}`).join('')}
-          <tr data-sk="*"><td><b>Весь магазин</b><small class="adm-sk-n">каждой вещи станет ровно столько штук</small><small class="adm-sk-n">${all.length} ${pl1(all.length)}</small></td><td>${sum.reduce((a, r) => a + r.on, 0)} в продаже, ${sum.reduce((a, r) => a + r.pcs, 0)} шт. всего</td><td><b>🔘 ${n(sum.reduce((a, r) => a + r.value, 0))}</b></td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток всем"><button type="button" class="pill-btn" data-set="*">${sOnly === 'all' ? 'Поставить всем, кроме легендарных' : 'Пополнить все найденные'}</button></td></tr></tbody></table>
-          <p><button type="button" class="pill-btn pill-fill" id="adm-set-all">💾 Сохранить все заполненные</button></p></section>
+          <table class="be-table adm-table adm-stock"><thead><tr><th>Категория</th><th>Сейчас в продаже</th><th title="Сколько пуговок нужно, чтобы купить всё, что сейчас есть в продаже (по сегодняшним ценам)">Всё вместе стоит</th><th>Сколько штук поставить</th></tr></thead><tbody>
+          ${sum.filter(r => sOnly === 'all' || r.hit).map(r => `<tr data-sk="${r.k}"><td><button type="button" class="adm-exp" data-exp="${r.k}" aria-expanded="${sOpen.has(r.k)}">${sOpen.has(r.k) ? '▾' : '▸'} ${esc(r.name)}</button><small class="adm-sk-n">${r.total} ${pl1(r.total)}</small></td><td>${sOnly === 'all' ? r.txt : `<span class="adm-sk-0">${r.hit} ${pl1(r.hit)} ${sOnly === 'empty' ? 'закончились' : sOnly === 'low' ? 'мало' : 'много'}</span><br><small>${r.txt}</small>`}</td><td>${r.value ? '🔘 ' + n(r.value) : '—'}</td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток: ${esc(r.name)}"></td></tr>${sOpen.has(r.k) ? `<tr class="adm-sk-items"><td colspan="4"><div class="adm-sk-grid">${all.filter(x => x.kind === r.k && only(x)).map(x => { const w = rows[x.kind + '|' + x.item] || { price: 0, base: (d.suggested || {})[x.kind + '|' + x.item] || 0, stock: 0 }, leg = B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item); return `<div class="adm-sk-it${leg ? ' adm-legend' : ''}${(w.stock || 0) > 0 ? '' : ' off'}" data-k="${esc(x.kind)}" data-i="${esc(x.item)}"><span class="adm-shop-pic"></span><span class="adm-sk-nm">${esc(x.name)}${leg && !x.name.includes('★') ? ' ★' : ''}</span><label>Остаток <input type="number" min="0" max="100000" inputmode="numeric" value="${w.stock || 0}" data-f="stock"></label>${leg ? `<label>Цена <input type="number" min="0" max="100000" inputmode="numeric" value="${w.base ?? w.price ?? 0}" data-f="price"></label>` : ''}<small class="adm-shop-st">${w.stock > 0 ? '🔘 ' + w.price : '—'}</small></div>`; }).join('')}</div></td></tr>` : ''}`).join('')}
+          <tr data-sk="*"><td><b>Весь магазин</b><small class="adm-sk-n">каждой вещи (кроме легендарных) станет ровно столько штук</small><small class="adm-sk-n">${all.length} ${pl1(all.length)}</small></td><td>${sum.reduce((a, r) => a + r.on, 0)} в продаже, ${sum.reduce((a, r) => a + r.pcs, 0)} шт. всего</td><td><b>🔘 ${n(sum.reduce((a, r) => a + r.value, 0))}</b></td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток всем"></td></tr></tbody></table>
+          <p><button type="button" class="pill-btn pill-fill" id="adm-set-all">💾 Поставить</button> <small class="be-note">— всем строкам, где вписано число</small></p></section>
+        <details class="adm-fine" id="adm-list"${sList || sq || sFilter !== 'all' || sSort !== 'cat' ? ' open' : ''}><summary>📋 Все вещи одним списком — поиск, темы, порядок</summary>
+        <div class="be-filters"><input type="search" id="adm-sq" placeholder="🔍 Найти вещь" value="${esc(sq)}"></div>
         <div class="adm-sbar"><label class="adm-sl">Порядок: <select id="adm-sort"><option value="cat">по видам</option><option value="few"${sSort === 'few' ? ' selected' : ''}>меньше всего сверху</option><option value="many"${sSort === 'many' ? ' selected' : ''}>больше всего сверху</option></select></label></div>
-        <div class="adm-sbar"><span class="adm-sl">Что:</span>${fb('all', 'Все')}${B.GIFT_KINDS.map(k => fb('kind:' + k[0], k[1][1])).join('')}${B.GIFT_THEMES.map(t => fb('theme:' + t[0], t[1][1])).join('')}</div>
+        <div class="adm-sbar"><span class="adm-sl">Вид:</span>${fb('all', 'Все')}${B.GIFT_KINDS.map(k => fb('kind:' + k[0], k[1][1])).join('')}</div>
+        <div class="adm-sbar"><span class="adm-sl">Тема:</span>${B.GIFT_THEMES.map(t => fb('theme:' + t[0], t[1][1])).join('')}</div>
         <table class="be-table adm-table adm-shop"><thead><tr><th>Вещь</th><th>Вид</th><th>Ценность 🔘</th><th>Остаток</th><th>Цена сейчас</th></tr></thead><tbody>
         ${list.map(x => { const r = rows[x.kind + '|' + x.item] || { price: 0, base: (d.suggested || {})[x.kind + '|' + x.item] || 0, stock: 0 }; const leg = B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item); return `<tr data-k="${esc(x.kind)}" data-i="${esc(x.item)}"${leg ? ' class="adm-legend"' : ''}><td class="adm-shop-it"><span class="adm-shop-pic"></span>${esc(x.name)}${leg ? ' <span class="adm-leg-tag" title="Легендарная: 1 штука на птичку, дарить нельзя">★ легендарная</span>' : ''}</td><td>${esc(x.kindName)}</td>
-          <td data-l="Цена 🔘">${leg ? `<input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.base ?? r.price}" data-f="price" aria-label="Цена легендарной">` : `<span class="be-note" title="ценность × % категории × уровень цен">${r.base || '—'}</span>`}</td><td data-l="Количество"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.stock}" data-f="stock" aria-label="Количество"></td><td class="adm-shop-st">${r.stock > 0 ? '🔘 ' + r.price : '—'}</td></tr>`; }).join('')}</tbody></table></section>
+          <td data-l="Цена 🔘">${leg ? `<input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.base ?? r.price}" data-f="price" aria-label="Цена легендарной">` : `<span class="be-note" title="ценность × % категории × уровень цен">${r.base || '—'}</span>`}</td><td data-l="Количество"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.stock}" data-f="stock" aria-label="Количество"></td><td class="adm-shop-st">${r.stock > 0 ? '🔘 ' + r.price : '—'}</td></tr>`; }).join('')}</tbody></table></details></section>
         <section class="adm-danger"><h3>⚠️ Осторожно</h3><button type="button" class="pill-btn be-danger adm-empty" id="adm-empty-all">🧹 Опустошить полки</button><p class="be-note">У всех вещей (и легендарных) остаток станет 0 — в магазине ничего не будет в продаже.</p></section>`;
       main.querySelectorAll('[data-cat]').forEach(i => i.onchange = async () => {
         const v = Math.max(10, Math.min(1000, Math.round(+i.value) || 100)); i.disabled = true;
@@ -948,6 +929,7 @@
       main.querySelectorAll('[data-sf]').forEach(b => b.onclick = () => { sFilter = b.dataset.sf; draw(); });
       main.querySelectorAll('[data-ss]').forEach(b => b.onclick = () => { sStock = b.dataset.ss; draw(); });
       main.querySelector('#adm-sort').onchange = e => { sSort = e.target.value; draw(); };
+      main.querySelector('#adm-list').addEventListener('toggle', e => { sList = e.target.open; });
       // поставить остаток: категории (или всему магазину) — каждой вещи ровно столько штук
       const setStock = async (pairs, btn) => {
         const items = []; let what = [];
@@ -959,7 +941,6 @@
         catch (x) { if (btn) btn.disabled = false; alert(err(x)); }
       };
       const val = tr => { const v = tr.querySelector('input').value.trim(); return v === '' ? null : Math.max(0, Math.min(10000, Math.floor(+v) || 0)); };
-      main.querySelectorAll('[data-set]').forEach(b => b.onclick = () => { const n = val(b.closest('tr')); if (n == null) return alert('Впишите число.'); setStock([[b.dataset.set, n]], b); });
       // опустошить полки: остаток 0 у всех вещей (и легендарных); ценность остаётся — цены снова посчитаются при пополнении
       main.querySelector('#adm-empty-all').onclick = async e => {
         if (!confirm('Опустошить полки? У всех ' + all.length + ' вещей (и легендарных) остаток станет 0 — в магазине ничего не будет в продаже. Ценность вещей не изменится.')) return;
@@ -996,14 +977,15 @@
       const th = (k, l) => `<th><button type="button" class="adm-sort" data-bsort="${k}" aria-pressed="${bSort === k}">${l}${bSort === k ? ' ↓' : ''}</button></th>`;
       main.innerHTML = `<section class="adm-box"><h2>🐦 Все птицы: ${d.users.length}</h2>
         <p class="be-note">Новых за неделю: <b>${week}</b>. Нажмите на ник, чтобы открыть профиль и работы.</p>
-        <p><button type="button" class="pill-btn pill-fill" id="adm-giftall">🎁 Подарить всем</button> <button type="button" class="pill-btn pill-fill" id="adm-salary" title="Пуговки сразу зачисляются всем птичкам с ником; при заходе на сайт птичка увидит конвертик от администрации Воббленда">💌 Выдать зарплату</button> <button type="button" class="pill-btn pill-fill" id="adm-tax" title="Списать пуговки у всех или только у тех, кто давно не заходит">🧾 Списать налог</button> <button type="button" class="pill-btn" id="adm-backfill">🔘 Начислить всем за прошлые бейджи и рисунки</button> <small class="be-note">Повторно не начислит — каждая награда даётся один раз.</small></p>
+        <p><button type="button" class="pill-btn pill-fill" id="adm-giftall">🎁 Подарить всем</button> <button type="button" class="pill-btn pill-fill" id="adm-salary" title="Пуговки сразу зачисляются всем птичкам с ником; при заходе на сайт птичка увидит конвертик от администрации Воббленда">💌 Выдать зарплату</button> <button type="button" class="pill-btn pill-fill" id="adm-tax" title="Списать пуговки у всех или только у тех, кто давно не заходит">🧾 Списать налог</button></p>
         <div class="be-filters"><input type="search" id="adm-bq" placeholder="🔍 Найти по нику" value="${esc(bq)}"></div>
         <table class="be-table adm-table adm-birds"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}${th('buttons', '🔘 Пуговки')}${th('invited', '👥 Позвали')}<th>Подарки</th><th>Вход</th></tr></thead><tbody>
         ${list.map(u => `<tr><td>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}${u.banned ? ' <small class="be-danger">заблокирована</small>' : ''}</td>
           <td data-l="Появилась">${fmt(u.created_at)}</td><td data-l="Заходила">${fmt(u.last_seen)}</td><td data-l="🎨 Работ">${n(u.works)}</td><td data-l="🔥 Рекорд">${n(u.best)}</td>
           <td data-l="🔘 Пуговки"><b>${n(u.buttons)}</b> <button type="button" class="adm-mini" data-btn="${u.id}" title="Добавить или забрать пуговки">±</button></td><td data-l="👥 Позвали">${n(u.invited)}</td>
           <td data-l="Подарки"><button type="button" class="pill-btn" data-gift="${u.id}" title="Подарить семечко для аватара">🎁${u.gifts ? ' ' + u.gifts : ''}</button></td>
-          <td data-l="Вход"><small title="${u.via === 'g:' ? 'Входит через Google' : 'Входит с паролем'}">${u.via === 'g:' ? 'Google' : ''}${u.via === 'g:' && u.haspw ? ' + ' : ''}${u.haspw ? '🔑' : ''}${u.pw_temp ? ' (временный)' : ''}</small> <button type="button" class="adm-mini" data-pwreset="${u.id}" title="Временный пароль: птичка входит с ним и сразу придумывает свой">🔑 Сбросить пароль</button></td></tr>`).join('')}</tbody></table></section>`;
+          <td data-l="Вход"><small title="${u.via === 'g:' ? 'Входит через Google' : 'Входит с паролем'}">${u.via === 'g:' ? 'Google' : ''}${u.via === 'g:' && u.haspw ? ' + ' : ''}${u.haspw ? '🔑' : ''}${u.pw_temp ? ' (временный)' : ''}</small> <button type="button" class="adm-mini" data-pwreset="${u.id}" title="Временный пароль: птичка входит с ним и сразу придумывает свой">🔑 Сбросить пароль</button></td></tr>`).join('')}</tbody></table>
+        <details class="adm-fine"><summary>⋯ Редко нужно</summary><p><button type="button" class="pill-btn" id="adm-backfill">🔘 Начислить всем за прошлые бейджи и рисунки</button> <small class="be-note">Нужно было один раз, когда появились пуговки. Повторно не начислит — каждая награда даётся один раз.</small></p></details></section>`;
       main.querySelectorAll('[data-gift]').forEach(b => b.onclick = () => giftDialog(d.users.find(u => u.id === +b.dataset.gift), birds));
       main.querySelector('#adm-giftall').onclick = () => giftDialog(null, birds);
       // зарплата: всем птичкам с ником (кроме заблокированных) N пуговок сразу, у них — конвертик с анимацией (account.js)
