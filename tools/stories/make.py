@@ -84,7 +84,7 @@ S = [
     ('intro', '#D85A30',
      {'en': ('Hello from Riga', 'Pigeon Polly Art Lab', 'The site of Alina Otkinska — artist, illustrator and learning experience designer. Art · creativity · technologies.',
              ['🎨 Watercolours, sketchbooks, books', '🐦 A pixel bird for everyone', '🕹 Little games and a daily challenge']),
-      'ru': ('Привет из Риги', 'Pigeon Polly Art Lab', 'Сайт Алины Откинской — художницы, иллюстратора и дизайнера образовательного опыта. Искусство · творчество · технологии.',
+      'ru': ('Привет из Риги', 'Pigeon Polly Art Lab', 'Сайт Алины Откинска — художницы, иллюстратора и дизайнера образовательного опыта. Искусство · творчество · технологии.',
              ['🎨 Акварели, скетчбуки, книги', '🐦 Пиксельная птичка для каждого', '🕹 Мини-игры и ежедневный челлендж'])},
      lambda l: f'<div class="intro">{img(I + "home/first-pigeon-polly.jpg", "photo tilt")}{img(I + "home/alina.jpg", "me")}</div>'),
     ('overview', '#534AB7',
@@ -214,7 +214,7 @@ S = [
     ('about', '#D85A30',
      {'en': ('About me', 'Alina Otkinska', 'Learning experience designer, artist and author of Pigeon Polly. Exhibitions, publications and projects about learning and AI.',
              ['🖼 On walls & pages', '🎓 Learning & AI projects', '🤝 Illustrations, courses, collaboration']),
-      'ru': ('Обо мне', 'Алина Откинская', 'Дизайнер образовательного опыта, художница и автор Pigeon Polly. Выставки, публикации и проекты об обучении и AI.',
+      'ru': ('Обо мне', 'Алина Откинска', 'Дизайнер образовательного опыта, художница и автор Pigeon Polly. Выставки, публикации и проекты об обучении и AI.',
              ['🖼 На стенах и страницах', '🎓 Проекты об обучении и AI', '🤝 Иллюстрации, курсы, сотрудничество'])},
      lambda l: f'<div class="intro">{img(I + "exhibitions/exhibitions-2022-1-800.jpg", "photo tilt")}{img(I + "home/alina.jpg", "me")}</div>'),
 ]
