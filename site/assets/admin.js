@@ -34,6 +34,7 @@
     { id: 'gifts', hide: 1, ic: '🎁', name: 'Подарки и зарплата', open: 'birds', focus: '#adm-giftall', about: 'Подарить вещь одной птичке или всем, выдать зарплату пуговками.' },
     { id: 'comments', ic: '💬', name: 'Комментарии', group: 'birds', about: 'Комментарии к статьям блога: одобрить, ответить, удалить.', count: 'comments' },
     { id: 'strict', hide: 1, ic: '🛡', name: 'Строгий режим', open: 'comments', focus: '#adm-strict', about: 'Строгий режим комментариев: не больше одного комментария в час с одного адреса.' },
+    { id: 'mail', ic: '✉️', name: 'Письма', group: 'birds', about: 'Письма птичкам на почту — только тем, кто согласился: уведомления из игр, новые фишки, новости от Полли.' },
     { id: 'subscribers', ic: '📬', name: 'Подписчики', group: 'birds', about: 'Адреса людей, которые ждут письма о новой книге.', count: 'subs' },
     { id: 'shop', ic: '🛍', name: 'Магазин', group: 'shop', about: 'Сколько штук каждой вещи в продаже; цены считаются сами.' },
     { id: 'cards', ic: '🃏', name: 'Карточки', group: 'shop', about: 'Коллекционные карточки: каждая — в одном экземпляре. Новая карточка, правка, номер, скрыть, удалить; цена обычных; импорт коллекций с сайта.' },
@@ -55,6 +56,7 @@
   const SECTIONS = { notes, titos, inbox, security, overview: () => overview(), visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art,
     themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
     cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
+    mail: () => window.PPMailAdmin ? window.PPMailAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился mail-admin.js</p>'), // ✉️ Письма (mail-admin.js)
     carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
   const secOf = id => ADMIN_SECTIONS.find(x => x.id === id);
   const nav = document.getElementById('adm-nav');

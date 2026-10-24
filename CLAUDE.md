@@ -29,6 +29,7 @@
 | Полли-питомец | docs/polly-pet.md |
 | «Нарисуй мне» | docs/requests.md |
 | Меню, шапка, главная | docs/site.md |
+| Продвижение, рост посетителей | docs/growth.md |
 | Устаревшее | docs/history.md |
 
 Помощники: `tools/sec.py файл "заголовок"`; `tools/i18n_add.py`; `tools/shots.py URL селектор [--w 390,1440] [--login dev:ник] [--check]`.
