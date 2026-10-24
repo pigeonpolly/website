@@ -35,9 +35,9 @@ function letter(list, L, nick, off) {
     `🎉 ${one ? h.title[2] + ' · ' + h.town[2] : 'Svētki Vobblendā'} — dāvana tavam putniņam`][i];
   const hi = [`Hi, ${nick}!`, `Привет, ${nick}!`, `Sveiki, ${nick}!`][i];
   const parts = list.map(x => [
-    `Today ${x.town[0]} celebrates “${x.title[0]}”.\n${x.desc[0]}\n\nThe whole town sends your bird a holiday gift: ${x.giftName[0]}. It is waiting in the envelope 🔔 on the site.`,
-    `Сегодня ${x.town[1]} празднует «${x.title[1]}».\n${x.desc[1]}\n\nВесь город шлёт птичке праздничный подарок: ${x.giftName[1]}. Он ждёт в конвертике 🔔 на сайте.`,
-    `Šodien ${x.town[2]} svin “${x.title[2]}”.\n${x.desc[2]}\n\nVisa pilsēta sūta tavam putniņam svētku dāvanu: ${x.giftName[2]}. Tā gaida aploksnē 🔔 vietnē.`][i]);
+    `Today ${x.town[0]} celebrates “${x.title[0]}”.\n${x.desc[0]}\n\nThe whole town sends your bird a holiday gift. It is waiting in the envelope 🔔 on the site.`,
+    `Сегодня ${x.town[1]} празднует «${x.title[1]}».\n${x.desc[1]}\n\nВесь город шлёт птичке праздничный подарок. Он ждёт в конвертике 🔔 на сайте.`,
+    `Šodien ${x.town[2]} svin “${x.title[2]}”.\n${x.desc[2]}\n\nVisa pilsēta sūta tavam putniņam svētku dāvanu. Tā gaida aploksnē 🔔 vietnē.`][i]);
   const end = [`Happy holiday! Take a walk around Wobbleland — the map, towns, holidays and recipes:\n${link}\n\nAlina, Pigeon Polly Art Lab\n\n—\nYou get this because your bird lives on pigeonpolly.com. No more holiday emails: ${off}\nor untick it in your profile.`,
     `С праздником! Загляни в Воббленд — карта, города, праздники и рецепты:\n${link}\n\nАлина, Pigeon Polly Art Lab\n\n—\nЭто письмо приходит, потому что на pigeonpolly.com живёт твоя птичка. Больше не присылать праздничные письма: ${off}\nили снять галочку в профиле.`,
     `Priecīgus svētkus! Ieskaties Vobblendā — karte, pilsētas, svētki un receptes:\n${link}\n\nAlīna, Pigeon Polly Art Lab\n\n—\nŠo vēstuli saņem, jo vietnē pigeonpolly.com dzīvo tavs putniņš. Vairs nesūtīt svētku vēstules: ${off}\nvai noņem atzīmi profilā.`][i];
@@ -51,9 +51,17 @@ export async function wlHolidayCron(env, h, force) {
   if (today.length && !(await h.getMeta('wl_gift:' + day))) {
     await h.setMeta('wl_gift:' + day, '1'); // сначала метка: при сбое лучше без подарка, чем подарок дважды
     const t = Math.floor(Date.now() / 1000);
+    const birds = (await env.DB.prepare("SELECT id FROM users WHERE banned = 0 AND nick IS NOT NULL AND nick != ''").all()).results.map(r => r.id);
     for (const x of today) {
-      const [k, v] = x.gift.split('|');
-      await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, created_at) SELECT id, ?, ?, ?, ? FROM users WHERE banned = 0 AND nick IS NOT NULL AND nick != ''").bind(k, v, wlNote(x), t).run();
+      const [k, v] = x.gift.split('|'), note = wlNote(x);
+      // праздник каждый год: у кого эта вещь уже есть (с прошлого года, из магазина) — другая вещь того же вида, которой у птички ещё нет
+      const has = new Set((await env.DB.prepare("SELECT DISTINCT user_id FROM gifts WHERE kind = ? AND item = ? AND status IN ('bag', 'new')").bind(k, v).all()).results.map(r => r.user_id));
+      const stmts = [];
+      for (const id of birds) {
+        const it = has.has(id) && h.surprise ? await h.surprise(id, k) : [k, v];
+        if (it) stmts.push(env.DB.prepare('INSERT INTO gifts (user_id, kind, item, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(id, it[0], it[1], note, t));
+      }
+      for (let i = 0; i < stmts.length; i += 50) await env.DB.batch(stmts.slice(i, i + 50));
     }
   }
   if (!mailOn(env)) return;

@@ -66,7 +66,7 @@ export default {
       await importTitos(env, new URL('https://www.pigeonpolly.com/')).catch(e => console.error('titos', e)); // дела Титоса: новый titos-cases.json — в D1 и перевести (один раз на хэш)
       await challengeCron(env, RULES).catch(e => console.error('challenge plan', e)); // темы челленджа: с 20-го — план следующего месяца
       await adventMail(env, authHelpers(env)).catch(e => console.error('advent mail', e)); // 1 декабря: письмо «адвент открылся» тем, кто отметил галочку
-      await wlHolidayCron(env, authHelpers(env)).catch(e => console.error('wl holiday', e)); // праздник Воббленда: подарок всем птичкам и письмо-поздравление
+      await wlHolidayCron(env, wlHelpers(env)).catch(e => console.error('wl holiday', e)); // праздник Воббленда: подарок всем птичкам и письмо-поздравление
       await flockNewsCron(env).catch(e => console.error('flock news', e)); // новости стаи — 30 дней
       await autoNicks(env).catch(e => console.error('auto nick', e)); // птички без ника — случайный ник
       await migrateToR2(env); await cleanupInactive(env);
@@ -293,7 +293,7 @@ function adventNow(req, env) {
 // reply (ответ на комментарий) — когда у комментариев появятся ответы и они будут связаны с птичкой; сейчас ответов нет — вид пропущен.
 const NEWS_KINDS = [
   ['gift', async (env, req, u) => { // неоткрытые подарки
-    const r = await env.DB.prepare("SELECT COUNT(*) AS n, MAX(id) AS last FROM gifts WHERE user_id = ? AND status = 'new'").bind(u.id).first();
+    const r = await env.DB.prepare("SELECT COUNT(*) AS n, MAX(id) AS last FROM gifts WHERE user_id = ? AND status = 'new' AND COALESCE(note, '') NOT LIKE 'wl:%'").bind(u.id).first(); // подарки к праздникам Воббленда — своим письмом (holiday)
     if (!r || !r.n) return null;
     const g = await env.DB.prepare('SELECT kind, item, note FROM gifts WHERE id = ?').bind(r.last).first();
     return { n: r.n, from: g && /^from:/.test(g.note || '') ? g.note.slice(5) : null };
@@ -316,6 +316,10 @@ const NEWS_KINDS = [
   }],
   ['card', (env, req, u) => cardGiftNews(env, u.id)], // карточки, подаренные из кабинета (worker/cards.js)
   ['trade', (env, req, u) => tradeNews(env, u.id, RULES.tradeDays)], // новые предложения обмена карточками (worker/cards.js)
+  ['holiday', async (env, req, u) => { // праздник Воббленда: письмо-поздравление с подарком (worker/wl-holidays.js), гаснет, когда подарок открыт
+    const g = await env.DB.prepare("SELECT kind, item, note FROM gifts WHERE user_id = ? AND status = 'new' AND note LIKE 'wl:%' ORDER BY id DESC LIMIT 1").bind(u.id).first();
+    return g ? { k: g.kind, v: g.item, note: g.note } : null;
+  }],
   ['reward', (env, req, u) => rewardNews(env, u.id)], // награда Титоса за уровень (worker/titos.js) — «Поставить» в ленте
   ['feathers', (env, req, u) => featherNews(env, u, rigaDay())], // пёрышки комнате — сводка раз в сутки (worker/flock.js)
   ['seeds', (env, req, u) => gardenNews(env, u.id)], // семечко из игры, редкое или волшебное — пока птичка не зашла в огород (worker/garden.js)
@@ -375,6 +379,7 @@ const cardHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDa
 const titosHelpers = env => ({ ...cardHelpers(env), unit: () => gameUnit(env), btnOf, top: (uid, n) => topScore(env, 'titos', uid, n), award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), stamp: (uid, task) => stamp(env, uid, task) });
 const flockHelpers = env => ({ json, fail, currentUser, needUser, rigaDay, flockEvent: flockEvent(env), streakOf: rows => streaks(streakDays(rows)).current });
 const newsHelpers = env => ({ json, fail, needUser, isAdmin, rigaMs, getMeta: k => getMeta(env, k) });
+const wlHelpers = env => ({ ...authHelpers(env), surprise: (uid, kind) => surpriseKI(env, new Request('https://www.pigeonpolly.com/'), uid, kind) }); // праздники Воббленда: вещь уже есть — другая того же вида
 const authHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, sessionCookie, sessionDays: SESSION_DAYS, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), bump: (k, sql) => bump(env, k, sql) });
 const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), awardComment: (uid, cid) => awardComment(env, uid, cid) });
 
@@ -1406,7 +1411,7 @@ async function route(req, env, url) {
   const p = url.pathname, m = req.method;
   if (p.startsWith('/api/pw/') || p === '/api/funnel' || p === '/api/admin/pw-reset' || p === '/api/admin/funnels') { const r = await authApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p === '/api/flock/news' || p === '/api/news-off' || p === '/api/admin/flock-notes') { const r = await flockNewsApi(req, env, url, newsHelpers(env)); if (r) return r; }
-  if (p.startsWith('/api/wl-mail') || p === '/api/admin/wl-holiday') { const r = await wlMailApi(req, env, url, authHelpers(env)); if (r) return r; }
+  if (p.startsWith('/api/wl-mail') || p === '/api/admin/wl-holiday') { const r = await wlMailApi(req, env, url, wlHelpers(env)); if (r) return r; }
   if (p === '/api/birds' || p === '/api/feathers' || p === '/api/feather') { const r = await flockApi(req, env, url, flockHelpers(env)); if (r) return r; }
   if (p === '/api/top' && url.searchParams.get('g')) { const r = await topApi(req, env, url, { json, fail, currentUser, avatarOf }); if (r) return r; }
   if (p === '/api/pancakes' || p.startsWith('/api/pancakes/')) { const r = await pancakesApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, top: (uid, n) => topScore(env, 'pan', uid, n),
