@@ -23,7 +23,7 @@
       <section class="adm-box"><h2>📮 Кто согласился</h2>
         <p class="be-note">Птичек с почтой: <b>${n('email')}</b> · ответили на окно: <b>${n('asked')}</b> · «Не сейчас»: <b>${n('later')}</b>. Окно «Можно писать тебе на почту?» видят все птички при входе, пока не ответят.</p>
         <table class="be-table adm-table"><tbody>${Object.keys(CAT).map(k => `<tr><td>${CAT[k]}</td><td><b>${n(k)}</b></td></tr>`).join('')}</tbody></table>
-        <p class="be-note">Сегодня отправлено: <b>${d.today}</b> из ${d.max} (бесплатный лимит Resend — 100 в сутки). Что не успело — уйдёт само в следующие часы и дни.</p></section>
+        <p class="be-note">Сегодня отправлено: <b>${d.today}</b> из ${d.max} (бесплатный лимит Resend — 100 в сутки). Что не успело — уйдёт само в следующие часы и дни. Одной птичке — не больше одного письма в день: если сегодня ей уже что-то пришло, ваше письмо уйдёт завтра.</p></section>
       <section class="adm-box"><h2>✍️ Новое письмо</h2>
         <p><label>Кому: <select class="ml-cat">${Object.keys(CAT).map(k => `<option value="${k}"${draft.cat === k ? ' selected' : ''}>${CAT[k]} — ${n(k)}</option>`).join('')}</select></label></p>
         <div class="ml-tabs adm-quick">${['en', 'ru', 'lv'].map(l => `<button type="button" class="pill-btn${l === 'en' ? ' pill-fill' : ''}" data-l="${l}">${l.toUpperCase()}</button>`).join('')}<span class="ml-tr"></span></div>

@@ -16,6 +16,7 @@ export const MAIL_TABLES = [
 export const MAIL_ALTER = ['ALTER TABLE users ADD COLUMN mail_games INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN mail_feat INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN mail_news INTEGER DEFAULT 0',
   'ALTER TABLE users ADD COLUMN mail_asked INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN mail_later INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN mail_lang TEXT DEFAULT ''",
   // уведомления из игр (mailGamesCron): mail_g_at — последнее такое письмо; garden — время письма об огороде; titos — номер дела, о котором писали; streak — день письма о серии
+  "ALTER TABLE users ADD COLUMN mail_day TEXT DEFAULT ''", // день (по Риге) последнего письма: больше одного письма в день птичке нельзя (решение Алины) — mailFree/mailSent
   'ALTER TABLE users ADD COLUMN mail_g_at INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN mail_g_garden INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN mail_g_titos INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN mail_g_streak TEXT DEFAULT ''"];
 // числа уведомлений из игр — в «📜 Правилах» (кабинет → Все правила → ✉️ Уведомления из игр)
 export const MAIL_RULES = { mailGamesOn: true, mailStreakMin: 3, mailStreakHour: 19, mailGardenDays: 3, mailTitosDays: 4 };
@@ -64,7 +65,7 @@ async function sendOne(env, h, u, cat, L) {
 }
 
 // ---------- уведомления из игр (вид games) ----------
-// Раз в час (cron): не больше одного такого письма птичке за ~сутки (mail_g_at), только с согласием mail_games = 1.
+// Раз в час (cron): только с согласием mail_games = 1 и если сегодня птичке ещё не было никакого письма (mail_day).
 // 🔥 серия челленджа ≥ mailStreakMin дней сгорит сегодня (с mailStreakHour по Риге, сегодня ещё нет рисунка и не день свободы);
 // 🥕/🌱 огород: созрел урожай или грядки сухие — если птичка не заходила больше суток, не чаще раза в mailGardenDays дней;
 // 🕵️ Титос: следующее дело ждёт, а птичка не заходила mailTitosDays дней — один раз на каждое дело.
@@ -100,12 +101,12 @@ export async function mailGamesCron(env, h) {
   if (!mailOn(env) || !R.mailGamesOn) return;
   let left = Math.min(MAIL_BATCH, MAIL_DAY_MAX - await usedToday(h)), n = 0;
   if (left <= 0) return;
-  const t = now(), day = new Date().toISOString().slice(0, 10), base = `u.mail_games = 1 AND u.email IS NOT NULL AND u.email != '' AND u.banned = 0 AND u.nick IS NOT NULL AND u.nick != '' AND COALESCE(u.mail_g_at, 0) < ${t - 20 * 3600}`;
+  const t = now(), day = new Date().toISOString().slice(0, 10), base = `u.mail_games = 1 AND u.email IS NOT NULL AND u.email != '' AND u.banned = 0 AND u.nick IS NOT NULL AND u.nick != '' AND COALESCE(u.mail_day, '') != '${h.rigaDay()}'`; // одно письмо в день — любое
   const send = async (u, T, set, ...args) => {
     const L = langOf(u.mail_lang), [subject, text] = T;
     const r = await sendOne(env, h, u, 'games', { [L]: { s: subject, t: text }, en: { s: subject, t: text } });
     if (!r.ok) return false;
-    await env.DB.prepare(`UPDATE users SET mail_g_at = ?, ${set} WHERE id = ?`).bind(t, ...args, u.id).run();
+    await env.DB.prepare(`UPDATE users SET mail_g_at = ?, mail_day = ?, ${set} WHERE id = ?`).bind(t, h.rigaDay(), ...args, u.id).run();
     n++; left--; return true;
   };
   const hour = Number(new Date().toLocaleString('en-GB', { timeZone: 'Europe/Riga', hour: '2-digit', hour12: false }));
@@ -155,6 +156,10 @@ export async function mailGamesCron(env, h) {
   await spend(h, n);
 }
 
+// одно письмо в день на птичку — для всех писем с сайта (рассылки, уведомления из игр, праздники Воббленда, адвент); кроме писем о пароле
+export const mailFree = 'COALESCE(mail_day, \'\') != ?'; // в WHERE, привязать h.rigaDay()
+export const mailSent = (env, h, uid) => env.DB.prepare('UPDATE users SET mail_day = ? WHERE id = ?').bind(h.rigaDay(), uid).run();
+
 const dayKey = h => 'mail_n:' + h.rigaDay();
 async function usedToday(h) { const d = h.rigaDay(); return (await Promise.all(['mail_n:', 'advent_mail_n:', 'wl_mail_n:'].map(k => h.getMeta(k + d)))).reduce((a, v) => a + (Number(v) || 0), 0); } // вместе с адвентом и праздниками Воббленда
 async function spend(h, n) { if (n) await h.setMeta(dayKey(h), String((Number(await h.getMeta(dayKey(h))) || 0) + n)); }
@@ -163,12 +168,17 @@ async function spend(h, n) { if (n) await h.setMeta(dayKey(h), String((Number(aw
 export async function mailCron(env, h) {
   if (!mailOn(env)) return;
   let left = Math.min(MAIL_BATCH, MAIL_DAY_MAX - await usedToday(h)), n = 0;
-  while (left > 0) {
-    const o = await env.DB.prepare("SELECT * FROM mail_out WHERE status = 'send' ORDER BY id LIMIT 1").first();
-    if (!o || !MAIL_CATS.includes(o.cat)) break;
+  const outs = (await env.DB.prepare("SELECT * FROM mail_out WHERE status = 'send' ORDER BY id").all()).results; // по порядку; ждущая до завтра не держит следующие
+  for (const o of outs) {
+    if (left <= 0) break;
+    if (!MAIL_CATS.includes(o.cat)) continue;
     const rows = (await env.DB.prepare(`SELECT u.id, u.email, u.mail_lang FROM users u LEFT JOIN mail_sent s ON s.out_id = ? AND s.user_id = u.id
-      WHERE u.mail_${o.cat} = 1 AND u.email IS NOT NULL AND u.email != '' AND u.banned = 0 AND s.user_id IS NULL ORDER BY u.id LIMIT ?`).bind(o.id, left).all()).results;
-    if (!rows.length) { await env.DB.prepare("UPDATE mail_out SET status = 'done' WHERE id = ?").bind(o.id).run(); continue; }
+      WHERE u.mail_${o.cat} = 1 AND u.email IS NOT NULL AND u.email != '' AND u.banned = 0 AND s.user_id IS NULL AND COALESCE(u.mail_day, '') != ? ORDER BY u.id LIMIT ?`).bind(o.id, h.rigaDay(), left).all()).results;
+    if (!rows.length) { // никого сегодня: либо всем отправлено, либо остальным сегодня уже было письмо — тогда завтра
+      const rest = await env.DB.prepare(`SELECT 1 FROM users u LEFT JOIN mail_sent s ON s.out_id = ? AND s.user_id = u.id WHERE u.mail_${o.cat} = 1 AND u.email IS NOT NULL AND u.email != '' AND u.banned = 0 AND s.user_id IS NULL LIMIT 1`).bind(o.id).first();
+      if (!rest) await env.DB.prepare("UPDATE mail_out SET status = 'done' WHERE id = ?").bind(o.id).run();
+      continue;
+    }
     const L = JSON.parse(o.L);
     let stop = false;
     for (const u of rows) {
@@ -177,6 +187,7 @@ export async function mailCron(env, h) {
       await env.DB.batch([
         env.DB.prepare('INSERT OR IGNORE INTO mail_sent (out_id, user_id, at) VALUES (?, ?, ?)').bind(o.id, u.id, now()),
         env.DB.prepare('UPDATE mail_out SET sent = sent + 1 WHERE id = ?').bind(o.id),
+        env.DB.prepare('UPDATE users SET mail_day = ? WHERE id = ?').bind(h.rigaDay(), u.id),
       ]);
       n++; left--;
     }
