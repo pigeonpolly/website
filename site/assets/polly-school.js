@@ -131,7 +131,7 @@
     if (s.quiz) {
       const a = p.quiz[i];
       if (a == null) return `<div class="ps-quiz">${s.quiz.opts.map(([q], k) => `<button type="button" data-q="${k}">${tr(q)}</button>`).join('')}</div>`;
-      return `<p class="ps-ans">${tr(s.quiz.opts[a][0])} — ${tr(s.quiz.opts[a][1] ? s.quiz.yes : s.quiz.no)}</p>`;
+      return `<p class="ps-ans${s.quiz.opts[a][1] ? ' ok' : ''}">${tr(s.quiz.opts[a][0])} — ${tr(s.quiz.opts[a][1] ? s.quiz.yes : s.quiz.no)}</p>`;
     }
     if (s.find) { const got = p.find[i] || []; return `<p class="ps-ans">${t('found')}: ${got.length} / ${s.find.parts.length}${got.length ? ' · ' + got.map(k => tr(s.find.parts.find(x => x[0] === k)[2])).join(', ') : ''}</p>`; }
     if (s.paper) return `<div class="ps-paper">${s.paper.opts.map((o, k) => `<label><input type="checkbox" data-p="${k}"${p.paper.includes(k) ? ' checked' : ''}> ${tr(o)}</label>`).join('')}</div>`;

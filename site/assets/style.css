@@ -5097,6 +5097,7 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .ps-quiz button, .ps-bar button, .ps-send, .ps-file { padding: 8px 14px; border: 0; border-radius: 999px; background: #2B1A51; color: #FBF4E2; font: 700 14px var(--sans); cursor: pointer; }
 .ps-quiz button { background: #534AB7; }
 .ps-ans { margin: 6px 0 0 !important; font-size: 14px; color: #B0573A; font-weight: 700; }
+.ps-ans.ok { color: #2E7D5B; }
 .ps-paper { display: flex; flex-wrap: wrap; gap: 6px 14px; margin-top: 8px; font-size: 14px; }
 .ps-paper label { display: inline-flex; gap: 5px; align-items: center; cursor: pointer; }
 .ps-paper input { width: 18px; height: 18px; accent-color: #D85A30; }
