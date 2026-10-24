@@ -62,15 +62,20 @@
     carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
   const secOf = id => ADMIN_SECTIONS.find(x => x.id === id);
   const nav = document.getElementById('adm-nav');
-  const navLink = x => `<a href="${x.href || '#' + x.id}" data-sec="${x.id}"${x.href ? ' class="adm-ext" title="Откроется на своей странице"' : ''}><span>${x.ic} ${x.name}</span>${x.count ? `<span class="adm-count" data-count="${x.count}"${x.count === 'comments' ? ' id="adm-pend"' : ''} hidden></span>` : ''}</a>`;
-  if (nav) nav.innerHTML = [['', ''], ...Object.entries(ADMIN_GROUPS)].map(([g, name]) =>
-    `<div class="adm-nav-grp">${name ? `<p class="adm-nav-g">${name}</p>` : ''}${ADMIN_SECTIONS.filter(x => !x.hide && (x.group || '') === g).map(navLink).join('')}</div>`).join('');
+  // меню слева — только группы (6 строк); разделы группы — вкладками над экраном
+  const inGroup = g => ADMIN_SECTIONS.filter(x => !x.hide && x.group === g);
+  const cnt = keys => keys.length ? `<span class="adm-count" data-count="${keys.join(',')}" hidden></span>` : '';
+  if (nav) nav.innerHTML = `<a href="#inbox" data-grp="">📥 Входящие${cnt(['total'])}</a>` + Object.entries(ADMIN_GROUPS).map(([g, name]) =>
+    `<a href="#${inGroup(g).find(x => !x.href).id}" data-grp="${g}">${name}${cnt(inGroup(g).filter(x => x.count && x.count !== 'total').map(x => x.count))}</a>`).join('');
+  const tabLink = (x, cur) => `<a href="${x.href || '#' + x.id}"${x.href ? ' class="adm-ext" title="Откроется на своей странице"' : ''}${x.id === cur ? ' aria-current="page"' : ''}>${x.ic} ${x.name}${x.count ? `<span class="adm-count" data-count="${x.count}"${x.count === 'comments' ? ' id="adm-pend"' : ''} hidden></span>` : ''}</a>`;
   // экран: строка «что здесь делается» сверху, потом сам раздел; focus — прокрутить к нужному месту
   async function route() {
     const id = (location.hash || '#inbox').slice(1), x = secOf(id) || (SECTIONS[id] ? { id } : secOf('inbox'));
-    document.querySelectorAll('.adm-nav [data-sec]').forEach(a => a.setAttribute('aria-current', a.dataset.sec === (x.hide ? x.open || x.id : x.id) ? 'page' : 'false'));
+    const cur = x.hide ? x.open || x.id : x.id, g = (secOf(cur) || x).group || '';
+    document.querySelectorAll('.adm-nav [data-grp]').forEach(a => a.setAttribute('aria-current', a.dataset.grp === g ? 'page' : 'false'));
     const about = document.getElementById('adm-about');
-    if (about) about.innerHTML = x.name ? `<h2>${x.ic} ${x.name}</h2>${x.about ? `<p>${x.about}</p>` : ''}` : '';
+    if (about) about.innerHTML = (g ? `<nav class="adm-tabs" aria-label="${esc(ADMIN_GROUPS[g])}">${inGroup(g).map(t => tabLink(t, cur)).join('')}</nav>` : x.name ? `<h2>${x.ic} ${x.name}</h2>` : '') + (x.about ? `<p>${x.about}</p>` : '');
+    if (inboxData) badges(inboxData);
     if (x.id === 'subscribers') api('admin/inbox/seen', { k: 'subs' }).then(() => counts()).catch(() => {}); // открыла — новые уже не новые
     await (SECTIONS[x.open || x.id] || inbox)();
     const f = typeof x.focus === 'function' ? x.focus(main) : x.focus ? main.querySelector(x.focus) : null;
@@ -87,7 +92,7 @@
   function badges(d) {
     const v = { ...d, comments: d.comments, requests: d.requests, subs: d.subs, edits: d.edits, advent: (d.advent || []).length, scheduled: (d.scheduled || []).length };
     v.total = inboxItems(d).length; // сколько разных дел ждёт
-    document.querySelectorAll('.adm-nav [data-count]').forEach(b => { const k = v[b.dataset.count] || 0; b.hidden = !k; b.textContent = k || ''; });
+    document.querySelectorAll('#adm [data-count]').forEach(b => { const k = b.dataset.count.split(',').reduce((a, c) => a + (v[c] || 0), 0); b.hidden = !k; b.textContent = k || ''; });
   }
   const counts = () => api('admin/inbox').then(d => { inboxData = d; badges(d); return d; });
   const plural = (k, one, few, many) => k % 10 === 1 && k % 100 !== 11 ? one : [2, 3, 4].includes(k % 10) && ![12, 13, 14].includes(k % 100) ? few : many;
