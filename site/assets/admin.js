@@ -590,6 +590,9 @@
         row('🥕🌱 Огород — не чаще раза в', num('mailGardenDays', R.mailGardenDays, D.mailGardenDays) + ' дн.', D.mailGardenDays + ' дн.', 'урожай созрел или грядки сухие, а птичка не заходила больше суток'),
         row('🕵️ Титос ждёт — если птичка не заходила', num('mailTitosDays', R.mailTitosDays, D.mailTitosDays) + ' дн.', D.mailTitosDays + ' дн.', 'про каждое следующее дело — одно письмо'),
       ], 'Письма уходят сами раз в час, в пределах бесплатного лимита (90 в сутки вместе с остальными письмами). <a href="#mail">✉️ Письма →</a>')}
+      ${box('🎓 «Школа Полли»', [
+        row('Диплом (печать у всех 12 уроков)', num('schoolDiplomaBtn', R.schoolDiplomaBtn, D.schoolDiplomaBtn) + ' 🔘', D.schoolDiplomaBtn + ' 🔘', 'один раз, когда вы ставите двенадцатую печать; 0 — без пуговок'),
+      ], '<a href="#school">🎓 Работы учеников →</a>')}
       ${box('⏱ «Смена с Полли»', [
         row(`<label class="adm-r-chk"><input type="checkbox" data-r="shiftOn"${R.shiftOn ? ' checked' : ''}> Давать пуговки за смены</label>`, num('shiftBtn', R.shiftBtn, D.shiftBtn) + ' 🔘 за час', D.shiftBtn + ' 🔘', 'минуты доигранных до конца смен копятся; каждый полный час — повышение и столько пуговок'),
       ], '<a href="/ru/shift/">Открыть страницу →</a>')}

@@ -15,6 +15,10 @@ export const SCHOOL_ALTER = ['ALTER TABLE school_works ADD COLUMN comment_tr TEX
 const LANGS = ['en', 'ru', 'lv'];
 const langOf = t => /[а-яё]/i.test(t) ? 'ru' : /[āēīūčšžņļķģ]/i.test(t) ? 'lv' : 'en'; // на каком языке написала Алина
 const trOf = r => { try { return JSON.parse(r.comment_tr || '{}'); } catch (e) { return {}; } };
+// пуговки за диплом (12 печатей) — один раз, button_log kind 'school' ref 'diploma'; число — в «📜 Правилах»
+export const SCHOOL_RULES = { schoolDiplomaBtn: 150 };
+export const SCHOOL_RANGE = { schoolDiplomaBtn: [0, 10000] };
+export const SCHOOL_INT = ['schoolDiplomaBtn'];
 export const SCHOOL_LESSONS = 12, SCHOOL_DAY_MAX = 20; // уроков; сдач в сутки на птичку
 
 const last = rows => { const m = {}; for (const r of rows) m[r.lesson] = r; return m; }; // rows по id → последняя попытка урока
@@ -24,10 +28,11 @@ export async function schoolNews(env, uid) {
   const r = (await env.DB.prepare('SELECT lesson, status FROM school_works WHERE user_id = ? AND seen = 0 ORDER BY id DESC').bind(uid).all()).results;
   if (!r.length) return null;
   const done = (await env.DB.prepare("SELECT COUNT(DISTINCT lesson) AS n FROM school_works WHERE user_id = ? AND status = 'ok'").bind(uid).first()).n;
-  return { n: r.length, lesson: r[0].lesson, ok: r.filter(x => x.status === 'ok').length, redo: r.filter(x => x.status === 'redo').length, diploma: done >= SCHOOL_LESSONS && r.some(x => x.status === 'ok') }; // 12-я печать — диплом
+  const dip = await env.DB.prepare("SELECT amount FROM button_log WHERE user_id = ? AND kind = 'school' AND ref = 'diploma'").bind(uid).first().catch(() => null);
+  return { btn: dip ? dip.amount : 0, n: r.length, lesson: r[0].lesson, ok: r.filter(x => x.status === 'ok').length, redo: r.filter(x => x.status === 'redo').length, diploma: done >= SCHOOL_LESSONS && r.some(x => x.status === 'ok') }; // 12-я печать — диплом
 }
 
-// h: json, fail, currentUser, needUser, isAdmin, imgPut, randomHex, now, translate(texts, from, langs) → { tr: {lang: [..]} }
+// h: json, fail, currentUser, needUser, isAdmin, imgPut, randomHex, now, rules(), award(uid, kind, ref, n), translate(texts, from, langs) → { tr: {lang: [..]} }
 export async function schoolApi(req, env, url, h) {
   const p = url.pathname, m = req.method, { json, fail } = h;
   if (m === 'GET' && p === '/api/school') {
@@ -38,7 +43,8 @@ export async function schoolApi(req, env, url, h) {
     const lang = LANGS.includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
     const works = Object.values(last(rows)).map(r => ({ lesson: r.lesson, status: r.status, comment: trOf(r)[lang] || r.comment || '', img: r.img, note: r.note || '', at: r.created_at, checked: r.checked_at, tries: tries[r.lesson], fresh: !r.seen }));
     if (rows.some(r => !r.seen)) await env.DB.prepare('UPDATE school_works SET seen = 1 WHERE user_id = ? AND seen = 0').bind(u.id).run(); // открыл школу — вердикты увидены
-    return json({ me: true, nick: u.nick, works }, 200, { 'cache-control': 'no-store' });
+    const dip = await env.DB.prepare("SELECT amount FROM button_log WHERE user_id = ? AND kind = 'school' AND ref = 'diploma'").bind(u.id).first().catch(() => null);
+    return json({ me: true, nick: u.nick, works, diplomaBtn: dip ? dip.amount : 0 }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/school/hand') {
     const u = await h.needUser(req, env);
@@ -77,13 +83,20 @@ export async function schoolApi(req, env, url, h) {
       const status = b.status, comment = String(b.comment || '').trim().slice(0, 1000);
       if (!['ok', 'redo'].includes(status)) fail(400, 'status');
       if (status === 'redo' && !comment) fail(400, 'comment'); // на доработку — всегда с объяснением
-      const work = await env.DB.prepare('SELECT id FROM school_works WHERE id = ?').bind(Number(b.id)).first();
+      const work = await env.DB.prepare('SELECT id, user_id FROM school_works WHERE id = ?').bind(Number(b.id)).first();
       if (!work) fail(404, 'work');
       // перевод комментария на все языки сайта (не вышло — ученик увидит оригинал; при следующей правке переведётся заново)
       const from = langOf(comment), tr = comment ? { [from]: comment } : {};
       if (comment) { try { const r = await h.translate([comment], from, LANGS); for (const l of LANGS) if (r.tr[l] && r.tr[l][0]) tr[l] = r.tr[l][0]; } catch (e) {} }
       await env.DB.prepare('UPDATE school_works SET status = ?, comment = ?, comment_tr = ?, checked_at = ?, seen = 0 WHERE id = ?').bind(status, comment, JSON.stringify(tr), h.now(), work.id).run();
-      return json({ ok: true, tr: Object.keys(tr) });
+      // 12-я печать — пуговки за диплом (один раз)
+      let diploma = 0;
+      if (status === 'ok') {
+        const done = (await env.DB.prepare("SELECT COUNT(DISTINCT lesson) AS n FROM school_works WHERE user_id = ? AND status = 'ok'").bind(work.user_id).first()).n;
+        const n = Math.round(h.rules().schoolDiplomaBtn || 0);
+        if (done >= SCHOOL_LESSONS && n > 0) diploma = await h.award(work.user_id, 'school', 'diploma', n);
+      }
+      return json({ ok: true, tr: Object.keys(tr), diploma });
     }
   }
   return null;

@@ -5228,3 +5228,4 @@ html.me-in .gm-pin.on { background: var(--star); color: #2B1A51; }
   .hd-gm .am-tile-ico { display: none; }
   html.me-in .gm-pin { width: 30px; height: 30px; font-size: 16px; top: 6px; right: 6px; }
 }
+.ps-dip-btn { display: inline-block; margin-left: 6px; padding: 2px 12px; border-radius: 999px; background: #E9A93B; color: #2B1A51; font: 700 .9em var(--sans); }

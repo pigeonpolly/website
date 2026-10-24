@@ -16,7 +16,7 @@
 
   const T = {
     title: ['Polly’s Drawing School', 'Школа Полли', 'Pollijas zīmēšanas skola'],
-    lead: ['Pen, paper and twelve small lessons. Every lesson ends with a real client from Wobbleland, and after twelve stamps you get a pixel diploma.', 'Ручка, бумага и двенадцать маленьких уроков. В конце каждого приходит настоящий клиент из Воббленда, а за двенадцать печатей — пиксельный диплом.', 'Pildspalva, papīrs un divpadsmit mazas nodarbības. Katras beigās ierodas īsts klients no Vobllendas, bet par divpadsmit zīmogiem — pikseļu diploms.'],
+    lead: ['Pen, paper and twelve small lessons. Every lesson ends with a real client from Wobbleland, and after twelve stamps you get a pixel diploma and buttons.', 'Ручка, бумага и двенадцать маленьких уроков. В конце каждого приходит настоящий клиент из Воббленда, а за двенадцать печатей — пиксельный диплом и пуговки.', 'Pildspalva, papīrs un divpadsmit mazas nodarbības. Katras beigās ierodas īsts klients no Vobllendas, bet par divpadsmit zīmogiem — pikseļu diploms un pogas.'],
     free: ['The daily challenge is open to everyone — school is just for courage.', 'Челлендж открыт всем — школа просто для смелости.', 'Izaicinājums ir atvērts visiem — skola ir tikai drosmei.'],
     path: ['Student path', 'Тропинка ученика', 'Skolēna taka'],
     lesson: ['Lesson', 'Урок', 'Nodarbība'],
@@ -91,7 +91,7 @@
   let mode = 'lesson', view = Math.min(ls(st.cur).step, stepsOf(st.cur).length - 1);
 
   const loadSrv = () => fetch('/api/school?lang=' + ['en', 'ru', 'lv'][L], { credentials: 'same-origin' }).then(r => r.json()).then(d => {
-    srv.me = !!d.me; srv.nick = d.nick || ''; srv.works = {}; for (const w of d.works || []) srv.works[w.lesson] = w;
+    srv.me = !!d.me; srv.nick = d.nick || ''; srv.btn = d.diplomaBtn || 0; srv.works = {}; for (const w of d.works || []) srv.works[w.lesson] = w;
     render();
   }).catch(() => { srv.me = false; render(); });
   // фото → полная (1600) и превью (480) JPEG, как в челлендже
@@ -202,7 +202,7 @@
   const diplomaView = () => {
     const k = stamps();
     if (k < N) return `<div class="ps-dipwait"><p>${t('dipWait')} <b>${k} / ${N}</b></p><button type="button" class="ps-back">${t('back')}</button></div>`;
-    return `<div class="ps-dip"><p class="ps-dip-hi">${t('dipCongrats')}</p><div class="ps-dip-pic"></div><div class="ps-dip-act"><button type="button" class="ps-dl">${t('dipSave')}</button><a class="ps-dl ps-dl2" href="${['', '/ru', '/lv'][L]}/challenge/">${t('toChallenge')}</a><button type="button" class="ps-back">${t('back')}</button></div></div>`;
+    return `<div class="ps-dip"><p class="ps-dip-hi">${t('dipCongrats')}${srv.btn ? ` <span class="ps-dip-btn">+${srv.btn} 🔘</span>` : ''}</p><div class="ps-dip-pic"></div><div class="ps-dip-act"><button type="button" class="ps-dl">${t('dipSave')}</button><a class="ps-dl ps-dl2" href="${['', '/ru', '/lv'][L]}/challenge/">${t('toChallenge')}</a><button type="button" class="ps-back">${t('back')}</button></div></div>`;
   };
 
   const render = () => {

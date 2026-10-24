@@ -36,7 +36,7 @@
       st.textContent = '…';
       try {
         const r = await api('admin/school/check', { id: +li.dataset.id, status: b.dataset.v, comment: li.querySelector('textarea').value });
-        st.textContent = (b.dataset.v === 'ok' ? '✓ Печать стоит' : '✓ Вернули на доработку') + (li.querySelector('textarea').value.trim() ? ((r.tr || []).length >= 3 ? ' · комментарий переведён на EN, RU, LV' : ' · перевод не получился, ученик увидит как написано') : '');
+        st.textContent = (b.dataset.v === 'ok' ? '✓ Печать стоит' : '✓ Вернули на доработку') + (r.diploma ? ` · 🎓 все 12 печатей — диплом и ${r.diploma} 🔘` : '') + (li.querySelector('textarea').value.trim() ? ((r.tr || []).length >= 3 ? ' · комментарий переведён на EN, RU, LV' : ' · перевод не получился, ученик увидит как написано') : '');
         if (tab === 'wait') setTimeout(() => li.remove(), 700);
       } catch (e) { st.textContent = ERR[e.message] || e.message; }
     });

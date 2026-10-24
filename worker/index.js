@@ -16,7 +16,7 @@ import { topApi, topScore, topCron, TOP_TABLES } from './top.js'; // доски 
 import { mailApi, mailCron, mailGamesCron, mailAsk, mailPrefs, MAIL_TABLES, MAIL_ALTER, MAIL_RULES, MAIL_RANGE, MAIL_INT } from './mail.js'; // письма по согласию: окно, отписка, рассылка из кабинета (docs/bird.md «Письма»)
 import { myGamesApi, MY_GAMES_TABLES } from './my-games.js'; // «★ Мои игры» на главной (docs/site.md)
 import { shiftApi, SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_RANGE, SHIFT_INT } from './shift.js'; // «Смена с Полли» (этап 29, docs/rooms.md)
-import { schoolApi, schoolNews, SCHOOL_TABLES, SCHOOL_ALTER } from './school.js'; // «Школа Полли»: сдача работ и проверка (docs/challenge.md)
+import { schoolApi, schoolNews, SCHOOL_TABLES, SCHOOL_ALTER, SCHOOL_RULES, SCHOOL_RANGE, SCHOOL_INT } from './school.js'; // «Школа Полли»: сдача работ и проверка (docs/challenge.md)
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
 import { gardenApi, gardenDrop, gardenNews, GARDEN_TABLES, GARDEN_ALTER, GARDEN_RULES, GARDEN_RANGE, GARDEN_INT, GARDEN_BOOL, GARDEN_SEASONS } from './garden.js'; // огород птички (этап 22, docs/bird.md «Огород»)
 import { ideasApi } from './ideas.js'; // кабинет → «💡 Темы для блога» (docs/admin.md)
@@ -602,6 +602,7 @@ const RULE_DEFAULTS = {
   ...GARDEN_RULES, // огород: грядки, полив, цены семян и урожая, жуки, погода (worker/garden.js)
   ...MAIL_RULES, // уведомления из игр на почту: серия, огород, Титос (worker/mail.js)
   ...SHIFT_RULES, // «Смена с Полли»: 🔘 за каждый отработанный час (worker/shift.js)
+  ...SCHOOL_RULES, // «Школа Полли»: 🔘 за диплом (worker/school.js)
   ...PAN_RULES, // «Блинная Полли»: пуговки за уровень, рекорд, вещь, мытьё сковородки (worker/pancakes.js)
   ...TITOS_RULES, // детектив Титос: кофе, пуговки за уровень (worker/titos.js)
   ...CH_DEFAULTS, // подбор тем челленджа: семья не ближе N дней, категории, колода сложности, доля сезона (worker/challenge-plan.js)
@@ -609,7 +610,7 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { homeKitchen: [0, 1000], homeBedroom: [0, 1000], homeCrypt: [0, 1000], homeBath: [0, 1000], homeOffice: [0, 1], welcomeBtn: [-1, 10000], wlBtn: [-1, 10000], daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potionRevive: [0, 30], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...GARDEN_RANGE, ...SHIFT_RANGE, ...MAIL_RANGE, ...CH_RANGE };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potionRevive: [0, 30], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...GARDEN_RANGE, ...SHIFT_RANGE, ...SCHOOL_RANGE, ...MAIL_RANGE, ...CH_RANGE };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -626,7 +627,7 @@ function cleanRules(r) {
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
   for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn', 'panOn', 'shiftOn', 'mailGamesOn', ...GARDEN_BOOL]) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['homeKitchen', 'homeBedroom', 'homeCrypt', 'homeBath', 'homeOffice', 'daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'potionRevive', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...GARDEN_INT, ...SHIFT_INT, ...MAIL_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
+  for (const k of ['homeKitchen', 'homeBedroom', 'homeCrypt', 'homeBath', 'homeOffice', 'daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'potionRevive', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...GARDEN_INT, ...SHIFT_INT, ...SCHOOL_INT, ...MAIL_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
   if (GARDEN_SEASONS.includes(r.gardenSeason)) out.gardenSeason = r.gardenSeason;
@@ -1462,7 +1463,7 @@ async function route(req, env, url) {
   if (p === '/api/garden' || p.startsWith('/api/garden/')) { const r = await gardenApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p === '/api/admin/ideas') { const r = await ideasApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/mail/') || p.startsWith('/api/admin/mail')) { const r = await mailApi(req, env, url, authHelpers(env)); if (r) return r; }
-  if (p === '/api/school' || p.startsWith('/api/school/') || p === '/api/admin/school' || p === '/api/admin/school/check') { const r = await schoolApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, randomHex, now, translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is a short friendly comment from an art teacher (Polly, a pigeon) on a student\'s drawing made on paper. Keep it warm, simple and encouraging.') }); if (r) return r; }
+  if (p === '/api/school' || p.startsWith('/api/school/') || p === '/api/admin/school' || p === '/api/admin/school/check') { const r = await schoolApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, randomHex, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is a short friendly comment from an art teacher (Polly, a pigeon) on a student\'s drawing made on paper. Keep it warm, simple and encouraging.') }); if (r) return r; }
   if (p === '/api/games/mine' || p === '/api/games/visit') { const r = await myGamesApi(req, env, url, { json, fail, currentUser, needUser }); if (r) return r; }
   if (p === '/api/shift' || p.startsWith('/api/shift/')) { const r = await shiftApi(req, env, url, { json, fail, currentUser, needUser, rules: () => RULES, randomHex, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p.startsWith('/api/titos') || p.startsWith('/api/admin/titos')) { const r = await titosApi(req, env, url, titosHelpers(env)); if (r) return r; }
