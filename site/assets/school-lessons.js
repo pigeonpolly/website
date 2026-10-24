@@ -9,7 +9,8 @@
   const svg = (inner, h = 190) => `<svg viewBox="0 0 200 ${h}" class="ps-art" aria-hidden="true"><rect width="200" height="${h}" fill="#fff"/>${inner}</svg>`;
   const ink = 'fill="none" stroke="#2B1A51" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"';
   // эллипсы (урок 9): отверстие кружки сверху, наискосок, сбоку
-  const cupArt = ry => svg(`<path d="M55 ${60} L60 160 Q100 176 140 160 L145 60" ${ink}/><ellipse cx="100" cy="60" rx="45" ry="${ry}" ${ink}/><path d="M145 85 c30 -4 30 50 -4 48" ${ink}/><ellipse cx="100" cy="60" rx="45" ry="${ry}" fill="none" stroke="#D85A30" stroke-width="2.5" stroke-dasharray="7 5"/>`);
+  // дно — передняя половина такого же эллипса (чуть круглее), а чем выше взгляд, тем ниже кажется кружка
+  const cupArt = ry => svg(`<path d="M55 60 L60 ${160 - ry / 2} A40 ${Math.max(4, Math.round(ry * 40 / 45 + 1))} 0 0 0 140 ${160 - ry / 2} L145 60" ${ink}/><ellipse cx="100" cy="60" rx="45" ry="${ry}" ${ink}/><path d="M145 85 c30 -4 30 50 -4 48" ${ink}/><ellipse cx="100" cy="60" rx="45" ry="${ry}" fill="none" stroke="#D85A30" stroke-width="2.5" stroke-dasharray="7 5"/>`);
 
   window.PP_SCHOOL_LESSONS = [
     { // 1 — Фигуры
@@ -222,8 +223,8 @@
           find: { parts: [
             ['e1', '<ellipse cx="40" cy="70" rx="26" ry="18"/>', ['seen from high above — round', 'вид сверху — круглое', 'no augšas — apaļa']],
             ['e2', '<ellipse cx="100" cy="70" rx="26" ry="9"/>', ['at an angle — an oval', 'наискосок — овал', 'slīpi — ovāls']],
-            ['e3', `${W(70, 60, 60, 20)}${W(130, 64, 60, 12)}<ellipse cx="160" cy="70" rx="26" ry="3"/>`, ['from the side — almost a line', 'сбоку — почти линия', 'no sāniem — gandrīz līnija']]],
-            deco: '<path d="M14 70 L18 130 Q40 140 62 130 L66 70 M74 70 L78 130 Q100 140 122 130 L126 70 M134 70 L138 130 Q160 140 182 130 L186 70" fill="none" stroke="#2B1A51" stroke-width="3"/>' } },
+            ['e3', `${W(132, 63, 56, 14)}<ellipse cx="160" cy="70" rx="26" ry="3"/>`, ['from the side — almost a line', 'сбоку — почти линия', 'no sāniem — gandrīz līnija']]],
+            deco: '<path d="M14 70 L18 118 A22 17 0 0 0 62 118 L66 70 M74 70 L78 130 A22 9 0 0 0 122 130 L126 70 M134 70 L138 138 A22 3 0 0 0 182 138 L186 70" fill="none" stroke="#2B1A51" stroke-width="3"/>' } },
         { art: cupArt(18), say: ['On paper: draw one mug (or a bowl) from different heights. Which views?', 'На бумаге: нарисуй одну кружку (или миску) с разной высоты. Какие виды?', 'Uz papīra: uzzīmē vienu krūzi (vai bļodu) no dažāda augstuma. Kādus skatus?'],
           paper: { min: 2, opts: [['from above', 'сверху', 'no augšas'], ['at an angle', 'наискосок', 'slīpi'], ['from the side', 'сбоку', 'no sāniem']] } },
         { say: ['Darling! I save every snack for a rainy day and dip it in a fresh puddle. Draw my mug and my bowl — from different sides, so I can admire them.', 'Дорогуша! Я берегу угощения на дождливый день и макаю их в свежую лужу. Нарисуй мою кружку и миску — с разных сторон, чтобы я ими любовалась.', 'Mīļumiņ! Es taupu kārumus lietainai dienai un mērcēju tos svaigā peļķē. Uzzīmē manu krūzi un bļodu — no dažādām pusēm, lai varu tās apbrīnot.'],
