@@ -4621,13 +4621,16 @@ html.me-in .myday { display: block; }
 .md-btns:hover { background: rgba(233, 169, 59, .3); }
 .md-card { min-width: 0; }
 @media (max-width: 760px) { .md-in { grid-template-columns: 1fr; gap: 18px; } .md-bird canvas { width: 128px; height: 112px; } }
-.home-games { max-width: 1200px; margin: 0 auto; padding: 30px 0 10px; }
+.home-games { margin: 0 auto; padding: 30px 0 10px; }
+/* все игры одной строкой во всю ширину; не влезают — листаются вбок */
+.home-games .gm-tiles { grid-auto-flow: column; grid-template-columns: none; grid-auto-columns: minmax(150px, 1fr); max-width: none; overflow-x: auto; scroll-snap-type: x mandatory; scroll-padding: 0 var(--gutter); padding-bottom: 6px; scrollbar-width: thin; }
+.home-games .gm-tile { scroll-snap-align: start; }
 .home-games h2 { margin: 0 var(--gutter) 14px; font-size: clamp(24px, 2.6vw, 32px); }
 .home-games .gm-tile[hidden] { display: none; }
 .hg-all { margin: 14px var(--gutter) 0; text-align: right; }
 .hg-all a { color: var(--peach); font-weight: 700; text-decoration: none; }
 /* главная под играми (24.10.2026): вошедшему — «Мой день» · мои новости · праздник + новое на сайте; гостю — новое в комнатах · праздник */
-.home-dash { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 22px; align-items: start; max-width: 1200px; margin: 0 auto; padding: 26px var(--gutter) 10px; }
+.home-dash { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 22px; align-items: start; margin: 0 auto; padding: 26px var(--gutter) 10px; }
 html.me-in .home-dash { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr); }
 .hd-col { min-width: 0; }
 .hd-news, .hd-upd, html.me-in .hd-rooms { display: none; }
@@ -4636,9 +4639,11 @@ html.me-in .hd-news, html.me-in .hd-upd { display: block; }
 .home-dash .md-in { grid-template-columns: 1fr; gap: 16px; }
 .hd-side { display: grid; gap: 22px; }
 .home-dash #blk-wl-holiday .wlh { max-width: none; margin: 0; padding: 0; } /* стили блока — с #blk-…, перебивать так же */
+@media (max-width: 1600px) {
 html.me-in .home-dash #blk-wl-holiday .wlh-card { display: grid; grid-template-columns: auto 1fr; align-items: center; padding: 24px 16px 16px; }
 html.me-in .home-dash #blk-wl-holiday .wlh-tx { grid-column: 1 / -1; grid-row: 2; }
 html.me-in .home-dash #blk-wl-holiday .wlh-cnt { justify-self: end; }
+}
 .home-dash #blk-wl-holiday .wlh-card { height: 100%; box-sizing: border-box; }
 .home-dash .fn-row { padding: 8px 12px; }
 .home-dash .fn-txt { font-size: 14px; }
