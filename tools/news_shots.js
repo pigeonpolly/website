@@ -45,11 +45,11 @@ async function page(b, w, h, api = {}) {
   }
   if (which === 'all' || which === 'wl') {
     const p = await page(b, 1200, 760);
-    await p.goto(B + '/ru/wobbleland/#walk-lemonvale', { waitUntil: 'load' }); await p.waitForTimeout(1500);
+    await p.goto(B + '/ru/wobbleland/#walk-' + (process.argv[4] || 'lemonvale') + '', { waitUntil: 'load' }); await p.waitForTimeout(1500);
     await p.waitForTimeout(1500); console.log('open?', await p.evaluate(() => location.hash + ' ' + !!document.querySelector('.wl-tw:not([hidden])')));
     await p.keyboard.down('ArrowRight'); await p.waitForTimeout(+process.argv[3] || 2500); await p.keyboard.up('ArrowRight');
     await p.waitForTimeout(900); console.log('still', await p.evaluate(() => location.hash));
-    await p.addStyleTag({ content: '.wl-tw-box *{visibility:hidden!important}.wl-tw-box canvas{visibility:visible!important}' }); await p.waitForTimeout(200); await (await p.$('.wl-tw-box canvas')).screenshot({ path: O + 'c-walk.png' }); await p.close();
+    await p.addStyleTag({ content: '.wl-tw-box *{visibility:hidden!important}.wl-tw-box canvas{visibility:visible!important}' }); await p.waitForTimeout(200); await (await p.$('.wl-tw-box canvas')).screenshot({ path: O + 'c-walk-' + (process.argv[4] || 'lemonvale') + '.png' }); await p.close();
   }
   if (which === 'all' || which === 'shift') {
     const p = await page(b, 1200, 900);

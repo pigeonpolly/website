@@ -152,7 +152,9 @@ async function ensureBlogSchema(env) {
 async function importDrafts(env) {
   const r = await env.ASSETS.fetch(new Request(SITE + '/assets/blog-drafts.json'));
   if (!r.ok) return;
-  const list = ((await r.json()).posts || []).filter(p => p && p.slug);
+  const data = await r.json(), list = (data.posts || []).filter(p => p && p.slug);
+  // drop — черновики, которые больше не нужны: убираются, только если остались черновиком и их не правили
+  for (const slug of data.drop || []) await env.DB.prepare("DELETE FROM blog_posts WHERE slug = ? AND status = 'draft' AND updated_at = created_at").bind(slug).run();
   if (!list.length) return;
   const done = new Set((await env.DB.prepare("SELECT key FROM meta WHERE key LIKE 'blog_draft:%'").all()).results.map(x => x.key));
   const now = Math.floor(Date.now() / 1000);
