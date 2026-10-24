@@ -2,7 +2,7 @@
 """Картинки для Instagram Stories (1080×1920) по всем разделам сайта, EN и RU, без кнопок.
 
   python3 tools/stories/cap.py    — снимки птичек, комнаты, огорода, челленджа и «Полли, помоги» → _held/stories/src/
-  python3 tools/stories/make.py [имя ...] — сторис → _held/stories/{en,ru}/NN-имя.png и лист _held/stories/sheet-{en,ru}.jpg
+  python3 tools/stories/make.py [имя ...] — сторис → _held/stories/{en,ru}/№-имя.png (№ — с 190, продолжает «Pinterest pins» в Notion, тип «Сторис») и лист _held/stories/sheet-{en,ru}.jpg
 
 Шрифты как на сайте (Fraunces, Karla); кириллицы в них нет — для RU сами подставляются Lora и Manrope.
 Тексты — из описаний страниц сайта и docs/*.md (факты не придумывать). Картинки — site/images и снимки cap.py.
@@ -331,7 +331,7 @@ def main():
                 over = pg.evaluate("(() => { const v = document.querySelector('.vis'), r = v.getBoundingClientRect(); return [...v.querySelectorAll('*')].filter(e => !e.closest('.clip')).some(e => { const b = e.getBoundingClientRect(); return b.bottom > r.bottom + 2 || b.top < r.top - 2; }) || document.querySelector('.foot').getBoundingClientRect().bottom > 1900; })()")
                 if over:
                     print('⚠ не влезает:', st[0], lang)
-                pg.screenshot(path=str(OUT / lang / f'{n:02d}-{st[0]}.png'))
+                pg.screenshot(path=str(OUT / lang / f'{n + 189}-{st[0]}.png'))
         b.close()
     sheet()
 
