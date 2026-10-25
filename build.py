@@ -576,7 +576,15 @@ def titos_cases():
         json.dumps({"hash": hashlib.md5(body.encode()).hexdigest()[:16], "cases": cases}, ensure_ascii=False, separators=(",", ":")) + "\n")
 
 
+def about_chat():
+    """Чат «Поболтать с Алиной и Полли» на /about-me/: content/about-chat/questions.json → site/assets/about-chat.json
+    (q — вопрос, a — ответ Алины, p — ответ Полли; en/ru/lv). Ответы из таблицы — tools/about_chat.py."""
+    data = json.loads((CONTENT / "about-chat" / "questions.json").read_text())
+    (OUT / "assets" / "about-chat.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n")
+
+
 def build():
+    about_chat()
     rooms_data()
     wobbleland_data()
     titos_cases()
