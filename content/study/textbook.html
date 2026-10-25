@@ -44,6 +44,7 @@ a:hover { color: var(--warm); }
 :focus-visible { outline: 2px solid var(--warm); outline-offset: 2px; border-radius: 3px; }
 h1, h2, h3, h4 { font-family: var(--f-body); text-wrap: balance; line-height: 1.2; }
 code, pre { font-variant-ligatures: none; }
+:not(pre) > code { overflow-wrap: anywhere; }
 code { font-family: var(--f-code); font-size: .84em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; }
 
 /* верхняя полоса */
@@ -186,6 +187,13 @@ details.sol figure.code { margin: 10px 0; }
 .thread figure.code { background: var(--paper); }
 .thread ul.todo input { accent-color: var(--thread); }
 .toc ul a[data-sub$="-thread"], .toc ul a[data-sub="intro-thread"] { color: var(--thread); font-weight: 600; }
+.notes { border-top: 1px solid var(--rule); border-bottom: 1px solid var(--rule); padding: 4px 0 12px; margin: 8px 0 24px; }
+.notes h4 { font: 600 17px var(--f-ui); margin: 20px 0 6px; color: var(--ink); }
+.notes ol, .notes ul { margin: 6px 0; }
+.box.example { background: var(--paper-2); border: 1px dashed var(--accent); }
+.box.example h4 { color: var(--accent); }
+.box.example > p { margin: 6px 0; }
+.box.example ol > li { margin: 4px 0; }
 .box.note { border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; font-size: 16px; }
 .box.note p { margin: 0; }
 
@@ -277,7 +285,7 @@ mark { background: var(--mark); color: inherit; }
   </div>
 
   <h3 id="intro-how">Как пользоваться учебником</h3>
-  <p>Все материалы бесплатны и находятся в открытом доступе. Каждая глава устроена одинаково: <b>цели</b>, <b>ключевые понятия</b> с объяснениями, <b>теория</b> (книги, курсы, видео, документация), <b>листинг</b> с примером кода, <b>интересный факт</b>, <b>практика</b>, <b>задачи с решениями</b>, <b>упражнения</b>, <b>вопросы «Проверь себя»</b>, <b>тест</b> с оценкой в % и разбором ответов и <b>чек-лист навыков</b>. В начале главы перечислено, что вы будете уметь после неё. Галочки сохраняются на сайте, их видно с любого устройства, где выполнен вход.</p>
+  <p>Все материалы бесплатны и находятся в открытом доступе. Каждая глава устроена одинаково: <b>цели</b>, <b>ключевые понятия</b> с объяснениями, <b>теория</b> (книги, курсы, видео, документация), <b>листинг</b> с примером кода, <b>конспект теории</b>, <b>интересный факт</b>, <b>практика</b>, <b>разбор похожего задания по шагам</b> и <b>задачи с решениями</b>, <b>упражнения</b>, <b>вопросы «Проверь себя»</b>, <b>тест</b> с оценкой в % и разбором ответов и <b>чек-лист навыков</b>. В начале главы перечислено, что вы будете уметь после неё. Галочки сохраняются на сайте, их видно с любого устройства, где выполнен вход.</p>
   <p>Оглавление слева показывает, сколько пунктов главы уже отмечено. Кнопка «Продолжить» ведёт к первому неотмеченному пункту. Поиск находит любую тему, книгу или термин.</p>
 
   <h3 id="intro-rules">Принципы самообучения</h3>
@@ -386,6 +394,30 @@ mark { background: var(--mark); color: inherit; }
     <dt>Gradle / Maven</dt><dd>Сборка, зависимости, запуск тестов.</dd>
   </dl>
 
+  <h3 id="ch1-notes">Конспект теории</h3>
+<div class="notes">
+<h4>Records: данные без шаблонного кода</h4>
+<p>Record объявляет неизменяемый класс одной строкой: <code>record Point(int x, int y) {}</code>. Компилятор создаёт поля <code>private final</code>, конструктор, методы доступа <code>x()</code> и <code>y()</code>, а также equals, hashCode и toString. Проверки входных данных пишут в компактном конструкторе — без списка параметров:</p><figure class="code"><figcaption>Компактный конструктор</figcaption><pre><code>record Money(BigDecimal amount, String currency) {
+    Money {
+        if (amount.signum() &lt; 0) throw new IllegalArgumentException("amount &lt; 0");
+        currency = currency.toUpperCase();   // можно нормализовать значение
+    }
+}</code></pre></figure>
+<h4>Sealed и pattern matching</h4>
+<p><code>sealed interface A permits B, C</code> перечисляет всех наследников. Поэтому <code>switch</code> по такому типу может быть исчерпывающим без <code>default</code>: если добавить новый вариант и забыть его обработать, код не скомпилируется.</p><ul><li><code>case Circle c -&gt;</code> — проверка типа и переменная сразу нужного типа.</li><li><code>case Rect(double w, double h) -&gt;</code> — record pattern: тип проверяется, а компоненты сразу разбираются в переменные (Java 21).</li><li><code>case Card c when c.foreign() -&gt;</code> — условие-охранник. Более узкие варианты пишут выше общих.</li></ul>
+<h4>Stream API: источник → промежуточные операции → итог</h4>
+<p>Поток не хранит данные, а описывает обработку. Промежуточные операции (<code>filter</code>, <code>map</code>, <code>sorted</code>, <code>limit</code>) ленивые: ничего не происходит, пока не вызвана завершающая (<code>toList</code>, <code>collect</code>, <code>count</code>, <code>max</code>).</p><ul><li><code>Collectors.groupingBy(ключ, что_считать)</code> строит <code>Map</code>: <code>counting()</code> — количество, <code>summingLong</code> — сумма, <code>averagingDouble</code> — среднее, <code>mapping</code> — преобразование значений.</li><li>Чтобы отсортировать Map по значению, превратите её в поток пар: <code>map.entrySet().stream().sorted(Map.Entry.comparingByValue())</code>. Для обратного порядка нужен явный тип: <code>Map.Entry.&lt;String, Long&gt;comparingByValue().reversed()</code>.</li><li><code>max</code> и <code>min</code> возвращают <code>Optional</code>: пустой поток не имеет максимума.</li></ul>
+<h4>Строки и регулярные выражения</h4>
+<ul><li><code>split("[^\\p{L}\\p{N}]+")</code> делит текст по всему, что не буква и не цифра, на любом языке. <code>\\W</code> считает кириллицу «не словом» — для русского текста он не подходит.</li><li><code>toLowerCase(Locale.ROOT)</code> не зависит от языка системы. Классическая ловушка — турецкая «I».</li><li>Пустые строки после <code>split</code> отфильтровывайте: <code>filter(w -&gt; !w.isBlank())</code>.</li></ul>
+<h4>Тест по схеме Arrange — Act — Assert</h4>
+<p>Подготовить данные, выполнить одно действие, проверить результат. Имя теста описывает поведение. Обязательно добавляйте граничные случаи: пустой ввод, один элемент, одинаковые частоты.</p><figure class="code"><figcaption>JUnit 5 + AssertJ</figcaption><pre><code>@Test
+void returnsMostFrequentFirst() {
+    var text = "кот кот пёс кот пёс ёж";           // Arrange
+    var top = WordStats.top3(text);               // Act
+    assertThat(top).containsExactly("кот", "пёс", "ёж");  // Assert
+}</code></pre></figure>
+</div>
+
   <h3 id="ch1-theory"><span class="sn">1.2</span>Теория</h3>
   <ul class="res">
     <li><span class="tag">Доки</span><a href="https://dev.java/learn/" target="_blank" rel="noopener">dev.java/learn</a><span class="note">Официальный учебник Oracle по современной Java: records, sealed, pattern matching, virtual threads.</span></li>
@@ -420,6 +452,22 @@ try (var pool = Executors.newVirtualThreadPerTaskExecutor()) {
   </ul>
 
   <h3 id="ch1-tasks"><span class="sn">1.4</span>Задачи с решениями</h3>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> найти самый частый HTTP-статус в списке строк лога вида <code>"GET /home 200"</code>.</p>
+    <ol><li>Определить вход и выход: список строк → <code>Optional&lt;Integer&gt;</code> (лог может быть пустым).</li><li>Из каждой строки достать статус: разделить по пробелу и взять третью часть; строки без неё отбросить.</li><li>Сгруппировать по статусу и посчитать: <code>groupingBy(s -&gt; s, counting())</code> даёт <code>Map&lt;Integer, Long&gt;</code>.</li><li>Найти пару с наибольшим значением: <code>max(Map.Entry.comparingByValue())</code> и взять ключ.</li><li>Проверить на пустом списке и на примере из трёх строк.</li></ol>
+    <figure class="code"><figcaption>Java</figcaption><pre><code>static Optional&lt;Integer&gt; mostFrequentStatus(List&lt;String&gt; lines) {
+    return lines.stream()
+        .map(l -&gt; l.split(" "))
+        .filter(p -&gt; p.length &gt; 2)
+        .map(p -&gt; Integer.parseInt(p[2]))
+        .collect(Collectors.groupingBy(s -&gt; s, Collectors.counting()))
+        .entrySet().stream()
+        .max(Map.Entry.comparingByValue())
+        .map(Map.Entry::getKey);
+}
+// ["GET /home 200", "GET /x 404", "POST /a 200"] → Optional[200]</code></pre></figure>
+    <p><b>Итог:</b> та же схема «разобрать → сгруппировать → отсортировать/выбрать» решает задачу 1.1. Отличия: нужно нормализовать слова и взять три первых, а не один максимум.</p>
+  </div>
   <div class="box task"><h4>Задача 1.1. Топ-3 слов</h4>
     <p>Напишите метод <code>top3(String text)</code>, который возвращает три самых частых слова текста без учёта регистра. Только Stream API, без циклов.</p>
     <details class="sol"><summary>Показать решение</summary>
@@ -436,6 +484,22 @@ try (var pool = Executors.newVirtualThreadPerTaskExecutor()) {
       <p>Регулярное выражение <code>[^\p{L}\p{N}]+</code> режет по всему, что не буква и не цифра, поэтому работает и для кириллицы (обычный <code>\W</code> считает кириллицу «не словом»). <code>groupingBy</code> + <code>counting</code> строят частоты, затем сортировка по значению по убыванию.</p>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c1-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> посчитать комиссию платежа: карта иностранного банка — 2 %, своя карта и наличные — без комиссии.</p>
+    <ol><li>Перечислить все виды платежей и закрыть список: <code>sealed interface Payment permits Card, Cash</code>.</li><li>Каждый вид — record со своими данными.</li><li>Написать <code>switch</code> по типу; особый случай описать охранником <code>when</code> и поставить выше общего.</li><li>Убедиться, что <code>default</code> не нужен: компилятор знает все варианты.</li></ol>
+    <figure class="code"><figcaption>Java 21</figcaption><pre><code>sealed interface Payment permits Card, Cash {}
+record Card(BigDecimal amount, boolean foreign) implements Payment {}
+record Cash(BigDecimal amount) implements Payment {}
+
+static BigDecimal fee(Payment p) {
+    return switch (p) {
+        case Card(BigDecimal a, boolean foreign) when foreign -&gt; a.multiply(new BigDecimal("0.02"));
+        case Card c -&gt; BigDecimal.ZERO;
+        case Cash c -&gt; BigDecimal.ZERO;
+    };
+}</code></pre></figure>
+    <p><b>Итог:</b> в задаче 1.2 нужно то же самое для фигур — без охранников, но с record patterns, чтобы сразу получить размеры.</p>
   </div>
   <div class="box task"><h4>Задача 1.2. Площадь фигур</h4>
     <p>Опишите фигуры круг и прямоугольник через sealed-интерфейс и records. Напишите <code>area(Shape s)</code> через <code>switch</code> с pattern matching без ветки <code>default</code>.</p>
@@ -530,6 +594,18 @@ public record Transaction(LocalDate date, BigDecimal amount, String currency, St
     <dt>N+1</dt><dd>Один запрос за списком и ещё N — за связанными сущностями каждого элемента.</dd>
   </dl>
 
+  <h3 id="ch2-notes">Конспект теории</h3>
+<div class="notes">
+<h4>В каком порядке база выполняет SELECT</h4>
+<p>Запрос читается сверху вниз, но выполняется в другом порядке: <b>FROM и JOIN → WHERE → GROUP BY → HAVING → SELECT → ORDER BY → LIMIT</b>. Поэтому псевдоним из SELECT нельзя использовать в WHERE (его ещё нет), но можно в ORDER BY. Агрегаты (<code>COUNT</code>, <code>SUM</code>) фильтруют в HAVING, а не в WHERE.</p>
+<h4>JOIN и NULL</h4>
+<ul><li><code>INNER JOIN</code> оставляет только пары, нашедшие друг друга.</li><li><code>LEFT JOIN</code> оставляет все строки левой таблицы; если пары нет, поля правой таблицы равны NULL. «Все X, даже без Y» — почти всегда LEFT JOIN от X.</li><li><code>COUNT(*)</code> считает строки, <code>COUNT(колонка)</code> — только не-NULL значения. После LEFT JOIN считают <code>COUNT(правая.id)</code>, иначе у пустого X получится 1.</li><li><code>AVG</code> и <code>SUM</code> пропускают NULL. Деление на ноль защищают <code>NULLIF(x, 0)</code>, пустое значение заменяют <code>COALESCE(x, 0)</code>.</li><li><code>COUNT(*) FILTER (WHERE условие)</code> — подсчёт части строк внутри группы (PostgreSQL).</li></ul>
+<h4>Индексы</h4>
+<p>Индекс B-tree — отсортированный список значений с указателями на строки. Составной индекс <code>(a, b)</code> работает для условий по <code>a</code> и по <code>a</code> и <code>b</code> вместе, но не по одному <code>b</code> — как телефонный справочник по фамилии и имени не помогает искать только по имени. Проверка — <code>EXPLAIN ANALYZE</code>: <code>Index Scan</code> хорошо, <code>Seq Scan</code> по большой таблице — повод подумать.</p>
+<h4>JPA: связи и загрузка</h4>
+<ul><li><code>@ManyToOne</code> по умолчанию загружается сразу (EAGER), <code>@OneToMany</code> — лениво (LAZY): коллекция подгружается при первом обращении.</li><li>N+1: загрузили 50 заказов одним запросом, а потом в цикле <code>order.getLines()</code> сделал ещё 50 запросов. Увидеть — включить <code>logging.level.org.hibernate.SQL=debug</code> и посчитать запросы.</li><li>Лечение: <code>join fetch</code> в JPQL или <code>@EntityGraph(attributePaths = "lines")</code> на методе репозитория — связанные данные приходят одним запросом.</li><li>С пагинацией fetch join по коллекции не сочетают: Hibernate выполнит пагинацию в памяти. Для страниц — <code>@BatchSize</code> или два запроса: сначала id, потом данные.</li></ul>
+</div>
+
   <h3 id="ch2-theory"><span class="sn">2.2</span>Теория</h3>
   <ul class="res">
     <li><span class="tag">Доки</span><a href="https://www.postgresql.org/docs/current/tutorial.html" target="_blank" rel="noopener">PostgreSQL Tutorial</a><span class="note">Официальный учебник PostgreSQL: таблицы, запросы, транзакции, оконные функции.</span></li>
@@ -562,6 +638,18 @@ CREATE INDEX idx_task_project_status ON task (project_id, status);</code></pre><
   </ul>
 
   <h3 id="ch2-tasks"><span class="sn">2.4</span>Задачи с решениями</h3>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> для каждого автора вывести число книг и средний рейтинг; авторы без книг тоже нужны.</p>
+    <ol><li>Выбрать главную таблицу: «каждый автор» → <code>FROM author</code>.</li><li>«Даже без книг» → <code>LEFT JOIN book</code>.</li><li>Одна строка на автора → <code>GROUP BY a.id, a.name</code>.</li><li>Считать по правой таблице: <code>COUNT(b.id)</code> (у автора без книг будет 0), <code>AVG(b.rating)</code> (будет NULL).</li><li>Отсортировать и проверить автора без книг.</li></ol>
+    <figure class="code"><figcaption>PostgreSQL</figcaption><pre><code>SELECT a.name,
+       COUNT(b.id)             AS books,
+       ROUND(AVG(b.rating), 2) AS avg_rating
+FROM author a
+LEFT JOIN book b ON b.author_id = a.id
+GROUP BY a.id, a.name
+ORDER BY books DESC;</code></pre></figure>
+    <p><b>Итог:</b> в задаче 2.1 добавляется подсчёт части строк (<code>FILTER</code>) и процент с защитой от деления на ноль.</p>
+  </div>
   <div class="box task"><h4>Задача 2.1. Прогресс проектов</h4>
     <p>Для каждого проекта выведите общее число задач, число задач DONE и процент выполненных. Проекты без задач тоже должны попасть в отчёт. Отсортируйте по проценту.</p>
     <details class="sol"><summary>Показать решение</summary>
@@ -577,6 +665,22 @@ ORDER BY done_pct DESC NULLS LAST;</code></pre></figure>
       <p><code>LEFT JOIN</code> оставляет проекты без задач. <code>COUNT(t.id)</code> не считает NULL, поэтому у пустого проекта total = 0. <code>NULLIF</code> защищает от деления на ноль, <code>FILTER</code> — компактная замена <code>SUM(CASE …)</code>.</p>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c2-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> страница «Заказы клиента» тормозит: на каждый заказ отдельный запрос за позициями.</p>
+    <ol><li>Включить лог SQL: <code>logging.level.org.hibernate.SQL=debug</code>.</li><li>Открыть страницу и посчитать запросы: 1 за заказы + N за позиции — это N+1.</li><li>Добавить к методу репозитория <code>@EntityGraph(attributePaths = "lines")</code>.</li><li>Снова посмотреть лог: должен остаться один запрос с JOIN.</li><li>Закрепить тестом: число запросов можно проверить через Hibernate Statistics.</li></ol>
+    <figure class="code"><figcaption>Spring Data JPA</figcaption><pre><code>@Entity
+class Order {
+    @Id Long id;
+    Long customerId;
+    @OneToMany(mappedBy = "order") List&lt;OrderLine&gt; lines;   // LAZY по умолчанию
+}
+
+interface OrderRepository extends JpaRepository&lt;Order, Long&gt; {
+    @EntityGraph(attributePaths = "lines")
+    List&lt;Order&gt; findByCustomerId(Long customerId);
+}</code></pre></figure>
+    <p><b>Итог:</b> в задаче 2.2 тот же приём для проектов и задач, плюс вариант через <code>join fetch</code>.</p>
   </div>
   <div class="box task"><h4>Задача 2.2. Убрать N+1</h4>
     <p>Метод <code>projectRepository.findAll()</code>, а затем <code>project.getTasks()</code> в цикле даёт 1 + N запросов. Исправьте одним запросом.</p>
@@ -670,6 +774,18 @@ ORDER BY done_pct DESC NULLS LAST;</code></pre></figure>
     <dt>Testcontainers</dt><dd>Библиотека, поднимающая настоящие PostgreSQL, Kafka и другие сервисы в Docker на время тестов.</dd>
   </dl>
 
+  <h3 id="ch3-notes">Конспект теории</h3>
+<div class="notes">
+<h4>Путь запроса через приложение</h4>
+<p>HTTP-запрос принимает <code>DispatcherServlet</code>, находит метод контроллера по адресу и методу HTTP, превращает JSON в объект (Jackson), проверяет его (Bean Validation) и вызывает метод. Ответ превращается обратно в JSON. Если метод бросил исключение, Spring ищет подходящий <code>@ExceptionHandler</code>.</p><ul><li><b>Контроллер</b> — только HTTP: адреса, статусы, DTO.</li><li><b>Сервис</b> — бизнес-правила и транзакции (<code>@Transactional</code>).</li><li><b>Репозиторий</b> — доступ к базе.</li><li>DTO (лучше records) отделяют внешний API от сущностей JPA: сущность можно менять, не ломая клиентов.</li></ul>
+<h4>Аннотации контроллера</h4>
+<ul><li><code>@GetMapping("/{id}")</code> + <code>@PathVariable long id</code> — часть адреса.</li><li><code>@RequestParam(required = false) String q</code> — параметр <code>?q=</code>.</li><li><code>@RequestBody</code> — тело запроса JSON; <code>@Valid</code> перед ним включает проверку аннотаций <code>@NotBlank</code>, <code>@Size</code>, <code>@Email</code> в DTO.</li><li><code>ResponseEntity</code> — когда нужен особый статус или заголовок: <code>ResponseEntity.created(uri).body(dto)</code>.</li></ul>
+<h4>Ошибки в формате ProblemDetail</h4>
+<p>Стандарт RFC 9457 описывает тело ошибки: <code>type</code>, <code>title</code>, <code>status</code>, <code>detail</code> и любые свои поля. В Spring это класс <code>ProblemDetail</code>. Принцип: сервис бросает понятное исключение предметной области (<code>TaskNotFoundException</code>), а один класс <code>@RestControllerAdvice</code> переводит исключения в HTTP-статусы. Контроллеры при этом остаются чистыми.</p><p>Ошибка валидации <code>@Valid</code> — это <code>MethodArgumentNotValidException</code>; список полей с сообщениями — в <code>ex.getBindingResult().getFieldErrors()</code>.</p>
+<h4>Тесты веб-слоя</h4>
+<p><code>@WebMvcTest(Контроллер.class)</code> поднимает только MVC: контроллер, advice, конвертеры JSON. Зависимости контроллера подменяют моками: <code>@MockitoBean</code> (Spring Boot 3.4+; раньше <code>@MockBean</code>). Поведение мока задают через <code>when(service.get(1L)).thenReturn(...)</code> или <code>thenThrow(...)</code>. Запрос выполняют через <code>MockMvc</code>, а ответ проверяют через <code>status()</code> и <code>jsonPath("$.поле")</code>.</p>
+</div>
+
   <h3 id="ch3-theory"><span class="sn">3.2</span>Теория</h3>
   <ul class="res">
     <li><span class="tag">Доки</span><a href="https://docs.spring.io/spring-framework/reference/core.html" target="_blank" rel="noopener">Spring Framework — Core Technologies</a><span class="note">Официальное объяснение IoC-контейнера, бинов, DI и AOP. Читать главы 1–4.</span></li>
@@ -713,6 +829,24 @@ class TaskController {
   </ul>
 
   <h3 id="ch3-tasks"><span class="sn">3.4</span>Задачи с решениями</h3>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> при регистрации с уже занятой почтой вернуть 409 с понятным сообщением.</p>
+    <ol><li>Создать исключение предметной области <code>EmailTakenException</code>.</li><li>В сервисе проверить почту и бросить исключение (контроллер о нём не знает).</li><li>В <code>@RestControllerAdvice</code> добавить <code>@ExceptionHandler</code>, который строит <code>ProblemDetail</code> со статусом 409.</li><li>Проверить: <code>curl -i -X POST …</code> → <code>409</code> и <code>application/problem+json</code>.</li></ol>
+    <figure class="code"><figcaption>Spring Boot 3</figcaption><pre><code>public class EmailTakenException extends RuntimeException {
+    public EmailTakenException(String email) { super("Email already registered: " + email); }
+}
+
+@RestControllerAdvice
+class UserErrors {
+    @ExceptionHandler(EmailTakenException.class)
+    ProblemDetail emailTaken(EmailTakenException ex) {
+        ProblemDetail pd = ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, ex.getMessage());
+        pd.setTitle("Email taken");
+        return pd;
+    }
+}</code></pre></figure>
+    <p><b>Итог:</b> в задаче 3.1 два обработчика: для валидации (список полей) и для «не найдено».</p>
+  </div>
   <div class="box task"><h4>Задача 3.1. Единый формат ошибок</h4>
     <p>Сделайте обработчик, который на ошибку валидации отдаёт 400 со списком полей, а на «задача не найдена» — 404. Оба ответа — в формате ProblemDetail.</p>
     <details class="sol"><summary>Показать решение</summary>
@@ -737,6 +871,24 @@ class ApiErrors {
       <p><code>@RestControllerAdvice</code> применяется ко всем контроллерам. Spring сам выставит <code>Content-Type: application/problem+json</code>. Третий аргумент <code>toMap</code> нужен, если у поля две ошибки — иначе будет исключение о дубликате ключа.</p>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c3-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> проверить, что <code>GET /api/v1/tasks/42</code> отвечает 404, если задачи нет.</p>
+    <ol><li>Тест только веб-слоя: <code>@WebMvcTest(TaskController.class)</code>.</li><li>Сервис — мок; заставить его бросить исключение: <code>when(...).thenThrow(...)</code>.</li><li>Выполнить запрос через MockMvc.</li><li>Проверить статус и поле в теле ответа через <code>jsonPath</code>.</li></ol>
+    <figure class="code"><figcaption>JUnit 5, MockMvc</figcaption><pre><code>@WebMvcTest(TaskController.class)
+class TaskNotFoundTest {
+    @Autowired MockMvc mvc;
+    @MockitoBean TaskService service;
+
+    @Test
+    void returns404WhenMissing() throws Exception {
+        when(service.get(42L)).thenThrow(new TaskNotFoundException(42L));
+        mvc.perform(get("/api/v1/tasks/42"))
+           .andExpect(status().isNotFound())
+           .andExpect(jsonPath("$.status").value(404));
+    }
+}</code></pre></figure>
+    <p><b>Итог:</b> в задаче 3.2 вместо мока с исключением отправляется неверное тело запроса, а проверяется список ошибок полей.</p>
   </div>
   <div class="box task"><h4>Задача 3.2. Тест контроллера</h4>
     <p>Напишите тест: POST с пустым title должен вернуть 400 и поле <code>errors.title</code> в ответе.</p>
@@ -846,6 +998,18 @@ parsed.stream().map(t -&gt; TxnEntity.from(t, account, categorizer.categoryOf(t)
     <dt>Guard</dt><dd>Проверка перед переходом по маршруту (например, «пользователь вошёл?»).</dd>
   </dl>
 
+  <h3 id="ch4-notes">Конспект теории</h3>
+<div class="notes">
+<h4>Устройство компонента</h4>
+<p>Компонент — класс с декоратором <code>@Component</code>: <code>selector</code> (тег), <code>template</code> (разметка), <code>imports</code> (что используется в шаблоне). Зависимости берут функцией <code>inject(Сервис)</code> прямо в поле класса. В шаблоне: <code>{{ значение }}</code> — вывод, <code>[свойство]="выражение"</code> — передача данных, <code>(событие)="метод()"</code> — реакция.</p>
+<h4>Signals</h4>
+<ul><li><code>count = signal(0)</code> — значение; читать — <code>count()</code>, менять — <code>count.set(1)</code> или <code>count.update(c =&gt; c + 1)</code>.</li><li><code>double = computed(() =&gt; count() * 2)</code> — пересчитывается сам, когда меняется то, что он читает.</li><li><code>effect(() =&gt; …)</code> — побочное действие при изменениях (запись в localStorage, лог). Не для вычисления значений.</li><li>В шаблоне сигнал вызывается как функция: <code>@if (items().length) { … }</code>.</li></ul>
+<h4>RxJS: поток во времени</h4>
+<p>Observable — поток значений, который начинает работать только при подписке. Операторы соединяют через <code>pipe</code>:</p><ul><li><code>debounceTime(300)</code> — выдать значение после 300 мс тишины.</li><li><code>distinctUntilChanged()</code> — не повторять одинаковые подряд.</li><li><code>switchMap(v =&gt; http.get(…))</code> — на каждое значение новый запрос, предыдущий отменяется.</li><li><code>catchError(() =&gt; of(запасное))</code> — превратить ошибку в значение. <b>Ошибка завершает поток</b>, поэтому catchError ставят внутри switchMap: тогда падает только один запрос, а поиск продолжает работать.</li><li><code>toSignal(поток, { initialValue })</code> — подписаться и получить сигнал; отписка при уничтожении компонента — автоматически.</li></ul>
+<h4>HttpClient и interceptors</h4>
+<p><code>provideHttpClient(withInterceptors([...]))</code> в <code>app.config.ts</code> включает HTTP. Interceptor — функция <code>(req, next) =&gt; next(req)</code>, через которую проходит каждый запрос. Запрос неизменяемый: чтобы добавить заголовок, его копируют: <code>req.clone({ setHeaders: { … } })</code>. Ответ обрабатывают операторами на результате <code>next(req)</code>.</p>
+</div>
+
   <h3 id="ch4-theory"><span class="sn">4.2</span>Теория</h3>
   <ul class="res">
     <li><span class="tag">Доки</span><a href="https://www.typescriptlang.org/docs/handbook/intro.html" target="_blank" rel="noopener">TypeScript Handbook</a><span class="note">Официальная книга по TypeScript: типы, generics, narrowing, utility types.</span></li>
@@ -890,6 +1054,28 @@ export class TaskListComponent {
   </ul>
 
   <h3 id="ch4-tasks"><span class="sn">4.4</span>Задачи с решениями</h3>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> при вводе ника показывать «свободен / занят», проверяя на сервере через 400 мс после остановки ввода.</p>
+    <ol><li>Источник событий — <code>valueChanges</code> поля формы.</li><li>Подождать паузу: <code>debounceTime(400)</code>; не повторять тот же ник: <code>distinctUntilChanged()</code>.</li><li>На каждый ник — запрос, старый отменяется: <code>switchMap</code>. Короткий ник не проверять — сразу <code>of('short')</code>.</li><li>Ошибку запроса превратить в значение <code>'error'</code> внутри switchMap.</li><li>Превратить поток в сигнал <code>toSignal</code> и показать состояние в шаблоне через <code>@switch</code>.</li></ol>
+    <figure class="code"><figcaption>Angular, RxJS</figcaption><pre><code>export class NickField {
+  private api = inject(UserApi);
+  nick = new FormControl('', { nonNullable: true });
+
+  status = toSignal(
+    this.nick.valueChanges.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap(n =&gt; n.length &lt; 3
+        ? of('short' as const)
+        : this.api.isFree(n).pipe(
+            map(free =&gt; (free ? 'free' : 'taken') as 'free' | 'taken'),
+            catchError(() =&gt; of('error' as const)))),
+    ),
+    { initialValue: 'short' as const },
+  );
+}</code></pre></figure>
+    <p><b>Итог:</b> в задаче 4.1 та же цепочка, только результат — список задач, а не одно состояние.</p>
+  </div>
   <div class="box task"><h4>Задача 4.1. Живой поиск</h4>
     <p>Сделайте поле поиска задач: запрос уходит через 300 мс после остановки ввода, при новом вводе старый запрос отменяется, при ошибке список пустой, меньше двух символов — не искать.</p>
     <details class="sol"><summary>Показать решение</summary>
@@ -920,6 +1106,16 @@ export class SearchComponent {
       <p><code>debounceTime</code> ждёт паузу в вводе, <code>distinctUntilChanged</code> не повторяет тот же запрос, <code>switchMap</code> отменяет предыдущий HTTP-запрос. <code>catchError</code> стоит внутри <code>switchMap</code>: иначе одна ошибка навсегда завершит весь поток. <code>toSignal</code> сам отписывается при уничтожении компонента.</p>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c4-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> добавлять к каждому запросу заголовок <code>X-Request-Id</code> для поиска по логам.</p>
+    <ol><li>Написать функцию типа <code>HttpInterceptorFn</code>.</li><li>Запрос неизменяемый — сделать копию с заголовком: <code>req.clone({ setHeaders })</code>.</li><li>Передать копию дальше: <code>next(копия)</code>.</li><li>Зарегистрировать в <code>provideHttpClient(withInterceptors([...]))</code> и проверить заголовок во вкладке Network.</li></ol>
+    <figure class="code"><figcaption>Angular</figcaption><pre><code>export const requestIdInterceptor: HttpInterceptorFn = (req, next) =&gt;
+  next(req.clone({ setHeaders: { 'X-Request-Id': crypto.randomUUID() } }));
+
+// app.config.ts
+provideHttpClient(withInterceptors([requestIdInterceptor, errorInterceptor]))</code></pre></figure>
+    <p><b>Итог:</b> в задаче 4.2 interceptor работает не с запросом, а с ответом: <code>next(req).pipe(catchError(...))</code>.</p>
   </div>
   <div class="box task"><h4>Задача 4.2. Interceptor ошибок</h4>
     <p>Напишите функциональный interceptor: при ответе 5xx показать тост «Сервер недоступен», ошибку пробросить дальше.</p>
@@ -1021,6 +1217,18 @@ export const appConfig: ApplicationConfig = {
     <dt>Серверное состояние</dt><dd>Данные с сервера, у которых есть кэш, устаревание и повторные запросы. Им управляет TanStack Query, а не useState.</dd>
   </dl>
 
+  <h3 id="ch4b-notes">Конспект теории</h3>
+<div class="notes">
+<h4>Как React отрисовывает интерфейс</h4>
+<p>Компонент — функция. Когда меняется его состояние (или props от родителя), React вызывает функцию заново, получает новую разметку, сравнивает её со старой и меняет в DOM только отличия. Отсюда главное правило: <b>всё, что видно на экране, вычисляется из props и state при каждой отрисовке</b>.</p>
+<h4>useState — снимок значения</h4>
+<ul><li><code>const [items, setItems] = useState&lt;Item[]&gt;([])</code>.</li><li>Внутри одной отрисовки <code>items</code> не меняется — это снимок. <code>setItems</code> не меняет переменную, а заказывает новую отрисовку.</li><li>Если новое значение зависит от старого, передавайте функцию: <code>setItems(prev =&gt; [...prev, x])</code>.</li><li>Состояние не изменяют напрямую (<code>items.push</code> — ошибка): создают новый массив или объект, иначе React не заметит изменений.</li></ul>
+<h4>useEffect и очистка</h4>
+<p>Эффект выполняется после отрисовки и нужен для связи с внешним миром: таймеры, подписки, сторонние библиотеки. Массив зависимостей говорит, когда перезапускать эффект. Функция, которую эффект возвращает, — очистка: React вызывает её перед следующим запуском и при удалении компонента. Без очистки остаются «висящие» таймеры и подписки.</p>
+<h4>TanStack Query</h4>
+<ul><li>Приложение оборачивают в <code>&lt;QueryClientProvider client={queryClient}&gt;</code>.</li><li><code>useQuery({ queryKey, queryFn, enabled })</code> — загрузка с кэшем по ключу. Ключ включает все параметры запроса: <code>['tasks', term]</code>.</li><li>Состояния: <code>isPending</code> (данных ещё нет), <code>isFetching</code> (идёт запрос), <code>isError</code>, <code>data</code>.</li><li><code>useMutation</code> — изменения на сервере; после успеха вызывают <code>queryClient.invalidateQueries({ queryKey: ['tasks'] })</code>, чтобы списки перезагрузились.</li></ul>
+</div>
+
   <h3 id="ch4b-theory"><span class="sn">4Б.2</span>Теория</h3>
   <ul class="res">
     <li><span class="tag">Доки</span><a href="https://react.dev/learn" target="_blank" rel="noopener">react.dev — Learn</a><span class="note">Официальный учебник React: компоненты, состояние, хуки. Начать с «Thinking in React».</span></li>
@@ -1071,6 +1279,18 @@ export const appConfig: ApplicationConfig = {
   </ul>
 
   <h3 id="ch4b-tasks"><span class="sn">4Б.4</span>Задачи с решениями</h3>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> кнопка «Добавить два товара» добавляет в корзину только второй.</p>
+    <ol><li>Найти место, где новое состояние считается из старого: <code>setItems([...items, a])</code>.</li><li>Вспомнить, что <code>items</code> — снимок текущей отрисовки, и оба вызова видят один и тот же массив.</li><li>Заменить на функцию-обновлятор, которая получает актуальное значение.</li><li>Проверить: после нажатия в корзине оба товара.</li></ol>
+    <figure class="code"><figcaption>React</figcaption><pre><code>// было: второй вызов перетирает первый
+setItems([...items, a]);
+setItems([...items, b]);
+
+// стало
+setItems(prev =&gt; [...prev, a]);
+setItems(prev =&gt; [...prev, b]);</code></pre></figure>
+    <p><b>Итог:</b> в задаче 4Б.1 та же ошибка со счётчиком.</p>
+  </div>
   <div class="box task"><h4>Задача 4Б.1. Почему +1, а не +3?</h4>
     <p>По нажатию кнопки вызывается <code>setCount(count + 1)</code> три раза подряд, но счётчик растёт на 1. Объясните и исправьте.</p>
     <details class="sol"><summary>Показать решение</summary>
@@ -1086,6 +1306,27 @@ setCount(c =&gt; c + 1);</code></pre></figure>
       <p>Внутри одной отрисовки <code>count</code> — константа (например, 0), поэтому три раза ставится 0 + 1. Обновления состояния собираются в очередь; функция-обновлятор получает результат предыдущего шага, и получается 3. Правило: если новое состояние зависит от старого — передавайте функцию.</p>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c4b-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> показать часы, которые обновляются каждую секунду, и список категорий с сервера.</p>
+    <ol><li>Часы — внешний мир (таймер), значит, <code>useEffect</code>.</li><li>Запустить <code>setInterval</code> в эффекте и вернуть очистку <code>clearInterval</code>.</li><li>Вынести в свой хук <code>useNow</code>, чтобы переиспользовать.</li><li>Данные с сервера — не через useEffect, а через <code>useQuery</code> с ключом <code>['categories']</code>.</li></ol>
+    <figure class="code"><figcaption>React, TanStack Query</figcaption><pre><code>function useNow(ms = 1000) {
+  const [now, setNow] = useState(() =&gt; new Date());
+  useEffect(() =&gt; {
+    const id = setInterval(() =&gt; setNow(new Date()), ms);
+    return () =&gt; clearInterval(id);
+  }, [ms]);
+  return now;
+}
+
+function Categories() {
+  const { data = [], isPending } = useQuery({
+    queryKey: ['categories'],
+    queryFn: () =&gt; fetch('/api/categories').then(r =&gt; r.json() as Promise&lt;Category[]&gt;),
+  });
+  return isPending ? &lt;p&gt;Загрузка…&lt;/p&gt; : &lt;ul&gt;{data.map(c =&gt; &lt;li key={c.id}&gt;{c.name}&lt;/li&gt;)}&lt;/ul&gt;;
+}</code></pre></figure>
+    <p><b>Итог:</b> в задаче 4Б.2 оба приёма соединяются: свой хук с таймером даёт задержку, а useQuery — запрос с отменой.</p>
   </div>
   <div class="box task"><h4>Задача 4Б.2. Живой поиск на React</h4>
     <p>Сделайте то же, что в задаче 4.1, но на React: запрос через 300 мс после остановки ввода, не искать при длине меньше 2, устаревший запрос отменяется.</p>
@@ -1201,6 +1442,20 @@ export default defineConfig({
     <dt>IAM</dt><dd>Identity and Access Management: Keycloak, ForgeRock (с 2023 года в составе Ping Identity), Okta.</dd>
   </dl>
 
+  <h3 id="ch5-notes">Конспект теории</h3>
+<div class="notes">
+<h4>Аутентификация и авторизация</h4>
+<p>Аутентификация отвечает на вопрос «кто это?», авторизация — «что ему можно?». Нет действительного токена — 401 Unauthorized. Токен есть, но прав нет — 403 Forbidden. Чужой ресурс часто отдают как 404, чтобы не подтверждать, что он существует.</p>
+<h4>Как устроен JWT</h4>
+<p>Три части через точку: <code>header.payload.signature</code> в Base64URL. В payload — claims: <code>sub</code> (кто), <code>iss</code> (кто выдал), <code>exp</code> (до какого времени), <code>aud</code> (для кого), роли или <code>scope</code>. Содержимое может прочитать любой, подпись лишь защищает от подделки. API проверяет подпись открытым ключом, который берёт у сервера авторизации по адресу из <code>issuer-uri</code> (JWKS). Поэтому в JWT не кладут секреты.</p>
+<h4>Authorization Code + PKCE по шагам</h4>
+<ol><li>Приложение создаёт случайный <code>code_verifier</code> и его хэш <code>code_challenge</code> (S256).</li><li>Браузер уходит на страницу входа Keycloak с <code>code_challenge</code>.</li><li>После входа Keycloak возвращает в приложение одноразовый <code>code</code>.</li><li>Приложение обменивает <code>code</code> + <code>code_verifier</code> на токены. Перехвативший <code>code</code> без verifier ничего не сделает.</li></ol><p>Для сервисов без пользователя — Client Credentials: сервис сам получает токен по client_id и секрету.</p>
+<h4>Spring Security: роли и права</h4>
+<ul><li>Права (authorities) — строки. <code>hasRole("ADMIN")</code> ищет <code>ROLE_ADMIN</code>, <code>hasAuthority("X")</code> — ровно <code>X</code>.</li><li>Resource Server по умолчанию превращает claim <code>scope</code> в права <code>SCOPE_…</code>; другие claims (например, <code>realm_access.roles</code> у Keycloak) нужно преобразовать своим конвертером.</li><li>Правила по адресам — в <code>authorizeHttpRequests</code>, правила на методах — <code>@PreAuthorize</code> (включается <code>@EnableMethodSecurity</code>).</li><li>Тесты без Keycloak: <code>mvc.perform(get(…).with(jwt().authorities(…)))</code>.</li></ul>
+<h4>Инъекции</h4>
+<p>Любые данные пользователя — это данные, а не код. В SQL их передают параметрами (<code>?</code>), в HTML — экранируют (Angular и React делают это сами), в командах ОС — не склеивают строки. Имена колонок и порядок сортировки параметром передать нельзя: их выбирают из списка разрешённых значений.</p>
+</div>
+
   <h3 id="ch5-theory"><span class="sn">5.2</span>Теория</h3>
   <ul class="res">
     <li><span class="tag">Доки</span><a href="https://owasp.org/www-project-top-ten/" target="_blank" rel="noopener">OWASP Top 10</a><span class="note">Десять главных рисков веб-приложений.</span></li>
@@ -1236,6 +1491,20 @@ SecurityFilterChain api(HttpSecurity http) throws Exception {
   </ul>
 
   <h3 id="ch5-tasks"><span class="sn">5.4</span>Задачи с решениями</h3>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> отчёты доступны только токенам со scope <code>reports:read</code>.</p>
+    <ol><li>Посмотреть содержимое тестового токена (расшифровать payload) и найти claim <code>scope</code>.</li><li>Вспомнить, что Resource Server сам превращает scope в права <code>SCOPE_…</code>.</li><li>Добавить правило для адреса отчётов через <code>hasAuthority</code>.</li><li>Написать тест с подставным JWT: со scope — 200, без него — 403.</li></ol>
+    <figure class="code"><figcaption>Spring Security</figcaption><pre><code>http.authorizeHttpRequests(a -&gt; a
+        .requestMatchers(HttpMethod.GET, "/api/reports/**").hasAuthority("SCOPE_reports:read")
+        .anyRequest().authenticated())
+    .oauth2ResourceServer(o -&gt; o.jwt(Customizer.withDefaults()));
+
+// тест
+mvc.perform(get("/api/reports/monthly")
+        .with(jwt().authorities(new SimpleGrantedAuthority("SCOPE_reports:read"))))
+   .andExpect(status().isOk());</code></pre></figure>
+    <p><b>Итог:</b> в задаче 5.1 права лежат не в scope, а в <code>realm_access.roles</code>, поэтому нужен свой конвертер.</p>
+  </div>
   <div class="box task"><h4>Задача 5.1. Роли из Keycloak</h4>
     <p>Keycloak кладёт роли в JWT в поле <code>realm_access.roles</code>, а Spring ждёт <code>ROLE_…</code>. Напишите конвертер, чтобы работал <code>hasRole("ADMIN")</code>.</p>
     <details class="sol"><summary>Показать решение</summary>
@@ -1256,6 +1525,20 @@ JwtAuthenticationConverter jwtAuthenticationConverter() {
       <p>Бин <code>JwtAuthenticationConverter</code> Spring Security подхватывает сам при <code>oauth2ResourceServer(o -> o.jwt(...))</code>. Префикс <code>ROLE_</code> нужен, потому что <code>hasRole("ADMIN")</code> ищет полномочие <code>ROLE_ADMIN</code>.</p>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c5-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> пользователь выбирает сортировку списка: <code>?sort=title</code>.</p>
+    <ol><li>Заметить опасность: имя колонки нельзя передать параметром <code>?</code>, а склеивать строку нельзя.</li><li>Сделать список разрешённых значений: что пришло → какая колонка.</li><li>Неизвестное значение заменить безопасным по умолчанию.</li><li>Значения фильтров по-прежнему передавать параметрами.</li></ol>
+    <figure class="code"><figcaption>Java, JdbcTemplate</figcaption><pre><code>private static final Map&lt;String, String&gt; SORT = Map.of(
+    "date", "created_at",
+    "title", "title");
+
+List&lt;Task&gt; list(long projectId, String sort) {
+    String col = SORT.getOrDefault(sort, "created_at");   // только из белого списка
+    return jdbc.query("SELECT * FROM task WHERE project_id = ? ORDER BY " + col,
+                      mapper, projectId);
+}</code></pre></figure>
+    <p><b>Итог:</b> в задаче 5.2 пользовательское значение — данные (строка поиска), поэтому оно передаётся параметром.</p>
   </div>
   <div class="box task"><h4>Задача 5.2. Найди уязвимость</h4>
     <p>Что не так с этим кодом и как исправить?<br><code>jdbc.query("SELECT * FROM task WHERE title LIKE '%" + q + "%'", mapper);</code></p>
@@ -1351,6 +1634,22 @@ spring.security.oauth2.resourceserver.jwt.issuer-uri: http://localhost:8081/real
     <dt>IaC</dt><dd>Инфраструктура как код: Terraform описывает облачные ресурсы файлами.</dd>
   </dl>
 
+  <h3 id="ch6-notes">Конспект теории</h3>
+<div class="notes">
+<h4>Docker: слои и кэш</h4>
+<p>Каждая инструкция Dockerfile — слой. Если файлы, скопированные в слой, не изменились, Docker берёт слой из кэша. Поэтому сначала копируют то, что меняется редко (файлы сборки и зависимости), а потом исходники. Ненужное исключают <code>.dockerignore</code> (build/, node_modules/, .git). Приложение запускают не от root (<code>USER</code>).</p>
+<h4>Docker Compose</h4>
+<ul><li>Каждый сервис — контейнер; все в общей сети, и <b>имя сервиса работает как адрес</b>: <code>jdbc:postgresql://db:5432/…</code>.</li><li>Настройки — переменными окружения. Spring Boot понимает их сам: <code>SPRING_DATASOURCE_URL</code> = <code>spring.datasource.url</code>.</li><li><code>healthcheck</code> описывает, как понять, что сервис готов; <code>depends_on: { db: { condition: service_healthy } }</code> ждёт готовности, а не просто запуска.</li><li>Данные базы хранят в volume, иначе они пропадут при пересоздании контейнера.</li></ul>
+<h4>Kubernetes: минимум объектов</h4>
+<ul><li><b>Deployment</b> — сколько копий пода держать и как обновлять. <code>selector.matchLabels</code> должен совпадать с метками в <code>template.metadata.labels</code>.</li><li><b>Service</b> — постоянное имя и адрес для подов с нужными метками; <code>port</code> — порт сервиса, <code>targetPort</code> — порт контейнера.</li><li><b>ConfigMap</b> и <b>Secret</b> — настройки и пароли; подключаются через <code>env</code> или <code>envFrom</code>.</li><li><b>Пробы</b>: readiness — готов ли принимать трафик, liveness — жив ли. Spring Boot Actuator даёт <code>/actuator/health/readiness</code> и <code>/liveness</code>.</li><li><b>resources</b>: <code>requests</code> — сколько гарантировать при планировании, <code>limits</code> — потолок.</li></ul>
+<h4>Команды на каждый день</h4>
+<figure class="code"><figcaption>kubectl</figcaption><pre><code>kubectl apply -f k8s/                 # применить манифесты
+kubectl get pods,svc                  # что запущено
+kubectl describe pod &lt;имя&gt;            # события: почему не стартует
+kubectl logs -f deploy/taskhub-api    # логи
+kubectl port-forward svc/taskhub-api 8080:80   # открыть сервис локально</code></pre></figure>
+</div>
+
   <h3 id="ch6-theory"><span class="sn">6.2</span>Теория</h3>
   <ul class="res">
     <li><span class="tag">Доки</span><a href="https://docs.docker.com/get-started/" target="_blank" rel="noopener">Docker — Get Started</a><span class="note">Официальное введение: образы, контейнеры, Compose.</span></li>
@@ -1401,6 +1700,26 @@ jobs:
   </ul>
 
   <h3 id="ch6-tasks"><span class="sn">6.4</span>Задачи с решениями</h3>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> открыть доступ к Deployment taskhub-api внутри кластера и передать ему настройки.</p>
+    <ol><li>Настройки — в ConfigMap; секреты — в Secret.</li><li>Service с <code>selector</code>, совпадающим с метками подов Deployment.</li><li>В контейнере подключить ConfigMap через <code>envFrom</code>.</li><li><code>kubectl apply -f</code>, затем <code>kubectl get svc</code> и <code>kubectl port-forward</code> для проверки.</li></ol>
+    <figure class="code"><figcaption>Kubernetes YAML</figcaption><pre><code>apiVersion: v1
+kind: ConfigMap
+metadata: { name: taskhub-config }
+data:
+  SPRING_PROFILES_ACTIVE: prod
+---
+apiVersion: v1
+kind: Service
+metadata: { name: taskhub-api }
+spec:
+  selector: { app: taskhub-api }          # те же метки, что в Deployment
+  ports: [{ port: 80, targetPort: 8080 }]
+
+# в Deployment, в описании контейнера:
+#   envFrom: [{ configMapRef: { name: taskhub-config } }]</code></pre></figure>
+    <p><b>Итог:</b> в задаче 6.1 описывается сам Deployment: реплики, ресурсы и пробы.</p>
+  </div>
   <div class="box task"><h4>Задача 6.1. Deployment с пробами</h4>
     <p>Опишите Deployment для taskhub-api: 2 реплики, запрос и лимит памяти, readiness- и liveness-пробы на эндпоинты Spring Boot Actuator.</p>
     <details class="sol"><summary>Показать решение</summary>
@@ -1429,6 +1748,21 @@ spec:
       <p>Spring Boot сам включает группы <code>liveness</code> и <code>readiness</code>, когда видит, что запущен в Kubernetes. Лимит CPU специально не задан: он часто тормозит JVM на старте, а памяти лимит нужен обязательно. Тег образа — конкретная версия, а не <code>latest</code>.</p>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c6-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> запустить приложение вместе с Redis так, чтобы оно стартовало только после готовности Redis.</p>
+    <ol><li>Описать два сервиса в <code>docker-compose.yml</code>.</li><li>У Redis добавить <code>healthcheck</code> (<code>redis-cli ping</code>).</li><li>Приложению передать адрес Redis переменной окружения; адрес — имя сервиса.</li><li>В <code>depends_on</code> указать <code>condition: service_healthy</code>.</li><li><code>docker compose up</code> и посмотреть порядок запуска в логах.</li></ol>
+    <figure class="code"><figcaption>Docker Compose</figcaption><pre><code>services:
+  redis:
+    image: redis:7
+    healthcheck: { test: ["CMD", "redis-cli", "ping"], interval: 5s, retries: 10 }
+  app:
+    build: .
+    environment:
+      SPRING_DATA_REDIS_HOST: redis
+    depends_on:
+      redis: { condition: service_healthy }</code></pre></figure>
+    <p><b>Итог:</b> в задаче 6.2 то же для PostgreSQL: healthcheck через <code>pg_isready</code>.</p>
   </div>
   <div class="box task"><h4>Задача 6.2. Compose: API и база</h4>
     <p>Напишите docker-compose.yml: PostgreSQL и API; API должен стартовать только когда база действительно готова.</p>
@@ -1532,6 +1866,20 @@ spec:
     <dt>Контрактный тест</dt><dd>Проверка, что поставщик API и потребитель понимают контракт одинаково.</dd>
   </dl>
 
+  <h3 id="ch7-notes">Конспект теории</h3>
+<div class="notes">
+<h4>Синхронно или через события</h4>
+<p>REST-вызов нужен, когда ответ требуется прямо сейчас («покажи каталог»). Событие — когда другие сервисы должны узнать о факте, а ждать их не нужно («заказ оплачен»). События уменьшают связанность: отправитель не знает получателей, а упавший получатель обработает всё позже.</p>
+<h4>Kafka в пяти понятиях</h4>
+<ul><li><b>Топик</b> — журнал событий одного типа.</li><li><b>Партиция</b> — часть топика; порядок гарантирован только внутри партиции. Сообщения с одинаковым ключом попадают в одну партицию.</li><li><b>Offset</b> — номер сообщения в партиции; консьюмер запоминает, докуда прочитал.</li><li><b>Consumer group</b> — несколько экземпляров сервиса делят партиции между собой.</li><li><b>At-least-once</b>: если сервис упал после обработки, но до сохранения offset, сообщение придёт снова. Отсюда требование идемпотентности.</li></ul>
+<h4>Как сделать обработку идемпотентной</h4>
+<ul><li>Естественный уникальный ключ: <code>INSERT … ON CONFLICT (order_id) DO NOTHING</code> — второй раз ничего не произойдёт.</li><li>Таблица обработанных id событий в той же транзакции, что и изменения.</li><li>Операции «установить значение» вместо «прибавить»: <code>status = 'PAID'</code> безопасно повторять, <code>balance = balance + 10</code> — нет.</li></ul>
+<h4>Outbox по шагам</h4>
+<ol><li>В той же транзакции, что и изменение данных, вставить строку в таблицу <code>outbox</code> (тема, ключ, JSON).</li><li>Отдельный процесс раз в секунду берёт неотправленные строки (<code>FOR UPDATE SKIP LOCKED</code>), отправляет в Kafka и отмечает отправленными.</li><li>Если процесс упал между отправкой и отметкой, событие уйдёт повторно — консьюмеры идемпотентны.</li></ol><p>Промышленная альтернатива опросу — Debezium (бесплатный): читает изменения таблицы outbox из журнала базы.</p>
+<h4>Устойчивость</h4>
+<p>Порядок защиты при вызове другого сервиса: <b>таймаут</b> (всегда) → <b>повтор</b> с паузой (только для идемпотентных операций) → <b>Circuit Breaker</b> (перестать звать сервис, который явно лежит) → <b>запасной ответ</b> (кэш, значение по умолчанию).</p>
+</div>
+
   <h3 id="ch7-theory"><span class="sn">7.2</span>Теория</h3>
   <ul class="res">
     <li><span class="tag">Сайт</span><a href="https://microservices.io/" target="_blank" rel="noopener">microservices.io</a><span class="note">Бесплатный каталог паттернов микросервисов Chris Richardson.</span></li>
@@ -1564,6 +1912,18 @@ private List&lt;ApiSummary&gt; lastKnown(Throwable ex) {
   </ul>
 
   <h3 id="ch7-tasks"><span class="sn">7.4</span>Задачи с решениями</h3>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> за каждый оплаченный заказ начислить бонусные баллы ровно один раз, даже если событие придёт дважды.</p>
+    <ol><li>Найти естественный уникальный ключ: один заказ — одно начисление, значит <code>order_id</code>.</li><li>Сделать на нём уникальное ограничение в таблице <code>bonus</code>.</li><li>Вставлять через <code>ON CONFLICT (order_id) DO NOTHING</code> — повтор ничего не изменит.</li><li>Проверить тестом: отправить одно событие дважды, начисление одно.</li></ol>
+    <figure class="code"><figcaption>Java, Spring Kafka</figcaption><pre><code>@KafkaListener(topics = "orders.paid")
+public void on(OrderPaid e) {
+    jdbc.update("""
+        INSERT INTO bonus (order_id, customer_id, points) VALUES (?, ?, ?)
+        ON CONFLICT (order_id) DO NOTHING
+        """, e.orderId(), e.customerId(), e.amount().intValue() / 10);
+}</code></pre></figure>
+    <p><b>Итог:</b> в задаче 7.1 естественного ключа «одно событие — одна строка» нет (счётчик растёт), поэтому нужна отдельная таблица обработанных событий.</p>
+  </div>
   <div class="box task"><h4>Задача 7.1. Идемпотентный консьюмер</h4>
     <p>Kafka может доставить событие использования API дважды. Напишите обработчик, который увеличивает счётчик вызовов за день ровно один раз на событие.</p>
     <details class="sol"><summary>Показать решение</summary>
@@ -1583,6 +1943,26 @@ public void on(UsageEvent e) {
       <p>Таблица <code>processed_event</code> с первичным ключом по id события запоминает обработанные события. Обе вставки в одной транзакции: либо засчитано и запомнено, либо ни то ни другое. Повторная доставка увидит <code>inserted == 0</code> и ничего не изменит.</p>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c7-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> при регистрации пользователя отправить событие <code>user.registered</code> и не потерять его.</p>
+    <ol><li>Создать таблицу <code>outbox</code>.</li><li>В одном методе <code>@Transactional</code> сохранить пользователя и строку outbox.</li><li>Отдельная задача забирает неотправленные строки и отправляет их в Kafka.</li><li>Проверить сценарий «Kafka недоступна»: регистрация проходит, событие уходит позже.</li></ol>
+    <figure class="code"><figcaption>PostgreSQL + Java</figcaption><pre><code>CREATE TABLE outbox (
+  id          BIGSERIAL PRIMARY KEY,
+  topic       TEXT NOT NULL,
+  msg_key     TEXT NOT NULL,
+  payload     JSONB NOT NULL,
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
+  sent_at     TIMESTAMPTZ
+);
+
+@Transactional
+public User register(NewUser cmd) {
+    User u = users.save(User.from(cmd));
+    outbox.save(new OutboxEvent("user.registered", u.getId().toString(), toJson(u)));
+    return u;
+}</code></pre></figure>
+    <p><b>Итог:</b> в задаче 7.2 та же схема для одобрения подписки, плюс сама задача-отправитель.</p>
   </div>
   <div class="box task"><h4>Задача 7.2. Outbox</h4>
     <p>При одобрении подписки нужно сохранить её в БД и отправить событие в Kafka. Сделайте так, чтобы событие не потерялось и не ушло без сохранённых данных.</p>
@@ -1688,7 +2068,31 @@ public void publish() throws Exception {
   </ul>
 
   <aside class="box fact"><h4>Интересный факт</h4><p>Agile-манифест подписали 17 разработчиков в феврале 2001 года на горнолыжном курорте Сноуберд в штате Юта. Весь манифест — четыре ценности и двенадцать принципов, он умещается на одной странице agilemanifesto.org.</p></aside>
+  <h3 id="ch8-notes">Конспект теории</h3>
+<div class="notes">
+<h4>Сложность алгоритма (O-нотация)</h4>
+<p>O-нотация показывает, как растёт время при росте входа n. O(1) — не зависит от n; O(log n) — делим пополам; O(n) — один проход; O(n log n) — хорошая сортировка; O(n²) — вложенный цикл по тем же данным. На собеседовании ждут, что вы назовёте сложность своего решения по времени и памяти.</p>
+<h4>Какая структура для чего</h4>
+<ul><li><code>ArrayList</code> — список с доступом по индексу за O(1).</li><li><code>HashMap</code> / <code>HashSet</code> — «видел ли я это?» и «сколько раз?» за O(1).</li><li><code>ArrayDeque</code> — стек (<code>push</code>/<code>pop</code>) и очередь (<code>offer</code>/<code>poll</code>). Класс <code>Stack</code> устарел.</li><li><code>PriorityQueue</code> — всегда быстро достать наименьший (или наибольший) элемент: «топ-K».</li><li>Отсортированный массив — бинарный поиск за O(log n).</li></ul>
+<h4>Как решать задачу на собеседовании</h4>
+<ol><li>Переспросить условие и уточнить граничные случаи: пустой ввод, дубликаты, отрицательные числа.</li><li>Разобрать 2–3 примера вручную.</li><li>Назвать простое решение «в лоб» и его сложность.</li><li>Найти улучшение: часто помогает HashMap или сортировка.</li><li>Написать код, проговаривая решения вслух.</li><li>Прогнать примеры и граничные случаи по коду.</li></ol>
+</div>
+
   <h3 id="ch8-tasks"><span class="sn">8.4</span>Задачи с решениями</h3>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> найти в массиве два числа с заданной суммой (классика собеседований).</p>
+    <ol><li>Решение «в лоб» — два вложенных цикла, O(n²).</li><li>Улучшение: для каждого числа нужно «дополнение» <code>target − x</code>. Проверять, видели ли его, — это HashMap.</li><li>Один проход: сначала искать дополнение, потом запоминать текущее число с индексом.</li><li>Сложность O(n) по времени и памяти. Проверить: пустой массив, ответа нет, одинаковые числа.</li></ol>
+    <figure class="code"><figcaption>Java</figcaption><pre><code>static int[] twoSum(int[] a, int target) {
+    Map&lt;Integer, Integer&gt; seen = new HashMap&lt;&gt;();
+    for (int i = 0; i &lt; a.length; i++) {
+        Integer j = seen.get(target - a[i]);
+        if (j != null) return new int[] { j, i };
+        seen.put(a[i], i);
+    }
+    return new int[0];
+}</code></pre></figure>
+    <p><b>Итог:</b> в задаче 8.1 вместо HashMap нужен стек — ключевой вопрос тот же: «какая структура данных ответит на мой вопрос быстро?».</p>
+  </div>
   <div class="box task"><h4>Задача 8.1. Скобки</h4>
     <p>Классическая задача собеседований: проверьте, что в строке правильно расставлены скобки <code>()[]{}</code>. Сложность O(n).</p>
     <details class="sol"><summary>Показать решение</summary>
@@ -1922,6 +2326,16 @@ Keycloak (IAM) · Prometheus + Grafana · OpenTelemetry → Jaeger или Tempo<
     <dt>Staging</dt><dd>Копия продакшена для проверки перед выпуском.</dd>
   </dl>
 
+  <h3 id="ch11-notes">Конспект теории</h3>
+<div class="notes">
+<h4>Гонки: «проверил, потом сделал»</h4>
+<p>Код «если свободно — записать» в двух одновременных запросах ломается: оба проверяют, оба видят «свободно», оба записывают. Между проверкой и действием проходит время, и другой запрос успевает вклиниться. Надёжные способы:</p><ul><li><b>Ограничение в базе</b> (UNIQUE, EXCLUDE): база сама отклонит второе, ошибку переводим в 409.</li><li><b>Условное обновление</b>: <code>UPDATE … WHERE seats_left &gt; 0</code> и проверить число изменённых строк.</li><li><b>Оптимистическая блокировка</b> JPA: поле <code>@Version</code>; если запись успели изменить, будет <code>OptimisticLockException</code>.</li><li><b>Пессимистическая блокировка</b>: <code>SELECT … FOR UPDATE</code> — второй ждёт, пока первый закончит.</li></ul>
+<h4>Время: какой тип для чего</h4>
+<ul><li><code>Instant</code> — точка на шкале времени в UTC. Для хранения и сравнения.</li><li><code>ZonedDateTime</code> — время в конкретной зоне (<code>Europe/Riga</code>). Для расчётов «в 10:00 по местному» и показа.</li><li><code>LocalDate</code>, <code>LocalTime</code> — без зоны: «рабочий день с 9 до 18».</li><li>В PostgreSQL — <code>timestamptz</code> (хранит момент в UTC). <code>timestamp</code> без зоны для моментов не использовать.</li><li>Зону храните именем (<code>Europe/Riga</code>), а не смещением (+02:00): смещение меняется летом.</li></ul>
+<h4>Задачи по расписанию в нескольких экземплярах</h4>
+<p><code>@Scheduled</code> запускается в каждом экземпляре приложения. Чтобы работа не выполнялась дважды, либо делят строки через <code>FOR UPDATE SKIP LOCKED</code> (каждый берёт свои), либо используют бесплатную библиотеку ShedLock, которая разрешает запуск задачи только одному экземпляру за раз.</p>
+</div>
+
   <h3 id="ch11-arch"><span class="sn">11.2</span>Архитектура</h3>
 <pre class="tree">Angular PWA: страница мастера для клиентов · кабинет мастера
    └─► Spring Boot (модульный монолит)            ← Keycloak (MASTER, ADMIN)
@@ -2021,6 +2435,16 @@ PostgreSQL · Prometheus + Grafana · CI/CD → Kubernetes (k3s или EKS)</pre
   </ul>
 
   <h3 id="ch11-tasks"><span class="sn">11.11</span>Задачи с решениями</h3>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> продажа билетов: нельзя продать больше мест, чем есть, даже при сотне одновременных покупок.</p>
+    <ol><li>Найти гонку: «прочитать остаток → проверить → уменьшить» — три шага, между ними вклинится другой запрос.</li><li>Объединить проверку и изменение в один атомарный SQL: <code>UPDATE … WHERE seats_left &gt; 0</code>.</li><li>Посмотреть число изменённых строк: 0 — мест нет, ответить 409.</li><li>Проверить нагрузочным тестом: 100 покупок на 10 мест — продано ровно 10.</li></ol>
+    <figure class="code"><figcaption>PostgreSQL + Java</figcaption><pre><code>int updated = jdbc.update("""
+    UPDATE event SET seats_left = seats_left - 1
+    WHERE id = ? AND seats_left &gt; 0
+    """, eventId);
+if (updated == 0) throw new SoldOutException(eventId);   // → 409 Conflict</code></pre></figure>
+    <p><b>Итог:</b> в задаче 11.1 «остатка» нет — запрещено пересечение интервалов, поэтому вместо условного UPDATE используется ограничение EXCLUDE.</p>
+  </div>
   <div class="box task"><h4>Задача 11.1. Никаких двойных записей</h4>
     <p>Два клиента одновременно нажимают «Записаться» на 15:00 к одному мастеру. Проверка «свободно ли» в Java не спасает: обе транзакции видят слот свободным. Сделайте так, чтобы база сама не пустила пересекающиеся записи.</p>
     <details class="sol"><summary>Показать решение</summary>
@@ -2045,6 +2469,14 @@ ProblemDetail taken() {
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="f2-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> показать время онлайн-встречи участникам из Риги и Нью-Йорка.</p>
+    <ol><li>Хранить момент встречи как <code>Instant</code> (UTC).</li><li>Для показа перевести в зону участника: <code>instant.atZone(ZoneId.of(...))</code>.</li><li>Проверить на дате, близкой к переходу на летнее время: в 2026 году США переводят часы 8 марта, а Европа — 29 марта.</li></ol>
+    <figure class="code"><figcaption>Java</figcaption><pre><code>Instant start = Instant.parse("2026-03-29T08:00:00Z");
+ZonedDateTime riga = start.atZone(ZoneId.of("Europe/Riga"));      // 11:00 (уже летнее время, UTC+3)
+ZonedDateTime ny   = start.atZone(ZoneId.of("America/New_York"));  // 04:00 (летнее время, UTC−4)</code></pre></figure>
+    <p><b>Итог:</b> в задаче 11.2 идём в обратную сторону: от местного рабочего дня в Риге к моментам <code>Instant</code> и сравниваем их с занятыми интервалами.</p>
+  </div>
   <div class="box task"><h4>Задача 11.2. Свободные слоты с учётом часового пояса</h4>
     <p>Напишите метод, который для дня, часов работы и длительности услуги вернёт свободные слоты мастера в Риге, исключая занятые интервалы.</p>
     <details class="sol"><summary>Показать решение</summary>
@@ -2065,6 +2497,20 @@ static List&lt;ZonedDateTime&gt; freeSlots(LocalDate day, LocalTime open, LocalT
       <p>Интервалы [s, e) и [b.start, b.end) пересекаются, если каждый начинается раньше конца другого. Сравнение идёт по <code>Instant</code> (UTC), поэтому переход на летнее время не ломает расчёт: <code>atZone</code> сам сдвигает несуществующее время 03:30 на 04:30. Тест обязательно для 29 марта 2026 года — дня перехода.</p>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="f2-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box example"><h4>Разбор похожего задания</h4>
+    <p><b>Задание:</b> несколько обработчиков разбирают общую очередь заданий в таблице, и никто не берёт одно задание дважды.</p>
+    <ol><li>Выбрать одно новое задание и сразу заблокировать его: <code>FOR UPDATE SKIP LOCKED</code>.</li><li>В том же запросе пометить его «в работе» и вернуть данные: <code>UPDATE … RETURNING</code>.</li><li>Запустить два обработчика одновременно и проверить, что задания не повторяются.</li></ol>
+    <figure class="code"><figcaption>PostgreSQL</figcaption><pre><code>UPDATE job SET status = 'RUNNING', taken_at = now()
+WHERE id = (
+  SELECT id FROM job
+  WHERE status = 'NEW'
+  ORDER BY id
+  LIMIT 1
+  FOR UPDATE SKIP LOCKED
+)
+RETURNING id, payload;</code></pre></figure>
+    <p><b>Итог:</b> в задаче 11.3 тот же приём, но берётся пачка строк и отметка ставится в Java-коде.</p>
   </div>
   <div class="box task"><h4>Задача 11.3. Напоминания без дублей</h4>
     <p>Приложение работает в двух экземплярах, и в каждом раз в минуту запускается задача «отправить напоминания о записях через 24 часа». Как сделать, чтобы клиент не получил два одинаковых напоминания?</p>
