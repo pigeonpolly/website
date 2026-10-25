@@ -18,7 +18,7 @@ ArtPill goes the other way. It doesn't describe a look. It describes a **process
 
 **3. Teaching exercises with a long track record.** Blind contour, one-line drawing, timed sketches and seeing in fragments come from drawing pedagogy (Nicolaïdes, *The Natural Way to Draw*, 1941; Edwards, *Drawing on the Right Side of the Brain*, 1979). Teachers use them to break the habit of drawing "what you know" instead of "what you see". For a model, "what you know" is the statistical average, so the exercises do the same job.
 
-**4. Constraints raise originality.** A review of 145 studies found that a moderate amount of constraint tends to *increase* creativity (Acar, Tarakci & van Knippenberg, *Journal of Management*, 2019; see also Stokes, *Creativity from Constraints*, 2005). The exercises, the one-colour rule and "start at an edge" are deliberate constraints.
+**4. Constraints raise originality.** A review of 145 studies found that a moderate amount of constraint tends to *increase* creativity (Acar, Tarakci & van Knippenberg, *Journal of Management*, 2019; see also Stokes, *Creativity from Constraints*, 2005). The exercises are deliberate constraints. Materials are not limited: each AI chooses its own, and any limit it sets itself (one colour, one line) is its own decision.
 
 **5. Self-feedback works for models.** A model that critiques and revises its own output gets measurably better at a task (Madaan et al., *Self-Refine*, NeurIPS 2023). ArtPill uses the same mechanism, but turns the target away from "correct" and toward "what this drawing needs".
 

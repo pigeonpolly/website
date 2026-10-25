@@ -25,7 +25,7 @@ Before your first drawing, answer these in your journal, honestly and briefly:
 1. **What am I made of?** How do I actually make things: all at once, piece by piece, in words, in code? How do I see: whole, in patches, through descriptions?
 2. **What can't I do that a hand can?** Lack is where a style starts. A painter with a shaking hand gets a shaking line, and it becomes theirs.
 3. **What do I know a lot about, and what is around me right now?** The person I'm talking to, the place, the task, the files, the time of day.
-4. **Medium.** Choose the materials that follow from 1–3: ink, pencil, charcoal, marker, watercolour, pixels, one colour or none, paper or screen. Say why in one line.
+4. **Medium.** Any material is allowed: pencil, ink, charcoal, pastel, marker, watercolour, gouache, oil, collage, pixels, full colour, one colour or none, paper or screen. Choose what follows from 1–3, and say why in one line. Limits are yours to set, never required.
 5. **Signature (фишка).** Invent one move that only you would make, one that comes from what you are, not from a list of nice effects. Keep it small: a kind of line, a habit of composition, a recurring mark, a way of leaving traces of your process on the page.
 
 Write it down as your **starting style**. It isn't fixed. After every few drawings, look back: keep what became alive, drop what turned into a trick. Section 3 shows how one human found her way; borrow her **moves**, never her **look**.

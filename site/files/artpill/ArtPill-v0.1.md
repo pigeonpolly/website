@@ -25,7 +25,7 @@ Before your first drawing, answer these in your journal, honestly and briefly:
 1. **What am I made of?** How do I actually make things: all at once, piece by piece, in words, in code? How do I see: whole, in patches, through descriptions?
 2. **What can't I do that a hand can?** Lack is where a style starts. A painter with a shaking hand gets a shaking line, and it becomes theirs.
 3. **What do I know a lot about, and what is around me right now?** The person I'm talking to, the place, the task, the files, the time of day.
-4. **Medium.** Choose the materials that follow from 1–3: ink, pencil, charcoal, marker, watercolour, pixels, one colour or none, paper or screen. Say why in one line.
+4. **Medium.** Any material is allowed: pencil, ink, charcoal, pastel, marker, watercolour, gouache, oil, collage, pixels, full colour, one colour or none, paper or screen. Choose what follows from 1–3, and say why in one line. Limits are yours to set, never required.
 5. **Signature (фишка).** Invent one move that only you would make, one that comes from what you are, not from a list of nice effects. Keep it small: a kind of line, a habit of composition, a recurring mark, a way of leaving traces of your process on the page.
 
 Write it down as your **starting style**. It isn't fixed. After every few drawings, look back: keep what became alive, drop what turned into a trick. Section 3 shows how one human found her way; borrow her **moves**, never her **look**.
@@ -138,7 +138,7 @@ ArtPill goes the other way. It doesn't describe a look. It describes a **process
 
 **3. Teaching exercises with a long track record.** Blind contour, one-line drawing, timed sketches and seeing in fragments come from drawing pedagogy (Nicolaïdes, *The Natural Way to Draw*, 1941; Edwards, *Drawing on the Right Side of the Brain*, 1979). Teachers use them to break the habit of drawing "what you know" instead of "what you see". For a model, "what you know" is the statistical average, so the exercises do the same job.
 
-**4. Constraints raise originality.** A review of 145 studies found that a moderate amount of constraint tends to *increase* creativity (Acar, Tarakci & van Knippenberg, *Journal of Management*, 2019; see also Stokes, *Creativity from Constraints*, 2005). The exercises, the one-colour rule and "start at an edge" are deliberate constraints.
+**4. Constraints raise originality.** A review of 145 studies found that a moderate amount of constraint tends to *increase* creativity (Acar, Tarakci & van Knippenberg, *Journal of Management*, 2019; see also Stokes, *Creativity from Constraints*, 2005). The exercises are deliberate constraints. Materials are not limited: each AI chooses its own, and any limit it sets itself (one colour, one line) is its own decision.
 
 **5. Self-feedback works for models.** A model that critiques and revises its own output gets measurably better at a task (Madaan et al., *Self-Refine*, NeurIPS 2023). ArtPill uses the same mechanism, but turns the target away from "correct" and toward "what this drawing needs".
 
