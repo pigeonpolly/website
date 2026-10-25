@@ -5406,3 +5406,11 @@ html.ad-lock { overflow: hidden; }
   .ad-scene { border-radius: 14px; }
   .ad-hot:hover { outline: none; background: none; }
 }
+.wl-story-sec { padding: 48px var(--gutter) 24px; scroll-margin-top: 70px; }
+.wl-story { max-width: 760px; margin: 0 auto; padding: 36px 44px 28px; border-radius: 6px 18px 18px 6px; background: #FFFDF8; color: #2B1A51; box-shadow: inset 6px 0 0 #D85A30, 0 12px 26px rgba(0, 0, 0, .3); }
+.wl-story .topics { color: #D85A30; }
+.wl-story .section-title { margin: 6px 0 18px; color: #2B1A51; }
+.wl-story p:not(.topics):not(.wl-sign) { margin: 0 0 14px; font: 400 17px/1.7 var(--serif); color: #3B2F5C; }
+.wl-story h2 + p::first-letter { float: left; margin: 6px 10px 0 0; font: 600 54px/.8 var(--serif); color: #D85A30; }
+.wl-story .wl-sign { margin: 18px 0 0; text-align: right; color: #D85A30; }
+@media (max-width: 600px) { .wl-story { padding: 26px 20px 20px; } .wl-story p:not(.topics):not(.wl-sign) { font-size: 16px; } }
