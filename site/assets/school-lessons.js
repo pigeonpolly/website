@@ -276,8 +276,9 @@
           paper: { min: 2, opts: [['asymmetry', 'асимметрия', 'asimetrija'], ['a close-up', 'крупный план', 'tuvplāns'], ['a title', 'надпись', 'uzraksts'], ['a sticker', 'наклейка', 'uzlīme'], ['a page split in two', 'лист на две части', 'lapa divās daļās']] } },
         { say: ['Hi, lovelies! My blog “Life in the Sugar Lane” is bored without a pretty page. Draw me just one thing — but with composition!', 'Привет, мои сладкие! Мой блог «Жизнь на Сахарной улице» скучает без красивой страницы. Нарисуй мне всего одну вещь — но с композицией!', 'Sveiki, mīļumiņi! Mans blogs “Dzīve Cukura ielā” garlaikojas bez skaistas lapas. Uzzīmē man tikai vienu lietu — bet ar kompozīciju!'],
           client: { card: 'halloween-2025/49.jpg', name: ['Candice Creepleton', 'Кэндис Криплтон', 'Kendisa Creepleton'], job: ['blogger, “Life in the Sugar Lane”', 'блогер, «Жизнь на Сахарной улице»', 'blogere, “Dzīve Cukura ielā”'],
-            task: [['Draw one object of your choice and use: {picked}.', 'Нарисуй один любой предмет и используй: {picked}.', 'Uzzīmē vienu priekšmetu pēc izvēles un izmanto: {picked}.'],
-              ['Leave some empty space so the drawing can breathe.', 'Оставь пустое место, чтобы рисунок дышал.', 'Atstāj tukšu vietu, lai zīmējums varētu elpot.'], PHOTO] } },
+            task: [['Draw a whole page or a sketchbook spread about one object of your choice — it must be the main hero.', 'Нарисуй целую страницу или разворот в скетчбуке про один любой предмет — он должен быть главным.', 'Uzzīmē veselu lapu vai skiču burtnīcas atvērumu par vienu priekšmetu pēc izvēles — tam jābūt galvenajam.'],
+              ['Choose the best way to place it on the page and use: {picked}.', 'Выбери, как лучше разместить его на странице, и используй: {picked}.', 'Izvēlies, kā to labāk izvietot lapā, un izmanto: {picked}.'],
+              ['Add captions and small mini-sketches around it — and leave some empty space so the page can breathe.', 'Добавь к нему надписи и мини-зарисовки — и оставь пустое место, чтобы страница дышала.', 'Pievieno tam uzrakstus un mazas mini skices — un atstāj tukšu vietu, lai lapa varētu elpot.'], PHOTO] } },
       ] },
 
     { // 12 — Коллаж
