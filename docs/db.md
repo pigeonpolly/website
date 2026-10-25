@@ -2,7 +2,7 @@
 
 _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TABLE / ALTER TABLE и обращений к meta в worker/*.js. Руками не править._
 
-## Таблицы (46)
+## Таблицы (47)
 
 Обозначения: PK — первичный ключ, nn — NOT NULL, =x — DEFAULT x; «+» — столбцы, добавленные ALTER TABLE.
 
@@ -53,6 +53,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **shift_runs** (worker/shift.js): `id` text PK, `user_id` int nn, `started` int nn, `min` int nn, `done` int =0 (1 — засчитана, 2 — отменена новым стартом); `users.shift_min` — сумма минут доигранных смен
 - **my_games** (worker/my-games.js): `user_id` int PK, `pins` text (JSON: до 3 путей игр), `visits` text (JSON: путь → заходов), `updated_at` int — «★ Мои игры» на главной
 - **about_chat** (worker/about-chat.js): `user_id` int PK, `opened` text (JSON: «a:q012» / «p:q012» — открытые ответы Алины / Полли), `updated_at` int — чат на /about-me/
+- **about_asks** (worker/about-chat.js): `id` PK, `user_id`, `text` (как прислали), `lang`, `status` (new / ok — в игре / no), `tr` text (JSON {q, a, p} × {en, ru, lv}), `created_at`, `answered_at`, `seen` (0 — автор не видел ответ) — свои вопросы из чата /about-me/
 - **school_works** (worker/school.js, «Школа Полли»): `id` int PK auto, `user_id` int nn, `lesson` int nn (1–12), `img` text nn (id картинки, /api/img/), `note` — записка ученика, `status` 'wait' / 'ok' / 'redo', `comment` — Алины (ученику «от Полли»), `comment_tr` — JSON {en, ru, lv} перевод комментария при проверке (translateTo; нет перевода — оригинал), `created_at`, `checked_at`, `seen` int =1 (0 — вердикт ещё не видел → новость school); пересдача после redo — новая строка; через год после диплома schoolCron удаляет фото (img = '' у печатей, прежние попытки — строкой)
 - **titos** (worker/titos.js): `user_id` int PK, `level` int =0, `coffee` int =10, `coffee_at` int =0, `drink_at` int =0, `sleep` int =0, `run` int =0, `found` text ='[]', `started` int =0, `bugs` text ='[]', `sell_day` text ='', `sell_n` int =0, `legacy` int =0; + `sort_lv` int =0, `sort_run` text ='', `bugs_run` int =0']
 - **titos_cases** (worker/titos.js): `n` int PK, `data` text nn, `tr` text ='{}', `hash` text, `updated_at` int

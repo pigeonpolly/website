@@ -106,6 +106,13 @@
       act: ['Plant it', 'Посадить', 'Iestādīt'],
       go: () => pre + '/garden/',
     },
+    aboutask: { // ответ Алины на вопрос из чата /about-me/ (worker/about-chat.js aboutAskNews); гаснет, когда автор открыл чат
+      icon: '📮',
+      title: () => ['Alina answered your question!', 'Алина ответила на твой вопрос!', 'Alīna atbildēja uz tavu jautājumu!'][L],
+      text: x => { const q = (x.q || {})[['en', 'ru', 'lv'][L]] || (x.q || {}).en || ''; return (q ? '«' + q + '»' + (x.n > 1 ? ' (+' + (x.n - 1) + ')' : '') + ' ' : '') + ['Now it’s in the chat for everyone, with your nickname.', 'Теперь он в чате для всех — с твоим ником.', 'Tagad tas ir čatā visiem — ar tavu segvārdu.'][L]; },
+      act: ['Read', 'Прочитать', 'Lasīt'],
+      go: () => pre + '/about-me/#chat',
+    },
     school: { // «Школа Полли» (worker/school.js schoolNews): печать или «на доработку» (ставит Алина, ученику — от Полли); гаснет, когда открыта /polly-helps/
       icon: '🎓',
       title: x => x.diploma ? ['Your diploma from Polly’s school! 📜', 'Твой диплом Школы Полли! 📜', 'Tavs Pollijas skolas diploms! 📜'][L] : x.redo && !x.ok ? ['Polly left you a note', 'Полли оставила записку', 'Pollija atstāja zīmīti'][L] : x.n > 1 ? [`Polly checked your pages (${x.n})`, `Полли проверила страницы (${x.n})`, `Pollija pārbaudīja lapas (${x.n})`][L] : ['A stamp from Polly!', 'Печать от Полли!', 'Zīmogs no Pollijas!'][L],

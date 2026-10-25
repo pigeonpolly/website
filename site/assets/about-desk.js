@@ -43,7 +43,18 @@
     try: ['Try:', 'Попробуй:', 'Pamēģini:'],
     noA: ['Hmm, I haven’t written an answer to this one yet. Check back soon! ✍️', 'Хм, на этот вопрос ответ ещё пишется. Загляни попозже! ✍️', 'Hmm, atbilde uz šo vēl top. Ieskaties vēlāk! ✍️'],
     noP: ['Coo… Polly is still thinking about this one. Come back later!', 'Курлы… Полли ещё думает над этим. Приходи попозже!', 'Kurr… Pollija vēl domā par šo. Nāc vēlāk!'],
-    miss: ['I don’t have an answer to that yet. Maybe one of these?', 'На такое ответа пока нет. Может, один из этих?', 'Uz to atbildes vēl nav. Varbūt kāds no šiem?'],
+    miss: ['I don’t have an answer to that yet. Maybe one of these? Or send it to Alina — she’ll answer it herself.', 'На такое ответа пока нет. Может, один из этих? Или отправь вопрос Алине — она ответит сама.', 'Uz to atbildes vēl nav. Varbūt kāds no šiem? Vai nosūti jautājumu Alīnai — viņa atbildēs pati.'],
+    own: ['📮 Send my question to Alina', '📮 Отправить вопрос Алине', '📮 Nosūtīt jautājumu Alīnai'],
+    ownS: ['📮 Ask my own question', '📮 Задать свой вопрос', '📮 Uzdot savu jautājumu'],
+    ownOk: ['Sent! 📮 Alina will answer it herself — you’ll get a 🔔 notification, and then your question will appear here for everyone, signed with your nickname.', 'Отправлено! 📮 Алина ответит сама — придёт уведомление 🔔, а потом вопрос появится здесь у всех с твоим ником.', 'Nosūtīts! 📮 Alīna atbildēs pati — saņemsi paziņojumu 🔔, un tad jautājums parādīsies šeit visiem ar tavu segvārdu.'],
+    ownIn: ['To send your own question, sign in and get a bird with a nickname — then the answer will come to you.', 'Чтобы отправить свой вопрос, войди и заведи птичку с ником — тогда ответ придёт тебе.', 'Lai nosūtītu savu jautājumu, ienāc un izveido putniņu ar segvārdu — tad atbilde atnāks tev.'],
+    ownErr: { short: ['That’s a bit short for a question — add a few words?', 'Коротковато для вопроса — добавь пару слов?', 'Jautājumam mazliet par īsu — pieliec pāris vārdus?'],
+      wait: ['You already have 3 questions waiting for Alina. Let her answer those first!', 'У Алины уже ждут 3 твоих вопроса. Пусть сначала ответит на них!', 'Alīnu jau gaida 3 tavi jautājumi. Lai viņa vispirms atbild uz tiem!'],
+      many: ['That’s enough questions for today — come back tomorrow!', 'На сегодня вопросов хватит — приходи завтра!', 'Šodienai jautājumu pietiek — nāc rīt!'],
+      x: ['Couldn’t send it — check the connection and try again.', 'Не получилось отправить — проверь интернет и попробуй ещё раз.', 'Neizdevās nosūtīt — pārbaudi savienojumu un mēģini vēlreiz.'] },
+    from: ['📮 asked by', '📮 вопрос прислал(а)', '📮 jautājumu atsūtīja'],
+    mine: ['📮 My questions to Alina', '📮 Мои вопросы Алине', '📮 Mani jautājumi Alīnai'],
+    mineW: ['⏳ waiting for an answer', '⏳ ждёт ответа', '⏳ gaida atbildi'], mineOk: ['✅ in the chat', '✅ в чате', '✅ čatā'],
     opened: ['Opened', 'Открыто', 'Atvērts'], of: ['of', 'из', 'no'],
     list: ['📖 My questions', '📖 Мои вопросы', '📖 Mani jautājumi'],
     listT: ['Questions you’ve opened', 'Открытые вопросы', 'Atvērtie jautājumi'],
@@ -447,14 +458,20 @@
 
   // ══════════════ чат ══════════════
   let Q = null, qLoad = null;
-  const loadQ = () => qLoad || (qLoad = fetch('/assets/about-chat.json').then(r => r.json()).then(d => { Q = d.questions; return Q; }).catch(() => { qLoad = null; return []; }));
+  // база (site/assets/about-chat.json) + вопросы посетителей, на которые ответила Алина (/api/about-chat/extra, с ником автора)
+  const loadQ = () => qLoad || (qLoad = Promise.all([
+    fetch('/assets/about-chat.json').then(r => r.json()),
+    fetch('/api/about-chat/extra').then(r => r.ok ? r.json() : { questions: [] }).catch(() => ({ questions: [] })),
+  ]).then(([d, x]) => { Q = d.questions.concat((x.questions || []).filter(q => q.q && (q.a || q.p))); return Q; }).catch(() => { qLoad = null; return []; }));
   const SK = 'pp-achat';
   const guestGet = () => { try { return JSON.parse(sessionStorage.getItem(SK)) || []; } catch (e) { return []; } };
   const guestSet = a => { try { sessionStorage.setItem(SK, JSON.stringify(a)); } catch (e) { /* без хранилища — только в памяти */ } };
-  let opened = new Set(guestGet()), user = false, srvLoad = null;
+  let opened = new Set(guestGet()), user = false, nick = '', asks = [], srvLoad = null;
   const syncSrv = () => srvLoad || (srvLoad = fetch('/api/about-chat', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(async d => {
     if (!d || !d.user) return;
     user = true;
+    nick = d.nick || '';
+    asks = d.asks || [];
     d.opened.forEach(k => opened.add(k));
     const g = guestGet().filter(k => !d.opened.includes(k));
     if (g.length) {
@@ -589,8 +606,9 @@
   }
   function render() {
     const log = $w('.ad-log');
-    log.innerHTML = logs[who].map(m => `<div class="ad-m${m.me ? ' me' : ''}"><b>${esc(m.me ? tr(T.you) : name(who))}</b> <time>(${m.t})</time>:<div class="ad-mt">${esc(m.text).replace(/\n/g, '<br>')}</div>${m.sug ? `<div class="ad-msug">${m.sug.map(id => { const q = Q.find(x => x.id === id); return q ? `<button type="button" data-q="${id}">${esc(qText(q))}</button>` : ''; }).join('')}</div>` : ''}</div>`).join('');
+    log.innerHTML = logs[who].map(m => `<div class="ad-m${m.me ? ' me' : ''}"><b>${esc(m.me ? tr(T.you) : name(who))}</b> <time>(${m.t})</time>:${m.by ? `<div class="ad-by">${tr(T.from)} <b>@${esc(m.by)}</b></div>` : ''}<div class="ad-mt">${esc(m.text).replace(/\n/g, '<br>')}</div>${m.own ? `<div class="ad-msug"><button type="button" class="ad-own" data-own="${esc(m.own)}">${tr(T.own)}</button></div>` : ''}${m.sug ? `<div class="ad-msug">${m.sug.map(id => { const q = Q.find(x => x.id === id); return q ? `<button type="button" data-q="${id}">${esc(qText(q))}</button>` : ''; }).join('')}</div>` : ''}</div>`).join('');
     log.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { const q = Q.find(x => x.id === b.dataset.q); if (q && !busy) ask(q); });
+    log.querySelectorAll('[data-own]').forEach(b => b.onclick = () => { if (!busy) { b.disabled = true; sendOwn(b.dataset.own); } });
     log.scrollTop = log.scrollHeight;
   }
   function counter() {
@@ -609,7 +627,8 @@
     const left = Math.max(0, total(who) - Q.filter(q => opened.has(who + ':' + q.id)).length);
     L.innerHTML = `<div class="ad-lhead"><b>${tr(T.listT)}</b><button type="button" class="ad-b ad-back">${tr(T.back)}</button></div>
       ${got.length ? `<ol>${got.map(q => `<li><button type="button" data-q="${q.id}">${esc(qText(q))}</button>${opened.has('a:' + q.id) ? `<img src="${ava('a')}" alt="${esc(tr(T.alina))}" title="${esc(tr(T.alina))}">` : ''}${opened.has('p:' + q.id) ? `<img src="${ava('p')}" alt="${esc(tr(T.polly))}" title="${esc(tr(T.polly))}">` : ''}</li>`).join('')}</ol>` : `<p>${tr(T.none)}</p>`}
-      <p class="ad-left">${tr(T.left)} <b>${plural(left)}</b> (${name(who)})</p>`;
+      <p class="ad-left">${tr(T.left)} <b>${plural(left)}</b> (${name(who)})</p>
+      ${asks.length ? `<b>${tr(T.mine)}</b><ul class="ad-mine">${asks.map(a => `<li>${esc(a.text)} <small>${a.status === 'ok' ? tr(T.mineOk) : a.status === 'new' ? tr(T.mineW) : ''}</small></li>`).join('')}</ul>` : ''}`;
     L.querySelector('.ad-back').onclick = () => showList(false);
     L.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { const q = Q.find(x => x.id === b.dataset.q); showList(false); if (q && !busy) ask(q); });
   }
@@ -622,11 +641,14 @@
       list = Q.filter(q => !opened.has(who + ':' + q.id)).sort(() => Math.random() - .5).slice(0, 4);
       head = `<span>${tr(T.try)}</span>`;
     }
-    box.innerHTML = list.length ? head + list.map(q => `<button type="button" role="option" data-q="${q.id}"${opened.has(who + ':' + q.id) ? ' class="seen"' : ''}>${esc(qText(q))}</button>`).join('') : '';
-    box.querySelectorAll('[data-q]').forEach(b => b.onmousedown = e => e.preventDefault());
+    const own = text.trim().length >= 5 ? `<button type="button" role="option" class="ad-own" data-own="1">${tr(T.ownS)}: «${esc(text.trim().slice(0, 60))}»</button>` : '';
+    box.innerHTML = list.length || own ? head + own + list.map(q => `<button type="button" role="option" data-q="${q.id}"${opened.has(who + ':' + q.id) ? ' class="seen"' : ''}>${esc(qText(q))}</button>`).join('') : '';
+    box.querySelectorAll('button').forEach(b => b.onmousedown = e => e.preventDefault());
+    const ob = box.querySelector('[data-own]');
+    if (ob) ob.onclick = () => { if (!busy) { const t = text.trim(); sent(t); sendOwn(t); } };
     box.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { const q = Q.find(x => x.id === b.dataset.q); if (q && !busy) ask(q); });
   }
-  function reply(text, sug, then) {
+  function reply(text, sug, then, extra) {
     busy = true;
     const w = who;
     const ty = $w('.ad-typing');
@@ -634,7 +656,7 @@
     setTimeout(() => {
       busy = false;
       ty.textContent = '';
-      logs[w].push({ me: false, text, sug, t: clock() });
+      logs[w].push({ me: false, text, sug, t: clock(), ...extra });
       if (then) then();
       if (who === w) { render(); counter(); }
     }, Math.min(2200, 600 + text.length * 12));
@@ -651,13 +673,22 @@
     sent(qText(q));
     const w = who, a = ansOf(q, w);
     if (!a) reply(tr(w === 'a' ? T.noA : T.noP));
-    else reply(a, null, () => markOpen(w + ':' + q.id));
+    else reply(a, null, () => markOpen(w + ':' + q.id), q.nick ? { by: q.nick } : null);
   }
   function free(text) {
     sent(text);
     const m = match(text).map(x => x.q.id);
     const pool = Q.filter(q => !opened.has(who + ':' + q.id) && !m.includes(q.id)).sort(() => Math.random() - .5);
-    reply(tr(T.miss), [...m, ...pool.map(q => q.id)].slice(0, 3));
+    reply(tr(T.miss), [...m, ...pool.map(q => q.id)].slice(0, 3), null, { own: text });
+  }
+  // свой вопрос → кабинет Алины (worker/about-chat.js); гостю или птичке без ника — войти
+  async function sendOwn(text) {
+    await syncSrv();
+    if (!user || !nick) { reply(tr(T.ownIn)); if (window.PPAccount) setTimeout(() => window.PPAccount.openSignIn(), 1200); return; }
+    let r = null, d = {};
+    try { r = await fetch('/api/about-chat/ask', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text, lang: LG }) }); d = await r.json().catch(() => ({})); } catch (e) { r = null; }
+    if (r && r.ok) { if (!d.dup) asks.unshift({ id: d.id, text, status: 'new' }); reply(tr(T.ownOk)); }
+    else reply(tr(T.ownErr[d.error] || T.ownErr.x));
   }
   function dice() {
     if (!Q || busy) return;
