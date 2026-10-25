@@ -5241,3 +5241,18 @@ html.me-in .gm-pin.on { background: var(--star); color: #2B1A51; }
   html.me-in .gm-pin { width: 30px; height: 30px; font-size: 16px; top: 6px; right: 6px; }
 }
 .ps-dip-btn { display: inline-block; margin-left: 6px; padding: 2px 12px; border-radius: 999px; background: #E9A93B; color: #2B1A51; font: 700 .9em var(--sans); }
+/* Главная гостю (25.10.2026, Алина): как вошедшему — вкладки «Мой день» (карточка дня гостя + праздник) · «Новое на сайте», но без колонки птички; «Письма» и «Мои игры» — только вошедшему */
+html:not(.me-in) .home-dash { grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr); grid-template-rows: auto 1fr; column-gap: 32px; row-gap: 18px; max-width: 1440px; padding-top: 34px; align-items: start; }
+html:not(.me-in) .home-dash .myday, html:not(.me-in) .home-dash .md-in, html:not(.me-in) .hd-side { display: contents; }
+html:not(.me-in) .home-dash .md-me, html:not(.me-in) .hd-tabs [data-t="news"], html:not(.me-in) .hd-tabs [data-t="games"], html:not(.me-in) .hd-upd .fn-h { display: none; }
+html:not(.me-in) .hd-tabs { display: flex; grid-column: 1 / -1; grid-row: 1; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+html:not(.me-in) .home-dash .md-card { grid-column: 1; grid-row: 2; }
+html:not(.me-in) .home-dash #blk-wl-holiday { grid-column: 2; grid-row: 2; }
+html:not(.me-in) .hd-upd { grid-column: 1 / -1; grid-row: 2; }
+html:not(.me-in) .home-dash:not([data-tab="site"]) .hd-upd, html:not(.me-in) .home-dash[data-tab="site"] .md-card, html:not(.me-in) .home-dash[data-tab="site"] #blk-wl-holiday { display: none; }
+@media (max-width: 760px) {
+  html:not(.me-in) .home-dash { grid-template-columns: minmax(0, 1fr); row-gap: 14px; padding-top: 22px; }
+  html:not(.me-in) .hd-tabs { grid-column: 1; margin: 0 calc(-1 * var(--gutter)); padding: 0 var(--gutter); }
+  html:not(.me-in) .home-dash .md-card, html:not(.me-in) .hd-upd { grid-column: 1; grid-row: 2; }
+  html:not(.me-in) .home-dash #blk-wl-holiday { grid-column: 1; grid-row: 3; }
+}
