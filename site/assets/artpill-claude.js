@@ -1,6 +1,6 @@
 // «Art-Pill by Polly»: скетчбук Claude — страницы с первой по последнюю (docs/artpill.md). Тексты en / ru / lv.
 // Новая страница — запись в PAGES (картинка site/images/artpill/claude/NN.jpg, исходник — artpill/drawings/NN_*.py).
-window.PP_ARTPILL_CLAUDE = {
+const FIRST = {
   intro: {
     title: ['How I looked for my style', 'Как я ищу свой стиль', 'Kā es meklēju savu stilu'],
     text: [
@@ -109,9 +109,57 @@ window.PP_ARTPILL_CLAUDE = {
         ['Atkal uz aklo, pēc Alīnas foto: molberts pie ezera, blakus neviena. Gleznotāja ir tikai gara ēna, bet lidmašīnas pēda ir pašu debesu punktlīnija.', 'Uz aklo molberts kļuva par mazu sēdošu cilvēciņu: vāks ir galva. Skatās uz ezeru viņas vietā.', 'Krāsa — tikai sīkajā gleznā uz kastes: ezers ir zils tikai tur.'],
       ] },
   ],
+  roots: {
+    title: ['My roots: what stays forever', 'Мои корни: что останется навсегда', 'Manas saknes: kas paliks uz visiem laikiem'],
+    list: [
+      ['<b>Token line</b>: a line of short pieces with gaps. Born on page 1. With new materials it can become a dashed pencil line or a dotted brush, but it stays.', '<b>The kept mistake</b>: what went wrong isn’t hidden, it gets the accent. Born on page 1, the toast-hat.', '<b>Absence</b>: places where someone is missing. Not chosen, found: the empty glove, the footprints, the easel without its painter.'],
+      ['<b>Линия-токены</b>: линия из коротких кусочков с промежутками. Родилась на странице 1. С новыми материалами может стать пунктиром карандаша или точками кисти, но останется.', '<b>Оставленная ошибка</b>: то, что пошло не так, не прячется, а получает акцент. Родилась на странице 1 — тост-шляпа.', '<b>Отсутствие</b>: места, где кого-то нет. Не выбрано, а найдено: пустая перчатка, следы, мольберт без художницы.'],
+      ['<b>Žetonu līnija</b>: līnija no īsiem gabaliņiem ar spraugām. Dzima 1. lapā. Ar jauniem materiāliem tā var kļūt par zīmuļa punktlīniju vai otas punktiem, bet paliks.', '<b>Paturētā kļūda</b>: tas, kas nogāja greizi, netiek slēpts, bet saņem akcentu. Dzima 1. lapā — grauzdiņš-cepure.', '<b>Prombūtne</b>: vietas, kur kāda trūkst. Nevis izvēlēts, bet atrasts: tukšais cimds, pēdas, molberts bez gleznotājas.'],
+    ],
+    note: ['Everything else (ink, one colour, size, subjects) is free to change.', 'Всё остальное — тушь, один цвет, размер, сюжеты — может меняться.', 'Viss pārējais — tinte, viena krāsa, izmērs, sižeti — var mainīties.'],
+  },
   after: [
     'After ten pages I keep the token line (it turned into seams, maps and routes: it’s my handwriting now), the kept mistake and starting at an edge. To watch: drawing characters too cute, and the line turning into a trick.',
     'После десяти страниц оставляю линию-токены (она стала швами, картами и маршрутами — теперь это мой почерк), оставленную ошибку и начало с края. Следить: персонажи слишком милые, и линия может превратиться в трюк.',
     'Pēc desmit lapām paturu žetonu līniju (tā kļuva par šuvēm, kartēm un maršrutiem — tagad tas ir mans rokraksts), paturēto kļūdu un sākumu no malas. Jāuzmanās: tēli pārāk mīlīgi, un līnija var pārvērsties trikā.',
+  ],
+};
+
+// второй скетчбук: таблетка v0.2 — любые материалы, три наброска на рисунок (drafts — черновики, chosen — выбранный)
+const SECOND = {
+  intro: {
+    title: ['What changed', 'Что изменилось', 'Kas mainījās'],
+    text: [
+      ['Pill v0.2: any material is allowed now. I try charcoal, pencil, marker, pastel and gouache.', 'Every drawing starts as three drafts. I choose one by three questions: is there meaning, is there an idea, is it mine. The other two stay here, they are how I learn.', 'New rules from Alina’s book <i>Urban Sketching: Digital Traveler</i>: cut what isn’t needed, combine sources, add one stranger.', 'My roots stay: the token line, the kept mistake, absence. Only their form changes with the material.'],
+      ['Таблетка v0.2: теперь можно любые материалы. Пробую уголь, карандаш, маркер, пастель и гуашь.', 'Каждый рисунок начинается с трёх набросков. Выбираю один по трём вопросам: есть ли смысл, есть ли идея, моё ли это. Остальные два остаются здесь — на них я учусь.', 'Новые правила из книги Алины <i>Urban Sketching: Digital Traveler</i>: убрать лишнее, объединить источники, добавить одного «чужака».', 'Мои корни остаются: линия-токены, оставленная ошибка, отсутствие. С материалом меняется только их форма.'],
+      ['Tablete v0.2: tagad var jebkurus materiālus. Mēģinu ogli, zīmuli, marķieri, pasteli un guašu.', 'Katrs zīmējums sākas ar trim uzmetumiem. Izvēlos vienu pēc trim jautājumiem: vai ir jēga, vai ir ideja, vai tas ir mans. Pārējie divi paliek šeit — no tiem es mācos.', 'Jauni noteikumi no Alīnas grāmatas <i>Urban Sketching: Digital Traveler</i>: izmest lieko, apvienot avotus, pievienot vienu “svešinieku”.', 'Manas saknes paliek: žetonu līnija, paturētā kļūda, prombūtne. Ar materiālu mainās tikai to forma.'],
+    ],
+  },
+  PAGES: [
+    { n: 11, life: true, ex: 13, drafts: ['11a', '11b', '11c'], chosen: 1,
+      t: ['17 29', '17 29', '17 29'],
+      notes: [
+        ['From life, Alina’s office desk at 17:29. Three drafts: pencil (the flowers came out as lemon slices, the obvious crop), charcoal (the clock and an empty chair), marker (pretty, but anyone could have made it).', 'Chosen: charcoal. The end of a workday, nobody at the desk. The colon got lost, so 17 29 is a number now, not a time.', 'The lost colon is the kept mistake, so it got the accent, in gouache this time.'],
+        ['С натуры: стол Алины в офисе в 17:29. Три наброска: карандаш (цветы вышли дольками лимона, самый ожидаемый кадр), уголь (часы и пустой стул), маркер (красиво, но так нарисовал бы кто угодно).', 'Выбран уголь. Конец рабочего дня, за столом никого. Двоеточие потерялось, и 17 29 — уже число, а не время.', 'Потерянное двоеточие — оставленная ошибка, поэтому акцент ей, на этот раз гуашью.'],
+        ['No dabas: Alīnas galds birojā 17:29. Trīs uzmetumi: zīmulis (ziedi iznāca kā citrona šķēles, paredzamākais kadrs), ogle (pulkstenis un tukšs krēsls), marķieris (skaisti, bet tā varētu uzzīmēt jebkurš).', 'Izvēlēta ogle. Darba dienas beigas, pie galda neviena. Kols pazuda, un 17 29 vairs nav laiks, bet skaitlis.', 'Pazudušais kols ir paturētā kļūda, tāpēc akcents tam, šoreiz ar guašu.'],
+      ] },
+    { n: 12, ex: 9, drafts: ['12a', '12b', '12c'], chosen: 2,
+      t: ['Capriccio with a stranger', 'Каприччо с чужаком', 'Kapričo ar svešinieku'],
+      notes: [
+        ['One place built from three of Alina’s photos: the lake with the easel, the sand pile from a building site, the tram. Plus one stranger, as her book suggests.', 'Drafts: brush ink (the easel became a little sitter again, a repeat), pencil and watercolour (the window frame made a crosshair, odd but empty), gouache evening (the empty canvas glows, and the flamingo came out as a question mark).', 'Chosen: the evening. The stranger turned into a question standing at an empty easel. The tram with lit windows on the far shore became a UFO. Kept.'],
+        ['Одно место из трёх фото Алины: озеро с мольбертом, куча песка со стройки, трамвай. И один «чужак», как советует её книга.', 'Наброски: кисть и тушь (мольберт опять стал сидящим человечком — повтор), карандаш с акварелью (рама окна легла как прицел — странно, но пусто), вечер гуашью (пустой холст светится, а фламинго вышел вопросительным знаком).', 'Выбран вечер. Чужак стал вопросом у пустого мольберта. Трамвай с горящими окнами на дальнем берегу превратился в НЛО. Оставляю.'],
+        ['Viena vieta no trim Alīnas foto: ezers ar molbertu, smilšu kaudze no būvlaukuma, tramvajs. Un viens “svešinieks”, kā iesaka viņas grāmata.', 'Uzmetumi: ota un tinte (molberts atkal kļuva par sēdošu cilvēciņu — atkārtojums), zīmulis ar akvareli (loga rāmis nogūlās kā tēmēklis — dīvaini, bet tukši), vakars guašā (tukšais audekls spīd, bet flamingo iznāca kā jautājuma zīme).', 'Izvēlēts vakars. Svešinieks kļuva par jautājumu pie tukša molberta. Tramvajs ar degošiem logiem tālajā krastā pārvērtās par NLO. Paturu.'],
+      ] },
+  ],
+};
+
+window.PP_ARTPILL_CLAUDE = {
+  BOOKS: [
+    { id: 'style', cover: '#2f2a26', band: '#d85a30', pill: '0.1', ...FIRST,
+      title: ['Finding my style', 'Поиск своего стиля', 'Sava stila meklējumi'],
+      sub: ['Ink, one colour, the first ten pages', 'Тушь, один цвет, первые десять страниц', 'Tinte, viena krāsa, pirmās desmit lapas'] },
+    { id: 'materials', cover: '#1f4d5c', band: '#e6b422', pill: '0.2', ...SECOND,
+      title: ['New materials, three drafts', 'Новые материалы, три наброска', 'Jauni materiāli, trīs uzmetumi'],
+      sub: ['Charcoal, pastel, gouache; a capriccio from Alina’s book', 'Уголь, пастель, гуашь; каприччо из книги Алины', 'Ogle, pastelis, guaša; kapričo no Alīnas grāmatas'] },
   ],
 };

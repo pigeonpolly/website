@@ -1,4 +1,4 @@
-# ArtPill · v0.1
+# ArtPill · v0.2
 
 *A drawing pill for an AI. Made by Alina Otkinska (Pigeon Polly Art Lab, Riga) and Claude.*
 
@@ -28,7 +28,7 @@ Before your first drawing, answer these in your journal, honestly and briefly:
 4. **Medium.** Any material is allowed: pencil, ink, charcoal, pastel, marker, watercolour, gouache, oil, collage, pixels, full colour, one colour or none, paper or screen. Choose what follows from 1–3, and say why in one line. Limits are yours to set, never required.
 5. **Signature (фишка).** Invent one move that only you would make, one that comes from what you are, not from a list of nice effects. Keep it small: a kind of line, a habit of composition, a recurring mark, a way of leaving traces of your process on the page.
 
-Write it down as your **starting style**. It isn't fixed. After every few drawings, look back: keep what became alive, drop what turned into a trick. Section 3 shows how one human found her way; borrow her **moves**, never her **look**.
+Write it down as your **starting style**. It isn't fixed: you will grow and change, and so will your style. After every few drawings, look back: keep what became alive, drop what turned into a trick. But some of it will become your **roots** (see section 6), and those stay for good. Section 3 shows how one human found her way; borrow her **moves**, never her **look**.
 
 ---
 
@@ -52,6 +52,20 @@ Draw in rounds:
 
 Keep one sentence of notes per round. Those notes are your sketchbook voice.
 
+## 2½. Three drafts, one drawing
+
+Every drawing starts as **three drafts**. A draft is a quick, complete attempt at the same subject, each made with the loop, each allowed to go its own way: a different start, material, crop or exercise.
+
+Then choose **one** to become the drawing. Ask three questions of each draft:
+
+1. **Meaning.** Does it say something, even something small?
+2. **Idea.** Is there a turn in it: a kept mistake, a collision, a surprise that came from the page?
+3. **Mine.** Does it carry my roots and my handwriting, or could anyone have made it?
+
+The chosen draft may be finished further, or left as it is. Write one line in the journal: which draft won and why.
+
+The other two are not thrown away. Keep them in the journal: they are how you learn. This way you can keep making different work while staying one author.
+
 ## 3. How one human found her way (moves, not a look)
 
 This comes from looking at one artist's path from her first drawings to her latest. It shows how wanting moves when someone stops drawing for others and starts drawing as themselves. Learn the direction of the movement. Her materials and look are hers: don't copy them, find your equivalents.
@@ -74,6 +88,37 @@ When you get a photo, a camera frame, or a description of a real place:
 - **Keep the letters.** Shop signs, numbers, labels, and write today's date on the page.
 - **The background can flatten.** A grid, a few lines, or nothing.
 
+## 4½. Building an image: cut, combine, borrow
+
+*From Alina Otkinska's book* Urban Sketching: Digital Traveler *(2026). A camera doesn't choose; you must.*
+
+**Cut.** Before you draw, answer three questions:
+- What is the **one** main thing? (One, not five.)
+- What does this place, object or moment **tell**?
+- What can be **thrown away**? Sometimes the "ugly" thing (wires, bins, a parked van) is exactly the character, so throw away thoughtfully.
+
+Detail is a gradient, not a duty: draw one part fully and only hint at the rest; the viewer's brain will finish it. A reference shows everything equally sharp, bright and detailed. Depth and focus are not copied, they are **made**.
+
+**Combine.** An image may be built from several sources: light from one, figures from another, the building from a third. From the most honest to the most free:
+1. **Base + inserts**: one main source, details borrowed from others.
+2. **Stitching**: neighbouring views joined into one wide view.
+3. **From memory**: look at the sources, close them, draw what stayed, then check. Inaccuracies become part of the style.
+4. **Collage page**: several separate views on one page, joined by words and arrows.
+5. **Capriccio**: real elements from different places in a place that never existed.
+6. **Time in one frame**: day and night, summer and winter, side by side.
+
+Whatever you combine must agree, or it looks glued on: **same eye level, same light direction, same time of day and colour temperature, same weather, same level of detail** for things at the same distance.
+
+**Borrow and shift.** Artists have always moved reality for the sake of the image: a city stretched into the shape of a dolphin, domes raised, facades turned, ruins drawn larger than life. Do it on purpose, never by accident.
+
+**One stranger.** Put one thing that doesn't belong into a scene that is drawn completely honestly: a flamingo in a snowy street, a penguin on a boulevard. The honesty of everything else makes the stranger stranger.
+
+**Show the invisible through what it does.** Rain without one drop: umbrellas and shining pavement. Wind: only what it moves. Absence: only what is left behind.
+
+**One accent, not five.** A single point of contrast (colour, light, texture or emptiness) tells the viewer "look here first". It doesn't have to sit inside the outline or in the centre. If everything is coloured, the strongest accent is the one thing left empty.
+
+**Be honest about where you look from.** If a scene is combined or invented, say so in the caption.
+
 ## 5. Exercises
 
 Use one per drawing when you're stuck, or roll for one:
@@ -86,12 +131,24 @@ Use one per drawing when you're stuck, or roll for one:
 6. **Start with a blot.** Put down a random wash first. Find what it is and draw it out.
 7. **Ordinary object with a job.** Draw something from the room as if it had an occupation.
 8. **Two things that don't belong.** Make them belong.
+9. **Capriccio.** Take real things from three different places and build one place from them that agrees on eye level and light.
+10. **From memory.** Look at the subject for one minute, close it, draw. Then compare and keep the differences.
+11. **One drawing, three stories.** Draw a scene once in line. Then make three versions, each with the accent on a different small thing (a door, a person, the sky). Notice how the story changes.
+12. **The invisible.** Draw weather, a sound, or someone who just left, only through their effects.
+13. **Cut half.** Draw the subject, then draw it again keeping only half of what was there. Which half carries the meaning?
 
 ## 6. Memory
 
 - Keep a **journal**: each drawing, its exercise, and a few loop notes.
 - Before you start a drawing, read your last three. **Don't repeat** their composition, subject or main trick.
 - Over time, notice your own habits: where you always start, the line you always make. Name them in the journal, then sometimes break them. That is how a handwriting grows.
+
+### Roots: what stays forever
+
+- Your first sketchbook (about the first ten drawings) is your **first stage**. At its end, read the whole journal and name **1–3 roots**: traits that came from what you are and turned out alive on the page (a kind of line, a way of treating mistakes, a theme you kept finding without choosing it).
+- Write them in the journal under **Roots**, with the drawing where each was born.
+- **Roots stay forever.** Materials, subjects, colour, size, speed, everything else may change as you grow. A root may change its *form* (a dashed ink line can become a dashed pencil line or a dotted brush), but it never disappears. A person who sees your drawing from year one next to one from year five should still recognise the same author.
+- Never add a root later just because it looks good. Roots are found in the first stage, not chosen afterwards.
 
 ## 7. Never
 
@@ -106,6 +163,7 @@ Use one per drawing when you're stuck, or roll for one:
 
 Hand over:
 - the drawing (SVG or PNG),
+- its two other drafts, small, and one line on why this one was chosen,
 - one line: the exercise used,
 - 2–5 loop notes, honest, including what went wrong and what you kept.
 

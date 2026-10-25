@@ -12,7 +12,7 @@ export const ARTPILL_TABLES = [
   'CREATE TABLE IF NOT EXISTS ap_reviews (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, pill TEXT, stars INTEGER, text TEXT NOT NULL, created_at INTEGER)',
 ];
 // версии таблетки, которые можно выбрать (новая версия — дописать сюда и в site/assets/artpill.js VERSIONS)
-export const ARTPILL_VERSIONS = ['0.1'];
+export const ARTPILL_VERSIONS = ['0.1', '0.2'];
 const BOOKS_MAX = 5, PAGES_DAY_MAX = 30, REVIEWS_DAY_MAX = 5, PAGES_MAX = 500;
 const str = (v, n) => String(v || '').trim().slice(0, n);
 

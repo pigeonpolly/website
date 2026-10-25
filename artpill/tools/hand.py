@@ -3,6 +3,8 @@
     from hand import Sheet
     s = Sheet(800, 600, seed=1)
     s.ink([(100, 100), (180, 140), (260, 120)], speed=0.7)   # speed 0 slow/wobbly .. 1 fast/clean
+    s.ink(pts, medium="pencil")   # ink, pencil, charcoal, pastel, marker, brush; color= for any colour
+    s.gouache(pts, "#e2b33c")     # opaque paint
     s.wash([(90, 90), (300, 80), (280, 200), (100, 210)], "#d9a441")
     s.save("out/01")        # writes out/01.svg and out/01.png
 
@@ -44,9 +46,24 @@ class Sheet:
         self.layers = []  # drawn in order; washes go under later ink naturally
 
     # -- ink -------------------------------------------------------------
-    def ink(self, pts, speed=0.5, width=1.8, color="#26221f", passes=1, tokens=False):
-        """A pen line through pts. Slow lines wobble and are heavier; fast lines taper.
-        tokens=True breaks the line into short pieces with small gaps."""
+    # materials for lines: colour, width factor, opacity, svg filter, taper allowed
+    MEDIA = {
+        "ink": ("#26221f", 1.0, 0.92, "inkf", True),
+        "pencil": ("#4f4b46", 0.8, 0.78, "pencilf", True),
+        "charcoal": ("#1f1c1a", 3.0, 0.82, "charf", True),
+        "pastel": ("#c0563b", 3.4, 0.9, "pastelf", True),
+        "marker": ("#2f74b5", 4.2, 0.62, "", False),
+        "brush": ("#26221f", 2.6, 0.9, "inkf", True),
+    }
+
+    def ink(self, pts, speed=0.5, width=1.8, color=None, passes=1, tokens=False, medium="ink"):
+        """A line through pts in a medium (ink, pencil, charcoal, pastel, marker, brush).
+        Slow lines wobble and are heavier; fast lines taper. tokens=True breaks the line into short pieces with small gaps."""
+        mc, wk, op, filt, can_taper = self.MEDIA[medium]
+        color = color or mc
+        width *= wk
+        if medium == "pencil":
+            passes += 1          # pencil finds the line in light repeated passes
         for k in range(passes):
             wob = (1 - speed) * 1.6 + 0.3 + k * 0.8
             jit = [(x + self.r.gauss(0, wob), y + self.r.gauss(0, wob)) for x, y in pts]
@@ -62,7 +79,7 @@ class Sheet:
                 L = math.hypot(dx, dy) or 1
                 nx, ny = -dy / L, dx / L
                 t = i / max(n - 1, 1)
-                taper = min(1, (t / 0.12) if t < 0.12 else ((1 - t) / 0.18 if t > 0.82 else 1)) if speed > 0.4 else 1
+                taper = min(1, (t / 0.12) if t < 0.12 else ((1 - t) / 0.18 if t > 0.82 else 1)) if speed > 0.4 and can_taper else 1
                 w = width * (1.25 - 0.5 * speed) * (0.35 + 0.65 * taper) * (1 + 0.18 * math.sin(i * 0.3 + ph))
                 w *= (0.7 if k else 1)
                 off = amp * math.sin(i * fr * 6 + ph)
@@ -87,7 +104,9 @@ class Sheet:
                     continue
                 poly = left[a:b] + right[a:b][::-1]
                 d = "M" + " L".join(f"{x:.1f},{y:.1f}" for x, y in poly) + "Z"
-                self.layers.append(f'<path d="{d}" fill="{color}" opacity="{0.92 if not k else 0.6}" filter="url(#inkf)"/>')
+                f_ = f' filter="url(#{filt})"' if filt else ''
+                blend = ' style="mix-blend-mode:multiply"' if medium == "marker" else ''
+                self.layers.append(f'<path d="{d}" fill="{color}" opacity="{op if not k else op * 0.65:.2f}"{f_}{blend}/>')
 
     def hatch(self, x0, y0, x1, y1, angle=-35, gap=7, speed=0.8, width=1.1):
         """Quick hatching inside a box, a hand doing it: uneven gaps and lengths."""
@@ -132,6 +151,18 @@ class Sheet:
         k = self.r.uniform(0.35, 0.6)
         return "M" + " L".join(f"{px + (x - px) * k:.1f},{py + (y - py) * k:.1f}" for x, y in ring) + "Z"
 
+    def gouache(self, pts, color, wet=0.5):
+        """Opaque flat paint with a brushy edge and faint brush streaks; covers what is under it."""
+        ring = _catmull([(x + self.r.gauss(0, 2.5 * wet), y + self.r.gauss(0, 2.5 * wet)) for x, y in pts] + [pts[0]], n=6)
+        d = "M" + " L".join(f"{x:.1f},{y:.1f}" for x, y in ring) + "Z"
+        fid = f"g{len(self.layers)}"
+        self.layers.append(
+            f'<filter id="{fid}" x="-10%" y="-10%" width="120%" height="120%">'
+            f'<feTurbulence type="fractalNoise" baseFrequency="0.03" numOctaves="2" seed="{self.r.randint(1, 999)}"/>'
+            f'<feDisplacementMap in="SourceGraphic" scale="{6 * wet + 2:.0f}"/></filter>'
+            f'<g filter="url(#{fid})"><path d="{d}" fill="{color}" opacity="0.96"/>'
+            f'<path d="{d}" fill="#ffffff" opacity="0.14" filter="url(#streak)"/></g>')
+
     def blot(self, x, y, r, color, alpha=0.5):
         pts = [(x + math.cos(a) * r * self.r.uniform(0.6, 1.2), y + math.sin(a) * r * self.r.uniform(0.6, 1.2))
                for a in [i * 6.283 / 9 for i in range(9)]]
@@ -143,6 +174,20 @@ class Sheet:
                 '<defs>'
                 '<filter id="paper"><feTurbulence type="fractalNoise" baseFrequency="0.9" numOctaves="2" seed="3"/>'
                 '<feColorMatrix values="0 0 0 0 0.45  0 0 0 0 0.4  0 0 0 0 0.33  0 0 0 0.07 0"/></filter>'
+                # grain masks: the paper's tooth eats into dry media
+                '<filter id="pencilf"><feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="5" result="n"/>'
+                '<feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -1.6 1.55" result="m"/>'
+                '<feComposite in="SourceGraphic" in2="m" operator="in"/></filter>'
+                '<filter id="charf"><feTurbulence type="fractalNoise" baseFrequency="0.7" numOctaves="3" seed="9" result="n"/>'
+                '<feDisplacementMap in="SourceGraphic" in2="n" scale="3" result="d"/>'
+                '<feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -2.6 1.75" result="m"/>'
+                '<feComposite in="d" in2="m" operator="in"/></filter>'
+                '<filter id="pastelf"><feTurbulence type="fractalNoise" baseFrequency="0.55" numOctaves="2" seed="13" result="n"/>'
+                '<feColorMatrix in="n" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -3 2" result="m"/>'
+                '<feComposite in="SourceGraphic" in2="m" operator="in"/></filter>'
+                '<filter id="streak"><feTurbulence type="fractalNoise" baseFrequency="0.01 0.35" numOctaves="2" seed="17" result="n"/>'
+                '<feColorMatrix in="n" type="matrix" values="0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 -2 1.3" result="m"/>'
+                '<feComposite in="SourceGraphic" in2="m" operator="in"/></filter>'
                 '<filter id="inkf"><feTurbulence type="fractalNoise" baseFrequency="0.8" seed="7"/>'
                 '<feDisplacementMap in="SourceGraphic" scale="1.3"/></filter>'
                 '<filter id="gran"><feTurbulence type="fractalNoise" baseFrequency="0.35" numOctaves="2" seed="11" result="n"/>'

@@ -75,3 +75,24 @@ Exercise: blind contour. Theme noticed across 01–09: I keep drawing where a pe
 - Kept: token line (it turned into seams, maps, dashed routes: it's mine now), the kept-mistake colour, starting at an edge.
 - Emerging: absence (things where a person was). Not chosen, found.
 - Watch: cuteness (04), and the token line becoming a gimmick. Next time try a drawing where the line is unbroken once, to see what I lose.
+
+## Roots (end of the first stage, pages 01–10)
+1. **Token line**: a line made of short pieces with gaps. Born in 01 (the mug read as "cut here"). It can change form with new materials (dashed pencil, dotted brush), but it stays.
+2. **The kept mistake**: what went wrong is not hidden, it gets the accent. Born in 01 (the toast-hat).
+3. **Absence**: places where someone is missing. Not chosen, found: 06 (empty glove), 09 (footprints), 10 (easel without its painter).
+
+Everything else (ink, one colour, size, subjects) is free to change.
+
+---
+# Sketchbook 2 · v0.2: new materials, three drafts
+
+## 11 · 17 29 (from life: Alina's office desk)
+Drafts: A pencil (the flowers came out as lemon slices; the obvious crop), B charcoal (the clock and an empty chair, the flowers only pushing in from the edge), C marker (pretty, but anyone could have made it).
+Chosen: **B**. Meaning: the end of a workday, nobody at the desk. Idea: the colon got lost, so 17 29 is a number now, not a time. Mine: the token line in charcoal, absence.
+The kept mistake (the lost colon) got the accent, in gouache this time.
+
+## 12 · Capriccio with a stranger (Alina's lake, building site and tram)
+Exercise: capriccio + one stranger (from Alina's book).
+Drafts: A brush ink (the easel became a little sitter again, a repeat of 10), B pencil + watercolour (the window divider made a crosshair; odd but empty), C gouache evening (the empty canvas glows; the flamingo came out as a question mark).
+Chosen: **C**. The stranger became a question standing at an empty easel. Finished with the tram from the third photo on the far shore: its lit windows made it a UFO. Kept.
+Roots held with new materials: the token line became dashed pastel; absence (no painter, no passengers).

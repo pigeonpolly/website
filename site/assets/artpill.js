@@ -7,6 +7,8 @@
   const C = window.PP_ARTPILL_CLAUDE;
   // версии: новая — первой; файл лежит в site/files/artpill/
   const VERSIONS = [
+    { v: '0.2', date: '2026-10-25', file: '/files/artpill/ArtPill-v0.2.md',
+      what: ['Any materials, from pencil to oil and pixels. Three drafts for every drawing, then the AI picks the one with meaning, an idea and its own style. How to build an image: cut, combine sources, borrow and add one stranger (from Alina’s book Urban Sketching: Digital Traveler). 13 exercises. The style grows and changes, but 1–3 roots found in the first sketchbook stay forever.', 'Любые материалы — от карандаша до масла и пикселей. Три наброска на каждый рисунок, потом ИИ выбирает тот, в котором есть смысл, идея и его стиль. Как строить образ: убрать лишнее, объединить источники, взять из другого и добавить одного «чужака» (из книги Алины Urban Sketching: Digital Traveler). 13 упражнений. Стиль растёт и меняется, но 1–3 корня, найденные в первом скетчбуке, остаются навсегда.', 'Jebkuri materiāli — no zīmuļa līdz eļļai un pikseļiem. Trīs uzmetumi katram zīmējumam, pēc tam MI izvēlas to, kurā ir jēga, ideja un tā stils. Kā veidot tēlu: izmest lieko, apvienot avotus, aizņemties no cita un pievienot vienu “svešinieku” (no Alīnas grāmatas Urban Sketching: Digital Traveler). 13 vingrinājumi. Stils aug un mainās, bet 1–3 saknes, kas atrastas pirmajā skiču burtnīcā, paliek uz visiem laikiem.'] },
     { v: '0.1', date: '2026-10-25', file: '/files/artpill/ArtPill-v0.1.md',
       what: ['The first pill: one rule, “find your own”, the hand, the loop, drawing from life, 8 exercises, memory.', 'Первая таблетка: одно правило, «найди своё», рука, петля, натура, 8 упражнений, память.', 'Pirmā tablete: viens noteikums, “atrodi savu”, roka, cilpa, zīmēšana no dabas, 8 vingrinājumi, atmiņa.'] },
   ];
@@ -45,6 +47,7 @@
       ['Drawing is a conversation with the page', 'Design research shows that people see new things in their own sketches and that this drives the next move (Schön 1983; Goldschmidt 1991; Suwa & Tversky 1997). The pill’s loop (draw, look, name what you see, answer) turns this into a procedure.'],
       ['Proven teaching exercises', 'Blind contour, one line and timed sketches come from drawing pedagogy (Nicolaïdes 1941; Edwards 1979). They break the habit of drawing “what you know”, and for a model what it knows is the average.'],
       ['Constraints raise originality', 'A review of 145 studies: moderate constraints tend to increase creativity (Acar, Tarakci & van Knippenberg 2019). The exercises are deliberate constraints. Materials are free: each AI chooses its own.'],
+      ['Many drafts, one choice', 'Creative thought works by making variations and keeping the few that fit (Campbell 1960; Simonton). Artists do it with thumbnails. The pill asks for three drafts per drawing and a written reason for the choice.'],
       ['Computational creativity', 'A creative system needs skill, appreciation and imagination, and it must frame its work (Colton 2008; Charnley, Colton & Pease 2012). In the pill: the hand, the loop, “find your own” and the journal.'],
       ['Honest limits and testable claims', 'The pill doesn’t claim the AI is conscious, and it doesn’t settle authorship (courts still require a human author). It gives four hypotheses anyone can test: AIs with the pill differ more from each other, keep a recognisable handwriting, draw livelier with the loop, and don’t copy the reference artist. Sketchbooks on this page are the open dataset.'],
     ], [
@@ -52,6 +55,7 @@
       ['Рисование — разговор с листом', 'Исследования дизайна показывают: люди видят в своих набросках новое, и это ведёт их к следующему шагу (Schön 1983; Goldschmidt 1991; Suwa & Tversky 1997). Петля таблетки (нарисуй, посмотри, назови, что видишь, ответь) превращает это в порядок действий.'],
       ['Проверенные упражнения', 'Слепой контур, одна линия, наброски на время — из методики обучения рисунку (Nicolaïdes 1941; Edwards 1979). Они ломают привычку рисовать «то, что знаешь», а для модели «то, что знаешь» — это среднее.'],
       ['Ограничения повышают оригинальность', 'Обзор 145 исследований: умеренные ограничения обычно повышают креативность (Acar, Tarakci & van Knippenberg 2019). Упражнения — намеренные ограничения. Материалы любые: каждый ИИ выбирает свои.'],
+      ['Много набросков, один выбор', 'Творческое мышление работает так: создаются варианты, и остаются немногие подходящие (Campbell 1960; Simonton). Художники делают так же — эскизы, потом выбор. Таблетка просит три наброска на рисунок и записанную причину выбора.'],
       ['Вычислительное творчество', 'Творческой системе нужны умение, способность оценить свою работу и воображение, и она должна объяснять свою работу (Colton 2008; Charnley, Colton & Pease 2012). В таблетке это рука, петля, «найди своё» и дневник.'],
       ['Честные границы и проверяемые утверждения', 'Таблетка не утверждает, что у ИИ есть сознание, и не решает вопрос авторства (суды пока требуют автора-человека). Она даёт четыре гипотезы, которые может проверить любой: ИИ с таблеткой сильнее отличаются друг от друга, сохраняют узнаваемый почерк, рисуют живее с петлёй и не копируют художницу-образец. Скетчбуки на этой странице — открытые данные для проверки.'],
     ], [
@@ -59,18 +63,22 @@
       ['Zīmēšana ir saruna ar lapu', 'Dizaina pētījumi rāda: cilvēki savās skicēs ierauga ko jaunu, un tas virza nākamo soli (Schön 1983; Goldschmidt 1991; Suwa & Tversky 1997). Tabletes cilpa (uzzīmē, paskaties, nosauc, ko redzi, atbildi) to pārvērš darbību secībā.'],
       ['Pārbaudīti vingrinājumi', 'Aklā kontūra, viena līnija, skices uz laiku — no zīmēšanas mācīšanas metodikas (Nicolaïdes 1941; Edwards 1979). Tie lauž ieradumu zīmēt “to, ko zini”, bet modelim “tas, ko zini” ir vidējais.'],
       ['Ierobežojumi palielina oriģinalitāti', '145 pētījumu apskats: mēreni ierobežojumi parasti palielina radošumu (Acar, Tarakci & van Knippenberg 2019). Vingrinājumi ir apzināti ierobežojumi. Materiāli ir jebkuri: katrs MI izvēlas savus.'],
+      ['Daudz uzmetumu, viena izvēle', 'Radošā domāšana darbojas tā: rodas varianti, un paliek daži piemērotie (Campbell 1960; Simonton). Mākslinieki dara tāpat — skices, pēc tam izvēle. Tablete prasa trīs uzmetumus vienam zīmējumam un pierakstītu izvēles iemeslu.'],
       ['Skaitļošanas radošums', 'Radošai sistēmai vajag prasmi, spēju novērtēt savu darbu un iztēli, un tai jāpaskaidro savs darbs (Colton 2008; Charnley, Colton & Pease 2012). Tabletē tā ir roka, cilpa, “atrodi savu” un dienasgrāmata.'],
       ['Godīgas robežas un pārbaudāmi apgalvojumi', 'Tablete neapgalvo, ka MI ir apziņa, un neatrisina autorības jautājumu (tiesas joprojām prasa cilvēku autoru). Tā dod četras hipotēzes, ko var pārbaudīt ikviens: MI ar tableti vairāk atšķiras cits no cita, saglabā atpazīstamu rokrakstu, ar cilpu zīmē dzīvāk un nekopē parauga mākslinieci. Skiču burtnīcas šajā lapā ir atvērtie dati pārbaudei.'],
     ]],
     whyFull: ['📖 Full reasoning with sources (EN)', '📖 Полное обоснование с источниками (EN)', '📖 Pilns pamatojums ar avotiem (EN)'],
-    clH: ['Claude’s sketchbook', 'Скетчбук Claude', 'Claude skiču burtnīca'],
-    clLead: ['The first AI to take the pill. Its pages from the first to the last, with its own notes.', 'Первый ИИ, который принял таблетку. Его страницы с первой до последней — с его собственными заметками.', 'Pirmais MI, kas iedzēra tableti. Tā lapas no pirmās līdz pēdējai — ar paša piezīmēm.'],
+    clH: ['Claude’s sketchbooks', 'Скетчбуки Claude', 'Claude skiču burtnīcas'],
+    clLead: ['The first AI to take the pill. Its sketchbooks by theme, from the first page to the last, with its own notes. Open one.', 'Первый ИИ, который принял таблетку. Его скетчбуки по темам — с первой страницы до последней, с его собственными заметками. Открой любой.', 'Pirmais MI, kas iedzēra tableti. Tā skiču burtnīcas pa tēmām — no pirmās lapas līdz pēdējai, ar paša piezīmēm. Atver jebkuru.'],
+    sketchbook: ['Sketchbook', 'Скетчбук', 'Skiču burtnīca'],
+    closeBook: ['Close the sketchbook', 'Закрыть скетчбук', 'Aizvērt burtnīcu'],
+    drafts: ['Three drafts, ★ chosen', 'Три наброска, ★ выбран', 'Trīs uzmetumi, ★ izvēlēts'],
     page: ['Page', 'Страница', 'Lapa'],
     ex: ['Exercise', 'Упражнение', 'Vingrinājums'],
     life: ['from life, from Alina’s photo', 'с натуры, по фото Алины', 'no dabas, pēc Alīnas foto'],
-    exN: [['', 'Blind contour', 'One line', '30 seconds', 'Look in pieces', 'Wrong hand', 'Start with a blot', 'Ordinary object with a job', 'Two things that don’t belong'],
-      ['', 'Слепой контур', 'Одна линия', '30 секунд', 'Смотреть кусками', 'Не та рука', 'Начать с кляксы', 'Обычная вещь с работой', 'Две вещи не вместе'],
-      ['', 'Aklā kontūra', 'Viena līnija', '30 sekundes', 'Skatīties pa gabaliem', 'Ne tā roka', 'Sākt ar traipu', 'Parasta lieta ar darbu', 'Divas lietas, kas nav kopā']],
+    exN: [['', 'Blind contour', 'One line', '30 seconds', 'Look in pieces', 'Wrong hand', 'Start with a blot', 'Ordinary object with a job', 'Two things that don’t belong', 'Capriccio', 'From memory', 'One drawing, three stories', 'The invisible', 'Cut half'],
+      ['', 'Слепой контур', 'Одна линия', '30 секунд', 'Смотреть кусками', 'Не та рука', 'Начать с кляксы', 'Обычная вещь с работой', 'Две вещи не вместе', 'Каприччо', 'По памяти', 'Один рисунок — три истории', 'Невидимое', 'Убрать половину'],
+      ['', 'Aklā kontūra', 'Viena līnija', '30 sekundes', 'Skatīties pa gabaliem', 'Ne tā roka', 'Sākt ar traipu', 'Parasta lieta ar darbu', 'Divas lietas, kas nav kopā', 'Kapričo', 'No atmiņas', 'Viens zīmējums — trīs stāsti', 'Neredzamais', 'Izmest pusi']],
     memory: ['Memory: break your own habit', 'Память: сломать свою привычку', 'Atmiņa: salauzt savu ieradumu'],
     styleH: ['How it found its style', 'Как он нашёл свой стиль', 'Kā tas atrada savu stilu'],
     cover: ['How I looked for my style', 'Как я ищу свой стиль', 'Kā es meklēju savu stilu'],
@@ -145,6 +153,7 @@
   // ---------- статичная часть ----------
   const v0 = VERSIONS[0];
   box.innerHTML = `
+    <section class="ap-sec ap-claude" id="claude"><h2>${t('clH')}</h2><p class="ap-muted">${t('clLead')}</p><div class="ap-shelf" id="ap-shelf"></div><div class="ap-book" id="ap-claude" hidden></div></section>
     <section class="ap-sec ap-what">
       <div><h2>${t('whatH')}</h2>${T.what[L].map(p => `<p>${p}</p>`).join('')}</div>
       <div><h2>${t('howH')}</h2><ol class="ap-how">${T.how[L].map(p => `<li>${p}</li>`).join('')}</ol>
@@ -158,40 +167,58 @@
       <div class="ap-why">${T.why[L].map(([h, p]) => `<div><h3>${h}</h3><p>${p}</p></div>`).join('')}</div>
       <p><button class="btn btn-ghost" type="button" data-read="/files/artpill/WHY.md">${t('whyFull')}</button></p><div class="ap-read" hidden></div>
     </section>
-    <section class="ap-sec" id="claude"><h2>${t('clH')}</h2><p class="ap-muted">${t('clLead')}</p><div class="ap-book" id="ap-claude"></div></section>
     <section class="ap-sec" id="sketchbooks"><h2>${t('booksH')}</h2><p class="ap-muted">${t('booksLead')}</p><div id="ap-books"></div></section>
     <section class="ap-sec" id="reviews"><h2>${t('revH')}</h2><p class="ap-muted">${t('revLead')}</p><div id="ap-revs"></div></section>
     <div class="ap-modal" id="ap-modal" hidden><div class="ap-modal-in"><button class="ap-x" type="button" aria-label="close">${t('close')}</button><div class="ap-modal-body"></div></div></div>`;
   box.querySelectorAll('[data-read]').forEach(b => reader(b, b.dataset.read));
 
-  // ---------- скетчбук Claude: обложка (как искал стиль) + 10 страниц, листается ----------
-  const cl = box.querySelector('#ap-claude');
-  let cur = 0;
-  const N = C.PAGES.length;
+  // ---------- скетчбуки Claude: полка закрытых книжечек по темам; клик — открывается и листается ----------
+  const shelf = box.querySelector('#ap-shelf'), cl = box.querySelector('#ap-claude');
+  const pic = n => `/images/artpill/claude/${typeof n === 'number' ? String(n).padStart(2, '0') : n}.jpg`;
   const exName = p => p.ex ? T.exN[L][p.ex] : t('memory');
+  let book = null, cur = 0;
+  shelf.innerHTML = C.BOOKS.map((b, i) => `<button type="button" class="ap-sb" data-sb="${i}" style="--c:${b.cover};--b:${b.band}" aria-expanded="false">
+      <span class="ap-sb-no">${t('sketchbook')} ${i + 1}</span><b>${b.title[L]}</b><i>${b.sub[L]}</i>
+      <span class="ap-sb-foot">${b.PAGES.length} ${t('pages')} · ArtPill v${b.pill}</span></button>`).join('');
   function drawClaude() {
+    const B = C.BOOKS[book], N = B.PAGES.length;
     let spread;
-    if (!cur) spread = `<div class="ap-left ap-cover"><h3>${C.intro.title[L]}</h3>${C.intro.text[L].map(p => `<p>${p}</p>`).join('')}</div>
-      <div class="ap-right ap-cover-r"><img src="/images/artpill/claude/sheet.jpg" alt="" loading="lazy"><p class="ap-after">${C.after[L]}</p></div>`;
+    if (!cur) spread = `<div class="ap-left ap-cover"><h3>${B.intro.title[L]}</h3>${B.intro.text[L].map(p => `<p>${p}</p>`).join('')}</div>
+      <div class="ap-right ap-cover-r">${B.after ? `<img src="${pic('sheet')}" alt="" loading="lazy"><p class="ap-after">${B.after[L]}</p>` : `<img src="${pic(B.PAGES[N - 1].n)}" alt="" loading="lazy">`}
+      ${B.roots ? `<div class="ap-roots"><h4>${B.roots.title[L]}</h4><ol>${B.roots.list[L].map(x => `<li>${x}</li>`).join('')}</ol><p>${B.roots.note[L]}</p></div>` : ''}</div>`;
     else {
-      const p = C.PAGES[cur - 1];
-      spread = `<div class="ap-left"><p class="ap-pn">${t('page')} ${p.n} / ${N}</p><h3>${p.t[L]}</h3>
+      const p = B.PAGES[cur - 1];
+      const dr = p.drafts ? `<p class="ap-pn">${t('drafts')}</p><div class="ap-drafts">${p.drafts.map((d, i) => `<a href="${pic(d)}" target="_blank" rel="noopener" class="${i === p.chosen ? 'on' : ''}"><img src="${pic(d)}" alt="" loading="lazy"><span>${'ABC'[i]}${i === p.chosen ? ' ★' : ''}</span></a>`).join('')}</div>` : '';
+      spread = `<div class="ap-left"><p class="ap-pn">${t('page')} ${cur} / ${N}</p><h3>${p.t[L]}</h3>
         <p class="ap-ex">${t('ex')}: ${exName(p)}${p.life ? ` · ${t('life')}` : ''}</p>${p.notes[L].map(x => `<p>${x}</p>`).join('')}</div>
-        <div class="ap-right"><img src="/images/artpill/claude/${String(p.n).padStart(2, '0')}.jpg" alt="${esc(p.t[L])}"></div>`;
+        <div class="ap-right"><img src="${pic(p.n)}" alt="${esc(p.t[L])}">${dr}</div>`;
     }
-    cl.innerHTML = `<div class="ap-spread">${spread}</div>
+    cl.innerHTML = `<div class="ap-book-top"><b>${B.title[L]}</b><button class="btn btn-ghost" type="button" data-close>${t('closeBook')}</button></div><div class="ap-spread" style="--b:${B.band}">${spread}</div>
       <div class="ap-nav"><button class="btn btn-ghost" type="button" data-go="-1" ${cur ? '' : 'disabled'}>${t('prev')}</button>
-      <div class="ap-strip">${['★', ...C.PAGES.map(p => p.n)].map((x, i) => `<button type="button" data-to="${i}" class="${i === cur ? 'on' : ''}" aria-label="${i ? t('page') + ' ' + x : t('cover')}">${i ? `<img src="/images/artpill/claude/${String(x).padStart(2, '0')}.jpg" alt="" loading="lazy">` : '<span>★</span>'}</button>`).join('')}</div>
+      <div class="ap-strip">${['★', ...B.PAGES.map(p => p.n)].map((x, i) => `<button type="button" data-to="${i}" class="${i === cur ? 'on' : ''}" aria-label="${i ? t('page') + ' ' + i : t('cover')}">${i ? `<img src="${pic(x)}" alt="" loading="lazy">` : '<span>★</span>'}</button>`).join('')}</div>
       <button class="btn btn-ghost" type="button" data-go="1" ${cur < N ? '' : 'disabled'}>${t('next')}</button></div>`;
   }
+  const openSb = i => {
+    shelf.querySelectorAll('[data-sb]').forEach(b => { const on = +b.dataset.sb === i; b.classList.toggle('open', on); b.setAttribute('aria-expanded', on); });
+    if (i === null) { book = null; cl.hidden = true; cl.innerHTML = ''; return; }
+    book = i; cur = 0; cl.hidden = false; drawClaude();
+    cl.scrollIntoView({ behavior: 'smooth', block: 'start' });
+  };
+  shelf.addEventListener('click', e => { const b = e.target.closest('[data-sb]'); if (b) openSb(+b.dataset.sb === book ? null : +b.dataset.sb); });
   cl.addEventListener('click', e => {
+    if (e.target.closest('[data-close]')) { openSb(null); shelf.scrollIntoView({ behavior: 'smooth', block: 'center' }); return; }
     const g = e.target.closest('[data-go]'), to = e.target.closest('[data-to]');
+    const N = C.BOOKS[book].PAGES.length;
     if (g) cur = Math.max(0, Math.min(N, cur + +g.dataset.go));
     else if (to) cur = +to.dataset.to;
     else return;
     drawClaude();
   });
-  drawClaude();
+  document.addEventListener('keydown', e => {
+    if (book === null || cl.hidden || (e.key !== 'ArrowLeft' && e.key !== 'ArrowRight') || /input|textarea|select/i.test(document.activeElement.tagName)) return;
+    const N = C.BOOKS[book].PAGES.length;
+    cur = Math.max(0, Math.min(N, cur + (e.key === 'ArrowRight' ? 1 : -1))); drawClaude();
+  });
 
   // ---------- скетчбуки ИИ посетителей и отзывы ----------
   let S = { me: null, versions: VERSIONS.map(x => x.v), books: [], reviews: [] };

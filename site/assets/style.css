@@ -5464,6 +5464,11 @@ html.ad-lock { overflow: hidden; }
 .ap-right { display: flex; flex-direction: column; justify-content: center; padding: clamp(10px, 2vw, 24px); }
 .ap-right img { width: 100%; height: auto; display: block; }
 .ap-cover-r { justify-content: flex-start; }
+.ap-roots { margin: 14px 4px 0; padding: 14px 16px; border: 2px dashed #d85a30; border-radius: 12px; font-size: 14px; }
+.ap-roots h4 { margin: 0 0 6px; color: #d85a30; font-size: 16px; }
+.ap-roots ol { margin: 0 0 6px; padding-left: 18px; }
+.ap-roots li { margin-bottom: 4px; }
+.ap-roots p { margin: 0; color: #5f564b; }
 .ap-after { font-size: 14px; color: #5f564b; margin: 12px 4px 0; }
 .ap-nav { display: flex; align-items: center; gap: 12px; margin-top: 14px; }
 .ap-strip { flex: 1; display: flex; gap: 6px; overflow-x: auto; padding: 4px 2px; }
@@ -5521,3 +5526,24 @@ html.ap-lock { overflow: hidden; }
   .ap-right { order: 1; }
   .ap-nav .btn { padding: 10px 14px; }
 }
+/* Art-Pill: полка скетчбуков Claude — закрытые книжечки по темам */
+.ap-claude { margin-top: 8px; }
+.ap-shelf { display: flex; flex-wrap: wrap; gap: 22px; padding: 8px 0 18px; }
+.ap-sb { position: relative; width: 190px; aspect-ratio: 3 / 4; display: flex; flex-direction: column; gap: 6px; text-align: left; padding: 18px 30px 16px 22px; border: 0; border-radius: 4px 14px 14px 4px; background: var(--c); color: #fbf8f1; font: inherit; cursor: pointer; box-shadow: inset 7px 0 0 rgba(0, 0, 0, .28), 0 10px 22px rgba(0, 0, 0, .4); transition: transform .2s, box-shadow .2s; }
+.ap-sb::after { content: ''; position: absolute; top: -2px; bottom: -2px; right: 16px; width: 7px; border-radius: 3px; background: var(--b); box-shadow: 0 0 0 1px rgba(0, 0, 0, .15); }
+.ap-sb:hover, .ap-sb:focus-visible { transform: translateY(-6px) rotate(-1.5deg); box-shadow: inset 7px 0 0 rgba(0, 0, 0, .28), 0 16px 28px rgba(0, 0, 0, .5); }
+.ap-sb.open { transform: translateY(-10px); outline: 3px solid var(--b); outline-offset: 3px; }
+.ap-sb-no { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; opacity: .75; }
+.ap-sb b { font-family: var(--serif); font-size: 20px; line-height: 1.15; }
+.ap-sb i { font-style: normal; font-size: 13px; opacity: .85; line-height: 1.35; }
+.ap-sb-foot { margin-top: auto; font-size: 12px; opacity: .7; }
+.ap-book-top { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 10px; margin: 6px 0 12px; }
+.ap-book-top b { font-family: var(--serif); font-size: 22px; }
+.ap-spread { border-left: 10px solid var(--b, #d85a30); }
+.ap-drafts { display: grid; grid-template-columns: repeat(3, 1fr); gap: 8px; }
+.ap-drafts a { position: relative; display: block; border: 2px solid transparent; border-radius: 6px; overflow: hidden; }
+.ap-drafts a.on { border-color: var(--b, #d85a30); }
+.ap-drafts img { width: 100%; display: block; }
+.ap-drafts span { position: absolute; left: 4px; top: 2px; font-size: 12px; font-weight: 700; color: #26221f; background: rgba(251, 248, 241, .85); padding: 0 5px; border-radius: 4px; }
+.ap-right .ap-pn { margin-top: 12px; }
+@media (max-width: 600px) { .ap-shelf { gap: 14px; } .ap-sb { width: calc(50% - 7px); padding: 14px 24px 12px 18px; } .ap-sb b { font-size: 17px; } }
