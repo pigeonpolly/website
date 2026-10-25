@@ -200,6 +200,19 @@ details.sol figure.code { margin: 10px 0; }
 .box.example h4 { color: var(--accent); }
 .box.example > p { margin: 6px 0; }
 .box.example ol > li { margin: 4px 0; }
+.os { display: grid; grid-template-columns: minmax(0, 1fr); gap: 10px; margin: 12px 0; }
+.os > div { border: 1px solid var(--rule); border-radius: 8px; padding: 10px 12px; min-width: 0; font-size: 15.5px; }
+.os > div > b { display: block; font: 600 13px var(--f-ui); letter-spacing: .06em; text-transform: uppercase; color: var(--accent); margin-bottom: 4px; }
+.os figure.code { margin: 6px 0; }
+.start { background: var(--ok-soft); border-radius: 12px; padding: 4px 20px 16px; margin: 18px 0 28px; }
+.start > h3 { color: var(--ok); margin-top: 16px; }
+.start h4 { font: 600 17px var(--f-ui); margin: 20px 0 6px; }
+.start figure.code { background: var(--paper); }
+p.need { font: 400 15px/1.5 var(--f-ui); background: var(--paper); border-radius: 8px; padding: 8px 12px; }
+.howto { background: var(--paper-2); border-radius: 8px; padding: 6px 14px 10px; margin: 10px 0 12px; font-size: 16px; }
+.howto h5 { font: 600 13px var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 8px 0 4px; }
+.howto p { margin: 6px 0; }
+.howto figure.code { background: var(--paper); margin: 8px 0; }
 .box.note { border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; font-size: 16px; }
 .box.note p { margin: 0; }
 
@@ -281,11 +294,11 @@ mark { background: var(--mark); color: inherit; }
   <h1>Full Stack разработчик: <em>Java и Angular</em></h1>
   <p class="lead">Курс построен под вакансию Full Stack Developer (Java/Angular) в Swisscom DevOps Center Latvia, Рига. Начальный уровень: три курса Programming Engineer.</p>
   <div class="facts">
-    <span><b>12</b> глав</span><span><b>~10</b> месяцев</span><span><b>15–20</b> часов в неделю</span><span><b>1</b> сквозной проект</span><span><b>5 + 2</b> проектов для портфолио</span>
+    <span><b>13</b> глав</span><span><b>~10</b> месяцев</span><span><b>15–20</b> часов в неделю</span><span><b>1</b> сквозной проект</span><span><b>5 + 2</b> проектов для портфолио</span>
   </div>
   <div class="go">
     <button class="btn primary" id="cont">Продолжить с места</button>
-    <a class="btn" href="#ch1">Начать с главы 1</a>
+    <a class="btn" href="#ch0">Начать с подготовки</a>
     <a class="btn" href="#intro-thread">Сквозной проект</a>
     <a class="btn" href="#ch10">Финальные проекты</a>
   </div>
@@ -311,6 +324,7 @@ mark { background: var(--mark); color: inherit; }
   <div class="tbl"><table>
     <thead><tr><th>Месяц</th><th>Главы</th><th>Проект</th></tr></thead>
     <tbody>
+      <tr><td class="num">0</td><td><a href="#ch0">0. Подготовка рабочего места</a></td><td>—</td></tr>
       <tr><td class="num">1</td><td><a href="#ch1">1. Java</a>, <a href="#ch2">2. Базы данных</a></td><td>logscope</td></tr>
       <tr><td class="num">2</td><td><a href="#ch3">3. Spring Boot и REST</a></td><td>taskhub-api</td></tr>
       <tr><td class="num">3–4</td><td><a href="#ch4">4. TypeScript и Angular</a>, <a href="#ch4b">4Б. React</a></td><td>taskhub-web, FinTrack на React</td></tr>
@@ -374,6 +388,115 @@ mark { background: var(--mark); color: inherit; }
   </ul>
 </section>
 
+<div class="part-h" data-part="Подготовка">Подготовка</div>
+
+<section class="ch" id="ch0" data-ch="20" data-title="Подготовка рабочего места">
+  <header class="ch-head">
+    <div class="ch-num">Глава 0</div>
+    <h2>Подготовка рабочего места</h2>
+    <p class="ch-meta"><span>1–3 вечера</span><span>Всё бесплатно</span><span>Возвращайтесь сюда, когда глава просит что-то установить</span></p>
+  </header>
+  <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
+    <li>Пользоваться терминалом на уровне, нужном для курса.</li>
+    <li>Устанавливать и проверять все программы курса.</li>
+    <li>Создавать и запускать проекты на Java, Angular и React.</li>
+    <li>Выкладывать код на GitHub.</li>
+  </ul></div>
+  <div class="box note"><p>Всё сразу ставить не обязательно. Для глав 1–3 нужны §0.1–0.6, для глав 4 и 4Б — §0.7, для 5 и 7 — §0.8, для 6 — §0.9. В начале каждой главы написано, что понадобится.</p></div>
+  <h3 id="setup-1"><span class="sn">0.1</span>Терминал: окно для команд</h3>
+<p>Многие программы в этом учебнике устанавливаются и запускаются командами. Команды вводят в <b>терминале</b> — окне, где пишут текст вместо нажатия кнопок. Бояться его не нужно: команду можно скопировать из учебника, вставить и нажать Enter.</p><div class="os"><div><b>Windows</b><p>Нажмите <b>Win</b>, наберите «Terminal» (или «PowerShell») и откройте. Вставка — правой кнопкой мыши или Ctrl+V.</p></div><div><b>macOS</b><p>Нажмите <b>Cmd + Пробел</b>, наберите «Терминал» и откройте. Вставка — Cmd+V.</p></div><div><b>Linux (Ubuntu)</b><p>Нажмите <b>Ctrl + Alt + T</b>. Вставка — Ctrl+Shift+V.</p></div></div>
+<p>Пять команд, которых хватит на весь курс:</p>
+<div class="tbl"><table><thead><tr><th>Команда</th><th>Что делает</th></tr></thead><tbody>
+<tr><td><code>cd папка</code></td><td>Перейти в папку. <code>cd ..</code> — на уровень выше.</td></tr>
+<tr><td><code>ls</code> (в Windows тоже работает в PowerShell)</td><td>Показать файлы в текущей папке.</td></tr>
+<tr><td><code>mkdir имя</code></td><td>Создать папку.</td></tr>
+<tr><td><code>pwd</code></td><td>Показать, в какой папке вы сейчас.</td></tr>
+<tr><td>Ctrl + C</td><td>Остановить запущенную программу (например, сервер).</td></tr>
+</tbody></table></div>
+<p>Совет: создайте папку для всех учебных проектов, например <code>mkdir study</code>, и работайте в ней.</p>
+  <h3 id="setup-2"><span class="sn">0.2</span>Java (JDK 21)</h3>
+<p><b>JDK</b> — набор для разработки на Java: компилятор и среда выполнения. Берём бесплатную сборку <b>Eclipse Temurin</b> версии 21 (LTS — с долгой поддержкой).</p><div class="os"><div><b>Windows</b><p>Способ 1: на <a href="https://adoptium.net/" target="_blank" rel="noopener">adoptium.net</a> скачайте установщик <b>.msi</b> для JDK 21 и запустите. В окне установки включите пункт <b>Set JAVA_HOME variable</b>.</p><p>Способ 2 — командой в терминале:</p><figure class="code"><figcaption>PowerShell</figcaption><pre><code>winget install EclipseAdoptium.Temurin.21.JDK</code></pre></figure></div><div><b>macOS</b><p>На <a href="https://adoptium.net/" target="_blank" rel="noopener">adoptium.net</a> скачайте <b>.pkg</b> для JDK 21 (для Mac на M1/M2/M3 — <b>aarch64</b>) и установите. Или через Homebrew:</p><figure class="code"><figcaption>Терминал</figcaption><pre><code>brew install --cask temurin@21</code></pre></figure></div><div><b>Linux (Ubuntu)</b><figure class="code"><figcaption>Терминал</figcaption><pre><code>sudo apt update
+sudo apt install openjdk-21-jdk</code></pre></figure></div></div><p><b>Проверка.</b> Закройте и заново откройте терминал, затем:</p><figure class="code"><figcaption>Терминал</figcaption><pre><code>java -version</code></pre></figure><p>Должна появиться строка с номером <code>21</code>. Если пишет «команда не найдена» — перезагрузите компьютер.</p>
+  <h3 id="setup-3"><span class="sn">0.3</span>IntelliJ IDEA: редактор для Java</h3>
+<p><b>IDE</b> — программа, в которой пишут код: подсвечивает ошибки, подсказывает, запускает программы и тесты. Для Java используем IntelliJ IDEA (бесплатная версия; раньше называлась Community Edition).</p><div class="os"><div><b>Windows</b><p>Скачайте с <a href="https://www.jetbrains.com/idea/download/" target="_blank" rel="noopener">jetbrains.com/idea/download</a> и установите. Или: <code>winget install JetBrains.IntelliJIDEA.Community</code></p></div><div><b>macOS</b><p>Скачайте с <a href="https://www.jetbrains.com/idea/download/" target="_blank" rel="noopener">jetbrains.com/idea/download</a>. Или: <code>brew install --cask intellij-idea-ce</code></p></div><div><b>Linux (Ubuntu)</b><figure class="code"><figcaption>Терминал</figcaption><pre><code>sudo snap install intellij-idea-community --classic</code></pre></figure></div></div>
+<h4>Первый проект — пошагово</h4>
+<ol>
+<li>Откройте IntelliJ IDEA → <b>New Project</b>.</li>
+<li>Слева выберите <b>Java</b>. Name: <code>java-basics</code>. Build system: <b>Gradle</b>. JDK: <b>21</b> (если списка нет — «Add JDK» и укажите установленный). Gradle DSL: <b>Kotlin</b>. Включите <b>Add sample code</b>. Нажмите <b>Create</b>.</li>
+<li>Подождите, пока внизу закончится загрузка (первый раз — несколько минут: Gradle скачивает нужное).</li>
+<li>Откройте <code>src/main/java/Main.java</code>. Рядом со строкой <code>public static void main</code> есть зелёный треугольник ▶ — нажмите его и выберите <b>Run</b>. Внизу появится вывод программы.</li>
+<li>Новый класс: правой кнопкой по папке <code>src/main/java</code> → <b>New → Java Class</b>.</li>
+<li>Тесты лежат в <code>src/test/java</code>. Запуск теста — тот же зелёный треугольник рядом с классом или методом теста. Зелёная галочка — тест прошёл, красный крестик — нет.</li>
+</ol>
+<p>Если для тестов не хватает библиотеки AssertJ, добавьте в файл <code>build.gradle.kts</code> в блок <code>dependencies</code> строку и нажмите появившуюся кнопку обновления Gradle (значок слона):</p><figure class="code"><figcaption>build.gradle.kts</figcaption><pre><code>testImplementation("org.assertj:assertj-core:3.26.3")</code></pre></figure>
+  <h3 id="setup-4"><span class="sn">0.4</span>Git и GitHub</h3>
+<p><b>Git</b> запоминает историю изменений кода: можно вернуться к любой версии. <b>GitHub</b> — сайт, где хранят код в интернете и показывают его работодателям.</p><div class="os"><div><b>Windows</b><p>Скачайте с <a href="https://git-scm.com/downloads" target="_blank" rel="noopener">git-scm.com</a> и устанавливайте с настройками по умолчанию. Или: <code>winget install --id Git.Git -e</code></p></div><div><b>macOS</b><p>Git уже есть или установится по запросу. Выполните <code>git --version</code>; если предложит установить инструменты разработчика — согласитесь.</p></div><div><b>Linux (Ubuntu)</b><figure class="code"><figcaption>Терминал</figcaption><pre><code>sudo apt install git</code></pre></figure></div></div><p>Один раз представьтесь Git (имя и почта попадут в историю изменений):</p><figure class="code"><figcaption>Терминал</figcaption><pre><code>git config --global user.name "Имя Фамилия"
+git config --global user.email "почта@example.com"</code></pre></figure>
+<h4>Как выложить проект на GitHub</h4>
+<ol>
+<li>Зарегистрируйтесь на <a href="https://github.com/" target="_blank" rel="noopener">github.com</a> и нажмите <b>New repository</b>. Введите имя (например, <code>logscope</code>), нажмите <b>Create repository</b>.</li>
+<li>В IntelliJ: меню <b>VCS → Share Project on GitHub</b> (войти в GitHub — по кнопке). IntelliJ сам создаст репозиторий и отправит код.</li>
+<li>Дальше после каждого шага работы: <b>Commit</b> (Ctrl+K / Cmd+K) — написать, что изменилось, и <b>Push</b> (Ctrl+Shift+K / Cmd+Shift+K) — отправить на GitHub.</li>
+</ol>
+<p>То же командами:</p><figure class="code"><figcaption>Терминал</figcaption><pre><code>git add .
+git commit -m "Что сделано"
+git push</code></pre></figure>
+  <h3 id="setup-5"><span class="sn">0.5</span>Docker: запуск программ в контейнерах</h3>
+<p>Docker позволяет запустить базу данных, Keycloak, Kafka одной командой, ничего не устанавливая в систему. Docker Desktop бесплатен для личного использования и обучения.</p><div class="os"><div><b>Windows</b><p>Скачайте Docker Desktop с <a href="https://docs.docker.com/get-started/get-docker/" target="_blank" rel="noopener">docs.docker.com/get-started/get-docker</a>. При установке оставьте галочку <b>Use WSL 2</b>; если попросит установить или обновить WSL — согласитесь и перезагрузитесь. После установки запустите Docker Desktop и дождитесь зелёного статуса.</p></div><div><b>macOS</b><p>Скачайте Docker Desktop с <a href="https://docs.docker.com/get-started/get-docker/" target="_blank" rel="noopener">docs.docker.com/get-started/get-docker</a> (Apple Silicon или Intel) и перетащите в Applications. Или: <code>brew install --cask docker</code>. Запустите Docker из Applications.</p></div><div><b>Linux (Ubuntu)</b><p>Официальный скрипт установки Docker Engine, затем права для своего пользователя (после этого выйдите из системы и войдите снова):</p><figure class="code"><figcaption>Терминал</figcaption><pre><code>curl -fsSL https://get.docker.com | sh
+sudo usermod -aG docker $USER</code></pre></figure></div></div><p><b>Проверка:</b></p><figure class="code"><figcaption>Терминал</figcaption><pre><code>docker run hello-world</code></pre></figure><p>Должно появиться «Hello from Docker!». Основные команды: <code>docker ps</code> — что запущено; <code>docker stop имя</code> — остановить; <code>docker start имя</code> — запустить снова; <code>docker logs имя</code> — посмотреть вывод.</p>
+  <h3 id="setup-6"><span class="sn">0.6</span>PostgreSQL и DBeaver</h3>
+<p>PostgreSQL — база данных. Запускаем её в Docker, а смотрим и пишем запросы в бесплатной программе DBeaver.</p>
+<h4>1. Запустить базу</h4><figure class="code"><figcaption>Терминал (одна команда)</figcaption><pre><code>docker run -d --name pg -e POSTGRES_PASSWORD=dev -p 5432:5432 postgres:16</code></pre></figure><p>База работает в фоне. После перезагрузки компьютера: <code>docker start pg</code>.</p>
+<h4>2. Установить DBeaver</h4><div class="os"><div><b>Windows</b><p><a href="https://dbeaver.io/download/" target="_blank" rel="noopener">dbeaver.io/download</a> → Community Edition. Или: <code>winget install dbeaver.dbeaver</code></p></div><div><b>macOS</b><p><a href="https://dbeaver.io/download/" target="_blank" rel="noopener">dbeaver.io/download</a>. Или: <code>brew install --cask dbeaver-community</code></p></div><div><b>Linux (Ubuntu)</b><figure class="code"><figcaption>Терминал</figcaption><pre><code>sudo snap install dbeaver-ce</code></pre></figure></div></div>
+<h4>3. Подключиться</h4>
+<ol>
+<li>DBeaver → кнопка с вилкой <b>New Database Connection</b> → <b>PostgreSQL</b> → Next.</li>
+<li>Host: <code>localhost</code>, Port: <code>5432</code>, Database: <code>postgres</code>, Username: <code>postgres</code>, Password: <code>dev</code>.</li>
+<li><b>Test Connection</b> (первый раз DBeaver предложит скачать драйвер — согласитесь) → Finish.</li>
+<li>Правой кнопкой по подключению → <b>SQL Editor → New SQL script</b>. Пишите запрос и нажимайте <b>Ctrl+Enter</b> (Cmd+Enter), чтобы выполнить его; результат появится внизу.</li>
+</ol>
+  <h3 id="setup-7"><span class="sn">0.7</span>Node.js, VS Code, Angular и React</h3>
+<p><b>Node.js</b> нужен для фронтенда: он запускает инструменты сборки Angular и React. <b>npm</b> ставится вместе с ним и скачивает библиотеки. Код фронтенда удобно писать в бесплатном <b>VS Code</b>.</p><div class="os"><div><b>Windows</b><p>Node.js: на <a href="https://nodejs.org/" target="_blank" rel="noopener">nodejs.org</a> скачайте версию с пометкой <b>LTS</b>. Или: <code>winget install OpenJS.NodeJS.LTS</code>.<br>VS Code: <a href="https://code.visualstudio.com/" target="_blank" rel="noopener">code.visualstudio.com</a> или <code>winget install Microsoft.VisualStudioCode</code>.</p></div><div><b>macOS</b><p>Node.js: установщик <b>LTS</b> с <a href="https://nodejs.org/" target="_blank" rel="noopener">nodejs.org</a>.<br>VS Code: <a href="https://code.visualstudio.com/" target="_blank" rel="noopener">code.visualstudio.com</a> или <code>brew install --cask visual-studio-code</code>.</p></div><div><b>Linux (Ubuntu)</b><p>Node.js: на <a href="https://nodejs.org/en/download" target="_blank" rel="noopener">nodejs.org/en/download</a> выберите Linux и выполните показанные там команды (версия LTS).<br>VS Code: <code>sudo snap install code --classic</code></p></div></div><p><b>Проверка:</b> <code>node -v</code> и <code>npm -v</code> показывают номера версий.</p>
+<p>В VS Code откройте вкладку Extensions (квадратики слева) и установите <b>Angular Language Service</b> и <b>ESLint</b>.</p>
+<h4>Angular: создать и запустить проект</h4><figure class="code"><figcaption>Терминал</figcaption><pre><code>npm install -g @angular/cli
+ng new taskhub-web     # на вопросы можно отвечать Enter (выбор по умолчанию)
+cd taskhub-web
+ng serve</code></pre></figure><p>Откройте в браузере <code>http://localhost:4200</code>. Код — в папке <code>src/app</code>. Новый компонент: <code>ng generate component search</code>. Если Windows ругается на «выполнение сценариев отключено», один раз выполните в PowerShell: <code>Set-ExecutionPolicy -Scope CurrentUser RemoteSigned</code>.</p>
+<h4>React: создать и запустить проект</h4><figure class="code"><figcaption>Терминал</figcaption><pre><code>npm create vite@latest web-react -- --template react-ts
+cd web-react
+npm install
+npm run dev</code></pre></figure><p>Откройте адрес, который покажет терминал (обычно <code>http://localhost:5173</code>). Код — в папке <code>src</code>, главный компонент — <code>src/App.tsx</code>.</p>
+  <h3 id="setup-8"><span class="sn">0.8</span>Keycloak, Kafka и Mailpit в Docker</h3>
+<p>Эти сервисы понадобятся в главах 5 и 7. Каждый запускается одной командой (нужен Docker из §0.5).</p>
+<div class="tbl"><table><thead><tr><th>Что</th><th>Команда</th><th>Где открыть</th></tr></thead><tbody>
+<tr><td>Keycloak — вход и роли (гл. 5)</td><td><code>docker run -d --name keycloak -p 8081:8080 -e KC_BOOTSTRAP_ADMIN_USERNAME=admin -e KC_BOOTSTRAP_ADMIN_PASSWORD=admin quay.io/keycloak/keycloak:26.0 start-dev</code></td><td><code>http://localhost:8081</code>, вход admin / admin</td></tr>
+<tr><td>Kafka — сообщения (гл. 7)</td><td><code>docker run -d --name kafka -p 9092:9092 apache/kafka:3.8.0</code></td><td>Адрес для приложения: <code>localhost:9092</code></td></tr>
+<tr><td>Mailpit — проверка писем (гл. 7, 11)</td><td><code>docker run -d --name mailpit -p 8025:8025 -p 1025:1025 axllent/mailpit</code></td><td>Письма: <code>http://localhost:8025</code>; SMTP для приложения: <code>localhost:1025</code></td></tr>
+</tbody></table></div>
+<p>Keycloak запускается около минуты; если страница не открывается — подождите. Остановить — <code>docker stop keycloak</code>, снова запустить — <code>docker start keycloak</code>.</p>
+  <h3 id="setup-9"><span class="sn">0.9</span>Kubernetes на своём компьютере: kubectl, kind, Helm</h3>
+<p><b>kind</b> создаёт учебный кластер Kubernetes внутри Docker, <b>kubectl</b> — команды для Kubernetes, <b>Helm</b> — установка готовых «пакетов» в кластер. Нужны в главе 6.</p><div class="os"><div><b>Windows</b><figure class="code"><figcaption>PowerShell</figcaption><pre><code>winget install Kubernetes.kubectl
+winget install Kubernetes.kind
+winget install Helm.Helm</code></pre></figure></div><div><b>macOS</b><figure class="code"><figcaption>Терминал</figcaption><pre><code>brew install kubectl kind helm</code></pre></figure></div><div><b>Linux (Ubuntu)</b><figure class="code"><figcaption>Терминал</figcaption><pre><code>sudo snap install kubectl --classic
+sudo snap install helm --classic
+# kind: готовый файл с сайта kind.sigs.k8s.io
+curl -Lo ./kind https://kind.sigs.k8s.io/dl/v0.24.0/kind-linux-amd64
+chmod +x ./kind
+sudo mv ./kind /usr/local/bin/kind</code></pre></figure></div></div><p><b>Проверка:</b></p><figure class="code"><figcaption>Терминал</figcaption><pre><code>kind create cluster          # 1–2 минуты
+kubectl get nodes            # должна быть строка со статусом Ready</code></pre></figure><p>Удалить кластер: <code>kind delete cluster</code>.</p>
+  <h3 id="setup-10"><span class="sn">0.10</span>Нагрузочные тесты: k6</h3>
+<p>k6 запускает сценарий, который имитирует много пользователей одновременно. Проще всего — через Docker, без установки:</p><figure class="code"><figcaption>Терминал (из папки со сценарием script.js)</figcaption><pre><code>docker run --rm -i grafana/k6 run - &lt; script.js</code></pre></figure><p>Или установить: Windows — <code>winget install k6 --source winget</code>, macOS — <code>brew install k6</code>; затем <code>k6 run script.js</code>.</p>
+  <h3 id="setup-11"><span class="sn">0.11</span>Как отправить запрос к своему серверу</h3>
+<ul>
+<li><b>Браузер</b> — только для GET: просто откройте адрес, например <code>http://localhost:8080/api/v1/tasks</code>.</li>
+<li><b>Swagger UI</b> (после главы 3) — страница <code>http://localhost:8080/swagger-ui.html</code>: выбираете метод, нажимаете <b>Try it out</b>, вводите данные, <b>Execute</b>. Самый удобный способ для новичка.</li>
+<li><b>curl</b> — из терминала. В Windows пишите <code>curl.exe</code>, а не <code>curl</code> (в PowerShell <code>curl</code> — другая команда).</li>
+</ul><figure class="code"><figcaption>Пример: создать задачу (macOS, Linux)</figcaption><pre><code>curl -i -X POST http://localhost:8080/api/v1/tasks \
+  -H "Content-Type: application/json" \
+  -d '{"title":"Купить молоко"}' </code></pre></figure><p>Ключ <code>-i</code> показывает статус ответа (например, <code>HTTP/1.1 201</code>).</p>
+  <div class="box skills"><h4>Всё установлено?</h4><ul class="todo"><li><label><input type="checkbox" data-k="c0-1"><span>Открываю терминал и умею перейти в папку.</span></label></li><li><label><input type="checkbox" data-k="c0-2"><span><code>java -version</code> показывает 21.</span></label></li><li><label><input type="checkbox" data-k="c0-3"><span>В IntelliJ запустил программу и тест.</span></label></li><li><label><input type="checkbox" data-k="c0-4"><span>Git настроен, есть аккаунт GitHub, первый проект выложен.</span></label></li><li><label><input type="checkbox" data-k="c0-5"><span><code>docker run hello-world</code> работает.</span></label></li><li><label><input type="checkbox" data-k="c0-6"><span>DBeaver подключён к PostgreSQL, выполнил <code>SELECT 1</code>.</span></label></li><li><label><input type="checkbox" data-k="c0-7"><span><code>node -v</code> работает, Angular-проект открывается на localhost:4200.</span></label></li><li><label><input type="checkbox" data-k="c0-8"><span>(к главе 6) <code>kubectl get nodes</code> показывает Ready.</span></label></li></ul></div>
+</section>
+
 <!-- ============ ЧАСТЬ I ============ -->
 <div class="part-h" data-part="Часть I · Backend">Часть I · Backend</div>
 
@@ -383,6 +506,51 @@ mark { background: var(--mark); color: inherit; }
     <h2>Современная Java и инструменты</h2>
     <p class="ch-meta"><span>3–4 недели</span><span>Проект: logscope</span></p>
   </header>
+  <div class="start">
+  <h3 id="ch1-start">С нуля: если вы видите это впервые</h3>
+<p class="need"><b>Что понадобится:</b> <a href="#setup-2">§0.2 Java</a>, <a href="#setup-3">§0.3 IntelliJ IDEA</a>, <a href="#setup-4">§0.4 Git</a>.</p><p>Эта часть — мини-курс программирования с нуля. Если вы уже писали программы, пролистайте её до «Ключевых понятий». Каждый пример можно вставить в <code>Main.java</code> проекта из <a href="#setup-3">§0.3 </a> и запустить зелёным треугольником.</p><h4>Что такое программа и Java</h4><p>Программа — это список команд для компьютера, записанный на понятном ему языке. Java — один из самых распространённых языков: на нём пишут серверную часть банков, магазинов, телеком-систем — то, что работает «за кулисами», когда вы нажимаете кнопку в приложении. Код пишут в файлах <code>.java</code>; специальная программа (компилятор) переводит его в форму, которую выполняет виртуальная машина Java (JVM). Поэтому одна и та же программа работает на Windows, macOS и Linux.</p><figure class="code"><figcaption>Первая программа</figcaption><pre><code>public class Main {                              // класс — «контейнер» для кода
+    public static void main(String[] args) {     // отсюда программа начинает работу
+        System.out.println("Привет!");           // вывести текст на экран
+    }
+}</code></pre></figure><p>Всё, что после <code>//</code>, — комментарий для человека, компьютер его пропускает. Каждая команда заканчивается точкой с запятой, блоки кода — в фигурных скобках.</p><h4>Шаг 1. Переменные и типы</h4><p>Переменная — подписанная коробочка для значения. В Java у каждой коробочки есть <b>тип</b>: что в неё можно положить.</p><figure class="code"><figcaption>Переменные</figcaption><pre><code>int age = 25;                 // целое число
+double price = 9.99;          // дробное число
+boolean isOpen = true;        // да/нет
+String name = "Анна";         // текст — в двойных кавычках
+age = age + 1;                // теперь 26
+System.out.println(name + " — " + age);   // Анна — 26</code></pre></figure><h4>Шаг 2. Условия: if / else</h4><figure class="code"><figcaption>Если… иначе…</figcaption><pre><code>int temperature = 12;
+if (temperature &gt; 20) {
+    System.out.println("Тепло");
+} else if (temperature &gt; 10) {
+    System.out.println("Прохладно");   // выполнится это
+} else {
+    System.out.println("Холодно");
+}</code></pre></figure><p>Сравнения: <code>==</code> равно, <code>!=</code> не равно, <code>&gt;</code> <code>&lt;</code> <code>&gt;=</code> <code>&lt;=</code>. «И» — <code>&amp;&amp;</code>, «или» — <code>||</code>. Строки сравнивают не через <code>==</code>, а через <code>a.equals(b)</code>.</p><h4>Шаг 3. Циклы: повторить много раз</h4><figure class="code"><figcaption>for и for-each</figcaption><pre><code>for (int i = 1; i &lt;= 3; i++) {        // i = 1, 2, 3
+    System.out.println("Раз " + i);
+}
+List&lt;String&gt; fruits = List.of("яблоко", "груша");
+for (String f : fruits) {             // для каждого элемента списка
+    System.out.println(f);
+}</code></pre></figure><h4>Шаг 4. Методы: свой «рецепт» с именем</h4><p>Метод — именованный кусок кода, который принимает входные данные (параметры) и возвращает результат. Пишем один раз — вызываем сколько угодно.</p><figure class="code"><figcaption>Метод</figcaption><pre><code>static int square(int x) {     // принимает число, возвращает число
+    return x * x;
+}
+// вызов:
+System.out.println(square(4));   // 16</code></pre></figure><h4>Шаг 5. Списки и словари</h4><ul><li><code>List</code> — упорядоченный список: <code>List&lt;String&gt; names = new ArrayList&lt;&gt;(); names.add("Ира"); names.get(0)</code>.</li><li><code>Map</code> — словарь «ключ → значение», как телефонная книга: <code>Map&lt;String, Integer&gt; ages = new HashMap&lt;&gt;(); ages.put("Ира", 30); ages.get("Ира")</code>.</li><li>В угловых скобках — тип элементов: <code>List&lt;String&gt;</code> — список строк.</li></ul><h4>Шаг 6. Классы и объекты</h4><p>Класс — чертёж, объект — вещь по этому чертежу. Чертёж «Задача» говорит: у задачи есть название и статус; по нему можно создать сколько угодно конкретных задач. Для простых «носителей данных» в Java есть короткая запись — <b>record</b>:</p><figure class="code"><figcaption>record</figcaption><pre><code>record Task(String title, boolean done) {}
+
+Task t = new Task("Купить хлеб", false);   // создать объект
+System.out.println(t.title());             // Купить хлеб</code></pre></figure><h4>Шаг 7. Stream — конвейер для списков</h4><p>Представьте конвейер на заводе: детали едут по ленте, на одном посту бракованные убирают (<code>filter</code>), на другом детали переделывают (<code>map</code>), в конце складывают в коробку (<code>toList</code>). Stream делает то же со списками без ручных циклов:</p><figure class="code"><figcaption>Конвейер</figcaption><pre><code>List&lt;Integer&gt; nums = List.of(1, 2, 3, 4, 5);
+List&lt;Integer&gt; result = nums.stream()
+    .filter(n -&gt; n % 2 == 1)    // оставить нечётные: 1, 3, 5
+    .map(n -&gt; n * 10)           // умножить: 10, 30, 50
+    .toList();                  // собрать в список</code></pre></figure><p><code>n -&gt; n % 2 == 1</code> — лямбда, короткая безымянная функция: «для каждого n проверь, нечётное ли оно».</p><h4>Шаг 8. Тест — программа, которая проверяет программу</h4><p>Чтобы не проверять руками после каждого изменения, пишут тесты: «вызови метод с такими данными — результат должен быть вот таким».</p><figure class="code"><figcaption>src/test/java/SquareTest.java</figcaption><pre><code>import org.junit.jupiter.api.Test;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class SquareTest {
+    @Test
+    void squareOfFour() {
+        assertEquals(16, Main.square(4));
+    }
+}</code></pre></figure><h4>Проверьте себя</h4><ul class="todo"><li><label><input type="checkbox" data-k="c1-z1"><span>Написал программу, которая печатает числа от 1 до 10 и для каждого — «чётное» или «нечётное».</span></label></li><li><label><input type="checkbox" data-k="c1-z2"><span>Написал метод <code>max(int a, int b)</code> и тест для него.</span></label></li><li><label><input type="checkbox" data-k="c1-z3"><span>Создал <code>record Book(String title, int pages)</code>, список из трёх книг и через stream вывел названия книг длиннее 300 страниц.</span></label></li></ul><p>Хочется больше практики по основам — бесплатный курс <a href="https://java-programming.mooc.fi/" target="_blank" rel="noopener">Java Programming MOOC</a> (Хельсинкский университет) начинается с самого начала, с автоматической проверкой задач.</p>
+  </div>
   <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Писать идиоматичный код на Java 17–21, а не «Java 8 со старыми привычками».</li>
     <li>Уверенно работать с коллекциями, Stream API и многопоточностью.</li>
@@ -482,6 +650,15 @@ try (var pool = Executors.newVirtualThreadPerTaskExecutor()) {
   </div>
   <div class="box task"><h4>Задача 1.1. Топ-3 слов</h4>
     <p>Напишите метод <code>top3(String text)</code>, который возвращает три самых частых слова текста без учёта регистра. Только Stream API, без циклов.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> дан текст. Нужно найти три слова, которые встречаются в нём чаще всего. Большие и маленькие буквы не различаем: «Кот» и «кот» — одно слово. Знаки препинания словами не считаются.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — строка, например <code>"Кот, кот! Кот и пёс. Пёс и ёж"</code>. Выход — список из трёх слов от самого частого: <code>[кот, пёс, и]</code> (кот — 3 раза, «пёс» и «и» — по 2; при равенстве порядок может быть любым).</p>
+      <p><b>Где писать и как запустить.</b> проект <code>java-basics</code> из <a href="#setup-3">§0.3</a>. Создайте класс <code>WordStats</code> с методом <code>static List&lt;String&gt; top3(String text)</code>. Для проверки вызовите его в <code>main</code>: <code>System.out.println(WordStats.top3("…"));</code> и запустите.</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Приведите текст к маленьким буквам.</li><li>Разрежьте текст на слова методом <code>split</code> по всему, что не буква и не цифра (подсказка в конспекте: <code>\p{L}</code>).</li><li>Уберите пустые строки, которые могут появиться после разрезания.</li><li>Посчитайте, сколько раз встречается каждое слово: получится словарь «слово → число» (<code>groupingBy</code> + <code>counting</code>).</li><li>Отсортируйте пары по числу — от большего к меньшему.</li><li>Возьмите первые три и оставьте только слова.</li></ol>
+      <p><b>Как проверить себя.</b> вызовите метод на примере выше; на пустой строке <code>""</code> должен получиться пустой список, а не ошибка. Лучше оформить это тестами в <code>src/test/java</code>.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Java</figcaption><pre><code>static List&lt;String&gt; top3(String text) {
     return Arrays.stream(text.toLowerCase().split("[^\\p{L}\\p{N}]+"))
@@ -515,6 +692,15 @@ static BigDecimal fee(Payment p) {
   </div>
   <div class="box task"><h4>Задача 1.2. Площадь фигур</h4>
     <p>Опишите фигуры круг и прямоугольник через sealed-интерфейс и records. Напишите <code>area(Shape s)</code> через <code>switch</code> с pattern matching без ветки <code>default</code>.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> есть два вида фигур: круг (известен радиус) и прямоугольник (известны ширина и высота). Нужна одна функция <code>area</code>, которая для любой фигуры вернёт площадь. Формулы: круг — π·r² (<code>Math.PI * r * r</code>), прямоугольник — ширина × высота. Слова «sealed» и «без default» означают: заранее перечислить все виды фигур, чтобы компилятор сам проверил, что каждая обработана.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — фигура: <code>new Circle(1)</code> или <code>new Rect(2, 3)</code>. Выход — число: примерно <code>3.14159</code> и <code>6.0</code>.</p>
+      <p><b>Где писать и как запустить.</b> тот же проект; создайте файл <code>Shapes.java</code> (интерфейс, два record и статический метод <code>area</code> можно положить в один файл). Вызов — в <code>main</code>.</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Объявите интерфейс <code>Shape</code> со словом <code>sealed</code> и списком <code>permits</code>.</li><li>Опишите <code>Circle</code> и <code>Rect</code> как record, которые реализуют <code>Shape</code>.</li><li>Напишите <code>switch (s)</code>, где для каждого вида фигуры своя ветка <code>case … -&gt;</code> с формулой.</li><li>Не пишите <code>default</code>.</li></ol>
+      <p><b>Как проверить себя.</b> выведите площади двух фигур. Затем временно удалите ветку для прямоугольника — компилятор должен сообщить об ошибке: так sealed защищает от забытых случаев.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Java 21</figcaption><pre><code>sealed interface Shape permits Circle, Rect {}
 record Circle(double r) implements Shape {}
@@ -549,6 +735,7 @@ static double area(Shape s) {
   <span class="th-tag">Сквозной проект · шаг 1 из 8</span>
   <h3 id="ch1-thread">FinTrack, шаг 1: ядро на чистой Java</h3>
   <p>Консольная программа читает выписку банка в CSV, раскладывает операции по категориям по правилам и печатает отчёт за месяц. Это модуль <code>core</code> — бизнес-логика без фреймворков. Он доживёт до финала: его будут использовать и API, и сервис импорта.</p>
+  <p class="need"><b>Что установить:</b> Java <a href="#setup-2">§0.2</a>, IntelliJ IDEA <a href="#setup-3">§0.3</a>, Git <a href="#setup-4">§0.4</a>.</p>
   <h4>Технологии (все бесплатные)</h4>
   <ul class="tech"><li><a href="https://adoptium.net/" target="_blank" rel="noopener">Java 21 (Temurin)</a></li><li><a href="https://docs.gradle.org/current/userguide/userguide.html" target="_blank" rel="noopener">Gradle</a></li><li><a href="https://junit.org/junit5/" target="_blank" rel="noopener">JUnit 5</a></li><li><a href="https://assertj.github.io/doc/" target="_blank" rel="noopener">AssertJ</a></li><li><a href="https://www.jetbrains.com/idea/download/" target="_blank" rel="noopener">IntelliJ IDEA Community</a></li><li><a href="https://git-scm.com/" target="_blank" rel="noopener">Git</a></li></ul>
   <h4>Как делать</h4>
@@ -590,6 +777,14 @@ public record Transaction(LocalDate date, BigDecimal amount, String currency, St
     <h2>Базы данных, SQL и JPA</h2>
     <p class="ch-meta"><span>2 недели, можно параллельно с главой 3</span><span>Проект: taskhub-api</span></p>
   </header>
+  <div class="start">
+  <h3 id="ch2-start">С нуля: если вы видите это впервые</h3>
+<p class="need"><b>Что понадобится:</b> <a href="#setup-5">§0.5 Docker</a>, <a href="#setup-6">§0.6 PostgreSQL и DBeaver</a>, для начала можно без установки — <a href="https://sqlbolt.com/" target="_blank" rel="noopener">SQLBolt</a> в браузере.</p><h4>Что такое база данных</h4><p>Представьте несколько таблиц Excel, у которых есть строгие правила: в столбец «цена» можно записать только число, у каждой строки есть уникальный номер, а ссылка на другую таблицу обязана вести на существующую строку. Это и есть реляционная база данных. Программа хранит в ней всё, что должно пережить перезапуск: пользователей, заказы, задачи.</p><ul><li><b>Таблица</b> — например, <code>task</code> (задачи). <b>Строка</b> — одна задача. <b>Столбец</b> — одно свойство: название, статус.</li><li><b>Первичный ключ</b> (<code>id</code>) — уникальный номер строки, как номер паспорта.</li><li><b>Внешний ключ</b> — столбец, который ссылается на строку другой таблицы: у задачи <code>project_id</code> указывает, к какому проекту она относится.</li></ul><h4>SQL — язык вопросов к базе</h4><figure class="code"><figcaption>Самые нужные запросы</figcaption><pre><code>CREATE TABLE fruit (id SERIAL PRIMARY KEY, name TEXT, price NUMERIC);   -- создать таблицу
+INSERT INTO fruit (name, price) VALUES ('яблоко', 1.20), ('груша', 2.50);   -- добавить строки
+SELECT name, price FROM fruit WHERE price &gt; 2;     -- найти: груша
+UPDATE fruit SET price = 1.00 WHERE name = 'яблоко';   -- изменить
+DELETE FROM fruit WHERE name = 'груша';            -- удалить</code></pre></figure><ul><li><b>JOIN</b> — «склеить» две таблицы по общему номеру: к каждой задаче приписать данные её проекта.</li><li><b>GROUP BY</b> — разложить строки по кучкам (например, по проекту) и для каждой кучки посчитать: сколько штук (<code>count</code>), сумму (<code>sum</code>), среднее (<code>avg</code>).</li><li><b>Индекс</b> — как алфавитный указатель в конце книги: помогает найти строки, не листая всю таблицу.</li></ul><h4>Как Java работает с базой</h4><p>Писать SQL для каждого действия долго, поэтому есть <b>JPA/Hibernate</b>: вы описываете Java-класс (сущность), а библиотека сама превращает объекты в строки таблицы и обратно. Удобно, но нужно понимать, какие запросы она делает «за кадром» — об этом проблема N+1 в главе.</p><h4>Попробуйте прямо сейчас</h4><ol><li>Запустите PostgreSQL и откройте SQL-редактор в DBeaver (<a href="#setup-6">§0.6 </a>).</li><li>Выполните запросы из примера выше по одному (Ctrl+Enter) и посмотрите на результат.</li><li>Пройдите первые 6 уроков SQLBolt — они в браузере и с проверкой.</li></ol>
+  </div>
   <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Проектировать схему: нормализация, ключи, индексы.</li>
     <li>Писать SQL с JOIN, агрегатами и оконными функциями.</li>
@@ -677,6 +872,18 @@ ORDER BY books DESC;</code></pre></figure>
   </div>
   <div class="box task"><h4>Задача 2.1. Прогресс проектов</h4>
     <p>Для каждого проекта выведите общее число задач, число задач DONE и процент выполненных. Проекты без задач тоже должны попасть в отчёт. Отсортируйте по проценту.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> в базе есть проекты и задачи. Для каждого проекта нужно узнать: сколько у него всего задач, сколько из них выполнено (статус DONE) и какой процент выполнен. Проекты, где задач нет, тоже должны быть в отчёте.</p>
+      <p><b>Что на входе и что на выходе.</b> выход — таблица со столбцами «проект, всего, выполнено, процент». На тестовых данных ниже ожидается: Сайт — 3, 2, 66.7; Мобильное приложение — 2, 1, 50.0; Пустой проект — 0, 0, пусто (NULL).</p>
+      <p><b>Где писать и как запустить.</b> PostgreSQL в Docker и DBeaver (<a href="#setup-6">§0.6</a>). Откройте SQL-редактор, выполните таблицы из листинга 2.1, затем тестовые данные:<figure class="code"><figcaption>Тестовые данные</figcaption><pre><code>INSERT INTO project (name) VALUES ('Сайт'), ('Мобильное приложение'), ('Пустой проект');
+INSERT INTO task (project_id, title, status) VALUES
+  (1, 'Макет', 'DONE'), (1, 'Вёрстка', 'DONE'), (1, 'Тесты', 'TODO'),
+  (2, 'Идея', 'DONE'), (2, 'Прототип', 'IN_PROGRESS');</code></pre></figure></p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Начните с таблицы проектов — ведь нужен каждый проект.</li><li>Присоедините задачи так, чтобы проекты без задач не пропали (какой JOIN оставляет все строки левой таблицы?).</li><li>Сгруппируйте строки по проекту.</li><li>Посчитайте задачи: подумайте, почему <code>count(*)</code> даст пустому проекту 1, а не 0.</li><li>Посчитайте только выполненные через <code>FILTER (WHERE …)</code>.</li><li>Процент: выполненные × 100 / всего; защитите от деления на ноль.</li></ol>
+      <p><b>Как проверить себя.</b> сравните результат с ожидаемой таблицей выше — особенно строку «Пустой проект».</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>PostgreSQL</figcaption><pre><code>SELECT p.name,
        COUNT(t.id)                                AS total,
@@ -709,6 +916,15 @@ interface OrderRepository extends JpaRepository&lt;Order, Long&gt; {
   </div>
   <div class="box task"><h4>Задача 2.2. Убрать N+1</h4>
     <p>Метод <code>projectRepository.findAll()</code>, а затем <code>project.getTasks()</code> в цикле даёт 1 + N запросов. Исправьте одним запросом.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> программа загружает список проектов, а потом для каждого проекта отдельно ходит в базу за его задачами. При 100 проектах — 101 запрос, и страница тормозит. Нужно, чтобы проекты и задачи загружались одним запросом.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — код, который вызывает <code>findAll()</code> и в цикле <code>getTasks()</code>. Выход — метод репозитория, после которого в логе SQL виден <b>один</b> запрос вместо многих.</p>
+      <p><b>Где писать и как запустить.</b> эту задачу удобнее делать после главы 3 — в проекте <code>taskhub-api</code> с базой PostgreSQL. Включите показ SQL в <code>src/main/resources/application.properties</code>: <code>spring.jpa.show-sql=true</code>. Запросы будут видны в консоли при запуске.</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Вызовите старый вариант (например, в тесте или временном эндпоинте) и посчитайте строки <code>select</code> в консоли.</li><li>Добавьте в интерфейс <code>ProjectRepository</code> новый метод с аннотацией <code>@Query</code> и словами <code>join fetch</code>.</li><li>Вызовите новый метод вместо <code>findAll()</code> и снова посчитайте запросы.</li></ol>
+      <p><b>Как проверить себя.</b> в консоли — один запрос с <code>join</code>, а данные те же.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Spring Data JPA</figcaption><pre><code>public interface ProjectRepository extends JpaRepository&lt;Project, Long&gt; {
 
@@ -741,6 +957,7 @@ interface OrderRepository extends JpaRepository&lt;Order, Long&gt; {
   <span class="th-tag">Сквозной проект · шаг 2 из 8</span>
   <h3 id="ch2-thread">FinTrack, шаг 2: база данных</h3>
   <p>Данные начинают храниться в PostgreSQL: счета, категории, правила, операции. Повторный импорт той же выписки не создаёт дублей. Отчёты переезжают в SQL.</p>
+  <p class="need"><b>Что установить:</b> Docker <a href="#setup-5">§0.5</a>, PostgreSQL и DBeaver <a href="#setup-6">§0.6</a>.</p>
   <h4>Технологии (все бесплатные)</h4>
   <ul class="tech"><li><a href="https://www.postgresql.org/" target="_blank" rel="noopener">PostgreSQL 16</a></li><li><a href="https://docs.docker.com/get-started/" target="_blank" rel="noopener">Docker</a></li><li><a href="https://dbeaver.io/" target="_blank" rel="noopener">DBeaver Community</a></li><li><a href="https://documentation.red-gate.com/flyway" target="_blank" rel="noopener">Flyway</a></li></ul>
   <h4>Как делать</h4>
@@ -781,6 +998,16 @@ interface OrderRepository extends JpaRepository&lt;Order, Long&gt; {
     <h2>Spring Boot и REST API</h2>
     <p class="ch-meta"><span>5–6 недель</span><span>Проект: taskhub-api</span></p>
   </header>
+  <div class="start">
+  <h3 id="ch3-start">С нуля: если вы видите это впервые</h3>
+<p class="need"><b>Что понадобится:</b> <a href="#setup-2">§0.2 Java</a>, <a href="#setup-3">§0.3 IntelliJ IDEA</a>, <a href="#setup-11">§0.11 способ отправлять запросы</a>, для работы с базой — <a href="#setup-6">§0.6 PostgreSQL</a>.</p><h4>Что такое сервер и API</h4><p>Представьте ресторан. Посетитель (приложение в телефоне или сайт) не идёт на кухню — он делает заказ официанту по меню. Официант передаёт заказ на кухню и приносит блюдо. <b>Сервер</b> — это кухня, <b>API</b> — меню и правила заказа: какие блюда есть и как их просить.</p><h4>Как выглядит запрос и ответ (HTTP)</h4><ul><li><b>Метод</b> — что сделать: <code>GET</code> — получить, <code>POST</code> — создать, <code>PUT</code> — заменить, <code>DELETE</code> — удалить.</li><li><b>Адрес</b> — с чем: <code>/api/v1/tasks</code> — все задачи, <code>/api/v1/tasks/7</code> — задача номер 7.</li><li><b>Тело</b> — данные в формате JSON: <code>{"title": "Купить молоко"}</code>.</li><li><b>Код ответа</b>: 200 — всё хорошо, 201 — создано, 400 — вы прислали неправильные данные, 401 — не представились, 403 — нельзя, 404 — не найдено, 500 — ошибка на сервере.</li></ul><h4>Что такое Spring Boot</h4><p>Написать сервер с нуля — огромная работа: принимать соединения, разбирать запросы, превращать JSON в объекты. <b>Spring Boot</b> — набор готовых деталей, который всё это делает за вас. Вы пишете только свою логику и помечаете классы <b>аннотациями</b> — «наклейками» со знаком <code>@</code>, по которым Spring понимает, что делать: <code>@RestController</code> — «этот класс отвечает на HTTP-запросы», <code>@GetMapping("/hello")</code> — «этот метод отвечает на GET /hello».</p><h4>Первый сервер за 10 минут</h4><ol><li>Откройте <a href="https://start.spring.io/" target="_blank" rel="noopener">start.spring.io</a>. Project: <b>Gradle - Kotlin</b>, Language: <b>Java</b>, Java: <b>21</b>. Artifact: <code>taskhub-api</code>.</li><li>Справа <b>Add dependencies</b> → добавьте <b>Spring Web</b>. Нажмите <b>Generate</b> — скачается zip.</li><li>Распакуйте архив в папку <code>study</code> и откройте папку в IntelliJ (File → Open). Подождите загрузку Gradle.</li><li>Рядом с классом <code>…Application.java</code> создайте файл <code>HelloController.java</code> с кодом ниже.</li><li>Запустите приложение зелёным треугольником у класса <code>…Application</code> (или в терминале <code>./gradlew bootRun</code>, в Windows <code>gradlew.bat bootRun</code>).</li><li>Откройте в браузере <code>http://localhost:8080/hello</code> — увидите «Привет!». Остановить сервер — красный квадрат в IntelliJ или Ctrl+C.</li></ol><figure class="code"><figcaption>HelloController.java</figcaption><pre><code>@RestController
+class HelloController {
+    @GetMapping("/hello")
+    String hello() {
+        return "Привет!";
+    }
+}</code></pre></figure><p>IntelliJ подчеркнёт аннотации красным — нажмите на них Alt+Enter (Option+Enter) → <b>Import class</b>. Так добавляются нужные <code>import</code>.</p>
+  </div>
   <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Понимать, что делает Spring «под капотом»: IoC, DI, автоконфигурация.</li>
     <li>Проектировать и документировать REST API по правилам.</li>
@@ -881,6 +1108,15 @@ class UserErrors {
   </div>
   <div class="box task"><h4>Задача 3.1. Единый формат ошибок</h4>
     <p>Сделайте обработчик, который на ошибку валидации отдаёт 400 со списком полей, а на «задача не найдена» — 404. Оба ответа — в формате ProblemDetail.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> когда клиент присылает неправильные данные (пустое название задачи) или просит несуществующую задачу, сервер должен отвечать понятной ошибкой в одном и том же формате, а не страницей с непонятным текстом.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — запрос <code>POST /api/v1/tasks</code> с телом <code>{"title":""}</code> или <code>GET /api/v1/tasks/999</code>. Выход — ответ 400 со списком полей:<figure class="code"><figcaption>Ожидаемый ответ 400</figcaption><pre><code>{ "title": "Validation failed", "status": 400, "errors": { "title": "must not be blank" } }</code></pre></figure> и ответ 404 с <code>"status": 404</code> и текстом «Task 999 not found».</p>
+      <p><b>Где писать и как запустить.</b> проект <code>taskhub-api</code>. Нужны: зависимость <b>Validation</b> (на start.spring.io или в <code>build.gradle.kts</code>: <code>implementation("org.springframework.boot:spring-boot-starter-validation")</code>), record <code>CreateTask(@NotBlank String title)</code>, класс исключения <code>TaskNotFoundException</code>. Новый файл <code>ApiErrors.java</code> — рядом с контроллером. Запуск — <code>./gradlew bootRun</code>, запросы — через Swagger UI или curl (<a href="#setup-11">§0.11</a>).</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Создайте класс с аннотацией <code>@RestControllerAdvice</code>.</li><li>Добавьте метод с <code>@ExceptionHandler(MethodArgumentNotValidException.class)</code>: создайте <code>ProblemDetail</code> со статусом 400 и положите в него список ошибок полей.</li><li>Добавьте метод для <code>TaskNotFoundException</code> со статусом 404.</li><li>Убедитесь, что в контроллере перед <code>@RequestBody</code> стоит <code>@Valid</code>.</li></ol>
+      <p><b>Как проверить себя.</b> отправьте оба запроса и сравните ответы с ожидаемыми. Заголовок ответа должен быть <code>Content-Type: application/problem+json</code>.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Java, Spring Boot 3</figcaption><pre><code>@RestControllerAdvice
 class ApiErrors {
@@ -924,6 +1160,15 @@ class TaskNotFoundTest {
   </div>
   <div class="box task"><h4>Задача 3.2. Тест контроллера</h4>
     <p>Напишите тест: POST с пустым title должен вернуть 400 и поле <code>errors.title</code> в ответе.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> нужно написать автоматическую проверку (тест): «если отправить задачу с пустым названием, сервер ответит 400 и укажет поле title». Тест сам отправит запрос — запускать сервер не нужно.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — ваш контроллер и обработчик ошибок из задачи 3.1. Выход — тест, который проходит (зелёная галочка).</p>
+      <p><b>Где писать и как запустить.</b> файл <code>src/test/java/…/TaskControllerTest.java</code> в проекте <code>taskhub-api</code>. Запуск — зелёный треугольник рядом с классом теста или <code>./gradlew test</code>.</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Пометьте класс <code>@WebMvcTest(TaskController.class)</code>.</li><li>Получите <code>MockMvc</code> через <code>@Autowired</code>, а сервис подмените через <code>@MockitoBean</code>.</li><li>В методе теста выполните <code>post(…)</code> с JSON-телом <code>{"title":""}</code>.</li><li>Проверьте статус (<code>status().isBadRequest()</code>) и наличие поля в ответе (<code>jsonPath</code>).</li></ol>
+      <p><b>Как проверить себя.</b> тест зелёный. Затем временно уберите <code>@NotBlank</code> из <code>CreateTask</code> — тест должен покраснеть. Так вы убедитесь, что он действительно что-то проверяет.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>JUnit 5, MockMvc</figcaption><pre><code>@WebMvcTest(TaskController.class)
 class TaskControllerTest {
@@ -963,6 +1208,7 @@ class TaskControllerTest {
   <span class="th-tag">Сквозной проект · шаг 3 из 8</span>
   <h3 id="ch3-thread">FinTrack, шаг 3: REST API на Spring Boot</h3>
   <p>Появляется модуль <code>api</code>: загрузка выписки через HTTP, список операций с фильтрами, категории и правила, отчёты. Всё описано в OpenAPI.</p>
+  <p class="need"><b>Что установить:</b> ничего нового — Spring Initializr работает в браузере.</p>
   <h4>Технологии (все бесплатные)</h4>
   <ul class="tech"><li><a href="https://spring.io/projects/spring-boot" target="_blank" rel="noopener">Spring Boot</a></li><li><a href="https://spring.io/projects/spring-data-jpa" target="_blank" rel="noopener">Spring Data JPA</a></li><li><a href="https://springdoc.org/" target="_blank" rel="noopener">springdoc-openapi</a></li><li><a href="https://testcontainers.com/" target="_blank" rel="noopener">Testcontainers</a></li><li><a href="https://start.spring.io/" target="_blank" rel="noopener">Spring Initializr</a></li></ul>
   <h4>Как делать</h4>
@@ -1012,6 +1258,21 @@ parsed.stream().map(t -&gt; TxnEntity.from(t, account, categorizer.categoryOf(t)
     <h2>TypeScript и Angular</h2>
     <p class="ch-meta"><span>6 недель</span><span>Проект: taskhub-web</span></p>
   </header>
+  <div class="start">
+  <h3 id="ch4-start">С нуля: если вы видите это впервые</h3>
+<p class="need"><b>Что понадобится:</b> <a href="#setup-7">§0.7 Node.js, VS Code и Angular CLI</a>.</p><h4>Что такое фронтенд</h4><p>Фронтенд — всё, что человек видит и нажимает в браузере. Его строят из трёх частей: <b>HTML</b> — что на странице (заголовки, кнопки, поля), <b>CSS</b> — как это выглядит (цвета, отступы), <b>JavaScript</b> — как это работает (что происходит по нажатию). <b>TypeScript</b> — тот же JavaScript, но с типами, как в Java: ошибки видны ещё до запуска.</p><h4>Зачем Angular</h4><p>Большие интерфейсы (интернет-банк, админка) сложно писать «голым» JavaScript. <b>Angular</b> — фреймворк, который делит интерфейс на <b>компоненты</b> — кирпичики: «шапка», «список задач», «карточка задачи». У каждого компонента своя разметка (шаблон) и свой код. Приложение — одна страница (SPA), которая меняет кирпичики без перезагрузки.</p><ul><li><b>Сигнал</b> (<code>signal</code>) — ячейка со значением. Изменили значение — Angular сам обновил всё на экране, где оно показано.</li><li><b>Observable</b> (RxJS) — подписка на поток событий во времени: ввод в поле, ответ сервера. Как подписка на рассылку: письма приходят, когда приходят.</li><li><b>HttpClient</b> — встроенный способ отправить запрос на сервер из главы 3.</li></ul><h4>Первое приложение</h4><ol><li>Создайте и запустите проект по <a href="#setup-7">§0.7 </a> (<code>ng new</code>, <code>ng serve</code>) и откройте <code>http://localhost:4200</code>.</li><li>В VS Code откройте папку проекта и файл <code>src/app/app.component.ts</code> (в новых версиях — <code>src/app/app.ts</code>).</li><li>Замените содержимое шаблона на пример ниже и сохраните — страница обновится сама.</li></ol><figure class="code"><figcaption>Счётчик на сигнале</figcaption><pre><code>import { Component, signal } from '@angular/core';
+
+@Component({
+  selector: 'app-root',
+  template: `
+    &lt;h1&gt;Нажато: {{ count() }}&lt;/h1&gt;
+    &lt;button (click)="count.set(count() + 1)"&gt;Нажми&lt;/button&gt;
+  `,
+})
+export class App {
+  count = signal(0);
+}</code></pre></figure><p><code>{{ count() }}</code> выводит значение, <code>(click)="…"</code> — что делать по нажатию. Если класс в вашем файле называется <code>AppComponent</code>, оставьте это имя.</p>
+  </div>
   <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Писать строго типизированный TypeScript.</li>
     <li>Строить приложение на современном Angular: standalone-компоненты, signals, новый control flow.</li>
@@ -1123,6 +1384,27 @@ export class TaskListComponent {
   </div>
   <div class="box task"><h4>Задача 4.1. Живой поиск</h4>
     <p>Сделайте поле поиска задач: запрос уходит через 300 мс после остановки ввода, при новом вводе старый запрос отменяется, при ошибке список пустой, меньше двух символов — не искать.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> есть поле поиска. Пока человек печатает, не нужно отправлять запрос на каждую букву. Когда он остановился на 0,3 секунды — искать. Если начал печатать снова — старый поиск отменить. Если ввёл меньше двух букв — не искать. Если сервер ответил ошибкой — показать пустой список, а поле должно продолжать работать.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — то, что человек вводит в поле. Выход — список найденных задач под полем.</p>
+      <p><b>Где писать и как запустить.</b> Angular-проект (<a href="#setup-7">§0.7</a>). Создайте компонент: <code>ng generate component search</code> и покажите его в главном шаблоне тегом <code>&lt;app-search /&gt;</code>. Если сервера ещё нет, сделайте временный сервис с поиском по массиву:<figure class="code"><figcaption>task-api.ts — временная заглушка</figcaption><pre><code>import { Injectable } from '@angular/core';
+import { of, delay } from 'rxjs';
+
+export interface Task { id: number; title: string; }
+const ALL: Task[] = [{ id: 1, title: 'Купить молоко' }, { id: 2, title: 'Купить хлеб' }, { id: 3, title: 'Позвонить маме' }];
+
+@Injectable({ providedIn: 'root' })
+export class TaskApi {
+  search(q: string) {
+    console.log('запрос:', q);   // видно, сколько «запросов» ушло
+    return of(ALL.filter(t =&gt; t.title.toLowerCase().includes(q.toLowerCase()))).pipe(delay(500));
+  }
+}</code></pre></figure></p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Добавьте поле формы <code>FormControl</code> и подключите его к <code>&lt;input&gt;</code> через <code>[formControl]</code> (нужен <code>ReactiveFormsModule</code> в <code>imports</code> компонента).</li><li>Возьмите поток изменений <code>valueChanges</code> и добавьте паузу <code>debounceTime(300)</code>.</li><li>Уберите пробелы и повторы (<code>map</code>, <code>distinctUntilChanged</code>).</li><li>Через <code>switchMap</code> вызывайте поиск; для коротких строк возвращайте <code>of([])</code>.</li><li>Внутри <code>switchMap</code> на запрос повесьте <code>catchError(() =&gt; of([]))</code>.</li><li>Превратите поток в сигнал <code>toSignal</code> и выведите список в шаблоне через <code>@for</code>.</li></ol>
+      <p><b>Как проверить себя.</b> откройте консоль браузера (F12 → Console). Быстро наберите «купить» — сообщений «запрос:» должно быть одно, а не шесть.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Angular, RxJS</figcaption><pre><code>@Component({
   selector: 'app-search',
@@ -1164,6 +1446,15 @@ provideHttpClient(withInterceptors([requestIdInterceptor, errorInterceptor]))</c
   </div>
   <div class="box task"><h4>Задача 4.2. Interceptor ошибок</h4>
     <p>Напишите функциональный interceptor: при ответе 5xx показать тост «Сервер недоступен», ошибку пробросить дальше.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> «перехватчик» (interceptor) — функция, через которую проходит каждый HTTP-запрос приложения. Нужно, чтобы при ответе сервера с кодом 500 и выше пользователь увидел сообщение «Сервер недоступен», а сама ошибка передалась дальше.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — любой ответ сервера. Выход — при ошибке 5xx появляется сообщение; при других ответах ничего не меняется.</p>
+      <p><b>Где писать и как запустить.</b> Angular-проект; новый файл <code>src/app/error.interceptor.ts</code>, подключение — в <code>src/app/app.config.ts</code>. Вместо настоящего сервиса уведомлений на первое время можно использовать <code>alert(…)</code>. Чтобы получить ошибку 500, добавьте в Spring-проект временный метод, который бросает исключение, — сервер ответит 500.</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Создайте константу типа <code>HttpInterceptorFn</code> — функцию от <code>(req, next)</code>.</li><li>Верните <code>next(req)</code> и через <code>pipe</code> добавьте <code>catchError</code>.</li><li>Внутри проверьте <code>err.status &gt;= 500</code> и покажите сообщение.</li><li>Верните ошибку дальше: <code>throwError(() =&gt; err)</code>.</li><li>В <code>app.config.ts</code> подключите: <code>provideHttpClient(withInterceptors([errorInterceptor]))</code>.</li></ol>
+      <p><b>Как проверить себя.</b> вызовите метод с ошибкой — появится сообщение. Нормальный запрос сообщения не показывает.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Angular</figcaption><pre><code>export const errorInterceptor: HttpInterceptorFn = (req, next) =&gt; {
   const toast = inject(ToastService);
@@ -1203,6 +1494,7 @@ export const appConfig: ApplicationConfig = {
   <span class="th-tag">Сквозной проект · шаг 4 из 8</span>
   <h3 id="ch4-thread">FinTrack, шаг 4: интерфейс на Angular</h3>
   <p>Появляется <code>web</code>: загрузка выписки перетаскиванием, таблица операций с фильтрами, редактор категорий и правил, дашборд с графиками трат.</p>
+  <p class="need"><b>Что установить:</b> Node.js, VS Code, Angular CLI <a href="#setup-7">§0.7</a>.</p>
   <h4>Технологии (все бесплатные)</h4>
   <ul class="tech"><li><a href="https://angular.dev/" target="_blank" rel="noopener">Angular</a></li><li><a href="https://material.angular.dev/" target="_blank" rel="noopener">Angular Material и CDK</a></li><li><a href="https://www.chartjs.org/docs/latest/" target="_blank" rel="noopener">Chart.js</a></li><li><a href="https://openapi-generator.tech/" target="_blank" rel="noopener">OpenAPI Generator</a></li><li><a href="https://playwright.dev/" target="_blank" rel="noopener">Playwright</a></li></ul>
   <h4>Как делать</h4>
@@ -1240,6 +1532,20 @@ export const appConfig: ApplicationConfig = {
     <h2>React</h2>
     <p class="ch-meta"><span>3 недели</span><span>После главы 4 — TypeScript уже знаком</span></p>
   </header>
+  <div class="start">
+  <h3 id="ch4b-start">С нуля: если вы видите это впервые</h3>
+<p class="need"><b>Что понадобится:</b> <a href="#setup-7">§0.7 Node.js и VS Code</a>.</p><h4>React простыми словами</h4><p>React решает ту же задачу, что Angular, — строит интерфейс из кирпичиков-компонентов, — но устроен проще: компонент — это обычная функция, которая возвращает разметку. Разметка пишется прямо в коде, похоже на HTML (это называется <b>JSX</b>).</p><ul><li><b>Props</b> — входные данные компонента, как параметры функции.</li><li><b>State</b> (<code>useState</code>) — то, что компонент «помнит». Меняете state — React заново вызывает функцию и обновляет экран.</li><li><b>Хуки</b> — функции, начинающиеся с <code>use</code>: useState, useEffect и другие.</li></ul><h4>Первое приложение</h4><ol><li>Создайте проект по <a href="#setup-7">§0.7 </a> (<code>npm create vite@latest</code>, <code>npm run dev</code>).</li><li>Откройте <code>src/App.tsx</code>, замените всё содержимое кодом ниже и сохраните.</li></ol><figure class="code"><figcaption>src/App.tsx</figcaption><pre><code>import { useState } from 'react';
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  return (
+    &lt;div&gt;
+      &lt;h1&gt;Нажато: {count}&lt;/h1&gt;
+      &lt;button onClick={() =&gt; setCount(c =&gt; c + 1)}&gt;Нажми&lt;/button&gt;
+    &lt;/div&gt;
+  );
+}</code></pre></figure>
+  </div>
   <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Строить интерфейс из функциональных компонентов на React и TypeScript.</li>
     <li>Управлять состоянием хуками и понимать, когда компонент перерисовывается.</li>
@@ -1354,6 +1660,24 @@ setItems(prev =&gt; [...prev, b]);</code></pre></figure>
   </div>
   <div class="box task"><h4>Задача 4Б.1. Почему +1, а не +3?</h4>
     <p>По нажатию кнопки вызывается <code>setCount(count + 1)</code> три раза подряд, но счётчик растёт на 1. Объясните и исправьте.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> кнопка должна прибавлять к счётчику 3, а прибавляет 1. Нужно понять почему и исправить.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — код ниже. Выход — после нажатий счётчик показывает 3, 6, 9.<figure class="code"><figcaption>src/App.tsx — код с ошибкой</figcaption><pre><code>import { useState } from 'react';
+
+export default function App() {
+  const [count, setCount] = useState(0);
+  return (
+    &lt;button onClick={() =&gt; { setCount(count + 1); setCount(count + 1); setCount(count + 1); }}&gt;
+      {count}
+    &lt;/button&gt;
+  );
+}</code></pre></figure></p>
+      <p><b>Где писать и как запустить.</b> React-проект (<a href="#setup-7">§0.7</a>), файл <code>src/App.tsx</code>. Запуск — <code>npm run dev</code>.</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Прочитайте в конспекте раздел «Состояние — это снимок».</li><li>Ответьте себе: чему равен <code>count</code> во всех трёх вызовах при первом нажатии?</li><li>Найдите в конспекте другую форму вызова сеттера — с функцией.</li></ol>
+      <p><b>Как проверить себя.</b> нажмите кнопку три раза: 3, 6, 9.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>React</figcaption><pre><code>// было: все три вызова видят одно и то же значение count из текущей отрисовки
 setCount(count + 1);
@@ -1391,6 +1715,22 @@ function Categories() {
   </div>
   <div class="box task"><h4>Задача 4Б.2. Живой поиск на React</h4>
     <p>Сделайте то же, что в задаче 4.1, но на React: запрос через 300 мс после остановки ввода, не искать при длине меньше 2, устаревший запрос отменяется.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> то же, что задача 4.1, но на React: поиск через 0,3 секунды после остановки ввода, не искать меньше двух букв, устаревший запрос отменять.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — ввод в поле. Выход — список найденных задач.</p>
+      <p><b>Где писать и как запустить.</b> React-проект. Установите библиотеку: <code>npm install @tanstack/react-query</code> и оберните приложение в провайдер:<figure class="code"><figcaption>src/main.tsx</figcaption><pre><code>import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
+const queryClient = new QueryClient();
+
+createRoot(document.getElementById('root')!).render(
+  &lt;QueryClientProvider client={queryClient}&gt;
+    &lt;App /&gt;
+  &lt;/QueryClientProvider&gt;,
+);</code></pre></figure> Без сервера сделайте временную функцию поиска: <code>new Promise(r =&gt; setTimeout(() =&gt; r(список.filter(…)), 500))</code>.</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Сделайте поле ввода с состоянием <code>q</code>.</li><li>Напишите свой хук <code>useDebounce</code>: эффект с <code>setTimeout</code> и очисткой <code>clearTimeout</code>.</li><li>Вызовите <code>useQuery</code>: в <code>queryKey</code> — слово для поиска, <code>enabled</code> — длина не меньше 2.</li><li>Выведите <code>data</code> списком с <code>key</code> по id и сообщение, пока <code>isFetching</code>.</li></ol>
+      <p><b>Как проверить себя.</b> добавьте <code>console.log</code> в функцию поиска и быстро наберите слово — вызовов должно быть мало.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>React, TanStack Query</figcaption><pre><code>function useDebounce&lt;T&gt;(value: T, ms = 300): T {
   const [v, setV] = useState(value);
@@ -1441,6 +1781,7 @@ export function TaskSearch() {
   <span class="th-tag">Сквозной проект · дополнительный шаг 4Б</span>
   <h3 id="ch4b-thread">FinTrack, шаг 4Б: второй интерфейс на React</h3>
   <p>Тот же FinTrack, второй фронтенд <code>web-react</code> на том же API. Лучшая демонстрация того, зачем на шаге 3 сделали контракт OpenAPI: сервер не меняется вообще.</p>
+  <p class="need"><b>Что установить:</b> Node.js <a href="#setup-7">§0.7</a>.</p>
   <h4>Технологии (все бесплатные)</h4>
   <ul class="tech"><li><a href="https://vite.dev/guide/" target="_blank" rel="noopener">Vite</a></li><li><a href="https://react.dev/" target="_blank" rel="noopener">React</a></li><li><a href="https://tanstack.com/query/latest" target="_blank" rel="noopener">TanStack Query</a></li><li><a href="https://reactrouter.com/" target="_blank" rel="noopener">React Router</a></li><li><a href="https://www.chartjs.org/docs/latest/" target="_blank" rel="noopener">Chart.js</a></li><li><a href="https://openapi-generator.tech/" target="_blank" rel="noopener">OpenAPI Generator</a></li><li><a href="https://vitest.dev/" target="_blank" rel="noopener">Vitest</a></li></ul>
   <h4>Как делать</h4>
@@ -1484,6 +1825,10 @@ export default defineConfig({
     <h2>Безопасная разработка и IAM</h2>
     <p class="ch-meta"><span>3 недели</span><span>Проект: taskhub + Keycloak</span></p>
   </header>
+  <div class="start">
+  <h3 id="ch5-start">С нуля: если вы видите это впервые</h3>
+<p class="need"><b>Что понадобится:</b> проект из главы 3, <a href="#setup-5">§0.5 Docker</a>, <a href="#setup-8">§0.8 Keycloak</a>.</p><h4>Две главные идеи</h4><ul><li><b>Аутентификация</b> — «кто вы?». Как охранник на входе в офис проверяет пропуск.</li><li><b>Авторизация</b> — «что вам можно?». Пропуск открывает не все двери: бухгалтер не войдёт в серверную.</li></ul><h4>Токен — браслет на фестивале</h4><p>Чтобы не показывать паспорт у каждой сцены, на входе фестиваля надевают браслет. Так и в вебе: пользователь один раз входит (логин и пароль), получает <b>токен</b>, а дальше прикладывает его к каждому запросу. <b>JWT</b> — популярный формат токена: внутри записано, кто это и какие у него права, и стоит цифровая подпись, чтобы токен нельзя было подделать.</p><h4>Кто выдаёт токены</h4><p>Писать вход самому опасно. Обычно этим занимается отдельная программа — <b>сервер авторизации</b>. Мы используем бесплатный <b>Keycloak</b>. Протокол, по которому приложение получает токен, называется <b>OAuth 2.0</b>, а надстройка для входа пользователей — <b>OpenID Connect</b>. Кнопка «Войти через Google» работает именно так.</p><h4>Самая частая дыра — инъекция</h4><p>Если программа склеивает SQL-запрос с тем, что ввёл пользователь, хитрый ввод может изменить смысл запроса. Пример: поиск <code>"SELECT * FROM users WHERE name = '" + name + "'"</code>, а пользователь вводит <code>x' OR '1'='1</code> — и получает всех пользователей. Защита в главе: передавать ввод отдельно от SQL.</p><h4>Попробуйте</h4><ol><li>Запустите Keycloak (<a href="#setup-8">§0.8 </a>) и войдите в консоль admin / admin.</li><li>Слева вверху — выпадающий список realm → <b>Create realm</b>, имя <code>taskhub</code>.</li><li><b>Users → Add user</b>: имя <code>alice</code> → Create; вкладка <b>Credentials → Set password</b>, выключите <b>Temporary</b>.</li><li>Это всё, что нужно до задач; дальше глава объяснит, как приложение проверяет токен.</li></ol>
+  </div>
   <div class="box note"><p>В вакансии отдельно названы secure development и, как плюс, IAM и ForgeRock. Эта глава даёт заметное преимущество перед другими кандидатами.</p></div>
   <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Знать OWASP Top 10 и уметь закрыть каждый пункт в своём коде.</li>
@@ -1579,6 +1924,16 @@ mvc.perform(get("/api/reports/monthly")
   </div>
   <div class="box task"><h4>Задача 5.1. Роли из Keycloak</h4>
     <p>Keycloak кладёт роли в JWT в поле <code>realm_access.roles</code>, а Spring ждёт <code>ROLE_…</code>. Напишите конвертер, чтобы работал <code>hasRole("ADMIN")</code>.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> Keycloak выдаёт токен, где роли пользователя записаны в своём месте — в поле <code>realm_access.roles</code>. Spring Security ищет роли в другом месте и в другом виде (<code>ROLE_ADMIN</code>). Нужно написать «переводчик» из формата Keycloak в формат Spring.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — токен пользователя с ролью ADMIN. Выход — запрос <code>DELETE /api/…</code> с этим токеном проходит, а с токеном пользователя без роли — получает 403.</p>
+      <p><b>Где писать и как запустить.</b> проект <code>taskhub-api</code>. Добавьте зависимость <code>implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")</code> и в <code>application.properties</code>: <code>spring.security.oauth2.resourceserver.jwt.issuer-uri=http://localhost:8081/realms/taskhub</code>. Код — в новом классе <code>SecurityConfig</code> с аннотацией <code>@Configuration</code>. Подготовка Keycloak (<a href="#setup-8">§0.8</a>): в realm <code>taskhub</code> — <b>Realm roles → Create role</b> <code>ADMIN</code>; пользователю alice — <b>Role mapping → Assign role → ADMIN</b>; второй пользователь bob без роли; <b>Clients → Create client</b> <code>taskhub-cli</code>, включите <b>Direct access grants</b>. Получить токен для проверки (только для учебной проверки, не для приложения):<figure class="code"><figcaption>Терминал</figcaption><pre><code>curl -X POST http://localhost:8081/realms/taskhub/protocol/openid-connect/token \
+  -d grant_type=password -d client_id=taskhub-cli -d username=alice -d password=ПАРОЛЬ</code></pre></figure></p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Скопируйте <code>access_token</code> из ответа и расшифруйте его middle-часть (между точками) — найдите <code>realm_access</code>.</li><li>Создайте бин <code>JwtAuthenticationConverter</code>.</li><li>В конвертере достаньте карту <code>realm_access</code>, из неё список <code>roles</code>.</li><li>Каждую роль превратите в <code>SimpleGrantedAuthority("ROLE_" + роль)</code>.</li></ol>
+      <p><b>Как проверить себя.</b> запрос с заголовком <code>Authorization: Bearer &lt;токен alice&gt;</code> к защищённому методу проходит, с токеном bob — 403, без токена — 401.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Spring Security</figcaption><pre><code>@Bean
 JwtAuthenticationConverter jwtAuthenticationConverter() {
@@ -1614,6 +1969,15 @@ List&lt;Task&gt; list(long projectId, String sort) {
   </div>
   <div class="box task"><h4>Задача 5.2. Найди уязвимость</h4>
     <p>Что не так с этим кодом и как исправить?<br><code>jdbc.query("SELECT * FROM task WHERE title LIKE '%" + q + "%'", mapper);</code></p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> код строит SQL-запрос, склеивая его с тем, что ввёл пользователь. Хитрый ввод меняет смысл запроса. Нужно объяснить, что не так, и исправить.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — строка поиска <code>q</code>. Если ввести <code>x' OR 1=1 --</code>, запрос превращается в <code>… LIKE '%x' OR 1=1 --%'</code>: условие <code>1=1</code> всегда истинно, а <code>--</code> превращает остаток в комментарий — вернутся все строки. Выход — исправленный код, где такой ввод ищется как обычный текст и ничего не находит.</p>
+      <p><b>Где писать и как запустить.</b> можно в проекте Spring с <code>JdbcTemplate</code> или сначала «на бумаге». Чтобы увидеть проблему своими глазами, выполните получившийся запрос в DBeaver на таблице <code>task</code> из главы 2.</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Найдите место, где строка пользователя попадает прямо в текст SQL.</li><li>Замените это место знаком <code>?</code>.</li><li>Передайте значение отдельным аргументом метода <code>query</code>; символы <code>%</code> для LIKE добавьте к значению, а не к SQL.</li></ol>
+      <p><b>Как проверить себя.</b> поиск обычного слова работает как раньше, а ввод <code>x' OR 1=1 --</code> возвращает пустой результат.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Java, JdbcTemplate</figcaption><pre><code>// Уязвимо: q = "' OR '1'='1" вернёт все задачи,
 // а более хитрый ввод может прочитать или удалить чужие данные.
@@ -1643,6 +2007,7 @@ jdbc.query("SELECT * FROM task WHERE title LIKE ?", mapper, "%" + q + "%");</cod
   <span class="th-tag">Сквозной проект · шаг 5 из 8</span>
   <h3 id="ch5-thread">FinTrack, шаг 5: пользователи и безопасность</h3>
   <p>FinTrack становится многопользовательским: вход через Keycloak, каждый видит только свои данные, можно вести общий семейный бюджет.</p>
+  <p class="need"><b>Что установить:</b> Keycloak <a href="#setup-8">§0.8</a>.</p>
   <h4>Технологии (все бесплатные)</h4>
   <ul class="tech"><li><a href="https://www.keycloak.org/getting-started/getting-started-docker" target="_blank" rel="noopener">Keycloak</a></li><li><a href="https://docs.spring.io/spring-security/reference/" target="_blank" rel="noopener">Spring Security</a></li><li><a href="https://github.com/damienbod/angular-auth-oidc-client" target="_blank" rel="noopener">angular-auth-oidc-client</a></li><li><a href="https://trivy.dev/" target="_blank" rel="noopener">Trivy</a></li><li><a href="https://owasp.org/www-project-dependency-check/" target="_blank" rel="noopener">OWASP Dependency-Check</a></li></ul>
   <h4>Как делать</h4>
@@ -1687,6 +2052,12 @@ spring.security.oauth2.resourceserver.jwt.issuer-uri: http://localhost:8081/real
     <h2>Docker, CI/CD, Kubernetes и AWS</h2>
     <p class="ch-meta"><span>6 недель</span><span>Проект: taskhub в Kubernetes</span></p>
   </header>
+  <div class="start">
+  <h3 id="ch6-start">С нуля: если вы видите это впервые</h3>
+<p class="need"><b>Что понадобится:</b> <a href="#setup-5">§0.5 Docker</a>, <a href="#setup-9">§0.9 kubectl, kind, Helm</a>, <a href="#setup-4">§0.4 GitHub</a>.</p><h4>Проблема «а у меня работает»</h4><p>Программа работает на компьютере разработчика, а на сервере — нет: другая версия Java, нет нужной библиотеки, другие настройки. <b>Контейнер</b> решает это, как стандартный морской контейнер: внутрь кладут программу вместе со всем, что ей нужно, и такой контейнер одинаково запускается где угодно.</p><ul><li><b>Образ</b> (image) — рецепт и упакованные продукты; <b>контейнер</b> — приготовленное по нему блюдо. Из одного образа можно запустить много контейнеров.</li><li><b>Dockerfile</b> — текстовый файл-рецепт: «возьми Java 21, положи мою программу, запусти её».</li><li><b>Docker Compose</b> — запуск нескольких контейнеров одной командой (база + приложение).</li></ul><h4>CI/CD — робот-проверяющий</h4><p>Каждый раз, когда вы отправляете код на GitHub, робот (GitHub Actions) сам собирает проект, запускает тесты и, если всё хорошо, выкладывает новую версию. Ошибка видна через минуты, а не через неделю.</p><h4>Kubernetes — диспетчер</h4><p>Когда контейнеров десятки, нужен диспетчер: он следит, чтобы нужное число копий приложения всегда работало, перезапускает упавшие, распределяет нагрузку. Это <b>Kubernetes</b>. Вы описываете желаемое состояние в YAML-файле («хочу 2 копии»), а он поддерживает его. <b>Облако</b> (AWS) — арендованные компьютеры, на которых всё это работает в интернете.</p><h4>Попробуйте</h4><figure class="code"><figcaption>Терминал: веб-сервер nginx в контейнере</figcaption><pre><code>docker run -d --name web -p 8088:80 nginx
+# откройте http://localhost:8088 — страница «Welcome to nginx!»
+docker stop web</code></pre></figure><p>YAML — формат файлов настроек: отступы пробелами важны (не табуляцией), <code>ключ: значение</code>, список — строки с <code>-</code>.</p>
+  </div>
   <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Упаковывать сервисы в компактные и безопасные образы.</li>
     <li>Строить конвейер: сборка → тесты → проверка → образ → развёртывание.</li>
@@ -1800,6 +2171,18 @@ spec:
   </div>
   <div class="box task"><h4>Задача 6.1. Deployment с пробами</h4>
     <p>Опишите Deployment для taskhub-api: 2 реплики, запрос и лимит памяти, readiness- и liveness-пробы на эндпоинты Spring Boot Actuator.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> нужно написать файл-инструкцию для Kubernetes: «запусти 2 копии моего приложения из такого-то образа, дай им столько-то памяти и проверяй, живы ли они и готовы ли принимать запросы».</p>
+      <p><b>Что на входе и что на выходе.</b> вход — Docker-образ приложения. Выход — файл <code>deployment.yaml</code>, после применения которого <code>kubectl get pods</code> показывает два пода в статусе Running и READY 1/1.</p>
+      <p><b>Где писать и как запустить.</b> папка <code>k8s/</code> в проекте <code>taskhub-api</code>. Нужны kind и kubectl (<a href="#setup-9">§0.9</a>), Dockerfile из листинга 6.1 и зависимость <b>Actuator</b> (<code>spring-boot-starter-actuator</code>). Образ собирается и загружается в кластер kind так:<figure class="code"><figcaption>Терминал</figcaption><pre><code>docker build -t taskhub-api:1.0.0 .
+kind load docker-image taskhub-api:1.0.0
+kubectl apply -f k8s/
+kubectl get pods</code></pre></figure></p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Скопируйте общий каркас Deployment из конспекта или документации Kubernetes.</li><li>Задайте <code>replicas: 2</code> и одинаковые метки в <code>selector</code> и <code>template</code>.</li><li>Укажите <code>image: taskhub-api:1.0.0</code> и порт 8080.</li><li>Добавьте <code>resources</code> и две пробы на адреса <code>/actuator/health/readiness</code> и <code>/actuator/health/liveness</code>.</li></ol>
+      <p><b>Как проверить себя.</b> <code>kubectl get pods</code> — два пода Running 1/1. <code>kubectl describe pod &lt;имя&gt;</code> не показывает ошибок проб.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Kubernetes YAML</figcaption><pre><code>apiVersion: apps/v1
 kind: Deployment
@@ -1844,6 +2227,15 @@ spec:
   </div>
   <div class="box task"><h4>Задача 6.2. Compose: API и база</h4>
     <p>Напишите docker-compose.yml: PostgreSQL и API; API должен стартовать только когда база действительно готова.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> нужен один файл, по которому команда <code>docker compose up</code> поднимет и базу, и приложение, причём приложение подождёт, пока база будет готова.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — ваш проект с Dockerfile. Выход — файл <code>docker-compose.yml</code>; после запуска <code>http://localhost:8080/actuator/health</code> отвечает <code>{"status":"UP"}</code>.</p>
+      <p><b>Где писать и как запустить.</b> файл <code>docker-compose.yml</code> в корне проекта рядом с Dockerfile. Запуск: <code>docker compose up --build</code>; остановка — Ctrl+C, затем <code>docker compose down</code>. Нужен Docker (<a href="#setup-5">§0.5</a>).</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Опишите сервис <code>db</code> на образе <code>postgres:16</code> с переменными базы, пользователя и пароля.</li><li>Добавьте ему <code>healthcheck</code> с командой <code>pg_isready</code>.</li><li>Опишите сервис <code>api</code> с <code>build: .</code>, портом 8080 и переменными <code>SPRING_DATASOURCE_…</code>; адрес базы — имя сервиса <code>db</code>.</li><li>В <code>depends_on</code> укажите условие <code>service_healthy</code>.</li></ol>
+      <p><b>Как проверить себя.</b> в логах сначала видно, что база готова («database system is ready to accept connections»), и только потом стартует приложение.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Docker Compose</figcaption><pre><code>services:
   db:
@@ -1886,6 +2278,7 @@ spec:
   <span class="th-tag">Сквозной проект · шаг 6 из 8</span>
   <h3 id="ch6-thread">FinTrack, шаг 6: контейнеры, CI/CD и Kubernetes</h3>
   <p>Вся система поднимается одной командой, каждая правка проверяется в CI, а приложение работает в локальном Kubernetes с мониторингом.</p>
+  <p class="need"><b>Что установить:</b> kind, kubectl, Helm <a href="#setup-9">§0.9</a>.</p>
   <h4>Технологии (все бесплатные)</h4>
   <ul class="tech"><li><a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">Docker / Docker Compose</a></li><li><a href="https://nginx.org/en/docs/" target="_blank" rel="noopener">nginx</a></li><li><a href="https://docs.github.com/en/actions" target="_blank" rel="noopener">GitHub Actions</a></li><li><a href="https://kind.sigs.k8s.io/" target="_blank" rel="noopener">kind</a></li><li><a href="https://helm.sh/docs/" target="_blank" rel="noopener">Helm</a></li><li><a href="https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack" target="_blank" rel="noopener">kube-prometheus-stack</a></li></ul>
   <h4>Как делать</h4>
@@ -1927,6 +2320,10 @@ spec:
     <h2>Микросервисы и интеграции</h2>
     <p class="ch-meta"><span>4 недели</span><span>Проект: APIForge</span></p>
   </header>
+  <div class="start">
+  <h3 id="ch7-start">С нуля: если вы видите это впервые</h3>
+<p class="need"><b>Что понадобится:</b> проект из главы 3, <a href="#setup-8">§0.8 Kafka и Mailpit</a>.</p><h4>Монолит и микросервисы</h4><p><b>Монолит</b> — одна большая программа, как ресторан с одной кухней. <b>Микросервисы</b> — фудкорт: несколько маленьких независимых кухонь, у каждой своё меню и свой склад (база данных). Плюс — их можно менять и масштабировать по отдельности. Минус — им нужно договариваться друг с другом по сети, а сеть иногда подводит.</p><h4>Звонок или письмо</h4><ul><li><b>Синхронно (REST)</b> — как звонок: сервис спрашивает другой и ждёт ответа. Если тот не отвечает — ждёт или ошибка.</li><li><b>Асинхронно (события)</b> — как письмо в общий почтовый ящик: «заказ оплачен». Кому интересно — прочитают, когда смогут. <b>Kafka</b> — такой «ящик»: журнал событий, который хранит их по порядку.</li></ul><h4>Три слова, без которых глава непонятна</h4><ul><li><b>Идемпотентность</b> — повторное действие ничего не меняет. Как кнопка лифта: нажать дважды — лифт всё равно приедет один раз. Kafka может доставить сообщение дважды, поэтому обработка должна быть такой.</li><li><b>Outbox</b> — сначала записать в свою базу «надо отправить такое-то сообщение», а отправить отдельным процессом. Так ничего не теряется, даже если программа упала.</li><li><b>Circuit Breaker</b> — автомат-предохранитель: если сосед постоянно не отвечает, перестать звонить ему на время и сразу отдать запасной ответ.</li></ul>
+  </div>
   <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Делить систему на сервисы по бизнес-границам, а не по слоям.</li>
     <li>Выбирать между синхронным REST и асинхронными сообщениями.</li>
@@ -2009,6 +2406,16 @@ public void on(OrderPaid e) {
   </div>
   <div class="box task"><h4>Задача 7.1. Идемпотентный консьюмер</h4>
     <p>Kafka может доставить событие использования API дважды. Напишите обработчик, который увеличивает счётчик вызовов за день ровно один раз на событие.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> Kafka иногда доставляет одно и то же сообщение дважды. Если на каждое сообщение делать «+1 к счётчику», счётчик окажется завышенным. Нужно, чтобы повторное такое же сообщение ничего не меняло.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — событие использования API с полями <code>eventId</code>, <code>apiId</code>, <code>day</code>. Выход — в таблице <code>usage_daily</code> за этот день ровно столько вызовов, сколько было разных событий.</p>
+      <p><b>Где писать и как запустить.</b> Spring Boot-проект с зависимостью <b>Spring for Apache Kafka</b>, Kafka в Docker (<a href="#setup-8">§0.8</a>), PostgreSQL. В <code>application.properties</code>: <code>spring.kafka.bootstrap-servers=localhost:9092</code>. Таблицы:<figure class="code"><figcaption>SQL</figcaption><pre><code>CREATE TABLE processed_event (id TEXT PRIMARY KEY);
+CREATE TABLE usage_daily (api_id BIGINT, day DATE, calls INT NOT NULL, PRIMARY KEY (api_id, day));</code></pre></figure> Отправить сообщение вручную: <code>docker exec -it kafka /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic api-usage</code> и вставить строку JSON.</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Напишите метод с <code>@KafkaListener(topics = "api-usage")</code> и <code>@Transactional</code>.</li><li>Сначала попробуйте записать id события в <code>processed_event</code> так, чтобы при повторе не было ошибки (<code>ON CONFLICT DO NOTHING</code>).</li><li>Если вставилась 0 строк — событие уже было, выйдите из метода.</li><li>Иначе увеличьте счётчик за день (вставка или обновление одной командой).</li></ol>
+      <p><b>Как проверить себя.</b> отправьте одно и то же сообщение дважды: в <code>usage_daily</code> — <code>calls = 1</code>. Отправьте событие с другим <code>eventId</code> — станет 2.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Java, Spring Kafka, PostgreSQL</figcaption><pre><code>@KafkaListener(topics = "api-usage")
 @Transactional
@@ -2049,6 +2456,15 @@ public User register(NewUser cmd) {
   </div>
   <div class="box task"><h4>Задача 7.2. Outbox</h4>
     <p>При одобрении подписки нужно сохранить её в БД и отправить событие в Kafka. Сделайте так, чтобы событие не потерялось и не ушло без сохранённых данных.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> при одобрении подписки нужно сделать две вещи: сохранить изменение в базе и отправить сообщение в Kafka. Если программа упадёт между ними, данные и сообщения разойдутся. Хитрость: сообщение тоже сохранить в базу в той же транзакции, а отправлять отдельным процессом.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — вызов метода <code>approve(id)</code>. Выход — подписка одобрена, а в таблице <code>outbox</code> есть строка события; через секунду она отправлена в Kafka и помечена как отправленная.</p>
+      <p><b>Где писать и как запустить.</b> тот же Spring-проект, таблица <code>outbox</code> из разбора похожего задания (добавьте столбец <code>sent BOOLEAN DEFAULT false</code> или используйте <code>sent_at</code>). Для задачи по расписанию добавьте <code>@EnableScheduling</code> на класс приложения.</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>В методе <code>approve</code> с <code>@Transactional</code> измените подписку и сохраните строку outbox.</li><li>Отдельный метод с <code>@Scheduled(fixedDelay = 1000)</code> выбирает неотправленные строки.</li><li>Для каждой отправьте сообщение и дождитесь подтверждения (<code>.get()</code>), затем пометьте отправленной.</li></ol>
+      <p><b>Как проверить себя.</b> остановите Kafka (<code>docker stop kafka</code>) и одобрите подписку — запрос всё равно успешен, строка в outbox ждёт. Запустите Kafka (<code>docker start kafka</code>) — строка помечается отправленной.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Java, Spring</figcaption><pre><code>@Transactional
 public Subscription approve(long id) {
@@ -2089,6 +2505,7 @@ public void publish() throws Exception {
   <span class="th-tag">Сквозной проект · шаг 7 из 8</span>
   <h3 id="ch7-thread">FinTrack, шаг 7: микросервисы и события</h3>
   <p>Импорт уходит в отдельный асинхронный сервис, появляются бюджеты с уведомлениями о превышении и пересчёт валют по курсам ЕЦБ.</p>
+  <p class="need"><b>Что установить:</b> Kafka и Mailpit <a href="#setup-8">§0.8</a>.</p>
   <h4>Технологии (все бесплатные)</h4>
   <ul class="tech"><li><a href="https://kafka.apache.org/quickstart" target="_blank" rel="noopener">Apache Kafka</a></li><li><a href="https://docs.spring.io/spring-kafka/reference/" target="_blank" rel="noopener">Spring for Apache Kafka</a></li><li><a href="https://spring.io/projects/spring-cloud-gateway" target="_blank" rel="noopener">Spring Cloud Gateway</a></li><li><a href="https://resilience4j.readme.io/" target="_blank" rel="noopener">Resilience4j</a></li><li><a href="https://frankfurter.dev/" target="_blank" rel="noopener">Frankfurter (курсы ЕЦБ)</a></li><li><a href="https://mailpit.axllent.org/" target="_blank" rel="noopener">Mailpit</a></li></ul>
   <h4>Как делать</h4>
@@ -2123,6 +2540,10 @@ public void publish() throws Exception {
     <h2>Сквозные навыки</h2>
     <p class="ch-meta"><span>1–2 часа в неделю на протяжении всего курса</span></p>
   </header>
+  <div class="start">
+  <h3 id="ch8-start">С нуля: если вы видите это впервые</h3>
+<p class="need"><b>Что понадобится:</b> проект Java из главы 1.</p><h4>Agile</h4><p>Вместо того чтобы год писать программу по толстому плану, команда работает короткими циклами по 1–4 недели (спринтами): сделала кусочек, показала, получила отзыв, поправила план. Scrum — самый известный способ так работать.</p><h4>Алгоритмы и структуры данных</h4><p><b>Алгоритм</b> — рецепт решения задачи по шагам. <b>Структура данных</b> — способ хранить данные: от выбора зависит скорость. Бытовые примеры: <b>список</b> — пронумерованные ячейки; <b>стек</b> — стопка тарелок (берём верхнюю, ту, что положили последней); <b>очередь</b> — очередь в магазине (первым пришёл — первым ушёл); <b>словарь (HashMap)</b> — телефонная книга: по имени сразу находим номер.</p><p><b>Сложность</b> показывает, как растёт время работы, когда данных становится больше. Найти фамилию в неотсортированном списке — просмотреть всех: O(n). В отсортированном — каждый раз открывать середину: O(log n). В телефонной книге по точному имени — сразу: O(1).</p>
+  </div>
   <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Понимать, как работает команда в масштабированном Agile (SAFe).</li>
     <li>Писать чистый и проверяемый код.</li>
@@ -2181,6 +2602,15 @@ public void publish() throws Exception {
   </div>
   <div class="box task"><h4>Задача 8.1. Скобки</h4>
     <p>Классическая задача собеседований: проверьте, что в строке правильно расставлены скобки <code>()[]{}</code>. Сложность O(n).</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> дана строка из скобок. Нужно проверить, правильно ли они закрываются: каждой открывающей — своя закрывающая того же вида, и в правильном порядке.</p>
+      <p><b>Что на входе и что на выходе.</b> вход и ожидаемый выход: <code>"([]{})"</code> → true; <code>"([)]"</code> → false; <code>"(("</code> → false; <code>""</code> → true.</p>
+      <p><b>Где писать и как запустить.</b> любой Java-проект, класс <code>Brackets</code> с методом <code>static boolean balanced(String s)</code>; проверка — в <code>main</code> или тестом.</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Идите по строке символ за символом.</li><li>Открывающую скобку кладите «на стопку».</li><li>Закрывающую сравнивайте с верхней скобкой стопки: если стопка пуста или скобка не того вида — сразу false.</li><li>В конце строки стопка должна быть пустой.</li><li>Для стопки возьмите <code>ArrayDeque</code> (методы <code>push</code> и <code>pop</code>).</li></ol>
+      <p><b>Как проверить себя.</b> проверьте все четыре примера выше.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Java</figcaption><pre><code>static boolean balanced(String s) {
     Deque&lt;Character&gt; st = new ArrayDeque&lt;&gt;();
@@ -2203,6 +2633,7 @@ public void publish() throws Exception {
   <span class="th-tag">Сквозной проект · шаг 8 из 8</span>
   <h3 id="ch8-thread">FinTrack, шаг 8: качество и выпуск v1.0</h3>
   <p>Всё собирается в цельный, проверенный и задокументированный продукт, который не стыдно показать на собеседовании.</p>
+  <p class="need"><b>Что установить:</b> k6 <a href="#setup-10">§0.10</a>.</p>
   <h4>Технологии (все бесплатные)</h4>
   <ul class="tech"><li><a href="https://www.archunit.org/userguide/html/000_Index.html" target="_blank" rel="noopener">ArchUnit</a></li><li><a href="https://sonarcloud.io/" target="_blank" rel="noopener">SonarCloud</a></li><li><a href="https://grafana.com/docs/k6/latest/" target="_blank" rel="noopener">k6</a></li><li><a href="https://c4model.com/" target="_blank" rel="noopener">C4 model</a></li><li><a href="https://adr.github.io/" target="_blank" rel="noopener">ADR</a></li></ul>
   <h4>Как делать</h4>
@@ -2243,6 +2674,10 @@ class ArchitectureTest {
     <h2>Тренировочные проекты</h2>
     <p class="ch-meta"><span>Идут вместе с главами 1–6</span><span>Каждый — в портфолио</span></p>
   </header>
+  <div class="start">
+  <h3 id="ch9-start">С нуля: если вы видите это впервые</h3>
+<p>Проект — это не одно упражнение, а небольшая программа «как настоящая». Делайте её маленькими шагами: один пункт «Готово, когда» — одна ветка, один коммит. Перед началом каждого проекта перечитайте нужную главу и установите программы из главы 0.</p><h4>Как работать над проектом</h4><ol><li>Создайте репозиторий на GitHub (<a href="#setup-4">§0.4 </a>) и файл README с одной фразой: что делает проект.</li><li>Разбейте ближайший пункт на задачи по 1–2 часа и запишите их в README или в GitHub Issues.</li><li>Работайте в ветке: <code>git checkout -b step-1</code>; закончили — коммит, push, на GitHub — Pull Request, затем Merge.</li><li>Застряли больше чем на час — вернитесь к конспекту и разбору похожего задания нужной главы, поищите ошибку дословно в интернете.</li></ol>
+  </div>
   <div class="box note"><p>У каждого проекта: README по <a href="#appA">шаблону из Приложения А</a>, зелёный CI и не меньше 70 % покрытия бизнес-логики тестами. Проекты 2–5 — одна система, которая растёт от главы к главе.</p></div>
 
   <h3 id="p1"><span class="sn">9.1</span>Проект 1 — logscope (Java CLI)</h3>
@@ -2324,6 +2759,10 @@ class ArchitectureTest {
     <h2>Финальный проект: APIForge</h2>
     <p class="ch-meta"><span>8–10 недель</span><span>Платформа API-продуктов</span></p>
   </header>
+  <div class="start">
+  <h3 id="ch10-start">С нуля: если вы видите это впервые</h3>
+<p>Большой проект собирается из всего пройденного. Не пытайтесь сделать всё сразу: идите по таблице недель, после каждой недели — рабочая версия и коммит. Если неделя не укладывается — это нормально: важнее довести каждую часть до работающего состояния.</p><h4>Как работать над проектом</h4><ol><li>Создайте репозиторий на GitHub (<a href="#setup-4">§0.4 </a>) и файл README с одной фразой: что делает проект.</li><li>Разбейте ближайший пункт на задачи по 1–2 часа и запишите их в README или в GitHub Issues.</li><li>Работайте в ветке: <code>git checkout -b step-1</code>; закончили — коммит, push, на GitHub — Pull Request, затем Merge.</li><li>Застряли больше чем на час — вернитесь к конспекту и разбору похожего задания нужной главы, поищите ошибку дословно в интернете.</li></ol>
+  </div>
   <p>Небольшая версия того, чем занимается команда API ART в Swisscom: внутренние команды публикуют свои API, потребители подписываются, получают доступ и видят статистику использования. На собеседовании этот проект легко связать с их работой: API Products, IAM, EAI.</p>
 
   <h3 id="fp-features"><span class="sn">10.1</span>Возможности</h3>
@@ -2390,6 +2829,10 @@ Keycloak (IAM) · Prometheus + Grafana · OpenTelemetry → Jaeger или Tempo<
     <h2>Второй финальный проект: SlotWise — онлайн-запись к мастерам</h2>
     <p class="ch-meta"><span>8–10 недель</span><span>Полный цикл: от разговора с пользователями до запуска</span></p>
   </header>
+  <div class="start">
+  <h3 id="ch11-start">С нуля: если вы видите это впервые</h3>
+<p>Здесь вы пройдёте путь настоящего продукта: от разговора с людьми до запуска. Технически почти всё уже встречалось в главах 1–7; новое — работа с пользователями и выпуск в интернет. Каждый этап ниже — отдельная небольшая цель с галочками.</p><h4>Как работать над проектом</h4><ol><li>Создайте репозиторий на GitHub (<a href="#setup-4">§0.4 </a>) и файл README с одной фразой: что делает проект.</li><li>Разбейте ближайший пункт на задачи по 1–2 часа и запишите их в README или в GitHub Issues.</li><li>Работайте в ветке: <code>git checkout -b step-1</code>; закончили — коммит, push, на GitHub — Pull Request, затем Merge.</li><li>Застряли больше чем на час — вернитесь к конспекту и разбору похожего задания нужной главы, поищите ошибку дословно в интернете.</li></ol>
+  </div>
   <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Превращать проблему реальных людей в требования, макеты и план.</li>
     <li>Проектировать API по контракту и генерировать по нему клиент.</li>
@@ -2542,6 +2985,20 @@ if (updated == 0) throw new SoldOutException(eventId);   // → 409 Conflict</co
   </div>
   <div class="box task"><h4>Задача 11.1. Никаких двойных записей</h4>
     <p>Два клиента одновременно нажимают «Записаться» на 15:00 к одному мастеру. Проверка «свободно ли» в Java не спасает: обе транзакции видят слот свободным. Сделайте так, чтобы база сама не пустила пересекающиеся записи.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> два клиента одновременно записываются к одному мастеру на одно время. Обе записи не должны пройти. Нужно, чтобы сама база данных отказала второй, даже если программа ошиблась.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — попытки вставить записи. Выход — вторая пересекающаяся запись получает ошибку, а запись на соседнее время проходит.</p>
+      <p><b>Где писать и как запустить.</b> PostgreSQL в Docker и DBeaver (<a href="#setup-6">§0.6</a>). Создайте таблицу мастеров, затем таблицу <code>booking</code> по вашему решению и проверьте:<figure class="code"><figcaption>SQL для проверки</figcaption><pre><code>CREATE TABLE master (id BIGSERIAL PRIMARY KEY, name TEXT NOT NULL);
+INSERT INTO master (name) VALUES ('Ирина');
+-- после создания таблицы booking:
+INSERT INTO booking (master_id, client, slot) VALUES (1, 'Анна',  '[2026-11-02 15:00+02, 2026-11-02 16:00+02)');  -- проходит
+INSERT INTO booking (master_id, client, slot) VALUES (1, 'Борис', '[2026-11-02 15:30+02, 2026-11-02 16:30+02)');  -- ошибка
+INSERT INTO booking (master_id, client, slot) VALUES (1, 'Вера',  '[2026-11-02 16:00+02, 2026-11-02 17:00+02)');  -- проходит</code></pre></figure></p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Время записи храните одним столбцом-интервалом <code>tstzrange</code>.</li><li>Подключите расширение <code>btree_gist</code>.</li><li>Добавьте ограничение <code>EXCLUDE USING gist</code>: тот же мастер (<code>=</code>) и пересекающееся время (<code>&amp;&amp;</code>).</li><li>Ограничение должно действовать только для активных записей (<code>WHERE (status = 'ACTIVE')</code>).</li></ol>
+      <p><b>Как проверить себя.</b> вторая вставка падает с ошибкой «conflicting key value violates exclusion constraint», третья проходит.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>PostgreSQL + Spring</figcaption><pre><code>CREATE EXTENSION IF NOT EXISTS btree_gist;
 
@@ -2574,6 +3031,15 @@ ZonedDateTime ny   = start.atZone(ZoneId.of("America/New_York"));  // 04:00 (л�
   </div>
   <div class="box task"><h4>Задача 11.2. Свободные слоты с учётом часового пояса</h4>
     <p>Напишите метод, который для дня, часов работы и длительности услуги вернёт свободные слоты мастера в Риге, исключая занятые интервалы.</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> мастер работает с 10:00 до 14:00, услуга длится 1 час, а с 11:00 до 12:00 уже есть запись. Нужно вывести клиенту свободное время.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — день <code>2026-11-02</code>, часы работы 10:00–14:00, длительность 1 час, занято 11:00–12:00 (по Риге). Выход — свободные начала: <code>10:00, 12:00, 13:00</code>.</p>
+      <p><b>Где писать и как запустить.</b> Java-проект, класс <code>Slots</code> с методом <code>freeSlots</code>; занятые интервалы создайте вручную через <code>ZonedDateTime.of(…, ZoneId.of("Europe/Riga")).toInstant()</code>.</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Получите момент начала дня работы: дата + время открытия + часовой пояс.</li><li>В цикле прибавляйте длительность услуги, пока конец слота не выходит за закрытие.</li><li>Для каждого слота проверьте, пересекается ли он с занятыми интервалами (подсказка в разборе: «каждый начинается раньше конца другого»).</li><li>Свободные добавьте в результат.</li></ol>
+      <p><b>Как проверить себя.</b> на примере выше — ровно три слота. Дополнительно: попробуйте день <code>2026-03-29</code> (переход на летнее время) с работой 02:00–06:00 и посмотрите, что получится.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Java</figcaption><pre><code>record Busy(Instant start, Instant end) {}
 
@@ -2609,6 +3075,15 @@ RETURNING id, payload;</code></pre></figure>
   </div>
   <div class="box task"><h4>Задача 11.3. Напоминания без дублей</h4>
     <p>Приложение работает в двух экземплярах, и в каждом раз в минуту запускается задача «отправить напоминания о записях через 24 часа». Как сделать, чтобы клиент не получил два одинаковых напоминания?</p>
+    <div class="howto">
+      <h5>Как понять задание</h5>
+      <p><b>Простыми словами.</b> приложение работает в двух копиях, и каждая раз в минуту ищет записи, которые начнутся примерно через сутки, чтобы отправить напоминание. Без защиты обе копии найдут одну и ту же запись и клиент получит два письма. Нужно, чтобы каждую запись забирала только одна копия и помечала её.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — таблица <code>booking</code> с новым столбцом <code>reminded_at TIMESTAMPTZ</code>. Выход — у каждой записи одно напоминание.</p>
+      <p><b>Где писать и как запустить.</b> Spring-проект и PostgreSQL. Чтобы увидеть работу <code>SKIP LOCKED</code> без двух копий приложения, откройте в DBeaver две вкладки SQL-редактора и переключите режим <b>Auto-Commit</b> на ручной (кнопка на панели инструментов). В первой выполните <code>BEGIN;</code> и ваш <code>SELECT … FOR UPDATE SKIP LOCKED</code>, не завершая транзакцию; во второй — тот же запрос.</p>
+      <p><b>Подсказки по шагам</b> (без готового решения):</p>
+      <ol><li>Выберите записи, которые начнутся через 23–24 часа и ещё без напоминания.</li><li>Добавьте в конец запроса <code>FOR UPDATE SKIP LOCKED</code>.</li><li>Для каждой записи в той же транзакции сохраните событие в outbox и поставьте <code>reminded_at = now()</code>.</li></ol>
+      <p><b>Как проверить себя.</b> вторая вкладка DBeaver не видит строки, заблокированные первой. После <code>COMMIT</code> в первой эти строки уже помечены и больше не выбираются.</p>
+    </div>
     <details class="sol"><summary>Показать решение</summary>
       <figure class="code"><figcaption>Java, PostgreSQL</figcaption><pre><code>@Scheduled(fixedDelay = 60_000)
 @Transactional
