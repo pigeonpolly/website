@@ -29,6 +29,10 @@ const MAX_FULL = 2_500_000, MAX_THUMB = 400_000;
 const GOLD_PICKS = 15; // 3 звезды «Выбора Полли» (каждые 5 раз — звезда) = золотой ник
 const INACTIVE_DAYS = 90; // 3 месяца без загрузок и без входа — картинки можно удалить (уровень и бейджи остаются), но только при заполненном хранилище
 
+async function tagColors(env) { // цвета тегов птичек в кабинете
+  try { return JSON.parse((await env.DB.prepare("SELECT value FROM meta WHERE key = 'atag_colors'").first())?.value || '{}') || {}; } catch (e) { return {}; }
+}
+
 export default {
   async fetch(req, env) {
     const url = new URL(req.url);
@@ -2064,9 +2068,19 @@ async function route(req, env, url) {
     return json({ users: (await env.DB.prepare(`SELECT u.id, u.nick, u.created_at, u.last_seen, u.banned, u.best, u.picks, u.avatar, COALESCE(u.buttons, 0) AS buttons, u.pw IS NOT NULL AS haspw, u.pw_temp, substr(u.sub, 1, 2) AS via, COALESCE(u.atags, '') AS atags,
       (SELECT COUNT(*) FROM users f WHERE f.referrer = u.id) AS invited,
       (SELECT COUNT(*) FROM gifts g WHERE g.user_id = u.id) AS gifts,
-      (SELECT COUNT(*) FROM posts w WHERE w.user_id = u.id) AS works FROM users u ORDER BY u.created_at DESC`).all()).results });
+      (SELECT COUNT(*) FROM posts w WHERE w.user_id = u.id) AS works FROM users u ORDER BY u.created_at DESC`).all()).results, tagColors: await tagColors(env) });
   }
   // теги птичек в кабинете (видит только админ): users.atags — через запятую
+  if (m === 'POST' && p === '/api/admin/tag-color') { // цвет тега: meta atag_colors = {тег: '#rrggbb'}
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const b = await req.json().catch(() => ({})), t = String(b.tag || '').trim().slice(0, 40), c = String(b.color || '');
+    if (!t || (c && !/^#[0-9a-f]{6}$/i.test(c))) fail(400, 'bad');
+    const colors = await tagColors(env);
+    if (c) colors[t] = c; else delete colors[t];
+    await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('atag_colors', ?)").bind(JSON.stringify(colors)).run();
+    return json({ ok: true, colors });
+  }
   if (m === 'POST' && p === '/api/admin/tags') {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');

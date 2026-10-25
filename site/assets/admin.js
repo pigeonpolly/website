@@ -1014,21 +1014,24 @@
       const q = bq.trim().toLowerCase().replace(/^@/, '');
       const tagsOf = u => (u.atags || '').split(',').filter(Boolean);
       const allTags = [...new Set(d.users.flatMap(tagsOf))].sort((a, b) => a.localeCompare(b));
-      if (bTag && !allTags.includes(bTag)) bTag = '';
-      const list = d.users.filter(u => (!q || (u.nick || '').toLowerCase().includes(q)) && (!bTag || tagsOf(u).includes(bTag))).sort((a, b) => (b[bSort] || 0) - (a[bSort] || 0));
+      if (bTag && bTag !== '-' && !allTags.includes(bTag)) bTag = '';
+      const TC = d.tagColors || {}, tagSty = t => TC[t] ? ` style="background:${TC[t]}"` : '';
+      const tagChip = (t, extra = '') => `<span class="adm-tag"${tagSty(t)}>${esc(t)}${extra}</span>`;
+      const noTag = d.users.filter(u => !u.atags).length;
+      const list = d.users.filter(u => (!q || (u.nick || '').toLowerCase().includes(q)) && (!bTag || (bTag === '-' ? !u.atags : tagsOf(u).includes(bTag)))).sort((a, b) => (b[bSort] || 0) - (a[bSort] || 0));
       const week = d.users.filter(u => u.created_at > Date.now() / 1000 - 7 * 86400).length;
       const th = (k, l) => `<th><button type="button" class="adm-sort" data-bsort="${k}" aria-pressed="${bSort === k}">${l}${bSort === k ? ' ↓' : ''}</button></th>`;
       main.innerHTML = `<section class="adm-box"><h2>🐦 Все птицы: ${d.users.length}</h2>
         <p class="be-note">Новых за неделю: <b>${week}</b>. Нажмите на ник, чтобы открыть профиль и работы.</p>
         <p><button type="button" class="pill-btn pill-fill" id="adm-giftall">🎁 Подарить всем</button> <button type="button" class="pill-btn pill-fill" id="adm-salary" title="Пуговки сразу зачисляются всем птичкам с ником; при заходе на сайт птичка увидит конвертик от администрации Воббленда">💌 Выдать зарплату</button> <button type="button" class="pill-btn pill-fill" id="adm-tax" title="Списать пуговки у всех или только у тех, кто давно не заходит">🧾 Списать налог</button></p>
         <div class="be-filters"><input type="search" id="adm-bq" placeholder="🔍 Найти по нику" value="${esc(bq)}"></div>
-        ${allTags.length ? `<p class="adm-tagbar">🏷 <button type="button" class="adm-tag" data-tagf="" aria-pressed="${!bTag}">Все</button> ${allTags.map(t => `<button type="button" class="adm-tag" data-tagf="${esc(t)}" aria-pressed="${bTag === t}">${esc(t)} <small>${d.users.filter(u => tagsOf(u).includes(t)).length}</small></button>`).join(' ')}${bTag ? ` <small class="be-note">Показано: ${list.length}</small>` : ''}</p>` : ''}
+        ${allTags.length ? `<p class="adm-tagbar">🏷 <button type="button" class="adm-tag" data-tagf="" aria-pressed="${!bTag}">Все</button> ${allTags.map(t => `<button type="button" class="adm-tag" data-tagf="${esc(t)}" aria-pressed="${bTag === t}"${tagSty(t)}>${esc(t)} <small>${d.users.filter(u => tagsOf(u).includes(t)).length}</small></button>`).join(' ')} <button type="button" class="adm-tag adm-tag-none" data-tagf="-" aria-pressed="${bTag === '-'}">Без тега <small>${noTag}</small></button> <button type="button" class="adm-mini" id="adm-tagcol" title="Поменять цвет тегов">🎨 Цвета</button>${bTag ? ` <small class="be-note">Показано: ${list.length}</small>` : ''}</p>` : ''}
         <table class="be-table adm-table adm-birds"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}${th('buttons', '🔘 Пуговки')}${th('invited', '👥 Позвали')}<th>Подарки</th><th>🏷 Теги</th><th>Вход</th></tr></thead><tbody>
         ${list.map(u => `<tr><td>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}${u.banned ? ' <small class="be-danger">заблокирована</small>' : ''}</td>
           <td data-l="Появилась">${fmt(u.created_at)}</td><td data-l="Заходила">${fmt(u.last_seen)}</td><td data-l="🎨 Работ">${n(u.works)}</td><td data-l="🔥 Рекорд">${n(u.best)}</td>
           <td data-l="🔘 Пуговки"><b>${n(u.buttons)}</b> <button type="button" class="adm-mini" data-btn="${u.id}" title="Добавить или забрать пуговки">±</button></td><td data-l="👥 Позвали">${n(u.invited)}</td>
           <td data-l="Подарки"><button type="button" class="pill-btn" data-gift="${u.id}" title="Подарить семечко для аватара">🎁${u.gifts ? ' ' + u.gifts : ''}</button></td>
-          <td data-l="🏷 Теги">${tagsOf(u).map(t => `<span class="adm-tag">${esc(t)}<button type="button" class="adm-tagx" data-tagdel="${u.id}" data-tag="${esc(t)}" title="Снять тег" aria-label="Снять тег ${esc(t)}">×</button></span>`).join(' ')} <button type="button" class="adm-mini" data-tagadd="${u.id}" title="Добавить тег (можно несколько через запятую)">＋</button></td>
+          <td data-l="🏷 Теги">${tagsOf(u).map(t => tagChip(t, `<button type="button" class="adm-tagx" data-tagdel="${u.id}" data-tag="${esc(t)}" title="Снять тег" aria-label="Снять тег ${esc(t)}">×</button>`)).join(' ')} <button type="button" class="adm-mini" data-tagadd="${u.id}" title="Добавить тег (можно несколько через запятую)">＋</button></td>
           <td data-l="Вход"><small title="${u.via === 'g:' ? 'Входит через Google' : 'Входит с паролем'}">${u.via === 'g:' ? 'Google' : ''}${u.via === 'g:' && u.haspw ? ' + ' : ''}${u.haspw ? '🔑' : ''}${u.pw_temp ? ' (временный)' : ''}</small> <button type="button" class="adm-mini" data-pwreset="${u.id}" title="Временный пароль: птичка входит с ним и сразу придумывает свой">🔑 Сбросить пароль</button></td></tr>`).join('')}</tbody></table>
         <details class="adm-fine"><summary>⋯ Редко нужно</summary><p><button type="button" class="pill-btn" id="adm-backfill">🔘 Начислить всем за прошлые бейджи и рисунки</button> <small class="be-note">Нужно было один раз, когда появились пуговки. Повторно не начислит — каждая награда даётся один раз.</small></p></details></section>`;
       main.querySelectorAll('[data-gift]').forEach(b => b.onclick = () => giftDialog(d.users.find(u => u.id === +b.dataset.gift), birds));
@@ -1055,10 +1058,39 @@
       // 🏷 теги птичек: свои слова Алины, видны только в кабинете
       const saveTags = async (u, tags) => { try { const r = await api('admin/tags', { uid: u.id, tags }); u.atags = r.tags.join(','); draw(); } catch (e) { alert(err(e)); } };
       main.querySelectorAll('[data-tagf]').forEach(b => b.onclick = () => { bTag = b.dataset.tagf; draw(); });
+      // «＋»: окошко под кнопкой — готовые теги (нажать — добавить) и поле для нового; набранное сужает список
       main.querySelectorAll('[data-tagadd]').forEach(b => b.onclick = () => {
-        const u = d.users.find(x => x.id === +b.dataset.tagadd);
-        const v = prompt(`Тег для @${u.nick || u.id} (можно несколько через запятую).${allTags.length ? '\nУже есть: ' + allTags.join(', ') : ''}`, bTag);
-        if (v && v.trim()) saveTags(u, [...tagsOf(u), ...v.split(',').map(t => t.trim()).filter(Boolean)]);
+        const u = d.users.find(x => x.id === +b.dataset.tagadd), has = tagsOf(u);
+        document.querySelector('.adm-tagpop')?.remove();
+        const pop = document.createElement('div'); pop.className = 'adm-tagpop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'Тег для птички');
+        pop.innerHTML = `<b>🏷 Тег для @${esc(u.nick || String(u.id))}</b><form><input type="text" maxlength="40" placeholder="Новый тег или поиск…"><button type="submit" class="adm-mini">Добавить</button></form><div class="adm-tagpop-list"></div>`;
+        const inp = pop.querySelector('input'), box = pop.querySelector('.adm-tagpop-list');
+        const close = () => { pop.remove(); document.removeEventListener('mousedown', out, true); };
+        const out = e => { if (!pop.contains(e.target) && e.target !== b) close(); };
+        const add = t => { t = t.trim(); if (t) { close(); saveTags(u, [...has, ...t.split(',').map(x => x.trim()).filter(Boolean)]); } };
+        const fill = () => {
+          const v = inp.value.trim().toLowerCase(), opts = allTags.filter(t => !has.includes(t) && (!v || t.toLowerCase().includes(v)));
+          box.innerHTML = opts.length ? opts.map(t => `<button type="button" class="adm-tag" data-pick="${esc(t)}"${tagSty(t)}>${esc(t)}</button>`).join(' ') : `<small class="be-note">${allTags.length ? 'Нет таких — «Добавить» создаст новый' : 'Тегов ещё нет — напишите первый'}</small>`;
+          box.querySelectorAll('[data-pick]').forEach(x => x.onclick = () => add(x.dataset.pick));
+        };
+        inp.oninput = fill; pop.querySelector('form').onsubmit = e => { e.preventDefault(); add(inp.value); };
+        pop.onkeydown = e => { if (e.key === 'Escape') close(); };
+        fill(); document.body.appendChild(pop);
+        const r = b.getBoundingClientRect(), W = Math.min(300, innerWidth - 16);
+        pop.style.width = W + 'px'; pop.style.left = Math.max(8, Math.min(r.left + scrollX, scrollX + innerWidth - W - 8)) + 'px'; pop.style.top = (r.bottom + scrollY + 6) + 'px';
+        inp.focus(); document.addEventListener('mousedown', out, true);
+      });
+      // 🎨 цвета тегов: общие для всего кабинета (meta atag_colors)
+      const colBtn = main.querySelector('#adm-tagcol');
+      colBtn && (colBtn.onclick = () => {
+        let w = main.querySelector('.adm-tagcols'); if (w) { w.remove(); return; }
+        const PAL = ['', '#ffd6d6', '#ffe2c2', '#fff2b3', '#d4f2d0', '#cdeef2', '#d6e2ff', '#e8d6ff', '#ffd6ef', '#e6ddd0', '#dedede'];
+        w = document.createElement('div'); w.className = 'adm-tagcols';
+        w.innerHTML = allTags.map(t => `<div>${tagChip(t)} ${PAL.map(c => `<button type="button" class="adm-swatch" data-t="${esc(t)}" data-c="${c}" style="background:${c || '#f4f0fb'}" aria-pressed="${(TC[t] || '') === c}" title="${c ? 'Этот цвет' : 'Обычный'}"></button>`).join('')}</div>`).join('');
+        main.querySelector('.adm-tagbar').after(w);
+        w.querySelectorAll('[data-c]').forEach(x => x.onclick = async () => {
+          try { const r = await api('admin/tag-color', { tag: x.dataset.t, color: x.dataset.c }); d.tagColors = r.colors; draw(); main.querySelector('#adm-tagcol').click(); } catch (e) { alert(err(e)); }
+        });
       });
       main.querySelectorAll('[data-tagdel]').forEach(b => b.onclick = () => { const u = d.users.find(x => x.id === +b.dataset.tagdel); saveTags(u, tagsOf(u).filter(t => t !== b.dataset.tag)); });
       main.querySelector('#adm-backfill').onclick = async e => {

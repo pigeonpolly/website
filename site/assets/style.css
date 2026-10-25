@@ -2965,7 +2965,17 @@ html:not(.is-admin) .statbar { display: none; }
 .adm-tagbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
 .adm-tag { display: inline-flex; align-items: center; gap: 3px; margin: 1px 0; padding: 2px 9px; border: 1px solid #ddd6ea; border-radius: 999px; background: #f4f0fb; color: #2B1A51; font-size: .85em; white-space: nowrap; }
 button.adm-tag { cursor: pointer; }
-button.adm-tag[aria-pressed="true"] { background: #2B1A51; color: #fff; border-color: #2B1A51; }
+button.adm-tag[aria-pressed="true"] { border-color: #2B1A51; box-shadow: 0 0 0 1.5px #2B1A51; font-weight: 700; }
+button.adm-tag.adm-tag-none { background: #fff; border-style: dashed; }
+.adm-tagpop { position: absolute; z-index: 50; padding: 10px; border: 1px solid #ddd6ea; border-radius: 12px; background: #fff; box-shadow: 0 8px 24px rgba(43, 26, 81, .18); color: #2B1A51; }
+.adm-tagpop form { display: flex; gap: 6px; margin: 8px 0; }
+.adm-tagpop input { flex: 1; min-width: 0; padding: 5px 8px; border: 1px solid #ddd6ea; border-radius: 8px; font: inherit; }
+.adm-tagpop-list { display: flex; flex-wrap: wrap; gap: 6px; max-height: 180px; overflow: auto; }
+.adm-tagcols { display: grid; gap: 6px; margin: 0 0 12px; padding: 10px; border: 1px solid #ddd6ea; border-radius: 12px; background: #fff; }
+.adm-tagcols > div { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.adm-tagcols .adm-tag { min-width: 90px; margin-right: 6px; }
+.adm-swatch { width: 22px; height: 22px; border: 1px solid #ccc3dc; border-radius: 50%; cursor: pointer; padding: 0; }
+.adm-swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px #2B1A51; }
 .adm-tagx { border: 0; background: none; color: #8a7aa8; cursor: pointer; padding: 0 0 0 2px; font-size: 1.1em; line-height: 1; }
 .adm-tagx:hover { color: #c0392b; }
 .adm-sbar { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
