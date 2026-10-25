@@ -4638,11 +4638,11 @@ html.me-in .myday { display: block; }
 .hg-all { margin: 14px var(--gutter) 0; text-align: right; }
 .hg-all a { color: var(--peach); font-weight: 700; text-decoration: none; }
 /* главная под играми (24.10.2026): вошедшему — «Мой день» · мои новости · праздник + новое на сайте; гостю — новое в комнатах · праздник + новое на сайте */
-.home-dash { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 22px; align-items: start; margin: 0 auto; padding: 26px var(--gutter) 56px; }
+.home-dash { display: grid; grid-template-columns: minmax(0, 1fr); /* гостю — праздник и «Новое на сайте» во всю ширину (25.10.2026) */ gap: 22px; align-items: start; margin: 0 auto; padding: 26px var(--gutter) 56px; }
 html.me-in .home-dash { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr); }
 .hd-col { min-width: 0; }
-.hd-news, .hd-upd, html.me-in .hd-rooms { display: none; }
-html.me-in .hd-news, html.me-in .hd-upd { display: block; } /* «Новое на сайте» — только вошедшему */
+.hd-news { display: none; }
+html.me-in .hd-news { display: block; }
 .home-dash .myday { padding: 0; }
 .home-dash .md-in { grid-template-columns: 1fr; gap: 16px; }
 .hd-side { display: grid; gap: 22px; }
@@ -4673,7 +4673,7 @@ html.me-in .hd-news { position: relative; min-height: 320px; }
 .nw-done time { color: #4CC38A; opacity: 1; }
 .nw-again { color: var(--peach); font-weight: 700; text-decoration: none; padding: 0 6px; }
 @media (max-width: 1000px) { html.me-in .home-dash { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); } html.me-in .hd-side { grid-column: 1 / -1; grid-template-columns: 1fr 1fr; } }
-@media (max-width: 760px) { .home-dash, html.me-in .home-dash, html.me-in .hd-side { grid-template-columns: 1fr; } .hd-rooms { order: 2; } }
+@media (max-width: 760px) { .home-dash, html.me-in .home-dash, html.me-in .hd-side { grid-template-columns: 1fr; } }
 .acct-nick.hatching form > :not(canvas) { opacity: 0; pointer-events: none; }
 .acct-nick form > * { transition: opacity .4s; }
 .hatch-hi form { position: relative; }
