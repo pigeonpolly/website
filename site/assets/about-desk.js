@@ -476,6 +476,8 @@
   const qText = q => q.q[LG] || q.q.en || q.q.ru;
   const ansOf = (q, who) => { const a = q[who === 'a' ? 'a' : 'p'] || {}; return a[LG] || a.en || a.ru || ''; };
   const hasAns = (q, who) => !!ansOf(q, who);
+  // всего в базе у собеседника — вопросы с его ответом (пока ответов нет — все вопросы)
+  const total = w => !Q ? 0 : (Q.filter(q => hasAns(q, w)).length || Q.length);
   function match(text) {
     const toks = norm(text).split(' ').filter(t => t.length > 1);
     if (!toks.length) return [];
@@ -592,9 +594,8 @@
     log.scrollTop = log.scrollHeight;
   }
   function counter() {
-    const n = Q ? Q.length : 0;
     const c = w => Q ? Q.filter(q => opened.has(w + ':' + q.id)).length : 0;
-    $w('.ad-cnt').innerHTML = `<b>${tr(T.list)}</b><span>${tr(T.alina)}: ${c('a')} / ${n}</span><span>${tr(T.polly)}: ${c('p')} / ${n}</span>`;
+    $w('.ad-cnt').innerHTML = `<b>${tr(T.list)}</b><span>${tr(T.alina)}: ${c('a')} / ${total('a')}</span><span>${tr(T.polly)}: ${c('p')} / ${total('p')}</span>`;
     $w('.ad-save').innerHTML = user ? tr(T.saved) : `⚠ ${tr(T.guest)} <button type="button" class="ad-link">${tr(T.signin)}</button>`;
     const l = $w('.ad-save .ad-link');
     if (l) l.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
@@ -605,7 +606,7 @@
     $w('.ad-log').hidden = on;
     if (!on || !Q) return;
     const got = Q.filter(q => opened.has('a:' + q.id) || opened.has('p:' + q.id));
-    const left = Q.length - Q.filter(q => opened.has(who + ':' + q.id)).length;
+    const left = Math.max(0, total(who) - Q.filter(q => opened.has(who + ':' + q.id)).length);
     L.innerHTML = `<div class="ad-lhead"><b>${tr(T.listT)}</b><button type="button" class="ad-b ad-back">${tr(T.back)}</button></div>
       ${got.length ? `<ol>${got.map(q => `<li><button type="button" data-q="${q.id}">${esc(qText(q))}</button>${opened.has('a:' + q.id) ? `<img src="${ava('a')}" alt="${esc(tr(T.alina))}" title="${esc(tr(T.alina))}">` : ''}${opened.has('p:' + q.id) ? `<img src="${ava('p')}" alt="${esc(tr(T.polly))}" title="${esc(tr(T.polly))}">` : ''}</li>`).join('')}</ol>` : `<p>${tr(T.none)}</p>`}
       <p class="ad-left">${tr(T.left)} <b>${plural(left)}</b> (${name(who)})</p>`;
