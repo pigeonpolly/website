@@ -4642,7 +4642,7 @@ html.me-in .myday { display: block; }
 html.me-in .home-dash { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr); }
 html:not(.me-in) .home-dash { display: none; } /* гостю (25.10.2026, Алина): приветствие → блог → игры → книга */
 .hd-col { min-width: 0; }
-.hd-news, html.me-in .hd-rooms { display: none; }
+.hd-news, .hd-rooms { display: none; }
 html.me-in .hd-news { display: block; }
 .home-dash .myday { padding: 0; }
 .home-dash .md-in { grid-template-columns: 1fr; gap: 16px; }
@@ -5201,7 +5201,9 @@ html.me-in .hd-tabs { display: flex; grid-column: 2 / -1; grid-row: 1; gap: 4px;
 html.me-in .home-dash .md-card { grid-column: 2; grid-row: 2; }
 html.me-in .home-dash #blk-wl-holiday { grid-column: 3; grid-row: 2; }
 html.me-in .hd-news, html.me-in .hd-upd, html.me-in .hd-games { grid-column: 2 / -1; grid-row: 2; }
-html.me-in .hd-games { display: block; }
+html.me-in .hd-games, html.me-in .hd-rooms { display: block; }
+html.me-in .hd-rooms { grid-column: 2 / -1; grid-row: 2; } /* вкладка «Комнаты птичек» (25.10.2026) */
+html.me-in .home-dash:not([data-tab="rooms"]) .hd-rooms, html.me-in .hd-rooms .fn-h { display: none; }
 html.me-in .home-dash:not([data-tab="day"]) .md-card, html.me-in .home-dash:not([data-tab="day"]) #blk-wl-holiday,
 html.me-in .home-dash:not([data-tab="news"]) .hd-news, html.me-in .home-dash:not([data-tab="site"]) .hd-upd,
 html.me-in .home-dash:not([data-tab="games"]) .hd-games { display: none; }
@@ -5233,7 +5235,7 @@ html.me-in .gm-pin.on { background: var(--star); color: #2B1A51; }
   html.me-in .home-dash .md-me { grid-row: 1; }
   html.me-in .hd-tabs { grid-column: 1; grid-row: 2; margin: 0 calc(-1 * var(--gutter)); padding: 0 var(--gutter); }
   .hd-tabs button { padding: 9px 12px; font-size: 15px; }
-  html.me-in .home-dash .md-card, html.me-in .hd-news, html.me-in .hd-upd, html.me-in .hd-games { grid-column: 1; grid-row: 3; }
+  html.me-in .home-dash .md-card, html.me-in .hd-news, html.me-in .hd-upd, html.me-in .hd-games, html.me-in .hd-rooms { grid-column: 1; grid-row: 3; }
   html.me-in .home-dash #blk-wl-holiday { grid-column: 1; grid-row: 4; }
   .hd-gm { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
   .hd-gm .am-tile-txt i { display: none; }

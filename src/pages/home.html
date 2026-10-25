@@ -63,6 +63,7 @@
 <div class="hd-upd" data-flock-news="4" data-fn-view="site"></div>
 </div>
 <div class="hd-col hd-games" data-my-games></div>
+<div class="hd-col hd-rooms" data-flock-news="5" data-fn-view="rooms"></div>
 </div>
 <script src="/assets/flock-news.js" defer></script>
 {{block:home-blog}}
@@ -97,21 +98,21 @@
 </script>
 <script src="/assets/games-hub.js" defer></script>
 <script>
-// «Мой день» вошедшему — вкладками (24.10.2026, жалобы «перегружено»): Мой день · Письма · Новое на сайте · ★ Мои игры. Гостю блока нет (25.10.2026): приветствие → блог → игры → книга.
+// «Мой день» вошедшему — вкладками (24.10.2026, жалобы «перегружено»): Мой день · Письма · Новое на сайте · ★ Мои игры · Комнаты птичек (новое в комнатах, 25.10.2026). Гостю блока нет (25.10.2026): приветствие → блог → игры → книга.
 // Мои игры: до 3 закреплённых (☆ на плитке — тут или в полосе «Игр»), остальное место — игры, куда птичка заходит чаще (GET /api/games/mine, worker/my-games.js), потом — самые популярные.
 (function () {
   var dash = document.querySelector('.home-dash'), bar = dash && dash.querySelector('.hd-tabs'), band = document.querySelector('.home-games .gm-tiles');
   if (!dash || !bar || !band) return;
   var L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
   var T = {
-    day: ['My day', 'Мой день', 'Mana diena'], news: ['Letters', 'Письма', 'Vēstules'], site: ['New on the site', 'Новое на сайте', 'Jaunumi vietnē'], games: ['★ My games', '★ Мои игры', '★ Manas spēles'],
+    day: ['My day', 'Мой день', 'Mana diena'], news: ['Letters', 'Письма', 'Vēstules'], site: ['New on the site', 'Новое на сайте', 'Jaunumi vietnē'], games: ['★ My games', '★ Мои игры', '★ Manas spēles'], rooms: ['Bird rooms', 'Комнаты птичек', 'Putniņu istabas'],
     pin: ['Pin to “My games”', 'Закрепить в «Моих играх»', 'Piespraust “Manām spēlēm”'], unpin: ['Unpin', 'Открепить', 'Atspraust'],
     hint: ['Tap ☆ on any game to pin it here — up to 3.', 'Нажми ☆ на любой игре — закрепится здесь, до 3.', 'Nospied ☆ uz jebkuras spēles — tā paliks šeit, līdz 3.'],
     often: ['Not pinned yet — the games you open most often.', 'Пока ничего не закреплено — игры, куда заходишь чаще всего.', 'Vēl nekas nav piesprausts — spēles, kurās ieskaties visbiežāk.'],
     all: ['All games ↓', 'Все игры ↓', 'Visas spēles ↓'],
     swap: [function (n) { return '“' + n + '” unpinned — only 3 fit'; }, function (n) { return '«' + n + '» откреплена — помещается 3'; }, function (n) { return '“' + n + '” atsprausta — vietas ir 3'; }]
   };
-  var TABS = ['day', 'news', 'site', 'games'], pins = [], visits = {}, me = false, seen = 0, siteTs = [];
+  var TABS = ['day', 'news', 'site', 'games', 'rooms'], pins = [], visits = {}, me = false, seen = 0, siteTs = [];
   try { seen = +localStorage.getItem('pp-hd-site') || 0; } catch (e) {}
   bar.innerHTML = TABS.map(function (k) { return '<button type="button" role="tab" data-t="' + k + '">' + T[k][L] + ' <span class="hd-n" hidden></span></button>'; }).join('');
   var n = function (k, v) { var s = bar.querySelector('[data-t="' + k + '"] .hd-n'); s.textContent = v || ''; s.hidden = !v; };
