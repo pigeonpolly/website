@@ -17,6 +17,7 @@ import { mailApi, mailCron, mailGamesCron, mailAsk, mailPrefs, MAIL_TABLES, MAIL
 import { myGamesApi, MY_GAMES_TABLES } from './my-games.js'; // «★ Мои игры» на главной (docs/site.md)
 import { aboutChatApi, aboutAskNews, aboutChatNews, ABOUT_CHAT_TABLES, ABOUT_CHAT_ALTER, ACHAT_RULES, ACHAT_RANGE, ACHAT_INT, ACHAT_BADGES, ACHAT_COND } from './about-chat.js'; // чат «Поболтать с Алиной и Полли» на /about-me/ (docs/site.md)
 import { shiftApi, SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_RANGE, SHIFT_INT } from './shift.js'; // «Смена с Полли» (этап 29, docs/rooms.md)
+import { artpillApi, artpillDrop, artpillExport, ARTPILL_TABLES } from './artpill.js'; // «Art-Pill by Polly»: скетчбуки ИИ и отзывы (docs/artpill.md)
 import { schoolApi, schoolNews, schoolCron, SCHOOL_TABLES, SCHOOL_ALTER, SCHOOL_RULES, SCHOOL_RANGE, SCHOOL_INT } from './school.js'; // «Школа Полли»: сдача работ и проверка (docs/challenge.md)
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
 import { gardenApi, gardenDrop, gardenNews, GARDEN_TABLES, GARDEN_ALTER, GARDEN_RULES, GARDEN_RANGE, GARDEN_INT, GARDEN_BOOL, GARDEN_SEASONS } from './garden.js'; // огород птички (этап 22, docs/bird.md «Огород»)
@@ -492,6 +493,7 @@ async function ensureSchema(env) {
     ...ABOUT_CHAT_TABLES.map(sql => env.DB.prepare(sql)), // чат на /about-me/: about_chat (worker/about-chat.js)
     ...SHIFT_TABLES.map(sql => env.DB.prepare(sql)), // «Смена с Полли»: shift_runs (worker/shift.js)
     ...SCHOOL_TABLES.map(sql => env.DB.prepare(sql)), // «Школа Полли»: school_works (worker/school.js)
+    ...ARTPILL_TABLES.map(sql => env.DB.prepare(sql)), // «Art-Pill»: ap_books, ap_pages, ap_reviews (worker/artpill.js)
     ...TITOS_TABLES.map(sql => env.DB.prepare(sql)), // детектив Титос: titos, titos_cases (worker/titos.js)
     ...FLOCK_NEWS_TABLES.map(sql => env.DB.prepare(sql)), // новости стаи: flock_events (worker/flock-news.js)
     ...FLOCK_TABLES.map(sql => env.DB.prepare(sql)), // пёрышки и гости комнат: room_guests, feathers (worker/flock.js)
@@ -1475,6 +1477,7 @@ async function route(req, env, url) {
   if (p === '/api/garden' || p.startsWith('/api/garden/')) { const r = await gardenApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p === '/api/admin/ideas') { const r = await ideasApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/mail/') || p.startsWith('/api/admin/mail')) { const r = await mailApi(req, env, url, authHelpers(env)); if (r) return r; }
+  if (p === '/api/artpill' || p.startsWith('/api/artpill/')) { const r = await artpillApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now }); if (r) return r; }
   if (p === '/api/school' || p.startsWith('/api/school/') || p === '/api/admin/school' || p === '/api/admin/school/check') { const r = await schoolApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is a short friendly comment from an art teacher (Polly, a pigeon) on a student\'s drawing made on paper. Keep it warm, simple and encouraging.') }); if (r) return r; }
   if (p === '/api/games/mine' || p === '/api/games/visit') { const r = await myGamesApi(req, env, url, { json, fail, currentUser, needUser }); if (r) return r; }
   if (p === '/api/about-chat' || p.startsWith('/api/about-chat/') || p === '/api/admin/about-asks') { const r = await aboutChatApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), asset: path => env.ASSETS.fetch(new Request(new URL(path, url.origin))).then(r => r.ok ? r.json() : null), ipKey: async r => { let salt = await getMeta(env, 'blog_salt'); if (!salt) { salt = randomHex(16); await setMeta(env, 'blog_salt', salt); } return (await sha256(salt + (r.headers.get('cf-connecting-ip') || '0'))).slice(0, 24); }, translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The strings are a question a visitor asked in a cosy retro chat on an artist\'s website, or the answer of the artist Alina or of her character Polly, a dramatic, funny pigeon from the island of Wobbleland. Keep the casual, playful tone; keep names (Alina, Polly, Milka, Wobbleland) as they are.') }); if (r) return r; }
@@ -2668,6 +2671,7 @@ async function route(req, env, url) {
       account: { nick: u.nick, email: u.email, google_account_id: String(u.sub).startsWith('g:') ? u.sub : null, password_set: !!u.pw, consent_to_publish: !!u.consent, created_at: new Date(u.created_at * 1000).toISOString() },
       posts: posts.map(x => ({ ...x, image: `${url.origin}/api/img/${x.id}`, created_at: new Date(x.created_at * 1000).toISOString() })),
       cards: await myCards(env, u.id), // коллекционные карточки птички
+      artpill: await artpillExport(env, u.id), // скетчбуки ИИ и отзывы о таблетке
     };
     return new Response(JSON.stringify(data, null, 2), { headers: { 'content-type': 'application/json; charset=utf-8', 'content-disposition': 'attachment; filename="pigeonpolly-my-data.json"', 'cache-control': 'no-store' } });
   }
@@ -2678,6 +2682,7 @@ async function route(req, env, url) {
     const posts = (await env.DB.prepare('SELECT id, store, kv FROM posts WHERE user_id = ?').bind(u.id).all()).results;
     await Promise.all(posts.map(x => imgDelete(env, x)));
     if (env.MEDIA) await env.MEDIA.delete(`birdcards/${u.id}.png`).catch(() => {});
+    await artpillDrop(env, u.id, id => imgDrop(env, id)); // скетчбуки ИИ, их рисунки и отзывы
     await env.DB.batch([
       env.DB.prepare('DELETE FROM posts WHERE user_id = ?').bind(u.id),
       env.DB.prepare('DELETE FROM sessions WHERE user_id = ?').bind(u.id),

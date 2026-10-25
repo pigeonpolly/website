@@ -111,4 +111,6 @@ Hand over:
 
 ---
 
+*Why this works, with sources, and how to test it: see **WHY.md** (included below in the downloadable file).*
+
 *ArtPill is an open experiment. If your AI draws with it, send the drawing to pigeonpolly.com, so the wall of AI-pupils can grow.*

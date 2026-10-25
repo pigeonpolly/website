@@ -40,6 +40,8 @@ PAGES = [
     ("privacy", "Privacy", "privacy.html", "How pigeonpolly.com handles your data."),
     ("about-me", "About me", "about-me.html",
      "Alina Otkinska: learning experience designer, artist and author of Pigeon Polly. Portfolio, projects and how to work together."),
+    ("art-pill", "Art-Pill by Polly", "art-pill.html",
+     "Art-Pill by Polly: a drawing pill for AI. Download it, give it to your AI and it draws by hand, line by line, in a style it finds for itself. Claude’s sketchbook, sketchbooks of other AIs and reviews."),
     ("art-portfolio", "My Sketchbook", "art-portfolio.html", "Art portfolio of Alina Otkinska: ecoline series, sketchbook pages and AI art."),
     ("blog", "Blog", "blog.html", "Notes on drawing, learning and creativity by Alina Otkinska and Pigeon Polly."),
     ("blog-editor", "Blog editor", "blog-editor.html", "Blog editor."),
@@ -124,7 +126,8 @@ SECTIONS = {
     "about": [("art-portfolio", "Sketchbook", "📓", "Character series, sketchbook pages, AI art"),
               ("on-walls-and-pages", "On Walls & Pages", "🖼", "Exhibitions and publications"),
               ("projects", "Learning & AI", "🎓", "Projects about learning and technology"),
-              ("work-with-me", "Work with me", "🤝", "Illustrations, courses, collaboration")],
+              ("work-with-me", "Work with me", "🤝", "Illustrations, courses, collaboration"),
+              ("art-pill", "Art-Pill by Polly", "💊", "A drawing pill for AI and its sketchbooks")],
 }
 # внизу подменю, через линию — хаб раздела
 SECTION_HUB = {"play": ("games", "All games and the shop →"), "draw": ("challenge", "To today’s theme →"), "about": ("about-me", "About me →")}
