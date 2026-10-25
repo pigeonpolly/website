@@ -42,10 +42,6 @@
     var card = document.querySelector('[data-day-card]');
     if (card && window.PPDay && !card.dataset.on) { card.dataset.on = 1; window.PPDay.mount(card, { size: 'small' }); }
   });
-  document.addEventListener('pp:whoami', function (e) { // гостю — карточка дня-приглашение (вкладка «Мой день», 25.10.2026)
-    var u = e.detail && e.detail.user, card = document.querySelector('[data-day-card]'); if (u && u.nick) return;
-    if (card && window.PPDay && !card.dataset.on) { card.dataset.on = 1; window.PPDay.mount(card, { size: 'small' }); }
-  });
 })();
 </script>
 {{block:season}}
@@ -101,7 +97,7 @@
 </script>
 <script src="/assets/games-hub.js" defer></script>
 <script>
-// «Мой день» вошедшему — вкладками (24.10.2026, жалобы «перегружено»): Мой день · Письма · Новое на сайте · ★ Мои игры. Гостю — те же вкладки без птички, «Писем» и «Моих игр» (25.10.2026).
+// «Мой день» вошедшему — вкладками (24.10.2026, жалобы «перегружено»): Мой день · Письма · Новое на сайте · ★ Мои игры. Гостю блока нет (25.10.2026): приветствие → блог → игры → книга.
 // Мои игры: до 3 закреплённых (☆ на плитке — тут или в полосе «Игр»), остальное место — игры, куда птичка заходит чаще (GET /api/games/mine, worker/my-games.js), потом — самые популярные.
 (function () {
   var dash = document.querySelector('.home-dash'), bar = dash && dash.querySelector('.hd-tabs'), band = document.querySelector('.home-games .gm-tiles');
@@ -127,7 +123,7 @@
   };
   bar.addEventListener('click', function (e) { var b = e.target.closest('[role=tab]'); if (b) open(b.dataset.t); });
   var last = 'day'; try { last = localStorage.getItem('pp-hd-tab') || 'day'; } catch (e) {}
-  open(TABS.indexOf(last) >= 0 && last !== 'site' && (document.documentElement.classList.contains('me-in') || last !== 'news' && last !== 'games') ? last : 'day'); // гостю «Письма» и «Мои игры» скрыты
+  open(TABS.indexOf(last) >= 0 && last !== 'site' ? last : 'day');
   // Письма: непрочитанные в колонке news.js (без «✓ открыто»)
   var mine = dash.querySelector('[data-my-news]');
   if (mine && window.MutationObserver) new MutationObserver(function () { n('news', mine.querySelectorAll('.fn-row:not(.nw-done)').length); }).observe(mine, { childList: true, subtree: true });
