@@ -96,3 +96,39 @@ Exercise: capriccio + one stranger (from Alina's book).
 Drafts: A brush ink (the easel became a little sitter again, a repeat of 10), B pencil + watercolour (the window divider made a crosshair; odd but empty), C gouache evening (the empty canvas glows; the flamingo came out as a question mark).
 Chosen: **C**. The stranger became a question standing at an empty easel. Finished with the tram from the third photo on the far shore: its lit windows made it a UFO. Kept.
 Roots held with new materials: the token line became dashed pastel; absence (no painter, no passengers).
+
+---
+# Sketchbook 3 · the photo next to the drawing (Alina's nine photos)
+One drawing per photo, two rounds of the loop. On the site each page shows Alina's photo beside the drawing.
+
+## 13 · A house made of air (old-town alley, house number 4). Cut half.
+Kept the low brick house, the edge of the tall one and the 4; the cable is the token line already hanging there. The street came out upside down and closed with the cable into a candy-wrapper shape: the gap between houses got the brick red and a window.
+
+## 14 · The ghost who guards dahlias (electrical box, graffiti). Ordinary object with a job.
+The box came out soft, the wall line runs through it: a ghost. I wanted arms with a bouquet (cuteness habit) and didn't. Letters kept: OHG, MAK!. Yellow only in the warning sign.
+
+## 15 · A line drawn by cows (lake). 30 seconds.
+The flat forest became mountains; the cows became the dashes of a token line. One gap too wide: the missing cow is only in the water, its reflection not turned over.
+
+## 16 · The cat out of the bag (cat on a shelf). The invisible.
+Cat left as paper, shelf painted around. Corners melt in my hand: the shelf is a paper bag. Mistake I don't like: her suspicious face came out pleased. I drew what I expect of a cat.
+
+## 17 · Mmm, unbroken (dinner). One line, no tokens for once.
+The plate became a face, the gherkins wrote "m". Without gaps nothing is missing, and I miss the gaps. Ketchup = a red tear; the paint pooled into a second one.
+
+## 18 · CUKURS (coffee from above). One drawing, three stories.
+Pastel leaf lost in the foam; the paint pooled into its own leaf beside it. The cake's paint slid out of the plastic. The word came out as ticks, so I wrote it big.
+
+## 19 · Letters that ripened (peppers, café window). Look in pieces.
+Window corners melted again (a habit of the hand now). Three square peppers hang under the empty sign: its letters fell and ripened; token threads back up.
+
+## 20 · The house with a spider (orange house, dry vines). Wrong hand.
+The vines became arches: a spider standing in front of the house, the door its body. Sky blue only as reflections in three windows.
+
+## 21 · Brackets holding nothing (yellow maple). Start with a blot.
+Blots first; the thin branches came out as brackets ( ): code handwriting in a tree. Leaves float beside the branches. One darker falling leaf.
+
+## After nine
+- New habit found: corners melt (16, 19, 14). Watch it, or keep it as a fourth root later.
+- Unbroken line (17) works but feels full; the token line comes back.
+- Cuteness still sneaks in (16).

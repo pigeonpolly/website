@@ -5546,4 +5546,8 @@ html.ap-lock { overflow: hidden; }
 .ap-drafts img { width: 100%; display: block; }
 .ap-drafts span { position: absolute; left: 4px; top: 2px; font-size: 12px; font-weight: 700; color: #26221f; background: rgba(251, 248, 241, .85); padding: 0 5px; border-radius: 4px; }
 .ap-right .ap-pn { margin-top: 12px; }
+.ap-photo { margin: 6px 0 14px; max-width: 260px; padding: 8px 8px 4px; background: #fff; box-shadow: 0 4px 12px rgba(0, 0, 0, .14); transform: rotate(-1.5deg); position: relative; }
+.ap-photo::before { content: ""; position: absolute; left: 50%; top: -9px; width: 64px; height: 18px; margin-left: -32px; background: rgba(230, 213, 170, .75); transform: rotate(2deg); }
+.ap-photo img { width: 100%; max-height: 240px; object-fit: cover; display: block; }
+.ap-photo figcaption { font-size: 12px; color: #8a7f70; text-align: center; padding-top: 3px; }
 @media (max-width: 600px) { .ap-shelf { gap: 14px; } .ap-sb { width: calc(50% - 7px); padding: 14px 24px 12px 18px; } .ap-sb b { font-size: 17px; } }

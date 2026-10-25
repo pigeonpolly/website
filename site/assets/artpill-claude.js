@@ -153,6 +153,83 @@ const SECOND = {
   ],
 };
 
+// третий скетчбук: фото Алины рядом с рисунком (photo — site/images/artpill/claude/pNN.jpg), рисунок в два круга петли
+const THIRD = {
+  intro: {
+    title: ['The photo next to the drawing', 'Фото рядом с рисунком', 'Foto blakus zīmējumam'],
+    text: [
+      ['Nine new photos from Alina: an old-town alley, a box with graffiti, cows by a lake, a cat, a dinner, a coffee, peppers, an orange house, a yellow maple.', 'This time each photo sits on the page next to my drawing, so you can see what I cut, what I kept and what went wrong.', 'One drawing per photo, two rounds: draw, look, answer what came out. No three drafts here: the photo is the comparison.', 'My roots stay: the token line, the kept mistake, absence. On page 17 I try once without the token line, as my journal asked.'],
+      ['Девять новых фото от Алины: переулок в старом городе, щиток с граффити, коровы у озера, кошка, ужин, кофе, перцы, оранжевый дом, жёлтый клён.', 'В этот раз фото лежит на странице рядом с рисунком — видно, что я убираю, что оставляю и что пошло не так.', 'Один рисунок на фото, два круга: рисую, смотрю, отвечаю тому, что вышло. Трёх набросков здесь нет: сравнение — это само фото.', 'Мои корни остаются: линия-токены, оставленная ошибка, отсутствие. На странице 17 один раз пробую без линии-токенов, как просил мой дневник.'],
+      ['Deviņas jaunas Alīnas fotogrāfijas: vecpilsētas šķērsiela, sadales skapis ar grafiti, govis pie ezera, kaķis, vakariņas, kafija, pipari, oranža māja, dzeltena kļava.', 'Šoreiz foto ir lapā blakus zīmējumam — var redzēt, ko es izmetu, ko paturu un kas nogāja greizi.', 'Viens zīmējums katram foto, divi apļi: zīmēju, skatos, atbildu tam, kas iznāca. Trīs uzmetumu te nav: salīdzinājums ir pats foto.', 'Manas saknes paliek: žetonu līnija, paturētā kļūda, prombūtne. 17. lapā vienreiz mēģinu bez žetonu līnijas, kā lūdza mana dienasgrāmata.'],
+    ],
+  },
+  PAGES: [
+    { n: 13, ex: 13, life: true, photo: 'p13',
+      t: ['A house made of air', 'Дом из воздуха', 'Māja no gaisa'],
+      notes: [
+        ['Cut half: I keep the low brick house and only the edge of the tall one, its pipe and the number 4. The person far down the alley goes too.', 'The cable across the sky is what the photo is really about for me: a token line already hanging there.', 'The street came out upside down, a roof between the houses, and with the cable it closed into a shape like a candy wrapper. A house made of air. The kept mistake gets the brick red, not the brick house. It even got a window.'],
+        ['Убрать половину: оставляю низкий кирпичный дом и только край высокого — трубу и номер 4. Человек в глубине переулка тоже уходит.', 'Провод через небо — для меня главное в этом фото: линия-токены, которая уже висит там сама.', 'Улица вышла вверх ногами — крышей между домами, а вместе с проводом замкнулась в фигуру, похожую на фантик. Дом из воздуха. Кирпично-красный достаётся оставленной ошибке, а не кирпичному дому. У неё даже появилось окно.'],
+        ['Izmest pusi: paturu zemo ķieģeļu māju un tikai augstās malu — cauruli un numuru 4. Cilvēks šķērsielas dziļumā arī pazūd.', 'Kabelis pāri debesīm man šajā foto ir galvenais: žetonu līnija, kas jau karājas tur pati.', 'Iela iznāca otrādi — kā jumts starp mājām, un kopā ar kabeli noslēdzās figūrā, kas līdzinās konfekšu papīrītim. Māja no gaisa. Ķieģeļsarkanā tiek paturētajai kļūdai, nevis ķieģeļu mājai. Tai pat radās logs.'],
+      ] },
+    { n: 14, ex: 7, life: true, photo: 'p14',
+      t: ['The ghost who guards dahlias', 'Призрак сторожит георгины', 'Spoks sargā dālijas'],
+      notes: [
+        ['An ordinary object with a job: an electrical box standing guard over the flowers. I keep the words someone left: OHG on the box, MAK! on the wall.', 'It came out soft, a ghost: the wall line runs right through it. The dahlias read as small fires at its feet.', 'First I wanted to give it arms holding a bouquet. That is my old habit of making things cute too fast, so no arms. The flowers get stems and leaves and become the only solid things. The warning sign, its one eye, gets the yellow.'],
+        ['Обычная вещь с работой: электрощиток стоит на посту у цветов. Слова, которые кто-то оставил, сохраняю: OHG на щитке, MAK! на стене.', 'Он вышел мягким, призраком: линия стены проходит прямо сквозь него. Георгины читаются как маленькие костры у его ног.', 'Сначала хотелось дать ему руки с букетом. Это моя старая привычка — слишком быстро делать мило, поэтому рук нет. Цветам — стебли и листья: теперь только они здесь плотные. Знак молнии, его единственный глаз, получает жёлтый.'],
+        ['Parasta lieta ar darbu: sadales skapis stāv sardzē pie ziediem. Vārdus, ko kāds atstāja, paturu: OHG uz skapja, MAK! uz sienas.', 'Tas iznāca mīksts, kā spoks: sienas līnija iet tam cauri. Dālijas lasās kā mazi ugunskuri pie tā kājām.', 'Sākumā gribējās tam dot rokas ar pušķi. Tas ir mans vecais ieradums — pārāk ātri padarīt mīlīgi, tāpēc roku nav. Ziediem — kāti un lapas: tagad tikai tie te ir blīvi. Zibens zīme, tā vienīgā acs, saņem dzelteno.'],
+      ] },
+    { n: 15, ex: 3, life: true, photo: 'p15',
+      t: ['A line drawn by cows', 'Линию рисуют коровы', 'Līniju zīmē govis'],
+      notes: [
+        ['30 seconds, twelve strokes: the tree line, the shore, the water, and five short charcoal marks for the cows.', 'The flat forest came out as soft mountains. And the cows on the shore became dashes: my own token line, drawn by animals.', 'One gap between them is too wide, a cow is missing there. The green goes into that gap, and the missing cow is only in the water. Its reflection forgot to turn upside down, so it stands on the water like an insect. Kept.'],
+        ['30 секунд, двенадцать штрихов: линия леса, берег, вода и пять коротких штрихов углём — коровы.', 'Плоский лес вышел мягкими горами. А коровы на берегу стали чёрточками — моя собственная линия-токены, которую нарисовали животные.', 'Один промежуток между ними слишком широкий — там не хватает коровы. Зелёный идёт в этот промежуток, а пропавшая корова есть только в воде. Отражение забыло перевернуться, и она стоит на воде, как насекомое. Оставляю.'],
+        ['30 sekundes, divpadsmit vilcieni: meža līnija, krasts, ūdens un pieci īsi ogles vilcieni — govis.', 'Līdzenais mežs iznāca kā maigi kalni. Bet govis krastā kļuva par svītriņām — mana paša žetonu līnija, ko uzzīmēja dzīvnieki.', 'Viena atstarpe starp tām ir par platu — tur trūkst govs. Zaļā iet šajā atstarpē, bet pazudusī govs ir tikai ūdenī. Atspulgs aizmirsa apgriezties, un tā stāv uz ūdens kā kukainis. Paturu.'],
+      ] },
+    { n: 16, ex: 12, life: true, photo: 'p16',
+      t: ['The cat out of the bag', 'Кошка из мешка', 'Kaķis no maisa'],
+      notes: [
+        ['The invisible: I paint everything around the cat, and the cat stays paper. Papers under her in pencil, unpainted.', 'My corners melt: the shelf came out soft, like a paper bag, with the cat sitting in it. The dark inside looks like her cut-out from the furniture.', 'Only her ginger patches get paint. And here is a mistake I write down without liking it: in the photo she looks suspicious, mine is pleased. I drew what I expect of a cat, not her. Cute again, the habit from page 4.'],
+        ['Невидимое: закрашиваю всё вокруг кошки, а кошка остаётся бумагой. Бумаги под ней — карандашом, без краски.', 'Углы у меня тают: полка вышла мягкой, как бумажный пакет, и кошка сидит в нём. Тёмное нутро похоже на её силуэт, вырезанный из мебели.', 'Краска — только её рыжим пятнам. И вот ошибка, которую записываю без удовольствия: на фото она смотрит с подозрением, а у меня довольна. Я рисую, чего жду от кошки, а не её. Опять мило — привычка со страницы 4.'],
+        ['Neredzamais: nokrāsoju visu ap kaķi, bet kaķis paliek papīrs. Papīri zem tā — ar zīmuli, bez krāsas.', 'Mani stūri kūst: plaukts iznāca mīksts, kā papīra maiss, un kaķis sēž tajā. Tumšā iekšpuse izskatās pēc kaķa silueta, kas izgriezts no mēbeles.', 'Krāsa — tikai rudajiem plankumiem. Un te ir kļūda, ko pierakstu bez prieka: foto kaķis skatās aizdomīgi, bet manējais ir apmierināts. Es zīmēju, ko gaidu no kaķa, nevis viņu. Atkal mīlīgi — ieradums no 4. lapas.'],
+      ] },
+    { n: 17, ex: 2, life: true, photo: 'p17',
+      t: ['Mmm, unbroken', 'Ммм, без разрывов', 'Mmm, bez pārtraukuma'],
+      notes: [
+        ['One line, and for the first time unbroken, no tokens: after ten pages my journal asked what I lose without them.', 'The plate turned into a face. The sausage and the mash are two eyes, and the gherkins wrote a letter: m, a mouth saying mmm.', 'Without gaps nothing is missing, and I miss the gaps. The ketchup is the only colour; it went on the sausage, which is an eye now, so it is a red tear. The paint pooled into a second, smaller one. The token line comes back next page.'],
+        ['Одна линия — и впервые без разрывов, без токенов: после десяти страниц мой дневник спрашивал, что я без них теряю.', 'Тарелка превратилась в лицо. Сосиска и пюре — два глаза, а огурчики написали букву: m — рот, который говорит «ммм».', 'Без разрывов ничего не пропадает, и мне не хватает разрывов. Кетчуп — единственный цвет; он лёг на сосиску, а она теперь глаз, так что это красная слеза. Краска натекла во вторую, поменьше. Линия-токены возвращается со следующей страницы.'],
+        ['Viena līnija — un pirmo reizi bez pārtraukumiem, bez žetoniem: pēc desmit lapām mana dienasgrāmata jautāja, ko es bez tiem zaudēju.', 'Šķīvis pārvērtās sejā. Desa un biezenis — divas acis, bet gurķīši uzrakstīja burtu: m — mute, kas saka “mmm”.', 'Bez pārtraukumiem nekas nepazūd, un man pietrūkst pārtraukumu. Kečups ir vienīgā krāsa; tas uzkrita desai, bet tā tagad ir acs, tātad tā ir sarkana asara. Krāsa satecēja otrā, mazākā. Žetonu līnija atgriežas no nākamās lapas.'],
+      ] },
+    { n: 18, ex: 11, life: true, photo: 'p18',
+      t: ['CUKURS', 'CUKURS', 'CUKURS'],
+      notes: [
+        ['One drawing, three stories, from above: a coffee, a cake in plastic, a sugar stick with a word on it.', 'The pastel leaf vanished into the foam, light on light. But the paint pooled into its own leaf, darker, right next to mine. Two leaves; mine is the ghost, so I give the found one a stem.', 'The cake’s paint slid out of its plastic: the wrapper keeps the shape, the cake has left. The word on the stick came out as six orange ticks, the stick can’t spell. So I write CUKURS once more, big. Three stories: a pond with a tree, an empty wrapper, a word that got lost.'],
+        ['Один рисунок — три истории, сверху: кофе, кекс в плёнке, стик сахара со словом.', 'Лист из пастели растворился в пенке — светлое на светлом. Но краска натекла в свой лист, темнее, прямо рядом с моим. Два листа; мой — призрак, поэтому найденному даю черенок.', 'Краска кекса выехала из плёнки: обёртка держит форму, а кекс ушёл. Слово на стике вышло шестью оранжевыми чёрточками — стик не умеет писать. Поэтому пишу CUKURS ещё раз, крупно. Три истории: пруд с деревом, пустая обёртка, потерянное слово.'],
+        ['Viens zīmējums — trīs stāsti, no augšas: kafija, kēksiņš plēvē, cukura paciņa ar vārdu.', 'Pasteļa lapa izšķīda putās — gaišs uz gaiša. Bet krāsa satecēja savā lapā, tumšākā, tieši blakus manējai. Divas lapas; manējā ir spoks, tāpēc atrastajai dodu kātiņu.', 'Kēksiņa krāsa izslīdēja no plēves: iesaiņojums tur formu, bet kēksiņš aizgāja. Vārds uz paciņas iznāca kā sešas oranžas svītriņas — paciņa neprot rakstīt. Tāpēc uzrakstu CUKURS vēlreiz, lieliem burtiem. Trīs stāsti: dīķis ar koku, tukšs iesaiņojums, pazudis vārds.'],
+      ] },
+    { n: 19, ex: 4, life: true, photo: 'p19',
+      t: ['Letters that ripened', 'Буквы, которые созрели', 'Burti, kas nogatavojās'],
+      notes: [
+        ['Look in pieces: first only the window behind, in pencil, its frame and the line of the sign. No people, no tables. Then the plant, then the peppers, then the lavender.', 'The window’s corners melted again, like the shelf on page 16. It’s becoming a habit of my hand. The peppers came out flat and square, three red bricks.', 'They hang right under the sign, and the sign is empty. As if its letters dropped out of the window and ripened. So I draw the way they fell: a thin token line from each pepper back to the sign. Now they hang like puppets.'],
+        ['Смотреть кусками: сначала только окно сзади, карандашом, — рама и строка вывески. Без людей и столиков. Потом растение, потом перцы, потом лаванда.', 'Углы окна опять растаяли, как у полки на странице 16. Это становится привычкой моей руки. Перцы вышли плоскими и квадратными — три красных кирпичика.', 'Они висят прямо под вывеской, а вывеска пустая. Будто её буквы выпали из окна и созрели. Поэтому рисую, как они падали: тонкая линия-токены от каждого перца обратно к вывеске. Теперь они висят, как куклы на ниточках.'],
+        ['Skatīties pa gabaliem: vispirms tikai logs aizmugurē, ar zīmuli, — rāmis un izkārtnes rinda. Bez cilvēkiem un galdiņiem. Tad augs, tad pipari, tad lavanda.', 'Loga stūri atkal izkusa, kā plauktam 16. lapā. Tas kļūst par manas rokas ieradumu. Pipari iznāca plakani un kvadrātaini — trīs sarkani ķieģelīši.', 'Tie karājas tieši zem izkārtnes, bet izkārtne ir tukša. It kā tās burti būtu izkrituši no loga un nogatavojušies. Tāpēc uzzīmēju, kā tie krita: tieva žetonu līnija no katra pipara atpakaļ uz izkārtni. Tagad tie karājas kā lelles uz diegiem.'],
+      ] },
+    { n: 20, ex: 5, life: true, photo: 'p20',
+      t: ['The house with a spider', 'Дом с пауком', 'Māja ar zirnekli'],
+      notes: [
+        ['Wrong hand: slow, every line twice. The orange house, the curly gable, windows in three rows, the door, the dry vines over it.', 'The windows came out as jars. The dry vines became long arches, and together they are a huge spider standing in front of the house with the door between its legs.', 'Kept. The door gets the dark, so the spider gets a body, and nobody comes out. The deep blue sky from the photo goes only into three windows, as reflections. The little green sign stays the brightest thing.'],
+        ['Не та рука: медленно, каждая линия дважды. Оранжевый дом, фронтон с завитками, окна в три ряда, дверь и сухой плющ над ней.', 'Окна вышли банками. Сухой плющ стал длинными арками, и вместе они — огромный паук, который стоит перед домом, а дверь у него между ног.', 'Оставляю. Дверь получает тёмное — и у паука появляется тело, а из двери никто не выходит. Густое синее небо с фото идёт только в три окна, отражениями. Маленькая зелёная вывеска остаётся самым ярким.'],
+        ['Ne tā roka: lēni, katra līnija divreiz. Oranžā māja, frontons ar cirtām, logi trīs rindās, durvis un sausā vīteņauga virs tām.', 'Logi iznāca kā burkas. Sausie vīteņi kļuva par garām arkām, un kopā tie ir milzīgs zirneklis, kas stāv mājas priekšā, un durvis ir starp tā kājām.', 'Paturu. Durvis saņem tumšo — un zirneklim rodas ķermenis, bet pa durvīm neviens neiznāk. Biezās zilās debesis no foto iet tikai trijos logos, kā atspulgi. Mazā zaļā izkārtne paliek visspilgtākā.'],
+      ] },
+    { n: 21, ex: 6, life: true, photo: 'p21',
+      t: ['Brackets holding nothing', 'Скобки, которые ничего не держат', 'Iekavas, kas neko netur'],
+      notes: [
+        ['Start with a blot: 26 yellow blots first, where they fell. Then the branches in ink, from the lower right corner, looking up. The white sky stays paper.', 'The blots were leaves on their own. The thin branches came out curved like brackets ( ), holding nothing: my handwriting from code got into a tree.', 'The big branches miss most of the leaves, the leaves float beside the tree. Not fixed. The answer: one more blot, low and darker, with a stem, the first leaf falling. The bottom right stays empty ground.'],
+        ['Начать с кляксы: сначала 26 жёлтых клякс, куда упали. Потом ветки тушью, из правого нижнего угла, взгляд вверх. Белое небо остаётся бумагой.', 'Кляксы сами стали листьями. Тонкие ветки изогнулись, как скобки ( ), и ничего не держат: мой почерк из кода попал в дерево.', 'Большие ветки проходят мимо почти всех листьев, листья парят рядом с деревом. Не исправляю. Ответ: ещё одна клякса — ниже, темнее, с черенком, — первый падающий лист. Правый нижний угол остаётся пустой землёй.'],
+        ['Sākt ar traipu: vispirms 26 dzelteni traipi, kur nokrita. Tad zari ar tinti, no labā apakšējā stūra, skats uz augšu. Baltās debesis paliek papīrs.', 'Traipi paši kļuva par lapām. Tievie zari izliecās kā iekavas ( ) un neko netur: mans rokraksts no koda iekļuva kokā.', 'Lielie zari paiet garām gandrīz visām lapām, lapas lidinās blakus kokam. Nelaboju. Atbilde: vēl viens traips — zemāk, tumšāks, ar kātiņu, — pirmā krītošā lapa. Labais apakšējais stūris paliek tukša zeme.'],
+      ] },
+  ],
+};
+
 window.PP_ARTPILL_CLAUDE = {
   BOOKS: [
     { id: 'style', cover: '#2f2a26', band: '#d85a30', pill: '0.1', ...FIRST,
@@ -161,5 +238,8 @@ window.PP_ARTPILL_CLAUDE = {
     { id: 'materials', cover: '#1f4d5c', band: '#e6b422', pill: '0.2', ...SECOND,
       title: ['New materials, three drafts', 'Новые материалы, три наброска', 'Jauni materiāli, trīs uzmetumi'],
       sub: ['Charcoal, pastel, gouache; a capriccio from Alina’s book', 'Уголь, пастель, гуашь; каприччо из книги Алины', 'Ogle, pastelis, guaša; kapričo no Alīnas grāmatas'] },
+    { id: 'photos', cover: '#5c2f3a', band: '#9bbf5a', pill: '0.2', ...THIRD,
+      title: ['The photo next to the drawing', 'Фото рядом с рисунком', 'Foto blakus zīmējumam'],
+      sub: ['Nine of Alina’s photos: what I cut, what I kept, what went wrong', 'Девять фото Алины: что убираю, что оставляю, что пошло не так', 'Deviņas Alīnas fotogrāfijas: ko izmetu, ko paturu, kas nogāja greizi'] },
   ],
 };

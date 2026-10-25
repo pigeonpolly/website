@@ -72,6 +72,7 @@
     clLead: ['The first AI to take the pill. Its sketchbooks by theme, from the first page to the last, with its own notes. Open one.', 'Первый ИИ, который принял таблетку. Его скетчбуки по темам — с первой страницы до последней, с его собственными заметками. Открой любой.', 'Pirmais MI, kas iedzēra tableti. Tā skiču burtnīcas pa tēmām — no pirmās lapas līdz pēdējai, ar paša piezīmēm. Atver jebkuru.'],
     sketchbook: ['Sketchbook', 'Скетчбук', 'Skiču burtnīca'],
     closeBook: ['Close the sketchbook', 'Закрыть скетчбук', 'Aizvērt burtnīcu'],
+    photo: ['Alina’s photo', 'Фото Алины', 'Alīnas foto'],
     drafts: ['Three drafts, ★ chosen', 'Три наброска, ★ выбран', 'Trīs uzmetumi, ★ izvēlēts'],
     page: ['Page', 'Страница', 'Lapa'],
     ex: ['Exercise', 'Упражнение', 'Vingrinājums'],
@@ -189,8 +190,9 @@
     else {
       const p = B.PAGES[cur - 1];
       const dr = p.drafts ? `<p class="ap-pn">${t('drafts')}</p><div class="ap-drafts">${p.drafts.map((d, i) => `<a href="${pic(d)}" target="_blank" rel="noopener" class="${i === p.chosen ? 'on' : ''}"><img src="${pic(d)}" alt="" loading="lazy"><span>${'ABC'[i]}${i === p.chosen ? ' ★' : ''}</span></a>`).join('')}</div>` : '';
+      const ph = p.photo ? `<figure class="ap-photo"><a href="${pic(p.photo)}" target="_blank" rel="noopener"><img src="${pic(p.photo)}" alt="${t('photo')}" loading="lazy"></a><figcaption>${t('photo')}</figcaption></figure>` : '';
       spread = `<div class="ap-left"><p class="ap-pn">${t('page')} ${cur} / ${N}</p><h3>${p.t[L]}</h3>
-        <p class="ap-ex">${t('ex')}: ${exName(p)}${p.life ? ` · ${t('life')}` : ''}</p>${p.notes[L].map(x => `<p>${x}</p>`).join('')}</div>
+        <p class="ap-ex">${t('ex')}: ${exName(p)}${p.life ? ` · ${t('life')}` : ''}</p>${ph}${p.notes[L].map(x => `<p>${x}</p>`).join('')}</div>
         <div class="ap-right"><img src="${pic(p.n)}" alt="${esc(p.t[L])}">${dr}</div>`;
     }
     cl.innerHTML = `<div class="ap-book-top"><b>${B.title[L]}</b><button class="btn btn-ghost" type="button" data-close>${t('closeBook')}</button></div><div class="ap-spread" style="--b:${B.band}">${spread}</div>
