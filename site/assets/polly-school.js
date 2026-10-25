@@ -152,7 +152,7 @@
   };
   const bubble = (n, i) => {
     const s = stepsOf(n)[i], c = s.client;
-    const who = c ? `<div class="ps-who"><img src="/images/cards/${c.card}" alt=""><b>${tr(c.name)}</b><span>${tr(c.job)}</span></div>` : '';
+    const who = c ? `<div class="ps-who"><i style="background-image:url(/images/cards/${c.card})"></i><b>${tr(c.name)}</b><span>${tr(c.job)}</span></div>` : '';
     return `<li class="ps-b${c ? ' client' : ''}${i === view ? ' cur' : ''}" data-i="${i}">${who}<p>${tr(s.say)}</p>${extra(n, i)}${i === view ? `<span class="ps-eye">👁 ${t('onEasel')}</span>` : ''}</li>`;
   };
 
