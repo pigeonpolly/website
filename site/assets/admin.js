@@ -1006,24 +1006,29 @@
   }
 
   // ---------- все птицы ----------
-  let bSort = 'created_at', bq = '';
+  let bSort = 'created_at', bq = '', bTag = '';
   async function birds() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('admin/users'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
     const draw = () => {
       const q = bq.trim().toLowerCase().replace(/^@/, '');
-      const list = d.users.filter(u => !q || (u.nick || '').toLowerCase().includes(q)).sort((a, b) => (b[bSort] || 0) - (a[bSort] || 0));
+      const tagsOf = u => (u.atags || '').split(',').filter(Boolean);
+      const allTags = [...new Set(d.users.flatMap(tagsOf))].sort((a, b) => a.localeCompare(b));
+      if (bTag && !allTags.includes(bTag)) bTag = '';
+      const list = d.users.filter(u => (!q || (u.nick || '').toLowerCase().includes(q)) && (!bTag || tagsOf(u).includes(bTag))).sort((a, b) => (b[bSort] || 0) - (a[bSort] || 0));
       const week = d.users.filter(u => u.created_at > Date.now() / 1000 - 7 * 86400).length;
       const th = (k, l) => `<th><button type="button" class="adm-sort" data-bsort="${k}" aria-pressed="${bSort === k}">${l}${bSort === k ? ' ↓' : ''}</button></th>`;
       main.innerHTML = `<section class="adm-box"><h2>🐦 Все птицы: ${d.users.length}</h2>
         <p class="be-note">Новых за неделю: <b>${week}</b>. Нажмите на ник, чтобы открыть профиль и работы.</p>
         <p><button type="button" class="pill-btn pill-fill" id="adm-giftall">🎁 Подарить всем</button> <button type="button" class="pill-btn pill-fill" id="adm-salary" title="Пуговки сразу зачисляются всем птичкам с ником; при заходе на сайт птичка увидит конвертик от администрации Воббленда">💌 Выдать зарплату</button> <button type="button" class="pill-btn pill-fill" id="adm-tax" title="Списать пуговки у всех или только у тех, кто давно не заходит">🧾 Списать налог</button></p>
         <div class="be-filters"><input type="search" id="adm-bq" placeholder="🔍 Найти по нику" value="${esc(bq)}"></div>
-        <table class="be-table adm-table adm-birds"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}${th('buttons', '🔘 Пуговки')}${th('invited', '👥 Позвали')}<th>Подарки</th><th>Вход</th></tr></thead><tbody>
+        ${allTags.length ? `<p class="adm-tagbar">🏷 <button type="button" class="adm-tag" data-tagf="" aria-pressed="${!bTag}">Все</button> ${allTags.map(t => `<button type="button" class="adm-tag" data-tagf="${esc(t)}" aria-pressed="${bTag === t}">${esc(t)} <small>${d.users.filter(u => tagsOf(u).includes(t)).length}</small></button>`).join(' ')}${bTag ? ` <small class="be-note">Показано: ${list.length}</small>` : ''}</p>` : ''}
+        <table class="be-table adm-table adm-birds"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}${th('buttons', '🔘 Пуговки')}${th('invited', '👥 Позвали')}<th>Подарки</th><th>🏷 Теги</th><th>Вход</th></tr></thead><tbody>
         ${list.map(u => `<tr><td>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}${u.banned ? ' <small class="be-danger">заблокирована</small>' : ''}</td>
           <td data-l="Появилась">${fmt(u.created_at)}</td><td data-l="Заходила">${fmt(u.last_seen)}</td><td data-l="🎨 Работ">${n(u.works)}</td><td data-l="🔥 Рекорд">${n(u.best)}</td>
           <td data-l="🔘 Пуговки"><b>${n(u.buttons)}</b> <button type="button" class="adm-mini" data-btn="${u.id}" title="Добавить или забрать пуговки">±</button></td><td data-l="👥 Позвали">${n(u.invited)}</td>
           <td data-l="Подарки"><button type="button" class="pill-btn" data-gift="${u.id}" title="Подарить семечко для аватара">🎁${u.gifts ? ' ' + u.gifts : ''}</button></td>
+          <td data-l="🏷 Теги">${tagsOf(u).map(t => `<span class="adm-tag">${esc(t)}<button type="button" class="adm-tagx" data-tagdel="${u.id}" data-tag="${esc(t)}" title="Снять тег" aria-label="Снять тег ${esc(t)}">×</button></span>`).join(' ')} <button type="button" class="adm-mini" data-tagadd="${u.id}" title="Добавить тег (можно несколько через запятую)">＋</button></td>
           <td data-l="Вход"><small title="${u.via === 'g:' ? 'Входит через Google' : 'Входит с паролем'}">${u.via === 'g:' ? 'Google' : ''}${u.via === 'g:' && u.haspw ? ' + ' : ''}${u.haspw ? '🔑' : ''}${u.pw_temp ? ' (временный)' : ''}</small> <button type="button" class="adm-mini" data-pwreset="${u.id}" title="Временный пароль: птичка входит с ним и сразу придумывает свой">🔑 Сбросить пароль</button></td></tr>`).join('')}</tbody></table>
         <details class="adm-fine"><summary>⋯ Редко нужно</summary><p><button type="button" class="pill-btn" id="adm-backfill">🔘 Начислить всем за прошлые бейджи и рисунки</button> <small class="be-note">Нужно было один раз, когда появились пуговки. Повторно не начислит — каждая награда даётся один раз.</small></p></details></section>`;
       main.querySelectorAll('[data-gift]').forEach(b => b.onclick = () => giftDialog(d.users.find(u => u.id === +b.dataset.gift), birds));
@@ -1047,6 +1052,15 @@
         try { const r = await api('admin/pw-reset', { uid: u.id }); u.haspw = 1; u.pw_temp = 1; draw(); prompt(`Временный пароль — отправьте птичке (показывается один раз).\nВход: ${r.login}\nПри входе она придумает новый пароль.`, r.password); } catch (e) { alert(err(e)); }
       });
       main.querySelectorAll('[data-bsort]').forEach(b => b.onclick = () => { bSort = b.dataset.bsort; draw(); });
+      // 🏷 теги птичек: свои слова Алины, видны только в кабинете
+      const saveTags = async (u, tags) => { try { const r = await api('admin/tags', { uid: u.id, tags }); u.atags = r.tags.join(','); draw(); } catch (e) { alert(err(e)); } };
+      main.querySelectorAll('[data-tagf]').forEach(b => b.onclick = () => { bTag = b.dataset.tagf; draw(); });
+      main.querySelectorAll('[data-tagadd]').forEach(b => b.onclick = () => {
+        const u = d.users.find(x => x.id === +b.dataset.tagadd);
+        const v = prompt(`Тег для @${u.nick || u.id} (можно несколько через запятую).${allTags.length ? '\nУже есть: ' + allTags.join(', ') : ''}`, bTag);
+        if (v && v.trim()) saveTags(u, [...tagsOf(u), ...v.split(',').map(t => t.trim()).filter(Boolean)]);
+      });
+      main.querySelectorAll('[data-tagdel]').forEach(b => b.onclick = () => { const u = d.users.find(x => x.id === +b.dataset.tagdel); saveTags(u, tagsOf(u).filter(t => t !== b.dataset.tag)); });
       main.querySelector('#adm-backfill').onclick = async e => {
         e.target.disabled = true; e.target.textContent = 'Считаю…';
         try { const r = await api('admin/buttons-backfill', {}); alert(`Готово: птиц ${r.users}. Пуговки за прошлые достижения начислены.`); birds(); } catch (x) { alert(err(x)); e.target.disabled = false; }

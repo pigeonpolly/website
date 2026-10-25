@@ -2962,6 +2962,12 @@ html:not(.is-admin) .statbar { display: none; }
 .shop-buy { padding: 6px 14px; font-size: 13px; }
 .shop-buy:disabled { opacity: .5; cursor: default; }
 .adm-mini { margin-left: 4px; padding: 1px 7px; border: 1px solid #ddd6ea; border-radius: 6px; background: #fff; color: #2B1A51; cursor: pointer; }
+.adm-tagbar { display: flex; flex-wrap: wrap; gap: 6px; align-items: center; }
+.adm-tag { display: inline-flex; align-items: center; gap: 3px; margin: 1px 0; padding: 2px 9px; border: 1px solid #ddd6ea; border-radius: 999px; background: #f4f0fb; color: #2B1A51; font-size: .85em; white-space: nowrap; }
+button.adm-tag { cursor: pointer; }
+button.adm-tag[aria-pressed="true"] { background: #2B1A51; color: #fff; border-color: #2B1A51; }
+.adm-tagx { border: 0; background: none; color: #8a7aa8; cursor: pointer; padding: 0 0 0 2px; font-size: 1.1em; line-height: 1; }
+.adm-tagx:hover { color: #c0392b; }
 .adm-sbar { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
 .adm-sbar .pill-btn { padding: 5px 12px; font-size: 13px; }
 .adm-shop input { width: 90px; padding: 6px 8px; border: 1px solid #ddd6ea; border-radius: 8px; font: 15px var(--sans); }
