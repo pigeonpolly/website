@@ -2980,6 +2980,9 @@ button.adm-tag.adm-tag-none { background: #fff; border-style: dashed; }
 .adm-tagx { border: 0; background: none; color: inherit; opacity: .6; cursor: pointer; padding: 0 0 0 2px; font-size: 1.1em; line-height: 1; }
 .adm-tagx:hover { opacity: 1; }
 .adm-tag small { color: inherit; opacity: .75; }
+.adm-tagf { position: relative; display: inline-flex; }
+.adm-tagdot { position: absolute; top: -5px; right: -5px; width: 14px; height: 14px; padding: 0; border: 2px solid #fff; border-radius: 50%; background: conic-gradient(#e53935, #fdd835, #43a047, #00acc1, #1e88e5, #8e24aa, #e53935); cursor: pointer; }
+.adm-tagdot::after { content: ""; position: absolute; inset: -8px; } /* палец попадает легче */
 .adm-sbar { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
 .adm-sbar .pill-btn { padding: 5px 12px; font-size: 13px; }
 .adm-shop input { width: 90px; padding: 6px 8px; border: 1px solid #ddd6ea; border-radius: 8px; font: 15px var(--sans); }
