@@ -44,17 +44,24 @@
     noA: ['Hmm, I haven’t written an answer to this one yet. Check back soon! ✍️', 'Хм, на этот вопрос ответ ещё пишется. Загляни попозже! ✍️', 'Hmm, atbilde uz šo vēl top. Ieskaties vēlāk! ✍️'],
     noP: ['Coo… Polly is still thinking about this one. Come back later!', 'Курлы… Полли ещё думает над этим. Приходи попозже!', 'Kurr… Pollija vēl domā par šo. Nāc vēlāk!'],
     miss: ['I don’t have an answer to that yet. Maybe one of these? Or send it to Alina — she’ll answer it herself.', 'На такое ответа пока нет. Может, один из этих? Или отправь вопрос Алине — она ответит сама.', 'Uz to atbildes vēl nav. Varbūt kāds no šiem? Vai nosūti jautājumu Alīnai — viņa atbildēs pati.'],
-    own: ['📮 Send my question to Alina', '📮 Отправить вопрос Алине', '📮 Nosūtīt jautājumu Alīnai'],
+    own: ['📮 Send as', '📮 Отправить от', '📮 Nosūtīt kā'],
+    anon: ['🙈 Send anonymously', '🙈 Отправить анонимно', '🙈 Nosūtīt anonīmi'],
+    anonHint: ['Sign in if you want a notification when Alina answers.', 'Войди, если хочешь уведомление, когда Алина ответит.', 'Ienāc, ja gribi paziņojumu, kad Alīna atbildēs.'],
     ownS: ['📮 Ask my own question', '📮 Задать свой вопрос', '📮 Uzdot savu jautājumu'],
     ownOk: ['Sent! 📮 Alina will answer it herself — you’ll get a 🔔 notification, and then your question will appear here for everyone, signed with your nickname.', 'Отправлено! 📮 Алина ответит сама — придёт уведомление 🔔, а потом вопрос появится здесь у всех с твоим ником.', 'Nosūtīts! 📮 Alīna atbildēs pati — saņemsi paziņojumu 🔔, un tad jautājums parādīsies šeit visiem ar tavu segvārdu.'],
-    ownIn: ['To send your own question, sign in and get a bird with a nickname — then the answer will come to you.', 'Чтобы отправить свой вопрос, войди и заведи птичку с ником — тогда ответ придёт тебе.', 'Lai nosūtītu savu jautājumu, ienāc un izveido putniņu ar segvārdu — tad atbilde atnāks tev.'],
+    ownAnon: ['Sent anonymously! 🙈 When Alina answers, the question will appear here for everyone — come back later and look for it.', 'Отправлено анонимно! 🙈 Когда Алина ответит, вопрос появится здесь у всех — загляни попозже.', 'Nosūtīts anonīmi! 🙈 Kad Alīna atbildēs, jautājums parādīsies šeit visiem — ieskaties vēlāk.'],
+    ownAnonIn: ['Sent anonymously! 🙈 Nobody will see your nickname, but you’ll still get a 🔔 notification when Alina answers.', 'Отправлено анонимно! 🙈 Ник никто не увидит, а уведомление 🔔 об ответе всё равно придёт.', 'Nosūtīts anonīmi! 🙈 Segvārdu neviens neredzēs, bet paziņojums 🔔 par atbildi tik un tā atnāks.'],
     ownErr: { short: ['That’s a bit short for a question — add a few words?', 'Коротковато для вопроса — добавь пару слов?', 'Jautājumam mazliet par īsu — pieliec pāris vārdus?'],
       wait: ['You already have 3 questions waiting for Alina. Let her answer those first!', 'У Алины уже ждут 3 твоих вопроса. Пусть сначала ответит на них!', 'Alīnu jau gaida 3 tavi jautājumi. Lai viņa vispirms atbild uz tiem!'],
       many: ['That’s enough questions for today — come back tomorrow!', 'На сегодня вопросов хватит — приходи завтра!', 'Šodienai jautājumu pietiek — nāc rīt!'],
+      busy: ['Too many questions right now — try again in an hour!', 'Сейчас слишком много вопросов — попробуй через час!', 'Pašlaik pārāk daudz jautājumu — mēģini pēc stundas!'],
+      fast: ['Whoa, that was fast! Try sending it again.', 'Ого, как быстро! Отправь ещё раз.', 'Oho, cik ātri! Nosūti vēlreiz.'],
+      link: ['Please, no links in questions.', 'Без ссылок, пожалуйста.', 'Lūdzu, bez saitēm.'],
       x: ['Couldn’t send it — check the connection and try again.', 'Не получилось отправить — проверь интернет и попробуй ещё раз.', 'Neizdevās nosūtīt — pārbaudi savienojumu un mēģini vēlreiz.'] },
     from: ['📮 asked by', '📮 вопрос прислал(а)', '📮 jautājumu atsūtīja'],
+    fromAnon: ['📮 an anonymous question', '📮 анонимный вопрос', '📮 anonīms jautājums'],
     mine: ['📮 My questions to Alina', '📮 Мои вопросы Алине', '📮 Mani jautājumi Alīnai'],
-    mineW: ['⏳ waiting for an answer', '⏳ ждёт ответа', '⏳ gaida atbildi'], mineOk: ['✅ in the chat', '✅ в чате', '✅ čatā'],
+    mineW: ['⏳ waiting for an answer', '⏳ ждёт ответа', '⏳ gaida atbildi'], mineA: ['🙈 anonymous', '🙈 анонимно', '🙈 anonīmi'], mineOk: ['✅ in the chat', '✅ в чате', '✅ čatā'],
     opened: ['Opened', 'Открыто', 'Atvērts'], of: ['of', 'из', 'no'],
     list: ['📖 My questions', '📖 Мои вопросы', '📖 Mani jautājumi'],
     listT: ['Questions you’ve opened', 'Открытые вопросы', 'Atvērtie jautājumi'],
@@ -569,8 +576,9 @@
   }
   const $w = s => win.querySelector(s);
 
+  let openedAt = Date.now();
   function open() {
-    if (!win) build();
+    if (!win) { build(); openedAt = Date.now(); }
     win.classList.add('on');
     document.documentElement.classList.add('ad-lock');
     Promise.all([loadQ(), syncSrv()]).then(() => { setWho(who); });
@@ -606,9 +614,10 @@
   }
   function render() {
     const log = $w('.ad-log');
-    log.innerHTML = logs[who].map(m => `<div class="ad-m${m.me ? ' me' : ''}"><b>${esc(m.me ? tr(T.you) : name(who))}</b> <time>(${m.t})</time>:${m.by ? `<div class="ad-by">${tr(T.from)} <b>@${esc(m.by)}</b></div>` : ''}<div class="ad-mt">${esc(m.text).replace(/\n/g, '<br>')}</div>${m.own ? `<div class="ad-msug"><button type="button" class="ad-own" data-own="${esc(m.own)}">${tr(T.own)}</button></div>` : ''}${m.sug ? `<div class="ad-msug">${m.sug.map(id => { const q = Q.find(x => x.id === id); return q ? `<button type="button" data-q="${id}">${esc(qText(q))}</button>` : ''; }).join('')}</div>` : ''}</div>`).join('');
+    log.innerHTML = logs[who].map(m => `<div class="ad-m${m.me ? ' me' : ''}"><b>${esc(m.me ? tr(T.you) : name(who))}</b> <time>(${m.t})</time>:${m.by ? `<div class="ad-by">${m.by === '-' ? tr(T.fromAnon) : `${tr(T.from)} <b>@${esc(m.by)}</b>`}</div>` : ''}<div class="ad-mt">${esc(m.text).replace(/\n/g, '<br>')}</div>${m.own ? `<div class="ad-msug">${user && nick ? `<button type="button" class="ad-own" data-own="${esc(m.own)}">${tr(T.own)} @${esc(nick)}</button>` : ''}<button type="button" class="ad-own" data-own="${esc(m.own)}" data-anon="1">${tr(T.anon)}</button>${user && nick ? '' : `<small class="ad-hintin">${tr(T.anonHint)} <button type="button" class="ad-link" data-in="1">${tr(T.signin)}</button></small>`}</div>` : ''}${m.sug ? `<div class="ad-msug">${m.sug.map(id => { const q = Q.find(x => x.id === id); return q ? `<button type="button" data-q="${id}">${esc(qText(q))}</button>` : ''; }).join('')}</div>` : ''}</div>`).join('');
     log.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { const q = Q.find(x => x.id === b.dataset.q); if (q && !busy) ask(q); });
-    log.querySelectorAll('[data-own]').forEach(b => b.onclick = () => { if (!busy) { b.disabled = true; sendOwn(b.dataset.own); } });
+    log.querySelectorAll('[data-own]').forEach(b => b.onclick = () => { if (!busy) { b.parentNode.querySelectorAll('[data-own]').forEach(x => x.disabled = true); sendOwn(b.dataset.own, !!b.dataset.anon); } });
+    log.querySelectorAll('[data-in]').forEach(b => b.onclick = () => window.PPAccount && window.PPAccount.openSignIn());
     log.scrollTop = log.scrollHeight;
   }
   function counter() {
@@ -628,7 +637,7 @@
     L.innerHTML = `<div class="ad-lhead"><b>${tr(T.listT)}</b><button type="button" class="ad-b ad-back">${tr(T.back)}</button></div>
       ${got.length ? `<ol>${got.map(q => `<li><button type="button" data-q="${q.id}">${esc(qText(q))}</button>${opened.has('a:' + q.id) ? `<img src="${ava('a')}" alt="${esc(tr(T.alina))}" title="${esc(tr(T.alina))}">` : ''}${opened.has('p:' + q.id) ? `<img src="${ava('p')}" alt="${esc(tr(T.polly))}" title="${esc(tr(T.polly))}">` : ''}</li>`).join('')}</ol>` : `<p>${tr(T.none)}</p>`}
       <p class="ad-left">${tr(T.left)} <b>${plural(left)}</b> (${name(who)})</p>
-      ${asks.length ? `<b>${tr(T.mine)}</b><ul class="ad-mine">${asks.map(a => `<li>${esc(a.text)} <small>${a.status === 'ok' ? tr(T.mineOk) : a.status === 'new' ? tr(T.mineW) : ''}</small></li>`).join('')}</ul>` : ''}`;
+      ${asks.length ? `<b>${tr(T.mine)}</b><ul class="ad-mine">${asks.map(a => `<li>${esc(a.text)} <small>${a.status === 'ok' ? tr(T.mineOk) : a.status === 'new' ? tr(T.mineW) : ''}${a.anon ? ' · ' + tr(T.mineA) : ''}</small></li>`).join('')}</ul>` : ''}`;
     L.querySelector('.ad-back').onclick = () => showList(false);
     L.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { const q = Q.find(x => x.id === b.dataset.q); showList(false); if (q && !busy) ask(q); });
   }
@@ -645,7 +654,7 @@
     box.innerHTML = list.length || own ? head + own + list.map(q => `<button type="button" role="option" data-q="${q.id}"${opened.has(who + ':' + q.id) ? ' class="seen"' : ''}>${esc(qText(q))}</button>`).join('') : '';
     box.querySelectorAll('button').forEach(b => b.onmousedown = e => e.preventDefault());
     const ob = box.querySelector('[data-own]');
-    if (ob) ob.onclick = () => { if (!busy) { const t = text.trim(); sent(t); sendOwn(t); } };
+    if (ob) ob.onclick = () => { if (!busy) free(text.trim()); };
     box.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { const q = Q.find(x => x.id === b.dataset.q); if (q && !busy) ask(q); });
   }
   function reply(text, sug, then, extra) {
@@ -673,7 +682,7 @@
     sent(qText(q));
     const w = who, a = ansOf(q, w);
     if (!a) reply(tr(w === 'a' ? T.noA : T.noP));
-    else reply(a, null, () => markOpen(w + ':' + q.id), q.nick ? { by: q.nick } : null);
+    else reply(a, null, () => markOpen(w + ':' + q.id), /^u/.test(q.id) ? { by: q.nick || '-' } : null);
   }
   function free(text) {
     sent(text);
@@ -682,13 +691,16 @@
     reply(tr(T.miss), [...m, ...pool.map(q => q.id)].slice(0, 3), null, { own: text });
   }
   // свой вопрос → кабинет Алины (worker/about-chat.js); гостю или птичке без ника — войти
-  async function sendOwn(text) {
+  // anon — без ника (гостю — всегда анонимно); ms — сколько открыт чат (защита от ботов)
+  async function sendOwn(text, anon) {
     await syncSrv();
-    if (!user || !nick) { reply(tr(T.ownIn)); if (window.PPAccount) setTimeout(() => window.PPAccount.openSignIn(), 1200); return; }
+    const named = user && nick && !anon;
     let r = null, d = {};
-    try { r = await fetch('/api/about-chat/ask', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text, lang: LG }) }); d = await r.json().catch(() => ({})); } catch (e) { r = null; }
-    if (r && r.ok) { if (!d.dup) asks.unshift({ id: d.id, text, status: 'new' }); reply(tr(T.ownOk)); }
-    else reply(tr(T.ownErr[d.error] || T.ownErr.x));
+    try { r = await fetch('/api/about-chat/ask', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ text, lang: LG, anon: !named, ms: Date.now() - openedAt }) }); d = await r.json().catch(() => ({})); } catch (e) { r = null; }
+    if (r && r.ok) {
+      if (user && !d.dup) asks.unshift({ id: d.id, text, status: 'new', anon: !named });
+      reply(tr(named ? T.ownOk : user && nick ? T.ownAnonIn : T.ownAnon));
+    } else reply(tr(T.ownErr[d.error] || T.ownErr.x));
   }
   function dice() {
     if (!Q || busy) return;

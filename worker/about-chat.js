@@ -1,9 +1,9 @@
 // Чат «Поболтать с Алиной и Полли» на /about-me/ (site/assets/about-desk.js, docs/site.md).
 // 1) Какие вопросы птичка уже открыла. Ключ — «a:q012» (ответ Алины) или «p:q012» (ответ Полли); вопросы посетителей — «a:u7».
 //    Гость копит в sessionStorage, после входа всё сливается сюда.
-// 2) Свои вопросы: птичка с ником присылает вопрос, которого нет в базе → кабинет «📮 Вопросы из чата» (about-admin.js).
+// 2) Свои вопросы: птичка с ником (от себя или анонимно) или гость (анонимно) присылает вопрос, которого нет в базе → кабинет «📮 Вопросы из чата» (about-admin.js).
 //    Алина отвечает по-русски (за себя и/или за Полли), вопрос и ответы переводятся на en/ru/lv и попадают в игру
-//    с пометкой «прислал(а) @ник»; автору — новость aboutask, пока не открыл чат.
+//    с пометкой «прислал(а) @ник» (или «анонимный вопрос»); автору с аккаунтом — новость aboutask, пока не открыл чат.
 // API: GET /api/about-chat → {opened, user, nick, asks}; POST /api/about-chat {add: [ключи]}; POST /api/about-chat/ask {text, lang};
 //      GET /api/about-chat/extra → {questions}; GET /api/admin/about-asks?status=; POST /api/admin/about-asks {id, q, a, p, status}.
 
@@ -14,9 +14,12 @@ export const ABOUT_CHAT_TABLES = [
   'CREATE INDEX IF NOT EXISTS about_asks_s ON about_asks (status)',
   'CREATE INDEX IF NOT EXISTS about_asks_u ON about_asks (user_id)',
 ];
+// анонимные вопросы (25.10.2026): гость (user_id = 0) или птичка, отметившая «анонимно» (anon = 1, ник в игре не показывается);
+// ip — хеш адреса с солью, для лимитов гостей
+export const ABOUT_CHAT_ALTER = ['ALTER TABLE about_asks ADD COLUMN anon INTEGER DEFAULT 0', 'ALTER TABLE about_asks ADD COLUMN ip TEXT'];
 const KEY = /^[ap]:(q\d{3,4}|u\d{1,7})$/, MAX = 2000;
 const LANGS = ['en', 'ru', 'lv'];
-export const ASK_MIN = 5, ASK_LEN = 200, ASK_WAIT = 3, ASK_DAY = 10; // длина вопроса; сколько может ждать ответа сразу; в сутки
+export const ASK_MIN = 5, ASK_LEN = 200, ASK_WAIT = 3, ASK_DAY = 10, GUEST_DAY = 5, GUEST_HOUR = 30; // длина вопроса; ждут ответа сразу; в сутки; гостю с адреса в сутки; гостей со всего сайта в час
 const parse = (s, d) => { try { return JSON.parse(s) || d; } catch (e) { return d; } };
 const langOf = t => /[а-яё]/i.test(t) ? 'ru' : /[āēīūčšžņļķģ]/i.test(t) ? 'lv' : 'en';
 
@@ -26,7 +29,7 @@ export async function aboutAskNews(env, uid) {
   return r.length ? { n: r.length, id: r[0].id, q: parse(r[0].tr, {}).q || {} } : null;
 }
 
-// h: json, fail, currentUser, needUser, isAdmin, now, translate(texts, from, langs) → { tr: {lang: [..]} }
+// h: json, fail, currentUser, needUser, isAdmin, now, ipKey(req) → хеш адреса, translate(texts, from, langs) → { tr: {lang: [..]} }
 export async function aboutChatApi(req, env, url, h) {
   const p = url.pathname, m = req.method, { json, fail } = h;
   const rowOf = async uid => {
@@ -34,15 +37,15 @@ export async function aboutChatApi(req, env, url, h) {
     return parse(r && r.opened, []).filter(k => KEY.test(k));
   };
   if (m === 'GET' && p === '/api/about-chat/extra') {
-    const rows = (await env.DB.prepare("SELECT a.id, a.tr, u.nick FROM about_asks a JOIN users u ON u.id = a.user_id WHERE a.status = 'ok' ORDER BY a.answered_at").all()).results;
-    const questions = rows.map(r => ({ id: 'u' + r.id, nick: r.nick || '', ...parse(r.tr, {}) })).filter(x => x.q);
+    const rows = (await env.DB.prepare("SELECT a.id, a.tr, a.anon, u.nick FROM about_asks a LEFT JOIN users u ON u.id = a.user_id WHERE a.status = 'ok' ORDER BY a.answered_at").all()).results;
+    const questions = rows.map(r => ({ id: 'u' + r.id, nick: r.anon ? '' : r.nick || '', ...parse(r.tr, {}) })).filter(x => x.q); // nick '' — анонимный вопрос
     return json({ questions }, 200, { 'cache-control': 'public, max-age=120' });
   }
   if (m === 'GET' && p === '/api/about-chat') {
     const u = await h.currentUser(req, env);
     if (!u) return json({ opened: [], user: false, asks: [] }, 200, { 'cache-control': 'no-store' });
-    const asks = (await env.DB.prepare('SELECT id, text, status, tr, seen FROM about_asks WHERE user_id = ? ORDER BY id DESC LIMIT 30').bind(u.id).all()).results
-      .map(r => ({ id: 'u' + r.id, text: r.text, status: r.status, fresh: r.status === 'ok' && !r.seen }));
+    const asks = (await env.DB.prepare('SELECT id, text, status, tr, seen, anon FROM about_asks WHERE user_id = ? ORDER BY id DESC LIMIT 30').bind(u.id).all()).results
+      .map(r => ({ id: 'u' + r.id, text: r.text, status: r.status, anon: !!r.anon, fresh: r.status === 'ok' && !r.seen }));
     if (asks.some(a => a.fresh)) await env.DB.prepare("UPDATE about_asks SET seen = 1 WHERE user_id = ? AND status = 'ok' AND seen = 0").bind(u.id).run(); // открыл чат — ответы увидены
     return json({ opened: await rowOf(u.id), user: true, nick: u.nick || '', asks }, 200, { 'cache-control': 'no-store' });
   }
@@ -59,31 +62,42 @@ export async function aboutChatApi(req, env, url, h) {
     return json({ opened });
   }
   if (m === 'POST' && p === '/api/about-chat/ask') {
-    const u = await h.needUser(req, env);
-    if (!u.nick || u.banned) fail(400, 'nick');
+    const u0 = await h.currentUser(req, env);
+    if (u0 && u0.banned) fail(403, 'banned');
+    const u = u0 && u0.nick ? u0 : null; // без ника — как гость
     const b = await req.json().catch(() => ({}));
+    if (b.hp) return json({ ok: true, id: 'u0' }); // скрытое поле заполняют только боты
     const text = String(b.text || '').replace(/\s+/g, ' ').trim().slice(0, ASK_LEN);
     if (text.length < ASK_MIN) fail(400, 'short');
-    const wait = (await env.DB.prepare("SELECT COUNT(*) AS n FROM about_asks WHERE user_id = ? AND status = 'new'").bind(u.id).first()).n;
+    if (/https?:|www\.|\.(com|net|org|ru|lv|io)\b/i.test(text)) fail(400, 'link'); // без ссылок
+    const anon = u ? (b.anon ? 1 : 0) : 1, ip = await h.ipKey(req);
+    // лимиты: птичке — по аккаунту, гостю — по адресу и общий наплыв гостей
+    const by = u ? ['user_id = ?', u.id] : ['user_id = 0 AND ip = ?', ip];
+    const wait = (await env.DB.prepare(`SELECT COUNT(*) AS n FROM about_asks WHERE ${by[0]} AND status = 'new'`).bind(by[1]).first()).n;
     if (wait >= ASK_WAIT) fail(429, 'wait');
-    const day = (await env.DB.prepare('SELECT COUNT(*) AS n FROM about_asks WHERE user_id = ? AND created_at > ?').bind(u.id, h.now() - 86400).first()).n;
-    if (day >= ASK_DAY) fail(429, 'many');
+    const day = (await env.DB.prepare(`SELECT COUNT(*) AS n FROM about_asks WHERE ${by[0]} AND created_at > ?`).bind(by[1], h.now() - 86400).first()).n;
+    if (day >= (u ? ASK_DAY : GUEST_DAY)) fail(429, 'many');
+    if (!u) {
+      if (!(Number(b.ms) >= 2000)) fail(400, 'fast'); // человек не напишет вопрос быстрее 2 с после открытия чата
+      const hour = (await env.DB.prepare('SELECT COUNT(*) AS n FROM about_asks WHERE user_id = 0 AND created_at > ?').bind(h.now() - 3600).first()).n;
+      if (hour >= GUEST_HOUR) fail(429, 'busy');
+    }
     const low = text.toLowerCase(); // lower() в SQLite не знает кириллицы — сравниваем здесь
-    const same = (await env.DB.prepare("SELECT id, text FROM about_asks WHERE user_id = ? AND status != 'no'").bind(u.id).all()).results.find(r => r.text.toLowerCase() === low);
+    const same = (await env.DB.prepare(`SELECT id, text FROM about_asks WHERE ${by[0]} AND status != 'no'`).bind(by[1]).all()).results.find(r => r.text.toLowerCase() === low);
     if (same) return json({ ok: true, id: 'u' + same.id, dup: true });
     const lang = LANGS.includes(b.lang) ? b.lang : langOf(text);
-    const r = await env.DB.prepare('INSERT INTO about_asks (user_id, text, lang, created_at) VALUES (?, ?, ?, ?)').bind(u.id, text, lang, h.now()).run();
-    return json({ ok: true, id: 'u' + r.meta.last_row_id });
+    const r = await env.DB.prepare('INSERT INTO about_asks (user_id, text, lang, anon, ip, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(u ? u.id : 0, text, lang, anon, ip, h.now()).run();
+    return json({ ok: true, id: 'u' + r.meta.last_row_id, anon: !!anon });
   }
   if (p === '/api/admin/about-asks') {
     const u = await h.needUser(req, env);
     if (!(await h.isAdmin(u, env))) fail(403, 'admin');
     if (m === 'GET') {
       const st = ['new', 'ok', 'no'].includes(url.searchParams.get('status')) ? url.searchParams.get('status') : 'new';
-      const rows = (await env.DB.prepare(`SELECT a.*, u.nick FROM about_asks a JOIN users u ON u.id = a.user_id WHERE a.status = ? ORDER BY a.created_at ${st === 'new' ? 'ASC' : 'DESC'} LIMIT 300`).bind(st).all()).results;
+      const rows = (await env.DB.prepare(`SELECT a.*, u.nick FROM about_asks a LEFT JOIN users u ON u.id = a.user_id WHERE a.status = ? ORDER BY a.created_at ${st === 'new' ? 'ASC' : 'DESC'} LIMIT 300`).bind(st).all()).results;
       const n = (await env.DB.prepare('SELECT status, COUNT(*) AS n FROM about_asks GROUP BY status').all()).results;
       return json({
-        asks: rows.map(r => { const t = parse(r.tr, {}); return { id: r.id, nick: r.nick, text: r.text, lang: r.lang, status: r.status, at: r.created_at, answered: r.answered_at, q: (t.q || {}).ru || '', a: (t.a || {}).ru || '', p: (t.p || {}).ru || '', langs: Object.keys(t.q || {}) }; }),
+        asks: rows.map(r => { const t = parse(r.tr, {}); return { id: r.id, nick: r.nick || '', anon: !!r.anon, text: r.text, lang: r.lang, status: r.status, at: r.created_at, answered: r.answered_at, q: (t.q || {}).ru || '', a: (t.a || {}).ru || '', p: (t.p || {}).ru || '', langs: Object.keys(t.q || {}) }; }),
         counts: Object.fromEntries(n.map(x => [x.status, x.n])),
       }, 200, { 'cache-control': 'no-store' });
     }

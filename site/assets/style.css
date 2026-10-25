@@ -5418,3 +5418,4 @@ html.ad-lock { overflow: hidden; }
 .ad-msug .ad-own:hover, .ad-sug .ad-own:hover, .ad-sug .ad-own.on { background: #c80000; color: #fff; }
 .ad-mine { margin: 6px 0 0; padding-left: 20px; }
 .ad-mine small { color: #555; }
+.ad-hintin { flex-basis: 100%; color: #555; font-size: 12px; }

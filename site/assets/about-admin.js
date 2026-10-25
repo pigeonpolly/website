@@ -1,6 +1,6 @@
 // Кабинет → «📮 Вопросы из чата» (admin.js открывает PPAboutAdmin.mount(main)): вопросы, которых не было в базе чата /about-me/
 // (worker/about-chat.js). Алина отвечает по-русски за себя и/или за Полли → вопрос и ответы переводятся и попадают в игру
-// с пометкой «прислал(а) @ник», автору — новость. «Не добавлять» — вопрос не появится в игре (из «В игре» — убирает).
+// с пометкой «прислал(а) @ник» или «анонимный вопрос», автору с аккаунтом — новость. «Не добавлять» — вопрос не появится в игре (из «В игре» — убирает).
 (() => {
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const TABS = [['new', '⏳ Ждут ответа'], ['ok', '✅ В игре'], ['no', '🚫 Не добавлены']];
@@ -19,10 +19,10 @@
     let d; try { d = await api('admin/about-asks?status=' + tab); } catch (e) { main.innerHTML = `<p class="be-note">${esc(ERR[e.message] || e.message)}</p>`; return; }
     const c = d.counts || {};
     main.innerHTML = `<section class="adm-box aa"><h2>📮 Вопросы из чата</h2>
-      <p class="be-note">Вопросы, которых не было в чате «Поболтать с Алиной и Полли» (/about-me/). Ответьте по-русски — за себя, за Полли или за обеих. Вопрос можно поправить: в игре он будет таким, как в поле «Вопрос». После «Ответить» всё переводится на EN и LV и появляется в чате у всех с пометкой «📮 прислал(а) @ник», а автору приходит новость.</p>
+      <p class="be-note">Вопросы, которых не было в чате «Поболтать с Алиной и Полли» (/about-me/). Ответьте по-русски — за себя, за Полли или за обеих. Вопрос можно поправить: в игре он будет таким, как в поле «Вопрос». После «Ответить» всё переводится на EN и LV и появляется в чате у всех с пометкой «📮 прислал(а) @ник» (анонимные — «📮 анонимный вопрос»), а автору с аккаунтом приходит новость.</p>
       <div class="sa-tabs">${TABS.map(([k, n]) => `<button type="button" class="pill-btn${k === tab ? ' pill-fill' : ''}" data-tab="${k}">${n} · ${c[k] || 0}</button>`).join('')}</div>
       ${d.asks.length ? `<ul class="aa-list">${d.asks.map(a => `<li class="aa-q" data-id="${a.id}">
-        <p class="sa-top"><a href="/bird/?nick=${encodeURIComponent(a.nick)}" target="_blank">@${esc(a.nick)}</a> · <small>${dm(a.at)} · прислано на ${LANG[a.lang] || a.lang}</small></p>
+        <p class="sa-top">${!a.nick ? '🙈 Гость (аноним)' : a.anon ? `🙈 Аноним · <a href="/bird/?nick=${encodeURIComponent(a.nick)}" target="_blank">@${esc(a.nick)}</a> <small>(ник видите только вы)</small>` : `<a href="/bird/?nick=${encodeURIComponent(a.nick)}" target="_blank">@${esc(a.nick)}</a>`} · <small>${dm(a.at)} · прислано на ${LANG[a.lang] || a.lang}</small></p>
         <p class="aa-orig">❓ ${esc(a.text)}</p>
         <label>Вопрос (как будет в игре)<input type="text" maxlength="200" data-f="q" value="${esc(a.q || a.text)}"></label>
         <label>Ответ Алины<textarea rows="3" data-f="a">${esc(a.a)}</textarea></label>
