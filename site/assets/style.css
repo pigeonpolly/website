@@ -5406,10 +5406,3 @@ html.ad-lock { overflow: hidden; }
   .ad-scene { border-radius: 14px; }
   .ad-hot:hover { outline: none; background: none; }
 }
-.wl-more { margin: 0 0 4px; }
-.wl-more summary { list-style: none; display: inline-flex; margin: 0 0 22px; cursor: pointer; }
-.wl-more summary::-webkit-details-marker { display: none; }
-.wl-more .c, .wl-more[open] .o { display: none; }
-.wl-more[open] .c { display: inline; }
-.wl-more[open] summary { order: 2; margin: 0 0 6px; }
-.wl-more[open] { display: flex; flex-direction: column; align-items: flex-start; }

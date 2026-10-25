@@ -510,6 +510,8 @@
       if (location.hash === '#recipes') history.replaceState(null, '', location.pathname + location.search);
       opener && opener.focus();
     };
+    const moreBtn = document.getElementById('wl-more-btn'), more = document.getElementById('wl-more');
+    if (moreBtn && more) moreBtn.addEventListener('click', () => { more.hidden = !more.hidden; moreBtn.setAttribute('aria-expanded', !more.hidden); moreBtn.textContent = more.hidden ? moreBtn.dataset.o : moreBtn.dataset.c; });
     document.querySelectorAll('#wl-spine, [data-open-book]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); openBook(el); }));
     bm.querySelector('.wl-bookmodal-x').addEventListener('click', closeBook);
     bm.addEventListener('click', e => { if (e.target === bm) closeBook(); });
