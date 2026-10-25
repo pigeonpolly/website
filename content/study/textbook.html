@@ -151,6 +151,26 @@ figure.code code { background: none; padding: 0; font-size: inherit; }
 .box.task > p { margin: 4px 0 8px; }
 details.sol { border-top: 1px solid var(--rule); }
 details.sol figure.code { margin: 10px 0; }
+.quiz { border: 1px solid var(--accent); border-radius: 10px; padding: 16px 18px; margin: 16px 0 24px; font-family: var(--f-ui); }
+.quiz .qz-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: baseline; gap: 6px 16px; margin-bottom: 8px; }
+.quiz .qz-head b { font-size: 15px; }
+.quiz .qz-best { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.quiz ol { padding-left: 1.4em; margin: 0; }
+.quiz ol > li { margin: 0 0 18px; max-width: none; }
+.quiz .qz-q { font: 400 17px/1.5 var(--f-body); margin: 0 0 6px; }
+.quiz .qz-opt { display: flex; gap: 10px; align-items: flex-start; padding: 6px 10px; margin: 4px 0; border: 1px solid var(--rule); border-radius: 8px; cursor: pointer; font-size: 15px; }
+.quiz .qz-opt input { margin-top: .25em; accent-color: var(--accent); flex: none; }
+.quiz .qz-opt:hover { border-color: var(--accent); }
+.quiz.done .qz-opt { cursor: default; }
+.quiz .qz-opt.right { border-color: var(--ok); background: var(--ok-soft); }
+.quiz .qz-opt.wrong { border-color: var(--warm); background: var(--warm-soft); }
+.quiz .qz-why { font-size: 14.5px; color: var(--muted); margin: 6px 0 0; padding-left: 10px; border-left: 2px solid var(--rule); }
+.quiz .qz-why b.ok { color: var(--ok); } .quiz .qz-why b.no { color: var(--warm); }
+.quiz .qz-res { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 18px; padding: 12px 14px; border-radius: 8px; background: var(--accent-soft); margin-bottom: 14px; }
+.quiz .qz-pct { font: 700 34px/1 var(--f-body); color: var(--accent); font-variant-numeric: tabular-nums; }
+.quiz .qz-pct.good { color: var(--ok); } .quiz .qz-pct.low { color: var(--warm); }
+.quiz .qz-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.quiz .qz-note { font-size: 13px; color: var(--muted); }
 .box.note { border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; font-size: 16px; }
 .box.note p { margin: 0; }
 
@@ -241,7 +261,7 @@ mark { background: var(--mark); color: inherit; }
   </div>
 
   <h3 id="intro-how">Как пользоваться учебником</h3>
-  <p>Все материалы бесплатны и находятся в открытом доступе. Каждая глава устроена одинаково: <b>цели</b>, <b>ключевые понятия</b> с объяснениями, <b>теория</b> (книги, курсы, видео, документация), <b>листинг</b> с примером кода, <b>интересный факт</b>, <b>практика</b>, <b>задачи с решениями</b>, <b>упражнения</b>, <b>вопросы «Проверь себя»</b> и <b>чек-лист навыков</b>. Галочки сохраняются на сайте, их видно с любого устройства, где выполнен вход.</p>
+  <p>Все материалы бесплатны и находятся в открытом доступе. Каждая глава устроена одинаково: <b>цели</b>, <b>ключевые понятия</b> с объяснениями, <b>теория</b> (книги, курсы, видео, документация), <b>листинг</b> с примером кода, <b>интересный факт</b>, <b>практика</b>, <b>задачи с решениями</b>, <b>упражнения</b>, <b>вопросы «Проверь себя»</b>, <b>тест</b> с оценкой в % и разбором ответов и <b>чек-лист навыков</b>. В начале главы перечислено, что вы будете уметь после неё. Галочки сохраняются на сайте, их видно с любого устройства, где выполнен вход.</p>
   <p>Оглавление слева показывает, сколько пунктов главы уже отмечено. Кнопка «Продолжить» ведёт к первому неотмеченному пункту. Поиск находит любую тему, книгу или термин.</p>
 
   <h3 id="intro-rules">Принципы самообучения</h3>
@@ -290,7 +310,7 @@ mark { background: var(--mark); color: inherit; }
     <h2>Современная Java и инструменты</h2>
     <p class="ch-meta"><span>3–4 недели</span><span>Проект: logscope</span></p>
   </header>
-  <div class="goals"><h4>Цели главы</h4><ul>
+  <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Писать идиоматичный код на Java 17–21, а не «Java 8 со старыми привычками».</li>
     <li>Уверенно работать с коллекциями, Stream API и многопоточностью.</li>
     <li>Собирать проект Gradle/Maven, покрывать его тестами JUnit 5.</li>
@@ -390,6 +410,9 @@ static double area(Shape s) {
     <details><summary>Чем map отличается от flatMap в Stream?</summary><p>map превращает каждый элемент в один новый, flatMap — в поток элементов и «расплющивает» их в один общий поток.</p></details>
   </div>
 
+  <h3 id="ch1-test"><span class="sn">1.5</span>Тест для самопроверки</h3>
+  <div class="quiz" data-quiz="1"></div>
+
   <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
     <li><label><input type="checkbox" data-k="c1-s1"><span>Пишу records, sealed-интерфейсы и switch-выражения с pattern matching.</span></label></li>
     <li><label><input type="checkbox" data-k="c1-s2"><span>Решаю задачи со Stream API без циклов там, где так понятнее.</span></label></li>
@@ -406,7 +429,7 @@ static double area(Shape s) {
     <h2>Базы данных, SQL и JPA</h2>
     <p class="ch-meta"><span>2 недели, можно параллельно с главой 3</span><span>Проект: taskhub-api</span></p>
   </header>
-  <div class="goals"><h4>Цели главы</h4><ul>
+  <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Проектировать схему: нормализация, ключи, индексы.</li>
     <li>Писать SQL с JOIN, агрегатами и оконными функциями.</li>
     <li>Понимать транзакции и уровни изоляции.</li>
@@ -500,6 +523,9 @@ ORDER BY done_pct DESC NULLS LAST;</code></pre></figure>
     <details><summary>От чего защищает уровень изоляции READ COMMITTED и от чего нет?</summary><p>Защищает от «грязного чтения» незафиксированных данных. Не защищает от неповторяющегося чтения и фантомов: повторный SELECT в той же транзакции может вернуть другой результат.</p></details>
   </div>
 
+  <h3 id="ch2-test"><span class="sn">2.5</span>Тест для самопроверки</h3>
+  <div class="quiz" data-quiz="2"></div>
+
   <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
     <li><label><input type="checkbox" data-k="c2-s1"><span>Проектирую схему в 3НФ и знаю, когда денормализовать.</span></label></li>
     <li><label><input type="checkbox" data-k="c2-s2"><span>Пишу JOIN, GROUP BY, оконные функции и читаю EXPLAIN.</span></label></li>
@@ -514,7 +540,7 @@ ORDER BY done_pct DESC NULLS LAST;</code></pre></figure>
     <h2>Spring Boot и REST API</h2>
     <p class="ch-meta"><span>5–6 недель</span><span>Проект: taskhub-api</span></p>
   </header>
-  <div class="goals"><h4>Цели главы</h4><ul>
+  <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Понимать, что делает Spring «под капотом»: IoC, DI, автоконфигурация.</li>
     <li>Проектировать и документировать REST API по правилам.</li>
     <li>Обрабатывать ошибки и валидацию в едином формате.</li>
@@ -637,6 +663,9 @@ class TaskControllerTest {
     <details><summary>Чем PUT отличается от PATCH?</summary><p>PUT заменяет ресурс целиком и идемпотентен. PATCH меняет часть полей.</p></details>
   </div>
 
+  <h3 id="ch3-test"><span class="sn">3.5</span>Тест для самопроверки</h3>
+  <div class="quiz" data-quiz="3"></div>
+
   <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
     <li><label><input type="checkbox" data-k="c3-s1"><span>Объясняю, как Spring создаёт бины и что делает автоконфигурация.</span></label></li>
     <li><label><input type="checkbox" data-k="c3-s2"><span>Проектирую REST API: ресурсы, статусы, пагинация, версии.</span></label></li>
@@ -656,7 +685,7 @@ class TaskControllerTest {
     <h2>TypeScript и Angular</h2>
     <p class="ch-meta"><span>6 недель</span><span>Проект: taskhub-web</span></p>
   </header>
-  <div class="goals"><h4>Цели главы</h4><ul>
+  <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Писать строго типизированный TypeScript.</li>
     <li>Строить приложение на современном Angular: standalone-компоненты, signals, новый control flow.</li>
     <li>Понимать RxJS настолько, чтобы делать поиск, загрузку и отмену запросов правильно.</li>
@@ -786,6 +815,9 @@ export const appConfig: ApplicationConfig = {
     <details><summary>Где во фронтенде хранить токен доступа?</summary><p>Безопаснее всего в памяти, а обновлять через refresh-механизм библиотеки OIDC. localStorage доступен любому скрипту при XSS. В крупных системах часто используют паттерн BFF: токены на сервере, браузер держит только HttpOnly-cookie.</p></details>
   </div>
 
+  <h3 id="ch4-test"><span class="sn">4.5</span>Тест для самопроверки</h3>
+  <div class="quiz" data-quiz="4"></div>
+
   <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
     <li><label><input type="checkbox" data-k="c4-s1"><span>Пишу TypeScript в strict-режиме без <code>any</code>.</span></label></li>
     <li><label><input type="checkbox" data-k="c4-s2"><span>Строю приложение из standalone-компонентов с lazy-loaded маршрутами и guards.</span></label></li>
@@ -803,7 +835,7 @@ export const appConfig: ApplicationConfig = {
     <p class="ch-meta"><span>3 недели</span><span>Проект: taskhub + Keycloak</span></p>
   </header>
   <div class="box note"><p>В вакансии отдельно названы secure development и, как плюс, IAM и ForgeRock. Эта глава даёт заметное преимущество перед другими кандидатами.</p></div>
-  <div class="goals"><h4>Цели главы</h4><ul>
+  <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Знать OWASP Top 10 и уметь закрыть каждый пункт в своём коде.</li>
     <li>Понимать OAuth 2.0 и OpenID Connect на уровне схем потоков.</li>
     <li>Настроить Spring Security как Resource Server и вход в Angular через Keycloak.</li>
@@ -904,6 +936,9 @@ jdbc.query("SELECT * FROM task WHERE title LIKE ?", mapper, "%" + q + "%");</cod
     <details><summary>Как защититься от SQL-инъекций?</summary><p>Только параметризованные запросы (PreparedStatement, JPA-параметры) и никакой склейки строк с пользовательским вводом. Плюс минимальные права у пользователя БД.</p></details>
   </div>
 
+  <h3 id="ch5-test"><span class="sn">5.5</span>Тест для самопроверки</h3>
+  <div class="quiz" data-quiz="5"></div>
+
   <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
     <li><label><input type="checkbox" data-k="c5-s1"><span>Объясняю каждый пункт OWASP Top 10 и как его закрыть.</span></label></li>
     <li><label><input type="checkbox" data-k="c5-s2"><span>Рассказываю потоки OAuth 2.0 / OIDC: Authorization Code + PKCE, Client Credentials.</span></label></li>
@@ -922,7 +957,7 @@ jdbc.query("SELECT * FROM task WHERE title LIKE ?", mapper, "%" + q + "%");</cod
     <h2>Docker, CI/CD, Kubernetes и AWS</h2>
     <p class="ch-meta"><span>6 недель</span><span>Проект: taskhub в Kubernetes</span></p>
   </header>
-  <div class="goals"><h4>Цели главы</h4><ul>
+  <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Упаковывать сервисы в компактные и безопасные образы.</li>
     <li>Строить конвейер: сборка → тесты → проверка → образ → развёртывание.</li>
     <li>Разворачивать и отлаживать приложение в Kubernetes, описывать его в Helm.</li>
@@ -1060,6 +1095,9 @@ spec:
     <details><summary>Как не переплатить за учебный аккаунт AWS?</summary><p>Включить AWS Budgets с оповещением на почту, создавать ресурсы только через Terraform и после демонстрации выполнять <code>terraform destroy</code>. EKS и NAT Gateway платные даже при простое.</p></details>
   </div>
 
+  <h3 id="ch6-test"><span class="sn">6.5</span>Тест для самопроверки</h3>
+  <div class="quiz" data-quiz="6"></div>
+
   <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
     <li><label><input type="checkbox" data-k="c6-s1"><span>Пишу Dockerfile и docker-compose для сервиса с базой.</span></label></li>
     <li><label><input type="checkbox" data-k="c6-s2"><span>Строю CI/CD в GitHub Actions: тесты, проверки, образ, развёртывание.</span></label></li>
@@ -1076,7 +1114,7 @@ spec:
     <h2>Микросервисы и интеграции</h2>
     <p class="ch-meta"><span>4 недели</span><span>Проект: APIForge</span></p>
   </header>
-  <div class="goals"><h4>Цели главы</h4><ul>
+  <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Делить систему на сервисы по бизнес-границам, а не по слоям.</li>
     <li>Выбирать между синхронным REST и асинхронными сообщениями.</li>
     <li>Делать систему устойчивой к сбоям соседей.</li>
@@ -1183,6 +1221,9 @@ public void publish() throws Exception {
     <details><summary>Почему консьюмер Kafka должен быть идемпотентным?</summary><p>Обычная гарантия доставки — at-least-once: одно сообщение может прийти дважды (например, после ребалансировки). Повторная обработка не должна портить данные.</p></details>
   </div>
 
+  <h3 id="ch7-test"><span class="sn">7.5</span>Тест для самопроверки</h3>
+  <div class="quiz" data-quiz="7"></div>
+
   <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
     <li><label><input type="checkbox" data-k="c7-s1"><span>Делю систему на сервисы по бизнес-границам и защищаю решение в ADR.</span></label></li>
     <li><label><input type="checkbox" data-k="c7-s2"><span>Пишу продюсеров и консьюмеров Kafka с обработкой ошибок и повторов.</span></label></li>
@@ -1198,7 +1239,7 @@ public void publish() throws Exception {
     <h2>Сквозные навыки</h2>
     <p class="ch-meta"><span>1–2 часа в неделю на протяжении всего курса</span></p>
   </header>
-  <div class="goals"><h4>Цели главы</h4><ul>
+  <div class="goals"><h4>После этой главы вы будете уметь</h4><ul>
     <li>Понимать, как работает команда в масштабированном Agile (SAFe).</li>
     <li>Писать чистый и проверяемый код.</li>
     <li>Быть готовым к алгоритмической части собеседования.</li>
@@ -1247,6 +1288,9 @@ public void publish() throws Exception {
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c8-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
+  <h3 id="ch8-test"><span class="sn">8.5</span>Тест для самопроверки</h3>
+  <div class="quiz" data-quiz="8"></div>
+
   <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
     <li><label><input type="checkbox" data-k="c8-s1"><span>Объясняю, что такое ART, PI Planning, Definition of Done.</span></label></li>
     <li><label><input type="checkbox" data-k="c8-s2"><span>SonarCloud подключён ко всем проектам, критичных замечаний нет.</span></label></li>
@@ -1527,7 +1571,8 @@ Link to Swagger UI / OpenAPI file.
       const own = ch.querySelectorAll('input[data-k]'), c = toc.querySelector(`[data-c="${ch.id}"]`);
       if (!c || !own.length) continue;
       const d = [...own].filter(b => b.checked).length;
-      c.textContent = d === own.length ? '✓' : `${d}/${own.length}`;
+      const qz = state['qz' + ch.dataset.ch];
+      c.textContent = (d === own.length ? '✓' : `${d}/${own.length}`) + (qz ? ` · ${qz}%` : '');
       c.classList.toggle('full', d === own.length);
     }
   }
@@ -1554,8 +1599,52 @@ Link to Swagger UI / OpenAPI file.
   });
   state = local.get(); paint();
   fetch('/api/study', { credentials: 'same-origin', cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(d => {
-    if (d && d.state && typeof d.state === 'object') { state = d.state; local.set(state); paint(); saveEl.textContent = 'Сохранено на сайте'; }
+    if (d && d.state && typeof d.state === 'object') { state = d.state; local.set(state); paint(); quizBest(); saveEl.textContent = 'Сохранено на сайте'; }
   }).catch(() => {});
+
+
+  // ---------- тесты: бесконечные попытки, результат в %, разбор; лучший результат — state['qzN'] ----------
+  const QUIZ = {"1": [{"q": "Что компилятор автоматически создаёт для <code>record</code>?", "a": ["Канонический конструктор, методы доступа, equals, hashCode и toString", "Только геттеры и сеттеры", "Builder и конструктор без параметров", "Ничего, всё пишется вручную"], "c": 0, "why": "Record — носитель данных: поля final, а конструктор, методы доступа (<code>name()</code>, не <code>getName()</code>), equals, hashCode и toString генерируются. Сеттеров нет — record неизменяемый."}, {"q": "Что вернёт <code>List.of(1, 2, 3).stream().map(x -&gt; x * 2).filter(x -&gt; x &gt; 2).count()</code>?", "a": ["3", "2", "1", "6"], "c": 1, "why": "После map получаем 2, 4, 6. Фильтр «больше 2» оставляет 4 и 6 — это 2 элемента."}, {"q": "Что произойдёт при вызове <code>List.of(1, 2).add(3)</code>?", "a": ["Список станет [1, 2, 3]", "Вернётся false", "Будет UnsupportedOperationException", "Ошибка компиляции"], "c": 2, "why": "<code>List.of</code> создаёт неизменяемый список. Код компилируется, потому что add есть в интерфейсе List, но во время выполнения бросается UnsupportedOperationException."}, {"q": "В какой задаче виртуальные потоки дают наибольший выигрыш?", "a": ["Вычисление больших простых чисел", "Тысячи одновременных HTTP-запросов и запросов к базе", "Сортировка массива в памяти", "Обработка изображения на одном ядре"], "c": 1, "why": "Виртуальные потоки дёшевы, пока ждут ввода-вывода. Для вычислительных задач они не быстрее обычных: число ядер процессора не меняется."}, {"q": "Что означает <code>sealed interface Shape permits Circle, Rect</code>?", "a": ["Shape нельзя реализовать вообще", "Реализовать Shape могут только Circle и Rect", "Circle и Rect нельзя наследовать", "Shape становится final-классом"], "c": 1, "why": "sealed ограничивает список наследников. Благодаря этому компилятор знает все варианты и проверяет, что <code>switch</code> по Shape исчерпывающий."}, {"q": "Чем <code>orElseGet(supplier)</code> отличается от <code>orElse(value)</code> у Optional?", "a": ["Ничем", "orElseGet вычисляет запасное значение только если Optional пуст", "orElseGet бросает исключение при пустом Optional", "orElse работает только со строками"], "c": 1, "why": "Аргумент <code>orElse</code> вычисляется всегда, даже если значение есть. <code>orElseGet</code> вызывает функцию только при пустом Optional — это важно, если запасное значение дорого получить."}, {"q": "Что сравнивает <code>==</code> для двух объектов String?", "a": ["Содержимое строк", "Длину строк", "Ссылки — один ли это объект", "Хэш-коды"], "c": 2, "why": "<code>==</code> для объектов сравнивает ссылки. Содержимое строк сравнивают через <code>equals</code>."}, {"q": "Какая команда Git переносит коммиты ветки поверх другой ветки, переписывая историю?", "a": ["git merge", "git rebase", "git cherry", "git stash"], "c": 1, "why": "<code>rebase</code> переигрывает коммиты поверх новой базы и создаёт новые коммиты. <code>merge</code> историю не переписывает, а добавляет коммит слияния."}], "2": [{"q": "Какой запрос вернёт все проекты, даже без задач?", "a": ["project INNER JOIN task", "project LEFT JOIN task", "task LEFT JOIN project", "project CROSS JOIN task"], "c": 1, "why": "LEFT JOIN сохраняет все строки левой таблицы (project); у проектов без задач поля задачи будут NULL."}, {"q": "Есть индекс <code>(project_id, status)</code>. Какой фильтр использует его лучше всего?", "a": ["WHERE status = ?", "WHERE project_id = ? AND status = ?", "WHERE title = ?", "WHERE created_at &gt; ?"], "c": 1, "why": "Составной B-tree индекс работает по левому префиксу: (project_id) или (project_id, status). Только по status он обычно не помогает."}, {"q": "Что означает атомарность (A в ACID)?", "a": ["Транзакция выполняется быстро", "Все изменения транзакции применяются целиком или не применяются вовсе", "Данные шифруются", "Транзакции идут строго по очереди"], "c": 1, "why": "Атомарность — «всё или ничего». Последовательное выполнение — это про изоляцию, а не атомарность."}, {"q": "Чем <code>COUNT(column)</code> отличается от <code>COUNT(*)</code>?", "a": ["Ничем", "COUNT(column) не считает строки, где column равен NULL", "COUNT(*) не считает NULL", "COUNT(column) работает только с числами"], "c": 1, "why": "COUNT(*) считает все строки, COUNT(column) — только строки с не-NULL значением. Поэтому при LEFT JOIN считают COUNT(t.id)."}, {"q": "Чем HAVING отличается от WHERE?", "a": ["Ничем, это синонимы", "HAVING фильтрует группы после GROUP BY, WHERE — строки до группировки", "WHERE работает только с индексами", "HAVING быстрее"], "c": 1, "why": "WHERE отбрасывает строки до группировки, HAVING — готовые группы по агрегатам (например, HAVING COUNT(*) &gt; 5)."}, {"q": "Что такое проблема N+1?", "a": ["Ошибка индексации на N+1 строке", "Один запрос за списком и ещё по запросу на каждый элемент за связанными данными", "Лимит соединений с базой", "Переполнение первичного ключа"], "c": 1, "why": "Типичная ловушка JPA с ленивыми связями. Лечится JOIN FETCH, @EntityGraph или batch fetching."}, {"q": "Можно ли поменять уже применённую миграцию Flyway V1?", "a": ["Да, Flyway применит изменения сам", "Нет: изменится контрольная сумма и проверка упадёт — нужна новая миграция V2", "Да, если перезапустить приложение", "Только в PostgreSQL"], "c": 1, "why": "Flyway хранит контрольные суммы применённых миграций. Изменения схемы всегда идут новой версией."}, {"q": "Какая стратегия загрузки по умолчанию у <code>@OneToMany</code> в JPA?", "a": ["EAGER", "LAZY", "BATCH", "Зависит от базы"], "c": 1, "why": "Коллекции (@OneToMany, @ManyToMany) по умолчанию LAZY, а @ManyToOne и @OneToOne — EAGER."}], "3": [{"q": "Какой статус HTTP возвращают при успешном создании ресурса?", "a": ["200 OK", "201 Created", "204 No Content", "302 Found"], "c": 1, "why": "201 Created и заголовок Location с адресом нового ресурса."}, {"q": "Какой метод HTTP не идемпотентен?", "a": ["GET", "PUT", "DELETE", "POST"], "c": 3, "why": "Повторный POST обычно создаёт ещё один ресурс. GET, PUT и DELETE при повторе дают тот же результат."}, {"q": "Что нужно, чтобы аннотации вроде @NotBlank на DTO проверялись в контроллере?", "a": ["@Valid перед @RequestBody", "@Autowired", "@Transactional", "Ничего, проверка включена всегда"], "c": 0, "why": "Без @Valid (или @Validated) Spring не запускает Bean Validation для тела запроса."}, {"q": "Что поднимает @WebMvcTest?", "a": ["Весь контекст приложения и базу", "Только веб-слой: контроллеры, advice, MockMvc", "Только репозитории", "Настоящий HTTP-сервер на порту"], "c": 1, "why": "@WebMvcTest — срез веб-слоя. Сервисы подменяются моками, поэтому тест быстрый."}, {"q": "Какой способ внедрения зависимостей рекомендуется?", "a": ["@Autowired на поле", "Через конструктор", "Через статический метод", "Через сеттер всегда"], "c": 1, "why": "Через конструктор: поля final, зависимости видны, класс легко создать в тесте без Spring."}, {"q": "Как держать отдельные настройки для production?", "a": ["Менять application.yml перед каждым деплоем", "Профиль: application-prod.yml и spring.profiles.active=prod", "Писать настройки в коде", "Отдельная ветка Git"], "c": 1, "why": "Профили позволяют один артефакт запускать с разной конфигурацией. Секреты — через переменные окружения."}, {"q": "Что делает @RestControllerAdvice?", "a": ["Ускоряет контроллеры", "Обрабатывает исключения всех контроллеров в одном месте", "Создаёт REST-клиент", "Включает CORS"], "c": 1, "why": "Обработчики @ExceptionHandler в таком классе применяются ко всем контроллерам — так получается единый формат ошибок."}, {"q": "Зачем нужен Testcontainers?", "a": ["Генерировать тестовые данные", "Поднимать настоящие PostgreSQL, Kafka и др. в Docker на время тестов", "Запускать тесты параллельно", "Измерять покрытие"], "c": 1, "why": "Тесты идут против настоящей базы той же версии, что в production, а не против H2, которая ведёт себя иначе."}], "4": [{"q": "Какой оператор RxJS отменяет предыдущий запрос при новом значении?", "a": ["mergeMap", "concatMap", "switchMap", "exhaustMap"], "c": 2, "why": "switchMap переключается на новый внутренний поток и отписывается от старого. mergeMap выполняет всё параллельно, concatMap — по очереди, exhaustMap игнорирует новые, пока идёт текущий."}, {"q": "Как в Angular создать значение, вычисляемое из других сигналов?", "a": ["effect()", "computed()", "signal()", "input()"], "c": 1, "why": "computed() пересчитывается автоматически, когда меняются сигналы, которые он читает. effect() — для побочных действий, а не для значений."}, {"q": "Зачем в <code>@for</code> указывают <code>track</code>?", "a": ["Для сортировки", "Чтобы Angular узнавал элементы и перерисовывал только изменённые", "Для фильтрации", "Это необязательное украшение"], "c": 1, "why": "По track Angular сопоставляет элементы между обновлениями. В @for он обязателен."}, {"q": "Что произойдёт, если вызвать <code>http.get(url)</code> и не подписаться?", "a": ["Запрос уйдёт сразу", "Запрос не отправится", "Будет ошибка", "Запрос уйдёт при следующем рендере"], "c": 1, "why": "Observable из HttpClient «холодный»: запрос отправляется только при подписке (subscribe, async pipe, toSignal)."}, {"q": "Как подключить функциональный interceptor?", "a": ["@Injectable в providers", "provideHttpClient(withInterceptors([fn]))", "В angular.json", "Через @Component"], "c": 1, "why": "В приложениях на standalone-компонентах interceptors-функции передают в withInterceptors при provideHttpClient."}, {"q": "Что делает <code>debounceTime(300)</code>?", "a": ["Задерживает каждое значение на 300 мс", "Пропускает значение, только если после него 300 мс не было новых", "Выдаёт не чаще раза в 300 мс первое значение", "Ограничивает запрос 300 мс"], "c": 1, "why": "debounce ждёт паузу. «Не чаще раза в N мс» — это throttleTime."}, {"q": "Как называется тип <code>string | number</code> в TypeScript?", "a": ["Intersection", "Union", "Tuple", "Generic"], "c": 1, "why": "Union — «одно из». Intersection (<code>A &amp; B</code>) — «и то и другое одновременно»."}, {"q": "Чем standalone-компонент отличается от прежних?", "a": ["Не может иметь шаблон", "Не требует NgModule и сам перечисляет импорты", "Работает без TypeScript", "Не поддерживает DI"], "c": 1, "why": "Standalone-компоненты — стандарт современного Angular: зависимости указываются в поле imports самого компонента."}], "5": [{"q": "Пользователь вошёл, но у него нет прав на удаление. Какой статус?", "a": ["400", "401", "403", "404"], "c": 2, "why": "403 Forbidden — личность известна, прав нет. 401 — нет действительной аутентификации."}, {"q": "Какой поток OAuth рекомендован для SPA?", "a": ["Implicit", "Password", "Authorization Code + PKCE", "Client Credentials"], "c": 2, "why": "Implicit и Password больше не рекомендуются. PKCE защищает обмен кода для клиентов, которые не могут хранить секрет."}, {"q": "Что OpenID Connect добавляет к OAuth 2.0?", "a": ["Шифрование трафика", "Аутентификацию пользователя: ID token и userinfo", "Хранение паролей", "Rate limiting"], "c": 1, "why": "OAuth 2.0 — про доступ к ресурсам. OIDC добавляет вход: кто именно пользователь."}, {"q": "Лучшая защита от SQL-инъекций?", "a": ["Экранировать кавычки вручную", "Параметризованные запросы", "Скрывать текст ошибок", "Использовать HTTPS"], "c": 1, "why": "Параметры передаются базе отдельно от SQL и не могут стать кодом. Ручное экранирование легко ошибается."}, {"q": "Для чего нужен refresh token?", "a": ["Обновлять страницу", "Получать новый access token без повторного входа", "Хранить пароль", "Подписывать запросы"], "c": 1, "why": "Access token живёт коротко (минуты). Refresh token позволяет получить новый без участия пользователя."}, {"q": "Почему хранить токен в localStorage рискованно?", "a": ["Он слишком мал", "Его может прочитать любой скрипт на странице при XSS", "Его удаляет браузер каждый час", "Он не работает с HTTPS"], "c": 1, "why": "localStorage доступен из JavaScript. Безопаснее держать токен в памяти или использовать BFF с HttpOnly-cookie."}, {"q": "Что гарантирует подпись JWT?", "a": ["Секретность содержимого", "Целостность и подлинность: токен не подделан", "Что пользователь онлайн", "Что токен нельзя украсть"], "c": 1, "why": "Содержимое JWT (payload) читается любым — это Base64URL. Подпись лишь доказывает, что его выдал сервер и не меняли."}, {"q": "Какой поток для общения сервиса с сервисом без пользователя?", "a": ["Authorization Code", "Client Credentials", "Device Code", "Implicit"], "c": 1, "why": "Client Credentials: сервис получает токен по своему client_id и секрету."}], "6": [{"q": "Что происходит при провале readiness probe?", "a": ["Контейнер перезапускается", "Под убирается из Service и не получает трафик", "Удаляется Deployment", "Ничего"], "c": 1, "why": "Перезапуск — это реакция на провал liveness. Readiness только временно выводит под из балансировки."}, {"q": "Главная цель multi-stage сборки Docker?", "a": ["Ускорить запуск JVM", "Получить маленький итоговый образ без инструментов сборки", "Запустить несколько процессов", "Шифровать образ"], "c": 1, "why": "JDK, Gradle и исходники остаются в промежуточном образе; в итоговом — только JRE и jar."}, {"q": "Какой объект Kubernetes даёт постоянный адрес группе подов?", "a": ["Pod", "Service", "ConfigMap", "Node"], "c": 1, "why": "Поды пересоздаются с новыми IP. Service находит их по меткам и даёт стабильное имя и адрес."}, {"q": "Почему тег <code>latest</code> плох в production?", "a": ["Он медленнее", "Непонятно, какая версия развёрнута, и сложно откатиться", "Kubernetes его не поддерживает", "Он платный"], "c": 1, "why": "Неизменяемые теги (версия или SHA коммита) делают развёртывание воспроизводимым."}, {"q": "По принципам Twelve-Factor App где хранить конфигурацию?", "a": ["В коде", "В переменных окружения", "В базе данных", "В README"], "c": 1, "why": "Конфигурация отделена от кода и меняется между окружениями без пересборки."}, {"q": "Что делает <code>terraform plan</code>?", "a": ["Создаёт ресурсы", "Показывает, что изменится, ничего не меняя", "Удаляет ресурсы", "Форматирует код"], "c": 1, "why": "plan — предпросмотр. Изменения вносит apply, удаляет destroy."}, {"q": "p95 времени ответа равен 200 мс. Что это значит?", "a": ["Среднее время 200 мс", "95 % запросов выполнились не дольше 200 мс", "5 % запросов выполнились за 200 мс", "Максимум 200 мс"], "c": 1, "why": "Перцентили лучше среднего показывают, что чувствует большинство пользователей, и не прячут медленные хвосты."}, {"q": "Что делает <code>helm upgrade --install</code>?", "a": ["Только удаляет релиз", "Обновляет релиз, а если его нет — устанавливает", "Обновляет сам Helm", "Собирает образ"], "c": 1, "why": "Удобная идемпотентная команда для CI: одна и та же для первого и последующих развёртываний."}], "7": [{"q": "Какую проблему решает паттерн Outbox?", "a": ["Медленные запросы", "Двойную запись: данные в БД и событие в брокер не сохраняются атомарно", "Нехватку памяти", "Авторизацию"], "c": 1, "why": "Событие пишется в таблицу в той же транзакции, что и данные, а отдельный процесс публикует его."}, {"q": "Что делает Circuit Breaker в состоянии OPEN?", "a": ["Пропускает все вызовы", "Сразу отклоняет вызовы или отдаёт запасной ответ", "Повторяет вызов бесконечно", "Перезапускает сервис"], "c": 1, "why": "OPEN защищает систему от ожидания упавшего сервиса. Через время переходит в HALF_OPEN и пробует снова."}, {"q": "Почему консьюмер Kafka должен быть идемпотентным?", "a": ["Так быстрее", "Обычная гарантия — at-least-once: сообщение может прийти повторно", "Kafka теряет сообщения", "Этого требует Spring"], "c": 1, "why": "После сбоя или ребалансировки сообщение может быть прочитано ещё раз. Повторная обработка не должна портить данные."}, {"q": "В каком случае Kafka гарантирует порядок сообщений?", "a": ["Во всём топике", "Внутри одной партиции", "Никогда", "Только при одном консьюмере на кластер"], "c": 1, "why": "Порядок — внутри партиции. Сообщения с одним ключом попадают в одну партицию, поэтому ключ выбирают по сущности (например, apiId)."}, {"q": "Что утверждает закон Конвея?", "a": ["Число транзисторов удваивается каждые 2 года", "Системы повторяют структуру коммуникаций организации", "Добавление людей в опаздывающий проект задерживает его", "Сложность растёт квадратично"], "c": 1, "why": "Поэтому границы сервисов часто совпадают с границами команд. Остальные варианты — законы Мура и Брукса."}, {"q": "Когда разумнее начать с модульного монолита?", "a": ["Всегда — микросервисы устарели", "Маленькая команда и неясные границы предметной области", "Если нужен Kubernetes", "Если есть база данных"], "c": 1, "why": "Микросервисы окупаются при независимых командах и понятных границах. Иначе их цена — сеть, развёртывание, наблюдаемость — выше пользы."}, {"q": "Что делает API Gateway?", "a": ["Хранит данные", "Единая точка входа: маршрутизация, аутентификация, лимиты", "Компилирует сервисы", "Заменяет базу данных"], "c": 1, "why": "Клиенту не нужно знать адреса всех сервисов, а сквозные задачи решаются в одном месте."}, {"q": "Что такое Saga?", "a": ["Распределённая блокировка", "Цепочка локальных транзакций с компенсирующими действиями при сбое", "Тип базы данных", "Протокол OAuth"], "c": 1, "why": "Вместо одной распределённой транзакции каждый сервис делает свою, а при ошибке выполняются компенсации (например, «отменить резерв»)."}], "8": [{"q": "Что такое ART в SAFe?", "a": ["Automated Release Tool", "Agile Release Train — несколько команд, планирующих работу вместе", "Тип спринта", "Роль тестировщика"], "c": 1, "why": "Команда из вакансии называется API ART: несколько команд вокруг API-продуктов с общим PI Planning."}, {"q": "Средняя сложность поиска по ключу в HashMap?", "a": ["O(n)", "O(log n)", "O(1)", "O(n log n)"], "c": 2, "why": "В среднем O(1). При многих коллизиях в Java 8+ корзина превращается в дерево — O(log n) в худшем случае."}, {"q": "Сложность бинарного поиска в отсортированном массиве?", "a": ["O(1)", "O(log n)", "O(n)", "O(n²)"], "c": 1, "why": "Каждый шаг делит диапазон пополам."}, {"q": "Какой роли нет в Scrum Guide?", "a": ["Product Owner", "Scrum Master", "Developers", "Project Manager"], "c": 3, "why": "В Scrum три ответственности: Product Owner, Scrum Master и Developers."}, {"q": "Какая структура данных подходит для проверки скобок?", "a": ["Очередь", "Стек", "Хэш-таблица", "Куча"], "c": 1, "why": "Последняя открытая скобка должна закрыться первой — принцип LIFO, то есть стек."}, {"q": "Что из этого — ценность Agile-манифеста?", "a": ["Процессы и инструменты важнее людей", "Люди и взаимодействие важнее процессов и инструментов", "Документация важнее работающего продукта", "Следование плану важнее изменений"], "c": 1, "why": "Остальные варианты перевёрнуты: манифест ставит работающий продукт, сотрудничество с заказчиком и готовность к изменениям выше."}, {"q": "Что означает STAR в ответах на собеседовании?", "a": ["Skills, Talent, Ability, Result", "Situation, Task, Action, Result", "Start, Test, Analyze, Repeat", "Strategy, Team, Agile, Review"], "c": 1, "why": "Ситуация, задача, ваши действия и результат — структура рассказа об опыте."}, {"q": "Что такое Definition of Done?", "a": ["Дата окончания проекта", "Общий для команды критерий, когда задача считается готовой", "Список багов", "Отчёт менеджеру"], "c": 1, "why": "Например: код проверен, тесты зелёные, документация обновлена, задача развёрнута на стенд."}]};
+  const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
+  const ruTimes = n => n % 10 === 1 && n % 100 !== 11 ? 'попытка' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'попытки' : 'попыток';
+  const tries = {};
+  function quiz(box) {
+    const n = box.dataset.quiz, data = QUIZ[n];
+    const order = shuffle(data.map((_, i) => i)).map(i => ({ i, opts: shuffle(data[i].a.map((_, k) => k)) }));
+    const best = state['qz' + n];
+    box.classList.remove('done');
+    box.innerHTML = `<div class="qz-head"><b>${data.length} вопросов · попыток без ограничений</b><span class="qz-best">${best ? 'Лучший результат: ' + best + ' %' : 'Ещё не пройден'}</span></div>
+      <div class="qz-res" hidden></div>
+      <ol>${order.map((o, qi) => `<li data-q="${o.i}"><p class="qz-q">${data[o.i].q}</p>${o.opts.map(k => `<label class="qz-opt"><input type="radio" name="qz${n}-${qi}" value="${k}"><span>${data[o.i].a[k]}</span></label>`).join('')}<div class="qz-why" hidden></div></li>`).join('')}</ol>
+      <div class="qz-bar"><button class="btn primary" data-check>Проверить</button><span class="qz-note">Без ответа вопрос считается неверным.</span></div>`;
+    box.querySelector('[data-check]').onclick = () => {
+      let right = 0;
+      box.querySelectorAll('ol > li').forEach(li => {
+        const q = data[li.dataset.q], pick = li.querySelector('input:checked'), v = pick ? +pick.value : -1, ok = v === q.c;
+        if (ok) right++;
+        li.querySelectorAll('.qz-opt').forEach(l => { const k = +l.querySelector('input').value; l.querySelector('input').disabled = true;
+          if (k === q.c) l.classList.add('right'); else if (k === v) l.classList.add('wrong'); });
+        const why = li.querySelector('.qz-why');
+        why.innerHTML = (ok ? '<b class="ok">Верно.</b> ' : v < 0 ? '<b class="no">Нет ответа.</b> ' : '<b class="no">Неверно.</b> ') + q.why;
+        why.hidden = false;
+      });
+      const pct = Math.round(right * 100 / data.length);
+      tries[n] = (tries[n] || 0) + 1;
+      if (pct > (state['qz' + n] || 0)) { state['qz' + n] = pct; paint(); save(); }
+      box.classList.add('done');
+      box.querySelector('.qz-best').textContent = 'Лучший результат: ' + state['qz' + n] + ' %';
+      const res = box.querySelector('.qz-res');
+      res.innerHTML = `<span class="qz-pct ${pct >= 80 ? 'good' : pct < 50 ? 'low' : ''}">${pct} %</span>
+        <span>Верно ${right} из ${data.length}. ${pct >= 80 ? 'Отлично, тему можно считать освоенной.' : pct >= 50 ? 'Неплохо: перечитайте разбор ошибок и попробуйте ещё раз.' : 'Стоит вернуться к теории главы и пройти тест снова.'}<br><small>${tries[n]} ${ruTimes(tries[n])} за этот заход · лучший результат: ${state['qz' + n] || pct} %</small></span>`;
+      res.hidden = false;
+      const bar = box.querySelector('.qz-bar');
+      bar.innerHTML = '<button class="btn primary" data-again>Пройти заново</button><span class="qz-note">Вопросы и варианты перемешаются.</span>';
+      bar.querySelector('[data-again]').onclick = () => { quiz(box); box.scrollIntoView({ block: 'start' }); };
+      res.scrollIntoView({ block: 'center' });
+    };
+  }
+  document.querySelectorAll('.quiz[data-quiz]').forEach(quiz);
+  const quizBest = () => document.querySelectorAll('.quiz[data-quiz]').forEach(b => { const v = state['qz' + b.dataset.quiz], el = b.querySelector('.qz-best'); if (el && v) el.textContent = 'Лучший результат: ' + v + ' %'; });
 
   // ---------- «продолжить с места» ----------
   function cont() {
@@ -1601,6 +1690,7 @@ Link to Swagger UI / OpenAPI file.
   for (const ch of chapters) {
     const title = ch.dataset.title;
     ch.querySelectorAll('h3[id], dt, ul.res li, ul.todo li, details, .goals li, p').forEach(el => {
+      if (el.closest('.quiz')) return;
       const host = el.closest('[id]') && el.matches('h3[id]') ? el : el;
       idx.push({ el: host, text: el.textContent.replace(/\s+/g, ' ').trim(), title });
     });

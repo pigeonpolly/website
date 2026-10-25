@@ -1,6 +1,6 @@
 // Личный учебник «Full Stack Java · Angular» (/study/, docs/site.md «Учебник»): только для птички Mr.Pepe и Алины.
 // Страница не лежит в site/ (там всё публично): её отдаёт worker из study-page.js (собирает tools/study_page.py из content/study/textbook.html).
-// Галочки — у каждого свои: GET /api/study → {state}, POST /api/study {state} (ключи галочек → 1).
+// Галочки и лучшие результаты тестов — у каждого свои: GET /api/study → {state}, POST /api/study {state} (ключ галочки → 1, qzN → лучший % теста главы N).
 import { STUDY_HTML } from './study-page.js';
 
 export const STUDY_NICKS = ['mr.pepe'];
@@ -36,7 +36,7 @@ export async function studyApi(req, env, url, h) {
   if (m !== 'POST') return null;
   const b = await req.json().catch(() => ({}));
   const state = {};
-  for (const k of Object.keys((b && typeof b.state === 'object' && b.state) || {}).slice(0, MAX_KEYS)) if (KEY.test(k) && b.state[k]) state[k] = 1;
+  for (const k of Object.keys((b && typeof b.state === 'object' && b.state) || {}).slice(0, MAX_KEYS)) if (KEY.test(k) && b.state[k]) state[k] = /^qz\d+$/.test(k) ? Math.max(1, Math.min(100, Math.round(+b.state[k]) || 1)) : 1; // qzN — лучший % теста главы N
   await env.DB.prepare(`INSERT INTO study_progress (user_id, state, updated_at) VALUES (?, ?, ?)
     ON CONFLICT(user_id) DO UPDATE SET state = excluded.state, updated_at = excluded.updated_at`).bind(u.id, JSON.stringify(state), Date.now()).run();
   return h.json({ ok: true });
