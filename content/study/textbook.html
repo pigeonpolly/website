@@ -15,6 +15,7 @@
   --paper: #fbfaff; --paper-2: #f2effa; --ink: #1f1832; --muted: #5d5675; --rule: #e1dcef;
   --accent: #534ab7; --accent-soft: #ecebfb; --warm: #c4521f; --warm-soft: #fdf0e8;
   --ok: #1d7a4e; --ok-soft: #e6f5ed; --code-bg: #f4f2fb; --mark: #fff1a8;
+  --thread: #0b6e99; --thread-soft: #e6f3fa;
   --f-body: "Source Serif 4", Georgia, "Times New Roman", serif;
   --f-ui: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
   --f-code: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
@@ -22,10 +23,12 @@
   color-scheme: light;
 }
 @media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --thread: #6cc4ec; --thread-soft: #10293a;
   --paper: #1a1230; --paper-2: #231a3d; --ink: #efeafb; --muted: #b3aacb; --rule: #392e58;
   --accent: #a59cf5; --accent-soft: #2c2452; --warm: #f0a987; --warm-soft: #3a2433;
   --ok: #6fd3a0; --ok-soft: #1c3a32; --code-bg: #140e26; --mark: #5a4a12; color-scheme: dark; } }
 :root[data-theme="dark"] {
+  --thread: #6cc4ec; --thread-soft: #10293a;
   --paper: #1a1230; --paper-2: #231a3d; --ink: #efeafb; --muted: #b3aacb; --rule: #392e58;
   --accent: #a59cf5; --accent-soft: #2c2452; --warm: #f0a987; --warm-soft: #3a2433;
   --ok: #6fd3a0; --ok-soft: #1c3a32; --code-bg: #140e26; --mark: #5a4a12; color-scheme: dark; }
@@ -171,6 +174,18 @@ details.sol figure.code { margin: 10px 0; }
 .quiz .qz-pct.good { color: var(--ok); } .quiz .qz-pct.low { color: var(--warm); }
 .quiz .qz-bar { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
 .quiz .qz-note { font-size: 13px; color: var(--muted); }
+.thread { background: var(--thread-soft); border: 2px solid var(--thread); border-radius: 12px; padding: 4px 20px 16px; margin: 32px 0; }
+.thread > h3 { color: var(--thread); margin-top: 16px; }
+.thread .th-tag { display: inline-block; font: 600 11px var(--f-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--paper); background: var(--thread); border-radius: 4px; padding: 3px 8px; margin-top: 14px; }
+.thread h4 { font: 600 13px var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--thread); margin: 18px 0 6px; }
+.thread ol > li { margin: 6px 0; }
+.thread .tech { display: flex; flex-wrap: wrap; gap: 6px; padding: 0; list-style: none; margin: 6px 0; }
+.thread .tech li { font: 500 13px var(--f-ui); border: 1px solid var(--thread); color: var(--thread); border-radius: 99px; padding: 2px 10px; margin: 0; }
+.thread .tech li a { color: inherit; text-decoration: none; }
+.thread .join { border-left: 3px solid var(--thread); padding: 4px 0 4px 14px; margin: 12px 0; }
+.thread figure.code { background: var(--paper); }
+.thread ul.todo input { accent-color: var(--thread); }
+.toc ul a[data-sub$="-thread"], .toc ul a[data-sub="intro-thread"] { color: var(--thread); font-weight: 600; }
 .box.note { border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; font-size: 16px; }
 .box.note p { margin: 0; }
 
@@ -252,11 +267,12 @@ mark { background: var(--mark); color: inherit; }
   <h1>Full Stack разработчик: <em>Java и Angular</em></h1>
   <p class="lead">Курс построен под вакансию Full Stack Developer (Java/Angular) в Swisscom DevOps Center Latvia, Рига. Начальный уровень: три курса Programming Engineer.</p>
   <div class="facts">
-    <span><b>11</b> глав</span><span><b>~9</b> месяцев</span><span><b>15–20</b> часов в неделю</span><span><b>5 + 2</b> проектов для портфолио</span>
+    <span><b>11</b> глав</span><span><b>~9</b> месяцев</span><span><b>15–20</b> часов в неделю</span><span><b>1</b> сквозной проект</span><span><b>5 + 2</b> проектов для портфолио</span>
   </div>
   <div class="go">
     <button class="btn primary" id="cont">Продолжить с места</button>
     <a class="btn" href="#ch1">Начать с главы 1</a>
+    <a class="btn" href="#intro-thread">Сквозной проект</a>
     <a class="btn" href="#ch10">Финальные проекты</a>
   </div>
 
@@ -291,6 +307,46 @@ mark { background: var(--mark); color: inherit; }
     </tbody>
   </table></div>
   <div class="box note"><p>Откликаться на вакансию можно уже после 4–5 месяца: проекты 2–5 на GitHub — достаточное портфолио для позиции junior/mid. Последние главы можно доучивать параллельно с собеседованиями.</p></div>
+
+
+  <div class="thread">
+  <span class="th-tag">Сквозной проект</span>
+  <h3 id="intro-thread">FinTrack — учёт личных финансов, собранный из всех глав</h3>
+  <p>Это главный учебный проект курса. Он не связан с вакансией: он учит думать как full stack разработчик. В каждой главе 1–8 есть блок этого цвета — очередной шаг. Каждый шаг использует новые знания главы и подключается к тому, что уже построено. В конце получается полноценная система: из консольной программы она вырастает в микросервисы в Kubernetes. Всё — на бесплатных инструментах.</p>
+  <p>Чем полезен сам FinTrack: импортирует выписки из интернет-банка, раскладывает траты по категориям, показывает графики, следит за бюджетом семьи и предупреждает о превышении.</p>
+  <h4>Как растёт система</h4>
+  <div class="tbl"><table><thead><tr><th>Шаг</th><th>Глава</th><th>Что добавляется</th><th>Тег</th></tr></thead><tbody>
+    <tr><td class="num"><a href="#ch1-thread">1</a></td><td>Java</td><td>Модуль <code>core</code>: разбор CSV, категории, отчёт</td><td>v0.1</td></tr>
+    <tr><td class="num"><a href="#ch2-thread">2</a></td><td>Базы данных</td><td>PostgreSQL, миграции, импорт без дублей, SQL-отчёты</td><td>v0.2</td></tr>
+    <tr><td class="num"><a href="#ch3-thread">3</a></td><td>Spring Boot</td><td>Модуль <code>api</code> поверх <code>core</code>, OpenAPI</td><td>v0.3</td></tr>
+    <tr><td class="num"><a href="#ch4-thread">4</a></td><td>Angular</td><td>Модуль <code>web</code>: таблица, импорт, дашборд</td><td>v0.4</td></tr>
+    <tr><td class="num"><a href="#ch5-thread">5</a></td><td>Безопасность</td><td>Keycloak, свои данные у каждого, семейный бюджет</td><td>v0.5</td></tr>
+    <tr><td class="num"><a href="#ch6-thread">6</a></td><td>DevOps</td><td>Docker, CI/CD, Kubernetes, мониторинг</td><td>v0.6</td></tr>
+    <tr><td class="num"><a href="#ch7-thread">7</a></td><td>Микросервисы</td><td>Kafka, import-, budget-service, уведомления</td><td>v0.7</td></tr>
+    <tr><td class="num"><a href="#ch8-thread">8</a></td><td>Качество</td><td>Архитектурные тесты, документация, выпуск</td><td>v1.0</td></tr>
+  </tbody></table></div>
+  <h4>Итоговая структура репозитория</h4>
+<pre class="tree">fintrack/                         один репозиторий (монорепо) на всё обучение
+ ├─ core/              шаг 1 · чистая Java: модель, CSV, категории — без Spring
+ ├─ api/               шаг 3 · Spring Boot, зависит от core; миграции Flyway (шаг 2)
+ ├─ web/               шаг 4 · Angular; nginx.conf (шаг 6)
+ ├─ import-service/    шаг 7 · тоже зависит от core
+ ├─ budget-service/    шаг 7
+ ├─ notifier/          шаг 7
+ ├─ gateway/           шаг 7
+ ├─ deploy/            шаги 5–7 · docker-compose.yml, realm.json, helm/
+ ├─ docs/              ER, C4, ADR, отчёты SQL
+ ├─ settings.gradle.kts           include("core", "api", "import-service", …)
+ └─ .github/workflows/            шаг 6 · CI/CD</pre>
+  <h4>Правила, которые склеивают шаги</h4>
+  <ol>
+    <li><b>Один репозиторий, Gradle-модули.</b> Java-части подключают друг друга через <code>implementation(project(":core"))</code>, а не копированием кода.</li>
+    <li><b>Чистое ядро.</b> Бизнес-логика живёт в <code>core</code> без фреймворков, поэтому её переиспользуют API и сервис импорта.</li>
+    <li><b>Контракт между частями.</b> Frontend и backend связаны файлом <code>api/openapi.json</code> и сгенерированным клиентом; сервисы — описанными событиями Kafka.</li>
+    <li><b>Одинаковые адреса везде.</b> <code>/api</code> проксируется в разработке (proxy.conf.json), в Docker и Kubernetes (nginx) — код не меняется между окружениями.</li>
+    <li><b>Каждый шаг — ветка, pull request и тег.</b> Ветка <code>step-N</code> → PR с зелёным CI → merge → тег <code>v0.N</code>. История репозитория сама показывает рост проекта.</li>
+  </ol>
+  </div>
 
   <h3 id="intro-legend">Обозначения</h3>
   <ul class="res">
@@ -411,6 +467,32 @@ static double area(Shape s) {
     <details><summary>Чем map отличается от flatMap в Stream?</summary><p>map превращает каждый элемент в один новый, flatMap — в поток элементов и «расплющивает» их в один общий поток.</p></details>
   </div>
 
+  <div class="thread">
+  <span class="th-tag">Сквозной проект · шаг 1 из 8</span>
+  <h3 id="ch1-thread">FinTrack, шаг 1: ядро на чистой Java</h3>
+  <p>Консольная программа читает выписку банка в CSV, раскладывает операции по категориям по правилам и печатает отчёт за месяц. Это модуль <code>core</code> — бизнес-логика без фреймворков. Он доживёт до финала: его будут использовать и API, и сервис импорта.</p>
+  <h4>Технологии (все бесплатные)</h4>
+  <ul class="tech"><li><a href="https://adoptium.net/" target="_blank" rel="noopener">Java 21 (Temurin)</a></li><li><a href="https://docs.gradle.org/current/userguide/userguide.html" target="_blank" rel="noopener">Gradle</a></li><li><a href="https://junit.org/junit5/" target="_blank" rel="noopener">JUnit 5</a></li><li><a href="https://assertj.github.io/doc/" target="_blank" rel="noopener">AssertJ</a></li><li><a href="https://www.jetbrains.com/idea/download/" target="_blank" rel="noopener">IntelliJ IDEA Community</a></li><li><a href="https://git-scm.com/" target="_blank" rel="noopener">Git</a></li></ul>
+  <h4>Как делать</h4>
+  <ol><li>Создайте репозиторий <code>fintrack</code> на GitHub и многомодульный Gradle-проект (<code>gradle init</code>) с первым модулем <code>core</code>.</li><li>Опишите модель на records: <code>Transaction(LocalDate date, BigDecimal amount, String currency, String description)</code>, <code>Category</code>, <code>Rule(String contains, String category)</code>.</li><li>Напишите <code>CsvParser</code>: выгрузите свою выписку из интернет-банка в CSV (или придумайте пример на 30 строк) и разберите её. Ошибочные строки собирайте в отчёт об ошибках, а не роняйте программу.</li><li>Напишите <code>Categorizer</code>: первое правило, чьё <code>contains</code> найдено в описании, задаёт категорию; иначе — «Прочее».</li><li>Напишите <code>MonthlyReport</code> на Stream API: сумма по категориям за месяц, отсортированная по убыванию трат.</li><li>Покройте парсер, категоризацию и отчёт тестами JUnit 5 + AssertJ, включая пустой файл и битые строки.</li></ol>
+  <h4>Как соединить с предыдущими шагами</h4>
+  <div class="join"><p>Это первый шаг, соединять пока нечего. Главное правило на всё обучение: <b>в <code>core</code> нет Spring, базы и HTTP</b>. Тогда на шаге 3 API просто подключит этот модуль зависимостью, а на шаге 7 его же переиспользует сервис импорта.</p></div>
+  <figure class="code"><figcaption>settings.gradle.kts и деньги в BigDecimal</figcaption><pre><code>// settings.gradle.kts — сюда будут добавляться модули на следующих шагах
+rootProject.name = "fintrack"
+include("core")
+
+// core/src/main/java/dev/fintrack/core/Transaction.java
+public record Transaction(LocalDate date, BigDecimal amount, String currency, String description) {
+    public Transaction {
+        Objects.requireNonNull(date); Objects.requireNonNull(amount);
+        amount = amount.setScale(2, RoundingMode.HALF_EVEN);  // деньги — только BigDecimal
+    }
+}</code></pre></figure><aside class="box fact"><h4>Почему не double</h4><p>В Java <code>0.1 + 0.2</code> в типе double даёт <code>0.30000000000000004</code>: двоичная дробь не может точно хранить десятичные копейки. Поэтому деньги считают в <code>BigDecimal</code> или в целых центах.</p></aside>
+  <h4>Шаг готов, когда</h4>
+  <ul class="todo"><li><label><input type="checkbox" data-k="th-1a"><span>Программа печатает отчёт по настоящей или тестовой выписке: <code>./gradlew :core:run --args="statement.csv 2026-10"</code>.</span></label></li><li><label><input type="checkbox" data-k="th-1b"><span>Тесты зелёные, в <code>core</code> нет зависимостей кроме JDK и тестовых библиотек.</span></label></li><li><label><input type="checkbox" data-k="th-1c"><span>README: что это, как запустить, пример вывода.</span></label></li></ul>
+  <p class="ch-meta"><span>Коммит и тег <code>v0.1</code></span><span>Навигация: <a href="#intro-thread">обзор проекта</a></span></p>
+  </div>
+
   <h3 id="ch1-test"><span class="sn">1.5</span>Тест для самопроверки</h3>
   <div class="quiz" data-quiz="1"></div>
 
@@ -522,6 +604,33 @@ ORDER BY done_pct DESC NULLS LAST;</code></pre></figure>
     <details><summary>Что такое N+1 и как его найти?</summary><p>Один запрос за списком плюс отдельный запрос за связанными данными каждого элемента. Видно в логе SQL (<code>spring.jpa.show-sql</code> или datasource-proxy). Лечится JOIN FETCH, @EntityGraph или batch fetching.</p></details>
     <details><summary>Поможет ли индекс (project_id, status) запросу только по status?</summary><p>Обычно нет: B-tree индекс используется по левому префиксу. Для поиска только по status нужен свой индекс.</p></details>
     <details><summary>От чего защищает уровень изоляции READ COMMITTED и от чего нет?</summary><p>Защищает от «грязного чтения» незафиксированных данных. Не защищает от неповторяющегося чтения и фантомов: повторный SELECT в той же транзакции может вернуть другой результат.</p></details>
+  </div>
+
+  <div class="thread">
+  <span class="th-tag">Сквозной проект · шаг 2 из 8</span>
+  <h3 id="ch2-thread">FinTrack, шаг 2: база данных</h3>
+  <p>Данные начинают храниться в PostgreSQL: счета, категории, правила, операции. Повторный импорт той же выписки не создаёт дублей. Отчёты переезжают в SQL.</p>
+  <h4>Технологии (все бесплатные)</h4>
+  <ul class="tech"><li><a href="https://www.postgresql.org/" target="_blank" rel="noopener">PostgreSQL 16</a></li><li><a href="https://docs.docker.com/get-started/" target="_blank" rel="noopener">Docker</a></li><li><a href="https://dbeaver.io/" target="_blank" rel="noopener">DBeaver Community</a></li><li><a href="https://documentation.red-gate.com/flyway" target="_blank" rel="noopener">Flyway</a></li></ul>
+  <h4>Как делать</h4>
+  <ol><li>Запустите PostgreSQL в Docker: <code>docker run -d --name fintrack-db -e POSTGRES_PASSWORD=dev -p 5432:5432 postgres:16</code>. Подключитесь DBeaver.</li><li>Нарисуйте ER-диаграмму: <code>account</code>, <code>category</code>, <code>rule</code>, <code>txn</code>; сохраните картинку в <code>docs/</code>.</li><li>Напишите миграцию <code>V1__init.sql</code>. У операции храните <code>import_hash</code> — хэш даты, суммы и описания — с уникальным индексом по <code>(account_id, import_hash)</code>.</li><li>Напишите SQL-отчёты: траты по категориям за месяц; помесячная динамика за год; накопительный баланс оконной функцией <code>SUM(...) OVER (ORDER BY date)</code>.</li><li>Проверьте <code>EXPLAIN ANALYZE</code> отчёта за месяц на 100 000 сгенерированных операций (<code>generate_series</code>) и добавьте индекс <code>(account_id, date)</code>.</li></ol>
+  <h4>Как соединить с предыдущими шагами</h4>
+  <div class="join"><p>Records из <code>core</code> остаются моделью предметной области, а таблицы — способом хранения. Связывать их будет API на шаге 3: сущности JPA и records — разные классы, между ними — маппер. Миграции положите в <code>api/src/main/resources/db/migration</code> уже сейчас: Flyway в Spring Boot найдёт их там сам.</p></div>
+  <figure class="code"><figcaption>Защита от повторного импорта</figcaption><pre><code>CREATE TABLE txn (
+  id           BIGSERIAL PRIMARY KEY,
+  account_id   BIGINT NOT NULL REFERENCES account(id),
+  date         DATE NOT NULL,
+  amount       NUMERIC(12, 2) NOT NULL,
+  currency     CHAR(3) NOT NULL,
+  description  TEXT NOT NULL,
+  category_id  BIGINT REFERENCES category(id),
+  import_hash  TEXT NOT NULL,
+  UNIQUE (account_id, import_hash)
+);
+-- импорт: INSERT ... ON CONFLICT (account_id, import_hash) DO NOTHING</code></pre></figure>
+  <h4>Шаг готов, когда</h4>
+  <ul class="todo"><li><label><input type="checkbox" data-k="th-2a"><span>Повторный импорт той же выписки добавляет 0 строк.</span></label></li><li><label><input type="checkbox" data-k="th-2b"><span>Три SQL-отчёта сохранены в <code>docs/reports.sql</code> и дают правильные числа.</span></label></li><li><label><input type="checkbox" data-k="th-2c"><span>ER-диаграмма в репозитории.</span></label></li></ul>
+  <p class="ch-meta"><span>Коммит и тег <code>v0.2</code></span><span>Навигация: <a href="#intro-thread">обзор проекта</a></span></p>
   </div>
 
   <h3 id="ch2-test"><span class="sn">2.5</span>Тест для самопроверки</h3>
@@ -662,6 +771,37 @@ class TaskControllerTest {
     <details><summary>Какой статус вернуть при создании ресурса и при ошибке валидации?</summary><p>201 Created с заголовком Location. При ошибке валидации — 400 Bad Request (иногда 422) с телом ProblemDetail, где перечислены поля.</p></details>
     <details><summary>Чем @WebMvcTest отличается от @SpringBootTest?</summary><p>@WebMvcTest поднимает только веб-слой (контроллеры, MockMvc), сервисы подменяются моками; тест быстрый. @SpringBootTest поднимает весь контекст приложения.</p></details>
     <details><summary>Чем PUT отличается от PATCH?</summary><p>PUT заменяет ресурс целиком и идемпотентен. PATCH меняет часть полей.</p></details>
+  </div>
+
+  <div class="thread">
+  <span class="th-tag">Сквозной проект · шаг 3 из 8</span>
+  <h3 id="ch3-thread">FinTrack, шаг 3: REST API на Spring Boot</h3>
+  <p>Появляется модуль <code>api</code>: загрузка выписки через HTTP, список операций с фильтрами, категории и правила, отчёты. Всё описано в OpenAPI.</p>
+  <h4>Технологии (все бесплатные)</h4>
+  <ul class="tech"><li><a href="https://spring.io/projects/spring-boot" target="_blank" rel="noopener">Spring Boot</a></li><li><a href="https://spring.io/projects/spring-data-jpa" target="_blank" rel="noopener">Spring Data JPA</a></li><li><a href="https://springdoc.org/" target="_blank" rel="noopener">springdoc-openapi</a></li><li><a href="https://testcontainers.com/" target="_blank" rel="noopener">Testcontainers</a></li><li><a href="https://start.spring.io/" target="_blank" rel="noopener">Spring Initializr</a></li></ul>
+  <h4>Как делать</h4>
+  <ol><li>Создайте модуль <code>api</code> через Spring Initializr (Web, Data JPA, Validation, Flyway, PostgreSQL, Actuator) и добавьте его в <code>settings.gradle.kts</code>.</li><li>Подключите <code>core</code> зависимостью и сделайте <code>ImportService</code>: принимает файл, вызывает <code>CsvParser</code> и <code>Categorizer</code> из core, сохраняет через JPA.</li><li>Эндпоинты: <code>POST /api/imports</code> (multipart CSV), <code>GET /api/transactions?month=&amp;category=&amp;page=</code>, CRUD <code>/api/categories</code> и <code>/api/rules</code>, <code>GET /api/reports/monthly?month=</code>.</li><li>Ошибки — ProblemDetail; валидация — Bean Validation; размер файла ограничьте 5 МБ (<code>spring.servlet.multipart.max-file-size</code>).</li><li>Тесты: <code>@WebMvcTest</code> для контроллеров, интеграционный тест импорта на Testcontainers с настоящим PostgreSQL.</li><li>Откройте Swagger UI и сохраните спецификацию в <code>api/openapi.json</code> — по ней на шаге 4 будет сгенерирован клиент.</li></ol>
+  <h4>Как соединить с предыдущими шагами</h4>
+  <div class="join"><p>Одна строка в <code>api/build.gradle.kts</code> — и вся логика шага 1 доступна в Spring. API ничего не знает о формате CSV: он передаёт поток в <code>core</code> и сохраняет результат. Миграции шага 2 Flyway применит при старте.</p></div>
+  <figure class="code"><figcaption>Как api получает core</figcaption><pre><code>// settings.gradle.kts
+include("core", "api")
+
+// api/build.gradle.kts
+dependencies {
+    implementation(project(":core"))
+    implementation("org.springframework.boot:spring-boot-starter-web")
+    implementation("org.springframework.boot:spring-boot-starter-data-jpa")
+    implementation("org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0")
+    testImplementation("org.springframework.boot:spring-boot-testcontainers")
+    testImplementation("org.testcontainers:postgresql")
+}
+
+// ImportService: core делает разбор, api — хранение
+List&lt;Transaction&gt; parsed = new CsvParser().parse(file.getInputStream()).transactions();
+parsed.stream().map(t -&gt; TxnEntity.from(t, account, categorizer.categoryOf(t))).forEach(repo::saveIgnoringDuplicates);</code></pre></figure>
+  <h4>Шаг готов, когда</h4>
+  <ul class="todo"><li><label><input type="checkbox" data-k="th-3a"><span>Через Swagger UI можно загрузить выписку и получить отчёт за месяц.</span></label></li><li><label><input type="checkbox" data-k="th-3b"><span>Интеграционный тест импорта на Testcontainers зелёный.</span></label></li><li><label><input type="checkbox" data-k="th-3c"><span><code>api/openapi.json</code> лежит в репозитории.</span></label></li></ul>
+  <p class="ch-meta"><span>Коммит и тег <code>v0.3</code></span><span>Навигация: <a href="#intro-thread">обзор проекта</a></span></p>
   </div>
 
   <h3 id="ch3-test"><span class="sn">3.5</span>Тест для самопроверки</h3>
@@ -816,6 +956,28 @@ export const appConfig: ApplicationConfig = {
     <details><summary>Где во фронтенде хранить токен доступа?</summary><p>Безопаснее всего в памяти, а обновлять через refresh-механизм библиотеки OIDC. localStorage доступен любому скрипту при XSS. В крупных системах часто используют паттерн BFF: токены на сервере, браузер держит только HttpOnly-cookie.</p></details>
   </div>
 
+  <div class="thread">
+  <span class="th-tag">Сквозной проект · шаг 4 из 8</span>
+  <h3 id="ch4-thread">FinTrack, шаг 4: интерфейс на Angular</h3>
+  <p>Появляется <code>web</code>: загрузка выписки перетаскиванием, таблица операций с фильтрами, редактор категорий и правил, дашборд с графиками трат.</p>
+  <h4>Технологии (все бесплатные)</h4>
+  <ul class="tech"><li><a href="https://angular.dev/" target="_blank" rel="noopener">Angular</a></li><li><a href="https://material.angular.dev/" target="_blank" rel="noopener">Angular Material и CDK</a></li><li><a href="https://www.chartjs.org/docs/latest/" target="_blank" rel="noopener">Chart.js</a></li><li><a href="https://openapi-generator.tech/" target="_blank" rel="noopener">OpenAPI Generator</a></li><li><a href="https://playwright.dev/" target="_blank" rel="noopener">Playwright</a></li></ul>
+  <h4>Как делать</h4>
+  <ol><li>Создайте приложение в папке <code>web</code>: <code>npx @angular/cli new web --routing --style=scss</code>.</li><li>Сгенерируйте клиент API из <code>api/openapi.json</code>: <code>npx @openapitools/openapi-generator-cli generate -i ../api/openapi.json -g typescript-angular -o src/app/api</code>.</li><li>Страницы (lazy-маршруты): «Операции» — таблица с фильтром по месяцу и категории на signals; «Импорт» — зона перетаскивания файла и отчёт о результате; «Категории и правила»; «Дашборд» — круговая диаграмма по категориям и столбцы по месяцам на Chart.js.</li><li>Смена категории операции прямо в таблице (оптимистичное обновление: сразу показать, откатить при ошибке).</li><li>E2E-тест Playwright: загрузить тестовую выписку → увидеть операции → поменять категорию → дашборд изменился.</li></ol>
+  <h4>Как соединить с предыдущими шагами</h4>
+  <div class="join"><p>Во время разработки Angular-сервер на порту 4200 перенаправляет все запросы <code>/api</code> на Spring Boot (8080) — так не нужен CORS, а адреса в коде те же, что будут в продакшене. Сгенерированный клиент гарантирует, что фронтенд и API говорят на одном контракте: изменили API — перегенерировали клиент — компилятор покажет, что сломалось.</p></div>
+  <figure class="code"><figcaption>web/proxy.conf.json и запуск</figcaption><pre><code>{
+  "/api": { "target": "http://localhost:8080", "secure": false }
+}
+
+// angular.json → projects.web.architect.serve.options:
+//   "proxyConfig": "proxy.conf.json"
+// запуск: в одном терминале ./gradlew :api:bootRun, в другом cd web &amp;&amp; npx ng serve</code></pre></figure>
+  <h4>Шаг готов, когда</h4>
+  <ul class="todo"><li><label><input type="checkbox" data-k="th-4a"><span>Весь путь «загрузил выписку → увидел график» работает в браузере.</span></label></li><li><label><input type="checkbox" data-k="th-4b"><span>Клиент API сгенерирован, ручных HTTP-вызовов с адресами в коде нет.</span></label></li><li><label><input type="checkbox" data-k="th-4c"><span>E2E-тест проходит, интерфейс удобен на телефоне.</span></label></li></ul>
+  <p class="ch-meta"><span>Коммит и тег <code>v0.4</code></span><span>Навигация: <a href="#intro-thread">обзор проекта</a></span></p>
+  </div>
+
   <h3 id="ch4-test"><span class="sn">4.5</span>Тест для самопроверки</h3>
   <div class="quiz" data-quiz="4"></div>
 
@@ -935,6 +1097,33 @@ jdbc.query("SELECT * FROM task WHERE title LIKE ?", mapper, "%" + q + "%");</cod
     <details><summary>Почему Implicit flow больше не рекомендуют?</summary><p>Токен приходит в URL и может утечь через историю, логи или Referer. Для SPA рекомендован Authorization Code + PKCE (OAuth 2.0 Security Best Current Practice).</p></details>
     <details><summary>Когда 401, а когда 403?</summary><p>401 — запрос без действительной аутентификации. 403 — пользователь известен, но прав на действие нет.</p></details>
     <details><summary>Как защититься от SQL-инъекций?</summary><p>Только параметризованные запросы (PreparedStatement, JPA-параметры) и никакой склейки строк с пользовательским вводом. Плюс минимальные права у пользователя БД.</p></details>
+  </div>
+
+  <div class="thread">
+  <span class="th-tag">Сквозной проект · шаг 5 из 8</span>
+  <h3 id="ch5-thread">FinTrack, шаг 5: пользователи и безопасность</h3>
+  <p>FinTrack становится многопользовательским: вход через Keycloak, каждый видит только свои данные, можно вести общий семейный бюджет.</p>
+  <h4>Технологии (все бесплатные)</h4>
+  <ul class="tech"><li><a href="https://www.keycloak.org/getting-started/getting-started-docker" target="_blank" rel="noopener">Keycloak</a></li><li><a href="https://docs.spring.io/spring-security/reference/" target="_blank" rel="noopener">Spring Security</a></li><li><a href="https://github.com/damienbod/angular-auth-oidc-client" target="_blank" rel="noopener">angular-auth-oidc-client</a></li><li><a href="https://trivy.dev/" target="_blank" rel="noopener">Trivy</a></li><li><a href="https://owasp.org/www-project-dependency-check/" target="_blank" rel="noopener">OWASP Dependency-Check</a></li></ul>
+  <h4>Как делать</h4>
+  <ol><li>Добавьте Keycloak в <code>docker-compose.yml</code>, создайте realm <code>fintrack</code>, публичного клиента <code>web</code> (PKCE) и экспортируйте realm в <code>deploy/realm.json</code>, чтобы он поднимался сам.</li><li>API — OAuth2 Resource Server. Добавьте таблицу <code>household</code> и <code>member(household_id, user_sub)</code>; у счёта появляется <code>household_id</code>.</li><li>Каждый запрос фильтруется по семьям текущего пользователя (<code>jwt.sub</code>). Чужой счёт — 404, а не 403, чтобы не раскрывать, что он существует.</li><li>В Angular подключите angular-auth-oidc-client: вход, выход, автоматическое обновление токена; токен к запросам <code>/api</code> добавляет interceptor библиотеки.</li><li>Защита загрузки: только <code>text/csv</code>, не больше 5 МБ. При экспорте в CSV экранируйте ячейки, начинающиеся с <code>= + - @</code> (CSV injection).</li><li>Тесты на 401, 404 для чужих данных и вход в e2e. Trivy и Dependency-Check в CI.</li></ol>
+  <h4>Как соединить с предыдущими шагами</h4>
+  <div class="join"><p>Keycloak становится третьим сервисом рядом с базой и API. Angular получает токен у Keycloak и передаёт его в API, API проверяет подпись по адресу Keycloak (<code>issuer-uri</code>). В коде <code>core</code> ничего не меняется — безопасность живёт на границе (API), а не в бизнес-логике.</p></div>
+  <figure class="code"><figcaption>Keycloak в docker-compose.yml и настройка API</figcaption><pre><code>services:
+  keycloak:
+    image: quay.io/keycloak/keycloak:26.0
+    command: start-dev --import-realm
+    environment:
+      KC_BOOTSTRAP_ADMIN_USERNAME: admin
+      KC_BOOTSTRAP_ADMIN_PASSWORD: admin
+    volumes: ["./deploy/realm.json:/opt/keycloak/data/import/realm.json"]
+    ports: ["8081:8080"]
+
+# api/src/main/resources/application.yml
+spring.security.oauth2.resourceserver.jwt.issuer-uri: http://localhost:8081/realms/fintrack</code></pre></figure>
+  <h4>Шаг готов, когда</h4>
+  <ul class="todo"><li><label><input type="checkbox" data-k="th-5a"><span>Два пользователя не видят данные друг друга; общий семейный счёт видят оба участника.</span></label></li><li><label><input type="checkbox" data-k="th-5b"><span>Вход, выход и обновление токена работают в Angular.</span></label></li><li><label><input type="checkbox" data-k="th-5c"><span>CSV injection закрыта, сканеры в CI без критичных находок.</span></label></li></ul>
+  <p class="ch-meta"><span>Коммит и тег <code>v0.5</code></span><span>Навигация: <a href="#intro-thread">обзор проекта</a></span></p>
   </div>
 
   <h3 id="ch5-test"><span class="sn">5.5</span>Тест для самопроверки</h3>
@@ -1096,6 +1285,32 @@ spec:
     <details><summary>Как не переплатить за учебный аккаунт AWS?</summary><p>Включить AWS Budgets с оповещением на почту, создавать ресурсы только через Terraform и после демонстрации выполнять <code>terraform destroy</code>. EKS и NAT Gateway платные даже при простое.</p></details>
   </div>
 
+  <div class="thread">
+  <span class="th-tag">Сквозной проект · шаг 6 из 8</span>
+  <h3 id="ch6-thread">FinTrack, шаг 6: контейнеры, CI/CD и Kubernetes</h3>
+  <p>Вся система поднимается одной командой, каждая правка проверяется в CI, а приложение работает в локальном Kubernetes с мониторингом.</p>
+  <h4>Технологии (все бесплатные)</h4>
+  <ul class="tech"><li><a href="https://docs.docker.com/compose/" target="_blank" rel="noopener">Docker / Docker Compose</a></li><li><a href="https://nginx.org/en/docs/" target="_blank" rel="noopener">nginx</a></li><li><a href="https://docs.github.com/en/actions" target="_blank" rel="noopener">GitHub Actions</a></li><li><a href="https://kind.sigs.k8s.io/" target="_blank" rel="noopener">kind</a></li><li><a href="https://helm.sh/docs/" target="_blank" rel="noopener">Helm</a></li><li><a href="https://github.com/prometheus-community/helm-charts/tree/main/charts/kube-prometheus-stack" target="_blank" rel="noopener">kube-prometheus-stack</a></li></ul>
+  <h4>Как делать</h4>
+  <ol><li>Multi-stage Dockerfile для <code>api</code> (JDK собирает, JRE запускает) и для <code>web</code> (Node собирает, nginx отдаёт статику и проксирует <code>/api</code>).</li><li>Полный <code>docker-compose.yml</code>: db, keycloak, api, web. Цель — <code>docker compose up</code> и открыть <code>http://localhost</code>.</li><li>GitHub Actions (бесплатно для публичных репозиториев): тесты core и api, сборка web, e2e, Trivy, публикация образов в GitHub Container Registry.</li><li>Кластер kind; Helm-чарт <code>deploy/helm/fintrack</code> с Deployment и Service для api и web, Ingress, пробами Actuator и Secret для паролей.</li><li>Мониторинг: kube-prometheus-stack, метрики Micrometer, дашборд Grafana «импорты в час, ошибки, p95».</li></ol>
+  <h4>Как соединить с предыдущими шагами</h4>
+  <div class="join"><p>nginx в образе <code>web</code> делает то же, что proxy.conf.json на шаге 4: <code>/api</code> уходит в сервис <code>api</code>. Поэтому код Angular не меняется между разработкой и продакшеном. В Kubernetes имена сервисов (<code>api</code>, <code>keycloak</code>) работают как DNS-имена — та же схема, что в Compose.</p></div>
+  <figure class="code"><figcaption>web/nginx.conf — фронтенд и API под одним адресом</figcaption><pre><code>server {
+  listen 80;
+  root /usr/share/nginx/html;
+
+  location /api/ {
+    proxy_pass http://api:8080;      # имя сервиса в Compose и в Kubernetes
+  }
+  location / {
+    try_files $uri $uri/ /index.html; # маршруты Angular
+  }
+}</code></pre></figure>
+  <h4>Шаг готов, когда</h4>
+  <ul class="todo"><li><label><input type="checkbox" data-k="th-6a"><span><code>docker compose up</code> поднимает всю систему с нуля.</span></label></li><li><label><input type="checkbox" data-k="th-6b"><span>CI зелёный, образы публикуются в GHCR.</span></label></li><li><label><input type="checkbox" data-k="th-6c"><span>В kind работает Helm-релиз, в Grafana видны метрики.</span></label></li></ul>
+  <p class="ch-meta"><span>Коммит и тег <code>v0.6</code></span><span>Навигация: <a href="#intro-thread">обзор проекта</a></span></p>
+  </div>
+
   <h3 id="ch6-test"><span class="sn">6.5</span>Тест для самопроверки</h3>
   <div class="quiz" data-quiz="6"></div>
 
@@ -1222,6 +1437,26 @@ public void publish() throws Exception {
     <details><summary>Почему консьюмер Kafka должен быть идемпотентным?</summary><p>Обычная гарантия доставки — at-least-once: одно сообщение может прийти дважды (например, после ребалансировки). Повторная обработка не должна портить данные.</p></details>
   </div>
 
+  <div class="thread">
+  <span class="th-tag">Сквозной проект · шаг 7 из 8</span>
+  <h3 id="ch7-thread">FinTrack, шаг 7: микросервисы и события</h3>
+  <p>Импорт уходит в отдельный асинхронный сервис, появляются бюджеты с уведомлениями о превышении и пересчёт валют по курсам ЕЦБ.</p>
+  <h4>Технологии (все бесплатные)</h4>
+  <ul class="tech"><li><a href="https://kafka.apache.org/quickstart" target="_blank" rel="noopener">Apache Kafka</a></li><li><a href="https://docs.spring.io/spring-kafka/reference/" target="_blank" rel="noopener">Spring for Apache Kafka</a></li><li><a href="https://spring.io/projects/spring-cloud-gateway" target="_blank" rel="noopener">Spring Cloud Gateway</a></li><li><a href="https://resilience4j.readme.io/" target="_blank" rel="noopener">Resilience4j</a></li><li><a href="https://frankfurter.dev/" target="_blank" rel="noopener">Frankfurter (курсы ЕЦБ)</a></li><li><a href="https://mailpit.axllent.org/" target="_blank" rel="noopener">Mailpit</a></li></ul>
+  <h4>Как делать</h4>
+  <ol><li>Новый модуль <code>import-service</code>: тоже зависит от <code>core</code>. API при загрузке сохраняет файл, пишет событие <code>import.requested</code> через Outbox и сразу отвечает <code>202 Accepted</code> с id импорта.</li><li><code>import-service</code> читает событие, разбирает файл, сохраняет операции идемпотентно (уникальный <code>import_hash</code> из шага 2) и публикует <code>transactions.imported</code>.</li><li>Новый модуль <code>budget-service</code>: бюджеты по категориям на месяц; при <code>transactions.imported</code> пересчитывает траты и публикует <code>budget.exceeded</code>.</li><li><code>notifier</code> слушает <code>budget.exceeded</code> и отправляет письмо (локально — Mailpit) или сообщение Telegram-боту.</li><li>Пересчёт в евро: клиент к бесплатному API Frankfurter с Circuit Breaker и кэшем последних курсов.</li><li>Spring Cloud Gateway — единый вход: проверка JWT, маршруты к api и budget-service. Трассировка OpenTelemetry показывает путь импорта через все сервисы.</li></ol>
+  <h4>Как соединить с предыдущими шагами</h4>
+  <div class="join"><p>Соединяют сервисы не вызовы друг друга, а события в Kafka: <code>import.requested → transactions.imported → budget.exceeded</code>. <code>core</code> теперь используют два модуля — вот зачем на шаге 1 его держали без Spring. В Compose и Helm добавляются kafka, import-service, budget-service, notifier, gateway; nginx из шага 6 теперь проксирует <code>/api</code> на gateway.</p></div>
+  <div class="tbl"><table><thead><tr><th>Событие</th><th>Кто публикует</th><th>Кто слушает</th><th>Ключ</th></tr></thead><tbody>
+<tr><td><code>import.requested</code></td><td>api (Outbox)</td><td>import-service</td><td>accountId</td></tr>
+<tr><td><code>transactions.imported</code></td><td>import-service</td><td>budget-service</td><td>householdId</td></tr>
+<tr><td><code>budget.exceeded</code></td><td>budget-service</td><td>notifier</td><td>householdId</td></tr>
+</tbody></table></div>
+  <h4>Шаг готов, когда</h4>
+  <ul class="todo"><li><label><input type="checkbox" data-k="th-7a"><span>Загрузка возвращает 202, операции появляются через секунды; при повторной доставке события дублей нет.</span></label></li><li><label><input type="checkbox" data-k="th-7b"><span>Превышение бюджета приходит письмом в Mailpit.</span></label></li><li><label><input type="checkbox" data-k="th-7c"><span>При недоступном Frankfurter работают кэшированные курсы; в трассировке виден весь путь импорта.</span></label></li></ul>
+  <p class="ch-meta"><span>Коммит и тег <code>v0.7</code></span><span>Навигация: <a href="#intro-thread">обзор проекта</a></span></p>
+  </div>
+
   <h3 id="ch7-test"><span class="sn">7.5</span>Тест для самопроверки</h3>
   <div class="quiz" data-quiz="7"></div>
 
@@ -1289,6 +1524,29 @@ public void publish() throws Exception {
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c8-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
+  <div class="thread">
+  <span class="th-tag">Сквозной проект · шаг 8 из 8</span>
+  <h3 id="ch8-thread">FinTrack, шаг 8: качество и выпуск v1.0</h3>
+  <p>Всё собирается в цельный, проверенный и задокументированный продукт, который не стыдно показать на собеседовании.</p>
+  <h4>Технологии (все бесплатные)</h4>
+  <ul class="tech"><li><a href="https://www.archunit.org/userguide/html/000_Index.html" target="_blank" rel="noopener">ArchUnit</a></li><li><a href="https://sonarcloud.io/" target="_blank" rel="noopener">SonarCloud</a></li><li><a href="https://grafana.com/docs/k6/latest/" target="_blank" rel="noopener">k6</a></li><li><a href="https://c4model.com/" target="_blank" rel="noopener">C4 model</a></li><li><a href="https://adr.github.io/" target="_blank" rel="noopener">ADR</a></li></ul>
+  <h4>Как делать</h4>
+  <ol><li>ArchUnit-тесты границ: <code>core</code> не зависит от Spring, сервисы не ходят в чужие базы.</li><li>SonarCloud для всех модулей; исправить критичные замечания, покрытие core — не меньше 80 %.</li><li>Нагрузочный тест k6: 50 одновременных импортов по 5 000 строк; записать время и узкое место.</li><li>Документация: C4-диаграммы (контекст, контейнеры), 5–7 ADR с главными решениями, README с запуском одной командой.</li><li>Выпуск: тег <code>v1.0</code>, GitHub Release с описанием изменений, видео-демо на 3 минуты, демо-пользователи в <code>realm.json</code>.</li></ol>
+  <h4>Как соединить с предыдущими шагами</h4>
+  <div class="join"><p>Здесь проверяется, что все части действительно работают вместе: один e2e-сценарий проходит через Angular → gateway → api → Kafka → import-service → budget-service → notifier. Если он зелёный в CI на каждом коммите, система цельная.</p></div>
+  <figure class="code"><figcaption>ArchUnit: core остаётся чистым</figcaption><pre><code>@AnalyzeClasses(packages = "dev.fintrack")
+class ArchitectureTest {
+
+    @ArchTest
+    static final ArchRule coreIsPure = noClasses()
+        .that().resideInAPackage("dev.fintrack.core..")
+        .should().dependOnClassesThat().resideInAPackage("org.springframework..");
+}</code></pre></figure>
+  <h4>Шаг готов, когда</h4>
+  <ul class="todo"><li><label><input type="checkbox" data-k="th-8a"><span>Сквозной e2e-сценарий через все сервисы зелёный в CI.</span></label></li><li><label><input type="checkbox" data-k="th-8b"><span>ArchUnit и SonarCloud без нарушений, покрытие core ≥ 80 %.</span></label></li><li><label><input type="checkbox" data-k="th-8c"><span>Есть тег v1.0, Release, README, C4, ADR и видео-демо.</span></label></li></ul>
+  <p class="ch-meta"><span>Коммит и тег <code>v1.0</code></span><span>Навигация: <a href="#intro-thread">обзор проекта</a></span></p>
+  </div>
+
   <h3 id="ch8-test"><span class="sn">8.5</span>Тест для самопроверки</h3>
   <div class="quiz" data-quiz="8"></div>
 
