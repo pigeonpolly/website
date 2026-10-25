@@ -84,3 +84,4 @@ _Пункты перенесены дословно из docs/_claude-old.md (э
 - Сквозной проект FinTrack (учёт личных финансов): обзор в предисловии (`#intro-thread`) и по шагу в главах 1–8 (`#chN-thread`, блок `.thread`, свой цвет `--thread`), галочки `th-*`; только бесплатные инструменты.
 - Глава 4Б «React» (`#ch4b`, data-ch 12, тест `qz12`, галочки `c4b-*`) после Angular, с дополнительным шагом FinTrack 4Б — второй фронтенд `web-react` на том же API.
 - «Конспект теории» (`#chN-notes`, блок `.notes`) в главах с задачами (1–8, 4Б, 11) и «Разбор похожего задания» (`.box.example`) перед каждой из 20 задач.
+- Конспекты переписаны по официальной документации (исходники с GitHub: JDK javadoc, PostgreSQL, Hibernate, Spring, Spring Security, angular.dev, rxjs.dev, react.dev, TanStack, OWASP, Kubernetes, Docker, Kafka, Debezium, Resilience4j, ODS): ссылка «Источник» под каждым разделом и «Частые ошибки» (`.pitfalls`) с источником у каждой.
