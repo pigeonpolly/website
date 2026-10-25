@@ -510,7 +510,17 @@
       if (location.hash === '#recipes') history.replaceState(null, '', location.pathname + location.search);
       opener && opener.focus();
     };
-    const moreBtn = document.getElementById('wl-more-btn'), more = document.getElementById('wl-more');
+    // история острова — из <template>: шапку могли поправить в режиме правки сайта, кнопку и текст вставляем поверх
+    const storyTpl = document.getElementById('wl-story-tpl'), wlHead = document.querySelector('.wl-head-text');
+    if (storyTpl && wlHead && !document.getElementById('wl-more-btn')) {
+      const f = storyTpl.content.cloneNode(true), jump = wlHead.querySelector('.wl-jump');
+      const moreBtn = f.querySelector('#wl-more-btn'), more = f.querySelector('#wl-more');
+      (wlHead.querySelector('.wl-sign') || jump || wlHead.lastChild).before(more);
+      if (jump) jump.prepend(moreBtn); else more.before(moreBtn);
+      const short = [['🗺 Map', '📖 Recipes', '📅 Holidays'], ['🗺 Карта', '📖 Рецепты', '📅 Праздники'], ['🗺 Karte', '📖 Receptes', '📅 Svētki']][L];
+      if (jump) ['#wl-map', '#recipes', '#wl-cal'].forEach((h, i) => { const a = jump.querySelector(`a[href="${h}"]`); if (a && short[i]) a.textContent = short[i]; }); // короткие подписи — все 4 кнопки в один ряд
+      moreBtn.addEventListener('click', () => { more.hidden = !more.hidden; moreBtn.setAttribute('aria-expanded', !more.hidden); moreBtn.textContent = more.hidden ? moreBtn.dataset.o : moreBtn.dataset.c; });
+    }
     if (moreBtn && more) moreBtn.addEventListener('click', () => { more.hidden = !more.hidden; moreBtn.setAttribute('aria-expanded', !more.hidden); moreBtn.textContent = more.hidden ? moreBtn.dataset.o : moreBtn.dataset.c; });
     document.querySelectorAll('#wl-spine, [data-open-book]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); openBook(el); }));
     bm.querySelector('.wl-bookmodal-x').addEventListener('click', closeBook);
