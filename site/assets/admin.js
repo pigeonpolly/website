@@ -1006,7 +1006,7 @@
   }
 
   // ---------- все птицы ----------
-  let bSort = 'created_at', bq = '', bTag = '';
+  let bSort = 'created_at', bq = '', bTag = '', bCol = false;
   async function birds() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('admin/users'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
@@ -1025,7 +1025,7 @@
         <p class="be-note">Новых за неделю: <b>${week}</b>. Нажмите на ник, чтобы открыть профиль и работы.</p>
         <p><button type="button" class="pill-btn pill-fill" id="adm-giftall">🎁 Подарить всем</button> <button type="button" class="pill-btn pill-fill" id="adm-salary" title="Пуговки сразу зачисляются всем птичкам с ником; при заходе на сайт птичка увидит конвертик от администрации Воббленда">💌 Выдать зарплату</button> <button type="button" class="pill-btn pill-fill" id="adm-tax" title="Списать пуговки у всех или только у тех, кто давно не заходит">🧾 Списать налог</button></p>
         <div class="be-filters"><input type="search" id="adm-bq" placeholder="🔍 Найти по нику" value="${esc(bq)}"></div>
-        ${allTags.length ? `<p class="adm-tagbar">🏷 <button type="button" class="adm-tag" data-tagf="" aria-pressed="${!bTag}">Все</button> ${allTags.map(t => `<button type="button" class="adm-tag" data-tagf="${esc(t)}" aria-pressed="${bTag === t}"${tagSty(t)}>${esc(t)} <small>${d.users.filter(u => tagsOf(u).includes(t)).length}</small></button>`).join(' ')} <button type="button" class="adm-tag adm-tag-none" data-tagf="-" aria-pressed="${bTag === '-'}">Без тега <small>${noTag}</small></button> <button type="button" class="adm-mini" id="adm-tagcol" title="Поменять цвет тегов">🎨 Цвета</button>${bTag ? ` <small class="be-note">Показано: ${list.length}</small>` : ''}</p>` : ''}
+        ${allTags.length ? `<p class="adm-tagbar">🏷 <button type="button" class="adm-tag" data-tagf="" aria-pressed="${!bTag}">Все</button> <button type="button" class="adm-tag adm-tag-none" data-tagf="-" aria-pressed="${bTag === '-'}">Без тега <small>${noTag}</small></button> ${allTags.map(t => `<button type="button" class="adm-tag" data-tagf="${esc(t)}" aria-pressed="${bTag === t}"${tagSty(t)}>${esc(t)} <small>${d.users.filter(u => tagsOf(u).includes(t)).length}</small></button>`).join(' ')} <button type="button" class="adm-mini" id="adm-tagcol" aria-pressed="${bCol}" title="Поменять цвет тегов">${bCol ? '✓ Готово' : '🎨 Цвета'}</button>${bCol ? ' <small class="be-note">Нажмите на тег — выберите цвет</small>' : ''}${bTag && !bCol ? ` <small class="be-note">Показано: ${list.length}</small>` : ''}</p>` : ''}
         <table class="be-table adm-table adm-birds"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}${th('buttons', '🔘 Пуговки')}${th('invited', '👥 Позвали')}<th>Подарки</th><th>🏷 Теги</th><th>Вход</th></tr></thead><tbody>
         ${list.map(u => `<tr><td>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}${u.banned ? ' <small class="be-danger">заблокирована</small>' : ''}</td>
           <td data-l="Появилась">${fmt(u.created_at)}</td><td data-l="Заходила">${fmt(u.last_seen)}</td><td data-l="🎨 Работ">${n(u.works)}</td><td data-l="🔥 Рекорд">${n(u.best)}</td>
@@ -1057,7 +1057,7 @@
       main.querySelectorAll('[data-bsort]').forEach(b => b.onclick = () => { bSort = b.dataset.bsort; draw(); });
       // 🏷 теги птичек: свои слова Алины, видны только в кабинете
       const saveTags = async (u, tags) => { try { const r = await api('admin/tags', { uid: u.id, tags }); u.atags = r.tags.join(','); draw(); } catch (e) { alert(err(e)); } };
-      main.querySelectorAll('[data-tagf]').forEach(b => b.onclick = () => { bTag = b.dataset.tagf; draw(); });
+      main.querySelectorAll('[data-tagf]').forEach(b => b.onclick = () => { if (bCol && b.dataset.tagf && b.dataset.tagf !== '-') colorPop(b); else { bTag = b.dataset.tagf; draw(); } });
       // «＋»: окошко под кнопкой — готовые теги (нажать — добавить) и поле для нового; набранное сужает список
       main.querySelectorAll('[data-tagadd]').forEach(b => b.onclick = () => {
         const u = d.users.find(x => x.id === +b.dataset.tagadd), has = tagsOf(u);
@@ -1080,18 +1080,27 @@
         pop.style.width = W + 'px'; pop.style.left = Math.max(8, Math.min(r.left + scrollX, scrollX + innerWidth - W - 8)) + 'px'; pop.style.top = (r.bottom + scrollY + 6) + 'px';
         inp.focus(); document.addEventListener('mousedown', out, true);
       });
-      // 🎨 цвета тегов: общие для всего кабинета (meta atag_colors)
+      // 🎨 цвета тегов (meta atag_colors): «🎨 Цвета» включает режим — нажатие на тег в строке фильтра открывает кружки цветов рядом с ним
       const colBtn = main.querySelector('#adm-tagcol');
-      colBtn && (colBtn.onclick = () => {
-        let w = main.querySelector('.adm-tagcols'); if (w) { w.remove(); return; }
-        const PAL = ['', '#ffd6d6', '#ffe2c2', '#fff2b3', '#d4f2d0', '#cdeef2', '#d6e2ff', '#e8d6ff', '#ffd6ef', '#e6ddd0', '#dedede'];
-        w = document.createElement('div'); w.className = 'adm-tagcols';
-        w.innerHTML = allTags.map(t => `<div>${tagChip(t)} ${PAL.map(c => `<button type="button" class="adm-swatch" data-t="${esc(t)}" data-c="${c}" style="background:${c || '#f4f0fb'}" aria-pressed="${(TC[t] || '') === c}" title="${c ? 'Этот цвет' : 'Обычный'}"></button>`).join('')}</div>`).join('');
-        main.querySelector('.adm-tagbar').after(w);
-        w.querySelectorAll('[data-c]').forEach(x => x.onclick = async () => {
-          try { const r = await api('admin/tag-color', { tag: x.dataset.t, color: x.dataset.c }); d.tagColors = r.colors; draw(); main.querySelector('#adm-tagcol').click(); } catch (e) { alert(err(e)); }
+      colBtn && (colBtn.onclick = () => { bCol = !bCol; draw(); });
+      const PAL = ['', '#ffd6d6', '#ffe2c2', '#fff2b3', '#d4f2d0', '#cdeef2', '#d6e2ff', '#e8d6ff', '#ffd6ef', '#e6ddd0', '#dedede'];
+      const colorPop = b => {
+        const t = b.dataset.tagf;
+        document.querySelector('.adm-tagpop')?.remove();
+        const pop = document.createElement('div'); pop.className = 'adm-tagpop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'Цвет тега');
+        pop.innerHTML = `<b>🎨 ${esc(t)}</b><div class="adm-tagpop-list">${PAL.map(c => `<button type="button" class="adm-swatch" data-c="${c}" style="background:${c || '#f4f0fb'}" aria-pressed="${(TC[t] || '') === c}" title="${c ? 'Этот цвет' : 'Обычный'}"></button>`).join('')}</div>`;
+        const close = () => { pop.remove(); document.removeEventListener('mousedown', out, true); };
+        const out = e => { if (!pop.contains(e.target) && e.target !== b) close(); };
+        pop.querySelectorAll('[data-c]').forEach(x => x.onclick = async () => {
+          close();
+          try { const r = await api('admin/tag-color', { tag: t, color: x.dataset.c }); d.tagColors = r.colors; draw(); } catch (e) { alert(err(e)); }
         });
-      });
+        pop.onkeydown = e => { if (e.key === 'Escape') close(); };
+        document.body.appendChild(pop);
+        const r = b.getBoundingClientRect(), W = Math.min(300, innerWidth - 16);
+        pop.style.width = W + 'px'; pop.style.left = Math.max(8, Math.min(r.left + scrollX, scrollX + innerWidth - W - 8)) + 'px'; pop.style.top = (r.bottom + scrollY + 6) + 'px';
+        pop.querySelector('[aria-pressed="true"]')?.focus(); document.addEventListener('mousedown', out, true);
+      };
       main.querySelectorAll('[data-tagdel]').forEach(b => b.onclick = () => { const u = d.users.find(x => x.id === +b.dataset.tagdel); saveTags(u, tagsOf(u).filter(t => t !== b.dataset.tag)); });
       main.querySelector('#adm-backfill').onclick = async e => {
         e.target.disabled = true; e.target.textContent = 'Считаю…';
