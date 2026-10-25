@@ -5419,3 +5419,5 @@ html.ad-lock { overflow: hidden; }
 .ad-mine { margin: 6px 0 0; padding-left: 20px; }
 .ad-mine small { color: #555; }
 .ad-hintin { flex-basis: 100%; color: #555; font-size: 12px; }
+.ad-sys { padding: 6px 8px; background: #fff6b8; border: 1px dashed #c8a400; font-weight: 700; }
+.ad-rw { color: #7a4f00; font-size: 11px; line-height: 1.3; }

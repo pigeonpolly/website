@@ -828,6 +828,7 @@
   const hsl = (h, s, l) => { s /= 100; l /= 100; const f = n => { const k = (n + h / 30) % 12, c = l - s * Math.min(l, 1 - l) * Math.max(-1, Math.min(k - 3, 9 - k, 1)); return Math.round(c * 255).toString(16).padStart(2, '0'); }; return '#' + f(0) + f(8) + f(4); };
   const potCoffee = i => hsl((25 + i * 137.508) % 360, 50 + (i * 7) % 25, [26, 34, 20, 42, 30][i % 5]);
   const ABOUT = {
+    'furn|pollychat': ['A retro laptop with PollyChat 98 always open. Milka guards it — nobody gets to type without petting her first.', 'Ретро-ноутбук, на котором всегда открыт PollyChat 98. Его охраняет Милка: печатать можно только после того, как погладишь.', 'Retro klēpjdators, kurā vienmēr atvērts PollyChat 98. To sargā Milka: rakstīt drīkst tikai pēc tam, kad viņu noglāsta.'],
     'furn|chalkrug': ['A black rug with a chalk outline. The outline insists it is just lying down for a rest.', 'Чёрный ковёр с меловым силуэтом. Силуэт уверяет, что просто прилёг отдохнуть.', 'Melns paklājs ar krīta siluetu. Siluets apgalvo, ka vienkārši prilēcis atpūsties.'],
     'furn|titospot': ['The coffee in it sloshes all by itself — out of impatience.', 'Кофе в нём плещется сам по себе — от нетерпения.', 'Kafija tajā šļakstās pati no sevis — aiz nepacietības.'],
     'deco|clueboard': ['Stare at it long enough and everything becomes clear. Or not.', 'Если долго смотреть, всё становится понятно. Или нет.', 'Ja ilgi skatās, viss kļūst skaidrs. Vai arī nē.'],
@@ -835,6 +836,12 @@
     'deco|titosbadge': ['For those who solved all 100 cases. Titos personally polished it with his sleeve.', 'Для тех, кто раскрыл все 100 дел. Титос лично протёр его рукавом.', 'Tiem, kas atrisinājuši visas 100 lietas. Titoss to personīgi noslaucīja ar piedurkni.'],
   };
   Object.assign(FURN, {
+    // награда чата /about-me/ (worker/about-chat.js ACHAT_ITEM): ноутбук с PollyChat 98 и Милка; курсор мигает, Милка моргает и шевелит ухом
+    pollychat: { n: N('PollyChat 98 laptop', 'Ноутбук PollyChat 98', 'PollyChat 98 klēpjdators'), w: 22, h: 12, top: null, game: true,
+      d: (p, t) => spr(p, ['oooooooooooo..........', 'oggggggggggo....e...e.', 'ogbbbbbbbbgo....eeeee.', 'ogwwwwwwwwgo...eEEEEEe', 'ogwtttwwwwgo...eEyEyEe', 'ogwwwwwwwwgo...eEEnEEe',
+        'ogwttcwwwwgo..eeEnnnEe', 'oggggggggggo.eEEEEEEEe', '.oooooooooo..eEEEEEEEe', 'oGkGkGkGkGGo.eeeeeeeee', 'oGGGGGGGGGGo....ee....', '.oooooooooo...........'],
+        { o: OUT, g: '#9AA3B5', G: '#C8CDD8', b: '#0A246A', w: '#ECE9D8', t: '#534AB7', c: Math.sin(t / 300) > 0 ? '#1B1240' : null, k: '#5A6070',
+          e: '#D9822B', E: '#F2B26B', n: '#FFF4E6', y: Math.sin(t / 900) > .96 ? '#F2B26B' : '#2B1A51' }) },
     chalkrug: { n: N('Rug “Somebody Was Here”', 'Ковёр «Здесь кто-то был»', 'Paklājs “Šeit kāds bija”'), w: 44, h: 8, top: 5, flat: true, game: true, titos: true, // flat — плоский, как коврики: на нём стоят
       d: p => { const k = '#1E1A26', e = '#2E2838', c = '#F4F0FA', cd = '#B9B3C6';
         for (let y = 0; y < 8; y += .5) { const ins = Math.round((2.5 - y * .3) * 2) / 2; p(ins, y, 44 - 2 * ins, .5, y < .5 ? e : y > 7 ? '#0E0C14' : k); } // ковёр в перспективе
@@ -1225,7 +1232,7 @@
         p(5, 7, 12, .25, '#E5484D'); p(16.75, 7, .25, 2, '#E5484D'); } },
   });
   // этап 11 В: мелкие вещи — только они встают на полки на стену (и в коробки, этап 11 Г). Награды Титоса небольшие — тоже мелкие
-  const SMALL = new Set(['mug', 'teapot', 'teaset', 'books', 'bookstack', 'spellbook', 'candle', 'skullcandle', 'candelabra', 'cake', 'cookies', 'donuts', 'pizzabox', 'candybowl', 'goblet', 'lemonade', 'watermelon', 'pancakes', 'souppot', 'mixer', 'toaster', 'breadbasket', 'applebasket', 'wormchips', 'coffeemachine',
+  const SMALL = new Set(['pollychat', 'mug', 'teapot', 'teaset', 'books', 'bookstack', 'spellbook', 'candle', 'skullcandle', 'candelabra', 'cake', 'cookies', 'donuts', 'pizzabox', 'candybowl', 'goblet', 'lemonade', 'watermelon', 'pancakes', 'souppot', 'mixer', 'toaster', 'breadbasket', 'applebasket', 'wormchips', 'coffeemachine',
     'cactus', 'succulents', 'vase', 'tulips', 'orchid', 'snakeplant', 'claypot', 'flytrap', 'yarn', 'knitting', 'globe', 'fishbowl', 'radio', 'recordplayer', 'speaker', 'handheld', 'tamagotchi', 'console', 'pumpkin', 'jacklantern', 'snowglobe', 'gingerhouse',
     'painttubes', 'brushjar', 'bust', 'rocket', 'moonlamp', 'lavalamp', 'helmet', 'orb', 'shipbottle', 'pollyplush', 'teddy', 'bunny', 'whale', 'cat', 'blackcat', 'raven', 'mrchew', 'ufo', 'eggbasket', 'wateringcan', 'boots', 'seedbag', 'chest',
     'kettle', 'cookiejar', 'herbpots', 'fruitbowl', 'alarmclock', 'mushlamp', 'slippers', 'sheepplush', 'oddjars', 'duckies', 'shampoos', 'laptop', 'printer', 'paperstack']); // + этап 21

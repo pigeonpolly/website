@@ -12,6 +12,7 @@
     'furn|throne', 'view|aurora', 'wall|gold', 'floor|marble', 'furn|dragon', 'furn|portal', 'furn|treasure', 'furn|phoenixnest', 'furn|pollystatue', 'deco|rainbowarc', 'deco|constellation', 'wall|stainedglass',
     'floor|clouds', 'floor|goldtiles', 'view|dragonsky', 'curtain|starlight', 'garden|goldcan', 'garden|orangery'];
   var TITOS = ['furn|chalkrug', 'furn|titospot', 'deco|clueboard', 'deco|titosbadge'];
+  var OWN = ['furn|pollychat']; // награды без магазина, как у Титоса: ноутбук PollyChat за чат /about-me/ (worker/about-chat.js)
   var BOXES = ['cardbox', 'crate', 'hatbox', 'trunkbox', 'giftbox']; // коробки в комнате (furn), этап 11 Г
   var base = function (item) { return String(item).split(':')[0]; };
   var isAlbum = function (kind, item) { return kind === 'furn' && base(item) === 'album'; };
@@ -21,12 +22,13 @@
   function canDo(kind, item) {
     if (kind && typeof kind === 'object') { item = kind.item != null ? kind.item : kind.v; kind = kind.kind || kind.k; }
     if (isAlbum(kind, item)) return { shop: false, gift: false, sell: false, bag: false, box: false, pack: false };
-    if (canDo.TITOS.has(kind + '|' + base(item)) || isCase(kind, item)) return { shop: false, gift: false, sell: false, bag: true, box: false, pack: true };
+    if (canDo.TITOS.has(kind + '|' + base(item)) || canDo.OWN.has(kind + '|' + base(item)) || isCase(kind, item)) return { shop: false, gift: false, sell: false, bag: true, box: false, pack: true };
     var leg = canDo.LEGEND.has(kind + '|' + item) || item === 'legend', game = isGame(kind, item);
     return { shop: !game, gift: !leg, sell: true, bag: true, box: !game, pack: !isBox(kind, item) };
   }
   canDo.LEGEND = new Set(LEGEND);
   canDo.TITOS = new Set(TITOS);
+  canDo.OWN = new Set(OWN);
   canDo.isAlbum = isAlbum;
   canDo.isGame = isGame;
   canDo.isCase = isCase;

@@ -67,6 +67,7 @@ _Пункты перенесены дословно из docs/_claude-old.md (э
 
 ## Бейджи игр
 - Бейджи игр (хранятся в `users.badges`, ставит `gameBadge()`, пуговки — RULES.badges): rain1/rain2/rain3 — «Пуговичный дождь» уровни cond.rainA/B/C (5/15/30); pot1 — первое зелье; pot2/pot3 — cond.potA/potB (10/50) разных зелий; potkid — зелье «Вкус детства»; maze — лабиринт уровня cond.mazeA (20). Картинки — EXTRA_PIX в sketch-wall.js, названия — BADGE_RU/BADGE_COND в admin.js. За уже набранные до появления бейджа рекорды бейдж дают при следующем пройденном уровне.
+- Бейджи чата /about-me/: chatA / chatP / chatAP (условие cond.chatFull = 100 ответов; worker/about-chat.js `chatRewards`, docs/site.md).
 
 ## Доски топа
 - Этап 17 (18.10.2026, «во всех играх должна быть доска топа»): общая доска `site/assets/top-board.js` (`PPTop`: `<div data-top="rain">` монтируется сам, `mount(el, {crown})`, `refresh()`), сервер `worker/top.js` — GET /api/top?g=…&p=all|week → top 10, `me` (место, даже ниже 10-го), `last` (победитель прошлой недели). Вкладки «За всё время» / «Эта неделя» (пн–вс по Риге), выбор помнится в localStorage. Стили `.gtop-*`.

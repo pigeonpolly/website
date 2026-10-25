@@ -40,7 +40,8 @@
     rainking: ['Rain king', 'Король дождя', 'Lietus karalis'], pan: ['Polly’s Pancakes', 'Блинная Полли', 'Pollijas pankūkas'], panrec: ['Pancake record', 'Блинный рекорд', 'Pankūku rekords'], pansoap: ['Washing-up liquid', 'Средство для мытья', 'Trauku līdzeklis'], panup: ['Pancake upgrade', 'Улучшение блинной', 'Pankūku uzlabojums'], potion: ['Potion', 'Зелье', 'Dzira'], titos: ['Titos case', 'Дело Титоса', 'Tito lieta'], titossell: ['Titos coffee', 'Кофе Титоса', 'Tito kafija'],
     advent: ['Advent', 'Адвент', 'Advente'], buy: ['Shop', 'Покупка', 'Pirkums'], sell: ['Sold', 'Продажа', 'Pārdots'], card: ['Card', 'Карточка', 'Kartīte'], admin: ['From Polly', 'От Полли', 'No Pollijas'],
     salary: ['Salary', 'Зарплата', 'Alga'], tax: ['Tax', 'Налог', 'Nodoklis'], daybonus: ['Bonus of the day', 'Бонус дня', 'Dienas bonuss'],
-    gsell: ['Harvest sold', 'Урожай продан', 'Raža pārdota'], gseed: ['Seeds', 'Семена', 'Sēklas'], gbug: ['Garden bug', 'Жук в огороде', 'Vabole dārzā'] };
+    gsell: ['Harvest sold', 'Урожай продан', 'Raža pārdota'], gseed: ['Seeds', 'Семена', 'Sēklas'], gbug: ['Garden bug', 'Жук в огороде', 'Vabole dārzā'],
+    achat: ['Chat with Alina & Polly', 'Чат с Алиной и Полли', 'Čats ar Alīnu un Polliju'] };
 
   // пиксельная Полли (как в today.js) — одним цветом чернил
   const P = ['......ddd.....', '.....dbbbd....', '....dbbwwbd...', '....dbbwkbdoo.', '....dbbbbbdo..', '...dbbbbbbd...', '..dbbsbbbbd...',

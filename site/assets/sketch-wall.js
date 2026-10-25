@@ -209,6 +209,13 @@
       h: ['Delight {n} customers in one game of “Polly’s Pancakes”', 'Привести в восторг {n} клиентов за одну игру в «Блинной Полли»', 'Sajūsmināt {n} klientus vienā “Pollijas pankūku” spēlē'] },
     { k: 'panwash', s: 'panwash', bg: '#D6EAF7', n: ['Squeaky clean', 'Чисто до скрипа', 'Tīrs līdz čīkstēšanai'], f: ['Your pan shines brighter than the Buttonspire tower.', 'Ваша сковородка блестит ярче башни Баттонспайра.', 'Tava panna spīd spožāk par Buttonspire torni.'],
       h: ['Wash the pan with washing-up liquid in “Polly’s Pancakes”', 'Помыть сковородку со средством в «Блинной Полли»', 'Nomazgāt pannu ar līdzekli spēlē “Pollijas pankūkas”'] },
+    // чат «Поболтать с Алиной и Полли» (/about-me/, worker/about-chat.js)
+    { k: 'chatA', s: 'chatA', bg: '#FDE3D6', n: ['Knows Alina', 'Знает Алину', 'Pazīst Alīnu'], f: ['Alina has no secrets from you anymore. Almost.', 'У Алины от вас больше нет секретов. Почти.', 'Alīnai no tevis vairs nav noslēpumu. Gandrīz.'],
+      h: ['Open {n} of Alina’s answers in the chat on the “About me” page', 'Открыть {n} ответов Алины в чате на странице «Обо мне»', 'Atvērt {n} Alīnas atbildes čatā lapā “Par mani”'] },
+    { k: 'chatP', s: 'chatP', bg: '#E2DAF5', n: ['Knows Polly', 'Знает Полли', 'Pazīst Polliju'], f: ['Polly calls you her best listener. And asks for a bun.', 'Полли называет вас лучшим слушателем. И просит булку.', 'Pollija tevi sauc par labāko klausītāju. Un prasa maizīti.'],
+      h: ['Open {n} of Polly’s answers in the chat on the “About me” page', 'Открыть {n} ответов Полли в чате на странице «Обо мне»', 'Atvērt {n} Pollijas atbildes čatā lapā “Par mani”'] },
+    { k: 'chatAP', s: 'chatAP', bg: '#D6E4F7', n: ['PollyChat 98 regular', 'Завсегдатай PollyChat 98', 'PollyChat 98 pastāvīgais'], f: ['You know both of them better than they know themselves.', 'Вы знаете их обеих лучше, чем они сами себя.', 'Tu pazīsti viņas abas labāk nekā viņas pašas sevi.'],
+      h: ['Open {n} answers from Alina and {n} from Polly in the chat on the “About me” page', 'Открыть {n} ответов Алины и {n} ответов Полли в чате на странице «Обо мне»', 'Atvērt {n} Alīnas un {n} Pollijas atbildes čatā lapā “Par mani”'] },
     { k: 'pot1', s: 'pot1', bg: '#D8EFD9', n: ['First potion', 'Первое зелье', 'Pirmā dzira'], f: ['It bubbled, it smelled, it worked!', 'Булькало, пахло — и получилось!', 'Burbuļoja, smaržoja — un izdevās!'],
       h: ['Brew your first potion in “Polly’s Potion Lab”', 'Сварить первое зелье в «Зельеварне Полли»', 'Izvārīt pirmo dziru “Pollijas dziru virtuvē”'] },
     { k: 'pot2', s: 'pot2', bg: '#E6DAF5', n: ['Young alchemist', 'Юный алхимик', 'Jaunais alķīmiķis'], f: ['The witch’s hat fits you perfectly.', 'Шляпа ведьмы сидит на вас идеально.', 'Raganas cepure tev der ideāli.'],
@@ -276,6 +283,10 @@
     potkid: [[11, 3, '.pp'], [11, 4, 'pwp'], [11, 5, 'pp.'], [12, 6, 'n'], [12, 7, 'n'], [12, 8, 'n'], [1, 0, 'Y'], [3, -2, 'p']],
     maze: [[0, 9, '.n.'], [0, 10, 'ooo'], [0, 11, 'oko'], [0, 12, 'ooo'], [10, 9, 'mmm'], [10, 10, 'm.m'], [10, 11, 'mmm'], [11, 12, 'm'], [11, 13, 'mm'], [5, -3, 'd.d.d'], [5, -2, 'ddddd']],
     // блины: стопка; лопатка; корона из блинов; сердечко; мыльные пузыри
+    // чат: облачко с сердечками (Алина), облачко с голубиными точками (Полли), два облачка и ноутбук (обе)
+    chatA: [[9, -3, '.www.'], [8, -2, 'wwwww'], [8, -1, 'wpwpw'], [8, 0, 'wwwww'], [9, 1, 'w'], [1, 1, 'p']],
+    chatP: [[9, -3, '.www.'], [8, -2, 'wwwww'], [8, -1, 'wbwsw'], [8, 0, 'wwwww'], [9, 1, 'w'], [1, 1, 'b']],
+    chatAP: [[0, -3, 'www'], [0, -2, 'wpw'], [1, -1, 'w'], [11, -3, 'www'], [11, -2, 'wbw'], [11, -1, 'w'], [9, 9, 'BBBB'], [9, 10, 'BhhB'], [9, 11, 'BBBB'], [8, 12, 'dddddd']],
     pan1: [[9, 9, '.nnnn.'], [9, 10, 'gggggg'], [9, 11, '.nnnn.'], [10, 8, 'll']],
     pan2: [[10, -3, '.gggg'], [10, -2, 'gnnnng'], [11, -1, 'gggg'], [1, 2, 'h'], [12, 2, 'h'], [12, 4, 'k'], [12, 5, 'k'], [12, 6, 'k']],
     pan3: [[4, -3, 'y.y.y'], [4, -2, 'yyyyy'], [9, 8, '.nnnn.'], [9, 9, 'gggggg'], [9, 10, '.nnnn.'], [9, 11, 'gggggg'], [10, 7, 'R.']],
@@ -296,10 +307,10 @@
     return `<svg viewBox="0 0 14 17" shape-rendering="crispEdges">${px.map(([x, y, c]) => `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${c}"/>`).join('')}</svg>`;
   }
   // условия бейджей приходят с сервера (me.btn.rules.cond — их меняет Алина в «📜 Правилах»); числа подставляются в описания
-  const COND0 = { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4, alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10, rainA: 5, rainB: 15, rainC: 30, potA: 10, potB: 50, mazeA: 20, panA: 5, panB: 15, panC: 30, panStar: 10 };
+  const COND0 = { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4, alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10, rainA: 5, rainB: 15, rainC: 30, potA: 10, potB: 50, mazeA: 20, panA: 5, panB: 15, panC: 30, panStar: 10 , chatFull: 100};
   const condVals = k => { const C = Object.assign({}, COND0, (me && me.btn && me.btn.rules && me.btn.rules.cond) || {});
     return ({ alt: { n: C.alt }, monthly: { n: C.monthly }, veteran: { n: C.veteranMonths, p: C.veteranPer }, early: { n: C.early, h: C.earlyBefore }, owl: { n: C.owl, a: C.owlFrom, b: C.owlTo },
-      weekend: { n: C.weekend }, ten: { n: C.ten }, fifty: { n: C.fifty }, hundred: { n: C.hundred }, inkmaster: { n: C.inkmaster }, comeback: { n: C.comeback }, collector: { n: C.collector }, rain1: { n: C.rainA }, rain2: { n: C.rainB }, rain3: { n: C.rainC }, pot2: { n: C.potA }, pot3: { n: C.potB }, maze: { n: C.mazeA }, pan1: { n: C.panA }, pan2: { n: C.panB }, pan3: { n: C.panC }, panstar: { n: C.panStar }, clock: { n: C.clock, w: C.clockWin }, cpurple: { n: C.colors }, cyellow: { n: C.colors }, cred: { n: C.colors }, cblue: { n: C.colors }, cgreen: { n: C.colors } })[k] || {}; };
+      weekend: { n: C.weekend }, ten: { n: C.ten }, fifty: { n: C.fifty }, hundred: { n: C.hundred }, inkmaster: { n: C.inkmaster }, comeback: { n: C.comeback }, collector: { n: C.collector }, rain1: { n: C.rainA }, rain2: { n: C.rainB }, rain3: { n: C.rainC }, pot2: { n: C.potA }, pot3: { n: C.potB }, maze: { n: C.mazeA }, pan1: { n: C.panA }, pan2: { n: C.panB }, pan3: { n: C.panC }, panstar: { n: C.panStar }, chatA: { n: C.chatFull }, chatP: { n: C.chatFull }, chatAP: { n: C.chatFull }, clock: { n: C.clock, w: C.clockWin }, cpurple: { n: C.colors }, cyellow: { n: C.colors }, cred: { n: C.colors }, cblue: { n: C.colors }, cgreen: { n: C.colors } })[k] || {}; };
   const howTo = lv => lv.h ? lv.h[L].replace(/\{(\w)\}/g, (m, x) => { const v = condVals(lv.k)[x]; return v == null ? m : v; }) : HOW_LEVEL[L](lv.d);
   // state: true — есть, false — нет, 'past' — был (чёрно-белый)
   const medal = (lv, on = true, big = false, tag = 'span', picks = me?.picks || 0) => {
@@ -371,7 +382,7 @@
     box.querySelectorAll('.chm-row').forEach(r => { const x = SPECIAL.find(v => v.k === r.dataset.mt); r.querySelector('.sw-medal').onclick = () => showBadge(x, !r.querySelector('.sw-medal').classList.contains('off')); });
   }
   // бейджи не за рисование (игры, адвент) — во вкладке «Остальное»
-  const NOT_DRAW = new Set(['collector', 'rain1', 'rain2', 'rain3', 'pan1', 'pan2', 'pan3', 'panstar', 'panwash', 'pot1', 'pot2', 'pot3', 'potkid', 'maze']);
+  const NOT_DRAW = new Set(['chatA', 'chatP', 'chatAP', 'collector', 'rain1', 'rain2', 'rain3', 'pan1', 'pan2', 'pan3', 'panstar', 'panwash', 'pot1', 'pot2', 'pot3', 'potkid', 'maze']);
   const stateOf = (s, got) => s.k === 'pick' ? (got.has('pick') ? true : got.has('pick_past') ? 'past' : false) : got.has(s.k);
   const levelOf = best => [...LEVELS].reverse().find(l => best >= l.d) || null;
   function specials(posts) {

@@ -106,6 +106,13 @@
       act: ['Plant it', 'Посадить', 'Iestādīt'],
       go: () => pre + '/garden/',
     },
+    chatnew: { // письмо о новом чате на /about-me/ (worker/about-chat.js aboutChatNews) — гаснет, когда птичка открыла чат
+      icon: '💬',
+      title: () => ['New: chat with Alina and Polly!', 'Новое: поболтай с Алиной и Полли!', 'Jaunums: parunājies ar Alīnu un Polliju!'][L],
+      text: () => ['A retro chat on the “About me” page: over a hundred answers from Alina and Polly, your own questions — and buttons, badges and a laptop for your room as rewards.', 'Ретро-чат на странице «Обо мне»: больше сотни ответов Алины и Полли, свои вопросы — а в награду пуговки, бейджи и ноутбук для комнаты.', 'Retro čats lapā “Par mani”: vairāk nekā simts Alīnas un Pollijas atbilžu, savi jautājumi — un balvā pogas, nozīmītes un klēpjdators istabai.'][L],
+      act: ['Open the chat', 'Открыть чат', 'Atvērt čatu'],
+      go: () => pre + '/about-me/#chat',
+    },
     aboutask: { // ответ Алины на вопрос из чата /about-me/ (worker/about-chat.js aboutAskNews); гаснет, когда автор открыл чат
       icon: '📮',
       title: () => ['Alina answered your question!', 'Алина ответила на твой вопрос!', 'Alīna atbildēja uz tavu jautājumu!'][L],

@@ -61,6 +61,13 @@
     from: ['📮 asked by', '📮 вопрос прислал(а)', '📮 jautājumu atsūtīja'],
     fromAnon: ['📮 an anonymous question', '📮 анонимный вопрос', '📮 anonīms jautājums'],
     mine: ['📮 My questions to Alina', '📮 Мои вопросы Алине', '📮 Mani jautājumi Alīnai'],
+    rwBtn: ['🎉 {n} of {who}’s answers opened — +{b} 🔘!', '🎉 Открыто {n} ответов: {who} — +{b} 🔘!', '🎉 Atvērtas {n} atbildes: {who} — +{b} 🔘!'],
+    rwBadge: ['🏅 New badge “{t}”{b}! Look for it in your profile.', '🏅 Новый бейдж «{t}»{b}! Он уже в профиле.', '🏅 Jauna nozīmīte “{t}”{b}! Tā jau ir profilā.'],
+    rwItem: ['🎁 The PollyChat 98 laptop (with Milka!) is in your bag — put it in your room!', '🎁 Ноутбук PollyChat 98 (с Милкой!) — в сумке. Поставь его в комнату!', '🎁 PollyChat 98 klēpjdators (ar Milku!) ir tavā somā — noliec to istabā!'],
+    rwT: { chatA: ['Knows Alina', 'Знает Алину', 'Pazīst Alīnu'], chatP: ['Knows Polly', 'Знает Полли', 'Pazīst Polliju'], chatAP: ['PollyChat 98 regular', 'Завсегдатай PollyChat 98', 'PollyChat 98 pastāvīgais'] },
+    rwNext: ['🎁 next reward:', '🎁 до награды:', '🎁 līdz balvai:'],
+    rwDone: ['🏅 all rewards', '🏅 все награды', '🏅 visas balvas'],
+    rwGuest: ['Sign in — answers bring buttons, badges and a laptop for your room 🎁', 'Войди — за ответы дают пуговки, бейджи и ноутбук для комнаты 🎁', 'Ienāc — par atbildēm dod pogas, nozīmītes un klēpjdatoru istabai 🎁'],
     mineW: ['⏳ waiting for an answer', '⏳ ждёт ответа', '⏳ gaida atbildi'], mineA: ['🙈 anonymous', '🙈 анонимно', '🙈 anonīmi'], mineOk: ['✅ in the chat', '✅ в чате', '✅ čatā'],
     opened: ['Opened', 'Открыто', 'Atvērts'], of: ['of', 'из', 'no'],
     list: ['📖 My questions', '📖 Мои вопросы', '📖 Mani jautājumi'],
@@ -473,13 +480,22 @@
   const SK = 'pp-achat';
   const guestGet = () => { try { return JSON.parse(sessionStorage.getItem(SK)) || []; } catch (e) { return []; } };
   const guestSet = a => { try { sessionStorage.setItem(SK, JSON.stringify(a)); } catch (e) { /* без хранилища — только в памяти */ } };
-  let opened = new Set(guestGet()), user = false, nick = '', asks = [], srvLoad = null;
+  let opened = new Set(guestGet()), user = false, nick = '', asks = [], srvLoad = null, full = 100, cnt = null;
+  // награды с сервера (worker/about-chat.js chatRewards): строка в чате и тост
+  const rewards = got => (got || []).forEach(g => {
+    const text = g.t === 'btn' ? tr(T.rwBtn).replace('{n}', g.s).replace('{who}', name(g.w)).replace('{b}', g.n)
+      : g.t === 'badge' ? tr(T.rwBadge).replace('{t}', tr(T.rwT[g.k] || T.rwT.chatAP)).replace('{b}', g.n ? ' · +' + g.n + ' 🔘' : '') : tr(T.rwItem);
+    if (win) { logs[who].push({ me: false, sys: true, text, t: clock() }); if (win.classList.contains('on')) render(); }
+    if (window.PPToast) window.PPToast(text, { ms: 5000 });
+  });
+  const score = d => { if (d && d.cnt) { cnt = d.cnt; full = d.full || 100; } };
   const syncSrv = () => srvLoad || (srvLoad = fetch('/api/about-chat', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(async d => {
     if (!d || !d.user) return;
     user = true;
     nick = d.nick || '';
     asks = d.asks || [];
     d.opened.forEach(k => opened.add(k));
+    score(d); rewards(d.got);
     const g = guestGet().filter(k => !d.opened.includes(k));
     if (g.length) {
       const r = await fetch('/api/about-chat', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ add: g }) }).catch(() => null);
@@ -491,7 +507,7 @@
     opened.add(key);
     if (user) {
       fetch('/api/about-chat', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ add: [key] }) })
-        .then(r => { if (!r.ok) throw 0; }).catch(() => guestSet([...new Set([...guestGet(), key])]));
+        .then(r => { if (!r.ok) throw 0; return r.json(); }).then(d => { score(d); rewards(d.got); if (win) counter(); }).catch(() => guestSet([...new Set([...guestGet(), key])]));
     } else guestSet([...opened]);
   };
   const guestCount = () => user ? 0 : [...opened].length;
@@ -614,7 +630,7 @@
   }
   function render() {
     const log = $w('.ad-log');
-    log.innerHTML = logs[who].map(m => `<div class="ad-m${m.me ? ' me' : ''}"><b>${esc(m.me ? tr(T.you) : name(who))}</b> <time>(${m.t})</time>:${m.by ? `<div class="ad-by">${m.by === '-' ? tr(T.fromAnon) : `${tr(T.from)} <b>@${esc(m.by)}</b>`}</div>` : ''}<div class="ad-mt">${esc(m.text).replace(/\n/g, '<br>')}</div>${m.own ? `<div class="ad-msug">${user && nick ? `<button type="button" class="ad-own" data-own="${esc(m.own)}">${tr(T.own)} @${esc(nick)}</button>` : ''}<button type="button" class="ad-own" data-own="${esc(m.own)}" data-anon="1">${tr(T.anon)}</button>${user && nick ? '' : `<small class="ad-hintin">${tr(T.anonHint)} <button type="button" class="ad-link" data-in="1">${tr(T.signin)}</button></small>`}</div>` : ''}${m.sug ? `<div class="ad-msug">${m.sug.map(id => { const q = Q.find(x => x.id === id); return q ? `<button type="button" data-q="${id}">${esc(qText(q))}</button>` : ''; }).join('')}</div>` : ''}</div>`).join('');
+    log.innerHTML = logs[who].map(m => m.sys ? `<div class="ad-m ad-sys">${esc(m.text)}</div>` : `<div class="ad-m${m.me ? ' me' : ''}"><b>${esc(m.me ? tr(T.you) : name(who))}</b> <time>(${m.t})</time>:${m.by ? `<div class="ad-by">${m.by === '-' ? tr(T.fromAnon) : `${tr(T.from)} <b>@${esc(m.by)}</b>`}</div>` : ''}<div class="ad-mt">${esc(m.text).replace(/\n/g, '<br>')}</div>${m.own ? `<div class="ad-msug">${user && nick ? `<button type="button" class="ad-own" data-own="${esc(m.own)}">${tr(T.own)} @${esc(nick)}</button>` : ''}<button type="button" class="ad-own" data-own="${esc(m.own)}" data-anon="1">${tr(T.anon)}</button>${user && nick ? '' : `<small class="ad-hintin">${tr(T.anonHint)} <button type="button" class="ad-link" data-in="1">${tr(T.signin)}</button></small>`}</div>` : ''}${m.sug ? `<div class="ad-msug">${m.sug.map(id => { const q = Q.find(x => x.id === id); return q ? `<button type="button" data-q="${id}">${esc(qText(q))}</button>` : ''; }).join('')}</div>` : ''}</div>`).join('');
     log.querySelectorAll('[data-q]').forEach(b => b.onclick = () => { const q = Q.find(x => x.id === b.dataset.q); if (q && !busy) ask(q); });
     log.querySelectorAll('[data-own]').forEach(b => b.onclick = () => { if (!busy) { b.parentNode.querySelectorAll('[data-own]').forEach(x => x.disabled = true); sendOwn(b.dataset.own, !!b.dataset.anon); } });
     log.querySelectorAll('[data-in]').forEach(b => b.onclick = () => window.PPAccount && window.PPAccount.openSignIn());
@@ -622,7 +638,9 @@
   }
   function counter() {
     const c = w => Q ? Q.filter(q => opened.has(w + ':' + q.id)).length : 0;
-    $w('.ad-cnt').innerHTML = `<b>${tr(T.list)}</b><span>${tr(T.alina)}: ${c('a')} / ${total('a')}</span><span>${tr(T.polly)}: ${c('p')} / ${total('p')}</span>`;
+    const nx = w => { const n = cnt ? cnt[w] : c(w), st = [.25, .5, .75, 1].map(f => Math.round(full * f)).find(x => n < x); return st ? st - n : 0; };
+    const nxt = !user ? `<small class="ad-rw">${tr(T.rwGuest)}</small>` : `<small class="ad-rw">${nx('a') || nx('p') ? `${tr(T.rwNext)} ${tr(T.alina)} ${nx('a') ? '+' + nx('a') : '✓'} · ${tr(T.polly)} ${nx('p') ? '+' + nx('p') : '✓'}` : tr(T.rwDone)}</small>`;
+    $w('.ad-cnt').innerHTML = `<b>${tr(T.list)}</b><span>${tr(T.alina)}: ${c('a')} / ${total('a')}</span><span>${tr(T.polly)}: ${c('p')} / ${total('p')}</span>${nxt}`;
     $w('.ad-save').innerHTML = user ? tr(T.saved) : `⚠ ${tr(T.guest)} <button type="button" class="ad-link">${tr(T.signin)}</button>`;
     const l = $w('.ad-save .ad-link');
     if (l) l.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
@@ -716,4 +734,5 @@
   const btn = root.querySelector('.ad-open');
   if (btn) btn.addEventListener('click', open);
   if (location.hash === '#chat') open();
+  addEventListener('hashchange', () => { if (location.hash === '#chat') open(); }); // ссылка из письма, когда страница уже открыта
 })();

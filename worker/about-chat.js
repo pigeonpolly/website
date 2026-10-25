@@ -20,6 +20,15 @@ export const ABOUT_CHAT_ALTER = ['ALTER TABLE about_asks ADD COLUMN anon INTEGER
 const KEY = /^[ap]:(q\d{3,4}|u\d{1,7})$/, MAX = 2000;
 const LANGS = ['en', 'ru', 'lv'];
 export const ASK_MIN = 5, ASK_LEN = 200, ASK_WAIT = 3, ASK_DAY = 10, GUEST_DAY = 5, GUEST_HOUR = 30; // длина вопроса; ждут ответа сразу; в сутки; гостю с адреса в сутки; гостей со всего сайта в час
+// награды чата (25.10.2026): ступени 25/50/75 % от RULES.cond.chatFull (100) — по achatStepBtn 🔘 за каждую сторону;
+// chatFull ответов Алины — бейдж chatA, Полли — chatP (пуговки — RULES.badges); обе — бейдж chatAP и ноутбук furn|pollychat в сумку
+export const ACHAT_RULES = { achatStepBtn: 10 };
+export const ACHAT_RANGE = { achatStepBtn: [0, 10000] };
+export const ACHAT_INT = ['achatStepBtn'];
+export const ACHAT_BADGES = { chatA: 100, chatP: 100, chatAP: 50 };
+export const ACHAT_COND = { chatFull: 100 };
+export const ACHAT_ITEM = ['furn', 'pollychat'];
+const STEPS = [0.25, 0.5, 0.75];
 const parse = (s, d) => { try { return JSON.parse(s) || d; } catch (e) { return d; } };
 const langOf = t => /[а-яё]/i.test(t) ? 'ru' : /[āēīūčšžņļķģ]/i.test(t) ? 'lv' : 'en';
 
@@ -29,7 +38,45 @@ export async function aboutAskNews(env, uid) {
   return r.length ? { n: r.length, id: r[0].id, q: parse(r[0].tr, {}).q || {} } : null;
 }
 
-// h: json, fail, currentUser, needUser, isAdmin, now, ipKey(req) → хеш адреса, translate(texts, from, langs) → { tr: {lang: [..]} }
+let baseAns = null, baseAt = 0;
+async function answered(env, h) {
+  if (!baseAns || Date.now() - baseAt > 600000) { // база меняется только с выкладкой сайта — держим 10 минут
+    const d = await h.asset('/assets/about-chat.json').catch(() => null);
+    if (d && d.questions) { baseAns = { a: new Set(), p: new Set() }; for (const q of d.questions) for (const w of ['a', 'p']) if (q[w] && Object.keys(q[w]).length) baseAns[w].add(q.id); baseAt = Date.now(); }
+  }
+  const out = { a: new Set(baseAns ? baseAns.a : []), p: new Set(baseAns ? baseAns.p : []) };
+  for (const r of (await env.DB.prepare("SELECT id, tr FROM about_asks WHERE status = 'ok'").all()).results) { const t = parse(r.tr, {}); for (const w of ['a', 'p']) if (t[w] && Object.keys(t[w]).length) out[w].add('u' + r.id); }
+  return out;
+}
+// счёт открытых ответов и награды (всё повторно не выдаётся: award — по ref, бейдж — один раз, вещь — если ещё не было)
+async function chatRewards(env, h, u, opened) {
+  const ok = await answered(env, h), R = h.rules(), full = Math.max(1, R.cond.chatFull || 100), got = [];
+  const cnt = { a: 0, p: 0 };
+  for (const k of opened) { const [w, id] = k.split(':'); if (ok[w] && ok[w].has(id)) cnt[w]++; }
+  for (const w of ['a', 'p']) {
+    for (const f of STEPS) { const s = Math.round(full * f); if (cnt[w] >= s && R.achatStepBtn > 0) { const n = await h.award(u.id, 'achat', w + s, R.achatStepBtn); if (n) got.push({ t: 'btn', w, s, n }); } }
+    if (cnt[w] >= full && await h.badge(u, w === 'a' ? 'chatA' : 'chatP')) got.push({ t: 'badge', k: w === 'a' ? 'chatA' : 'chatP', n: (R.badges || {})[w === 'a' ? 'chatA' : 'chatP'] || 0 });
+  }
+  if (cnt.a >= full && cnt.p >= full) {
+    if (await h.badge(u, 'chatAP')) got.push({ t: 'badge', k: 'chatAP', n: (R.badges || {}).chatAP || 0 });
+    const [kind, item] = ACHAT_ITEM;
+    if (!(await env.DB.prepare('SELECT 1 FROM gifts WHERE user_id = ? AND kind = ? AND item = ?').bind(u.id, kind, item).first())) {
+      await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'achat', 'bag', ?, NULL)").bind(u.id, kind, item, h.now()).run();
+      got.push({ t: 'item', kind, item });
+    }
+  }
+  return { cnt, full, got };
+}
+
+// письмо-новость о чате (news.js chatnew) всем птичкам, кто ещё не открывал чат, до CHATNEW_UNTIL; гаснет, когда птичка открыла чат
+export const CHATNEW_UNTIL = '2026-11-30';
+export async function aboutChatNews(env, uid, day) {
+  if (day > CHATNEW_UNTIL) return null;
+  return (await env.DB.prepare('SELECT 1 FROM about_chat WHERE user_id = ?').bind(uid).first()) ? null : { n: 1 };
+}
+
+// h: json, fail, currentUser, needUser, isAdmin, now, ipKey(req) → хеш адреса, translate(texts, from, langs) → { tr: {lang: [..]} },
+//    rules(), award(uid, kind, ref, n), badge(u, k) — бейдж + его пуговки, asset(path) → JSON из site/
 export async function aboutChatApi(req, env, url, h) {
   const p = url.pathname, m = req.method, { json, fail } = h;
   const rowOf = async uid => {
@@ -47,7 +94,9 @@ export async function aboutChatApi(req, env, url, h) {
     const asks = (await env.DB.prepare('SELECT id, text, status, tr, seen, anon FROM about_asks WHERE user_id = ? ORDER BY id DESC LIMIT 30').bind(u.id).all()).results
       .map(r => ({ id: 'u' + r.id, text: r.text, status: r.status, anon: !!r.anon, fresh: r.status === 'ok' && !r.seen }));
     if (asks.some(a => a.fresh)) await env.DB.prepare("UPDATE about_asks SET seen = 1 WHERE user_id = ? AND status = 'ok' AND seen = 0").bind(u.id).run(); // открыл чат — ответы увидены
-    return json({ opened: await rowOf(u.id), user: true, nick: u.nick || '', asks }, 200, { 'cache-control': 'no-store' });
+    await env.DB.prepare("INSERT OR IGNORE INTO about_chat (user_id, opened, updated_at) VALUES (?, '[]', ?)").bind(u.id, Date.now()).run(); // открыл чат — письмо о нём гаснет
+    const opened = await rowOf(u.id), rw = await chatRewards(env, h, u, opened).catch(() => null); // награды, если правила поменялись или база выросла
+    return json({ opened, user: true, nick: u.nick || '', asks, full: rw ? rw.full : 100, cnt: rw ? rw.cnt : null, got: rw ? rw.got : [] }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/about-chat') {
     const u = await h.needUser(req, env);
@@ -59,7 +108,8 @@ export async function aboutChatApi(req, env, url, h) {
     await env.DB.prepare(`INSERT INTO about_chat (user_id, opened, updated_at) VALUES (?, ?, ?)
       ON CONFLICT(user_id) DO UPDATE SET opened = excluded.opened, updated_at = excluded.updated_at`)
       .bind(u.id, JSON.stringify(opened), Date.now()).run();
-    return json({ opened });
+    const rw = u.nick && !u.banned ? await chatRewards(env, h, u, opened).catch(e => { console.error('achat', e); return null; }) : null;
+    return json({ opened, full: rw ? rw.full : 100, cnt: rw ? rw.cnt : null, got: rw ? rw.got : [] });
   }
   if (m === 'POST' && p === '/api/about-chat/ask') {
     const u0 = await h.currentUser(req, env);
