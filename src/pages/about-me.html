@@ -1,5 +1,5 @@
 <section class="am-hero">
-  <figure class="am-photo"><img src="/images/home/first-pigeon-polly.jpg" alt="The first Pigeon Polly drawing" loading="lazy"><figcaption>The very first Pigeon Polly</figcaption></figure>
+  <figure class="am-photo" tabindex="0"><span class="am-pic"><img src="/images/home/first-pigeon-polly.jpg" alt="The first Pigeon Polly drawing" loading="lazy"><img class="am-me" src="/images/home/alina.jpg" alt="" aria-hidden="true" loading="lazy"></span><figcaption>The very first Pigeon Polly</figcaption></figure>
   <div class="am-text">
     <p class="topics">hi, I’m Alina</p>
     <h1>The human behind Pigeon Polly</h1>
@@ -26,3 +26,6 @@
     <a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener">Amazon</a>
   </div>
 </section>
+<script>
+  var ph = document.querySelector('.am-photo'); if (ph) ph.addEventListener('click', function () { ph.classList.toggle('on'); });
+</script>
