@@ -2,7 +2,7 @@
 
 _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TABLE / ALTER TABLE и обращений к meta в worker/*.js. Руками не править._
 
-## Таблицы (55)
+## Таблицы (56)
 
 Обозначения: PK — первичный ключ, nn — NOT NULL, =x — DEFAULT x; «+» — столбцы, добавленные ALTER TABLE.
 
@@ -61,6 +61,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **titos** (worker/titos.js): `user_id` int PK, `level` int =0, `coffee` int =10, `coffee_at` int =0, `drink_at` int =0, `sleep` int =0, `run` int =0, `found` text ='[]', `started` int =0, `bugs` text ='[]', `sell_day` text ='', `sell_n` int =0, `legacy` int =0; + `sort_lv` int =0, `sort_run` text ='', `bugs_run` int =0']
 - **titos_cases** (worker/titos.js): `n` int PK, `data` text nn, `tr` text ='{}', `hash` text, `updated_at` int
 - **top_week** (worker/top.js): `game` text nn, `week` text nn, `user_id` int nn, `score` int nn, `at` int; PRIMARY KEY (game, week, user_id)
+- **study_progress** (worker/study.js): `user_id` int PK, `state` text (JSON: ключ галочки → 1), `updated_at` int
 
 ## Ключи meta (48)
 

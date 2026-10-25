@@ -17,6 +17,7 @@ import { mailApi, mailCron, mailGamesCron, mailAsk, mailPrefs, MAIL_TABLES, MAIL
 import { myGamesApi, MY_GAMES_TABLES } from './my-games.js'; // «★ Мои игры» на главной (docs/site.md)
 import { aboutChatApi, aboutAskNews, aboutChatNews, ABOUT_CHAT_TABLES, ABOUT_CHAT_ALTER, ACHAT_RULES, ACHAT_RANGE, ACHAT_INT, ACHAT_BADGES, ACHAT_COND } from './about-chat.js'; // чат «Поболтать с Алиной и Полли» на /about-me/ (docs/site.md)
 import { shiftApi, SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_RANGE, SHIFT_INT } from './shift.js'; // «Смена с Полли» (этап 29, docs/rooms.md)
+import { studyApi, studyOk, STUDY_TABLES } from './study.js'; // личный учебник /study/ для Mr.Pepe и Алины (docs/site.md «Учебник»)
 import { artpillApi, artpillDrop, artpillExport, ARTPILL_TABLES } from './artpill.js'; // «Art-Pill by Polly»: скетчбуки ИИ и отзывы (docs/artpill.md)
 import { schoolApi, schoolNews, schoolCron, SCHOOL_TABLES, SCHOOL_ALTER, SCHOOL_RULES, SCHOOL_RANGE, SCHOOL_INT } from './school.js'; // «Школа Полли»: сдача работ и проверка (docs/challenge.md)
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
@@ -43,6 +44,11 @@ export default {
       if (!env.DB) return env.ASSETS.fetch(req);
       try { await ensureSchema(env); return await blogPage(req, env, url, helpers(env)); }
       catch (e) { console.error(e); return env.ASSETS.fetch(req); } // если база недоступна — статическая заглушка
+    }
+    if (p === '/study' || p === '/study/') { // личный учебник: страница из worker, не из site/ (worker/study.js)
+      if (!env.DB) return new Response('Not found', { status: 404 });
+      await ensureSchema(env);
+      return studyApi(req, env, url, studyHelpers(env));
     }
     if (!p.startsWith('/api/')) return sitePage(req, env, url);
     if (!env.DB || !env.IMAGES || !env.GOOGLE_CLIENT_ID) return json({ ready: false }, 503);
@@ -419,6 +425,7 @@ const flockEvent = env => (kind, bird, data) => flockEventDb(env, kind, bird, da
 const cardHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, rules: () => RULES, avgItemPrice: () => avgItemPrice(env), setRules: patch => setRules(env, patch), flockEvent: flockEvent(env) });
 const titosHelpers = env => ({ ...cardHelpers(env), unit: () => gameUnit(env), btnOf, top: (uid, n) => topScore(env, 'titos', uid, n), award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), stamp: (uid, task) => stamp(env, uid, task) });
 const flockHelpers = env => ({ json, fail, currentUser, needUser, rigaDay, flockEvent: flockEvent(env), streakOf: rows => streaks(streakDays(rows)).current });
+const studyHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, adminIdentity });
 const newsHelpers = env => ({ json, fail, needUser, isAdmin, rigaMs, getMeta: k => getMeta(env, k) });
 const wlHelpers = env => ({ ...authHelpers(env), surprise: (uid, kind) => surpriseKI(env, new Request('https://www.pigeonpolly.com/'), uid, kind),
   award: async (uid, ref, n) => { const r = await award(env, uid, 'holiday', ref, n); if (r) await env.DB.prepare("UPDATE button_log SET seen = 0 WHERE user_id = ? AND kind = 'holiday' AND ref = ?").bind(uid, ref).run(); return r; }, btnFor: async (kind, item) => RULES.wlBtn >= 0 ? RULES.wlBtn : baseNow(kind, item, ((await catalog(env, new Request('https://www.pigeonpolly.com/'))).prices || {})[kind + '|' + item]) || 30 }); // праздники Воббленда: вещь уже есть — другая того же вида, вещей вида больше нет — пуговки
@@ -493,6 +500,7 @@ async function ensureSchema(env) {
     ...ABOUT_CHAT_TABLES.map(sql => env.DB.prepare(sql)), // чат на /about-me/: about_chat (worker/about-chat.js)
     ...SHIFT_TABLES.map(sql => env.DB.prepare(sql)), // «Смена с Полли»: shift_runs (worker/shift.js)
     ...SCHOOL_TABLES.map(sql => env.DB.prepare(sql)), // «Школа Полли»: school_works (worker/school.js)
+    ...STUDY_TABLES.map(sql => env.DB.prepare(sql)), // учебник: study_progress (worker/study.js)
     ...ARTPILL_TABLES.map(sql => env.DB.prepare(sql)), // «Art-Pill»: ap_books, ap_pages, ap_reviews (worker/artpill.js)
     ...TITOS_TABLES.map(sql => env.DB.prepare(sql)), // детектив Титос: titos, titos_cases (worker/titos.js)
     ...FLOCK_NEWS_TABLES.map(sql => env.DB.prepare(sql)), // новости стаи: flock_events (worker/flock-news.js)
@@ -1477,6 +1485,7 @@ async function route(req, env, url) {
   if (p === '/api/garden' || p.startsWith('/api/garden/')) { const r = await gardenApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p === '/api/admin/ideas') { const r = await ideasApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/mail/') || p.startsWith('/api/admin/mail')) { const r = await mailApi(req, env, url, authHelpers(env)); if (r) return r; }
+  if (p === '/api/study') { const r = await studyApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/artpill' || p.startsWith('/api/artpill/')) { const r = await artpillApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now }); if (r) return r; }
   if (p === '/api/school' || p.startsWith('/api/school/') || p === '/api/admin/school' || p === '/api/admin/school/check') { const r = await schoolApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is a short friendly comment from an art teacher (Polly, a pigeon) on a student\'s drawing made on paper. Keep it warm, simple and encouraging.') }); if (r) return r; }
   if (p === '/api/games/mine' || p === '/api/games/visit') { const r = await myGamesApi(req, env, url, { json, fail, currentUser, needUser }); if (r) return r; }
@@ -2206,7 +2215,7 @@ async function route(req, env, url) {
     // серия челленджа — для меню аватара в шапке (этап 14 Б)
     const streak = u && u.nick && !u.banned ? streaks(streakDays((await env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(u.id).all()).results)).current : 0;
     const titos = u && !u.banned ? titosState(await env.DB.prepare('SELECT * FROM titos WHERE user_id = ?').bind(u.id).first(), RULES, titosHelpers(env)) : null; // кофейник Титоса (worker/titos.js)
-    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), pin: !(await isAdmin(u, env)) && await adminIdentity(u, env) ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, streak, news, friendBtns: BTN.friend, titos, pwTemp: u.pw_temp ? 1 : 0, mailAsk: mailAsk(env, u) ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
+    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), pin: !(await isAdmin(u, env)) && await adminIdentity(u, env) ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, streak, news, friendBtns: BTN.friend, titos, study: await studyOk(u, env, studyHelpers(env)) ? 1 : 0, pwTemp: u.pw_temp ? 1 : 0, mailAsk: mailAsk(env, u) ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
   }
   if (m === 'GET' && p === '/api/news') return json({ news: await newsOf(env, req, await currentUser(req, env)) }, 200, { 'cache-control': 'no-store' });
   if (m === 'GET' && p === '/api/news/history') return json({ items: await newsHistory(env, await currentUser(req, env)) }, 200, { 'cache-control': 'no-store' });

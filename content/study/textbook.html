@@ -1,0 +1,1633 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="robots" content="noindex, nofollow">
+<title>Учебник Full Stack Java</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;0,8..60,700;1,8..60,400&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Учебник: слева оглавление по главам и темам (на телефоне — выезжает), справа колонка чтения ~68 знаков.
+   Цвета — из палитры pigeonpolly.com: фиолетовый и оранжевый на светлой «бумаге», тёмная тема — ночной фиолетовый сайта. */
+:root {
+  --paper: #fbfaff; --paper-2: #f2effa; --ink: #1f1832; --muted: #5d5675; --rule: #e1dcef;
+  --accent: #534ab7; --accent-soft: #ecebfb; --warm: #c4521f; --warm-soft: #fdf0e8;
+  --ok: #1d7a4e; --ok-soft: #e6f5ed; --code-bg: #f4f2fb; --mark: #fff1a8;
+  --f-body: "Source Serif 4", Georgia, "Times New Roman", serif;
+  --f-ui: "IBM Plex Sans", "Segoe UI", system-ui, sans-serif;
+  --f-code: "JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+  --side: 300px;
+  color-scheme: light;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) {
+  --paper: #1a1230; --paper-2: #231a3d; --ink: #efeafb; --muted: #b3aacb; --rule: #392e58;
+  --accent: #a59cf5; --accent-soft: #2c2452; --warm: #f0a987; --warm-soft: #3a2433;
+  --ok: #6fd3a0; --ok-soft: #1c3a32; --code-bg: #140e26; --mark: #5a4a12; color-scheme: dark; } }
+:root[data-theme="dark"] {
+  --paper: #1a1230; --paper-2: #231a3d; --ink: #efeafb; --muted: #b3aacb; --rule: #392e58;
+  --accent: #a59cf5; --accent-soft: #2c2452; --warm: #f0a987; --warm-soft: #3a2433;
+  --ok: #6fd3a0; --ok-soft: #1c3a32; --code-bg: #140e26; --mark: #5a4a12; color-scheme: dark; }
+
+* { box-sizing: border-box; }
+html { scroll-behavior: smooth; scroll-padding-top: 72px; }
+@media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } * { transition: none !important; } }
+body { margin: 0; background: var(--paper); color: var(--ink); font: 400 18px/1.65 var(--f-body);
+  padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+body::before { content: ""; position: fixed; inset: 0 0 auto; height: env(safe-area-inset-top, 0px); z-index: 30; background: var(--paper); }
+a { color: var(--accent); text-underline-offset: 3px; }
+a:hover { color: var(--warm); }
+:focus-visible { outline: 2px solid var(--warm); outline-offset: 2px; border-radius: 3px; }
+h1, h2, h3, h4 { font-family: var(--f-body); text-wrap: balance; line-height: 1.2; }
+code, pre { font-variant-ligatures: none; }
+code { font-family: var(--f-code); font-size: .84em; background: var(--code-bg); padding: .1em .35em; border-radius: 4px; }
+
+/* верхняя полоса */
+.bar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 20; background: var(--paper); border-bottom: 1px solid var(--rule);
+  display: flex; align-items: center; gap: 12px; padding-block: 10px;
+  padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); font-family: var(--f-ui); }
+.bar .brand { font-weight: 700; font-size: 15px; color: var(--ink); text-decoration: none; white-space: nowrap; }
+.bar .brand span { color: var(--accent); }
+.bar .grow { flex: 1; min-width: 0; }
+.meter { height: 6px; background: var(--rule); border-radius: 99px; overflow: hidden; max-width: 260px; }
+.meter i { display: block; height: 100%; width: 0; background: var(--ok); transition: width .3s; }
+.bar .pct { font-size: 13px; color: var(--muted); font-variant-numeric: tabular-nums; white-space: nowrap; }
+.save { font-size: 12px; color: var(--muted); white-space: nowrap; }
+.save.err { color: var(--warm); }
+.btn { font: 500 14px var(--f-ui); border: 1px solid var(--rule); background: var(--paper-2); color: var(--ink); border-radius: 99px;
+  padding: 7px 14px; cursor: pointer; white-space: nowrap; }
+.btn:hover { border-color: var(--accent); }
+.btn.primary { background: var(--accent); color: var(--paper); border-color: var(--accent); }
+.menu-btn { display: none; }
+
+/* раскладка */
+.wrap { display: grid; grid-template-columns: var(--side) minmax(0, 1fr); }
+.side { position: sticky; top: calc(env(safe-area-inset-top, 0px) + 53px); height: calc(100vh - 53px - env(safe-area-inset-top, 0px)); overflow-y: auto;
+  border-right: 1px solid var(--rule); background: var(--paper-2); font-family: var(--f-ui); font-size: 14px; padding: 16px 12px 40px max(12px, env(safe-area-inset-left, 0px)); }
+.search { width: 100%; font: 400 14px var(--f-ui); padding: 8px 12px; border: 1px solid var(--rule); border-radius: 8px; background: var(--paper); color: var(--ink); }
+.hits { margin: 8px 0 0; padding: 0; list-style: none; }
+.hits li a { display: block; padding: 6px 8px; border-radius: 6px; text-decoration: none; color: var(--ink); }
+.hits li a:hover { background: var(--accent-soft); }
+.hits small { display: block; color: var(--muted); }
+.toc { list-style: none; margin: 14px 0 0; padding: 0; }
+.toc .part { margin: 18px 6px 6px; font-size: 11px; letter-spacing: .09em; text-transform: uppercase; color: var(--muted); font-weight: 600; }
+.toc > li > a { display: flex; gap: 8px; align-items: baseline; padding: 7px 8px; border-radius: 6px; text-decoration: none; color: var(--ink); font-weight: 500; }
+.toc > li > a .n { color: var(--muted); font-variant-numeric: tabular-nums; min-width: 1.6em; }
+.toc > li > a .t { flex: 1; min-width: 0; }
+.toc > li > a .c { font-size: 12px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.toc > li > a .c.full { color: var(--ok); font-weight: 600; }
+.toc > li > a:hover { background: var(--accent-soft); }
+.toc > li.on > a { background: var(--accent-soft); color: var(--accent); }
+.toc ul { list-style: none; margin: 0 0 6px 34px; padding: 0; display: none; }
+.toc > li.on ul, .toc > li.open ul { display: block; }
+.toc ul a { display: block; padding: 3px 8px; color: var(--muted); text-decoration: none; border-left: 2px solid var(--rule); }
+.toc ul a:hover { color: var(--ink); }
+.toc ul a.on { color: var(--accent); border-left-color: var(--accent); }
+
+.main { min-width: 0; padding-block: 32px 80px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+.col { max-width: 46rem; margin: 0 auto; }
+
+/* обложка */
+.cover { padding-block: 24px 8px; border-bottom: 3px double var(--rule); margin-bottom: 40px; }
+.cover .kicker { font: 600 12px var(--f-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--warm); }
+.cover h1 { font-size: clamp(34px, 6vw, 54px); margin: 8px 0 12px; font-weight: 700; letter-spacing: -.01em; }
+.cover h1 em { font-style: italic; font-weight: 400; color: var(--accent); }
+.cover .lead { font-size: 20px; color: var(--muted); margin: 0 0 20px; }
+.cover .facts { display: flex; flex-wrap: wrap; gap: 8px 22px; font: 400 14px var(--f-ui); color: var(--muted); margin-bottom: 20px; }
+.cover .facts b { color: var(--ink); font-weight: 600; }
+.cover .go { display: flex; flex-wrap: wrap; gap: 10px; margin-bottom: 24px; }
+
+/* части и главы */
+.part-h { font: 600 13px var(--f-ui); letter-spacing: .12em; text-transform: uppercase; color: var(--warm); margin: 72px 0 0; padding-top: 18px; border-top: 1px solid var(--rule); }
+.part-h + .ch { margin-top: 16px; }
+.ch { margin-top: 64px; }
+.ch-head { margin-bottom: 18px; }
+.ch-num { font: 600 13px var(--f-ui); letter-spacing: .1em; text-transform: uppercase; color: var(--accent); }
+.ch h2 { font-size: clamp(28px, 4.4vw, 38px); margin: 4px 0 8px; }
+.ch-meta { font: 400 14px var(--f-ui); color: var(--muted); margin: 0; display: flex; flex-wrap: wrap; gap: 4px 16px; }
+.ch h3 { font-size: 23px; margin: 40px 0 10px; }
+.ch h3 .sn { font: 500 14px var(--f-ui); color: var(--muted); margin-right: 8px; font-variant-numeric: tabular-nums; }
+.ch p, .ch li { max-width: 68ch; }
+.ch ul, .ch ol { padding-left: 1.3em; }
+.ch li { margin: 3px 0; }
+
+.goals { background: var(--accent-soft); border-radius: 10px; padding: 14px 20px; margin: 18px 0; }
+.goals h4, .box h4 { font: 600 13px var(--f-ui); letter-spacing: .08em; text-transform: uppercase; margin: 0 0 6px; }
+.goals h4 { color: var(--accent); }
+.goals ul { margin: 0; }
+
+dl.terms { display: grid; grid-template-columns: minmax(0, 11rem) minmax(0, 1fr); gap: 8px 18px; margin: 10px 0; }
+dl.terms dt { font: 600 15px var(--f-ui); }
+dl.terms dd { margin: 0; color: var(--muted); font-size: 16px; }
+
+ul.res { list-style: none; padding: 0; margin: 10px 0; display: grid; gap: 10px; }
+ul.res li { display: grid; grid-template-columns: 86px minmax(0, 1fr); gap: 2px 12px; align-items: baseline; }
+ul.res .tag { grid-row: span 2; font: 600 11px var(--f-ui); letter-spacing: .06em; text-transform: uppercase; text-align: center; padding: 3px 4px; border-radius: 4px;
+  border: 1px solid var(--rule); color: var(--muted); }
+ul.res .tag.book { color: var(--warm); border-color: currentColor; }
+ul.res .tag.course { color: var(--accent); border-color: currentColor; }
+ul.res .tag.video { color: var(--ok); border-color: currentColor; }
+ul.res a { font-weight: 600; }
+ul.res .note { font-size: 15px; color: var(--muted); }
+ul.res .price { font: 500 12px var(--f-ui); color: var(--muted); margin-left: 6px; }
+
+figure.code { margin: 20px 0; border: 1px solid var(--rule); border-radius: 10px; overflow: hidden; background: var(--code-bg); }
+figure.code figcaption { font: 500 13px var(--f-ui); color: var(--muted); padding: 8px 14px; border-bottom: 1px solid var(--rule); }
+figure.code pre { margin: 0; padding: 14px; overflow-x: auto; font: 400 13.5px/1.55 var(--f-code); }
+figure.code code { background: none; padding: 0; font-size: inherit; }
+
+.box { border: 1px solid var(--rule); border-radius: 10px; padding: 14px 18px; margin: 20px 0; }
+.box.ex { background: var(--warm-soft); border-color: transparent; }
+.box.ex h4 { color: var(--warm); }
+.box.quiz h4 { color: var(--accent); }
+.box.skills { background: var(--ok-soft); border-color: transparent; }
+.box.skills h4 { color: var(--ok); }
+.box.fact { background: var(--paper-2); border-style: dashed; }
+.box.fact h4 { color: var(--warm); }
+.box.fact p { margin: 0; font-size: 16px; }
+.box.task { border-color: var(--accent); }
+.box.task h4 { color: var(--accent); }
+.box.task > p { margin: 4px 0 8px; }
+details.sol { border-top: 1px solid var(--rule); }
+details.sol figure.code { margin: 10px 0; }
+.box.note { border-left: 3px solid var(--accent); border-radius: 0 10px 10px 0; font-size: 16px; }
+.box.note p { margin: 0; }
+
+ul.todo { list-style: none; padding: 0; margin: 4px 0 0; }
+ul.todo li { margin: 0; max-width: none; }
+ul.todo label { display: flex; gap: 10px; align-items: flex-start; padding: 5px 0; cursor: pointer; }
+ul.todo input { flex: none; width: 18px; height: 18px; margin-top: .3em; accent-color: var(--ok); cursor: pointer; }
+ul.todo input:checked + span { color: var(--muted); text-decoration: line-through; text-decoration-color: var(--rule); }
+
+details { border-top: 1px solid var(--rule); padding: 8px 0; }
+details:first-of-type { border-top: 0; }
+summary { cursor: pointer; font-weight: 600; }
+summary::marker { color: var(--accent); }
+details p { margin: 8px 0 4px; color: var(--muted); font-size: 16px; }
+
+.tbl { overflow-x: auto; margin: 16px 0; }
+table { border-collapse: collapse; width: 100%; font: 400 15px/1.45 var(--f-ui); }
+th, td { text-align: left; padding: 8px 10px; border-bottom: 1px solid var(--rule); vertical-align: top; }
+th { font-weight: 600; color: var(--muted); font-size: 13px; letter-spacing: .04em; text-transform: uppercase; }
+td.num { font-variant-numeric: tabular-nums; white-space: nowrap; }
+
+pre.tree { font: 400 13.5px/1.5 var(--f-code); background: var(--code-bg); border: 1px solid var(--rule); border-radius: 10px; padding: 14px; overflow-x: auto; }
+
+.pager { display: flex; justify-content: space-between; gap: 12px; margin-top: 40px; padding-top: 16px; border-top: 1px solid var(--rule); font-family: var(--f-ui); }
+.pager a { text-decoration: none; display: flex; flex-direction: column; max-width: 48%; }
+.pager a small { color: var(--muted); font-size: 12px; text-transform: uppercase; letter-spacing: .08em; }
+.pager a.next { margin-left: auto; text-align: right; }
+mark { background: var(--mark); color: inherit; }
+.flash { animation: flash 1.6s ease-out; }
+@keyframes flash { from { background: var(--mark); } to { background: transparent; } }
+
+.top { position: fixed; right: max(16px, env(safe-area-inset-right, 0px)); bottom: calc(16px + env(safe-area-inset-bottom, 0px)); z-index: 15; }
+.scrim { display: none; }
+
+@media (max-width: 960px) {
+  .wrap { grid-template-columns: minmax(0, 1fr); }
+  .menu-btn { display: inline-block; }
+  .side { position: fixed; top: 0; left: 0; bottom: 0; height: auto; width: min(86vw, 340px); z-index: 40; transform: translateX(-102%); transition: transform .25s;
+    padding-top: calc(16px + env(safe-area-inset-top, 0px)); padding-bottom: calc(40px + env(safe-area-inset-bottom, 0px)); box-shadow: 0 0 40px rgb(0 0 0 / .2); }
+  body.nav .side { transform: none; }
+  body.nav .scrim { display: block; position: fixed; inset: 0; z-index: 35; background: rgb(0 0 0 / .35); }
+  .bar .meter, .save { display: none; }
+  body { font-size: 17px; }
+}
+@media (max-width: 520px) {
+  dl.terms { grid-template-columns: minmax(0, 1fr); gap: 2px; }
+  dl.terms dd { margin-bottom: 8px; }
+  ul.res li { grid-template-columns: minmax(0, 1fr); }
+  ul.res .tag { grid-row: auto; justify-self: start; }
+  .bar .brand { display: none; }
+  #cont-top { display: none; }
+}
+</style>
+</head>
+<body>
+
+<header class="bar">
+  <button class="btn menu-btn" id="menu" aria-controls="side" aria-expanded="false">☰ Оглавление</button>
+  <a class="brand" href="#top">Full Stack <span>Java · Angular</span></a>
+  <div class="grow"><div class="meter" aria-hidden="true"><i id="meter"></i></div></div>
+  <span class="save" id="save"></span>
+  <span class="pct" id="pct">0 %</span>
+  <button class="btn primary" id="cont-top">Продолжить</button>
+</header>
+
+<div class="wrap">
+<nav class="side" id="side" aria-label="Оглавление">
+  <input class="search" id="q" type="search" placeholder="Поиск по учебнику…" autocomplete="off">
+  <ul class="hits" id="hits"></ul>
+  <ul class="toc" id="toc"></ul>
+</nav>
+<div class="scrim" id="scrim"></div>
+
+<main class="main" id="top">
+<div class="col">
+
+<section class="cover" id="intro" data-ch="0" data-title="Предисловие">
+  <div class="kicker">Учебник для самостоятельного изучения</div>
+  <h1>Full Stack разработчик: <em>Java и Angular</em></h1>
+  <p class="lead">Курс построен под вакансию Full Stack Developer (Java/Angular) в Swisscom DevOps Center Latvia, Рига. Начальный уровень: три курса Programming Engineer.</p>
+  <div class="facts">
+    <span><b>10</b> глав</span><span><b>~7</b> месяцев</span><span><b>15–20</b> часов в неделю</span><span><b>5 + 1</b> проектов для портфолио</span>
+  </div>
+  <div class="go">
+    <button class="btn primary" id="cont">Продолжить с места</button>
+    <a class="btn" href="#ch1">Начать с главы 1</a>
+    <a class="btn" href="#ch10">Финальный проект</a>
+  </div>
+
+  <h3 id="intro-how">Как пользоваться учебником</h3>
+  <p>Все материалы бесплатны и находятся в открытом доступе. Каждая глава устроена одинаково: <b>цели</b>, <b>ключевые понятия</b> с объяснениями, <b>теория</b> (книги, курсы, видео, документация), <b>листинг</b> с примером кода, <b>интересный факт</b>, <b>практика</b>, <b>задачи с решениями</b>, <b>упражнения</b>, <b>вопросы «Проверь себя»</b> и <b>чек-лист навыков</b>. Галочки сохраняются на сайте, их видно с любого устройства, где выполнен вход.</p>
+  <p>Оглавление слева показывает, сколько пунктов главы уже отмечено. Кнопка «Продолжить» ведёт к первому неотмеченному пункту. Поиск находит любую тему, книгу или термин.</p>
+
+  <h3 id="intro-rules">Принципы самообучения</h3>
+  <ul>
+    <li><b>30 / 70.</b> 30 % времени на теорию, 70 % на код. Каждая тема заканчивается коммитом в проект.</li>
+    <li><b>Учить по необходимости.</b> Книгу главы открывать в начале главы, не раньше.</li>
+    <li><b>Активное припоминание.</b> В конце недели 10 минут: своими словами записать в <code>LEARNING.md</code>, что понято. Ответить на «Проверь себя», не подглядывая.</li>
+    <li><b>Интервальное повторение.</b> Вопросы прошлых глав повторять через 1, 3 и 7 дней (удобно в Anki).</li>
+    <li><b>Метод Фейнмана.</b> Если тему не получается объяснить простыми словами, её стоит перечитать.</li>
+    <li><b>Публичность.</b> Все проекты на GitHub, с README, скриншотами и зелёным CI.</li>
+  </ul>
+  <ul class="res">
+    <li><span class="tag">Карта</span><a href="https://roadmap.sh/java" target="_blank" rel="noopener">roadmap.sh: Java</a><span class="note">Также <a href="https://roadmap.sh/spring-boot" target="_blank" rel="noopener">Spring Boot</a> и <a href="https://roadmap.sh/angular" target="_blank" rel="noopener">Angular</a>: карты тем, чтобы видеть пробелы.</span></li>
+  </ul>
+
+  <h3 id="intro-plan">План по месяцам</h3>
+  <div class="tbl"><table>
+    <thead><tr><th>Месяц</th><th>Главы</th><th>Проект</th></tr></thead>
+    <tbody>
+      <tr><td class="num">1</td><td><a href="#ch1">1. Java</a>, <a href="#ch2">2. Базы данных</a></td><td>logscope</td></tr>
+      <tr><td class="num">2</td><td><a href="#ch3">3. Spring Boot и REST</a></td><td>taskhub-api</td></tr>
+      <tr><td class="num">3</td><td><a href="#ch4">4. TypeScript и Angular</a></td><td>taskhub-web</td></tr>
+      <tr><td class="num">4</td><td><a href="#ch5">5. Безопасность и IAM</a></td><td>taskhub + Keycloak</td></tr>
+      <tr><td class="num">5</td><td><a href="#ch6">6. Docker, CI/CD, Kubernetes, AWS</a></td><td>taskhub в Kubernetes</td></tr>
+      <tr><td class="num">6–7</td><td><a href="#ch7">7. Микросервисы</a>, <a href="#ch10">10. APIForge</a></td><td>APIForge</td></tr>
+    </tbody>
+  </table></div>
+  <div class="box note"><p>Откликаться на вакансию можно уже после 4–5 месяца: проекты 2–5 на GitHub — достаточное портфолио для позиции junior/mid. Последние главы можно доучивать параллельно с собеседованиями.</p></div>
+
+  <h3 id="intro-legend">Обозначения</h3>
+  <ul class="res">
+    <li><span class="tag book">Книга</span><span>Книга на английском в открытом доступе: читается бесплатно онлайн или в PDF.</span></li>
+    <li><span class="tag course">Курс</span><span>Бесплатный онлайн-курс или тренажёр.</span></li>
+    <li><span class="tag video">Видео</span><span>YouTube-канал или видеокурс.</span></li>
+    <li><span class="tag">Доки</span><span>Официальная документация: самый достоверный источник.</span></li>
+    <li><span class="tag">Сайт</span><span>Бесплатный сайт или статья признанного автора.</span></li>
+  </ul>
+</section>
+
+<!-- ============ ЧАСТЬ I ============ -->
+<div class="part-h" data-part="Часть I · Backend">Часть I · Backend</div>
+
+<section class="ch" id="ch1" data-ch="1" data-title="Современная Java">
+  <header class="ch-head">
+    <div class="ch-num">Глава 1</div>
+    <h2>Современная Java и инструменты</h2>
+    <p class="ch-meta"><span>3–4 недели</span><span>Проект: logscope</span></p>
+  </header>
+  <div class="goals"><h4>Цели главы</h4><ul>
+    <li>Писать идиоматичный код на Java 17–21, а не «Java 8 со старыми привычками».</li>
+    <li>Уверенно работать с коллекциями, Stream API и многопоточностью.</li>
+    <li>Собирать проект Gradle/Maven, покрывать его тестами JUnit 5.</li>
+    <li>Работать в Git как в команде: ветки, pull request, rebase.</li>
+  </ul></div>
+
+  <h3 id="ch1-terms"><span class="sn">1.1</span>Ключевые понятия</h3>
+  <dl class="terms">
+    <dt>record</dt><dd>Неизменяемый класс-носитель данных: конструктор, equals, hashCode и toString генерируются сами.</dd>
+    <dt>sealed</dt><dd>Класс или интерфейс с закрытым списком наследников. Вместе с pattern matching даёт исчерпывающий <code>switch</code>.</dd>
+    <dt>Stream API</dt><dd>Декларативная обработка коллекций: filter, map, collect, groupingBy.</dd>
+    <dt>Optional</dt><dd>Явное «значение может отсутствовать». Задуман как тип возврата.</dd>
+    <dt>Virtual threads</dt><dd>Лёгкие потоки Java 21: тысячи одновременных блокирующих операций ввода-вывода без пулов.</dd>
+    <dt>Gradle / Maven</dt><dd>Сборка, зависимости, запуск тестов.</dd>
+  </dl>
+
+  <h3 id="ch1-theory"><span class="sn">1.2</span>Теория</h3>
+  <ul class="res">
+    <li><span class="tag">Доки</span><a href="https://dev.java/learn/" target="_blank" rel="noopener">dev.java/learn</a><span class="note">Официальный учебник Oracle по современной Java: records, sealed, pattern matching, virtual threads.</span></li>
+    <li><span class="tag book">Книга</span><a href="https://greenteapress.com/wp/think-java-2e/" target="_blank" rel="noopener">Think Java, 2nd ed. — Allen Downey, Chris Mayfield</a><span class="note">Бесплатная книга (HTML и PDF, лицензия CC). Быстро повторить основы и закрыть пробелы.</span></li>
+    <li><span class="tag">Сайт</span><a href="https://jenkov.com/tutorials/java-concurrency/index.html" target="_blank" rel="noopener">Jenkov — Java Concurrency</a><span class="note">Бесплатный подробный учебник по многопоточности: потоки, гонки, локи, ExecutorService, virtual threads.</span></li>
+    <li><span class="tag">Доки</span><a href="https://www.baeldung.com/" target="_blank" rel="noopener">Baeldung</a><span class="note">Справочник с примерами почти по любой теме Java и Spring.</span></li>
+    <li><span class="tag">Сайт</span><a href="https://refactoring.guru/design-patterns" target="_blank" rel="noopener">Refactoring.Guru — Design Patterns</a><span class="note">Паттерны проектирования с примерами на Java.</span></li>
+    <li><span class="tag book">Книга</span><a href="https://git-scm.com/book/en/v2" target="_blank" rel="noopener">Pro Git</a><span class="note">Бесплатная официальная книга по Git.</span></li>
+  </ul>
+
+  <figure class="code"><figcaption>Листинг 1.1. Record, Stream API и groupingBy: средняя длительность запросов по адресу</figcaption>
+<pre><code>record Hit(String path, int status, long millis) {}
+
+Map&lt;String, Double&gt; avgByPath = hits.stream()
+    .filter(h -&gt; h.status() &lt; 500)
+    .collect(Collectors.groupingBy(Hit::path,
+             Collectors.averagingLong(Hit::millis)));
+
+// Java 21: виртуальный поток на каждый файл
+try (var pool = Executors.newVirtualThreadPerTaskExecutor()) {
+    files.forEach(f -&gt; pool.submit(() -&gt; parse(f)));
+}</code></pre></figure>
+
+  <aside class="box fact"><h4>Интересный факт</h4><p>Java создавали в Sun Microsystems под руководством Джеймса Гослинга. Сначала язык назывался Oak — в честь дуба за окном, но имя оказалось занято, и в 1995 году он вышел как Java. С 2018 года новая версия выходит каждые полгода, а версия с долгой поддержкой (LTS) — раз в два года: 17, 21, 25.</p></aside>
+
+  <h3 id="ch1-practice"><span class="sn">1.3</span>Практика</h3>
+  <ul class="res">
+    <li><span class="tag course">Курс</span><a href="https://java-programming.mooc.fi/" target="_blank" rel="noopener">Java Programming MOOC</a><span class="note">Университет Хельсинки. Сотни задач с автопроверкой; пройти темы, где есть пробелы.</span></li>
+    <li><span class="tag course">Курс</span><a href="https://exercism.org/tracks/java" target="_blank" rel="noopener">Exercism — Java track</a><span class="note">Задачи с бесплатным ревью от менторов.</span></li>
+    <li><span class="tag course">Курс</span><a href="https://learngitbranching.js.org/" target="_blank" rel="noopener">Learn Git Branching</a><span class="note">Интерактивный тренажёр веток, merge и rebase.</span></li>
+    <li><span class="tag">Доки</span><a href="https://junit.org/junit5/docs/current/user-guide/" target="_blank" rel="noopener">JUnit 5 User Guide</a><span class="note">Параметризованные тесты, вложенные классы, расширения.</span></li>
+  </ul>
+
+  <h3 id="ch1-tasks"><span class="sn">1.4</span>Задачи с решениями</h3>
+  <div class="box task"><h4>Задача 1.1. Топ-3 слов</h4>
+    <p>Напишите метод <code>top3(String text)</code>, который возвращает три самых частых слова текста без учёта регистра. Только Stream API, без циклов.</p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>Java</figcaption><pre><code>static List&lt;String&gt; top3(String text) {
+    return Arrays.stream(text.toLowerCase().split("[^\\p{L}\\p{N}]+"))
+        .filter(w -&gt; !w.isBlank())
+        .collect(Collectors.groupingBy(w -&gt; w, Collectors.counting()))
+        .entrySet().stream()
+        .sorted(Map.Entry.&lt;String, Long&gt;comparingByValue().reversed())
+        .limit(3)
+        .map(Map.Entry::getKey)
+        .toList();
+}</code></pre></figure>
+      <p>Регулярное выражение <code>[^\p{L}\p{N}]+</code> режет по всему, что не буква и не цифра, поэтому работает и для кириллицы (обычный <code>\W</code> считает кириллицу «не словом»). <code>groupingBy</code> + <code>counting</code> строят частоты, затем сортировка по значению по убыванию.</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c1-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box task"><h4>Задача 1.2. Площадь фигур</h4>
+    <p>Опишите фигуры круг и прямоугольник через sealed-интерфейс и records. Напишите <code>area(Shape s)</code> через <code>switch</code> с pattern matching без ветки <code>default</code>.</p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>Java 21</figcaption><pre><code>sealed interface Shape permits Circle, Rect {}
+record Circle(double r) implements Shape {}
+record Rect(double w, double h) implements Shape {}
+
+static double area(Shape s) {
+    return switch (s) {
+        case Circle c -&gt; Math.PI * c.r() * c.r();
+        case Rect(double w, double h) -&gt; w * h;   // record pattern, Java 21
+    };
+}</code></pre></figure>
+      <p>Компилятор знает все разрешённые реализации sealed-интерфейса, поэтому <code>switch</code> исчерпывающий и <code>default</code> не нужен. Если добавить новую фигуру, код перестанет компилироваться, пока её не обработают, — это и есть польза sealed.</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c1-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+
+  <div class="box ex"><h4>Упражнения</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c1-e1"><span>Переписать 3 старых учебных класса на records и sealed-интерфейсы с <code>switch</code> по шаблону.</span></label></li>
+    <li><label><input type="checkbox" data-k="c1-e2"><span>Решить 15 задач Exercism Java, к пяти из них получить ревью ментора.</span></label></li>
+    <li><label><input type="checkbox" data-k="c1-e3"><span>Пройти Learn Git Branching: разделы Main и Remote целиком.</span></label></li>
+    <li><label><input type="checkbox" data-k="c1-e4"><span>Сравнить время обработки 1000 файлов: обычный пул потоков и виртуальные потоки.</span></label></li>
+  </ul></div>
+
+  <div class="box quiz"><h4>Проверь себя</h4>
+    <details><summary>Чем record отличается от обычного класса?</summary><p>Поля final, а конструктор, equals, hashCode, toString и методы доступа генерируются автоматически. Record не может наследовать другой класс, но может реализовывать интерфейсы.</p></details>
+    <details><summary>Когда виртуальные потоки дают выигрыш, а когда нет?</summary><p>Выигрыш — при большом числе блокирующих операций ввода-вывода (HTTP, база, файлы). Для вычислительных задач они не быстрее обычных: число ядер не меняется.</p></details>
+    <details><summary>Почему Optional не стоит делать полем класса или параметром метода?</summary><p>Он задуман как тип возврата: «результата может не быть». В полях он усложняет сериализацию и добавляет лишний объект, в параметрах лучше перегрузка или null-проверка.</p></details>
+    <details><summary>Чем map отличается от flatMap в Stream?</summary><p>map превращает каждый элемент в один новый, flatMap — в поток элементов и «расплющивает» их в один общий поток.</p></details>
+  </div>
+
+  <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c1-s1"><span>Пишу records, sealed-интерфейсы и switch-выражения с pattern matching.</span></label></li>
+    <li><label><input type="checkbox" data-k="c1-s2"><span>Решаю задачи со Stream API без циклов там, где так понятнее.</span></label></li>
+    <li><label><input type="checkbox" data-k="c1-s3"><span>Знаю разницу между ExecutorService, CompletableFuture и virtual threads.</span></label></li>
+    <li><label><input type="checkbox" data-k="c1-s4"><span>Настраиваю Gradle-проект с JUnit 5, AssertJ и Mockito с нуля.</span></label></li>
+    <li><label><input type="checkbox" data-k="c1-s5"><span>Делаю ветку, pull request, rebase и разрешаю конфликт.</span></label></li>
+    <li><label><input type="checkbox" data-k="c1-s6"><span>Проект 1 logscope готов (<a href="#p1">задание</a>).</span></label></li>
+  </ul></div>
+</section>
+
+<section class="ch" id="ch2" data-ch="2" data-title="Базы данных и SQL">
+  <header class="ch-head">
+    <div class="ch-num">Глава 2</div>
+    <h2>Базы данных, SQL и JPA</h2>
+    <p class="ch-meta"><span>2 недели, можно параллельно с главой 3</span><span>Проект: taskhub-api</span></p>
+  </header>
+  <div class="goals"><h4>Цели главы</h4><ul>
+    <li>Проектировать схему: нормализация, ключи, индексы.</li>
+    <li>Писать SQL с JOIN, агрегатами и оконными функциями.</li>
+    <li>Понимать транзакции и уровни изоляции.</li>
+    <li>Работать с JPA/Hibernate и не попадать в проблему N+1.</li>
+  </ul></div>
+
+  <h3 id="ch2-terms"><span class="sn">2.1</span>Ключевые понятия</h3>
+  <dl class="terms">
+    <dt>Нормализация</dt><dd>Разбиение данных по таблицам так, чтобы факт хранился в одном месте.</dd>
+    <dt>Индекс</dt><dd>Структура (обычно B-tree), ускоряющая поиск. Составной индекс (a, b) работает для запросов по a и по (a, b).</dd>
+    <dt>ACID</dt><dd>Атомарность, согласованность, изоляция, долговечность транзакции.</dd>
+    <dt>Миграция</dt><dd>Версионированное изменение схемы (Flyway: <code>V1__init.sql</code>, <code>V2__…</code>).</dd>
+    <dt>N+1</dt><dd>Один запрос за списком и ещё N — за связанными сущностями каждого элемента.</dd>
+  </dl>
+
+  <h3 id="ch2-theory"><span class="sn">2.2</span>Теория</h3>
+  <ul class="res">
+    <li><span class="tag">Доки</span><a href="https://www.postgresql.org/docs/current/tutorial.html" target="_blank" rel="noopener">PostgreSQL Tutorial</a><span class="note">Официальный учебник PostgreSQL: таблицы, запросы, транзакции, оконные функции.</span></li>
+    <li><span class="tag">Сайт</span><a href="https://vladmihalcea.com/" target="_blank" rel="noopener">Блог Vlad Mihalcea</a><span class="note">Бесплатные статьи о Hibernate и производительности: лучший источник по теме.</span></li>
+    <li><span class="tag">Доки</span><a href="https://documentation.red-gate.com/flyway" target="_blank" rel="noopener">Flyway Documentation</a><span class="note">Миграции схемы.</span></li>
+    <li><span class="tag">Доки</span><a href="https://docs.spring.io/spring-data/jpa/reference/" target="_blank" rel="noopener">Spring Data JPA Reference</a><span class="note">Репозитории, запросы по имени метода, @EntityGraph.</span></li>
+    <li><span class="tag book">Книга</span><a href="https://use-the-index-luke.com/" target="_blank" rel="noopener">Use The Index, Luke — Markus Winand</a><span class="note">Бесплатная веб-книга об индексах и производительности SQL для разработчиков.</span></li>
+  </ul>
+
+  <figure class="code"><figcaption>Листинг 2.1. Flyway-миграция V1__init.sql для taskhub</figcaption>
+<pre><code>CREATE TABLE project (
+  id    BIGSERIAL PRIMARY KEY,
+  name  TEXT NOT NULL UNIQUE
+);
+CREATE TABLE task (
+  id          BIGSERIAL PRIMARY KEY,
+  project_id  BIGINT NOT NULL REFERENCES project(id) ON DELETE CASCADE,
+  title       TEXT NOT NULL,
+  status      TEXT NOT NULL CHECK (status IN ('TODO', 'IN_PROGRESS', 'DONE')),
+  created_at  TIMESTAMPTZ NOT NULL DEFAULT now()
+);
+CREATE INDEX idx_task_project_status ON task (project_id, status);</code></pre></figure>
+
+  <aside class="box fact"><h4>Интересный факт</h4><p>SQL придумали в IBM в начале 1970-х Дональд Чемберлин и Рэймонд Бойс. Язык назывался SEQUEL, но название пришлось сменить из-за чужой торговой марки, поэтому многие до сих пор произносят SQL как «сиквел». PostgreSQL вырос из проекта POSTGRES Майкла Стоунбрейкера в Беркли; за работы над базами данных он получил премию Тьюринга в 2014 году.</p></aside>
+
+  <h3 id="ch2-practice"><span class="sn">2.3</span>Практика</h3>
+  <ul class="res">
+    <li><span class="tag course">Курс</span><a href="https://sqlbolt.com/" target="_blank" rel="noopener">SQLBolt</a><span class="note">Интерактивные уроки SQL с задачами прямо в браузере.</span></li>
+    <li><span class="tag course">Курс</span><a href="https://pgexercises.com/" target="_blank" rel="noopener">PostgreSQL Exercises</a><span class="note">Задачи на JOIN, агрегаты и рекурсивные запросы.</span></li>
+  </ul>
+
+  <h3 id="ch2-tasks"><span class="sn">2.4</span>Задачи с решениями</h3>
+  <div class="box task"><h4>Задача 2.1. Прогресс проектов</h4>
+    <p>Для каждого проекта выведите общее число задач, число задач DONE и процент выполненных. Проекты без задач тоже должны попасть в отчёт. Отсортируйте по проценту.</p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>PostgreSQL</figcaption><pre><code>SELECT p.name,
+       COUNT(t.id)                                AS total,
+       COUNT(*) FILTER (WHERE t.status = 'DONE')  AS done,
+       ROUND(100.0 * COUNT(*) FILTER (WHERE t.status = 'DONE')
+             / NULLIF(COUNT(t.id), 0), 1)          AS done_pct
+FROM project p
+LEFT JOIN task t ON t.project_id = p.id
+GROUP BY p.id, p.name
+ORDER BY done_pct DESC NULLS LAST;</code></pre></figure>
+      <p><code>LEFT JOIN</code> оставляет проекты без задач. <code>COUNT(t.id)</code> не считает NULL, поэтому у пустого проекта total = 0. <code>NULLIF</code> защищает от деления на ноль, <code>FILTER</code> — компактная замена <code>SUM(CASE …)</code>.</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c2-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box task"><h4>Задача 2.2. Убрать N+1</h4>
+    <p>Метод <code>projectRepository.findAll()</code>, а затем <code>project.getTasks()</code> в цикле даёт 1 + N запросов. Исправьте одним запросом.</p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>Spring Data JPA</figcaption><pre><code>public interface ProjectRepository extends JpaRepository&lt;Project, Long&gt; {
+
+    @Query("select distinct p from Project p left join fetch p.tasks")
+    List&lt;Project&gt; findAllWithTasks();
+
+    // или то же через EntityGraph:
+    @EntityGraph(attributePaths = "tasks")
+    List&lt;Project&gt; findAllBy();
+}</code></pre></figure>
+      <p><code>join fetch</code> загружает проекты и их задачи одним SQL-запросом. <code>distinct</code> убирает дубликаты проектов в результате. Для пагинации fetch join по коллекции не подходит — там используют batch fetching (<code>@BatchSize</code>).</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c2-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+
+  <div class="box ex"><h4>Упражнения</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c2-e1"><span>Пройти SQLBolt целиком и разделы Joins и Aggregation на pgexercises.</span></label></li>
+    <li><label><input type="checkbox" data-k="c2-e2"><span>Нарисовать ER-диаграмму taskhub (проекты, задачи, пользователи, комментарии) и написать миграции.</span></label></li>
+    <li><label><input type="checkbox" data-k="c2-e3"><span>Специально получить N+1 в JPA, увидеть его в логе SQL и исправить через JOIN FETCH или @EntityGraph.</span></label></li>
+    <li><label><input type="checkbox" data-k="c2-e4"><span>Сравнить план запроса (<code>EXPLAIN ANALYZE</code>) с индексом и без.</span></label></li>
+  </ul></div>
+
+  <div class="box quiz"><h4>Проверь себя</h4>
+    <details><summary>Что такое N+1 и как его найти?</summary><p>Один запрос за списком плюс отдельный запрос за связанными данными каждого элемента. Видно в логе SQL (<code>spring.jpa.show-sql</code> или datasource-proxy). Лечится JOIN FETCH, @EntityGraph или batch fetching.</p></details>
+    <details><summary>Поможет ли индекс (project_id, status) запросу только по status?</summary><p>Обычно нет: B-tree индекс используется по левому префиксу. Для поиска только по status нужен свой индекс.</p></details>
+    <details><summary>От чего защищает уровень изоляции READ COMMITTED и от чего нет?</summary><p>Защищает от «грязного чтения» незафиксированных данных. Не защищает от неповторяющегося чтения и фантомов: повторный SELECT в той же транзакции может вернуть другой результат.</p></details>
+  </div>
+
+  <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c2-s1"><span>Проектирую схему в 3НФ и знаю, когда денормализовать.</span></label></li>
+    <li><label><input type="checkbox" data-k="c2-s2"><span>Пишу JOIN, GROUP BY, оконные функции и читаю EXPLAIN.</span></label></li>
+    <li><label><input type="checkbox" data-k="c2-s3"><span>Пишу миграции Flyway и не меняю уже применённые.</span></label></li>
+    <li><label><input type="checkbox" data-k="c2-s4"><span>Настраиваю связи JPA и выбираю lazy или eager осознанно.</span></label></li>
+  </ul></div>
+</section>
+
+<section class="ch" id="ch3" data-ch="3" data-title="Spring Boot и REST">
+  <header class="ch-head">
+    <div class="ch-num">Глава 3</div>
+    <h2>Spring Boot и REST API</h2>
+    <p class="ch-meta"><span>5–6 недель</span><span>Проект: taskhub-api</span></p>
+  </header>
+  <div class="goals"><h4>Цели главы</h4><ul>
+    <li>Понимать, что делает Spring «под капотом»: IoC, DI, автоконфигурация.</li>
+    <li>Проектировать и документировать REST API по правилам.</li>
+    <li>Обрабатывать ошибки и валидацию в едином формате.</li>
+    <li>Тестировать слои по отдельности и вместе, с настоящей базой в Testcontainers.</li>
+  </ul></div>
+
+  <h3 id="ch3-terms"><span class="sn">3.1</span>Ключевые понятия</h3>
+  <dl class="terms">
+    <dt>IoC / DI</dt><dd>Объекты (бины) создаёт и связывает контейнер Spring; класс получает зависимости через конструктор.</dd>
+    <dt>Автоконфигурация</dt><dd>Spring Boot сам настраивает бины по зависимостям в classpath и свойствам.</dd>
+    <dt>Профили</dt><dd>Наборы настроек для dev, test, prod (<code>application-prod.yml</code>).</dd>
+    <dt>ProblemDetail</dt><dd>Стандартный формат ошибок HTTP API (RFC 9457), встроен в Spring 6.</dd>
+    <dt>Идемпотентность</dt><dd>Повторный запрос даёт тот же результат: GET, PUT, DELETE — да, POST — нет.</dd>
+    <dt>OpenAPI</dt><dd>Машиночитаемое описание API, из него строится Swagger UI.</dd>
+    <dt>Testcontainers</dt><dd>Библиотека, поднимающая настоящие PostgreSQL, Kafka и другие сервисы в Docker на время тестов.</dd>
+  </dl>
+
+  <h3 id="ch3-theory"><span class="sn">3.2</span>Теория</h3>
+  <ul class="res">
+    <li><span class="tag">Доки</span><a href="https://docs.spring.io/spring-framework/reference/core.html" target="_blank" rel="noopener">Spring Framework — Core Technologies</a><span class="note">Официальное объяснение IoC-контейнера, бинов, DI и AOP. Читать главы 1–4.</span></li>
+    <li><span class="tag">Доки</span><a href="https://spring.io/guides" target="_blank" rel="noopener">Spring Guides</a><span class="note">Короткие официальные руководства: REST, JPA, тестирование.</span></li>
+    <li><span class="tag">Доки</span><a href="https://docs.spring.io/spring-boot/index.html" target="_blank" rel="noopener">Spring Boot Reference</a><span class="note">Официальная документация.</span></li>
+    <li><span class="tag course">Курс</span><a href="https://spring.academy/courses" target="_blank" rel="noopener">Spring Academy</a><span class="note">Официальные курсы команды Spring, бесплатны после регистрации. Начать со Spring Boot Essentials.</span></li>
+    <li><span class="tag video">Видео</span><a href="https://www.youtube.com/@DanVega" target="_blank" rel="noopener">Dan Vega</a><span class="note">Spring Developer Advocate: короткие и точные разборы.</span></li>
+    <li><span class="tag video">Видео</span><a href="https://www.youtube.com/@amigoscode" target="_blank" rel="noopener">Amigoscode</a><span class="note">Полные курсы Spring Boot для начинающих.</span></li>
+    <li><span class="tag video">Видео</span><a href="https://www.youtube.com/@SpringSourceDev" target="_blank" rel="noopener">SpringDeveloper</a><span class="note">Официальный канал: доклады Spring I/O и SpringOne.</span></li>
+    <li><span class="tag">Доки</span><a href="https://learn.openapis.org/" target="_blank" rel="noopener">OpenAPI — Learn</a><span class="note">Как описывать API. Для Spring — <a href="https://springdoc.org/" target="_blank" rel="noopener">springdoc-openapi</a>.</span></li>
+  </ul>
+
+  <figure class="code"><figcaption>Листинг 3.1. Контроллер: внедрение через конструктор, валидация, 201 Created с Location</figcaption>
+<pre><code>@RestController
+@RequestMapping("/api/v1/tasks")
+class TaskController {
+    private final TaskService service;
+
+    TaskController(TaskService service) { this.service = service; }
+
+    @PostMapping
+    ResponseEntity&lt;TaskDto&gt; create(@Valid @RequestBody CreateTask cmd) {
+        TaskDto saved = service.create(cmd);
+        return ResponseEntity
+            .created(URI.create("/api/v1/tasks/" + saved.id()))
+            .body(saved);
+    }
+
+    @GetMapping
+    Page&lt;TaskDto&gt; list(@RequestParam(required = false) Status status, Pageable page) {
+        return service.find(status, page);
+    }
+}</code></pre></figure>
+
+  <aside class="box fact"><h4>Интересный факт</h4><p>Spring начался с примеров кода к книге Рода Джонсона «Expert One-on-One J2EE Design and Development» (2002). Это был ответ на тяжеловесную платформу EJB: Джонсон показал, что корпоративные приложения можно строить на простых Java-объектах. Читатели попросили выложить код отдельно, и так появился фреймворк.</p></aside>
+
+  <h3 id="ch3-practice"><span class="sn">3.3</span>Практика</h3>
+  <ul class="res">
+    <li><span class="tag">Доки</span><a href="https://testcontainers.com/guides/" target="_blank" rel="noopener">Testcontainers Guides</a><span class="note">Начать с «Getting started with Testcontainers in a Java Spring Boot project».</span></li>
+    <li><span class="tag">Доки</span><a href="https://start.spring.io/" target="_blank" rel="noopener">Spring Initializr</a><span class="note">Генератор каркаса проекта.</span></li>
+  </ul>
+
+  <h3 id="ch3-tasks"><span class="sn">3.4</span>Задачи с решениями</h3>
+  <div class="box task"><h4>Задача 3.1. Единый формат ошибок</h4>
+    <p>Сделайте обработчик, который на ошибку валидации отдаёт 400 со списком полей, а на «задача не найдена» — 404. Оба ответа — в формате ProblemDetail.</p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>Java, Spring Boot 3</figcaption><pre><code>@RestControllerAdvice
+class ApiErrors {
+
+    @ExceptionHandler(MethodArgumentNotValidException.class)
+    ProblemDetail invalid(MethodArgumentNotValidException ex) {
+        ProblemDetail pd = ProblemDetail.forStatus(HttpStatus.BAD_REQUEST);
+        pd.setTitle("Validation failed");
+        pd.setProperty("errors", ex.getBindingResult().getFieldErrors().stream()
+            .collect(Collectors.toMap(FieldError::getField,
+                     e -&gt; String.valueOf(e.getDefaultMessage()), (a, b) -&gt; a)));
+        return pd;
+    }
+
+    @ExceptionHandler(TaskNotFoundException.class)
+    ProblemDetail notFound(TaskNotFoundException ex) {
+        return ProblemDetail.forStatusAndDetail(HttpStatus.NOT_FOUND, ex.getMessage());
+    }
+}</code></pre></figure>
+      <p><code>@RestControllerAdvice</code> применяется ко всем контроллерам. Spring сам выставит <code>Content-Type: application/problem+json</code>. Третий аргумент <code>toMap</code> нужен, если у поля две ошибки — иначе будет исключение о дубликате ключа.</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c3-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box task"><h4>Задача 3.2. Тест контроллера</h4>
+    <p>Напишите тест: POST с пустым title должен вернуть 400 и поле <code>errors.title</code> в ответе.</p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>JUnit 5, MockMvc</figcaption><pre><code>@WebMvcTest(TaskController.class)
+class TaskControllerTest {
+
+    @Autowired MockMvc mvc;
+    @MockitoBean TaskService service;   // в Spring Boot до 3.4 — @MockBean
+
+    @Test
+    void rejectsEmptyTitle() throws Exception {
+        mvc.perform(post("/api/v1/tasks")
+                .contentType(MediaType.APPLICATION_JSON)
+                .content("{\"title\":\"\"}"))
+           .andExpect(status().isBadRequest())
+           .andExpect(jsonPath("$.errors.title").exists());
+    }
+}</code></pre></figure>
+      <p><code>@WebMvcTest</code> поднимает только веб-слой и ваш <code>@RestControllerAdvice</code>. Сервис заменён моком: тест проверяет именно валидацию и формат ошибки, а не бизнес-логику. В <code>CreateTask</code> на поле title должна стоять аннотация <code>@NotBlank</code>.</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c3-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+
+  <div class="box ex"><h4>Упражнения</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c3-e1"><span>Пройти 5 Spring Guides: REST Service, Accessing Data JPA, Validating Form Input, Testing the Web Layer, Building REST services with Spring.</span></label></li>
+    <li><label><input type="checkbox" data-k="c3-e2"><span>Написать @ControllerAdvice, который отдаёт все ошибки в формате ProblemDetail.</span></label></li>
+    <li><label><input type="checkbox" data-k="c3-e3"><span>Описать API taskhub в OpenAPI и открыть Swagger UI.</span></label></li>
+    <li><label><input type="checkbox" data-k="c3-e4"><span>Написать по одному тесту: @WebMvcTest, @DataJpaTest, @SpringBootTest + Testcontainers.</span></label></li>
+  </ul></div>
+
+  <div class="box quiz"><h4>Проверь себя</h4>
+    <details><summary>Почему внедрение через конструктор лучше, чем @Autowired на поле?</summary><p>Зависимости видны в сигнатуре, поля можно сделать final, класс легко создать в unit-тесте без Spring, а циклические зависимости обнаруживаются сразу.</p></details>
+    <details><summary>Какой статус вернуть при создании ресурса и при ошибке валидации?</summary><p>201 Created с заголовком Location. При ошибке валидации — 400 Bad Request (иногда 422) с телом ProblemDetail, где перечислены поля.</p></details>
+    <details><summary>Чем @WebMvcTest отличается от @SpringBootTest?</summary><p>@WebMvcTest поднимает только веб-слой (контроллеры, MockMvc), сервисы подменяются моками; тест быстрый. @SpringBootTest поднимает весь контекст приложения.</p></details>
+    <details><summary>Чем PUT отличается от PATCH?</summary><p>PUT заменяет ресурс целиком и идемпотентен. PATCH меняет часть полей.</p></details>
+  </div>
+
+  <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c3-s1"><span>Объясняю, как Spring создаёт бины и что делает автоконфигурация.</span></label></li>
+    <li><label><input type="checkbox" data-k="c3-s2"><span>Проектирую REST API: ресурсы, статусы, пагинация, версии.</span></label></li>
+    <li><label><input type="checkbox" data-k="c3-s3"><span>Валидирую входные данные и отдаю ошибки в одном формате.</span></label></li>
+    <li><label><input type="checkbox" data-k="c3-s4"><span>Пишу тесты на всех слоях, включая Testcontainers.</span></label></li>
+    <li><label><input type="checkbox" data-k="c3-s5"><span>Настраиваю профили, Actuator и логирование.</span></label></li>
+    <li><label><input type="checkbox" data-k="c3-s6"><span>Проект 2 taskhub-api готов (<a href="#p2">задание</a>).</span></label></li>
+  </ul></div>
+</section>
+
+<!-- ============ ЧАСТЬ II ============ -->
+<div class="part-h" data-part="Часть II · Frontend и безопасность">Часть II · Frontend и безопасность</div>
+
+<section class="ch" id="ch4" data-ch="4" data-title="TypeScript и Angular">
+  <header class="ch-head">
+    <div class="ch-num">Глава 4</div>
+    <h2>TypeScript и Angular</h2>
+    <p class="ch-meta"><span>6 недель</span><span>Проект: taskhub-web</span></p>
+  </header>
+  <div class="goals"><h4>Цели главы</h4><ul>
+    <li>Писать строго типизированный TypeScript.</li>
+    <li>Строить приложение на современном Angular: standalone-компоненты, signals, новый control flow.</li>
+    <li>Понимать RxJS настолько, чтобы делать поиск, загрузку и отмену запросов правильно.</li>
+    <li>Тестировать компоненты и сценарии пользователя.</li>
+  </ul></div>
+
+  <h3 id="ch4-terms"><span class="sn">4.1</span>Ключевые понятия</h3>
+  <dl class="terms">
+    <dt>Standalone-компонент</dt><dd>Компонент без NgModule: сам перечисляет, что импортирует. Стандарт с Angular 17.</dd>
+    <dt>Signal</dt><dd>Реактивное значение: <code>signal()</code>, производное — <code>computed()</code>, побочный эффект — <code>effect()</code>.</dd>
+    <dt>Control flow</dt><dd>Встроенные <code>@if</code>, <code>@for</code>, <code>@switch</code> в шаблоне вместо *ngIf и *ngFor.</dd>
+    <dt>Observable</dt><dd>Поток событий RxJS. HttpClient возвращает Observable.</dd>
+    <dt>switchMap</dt><dd>Оператор, который отменяет предыдущий запрос, когда приходит новое значение. Основа «живого» поиска.</dd>
+    <dt>Interceptor</dt><dd>Функция, через которую проходит каждый HTTP-запрос: токен, ошибки, индикатор загрузки.</dd>
+    <dt>Guard</dt><dd>Проверка перед переходом по маршруту (например, «пользователь вошёл?»).</dd>
+  </dl>
+
+  <h3 id="ch4-theory"><span class="sn">4.2</span>Теория</h3>
+  <ul class="res">
+    <li><span class="tag">Доки</span><a href="https://www.typescriptlang.org/docs/handbook/intro.html" target="_blank" rel="noopener">TypeScript Handbook</a><span class="note">Официальная книга по TypeScript: типы, generics, narrowing, utility types.</span></li>
+    <li><span class="tag">Доки</span><a href="https://angular.dev/tutorials" target="_blank" rel="noopener">angular.dev — Tutorials</a><span class="note">Официальные интерактивные уроки. Учить по angular.dev: angular.io описывает устаревшие подходы.</span></li>
+    <li><span class="tag">Доки</span><a href="https://angular.dev/overview" target="_blank" rel="noopener">angular.dev — Guides</a><span class="note">Signals, DI, роутинг, формы, HttpClient, тестирование.</span></li>
+    <li><span class="tag">Доки</span><a href="https://rxjs.dev/guide/overview" target="_blank" rel="noopener">RxJS — Overview</a><span class="note">Официальное руководство. Операторы с примерами — <a href="https://www.learnrxjs.io/" target="_blank" rel="noopener">Learn RxJS</a>.</span></li>
+    <li><span class="tag">Доки</span><a href="https://developer.mozilla.org/" target="_blank" rel="noopener">MDN Web Docs</a><span class="note">HTML, CSS, JavaScript, HTTP, CORS — справочник для всего веба.</span></li>
+    <li><span class="tag">Доки</span><a href="https://material.angular.dev/" target="_blank" rel="noopener">Angular Material</a><span class="note">Готовые компоненты и CDK (drag &amp; drop, оверлеи).</span></li>
+    <li><span class="tag video">Видео</span><a href="https://www.youtube.com/@Angular" target="_blank" rel="noopener">Angular</a><span class="note">Официальный канал команды Angular.</span></li>
+    <li><span class="tag video">Видео</span><a href="https://www.youtube.com/@DecodedFrontend" target="_blank" rel="noopener">Decoded Frontend</a><span class="note">Продвинутый Angular: DI, производительность, архитектура.</span></li>
+    <li><span class="tag video">Видео</span><a href="https://www.youtube.com/@JoshuaMorony" target="_blank" rel="noopener">Joshua Morony</a><span class="note">Signals и реактивный подход.</span></li>
+  </ul>
+
+  <figure class="code"><figcaption>Листинг 4.1. Список задач на signals: данные из API, фильтр, производное значение</figcaption>
+<pre><code>@Component({
+  selector: 'app-task-list',
+  imports: [TaskCardComponent],
+  template: `
+    &lt;input placeholder="Фильтр" (input)="filter.set($any($event.target).value)" /&gt;
+    @for (task of visible(); track task.id) {
+      &lt;app-task-card [task]="task" /&gt;
+    } @empty {
+      &lt;p&gt;Задач нет&lt;/p&gt;
+    }
+  `,
+})
+export class TaskListComponent {
+  private api = inject(TaskApi);
+  filter = signal('');
+  tasks = toSignal(this.api.list(), { initialValue: [] });
+  visible = computed(() =&gt;
+    this.tasks().filter(t =&gt; t.title.toLowerCase().includes(this.filter().toLowerCase())));
+}</code></pre></figure>
+
+  <aside class="box fact"><h4>Интересный факт</h4><p>AngularJS (2010) и Angular (2016) — разные фреймворки. Вторую версию переписали с нуля на TypeScript, и код с первой на неё не переносится. TypeScript создал Андерс Хейлсберг — автор Turbo Pascal и Delphi и главный архитектор C#.</p></aside>
+
+  <h3 id="ch4-practice"><span class="sn">4.3</span>Практика</h3>
+  <ul class="res">
+    <li><span class="tag course">Курс</span><a href="https://angular.dev/tutorials/learn-angular" target="_blank" rel="noopener">Learn Angular in your browser</a><span class="note">Интерактивный курс на angular.dev — пройти целиком.</span></li>
+    <li><span class="tag course">Курс</span><a href="https://www.typescriptlang.org/play" target="_blank" rel="noopener">TypeScript Playground</a><span class="note">Проверять типы и примеры из Handbook прямо в браузере.</span></li>
+    <li><span class="tag">Доки</span><a href="https://playwright.dev/docs/intro" target="_blank" rel="noopener">Playwright</a><span class="note">E2E-тесты сценариев пользователя.</span></li>
+  </ul>
+
+  <h3 id="ch4-tasks"><span class="sn">4.4</span>Задачи с решениями</h3>
+  <div class="box task"><h4>Задача 4.1. Живой поиск</h4>
+    <p>Сделайте поле поиска задач: запрос уходит через 300 мс после остановки ввода, при новом вводе старый запрос отменяется, при ошибке список пустой, меньше двух символов — не искать.</p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>Angular, RxJS</figcaption><pre><code>@Component({
+  selector: 'app-search',
+  imports: [ReactiveFormsModule],
+  template: `
+    &lt;input [formControl]="q" placeholder="Поиск задач" /&gt;
+    @for (t of results(); track t.id) { &lt;p&gt;{{ t.title }}&lt;/p&gt; }
+  `,
+})
+export class SearchComponent {
+  private api = inject(TaskApi);
+  q = new FormControl('', { nonNullable: true });
+
+  results = toSignal(
+    this.q.valueChanges.pipe(
+      debounceTime(300),
+      map(s =&gt; s.trim()),
+      distinctUntilChanged(),
+      switchMap(s =&gt; s.length &lt; 2
+        ? of([])
+        : this.api.search(s).pipe(catchError(() =&gt; of([])))),
+    ),
+    { initialValue: [] as Task[] },
+  );
+}</code></pre></figure>
+      <p><code>debounceTime</code> ждёт паузу в вводе, <code>distinctUntilChanged</code> не повторяет тот же запрос, <code>switchMap</code> отменяет предыдущий HTTP-запрос. <code>catchError</code> стоит внутри <code>switchMap</code>: иначе одна ошибка навсегда завершит весь поток. <code>toSignal</code> сам отписывается при уничтожении компонента.</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c4-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box task"><h4>Задача 4.2. Interceptor ошибок</h4>
+    <p>Напишите функциональный interceptor: при ответе 5xx показать тост «Сервер недоступен», ошибку пробросить дальше.</p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>Angular</figcaption><pre><code>export const errorInterceptor: HttpInterceptorFn = (req, next) =&gt; {
+  const toast = inject(ToastService);
+  return next(req).pipe(
+    catchError((err: HttpErrorResponse) =&gt; {
+      if (err.status &gt;= 500) toast.show('Сервер недоступен, попробуйте позже');
+      return throwError(() =&gt; err);
+    }),
+  );
+};
+
+// app.config.ts
+export const appConfig: ApplicationConfig = {
+  providers: [provideHttpClient(withInterceptors([errorInterceptor]))],
+};</code></pre></figure>
+      <p>Функциональные interceptors — современный способ вместо классов с <code>HttpInterceptor</code>. <code>inject()</code> работает внутри них, потому что Angular вызывает их в контексте внедрения. <code>throwError</code> возвращает ошибку вызывающему коду, чтобы компонент тоже мог отреагировать.</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c4-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+
+  <div class="box ex"><h4>Упражнения</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c4-e1"><span>Прочитать разделы TypeScript Handbook: Everyday Types, Narrowing, Generics, Utility Types.</span></label></li>
+    <li><label><input type="checkbox" data-k="c4-e2"><span>Пройти интерактивный курс angular.dev целиком.</span></label></li>
+    <li><label><input type="checkbox" data-k="c4-e3"><span>Сделать «живой» поиск: debounceTime + distinctUntilChanged + switchMap, проверить отмену запросов во вкладке Network.</span></label></li>
+    <li><label><input type="checkbox" data-k="c4-e4"><span>Написать функциональный interceptor, который показывает тост при ошибке 5xx.</span></label></li>
+    <li><label><input type="checkbox" data-k="c4-e5"><span>Написать e2e-тест Playwright: создать задачу и перетащить её в колонку DONE.</span></label></li>
+  </ul></div>
+
+  <div class="box quiz"><h4>Проверь себя</h4>
+    <details><summary>Когда брать signal, а когда Observable?</summary><p>Signal — для состояния, которое нужно прочитать «сейчас» и показать в шаблоне. Observable — для потоков событий во времени: HTTP, ввод с debounce, WebSocket. Между ними переходят через toSignal и toObservable.</p></details>
+    <details><summary>Почему для поиска switchMap, а не mergeMap?</summary><p>switchMap отменяет предыдущий запрос, когда пользователь ввёл новый символ, поэтому старый ответ не перезапишет новый. mergeMap выполняет все запросы параллельно, и ответы могут прийти не по порядку.</p></details>
+    <details><summary>Зачем в @for нужен track?</summary><p>По нему Angular узнаёт элементы при обновлении списка и перерисовывает только изменённые, а не весь список.</p></details>
+    <details><summary>Где во фронтенде хранить токен доступа?</summary><p>Безопаснее всего в памяти, а обновлять через refresh-механизм библиотеки OIDC. localStorage доступен любому скрипту при XSS. В крупных системах часто используют паттерн BFF: токены на сервере, браузер держит только HttpOnly-cookie.</p></details>
+  </div>
+
+  <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c4-s1"><span>Пишу TypeScript в strict-режиме без <code>any</code>.</span></label></li>
+    <li><label><input type="checkbox" data-k="c4-s2"><span>Строю приложение из standalone-компонентов с lazy-loaded маршрутами и guards.</span></label></li>
+    <li><label><input type="checkbox" data-k="c4-s3"><span>Управляю состоянием на signals и знаю, когда нужен NgRx.</span></label></li>
+    <li><label><input type="checkbox" data-k="c4-s4"><span>Делаю Reactive Forms с валидацией и своими валидаторами.</span></label></li>
+    <li><label><input type="checkbox" data-k="c4-s5"><span>Уверенно использую 10 основных операторов RxJS и не забываю об отписке.</span></label></li>
+    <li><label><input type="checkbox" data-k="c4-s6"><span>Проект 3 taskhub-web готов (<a href="#p3">задание</a>).</span></label></li>
+  </ul></div>
+</section>
+
+<section class="ch" id="ch5" data-ch="5" data-title="Безопасность и IAM">
+  <header class="ch-head">
+    <div class="ch-num">Глава 5</div>
+    <h2>Безопасная разработка и IAM</h2>
+    <p class="ch-meta"><span>3 недели</span><span>Проект: taskhub + Keycloak</span></p>
+  </header>
+  <div class="box note"><p>В вакансии отдельно названы secure development и, как плюс, IAM и ForgeRock. Эта глава даёт заметное преимущество перед другими кандидатами.</p></div>
+  <div class="goals"><h4>Цели главы</h4><ul>
+    <li>Знать OWASP Top 10 и уметь закрыть каждый пункт в своём коде.</li>
+    <li>Понимать OAuth 2.0 и OpenID Connect на уровне схем потоков.</li>
+    <li>Настроить Spring Security как Resource Server и вход в Angular через Keycloak.</li>
+    <li>Встроить проверку зависимостей и образов в CI.</li>
+  </ul></div>
+
+  <h3 id="ch5-terms"><span class="sn">5.1</span>Ключевые понятия</h3>
+  <dl class="terms">
+    <dt>Аутентификация</dt><dd>Кто ты (401 Unauthorized, если неизвестно).</dd>
+    <dt>Авторизация</dt><dd>Что тебе можно (403 Forbidden, если нельзя).</dd>
+    <dt>OAuth 2.0</dt><dd>Протокол делегирования доступа: клиент получает access token к API.</dd>
+    <dt>OpenID Connect</dt><dd>Слой над OAuth 2.0 для входа пользователя: добавляет ID token и userinfo.</dd>
+    <dt>PKCE</dt><dd>Защита Authorization Code flow для публичных клиентов (SPA, мобильные).</dd>
+    <dt>JWT</dt><dd>Подписанный токен с полями (claims): кто, до какого времени, какие роли.</dd>
+    <dt>IAM</dt><dd>Identity and Access Management: Keycloak, ForgeRock (с 2023 года в составе Ping Identity), Okta.</dd>
+  </dl>
+
+  <h3 id="ch5-theory"><span class="sn">5.2</span>Теория</h3>
+  <ul class="res">
+    <li><span class="tag">Доки</span><a href="https://owasp.org/www-project-top-ten/" target="_blank" rel="noopener">OWASP Top 10</a><span class="note">Десять главных рисков веб-приложений.</span></li>
+    <li><span class="tag">Доки</span><a href="https://cheatsheetseries.owasp.org/" target="_blank" rel="noopener">OWASP Cheat Sheet Series</a><span class="note">Короткие практические инструкции: пароли, JWT, REST Security, CSRF.</span></li>
+    <li><span class="tag">Доки</span><a href="https://docs.spring.io/spring-security/reference/" target="_blank" rel="noopener">Spring Security Reference</a><span class="note">Главное — архитектура (filter chain) и OAuth2 Resource Server.</span></li>
+    <li><span class="tag">Доки</span><a href="https://oauth.net/2/" target="_blank" rel="noopener">oauth.net/2</a><span class="note">Справочник по OAuth 2.0: потоки, RFC, рекомендации.</span></li>
+    <li><span class="tag book">Книга</span><a href="https://www.oauth.com/" target="_blank" rel="noopener">OAuth 2.0 Simplified — Aaron Parecki</a><span class="note">Бесплатная онлайн-книга одного из авторов спецификаций OAuth: все потоки по шагам.</span></li>
+    <li><span class="tag">Доки</span><a href="https://owasp.org/www-project-application-security-verification-standard/" target="_blank" rel="noopener">OWASP ASVS</a><span class="note">Стандарт проверки безопасности приложения: готовый чек-лист требований.</span></li>
+    <li><span class="tag">Доки</span><a href="https://www.keycloak.org/getting-started" target="_blank" rel="noopener">Keycloak — Getting Started</a><span class="note">Бесплатный IAM-сервер: realm, клиенты, роли — локально в Docker.</span></li>
+    <li><span class="tag">Доки</span><a href="https://docs.pingidentity.com/" target="_blank" rel="noopener">Ping Identity Docs</a><span class="note">Документация ForgeRock AM / IDM / Identity Cloud — для общего понимания продукта.</span></li>
+  </ul>
+
+  <figure class="code"><figcaption>Листинг 5.1. Spring Security: API как OAuth2 Resource Server с проверкой JWT</figcaption>
+<pre><code>@Bean
+SecurityFilterChain api(HttpSecurity http) throws Exception {
+    return http
+        .authorizeHttpRequests(a -&gt; a
+            .requestMatchers("/actuator/health").permitAll()
+            .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+            .anyRequest().authenticated())
+        .oauth2ResourceServer(o -&gt; o.jwt(Customizer.withDefaults()))
+        .build();
+}
+// Keycloak кладёт роли в realm_access.roles — для hasRole нужен свой
+// JwtAuthenticationConverter, который превращает их в ROLE_ADMIN и т. д.</code></pre></figure>
+
+  <aside class="box fact"><h4>Интересный факт</h4><p>В декабре 2021 года нашли Log4Shell (CVE-2021-44228) — уязвимость в популярной Java-библиотеке логирования Log4j с максимальной оценкой опасности CVSS 10. Достаточно было записать в лог строку от злоумышленника, чтобы выполнить его код на сервере. Многие компании неделями искали, где у них спрятан Log4j, — поэтому сканирование зависимостей теперь обязательная часть CI.</p></aside>
+
+  <h3 id="ch5-practice"><span class="sn">5.3</span>Практика</h3>
+  <ul class="res">
+    <li><span class="tag course">Курс</span><a href="https://portswigger.net/web-security" target="_blank" rel="noopener">PortSwigger Web Security Academy</a><span class="note">Бесплатные лабораторные работы по уязвимостям: лучшая практика по безопасности.</span></li>
+    <li><span class="tag">Доки</span><a href="https://owasp.org/www-project-dependency-check/" target="_blank" rel="noopener">OWASP Dependency-Check</a><span class="note">Проверка зависимостей на известные уязвимости. Образы Docker — <a href="https://trivy.dev/" target="_blank" rel="noopener">Trivy</a>.</span></li>
+  </ul>
+
+  <h3 id="ch5-tasks"><span class="sn">5.4</span>Задачи с решениями</h3>
+  <div class="box task"><h4>Задача 5.1. Роли из Keycloak</h4>
+    <p>Keycloak кладёт роли в JWT в поле <code>realm_access.roles</code>, а Spring ждёт <code>ROLE_…</code>. Напишите конвертер, чтобы работал <code>hasRole("ADMIN")</code>.</p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>Spring Security</figcaption><pre><code>@Bean
+JwtAuthenticationConverter jwtAuthenticationConverter() {
+    JwtAuthenticationConverter conv = new JwtAuthenticationConverter();
+    conv.setJwtGrantedAuthoritiesConverter(jwt -&gt; {
+        Map&lt;String, Object&gt; realm = jwt.getClaimAsMap("realm_access");
+        if (realm == null) return List.of();
+        @SuppressWarnings("unchecked")
+        List&lt;String&gt; roles = (List&lt;String&gt;) realm.getOrDefault("roles", List.of());
+        return roles.stream()
+            .map(r -&gt; (GrantedAuthority) new SimpleGrantedAuthority("ROLE_" + r))
+            .toList();
+    });
+    return conv;
+}</code></pre></figure>
+      <p>Бин <code>JwtAuthenticationConverter</code> Spring Security подхватывает сам при <code>oauth2ResourceServer(o -> o.jwt(...))</code>. Префикс <code>ROLE_</code> нужен, потому что <code>hasRole("ADMIN")</code> ищет полномочие <code>ROLE_ADMIN</code>.</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c5-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box task"><h4>Задача 5.2. Найди уязвимость</h4>
+    <p>Что не так с этим кодом и как исправить?<br><code>jdbc.query("SELECT * FROM task WHERE title LIKE '%" + q + "%'", mapper);</code></p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>Java, JdbcTemplate</figcaption><pre><code>// Уязвимо: q = "' OR '1'='1" вернёт все задачи,
+// а более хитрый ввод может прочитать или удалить чужие данные.
+
+// Исправлено: значение передаётся параметром, а не склеивается в SQL
+jdbc.query("SELECT * FROM task WHERE title LIKE ?", mapper, "%" + q + "%");</code></pre></figure>
+      <p>Это SQL-инъекция: пользовательский ввод становится частью SQL-кода. Параметр <code>?</code> передаётся базе отдельно от текста запроса, поэтому никогда не исполняется как код. Это пункт A03 Injection в OWASP Top 10.</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c5-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+
+  <div class="box ex"><h4>Упражнения</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c5-e1"><span>Решить лабораторные PortSwigger: SQL injection, XSS, CSRF, Access control (уровень Apprentice).</span></label></li>
+    <li><label><input type="checkbox" data-k="c5-e2"><span>Поднять Keycloak в Docker, создать realm, клиента для SPA и роли ADMIN / MEMBER.</span></label></li>
+    <li><label><input type="checkbox" data-k="c5-e3"><span>Нарисовать от руки схему Authorization Code + PKCE и объяснить каждый шаг вслух.</span></label></li>
+    <li><label><input type="checkbox" data-k="c5-e4"><span>Подключить Dependabot и Trivy в CI, исправить найденное.</span></label></li>
+  </ul></div>
+
+  <div class="box quiz"><h4>Проверь себя</h4>
+    <details><summary>Чем OAuth 2.0 отличается от OpenID Connect?</summary><p>OAuth 2.0 — про доступ к ресурсам (access token). OIDC добавляет вход пользователя: ID token с данными о том, кто вошёл.</p></details>
+    <details><summary>Почему Implicit flow больше не рекомендуют?</summary><p>Токен приходит в URL и может утечь через историю, логи или Referer. Для SPA рекомендован Authorization Code + PKCE (OAuth 2.0 Security Best Current Practice).</p></details>
+    <details><summary>Когда 401, а когда 403?</summary><p>401 — запрос без действительной аутентификации. 403 — пользователь известен, но прав на действие нет.</p></details>
+    <details><summary>Как защититься от SQL-инъекций?</summary><p>Только параметризованные запросы (PreparedStatement, JPA-параметры) и никакой склейки строк с пользовательским вводом. Плюс минимальные права у пользователя БД.</p></details>
+  </div>
+
+  <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c5-s1"><span>Объясняю каждый пункт OWASP Top 10 и как его закрыть.</span></label></li>
+    <li><label><input type="checkbox" data-k="c5-s2"><span>Рассказываю потоки OAuth 2.0 / OIDC: Authorization Code + PKCE, Client Credentials.</span></label></li>
+    <li><label><input type="checkbox" data-k="c5-s3"><span>Настраиваю Spring Security Resource Server и роли из JWT.</span></label></li>
+    <li><label><input type="checkbox" data-k="c5-s4"><span>Подключаю вход через Keycloak в Angular-приложении.</span></label></li>
+    <li><label><input type="checkbox" data-k="c5-s5"><span>Проект 4 готов (<a href="#p4">задание</a>).</span></label></li>
+  </ul></div>
+</section>
+
+<!-- ============ ЧАСТЬ III ============ -->
+<div class="part-h" data-part="Часть III · Облако и архитектура">Часть III · Облако и архитектура</div>
+
+<section class="ch" id="ch6" data-ch="6" data-title="Docker, CI/CD, K8s, AWS">
+  <header class="ch-head">
+    <div class="ch-num">Глава 6</div>
+    <h2>Docker, CI/CD, Kubernetes и AWS</h2>
+    <p class="ch-meta"><span>6 недель</span><span>Проект: taskhub в Kubernetes</span></p>
+  </header>
+  <div class="goals"><h4>Цели главы</h4><ul>
+    <li>Упаковывать сервисы в компактные и безопасные образы.</li>
+    <li>Строить конвейер: сборка → тесты → проверка → образ → развёртывание.</li>
+    <li>Разворачивать и отлаживать приложение в Kubernetes, описывать его в Helm.</li>
+    <li>Знать базовые сервисы AWS и описывать инфраструктуру в Terraform.</li>
+    <li>Видеть, что происходит с приложением: метрики, логи, трассировка.</li>
+  </ul></div>
+
+  <h3 id="ch6-terms"><span class="sn">6.1</span>Ключевые понятия</h3>
+  <dl class="terms">
+    <dt>Образ / контейнер</dt><dd>Образ — неизменяемый шаблон, контейнер — его запущенный экземпляр.</dd>
+    <dt>Multi-stage build</dt><dd>Сборка в одном образе, а в итоговый попадает только результат.</dd>
+    <dt>Pod / Deployment</dt><dd>Pod — один или несколько контейнеров вместе; Deployment держит нужное число одинаковых подов и обновляет их.</dd>
+    <dt>Service / Ingress</dt><dd>Постоянный адрес группы подов; Ingress — вход снаружи по HTTP.</dd>
+    <dt>Probes</dt><dd>liveness — «жив ли, не пора ли перезапустить»; readiness — «готов ли принимать трафик».</dd>
+    <dt>Helm</dt><dd>Пакетный менеджер Kubernetes: шаблоны манифестов с параметрами.</dd>
+    <dt>IaC</dt><dd>Инфраструктура как код: Terraform описывает облачные ресурсы файлами.</dd>
+  </dl>
+
+  <h3 id="ch6-theory"><span class="sn">6.2</span>Теория</h3>
+  <ul class="res">
+    <li><span class="tag">Доки</span><a href="https://docs.docker.com/get-started/" target="_blank" rel="noopener">Docker — Get Started</a><span class="note">Официальное введение: образы, контейнеры, Compose.</span></li>
+    <li><span class="tag">Доки</span><a href="https://docs.github.com/en/actions" target="_blank" rel="noopener">GitHub Actions</a><span class="note">Конвейеры CI/CD в GitHub. Для общего понимания — <a href="https://docs.gitlab.com/ee/ci/" target="_blank" rel="noopener">GitLab CI/CD</a>.</span></li>
+    <li><span class="tag">Доки</span><a href="https://kubernetes.io/docs/tutorials/kubernetes-basics/" target="_blank" rel="noopener">Kubernetes Basics</a><span class="note">Официальный интерактивный учебник.</span></li>
+    <li><span class="tag">Сайт</span><a href="https://12factor.net/" target="_blank" rel="noopener">The Twelve-Factor App</a><span class="note">12 принципов облачных приложений: конфигурация, логи, процессы. Основа cloud-native.</span></li>
+    <li><span class="tag course">Курс</span><a href="https://github.com/kelseyhightower/kubernetes-the-hard-way" target="_blank" rel="noopener">Kubernetes The Hard Way</a><span class="note">Кластер вручную, шаг за шагом, — после основ, чтобы понять устройство изнутри.</span></li>
+    <li><span class="tag">Доки</span><a href="https://helm.sh/docs/" target="_blank" rel="noopener">Helm Docs</a><span class="note">Чарты, шаблоны, values.</span></li>
+    <li><span class="tag video">Видео</span><a href="https://www.youtube.com/@TechWorldwithNana" target="_blank" rel="noopener">TechWorld with Nana</a><span class="note">Понятные курсы по Docker, Kubernetes, CI/CD, Terraform.</span></li>
+    <li><span class="tag video">Видео</span><a href="https://www.youtube.com/@freecodecamp" target="_blank" rel="noopener">freeCodeCamp</a><span class="note">Полные многочасовые курсы по AWS и Kubernetes.</span></li>
+    <li><span class="tag course">Курс</span><a href="https://skillbuilder.aws/" target="_blank" rel="noopener">AWS Skill Builder</a><span class="note">Бесплатный курс AWS Cloud Practitioner Essentials.</span></li>
+    <li><span class="tag course">Курс</span><a href="https://developer.hashicorp.com/terraform/tutorials" target="_blank" rel="noopener">Terraform Tutorials</a><span class="note">Официальные уроки HashiCorp, есть трек для AWS.</span></li>
+    <li><span class="tag">Доки</span><a href="https://docs.spring.io/spring-boot/reference/actuator/index.html" target="_blank" rel="noopener">Spring Boot Actuator</a><span class="note">Метрики Micrometer → <a href="https://prometheus.io/docs/introduction/overview/" target="_blank" rel="noopener">Prometheus</a> → Grafana; трассировка — <a href="https://opentelemetry.io/docs/languages/java/" target="_blank" rel="noopener">OpenTelemetry Java</a>.</span></li>
+  </ul>
+
+  <figure class="code"><figcaption>Листинг 6.1. Multi-stage Dockerfile для Spring Boot</figcaption>
+<pre><code>FROM eclipse-temurin:21-jdk AS build
+WORKDIR /app
+COPY . .
+RUN ./gradlew bootJar --no-daemon
+
+FROM eclipse-temurin:21-jre
+WORKDIR /app
+COPY --from=build /app/build/libs/*.jar app.jar
+USER 1000
+EXPOSE 8080
+ENTRYPOINT ["java", "-jar", "app.jar"]</code></pre></figure>
+
+  <aside class="box fact"><h4>Интересный факт</h4><p>Kubernetes вырос из опыта Google с внутренней системой Borg, которая годами управляла их серверами. Название по-гречески значит «кормчий, рулевой» — отсюда штурвал на логотипе. Сокращение K8s: между K и s ровно 8 букв. А Docker впервые показали публике в 2013 году на конференции PyCon в пятиминутном докладе.</p></aside>
+
+  <figure class="code"><figcaption>Листинг 6.2. GitHub Actions: тесты и образ на каждый push в main</figcaption>
+<pre><code>name: ci
+on: { push: { branches: [main] }, pull_request: {} }
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-java@v4
+        with: { distribution: temurin, java-version: 21 }
+      - run: ./gradlew test
+      - run: docker build -t ghcr.io/${{ github.repository }}:${{ github.sha }} .</code></pre></figure>
+
+  <h3 id="ch6-practice"><span class="sn">6.3</span>Практика</h3>
+  <ul class="res">
+    <li><span class="tag">Доки</span><a href="https://kind.sigs.k8s.io/" target="_blank" rel="noopener">kind</a><span class="note">Kubernetes в Docker на своём компьютере. Альтернатива — <a href="https://minikube.sigs.k8s.io/docs/start/" target="_blank" rel="noopener">minikube</a>.</span></li>
+    <li><span class="tag">Доки</span><a href="https://aws.amazon.com/free/" target="_blank" rel="noopener">AWS Free Tier</a><span class="note">Сразу настроить AWS Budgets с оповещением, чтобы не получить счёт.</span></li>
+  </ul>
+
+  <h3 id="ch6-tasks"><span class="sn">6.4</span>Задачи с решениями</h3>
+  <div class="box task"><h4>Задача 6.1. Deployment с пробами</h4>
+    <p>Опишите Deployment для taskhub-api: 2 реплики, запрос и лимит памяти, readiness- и liveness-пробы на эндпоинты Spring Boot Actuator.</p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>Kubernetes YAML</figcaption><pre><code>apiVersion: apps/v1
+kind: Deployment
+metadata: { name: taskhub-api }
+spec:
+  replicas: 2
+  selector: { matchLabels: { app: taskhub-api } }
+  template:
+    metadata: { labels: { app: taskhub-api } }
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/USER/taskhub-api:1.0.0
+          ports: [{ containerPort: 8080 }]
+          resources:
+            requests: { cpu: 250m, memory: 384Mi }
+            limits: { memory: 512Mi }
+          readinessProbe:
+            httpGet: { path: /actuator/health/readiness, port: 8080 }
+            initialDelaySeconds: 10
+          livenessProbe:
+            httpGet: { path: /actuator/health/liveness, port: 8080 }
+            initialDelaySeconds: 30</code></pre></figure>
+      <p>Spring Boot сам включает группы <code>liveness</code> и <code>readiness</code>, когда видит, что запущен в Kubernetes. Лимит CPU специально не задан: он часто тормозит JVM на старте, а памяти лимит нужен обязательно. Тег образа — конкретная версия, а не <code>latest</code>.</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c6-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box task"><h4>Задача 6.2. Compose: API и база</h4>
+    <p>Напишите docker-compose.yml: PostgreSQL и API; API должен стартовать только когда база действительно готова.</p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>Docker Compose</figcaption><pre><code>services:
+  db:
+    image: postgres:16
+    environment: { POSTGRES_DB: taskhub, POSTGRES_USER: app, POSTGRES_PASSWORD: app }
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U app -d taskhub"]
+      interval: 5s
+      retries: 10
+  api:
+    build: .
+    ports: ["8080:8080"]
+    environment:
+      SPRING_DATASOURCE_URL: jdbc:postgresql://db:5432/taskhub
+      SPRING_DATASOURCE_USERNAME: app
+      SPRING_DATASOURCE_PASSWORD: app
+    depends_on:
+      db: { condition: service_healthy }</code></pre></figure>
+      <p>Простой <code>depends_on</code> ждёт только запуска контейнера, а не готовности базы. <code>condition: service_healthy</code> вместе с <code>healthcheck</code> ждёт, пока <code>pg_isready</code> ответит успешно. Имя сервиса <code>db</code> работает как имя хоста внутри сети Compose.</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c6-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+
+  <div class="box ex"><h4>Упражнения</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c6-e1"><span>Уменьшить образ taskhub-api вдвое за счёт multi-stage и JRE-образа; сравнить размеры.</span></label></li>
+    <li><label><input type="checkbox" data-k="c6-e2"><span>Пройти Kubernetes Basics целиком, затем развернуть taskhub в kind вручную через kubectl.</span></label></li>
+    <li><label><input type="checkbox" data-k="c6-e3"><span>Сломать readiness probe и посмотреть через <code>kubectl describe</code>, как под пропадает из Service.</span></label></li>
+    <li><label><input type="checkbox" data-k="c6-e4"><span>Пройти курс Cloud Practitioner Essentials и трек Terraform «Get Started — AWS».</span></label></li>
+    <li><label><input type="checkbox" data-k="c6-e5"><span>Собрать дашборд Grafana: RPS, p95 времени ответа, ошибки 5xx.</span></label></li>
+  </ul></div>
+
+  <div class="box quiz"><h4>Проверь себя</h4>
+    <details><summary>Чем liveness probe отличается от readiness probe?</summary><p>Провал liveness — Kubernetes перезапускает контейнер. Провал readiness — под временно убирается из Service и не получает трафик, но не перезапускается.</p></details>
+    <details><summary>Зачем нужен multi-stage build?</summary><p>JDK, Gradle и исходники остаются в промежуточном образе, в итоговом только JRE и jar. Образ меньше, быстрее скачивается и содержит меньше уязвимостей.</p></details>
+    <details><summary>Чем Deployment отличается от StatefulSet?</summary><p>Deployment — для одинаковых взаимозаменяемых подов без состояния. StatefulSet даёт подам постоянные имена и собственные тома — для баз данных и брокеров.</p></details>
+    <details><summary>Как не переплатить за учебный аккаунт AWS?</summary><p>Включить AWS Budgets с оповещением на почту, создавать ресурсы только через Terraform и после демонстрации выполнять <code>terraform destroy</code>. EKS и NAT Gateway платные даже при простое.</p></details>
+  </div>
+
+  <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c6-s1"><span>Пишу Dockerfile и docker-compose для сервиса с базой.</span></label></li>
+    <li><label><input type="checkbox" data-k="c6-s2"><span>Строю CI/CD в GitHub Actions: тесты, проверки, образ, развёртывание.</span></label></li>
+    <li><label><input type="checkbox" data-k="c6-s3"><span>Разворачиваю и отлаживаю приложение в Kubernetes, пишу Helm-чарт.</span></label></li>
+    <li><label><input type="checkbox" data-k="c6-s4"><span>Знаю IAM, VPC, EC2, ECR, EKS/ECS, RDS, S3, CloudWatch на базовом уровне.</span></label></li>
+    <li><label><input type="checkbox" data-k="c6-s5"><span>Описываю инфраструктуру в Terraform.</span></label></li>
+    <li><label><input type="checkbox" data-k="c6-s6"><span>Проект 5 готов (<a href="#p5">задание</a>).</span></label></li>
+  </ul></div>
+</section>
+
+<section class="ch" id="ch7" data-ch="7" data-title="Микросервисы и интеграции">
+  <header class="ch-head">
+    <div class="ch-num">Глава 7</div>
+    <h2>Микросервисы и интеграции</h2>
+    <p class="ch-meta"><span>4 недели</span><span>Проект: APIForge</span></p>
+  </header>
+  <div class="goals"><h4>Цели главы</h4><ul>
+    <li>Делить систему на сервисы по бизнес-границам, а не по слоям.</li>
+    <li>Выбирать между синхронным REST и асинхронными сообщениями.</li>
+    <li>Делать систему устойчивой к сбоям соседей.</li>
+    <li>Понимать интеграционные паттерны (EAI), которыми занимается команда в Swisscom.</li>
+  </ul></div>
+
+  <h3 id="ch7-terms"><span class="sn">7.1</span>Ключевые понятия</h3>
+  <dl class="terms">
+    <dt>API Gateway</dt><dd>Единая точка входа: маршрутизация, аутентификация, лимиты.</dd>
+    <dt>Bounded context</dt><dd>Граница модели предметной области из DDD; хороший кандидат в отдельный сервис.</dd>
+    <dt>Circuit Breaker</dt><dd>«Предохранитель»: при серии сбоев перестаёт звать сервис и сразу отдаёт запасной ответ.</dd>
+    <dt>Outbox</dt><dd>Запись события в таблицу в той же транзакции, что и данные; отдельный процесс публикует его в брокер.</dd>
+    <dt>Saga</dt><dd>Распределённая операция как цепочка локальных транзакций с компенсирующими действиями.</dd>
+    <dt>Контрактный тест</dt><dd>Проверка, что поставщик API и потребитель понимают контракт одинаково.</dd>
+  </dl>
+
+  <h3 id="ch7-theory"><span class="sn">7.2</span>Теория</h3>
+  <ul class="res">
+    <li><span class="tag">Сайт</span><a href="https://microservices.io/" target="_blank" rel="noopener">microservices.io</a><span class="note">Бесплатный каталог паттернов микросервисов Chris Richardson.</span></li>
+    <li><span class="tag">Сайт</span><a href="https://martinfowler.com/articles/microservices.html" target="_blank" rel="noopener">Martin Fowler — Microservices</a><span class="note">Статья, с которой началось широкое обсуждение микросервисов: признаки и компромиссы.</span></li>
+    <li><span class="tag">Сайт</span><a href="https://www.enterpriseintegrationpatterns.com/patterns/messaging/" target="_blank" rel="noopener">Enterprise Integration Patterns</a><span class="note">Бесплатный каталог паттернов интеграции (EAI) Gregor Hohpe и Bobby Woolf — то, чем занимается команда.</span></li>
+    <li><span class="tag">Сайт</span><a href="https://martinfowler.com/bliki/MonolithFirst.html" target="_blank" rel="noopener">Martin Fowler — MonolithFirst</a><span class="note">Почему начинать стоит с монолита.</span></li>
+    <li><span class="tag">Доки</span><a href="https://spring.io/projects/spring-cloud-gateway" target="_blank" rel="noopener">Spring Cloud Gateway</a><span class="note">Шлюз на Spring: маршруты, фильтры, rate limiting.</span></li>
+    <li><span class="tag">Доки</span><a href="https://resilience4j.readme.io/" target="_blank" rel="noopener">Resilience4j</a><span class="note">Circuit Breaker, Retry, Rate Limiter, Bulkhead.</span></li>
+    <li><span class="tag">Доки</span><a href="https://kafka.apache.org/quickstart" target="_blank" rel="noopener">Apache Kafka Quickstart</a><span class="note">Запустить Kafka и отправить первые сообщения.</span></li>
+    <li><span class="tag course">Курс</span><a href="https://developer.confluent.io/courses/" target="_blank" rel="noopener">Confluent Developer Courses</a><span class="note">Бесплатные курсы: Kafka 101, Spring for Apache Kafka.</span></li>
+  </ul>
+
+  <figure class="code"><figcaption>Листинг 7.1. Resilience4j: предохранитель с запасным ответом из кэша</figcaption>
+<pre><code>@CircuitBreaker(name = "catalog", fallbackMethod = "lastKnown")
+public List&lt;ApiSummary&gt; fetchCatalog() {
+    return catalogClient.list();
+}
+
+private List&lt;ApiSummary&gt; lastKnown(Throwable ex) {
+    log.warn("catalog unavailable, serving cache", ex);
+    return cache.lastKnown();
+}</code></pre></figure>
+
+  <aside class="box fact"><h4>Интересный факт</h4><p>Закон Конвея (1967): организации проектируют системы, повторяющие структуру своих коммуникаций. Поэтому микросервисы — вопрос не только архитектуры, но и устройства команд. А Apache Kafka создали в LinkedIn около 2010 года; Джей Крепс назвал её в честь писателя Франца Кафки, потому что это «система, оптимизированная для записи».</p></aside>
+
+  <h3 id="ch7-practice"><span class="sn">7.3</span>Практика</h3>
+  <ul class="res">
+    <li><span class="tag">Доки</span><a href="https://spring.io/projects/spring-cloud-contract" target="_blank" rel="noopener">Spring Cloud Contract</a><span class="note">Контрактные тесты. Альтернатива — <a href="https://docs.pact.io/" target="_blank" rel="noopener">Pact</a>.</span></li>
+    <li><span class="tag">Доки</span><a href="https://docs.spring.io/spring-kafka/reference/" target="_blank" rel="noopener">Spring for Apache Kafka</a><span class="note">Продюсеры, консьюмеры, обработка ошибок.</span></li>
+  </ul>
+
+  <h3 id="ch7-tasks"><span class="sn">7.4</span>Задачи с решениями</h3>
+  <div class="box task"><h4>Задача 7.1. Идемпотентный консьюмер</h4>
+    <p>Kafka может доставить событие использования API дважды. Напишите обработчик, который увеличивает счётчик вызовов за день ровно один раз на событие.</p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>Java, Spring Kafka, PostgreSQL</figcaption><pre><code>@KafkaListener(topics = "api-usage")
+@Transactional
+public void on(UsageEvent e) {
+    int inserted = jdbc.update(
+        "INSERT INTO processed_event (id) VALUES (?) ON CONFLICT DO NOTHING",
+        e.eventId());
+    if (inserted == 0) return;   // это событие уже обработано
+
+    jdbc.update("""
+        INSERT INTO usage_daily (api_id, day, calls) VALUES (?, ?, 1)
+        ON CONFLICT (api_id, day) DO UPDATE SET calls = usage_daily.calls + 1
+        """, e.apiId(), e.day());
+}</code></pre></figure>
+      <p>Таблица <code>processed_event</code> с первичным ключом по id события запоминает обработанные события. Обе вставки в одной транзакции: либо засчитано и запомнено, либо ни то ни другое. Повторная доставка увидит <code>inserted == 0</code> и ничего не изменит.</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c7-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box task"><h4>Задача 7.2. Outbox</h4>
+    <p>При одобрении подписки нужно сохранить её в БД и отправить событие в Kafka. Сделайте так, чтобы событие не потерялось и не ушло без сохранённых данных.</p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>Java, Spring</figcaption><pre><code>@Transactional
+public Subscription approve(long id) {
+    Subscription s = repo.findById(id).orElseThrow();
+    s.approve();
+    outbox.save(new OutboxEvent("subscription.approved", s.getId(), toJson(s)));
+    return s;   // данные и событие сохраняются в одной транзакции
+}
+
+@Scheduled(fixedDelay = 1000)
+@Transactional
+public void publish() throws Exception {
+    for (OutboxEvent e : outbox.findTop100BySentFalseOrderById()) {
+        kafka.send("subscriptions", e.getKey(), e.getPayload()).get();  // ждём подтверждения
+        e.markSent();
+    }
+}</code></pre></figure>
+      <p>Событие пишется в таблицу outbox в той же транзакции, что и данные, — двойной записи больше нет. Отдельная задача публикует неотправленные события. Если она упадёт после отправки, но до <code>markSent</code>, событие уйдёт ещё раз — поэтому консьюмеры и должны быть идемпотентными (задача 7.1).</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c7-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+
+  <div class="box ex"><h4>Упражнения</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c7-e1"><span>Пройти Kafka 101 на Confluent Developer.</span></label></li>
+    <li><label><input type="checkbox" data-k="c7-e2"><span>Реализовать Outbox: событие в таблицу в одной транзакции и публикация в Kafka по расписанию.</span></label></li>
+    <li><label><input type="checkbox" data-k="c7-e3"><span>Выключить сервис-зависимость и показать, как срабатывает Circuit Breaker (метрики в Actuator).</span></label></li>
+    <li><label><input type="checkbox" data-k="c7-e4"><span>Написать ADR «Почему REST между catalog и subscription, а Kafka для usage».</span></label></li>
+  </ul></div>
+
+  <div class="box quiz"><h4>Проверь себя</h4>
+    <details><summary>Когда микросервисы НЕ нужны?</summary><p>Маленькая команда, неясная предметная область, нет автоматизации развёртывания и наблюдаемости. Тогда лучше модульный монолит (Fowler, «MonolithFirst»).</p></details>
+    <details><summary>Какую проблему решает Outbox?</summary><p>Проблему «двойной записи»: нельзя атомарно сохранить данные в БД и отправить сообщение в брокер. Outbox делает запись события частью той же транзакции БД.</p></details>
+    <details><summary>Какие состояния у Circuit Breaker?</summary><p>CLOSED — вызовы идут; OPEN — вызовы сразу отклоняются; HALF_OPEN — пробные вызовы, чтобы понять, восстановился ли сервис.</p></details>
+    <details><summary>Почему консьюмер Kafka должен быть идемпотентным?</summary><p>Обычная гарантия доставки — at-least-once: одно сообщение может прийти дважды (например, после ребалансировки). Повторная обработка не должна портить данные.</p></details>
+  </div>
+
+  <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c7-s1"><span>Делю систему на сервисы по бизнес-границам и защищаю решение в ADR.</span></label></li>
+    <li><label><input type="checkbox" data-k="c7-s2"><span>Пишу продюсеров и консьюмеров Kafka с обработкой ошибок и повторов.</span></label></li>
+    <li><label><input type="checkbox" data-k="c7-s3"><span>Применяю Circuit Breaker, Retry, Outbox, идемпотентность.</span></label></li>
+    <li><label><input type="checkbox" data-k="c7-s4"><span>Настраиваю шлюз: маршруты, JWT, rate limiting.</span></label></li>
+    <li><label><input type="checkbox" data-k="c7-s5"><span>Пишу контрактные тесты и смотрю распределённую трассировку.</span></label></li>
+  </ul></div>
+</section>
+
+<section class="ch" id="ch8" data-ch="8" data-title="Сквозные навыки">
+  <header class="ch-head">
+    <div class="ch-num">Глава 8</div>
+    <h2>Сквозные навыки</h2>
+    <p class="ch-meta"><span>1–2 часа в неделю на протяжении всего курса</span></p>
+  </header>
+  <div class="goals"><h4>Цели главы</h4><ul>
+    <li>Понимать, как работает команда в масштабированном Agile (SAFe).</li>
+    <li>Писать чистый и проверяемый код.</li>
+    <li>Быть готовым к алгоритмической части собеседования.</li>
+  </ul></div>
+
+  <h3 id="ch8-agile"><span class="sn">8.1</span>Agile и SAFe</h3>
+  <p>Команда в вакансии называется «API ART». ART — Agile Release Train из SAFe: несколько команд, которые планируют работу вместе на квартал (PI Planning) и поставляют её спринтами.</p>
+  <ul class="res">
+    <li><span class="tag">Доки</span><a href="https://scrumguides.org/scrum-guide.html" target="_blank" rel="noopener">The Scrum Guide</a><span class="note">13 страниц — официальное описание Scrum.</span></li>
+    <li><span class="tag">Доки</span><a href="https://framework.scaledagile.com/agile-release-train/" target="_blank" rel="noopener">SAFe — Agile Release Train</a><span class="note">Что такое ART, PI Planning, роли.</span></li>
+  </ul>
+
+  <h3 id="ch8-quality"><span class="sn">8.2</span>Качество кода</h3>
+  <ul class="res">
+    <li><span class="tag">Доки</span><a href="https://google.github.io/styleguide/javaguide.html" target="_blank" rel="noopener">Google Java Style Guide</a><span class="note">Правила оформления Java-кода, которые используют во многих командах.</span></li>
+    <li><span class="tag">Сайт</span><a href="https://refactoring.guru/refactoring" target="_blank" rel="noopener">Refactoring.Guru — Refactoring</a><span class="note">Бесплатный каталог «запахов кода» и приёмов рефакторинга.</span></li>
+    <li><span class="tag book">Книга</span><a href="https://opendatastructures.org/" target="_blank" rel="noopener">Open Data Structures (Java) — Pat Morin</a><span class="note">Бесплатная книга о структурах данных с кодом на Java — к собеседованию.</span></li>
+    <li><span class="tag">Доки</span><a href="https://sonarcloud.io/" target="_blank" rel="noopener">SonarCloud</a><span class="note">Бесплатный анализ кода для публичных репозиториев.</span></li>
+  </ul>
+
+  <h3 id="ch8-algo"><span class="sn">8.3</span>Алгоритмы к собеседованию</h3>
+  <ul class="res">
+    <li><span class="tag course">Курс</span><a href="https://neetcode.io/practice" target="_blank" rel="noopener">NeetCode 150</a><span class="note">150 задач по темам с видеоразборами.</span></li>
+    <li><span class="tag course">Курс</span><a href="https://leetcode.com/" target="_blank" rel="noopener">LeetCode</a><span class="note">3–4 задачи в неделю, уровни Easy и Medium.</span></li>
+  </ul>
+
+  <aside class="box fact"><h4>Интересный факт</h4><p>Agile-манифест подписали 17 разработчиков в феврале 2001 года на горнолыжном курорте Сноуберд в штате Юта. Весь манифест — четыре ценности и двенадцать принципов, он умещается на одной странице agilemanifesto.org.</p></aside>
+  <h3 id="ch8-tasks"><span class="sn">8.4</span>Задачи с решениями</h3>
+  <div class="box task"><h4>Задача 8.1. Скобки</h4>
+    <p>Классическая задача собеседований: проверьте, что в строке правильно расставлены скобки <code>()[]{}</code>. Сложность O(n).</p>
+    <details class="sol"><summary>Показать решение</summary>
+      <figure class="code"><figcaption>Java</figcaption><pre><code>static boolean balanced(String s) {
+    Deque&lt;Character&gt; st = new ArrayDeque&lt;&gt;();
+    for (char c : s.toCharArray()) {
+        switch (c) {
+            case '(', '[', '{' -&gt; st.push(c);
+            case ')' -&gt; { if (st.isEmpty() || st.pop() != '(') return false; }
+            case ']' -&gt; { if (st.isEmpty() || st.pop() != '[') return false; }
+            case '}' -&gt; { if (st.isEmpty() || st.pop() != '{') return false; }
+            default -&gt; { }
+        }
+    }
+    return st.isEmpty();
+}</code></pre></figure>
+      <p>Открывающая скобка кладётся в стек, закрывающая должна совпасть с верхушкой стека. В конце стек должен быть пустым. <code>ArrayDeque</code> — рекомендуемая замена устаревшему классу <code>Stack</code>.</p>
+    </details>
+    <ul class="todo"><li><label><input type="checkbox" data-k="c8-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
+  </div>
+  <div class="box skills"><h4>Чек-лист навыков</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="c8-s1"><span>Объясняю, что такое ART, PI Planning, Definition of Done.</span></label></li>
+    <li><label><input type="checkbox" data-k="c8-s2"><span>SonarCloud подключён ко всем проектам, критичных замечаний нет.</span></label></li>
+    <li><label><input type="checkbox" data-k="c8-s3"><span>Решено 75 задач NeetCode.</span></label></li>
+    <li><label><input type="checkbox" data-k="c8-s4"><span>Решено 150 задач NeetCode.</span></label></li>
+    <li><label><input type="checkbox" data-k="c8-s5"><span>README, коммиты и документация всех проектов — на английском.</span></label></li>
+  </ul></div>
+</section>
+
+<!-- ============ ЧАСТЬ IV ============ -->
+<div class="part-h" data-part="Часть IV · Практикум">Часть IV · Практикум</div>
+
+<section class="ch" id="ch9" data-ch="9" data-title="Тренировочные проекты">
+  <header class="ch-head">
+    <div class="ch-num">Глава 9</div>
+    <h2>Тренировочные проекты</h2>
+    <p class="ch-meta"><span>Идут вместе с главами 1–6</span><span>Каждый — в портфолио</span></p>
+  </header>
+  <div class="box note"><p>У каждого проекта: README по <a href="#appA">шаблону из Приложения А</a>, зелёный CI и не меньше 70 % покрытия бизнес-логики тестами. Проекты 2–5 — одна система, которая растёт от главы к главе.</p></div>
+
+  <h3 id="p1"><span class="sn">9.1</span>Проект 1 — logscope (Java CLI)</h3>
+  <p>Анализатор логов: читает access-логи nginx и Spring, считает топ ошибок, медленные адреса и запросы в минуту; выводит отчёт в консоль, JSON или CSV. Пригодится потом для отладки на работе.</p>
+  <p><b>Стек:</b> Java 21, records, Stream API, virtual threads, picocli, JUnit 5, Gradle.</p>
+<pre class="tree">logscope/
+ ├─ src/main/java/dev/logscope/
+ │   ├─ cli/        # picocli-команды
+ │   ├─ parse/      # парсеры форматов (sealed interface LogFormat)
+ │   ├─ stats/      # агрегаты на Stream API
+ │   └─ report/     # консоль, JSON, CSV
+ ├─ src/test/java/...
+ ├─ samples/        # примеры логов
+ └─ .github/workflows/ci.yml</pre>
+  <div class="box ex"><h4>Готово, когда</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="p1-1"><span>Разбирает минимум 2 формата логов, формат определяется сам.</span></label></li>
+    <li><label><input type="checkbox" data-k="p1-2"><span>Файл в 1 ГБ обрабатывается, в README — замер времени.</span></label></li>
+    <li><label><input type="checkbox" data-k="p1-3"><span>Тесты на парсеры и агрегаты, CI зелёный.</span></label></li>
+    <li><label><input type="checkbox" data-k="p1-4"><span>Опубликован GitHub Release с исполняемым jar.</span></label></li>
+  </ul></div>
+
+  <h3 id="p2"><span class="sn">9.2</span>Проект 2 — taskhub-api (Spring Boot REST)</h3>
+  <p>API трекера задач: проекты, задачи, исполнители, статусы, комментарии, фильтры и пагинация.</p>
+  <p><b>Стек:</b> Spring Boot, Spring Data JPA, PostgreSQL, Flyway, springdoc-openapi, Testcontainers.</p>
+<pre class="tree">taskhub-api/
+ ├─ src/main/java/.../{project,task,user}/   # пакет на фичу: controller, service, repo, dto
+ ├─ src/main/resources/db/migration/          # Flyway V1__init.sql …
+ ├─ src/test/java/...                         # unit + Testcontainers
+ ├─ docker-compose.yml                        # postgres
+ └─ .github/workflows/ci.yml</pre>
+  <div class="box ex"><h4>Готово, когда</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="p2-1"><span>Swagger UI описывает все эндпоинты с примерами.</span></label></li>
+    <li><label><input type="checkbox" data-k="p2-2"><span>Все ошибки — в формате ProblemDetail.</span></label></li>
+    <li><label><input type="checkbox" data-k="p2-3"><span>Интеграционные тесты на Testcontainers проходят в CI.</span></label></li>
+    <li><label><input type="checkbox" data-k="p2-4"><span>В логе SQL нет N+1 на списках.</span></label></li>
+  </ul></div>
+
+  <h3 id="p3"><span class="sn">9.3</span>Проект 3 — taskhub-web (Angular)</h3>
+  <p>Интерфейс для taskhub-api: канбан-доска с перетаскиванием, формы с валидацией, поиск, тёмная тема.</p>
+  <p><b>Стек:</b> Angular, signals, Angular Material и CDK, RxJS, Playwright.</p>
+<pre class="tree">taskhub-web/
+ ├─ src/app/
+ │   ├─ core/        # interceptors, guards, api-клиенты
+ │   ├─ features/
+ │   │   ├─ board/   # канбан (lazy)
+ │   │   └─ projects/
+ │   └─ shared/      # общие компоненты
+ ├─ e2e/             # Playwright
+ └─ .github/workflows/ci.yml</pre>
+  <div class="box ex"><h4>Готово, когда</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="p3-1"><span>Канбан с drag &amp; drop сохраняет статус через API.</span></label></li>
+    <li><label><input type="checkbox" data-k="p3-2"><span>Поиск с debounce и отменой запросов; interceptor для ошибок и загрузки.</span></label></li>
+    <li><label><input type="checkbox" data-k="p3-3"><span>Удобно и на телефоне, и на компьютере; e2e-тест основных сценариев.</span></label></li>
+    <li><label><input type="checkbox" data-k="p3-4"><span>Фронтенд развёрнут (GitHub Pages, Netlify или S3), ссылка в README.</span></label></li>
+  </ul></div>
+
+  <h3 id="p4"><span class="sn">9.4</span>Проект 4 — безопасность taskhub</h3>
+  <p>Keycloak в docker-compose; вход в Angular через Authorization Code + PKCE; API — OAuth2 Resource Server; роли ADMIN и MEMBER; правило «задачу меняет только участник проекта».</p>
+  <div class="box ex"><h4>Готово, когда</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="p4-1"><span>Вход и выход работают, токен обновляется сам.</span></label></li>
+    <li><label><input type="checkbox" data-k="p4-2"><span>Права проверяются на сервере, тесты на 401 и 403.</span></label></li>
+    <li><label><input type="checkbox" data-k="p4-3"><span>В CI: Dependabot, Trivy, OWASP Dependency-Check.</span></label></li>
+    <li><label><input type="checkbox" data-k="p4-4"><span>В README раздел Security: какие пункты OWASP Top 10 закрыты и как.</span></label></li>
+  </ul></div>
+
+  <h3 id="p5"><span class="sn">9.5</span>Проект 5 — taskhub в Kubernetes</h3>
+  <p>Dockerfile, Helm-чарт, развёртывание в kind, конвейер GitHub Actions, мониторинг, Terraform для AWS.</p>
+  <div class="box ex"><h4>Готово, когда</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="p5-1"><span>Конвейер: build → test → scan → push в GHCR → helm upgrade.</span></label></li>
+    <li><label><input type="checkbox" data-k="p5-2"><span>Probes, лимиты ресурсов и HPA настроены.</span></label></li>
+    <li><label><input type="checkbox" data-k="p5-3"><span>Prometheus и Grafana-дашборд; скриншот в README.</span></label></li>
+    <li><label><input type="checkbox" data-k="p5-4"><span>Terraform-модуль для AWS (ECR + EKS или ECS + RDS); после демонстрации — <code>terraform destroy</code>.</span></label></li>
+  </ul></div>
+</section>
+
+<section class="ch" id="ch10" data-ch="10" data-title="Финальный проект APIForge">
+  <header class="ch-head">
+    <div class="ch-num">Глава 10</div>
+    <h2>Финальный проект: APIForge</h2>
+    <p class="ch-meta"><span>8–10 недель</span><span>Платформа API-продуктов</span></p>
+  </header>
+  <p>Небольшая версия того, чем занимается команда API ART в Swisscom: внутренние команды публикуют свои API, потребители подписываются, получают доступ и видят статистику использования. На собеседовании этот проект легко связать с их работой: API Products, IAM, EAI.</p>
+
+  <h3 id="fp-features"><span class="sn">10.1</span>Возможности</h3>
+  <ol>
+    <li><b>Каталог API:</b> загрузка OpenAPI-спецификации, версии, статусы draft / published / deprecated, документация в Swagger UI.</li>
+    <li><b>Подписки:</b> потребитель запрашивает доступ, владелец одобряет, выдаются client credentials в Keycloak.</li>
+    <li><b>Шлюз:</b> Spring Cloud Gateway проверяет токен, применяет rate limit (Redis) и проксирует запрос.</li>
+    <li><b>Учёт использования:</b> шлюз пишет события в Kafka, usage-service считает статистику, портал рисует графики.</li>
+    <li><b>Портал на Angular:</b> роли Provider, Consumer, Admin; дашборды, поиск по каталогу.</li>
+    <li><b>Уведомления:</b> письмо или webhook, когда API помечен deprecated.</li>
+  </ol>
+
+  <h3 id="fp-arch"><span class="sn">10.2</span>Архитектура</h3>
+<pre class="tree">Angular portal ──► api-gateway (Spring Cloud Gateway: JWT, rate limit)
+                      ├─► catalog-service       (PostgreSQL) ── REST
+                      ├─► subscription-service  (PostgreSQL) ── REST + Keycloak Admin API
+                      ├─► usage-service         (PostgreSQL / TimescaleDB)
+                      └─► demo-backends         (2–3 мок-API)
+api-gateway ──события──► Kafka ──► usage-service
+                              └──► notification-service
+Keycloak (IAM) · Prometheus + Grafana · OpenTelemetry → Jaeger или Tempo</pre>
+
+  <h3 id="fp-repo"><span class="sn">10.3</span>Структура репозитория</h3>
+<pre class="tree">apiforge/
+ ├─ services/{gateway,catalog,subscription,usage,notification}/
+ ├─ portal/                     # Angular
+ ├─ infra/helm/                 # umbrella-чарт
+ ├─ infra/terraform/aws/
+ ├─ docs/adr/                   # Architecture Decision Records
+ ├─ docs/architecture.md        # C4-диаграммы
+ ├─ docker-compose.yml          # вся система одной командой
+ └─ .github/workflows/</pre>
+
+  <h3 id="fp-plan"><span class="sn">10.4</span>Этапы по неделям</h3>
+  <div class="box ex"><h4>План</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="fp-w1"><span><b>Неделя 1.</b> Требования, C4-диаграммы, первые ADR, каркас всех сервисов, CI.</span></label></li>
+    <li><label><input type="checkbox" data-k="fp-w2"><span><b>Недели 2–3.</b> catalog-service и портал: каталог, загрузка OpenAPI.</span></label></li>
+    <li><label><input type="checkbox" data-k="fp-w4"><span><b>Неделя 4.</b> Keycloak, subscription-service, выдача доступа.</span></label></li>
+    <li><label><input type="checkbox" data-k="fp-w5"><span><b>Неделя 5.</b> Шлюз: JWT, rate limit, маршруты.</span></label></li>
+    <li><label><input type="checkbox" data-k="fp-w6"><span><b>Неделя 6.</b> Kafka, usage-service, графики в портале.</span></label></li>
+    <li><label><input type="checkbox" data-k="fp-w7"><span><b>Неделя 7.</b> Resilience4j, Outbox, контрактные тесты, трассировка.</span></label></li>
+    <li><label><input type="checkbox" data-k="fp-w8"><span><b>Неделя 8.</b> Helm, развёртывание в kind и AWS, дашборды Grafana.</span></label></li>
+    <li><label><input type="checkbox" data-k="fp-w9"><span><b>Недели 9–10.</b> Нагрузочный тест (k6 или Gatling), безопасность, документация, видео-демо на 3 минуты.</span></label></li>
+  </ul></div>
+
+  <h3 id="fp-done"><span class="sn">10.5</span>Критерии готовности</h3>
+  <div class="box skills"><h4>Для портфолио</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="fp-d1"><span><code>docker compose up</code> поднимает всю систему с демо-пользователями.</span></label></li>
+    <li><label><input type="checkbox" data-k="fp-d2"><span>Тесты на трёх уровнях (unit, integration, contract) и e2e портала; CI зелёный.</span></label></li>
+    <li><label><input type="checkbox" data-k="fp-d3"><span>README: архитектура, ADR, скриншоты, видео, раздел «Trade-offs &amp; what I'd do next».</span></label></li>
+    <li><label><input type="checkbox" data-k="fp-d4"><span>Результат нагрузочного теста: «шлюз держит N rps при p95 &lt; X мс».</span></label></li>
+  </ul></div>
+  <ul class="res">
+    <li><span class="tag">Доки</span><a href="https://c4model.com/" target="_blank" rel="noopener">C4 model</a><span class="note">Как рисовать архитектуру на 4 уровнях детализации.</span></li>
+    <li><span class="tag">Доки</span><a href="https://adr.github.io/" target="_blank" rel="noopener">Architecture Decision Records</a><span class="note">Шаблоны и примеры ADR.</span></li>
+    <li><span class="tag">Доки</span><a href="https://grafana.com/docs/k6/latest/" target="_blank" rel="noopener">Grafana k6</a><span class="note">Нагрузочные тесты на JavaScript.</span></li>
+  </ul>
+  <div class="box note"><p>Потом пригодится и вне собеседования: шлюз с лимитами и учётом использования подходит для своих API или pet-SaaS.</p></div>
+</section>
+
+<!-- ============ ПРИЛОЖЕНИЯ ============ -->
+<div class="part-h" data-part="Приложения">Приложения</div>
+
+<section class="ch" id="appA" data-ch="11" data-title="А. Шаблон README">
+  <header class="ch-head"><div class="ch-num">Приложение А</div><h2>Шаблон README проекта</h2></header>
+  <figure class="code"><figcaption>README.md</figcaption>
+<pre><code># Project name
+
+One sentence: what problem it solves and for whom.
+
+![CI](badge-url) ![Coverage](badge-url)
+
+## Features
+- …
+
+## Tech stack
+Java 21 · Spring Boot · PostgreSQL · Angular · Docker · Kubernetes
+
+## Architecture
+(diagram + 3–5 sentences, links to docs/adr/)
+
+## Run locally
+    docker compose up
+    open http://localhost:8080/swagger-ui.html
+
+## API docs
+Link to Swagger UI / OpenAPI file.
+
+## Screenshots
+
+## What I learned
+- …
+
+## Trade-offs &amp; what I'd do next
+- …</code></pre></figure>
+</section>
+
+<section class="ch" id="appB" data-ch="12" data-title="Б. Подготовка к собеседованию">
+  <header class="ch-head"><div class="ch-num">Приложение Б</div><h2>Подготовка к собеседованию</h2></header>
+  <div class="box skills"><h4>Чек-лист</h4><ul class="todo">
+    <li><label><input type="checkbox" data-k="b-1"><span>Резюме на английском, одна страница, ссылки на GitHub и APIForge.</span></label></li>
+    <li><label><input type="checkbox" data-k="b-2"><span>Профиль GitHub: закреплены 4–6 лучших репозиториев, у каждого README.</span></label></li>
+    <li><label><input type="checkbox" data-k="b-3"><span>Рассказ о себе на 2 минуты на английском.</span></label></li>
+    <li><label><input type="checkbox" data-k="b-4"><span>3 истории по схеме STAR: трудная задача, конфликт, ошибка и что из неё вынесено.</span></label></li>
+    <li><label><input type="checkbox" data-k="b-5"><span>Повторены все «Проверь себя» из глав 1–7.</span></label></li>
+    <li><label><input type="checkbox" data-k="b-6"><span>Пробное собеседование: system design APIForge за 30 минут у доски.</span></label></li>
+    <li><label><input type="checkbox" data-k="b-7"><span>Сверены требования оригинальной вакансии с главами этого учебника.</span></label></li>
+  </ul></div>
+</section>
+
+<section class="ch" id="appC" data-ch="13" data-title="В. Требования вакансии">
+  <header class="ch-head"><div class="ch-num">Приложение В</div><h2>Требования вакансии и источники</h2></header>
+  <div class="tbl"><table>
+    <thead><tr><th>Требование</th><th>Глава</th></tr></thead>
+    <tbody>
+      <tr><td>Java 17+, Spring Boot</td><td><a href="#ch1">1</a>, <a href="#ch3">3</a></td></tr>
+      <tr><td>Angular (TypeScript, RxJS)</td><td><a href="#ch4">4</a></td></tr>
+      <tr><td>REST API, микросервисы, базы данных</td><td><a href="#ch2">2</a>, <a href="#ch3">3</a>, <a href="#ch7">7</a></td></tr>
+      <tr><td>Cloud-native, AWS, Kubernetes, CI/CD</td><td><a href="#ch6">6</a></td></tr>
+      <tr><td>Secure development</td><td><a href="#ch5">5</a></td></tr>
+      <tr><td>Agile, команда API ART (SAFe)</td><td><a href="#ch8">8</a></td></tr>
+      <tr><td>Плюсом: IAM, ForgeRock</td><td><a href="#ch5">5</a></td></tr>
+      <tr><td>Хороший английский</td><td><a href="#ch8">8</a>, <a href="#appB">Б</a></td></tr>
+    </tbody>
+  </table></div>
+  <p>Требования собраны из объявлений Swisscom DevOps Center Riga:</p>
+  <ul>
+    <li><a href="https://www.cvmarket.lv/full-stack-developer-javaangular-riga-swisscom-devops-center-latvia-sia-1660299" target="_blank" rel="noopener">CV Market — Full Stack Developer (Java/Angular)</a> — оригинал вакансии</li>
+    <li><a href="https://freehire.me/jobs/full-stack-developer-java-angular-swisscom-lv-mffoet2i" target="_blank" rel="noopener">Freehire — Full Stack Developer (Java/Angular), Swisscom</a></li>
+    <li><a href="https://sdcriga.swisscom.ch/homepage" target="_blank" rel="noopener">SDC Riga — Open positions</a></li>
+    <li><a href="https://lv.linkedin.com/jobs/view/software-developer-at-swisscom-devops-center-riga-3653987007" target="_blank" rel="noopener">LinkedIn — Software Developer, Swisscom DevOps Center Riga</a></li>
+  </ul>
+  <div class="box note"><p>Все материалы бесплатны и в открытом доступе: официальная документация, открытые книги, бесплатные курсы и крупные каналы. Если ссылка перестала открываться, ресурс легко найти по названию.</p></div>
+</section>
+
+</div>
+</main>
+</div>
+
+<button class="btn top" id="up" aria-label="Наверх" hidden>↑</button>
+
+<script>
+(() => {
+  const $ = s => document.querySelector(s), $$ = s => [...document.querySelectorAll(s)];
+  const boxes = $$('input[type=checkbox][data-k]');
+  const chapters = $$('section[data-ch]');
+  const KEY = 'study-progress';
+  let state = {};
+
+  // ---------- оглавление ----------
+  const toc = $('#toc');
+  let html = '';
+  for (const el of document.querySelectorAll('.part-h, section[data-ch]')) {
+    if (el.classList.contains('part-h')) { html += `<li class="part">${el.dataset.part}</li>`; continue; }
+    const subs = [...el.querySelectorAll('h3[id]')].map(h => `<li><a href="#${h.id}" data-sub="${h.id}">${h.textContent.replace(/^\s*[\d.]+\s*/, '')}</a></li>`).join('');
+    const n = el.id === 'intro' ? '' : (el.querySelector('.ch-num')?.textContent.replace(/^(Глава|Приложение)\s*/, '') || '');
+    html += `<li data-for="${el.id}"><a href="#${el.id}"><span class="n">${n}</span><span class="t">${el.dataset.title}</span><span class="c" data-c="${el.id}"></span></a>${subs ? `<ul>${subs}</ul>` : ''}</li>`;
+  }
+  toc.innerHTML = html;
+
+  // ---------- «предыдущая / следующая» ----------
+  chapters.forEach((ch, i) => {
+    const prev = chapters[i - 1], next = chapters[i + 1];
+    if (!prev && !next) return;
+    const nav = document.createElement('nav'); nav.className = 'pager';
+    nav.innerHTML = (prev ? `<a href="#${prev.id}" class="prev"><small>← Назад</small>${prev.dataset.title}</a>` : '') +
+                    (next ? `<a href="#${next.id}" class="next"><small>Дальше →</small>${next.dataset.title}</a>` : '');
+    ch.appendChild(nav);
+  });
+
+  // ---------- прогресс ----------
+  function paint() {
+    let done = 0;
+    for (const b of boxes) { b.checked = !!state[b.dataset.k]; if (b.checked) done++; }
+    const pct = boxes.length ? Math.round(done * 100 / boxes.length) : 0;
+    $('#meter').style.width = pct + '%';
+    $('#pct').textContent = `${pct} % · ${done}/${boxes.length}`;
+    for (const ch of chapters) {
+      const own = ch.querySelectorAll('input[data-k]'), c = toc.querySelector(`[data-c="${ch.id}"]`);
+      if (!c || !own.length) continue;
+      const d = [...own].filter(b => b.checked).length;
+      c.textContent = d === own.length ? '✓' : `${d}/${own.length}`;
+      c.classList.toggle('full', d === own.length);
+    }
+  }
+  const saveEl = $('#save');
+  const local = { get() { try { return JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { return {}; } },
+                  set(v) { try { localStorage.setItem(KEY, JSON.stringify(v)); } catch (e) {} } };
+  let timer = 0;
+  function save() {
+    local.set(state);
+    saveEl.textContent = 'Сохраняю…'; saveEl.classList.remove('err');
+    clearTimeout(timer);
+    timer = setTimeout(async () => {
+      try {
+        const r = await fetch('/api/study', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ state }) });
+        if (!r.ok) throw new Error(r.status);
+        saveEl.textContent = 'Сохранено';
+      } catch (e) { saveEl.textContent = 'Не сохранилось — проверьте вход на сайт'; saveEl.classList.add('err'); }
+    }, 600);
+  }
+  document.addEventListener('change', e => {
+    const b = e.target.closest('input[data-k]'); if (!b) return;
+    if (b.checked) state[b.dataset.k] = 1; else delete state[b.dataset.k];
+    paint(); save();
+  });
+  state = local.get(); paint();
+  fetch('/api/study', { credentials: 'same-origin', cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(d => {
+    if (d && d.state && typeof d.state === 'object') { state = d.state; local.set(state); paint(); saveEl.textContent = 'Сохранено на сайте'; }
+  }).catch(() => {});
+
+  // ---------- «продолжить с места» ----------
+  function cont() {
+    const b = boxes.find(x => !x.checked);
+    const li = b ? b.closest('li') : $('#ch10');
+    closeNav();
+    li.scrollIntoView({ block: 'center' });
+    li.classList.remove('flash'); void li.offsetWidth; li.classList.add('flash');
+  }
+  $('#cont').onclick = cont; $('#cont-top').onclick = cont;
+
+  // ---------- подсветка текущей главы и темы ----------
+  const subs = $$('section[data-ch] h3[id]');
+  let ticking = false;
+  function spy() {
+    ticking = false;
+    const y = 90;
+    let cur = chapters[0];
+    for (const ch of chapters) if (ch.getBoundingClientRect().top <= y) cur = ch;
+    let sub = null;
+    for (const h of subs) if (cur.contains(h) && h.getBoundingClientRect().top <= y + 40) sub = h;
+    for (const li of toc.querySelectorAll('li[data-for]')) li.classList.toggle('on', li.dataset.for === cur.id);
+    for (const a of toc.querySelectorAll('a[data-sub]')) a.classList.toggle('on', !!sub && a.dataset.sub === sub.id);
+    $('#up').hidden = window.scrollY < 800;
+  }
+  window.addEventListener('scroll', () => { if (!ticking) { ticking = true; requestAnimationFrame(spy); } }, { passive: true });
+  spy();
+  $('#up').onclick = () => window.scrollTo({ top: 0 });
+
+  // ---------- меню на телефоне ----------
+  const menu = $('#menu');
+  function closeNav() { document.body.classList.remove('nav'); menu.setAttribute('aria-expanded', 'false'); }
+  menu.onclick = () => { const on = document.body.classList.toggle('nav'); menu.setAttribute('aria-expanded', String(on)); };
+  $('#scrim').onclick = closeNav;
+  toc.addEventListener('click', e => { if (e.target.closest('a')) closeNav(); });
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') closeNav();
+    if (e.key === '/' && document.activeElement.tagName !== 'INPUT') { e.preventDefault(); document.body.classList.add('nav'); $('#q').focus(); }
+  });
+
+  // ---------- поиск ----------
+  const idx = [];
+  for (const ch of chapters) {
+    const title = ch.dataset.title;
+    ch.querySelectorAll('h3[id], dt, ul.res li, ul.todo li, details, .goals li, p').forEach(el => {
+      const host = el.closest('[id]') && el.matches('h3[id]') ? el : el;
+      idx.push({ el: host, text: el.textContent.replace(/\s+/g, ' ').trim(), title });
+    });
+  }
+  const esc = s => s.replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const hits = $('#hits'), q = $('#q');
+  q.addEventListener('input', () => {
+    const s = q.value.trim().toLowerCase();
+    toc.hidden = !!s;
+    if (s.length < 2) { hits.innerHTML = ''; return; }
+    const found = idx.filter(x => x.text.toLowerCase().includes(s)).slice(0, 30);
+    hits.innerHTML = found.length ? found.map((x, i) => {
+      const t = x.text, at = t.toLowerCase().indexOf(s), from = Math.max(0, at - 30);
+      const snip = (from ? '…' : '') + esc(t.slice(from, at)) + '<mark>' + esc(t.slice(at, at + s.length)) + '</mark>' + esc(t.slice(at + s.length, at + s.length + 50)) + '…';
+      return `<li><a href="#" data-i="${idx.indexOf(x)}">${snip}<small>${esc(x.title)}</small></a></li>`;
+    }).join('') : '<li><small>Ничего не найдено</small></li>';
+  });
+  hits.addEventListener('click', e => {
+    const a = e.target.closest('a[data-i]'); if (!a) return;
+    e.preventDefault();
+    const el = idx[+a.dataset.i].el;
+    const d = el.closest('details'); if (d) d.open = true;
+    closeNav();
+    el.scrollIntoView({ block: 'center' });
+    el.classList.remove('flash'); void el.offsetWidth; el.classList.add('flash');
+  });
+})();
+</script>
+</body>
+</html>
