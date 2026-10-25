@@ -211,7 +211,56 @@ def work():
     return cv
 
 
-SCENES = {'sketchbook': sketchbook, 'walls': walls, 'projects': projects, 'work': work}
+def books():
+    """Книги: книжный шкаф, торшер, Полли читает на стопке своих гайдов."""
+    rnd = random.Random(13)
+    cv = Cv('#1f4a52')
+    for y in range(0, 58, 4):
+        for x in range((y // 4) % 2 * 4, 96, 8):
+            cv.put(x, y, '#245460')
+    # шкаф
+    cv.rect(10, 2, 76, 52, '#6a4228')
+    cols = ['#e05a7a', '#7fb2f0', '#f6c445', '#6fbf73', '#c48af0', '#f29b7b', '#fbf4e2', '#5b47c2']
+    for sy in (4, 21, 38):
+        cv.rect(12, sy, 72, 14, '#3a2418')
+        x = 13
+        while x < 82:
+            w = rnd.choice((2, 3, 3, 4))
+            h = rnd.randint(9, 13)
+            if x + w > 83:
+                break
+            c = rnd.choice(cols)
+            cv.rect(x, sy + 14 - h, w, h, c)
+            cv.hline(x, x + w - 1, sy + 15 - h + 2, '#fbf4e2' if c != '#fbf4e2' else '#c9c2da')
+            x += w + (1 if rnd.random() < .2 else 0)
+        cv.rect(12, sy + 14, 72, 3, '#8a5a36')
+    # пол
+    cv.rect(0, 58, 96, 38, '#8e5e38')
+    cv.hline(0, 95, 58, '#a87048')
+    # торшер
+    cv.vline(78, 30, 70, '#2b1a51')
+    cv.rect(72, 24, 13, 7, '#f6c445')
+    cv.hline(73, 83, 24, '#fff6c8')
+    cv.rect(75, 70, 7, 2, '#2b1a51')
+    # стопка книг и Полли с раскрытой книгой
+    for i, (c, w) in enumerate((('#5b47c2', 30), ('#e05a7a', 28), ('#f2a73b', 31))):
+        cv.rect(30 + (31 - w) // 2, 58 - i * 5, w, 5, c)
+        cv.hline(31 + (31 - w) // 2, 28 + (31 - w) // 2 + w, 59 - i * 5, '#fbf4e2')
+    polly(cv, 32, 20)
+    cv.rect(40, 34, 18, 9, '#2b1a51')
+    cv.rect(41, 33, 8, 9, '#fbf4e2')
+    cv.rect(50, 33, 7, 9, '#fff9ec')
+    for y in (35, 37, 39):
+        cv.hline(42, 47, y, '#c9c2da')
+        cv.hline(51, 55, y, '#c9c2da')
+    # кружка какао
+    cv.rect(18, 52, 6, 6, '#e05a7a')
+    cv.put(24, 54, '#e05a7a'); cv.put(24, 55, '#e05a7a')
+    cv.put(20, 49, '#ffffff'); cv.put(21, 48, '#ffffff')
+    return cv
+
+
+SCENES = {'sketchbook': sketchbook, 'walls': walls, 'projects': projects, 'work': work, 'books': books}
 
 if __name__ == '__main__':
     OUT.mkdir(parents=True, exist_ok=True)
