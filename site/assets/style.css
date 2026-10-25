@@ -1126,6 +1126,7 @@ h2 .sw-nickname.gold { padding: 2px 12px; }
 .wl-sign { margin: 6px 0 22px; font: italic 400 18px var(--serif); color: var(--peach); }
 .wl-jump { display: flex; flex-wrap: wrap; gap: 10px; }
 .wl-jump .pill-btn { text-decoration: none; }
+@media (max-width: 1280px) and (min-width: 1101px) { .wl-jump .pill-btn { padding: 11px 15px; } }
 .wl-map-sec, .wl-quiz-sec, .wl-comics-sec { padding: 40px var(--gutter) 24px; scroll-margin-top: 70px; }
 .wl-map-head { display: flex; flex-wrap: wrap; justify-content: space-between; align-items: flex-end; gap: 12px 32px; margin-bottom: 18px; }
 .wl-map-head .section-title { margin: 0 0 6px; }

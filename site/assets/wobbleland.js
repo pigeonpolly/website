@@ -517,6 +517,8 @@
       const moreBtn = f.querySelector('#wl-more-btn'), more = f.querySelector('#wl-more');
       (wlHead.querySelector('.wl-sign') || jump || wlHead.lastChild).before(more);
       if (jump) jump.prepend(moreBtn); else more.before(moreBtn);
+      const short = [['🗺 Map', '📖 Recipes', '📅 Holidays'], ['🗺 Карта', '📖 Рецепты', '📅 Праздники'], ['🗺 Karte', '📖 Receptes', '📅 Svētki']][L];
+      if (jump) ['#wl-map', '#recipes', '#wl-cal'].forEach((h, i) => { const a = jump.querySelector(`a[href="${h}"]`); if (a && short[i]) a.textContent = short[i]; }); // короткие подписи — все 4 кнопки в один ряд
       moreBtn.addEventListener('click', () => { more.hidden = !more.hidden; moreBtn.setAttribute('aria-expanded', !more.hidden); moreBtn.textContent = more.hidden ? moreBtn.dataset.o : moreBtn.dataset.c; });
     }
     if (moreBtn && more) moreBtn.addEventListener('click', () => { more.hidden = !more.hidden; moreBtn.setAttribute('aria-expanded', !more.hidden); moreBtn.textContent = more.hidden ? moreBtn.dataset.o : moreBtn.dataset.c; });
