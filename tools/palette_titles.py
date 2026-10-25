@@ -14,6 +14,7 @@ T = {
 '2025-pigeon-polly-romantizing-coffee-and-trains-in-autumn-vibes': ('Night train in October', 'Ночной поезд в октябре', 'Nakts vilciens oktobrī'),
 '2026-pigeon-polly-accidentaly-drinked-brush-watercolor-water': ('Brush water', 'Вода из-под кисточки', 'Otas ūdens'),
 '2026-pigeon-polly-and-rat-tuna-are-scared-of-last-news-about-drones-and-hantavirus': ('Breaking news', 'Срочные новости', 'Jaunākās ziņas'),
+'2026-pigeon-polly-is-hiding-something': ('Something to hide', 'Что-то скрывает', 'Kaut kas slēpts'),
 '2026-pigeon-polly-fancy-life': ('Fancy life', 'Шикарная жизнь', 'Grezna dzīve'),
 '2026-pigeon-polly-fired-changing-remote-work-to-office-job-after-6-years': ('Back to the office', 'Снова в офис', 'Atpakaļ birojā'),
 '2026-pigeon-polly-keeps-busy-living': ('Five minutes of peace', 'Пять минут тишины', 'Piecas miera minūtes'),

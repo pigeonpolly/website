@@ -1,5 +1,56 @@
 [
 {
+"key": "2026-pigeon-polly-is-hiding-something",
+"gallery": "bird",
+"img": "images/bird/2026-pigeon-polly-is-hiding-something.jpg",
+"thumb": "images/bird/2026-pigeon-polly-is-hiding-something-800.jpg",
+"w": 800,
+"h": 603,
+"title": {
+"en": "Something to hide",
+"ru": "Что-то скрывает",
+"lv": "Kaut kas slēpts"
+},
+"colors": [
+{
+"hex": "#EDAE3F",
+"en": "Marigold",
+"ru": "Бархатец",
+"lv": "Samtene"
+},
+{
+"hex": "#DB7A6C",
+"en": "Salmon",
+"ru": "Лосось",
+"lv": "Lasis"
+},
+{
+"hex": "#4B5D97",
+"en": "Denim",
+"ru": "Деним",
+"lv": "Džinss"
+},
+{
+"hex": "#221E21",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#514C56",
+"en": "Storm Cloud",
+"ru": "Грозовая туча",
+"lv": "Negaisa mākonis"
+},
+{
+"hex": "#8E878A",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
+}
+]
+},
+{
 "key": "2026-pigeon-polly-fancy-life",
 "gallery": "bird",
 "img": "images/bird/2026-pigeon-polly-fancy-life.jpg",
