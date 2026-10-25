@@ -1,321 +1,78 @@
-# «Обо мне»: мастерская Алины (Pigeon Polly Art Lab) в стиле комнат сайта — чистые цвета, контур INK, 640x360.
-# По фото Алины: стол со стеллажом, пробковая доска с гирляндой, лампа, окно со шторой-роллом и решёткой, тыквы-соты, рыжий кот.
-# Алина сидит спиной (фиолетовое худи, рыжие кудри как в «Alina 2.0»), Полли — на подоконнике.
-# python3 tools/rooms/lab.py → site/images/about/lab.png (640x360) и lab@3x.png
-import sys, os, math, random
-sys.path.insert(0, os.path.dirname(__file__))
-import shift                                   # Полли из «Смены» (body/hang/frame)
-import kit
-kit.W, kit.H = 640, 360
-from kit import Layer, INK, L, D
-from PIL import Image, ImageDraw, ImageFilter
+# «Обо мне»: мастерская Алины — пиксельная картинка из её фото (рисовка, которую Алина выбрала 25.10.2026).
+# Основа — фото стола (_held/lab/desk.webp): акварель, скетчбук с Полли, ноутбук, рыжий кот в солнце.
+# Меняем: рулон бумаги → тыква-соты с фото полки (_held/lab/shelf.webp), экран → сад Полли с сайта, тёплый свет, гирлянда.
+# Потом: медианный фильтр → уменьшение → 56 цветов без дизеринга → крупные пиксели.
+# python3 tools/rooms/lab.py → site/images/about/lab.png (360 px) и lab@3x.png
+import os
+from PIL import Image, ImageDraw, ImageFilter, ImageEnhance, ImageChops
 import numpy as np
 
-W, H = 640, 360
-OUT = os.path.join(os.path.dirname(__file__), '../../site/images/about')
-os.makedirs(OUT, exist_ok=True)
-rnd = random.Random(7)
-base = Layer()
-cur = base
-def new():
-    global cur; cur = Layer(); return cur
-def put(): base.im.alpha_composite(cur.outlined())
-def R(b, c): cur.r(b, c)
-def E(b, c): cur.e(b, c)
-def P(pts, c): cur.p(pts, c)
-def Ln(pts, c, w=1): cur.l(pts, c, w)
-def px(x, y, c): cur.px([(x, y)], c)
-def box(b, c, k=24): cur.box(b, c, k)
-def mix(a, b, t): return tuple(int(a[i] + (b[i] - a[i]) * t) for i in range(3))
+ROOT = os.path.join(os.path.dirname(__file__), '../..')
+OUT = os.path.join(ROOT, 'site/images/about'); os.makedirs(OUT, exist_ok=True)
+desk = Image.open(os.path.join(ROOT, '_held/lab/desk.webp')).convert('RGB')       # 2000x1500
+shelf = Image.open(os.path.join(ROOT, '_held/lab/shelf.webp')).convert('RGB')     # 960x1280
+W, H = desk.size
 
-# палитра
-WALL, WALL2, RWALL = (198, 172, 156), (188, 162, 146), (170, 146, 132)
-CEIL, FLOOR, FLOORL = (234, 228, 218), (168, 116, 78), (150, 102, 68)
-OAK, OAKD, OAKS = (226, 190, 136), (198, 158, 106), (110, 82, 62)
-WHITE = (244, 242, 236)
-HOOD, HOODD, HOODL = (138, 86, 184), (106, 62, 150), (170, 122, 212)
-HAIR, HAIRL, HAIRD = (234, 108, 42), (252, 170, 78), (190, 72, 28)
-GIN, GIND, GINL = (240, 150, 60), (204, 110, 40), (252, 196, 120)
-LAMPC = (150, 180, 198)
-FLOOR_Y, DT, DF = 300, 214, 244      # пол; стол: задний край, передний край
-WX0, WY0, WX1, WY1 = 424, 26, 576, 200   # окно (рама внутри), подоконник — WY1
-BLIND = 106
 
-# ---------- стены, потолок, пол ----------
-base.r((0, 0, W, 14), CEIL); base.r((0, 14, W, 15), (206, 196, 184))
-base.r((0, 15, 592, FLOOR_Y), WALL)
-for y in range(18, FLOOR_Y, 6):
-    for x in range((y // 6) % 2 * 3, 592, 6): base.px([(x, y)], WALL2)
-base.p([(592, 15), (640, 4), (640, H), (592, FLOOR_Y)], RWALL); base.p([(592, 0), (640, 0), (640, 4), (592, 15)], (220, 214, 204))
-base.l([(592, 15), (592, FLOOR_Y)], D(RWALL, 24))
-base.r((0, FLOOR_Y, W, H), FLOOR)
-for y in range(FLOOR_Y + 10, H, 12):
-    base.l([(0, y), (W, y)], FLOORL)
-    for x in range((y * 7) % 80, W, 80): base.l([(x, y - 11), (x, y)], FLOORL)
-for _ in range(900): base.px([(rnd.randrange(W), rnd.randrange(FLOOR_Y, H))], rnd.choice([(176, 124, 84), (158, 108, 72)]))
-base.r((0, FLOOR_Y - 6, 592, FLOOR_Y - 1), (238, 232, 220)); base.r((0, FLOOR_Y - 1, 592, FLOOR_Y - 1), (190, 180, 166))
+def soft_mask(size, draw, blur=2):
+    m = Image.new('L', size, 0); draw(ImageDraw.Draw(m)); return m.filter(ImageFilter.GaussianBlur(blur))
 
-# ---------- окно: вид, решётка, штора-ролл, подоконник ----------
-new(); R((WX0 - 6, WY0 - 6, WX1 + 6, WY1), WHITE); put()
-view = Layer()
-for y in range(WY0, WY1):
-    view.r((WX0, y, WX1, y), mix((150, 204, 238), (206, 232, 244), (y - WY0) / (WY1 - WY0)))
-view.e((440, 120, 470, 132), (252, 252, 252)); view.e((452, 116, 476, 130), (252, 252, 252))
-for cx, r, c in ((440, 26, (104, 160, 88)), (494, 20, (122, 176, 96)), (548, 30, (96, 150, 80)), (580, 18, (112, 166, 90))):
-    view.e((cx - r, WY1 - 34 - r // 2, cx + r, WY1 + 10), c); view.e((cx - r + 6, WY1 - 30 - r // 2, cx + r - 10, WY1 - 10), L(c, 22))
-view.r((468, 150, 470, 176), (110, 84, 70)); view.r((528, 146, 530, 170), (110, 84, 70))
-for k in range(-6, 8):                                     # решётка ромбами
-    view.l([(WX0 + k * 28, WY1), (WX0 + k * 28 + 56, BLIND)], (72, 70, 82))
-    view.l([(WX0 + k * 28, BLIND), (WX0 + k * 28 + 56, WY1)], (72, 70, 82))
-view.r((498, WY0, 501, WY1), WHITE)
-mask = Image.new('L', (W, H), 0); ImageDraw.Draw(mask).rectangle((WX0, WY0, WX1, WY1 - 1), fill=255)
-base.im.paste(view.im, (0, 0), mask)
-new()                                                      # штора-ролл
-R((WX0 - 4, WY0 - 2, WX1 + 4, BLIND), (246, 234, 206))
-for y in range(WY0 + 4, BLIND - 2, 5): Ln([(WX0, y), (WX1, y)], (238, 224, 192))
-R((WX0 - 4, BLIND - 3, WX1 + 4, BLIND), (226, 210, 176)); E((496, BLIND, 502, BLIND + 6), (226, 210, 176))
-R((WX0 - 8, WY0 - 10, WX1 + 8, WY0 - 3), (232, 228, 220))
-put()
-new(); P([(WX0 - 14, WY1), (WX1 + 14, WY1), (WX1 + 18, WY1 + 6), (WX0 - 18, WY1 + 6)], (250, 250, 246)); R((WX0 - 18, WY1 + 6, WX1 + 18, WY1 + 9), (214, 212, 206)); put()
 
-# ---------- картины ----------
-def frame(b, fc, inner, mat=True):
-    new(); box(b, fc, 20); x0, y0, x1, y1 = b
-    if mat: R((x0 + 3, y0 + 3, x1 - 3, y1 - 3), (250, 248, 240))
-    inner(x0 + (7 if mat else 4), y0 + (7 if mat else 4), x1 - (7 if mat else 4), y1 - (7 if mat else 4)); put()
-def pic_coffee(x0, y0, x1, y1):
-    R((x0, y0, x1, y1), (44, 40, 52)); R((x0 + 3, y0 + 3, x1 - 3, y0 + 8), (214, 70, 60)); cur.text(x0 + 5, y0 + 3, 'CAFE', (255, 236, 220))
-    mx, my = (x0 + x1) // 2, (y0 + y1) // 2 + 5
-    P([(mx, my - 12), (mx + 13, my), (mx, my + 12), (mx - 13, my)], (240, 150, 50)); P([(mx, my - 8), (mx + 9, my), (mx, my + 8), (mx - 9, my)], (44, 40, 52))
-    R((mx - 4, my - 2, mx + 3, my + 4), (250, 240, 220)); px(mx + 4, my, (250, 240, 220))
-def pic_collage(x0, y0, x1, y1):
-    mx, my = (x0 + x1) // 2, (y0 + y1) // 2
-    R((x0, y0, mx, my), (214, 120, 56))
-    for i in range(3):
-        for j in range(2): E((x0 + 2 + i * 8, y0 + 2 + j * 7, x0 + 8 + i * 8, y0 + 8 + j * 7), (246, 156, 60))
-    R((mx + 1, y0, x1, my), (206, 212, 210)); E((mx + 5, y0 + 4, mx + 13, y0 + 15), (255, 255, 255)); E((mx + 13, y0 + 6, mx + 19, y0 + 15), (244, 244, 240)); px(mx + 8, y0 + 7, (240, 150, 40))
-    R((x0, my + 1, x1, y1), (120, 160, 196)); R((x0 + 6, y1 - 8, x0 + 28, y1 - 3), (220, 44, 44)); R((x0 + 11, y1 - 11, x0 + 22, y1 - 8), (232, 80, 70))
-    E((x0 + 8, y1 - 5, x0 + 12, y1 - 1), (40, 40, 40)); E((x0 + 22, y1 - 5, x0 + 26, y1 - 1), (40, 40, 40))
-def pic_pigeon(x0, y0, x1, y1):
-    E((x0 + 3, y0 + 6, x1 - 3, y1), (150, 156, 196)); E((x1 - 11, y0 + 1, x1 - 3, y0 + 9), (140, 146, 188)); px(x1 - 6, y0 + 4, INK); px(x1 - 2, y0 + 5, (240, 150, 50))
-def pic_sea(x0, y0, x1, y1):
-    my = (y0 + y1) // 2; R((x0, y0, x1, my), (196, 220, 232)); R((x0, my, x1, y1), (86, 132, 168)); R((x0, y1 - 4, x1, y1), (226, 204, 156)); E((x1 - 10, y0 + 2, x1 - 4, y0 + 8), (252, 220, 120))
-frame((54, 22, 104, 80), WHITE, pic_coffee)
-frame((178, 16, 254, 70), (120, 80, 54), pic_collage, False)
-frame((272, 26, 304, 58), WHITE, pic_pigeon)
-frame((322, 20, 364, 56), WHITE, pic_sea)
-new(); P([(604, 60), (630, 54), (630, 100), (604, 102)], (214, 170, 60)); P([(608, 66), (626, 62), (626, 94), (608, 96)], (60, 40, 50))
-E((611, 66, 623, 78), (236, 200, 176)); P([(608, 80), (626, 78), (626, 94), (608, 96)], (170, 60, 70)); put()
+# экран ноутбука: сад Полли с сайта, натянутый на четырёхугольник экрана
+scr = Image.open(os.path.join(ROOT, 'site/images/blog/site-news-2026-10/garden.webp')).convert('RGB')
+quad = [(500, 92), (1168, 102), (1164, 494), (504, 488)]           # ЛВ, ПВ, ПН, ЛН в координатах фото
 
-# ---------- пробковая доска с гирляндой ----------
-CB = (132, 82, 332, 160)
-new(); box(CB, WHITE, 16); R((CB[0] + 4, CB[1] + 4, CB[2] - 4, CB[3] - 4), (206, 154, 98))
-for _ in range(900): px(rnd.randint(CB[0] + 4, CB[2] - 4), rnd.randint(CB[1] + 4, CB[3] - 4), rnd.choice([(192, 140, 86), (218, 168, 110)]))
-put()
-new(); cx, cy = 170, 120                                  # цветовой круг на чёрном квадрате
-R((cx - 22, cy - 22, cx + 22, cy + 22), (40, 38, 46))
-for a in range(0, 360, 2):
-    col = Image.new('HSV', (1, 1), (int(a / 360 * 255), 200, 236)).convert('RGB').getpixel((0, 0))
-    for r_ in range(11, 20): cur.px([(cx + round(r_ * math.cos(math.radians(a))), cy + round(r_ * math.sin(math.radians(a))))], col)
-P([(cx, cy - 10), (cx + 9, cy + 5), (cx - 9, cy + 5)], (250, 214, 60)); P([(cx - 4, cy + 1), (cx + 4, cy + 1), (cx, cy + 8)], (80, 96, 180))
-put()
-new(); R((204, 96, 240, 146), (252, 252, 248))            # набросок Полли
-Ln([(212, 138), (218, 116), (232, 118), (232, 140)], (110, 110, 130)); E((216, 104, 232, 120), (252, 252, 248)); Ln([(216, 112), (222, 104), (230, 106), (232, 114)], (110, 110, 130)); px(226, 110, INK); Ln([(232, 112), (237, 113)], (230, 140, 50))
-put()
-for b, c in (((252, 94, 284, 118), (240, 206, 120)), ((292, 92, 322, 122), (200, 90, 72)), ((250, 126, 276, 152), (130, 182, 200)), ((284, 130, 322, 154), (250, 246, 236))):
-    new(); box(b, c, 16)
-    if c == (250, 246, 236):
-        for y in range(b[1] + 5, b[3] - 2, 4): Ln([(b[0] + 4, y), (b[2] - 4, y)], (176, 172, 168))
-    put()
-new(); E((258, 132, 270, 144), (240, 140, 50)); Ln([(264, 132), (264, 129)], (90, 130, 60)); put()
-for x, y, c in ((170, 97, (220, 50, 50)), (222, 97, (60, 120, 220)), (268, 95, (250, 200, 60)), (307, 93, (90, 180, 90)), (263, 127, (220, 50, 50)), (303, 131, (60, 120, 220))):
-    base.r((x - 1, y - 1, x + 1, y + 1), c); base.px([(x - 1, y - 1)], L(c, 60))
-# гирлянда: провод и лампочки (свечение — в конце)
-def sag(xa, ya, xb, yb, s, n): return [(xa + (xb - xa) * i / n, ya + (yb - ya) * i / n + s * math.sin(math.pi * i / n)) for i in range(n + 1)]
-wire = sag(128, 80, 232, 86, 12, 40) + sag(232, 86, 336, 78, 10, 40)[1:] + sag(336, 78, 348, 164, -5, 30)[1:]
-base.l([(round(x), round(y)) for x, y in wire], (70, 62, 56))
-BULBS = [(round(x), round(y) + 2) for x, y in wire[3::8]]
-for i, (x, y) in enumerate(BULBS):
-    c = (255, 214, 110) if i % 3 else (255, 150, 90)
-    base.r((x - 1, y - 1, x + 1, y + 2), c); base.px([(x - 1, y - 1)], (255, 250, 220)); base.px([(x, y - 2)], (70, 62, 56))
 
-# ---------- стеллаж и стол ----------
-HX0, HX1, HT = 12, 340, 164
-new()
-R((HX0, HT, HX1, DT), OAKS)
-for xa, xb in ((HX0 + 6, 120), (126, 230), (236, HX1 - 6)):
-    for y in range(HT + 6, DT): R((xa, y, xb, y), mix((96, 70, 54), (128, 96, 72), (y - HT) / (DT - HT)))
-box((HX0 - 4, HT - 6, HX1 + 4, HT + 1), OAK, 30)
-for x in (HX0 - 4, 120, 230, HX1 - 6): box((x, HT + 1, x + 6, DT), OAKD, 18)
-put()
-new()                                                       # столешница и тумба
-P([(4, DT), (592, DT), (592, DF), (4, DF)], OAK); R((4, DT, 592, DT + 1), L(OAK, 20)); R((4, DF - 3, 592, DF), L(OAK, 12))
-for _ in range(500): px(rnd.randint(6, 590), rnd.randint(DT + 2, DF - 4), (214, 176, 122))
-R((4, DF + 1, 592, FLOOR_Y - 6), (84, 64, 54))
-box((4, DF + 1, 150, FLOOR_Y - 2), OAKD, 20)
-for y in (DF + 6, DF + 26): box((10, y, 144, y + 16), L(OAKD, 10), 18); R((66, y + 7, 88, y + 9), (240, 226, 196))
-box((566, DF + 1, 592, FLOOR_Y - 2), OAKD, 20)
-put()
-new()                                                       # коврик под ноутбук
-P([(352, DT + 4), (500, DT + 4), (506, DF - 5), (346, DF - 5)], (48, 58, 120))
-for x, y in ((364, DT + 10), (420, DT + 20), (480, DT + 12), (392, DT + 24)): P([(x, y - 3), (x + 1, y - 1), (x + 4, y), (x + 1, y + 1), (x, y + 4), (x - 1, y + 1), (x - 4, y), (x - 1, y - 1)], (232, 64, 74))
-put()
+def coeffs(dst, src):
+    m = []
+    for (x, y), (u, v) in zip(dst, src):
+        m += [[x, y, 1, 0, 0, 0, -u * x, -u * y], [0, 0, 0, x, y, 1, -v * x, -v * y]]
+    return np.linalg.solve(np.array(m, float), np.array([c for p in src for c in p], float)).tolist()
 
-# ---------- на стеллаже ----------
-new(); box((22, 110, 98, HT - 6), (190, 146, 98), 24)       # комодик-декупаж
-paper = [(232, 214, 176), (204, 130, 98), (214, 186, 132), (176, 196, 172)]
-for i in range(3):
-    for j in range(2):
-        b = (26 + j * 36, 114 + i * 14, 58 + j * 36, 125 + i * 14); c = paper[(i * 2 + j) % 4]; box(b, c, 16)
-        if (i + j) % 2:
-            for x in range(b[0] + 2, b[2], 4): Ln([(x, b[1] + 1), (x, b[3] - 1)], D(c, 40))
-        else:
-            for k in range(6): px(b[0] + 3 + k * 5, b[1] + 3 + k % 2 * 4, D(c, 60))
-        R(((b[0] + b[2]) // 2 - 1, (b[1] + b[3]) // 2, (b[0] + b[2]) // 2 + 1, (b[1] + b[3]) // 2 + 1), (110, 74, 50))
-put()
-def honey(cx, cy, rx, ry):                                 # бумажная тыква-соты
-    new(); E((cx - rx, cy - ry, cx + rx, cy + ry), (244, 112, 34))
-    for k in (-2, -1, 0, 1, 2):
-        xs = [cx + k * rx * .42 * math.sin(math.pi * t / 16) for t in range(17)]
-        Ln([(round(x), round(cy - ry + 2 * ry * t / 16)) for t, x in enumerate(xs)], (206, 80, 20))
-    for y in range(cy - ry + 4, cy + ry - 3, 4):
-        for x in range(cx - rx + 4, cx + rx - 3, 6):
-            if ((x - cx) / rx) ** 2 + ((y - cy) / ry) ** 2 < .7: px(x + (y // 4) % 2 * 3, y, (252, 160, 80))
-    R((cx - 1, cy - ry - 5, cx + 1, cy - ry), (90, 130, 60)); put()
-honey(60, 90, 26, 19)
-for bx, h, c in ((104, 20, (80, 130, 104)), (218, 16, (214, 96, 76))):   # баночки с кистями
-    new()
-    for i in range(5):
-        tx = bx + 2 + i * 2; Ln([(tx, HT - 6 - h), (tx + (i - 2) * 2, HT - 22 - h + i % 2 * 4)], [(160, 100, 56), (50, 46, 52), (220, 70, 70), (70, 96, 180), (240, 200, 70)][i])
-    box((bx, HT - 6 - h, bx + 12, HT - 7), c, 20); put()
-def chibi(x, hair, shirt):
-    new(); y = HT - 7; R((x, y - 6, x + 8, y), shirt); E((x - 2, y - 18, x + 10, y - 6), (246, 210, 180)); E((x - 3, y - 20, x + 11, y - 12), hair); R((x - 3, y - 14, x - 1, y - 6), hair)
-    px(x + 2, y - 11, INK); px(x + 6, y - 11, INK); put()
-chibi(128, (70, 46, 34), (250, 250, 246)); chibi(144, (44, 34, 30), (214, 70, 70)); chibi(160, (250, 214, 96), (96, 140, 200))
-new(); E((178, HT - 24, 200, HT - 6), (246, 128, 40)); Ln([(189, HT - 24), (189, HT - 7)], (210, 92, 26)); R((188, HT - 28, 190, HT - 24), (90, 130, 60)); put()
-new()                                                       # зелёный органайзер с книгами
-for i, c in enumerate(((70, 70, 84), (226, 214, 190), (110, 84, 150), (240, 232, 214), (176, 70, 60), (84, 110, 84))):
-    R((250 + i * 10, 112 + (i % 3) * 4, 258 + i * 10, HT - 14), c); R((251 + i * 10, 116 + (i % 3) * 4, 252 + i * 10, HT - 18), L(c, 30))
-put()
-honey(320, 134, 13, 10)
-new(); P([(244, 136), (338, 136), (338, HT - 6), (244, HT - 6)], (110, 196, 84)); R((244, 136, 338, 137), (150, 222, 120)); R((244, HT - 8, 338, HT - 6), (80, 156, 62)); put()
 
-# ---------- в ячейках ----------
-for i, c in enumerate(((50, 54, 62), (84, 88, 96), (160, 50, 50))):
-    new(); box((22, DT - 8 - i * 8, 74, DT - 2 - i * 8), c, 22); put()
-for i, c in enumerate(((236, 232, 220), (196, 160, 116), (70, 82, 130))):
-    new(); box((80, DT - 6 - i * 6, 114, DT - 1 - i * 6), c, 18); put()
-new(); P([(132, 182), (164, 180), (166, DT - 1), (130, DT - 1)], (56, 70, 58)); Ln([(142, 180), (148, 172), (154, 180)], (214, 190, 120))
-for k in range(8): px(136 + k * 4, 188 + k % 3 * 6, (220, 186, 90))
-put()
-new(); P([(168, 184), (196, 182), (198, DT - 1), (166, DT - 1)], (226, 96, 156)); Ln([(176, 182), (182, 174), (188, 182)], (246, 206, 226)); put()
-new(); E((200, 186, 224, 204), (236, 186, 214)); E((205, 191, 219, 206), (110, 82, 64)); R((200, 196, 206, DT - 2), (226, 166, 202)); R((218, 196, 224, DT - 2), (226, 166, 202)); put()
-new(); box((242, 184, 258, DT - 1), (246, 214, 60), 22)
-for i in range(4): Ln([(245 + i * 3, 183), (243 + i * 4, 172 + i % 2 * 4)], [(70, 96, 210), (226, 64, 64), (50, 46, 52), (96, 180, 96)][i])
-put()
-new(); box((266, 192, 304, DT - 1), (130, 98, 78), 18); R((270, 196, 300, 199), (240, 230, 210)); put()
-new(); P([(316, 162), (334, 162), (336, 200), (318, 202)], (246, 200, 56))    # шарф в полоску
-for k in range(4): R((316, 166 + k * 9, 335, 170 + k * 9), (140, 40, 46))
-for x in range(319, 336, 3): Ln([(x, 202), (x, 207)], (246, 200, 56))
-put()
+sw, sh = scr.size
+warp = scr.transform((W, H), Image.PERSPECTIVE, coeffs(quad, [(0, 0), (sw, 0), (sw, sh), (0, sh)]), Image.BICUBIC)
+warp = ImageEnhance.Brightness(warp).enhance(.92)
+desk.paste(warp, (0, 0), soft_mask((W, H), lambda d: d.polygon(quad, fill=255), 1))
 
-# ---------- лампа ----------
-new()
-box((360, DT - 6, 374, DT + 2), (90, 96, 106), 16)
-Ln([(367, DT - 6), (384, 110)], LAMPC, 3); Ln([(384, 110), (300, 92)], LAMPC, 3); Ln([(370, DT - 20), (382, 128)], (110, 126, 140))
-for x, y in ((384, 110), (367, DT - 6), (300, 92)): E((x - 3, y - 3, x + 3, y + 3), D(LAMPC, 20))
-P([(278, 98), (302, 86), (314, 112), (286, 124)], LAMPC); P([(280, 98), (302, 87), (306, 95), (284, 106)], L(LAMPC, 30))
-P([(286, 124), (314, 112), (310, 118), (290, 126)], (255, 246, 206))
-put()
+# тыква-соты вместо рулона бумаги слева
+pk = shelf.crop((540, 870, 726, 1046))
+pm = soft_mask(pk.size, lambda d: (d.ellipse((9, 16, 177, 172), fill=255), d.rectangle((84, 10, 102, 30), fill=255)), 1.5)
+k = 1.75
+pk = pk.resize((round(pk.width * k), round(pk.height * k)), Image.LANCZOS); pm = pm.resize(pk.size, Image.LANCZOS)
+pk = ImageEnhance.Color(ImageEnhance.Brightness(pk).enhance(.98)).enhance(.8)
+# сначала закрыть рулон тёмной столешницей (тень), потом поставить тыкву
+desk.paste(desk.crop((0, 1180, 220, 1500)).resize((230, 360)), (-10, 760))
+desk.paste(pk, (-60, 760), pm)
 
-# ---------- на столе ----------
-new(); box((16, 194, 38, 222), (52, 96, 82), 20); E((34, 200, 44, 214), (52, 96, 82)); E((37, 203, 41, 211), OAK)   # кружка с кистями
-for i in range(5): Ln([(20 + i * 4, 194), (14 + i * 6, 170 + i % 2 * 5)], [(40, 38, 44), (150, 90, 50), (70, 80, 170), (220, 220, 226), (40, 38, 44)][i])
-put()
-new(); box((50, 198, 82, 224), (248, 202, 44), 30); E((50, 192, 82, 204), (252, 220, 70)); E((54, 195, 64, 201), (190, 140, 30)); E((68, 195, 78, 201), (190, 140, 30))   # непроливайка
-R((53, 207, 79, 220), (226, 236, 238)); put()
-def tin(b):
-    new(); box(b, (200, 204, 212), 24); x0, y0, x1, y1 = b
-    pal = [(246, 206, 40), (244, 150, 34), (226, 60, 46), (204, 44, 98), (126, 58, 132), (54, 76, 170), (40, 150, 180), (44, 130, 84), (120, 172, 64), (156, 96, 54), (96, 64, 44), (44, 44, 50)]
-    cw = (x1 - x0 - 3) // 6
-    for r_ in range(2):
-        for c_ in range(6):
-            col = pal[(r_ * 6 + c_) % 12]; R((x0 + 2 + c_ * cw, y0 + 2 + r_ * 6, x0 + c_ * cw + cw, y0 + r_ * 6 + 6), col); px(x0 + 2 + c_ * cw, y0 + 2 + r_ * 6, L(col, 60))
-    put()
-tin((92, 222, 146, 236))
-new(); E((100, 236, 136, 243), (250, 250, 248)); E((106, 237, 114, 241), (120, 180, 96)); E((118, 237, 126, 241), (90, 90, 160)); put()
-new(); P([(300, 226), (346, 224), (348, 240), (300, 240)], (252, 252, 248)); Ln([(306, 230), (340, 229)], (180, 176, 172)); Ln([(306, 234), (330, 233)], (180, 176, 172)); put()   # чистый лист справа
-new()                                                       # ноутбук со стикерами
-P([(372, 228), (466, 228), (474, 238), (364, 238)], (50, 54, 66))
-for x in range(372, 466, 5): px(x, 232, (200, 110, 220)); px(x + 2, 235, (100, 170, 236))
-box((376, 170, 462, 228), (46, 50, 62), 18)
-R((381, 175, 457, 223), (64, 70, 92))
-for x, y, c in ((388, 182, (246, 206, 60)), (420, 190, (232, 70, 90)), (440, 178, (100, 190, 230)), (400, 206, (130, 206, 110)), (444, 206, (246, 150, 60)), (414, 212, (240, 240, 240))):
-    E((x - 5, y - 5, x + 5, y + 5), c); E((x - 2, y - 2, x + 2, y + 2), L(c, 40))
-put()
-new(); E((478, 226, 492, 236), (196, 186, 236)); px(485, 229, (236, 60, 80)); put()     # мышка
-new(); box((548, 210, 564, 232), (244, 240, 232), 22); E((560, 214, 570, 226), (244, 240, 232)); E((563, 217, 567, 223), OAK); R((549, 210, 563, 212), (150, 96, 54)); R((551, 218, 561, 220), (226, 64, 64)); put()   # кружка
+# тёплый «уютный» свет: золотистее, мягче контраст в тенях
+a = np.asarray(desk).astype(float) / 255
+a = a ** np.array([.96, 1.0, 1.04])                    # чуть теплее, синие краски остаются синими
+a = a * np.array([1.03, 1.0, .96])
+lum = a.mean(2, keepdims=True)
+a = a + (lum < .35) * np.array([.04, .02, 0])          # тени — коричневые, не серые
+desk = Image.fromarray((np.clip(a, 0, 1) * 255).astype(np.uint8))
+desk = ImageEnhance.Color(desk).enhance(1.3)
+desk = ImageEnhance.Contrast(desk).enhance(1.08)
 
-# ---------- Полли на подоконнике ----------
-pf = shift.frame(shift.hang, tie=False, look=-2).transpose(Image.FLIP_LEFT_RIGHT)
-base.im.alpha_composite(pf, (556 - (shift.FW - shift.FX), WY1 - shift.FY + 1))
+# пикселизация как на выбранном образце
+TW = 400
+TH = round(H * TW / W)
+small = desk.filter(ImageFilter.MedianFilter(5)).resize((TW, TH), Image.LANCZOS)
+q = small.quantize(colors=56, method=Image.Quantize.MAXCOVERAGE, kmeans=4, dither=Image.Dither.NONE).convert('RGB')
 
-# ---------- рыжий кот спит на столе ----------
-new()
-P([(486, 236), (520, 236), (530, 232), (534, 236), (526, 242), (482, 242)], GIN)        # хвост
-E((480, 198, 540, 240), GIN); E((484, 214, 540, 240), GIND)
-for k in range(5): Ln([(490 + k * 10, 200), (494 + k * 10, 214)], GIND)
-E((514, 196, 548, 226), GIN); E((520, 212, 544, 226), (252, 244, 232))
-P([(516, 204), (520, 190), (528, 200)], GIN); P([(536, 199), (544, 190), (546, 206)], GIN)
-P([(519, 201), (521, 195), (525, 200)], (246, 176, 166)); P([(538, 200), (542, 195), (543, 204)], (246, 176, 166))
-Ln([(522, 209), (527, 211)], INK); Ln([(535, 211), (540, 209)], INK); px(531, 214, (220, 110, 110))
-E((500, 230, 512, 240), (252, 244, 232))
-put()
-
-# ---------- Алина за столом: спиной, фиолетовое худи, рыжие кудри ----------
-AX = 236                                                    # центр
-new()                                                       # кресло: спинка и основание
-E((AX - 44, 210, AX + 44, 236), (54, 52, 64)); R((AX - 44, 222, AX + 44, 276), (54, 52, 64)); E((AX - 44, 262, AX + 44, 286), (54, 52, 64))
-Ln([(AX - 36, 226), (AX - 36, 272)], (78, 76, 92)); Ln([(AX + 38, 226), (AX + 38, 272)], (40, 38, 48))
-R((AX - 4, 286, AX + 4, 318), (40, 40, 48))
-for dx, dy in ((-46, 6), (46, 6), (-26, 12), (26, 12)):
-    Ln([(AX, 318), (AX + dx, 318 + dy)], (40, 40, 48), 3); E((AX + dx - 4, 318 + dy, AX + dx + 4, 318 + dy + 7), (30, 30, 36))
-put()
-new()                                                       # худи: плечи, рукава к столу, капюшон
-P([(AX - 52, 236), (AX - 44, 192), (AX - 26, 176), (AX + 26, 176), (AX + 44, 192), (AX + 52, 236)], HOOD)
-P([(AX - 52, 236), (AX - 44, 192), (AX - 62, 214), (AX - 66, DT + 6), (AX - 50, DT + 8)], HOODD)     # левый рукав
-P([(AX + 52, 236), (AX + 44, 192), (AX + 62, 214), (AX + 66, DT + 6), (AX + 50, DT + 8)], HOODD)     # правый рукав
-Ln([(AX - 40, 196), (AX - 46, 232)], HOODL); Ln([(AX + 10, 200), (AX + 6, 234)], HOODD)
-P([(AX - 24, 168), (AX + 24, 168), (AX + 30, 186), (AX + 14, 200), (AX - 14, 200), (AX - 30, 186)], HOODL)  # капюшон
-P([(AX - 18, 176), (AX + 18, 176), (AX + 20, 186), (AX + 10, 194), (AX - 10, 194), (AX - 20, 186)], HOOD)
-Ln([(AX - 10, 194), (AX, 190), (AX + 10, 194)], HOODD)
-put()
-new()                                                       # рыжие кудри
-E((AX - 30, 120, AX + 30, 178), HAIR)
-for cx_, cy_, r in ((AX - 30, 150, 12), (AX + 30, 150, 12), (AX - 24, 170, 10), (AX + 24, 170, 10), (AX - 16, 118, 12), (AX + 14, 116, 12), (AX, 112, 11), (AX - 28, 132, 10), (AX + 28, 132, 10), (AX - 6, 176, 9), (AX + 8, 176, 9)):
-    E((cx_ - r, cy_ - r, cx_ + r, cy_ + r), HAIR)
-for k in range(46):                                         # завитки — светлые и тёмные крестики, как в «Alina 2.0»
-    a, rr = rnd.random() * 6.28, rnd.random() ** .6 * 34
-    x, y = int(AX + math.cos(a) * rr), int(146 + math.sin(a) * rr * .95)
-    c = HAIRL if k % 3 else HAIRD
-    if cur.im.getpixel((x, y))[3]: px(x, y, c); px(x - 1, y, c); px(x + 1, y, c); px(x, y - 1, c); px(x, y + 1, c)
-put()
-
-# ---------- мягкий свет: гирлянда, лампа, окно ----------
-img = np.asarray(base.im.convert('RGB')).astype(float)
-yy, xx = np.mgrid[0:H, 0:W].astype(float)
-glow = np.zeros((H, W, 3))
-for i, (x, y) in enumerate(BULBS):
-    f = np.clip(1 - np.hypot(xx - x, yy - y) / 14, 0, 1) ** 2
-    glow += f[..., None] * (np.array([255, 190, 90]) if i % 3 else np.array([255, 140, 80])) * .35
-cone = Image.new('L', (W, H), 0); ImageDraw.Draw(cone).polygon([(288, 124), (312, 114), (360, DT + 12), (190, DT + 12)], fill=60)
-cone = np.asarray(cone.filter(ImageFilter.GaussianBlur(8))).astype(float) / 255
-glow += cone[..., None] * np.array([255, 236, 190]) * .45
-win = Image.new('L', (W, H), 0); ImageDraw.Draw(win).polygon([(WX0, BLIND), (WX1, BLIND), (WX1 - 40, DF), (WX0 - 110, DF)], fill=40)
-win = np.asarray(win.filter(ImageFilter.GaussianBlur(14))).astype(float) / 255
-glow += win[..., None] * np.array([255, 240, 210]) * .35
-img = np.clip(img + glow, 0, 255).astype(np.uint8)
-out = Image.fromarray(img)
-out.save(os.path.join(OUT, 'lab.png'))
-out.resize((W * 3, H * 3), Image.NEAREST).save(os.path.join(OUT, 'lab@3x.png'))
-print('ok', os.path.join(OUT, 'lab.png'))
+# гирлянда по верху окна — уже в пикселях, чтобы лампочки были чёткими
+d = ImageDraw.Draw(q)
+import math
+pts = [(x, 6 + 7 * math.sin(math.pi * ((x - 4) % 132) / 132)) for x in range(-4, TW + 4)]
+d.line([(x, round(y)) for x, y in pts], fill=(60, 48, 40))
+glow = Image.new('RGB', q.size, 0); g = ImageDraw.Draw(glow)
+for i, x in enumerate(range(6, TW, 16)):
+    y = round(6 + 7 * math.sin(math.pi * ((x - 4) % 132) / 132)) + 2
+    c = (255, 206, 110) if i % 3 else (255, 150, 90)
+    g.ellipse((x - 6, y - 5, x + 6, y + 7), fill=tuple(v // 3 for v in c))
+    d.rectangle((x - 1, y, x + 1, y + 2), fill=c); d.point((x - 1, y), fill=(255, 248, 220)); d.point((x, y - 1), fill=(60, 48, 40))
+q = ImageChops.add(q, glow.filter(ImageFilter.GaussianBlur(2)))
+q.save(os.path.join(OUT, 'lab.png'))
+q.resize((TW * 3, TH * 3), Image.NEAREST).save(os.path.join(OUT, 'lab@3x.png'))
+print('ok', q.size)
