@@ -4641,8 +4641,8 @@ html.me-in .myday { display: block; }
 .home-dash { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 2fr); gap: 22px; align-items: start; margin: 0 auto; padding: 26px var(--gutter) 56px; }
 html.me-in .home-dash { grid-template-columns: minmax(0, 1fr) minmax(0, 1.25fr) minmax(0, 1fr); }
 .hd-col { min-width: 0; }
-.hd-news, html.me-in .hd-rooms { display: none; }
-html.me-in .hd-news { display: block; }
+.hd-news, .hd-upd, html.me-in .hd-rooms { display: none; }
+html.me-in .hd-news, html.me-in .hd-upd { display: block; } /* «Новое на сайте» — только вошедшему */
 .home-dash .myday { padding: 0; }
 .home-dash .md-in { grid-template-columns: 1fr; gap: 16px; }
 .hd-side { display: grid; gap: 22px; }
