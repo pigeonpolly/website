@@ -1015,7 +1015,8 @@
       const tagsOf = u => (u.atags || '').split(',').filter(Boolean);
       const allTags = [...new Set(d.users.flatMap(tagsOf))].sort((a, b) => a.localeCompare(b));
       if (bTag && bTag !== '-' && !allTags.includes(bTag)) bTag = '';
-      const TC = d.tagColors || {}, tagSty = t => TC[t] ? ` style="background:${TC[t]}"` : '';
+      const TC = d.tagColors || {}, tagInk = c => { const n = parseInt(c.slice(1), 16); return (0.299 * (n >> 16) + 0.587 * (n >> 8 & 255) + 0.114 * (n & 255)) < 150 ? '#fff' : '#2B1A51'; }, // на тёмном — белые буквы
+        tagSty = t => TC[t] ? ` style="background:${TC[t]};color:${tagInk(TC[t])};border-color:${TC[t]}"` : '';
       const tagChip = (t, extra = '') => `<span class="adm-tag"${tagSty(t)}>${esc(t)}${extra}</span>`;
       const noTag = d.users.filter(u => !u.atags).length;
       const list = d.users.filter(u => (!q || (u.nick || '').toLowerCase().includes(q)) && (!bTag || (bTag === '-' ? !u.atags : tagsOf(u).includes(bTag)))).sort((a, b) => (b[bSort] || 0) - (a[bSort] || 0));
@@ -1083,18 +1084,21 @@
       // 🎨 цвета тегов (meta atag_colors): «🎨 Цвета» включает режим — нажатие на тег в строке фильтра открывает кружки цветов рядом с ним
       const colBtn = main.querySelector('#adm-tagcol');
       colBtn && (colBtn.onclick = () => { bCol = !bCol; draw(); });
-      const PAL = ['', '#ffd6d6', '#ffe2c2', '#fff2b3', '#d4f2d0', '#cdeef2', '#d6e2ff', '#e8d6ff', '#ffd6ef', '#e6ddd0', '#dedede'];
+      const PAL = ['#ffd6d6', '#ffe2c2', '#fff2b3', '#d4f2d0', '#cdeef2', '#d6e2ff', '#e8d6ff', '#ffd6ef', '#e6ddd0', // пастель
+        '#ff8a8a', '#ffb366', '#ffe066', '#8fdc8a', '#6fd3e0', '#8fb0ff', '#c39bff', '#ff8fd0', '#c9a98a', // ярче
+        '#e53935', '#fb8c00', '#fdd835', '#43a047', '#00acc1', '#1e88e5', '#8e24aa', '#d81b60', '#8d6e63', // яркие
+        '#8b1a1a', '#a35200', '#7a6a00', '#1b5e20', '#00606b', '#0d3c8c', '#4a148c', '#880e4f', '#3e2723', // тёмные
+        '', '#ffffff', '#dedede', '#b0b0b0', '#757575', '#424242', '#212121', '#2b1a51', '#000000']; // '' — обычный
       const colorPop = b => {
         const t = b.dataset.tagf;
         document.querySelector('.adm-tagpop')?.remove();
         const pop = document.createElement('div'); pop.className = 'adm-tagpop'; pop.setAttribute('role', 'dialog'); pop.setAttribute('aria-label', 'Цвет тега');
-        pop.innerHTML = `<b>🎨 ${esc(t)}</b><div class="adm-tagpop-list">${PAL.map(c => `<button type="button" class="adm-swatch" data-c="${c}" style="background:${c || '#f4f0fb'}" aria-pressed="${(TC[t] || '') === c}" title="${c ? 'Этот цвет' : 'Обычный'}"></button>`).join('')}</div>`;
+        pop.innerHTML = `<b>🎨 ${esc(t)}</b><div class="adm-swatches">${PAL.map(c => `<button type="button" class="adm-swatch" data-c="${c}" style="background:${c || '#f4f0fb'}" aria-pressed="${(TC[t] || '') === c}" title="${c ? 'Этот цвет' : 'Обычный'}"></button>`).join('')}</div><label class="adm-owncol">Свой цвет <input type="color" value="${TC[t] || '#f4f0fb'}"></label>`;
         const close = () => { pop.remove(); document.removeEventListener('mousedown', out, true); };
         const out = e => { if (!pop.contains(e.target) && e.target !== b) close(); };
-        pop.querySelectorAll('[data-c]').forEach(x => x.onclick = async () => {
-          close();
-          try { const r = await api('admin/tag-color', { tag: t, color: x.dataset.c }); d.tagColors = r.colors; draw(); } catch (e) { alert(err(e)); }
-        });
+        const setCol = async c => { close(); try { const r = await api('admin/tag-color', { tag: t, color: c }); d.tagColors = r.colors; draw(); } catch (e) { alert(err(e)); } };
+        pop.querySelectorAll('[data-c]').forEach(x => x.onclick = () => setCol(x.dataset.c));
+        pop.querySelector('input[type=color]').onchange = e => setCol(e.target.value);
         pop.onkeydown = e => { if (e.key === 'Escape') close(); };
         document.body.appendChild(pop);
         const r = b.getBoundingClientRect(), W = Math.min(300, innerWidth - 16);

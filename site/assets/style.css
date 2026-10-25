@@ -2973,9 +2973,13 @@ button.adm-tag.adm-tag-none { background: #fff; border-style: dashed; }
 .adm-tagpop input { flex: 1; min-width: 0; padding: 5px 8px; border: 1px solid #ddd6ea; border-radius: 8px; font: inherit; }
 .adm-tagpop-list { display: flex; flex-wrap: wrap; gap: 6px; max-height: 180px; overflow: auto; }
 .adm-swatch { width: 26px; height: 26px; border: 1px solid #ccc3dc; border-radius: 50%; cursor: pointer; padding: 0; }
-.adm-swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px #2B1A51; }
-.adm-tagx { border: 0; background: none; color: #8a7aa8; cursor: pointer; padding: 0 0 0 2px; font-size: 1.1em; line-height: 1; }
-.adm-tagx:hover { color: #c0392b; }
+.adm-swatch[aria-pressed="true"] { box-shadow: 0 0 0 2px #fff, 0 0 0 4px #2B1A51; }
+.adm-swatches { display: grid; grid-template-columns: repeat(9, 26px); gap: 5px; margin-top: 8px; }
+.adm-owncol { display: flex; align-items: center; gap: 8px; margin-top: 10px; font-size: .9em; cursor: pointer; }
+.adm-owncol input { width: 40px; height: 28px; padding: 0; border: 1px solid #ddd6ea; border-radius: 6px; background: none; cursor: pointer; }
+.adm-tagx { border: 0; background: none; color: inherit; opacity: .6; cursor: pointer; padding: 0 0 0 2px; font-size: 1.1em; line-height: 1; }
+.adm-tagx:hover { opacity: 1; }
+.adm-tag small { color: inherit; opacity: .75; }
 .adm-sbar { display: flex; flex-wrap: wrap; gap: 6px; margin: 0 0 12px; }
 .adm-sbar .pill-btn { padding: 5px 12px; font-size: 13px; }
 .adm-shop input { width: 90px; padding: 6px 8px; border: 1px solid #ddd6ea; border-radius: 8px; font: 15px var(--sans); }
