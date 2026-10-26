@@ -29,7 +29,8 @@
   const EXTRA = window.EN_EXTRA || {}, BOOK = window.EN_BOOK || { parts: [] }, NOTES = window.EN_NOTES || {};
   const bookOf = u => BOOK.parts.find(p => p.u === u.id);
   const PICS = window.EN_PICS || {}; // иллюстрации Тенниела: номер части книги → картинки (content/english/pics.js)
-  const picHTML = (x, cls = '') => `<figure class="tenniel ${cls}"><img src="/images/english/tenniel-${x.n}.webp" alt="${esc(x.alt)}" loading="lazy"><figcaption><i class="en">${esc(x.alt)}</i> <span>— John Tenniel, 1865</span></figcaption></figure>`;
+  // линии рисунка — цветом текста темы: картинка служит маской (сама прозрачна и только задаёт размер)
+  const picHTML = (x, cls = '') => `<figure class="tenniel ${cls}"><span class="tn" style="-webkit-mask-image:url(/images/english/tenniel-${x.n}.webp);mask-image:url(/images/english/tenniel-${x.n}.webp)"><img src="/images/english/tenniel-${x.n}.webp" alt="${esc(x.alt)}" loading="lazy"></span><figcaption><i class="en">${esc(x.alt)}</i> <span>— John Tenniel, 1865</span></figcaption></figure>`;
   const PODS = window.EN_PODS || {}, podq = n => 'https://open.spotify.com/search/' + encodeURIComponent(n) + '/podcasts';
   const podHTML = ([n, a, why]) => `<li><a href="${podq(n)}" target="_blank" rel="noopener"><b>${esc(n)}</b></a> <span class="note-s">· ${esc(a)}</span><br>${fmt(why)}</li>`;
   // ---------- имя: в материалах «Alina» / «Алина» заменяется на имя того, кто учится (S.name = {en, ru}) ----------
@@ -96,6 +97,7 @@
     m.c = { ...(b.c || {}) }; for (const [k, v] of Object.entries(a.c || {})) m.c[k] = Math.max(v, m.c[k] || 0);
     m.k = { ...(b.k || {}), ...(a.k || {}) };
     m.name = a.name || b.name;
+    m.theme = a.theme !== undefined ? a.theme : b.theme;
     m.m = { ...(b.m || {}) }; for (const [k, v] of Object.entries(a.m || {})) m.m[k] = m.m[k] && m.m[k][1] > v[1] ? m.m[k] : v;
     m.x = (a.t || 0) >= (b.t || 0) ? (a.x || {}) : (b.x || {}); // отработанные ошибки удаляются — берём более свежий список
     return m;
@@ -859,9 +861,27 @@
     msg.textContent = 'Проверяю…';
     const r = await fetch('/api/admin/pin/verify', { method: 'POST', headers: { 'content-type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ pin }) }).catch(() => null);
     if (!r || !r.ok) { const j = r ? await r.json().catch(() => ({})) : {}; msg.textContent = !r ? 'Нет связи с сайтом' : r.status === 429 ? `Много попыток — подождите ${j.minutes || 60} мин.` : r.status === 401 ? 'Войдите на сайт' : 'Неверный пароль'; return; }
-    if (key === 'reset') { const nm = S.name; S = fresh(Date.now()); S.name = nm; try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { /* нет места */ } save(); location.hash = 'home'; route(); toast('🧹', 'Учебник сброшен', 'Всё с начала. Невермор уже точит клюв.', ''); return; }
+    if (key === 'reset') { const nm = S.name, th = S.theme; S = fresh(Date.now()); S.name = nm; S.theme = th; try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { /* нет места */ } save(); location.hash = 'home'; route(); toast('🧹', 'Учебник сброшен', 'Всё с начала. Невермор уже точит клюв.', ''); return; }
     S.k[key] = Date.now(); save(); route();
   }
+  // ---------- цветовая схема: S.theme (в аккаунте) + localStorage english-theme (сразу при загрузке, скрипт в shell.html) ----------
+  const THEMES = [['', 'Лаванда', '#fbfaff', '#534ab7'], ['mint', 'Мята', '#f5fbf8', '#2a7a5f'], ['peach', 'Персик', '#fff8f3', '#b9532f'], ['sky', 'Небо', '#f5f9fe', '#2c69b0'],
+    ['rose', 'Роза', '#fff7f9', '#ad3a66'], ['lemon', 'Лимон', '#fffdf1', '#806300'], ['night', 'Ночь', '#16132a', '#a49aff'], ['forest', 'Лес', '#141a17', '#7fd2a8']];
+  function setTheme(t, keep) {
+    if (!THEMES.some(x => x[0] === t)) t = '';
+    if (t) document.documentElement.dataset.theme = t; else delete document.documentElement.dataset.theme;
+    try { if (t) localStorage.setItem('english-theme', t); else localStorage.removeItem('english-theme'); } catch (e) { /* без памяти браузера */ }
+    if (!keep && (S.theme || '') !== t) { S.theme = t; save(); }
+    for (const b of $$('[data-theme-set]')) b.classList.toggle('on', b.dataset.themeSet === t);
+  }
+  function themePanel() {
+    const old = $('.themes'); if (old) { old.remove(); return; }
+    const cur = document.documentElement.dataset.theme || '', box = document.createElement('div'); box.className = 'themes';
+    box.innerHTML = `<h4>Пастельные</h4><div class="sw">${THEMES.slice(0, 6).map(sw).join('')}</div><h4 style="margin-top:10px">Тёмные</h4><div class="sw">${THEMES.slice(6).map(sw).join('')}</div>`;
+    function sw([id, n, bg, ac]) { return `<button type="button" data-theme-set="${id}" class="${id === cur ? 'on' : ''}"><i style="background:linear-gradient(135deg, ${bg} 55%, ${ac} 55%)"></i>${n}</button>`; }
+    document.body.append(box);
+  }
+
   // имя при первом заходе (и «Изменить» на главной)
   function askName() {
     if ($('#namebox')) return;
@@ -974,6 +994,7 @@
   // ---------- события ----------
   document.addEventListener('click', e => {
     const t = e.target;
+    if (!t.closest('.themes, #themeb')) { const tp = $('.themes'); if (tp) tp.remove(); } // панель тем закрывается любым кликом мимо
     const tb = t.closest('[data-tobook]'); if (tb) { e.preventDefault(); const el = $('#book'); if (el) el.scrollIntoView({ behavior: 'smooth' }); return; }
     const mic = t.closest('[data-mic]'); if (mic) { listen(mic); return; }
     const sb = t.closest('[data-say]'); if (sb) { say(sb.dataset.say, sb.dataset.slow !== undefined); return; }
@@ -997,6 +1018,8 @@
     const cd = t.closest('[data-cards]'); if (cd) { const box = cd.closest('section, .col').querySelector('.cards'); if (box) { box.hidden = !box.hidden; cd.classList.toggle('primary', !box.hidden); } return; }
     if (t.closest('[data-xlate]')) { xlate(); return; }
     if (t.closest('[data-name]')) { askName(); return; }
+    if (t.closest('#themeb')) { themePanel(); return; }
+    const ts = t.closest('[data-theme-set]'); if (ts) { setTheme(ts.dataset.themeSet); return; }
     const ao = t.closest('[data-accoff]'); if (ao) { if (confirm(`Закрыть учебник для ${ao.dataset.accoff}?`)) accessPanel(ao.dataset.accoff, false); return; }
     if (t.closest('[data-train]')) { train(false); return; }
     if (t.closest('[data-train-all]')) { train(true); return; }
@@ -1043,6 +1066,6 @@
   window.EN_DEBUG = { BLOCKS, state: () => S }; // для tools/english_check.js
   buildToc(); route();
   fetch('/api/english', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : Promise.reject(r.status))
-    .then(j => { const sv = (j && j.state) || {}; S = merge(S, sv); if ((sv.rv || 0) !== S.rv) save(); /* сброс записываем на сервер один раз — дальше прогресс копится как обычно */ try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { /* нет места */ } saveEl.textContent = 'синхронизировано'; synced = true; applyName(S.name); route(); if (!S.name) askName(); })
+    .then(j => { const sv = (j && j.state) || {}; S = Object.assign(fresh(RESET_AT), merge(S, sv)); /* недостающие разделы — пустыми */ if ((sv.rv || 0) !== S.rv) save(); /* сброс записываем на сервер один раз — дальше прогресс копится как обычно */ try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { /* нет места */ } saveEl.textContent = 'синхронизировано'; synced = true; applyName(S.name); if (S.theme !== undefined) setTheme(S.theme, true); route(); if (!S.name) askName(); })
     .catch(() => { online = location.protocol !== 'file:'; saveEl.textContent = 'сохранено на этом устройстве'; synced = true; refresh(); if (!S.name) askName(); });
 })();
