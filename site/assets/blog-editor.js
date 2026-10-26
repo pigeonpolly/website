@@ -390,7 +390,7 @@
   const MARKS = ['#FFF3A8', '#FFD6E0', '#CDEBD8', '#BFD7F5', '#E2D3F7'];
   const INSERTS = [
     ['img', 'Картинка с устройства или по ссылке', '🖼 Картинка'], ['yt', 'Видео с YouTube', '🎬 Видео YouTube'], ['fn', 'Сноска: циферка в тексте, пояснение или источник — внизу статьи', '¹ Сноска'], ['quote', 'Цитата', '❝ Цитата'],
-    ['hr', 'Разделитель', '— Разделитель'], ['h2', 'Заголовок раздела', 'H2 Заголовок'], ['imgs', 'Вставить картинки (с подписями) из оригинала на те же места', '🖼 Картинки из оригинала'],
+    ['btn', 'Кнопка со ссылкой (как на Substack и Patreon)', '🔘 Кнопка'], ['hr', 'Разделитель', '— Разделитель'], ['h2', 'Заголовок раздела', 'H2 Заголовок'], ['imgs', 'Вставить картинки (с подписями) из оригинала на те же места', '🖼 Картинки из оригинала'],
   ];
   async function editor(id) {
     let post = { id: 0, slug: '', status: 'draft', cover: '' };
@@ -662,6 +662,12 @@
           if (u === null) return;
           if (!u.trim() || u.trim() === 'https://') document.execCommand('unlink');
           else document.execCommand('createLink', false, u.trim());
+        } else if (c === 'btn') {
+          // кнопка-ссылка: по центру, текст правится прямо на кнопке, адрес — в окошке по нажатию
+          const t = prompt('Надпись на кнопке:', 'Подробнее'); if (!t || !t.trim()) return;
+          const u = prompt('Куда ведёт кнопка (https://… или /страница/):', 'https://'); if (!u || !/^(https?:\/\/\S+|\/\S*|mailto:\S+)$/i.test(u.trim())) { if (u && u.trim() !== 'https://') alert('Не похоже на ссылку.'); return; }
+          const esc = x => x.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/"/g, '&quot;');
+          document.execCommand('insertHTML', false, `<p style="text-align: center"><a class="bp-btn" href="${esc(u.trim())}">${esc(t.trim())}</a></p><p><br></p>`);
         } else if (c === 'yt') {
           const u = prompt('Ссылка на видео YouTube:', 'https://www.youtube.com/watch?v=');
           const m = String(u || '').match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{6,20})/);

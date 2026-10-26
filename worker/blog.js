@@ -171,7 +171,7 @@ async function importDrafts(env) {
 
 // ---------- очистка HTML статьи (пишет только админ, но всё равно оставляем только безопасные теги) ----------
 const ALLOWED = { p: ['style'], h2: ['style'], h3: ['style'], b: [], strong: [], i: [], em: [], u: [], s: [], strike: [], del: [], br: [], hr: [], ul: [], ol: [], li: ['style'],
-  blockquote: ['style'], figure: [], figcaption: [], a: ['href'], img: ['src', 'alt'], span: ['style'], mark: ['style'], font: ['color'] };
+  blockquote: ['style'], figure: [], figcaption: [], a: ['href', 'class'], img: ['src', 'alt'], span: ['style'], mark: ['style'], font: ['color'] };
 // из style оставляем только цвет текста, цвет маркера и выравнивание
 const safeStyle = v => String(v || '').split(';').map(x => x.trim()).filter(x => /^(color|background-color)\s*:\s*(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\)|transparent)$/i.test(x) || /^text-align\s*:\s*(left|center|right)$/i.test(x)).join('; ');
 const DROP = new Set(['script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'textarea', 'select', 'meta', 'link', 'svg', 'math', 'template', 'noscript']);
@@ -193,7 +193,7 @@ export async function cleanHtml(html) {
       if (tag === 'div') { e.tagName = 'p'; tag = 'p'; }
       if (!ALLOWED[tag]) { e.removeAndKeepContent(); return; }
       for (const [name, value] of [...e.attributes]) {
-        if (!ALLOWED[tag].includes(name) || ((name === 'href' || name === 'src') && !safeUrl(value))) e.removeAttribute(name);
+        if (!ALLOWED[tag].includes(name) || ((name === 'href' || name === 'src') && !safeUrl(value)) || (name === 'class' && value !== 'bp-btn')) e.removeAttribute(name); // class — только у кнопки-ссылки
         else if (name === 'style') { const st = safeStyle(value); if (st) e.setAttribute('style', st); else e.removeAttribute('style'); }
         else if (name === 'color' && !/^#[0-9a-f]{3,8}$/i.test(value)) e.removeAttribute('color');
       }
