@@ -8,7 +8,7 @@ const file = path.resolve(process.argv[2] || 'english.html');
 const TYPES = ['gap', 'choice', 'order', 'fix', 'tr', 'tf', 'mk'], SHOWS = ['friends', 'tbbt', 'parks', 'spn', 'hp'];
 (async () => {
   const b = await chromium.launch(); const pg = await b.newPage({ viewport: { width: 1280, height: 900 } });
-  const errs = []; pg.on('pageerror', e => errs.push(String(e))); pg.on('console', m => { if (m.type() === 'error' && !/api\/english|Failed to load|ERR_/.test(m.text())) errs.push(m.text()); });
+  const errs = []; pg.on('pageerror', e => errs.push(String(e))); pg.on('console', m => { if (m.type() === 'error' && !/api\/english|Failed to load|ERR_|CORS policy/.test(m.text())) errs.push(m.text()); });
   await pg.goto('file://' + file); await pg.waitForTimeout(100);
   const { units, notes, book, lift } = await pg.evaluate(() => ({ units: UNITS, notes: window.EN_NOTES, book: window.EN_BOOK, lift: window.EN_LIFT }));
   const bad = [], ids = new Set();

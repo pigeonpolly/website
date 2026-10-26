@@ -37,10 +37,10 @@ U({
   ],
   read: {
     title: 'My week', intro: 'Короткий текст — обратите внимание на порядок слов в каждом предложении.',
-    txt: ['My name is Kate. I live in Riga with my cat, Biscuit. I work in a small bookshop near the river.', 'I usually get up at seven. I drink coffee and read the news. Biscuit always sleeps on my bed in the morning.', 'On Saturdays I meet my friends in a café. We talk, laugh and eat cake. On Sundays I never work. I draw in the park or watch a funny series at home.'],
+    txt: ['My name is Alina. I live in Riga with my cat, Biscuit. I work in a small bookshop near the river.', 'I usually get up at seven. I drink coffee and read the news. Biscuit always sleeps on my bed in the morning.', 'On Saturdays I meet my friends in a café. We talk, laugh and eat cake. On Sundays I never work. I draw in the park or watch a funny series at home.'],
     gl: { 'bookshop': 'книжный магазин', 'near': 'рядом с', 'get up': 'вставать', 'news': 'новости', 'laugh': 'смеяться', 'draw': 'рисовать', 'series': 'сериал' },
-    q: [{ t: 'tf', q: ['Kate lives alone.|F # Она живёт с кошкой Biscuit.', 'Kate works in a bookshop.|T', 'The cat sleeps on the bed in the morning.|T', 'Kate works on Sundays.|F # On Sundays I never work.'] },
-      { t: 'choice', q: ['What does Kate do on Saturdays?|She meets her friends.|She works.|She sleeps all day.', 'When does Kate get up?|at seven|at nine|at eleven'] }],
+    q: [{ t: 'tf', q: ['Alina lives alone.|F # Живёт с кошкой Biscuit.', 'Alina works in a bookshop.|T', 'The cat sleeps on the bed in the morning.|T', 'Alina works on Sundays.|F # On Sundays I never work.'] },
+      { t: 'choice', q: ['What does Alina do on Saturdays?|meets friends in a café|works in the bookshop|sleeps all day', 'When does Alina get up?|at seven|at nine|at eleven'] }],
   },
   write: { h: 'Напишите 5–6 предложений о своей обычной неделе по схеме «кто — делает — что — где — когда».', min: 35, use: ['usually', 'always', 'never', 'every day', 'at the weekend'],
     plan: ['Как вас зовут и где вы живёте.', 'Что делаете утром (usually, always).', 'Что делаете по выходным.', 'Чего не делаете никогда (never).'],

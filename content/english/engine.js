@@ -354,7 +354,7 @@
     if (pct >= PASS && !(S.pd || []).includes(today())) S.pd = [...(S.pd || []), today()].slice(-400);
     const b = $('.best', sec); b.textContent = 'лучший результат: ' + S.d[id] + ' %'; b.classList.toggle('full', S.d[id] === 100);
     let cf = $('.crow-fb', sec); if (!cf) { cf = document.createElement('div'); cf.className = 'crow-fb'; $('footer', sec).after(cf); }
-    cf.innerHTML = crow(crowFor(pct), 'small');
+    cf.innerHTML = crow((pct >= PASS && Math.random() < .35 ? hey() : '') + crowFor(pct), 'small');
     touch(); save(); refresh(); openLive();
     const nu = UNITS[reach()]; if (reach() > was && nu) toast('🔓', nu.lvl + ' · ' + nu.t, `Урок пройден на ${PASS} % — открыт следующий`, 'Открыто: ');
   }
@@ -512,6 +512,8 @@
 
   // ---------- ворона Невермор: ведёт уроки, язвит, но болеет за вас ----------
   const CROW_SVG = `<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="30" cy="40" rx="17" ry="15" fill="#2b2540"/><circle cx="38" cy="22" r="11" fill="#2b2540"/><path d="M47 20 L60 24 L47 27 Z" fill="#e0a526"/><circle cx="41" cy="20" r="3.4" fill="#fff"/><circle cx="42" cy="20" r="1.7" fill="#1f1832"/><path d="M36.5 15.5 L45 17" stroke="#fff" stroke-width="1.6" stroke-linecap="round"/><path d="M14 38 Q2 44 8 56 Q16 50 20 46 Z" fill="#3b3456"/><path d="M24 54 L22 61 M32 55 L33 61" stroke="#e0a526" stroke-width="2.4" stroke-linecap="round"/><path d="M22 34 Q30 30 38 36" stroke="#4a4266" stroke-width="2" fill="none"/></svg>`;
+  const nameRu = () => (S.name && (S.name.ru || S.name.en)) || '';
+  const hey = () => nameRu() ? pick([`Кар, ${nameRu()}! `, `${nameRu()}, `, `Так, ${nameRu()}. `, '']) : ''; // обращение по имени — не каждый раз
   const crow = (txt, cls = '') => `<div class="crow ${cls}"><div class="crow-av" title="Ворона Невермор">${CROW_SVG}</div><div class="crow-say"><b>Невермор:</b> ${fmt(txt)}</div></div>`;
   const CROW = {
     hi: ['Кар. Я Невермор, и сегодня я ваш учитель. Сочувствую нам обоим.', 'Снова вы. Ладно, ладно, я рада. Почти.', 'Открываем урок. Обещаю язвить только по делу.', 'Сядьте прямо. Ну, или как удобно — я же ворона, а не завуч.'],
@@ -584,7 +586,7 @@
     view.dataset.unit = u.id;
     let h = `<div class="uhead"><div class="lv">Уровень ${u.lvl} · урок ${unitsOf(u.lvl).indexOf(u) + 1} · пройдено ${unitScore(u)} %</div><h2>${esc(u.t)}</h2>${u.en ? `<p class="sub">${esc(u.en)}</p>` : ''}<div class="m"><i data-um="${u.id}"></i></div></div>`;
     const hp = (PICS[BOOK.parts.indexOf(bk)] || [])[0];
-    h += crow(N.crow || crowPick('hi'));
+    h += crow(hey() + (N.crow || crowPick('hi')));
     if (hp) h += `<a class="uhead-pic" href="#book-${u.id}" data-tobook>${picHTML(hp, 'small')}</a>`;
     if (u.goals) h += `<div class="goals"><h4>После урока получится</h4><ul>${u.goals.map(g => `<li>${fmt(g)}</li>`).join('')}</ul></div>`;
     h += `<section class="sec th" id="theory"><h3><span class="ic">📘</span>Теория</h3>${u.th}${u.simple ? `<p class="simple">${fmt(u.simple)}</p>` : ''}</section>`;
@@ -688,7 +690,7 @@
       <div class="big-meter"><i style="width:${p}%"></i></div><p class="note-s">Пройдено ${p} % учебника · задание считается пройденным от ${PASS} %; следующий урок открывается, когда предыдущий пройден в среднем на ${PASS} %</p>
       <div class="stats"><div><b>${ALL().filter(isDone).length}</b><span>блоков пройдено из ${ALL().length}</span></div><div><b>${Object.keys(S.v).length}</b><span>слов в словаре</span></div><div><b>${nUsed()}</b><span>слов использовано в своих предложениях</span></div><div><b>${nWrite()}</b><span>текстов написано</span></div><div><b>${pstreak()}</b><span>дней подряд с заданием</span></div><div><b>${Object.keys(S.a).length}/${ACH.length}</b><span>ачивок</span></div></div>
       <div class="go"><a class="btn primary" href="#u/${last.id}">${S.last ? 'Продолжить: ' + esc(last.lvl + ' · ' + last.t) : 'Начать с A1'}</a><a class="btn" href="#dict">📒 Словарь${due ? ` · ${due} к повторению` : ''}</a><a class="btn" href="#ach">🏆 Ачивки</a></div></section>
-      ${crow(S.last ? `С возвращением. ${due ? `В словаре ${due} слов ждут повторения — они не обидятся, но я да.` : 'Словарь в порядке. Подозрительно.'}${nx ? ` А ещё ${nx} ошибок скучают в «Работе над ошибками».` : ''}` : 'Кар. Я Невермор, ворона и по совместительству ваш учитель английского. Буду вести уроки, проверять, язвить и болеть за вас. Начинаем с A1 — да, даже если кажется, что это слишком просто. Особенно тогда.')}
+      ${crow(S.last ? `${nameRu() ? 'С возвращением, ' + esc(nameRu()) + '.' : 'С возвращением.'} ${due ? `В словаре ${due} слов ждут повторения — они не обидятся, но я да.` : 'Словарь в порядке. Подозрительно.'}${nx ? ` А ещё ${nx} ошибок скучают в «Работе над ошибками».` : ''}` : 'Кар. Я Невермор, ворона и по совместительству ваш учитель английского. Буду вести уроки, проверять, язвить и болеть за вас. Начинаем с A1 — да, даже если кажется, что это слишком просто. Особенно тогда.')}
       <div class="box fixbox"><h4>🩹 Слабые места</h4>${nx ? `<p>Ошибок к отработке: <b>${nx}</b>.${weak.length ? ' Чаще всего ошибки в уроках: ' + weak.map(([u, r]) => `<a href="#u/${u.id}">${esc(u.lvl + ' · ' + u.t)}</a> (${Math.round(r * 100)} %)`).join(', ') + '.' : ''}</p><p><a class="btn primary small" href="#fix">Работа над ошибками</a></p>` : '<p class="note-s">Пока ошибок нет — или пока нет заданий. Где будут ошибаться чаще всего, там и появятся новые задания.</p>'}</div>
       ${f ? `<div class="box fact"><h4>💡 Факт дня</h4><p>${fmt(f.fact)}</p></div>` : ''}
       ${e1 ? `<div class="box etym"><h4>🔎 Слово дня: откуда оно</h4><p><b class="en">${esc(e1[1][0])}</b> — ${fmt(e1[1][1])}</p><p class="note-s"><a href="#etym">Все истории слов</a></p></div>` : ''}
