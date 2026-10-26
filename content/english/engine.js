@@ -286,8 +286,27 @@
   let uid = 0;
   // mk — «напиши сама»: «задание|слово1/вариант;слово2|пример # пояснение». Проверка: нужные слова (с окончаниями), от it.min слов (6), большая буква, точка, без кириллицы
   const needsOf = it => (it.p[1] || '').split(';').map(x => x.trim()).filter(Boolean);
+  // частые ошибки в своих предложениях — [шаблон, объяснение]; это не полный проверщик грамматики, а самые типичные ловушки
+  const VB = 'like|love|want|need|go|work|live|eat|drink|know|think|draw|play|make|have|do|watch|read|write|speak|sleep|cook|walk|come|see|say|get|take|feel|look|wear|buy|try|help|study|learn|teach|paint|hate|start|finish|visit|call|run';
+  const ES = v => v === 'have' ? 'has' : v === 'do' ? 'does' : v === 'go' ? 'goes' : /(sh|ch|ss|x|o)$/.test(v) ? v + 'es' : /[^aeiou]y$/.test(v) ? v.slice(0, -1) + 'ies' : v + 's';
+  const GRAM = [
+    [/\b(always|usually|often|sometimes|never|rarely|seldom)\s+(am|is|are|was|were)\b/i, m => `«${m[1]} ${m[2]}» → «${m[2]} ${m[1]}»: слова частоты стоят после am/is/are/was/were`],
+    [new RegExp(`\\b(he|she|it|my (?:cat|dog|mum|mom|dad|friend|sister|brother|boss|neighbour))\\s+(?:always\\s+|usually\\s+|often\\s+|sometimes\\s+|never\\s+)?(${VB})\\b`, 'i'), m => `«${m[1]} … ${m[2]}»: про одного (he/she/it) глагол с -s — ${ES(m[2].toLowerCase())}`],
+    [new RegExp(`\\b(can|could|must|should|might|may|will|would|doesn't|does not|don't|do not|didn't|did not)\\s+((?:${VB})e?s)\\b`, 'i'), m => `«${m[1]} ${m[2]}»: после ${m[1]} глагол без -s`],
+    [/\b(can|could|must|should|might|may|will|would)\s+to\b/i, m => `«${m[1]} to»: после ${m[1]} — глагол без to`],
+    [/\b(did|didn't|did not)\s+(?!need\b|feed\b|speed\b|bleed\b|succeed\b|proceed\b)([a-z]+ed)\b/i, m => `«${m[1]} ${m[2]}»: после did глагол в начальной форме, без -ed`],
+    [/\bmore\s+(better|worse|bigger|smaller|easier|faster|cheaper|happier|older|younger|nicer|larger|longer|shorter)\b/i, m => `«more ${m[1]}» → просто «${m[1]}»`],
+    [/\b(people|children|police)\s+(is|was|has)\b/i, m => `«${m[1]} ${m[2]}»: ${m[1]} — это «они», нужно ${m[2] === 'is' ? 'are' : m[2] === 'was' ? 'were' : 'have'}`],
+    [/\b(am|is|are)\s+agree\b/i, m => `«${m[1]} agree» → просто «agree» (I agree)`],
+    [/\ba\s+(?!one\b|once\b)([aeio][a-z]*)/i, m => `«a ${m[1]}» → «an ${m[1]}»: перед гласным звуком an`],
+    [/\b(you|we|they)\s+(is|was)\b/i, m => `«${m[1]} ${m[2]}» → «${m[1]} ${m[2] === 'is' ? 'are' : 'were'}»`],
+    [/\b(I)\s+(is|are)\b/, m => `«I ${m[2]}» → «I am»`],
+    [/\b(he|she|it)\s+(are|were|am)\b/i, m => `«${m[1]} ${m[2]}» → «${m[1]} ${m[2] === 'were' ? 'was' : 'is'}»`],
+  ];
+  const SUBJ = /\b(insist|insists|insisted|demand|demands|demanded|suggest|suggests|suggested|recommend|recommended|propose|proposed|essential|vital|important|crucial|necessary)\b[^.!?]*\bthat\s+$/i; // сослагательное (C1): «I insist that he watch» — без -s
+  function grammar(t) { return GRAM.map(([re, msg], i) => { const m = t.match(re); return m && !(i === 1 && SUBJ.test(t.slice(0, m.index))) ? msg(m) : ''; }).filter(Boolean); }
   function mkProbs(it, t) {
-    const probs = [];
+    const probs = grammar(t);
     for (const nd of needsOf(it)) if (!nd.split('/').some(w => uses(t, w))) probs.push(`нет «${esc(nd.split('/')[0])}»`);
     if ((t.match(/[A-Za-z']+/g) || []).length < (it.min || 6)) probs.push(`коротко: нужно хотя бы ${it.min || 6} слов`);
     if (t && !/^[A-Z"'«(]/.test(t)) probs.push('начните с большой буквы');
@@ -416,11 +435,11 @@
     return out;
   }
   function grouped(items) { const gs = []; for (const it of items) { const g = gs[gs.length - 1]; if (g && g.t === it.t) g.q.push(it); else gs.push({ t: it.t, h: HOW[it.t], q: [it] }); } return gs; }
-  function check(sec, silent) { // silent — показать сохранённые ответы с проверкой, ничего не засчитывая
+  function check(sec, silent, only) { // silent — показать сохранённые ответы с проверкой, ничего не засчитывая; only — только эти пункты
     const items = BLOCKS[sec.dataset.b]; if (!items) return;
     const saved = silent ? (S.ans[sec.dataset.b] || {}) : null;
     for (const li of $$('ol > li', sec)) {
-      if (li.dataset.keep) continue; // верный ответ сохранён после 3 неудачных попыток — не проверяем заново
+      if (li.dataset.keep || (only && !only.has(li))) continue; // верный ответ сохранён после 3 неудачных попыток — не проверяем заново
       const it = items[+li.dataset.n]; const r = itemOK(it, li);
       if (silent && (saved[ikey(it)] || {}).s) r.ok = true; // «Мой вариант тоже верен»
       li.classList.toggle('ok', r.ok); li.classList.toggle('no', !r.ok);
@@ -437,6 +456,7 @@
       for (const b of $$('.tok', li)) b.disabled = true;
     }
     $('[data-act=check]', sec).hidden = true; $('[data-act=again]', sec).hidden = false;
+    if (only) { $('[data-act=check]', sec).hidden = false; return; } // есть неотвеченные — «Проверить» остаётся
     if (silent) { const r = $('.res', sec), pct = score(sec); r.textContent = pct + ' %'; r.className = 'res ' + (pct >= PASS ? 'good' : pct < 60 ? 'low' : ''); return; }
     storeAns(sec);
     setResult(sec, score(sec));
@@ -467,9 +487,9 @@
   function restoreAns(root) { // после отрисовки: свои ответы на место и проверка без засчитывания
     for (const sec of $$('.exb[data-b]', root)) {
       const id = sec.dataset.b, o = S.ans[id], items = BLOCKS[id]; if (!o || !items || NOSAVE.test(id)) continue;
-      const lis = $$('ol > li', sec); let all = true;
-      for (const li of lis) { const it = items[+li.dataset.n], a = o[ikey(it)]; if (a) putAns(it, li, a.v); else all = false; }
-      if (all) check(sec, true);
+      const lis = $$('ol > li', sec), got = new Set();
+      for (const li of lis) { const it = items[+li.dataset.n], a = o[ikey(it)]; if (a) { putAns(it, li, a.v); got.add(li); } }
+      if (got.size) check(sec, true, got.size < lis.length ? got : null); // новые задания (если появились) остаются пустыми
     }
   }
   function again(sec) { // «Очистить»: стереть ответы (после 3 неудачных попыток — только ошибки)
@@ -582,11 +602,14 @@
   // ---------- задания, собранные на лету: «Своими словами», слушание, повторение ----------
   const CTX = ['про кота, который уверен, что он тут начальник', 'про голубя, который ворует картошку фри', 'про утренний кофе', 'про ваш последний рисунок', 'про Шелдона, Пенни или Раджа', 'про Ригу под дождём', 'про планы на выходные', 'про самый странный сон', 'про работу, где все хотят «просто быстренько»', 'про друга, который всегда опаздывает', 'про ворону, которая ведёт этот учебник', 'про Алису и Белого Кролика', 'про любимый сериал', 'про путешествие мечты', 'про чашку чая, которая остыла, пока вы работали', 'про поход в магазин за молоком, который пошёл не по плану'];
   const clean = w => w.replace(/[^A-Za-z' \/-]/g, ' ').replace(/\s+/g, ' ').trim().split(' / ').join('/');
+  // случайность с зерном: у урока всегда одни и те же задания (иначе сохранённые ответы не совпадут с заданиями)
+  const rng = seed => { let h = 1779033703; for (const c of String(seed)) h = Math.imul(h ^ c.charCodeAt(0), 3432918353) | 0; return () => { h = Math.imul(h ^ h >>> 16, 2246822507); h = Math.imul(h ^ h >>> 13, 3266489909); return ((h ^= h >>> 16) >>> 0) / 4294967296; }; };
+  const sshuffle = (a, r) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   function mkAuto(u) {
-    const ws = shuffle(u.words || []).slice(0, 2);
-    const out = ws.map(([w, tr, ex]) => ({ t: 'mk', p: [`Придумайте предложение со словом *${w}* (${tr}) — ${pick(CTX)}.`, clean(w), ex || ''], auto: 1, min: 4 }));
-    const due = shuffle(Object.entries(S.v).filter(([k, v]) => v.due <= today() && !(u.words || []).some(x => x[0].toLowerCase() === k)))[0];
-    if (due) out.push({ t: 'mk', p: [`Слово из словаря, пора повторить: *${due[1].w}* (${due[1].tr || '—'}) — ${pick(CTX)}.`, clean(due[1].w), due[1].ex || ''], auto: 1, min: 4, dk: due[0] });
+    const r = rng(u.id), ws = sshuffle(u.words || [], r).slice(0, 2);
+    const out = ws.map(([w, tr, ex]) => ({ t: 'mk', p: [`Придумайте предложение со словом *${w}* (${tr}) — ${CTX[Math.floor(r() * CTX.length)]}.`, clean(w), ex || ''], auto: 1, min: 4 }));
+    const r2 = rng(u.id + ':' + today()), due = sshuffle(Object.entries(S.v).filter(([k, v]) => v.due <= today() && !(u.words || []).some(x => x[0].toLowerCase() === k)), r2)[0]; // слово к повторению — своё на каждый день
+    if (due) out.push({ t: 'mk', p: [`Слово из словаря, пора повторить: *${due[1].w}* (${due[1].tr || '—'}) — ${CTX[Math.floor(r2() * CTX.length)]}.`, clean(due[1].w), due[1].ex || ''], auto: 1, min: 4, dk: due[0] });
     return out;
   }
   function mkGroups(u) { return [{ t: 'mk', q: [...((NOTES[u.id] || {}).mk || []), ...mkAuto(u)] }]; }
@@ -866,7 +889,7 @@
   }
   function checkUse(card) {
     const k = card.dataset.k, v = S.v[k], t = $('textarea', card).value.trim(), fb = $('.fb', card);
-    const probs = [];
+    const probs = grammar(t);
     if (!uses(t, v.w)) probs.push(`нет слова «${esc(v.w)}»`);
     if ((t.match(/[A-Za-z']+/g) || []).length < 4) probs.push('коротко: нужно хотя бы 4 слова');
     if (t && !/^[A-Z"'«]/.test(t)) probs.push('начните с большой буквы');
@@ -1125,7 +1148,7 @@
     const f = new FormData(e.target); if (addWord(f.get('w'), f.get('tr'), f.get('ex'), 'моё')) dictPage(); else alert('Такое слово уже есть в словаре');
   });
 
-  window.EN_DEBUG = { BLOCKS, state: () => S }; // для tools/english_check.js
+  window.EN_DEBUG = { BLOCKS, state: () => S, grammar }; // для tools/english_check.js
   buildToc(); route();
   fetch('/api/english', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : Promise.reject(r.status))
     .then(j => { const sv = (j && j.state) || {}; S = Object.assign(fresh(RESET_AT), merge(S, sv)); /* недостающие разделы — пустыми */ if ((sv.rv || 0) !== S.rv) save(); /* сброс записываем на сервер один раз — дальше прогресс копится как обычно */ try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { /* нет места */ } saveEl.textContent = 'синхронизировано'; synced = true; applyName(S.name); if (S.theme !== undefined) setTheme(S.theme, true); route(); if (!S.name) askName(); })
