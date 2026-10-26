@@ -691,14 +691,14 @@
     const p = pctOf(ALL());
     const due = Object.values(S.v).filter(v => v.due <= today()).length;
     const facts = UNITS.filter(u => u.fact); const f = facts[today() % Math.max(1, facts.length)];
-    const last = byId(S.last) && unitOpen(byId(S.last)) ? byId(S.last) : UNITS[Math.min(reach(), UNITS.length - 1)];
+    const last = UNITS[Math.min(reach(), UNITS.length - 1)]; // самый новый открытый урок; «Продолжить» ведёт к его первому непройденному заданию (#u/id/go)
     const ety = UNITS.flatMap(u => ((NOTES[u.id] || {}).etym || []).map(e => [u, e])), e1 = ety[(today() * 7) % Math.max(1, ety.length)];
     const nx = Object.keys(S.x).length, weak = weakUnits().slice(0, 3);
     let h = `<section class="cover"><div class="kicker">Учебник · от азов до C2</div><h1>English <em>от A1 до C2</em></h1>
       <p class="lead">Ведёт уроки ворона Невермор. Теория простыми словами, упражнения с проверкой, «Своими словами», слушание и говорение, чтение, вся «Алиса в Стране чудес» в оригинале, письмо и разбор шуток из «Друзей», «Теории большого взрыва», «Парков», «Сверхъестественного» и «Гарри Поттера».</p>
       <div class="big-meter"><i style="width:${p}%"></i></div><p class="note-s">Пройдено ${p} % учебника · задание считается пройденным от ${PASS} %; следующий урок открывается, когда предыдущий пройден в среднем на ${PASS} %</p>
       <div class="stats"><div><b>${ALL().filter(isDone).length}</b><span>блоков пройдено из ${ALL().length}</span></div><div><b>${Object.keys(S.v).length}</b><span>слов в словаре</span></div><div><b>${nUsed()}</b><span>слов использовано в своих предложениях</span></div><div><b>${nWrite()}</b><span>текстов написано</span></div><div><b>${pstreak()}</b><span>дней подряд с заданием</span></div><div><b>${Object.keys(S.a).length}/${ACH.length}</b><span>ачивок</span></div></div>
-      <div class="go"><a class="btn primary" href="#u/${last.id}">${S.last ? 'Продолжить: ' + esc(last.lvl + ' · ' + last.t) : 'Начать с A1'}</a><a class="btn" href="#dict">📒 Словарь${due ? ` · ${due} к повторению` : ''}</a><a class="btn" href="#ach">🏆 Ачивки</a></div></section>
+      <div class="go"><a class="btn primary" href="#u/${last.id}/go">${S.last ? 'Продолжить: ' + esc(last.lvl + ' · ' + last.t) : 'Начать с A1'}</a><a class="btn" href="#dict">📒 Словарь${due ? ` · ${due} к повторению` : ''}</a><a class="btn" href="#ach">🏆 Ачивки</a></div></section>
       ${crow(S.last ? `${nameRu() ? 'С возвращением, ' + esc(nameRu()) + '.' : 'С возвращением.'} ${due ? `В словаре ${due} слов ждут повторения — они не обидятся, но я да.` : 'Словарь в порядке. Подозрительно.'}${nx ? ` А ещё ${nx} ошибок скучают в «Работе над ошибками».` : ''}` : 'Кар. Я Невермор, ворона и по совместительству ваш учитель английского. Буду вести уроки, проверять, язвить и болеть за вас. Начинаем с A1 — да, даже если кажется, что это слишком просто. Особенно тогда.')}
       <div class="box fixbox"><h4>🩹 Слабые места</h4>${nx ? `<p>Ошибок к отработке: <b>${nx}</b>.${weak.length ? ' Чаще всего ошибки в уроках: ' + weak.map(([u, r]) => `<a href="#u/${u.id}">${esc(u.lvl + ' · ' + u.t)}</a> (${Math.round(r * 100)} %)`).join(', ') + '.' : ''}</p><p><a class="btn primary small" href="#fix">Работа над ошибками</a></p>` : '<p class="note-s">Пока ошибок нет — или пока нет заданий. Где будут ошибаться чаще всего, там и появятся новые задания.</p>'}</div>
       ${f ? `<div class="box fact"><h4>💡 Факт дня</h4><p>${fmt(f.fact)}</p></div>` : ''}
@@ -978,7 +978,7 @@
   function route() {
     const h = location.hash.slice(1) || 'home';
     tip.hidden = true; if (canSay) speechSynthesis.cancel();
-    const [a, b] = h.split('/');
+    const [a, b, c] = h.split('/');
     if (a === 'u' && byId(b)) unitPage(byId(b));
     else if (a === 'test' && LEVELS.some(l => l.id === b)) testPage(b);
     else if (a === 'dict') dictPage();
@@ -999,6 +999,14 @@
     document.body.classList.remove('nav');
     scrollTo({ top: 0, behavior: 'instant' });
     refresh();
+    if (a === 'u' && c === 'go' && byId(b)) goNext(byId(b));
+  }
+  function goNext(u) { // к первому открытому, но ещё не пройденному заданию урока
+    history.replaceState(null, '', '#u/' + u.id);
+    for (const x of $$('#toc a')) x.classList.toggle('on', x.dataset.to === 'u/' + u.id);
+    const id = blocksOf(u).find(x => blockOpen(x) && (S.d[x] || 0) < PASS);
+    const el = id && ($(`[data-b="${id}"]`, view) || $(`[data-w="${id}"]`, view));
+    if (el) requestAnimationFrame(() => el.scrollIntoView({ behavior: 'instant', block: 'start' }));
   }
   addEventListener('hashchange', route);
 
