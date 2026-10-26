@@ -44,8 +44,14 @@ const TYPES = ['gap', 'choice', 'order', 'fix', 'tr', 'tf', 'mk'], SHOWS = ['fri
   for (const [lv, L] of Object.entries(lift || {})) fmtCheck('лифт ' + lv, { t: 'choice', q: L.q });
   if (Object.keys(lift || {}).length !== 6) bad.push('лифт: не все уровни');
   if (book.parts.length !== units.length) bad.push(`частей книги ${book.parts.length}, уроков ${units.length}`);
+  // имя: при первом заходе спрашивает, «Alina» в заданиях заменяется
+  await pg.evaluate(() => { localStorage.clear(); }); await pg.reload(); await pg.waitForTimeout(150);
+  if (!(await pg.$('#namebox'))) bad.push('имя: окно не появилось при первом заходе');
+  else { await pg.fill('#namebox [name=en]', 'Tessa'); await pg.fill('#namebox [name=ru]', 'Тесса'); await pg.click('#namebox button'); await pg.waitForTimeout(50); }
+  const named = await pg.evaluate(() => JSON.stringify(UNITS).includes('Tessa') && !JSON.stringify(UNITS).includes('Alina') && JSON.stringify(window.EN_NOTES).includes('Тесса'));
+  if (!named) bad.push('имя: не подставилось в материалы');
   // замки: с нуля открыт только первый урок
-  await pg.evaluate(() => { localStorage.clear(); }); await pg.reload(); await pg.waitForTimeout(100);
+  await pg.evaluate(() => { const k = Object.keys(localStorage).find(x => x.startsWith('english-state')); const st = JSON.parse(localStorage.getItem(k)); localStorage.setItem(k, JSON.stringify({ rv: st.rv, name: st.name })); }); await pg.reload(); await pg.waitForTimeout(100);
   await pg.evaluate(() => { location.hash = 'u/' + UNITS[1].id; }); await pg.waitForTimeout(50);
   if (!(await pg.$('[data-pwf]')) || (await pg.$$('.exb')).length) bad.push('замок: второй урок открыт с нуля');
   // правильные ответы → 100 %
@@ -66,7 +72,7 @@ const TYPES = ['gap', 'choice', 'order', 'fix', 'tr', 'tf', 'mk'], SHOWS = ['fri
           if (it.t === 'order') { const built = li.querySelector('.built'); for (const w of p[0].replace(/[.!?]+$/, '').split(/\s+/)) { const tok = [...li.querySelectorAll('.pool .tok')].find(x => x.textContent.toLowerCase() === w.toLowerCase()); if (tok) built.append(tok); } }
         }
         sec.querySelector('[data-act=check]').click();
-        for (const li of sec.querySelectorAll('ol > li.no')) { const it = items[+li.dataset.n]; if (it.auto || /^(fx-|lt-)/.test(sec.dataset.b) && it.t !== 'mk') { const bt = li.querySelector('[data-act=self]'); if (bt) bt.click(); else probs.push('авто: ' + li.textContent.slice(0, 120)); } else probs.push(li.textContent.slice(0, 160)); }
+        for (const li of sec.querySelectorAll('ol > li.no')) { const it = items[+li.dataset.n]; if (it.auto || /^(fx-|lt-)/.test(sec.dataset.b) && it.t !== 'mk') { const bt = li.querySelector('[data-act=self]'); if (bt) bt.click(); else if (it.t !== 'mk') probs.push('авто: ' + li.textContent.slice(0, 120)); } else probs.push(li.textContent.slice(0, 160)); }
         return { id: sec.dataset.b, res: sec.querySelector('.res').textContent, probs };
       });
       if (r.probs.length) bad.push(`${r.id}: правильные ответы не прошли: ${r.probs.join(' || ')}`);

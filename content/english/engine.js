@@ -28,18 +28,49 @@
   const byId = id => UNITS.find(u => u.id === id);
   const EXTRA = window.EN_EXTRA || {}, BOOK = window.EN_BOOK || { parts: [] }, NOTES = window.EN_NOTES || {};
   const bookOf = u => BOOK.parts.find(p => p.u === u.id);
+  const PICS = window.EN_PICS || {}; // иллюстрации Тенниела: номер части книги → картинки (content/english/pics.js)
+  const picHTML = (x, cls = '') => `<figure class="tenniel ${cls}"><img src="/images/english/tenniel-${x.n}.webp" alt="${esc(x.alt)}" loading="lazy"><figcaption><i class="en">${esc(x.alt)}</i> <span>— John Tenniel, 1865</span></figcaption></figure>`;
   const PODS = window.EN_PODS || {}, podq = n => 'https://open.spotify.com/search/' + encodeURIComponent(n) + '/podcasts';
   const podHTML = ([n, a, why]) => `<li><a href="${podq(n)}" target="_blank" rel="noopener"><b>${esc(n)}</b></a> <span class="note-s">· ${esc(a)}</span><br>${fmt(why)}</li>`;
-  for (const u of UNITS) { const sr = (NOTES[u.id] || {}).sr; if (sr) u.series = [...(u.series || []), ...sr]; } // цитаты из notes.js — к цитатам урока
+  // ---------- имя: в материалах «Alina» / «Алина» заменяется на имя того, кто учится (S.name = {en, ru}) ----------
+  const ORIG = JSON.parse(JSON.stringify({ u: UNITS, n: NOTES, l: window.EN_LIFT || {} })); // исходные тексты — чтобы имя можно было поменять
+  let ME = 'Alina', idxOn = false; // idxOn — поиск уже собран (IDX объявлен ниже)
+  function ruCase(n, end) { // простое склонение русского имени: Алин|а, ы, е, у, ой
+    const c = { 'а': 0, 'ы': 1, 'е': 2, 'у': 3, 'ой': 4, 'ою': 4 }[end], st = n.slice(0, -1), l = n.slice(-1).toLowerCase();
+    if (c === 0 || !/[а-яё]/i.test(l)) return n;
+    if (l === 'а') return st + [, /[гкхжшщч]$/i.test(st) ? 'и' : 'ы', 'е', 'у', /[жшщчц]$/i.test(st) ? 'ей' : 'ой'][c];
+    if (l === 'я') return st + [, 'и', /и$/i.test(st) ? 'и' : 'е', 'ю', 'ей'][c];
+    if (l === 'й' || l === 'ь') return st + [, 'я', 'ю', 'я', 'ем'][c];
+    if (/[бвгджзклмнпрстфхцчшщ]/.test(l)) return n + [, 'а', 'у', 'а', /[жшщчц]$/i.test(n) ? 'ем' : 'ом'][c];
+    return n;
+  }
+  function personal(o, en, ru) {
+    if (typeof o === 'string') return o.replace(/\bAlina\b/g, en).replace(/Алин(ой|ою|ы|е|у|а)(?![а-яё])/g, (m, e) => ruCase(ru, e));
+    if (Array.isArray(o)) return o.map(x => personal(x, en, ru));
+    if (o && typeof o === 'object') { const r = {}; for (const [k, v] of Object.entries(o)) r[k] = personal(v, en, ru); return r; }
+    return o;
+  }
+  function applyName(nm) {
+    const en = (nm && nm.en) || 'Alina', ru = (nm && nm.ru) || (nm && nm.en) || 'Алина'; ME = en;
+    const P = personal(ORIG, en, ru);
+    UNITS.splice(0, UNITS.length, ...P.u);
+    for (const k of Object.keys(NOTES)) delete NOTES[k]; Object.assign(NOTES, P.n);
+    if (window.EN_LIFT) Object.assign(window.EN_LIFT, P.l);
+    for (const u of UNITS) { const sr = (NOTES[u.id] || {}).sr; if (sr) u.series = [...(u.series || []), ...sr]; } // цитаты из notes.js — к цитатам урока
+    if (idxOn) buildIdx();
+  }
 
   // ---------- состояние ----------
-  const LS = 'english-state';
+  // прогресс в браузере — отдельно для каждого аккаунта (EN_UID подставляет worker/english.js); общий старый ключ больше не читаем
+  const LS = 'english-state:' + (/^\d+$/.test(window.EN_UID || '') ? window.EN_UID : 'local');
+  try { localStorage.removeItem('english-state'); } catch (e) { /* нет доступа */ }
   // k — открыто паролем админа {id урока или блока: время}; m — ошибки {id урока или t:тип: [неверно, всего]}; x — задания с ошибками {ref: вес}; t — время сохранения
   // rv — когда прогресс сбрасывали (кнопка «Сбросить учебник» или RESET_AT ниже): состояние со старым rv при слиянии отбрасывается целиком
   const RESET_AT = 1793007114497; // 26.10.2026: учебник обновлён (замки, книга, ворона, смолток) — прогресс с нуля; новое значение = ещё один сброс у всех
   const fresh = rv => ({ d: {}, w: {}, v: {}, a: {}, days: [], pd: [], c: {}, last: '', k: {}, m: {}, x: {}, t: 0, rv }); // pd — дни, когда хоть одно задание пройдено от PASS %
   let S = fresh(RESET_AT);
   try { const loc = JSON.parse(localStorage.getItem(LS) || '{}') || {}; if ((loc.rv || 0) >= RESET_AT) Object.assign(S, loc); } catch (e) { /* пусто */ } // старое состояние без метки сброса не берём
+  applyName(S.name);
   const saveEl = $('#save');
   let timer = 0, online = true;
   function save() {
@@ -64,6 +95,7 @@
     m.pd = [...new Set([...(b.pd || []), ...(a.pd || [])])].sort((x, y) => x - y).slice(-400);
     m.c = { ...(b.c || {}) }; for (const [k, v] of Object.entries(a.c || {})) m.c[k] = Math.max(v, m.c[k] || 0);
     m.k = { ...(b.k || {}), ...(a.k || {}) };
+    m.name = a.name || b.name;
     m.m = { ...(b.m || {}) }; for (const [k, v] of Object.entries(a.m || {})) m.m[k] = m.m[k] && m.m[k][1] > v[1] ? m.m[k] : v;
     m.x = (a.t || 0) >= (b.t || 0) ? (a.x || {}) : (b.x || {}); // отработанные ошибки удаляются — берём более свежий список
     return m;
@@ -236,7 +268,7 @@
       return `<li data-n="${n}"><div>${fmt(p[0]).replace(/_{3,}/g, '<b>____</b>')}</div>${opts.map(([v, l]) => `<label class="opt"><input type="radio" name="o${uid}-${n}" value="${esc(v)}"><span>${fmt(l)}</span></label>`).join('')}</li>`;
     }
     if (t === 'order') {
-      const toks = p[0].replace(/[.!?]+$/, '').split(/\s+/).map((w, i) => i === 0 && !NAMES.test(w) ? w[0].toLowerCase() + w.slice(1) : w);
+      const toks = p[0].replace(/[.!?]+$/, '').split(/\s+/).map((w, i) => i === 0 && !NAMES.test(w) && w !== ME ? w[0].toLowerCase() + w.slice(1) : w);
       return `<li data-n="${n}"><div class="note-s">${it.hint ? fmt(it.hint) : 'Нажимайте на слова по порядку; нажатое слово в строке — вернуть.'}</div><div class="built" aria-label="ваше предложение"></div><div class="pool">${shuffle(toks).map(w => `<button type="button" class="tok">${esc(w)}</button>`).join('')}</div></li>`;
     }
     if (t === 'fix') return `<li data-n="${n}"><div>${fmt(p[0])}</div><input class="line" value="${esc(p[0])}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="исправленное предложение"></li>`;
@@ -549,7 +581,9 @@
     S.last = u.id; save();
     view.dataset.unit = u.id;
     let h = `<div class="uhead"><div class="lv">Уровень ${u.lvl} · урок ${unitsOf(u.lvl).indexOf(u) + 1} · пройдено ${unitScore(u)} %</div><h2>${esc(u.t)}</h2>${u.en ? `<p class="sub">${esc(u.en)}</p>` : ''}<div class="m"><i data-um="${u.id}"></i></div></div>`;
+    const hp = (PICS[BOOK.parts.indexOf(bk)] || [])[0];
     h += crow(N.crow || crowPick('hi'));
+    if (hp) h += `<a class="uhead-pic" href="#book-${u.id}" data-tobook>${picHTML(hp, 'small')}</a>`;
     if (u.goals) h += `<div class="goals"><h4>После урока получится</h4><ul>${u.goals.map(g => `<li>${fmt(g)}</li>`).join('')}</ul></div>`;
     h += `<section class="sec th" id="theory"><h3><span class="ic">📘</span>Теория</h3>${u.th}${u.simple ? `<p class="simple">${fmt(u.simple)}</p>` : ''}</section>`;
     if (u.exm) h += `<div class="ex-list">${u.exm.map(([e, r]) => `<p>${sayBtn(e)} <i class="en">${esc(e)}</i><span class="ru">${esc(r)}</span></p>`).join('')}</div>`;
@@ -604,10 +638,10 @@
   }
   function bookHTML(u, bk, N) {
     const k = BOOK.parts.indexOf(bk);
-    return `<section class="sec" id="book"><h3><span class="ic">🐇</span>Книга: «Alice's Adventures in Wonderland»</h3>${crow(N.bcrow || crowPick('book'), 'small')}
+    return `<section class="sec" id="book"><span id="book-${u.id}"></span><h3><span class="ic">🐇</span>Книга: «Alice's Adventures in Wonderland»</h3>${crow(N.bcrow || crowPick('book'), 'small')}
       <p class="note-s">Часть ${k + 1} из ${BOOK.parts.length} · Lewis Carroll, 1865 — оригинал, без сокращений. Глава ${esc(bk.ch)} · ${bk.n} слов. К концу учебника — вся книга.</p>
       ${N.ru ? `<div class="box bk-ru"><h4>${['A1', 'A2'].includes(u.lvl) ? 'Сначала по-русски: что будет в отрывке' : 'Перед чтением'}</h4><p>${fmt(N.ru)}</p></div>` : ''}
-      <article class="reading book">${bk.h.map(x => `<h4>Chapter ${esc(x)}</h4>`).join('')}<div class="txt">${bk.txt.map(p => `<p>${glossText(p, N.gl)}</p>`).join('')}</div>
+      <article class="reading book">${bk.h.map(x => `<h4>Chapter ${esc(x)}</h4>`).join('')}<div class="txt">${bk.txt.map((p, j) => { const ps = PICS[k] || []; return ps.filter(x => x.at === j && !x.after).map(x => picHTML(x)).join('') + `<p>${glossText(p, N.gl)}</p>` + ps.filter(x => x.at === j && x.after).map(x => picHTML(x)).join(''); }).join('')}</div>
       <p>${sayBtn(bk.txt.join(' ').replace(/<br>/g, ' ').replace(/&amp;/g, '&').slice(0, 3000))} <span class="note-s">послушать отрывок (начало)</span></p>
       ${N.gl ? '<p class="note-s">Подчёркнутые слова — нажмите: перевод и «+ в словарь».</p>' : ''}</article>
       ${N.etb ? `<div class="box etym"><h4>🔎 Слово из Кэрролла</h4><p>${fmt(N.etb)}</p></div>` : ''}
@@ -656,7 +690,7 @@
       <div class="box fixbox"><h4>🩹 Слабые места</h4>${nx ? `<p>Ошибок к отработке: <b>${nx}</b>.${weak.length ? ' Чаще всего ошибки в уроках: ' + weak.map(([u, r]) => `<a href="#u/${u.id}">${esc(u.lvl + ' · ' + u.t)}</a> (${Math.round(r * 100)} %)`).join(', ') + '.' : ''}</p><p><a class="btn primary small" href="#fix">Работа над ошибками</a></p>` : '<p class="note-s">Пока ошибок нет — или пока нет заданий. Где будут ошибаться чаще всего, там и появятся новые задания.</p>'}</div>
       ${f ? `<div class="box fact"><h4>💡 Факт дня</h4><p>${fmt(f.fact)}</p></div>` : ''}
       ${e1 ? `<div class="box etym"><h4>🔎 Слово дня: откуда оно</h4><p><b class="en">${esc(e1[1][0])}</b> — ${fmt(e1[1][1])}</p><p class="note-s"><a href="#etym">Все истории слов</a></p></div>` : ''}
-      <div class="box bk-ru"><h4>🐇 Книга курса</h4><p>По ходу уроков — вся «Alice's Adventures in Wonderland» Льюиса Кэрролла в оригинале: в каждом уроке следующий отрывок и задания к нему. Прочитано частей: <b>${nBook()} из ${BOOK.parts.length}</b>. <a href="#book">Оглавление книги</a></p></div>
+      <div class="box bk-ru"><h4>🐇 Книга курса</h4>${picHTML({ n: 2, alt: 'The White Rabbit in a waistcoat, consulting his pocket-watch.' }, 'side')}<p>По ходу уроков — вся «Alice's Adventures in Wonderland» Льюиса Кэрролла в оригинале: в каждом уроке следующий отрывок и задания к нему. Прочитано частей: <b>${nBook()} из ${BOOK.parts.length}</b>. <a href="#book">Оглавление книги</a></p></div>
       <h2>Уровни</h2><p>A1 и A2 — коротко, чтобы закрыть пробелы. Если уверены в уровне — сдайте тест уровня: от 85 % можно идти дальше. Больше всего материала — на B1 и выше.</p>
       <div class="levels">${LEVELS.map(l => { const us = unitsOf(l.id); return `<div class="lvcard"><h3><span>${l.id}</span>${esc(l.name)}</h3><p>${esc(l.about)}</p><p>${us.length} уроков · ${levelPct(l.id)} %${S.d['lt-' + l.id] != null ? ` · тест: ${S.d['lt-' + l.id]} %` : ''}</p><div class="m"><i style="width:${levelPct(l.id)}%"></i></div>
         <div class="row">${us.length ? `<a class="btn small primary" href="#u/${(us.find(u => unitPct(u) < 100) || us[0]).id}">Открыть</a><a class="btn small" href="#test/${l.id}">Тест уровня</a>` : '<span class="note-s">скоро</span>'}</div></div>`; }).join('')}</div>
@@ -667,6 +701,7 @@
       <li><b>Письмо.</b> Пишите сами, потом сравнивайте с примером. Ошибки — нормально: это материал для следующего раза.</li>
       <li><b>Сериалы.</b> С B1 в уроках есть цитаты и шутки. Посмотрите сцену с английскими субтитрами, потом без них.</li></ol>
       <p class="note-s">Прогресс, словарь и ачивки сохраняются в вашем аккаунте на сайте (и на этом устройстве).</p>
+      <p class="note-s">Имя в учебнике: <b>${esc((S.name || {}).en || '—')}</b>${(S.name || {}).ru ? ' / ' + esc(S.name.ru) : ''} · <button type="button" class="btn small" data-name>Изменить</button></p>
       <div id="access"></div>
       <details class="pw reset"><summary>Сбросить учебник</summary><p class="note-s">Весь прогресс, словарь, ачивки и тексты удалятся — на всех устройствах. Нужен пароль админа и два подтверждения.</p><form data-pwf="reset"><input type="password" inputmode="numeric" autocomplete="current-password" placeholder="пароль (PIN) админа" aria-label="пароль админа"><button class="btn small">Сбросить всё</button><span class="note-s" data-pwm></span></form></details>`;
     view.innerHTML = h;
@@ -703,6 +738,7 @@
   }
   function bookPage() {
     view.innerHTML = `<div class="uhead"><div class="lv">Книга курса</div><h2>Alice's Adventures in Wonderland</h2><p class="sub">Lewis Carroll, 1865 · ${BOOK.parts.length} частей — по одной в каждом уроке. Прочитано с заданиями: ${nBook()}.</p></div>
+      ${PICS.front ? picHTML(PICS.front) : ''}
       ${crow('Книга про девочку, которая падает в нору, растёт, уменьшается и спорит с грибами. То есть обычная неделя взрослого человека.')}
       <ol class="booktoc">${BOOK.parts.map((bp, i) => { const u = byId(bp.u); if (!u) return ''; const done = isDone(u.id + '-b'); return `<li class="${done ? 'done' : ''}">${bp.h.length ? `<b>Chapter ${esc(bp.h.join(' · '))}</b><br>` : ''}${unitOpen(u) ? `<a href="#u/${u.id}">Часть ${i + 1}</a>` : `🔒 Часть ${i + 1}`} <span class="note-s">· урок ${esc(u.lvl + ' · ' + u.t)} · ${bp.n} слов${done ? ' · ✓' : ''}</span></li>`; }).join('')}</ol>
       <p class="note-s">Текст — Project Gutenberg (eBook #11), общественное достояние.</p>`;
@@ -823,9 +859,27 @@
     msg.textContent = 'Проверяю…';
     const r = await fetch('/api/admin/pin/verify', { method: 'POST', headers: { 'content-type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ pin }) }).catch(() => null);
     if (!r || !r.ok) { const j = r ? await r.json().catch(() => ({})) : {}; msg.textContent = !r ? 'Нет связи с сайтом' : r.status === 429 ? `Много попыток — подождите ${j.minutes || 60} мин.` : r.status === 401 ? 'Войдите на сайт' : 'Неверный пароль'; return; }
-    if (key === 'reset') { S = fresh(Date.now()); try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { /* нет места */ } save(); location.hash = 'home'; route(); toast('🧹', 'Учебник сброшен', 'Всё с начала. Невермор уже точит клюв.', ''); return; }
+    if (key === 'reset') { const nm = S.name; S = fresh(Date.now()); S.name = nm; try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { /* нет места */ } save(); location.hash = 'home'; route(); toast('🧹', 'Учебник сброшен', 'Всё с начала. Невермор уже точит клюв.', ''); return; }
     S.k[key] = Date.now(); save(); route();
   }
+  // имя при первом заходе (и «Изменить» на главной)
+  function askName() {
+    if ($('#namebox')) return;
+    const nm = S.name || {}, box = document.createElement('div'); box.id = 'namebox';
+    box.innerHTML = `<form class="namecard" data-namef>${crow('Кар! Давайте познакомимся. Как вас зовут? Имя появится в примерах, диалогах и смолтоках — вместо «Alina». Поменять можно потом на главной.')}
+      <label>Имя латиницей — для английских текстов<input name="en" required maxlength="30" autocomplete="given-name" placeholder="Alina" value="${esc(nm.en || '')}"></label>
+      <label>Имя по-русски — для русских пояснений (можно пусто)<input name="ru" maxlength="30" placeholder="Алина" value="${esc(nm.ru || '')}"></label>
+      <p class="note-s" data-namem></p><button class="btn primary">Готово</button></form>`;
+    document.body.append(box); $('input', box).focus();
+  }
+  function saveName(f) {
+    const cap = x => x.trim().replace(/\s+/g, ' ').replace(/^./, c => c.toUpperCase());
+    const en = cap(f.en.value), ru = cap(f.ru.value), m = $('[data-namem]', f);
+    if (!/^[A-Za-z][A-Za-z -]{0,29}$/.test(en)) { m.textContent = 'Имя латиницей: только английские буквы, пробел и дефис.'; return; }
+    if (ru && !/^[А-Яа-яЁё][А-Яа-яЁё -]{0,29}$/.test(ru)) { m.textContent = 'Имя по-русски: только русские буквы.'; return; }
+    S.name = { en, ru }; save(); applyName(S.name); $('#namebox').remove(); route();
+  }
+
   // доступ к учебнику для других птичек (только админ: /api/english/access отвечает 403 остальным — панель не показывается)
   async function accessPanel(nick, on) {
     const box = $('#access'); if (!box) return;
@@ -876,13 +930,14 @@
       <li><a href="#src" data-to="src"><span class="n">📚</span><span class="t">Источники</span></a></li>`;
   }
   const IDX = [];
-  for (const u of UNITS) {
+  function buildIdx() { IDX.length = 0; for (const u of UNITS) {
     IDX.push([u.t + ' ' + (u.en || ''), u.lvl + ' · ' + u.t, 'урок', '#u/' + u.id]);
     for (const w of u.words || []) IDX.push([w[0] + ' ' + w[1], w[0] + ' — ' + w[1], 'слово · ' + u.lvl + ' · ' + u.t, '#u/' + u.id]);
     for (const s of u.series || []) IDX.push([s.q + ' ' + s.who, s.q, (SHOWS[s.show] || {}).name + ' · ' + u.lvl, '#u/' + u.id]);
     for (const e of (NOTES[u.id] || {}).etym || []) IDX.push([e[0] + ' происхождение', e[0], 'откуда слово · ' + u.lvl, '#u/' + u.id]);
     for (const c of u.conf || []) IDX.push([c[0].replace(/[*_]/g, ''), c[0].replace(/[*_]/g, ''), 'не путай · ' + u.lvl, '#u/' + u.id]);
-  }
+  } }
+  buildIdx(); idxOn = true;
   $('#q').addEventListener('input', e => {
     const q = e.target.value.trim().toLowerCase();
     $('#hits').innerHTML = q.length < 2 ? '' : IDX.filter(x => x[0].toLowerCase().includes(q)).slice(0, 12).map(x => `<li><a href="${x[3]}">${esc(x[1])}<small>${esc(x[2])}</small></a></li>`).join('') || '<li class="note-s">Ничего не нашлось</li>';
@@ -919,6 +974,7 @@
   // ---------- события ----------
   document.addEventListener('click', e => {
     const t = e.target;
+    const tb = t.closest('[data-tobook]'); if (tb) { e.preventDefault(); const el = $('#book'); if (el) el.scrollIntoView({ behavior: 'smooth' }); return; }
     const mic = t.closest('[data-mic]'); if (mic) { listen(mic); return; }
     const sb = t.closest('[data-say]'); if (sb) { say(sb.dataset.say, sb.dataset.slow !== undefined); return; }
     const lvb = t.closest('#toc li.lvl > button'); if (lvb) { const li = lvb.parentElement; li.classList.toggle('open'); lvb.setAttribute('aria-expanded', li.classList.contains('open')); return; }
@@ -940,6 +996,7 @@
     const fc = t.closest('[data-flip]'); if (fc) { fc.classList.toggle('on'); if (fc.classList.contains('on')) say($('.f b', fc).textContent); return; }
     const cd = t.closest('[data-cards]'); if (cd) { const box = cd.closest('section, .col').querySelector('.cards'); if (box) { box.hidden = !box.hidden; cd.classList.toggle('primary', !box.hidden); } return; }
     if (t.closest('[data-xlate]')) { xlate(); return; }
+    if (t.closest('[data-name]')) { askName(); return; }
     const ao = t.closest('[data-accoff]'); if (ao) { if (confirm(`Закрыть учебник для ${ao.dataset.accoff}?`)) accessPanel(ao.dataset.accoff, false); return; }
     if (t.closest('[data-train]')) { train(false); return; }
     if (t.closest('[data-train-all]')) { train(true); return; }
@@ -977,6 +1034,7 @@
   document.addEventListener('change', e => { if (e.target.id === 'ds') { dictSort = e.target.value; dictPage(); } });
   document.addEventListener('submit', e => {
     if (e.target.dataset.pwf) { e.preventDefault(); pwSubmit(e.target); return; }
+    if (e.target.dataset.namef !== undefined) { e.preventDefault(); saveName(e.target); return; }
     if (e.target.dataset.accf !== undefined) { e.preventDefault(); accessPanel(e.target.nick.value.trim(), true); return; }
     if (e.target.id !== 'addf') return; e.preventDefault();
     const f = new FormData(e.target); if (addWord(f.get('w'), f.get('tr'), f.get('ex'), 'моё')) dictPage(); else alert('Такое слово уже есть в словаре');
@@ -985,6 +1043,6 @@
   window.EN_DEBUG = { BLOCKS, state: () => S }; // для tools/english_check.js
   buildToc(); route();
   fetch('/api/english', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : Promise.reject(r.status))
-    .then(j => { const sv = (j && j.state) || {}; S = merge(S, sv); if ((sv.rv || 0) !== S.rv) save(); /* сброс записываем на сервер один раз — дальше прогресс копится как обычно */ try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { /* нет места */ } saveEl.textContent = 'синхронизировано'; synced = true; route(); })
-    .catch(() => { online = location.protocol !== 'file:'; saveEl.textContent = 'сохранено на этом устройстве'; synced = true; refresh(); });
+    .then(j => { const sv = (j && j.state) || {}; S = merge(S, sv); if ((sv.rv || 0) !== S.rv) save(); /* сброс записываем на сервер один раз — дальше прогресс копится как обычно */ try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { /* нет места */ } saveEl.textContent = 'синхронизировано'; synced = true; applyName(S.name); route(); if (!S.name) askName(); })
+    .catch(() => { online = location.protocol !== 'file:'; saveEl.textContent = 'сохранено на этом устройстве'; synced = true; refresh(); if (!S.name) askName(); });
 })();

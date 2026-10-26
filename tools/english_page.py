@@ -5,7 +5,7 @@ import json, pathlib, sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 D = ROOT / 'content/english'
 shell = (D / 'shell.html').read_text(encoding='utf-8')
-files = sorted(D.glob('[abc][12]*.js')) + [D / 'extra.js', D / 'book.js', D / 'notes.js', D / 'smalltalk.js']  # book.js — «Алиса» (tools/english_book.py), notes.js — книга, «Своими словами», истории слов, реплики вороны  # a1.js, a2.js, b1.js, b1b.js … c2.js — по порядку уровней
+files = sorted(D.glob('[abc][12]*.js')) + [D / 'extra.js', D / 'book.js', D / 'notes.js', D / 'smalltalk.js', D / 'pics.js']  # book.js — «Алиса» (tools/english_book.py), notes.js — книга, «Своими словами», истории слов, реплики вороны  # a1.js, a2.js, b1.js, b1b.js … c2.js — по порядку уровней
 units = '\n'.join(f.read_text(encoding='utf-8') for f in files if f.exists())
 engine = (D / 'engine.js').read_text(encoding='utf-8')
 for name, part in (('уроки', units), ('движок', engine)):

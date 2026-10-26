@@ -268,6 +268,16 @@ details.reset { margin-top: 28px; }
 .box.pod h4 { color: var(--friends); } .pods { padding-left: 1.1em; } .pods li { margin: 8px 0; font-size: 16px; }
 .box.lift { background: var(--warm-soft); border-color: transparent; } .box.lift h4 { color: var(--warm); } .box.lift > p { margin: 0 0 6px; }
 .box.access h4 { color: var(--ok); } .box.access ul { padding-left: 1.1em; } .box.access li { margin: 6px 0; }
+#namebox { position: fixed; inset: 0; z-index: 80; background: rgb(31 24 50 / .45); display: grid; place-items: center; padding: 16px; }
+.namecard { background: var(--paper); border-radius: 16px; padding: 18px 20px; max-width: 460px; width: 100%; box-shadow: 0 20px 50px rgb(0 0 0 / .3); font-family: var(--f-ui); }
+.namecard label { display: block; font-size: 14px; color: var(--muted); margin: 10px 0; }
+.namecard input { display: block; width: 100%; margin-top: 4px; font: 400 17px var(--f-ui); border: 1px solid var(--rule); border-radius: 8px; padding: 8px 10px; background: #fff; color: var(--ink); }
+figure.tenniel { margin: 18px auto; max-width: 420px; text-align: center; }
+figure.tenniel img { width: 100%; height: auto; mix-blend-mode: multiply; }
+figure.tenniel figcaption { font: 400 13.5px/1.45 var(--f-ui); color: var(--muted); margin-top: 6px; } figure.tenniel figcaption span { white-space: nowrap; }
+figure.tenniel.small { max-width: 220px; margin: 4px auto 12px; } figure.tenniel.small figcaption { display: none; }
+figure.tenniel.side { float: right; max-width: 120px; margin: 0 0 8px 12px; } figure.tenniel.side figcaption { display: none; }
+.uhead-pic { display: block; text-decoration: none; }
 .box.fixbox h4 { color: var(--warm); } .box.fixbox p { margin: 4px 0; }
 .reading.book .txt p { text-indent: 1.2em; }
 .booktoc li { margin: 6px 0; font-family: var(--f-ui); } .booktoc li.done a { color: var(--ok); }
@@ -339,6 +349,7 @@ details.reset { margin-top: 28px; }
 <a class="btn top" href="#" id="up" aria-label="Наверх">↑</a>
 <div class="toast" id="toast" role="status" aria-live="polite"></div>
 <script>
+window.EN_UID = '/*UID*/'; // id птички — подставляет worker/english.js (прогресс в браузере у каждого свой)
 const UNITS = []; const U = u => UNITS.push(u);
 /*UNITS*/
 </script>
