@@ -1,4 +1,4 @@
-// Личный учебник английского A1–C2 (/english/, docs/site.md «Учебник английского»): открыт Алине (админ) и ником из ENGLISH_NICKS.
+// Личный учебник английского A1–C2 (/english/, docs/site.md «Учебник английского»): открыт Алине (админ), ником из ENGLISH_NICKS и тем, кому Алина открыла доступ (english_access).
 // Страница не лежит в site/ (там всё публично): её отдаёт worker из english-page.js (собирает tools/english_page.py из content/english/).
 // Прогресс у каждого свой: GET /api/english → {state}, POST /api/english {state} — блоки, словарь, ачивки, черновики текстов (english_progress).
 import { ENGLISH_HTML } from './english-page.js';
@@ -6,6 +6,7 @@ import { ENGLISH_HTML } from './english-page.js';
 export const ENGLISH_NICKS = [];
 export const ENGLISH_TABLES = [
   'CREATE TABLE IF NOT EXISTS english_progress (user_id INTEGER PRIMARY KEY, state TEXT, updated_at INTEGER)',
+  'CREATE TABLE IF NOT EXISTS english_access (user_id INTEGER PRIMARY KEY, added_at INTEGER)', // кому Алина открыла учебник (панель «Доступ» на главной учебника)
 ];
 const MAX = 400000, PARTS = ['d', 'w', 'v', 'a', 'days', 'c', 'last', 'k', 'm', 'x', 't', 'rv', 'pd']; // MAX — символов JSON; PARTS — разделы состояния (content/english/engine.js)
 
@@ -13,6 +14,7 @@ const MAX = 400000, PARTS = ['d', 'w', 'v', 'a', 'days', 'c', 'last', 'k', 'm', 
 export async function englishOk(u, env, h) {
   if (!u || u.banned) return false;
   if (u.nick && ENGLISH_NICKS.includes(String(u.nick).toLowerCase())) return true;
+  if (await env.DB.prepare('SELECT 1 FROM english_access WHERE user_id = ?').bind(u.id).first().catch(() => null)) return true;
   return !!(await h.isAdmin(u, env) || await h.adminIdentity(u, env));
 }
 
@@ -26,8 +28,20 @@ export async function englishApi(req, env, url, h) {
   const p = url.pathname, m = req.method;
   const u = await h.currentUser(req, env);
   const ok = await englishOk(u, env, h);
-  if (p !== '/api/english') return m === 'GET' ? page(ok ? ENGLISH_HTML : LOCKED, ok ? 200 : 403) : page(LOCKED, 405);
+  if (!p.startsWith('/api/english')) return m === 'GET' ? page(ok ? ENGLISH_HTML : LOCKED, ok ? 200 : 403) : page(LOCKED, 405);
   if (!ok) h.fail(u ? 403 : 401, u ? 'forbidden' : 'login');
+  if (p === '/api/english/access') { // только админ: GET — список, POST {nick, on} — открыть / закрыть доступ птичке по нику
+    if (!(await h.isAdmin(u, env))) h.fail(403, 'admin');
+    if (m === 'POST') {
+      const b = await req.json().catch(() => ({})), nick = String(b.nick || '').trim().replace(/^@/, '');
+      const t = nick && await env.DB.prepare('SELECT id, nick FROM users WHERE lower(nick) = lower(?)').bind(nick).first();
+      if (!t) h.fail(404, 'no_user');
+      if (b.on === false) await env.DB.prepare('DELETE FROM english_access WHERE user_id = ?').bind(t.id).run();
+      else await env.DB.prepare('INSERT OR IGNORE INTO english_access (user_id, added_at) VALUES (?, ?)').bind(t.id, Date.now()).run();
+    }
+    const r = await env.DB.prepare('SELECT u.nick, a.added_at FROM english_access a JOIN users u ON u.id = a.user_id ORDER BY a.added_at DESC').all();
+    return h.json({ list: (r.results || []).map(x => ({ nick: x.nick, at: x.added_at })) }, 200, { 'cache-control': 'no-store' });
+  }
   if (m === 'GET') {
     const r = await env.DB.prepare('SELECT state FROM english_progress WHERE user_id = ?').bind(u.id).first();
     let state = {}; try { state = JSON.parse((r && r.state) || '{}') || {}; } catch (e) { state = {}; }

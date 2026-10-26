@@ -1493,7 +1493,7 @@ async function route(req, env, url) {
   if (p === '/api/admin/ideas' || p === '/api/admin/ideas/write') { const r = await ideasApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/mail/') || p.startsWith('/api/admin/mail')) { const r = await mailApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p === '/api/study') { const r = await studyApi(req, env, url, studyHelpers(env)); if (r) return r; }
-  if (p === '/api/english') { const r = await englishApi(req, env, url, studyHelpers(env)); if (r) return r; }
+  if (p === '/api/english' || p === '/api/english/access') { const r = await englishApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/artpill' || p.startsWith('/api/artpill/')) { const r = await artpillApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now }); if (r) return r; }
   if (p === '/api/school' || p.startsWith('/api/school/') || p === '/api/admin/school' || p === '/api/admin/school/check') { const r = await schoolApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is a short friendly comment from an art teacher (Polly, a pigeon) on a student\'s drawing made on paper. Keep it warm, simple and encouraging.') }); if (r) return r; }
   if (p === '/api/games/mine' || p === '/api/games/visit') { const r = await myGamesApi(req, env, url, { json, fail, currentUser, needUser }); if (r) return r; }

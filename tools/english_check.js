@@ -10,7 +10,7 @@ const TYPES = ['gap', 'choice', 'order', 'fix', 'tr', 'tf', 'mk'], SHOWS = ['fri
   const b = await chromium.launch(); const pg = await b.newPage({ viewport: { width: 1280, height: 900 } });
   const errs = []; pg.on('pageerror', e => errs.push(String(e))); pg.on('console', m => { if (m.type() === 'error' && !/api\/english|Failed to load|ERR_/.test(m.text())) errs.push(m.text()); });
   await pg.goto('file://' + file); await pg.waitForTimeout(100);
-  const { units, notes, book } = await pg.evaluate(() => ({ units: UNITS, notes: window.EN_NOTES, book: window.EN_BOOK }));
+  const { units, notes, book, lift } = await pg.evaluate(() => ({ units: UNITS, notes: window.EN_NOTES, book: window.EN_BOOK, lift: window.EN_LIFT }));
   const bad = [], ids = new Set();
   const fmtCheck = (where, g) => {
     if (!TYPES.includes(g.t)) bad.push(`${where}: тип ${g.t}`);
@@ -36,10 +36,13 @@ const TYPES = ['gap', 'choice', 'order', 'fix', 'tr', 'tf', 'mk'], SHOWS = ['fri
     if (!part) bad.push(`${u.id}: нет части книги`);
     for (const k of ['crow', 'mk', 'etym', 'ru', 'gl', 'tf', 'ch', 'bmk']) if (!n[k]) bad.push(`${u.id}: notes без ${k}`);
     if (n.mk) fmtCheck(`${u.id}-m`, { t: 'mk', q: n.mk });
+    if (!n.st) bad.push(`${u.id}: нет смолтока (smalltalk.js)`); else { fmtCheck(`${u.id}-t`, { t: 'choice', q: n.st.dlg }); fmtCheck(`${u.id}-t`, { t: 'mk', q: [n.st.mk] }); }
     for (const k of ['tf', 'ch', 'bmk']) if (n[k]) fmtCheck(`${u.id}-b`, { t: k === 'ch' ? 'choice' : k === 'bmk' ? 'mk' : 'tf', q: n[k] });
     const txt = part ? part.txt.join(' ').toLowerCase() : '';
     for (const w of Object.keys(n.gl || {})) if (!new RegExp(`\\b${w.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}\\b`).test(txt)) bad.push(`${u.id}: подсказки «${w}» нет в тексте части книги`);
   }
+  for (const [lv, L] of Object.entries(lift || {})) fmtCheck('лифт ' + lv, { t: 'choice', q: L.q });
+  if (Object.keys(lift || {}).length !== 6) bad.push('лифт: не все уровни');
   if (book.parts.length !== units.length) bad.push(`частей книги ${book.parts.length}, уроков ${units.length}`);
   // замки: с нуля открыт только первый урок
   await pg.evaluate(() => { localStorage.clear(); }); await pg.reload(); await pg.waitForTimeout(100);

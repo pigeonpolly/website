@@ -36,11 +36,10 @@
   const LS = 'english-state';
   // k — открыто паролем админа {id урока или блока: время}; m — ошибки {id урока или t:тип: [неверно, всего]}; x — задания с ошибками {ref: вес}; t — время сохранения
   // rv — когда прогресс сбрасывали (кнопка «Сбросить учебник» или RESET_AT ниже): состояние со старым rv при слиянии отбрасывается целиком
-  const RESET_AT = 1793005402476; // 26.10.2026: учебник обновлён (замки, книга, ворона) — прогресс с нуля
+  const RESET_AT = 1793007114497; // 26.10.2026: учебник обновлён (замки, книга, ворона, смолток) — прогресс с нуля; новое значение = ещё один сброс у всех
   const fresh = rv => ({ d: {}, w: {}, v: {}, a: {}, days: [], pd: [], c: {}, last: '', k: {}, m: {}, x: {}, t: 0, rv }); // pd — дни, когда хоть одно задание пройдено от PASS %
   let S = fresh(RESET_AT);
-  try { Object.assign(S, JSON.parse(localStorage.getItem(LS) || '{}')); } catch (e) { /* пусто */ }
-  if ((S.rv || 0) < RESET_AT) S = fresh(RESET_AT);
+  try { const loc = JSON.parse(localStorage.getItem(LS) || '{}') || {}; if ((loc.rv || 0) >= RESET_AT) Object.assign(S, loc); } catch (e) { /* пусто */ } // старое состояние без метки сброса не берём
   const saveEl = $('#save');
   let timer = 0, online = true;
   function save() {
@@ -82,9 +81,12 @@
   // ---------- блоки и прогресс ----------
   // порядок блоков = порядок на странице урока: упражнения → «Своими словами» → слушание → чтение → книга → сериалы → повторение → письмо; следующий открывается от PASS % в предыдущем
   const hasMk = u => !!((NOTES[u.id] || {}).mk || u.words);
+  const hasSt = u => !!(NOTES[u.id] || {}).st;
+  const LIFT = window.EN_LIFT || {};
+  const liftOf = u => { const L = LIFT[u.lvl]; if (!L) return []; const i = unitsOf(u.lvl).indexOf(u) * 2; return [L.q[i % L.q.length], L.q[(i + 1) % L.q.length]]; }; // два «лифта с коллегами» на урок, по кругу
   const hasLs = u => !!((u.exm || []).length || (u.words || []).length);
-  const blocksOf = u => [...(u.ex || []).map((_, i) => `${u.id}-e${i}`), ...(hasMk(u) ? [`${u.id}-m`] : []), ...(hasLs(u) ? [`${u.id}-l`] : []), ...(u.read ? [`${u.id}-r`] : []), ...(bookOf(u) && bookGroups(u).length ? [`${u.id}-b`] : []), ...(u.series ? [`${u.id}-s`] : []), ...(UNITS.indexOf(u) > 0 ? [`${u.id}-p`] : []), ...(u.write ? [`${u.id}-w`] : [])];
-  const BID = /-(e\d+|m|l|r|b|s|p|w)$/;
+  const blocksOf = u => [...(u.ex || []).map((_, i) => `${u.id}-e${i}`), ...(hasMk(u) ? [`${u.id}-m`] : []), ...(hasLs(u) ? [`${u.id}-l`] : []), ...(hasSt(u) ? [`${u.id}-t`] : []), ...(u.read ? [`${u.id}-r`] : []), ...(bookOf(u) && bookGroups(u).length ? [`${u.id}-b`] : []), ...(u.series ? [`${u.id}-s`] : []), ...(UNITS.indexOf(u) > 0 ? [`${u.id}-p`] : []), ...(u.write ? [`${u.id}-w`] : [])];
+  const BID = /-(e\d+|m|l|t|r|b|s|p|w)$/;
   const PASS = 80;
   const isDone = id => (S.d[id] || 0) >= PASS;
   const pctOf = ids => ids.length ? Math.round(100 * ids.filter(isDone).length / ids.length) : 0;
@@ -323,7 +325,7 @@
     const nu = UNITS[reach()]; if (reach() > was && nu) toast('🔓', nu.lvl + ' · ' + nu.t, `Урок пройден на ${PASS} % — открыт следующий`, 'Открыто: ');
   }
   // ---------- ошибки: где ошибаюсь — там новые задания ----------
-  const refUnit = ref => byId(ref.replace(/-(e\d+|m|r|b|s)#\d+$/, ''));
+  const refUnit = ref => byId(ref.replace(/-(e\d+|m|t|r|b|s)#\d+$/, ''));
   function mark(it, ok) {
     const u = refUnit(it.ref), bump = k => { const a = S.m[k] || [0, 0]; S.m[k] = [a[0] + (ok ? 0 : 1), a[1] + 1]; };
     if (u) bump(u.id); bump('t:' + it.t);
@@ -336,10 +338,11 @@
     if (tag === 's') return [{ t: 'choice', q: (u.series || []).map(s => s.qz).filter(Boolean) }];
     if (tag === 'm') return [{ t: 'mk', q: (NOTES[u.id] || {}).mk || [] }];
     if (tag === 'b') return bookGroups(u);
+    if (tag === 't') { const st = (NOTES[u.id] || {}).st; return st ? [{ t: 'choice', h: 'Что ответить естественно?', q: st.dlg }, { t: 'choice', h: '🛗 Лифт с коллегами: что сказать?', q: liftOf(u) }, { t: 'mk', q: [st.mk] }] : []; }
     return [];
   }
   function itemsOf(bid) {
-    const u = byId(bid.replace(/-(e\d+|m|r|b|s)$/, '')); if (!u) return [];
+    const u = byId(bid.replace(/-(e\d+|m|t|r|b|s)$/, '')); if (!u) return [];
     return groupsOf(u, bid.slice(u.id.length + 1)).flatMap(g => g.q.map(s => ({ ...parse(g.t, s), hint: g.hint })));
   }
   function itemByRef(ref) { const [bid, n] = ref.split('#'); const its = itemsOf(bid); return its[+n] ? { ...its[+n], ref, sib: its } : null; }
@@ -439,7 +442,8 @@
   const stem = w => w.toLowerCase().split(/\s+/).map(x => x.length > 4 ? x.slice(0, x.length - (x.endsWith('e') ? 1 : 2)) : x);
   function uses(text, w) { // слово (или все части выражения) встречается в тексте, с учётом окончаний
     if (/^'/.test(w.trim())) return text.toLowerCase().replace(/[’]/g, "'").includes(w.trim().toLowerCase()); // 's, 'd — часть слова
-    const t = ' ' + text.toLowerCase().replace(/[’']/g, "'").replace(/[^a-z' ]+/g, ' ') + ' ';
+    const t = ' ' + text.toLowerCase().replace(/[’']/g, "'").replace(/'ve\b/g, ' have').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will').replace(/\bi'm\b/g, 'i am').replace(/[^a-z' ]+/g, ' ') + ' '; // I've = I have — нужное слово засчитывается
+    w = w.toLowerCase().replace(/[’]/g, "'").replace(/'ve\b/g, ' have').replace(/'re\b/g, ' are').replace(/'ll\b/g, ' will').replace(/\bi'm\b/g, 'i am');
     return stem(w).every(s => new RegExp(`\\s${s.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}[a-z']*\\s`).test(t));
   }
 
@@ -557,6 +561,7 @@
     if (u.ex) h += `<section class="sec" id="practice"><h3><span class="ic">✏️</span>Упражнения</h3>${u.ex.map((e, k) => { const id = `${u.id}-e${k}`, title = `Упражнение ${k + 1}. ${e.h || NAMES_T[e.t]}`; return late(id, title, () => blockHTML(id, title, [{ t: e.t, q: e.q, hint: e.hint, how: e.how }], { track: true })); }).join('')}</section>`;
     if (hasMk(u)) h += `<section class="sec" id="mk"><h3><span class="ic">💬</span>Своими словами</h3>${crow(crowPick('mk'), 'small')}${late(u.id + '-m', 'Своими словами', () => blockHTML(u.id + '-m', 'Своими словами: пишем сами', mkGroups(u), { track: true }))}</section>`;
     if (hasLs(u)) h += `<section class="sec" id="listen"><h3><span class="ic">🎧</span>Слушание и говорение</h3>${crow(crowPick('ls'), 'small')}${canSay ? '' : '<p class="note-s">В этом браузере нет озвучки — откройте страницу в Chrome или Safari.</p>'}${late(u.id + '-l', 'Слушание и говорение', () => blockHTML(u.id + '-l', 'Послушайте, ответьте и скажите сами', grouped(listenItems(u))))}</section>`;
+    if (hasSt(u)) h += smallTalkHTML(u);
     if (u.read) {
       const r = u.read;
       h += `<section class="sec" id="reading"><h3><span class="ic">📖</span>Чтение</h3>${r.intro ? `<p>${fmt(r.intro)}</p>` : ''}<article class="reading"><h4>${esc(r.title)} ${sayBtn(r.title + '. ' + r.txt.join(' '))}</h4><div class="txt">${r.txt.map(p => `<p>${glossText(p, r.gl)}</p>`).join('')}</div>
@@ -587,6 +592,15 @@
     h += `<nav class="pager">${prev ? `<a href="#u/${prev.id}"><small>← назад</small>${esc(prev.lvl + ' · ' + prev.t)}</a>` : ''}${next ? `<a class="next" href="#u/${next.id}"><small>${unitOpen(next) ? 'дальше →' : '🔒 дальше — от ' + PASS + ' %'}</small>${esc(next.lvl + ' · ' + next.t)}</a>` : ''}</nav>`;
     view.innerHTML = h;
     for (const s of $$('.write', view)) wInput(s);
+  }
+  function smallTalkHTML(u) { // смолток с Невермор: ситуация, фразы, лифт с коллегами, задания (+ сказать вслух)
+    const st = NOTES[u.id].st, L = LIFT[u.lvl];
+    const phr = list => `<div class="ex-list">${list.map(([e, r]) => `<p>${sayBtn(e)} <i class="en">${esc(e)}</i><span class="ru">${esc(r)}</span></p>`).join('')}</div>`;
+    const build = () => blockHTML(u.id + '-t', 'Смолток: ваша очередь', [...groupsOf(u, 't'), { t: 'sp', h: 'Скажите вслух — как будто это ваша реплика:', q: [{ t: 'sp', p: [st.ph[0][0], st.ph[0][0]], auto: 1 }] }], { track: true });
+    return `<section class="sec" id="smalltalk"><h3><span class="ic">☕</span>Смолток с Невермор: ${esc(st.t)}</h3>${crow(st.tip)}
+      <p><b>Ситуация.</b> ${fmt(st.sit)}</p>${phr(st.ph)}
+      ${L ? `<div class="box lift"><h4>🛗 Лифт с коллегами</h4><p>${fmt(L.tip)}</p>${phr(L.ph)}</div>` : ''}
+      ${late(u.id + '-t', 'Смолток: ваша очередь', build)}</section>`;
   }
   function bookHTML(u, bk, N) {
     const k = BOOK.parts.indexOf(bk);
@@ -653,8 +667,10 @@
       <li><b>Письмо.</b> Пишите сами, потом сравнивайте с примером. Ошибки — нормально: это материал для следующего раза.</li>
       <li><b>Сериалы.</b> С B1 в уроках есть цитаты и шутки. Посмотрите сцену с английскими субтитрами, потом без них.</li></ol>
       <p class="note-s">Прогресс, словарь и ачивки сохраняются в вашем аккаунте на сайте (и на этом устройстве).</p>
+      <div id="access"></div>
       <details class="pw reset"><summary>Сбросить учебник</summary><p class="note-s">Весь прогресс, словарь, ачивки и тексты удалятся — на всех устройствах. Нужен пароль админа и два подтверждения.</p><form data-pwf="reset"><input type="password" inputmode="numeric" autocomplete="current-password" placeholder="пароль (PIN) админа" aria-label="пароль админа"><button class="btn small">Сбросить всё</button><span class="note-s" data-pwm></span></form></details>`;
     view.innerHTML = h;
+    if (location.protocol !== 'file:') accessPanel();
   }
 
   function testPage(lv) { // тест уровня: грамматика, чтение, понимание (книга и сериалы), слушание, говорение
@@ -810,6 +826,18 @@
     if (key === 'reset') { S = fresh(Date.now()); try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { /* нет места */ } save(); location.hash = 'home'; route(); toast('🧹', 'Учебник сброшен', 'Всё с начала. Невермор уже точит клюв.', ''); return; }
     S.k[key] = Date.now(); save(); route();
   }
+  // доступ к учебнику для других птичек (только админ: /api/english/access отвечает 403 остальным — панель не показывается)
+  async function accessPanel(nick, on) {
+    const box = $('#access'); if (!box) return;
+    const r = await fetch('/api/english/access', nick ? { method: 'POST', headers: { 'content-type': 'application/json' }, credentials: 'same-origin', body: JSON.stringify({ nick, on }) } : { credentials: 'same-origin' }).catch(() => null);
+    if (!r) return;
+    if (!r.ok) { if (nick) { const m = $('[data-accm]', box); if (m) m.textContent = r.status === 404 ? 'Такого ника на сайте нет' : 'Не получилось — нужен вход админом с PIN'; } return; }
+    const j = await r.json();
+    box.innerHTML = `<div class="box access"><h4>🔑 Доступ к учебнику</h4><p class="note-s">Видно только вам. Впишите ник птички с сайта — у неё появится «🇬🇧 Учебник английского» в меню аватара, прогресс у каждого свой.</p>
+      <form class="dict-tools" data-accf><input name="nick" placeholder="ник птички" maxlength="40" required><button class="btn small primary">Открыть доступ</button><span class="note-s" data-accm></span></form>
+      ${j.list.length ? `<ul>${j.list.map(x => `<li><b>${esc(x.nick)}</b> <span class="note-s">с ${new Date(x.at).toLocaleDateString('ru-RU')}</span> <button type="button" class="btn small" data-accoff="${esc(x.nick)}">Закрыть</button></li>`).join('')}</ul>` : '<p class="note-s">Пока доступ только у вас.</p>'}</div>`;
+  }
+
   // перевод для «Добавить своё слово»: сначала слова и подсказки учебника, потом — бесплатный онлайн-переводчик MyMemory
   function lex() {
     const L = {};
@@ -912,6 +940,7 @@
     const fc = t.closest('[data-flip]'); if (fc) { fc.classList.toggle('on'); if (fc.classList.contains('on')) say($('.f b', fc).textContent); return; }
     const cd = t.closest('[data-cards]'); if (cd) { const box = cd.closest('section, .col').querySelector('.cards'); if (box) { box.hidden = !box.hidden; cd.classList.toggle('primary', !box.hidden); } return; }
     if (t.closest('[data-xlate]')) { xlate(); return; }
+    const ao = t.closest('[data-accoff]'); if (ao) { if (confirm(`Закрыть учебник для ${ao.dataset.accoff}?`)) accessPanel(ao.dataset.accoff, false); return; }
     if (t.closest('[data-train]')) { train(false); return; }
     if (t.closest('[data-train-all]')) { train(true); return; }
     const us = t.closest('[data-use]'); if (us) { useCard(us.dataset.use); return; }
@@ -948,6 +977,7 @@
   document.addEventListener('change', e => { if (e.target.id === 'ds') { dictSort = e.target.value; dictPage(); } });
   document.addEventListener('submit', e => {
     if (e.target.dataset.pwf) { e.preventDefault(); pwSubmit(e.target); return; }
+    if (e.target.dataset.accf !== undefined) { e.preventDefault(); accessPanel(e.target.nick.value.trim(), true); return; }
     if (e.target.id !== 'addf') return; e.preventDefault();
     const f = new FormData(e.target); if (addWord(f.get('w'), f.get('tr'), f.get('ex'), 'моё')) dictPage(); else alert('Такое слово уже есть в словаре');
   });
