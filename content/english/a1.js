@@ -82,7 +82,7 @@ U({
     model: 'Hello! My name is Marta. I am from Latvia and I am thirty-two.\nI am a designer. My office is in Riga.\nToday I am happy, but I am a bit tired. My friends are at the cinema, and I am at home with my cat.' },
   vid: [['BBC Learning English', 'verb to be am is are'], ['English with Lucy', 'verb to be'], ['Learn English with EnglishClass101', 'to be am is are beginners']],
   fact: 'Глагол <i>be</i> — самый неправильный в английском: у него восемь форм (be, am, is, are, was, were, been, being). Они пришли из трёх разных древних корней.',
-  src: [['British Council — be', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Be', 'https://dictionary.cambridge.org/grammar/british-grammar/be']],
+  src: [['British Council — be', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Be', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -121,7 +121,7 @@ U({
     model: 'I get up at seven and have breakfast. My husband doesn\'t eat in the morning, he only drinks coffee.\nI go to work by tram. I finish work at five.\nIn the evening we often cook together. My son plays the guitar, and our cat watches him.\nI never go to bed after midnight.' },
   vid: [['BBC Learning English', 'present simple'], ['English with Lucy', 'present simple tense'], ['Oxford Online English', 'present simple'], ['engVid', 'present simple do does']],
   fact: 'Окончание <i>-s</i> у he/she/it — единственный «осколок» старых личных окончаний. Когда-то у глагола были разные окончания почти для каждого лица, как в русском.',
-  src: [['British Council — Present simple', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Present simple', 'https://dictionary.cambridge.org/grammar/british-grammar/present-simple-i-work']],
+  src: [['British Council — Present simple', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Present simple', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -158,7 +158,7 @@ U({
     model: 'My room is small but cosy. There is a big window and a desk under the window.\nThe desk is white. On the desk there is a lamp and an old laptop.\nI have a shelf with books and plants. The plants are my favourite thing in the room.' },
   vid: [['BBC Learning English', 'articles a an the'], ['English with Lucy', 'articles a an the'], ['engVid', 'a an the articles']],
   fact: 'Слово <i>an</i> старше, чем <i>a</i>: оно произошло от древнеанглийского <i>ān</i> — «один». Перед согласными <i>n</i> со временем отпала, и получилось <i>a</i>.',
-  src: [['British Council — Articles', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Articles', 'https://dictionary.cambridge.org/grammar/british-grammar/articles-a-an-the']],
+  src: [['British Council — Articles', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Articles', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -193,7 +193,7 @@ U({
     model: 'I live in a green neighbourhood. There is a big park near my house.\nThere are two supermarkets and a pharmacy. The pharmacy is next to the bus stop.\nOpposite my building there is a school, so it is noisy in the morning.\nThere isn\'t a cinema, but there is a cosy café on the corner.' },
   vid: [['BBC Learning English', 'there is there are'], ['English with Lucy', 'prepositions of place in on at'], ['engVid', 'prepositions in on at place']],
   fact: 'В английском около 150 предлогов, но 10 самых частых (of, in, to, for, with, on, at, by, from, about) — это большая часть всех предлогов в текстах.',
-  src: [['British Council — There is/are', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — There is, there are', 'https://dictionary.cambridge.org/grammar/british-grammar/there']],
+  src: [['British Council — There is/are', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — There is, there are', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -232,5 +232,5 @@ U({
     model: 'I can speak three languages: Latvian, Russian and English. I can draw and I can cook good soup.\nI can\'t drive, and I can\'t swim very well.\nMy questions for you: Can you play the guitar? What languages can you speak? Why do you want to learn English?' },
   vid: [['BBC Learning English', 'can and can\'t ability'], ['English with Lucy', 'question words'], ['engVid', 'possessive adjectives pronouns my mine']],
   fact: 'Путаница <i>its / it\'s</i> настолько частая, что её делают даже носители языка — в том числе в рекламе и на вывесках. Запомните проверку: если можно сказать <i>it is</i> — нужен апостроф.',
-  src: [['British Council — can', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Questions', 'https://dictionary.cambridge.org/grammar/british-grammar/questions']],
+  src: [['British Council — can', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Questions', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });

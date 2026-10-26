@@ -19,6 +19,7 @@
     admin: ['admin', 'админ', 'admins'],
     cabinet: ['Admin dashboard', 'Кабинет', 'Kabinets'],
     study: ['Textbook', 'Учебник', 'Mācību grāmata'],
+    english: ['English course', 'Учебник английского', 'Angļu valodas mācību grāmata'],
     nTitle: ['Meet your bird! Now pick a nickname', 'Знакомься со своей птичкой! Теперь выбери ник', 'Iepazīsties ar savu putniņu! Tagad izvēlies segvārdu'],
     nTitleCat: ['You are a cat! Now pick a nickname', 'Ты котик! Теперь выбери ник', 'Tu esi kaķītis! Tagad izvēlies segvārdu'],
     nTitleCrow: ['You are a crow with a treasure! Now pick a nickname', 'Ты ворона с сокровищем! Теперь выбери ник', 'Tu esi vārna ar dārgumu! Tagad izvēlies segvārdu'],
@@ -222,6 +223,7 @@
           ${u.nick ? [['/bird/#room', '🏠', 'room'], ['/shop/', '🛍', 'shop']]
             .map(([h, i, k]) => `<a role="menuitem" href="${pre}${h}"><i aria-hidden="true">${i}</i>${t(k)}</a>`).join('') + `<button type="button" role="menuitem" data-env><i aria-hidden="true">✉️</i>${t('env')}</button>`
             + (u.study ? `<a role="menuitem" href="/study/"><i aria-hidden="true">📘</i>${t('study')}</a>` : '') // личный учебник (worker/study.js)
+            + (u.english ? `<a role="menuitem" href="/english/"><i aria-hidden="true">🇬🇧</i>${t('english')}</a>` : '') // учебник английского (worker/english.js)
             : `<a role="menuitem" href="${pre}/challenge/">${t('nick')}</a>`}
           ${u.admin ? `<hr><a role="menuitem" href="/admin/"><i aria-hidden="true">⚙</i>${t('cabinet')}</a>${document.querySelector('[data-ppb]') ? `<button type="button" role="menuitem" data-edit><i aria-hidden="true">✏️</i>${t('edit')}</button>` : ''}` : ''}
           <hr><button type="button" role="menuitem" data-out>${t('out')}</button>

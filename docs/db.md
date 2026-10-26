@@ -62,6 +62,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **titos_cases** (worker/titos.js): `n` int PK, `data` text nn, `tr` text ='{}', `hash` text, `updated_at` int
 - **top_week** (worker/top.js): `game` text nn, `week` text nn, `user_id` int nn, `score` int nn, `at` int; PRIMARY KEY (game, week, user_id)
 - **study_progress** (worker/study.js): `user_id` int PK, `state` text (JSON: ключ галочки → 1), `updated_at` int
+- **english_progress** (worker/english.js): `user_id` int PK, `state` text (JSON: d — блок → лучший %, w — тексты, v — словарь, a — ачивки, days, c — счётчики, last), `updated_at` int
 
 ## Ключи meta (48)
 

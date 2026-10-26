@@ -43,7 +43,7 @@ U({
     model: 'I have worked as a designer for six years. I started my career in a small agency in 2018, and since then I have changed jobs twice.\nSo far I have designed more than forty websites, and I have managed to build my own little portfolio. My favourite project happened last spring: I created the logo for a bakery, and they printed it on every cake box.\nI have recently moved to a new flat, and I\'m still getting used to the noise from the street. I haven\'t finished painting the kitchen yet, but I hope to do it next month.' },
   vid: [['BBC Learning English', 'present perfect or past simple'], ['English with Lucy', 'present perfect vs past simple'], ['engVid', 'for since'], ['Learn English With TV Series', 'present perfect']],
   fact: 'В английском всего два «настоящих» морфологических времени — present (<i>work/works</i>) и past (<i>worked</i>). Все остальные «времена» строятся вспомогательными глаголами: <i>have, be, will</i>. Поэтому грамматисты часто говорят не «12 времён», а «2 времени и аспекты».',
-  src: [['British Council — Present perfect / Past simple', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Present perfect or past simple?', 'https://dictionary.cambridge.org/grammar/british-grammar/present-perfect-simple-or-past-simple']],
+  src: [['British Council — Present perfect / Past simple', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Present perfect or past simple?', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -86,7 +86,7 @@ U({
     model: 'It was a quiet Sunday morning. I was sitting in a café in the old town, and I was reading a book while my coffee was getting cold.\nSuddenly a pigeon flew in through the open door. People were screaming and the waiter was waving a menu at it. At that moment the bird landed on my table and looked straight at my croissant.\nI didn\'t know what to do, so I broke off a small piece and put it on the floor. The pigeon jumped down, ate it and walked out like a regular customer. The waiter laughed and said, "He comes every Sunday. You\'re the first who paid for his breakfast!"' },
   vid: [['BBC Learning English', 'past continuous'], ['English with Lucy', 'past simple vs past continuous'], ['Oxford Online English', 'narrative tenses'], ['Learn English With TV Series', 'Friends pivot']],
   fact: 'Знаменитая серия с диваном — «The One with the Cop» (5 сезон, 2000 год). Почти все серии «Друзей» называются по шаблону <i>The One with…</i> или <i>The One Where…</i> — «Та, где…»: так сами зрители пересказывают друг другу серии.',
-  src: [['British Council — Past continuous', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Past continuous', 'https://dictionary.cambridge.org/grammar/british-grammar/past-continuous-i-was-working']],
+  src: [['British Council — Past continuous', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Past continuous', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -129,7 +129,7 @@ U({
     model: 'Welcome to Riga! Here is some advice for your first week.\nYou have to buy a ticket before you get on the tram, or you might pay a big fine. You don\'t have to speak Latvian — most people under fifty understand English — but you should learn "paldies" (thank you). People love it.\nYou mustn\'t cross the road on a red light, even if the street is empty. In winter you should wear good boots, because the pavements can be very slippery.\nYou are allowed to drink coffee on the go, but you should try a real café in the old town at least once. And you must taste black balsam — but only a little!' },
   vid: [['BBC Learning English', 'must have to'], ['English with Lucy', 'mustn\'t don\'t have to'], ['engVid', 'should could might'], ['Learn English With TV Series', 'Supernatural']],
   fact: 'Слово <i>shotgun</i> в значении «переднее место» пришло из эпохи Дикого Запада: рядом с кучером дилижанса сидел охранник с ружьём (shotgun messenger). Сегодня дети в США кричат «Shotgun!», чтобы занять место рядом с водителем.',
-  src: [['British Council — Modals: obligation', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Modality', 'https://dictionary.cambridge.org/grammar/british-grammar/modality-introduction']],
+  src: [['British Council — Modals: obligation', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Modality', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -172,7 +172,7 @@ U({
     model: 'If I were the mayor of Riga for one day, I would start with the trams. I would make them free for everyone, as long as people promised to leave their cars at home.\nIf I had enough money, I would plant trees on every street in the centre. The city would look greener and the air would be cleaner.\nI would also open a big park for dogs, because many people can\'t afford a house with a garden.\nImagine a city where everyone smiles on the tram! Of course, the real mayor won\'t do this unless people ask. So if you agree with me, write to the city council tomorrow.' },
   vid: [['BBC Learning English', 'first and second conditional'], ['English with Lucy', 'conditionals zero first second'], ['engVid', 'unless'], ['Learn English With TV Series', 'conditionals']],
   fact: 'Фраза <i>If I were a rich man</i> из мюзикла «Скрипач на крыше» и песня Бейонсе <i>If I Were a Boy</i> — обе используют «правильное» <i>were</i>. А вот в разговорной речи многие говорят <i>If I was</i>, и это тоже встречается у носителей.',
-  src: [['British Council — Conditionals', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Conditionals', 'https://dictionary.cambridge.org/grammar/british-grammar/conditionals-if']],
+  src: [['British Council — Conditionals', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Conditionals', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -214,7 +214,7 @@ U({
     model: 'The House of the Blackheads is one of the most famous buildings in Riga. It was built in the 14th century and was used by a guild of unmarried merchants.\nThe house was completely destroyed in 1941 and its ruins were removed after the war. For many years only an empty square was left.\nThe building was rebuilt in the 1990s, and it was opened again in 1999 for Riga\'s 800th birthday. Today concerts are held there, and the house is visited by thousands of tourists every year. Some parts of the square are being repaired now, but they will be finished soon.' },
   vid: [['BBC Learning English', 'passive voice'], ['English with Lucy', 'passive voice'], ['engVid', 'passive voice all tenses'], ['Oxford Online English', 'have something done']],
   fact: 'Почти все серии «Друзей» и «Теории большого взрыва» снимали перед живыми зрителями. На съёмку серии «Теории» уходило несколько часов, и актёры иногда играли сцену заново с другими шутками, чтобы выбрать ту, на которую смеялись громче.',
-  src: [['British Council — Passive', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Passive', 'https://dictionary.cambridge.org/grammar/british-grammar/passive-voice']],
+  src: [['British Council — Passive', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Passive', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -258,5 +258,5 @@ U({
     model: 'The first person who changed my life is my grandmother, whose kitchen was always full of books and pies. She taught me that a person who reads is never lonely.\nThe second thing is a small sketchbook which I bought in Lisbon. It\'s the place where I started drawing every day, and it reminds me of the city where I felt truly free.\nThe third is my old bike, which I still ride to work. It\'s the bike that I learned to ride on when I was thirty, in the park where I grew up. Every time I ride it, I remember that it\'s never too late.' },
   vid: [['BBC Learning English', 'relative clauses who which that'], ['English with Lucy', 'relative clauses'], ['engVid', 'defining non-defining relative clauses'], ['Learn English With TV Series', 'Friends moo point']],
   fact: 'Ошибки вроде Джоуиного <i>moo point</i> называют <b>эгкорнами</b> (eggcorn): человек слышит выражение и перестраивает его в «логичное» — <i>for all intensive purposes</i> вместо <i>for all intents and purposes</i>. Само слово появилось из ошибки <i>egg corn</i> вместо <i>acorn</i> (жёлудь).',
-  src: [['British Council — Relative clauses', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Relative clauses', 'https://dictionary.cambridge.org/grammar/british-grammar/relative-clauses']],
+  src: [['British Council — Relative clauses', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Relative clauses', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });

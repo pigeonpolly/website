@@ -42,7 +42,7 @@ U({
     model: 'I really enjoy drawing in cafés. I\'m not very good at painting faces yet, but I love watching people and trying to catch their gestures.\nI can\'t stand waiting in queues, so I always carry a small sketchbook. Last year I decided to draw something every day, and I managed to keep the habit for 200 days.\nI gave up drinking coffee in the evening because I couldn\'t sleep. Now I prefer herbal tea.\nNext month I\'m planning to take a watercolour course, and I\'m really looking forward to meeting other artists. I hope to learn how to paint rain.' },
   vid: [['BBC Learning English', 'gerunds and infinitives'], ['English with Lucy', 'gerund or infinitive'], ['engVid', 'stop remember try ing to'], ['Learn English With TV Series', 'Chandler sarcasm']],
   fact: 'Голландское <i>niksen</i> и датское <i>hygge</i> (уют) попали в английские статьи и книги как модные заимствования. Английский вообще охотно берёт слова: в нём заимствования из более чем 350 языков.',
-  src: [['British Council — Verbs followed by -ing or infinitive', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Verb patterns', 'https://dictionary.cambridge.org/grammar/british-grammar/verb-patterns-verb-infinitive-or-verb-ing']],
+  src: [['British Council — Verbs followed by -ing or infinitive', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Verb patterns', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -85,7 +85,7 @@ U({
     model: 'Yesterday I met my old teacher at the market. She told me that she had retired last year and was now learning to paint.\nShe asked me whether I still drew birds. I said that I did and that I was making an online course. She seemed surprised and asked how many students I had.\nThen she explained that she had always kept one of my school drawings on her fridge. She warned me that she would come to my next exhibition and tell everyone she had been my first fan.\nBefore leaving, she asked me to send her the link to my course.' },
   vid: [['BBC Learning English', 'reported speech'], ['English with Lucy', 'reported speech'], ['engVid', 'say vs tell'], ['Learn English With TV Series', 'Friends they know we know']],
   fact: 'В английских новостях почти всё — косвенная речь: <i>The minister said that…</i>. Журналисты используют десятки глаголов вместо <i>said</i>: <i>claimed, admitted, denied, insisted, revealed</i> — каждый добавляет оттенок (утверждал, признал, отрицал, настаивал, раскрыл).',
-  src: [['British Council — Reported speech', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Reported speech', 'https://dictionary.cambridge.org/grammar/british-grammar/reported-speech']],
+  src: [['British Council — Reported speech', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Reported speech', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -130,7 +130,7 @@ U({
     model: 'Last Saturday we set off for the lake at seven. Halfway there we realised we had run out of petrol, and the nearest station was ten kilometres away.\nWhile my husband tried to figure out what to do, a farmer turned up on a tractor. He offered to help and gave us some petrol from his garage. We got along with him so well that he invited us for tea.\nWe came up with a new plan: instead of the lake, we hung out at his farm, fed the goats and picked strawberries. We\'ve put off our lake trip until next weekend, but nobody is complaining.' },
   vid: [['BBC Learning English', 'phrasal verbs'], ['English with Lucy', 'most common phrasal verbs'], ['engVid', 'phrasal verbs get'], ['Learn English With TV Series', 'phrasal verbs Friends']],
   fact: 'В английском тысячи фразовых глаголов, а у одного может быть десяток значений: <i>get up, get on, get over, get by, get away with</i>… Словари вроде Oxford и Cambridge выпускают отдельные толстые словари только фразовых глаголов.',
-  src: [['British Council — Phrasal verbs', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Phrasal verbs', 'https://dictionary.cambridge.org/grammar/british-grammar/phrasal-verbs-and-multi-word-verbs']],
+  src: [['British Council — Phrasal verbs', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Phrasal verbs', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -171,7 +171,7 @@ U({
     model: 'In my childhood I used to spend every summer at my grandparents\' farm. My grandfather would wake me up at six, and we would go to feed the cows. I used to hate getting up so early, but I loved the fresh milk.\nI didn\'t use to like reading — I preferred climbing trees. My grandmother would leave books on my bed until I started reading them "by accident".\nNowadays I live in the city, and I\'m used to the noise and the traffic. When I moved here, it took me a year to get used to the small flat. But every summer I still go back to the farm, and I still can\'t get up at six.' },
   vid: [['BBC Learning English', 'used to be used to'], ['English with Lucy', 'used to would get used to'], ['engVid', 'used to'], ['Learn English With TV Series', 'Soft Kitty']],
   fact: 'В <i>used to</i> буква <i>d</i> не слышна: говорят «юс-ту» [ˈjuːstə]. Поэтому даже носители иногда пишут с ошибкой: <i>use to</i>. Слушайте и повторяйте: <i>I used to…</i> звучит как «ай юс-ту».',
-  src: [['British Council — Used to / be used to', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Used to', 'https://dictionary.cambridge.org/grammar/british-grammar/used-to']],
+  src: [['British Council — Used to / be used to', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Used to', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -213,7 +213,7 @@ U({
     model: 'Dear Sir or Madam,\nI am planning to stay at your hotel from 12 to 15 May, and I have a few questions.\nCould you tell me what time check-in starts? I would also like to know if breakfast is included in the price. Do you know whether there is a bus from the airport to the hotel? I wonder if you have rooms with a view of the sea, by any chance.\nYou also have a spa, don\'t you? And the old town is only ten minutes away, isn\'t it?\nCould you let me know how I can pay for the room?\nThank you in advance.\nBest regards,\nMarta Ozola' },
   vid: [['BBC Learning English', 'question tags'], ['English with Lucy', 'indirect questions'], ['engVid', 'subject questions'], ['Learn English With TV Series', 'How you doin Joey']],
   fact: 'Хвостики (<i>isn\'t it?</i>) очень британская вещь. В американском разговорном их часто заменяют универсальным <i>right?</i>: <i>You\'re coming, right?</i> А в Индии и Сингапуре популярно универсальное <i>isn\'t it?</i> для любого предложения.',
-  src: [['British Council — Question tags / Indirect questions', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Questions: tags', 'https://dictionary.cambridge.org/grammar/british-grammar/question-tags']],
+  src: [['British Council — Question tags / Indirect questions', 'https://learnenglish.britishcouncil.org/grammar/b1-b2-grammar'], ['Cambridge — Questions: tags', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -262,5 +262,5 @@ U({
     model: 'Anna: Hey! Wanna grab a coffee?\nMax: Sure. You look kinda nervous. What\'s up?\nAnna: OK, don\'t freak out… I\'m gonna move to Lisbon!\nMax: No way! When?\nAnna: Next month. I got a job there.\nMax: Oh my God, that\'s awesome! But who\'s gonna drink coffee with me every morning?\nAnna: Gunther?\nMax: Seriously? He doesn\'t even like me.\nAnna: Tell me about it. He gave you decaf for three years.\nMax: Wait… what?!\n(Full forms: I am going to move. Do you want to grab a coffee? You look kind of nervous.)' },
   vid: [['Learn English With TV Series', 'Friends'], ['BBC Learning English', 'gonna wanna gotta'], ['Rachel\'s English', 'reduced speech gonna wanna'], ['English with Lucy', 'learn English with Friends']],
   fact: 'Сериал «Друзья» (10 сезонов, 236 серий) популярен у изучающих английский по всему миру. Актриса Дженнифер Энистон рассказывала, что её прическа «The Rachel» стала самой копируемой стрижкой 90-х, хотя сама она её недолюбливала.',
-  src: [['BBC Learning English — The English We Speak', 'https://www.bbc.co.uk/learningenglish/english/features/the-english-we-speak'], ['Cambridge — Spoken English', 'https://dictionary.cambridge.org/grammar/british-grammar/spoken-english']],
+  src: [['BBC Learning English — The English We Speak', 'https://www.bbc.co.uk/learningenglish/english/features/the-english-we-speak'], ['Cambridge — Spoken English', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });

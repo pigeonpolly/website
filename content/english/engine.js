@@ -366,7 +366,7 @@
     const txt = ta.value; const n = (txt.match(/[A-Za-z]+(?:['’-][A-Za-z]+)*/g) || []).length;
     S.d[id] = 100; S.w[id] = txt.slice(0, 6000); if (n >= 250) S.c.long = (S.c.long || 0) + 1;
     let used = 0;
-    for (const x of u.write.use || []) if (uses(txt, x)) { const wd = (u.words || []).find(w => w[0].toLowerCase() === x.toLowerCase()); addWord(x, wd ? wd[1] : '', wd ? wd[2] : '', u.id); S.v[x.toLowerCase()].u++; used++; }
+    for (const x of u.write.use || []) if (uses(txt, x)) { const wd = (u.words || []).find(w => w[0].toLowerCase() === x.toLowerCase()); if (wd) addWord(wd[0], wd[1], wd[2], u.id); if (S.v[x.toLowerCase()]) { S.v[x.toLowerCase()].u++; used++; } } // слово урока — сразу в словарь
     for (const v of Object.values(S.v)) if (!(u.write.use || []).some(x => x.toLowerCase() === v.w.toLowerCase()) && uses(txt, v.w)) { v.u++; used++; }
     $('[data-wstat]', sec).textContent = `Сдано ✓ Слов из словаря в тексте: ${used}. Сравните с примером ответа ниже.`;
     touch(); save(); refresh();

@@ -35,7 +35,7 @@ U({
     model: 'Two years ago I went to Tallinn with my sister. We decided to go by bus because it was cheap.\nThe trip took four hours. We arrived in the evening and walked around the old town.\nThe next day we visited a museum and ate in a small café. It rained all day, but we didn\'t care.\nWe spent all our money on cakes and books. It was a great weekend.' },
   vid: [['BBC Learning English', 'past simple'], ['English with Lucy', 'past simple irregular verbs'], ['Rachel\'s English', 'ed pronunciation'], ['engVid', 'past simple questions did']],
   fact: 'Около 70 самых частых глаголов английского — неправильные. Правильные глаголы «побеждают»: многие формы со временем стали правильными (например, <i>helped</i> вместо старого <i>holp</i>).',
-  src: [['British Council — Past simple', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Past simple', 'https://dictionary.cambridge.org/grammar/british-grammar/past-simple-i-worked']],
+  src: [['British Council — Past simple', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Past simple', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -73,7 +73,7 @@ U({
     model: 'Hi! I\'m sitting on my balcony at the moment. Usually I work in the evenings, but today I\'m relaxing.\nMy neighbour is watering his flowers and his dog is barking at a cat.\nI\'m wearing my old pyjamas and drinking tea.\nWhat about you? Are you still working? I usually call you on Sundays, but I miss you!' },
   vid: [['BBC Learning English', 'present continuous'], ['English with Lucy', 'present simple vs present continuous'], ['engVid', 'stative verbs']],
   fact: 'Слоган McDonald\'s <i>I\'m lovin\' it</i> (2003) нарушает правило: <i>love</i> обычно не ставят в -ing. Именно поэтому фраза звучит живо и запоминается — так носители говорят о сильной эмоции «прямо сейчас».',
-  src: [['British Council — Present continuous', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Present continuous', 'https://dictionary.cambridge.org/grammar/british-grammar/present-continuous-i-am-working']],
+  src: [['British Council — Present continuous', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Present continuous', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -110,7 +110,7 @@ U({
     model: 'This year I\'m going to learn English properly. I plan to study every morning for twenty minutes.\nI\'m also going to visit my friend in Berlin. I\'m flying there on the 3rd of May.\nI think it will be a busy year, but I\'ll probably have more time in summer.\nI promise I\'ll call my grandma more often. As soon as I get a new phone, I\'ll send her photos every day.' },
   vid: [['BBC Learning English', 'will or going to'], ['English with Lucy', 'future tenses will going to'], ['Oxford Online English', 'future tenses']],
   fact: 'В английском нет «будущего времени» в том смысле, как в русском, — нет отдельной формы глагола. Будущее выражают вспомогательными словами (<i>will, going to</i>) или настоящим временем.',
-  src: [['British Council — Future forms', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Future', 'https://dictionary.cambridge.org/grammar/british-grammar/future']],
+  src: [['British Council — Future forms', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Future', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -148,7 +148,7 @@ U({
     model: 'I lived in Daugavpils and now I live in Riga. Riga is bigger and more crowded than Daugavpils.\nFlats in Riga are much more expensive, but the salaries are higher too.\nDaugavpils is quieter and the parks are as beautiful as in the capital.\nThe best thing about Riga is the sea. The worst thing is the traffic in the morning.' },
   vid: [['BBC Learning English', 'comparatives and superlatives'], ['English with Lucy', 'comparative superlative adjectives'], ['engVid', 'as as comparisons']],
   fact: 'Слово <i>worse</i> и <i>worst</i> — от древнего корня, а не от <i>bad</i>. Так же <i>better/best</i> не связаны с <i>good</i>: это «осколки» разных старых слов, как в русском «хороший — лучше».',
-  src: [['British Council — Comparatives', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Comparison', 'https://dictionary.cambridge.org/grammar/british-grammar/comparison-adjectives-bigger-biggest-more-interesting']],
+  src: [['British Council — Comparatives', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Comparison', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -184,7 +184,7 @@ U({
     model: 'For my birthday party I need to buy some things. There isn\'t any juice in the fridge, and there are only a few eggs.\nWe have a lot of plates, but not enough glasses.\nI need a little cheese for the salad and some flowers for the table.\nHow many people are coming? About twenty, so I need a lot of cake!' },
   vid: [['BBC Learning English', 'countable uncountable nouns'], ['English with Lucy', 'much many a lot of'], ['engVid', 'some any']],
   fact: 'Слово <i>news</i> выглядит как множественное число, но ведёт себя как единственное: <i>The news is…</i>. А <i>police</i> — наоборот: <i>The police are coming.</i>',
-  src: [['British Council — Countable and uncountable', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Nouns: countable and uncountable', 'https://dictionary.cambridge.org/grammar/british-grammar/nouns-countable-and-uncountable']],
+  src: [['British Council — Countable and uncountable', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Nouns: countable and uncountable', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
 
 U({
@@ -225,5 +225,5 @@ U({
     model: 'Have you ever been to Iceland? No, I haven\'t, but I want to go.\nHave you ever tried sushi? Yes, I have. I tried it in Riga last year and I loved it.\nHave you ever lost your phone? Yes! I left it in a taxi in 2021. The driver brought it back.\nI have just finished a big project, and I haven\'t had a holiday yet.' },
   vid: [['BBC Learning English', 'present perfect'], ['English with Lucy', 'present perfect ever never just already yet'], ['engVid', 'been vs gone']],
   fact: 'Американцы реже британцев используют Present Perfect: в США нормально сказать <i>Did you eat yet?</i>, а в Британии скорее скажут <i>Have you eaten yet?</i>. Оба варианта понятны везде.',
-  src: [['British Council — Present perfect', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Present perfect', 'https://dictionary.cambridge.org/grammar/british-grammar/present-perfect-simple-i-have-worked']],
+  src: [['British Council — Present perfect', 'https://learnenglish.britishcouncil.org/grammar/a1-a2-grammar'], ['Cambridge — Present perfect', 'https://dictionary.cambridge.org/grammar/british-grammar/']],
 });
