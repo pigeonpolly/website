@@ -411,7 +411,7 @@
       const right = p[1].split('/')[0], ds = [...new Set(it.sib.filter(x => x.t === 'gap' && !x.p[1].includes(';')).map(x => x.p[1].split('/')[0]))].filter(x => norm(x) !== norm(right));
       if (ds.length >= 2 && Math.random() < .6) return { ...base, t: 'choice', p: [p[0], right, ...shuffle(ds).slice(0, 2)] };
     }
-    if (t === 'choice' && /_{3,}/.test(p[0]) && p[1].split(' ').length <= 3 && Math.random() < .6) return { ...base, t: 'gap', p: [p[0], p[1]] };
+    if (t === 'choice' && (p[0].match(/_{3,}/g) || []).length === 1 && p[1].split(' ').length <= 3 && Math.random() < .6) return { ...base, t: 'gap', p: [p[0], p[1]] };
     if (t === 'tr' && Math.random() < .6) return { ...base, t: 'order', p: [p[1], ...p.slice(2)], hint: 'Соберите перевод: «' + p[0] + '»' };
     if (t === 'fix') {
       const a = p[0].split(/\s+/), b = p[1].split(/\s+/); let i = 0, j = 0;
@@ -551,12 +551,11 @@
 
   // ---------- подсказка к словам текста ----------
   const tip = document.createElement('div'); tip.id = 'tip'; tip.hidden = true; document.body.append(tip);
-  function showTip(el) {
-    const w = el.dataset.w, tr = el.dataset.tr;
-    const p = el.closest('p'); const sent = p ? (p.textContent.split(/(?<=[.!?])\s+/).find(s => s.toLowerCase().includes(el.textContent.toLowerCase())) || '') : '';
-    tip.innerHTML = `<b>${esc(w)}</b>${esc(tr)}<br>${S.v[w.toLowerCase()] ? '<small>уже в словаре ✓</small>' : '<button type="button" data-add>+ в словарь</button>'} ${canSay ? '<button type="button" data-tsay>🔊</button>' : ''}`;
+  function showTip(el, w = el.dataset.w, tr = el.dataset.tr, rect, note) {
+    const p = el.closest ? el.closest('p') : null; const sent = p ? (p.textContent.split(/(?<=[.!?])\s+/).find(s => s.toLowerCase().includes(w.toLowerCase().split(' ')[0])) || '') : '';
+    tip.innerHTML = `<b>${esc(w)}</b>${tr == null ? '<span class="tip-wait">ищу перевод…</span>' : esc(tr)}${note ? `<br><small>${esc(note)}</small>` : ''}<br>${S.v[w.toLowerCase()] ? '<small>уже в словаре ✓</small>' : tr == null ? '' : '<button type="button" data-add>+ в словарь</button>'} ${canSay ? '<button type="button" data-tsay>🔊</button>' : ''}`;
     tip.hidden = false;
-    const r = el.getBoundingClientRect();
+    const r = rect || el.getBoundingClientRect();
     tip.style.left = Math.max(8, Math.min(innerWidth - tip.offsetWidth - 8, r.left)) + 'px';
     tip.style.top = (r.bottom + 6 + tip.offsetHeight > innerHeight ? r.top - tip.offsetHeight - 6 : r.bottom + 6) + 'px';
     tip.onclick = e => {
@@ -564,8 +563,48 @@
       if (e.target.dataset.tsay !== undefined) say(w);
     };
   }
+  // ---------- любое слово текста — по нажатию; несколько слов — выделить ----------
+  const TRC = (() => { try { return JSON.parse(localStorage.getItem('english-tr') || '{}'); } catch (e) { return {}; } })(); // кэш машинных переводов
+  let LEXC = null;
+  async function trWord(w) { // перевод: подсказки и слова учебника (с окончаниями), иначе MyMemory
+    const k = w.toLowerCase().replace(/[’]/g, "'"); LEXC = LEXC || lex();
+    const forms = [k, k.replace(/'s$/, ''), k.replace(/ies$/, 'y'), k.replace(/ied$/, 'y'), k.replace(/(es|s)$/, ''), k.replace(/ed$/, ''), k.replace(/d$/, ''), k.replace(/ing$/, ''), k.replace(/ing$/, 'e'), k.replace(/([bdglmnprt])\1(ed|ing)$/, '$1'), k.replace(/(er|est)$/, ''), k.replace(/ly$/, '')];
+    for (const f of forms) if (LEXC[f]) return { w: f, tr: LEXC[f][0], src: 'учебник' };
+    if (TRC[k]) return { w: k, tr: TRC[k], src: 'машинный перевод' };
+    try {
+      const j = await (await fetch('https://api.mymemory.translated.net/get?langpair=en|ru&q=' + encodeURIComponent(w))).json();
+      const tr = j && j.responseData && j.responseData.translatedText;
+      if (tr && !/MYMEMORY|INVALID|QUERY LENGTH/i.test(tr) && tr.toLowerCase() !== k) { TRC[k] = tr.slice(0, 120); try { localStorage.setItem('english-tr', JSON.stringify(TRC)); } catch (e) { /* нет места */ } return { w: k, tr: TRC[k], src: 'машинный перевод' }; }
+    } catch (e) { /* нет сети */ }
+    return { w: k, tr: '', src: 'перевод не нашёлся' };
+  }
+  async function tapWord(el, text, rect) {
+    showTip(el, text, null, rect);
+    const r = await trWord(text);
+    if (!tip.hidden) showTip(el, r.w.includes(' ') ? text : r.w, r.tr || '—', rect, r.src === 'учебник' ? '' : r.src);
+  }
+  function wrapWords(root) { // каждое слово абзаца — в <span class="w">, кроме уже подсказанных (.gl)
+    for (const p of $$('.reading .txt p', root)) {
+      const tw = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentElement.closest('.gl, .w') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+      const nodes = []; while (tw.nextNode()) nodes.push(tw.currentNode);
+      for (const n of nodes) {
+        if (!/[A-Za-z]/.test(n.nodeValue)) continue;
+        const f = document.createDocumentFragment();
+        n.nodeValue.split(/([A-Za-z]+(?:['’-][A-Za-z]+)*)/).forEach((part, i) => { if (i % 2) { const sp = document.createElement('span'); sp.className = 'w'; sp.textContent = part; f.append(sp); } else if (part) f.append(part); });
+        n.replaceWith(f);
+      }
+    }
+  }
+  const onSel = () => setTimeout(() => { // выделили несколько слов — перевод фразы
+    const sel = getSelection(); if (!sel || sel.isCollapsed) return;
+    const txt = sel.toString().trim().replace(/\s+/g, ' ');
+    if (!txt.includes(' ') || txt.length > 200 || !sel.anchorNode || !sel.anchorNode.parentElement || !sel.anchorNode.parentElement.closest('.reading .txt')) return;
+    tapWord(sel.anchorNode.parentElement, txt, sel.getRangeAt(0).getBoundingClientRect());
+  }, 10);
+  document.addEventListener('mouseup', onSel); document.addEventListener('touchend', () => setTimeout(onSel, 300));
   document.addEventListener('click', e => {
     const g = e.target.closest('.gl'); if (g) { showTip(g); return; }
+    const wd = e.target.closest('.reading .w'); if (wd && getSelection().isCollapsed) { tapWord(wd, wd.textContent); return; }
     if (!e.target.closest('#tip')) tip.hidden = true;
   });
   addEventListener('scroll', () => { tip.hidden = true; }, { passive: true });
@@ -674,7 +713,7 @@
     if (u.read) {
       const r = u.read;
       h += `<section class="sec" id="reading"><h3><span class="ic">📖</span>Чтение</h3>${r.intro ? `<p>${fmt(r.intro)}</p>` : ''}<article class="reading"><h4>${esc(r.title)} ${sayBtn(r.title + '. ' + r.txt.join(' '))}</h4><div class="txt">${r.txt.map(p => `<p>${glossText(p, r.gl)}</p>`).join('')}</div>
-        ${r.gl ? '<p class="note-s">Подчёркнутые слова — нажмите: перевод и «+ в словарь».</p>' : ''}</article>${late(u.id + '-r', 'Задания к тексту', () => blockHTML(u.id + '-r', 'Задания к тексту', r.q, { track: true }))}</section>`;
+        <p class="note-s">Нажмите на любое слово — перевод и «+ в словарь»; выделите несколько слов — переведётся фраза. Подчёркнутые — с готовой подсказкой.</p></article>${late(u.id + '-r', 'Задания к тексту', () => blockHTML(u.id + '-r', 'Задания к тексту', r.q, { track: true }))}</section>`;
     }
     if (bk) h += bookHTML(u, bk, N);
     if (u.series) {
@@ -701,7 +740,7 @@
     h += `<nav class="pager">${prev ? `<a href="#u/${prev.id}"><small>← назад</small>${esc(prev.lvl + ' · ' + prev.t)}</a>` : ''}${next ? `<a class="next" href="#u/${next.id}"><small>${unitOpen(next) ? 'дальше →' : '🔒 дальше — от ' + PASS + ' %'}</small>${esc(next.lvl + ' · ' + next.t)}</a>` : ''}</nav>`;
     view.innerHTML = h;
     for (const s of $$('.write', view)) wInput(s);
-    restoreAns(view);
+    restoreAns(view); wrapWords(view);
   }
   function smallTalkHTML(u) { // смолток с Невермор: ситуация, фразы, лифт с коллегами, задания (+ сказать вслух)
     const st = NOTES[u.id].st, L = LIFT[u.lvl];
@@ -719,7 +758,7 @@
       ${N.ru ? `<div class="box bk-ru"><h4>${['A1', 'A2'].includes(u.lvl) ? 'Сначала по-русски: что будет в отрывке' : 'Перед чтением'}</h4><p>${fmt(N.ru)}</p></div>` : ''}
       <article class="reading book">${bk.h.map(x => `<h4>Chapter ${esc(x)}</h4>`).join('')}<div class="txt">${bk.txt.map((p, j) => { const ps = PICS[k] || []; return ps.filter(x => x.at === j && !x.after).map(x => picHTML(x)).join('') + `<p>${glossText(p, N.gl)}</p>` + ps.filter(x => x.at === j && x.after).map(x => picHTML(x)).join(''); }).join('')}</div>
       <p>${sayBtn(bk.txt.join(' ').replace(/<br>/g, ' ').replace(/&amp;/g, '&').slice(0, 3000))} <span class="note-s">послушать отрывок (начало)</span></p>
-      ${N.gl ? '<p class="note-s">Подчёркнутые слова — нажмите: перевод и «+ в словарь».</p>' : ''}</article>
+      <p class="note-s">Нажмите на любое слово — перевод и «+ в словарь»; выделите несколько слов — переведётся фраза. Подчёркнутые — с готовой подсказкой.</p></article>
       ${N.etb ? `<div class="box etym"><h4>🔎 Слово из Кэрролла</h4><p>${fmt(N.etb)}</p></div>` : ''}
       ${bookGroups(u).length ? late(u.id + '-b', 'Задания к книге', () => blockHTML(u.id + '-b', 'Задания к книге', bookGroups(u), { track: true })) : ''}</section>`;
   }
