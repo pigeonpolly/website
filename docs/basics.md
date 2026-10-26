@@ -17,6 +17,7 @@
 - **Новый английский текст — в оба словаря.** Проекты: `content/i18n/projects.ru.json`, `projects.lv.json` (без пунктов).
 - Подписи работ, названия проектов/книг не переводятся.
 - Тексты в RU пишутся без рода («У @ник новый рисунок»). Если нужен глагол — «птичка @ник» (женский род).
+- Выбор языка запоминается: клик по переключателю пишет `localStorage.pp_lang`; скрипт в `<head>` (src/layout.html) на следующих заходах уводит на ту же страницу в этом языке по `<link rel="alternate" hreflang>`. Без сохранённого выбора запоминается язык первой открытой страницы.
 
 ## Картинки
 - Алина грузит через GitHub (Upload files) в корень: `polly_`, `chew_`, `titos_`, `pumpkin_`, `anxiety_`, `sketchbook_`, `aiart_`, `exhibition_`, `publication_`, подпись в имени (`polly_(2026) Pigeon Polly Fancy Life.jpg`) → `python3 tools/import_uploads.py` (ужимает, раскладывает, удаляет исходники) → `python3 build.py`.
