@@ -8,7 +8,7 @@ export const ENGLISH_TABLES = [
   'CREATE TABLE IF NOT EXISTS english_progress (user_id INTEGER PRIMARY KEY, state TEXT, updated_at INTEGER)',
   'CREATE TABLE IF NOT EXISTS english_access (user_id INTEGER PRIMARY KEY, added_at INTEGER)', // кому Алина открыла учебник (панель «Доступ» на главной учебника)
 ];
-const MAX = 400000, PARTS = ['d', 'w', 'v', 'a', 'days', 'c', 'last', 'k', 'm', 'x', 't', 'rv', 'pd', 'name', 'theme']; // MAX — символов JSON; PARTS — разделы состояния (content/english/engine.js)
+const MAX = 400000, PARTS = ['d', 'w', 'v', 'a', 'days', 'c', 'last', 'k', 'm', 'x', 't', 'rv', 'pd', 'name', 'theme', 'n']; // MAX — символов JSON; PARTS — разделы состояния (content/english/engine.js)
 
 // h: isAdmin, adminIdentity
 export async function englishOk(u, env, h) {

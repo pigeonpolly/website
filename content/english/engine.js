@@ -68,7 +68,7 @@
   // k — открыто паролем админа {id урока или блока: время}; m — ошибки {id урока или t:тип: [неверно, всего]}; x — задания с ошибками {ref: вес}; t — время сохранения
   // rv — когда прогресс сбрасывали (кнопка «Сбросить учебник» или RESET_AT ниже): состояние со старым rv при слиянии отбрасывается целиком
   const RESET_AT = 1793007114497; // 26.10.2026: учебник обновлён (замки, книга, ворона, смолток) — прогресс с нуля; новое значение = ещё один сброс у всех
-  const fresh = rv => ({ d: {}, w: {}, v: {}, a: {}, days: [], pd: [], c: {}, last: '', k: {}, m: {}, x: {}, t: 0, rv }); // pd — дни, когда хоть одно задание пройдено от PASS %
+  const fresh = rv => ({ d: {}, w: {}, v: {}, a: {}, days: [], pd: [], c: {}, n: {}, last: '', k: {}, m: {}, x: {}, t: 0, rv }); // n — неудачных попыток подряд по блокам // pd — дни, когда хоть одно задание пройдено от PASS %
   let S = fresh(RESET_AT);
   try { const loc = JSON.parse(localStorage.getItem(LS) || '{}') || {}; if ((loc.rv || 0) >= RESET_AT) Object.assign(S, loc); } catch (e) { /* пусто */ } // старое состояние без метки сброса не берём
   applyName(S.name);
@@ -98,6 +98,7 @@
     m.k = { ...(b.k || {}), ...(a.k || {}) };
     m.name = a.name || b.name;
     m.theme = a.theme !== undefined ? a.theme : b.theme;
+    m.n = (a.t || 0) >= (b.t || 0) ? (a.n || {}) : (b.n || {});
     m.m = { ...(b.m || {}) }; for (const [k, v] of Object.entries(a.m || {})) m.m[k] = m.m[k] && m.m[k][1] > v[1] ? m.m[k] : v;
     m.x = (a.t || 0) >= (b.t || 0) ? (a.x || {}) : (b.x || {}); // отработанные ошибки удаляются — берём более свежий список
     return m;
@@ -351,6 +352,7 @@
     const r = $('.res', sec); r.textContent = pct + ' %' + (pct < PASS && blocksOf(byId(view.dataset.unit) || {}).includes(sec.dataset.b) ? ` · для следующего задания нужно ${PASS} %` : ''); r.className = 'res ' + (pct >= PASS ? 'good' : pct < 60 ? 'low' : '');
     const id = sec.dataset.b, was = reach();
     if (pct > (S.d[id] ?? -1)) S.d[id] = pct;
+    if (pct < PASS) S.n[id] = (S.n[id] || 0) + 1; else delete S.n[id]; // неудачные попытки подряд
     if (pct >= PASS && !(S.pd || []).includes(today())) S.pd = [...(S.pd || []), today()].slice(-400);
     const b = $('.best', sec); b.textContent = 'лучший результат: ' + S.d[id] + ' %'; b.classList.toggle('full', S.d[id] === 100);
     let cf = $('.crow-fb', sec); if (!cf) { cf = document.createElement('div'); cf.className = 'crow-fb'; $('footer', sec).after(cf); }
@@ -414,6 +416,7 @@
   function check(sec) {
     const items = BLOCKS[sec.dataset.b]; if (!items) return;
     for (const li of $$('ol > li', sec)) {
+      if (li.dataset.keep) continue; // верный ответ сохранён после 3 неудачных попыток — не проверяем заново
       const it = items[+li.dataset.n]; const r = itemOK(it, li);
       li.classList.toggle('ok', r.ok); li.classList.toggle('no', !r.ok);
       if (r.ok && it.t === 'order') S.c.built = (S.c.built || 0) + 1;
@@ -434,8 +437,12 @@
   function again(sec) {
     const id = sec.dataset.b, items = BLOCKS[id];
     const lis = $$('ol > li', sec);
-    for (const li of lis) { const n = +li.dataset.n; const tmp = document.createElement('div'); tmp.innerHTML = itemHTML(items[n], n); li.replaceWith(tmp.firstElementChild); }
-    $('.res', sec).textContent = ''; const cf = $('.crow-fb', sec); if (cf) cf.remove(); $('[data-act=check]', sec).hidden = false; $('[data-act=again]', sec).hidden = true;
+    const keep = (S.n[id] || 0) >= 3; // с 3-й попытки ниже PASS верные ответы остаются, решать заново — только ошибки
+    for (const li of lis) {
+      if (keep && li.classList.contains('ok')) { li.dataset.keep = 1; continue; }
+      const n = +li.dataset.n; const tmp = document.createElement('div'); tmp.innerHTML = itemHTML(items[n], n); li.replaceWith(tmp.firstElementChild);
+    }
+    $('.res', sec).textContent = keep ? 'Верные ответы сохранены — исправьте только ошибки.' : ''; const cf = $('.crow-fb', sec); if (cf) cf.remove(); $('[data-act=check]', sec).hidden = false; $('[data-act=again]', sec).hidden = true;
   }
 
   // ---------- озвучка ----------
