@@ -176,7 +176,7 @@ const ALLOWED = { p: ['style'], h2: ['style'], h3: ['style'], b: [], strong: [],
 const safeStyle = v => String(v || '').split(';').map(x => x.trim()).filter(x => /^(color|background-color)\s*:\s*(#[0-9a-f]{3,8}|rgba?\([\d\s.,%]+\)|transparent)$/i.test(x) || /^text-align\s*:\s*(left|center|right)$/i.test(x)).join('; ');
 const DROP = new Set(['script', 'style', 'iframe', 'object', 'embed', 'form', 'input', 'button', 'textarea', 'select', 'meta', 'link', 'svg', 'math', 'template', 'noscript']);
 const safeUrl = u => /^(https?:\/\/|\/(?!\/)|mailto:)/i.test(String(u).trim());
-async function cleanHtml(html) {
+export async function cleanHtml(html) {
   const out = await new HTMLRewriter().on('*', {
     element(e) {
       let tag = e.tagName.toLowerCase();
@@ -209,7 +209,7 @@ async function cleanHtml(html) {
   return out.replace(/^<body>|<\/body>$/g, '').replace(/<p>(\s|<br>|&nbsp;)*<\/p>/g, '').replace(/<figcaption>(\s|<br>|&nbsp;)*<\/figcaption>/g, '').trim();
 }
 
-const slugify = s => String(s || '').toLowerCase()
+export const slugify = s => String(s || '').toLowerCase()
   .replace(/[а-яё]/g, c => ({ а: 'a', б: 'b', в: 'v', г: 'g', д: 'd', е: 'e', ё: 'e', ж: 'zh', з: 'z', и: 'i', й: 'y', к: 'k', л: 'l', м: 'm', н: 'n', о: 'o', п: 'p', р: 'r', с: 's', т: 't', у: 'u', ф: 'f', х: 'h', ц: 'ts', ч: 'ch', ш: 'sh', щ: 'sch', ъ: '', ы: 'y', ь: '', э: 'e', ю: 'yu', я: 'ya' }[c]))
   .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 70);
 
