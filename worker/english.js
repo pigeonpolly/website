@@ -7,7 +7,7 @@ export const ENGLISH_NICKS = [];
 export const ENGLISH_TABLES = [
   'CREATE TABLE IF NOT EXISTS english_progress (user_id INTEGER PRIMARY KEY, state TEXT, updated_at INTEGER)',
 ];
-const MAX = 400000, PARTS = ['d', 'w', 'v', 'a', 'days', 'c', 'last']; // MAX — символов JSON; PARTS — разделы состояния (content/english/engine.js)
+const MAX = 400000, PARTS = ['d', 'w', 'v', 'a', 'days', 'c', 'last', 'k', 'm', 'x', 't', 'rv', 'pd']; // MAX — символов JSON; PARTS — разделы состояния (content/english/engine.js)
 
 // h: isAdmin, adminIdentity
 export async function englishOk(u, env, h) {
