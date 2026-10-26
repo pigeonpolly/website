@@ -405,24 +405,30 @@
   }
   function itemByRef(ref) { const [bid, n] = ref.split('#'); const its = itemsOf(bid); return its[+n] ? { ...its[+n], ref, sib: its } : null; }
   const pick = a => a[Math.floor(Math.random() * a.length)];
+  function clue(w) { // подсказка к пропуску, собранному на лету: перевод (если есть в учебнике) и буквы вперемешку
+    LEXC = LEXC || lex(); const tr = (LEXC[w.toLowerCase()] || [])[0];
+    let mix = w; if (w.length >= 3) for (let i = 0; i < 9 && mix === w; i++) mix = shuffle([...w.toLowerCase()]).join('');
+    return ` <small class="clue">(${esc(tr ? tr + ' · ' : '')}${w.length >= 3 ? esc([...mix].join('·')) : w.length + ' буквы, на «' + esc(w[0].toLowerCase()) + '»'})</small>`;
+  }
+  const withClue = (txt, w) => txt.replace(/_{3,}/, m => m + clue(w));
   function variant(it) { // то же правило в другой форме: пропуск ↔ выбор, перевод → конструктор, ошибка → пропуск в нужном месте
     const { t, p } = it, base = { ref: it.ref, why: it.why, hint: '' };
     if (t === 'gap' && !p[1].includes(';')) {
       const right = p[1].split('/')[0], ds = [...new Set(it.sib.filter(x => x.t === 'gap' && !x.p[1].includes(';')).map(x => x.p[1].split('/')[0]))].filter(x => norm(x) !== norm(right));
       if (ds.length >= 2 && Math.random() < .6) return { ...base, t: 'choice', p: [p[0], right, ...shuffle(ds).slice(0, 2)] };
     }
-    if (t === 'choice' && (p[0].match(/_{3,}/g) || []).length === 1 && p[1].split(' ').length <= 3 && Math.random() < .6) return { ...base, t: 'gap', p: [p[0], p[1]] };
+    if (t === 'choice' && (p[0].match(/_{3,}/g) || []).length === 1 && p[1].split(' ').length <= 3 && Math.random() < .6) return { ...base, t: 'gap', p: [withClue(p[0], p[1]), p[1]] };
     if (t === 'tr' && Math.random() < .6) return { ...base, t: 'order', p: [p[1], ...p.slice(2)], hint: 'Соберите перевод: «' + p[0] + '»' };
     if (t === 'fix') {
       const a = p[0].split(/\s+/), b = p[1].split(/\s+/); let i = 0, j = 0;
       while (i < a.length && i < b.length && norm(a[i]) === norm(b[i])) i++;
       while (j < a.length - i && j < b.length - i && norm(a[a.length - 1 - j]) === norm(b[b.length - 1 - j])) j++;
       const mid = b.slice(i, b.length - j);
-      if (mid.length >= 1 && mid.length <= 3) return { ...base, t: 'gap', p: [[...b.slice(0, i), '___', ...b.slice(b.length - j)].join(' '), mid.join(' ')], why: (it.why ? it.why + ' ' : '') + `(Было с ошибкой: «${a.slice(i, a.length - j).join(' ') || '—'}».)` };
+      if (mid.length >= 1 && mid.length <= 3) return { ...base, t: 'gap', p: [`Исправьте ошибку в «${p[0]}»: ` + [...b.slice(0, i), '___', ...b.slice(b.length - j)].join(' '), mid.join(' ')] };
     }
     if (t === 'order' && Math.random() < .5) {
       const ws = p[0].replace(/[.!?]+$/, '').split(/\s+/), cand = ws.map((w, k) => [w, k]).filter(([w, k]) => k > 0 && /^[a-z']{4,}$/i.test(w));
-      if (cand.length) { const [w, k] = pick(cand); ws[k] = '___'; return { ...base, t: 'gap', p: [ws.join(' ') + (p[0].match(/[.!?]+$/) || ['.'])[0], w] }; }
+      if (cand.length) { const [w, k] = pick(cand); ws[k] = '___' + clue(w); return { ...base, t: 'gap', p: [ws.join(' ') + (p[0].match(/[.!?]+$/) || ['.'])[0], w] }; }
     }
     return { ...base, t, p: p.slice() };
   }
