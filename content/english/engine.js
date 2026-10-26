@@ -193,7 +193,7 @@
     }
     BLOCKS[id] = items;
     const best = S.d[id];
-    const one = groups.length === 1 && !groups[0].h ? `<p class="how">${HOW[groups[0].t]}</p>` : '';
+    const one = groups.length === 1 && !groups[0].h ? `<p class="how">${groups[0].how || HOW[groups[0].t]}</p>` : '';
     return `<section class="exb" data-b="${id}"><header><b>${esc(title || (groups.length === 1 ? NAMES_T[groups[0].t] : 'Упражнение'))}</b><span class="best${best === 100 ? ' full' : ''}">${best != null ? 'лучший результат: ' + best + ' %' : ''}</span></header>
       ${one}${html}<footer><button type="button" class="btn primary" data-act="check">Проверить</button><button type="button" class="btn" data-act="again" hidden>Ещё раз</button><span class="res"></span>${opts.foot || ''}</footer></section>`;
   }
@@ -320,7 +320,7 @@
     if (u.words) h += `<section class="sec" id="words"><h3><span class="ic">📒</span>Слова урока</h3><p class="note-s">Слово запоминается, когда его используешь: добавьте слова в словарь, потом тренируйте их и пишите с ними свои предложения.</p>
       <ul class="words">${u.words.map(([w, tr, s]) => `<li><span><span class="w">${esc(w)}</span> <span class="tr">— ${esc(tr)}</span></span><span class="acts">${sayBtn(w)}${S.v[w.toLowerCase()] ? '<span class="in-dict">в словаре ✓</span>' : `<button type="button" class="btn small" data-addw="${esc(w)}">+</button>`}</span>${s ? `<span class="s">${esc(s)}</span>` : ''}</li>`).join('')}</ul>
       <button type="button" class="btn" data-addall>+ Все слова урока в словарь</button></section>`;
-    if (u.ex) h += `<section class="sec" id="practice"><h3><span class="ic">✏️</span>Упражнения</h3>${u.ex.map((e, k) => blockHTML(`${u.id}-e${k}`, `Упражнение ${k + 1}. ${e.h || NAMES_T[e.t]}`, [{ t: e.t, q: e.q, hint: e.hint }])).join('')}</section>`;
+    if (u.ex) h += `<section class="sec" id="practice"><h3><span class="ic">✏️</span>Упражнения</h3>${u.ex.map((e, k) => blockHTML(`${u.id}-e${k}`, `Упражнение ${k + 1}. ${e.h || NAMES_T[e.t]}`, [{ t: e.t, q: e.q, hint: e.hint, how: e.how }])).join('')}</section>`;
     if (u.read) {
       const r = u.read;
       h += `<section class="sec" id="reading"><h3><span class="ic">📖</span>Чтение</h3>${r.intro ? `<p>${fmt(r.intro)}</p>` : ''}<article class="reading"><h4>${esc(r.title)} ${sayBtn(r.title + '. ' + r.txt.join(' '))}</h4><div class="txt">${r.txt.map(p => `<p>${glossText(p, r.gl)}</p>`).join('')}</div>
