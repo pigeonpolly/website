@@ -14,7 +14,10 @@ U({
   <li><b>В предложении всегда есть глагол.</b> «Я дома» → <i>I <b>am</b> at home</i>. «Она врач» → <i>She <b>is</b> a doctor</i>. Там, где по-русски ничего нет, по-английски стоит <i>am / is / are</i> (следующий урок).</li>
   <li><b>Наречие места — перед наречием времени.</b> <i>I work <u>in Riga</u> <u>every day</u>.</i> Время можно вынести и в начало: <i>Every day I work in Riga.</i></li></ol>
   <h4>Где стоят «часто», «всегда», «никогда»</h4>
-  <p>Слова частоты (<i>always, usually, often, sometimes, never</i>) стоят <b>перед смысловым глаголом</b>, но <b>после</b> <i>am/is/are</i>: <i>I <b>often</b> drink tea.</i> — <i>I am <b>often</b> tired.</i></p>`,
+  <p>Слова частоты (<i>always, usually, often, sometimes, never</i>) стоят <b>перед смысловым глаголом</b>, но <b>после</b> <i>am/is/are</i>: <i>I <b>often</b> drink tea.</i> — <i>I am <b>often</b> tired.</i></p>
+  <h4>Почему <i>love</i>, но <i>eats</i>?</h4>
+  <p>Глагол подстраивается под «кто». Если «кто» — <b>он, она, оно</b> (<i>he, she, it</i>, или одно существо: <i>my mum, the cat, Alina</i>), к глаголу добавляется <b>-s</b>: <i>She eat<b>s</b> fish. The cat like<b>s</b> milk.</i> Со всеми остальными (<i>I, you, we, they</i> и «много кого»: <i>the children</i>) — без -s: <i>They love cake. The children love their teacher.</i></p>
+  <p>Подвох: <i>The children love their teacher</i> — любят дети, их много, поэтому <i>love</i>. А если перевернуть — <i>The teacher love<b>s</b> the children</i> — учитель один, и нужно уже <i>loves</i>. Подробно — в уроке A1.3 «Present Simple».</p>`,
   simple: 'сначала «кто», сразу за ним «делает», потом всё остальное. Нет «кто» — ставим it. Нет глагола — ставим am/is/are.',
   exm: [['I love you.', 'Я тебя люблю. (не «I you love»)'], ['It is cold today.', 'Сегодня холодно.'], ['We usually have lunch at one.', 'Мы обычно обедаем в час.'], ['My brother plays football in the park on Saturdays.', 'Мой брат играет в футбол в парке по субботам.']],
   conf: [['*I like it* / *I it like*', 'Объект всегда <b>после</b> глагола: <i>I like it</i>, <i>She knows him</i>. По-русски «я его знаю», по-английски только <i>I know him</i>.', 'По-английски «Я его знаю» — это …|I know him.|I him know.|Him I know. # Объект после глагола.'],
