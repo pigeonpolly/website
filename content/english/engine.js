@@ -68,7 +68,7 @@
   // k — открыто паролем админа {id урока или блока: время}; m — ошибки {id урока или t:тип: [неверно, всего]}; x — задания с ошибками {ref: вес}; t — время сохранения
   // rv — когда прогресс сбрасывали (кнопка «Сбросить учебник» или RESET_AT ниже): состояние со старым rv при слиянии отбрасывается целиком
   const RESET_AT = 1793007114497; // 26.10.2026: учебник обновлён (замки, книга, ворона, смолток) — прогресс с нуля; новое значение = ещё один сброс у всех
-  const fresh = rv => ({ d: {}, w: {}, v: {}, a: {}, days: [], pd: [], c: {}, n: {}, last: '', k: {}, m: {}, x: {}, t: 0, rv }); // n — неудачных попыток подряд по блокам // pd — дни, когда хоть одно задание пройдено от PASS %
+  const fresh = rv => ({ d: {}, w: {}, v: {}, a: {}, days: [], pd: [], c: {}, n: {}, ans: {}, last: '', k: {}, m: {}, x: {}, t: 0, rv }); // n — неудачных попыток подряд по блокам // pd — дни, когда хоть одно задание пройдено от PASS %
   let S = fresh(RESET_AT);
   try { const loc = JSON.parse(localStorage.getItem(LS) || '{}') || {}; if ((loc.rv || 0) >= RESET_AT) Object.assign(S, loc); } catch (e) { /* пусто */ } // старое состояние без метки сброса не берём
   applyName(S.name);
@@ -99,6 +99,7 @@
     m.name = a.name || b.name;
     m.theme = a.theme !== undefined ? a.theme : b.theme;
     m.n = (a.t || 0) >= (b.t || 0) ? (a.n || {}) : (b.n || {});
+    m.ans = (a.t || 0) >= (b.t || 0) ? (a.ans || {}) : (b.ans || {}); // свои ответы — из более свежего состояния
     m.m = { ...(b.m || {}) }; for (const [k, v] of Object.entries(a.m || {})) m.m[k] = m.m[k] && m.m[k][1] > v[1] ? m.m[k] : v;
     m.x = (a.t || 0) >= (b.t || 0) ? (a.x || {}) : (b.x || {}); // отработанные ошибки удаляются — берём более свежий список
     return m;
@@ -317,7 +318,7 @@
     const one = groups.length === 1 && !groups[0].h ? `<p class="how">${groups[0].how || HOW[groups[0].t]}</p>` : '';
     const fold = best >= PASS; // пройденное — свёрнуто, разворачивается по нажатию на заголовок (foldable — можно свернуть обратно)
     return `<section class="exb${fold ? ' fold foldable' : ''}" data-b="${id}"><header data-fold title="Свернуть / развернуть"><b>${esc(title || (groups.length === 1 ? NAMES_T[groups[0].t] : 'Упражнение'))}</b><span class="best${best === 100 ? ' full' : ''}">${best != null ? (best >= PASS ? '✓ ' : '') + 'лучший результат: ' + best + ' %' : ''}</span><span class="fold-t" aria-hidden="true"></span></header>
-      ${one}${html}<footer><button type="button" class="btn primary" data-act="check">Проверить</button><button type="button" class="btn" data-act="again" hidden>Ещё раз</button><span class="res"></span>${opts.foot || ''}<button type="button" class="btn small fold-b" data-act="fold"${fold ? '' : ' hidden'}>Свернуть ✓</button></footer></section>`;
+      ${one}${html}<footer><button type="button" class="btn primary" data-act="check">Проверить</button><button type="button" class="btn" data-act="again" hidden>Очистить</button><span class="res"></span>${opts.foot || ''}<button type="button" class="btn small fold-b" data-act="fold"${fold ? '' : ' hidden'}>Свернуть ✓</button></footer></section>`;
   }
   const BLOCKS = {};
   function itemOK(it, li) {
@@ -415,15 +416,17 @@
     return out;
   }
   function grouped(items) { const gs = []; for (const it of items) { const g = gs[gs.length - 1]; if (g && g.t === it.t) g.q.push(it); else gs.push({ t: it.t, h: HOW[it.t], q: [it] }); } return gs; }
-  function check(sec) {
+  function check(sec, silent) { // silent — показать сохранённые ответы с проверкой, ничего не засчитывая
     const items = BLOCKS[sec.dataset.b]; if (!items) return;
+    const saved = silent ? (S.ans[sec.dataset.b] || {}) : null;
     for (const li of $$('ol > li', sec)) {
       if (li.dataset.keep) continue; // верный ответ сохранён после 3 неудачных попыток — не проверяем заново
       const it = items[+li.dataset.n]; const r = itemOK(it, li);
+      if (silent && (saved[ikey(it)] || {}).s) r.ok = true; // «Мой вариант тоже верен»
       li.classList.toggle('ok', r.ok); li.classList.toggle('no', !r.ok);
-      if (r.ok && it.t === 'order') S.c.built = (S.c.built || 0) + 1;
-      if (it.ref) mark(it, r.ok);
-      if (r.ok && it.t === 'mk') mkCredit(it, r.text);
+      if (!silent && r.ok && it.t === 'order') S.c.built = (S.c.built || 0) + 1;
+      if (!silent && it.ref) mark(it, r.ok);
+      if (!silent && r.ok && it.t === 'mk') mkCredit(it, r.text);
       let fb = $('.fb', li); if (!fb) { fb = document.createElement('p'); fb.className = 'fb'; li.append(fb); }
       fb.innerHTML = (r.mk ? (r.ok ? '<b class="ok">✓ Принято.</b> ' : `<b class="no">Почти:</b> ${r.mk.join('; ')}. `) + (r.right ? `Пример: <i class="en">${esc(r.right)}</i> ` : '')
         : r.ok ? '<b class="ok">✓ Верно.</b> ' : `<b class="no">✗</b> ${r.noShow ? '' : 'Правильно: '}<span class="ans">${r.noShow ? '' : fmt(r.right)}</span> `)
@@ -434,9 +437,42 @@
       for (const b of $$('.tok', li)) b.disabled = true;
     }
     $('[data-act=check]', sec).hidden = true; $('[data-act=again]', sec).hidden = false;
+    if (silent) { const r = $('.res', sec), pct = score(sec); r.textContent = pct + ' %'; r.className = 'res ' + (pct >= PASS ? 'good' : pct < 60 ? 'low' : ''); return; }
+    storeAns(sec);
     setResult(sec, score(sec));
   }
-  function again(sec) {
+  // ---------- ответы сохраняются (S.ans[блок][задание]) — видно свои ошибки, пока не нажать «Очистить» ----------
+  const NOSAVE = /^(lt-|fx-|conf-q|irr-q)|-(l|p)$/; // наборы, которые каждый раз собираются заново
+  const ikey = it => it.t + '|' + String(it.p[0] || '').slice(0, 80);
+  function ansOf(it, li) {
+    if (it.t === 'gap') return $$('input.gap', li).map(x => x.value.slice(0, 120));
+    if (['choice', 'tf', 'lc'].includes(it.t)) return ($('input:checked', li) || {}).value || '';
+    if (it.t === 'order') return $$('.built .tok', li).map(b => b.textContent);
+    if (it.t === 'mk') return $('textarea', li).value.slice(0, 600);
+    return ($('input.line', li) || {}).value || '';
+  }
+  function putAns(it, li, v) {
+    if (it.t === 'gap') $$('input.gap', li).forEach((x, i) => { x.value = (v || [])[i] || ''; });
+    else if (['choice', 'tf', 'lc'].includes(it.t)) { const r = $$('input[type=radio]', li).find(x => x.value === v); if (r) r.checked = true; }
+    else if (it.t === 'order') { const built = $('.built', li); for (const w of v || []) { const t = $$('.pool .tok', li).find(x => x.textContent === w); if (t) built.append(t); } }
+    else if (it.t === 'mk') $('textarea', li).value = v || '';
+    else if ($('input.line', li)) $('input.line', li).value = v || '';
+  }
+  function storeAns(sec) {
+    const id = sec.dataset.b; if (NOSAVE.test(id)) return;
+    const items = BLOCKS[id], o = {};
+    for (const li of $$('ol > li', sec)) { const it = items[+li.dataset.n]; o[ikey(it)] = { v: ansOf(it, li), s: li.querySelector('b.ok.selfok') ? 1 : 0 }; }
+    S.ans[id] = o;
+  }
+  function restoreAns(root) { // после отрисовки: свои ответы на место и проверка без засчитывания
+    for (const sec of $$('.exb[data-b]', root)) {
+      const id = sec.dataset.b, o = S.ans[id], items = BLOCKS[id]; if (!o || !items || NOSAVE.test(id)) continue;
+      const lis = $$('ol > li', sec); let all = true;
+      for (const li of lis) { const it = items[+li.dataset.n], a = o[ikey(it)]; if (a) putAns(it, li, a.v); else all = false; }
+      if (all) check(sec, true);
+    }
+  }
+  function again(sec) { // «Очистить»: стереть ответы (после 3 неудачных попыток — только ошибки)
     const id = sec.dataset.b, items = BLOCKS[id];
     const lis = $$('ol > li', sec);
     const keep = (S.n[id] || 0) >= 3; // с 3-й попытки ниже PASS верные ответы остаются, решать заново — только ошибки
@@ -444,6 +480,9 @@
       if (keep && li.classList.contains('ok')) { li.dataset.keep = 1; continue; }
       const n = +li.dataset.n; const tmp = document.createElement('div'); tmp.innerHTML = itemHTML(items[n], n); li.replaceWith(tmp.firstElementChild);
     }
+    if (keep) storeAns(sec); else delete S.ans[id];
+    if (keep) for (const li of $$('ol > li:not([data-keep])', sec)) { const it = items[+li.dataset.n]; delete (S.ans[id] || {})[ikey(it)]; }
+    save();
     $('.res', sec).textContent = keep ? 'Верные ответы сохранены — исправьте только ошибки.' : ''; const cf = $('.crow-fb', sec); if (cf) cf.remove(); $('[data-act=check]', sec).hidden = false; $('[data-act=again]', sec).hidden = true;
   }
 
@@ -576,7 +615,7 @@
   function openLive() {
     for (const el of $$('[data-lock]', view)) if (blockOpen(el.dataset.lock) && LATE[el.dataset.lock]) {
       const tmp = document.createElement('div'); tmp.innerHTML = LATE[el.dataset.lock](); const n = tmp.firstElementChild; el.replaceWith(n);
-      if (n.matches('.write')) wInput(n);
+      if (n.matches('.write')) wInput(n); else restoreAns(n.parentNode);
     }
   }
   function lockedUnit(u) {
@@ -639,6 +678,7 @@
     h += `<nav class="pager">${prev ? `<a href="#u/${prev.id}"><small>← назад</small>${esc(prev.lvl + ' · ' + prev.t)}</a>` : ''}${next ? `<a class="next" href="#u/${next.id}"><small>${unitOpen(next) ? 'дальше →' : '🔒 дальше — от ' + PASS + ' %'}</small>${esc(next.lvl + ' · ' + next.t)}</a>` : ''}</nav>`;
     view.innerHTML = h;
     for (const s of $$('.write', view)) wInput(s);
+    restoreAns(view);
   }
   function smallTalkHTML(u) { // смолток с Невермор: ситуация, фразы, лифт с коллегами, задания (+ сказать вслух)
     const st = NOTES[u.id].st, L = LIFT[u.lvl];
@@ -1027,7 +1067,7 @@
       if (act.dataset.act === 'check') check(sec);
       else if (act.dataset.act === 'again') again(sec);
       else if (act.dataset.act === 'fold') { sec.classList.add('fold'); sec.scrollIntoView({ block: 'nearest' }); }
-      else if (act.dataset.act === 'self') { const li = act.closest('li'), it = (BLOCKS[sec.dataset.b] || [])[+li.dataset.n]; if (it && it.t === 'mk') mkCredit(it, $('textarea', li).value.trim()); if (it && it.ref && S.x[it.ref]) mark(it, true); li.classList.remove('no'); li.classList.add('ok'); act.replaceWith(Object.assign(document.createElement('b'), { className: 'ok', textContent: ' ✓ засчитано' })); setResult(sec, score(sec)); }
+      else if (act.dataset.act === 'self') { const li = act.closest('li'), it = (BLOCKS[sec.dataset.b] || [])[+li.dataset.n]; if (it && it.t === 'mk') mkCredit(it, $('textarea', li).value.trim()); if (it && it.ref && S.x[it.ref]) mark(it, true); li.classList.remove('no'); li.classList.add('ok'); act.replaceWith(Object.assign(document.createElement('b'), { className: 'ok selfok', textContent: ' ✓ засчитано' })); storeAns(sec); setResult(sec, score(sec)); }
       return;
     }
     const tok = t.closest('.tok');
