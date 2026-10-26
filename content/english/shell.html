@@ -296,6 +296,17 @@ figure.tenniel figcaption { font: 400 13.5px/1.45 var(--f-ui); color: var(--mute
 figure.tenniel.small { max-width: 220px; margin: 4px auto 12px; } figure.tenniel.small figcaption { display: none; }
 figure.tenniel.side { float: right; max-width: 120px; margin: 0 0 8px 12px; } figure.tenniel.side figcaption { display: none; }
 .uhead-pic { display: block; text-decoration: none; }
+.exb > header[data-fold] { cursor: default; }
+.exb.fold > header, .exb.foldable > header, .write.fold > h3 { cursor: pointer; }
+.exb.fold > :not(header) { display: none; }
+.exb.fold { padding-bottom: 6px; background: var(--paper-2); border-style: dashed; }
+.exb.fold > header { margin-bottom: 4px; }
+.exb.fold > header .best { color: var(--ok); font-weight: 600; }
+.exb .fold-t::after, .write .fold-t::after { font: 500 13px var(--f-ui); color: var(--accent); }
+.exb.fold .fold-t::after, .write.fold .fold-t::after { content: 'развернуть ▾'; }
+.exb.foldable:not(.fold) .fold-t::after { content: 'свернуть ▴'; }
+.write .wdone { display: none; } .write.fold .wdone { display: block; }
+.write.fold > :not(h3):not(.wdone) { display: none; }
 .box.fixbox h4 { color: var(--warm); } .box.fixbox p { margin: 4px 0; }
 .reading.book .txt p { text-indent: 1.2em; }
 .booktoc li { margin: 6px 0; font-family: var(--f-ui); } .booktoc li.done a { color: var(--ok); }

@@ -315,8 +315,9 @@
     BLOCKS[id] = items;
     const best = S.d[id];
     const one = groups.length === 1 && !groups[0].h ? `<p class="how">${groups[0].how || HOW[groups[0].t]}</p>` : '';
-    return `<section class="exb" data-b="${id}"><header><b>${esc(title || (groups.length === 1 ? NAMES_T[groups[0].t] : 'Упражнение'))}</b><span class="best${best === 100 ? ' full' : ''}">${best != null ? 'лучший результат: ' + best + ' %' : ''}</span></header>
-      ${one}${html}<footer><button type="button" class="btn primary" data-act="check">Проверить</button><button type="button" class="btn" data-act="again" hidden>Ещё раз</button><span class="res"></span>${opts.foot || ''}</footer></section>`;
+    const fold = best >= PASS; // пройденное — свёрнуто, разворачивается по нажатию на заголовок (foldable — можно свернуть обратно)
+    return `<section class="exb${fold ? ' fold foldable' : ''}" data-b="${id}"><header data-fold title="Свернуть / развернуть"><b>${esc(title || (groups.length === 1 ? NAMES_T[groups[0].t] : 'Упражнение'))}</b><span class="best${best === 100 ? ' full' : ''}">${best != null ? (best >= PASS ? '✓ ' : '') + 'лучший результат: ' + best + ' %' : ''}</span><span class="fold-t" aria-hidden="true"></span></header>
+      ${one}${html}<footer><button type="button" class="btn primary" data-act="check">Проверить</button><button type="button" class="btn" data-act="again" hidden>Ещё раз</button><span class="res"></span>${opts.foot || ''}<button type="button" class="btn small fold-b" data-act="fold"${fold ? '' : ' hidden'}>Свернуть ✓</button></footer></section>`;
   }
   const BLOCKS = {};
   function itemOK(it, li) {
@@ -352,6 +353,7 @@
     const r = $('.res', sec); r.textContent = pct + ' %' + (pct < PASS && blocksOf(byId(view.dataset.unit) || {}).includes(sec.dataset.b) ? ` · для следующего задания нужно ${PASS} %` : ''); r.className = 'res ' + (pct >= PASS ? 'good' : pct < 60 ? 'low' : '');
     const id = sec.dataset.b, was = reach();
     if (pct > (S.d[id] ?? -1)) S.d[id] = pct;
+    if (S.d[id] >= PASS) { $('[data-act=fold]', sec).hidden = false; sec.classList.add('foldable'); }
     if (pct < PASS) S.n[id] = (S.n[id] || 0) + 1; else delete S.n[id]; // неудачные попытки подряд
     if (pct >= PASS && !(S.pd || []).includes(today())) S.pd = [...(S.pd || []), today()].slice(-400);
     const b = $('.best', sec); b.textContent = 'лучший результат: ' + S.d[id] + ' %'; b.classList.toggle('full', S.d[id] === 100);
@@ -620,7 +622,7 @@
     if (prev) h += `<section class="sec" id="review"><h3><span class="ic">🔄</span>Повторение пройденного</h3>${crow(crowPick('rev'), 'small')}<p class="note-s">Слова и правила из прошлых уроков, коротко. Каждый раз набор новый — сначала то, что вспоминается хуже.</p>${late(u.id + '-p', 'Повторение пройденного', () => blockHTML(u.id + '-p', 'Вспомнить прошлое', grouped(reviewItems(u))))}</section>`;
     if (u.write) {
       const w = u.write, id = u.id + '-w';
-      h += late(id, 'Письмо', () => `<section class="sec write" id="writing" data-w="${id}"><h3><span class="ic">✍️</span>Письмо</h3><p>${fmt(w.h)}</p>
+      h += late(id, 'Письмо', () => `<section class="sec write${(S.d[id] || 0) >= PASS ? ' fold' : ''}" id="writing" data-w="${id}"><h3><span class="ic">✍️</span>Письмо <span class="fold-t" aria-hidden="true"></span></h3><p class="wdone note-s">Текст сдан ✓ — нажмите на заголовок, чтобы открыть.</p><p>${fmt(w.h)}</p>
         ${w.plan ? `<ol class="plan">${w.plan.map(x => `<li>${fmt(x)}</li>`).join('')}</ol>` : ''}
         ${w.use ? `<p class="note-s">Используйте эти слова (засчитывается и с окончаниями):</p><div class="need">${w.use.map(x => `<span data-need="${esc(x)}">${esc(x)}</span>`).join('')}</div>` : ''}
         <textarea data-ta="${id}" placeholder="Пишите по-английски…" spellcheck="true" lang="en">${esc(S.w[id] || '')}</textarea>
@@ -1004,6 +1006,8 @@
   document.addEventListener('click', e => {
     const t = e.target;
     if (!t.closest('.themes, #themeb')) { const tp = $('.themes'); if (tp) tp.remove(); } // панель тем закрывается любым кликом мимо
+    const fh = t.closest('.exb > header[data-fold], .write.fold > h3, .write .wfold');
+    if (fh && !t.closest('button:not(.wfold)')) { const box = fh.closest('.exb, .write'); if (box.classList.contains('fold') || box.classList.contains('foldable') || (S.d[box.dataset.b || box.dataset.w] || 0) >= PASS) box.classList.toggle('fold'); return; }
     const tb = t.closest('[data-tobook]'); if (tb) { e.preventDefault(); const el = $('#book'); if (el) el.scrollIntoView({ behavior: 'smooth' }); return; }
     const mic = t.closest('[data-mic]'); if (mic) { listen(mic); return; }
     const sb = t.closest('[data-say]'); if (sb) { say(sb.dataset.say, sb.dataset.slow !== undefined); return; }
@@ -1014,6 +1018,7 @@
       const sec = act.closest('.exb');
       if (act.dataset.act === 'check') check(sec);
       else if (act.dataset.act === 'again') again(sec);
+      else if (act.dataset.act === 'fold') { sec.classList.add('fold'); sec.scrollIntoView({ block: 'nearest' }); }
       else if (act.dataset.act === 'self') { const li = act.closest('li'), it = (BLOCKS[sec.dataset.b] || [])[+li.dataset.n]; if (it && it.t === 'mk') mkCredit(it, $('textarea', li).value.trim()); if (it && it.ref && S.x[it.ref]) mark(it, true); li.classList.remove('no'); li.classList.add('ok'); act.replaceWith(Object.assign(document.createElement('b'), { className: 'ok', textContent: ' ✓ засчитано' })); setResult(sec, score(sec)); }
       return;
     }
