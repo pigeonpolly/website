@@ -1,4 +1,4 @@
-/* Редизайн 2.0, часть 3: только новая шапка и подвал (из v2.css) для страниц, внутри которых — старые стили style.css: /preview/lab/, /preview/wobbleland/ (src/layout-v2-lab.html). Правишь шапку в v2.css — поправь и здесь. */
+/* Редизайн 2.0, часть 3: только новая шапка и подвал (из v2.css) для страниц, внутри которых — старые стили style.css: все страницы на src/layout-v2-lab.html (части 3 и 5). Правишь шапку в v2.css — поправь и здесь. */
 .v2s .hd2,.v2s .ft2{--bg:#F4F0EA;--sheet:#FBF9F5;--ink:#2A211C;--mut:#6C6058;--line:#DED5CA;--gr:#2E2521;--gr2:#3A302B;--acc:#22405F;--acc2:#93AFCC;--inner:#2A1D16;--grtx:#ECEDEE;--grmut:#A3A8AC;--hero-pos:center 22%}
 html[data-season=winter] .v2s .hd2,html[data-season=winter] .v2s .ft2{--bg:#EEF1F3;--sheet:#F8FAFB;--ink:#1C2430;--mut:#5D6670;--line:#D3DAE0;--gr:#26303A;--gr2:#313C47;--acc:#9E1B22;--acc2:#E2544A;--inner:#1B2632;--hero-pos:center 58%}
 html[data-season=spring] .v2s .hd2,html[data-season=spring] .v2s .ft2{--bg:#F1F4F0;--sheet:#FAFBF9;--ink:#1F2A25;--mut:#5E6A63;--line:#D4DDD6;--gr:#26302B;--gr2:#313C36;--acc:#BE2F3A;--acc2:#E85C64;--inner:#1C2A23;--hero-pos:center 62%}
@@ -87,3 +87,10 @@ html[data-season=summer] body.v2s:has(.wl-map){--wlbg:#2F2622}
 .v2s .sea-m .switch button:hover{background:var(--bg)}
 .v2s .sea-m .switch button[aria-pressed=true]{box-shadow:none;font-weight:700}.sea-m .switch button[aria-pressed=true]:after{content:"✓";margin-left:auto;padding-left:12px;color:var(--acc)}
 @media (max-width:700px){.v2s .hr .sea2{display:none}}
+
+/* часть 5: поиск 🔍 и корзина в новой шапке всех старых страниц */
+.v2s .hr .search-btn{order:0;margin:0;width:36px;height:36px;border:1.5px solid var(--line);color:var(--ink);background:none}
+.v2s .hr .search-btn:hover{background:var(--sheet);border-color:var(--ink)}
+.v2s .hr .search-btn+.lang-switch{margin-left:0}
+.v2s .hr .hd-cart{color:var(--ink)}
+@media (max-width:700px){.v2s .hr .search-btn{width:32px;height:32px}}

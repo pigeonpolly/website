@@ -78,12 +78,12 @@
   show('a'); place();
 
   // ---------- места ----------
-  const header = document.querySelector('.site-header');
+  const header = document.querySelector('.site-header, .hd2'); // старая шапка или новая (редизайн 2.0)
   const floorY = () => innerHeight - H - 8;
   const headerSpot = () => {
     // любой свободный промежуток в шапке (между логотипом, пунктами меню и переключателем)
     const hb = header.getBoundingClientRect();
-    const items = [header.querySelector('.brand'), ...header.querySelectorAll('.site-nav > ul > li, .lang-switch, .menu-toggle')]
+    const items = [header.querySelector('.brand, .lg'), ...header.querySelectorAll('.site-nav > ul > li, .lang-switch, .menu-toggle, .nv > a, .hr > *')]
       .map(e => e.getBoundingClientRect()).filter(r => r.width && r.top < hb.bottom && r.bottom > hb.top)
       .sort((a, b) => a.left - b.left);
     const gaps = [];

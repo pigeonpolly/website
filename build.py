@@ -19,8 +19,9 @@ SITE_URL = "https://www.pigeonpolly.com"
 
 # path, title, file, description
 PAGES = [
-    ("", "Pigeon Polly Art Lab", "home.html",
-     "Get your own pixel bird and join the flock, try the daily drawing challenge and mini-games, and support an artist for free. Books and art by the author of Pigeon Polly."),
+    # редизайн 2.0, часть 5 (11.11): новая главная (бывшая /preview/); старая src/pages/home.html больше не собирается
+    ("", "Pigeon Polly Art Lab", "preview.html",
+     "Free watercolour and ink lessons, creative guides and books by illustrator Alina Otkinska, and a little painted world of Pigeon Polly."),
     ("projects", "Projects", "projects.html",
      "Learning design, EdTech and AI automation projects by Alina Otkinska."),
     ("work-with-me", "Work with me", "work-with-me.html",
@@ -78,32 +79,36 @@ PAGES = [
      "The Pigeon Polly advent calendar: from December 1 to 31 open a window a day and a pixel bird flies out with a gift for your profile."),
     ("palettes", "Palettes", "palettes.html",
      "Color palettes from Pigeon Polly watercolors and sketchbook pages: six colors with HEX codes from every artwork. Copy a color, pick a palette and draw."),
-    ("preview", "Pigeon Polly Art Lab", "preview.html",
-     "Free watercolour and ink lessons, full paint-alongs and creative guides by illustrator Alina Otkinska."),  # редизайн 2.0, скрытый адрес
-    ("preview/learn", "Lessons", "preview-learn.html",
-     "Watercolour and ink lessons by Alina Otkinska: free videos open to everyone and monthly paint-alongs in the Studio Club on Patreon."),
-    ("preview/guides", "Guides & books", "preview-guides.html",
+    ("learn", "Lessons", "preview-learn.html",
+     "Watercolour and ink lessons by Alina Otkinska: free videos open to everyone and extra video lessons for signed-in visitors."),
+    ("guides", "Guides & books", "preview-guides.html",
      "Creative guides and books by illustrator Alina Otkinska: ink and watercolour sketching, a free colouring book, palettes and little drawing guides."),
-    ("preview/about", "About Alina", "preview-about.html",
+    ("about", "About Alina", "preview-about.html",
      "Alina Otkinska: learning experience designer and illustrator from Riga, the human behind Pigeon Polly."),
-    ("preview/lab", "The Lab", "games.html",
-     "Games, buttons and the shop for your bird in the Pigeon Polly Lab."),
-    ("preview/wobbleland", "Wobbleland", "wobbleland.html",
-     "Wobbleland: an island of eleven towns. Explore the interactive map and meet every town with Polly as your guide."),
     ("wobbleland", "Wobbleland", "wobbleland.html",
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
 # готовые, но пока не открытые страницы: не попадают в sitemap
-UNLISTED = {"blog-editor", "admin", "garden", "preview", "preview/learn", "preview/guides", "preview/about", "preview/lab", "preview/wobbleland"}
-# редизайн 2.0: страницы на новом шаблоне src/layout-v2.html (шапка, подвал, сезоны — site/assets/v2.css, v2.js); NOINDEX — не для поисковиков
-V2 = {"preview", "preview/learn", "preview/guides", "preview/about"}
-# часть 3: новая шапка и подвал, внутри — старая страница как есть (src/layout-v2-lab.html: style.css + старые скрипты + v2-shell.css);
-# значение — путь старой страницы: её правки из «Править страницу» (data-ppb) действуют и здесь
-V2_LAB = {"preview/lab": "games", "preview/wobbleland": "wobbleland"}
-NOINDEX = {"preview", "preview/learn", "preview/guides", "preview/about", "preview/lab", "preview/wobbleland"}
-V2_HOME = "/preview/"  # куда ведёт логотип новой шапки; станет "/" при замене главной (часть 5)
-V2_LEARN, V2_GUIDES = "/preview/learn/", "/preview/guides/"  # пункты Lessons и Guides новой шапки (часть 5: свои адреса)
-V2_ABOUT, V2_LAB_URL, V2_WOBBLE = "/preview/about/", "/preview/lab/", "/preview/wobbleland/"  # About, The Lab, Wobbleland (часть 5: /about-me/, /games/, /wobbleland/)
+UNLISTED = {"blog-editor", "admin", "garden"}
+# редизайн 2.0: страницы на новом шаблоне src/layout-v2.html (шапка, подвал, сезоны — site/assets/v2.css, v2.js)
+V2 = {"", "learn", "guides", "about", "blog"}
+# часть 5: все остальные страницы — на src/layout-v2-lab.html (новая шапка и подвал, внутри старые style.css и скрипты как есть)
+# ключ правок «Править страницу» (data-ppb): у новых страниц — прежний, с /preview/, чтобы сохранённые правки не потерялись
+EDIT_KEY = {"": "preview", "learn": "preview-learn", "guides": "preview-guides", "about": "preview-about"}
+NOINDEX = set()
+# адреса в шаблонах и словарях content/i18n остались с /preview/ — build.py меняет их на настоящие в готовой странице (v2_urls)
+V2_HOME = "/preview/"
+V2_LEARN, V2_GUIDES = "/preview/learn/", "/preview/guides/"
+V2_ABOUT, V2_LAB_URL, V2_WOBBLE = "/preview/about/", "/preview/lab/", "/preview/wobbleland/"
+V2_URLS = [("preview/learn/", "learn/"), ("preview/guides/", "guides/"), ("preview/about/", "about/"),
+           ("preview/lab/", "games/"), ("preview/wobbleland/", "wobbleland/"), ("preview/", "")]
+
+
+def v2_urls(page):
+    """/preview/… → настоящие адреса (и /ru/preview/…, /lv/preview/…)."""
+    for a, b in V2_URLS:
+        page = re.sub(r'(href="(?:/ru|/lv)?/)' + re.escape(a), lambda m: m.group(1) + b, page)
+    return page
 
 
 def v2_page(layout_v2, title, desc, canonical, robots, content):
@@ -684,21 +689,12 @@ def build():
             alt = SRC / "pages" / f"{pathlib.Path(file).stem}.{lang}.html"
             if lang != "en" and alt.exists():
                 page_body = alt.read_text()
-            page_body = mark_editable(page_body, (V2_LAB.get(path) or path or "home").replace("/", "-"))
-            if path in V2_LAB:
-                page = v2_page(layout_v2_lab, full_title, desc, canonical, True, page_body)
-            elif path in V2:
+            page_body = mark_editable(page_body, EDIT_KEY.get(path, path).replace("/", "-"))
+            if path in V2:
                 page = v2_page(layout_v2, full_title, desc, canonical, path in NOINDEX, page_body)
             else:
-                page_body = section_tabs(path) + page_body
-                page = (layout
-                    .replace("{{title}}", esc(full_title))
-                    .replace("{{description}}", esc(desc))
-                    .replace("{{canonical}}", canonical)
-                    .replace("{{nav}}", nav_html(path)).replace("{{footer_map}}", footer_html())
-                        .replace("{{body_class}}", "home" if not path else "inner")
-                        .replace("{{content}}", page_body))
-            page = localize(page, lang)
+                page = v2_page(layout_v2_lab, full_title, desc, canonical, path in NOINDEX, section_tabs(path) + page_body)
+            page = v2_urls(localize(page, lang))
             page = page.replace("{{hreflang}}", hreflang).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
             page = bust(page)
             dest = OUT / prefix / path / "index.html"
@@ -712,7 +708,7 @@ def build():
     for lang, prefix in LANGS.items():
         canonical, hreflang, switch = lang_bits("blog", lang)
         page = v2_page(layout_v2, "Blog · Pigeon Polly Art Lab", blog_desc, canonical, False, (SRC / "pages" / "blog.html").read_text())
-        page = localize(page, lang).replace("{{hreflang}}", hreflang).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
+        page = v2_urls(localize(page, lang)).replace("{{hreflang}}", hreflang).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
         dest = OUT / prefix / "blog" / "v2" / "index.html"
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(bust(page))
@@ -748,9 +744,7 @@ def build():
     for lang, entries in search_index.items():
         (OUT / "assets" / f"search-{lang}.json").write_text(json.dumps(entries, ensure_ascii=False, separators=(",", ":")))
     # 404
-    nf = layout.replace("{{title}}", "Page not found · Pigeon Polly Art Lab").replace("{{description}}", "")
-    nf = nf.replace("{{canonical}}", SITE_URL + "/").replace("{{nav}}", nav_html("404")).replace("{{footer_map}}", footer_html()).replace("{{body_class}}", "inner")
-    nf = nf.replace("{{content}}", (SRC / "pages" / "404.html").read_text())
+    nf = v2_urls(v2_page(layout_v2_lab, "Page not found · Pigeon Polly Art Lab", "", SITE_URL + "/", True, (SRC / "pages" / "404.html").read_text()))
     nf = nf.replace("{{hreflang}}", "").replace("{{lang_switch}}", "")
     (OUT / "404.html").write_text(bust(nf))
     # sitemap

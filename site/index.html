@@ -4,742 +4,125 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Pigeon Polly Art Lab</title>
-<meta name="description" content="Get your own pixel bird and join the flock, try the daily drawing challenge and mini-games, and support an artist for free. Books and art by the author of Pigeon Polly.">
+<meta name="description" content="Free watercolour and ink lessons, creative guides and books by illustrator Alina Otkinska, and a little painted world of Pigeon Polly.">
 <link rel="canonical" href="https://www.pigeonpolly.com/">
 <link rel="alternate" hreflang="en" href="https://www.pigeonpolly.com/"><link rel="alternate" hreflang="lv" href="https://www.pigeonpolly.com/lv/"><link rel="alternate" hreflang="ru" href="https://www.pigeonpolly.com/ru/"><link rel="alternate" hreflang="x-default" href="https://www.pigeonpolly.com/">
 <script>/* язык: последний выбранный в переключателе (pp_lang) — на всех следующих заходах */(function(){try{var h=document.documentElement.lang,s=localStorage.getItem('pp_lang');if(!s)localStorage.setItem('pp_lang',h);else if(s!==h){var a=document.querySelector('link[rel=alternate][hreflang="'+s+'"]'),u=a&&new URL(a.href);if(u&&u.pathname!==location.pathname)location.replace(u.pathname+location.search+location.hash)}}catch(e){}document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('.lang-switch a[hreflang]');if(a)try{localStorage.setItem('pp_lang',a.getAttribute('hreflang'))}catch(e){}})})();</script>
+<script>/* сезон: по дате (дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень) или выбранный вручную (pp_season) */(function(){var m=new Date().getMonth(),s=['winter','winter','spring','spring','spring','summer','summer','summer','autumn','autumn','autumn','winter'][m];try{var v=localStorage.getItem('pp_season');if(/^(winter|spring|summer|autumn)$/.test(v||''))s=v}catch(e){}document.documentElement.setAttribute('data-season',s)})();</script>
 <meta property="og:title" content="Pigeon Polly Art Lab">
-<meta property="og:description" content="Get your own pixel bird and join the flock, try the daily drawing challenge and mini-games, and support an artist for free. Books and art by the author of Pigeon Polly.">
+<meta property="og:description" content="Free watercolour and ink lessons, creative guides and books by illustrator Alina Otkinska, and a little painted world of Pigeon Polly.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.pigeonpolly.com/">
 <meta property="og:site_name" content="Pigeon Polly Art Lab">
 <meta property="og:image" content="https://www.pigeonpolly.com/assets/og-flock-en.jpg">
-<meta property="og:image:width" content="1200">
-<meta property="og:image:height" content="630">
-<meta property="og:image:alt" content="Get your own pixel bird: a flock of pixel birds around a bench at night">
 <meta name="twitter:card" content="summary_large_image">
-<meta name="twitter:image" content="https://www.pigeonpolly.com/assets/og-flock-en.jpg">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Alina Otkinska", "url": "https://www.pigeonpolly.com/", "image": "https://www.pigeonpolly.com/assets/og-image.jpg", "jobTitle": "Learning Experience Designer & Illustrator", "worksFor": {"@type": "Organization", "name": "Transport and Telecommunication Institute (TSI)"}, "alumniOf": [{"@type": "CollegeOrUniversity", "name": "University of Latvia"}], "knowsAbout": ["Learning design", "EdTech", "AI in education", "Moodle", "Watercolor", "Illustration"], "sameAs": ["https://lv.linkedin.com/in/otkinska", "https://www.instagram.com/pigeonpolly", "https://www.tiktok.com/@pigeonpolly", "https://www.patreon.com/cw/pigeon_polly", "https://www.pinterest.com/pigeonpollyart/"]}</script>
-<meta name="theme-color" content="#2B1A51">
 <link rel="icon" href="/assets/favicon.png" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=7bb16a9d">
-<link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
-<script src="/assets/site.js?v=3d084c34" defer></script>
-<script src="/assets/polly.js?v=573aaaf7" defer></script>
-<script src="/assets/can-do.js?v=82001f18" defer></script>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=Karla:wght@400;500;700&family=Caveat:wght@700&family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito+Sans:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/v2.css?v=159d5620">
 <script src="/assets/birds.js?v=8b869e67" defer></script>
-<script src="/assets/room.js?v=686e8cfd" defer></script>
-<script src="/assets/garden-items.js?v=0e83e9e3" defer></script>
-<script src="/assets/potion-names.js?v=e02872fd" defer></script>
-<script src="/assets/toast.js?v=93392a35" defer></script>
-<script src="/assets/day-card.js?v=8fce5fd5" defer></script>
-<script src="/assets/hatch.js?v=6d36422a" defer></script>
-<script src="/assets/cart.js?v=8f90c619" defer></script>
-<script src="/assets/account.js?v=81dfcd87" defer></script>
-<script src="/assets/news.js?v=f4fbd300" defer></script>
-<script src="/assets/search.js?v=fd80358d" defer></script>
+<script src="/assets/v2.js?v=caa2163e" defer></script>
 </head>
-<body class="home">
+<body class="v2">
 <a class="skip" href="#main">Skip to content</a>
-<div class="statbar" aria-label="Pigeon Polly in numbers"><div class="statbar-in">
-  <a href="/e-books/"><span aria-hidden="true">📚</span> <span class="sb-l">Books out</span> <b>2</b></a>
-  <a href="/titos/"><span aria-hidden="true">🎮</span> <span class="sb-l">Games</span> <b>2</b></a>
-  <a href="/flock/"><span aria-hidden="true">🐦</span> <span class="sb-l">Birds in the flock</span> <b data-stat="birds">·</b></a>
-  <a href="/challenge/#sw-wall"><span aria-hidden="true">🎨</span> <span class="sb-l">Challenge sketches</span> <b data-stat="works">·</b></a>
-  <a href="/about-me/"><span aria-hidden="true">✏️</span> <span class="sb-l">Days on the artist's path</span> <b data-stat="days">·</b></a>
-  <a href="/blog/"><span aria-hidden="true">📝</span> <span class="sb-l">Blog articles</span> <b data-stat="posts">·</b></a>
-</div></div>
-<header class="site-header">
-  <a class="brand" href="/">
-    <img class="brand-star" src="/assets/logo.png?v=2" width="64" height="64" alt="">
-    <span>Pigeon Polly <em>Art Lab</em></span>
-  </a>
-  <button type="button" class="search-btn" aria-label="Search the site"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
-  <nav class="lang-switch" aria-label="Language"><a href="/" hreflang="en" lang="en" aria-current="true">EN</a><a href="/lv/" hreflang="lv" lang="lv">LV</a><a href="/ru/" hreflang="ru" lang="ru">RU</a></nav>
-  <a class="hd-btns" id="hd-btns" href="/shop/" hidden aria-label="Buttons · shop"><span aria-hidden="true">🔘</span> <b></b></a>
-  <a class="hd-cart bell" id="hd-cart" href="/shop/#cart" hidden aria-label="Cart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.5l2.2 10.5h10L20 7H7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="9.5" cy="19" r="1.6" fill="currentColor"/><circle cx="16.5" cy="19" r="1.6" fill="currentColor"/></svg><b class="bell-n" hidden></b></a>
-  <button type="button" class="bell" id="pp-bell" hidden aria-label="News"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 21h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><b class="bell-n" hidden></b></button>
-  <div class="acct" id="acct"></div>
-  <button class="menu-toggle" aria-expanded="false" aria-controls="site-nav" aria-label="Menu">
-    <span></span><span></span><span></span>
-  </button>
-  <nav id="site-nav" class="site-nav" aria-label="Main">
-    <ul>
-<li class="has-sub"><a href="/flock/"><span class="nm-t">The Flock</span></a><button type="button" class="sub-toggle" aria-expanded="false" aria-label="Show submenu"><span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/flock/"><i class="ns-i" aria-hidden="true">🐦</i><span class="ns-t">All birds</span><small class="ns-d">Find any bird and pay a visit</small></a></li><li><a href="/challenge/#sw-wall"><i class="ns-i" aria-hidden="true">🎨</i><span class="ns-t">Flock drawings</span><small class="ns-d">What was drawn today and before</small></a></li><li><a href="/flock/news/"><i class="ns-i" aria-hidden="true">📰</i><span class="ns-t">Flock news</span><small class="ns-d">Who hatched, what was drawn, who had a housewarming</small></a></li></ul></li>
-<li class="has-sub"><a href="/games/"><span class="nm-t">Play</span></a><button type="button" class="sub-toggle" aria-expanded="false" aria-label="Show submenu"><span aria-hidden="true">▾</span></button><ul class="nav-sub"><li data-adv><a href="/advent/"><i class="ns-i" aria-hidden="true">🎄</i><span class="ns-t">Advent calendar</span><small class="ns-d">31 windows with gifts</small></a></li><li><a href="/rain/"><i class="ns-i" aria-hidden="true">🔘</i><span class="ns-t">Button Rain</span><small class="ns-d">Catch buttons, dodge ink blots</small></a></li><li><a href="/potions/"><i class="ns-i" aria-hidden="true">🧪</i><span class="ns-t">Potion Lab</span><small class="ns-d">A maze, ingredients and potions with silly names</small></a></li><li><a href="/pancakes/"><i class="ns-i" aria-hidden="true">🥞</i><span class="ns-t">Polly’s Pancakes</span><small class="ns-d">Pancakes for Wobbleland, every customer is different</small></a></li><li><a href="/titos/"><i class="ns-i" aria-hidden="true">🕵️</i><span class="ns-t">Detective Titos</span><small class="ns-d">100 cases and one very perky detective</small></a></li><li><a href="/shift/"><i class="ns-i" aria-hidden="true">⏱</i><span class="ns-t">Shift with Polly</span><small class="ns-d">A timer, retro music and Polly working next to you</small></a></li><li><a href="/polly-office/"><i class="ns-i" aria-hidden="true">📮</i><span class="ns-t">Polly’s Office</span><small class="ns-d">Help Polly with the Council of Towns’ mail</small></a></li><li><a href="/wobbleland/"><i class="ns-i" aria-hidden="true">🗺</i><span class="ns-t">Wobbleland</span><small class="ns-d">Map, holidays and recipes of eleven towns</small></a></li><li class="ns-hub"><a href="/games/"><span class="ns-t">All games and the shop →</span></a></li></ul></li>
-<li class="has-sub"><a href="/challenge/"><span class="nm-t">Draw</span></a><button type="button" class="sub-toggle" aria-expanded="false" aria-label="Show submenu"><span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/challenge/"><i class="ns-i" aria-hidden="true">✏️</i><span class="ns-t">Daily Challenge</span><small class="ns-d">A theme, a few colours and a timer — every day</small></a></li><li><a href="/requests/"><i class="ns-i" aria-hidden="true">💡</i><span class="ns-t">Draw this for me</span><small class="ns-d">Suggest an idea and I’ll draw it</small></a></li><li><a href="/palettes/"><i class="ns-i" aria-hidden="true">🎨</i><span class="ns-t">Palettes</span><small class="ns-d">Colours from my paintings and from your photos</small></a></li><li><a href="/polly-helps/"><i class="ns-i" aria-hidden="true">🕊</i><span class="ns-t">Polly, help me</span><small class="ns-d">How to draw anything from simple shapes</small></a></li><li><a href="/e-books/"><i class="ns-i" aria-hidden="true">📚</i><span class="ns-t">Books</span><small class="ns-d">My books about drawing</small></a></li><li class="ns-hub"><a href="/challenge/"><span class="ns-t">To today’s theme →</span></a></li></ul></li>
-<li><a href="/blog/"><span class="nm-t">Blog</span></a></li>
-<li class="has-sub"><a href="/about-me/"><span class="nm-t">About me</span></a><button type="button" class="sub-toggle" aria-expanded="false" aria-label="Show submenu"><span aria-hidden="true">▾</span></button><ul class="nav-sub"><li><a href="/art-portfolio/"><i class="ns-i" aria-hidden="true">📓</i><span class="ns-t">Sketchbook</span><small class="ns-d">Character series, sketchbook pages, AI art</small></a></li><li><a href="/on-walls-and-pages/"><i class="ns-i" aria-hidden="true">🖼</i><span class="ns-t">On Walls &amp; Pages</span><small class="ns-d">Exhibitions and publications</small></a></li><li><a href="/projects/"><i class="ns-i" aria-hidden="true">🎓</i><span class="ns-t">Learning &amp; AI</span><small class="ns-d">Projects about learning and technology</small></a></li><li><a href="/work-with-me/"><i class="ns-i" aria-hidden="true">🤝</i><span class="ns-t">Work with me</span><small class="ns-d">Illustrations, courses, collaboration</small></a></li><li><a href="/art-pill/"><i class="ns-i" aria-hidden="true">💊</i><span class="ns-t">Art-Pill by Polly</span><small class="ns-d">A drawing pill for AI and its sketchbooks</small></a></li><li class="ns-hub"><a href="/about-me/"><span class="ns-t">About me →</span></a></li></ul></li>
-    </ul>
-    <div class="nav-foot"><nav class="lang-switch" aria-label="Language"><a href="/" hreflang="en" lang="en" aria-current="true">EN</a><a href="/lv/" hreflang="lv" lang="lv">LV</a><a href="/ru/" hreflang="ru" lang="ru">RU</a></nav><button type="button" class="search-btn nav-search"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg><span>Search the site</span></button></div>
+<header class="hd2"><div class="w">
+  <a class="lg" href="/"><img src="/images/v2/logo-wc.png" width="46" height="46" alt=""><span>Pigeon Polly <i>Art Lab</i></span></a>
+  <nav class="nv" aria-label="Main">
+    <a href="/learn/">Lessons</a><a href="/guides/">Guides</a><a href="/blog/">Journal</a><a href="/about/">About</a>
   </nav>
+  <div class="hr">
+    <a class="lb" href="/games/">The Lab</a>
+    <nav class="lang-switch" aria-label="Language"><a href="/" hreflang="en" lang="en" aria-current="true">EN</a><a href="/lv/" hreflang="lv" lang="lv">LV</a><a href="/ru/" hreflang="ru" lang="ru">RU</a></nav>
+    <div class="sea2"><button type="button" class="sea-b" aria-expanded="false" aria-controls="sea-m" title="Season" aria-label="Season"><i></i></button><div class="sea-m" id="sea-m" hidden><span class="switch" role="group" aria-label="Season"><button type="button" data-s="winter" title="Winter" aria-label="Winter"><i></i>Winter</button><button type="button" data-s="spring" title="Spring" aria-label="Spring"><i></i>Spring</button><button type="button" data-s="summer" title="Summer" aria-label="Summer"><i></i>Summer</button><button type="button" data-s="autumn" title="Autumn" aria-label="Autumn"><i></i>Autumn</button></span></div></div>
+    <a class="btn acct2" id="acct2" href="/games/#signin">Sign in</a>
+    <button type="button" class="burger" aria-expanded="false" aria-controls="drawer" aria-label="Menu">☰</button>
+  </div>
+</div>
+<div class="drawer" id="drawer" hidden><div class="w">
+  <a href="/learn/">Lessons</a><a href="/guides/">Guides</a><a href="/blog/">Journal</a><a href="/about/">About</a><a class="lb" href="/games/">The Lab</a>
+  <nav class="lang-switch" aria-label="Language"><a href="/" hreflang="en" lang="en" aria-current="true">EN</a><a href="/lv/" hreflang="lv" lang="lv">LV</a><a href="/ru/" hreflang="ru" lang="ru">RU</a></nav>
+    <span class="switch sw-m" role="group" aria-label="Season"><button type="button" data-s="winter" title="Winter" aria-label="Winter"></button><button type="button" data-s="spring" title="Spring" aria-label="Spring"></button><button type="button" data-s="summer" title="Summer" aria-label="Summer"></button><button type="button" data-s="autumn" title="Autumn" aria-label="Autumn"></button></span>
+</div></div>
 </header>
 <main id="main">
-<script>try { if (localStorage.getItem('pp-in')) document.documentElement.classList.add('me-in'); } catch (e) {}</script>
-<section data-ppb="home.1" class="hero">
-  <div class="hero-text">
-    <p class="topics">art &middot; creativity &middot; technologies</p>
-    <h1>A small lab for big imagination</h1>
-    <p class="lead">Watercolors, sketchbooks and illustrated worlds, daily drawing challenges and a little bit of tech magic, all under one roof.</p>
-    <div class="actions">
-      <a class="btn btn-join" href="/flock/" data-join>🥚 Hatch your bird</a>
-    </div>
-    <p class="hatch-note">Every bird is one of a kind on this site. Every 10th is a cat, every 11th a crow.</p>
-  </div>
-  <div class="art" tabindex="0">
-    <div class="frame" role="img" aria-label="Pigeon Polly as an astronaut planting sunflowers, an illustration by Alina Otkinska"></div>
-    <div class="frame frame-me" aria-hidden="true"></div>
-    <svg class="star" viewBox="-48 -48 96 96" aria-hidden="true"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z"/></svg>
-    <span class="dot dot-1"></span>
-    <span class="dot dot-2"></span>
-    <button type="button" class="hero-egg" data-join aria-label="Hatch your bird"><canvas width="28" height="26"></canvas></button>
-  </div>
+<section data-ppb="preview.1" class="hero"><div class="w">
+  <span class="pill">Watercolour &amp; ink · free lessons</span>
+  <span class="sea" data-sv="tag">autumn edition</span>
+  <h1>Paint small, <em>joyful<svg viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M5 20 C 60 6, 120 28, 180 14 S 270 10, 295 18"/></svg></em> things</h1>
+  <p>Free lessons, full paint-alongs and creative guides by illustrator Alina Otkinska.</p>
+  <div class="ctas"><a class="btn pri" href="#lessons">▶ Watch a free lesson</a><a class="btn" href="#guides">Browse the guides</a></div>
+</div>
+<div data-ppb="preview.2" class="pano"><img id="v2-hero" src="/images/v2/hero-autumn.jpg" srcset="/images/v2/hero-autumn-900.jpg 900w, /images/v2/hero-autumn.jpg 1800w" sizes="100vw" alt="Watercolour by Alina Otkinska" fetchpriority="high"><span class="cap2" data-sv="note">Polly on the train ✿</span></div>
 </section>
-<script>
-// этап 14: гостю — яйцо и «🥚 Вылупи свою птичку» (окно входа, воронка hatch), вошедшему с ником — «Мой день» (html.me-in, hatch.js)
-(function () {
-  var a = document.querySelector('.hero .art'); if (a) a.addEventListener('click', function (e) { if (!e.target.closest('.hero-egg')) a.classList.toggle('on'); });
-  var pre = { ru: '/ru', lv: '/lv' }[document.documentElement.lang] || '';
-  document.querySelectorAll('[data-join]').forEach(function (b) {
-    b.addEventListener('click', function (e) {
-      if (window.PPAccount && window.PPAccount.signedIn()) { e.preventDefault(); location.href = pre + '/bird/'; return; }
-      if (window.PPHatch) window.PPHatch.click();
-      if (window.PPAccount && window.PPAccount.openSignIn()) e.preventDefault();
-    });
-  });
-  document.addEventListener('DOMContentLoaded', function () {
-    var eg = document.querySelector('.hero-egg canvas'); if (eg && window.PPHatch) window.PPHatch.egg(eg);
-  });
-  document.addEventListener('pp:whoami', function (e) {
-    var u = e.detail && e.detail.user; if (!u || !u.nick) return;
-    var B = window.PPBirds, cv = document.querySelector('.md-bird canvas, .md-bird .pp-ava');
-    if (B && cv) cv.replaceWith(B.avatar(u.id, u.avatar, window.innerWidth > 760 ? 200 : 150)); // аватар как в профиле: свой фон, рамка, анимация
-    document.querySelector('.md-nick').textContent = '@' + u.nick;
-    document.querySelector('[data-me-btns]').textContent = u.buttons || 0;
-    var card = document.querySelector('[data-day-card]');
-    if (card && window.PPDay && !card.dataset.on) { card.dataset.on = 1; window.PPDay.mount(card, { size: 'small' }); }
-  });
-})();
-</script>
-<div class="blk" id="blk-season" data-ppb="blk-season"><style>#blk-season .ss { position: relative; overflow: hidden; box-sizing: border-box; padding: 34px 32px; background: radial-gradient(ellipse at 20% 0%, #3E2A7A 0, #24163F 60%, #1B1030 100%); font-family: 'Karla', sans-serif; color: #F3EFFA; }
-#blk-season .ss[hidden] { display: none; }
-#blk-season .ss-in { display: flex; align-items: center; justify-content: center; gap: 36px; max-width: 980px; margin: 0 auto; }
-#blk-season .ss-house { flex: none; width: 240px; }
-#blk-season .ss-house svg { display: block; width: 100%; height: auto; image-rendering: pixelated; filter: drop-shadow(0 10px 14px rgba(0, 0, 0, .45)); }
-#blk-season .ss-win-today { animation: ss-glow 1.6s ease-in-out infinite; }
-#blk-season .ss-tx { flex: 1; min-width: 0; max-width: 560px; }
-#blk-season .ss-kick { margin: 0 0 6px; font-family: 'Fraunces', serif; font-style: italic; font-size: 19px; color: #F0A987; }
-#blk-season .ss-main { margin: 0; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(22px, 3vw, 30px); line-height: 1.2; }
-#blk-season .ss-main b, #blk-season .ss-sub b { font-variant-numeric: tabular-nums; color: #F5D547; white-space: nowrap; }
-#blk-season .ss-sub { margin: 8px 0 0; font-size: 17px; line-height: 1.5; color: #D9D3F2; }
-#blk-season .ss-miss { margin: 8px 0 0; font-size: 16px; color: #F5C4B3; }
-#blk-season .ss-guest { margin: 10px 0 0; font-size: 15px; color: #D9D3F2; }
-#blk-season .ss-guest button { padding: 0; border: 0; background: none; color: #F0A987; font: 700 15px 'Karla', sans-serif; text-decoration: underline; cursor: pointer; }
-#blk-season .ss-btn { display: inline-block; margin-top: 18px; padding: 12px 26px; border-radius: 999px; background: #D85A30; color: #fff; font: 700 16px 'Karla', sans-serif; text-decoration: none; box-shadow: 0 5px 0 #8E3519; transition: transform .2s, box-shadow .2s; }
-#blk-season .ss-btn:hover { transform: translateY(2px); box-shadow: 0 3px 0 #8E3519; }
-#blk-season .ss-snow { position: absolute; width: 4px; height: 4px; background: #fff; opacity: .5; pointer-events: none; animation: ss-fall linear infinite; }
-#blk-season .ss-shelf { flex: none; display: grid; grid-template-columns: repeat(3, 72px); gap: 8px; }
-#blk-season .ss-shelf span { display: grid; place-items: center; width: 72px; height: 72px; border-radius: 14px; background: #FFFDF8; box-shadow: 0 4px 0 rgba(0, 0, 0, .25); }
-#blk-season .ss-shelf canvas, #blk-season .ss-shelf .pp-icon { max-width: 60px; max-height: 60px; background: none; box-shadow: none; }
-@keyframes ss-glow { 50% { fill: #FFF6C2; } }
-@keyframes ss-fall { from { transform: translateY(-20px); } to { transform: translateY(260px); } }
-@media (prefers-reduced-motion: reduce) {#blk-season .ss-win-today, #blk-season .ss-snow { animation: none; }}
-@media (max-width: 700px) {#blk-season .ss { padding: 28px 16px; }
-#blk-season .ss-in { flex-direction: column; gap: 18px; text-align: center; }
-#blk-season .ss-house { width: 200px; }
-#blk-season .ss-shelf { grid-template-columns: repeat(3, 60px); }
-#blk-season .ss-shelf span { width: 60px; height: 60px; }
-#blk-season .ss-shelf canvas, #blk-season .ss-shelf .pp-icon { max-width: 50px; max-height: 50px; }}</style><section class="ss" id="season" hidden aria-live="polite"></section>
-<script>
-  // сезонный блок под приветствием (этап 4 Б): 1.10–30.11 — домик адвента с отсчётом; 1–31.12 — окошко дня; 1–23.01 — пропущенные; иначе пусто.
-  // Этап 6: когда адвента нет (кроме ноября–января), а идёт сезон (SEASONS) — витрина «🎃 Хеллоуин · ещё N дней · все вещи →» (магазин с этой темой). Блок и на главной, и в магазине.
-  // Данные — /api/advent (startsAt, now, nextAt, date, opened); ?devdate= — проверка дат на локальном сервере (account.js, PPDevH)
-  document.addEventListener('DOMContentLoaded', () => {
-    const box = document.getElementById('season');
-    if (!box) return;
-    const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, pre = ['', '/ru', '/lv'][L];
-    const T = {
-      kick: ['Advent calendar', 'Адвент-календарь', 'Adventes kalendārs'],
-      soon: [c => `The advent calendar opens in ${c}`, c => `Адвент-календарь откроется через ${c}`, c => `Adventes kalendārs atvērsies pēc ${c}`],
-      soonSub: ['31 windows with gifts for your bird', '31 окошко с подарками для птички', '31 lodziņš ar dāvanām putniņam'],
-      d: ['d', 'дн.', 'd.'],
-      peek: ['Peek inside →', 'Заглянуть →', 'Ieskatīties →'],
-      guest: ['Hatch a bird', 'Вылупи птичку', 'Izperi putniņu'], guestTail: [' to open the windows', ', чтобы открывать окошки', ', lai atvērtu lodziņus'],
-      today: [n => `Window №${n} is open!`, n => `Окошко №${n} открылось!`, n => `Lodziņš Nr. ${n} ir atvēries!`],
-      todaySub: ['A gift for your bird is waiting inside.', 'Внутри ждёт подарок для птички.', 'Iekšā gaida dāvana putniņam.'],
-      open: ['Open →', 'Открыть →', 'Atvērt →'],
-      done: [n => `Window №${n} is opened ✓`, n => `Окошко №${n} открыто ✓`, n => `Lodziņš Nr. ${n} atvērts ✓`],
-      next: [c => `the next one in ${c}`, c => `следующее через ${c}`, c => `nākamais pēc ${c}`],
-      last: ['that was the last one!', 'это было последнее!', 'tas bija pēdējais!'],
-      miss: [n => `+${n} missed — you can still take ${n === 1 ? 'it' : 'them'}`, n => `+${n} ${n % 10 === 1 && n % 100 !== 11 ? 'пропущенное' : 'пропущенных'} — тоже можно забрать`, n => `+${n} ${n % 10 === 1 && n % 100 !== 11 ? 'izlaists' : 'izlaisti'} — arī var paņemt`],
-      shopKick: ['Season in the shop', 'Сезон в магазине', 'Sezona veikalā'],
-      left: [n => n ? `${n} more day${n === 1 ? '' : 's'}` : 'last day', n => n ? `ещё ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'день' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'дня' : 'дней'}` : 'последний день', n => n ? `vēl ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'diena' : 'dienas'}` : 'pēdējā diena'],
-      shopSub: [n => `${n} things for the season — while they last`, n => `Вещей к сезону: ${n} — пока не разобрали`, n => `Sezonas lietas: ${n} — kamēr vēl ir`],
-      allThings: ['All the things →', 'Все вещи →', 'Visas lietas →'],
-      jan: [(j, n) => `You can still take the missed windows — until January ${j}${n ? ` (${n})` : ''}`, (j, n) => `Ещё можно забрать пропущенные окошки — до ${j} января${n ? ` (${n} шт.)` : ''}`, (j, n) => `Izlaistos lodziņus vēl var paņemt — līdz ${j}. janvārim${n ? ` (${n} gab.)` : ''}`],
-    };
-    const t = k => T[k][L];
-    const H = () => (window.PPDevH ? window.PPDevH() : {});
-    let S = null, skew = 0, tick = 0, wake = 0; // после полуночи (новое окошко) — и новости в 🔔 спросить заново
-    const two = n => String(n).padStart(2, '0');
-    const clock = ms => { const s = Math.max(0, Math.floor(ms / 1000)); return `${two(Math.floor(s / 3600) % 24)}:${two(Math.floor(s / 60) % 60)}:${two(s % 60)}`; };
-    const cd = ms => `${Math.floor(Math.max(0, ms) / 864e5)} ${t('d')} ${clock(ms)}`;
-    const now = () => Date.now() + skew;
 
-    // пиксельный домик-календарь: 31 окошко (8 × 4, одно место — дверь), крыша со снегом и труба. st(d) → 'shut' | 'open' | 'today' | 'miss'
-    function house(st, star) {
-      const r = (x, y, w, h, c, cls) => `<rect x="${x}" y="${y}" width="${w}" height="${h}" fill="${c}"${cls ? ` class="${cls}"` : ''}/>`;
-      let s = r(0, 49, 64, 3, '#F3EFFA') + r(44, 6, 5, 10, '#7A2E1E') + r(43, 5, 7, 2, '#FFFFFF');
-      for (let k = 0; k < 7; k++) { const x = 3 + k * 4, w = 58 - k * 8; s += r(x, 19 - k * 2, w, 2, k % 2 ? '#5A2E6E' : '#4A2560') + r(x, 19 - k * 2, 2, 1, '#FFFFFF') + r(x + w - 2, 19 - k * 2, 2, 1, '#FFFFFF'); }
-      s += r(29, 5, 6, 1, '#FFFFFF');
-      if (star) s += r(31, 0, 2, 5, '#F5D547') + r(29.5, 1.5, 5, 2, '#F5D547');
-      s += r(5, 21, 54, 28, '#7A2E1E') + r(6, 21, 52, 27, '#C0563A');
-      const C = { shut: '#2B1A51', open: '#F0A987', today: '#F5D547', miss: '#8E7BD6' };
-      let day = 1;
-      for (let row = 0; row < 4; row++) for (let col = 0; col < 8; col++) {
-        const x = 8.5 + col * 6, y = 23.5 + row * 6;
-        if (row === 3 && col === 4) { s += r(x - .5, y - 1, 5, 7, '#5A2E1A') + r(x + .5, y, 3, 6, '#8E4A2A') + r(x + 2.5, y + 3, .8, .8, '#F5D547'); continue; } // дверь
-        const k = st(day++);
-        s += r(x, y, 4, 4, '#FBF4E2') + r(x + .5, y + .5, 3, 3, C[k], k === 'today' ? 'ss-win-today' : '');
-      }
-      return `<svg viewBox="0 0 64 52" shape-rendering="crispEdges" role="img" aria-label="${t('kick')}">${s}</svg>`;
-    }
-    // сезоны магазина: тема (PPBirds.GIFT_THEMES), с какого и по какое число (ММ-ДД)
-    const SEASONS = [['halloween', '10-01', '10-31'], ['valentine', '02-01', '02-14'], ['spring', '03-01', '05-31'], ['summer', '06-01', '08-31'], ['autumn', '09-01', '09-30']];
-    function seasonNow() {
-      const ymd = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Riga' }).format(new Date(now())), md = ymd.slice(5), y = +ymd.slice(0, 4);
-      const s = SEASONS.find(x => md >= x[1] && md <= x[2]), B = window.PPBirds, th = s && B && B.GIFT_THEMES.find(x => x[0] === s[0]);
-      if (!th) return null;
-      const days = Math.round((Date.UTC(y, +s[2].slice(0, 2) - 1, +s[2].slice(3)) - Date.UTC(y, +md.slice(0, 2) - 1, +md.slice(3))) / 864e5);
-      return { th, days };
-    }
-    function showcase(sn) {
-      const B = window.PPBirds, list = sn.th[2].filter(x => !x.endsWith('|?') && !(B.LEGEND && B.LEGEND.has(x))), pics = list.filter(x => !/^(bg|frame|anim)\|/.test(x)), step = Math.max(1, Math.floor(pics.length / 6));
-      box.innerHTML = `<div class="ss-in"><div class="ss-shelf" aria-hidden="true"></div><div class="ss-tx"><p class="ss-kick">🛍 ${t('shopKick')}</p>
-        <p class="ss-main">${sn.th[1][L]} · <b>${T.left[L](sn.days)}</b></p><p class="ss-sub">${T.shopSub[L](list.length)}</p>
-        <a class="ss-btn" href="${pre}/shop/#theme:${sn.th[0]}">${t('allThings')}</a></div></div>`;
-      const sh = box.querySelector('.ss-shelf');
-      for (let i = 0; i < 6 && i * step < pics.length; i++) { const [k, v] = pics[i * step].split('|'), c = document.createElement('span'); try { c.appendChild(B.itemIcon(k, v, 60, 2)); } catch (e) { continue; } sh.appendChild(c); }
-      box.hidden = false;
-    }
-    const snow = () => [...Array(14)].map((_, i) => `<i class="ss-snow" aria-hidden="true" style="left:${(i * 37) % 100}%;top:${-10 - (i * 13) % 30}px;animation-duration:${6 + (i % 5)}s;animation-delay:-${(i * 1.3) % 6}s"></i>`).join('');
+<section data-ppb="preview.3" class="fl" id="lessons"><div class="w">
+  <div><span class="hand">hi! let’s paint something small ✿</span>
+    <h2>Free lessons, <i>open to everyone</i></h2>
+    <p>Video lessons you can watch right here, with no sign-up. Grab a brush and paint along.</p>
+    <a class="btn pri" href="/learn/#free">All video lessons →</a></div>
+  <div class="cl">
+    <a class="t a yt" href="https://youtu.be/VVvLZcIqUbM" data-yt="VVvLZcIqUbM" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/VVvLZcIqUbM/hqdefault.jpg" alt="Free video lesson, cover" loading="lazy"><span class="pl" aria-hidden="true">▶</span><b>Free lesson №1</b></a>
+    <a class="t b yt" href="https://youtu.be/eRa1uB_7s9U" data-yt="eRa1uB_7s9U" target="_blank" rel="noopener"><img src="https://i.ytimg.com/vi/eRa1uB_7s9U/hqdefault.jpg" alt="Free video lesson, cover" loading="lazy"><span class="pl" aria-hidden="true">▶</span><b>Free lesson №2</b></a>
+    <span class="tp" style="left:150px;top:-2px;transform:rotate(-8deg)"></span><span class="tp" style="right:120px;top:250px;transform:rotate(10deg)"></span>
+    <div class="ticket" aria-hidden="true">ADMIT ONE<b>Free lesson</b>NO SIGN-UP</div>
+  </div>
+</div></section>
 
-    function load() {
-      return fetch('/api/advent', { credentials: 'same-origin', headers: H() }).then(r => r.ok ? r.json() : null).then(d => { if (d) { const turn = S && (S.date !== d.date || S.month !== d.month); S = d; skew = d.now - Date.now(); draw(); if (turn && window.PPNews) window.PPNews.refresh(); } }).catch(() => {});
-    }
-    function draw() {
-      clearInterval(tick); clearTimeout(wake);
-      const guest = !S.user || !S.user.nick, opened = new Set((S.opened || []).map(o => o.day));
-      const guestLine = guest ? `<p class="ss-guest"><button type="button" data-in>${t('guest')}</button>${t('guestTail')}</p>` : '';
-      let st = () => 'shut', html = '', live = null, star = false;
-      const sn = S.month !== 11 && S.month !== 12 && !S.catchUp && seasonNow(); // адвента нет — витрина сезона
-      if (sn && !/\/shop\/?$/.test(location.pathname)) { box.hidden = true; return; } // витрина сезона — только в магазине, не на главной
-      if (sn) { showcase(sn); if (S.nextAt) { const ms = S.nextAt - now(); if (ms > 0 && ms < 2e9) wake = setTimeout(load, ms + 1500); } return; }
-      if (S.month === 10 || S.month === 11) { // до 1 декабря: отсчёт
-        html = `<p class="ss-main">${T.soon[L]('<b data-cd></b>')}</p><p class="ss-sub">${t('soonSub')}</p><a class="ss-btn" href="${pre}/advent/">${t('peek')}</a>${guestLine}`;
-        live = el => { const ms = S.startsAt - now(); el.textContent = cd(ms); if (ms <= 0) { clearInterval(tick); setTimeout(load, 1200); } };
-      } else if (S.month === 12 && S.today) { // декабрь: окошко дня
-        const d = S.today, done = !guest && opened.has(d);
-        let miss = 0; if (!guest) for (let i = 1; i < d; i++) if (!opened.has(i)) miss++;
-        st = i => i === d ? (done ? 'open' : 'today') : opened.has(i) ? 'open' : i < d ? (guest ? 'open' : 'miss') : 'shut'; star = true;
-        html = done
-          ? `<p class="ss-main">${T.done[L](d)}</p><p class="ss-sub">${d < 31 ? T.next[L]('<b data-cd></b>') : t('last')}</p>`
-          : `<p class="ss-main">${T.today[L](d)}</p><p class="ss-sub">${t('todaySub')}</p>`;
-        if (miss) html += `<p class="ss-miss">${T.miss[L](miss)}</p>`;
-        const first = done ? [...Array(d - 1)].map((_, i) => i + 1).find(i => !opened.has(i)) : d;
-        html += `<a class="ss-btn" href="${pre}/advent/${first ? '#d=' + first : ''}">${done && !first ? t('peek') : t('open')}</a>${guestLine}`;
-        if (done && d < 31) live = el => { const ms = S.nextAt - now(); el.textContent = clock(ms); if (ms <= 0) { clearInterval(tick); setTimeout(load, 1200); } };
-      } else if (S.catchUp) { // 1–23 января: пропущенные
-        const left = 31 - opened.size;
-        if (!guest && !left) { box.hidden = true; return; }
-        const first = [...Array(31)].map((_, i) => i + 1).find(i => !opened.has(i));
-        st = i => opened.has(i) ? 'open' : 'miss'; star = true;
-        html = `<p class="ss-main">${T.jan[L](S.lastJan, guest ? 0 : left)}</p><a class="ss-btn" href="${pre}/advent/${!guest && first ? '#d=' + first : ''}">${t('open')}</a>${guestLine}`;
-      } else { // 24 января – 30 сентября: блок пустой
-        box.hidden = true; box.innerHTML = '';
-        if (S.nextAt) { const ms = S.nextAt - now(); if (ms > 0 && ms < 2e9) wake = setTimeout(load, ms + 1500); }
-        return;
-      }
-      box.innerHTML = `${snow()}<div class="ss-in"><div class="ss-house">${house(st, star)}</div><div class="ss-tx"><p class="ss-kick">🎄 ${t('kick')}</p>${html}</div></div>`;
-      box.hidden = false;
-      const lg = box.querySelector('[data-in]'); if (lg) lg.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
-      const el = box.querySelector('[data-cd]');
-      if (el && live) { live(el); tick = setInterval(() => live(el), 1000); }
-      // в полночь по Риге — новое окошко (или новая фаза)
-      if (S.nextAt) { const ms = S.nextAt - now(); if (ms > 0 && ms < 2e9) wake = setTimeout(load, ms + 1500); }
-    }
-    load();
-  });
-</script>
-</div>
-<div data-ppb="home.2" class="home-dash" data-tab="day">
-<div data-ppb="home.3" class="hd-tabs" role="tablist"></div>
-<section data-ppb="home.4" class="myday hd-col" aria-labelledby="md-title">
-  <div class="md-in">
-    <div class="md-me">
-      <p class="md-kick" id="md-title">My day</p>
-      <a class="md-bird" href="/bird/" data-me-link><canvas width="64" height="56" aria-hidden="true"></canvas><b class="md-nick"></b></a>
-      <a class="md-btns" href="/shop/">🔘 <b data-me-btns>0</b> <span>buttons · shop →</span></a>
-    </div>
-    <div class="md-card" data-day-card></div>
-  </div>
-</section>
-<div data-ppb="home.5" class="hd-col hd-news" data-my-news></div>
-<div data-ppb="home.6" class="hd-col hd-side">
-<div class="blk" id="blk-wl-holiday" data-ppb="blk-wl-holiday"><style>#blk-wl-holiday .wlh { position: relative; max-width: 980px; margin: 18px auto 0; padding: 0 var(--gutter); }
-#blk-wl-holiday .wlh[hidden] { display: none; }
-#blk-wl-holiday .wlh-card { position: relative; overflow: hidden; display: flex; align-items: center; gap: 18px; padding: 26px 22px 18px 22px; border-radius: 18px; background: linear-gradient(135deg, #3B2668 0, #2F1E57 100%); border: 1px solid var(--line); box-shadow: 0 8px 22px rgba(0, 0, 0, .25); }
-#blk-wl-holiday .wlh-card::before { content: ''; position: absolute; left: 0; right: 0; top: 0; height: 12px; background:
-    conic-gradient(from 135deg at 50% 0, #F0A987 0 90deg, transparent 0) 0 0 / 28px 12px repeat-x,
-    conic-gradient(from 135deg at 50% 0, #F5D547 0 90deg, transparent 0) 14px 0 / 28px 12px repeat-x; opacity: .9; }
-#blk-wl-holiday .wlh-crests { flex: none; display: flex; gap: 6px; }
-#blk-wl-holiday .wlh-crests img { width: 40px; height: 46px; image-rendering: pixelated; filter: drop-shadow(0 3px 4px rgba(0, 0, 0, .4)); }
-#blk-wl-holiday .wlh.today .wlh-crests img { animation: wlh-bob 2.4s ease-in-out infinite; }
-#blk-wl-holiday .wlh.today .wlh-crests img + img { animation-delay: -1.2s; }
-#blk-wl-holiday .wlh-tx { flex: 1; min-width: 0; }
-#blk-wl-holiday .wlh-kick { margin: 0; font-size: 14px; letter-spacing: .04em; text-transform: uppercase; color: var(--peach); }
-#blk-wl-holiday .wlh-t { margin: 2px 0 0; font-family: var(--serif); font-weight: 600; font-size: clamp(19px, 2.2vw, 24px); line-height: 1.25; }
-#blk-wl-holiday .wlh-t small { font: 400 15px var(--sans); color: var(--muted); }
-#blk-wl-holiday .wlh-x { margin: 4px 0 0; font-size: 15px; line-height: 1.45; color: var(--muted); }
-#blk-wl-holiday .wlh-go { display: inline-block; margin-top: 6px; color: #F5D547; font-weight: 700; font-size: 15px; text-decoration: none; }
-#blk-wl-holiday .wlh-go:hover { text-decoration: underline; }
-#blk-wl-holiday .wlh-cnt { flex: none; display: grid; place-items: center; align-content: center; min-width: 86px; padding: 8px 10px; border-radius: 14px; background: #FFFDF8; color: #2B1A51; text-align: center; box-shadow: 0 4px 0 rgba(0, 0, 0, .25); }
-#blk-wl-holiday .wlh-cnt b { font: 700 34px/1 var(--serif); font-variant-numeric: tabular-nums; color: #D85A30; }
-#blk-wl-holiday .wlh-cnt span { margin-top: 4px; font-size: 13px; line-height: 1.2; }
-#blk-wl-holiday .wlh-conf { position: absolute; width: 5px; height: 5px; pointer-events: none; opacity: .75; animation: wlh-fall linear infinite; }
-@keyframes wlh-bob { 50% { transform: translateY(-4px) rotate(-3deg); } }
-@keyframes wlh-fall { from { transform: translateY(-10px) rotate(0); } to { transform: translateY(170px) rotate(360deg); } }
-@media (prefers-reduced-motion: reduce) {#blk-wl-holiday .wlh.today .wlh-crests img, #blk-wl-holiday .wlh-conf { animation: none; display: none; }
-#blk-wl-holiday .wlh.today .wlh-crests img { display: block; }}
-@media (max-width: 600px) {#blk-wl-holiday .wlh-card { gap: 12px; padding: 24px 14px 14px; align-items: flex-start; }
-#blk-wl-holiday .wlh-cnt { min-width: 64px; padding: 6px 8px; }
-#blk-wl-holiday .wlh-cnt b { font-size: 26px; }
-#blk-wl-holiday .wlh-cnt span { font-size: 12px; }
-#blk-wl-holiday .wlh-crests img { width: 30px; height: 35px; }}</style><section class="wlh" id="wl-holiday" hidden aria-live="polite"></section>
-<script>
-  // ближайший праздник Wobbleland на главной: карточка видна всегда, справа — отсчёт дней; в день праздника — поздравление и конфетти.
-  // Данные — /assets/wl-holidays.<lang>.json (build.py из content/wobbleland.json), грузятся после загрузки страницы. ?devdate= (account.js) — проверка дат.
-  window.addEventListener('load', () => {
-    const box = document.getElementById('wl-holiday');
-    if (!box) return;
-    const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, lang = ['en', 'ru', 'lv'][L], pre = ['', '/ru', '/lv'][L];
-    const T = {
-      today: ['Today in Wobbleland', 'Сегодня в Wobbleland', 'Šodien Wobbleland'],
-      soon: ['Next holiday in Wobbleland', 'Ближайший праздник в Wobbleland', 'Tuvākie svētki Wobbleland'],
-      days: [n => n === 1 ? 'day left' : 'days left', n => n % 10 === 1 && n % 100 !== 11 ? 'день' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 10 || n % 100 >= 20) ? 'дня' : 'дней', n => n % 10 === 1 && n % 100 !== 11 ? 'diena' : 'dienas'],
-      tomorrow: ['tomorrow!', 'завтра!', 'rīt!'], todayCnt: ['today!', 'сегодня!', 'šodien!'],
-      happy: ['Happy holiday!', 'С праздником!', 'Priecīgus svētkus!'],
-      prep: ['The town is getting ready.', 'Город уже готовится.', 'Pilsēta jau gatavojas.'],
-      go: ['Visit the town →', 'Заглянуть в город →', 'Ieskatīties pilsētā →'],
-    };
-    let now = new Date();
-    try { const dv = JSON.parse(sessionStorage.getItem('pp-devdate') || 'null'); if (dv && dv.base) now = new Date(dv.base.slice(0, 10) + 'T12:00:00'); } catch (e) {}
-    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
-    const daysTo = h => { let d = new Date(today.getFullYear(), h.m - 1, h.d); if (d < today) d = new Date(today.getFullYear() + 1, h.m - 1, h.d); return Math.round((d - today) / 864e5); };
-    fetch(`/assets/wl-holidays.${lang}.json`).then(r => r.ok ? r.json() : []).then(all => {
-      const near = all.map(h => ({ ...h, n: daysTo(h) }));
-      if (!near.length) return;
-      const n = Math.min(...near.map(h => h.n)), hs = near.filter(h => h.n === n).slice(0, 3);
-      const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-      box.classList.toggle('today', n === 0);
-      box.innerHTML = `<div class="wlh-card">
-        <div class="wlh-crests">${hs.map(h => `<img src="/images/wobbleland/crest-${h.k}.png" alt="">`).join('')}</div>
-        <div class="wlh-tx">
-          <p class="wlh-kick">${n === 0 ? T.today[L] : T.soon[L]}</p>
-          ${hs.map(h => `<p class="wlh-t">${esc(h.t)} <small>· ${esc(h.c)}</small></p>`).join('')}
-          <p class="wlh-x">${n === 0 ? T.happy[L] + ' ' : ''}${hs.length === 1 && hs[0].x ? esc(hs[0].x) : (n > 0 && n <= 3 ? T.prep[L] : '')}</p>
-          <a class="wlh-go" href="${pre}/wobbleland/#town-${hs[0].k}">${T.go[L]}</a>
-        </div>
-        <div class="wlh-cnt">${n === 0 ? '<b>🎉</b><span>' + T.todayCnt[L] + '</span>' : `<b>${n}</b><span>${n === 1 ? T.tomorrow[L] : T.days[L](n)}</span>`}</div>
-      </div>`;
-      if (n === 0 && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
-        const card = box.firstElementChild, cols = ['#F0A987', '#F5D547', '#AFA9EC', '#F5C4B3'];
-        for (let i = 0; i < 14; i++) {
-          const c = document.createElement('i'); c.className = 'wlh-conf';
-          c.style.cssText = `left:${Math.random() * 100}%;top:0;background:${cols[i % 4]};animation-duration:${4 + Math.random() * 4}s;animation-delay:${-Math.random() * 8}s`;
-          card.appendChild(c);
-        }
-      }
-      box.hidden = false;
-    }).catch(() => {});
-  });
-</script>
-</div>
-<div data-ppb="home.7" class="hd-upd" data-flock-news="4" data-fn-view="site"></div>
-</div>
-<div data-ppb="home.8" class="hd-col hd-games" data-my-games></div>
-<div data-ppb="home.9" class="hd-col hd-rooms" data-flock-news="5" data-fn-view="rooms"></div>
-</div>
-<script src="/assets/flock-news.js?v=7977d4d3" defer></script>
-<div class="blk" id="blk-home-blog" data-ppb="blk-home-blog"><style>#blk-home-blog .hb { padding: 56px var(--gutter) 60px; background: #FFFDF8; color: #2B1A51; }
-#blk-home-blog .hb[hidden] { display: none; }
-#blk-home-blog .hb-top { display: flex; justify-content: space-between; align-items: baseline; gap: 16px; margin-bottom: 26px; flex-wrap: wrap; }
-#blk-home-blog .hb-top h2 { margin: 0; font: 600 clamp(28px, 3.2vw, 40px)/1.1 var(--serif); color: #2B1A51; }
-#blk-home-blog .hb-kick { margin: 0 0 6px; font: italic 400 18px var(--serif); color: #D85A30; }
-#blk-home-blog .hb-all { display: inline-flex; align-items: center; gap: 8px; padding: 12px 24px; border-radius: 999px; border: 2px solid #2B1A51; color: #2B1A51; font: 700 16px/1 var(--sans); text-decoration: none; transition: background .2s, color .2s, transform .2s; white-space: nowrap; }
-#blk-home-blog .hb-all:hover, #blk-home-blog .hb-all:focus-visible { background: #2B1A51; color: #FFFDF8; transform: translateY(-1px); }
-#blk-home-blog .hb-top { align-items: center; }
-#blk-home-blog .hb-grid { display: grid; grid-template-columns: minmax(0, 1fr) 320px; gap: 48px; align-items: start; }
-#blk-home-blog .hb-main { display: grid; grid-template-columns: minmax(0, 11fr) minmax(0, 9fr); gap: 32px; align-items: center; color: inherit; text-decoration: none; }
-#blk-home-blog .hb-main .hb-img { aspect-ratio: 4 / 3; border-radius: 18px; overflow: hidden; background: #EDE8F7; display: grid; place-items: center; font-size: 56px; box-shadow: 0 14px 34px rgba(43, 26, 81, .14); }
-#blk-home-blog .hb-main img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .4s; }
-#blk-home-blog .hb-main:hover img { transform: scale(1.03); }
-#blk-home-blog .hb-txt { display: block; }
-#blk-home-blog .hb-meta { margin: 0 0 8px; font: 600 14px var(--sans); color: #7A6F99; }
-#blk-home-blog .hb-main h3 { margin: 0 0 12px; font: 700 clamp(22px, 2.2vw, 30px)/1.2 var(--article, serif); color: #2B1A51; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
-#blk-home-blog .hb-main:hover h3 { text-decoration: underline; text-decoration-thickness: 2px; text-underline-offset: 4px; }
-#blk-home-blog .hb-main p.hb-ex { margin: 0 0 20px; font: 17px/1.6 var(--article, serif); color: #4A3F6B; display: -webkit-box; -webkit-line-clamp: 4; -webkit-box-orient: vertical; overflow: hidden; }
-#blk-home-blog .hb-more { display: inline-block; padding: 12px 24px; border-radius: 999px; background: #F0A987; color: #2B1A51; font: 800 16px/1 var(--sans); box-shadow: 0 5px 0 #B0573A; transition: transform .15s; }
-#blk-home-blog .hb-main:hover .hb-more { transform: translateY(-2px); }
-#blk-home-blog .hb-side { border-left: 1px solid #ECE6F5; padding-left: 32px; }
-#blk-home-blog .hb-side h3.hb-fav { margin: 0 0 16px; font: 700 15px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: #E9A93B; }
-#blk-home-blog .hb-side ol { list-style: none; margin: 0; padding: 0; display: grid; gap: 14px; }
-#blk-home-blog .hb-side a { display: grid; grid-template-columns: 84px minmax(0, 1fr); gap: 14px; align-items: center; color: inherit; text-decoration: none; padding: 8px; margin: -8px; border-radius: 14px; transition: background .2s; }
-#blk-home-blog .hb-side a:hover { background: #F3EEFB; }
-#blk-home-blog .hb-side .hb-th { width: 84px; aspect-ratio: 4 / 3; border-radius: 10px; overflow: hidden; background: #EDE8F7; display: grid; place-items: center; font-size: 24px; }
-#blk-home-blog .hb-side img { width: 100%; height: 100%; object-fit: cover; display: block; }
-#blk-home-blog .hb-side b { display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden; font: 700 16px/1.3 var(--article, serif); color: #2B1A51; }
-#blk-home-blog .hb-side small { display: block; margin-top: 4px; font: 600 13px var(--sans); color: #7A6F99; }
-#blk-home-blog .hb-solo .hb-grid { grid-template-columns: 1fr; }
-#blk-home-blog .hb-solo .hb-main { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); max-width: 1160px; gap: 44px; }
-#blk-home-blog .hb-solo .hb-main .hb-img { aspect-ratio: 16 / 10; }
-#blk-home-blog .hb-none .hb-side { display: none; }
-#blk-home-blog .hb-soon { display: flex; gap: 28px; align-items: center; padding: 28px 32px; border-radius: 18px; background: #F3EEFB; }
-#blk-home-blog .hb-soon h3 { margin: 0 0 8px; font: 600 clamp(22px, 2.4vw, 30px)/1.2 var(--serif); color: #2B1A51; }
-#blk-home-blog .hb-soon .hb-ex { margin: 0; }
-#blk-home-blog .hb-soon-pic { font-size: 48px; flex: none; }
-@media (max-width: 1100px) {#blk-home-blog .hb-grid { grid-template-columns: 1fr; gap: 36px; }
-#blk-home-blog .hb-side { border-left: 0; padding-left: 0; border-top: 1px solid #ECE6F5; padding-top: 28px; }
-#blk-home-blog .hb-side ol { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }}
-@media (max-width: 700px) {#blk-home-blog .hb { padding-top: 40px; padding-bottom: 44px; }
-#blk-home-blog .hb-top { margin-bottom: 20px; }
-#blk-home-blog .hb-main, #blk-home-blog .hb-solo .hb-main { grid-template-columns: 1fr; gap: 16px; }
-#blk-home-blog .hb-main .hb-img, #blk-home-blog .hb-solo .hb-main .hb-img { aspect-ratio: 16 / 10; }
-#blk-home-blog .hb-main h3 { font-size: 24px; }
-#blk-home-blog .hb-main p.hb-ex { font-size: 16px; margin-bottom: 18px; -webkit-line-clamp: 3; }
-#blk-home-blog .hb-more { padding: 12px 22px; font-size: 15px; }
-#blk-home-blog .hb-all { padding: 10px 18px; font-size: 15px; }}
-@media (max-width: 700px) {#blk-home-blog .hb-soon { flex-direction: column; text-align: center; padding: 24px 18px; }}</style><section class="hb" id="home-blog" hidden aria-labelledby="hb-title">
-  <div class="hb-top">
-    <div><p class="hb-kick">Fresh from the blog</p><h2 id="hb-title">Notes from the lab</h2></div>
-    <a class="hb-all" href="/blog/">All posts →</a>
-  </div>
-  <div class="hb-grid">
-    <div class="hb-latest"><div class="hb-soon"><span class="hb-soon-pic" aria-hidden="true">✍️🕊</span><div><h3>The first posts are on their way</h3><p class="hb-ex">Soon here: my Patreon articles about sketchbooks, watercolor, AI experiments and finding your own style. Free for everyone.</p></div></div></div>
-    <aside class="hb-side"><h3 class="hb-fav">★ Favourites</h3><ol></ol></aside>
-  </div>
-  <span class="hb-label" hidden data-read>Read the article →</span>
-</section>
-<script src="/assets/home-blog.js?v=0579a5ee" defer></script>
-</div>
-<section data-ppb="home.10" class="home-games" aria-labelledby="hg-title">
-  <h2 id="hg-title">Games</h2>
-  <div class="am-tiles gm-tiles">
-    <a class="am-tile gm-tile" href="/rain/" data-g="rain"><img src="/images/games/rain.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Button Rain</b><i>Catch the buttons!</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🔘</span></a>
-    <a class="am-tile gm-tile" href="/potions/" data-g="potion"><img src="/images/games/potions.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Potion Lab</b><i>Maze and potions</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🧪</span></a>
-    <a class="am-tile gm-tile" href="/pancakes/" data-added="2026-10-18" data-g="pan"><img src="/images/games/pancakes.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Polly’s Pancakes</b><i>Pancakes to order</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🥞</span></a>
-    <a class="am-tile gm-tile" href="/titos/" data-g="titos"><img src="/images/games/titos.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Detective Titos</b><i>100 detective cases</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🕵️</span></a>
-    <a class="am-tile gm-tile" href="/shift/" data-added="2026-10-23"><img src="/images/games/shift.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Shift with Polly</b><i>Work together with Polly</i></span><span class="am-tile-ico" aria-hidden="true">⏱</span></a>
-    <a class="am-tile gm-tile" href="/polly-office/"><img src="/images/games/polly-office.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Polly’s Office</b><i>Sort Polly’s mail</i></span><span class="am-tile-ico" aria-hidden="true">📮</span></a>
-    <a class="am-tile gm-tile" href="/wobbleland/"><img src="/images/games/wobbleland.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Wobbleland</b><i>Map of eleven towns</i></span><span class="am-tile-ico" aria-hidden="true">🗺</span></a>
-    <a class="am-tile gm-tile" href="/advent/" data-g="advent"><img src="/images/games/advent.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Advent calendar</b><i>31 windows with gifts</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🎄</span></a>
-  </div>
-  <p class="hg-all"><a href="/games/">All games and the shop →</a></p>
-</section>
-<script>
-// Игры на главной — полосой между блогом и книгой (24.10.2026; раньше — сразу под приветствием): первая — самая новая (data-added, новой игре — дата), дальше по популярности за 30 дней (GET /api/games/top), видны все
-(function () {
-  var box = document.querySelector('.home-games .gm-tiles'); if (!box) return;
-  var all = [].slice.call(box.children), pathOf = function (a) { return a.getAttribute('href').replace(/^\/(ru|lv)(?=\/)/, ''); };
-  var show = function (top) {
-    top = top || {};
-    var newest = all.filter(function (a) { return a.dataset.added; }).sort(function (a, b) { return b.dataset.added < a.dataset.added ? -1 : 1; })[0];
-    var rest = all.filter(function (a) { return a !== newest; }).sort(function (a, b) { return (top[pathOf(b)] || 0) - (top[pathOf(a)] || 0); });
-    (newest ? [newest] : []).concat(rest).forEach(function (a, i) { box.appendChild(a); });
-  };
-  show();
-  fetch('/api/games/top').then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d) show(d.top); }).catch(function () {});
-})();
-</script>
-<script src="/assets/games-hub.js?v=b464d2b8" defer></script>
-<script>
-// «Мой день» вошедшему — вкладками (24.10.2026, жалобы «перегружено»): Мой день · Письма · Новое на сайте · ★ Мои игры · Комнаты птичек (новое в комнатах, 25.10.2026). Гостю блока нет (25.10.2026): приветствие → блог → игры → книга.
-// Мои игры: до 3 закреплённых (☆ на плитке — тут или в полосе «Игр»), остальное место — игры, куда птичка заходит чаще (GET /api/games/mine, worker/my-games.js), потом — самые популярные.
-(function () {
-  var dash = document.querySelector('.home-dash'), bar = dash && dash.querySelector('.hd-tabs'), band = document.querySelector('.home-games .gm-tiles');
-  if (!dash || !bar || !band) return;
-  var L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
-  var T = {
-    day: ['My day', 'Мой день', 'Mana diena'], news: ['Letters', 'Письма', 'Vēstules'], site: ['New on the site', 'Новое на сайте', 'Jaunumi vietnē'], games: ['★ My games', '★ Мои игры', '★ Manas spēles'], rooms: ['Bird rooms', 'Комнаты птичек', 'Putniņu istabas'],
-    pin: ['Pin to “My games”', 'Закрепить в «Моих играх»', 'Piespraust “Manām spēlēm”'], unpin: ['Unpin', 'Открепить', 'Atspraust'],
-    hint: ['Tap ☆ on any game to pin it here — up to 3.', 'Нажми ☆ на любой игре — закрепится здесь, до 3.', 'Nospied ☆ uz jebkuras spēles — tā paliks šeit, līdz 3.'],
-    often: ['Not pinned yet — the games you open most often.', 'Пока ничего не закреплено — игры, куда заходишь чаще всего.', 'Vēl nekas nav piesprausts — spēles, kurās ieskaties visbiežāk.'],
-    all: ['All games ↓', 'Все игры ↓', 'Visas spēles ↓'],
-    swap: [function (n) { return '“' + n + '” unpinned — only 3 fit'; }, function (n) { return '«' + n + '» откреплена — помещается 3'; }, function (n) { return '“' + n + '” atsprausta — vietas ir 3'; }]
-  };
-  var TABS = ['day', 'news', 'site', 'games', 'rooms'], pins = [], visits = {}, me = false, seen = 0, siteTs = [];
-  try { seen = +localStorage.getItem('pp-hd-site') || 0; } catch (e) {}
-  bar.innerHTML = TABS.map(function (k) { return '<button type="button" role="tab" data-t="' + k + '">' + T[k][L] + ' <span class="hd-n" hidden></span></button>'; }).join('');
-  var n = function (k, v) { var s = bar.querySelector('[data-t="' + k + '"] .hd-n'); s.textContent = v || ''; s.hidden = !v; };
-  var open = function (k) {
-    dash.dataset.tab = k;
-    bar.querySelectorAll('[role=tab]').forEach(function (b) { b.setAttribute('aria-selected', b.dataset.t === k ? 'true' : 'false'); });
-    try { localStorage.setItem('pp-hd-tab', k); } catch (e) {}
-    if (k === 'site' && siteTs.length) { seen = Math.max.apply(null, siteTs.concat(seen)); n('site', 0); try { localStorage.setItem('pp-hd-site', seen); } catch (e) {} }
-  };
-  bar.addEventListener('click', function (e) { var b = e.target.closest('[role=tab]'); if (b) open(b.dataset.t); });
-  var last = 'day'; try { last = localStorage.getItem('pp-hd-tab') || 'day'; } catch (e) {}
-  open(TABS.indexOf(last) >= 0 && last !== 'site' ? last : 'day');
-  // Письма: непрочитанные в колонке news.js (без «✓ открыто»)
-  var mine = dash.querySelector('[data-my-news]');
-  if (mine && window.MutationObserver) new MutationObserver(function () { n('news', mine.querySelectorAll('.fn-row:not(.nw-done)').length); }).observe(mine, { childList: true, subtree: true });
-  // Новое на сайте: строки новее, чем при последнем открытии вкладки
-  dash.addEventListener('pp:fn', function (e) { if (e.detail.view !== 'site') return; siteTs = e.detail.ts || []; n('site', dash.dataset.tab === 'site' ? 0 : siteTs.filter(function (t) { return t > seen; }).length); });
+<section data-ppb="preview.4" class="desk" id="guides"><div class="w">
+  <div><span class="k">Guides &amp; books</span><h2>Guides to keep <em>on your desk</em></h2>
+    <p class="dc">Written, illustrated and designed by Alina. Clear steps and real sketchbook pages, from the first line to a finished little painting. No talent required, just a brush.</p>
+    <a class="btn" href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener">Buy on Amazon</a> <a class="btn ghost" href="https://drive.google.com/file/d/1IWMWb0nLOaN2UuJLZA-DqhdmwDh3T9Nx/view?usp=sharing" target="_blank" rel="noopener">Free colouring book →</a></div>
+  <div class="books"><a class="b0" href="https://a.co/d/009gymDC" target="_blank" rel="noopener"><img src="/images/e-books/watercolor-sketches.jpg" alt="Watercolor Sketches: Creative Guide" loading="lazy"></a><a class="b1" href="https://a.co/d/0cJY0kk5" target="_blank" rel="noopener"><img src="/images/e-books/ink-sketching.jpg" alt="Ink Sketching: Creative Guide" loading="lazy"></a><a class="b2" href="/blog/new-book-coming-soon/"><span class="lbl">Soon</span><img src="/images/e-books/urban-sketching-digital-traveler.jpg" alt="Urban Sketching: Digital Traveler" loading="lazy"></a><span class="hand">start with this one ↑</span></div>
+</div></section>
 
-  // ★ Мои игры
-  var pathOf = function (a) { return a.getAttribute('href').replace(/^\/(ru|lv)(?=\/)/, ''); };
-  var nameOf = function (x) { var a = [].slice.call(band.children).filter(function (t) { return pathOf(t) === x; })[0]; return a ? a.querySelector('.ns-t').textContent : x; };
-  var star = function (a) {
-    var s = a.querySelector('.gm-pin');
-    if (!s) { s = document.createElement('span'); s.className = 'gm-pin'; s.setAttribute('role', 'button'); s.tabIndex = 0; a.appendChild(s); }
-    var on = pins.indexOf(pathOf(a)) >= 0;
-    s.textContent = on ? '★' : '☆'; s.classList.toggle('on', on); s.title = (on ? T.unpin : T.pin)[L]; s.setAttribute('aria-label', s.title); s.setAttribute('aria-pressed', on ? 'true' : 'false');
-  };
-  var toggle = function (x) {
-    var i = pins.indexOf(x), out = null;
-    if (i >= 0) pins.splice(i, 1); else { pins.push(x); if (pins.length > 3) out = pins.shift(); }
-    if (out && window.PPToast) window.PPToast(T.swap[L](nameOf(out)));
-    fetch('/api/games/mine', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ pins: pins }) }).catch(function () {});
-    draw();
-  };
-  var onStar = function (e) {
-    var s = e.target.closest('.gm-pin'); if (!s) return;
-    if (e.type === 'keydown' && e.key !== 'Enter' && e.key !== ' ') return;
-    e.preventDefault(); e.stopPropagation(); toggle(pathOf(s.closest('a')));
-  };
-  var pane = dash.querySelector('[data-my-games]'), busy = false;
-  var draw = function () {
-    if (!me) return; busy = true;
-    var tiles = [].slice.call(band.children), order = tiles.map(pathOf);
-    tiles.forEach(star);
-    var often = order.slice().sort(function (a, b) { return (visits[b] || 0) - (visits[a] || 0) || order.indexOf(a) - order.indexOf(b); });
-    var pick = pins.concat(often.filter(function (x) { return pins.indexOf(x) < 0; })).slice(0, 3);
-    pane.innerHTML = '<div class="am-tiles gm-tiles hd-gm"></div><p class="hd-gm-note">' + (pins.length ? T.hint : T.often)[L] + (pins.length ? '' : ' ' + T.hint[L]) + ' <a href="#hg-title">' + T.all[L] + '</a></p>';
-    pick.forEach(function (x) { var a = tiles[order.indexOf(x)].cloneNode(true); a.hidden = false; star(a); pane.firstChild.appendChild(a); });
-    setTimeout(function () { busy = false; });
-  };
-  band.addEventListener('click', onStar, true); band.addEventListener('keydown', onStar, true);
-  pane.addEventListener('click', onStar, true); pane.addEventListener('keydown', onStar, true);
-  if (window.MutationObserver) { var t; new MutationObserver(function () { if (busy) return; clearTimeout(t); t = setTimeout(draw, 80); }).observe(band, { childList: true, subtree: true, attributes: true, attributeFilter: ['hidden', 'class'] }); } // порядок по популярности, «готово» (games-hub.js)
-  document.addEventListener('pp:whoami', function (e) {
-    var u = e.detail && e.detail.user; if (!u || !u.nick || me) return; me = true;
-    fetch('/api/games/mine', { credentials: 'same-origin' }).then(function (r) { return r.ok ? r.json() : null; }).then(function (d) { if (d) { pins = d.pins || []; visits = d.visits || {}; } draw(); }).catch(draw);
-  });
-})();
-</script>
-<div class="blk" id="blk-coming-soon" data-ppb="blk-coming-soon"><style>#blk-coming-soon { margin: 0; background: #FFFFFF; }
-#blk-coming-soon .bk { box-sizing: border-box; padding: 64px 32px; font-family: 'Karla', sans-serif; color: #2B1A51; }
-#blk-coming-soon .bk-in { display: grid; grid-template-columns: minmax(0, 360px) minmax(0, 1fr); gap: 56px; align-items: center; max-width: 1080px; margin: 0 auto; }
-#blk-coming-soon .bk-cover { position: relative; }
-#blk-coming-soon .bk-cover img { display: block; width: 100%; height: auto; border-radius: 10px; box-shadow: 0 18px 40px rgba(43, 26, 81, .22); transform: rotate(-2deg); transition: transform .3s; }
-#blk-coming-soon .bk-cover:hover img { transform: rotate(0deg) translateY(-4px); }
-#blk-coming-soon .bk-cover .spark { position: absolute; top: -18px; right: -14px; width: 56px; height: 56px; }
-#blk-coming-soon .bk p.bk-eyebrow { display: inline-flex; align-items: center; gap: 8px; margin: 0 0 14px; padding: 6px 14px; border-radius: 999px; background: #FBEFEA; color: #D85A30; font-size: 14px; font-weight: 700; letter-spacing: .06em; text-transform: uppercase; }
-#blk-coming-soon .bk-eyebrow i { width: 8px; height: 8px; border-radius: 50%; background: #D85A30; animation: pulse 1.8s infinite; }
-@keyframes pulse { 0%,100% { opacity: 1; } 50% { opacity: .3; } }
-#blk-coming-soon .bk h2 { margin: 0 0 16px; font-family: 'Fraunces', serif; font-weight: 600; font-size: clamp(30px, 4vw, 46px); line-height: 1.08; }
-#blk-coming-soon .bk h2 span { color: #8E6FE0; }
-#blk-coming-soon .bk p { margin: 0 0 14px; max-width: 56ch; font-size: 17px; line-height: 1.65; color: #5A4E78; }
-#blk-coming-soon .bk .note { font-size: 15px; }
-#blk-coming-soon .bk-btns { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 26px; }
-#blk-coming-soon .btn { display: inline-flex; align-items: center; gap: 10px; padding: 13px 22px; border-radius: 999px; font-size: 16px; font-weight: 700; text-decoration: none; transition: transform .2s, background .2s; }
-#blk-coming-soon .btn:hover { transform: translateY(-2px); }
-#blk-coming-soon .btn:focus-visible { outline: 3px solid #D85A30; outline-offset: 3px; }
-#blk-coming-soon .btn-main { background: #2B1A51; color: #FFFFFF; }
-#blk-coming-soon .btn-main:hover { background: #3C2670; }
-#blk-coming-soon .btn-ghost { border: 2px solid #2B1A51; color: #2B1A51; }
-#blk-coming-soon .btn svg { width: 18px; height: 18px; }
-#blk-coming-soon .bk-notify { margin-top: 26px; max-width: 520px; }
-#blk-coming-soon .bk p.bk-notify-h { margin: 0 0 10px; font-weight: 700; color: #2B1A51; }
-#blk-coming-soon .bk-row { display: flex; gap: 10px; flex-wrap: wrap; }
-#blk-coming-soon .bk-row input { flex: 1; min-width: 200px; padding: 13px 18px; border-radius: 999px; border: 2px solid #D9D0EC; font: 16px 'Karla', sans-serif; color: #2B1A51; background: #fff; }
-#blk-coming-soon .bk-row input:focus { outline: none; border-color: #8E6FE0; }
-#blk-coming-soon .bk-row .btn { border: 0; cursor: pointer; font-family: inherit; }
-#blk-coming-soon .bk-consent { display: flex; gap: 10px; align-items: flex-start; margin-top: 12px; font-size: 13px; line-height: 1.5; color: #6B6290; text-align: left; cursor: pointer; }
-#blk-coming-soon .bk-consent input { margin-top: 3px; width: 17px; height: 17px; accent-color: #8E6FE0; flex: none; }
-#blk-coming-soon .bk-consent a { color: #8E6FE0; }
-#blk-coming-soon .bk p.bk-msg { margin: 10px 0 0; font-weight: 700; color: #2E8B57; min-height: 1em; }
-#blk-coming-soon .bk p.bk-msg.err { color: #C0392B; }
-#blk-coming-soon .bk p.bk-unsub { margin: 4px 0 0; }
-#blk-coming-soon .bk-link { border: 0; background: none; padding: 0; color: #8C7FB0; font: 13px 'Karla', sans-serif; text-decoration: underline; cursor: pointer; }
-#blk-coming-soon .hp { position: absolute; left: -9999px; }
-@media (max-width: 760px) {#blk-coming-soon .bk-notify { margin-left: auto; margin-right: auto; }
-#blk-coming-soon .bk { padding: 44px 20px; }
-#blk-coming-soon .bk-in { grid-template-columns: 1fr; gap: 32px; text-align: center; }
-#blk-coming-soon .bk-cover { max-width: 260px; margin: 0 auto; }
-#blk-coming-soon .bk p { margin-left: auto; margin-right: auto; }
-#blk-coming-soon .bk-btns { justify-content: center; }}
-@media (prefers-reduced-motion: reduce) {#blk-coming-soon .bk-cover img, #blk-coming-soon .btn { transition: none; }
-#blk-coming-soon .bk-eyebrow i { animation: none; }}</style><section class="bk">
-  <div class="bk-in">
-    <div class="bk-cover">
-      <img src="/images/home/urban-sketching-digital-traveler.jpg" width="848" height="1200" loading="lazy" alt="Cover of the book Urban Sketching: Digital Traveler by Alina Otkinska, a watercolor and ink sketch of old towers and rooftops">
-      <svg class="spark" viewBox="-50 -50 100 100" aria-hidden="true"><path d="M0 -48 l14 34 34 14 -34 14 -14 34 -14 -34 -34 -14 34 -14z" fill="#E9A93B"/></svg>
+<section data-ppb="preview.5" class="jr" id="journal"><div class="w">
+  <span class="doodle" aria-hidden="true">fresh from the sketchbook ↓</span>
+  <div class="hd3"><div><span class="k">Journal</span><h2>Notes from <em>the studio</em></h2></div><a class="btn" href="/blog/">All articles</a></div>
+  <div class="jg" id="v2-blog"><div class="feat"><div class="im sk"></div></div><div><div class="post"><div class="sk" style="height:90px"></div></div><div class="post"><div class="sk" style="height:90px"></div></div><div class="post"><div class="sk" style="height:90px"></div></div></div></div>
+</div></section>
+
+<section data-ppb="preview.6" class="dark" id="club"><div class="w"><div class="club">
+  <div class="ph"><img src="/images/v2/club-cat.jpg" alt="A ginger cat next to a colouring page and watercolours" loading="lazy"><span class="k">Free with sign-in</span><h2>VIP lessons <em>for friends of Polly</em></h2></div>
+  <div class="tk"><div class="stamp" aria-hidden="true">ADMIT<br>ONE<br>✦ VIP ✦</div><span class="k">VIP corner</span>
+    <p>Sign in with Google, it’s free, and extra video lessons open right here on the site.</p>
+    <div class="row top"><span>Watercolour review</span><small>VIP video</small></div>
+    <div class="row"><span>More VIP lessons</span><small>on the way ✿</small></div>
+    <a class="btn pri vip-go" href="/games/#signin">Sign in for free</a><span class="note">Want to support my work? <a href="#guides">Get one of my books</a>.</span></div>
+</div></div></section>
+
+<section data-ppb="preview.7" class="ab2" id="about"><div class="w">
+  <div class="ph"><img src="/images/home/alina.jpg" alt="Alina Otkinska" loading="lazy"><span>— Alina &amp; Polly</span></div>
+  <div><span class="k">Hi, I’m Alina</span><h2>I teach the way I sketch: <em>small, kind, step by step</em></h2>
+    <p>Illustrator and learning experience designer from Riga. I once drew a pigeon called Polly, and she grew into a whole world.</p>
+    <a class="btn" href="/about/">More about me →</a></div>
+</div></section>
+
+<section data-ppb="preview.8" class="lab3" id="lab"><div class="w">
+  <div class="hd4"><span class="k">Psst… there’s another side</span><h2>Top secret: <em>the Lab</em></h2><span class="hand">open the folder to peek inside</span></div>
+  <div class="fold"><div class="bk"></div><span class="tb">case file · the lab</span>
+    <div class="ins">
+      <div class="nt"><span class="pin"></span><span class="k">Behind this door</span><h3>Birds, games &amp; silly experiments</h3>
+        <p>Hatch your own bird, join the Flock, play games for buttons, solve cases with detective Titos. Cosy and free.</p>
+        <div class="ltabs"><a href="/games/">Play</a><a href="/flock/">My bird</a><a href="/shop/">Bird market</a><a href="/art-pill/">Experiments</a></div>
+        <a class="btn pri" href="/games/">🚪 Open the Lab</a></div>
+      <div class="ph2"><span class="clip"></span><img src="/images/home/first-pigeon-polly.jpg" alt="The very first Pigeon Polly" loading="lazy"><span>the very first Polly</span></div>
     </div>
-    <div>
-      <p class="bk-eyebrow"><i></i> Work in progress · Book 3</p>
-      <h2>Urban Sketching<br><span>Digital Traveler</span></h2>
-      <p>I&#39;m writing my third sketching guide. This time it&#39;s about drawing cities you can&#39;t (or don&#39;t want to) walk into right now: street panoramas, photos and videos, and a sketchbook on your own kitchen table.</p>
-      <p>Perspective made simple, weather, people and pigeons, color accents, composition, references and a lot of stories.</p>
-      <p class="note">Every illustration is made by hand, without AI. Coming soon on Amazon.</p>
-      <form class="bk-notify" data-topic="books">
-        <p class="bk-notify-h">🔔 Get an email when the book is out</p>
-        <div class="bk-row"><input type="email" name="email" required maxlength="254" placeholder="your@email.com" aria-label="Your email" autocomplete="email"><button class="btn btn-main" type="submit">Notify me</button></div>
-        <input class="hp" type="text" name="website" tabindex="-1" autocomplete="off" aria-hidden="true">
-        <label class="bk-consent"><input type="checkbox" name="consent" required> <span>I agree that Alina will email me once when the book is published. My address is not shared with anyone, and I can unsubscribe at any time. <a href="/privacy/">Privacy</a></span></label>
-        <p class="bk-msg" role="status" aria-live="polite"></p>
-        <p class="bk-unsub"><button type="button" class="bk-link" data-unsub>Unsubscribe</button></p>
-      </form>
-    </div>
+    <button type="button" class="cv" aria-label="Open the folder"><span class="f"><span class="clbl">THE LAB</span><span class="stp">FOR CURIOUS BIRDS ONLY</span><span class="hand">psst… open me →</span><span class="tie"></span></span><span class="b"></span></button>
   </div>
-</section>
-<script>
-// «Сообщите, когда выйдет книга»: адрес + согласие → /api/subscribe; «Отписаться» → /api/unsubscribe
-document.querySelectorAll('.bk-notify').forEach(function (f) {
-  var lang = document.documentElement.lang || 'en', L = { en: 0, ru: 1, lv: 2 }[lang] || 0;
-  var T = { ok: ['Done! I will write to you when the book is out 💛', 'Готово! Я напишу вам, когда книга выйдет 💛', 'Gatavs! Uzrakstīšu, kad grāmata iznāks 💛'],
-    bye: ['You are unsubscribed. The address is deleted.', 'Вы отписались. Адрес удалён.', 'Tu esi atrakstījies. Adrese ir dzēsta.'],
-    unsubQ: ['Enter the email to unsubscribe:', 'Введите адрес, который нужно отписать:', 'Ievadi e-pastu, ko atrakstīt:'],
-    email: ['Please check the email address.', 'Проверьте адрес почты.', 'Pārbaudi e-pasta adresi.'],
-    consent: ['Please tick the consent box.', 'Отметьте, пожалуйста, согласие.', 'Lūdzu, atzīmē piekrišanu.'], err: ['Something went wrong. Please try again.', 'Что-то пошло не так. Попробуйте ещё раз.', 'Kaut kas nogāja greizi. Mēģini vēlreiz.'] };
-  var msg = f.querySelector('.bk-msg');
-  var say = function (k, bad) { msg.textContent = T[k][L]; msg.classList.toggle('err', !!bad); };
-  var post = function (url, body) { return fetch(url, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }).then(function (r) { return r.json().then(function (d) { if (!r.ok) throw d; return d; }); }); };
-  f.addEventListener('submit', function (e) {
-    e.preventDefault();
-    post('/api/subscribe', { email: f.email.value, consent: f.consent.checked, consentText: f.querySelector('.bk-consent span').textContent.trim(), topic: f.dataset.topic, lang: lang, website: f.website.value })
-      .then(function () { say('ok'); f.email.value = ''; }).catch(function (d) { say(d && d.error === 'email' ? 'email' : d && d.error === 'consent' ? 'consent' : 'err', true); });
-  });
-  f.querySelector('[data-unsub]').addEventListener('click', function () {
-    var em = prompt(T.unsubQ[L], f.email.value || ''); if (!em) return;
-    post('/api/unsubscribe', { email: em }).then(function () { say('bye'); }).catch(function () { say('err', true); });
-  });
-});
-</script>
-</div>
-<div class="blk" id="blk-flock" data-ppb="blk-flock"><style>#blk-flock .fl { padding: 56px var(--gutter) 64px; text-align: center; }
-#blk-flock .fl-kick { margin: 0 0 6px; font: italic 400 18px var(--serif); color: #F0A987; }
-#blk-flock .fl h2 { margin: 0 0 10px; font: 600 clamp(28px, 3.2vw, 40px)/1.1 var(--serif); }
-#blk-flock .fl-sub { margin: 0 auto 8px; max-width: 58ch; font-size: 16px; line-height: 1.6; color: #D9D3F2; }
-#blk-flock .fl-count { margin: 0 0 20px; font-size: 14px; font-weight: 700; color: #E9A93B; min-height: 1.2em; }
-#blk-flock .fl-stage { position: relative; max-width: 1200px; margin: 0 auto; border-radius: 18px; overflow: hidden; box-shadow: 0 0 0 3px #1a1528, 0 18px 40px rgba(0, 0, 0, .35); cursor: pointer; }
-#blk-flock .fl-stage canvas { display: block; width: 100%; image-rendering: pixelated; }
-#blk-flock .fl-labels { position: absolute; inset: 0; pointer-events: none; }
-#blk-flock .fl-nick { position: absolute; left: 0; top: 0; padding: 1px 6px; border-radius: 99px; background: rgba(26, 21, 40, .72); color: #F3EFFA; font: 700 11px/1.4 var(--sans); white-space: nowrap; text-decoration: none; pointer-events: auto; will-change: transform; }
-#blk-flock .fl-nick:hover { background: #F0A987; color: #2B1A51; z-index: 2; }
-#blk-flock .fl-nick.me { background: #E9A93B; color: #2B1A51; z-index: 1; }
-#blk-flock .fl-join { display: inline-block; margin-top: 12px; }
-#blk-flock .fl-how { margin: 22px 0 0; font-size: 15px; color: #F3EFFA; font-weight: 700; }
-#blk-flock .fl-tools { display: flex; flex-wrap: wrap; justify-content: center; gap: 6px; max-width: 1000px; margin: 0 auto 14px; }
-#blk-flock .fl-tools button { padding: 6px 12px; border-radius: 99px; border: 1.5px solid rgba(243, 239, 250, .35); background: rgba(255, 255, 255, .06); color: #F3EFFA; font: 700 13px var(--sans); cursor: pointer; transition: background .15s, transform .15s; }
-#blk-flock .fl-tools button:hover { background: rgba(240, 169, 135, .25); border-color: #F0A987; }
-#blk-flock .fl-tools button[aria-pressed="true"] { background: #E9A93B; border-color: #E9A93B; color: #2B1A51; }
-#blk-flock .fl-tools button.pop { animation: fl-pop .35s; }
-@keyframes fl-pop { 40% { transform: scale(1.12); } }
-#blk-flock .fl-tools .fl-reset { border-color: #4CC38A; color: #BFF0D6; }
-#blk-flock .fl-tools .fl-reset:hover { background: rgba(76, 195, 138, .25); border-color: #4CC38A; }
-#blk-flock .fl-open { padding: 6px 12px; border-radius: 99px; border: 1.5px solid #F0A987; background: #F0A987; color: #2B1A51; font: 700 13px var(--sans); text-decoration: none; }
-#blk-flock .fl-open:hover { background: #F7C6A9; color: #2B1A51; }
-#blk-flock .fl-labels.hide-nicks .fl-nick:not(.me):not(.found) { display: none; }
-#blk-flock .fl-nick.found { background: #E9A93B; color: #2B1A51; z-index: 3; box-shadow: 0 0 0 2px #FFFDF5; }
-#blk-flock .fl-find { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin: 0 auto 14px; }
-#blk-flock .fl-find input { width: min(260px, 60vw); padding: 7px 14px; border-radius: 99px; border: 1.5px solid rgba(243, 239, 250, .35); background: rgba(255, 255, 255, .08); color: #F3EFFA; font: 600 14px var(--sans); }
-#blk-flock .fl-find input::placeholder { color: #B9B0D6; }
-#blk-flock .fl-find input:focus { outline: none; border-color: #E9A93B; }
-#blk-flock .fl-find button { padding: 7px 14px; border-radius: 99px; border: 0; background: #E9A93B; color: #2B1A51; font: 700 13px var(--sans); cursor: pointer; }
-#blk-flock .fl-find-msg { min-width: 1em; font-size: 14px; font-weight: 700; color: #E9A93B; }
-#blk-flock .fl-seedhint { margin: -6px 0 12px; font-size: 14px; color: #E9A93B; font-weight: 700; }
-#blk-flock .fl-stage.seeding { cursor: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='28' height='28'%3E%3Ctext y='22' font-size='22'%3E%F0%9F%8C%BE%3C/text%3E%3C/svg%3E") 6 22, crosshair; touch-action: none; }
-#blk-flock .fl-stage.seeding .fl-nick { pointer-events: none; }
-@media (max-width: 600px) {#blk-flock .fl-tools button { font-size: 12px; padding: 5px 9px; }
-#blk-flock .fl-nick { font-size: 10px; padding: 0 4px; }}
-#blk-flock .fl-menu { position: relative; }
-#blk-flock .fl-menu > summary { list-style: none; cursor: pointer; padding: 6px 14px; border-radius: 99px; border: 1.5px solid #E9A93B; background: rgba(233, 169, 59, .15); color: #F3EFFA; font: 700 13px var(--sans); }
-#blk-flock .fl-menu > summary::-webkit-details-marker { display: none; }
-#blk-flock .fl-menu > summary::after { content: ' ▾'; }
-#blk-flock .fl-menu[open] > summary { background: #E9A93B; color: #2B1A51; }
-#blk-flock .fl-menu[open] > summary::after { content: ' ▴'; }
-#blk-flock .fl-menu-in { position: absolute; z-index: 30; top: calc(100% + 6px); left: 50%; transform: translateX(-50%); display: grid; grid-template-columns: repeat(2, max-content); gap: 6px; padding: 10px; border-radius: 16px; background: #2B1A51; box-shadow: 0 14px 32px rgba(0,0,0,.45), 0 0 0 1.5px rgba(243,239,250,.25); }
-#blk-flock .fl-menu-in button { text-align: left; }
-#blk-flock .fl-tools { position: relative; }
-@media (max-width: 600px) {#blk-flock .fl-menu { position: static; }
-#blk-flock .fl-menu-in { left: 0; right: 0; transform: none; grid-template-columns: 1fr 1fr; }}
-#blk-flock .fl-book { position: absolute; left: 0; top: 0; display: grid; place-items: center; padding: 0; border: 0; border-radius: 2px 3px 3px 2px; background: var(--tc); box-shadow: inset 3px 0 0 rgba(0,0,0,.25), inset 0 0 0 2px rgba(255,255,255,.25), 0 2px 6px rgba(0,0,0,.4); font-size: 15px; cursor: pointer; pointer-events: auto; transition: filter .15s; will-change: transform; animation: fl-glow 2.4s ease-in-out infinite; }
-#blk-flock .fl-spine { border-radius: 1px; box-shadow: inset 0 3px 0 rgba(255,255,255,.35); }
-#blk-flock .fl-spine::after { content: '✨'; position: absolute; top: -15px; left: 50%; transform: translateX(-50%); font-size: 11px; pointer-events: none; }
-#blk-flock .fl-book:hover, #blk-flock .fl-book:focus-visible { filter: brightness(1.25); outline: 2px solid #F5D547; z-index: 4; }
-@keyframes fl-glow { 50% { box-shadow: inset 3px 0 0 rgba(0,0,0,.25), 0 0 10px 2px rgba(245,213,71,.75); } }
-@media (prefers-reduced-motion: reduce) {#blk-flock .fl-book { animation: none; }}
-#blk-flock .fl-tale { max-width: min(520px, calc(100vw - 32px)); padding: 0; border: 0; border-radius: 18px; background: #FFFDF5; color: #2B1A51; box-shadow: 0 20px 50px rgba(0,0,0,.45); }
-#blk-flock .fl-tale::backdrop { background: rgba(20,12,40,.6); }
-#blk-flock .fl-tale article { text-align: left; padding: 22px 24px 20px; border-top: 10px solid var(--tc); }
-#blk-flock .fl-tale-kick { margin: 0 0 4px; font: 700 12px/1.4 var(--sans); text-transform: uppercase; letter-spacing: .06em; opacity: .7; }
-#blk-flock .fl-tale h3 { margin: 0 0 12px; font-size: 1.35rem; }
-#blk-flock .fl-tale p { margin: 0 0 16px; line-height: 1.6; }
-#blk-flock .fl-tale button { padding: 8px 18px; border: 0; border-radius: 99px; background: #2B1A51; color: #fff; font: 700 14px var(--sans); cursor: pointer; }
-#blk-flock .fl-reading { position: absolute; left: 0; top: 0; padding: 2px 8px; border: 0; cursor: pointer; border-radius: 99px; background: #FFFDF5; color: #2B1A51; font: 700 11px/1.4 var(--sans); white-space: nowrap; text-decoration: none; pointer-events: auto; box-shadow: 0 3px 8px rgba(0,0,0,.3); z-index: 3; }
-#blk-flock .fl-reading:hover { background: #F5D547; }
-#blk-flock .fl-menu-in button[hidden] { display: none; }
-#blk-flock .fl-invite { margin: 0 auto 14px; padding: 10px 16px; max-width: 620px; border-radius: 18px; background: #F5D547; color: #2B1A51; font: 500 15px/1.5 var(--sans); text-align: center; }
-#blk-flock .fl-invite button { margin-left: 6px; padding: 5px 14px; border: 0; border-radius: 99px; background: #D85A30; color: #fff; font: 700 14px var(--sans); cursor: pointer; }
-#blk-flock .fl-invite button:hover { background: #2B1A51; }</style><section class="fl" id="flock" aria-labelledby="fl-title">
-  <p class="fl-kick">Everyone who signs in gets a bird</p>
-  <h2 id="fl-title">Our flock</h2>
-  <p class="fl-sub">Everyone who has ever signed in on this site lives here as a little pixel bird. No two birds are alike: different shapes, hats and very fancy shoes. Every 10th guest is a friendly cat, every 11th a crow with a treasure in its beak. Click a nickname to see the profile.</p>
-  <p class="fl-count" data-tpl="Birds in the flock: {n}" data-recent="· showing those who dropped by recently"></p>
-  <div class="fl-tools" role="toolbar" aria-label="Play with the flock"><details class="fl-menu"><summary><span aria-hidden="true">🎮</span> Play</summary><div class="fl-menu-in"><button type="button" data-act="seed" aria-pressed="false"><span aria-hidden="true">🌾</span> Seeds</button><button type="button" data-act="party" aria-pressed="false"><span aria-hidden="true">🎉</span> Party</button><button type="button" data-act="wind"><span aria-hidden="true">💨</span> Wind</button><button type="button" data-act="rain"><span aria-hidden="true">🌧</span> Rain</button><button type="button" data-act="football"><span aria-hidden="true">⚽</span> Football</button><button type="button" data-act="dance"><span aria-hidden="true">🪩</span> Disco</button><button type="button" data-act="nap"><span aria-hidden="true">🌙</span> Night</button><button type="button" data-act="coffee"><span aria-hidden="true">☕</span> Coffee</button><button type="button" data-act="tug"><span aria-hidden="true">🥖</span> Baguette tug</button><button type="button" data-act="plane"><span aria-hidden="true">✈️</span> Paper plane</button><button type="button" data-act="bookclub"><span aria-hidden="true">📖</span> Book club</button><button type="button" data-act="box"><span aria-hidden="true">📦</span> Box</button><button type="button" data-act="delivery"><span aria-hidden="true">🪂</span> Delivery</button><button type="button" data-act="milkshake"><span aria-hidden="true">🥤</span> Milkshakes</button><button type="button" data-act="pancakes"><span aria-hidden="true">🥞</span> Pancakes</button><button type="button" data-act="reading"><span aria-hidden="true">📖</span> Reading hour</button><button type="button" data-act="booktower"><span aria-hidden="true">🗼</span> Book tower</button><button type="button" data-act="hideseek"><span aria-hidden="true">🫣</span> Hide and seek</button><button type="button" data-act="spooky"><span aria-hidden="true">👻</span> Spooky</button><button type="button" data-act="decorate"><span aria-hidden="true">🎄</span> Decorate the tree</button><button type="button" data-act="presents"><span aria-hidden="true">🎁</span> Open presents</button><button type="button" data-act="khorovod"><span aria-hidden="true">💃</span> Round dance</button><button type="button" data-act="tidy"><span aria-hidden="true">🧹</span> Tidy up</button></div></details><details class="fl-menu"><summary><span aria-hidden="true">📍</span> Where is the flock</summary><div class="fl-menu-in"><button type="button" data-act="loc-park" aria-pressed="true"><span aria-hidden="true">🌳</span> Square</button><button type="button" data-act="loc-diner" aria-pressed="false"><span aria-hidden="true">🍽</span> Diner</button><button type="button" data-act="loc-books" aria-pressed="false"><span aria-hidden="true">📚</span> Bookstore</button><button type="button" data-act="loc-pumpkins" aria-pressed="false"><span aria-hidden="true">🎃</span> Pumpkin field</button><button type="button" data-act="loc-xmas" aria-pressed="false"><span aria-hidden="true">🎄</span> New Year tree</button></div></details><button type="button" data-act="nicks" aria-pressed="true"><span aria-hidden="true">🏷</span> Nicknames</button><button type="button" data-act="reset" class="fl-reset"><span aria-hidden="true">↺</span> Back to normal</button><a class="fl-open" href="/flock/" target="_blank"><span aria-hidden="true">⛶</span> Full screen</a></div>
-  <form class="fl-find" role="search"><input type="search" name="nick" placeholder="Find a bird by nickname" aria-label="Find a bird by nickname" maxlength="40" autocomplete="off"><button type="submit">🔍 Find</button><span class="fl-find-msg" role="status" aria-live="polite"></span></form>
-  <p class="fl-seedhint" hidden>Hold the mouse button (or your finger) and move over the scene — the birds will flock to the seeds.</p>
-  <div class="fl-stage"><canvas width="300" height="142" role="img" aria-label="Pixel birds living their little lives around a bench: they carry things, tug a baguette, play football, read a book and drink coffee"></canvas><div class="fl-labels"></div></div>
-  <p class="fl-how">To get into the flock, just sign in with Google and pick a nickname.</p>
-  <a class="pill-btn pill-fill fl-join" href="/challenge/">Get my bird →</a>
-</section>
-<script src="/assets/flock.js?v=46ff4cd9" defer></script>
-</div>
+</div></section>
 
 </main>
-<dialog class="modal" id="contact" aria-labelledby="contact-t">
-  <div class="modal-band" style="background:#D85A30"></div>
-  <button class="modal-close" aria-label="Close">✕</button>
-  <p class="modal-kicker">Say hello</p>
-  <h2 id="contact-t">Write to me</h2>
-  <form class="contact-form" action="https://formsubmit.co/ajax/769d04d721e5563890ed721ba698f9bc" method="POST">
-    <label>Your email
-      <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
-    </label>
-    <label>Message <span>(optional)</span>
-      <textarea name="message" placeholder="Hi Alina, …"></textarea>
-    </label>
-    <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <button type="submit">Send</button>
-    <p class="form-status" role="status" aria-live="polite"></p>
-  </form>
-</dialog>
-<footer class="site-footer">
-  <nav class="ft-map" aria-label="Site map"><div class="ft-col"><p class="ft-h"><a href="/flock/"><span class="nm-t">The Flock</span></a></p><ul><li><a href="/flock/"><span class="ns-t">All birds</span></a></li><li><a href="/challenge/#sw-wall"><span class="ns-t">Flock drawings</span></a></li><li><a href="/flock/news/"><span class="ns-t">Flock news</span></a></li></ul></div><div class="ft-col"><p class="ft-h"><a href="/games/"><span class="nm-t">Play</span></a></p><ul><li><a href="/advent/"><span class="ns-t">Advent calendar</span></a></li><li><a href="/rain/"><span class="ns-t">Button Rain</span></a></li><li><a href="/potions/"><span class="ns-t">Potion Lab</span></a></li><li><a href="/pancakes/"><span class="ns-t">Polly’s Pancakes</span></a></li><li><a href="/titos/"><span class="ns-t">Detective Titos</span></a></li><li><a href="/shift/"><span class="ns-t">Shift with Polly</span></a></li><li><a href="/polly-office/"><span class="ns-t">Polly’s Office</span></a></li><li><a href="/wobbleland/"><span class="ns-t">Wobbleland</span></a></li></ul></div><div class="ft-col"><p class="ft-h"><a href="/challenge/"><span class="nm-t">Draw</span></a></p><ul><li><a href="/challenge/"><span class="ns-t">Daily Challenge</span></a></li><li><a href="/requests/"><span class="ns-t">Draw this for me</span></a></li><li><a href="/palettes/"><span class="ns-t">Palettes</span></a></li><li><a href="/polly-helps/"><span class="ns-t">Polly, help me</span></a></li><li><a href="/e-books/"><span class="ns-t">Books</span></a></li></ul></div><div class="ft-col"><p class="ft-h"><a href="/blog/"><span class="nm-t">Blog</span></a></p><ul></ul></div><div class="ft-col"><p class="ft-h"><a href="/about-me/"><span class="nm-t">About me</span></a></p><ul><li><a href="/art-portfolio/"><span class="ns-t">Sketchbook</span></a></li><li><a href="/on-walls-and-pages/"><span class="ns-t">On Walls &amp; Pages</span></a></li><li><a href="/projects/"><span class="ns-t">Learning &amp; AI</span></a></li><li><a href="/work-with-me/"><span class="ns-t">Work with me</span></a></li><li><a href="/art-pill/"><span class="ns-t">Art-Pill by Polly</span></a></li></ul></div></nav>
-  <p>© Alina Otkinska · Pigeon Polly Art Lab</p>
-  <p class="footer-links">
-    <a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener">LinkedIn</a>
-    <a href="https://www.instagram.com/pigeonpolly" target="_blank" rel="noopener">Instagram</a>
-    <a href="https://www.tiktok.com/@pigeonpolly" target="_blank" rel="noopener">TikTok</a>
-    <a href="https://www.patreon.com/cw/pigeon_polly" target="_blank" rel="noopener">Patreon</a>
-    <a href="https://www.pinterest.com/pigeonpollyart/" target="_blank" rel="noopener">Pinterest</a>
-    <a href="/privacy/">Privacy</a>
-  </p>
-</footer>
+<footer class="ft2"><div class="w">
+  <div class="cols">
+    <div class="intro"><h4>Pigeon Polly <em>Art Lab</em></h4><p>Watercolour and ink lessons, creative guides and a small world of painted characters, made in Riga.</p>
+      <div class="soc"><a href="https://www.patreon.com/cw/pigeon_polly" target="_blank" rel="noopener">Patreon</a><a href="https://www.instagram.com/pigeonpolly" target="_blank" rel="noopener">Instagram</a><a href="https://www.tiktok.com/@pigeonpolly" target="_blank" rel="noopener">TikTok</a><a href="https://www.pinterest.com/pigeonpollyart/" target="_blank" rel="noopener">Pinterest</a></div></div>
+    <div><h4>Learn</h4><a href="/learn/">Lessons</a><a href="/guides/">Guides &amp; books</a><a href="/blog/">Journal</a><a href="/palettes/">Palettes</a></div>
+    <div><h4>Explore</h4><a href="/wobbleland/">Wobbleland</a><a href="/games/">The Lab</a><a href="/flock/">The Flock</a><a href="/challenge/">Daily Challenge</a></div>
+    <div><h4>Alina</h4><a href="/about/">About</a><a href="/work-with-me/">Work with me</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener">LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener">Amazon</a></div>
+  </div>
+  <div class="bt"><span>© 2026 Alina Otkinska · Pigeon Polly Art Lab · Riga</span><span><a href="/privacy/">Privacy</a></span></div>
+</div></footer>
 </body>
 </html>
