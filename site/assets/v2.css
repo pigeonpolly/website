@@ -113,11 +113,12 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
 /* клуб */
 .dark{background:var(--gr);color:var(--grtx);padding:110px 0}
 .club{position:relative;height:520px}
-.club .ph{position:absolute;left:0;top:0;width:62%;height:100%;overflow:hidden;border-radius:4px}
-.club .ph img{width:100%;height:100%;object-fit:cover;filter:brightness(.55) saturate(.85)}
-.club .ph .k{position:absolute;left:30px;top:30px;color:#E9E2D6}
-.club .ph h2{position:absolute;left:30px;bottom:30px;font:300 70px/.95 Fraunces,Lora,serif;color:#F2ECE3;max-width:7em}.club .ph h2 em{color:#F2ECE3}
-.tk{position:absolute;right:0;top:50px;width:44%;background:var(--sheet);color:var(--ink);padding:36px 40px;box-shadow:0 30px 60px rgba(0,0,0,.4);
+.club .ph{position:absolute;left:0;top:0;width:48%;height:100%;overflow:hidden;border-radius:4px}
+.club .ph:after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(20,14,10,.78) 0,rgba(20,14,10,.35) 42%,transparent 62%)}
+.club .ph img{width:100%;height:100%;object-fit:cover;object-position:center 60%}
+.club .ph .k{position:absolute;left:30px;top:30px;color:#E9E2D6;z-index:1}
+.club .ph h2{position:absolute;left:30px;top:62px;font:300 58px/.95 Fraunces,Lora,serif;color:#F2ECE3;max-width:7em;z-index:1;text-shadow:0 2px 14px rgba(0,0,0,.4)}.club .ph h2 em{color:#F2ECE3}
+.tk{position:absolute;right:0;top:50px;width:56%;background:var(--sheet);color:var(--ink);padding:36px 40px;box-shadow:0 30px 60px rgba(0,0,0,.4);
  -webkit-mask:radial-gradient(circle 14px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 14px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 14px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 14px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat}
 .tk p{color:var(--mut);font-size:15px;margin:6px 100px 10px 0}
 .tk .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px dashed rgba(31,35,38,.3);padding:15px 0;font:400 21px Fraunces,Lora,serif}
@@ -186,7 +187,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
  .drawer .lb{color:var(--acc)}.drawer .lang-switch{margin-top:14px}.drawer .lang-switch a{font:500 15px Karla,'Nunito Sans',sans-serif;border:0;padding:4px 10px 4px 0}
  .fl .w,.desk .w,.jg,.ab2 .w{grid-template-columns:1fr}
  .books{max-width:640px}
- .club{height:auto}.club .ph{position:relative;width:100%;height:380px}.club .ph h2{bottom:76px}.tk{position:relative;width:auto;top:-50px;margin:0 20px}
+ .club{height:auto}.club .ph{position:relative;width:100%;height:380px}.club .ph{height:460px}.tk{position:relative;width:auto;top:-50px;margin:0 20px}
  .fold{width:100%}
 }
 @media (max-width:700px){
@@ -202,7 +203,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
  .cl{height:500px}.cl .a{width:80%;top:10px}.cl .b{width:78%;right:0;top:250px}.cl .t b{font-size:14px;right:10px;line-height:1.15}.cl .t .pl{width:38px;height:38px;bottom:48px}.ticket{left:0;right:auto;top:212px;bottom:auto;padding:7px 10px;z-index:6}.ticket b{font-size:17px}
  .desk{padding:80px 0}.desk .w{gap:28px}.desk h2{font-size:40px}.books{height:300px}.books a{width:130px}.books .b1{left:105px}.books .b2{left:210px}.lbl{font-size:9px;padding:5px 8px}.books .hand{left:0;bottom:-10px;font-size:22px}
  .jr{padding:70px 0}.hd3{flex-direction:column;align-items:start;gap:14px}.hd3 h2{font-size:40px}.doodle{display:none}.jg{gap:30px}.feat .im{height:250px}.feat .card{width:auto;margin:-60px 12px 0}.feat h3{font-size:24px}.post{grid-template-columns:1fr 90px}.post img{width:90px;height:72px}.post h3{font-size:20px}
- .dark{padding:70px 0}.club .ph{height:320px}.club .ph h2{font-size:42px}.tk{top:-40px;margin:0 10px;padding:28px 22px}.tk p{margin-right:70px}.tk .row{font-size:18px}.stamp{width:74px;height:74px;font-size:8px;right:14px;top:14px}
+ .dark{padding:70px 0}.club .ph{height:420px}.club .ph h2{font-size:40px}.tk{top:-16px;margin:0 10px;padding:28px 22px}.tk p{margin-right:70px}.tk .row{font-size:18px}.stamp{width:74px;height:74px;font-size:8px;right:14px;top:14px}
  .ab2{padding:70px 0}.ab2 .w{gap:40px}.ab2 .ph{width:86%;margin:0 auto}.ab2 h2{font-size:38px}.ab2 p{font-size:17px}
  .lab3{padding:70px 0 90px}.lab3 .hd4{margin-bottom:56px}.lab3 .hd4 h2{font-size:38px}
  .fold{height:auto}.fold .ins{position:relative;inset:auto;grid-template-columns:1fr;gap:34px;padding:34px 16px 30px}
