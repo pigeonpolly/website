@@ -8,7 +8,7 @@ SEASONS = {
  'winter': dict(name='Winter', ru='Зима', bg='#EEF1F3', sheet='#F8FAFB', ink='#1C2430', mut='#5D6670', line='#D3DAE0', gr='#26303A', gr2='#313C47', acc='#9E1B22', acc2='#E2544A', inner='#1B2632', hero='img/hero-winter.jpg', pos='center 32%', note='frosty rooftops, Riga ❄', tag='winter edition'),
  'autumn': dict(name='Autumn', ru='Осень', bg='#F4F0EA', sheet='#FBF9F5', ink='#2A211C', mut='#6C6058', line='#DED5CA', gr='#2E2521', gr2='#3A302B', acc='#C04A1C', acc2='#EE7A45', inner='#2A1D16', hero='img/hero-autumn.jpg', pos='center 45%', note='night garden, physalis ✿', tag='autumn edition'),
  'spring': dict(name='Spring', ru='Весна', bg='#F1F4F0', sheet='#FAFBF9', ink='#1F2A25', mut='#5E6A63', line='#D4DDD6', gr='#26302B', gr2='#313C36', acc='#BE2F3A', acc2='#E85C64', inner='#1C2A23', hero='img/hero-spring.jpg', pos='center 55%', note='wild strawberries ❀', tag='spring edition'),
- 'summer': dict(name='Summer', ru='Лето', bg='#F7F4EE', sheet='#FFFDFA', ink='#2A2420', mut='#6D635B', line='#E3DACE', gr='#2F2622', gr2='#3B312C', acc='#D2452B', acc2='#F07A55', inner='#3A1A1C', hero='img/hero-summer.jpg', pos='center 22%', note='Polly, summer lover ☀', tag='summer edition'),
+ 'summer': dict(name='Summer', ru='Лето', bg='#F7F4EE', sheet='#FFFDFA', ink='#2A2420', mut='#6D635B', line='#E3DACE', gr='#2F2622', gr2='#3B312C', acc='#D2452B', acc2='#F07A55', inner='#3A1A1C', hero='img/hero-summer.jpg', pos='center 45%', note='Polly’s ice cream van ☀', tag='summer edition'),
 }
 
 def stain(col, seed, op):
@@ -93,6 +93,8 @@ def build(key, s, mode=''):
                  ('#E2544A', 'var(--acc2)')]:
         assert a in css, a; css = css.replace(a, b)
     css = css.replace('object-position:center 32%', 'object-position:' + s['pos'])
+    if key == 'summer':
+        css += '.pano{height:620px}.pano img{-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 26%);mask-image:linear-gradient(to bottom,transparent 0,#000 26%)}'
     css = css.replace('.post img{width:110px;height:110px;object-fit:cover;border-radius:55px 55px 3px 3px}', '.post img{width:130px;height:96px;object-fit:cover;border-radius:3px}')
     css = css.replace('STAINS', ', '.join([stain(s['acc'], 4, .22), stain(s['mut'], 9, .2), stain(s['acc'], 12, .16)]) + ';background-size:420px 420px,300px 300px,200px 200px;background-position:8% 20%,88% 70%,60% 10%')
     b = B0
