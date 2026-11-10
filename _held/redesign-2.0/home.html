@@ -1,0 +1,189 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Pigeon Polly Art Lab — mockup</title>
+<link rel="stylesheet" href="m.css">
+<style>
+.hero{padding:64px 0 72px}
+.hero .wrap{display:grid;grid-template-columns:1.05fr 1fr;gap:56px;align-items:center}
+.hero h1{font-size:68px;font-weight:600}
+.hero h1 em{font-style:italic;color:var(--orange);font-weight:400}
+.hero p.lead{font-size:19px;color:var(--ink2);margin:22px 0 30px;max-width:30em}
+.hero .ctas{display:flex;gap:12px;flex-wrap:wrap}
+.trust{display:flex;gap:22px;margin-top:34px;font-size:13px;color:var(--ink2)}
+.trust b{display:block;font:600 22px Fraunces;color:var(--ink)}
+.col{position:relative;height:520px}
+.col .p{position:absolute;background:#fff;padding:10px 10px 30px;box-shadow:0 14px 30px rgba(60,40,20,.18)}
+.col .p img{width:100%;height:100%;object-fit:cover}
+.col .a{width:300px;height:360px;left:20px;top:30px;transform:rotate(-4deg)}
+.col .b{width:260px;height:310px;right:10px;top:0;transform:rotate(5deg)}
+.col .c{width:240px;height:230px;right:70px;bottom:0;transform:rotate(-2deg)}
+.col .lbl{position:absolute;bottom:6px;left:12px;font:italic 13px Fraunces;color:var(--ink2)}
+.col .stamp{position:absolute;left:0;bottom:30px;width:120px;height:120px;border-radius:50%;background:var(--moss);color:var(--paper);display:grid;place-items:center;text-align:center;font:italic 15px/1.2 Fraunces;transform:rotate(-10deg);border:3px dashed var(--apricot);outline:6px solid var(--moss)}
+section.blk{padding:80px 0;border-top:1px solid var(--line)}
+.bh{display:flex;justify-content:space-between;align-items:end;margin-bottom:34px;gap:20px}
+.bh h2{font-size:44px}
+.bh p{color:var(--ink2);max-width:28em}
+.three{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.way{background:var(--card);border:1px solid var(--line);padding:28px;border-radius:4px;display:flex;flex-direction:column}
+.way .ic{height:170px;margin:-28px -28px 22px;overflow:hidden;background:var(--paper2)}
+.way .ic img{width:100%;height:100%;object-fit:cover}
+.way h3{font-size:27px}
+.way p{color:var(--ink2);margin:8px 0 20px;flex:1}
+.way .btn{align-self:flex-start}
+.way.soon{background:var(--burgundy);color:var(--paper);border-color:var(--burgundy)}
+.way.soon p{color:#E8D5C8}
+.way.soon .btn{border-color:var(--paper)}
+.grid4{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.books{background:var(--burgundy);color:var(--paper);border:0}
+.books .wrap{display:grid;grid-template-columns:1fr 1.3fr;gap:60px;align-items:center}
+.books h2{font-size:46px}
+.books p{opacity:.85;margin:16px 0 26px}
+.covers{display:flex;gap:22px;justify-content:center}
+.covers img{width:190px;box-shadow:12px 16px 0 rgba(0,0,0,.25);border-radius:2px}
+.covers .c2{transform:translateY(30px)}
+.wait .wrap{display:grid;grid-template-columns:1fr 1fr;gap:50px;align-items:center}
+.wait h2{font-size:44px}
+.poll{background:var(--card);border:1px solid var(--line);padding:30px;border-radius:4px}
+.poll h3{font-size:20px;margin-bottom:14px}
+.chips{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:18px}
+.chips span{border:1.5px solid var(--ink);border-radius:999px;padding:7px 14px;font:500 14px Karla}
+.chips span.on{background:var(--ink);color:var(--paper)}
+.f{display:flex;gap:8px}.f input{flex:1;padding:13px 18px;border-radius:999px;border:1.5px solid var(--ink);font:15px Karla;background:#fff}
+.me .wrap{display:grid;grid-template-columns:340px 1fr;gap:60px;align-items:center}
+.me img{width:100%;aspect-ratio:4/5;object-fit:cover;border-radius:200px 200px 4px 4px}
+.me h2{font-size:42px}.me p{color:var(--ink2);margin:14px 0;font-size:18px}
+.me .sig{font:italic 26px Fraunces;color:var(--orange)}
+.wl{background:#E9DFC6}
+.wl .wrap{display:grid;grid-template-columns:1.2fr 1fr;gap:50px;align-items:center}
+.fan{position:relative;height:420px}.fan img{position:absolute;width:230px;border-radius:10px;box-shadow:0 16px 30px rgba(60,40,20,.25)}
+.fan img:nth-child(1){left:20px;top:40px;transform:rotate(-9deg)}.fan img:nth-child(2){left:190px;top:10px;transform:rotate(-1deg);z-index:2}.fan img:nth-child(3){left:360px;top:44px;transform:rotate(8deg)}
+.wl .map{display:none}
+.wl .map img{filter:sepia(.5) saturate(.75) hue-rotate(-12deg) contrast(.9) brightness(1.1);image-rendering:pixelated}
+.wl .map:after{content:"";position:absolute;inset:0;background:radial-gradient(transparent 55%,rgba(110,70,30,.35));mix-blend-mode:multiply}
+.chars{display:flex;gap:10px;margin:20px 0 26px}
+.chars{display:none}
+.lab{background:#2C1F2B;color:#F6E7B4;border:0;position:relative;overflow:hidden;background-image:radial-gradient(rgba(246,231,180,.08) 1px,transparent 1px);background-size:22px 22px}
+.lab .wrap{display:grid;grid-template-columns:1fr 1.1fr;gap:50px;align-items:center}
+.lab h2{font-size:46px;font-style:italic;font-weight:400}
+.lab p{color:#E6D6C8;margin:14px 0 26px;font-size:18px}
+.lab .btn{background:var(--mustard);color:#2C1F2B;border-color:var(--mustard)}
+.lab .pic{position:relative;background:#fff;padding:12px 12px 40px;transform:rotate(2deg);box-shadow:0 20px 40px rgba(0,0,0,.4)}.lab .pic img{width:100%}.lab .pic span{position:absolute;bottom:10px;left:14px;font:italic 15px Fraunces;color:var(--ink2)}
+.ltabs{display:flex;gap:6px;flex-wrap:wrap;margin:0 0 26px}.ltabs span{border:1px solid rgba(246,231,180,.35);border-radius:12px 12px 3px 3px;padding:7px 14px;font:italic 15px Fraunces;color:#F6E7B4}
+.drawers{display:grid;grid-template-columns:repeat(3,1fr);gap:14px}
+.drawer{background:#342A57;border-radius:8px 8px 4px 4px;padding:18px;border-top:6px solid var(--mustard)}
+.drawer:nth-child(2){border-top-color:var(--apricot)}.drawer:nth-child(3){border-top-color:#8FB3A0}
+.drawer b{font:700 18px 'Pixelify Sans';display:block}
+.drawer span{font-size:13px;color:#CFC4E6}
+.drawer img{width:64px;height:64px;image-rendering:pixelated;margin-bottom:10px}
+.journal .grid3{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.art{border-top:2px solid var(--ink);padding-top:16px}
+.art small{font:700 11px Karla;letter-spacing:.14em;text-transform:uppercase;color:var(--olive)}
+.art h3{font-size:23px;margin:8px 0}
+.art p{color:var(--ink2);font-size:15px}
+.club{margin-top:36px;display:flex;justify-content:space-between;align-items:center;background:var(--card);border:1px dashed var(--orange);padding:22px 26px;border-radius:4px;gap:20px}
+.club b{font:600 20px Fraunces}
+@media(max-width:700px){
+  .hero{padding:30px 0 40px}
+  .hero .wrap,.books .wrap,.wait .wrap,.me .wrap,.wl .wrap,.lab .wrap{grid-template-columns:1fr;gap:28px}
+  .hero h1{font-size:42px}.hero p.lead{font-size:17px;margin:14px 0 22px}
+  .hero .ctas .btn{flex:1;justify-content:center}
+  .col{height:300px}
+  .col .a{width:190px;height:230px;left:0;top:20px}.col .b{width:170px;height:200px;right:0}.col .c{width:150px;height:140px;right:40px}
+  .col .stamp{left:4px;bottom:0;width:86px;height:86px;font-size:12px}
+  .trust{gap:14px;margin-top:22px}.trust b{font-size:18px}
+  section.blk{padding:48px 0}
+  .bh{flex-direction:column;align-items:start;margin-bottom:22px}.bh h2,.books h2,.wait h2,.me h2,.lab h2{font-size:32px}
+  .three,.grid4,.journal .grid3{grid-template-columns:1fr}
+  .grid4{grid-template-columns:1fr 1fr;gap:12px}.grid4 .pc h3{font-size:15px}.grid4 .pc .btn{display:none}
+  .covers{gap:10px}.covers img{width:31%}
+  .me img{width:70%;margin:0 auto}
+  .fan{height:300px}.fan img{width:150px}.fan img:nth-child(2){left:100px}.fan img:nth-child(3){left:190px}
+  .club{flex-direction:column;align-items:start}
+  .f{flex-direction:column}
+}
+</style></head><body>
+<header class="hd"><div class="wrap">
+  <a class="logo" href="#"><img src="img/logo-wc.png" alt=""><span>Pigeon Polly<small>Art Lab · Riga</small></span></a>
+  <nav class="nav"><a href="shop.html">Shop</a><a href="#">Learn</a><a href="wobbleland.html">Wobbleland</a><a href="#">Journal</a><a href="#">About</a></nav>
+  <div class="hd-r"><span class="lang">EN · LV · RU</span><span>🛒 2</span><a class="door-btn" href="lab.html"><img src="../../site/images/wobbleland/ch-polly.png" alt=""><span>The Lab</span></a><span class="burger">☰</span></div>
+</div></header>
+
+<section class="hero"><div class="wrap">
+  <div>
+    <div class="eyebrow">Watercolour · sketching · small joys</div>
+    <h1>Art you can hang,<br><em>and art you can learn</em></h1>
+    <p class="lead">Prints and creative guides by illustrator Alina Otkinska, made in a small art lab in Riga. Paint-along lessons are on the way.</p>
+    <div class="ctas"><a class="btn pri" href="shop.html">Shop prints</a><a class="btn" href="#">Get the guides</a></div>
+    <div class="trust"><div><b>2</b>guides on Amazon</div><div><b>11</b>towns in Wobbleland</div><div><b>since 2019</b>Pigeon Polly</div></div>
+  </div>
+  <div class="col">
+    <div class="p a"><img src="../../site/images/sketchbook/sketchbook-15-800.jpg" alt=""><span class="lbl">Night garden, print</span></div>
+    <div class="p b"><img src="../../site/images/sketchbook/sketchbook-17-800.jpg" alt=""><span class="lbl">Persimmons</span></div>
+    <div class="p c"><img src="../../site/images/sketchbook/sketchbook-7-800.jpg" alt=""><span class="lbl">Rooftops</span></div>
+    <div class="stamp">hand-painted<br>in Riga</div>
+  </div>
+</div></section>
+
+<section class="blk"><div class="wrap">
+  <div class="bh"><div><div class="eyebrow">Start here</div><h2>Three ways in</h2></div><p>Pick what you came for. Everything else is one click away.</p></div>
+  <div class="three">
+    <div class="way"><div class="ic"><img src="../../site/images/sketchbook/sketchbook-16-800.jpg" alt=""></div><h3>Prints &amp; originals</h3><p>Watercolour botanicals, cafés and city corners. Printed on cotton paper, signed.</p><a class="btn dark" href="shop.html">Browse prints</a></div>
+    <div class="way"><div class="ic"><img src="../../site/images/sketchbook/sketchbook-21-800.jpg" alt=""></div><h3>Creative guides</h3><p>Step-by-step books for watercolour and ink sketching. Start in one evening.</p><a class="btn" href="#">See the guides</a></div>
+    <div class="way soon"><div class="ic"><img src="../../site/images/sketchbook/sketchbook-5-800.jpg" alt=""></div><h3>Paint with me <small style="font:700 11px Karla;letter-spacing:.1em;background:var(--mustard);color:var(--ink);padding:3px 8px;border-radius:3px;vertical-align:middle">SOON</small></h3><p>Short paint-along videos in English with Latvian subtitles. Join the list and choose the first topic.</p><a class="btn" href="#wait">Join the waitlist</a></div>
+  </div>
+</div></section>
+
+<section class="blk"><div class="wrap">
+  <div class="bh"><div><div class="eyebrow">New in the shop</div><h2>Prints of the season</h2></div><a class="btn" href="shop.html">All prints →</a></div>
+  <div class="grid4">
+    <div class="pc"><span class="tag">Bestseller</span><div class="im"><img src="../../site/images/sketchbook/sketchbook-15-800.jpg" alt=""></div><h3>Night Garden</h3><div class="row"><span class="price">€28</span><span class="btn sm">Add</span></div></div>
+    <div class="pc"><div class="im"><img src="../../site/images/sketchbook/sketchbook-14-800.jpg" alt=""></div><h3>Red Wall, Riga</h3><div class="row"><span class="price">€28</span><span class="btn sm">Add</span></div></div>
+    <div class="pc"><div class="im"><img src="../../site/images/sketchbook/sketchbook-21-800.jpg" alt=""></div><h3>Cup of Brushes</h3><div class="row"><span class="price">€24</span><span class="btn sm">Add</span></div></div>
+    <div class="pc"><span class="tag">Original</span><div class="im"><img src="../../site/images/sketchbook/sketchbook-16-800.jpg" alt=""></div><h3>Strawberry Leaves</h3><div class="row"><span class="price">€140</span><span class="btn sm">Add</span></div></div>
+  </div>
+</div></section>
+
+<section class="blk books"><div class="wrap">
+  <div><div class="eyebrow" style="color:var(--apricot)">Creative guides</div><h2>Learn to sketch, one page at a time</h2><p>Written, illustrated and designed by Alina. Clear steps, real sketchbook pages, no talent required.</p><a class="btn" style="border-color:var(--paper)" href="#">Buy on Amazon</a> <a class="btn" style="border:0" href="#">Free colouring book →</a></div>
+  <div class="covers"><img src="../../site/images/e-books/watercolor-sketches.jpg" alt=""><img class="c2" src="../../site/images/e-books/ink-sketching.jpg" alt=""><img src="../../site/images/e-books/urban-sketching-digital-traveler.jpg" alt=""></div>
+</div></section>
+
+<section class="blk wait" id="wait"><div class="wrap">
+  <div><div class="eyebrow">Coming next</div><h2>What should we paint first?</h2><p style="color:var(--ink2);margin-top:14px;font-size:18px">I’m filming paint-along lessons: 20–30 minutes, one small painting each. Vote for a topic and you’ll get the first lesson free.</p></div>
+  <div class="poll"><h3>I want to paint…</h3><div class="chips"><span class="on">Cosy cafés</span><span>Botanicals</span><span>City sketching</span><span>Wobbly characters</span><span>Seasonal cards</span></div>
+  <div class="f"><input placeholder="Your email"><span class="btn pri">Save my seat</span></div><p class="note" style="margin-top:10px">Lessons in English with Latvian subtitles · no spam, one letter a month</p></div>
+</div></section>
+
+<section class="blk me"><div class="wrap">
+  <img src="../../site/images/home/alina.jpg" alt="">
+  <div><div class="eyebrow">Hi, I’m Alina</div><h2>An illustrator with a sketchbook in every bag</h2><p>I paint with watercolour and ink, design learning experiences, and once drew a pigeon called Polly who grew into a whole world.</p><p class="sig">— Alina &amp; Polly</p><a class="btn" href="#">My story</a> <a class="btn" style="border:0" href="#">Work with me →</a></div>
+</div></section>
+
+<section class="blk wl"><div class="wrap">
+  <div class="fan"><img src="../../site/images/cards/classic/13.jpg"><img src="../../site/images/cards/classic/16.jpg"><img src="../../site/images/cards/classic/14.jpg"></div>
+  <div><div class="eyebrow">A world of my own</div><h2 style="font-size:44px">Welcome to Wobbleland</h2><p style="color:var(--ink2);margin-top:14px;font-size:18px">Eleven wobbly towns and their residents: a bakery seller, a detective pigeon, a mouse who keeps the lost-and-found boxes. Each one is a hand-painted collectible card.</p>
+  <div class="chars"><img src="../../site/images/wobbleland/pt-bramwell-bear.png"><img src="../../site/images/wobbleland/pt-count-hopula.png"><img src="../../site/images/wobbleland/pt-dr-dripsson.png"><img src="../../site/images/wobbleland/pt-barnaby-burrows.png"><img src="../../site/images/wobbleland/pt-candice-creepleton.png"></div>
+  <a class="btn dark" href="wobbleland.html">Explore the map</a> <a class="btn" style="border:0" href="#">Card sets →</a></div>
+</div></section>
+
+<section class="blk lab"><div class="wrap">
+  <div><div class="eyebrow" style="color:var(--mustard)">Psst… there’s another side</div><h2>Behind this door is the Lab</h2><p>Hatch your own bird, join the Flock, play games for buttons, solve cases with detective Titos. Silly, cosy and free.</p><div class="ltabs"><span>Play</span><span>My bird</span><span>Bird market</span><span>Experiments</span></div><a class="btn" href="lab.html">🚪 Open the Lab door</a></div>
+  <div class="pic"><img src="../../site/images/home/first-pigeon-polly.jpg" alt=""><span>The very first Pigeon Polly</span></div>
+</div></section>
+
+<section class="blk journal"><div class="wrap">
+  <div class="bh"><div><div class="eyebrow">Journal</div><h2>Notes from the studio</h2></div><a class="btn" href="#">All articles →</a></div>
+  <div class="grid3">
+    <div class="art"><small>Watercolour</small><h3>Five colours are enough: my travel palette</h3><p>The small kit I carry everywhere, and why fewer paints make better sketches.</p></div>
+    <div class="art"><small>Learning &amp; AI</small><h3>What AI can’t learn for you</h3><p>On creativity, education and keeping the hand in the process.</p></div>
+    <div class="art"><small>Behind the scenes</small><h3>How a guide gets made</h3><p>From the first sketch to the Amazon page, the whole cycle done solo.</p></div>
+  </div>
+  <div class="club"><div><b>Join the Studio Club on Patreon</b><br><span class="note">Process videos, printable cards each month and early access to lessons.</span></div><span class="btn dark">Become a member</span></div>
+</div></section>
+
+<footer class="ft"><div class="wrap">
+  <div><h4>One letter a month</h4><p>New prints, a free mini-lesson and what’s cooking in the Lab.</p><input placeholder="Your email"><span class="btn pri">Subscribe</span></div>
+  <div><h4>Shop</h4><ul><li>Prints</li><li>Originals</li><li>Guides</li><li>Card sets</li></ul></div>
+  <div><h4>Explore</h4><ul><li>Wobbleland</li><li>Journal</li><li>Palettes</li><li>The Lab 🚪</li></ul></div>
+  <div><h4>Alina</h4><ul><li>About</li><li>Work with me</li><li>LinkedIn</li><li>Patreon</li></ul></div>
+  <div class="bot"><span>© 2026 Pigeon Polly Art Lab · Riga</span><span>EN · LV · RU</span></div>
+</div></footer>
+</body></html>
