@@ -968,6 +968,7 @@ async function blogPageInner(req, env, url, h) {
   // картинки блога из R2
   if (p.startsWith('/media/')) {
     if (!env.MEDIA) return new Response('Not found', { status: 404 });
+    if (decodeURIComponent(p.slice(7)).startsWith('notes/')) return new Response('Not found', { status: 404 }); // файлы 📣 Рассылки — только через /api/note/file
     const obj = await env.MEDIA.get(decodeURIComponent(p.slice(7)));
     if (!obj) return new Response('Not found', { status: 404 });
     return new Response(obj.body, { headers: { 'content-type': obj.httpMetadata?.contentType || 'application/octet-stream', 'cache-control': 'public, max-age=31536000, immutable', etag: obj.httpEtag } });

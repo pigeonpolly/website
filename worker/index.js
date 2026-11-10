@@ -9,6 +9,7 @@ import '../site/assets/can-do.js'; // PPCanDo — что можно с вещь�
 const PPCanDo = globalThis.PPCanDo;
 import { cardsApi, importCards, translateMissing, myCards, tradeNews, cardGiftNews, CARD_TABLES, CARD_ALTER } from './cards.js'; // коллекционные карточки (docs/cards.md)
 import { authApi, googleLink, funnelStep, mailOn, adventMail, adventAsk, AUTH_TABLES, AUTH_ALTER } from './auth.js'; // вход с паролем, письма, воронки (этап 12)
+import { notesApi, noteNews, noteHistory, audWhere, NOTE_TABLES, NOTE_ALTER } from './notes.js'; // 📣 Рассылка: сообщения и файлы птичкам, «кому» (docs/bird.md «Рассылка»)
 import { wlHolidayCron, wlMailApi, wlLang, WL_ALTER } from './wl-holidays.js'; // праздники Воббленда: подарки и письма (docs/wobbleland.md)
 import { flockApi, featherNews, FLOCK_TABLES, FLOCK_ALTER } from './flock.js'; // «Все птички» и пёрышки (этап 13 Б+В, docs/flock.md)
 import { flockNewsApi, flockEvent as flockEventDb, roomEvent, flockNewsCron, FLOCK_NEWS_TABLES, FLOCK_NEWS_ALTER } from './flock-news.js'; // новости стаи (этап 13 Г, docs/flock.md)
@@ -360,6 +361,7 @@ const NEWS_KINDS = [
   ['chatnew', (env, req, u) => aboutChatNews(env, u.id, rigaDay())], // письмо о новом чате /about-me/ — пока птичка его не открыла, до 30.11.2026 (worker/about-chat.js)
   ['aboutask', (env, req, u) => aboutAskNews(env, u.id)], // ответ Алины на вопрос из чата /about-me/, пока автор не открыл чат (worker/about-chat.js)
   ['school', (env, req, u) => schoolNews(env, u.id)], // «Школа Полли»: печать или «на доработку» от Алины, пока ученик не открыл /polly-helps/ (worker/school.js)
+  ['note', (env, req, u) => noteNews(env, u, wlLang(req) || u.lang || 'en')], // 📣 сообщения от Алины из «Рассылки» (worker/notes.js), гаснут после «Прочитать»
   ['boxes', (env, req, u) => u.box_mail ? { n: 1, box: u.box0 || 'cardbox' } : null], // письмо о коробках и бардаке (старым птичкам и новым после выбора коробки)
 ];
 async function newsOf(env, req, u) {
@@ -389,6 +391,7 @@ async function newsHistory(env, u, limit = 12) {
     out.push({ kind: 'card', n: 1, note: x.gift || '', at: x.bought_at });
   for (const x of await all('SELECT u.nick, tr.created_at FROM card_trades tr LEFT JOIN users u ON u.id = tr.from_id WHERE tr.to_id = ? AND tr.seen = 1 ORDER BY tr.id DESC LIMIT ?', u.id, limit))
     out.push({ kind: 'trade', n: 1, from: x.nick ? [x.nick] : [], at: x.created_at });
+  out.push(...await noteHistory(env, u, u.lang || 'en', limit).catch(() => []));
   return out.filter(x => x.at).sort((a, b) => b.at - a.at).slice(0, limit);
 }
 
@@ -523,6 +526,7 @@ async function ensureSchema(env) {
     ...FLOCK_TABLES.map(sql => env.DB.prepare(sql)), // пёрышки и гости комнат: room_guests, feathers (worker/flock.js)
     ...AUTH_TABLES.map(sql => env.DB.prepare(sql)), // вход с паролем: login_fail, pw_reset, funnel (worker/auth.js)
     ...MAIL_TABLES.map(sql => env.DB.prepare(sql)), // письма: mail_out, mail_sent (worker/mail.js)
+    ...NOTE_TABLES.map(sql => env.DB.prepare(sql)), // рассылка: notes, note_to (worker/notes.js)
   ]);
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
   for (const sql of ["ALTER TABLE users ADD COLUMN avatar TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
@@ -531,7 +535,7 @@ async function ensureSchema(env) {
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_days INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_last TEXT', 'ALTER TABLE users ADD COLUMN cats_alive INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
-    'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER,
+    'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER, ...NOTE_ALTER,
     "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN atags TEXT DEFAULT ''", ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...SHIFT_ALTER, ...SCHOOL_ALTER, ...ABOUT_CHAT_ALTER, ...CHALLENGE_ALTER, ...GARDEN_ALTER, ...WL_ALTER, ...MAIL_ALTER]) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
@@ -1502,6 +1506,7 @@ async function route(req, env, url) {
     award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), item: (rq, uid, note) => rainItem(env, rq, uid, 0, note) }); if (r) return r; }
   if (p === '/api/garden' || p.startsWith('/api/garden/')) { const r = await gardenApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p === '/api/admin/ideas' || p === '/api/admin/ideas/write') { const r = await ideasApi(req, env, url, authHelpers(env)); if (r) return r; }
+  if (p.startsWith('/api/note/') || p.startsWith('/api/admin/notes')) { const r = await notesApi(req, env, url, helpers(env)); if (r) { if (p === '/api/admin/notes/send') await mailCron(env, authHelpers(env)).catch(() => {}); return r; } }
   if (p.startsWith('/api/mail/') || p.startsWith('/api/admin/mail')) { const r = await mailApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p === '/api/study') { const r = await studyApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/english' || p === '/api/english/access') { const r = await englishApi(req, env, url, studyHelpers(env)); if (r) return r; }
@@ -2480,7 +2485,7 @@ async function route(req, env, url) {
     const b = await req.json().catch(() => ({}));
     const n = Math.floor(Number(b.amount) || 0);
     if (n < 1 || n > 10000) fail(400, 'bad');
-    const ref = 'sal' + Date.now() + randomHex(2), who = 'nick IS NOT NULL AND banned = 0';
+    const ref = 'sal' + Date.now() + randomHex(2), who = audWhere(b, now()).sql; // «кому» из 📣 Рассылки: все / новые / старые
     const [ins] = await env.DB.batch([
       env.DB.prepare(`INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at, seen) SELECT id, 'salary', ?, ?, ?, ?, 0 FROM users WHERE ${who}`).bind(ref, n, rigaDay(), now()),
       env.DB.prepare(`UPDATE users SET buttons = COALESCE(buttons, 0) + ? WHERE ${who} AND id IN (SELECT user_id FROM button_log WHERE kind = 'salary' AND ref = ?)`).bind(n, ref),
@@ -2562,14 +2567,14 @@ async function route(req, env, url) {
     const b = await req.json().catch(() => ({}));
     if (!okItem(b.kind, b.item)) fail(400, 'bad');
     if (b.item === '?' || b.kind === 'any') { // «🎲 Сюрприз»: каждой птичке своя случайная вещь, которой у неё ещё нет
-      const users = (await env.DB.prepare("SELECT id FROM users WHERE banned = 0 AND nick IS NOT NULL AND nick != ''").all()).results;
+      const users = (await env.DB.prepare(`SELECT id FROM users WHERE ${audWhere(b, now()).sql}`).all()).results; // «кому» из 📣 Рассылки
       const stmts = [];
       for (const x of users) { const it = await surpriseKI(env, req, x.id, b.kind, b.item); if (it) stmts.push(env.DB.prepare('INSERT INTO gifts (user_id, kind, item, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(x.id, it[0], it[1], String(b.note || '').slice(0, 200), now())); }
       for (let i = 0; i < stmts.length; i += 50) await env.DB.batch(stmts.slice(i, i + 50));
       return json({ ok: true, count: stmts.length });
     }
     const lim = legMax(b.kind, b.item);
-    const r = await env.DB.prepare(`INSERT INTO gifts (user_id, kind, item, note, created_at) SELECT u.id, ?, ?, ?, ? FROM users u WHERE u.banned = 0 AND u.nick IS NOT NULL AND u.nick != ''
+    const r = await env.DB.prepare(`INSERT INTO gifts (user_id, kind, item, note, created_at) SELECT u.id, ?, ?, ?, ? FROM users u WHERE ${audWhere(b, now(), 'u').sql}
       AND (SELECT COUNT(*) FROM gifts g WHERE g.user_id = u.id AND g.kind = ? AND g.item = ? AND g.status IN ('bag', 'new')) < ?`)
       .bind(b.kind, String(b.item), String(b.note || '').slice(0, 200), now(), b.kind, String(b.item), lim).run();
     return json({ ok: true, count: r.meta.changes || 0 });

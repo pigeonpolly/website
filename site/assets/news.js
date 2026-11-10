@@ -127,6 +127,13 @@
       act: ['Look', 'Посмотреть', 'Apskatīt'],
       go: x => pre + '/polly-helps/' + (x.diploma ? '#diploma' : '#school'),
     },
+    note: { // 📣 сообщение от Алины из кабинета → «Рассылка» (worker/notes.js noteNews); гаснет после «Прочитать»
+      icon: '📣',
+      title: x => ((x.items || [])[0] || {}).s + (x.n > 1 ? ` (+${x.n - 1})` : ''),
+      text: x => { const it = (x.items || [])[0] || {}; const t = String(it.t || '').replace(/\s+/g, ' '); return (it.file ? '📎 ' : '') + (t.length > 90 ? t.slice(0, 90) + '…' : t); },
+      act: ['Read', 'Прочитать', 'Lasīt'],
+      open: noteOpen,
+    },
     boxes: { // письмо о коробках и бардаке — старым птичкам и новым после выбора коробки (worker: users.box_mail)
       icon: '📦',
       title: () => ['A letter for you!', 'Тебе письмо!', 'Tev vēstule!'][L],
@@ -267,6 +274,17 @@
       if (gb) { if (f) f.close(); gb.click(); } else location.href = pre + '/bird/#gift';
     };
   }
+  // 📣 сообщение(я) от Алины: текст абзацами, ссылки кликабельны, файл — «Скачать» (только получателю, /api/note/file)
+  function noteOpen(card, x, btn) {
+    if (card.classList.contains('open')) return drop('note', card);
+    card.classList.add('open');
+    const kb = n => n > 1048576 ? (n / 1048576).toFixed(1) + ' MB' : Math.max(1, Math.round(n / 1024)) + ' KB';
+    const para = t => esc(t).split(/\n{2,}/).map(p => `<p>${p.replace(/\n/g, '<br>').replace(/https?:\/\/[^\s<]+/g, u => `<a href="${u}" target="_blank" rel="noopener">${u}</a>`)}</p>`).join('');
+    card.insertAdjacentHTML('beforeend', (x.items || []).map(it => `<div class="nw-paper"><b>${esc(it.s)}</b>${para(it.t)}${it.file ? `<p class="nw-paper-act"><a class="pill-btn" href="${esc(it.file.url)}" download>📎 ${['Download', 'Скачать', 'Lejupielādēt'][L]} ${esc(it.file.name)} (${kb(it.file.size)})</a></p>` : ''}<i>— Alina &amp; Polly</i></div>`).join(''));
+    btn.textContent = ['Got it ✓', 'Прочитано ✓', 'Izlasīts ✓'][L];
+    const pp = card.querySelector('.nw-paper'); if (pp) pp.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+    fetch('/api/note/seen', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ ids: (x.items || []).map(i => i.id) }) }).catch(() => {});
+  }
   function boxLetter(card, x, btn) {
     if (card.classList.contains('open')) return drop('boxes', card);
     card.classList.add('open');
@@ -310,6 +328,7 @@
       if (x.kind === 'gift') text = [x.from ? ['From @', 'От @', 'No @'][L] + x.from : '', window.PPBirds && x.k ? PPBirds.giftName(x.k, x.v, L) : ''].filter(Boolean).join(' · '); // «ждёт нераскрытым» — уже не так
       if (x.kind === 'gift') go = pre + '/bird/#room';
       if (x.kind === 'salary' && x.sum) text = T.salGot[L](x.sum);
+      if (x.kind === 'note') { const f = ((x.items || [])[0] || {}).file; if (f) go = f.url; } // прочитанное сообщение: файл можно скачать снова
       return { icon: k.icon, title: k.title(x), text, go, at: x.at * 1000 }; });
     const when = ms => new Date(ms).toLocaleDateString(['en-GB', 'ru-RU', 'lv-LV'][L], { day: 'numeric', month: 'short' });
     const opened = ['opened', 'открыто', 'atvērts'][L];
