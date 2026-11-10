@@ -283,3 +283,4 @@
 - 10.11: редизайн — в журнале на главной 4 статьи: крупно одна, справа три (просьба Алины).
 - 10.11: редизайн — клуб по настоящим уровням Patreon (скрин Алины): Little Persimmon €5, Polly’s Travel Buddy €10 (★), Cloudberry Patron €25 (голосование, упоминания, живые Q&A); обложки уроков — кадры видео (site/images/v2/lesson-szmal.jpg, lesson-pepper.jpg), названия «Roman Szmal watercolours» и «Pepper sketching».
 - 10.11: редизайн — в клубе фото Алины: кот у раскраски (site/images/v2/club-cat.jpg, 511×557 — поэтому блок фото уже и выше, без растягивания).
+- 10.11: редизайн — «Join the club» ведёт на https://www.patreon.com/15601106/join (выбор уровня).
