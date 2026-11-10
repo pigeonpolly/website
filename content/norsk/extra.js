@@ -5,6 +5,9 @@ window.NO_NOTES = {};
 window.NO_BOOK = { title: 'Pelle og den store reisen', author: 'повесть для учебника', year: 2026, parts: [] };
 function NOTE(id, o) { window.NO_NOTES[id] = Object.assign(window.NO_NOTES[id] || {}, o); }
 function ST(id, o) { (window.NO_NOTES[id] = window.NO_NOTES[id] || {}).st = o; }
+window.NO_TOPICS = {};
+function TOP(id, o) { window.NO_TOPICS[id] = o; } // тематический словарь урока: {t: тема, ic: значок, w: [[слово, перевод, пример]]} — topics.js
+function SR(id, a) { NOTE(id, { sr: a }); } // сцены из сериалов к уроку (series.js): добавляются к u.series
 function BK(id, ch, txt) { window.NO_BOOK.parts.push({ u: id, ch, h: [ch], txt, n: txt.join(' ').split(/\s+/).length }); }
 
 window.NO_EXTRA = {

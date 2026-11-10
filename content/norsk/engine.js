@@ -21,7 +21,14 @@
     ordtak: { name: 'Ordtak · пословицы', cls: 's-ordtak' },
     uttrykk: { name: 'Uttrykk · идиомы', cls: 's-uttrykk' },
     kultur: { name: 'Typisk norsk · культура', cls: 's-kultur' },
+    vikingane: { name: 'Vikingane · «Викинги» (NRK)', cls: 's-vikingane' }, // сериалы — сцены и фразы в их духе (не дословные цитаты): content/norsk/series.js
+    sideomside: { name: 'Side om side · «Бок о бок» (NRK)', cls: 's-sideomside' },
+    dal: { name: 'Brødrene Dal · «Братья Даль» (NRK)', cls: 's-dal' },
+    dag: { name: 'Dag (TV 2)', cls: 's-dag' },
+    fremvandrerne: { name: 'Fremvandrerne · «Beforeigners» (HBO)', cls: 's-fremvandrerne' },
+    nytt: { name: 'Nytt på nytt (NRK)', cls: 's-nytt' },
   };
+  const TOPICS = window.NO_TOPICS || {}; // тематические словари: id урока → {t, ic, w: [[слово, перевод, пример]]} (content/norsk/topics.js)
   const unitsOf = lv => UNITS.filter(u => u.lvl === lv);
   const byId = id => UNITS.find(u => u.id === id);
   const EXTRA = window.NO_EXTRA || {}, BOOK = window.NO_BOOK || { parts: [] }, NOTES = window.NO_NOTES || {};
@@ -119,8 +126,8 @@
   const LIFT = window.NO_LIFT || {};
   const liftOf = u => { const L = LIFT[u.lvl]; if (!L) return []; const i = unitsOf(u.lvl).indexOf(u) * 2; return [L.q[i % L.q.length], L.q[(i + 1) % L.q.length]]; }; // два «kaffepause» на урок, по кругу
   const hasLs = u => !!((u.exm || []).length || (u.words || []).length);
-  const blocksOf = u => [...(u.ex || []).map((_, i) => `${u.id}-e${i}`), ...(hasMk(u) ? [`${u.id}-m`] : []), ...(hasLs(u) ? [`${u.id}-l`] : []), ...(hasSt(u) ? [`${u.id}-t`] : []), ...(u.read ? [`${u.id}-r`] : []), ...(bookOf(u) && bookGroups(u).length ? [`${u.id}-b`] : []), ...(u.series ? [`${u.id}-s`] : []), ...(UNITS.indexOf(u) > 0 ? [`${u.id}-p`] : []), ...(u.write ? [`${u.id}-w`] : [])];
-  const BID = /-(e\d+|m|l|t|r|b|s|p|w)$/;
+  const blocksOf = u => [...(u.ex || []).map((_, i) => `${u.id}-e${i}`), ...(hasMk(u) ? [`${u.id}-m`] : []), ...(hasLs(u) ? [`${u.id}-l`] : []), ...(hasSt(u) ? [`${u.id}-t`] : []), ...(u.read ? [`${u.id}-r`] : []), ...(bookOf(u) && bookGroups(u).length ? [`${u.id}-b`] : []), ...(u.series ? [`${u.id}-s`] : []), ...(UNITS.indexOf(u) > 0 ? [`${u.id}-p`] : []), ...(u.write ? [`${u.id}-w`] : []), ...(TOPICS[u.id] ? [`${u.id}-v`] : [])]; // -v — проверка тематического словаря (в конце, чтобы не сдвигать замки старых блоков)
+  const BID = /-(e\d+|m|l|t|r|b|s|p|w|v)$/;
   const PASS = 80;
   const isDone = id => (S.d[id] || 0) >= PASS;
   const pctOf = ids => ids.length ? Math.round(100 * ids.filter(isDone).length / ids.length) : 0;
@@ -171,6 +178,7 @@
   const nWrite = () => Object.keys(S.d).filter(k => k.endsWith('-w')).length;
   const nUsed = () => Object.values(S.v).filter(v => (v.u || 0) > 0).length;
   const lvDone = lv => unitsOf(lv).length && levelPct(lv) === 100;
+  const nTop = () => UNITS.filter(u => TOPICS[u.id] && isDone(u.id + '-v')).length;
   const nBook = () => UNITS.filter(u => bookOf(u) && isDone(u.id + '-b')).length;
   const ACH = [
     ['first', '🌱', 'Первый шаг', 'Пройти первое упражнение', () => nDone() >= 1],
@@ -221,6 +229,15 @@
     ['book1', '⛵', 'Første reis', 'Первая часть книги курса с заданиями', () => nBook() >= 1],
     ['book25', '🗺️', 'Halvveis', 'Половина книги курса', () => nBook() >= Math.ceil(BOOK.parts.length / 2)],
     ['bookAll', '👑', 'Книга прочитана', 'Вся книга курса по-норвежски', () => BOOK.parts.length && nBook() >= BOOK.parts.length],
+    ['vikingane', '⚔️', 'Skål, vikinger!', 'Все сцены из «Vikingane»', () => showAny('vikingane') && showDone('vikingane')],
+    ['sideomside', '🏡', 'Gode naboer', 'Все сцены из «Side om side»', () => showAny('sideomside') && showDone('sideomside')],
+    ['dal', '🎩', 'Brødrene', 'Все сцены из «Brødrene Dal»', () => showAny('dal') && showDone('dal')],
+    ['dag', '🛋️', 'Terapeuten', 'Все сцены из «Dag»', () => showAny('dag') && showDone('dag')],
+    ['fremvandrerne', '⏳', 'Fra fortiden', 'Все сцены из «Fremvandrerne»', () => showAny('fremvandrerne') && showDone('fremvandrerne')],
+    ['nytt', '📰', 'Nytt på nytt', 'Все сцены из «Nytt på nytt»', () => showAny('nytt') && showDone('nytt')],
+    ['topic5', '🗂', 'Пять тем', 'Проверка 5 тематических словарей', () => nTop() >= 5],
+    ['topic20', '🗃️', 'Двадцать тем', 'Проверка 20 тематических словарей', () => nTop() >= 20],
+    ['topicAll', '📚', 'Все темы', 'Все тематические словари курса', () => Object.keys(TOPICS).length && nTop() >= Object.keys(TOPICS).length],
     ['mk20', '💬', 'Своими словами', '20 своих предложений в заданиях', () => (S.c.mk || 0) >= 20],
     ['mk100', '📣', 'Красноречие', '100 своих предложений в заданиях', () => (S.c.mk || 0) >= 100],
     ['fix20', '🩹', 'Работа над ошибками', '20 отработанных ошибок', () => (S.c.fixed || 0) >= 20],
@@ -376,7 +393,7 @@
     const nu = UNITS[reach()]; if (reach() > was && nu) toast('🔓', nu.lvl + ' · ' + nu.t, `Урок пройден на ${PASS} % — открыт следующий`, 'Открыто: ');
   }
   // ---------- ошибки: где ошибаюсь — там новые задания ----------
-  const refUnit = ref => byId(ref.replace(/-(e\d+|m|t|r|b|s)#\d+$/, ''));
+  const refUnit = ref => byId(ref.replace(/-(e\d+|m|t|r|b|s|v)#\d+$/, ''));
   function mark(it, ok) {
     const u = refUnit(it.ref), bump = k => { const a = S.m[k] || [0, 0]; S.m[k] = [a[0] + (ok ? 0 : 1), a[1] + 1]; };
     if (u) bump(u.id); bump('t:' + it.t);
@@ -389,11 +406,12 @@
     if (tag === 's') return [{ t: 'choice', q: (u.series || []).map(s => s.qz).filter(Boolean) }];
     if (tag === 'm') return [{ t: 'mk', q: (NOTES[u.id] || {}).mk || [] }];
     if (tag === 'b') return bookGroups(u);
+    if (tag === 'v') return topicGroups(u);
     if (tag === 't') { const st = (NOTES[u.id] || {}).st; return st ? [{ t: 'choice', h: 'Что ответить естественно?', q: st.dlg }, { t: 'choice', h: '☕ Kaffepause: что сказать?', q: liftOf(u) }, { t: 'mk', q: [st.mk] }] : []; }
     return [];
   }
   function itemsOf(bid) {
-    const u = byId(bid.replace(/-(e\d+|m|t|r|b|s)$/, '')); if (!u) return [];
+    const u = byId(bid.replace(/-(e\d+|m|t|r|b|s|v)$/, '')); if (!u) return [];
     return groupsOf(u, bid.slice(u.id.length + 1)).flatMap(g => g.q.map(s => ({ ...parse(g.t, s), hint: g.hint })));
   }
   function itemByRef(ref) { const [bid, n] = ref.split('#'); const its = itemsOf(bid); return its[+n] ? { ...its[+n], ref, sib: its } : null; }
@@ -665,6 +683,26 @@
     });
     return [...wi, ...fixItems(prev.slice(-8), 3)];
   }
+  function topicGroups(u) { // проверка тематического словаря: всегда одни и те же задания для урока (rng), чтобы сохранённые ответы совпадали
+    const T = TOPICS[u.id]; if (!T) return [];
+    const r = rng(u.id + ':v'), ws = sshuffle(T.w, r).slice(0, 10), trs = T.w.map(x => x[1]), nos = T.w.map(x => x[0]);
+    const others = (list, not) => sshuffle(list.filter(x => x !== not), r).slice(0, 2);
+    const ch = [], gp = [];
+    ws.forEach(([w, tr, ex], i) => {
+      const bare = w.replace(/^(en|ei|et|å) /, ''), re = new RegExp(`(?<![\\wæøåÆØÅ])${bare.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\wæøåÆØÅ])`, 'i');
+      if (i % 2 && ex && re.test(ex)) gp.push(`${ex.replace(re, '___')} (${tr})|${bare}`);
+      else if (i % 3 === 2) ch.push(`Как по-норвежски «${tr}»?|${w}|${others(nos, w).join('|')}`);
+      else ch.push(`Что значит *${w}*?|${tr}|${others(trs, tr).join('|')}`);
+    });
+    return [...(ch.length ? [{ t: 'choice', h: 'Слова темы: выберите перевод.', q: ch }] : []), ...(gp.length ? [{ t: 'gap', h: 'Вставьте слово темы (подсказка — в скобках).', q: gp }] : [])];
+  }
+  function topicHTML(u) {
+    const T = TOPICS[u.id];
+    return `<section class="sec topic" id="topic"><details class="tdet"><summary><span class="ic">${T.ic || '🗂'}</span> Тематический словарь: ${esc(T.t)} <span class="note-s">· ${T.w.length} слов — нажмите, чтобы раскрыть</span></summary>
+      <ul class="words">${T.w.map(([w, tr, s], i) => `<li><span><span class="w">${esc(w)}</span> <span class="tr">— ${esc(tr)}</span></span><span class="acts">${sayBtn(w)}${S.v[w.toLowerCase()] ? '<span class="in-dict">в словаре ✓</span>' : `<button type="button" class="btn small" data-addtw="${i}">+</button>`}</span>${s ? `<span class="s">${esc(s)}</span>` : ''}</li>`).join('')}</ul>
+      <p><button type="button" class="btn" data-addtall>+ Вся тема в словарь</button> <button type="button" class="btn" data-cards>🃏 Карточки</button></p><div class="cards" hidden>${cardsHTML(T.w.map(([w, tr, s]) => ({ w, tr, ex: s })))}</div>
+      <p class="note-s">Проверка этих слов — в конце урока, блок «🗂 Слова темы». <a href="#topics">Все темы курса</a></p></details></section>`;
+  }
   function bookGroups(u) { const n = NOTES[u.id] || {}, gs = []; if (n.tf) gs.push({ t: 'tf', q: n.tf }); if (n.ch) gs.push({ t: 'choice', q: n.ch }); if (n.bmk) gs.push({ t: 'mk', q: n.bmk }); return gs; }
 
   // ---------- страницы ----------
@@ -702,6 +740,7 @@
     if (u.words) h += `<section class="sec" id="words"><h3><span class="ic">📒</span>Слова урока</h3><p class="note-s">Слово запоминается, когда его используешь: оно встретится в заданиях «Своими словами», в слушании и в повторении следующих уроков.</p>
       <ul class="words">${u.words.map(([w, tr, s]) => `<li><span><span class="w">${esc(w)}</span> <span class="tr">— ${esc(tr)}</span></span><span class="acts">${sayBtn(w)}${S.v[w.toLowerCase()] ? '<span class="in-dict">в словаре ✓</span>' : `<button type="button" class="btn small" data-addw="${esc(w)}">+</button>`}</span>${s ? `<span class="s">${esc(s)}</span>` : ''}</li>`).join('')}</ul>
       <p><button type="button" class="btn" data-addall>+ Все слова урока в словарь</button> <button type="button" class="btn" data-cards>🃏 Карточки</button></p><div class="cards" hidden>${cardsHTML(u.words.map(([w, tr, s]) => ({ w, tr, ex: s })))}</div></section>`;
+    if (TOPICS[u.id]) h += topicHTML(u);
     if (N.etym) h += `<div class="box etym"><h4>🔎 Откуда слово</h4>${N.etym.map(([w, t]) => `<p><b class="en">${esc(w)}</b> — ${fmt(t)}</p>`).join('')}</div>`;
     if (u.ex) h += `<section class="sec" id="practice"><h3><span class="ic">✏️</span>Упражнения</h3>${u.ex.map((e, k) => { const id = `${u.id}-e${k}`, title = `Упражнение ${k + 1}. ${e.h || NAMES_T[e.t]}`; return late(id, title, () => blockHTML(id, title, [{ t: e.t, q: e.q, hint: e.hint, how: e.how }], { track: true })); }).join('')}</section>`;
     if (hasMk(u)) h += `<section class="sec" id="mk"><h3><span class="ic">💬</span>Своими словами</h3>${crow(crowPick('mk'), 'small')}${late(u.id + '-m', 'Своими словами', () => blockHTML(u.id + '-m', 'Своими словами: пишем сами', mkGroups(u), { track: true }))}</section>`;
@@ -714,7 +753,7 @@
     }
     if (bk) h += bookHTML(u, bk, N);
     if (u.series) {
-      h += `<section class="sec" id="series"><h3><span class="ic">🗣</span>Как говорят норвежцы</h3><p class="note-s">Пословицы, идиомы и «типично норвежское» — то, что в учебниках грамматики не пишут, а в Норвегии слышно каждый день.</p><div class="series">${u.series.map(quoteHTML).join('')}</div>
+      h += `<section class="sec" id="series"><h3><span class="ic">🗣</span>Как говорят норвежцы: выражения и сериалы</h3><p class="note-s">Пословицы, идиомы, «типично норвежское» — и норвежские комедии. Фразы из сериалов — в духе героев, не дословные цитаты: найдите серию по ссылке и послушайте, как это звучит у них.</p><div class="series">${u.series.map(quoteHTML).join('')}</div>
         ${late(u.id + '-s', 'Проверь себя: поймёшь норвежца?', () => blockHTML(u.id + '-s', 'Проверь себя: поймёшь норвежца?', [{ t: 'choice', q: u.series.map(s => s.qz).filter(Boolean) }], { track: true }))}</section>`;
     }
     if (prev) h += `<section class="sec" id="review"><h3><span class="ic">🔄</span>Повторение пройденного</h3>${crow(crowPick('rev'), 'small')}<p class="note-s">Слова и правила из прошлых уроков, коротко. Каждый раз набор новый — сначала то, что вспоминается хуже.</p>${late(u.id + '-p', 'Повторение пройденного', () => blockHTML(u.id + '-p', 'Вспомнить прошлое', grouped(reviewItems(u))))}</section>`;
@@ -729,6 +768,7 @@
         <p><button type="button" class="btn primary" data-submit="${id}" disabled>Сдать текст</button> <span class="note-s" data-wstat>${S.d[id] ? 'Сдано ✓ — можно дописывать и сдавать снова.' : ''}</span></p>
         ${w.model ? `<details><summary>Пример ответа</summary><div class="model">${w.model.split('\n').map(p => `<p class="en">${esc(p)}</p>`).join('')}</div></details>` : ''}</section>`);
     }
+    if (TOPICS[u.id]) h += `<section class="sec" id="topicq"><h3><span class="ic">🗂</span>Слова темы: ${esc(TOPICS[u.id].t)}</h3>${late(u.id + '-v', 'Слова темы', () => blockHTML(u.id + '-v', 'Проверь себя: слова темы', topicGroups(u), { track: true }))}</section>`;
     if (Object.keys(S.x).some(r => refUnit(r) === u)) h += `<section class="sec" id="fix"><h3><span class="ic">🩹</span>Работа над ошибками</h3>${crow(crowPick('fix'), 'small')}<p class="note-s">Задания этого урока, где были ошибки, — в другой форме, и новые задания на ту же тему. Ошибка уходит из списка после двух верных ответов подряд.</p>${blockHTML('fx-' + u.id, 'Ещё раз, но по-другому', grouped(fixItems([u], 8)))}</section>`;
     if (u.vid) h += `<section class="sec" id="video"><h3><span class="ic">▶️</span>Видео по теме</h3><ul class="vids">${u.vid.map(([ch, t]) => `<li><a href="${ytq(ch, t)}" target="_blank" rel="noopener"><span><b>${esc(ch)}</b> — ${esc(t)}</span><small>YouTube</small></a></li>`).join('')}</ul><p class="note-s">Ссылки открывают поиск на YouTube по каналу и теме — там всегда свежие уроки этого автора.</p></section>`;
     const pods = PODS[u.lvl] || []; if (pods.length) h += `<div class="box pod"><h4>🎙 Подкаст уровня ${u.lvl}</h4><ul class="pods">${podHTML(pods[unitsOf(u.lvl).indexOf(u) % pods.length])}</ul><p class="note-s"><a href="#pods">Все подкасты</a></p></div>`;
@@ -943,9 +983,15 @@
       ${LEVELS.map(l => { const xs = list.filter(([u]) => u.lvl === l.id); return xs.length ? `<h3>${l.id}</h3><div class="box conf"><dl>${xs.map(([u, c]) => `<dt>${fmt(c[0])} <a class="note-s" href="#u/${u.id}">урок</a></dt><dd>${c[1]}</dd>`).join('')}</dl></div>` : ''; }).join('')}
       ${q.length ? blockHTML('conf-q', 'Тест «Не путай»', [{ t: 'choice', q: shuffle(q).slice(0, 25) }]) : ''}`;
   }
+  function topicsPage() {
+    const n = Object.values(TOPICS).reduce((a, t) => a + t.w.length, 0);
+    view.innerHTML = `<div class="uhead"><div class="lv">Справочник</div><h2>Тематический словарь</h2><p class="sub">${Object.keys(TOPICS).length} тем · ${n} слов — по одной теме в каждом уроке. К концу курса — словарь на все случаи жизни.</p></div>
+      ${crow('Слова по темам — как рыба по сортам: треска к треске, сельдь к сельди. Так запоминается лучше.')}
+      ${LEVELS.map(l => { const us = unitsOf(l.id).filter(u => TOPICS[u.id]); return us.length ? `<h3>${l.id} · ${esc(l.name)}</h3>${us.map(u => { const T = TOPICS[u.id]; return `<details class="box tdet"><summary>${T.ic || '🗂'} <b>${esc(T.t)}</b> <span class="note-s">· ${T.w.length} слов${isDone(u.id + '-v') ? ' · ✓' : ''} · <a href="#u/${u.id}">урок ${esc(u.lvl)}</a></span></summary><ul class="words">${T.w.map(([w, tr, s]) => `<li><span><span class="w">${esc(w)}</span> <span class="tr">— ${esc(tr)}</span></span><span class="acts">${sayBtn(w)}</span>${s ? `<span class="s">${esc(s)}</span>` : ''}</li>`).join('')}</ul></details>`; }).join('')}` : ''; }).join('')}`;
+  }
   function seriesPage() {
     const all = UNITS.filter(u => u.series).flatMap(u => u.series.map(s => [u, s]));
-    view.innerHTML = `<div class="uhead"><div class="lv">Справочник</div><h2>Пословицы и выражения</h2><p class="sub">Все пословицы, идиомы и «типично норвежское» из уроков. ${all.length} разборов.</p></div>
+    view.innerHTML = `<div class="uhead"><div class="lv">Справочник</div><h2>Выражения и сериалы</h2><p class="sub">Пословицы, идиомы, «типично норвежское» и сцены из норвежских комедий — фразы в духе героев, не дословные цитаты. ${all.length} разборов.</p></div>
       ${Object.entries(SHOWS).map(([k, sh]) => { const xs = all.filter(([, s]) => s.show === k); return xs.length ? `<h3>${esc(sh.name)}</h3><div class="series">${xs.map(([u, s]) => quoteHTML(s) + `<p class="note-s" style="margin:-8px 0 0">Урок: <a href="#u/${u.id}">${esc(u.lvl + ' · ' + u.t)}</a></p>`).join('')}</div>` : ''; }).join('')}`;
   }
   function irrPage() {
@@ -1025,6 +1071,7 @@
   function lex() {
     const L = {};
     for (const u of UNITS) { for (const [w, tr, ex] of u.words || []) for (const x of w.split(' / ')) L[x.toLowerCase()] = L[x.toLowerCase()] || [tr, ex]; for (const [w, tr] of Object.entries((u.read || {}).gl || {})) L[w.toLowerCase()] = L[w.toLowerCase()] || [tr, '']; for (const [w, tr] of Object.entries((NOTES[u.id] || {}).gl || {})) L[w.toLowerCase()] = L[w.toLowerCase()] || [tr, '']; }
+    for (const T of Object.values(TOPICS)) for (const [w, tr, ex] of T.w) { const k = w.toLowerCase(); L[k] = L[k] || [tr, ex]; const b = k.replace(/^(en|ei|et|å) /, ''); L[b] = L[b] || [tr, ex]; }
     for (const [a, b, c, r] of EXTRA.irr || []) L[a.toLowerCase()] = L[a.toLowerCase()] || [r, ''];
     return L;
   }
@@ -1054,13 +1101,15 @@
       <li><a href="#etym" data-to="etym"><span class="n">🔎</span><span class="t">Откуда слова</span></a></li>
       <li><a href="#conf" data-to="conf"><span class="n">⚠</span><span class="t">Не путай!</span></a></li>
       <li><a href="#irr" data-to="irr"><span class="n">🔤</span><span class="t">Сильные глаголы</span></a></li>
-      <li><a href="#series" data-to="series"><span class="n">🗣</span><span class="t">Пословицы и выражения</span></a></li>
+      <li><a href="#series" data-to="series"><span class="n">🗣</span><span class="t">Выражения и сериалы</span></a></li>
+      <li><a href="#topics" data-to="topics"><span class="n">🗂</span><span class="t">Тематический словарь</span></a></li>
       <li><a href="#ach" data-to="ach"><span class="n">🏆</span><span class="t">Ачивки</span></a></li>
       <li><a href="#src" data-to="src"><span class="n">📚</span><span class="t">Источники</span></a></li>`;
   }
   const IDX = [];
   function buildIdx() { IDX.length = 0; for (const u of UNITS) {
     IDX.push([u.t + ' ' + (u.en || ''), u.lvl + ' · ' + u.t, 'урок', '#u/' + u.id]);
+    for (const w of (TOPICS[u.id] || {}).w || []) IDX.push([w[0] + ' ' + w[1], w[0] + ' — ' + w[1], 'тема «' + TOPICS[u.id].t + '» · ' + u.lvl, '#u/' + u.id]);
     for (const w of u.words || []) IDX.push([w[0] + ' ' + w[1], w[0] + ' — ' + w[1], 'слово · ' + u.lvl + ' · ' + u.t, '#u/' + u.id]);
     for (const s of u.series || []) IDX.push([s.q + ' ' + s.who, s.q, (SHOWS[s.show] || {}).name + ' · ' + u.lvl, '#u/' + u.id]);
     for (const e of (NOTES[u.id] || {}).etym || []) IDX.push([e[0] + ' происхождение', e[0], 'откуда слово · ' + u.lvl, '#u/' + u.id]);
@@ -1089,6 +1138,7 @@
     else if (a === 'book') bookPage();
     else if (a === 'etym') etymPage();
     else if (a === 'pods') podsPage();
+    else if (a === 'topics') topicsPage();
     else homePage();
     if (a !== 'u') delete view.dataset.unit;
     for (const x of $$('#toc a')) x.classList.toggle('on', x.dataset.to === h);
@@ -1130,6 +1180,9 @@
     }
     const tok = t.closest('.tok');
     if (tok && !tok.disabled) { const li = tok.closest('li'); (tok.parentElement.classList.contains('pool') ? $('.built', li) : $('.pool', li)).append(tok); return; }
+    const atw = t.closest('[data-addtw]');
+    if (atw) { const u = byId(view.dataset.unit), w = TOPICS[u.id].w[+atw.dataset.addtw]; addWord(w[0], w[1], w[2], u.id); atw.outerHTML = '<span class="in-dict">в словаре ✓</span>'; return; }
+    if (t.closest('[data-addtall]')) { const u = byId(view.dataset.unit); let n = 0; for (const w of TOPICS[u.id].w) if (addWord(w[0], w[1], w[2], u.id)) n++; for (const b of $$('[data-addtw]')) b.outerHTML = '<span class="in-dict">в словаре ✓</span>'; t.textContent = n ? `Добавлено слов: ${n} ✓` : 'Вся тема уже в словаре ✓'; return; }
     const aw = t.closest('[data-addw]');
     if (aw) { const u = byId(view.dataset.unit); const w = u.words.find(x => x[0] === aw.dataset.addw); addWord(w[0], w[1], w[2], u.id); aw.outerHTML = '<span class="in-dict">в словаре ✓</span>'; return; }
     if (t.closest('[data-addall]')) { const u = byId(view.dataset.unit); let n = 0; for (const w of u.words) if (addWord(w[0], w[1], w[2], u.id)) n++; for (const b of $$('[data-addw]')) b.outerHTML = '<span class="in-dict">в словаре ✓</span>'; t.textContent = n ? `Добавлено слов: ${n} ✓` : 'Все слова уже в словаре ✓'; return; }

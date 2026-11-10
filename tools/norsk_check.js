@@ -5,7 +5,7 @@
 const { chromium } = require('playwright');
 const path = require('path');
 const file = path.resolve(process.argv[2] || 'norsk.html');
-const TYPES = ['gap', 'choice', 'order', 'fix', 'tr', 'tf', 'mk'], SHOWS = ['ordtak', 'uttrykk', 'kultur'];
+const TYPES = ['gap', 'choice', 'order', 'fix', 'tr', 'tf', 'mk'], SHOWS = ['ordtak', 'uttrykk', 'kultur', 'vikingane', 'sideomside', 'dal', 'dag', 'fremvandrerne', 'nytt'];
 (async () => {
   const b = await chromium.launch(); const pg = await b.newPage({ viewport: { width: 1280, height: 900 } });
   const errs = []; pg.on('pageerror', e => errs.push(String(e))); pg.on('console', m => { if (m.type() === 'error' && !/api\/norsk|Failed to load|ERR_|CORS policy/.test(m.text())) errs.push(m.text()); });
@@ -41,6 +41,8 @@ const TYPES = ['gap', 'choice', 'order', 'fix', 'tr', 'tf', 'mk'], SHOWS = ['ord
     const txt = part ? part.txt.join(' ').toLowerCase() : '';
     for (const w of Object.keys(n.gl || {})) if (!new RegExp(`(?<![\\wæøå])${w.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\wæøå])`).test(txt)) bad.push(`${u.id}: подсказки «${w}» нет в тексте части книги`);
   }
+  const topics = await pg.evaluate(() => window.NO_TOPICS || {});
+  for (const u of units) { const T = topics[u.id]; if (!T) { bad.push(u.id + ': нет тематического словаря (topics.js)'); continue; } if (T.w.length < 12) bad.push(u.id + ': в теме мало слов'); for (const w of T.w) if (w.length !== 3 || w.some(x => /\|| # /.test(x))) bad.push(u.id + ': тема, плохое слово ' + w[0]); }
   for (const [lv, L] of Object.entries(lift || {})) fmtCheck('лифт ' + lv, { t: 'choice', q: L.q });
   if (Object.keys(lift || {}).length !== 6) bad.push('лифт: не все уровни');
   if (book.parts.length !== units.length) bad.push(`частей книги ${book.parts.length}, уроков ${units.length}`);

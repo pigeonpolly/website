@@ -222,6 +222,10 @@ li.no .built { border-color: var(--warm); background: var(--warm-soft); }
 .quote p { margin: 6px 0 0; font-size: 16.5px; }
 .quote p b { font-family: var(--f-ui); font-size: 14px; color: var(--show, var(--accent)); }
 .s-ordtak { --show: var(--ordtak); } .s-uttrykk { --show: var(--uttrykk); } .s-kultur { --show: var(--kultur); }
+.s-vikingane { --show: #8a3b12; } .s-sideomside { --show: #2f6f3e; } .s-dal { --show: #6a3d9a; } .s-dag { --show: #234a75; } .s-fremvandrerne { --show: #7a5c00; } .s-nytt { --show: #b0123a; }
+:root[data-theme="night"] .quote, :root[data-theme="forest"] .quote { --show: var(--accent); }
+.tdet > summary { cursor: pointer; font: 600 17px var(--f-ui); list-style: none; padding: 10px 0; } .tdet > summary::-webkit-details-marker { display: none; } .tdet > summary::before { content: '▸ '; color: var(--accent); } .tdet[open] > summary::before { content: '▾ '; }
+.box.tdet > summary { font-size: 15.5px; padding: 2px 0; }
 .quote .yt { margin: 6px 0 0; font: 500 14px var(--f-ui); }
 
 .write textarea { width: 100%; min-height: 200px; font: 400 17px/1.6 var(--f-body); border: 1px solid var(--rule); border-radius: 10px; padding: 12px; background: var(--card); color: var(--ink); resize: vertical; }
