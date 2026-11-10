@@ -1031,6 +1031,7 @@ function cookie(req, name) {
   return m ? m[1] : null;
 }
 const sessionCookie = (token, maxAge) => `pp_s=${token}; Path=/; HttpOnly; Secure; SameSite=Lax; Max-Age=${maxAge}`;
+const VIP_VIDEOS = [{ id: 'PaypNmVZFOw', key: 'review' }]; // VIP-видео для вошедших (/api/v2/vip, site/assets/v2.js)
 async function currentUser(req, env) {
   const token = cookie(req, 'pp_s');
   if (!token || !/^[0-9a-f]{64}$/.test(token)) return null;
@@ -2232,6 +2233,12 @@ async function route(req, env, url) {
     const streak = u && u.nick && !u.banned ? streaks(streakDays((await env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(u.id).all()).results)).current : 0;
     const titos = u && !u.banned ? titosState(await env.DB.prepare('SELECT * FROM titos WHERE user_id = ?').bind(u.id).first(), RULES, titosHelpers(env)) : null; // кофейник Титоса (worker/titos.js)
     return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), pin: !(await isAdmin(u, env)) && await adminIdentity(u, env) ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, streak, news, friendBtns: BTN.friend, titos, study: await studyOk(u, env, studyHelpers(env)) ? 1 : 0, english: await englishOk(u, env, studyHelpers(env)) ? 1 : 0, norsk: await norskOk(u, env, studyHelpers(env)) ? 1 : 0, pwTemp: u.pw_temp ? 1 : 0, mailAsk: mailAsk(env, u) ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
+  }
+  // VIP-видео (редизайн 2.0, 10.11.2026): ссылка YouTube «по ссылке» отдаётся только вошедшим — в HTML её нет
+  if (m === 'GET' && p === '/api/v2/vip') {
+    const u = await currentUser(req, env);
+    if (!u || u.banned) return json({ login: true, videos: [] }, 200, { 'cache-control': 'no-store' });
+    return json({ videos: VIP_VIDEOS }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'GET' && p === '/api/news') return json({ news: await newsOf(env, req, await currentUser(req, env)) }, 200, { 'cache-control': 'no-store' });
   if (m === 'GET' && p === '/api/news/history') return json({ items: await newsHistory(env, await currentUser(req, env)) }, 200, { 'cache-control': 'no-store' });

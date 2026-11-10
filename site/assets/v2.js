@@ -53,6 +53,40 @@
     if (window.PPBirds) draw(); else addEventListener('load', draw);
   }).catch(() => {});
 
+  // видео YouTube прямо на сайте: [data-yt] открывает плеер в окне (без YouTube — обычная ссылка)
+  let box2;
+  function play(id) {
+    if (!box2) {
+      box2 = document.createElement('dialog'); box2.className = 'ytbox';
+      box2.innerHTML = `<button type="button" class="x" aria-label="${['Close', 'Закрыть', 'Aizvērt'][L]}">✕</button><div class="fr"></div>`;
+      const close = () => { box2.querySelector('.fr').innerHTML = ''; if (box2.open) box2.close(); };
+      box2.querySelector('.x').addEventListener('click', close);
+      box2.addEventListener('click', e => { if (e.target === box2) close(); });
+      box2.addEventListener('close', () => { box2.querySelector('.fr').innerHTML = ''; });
+      document.body.appendChild(box2);
+    }
+    box2.querySelector('.fr').innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(id)}?autoplay=1&rel=0&hl=${lang}" title="YouTube" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+    if (box2.showModal) box2.showModal(); else box2.setAttribute('open', '');
+  }
+  document.addEventListener('click', e => {
+    const a = e.target.closest('[data-yt]');
+    if (!a || e.ctrlKey || e.metaKey || e.shiftKey) return;
+    e.preventDefault(); play(a.dataset.yt);
+  });
+
+  // VIP-видео: только вошедшим (/api/v2/vip), гостю остаётся «Войти бесплатно»
+  if (document.querySelector('.vip-go, .vc.vip')) fetch('/api/v2/vip', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => {
+    const v = d && d.videos && d.videos[0];
+    if (!v) return;
+    document.querySelectorAll('.vip-go').forEach(b => { b.dataset.yt = v.id; b.href = 'https://youtu.be/' + v.id; b.textContent = ['▶ Watch the VIP lesson', '▶ Смотреть VIP-урок', '▶ Skatīties VIP nodarbību'][L]; });
+    document.querySelectorAll('.vc.vip').forEach(c => {
+      c.dataset.yt = v.id; c.href = 'https://youtu.be/' + v.id;
+      c.querySelector('.pl').textContent = '▶';
+      c.querySelector('.vip-st').textContent = ['VIP lesson · open for you', 'VIP-урок · открыт для тебя', 'VIP nodarbība · atvērta tev'][L];
+      c.querySelector('.go').textContent = ['Watch →', 'Смотреть →', 'Skatīties →'][L];
+    });
+  }).catch(() => {});
+
   // журнал: 4 последние статьи блога
   const box = document.getElementById('v2-blog');
   if (box) fetch('/api/blog/home?lang=' + lang).then(r => r.ok ? r.json() : null).then(d => {

@@ -370,3 +370,10 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 .v2 .scroll-nav{position:fixed;right:18px;bottom:22px;z-index:40;display:grid;gap:8px}
 .v2 .scroll-nav button{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--ink);background:var(--sheet);color:var(--ink);font:700 18px/1 Karla,sans-serif;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.15);opacity:0;pointer-events:none;transform:translateY(6px);transition:opacity .2s,transform .2s}
 .v2 .scroll-nav button.on{opacity:1;pointer-events:auto;transform:none}.v2 .scroll-nav button:hover{background:var(--acc);border-color:var(--acc);color:#fff}
+/* видео в окне (v2.js play) и VIP-уроки (10.11.2026) */
+.ytbox{position:fixed;inset:0;margin:auto;height:fit-content;border:0;padding:0;background:transparent;width:min(1100px,94vw);max-width:none;overflow:visible}
+.ytbox::backdrop{background:rgba(20,14,10,.82)}
+.ytbox .fr{aspect-ratio:16/9;background:#000;box-shadow:0 30px 60px rgba(0,0,0,.5)}.ytbox iframe{width:100%;height:100%;border:0;display:block}
+.ytbox .x{position:absolute;right:0;top:-46px;width:38px;height:38px;border:0;border-radius:50%;background:#fff;color:#222;font-size:16px;cursor:pointer}
+.vg2.vip1{grid-template-columns:1fr}.vg2.vip1 .vc{max-width:520px}
+.al p a,.tk .note a{color:var(--acc);text-decoration:underline}
