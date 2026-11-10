@@ -68,16 +68,17 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
 .fl h2{font-size:72px;font-weight:600;color:var(--acc);line-height:.92}.fl h2 i{font-weight:300;color:var(--ink)}
 .fl p{color:var(--mut);font-size:17px;margin:20px 0 28px;max-width:26em}
 .fl .hand{display:inline-block;transform:rotate(-3deg);margin-bottom:10px}
-.cl{position:relative;height:480px}
+.cl{position:relative;height:540px}
 .cl .t{position:absolute;background:#fff;padding:11px 11px 40px;box-shadow:0 14px 28px rgba(31,35,38,.18);transition:transform .25s}
 .cl .t:hover{transform:rotate(0) scale(1.02)!important;z-index:5}
 .cl .t img{width:100%;height:100%;object-fit:cover}
 .cl .t b{position:absolute;left:12px;bottom:10px;font:400 16px Fraunces,Lora,serif}
 .cl .t .pl{position:absolute;right:20px;bottom:54px;width:46px;height:46px;border-radius:50%;background:#fff;color:var(--acc);display:grid;place-items:center;font-size:15px;box-shadow:0 4px 10px rgba(0,0,0,.15)}
-.cl .a{width:350px;height:280px;left:0;top:40px;transform:rotate(-3deg)}
-.cl .b{width:280px;height:320px;right:20px;top:0;transform:rotate(4deg)}
+.cl .t img{aspect-ratio:16/9;height:auto}
+.cl .a{width:400px;left:0;top:10px;transform:rotate(-3deg)}
+.cl .b{width:380px;right:0;top:262px;transform:rotate(3deg)}
 .tp{position:absolute;width:100px;height:26px;background:color-mix(in srgb,var(--acc) 16%,transparent);z-index:3}
-.ticket{position:absolute;left:250px;bottom:20px;z-index:4;background:var(--acc);color:#fff;padding:12px 20px;transform:rotate(-6deg);font:700 11px Karla,'Nunito Sans',sans-serif;letter-spacing:.2em;text-align:center;outline:1.5px dashed rgba(255,255,255,.6);outline-offset:-6px}
+.ticket{position:absolute;left:60px;bottom:40px;z-index:4;background:var(--acc);color:#fff;padding:12px 20px;transform:rotate(-6deg);font:700 11px Karla,'Nunito Sans',sans-serif;letter-spacing:.2em;text-align:center;outline:1.5px dashed rgba(255,255,255,.6);outline-offset:-6px}
 .ticket b{display:block;font:400 24px Fraunces,Lora,serif;letter-spacing:0}
 
 /* гайды и книги */
@@ -185,7 +186,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
  .drawer .lb{color:var(--acc)}.drawer .lang-switch{margin-top:14px}.drawer .lang-switch a{font:500 15px Karla,'Nunito Sans',sans-serif;border:0;padding:4px 10px 4px 0}
  .fl .w,.desk .w,.jg,.ab2 .w{grid-template-columns:1fr}
  .books{max-width:640px}
- .club{height:auto}.club .ph{position:relative;width:100%;height:380px}.tk{position:relative;width:auto;top:-50px;margin:0 20px}
+ .club{height:auto}.club .ph{position:relative;width:100%;height:380px}.club .ph h2{bottom:76px}.tk{position:relative;width:auto;top:-50px;margin:0 20px}
  .fold{width:100%}
 }
 @media (max-width:700px){
@@ -198,7 +199,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
  .sea{position:static;display:block;transform:rotate(-3deg);font-size:21px;margin-top:14px}.sea:before{display:none}
  .pano,html[data-season=summer] .pano{height:300px}.cap2{right:18px;font-size:19px}
  .fl{padding:70px 0}.fl .w{gap:30px}.fl h2{font-size:48px}
- .cl{height:420px}.cl .a{width:60%;height:200px;top:10px}.cl .b{width:54%;height:220px;right:0;top:150px}.cl .t b{font-size:14px;right:10px;line-height:1.15}.cl .t .pl{width:38px;height:38px;bottom:48px}.ticket{left:6px;right:auto;bottom:30px;padding:8px 12px}.ticket b{font-size:17px}
+ .cl{height:500px}.cl .a{width:80%;top:10px}.cl .b{width:78%;right:0;top:250px}.cl .t b{font-size:14px;right:10px;line-height:1.15}.cl .t .pl{width:38px;height:38px;bottom:48px}.ticket{left:0;right:auto;top:212px;bottom:auto;padding:7px 10px;z-index:6}.ticket b{font-size:17px}
  .desk{padding:80px 0}.desk .w{gap:28px}.desk h2{font-size:40px}.books{height:300px}.books a{width:130px}.books .b1{left:105px}.books .b2{left:210px}.lbl{font-size:9px;padding:5px 8px}.books .hand{left:0;bottom:-10px;font-size:22px}
  .jr{padding:70px 0}.hd3{flex-direction:column;align-items:start;gap:14px}.hd3 h2{font-size:40px}.doodle{display:none}.jg{gap:30px}.feat .im{height:250px}.feat .card{width:auto;margin:-60px 12px 0}.feat h3{font-size:24px}.post{grid-template-columns:1fr 90px}.post img{width:90px;height:72px}.post h3{font-size:20px}
  .dark{padding:70px 0}.club .ph{height:320px}.club .ph h2{font-size:42px}.tk{top:-40px;margin:0 10px;padding:28px 22px}.tk p{margin-right:70px}.tk .row{font-size:18px}.stamp{width:74px;height:74px;font-size:8px;right:14px;top:14px}
