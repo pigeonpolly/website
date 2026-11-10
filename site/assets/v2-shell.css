@@ -64,3 +64,12 @@ html[data-season=summer] body.v2s:has(.wl-map){--wlbg:#2F2622}
 .v2s .wl-map-sec .wl-map{border-radius:3px;box-shadow:0 0 0 12px #F4EEE3,0 0 0 13px rgba(0,0,0,.12),0 30px 60px rgba(0,0,0,.5);transform:rotate(-.5deg);margin:22px 12px 34px;overflow:hidden}
 .v2s .wl-map-sec{position:relative}
 @media (max-width:700px){.v2s .wl-map-sec .wl-map{box-shadow:0 0 0 7px #F4EEE3,0 18px 34px rgba(0,0,0,.5);margin:14px 6px 24px}}
+/* старая кнопка входа (account.js) в новой шапке: только «Войти», в виде кнопки нового стиля; надписи шапки не переносятся */
+.v2s .nv a,.v2s .hr .lb{white-space:nowrap}
+.v2s .hr .acct .acct-get{display:none}
+.v2s .hr .acct .acct-in{padding:11px 22px;border:1.5px solid var(--ink);border-radius:999px;background:none;color:var(--ink);font:700 14px Karla,'Nunito Sans',sans-serif;white-space:nowrap}
+.v2s .hr .acct .acct-in:hover,.v2s .hr .acct .acct-in[aria-expanded=true]{background:var(--ink);color:var(--bg)}
+.v2s .hr .acct .acct-me{border-color:var(--ink)}
+@media (max-width:700px){.v2s .hr .acct .acct-in{padding:8px 14px;font-size:13px}}
+.v2s .hr .acct{order:8}.v2s .hr .burger{order:9}
+@media (max-width:1120px) and (min-width:1041px){.v2s .nv{gap:16px}.v2s .hr{gap:10px}}
