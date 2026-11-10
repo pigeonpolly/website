@@ -347,7 +347,7 @@ export async function blogApi(req, env, url, h) {
       cover: x.cover, date: fmtDate(x.published_at, lang), tags: tagsOf(x).slice(0, 3).map(g => tagLabel(g, lang)), likes: x.likes });
     const latest = rows[0] || null; // крупно — самая новая статья
     const featured = rows.filter(x => x.featured && x !== latest).slice(0, 3); // справа — три последние со ★ (кроме той, что уже крупно)
-    return json({ latest: latest && pack(latest), featured: featured.map(x => ({ ...pack(x), star: true })), recent: rows.slice(0, 3).map(pack) }); // recent — новая главная (/preview/)
+    return json({ latest: latest && pack(latest), featured: featured.map(x => ({ ...pack(x), star: true })), recent: rows.slice(0, 4).map(pack) }); // recent — новая главная (/preview/)
   }
 
   // полная копия сайта: блог + челлендж (аккаунты, работы) + список файлов картинок. Доступ — админ или личный ключ автокопии (?token=)

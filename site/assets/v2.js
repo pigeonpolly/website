@@ -3,10 +3,10 @@
   const html = document.documentElement, lang = html.lang || 'en', L = { en: 0, ru: 1, lv: 2 }[lang] ?? 0;
   const pre = lang === 'en' ? '' : '/' + lang;
   const T = {
-    winter: { tag: ['winter edition', 'зимний выпуск', 'ziemas izdevums'], note: ['frosty rooftops, Riga ❄', 'морозные крыши Риги ❄', 'salnaini Rīgas jumti ❄'] },
-    spring: { tag: ['spring edition', 'весенний выпуск', 'pavasara izdevums'], note: ['wild strawberries ❀', 'земляника ❀', 'meža zemenes ❀'] },
+    winter: { tag: ['winter edition', 'зимний выпуск', 'ziemas izdevums'], note: ['rooftops and towers ❄', 'крыши и башни ❄', 'jumti un torņi ❄'] },
+    spring: { tag: ['spring edition', 'весенний выпуск', 'pavasara izdevums'], note: ['on my desk: strawberries ❀', 'на моём столе: земляника ❀', 'uz mana galda: zemenes ❀'] },
     summer: { tag: ['summer edition', 'летний выпуск', 'vasaras izdevums'], note: ['Polly, summer lover ☀', 'Полли обожает лето ☀', 'Pollija mīl vasaru ☀'] },
-    autumn: { tag: ['autumn edition', 'осенний выпуск', 'rudens izdevums'], note: ['night garden, physalis ✿', 'ночной сад, физалис ✿', 'nakts dārzs, fizāles ✿'] },
+    autumn: { tag: ['autumn edition', 'осенний выпуск', 'rudens izdevums'], note: ['Polly on the train ✿', 'Полли в поезде ✿', 'Pollija vilcienā ✿'] },
   };
   const COL = { winter: '#9E1B22', spring: '#BE2F3A', summer: '#D2452B', autumn: '#C04A1C' };
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -53,11 +53,11 @@
     if (window.PPBirds) draw(); else addEventListener('load', draw);
   }).catch(() => {});
 
-  // журнал: 3 последние статьи блога
+  // журнал: 4 последние статьи блога
   const box = document.getElementById('v2-blog');
   if (box) fetch('/api/blog/home?lang=' + lang).then(r => r.ok ? r.json() : null).then(d => {
     const list = (d && (d.recent || [d.latest].concat(d.featured || []))) || [];
-    const posts = list.filter(Boolean).slice(0, 3);
+    const posts = list.filter(Boolean).slice(0, 4); // крупно одна + справа три
     if (!posts.length) { box.closest('section').hidden = true; return; }
     const meta = p => `<span class="meta">${p.tags && p.tags[0] ? `<i>${esc(p.tags[0])}</i> · ` : ''}${esc(p.date)}</span>`;
     const pic = (p, cls) => p.cover ? `<img src="${esc(p.cover)}" alt="" loading="lazy"${cls ? ` class="${cls}"` : ''}>` : '';

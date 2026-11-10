@@ -1,8 +1,8 @@
 /* Редизайн 2.0 — общий стиль новых страниц (/preview/). Сезон — html[data-season] (src/layout-v2.html). Не путать со style.css старых страниц. */
 *{box-sizing:border-box;margin:0;padding:0}
-:root,html[data-season=autumn]{--bg:#F4F0EA;--sheet:#FBF9F5;--ink:#2A211C;--mut:#6C6058;--line:#DED5CA;--gr:#2E2521;--gr2:#3A302B;--acc:#C04A1C;--acc2:#EE7A45;--inner:#2A1D16;--grtx:#ECEDEE;--grmut:#A3A8AC;--hero-pos:center 45%}
-html[data-season=winter]{--bg:#EEF1F3;--sheet:#F8FAFB;--ink:#1C2430;--mut:#5D6670;--line:#D3DAE0;--gr:#26303A;--gr2:#313C47;--acc:#9E1B22;--acc2:#E2544A;--inner:#1B2632;--hero-pos:center 32%}
-html[data-season=spring]{--bg:#F1F4F0;--sheet:#FAFBF9;--ink:#1F2A25;--mut:#5E6A63;--line:#D4DDD6;--gr:#26302B;--gr2:#313C36;--acc:#BE2F3A;--acc2:#E85C64;--inner:#1C2A23;--hero-pos:center 55%}
+:root,html[data-season=autumn]{--bg:#F4F0EA;--sheet:#FBF9F5;--ink:#2A211C;--mut:#6C6058;--line:#DED5CA;--gr:#2E2521;--gr2:#3A302B;--acc:#C04A1C;--acc2:#EE7A45;--inner:#2A1D16;--grtx:#ECEDEE;--grmut:#A3A8AC;--hero-pos:center 22%}
+html[data-season=winter]{--bg:#EEF1F3;--sheet:#F8FAFB;--ink:#1C2430;--mut:#5D6670;--line:#D3DAE0;--gr:#26303A;--gr2:#313C47;--acc:#9E1B22;--acc2:#E2544A;--inner:#1B2632;--hero-pos:center 58%}
+html[data-season=spring]{--bg:#F1F4F0;--sheet:#FAFBF9;--ink:#1F2A25;--mut:#5E6A63;--line:#D4DDD6;--gr:#26302B;--gr2:#313C36;--acc:#BE2F3A;--acc2:#E85C64;--inner:#1C2A23;--hero-pos:center 62%}
 html[data-season=summer]{--bg:#F7F4EE;--sheet:#FFFDFA;--ink:#2A2420;--mut:#6D635B;--line:#E3DACE;--gr:#2F2622;--gr2:#3B312C;--acc:#D2452B;--acc2:#F07A55;--inner:#3A1A1C;--hero-pos:center 0%}
 html,body{overflow-x:hidden}
 body.v2{background:var(--bg);color:var(--ink);font:16px/1.55 Karla,'Nunito Sans',sans-serif;transition:background .4s}
@@ -56,6 +56,10 @@ section{position:relative}
 .pano img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos);-webkit-mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 20%,#000 48%);mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 20%,#000 48%)}
 html[data-season=summer] .pano{height:640px}
 html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 10%);mask-image:linear-gradient(to bottom,transparent 0,#000 10%)}
+/* широкий экран: картинка не шире 1600 px (исходники 1280–2000 px), края растворяются в фоне */
+@media (min-width:1601px){.pano img{left:50%;width:1600px;transform:translateX(-50%);-webkit-mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 20%,#000 48%),linear-gradient(to right,transparent 0,#000 12%,#000 88%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 20%,#000 48%),linear-gradient(to right,transparent 0,#000 12%,#000 88%,transparent 100%);mask-composite:intersect}
+ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 10%),linear-gradient(to right,transparent 0,#000 12%,#000 88%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 10%),linear-gradient(to right,transparent 0,#000 12%,#000 88%,transparent 100%)}
+ .cap2{right:calc(50% - 760px)}}
 .cap2{position:absolute;right:44px;bottom:18px;z-index:2;font:700 22px Caveat,cursive;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.5)}
 
 /* бесплатные уроки */
@@ -64,16 +68,17 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
 .fl h2{font-size:72px;font-weight:600;color:var(--acc);line-height:.92}.fl h2 i{font-weight:300;color:var(--ink)}
 .fl p{color:var(--mut);font-size:17px;margin:20px 0 28px;max-width:26em}
 .fl .hand{display:inline-block;transform:rotate(-3deg);margin-bottom:10px}
-.cl{position:relative;height:480px}
+.cl{position:relative;height:540px}
 .cl .t{position:absolute;background:#fff;padding:11px 11px 40px;box-shadow:0 14px 28px rgba(31,35,38,.18);transition:transform .25s}
 .cl .t:hover{transform:rotate(0) scale(1.02)!important;z-index:5}
 .cl .t img{width:100%;height:100%;object-fit:cover}
 .cl .t b{position:absolute;left:12px;bottom:10px;font:400 16px Fraunces,Lora,serif}
 .cl .t .pl{position:absolute;right:20px;bottom:54px;width:46px;height:46px;border-radius:50%;background:#fff;color:var(--acc);display:grid;place-items:center;font-size:15px;box-shadow:0 4px 10px rgba(0,0,0,.15)}
-.cl .a{width:350px;height:280px;left:0;top:40px;transform:rotate(-3deg)}
-.cl .b{width:280px;height:320px;right:20px;top:0;transform:rotate(4deg)}
+.cl .t img{aspect-ratio:16/9;height:auto}
+.cl .a{width:400px;left:0;top:10px;transform:rotate(-3deg)}
+.cl .b{width:380px;right:0;top:262px;transform:rotate(3deg)}
 .tp{position:absolute;width:100px;height:26px;background:color-mix(in srgb,var(--acc) 16%,transparent);z-index:3}
-.ticket{position:absolute;left:250px;bottom:20px;z-index:4;background:var(--acc);color:#fff;padding:12px 20px;transform:rotate(-6deg);font:700 11px Karla,'Nunito Sans',sans-serif;letter-spacing:.2em;text-align:center;outline:1.5px dashed rgba(255,255,255,.6);outline-offset:-6px}
+.ticket{position:absolute;left:60px;bottom:40px;z-index:4;background:var(--acc);color:#fff;padding:12px 20px;transform:rotate(-6deg);font:700 11px Karla,'Nunito Sans',sans-serif;letter-spacing:.2em;text-align:center;outline:1.5px dashed rgba(255,255,255,.6);outline-offset:-6px}
 .ticket b{display:block;font:400 24px Fraunces,Lora,serif;letter-spacing:0}
 
 /* гайды и книги */
@@ -108,11 +113,12 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
 /* клуб */
 .dark{background:var(--gr);color:var(--grtx);padding:110px 0}
 .club{position:relative;height:520px}
-.club .ph{position:absolute;left:0;top:0;width:62%;height:100%;overflow:hidden;border-radius:4px}
-.club .ph img{width:100%;height:100%;object-fit:cover;filter:brightness(.55) saturate(.85)}
-.club .ph .k{position:absolute;left:30px;top:30px;color:#E9E2D6}
-.club .ph h2{position:absolute;left:30px;bottom:30px;font:300 70px/.95 Fraunces,Lora,serif;color:#F2ECE3;max-width:7em}.club .ph h2 em{color:#F2ECE3}
-.tk{position:absolute;right:0;top:50px;width:44%;background:var(--sheet);color:var(--ink);padding:36px 40px;box-shadow:0 30px 60px rgba(0,0,0,.4);
+.club .ph{position:absolute;left:0;top:0;width:48%;height:100%;overflow:hidden;border-radius:4px}
+.club .ph:after{content:"";position:absolute;inset:0;background:linear-gradient(to bottom,rgba(20,14,10,.78) 0,rgba(20,14,10,.35) 42%,transparent 62%)}
+.club .ph img{width:100%;height:100%;object-fit:cover;object-position:center 60%}
+.club .ph .k{position:absolute;left:30px;top:30px;color:#E9E2D6;z-index:1}
+.club .ph h2{position:absolute;left:30px;top:62px;font:300 58px/.95 Fraunces,Lora,serif;color:#F2ECE3;max-width:7em;z-index:1;text-shadow:0 2px 14px rgba(0,0,0,.4)}.club .ph h2 em{color:#F2ECE3}
+.tk{position:absolute;right:0;top:50px;width:56%;background:var(--sheet);color:var(--ink);padding:36px 40px;box-shadow:0 30px 60px rgba(0,0,0,.4);
  -webkit-mask:radial-gradient(circle 14px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 14px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 14px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 14px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat}
 .tk p{color:var(--mut);font-size:15px;margin:6px 100px 10px 0}
 .tk .row{display:flex;justify-content:space-between;align-items:baseline;gap:12px;border-bottom:1px dashed rgba(31,35,38,.3);padding:15px 0;font:400 21px Fraunces,Lora,serif}
@@ -181,7 +187,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
  .drawer .lb{color:var(--acc)}.drawer .lang-switch{margin-top:14px}.drawer .lang-switch a{font:500 15px Karla,'Nunito Sans',sans-serif;border:0;padding:4px 10px 4px 0}
  .fl .w,.desk .w,.jg,.ab2 .w{grid-template-columns:1fr}
  .books{max-width:640px}
- .club{height:auto}.club .ph{position:relative;width:100%;height:380px}.tk{position:relative;width:auto;top:-50px;margin:0 20px}
+ .club{height:auto}.club .ph{position:relative;width:100%;height:380px}.club .ph{height:460px}.tk{position:relative;width:auto;top:-50px;margin:0 20px}
  .fold{width:100%}
 }
 @media (max-width:700px){
@@ -194,10 +200,10 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
  .sea{position:static;display:block;transform:rotate(-3deg);font-size:21px;margin-top:14px}.sea:before{display:none}
  .pano,html[data-season=summer] .pano{height:300px}.cap2{right:18px;font-size:19px}
  .fl{padding:70px 0}.fl .w{gap:30px}.fl h2{font-size:48px}
- .cl{height:420px}.cl .a{width:60%;height:200px;top:10px}.cl .b{width:54%;height:220px;right:0;top:150px}.cl .t b{font-size:14px;right:10px;line-height:1.15}.cl .t .pl{width:38px;height:38px;bottom:48px}.ticket{left:6px;right:auto;bottom:30px;padding:8px 12px}.ticket b{font-size:17px}
+ .cl{height:500px}.cl .a{width:80%;top:10px}.cl .b{width:78%;right:0;top:250px}.cl .t b{font-size:14px;right:10px;line-height:1.15}.cl .t .pl{width:38px;height:38px;bottom:48px}.ticket{left:0;right:auto;top:212px;bottom:auto;padding:7px 10px;z-index:6}.ticket b{font-size:17px}
  .desk{padding:80px 0}.desk .w{gap:28px}.desk h2{font-size:40px}.books{height:300px}.books a{width:130px}.books .b1{left:105px}.books .b2{left:210px}.lbl{font-size:9px;padding:5px 8px}.books .hand{left:0;bottom:-10px;font-size:22px}
  .jr{padding:70px 0}.hd3{flex-direction:column;align-items:start;gap:14px}.hd3 h2{font-size:40px}.doodle{display:none}.jg{gap:30px}.feat .im{height:250px}.feat .card{width:auto;margin:-60px 12px 0}.feat h3{font-size:24px}.post{grid-template-columns:1fr 90px}.post img{width:90px;height:72px}.post h3{font-size:20px}
- .dark{padding:70px 0}.club .ph{height:320px}.club .ph h2{font-size:42px}.tk{top:-40px;margin:0 10px;padding:28px 22px}.tk p{margin-right:70px}.tk .row{font-size:18px}.stamp{width:74px;height:74px;font-size:8px;right:14px;top:14px}
+ .dark{padding:70px 0}.club .ph{height:420px}.club .ph h2{font-size:40px}.tk{top:-16px;margin:0 10px;padding:28px 22px}.tk p{margin-right:70px}.tk .row{font-size:18px}.stamp{width:74px;height:74px;font-size:8px;right:14px;top:14px}
  .ab2{padding:70px 0}.ab2 .w{gap:40px}.ab2 .ph{width:86%;margin:0 auto}.ab2 h2{font-size:38px}.ab2 p{font-size:17px}
  .lab3{padding:70px 0 90px}.lab3 .hd4{margin-bottom:56px}.lab3 .hd4 h2{font-size:38px}
  .fold{height:auto}.fold .ins{position:relative;inset:auto;grid-template-columns:1fr;gap:34px;padding:34px 16px 30px}

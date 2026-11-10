@@ -6,6 +6,7 @@
 - Редактор `/blog-editor/`: `site/assets/blog-editor.js` (только админ). Главная: `src/blocks/home-blog.html` + `home-blog.js`.
 - Перевод — только Gemini (`GEMINI_KEY` или meta `gemini_key`). Картинки — R2 `MEDIA`.
 - D1: `blog_posts`, `blog_likes`, `blog_comments`, `blog_tags`, `blog_sections`.
+- Редизайн 2.0: с cookie `pp_v2=1` страницы блога собираются на шаблоне `/blog/v2/` (новая шапка, v2.css) — docs/site.md «Редизайн 2.0».
 
 ## Оглавление
 - [Устройство](#устройство)
