@@ -652,8 +652,8 @@
   "<li><b>Vote &amp; ask</b><span>Cloudberry Patrons vote on future projects and join live Q&amp;As.</span></li>": "<li><b>Голос и вопросы</b><span>На уровне Cloudberry Patron — голосование за будущие проекты и живые вопросы-ответы.</span></li>",
   "<h2>Pick your <em>perch</em></h2><p>Payment, VAT and videos are handled by Patreon.</p>": "<h2>Выберите <em>жёрдочку</em></h2><p>Оплату, НДС и видео берёт на себя Patreon.</p>",
   "<h3>Free follower</h3><div class=\"pr\">Free</div><ul><li>Free lessons</li><li>Public posts and news</li></ul>": "<h3>Free follower</h3><div class=\"pr\">Бесплатно</div><ul><li>Бесплатные уроки</li><li>Открытые посты и новости</li></ul>",
-  "<ul><li>Behind-the-scenes process</li><li>The complete post archive</li><li>Video lessons</li></ul>": "<ul><li>Процесс за кадром</li><li>Весь архив постов</li><li>Видеоуроки</li></ul>",
-  "<ul><li>Everything in Little Persimmon</li><li>More support for new lessons and guides</li></ul>": "<ul><li>Всё из Little Persimmon</li><li>Больше поддержки новым урокам и гайдам</li></ul>",
-  "<ul><li>Everything above</li><li>A vote on future projects</li><li>Live Q&amp;As</li><li>A thank-you mention</li></ul>": "<ul><li>Всё, что выше</li><li>Голос за будущие проекты</li><li>Живые вопросы-ответы</li><li>Упоминание с благодарностью</li></ul>",
-  "<small> / month</small>": "<small> / мес.</small>"
+  "<small> / month</small>": "<small> / мес.</small>",
+  "<ul><li>Behind-the-scenes content</li><li>Complete post archive</li></ul>": "<ul><li>Материалы за кадром</li><li>Весь архив постов</li></ul>",
+  "<ul><li>Everything in Little Persimmon</li><li>Video tutorials &amp; lessons</li></ul>": "<ul><li>Всё из Little Persimmon</li><li>Видеотуториалы и уроки</li></ul>",
+  "<ul><li>Everything above</li><li>Member shout-out</li><li>Exclusive voting power</li><li>Live Q&amp;As</li></ul>": "<ul><li>Всё, что выше</li><li>Упоминание участника</li><li>Право голоса за будущие проекты</li><li>Живые вопросы-ответы</li></ul>"
 }

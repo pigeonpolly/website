@@ -652,8 +652,8 @@
   "<li><b>Vote &amp; ask</b><span>Cloudberry Patrons vote on future projects and join live Q&amp;As.</span></li>": "<li><b>Balss un jautājumi</b><span>Cloudberry Patron līmenī — balsojums par nākamajiem projektiem un tiešraides jautājumi un atbildes.</span></li>",
   "<h2>Pick your <em>perch</em></h2><p>Payment, VAT and videos are handled by Patreon.</p>": "<h2>Izvēlieties <em>laktiņu</em></h2><p>Maksājumus, PVN un video nodrošina Patreon.</p>",
   "<h3>Free follower</h3><div class=\"pr\">Free</div><ul><li>Free lessons</li><li>Public posts and news</li></ul>": "<h3>Free follower</h3><div class=\"pr\">Bez maksas</div><ul><li>Bezmaksas nodarbības</li><li>Publiski ieraksti un jaunumi</li></ul>",
-  "<ul><li>Behind-the-scenes process</li><li>The complete post archive</li><li>Video lessons</li></ul>": "<ul><li>Process aizkulisēs</li><li>Viss ierakstu arhīvs</li><li>Video nodarbības</li></ul>",
-  "<ul><li>Everything in Little Persimmon</li><li>More support for new lessons and guides</li></ul>": "<ul><li>Viss no Little Persimmon</li><li>Lielāks atbalsts jaunām nodarbībām un ceļvežiem</li></ul>",
-  "<ul><li>Everything above</li><li>A vote on future projects</li><li>Live Q&amp;As</li><li>A thank-you mention</li></ul>": "<ul><li>Viss iepriekšminētais</li><li>Balss par nākamajiem projektiem</li><li>Tiešraides jautājumi un atbildes</li><li>Pateicības pieminējums</li></ul>",
-  "<small> / month</small>": "<small> / mēnesī</small>"
+  "<small> / month</small>": "<small> / mēnesī</small>",
+  "<ul><li>Behind-the-scenes content</li><li>Complete post archive</li></ul>": "<ul><li>Aizkulišu materiāli</li><li>Viss ierakstu arhīvs</li></ul>",
+  "<ul><li>Everything in Little Persimmon</li><li>Video tutorials &amp; lessons</li></ul>": "<ul><li>Viss no Little Persimmon</li><li>Video pamācības un nodarbības</li></ul>",
+  "<ul><li>Everything above</li><li>Member shout-out</li><li>Exclusive voting power</li><li>Live Q&amp;As</li></ul>": "<ul><li>Viss iepriekšminētais</li><li>Dalībnieka pieminējums</li><li>Balsstiesības par nākamajiem projektiem</li><li>Tiešraides jautājumi un atbildes</li></ul>"
 }
