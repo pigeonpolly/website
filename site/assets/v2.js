@@ -3,10 +3,10 @@
   const html = document.documentElement, lang = html.lang || 'en', L = { en: 0, ru: 1, lv: 2 }[lang] ?? 0;
   const pre = lang === 'en' ? '' : '/' + lang;
   const T = {
-    winter: { tag: ['winter edition', 'зимний выпуск', 'ziemas izdevums'], note: ['frosty rooftops, Riga ❄', 'морозные крыши Риги ❄', 'salnaini Rīgas jumti ❄'] },
-    spring: { tag: ['spring edition', 'весенний выпуск', 'pavasara izdevums'], note: ['wild strawberries ❀', 'земляника ❀', 'meža zemenes ❀'] },
+    winter: { tag: ['winter edition', 'зимний выпуск', 'ziemas izdevums'], note: ['rooftops and towers ❄', 'крыши и башни ❄', 'jumti un torņi ❄'] },
+    spring: { tag: ['spring edition', 'весенний выпуск', 'pavasara izdevums'], note: ['on my desk: strawberries ❀', 'на моём столе: земляника ❀', 'uz mana galda: zemenes ❀'] },
     summer: { tag: ['summer edition', 'летний выпуск', 'vasaras izdevums'], note: ['Polly, summer lover ☀', 'Полли обожает лето ☀', 'Pollija mīl vasaru ☀'] },
-    autumn: { tag: ['autumn edition', 'осенний выпуск', 'rudens izdevums'], note: ['night garden, physalis ✿', 'ночной сад, физалис ✿', 'nakts dārzs, fizāles ✿'] },
+    autumn: { tag: ['autumn edition', 'осенний выпуск', 'rudens izdevums'], note: ['Polly on the train ✿', 'Полли в поезде ✿', 'Pollija vilcienā ✿'] },
   };
   const COL = { winter: '#9E1B22', spring: '#BE2F3A', summer: '#D2452B', autumn: '#C04A1C' };
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

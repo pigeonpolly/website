@@ -1,8 +1,8 @@
 /* Редизайн 2.0 — общий стиль новых страниц (/preview/). Сезон — html[data-season] (src/layout-v2.html). Не путать со style.css старых страниц. */
 *{box-sizing:border-box;margin:0;padding:0}
-:root,html[data-season=autumn]{--bg:#F4F0EA;--sheet:#FBF9F5;--ink:#2A211C;--mut:#6C6058;--line:#DED5CA;--gr:#2E2521;--gr2:#3A302B;--acc:#C04A1C;--acc2:#EE7A45;--inner:#2A1D16;--grtx:#ECEDEE;--grmut:#A3A8AC;--hero-pos:center 45%}
-html[data-season=winter]{--bg:#EEF1F3;--sheet:#F8FAFB;--ink:#1C2430;--mut:#5D6670;--line:#D3DAE0;--gr:#26303A;--gr2:#313C47;--acc:#9E1B22;--acc2:#E2544A;--inner:#1B2632;--hero-pos:center 32%}
-html[data-season=spring]{--bg:#F1F4F0;--sheet:#FAFBF9;--ink:#1F2A25;--mut:#5E6A63;--line:#D4DDD6;--gr:#26302B;--gr2:#313C36;--acc:#BE2F3A;--acc2:#E85C64;--inner:#1C2A23;--hero-pos:center 55%}
+:root,html[data-season=autumn]{--bg:#F4F0EA;--sheet:#FBF9F5;--ink:#2A211C;--mut:#6C6058;--line:#DED5CA;--gr:#2E2521;--gr2:#3A302B;--acc:#C04A1C;--acc2:#EE7A45;--inner:#2A1D16;--grtx:#ECEDEE;--grmut:#A3A8AC;--hero-pos:center 22%}
+html[data-season=winter]{--bg:#EEF1F3;--sheet:#F8FAFB;--ink:#1C2430;--mut:#5D6670;--line:#D3DAE0;--gr:#26303A;--gr2:#313C47;--acc:#9E1B22;--acc2:#E2544A;--inner:#1B2632;--hero-pos:center 58%}
+html[data-season=spring]{--bg:#F1F4F0;--sheet:#FAFBF9;--ink:#1F2A25;--mut:#5E6A63;--line:#D4DDD6;--gr:#26302B;--gr2:#313C36;--acc:#BE2F3A;--acc2:#E85C64;--inner:#1C2A23;--hero-pos:center 62%}
 html[data-season=summer]{--bg:#F7F4EE;--sheet:#FFFDFA;--ink:#2A2420;--mut:#6D635B;--line:#E3DACE;--gr:#2F2622;--gr2:#3B312C;--acc:#D2452B;--acc2:#F07A55;--inner:#3A1A1C;--hero-pos:center 0%}
 html,body{overflow-x:hidden}
 body.v2{background:var(--bg);color:var(--ink);font:16px/1.55 Karla,'Nunito Sans',sans-serif;transition:background .4s}
@@ -56,6 +56,10 @@ section{position:relative}
 .pano img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:var(--hero-pos);-webkit-mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 20%,#000 48%);mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 20%,#000 48%)}
 html[data-season=summer] .pano{height:640px}
 html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 10%);mask-image:linear-gradient(to bottom,transparent 0,#000 10%)}
+/* широкий экран: картинка не шире 1600 px (исходники 1280–2000 px), края растворяются в фоне */
+@media (min-width:1601px){.pano img{left:50%;width:1600px;transform:translateX(-50%);-webkit-mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 20%,#000 48%),linear-gradient(to right,transparent 0,#000 12%,#000 88%,transparent 100%);-webkit-mask-composite:source-in;mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 20%,#000 48%),linear-gradient(to right,transparent 0,#000 12%,#000 88%,transparent 100%);mask-composite:intersect}
+ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,transparent 0,#000 10%),linear-gradient(to right,transparent 0,#000 12%,#000 88%,transparent 100%);mask-image:linear-gradient(to bottom,transparent 0,#000 10%),linear-gradient(to right,transparent 0,#000 12%,#000 88%,transparent 100%)}
+ .cap2{right:calc(50% - 760px)}}
 .cap2{position:absolute;right:44px;bottom:18px;z-index:2;font:700 22px Caveat,cursive;color:#fff;text-shadow:0 1px 8px rgba(0,0,0,.5)}
 
 /* бесплатные уроки */
