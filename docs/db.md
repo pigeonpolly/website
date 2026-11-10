@@ -118,3 +118,6 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `wl_gift:` — worker/wl-holidays.js
 - `wl_mail_n:` — worker/mail.js, worker/wl-holidays.js
 - `works_total` — worker/blog.js, worker/index.js
+- **notes** (worker/notes.js): `id` int PK auto, `L` text nn (JSON {en,ru,lv: {s,t}}), `file_key` text, `file_name` text, `file_size` int =0, `file_type` text, `aud` text ='all', `days` int =0, `total` int =0, `mail_id` int, `created_at` int
+- **note_to** (worker/notes.js): `note_id` int nn, `user_id` int nn, `seen_at` int =0; PRIMARY KEY (note_id, user_id); индекс note_to_user
+- mail_out + `aud_from` int =0, `aud_to` int =0 — границы даты регистрации получателей (📢 Рассылка)

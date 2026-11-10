@@ -172,9 +172,9 @@ export async function mailCron(env, h) {
     if (left <= 0) break;
     if (!MAIL_CATS.includes(o.cat)) continue;
     const rows = (await env.DB.prepare(`SELECT u.id, u.email, u.mail_lang FROM users u LEFT JOIN mail_sent s ON s.out_id = ? AND s.user_id = u.id
-      WHERE u.mail_${o.cat} = 1 AND u.email IS NOT NULL AND u.email != '' AND u.banned = 0 AND s.user_id IS NULL AND COALESCE(u.mail_day, '') != ? ORDER BY u.id LIMIT ?`).bind(o.id, h.rigaDay(), left).all()).results;
+      WHERE u.mail_${o.cat} = 1 AND u.email IS NOT NULL AND u.email != '' AND u.banned = 0 AND s.user_id IS NULL AND COALESCE(u.created_at, 0) >= ${Number(o.aud_from) || 0} AND COALESCE(u.created_at, 0) < ${Number(o.aud_to) || 9e9} AND COALESCE(u.mail_day, '') != ? ORDER BY u.id LIMIT ?`).bind(o.id, h.rigaDay(), left).all()).results;
     if (!rows.length) { // никого сегодня: либо всем отправлено, либо остальным сегодня уже было письмо — тогда завтра
-      const rest = await env.DB.prepare(`SELECT 1 FROM users u LEFT JOIN mail_sent s ON s.out_id = ? AND s.user_id = u.id WHERE u.mail_${o.cat} = 1 AND u.email IS NOT NULL AND u.email != '' AND u.banned = 0 AND s.user_id IS NULL LIMIT 1`).bind(o.id).first();
+      const rest = await env.DB.prepare(`SELECT 1 FROM users u LEFT JOIN mail_sent s ON s.out_id = ? AND s.user_id = u.id WHERE u.mail_${o.cat} = 1 AND u.email IS NOT NULL AND u.email != '' AND u.banned = 0 AND s.user_id IS NULL AND COALESCE(u.created_at, 0) >= ${Number(o.aud_from) || 0} AND COALESCE(u.created_at, 0) < ${Number(o.aud_to) || 9e9} LIMIT 1`).bind(o.id).first();
       if (!rest) await env.DB.prepare("UPDATE mail_out SET status = 'done' WHERE id = ?").bind(o.id).run();
       continue;
     }
