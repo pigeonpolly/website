@@ -98,11 +98,10 @@ V2_LEARN, V2_GUIDES = "/preview/learn/", "/preview/guides/"  # пункты Less
 
 def v2_page(layout_v2, title, desc, canonical, robots, content):
     """Страница на новом шаблоне (редизайн 2.0)."""
-    return (layout_v2.replace("{{title}}", esc(title)).replace("{{description}}", esc(desc))
+    return (layout_v2.replace("{{content}}", content).replace("{{title}}", esc(title)).replace("{{description}}", esc(desc))
             .replace("{{canonical}}", canonical).replace("{{home}}", V2_HOME)
             .replace("{{learn}}", V2_LEARN).replace("{{guides}}", V2_GUIDES)
-            .replace("{{robots}}", '<meta name="robots" content="noindex">\n' if robots else "")
-            .replace("{{content}}", content))
+            .replace("{{robots}}", '<meta name="robots" content="noindex">\n' if robots else ""))
 
 
 PORTFOLIO = [
