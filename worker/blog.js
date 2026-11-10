@@ -14,7 +14,7 @@ const T = {
     blog: 'Blog', head: 'Notes from the lab', lead: 'Articles about drawing, learning and creativity: what I try, what works, and what Polly thinks about it.',
     tags: 'Tags', moreTags: 'Show all tags', lessTags: 'Show less', popular: 'Popular', all: 'All posts', empty: 'No posts here yet. The first one is on its way!',
     comments: 'Comments', noComments: 'No comments yet. Be the first!', back: '← All posts', tagged: 'Posts tagged',
-    members: 'Members only', lockT: 'This article is for members', lockP: 'Sign in for free to read the whole article. It takes a minute.', lockBtn: 'Sign in for free', min: 'min read', share: 'Share', copy: 'Copy link', copied: 'Link copied ✓', email: 'E-mail', draft: 'Draft', read: 'Read →', months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    members: 'Members only', lockT: 'This article is for members', lockP: 'Sign in for free to read the whole article. It takes a minute.', lockBtn: 'Sign in for free', accAll: 'All posts', accOpen: 'Open to everyone', accLabel: 'Who can read', min: 'min read', share: 'Share', copy: 'Copy link', copied: 'Link copied ✓', email: 'E-mail', draft: 'Draft', read: 'Read →', months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     descr: 'Notes on drawing, learning and creativity by Alina Otkinska and Pigeon Polly.',
     featured: '★ Favourites', archive: 'Archive', inMonth: 'Posts from', onlyFav: 'My favourite posts', allSections: 'All', search: 'Search the blog…', searchBtn: 'Search', found: 'Search results for', nothing: 'Nothing found. Try another word.', prev: '← Newer', next: 'Older →', section: 'Section', sections: 'Sections', scheduled: '⏰ Scheduled', browse: 'Sections, tags & archive', count: n => `${n} ${n === 1 ? 'post' : 'posts'} in the blog`,
     monthsFull: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
@@ -23,7 +23,7 @@ const T = {
     blog: 'Блог', head: 'Заметки из лаборатории', lead: 'Статьи о рисовании, обучении и творчестве: что я пробую, что работает и что об этом думает Полли.',
     tags: 'Теги', moreTags: 'Показать все теги', lessTags: 'Свернуть', popular: 'Популярное', all: 'Все статьи', empty: 'Здесь пока нет статей. Первая уже в пути!',
     comments: 'Комментарии', noComments: 'Комментариев пока нет. Будьте первым!', back: '← Все статьи', tagged: 'Статьи с тегом',
-    members: 'Только для своих', lockT: 'Эта статья — для своих', lockP: 'Войдите бесплатно, чтобы прочитать статью целиком. Это займёт минуту.', lockBtn: 'Войти бесплатно', min: 'мин чтения', share: 'Поделиться', copy: 'Скопировать ссылку', copied: 'Ссылка скопирована ✓', email: 'Почта', draft: 'Черновик', read: 'Читать →', months: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
+    members: 'Только для своих', lockT: 'Эта статья — для своих', lockP: 'Войдите бесплатно, чтобы прочитать статью целиком. Это займёт минуту.', lockBtn: 'Войти бесплатно', accAll: 'Все статьи', accOpen: 'Открытые всем', accLabel: 'Кто может читать', min: 'мин чтения', share: 'Поделиться', copy: 'Скопировать ссылку', copied: 'Ссылка скопирована ✓', email: 'Почта', draft: 'Черновик', read: 'Читать →', months: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
     descr: 'Заметки о рисовании, обучении и творчестве от Алины Откинской и голубя Полли.',
     featured: '★ Избранное', archive: 'Архив', inMonth: 'Статьи за', onlyFav: 'Мои избранные статьи', allSections: 'Все', search: 'Поиск по блогу…', searchBtn: 'Найти', found: 'Результаты поиска', nothing: 'Ничего не нашлось. Попробуйте другое слово.', prev: '← Новее', next: 'Старше →', section: 'Раздел', sections: 'Разделы', scheduled: '⏰ Запланирована', browse: 'Разделы, теги и архив', count: n => `В блоге ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'статья' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'статьи' : 'статей'}`,
     monthsFull: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
@@ -32,7 +32,7 @@ const T = {
     blog: 'Blogs', head: 'Piezīmes no laboratorijas', lead: 'Raksti par zīmēšanu, mācīšanos un radošumu: ko es izmēģinu, kas strādā un ko par to domā Pollija.',
     tags: 'Birkas', moreTags: 'Rādīt visas birkas', lessTags: 'Sakļaut', popular: 'Populārākie', all: 'Visi raksti', empty: 'Šeit vēl nav rakstu. Pirmais jau ceļā!',
     comments: 'Komentāri', noComments: 'Komentāru vēl nav. Esi pirmais!', back: '← Visi raksti', tagged: 'Raksti ar birku',
-    members: 'Tikai saviem', lockT: 'Šis raksts ir saviem', lockP: 'Ienāc bez maksas, lai izlasītu visu rakstu. Tas aizņems minūti.', lockBtn: 'Ienākt bez maksas', min: 'min lasīšanas', share: 'Dalīties', copy: 'Kopēt saiti', copied: 'Saite nokopēta ✓', email: 'E-pasts', draft: 'Melnraksts', read: 'Lasīt →', months: ['janv.', 'febr.', 'marts', 'apr.', 'maijs', 'jūn.', 'jūl.', 'aug.', 'sept.', 'okt.', 'nov.', 'dec.'],
+    members: 'Tikai saviem', lockT: 'Šis raksts ir saviem', lockP: 'Ienāc bez maksas, lai izlasītu visu rakstu. Tas aizņems minūti.', lockBtn: 'Ienākt bez maksas', accAll: 'Visi raksti', accOpen: 'Atvērti visiem', accLabel: 'Kas var lasīt', min: 'min lasīšanas', share: 'Dalīties', copy: 'Kopēt saiti', copied: 'Saite nokopēta ✓', email: 'E-pasts', draft: 'Melnraksts', read: 'Lasīt →', months: ['janv.', 'febr.', 'marts', 'apr.', 'maijs', 'jūn.', 'jūl.', 'aug.', 'sept.', 'okt.', 'nov.', 'dec.'],
     descr: 'Piezīmes par zīmēšanu, mācīšanos un radošumu no Alīnas Otkinskas un baloža Pollijas.',
     featured: '★ Izlase', archive: 'Arhīvs', inMonth: 'Raksti par', onlyFav: 'Mani izlases raksti', allSections: 'Visi', search: 'Meklēt blogā…', searchBtn: 'Meklēt', found: 'Meklēšanas rezultāti', nothing: 'Nekas netika atrasts. Pamēģiniet citu vārdu.', prev: '← Jaunāki', next: 'Vecāki →', section: 'Sadaļa', sections: 'Sadaļas', scheduled: '⏰ Ieplānots', browse: 'Sadaļas, birkas un arhīvs', count: n => `Blogā ir ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'raksts' : 'raksti'}`,
     monthsFull: ['janvāris', 'februāris', 'marts', 'aprīlis', 'maijs', 'jūnijs', 'jūlijs', 'augusts', 'septembris', 'oktobris', 'novembris', 'decembris'],
@@ -999,20 +999,22 @@ async function blogPageInner(req, env, url, h) {
     const favOnly = P.get('fav') === '1';
     const section = (P.get('section') || '').trim().toLowerCase();
     const q = (P.get('q') || '').trim().slice(0, 80);
+    const access = ['open', 'members'].includes(P.get('access')) ? P.get('access') : ''; // фильтр: открытые / 🔒 для своих
     let list = posts;
+    if (access) list = list.filter(x => access === 'members' ? !!x.members : !x.members);
     if (section) list = list.filter(x => secsOf(x).includes(section));
     if (tag) list = list.filter(x => tagsOf(x).includes(tag) || splitTags(x['tags_' + lang]).includes(tag)); // старые ссылки с переводом тега тоже работают
     if (month) list = list.filter(x => ym(x) === month);
     if (favOnly) list = list.filter(x => x.featured);
     if (q) { // поиск: заголовок, описание, текст и теги на любом языке
       const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-      list = list.filter(x => { const hay = [...LANGS.flatMap(l => [x['t_' + l], x['d_' + l], stripTags(x['b_' + l])]), ...tagsOf(x).map(g => g + ' ' + tagLabel(g, lang))].join(' ').toLowerCase(); return words.every(w => hay.includes(w)); });
+      list = list.filter(x => { const hay = [...LANGS.flatMap(l => [x['t_' + l], x['d_' + l], x.members && !u ? '' : stripTags(x['b_' + l])]), ...tagsOf(x).map(g => g + ' ' + tagLabel(g, lang))].join(' ').toLowerCase(); return words.every(w => hay.includes(w)); });
     }
     // по 8 статей на странице
     const PER = 8, pages = Math.max(1, Math.ceil(list.length / PER)), page = Math.min(pages, Math.max(1, parseInt(P.get('page')) || 1));
     const shown = list.slice((page - 1) * PER, page * PER);
     const link = (over) => { const u = new URLSearchParams(P); for (const [k, v] of Object.entries(over)) { if (v === '' || v == null) u.delete(k); else u.set(k, v); } const qs = u.toString(); return blogUrl(lang, '', qs ? '?' + qs : ''); };
-    const filtered = tag || month || favOnly || section || q || page > 1;
+    const filtered = tag || month || favOnly || section || q || access || page > 1;
     const label = q ? `${t.found}: <b>«${esc(q)}»</b> (${list.length})` : tag ? `${t.tagged} <b>#${esc(tagLabel(tag, lang))}</b>` : month ? `${t.inMonth} <b>${t.monthsFull[+month.slice(5) - 1]} ${month.slice(0, 4)}</b>` : favOnly ? `<b>${t.featured}</b>` : section ? `${t.section}: <b>${esc(sectionName(section, lang))}</b>` : '';
     const pager = pages > 1 ? `<nav class="bl-pager" aria-label="Pages">${page > 1 ? `<a href="${link({ page: page - 1 > 1 ? page - 1 : '' })}">${t.prev}</a>` : '<span></span>'}
       <span class="bl-pages">${Array.from({ length: pages }, (_, k) => k + 1).map(n => n === page ? `<b aria-current="page">${n}</b>` : `<a href="${link({ page: n > 1 ? n : '' })}">${n}</a>`).join('')}</span>
@@ -1020,7 +1022,7 @@ async function blogPageInner(req, env, url, h) {
     const content = `<section class="page-head bl-head"><p class="topics">${t.blog.toLowerCase()}</p><h1>${t.head}</h1><p class="lead">${t.lead}</p><p class="bl-count">📝 ${t.count(published.length)}</p>
       <div class="bl-admin" data-blog-admin hidden><a class="pill-btn" href="/blog-editor/">＋ ${lang === 'ru' ? 'Новая статья' : lang === 'lv' ? 'Jauns raksts' : 'New post'}</a></div></section>
       <div class="bl-tools">
-        <span></span>
+        ${published.some(x => x.members) ? `<nav class="bl-access" aria-label="${t.accLabel}">${[['', t.accAll], ['open', t.accOpen], ['members', '🔒 ' + t.members]].map(([v, n]) => v === access ? `<b aria-current="true">${esc(n)}</b>` : `<a href="${link({ access: v, page: '' })}">${esc(n)}</a>`).join('')}</nav>` : '<span></span>'}
         <form class="bl-search" action="${blogUrl(lang, '')}" method="get" role="search">${section ? `<input type="hidden" name="section" value="${esc(section)}">` : ''}
           <input type="search" name="q" value="${esc(q)}" placeholder="${t.search}" aria-label="${t.search}"><button type="submit" aria-label="${t.searchBtn}">🔍</button></form>
       </div>

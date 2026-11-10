@@ -417,6 +417,7 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 }
 .col3 .pa figcaption{left:auto;right:16px}
 .v2 .bl-lock{background:var(--sheet);color:var(--acc)}.v2 .bp-lock{background:var(--sheet);border-color:var(--acc);border-radius:4px}.v2 .bp-lock:before{background:linear-gradient(to bottom,transparent,var(--bg))}
+<<<<<<< HEAD
 
 /* выбор сезона: один кружок + список (v2.js seaMenu) */
 .sea2{position:relative;display:flex}
@@ -432,3 +433,6 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 .sea-m .switch button[aria-pressed=true]{box-shadow:none;font-weight:700}.sea-m .switch button[aria-pressed=true]:after{content:"✓";margin-left:auto;padding-left:12px;color:var(--acc)}
 @media (max-width:700px){.hr .sea2{display:none}}
 @media (max-width:1240px) and (min-width:1041px){.cl{height:600px}.cl .b{top:310px}.ticket{top:360px}}
+=======
+.v2 .bl-access a,.v2 .bl-access b{border-color:var(--line);border-radius:4px}.v2 .bl-access b{background:var(--sheet);border-color:var(--acc);color:var(--acc)}
+>>>>>>> origin/main

@@ -2155,6 +2155,9 @@ details.am-art .am-series { padding: 0 24px 24px; }
 
 /* разделы, поиск, листание */
 .bl-tools { display: flex; flex-wrap: wrap; gap: 14px 24px; align-items: center; justify-content: space-between; padding: 0 var(--gutter) 26px; }
+.bl-access { display: flex; flex-wrap: wrap; gap: 8px; }
+.bl-access a, .bl-access b { padding: 6px 14px; border-radius: 99px; border: 1.5px solid #D9CBB8; font-size: 14px; text-decoration: none; color: inherit; }
+.bl-access b { background: #F1E6D8; border-color: #C98A5A; }
 .bl-sections { display: flex; flex-wrap: wrap; gap: 8px; }
 .bl-sections a { padding: 8px 16px; border-radius: 99px; border: 1.5px solid var(--line); color: var(--text); font: 700 14px var(--sans); text-decoration: none; }
 .bl-sections a:hover { border-color: var(--peach); }
