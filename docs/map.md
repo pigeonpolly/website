@@ -16,6 +16,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/garden.js` (21K) — Огород птички (этап 22, /garden/, site/assets/garden.js, docs/bird.md «Огород»): грядки, с: CROPS, TIER, DAY, SIMPLE, GARDEN_ALTER, GARDEN_BOOL, out, fnv, grown, prices, bedOk, bugsOf
 - `worker/ideas.js` (9K) — Кабинет → «💡 Темы для блога»: по кнопке собираем, что сейчас ищут и обсуждают в сфере Алин: MONTHS, PAGES, SUBS, SEEDS, reddit, suggest, ask, ideasApi
 - `worker/index.js` (271K) — Worker: site/, страницы через HTMLRewriter, /api (кроме блога), cron: RULES, BTN, STOCK, GIFT_KINDS, GOLD_PICKS, PLEVEL, award, btnOf, catalog, avatarOf, cnt, gameUnit
+- `worker/notes.js` — 📢 Рассылка: сообщения и файлы птичкам, «кому» все/новые/старые: notesApi, noteNews, noteHistory, audWhere, audRange, NOTE_TABLES, NOTE_ALTER, NOTE_FILE_MAX
 - `worker/mail.js` (24K) — Письма с сайта по согласию (docs/bird.md «Письма»): три вида — games (уведомления из игр),: MAIL_DAY_MAX, ORDER, DIGEST, MAIL_CATS, ITEM, CAT, pageUrl, langOf, pre, sendOne, spend, usedToday
 - `worker/my-games.js` (3K) — «★ Мои игры» на главной (вкладка в «Моём дне», docs/site.md): 3 закреплённые игры птички и: MY_GAMES, MY_PINS, MY_GAMES_TABLES, rowOf, myGamesApi
 - `worker/pancakes.js` (12K) — «Блинная Полли» (/pancakes/, site/assets/pancakes.js, docs/games.md): Полли печёт блины жи: PAN_UPS, TOP, PAN_ALTER, PAN_BADGES, PAN_COND, PAN_INT, today, upsOf, price, pancakesApi
@@ -64,6 +65,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/hatch.js` (9K) — Вылупление (этап 14, docs/site.md «Главная»): пиксельное яйцо, трещины и птичка из скорлуп: PPHatch, EGG, KEY, SPOTS, step
 - `site/assets/home-blog.js` (2K) — блок блога на главной: pic
 - `site/assets/ideas-admin.js` (5K) — Кабинет → «💡 Темы для блога» (admin.js открывает PPIdeasAdmin.mount(main)): кнопка — сайт : PPIdeasAdmin, ERR, fmt, mount, text
+- `site/assets/broadcast-admin.js` — Кабинет → «📢 Рассылка» (PPBroadcast.mount): кому, сообщение + файл, подарок (PPGiftDialog + window.PPAud), пуговки, отправленные
 - `site/assets/mail-admin.js` (9K) — Кабинет → «✉️ Письма» (admin.js открывает PPMailAdmin.mount(main)): кто согласился на пись: PPMailAdmin, CAT, ERR, KEY, mount
 - `site/assets/news.js` (44K) — «Конвертик» — одна очередь новостей птички на всех страницах (этап 4 А).: PPNews, KINDS, COL, BOXES, feed
 - `site/assets/palettes.js` (38K) — страница /palettes/, палитра из фото, добавление палитр админом: NAMES, ADD_G, isAdmin, hue, monthName

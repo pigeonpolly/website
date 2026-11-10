@@ -38,6 +38,7 @@
     { id: 'asks', ic: '📮', name: 'Вопросы из чата', group: 'birds', about: 'Вопросы посетителей из чата «Поболтать с Алиной и Полли»: ответить за себя и за Полли — и вопрос появится в игре с ником автора.', count: 'asks' },
     { id: 'comments', ic: '💬', name: 'Комментарии', group: 'birds', about: 'Комментарии к статьям блога: одобрить, ответить, удалить.', count: 'comments' },
     { id: 'strict', hide: 1, ic: '🛡', name: 'Строгий режим', open: 'comments', focus: '#adm-strict', about: 'Строгий режим комментариев: не больше одного комментария в час с одного адреса.' },
+    { id: 'broadcast', ic: '📢', name: 'Рассылка', group: 'birds', about: 'Одной кнопкой: сообщение с файлом, подарок или пуговки — всем, новым или старым птичкам. На почту — только тем, кто согласился.' },
     { id: 'mail', ic: '✉️', name: 'Письма', group: 'birds', about: 'Письма птичкам на почту — только тем, кто согласился: уведомления из игр, новые фишки, новости от Полли.' },
     { id: 'subscribers', ic: '📬', name: 'Подписчики', group: 'birds', about: 'Адреса людей, которые ждут письма о новой книге.', count: 'subs' },
     { id: 'shop', ic: '🛍', name: 'Магазин', group: 'shop', about: 'Сколько штук каждой вещи в продаже; цены считаются сами.' },
@@ -64,6 +65,7 @@
     cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
     posts: () => window.PPPostsAdmin ? window.PPPostsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился posts-admin.js</p>'), // 📣 Посты (posts-admin.js)
     ideas: () => window.PPIdeasAdmin ? window.PPIdeasAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился ideas-admin.js</p>'), // 💡 Темы для блога (ideas-admin.js)
+    broadcast: () => window.PPBroadcast ? window.PPBroadcast.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился broadcast-admin.js</p>'), // 📢 Рассылка (broadcast-admin.js)
     mail: () => window.PPMailAdmin ? window.PPMailAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился mail-admin.js</p>'), // ✉️ Письма (mail-admin.js)
     carousel: () => window.PPCarousel ? window.PPCarousel(main) : (main.innerHTML = '<p class="be-note">Не загрузился carousel.js</p>') };
   const secOf = id => ADMIN_SECTIONS.find(x => x.id === id);
@@ -765,6 +767,7 @@
   }
 
   // ---------- подарить семечко: фон, обувь, головной убор, анимация, рамка ----------
+  window.PPGiftDialog = (u, done) => giftDialog(u, done || (() => {})); // 📢 Рассылка открывает то же окно подарка (кому — window.PPAud)
   function giftDialog(u, done) {
 
     const B = window.PPBirds, C = window.PPCatalog; if (!B || !C) return;
@@ -776,7 +779,7 @@
     let price = {}, LIM = { max: 3, leg: 1 };
     const priceOf = (kd, v) => price[kd + '|' + v] || 0;
     const w = document.createElement('div'); w.className = 'adm-gift';
-    w.innerHTML = `<div class="adm-gift-card" role="dialog" aria-label="Подарок"><h3>${all ? '🎁 Подарок всем птичкам' : `🎁 Подарок для ${u.nick ? '@' + esc(u.nick) : 'птички без ника'}`}</h3>${all ? '<p class="be-note">Получит каждая птичка с ником (кроме заблокированных). У кого такой вещи уже максимум (3, легендарной — 1), тому не придёт.</p>' : ''}
+    w.innerHTML = `<div class="adm-gift-card" role="dialog" aria-label="Подарок"><h3>${all ? '🎁 Подарок ' + esc((window.PPAud && window.PPAud.label) || 'всем птичкам') : `🎁 Подарок для ${u.nick ? '@' + esc(u.nick) : 'птички без ника'}`}</h3>${all ? '<p class="be-note">Получит каждая птичка с ником (кроме заблокированных). У кого такой вещи уже максимум (3, легендарной — 1), тому не придёт.</p>' : ''}
       <div class="adm-gift-cat"></div>
       <div class="adm-gift-prev"><figure><span class="gnow"></span><figcaption>Сейчас</figcaption></figure><span class="adm-gift-arrow">→</span><figure><span class="gp"></span><figcaption>С подарком</figcaption></figure>
         <p class="be-note">✓ — у птички это уже есть (в сумке), 🎁 — подарено, но ещё не открыто. Вещи, которых у птички уже максимум, скрыты («Фильтры» → «Показать то, что нельзя»). Человек увидит «🎁 Тебе подарок!» в профиле челленджа.</p></div>
@@ -862,7 +865,7 @@
     w.querySelector('[data-send]').onclick = async e => {
       e.target.disabled = true;
       try {
-        if (all) { if (!confirm('Подарить «' + (B.giftName ? B.giftName(kind, item, 1) : item) + '» всем птичкам?')) { e.target.disabled = false; return; } const r = await api('admin/gift-all', { kind, item, note: w.querySelector('input').value.trim() }); sentNote('🎁 ' + (B.giftName ? B.giftName(kind, item, 1) : item) + ' — отправлено ' + r.count + ' птичкам'); e.target.disabled = false; return; }
+        if (all) { if (!confirm('Подарить «' + (B.giftName ? B.giftName(kind, item, 1) : item) + '» ' + ((window.PPAud && window.PPAud.label) || 'всем птичкам') + '?')) { e.target.disabled = false; return; } const r = await api('admin/gift-all', { kind, item, note: w.querySelector('input').value.trim(), ...(window.PPAud || {}) }); sentNote('🎁 ' + (B.giftName ? B.giftName(kind, item, 1) : item) + ' — отправлено ' + r.count + ' птичкам'); e.target.disabled = false; return; }
         const r = await api('admin/gift', { uid: u.id, kind, item, note: w.querySelector('input').value.trim() });
         const gk = r && r.kind || kind, got = r && r.item || item; owned[gk + '|' + got] = owned[gk + '|' + got] || 'new'; copies[gk + '|' + got] = (copies[gk + '|' + got] || 0) + 1; // у сюрприза сервер называет, что выпало
         sentNote('🎁 ' + (B.giftName ? B.giftName(gk, got, 1) : got) + ' — подарено'); e.target.disabled = false; ui.drawList(); }
@@ -1043,7 +1046,7 @@
           <td data-l="Вход"><small title="${u.via === 'g:' ? 'Входит через Google' : 'Входит с паролем'}">${u.via === 'g:' ? 'Google' : ''}${u.via === 'g:' && u.haspw ? ' + ' : ''}${u.haspw ? '🔑' : ''}${u.pw_temp ? ' (временный)' : ''}</small> <button type="button" class="adm-mini" data-pwreset="${u.id}" title="Временный пароль: птичка входит с ним и сразу придумывает свой">🔑 Сбросить пароль</button></td></tr>`).join('')}</tbody></table>
         <details class="adm-fine"><summary>⋯ Редко нужно</summary><p><button type="button" class="pill-btn" id="adm-backfill">🔘 Начислить всем за прошлые бейджи и рисунки</button> <small class="be-note">Нужно было один раз, когда появились пуговки. Повторно не начислит — каждая награда даётся один раз.</small></p></details></section>`;
       main.querySelectorAll('[data-gift]').forEach(b => b.onclick = () => giftDialog(d.users.find(u => u.id === +b.dataset.gift), birds));
-      main.querySelector('#adm-giftall').onclick = () => giftDialog(null, birds);
+      main.querySelector('#adm-giftall').onclick = () => { window.PPAud = null; giftDialog(null, birds); };
       // зарплата: всем птичкам с ником (кроме заблокированных) N пуговок сразу, у них — конвертик с анимацией (account.js)
       main.querySelector('#adm-salary').onclick = async e => {
         const v = prompt('Зарплата: сколько пуговок 🔘 выдать КАЖДОЙ птичке с ником?\nПуговки зачислятся сразу, а при заходе на сайт птичка откроет конвертик от администрации Воббленда.', '10');
