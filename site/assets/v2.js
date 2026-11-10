@@ -33,6 +33,11 @@
     drawer.addEventListener('click', e => { if (e.target.closest('a')) { drawer.hidden = true; burger.setAttribute('aria-expanded', 'false'); burger.textContent = '☰'; } });
   }
 
+  // текущий раздел в шапке; метка pp_v2 — блог (/blog/) тоже показывается в новом стиле (worker/blog.js, ?v2=0 — снять)
+  const here = location.pathname.replace(/^\/(ru|lv)\//, '/');
+  document.querySelectorAll('.nv a, .drawer a').forEach(a => { const p = a.pathname.replace(/^\/(ru|lv)\//, '/'); if (p !== '/' && p !== '/preview/' && here.startsWith(p)) a.setAttribute('aria-current', 'page'); });
+  try { if (!/(^|;\s*)pp_v2=1/.test(document.cookie)) document.cookie = 'pp_v2=1; path=/; max-age=31536000; samesite=lax'; } catch (e) {}
+
   // папка Лаборатории: на телефоне открывается нажатием
   const fold = document.querySelector('.fold');
   if (fold) fold.querySelector('.cv').addEventListener('click', () => fold.classList.add('open'));

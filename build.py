@@ -80,15 +80,29 @@ PAGES = [
      "Color palettes from Pigeon Polly watercolors and sketchbook pages: six colors with HEX codes from every artwork. Copy a color, pick a palette and draw."),
     ("preview", "Pigeon Polly Art Lab", "preview.html",
      "Free watercolour and ink lessons, full paint-alongs and creative guides by illustrator Alina Otkinska."),  # редизайн 2.0, скрытый адрес
+    ("preview/learn", "Lessons", "preview-learn.html",
+     "Watercolour and ink lessons by Alina Otkinska: free videos open to everyone and monthly paint-alongs in the Studio Club on Patreon."),
+    ("preview/guides", "Guides & books", "preview-guides.html",
+     "Creative guides and books by illustrator Alina Otkinska: ink and watercolour sketching, a free colouring book, palettes and little drawing guides."),
     ("wobbleland", "Wobbleland", "wobbleland.html",
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
 # готовые, но пока не открытые страницы: не попадают в sitemap
-UNLISTED = {"blog-editor", "admin", "garden", "preview"}
+UNLISTED = {"blog-editor", "admin", "garden", "preview", "preview/learn", "preview/guides"}
 # редизайн 2.0: страницы на новом шаблоне src/layout-v2.html (шапка, подвал, сезоны — site/assets/v2.css, v2.js); NOINDEX — не для поисковиков
-V2 = {"preview"}
-NOINDEX = {"preview"}
+V2 = {"preview", "preview/learn", "preview/guides"}
+NOINDEX = {"preview", "preview/learn", "preview/guides"}
 V2_HOME = "/preview/"  # куда ведёт логотип новой шапки; станет "/" при замене главной (часть 5)
+V2_LEARN, V2_GUIDES = "/preview/learn/", "/preview/guides/"  # пункты Lessons и Guides новой шапки (часть 5: свои адреса)
+
+
+def v2_page(layout_v2, title, desc, canonical, robots, content):
+    """Страница на новом шаблоне (редизайн 2.0)."""
+    return (layout_v2.replace("{{title}}", esc(title)).replace("{{description}}", esc(desc))
+            .replace("{{canonical}}", canonical).replace("{{home}}", V2_HOME)
+            .replace("{{learn}}", V2_LEARN).replace("{{guides}}", V2_GUIDES)
+            .replace("{{robots}}", '<meta name="robots" content="noindex">\n' if robots else "")
+            .replace("{{content}}", content))
 
 
 PORTFOLIO = [
@@ -592,6 +606,22 @@ def about_chat():
     (OUT / "assets" / "about-chat.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n")
 
 
+def v2_shelf():
+    """Редизайн 2.0, страница «Гайды и книги»: все книги из content/ebooks.json — вышедшие, бесплатная, «скоро» последней."""
+    books = [b for sec in json.loads((CONTENT / "ebooks.json").read_text())["sections"] for b in sec["books"] if b.get("cover")]
+    soon = [b for b in books if "coming soon" in b["title"]]
+    free = [b for b in books if "(free)" in b["title"]]
+    out = [b for b in books if b not in soon and b not in free][::-1] + free + soon
+    cards = []
+    for b in out:
+        title = b["title"].replace(" (coming soon)", "").replace(" (free)", "")
+        ext = ' target="_blank" rel="noopener"' if b["url"].startswith("http") else ""
+        kind = ("soon", "Coming soon", "Read the news →") if b in soon else ("free", "Free PDF", "Download free →") if b in free else ("buy", "Paperback &amp; Kindle", "On Amazon →")
+        cards.append(f'<a class="gb {kind[0]}" href="{esc(b["url"])}"{ext}><span class="cvr"><img src="/{esc(b["cover"])}" alt="" loading="lazy"></span>'
+                     f'<span class="lbl2">{kind[1]}</span><b>{esc(title)}</b><span class="go">{kind[2]}</span></a>')
+    return '<div class="shelf">' + "".join(cards) + "</div>"
+
+
 def v2_books():
     """Редизайн 2.0: книги из content/ebooks.json для блока «Гайды» — вышедшие первыми, «скоро» последней; бесплатная раскраска — ссылкой."""
     books = [b for sec in json.loads((CONTENT / "ebooks.json").read_text())["sections"] for b in sec["books"] if b.get("cover")]
@@ -629,6 +659,8 @@ def build():
             body = body[:start] + block_html(body[start + 8:end]) + body[end + 2:]
 
         body = body.replace("{{ebooks}}", ebooks_html() if "{{ebooks}}" in body else "")
+        if "{{v2shelf}}" in body:
+            body = body.replace("{{v2shelf}}", v2_shelf())
         if "{{v2books}}" in body:
             books, free = v2_books()
             body = body.replace("{{v2books}}", books).replace("{{v2free}}", free)
@@ -643,10 +675,7 @@ def build():
                 page_body = alt.read_text()
             page_body = mark_editable(page_body, (path or "home").replace("/", "-"))
             if path in V2:
-                page = (layout_v2.replace("{{title}}", esc(full_title)).replace("{{description}}", esc(desc))
-                        .replace("{{canonical}}", canonical).replace("{{home}}", V2_HOME)
-                        .replace("{{robots}}", '<meta name="robots" content="noindex">\n' if path in NOINDEX else "")
-                        .replace("{{content}}", page_body))
+                page = v2_page(layout_v2, full_title, desc, canonical, path in NOINDEX, page_body)
             else:
                 page_body = section_tabs(path) + page_body
                 page = (layout
@@ -665,6 +694,15 @@ def build():
             if path not in UNLISTED:
                 search_index[lang].append(search_entry(page, lang, path))
         print("built", dest.relative_to(ROOT))
+    # редизайн 2.0: шаблон блога на новой шапке — /blog/v2/ (worker/blog.js берёт его вместо /blog/, если стоит метка pp_v2: заход на /preview/ или ?v2=1; ?v2=0 — снять)
+    blog_desc = next(d for pth, _, _, d in PAGES if pth == "blog")
+    for lang, prefix in LANGS.items():
+        canonical, hreflang, switch = lang_bits("blog", lang)
+        page = v2_page(layout_v2, "Blog · Pigeon Polly Art Lab", blog_desc, canonical, False, (SRC / "pages" / "blog.html").read_text())
+        page = localize(page, lang).replace("{{hreflang}}", hreflang).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
+        dest = OUT / prefix / "blog" / "v2" / "index.html"
+        dest.parent.mkdir(parents=True, exist_ok=True)
+        dest.write_text(bust(page))
     # книги Алины для стаи (витрина в книжном: обложки кликабельные, птички их читают)
     books = [b for sec in json.loads((CONTENT / "ebooks.json").read_text())["sections"] for b in sec["books"]]
     (OUT / "assets" / "books.json").write_text(json.dumps([{"title": b["title"], "url": b["url"], "cover": "/" + b["cover"]} for b in books if b.get("cover")], ensure_ascii=False))

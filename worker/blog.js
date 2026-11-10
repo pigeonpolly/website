@@ -916,10 +916,14 @@ function sidebar(posts, lang, activeTag, activeMonth = '', post = false, activeS
   </aside>`;
 }
 
-async function template(env, url, lang) {
+async function template(env, url, lang, v2) {
+  // редизайн 2.0: с меткой pp_v2 — шаблон на новой шапке (build.py → site/<язык>/blog/v2/), без него — обычный
+  if (v2) { const r = await env.ASSETS.fetch(new Request(url.origin + PREFIX[lang] + '/blog/v2/')); if (r.ok) return r.text(); }
   const r = await env.ASSETS.fetch(new Request(url.origin + PREFIX[lang] + '/blog/'));
   return r.ok ? r.text() : null;
 }
+// метка нового стиля: ставит /preview/ (v2.js) или ?v2=1, снимает ?v2=0
+const v2Flag = (req, url) => { const q = url.searchParams.get('v2'); return q === '1' || (q !== '0' && /(?:^|;\s*)pp_v2=1/.test(req.headers.get('cookie') || '')); };
 function fill(tpl, { title, description, canonical, content, image, type, slug, jsonld, noindex }) {
   let s = tpl.replace(/<!--BLOG-->[\s\S]*?<!--\/BLOG-->/, content)
     .replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`)
@@ -945,6 +949,13 @@ function fill(tpl, { title, description, canonical, content, image, type, slug, 
 const html = (s, status = 200) => new Response(s, { status, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
 
 export async function blogPage(req, env, url, h) {
+  const r = await blogPageInner(req, env, url, h), q = url.searchParams.get('v2');
+  if (q !== '1' && q !== '0') return r;
+  const res = new Response(r.body, r);
+  res.headers.append('set-cookie', `pp_v2=${q === '1' ? '1' : ''}; Path=/; Max-Age=${q === '1' ? 31536000 : 0}; SameSite=Lax`);
+  return res;
+}
+async function blogPageInner(req, env, url, h) {
   const p = url.pathname;
   // картинки блога из R2
   if (p.startsWith('/media/')) {
@@ -963,7 +974,7 @@ export async function blogPage(req, env, url, h) {
   const mm = p.match(/^\/(?:(ru|lv)\/)?blog\/(?:([a-z0-9-]+)\/)?$/);
   if (!mm) return env.ASSETS.fetch(req);
   const lang = mm[1] || 'en', slug = mm[2], t = T[lang];
-  const tpl = await template(env, url, lang);
+  const tpl = await template(env, url, lang, v2Flag(req, url));
   if (!tpl) return env.ASSETS.fetch(req);
   const u = await h.currentUser(req, env);
   const isAdm = await h.isAdmin(u, env);
