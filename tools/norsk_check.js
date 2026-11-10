@@ -42,7 +42,7 @@ const TYPES = ['gap', 'choice', 'order', 'fix', 'tr', 'tf', 'mk'], SHOWS = ['ord
     for (const w of Object.keys(n.gl || {})) if (!new RegExp(`(?<![\\wæøå])${w.toLowerCase().replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\wæøå])`).test(txt)) bad.push(`${u.id}: подсказки «${w}» нет в тексте части книги`);
   }
   for (const [lv, L] of Object.entries(lift || {})) fmtCheck('лифт ' + lv, { t: 'choice', q: L.q });
-  if (Object.keys(lift || {}).length !== 4) bad.push('лифт: не все уровни');
+  if (Object.keys(lift || {}).length !== 6) bad.push('лифт: не все уровни');
   if (book.parts.length !== units.length) bad.push(`частей книги ${book.parts.length}, уроков ${units.length}`);
   // имя: при первом заходе спрашивает, «Alina» в заданиях заменяется
   await pg.evaluate(() => { localStorage.clear(); }); await pg.reload(); await pg.waitForTimeout(150);
@@ -88,7 +88,7 @@ const TYPES = ['gap', 'choice', 'order', 'fix', 'tr', 'tf', 'mk'], SHOWS = ['ord
     const sc = await pg.evaluate(id => { const S = window.NO_DEBUG.state(); return UNITS.find(x => x.id === id) && Object.keys(S.d).filter(k => k.startsWith(id + '-')).length; }, u.id);
     if (!sc) bad.push(`${u.id}: ни один блок не засчитан`);
   }
-  for (const l of ['A1', 'A2', 'B1', 'B2']) { await pg.evaluate(h => { location.hash = h; }, 'test/' + l); await pg.waitForTimeout(30); blocks += await solve(); }
+  for (const l of ['A1', 'A2', 'B1', 'B2', 'C1', 'C2']) { await pg.evaluate(h => { location.hash = h; }, 'test/' + l); await pg.waitForTimeout(30); blocks += await solve(); }
   for (const h of ['home', 'dict', 'ach', 'conf', 'series', 'irr', 'src', 'fix', 'book', 'etym', 'pods']) { await pg.evaluate(h => { location.hash = h; }, h); await pg.waitForTimeout(30); }
   // прогресс после перезагрузки на месте
   const before = await pg.evaluate(() => Object.keys(window.NO_DEBUG.state().d).length);

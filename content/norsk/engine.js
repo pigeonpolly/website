@@ -14,6 +14,8 @@
     { id: 'A2', name: 'Элементарный', about: 'Прошлое и будущее, прилагательные, определённая форма, предлоги времени и места, первые инверсии.' },
     { id: 'B1', name: 'Средний', about: 'Придаточные (и где тогда ikke), возвратные глаголы, пассив, модальные, связки. Пословицы и выражения.' },
     { id: 'B2', name: 'Выше среднего', about: 'Тонкости порядка слов, стиль, частицы jo/vel/da, диалекты и nynorsk на слух, длинные тексты и эссе.' },
+    { id: 'C1', name: 'Продвинутый', about: 'Klarspråk и регистр, выделение и инверсия, нереальное и пожелания, фразовые глаголы, аргументация, идиомы.' },
+    { id: 'C2', name: 'Свободный', about: 'Оттенки синонимов, ирония и преуменьшение, Ибсен и Гамсун в оригинале, игра слов и тоны, риторика, язык сегодня.' },
   ];
   const SHOWS = { // «Как говорят норвежцы»: пословицы, идиомы и культурные коды (вместо цитат из сериалов в английском учебнике)
     ordtak: { name: 'Ordtak · пословицы', cls: 's-ordtak' },
@@ -63,7 +65,7 @@
   try { localStorage.removeItem('norsk-state'); } catch (e) { /* нет доступа */ }
   // k — открыто паролем админа {id урока или блока: время}; m — ошибки {id урока или t:тип: [неверно, всего]}; x — задания с ошибками {ref: вес}; t — время сохранения
   // rv — когда прогресс сбрасывали (кнопка «Сбросить учебник» или RESET_AT ниже): состояние со старым rv при слиянии отбрасывается целиком
-  const RESET_AT = 1794268800000; // 10.11.2026: первый выпуск; новое значение = сброс прогресса у всех
+  const RESET_AT = 1794268800000; // 10.11.2026: первый выпуск (C1–C2 добавлены без сброса); новое значение = сброс прогресса у всех
   const fresh = rv => ({ d: {}, w: {}, v: {}, a: {}, days: [], pd: [], c: {}, n: {}, ans: {}, last: '', k: {}, m: {}, x: {}, t: 0, rv }); // n — неудачных попыток подряд по блокам // pd — дни, когда хоть одно задание пройдено от PASS %
   let S = fresh(RESET_AT);
   try { const loc = JSON.parse(localStorage.getItem(LS) || '{}') || {}; if ((loc.rv || 0) >= RESET_AT) Object.assign(S, loc); } catch (e) { /* пусто */ } // старое состояние без метки сброса не берём
@@ -211,6 +213,8 @@
     ['A2', '🐥', 'A2 пройден', 'Все блоки уровня A2', () => lvDone('A2')],
     ['B1', '🐦', 'B1 пройден', 'Все блоки уровня B1', () => lvDone('B1')],
     ['B2', '🕊️', 'B2 пройден', 'Все блоки уровня B2', () => lvDone('B2')],
+    ['C1', '🦅', 'C1 пройден', 'Все блоки уровня C1', () => lvDone('C1')],
+    ['C2', '🦚', 'C2 пройден', 'Все блоки уровня C2', () => lvDone('C2')],
     ['ordtak', '🧶', 'Borte bra, men hjemme best', 'Все пословицы из уроков', () => showAny('ordtak') && showDone('ordtak')],
     ['uttrykk', '🧈', 'Som smurt', 'Все идиомы из уроков', () => showAny('uttrykk') && showDone('uttrykk')],
     ['kultur', '🥾', 'Ut på tur, aldri sur', 'Все «Typisk norsk» из уроков', () => showAny('kultur') && showDone('kultur')],
@@ -789,8 +793,8 @@
     const last = UNITS[Math.min(reach(), UNITS.length - 1)]; // самый новый открытый урок; «Продолжить» ведёт к его первому непройденному заданию (#u/id/go)
     const ety = UNITS.flatMap(u => ((NOTES[u.id] || {}).etym || []).map(e => [u, e])), e1 = ety[(today() * 7) % Math.max(1, ety.length)];
     const nx = Object.keys(S.x).length, weak = weakUnits().slice(0, 3);
-    let h = `<section class="cover"><div class="kicker">Учебник · букмол от азов до B2</div><h1>Norsk <em>от A1 до B2</em></h1>
-      <p class="lead">Ведёт уроки тупик Пелле. Теория простыми словами (и с опорой на английский, где он помогает), упражнения с проверкой, «Своими словами», слушание и говорение, чтение, повесть «Pelle og den store reisen» по главам, письмо, пословицы и «типично норвежское».</p>
+    let h = `<section class="cover"><div class="kicker">Учебник · букмол от азов до C2</div><h1>Norsk <em>от A1 до C2</em></h1>
+      <p class="lead">Ведёт уроки тупик Пелле. Теория простыми словами (и с опорой на английский, где он помогает), упражнения с проверкой, «Своими словами», слушание и говорение, чтение, повесть «Pelle og den store reisen» по главам (с C1 — вторая часть, «Kartet mot nord»), письмо, пословицы и «типично норвежское».</p>
       <div class="big-meter"><i style="width:${p}%"></i></div><p class="note-s">Пройдено ${p} % учебника · задание считается пройденным от ${PASS} %; следующий урок открывается, когда предыдущий пройден в среднем на ${PASS} %</p>
       <div class="stats"><div><b>${ALL().filter(isDone).length}</b><span>блоков пройдено из ${ALL().length}</span></div><div><b>${Object.keys(S.v).length}</b><span>слов в словаре</span></div><div><b>${nUsed()}</b><span>слов использовано в своих предложениях</span></div><div><b>${nWrite()}</b><span>текстов написано</span></div><div><b>${pstreak()}</b><span>дней подряд с заданием</span></div><div><b>${Object.keys(S.a).length}/${ACH.length}</b><span>ачивок</span></div></div>
       <div class="go"><a class="btn primary" href="#u/${last.id}/go">${S.last ? 'Продолжить: ' + esc(last.lvl + ' · ' + last.t) : 'Начать с A1'}</a><a class="btn" href="#dict">📒 Словарь${due ? ` · ${due} к повторению` : ''}</a><a class="btn" href="#ach">🏆 Ачивки</a></div></section>
@@ -798,7 +802,7 @@
       <div class="box fixbox"><h4>🩹 Слабые места</h4>${nx ? `<p>Ошибок к отработке: <b>${nx}</b>.${weak.length ? ' Чаще всего ошибки в уроках: ' + weak.map(([u, r]) => `<a href="#u/${u.id}">${esc(u.lvl + ' · ' + u.t)}</a> (${Math.round(r * 100)} %)`).join(', ') + '.' : ''}</p><p><a class="btn primary small" href="#fix">Работа над ошибками</a></p>` : '<p class="note-s">Пока ошибок нет — или пока нет заданий. Где будут ошибаться чаще всего, там и появятся новые задания.</p>'}</div>
       ${f ? `<div class="box fact"><h4>💡 Факт дня</h4><p>${fmt(f.fact)}</p></div>` : ''}
       ${e1 ? `<div class="box etym"><h4>🔎 Слово дня: откуда оно</h4><p><b class="en">${esc(e1[1][0])}</b> — ${fmt(e1[1][1])}</p><p class="note-s"><a href="#etym">Все истории слов</a></p></div>` : ''}
-      <div class="box bk-ru"><h4>⛵ Книга курса</h4><p>По ходу уроков — повесть «${esc(BOOK.title)}»: тупик Пелле плывёт с Лофотенов через всю Норвегию. В каждом уроке — следующая глава и задания к ней, язык усложняется вместе с уровнями. Прочитано частей: <b>${nBook()} из ${BOOK.parts.length}</b>. <a href="#book">Оглавление книги</a></p></div>
+      <div class="box bk-ru"><h4>⛵ Книга курса</h4><p>По ходу уроков — повесть «${esc(BOOK.title)}»: тупик Пелле плывёт с Лофотенов через всю Норвегию, а на C1–C2 — дальше, на Шпицберген. В каждом уроке — следующая глава и задания к ней, язык усложняется вместе с уровнями. Прочитано частей: <b>${nBook()} из ${BOOK.parts.length}</b>. <a href="#book">Оглавление книги</a></p></div>
       <h2>Уровни</h2><p>Начинаем с нуля. Если уровень уже есть — сдайте тест уровня: от 85 % можно идти дальше.</p>
       <div class="levels">${LEVELS.map(l => { const us = unitsOf(l.id); return `<div class="lvcard"><h3><span>${l.id}</span>${esc(l.name)}</h3><p>${esc(l.about)}</p><p>${us.length} уроков · ${levelPct(l.id)} %${S.d['lt-' + l.id] != null ? ` · тест: ${S.d['lt-' + l.id]} %` : ''}</p><div class="m"><i style="width:${levelPct(l.id)}%"></i></div>
         <div class="row">${us.length ? `<a class="btn small primary" href="#u/${(us.find(u => unitPct(u) < 100) || us[0]).id}">Открыть</a><a class="btn small" href="#test/${l.id}">Тест уровня</a>` : '<span class="note-s">скоро</span>'}</div></div>`; }).join('')}</div>

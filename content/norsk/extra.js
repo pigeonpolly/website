@@ -57,6 +57,10 @@ window.NO_PODS = {
     ['Norsk for deg', 'подкаст для изучающих', 'Разговоры о жизни в Норвегии нормальным темпом, но без сложного сленга.']],
   B2: [['Radioresepsjonen', 'NRK P3', 'Легендарное абсурдное радио-шоу трёх друзей. Быстро, смешно и очень по-норвежски.'],
     ['Hele historien', 'NRK', 'Документальные истории о реальных событиях: затягивает, как сериал.']],
+  C1: [['Ekko', 'NRK P2', 'Ежедневная передача об обществе и культуре: интервью, споры, длинные мысли. Литературный букмол.'],
+    ['Lørdagsrådet', 'NRK P1', 'Субботние советы и юмор: ведущие обсуждают странные вопросы слушателей. Много идиом и иронии.']],
+  C2: [['Studio 2', 'NRK P2', 'Новости культуры и общества с экспертами: быстрая, плотная, книжная речь.'],
+    ['Radioresepsjonen', 'NRK P3', 'На C2 — для удовольствия: абсурд, игра слов и диалекты, которые понимаешь уже без перевода.']],
 };
 
 // ☕ Kaffepause — кофе с коллегами (как «лифт с коллегами» в английском): tip — совет Пелле, ph — фразы, q — «что ответить»; engine.js берёт два задания на урок
@@ -93,4 +97,20 @@ window.NO_LIFT = {
       'Коллега: «Ledelsen har bestemt at vi skal flytte kontoret.»|Det er vel sånn det er. Når skjer det?|Ledelsen er idioter.|Jeg slutter! # Спокойное принятие + вопрос.',
       'Коллега хвалит ваш рисунок на стене.|Takk, det var hyggelig å høre! Jeg er ganske fornøyd med den.|Ja, jeg er en geni.|Nei, den er dårlig. # Принять комплимент скромно, без самоуничижения.',
       'Вы оба молча пьёте кофе у окна. Минута тишины.|… (спокойно помолчать и улыбнуться)|Hvorfor sier du ingenting?!|Så… vær, ikke sant? Hva synes du om været? Liker du vær? # В Норвегии совместное молчание — это нормально и даже уютно.'] },
+  C1: { tip: 'На C1 у кофемашины уже обсуждают новости, политику и работу — но аккуратно. Норвежцы ценят взвешенность: *Jeg ser poenget ditt, men…* и *Det er et godt spørsmål*. Перебивать не принято: дождитесь паузы.',
+    ph: [['Jeg ser poenget ditt, men…', 'Понимаю твою мысль, но…'], ['Det kommer litt an på.', 'Смотря как посмотреть.'], ['Nå tar du munnen litt for full.', 'Ну, ты немного преувеличиваешь.'], ['Det får vi ta en annen gang.', 'Давай обсудим это в другой раз.']],
+    q: ['Коллега: «Hjemmekontor er bare tull.» Вы не согласны.|Jeg ser poenget ditt, men for meg fungerer det faktisk godt.|Du er gammeldags.|Tull er tull. # Взвешенное несогласие.',
+      'Коллега: «Er det lurt å flytte kontoret?»|Det kommer litt an på hva vi får igjen for det.|Ja. Nei. Kanskje.|Jeg bryr meg ikke. # «Смотря как» — нюанс.',
+      'Коллега: «Jeg er den eneste som jobber her!»|Nå tar du munnen litt for full, men jeg skjønner at du er sliten.|Ja, du er helten vår.|Nei, du jobber minst. # Мягко осадить с иронией.',
+      'Разговор ушёл в политику, а вам пора на встречу.|Spennende tema! Det får vi ta en annen gang.|Politikk er kjedelig.|Jeg går. # Вежливо закрыть тему.',
+      'Коллега рассказывает о проблеме с проектом.|Så kjipt! Er det noe jeg kan bidra med?|Det er ditt problem.|Prosjekter er alltid dårlige. # Предложить помощь.',
+      'Коллега: «Har du lest den nye rapporten?» Вы не читали.|Ikke ennå, men den står øverst på lista mi.|Nei, rapporter er kjedelige.|Hvilken rapport? Hvorfor? # Честно и вежливо.'] },
+  C2: { tip: 'На C2 вы уже свой: можно иронизировать, преуменьшать и шутить по-норвежски. *Ikke verst!* о блестящей работе, *Det kunne vært verre* о катастрофе. Главное — сухой тон и ни тени восторга.',
+    ph: [['Ikke verst!', 'Неплохо! (= великолепно)'], ['Det kunne vært verre.', 'Могло быть и хуже.'], ['Typisk mandag.', 'Типичный понедельник.'], ['Vi får se, sa den blinde.', 'Поживём — увидим (шутливо).']],
+    q: ['Коллега показывает блестящую презентацию.|Ikke verst, altså!|Den er helt perfekt og jeg elsker deg!|Grei nok. Neste. # Норвежская похвала — преуменьшение.',
+      'Кофемашина сломалась в третий раз за неделю.|Typisk. Det kunne vært verre — det kunne vært mandag.|Jeg slutter i denne jobben!|Ring politiet! # Сухой юмор.',
+      'Коллега: «Tror du vi får bonus i år?»|Vi får se, sa den blinde.|Ja, sikkert, alle blir rike.|Bonus? Hva er det? # Шутливая поговорка вместо прогноза.',
+      'Коллега хвастается новой машиной.|Fin bil! Du må ha vunnet i Lotto, du.|Jeg har en bedre.|Biler forurenser. # Лёгкая ирония без зависти.',
+      'Начальник: «Vi må jobbe litt ekstra denne uka.»|Det er jo bare å brette opp ermene.|Nei, jeg har ferie.|Hvorfor alltid vi? # «Засучить рукава» — с улыбкой.',
+      'Коллега: «Jeg har ikke sovet på tre døgn.»|Da forstår jeg at e-posten din var litt kreativ.|Det er ditt problem.|Jeg sover alltid godt. # Мягкая ирония и сочувствие.'] },
 };

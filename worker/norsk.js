@@ -1,4 +1,4 @@
-// Личный учебник норвежского (букмол) A1–B2 (/norsk/, docs/site.md «Учебник норвежского») — устроен как worker/english.js: открыт Алине (админ), ником из NORSK_NICKS и тем, кому Алина открыла доступ (norsk_access).
+// Личный учебник норвежского (букмол) A1–C2 (/norsk/, docs/site.md «Учебник норвежского») — устроен как worker/english.js: открыт Алине (админ), ником из NORSK_NICKS и тем, кому Алина открыла доступ (norsk_access).
 // Страница — из norsk-page.js (собирает tools/norsk_page.py из content/norsk/). Прогресс: GET/POST /api/norsk {state} (norsk_progress).
 import { NORSK_HTML } from './norsk-page.js';
 

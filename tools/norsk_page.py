@@ -5,7 +5,7 @@ import json, pathlib, sys
 ROOT = pathlib.Path(__file__).resolve().parent.parent
 D = ROOT / 'content/norsk'
 shell = (D / 'shell.html').read_text(encoding='utf-8')
-files = [D / 'extra.js'] + sorted(D.glob('[ab][12]*.js'))  # extra.js — помощники NOTE/ST/BK и справочники; a1.js … b2.js — уроки вместе с их NOTE, ST и главой книги BK
+files = [D / 'extra.js'] + sorted(D.glob('[abc][12]*.js'))  # extra.js — помощники NOTE/ST/BK и справочники; a1.js … c2.js — уроки вместе с их NOTE, ST и главой книги BK
 units = '\n'.join(f.read_text(encoding='utf-8') for f in files if f.exists())
 engine = (D / 'engine.js').read_text(encoding='utf-8')
 for name, part in (('уроки', units), ('движок', engine)):
