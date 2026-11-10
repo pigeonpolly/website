@@ -108,12 +108,11 @@ V2_ABOUT, V2_LAB_URL, V2_WOBBLE = "/preview/about/", "/preview/lab/", "/preview/
 
 def v2_page(layout_v2, title, desc, canonical, robots, content):
     """Страница на новом шаблоне (редизайн 2.0)."""
-    return (layout_v2.replace("{{title}}", esc(title)).replace("{{description}}", esc(desc))
+    return (layout_v2.replace("{{content}}", content).replace("{{title}}", esc(title)).replace("{{description}}", esc(desc))
             .replace("{{canonical}}", canonical).replace("{{home}}", V2_HOME)
             .replace("{{learn}}", V2_LEARN).replace("{{guides}}", V2_GUIDES)
             .replace("{{about}}", V2_ABOUT).replace("{{lab}}", V2_LAB_URL).replace("{{wobble}}", V2_WOBBLE)
-            .replace("{{robots}}", '<meta name="robots" content="noindex">\n' if robots else "")
-            .replace("{{content}}", content))
+            .replace("{{robots}}", '<meta name="robots" content="noindex">\n' if robots else ""))
 
 
 PORTFOLIO = [

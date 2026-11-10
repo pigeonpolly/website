@@ -169,7 +169,7 @@
           <button type="button" class="bc-link" data-unpick>снять выбор</button>` : ''}</div>`;
       return head + bulk + `<table class="be-table be-posts"><thead><tr><th class="be-ck"><input type="checkbox" id="be-pickall" aria-label="Выбрать все" ${n && n === list.length ? 'checked' : ''}></th>${th('title', 'Статья')}<th>Языки</th><th>Разделы</th>${th('date', 'Дата')}${th('likes', '♥', 'лайки')}${th('views', '👁', 'просмотры')}${th('comments', '💬', 'комментарии')}<th></th></tr></thead><tbody>
         ${list.map(p => `<tr data-id="${p.id}"${picked.has(p.id) ? ' class="picked"' : ''}><td class="be-ck"><input type="checkbox" data-pick ${picked.has(p.id) ? 'checked' : ''} aria-label="Выбрать"></td>
-          <td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(ptitle(p) || '(без названия)')}${ptitle(p) && !p['t_' + vl] ? ` <small class="be-nolang">(нет на ${vl.toUpperCase()})</small>` : ''}</b></a>${isSched(p) ? `<br><small class="be-schedmark">⏰ Запланирована на ${schedText(p.published_at)}</small>` : ''}</td>
+          <td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${p.members ? '🔒 ' : ''}${esc(ptitle(p) || '(без названия)')}${ptitle(p) && !p['t_' + vl] ? ` <small class="be-nolang">(нет на ${vl.toUpperCase()})</small>` : ''}</b></a>${isSched(p) ? `<br><small class="be-schedmark">⏰ Запланирована на ${schedText(p.published_at)}</small>` : ''}</td>
           <td><span class="be-langs">${['ru', 'en', 'lv'].map(l => p['t_' + l] ? `<i class="on" title="Есть на ${l.toUpperCase()}">✓ ${l.toUpperCase()}</i>` : `<i title="Нет перевода на ${l.toUpperCase()}">${l.toUpperCase()}</i>`).join('')}</span></td>
           <td><details class="be-rowsecs" data-rowsecs><summary>${secsOf(p).length ? secsOf(p).map(x => `<i>${esc(sname(sections.find(r => r.slug === x) || { en: x }))}</i>`).join('') : '<span>— без раздела —</span>'}</summary>
             <div>${sections.map(x => `<label><input type="checkbox" value="${esc(x.slug)}" ${secsOf(p).includes(x.slug) ? 'checked' : ''}> ${esc(sname(x))}</label>`).join('')}</div></details></td>
@@ -446,6 +446,7 @@
           <datalist id="be-taglist-en">${(knownTags.en || []).map(x => `<option value="${esc(x)}">`).join('')}</datalist>
           <input type="hidden" data-k="tags_en" value="${esc(post.tags_en || post.tags_ru || post.tags_lv || '')}"></div>
         <label class="be-check"><input type="checkbox" id="be-featured" ${post.featured ? 'checked' : ''}> <b>★ Избранное</b> <small>— показывать справа в блоке блога на главной</small></label>
+        <label class="be-check"><input type="checkbox" id="be-members" ${post.members ? 'checked' : ''}> <b>🔒 Только для своих</b> <small>— гости видят начало и кнопку «Войти»; читать целиком могут все, кто вошёл</small></label>
         <label class="be-f"><span>Адрес статьи <small id="be-slug-note">${post.status === 'published' ? '(статья опубликована — адрес лучше не менять, иначе старые ссылки перестанут работать)' : '(заполняется сам из заголовка; можно поправить)'}</small></span><div class="be-slug"><span>pigeonpolly.com/blog/</span><input type="text" id="be-slug" value="${esc(post.slug)}" spellcheck="false"><span>/</span></div></label>
       </section></aside><div class="be-shade" id="be-shade" hidden></div>
       <div class="be-save">
@@ -469,7 +470,7 @@
     // метка этой новой статьи: если ответ на сохранение потерялся, повторное сохранение обновит ту же статью, а не создаст копию
     if (!post.id && !post.key) post.key = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
     const collect = () => {
-      const d = { id: post.id, client_key: post.key, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value, published_at: dateTouched || post.status === 'published' ? dateToTs($('#be-date').value, $('#be-time').value, post.published_at) : undefined, section: [...app.querySelectorAll('#be-secs input:checked')].map(i => i.value) };
+      const d = { id: post.id, client_key: post.key, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, members: $('#be-members').checked, src_lang: $('#be-src').value, published_at: dateTouched || post.status === 'published' ? dateToTs($('#be-date').value, $('#be-time').value, post.published_at) : undefined, section: [...app.querySelectorAll('#be-secs input:checked')].map(i => i.value) };
       app.querySelectorAll('[data-k]').forEach(el => {
         if (!el.isContentEditable) { d[el.dataset.k] = el.value; return; }
         const c = el.cloneNode(true);
