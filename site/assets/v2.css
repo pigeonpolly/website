@@ -78,7 +78,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
 .cl .a{width:400px;left:0;top:10px;transform:rotate(-3deg)}
 .cl .b{width:380px;right:0;top:262px;transform:rotate(3deg)}
 .tp{position:absolute;width:100px;height:26px;background:color-mix(in srgb,var(--acc) 16%,transparent);z-index:3}
-.ticket{position:absolute;left:60px;bottom:40px;z-index:4;background:var(--acc);color:#fff;padding:12px 20px;transform:rotate(-6deg);font:700 11px Karla,'Nunito Sans',sans-serif;letter-spacing:.2em;text-align:center;outline:1.5px dashed rgba(255,255,255,.6);outline-offset:-6px}
+.ticket{position:absolute;left:-14px;top:330px;z-index:4;background:var(--acc);color:#fff;padding:12px 20px;transform:rotate(-6deg);font:700 11px Karla,'Nunito Sans',sans-serif;letter-spacing:.2em;text-align:center;outline:1.5px dashed rgba(255,255,255,.6);outline-offset:-6px}
 .ticket b{display:block;font:400 24px Fraunces,Lora,serif;letter-spacing:0}
 
 /* гайды и книги */
@@ -417,3 +417,18 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 }
 .col3 .pa figcaption{left:auto;right:16px}
 .v2 .bl-lock{background:var(--sheet);color:var(--acc)}.v2 .bp-lock{background:var(--sheet);border-color:var(--acc);border-radius:4px}.v2 .bp-lock:before{background:linear-gradient(to bottom,transparent,var(--bg))}
+
+/* выбор сезона: один кружок + список (v2.js seaMenu) */
+.sea2{position:relative;display:flex}
+.sea-b{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--ink);padding:2px;background:none;cursor:pointer;display:grid}
+.sea-b i{display:block;border-radius:50%;width:100%;height:100%}
+.sea-b:hover,.sea-b[aria-expanded=true]{box-shadow:0 0 0 3px var(--bg),0 0 0 4.5px var(--acc)}
+.sea-m{position:absolute;right:-12px;top:calc(100% + 14px);z-index:30;background:var(--sheet);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 34px rgba(0,0,0,.14);padding:8px}
+.sea-m[hidden]{display:none}
+.sea-m .switch{display:flex;flex-direction:column;gap:2px}
+.sea-m .switch button{display:flex;align-items:center;gap:10px;width:auto;height:auto;border:0;border-radius:9px;padding:8px 14px 8px 10px;background:none;color:var(--ink);font:500 14px Karla,'Nunito Sans',sans-serif;white-space:nowrap;cursor:pointer;text-align:left}
+.sea-m .switch button i{width:14px;height:14px;border-radius:50%;flex:none}
+.sea-m .switch button:hover{background:var(--bg)}
+.sea-m .switch button[aria-pressed=true]{box-shadow:none;font-weight:700}.sea-m .switch button[aria-pressed=true]:after{content:"✓";margin-left:auto;padding-left:12px;color:var(--acc)}
+@media (max-width:700px){.hr .sea2{display:none}}
+@media (max-width:1240px) and (min-width:1041px){.cl{height:600px}.cl .b{top:310px}.ticket{top:360px}}

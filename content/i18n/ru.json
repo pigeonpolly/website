@@ -699,5 +699,10 @@
   "<h2>Find me <em>online</em></h2>": "<h2>Где меня <em>найти</em></h2>",
   "/preview/about/\">About<": "/preview/about/\">Обо мне<",
   "<div><h4>Alina</h4><a href=\"/preview/about/\">About</a>": "<div><h4>Алина</h4><a href=\"/preview/about/\">Обо мне</a>",
-  ">All video lessons →<": ">Все видеоуроки →<"
+  ">All video lessons →<": ">Все видеоуроки →<",
+  "<i></i>Winter</button>": "<i></i>Зима</button>",
+  "<i></i>Spring</button>": "<i></i>Весна</button>",
+  "<i></i>Summer</button>": "<i></i>Лето</button>",
+  "<i></i>Autumn</button>": "<i></i>Осень</button>",
+  "title=\"Season\" aria-label=\"Season\"": "title=\"Сезон\" aria-label=\"Сезон\""
 }
