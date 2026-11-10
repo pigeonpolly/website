@@ -13,16 +13,16 @@ NOISE = "url(\"data:image/svg+xml;utf8,%3Csvg xmlns='http://www.w3.org/2000/svg'
 CSS = '''
 @import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=Karla:wght@400;500;700&family=Caveat:wght@600;700&display=swap');
 *{box-sizing:border-box;margin:0;padding:0}
-:root{--bg:#E7E2DA;--sheet:#F2EDE5;--ink:#262321;--mut:#6B645D;--line:#D2CBC0;--gr:#2B2826;--gr2:#36322F;--grtx:#E9E2D6;--grmut:#A39A90;--wine:#8A2638;--wine2:#A33449;--plum:#2C1F2B}
+:root{--bg:#EEF0F1;--sheet:#F8F9F9;--ink:#1F2326;--mut:#5E656A;--line:#D5DADD;--gr:#2A2C2E;--gr2:#35383B;--grtx:#ECEDEE;--grmut:#A3A8AC;--wine:#9E1B22;--wine2:#B8262D;--plum:#2C1F2B}
 html,body{overflow-x:hidden}
-body{background:var(--bg);background-image:NOISE;color:var(--ink);font:16px/1.55 Karla,sans-serif}
+body{background:var(--bg);color:var(--ink);font:16px/1.55 Karla,sans-serif}
 img{display:block;max-width:100%}
 .w{max-width:1260px;margin:0 auto;padding:0 44px;position:relative}
 h1,h2,h3{font-family:Fraunces,serif;font-weight:400;line-height:1;letter-spacing:-.015em}
 em{font-style:italic;color:var(--wine);font-weight:300}
 .k{font:700 11px Karla;letter-spacing:.22em;text-transform:uppercase;color:var(--wine)}
 .btn{display:inline-flex;align-items:center;gap:8px;font:700 14px Karla;padding:14px 24px;border-radius:999px;border:1.5px solid var(--ink);color:var(--ink);white-space:nowrap}
-.btn.pri{background:var(--wine);border-color:var(--wine);color:#fff;box-shadow:0 10px 24px rgba(138,38,56,.28)}
+.btn.pri{background:var(--wine);border-color:var(--wine);color:#fff;box-shadow:0 10px 24px rgba(158,27,34,.28)}
 .btn.lt{border-color:var(--grtx);color:var(--grtx)}
 .hand{font:700 26px Caveat;color:var(--wine)}
 /* header */
@@ -37,8 +37,8 @@ em{font-style:italic;color:var(--wine);font-weight:300}
 .hero p{font-size:19px;color:var(--mut);max-width:32em;margin:0 auto 34px}
 .ctas{display:flex;gap:14px;justify-content:center}
 .pano{position:relative;height:500px;margin-top:-6px}
-.pano img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 32%;filter:saturate(.9);-webkit-mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 20%,#000 48%);mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 20%,#000 48%)}
-.tagp{position:absolute;z-index:2;display:flex;flex-direction:column;align-items:center}.tagp span{background:var(--sheet);border-radius:999px;padding:8px 15px;font:700 11px Karla;letter-spacing:.14em;text-transform:uppercase;box-shadow:0 6px 16px rgba(38,35,33,.15);display:flex;gap:8px;align-items:center}.tagp span:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--wine)}.tagp i{width:1px;height:46px;background:var(--ink)}
+.pano img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;object-position:center 32%;-webkit-mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 20%,#000 48%);mask-image:linear-gradient(to bottom,transparent 0,rgba(0,0,0,.4) 20%,#000 48%)}
+.tagp{position:absolute;z-index:2;display:flex;flex-direction:column;align-items:center}.tagp span{background:var(--sheet);border-radius:999px;padding:8px 15px;font:700 11px Karla;letter-spacing:.14em;text-transform:uppercase;box-shadow:0 6px 16px rgba(31,35,38,.15);display:flex;gap:8px;align-items:center}.tagp span:before{content:"";width:7px;height:7px;border-radius:50%;background:var(--wine)}.tagp i{width:1px;height:46px;background:var(--ink)}
 .facts{background:var(--gr);color:var(--grtx)}.facts span{flex:1;padding:24px 44px;font-size:12px;color:var(--grmut);border-right:1px solid rgba(233,226,214,.12)}.facts span:last-child{border:0}.facts b{display:block;font:400 22px Fraunces;color:var(--grtx)}
 .facts .w{display:flex;padding:0}
 /* free lessons collage */
@@ -48,12 +48,12 @@ em{font-style:italic;color:var(--wine);font-weight:300}
 .fl p{color:var(--mut);font-size:17px;margin:20px 0 28px;max-width:26em}
 .fl .hand{display:inline-block;transform:rotate(-3deg);margin-bottom:10px}
 .cl{position:relative;height:500px}
-.cl .t{position:absolute;background:#FBF8F3;padding:11px 11px 36px;box-shadow:0 14px 28px rgba(38,35,33,.18)}
+.cl .t{position:absolute;background:#FFFFFF;padding:11px 11px 36px;box-shadow:0 14px 28px rgba(31,35,38,.18)}
 .cl .t img{width:100%;height:100%;object-fit:cover}
 .cl .t b{position:absolute;left:12px;bottom:9px;font:400 15px Fraunces}
 .cl .t .pl{position:absolute;right:20px;bottom:50px;width:42px;height:42px;border-radius:50%;background:#fff;color:var(--wine);display:grid;place-items:center;font-size:14px;box-shadow:0 4px 10px rgba(0,0,0,.15)}
 .cl .a{width:330px;height:250px;left:0;top:30px;transform:rotate(-3deg)}.cl .b{width:240px;height:290px;right:10px;top:0;transform:rotate(4deg)}.cl .c{width:270px;height:210px;left:150px;bottom:0;transform:rotate(1.5deg);z-index:2}
-.tp{position:absolute;width:100px;height:26px;background:rgba(138,38,56,.18);z-index:3}
+.tp{position:absolute;width:100px;height:26px;background:rgba(158,27,34,.16);z-index:3}
 .ticket{position:absolute;right:20px;bottom:40px;z-index:4;background:var(--wine);color:#fff;padding:12px 20px;transform:rotate(-6deg);font:700 11px Karla;letter-spacing:.2em;text-align:center;outline:1.5px dashed rgba(255,255,255,.6);outline-offset:-6px}.ticket b{display:block;font:400 24px Fraunces;letter-spacing:0}
 /* guides desk */
 .desk{background:var(--sheet);clip-path:TORN;padding:120px 0}
@@ -61,7 +61,7 @@ em{font-style:italic;color:var(--wine);font-weight:300}
 .desk h2{font-size:58px}.desk p{color:var(--mut);font-size:17px;margin:18px 0 26px;max-width:26em}
 .dc{font:400 84px/.8 Fraunces;float:left;margin:6px 10px 0 0;color:var(--wine)}
 .books{position:relative;height:430px}
-.books img{position:absolute;width:220px;box-shadow:14px 20px 30px rgba(38,35,33,.25)}
+.books img{position:absolute;width:220px;box-shadow:14px 20px 30px rgba(31,35,38,.25)}
 .books .b1{left:0;top:60px;transform:rotate(-7deg)}.books .b2{left:200px;top:0;transform:rotate(2deg);z-index:2}.books .b3{left:400px;top:70px;transform:rotate(8deg)}
 .lbl{position:absolute;z-index:3;background:var(--ink);color:#fff;font:700 10px Karla;letter-spacing:.2em;text-transform:uppercase;padding:7px 12px}
 .books .hand{position:absolute;left:250px;bottom:-6px;transform:rotate(-4deg)}
@@ -70,7 +70,7 @@ em{font-style:italic;color:var(--wine);font-weight:300}
 .hd2{display:flex;justify-content:space-between;align-items:end;margin-bottom:44px}.hd2 h2{font-size:56px}
 .jg{display:grid;grid-template-columns:1.25fr 1fr;gap:50px;align-items:start}
 .feat .im{height:430px;overflow:hidden;border-radius:4px}.feat .im img{width:100%;height:100%;object-fit:cover}
-.feat .card{position:relative;margin:-110px 40px 0 auto;width:72%;background:#FBF8F3;padding:28px 30px;box-shadow:0 20px 40px rgba(38,35,33,.14)}
+.feat .card{position:relative;margin:-110px 40px 0 auto;width:72%;background:#FFFFFF;padding:28px 30px;box-shadow:0 20px 40px rgba(31,35,38,.14)}
 .feat h3{font-size:30px;line-height:1.1;margin:10px 0}.feat p{color:var(--mut);font-size:15px}
 .meta{font:700 10px Karla;letter-spacing:.18em;text-transform:uppercase;color:var(--mut)}.meta i{font-style:normal;color:var(--wine)}
 .post{display:grid;grid-template-columns:1fr 110px;gap:22px;align-items:center;padding:24px 0;border-bottom:1px solid var(--line)}.post:first-child{padding-top:0}
@@ -86,18 +86,18 @@ em{font-style:italic;color:var(--wine);font-weight:300}
 .tk{position:absolute;right:0;top:60px;width:44%;background:var(--sheet);color:var(--ink);padding:36px 40px;box-shadow:0 30px 60px rgba(0,0,0,.4);
  -webkit-mask:radial-gradient(circle 14px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 14px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat;mask:radial-gradient(circle 14px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 14px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat}
 .tk p{color:var(--mut);font-size:15px;margin:6px 90px 10px 0}
-.tk .row{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed rgba(38,35,33,.3);padding:15px 0;font:400 21px Fraunces}.tk .row small{font:500 14px Karla;color:var(--mut)}.tk .row.off{opacity:.5}
+.tk .row{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed rgba(31,35,38,.3);padding:15px 0;font:400 21px Fraunces}.tk .row small{font:500 14px Karla;color:var(--mut)}.tk .row.off{opacity:.5}
 .tk .btn{margin-top:22px}
 .stamp{position:absolute;right:26px;top:20px;width:100px;height:100px;border-radius:50%;border:2px solid var(--wine);color:var(--wine);display:grid;place-items:center;text-align:center;font:700 10px/1.4 Karla;letter-spacing:.16em;transform:rotate(12deg)}
 .ab{display:grid;grid-template-columns:360px 1fr 300px;gap:60px;align-items:center}
 .ab .ar{height:460px;border-radius:180px 180px 0 0;overflow:hidden}.ab .ar img{width:100%;height:100%;object-fit:cover}
-.ab h2{font-size:52px;color:var(--grtx)}.ab h2 em{color:#D2697C}
+.ab h2{font-size:52px;color:var(--grtx)}.ab h2 em{color:#E2544A}
 .ab p{color:var(--grmut);font-size:17px;margin:18px 0 24px}
 .side2{display:flex;gap:30px;margin-top:30px}.side2 a{display:flex;gap:12px;align-items:center;font:400 18px Fraunces}.side2 img{width:54px;height:54px;border-radius:50%;object-fit:cover}.side2 small{display:block;font:500 12px Karla;color:var(--grmut)}
 .vote{background:var(--gr2);border:1px solid rgba(233,226,214,.12);padding:28px;border-radius:4px}
-.vote .k{color:#D2697C}.vote h3{font-size:26px;margin:8px 0 14px}
-.ch{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}.ch span{border:1px solid #6E665E;border-radius:999px;padding:6px 12px;font-size:13px;color:var(--grtx)}.ch span.on{background:var(--grtx);color:var(--ink)}
-.vote input{width:100%;padding:12px 16px;border-radius:999px;border:1px solid #6E665E;background:transparent;color:var(--grtx);font:14px Karla;margin-bottom:10px}
+.vote .k{color:#E2544A}.vote h3{font-size:26px;margin:8px 0 14px}
+.ch{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}.ch span{border:1px solid #6A6F73;border-radius:999px;padding:6px 12px;font-size:13px;color:var(--grtx)}.ch span.on{background:var(--grtx);color:var(--ink)}
+.vote input{width:100%;padding:12px 16px;border-radius:999px;border:1px solid #6A6F73;background:transparent;color:var(--grtx);font:14px Karla;margin-bottom:10px}
 .vote .btn{width:100%;justify-content:center}
 /* lab */
 .lab{background:var(--plum);color:#F2E6C9;padding:90px 0;background-image:radial-gradient(rgba(242,230,201,.07) 1px,transparent 1px);background-size:22px 22px}
@@ -163,7 +163,7 @@ B = '''<header class="hd"><div class="w"><span class="lg"><img src="img/logo-wc.
 <div class="tk"><div class="stamp">ADMIT<br>ONE<br>✦ CLUB ✦</div><span class="k">Membership</span><p>All full paint-alongs, reference packs and line sketches, plus a vote on what we paint next.</p>
 <div class="row"><span>Sketchbook friend</span><small>€5 / month</small></div><div class="row"><span>Studio · all lessons</span><small>€12 / month</small></div><div class="row off"><span>Feedback · soon</span><small>€30 / month</small></div><span class="btn pri">Join the club</span></div></div>
 <div class="ab"><div class="ar"><img src="@home/alina.jpg"></div>
-<div><span class="k" style="color:#D2697C">Hi, I’m Alina</span><h2 style="margin-top:14px">I teach the way I sketch: <em>small, kind, step by step</em></h2><p>Illustrator and learning experience designer from Riga. I once drew a pigeon called Polly, and she grew into a whole world.</p><span class="btn lt">My story</span>
+<div><span class="k" style="color:#E2544A">Hi, I’m Alina</span><h2 style="margin-top:14px">I teach the way I sketch: <em>small, kind, step by step</em></h2><p>Illustrator and learning experience designer from Riga. I once drew a pigeon called Polly, and she grew into a whole world.</p><span class="btn lt">My story</span>
 <div class="side2"><a><img src="@cards/classic/16.jpg"><span>Wobbleland<small>my painted characters</small></span></a><a><img src="@cards/classic/11.jpg"><span>Work with me<small>LinkedIn, projects</small></span></a></div></div>
 <div class="vote"><span class="k">Next lesson</span><h3>What should we paint next?</h3><div class="ch"><span class="on">Cosy cafés</span><span>Botanicals</span><span>City</span><span>Characters</span><span>Winter cards</span></div><input placeholder="Your email"><span class="btn pri">Vote &amp; get it free</span></div></div></div></section>
 
