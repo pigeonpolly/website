@@ -75,6 +75,12 @@ _Пункты перенесены дословно из docs/_claude-old.md (э
 - Праздник Воббленда во вкладке «Мой день» — колонка шире карточки дня (1 : 1.4), уже 1360 px — под карточкой: название не переносится.
 - 25.10.2026 (Алина): гостю `.home-dash` скрыт целиком (`html:not(.me-in) .home-dash`) — порядок гостя: приветствие с яйцом → блог → игры → книга. «Новое в комнатах птичек» — вошедшему пятой вкладкой «Комнаты птичек» (`.hd-rooms`, `data-fn-view="rooms"`, после «★ Мои игры»).
 
+## Редизайн 2.0 (/preview/)
+- Новый шаблон `src/layout-v2.html` (шапка: логотип, Lessons · Guides · Journal · About, «The Lab» → /games/, языки, 4 кружка сезона, «Sign in» → /games/#signin — account.js открывает окно входа; ☰ при ≤1040px, на телефоне кружки сезона — в меню) и свой подвал. Страницы на нём — build.py `V2`, без поисковиков — `NOINDEX`, логотип ведёт на `V2_HOME` (часть 5: "/").
+- Стиль `site/assets/v2.css` (не style.css): цвета сезона — `html[data-season=winter|spring|summer|autumn]` (токены --bg, --ink, --acc…); сезон по дате (дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень), выбор кружком запоминается (localStorage `pp_season`). Шрифты: Fraunces/Karla, для кириллицы — Lora/Nunito Sans (подхватываются сами), Caveat — рукописные подписи.
+- `site/assets/v2.js`: сезон (картинка первого экрана `site/images/v2/hero-<сезон>(-900).jpg`, подписи), меню, вход (/api/whoami → птичка и ник), папка Лаборатории (наведение / нажатие), журнал — 3 статьи из `/api/blog/home` (`recent`).
+- /preview/ (src/pages/preview.html): первый экран → бесплатные уроки (2 видео Patreon, открыты всем) → гайды (`{{v2books}}`/`{{v2free}}` из content/ebooks.json) → журнал → клуб (уровни из _held/redesign-2.0/patreon-tiers.md) → обо мне → папка Лаборатории. Тексты RU/LV — словари content/i18n.
+
 ## Учебник английского /english/ (личный)
 - «English A1–C2» для Алины (админ); кому ещё — `ENGLISH_NICKS` в worker/english.js. Остальным — «Страница закрыта» (403), в меню и sitemap нет. Пункт «🇬🇧 Учебник английского» в меню аватара (флаг `english` в /api/whoami).
 - Источник — `content/english/`: shell.html (вёрстка, только светлая тема), engine.js (движок), уроки a1.js, a2.js, b1.js, b1b.js, b2.js, b2b.js, c1.js, c1b.js, c2.js (`U({...})`), extra.js (неправильные глаголы, источники). Сборка: `python3 tools/english_page.py [--html файл]` → worker/english-page.js; проверка: `node tools/english_check.js файл.html` (данные + правильные ответы дают 100 % в каждом блоке).

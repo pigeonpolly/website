@@ -155,7 +155,9 @@
     if (c) { c.hidden = n == null; c.href = pre + '/shop/#cart'; }
   }
   window.PPAccount = { check, openSignIn, signedIn: () => !!(info && info.user), pwDialog, logoutAll, setButtons };
-  check();
+  const first = check();
+  // /…#signin — сразу окно входа (кнопка «Sign in» на новых страницах /preview/)
+  if (location.hash === '#signin') first.then(() => { if (!(info && info.user)) openSignIn(); history.replaceState(null, '', location.pathname + location.search); });
 
   // ник обязателен: окно сразу после первого входа, закрыть можно только выбрав ник (или выйдя)
   function askNick(u) {

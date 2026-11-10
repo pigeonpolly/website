@@ -78,11 +78,17 @@ PAGES = [
      "The Pigeon Polly advent calendar: from December 1 to 31 open a window a day and a pixel bird flies out with a gift for your profile."),
     ("palettes", "Palettes", "palettes.html",
      "Color palettes from Pigeon Polly watercolors and sketchbook pages: six colors with HEX codes from every artwork. Copy a color, pick a palette and draw."),
+    ("preview", "Pigeon Polly Art Lab", "preview.html",
+     "Free watercolour and ink lessons, full paint-alongs and creative guides by illustrator Alina Otkinska."),  # редизайн 2.0, скрытый адрес
     ("wobbleland", "Wobbleland", "wobbleland.html",
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
 # готовые, но пока не открытые страницы: не попадают в sitemap
-UNLISTED = {"blog-editor", "admin", "garden"}
+UNLISTED = {"blog-editor", "admin", "garden", "preview"}
+# редизайн 2.0: страницы на новом шаблоне src/layout-v2.html (шапка, подвал, сезоны — site/assets/v2.css, v2.js); NOINDEX — не для поисковиков
+V2 = {"preview"}
+NOINDEX = {"preview"}
+V2_HOME = "/preview/"  # куда ведёт логотип новой шапки; станет "/" при замене главной (часть 5)
 
 
 PORTFOLIO = [
@@ -586,12 +592,30 @@ def about_chat():
     (OUT / "assets" / "about-chat.json").write_text(json.dumps(data, ensure_ascii=False, separators=(",", ":")) + "\n")
 
 
+def v2_books():
+    """Редизайн 2.0: книги из content/ebooks.json для блока «Гайды» — вышедшие первыми, «скоро» последней; бесплатная раскраска — ссылкой."""
+    books = [b for sec in json.loads((CONTENT / "ebooks.json").read_text())["sections"] for b in sec["books"] if b.get("cover")]
+    free = [b for b in books if "(free)" in b["title"]]
+    soon = [b for b in books if "coming soon" in b["title"]]
+    out = [b for b in books if b not in free and b not in soon][::-1] + soon
+    tiles = []
+    for i, b in enumerate(out[:3]):
+        title = b["title"].replace(" (coming soon)", "")
+        ext = ' target="_blank" rel="noopener"' if b["url"].startswith("http") else ""
+        lbl = '<span class="lbl">Soon</span>' if b in soon else ""
+        tiles.append(f'<a class="b{i}" href="{esc(b["url"])}"{ext}>{lbl}<img src="/{esc(b["cover"])}" alt="{esc(title)}" loading="lazy"></a>')
+    hand = '<span class="hand">start with this one ↑</span>' if out and out[0] not in soon else ""
+    link = (f'<a class="btn ghost" href="{esc(free[0]["url"])}" target="_blank" rel="noopener">Free colouring book →</a>' if free else "")
+    return '<div class="books">' + "".join(tiles) + hand + "</div>", link
+
+
 def build():
     about_chat()
     rooms_data()
     wobbleland_data()
     titos_cases()
     layout = (SRC / "layout.html").read_text()
+    layout_v2 = (SRC / "layout-v2.html").read_text()
     search_index = {lang: [] for lang in LANGS}
     for path, title, file, desc in PAGES:
         body = (SRC / "pages" / file).read_text()
@@ -605,6 +629,9 @@ def build():
             body = body[:start] + block_html(body[start + 8:end]) + body[end + 2:]
 
         body = body.replace("{{ebooks}}", ebooks_html() if "{{ebooks}}" in body else "")
+        if "{{v2books}}" in body:
+            books, free = v2_books()
+            body = body.replace("{{v2books}}", books).replace("{{v2free}}", free)
         full_title = title if not path else f"{title} · Pigeon Polly Art Lab"
         for lang, prefix in LANGS.items():
             canonical, hreflang, switch = lang_bits(path, lang)
@@ -615,14 +642,20 @@ def build():
             if lang != "en" and alt.exists():
                 page_body = alt.read_text()
             page_body = mark_editable(page_body, (path or "home").replace("/", "-"))
-            page_body = section_tabs(path) + page_body
-            page = (layout
+            if path in V2:
+                page = (layout_v2.replace("{{title}}", esc(full_title)).replace("{{description}}", esc(desc))
+                        .replace("{{canonical}}", canonical).replace("{{home}}", V2_HOME)
+                        .replace("{{robots}}", '<meta name="robots" content="noindex">\n' if path in NOINDEX else "")
+                        .replace("{{content}}", page_body))
+            else:
+                page_body = section_tabs(path) + page_body
+                page = (layout
                     .replace("{{title}}", esc(full_title))
                     .replace("{{description}}", esc(desc))
                     .replace("{{canonical}}", canonical)
                     .replace("{{nav}}", nav_html(path)).replace("{{footer_map}}", footer_html())
-                    .replace("{{body_class}}", "home" if not path else "inner")
-                    .replace("{{content}}", page_body))
+                        .replace("{{body_class}}", "home" if not path else "inner")
+                        .replace("{{content}}", page_body))
             page = localize(page, lang)
             page = page.replace("{{hreflang}}", hreflang).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
             page = bust(page)
