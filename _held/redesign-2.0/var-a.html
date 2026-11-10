@@ -1,0 +1,97 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Variant A — mockup</title><link rel="stylesheet" href="m.css"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,300;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:wght@500;600&family=Caveat:wght@500;700&display=swap');
+body{background:#F3EADB}
+.mast{text-align:center;padding:18px 0 0}
+.mast .top{display:flex;justify-content:space-between;font:700 11px Karla;letter-spacing:.2em;text-transform:uppercase;color:var(--ink2);border-bottom:1px solid var(--ink);padding-bottom:10px}
+.mast h1{font:300 112px/0.95 Fraunces;letter-spacing:-.03em;margin:22px 0 4px}.mast h1 em{font-weight:300;color:var(--burgundy)}
+.mast .sub{font:italic 18px Fraunces;color:var(--ink2)}
+.mnav{display:flex;justify-content:center;gap:34px;border-top:3px double var(--ink);border-bottom:3px double var(--ink);margin-top:20px;padding:12px 0;font:600 13px Karla;letter-spacing:.16em;text-transform:uppercase}
+.mnav .door{color:var(--burgundy)}
+.hero{display:grid;grid-template-columns:1.55fr 1fr;gap:44px;padding:44px 0 56px;border-bottom:1px solid var(--ink)}
+.kick{font:700 11px Karla;letter-spacing:.2em;text-transform:uppercase;color:var(--orange);display:flex;gap:10px;align-items:center}.kick:after{content:"";flex:1;height:1px;background:var(--line)}
+.vid{position:relative;margin:14px 0 18px;aspect-ratio:16/10;overflow:hidden}
+.vid img{width:100%;height:100%;object-fit:cover}
+.vid .pl{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:92px;height:92px;border-radius:50%;background:rgba(243,234,219,.94);display:grid;place-items:center;font-size:30px;color:var(--burgundy);box-shadow:0 0 0 10px rgba(243,234,219,.35)}
+.vid .dur{position:absolute;right:14px;bottom:14px;background:var(--ink);color:#fff;font:700 12px Karla;padding:4px 8px}
+.hero h2{font:400 46px/1.02 Fraunces}.hero h2 em{color:var(--burgundy)}
+.hero p{color:var(--ink2);font-size:17px;margin:12px 0 18px;max-width:36em}
+.alm h3{font:italic 400 30px Fraunces;border-bottom:2px solid var(--ink);padding-bottom:8px;margin-bottom:4px}
+.alm .r{display:grid;grid-template-columns:62px 1fr auto;gap:14px;align-items:center;padding:14px 0;border-bottom:1px dotted var(--ink2)}
+.alm .d{font:300 40px/1 Fraunces;text-align:center}.alm .d small{display:block;font:700 10px Karla;letter-spacing:.2em}
+.alm b{font:600 18px Fraunces;display:block}.alm span.m{font-size:13px;color:var(--ink2)}
+.tg{font:700 10px Karla;letter-spacing:.14em;text-transform:uppercase;padding:4px 8px;border:1.5px solid var(--ink)}
+.tg.p{background:var(--burgundy);border-color:var(--burgundy);color:#fff}
+.alm .ill{margin-top:20px;display:flex;gap:14px;align-items:center;font:italic 15px Fraunces;color:var(--ink2)}.alm .ill img{width:90px;height:110px;object-fit:cover;filter:sepia(.2)}
+.sw{display:grid;grid-template-columns:repeat(6,1fr);margin:50px 0 0}
+.sw div{height:150px;padding:14px;color:#fff;display:flex;flex-direction:column;justify-content:space-between}
+.sw b{font:400 22px Fraunces;letter-spacing:.04em;text-transform:uppercase}.sw span{font:500 11px Karla;letter-spacing:.1em;opacity:.85}
+.swcap{display:flex;justify-content:space-between;align-items:center;padding:16px 0 54px;border-bottom:1px solid var(--ink)}
+.swcap p{font:italic 18px Fraunces}
+.ways{display:grid;grid-template-columns:repeat(3,1fr);border-bottom:1px solid var(--ink)}
+.way{padding:44px 34px;border-right:1px solid var(--ink)}.way:last-child{border-right:0}.way:first-child{padding-left:0}
+.way .n{font:300 72px/1 Fraunces;color:var(--apricot)}
+.way h3{font:400 32px Fraunces;margin:10px 0}.way p{color:var(--ink2);margin-bottom:18px}
+.way img{width:100%;aspect-ratio:4/3;object-fit:cover;margin-bottom:18px}
+.shelf{padding:60px 0;border-bottom:1px solid var(--ink);display:grid;grid-template-columns:1fr 2fr;gap:50px;align-items:end}
+.shelf h2{font:400 52px/1 Fraunces}.shelf h2 em{color:var(--burgundy)}.shelf p{color:var(--ink2);margin:14px 0 20px}
+.plates{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;border-bottom:10px solid #8A5A2B;padding-bottom:0}
+.plate{text-align:center}.plate img{width:100%;box-shadow:6px -4px 0 rgba(0,0,0,.12)}
+.plate small{display:block;font:700 10px Karla;letter-spacing:.18em;text-transform:uppercase;margin-top:10px;color:var(--ink2)}
+.plate b{font:italic 16px Fraunces}
+.platecap{display:grid;grid-template-columns:repeat(4,1fr);gap:22px;text-align:center;padding-top:12px}
+.mat{padding:60px 0;border-bottom:1px solid var(--ink)}
+.mat .hd2{display:flex;justify-content:space-between;align-items:end;margin-bottom:26px}.mat h2{font:400 44px Fraunces}
+.mg{display:grid;grid-template-columns:repeat(4,1fr);gap:20px}
+.mi{background:#FBF6EC;border:1px solid var(--line);padding:16px;position:relative}
+.mi img{width:100%;aspect-ratio:1;object-fit:cover;filter:grayscale(1) contrast(1.6) brightness(1.15);mix-blend-mode:multiply}
+.mi img.col{filter:none;mix-blend-mode:normal}
+.mi b{font:600 18px Fraunces;display:block;margin-top:12px}.mi span{font-size:13px;color:var(--ink2)}
+.mi .tg{position:absolute;top:24px;left:24px;background:#FBF6EC}.mi .tg.p{background:var(--burgundy)}
+.club{margin:60px 0;display:grid;grid-template-columns:1.3fr 1fr;background:var(--burgundy);color:var(--paper)}
+.club .l{padding:44px}.club h2{font:300 56px/1 Fraunces}.club h2 em{color:var(--apricot)}
+.club p{opacity:.85;margin:14px 0 22px;font-size:17px}
+.club .r{border-left:2px dashed rgba(243,234,219,.5);padding:44px;display:flex;flex-direction:column;justify-content:center;gap:14px}
+.club .tier{display:flex;justify-content:space-between;border-bottom:1px solid rgba(243,234,219,.3);padding-bottom:12px;font:400 20px Fraunces}
+.club .btn{background:var(--apricot);color:var(--ink);border-color:var(--apricot);align-self:flex-start}
+.duo{display:grid;grid-template-columns:1fr 1fr;gap:0;border-top:1px solid var(--ink);border-bottom:1px solid var(--ink);margin-bottom:60px}
+.duo>div{padding:40px 34px 40px 0;display:grid;grid-template-columns:150px 1fr;gap:24px;align-items:center}
+.duo>div+div{border-left:1px solid var(--ink);padding-left:34px}
+.duo img{width:150px;height:180px;object-fit:cover}
+.arch{border-radius:80px 80px 0 0}
+.duo h3{font:400 30px Fraunces}.duo p{color:var(--ink2);margin:8px 0 14px}
+.ft{background:var(--ink)}
+@media(max-width:700px){
+ .mast .top span:nth-child(2){display:none}.mast h1{font-size:58px}.mnav{gap:16px;font-size:11px;overflow:auto;justify-content:flex-start;padding:10px 4px}
+ .hero,.shelf,.club,.duo,.ways{grid-template-columns:1fr}.hero{gap:30px;padding:24px 0 36px}.hero h2{font-size:32px}
+ .sw{grid-template-columns:repeat(3,1fr)}.sw div{height:96px;padding:10px}.sw b{font-size:15px}.swcap{flex-direction:column;align-items:start;gap:12px}
+ .way{border-right:0;border-bottom:1px solid var(--line);padding:32px 0}.way .n{font-size:52px}
+ .shelf h2,.mat h2{font-size:34px}.plates,.platecap{grid-template-columns:repeat(2,1fr)}.mg{grid-template-columns:1fr 1fr;gap:10px}.mi b{font-size:15px}
+ .club .l,.club .r{padding:28px}.club .r{border-left:0;border-top:2px dashed rgba(243,234,219,.5)}.club h2{font-size:40px}
+ .duo>div{padding:28px 0;grid-template-columns:100px 1fr}.duo>div+div{border-left:0;border-top:1px solid var(--ink);padding-left:0}.duo img{width:100px;height:120px}
+}
+</style></head><body><div class="wrap"><div class="mast"><div class="top"><span>Riga · Est. 2019</span><span>Watercolour · Ink · Sketching</span><span>No. 11 · November</span></div>
+<h1>Pigeon Polly <em>Art Lab</em></h1><div class="sub">a small almanac of watercolour lessons, guides &amp; things to paint</div>
+<nav class="mnav"><span>Lessons</span><span>Guides &amp; books</span><span>Materials</span><span>Studio Club</span><span>Wobbleland</span><span>About</span><span class="door">🚪 The Lab</span></nav></div>
+<section class="hero"><div><div class="kick">Free lesson of the week</div>
+<div class="vid"><img src="../../site/images/sketchbook/sketchbook-17.jpg"><span class="pl">▶</span><span class="dur">10:24</span></div>
+<h2>Persimmons on a blue plate, <em>in ten minutes</em></h2><p>Three colours, one brush, no drawing first. A free paint-along for complete beginners, in English with Latvian subtitles.</p>
+<span class="btn pri">▶ Watch free</span> <span class="btn">All lessons</span></div>
+<div class="alm"><h3>The November almanac</h3><div class="r"><div class="d">03<small>NOV</small></div><div><b>Persimmons on a blue plate</b><span class="m">10 min · beginner</span></div><span class="tg ">Free</span></div><div class="r"><div class="d">10<small>NOV</small></div><div><b>Rooftops of Riga</b><span class="m">40 min · full paint-along</span></div><span class="tg p">Member</span></div><div class="r"><div class="d">17<small>NOV</small></div><div><b>A cup of brushes in ink</b><span class="m">12 min · ink + wash</span></div><span class="tg ">Free</span></div><div class="r"><div class="d">24<small>NOV</small></div><div><b>Cosy café breakfast</b><span class="m">35 min · reference + sketch</span></div><span class="tg p">Member</span></div><div class="ill"><img src="../../site/images/sketchbook/sketchbook-16-800.jpg"><span>“A new small painting every Monday. Members get the long version, everyone gets the short one.”</span></div></div></section>
+<div class="sw"><div style="background:#E8A87C"><span>#E8A87C</span><b>Apricot</b></div><div style="background:#E3A19A"><span>#E3A19A</span><b>Blush</b></div><div style="background:#C4552D"><span>#C4552D</span><b>Blood orange</b></div><div style="background:#A8452E"><span>#A8452E</span><b>Copper tulip</b></div><div style="background:#D6A640"><span>#D6A640</span><b>Sunshine</b></div><div style="background:#6A2432"><span>#6A2432</span><b>Burgundy</b></div></div><div class="swcap"><p>The palette of the month. Mix these six and paint along with every November lesson.</p><span class="btn">Download palette card · free</span></div>
+<section class="ways">
+<div class="way"><div class="n">I.</div><img src="../../site/images/sketchbook/sketchbook-21-800.jpg"><h3>Free lessons</h3><p>Short paint-alongs and tips on YouTube, playing right here on the site.</p><span class="btn sm">Start watching</span></div>
+<div class="way"><div class="n">II.</div><img src="../../site/images/sketchbook/sketchbook-5-800.jpg"><h3>Paint-alongs</h3><p>Full 30–40 minute lessons with reference photo and line sketch. Buy one or get them all as a member.</p><span class="btn sm dark">From €9</span></div>
+<div class="way"><div class="n">III.</div><img src="../../site/images/sketchbook/sketchbook-2-800.jpg"><h3>Guides &amp; books</h3><p>Step-by-step creative guides, on Amazon, to keep on your desk.</p><span class="btn sm">See the shelf</span></div></section>
+<section class="shelf"><div><div class="kick">The bookshelf</div><h2>Guides you can <em>hold</em></h2><p>Written, illustrated and designed by Alina. Each guide comes with a free video for the first chapter.</p><span class="btn dark">Buy on Amazon</span></div>
+<div><div class="plates"><div class="plate"><img src="../../site/images/e-books/watercolor-sketches.jpg"></div><div class="plate"><img src="../../site/images/e-books/ink-sketching.jpg"></div><div class="plate"><img src="../../site/images/e-books/urban-sketching-digital-traveler.jpg"></div><div class="plate"><img src="../../site/images/e-books/coloring-book-world-breakfasts.jpg"></div></div>
+<div class="platecap"><div class="plate"><small>Plate I</small><b>Watercolor Sketches</b></div><div class="plate"><small>Plate II</small><b>Ink Sketching</b></div><div class="plate"><small>Plate III · soon</small><b>Digital Traveler</b></div><div class="plate"><small>Plate IV · free</small><b>World Breakfasts</b></div></div></div></section>
+<section class="mat"><div class="hd2"><div><div class="kick">Materials</div><h2>Things to print &amp; paint</h2></div><span class="btn">All materials</span></div>
+<div class="mg"><div class="mi"><span class="tg">Free</span><img src="../../site/images/sketchbook/sketchbook-17-800.jpg"><b>Line sketch: Persimmons</b><span>PDF to trace or print</span></div>
+<div class="mi"><span class="tg p">Member</span><img class="col" src="../../site/images/sketchbook/sketchbook-7-800.jpg"><b>Reference pack: Riga</b><span>24 photos for painting</span></div>
+<div class="mi"><span class="tg">Free</span><img src="../../site/images/cards/classic/13.jpg"><b>Colouring page: Miss Peony</b><span>from Wobbleland</span></div>
+<div class="mi"><span class="tg">€4</span><img class="col" src="../../site/images/sketchbook/sketchbook-21-800.jpg"><b>Palette cards · set of 12</b><span>print, cut, swatch</span></div></div></section>
+<section class="club"><div class="l"><div class="kick" style="color:var(--apricot)">Studio Club · on Patreon</div><h2>Paint with me <em>every week</em></h2><p>Every paint-along, reference packs, line sketches and a vote on what we paint next.</p><span class="btn">Join the club</span></div>
+<div class="r"><div class="tier"><span>Sketchbook friend</span><span>€5 / mo</span></div><div class="tier"><span>Studio · all lessons</span><span>€12 / mo</span></div><div class="tier" style="border:0;opacity:.7"><span>Feedback · soon</span><span>€30 / mo</span></div></div></section>
+<section class="duo"><div><img class="arch" src="../../site/images/home/alina.jpg"><div><h3>Hi, I’m Alina</h3><p>Illustrator and learning experience designer. I teach the way I sketch: small, kind and step by step.</p><span class="btn sm">My story</span></div></div>
+<div><img class="arch" src="../../site/images/home/first-pigeon-polly.jpg"><div><h3>Behind the door</h3><p>Hatch a bird, play games and wander around Wobbleland. The playful side of the lab.</p><span class="btn sm">🚪 Open the Lab</span></div></div></section></div><footer class="ft"><div class="wrap"><div><h4>One letter a month</h4><p>A free lesson every Monday and what’s cooking in the Lab.</p><input placeholder="Your email"><span class="btn pri">Subscribe</span></div>
+<div><h4>Learn</h4><ul><li>Free lessons</li><li>Paint-alongs</li><li>Guides &amp; books</li><li>Materials</li></ul></div><div><h4>Explore</h4><ul><li>Wobbleland</li><li>Journal</li><li>Palettes</li><li>The Lab 🚪</li></ul></div>
+<div><h4>Alina</h4><ul><li>About</li><li>Work with me</li><li>LinkedIn</li><li>Patreon</li></ul></div><div class="bot"><span>© 2026 Pigeon Polly Art Lab · Riga</span><span>EN · LV · RU</span></div></div></footer></body></html>

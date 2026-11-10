@@ -1,0 +1,90 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Variant B — mockup</title><link rel="stylesheet" href="m.css"><style>@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;0,9..144,800;1,9..144,300;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:wght@500;600&family=Caveat:wght@500;700&display=swap');
+body{background:#EFD9C3;background-image:radial-gradient(rgba(110,60,30,.07) 1px,transparent 1px);background-size:4px 4px}
+.bh{display:flex;align-items:center;justify-content:space-between;padding:22px 0}
+.bh .lg{font:italic 400 28px Fraunces}.bh .lg b{font-style:normal;font-weight:800}
+.bh nav{display:flex;gap:8px}.bh nav span{background:#FBF3E6;border-radius:999px;padding:9px 16px;font:600 14px Karla;box-shadow:0 2px 0 rgba(60,30,10,.15)}
+.bh nav span.d{background:var(--burgundy);color:var(--paper)}
+.hero{display:grid;grid-template-columns:1fr 1.1fr;gap:30px;padding:30px 0 70px;align-items:center}
+.hero h1{margin-bottom:22px;font:800 92px/.95 Fraunces;letter-spacing:-.03em;color:var(--burgundy)}
+.hero h1 i{font-weight:300;color:var(--ink)}
+.hand{font:700 30px Caveat;color:var(--orange);transform:rotate(-4deg);display:inline-block;margin:16px 0 4px}
+.hero p{font-size:18px;color:var(--ink2);max-width:28em;margin:8px 0 26px}
+.cl{position:relative;height:560px}
+.cl .t{position:absolute;background:#FBF3E6;padding:12px;clip-path:polygon(0.0% 0.7% 2.5% 0.3% 5.0% 1.4% 7.5% 0.2% 10.0% 1.2% 12.5% 0.8% 15.0% 0.1% 17.5% 1.1% 20.0% 0.1% 22.5% 1.0% 25.0% 0.2% 27.5% 0.2% 30.0% 0.9% 32.5% 1.8% 35.0% 0.3% 37.5% 0.5% 40.0% 1.4% 42.5% 2.1% 45.0% 1.3% 47.5% 0.9% 50.0% 2.1% 52.5% 0.1% 55.0% 1.9% 57.5% 0.6% 60.0% 0.3% 62.5% 0.3% 65.0% 0.7% 67.5% 1.8% 70.0% 0.4% 72.5% 1.3% 75.0% 1.4% 77.5% 0.8% 80.0% 1.2% 82.5% 0.1% 85.0% 0.1% 87.5% 0.5% 90.0% 1.5% 92.5% 0.9% 95.0% 0.7% 97.5% 1.3% 100.0% 1.0%, 100.0% 99.3% 97.5% 98.3% 95.0% 98.5% 92.5% 99.5% 90.0% 98.7% 87.5% 98.8% 85.0% 98.1% 82.5% 98.4% 80.0% 99.4% 77.5% 97.8% 75.0% 99.7% 72.5% 99.1% 70.0% 98.3% 67.5% 99.7% 65.0% 98.9% 62.5% 99.9% 60.0% 98.5% 57.5% 98.3% 55.0% 98.7% 52.5% 98.1% 50.0% 99.3% 47.5% 98.5% 45.0% 98.7% 42.5% 98.7% 40.0% 99.0% 37.5% 98.2% 35.0% 97.9% 32.5% 99.0% 30.0% 98.5% 27.5% 99.9% 25.0% 98.5% 22.5% 98.6% 20.0% 97.8% 17.5% 98.2% 15.0% 99.4% 12.5% 99.2% 10.0% 98.5% 7.5% 100.0% 5.0% 99.0% 2.5% 99.6% 0.0% 99.7%);box-shadow:0 10px 20px rgba(60,30,10,.18)}
+.cl .t img{width:100%;height:100%;object-fit:cover}
+.cl .a{width:360px;height:250px;left:10px;top:30px;transform:rotate(-3deg)}
+.cl .b{width:250px;height:320px;right:0;top:0;transform:rotate(4deg)}
+.cl .c{width:290px;height:210px;left:120px;bottom:10px;transform:rotate(2deg)}
+.cl .tp{position:absolute;width:110px;height:28px;background:rgba(214,166,64,.6);z-index:3}
+.cl .ticket{position:absolute;right:40px;bottom:60px;z-index:4;background:var(--mustard);padding:14px 22px;transform:rotate(-7deg);font:700 12px Karla;letter-spacing:.18em;text-align:center;border:2px dashed #fff;outline:6px solid var(--mustard)}
+.cl .ticket b{display:block;font:800 26px Fraunces;letter-spacing:0}
+.cl .stamp{position:absolute;left:0;bottom:120px;z-index:4;width:110px;height:110px;border-radius:50%;border:3px solid var(--burgundy);color:var(--burgundy);display:grid;place-items:center;text-align:center;font:700 11px/1.3 Karla;letter-spacing:.12em;transform:rotate(-14deg);background:rgba(239,217,195,.7)}
+.cl .note{position:absolute;left:10px;top:300px;z-index:4;font:700 26px Caveat;color:var(--ink);transform:rotate(-6deg)}
+.pick{background:#FBF3E6;border-radius:16px;padding:26px 30px;display:flex;align-items:center;gap:20px;flex-wrap:wrap;margin-bottom:60px;box-shadow:0 6px 0 rgba(60,30,10,.1)}
+.pick b{font:400 26px Fraunces}.pick span.c{border:1.5px solid var(--ink);border-radius:999px;padding:9px 16px;font:600 14px Karla}.pick span.c.on{background:var(--ink);color:var(--paper)}
+.cab h2{font:800 60px/1 Fraunces;color:var(--ink);margin-bottom:6px}.cab>p{font:italic 19px Fraunces;color:var(--ink2);margin-bottom:30px}
+.tabs{display:flex;gap:4px;position:relative;z-index:2;margin-bottom:-1px}
+.tabs span{padding:14px 22px 12px;border-radius:14px 14px 0 0;font:700 13px Karla;letter-spacing:.12em;text-transform:uppercase;color:#fff}
+.tabs span i{font:300 italic 22px Fraunces;letter-spacing:0;text-transform:none;margin-right:6px}
+.folder{border-radius:0 16px 16px 16px;padding:34px;margin-bottom:0;position:relative}
+.f1{background:#E8A87C}.f2{background:#C4552D}.f3{background:#6A2432}.f4{background:#D6A640}.f5{background:#8A5A2B}
+.tabs .f1,.tabs .f4{color:var(--ink)}
+.peek{height:46px;border-radius:0 0 16px 16px;margin:0 14px;opacity:.95}
+.peek.p2{margin:0 28px;height:30px}.peek.p3{margin:0 42px;height:18px}
+.fg{display:grid;grid-template-columns:1.4fr 1fr 1fr;gap:20px}
+.fc{background:#FBF3E6;border-radius:6px;padding:12px;position:relative;box-shadow:0 8px 16px rgba(60,30,10,.18)}
+.fc .th{position:relative;aspect-ratio:16/11;overflow:hidden;border-radius:3px}.fc .th img{width:100%;height:100%;object-fit:cover}
+.fc .pl{position:absolute;left:14px;bottom:14px;width:46px;height:46px;border-radius:50%;background:#fff;display:grid;place-items:center;color:var(--burgundy)}
+.fc b{font:600 20px Fraunces;display:block;margin:12px 0 2px}.fc span{font-size:13px;color:var(--ink2)}
+.fc .tg{position:absolute;top:22px;right:22px;font:700 10px Karla;letter-spacing:.14em;text-transform:uppercase;padding:4px 8px;background:#fff;border-radius:3px}
+.fc .tg.p{background:var(--burgundy);color:#fff}
+.fc.big .th{aspect-ratio:16/12}
+.fhd{display:flex;justify-content:space-between;align-items:end;margin-bottom:22px;color:var(--ink)}
+.fhd h3{font:400 38px Fraunces}.fhd p{max-width:26em}
+.rows{display:grid;grid-template-columns:1fr 1fr;gap:30px;margin:70px 0}
+.idx{background:#FBF3E6;padding:28px;border-radius:4px;position:relative;background-image:repeating-linear-gradient(transparent 0 31px,rgba(196,85,45,.25) 31px 32px);box-shadow:0 8px 16px rgba(60,30,10,.12)}
+.idx:before{content:"";position:absolute;left:52px;top:0;bottom:0;width:1.5px;background:rgba(196,85,45,.5)}
+.idx h3{font:800 32px Fraunces;padding-left:44px;margin-bottom:12px}
+.idx .bk{display:grid;grid-template-columns:70px 1fr auto;gap:16px;align-items:center;padding:8px 0 8px 44px}
+.idx .bk img{width:70px;box-shadow:3px 4px 0 rgba(0,0,0,.15)}.idx .bk b{font:600 18px Fraunces;display:block}.idx .bk span{font-size:13px;color:var(--ink2)}
+.club{background:var(--burgundy);color:var(--paper);border-radius:16px;padding:36px;position:relative;overflow:hidden}
+.club h3{font:300 50px/1 Fraunces}.club h3 b{font-weight:800;color:var(--apricot)}
+.club p{opacity:.85;margin:14px 0 20px}.club .btn{background:var(--apricot);border-color:var(--apricot);color:var(--ink)}
+.club .tk{display:flex;gap:10px;margin-top:22px}.club .tk div{flex:1;border:1.5px dashed rgba(243,234,219,.5);border-radius:10px;padding:12px;font-size:13px}.club .tk b{display:block;font:400 22px Fraunces}
+.club h3,.club p{padding-right:120px}.club img{position:absolute;right:-24px;top:-40px;width:140px;transform:rotate(14deg);border-radius:10px;opacity:.95}
+.lab{display:grid;grid-template-columns:auto 1fr auto;gap:30px;align-items:center;background:#FBF3E6;border-radius:16px;padding:22px 30px;margin-bottom:60px}
+.lab img{width:120px;height:90px;object-fit:cover;border-radius:60px 60px 4px 4px}
+.lab b{font:400 28px Fraunces}.lab p{color:var(--ink2)}
+.ft{background:var(--burgundy)}
+@media(max-width:700px){
+ .bh nav span:not(.d){display:none}.bh .lg{font-size:22px}
+ .hero{grid-template-columns:1fr;padding:6px 0 40px}.hero h1{font-size:54px}
+ .cl{height:360px}.cl .a{width:220px;height:160px;left:0;top:10px}.cl .b{width:150px;height:200px}.cl .c{width:190px;height:140px;left:70px}
+ .cl .ticket{right:0;bottom:20px;padding:8px 12px;font-size:10px}.cl .ticket b{font-size:18px}.cl .stamp{width:76px;height:76px;font-size:8px;bottom:60px}.cl .note{left:0;top:190px;font-size:20px}
+ .pick{padding:20px}.pick b{font-size:22px;width:100%}
+ .cab h2{font-size:40px}.tabs{overflow:auto;margin:0 -16px -1px;padding:0 16px}.tabs span{white-space:nowrap;padding:12px 14px 10px;font-size:11px}
+ .folder{padding:18px;border-radius:0 0 16px 16px}.fg{grid-template-columns:1fr}.fhd{flex-direction:column;align-items:start;gap:10px}.fhd h3{font-size:30px}
+ .rows{grid-template-columns:1fr;margin:40px 0}.idx{padding:20px 14px}.idx:before{left:30px}.idx h3,.idx .bk{padding-left:26px}.idx .bk{grid-template-columns:54px 1fr}.idx .bk img{width:54px}.idx .bk .btn{display:none}
+ .club h3{font-size:36px}.club h3,.club p{padding-right:70px}.club img{width:90px;top:-20px}.club .tk{flex-direction:column}
+ .lab{grid-template-columns:1fr;text-align:left}
+}
+</style></head><body><div class="wrap"><header class="bh"><span class="lg"><b>Pigeon Polly</b> art lab</span><nav><span>Lessons</span><span>Guides</span><span>Materials</span><span>Club</span><span>About</span><span class="d">🚪 The Lab</span></nav></header>
+<section class="hero"><div><span class="hand">hi! let’s paint something small ✿</span><h1>Small paintings, <i>big joy</i></h1><p>Free and full-length watercolour lessons, creative guides and printable materials by illustrator Alina Otkinska.</p><span class="btn pri">▶ Start with a free lesson</span> <span class="btn">Browse guides</span></div>
+<div class="cl"><div class="t a"><img src="../../site/images/sketchbook/sketchbook-5-800.jpg"></div><div class="t b"><img src="../../site/images/sketchbook/sketchbook-15-800.jpg"></div><div class="t c"><img src="../../site/images/sketchbook/sketchbook-7-800.jpg"></div>
+<span class="tp" style="left:150px;top:18px;transform:rotate(-8deg)"></span><span class="tp" style="right:80px;top:-8px;transform:rotate(10deg)"></span><span class="tp" style="left:220px;bottom:200px;transform:rotate(-3deg)"></span>
+<div class="ticket">ADMIT ONE<b>Free lesson</b>EVERY MONDAY</div><div class="stamp">PAINTED<br>IN RIGA<br>✦ 2019 ✦</div><div class="note">you can paint this! →</div></div></section>
+<div class="pick"><b>I am…</b><span class="c on">a total beginner</span><span class="c">sketching already</span><span class="c">here for ink</span><span class="c">looking for a gift</span><span class="note" style="margin-left:auto">→ we show the right folder first</span></div>
+<section class="cab"><h2>The studio archive</h2><p>Everything to learn, sorted into folders.</p>
+<div class="tabs"><span class="f1"><i>01</i>Free lessons</span><span class="f2"><i>02</i>Paint-alongs</span><span class="f3"><i>03</i>Guides &amp; books</span><span class="f4"><i>04</i>Materials</span><span class="f5"><i>05</i>Studio Club</span></div>
+<div class="folder f1"><div class="fhd"><h3>Free lessons</h3><p>On YouTube, playing right here. A new short one every Monday, in English with Latvian subtitles.</p></div>
+<div class="fg"><div class="fc big"><span class="tg ">Free</span><div class="th"><img src="../../site/images/sketchbook/sketchbook-17-800.jpg"><span class="pl">▶</span></div><b>Persimmons in 10 minutes</b><span>10 min · beginner</span></div><div class="fc"><span class="tg ">Free</span><div class="th"><img src="../../site/images/sketchbook/sketchbook-21-800.jpg"><span class="pl">▶</span></div><b>My 5-colour palette</b><span>4 min · tip</span></div><div class="fc"><span class="tg p">Member</span><div class="th"><img src="../../site/images/sketchbook/sketchbook-14-800.jpg"><span class="pl">🔒</span></div><b>Red wall, long version</b><span>38 min · paint-along</span></div></div></div>
+<div class="peek f2"></div><div class="peek p2 f3"></div><div class="peek p3 f4"></div></section>
+<section class="rows"><div class="idx"><h3>Guides &amp; books</h3>
+<div class="bk"><img src="../../site/images/e-books/watercolor-sketches.jpg"><div><b>Watercolor Sketches</b><span>Creative guide · Amazon</span></div><span class="btn sm">Buy</span></div>
+<div class="bk"><img src="../../site/images/e-books/ink-sketching.jpg"><div><b>Ink Sketching</b><span>Creative guide · Amazon</span></div><span class="btn sm">Buy</span></div>
+<div class="bk"><img src="../../site/images/e-books/coloring-book-world-breakfasts.jpg"><div><b>World Breakfasts</b><span>Colouring book · free</span></div><span class="btn sm">Get</span></div></div>
+<div class="club"><img src="../../site/images/cards/classic/16.jpg"><h3>Join the <b>Studio Club</b></h3><p>All paint-alongs, reference packs and line sketches. On Patreon, cancel any time.</p><span class="btn">Become a member</span>
+<div class="tk"><div><b>€5</b>Sketchbook friend</div><div><b>€12</b>Studio · all lessons</div><div style="opacity:.6"><b>€30</b>Feedback · soon</div></div></div></section>
+<section class="lab"><img src="../../site/images/home/first-pigeon-polly.jpg"><div><b>Psst… there’s a door at the back</b><p>Hatch a bird, play games and wander around Wobbleland.</p></div><span class="btn dark">🚪 Open the Lab</span></section></div><footer class="ft"><div class="wrap"><div><h4>One letter a month</h4><p>A free lesson every Monday and what’s cooking in the Lab.</p><input placeholder="Your email"><span class="btn pri">Subscribe</span></div>
+<div><h4>Learn</h4><ul><li>Free lessons</li><li>Paint-alongs</li><li>Guides &amp; books</li><li>Materials</li></ul></div><div><h4>Explore</h4><ul><li>Wobbleland</li><li>Journal</li><li>Palettes</li><li>The Lab 🚪</li></ul></div>
+<div><h4>Alina</h4><ul><li>About</li><li>Work with me</li><li>LinkedIn</li><li>Patreon</li></ul></div><div class="bot"><span>© 2026 Pigeon Polly Art Lab · Riga</span><span>EN · LV · RU</span></div></div></footer></body></html>

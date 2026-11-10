@@ -1,0 +1,191 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Variant F — mockup</title><link rel="stylesheet" href="m.css"><style>
+@import url('https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:wght@500;600&family=Caveat:wght@500;700&display=swap');
+:root{--bg:#EEEBE5;--sh:#FBFAF7;--sh2:#E4DED3;--dk:#24292E;--sl:#8A959B;--ink:#1E2226;--ink2:#5D646A;--acc:#B0573A;--line:#D6D0C5}
+html,body{background:var(--bg);color:var(--ink);overflow-x:hidden}
+body{background-image:radial-gradient(rgba(30,34,38,.035) 1px,transparent 1px);background-size:4px 4px}
+h1,h2,h3{font-family:Fraunces,Lora,serif;font-weight:400;color:inherit}
+.wrap{max-width:1280px}
+.k{font:700 11px Karla;letter-spacing:.24em;text-transform:uppercase;color:var(--ink2)}
+.k.a{color:var(--acc)}
+.btn{border-color:var(--ink);color:var(--ink)}.btn.pri{background:var(--acc);border-color:var(--acc);color:#fff}
+.btn.ink{border-color:var(--ink);color:var(--ink)}
+.hand{font:700 26px Caveat;color:var(--acc)}
+/* header */
+.top{position:relative;z-index:5}.top .wrap{display:flex;align-items:center;height:110px;gap:30px}
+.lg{display:flex;align-items:center;gap:12px;font:400 24px Fraunces}.lg img{width:46px;height:46px;border-radius:50%;box-shadow:0 0 0 1px var(--ink)}
+.lg small{display:block;font:700 10px Karla;letter-spacing:.24em;text-transform:uppercase;color:var(--ink2)}
+.nv{display:flex;gap:44px;margin:0 auto;font:700 12px Karla;letter-spacing:.22em;text-transform:uppercase;color:var(--ink2)}.nv .on{color:var(--ink);border-bottom:1px solid var(--acc);padding-bottom:4px}
+.tr{display:flex;gap:14px;align-items:center;font-size:13px;color:var(--ink2)}.top{border-bottom:1px solid var(--line)}.tr .btn{padding:12px 24px}
+/* hero */
+.hero{position:relative;padding:60px 0 40px}
+.hero .wrap{display:grid;grid-template-columns:1.15fr 1fr;gap:60px;align-items:center;position:relative}
+.vt{position:absolute;right:0;top:20px;writing-mode:vertical-rl;font:700 11px Karla;letter-spacing:.3em;text-transform:uppercase;color:var(--sl)}
+.hero h1{font:300 112px/.92 Fraunces;letter-spacing:-.035em;margin:18px 0 26px}.hero h1 em{font-style:italic;color:var(--acc)}
+.hero p{color:var(--ink2);font-size:18px;max-width:28em;margin-bottom:28px}
+.ar1{position:relative;justify-self:center;margin-right:40px}
+.arch{width:440px;height:600px;border-radius:220px 220px 0 0;overflow:hidden;box-shadow:0 0 0 1px var(--line),0 0 0 14px var(--bg),0 0 0 15px var(--ink)}
+.arch img{width:100%;height:100%;object-fit:cover}
+.note{position:absolute;left:-110px;bottom:60px;background:var(--sh);color:var(--ink);padding:22px 24px 26px;transform:rotate(-3deg);box-shadow:0 20px 40px rgba(30,34,38,.18);clip-path:polygon(0.0% 1.36%, 2.2% 1.68%, 4.3% 2.77%, 6.5% 1.40%, 8.7% 1.52%, 10.9% 1.76%, 13.0% 0.55%, 15.2% 1.54%, 17.4% 1.89%, 19.6% 2.38%, 21.7% 0.28%, 23.9% 0.91%, 26.1% 0.27%, 28.3% 2.43%, 30.4% 2.08%, 32.6% 0.13%, 34.8% 2.95%, 37.0% 2.89%, 39.1% 1.96%, 41.3% 1.85%, 43.5% 0.47%, 45.7% 0.05%, 47.8% 1.59%, 50.0% 0.18%, 52.2% 0.57%, 54.3% 0.73%, 56.5% 0.09%, 58.7% 1.39%, 60.9% 1.32%, 63.0% 2.53%, 65.2% 1.56%, 67.4% 1.92%, 69.6% 1.50%, 71.7% 1.99%, 73.9% 1.37%, 76.1% 0.83%, 78.3% 2.99%, 80.4% 2.99%, 82.6% 2.52%, 84.8% 2.12%, 87.0% 0.95%, 89.1% 0.69%, 91.3% 0.87%, 93.5% 0.21%, 95.7% 2.30%, 97.8% 1.20%, 100.0% 2.54%, 100% 100%, 0% 100%);width:270px;z-index:2}
+.note b{font:400 24px/1.1 Fraunces;display:block;margin:8px 0 10px}.note span{font-size:13px;color:var(--ink2)}
+.note .pl{display:inline-grid;place-items:center;width:40px;height:40px;border-radius:50%;background:var(--acc);color:#fff;margin-top:14px;font-size:14px}
+.tape{position:absolute;width:100px;height:26px;background:rgba(176,87,58,.22);transform:rotate(6deg);left:-40px;bottom:228px;z-index:3}
+.hand2{position:absolute;right:-70px;top:-24px;transform:rotate(8deg)}
+.stat{display:flex;gap:34px;margin-top:44px;color:var(--ink2);font-size:12px;border-top:1px solid var(--line);padding-top:22px}.stat b{display:block;font:300 34px Fraunces;color:var(--ink)}
+/* archive folders */
+.arc{padding:150px 0 120px;position:relative}
+.arc .hd2{display:grid;grid-template-columns:1fr 1fr;gap:40px;align-items:end;margin-bottom:46px}
+.arc h2{font-size:64px;line-height:1}.arc h2 em{color:var(--acc)}
+.arc .hd2 p{color:var(--ink2);max-width:26em;justify-self:end}
+.fold{display:flex;gap:10px;height:560px}
+.fo{flex:0 0 96px;border-radius:14px 14px 4px 4px;position:relative;overflow:hidden;display:flex;flex-direction:column;align-items:center;padding:22px 0}
+.fo .n{font:italic 300 26px Fraunces}
+.fo .lb{writing-mode:vertical-rl;transform:rotate(180deg);font:700 12px Karla;letter-spacing:.3em;text-transform:uppercase;margin-top:auto}
+.fo.c1{background:var(--dk);color:#EEE}.fo.c2{background:var(--sl);color:#fff}.fo.c3{background:var(--sh2);color:var(--ink)}.fo.c4{background:var(--acc);color:#fff}
+.fo.open{flex:1;background:var(--sh);box-shadow:0 16px 40px rgba(30,34,38,.1);color:var(--ink);align-items:stretch;padding:34px 36px;border-radius:14px 14px 4px 4px}
+.fo.open:before{content:"";position:absolute;top:0;left:0;width:200px;height:10px;background:var(--acc)}
+.oh{display:flex;justify-content:space-between;align-items:baseline;margin-bottom:24px}.oh h3{font-size:40px}.oh .n{color:var(--acc)}
+.og{display:grid;grid-template-columns:1.25fr 1fr;grid-template-rows:1fr 1fr;gap:18px;flex:1;min-height:0}
+.lv{position:relative;overflow:hidden;border-radius:3px}.lv img{width:100%;height:100%;object-fit:cover}
+.lv.big{grid-row:1/3}
+.lv .cap{position:absolute;left:0;right:0;bottom:0;padding:40px 18px 16px;background:linear-gradient(transparent,rgba(27,30,33,.85));color:#F3EFE8}
+.lv .cap b{font:400 22px Fraunces;display:block}.lv .cap span{font-size:12px;color:#D8D2C8}
+.lv .pl{position:absolute;top:16px;right:16px;width:46px;height:46px;border-radius:50%;background:var(--sh);color:var(--acc);display:grid;place-items:center}
+.lv .tg{position:absolute;top:16px;left:16px;font:700 10px Karla;letter-spacing:.16em;text-transform:uppercase;background:var(--sh);color:var(--ink);padding:5px 9px}
+.lv .tg.m{background:var(--acc);color:#fff}
+/* desk: guides on paper */
+.desk{position:relative;background:var(--sh2);color:var(--ink);clip-path:polygon(0.0% 1.36%, 2.2% 1.68%, 4.3% 2.77%, 6.5% 1.40%, 8.7% 1.52%, 10.9% 1.76%, 13.0% 0.55%, 15.2% 1.54%, 17.4% 1.89%, 19.6% 2.38%, 21.7% 0.28%, 23.9% 0.91%, 26.1% 0.27%, 28.3% 2.43%, 30.4% 2.08%, 32.6% 0.13%, 34.8% 2.95%, 37.0% 2.89%, 39.1% 1.96%, 41.3% 1.85%, 43.5% 0.47%, 45.7% 0.05%, 47.8% 1.59%, 50.0% 0.18%, 52.2% 0.57%, 54.3% 0.73%, 56.5% 0.09%, 58.7% 1.39%, 60.9% 1.32%, 63.0% 2.53%, 65.2% 1.56%, 67.4% 1.92%, 69.6% 1.50%, 71.7% 1.99%, 73.9% 1.37%, 76.1% 0.83%, 78.3% 2.99%, 80.4% 2.99%, 82.6% 2.52%, 84.8% 2.12%, 87.0% 0.95%, 89.1% 0.69%, 91.3% 0.87%, 93.5% 0.21%, 95.7% 2.30%, 97.8% 1.20%, 100.0% 2.54%, 100% 100%, 0% 100%);padding:130px 0 130px;margin-top:-40px}
+.desk:after{content:"";position:absolute;left:0;right:0;bottom:-1px;height:60px;background:var(--bg);clip-path:polygon(0.0% 1.36%, 2.2% 1.68%, 4.3% 2.77%, 6.5% 1.40%, 8.7% 1.52%, 10.9% 1.76%, 13.0% 0.55%, 15.2% 1.54%, 17.4% 1.89%, 19.6% 2.38%, 21.7% 0.28%, 23.9% 0.91%, 26.1% 0.27%, 28.3% 2.43%, 30.4% 2.08%, 32.6% 0.13%, 34.8% 2.95%, 37.0% 2.89%, 39.1% 1.96%, 41.3% 1.85%, 43.5% 0.47%, 45.7% 0.05%, 47.8% 1.59%, 50.0% 0.18%, 52.2% 0.57%, 54.3% 0.73%, 56.5% 0.09%, 58.7% 1.39%, 60.9% 1.32%, 63.0% 2.53%, 65.2% 1.56%, 67.4% 1.92%, 69.6% 1.50%, 71.7% 1.99%, 73.9% 1.37%, 76.1% 0.83%, 78.3% 2.99%, 80.4% 2.99%, 82.6% 2.52%, 84.8% 2.12%, 87.0% 0.95%, 89.1% 0.69%, 91.3% 0.87%, 93.5% 0.21%, 95.7% 2.30%, 97.8% 1.20%, 100.0% 2.54%, 100% 100%, 0% 100%)}
+.desk .wrap{display:grid;grid-template-columns:.9fr 1.3fr;gap:70px;align-items:center}
+.desk h2{font-size:60px;line-height:1}.desk h2 em{color:var(--acc)}
+.desk p{color:var(--ink2);font-size:17px;margin:18px 0 26px;max-width:26em}
+.dc{font:400 88px/.8 Fraunces;float:left;margin:6px 10px 0 0;color:var(--acc)}
+.books{position:relative;height:470px}
+.books img{position:absolute;width:230px;box-shadow:14px 20px 30px rgba(27,30,33,.3)}
+.books .b1{left:0;top:60px;transform:rotate(-7deg)}.books .b2{left:200px;top:0;transform:rotate(2deg);z-index:2}.books .b3{left:410px;top:70px;transform:rotate(8deg)}
+.books .lbl{position:absolute;z-index:3;background:var(--ink);color:#fff;font:700 10px Karla;letter-spacing:.2em;text-transform:uppercase;padding:7px 12px}
+.books .hand{position:absolute;left:250px;bottom:0;transform:rotate(-4deg)}
+/* materials: pinned on dark */
+.mat{padding:120px 0}
+.mat .hd2{display:flex;justify-content:space-between;align-items:end;margin-bottom:50px}.mat h2{font-size:56px;line-height:1}
+.pins{display:grid;grid-template-columns:repeat(4,1fr);gap:34px}
+.pin{background:var(--sh);color:var(--ink);padding:12px 12px 18px;position:relative;box-shadow:0 16px 30px rgba(30,34,38,.14)}
+.pin:nth-child(1){transform:rotate(-2.5deg)}.pin:nth-child(2){transform:rotate(1.5deg) translateY(30px)}.pin:nth-child(3){transform:rotate(-1deg)}.pin:nth-child(4){transform:rotate(2.5deg) translateY(24px)}
+.pin img{width:100%;aspect-ratio:1;object-fit:cover}.pin img.bw{filter:grayscale(1) contrast(1.4) brightness(1.1)}
+.pin .t{position:absolute;top:-12px;left:50%;width:84px;height:24px;margin-left:-42px;background:rgba(176,87,58,.2)}
+.pin b{font:400 19px Fraunces;display:block;margin-top:12px}.pin span{font-size:12px;color:var(--ink2)}
+.pin .pr{position:absolute;right:12px;bottom:16px;font:700 10px Karla;letter-spacing:.16em;text-transform:uppercase;color:var(--acc)}
+/* club ticket over photo */
+.club{position:relative;padding:60px 0 140px}
+.club .wrap{position:relative;height:520px}
+.club .ph{position:absolute;left:0;top:0;width:62%;height:100%;overflow:hidden;border-radius:4px}
+.club .ph img{width:100%;height:100%;object-fit:cover;filter:brightness(.55) saturate(.8)}
+.club .ph .k{position:absolute;left:30px;top:30px}
+.club .ph h2{position:absolute;left:30px;bottom:30px;font:300 72px/.95 Fraunces;color:#F3EFE8;max-width:7em}.club .ph h2 em{color:#F3EFE8}.club .ph .k{color:#E8E2D8}
+.tk{position:absolute;right:0;top:60px;width:44%;background:var(--sh);color:var(--ink);padding:36px 40px;box-shadow:0 30px 60px rgba(30,34,38,.2);
+ -webkit-mask:radial-gradient(circle 14px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 14px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat;
+ mask:radial-gradient(circle 14px at 0 50%,transparent 98%,#000) left/51% 100% no-repeat,radial-gradient(circle 14px at 100% 50%,transparent 98%,#000) right/51% 100% no-repeat}
+.tk .row{display:flex;justify-content:space-between;align-items:baseline;border-bottom:1px dashed rgba(27,30,33,.3);padding:16px 0;font:400 22px Fraunces}.tk .row small{font:500 14px Karla;color:var(--ink2)}
+.tk .row.off{opacity:.5}
+.tk p{color:var(--ink2);font-size:15px;margin:6px 90px 10px 0}
+.tk .btn{margin-top:22px}
+.stamp{position:absolute;right:24px;top:18px;width:110px;height:110px;border-radius:50%;border:2px solid var(--acc);color:var(--acc);display:grid;place-items:center;text-align:center;font:700 10px/1.4 Karla;letter-spacing:.16em;transform:rotate(12deg);background:var(--sh)}
+/* about: arch + column */
+.ab{padding:40px 0 140px}
+.ab .wrap{display:grid;grid-template-columns:380px 1fr 300px;gap:60px;align-items:center}
+.ab .ar{height:480px;border-radius:190px 190px 0 0;overflow:hidden}.ab .ar img{width:100%;height:100%;object-fit:cover}
+.ab h2{font-size:54px;line-height:1}.ab h2 em{color:var(--acc)}
+.ab p{color:var(--ink2);font-size:17px;margin:18px 0 24px}
+.vote{background:var(--sh);border:1px solid var(--line);padding:28px;border-radius:4px}
+.vote h3{font-size:26px;margin:8px 0 14px}
+.ch{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px}.ch span{border:1px solid var(--sl);border-radius:999px;padding:6px 12px;font-size:13px;color:var(--ink2)}.ch span.on{background:var(--ink);color:#fff;border-color:var(--ink)}
+.vote input{width:100%;padding:12px 16px;border-radius:999px;border:1px solid var(--sl);background:#fff;color:var(--ink);font:14px Karla;margin-bottom:10px}
+.vote .btn{width:100%;justify-content:center}
+.side2{display:flex;gap:30px;margin-top:30px}.side2 a{display:flex;gap:12px;align-items:center;font:400 18px Fraunces}.side2 img{width:56px;height:56px;border-radius:50%;object-fit:cover}.side2 small{display:block;font:500 12px Karla;color:var(--ink2)}
+/* journal */
+.jr{padding:40px 0 120px}
+.jr .hd2{display:flex;justify-content:space-between;align-items:end;margin-bottom:44px}.jr h2{font-size:56px;line-height:1}.jr h2 em{color:var(--acc)}
+.jg{display:grid;grid-template-columns:1.25fr 1fr;gap:50px;align-items:start}
+.feat{position:relative}.feat .im{height:440px;overflow:hidden;border-radius:4px}.feat .im img{width:100%;height:100%;object-fit:cover}
+.feat .card{position:relative;margin:-110px 40px 0 auto;width:72%;background:var(--sh);padding:28px 30px;box-shadow:0 20px 40px rgba(30,34,38,.14)}
+.feat h3{font-size:32px;line-height:1.1;margin:10px 0}.feat p{color:var(--ink2);font-size:15px}
+.meta{font:700 10px Karla;letter-spacing:.18em;text-transform:uppercase;color:var(--ink2)}.meta i{font-style:normal;color:var(--acc)}
+.list .post{display:grid;grid-template-columns:1fr 120px;gap:22px;align-items:center;padding:26px 0;border-bottom:1px solid var(--line)}
+.list .post:first-child{padding-top:0}
+.list .post h3{font-size:24px;line-height:1.15;margin:8px 0 6px}.list .post p{font-size:14px;color:var(--ink2)}
+.list .post img{width:120px;height:120px;object-fit:cover;border-radius:60px 60px 3px 3px}
+.list .cl{display:flex;justify-content:space-between;align-items:center;margin-top:26px;background:var(--sh);border:1px dashed var(--acc);padding:16px 20px;font-size:14px}
+.list .cl b{font:400 18px Fraunces;display:block}
+/* footer */
+.fz{background:var(--dk);color:#EEE;padding:70px 0 30px}
+.fz .big{font:300 150px/.85 Fraunces;letter-spacing:-.04em;color:#3A4046;margin-bottom:40px}.fz .big em{color:var(--acc)}
+.fz .cols{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:30px;font-size:14px;color:#B9BFC3;line-height:2}
+.fz h4{font:400 18px Fraunces;color:#fff;margin-bottom:8px}
+.fz input{width:100%;padding:13px 18px;border-radius:999px;border:1px solid var(--sl);background:transparent;color:#fff;margin:8px 0 12px}
+.fz .bt{display:flex;justify-content:space-between;border-top:1px solid #3A4046;margin-top:40px;padding-top:18px;font-size:12px;color:var(--sl)}
+@media(max-width:700px){
+ .top .wrap{height:74px}.nv,.tr .lang,.tr .btn{display:none}.tr:after{content:"☰";font-size:26px;color:var(--ink)}
+ .hero{padding:30px 0 20px}.hero .wrap{grid-template-columns:1fr;gap:30px}.vt{display:none}.hero h1{font-size:56px}
+ .ar1{margin:0 0 0 30px;justify-self:end}.arch{width:280px;height:380px}.note{left:-40px;bottom:30px;width:210px;padding:16px 18px 20px}.note b{font-size:19px}.tape{left:-10px;bottom:170px}.hand2{display:none}
+ .stat{gap:18px}.stat b{font-size:26px}
+ .jr{padding:20px 0 70px}.jr .hd2{flex-direction:column;align-items:start;gap:14px}.jr h2{font-size:40px}.jg{grid-template-columns:1fr;gap:30px}
+ .feat .im{height:260px}.feat .card{width:auto;margin:-60px 12px 0}.feat h3{font-size:26px}.list .post{grid-template-columns:1fr 84px}.list .post img{width:84px;height:84px}.list .cl{flex-direction:column;align-items:start;gap:10px}
+ .arc{padding:80px 0 70px}.arc .hd2{grid-template-columns:1fr}.arc .hd2 p{justify-self:start}.arc h2,.desk h2,.mat h2,.ab h2{font-size:40px}
+ .fold{flex-direction:column;height:auto;gap:6px}.fo{flex:0 0 auto;flex-direction:row;padding:16px 20px;border-radius:12px 12px 4px 4px;gap:14px}.fo .lb{writing-mode:horizontal-tb;transform:none;margin:0}
+ .fo.open{padding:22px 18px;flex-direction:column}.oh h3{font-size:30px}.og{grid-template-columns:1fr;grid-template-rows:none}.lv{height:200px}.lv.big{grid-row:auto;height:260px}
+ .desk{padding:80px 0}.desk .wrap{grid-template-columns:1fr;gap:20px}.books{height:300px}.books img{width:140px}.books .b2{left:110px}.books .b3{left:220px}.books .hand{left:120px}.books .lbl{display:none}
+ .mat{padding:70px 0}.mat .hd2{flex-direction:column;align-items:start;gap:16px}.pins{grid-template-columns:1fr 1fr;gap:20px}
+ .club{padding:20px 0 80px}.club .wrap{height:auto}.club .ph{position:relative;width:100%;height:340px}.club .ph h2{font-size:44px}
+ .tk{position:relative;width:auto;top:-40px;margin:0 10px;padding:28px 24px}.stamp{width:80px;height:80px;font-size:8px;right:14px;top:-26px}
+ .ab{padding:0 0 70px}.ab .wrap{grid-template-columns:1fr;gap:28px}.ab .ar{height:360px;width:80%}.side2{flex-direction:column;gap:14px}
+ .fz .big{font-size:64px}.fz .cols{grid-template-columns:1fr 1fr}.fz .cols>div:first-child{grid-column:1/-1}
+}
+</style></head><body><header class="top"><div class="wrap"><span class="lg"><img src="img/logo-wc.png"><span>Pigeon Polly<small>Art Lab · Riga</small></span></span>
+<nav class="nv"><span class="on">Lessons</span><span>Guides</span><span>Materials</span><span>Club</span><span>About</span></nav>
+<div class="tr"><span class="lang">EN · LV · RU</span><span>🚪 The Lab</span><span class="btn">Sign in</span></div></div></header>
+
+<section class="hero"><div class="wrap"><span class="vt">Pigeon Polly Art Lab — Riga — watercolour &amp; ink</span>
+<div><span class="k a">Watercolour &amp; ink lessons</span><h1>Paint small, <em>joyful</em> things</h1>
+<p>Free short lessons, full paint-alongs and creative guides by illustrator Alina Otkinska. In English with Latvian subtitles.</p>
+<span class="btn pri">▶ Watch a free lesson</span> <span class="btn" style="border:0">Browse guides →</span>
+<div class="stat"><div><b>Mon</b>new free lesson</div><div><b>2</b>guides on Amazon</div><div><b>EN·LV</b>subtitles</div></div></div>
+<div class="ar1"><div class="arch"><img src="../../site/images/sketchbook/sketchbook-15.jpg"></div><span class="tape"></span>
+<div class="note"><span class="k a">This week · free</span><b>Persimmons on a blue plate</b><span>10 min · three colours, one brush</span><br><span class="pl">▶</span></div>
+<span class="hand hand2">night garden ✿</span></div></div></section>
+
+<section class="arc"><div class="wrap"><div class="hd2"><div><span class="k a">The studio archive</span><h2 style="margin-top:14px">Everything to learn, <em>filed in folders</em></h2></div><p>Start with the open folder. The others hold full paint-alongs, guides and things to print.</p></div>
+<div class="fold"><div class="fo open"><div class="oh"><h3>Free lessons</h3><span class="n">№ 01</span></div><div class="og"><div class="lv big"><img src="../../site/images/sketchbook/sketchbook-17-800.jpg"><span class="tg">Free</span><span class="pl">▶</span><div class="cap"><b>Persimmons in 10 minutes</b><span>10 min · beginner</span></div></div><div class="lv"><img src="../../site/images/sketchbook/sketchbook-21-800.jpg"><span class="tg">Free</span><span class="pl">▶</span><div class="cap"><b>My 5-colour palette</b><span>4 min · tip</span></div></div><div class="lv"><img src="../../site/images/sketchbook/sketchbook-14-800.jpg"><span class="tg m">Club</span><span class="pl">🔒</span><div class="cap"><b>Red wall, full version</b><span>38 min · paint-along</span></div></div></div></div>
+<div class="fo c1"><span class="n">02</span><span class="lb">Paint-alongs</span></div><div class="fo c2"><span class="n">03</span><span class="lb">Guides &amp; books</span></div><div class="fo c3"><span class="n">04</span><span class="lb">Materials</span></div><div class="fo c4"><span class="n">05</span><span class="lb">Studio Club</span></div></div></div></section>
+
+<section class="desk"><div class="wrap"><div><span class="k a">Guides &amp; books</span><h2 style="margin-top:14px">Guides to keep <em>on your desk</em></h2>
+<p><span class="dc">W</span>ritten, illustrated and designed by Alina. Clear steps and real sketchbook pages, from the first line to a finished little painting. No talent required, just a brush.</p>
+<span class="btn ink">Buy on Amazon</span> <span class="btn ink" style="border:0">Free colouring book →</span></div>
+<div class="books"><img class="b1" src="../../site/images/e-books/watercolor-sketches.jpg"><img class="b2" src="../../site/images/e-books/ink-sketching.jpg"><img class="b3" src="../../site/images/e-books/urban-sketching-digital-traveler.jpg">
+<span class="lbl" style="left:30px;top:30px;transform:rotate(-7deg)">Plate I</span><span class="lbl" style="left:240px;top:-12px">Plate II</span><span class="lbl" style="left:470px;top:50px;transform:rotate(8deg)">Soon</span><span class="hand">start with this one ↑</span></div></div></section>
+
+<section class="mat"><div class="wrap"><div class="hd2"><div><span class="k a">Materials</span><h2 style="margin-top:14px">Things to print &amp; paint</h2></div><span class="btn">All materials</span></div>
+<div class="pins"><div class="pin"><span class="t"></span><img class="bw" src="../../site/images/sketchbook/sketchbook-17-800.jpg"><b>Line sketch: Persimmons</b><span>PDF to trace</span><span class="pr">Free</span></div>
+<div class="pin"><span class="t"></span><img src="../../site/images/sketchbook/sketchbook-7-800.jpg"><b>Reference pack: Riga</b><span>24 photos</span><span class="pr">Club</span></div>
+<div class="pin"><span class="t"></span><img class="bw" src="../../site/images/cards/classic/13.jpg"><b>Colouring: Miss Peony</b><span>from Wobbleland</span><span class="pr">Free</span></div>
+<div class="pin"><span class="t"></span><img src="../../site/images/sketchbook/sketchbook-21-800.jpg"><b>Palette cards</b><span>print, cut, swatch</span><span class="pr">€4</span></div></div></div></section>
+
+<section class="jr"><div class="wrap"><div class="hd2"><div><span class="k a">Journal</span><h2 style="margin-top:14px">Notes from <em>the studio</em></h2></div><span class="btn">All articles</span></div>
+<div class="jg"><div class="feat"><div class="im"><img src="../../site/images/sketchbook/sketchbook-12-800.jpg"></div><div class="card"><span class="meta"><i>Watercolour</i> · 6 min read</span><h3>Five colours are enough: my travel palette</h3><p>The small kit I carry everywhere, and why fewer paints make braver sketches.</p></div></div>
+<div class="list"><div class="post"><div><span class="meta"><i>Learning &amp; AI</i> · 8 min</span><h3>What AI can’t learn for you</h3><p>On creativity, education and keeping the hand in the process.</p></div><img src="../../site/images/sketchbook/sketchbook-1-800.jpg"></div>
+<div class="post"><div><span class="meta"><i>Behind the scenes</i> · 5 min</span><h3>How a guide gets made</h3><p>From the first sketch to the Amazon page, done solo.</p></div><img src="../../site/images/sketchbook/sketchbook-21-800.jpg"></div>
+<div class="post"><div><span class="meta"><i>Site news</i> · 3 min</span><h3>New rooms for your bird</h3><p>What’s new in the Lab this month.</p></div><img src="../../site/images/blog/site-news-2026-10/kitchen.webp"></div>
+<div class="cl"><div><b>Read it first on Patreon</b>Members get every article a week early.</div><span class="btn sm pri">Join</span></div></div></div></div></section>
+
+<section class="club"><div class="wrap"><div class="ph"><img src="../../site/images/sketchbook/sketchbook-5.jpg"><span class="k">Studio Club · on Patreon</span><h2>Paint along <em>every week</em></h2></div>
+<div class="tk"><div class="stamp">ADMIT<br>ONE<br>✦ CLUB ✦</div><span class="k a">Membership</span><p>All full paint-alongs, reference packs and line sketches, plus a vote on what we paint next.</p>
+<div class="row"><span>Sketchbook friend</span><small>€5 / month</small></div><div class="row"><span>Studio · all lessons</span><small>€12 / month</small></div><div class="row off"><span>Feedback · soon</span><small>€30 / month</small></div>
+<span class="btn pri">Join the club</span></div></div></section>
+
+<section class="ab"><div class="wrap"><div class="ar"><img src="../../site/images/home/alina.jpg"></div>
+<div><span class="k a">Hi, I’m Alina</span><h2 style="margin-top:14px">I teach the way I sketch: <em>small, kind, step by step</em></h2><p>Illustrator and learning experience designer from Riga. I once drew a pigeon called Polly, and she grew into a whole world.</p><span class="btn">My story</span>
+<div class="side2"><a><img src="../../site/images/cards/classic/16.jpg"><span>Wobbleland<small>my painted characters</small></span></a><a><img src="../../site/images/home/first-pigeon-polly.jpg"><span>The Lab<small>birds &amp; games</small></span></a></div></div>
+<div class="vote"><span class="k a">Next lesson</span><h3>What should we paint next?</h3><div class="ch"><span class="on">Cosy cafés</span><span>Botanicals</span><span>City</span><span>Characters</span><span>Winter cards</span></div><input placeholder="Your email"><span class="btn pri">Vote &amp; get it free</span></div></div></section>
+
+<footer class="fz"><div class="wrap"><div class="big">Pigeon Polly <em>Art Lab</em></div><div class="cols">
+<div><h4>A free lesson every Monday</h4>One letter a week, nothing else.<input placeholder="Your email"><span class="btn pri">Subscribe</span></div>
+<div><h4>Learn</h4>Free lessons<br>Paint-alongs<br>Guides &amp; books<br>Materials</div><div><h4>Explore</h4>Wobbleland<br>Journal<br>Palettes<br>The Lab</div><div><h4>Alina</h4>About<br>Work with me<br>LinkedIn<br>Patreon</div></div>
+<div class="bt"><span>© 2026 Pigeon Polly Art Lab · Riga</span><span>EN · LV · RU</span></div></div></footer></body></html>
