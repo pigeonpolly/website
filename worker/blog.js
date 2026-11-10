@@ -14,7 +14,7 @@ const T = {
     blog: 'Blog', head: 'Notes from the lab', lead: 'Articles about drawing, learning and creativity: what I try, what works, and what Polly thinks about it.',
     tags: 'Tags', moreTags: 'Show all tags', lessTags: 'Show less', popular: 'Popular', all: 'All posts', empty: 'No posts here yet. The first one is on its way!',
     comments: 'Comments', noComments: 'No comments yet. Be the first!', back: '← All posts', tagged: 'Posts tagged',
-    min: 'min read', share: 'Share', copy: 'Copy link', copied: 'Link copied ✓', email: 'E-mail', draft: 'Draft', read: 'Read →', months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    members: 'Members only', lockT: 'This article is for members', lockP: 'Sign in for free to read the whole article. It takes a minute.', lockBtn: 'Sign in for free', min: 'min read', share: 'Share', copy: 'Copy link', copied: 'Link copied ✓', email: 'E-mail', draft: 'Draft', read: 'Read →', months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     descr: 'Notes on drawing, learning and creativity by Alina Otkinska and Pigeon Polly.',
     featured: '★ Favourites', archive: 'Archive', inMonth: 'Posts from', onlyFav: 'My favourite posts', allSections: 'All', search: 'Search the blog…', searchBtn: 'Search', found: 'Search results for', nothing: 'Nothing found. Try another word.', prev: '← Newer', next: 'Older →', section: 'Section', sections: 'Sections', scheduled: '⏰ Scheduled', browse: 'Sections, tags & archive', count: n => `${n} ${n === 1 ? 'post' : 'posts'} in the blog`,
     monthsFull: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
@@ -23,7 +23,7 @@ const T = {
     blog: 'Блог', head: 'Заметки из лаборатории', lead: 'Статьи о рисовании, обучении и творчестве: что я пробую, что работает и что об этом думает Полли.',
     tags: 'Теги', moreTags: 'Показать все теги', lessTags: 'Свернуть', popular: 'Популярное', all: 'Все статьи', empty: 'Здесь пока нет статей. Первая уже в пути!',
     comments: 'Комментарии', noComments: 'Комментариев пока нет. Будьте первым!', back: '← Все статьи', tagged: 'Статьи с тегом',
-    min: 'мин чтения', share: 'Поделиться', copy: 'Скопировать ссылку', copied: 'Ссылка скопирована ✓', email: 'Почта', draft: 'Черновик', read: 'Читать →', months: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
+    members: 'Только для своих', lockT: 'Эта статья — для своих', lockP: 'Войдите бесплатно, чтобы прочитать статью целиком. Это займёт минуту.', lockBtn: 'Войти бесплатно', min: 'мин чтения', share: 'Поделиться', copy: 'Скопировать ссылку', copied: 'Ссылка скопирована ✓', email: 'Почта', draft: 'Черновик', read: 'Читать →', months: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
     descr: 'Заметки о рисовании, обучении и творчестве от Алины Откинской и голубя Полли.',
     featured: '★ Избранное', archive: 'Архив', inMonth: 'Статьи за', onlyFav: 'Мои избранные статьи', allSections: 'Все', search: 'Поиск по блогу…', searchBtn: 'Найти', found: 'Результаты поиска', nothing: 'Ничего не нашлось. Попробуйте другое слово.', prev: '← Новее', next: 'Старше →', section: 'Раздел', sections: 'Разделы', scheduled: '⏰ Запланирована', browse: 'Разделы, теги и архив', count: n => `В блоге ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'статья' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'статьи' : 'статей'}`,
     monthsFull: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
@@ -32,7 +32,7 @@ const T = {
     blog: 'Blogs', head: 'Piezīmes no laboratorijas', lead: 'Raksti par zīmēšanu, mācīšanos un radošumu: ko es izmēģinu, kas strādā un ko par to domā Pollija.',
     tags: 'Birkas', moreTags: 'Rādīt visas birkas', lessTags: 'Sakļaut', popular: 'Populārākie', all: 'Visi raksti', empty: 'Šeit vēl nav rakstu. Pirmais jau ceļā!',
     comments: 'Komentāri', noComments: 'Komentāru vēl nav. Esi pirmais!', back: '← Visi raksti', tagged: 'Raksti ar birku',
-    min: 'min lasīšanas', share: 'Dalīties', copy: 'Kopēt saiti', copied: 'Saite nokopēta ✓', email: 'E-pasts', draft: 'Melnraksts', read: 'Lasīt →', months: ['janv.', 'febr.', 'marts', 'apr.', 'maijs', 'jūn.', 'jūl.', 'aug.', 'sept.', 'okt.', 'nov.', 'dec.'],
+    members: 'Tikai saviem', lockT: 'Šis raksts ir saviem', lockP: 'Ienāc bez maksas, lai izlasītu visu rakstu. Tas aizņems minūti.', lockBtn: 'Ienākt bez maksas', min: 'min lasīšanas', share: 'Dalīties', copy: 'Kopēt saiti', copied: 'Saite nokopēta ✓', email: 'E-pasts', draft: 'Melnraksts', read: 'Lasīt →', months: ['janv.', 'febr.', 'marts', 'apr.', 'maijs', 'jūn.', 'jūl.', 'aug.', 'sept.', 'okt.', 'nov.', 'dec.'],
     descr: 'Piezīmes par zīmēšanu, mācīšanos un radošumu no Alīnas Otkinskas un baloža Pollijas.',
     featured: '★ Izlase', archive: 'Arhīvs', inMonth: 'Raksti par', onlyFav: 'Mani izlases raksti', allSections: 'Visi', search: 'Meklēt blogā…', searchBtn: 'Meklēt', found: 'Meklēšanas rezultāti', nothing: 'Nekas netika atrasts. Pamēģiniet citu vārdu.', prev: '← Jaunāki', next: 'Vecāki →', section: 'Sadaļa', sections: 'Sadaļas', scheduled: '⏰ Ieplānots', browse: 'Sadaļas, birkas un arhīvs', count: n => `Blogā ir ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'raksts' : 'raksti'}`,
     monthsFull: ['janvāris', 'februāris', 'marts', 'aprīlis', 'maijs', 'jūnijs', 'jūlijs', 'augusts', 'septembris', 'oktobris', 'novembris', 'decembris'],
@@ -108,6 +108,7 @@ async function ensureBlogSchema(env) {
   ]);
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN featured INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ }
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN pinned INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ }
+  try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN members INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ } // 🔒 статья только для вошедших (10.11.2026)
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN src_lang TEXT').run(); } catch (e) { /* уже есть */ }
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN client_key TEXT').run(); } catch (e) { /* уже есть */ } // метка новой статьи из редактора: повторное «Сохранить» не создаёт копию
   await env.DB.prepare(`CREATE TABLE IF NOT EXISTS blog_tags (en TEXT PRIMARY KEY, ru TEXT DEFAULT '', lv TEXT DEFAULT '')`).run();
@@ -363,7 +364,7 @@ export async function blogApi(req, env, url, h) {
     await admin();
     const a = p.slice('/api/blog/admin/'.length);
     if (m === 'GET' && a === 'posts') {
-      const rows = (await env.DB.prepare(`SELECT p.id, p.slug, p.status, p.featured, p.pinned, p.section, p.t_ru, p.t_en, p.t_lv, p.tags_ru, p.tags_en, p.tags_lv, p.cover, p.views, p.likes, p.updated_at, p.published_at,
+      const rows = (await env.DB.prepare(`SELECT p.id, p.slug, p.status, p.featured, p.pinned, p.members, p.section, p.t_ru, p.t_en, p.t_lv, p.tags_ru, p.tags_en, p.tags_lv, p.cover, p.views, p.likes, p.updated_at, p.published_at,
         (SELECT COUNT(*) FROM blog_comments c WHERE c.post_id = p.id) AS comments FROM blog_posts p ORDER BY COALESCE(p.published_at, p.updated_at) DESC`).all()).results;
       const pending = (await env.DB.prepare(`SELECT c.id, c.body, c.anon, c.created_at, c.post_id, p.slug, p.t_ru, u.nick FROM blog_comments c
         JOIN blog_posts p ON p.id = c.post_id LEFT JOIN users u ON u.id = c.user_id WHERE c.status = 'pending' ORDER BY c.created_at DESC LIMIT 100`).all()).results
@@ -392,6 +393,7 @@ export async function blogApi(req, env, url, h) {
       const untranslated = g => !TAGMAP[g] || (!TAGMAP[g].checked && (!TAGMAP[g].ru || !TAGMAP[g].lv || TAGMAP[g].ru === g || TAGMAP[g].lv === g));
       const fresh = tagList.filter(untranslated);
       if (fresh.length) await translateTags(env, fresh);
+      f.members = b.members ? 1 : 0; // 🔒 только для вошедших
       f.section = [...new Set((Array.isArray(b.section) ? b.section : String(b.section || '').split(',')).map(x => slugify(x)).filter(Boolean))].join(',');
       f.tags_en = tagList.join(', ');
       f.tags_ru = tagList.map(g => tagLabel(g, 'ru')).join(', ');
@@ -584,11 +586,11 @@ export async function blogApi(req, env, url, h) {
     if (m === 'POST' && a === 'import') {
       const b = await body();
       if (!b || ![1, 2].includes(b.version) || !Array.isArray(b.posts)) fail(400, 'bad');
-      const COLS = ['slug', 'status', 'cover', 't_ru', 't_en', 't_lv', 'd_ru', 'd_en', 'd_lv', 'b_ru', 'b_en', 'b_lv', 'tags_ru', 'tags_en', 'tags_lv', 'views', 'likes', 'created_at', 'updated_at', 'published_at', 'featured', 'pinned', 'src_lang', 'section'];
+      const COLS = ['slug', 'status', 'cover', 't_ru', 't_en', 't_lv', 'd_ru', 'd_en', 'd_lv', 'b_ru', 'b_en', 'b_lv', 'tags_ru', 'tags_en', 'tags_lv', 'views', 'likes', 'created_at', 'updated_at', 'published_at', 'featured', 'pinned', 'src_lang', 'section', 'members'];
       let posts = 0, comments = 0;
       for (const p of b.posts) {
         if (!p.slug) continue;
-        const vals = COLS.map(c => p[c] ?? (['views', 'likes', 'featured', 'pinned'].includes(c) ? 0 : c.endsWith('_at') ? null : ''));
+        const vals = COLS.map(c => p[c] ?? (['views', 'likes', 'featured', 'pinned', 'members'].includes(c) ? 0 : c.endsWith('_at') ? null : ''));
         await env.DB.prepare(`INSERT INTO blog_posts (${COLS.join(', ')}) VALUES (${COLS.map(() => '?').join(', ')}) ON CONFLICT(slug) DO UPDATE SET ${COLS.filter(c => c !== 'slug').map(c => `${c} = excluded.${c}`).join(', ')}`).bind(...vals).run();
         posts++;
       }
@@ -869,6 +871,12 @@ function commentHtml(c, lang) {
   return `<li class="bc" id="c${c.id}" data-cid="${c.id}"><p class="bc-head">${name} <time>${fmtDate(c.created_at, lang)}</time></p><div class="bc-body"><p>${body}</p></div></li>`;
 }
 
+// начало закрытой статьи: первые 2 абзаца (без картинок и видео)
+function teaser(html) {
+  const ps = String(html).match(/<p\b[^>]*>[\s\S]*?<\/p>/gi) || [];
+  return ps.filter(x => stripTags(x).trim()).slice(0, 2).map(x => x.replace(/<(img|iframe)[^>]*>/gi, '')).join('');
+}
+
 function card(p, lang) {
   const t = T[lang], tags = tagsOf(p);
   const words = stripTags(field(p, 'b', lang)).split(' ').length;
@@ -876,7 +884,7 @@ function card(p, lang) {
   return `<article class="bl-card">
     <a class="bl-cover" href="${blogUrl(lang, p.slug)}" tabindex="-1" aria-hidden="true">${p.cover ? `<img src="${esc(p.cover)}" alt="" loading="lazy">` : '<span class="bl-nocover">🕊</span>'}</a>
     <div class="bl-text">
-      <p class="bl-meta">${p.status === 'draft' ? `<span class="bl-draft">${t.draft}</span> · ` : (p.published_at || 0) > Date.now() / 1000 ? `<span class="bl-draft">${t.scheduled}</span> · ` : ''}${secsOf(p).filter(x => sectionName(x, lang)).map(x => `<a class="bl-sec" href="${blogUrl(lang, '', '?section=' + encodeURIComponent(x))}">${esc(sectionName(x, lang))}</a> · `).join('')}${fmtDate(p.published_at || p.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}</p>
+      <p class="bl-meta">${p.members ? `<span class="bl-lock">🔒 ${t.members}</span> · ` : ''}${p.status === 'draft' ? `<span class="bl-draft">${t.draft}</span> · ` : (p.published_at || 0) > Date.now() / 1000 ? `<span class="bl-draft">${t.scheduled}</span> · ` : ''}${secsOf(p).filter(x => sectionName(x, lang)).map(x => `<a class="bl-sec" href="${blogUrl(lang, '', '?section=' + encodeURIComponent(x))}">${esc(sectionName(x, lang))}</a> · `).join('')}${fmtDate(p.published_at || p.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}</p>
       <h2><a href="${blogUrl(lang, p.slug)}">${esc(field(p, 't', lang))}</a></h2>
       <p class="bl-excerpt">${esc(excerpt)}</p>
       <p class="bl-foot">${tags.map(g => `<a class="bl-tag" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}">#${esc(tagLabel(g, lang))}</a>`).join(' ')}
@@ -1039,17 +1047,21 @@ async function blogPageInner(req, env, url, h) {
   const textLang = langOf(post, lang);
   const words = stripTags(field(post, 'b', lang)).split(' ').length;
   const description = field(post, 'd', lang) || stripTags(field(post, 'b', lang)).slice(0, 160);
+  // 🔒 статья для вошедших: гостю (и поисковику) — начало статьи и приглашение войти
+  const locked = !!post.members && !isAdm && !(u && !u.banned);
+  const fullBody = footnotes(field(post, 'b', lang), lang);
+  const bodyHtml = locked ? teaser(fullBody) + `<div class="bp-lock"><p class="bp-lock-t">🔒 ${t.lockT}</p><p>${t.lockP}</p><button type="button" class="pill-btn bp-signin" onclick="window.PPAccount ? PPAccount.openSignIn() : (location.href = '/games/#signin')">${t.lockBtn}</button></div>` : fullBody;
   const content = `<div class="bp-wrap"><article class="bp" data-post-id="${post.id}" data-status="${post.status}">
     <p class="bp-back"><a href="${blogUrl(lang, '')}">${t.back}</a><a class="bp-pencil" href="/blog-editor/#${post.id}" hidden data-blog-admin title="Редактировать статью">✎ Редактировать</a></p>
     <header class="bp-head"${textLang !== lang ? ` lang="${textLang}"` : ''}>
       ${post.status === 'draft' ? `<p class="bl-draft">${t.draft}</p>` : (post.published_at || 0) > Date.now() / 1000 ? `<p class="bl-draft">${t.scheduled}</p>` : ''}
       ${secsOf(post).some(x => sectionName(x, lang)) ? `<p class="bp-sec">${secsOf(post).filter(x => sectionName(x, lang)).map(x => `<a href="${blogUrl(lang, '', '?section=' + encodeURIComponent(x))}">${esc(sectionName(x, lang))}</a>`).join(' · ')}</p>` : ''}
       <h1>${esc(title)}</h1>
-      <p class="bl-meta">${fmtDate(post.published_at || post.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}
+      <p class="bl-meta">${post.members ? `<span class="bl-lock">🔒 ${t.members}</span> · ` : ''}${fmtDate(post.published_at || post.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}
         ${tags.length ? ' · ' + tags.map(g => `<a class="bl-tag" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}">#${esc(tagLabel(g, lang))}</a>`).join(' ') : ''}</p>
     </header>
     ${post.cover ? `<figure class="bp-cover"><img src="${esc(post.cover)}" alt=""></figure>` : ''}
-    <div class="bp-body"${textLang !== lang ? ` lang="${textLang}"` : ''}>${footnotes(field(post, 'b', lang), lang)}${post.src_lang && post.src_lang !== textLang && post['t_' + post.src_lang]
+    <div class="bp-body"${textLang !== lang ? ` lang="${textLang}"` : ''}>${bodyHtml}${post.src_lang && post.src_lang !== textLang && post['t_' + post.src_lang]
       ? `<p class="bp-tr-note">${TR_NOTE[lang](post.src_lang, blogUrl(post.src_lang, post.slug))}</p>` : ''}</div>
     <div class="bp-actions"><button type="button" class="bp-like" aria-pressed="false"><span class="bp-heart">♥</span> <span class="bp-likes">${post.likes || 0}</span></button>
       <div class="bp-share-wrap"><button type="button" class="bp-share" aria-expanded="false" data-url="${SITE + blogUrl(lang, post.slug)}" data-title="${esc(title)}" data-img="${esc(post.cover ? (post.cover.startsWith('/') ? SITE + post.cover : post.cover) : '')}"
@@ -1066,7 +1078,7 @@ async function blogPageInner(req, env, url, h) {
   const jsonld = { '@context': 'https://schema.org', '@type': 'BlogPosting', headline: title, description, inLanguage: textLang,
     datePublished: new Date((post.published_at || post.updated_at) * 1000).toISOString(), dateModified: new Date(post.updated_at * 1000).toISOString(),
     author: { '@type': 'Person', name: 'Alina Otkinska', url: SITE + '/about-me/' }, mainEntityOfPage: SITE + blogUrl(lang, post.slug),
-    ...(post.cover ? { image: post.cover.startsWith('/') ? SITE + post.cover : post.cover } : {}), keywords: tags.join(', ') };
+    ...(post.cover ? { image: post.cover.startsWith('/') ? SITE + post.cover : post.cover } : {}), keywords: tags.join(', '), ...(post.members ? { isAccessibleForFree: false, hasPart: { '@type': 'WebPageElement', isAccessibleForFree: false, cssSelector: '.bp-lock' } } : {}) };
   return html(fill(tpl, { title: `${title} · Pigeon Polly Art Lab`, description, canonical: SITE + blogUrl(lang, post.slug), content, image: post.cover,
     type: 'article', slug: post.slug, jsonld, noindex: post.status !== 'published' || (post.published_at || 0) > Date.now() / 1000 }));
 }

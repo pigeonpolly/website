@@ -416,3 +416,4 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
  .dk .hand{right:6px;bottom:-30px;font-size:21px}
 }
 .col3 .pa figcaption{left:auto;right:16px}
+.v2 .bl-lock{background:var(--sheet);color:var(--acc)}.v2 .bp-lock{background:var(--sheet);border-color:var(--acc);border-radius:4px}.v2 .bp-lock:before{background:linear-gradient(to bottom,transparent,var(--bg))}
