@@ -32,7 +32,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/about-admin.js` (6K) — Кабинет → «📮 Вопросы из чата» (admin.js открывает PPAboutAdmin.mount(main)): вопросы, кото: PPAboutAdmin, ERR, LANG, TABS, mount
 - `site/assets/about-desk.js` (52K) — «Стол Алины» на /about-me/ (docs/site.md): пиксельная картинка site/images/about/desk.webp: PAGE, SKIN, PAINT, rnd, box
 - `site/assets/account.js` (41K) — вход в шапке, меню аккаунта, обязательный ник, `html.is-admin`: PPDevH, PPWho, PPAccount, ALINA_MAIL, IN_APP
-- `site/assets/admin.js` (188K) — кабинет /admin/ (все разделы): BADGE_COND, FOLD, ADMIN_GROUPS, pct, shop
+- `site/assets/admin.js` (188K) — кабинет /admin/ (первый экран «🗓 Неделя», все разделы): BADGE_COND, FOLD, ADMIN_GROUPS, pct, shop
 - `site/assets/advent-admin.js` (9K) — кабинет → 🎄 Адвент: план окошек: PPAdventAdmin, ADV_SP, advSet, advBoard, advDayPick
 - `site/assets/advent.js` (17K) — адвент /advent/: отсчёт, окошки: ORDER, tap, goTo, draw, load
 - `site/assets/artpill-claude.js` (20K) — «Art-Pill by Polly»: скетчбук Claude — страницы с первой по последнюю (docs/artpill.md): PP_ARTPILL_CLAUDE

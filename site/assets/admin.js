@@ -24,6 +24,7 @@
   const ADMIN_GROUPS = { pub: '✍️ Публиковать', birds: '🐦 Птицы', shop: '🛍 Магазин и игры', stats: '📊 Статистика', service: '⚙️ Сервис' };
   const rulesBox = re => m => [...m.querySelectorAll('.adm-rules h3')].find(h => re.test(h.textContent));
   const ADMIN_SECTIONS = [
+    { id: 'week', ic: '🗓', name: 'Неделя' }, // первый экран (редизайн 2.0, часть 4): 5 цифр, 5 кнопок, остальное — «⚙ Ещё инструменты»
     { id: 'inbox', ic: '📥', name: 'Входящие', about: 'Только то, что ждёт вас. Пусто — значит, всё спокойно.', count: 'total' },
     { id: 'blog', ic: '✍️', name: 'Блог', group: 'pub', href: '/blog-editor/', count: 'scheduled' },
     { id: 'requests', ic: '🖍', name: 'Нарисуй мне', group: 'pub', href: '/ru/requests/', count: 'requests' },
@@ -57,7 +58,7 @@
     { id: 'edits', ic: '🧩', name: 'Правки страниц', group: 'service', about: 'Блоки, которые вы поменяли или скрыли прямо на сайте («✏️ Править страницу»), — здесь их можно вернуть как было.', count: 'edits' },
     { id: 'gemini', hide: 1, ic: '🔑', name: 'Ключ Gemini', href: '/blog-editor/#gemini' },
   ];
-  const SECTIONS = { notes, titos, inbox, security, overview: () => overview(), visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art,
+  const SECTIONS = { week, notes, titos, inbox, security, overview: () => overview(), visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art,
     themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
     asks: () => window.PPAboutAdmin ? window.PPAboutAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился about-admin.js</p>'), // 📮 Вопросы из чата (about-admin.js)
     school: () => window.PPSchoolAdmin ? window.PPSchoolAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился school-admin.js</p>'), // 🎓 Школа Полли (school-admin.js)
@@ -71,19 +72,20 @@
   // меню слева — только группы (6 строк); разделы группы — вкладками над экраном
   const inGroup = g => ADMIN_SECTIONS.filter(x => !x.hide && x.group === g);
   const cnt = keys => keys.length ? `<span class="adm-count" data-count="${keys.join(',')}" hidden></span>` : '';
-  if (nav) nav.innerHTML = `<a href="#inbox" data-grp="">📥 Входящие${cnt(['total'])}</a>` + Object.entries(ADMIN_GROUPS).map(([g, name]) =>
+  if (nav) nav.innerHTML = `<a href="#week" data-grp="week">🗓 Неделя</a><a href="#inbox" data-grp="">📥 Входящие${cnt(['total'])}</a>` + Object.entries(ADMIN_GROUPS).map(([g, name]) =>
     `<a href="#${inGroup(g).find(x => !x.href).id}" data-grp="${g}">${name}${cnt(inGroup(g).filter(x => x.count && x.count !== 'total').map(x => x.count))}</a>`).join('');
   const tabLink = (x, cur) => `<a href="${x.href || '#' + x.id}"${x.href ? ' class="adm-ext" title="Откроется на своей странице"' : ''}${x.id === cur ? ' aria-current="page"' : ''}>${x.ic} ${x.name}${x.count ? `<span class="adm-count" data-count="${x.count}"${x.count === 'comments' ? ' id="adm-pend"' : ''} hidden></span>` : ''}</a>`;
   // экран: строка «что здесь делается» сверху, потом сам раздел; focus — прокрутить к нужному месту
   async function route() {
-    const id = (location.hash || '#inbox').slice(1), x = secOf(id) || (SECTIONS[id] ? { id } : secOf('inbox'));
+    const id = (location.hash || '#week').slice(1), x = secOf(id) || (SECTIONS[id] ? { id } : secOf('week'));
     const cur = x.hide ? x.open || x.id : x.id, g = (secOf(cur) || x).group || '';
-    document.querySelectorAll('.adm-nav [data-grp]').forEach(a => a.setAttribute('aria-current', a.dataset.grp === g ? 'page' : 'false'));
+    const adm = document.getElementById('adm'); if (adm) adm.classList.toggle('adm-wk', x.id === 'week'); // «Неделя» — на всю ширину, без меню слева
+    document.querySelectorAll('.adm-nav [data-grp]').forEach(a => a.setAttribute('aria-current', a.dataset.grp === (x.id === 'week' ? 'week' : g) ? 'page' : 'false'));
     const about = document.getElementById('adm-about');
-    if (about) about.innerHTML = (g ? `<nav class="adm-tabs" aria-label="${esc(ADMIN_GROUPS[g])}">${inGroup(g).map(t => tabLink(t, cur)).join('')}</nav>` : x.name ? `<h2>${x.ic} ${x.name}</h2>` : '') + (x.about ? `<p>${x.about}</p>` : '');
+    if (about) about.innerHTML = x.id === 'week' ? '' : (g ? `<nav class="adm-tabs" aria-label="${esc(ADMIN_GROUPS[g])}">${inGroup(g).map(t => tabLink(t, cur)).join('')}</nav>` : x.name ? `<h2>${x.ic} ${x.name}</h2>` : '') + (x.about ? `<p>${x.about}</p>` : '');
     if (inboxData) badges(inboxData);
     if (x.id === 'subscribers') api('admin/inbox/seen', { k: 'subs' }).then(() => counts()).catch(() => {}); // открыла — новые уже не новые
-    await (SECTIONS[x.open || x.id] || inbox)();
+    await (SECTIONS[x.open || x.id] || week)();
     const f = typeof x.focus === 'function' ? x.focus(main) : x.focus ? main.querySelector(x.focus) : null;
     if (f) {
       for (let d = f.closest('details'); d; d = d.parentElement && d.parentElement.closest('details')) d.open = true;
@@ -141,6 +143,61 @@
         <span class="adm-in-t"><b>${it.t}</b><small>${it.raw ? it.d : esc(it.d)}</small></span><a class="pill-btn" href="${it.href}"${it.cf ? ` data-cf-go="${it.cf}"` : ''}>${it.go}</a></li>`).join('')}</ul>`
         : '<p class="adm-calm">Всё спокойно ✓<small>Ничего не ждёт: комментарии проверены, заявок и новых подписчиков нет, автопилот работает.</small></p>'}`;
     main.querySelectorAll('[data-cf-go]').forEach(a => a.addEventListener('click', () => { cFilter = a.dataset.cfGo; }));
+  }
+
+  // ---------- 🗓 неделя (редизайн 2.0, часть 4): 5 цифр за 7 дней, 5 главных кнопок, остальное свёрнуто ----------
+  const isoWeek = () => { const [y, m, d] = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }).split('-').map(Number), t = new Date(Date.UTC(y, m - 1, d));
+    t.setUTCDate(t.getUTCDate() + 4 - (t.getUTCDay() || 7)); return Math.ceil(((t - Date.UTC(t.getUTCFullYear(), 0, 1)) / 86400000 + 1) / 7); };
+  const hello = () => { const h = +new Date().toLocaleString('en-GB', { hour: 'numeric', hourCycle: 'h23', timeZone: 'Europe/Riga' });
+    return h >= 5 && h < 12 ? 'Доброе утро' : h >= 12 && h < 18 ? 'Добрый день' : h >= 18 && h < 23 ? 'Добрый вечер' : 'Доброй ночи'; };
+  const wkDay = ts => ts ? new Date(ts * 1000).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', timeZone: 'Europe/Riga' }) : '';
+  // сравнение с прошлыми 7 днями: посетители — в %, остальное — штуками
+  const wkDelta = (a, b, pct) => {
+    if (!a && !b) return '<i class="wk-eq">как на прошлой неделе</i>';
+    if (pct && b) { const v = Math.round((a - b) / b * 100); return v ? `<i class="${v > 0 ? 'wk-up' : 'wk-dn'}">${v > 0 ? '▲ +' : '▼ −'}${Math.abs(v)}%</i>` : '<i class="wk-eq">= как на прошлой</i>'; }
+    const v = a - b; return v ? `<i class="${v > 0 ? 'wk-up' : 'wk-dn'}">${v > 0 ? '▲ +' : '▼ −'}${n(Math.abs(v))} к прошлой</i>` : '<i class="wk-eq">= как на прошлой</i>';
+  };
+  async function week() {
+    main.innerHTML = '<p class="be-note">Загрузка…</p>';
+    let d, ib; try { [d, ib] = await Promise.all([api('admin/week'), counts().catch(() => null)]); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    const items = ib ? inboxItems(ib) : [], go = (d.shop.now || 0) + (d.amazon.now || 0), goPrev = (d.shop.prev || 0) + (d.amazon.prev || 0);
+    const since = d.amazonFirst && d.amazonFirst > Date.now() / 1000 - 14 * 86400 ? ` · Amazon считается с ${wkDay(d.amazonFirst)}` : !d.amazonFirst ? ' · Amazon считается с этой недели' : '';
+    const nums = [
+      [d.people.now, plural(d.people.now, 'посетитель', 'посетителя', 'посетителей') + ' за 7 дней', wkDelta(d.people.now, d.people.prev, 1), 'wk-n-vis'],
+      [go, plural(go, 'переход', 'перехода', 'переходов') + ' в магазин и на Amazon', wkDelta(go, goPrev) + `<small>магазин ${n(d.shop.now)} · Amazon ${n(d.amazon.now)}${since}</small>`],
+      [d.buys.now, plural(d.buys.now, 'покупка', 'покупки', 'покупок') + ' в магазине птичек', wkDelta(d.buys.now, d.buys.prev)],
+      [d.subs.total, 'в списке ожидания книги', d.subs.now ? `<i class="wk-up">▲ +${n(d.subs.now)} за неделю</i>` : '<i class="wk-eq">новых нет</i>'],
+      [d.birds.now, plural(d.birds.now, 'новая птичка', 'новые птички', 'новых птичек'), wkDelta(d.birds.now, d.birds.prev)],
+    ];
+    const sal = d.salary, rs = d.restock;
+    const inboxTxt = items.length ? items.slice(0, 3).map(it => `${it.ic} ${n(it.n)} — ${it.t}`).join('<br>') + (items.length > 3 ? `<br>и ещё ${items.length - 3}` : '') : 'Всё спокойно ✓ Ничего не ждёт ответа.';
+    const acts = [
+      { ic: '📥', t: 'Входящие', badge: items.length, d: inboxTxt, btn: `<a class="pill-btn${items.length ? ' pill-fill' : ''}" href="#inbox">Открыть</a>`, hot: items.length },
+      { ic: '✍️', t: 'Написать статью', d: 'Редактор с переводчиком на три языка. Темы подскажет «💡 Темы для блога».', btn: '<a class="pill-btn pill-fill" href="/blog-editor/#new">＋ Новая статья</a><a class="pill-btn" href="#ideas">💡 Темы</a>' },
+      { ic: '🛍', t: 'Магазин', d: rs && rs.at ? `Последнее пополнение — ${wkDay(rs.at)}${rs.items ? `, ${n(rs.items)} ${plural(rs.items, 'вещь', 'вещи', 'вещей')}` : ''}.` : 'Закончившиеся вещи пополняются одной кнопкой.', btn: '<button class="pill-btn pill-fill" type="button" id="wk-restock">🔄 Пополнить</button><a class="pill-btn" href="#shop">Открыть</a>' },
+      { ic: '🔘', t: 'Зарплата птичкам', d: sal ? `Последняя — ${wkDay(sal.at)}: по ${n(sal.amount)} 🔘, ${n(sal.birds)} ${plural(sal.birds, 'птичке', 'птичкам', 'птичкам')}.` : 'Ещё не выдавалась.', btn: `<label class="wk-sal"><input type="number" min="1" max="10000" value="${sal ? sal.amount : 10}" id="wk-sal-n" aria-label="Сколько пуговок каждой"> 🔘</label><button class="pill-btn pill-fill" type="button" id="wk-salary">Выдать всем</button>` },
+      { ic: '🎨', t: 'Челлендж сезона', d: 'Темы челленджа на месяц вперёд: три языка, цвета, банк ваших тем.', btn: '<a class="pill-btn pill-fill" href="#themes">Темы</a>' },
+    ];
+    const more = Object.entries(ADMIN_GROUPS).map(([g, name]) => `<div><b>${name}</b>${inGroup(g).map(x => `<a href="${x.href || '#' + x.id}"${x.href ? ' class="adm-ext"' : ''}>${x.ic} ${x.name}${x.href ? ' ↗' : ''}</a>`).join('')}</div>`).join('');
+    main.innerHTML = `<div class="adm-week">
+      <header class="wk-hi"><h2>${hello()}, Алина</h2><p>Неделя ${isoWeek()} · всё, что нужно на неделе, — на одном экране</p></header>
+      <div class="wk-nums">${nums.map(([v, t, dl, c]) => `<div class="wk-num${c ? ' ' + c : ''}"><b>${n(v)}</b><span>${t}</span>${dl}</div>`).join('')}</div>
+      <div class="wk-acts">${acts.map(a => `<section class="wk-act${a.hot ? ' wk-hot' : ''}"><span class="wk-e" aria-hidden="true">${a.ic}</span><h3>${a.t}${a.badge ? `<span class="wk-badge">${a.badge}</span>` : ''}</h3><p>${a.d}</p><div class="wk-btns">${a.btn}</div></section>`).join('')}</div>
+      <details class="wk-more"><summary>⚙ Ещё инструменты</summary><div class="wk-cols">${more}</div></details>
+      <p class="be-note wk-foot">Цифры — за последние 7 дней (${esc(d.from.slice(8))}.${esc(d.from.slice(5, 7))}–${esc(d.to.slice(8))}.${esc(d.to.slice(5, 7))}), сравнение — с 7 днями до них. Подробно — 📊 Статистика → <a href="#visitors">Посетители</a>.</p>
+    </div>`;
+    main.querySelector('#wk-restock').onclick = async e => {
+      if (!confirm('Пополнить магазин: все закончившиеся вещи (кроме легендарных) — снова в продажу?')) return;
+      e.target.disabled = true;
+      try { const r = await api('admin/shop/autorestock', {}); alert(`🔄 Готово: пополнено ${r.items || 0} закончившихся вещей, по ${r.to} шт.`); week(); } catch (x) { e.target.disabled = false; alert(err(x)); }
+    };
+    main.querySelector('#wk-salary').onclick = async e => {
+      const v = Math.floor(+main.querySelector('#wk-sal-n').value);
+      if (!(v >= 1 && v <= 10000)) return alert('Нужно число от 1 до 10000.');
+      if (!confirm(`Выдать всем птичкам по ${v} 🔘?\nПуговки зачислятся сразу, а при заходе птичка откроет конвертик.`)) return;
+      e.target.disabled = true;
+      try { const r = await api('admin/salary', { amount: v }); alert(`💌 Зарплата выдана: ${r.count} птичкам по ${r.amount} 🔘`); week(); } catch (x) { e.target.disabled = false; alert(err(x)); }
+    };
   }
 
   // ---------- 🔐 защита (12.10.2026): PIN админа и код восстановления ----------

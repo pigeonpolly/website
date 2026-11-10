@@ -200,6 +200,20 @@
     const body = JSON.stringify({ p: location.pathname, r: document.referrer, u, w: screen.width, t: navigator.maxTouchPoints > 1 });
     if (!(navigator.sendBeacon && navigator.sendBeacon('/api/hit', new Blob([body], { type: 'application/json' })))) fetch('/api/hit', { method: 'POST', body, keepalive: true, headers: { 'content-type': 'application/json' } }).catch(() => {});
   } catch (e) { /* статистика не должна ломать сайт */ }
+
+  // нажатие на ссылку книги на Amazon — для «🗓 Недели» в кабинете (worker/week.js); один обработчик на страницу
+  try {
+    if (!window.PPOut && !navigator.webdriver && !/^(localhost|127\.)/.test(location.hostname)) {
+      window.PPOut = 1;
+      document.addEventListener('click', e => {
+        const a = e.target.closest && e.target.closest('a[href]'); if (!a) return;
+        let h = ''; try { h = new URL(a.href, location.href).hostname.replace(/^www\./, ''); } catch (x) { return; }
+        if (!/(^|\.)amazon\.[a-z.]+$|^a\.co$/.test(h)) return;
+        const body = JSON.stringify({ o: 'amazon', p: location.pathname, h: a.href });
+        if (!(navigator.sendBeacon && navigator.sendBeacon('/api/hit', new Blob([body], { type: 'application/json' })))) fetch('/api/hit', { method: 'POST', body, keepalive: true, headers: { 'content-type': 'application/json' } }).catch(() => {});
+      }, true);
+    }
+  } catch (e) { /* статистика не должна ломать сайт */ }
 })();
 
 // шапка всегда влезает в экран (12.10.2026): ширина телефонов, размер шрифта в браузере, кнопка аккаунта — у всех разные,

@@ -24,6 +24,7 @@ import { artpillApi, artpillDrop, artpillExport, ARTPILL_TABLES } from './artpil
 import { schoolApi, schoolNews, schoolCron, SCHOOL_TABLES, SCHOOL_ALTER, SCHOOL_RULES, SCHOOL_RANGE, SCHOOL_INT } from './school.js'; // «Школа Полли»: сдача работ и проверка (docs/challenge.md)
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
 import { gardenApi, gardenDrop, gardenNews, GARDEN_TABLES, GARDEN_ALTER, GARDEN_RULES, GARDEN_RANGE, GARDEN_INT, GARDEN_BOOL, GARDEN_SEASONS } from './garden.js'; // огород птички (этап 22, docs/bird.md «Огород»)
+import { weekApi, outClick, WEEK_TABLES } from './week.js'; // кабинет → «🗓 Неделя» и переходы на Amazon (docs/admin.md)
 import { ideasApi } from './ideas.js'; // кабинет → «💡 Темы для блога» (docs/admin.md)
 import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
@@ -510,6 +511,7 @@ async function ensureSchema(env) {
     ...GARDEN_TABLES.map(sql => env.DB.prepare(sql)), // огород: garden (worker/garden.js)
     ...MY_GAMES_TABLES.map(sql => env.DB.prepare(sql)), // «★ Мои игры»: my_games (worker/my-games.js)
     ...ABOUT_CHAT_TABLES.map(sql => env.DB.prepare(sql)), // чат на /about-me/: about_chat (worker/about-chat.js)
+    ...WEEK_TABLES.map(sql => env.DB.prepare(sql)), // переходы на Amazon: out_clicks (worker/week.js)
     ...SHIFT_TABLES.map(sql => env.DB.prepare(sql)), // «Смена с Полли»: shift_runs (worker/shift.js)
     ...SCHOOL_TABLES.map(sql => env.DB.prepare(sql)), // «Школа Полли»: school_works (worker/school.js)
     ...STUDY_TABLES.map(sql => env.DB.prepare(sql)), // учебник: study_progress (worker/study.js)
@@ -984,6 +986,7 @@ async function hit(req, env) {
   if (!salt) { salt = randomHex(16); await setMeta(env, 'visit_salt', salt); }
   const day = rigaDay();
   const vid = (await sha256(salt + day + (req.headers.get('cf-connecting-ip') || '') + ua)).slice(0, 16);
+  if (b.o) { await outClick(env, b, day, now(), vid); return ok; } // нажатие на ссылку наружу (Amazon) — не просмотр страницы
   const lang = /^\/ru(\/|$)/.test(path) ? 'RU' : /^\/lv(\/|$)/.test(path) ? 'LV' : 'EN';
   await env.DB.prepare('INSERT INTO visits (day, ts, vid, entry, path, lang, src, ref, campaign, device, os, browser, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
     .bind(day, now(), vid, entry, path, lang, src, ref && ref !== 'self' ? ref.slice(0, 80) : null, campaign, info.device, info.os, info.browser, (req.cf && req.cf.country) || null).run();
@@ -1507,6 +1510,7 @@ async function route(req, env, url) {
   if (p === '/api/school' || p.startsWith('/api/school/') || p === '/api/admin/school' || p === '/api/admin/school/check') { const r = await schoolApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is a short friendly comment from an art teacher (Polly, a pigeon) on a student\'s drawing made on paper. Keep it warm, simple and encouraging.') }); if (r) return r; }
   if (p === '/api/games/mine' || p === '/api/games/visit') { const r = await myGamesApi(req, env, url, { json, fail, currentUser, needUser }); if (r) return r; }
   if (p === '/api/about-chat' || p.startsWith('/api/about-chat/') || p === '/api/admin/about-asks') { const r = await aboutChatApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), asset: path => env.ASSETS.fetch(new Request(new URL(path, url.origin))).then(r => r.ok ? r.json() : null), ipKey: async r => { let salt = await getMeta(env, 'blog_salt'); if (!salt) { salt = randomHex(16); await setMeta(env, 'blog_salt', salt); } return (await sha256(salt + (r.headers.get('cf-connecting-ip') || '0'))).slice(0, 24); }, translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The strings are a question a visitor asked in a cosy retro chat on an artist\'s website, or the answer of the artist Alina or of her character Polly, a dramatic, funny pigeon from the island of Wobbleland. Keep the casual, playful tone; keep names (Alina, Polly, Milka, Wobbleland) as they are.') }); if (r) return r; }
+  if (p === '/api/admin/week') { const r = await weekApi(req, env, url, { json, fail, needUser, isAdmin, getMeta, now }); if (r) return r; }
   if (p === '/api/shift' || p.startsWith('/api/shift/')) { const r = await shiftApi(req, env, url, { json, fail, currentUser, needUser, rules: () => RULES, randomHex, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p.startsWith('/api/titos') || p.startsWith('/api/admin/titos')) { const r = await titosApi(req, env, url, titosHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/cards') || p.startsWith('/api/admin/cards')) { const r = await cardsApi(req, env, url, cardHelpers(env)); if (r) return r; }

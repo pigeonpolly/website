@@ -118,3 +118,4 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `wl_gift:` — worker/wl-holidays.js
 - `wl_mail_n:` — worker/mail.js, worker/wl-holidays.js
 - `works_total` — worker/blog.js, worker/index.js
+- `out_clicks(id, day, ts, vid, target, path, href)` — нажатия на ссылки наружу (пока target = amazon), vid — суточный отпечаток как в visits; worker/week.js, кабинет «🗓 Неделя».
