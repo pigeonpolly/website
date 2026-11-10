@@ -8,7 +8,7 @@
     summer: { tag: ['summer edition', 'летний выпуск', 'vasaras izdevums'], note: ['Polly, summer lover ☀', 'Полли обожает лето ☀', 'Pollija mīl vasaru ☀'] },
     autumn: { tag: ['autumn edition', 'осенний выпуск', 'rudens izdevums'], note: ['Polly on the train ✿', 'Полли в поезде ✿', 'Pollija vilcienā ✿'] },
   };
-  const COL = { winter: '#9E1B22', spring: '#BE2F3A', summer: '#D2452B', autumn: '#C04A1C' };
+  const COL = { winter: '#9E1B22', spring: '#BE2F3A', summer: '#1F7FAE', autumn: '#1F4149' };
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   function season(s, save) {
@@ -16,14 +16,23 @@
     html.setAttribute('data-season', s);
     if (save) try { localStorage.setItem('pp_season', s); } catch (e) {}
     document.querySelectorAll('.switch button').forEach(b => b.setAttribute('aria-pressed', b.dataset.s === s ? 'true' : 'false'));
+    document.querySelectorAll('.sea-b i').forEach(i => { i.style.background = COL[s]; });
     document.querySelectorAll('[data-sv]').forEach(el => { el.textContent = T[s][el.dataset.sv][L]; });
     const img = document.getElementById('v2-hero');
     if (img) { img.srcset = `/images/v2/hero-${s}-900.jpg 900w, /images/v2/hero-${s}.jpg 1800w`; img.src = `/images/v2/hero-${s}.jpg`; }
   }
   document.querySelectorAll('.switch button').forEach(b => {
-    b.style.background = COL[b.dataset.s];
-    b.addEventListener('click', () => season(b.dataset.s, true));
+    (b.querySelector('i') || b).style.background = COL[b.dataset.s];
+    b.addEventListener('click', () => { season(b.dataset.s, true); seaMenu(false); });
   });
+  // выбор сезона в шапке: один кружок текущего сезона, по нажатию — список из 4
+  const seaB = document.querySelector('.sea-b'), seaM = document.getElementById('sea-m');
+  function seaMenu(open) { if (!seaB || !seaM) return; seaM.hidden = !open; seaB.setAttribute('aria-expanded', String(open)); }
+  if (seaB && seaM) {
+    seaB.addEventListener('click', e => { e.stopPropagation(); seaMenu(seaM.hidden); });
+    document.addEventListener('click', e => { if (!seaM.hidden && !e.target.closest('.sea2')) seaMenu(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !seaM.hidden) { seaMenu(false); seaB.focus(); } });
+  }
   season(html.getAttribute('data-season'));
 
   // меню на телефоне

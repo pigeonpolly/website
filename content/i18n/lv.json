@@ -699,5 +699,10 @@
   "<h2>Find me <em>online</em></h2>": "<h2>Kur mani <em>atrast</em></h2>",
   "/preview/about/\">About<": "/preview/about/\">Par mani<",
   "<div><h4>Alina</h4><a href=\"/preview/about/\">About</a>": "<div><h4>Alīna</h4><a href=\"/preview/about/\">Par mani</a>",
-  ">All video lessons →<": ">Visas video nodarbības →<"
+  ">All video lessons →<": ">Visas video nodarbības →<",
+  "<i></i>Winter</button>": "<i></i>Ziema</button>",
+  "<i></i>Spring</button>": "<i></i>Pavasaris</button>",
+  "<i></i>Summer</button>": "<i></i>Vasara</button>",
+  "<i></i>Autumn</button>": "<i></i>Rudens</button>",
+  "title=\"Season\" aria-label=\"Season\"": "title=\"Sezona\" aria-label=\"Sezona\""
 }
