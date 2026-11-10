@@ -417,3 +417,4 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 }
 .col3 .pa figcaption{left:auto;right:16px}
 .v2 .bl-lock{background:var(--sheet);color:var(--acc)}.v2 .bp-lock{background:var(--sheet);border-color:var(--acc);border-radius:4px}.v2 .bp-lock:before{background:linear-gradient(to bottom,transparent,var(--bg))}
+.v2 .bl-access a,.v2 .bl-access b{border-color:var(--line);border-radius:4px}.v2 .bl-access b{background:var(--sheet);border-color:var(--acc);color:var(--acc)}
