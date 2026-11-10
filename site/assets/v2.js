@@ -48,11 +48,11 @@
     if (window.PPBirds) draw(); else addEventListener('load', draw);
   }).catch(() => {});
 
-  // журнал: 3 последние статьи блога
+  // журнал: 4 последние статьи блога
   const box = document.getElementById('v2-blog');
   if (box) fetch('/api/blog/home?lang=' + lang).then(r => r.ok ? r.json() : null).then(d => {
     const list = (d && (d.recent || [d.latest].concat(d.featured || []))) || [];
-    const posts = list.filter(Boolean).slice(0, 3);
+    const posts = list.filter(Boolean).slice(0, 4); // крупно одна + справа три
     if (!posts.length) { box.closest('section').hidden = true; return; }
     const meta = p => `<span class="meta">${p.tags && p.tags[0] ? `<i>${esc(p.tags[0])}</i> · ` : ''}${esc(p.date)}</span>`;
     const pic = (p, cls) => p.cover ? `<img src="${esc(p.cover)}" alt="" loading="lazy"${cls ? ` class="${cls}"` : ''}>` : '';
