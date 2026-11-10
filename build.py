@@ -84,16 +84,26 @@ PAGES = [
      "Watercolour and ink lessons by Alina Otkinska: free videos open to everyone and monthly paint-alongs in the Studio Club on Patreon."),
     ("preview/guides", "Guides & books", "preview-guides.html",
      "Creative guides and books by illustrator Alina Otkinska: ink and watercolour sketching, a free colouring book, palettes and little drawing guides."),
+    ("preview/about", "About Alina", "preview-about.html",
+     "Alina Otkinska: learning experience designer and illustrator from Riga, the human behind Pigeon Polly."),
+    ("preview/lab", "The Lab", "games.html",
+     "Games, buttons and the shop for your bird in the Pigeon Polly Lab."),
+    ("preview/wobbleland", "Wobbleland", "wobbleland.html",
+     "Wobbleland: an island of eleven towns. Explore the interactive map and meet every town with Polly as your guide."),
     ("wobbleland", "Wobbleland", "wobbleland.html",
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
 # готовые, но пока не открытые страницы: не попадают в sitemap
-UNLISTED = {"blog-editor", "admin", "garden", "preview", "preview/learn", "preview/guides"}
+UNLISTED = {"blog-editor", "admin", "garden", "preview", "preview/learn", "preview/guides", "preview/about", "preview/lab", "preview/wobbleland"}
 # редизайн 2.0: страницы на новом шаблоне src/layout-v2.html (шапка, подвал, сезоны — site/assets/v2.css, v2.js); NOINDEX — не для поисковиков
-V2 = {"preview", "preview/learn", "preview/guides"}
-NOINDEX = {"preview", "preview/learn", "preview/guides"}
+V2 = {"preview", "preview/learn", "preview/guides", "preview/about"}
+# часть 3: новая шапка и подвал, внутри — старая страница как есть (src/layout-v2-lab.html: style.css + старые скрипты + v2-shell.css);
+# значение — путь старой страницы: её правки из «Править страницу» (data-ppb) действуют и здесь
+V2_LAB = {"preview/lab": "games", "preview/wobbleland": "wobbleland"}
+NOINDEX = {"preview", "preview/learn", "preview/guides", "preview/about", "preview/lab", "preview/wobbleland"}
 V2_HOME = "/preview/"  # куда ведёт логотип новой шапки; станет "/" при замене главной (часть 5)
 V2_LEARN, V2_GUIDES = "/preview/learn/", "/preview/guides/"  # пункты Lessons и Guides новой шапки (часть 5: свои адреса)
+V2_ABOUT, V2_LAB_URL, V2_WOBBLE = "/preview/about/", "/preview/lab/", "/preview/wobbleland/"  # About, The Lab, Wobbleland (часть 5: /about-me/, /games/, /wobbleland/)
 
 
 def v2_page(layout_v2, title, desc, canonical, robots, content):
@@ -101,6 +111,7 @@ def v2_page(layout_v2, title, desc, canonical, robots, content):
     return (layout_v2.replace("{{title}}", esc(title)).replace("{{description}}", esc(desc))
             .replace("{{canonical}}", canonical).replace("{{home}}", V2_HOME)
             .replace("{{learn}}", V2_LEARN).replace("{{guides}}", V2_GUIDES)
+            .replace("{{about}}", V2_ABOUT).replace("{{lab}}", V2_LAB_URL).replace("{{wobble}}", V2_WOBBLE)
             .replace("{{robots}}", '<meta name="robots" content="noindex">\n' if robots else "")
             .replace("{{content}}", content))
 
@@ -646,6 +657,7 @@ def build():
     titos_cases()
     layout = (SRC / "layout.html").read_text()
     layout_v2 = (SRC / "layout-v2.html").read_text()
+    layout_v2_lab = (SRC / "layout-v2-lab.html").read_text()
     search_index = {lang: [] for lang in LANGS}
     for path, title, file, desc in PAGES:
         body = (SRC / "pages" / file).read_text()
@@ -673,8 +685,10 @@ def build():
             alt = SRC / "pages" / f"{pathlib.Path(file).stem}.{lang}.html"
             if lang != "en" and alt.exists():
                 page_body = alt.read_text()
-            page_body = mark_editable(page_body, (path or "home").replace("/", "-"))
-            if path in V2:
+            page_body = mark_editable(page_body, (V2_LAB.get(path) or path or "home").replace("/", "-"))
+            if path in V2_LAB:
+                page = v2_page(layout_v2_lab, full_title, desc, canonical, True, page_body)
+            elif path in V2:
                 page = v2_page(layout_v2, full_title, desc, canonical, path in NOINDEX, page_body)
             else:
                 page_body = section_tabs(path) + page_body

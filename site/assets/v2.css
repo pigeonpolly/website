@@ -370,3 +370,42 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 .v2 .scroll-nav{position:fixed;right:18px;bottom:22px;z-index:40;display:grid;gap:8px}
 .v2 .scroll-nav button{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--ink);background:var(--sheet);color:var(--ink);font:700 18px/1 Karla,sans-serif;cursor:pointer;box-shadow:0 6px 16px rgba(0,0,0,.15);opacity:0;pointer-events:none;transform:translateY(6px);transition:opacity .2s,transform .2s}
 .v2 .scroll-nav button.on{opacity:1;pointer-events:auto;transform:none}.v2 .scroll-nav button:hover{background:var(--acc);border-color:var(--acc);color:#fff}
+
+/* ===== Часть 3: «Обо мне» (/preview/about/), Воббленд и Лаборатория в новой шапке (src/layout-v2-lab.html, v2-shell.css) ===== */
+.abh{padding:80px 0 100px;border-bottom:1px solid var(--line)}
+.abh .w{display:grid;grid-template-columns:1.05fr .95fr;gap:70px;align-items:center}
+.abh h1{font-size:78px;margin:16px 0 24px}.abh p{font-size:18px;color:var(--mut);max-width:30em;margin-bottom:14px}
+.col3{position:relative;height:560px}
+.col3 figure{position:absolute;background:#fff;padding:12px 12px 46px;box-shadow:0 20px 40px rgba(31,35,38,.16)}
+.col3 img{width:100%;height:auto;object-fit:cover}
+.col3 figcaption{position:absolute;left:16px;bottom:9px;font:700 23px Caveat,cursive;color:var(--ink)}
+.col3 .pa{width:56%;right:4%;top:0;transform:rotate(2.5deg)}.col3 .pa img{aspect-ratio:4/5}
+.col3 .pb{width:58%;left:3%;bottom:0;transform:rotate(-3.5deg);z-index:2}.col3 .pb img{aspect-ratio:900/617}
+.tape{position:absolute;left:50%;top:-14px;width:110px;height:28px;transform:translateX(-50%) rotate(-4deg);background:color-mix(in srgb,var(--acc2) 45%,#fff 40%);opacity:.8;box-shadow:0 2px 4px rgba(0,0,0,.08)}
+.abf{padding:100px 0}
+.fg{display:grid;grid-template-columns:repeat(4,1fr);gap:26px;padding-top:22px}
+.fo{position:relative;display:flex;flex-direction:column;background:var(--sheet);border:1px solid var(--line);border-radius:0 10px 10px 10px;padding:16px 16px 22px;transition:transform .2s,border-color .2s}
+.fo .tb2{position:absolute;left:-1px;top:-24px;width:96px;height:24px;background:var(--sheet);border:1px solid var(--line);border-bottom:0;border-radius:10px 10px 0 0;font:700 11px Karla,'Nunito Sans',sans-serif;letter-spacing:.2em;color:var(--acc);padding:5px 14px}
+.fo:nth-child(2) .tb2{left:30%}.fo:nth-child(3) .tb2{left:auto;right:-1px}.fo:nth-child(4) .tb2{left:18%}
+.fo img{width:100%;aspect-ratio:4/3;object-fit:cover;margin-bottom:16px;filter:saturate(.9)}
+.fo b{font:400 23px/1.15 Fraunces,Lora,serif;margin-bottom:6px}.fo span:last-child{color:var(--mut);font-size:15px}
+.fo:hover{transform:translateY(-5px);border-color:var(--acc)}
+.abd{background:var(--gr);color:var(--grtx);padding:100px 0}
+.abd .w{display:grid;grid-template-columns:1.2fr .8fr;gap:70px;align-items:center}
+.abd h2{font-size:58px;margin:14px 0 18px;color:#F2ECE3}.abd em,.abd .k{color:var(--acc2)}.abd p{color:var(--grmut);font-size:17px;margin-bottom:26px;max-width:26em}
+.abd .btn{border-color:#F2ECE3;color:#F2ECE3}
+.dk{position:relative;transform:rotate(-1.2deg)}.dk img{width:100%;border-radius:4px;box-shadow:0 24px 50px rgba(0,0,0,.4)}
+.dk .hand{position:absolute;right:-6px;bottom:-34px;color:var(--acc2);transform:rotate(-3deg)}
+.abo{padding:90px 0 40px;text-align:center}.abo h2{font-size:52px;margin-bottom:28px}
+.soc3{display:flex;flex-wrap:wrap;justify-content:center;gap:12px}
+.soc3 a{border:1.5px solid var(--ink);border-radius:999px;padding:11px 22px;font:700 14px Karla,'Nunito Sans',sans-serif}.soc3 a:hover{background:var(--ink);color:var(--bg)}
+@media (max-width:1040px){
+ .abh .w,.abd .w{grid-template-columns:1fr;gap:50px}.col3{max-width:560px;width:100%;margin:0 auto}
+ .fg{grid-template-columns:1fr 1fr;gap:46px 24px}
+}
+@media (max-width:700px){
+ .abh{padding:44px 0 70px}.abh h1{font-size:46px}.abh p{font-size:17px}.col3{height:420px}
+ .abf,.abd{padding:70px 0}.abd h2,.abo h2{font-size:40px}.fg{grid-template-columns:1fr;gap:44px}
+ .dk .hand{right:6px;bottom:-30px;font-size:21px}
+}
+.col3 .pa figcaption{left:auto;right:16px}

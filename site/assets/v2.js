@@ -68,7 +68,8 @@
 
   // своя статистика посетителей (как в site.js)
   try {
-    if (!navigator.webdriver && !/^(localhost|127\.)/.test(location.hostname)) {
+    // на страницах со старыми скриптами (src/layout-v2-lab.html) посещение уже считает site.js
+    if (!navigator.webdriver && !/^(localhost|127\.)/.test(location.hostname) && !document.querySelector('script[src*="/assets/site.js"]')) {
       const body = JSON.stringify({ p: location.pathname, r: document.referrer, u: {}, w: screen.width, t: navigator.maxTouchPoints > 1 });
       if (!(navigator.sendBeacon && navigator.sendBeacon('/api/hit', new Blob([body], { type: 'application/json' })))) fetch('/api/hit', { method: 'POST', body, keepalive: true, headers: { 'content-type': 'application/json' } }).catch(() => {});
     }

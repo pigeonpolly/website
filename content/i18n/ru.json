@@ -655,5 +655,18 @@
   "<ul><li>Behind-the-scenes process</li><li>The complete post archive</li><li>Video lessons</li></ul>": "<ul><li>Процесс за кадром</li><li>Весь архив постов</li><li>Видеоуроки</li></ul>",
   "<ul><li>Everything in Little Persimmon</li><li>More support for new lessons and guides</li></ul>": "<ul><li>Всё из Little Persimmon</li><li>Больше поддержки новым урокам и гайдам</li></ul>",
   "<ul><li>Everything above</li><li>A vote on future projects</li><li>Live Q&amp;As</li><li>A thank-you mention</li></ul>": "<ul><li>Всё, что выше</li><li>Голос за будущие проекты</li><li>Живые вопросы-ответы</li><li>Упоминание с благодарностью</li></ul>",
-  "<small> / month</small>": "<small> / мес.</small>"
+  "<small> / month</small>": "<small> / мес.</small>",
+  "<h1>The human behind <em>Pigeon Polly</em></h1>": "<h1>Кто придумал <em>голубя Полли</em></h1>",
+  ">Find me online ↓<": ">Где меня найти ↓<",
+  "<figcaption>— Alina, Riga</figcaption>": "<figcaption>— Алина, Рига</figcaption>",
+  "<span class=\"k\">What I do</span><h2>Three things, <em>one desk</em></h2>": "<span class=\"k\">Чем я занимаюсь</span><h2>Три дела, <em>один стол</em></h2>",
+  "<b>Learning design</b>": "<b>Дизайн обучения</b>",
+  "<b>Sketching &amp; illustration</b>": "<b>Скетчинг и иллюстрация</b>",
+  "<span class=\"k\">The archive</span><h2>Open a <em>folder</em></h2>": "<span class=\"k\">Архив</span><h2>Открой <em>папку</em></h2>",
+  "<span class=\"hand\">Milka keeps an eye on things</span>": "<span class=\"hand\">Милка за всем присматривает</span>",
+  "<span class=\"k\">My desk</span><h2>Come <em>closer</em></h2>": "<span class=\"k\">Мой стол</span><h2>Подойди <em>поближе</em></h2>",
+  "Laptop, paints, brushes, a sketchbook and Milka the cat. Click on things on my desk ✨ and chat with me and Polly on the little laptop.": "Ноутбук, краски, кисти, скетчбук и кошка Милка. Нажимай на вещи на моём столе ✨ и болтай со мной и Полли в маленьком ноутбуке.",
+  "<h2>Find me <em>online</em></h2>": "<h2>Где меня <em>найти</em></h2>",
+  "/preview/about/\">About<": "/preview/about/\">Обо мне<",
+  "<div><h4>Alina</h4><a href=\"/preview/about/\">About</a>": "<div><h4>Алина</h4><a href=\"/preview/about/\">Обо мне</a>"
 }

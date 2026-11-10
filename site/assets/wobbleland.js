@@ -521,7 +521,6 @@
       if (jump) ['#wl-map', '#recipes', '#wl-cal'].forEach((h, i) => { const a = jump.querySelector(`a[href="${h}"]`); if (a && short[i]) a.textContent = short[i]; }); // короткие подписи — все 4 кнопки в один ряд
       moreBtn.addEventListener('click', () => { more.hidden = !more.hidden; moreBtn.setAttribute('aria-expanded', !more.hidden); moreBtn.textContent = more.hidden ? moreBtn.dataset.o : moreBtn.dataset.c; });
     }
-    if (moreBtn && more) moreBtn.addEventListener('click', () => { more.hidden = !more.hidden; moreBtn.setAttribute('aria-expanded', !more.hidden); moreBtn.textContent = more.hidden ? moreBtn.dataset.o : moreBtn.dataset.c; });
     document.querySelectorAll('#wl-spine, [data-open-book]').forEach(el => el.addEventListener('click', e => { e.preventDefault(); openBook(el); }));
     bm.querySelector('.wl-bookmodal-x').addEventListener('click', closeBook);
     bm.addEventListener('click', e => { if (e.target === bm) closeBook(); });
