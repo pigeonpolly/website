@@ -74,6 +74,17 @@
     e.preventDefault(); play(a.dataset.yt);
   });
 
+  // подписи бесплатных уроков — по названию видео на YouTube (/api/v2/yt); известные — на языке страницы
+  const NAMES = [[/pepper|перец|перц/i, ['Pepper sketching', 'Скетч перца', 'Pipara skice']], [/caf[eé]|outdoor|кафе/i, ['Outdoor sketching in a cafe', 'Скетч на выезде: кафе', 'Skices ārpus mājām: kafejnīca']]];
+  document.querySelectorAll('[data-yt]').forEach(a => {
+    const b = a.querySelector('b'); if (!b) return;
+    fetch('/api/v2/yt?id=' + encodeURIComponent(a.dataset.yt)).then(r => r.ok ? r.json() : null).then(d => {
+      const t = d && d.title; if (!t) return;
+      const k = NAMES.find(n => n[0].test(t)), name = k ? k[1][L] : t;
+      b.textContent = name; const im = a.querySelector('img'); if (im) im.alt = name;
+    }).catch(() => {});
+  });
+
   // VIP-видео: только вошедшим (/api/v2/vip), гостю остаётся «Войти бесплатно»
   if (document.querySelector('.vip-go, .vc.vip')) fetch('/api/v2/vip', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => {
     const v = d && d.videos && d.videos[0];

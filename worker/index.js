@@ -2234,6 +2234,14 @@ async function route(req, env, url) {
     const titos = u && !u.banned ? titosState(await env.DB.prepare('SELECT * FROM titos WHERE user_id = ?').bind(u.id).first(), RULES, titosHelpers(env)) : null; // кофейник Титоса (worker/titos.js)
     return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), pin: !(await isAdmin(u, env)) && await adminIdentity(u, env) ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, streak, news, friendBtns: BTN.friend, titos, study: await studyOk(u, env, studyHelpers(env)) ? 1 : 0, english: await englishOk(u, env, studyHelpers(env)) ? 1 : 0, norsk: await norskOk(u, env, studyHelpers(env)) ? 1 : 0, pwTemp: u.pw_temp ? 1 : 0, mailAsk: mailAsk(env, u) ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
   }
+  // название видео YouTube (oEmbed), чтобы подписи уроков на сайте совпадали с видео; кэш на сутки
+  if (m === 'GET' && p === '/api/v2/yt') {
+    const id = url.searchParams.get('id') || '';
+    if (!/^[\w-]{6,20}$/.test(id)) return json({ title: '' }, 400);
+    const r = await fetch(`https://www.youtube.com/oembed?format=json&url=https://youtu.be/${id}`, { cf: { cacheTtl: 86400, cacheEverything: true } }).catch(() => null);
+    const d = r && r.ok ? await r.json().catch(() => null) : null;
+    return json({ title: (d && d.title) || '' }, 200, { 'cache-control': 'public, max-age=86400' });
+  }
   // VIP-видео (редизайн 2.0, 10.11.2026): ссылка YouTube «по ссылке» отдаётся только вошедшим — в HTML её нет
   if (m === 'GET' && p === '/api/v2/vip') {
     const u = await currentUser(req, env);
