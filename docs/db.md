@@ -64,6 +64,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **study_progress** (worker/study.js): `user_id` int PK, `state` text (JSON: ключ галочки → 1), `updated_at` int
 - **english_progress** (worker/english.js): `user_id` int PK, `state` text (JSON: d — блок → лучший %, w — тексты, v — словарь, a — ачивки, days, c — счётчики, last, k — открыто паролем, m — доля ошибок, x — задания с ошибками, pd — дни с пройденным заданием, t — время сохранения, rv — метка сброса), `updated_at` int
 - **english_access** (worker/english.js): `user_id` int PK, `added_at` int (мс) — кому админ открыл учебник английского
+- **norsk_progress**, **norsk_access** (worker/norsk.js): как english_progress / english_access — учебник норвежского
 
 ## Ключи meta (48)
 

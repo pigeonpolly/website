@@ -287,7 +287,7 @@
     [new RegExp(`(?:^|\\s)(er|var)\\s+(?!(?:${NOUN})${NB})(${VPs})${NB}`, 'i'), m => `«${m[1]} ${m[2]}» → просто «${m[2]}»: er не ставится перед другим глаголом`],
     [new RegExp(`(?:^|\\s)(kan|vil|skal|må|bør|kunne|ville|skulle|måtte|liker å|pleier å|prøver å)\\s+(?:ikke\\s+)?(${VPs})${NB}`, 'i'), m => `«${m[1]} ${m[2]}» → «${m[1]} ${VP[m[2].toLowerCase()]}»: после ${m[1]} — глагол в инфинитиве`],
     [/(?:^|\s)(kan|vil|skal|må|bør)\s+å\s/i, m => `«${m[1]} å» → без å: после ${m[1]} инфинитив без å`],
-    [new RegExp(`(?:^|[.!?,]\\s+|\\s(?:og|men|eller)\\s+)(jeg|du|han|hun|vi|dere|de)\\s+(ikke|aldri|alltid|ofte|også|bare)\\s+(${VPs}|er|var|kan|vil|skal|må)${NB}`, 'i'), m => `«${m[1]} ${m[2]} ${m[3]}» → «${m[1]} ${m[3]} ${m[2]}»: в главном предложении ${m[2]} — после глагола (перед глаголом — только в придаточном: «fordi ${m[1]} ${m[2]} ${m[3]}»)`],
+    [new RegExp(`(?:^|[.!?,]\\s+|\\s(?:og|men|eller)\\s+)(jeg|du|han|hun|vi|dere|de)\\s+(ikke|aldri|alltid|ofte|også|bare)\\s+(${VPs}|er|var|kan|vil|skal|må)${NB}`, 'i'), m => `«${m[1]} ${m[2]} ${m[3]}» → «${m[1]} ${m[3]} ${m[2]}»: в главном предложении ${m[2]} — после глагола (перед глаголом — только в придаточном: «fordi ${m[1].toLowerCase()} ${m[2]} ${m[3]}»)`],
     [/(?:^|\s)et\s+(stor|liten|fin|ny|god|gammel|rød|hvit|kald|varm|pen|søt|rar|morsom|dyr)\s/i, m => `«et ${m[1]}» → «et ${{ liten: 'lite', ny: 'nytt', god: 'godt', gammel: 'gammelt', søt: 'søtt', hvit: 'hvitt' }[m[1].toLowerCase()] || m[1] + 't'}»: со словом среднего рода (et) прилагательное с -t`],
     [/(?:^|\s)(jeg|du|han|hun|vi|de)\s+har\s+(\d+)\s+år/i, m => `«${m[1]} har ${m[2]} år» → «${m[1]} er ${m[2]} år»: возраст — через er`],
     [/(?:^|[.!?]\s+)(hva|hvor|når|hvem|hvorfor|hvordan)\s+(jeg|du|han|hun|vi|dere|de)\s+[^?]*\?/i, m => `«${m[1]} ${m[2]} …?» → «${m[1]} [глагол] ${m[2]} …?»: в вопросе глагол сразу после вопросительного слова`],
@@ -613,7 +613,7 @@
   // ---------- тупик Пелле (lundefugl): ведёт уроки, шутит, любит кофе, вафли и плохую погоду ----------
   const CROW_SVG = `<svg viewBox="0 0 64 64" aria-hidden="true"><ellipse cx="30" cy="42" rx="16" ry="16" fill="#23202e"/><ellipse cx="31" cy="46" rx="10" ry="12" fill="#fff"/><circle cx="32" cy="22" r="13" fill="#23202e"/><ellipse cx="30" cy="23" rx="9" ry="8.5" fill="#f1eee8"/><path d="M38 15 Q52 17 54 26 Q50 32 39 30 Z" fill="#f05a28"/><path d="M38 15 Q41 22 39 30 L36 29 Q37 22 35 16 Z" fill="#7f8aa3"/><path d="M44 17 Q46 23 44 30" stroke="#f7b733" stroke-width="2" fill="none"/><path d="M49 20 Q50 25 48 30" stroke="#c9341a" stroke-width="1.6" fill="none"/><circle cx="31" cy="21" r="3" fill="#1d1a26"/><circle cx="32" cy="20" r="1" fill="#fff"/><path d="M28 18 L30 17.5 M33 18.5 L35 19.5" stroke="#c9341a" stroke-width="1.2" stroke-linecap="round"/><path d="M15 36 Q6 46 12 56 Q18 50 21 45 Z" fill="#35303f"/><path d="M24 57 Q22 62 18 62 L28 62 Z M35 57 Q37 62 41 62 L31 62 Z" fill="#f05a28"/></svg>`;
   const nameRu = () => (S.name && (S.name.ru || S.name.en)) || '';
-  const hey = () => nameRu() ? pick([`Hei, ${nameRu()}! `, `${nameRu()}, `, `Så, ${nameRu()}. `, '']) : ''; // обращение по имени — не каждый раз
+  const hey = () => nameRu() ? pick([`${nameRu()}! `, `${nameRu()}, `, `Så, ${nameRu()}. `, '']) : ''; // обращение по имени — не каждый раз
   const crow = (txt, cls = '') => `<div class="crow ${cls}"><div class="crow-av" title="Тупик Пелле">${CROW_SVG}</div><div class="crow-say"><b>Пелле:</b> ${fmt(txt)}</div></div>`;
   const CROW = {
     hi: ['Hei hei! Я Пелле, тупик с Лофотенов, и сегодня я ваш учитель. Кофе есть? Тогда начинаем.', 'Ну вот и вы! Я уже сварил кофе и съел селёдку. Готов учить.', 'God dag! Открываем урок. За окном, скорее всего, дождь — значит, самое время учиться.', 'Садитесь поудобнее. В Норвегии это называется *koselig*, и это почти обязательно.'],
@@ -747,7 +747,7 @@
   function bookHTML(u, bk, N) {
     const k = BOOK.parts.indexOf(bk);
     return `<section class="sec" id="book"><span id="book-${u.id}"></span><h3><span class="ic">⛵</span>Книга: «${esc(BOOK.title)}»</h3>${crow(N.bcrow || crowPick('book'), 'small')}
-      <p class="note-s">Часть ${k + 1} из ${BOOK.parts.length} · ${esc(BOOK.author)} — повесть, написанная для этого учебника: язык растёт вместе с уровнями. ${esc(bk.ch)} · ${bk.n} слов. К концу учебника — вся книга.</p>
+      <p class="note-s">Часть ${k + 1} из ${BOOK.parts.length} · повесть, написанная для этого учебника: язык растёт вместе с уровнями. ${esc(bk.ch)} · ${bk.n} слов. К концу учебника — вся книга.</p>
       ${N.ru ? `<div class="box bk-ru"><h4>${['A1', 'A2'].includes(u.lvl) ? 'Сначала по-русски: что будет в отрывке' : 'Перед чтением'}</h4><p>${fmt(N.ru)}</p></div>` : ''}
       <article class="reading book">${bk.h.map(x => `<h4>${esc(x)}</h4>`).join('')}<div class="txt">${bk.txt.map((p, j) => { const ps = PICS[k] || []; return ps.filter(x => x.at === j && !x.after).map(x => picHTML(x)).join('') + `<p>${glossText(p, N.gl)}</p>` + ps.filter(x => x.at === j && x.after).map(x => picHTML(x)).join(''); }).join('')}</div>
       <p>${sayBtn(bk.txt.join(' ').replace(/<br>/g, ' ').replace(/&amp;/g, '&').slice(0, 3000))} <span class="note-s">послушать отрывок (начало)</span></p>
@@ -845,7 +845,7 @@
       ${items.length ? blockHTML('fx-all', 'Набор по слабым местам', grouped(items)) + `<p><a class="btn" href="#fix" data-retest>Новый набор</a></p>` : '<p>Ошибок пока нет. Пелле доволен и ушёл ловить рыбу.</p>'}`;
   }
   function bookPage() {
-    view.innerHTML = `<div class="uhead"><div class="lv">Книга курса</div><h2>${esc(BOOK.title)}</h2><p class="sub">${esc(BOOK.author)} · ${BOOK.parts.length} частей — по одной в каждом уроке</p></div>
+    view.innerHTML = `<div class="uhead"><div class="lv">Книга курса</div><h2>${esc(BOOK.title)}</h2><p class="sub">Повесть для учебника · ${BOOK.parts.length} частей — по одной в каждом уроке</p></div>
       ${crow('Повесть про тупика, который отправился от Лофотенов до Осло, чтобы найти… ну, читайте сами. Спойлер: там есть вафли.')}
       <ol class="booktoc">${BOOK.parts.map((bp, i) => { const u = byId(bp.u); if (!u) return ''; const done = isDone(u.id + '-b'); return `<li class="${done ? 'done' : ''}"><b>${esc(bp.ch)}</b><br>${unitOpen(u) ? `<a href="#u/${u.id}">Часть ${i + 1}</a>` : `🔒 Часть ${i + 1}`} <span class="note-s">· урок ${esc(u.lvl + ' · ' + u.t)} · ${bp.n} слов${done ? ' · ✓' : ''}</span></li>`; }).join('')}</ol>
       <p class="note-s">Текст написан для учебника: в начале — короткие простые фразы, к B2 — настоящая проза.</p>`;
