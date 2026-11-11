@@ -1,4 +1,4 @@
-// «Поезд в Испанию» (/train/, src/pages/train.html, docs/games.md): Полли едет на поезде из Риги в Испанию и дальше по Испании без конца,
+// «Поезд Полли» (/train/, src/pages/train.html, docs/games.md): Полли едет на поезде из Риги в Испанию и дальше по Испании без конца,
 // Эмпанадильо (маскот Libertas.study) помогает узнавать слова: из плиток с буквами собрать слова станции (очки за буквы — как в настольных играх).
 // Языки игры: en, lv, es, no (слова — site/assets/train-words.js). Станции 1–8 — ручные, дальше `gen` собирает их из словаря (бесконечно).
 // Пуговки, рекорды, вещи, бейджи и улучшения — сервер (worker/train.js): /api/train, /api/train/{start,station,up}.
@@ -10,11 +10,13 @@
   const T = {
     langs: { en: ['English', 'Английский', 'Angļu'], lv: ['Latvian', 'Латышский', 'Latviešu'], es: ['Spanish', 'Испанский', 'Spāņu'], no: ['Norwegian', 'Норвежский', 'Norvēģu'] },
     support: ['With the support of', 'При поддержке', 'Ar atbalstu no'],
-    title: ['Polly’s train to Spain', 'Поезд Полли в Испанию', 'Pollijas vilciens uz Spāniju'],
-    intro: ['Polly is going to Spain by train, and Empanadillo is helping with the words. At every station, make words out of the letters. The trip never ends: after Madrid the train goes on around Spain.',
-      'Полли едет в Испанию на поезде, а Эмпанадильо помогает со словами. На каждой станции собери слова из букв. Поездка не кончается: после Мадрида поезд едет дальше по Испании.',
-      'Pollija brauc uz Spāniju ar vilcienu, un Empanadiljo palīdz ar vārdiem. Katrā stacijā saliec vārdus no burtiem. Brauciens nebeidzas: pēc Madrides vilciens brauc tālāk pa Spāniju.'],
-    pickLang: ['Language of the game', 'Язык игры', 'Spēles valoda'],
+    title: ['Polly’s train', 'Поезд Полли', 'Pollijas vilciens'],
+    intro: ['Polly is going on a trip by train, and Empanadillo is helping with the words. Choose where to go: you will learn the language of that country. At every station, make words out of the letters. The trip never ends.',
+      'Полли едет в путешествие на поезде, а Эмпанадильо помогает со словами. Выбери, куда ехать: язык этой страны и будешь учить. На каждой станции собери слова из букв. Поездка не кончается.',
+      'Pollija dodas ceļojumā ar vilcienu, un Empanadiljo palīdz ar vārdiem. Izvēlies, kurp braukt: tās valsts valodu arī mācīsies. Katrā stacijā saliec vārdus no burtiem. Brauciens nebeidzas.'],
+    where: ['Where are we going?', 'Куда едем?', 'Kurp brauksim?'],
+    to: { es: ['to Spain', 'в Испанию', 'uz Spāniju'], no: ['to Norway', 'в Норвегию', 'uz Norvēģiju'], en: ['to Great Britain', 'в Великобританию', 'uz Lielbritāniju'], lv: ['to Latvia', 'в Латвию', 'uz Latviju'] },
+    land: { es: ['Spain', 'Испания', 'Spānija'], no: ['Norway', 'Норвегия', 'Norvēģija'], en: ['Great Britain', 'Великобритания', 'Lielbritānija'], lv: ['Latvia', 'Латвия', 'Latvija'] },
     go: ['🚆 All aboard!', '🚆 По вагонам!', '🚆 Iekāpt!'],
     from: ['From station {n}', 'Со станции {n}', 'No {n}. stacijas'],
     ups: ['🛠 Upgrades', '🛠 Улучшения', '🛠 Uzlabojumi'],
@@ -73,7 +75,8 @@
   // ---------- хранилище в браузере ----------
   const store = (() => { let o = {}; try { o = JSON.parse(localStorage.getItem('pp-train') || '{}') || {}; } catch (e) {} return o; })();
   const save = () => { try { localStorage.setItem('pp-train', JSON.stringify(store)); } catch (e) {} };
-  store.lang = store.lang || ({ lv: 'lv' }[SL] || 'en'); store.best = store.best || {}; store.lv = store.lv || {}; store.dict = store.dict || {};
+  const DEST = ['es', 'no', 'en', 'lv'].filter(l => l !== SL), FLAG = { en: '🇬🇧', lv: '🇱🇻', es: '🇪🇸', no: '🇳🇴' };
+  if (!DEST.includes(store.lang)) store.lang = 'es'; store.best = store.best || {}; store.lv = store.lv || {}; store.dict = store.dict || {};
 
   // ---------- слова ----------
   const COL = { en: 1, lv: 3, es: 4, no: 5 };
@@ -129,10 +132,18 @@
   const scoreOf = w => { let s = 0; for (const c of w) s += pts(c); return s * (w.length >= 6 ? 2 : 1); };
 
   // ---------- станции маршрута ----------
-  const ROUTE = ['Rīga', 'Vilnius', 'Warszawa', 'Berlin', 'Köln', 'Paris', 'Lyon', 'Barcelona', 'Madrid'];
-  const SPAIN = ['Toledo', 'Córdoba', 'Sevilla', 'Cádiz', 'Málaga', 'Granada', 'Almería', 'Murcia', 'Alicante', 'Valencia', 'Tarragona', 'Girona', 'Zaragoza', 'Pamplona', 'San Sebastián', 'Bilbao', 'Santander', 'Oviedo', 'Santiago', 'León', 'Burgos', 'Salamanca', 'Segovia', 'Ávila', 'Cuenca', 'Ronda', 'Mérida', 'Madrid'];
-  const city = n => n < ROUTE.length ? ROUTE[n] : SPAIN[(n - ROUTE.length) % SPAIN.length];
-  const tripOf = n => n < ROUTE.length ? 1 : 2 + Math.floor((n - ROUTE.length) / SPAIN.length);
+  // маршрут из Риги до страны (первые станции), дальше — по кругу городов страны; в Латвию — из Таллина
+  const ROUTES = {
+    es: [['Rīga', 'Vilnius', 'Warszawa', 'Berlin', 'Köln', 'Paris', 'Lyon', 'Barcelona', 'Madrid'],
+      ['Toledo', 'Córdoba', 'Sevilla', 'Cádiz', 'Málaga', 'Granada', 'Almería', 'Murcia', 'Alicante', 'Valencia', 'Tarragona', 'Girona', 'Zaragoza', 'Pamplona', 'San Sebastián', 'Bilbao', 'Santander', 'Oviedo', 'Santiago', 'León', 'Burgos', 'Salamanca', 'Segovia', 'Ávila', 'Cuenca', 'Ronda', 'Mérida', 'Madrid']],
+    no: [['Rīga', 'Kaunas', 'Warszawa', 'Berlin', 'Hamburg', 'København', 'Göteborg', 'Halden', 'Oslo'],
+      ['Drammen', 'Kongsberg', 'Geilo', 'Finse', 'Myrdal', 'Flåm', 'Voss', 'Bergen', 'Stavanger', 'Kristiansand', 'Arendal', 'Lillehammer', 'Dombås', 'Åndalsnes', 'Røros', 'Trondheim', 'Steinkjer', 'Mo i Rana', 'Bodø', 'Narvik', 'Tromsø', 'Hamar', 'Oslo']],
+    en: [['Rīga', 'Vilnius', 'Warszawa', 'Berlin', 'Köln', 'Bruxelles', 'Lille', 'Folkestone', 'London'],
+      ['Oxford', 'Bath', 'Bristol', 'Cardiff', 'Birmingham', 'Liverpool', 'Manchester', 'York', 'Durham', 'Newcastle', 'Edinburgh', 'Glasgow', 'Fort William', 'Inverness', 'Aberdeen', 'Dundee', 'Carlisle', 'Lancaster', 'Chester', 'Cambridge', 'Norwich', 'Canterbury', 'Brighton', 'London']],
+    lv: [['Tallinn', 'Tartu', 'Valga', 'Valka', 'Valmiera', 'Cēsis', 'Līgatne', 'Sigulda', 'Rīga'],
+      ['Jūrmala', 'Tukums', 'Kuldīga', 'Ventspils', 'Talsi', 'Liepāja', 'Saldus', 'Jelgava', 'Bauska', 'Ogre', 'Aizkraukle', 'Jēkabpils', 'Daugavpils', 'Krāslava', 'Rēzekne', 'Ludza', 'Gulbene', 'Alūksne', 'Madona', 'Limbaži', 'Salacgrīva', 'Saulkrasti', 'Rīga']],
+  };
+  const city = n => { const [a, b] = ROUTES[lang] || ROUTES.es; return n < a.length ? a[n] : b[(n - a.length) % b.length]; };
 
   // ---------- сервер ----------
   let srv = { on: true, per: 1, record: 0, every: 10, start: 10, up: {}, ups: null, lv: null, today: 0, best: 0, buttons: 0, me: null };
@@ -254,8 +265,8 @@
     const froms = []; for (let f = every; f <= best && every; f += every) froms.push(f);
     ov.innerHTML = `<div class="tr-card tr-menu">
       <a class="tr-sup" href="https://libertas.study/" target="_blank" rel="noopener"><span>${t('support')}</span><img src="/images/train/libertas.png" alt="Libertas.study" width="129" height="52"></a>
-      <h2>${t('title')}</h2><img class="tr-emp" src="/images/train/emp.png" alt="" width="96" height="48"><p>${t('intro')}</p>
-      <p class="tr-lh">${t('pickLang')}</p><div class="tr-langs">${Object.keys(T.langs).map(l => `<button type="button" class="tr-lang${l === lang ? ' on' : ''}" data-l="${l}">${{ en: '🇬🇧', lv: '🇱🇻', es: '🇪🇸', no: '🇳🇴' }[l]} ${tr(T.langs[l])}</button>`).join('')}</div>
+      <h2>${t('title')} ${tr(T.to[lang])}</h2><img class="tr-emp" src="/images/train/emp.png" alt="" width="96" height="48"><p>${t('intro')}</p>
+      <p class="tr-lh">${t('where')}</p><div class="tr-langs">${DEST.map(l => `<button type="button" class="tr-lang${l === lang ? ' on' : ''}" data-l="${l}">${FLAG[l]} <b>${tr(T.land[l])}</b><small>${tr(T.langs[l])}</small></button>`).join('')}</div>
       <p class="tr-best">${best ? t('station', { n: best }) + ' · ' + city(best) + ' · ' : ''}${t('best', { n: store.best[lang] || 0 })}</p>
       <p><button type="button" class="pill-btn pill-fill tr-go" data-f="0">${t('go')}</button>${froms.slice(-3).map(f => ` <button type="button" class="pill-btn tr-go" data-f="${f}">${t('from', { n: f + 1 })}</button>`).join('')}</p>
       <p><button type="button" class="pill-btn tr-upsb">${t('ups')}</button> <button type="button" class="pill-btn tr-dictb">${t('dict')}</button></p>
@@ -315,6 +326,11 @@
   // Полли — как на загрузке (src/polly-loader.html), с беретом
   const PB = ['......rrr.....', '.....rrrrr....', '......ddd.....', '.....dbbbd....', '....dbbwwbd...', '....dbbwkbdoo.', '....dbbbbbdo..', '...dbbbbbbd...', '..dbbsbbbbd...', '.dbbssbbbbd...', 'dbbssbbbbbd...', 'dbbbbbbbbd....'];
   const PC = { d: '#1e1a26', b: '#4c4369', s: '#3b3352', w: '#fbf5ec', k: '#1e1a26', o: '#e8782e', r: '#c2305c' };
+  // пейзаж страны: Испания — оливы и рыжие холмы, Норвегия — горы со снегом и ели, Британия — зелёные холмы, Латвия — сосны
+  const LAND = { es: { hill: '#D9B27C', ground: '#C9B26A', tree: '#7E9A4E', leaf: '#97B260', peak: 70, olive: 1 },
+    no: { hill: '#8DA3B8', ground: '#6FA27A', tree: '#2F6B4A', peak: 52, snow: 1, pine: 1 },
+    en: { hill: '#9CC7A4', ground: '#7FB58A', tree: '#4C9A5B', leaf: '#5DB06C', peak: 72 },
+    lv: { hill: '#A9C9A0', ground: '#86B77E', tree: '#3E7D50', peak: 76, pine: 1 } };
   const SKY = [['#BFE3F5', '#EAF6FB'], ['#9FD3EF', '#DDF0F9'], ['#F6C8A0', '#FBE6CF'], ['#C7B5E8', '#F3D9E4']];
   let travel = 0, travelT = 0, scroll = 0, last = 0;
   const R = (x, y, w, h, c) => { ctx.fillStyle = c; ctx.fillRect(Math.round(x), Math.round(y), w, h); };
@@ -324,9 +340,12 @@
     const g = ctx.createLinearGradient(0, 0, 0, 100); g.addColorStop(0, sk[0]); g.addColorStop(1, sk[1]); ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
     R(300, 18, 14, 14, '#F6D04D'); R(298, 22, 18, 6, '#F6D04D');
     // дальние холмы и ближние деревья (параллакс)
-    for (let i = -1; i < 8; i++) { const x = i * 60 - (scroll * .25) % 60; ctx.fillStyle = '#9CC7A4'; ctx.beginPath(); ctx.moveTo(x, 96); ctx.lineTo(x + 30, 66 + (i % 3) * 6); ctx.lineTo(x + 60, 96); ctx.fill(); }
-    R(0, 92, W, 58, '#7FB58A');
-    for (let i = -1; i < 10; i++) { const x = i * 44 - (scroll * .7) % 44; R(x + 10, 80, 4, 14, '#6B4A2E'); R(x + 4, 70, 16, 12, '#4C9A5B'); R(x + 7, 66, 10, 6, '#5DB06C'); }
+    const LS = LAND[lang] || LAND.es;
+    for (let i = -1; i < 8; i++) { const x = i * 60 - (scroll * .25) % 60, top = LS.peak + (i % 3) * 6; ctx.fillStyle = LS.hill; ctx.beginPath(); ctx.moveTo(x, 96); ctx.lineTo(x + 30, top); ctx.lineTo(x + 60, 96); ctx.fill();
+      if (LS.snow) { ctx.fillStyle = '#F7F9FB'; ctx.beginPath(); ctx.moveTo(x + 22, top + 8); ctx.lineTo(x + 30, top); ctx.lineTo(x + 38, top + 8); ctx.fill(); } }
+    R(0, 92, W, 58, LS.ground);
+    for (let i = -1; i < 10; i++) { const x = i * 44 - (scroll * .7) % 44; R(x + 10, 80, 4, 14, '#6B4A2E');
+      if (LS.pine) { R(x + 8, 62, 8, 6, LS.tree); R(x + 5, 68, 14, 7, LS.tree); R(x + 3, 75, 18, 6, LS.tree); } else if (LS.olive) { R(x + 2, 72, 20, 9, LS.tree); R(x + 6, 68, 12, 5, LS.leaf); } else { R(x + 4, 70, 16, 12, LS.tree); R(x + 7, 66, 10, 6, LS.leaf); } }
     // перрон с вывеской станции, когда стоим
     if (state !== 'travel' || travelT < .9 || travelT > 1.8) {
       const off = state === 'travel' ? (travelT < .9 ? -travelT * 300 : (2.6 - travelT) * 300) : 0, name = city(state === 'travel' && travelT < .9 ? lvl - 1 : lvl);

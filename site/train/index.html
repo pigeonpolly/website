@@ -4,14 +4,14 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Polly’s Train to Spain · Pigeon Polly Art Lab</title>
-<meta name="description" content="Polly’s Train to Spain: a word game with Empanadillo from Libertas.study. Make words out of letters in English, Latvian, Spanish or Norwegian, learn what they mean and earn buttons. Endless stations.">
+<title>Polly’s Train · Pigeon Polly Art Lab</title>
+<meta name="description" content="Polly’s Train: a word game with Empanadillo from Libertas.study. Go by train to Spain, Norway, Great Britain or Latvia, make words out of letters in the language of that country, learn what they mean and earn buttons. Endless stations.">
 <link rel="canonical" href="https://www.pigeonpolly.com/train/">
 <link rel="alternate" hreflang="en" href="https://www.pigeonpolly.com/train/"><link rel="alternate" hreflang="lv" href="https://www.pigeonpolly.com/lv/train/"><link rel="alternate" hreflang="ru" href="https://www.pigeonpolly.com/ru/train/"><link rel="alternate" hreflang="x-default" href="https://www.pigeonpolly.com/train/">
 <script>/* язык: последний выбранный в переключателе (pp_lang) — на всех следующих заходах */(function(){try{var h=document.documentElement.lang,s=localStorage.getItem('pp_lang');if(!s)localStorage.setItem('pp_lang',h);else if(s!==h){var a=document.querySelector('link[rel=alternate][hreflang="'+s+'"]'),u=a&&new URL(a.href);if(u&&u.pathname!==location.pathname)location.replace(u.pathname+location.search+location.hash)}}catch(e){}document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('.lang-switch a[hreflang]');if(a)try{localStorage.setItem('pp_lang',a.getAttribute('hreflang'))}catch(e){}})})();</script>
 <script>/* сезон: по дате (дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень) или выбранный вручную (pp_season) */(function(){var m=new Date().getMonth(),s=['winter','winter','spring','spring','spring','summer','summer','summer','autumn','autumn','autumn','winter'][m];try{var v=localStorage.getItem('pp_season');if(/^(winter|spring|summer|autumn)$/.test(v||''))s=v}catch(e){}document.documentElement.setAttribute('data-season',s)})();</script>
-<meta property="og:title" content="Polly’s Train to Spain · Pigeon Polly Art Lab">
-<meta property="og:description" content="Polly’s Train to Spain: a word game with Empanadillo from Libertas.study. Make words out of letters in English, Latvian, Spanish or Norwegian, learn what they mean and earn buttons. Endless stations.">
+<meta property="og:title" content="Polly’s Train · Pigeon Polly Art Lab">
+<meta property="og:description" content="Polly’s Train: a word game with Empanadillo from Libertas.study. Go by train to Spain, Norway, Great Britain or Latvia, make words out of letters in the language of that country, learn what they mean and earn buttons. Endless stations.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.pigeonpolly.com/train/">
 <meta property="og:site_name" content="Pigeon Polly Art Lab">
@@ -35,8 +35,8 @@
 <script src="/assets/site.js?v=3d084c34" defer></script>
 <script src="/assets/polly.js?v=b092bea5" defer></script>
 <script src="/assets/can-do.js?v=877ca7f4" defer></script>
-<script src="/assets/birds.js?v=ea00f606" defer></script>
-<script src="/assets/room.js?v=7d294298" defer></script>
+<script src="/assets/birds.js?v=01c719e0" defer></script>
+<script src="/assets/room.js?v=c98540dd" defer></script>
 <script src="/assets/garden-items.js?v=0e83e9e3" defer></script>
 <script src="/assets/potion-names.js?v=e02872fd" defer></script>
 <script src="/assets/toast.js?v=93392a35" defer></script>
@@ -108,23 +108,23 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 </div></div>
 </header>
 <main id="main">
-<nav class="crumbs" aria-label="Breadcrumb"><a href="/games/"><span class="nm-t">Play</span></a><span aria-hidden="true">›</span><span aria-current="page" class="ns-t">Train to Spain</span></nav>
-<!-- «Поезд в Испанию» (docs/games.md): игра — site/assets/train.js, слова — train-words.js, стили — train.css; партнёр — Libertas.study -->
+<nav class="crumbs" aria-label="Breadcrumb"><a href="/games/"><span class="nm-t">Play</span></a><span aria-hidden="true">›</span><span aria-current="page" class="ns-t">Polly’s Train</span></nav>
+<!-- «Поезд Полли» (docs/games.md): игра — site/assets/train.js, слова — train-words.js, стили — train.css; партнёр — Libertas.study -->
 <section data-ppb="train.1" class="page-head">
   <p class="topics">a word game for buttons</p>
-  <h1>Polly’s Train to Spain</h1>
-  <p class="lead">Polly is going to Spain by train, and Empanadillo helps with the words. Make words out of letters in English, Latvian, Spanish or Norwegian, learn what they mean and earn buttons 🔘 for every station.</p>
+  <h1>Polly’s Train</h1>
+  <p class="lead">Polly is going on a trip by train, and Empanadillo helps with the words. Choose Spain, Norway or Great Britain, make words out of letters in the language of that country, learn what they mean and earn buttons 🔘 for every station.</p>
 </section>
-<link rel="stylesheet" href="/assets/train.css?v=aafa5593">
+<link rel="stylesheet" href="/assets/train.css?v=95edd056">
 <section data-ppb="train.2" class="train" id="train" aria-live="polite"></section>
 <section data-ppb="train.3" class="tr-cta">
   <a class="tr-cta-logo" href="https://libertas.study/" target="_blank" rel="noopener"><img src="/images/train/libertas.png" alt="Libertas.study" width="129" height="52" loading="lazy"></a>
   <div><h2>Want to learn a language for real?</h2><p>Empanadillo comes from Libertas.study, where people learn languages with a teacher and have fun doing it.</p></div>
   <a class="pill-btn pill-fill tr-cta-btn" href="https://libertas.study/" target="_blank" rel="noopener">Learn languages with Libertas.study →</a>
 </section>
-<script src="/assets/train-words.js?v=48bacc29" defer></script>
-<script src="/assets/top-board.js?v=dbe4b116" defer></script>
-<script src="/assets/train.js?v=dff7128f" defer></script>
+<script src="/assets/train-words.js?v=31f31e69" defer></script>
+<script src="/assets/top-board.js?v=95bb465a" defer></script>
+<script src="/assets/train.js?v=517f7d67" defer></script>
 
 </main>
 <dialog class="modal" id="contact" aria-labelledby="contact-t">
@@ -151,7 +151,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
       <div class="soc"><a href="https://www.patreon.com/cw/pigeon_polly" target="_blank" rel="noopener">Patreon</a><a href="https://www.instagram.com/pigeonpolly" target="_blank" rel="noopener">Instagram</a><a href="https://www.tiktok.com/@pigeonpolly" target="_blank" rel="noopener">TikTok</a><a href="https://www.pinterest.com/pigeonpollyart/" target="_blank" rel="noopener">Pinterest</a></div>
       <a class="ft-friend" href="https://libertas.study/" target="_blank" rel="noopener" data-f><span>Our friends:</span><img src="/images/train/libertas.png" alt="Libertas.study" width="86" height="35" loading="lazy"></a></div>
     <div><h4 data-f>Learn</h4><a href="/learn/" data-f>Lessons</a><a href="/books/" data-f>Books</a><a href="/blog/" data-f>Journal</a><a href="/palettes/" data-f>Palettes</a><a href="/polly-helps/" data-f>Polly, help me</a></div>
-    <div><h4 data-f>The Lab</h4><a href="/games/" data-f>All games</a><a href="/shop/" data-f>Shop</a><a href="/advent/" data-f>Advent calendar</a><a href="/rain/" data-f>Button Rain</a><a href="/potions/" data-f>Potion Lab</a><a href="/pancakes/" data-f>Polly’s Pancakes</a><a href="/train/" data-f>Train to Spain</a><a href="/titos/" data-f>Detective Titos</a><a href="/shift/" data-f>Shift with Polly</a><a href="/polly-office/" data-f>Polly’s Office</a><a href="/wobbleland/" data-f>Wobbleland</a></div>
+    <div><h4 data-f>The Lab</h4><a href="/games/" data-f>All games</a><a href="/shop/" data-f>Shop</a><a href="/advent/" data-f>Advent calendar</a><a href="/rain/" data-f>Button Rain</a><a href="/potions/" data-f>Potion Lab</a><a href="/pancakes/" data-f>Polly’s Pancakes</a><a href="/train/" data-f>Polly’s Train</a><a href="/titos/" data-f>Detective Titos</a><a href="/shift/" data-f>Shift with Polly</a><a href="/polly-office/" data-f>Polly’s Office</a><a href="/wobbleland/" data-f>Wobbleland</a></div>
     <div><h4 data-f>The Flock</h4><a href="/flock/" data-f>All birds</a><a href="/flock/news/" data-f>Flock news</a><a href="/challenge/" data-f>Daily Challenge</a><a href="/challenge/#sw-wall" data-f>Flock drawings</a><a href="/requests/" data-f>Draw this for me</a><a href="/garden/" data-f>Bird garden</a></div>
     <div><h4 data-f>Alina</h4><a href="/sketchbook/" data-f>Sketchbook</a><a href="/about-me/" data-f>About me</a><a href="/on-walls-and-pages/" data-f>On Walls &amp; Pages</a><a href="/projects/" data-f>Learning &amp; AI</a><a href="/work-with-me/" data-f>Work with me</a><a href="/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>

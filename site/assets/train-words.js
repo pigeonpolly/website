@@ -1,4 +1,4 @@
-// «Поезд в Испанию» (/train/, site/assets/train.js, docs/games.md): слова станций на 4 языках игры.
+// «Поезд Полли» (/train/, site/assets/train.js, docs/games.md): слова станций на 4 языках игры.
 // Станция: b — буквы (плитки), w — слова, которые надо найти: [слово, значок, en, ru, lv], x — бонусные слова (только очки).
 // Испанский: плитки без ударений (estación → ESTACION), ñ — своя плитка. Проверка: node tools/train_check.js
 window.PPTrainWords = {

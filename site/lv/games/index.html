@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Games · Pigeon Polly Art Lab</title>
-<meta name="description" content="Pigeon Polly spēles: Pogu lietus, Pollijas dziru darbnīca, Pollijas pankūkas, Pollijas vilciens uz Spāniju, Detektīvs Titoss, Pollijas birojs, Vobllenda un Adventes kalendārs. Pelni pogas un tērē tās veikalā.">
+<meta name="description" content="Pigeon Polly spēles: Pogu lietus, Pollijas dziru darbnīca, Pollijas pankūkas, Pollijas vilciens, Detektīvs Titoss, Pollijas birojs, Vobllenda un Adventes kalendārs. Pelni pogas un tērē tās veikalā.">
 <link rel="canonical" href="https://www.pigeonpolly.com/lv/games/">
 <link rel="alternate" hreflang="en" href="https://www.pigeonpolly.com/games/"><link rel="alternate" hreflang="lv" href="https://www.pigeonpolly.com/lv/games/"><link rel="alternate" hreflang="ru" href="https://www.pigeonpolly.com/ru/games/"><link rel="alternate" hreflang="x-default" href="https://www.pigeonpolly.com/games/">
 <script>/* язык: последний выбранный в переключателе (pp_lang) — на всех следующих заходах */(function(){try{var h=document.documentElement.lang,s=localStorage.getItem('pp_lang');if(!s)localStorage.setItem('pp_lang',h);else if(s!==h){var a=document.querySelector('link[rel=alternate][hreflang="'+s+'"]'),u=a&&new URL(a.href);if(u&&u.pathname!==location.pathname)location.replace(u.pathname+location.search+location.hash)}}catch(e){}document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('.lang-switch a[hreflang]');if(a)try{localStorage.setItem('pp_lang',a.getAttribute('hreflang'))}catch(e){}})})();</script>
 <script>/* сезон: по дате (дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень) или выбранный вручную (pp_season) */(function(){var m=new Date().getMonth(),s=['winter','winter','spring','spring','spring','summer','summer','summer','autumn','autumn','autumn','winter'][m];try{var v=localStorage.getItem('pp_season');if(/^(winter|spring|summer|autumn)$/.test(v||''))s=v}catch(e){}document.documentElement.setAttribute('data-season',s)})();</script>
 <meta property="og:title" content="Games · Pigeon Polly Art Lab">
-<meta property="og:description" content="Pigeon Polly spēles: Pogu lietus, Pollijas dziru darbnīca, Pollijas pankūkas, Pollijas vilciens uz Spāniju, Detektīvs Titoss, Pollijas birojs, Vobllenda un Adventes kalendārs. Pelni pogas un tērē tās veikalā.">
+<meta property="og:description" content="Pigeon Polly spēles: Pogu lietus, Pollijas dziru darbnīca, Pollijas pankūkas, Pollijas vilciens, Detektīvs Titoss, Pollijas birojs, Vobllenda un Adventes kalendārs. Pelni pogas un tērē tās veikalā.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.pigeonpolly.com/lv/games/">
 <meta property="og:site_name" content="Pigeon Polly Art Lab">
@@ -35,8 +35,8 @@
 <script src="/assets/site.js?v=3d084c34" defer></script>
 <script src="/assets/polly.js?v=b092bea5" defer></script>
 <script src="/assets/can-do.js?v=877ca7f4" defer></script>
-<script src="/assets/birds.js?v=ea00f606" defer></script>
-<script src="/assets/room.js?v=7d294298" defer></script>
+<script src="/assets/birds.js?v=01c719e0" defer></script>
+<script src="/assets/room.js?v=c98540dd" defer></script>
 <script src="/assets/garden-items.js?v=0e83e9e3" defer></script>
 <script src="/assets/potion-names.js?v=e02872fd" defer></script>
 <script src="/assets/toast.js?v=93392a35" defer></script>
@@ -121,7 +121,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <a class="am-tile gm-tile" href="/lv/rain/" data-g="rain"><img src="/images/games/rain.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Pogu lietus</b><i>Ķer pogas!</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🔘</span></a>
     <a class="am-tile gm-tile" href="/lv/potions/" data-g="potion"><img src="/images/games/potions.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Dziru virtuve</b><i>Labirints un dziras</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🧪</span></a>
     <a class="am-tile gm-tile" href="/lv/pancakes/" data-g="pan"><img src="/images/games/pancakes.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Pollijas pankūkas</b><i>Pankūkas pēc pasūtījuma</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🥞</span></a>
-    <a class="am-tile gm-tile" href="/lv/train/" data-g="train"><img src="/images/games/train.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Vilciens uz Spāniju</b><i>Vārdi 4 valodās</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🚆</span></a>
+    <a class="am-tile gm-tile" href="/lv/train/" data-g="train"><img src="/images/games/train.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Pollijas vilciens</b><i>Vārdi 4 valodās</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🚆</span></a>
     <a class="am-tile gm-tile" href="/lv/titos/" data-g="titos"><img src="/images/games/titos.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Detektīvs Titoss</b><i>100 detektīvu lietu</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🕵️</span></a>
   </div>
 </section>
@@ -246,7 +246,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
       <div class="soc"><a href="https://www.patreon.com/cw/pigeon_polly" target="_blank" rel="noopener">Patreon</a><a href="https://www.instagram.com/pigeonpolly" target="_blank" rel="noopener">Instagram</a><a href="https://www.tiktok.com/@pigeonpolly" target="_blank" rel="noopener">TikTok</a><a href="https://www.pinterest.com/pigeonpollyart/" target="_blank" rel="noopener">Pinterest</a></div>
       <a class="ft-friend" href="https://libertas.study/" target="_blank" rel="noopener" data-f><span>Mūsu draugi:</span><img src="/images/train/libertas.png" alt="Libertas.study" width="86" height="35" loading="lazy"></a></div>
     <div><h4 data-f>Mācīties</h4><a href="/lv/learn/" data-f>Nodarbības</a><a href="/lv/books/" data-f>Grāmatas</a><a href="/lv/blog/" data-f>Žurnāls</a><a href="/lv/palettes/" data-f>Paletes</a><a href="/lv/polly-helps/" data-f>Pollija, palīdzi</a></div>
-    <div><h4 data-f>Laboratorija</h4><a href="/lv/games/" data-f>Visas spēles</a><a href="/lv/shop/" data-f>Veikals</a><a href="/lv/advent/" data-f>Adventes kalendārs</a><a href="/lv/rain/" data-f>Pogu lietus</a><a href="/lv/potions/" data-f>Dziru virtuve</a><a href="/lv/pancakes/" data-f>Pollijas pankūkas</a><a href="/lv/train/" data-f>Vilciens uz Spāniju</a><a href="/lv/titos/" data-f>Detektīvs Titoss</a><a href="/lv/shift/" data-f>Maiņa ar Polliju</a><a href="/lv/polly-office/" data-f>Pollijas birojs</a><a href="/lv/wobbleland/" data-f>Wobbleland</a></div>
+    <div><h4 data-f>Laboratorija</h4><a href="/lv/games/" data-f>Visas spēles</a><a href="/lv/shop/" data-f>Veikals</a><a href="/lv/advent/" data-f>Adventes kalendārs</a><a href="/lv/rain/" data-f>Pogu lietus</a><a href="/lv/potions/" data-f>Dziru virtuve</a><a href="/lv/pancakes/" data-f>Pollijas pankūkas</a><a href="/lv/train/" data-f>Pollijas vilciens</a><a href="/lv/titos/" data-f>Detektīvs Titoss</a><a href="/lv/shift/" data-f>Maiņa ar Polliju</a><a href="/lv/polly-office/" data-f>Pollijas birojs</a><a href="/lv/wobbleland/" data-f>Wobbleland</a></div>
     <div><h4 data-f>Bars</h4><a href="/lv/flock/" data-f>Visi putniņi</a><a href="/lv/flock/news/" data-f>Bara ziņas</a><a href="/lv/challenge/" data-f>Dienas izaicinājums</a><a href="/lv/challenge/#sw-wall" data-f>Bara zīmējumi</a><a href="/lv/requests/" data-f>Uzzīmē man</a><a href="/lv/garden/" data-f>Putniņa dārzs</a></div>
     <div><h4 data-f>Alīna</h4><a href="/lv/sketchbook/" data-f>Skiču burtnīca</a><a href="/lv/about-me/" data-f>Par mani</a><a href="/lv/on-walls-and-pages/" data-f>Uz sienām un lapām</a><a href="/lv/projects/" data-f>Mācības un MI</a><a href="/lv/work-with-me/" data-f>Sadarbība</a><a href="/lv/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>

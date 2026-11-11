@@ -5,13 +5,13 @@
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>Games · Pigeon Polly Art Lab</title>
-<meta name="description" content="Игры Pigeon Polly: Пуговичный дождь, Зельеварня Полли, Блинная Полли, Поезд Полли в Испанию, Детектив Титос, Офис Полли, Воббленд и адвент-календарь. Зарабатывай пуговки и трать их в магазине.">
+<meta name="description" content="Игры Pigeon Polly: Пуговичный дождь, Зельеварня Полли, Блинная Полли, Поезд Полли, Детектив Титос, Офис Полли, Воббленд и адвент-календарь. Зарабатывай пуговки и трать их в магазине.">
 <link rel="canonical" href="https://www.pigeonpolly.com/ru/games/">
 <link rel="alternate" hreflang="en" href="https://www.pigeonpolly.com/games/"><link rel="alternate" hreflang="lv" href="https://www.pigeonpolly.com/lv/games/"><link rel="alternate" hreflang="ru" href="https://www.pigeonpolly.com/ru/games/"><link rel="alternate" hreflang="x-default" href="https://www.pigeonpolly.com/games/">
 <script>/* язык: последний выбранный в переключателе (pp_lang) — на всех следующих заходах */(function(){try{var h=document.documentElement.lang,s=localStorage.getItem('pp_lang');if(!s)localStorage.setItem('pp_lang',h);else if(s!==h){var a=document.querySelector('link[rel=alternate][hreflang="'+s+'"]'),u=a&&new URL(a.href);if(u&&u.pathname!==location.pathname)location.replace(u.pathname+location.search+location.hash)}}catch(e){}document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('.lang-switch a[hreflang]');if(a)try{localStorage.setItem('pp_lang',a.getAttribute('hreflang'))}catch(e){}})})();</script>
 <script>/* сезон: по дате (дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень) или выбранный вручную (pp_season) */(function(){var m=new Date().getMonth(),s=['winter','winter','spring','spring','spring','summer','summer','summer','autumn','autumn','autumn','winter'][m];try{var v=localStorage.getItem('pp_season');if(/^(winter|spring|summer|autumn)$/.test(v||''))s=v}catch(e){}document.documentElement.setAttribute('data-season',s)})();</script>
 <meta property="og:title" content="Games · Pigeon Polly Art Lab">
-<meta property="og:description" content="Игры Pigeon Polly: Пуговичный дождь, Зельеварня Полли, Блинная Полли, Поезд Полли в Испанию, Детектив Титос, Офис Полли, Воббленд и адвент-календарь. Зарабатывай пуговки и трать их в магазине.">
+<meta property="og:description" content="Игры Pigeon Polly: Пуговичный дождь, Зельеварня Полли, Блинная Полли, Поезд Полли, Детектив Титос, Офис Полли, Воббленд и адвент-календарь. Зарабатывай пуговки и трать их в магазине.">
 <meta property="og:type" content="website">
 <meta property="og:url" content="https://www.pigeonpolly.com/ru/games/">
 <meta property="og:site_name" content="Pigeon Polly Art Lab">
@@ -35,8 +35,8 @@
 <script src="/assets/site.js?v=3d084c34" defer></script>
 <script src="/assets/polly.js?v=b092bea5" defer></script>
 <script src="/assets/can-do.js?v=877ca7f4" defer></script>
-<script src="/assets/birds.js?v=ea00f606" defer></script>
-<script src="/assets/room.js?v=7d294298" defer></script>
+<script src="/assets/birds.js?v=01c719e0" defer></script>
+<script src="/assets/room.js?v=c98540dd" defer></script>
 <script src="/assets/garden-items.js?v=0e83e9e3" defer></script>
 <script src="/assets/potion-names.js?v=e02872fd" defer></script>
 <script src="/assets/toast.js?v=93392a35" defer></script>
@@ -121,7 +121,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <a class="am-tile gm-tile" href="/ru/rain/" data-g="rain"><img src="/images/games/rain.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Пуговичный дождь</b><i>Лови пуговки!</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🔘</span></a>
     <a class="am-tile gm-tile" href="/ru/potions/" data-g="potion"><img src="/images/games/potions.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Зельеварня</b><i>Лабиринт и зелья</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🧪</span></a>
     <a class="am-tile gm-tile" href="/ru/pancakes/" data-g="pan"><img src="/images/games/pancakes.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Блинная Полли</b><i>Блины на заказ</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🥞</span></a>
-    <a class="am-tile gm-tile" href="/ru/train/" data-g="train"><img src="/images/games/train.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Поезд в Испанию</b><i>Слова на 4 языках</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🚆</span></a>
+    <a class="am-tile gm-tile" href="/ru/train/" data-g="train"><img src="/images/games/train.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Поезд Полли</b><i>Слова на 4 языках</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🚆</span></a>
     <a class="am-tile gm-tile" href="/ru/titos/" data-g="titos"><img src="/images/games/titos.png" alt="" loading="lazy"><span class="am-tile-txt"><b class="ns-t">Детектив Титос</b><i>100 детективных дел</i><em class="gm-ready" hidden></em></span><span class="am-tile-ico" aria-hidden="true">🕵️</span></a>
   </div>
 </section>
@@ -246,7 +246,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
       <div class="soc"><a href="https://www.patreon.com/cw/pigeon_polly" target="_blank" rel="noopener">Patreon</a><a href="https://www.instagram.com/pigeonpolly" target="_blank" rel="noopener">Instagram</a><a href="https://www.tiktok.com/@pigeonpolly" target="_blank" rel="noopener">TikTok</a><a href="https://www.pinterest.com/pigeonpollyart/" target="_blank" rel="noopener">Pinterest</a></div>
       <a class="ft-friend" href="https://libertas.study/" target="_blank" rel="noopener" data-f><span>Наши друзья:</span><img src="/images/train/libertas.png" alt="Libertas.study" width="86" height="35" loading="lazy"></a></div>
     <div><h4 data-f>Учиться</h4><a href="/ru/learn/" data-f>Уроки</a><a href="/ru/books/" data-f>Книги</a><a href="/ru/blog/" data-f>Журнал</a><a href="/ru/palettes/" data-f>Палитры</a><a href="/ru/polly-helps/" data-f>Полли, помоги</a></div>
-    <div><h4 data-f>Лаборатория</h4><a href="/ru/games/" data-f>Все игры</a><a href="/ru/shop/" data-f>Магазин</a><a href="/ru/advent/" data-f>Адвент</a><a href="/ru/rain/" data-f>Пуговичный дождь</a><a href="/ru/potions/" data-f>Зельеварня</a><a href="/ru/pancakes/" data-f>Блинная Полли</a><a href="/ru/train/" data-f>Поезд в Испанию</a><a href="/ru/titos/" data-f>Детектив Титос</a><a href="/ru/shift/" data-f>Смена с Полли</a><a href="/ru/polly-office/" data-f>Офис Полли</a><a href="/ru/wobbleland/" data-f>Воббленд</a></div>
+    <div><h4 data-f>Лаборатория</h4><a href="/ru/games/" data-f>Все игры</a><a href="/ru/shop/" data-f>Магазин</a><a href="/ru/advent/" data-f>Адвент</a><a href="/ru/rain/" data-f>Пуговичный дождь</a><a href="/ru/potions/" data-f>Зельеварня</a><a href="/ru/pancakes/" data-f>Блинная Полли</a><a href="/ru/train/" data-f>Поезд Полли</a><a href="/ru/titos/" data-f>Детектив Титос</a><a href="/ru/shift/" data-f>Смена с Полли</a><a href="/ru/polly-office/" data-f>Офис Полли</a><a href="/ru/wobbleland/" data-f>Воббленд</a></div>
     <div><h4 data-f>Стая</h4><a href="/ru/flock/" data-f>Все птички</a><a href="/ru/flock/news/" data-f>Новости стаи</a><a href="/ru/challenge/" data-f>Челлендж дня</a><a href="/ru/challenge/#sw-wall" data-f>Рисунки стаи</a><a href="/ru/requests/" data-f>Нарисуй мне</a><a href="/ru/garden/" data-f>Огород птички</a></div>
     <div><h4 data-f>Алина</h4><a href="/ru/sketchbook/" data-f>Скетчбук</a><a href="/ru/about-me/" data-f>Обо мне</a><a href="/ru/on-walls-and-pages/" data-f>На стенах и страницах</a><a href="/ru/projects/" data-f>Обучение и AI</a><a href="/ru/work-with-me/" data-f>Сотрудничество</a><a href="/ru/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>

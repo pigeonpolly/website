@@ -1,4 +1,4 @@
-// «Поезд в Испанию» (/train/, site/assets/train.js, docs/games.md): Полли едет на поезде, Эмпанадильо помогает собирать слова из букв.
+// «Поезд Полли» (/train/, site/assets/train.js, docs/games.md): Полли едет на поезде, Эмпанадильо помогает собирать слова из букв.
 // 4 языка игры (en, lv, es, no), у каждого свой счёт станций (users.train_lv JSON {en: N, …}); рекорд для доски топа — лучший из языков (users.train_best).
 // Как «Блинная»: забег (train_runs), станции подтверждаются по одной и не быстрее trainMinSec с на станцию от старта;
 // пуговки за станцию × (1 + десяток), каждая станция языка — раз в сутки; бонус за новый рекорд языка; вещь каждые trainItemEvery станций (сначала — из темы «🚆 Поезд»).
@@ -21,7 +21,7 @@ export const TRAIN_UPS = { hint: { max: 3, pct: 'trainUpHintPct' }, word: { max:
 export const TRAIN_RANGE = { trainLevelPct: [0, 100], trainRecordPct: [0, 100], trainMinSec: [1, 120], trainItemEvery: [0, 1000], trainStartEvery: [0, 100],
   trainUpHintPct: [0, 10000], trainUpWordPct: [0, 10000], trainUpJarPct: [0, 10000] };
 export const TRAIN_INT = ['trainMinSec', 'trainItemEvery', 'trainStartEvery'];
-// бейджи: tr1/tr2/tr3 — станций в одном языке (cond.trainA/B/C), trpoly — trainPoly станций в каждом из 4 языков, trwords — trainWords найденных слов всего
+// бейджи: tr1/tr2/tr3 — станций в одном языке (cond.trainA/B/C), trpoly — trainPoly станций в 3 языках из 4 (язык сайта не изучают), trwords — trainWords найденных слов всего
 export const TRAIN_BADGES = { tr1: 10, tr2: 20, tr3: 40, trpoly: 30, trwords: 25 };
 export const TRAIN_COND = { trainA: 8, trainB: 25, trainC: 60, trainPoly: 8, trainWords: 300 };
 export const TRAIN_LANGS = ['en', 'lv', 'es', 'no'];
@@ -85,7 +85,7 @@ export async function trainApi(req, env, url, h) {
       .bind(JSON.stringify(lvs), words, best, lv, Date.now(), u.id).run();
     await h.top(u.id, lv); // доска топа: лучший забег недели
     const badges = [], C = R.cond;
-    for (const [k, ok] of [['tr1', lv >= C.trainA], ['tr2', lv >= C.trainB], ['tr3', lv >= C.trainC], ['trpoly', TRAIN_LANGS.every(l => lvs[l] >= C.trainPoly)], ['trwords', words >= C.trainWords]])
+    for (const [k, ok] of [['tr1', lv >= C.trainA], ['tr2', lv >= C.trainB], ['tr3', lv >= C.trainC], ['trpoly', TRAIN_LANGS.filter(l => lvs[l] >= C.trainPoly).length >= 3], ['trwords', words >= C.trainWords]])
       if (ok && await h.badge(u, k)) badges.push(k);
     // каждая станция языка платит раз в сутки; за новый рекорд языка — бонус за каждую станцию выше прежнего (один раз навсегда)
     const got = R.trainOn ? await h.award(u.id, 'train', day + ':' + r.lang + ':' + lv, price(unit, lv)) : 0;

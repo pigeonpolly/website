@@ -225,7 +225,7 @@
     propeller: { r: ['rrrr.bbbb', '....k....', '..yyyyy..', '.ybyrygy.', 'yyyyyyyyy', 'ddddddddd'], p: { r: '#E0443A', b: '#4A7BD8', k: '#2A2433', y: '#F5D547', g: '#4CC38A', d: '#C9A72A' }, lo: ['cap', '#E9A93B'] },
     pancakehat: { r: ['...yy...', '.oooooo.', 'OkOOOOOO', '.oooooo.', 'OkOOOkOO', '.oooooo.', 'OOOOOkOO'], p: { y: '#FFF3A8', o: '#E9B86A', O: '#D99A4A', k: '#8B4A20' }, lo: ['top', '#D99A4A'] },
     pancakecrown: { r: ['y..y.y..y', 'yr.yyy.ry', 'yyyyyyyyy', '.ooooooo.', 'OOOOOOOOO', '.ooooooo.'], p: { y: '#E9C14A', r: '#E0443A', o: '#E9B86A', O: '#D99A4A' }, lo: ['crown', '#E9C14A'] },
-    // тема «🚆 Поезд» (игра «Поезд в Испанию»): фуражка проводника, ★ золотая фуражка машиниста
+    // тема «🚆 Поезд» (игра «Поезд Полли»): фуражка проводника, ★ золотая фуражка машиниста
     conductor: { r: ['..nnnnnn..', '.nnnnnnnn.', 'nnnnynnnnn', 'yyyyyyyyyy', 'kkkkkkk...'], p: { n: '#22405F', y: '#E9C14A', k: '#1E1A26' }, lo: ['cap', '#22405F'] },
     goldcap: { r: ['....rr....', '..yyyyyy..', '.yyYyyyyy.', 'yyyyryyyyy', 'kkkkkkkkkk', 'dddddddd..'], p: { y: '#E9C14A', Y: '#FFF3A8', r: '#C2305C', k: '#8C5A1E', d: '#2A2433' }, lo: ['crown', '#E9C14A'] },
     sunflowers: { r: ['.y...y...y.', 'yoy.yoy.yoy', '.yg.gyg.gy.', 'ggggggggggg'], p: { y: '#F5D547', o: '#8B5A2B', g: '#4C9A5B' }, lo: ['crown', '#E9A93B'] },

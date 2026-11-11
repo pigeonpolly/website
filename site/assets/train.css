@@ -1,4 +1,4 @@
-/* «Поезд в Испанию» (/train/, site/assets/train.js) */
+/* «Поезд Полли» (/train/, site/assets/train.js) */
 .train{max-width:720px;margin:0 auto 28px;color:#2A211C}
 .tr-stage{position:relative;background:#FBF6EE;border:1px solid #E3D8C8;border-radius:18px;overflow:hidden;box-shadow:0 6px 18px rgba(60,40,20,.08)}
 .tr-scene{display:block;width:100%;height:auto;aspect-ratio:360/150;image-rendering:pixelated;background:#BFE3F5}
@@ -67,3 +67,6 @@
 /* меню и карточка станции — в потоке, под картинкой поезда (на телефоне не обрезаются) */
 .tr-stage.ov .tr-ov{position:relative;inset:auto;background:#FBF6EE}
 .tr-stage.ov .tr-hud,.tr-stage.ov .tr-say,.tr-stage.ov .tr-play{display:none}
+/* выбор страны: флаг, страна, язык */
+.tr-lang{display:inline-flex;flex-direction:column;align-items:center;gap:0;padding:8px 14px;min-width:120px;border-radius:14px;line-height:1.25}
+.tr-lang b{font-weight:800}.tr-lang small{font-weight:500;font-size:12px;opacity:.75}
