@@ -1729,7 +1729,10 @@
     box.querySelectorAll('[data-act^="loc"]').forEach(x => x.setAttribute('aria-pressed', String(x.dataset.act === (LOC_ACT[loc] || 'loc-park'))));
     const cnt = box.querySelector('.fl-count');
     if (cnt && data.total) cnt.textContent = cnt.dataset.tpl.replace('{n}', data.total) + (data.recent ? ' ' + cnt.dataset.recent : '');
-    if (data.birds.some(b => b.me)) { const j = box.querySelector('.fl-join'); if (j) j.hidden = true; }
+    // вошедшим «Хочу свою птичку» и подсказка про вход не нужны (птичка уже есть, даже если её нет среди показанных)
+    const hideJoin = () => box.querySelectorAll('.fl-join, .fl-how').forEach(x => { x.hidden = true; });
+    if (data.birds.some(b => b.me) || (window.PPWho && window.PPWho.user)) hideJoin();
+    document.addEventListener('pp:whoami', e => { if (e.detail && e.detail.user) hideJoin(); });
     // «Хочу свою птичку»: открывает вход через Google в шапке (после входа сразу попросит ник)
     const join = box.querySelector('.fl-join');
     join && join.addEventListener('click', e => {
