@@ -205,6 +205,8 @@ _правка — кабинет → 📜 Правила (meta `rules`)_
 
 _Сюда следующие этапы дописывают общие сведения о коде._
 
+- 📒 Блокнот в учебниках: content/shared/notebook.js (клиент, встраивают tools/{study,english,norsk}_page.py функцией notebook(html, book)) + worker/notebook.js (`/api/notebook?book=`, таблица textbook_notes). Новый учебник — книга в `BOOKS` worker/notebook.js и вызов notebook() в его *_page.py.
+
 - Письма птичкам на почту — только через согласие worker/mail.js: новое автоматическое письмо = проверка `users.mail_games` (или feat/news), подвал и отписка — `sendOne`, общий суточный лимит — `usedToday` (meta `mail_n:`, `advent_mail_n:`, `wl_mail_n:`). Рассылки Алины — кабинет ✉️ Письма (mail-admin.js `PPMailAdmin`).
 - Картинки для соцсетей — кабинет 📣 Посты (posts-admin.js `PPPostsAdmin`): новый вид поста = запись в `POSTS` (draw(canvas) → {file, text, loading}); общие `frame`/`footer`/`swatches`/`fit`/`wrap`/`cover`.
 

@@ -21,6 +21,7 @@ import { shiftApi, SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_RANGE, SHIFT_IN
 import { studyApi, studyOk, STUDY_TABLES } from './study.js'; // личный учебник /study/ для Mr.Pepe и Алины (docs/site.md «Учебник»)
 import { englishApi, englishOk, ENGLISH_TABLES } from './english.js'; // личный учебник английского /english/ (docs/site.md «Учебник английского»)
 import { norskApi, norskOk, NORSK_TABLES } from './norsk.js'; // личный учебник норвежского /norsk/ (docs/site.md «Учебник норвежского»)
+import { notebookApi, NOTEBOOK_TABLES } from './notebook.js'; // 📒 блокнот в учебниках (docs/site.md «Блокнот в учебниках»)
 import { artpillApi, artpillDrop, artpillExport, ARTPILL_TABLES } from './artpill.js'; // «Art-Pill by Polly»: скетчбуки ИИ и отзывы (docs/artpill.md)
 import { schoolApi, schoolNews, schoolCron, SCHOOL_TABLES, SCHOOL_ALTER, SCHOOL_RULES, SCHOOL_RANGE, SCHOOL_INT } from './school.js'; // «Школа Полли»: сдача работ и проверка (docs/challenge.md)
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
@@ -519,6 +520,7 @@ async function ensureSchema(env) {
     ...SCHOOL_TABLES.map(sql => env.DB.prepare(sql)), // «Школа Полли»: school_works (worker/school.js)
     ...STUDY_TABLES.map(sql => env.DB.prepare(sql)), // учебник: study_progress (worker/study.js)
     ...ENGLISH_TABLES.map(sql => env.DB.prepare(sql)), // учебник английского: english_progress (worker/english.js)
+    ...NOTEBOOK_TABLES.map(sql => env.DB.prepare(sql)), // блокнот в учебниках: textbook_notes (worker/notebook.js)
     ...NORSK_TABLES.map(sql => env.DB.prepare(sql)), // учебник норвежского: norsk_progress, norsk_access (worker/norsk.js)
     ...ARTPILL_TABLES.map(sql => env.DB.prepare(sql)), // «Art-Pill»: ap_books, ap_pages, ap_reviews (worker/artpill.js)
     ...TITOS_TABLES.map(sql => env.DB.prepare(sql)), // детектив Титос: titos, titos_cases (worker/titos.js)
@@ -1510,6 +1512,7 @@ async function route(req, env, url) {
   if (p.startsWith('/api/mail/') || p.startsWith('/api/admin/mail')) { const r = await mailApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p === '/api/study') { const r = await studyApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/english' || p === '/api/english/access') { const r = await englishApi(req, env, url, studyHelpers(env)); if (r) return r; }
+  if (p === '/api/notebook') { const r = await notebookApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/norsk' || p === '/api/norsk/access' || p === '/api/norsk/tts') { const r = await norskApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/artpill' || p.startsWith('/api/artpill/')) { const r = await artpillApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now }); if (r) return r; }
   if (p === '/api/school' || p.startsWith('/api/school/') || p === '/api/admin/school' || p === '/api/admin/school/check') { const r = await schoolApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is a short friendly comment from an art teacher (Polly, a pigeon) on a student\'s drawing made on paper. Keep it warm, simple and encouraging.') }); if (r) return r; }
