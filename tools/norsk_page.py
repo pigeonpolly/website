@@ -14,8 +14,13 @@ NB = (ROOT / 'content/shared/notebook.js').read_text(encoding='utf-8')  # 📒 �
 def notebook(html, book):
     if '</script' in NB.lower() or html.count('</body>') != 1: raise SystemExit('блокнот: не встроить')
     return html.replace('</body>', f"<script>window.PPNB_BOOK = '{book}';\n{NB}</script>\n</body>")
+KB = (ROOT / 'content/shared/keys.js').read_text(encoding='utf-8')  # ⌨️ кнопки особых букв (docs/site.md «Кнопки особых букв»)
+def keys(html, chars):
+    if '</script' in KB.lower() or html.count('</body>') != 1: raise SystemExit('кнопки букв: не встроить')
+    return html.replace('</body>', f"<script>window.PPKEYS = '{chars}';\n{KB}</script>\n</body>")
 html = shell.replace('/*UNITS*/', units).replace('/*ENGINE*/', engine)
 html = notebook(html, 'norsk')
+html = keys(html, 'å æ ø é è ê ó ô')
 out = ROOT / 'worker/norsk-page.js'
 out.write_text('// Собрано tools/norsk_page.py из content/norsk/ — руками не править.\nexport const NORSK_HTML = ' + json.dumps(html, ensure_ascii=False) + ';\n', encoding='utf-8')
 if '--html' in sys.argv: pathlib.Path(sys.argv[sys.argv.index('--html') + 1]).write_text(html, encoding='utf-8')
