@@ -291,7 +291,7 @@
     if (t === 'ls') return `<li data-n="${n}"><div class="lsn">${canSay ? `<button type="button" class="btn small" data-say="${esc(p[0])}">🔊 Послушать</button><button type="button" class="btn small" data-say="${esc(p[0])}" data-slow>🐢 Медленно</button>` : `<i class="en">${esc(p[0])}</i>`}</div><input class="line" placeholder="запишите, что услышали…" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="что услышали"></li>`;
     if (t === 'lc') return `<li data-n="${n}"><div class="lsn">${canSay ? `<button type="button" class="btn small" data-say="${esc(p[0])}">🔊 Послушать слово</button>` : `<i class="en">${esc(p[0])}</i>`} — что оно значит?</div>${shuffle(p.slice(1)).map(o => `<label class="opt"><input type="radio" name="o${uid}-${n}" value="${esc(o)}"><span>${esc(o)}</span></label>`).join('')}</li>`;
     if (t === 'sp') return `<li data-n="${n}"><div class="${p[0] === p[1] ? 'en-q' : 'ru-q'}">${p[0] === p[1] ? '<span class="note-s">Прочитайте вслух:</span> <i class="en">' + esc(p[0]) + '</i> ' + sayBtn(p[0]) : fmt(p[0])}</div><div class="lsn">${canRec ? '<button type="button" class="btn small" data-mic>🎤 Сказать</button>' : '<span class="note-s">микрофона нет — напишите, что сказали бы</span>'}<input class="line" placeholder="${canRec ? 'тут появится сказанное (можно поправить)' : 'по-норвежски…'}" autocomplete="off" autocapitalize="off" spellcheck="false" aria-label="сказанное"></div></li>`;
-    if (t === 'mk') { const need = needsOf(it); return `<li data-n="${n}"><div class="ru-q">${fmt(p[0])}</div>${need.length ? `<div class="need">${need.map(x => `<span>${esc(x.split('/')[0])}</span>`).join('')}</div>` : ''}<textarea class="mk" rows="2" lang="nb" spellcheck="true" placeholder="Пишите по-норвежски…" aria-label="своё предложение"></textarea></li>`; }
+    if (t === 'mk') { const need = needsOf(it); return `<li data-n="${n}"><div class="ru-q">${fmt(p[0])}</div>${need.length ? `<div class="need">${need.map(x => `<span>${esc(x.split('/')[0])}</span>`).join('')}</div>` : ''}${['A1', 'A2'].includes(lvNow()) && p[2] ? `<div class="note-s sample">Образец: <i class="en">${esc(p[2])}</i> ${sayBtn(p[2])} — можно взять его и поменять одно-два слова на свои.</div>` : ''}<textarea class="mk" rows="2" lang="nb" spellcheck="true" placeholder="${lvNow() === 'A1' ? 'Можно коротко: 2–4 слова…' : 'Пишите по-норвежски…'}" aria-label="своё предложение"></textarea></li>`; }
     return '';
   }
   let uid = 0;
@@ -315,12 +315,15 @@
     [/(?:^|\s)(mange|flere|to|tre|fire|fem)\s+(bok|venn|katt|hund|dag|bil|stol|kopp)(?=[\s.,!?])/i, m => `«${m[1]} ${m[2]}»: после ${m[1]} — множественное число`],
   ];
   function grammar(t) { return GRAM.map(([re, msg]) => { const m = t.match(re); return m ? msg(m) : ''; }).filter(Boolean); }
+  const lvNow = () => (byId(view.dataset.unit || '') || {}).lvl || '';
+  const MKMIN = { A1: 2, A2: 3, B1: 5 }; // минимум слов в «Своими словами» по уровням (дальше — 6)
   function mkProbs(it, t) {
     const probs = grammar(t);
     for (const nd of needsOf(it)) if (!nd.split('/').some(w => uses(t, w))) probs.push(`нет «${esc(nd.split('/')[0])}»`);
-    if ((t.match(/[A-Za-zÆØÅæøåÉéÈèÔôÜü']+/g) || []).length < (it.min || 6)) probs.push(`коротко: нужно хотя бы ${it.min || 6} слов`);
-    if (t && !/^[A-ZÆØÅ"'«(]/.test(t)) probs.push('начните с большой буквы');
-    if (t && !/[.!?…]["'»)]?$/.test(t)) probs.push('в конце нужна точка, ? или !');
+    const lv = lvNow(), min = Math.min(it.min || 6, MKMIN[lv] || 6);
+    if ((t.match(/[A-Za-zÆØÅæøåÉéÈèÔôÜü']+/g) || []).length < min) probs.push(`коротко: нужно хотя бы ${min} слов${min < 5 ? 'а' : ''}`);
+    if (lv !== 'A1' && t && !/^[A-ZÆØÅ"'«(]/.test(t)) probs.push('начните с большой буквы'); // на A1 большая буква и точка не обязательны
+    if (lv !== 'A1' && t && !/[.!?…]["'»)]?$/.test(t)) probs.push('в конце нужна точка, ? или !');
     if (/[а-яё]/i.test(t)) probs.push('есть русские буквы');
     return probs;
   }
@@ -661,7 +664,8 @@
   const sshuffle = (a, r) => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   function mkAuto(u) {
     const r = rng(u.id), ws = sshuffle(u.words || [], r).slice(0, 2);
-    const out = ws.map(([w, tr, ex]) => ({ t: 'mk', p: [`Придумайте предложение со словом *${w}* (${tr}) — ${CTX[Math.floor(r() * CTX.length)]}.`, clean(w), ex || ''], auto: 1, min: 4 }));
+    const easy = ['A1', 'A2'].includes(u.lvl);
+    const out = ws.map(([w, tr, ex]) => ({ t: 'mk', p: [easy ? `Короткая фраза со словом *${w}* (${tr}). Можно по образцу.` : `Придумайте предложение со словом *${w}* (${tr}) — ${CTX[Math.floor(r() * CTX.length)]}.`, clean(w), ex || ''], auto: 1, min: easy ? 2 : 4 }));
     const r2 = rng(u.id + ':' + today()), due = sshuffle(Object.entries(S.v).filter(([k, v]) => v.due <= today() && !(u.words || []).some(x => x[0].toLowerCase() === k)), r2)[0]; // слово к повторению — своё на каждый день
     if (due) out.push({ t: 'mk', p: [`Слово из словаря, пора повторить: *${due[1].w}* (${due[1].tr || '—'}) — ${CTX[Math.floor(r2() * CTX.length)]}.`, clean(due[1].w), due[1].ex || ''], auto: 1, min: 4, dk: due[0] });
     return out;
