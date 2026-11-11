@@ -26,7 +26,7 @@ section{position:relative}
 .hd2{border-bottom:1px solid var(--line);position:relative;z-index:20;background:var(--bg)}
 .hd2 .w{display:flex;align-items:center;height:100px;gap:30px}
 .lg{display:flex;align-items:center;gap:12px;font:400 23px Fraunces,Lora,serif;white-space:nowrap}.lg i{font-style:italic;font-weight:300;color:var(--acc)}
-.lg img{width:46px;height:46px;border-radius:50%;box-shadow:0 0 0 1.5px var(--ink)}.lg .lg-m{width:50px;height:50px;flex:none;display:block;overflow:visible}
+.lg img{width:46px;height:46px;border-radius:50%;box-shadow:0 0 0 1.5px var(--ink)}.lg .lg-m{width:94px;height:94px;flex:none;display:block;background:url(/assets/logo-badge-autumn.png) center/contain no-repeat}html[data-season=winter] .lg .lg-m{background-image:url(/assets/logo-badge-winter.png)}html[data-season=spring] .lg .lg-m{background-image:url(/assets/logo-badge-spring.png)}html[data-season=summer] .lg .lg-m{background-image:url(/assets/logo-badge-summer.png)}
 .nv{margin-left:auto;display:flex;gap:40px;font:700 12px Karla,'Nunito Sans',sans-serif;letter-spacing:.2em;text-transform:uppercase}
 .nv a{padding:6px 0;border-bottom:1.5px solid transparent}.nv a:hover,.nv a[aria-current]{color:var(--acc);border-color:var(--acc)}
 .hr{display:flex;align-items:center;gap:18px;margin-left:24px;font-size:14px}
@@ -192,7 +192,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
 }
 @media (max-width:700px){
  .v2 .w{padding:0 18px}
- .hd2 .w{height:72px;gap:10px}.lg{font-size:19px;gap:9px}.lg img{width:38px;height:38px}.lg .lg-m{width:42px;height:42px}
+ .hd2 .w{height:72px;gap:10px}.lg{font-size:19px;gap:9px}.lg img{width:38px;height:38px}.lg .lg-m{width:64px;height:64px}
  .hr{margin-left:auto;gap:8px}.hr .switch{display:none}.v2 .acct2{padding:8px 14px;font-size:13px}
  .drawer .sw-m{display:flex;gap:12px;margin-top:16px}.drawer .sw-m button{width:22px;height:22px}
  .pill{font-size:9.5px;letter-spacing:.14em;padding:9px 14px}
