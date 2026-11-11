@@ -693,7 +693,7 @@ def build():
             if path in V2:
                 page = v2_page(layout_v2, full_title, desc, canonical, path in NOINDEX, page_body)
             else:
-                page = v2_page(layout_v2_lab, full_title, desc, canonical, path in NOINDEX, section_tabs(path) + page_body)
+                page = v2_page(layout_v2_lab, full_title, desc, canonical, path in NOINDEX, section_tabs(path) + page_body).replace('<body class="inner v2s">', '<body class="inner v2s" data-p="%s">' % (path.replace("/", "-") or "home"), 1)  # Д, шаг 2: data-p — какая страница (игры не перекрашиваем)
             page = v2_urls(localize(page, lang))
             page = page.replace("{{hreflang}}", hreflang).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
             page = bust(page)

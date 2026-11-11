@@ -65,7 +65,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **english_progress** (worker/english.js): `user_id` int PK, `state` text (JSON: d — блок → лучший %, w — тексты, v — словарь, a — ачивки, days, c — счётчики, last, k — открыто паролем, m — доля ошибок, x — задания с ошибками, pd — дни с пройденным заданием, t — время сохранения, rv — метка сброса), `updated_at` int
 - **english_access** (worker/english.js): `user_id` int PK, `added_at` int (мс) — кому админ открыл учебник английского
 - **norsk_progress**, **norsk_access** (worker/norsk.js): как english_progress / english_access — учебник норвежского
-- **textbook_notes** (worker/notebook.js): `user_id` int nn, `book` text nn (study / english / norsk), `page_id` text nn ('_' — служебная: {cleared, del}), `data` text (JSON страницы), `t` int nn; PK (user_id, book, page_id) — 📒 блокнот в учебниках, отдельно от прогресса
+- **textbook_notes** (worker/notebook.js): `user_id` int nn, `book` text nn (study / english / norsk), `page_id` text nn ('_' — служебная: {cleared, del}), `data` text (JSON страницы {title, html, c, mark, at, nb} или блокнота {kind: 'book', title}), `t` int nn; PK (user_id, book, page_id) — 📒 блокнот в учебниках, отдельно от прогресса
 
 ## Ключи meta (48)
 
