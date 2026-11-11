@@ -96,6 +96,7 @@
     const a = e.target.closest('[data-yt]');
     if (!a || e.ctrlKey || e.metaKey || e.shiftKey) return;
     e.preventDefault(); play(a.dataset.yt);
+    try { localStorage.setItem('pp-yt-last', a.dataset.yt); } catch (e2) {} // «последний просмотренный» в кабинете (cabinet.js)
   });
 
   // подписи бесплатных уроков — по названию видео на YouTube (/api/v2/yt); известные — на языке страницы
@@ -107,6 +108,14 @@
       const k = NAMES.find(n => n[0].test(t)), name = k ? k[1][L] : t;
       b.textContent = name; const im = a.querySelector('img'); if (im) im.alt = name;
     }).catch(() => {});
+  });
+
+  // «Войти» у VIP-уроков: окно входа прямо здесь, без перехода на другую страницу
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href="#signin"]');
+    if (!a || a.dataset.yt || !window.PPAccount) return;
+    e.preventDefault(); window.scrollTo({ top: 0, behavior: 'instant' }); // окно входа крепится к шапке — сначала наверх
+    window.PPAccount.openSignIn();
   });
 
   // VIP-видео: только вошедшим (/api/v2/vip), гостю остаётся «Войти бесплатно»

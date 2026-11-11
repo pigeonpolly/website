@@ -109,12 +109,12 @@
 
   // ---------- оформление ----------
   const css = `
-#ppnb-tab{position:fixed;z-index:84;right:0;top:50%;transform:translateY(-50%);writing-mode:vertical-rl;border:1px solid var(--rule,#ddd);border-right:0;border-radius:10px 0 0 10px;background:var(--card,var(--paper,#fff));color:var(--ink,#222);font:600 13px/1 var(--f-ui,system-ui,sans-serif);padding:12px 7px;cursor:pointer;box-shadow:-2px 2px 10px rgb(0 0 0/.08);letter-spacing:.04em}
+#ppnb-tab{position:fixed;z-index:84;right:0;top:50%;transform:translateY(-50%);display:grid;place-items:center;border:1px solid var(--rule,#ddd);border-right:0;border-radius:12px 0 0 12px;background:var(--card,var(--paper,#fff));color:var(--accent,#534ab7);padding:10px 8px 10px 10px;cursor:pointer;box-shadow:-2px 2px 10px rgb(0 0 0/.08);transition:padding .15s}
 #ppnb-tab:hover{color:var(--accent,#534ab7)}
 #ppnb-clip{position:fixed;z-index:86;display:flex;align-items:center;gap:5px;border:1px solid var(--accent,#534ab7);background:var(--card,var(--paper,#fff));color:var(--accent,#534ab7);border-radius:999px;padding:5px 11px 5px 9px;font:600 13px/1 var(--f-ui,system-ui,sans-serif);cursor:pointer;box-shadow:0 4px 14px rgb(0 0 0/.16);animation:ppnbc .15s ease}
 #ppnb-clip[hidden]{display:none}#ppnb-clip:hover{background:var(--accent,#534ab7);color:var(--on-accent,#fff)}
 @keyframes ppnbc{from{opacity:0;transform:translateY(4px)}}
-#ppnb-tab .i{writing-mode:horizontal-tb;display:block;margin-bottom:6px;font-size:16px}
+#ppnb-tab svg{display:block;width:26px;height:26px}#ppnb-tab:hover{padding-right:12px}
 body.ppnb-open #ppnb-tab{opacity:0;pointer-events:none}
 #ppnb{position:fixed;z-index:85;top:0;right:0;bottom:0;width:min(540px,100vw);display:flex;flex-direction:column;background:var(--card,var(--paper,#fff));color:var(--ink,#222);border-left:1px solid var(--rule,#ddd);box-shadow:-10px 0 30px rgb(0 0 0/.14);transform:translateX(104%);transition:transform .25s ease;font:15px/1.5 var(--f-ui,system-ui,sans-serif);padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
 #ppnb.open{transform:none}
@@ -169,13 +169,16 @@ body.ppnb-open #ppnb-tab{opacity:0;pointer-events:none}
 #ppnb .ft .sp{flex:1}
 #ppnb .ft a{color:var(--accent,#534ab7)}
 #ppnb .ib.danger{color:var(--warm,#c4521f)}
-@media (max-width:600px){#ppnb{width:100vw;border-left:0}#ppnb .ed{font-size:16px;padding:12px 12px 40vh}#ppnb-tab{padding:10px 5px;font-size:12px}}
+@media (max-width:600px){#ppnb{width:100vw;border-left:0}#ppnb .ed{font-size:16px;padding:12px 12px 40vh}#ppnb-tab{padding:8px 6px 8px 8px}#ppnb-tab svg{width:24px;height:24px}}
 @media print{#ppnb,#ppnb-tab,#ppnb-clip{display:none!important}}`;
   const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 
   const tab = document.createElement('button');
   tab.id = 'ppnb-tab'; tab.type = 'button'; tab.title = 'Блокнот (Alt+N)'; tab.setAttribute('aria-label', 'Открыть блокнот');
-  tab.innerHTML = '<span class="i">📒</span>Блокнот';
+  tab.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round">' // блокнот с закладкой-ленточкой
+    + '<rect x="5.5" y="3" width="14" height="18" rx="2.2" fill="var(--accent-soft,#ecebfb)"/><path d="M9 3.4v17.2"/>'
+    + '<path d="M3.8 7.5h3.4M3.8 12h3.4M3.8 16.5h3.4"/><path d="M11.5 13.5h5M11.5 16.5h3.5"/>'
+    + '<path d="M13.6 2.2v7.6l1.8-1.4 1.8 1.4V2.2z" fill="var(--warm,#c4521f)" stroke="var(--warm,#c4521f)" stroke-width="1.2"/></svg>';
   const root = document.createElement('aside');
   root.id = 'ppnb'; root.setAttribute('aria-label', 'Блокнот'); root.setAttribute('aria-hidden', 'true'); root.inert = true;
   root.innerHTML = `

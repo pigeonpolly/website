@@ -10,14 +10,8 @@
     bird: ['🐦 Bird & games', '🐦 Птичка и игры', '🐦 Putniņš un spēles'],
     mail: ['✉️ Letters', '✉️ Письма', '✉️ Vēstules'],
     acc: ['⚙ Settings', '⚙ Настройки', '⚙ Iestatījumi'],
-    vipK: ['VIP lesson · open for you', 'VIP-урок · открыт для тебя', 'VIP nodarbība · atvērta tev'],
     vipT: ['Watercolour review', 'Обзор акварели', 'Akvareļu apskats'],
     watch: ['▶ Watch', '▶ Смотреть', '▶ Skatīties'],
-    freeT: ['Free lessons', 'Бесплатные уроки', 'Bezmaksas nodarbības'],
-    freeS: ['Paint-alongs and sketches, open to everyone', 'Рисуем вместе и скетчи — открыты всем', 'Zīmējam kopā un skices — atvērtas visiem'],
-    guidesT: ['Guides & books', 'Гайды и книги', 'Ceļveži un grāmatas'],
-    guidesS: ['Creative guides by Alina', 'Творческие гайды Алины', 'Alīnas radošie ceļveži'],
-    open: ['Open →', 'Открыть →', 'Atvērt →'],
     schT: ['Polly’s School', 'Школа Полли', 'Pollijas skola'],
     schS: n => [`Stamps: ${n} of 12`, `Печатей: ${n} из 12`, `Zīmogi: ${n} no 12`][L],
     schNew: ['Twelve small drawing lessons with a pixel diploma at the end', 'Двенадцать маленьких уроков рисования, в конце — пиксельный диплом', 'Divpadsmit mazas zīmēšanas nodarbības, beigās — pikseļu diploms'],
@@ -26,15 +20,27 @@
     dipT: ['📜 Diploma of Polly’s School', '📜 Диплом Школы Полли', '📜 Pollijas skolas diploms'],
     dipS: ['All twelve stamps are in. Your diploma lives here.', 'Все двенадцать печатей собраны. Твой диплом лежит здесь.', 'Visi divpadsmit zīmogi savākti. Tavs diploms glabājas šeit.'],
     dipGo: ['Open the diploma →', 'Открыть диплом →', 'Atvērt diplomu →'],
-    books: ['My textbooks', 'Мои учебники', 'Manas mācību grāmatas'],
-    study: ['📘 Textbook', '📘 Учебник', '📘 Mācību grāmata'],
-    english: ['🇬🇧 English course', '🇬🇧 Учебник английского', '🇬🇧 Angļu valodas kurss'],
-    norsk: ['🇳🇴 Norwegian course', '🇳🇴 Учебник норвежского', '🇳🇴 Norvēģu valodas kurss'],
+    books: ['📘 My textbooks', '📘 Мои учебники', '📘 Manas mācību grāmatas'],
+    study: ['Programming textbook', 'Учебник программирования', 'Programmēšanas mācību grāmata'],
+    english: ['English course', 'Учебник английского', 'Angļu valodas kurss'],
+    norsk: ['Norwegian course', 'Учебник норвежского', 'Norvēģu valodas kurss'],
+    openBook: ['Open →', 'Открыть →', 'Atvērt →'],
+    dips: ['📜 Diplomas', '📜 Дипломы', '📜 Diplomi'],
+    dipNext: ['On the way to a diploma', 'На пути к диплому', 'Ceļā uz diplomu'],
+    guidesH: ['🎬 Guides', '🎬 Гайды', '🎬 Ceļveži'],
+    allT: ['All video guides', 'Все видеогайды', 'Visi video ceļveži'],
+    allS: ['Free lessons and VIP lessons — in one place', 'Бесплатные и VIP-уроки — в одном месте', 'Bezmaksas un VIP nodarbības — vienuviet'],
+    seeAll: ['See all →', 'Смотреть все →', 'Skatīt visus →'],
+    gNew: ['New', 'Новое', 'Jaunākais'], gLast: ['Last watched', 'Последний просмотренный', 'Pēdējais skatītais'],
+    gNext: ['Next to watch', 'Посмотреть дальше', 'Skaties tālāk'], gSeen: ['watched', 'просмотрено', 'skatīts'],
+    vidT: ['Video lesson', 'Видеоурок', 'Video nodarbība'],
+    pdf: ['PDF guides and books →', 'PDF-гайды и книги →', 'PDF ceļveži un grāmatas →'],
     soon: ['Courses and materials you get will appear here too.', 'Сюда же лягут курсы и материалы, которые у тебя появятся.', 'Šeit parādīsies arī tavi kursi un materiāli.'],
     all: ['✓ Tick all', '✓ Отметить все', '✓ Atzīmēt visus'], none: ['Untick all', 'Снять все', 'Noņemt visus'],
     play: ['Games', 'Игры', 'Spēles'], shop: ['Shop', 'Магазин', 'Veikals'], flock: ['Other birds’ rooms', 'Комнаты других птичек', 'Citu putniņu istabas'],
   };
   const t = k => T[k][L];
+  const NAMES = [[/pepper|перец|перц/i, ['Pepper sketching', 'Скетч перца', 'Pipara skice']], [/caf[eé]|outdoor|кафе/i, ['Outdoor sketching in a cafe', 'Скетч на выезде: кафе', 'Skices ārpus mājām: kafejnīca']]]; // как в v2.js
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const TABS = ['learn', 'bird', 'mail', 'acc'];
   const HASH = { learn: 'learn', bird: 'bird', mail: 'mail', settings: 'acc' };
@@ -59,40 +65,59 @@
 
   const who = () => window.PPWho ? Promise.resolve(window.PPWho) : fetch('/api/whoami', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null);
 
+  // Учёба: 📘 учебники книжечками (если доступны) · 📜 дипломы (Школа Полли; пока не пройдена — печати) · 🎬 гайды:
+  // новый и последний просмотренный (localStorage pp-yt-last — пишет v2.js при запуске [data-yt]) + «Смотреть все» → /learn/
+  const FREE_YT = ['eRa1uB_7s9U', 'VVvLZcIqUbM']; // как в src/pages/preview-learn.html, новое первым
+  const BOOK = { study: ['#2F5F6A', '💻', '/study/'], english: ['#22405F', '🇬🇧', '/english/'], norsk: ['#8E2F3C', '🇳🇴', '/norsk/'] };
+  const sec = (k, h, more) => `<section class="cab-sec cab-${k}"${k === 'books' ? ' hidden' : ''}><div class="cab-sh"><h2>${h}</h2>${more || ''}</div><div class="cab-body"></div></section>`;
   function learnPane(el) {
-    el.innerHTML = `<div class="cab-grid">
-      <a class="cab-card cab-vip" href="${pre}/learn/" hidden><span class="cab-cover"><img src="/images/v2/lesson-szmal.jpg" alt="" loading="lazy"><i>▶</i></span>
-        <span class="cab-k">${t('vipK')}</span><b>${t('vipT')}</b><em>${t('watch')}</em></a>
-      <div class="cab-card cab-school"><span class="cab-k">${t('schT')}</span><b class="cab-sch-t">${t('schT')}</b><p class="cab-sch-s">${t('schNew')}</p>
-        <div class="cab-stamps" aria-hidden="true">${'<i></i>'.repeat(12)}</div><a class="cab-btn" href="${pre}/polly-helps/#school">${t('schStart')}</a></div>
-      <a class="cab-card" href="${pre}/learn/"><span class="cab-k">YouTube</span><b>${t('freeT')}</b><p>${t('freeS')}</p><em>${t('open')}</em></a>
-      <a class="cab-card" href="${pre}/guides/"><span class="cab-k">PDF · Amazon</span><b>${t('guidesT')}</b><p>${t('guidesS')}</p><em>${t('open')}</em></a>
-    </div>
-    <div class="cab-books" hidden><h2>${t('books')}</h2><div class="cab-row"></div></div>
-    <p class="cab-soon">${t('soon')}</p>`;
-    fetch('/api/v2/vip', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => {
-      const v = d && d.videos && d.videos[0]; if (!v) return;
-      const a = el.querySelector('.cab-vip'); a.hidden = false; a.dataset.yt = v.id; a.href = 'https://youtu.be/' + v.id;
-    }).catch(() => {});
+    el.innerHTML = sec('books', t('books'))
+      + sec('dips', t('dips'))
+      + sec('guides', t('guidesH'))
+      + `<p class="cab-soon">${t('soon')} <a href="${pre}/guides/">${t('pdf')}</a></p>`;
+    const dips = el.querySelector('.cab-dips .cab-body'), guides = el.querySelector('.cab-guides .cab-body');
+    dips.innerHTML = `<div class="cab-card cab-school"><span class="cab-k">${t('schT')}</span><b class="cab-sch-t">${t('schT')}</b><p class="cab-sch-s">${t('schNew')}</p>
+        <div class="cab-stamps" aria-hidden="true">${'<i></i>'.repeat(12)}</div><a class="cab-btn" href="${pre}/polly-helps/#school">${t('schStart')}</a></div>`;
     fetch('/api/school?peek=1&lang=' + ['en', 'ru', 'lv'][L], { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => {
       if (!d || !d.me) return;
-      const n = (d.works || []).filter(w => w.status === 'ok').length, box = el.querySelector('.cab-school');
+      const n = (d.works || []).filter(w => w.status === 'ok').length, box = dips.querySelector('.cab-school');
       box.querySelectorAll('.cab-stamps i').forEach((i, k) => i.classList.toggle('on', k < n));
       if (n >= 12) {
         box.classList.add('cab-dip');
         box.querySelector('.cab-sch-t').textContent = t('dipT'); box.querySelector('.cab-sch-s').textContent = t('dipS');
         const b = box.querySelector('.cab-btn'); b.href = pre + '/polly-helps/#diploma'; b.textContent = t('dipGo');
       } else if (n || (d.works || []).length) {
+        box.querySelector('.cab-k').textContent = t('dipNext');
         box.querySelector('.cab-sch-s').textContent = T.schS(n);
         box.querySelector('.cab-btn').textContent = t('schGo');
-      }
+      } else box.querySelector('.cab-k').textContent = t('dipNext');
     }).catch(() => {});
+    // гайды: VIP (вошедшим) новее бесплатных
+    fetch('/api/v2/vip', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null).then(d => {
+      const vids = [...((d && d.videos) || []).map(v => ({ id: v.id, vip: 1 })), ...FREE_YT.map(id => ({ id }))];
+      let last = null; try { last = localStorage.getItem('pp-yt-last'); } catch (e) {}
+      const seen = vids.find(v => v.id === last && v !== vids[0]);
+      const pick = [[vids[0], t('gNew')], seen ? [seen, t('gLast')] : [vids[1], t('gNext')]].filter(x => x[0]);
+      if (last && last === vids[0].id) pick[0][1] = t('gNew') + ' · ' + t('gSeen');
+      guides.innerHTML = '<div class="cab-grid">' + pick.map(([v, k]) => `<a class="cab-card cab-vid" href="https://youtu.be/${v.id}" data-yt="${v.id}" target="_blank" rel="noopener">
+        <span class="cab-cover"><img src="${v.vip ? '/images/v2/lesson-szmal.jpg' : `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`}" alt="" loading="lazy"><i>▶</i></span>
+        <span class="cab-k">${k}${v.vip ? ' · VIP' : ''}</span><b>${v.vip ? t('vipT') : '…'}</b><em>${t('watch')}</em></a>`).join('')
+        + `<a class="cab-card cab-more" href="${pre}/learn/"><span class="cab-k">${t('guidesH').slice(3)}</span><b>${t('allT')}</b><p>${t('allS')}</p><em class="cab-go">${t('seeAll')}</em></a></div>`;
+      guides.querySelectorAll('.cab-vid').forEach((a, i) => {
+        if (pick[i][0].vip) return;
+        const b = a.querySelector('b'); b.textContent = t('vidT');
+        fetch('/api/v2/yt?id=' + a.dataset.yt).then(r => r.ok ? r.json() : null).then(x => {
+          const tt = x && x.title; if (!tt) return;
+          const nm = NAMES.find(n => n[0].test(tt)); b.textContent = nm ? nm[1][L] : tt;
+        }).catch(() => {});
+      });
+    });
     who().then(w => {
       const u = w && (w.user || w); if (!u) return;
-      const links = [['study', '/study/'], ['english', '/english/'], ['norsk', '/norsk/']].filter(([k]) => u[k]);
-      if (!links.length) return;
+      const ks = Object.keys(BOOK).filter(k => u[k]);
+      if (!ks.length) return;
       const b = el.querySelector('.cab-books'); b.hidden = false;
-      b.querySelector('.cab-row').innerHTML = links.map(([k, h]) => `<a class="cab-pill" href="${h}">${t(k)}</a>`).join('');
+      b.querySelector('.cab-body').innerHTML = '<div class="cab-shelf">' + ks.map(k => `<a class="cab-book" href="${BOOK[k][2]}" style="--bk:${BOOK[k][0]}"><span class="cab-bk-c"><i>${BOOK[k][1]}</i><b>${t(k)}</b></span><em>${t('openBook')}</em></a>`).join('') + '</div>';
     });
   }
 

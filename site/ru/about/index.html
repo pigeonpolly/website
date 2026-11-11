@@ -21,12 +21,23 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=Karla:wght@400;500;700&family=Caveat:wght@700&family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito+Sans:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/v2.css?v=09274be1">
+<link rel="stylesheet" href="/assets/v2.css?v=dea8eb52">
+<link rel="stylesheet" href="/assets/v2-acct.css?v=f9f748a5">
+<link rel="stylesheet" href="/assets/v2-shell.css?v=be3e16ce">
+<!-- шапка как на остальных страницах: вход, меню аватара, пуговки, корзина, колокольчик, поиск (стили — v2-acct.css из tools/v2_acct_css.py) -->
 <script src="/assets/birds.js?v=8b869e67" defer></script>
-<script src="/assets/v2.js?v=825a1793" defer></script>
+<script src="/assets/room.js?v=686e8cfd" defer></script>
+<script src="/assets/toast.js?v=93392a35" defer></script>
+<script src="/assets/day-card.js?v=8fce5fd5" defer></script>
+<script src="/assets/hatch.js?v=6d36422a" defer></script>
+<script src="/assets/cart.js?v=8f90c619" defer></script>
+<script src="/assets/account.js?v=92b521ac" defer></script>
+<script src="/assets/news.js?v=ccd55f0a" defer></script>
+<script src="/assets/search.js?v=fd80358d" defer></script>
+<script src="/assets/v2.js?v=d29517b0" defer></script>
 <script src="/assets/polly.js?v=b092bea5" defer></script>
 </head>
-<body class="v2">
+<body class="v2 v2s">
 <a class="skip" href="#main">Перейти к содержанию</a>
 <header class="hd2"><div class="w">
   <a class="lg" href="/ru/"><img src="/images/v2/logo-wc.png" width="46" height="46" alt=""><span>Pigeon Polly <i>Art Lab</i></span></a>
@@ -35,9 +46,13 @@
   </nav>
   <div class="hr">
     <a class="lb" href="/ru/games/">The Lab</a>
+    <button type="button" class="search-btn" aria-label="Поиск по сайту"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
     <nav class="lang-switch" aria-label="Language"><a href="/about/" hreflang="en" lang="en">EN</a><a href="/lv/about/" hreflang="lv" lang="lv">LV</a><a href="/ru/about/" hreflang="ru" lang="ru" aria-current="true">RU</a></nav>
     <div class="sea2"><button type="button" class="sea-b" aria-expanded="false" aria-controls="sea-m" title="Сезон" aria-label="Сезон"><i></i></button><div class="sea-m" id="sea-m" hidden><span class="switch" role="group" aria-label="Сезон"><button type="button" data-s="winter" title="Зима" aria-label="Зима"><i></i>Зима</button><button type="button" data-s="spring" title="Весна" aria-label="Весна"><i></i>Весна</button><button type="button" data-s="summer" title="Лето" aria-label="Лето"><i></i>Лето</button><button type="button" data-s="autumn" title="Осень" aria-label="Осень"><i></i>Осень</button></span></div></div>
-    <a class="btn acct2" id="acct2" href="/ru/games/#signin">Войти</a>
+    <a class="hd-btns" id="hd-btns" href="/ru/shop/" hidden aria-label="Пуговки · магазин"><span aria-hidden="true">🔘</span> <b></b></a>
+    <a class="hd-cart bell" id="hd-cart" href="/ru/shop/#cart" hidden aria-label="Cart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.5l2.2 10.5h10L20 7H7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="9.5" cy="19" r="1.6" fill="currentColor"/><circle cx="16.5" cy="19" r="1.6" fill="currentColor"/></svg><b class="bell-n" hidden></b></a>
+    <button type="button" class="bell" id="pp-bell" hidden aria-label="News"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 21h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><b class="bell-n" hidden></b></button>
+    <div class="acct" id="acct"></div>
     <button type="button" class="burger" aria-expanded="false" aria-controls="drawer" aria-label="Меню">☰</button>
   </div>
 </div>
@@ -101,12 +116,14 @@
 
 </main>
 <footer class="ft2"><div class="w">
+  <!-- подвал: все страницы сайта по разделам (11.11, просьба Алины); подписи — ключи data-f>…< в content/i18n -->
   <div class="cols">
     <div class="intro"><h4>Pigeon Polly <em>Art Lab</em></h4><p>Уроки акварели и туши, творческие гайды и маленький мир нарисованных героев, сделано в Риге.</p>
       <div class="soc"><a href="https://www.patreon.com/cw/pigeon_polly" target="_blank" rel="noopener">Patreon</a><a href="https://www.instagram.com/pigeonpolly" target="_blank" rel="noopener">Instagram</a><a href="https://www.tiktok.com/@pigeonpolly" target="_blank" rel="noopener">TikTok</a><a href="https://www.pinterest.com/pigeonpollyart/" target="_blank" rel="noopener">Pinterest</a></div></div>
-    <div><h4>Учиться</h4><a href="/ru/learn/">Уроки</a><a href="/ru/guides/">Гайды и книги</a><a href="/ru/blog/">Журнал</a><a href="/ru/palettes/">Палитры</a></div>
-    <div><h4>Исследовать</h4><a href="/ru/wobbleland/">Wobbleland</a><a href="/ru/games/">The Lab</a><a href="/ru/flock/">Стая</a><a href="/ru/challenge/">Челлендж</a></div>
-    <div><h4>Алина</h4><a href="/ru/about/">Обо мне</a><a href="/ru/work-with-me/">Сотрудничество</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener">LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener">Amazon</a></div>
+    <div><h4 data-f>Учиться</h4><a href="/ru/learn/" data-f>Уроки</a><a href="/ru/guides/" data-f>Гайды и книги</a><a href="/ru/blog/" data-f>Журнал</a><a href="/ru/e-books/" data-f>Книги</a><a href="/ru/palettes/" data-f>Палитры</a><a href="/ru/polly-helps/" data-f>Полли, помоги</a></div>
+    <div><h4 data-f>Лаборатория</h4><a href="/ru/games/" data-f>Все игры</a><a href="/ru/shop/" data-f>Магазин</a><a href="/ru/advent/" data-f>Адвент</a><a href="/ru/rain/" data-f>Пуговичный дождь</a><a href="/ru/potions/" data-f>Зельеварня</a><a href="/ru/pancakes/" data-f>Блинная Полли</a><a href="/ru/titos/" data-f>Детектив Титос</a><a href="/ru/shift/" data-f>Смена с Полли</a><a href="/ru/polly-office/" data-f>Офис Полли</a><a href="/ru/wobbleland/" data-f>Воббленд</a></div>
+    <div><h4 data-f>Стая</h4><a href="/ru/flock/" data-f>Все птички</a><a href="/ru/flock/news/" data-f>Новости стаи</a><a href="/ru/challenge/" data-f>Челлендж дня</a><a href="/ru/challenge/#sw-wall" data-f>Рисунки стаи</a><a href="/ru/requests/" data-f>Нарисуй мне</a><a href="/ru/garden/" data-f>Огород птички</a></div>
+    <div><h4 data-f>Алина</h4><a href="/ru/about/" data-f>Обо мне</a><a href="/ru/art-portfolio/" data-f>Скетчбук</a><a href="/ru/on-walls-and-pages/" data-f>На стенах и страницах</a><a href="/ru/projects/" data-f>Обучение и AI</a><a href="/ru/work-with-me/" data-f>Сотрудничество</a><a href="/ru/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
   <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
 </div></footer>
