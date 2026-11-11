@@ -754,9 +754,14 @@ def build():
     for lang, entries in search_index.items():
         (OUT / "assets" / f"search-{lang}.json").write_text(json.dumps(entries, ensure_ascii=False, separators=(",", ":")))
     # 404
-    nf = v2_urls(v2_page(layout_v2_lab, "Page not found · Pigeon Polly Art Lab", "", SITE_URL + "/", True, (SRC / "pages" / "404.html").read_text()))
-    nf = nf.replace("{{hreflang}}", "").replace("{{lang_dd}}", "").replace("{{lang_switch}}", "")
-    (OUT / "404.html").write_text(bust(nf))
+    # страницы ошибок на 3 языках: /404.html, /ru/404.html… (Cloudflare берёт ближайший 404.html); 500 и 503 отдаёт worker (errorPage в worker/index.js)
+    for code, title in (("404", "Page not found"), ("500", "Something broke"), ("503", "Short break")):
+        for lang, prefix in LANGS.items():
+            nf = v2_page(layout_v2_lab, title + " · Pigeon Polly Art Lab", "", SITE_URL + "/", True, (SRC / "pages" / f"{code}.html").read_text())
+            nf = v2_urls(localize(nf, lang)).replace("{{hreflang}}", "").replace("{{lang_dd}}", "").replace("{{lang_switch}}", "").replace("{{lang}}", lang)
+            d = OUT / prefix if prefix else OUT
+            d.mkdir(parents=True, exist_ok=True)
+            (d / f"{code}.html").write_text(bust(nf))
     # sitemap
     urls = "".join(f"<url><loc>{SITE_URL}/{(v + '/') if v else ''}{(p + '/') if p else ''}</loc></url>"
                    for p, *_ in PAGES if p not in UNLISTED for v in LANGS.values())

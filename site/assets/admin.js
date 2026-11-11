@@ -169,7 +169,7 @@
       [go, plural(go, 'переход', 'перехода', 'переходов') + ' в магазин и на Amazon', wkDelta(go, goPrev) + `<small>магазин ${n(d.shop.now)} · Amazon ${n(d.amazon.now)}${since}</small>`],
       [d.buys.now, plural(d.buys.now, 'покупка', 'покупки', 'покупок') + ' в магазине птичек', wkDelta(d.buys.now, d.buys.prev)],
       [d.subs.total, 'в списке ожидания книги', d.subs.now ? `<i class="wk-up">▲ +${n(d.subs.now)} за неделю</i>` : '<i class="wk-eq">новых нет</i>'],
-      [d.birds.now, plural(d.birds.now, 'новая птичка', 'новые птички', 'новых птичек'), wkDelta(d.birds.now, d.birds.prev)],
+      [d.birds.total, plural(d.birds.total, 'птичка', 'птички', 'птичек') + ' на сайте', (d.birds.now ? `<i class="wk-up">▲ +${n(d.birds.now)} за неделю</i>` : '<i class="wk-eq">новых нет</i>') + `<small>🟢 сейчас на сайте: ${n(d.online)} · список →</small>`, 'wk-n-link', '#birds'],
     ];
     const sal = d.salary, rs = d.restock;
     const inboxTxt = items.length ? items.slice(0, 3).map(it => `${it.ic} ${n(it.n)} — ${it.t}`).join('<br>') + (items.length > 3 ? `<br>и ещё ${items.length - 3}` : '') : 'Всё спокойно ✓ Ничего не ждёт ответа.';
@@ -183,7 +183,7 @@
     const more = Object.entries(ADMIN_GROUPS).map(([g, name]) => `<div><b>${name}</b>${inGroup(g).map(x => `<a href="${x.href || '#' + x.id}"${x.href ? ' class="adm-ext"' : ''}>${x.ic} ${x.name}${x.href ? ' ↗' : ''}</a>`).join('')}</div>`).join('');
     main.innerHTML = `<div class="adm-week">
       <header class="wk-hi"><h2>${hello()}, Алина</h2><p>Неделя ${isoWeek()} · всё, что нужно на неделе, — на одном экране</p></header>
-      <div class="wk-nums">${nums.map(([v, t, dl, c]) => `<div class="wk-num${c ? ' ' + c : ''}"><b>${n(v)}</b><span>${t}</span>${dl}</div>`).join('')}</div>
+      <div class="wk-nums">${nums.map(([v, t, dl, c, href]) => { const tag = href ? 'a' : 'div'; return `<${tag}${href ? ` href="${href}" title="Открыть список птичек"` : ''} class="wk-num${c ? ' ' + c : ''}"><b>${n(v)}</b><span>${t}</span>${dl}</${tag}>`; }).join('')}</div>
       <div class="wk-acts">${acts.map(a => `<section class="wk-act${a.hot ? ' wk-hot' : ''}"><span class="wk-e" aria-hidden="true">${a.ic}</span><h3>${a.t}${a.badge ? `<span class="wk-badge">${a.badge}</span>` : ''}</h3><p>${a.d}</p><div class="wk-btns">${a.btn}</div></section>`).join('')}</div>
       <details class="wk-more"><summary>⚙ Ещё инструменты</summary><div class="wk-cols">${more}</div></details>
       <p class="be-note wk-foot">Цифры — за последние 7 дней (${esc(d.from.slice(8))}.${esc(d.from.slice(5, 7))}–${esc(d.to.slice(8))}.${esc(d.to.slice(5, 7))}), сравнение — с 7 днями до них. Подробно — 📊 Статистика → <a href="#visitors">Посетители</a>.</p>
@@ -1074,9 +1074,23 @@
 
   // ---------- все птицы ----------
   let bSort = 'created_at', bq = '', bTag = '';
+  const bPick = new Set(); // ☑ отмеченные птички — «📢 Отправить отмеченным» (окно с broadcast-admin.js)
+  // окно «📢 Отправить» поверх списка: pick = { ids, label } или null (всем / новым / старым)
+  const sendDialog = pick => {
+    if (!window.PPBroadcast) return alert('Не загрузился broadcast-admin.js — обновите страницу.');
+    const w = document.createElement('div'); w.className = 'adm-gift';
+    w.innerHTML = '<div class="adm-gift-card adm-bc-card" role="dialog" aria-label="Отправить"><button type="button" class="adm-bc-x" aria-label="Закрыть">×</button><div></div></div>';
+    const close = () => { w.remove(); document.removeEventListener('keydown', esc1); };
+    const esc1 = e => { if (e.key === 'Escape' && !document.querySelector('.adm-gift ~ .adm-gift')) close(); };
+    w.querySelector('.adm-bc-x').onclick = close; w.onclick = e => { if (e.target === w) close(); };
+    document.addEventListener('keydown', esc1);
+    document.body.appendChild(w); window.PPBroadcast.mount(w.querySelector('.adm-bc-card > div'), pick);
+  };
+  const pickLabel = us => us.length === 1 ? `Одной птичке: @${us[0].nick}` : `Отмеченным (${us.length}): ` + us.slice(0, 6).map(u => '@' + u.nick).join(', ') + (us.length > 6 ? ` и ещё ${us.length - 6}` : '');
   async function birds() {
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
     let d; try { d = await api('admin/users'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    const pickBar = () => { const k = d.users.filter(u => bPick.has(u.id)).length; return `<div class="adm-pickbar${k ? ' on' : ''}" aria-live="polite">${k ? `☑ Отмечено: <b>${k}</b> <button type="button" class="pill-btn pill-fill" id="adm-picksend">📢 Отправить отмеченным</button> <button type="button" class="pill-btn" id="adm-pickmail">📋 Скопировать почты</button> <button type="button" class="adm-mini" id="adm-pickclear">Снять отметки</button>` : '<small class="be-note">☑ Отметьте птичек галочками — и отправьте им сообщение, файл, подарок или пуговки. 📢 у ника — только этой птичке.</small>'}</div>`; };
     const draw = () => {
       const q = bq.trim().toLowerCase().replace(/^@/, '');
       const tagsOf = u => (u.atags || '').split(',').filter(Boolean);
@@ -1086,17 +1100,18 @@
         tagSty = t => TC[t] ? ` style="background:${TC[t]};color:${tagInk(TC[t])};border-color:${TC[t]}"` : '';
       const tagChip = (t, extra = '') => `<span class="adm-tag"${tagSty(t)}>${esc(t)}${extra}</span>`;
       const noTag = d.users.filter(u => !u.atags).length;
-      const list = d.users.filter(u => (!q || (u.nick || '').toLowerCase().includes(q)) && (!bTag || (bTag === '-' ? !u.atags : tagsOf(u).includes(bTag)))).sort((a, b) => (b[bSort] || 0) - (a[bSort] || 0));
+      const list = d.users.filter(u => (!q || (u.nick || '').toLowerCase().includes(q) || (u.email || '').toLowerCase().includes(q)) && (!bTag || (bTag === '-' ? !u.atags : tagsOf(u).includes(bTag)))).sort((a, b) => (b[bSort] || 0) - (a[bSort] || 0));
       const week = d.users.filter(u => u.created_at > Date.now() / 1000 - 7 * 86400).length;
       const th = (k, l) => `<th><button type="button" class="adm-sort" data-bsort="${k}" aria-pressed="${bSort === k}">${l}${bSort === k ? ' ↓' : ''}</button></th>`;
       main.innerHTML = `<section class="adm-box"><h2>🐦 Все птицы: ${d.users.length}</h2>
         <p class="be-note">Новых за неделю: <b>${week}</b>. Нажмите на ник, чтобы открыть профиль и работы.</p>
-        <p><button type="button" class="pill-btn pill-fill" id="adm-giftall">🎁 Подарить всем</button> <button type="button" class="pill-btn pill-fill" id="adm-salary" title="Пуговки сразу зачисляются всем птичкам с ником; при заходе на сайт птичка увидит конвертик от администрации Воббленда">💌 Выдать зарплату</button> <button type="button" class="pill-btn pill-fill" id="adm-tax" title="Списать пуговки у всех или только у тех, кто давно не заходит">🧾 Списать налог</button></p>
-        <div class="be-filters"><input type="search" id="adm-bq" placeholder="🔍 Найти по нику" value="${esc(bq)}"></div>
+        <p><button type="button" class="pill-btn pill-fill" id="adm-sendall" title="Сообщение с файлом, подарок или пуговки — всем, новым или старым птичкам">📢 Отправить всем</button> <button type="button" class="pill-btn pill-fill" id="adm-giftall">🎁 Подарить всем</button> <button type="button" class="pill-btn pill-fill" id="adm-salary" title="Пуговки сразу зачисляются всем птичкам с ником; при заходе на сайт птичка увидит конвертик от администрации Воббленда">💌 Выдать зарплату</button> <button type="button" class="pill-btn pill-fill" id="adm-tax" title="Списать пуговки у всех или только у тех, кто давно не заходит">🧾 Списать налог</button></p>
+        <div class="be-filters"><input type="search" id="adm-bq" placeholder="🔍 Найти по нику или почте" value="${esc(bq)}"></div>
         ${allTags.length ? `<p class="adm-tagbar">🏷 <button type="button" class="adm-tag" data-tagf="" aria-pressed="${!bTag}">Все</button> <button type="button" class="adm-tag adm-tag-none" data-tagf="-" aria-pressed="${bTag === '-'}">Без тега <small>${noTag}</small></button> ${allTags.map(t => `<span class="adm-tagf"><button type="button" class="adm-tag" data-tagf="${esc(t)}" aria-pressed="${bTag === t}"${tagSty(t)}>${esc(t)} <small>${d.users.filter(u => tagsOf(u).includes(t)).length}</small></button><button type="button" class="adm-tagdot" data-tagcol="${esc(t)}" title="Цвет тега" aria-label="Цвет тега ${esc(t)}"></button></span>`).join(' ')}${bTag ? ` <small class="be-note">Показано: ${list.length}</small>` : ''}</p>` : ''}
-        <table class="be-table adm-table adm-birds"><thead><tr><th>Ник</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}${th('buttons', '🔘 Пуговки')}${th('invited', '👥 Позвали')}<th>Подарки</th><th>🏷 Теги</th><th>Вход</th></tr></thead><tbody>
-        ${list.map(u => `<tr><td>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}${u.banned ? ' <small class="be-danger">заблокирована</small>' : ''}</td>
-          <td data-l="Появилась">${fmt(u.created_at)}</td><td data-l="Заходила">${fmt(u.last_seen)}</td><td data-l="🎨 Работ">${n(u.works)}</td><td data-l="🔥 Рекорд">${n(u.best)}</td>
+        ${pickBar()}
+        <table class="be-table adm-table adm-birds"><thead><tr><th class="adm-ck"><input type="checkbox" id="adm-pickall" title="Отметить всех показанных" aria-label="Отметить всех показанных"${list.length && list.every(u => bPick.has(u.id)) ? ' checked' : ''}></th><th>Ник</th><th>✉️ Почта</th>${th('created_at', 'Появилась')}${th('last_seen', 'Заходила')}${th('works', '🎨 Работ')}${th('best', '🔥 Рекорд серии')}${th('buttons', '🔘 Пуговки')}${th('invited', '👥 Позвали')}<th>Подарки</th><th>🏷 Теги</th><th>Вход</th></tr></thead><tbody>
+        ${list.map(u => `<tr${bPick.has(u.id) ? ' class="adm-picked"' : ''}><td class="adm-ck">${u.nick && !u.banned ? `<input type="checkbox" data-pick="${u.id}" aria-label="Отметить @${esc(u.nick)}"${bPick.has(u.id) ? ' checked' : ''}>` : ''}</td><td>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}${u.banned ? ' <small class="be-danger">заблокирована</small>' : ''}${u.nick && !u.banned ? ` <button type="button" class="adm-mini" data-send1="${u.id}" title="Отправить только этой птичке: сообщение, файл, подарок или пуговки">📢</button>` : ''}</td>
+          <td data-l="✉️ Почта">${u.email ? `<a href="mailto:${esc(u.email)}">${esc(u.email)}</a>${u.mail_news ? ' <small title="Согласилась на письма «Новости от Полли»">📰</small>' : ''}` : '<small class="be-note">—</small>'}</td>          <td data-l="Появилась">${fmt(u.created_at)}</td><td data-l="Заходила">${fmt(u.last_seen)}</td><td data-l="🎨 Работ">${n(u.works)}</td><td data-l="🔥 Рекорд">${n(u.best)}</td>
           <td data-l="🔘 Пуговки"><b>${n(u.buttons)}</b> <button type="button" class="adm-mini" data-btn="${u.id}" title="Добавить или забрать пуговки">±</button></td><td data-l="👥 Позвали">${n(u.invited)}</td>
           <td data-l="Подарки"><button type="button" class="pill-btn" data-gift="${u.id}" title="Подарить семечко для аватара">🎁${u.gifts ? ' ' + u.gifts : ''}</button></td>
           <td data-l="🏷 Теги">${tagsOf(u).map(t => tagChip(t, `<button type="button" class="adm-tagx" data-tagdel="${u.id}" data-tag="${esc(t)}" title="Снять тег" aria-label="Снять тег ${esc(t)}">×</button>`)).join(' ')} <button type="button" class="adm-mini" data-tagadd="${u.id}" title="Добавить тег (можно несколько через запятую)">＋</button></td>
@@ -1104,6 +1119,15 @@
         <details class="adm-fine"><summary>⋯ Редко нужно</summary><p><button type="button" class="pill-btn" id="adm-backfill">🔘 Начислить всем за прошлые бейджи и рисунки</button> <small class="be-note">Нужно было один раз, когда появились пуговки. Повторно не начислит — каждая награда даётся один раз.</small></p></details></section>`;
       main.querySelectorAll('[data-gift]').forEach(b => b.onclick = () => giftDialog(d.users.find(u => u.id === +b.dataset.gift), birds));
       main.querySelector('#adm-giftall').onclick = () => { window.PPAud = null; giftDialog(null, birds); };
+      // ☑ отметки и «📢 Отправить»: всем / отмеченным / одной
+      main.querySelector('#adm-sendall').onclick = () => sendDialog(null);
+      main.querySelectorAll('[data-send1]').forEach(b => b.onclick = () => { const u = d.users.find(x => x.id === +b.dataset.send1); sendDialog({ ids: [u.id], label: pickLabel([u]) }); });
+      main.querySelectorAll('[data-pick]').forEach(c => c.onchange = () => { c.checked ? bPick.add(+c.dataset.pick) : bPick.delete(+c.dataset.pick); draw(); });
+      main.querySelector('#adm-pickall').onchange = e => { list.filter(u => u.nick && !u.banned).forEach(u => e.target.checked ? bPick.add(u.id) : bPick.delete(u.id)); draw(); };
+      const picked = () => d.users.filter(u => bPick.has(u.id));
+      main.querySelector('#adm-picksend')?.addEventListener('click', () => { const us = picked(); if (us.length) sendDialog({ ids: us.map(u => u.id), label: pickLabel(us) }); });
+      main.querySelector('#adm-pickclear')?.addEventListener('click', () => { bPick.clear(); draw(); });
+      main.querySelector('#adm-pickmail')?.addEventListener('click', async e => { const m = picked().map(u => u.email).filter(Boolean).join(', '); if (!m) return alert('У отмеченных птичек нет почты.'); try { await navigator.clipboard.writeText(m); e.target.textContent = '✓ Скопировано'; } catch (x) { prompt('Почты отмеченных:', m); } });
       // зарплата: всем птичкам с ником (кроме заблокированных) N пуговок сразу, у них — конвертик с анимацией (account.js)
       main.querySelector('#adm-salary').onclick = async e => {
         const v = prompt('Зарплата: сколько пуговок 🔘 выдать КАЖДОЙ птичке с ником?\nПуговки зачислятся сразу, а при заходе на сайт птичка откроет конвертик от администрации Воббленда.', '10');

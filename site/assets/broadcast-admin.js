@@ -13,15 +13,17 @@
   const fmt = t => new Date(t * 1000).toLocaleString('ru-RU', { day: 'numeric', month: 'short', hour: '2-digit', minute: '2-digit' });
   const kb = n => n > 1048576 ? (n / 1048576).toFixed(1) + ' МБ' : Math.max(1, Math.round(n / 1024)) + ' КБ';
   const AUD = { all: 'всем птичкам', new: 'новым', old: 'старым' };
-  const audText = (aud, days) => aud === 'all' ? 'Всем' : aud === 'new' ? `Новым (за ${days} дн.)` : `Старым (раньше ${days} дн.)`;
+  const audText = (aud, days) => aud === 'pick' ? `Отмеченным (${days})` : aud === 'all' ? 'Всем' : aud === 'new' ? `Новым (за ${days} дн.)` : `Старым (раньше ${days} дн.)`;
   const KEY = 'pp_bc_draft';
 
-  async function mount(main) {
+  // pick = { ids, label } — «отмеченным» из 🐦 Птиц (admin.js birds(), окно поверх списка); без pick — экран «📢 Рассылка»
+  async function mount(main, pick) {
     let draft = {}; try { draft = JSON.parse(localStorage.getItem(KEY) || '{}'); } catch (e) { /* нет хранилища */ }
-    const st = { aud: draft.aud || 'all', days: draft.days || 30, what: 'msg', file: null };
+    const st = { aud: pick ? 'pick' : draft.aud || 'all', days: draft.days || 30, what: 'msg', file: null, uids: pick ? pick.ids : null };
+    const who = () => st.uids ? { aud: 'pick', uids: st.uids } : { aud: st.aud, days: st.days };
     main.innerHTML = `<section class="adm-box"><h2>👥 Кому</h2>
-        <div class="adm-quick bc-aud">${Object.keys(AUD).map(k => `<label class="pill-btn"><input type="radio" name="bc-aud" value="${k}"${st.aud === k ? ' checked' : ''}> ${k === 'all' ? 'Всем' : k === 'new' ? 'Новым' : 'Старым'}</label>`).join('')}
-          <label class="bc-days">— зарегистрировались <span class="bc-dw"></span> <input type="number" class="be-input bc-n" min="1" max="3650" value="${st.days}" style="width:80px"> дней</label></div>
+        ${pick ? `<p class="bc-pick">${esc(pick.label)}</p>` : `<div class="adm-quick bc-aud">${Object.keys(AUD).map(k => `<label class="pill-btn"><input type="radio" name="bc-aud" value="${k}"${st.aud === k ? ' checked' : ''}> ${k === 'all' ? 'Всем' : k === 'new' ? 'Новым' : 'Старым'}</label>`).join('')}
+          <label class="bc-days">— зарегистрировались <span class="bc-dw"></span> <input type="number" class="be-input bc-n" min="1" max="3650" value="${st.days}" style="width:80px"> дней</label></div>`}
         <p class="be-note bc-count" aria-live="polite">Считаю…</p>
         <p class="be-note">Сообщения на сайте получают все выбранные птички с ником — это сообщение внутри аккаунта, согласие не нужно. На почту — только тем, кто сам включил «🐦 Новости от Полли» (ссылка «Отписаться» в каждом письме, не больше одного письма в день).</p></section>
       <section class="adm-box"><h2>📦 Что отправить</h2>
@@ -40,18 +42,18 @@
           <p><label>Сколько каждой: <input type="number" class="be-input bc-amt" min="1" max="10000" value="10" style="width:100px"> 🔘</label></p>
           <button type="button" class="pill-btn pill-fill bc-btn">🔘 Выдать</button></div>
         <p class="be-note bc-msg" aria-live="polite"></p></section>
-      <section class="adm-box"><h2>📜 Отправленные сообщения</h2><div class="bc-list" style="overflow-x:auto"><p class="be-note">Загрузка…</p></div></section>`;
+      <section class="adm-box"${pick ? ' hidden' : ''}><h2>📜 Отправленные сообщения</h2><div class="bc-list" style="overflow-x:auto"><p class="be-note">Загрузка…</p></div></section>`;
     const $ = s => main.querySelector(s), $$ = s => [...main.querySelectorAll(s)];
     const f = l => main.querySelector(`.ml-lang[data-l="${l}"]`);
     const msg = (t, bad) => { const m = $('.bc-msg'); m.textContent = t; m.style.color = bad ? '#b00' : ''; };
-    const label = () => st.aud === 'all' ? AUD.all : `${AUD[st.aud]} птичкам (${st.aud === 'new' ? 'за последние' : 'раньше, чем'} ${st.days} дн.)`;
-    const save = () => { const d = { aud: st.aud, days: st.days }; for (const l of ['en', 'ru', 'lv']) d[l] = { s: f(l).querySelector('.ml-s').value, t: f(l).querySelector('.ml-t').value }; try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} };
+    const label = () => pick ? pick.label : st.aud === 'all' ? AUD.all : `${AUD[st.aud]} птичкам (${st.aud === 'new' ? 'за последние' : 'раньше, чем'} ${st.days} дн.)`;
+    const save = () => { const d = pick ? { aud: draft.aud, days: draft.days } : { aud: st.aud, days: st.days }; for (const l of ['en', 'ru', 'lv']) d[l] = { s: f(l).querySelector('.ml-s').value, t: f(l).querySelector('.ml-t').value }; try { localStorage.setItem(KEY, JSON.stringify(d)); } catch (e) {} };
     let cnt = { count: 0, mail: 0 };
     async function count() {
-      $('.bc-days').hidden = st.aud === 'all';
-      $('.bc-dw').textContent = st.aud === 'new' ? 'за последние' : 'раньше, чем';
+      if (!pick) $('.bc-days').hidden = st.aud === 'all';
+      if (!pick) $('.bc-dw').textContent = st.aud === 'new' ? 'за последние' : 'раньше, чем';
       try {
-        const d = await api(`admin/notes?aud=${st.aud}&days=${st.days}`); cnt = d;
+        const d = await api(st.uids ? `admin/notes?aud=pick&uids=${st.uids.join(',')}` : `admin/notes?aud=${st.aud}&days=${st.days}`); cnt = d;
         $('.bc-count').innerHTML = `Получат на сайте: <b>${d.count}</b> птичек · из них согласились на письма: <b>${d.mail}</b>`;
         $('.bc-mailn').textContent = d.mailOn ? `— ${d.mail} птичкам, кто согласился на «Новости от Полли»` : '— письма выключены (нет RESEND_KEY в Cloudflare)';
         $('.bc-mail').disabled = !d.mailOn;
@@ -67,8 +69,8 @@
         try { await api('admin/notes/delete', { id: Number(b.closest('tr').dataset.id) }); count(); } catch (e) { alert(e.message); }
       });
     }
-    $$('[name="bc-aud"]').forEach(r => r.onchange = () => { st.aud = r.value; save(); count(); });
-    $('.bc-n').onchange = () => { st.days = Math.min(3650, Math.max(1, Math.floor(+$('.bc-n').value) || 30)); $('.bc-n').value = st.days; save(); count(); };
+    if (!pick) $$('[name="bc-aud"]').forEach(r => r.onchange = () => { st.aud = r.value; save(); count(); });
+    if (!pick) $('.bc-n').onchange = () => { st.days = Math.min(3650, Math.max(1, Math.floor(+$('.bc-n').value) || 30)); $('.bc-n').value = st.days; save(); count(); };
     $$('.bc-what [data-w]').forEach(b => b.onclick = () => { st.what = b.dataset.w; $$('.bc-what [data-w]').forEach(x => x.classList.toggle('pill-fill', x === b)); $$('.bc-pane').forEach(p => p.hidden = p.dataset.w !== st.what); });
     $$('.ml-tabs [data-l]').forEach(b => b.onclick = () => { $$('.ml-tabs [data-l]').forEach(x => x.classList.toggle('pill-fill', x === b)); $$('.ml-lang').forEach(x => x.hidden = x.dataset.l !== b.dataset.l); });
     $$('.ml-s, .ml-t').forEach(i => i.addEventListener('input', save));
@@ -97,7 +99,7 @@
           file = d;
         }
         msg('Отправляю…');
-        const r = await api('admin/notes/send', { L, file, aud: st.aud, days: st.days, mail });
+        const r = await api('admin/notes/send', { L, file, ...who(), mail });
         msg(`📢 Отправлено: ${r.total} птичкам на сайте${r.mail ? `, письма — ${r.mail} (уходят порциями, не больше одного письма в день)` : ''}.`);
         for (const l of ['en', 'ru', 'lv']) { f(l).querySelector('.ml-s').value = ''; f(l).querySelector('.ml-t').value = ''; }
         st.file = null; $('.bc-file').value = ''; $('.bc-fname').textContent = ''; $('.bc-mail').checked = false; save(); count();
@@ -106,7 +108,7 @@
     };
     $('.bc-gift').onclick = () => {
       if (!window.PPGiftDialog) return msg('Окно подарка не загрузилось — обновите страницу.', true);
-      window.PPAud = { aud: st.aud, days: st.days, label: label() };
+      window.PPAud = { ...who(), label: label() };
       window.PPGiftDialog(null, () => count());
     };
     $('.bc-btn').onclick = async e => {
@@ -114,7 +116,7 @@
       if (!(n >= 1 && n <= 10000)) return msg('Нужно число от 1 до 10000.', true);
       if (!confirm(`Выдать по ${n} 🔘 ${label()} — ${cnt.count} птичкам?`)) return;
       e.target.disabled = true;
-      try { const r = await api('admin/salary', { amount: n, aud: st.aud, days: st.days }); msg(`💌 Выдано: ${r.count} птичкам по ${r.amount} 🔘`); } catch (x) { msg(x.message, true); }
+      try { const r = await api('admin/salary', { amount: n, ...who() }); msg(`💌 Выдано: ${r.count} птичкам по ${r.amount} 🔘`); } catch (x) { msg(x.message, true); }
       e.target.disabled = false;
     };
     count();

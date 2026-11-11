@@ -1038,8 +1038,7 @@ async function blogPageInner(req, env, url, h) {
 
   const post = posts.find(x => x.slug === slug);
   if (!post) {
-    const nf = await env.ASSETS.fetch(new Request(url.origin + '/404.html'));
-    return html(await nf.text(), 404);
+    return h.errorPage(env, url, 404); // своя 404 на языке адреса (worker/index.js errorPage)
   }
   if (!isAdm && !/bot|crawl|spider|slurp|preview|facebookexternalhit|headless/i.test(req.headers.get('user-agent') || '')) {
     await env.DB.prepare('UPDATE blog_posts SET views = views + 1 WHERE id = ?').bind(post.id).run();

@@ -8,13 +8,16 @@ export const NOTE_TABLES = [
   'CREATE TABLE IF NOT EXISTS note_to (note_id INTEGER NOT NULL, user_id INTEGER NOT NULL, seen_at INTEGER DEFAULT 0, PRIMARY KEY (note_id, user_id))',
   'CREATE INDEX IF NOT EXISTS note_to_user ON note_to(user_id, seen_at)',
 ];
-export const NOTE_ALTER = ['ALTER TABLE mail_out ADD COLUMN aud_from INTEGER DEFAULT 0', 'ALTER TABLE mail_out ADD COLUMN aud_to INTEGER DEFAULT 0'];
+export const NOTE_ALTER = ['ALTER TABLE mail_out ADD COLUMN aud_from INTEGER DEFAULT 0', 'ALTER TABLE mail_out ADD COLUMN aud_to INTEGER DEFAULT 0', 'ALTER TABLE mail_out ADD COLUMN aud_ids TEXT']; // aud_ids — «отмеченным»: id через запятую
 export const NOTE_FILE_MAX = 20 * 1024 * 1024;
 const SITE = 'https://www.pigeonpolly.com';
 const LANGS = ['en', 'ru', 'lv'];
 
 // «кому»: границы даты регистрации [from, to) — all: все, new: за последние N дней, old: раньше N дней назад
+// pick — отмеченные в «🐦 Птицах» (b.uids — id птичек, до 5000)
+export const audIds = b => [...new Set((Array.isArray(b && b.uids) ? b.uids : String((b && b.uids) || '').split(',')).map(x => Math.floor(Number(x))).filter(x => x > 0))].slice(0, 5000);
 export function audRange(b, t) {
+  if (b && b.aud === 'pick') { const ids = audIds(b); return { aud: 'pick', days: ids.length, from: 0, to: t + 1, ids }; }
   const aud = ['new', 'old'].includes(b && b.aud) ? b.aud : 'all';
   const days = Math.min(3650, Math.max(1, Math.floor(Number(b && b.days) || 30)));
   const cut = t - days * 86400;
@@ -23,7 +26,8 @@ export function audRange(b, t) {
 // условие для SQL по таблице users (алиас a): птички с ником, не заблокированные, в границах «кому»
 export function audWhere(b, t, a = '') {
   const r = audRange(b, t), p = a ? a + '.' : '';
-  return { sql: `${p}banned = 0 AND ${p}nick IS NOT NULL AND ${p}nick != '' AND COALESCE(${p}created_at, 0) >= ${r.from} AND COALESCE(${p}created_at, 0) < ${r.to}`, ...r };
+  const pick = r.ids ? ` AND ${p}id IN (${r.ids.join(',') || 0})` : '';
+  return { sql: `${p}banned = 0 AND ${p}nick IS NOT NULL AND ${p}nick != '' AND COALESCE(${p}created_at, 0) >= ${r.from} AND COALESCE(${p}created_at, 0) < ${r.to}${pick}`, ...r };
 }
 
 const pickL = (L, lang) => { const x = L[lang] || {}; return x.s && x.s.trim() ? x : L.en || {}; };
@@ -65,7 +69,7 @@ export async function notesApi(req, env, url, h) {
   const a = await h.needUser(req, env); if (!(await h.isAdmin(a, env))) h.fail(403, 'admin');
   const t = h.now();
   if (m === 'GET' && p === '/api/admin/notes') { // сколько птичек в каждой группе и в т. ч. согласных на письма; последние рассылки
-    const b = { aud: url.searchParams.get('aud'), days: url.searchParams.get('days') };
+    const b = { aud: url.searchParams.get('aud'), days: url.searchParams.get('days'), uids: url.searchParams.get('uids') };
     const w = audWhere(b, t);
     const c = await env.DB.prepare(`SELECT COUNT(*) AS n, SUM(mail_news = 1 AND email IS NOT NULL AND email != '') AS mail FROM users WHERE ${w.sql}`).first();
     const list = (await env.DB.prepare('SELECT n.id, n.L, n.file_name, n.file_size, n.aud, n.days, n.total, n.created_at, n.mail_id, (SELECT COUNT(*) FROM note_to x WHERE x.note_id = n.id AND x.seen_at > 0) AS seen, mo.sent AS mail_sent, mo.total AS mail_total FROM notes n LEFT JOIN mail_out mo ON mo.id = n.mail_id ORDER BY n.id DESC LIMIT 30').all()).results
@@ -106,7 +110,7 @@ export async function notesApi(req, env, url, h) {
       const att = { en: 'There is a file attached — download it on the site.', ru: 'К сообщению приложен файл — скачать его можно на сайте.', lv: 'Ziņai pievienots fails — to var lejupielādēt vietnē.' };
       for (const l of LANGS) if (L[l].s && L[l].t) ML[l] = { s: L[l].s, t: L[l].t + (f ? '\n\n' + att[l] : '') + '\n\n' + more[l] + ' ' + SITE + (l === 'en' ? '' : '/' + l) + '/bird/' };
       mailTotal = (await env.DB.prepare(`SELECT COUNT(*) AS n FROM users WHERE ${w.sql} AND mail_news = 1 AND email IS NOT NULL AND email != ''`).first()).n || 0;
-      const mo = await env.DB.prepare("INSERT INTO mail_out (cat, L, status, total, created_at, aud_from, aud_to) VALUES ('news', ?, 'send', ?, ?, ?, ?)").bind(JSON.stringify(ML), mailTotal, t, w.from, w.to).run();
+      const mo = await env.DB.prepare("INSERT INTO mail_out (cat, L, status, total, created_at, aud_from, aud_to, aud_ids) VALUES ('news', ?, 'send', ?, ?, ?, ?, ?)").bind(JSON.stringify(ML), mailTotal, t, w.from, w.to, w.ids ? w.ids.join(',') || '0' : null).run();
       mailId = mo.meta.last_row_id;
     }
     await env.DB.prepare('UPDATE notes SET total = ?, mail_id = ? WHERE id = ?').bind(total, mailId, id).run();

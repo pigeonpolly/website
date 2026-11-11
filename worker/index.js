@@ -45,27 +45,9 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     const p = url.pathname;
-    if (/^\/(?:(?:ru|lv)\/)?blog\//.test(p) || p.startsWith('/media/') || p === '/sitemap-blog.xml') {
-      if (!env.DB) return env.ASSETS.fetch(req);
-      try { await ensureSchema(env); return await blogPage(req, env, url, helpers(env)); }
-      catch (e) { console.error(e); return env.ASSETS.fetch(req); } // если база недоступна — статическая заглушка
+    if (!p.startsWith('/api/')) { // страницы: при сбое — своя страница «500 · что-то сломалось» вместо голой ошибки Cloudflare
+      try { return await pageFetch(req, env, url, p); } catch (e) { console.error(e); return errorPage(env, url, 500); }
     }
-    if (p === '/study' || p === '/study/') { // личный учебник: страница из worker, не из site/ (worker/study.js)
-      if (!env.DB) return new Response('Not found', { status: 404 });
-      await ensureSchema(env);
-      return studyApi(req, env, url, studyHelpers(env));
-    }
-    if (p === '/english' || p === '/english/') { // учебник английского: страница из worker, не из site/ (worker/english.js)
-      if (!env.DB) return new Response('Not found', { status: 404 });
-      await ensureSchema(env);
-      return englishApi(req, env, url, studyHelpers(env));
-    }
-    if (p === '/norsk' || p === '/norsk/') { // учебник норвежского: страница из worker (worker/norsk.js)
-      if (!env.DB) return new Response('Not found', { status: 404 });
-      await ensureSchema(env);
-      return norskApi(req, env, url, studyHelpers(env));
-    }
-    if (!p.startsWith('/api/')) return sitePage(req, env, url);
     if (!env.DB || !env.IMAGES || !env.GOOGLE_CLIENT_ID) return json({ ready: false }, 503);
     try {
       await ensureSchema(env);
@@ -131,6 +113,42 @@ async function hiddenArt(env) {
   hiddenArtCache = { at: Date.now(), rows };
   return rows;
 }
+// страницы сайта (не /api/): блог, учебники, остальное — из site/ через sitePage
+async function pageFetch(req, env, url, p) {
+  if (/^\/(?:(?:ru|lv)\/)?blog\//.test(p) || p.startsWith('/media/') || p === '/sitemap-blog.xml') {
+    if (!env.DB) return env.ASSETS.fetch(req);
+    try { await ensureSchema(env); return await blogPage(req, env, url, helpers(env)); }
+    catch (e) { console.error(e); return env.ASSETS.fetch(req); } // если база недоступна — статическая заглушка
+  }
+  if (p === '/study' || p === '/study/') { // личный учебник: страница из worker, не из site/ (worker/study.js)
+    if (!env.DB) return errorPage(env, url, 503);
+    await ensureSchema(env);
+    return studyApi(req, env, url, studyHelpers(env));
+  }
+  if (p === '/english' || p === '/english/') { // учебник английского: страница из worker, не из site/ (worker/english.js)
+    if (!env.DB) return errorPage(env, url, 503);
+    await ensureSchema(env);
+    return englishApi(req, env, url, studyHelpers(env));
+  }
+  if (p === '/norsk' || p === '/norsk/') { // учебник норвежского: страница из worker (worker/norsk.js)
+    if (!env.DB) return errorPage(env, url, 503);
+    await ensureSchema(env);
+    return norskApi(req, env, url, studyHelpers(env));
+  }
+  return await sitePage(req, env, url);
+}
+// страница ошибки на языке адреса: site/(ru|lv/)404.html, 500.html, 503.html (build.py, src/pages/404.html и др.)
+export async function errorPage(env, url, code) {
+  const lang = (url.pathname.match(/^\/(ru|lv)\//) || [])[1], base = url.origin + (lang ? '/' + lang : '') + '/' + code;
+  let text = '';
+  for (const u of [base, base + '.html']) {
+    try { const r = await env.ASSETS.fetch(new Request(u)); if (r.ok) { text = await r.text(); break; } } catch (e) { /* нет файла */ }
+  }
+  const h = { 'content-type': text ? 'text/html; charset=utf-8' : 'text/plain; charset=utf-8', 'cache-control': 'no-store' };
+  if (code === 503) h['retry-after'] = '120';
+  return new Response(text || (code === 404 ? 'Not found' : code === 503 ? 'Short break — try again in a few minutes' : 'Something broke — try again in a minute'), { status: code, headers: h });
+}
+
 async function sitePage(req, env, url) {
   if (req.method !== 'GET' || !env.DB || url.searchParams.has('raw')) return env.ASSETS.fetch(req);
   let rows, hid = [];
@@ -2131,7 +2149,7 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/admin/users') {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');
-    return json({ users: (await env.DB.prepare(`SELECT u.id, u.nick, u.created_at, u.last_seen, u.banned, u.best, u.picks, u.avatar, COALESCE(u.buttons, 0) AS buttons, u.pw IS NOT NULL AS haspw, u.pw_temp, substr(u.sub, 1, 2) AS via, COALESCE(u.atags, '') AS atags,
+    return json({ users: (await env.DB.prepare(`SELECT u.id, u.nick, u.email, COALESCE(u.mail_news, 0) AS mail_news, u.created_at, u.last_seen, u.banned, u.best, u.picks, u.avatar, COALESCE(u.buttons, 0) AS buttons, u.pw IS NOT NULL AS haspw, u.pw_temp, substr(u.sub, 1, 2) AS via, COALESCE(u.atags, '') AS atags,
       (SELECT COUNT(*) FROM users f WHERE f.referrer = u.id) AS invited,
       (SELECT COUNT(*) FROM gifts g WHERE g.user_id = u.id) AS gifts,
       (SELECT COUNT(*) FROM posts w WHERE w.user_id = u.id) AS works FROM users u ORDER BY u.created_at DESC`).all()).results, tagColors: await tagColors(env) });

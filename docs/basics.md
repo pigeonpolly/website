@@ -11,6 +11,7 @@
 - Сервер `worker/index.js` (site/ через ASSETS + /api/*): D1 `pigeonpolly` (`DB`, таблицы создаются сами), KV `IMAGES`, `GOOGLE_CLIENT_ID` в `wrangler.jsonc` (`main`); 503 {ready:false} — пропала привязка. Стена — `site/assets/sketch-wall.js`.
 - `ensureSchema`: полная проверка таблиц (~150 запросов) только при смене метки `schema_ver` в meta (хэш текста функции и таблиц) — новые таблицы/ALTER добавлять как раньше, метка сменится сама. Иначе каждый холодный запуск тормозил все страницы.
 - Локально: wrangler dev, отдельный конфиг, `DEV_FAKE_LOGIN=1` («dev:ник», `dev:admin` = админ); в рабочем — НЕ ставить.
+- **Страницы ошибок** 404 / 500 / 503 на 3 языках: `src/pages/404.html`, `500.html`, `503.html` → `site/(ru|lv/)404.html` и др. (build.py). 404 Cloudflare берёт ближайший сам; 500 (сбой страницы) и 503 (нет базы) отдаёт `errorPage()` в worker/index.js.
 - `_held/` — заготовки, без просьбы не публиковать (комиксы и квиз Wobbleland Алина пока не хочет).
 
 ## Языки
