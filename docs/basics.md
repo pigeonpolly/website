@@ -9,6 +9,7 @@
 - `content/galleries/*.json` (full, thumb, w, h, caption), `content/ebooks.json`, `content/projects.json` (полка проектов), `content/cv.json` (`"current": true` — мигающий кружок; переводы — `content/i18n/cv.<lang>.json`, английская строка → перевод).
 - `build.py`: `PAGES`, меню `NAV` + `SECTIONS`, `LANGS`.
 - Сервер `worker/index.js` (site/ через ASSETS + /api/*): D1 `pigeonpolly` (`DB`, таблицы создаются сами), KV `IMAGES`, `GOOGLE_CLIENT_ID` в `wrangler.jsonc` (`main`); 503 {ready:false} — пропала привязка. Стена — `site/assets/sketch-wall.js`.
+- `ensureSchema`: полная проверка таблиц (~150 запросов) только при смене метки `schema_ver` в meta (хэш текста функции и таблиц) — новые таблицы/ALTER добавлять как раньше, метка сменится сама. Иначе каждый холодный запуск тормозил все страницы.
 - Локально: wrangler dev, отдельный конфиг, `DEV_FAKE_LOGIN=1` («dev:ник», `dev:admin` = админ); в рабочем — НЕ ставить.
 - `_held/` — заготовки, без просьбы не публиковать (комиксы и квиз Wobbleland Алина пока не хочет).
 

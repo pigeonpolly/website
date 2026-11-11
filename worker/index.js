@@ -460,85 +460,99 @@ const json = (data, status = 200, headers = {}) =>
   new Response(JSON.stringify(data), { status, headers: { 'content-type': 'application/json; charset=utf-8', 'cache-control': 'no-store', ...headers } });
 
 // ---------- база ----------
-let schemaReady = false;
-async function ensureSchema(env) {
-  if (schemaReady) return;
-  await env.DB.batch([
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS users (
+// Устройство базы проверяется полностью (~150 запросов подряд) только когда оно изменилось:
+// метка schema_ver в meta = хэш текста этой функции и всех таблиц; совпала — один запрос вместо полутора сотен
+// (раньше каждый «холодный» запуск сервера ждал их все — сайт открывался по нескольку секунд).
+let schemaReady = false, schemaWait = null;
+function ensureSchema(env) {
+  if (schemaReady) return Promise.resolve();
+  if (!schemaWait) schemaWait = ensureSchemaRun(env).finally(() => { schemaWait = null; });
+  return schemaWait;
+}
+const strHash = t => { let h = 2166136261; for (let i = 0; i < t.length; i++) h = Math.imul(h ^ t.charCodeAt(i), 16777619); return (h >>> 0).toString(36) + '.' + t.length; };
+async function ensureSchemaRun(env) {
+  const sig = [];
+  const prep = sql => { sig.push(sql); return env.DB.prepare(sql); };
+  const stmts = [
+    prep(`CREATE TABLE IF NOT EXISTS users (
       id INTEGER PRIMARY KEY AUTOINCREMENT, sub TEXT UNIQUE NOT NULL, email TEXT, nick TEXT UNIQUE COLLATE NOCASE,
       consent INTEGER DEFAULT 0, banned INTEGER DEFAULT 0, created_at INTEGER)`),
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, user_id INTEGER NOT NULL, expires INTEGER NOT NULL)`),
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS posts (
+    prep(`CREATE TABLE IF NOT EXISTS sessions (token TEXT PRIMARY KEY, user_id INTEGER NOT NULL, expires INTEGER NOT NULL)`),
+    prep(`CREATE TABLE IF NOT EXISTS posts (
       id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, day TEXT NOT NULL, theme TEXT, bw INTEGER DEFAULT 0,
       created_at INTEGER, hidden INTEGER DEFAULT 0, UNIQUE(user_id, day))`),
-    env.DB.prepare(`CREATE INDEX IF NOT EXISTS posts_created ON posts(created_at)`),
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)`),
+    prep(`CREATE INDEX IF NOT EXISTS posts_created ON posts(created_at)`),
+    prep(`CREATE TABLE IF NOT EXISTS meta (key TEXT PRIMARY KEY, value TEXT)`),
     // подписка «сообщите, когда выйдет книга»: только адрес, язык и текст согласия (GDPR); рассылает Алина вручную
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS subscribers (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, topic TEXT NOT NULL DEFAULT 'books',
+    prep(`CREATE TABLE IF NOT EXISTS subscribers (id INTEGER PRIMARY KEY AUTOINCREMENT, email TEXT NOT NULL, topic TEXT NOT NULL DEFAULT 'books',
       lang TEXT, consent TEXT, created_at INTEGER, UNIQUE(email, topic))`),
     // правки блоков сайта из режима «✏️ Править страницу»: id = data-ppb блока, lang = en/ru/lv; hidden — скрыт на всех языках (lang = '*')
     // подарки-семечки для аватара: Алина выдаёт из кабинета; status: new — ещё не открыт, bag — в сумке (удалить нельзя)
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS gifts (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, kind TEXT NOT NULL, item TEXT NOT NULL, note TEXT, status TEXT DEFAULT 'new', created_at INTEGER, opened_at INTEGER)`),
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS site_blocks (id TEXT NOT NULL, lang TEXT NOT NULL, html TEXT, hidden INTEGER DEFAULT 0, page TEXT, updated_at INTEGER, PRIMARY KEY (id, lang))`),
+    prep(`CREATE TABLE IF NOT EXISTS gifts (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, kind TEXT NOT NULL, item TEXT NOT NULL, note TEXT, status TEXT DEFAULT 'new', created_at INTEGER, opened_at INTEGER)`),
+    prep(`CREATE TABLE IF NOT EXISTS site_blocks (id TEXT NOT NULL, lang TEXT NOT NULL, html TEXT, hidden INTEGER DEFAULT 0, page TEXT, updated_at INTEGER, PRIMARY KEY (id, lang))`),
     // пуговки: журнал начислений и трат (одно начисление на (кто, за что, ref) — повторно не дать); магазин: цена и сколько осталось
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS button_log (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, kind TEXT NOT NULL, ref TEXT NOT NULL, amount INTEGER NOT NULL, day TEXT, created_at INTEGER, UNIQUE (user_id, kind, ref))`),
+    prep(`CREATE TABLE IF NOT EXISTS button_log (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, kind TEXT NOT NULL, ref TEXT NOT NULL, amount INTEGER NOT NULL, day TEXT, created_at INTEGER, UNIQUE (user_id, kind, ref))`),
     // посетители сайта (своя статистика без cookie): одна строка = один просмотр страницы; vid — хеш (IP + браузер + соль), меняется каждые сутки, сам IP не храним
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS visits (id INTEGER PRIMARY KEY AUTOINCREMENT, day TEXT NOT NULL, ts INTEGER, vid TEXT, entry INTEGER DEFAULT 0, path TEXT, lang TEXT,
+    prep(`CREATE TABLE IF NOT EXISTS visits (id INTEGER PRIMARY KEY AUTOINCREMENT, day TEXT NOT NULL, ts INTEGER, vid TEXT, entry INTEGER DEFAULT 0, path TEXT, lang TEXT,
       src TEXT, ref TEXT, campaign TEXT, device TEXT, os TEXT, browser TEXT, country TEXT)`),
-    env.DB.prepare(`CREATE INDEX IF NOT EXISTS visits_day ON visits(day)`),
+    prep(`CREATE INDEX IF NOT EXISTS visits_day ON visits(day)`),
     // сохранённые ссылки с метками (кабинет → «Посетители»): по ним считаем заходы
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS utm_links (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT NOT NULL, source TEXT NOT NULL, campaign TEXT NOT NULL, note TEXT, created_at INTEGER, UNIQUE (path, source, campaign))`),
+    prep(`CREATE TABLE IF NOT EXISTS utm_links (id INTEGER PRIMARY KEY AUTOINCREMENT, path TEXT NOT NULL, source TEXT NOT NULL, campaign TEXT NOT NULL, note TEXT, created_at INTEGER, UNIQUE (path, source, campaign))`),
     // картины, добавленные Алиной с сайта (галереи «Мой скетчбук» + палитра): картинки в R2 art/<key>.jpg и art/<key>-800.jpg.
     // pos — место в очереди палитр дней ЭКСТРА в момент добавления; hidden — убрана с сайта; removed_at — убрана и из очереди (ещё не была показана)
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS art_added (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT UNIQUE NOT NULL, gallery TEXT NOT NULL, title TEXT, colors TEXT,
+    prep(`CREATE TABLE IF NOT EXISTS art_added (id INTEGER PRIMARY KEY AUTOINCREMENT, key TEXT UNIQUE NOT NULL, gallery TEXT NOT NULL, title TEXT, colors TEXT,
       w INTEGER, h INTEGER, palette INTEGER DEFAULT 1, pos INTEGER, hidden INTEGER DEFAULT 0, created_at INTEGER, removed_at INTEGER)`),
     // картины из статики, скрытые Алиной в галереях «Мой скетчбук» (src = images/.../x.jpg); сервер вырезает их из страниц
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS art_hidden (src TEXT PRIMARY KEY, thumb TEXT, gallery TEXT, created_at INTEGER)`),
+    prep(`CREATE TABLE IF NOT EXISTS art_hidden (src TEXT PRIMARY KEY, thumb TEXT, gallery TEXT, created_at INTEGER)`),
     // адвент-календарь: что Алина положила в окошко дня (можно несколько — птичке достаётся одна из них) и кто что открыл
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS advent_plan (day INTEGER NOT NULL, kind TEXT NOT NULL, item TEXT NOT NULL, PRIMARY KEY (day, kind, item))`),
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS advent_open (user_id INTEGER NOT NULL, year INTEGER NOT NULL, day INTEGER NOT NULL, kind TEXT, item TEXT, buttons INTEGER DEFAULT 0, created_at INTEGER, PRIMARY KEY (user_id, year, day))`),
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS shop (kind TEXT NOT NULL, item TEXT NOT NULL, price INTEGER DEFAULT 0, stock INTEGER DEFAULT 0, PRIMARY KEY (kind, item))`),
+    prep(`CREATE TABLE IF NOT EXISTS advent_plan (day INTEGER NOT NULL, kind TEXT NOT NULL, item TEXT NOT NULL, PRIMARY KEY (day, kind, item))`),
+    prep(`CREATE TABLE IF NOT EXISTS advent_open (user_id INTEGER NOT NULL, year INTEGER NOT NULL, day INTEGER NOT NULL, kind TEXT, item TEXT, buttons INTEGER DEFAULT 0, created_at INTEGER, PRIMARY KEY (user_id, year, day))`),
+    prep(`CREATE TABLE IF NOT EXISTS shop (kind TEXT NOT NULL, item TEXT NOT NULL, price INTEGER DEFAULT 0, stock INTEGER DEFAULT 0, PRIMARY KEY (kind, item))`),
     // игра «Пуговичный дождь»: забег (run) — с какого времени и какой уровень пройден
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS game_runs (id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, started INTEGER NOT NULL, level INTEGER DEFAULT 0)`),
+    prep(`CREATE TABLE IF NOT EXISTS game_runs (id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, started INTEGER NOT NULL, level INTEGER DEFAULT 0)`),
     // «Зельеварня Полли»: забег по лабиринту (какие ингредиенты в нём лежат) и книга рецептов птички (tier 0 — не сработало)
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS maze_runs (id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, level INTEGER NOT NULL, seed INTEGER NOT NULL, items TEXT, started INTEGER NOT NULL, done INTEGER DEFAULT 0)`),
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS potion_book (user_id INTEGER NOT NULL, combo TEXT NOT NULL, tier INTEGER NOT NULL, n INTEGER DEFAULT 1, created_at INTEGER, PRIMARY KEY (user_id, combo))`),
+    prep(`CREATE TABLE IF NOT EXISTS maze_runs (id TEXT PRIMARY KEY, user_id INTEGER NOT NULL, level INTEGER NOT NULL, seed INTEGER NOT NULL, items TEXT, started INTEGER NOT NULL, done INTEGER DEFAULT 0)`),
+    prep(`CREATE TABLE IF NOT EXISTS potion_book (user_id INTEGER NOT NULL, combo TEXT NOT NULL, tier INTEGER NOT NULL, n INTEGER DEFAULT 1, created_at INTEGER, PRIMARY KEY (user_id, combo))`),
     // «Нарисуй мне» (/requests/): темы от посетителей и ответы Алины (img — id картинки, как у работ челленджа: /api/img/…)
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS draw_requests (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, anon TEXT, text TEXT NOT NULL, lang TEXT, who TEXT, status TEXT DEFAULT 'open', img TEXT, gift TEXT, created_at INTEGER, answered_at INTEGER)`),
+    prep(`CREATE TABLE IF NOT EXISTS draw_requests (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER, anon TEXT, text TEXT NOT NULL, lang TEXT, who TEXT, status TEXT DEFAULT 'open', img TEXT, gift TEXT, created_at INTEGER, answered_at INTEGER)`),
     // лайки «Нарисуй мне»: kind 't' — тема (пока не нарисована), 'd' — рисунок; who — 'u'+id или 'v'+cookie
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS draw_likes (rid INTEGER NOT NULL, kind TEXT NOT NULL, who TEXT NOT NULL, created_at INTEGER, PRIMARY KEY (rid, kind, who))`),
-    env.DB.prepare(`CREATE TABLE IF NOT EXISTS potion_gifts (id INTEGER PRIMARY KEY AUTOINCREMENT, to_id INTEGER NOT NULL, from_nick TEXT, ing TEXT NOT NULL, n INTEGER NOT NULL, created_at INTEGER, seen INTEGER DEFAULT 0)`),
-    ...CHALLENGE_TABLES.map(sql => env.DB.prepare(sql)), // план тем челленджа: challenge_days (worker/challenge-days.js)
-    ...CARD_TABLES.map(sql => env.DB.prepare(sql)), // карточки: cards, card_sets, card_owner (worker/cards.js)
-    ...TOP_TABLES.map(sql => env.DB.prepare(sql)), // доски топа игр: top_week (worker/top.js)
-    ...PAN_TABLES.map(sql => env.DB.prepare(sql)), // «Блинная Полли»: pan_runs (worker/pancakes.js)
-    ...GARDEN_TABLES.map(sql => env.DB.prepare(sql)), // огород: garden (worker/garden.js)
-    ...MY_GAMES_TABLES.map(sql => env.DB.prepare(sql)), // «★ Мои игры»: my_games (worker/my-games.js)
-    ...ABOUT_CHAT_TABLES.map(sql => env.DB.prepare(sql)), // чат на /about-me/: about_chat (worker/about-chat.js)
-    ...WEEK_TABLES.map(sql => env.DB.prepare(sql)), // переходы на Amazon: out_clicks (worker/week.js)
-    ...SHIFT_TABLES.map(sql => env.DB.prepare(sql)), // «Смена с Полли»: shift_runs (worker/shift.js)
-    ...SCHOOL_TABLES.map(sql => env.DB.prepare(sql)), // «Школа Полли»: school_works (worker/school.js)
-    ...STUDY_TABLES.map(sql => env.DB.prepare(sql)), // учебник: study_progress (worker/study.js)
-    ...ENGLISH_TABLES.map(sql => env.DB.prepare(sql)), // учебник английского: english_progress (worker/english.js)
-    ...NOTEBOOK_TABLES.map(sql => env.DB.prepare(sql)), // блокнот в учебниках: textbook_notes (worker/notebook.js)
-    ...NORSK_TABLES.map(sql => env.DB.prepare(sql)), // учебник норвежского: norsk_progress, norsk_access (worker/norsk.js)
-    ...ARTPILL_TABLES.map(sql => env.DB.prepare(sql)), // «Art-Pill»: ap_books, ap_pages, ap_reviews (worker/artpill.js)
-    ...TITOS_TABLES.map(sql => env.DB.prepare(sql)), // детектив Титос: titos, titos_cases (worker/titos.js)
-    ...FLOCK_NEWS_TABLES.map(sql => env.DB.prepare(sql)), // новости стаи: flock_events (worker/flock-news.js)
-    ...FLOCK_TABLES.map(sql => env.DB.prepare(sql)), // пёрышки и гости комнат: room_guests, feathers (worker/flock.js)
-    ...AUTH_TABLES.map(sql => env.DB.prepare(sql)), // вход с паролем: login_fail, pw_reset, funnel (worker/auth.js)
-    ...MAIL_TABLES.map(sql => env.DB.prepare(sql)), // письма: mail_out, mail_sent (worker/mail.js)
-    ...NOTE_TABLES.map(sql => env.DB.prepare(sql)), // рассылка: notes, note_to (worker/notes.js)
-  ]);
+    prep(`CREATE TABLE IF NOT EXISTS draw_likes (rid INTEGER NOT NULL, kind TEXT NOT NULL, who TEXT NOT NULL, created_at INTEGER, PRIMARY KEY (rid, kind, who))`),
+    prep(`CREATE TABLE IF NOT EXISTS potion_gifts (id INTEGER PRIMARY KEY AUTOINCREMENT, to_id INTEGER NOT NULL, from_nick TEXT, ing TEXT NOT NULL, n INTEGER NOT NULL, created_at INTEGER, seen INTEGER DEFAULT 0)`),
+    ...CHALLENGE_TABLES.map(sql => prep(sql)), // план тем челленджа: challenge_days (worker/challenge-days.js)
+    ...CARD_TABLES.map(sql => prep(sql)), // карточки: cards, card_sets, card_owner (worker/cards.js)
+    ...TOP_TABLES.map(sql => prep(sql)), // доски топа игр: top_week (worker/top.js)
+    ...PAN_TABLES.map(sql => prep(sql)), // «Блинная Полли»: pan_runs (worker/pancakes.js)
+    ...GARDEN_TABLES.map(sql => prep(sql)), // огород: garden (worker/garden.js)
+    ...MY_GAMES_TABLES.map(sql => prep(sql)), // «★ Мои игры»: my_games (worker/my-games.js)
+    ...ABOUT_CHAT_TABLES.map(sql => prep(sql)), // чат на /about-me/: about_chat (worker/about-chat.js)
+    ...WEEK_TABLES.map(sql => prep(sql)), // переходы на Amazon: out_clicks (worker/week.js)
+    ...SHIFT_TABLES.map(sql => prep(sql)), // «Смена с Полли»: shift_runs (worker/shift.js)
+    ...SCHOOL_TABLES.map(sql => prep(sql)), // «Школа Полли»: school_works (worker/school.js)
+    ...STUDY_TABLES.map(sql => prep(sql)), // учебник: study_progress (worker/study.js)
+    ...ENGLISH_TABLES.map(sql => prep(sql)), // учебник английского: english_progress (worker/english.js)
+    ...NOTEBOOK_TABLES.map(sql => prep(sql)), // блокнот в учебниках: textbook_notes (worker/notebook.js)
+    ...NORSK_TABLES.map(sql => prep(sql)), // учебник норвежского: norsk_progress, norsk_access (worker/norsk.js)
+    ...ARTPILL_TABLES.map(sql => prep(sql)), // «Art-Pill»: ap_books, ap_pages, ap_reviews (worker/artpill.js)
+    ...TITOS_TABLES.map(sql => prep(sql)), // детектив Титос: titos, titos_cases (worker/titos.js)
+    ...FLOCK_NEWS_TABLES.map(sql => prep(sql)), // новости стаи: flock_events (worker/flock-news.js)
+    ...FLOCK_TABLES.map(sql => prep(sql)), // пёрышки и гости комнат: room_guests, feathers (worker/flock.js)
+    ...AUTH_TABLES.map(sql => prep(sql)), // вход с паролем: login_fail, pw_reset, funnel (worker/auth.js)
+    ...MAIL_TABLES.map(sql => prep(sql)), // письма: mail_out, mail_sent (worker/mail.js)
+    ...NOTE_TABLES.map(sql => prep(sql)), // рассылка: notes, note_to (worker/notes.js)
+  ];
   // новые колонки для уже созданной базы: рекорд и бейджи, которые остаются после очистки картинок
-  for (const sql of ["ALTER TABLE users ADD COLUMN avatar TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
+  const alters = ["ALTER TABLE users ADD COLUMN avatar TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN best INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN badges TEXT DEFAULT ''",
     "ALTER TABLE users ADD COLUMN months TEXT DEFAULT ''", 'ALTER TABLE advent_open ADD COLUMN got TEXT', "ALTER TABLE users ADD COLUMN room TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN tod INTEGER',
     'ALTER TABLE users ADD COLUMN picks INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN picked INTEGER DEFAULT 0',
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_days INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_last TEXT', 'ALTER TABLE users ADD COLUMN cats_alive INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER, ...NOTE_ALTER,
-    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN atags TEXT DEFAULT ''", ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...SHIFT_ALTER, ...SCHOOL_ALTER, ...ABOUT_CHAT_ALTER, ...CHALLENGE_ALTER, ...GARDEN_ALTER, ...WL_ALTER, ...MAIL_ALTER]) {
+    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN atags TEXT DEFAULT ''", ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...SHIFT_ALTER, ...SCHOOL_ALTER, ...ABOUT_CHAT_ALTER, ...CHALLENGE_ALTER, ...GARDEN_ALTER, ...WL_ALTER, ...MAIL_ALTER];
+  const ver = strHash(ensureSchemaRun.toString() + '\n' + sig.join('\n') + '\n' + alters.join('\n'));
+  try { if (((await env.DB.prepare("SELECT value FROM meta WHERE key = 'schema_ver'").first()) || {}).value === ver) { schemaReady = true; return; } } catch (e) { /* новой базы ещё нет — создать */ }
+  await env.DB.batch(stmts);
+  for (const sql of alters) {
     try { await env.DB.prepare(sql).run(); } catch (e) { /* колонка уже есть */ }
   }
   // «Выбор Полли» подешевел с 50 до 11 пуговок: уже начисленные записи пересчитать один раз, баланс = сумма журнала
@@ -579,6 +593,7 @@ async function ensureSchema(env) {
       for (let i = 0; i < us.length; i += 25) await env.DB.batch(us.slice(i, i + 25).flatMap(u => starterBoxSql(env, u, 'cardbox', 1)));
     }
   } catch (e) { console.error('starter box', e); }
+  await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('schema_ver', ?)").bind(ver).run().catch(e => console.error('schema ver', e));
   schemaReady = true;
 }
 
