@@ -94,3 +94,8 @@ html[data-season=summer] body.v2s:has(.wl-map){--wlbg:#2F2622}
 .v2s .hr .search-btn+.lang-switch{margin-left:0}
 .v2s .hr .hd-cart{color:var(--ink)}
 @media (max-width:700px){.v2s .hr .search-btn{width:32px;height:32px}}
+/* Часть Д: внутри старых страниц — вместо фиолетового графит сезона и его акцент (tools/v2_recolor.py заменил цвета style.css на --pp-*) */
+:root{--pp-ink:#2E2521;--pp-deep:#1F1916;--pp-card:#3A302B;--pp-2:#5C4D44;--pp-acc:#93AFCC}
+html[data-season=winter]{--pp-ink:#26303A;--pp-deep:#19212A;--pp-card:#313C47;--pp-2:#4C5A68;--pp-acc:#E2544A}
+html[data-season=spring]{--pp-ink:#26302B;--pp-deep:#19211D;--pp-card:#313C36;--pp-2:#4B5A51;--pp-acc:#E85C64}
+html[data-season=summer]{--pp-ink:#2F2622;--pp-deep:#201A17;--pp-card:#3B312C;--pp-2:#5E4E45;--pp-acc:#7CC6E6}
