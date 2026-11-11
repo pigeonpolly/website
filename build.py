@@ -21,7 +21,7 @@ SITE_URL = "https://www.pigeonpolly.com"
 PAGES = [
     # редизайн 2.0, часть 5 (11.11): новая главная (бывшая /preview/); старая src/pages/home.html больше не собирается
     ("", "Pigeon Polly Art Lab", "preview.html",
-     "Free watercolour and ink lessons, creative guides and books by illustrator Alina Otkinska, and a little painted world of Pigeon Polly."),
+     "Free watercolour and ink lessons, creative guides and books by artist Alina Otkinska, and a little painted world of Pigeon Polly."),
     ("projects", "Projects", "projects.html",
      "Learning design, EdTech and AI automation projects by Alina Otkinska."),
     ("work-with-me", "Work with me", "work-with-me.html",
@@ -82,9 +82,9 @@ PAGES = [
     ("learn", "Lessons", "preview-learn.html",
      "Watercolour and ink lessons by Alina Otkinska: free videos open to everyone and extra video lessons for signed-in visitors."),
     ("guides", "Guides & books", "preview-guides.html",
-     "Creative guides and books by illustrator Alina Otkinska: ink and watercolour sketching, a free colouring book, palettes and little drawing guides."),
+     "Creative guides and books by artist Alina Otkinska: ink and watercolour sketching, a free colouring book, palettes and little drawing guides."),
     ("about", "About Alina", "preview-about.html",
-     "Alina Otkinska: learning experience designer and illustrator from Riga, the human behind Pigeon Polly."),
+     "Alina Otkinska: learning experience designer and artist from Riga, the human behind Pigeon Polly."),
     ("wobbleland", "Wobbleland", "wobbleland.html",
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
