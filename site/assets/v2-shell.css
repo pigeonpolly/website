@@ -147,3 +147,10 @@ a.cab-card:hover{transform:translateY(-2px);color:#2A211C}a.cab-card{transition:
 @media (max-width:700px){.v2s .hr .hd-btns{display:none}}
 @media (max-width:520px){.v2s .hd2:has(.acct-me) .lg span{display:none}}
 .cab-all{display:inline-block;margin:2px 0 8px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--pp-acc);background:none;color:var(--pp-acc);font:700 13px Karla,'Nunito Sans',sans-serif;cursor:pointer}.cab-all:hover{background:var(--pp-acc);color:var(--pp-ink)}
+/* меню аватара (account.js) внутри новой шапки: вернуть отступы, которые снимает обнуление .hd2 * */
+.v2s .hd2 .acct-pop{padding:16px}
+.v2s .hd2 .acct-pop p{margin:0 0 10px}.v2s .hd2 .acct-pop .acct-name{margin:0 0 4px;padding:0 10px}.v2s .hd2 .acct-pop .acct-btns{padding:0 10px}
+.v2s .hd2 .acct-pop a,.v2s .hd2 .acct-pop button[role=menuitem]{padding:9px 10px}
+.v2s .hd2 .acct-pop .acct-ok a{padding:0}
+.v2s .hd2 .acct-pop a.acct-mail{padding:11px}
+.v2s .hd2 .acct-pop hr{margin:6px 0}
