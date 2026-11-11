@@ -1,0 +1,145 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Fredoka:wght@600;700&family=Karla:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F0EA;font-family:Karla,sans-serif;color:#2A211C;width:1440px}
+h1{font-family:Fraunces,serif;font-weight:600;margin:30px 48px 4px;font-size:32px}
+h2{font-family:Fraunces,serif;font-weight:600;margin:6px 48px 4px;font-size:26px}
+p.s{margin:0 48px 22px;color:#6C6058;font-size:16px}
+.top{display:grid;grid-template-columns:560px 1fr;gap:24px;padding:0 48px}
+.card{background:#FBF9F5;border:1px solid #DED5CA;border-radius:20px;padding:20px;position:relative}
+.lab{font-size:13px;color:#6C6058;text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin:0 0 12px}
+.hero{display:flex;justify-content:center;align-items:center;height:520px}.hero svg{width:480px;height:480px}
+.vars{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.v{border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 10px 12px;border:1px solid #DED5CA}
+.v svg{width:190px;height:190px}.v b{font-size:13px;margin-top:10px;opacity:.75}
+.hd{display:flex;align-items:center;gap:12px;background:#2E2521;color:#ECEDEE;border-radius:14px;padding:12px 18px;margin-top:16px}
+.hd svg{width:46px;height:46px}.hd span{font-family:Fraunces,serif;font-size:22px}.hd i{font-style:normal;opacity:.6;font-family:Karla;font-size:15px;margin-left:4px}
+.sizes{display:flex;align-items:flex-end;gap:18px;margin-left:auto}.sizes div{display:flex;flex-direction:column;align-items:center;gap:4px;font-size:11px;color:#A3A8AC}
+.ideas{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:24px;padding:0 48px 48px}
+.idea .pic{display:flex;justify-content:center;gap:14px;align-items:center}.idea .pic svg.b{width:300px;height:300px}
+.idea .mini{display:flex;flex-direction:column;gap:10px}.idea .pic .mini svg.b{width:120px;height:120px}.idea .pic>svg.b{width:270px;height:270px}
+.idea h3{font-family:Fraunces,serif;font-size:21px;margin:12px 0 2px}.idea p{margin:0;color:#6C6058;font-size:14px}
+.n{display:inline-block;background:#22405F;color:#fff;border-radius:50%;width:26px;height:26px;text-align:center;line-height:26px;font-family:Karla;font-size:15px;margin-right:6px;vertical-align:3px}
+</style></head><body>
+<h1>Pigeon Polly — значок, версия 2</h1>
+<p class="s">Без пятен на шее · надпись без засечек · кофе переливается через край чашки · больше объёма</p>
+<div class="top">
+ <div class="card"><p class="lab">Основной</p><div class="hero" id="hero"></div></div>
+ <div><div class="vars" id="vars"></div><div class="hd" id="hd"></div></div>
+</div>
+<h2 style="margin-top:34px">Ещё идеи</h2><p class="s">Та же Полли и тот же круг — разные истории</p>
+<div class="ideas" id="ideas"></div>
+<script>
+let N=0;
+const T={
+ color:{band:'#3B3352',text:'#FBF5EC',star:'#E9A93B',paper:'#FBF5EC',paper2:'#EFE4D6',ink:'#1E1A26',body:'#4C4369',shade:'#3A3254',glow:'#6A5F8C',eyew:'#FFFDF8',eyesh:'#DCD6E4',iris:'#E8782E',irisS:'none',pupil:'#1E1A26',hi:'#FFFDF8',beak:'#E8782E',beakS:'#C45A1C',cere:'#FBF5EC',cup:'#FFFDF8',cupS:'#D9D2E0',stripe:'#93AFCC',coffee:'#7A4E33',coffeeHi:'#A9775A',beret:'#BE2F3A',beretS:'#952230',brush:'#D9A15B',paint:'#22405F',env:'#FFFDF8',envS:'#E2D8CA',wave:'#93AFCC',seal:'#BE2F3A'},
+ solid:{band:'#141414',text:'#fff',star:'#fff',paper:'#fff',paper2:'#fff',ink:'#141414',body:'#141414',shade:'#141414',glow:'#141414',eyew:'#fff',eyesh:'#fff',iris:'#fff',irisS:'#141414',pupil:'#141414',hi:'#fff',beak:'#fff',beakS:'#fff',cere:'#fff',cup:'#fff',cupS:'#fff',stripe:'#141414',coffee:'#141414',coffeeHi:'#141414',beret:'#141414',beretS:'#141414',brush:'#fff',paint:'#141414',env:'#fff',envS:'#fff',wave:'#141414',seal:'#141414'},
+};
+T.line=bg=>({band:'#fff',text:bg,star:bg,paper:bg,paper2:bg,ink:'#fff',body:bg,shade:bg,glow:bg,eyew:'#fff',eyesh:'#fff',iris:'#fff',irisS:'none',pupil:bg,hi:bg,beak:bg,beakS:bg,cere:bg,cup:bg,cupS:bg,stripe:'#fff',coffee:'#fff',coffeeHi:'#fff',beret:bg,beretS:bg,brush:bg,paint:'#fff',env:bg,envS:bg,wave:'#fff',seal:'#fff'});
+const star=(x,y,s,c)=>`<path transform="translate(${x} ${y}) scale(${s})" d="M0 -10 Q1.6 -1.6 10 0 Q1.6 1.6 0 10 Q-1.6 1.6 -10 0 Q-1.6 -1.6 0 -10Z" fill="${c}"/>`;
+const BODY='M62 238 C64 170 82 82 126 72 C170 64 182 150 186 238 Z';
+function cup(c){
+ const sheet='M-14 -9.5 C-20 -9 -26.5 -10 -26.5 -6.5 C-26.5 -2 -23 4 -22 9 C-21.5 13 -19 17 -17 19 L-8 19.5 C-9 15 -6 11 -8.5 6 C-10.5 2 -6.5 -2 -9 -5.5 C-4 -7 -2 -8 -3 -9.5 Z';
+ const drip='M105.5 76 C105 84 103 90 103.5 98 C104 106 111 107 111.5 99 C112 93 112 88 113.5 84 C114.5 88 115 92 116 94 C117 98 121.5 97 121 92 C120.5 86 117 80 116.5 76 Z';
+ const T='translate(117 61) rotate(-16) scale(.86)';
+ return `
+  <g transform="${T}">
+   <path d="M24 -4 C37 -4 37 12 18 11" fill="none"/>
+   <path d="M-24 -12 L24 -12 L17 14 Q0 19 -17 14 Z" fill="${c.cup}"/>
+   <path d="M12 -12 L24 -12 L17 14 Q12 16 8 16.6 Z" fill="${c.cupS}" stroke="none"/>
+   <path d="M-24 -12 L24 -12 L17 14 Q0 19 -17 14 Z" fill="none"/>
+   <path d="M-21 0 Q0 4 21 0" fill="none" stroke="${c.stripe}" stroke-width="4"/>
+   <ellipse cx="0" cy="-12" rx="24" ry="6" fill="${c.cup}"/>
+   <ellipse cx="0" cy="-11.5" rx="18" ry="3.6" fill="${c.coffee}" stroke="none"/>
+  </g>
+  <path d="${drip}" fill="${c.coffee}" stroke-width="6"/>
+  <path d="${sheet}" transform="${T}" fill="${c.coffee}" stroke-width="7"/>
+  <path d="${drip}" fill="${c.coffee}" stroke="none"/>
+  <path d="${sheet}" transform="${T}" fill="${c.coffee}" stroke="none"/>
+  <path d="M-23 -5 C-22 0 -20 5 -19.5 9" transform="${T}" fill="none" stroke="${c.coffeeHi}" stroke-width="2.6"/>
+  <path d="M106.5 86 C106 90 106 93 106.5 96" fill="none" stroke="${c.coffeeHi}" stroke-width="2.4"/>`}
+function beret(c){return `
+  <g transform="translate(124 70) rotate(12)">
+   <path d="M-38 2 C-40 -22 34 -26 40 -4 C42 6 18 8 0 8 C-18 8 -37 8 -38 2 Z" fill="${c.beret}"/>
+   <path d="M10 -18 C30 -16 40 -10 40 -4 C42 6 18 8 6 8 C22 0 22 -10 10 -18 Z" fill="${c.beretS}" stroke="none"/>
+   <path d="M-38 2 C-40 -22 34 -26 40 -4 C42 6 18 8 0 8 C-18 8 -37 8 -38 2 Z" fill="none"/>
+   <path d="M-2 -18 Q0 -27 6 -26" fill="none" stroke-width="4.5"/>
+  </g>`}
+function brush(c){return `
+  <g transform="translate(64 134) rotate(-24)">
+   <rect x="-34" y="-3.6" width="58" height="7.2" rx="3.6" fill="${c.brush}"/>
+   <rect x="-44" y="-4.6" width="13" height="9.2" rx="1.5" fill="${c.cup}"/>
+   <path d="M-44 -4.6 C-56 -4 -64 -1 -68 0 C-64 1 -56 4 -44 4.6 Z" fill="${c.paint}"/>
+  </g>
+  <path d="M30 152 C27 157 27 162 30.5 162 C34 162 33.5 157 30 152 Z" fill="${c.paint}" stroke-width="3"/>`}
+function polly(c,id,o={}){
+ return `<clipPath id="ey${id}"><circle cx="140" cy="124" r="25"/></clipPath><clipPath id="bd${id}"><path d="${BODY}"/></clipPath>
+ <g transform="translate(0 ${o.dy??10})" stroke="${c.ink}" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M84 116 Q66 122 50 135 Q66 141 82 142 Z" fill="${c.beak}"/>
+  <path d="M82 131 Q66 134 52 135 Q66 141 82 142 Z" fill="${c.beakS}" stroke="none"/>
+  <path d="M84 116 Q66 122 50 135 Q66 141 82 142 Z" fill="none"/>
+  <path d="${BODY}" fill="${c.shade}"/>
+  <g clip-path="url(#bd${id})" stroke="none">
+   <ellipse cx="110" cy="168" rx="56" ry="104" fill="${c.body}"/>
+   <path d="M90 118 Q94 96 112 84" fill="none" stroke="${c.glow}" stroke-width="7" stroke-linecap="round"/>
+  </g>
+  <path d="${BODY}" fill="none"/>
+  <path d="M168 168 Q150 192 158 238" fill="none"/>
+  <ellipse cx="79" cy="118" rx="6" ry="4" transform="rotate(-22 79 118)" fill="${c.cere}" stroke-width="3.5"/>
+  <circle cx="140" cy="124" r="25" fill="${c.eyew}"/>
+  <g clip-path="url(#ey${id})" stroke="none">
+   <path d="M110 112 Q140 100 170 112 V124 Q140 110 110 124 Z" fill="${c.eyesh}"/>
+   <circle cx="137" cy="131" r="17" fill="${c.iris}" stroke="${c.irisS}" stroke-width="3"/>
+   <circle cx="136" cy="128" r="12" fill="${c.pupil}"/>
+   <circle cx="131" cy="124" r="3.6" fill="${c.hi}"/>
+   <path d="M110 90 H170 V117 Q140 101 110 117 Z" fill="${c.body}"/>
+  </g>
+  <path d="M116.5 117 Q140 103 163.5 117" fill="none"/>
+  <circle cx="140" cy="124" r="25" fill="none"/>
+  <path d="M118 146 Q140 164 162 146" fill="none" stroke-width="3.5"/>
+  ${o.hat==='beret'?beret(c):o.hat==='none'?'':cup(c)}
+  ${o.brush?brush(c):''}
+ </g>`;}
+const F='font-family="Fredoka" font-weight="600"';
+function ringText(c,id,top,bot){return `<path id="tt${id}" d="M33 120 A87 87 0 0 1 207 120" fill="none"/><path id="tb${id}" d="M14 120 A106 106 0 0 0 226 120" fill="none"/>
+  ${top?`<text ${F} font-size="25" letter-spacing="3.5" fill="${c.text}" text-anchor="middle"><textPath href="#tt${id}" startOffset="50%">${top}</textPath></text>`:''}
+  <text ${F} font-size="20" letter-spacing="5" fill="${c.text}" text-anchor="middle"><textPath href="#tb${id}" startOffset="50%">${bot}</textPath></text>`}
+function badge(c,o={}){const id=++N;const b=o.band||c.band;
+ let edge=`<circle cx="120" cy="120" r="116" fill="${b}" stroke="${c.ink}" stroke-width="4"/>`;
+ if(o.stamp){let d='';const n=40;for(let i=0;i<n;i++){const a=i/n*Math.PI*2,a2=(i+.5)/n*Math.PI*2;
+   d+=(i?'L':'M')+(120+117*Math.cos(a)).toFixed(1)+' '+(120+117*Math.sin(a)).toFixed(1)+' Q'+(120+108*Math.cos(a2)).toFixed(1)+' '+(120+108*Math.sin(a2)).toFixed(1)+' ';}
+   d=d.replace(/Q([\d.]+) ([\d.]+) L/g,'Q$1 $2 ');
+   let p='';for(let i=0;i<n;i++){const a=i/n*Math.PI*2,a2=(i+1)/n*Math.PI*2,am=(i+.5)/n*Math.PI*2;
+    p+=(i?'':'M'+(120+117*Math.cos(a)).toFixed(1)+' '+(120+117*Math.sin(a)).toFixed(1))+' Q'+(120+109*Math.cos(am)).toFixed(1)+' '+(120+109*Math.sin(am)).toFixed(1)+' '+(120+117*Math.cos(a2)).toFixed(1)+' '+(120+117*Math.sin(a2)).toFixed(1);}
+   edge=`<path d="${p}Z" fill="${b}" stroke="${c.ink}" stroke-width="4"/>`;}
+ const pop=o.pop;
+ const clip=pop?`<circle cx="120" cy="120" r="82"/><path d="M62 120 L62 30 A108 108 0 0 1 178 30 L178 120 Z"/>`:`<circle cx="120" cy="120" r="82"/>`;
+ const waves=o.stamp?`<g fill="none" stroke="${c.wave}" stroke-width="3.5" stroke-linecap="round" opacity=".9">${[64,80,96].map(y=>`<path d="M30 ${y} q14 -9 28 0 t28 0 t28 0 t28 0 t28 0 t28 0 t28 0"/>`).join('')}</g>`:'';
+ return `<svg class="b" viewBox="0 0 240 240"><defs><clipPath id="ic${id}">${clip}</clipPath></defs>
+  ${edge}
+  <circle cx="120" cy="120" r="109" fill="none" stroke="${c.text}" stroke-width="1.6" stroke-dasharray="2 5" opacity=".7"/>
+  ${pop?ringText(c,id,'',o.bot||'PIGEON POLLY · ART LAB'):ringText(c,id,o.top||'PIGEON POLLY',o.bot||'ART LAB')}
+  ${pop?'':`${star(20,120,.95,c.star)}${star(220,120,.95,c.star)}`}
+  <circle cx="120" cy="120" r="84" fill="${c.paper}" stroke="${c.ink}" stroke-width="4.5"/>
+  <g clip-path="url(#ic${id})"><path d="M36 150 Q120 128 204 150 V210 H36 Z" fill="${c.paper2}" opacity="${o.stamp?0:1}"/>${waves}${polly(c,id,o)}</g>
+  ${pop?'':`<circle cx="120" cy="120" r="84" fill="none" stroke="${c.ink}" stroke-width="4.5"/>`}
+  ${star(176,72,.75,c.star===c.text?c.ink:c.star)}</svg>`;}
+function mark(c,o={}){const id=++N;
+ return `<svg viewBox="0 0 240 240"><defs><clipPath id="ic${id}"><circle cx="120" cy="120" r="112"/></clipPath></defs>
+  <circle cx="120" cy="120" r="114" fill="${c.paper}"/>
+  <g clip-path="url(#ic${id})"><g transform="translate(120 120) scale(1.16) translate(-124 -134)">${polly(c,id,o)}</g></g>
+  <circle cx="120" cy="120" r="114" fill="none" stroke="${c.ink}" stroke-width="8"/></svg>`;}
+const G='#2E2521';
+hero.innerHTML=badge(T.color);
+vars.innerHTML=`<div class="v" style="background:#fff">${badge(T.solid)}<b>чёрный на светлом</b></div>
+<div class="v" style="background:${G};color:#ECEDEE">${badge(T.line(G))}<b>белый на тёмном</b></div>
+<div class="v" style="background:${G};color:#ECEDEE">${badge(T.color,{band:'#22405F'})}<b>цветной · осень</b></div>`;
+hd.innerHTML=mark(T.color)+'<span>Pigeon Polly<i>Art Lab</i></span><div class="sizes">'+[48,32,16].map(s=>`<div>${mark(T.color).replace('<svg',`<svg width="${s}" height="${s}"`)}${s}px</div>`).join('')+'</div>';
+const I=[
+ ['Художница','Берет и кисточка в клюве — с кисти капает краска. Сразу понятно: Art Lab.',{hat:'beret',brush:true}],
+ ['Голубиная почта','Край как у марки-печати, за Полли — волны почтового штемпеля. Обыгрывает «pigeon».',{stamp:true}],
+ ['Выглядывает из круга','Чашка выходит за внутренний круг на ободок — значок выглядит объёмнее. Надпись одна, снизу.',{pop:true,dy:-16}],
+];
+ideas.innerHTML=I.map(([t,d,o],i)=>`<div class="card idea"><div class="pic">${badge(T.color,o)}<div class="mini">${badge(T.solid,o)}${(()=>{const s=badge(T.line(G),o);return `<div style="background:${G};border-radius:12px;padding:4px;line-height:0">${s}</div>`})()}</div></div>
+<h3><span class="n">${i+1}</span>${t}</h3><p>${d}</p></div>`).join('');
+</script></body></html>
