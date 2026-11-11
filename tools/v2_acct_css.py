@@ -38,6 +38,6 @@ walk(blocks(css))
 text = "\n".join(x for x in out if isinstance(x, str))
 names = {n for n in re.findall(r"animation(?:-name)?\s*:\s*([^;}]+)", text) for n in re.findall(r"[a-zA-Z_][\w-]*", n)}
 kf = [x[2] for x in out if not isinstance(x, str) and x[1] in names]
-root = ":root{--text:#F6F4F3;--muted:#E6E2DF;--peach:var(--pp-acc,#F0A987);--orange:#D85A30;--star:#E9A93B;--dot:#F5C4B3;--serif:'Fraunces',Georgia,serif;--sans:'Karla',system-ui,sans-serif;--bg-2:var(--pp-2,#534AB7);--bg-card:var(--pp-card,#36235F)}"
+root = ":root{--text:#F6F4F3;--muted:#E6E2DF;--peach:var(--pp-acc,#F0A987);--orange:#D85A30;--star:#E9A93B;--dot:#F5C4B3;--serif:'Fraunces',Georgia,serif;--sans:'Karla',system-ui,sans-serif;--bg-2:var(--pp-2,#534AB7);--bg-card:var(--pp-card,#36235F);--header-h:73px;--sb:0px}"
 (R / "site/assets/v2-acct.css").write_text("/* собрано tools/v2_acct_css.py из style.css — руками не править */\n" + root + "\n" + text + "\n" + "\n".join(kf) + "\n")
 print(len(text) // 1024, "KB,", text.count("{"), "rules")

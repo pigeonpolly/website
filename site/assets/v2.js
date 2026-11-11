@@ -109,6 +109,14 @@
     }).catch(() => {});
   });
 
+  // «Войти» у VIP-уроков: окно входа прямо здесь, без перехода на другую страницу
+  document.addEventListener('click', e => {
+    const a = e.target.closest('a[href="#signin"]');
+    if (!a || a.dataset.yt || !window.PPAccount) return;
+    e.preventDefault(); window.scrollTo({ top: 0, behavior: 'instant' }); // окно входа крепится к шапке — сначала наверх
+    window.PPAccount.openSignIn();
+  });
+
   // VIP-видео: только вошедшим (/api/v2/vip), гостю остаётся «Войти бесплатно»
   if (document.querySelector('.vip-go, .vc.vip')) fetch('/api/v2/vip', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => {
     const v = d && d.videos && d.videos[0];

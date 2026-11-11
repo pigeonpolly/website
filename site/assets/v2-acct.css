@@ -1,5 +1,5 @@
 /* собрано tools/v2_acct_css.py из style.css — руками не править */
-:root{--text:#F6F4F3;--muted:#E6E2DF;--peach:var(--pp-acc,#F0A987);--orange:#D85A30;--star:#E9A93B;--dot:#F5C4B3;--serif:'Fraunces',Georgia,serif;--sans:'Karla',system-ui,sans-serif;--bg-2:var(--pp-2,#534AB7);--bg-card:var(--pp-card,#36235F)}
+:root{--text:#F6F4F3;--muted:#E6E2DF;--peach:var(--pp-acc,#F0A987);--orange:#D85A30;--star:#E9A93B;--dot:#F5C4B3;--serif:'Fraunces',Georgia,serif;--sans:'Karla',system-ui,sans-serif;--bg-2:var(--pp-2,#534AB7);--bg-card:var(--pp-card,#36235F);--header-h:73px;--sb:0px}
 .acct{order: 2;}
 @media (min-width: 1301px){
 .acct{order: 4;}
