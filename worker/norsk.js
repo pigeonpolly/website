@@ -1,6 +1,7 @@
 // Личный учебник норвежского (букмол) A1–C2 (/norsk/, docs/site.md «Учебник норвежского») — устроен как worker/english.js: открыт Алине (админ), ником из NORSK_NICKS и тем, кому Алина открыла доступ (norsk_access).
 // Страница — из norsk-page.js (собирает tools/norsk_page.py из content/norsk/). Прогресс: GET/POST /api/norsk {state} (norsk_progress).
 import { NORSK_HTML } from './norsk-page.js';
+import { geminiKey } from './translate.js';
 
 export const NORSK_NICKS = [];
 export const NORSK_TABLES = [
@@ -41,6 +42,7 @@ export async function norskApi(req, env, url, h) {
     const r = await env.DB.prepare('SELECT u.nick, a.added_at FROM norsk_access a JOIN users u ON u.id = a.user_id ORDER BY a.added_at DESC').all();
     return h.json({ list: (r.results || []).map(x => ({ nick: x.nick, at: x.added_at })) }, 200, { 'cache-control': 'no-store' });
   }
+  if (p === '/api/norsk/tts') return tts(env, url, h);
   if (m === 'GET') {
     const r = await env.DB.prepare('SELECT state FROM norsk_progress WHERE user_id = ?').bind(u.id).first();
     let state = {}; try { state = JSON.parse((r && r.state) || '{}') || {}; } catch (e) { state = {}; }
@@ -55,4 +57,41 @@ export async function norskApi(req, env, url, h) {
   await env.DB.prepare(`INSERT INTO norsk_progress (user_id, state, updated_at) VALUES (?, ?, ?)
     ON CONFLICT(user_id) DO UPDATE SET state = excluded.state, updated_at = excluded.updated_at`).bind(u.id, s, Date.now()).run();
   return h.json({ ok: true });
+}
+
+// Озвучка Gemini TTS: GET /api/norsk/tts?t=текст → audio/wav. Готовый звук — в R2 (MEDIA, norsk-tts/<sha256>.wav), второй раз Gemini не зовём.
+// Нет ключа / все модели заняты — 503, движок (content/norsk/engine.js say()) говорит голосом браузера.
+const TTS_MODELS = ['gemini-2.5-flash-preview-tts', 'gemini-2.5-flash-tts', 'gemini-2.5-pro-preview-tts'];
+const TTS_VOICE = 'Kore';
+const AUDIO = { 'content-type': 'audio/wav', 'cache-control': 'private, max-age=31536000, immutable' };
+function wav(pcm, rate = 24000) { // Gemini отдаёт голый PCM 16 бит моно — дописываем WAV-заголовок
+  const b = new ArrayBuffer(44 + pcm.length), v = new DataView(b), str = (o, s) => { for (let i = 0; i < s.length; i++) v.setUint8(o + i, s.charCodeAt(i)); };
+  str(0, 'RIFF'); v.setUint32(4, 36 + pcm.length, true); str(8, 'WAVE'); str(12, 'fmt '); v.setUint32(16, 16, true); v.setUint16(20, 1, true); v.setUint16(22, 1, true);
+  v.setUint32(24, rate, true); v.setUint32(28, rate * 2, true); v.setUint16(32, 2, true); v.setUint16(34, 16, true); str(36, 'data'); v.setUint32(40, pcm.length, true);
+  new Uint8Array(b, 44).set(pcm); return b;
+}
+async function tts(env, url, h) {
+  const text = String(url.searchParams.get('t') || '').replace(/\s+/g, ' ').trim();
+  if (!text || text.length > 500) h.fail(400, 'text');
+  const hash = [...new Uint8Array(await crypto.subtle.digest('SHA-256', new TextEncoder().encode(TTS_VOICE + '|' + text)))].map(x => x.toString(16).padStart(2, '0')).join('');
+  const r2 = 'norsk-tts/' + hash + '.wav';
+  if (env.MEDIA) { const o = await env.MEDIA.get(r2).catch(() => null); if (o) return new Response(o.body, { headers: AUDIO }); }
+  const key = await geminiKey(env);
+  if (!key) h.fail(503, 'no_key');
+  const body = JSON.stringify({ contents: [{ parts: [{ text: 'Read aloud in Norwegian Bokmål, clearly, at a natural pace for a language learner: ' + text }] }],
+    generationConfig: { responseModalities: ['AUDIO'], speechConfig: { voiceConfig: { prebuiltVoiceConfig: { voiceName: TTS_VOICE } } } } });
+  for (const model of TTS_MODELS) {
+    try {
+      const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, { method: 'POST', headers: { 'x-goog-api-key': key, 'content-type': 'application/json' }, body, signal: AbortSignal.timeout(20000) });
+      if (!r.ok) continue; // 404 (нет модели), 429, 503 — следующая
+      const d = await r.json(), part = ((d.candidates || [])[0]?.content?.parts || []).find(x => x.inlineData && x.inlineData.data);
+      if (!part) continue;
+      const rate = +((part.inlineData.mimeType || '').match(/rate=(\d+)/) || [])[1] || 24000;
+      const pcm = Uint8Array.from(atob(part.inlineData.data), c => c.charCodeAt(0));
+      const out = wav(pcm, rate);
+      if (env.MEDIA) await env.MEDIA.put(r2, out, { httpMetadata: { contentType: 'audio/wav' } }).catch(() => null);
+      return new Response(out, { headers: AUDIO });
+    } catch (e) { /* таймаут — следующая модель */ }
+  }
+  h.fail(503, 'tts');
 }
