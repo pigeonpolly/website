@@ -16,27 +16,35 @@ const cut = (s, n) => String(s || '').trim().slice(0, n);
 export async function guidesList(h) {
   try { const a = JSON.parse(await h.getMeta(KEY) || '[]'); return Array.isArray(a) ? a : []; } catch (e) { return []; }
 }
-const cover = x => x.img ? `/api/img/${x.img}?t=1` : x.kind === 'video' && x.yt ? `https://i.ytimg.com/vi/${x.yt}/hqdefault.jpg` : '';
+const cover = x => x.img ? `/api/img/${x.img}?t=1` : x.pic ? x.pic : x.kind === 'video' && x.yt ? `https://i.ytimg.com/vi/${x.yt}/hqdefault.jpg` : '';
 // для сайта: VIP-ссылка YouTube — только вошедшим (как /api/v2/vip)
-export const guideOut = (x, open) => ({ id: x.id, kind: x.kind, vip: x.vip ? 1 : 0, soon: x.soon ? 1 : 0, t: x.t || {}, cover: cover(x),
+export const guideOut = (x, open) => ({ id: x.id, kind: x.kind, vip: x.vip ? 1 : 0, soon: x.soon ? 1 : 0, t: x.t || {}, d: x.d || {}, cover: cover(x),
   ...(x.kind === 'video' ? (x.vip && !open ? {} : { yt: x.yt }) : { url: x.url }), at: x.at });
 
-// встроенные (были на сайте до кабинета): идут после добавленных; названия бесплатных — с YouTube (v2.js ytName)
+// встроенные (были на сайте до кабинета): один раз дописываются в конец списка (метка meta v2_guides_base),
+// дальше их можно править, скрывать и удалять в кабинете, как добавленные; названия бесплатных — с YouTube (v2.js ytName)
 const BASE = [
-  { id: 'b-cafe', kind: 'video', yt: 'eRa1uB_7s9U', base: 1 },
-  { id: 'b-pepper', kind: 'video', yt: 'VVvLZcIqUbM', base: 1 },
-  { id: 'review', kind: 'video', vip: 1, yt: 'PaypNmVZFOw', cover: '/images/v2/lesson-szmal.jpg', base: 1, t: { en: 'Watercolour review', ru: 'Обзор акварели', lv: 'Akvareļu apskats' } },
+  { id: 'b-cafe', kind: 'video', yt: 'eRa1uB_7s9U', at: 1 },
+  { id: 'b-pepper', kind: 'video', yt: 'VVvLZcIqUbM', at: 1 },
+  { id: 'review', kind: 'video', vip: 1, yt: 'PaypNmVZFOw', pic: '/images/v2/lesson-szmal.jpg', at: 1, t: { en: 'Watercolour review', ru: 'Обзор акварели', lv: 'Akvareļu apskats' } },
 ];
+async function withBase(h) {
+  const list = await guidesList(h);
+  if (await h.getMeta(KEY + '_base') === '1') return list;
+  for (const b of BASE) if (!list.some(x => x.id === b.id || (x.kind === 'video' && x.yt === b.yt))) list.push({ ...b });
+  await h.setMeta(KEY, JSON.stringify(list)); await h.setMeta(KEY + '_base', '1');
+  return list;
+}
 export async function guidesApi(req, env, url, h) {
   const p = url.pathname, m = req.method;
   if (p === '/api/v2/guides' && m === 'GET') {
     const u = await h.currentUser(req, env), open = !!(u && !u.banned);
-    const items = [...(await guidesList(h)).filter(x => !x.hidden).map(x => guideOut(x, open)), ...BASE.map(x => ({ ...guideOut(x, open), cover: x.cover || cover(x), base: 1 }))];
+    const items = (await withBase(h)).filter(x => !x.hidden).map(x => guideOut(x, open));
     return h.json({ items, open: open ? 1 : 0 }, 200, { 'cache-control': 'no-store' });
   }
   if (p !== '/api/admin/guides') return null;
   const u = await h.needUser(req, env); if (!(await h.isAdmin(u, env))) h.fail(403, 'admin');
-  let list = await guidesList(h);
+  let list = await withBase(h);
   const out = () => h.json({ items: list.map(x => ({ ...x, cover: cover(x) })) });
   if (m === 'GET') return out();
   if (m !== 'POST') h.fail(405, 'method');
@@ -80,6 +88,14 @@ export async function guidesApi(req, env, url, h) {
     for (const l of need) t[l] = cut(((r.tr || {})[l] || [])[0], 120) || t[src];
   }
   x.t = t;
+  // описание (необязательно): на странице видео /learn/v/<id>/ — тоже переводится на остальные языки
+  const d = {}; for (const l of LANGS) d[l] = cut(f.get('d_' + l), 3000);
+  const dsrc = LANGS.find(l => d[l]), dneed = LANGS.filter(l => !d[l]);
+  if (dsrc && dneed.length) {
+    const r = await h.translate([d[dsrc]], dsrc, dneed).catch(() => ({ tr: {} }));
+    for (const l of dneed) d[l] = cut(((r.tr || {})[l] || [])[0], 3000) || d[dsrc];
+  }
+  if (dsrc) x.d = d; else delete x.d;
   const pic = f.get('cover');
   if (pic && typeof pic === 'object' && pic.size) {
     if (pic.size > 3e6) h.fail(400, 'img');

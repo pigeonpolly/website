@@ -111,11 +111,12 @@
   // подписи бесплатных уроков — по названию видео на YouTube (/api/v2/yt); известные — на языке страницы
   const NAMES = [[/pepper|перец|перц/i, ['Pepper sketching', 'Скетч перца', 'Pipara skice']], [/caf[eé]|outdoor|кафе/i, ['Outdoor sketching in a cafe', 'Скетч на выезде: кафе', 'Skices ārpus mājām: kafejnīca']]];
   const ytName = a => {
-    const b = a.querySelector('b'); if (!b || a.dataset.own) return;
-    fetch('/api/v2/yt?id=' + encodeURIComponent(a.dataset.yt)).then(r => r.ok ? r.json() : null).then(d => {
+    const b = a.querySelector('b, h1'); if (!b || a.dataset.own) return;
+    fetch('/api/v2/yt?id=' + encodeURIComponent(a.dataset.yt || a.dataset.ytn)).then(r => r.ok ? r.json() : null).then(d => {
       const t = d && d.title; if (!t) return;
       const k = NAMES.find(n => n[0].test(t)), name = k ? k[1][L] : t;
       b.textContent = name; const im = a.querySelector('img'); if (im) im.alt = name;
+      if (b.tagName === 'H1') document.title = name + ' · Pigeon Polly Art Lab';
     }).catch(() => {});
   };
   document.querySelectorAll('[data-yt]').forEach(ytName);
@@ -133,6 +134,16 @@
   const tOf = x => (x.t && (x.t[lang] || x.t.en || x.t.ru || x.t.lv)) || '';
   const ext = u => /^https?:/.test(u) ? ' target="_blank" rel="noopener"' : '';
   const own = x => tOf(x) ? ' data-own="1"' : '';
+  // страница видео /learn/v/<id>/ и «просмотрено» (localStorage pp-yt-seen — id YouTube; у каждого браузера свой)
+  const vurl = x => `${pre}/learn/v/${encodeURIComponent(x.id)}/`;
+  const SEEN = (() => { try { return new Set(JSON.parse(localStorage.getItem('pp-yt-seen') || '[]')); } catch (e) { return new Set(); } })();
+  const seenSave = () => { try { localStorage.setItem('pp-yt-seen', JSON.stringify([...SEEN].slice(-500))); } catch (e) {} };
+  const isSeen = x => !!(x.yt && SEEN.has(x.yt));
+  const W = { seen: ['✓ Watched', '✓ Просмотрено', '✓ Noskatīts'], mark: ['Mark as watched', 'Отметить как просмотренное', 'Atzīmēt kā noskatītu'],
+    hide: ['Hide watched', 'Скрыть просмотренные', 'Paslēpt noskatītos'], vid: ['Video', 'Видео', 'Video'], nf: ['This video is not here any more.', 'Этого видео здесь больше нет.', 'Šī video šeit vairs nav.'],
+    all: ['See all videos', 'Все видео', 'Visi video'], soonP: ['This video is coming soon. Come back in a little while!', 'Это видео скоро появится. Загляните чуть позже!', 'Šis video drīzumā būs. Ienāc nedaudz vēlāk!'],
+    lockP: ['This is a VIP video. Sign in for free and it opens right here.', 'Это VIP-видео. Войдите бесплатно — и оно откроется прямо здесь.', 'Šis ir VIP video. Ienāc bez maksas, un tas atvērsies tepat.'],
+    signin: ['Sign in for free', 'Войти бесплатно', 'Ienākt bez maksas'], yt: ['Open on YouTube', 'Открыть на YouTube', 'Atvērt YouTube'], play: ['Play the video', 'Включить видео', 'Atskaņot video'] };
   const guidesReady = fetch('/api/v2/guides', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null).then(d => {
     const items = (d && d.items) || [], vids = items.filter(x => x.kind === 'video'), free = vids.filter(x => !x.vip), vip = vids.filter(x => x.vip), books = items.filter(x => x.kind === 'book');
     const ytCard = x => `<a class="vc yt" href="https://youtu.be/${esc(x.yt)}" data-yt="${esc(x.yt)}"${own(x)} target="_blank" rel="noopener"><span class="th"><img src="${esc(x.cover)}" alt="${esc(tOf(x))}" loading="lazy"><span class="bd">${G.free[L]}</span><span class="pl" aria-hidden="true">▶</span></span><span class="tx"><b>${esc(tOf(x) || G.vidT[L])}</b><small>${G.vid[L]}</small><span class="go">${G.watch[L]}</span></span></a>`;
@@ -142,24 +153,33 @@
       const lock = x.vip && !op, nm = esc(tOf(x) || G.vidT[L]);
       if (x.soon) return `<div class="vc soon" data-f="${x.vip ? 'vip' : 'free'}"><span class="th">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : ''}<span class="bd">${x.vip ? 'VIP · ' : ''}${G.soon[L]}</span><span class="pl" aria-hidden="true">⏳</span></span>`
         + `<span class="tx"><b>${nm}</b><small>${G.soonS[L]}</small></span></div>`; // «скоро»: видео ещё нет
-      return `<a class="vc${lock ? ' lock' : ''}" data-f="${x.vip ? 'vip' : 'free'}" href="${lock ? '#signin' : 'https://youtu.be/' + esc(x.yt)}"${lock ? '' : ` data-yt="${esc(x.yt)}" target="_blank" rel="noopener"`}${own(x)}>`
-        + `<span class="th"><img src="${esc(x.cover)}" alt="" loading="lazy"><span class="bd">${x.vip ? 'VIP' : G.free[L]}</span><span class="pl" aria-hidden="true">${lock ? '🔒' : '▶'}</span></span>`
+      const sn = !lock && isSeen(x);
+      return `<a class="vc${lock ? ' lock' : ''}${sn ? ' seen' : ''}" data-f="${x.vip ? 'vip' : 'free'}" href="${vurl(x)}"${lock ? '' : ` data-ytn="${esc(x.yt)}"`}${own(x)}>`
+        + `<span class="th"><img src="${esc(x.cover)}" alt="" loading="lazy"><span class="bd">${x.vip ? 'VIP' : G.free[L]}</span>${sn ? `<span class="sn">${W.seen[L]}</span>` : ''}<span class="pl" aria-hidden="true">${lock ? '🔒' : '▶'}</span></span>`
         + `<span class="tx"><b>${nm}</b><small>${x.vip ? (lock ? G.lock[L] : G.vipOpen[L]) : G.vid[L]}</small><span class="go">${lock ? G.signin[L] : G.watch[L]}</span></span></a>`;
     };
     if (fg && vids.length) {
       const more = fg.querySelector('.vc.more');
       fg.innerHTML = vids.map(card).join(''); if (more) fg.appendChild(more);
-      fg.querySelectorAll('[data-yt]').forEach(ytName);
+      fg.querySelectorAll('[data-ytn]').forEach(ytName);
       const F = [['all', G.all[L], vids.length], ['free', G.freeF[L], free.length], ['vip', 'VIP', vip.length]];
       fg.insertAdjacentHTML('beforebegin', `<div class="flt" role="group" aria-label="${G.fl[L]}">${F.map(([k, n, c], i) => `<button type="button" data-k="${k}" aria-pressed="${i ? 'false' : 'true'}">${n} <i>${c}</i></button>`).join('')}`
+        + (SEEN.size ? `<label class="flt-sn"><input type="checkbox"> ${W.hide[L]}</label>` : '')
         + `<span class="flt-st">${op ? G.allOpen[L] : `🔒 ${G.vipN[L](vip.length)} · <a href="#signin">${G.signin[L]}</a>`}</span></div>`);
-      const bar = fg.previousElementSibling;
+      const bar = fg.previousElementSibling, hs = bar.querySelector('.flt-sn input');
+      let k = 'all';
+      const apply = () => {
+        const h = !!(hs && hs.checked);
+        fg.querySelectorAll('.vc[data-f]').forEach(c => { c.hidden = (k !== 'all' && c.dataset.f !== k) || (h && c.classList.contains('seen')); });
+        if (more) more.hidden = k !== 'all';
+      };
+      if (hs) { try { hs.checked = localStorage.getItem('pp-yt-hide') === '1'; } catch (e) {} hs.addEventListener('change', () => { try { localStorage.setItem('pp-yt-hide', hs.checked ? '1' : '0'); } catch (e) {} apply(); }); }
       bar.addEventListener('click', e => {
         const b = e.target.closest('button'); if (!b) return;
         bar.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
-        fg.querySelectorAll('.vc[data-f]').forEach(c => { c.hidden = b.dataset.k !== 'all' && c.dataset.f !== b.dataset.k; });
-        if (more) more.hidden = b.dataset.k !== 'all';
+        k = b.dataset.k; apply();
       });
+      apply();
     }
     // /learn/: блок VIP — список VIP-уроков: вошедшему открыт («тебе открыто»), гостю размыт
     const vg = document.querySelector('.vg2.vip1');
@@ -168,10 +188,10 @@
       vg.innerHTML = `<p class="vl-h">${op ? G.youN[L](vip.length) : G.vipN[L](vip.length)}</p>` + vip.map(x => {
         const nm = esc(tOf(x) || G.vidT[L]);
         if (x.soon) return `<div class="vr soon"><span class="th">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : ''}</span><b>${nm}</b><em title="${G.soon[L]}">⏳</em></div>`;
-        return op ? `<a class="vr" href="https://youtu.be/${esc(x.yt)}" data-yt="${esc(x.yt)}"${own(x)} target="_blank" rel="noopener"><span class="th"><img src="${esc(x.cover)}" alt="" loading="lazy"></span><b>${nm}</b><em>▶</em></a>`
+        return op ? `<a class="vr${isSeen(x) ? ' seen' : ''}" href="${vurl(x)}" data-ytn="${esc(x.yt)}"${own(x)}><span class="th"><img src="${esc(x.cover)}" alt="" loading="lazy"></span><b>${nm}</b><em>${isSeen(x) ? '✓' : '▶'}</em></a>`
           : `<a class="vr" href="#signin"><span class="th"><img src="${esc(x.cover)}" alt="" loading="lazy"></span><b>${nm}</b><em>🔒</em></a>`;
       }).join('');
-      vg.querySelectorAll('[data-yt]').forEach(ytName);
+      vg.querySelectorAll('[data-ytn]').forEach(ytName);
       const al = vg.closest('.al'), k = al && al.querySelector('.k'), pp = al && al.querySelector('h2 + p');
       if (op && k) k.textContent = ['You are signed in', 'Вход выполнен', 'Laipni lūdzam'][L];
       if (op && pp) pp.innerHTML = [`All VIP lessons are open for you, right here. Want to support my work? <a href="${pre}/books/">Get one of my books</a>.`, `Все VIP-уроки открыты, смотрите прямо здесь. Хотите поддержать меня? <a href="${pre}/books/">Купите одну из моих книг</a>.`, `Visas VIP nodarbības ir atvērtas, skaties tepat. Gribi atbalstīt manu darbu? <a href="${pre}/books/">Iegādājies kādu no manām grāmatām</a>.`][L];
@@ -179,11 +199,45 @@
     // главная: две плитки бесплатных уроков — самые новые
     const tiles = [...document.querySelectorAll('#lessons .t.yt')];
     free.filter(x => !x.soon).slice(0, tiles.length).forEach((x, i) => {
-      const a = tiles[i]; a.href = 'https://youtu.be/' + x.yt; a.dataset.yt = x.yt;
+      const a = tiles[i]; a.href = vurl(x); delete a.dataset.yt; a.removeAttribute('target'); a.dataset.ytn = x.yt;
       const im = a.querySelector('img'); if (im) { im.src = x.cover; im.alt = tOf(x); }
       const b = a.querySelector('b'); if (b) b.textContent = tOf(x) || G.vidT[L];
       if (tOf(x)) a.dataset.own = 1; else ytName(a);
     });
+    // страница одного видео /learn/v/<id>/ (src/pages/watch.html): плеер, название, описание, «просмотрено», ещё видео
+    const wm = document.querySelector('.wv-main');
+    if (wm) {
+      const key = decodeURIComponent((location.pathname.match(/\/learn\/v\/([\w-]+)/) || [])[1] || '');
+      const x = vids.find(v => v.id === key || (v.yt && v.yt === key));
+      if (!x) { wm.innerHTML = `<p class="wv-wait">${W.nf[L]}</p><a class="btn pri" href="${pre}/learn/">${W.all[L]}</a>`; }
+      else {
+        const lock = x.vip && !op, nm = tOf(x) || W.vid[L];
+        document.title = nm + ' · Pigeon Polly Art Lab';
+        const d = (x.d && (x.d[lang] || x.d.en || x.d.ru || x.d.lv)) || '';
+        const desc = d ? d.split(/\n\s*\n/).map(p => `<p>${esc(p.trim()).replace(/\n/g, '<br>')}</p>`).join('') : '';
+        const stage = x.soon ? `<div class="wv-pl soon">${x.cover ? `<img src="${esc(x.cover)}" alt="">` : ''}<span class="pl" aria-hidden="true">⏳</span></div>`
+          : lock ? `<a class="wv-pl lock" href="#signin"><img src="${esc(x.cover)}" alt=""><span class="pl" aria-hidden="true">🔒</span></a>`
+          : `<button type="button" class="wv-pl" aria-label="${W.play[L]}"><img src="${esc(x.cover)}" alt=""><span class="pl" aria-hidden="true">▶</span></button>`;
+        const note = x.soon ? `<p class="wv-note">${W.soonP[L]}</p>` : lock ? `<p class="wv-note">${W.lockP[L]}</p><a class="btn pri" href="#signin">${W.signin[L]}</a>` : '';
+        wm.innerHTML = stage + `<div class="wv-tx"${x.yt && !tOf(x) ? ` data-ytn="${esc(x.yt)}"` : ' data-own="1"'}><p class="wv-k"><span class="bd2">${x.vip ? 'VIP' : G.free[L]}</span>${x.soon ? ` · ${G.soon[L]}` : ''}</p><h1>${esc(nm)}</h1>`
+          + (lock || x.soon ? '' : `<div class="wv-act"><button type="button" class="wv-seen" aria-pressed="false"></button><a class="wv-yt" href="https://youtu.be/${esc(x.yt)}" target="_blank" rel="noopener">${W.yt[L]} ↗</a></div>`)
+          + note + (desc ? `<div class="wv-d">${desc}</div>` : '') + '</div>';
+        const tx = wm.querySelector('.wv-tx'); if (tx.dataset.ytn) ytName(tx);
+        const sb = wm.querySelector('.wv-seen');
+        const mark = on => { if (on) SEEN.add(x.yt); else SEEN.delete(x.yt); seenSave(); if (sb) { sb.setAttribute('aria-pressed', on ? 'true' : 'false'); sb.textContent = on ? W.seen[L] : W.mark[L]; } };
+        if (sb) { mark(isSeen(x)); sb.addEventListener('click', () => mark(!isSeen(x))); }
+        const pb = wm.querySelector('button.wv-pl');
+        if (pb) pb.addEventListener('click', () => {
+          const fr = document.createElement('div'); fr.className = 'wv-pl on';
+          fr.innerHTML = `<iframe src="https://www.youtube-nocookie.com/embed/${encodeURIComponent(x.yt)}?autoplay=1&rel=0&hl=${lang}" title="${esc(nm)}" allow="autoplay; encrypted-media; picture-in-picture; fullscreen" allowfullscreen></iframe>`;
+          pb.replaceWith(fr); mark(true);
+          try { localStorage.setItem('pp-yt-last', x.yt); } catch (e) {} // «последний просмотренный» в кабинете (cabinet.js)
+        });
+      }
+      const mg = document.querySelector('.wv-more .vg2'), rest = vids.filter(v => v !== x && !v.soon);
+      const pick = [...rest.filter(v => !isSeen(v)), ...rest.filter(isSeen)].slice(0, 3); // сначала непросмотренные
+      if (mg && pick.length) { mg.innerHTML = pick.map(card).join(''); mg.querySelectorAll('[data-ytn]').forEach(ytName); mg.closest('section').hidden = false; }
+    }
     // /books/: полка — новые книги первыми
     const shelf = document.querySelector('.shelf');
     if (shelf && books.length) shelf.insertAdjacentHTML('afterbegin', books.map(x => {

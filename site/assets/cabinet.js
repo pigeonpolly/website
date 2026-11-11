@@ -66,7 +66,7 @@
   const who = () => window.PPWho ? Promise.resolve(window.PPWho) : fetch('/api/whoami', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null);
 
   // Учёба: 📘 учебники книжечками (если доступны) · 📜 дипломы (Школа Полли; пока не пройдена — печати) · 🎬 гайды:
-  // новый и последний просмотренный (localStorage pp-yt-last — пишет v2.js при запуске [data-yt]) + «Смотреть все» → /learn/
+  // новый и последний просмотренный (localStorage pp-yt-last — пишет v2.js при запуске видео на странице /learn/v/<id>/) + «Смотреть все» → /learn/
   const FREE_YT = ['eRa1uB_7s9U', 'VVvLZcIqUbM']; // как в src/pages/preview-learn.html, новое первым
   const BOOK = { study: ['#2F5F6A', '💻', '/study/'], english: ['#22405F', '🇬🇧', '/english/'], norsk: ['#8E2F3C', '🇳🇴', '/norsk/'] };
   const sec = (k, h, more) => `<section class="cab-sec cab-${k}"${k === 'books' ? ' hidden' : ''}><div class="cab-sh"><h2>${h}</h2>${more || ''}</div><div class="cab-body"></div></section>`;
@@ -102,14 +102,14 @@
       const seen = vids.find(v => v.id === last && v !== vids[0]);
       const pick = [[vids[0], t('gNew')], seen ? [seen, t('gLast')] : [vids[1], t('gNext')]].filter(x => x[0]);
       if (last && last === vids[0].id) pick[0][1] = t('gNew') + ' · ' + t('gSeen');
-      guides.innerHTML = '<div class="cab-grid">' + pick.map(([v, k]) => `<a class="cab-card cab-vid" href="https://youtu.be/${v.id}" data-yt="${v.id}" target="_blank" rel="noopener">
+      guides.innerHTML = '<div class="cab-grid">' + pick.map(([v, k]) => `<a class="cab-card cab-vid" href="${pre}/learn/v/${encodeURIComponent(v.id)}/" data-ytn="${v.id}">
         <span class="cab-cover"><img src="${v.cover || (v.vip ? '/images/v2/lesson-szmal.jpg' : `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`)}" alt="" loading="lazy"><i>▶</i></span>
         <span class="cab-k">${k}${v.vip ? ' · VIP' : ''}</span><b>${esc(v.name || (v.vip ? t('vipT') : '…'))}</b><em>${t('watch')}</em></a>`).join('')
         + `<a class="cab-card cab-more" href="${pre}/learn/"><span class="cab-k">${t('guidesH').slice(3)}</span><b>${t('allT')}</b><p>${t('allS')}</p><em class="cab-go">${t('seeAll')}</em></a></div>`;
       guides.querySelectorAll('.cab-vid').forEach((a, i) => {
         if (pick[i][0].vip || pick[i][0].name) return;
         const b = a.querySelector('b'); b.textContent = t('vidT');
-        fetch('/api/v2/yt?id=' + a.dataset.yt).then(r => r.ok ? r.json() : null).then(x => {
+        fetch('/api/v2/yt?id=' + a.dataset.ytn).then(r => r.ok ? r.json() : null).then(x => {
           const tt = x && x.title; if (!tt) return;
           const nm = NAMES.find(n => n[0].test(tt)); b.textContent = nm ? nm[1][L] : tt;
         }).catch(() => {});

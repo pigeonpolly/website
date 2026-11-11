@@ -23,7 +23,7 @@
   const inp = 'style="width:100%;padding:10px 12px;font:inherit;box-sizing:border-box"';
 
   function form(box, x, done) {
-    const kind = x ? x.kind : box.dataset.kind, v = kind === 'video', t = (x && x.t) || {};
+    const kind = x ? x.kind : box.dataset.kind, v = kind === 'video', t = (x && x.t) || {}, d = (x && x.d) || {};
     box.innerHTML = `<section class="adm-box"><h2>${x ? '✏️ Править' : v ? '🎬 Новое видео' : '📘 Новая книга'}</h2>
       <p><label>${v ? 'Ссылка на видео YouTube' : 'Ссылка на книгу (Amazon, Google Drive…)'}<br>
         <input ${inp} class="be-input gd-url" value="${esc(x ? (v ? (x.yt ? 'https://youtu.be/' + x.yt : '') : x.url) : '')}" placeholder="${v ? 'https://youtu.be/…' : 'https://…'}"></label></p>
@@ -33,6 +33,8 @@
       <p><label><input type="checkbox" class="gd-soon"${x && x.soon ? ' checked' : ''}> ⏳ Скоро — ${v ? 'видео ещё нет: на сайте карточка «Скоро», ссылку можно не вставлять (нужны название и обложка)' : 'книга ещё не вышла: на сайте пометка «Скоро», ссылку можно не вставлять'}</label></p>
       <p class="be-note">Название — хотя бы на одном языке, остальные переведутся сами.${v ? ' Можно пусто — возьмётся название с YouTube.' : ''}</p>
       ${L3.map(([l, n]) => `<p><label>${n}<br><input ${inp} class="be-input gd-t" data-l="${l}" maxlength="120" value="${esc(t[l] || '')}"></label></p>`).join('')}
+      ${v ? `<p class="be-note">Описание — на странице видео под названием (что рисуем, чем, для кого). Необязательно; хотя бы на одном языке — остальные переведутся сами. Пустая строка — новый абзац.</p>
+      ${L3.map(([l, n]) => `<p><label>Описание ${n}<br><textarea ${inp} rows="5" class="be-input gd-d" data-l="${l}" maxlength="3000">${esc(d[l] || '')}</textarea></label></p>`).join('')}` : ''}
       <p><label>${v ? 'Своя обложка (можно пусто — возьмётся кадр с YouTube)' : 'Обложка'}<br><input type="file" accept="image/*" class="gd-pic"></label></p>
       ${x && x.img ? `<p><img src="${esc(x.cover)}" alt="" style="max-height:120px;border-radius:8px"> ${v ? '<label><input type="checkbox" class="gd-nocov"> убрать свою обложку</label>' : ''}</p>` : ''}
       <div class="adm-quick"><button type="button" class="pill-btn pill-fill gd-save">${x ? '💾 Сохранить' : '➕ Добавить на сайт'}</button><button type="button" class="pill-btn gd-cancel">Отмена</button></div>
@@ -45,9 +47,10 @@
       fd.set('url', $('.gd-url').value.trim());
       if (v) fd.set('vip', (box.querySelector('[name=gd-vip]:checked') || {}).value || '0'); else fd.set('free', $('.gd-free').checked ? '1' : '0');
       box.querySelectorAll('.gd-t').forEach(i => fd.set('t_' + i.dataset.l, i.value.trim()));
+      box.querySelectorAll('.gd-d').forEach(i => fd.set('d_' + i.dataset.l, i.value.trim()));
       if ($('.gd-nocov') && $('.gd-nocov').checked) fd.set('nocover', '1');
       fd.set('soon', $('.gd-soon').checked ? '1' : '0');
-      b.disabled = true; msg.textContent = '⏳ Сохраняю и перевожу название…';
+      b.disabled = true; msg.textContent = '⏳ Сохраняю и перевожу…';
       try {
         const f = $('.gd-pic').files[0]; if (f) fd.set('cover', await jpeg(f), 'cover.jpg');
         const items = await api(fd); box.innerHTML = ''; done(items, x ? '✓ Сохранено' : '✓ Добавлено — уже на сайте');
@@ -56,12 +59,12 @@
   }
 
   function list(box, items, onEdit, onChange) {
-    if (!items.length) { box.innerHTML = '<p class="be-note">Пока ничего не добавлено. Уже на сайте: 2 бесплатных урока, VIP «Обзор акварели» и книги — они остаются.</p>'; return; }
+    if (!items.length) { box.innerHTML = '<p class="be-note">Пока ничего нет. Книги с полки «Книги» (из файла сайта) остаются как были.</p>'; return; }
     box.innerHTML = items.map((x, i) => `<div class="adm-box" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap${x.hidden ? ';opacity:.5' : ''}">
       <img src="${esc(x.cover)}" alt="" style="width:96px;height:64px;object-fit:cover;border-radius:8px;background:#eee">
       <div style="flex:1;min-width:180px"><b>${esc((x.t && (x.t.ru || x.t.en)) || 'Название с YouTube')}</b><br>
-        <small class="be-note">${x.kind === 'video' ? (x.vip ? '🔒 VIP-видео' : '🎬 Бесплатное видео') : x.free ? '📘 Бесплатная книга' : '📘 Книга'}${x.soon ? ' · ⏳ скоро' : ''}${x.hidden ? ' · скрыто' : ''} ·
-        ${(x.kind === 'video' ? x.yt : x.url) ? `<a href="${esc(x.kind === 'video' ? 'https://youtu.be/' + x.yt : x.url)}" target="_blank" rel="noopener">ссылка</a>` : 'без ссылки'}</small></div>
+        <small class="be-note">${x.kind === 'video' ? (x.vip ? '🔒 VIP-видео' : '🎬 Бесплатное видео') : x.free ? '📘 Бесплатная книга' : '📘 Книга'}${x.soon ? ' · ⏳ скоро' : ''}${x.hidden ? ' · скрыто' : ''}${x.d && (x.d.ru || x.d.en) ? ' · 📝 есть описание' : ''} ·
+        ${x.kind === 'video' && !x.soon ? `<a href="/ru/learn/v/${esc(x.id)}/" target="_blank" rel="noopener">страница на сайте</a> · ` : ''}${(x.kind === 'video' ? x.yt : x.url) ? `<a href="${esc(x.kind === 'video' ? 'https://youtu.be/' + x.yt : x.url)}" target="_blank" rel="noopener">ссылка</a>` : 'без ссылки'}</small></div>
       <div class="adm-quick" style="margin:0">
         <button type="button" class="pill-btn" data-a="up" data-i="${i}" title="Выше"${i ? '' : ' disabled'}>↑</button>
         <button type="button" class="pill-btn" data-a="down" data-i="${i}" title="Ниже"${i < items.length - 1 ? '' : ' disabled'}>↓</button>

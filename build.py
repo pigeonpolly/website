@@ -81,6 +81,9 @@ PAGES = [
      "Color palettes from Pigeon Polly watercolors and sketchbook pages: six colors with HEX codes from every artwork. Copy a color, pick a palette and draw."),
     ("learn", "Lessons", "preview-learn.html",
      "Watercolour and ink lessons by Alina Otkinska: free videos open to everyone and extra video lessons for signed-in visitors."),
+    # страница одного видео: адрес /learn/v/<id>/ (worker отдаёт этот файл), видео рисует v2.js по адресу
+    ("learn/watch", "Video", "watch.html",
+     "A video by artist Alina Otkinska: watch, paint along and come back to it any time."),
     ("books", "Books", "preview-guides.html",
      "Creative guides and books by artist Alina Otkinska: ink and watercolour sketching, a free colouring book, palettes and little drawing guides."),
     ("about", "About Alina", "preview-about.html",
@@ -89,9 +92,9 @@ PAGES = [
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
 # готовые, но пока не открытые страницы: не попадают в sitemap
-UNLISTED = {"blog-editor", "admin", "garden"}
+UNLISTED = {"blog-editor", "admin", "garden", "learn/watch"}
 # редизайн 2.0: страницы на новом шаблоне src/layout-v2.html (шапка, подвал, сезоны — site/assets/v2.css, v2.js)
-V2 = {"", "learn", "books", "about", "blog"}
+V2 = {"", "learn", "learn/watch", "books", "about", "blog"}
 # часть 5: все остальные страницы — на src/layout-v2-lab.html (новая шапка и подвал, внутри старые style.css и скрипты как есть)
 # ключ правок «Править страницу» (data-ppb): у новых страниц — прежний, с /preview/, чтобы сохранённые правки не потерялись
 EDIT_KEY = {"": "preview", "learn": "preview-learn", "books": "preview-guides", "about": "preview-about"}

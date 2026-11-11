@@ -140,6 +140,12 @@ async function pageFetch(req, env, url, p) {
     await ensureSchema(env);
     return norskApi(req, env, url, studyHelpers(env));
   }
+  // страница видео /learn/v/<id>/ (и /ru/, /lv/): одна готовая страница site/learn/watch/, видео по адресу рисует v2.js (docs/site.md)
+  const wv = p.match(/^(\/(?:ru|lv))?\/learn\/v\/[\w-]{1,40}\/?$/);
+  if (wv) {
+    const u2 = new URL((wv[1] || '') + '/learn/watch/', url);
+    return await sitePage(new Request(u2, req), env, u2);
+  }
   return await sitePage(req, env, url);
 }
 // страница ошибки на языке адреса: site/(ru|lv/)404.html, 500.html, 503.html (build.py, src/pages/404.html и др.)
@@ -476,7 +482,7 @@ const mailHelpers = env => ({ ...authHelpers(env), rules: () => RULES, streakRis
   return { current: streaks(days).current, risk: last < today && !isExtraNum(today) };
 } });
 const guidesHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), imgPut, imgDrop: id => imgDrop(env, id), randomHex, now,
-  translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is a short title of an art video lesson or an illustrated drawing guide/book. Keep it short, natural and catchy.') });
+  translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is the title or the description of an art video (a lesson or a "paint along with me" video) or of an illustrated drawing guide/book by the artist Alina. Titles: short, natural and catchy. Descriptions: keep the warm, friendly tone, line breaks and lists.') });
 const authHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, sessionCookie, sessionDays: SESSION_DAYS, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), bump: (k, sql) => bump(env, k, sql) });
 const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), awardComment: (uid, cid) => awardComment(env, uid, cid) });
 
@@ -2323,7 +2329,7 @@ async function route(req, env, url) {
     const u = await currentUser(req, env);
     if (!u || u.banned) return json({ login: true, videos: [] }, 200, { 'cache-control': 'no-store' });
     const added = (await guidesList(guidesHelpers(env))).filter(x => x.kind === 'video' && x.vip && !x.hidden && !x.soon && x.yt).map(x => guideOut(x, true)); // добавленные в кабинете — новее
-    return json({ videos: [...added.map(x => ({ id: x.yt, key: x.id, t: x.t, cover: x.cover })), ...VIP_VIDEOS] }, 200, { 'cache-control': 'no-store' });
+    return json({ videos: [...added.map(x => ({ id: x.yt, key: x.id, t: x.t, cover: x.cover })), ...(await getMeta(env, 'v2_guides_base') === '1' ? [] : VIP_VIDEOS.filter(v => !added.some(x => x.yt === v.id)))] } /* встроенный VIP уже в списке кабинета (worker/guides.js withBase) */, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'GET' && p === '/api/news') return json({ news: await newsOf(env, req, await currentUser(req, env)) }, 200, { 'cache-control': 'no-store' });
   if (m === 'GET' && p === '/api/news/history') return json({ items: await newsHistory(env, await currentUser(req, env)) }, 200, { 'cache-control': 'no-store' });
