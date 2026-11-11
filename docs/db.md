@@ -71,7 +71,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **top_week** (worker/top.js): `game` text nn, `week` text nn, `user_id` int nn, `score` int nn, `at` int; PRIMARY KEY (game, week, user_id)
 - **out_clicks** (worker/week.js): `id` int PK auto, `day` text nn, `ts` int, `vid` text, `target` text, `path` text, `href` text
 
-## Ключи meta (49)
+## Ключи meta (50)
 
 Таблица `meta (key, value)`. Ключ → где используется.
 
@@ -113,6 +113,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `restock_day` — worker/index.js
 - `restock_last` — worker/index.js, worker/week.js
 - `rules` — worker/index.js
+- `schema_ver` — worker/index.js
 - `sections_news` — worker/blog.js
 - `sections_v2` — worker/blog.js
 - `starter_box_v1` — worker/index.js

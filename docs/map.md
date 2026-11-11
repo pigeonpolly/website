@@ -18,7 +18,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/garden.js` (21K) — Огород птички (этап 22, /garden/, site/assets/garden.js, docs/bird.md «Огород»): грядки, с: CROPS, TIER, DAY, SIMPLE, GARDEN_ALTER, GARDEN_BOOL, out, fnv, grown, prices, bedOk, bugsOf
 - `worker/guides.js` (5K) — Кабинет → «🎬 Видео и гайды» (site/assets/guides-admin.js, docs/admin.md): Алина сама добав: KEY, out, cut, guidesList, guideOut, okUrl, ytId, guidesApi
 - `worker/ideas.js` (17K) — Кабинет → «💡 Темы для блога»: по кнопке собираем, что сейчас ищут и обсуждают в сфере Алин: PAGES, IDEAS, MONTHS, SITE, SUBS, ARTICLE, write, ask, suggest, reddit, plain, redditSearch
-- `worker/index.js` (278K) — Worker: site/, страницы через HTMLRewriter, /api (кроме блога), cron: RULES, BTN, STOCK, GIFT_KINDS, GOLD_PICKS, PLEVEL, award, btnOf, catalog, avatarOf, cnt, gameUnit
+- `worker/index.js` (279K) — Worker: site/, страницы через HTMLRewriter, /api (кроме блога), cron: RULES, BTN, STOCK, GIFT_KINDS, GOLD_PICKS, PLEVEL, prep, award, btnOf, catalog, avatarOf, cnt
 - `worker/mail.js` (24K) — Письма с сайта по согласию (docs/bird.md «Письма»): три вида — games (уведомления из игр),: MAIL_DAY_MAX, ORDER, DIGEST, MAIL_CATS, ITEM, CAT, pageUrl, langOf, pre, sendOne, spend, usedToday
 - `worker/my-games.js` (3K) — «★ Мои игры» на главной (вкладка в «Моём дне», docs/site.md): 3 закреплённые игры птички и: MY_GAMES, MY_PINS, MY_GAMES_TABLES, rowOf, myGamesApi
 - `worker/norsk-page.js` (932K) — Собрано tools/norsk_page.py из content/norsk/ — руками не править.: NORSK_HTML
@@ -121,7 +121,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 
 ## Сборка
 
-- `build.py` (48K) — сборка: страницы, меню, языки, блоки, галереи, поиск, данные для JS: CONTENT, OUT, ROOT, href, v2_page
+- `build.py` (49K) — сборка: страницы, меню, языки, блоки, галереи, поиск, данные для JS: CONTENT, OUT, ROOT, href, lang_dd
 
 ## Инструменты (tools)
 

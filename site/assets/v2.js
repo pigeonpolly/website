@@ -34,6 +34,15 @@
     document.addEventListener('keydown', e => { if (e.key === 'Escape' && !seaM.hidden) { seaMenu(false); seaB.focus(); } });
   }
   season(html.getAttribute('data-season'));
+  // выбор языка в шапке: кнопка текущего языка, по нажатию — список из 3
+  const langB = document.querySelector('.lang-b'), langM = document.getElementById('lang-m');
+  if (langB && langM) {
+    const langMenu = open => { langM.hidden = !open; langB.setAttribute('aria-expanded', String(open)); };
+    langB.addEventListener('click', e => { e.stopPropagation(); seaMenu(false); langMenu(langM.hidden); });
+    seaB && seaB.addEventListener('click', () => langMenu(false));
+    document.addEventListener('click', e => { if (!langM.hidden && !e.target.closest('.lang2')) langMenu(false); });
+    document.addEventListener('keydown', e => { if (e.key === 'Escape' && !langM.hidden) { langMenu(false); langB.focus(); } });
+  }
 
   // меню на телефоне
   const burger = document.querySelector('.burger'), drawer = document.getElementById('drawer');

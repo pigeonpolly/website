@@ -21,7 +21,7 @@ SITE_URL = "https://www.pigeonpolly.com"
 PAGES = [
     # редизайн 2.0, часть 5 (11.11): новая главная (бывшая /preview/); старая src/pages/home.html больше не собирается
     ("", "Pigeon Polly Art Lab", "preview.html",
-     "Free watercolour and ink lessons, creative guides and books by illustrator Alina Otkinska, and a little painted world of Pigeon Polly."),
+     "Free watercolour and ink lessons, creative guides and books by artist Alina Otkinska, and a little painted world of Pigeon Polly."),
     ("projects", "Projects", "projects.html",
      "Learning design, EdTech and AI automation projects by Alina Otkinska."),
     ("work-with-me", "Work with me", "work-with-me.html",
@@ -82,9 +82,9 @@ PAGES = [
     ("learn", "Lessons", "preview-learn.html",
      "Watercolour and ink lessons by Alina Otkinska: free videos open to everyone and extra video lessons for signed-in visitors."),
     ("guides", "Guides & books", "preview-guides.html",
-     "Creative guides and books by illustrator Alina Otkinska: ink and watercolour sketching, a free colouring book, palettes and little drawing guides."),
+     "Creative guides and books by artist Alina Otkinska: ink and watercolour sketching, a free colouring book, palettes and little drawing guides."),
     ("about", "About Alina", "preview-about.html",
-     "Alina Otkinska: learning experience designer and illustrator from Riga, the human behind Pigeon Polly."),
+     "Alina Otkinska: learning experience designer and artist from Riga, the human behind Pigeon Polly."),
     ("wobbleland", "Wobbleland", "wobbleland.html",
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
@@ -513,6 +513,16 @@ def lang_bits(path, lang):
     return url[lang], hreflang, '<nav class="lang-switch" aria-label="Language">' + "".join(links) + "</nav>"
 
 
+LANG_NAMES = {"en": "English", "lv": "Latviešu", "ru": "Русский"}
+
+
+def lang_dd(switch, lang):
+    """Выбор языка в шапке v2: кнопка с текущим языком, по нажатию — список (как кружок сезона)."""
+    full = re.sub(r'hreflang="(\w+)" lang="\w+"([^>]*)>\w+</a>', lambda m: f'hreflang="{m[1]}" lang="{m[1]}"{m[2]}><b>{m[1].upper()}</b>{LANG_NAMES[m[1]]}</a>', switch)
+    return (f'<div class="lang2"><button type="button" class="lang-b" aria-expanded="false" aria-controls="lang-m" aria-label="Language">{lang.upper()}</button>'
+            f'<div class="lang-m" id="lang-m" hidden>{full}</div></div>')
+
+
 def wobbleland_data():
     """Данные Wobbleland по языкам: content/wobbleland.json + переводы content/i18n/wobbleland.<lang>.json."""
     base = json.loads((CONTENT / "wobbleland.json").read_text())
@@ -695,7 +705,7 @@ def build():
             else:
                 page = v2_page(layout_v2_lab, full_title, desc, canonical, path in NOINDEX, section_tabs(path) + page_body).replace('<body class="inner v2s">', '<body class="inner v2s" data-p="%s">' % (path.replace("/", "-") or "home"), 1)  # Д, шаг 2: data-p — какая страница (игры не перекрашиваем)
             page = v2_urls(localize(page, lang))
-            page = page.replace("{{hreflang}}", hreflang).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
+            page = page.replace("{{hreflang}}", hreflang).replace("{{lang_dd}}", lang_dd(switch, lang)).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
             page = bust(page)
             dest = OUT / prefix / path / "index.html"
             dest.parent.mkdir(parents=True, exist_ok=True)
@@ -708,7 +718,7 @@ def build():
     for lang, prefix in LANGS.items():
         canonical, hreflang, switch = lang_bits("blog", lang)
         page = v2_page(layout_v2, "Blog · Pigeon Polly Art Lab", blog_desc, canonical, False, (SRC / "pages" / "blog.html").read_text())
-        page = v2_urls(localize(page, lang)).replace("{{hreflang}}", hreflang).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
+        page = v2_urls(localize(page, lang)).replace("{{hreflang}}", hreflang).replace("{{lang_dd}}", lang_dd(switch, lang)).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
         dest = OUT / prefix / "blog" / "v2" / "index.html"
         dest.parent.mkdir(parents=True, exist_ok=True)
         dest.write_text(bust(page))
@@ -745,7 +755,7 @@ def build():
         (OUT / "assets" / f"search-{lang}.json").write_text(json.dumps(entries, ensure_ascii=False, separators=(",", ":")))
     # 404
     nf = v2_urls(v2_page(layout_v2_lab, "Page not found · Pigeon Polly Art Lab", "", SITE_URL + "/", True, (SRC / "pages" / "404.html").read_text()))
-    nf = nf.replace("{{hreflang}}", "").replace("{{lang_switch}}", "")
+    nf = nf.replace("{{hreflang}}", "").replace("{{lang_dd}}", "").replace("{{lang_switch}}", "")
     (OUT / "404.html").write_text(bust(nf))
     # sitemap
     urls = "".join(f"<url><loc>{SITE_URL}/{(v + '/') if v else ''}{(p + '/') if p else ''}</loc></url>"

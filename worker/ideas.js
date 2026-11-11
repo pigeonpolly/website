@@ -97,7 +97,7 @@ async function build(env, note) {
   const searches = seeds.map((q, i) => sg[i].length ? `- ${q}: ${sg[i].join('; ')}` : '').filter(Boolean);
   const threads = SUBS.map((s, i) => rd[i].length ? `- r/${s}: ${rd[i].join(' | ')}` : '').filter(Boolean);
   const top = posts.slice().sort((a, b) => (b.views || 0) - (a.views || 0)).slice(0, 5);
-  const prompt = `You help Alina Otkinska, an illustrator and learning experience designer from Riga, plan blog posts for her website pigeonpolly.com.
+  const prompt = `You help Alina Otkinska, an artist and learning experience designer from Riga, plan blog posts for her website pigeonpolly.com.
 The site is "a cozy little world for tired grown-ups": draw a daily prompt, solve a tiny mystery, bake pancakes, decorate your pixel bird's house. Audience: adults 25–40, cozy games, sketchbooks, drawing for yourself after work, Neopets nostalgia. Main language English (also Russian, Latvian).
 Today is ${d.toISOString().slice(0, 10)}.
 
@@ -137,7 +137,7 @@ async function write(env, x, topic) {
   if (topic) { const r = await research(env, key, topic); x = { title_en: '', title_ru: '', idea_ru: topic, keywords: r.keywords.slice(0, 6), page: '', found: r.text }; }
   const mine = (await env.DB.prepare("SELECT t_ru, b_ru FROM blog_posts WHERE status = 'published' AND b_ru != '' AND COALESCE(section, '') != 'stories' ORDER BY published_at DESC LIMIT 3").all().then(r => r.results).catch(() => []))
     .map(p => `### ${p.t_ru}\n${plain(p.b_ru).slice(0, 2500)}`);
-  const prompt = `You write a blog post for Alina Otkinska, an illustrator and learning experience designer from Riga, for her website pigeonpolly.com —
+  const prompt = `You write a blog post for Alina Otkinska, an artist and learning experience designer from Riga, for her website pigeonpolly.com —
 "a cozy little world for tired grown-ups": a daily drawing prompt, tiny mystery cases, cozy browser games, a pixel bird with its own house. Readers: adults 25–40, cozy games, sketchbooks, drawing for yourself after work.
 
 ${x.found ? `Alina's own topic: ${x.idea_ru}
