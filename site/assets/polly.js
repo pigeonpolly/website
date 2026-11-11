@@ -174,8 +174,7 @@
   // ---------- сезонные вещи в подвале страницы ----------
   const SEASON = (() => {
     const q = (location.search.match(/[?&]season=(\w+)/) || [])[1]; if (q) return q;
-    const m = new Date().getMonth(), ds = document.documentElement.dataset.season; // новый дизайн: сезон из переключателя в шапке
-    if (ds) return ds === 'autumn' && m === 9 ? 'october' : ds;
+    const m = new Date().getMonth(); // погода — по настоящей дате, не по переключателю цветов в шапке
     return m === 9 ? 'october' : m >= 8 && m <= 10 ? 'autumn' : m === 11 || m <= 1 ? 'winter' : m <= 4 ? 'spring' : 'summer';
   })();
   const sprite = (rows, pal) => {
