@@ -1,0 +1,91 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Karla:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F0EA;font-family:Karla,sans-serif;color:#2A211C;width:1440px}
+h1{font-family:Fraunces,serif;font-weight:600;margin:28px 40px 4px;font-size:30px}
+p.s{margin:0 40px 18px;color:#6C6058}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:22px;padding:0 40px 40px}
+.c{background:#FBF9F5;border:1px solid #DED5CA;border-radius:18px;padding:18px 20px 16px}
+.c h2{font-family:Fraunces,serif;font-size:21px;margin:0 0 2px}
+.c .d{color:#6C6058;font-size:14px;margin:0 0 10px;min-height:36px}
+.big{display:flex;align-items:center;justify-content:center;height:220px}
+.big svg{width:200px;height:200px}
+.row{display:flex;align-items:center;gap:14px;margin-top:10px}
+.hd{flex:1;display:flex;align-items:center;gap:10px;background:#2E2521;color:#ECEDEE;border-radius:12px;padding:10px 14px}
+.hd.l{background:#fff;color:#2A211C;border:1px solid #DED5CA}
+.hd svg{width:40px;height:40px;flex:none}
+.hd span{font-family:Fraunces,serif;font-size:19px;white-space:nowrap}.hd i{font-style:normal;opacity:.6;font-family:Karla;font-size:14px}
+.fav{display:flex;gap:8px;align-items:center}.fav svg{display:block}
+.n{display:inline-block;background:#22405F;color:#fff;border-radius:50%;width:26px;height:26px;text-align:center;line-height:26px;font-weight:700;margin-right:6px;font-family:Karla}
+</style></head><body>
+<h1>Логотип Pigeon Polly — 6 идей</h1>
+<p class="s">Крупно · в шапке (тёмной и светлой) · размер значка во вкладке браузера</p>
+<div class="grid" id="g"></div>
+<script>
+const INK='#2A2238', BODY='#3E3656', OR='#E2762C', WH='#FFFDF8';
+// sleepy eye of Polly at cx,cy radius r, lid colour
+function eye(cx,cy,r,lid,id){return `
+<clipPath id="e${id}"><circle cx="${cx}" cy="${cy}" r="${r}"/></clipPath>
+<circle cx="${cx}" cy="${cy}" r="${r}" fill="${WH}"/>
+<g clip-path="url(#e${id})">
+ <circle cx="${cx}" cy="${cy+r*.18}" r="${r*.72}" fill="${OR}"/>
+ <circle cx="${cx}" cy="${cy+r*.02}" r="${r*.6}" fill="#15111C"/>
+ <circle cx="${cx-r*.22}" cy="${cy+r*.12}" r="${r*.13}" fill="#fff" opacity=".85"/>
+ <path d="M${cx-r-2} ${cy-r-2} H${cx+r+2} V${cy-r*.18} Q${cx} ${cy-r*.62} ${cx-r-2} ${cy-r*.18} Z" fill="${lid}"/>
+</g>
+<path d="M${cx-r*.98} ${cy-r*.2} Q${cx} ${cy-r*.64} ${cx+r*.98} ${cy-r*.2}" fill="none" stroke="#15111C" stroke-width="${r*.14}" stroke-linecap="round"/>
+<circle cx="${cx}" cy="${cy}" r="${r}" fill="none" stroke="#15111C" stroke-width="${r*.1}"/>`}
+const rough=id=>`<filter id="r${id}"><feTurbulence type="fractalNoise" baseFrequency=".06" numOctaves="2" seed="4"/><feDisplacementMap in="SourceGraphic" scale="2.6"/></filter>`;
+const body='M50 9 C69 9 81 36 83 60 C85 83 71 94 50 94 C29 94 15 83 17 60 C19 36 31 9 50 9 Z';
+const L={
+ drop:{t:'Полли-капелька',d:'Полли целиком как простая фигура: тело-капля, сонный глаз, клюв.',
+  s:(k)=>`<svg viewBox="0 0 100 100">${rough('a'+k)}<g filter="url(#ra${k})">
+   <path d="M23 47 L5 55 L24 60 Z" fill="${OR}" stroke="#15111C" stroke-width="2.2" stroke-linejoin="round"/>
+   <path d="${body}" fill="${BODY}"/>
+   <path d="M30 70 Q40 84 58 86" fill="none" stroke="#5A5177" stroke-width="3" stroke-linecap="round" opacity=".8"/>
+   ${eye(56,45,17,BODY,'a'+k)}</g></svg>`},
+ cup:{t:'Полли с чашкой',d:'Как на карточке «Coffee Lover»: рисунок тушью с акварельной заливкой и чашкой на голове.',
+  s:(k)=>`<svg viewBox="0 0 100 100">${rough('b'+k)}<g filter="url(#rb${k})">
+   <ellipse cx="51" cy="56" rx="38" ry="38" fill="#E7DCEB" opacity=".75"/>
+   <path d="M26 54 L8 61 L27 65 Z" fill="${OR}" stroke="#15111C" stroke-width="2" stroke-linejoin="round"/>
+   <path d="M50 22 C67 22 78 44 80 66 C82 86 69 95 50 95 C31 95 19 86 21 66 C23 44 33 22 50 22 Z" fill="${BODY}" stroke="#15111C" stroke-width="2"/>
+   <g transform="rotate(-14 50 15)"><path d="M36 7 L64 7 L60 22 L40 22 Z" fill="#EEE7DD" stroke="#15111C" stroke-width="2" stroke-linejoin="round"/>
+   <ellipse cx="50" cy="7" rx="14" ry="3.2" fill="#6B4A36" stroke="#15111C" stroke-width="1.8"/>
+   <path d="M63 10 Q72 12 62 19" fill="none" stroke="#15111C" stroke-width="2"/><path d="M41 15 H59" stroke="#8FA6BD" stroke-width="2"/></g>
+   <path d="M56 26 Q53 31 56 34" fill="none" stroke="#6B4A36" stroke-width="2.4" stroke-linecap="round"/>
+   ${eye(56,55,15,BODY,'b'+k)}</g></svg>`},
+ stamp:{t:'Лапка-печать',d:'Отпечаток лапки голубя в круглом штампе с надписью — как печать художника.',
+  s:(k,c='#B5402A')=>`<svg viewBox="0 0 100 100">${rough('c'+k)}<defs><path id="tp${k}" d="M50 50 m-37 0 a37 37 0 1 1 74 0 a37 37 0 1 1 -74 0"/></defs>
+   <g filter="url(#rc${k})" fill="none" stroke="${c}" stroke-linecap="round">
+   <circle cx="50" cy="50" r="46" stroke-width="3.2"/><circle cx="50" cy="50" r="29" stroke-width="1.6"/>
+   <text font-family="Karla" font-weight="700" font-size="9.2" letter-spacing="1.4" fill="${c}" stroke="none"><textPath href="#tp${k}">PIGEON POLLY · ART LAB · RIGA · </textPath></text>
+   <path d="M50 58 L50 30 M50 58 L33 37 M50 58 L67 37 M50 58 L50 72" stroke-width="6.5"/>
+   <circle cx="50" cy="58" r="5" fill="${c}" stroke="none"/></g></svg>`},
+ paint:{t:'Лапка-мазки',d:'Отпечаток лапки из трёх мазков кистью разных цветов — голубь прошёл по палитре.',
+  s:(k)=>`<svg viewBox="0 0 100 100"><filter id="d${k}"><feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="3" seed="7"/><feDisplacementMap in="SourceGraphic" scale="5"/></filter>
+   <g filter="url(#d${k})" fill="none" stroke-linecap="round">
+   <path d="M50 64 L49 12" stroke="#22405F" stroke-width="13"/>
+   <path d="M47 64 L17 30" stroke="${OR}" stroke-width="12"/>
+   <path d="M53 64 L83 30" stroke="#BE2F3A" stroke-width="12"/>
+   <path d="M50 66 L51 91" stroke="${BODY}" stroke-width="11"/></g>
+   <circle cx="50" cy="65" r="8" fill="${BODY}" filter="url(#d${k})"/></svg>`},
+ p:{t:'Буква P = Полли',d:'Монограмма: петля буквы P — голова Полли с глазом и клювом.',
+  s:(k,bg=BODY)=>`<svg viewBox="0 0 100 100">${rough('e'+k)}<g filter="url(#re${k})">
+   <path d="M76 44 L95 50 L75 56 Z" fill="${OR}" stroke="#15111C" stroke-width="2" stroke-linejoin="round"/>
+   <path d="M22 94 L22 38 C22 18 36 8 50 8 C67 8 79 22 79 40 C79 58 66 70 48 70 L40 70 L40 94 Z" fill="${bg}"/>
+   ${eye(51,39,17,bg,'e'+k)}</g></svg>`},
+ eye:{t:'Только глаз',d:'Самая узнаваемая черта Полли — сонный глаз — в круге. Лучше всех читается крошечным.',
+  s:(k)=>`<svg viewBox="0 0 100 100">${rough('f'+k)}<g filter="url(#rf${k})">
+   <circle cx="50" cy="50" r="46" fill="${BODY}"/>
+   <path d="M8 58 L-6 63 L9 67 Z" fill="${OR}"/>
+   ${eye(52,50,30,BODY,'f'+k)}</g></svg>`},
+};
+let i=0,h='';
+for(const [key,o] of Object.entries(L)){i++;
+ h+=`<div class="c"><h2><span class="n">${i}</span>${o.t}</h2><p class="d">${o.d}</p>
+ <div class="big">${o.s(key+'1')}</div>
+ <div class="row"><div class="hd">${o.s(key+'2',key==='stamp'?'#F0A987':undefined)}<span>Pigeon Polly <i>Art Lab</i></span></div></div>
+ <div class="row"><div class="hd l">${o.s(key+'3')}<span>Pigeon Polly <i>Art Lab</i></span></div>
+ <div class="fav">${o.s(key+'4').replace('<svg','<svg width="32" height="32"')}${o.s(key+'5').replace('<svg','<svg width="16" height="16"')}</div></div></div>`;}
+document.getElementById('g').innerHTML=h;
+</script></body></html>
