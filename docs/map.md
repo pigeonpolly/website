@@ -16,7 +16,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/flock-news.js` (10K) — Новости стаи (этап 13 Г, docs/flock.md): /flock/news/ и 3 строки на главной.: KEEP, BIRD_KINDS, REF, FLOCK_NEWS_ALTER, FLOCK_NEWS_TABLES, note, rigaDayOf, flockEvent, flockNewsCron, roomEvent, flockNewsApi
 - `worker/flock.js` (10K) — «Все птички» (/flock/) и пёрышки комнат (этап 13 Б+В, docs/flock.md).: BIRD, PER, COLS, SORTS, FLOCK_ALTER, FLOCK_TABLES, ownerOf, stateOf, featherNews, flockApi
 - `worker/garden.js` (21K) — Огород птички (этап 22, /garden/, site/assets/garden.js, docs/bird.md «Огород»): грядки, с: CROPS, TIER, DAY, SIMPLE, GARDEN_ALTER, GARDEN_BOOL, out, fnv, grown, prices, bedOk, bugsOf
-- `worker/guides.js` (5K) — Кабинет → «🎬 Видео и гайды» (site/assets/guides-admin.js, docs/admin.md): Алина сама добав: KEY, out, cut, guidesList, guideOut, okUrl, ytId, guidesApi
+- `worker/guides.js` (5K) — Кабинет → «🎬 Видео и гайды» (site/assets/guides-admin.js, docs/admin.md): Алина сама добав: KEY, BASE, out, cut, guidesList, guideOut, okUrl, ytId, guidesApi
 - `worker/ideas.js` (17K) — Кабинет → «💡 Темы для блога»: по кнопке собираем, что сейчас ищут и обсуждают в сфере Алин: PAGES, IDEAS, MONTHS, SITE, SUBS, ARTICLE, write, ask, suggest, reddit, plain, redditSearch
 - `worker/index.js` (279K) — Worker: site/, страницы через HTMLRewriter, /api (кроме блога), cron: RULES, BTN, STOCK, GIFT_KINDS, GOLD_PICKS, PLEVEL, prep, award, btnOf, catalog, avatarOf, cnt
 - `worker/mail.js` (24K) — Письма с сайта по согласию (docs/bird.md «Письма»): три вида — games (уведомления из игр),: MAIL_DAY_MAX, ORDER, DIGEST, MAIL_CATS, ITEM, CAT, pageUrl, langOf, pre, sendOne, spend, usedToday
@@ -112,7 +112,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/today.js` (6K) — блок «Тема дня» (с главной убран): LBL, fill, open, wait
 - `site/assets/top-board.js` (8K) — Доска топа игр (docs/games.md § Доски топа): <div class="gtop" data-top="rain"></div> или : PPTop, BOARDS, MED, day, row
 - `site/assets/translate-btn.js` (3K) — «🌐 Перевести» — одна кнопка для всех разделов кабинета: PPTranslateBtn, LANGS, ERR
-- `site/assets/v2.js` (19K) — Редизайн 2.0 (/preview/): сезон (по дате, кнопки в шапке), меню ☰, вход, папка Лаборатории: PPOut, COL, NAMES, tOf, seaMenu
+- `site/assets/v2.js` (23K) — Редизайн 2.0 (/preview/): сезон (по дате, кнопки в шапке), меню ☰, вход, папка Лаборатории: PPOut, COL, NAMES, tOf, seaMenu
 - `site/assets/wl-town.js` (68K) — Wobbleland: прогулка по городу (docs/wobbleland.md «Прогулка»): PPWlTown, LAND, PICKS, CRIT, crit
 - `site/assets/wobbleland-data.en.js` (43K) — из content/wobbleland.json (build.py): WOBBLELAND
 - `site/assets/wobbleland-data.lv.js` (45K) — то же, LV: WOBBLELAND

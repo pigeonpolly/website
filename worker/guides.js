@@ -21,11 +21,18 @@ const cover = x => x.img ? `/api/img/${x.img}?t=1` : x.kind === 'video' && x.yt 
 export const guideOut = (x, open) => ({ id: x.id, kind: x.kind, vip: x.vip ? 1 : 0, t: x.t || {}, cover: cover(x),
   ...(x.kind === 'video' ? (x.vip && !open ? {} : { yt: x.yt }) : { url: x.url }), at: x.at });
 
+// встроенные (были на сайте до кабинета): идут после добавленных; названия бесплатных — с YouTube (v2.js ytName)
+const BASE = [
+  { id: 'b-cafe', kind: 'video', yt: 'eRa1uB_7s9U', base: 1 },
+  { id: 'b-pepper', kind: 'video', yt: 'VVvLZcIqUbM', base: 1 },
+  { id: 'review', kind: 'video', vip: 1, yt: 'PaypNmVZFOw', cover: '/images/v2/lesson-szmal.jpg', base: 1, t: { en: 'Watercolour review', ru: 'Обзор акварели', lv: 'Akvareļu apskats' } },
+];
 export async function guidesApi(req, env, url, h) {
   const p = url.pathname, m = req.method;
   if (p === '/api/v2/guides' && m === 'GET') {
     const u = await h.currentUser(req, env), open = !!(u && !u.banned);
-    return h.json({ items: (await guidesList(h)).filter(x => !x.hidden).map(x => guideOut(x, open)), open: open ? 1 : 0 }, 200, { 'cache-control': 'no-store' });
+    const items = [...(await guidesList(h)).filter(x => !x.hidden).map(x => guideOut(x, open)), ...BASE.map(x => ({ ...guideOut(x, open), cover: x.cover || cover(x), base: 1 }))];
+    return h.json({ items, open: open ? 1 : 0 }, 200, { 'cache-control': 'no-store' });
   }
   if (p !== '/api/admin/guides') return null;
   const u = await h.needUser(req, env); if (!(await h.isAdmin(u, env))) h.fail(403, 'admin');
