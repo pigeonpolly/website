@@ -807,6 +807,7 @@
     const go = () => {
       const k = mine && location.hash.slice(1);
       if (!['room', 'bag', 'album'].includes(k) || !page.isConnected) return;
+      if (window.PPCab) window.PPCab.show('bird'); // кабинет: вкладка «Птичка и игры»
       history.replaceState(null, '', location.pathname + location.search);
       if (k === 'album') return page.querySelector('#bp-album').click();
       if (k === 'bag') show('bag');
@@ -836,6 +837,7 @@
       document.getElementById('sw-pw').onclick = () => { if (!window.PPAccount) return; window.PPAccount.pwDialog(me.pw ? 'change' : 'add'); document.addEventListener('pp:pw', () => { me.pw = true; document.getElementById('sw-pw').textContent = '🔑 ' + t('pwSet'); }, { once: true }); };
       document.getElementById('sw-delacc').onclick = async () => { if (!confirm(t('delAccAsk'))) return; try { await post('delete-account'); location.href = pre + '/'; } catch (e) { alert(t('err')); } };
     }
+    document.dispatchEvent(new CustomEvent('pp:profile', { detail: { mine, me, pr } })); // свой профиль — «Мой кабинет» (cabinet.js раскладывает по вкладкам)
   }
   if (page) renderPage();
 

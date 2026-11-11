@@ -95,10 +95,10 @@ html[data-season=summer] body.v2s:has(.wl-map){--wlbg:#2F2622}
 .v2s .hr .hd-cart{color:var(--ink)}
 @media (max-width:700px){.v2s .hr .search-btn{width:32px;height:32px}}
 /* Часть Д: внутри старых страниц — вместо фиолетового графит сезона и его акцент (tools/v2_recolor.py заменил цвета style.css на --pp-*) */
-:root{--pp-ink:#2E2521;--pp-deep:#1F1916;--pp-card:#3A302B;--pp-2:#5C4D44;--pp-acc:#93AFCC}
-html[data-season=winter]{--pp-ink:#26303A;--pp-deep:#19212A;--pp-card:#313C47;--pp-2:#4C5A68;--pp-acc:#E2544A}
-html[data-season=spring]{--pp-ink:#26302B;--pp-deep:#19211D;--pp-card:#313C36;--pp-2:#4B5A51;--pp-acc:#E85C64}
-html[data-season=summer]{--pp-ink:#2F2622;--pp-deep:#201A17;--pp-card:#3B312C;--pp-2:#5E4E45;--pp-acc:#7CC6E6}
+:root{--pp-accd:#22405F;--pp-ink:#2E2521;--pp-deep:#1F1916;--pp-card:#3A302B;--pp-2:#5C4D44;--pp-acc:#93AFCC}
+html[data-season=winter]{--pp-accd:#9E1B22;--pp-ink:#26303A;--pp-deep:#19212A;--pp-card:#313C47;--pp-2:#4C5A68;--pp-acc:#E2544A}
+html[data-season=spring]{--pp-accd:#BE2F3A;--pp-ink:#26302B;--pp-deep:#19211D;--pp-card:#313C36;--pp-2:#4B5A51;--pp-acc:#E85C64}
+html[data-season=summer]{--pp-accd:#1F7FAE;--pp-ink:#2F2622;--pp-deep:#201A17;--pp-card:#3B312C;--pp-2:#5E4E45;--pp-acc:#7CC6E6}
 /* шапка не помещается (вошла птичка: корзина, колокольчик, пуговки, аватар) — v2.js ставит .tight: меню прячется в ☰, как на узком экране */
 .v2s .lg{flex-shrink:0}
 .v2s .hd2.tight .nv,.v2s .hd2.tight .hr .lb,.v2s .hd2.tight .hr .lang-switch{display:none}.v2s .hd2.tight .burger{display:block}
@@ -109,3 +109,40 @@ html[data-season=summer]{--pp-ink:#2F2622;--pp-deep:#201A17;--pp-card:#3B312C;--
 .v2s .hd2.tight .drawer .lb{color:var(--acc)}.v2s .hd2.tight .drawer .lang-switch{margin-top:14px}.v2s .hd2.tight .drawer .lang-switch a{font:500 15px Karla,'Nunito Sans',sans-serif;border:0;padding:4px 10px 4px 0}
 .v2s .hd2.snug .w{max-width:1440px;padding:0 28px;gap:16px}.v2s .hd2.snug .nv{gap:22px;letter-spacing:.14em}.v2s .hd2.snug .hr{gap:10px;margin-left:14px}.v2s .hd2.snug .lg{font-size:21px}
 .v2s .hd2.tight .hr{margin-left:auto}
+/* «Мой кабинет» — свой профиль /bird/ (cabinet.js): вкладки и карточки учёбы на бумажных листах в новом стиле */
+.cab-on .bp-head h1{font-family:Fraunces,Lora,serif;font-weight:400;letter-spacing:-.015em}
+.cab-kick{margin:0;font:700 11px Karla,'Nunito Sans',sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--pp-acc)}
+.cab{display:grid;gap:22px}
+.cab-tabs{display:flex;flex-wrap:wrap;gap:8px;border-bottom:1px solid rgba(255,255,255,.14);padding-bottom:14px}
+.cab-tabs button{font:700 14px Karla,'Nunito Sans',sans-serif;padding:11px 20px;border-radius:999px;border:1.5px solid rgba(255,255,255,.28);background:none;color:inherit;cursor:pointer;white-space:nowrap}
+.cab-tabs button:hover{border-color:var(--pp-acc)}
+.cab-tabs button[aria-selected=true]{background:var(--pp-acc);border-color:var(--pp-acc);color:var(--pp-ink)}
+.cab-pane{display:grid;gap:20px}.cab-pane[hidden]{display:none}
+.cab-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:16px}
+.cab-card{display:flex;flex-direction:column;gap:6px;padding:20px 22px;border-radius:6px;background:#FBF9F5;color:#2A211C;text-decoration:none;box-shadow:0 14px 30px rgba(0,0,0,.28);position:relative;min-width:0}
+.cab-card[hidden]{display:none}
+a.cab-card:hover{transform:translateY(-2px);color:#2A211C}a.cab-card{transition:transform .15s}
+.cab-card b{font:400 25px/1.15 Fraunces,Lora,serif;letter-spacing:-.01em}
+.cab-card p{margin:0;color:#6C6058;font-size:15px;line-height:1.5}
+.cab-card em,.cab-btn{font-style:normal;font-weight:700;font-size:14px;color:var(--pp-accd);margin-top:auto;padding-top:6px}
+.cab-k{font:700 11px Karla,'Nunito Sans',sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--pp-accd)}
+.cab-vip{grid-row:span 2;padding:12px 12px 20px}.cab-vip>:not(.cab-cover){margin-left:10px;margin-right:10px}
+.cab-cover{position:relative;display:block;aspect-ratio:16/10;overflow:hidden;border-radius:3px;margin-bottom:8px}
+.cab-cover img{width:100%;height:100%;object-fit:cover}
+.cab-cover i{position:absolute;left:50%;top:50%;transform:translate(-50%,-50%);width:58px;height:58px;border-radius:50%;background:var(--pp-accd);color:#fff;display:grid;place-items:center;font-style:normal;font-size:20px;box-shadow:0 8px 20px rgba(0,0,0,.3)}
+.cab-stamps{display:flex;gap:6px;flex-wrap:wrap;margin:6px 0 2px}
+.cab-stamps i{width:18px;height:18px;border-radius:50%;border:1.5px dashed #B9AEA4}
+.cab-stamps i.on{border:0;background:var(--pp-accd);box-shadow:inset 0 0 0 3px #FBF9F5,0 0 0 1.5px var(--pp-accd)}
+.cab-btn{text-decoration:none}
+.cab-dip{background:#F3EBDD;outline:1.5px solid #C9A86A;outline-offset:-8px}
+.cab-books h2{margin:0 0 10px;font:400 24px Fraunces,Lora,serif}
+.cab-row{display:flex;flex-wrap:wrap;gap:8px}
+.cab-pill{display:inline-flex;align-items:center;gap:6px;padding:10px 18px;border-radius:999px;border:1.5px solid rgba(255,255,255,.3);color:inherit;text-decoration:none;font-weight:700;font-size:14px}
+.cab-pill:hover{border-color:var(--pp-acc);color:var(--pp-acc)}
+.cab-soon{margin:0;font-size:14px;opacity:.7}
+.cab-mail{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:18px;align-items:start}
+.cab-col{min-width:0}
+@media (max-width:760px){.cab-grid,.cab-mail{grid-template-columns:1fr}.cab-vip{grid-row:auto}.cab-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.cab-tabs button{padding:9px 14px;font-size:13px}}
+/* телефон, птичка вошла: пуговки — в кабинете и меню аватара, название — только логотип, чтобы всё влезло */
+@media (max-width:700px){.v2s .hr .hd-btns{display:none}}
+@media (max-width:520px){.v2s .hd2:has(.acct-me) .lg span{display:none}}

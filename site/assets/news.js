@@ -438,7 +438,7 @@
     return fetch('/api/news', { credentials: 'same-origin', headers: window.PPDevH ? window.PPDevH() : {} }).then(r => r.ok ? r.json() : null)
       .then(j => { if (j) { news = j.news || []; drawBell(); } }).catch(() => {});
   }
-  window.PPNews = { refresh, open: feed, list: () => known().slice(), pickBox: () => me && pickBox(me.box0 || '') };
+  window.PPNews = { refresh, open: feed, inline: () => loadHist(), list: () => known().slice(), pickBox: () => me && pickBox(me.box0 || '') };
   if (window.PPWho) set(window.PPWho);
   document.addEventListener('pp:whoami', e => set(e.detail));
 })();

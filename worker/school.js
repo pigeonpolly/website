@@ -55,7 +55,7 @@ export async function schoolApi(req, env, url, h) {
     const tries = {}; for (const r of rows) tries[r.lesson] = (tries[r.lesson] || 0) + 1;
     const lang = LANGS.includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
     const works = Object.values(last(rows)).map(r => ({ lesson: r.lesson, status: r.status, comment: trOf(r)[lang] || r.comment || '', img: r.img, note: r.note || '', at: r.created_at, checked: r.checked_at, tries: tries[r.lesson], fresh: !r.seen }));
-    if (rows.some(r => !r.seen)) await env.DB.prepare('UPDATE school_works SET seen = 1 WHERE user_id = ? AND seen = 0').bind(u.id).run(); // открыл школу — вердикты увидены
+    if (!url.searchParams.has('peek') && rows.some(r => !r.seen)) await env.DB.prepare('UPDATE school_works SET seen = 1 WHERE user_id = ? AND seen = 0').bind(u.id).run(); // открыл школу — вердикты увидены (?peek — кабинет /bird/ только смотрит)
     const dip = await env.DB.prepare("SELECT amount FROM button_log WHERE user_id = ? AND kind = 'school' AND ref = 'diploma'").bind(u.id).first().catch(() => null);
     return json({ me: true, nick: u.nick, works, diplomaBtn: dip ? dip.amount : 0 }, 200, { 'cache-control': 'no-store' });
   }
