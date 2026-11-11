@@ -93,18 +93,21 @@
       } else box.querySelector('.cab-k').textContent = t('dipNext');
     }).catch(() => {});
     // гайды: VIP (вошедшим) новее бесплатных
-    fetch('/api/v2/vip', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null).then(d => {
-      const vids = [...((d && d.videos) || []).map(v => ({ id: v.id, vip: 1 })), ...FREE_YT.map(id => ({ id }))];
+    const get = u => fetch(u, { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null);
+    Promise.all([get('/api/v2/vip'), get('/api/v2/guides')]).then(([d, g]) => {
+      const nm = x => (x.t && (x.t[['en', 'ru', 'lv'][L]] || x.t.en || x.t.ru)) || ''; // добавленные в кабинете «🎬 Видео и гайды» (worker/guides.js)
+      const added = ((g && g.items) || []).filter(x => x.kind === 'video' && !x.vip).map(x => ({ id: x.yt, cover: x.cover, name: nm(x) }));
+      const vids = [...((d && d.videos) || []).map(v => ({ id: v.id, vip: 1, cover: v.cover, name: v.t ? nm(v) : '' })), ...added, ...FREE_YT.filter(id => !added.some(x => x.id === id)).map(id => ({ id }))];
       let last = null; try { last = localStorage.getItem('pp-yt-last'); } catch (e) {}
       const seen = vids.find(v => v.id === last && v !== vids[0]);
       const pick = [[vids[0], t('gNew')], seen ? [seen, t('gLast')] : [vids[1], t('gNext')]].filter(x => x[0]);
       if (last && last === vids[0].id) pick[0][1] = t('gNew') + ' · ' + t('gSeen');
       guides.innerHTML = '<div class="cab-grid">' + pick.map(([v, k]) => `<a class="cab-card cab-vid" href="https://youtu.be/${v.id}" data-yt="${v.id}" target="_blank" rel="noopener">
-        <span class="cab-cover"><img src="${v.vip ? '/images/v2/lesson-szmal.jpg' : `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`}" alt="" loading="lazy"><i>▶</i></span>
-        <span class="cab-k">${k}${v.vip ? ' · VIP' : ''}</span><b>${v.vip ? t('vipT') : '…'}</b><em>${t('watch')}</em></a>`).join('')
+        <span class="cab-cover"><img src="${v.cover || (v.vip ? '/images/v2/lesson-szmal.jpg' : `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`)}" alt="" loading="lazy"><i>▶</i></span>
+        <span class="cab-k">${k}${v.vip ? ' · VIP' : ''}</span><b>${esc(v.name || (v.vip ? t('vipT') : '…'))}</b><em>${t('watch')}</em></a>`).join('')
         + `<a class="cab-card cab-more" href="${pre}/learn/"><span class="cab-k">${t('guidesH').slice(3)}</span><b>${t('allT')}</b><p>${t('allS')}</p><em class="cab-go">${t('seeAll')}</em></a></div>`;
       guides.querySelectorAll('.cab-vid').forEach((a, i) => {
-        if (pick[i][0].vip) return;
+        if (pick[i][0].vip || pick[i][0].name) return;
         const b = a.querySelector('b'); b.textContent = t('vidT');
         fetch('/api/v2/yt?id=' + a.dataset.yt).then(r => r.ok ? r.json() : null).then(x => {
           const tt = x && x.title; if (!tt) return;

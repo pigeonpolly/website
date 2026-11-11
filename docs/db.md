@@ -2,7 +2,7 @@
 
 _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TABLE / ALTER TABLE и обращений к meta в worker/*.js. Руками не править._
 
-## Таблицы (57)
+## Таблицы (64)
 
 Обозначения: PK — первичный ключ, nn — NOT NULL, =x — DEFAULT x; «+» — столбцы, добавленные ALTER TABLE.
 
@@ -14,7 +14,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **login_fail** (worker/auth.js): `k` text PK, `n` int nn, `at` int nn
 - **pw_reset** (worker/auth.js): `hash` text PK, `user_id` int nn, `expires` int nn, `created_at` int
 - **funnel** (worker/auth.js): `day` text nn, `name` text nn, `step` text nn, `vid` text nn; PRIMARY KEY (day, name, step, vid)
-- **blog_posts** (worker/blog.js): `id` int PK auto, `slug` text UNIQUE nn, `status` text ='draft', `cover` text ='', `t_ru` text ='', `t_en` text ='', `t_lv` text ='', `d_ru` text ='', `d_en` text ='', `d_lv` text ='', `b_ru` text ='', `b_en` text ='', `b_lv` text ='', `tags_ru` text ='', `tags_en` text ='', `tags_lv` text ='', `views` int =0, `likes` int =0, `created_at` int, `updated_at` int, `published_at` int; + `featured` int =0').run(), `pinned` int =0').run(), `src_lang` text, `client_key` text, `section` text ='', `members` int =0 (🔒 только для вошедших)
+- **blog_posts** (worker/blog.js): `id` int PK auto, `slug` text UNIQUE nn, `status` text ='draft', `cover` text ='', `t_ru` text ='', `t_en` text ='', `t_lv` text ='', `d_ru` text ='', `d_en` text ='', `d_lv` text ='', `b_ru` text ='', `b_en` text ='', `b_lv` text ='', `tags_ru` text ='', `tags_en` text ='', `tags_lv` text ='', `views` int =0, `likes` int =0, `created_at` int, `updated_at` int, `published_at` int; + `featured` int =0').run(), `pinned` int =0').run(), `members` int =0').run(), `src_lang` text, `client_key` text, `section` text =''
 - **blog_likes** (worker/blog.js): `post_id` int nn, `who` text nn; PRIMARY KEY (post_id, who)
 - **blog_comments** (worker/blog.js): `id` int PK auto, `post_id` int nn, `user_id` int, `anon` text, `body` text nn, `ip` text, `status` text ='ok', `created_at` int
 - **blog_tags** (worker/blog.js): `en` text PK, `ru` text ='', `lv` text =''; + `checked` int =0, `src` text ='', `created_at` int
@@ -26,6 +26,8 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **challenge_days** (worker/challenge-days.js): `day` text PK, `item` int, `subject_en` text, `subject_ru` text, `subject_lv` text, `tip_en` text, `tip_ru` text, `tip_lv` text, `colors` text, `time` int, `twist_en` text, `twist_ru` text, `twist_lv` text, `extra_en` text, `extra_ru` text, `extra_lv` text, `edited` int =0, `orig` text, `updated_at` int, `pal` text
 - **challenge_bank** (worker/challenge-days.js): `id` int PK auto, `k` text UNIQUE, `en` text, `ru` text, `lv` text, `days` text ='', `created_at` int, `updated_at` int, `manual` int =0, `hidden` int =0, `tags` text =''
 - **challenge_months** (worker/challenge-days.js): `ym` text PK, `en` text, `ru` text, `lv` text, `updated_at` int, `badge` text, `start_day` text, `end_day` text
+- **english_progress** (worker/english.js): `user_id` int PK, `state` text, `updated_at` int
+- **english_access** (worker/english.js): `user_id` int PK, `added_at` int
 - **flock_events** (worker/flock-news.js): `id` int PK auto, `ts` int nn, `user_id` int nn =0, `kind` text nn, `ref` text nn ='', `data` text ='{}'; UNIQUE (user_id, kind, ref)
 - **room_guests** (worker/flock.js): `owner_id` int nn, `guest_id` int nn, `first_at` int, `last_at` int; PRIMARY KEY (owner_id, guest_id)
 - **feathers** (worker/flock.js): `owner_id` int nn, `from_id` int nn, `day` text nn, `created_at` int, `seen` int =0; PRIMARY KEY (owner_id, from_id, day)
@@ -52,22 +54,24 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **draw_likes** (worker/index.js): `rid` int nn, `kind` text nn, `who` text nn, `created_at` int; PRIMARY KEY (rid, kind, who)
 - **potion_gifts** (worker/index.js): `id` int PK auto, `to_id` int nn, `from_nick` text, `ing` text nn, `n` int nn, `created_at` int, `seen` int =0
 - **anon_names** (worker/index.js): `vid` text PK, `code` text UNIQUE nn, `created_at` int
-- **mail_out** (worker/mail.js): `id` int PK auto, `cat` text nn, `L` text nn, `status` text nn, `total` int =0, `sent` int =0, `created_at` int
+- **mail_out** (worker/mail.js): `id` int PK auto, `cat` text nn, `L` text nn, `status` text nn, `total` int =0, `sent` int =0, `created_at` int; + `aud_from` int =0, `aud_to` int =0']
 - **mail_sent** (worker/mail.js): `out_id` int nn, `user_id` int nn, `at` int; PRIMARY KEY (out_id, user_id)
 - **my_games** (worker/my-games.js): `user_id` int PK, `pins` text, `visits` text, `updated_at` int
+- **norsk_progress** (worker/norsk.js): `user_id` int PK, `state` text, `updated_at` int
+- **norsk_access** (worker/norsk.js): `user_id` int PK, `added_at` int
+- **textbook_notes** (worker/notebook.js): `user_id` int nn, `book` text nn, `page_id` text nn, `data` text, `t` int nn; PRIMARY KEY (user_id, book, page_id)
+- **notes** (worker/notes.js): `id` int PK auto, `L` text nn, `file_key` text, `file_name` text, `file_size` int =0, `file_type` text, `aud` text =\'all\', `days` int =0, `total` int =0, `mail_id` int, `created_at` int
+- **note_to** (worker/notes.js): `note_id` int nn, `user_id` int nn, `seen_at` int =0; PRIMARY KEY (note_id, user_id)
 - **pan_runs** (worker/pancakes.js): `id` text PK, `user_id` int nn, `started` int nn, `level` int =0, `washed` int =0, `stars` int =0, `base` int =0, `spare` int =0
 - **school_works** (worker/school.js): `id` int PK auto, `user_id` int nn, `lesson` int nn, `img` text nn, `note` text, `status` text ='wait', `comment` text, `created_at` int, `checked_at` int, `seen` int =1; + `comment_tr` text
 - **shift_runs** (worker/shift.js): `id` text PK, `user_id` int nn, `started` int nn, `min` int nn, `done` int =0
+- **study_progress** (worker/study.js): `user_id` int PK, `state` text, `updated_at` int
 - **titos** (worker/titos.js): `user_id` int PK, `level` int =0, `coffee` int =10, `coffee_at` int =0, `drink_at` int =0, `sleep` int =0, `run` int =0, `found` text ='[]', `started` int =0, `bugs` text ='[]', `sell_day` text ='', `sell_n` int =0, `legacy` int =0; + `sort_lv` int =0, `sort_run` text ='', `bugs_run` int =0']
 - **titos_cases** (worker/titos.js): `n` int PK, `data` text nn, `tr` text ='{}', `hash` text, `updated_at` int
 - **top_week** (worker/top.js): `game` text nn, `week` text nn, `user_id` int nn, `score` int nn, `at` int; PRIMARY KEY (game, week, user_id)
-- **study_progress** (worker/study.js): `user_id` int PK, `state` text (JSON: ключ галочки → 1), `updated_at` int
-- **english_progress** (worker/english.js): `user_id` int PK, `state` text (JSON: d — блок → лучший %, w — тексты, v — словарь, a — ачивки, days, c — счётчики, last, k — открыто паролем, m — доля ошибок, x — задания с ошибками, pd — дни с пройденным заданием, t — время сохранения, rv — метка сброса), `updated_at` int
-- **english_access** (worker/english.js): `user_id` int PK, `added_at` int (мс) — кому админ открыл учебник английского
-- **norsk_progress**, **norsk_access** (worker/norsk.js): как english_progress / english_access — учебник норвежского
-- **textbook_notes** (worker/notebook.js): `user_id` int nn, `book` text nn (study / english / norsk), `page_id` text nn ('_' — служебная: {cleared, del}), `data` text (JSON страницы {title, html, c, mark, at, nb} или блокнота {kind: 'book', title}), `t` int nn; PK (user_id, book, page_id) — 📒 блокнот в учебниках, отдельно от прогресса
+- **out_clicks** (worker/week.js): `id` int PK auto, `day` text nn, `ts` int, `vid` text, `target` text, `path` text, `href` text
 
-## Ключи meta (48)
+## Ключи meta (49)
 
 Таблица `meta (key, value)`. Ключ → где используется.
 
@@ -107,11 +111,12 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `recovery_hash` — worker/blog.js, worker/index.js
 - `req_closed` — worker/index.js
 - `restock_day` — worker/index.js
-- `restock_last` — worker/index.js
+- `restock_last` — worker/index.js, worker/week.js
 - `rules` — worker/index.js
 - `sections_news` — worker/blog.js
 - `sections_v2` — worker/blog.js
 - `starter_box_v1` — worker/index.js
+- `t:` — worker/english-page.js, worker/norsk-page.js
 - `titos_pot_n` — worker/titos.js
 - `unit` — worker/index.js
 - `users_total` — worker/auth.js, worker/blog.js, worker/index.js
@@ -119,7 +124,3 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `wl_gift:` — worker/wl-holidays.js
 - `wl_mail_n:` — worker/mail.js, worker/wl-holidays.js
 - `works_total` — worker/blog.js, worker/index.js
-- `out_clicks(id, day, ts, vid, target, path, href)` — нажатия на ссылки наружу (пока target = amazon), vid — суточный отпечаток как в visits; worker/week.js, кабинет «🗓 Неделя».
-- **notes** (worker/notes.js): `id` int PK auto, `L` text nn (JSON {en,ru,lv: {s,t}}), `file_key` text, `file_name` text, `file_size` int =0, `file_type` text, `aud` text ='all', `days` int =0, `total` int =0, `mail_id` int, `created_at` int
-- **note_to** (worker/notes.js): `note_id` int nn, `user_id` int nn, `seen_at` int =0; PRIMARY KEY (note_id, user_id); индекс note_to_user
-- mail_out + `aud_from` int =0, `aud_to` int =0 — границы даты регистрации получателей (📢 Рассылка)
