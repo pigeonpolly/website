@@ -96,7 +96,7 @@
   //       undo: { can(), run() } — кнопка «↶ Отменить»; shopUrl(tab, kind) — плитка «＋ в магазин»; shopCount(kind) — сколько таких вещей в продаже (для пустого вида) }
   function bag(box, o) {
     const S = o.state || (o.state = {});
-    S.tab = S.tab || 'all'; S.kind = S.kind || '';
+    S.tab = S.tab || 'all'; S.kind = S.kind || ''; if (S.free === undefined) S.free = true; // «Только неиспользуемые» включено по умолчанию
     const draw = () => {
       closeMenu();
       const all = o.items, bird = all.filter(g => !isRoom(g.kind)), room = all.filter(g => isRoom(g.kind));
