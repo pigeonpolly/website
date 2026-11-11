@@ -152,6 +152,7 @@ body.ppnb-open #ppnb-tab{opacity:0;pointer-events:none}
 #ppnb .ed h2{font-size:1.3em;margin:.8em 0 .3em}#ppnb .ed h3{font-size:1.12em;margin:.7em 0 .25em}
 #ppnb .ed p,#ppnb .ed div{margin:0 0 .45em}
 #ppnb .ed blockquote{margin:.4em 0;padding:.2em .8em;border-left:3px solid var(--accent,#534ab7);background:var(--accent-soft,#f3f3f3);border-radius:0 8px 8px 0}
+#ppnb .ed blockquote a[href^="#"]:empty::after{content:"↩ в учебник";margin-left:.4em;white-space:nowrap} /* надпись рисуется стилем — не попадает в выделение и копирование */
 #ppnb .ed mark{background:var(--mark,#fff1a8);color:inherit;padding:0 .1em;border-radius:3px}
 #ppnb .ed a{color:var(--accent,#534ab7)}
 #ppnb .ed ul,#ppnb .ed ol{margin:.2em 0 .5em;padding-left:1.4em}
@@ -340,6 +341,9 @@ body.ppnb-open #ppnb-tab{opacity:0;pointer-events:none}
     const t = e.dataTransfer && e.dataTransfer.getData('text/plain'); e.preventDefault(); snap();
     if (t) { const r = document.caretRangeFromPoint ? document.caretRangeFromPoint(e.clientX, e.clientY) : null; if (r) { const s = getSelection(); s.removeAllRanges(); s.addRange(r); } document.execCommand('insertText', false, t); }
   });
+  function backLinks() { // старые цитаты: надпись «↩ в учебник» была текстом — убрать, теперь её рисует стиль
+    ed.querySelectorAll('blockquote a[href^="#"]').forEach(a => { if (/^\s*↩ в учебник\s*$/.test(a.textContent)) { a.textContent = ''; a.contentEditable = 'false'; } });
+  }
   ed.addEventListener('click', e => { // ссылка «↩ в учебник» — переход к месту
     const a = e.target.closest('a[href]'); if (!a) return;
     e.preventDefault(); const h = a.getAttribute('href');
@@ -364,7 +368,7 @@ body.ppnb-open #ppnb-tab{opacity:0;pointer-events:none}
   }
   function quoteBlock() {
     const bq = document.createElement('blockquote'); bq.textContent = lastSel.text;
-    if (lastSel.at) { const a = document.createElement('a'); a.href = lastSel.at; a.textContent = ' ↩ в учебник'; bq.append(a); }
+    if (lastSel.at) { const a = document.createElement('a'); a.href = lastSel.at; a.contentEditable = 'false'; a.title = 'вернуться к месту в учебнике'; bq.append(a); }
     return bq;
   }
   clip.addEventListener('pointerdown', e => e.preventDefault()); // выделение не сбрасываем до клика
@@ -426,7 +430,7 @@ body.ppnb-open #ppnb-tab{opacity:0;pointer-events:none}
   function render() { // текущая страница в редактор
     const p = cur(), all = list(), i = all.indexOf(p);
     $('.bk span').textContent = bookTitle(bookOf(D.book));
-    if (edFor !== p.id) { ed.innerHTML = p.html; edFor = p.id; ttl.value = p.title; $('.body').scrollTop = 0; histReset(); }
+    if (edFor !== p.id) { ed.innerHTML = p.html; backLinks(); edFor = p.id; ttl.value = p.title; $('.body').scrollTop = 0; histReset(); }
     ed.contentEditable = loaded ? 'true' : 'false';
     $('.pg').textContent = `стр. ${i + 1} из ${all.length}`;
     $('[data-a=prev]').disabled = i <= 0; $('[data-a=next]').disabled = i >= all.length - 1;
