@@ -209,6 +209,24 @@
     f.nick.focus();
   }
 
+  // фон аватара (подарок «bg») в кружке шапки: цвет — как есть, картинка — из ava-deco.css (.pp-ava.bg-<имя>)
+  function avaBg(btn, bg) {
+    if (!btn || !bg) return;
+    if (/^#[0-9a-f]{6}$/i.test(bg)) { btn.style.background = bg; return; }
+    if (!/^[a-z0-9-]+$/i.test(bg)) return;
+    let css = document.querySelector('link[href*="/assets/ava-deco.css"]');
+    if (!css) { // страницы v2 файл с фонами не грузят — подгрузить по необходимости
+      css = document.createElement('link'); css.rel = 'stylesheet'; css.href = '/assets/ava-deco.css';
+      css.onload = () => avaBg(btn, bg); document.head.appendChild(css); return;
+    }
+    const tmp = document.createElement('span'); tmp.className = 'pp-ava bg-' + bg; tmp.style.display = 'none';
+    document.body.appendChild(tmp);
+    const cs = getComputedStyle(tmp), img = cs.backgroundImage, col = cs.backgroundColor;
+    tmp.remove();
+    if (img && img !== 'none') { btn.style.backgroundImage = img; btn.style.backgroundSize = 'cover'; btn.style.backgroundPosition = 'center'; }
+    if (col && col !== 'rgba(0, 0, 0, 0)' && col !== 'transparent') btn.style.backgroundColor = col;
+  }
+
   function render() {
     const u = info.user;
     if (!u) {
@@ -243,6 +261,7 @@
       // своя страница профиля: /bird/#room и т.п. меняет только якорь — sketch-wall.js ловит hashchange
       el.querySelectorAll('.acct-pop a[href*="/bird/#"]').forEach(a => a.addEventListener('click', () => { el.querySelector('.acct-pop').hidden = true; }));
       if (window.PPBirds) el.querySelector('canvas').getContext('2d').drawImage(window.PPBirds.spriteHD(window.PPBirds.dress(window.PPBirds.looks(u.id), u.avatar), 0), -8, -2); // детальная птичка
+      avaBg(el.querySelector('.acct-me'), u.avatar && u.avatar.bg); // тот же фон, что у аватара в профиле
     }
     setButtons(u && u.nick ? u.buttons || 0 : null);
     const get = el.querySelector('.acct-get');

@@ -6,6 +6,7 @@ export const WEEK_TABLES = [
   // переходы с сайта наружу (пока только Amazon): vid — тот же суточный отпечаток, что в visits (без IP)
   'CREATE TABLE IF NOT EXISTS out_clicks (id INTEGER PRIMARY KEY AUTOINCREMENT, day TEXT NOT NULL, ts INTEGER, vid TEXT, target TEXT, path TEXT, href TEXT)',
   'CREATE INDEX IF NOT EXISTS out_clicks_day ON out_clicks(day)',
+  'CREATE INDEX IF NOT EXISTS button_log_kind_day ON button_log(kind, day)', // «покупки за 7 дней» без полного прохода
 ];
 
 export const OUT_TARGETS = { amazon: /(^|\.)amazon\.[a-z.]+$|^a\.co$/ };
@@ -28,18 +29,25 @@ export async function weekApi(req, env, url, h) {
   const dayAgo = n => new Date(Date.now() - n * 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
   const t = h.now(), d0 = dayAgo(6), p0 = dayAgo(13), p1 = dayAgo(7), today = dayAgo(0);
   const one = async (sql, ...v) => { try { return Number((await env.DB.prepare(sql).bind(...v).first())?.n) || 0; } catch (e) { return 0; } };
-  const pair = async (sql, a, b, c, d) => ({ now: await one(sql, a, b), prev: await one(sql, c, d) });
-  // люди — уникальные за сутки, как в «👥 Посетителях»
-  const people = await pair('SELECT COUNT(DISTINCT day || vid) AS n FROM visits WHERE day >= ? AND day <= ?', d0, today, p0, p1);
-  const shop = await pair("SELECT COUNT(DISTINCT day || vid) AS n FROM visits WHERE day >= ? AND day <= ? AND path GLOB '*/shop/*'", d0, today, p0, p1);
-  const amazon = await pair("SELECT COUNT(*) AS n FROM out_clicks WHERE target = 'amazon' AND day >= ? AND day <= ?", d0, today, p0, p1);
-  const buys = await pair("SELECT COUNT(*) AS n FROM button_log WHERE kind = 'buy' AND day >= ? AND day <= ?", d0, today, p0, p1);
+  const pair = async (sql, a, b, c, d) => { const [now, prev] = await Promise.all([one(sql, a, b), one(sql, c, d)]); return { now, prev }; };
   const wk = 7 * 86400;
-  const subs = { total: await one("SELECT COUNT(*) AS n FROM subscribers"), now: await one('SELECT COUNT(*) AS n FROM subscribers WHERE created_at > ?', t - wk), prev: await one('SELECT COUNT(*) AS n FROM subscribers WHERE created_at > ? AND created_at <= ?', t - 2 * wk, t - wk) };
-  const birds = { now: await one('SELECT COUNT(*) AS n FROM users WHERE created_at > ?', t - wk), prev: await one('SELECT COUNT(*) AS n FROM users WHERE created_at > ? AND created_at <= ?', t - 2 * wk, t - wk) };
-  let salary = null;
-  try { salary = await env.DB.prepare("SELECT created_at AS at, amount, COUNT(*) AS birds FROM button_log WHERE kind = 'salary' GROUP BY ref ORDER BY created_at DESC LIMIT 1").first(); } catch (e) { /* ещё не выдавали */ }
-  let restock = null; try { restock = JSON.parse(await h.getMeta(env, 'restock_last')); } catch (e) { /* не пополняли */ }
-  const amazonFirst = await one("SELECT MIN(ts) AS n FROM out_clicks WHERE target = 'amazon'");
+  // все запросы — разом, а не по очереди (раньше кабинет открывался по 2–3 с)
+  const [people, shop, amazon, buys, subsT, subsN, subsP, birdsN, birdsP, salary, restockRaw, amazonFirst] = await Promise.all([
+    // люди — уникальные за сутки, как в «👥 Посетителях»
+    pair('SELECT COUNT(DISTINCT day || vid) AS n FROM visits WHERE day >= ? AND day <= ?', d0, today, p0, p1),
+    pair("SELECT COUNT(DISTINCT day || vid) AS n FROM visits WHERE day >= ? AND day <= ? AND path GLOB '*/shop/*'", d0, today, p0, p1),
+    pair("SELECT COUNT(*) AS n FROM out_clicks WHERE target = 'amazon' AND day >= ? AND day <= ?", d0, today, p0, p1),
+    pair("SELECT COUNT(*) AS n FROM button_log WHERE kind = 'buy' AND day >= ? AND day <= ?", d0, today, p0, p1),
+    one('SELECT COUNT(*) AS n FROM subscribers'),
+    one('SELECT COUNT(*) AS n FROM subscribers WHERE created_at > ?', t - wk),
+    one('SELECT COUNT(*) AS n FROM subscribers WHERE created_at > ? AND created_at <= ?', t - 2 * wk, t - wk),
+    one('SELECT COUNT(*) AS n FROM users WHERE created_at > ?', t - wk),
+    one('SELECT COUNT(*) AS n FROM users WHERE created_at > ? AND created_at <= ?', t - 2 * wk, t - wk),
+    env.DB.prepare("SELECT created_at AS at, amount, COUNT(*) AS birds FROM button_log WHERE kind = 'salary' GROUP BY ref ORDER BY created_at DESC LIMIT 1").first().catch(() => null), // ещё не выдавали
+    Promise.resolve(h.getMeta(env, 'restock_last')).catch(() => null),
+    one("SELECT MIN(ts) AS n FROM out_clicks WHERE target = 'amazon'"),
+  ]);
+  const subs = { total: subsT, now: subsN, prev: subsP }, birds = { now: birdsN, prev: birdsP };
+  let restock = null; try { restock = JSON.parse(restockRaw); } catch (e) { /* не пополняли */ }
   return h.json({ from: d0, to: today, people, shop, amazon, amazonFirst, buys, subs, birds, salary, restock }, 200, { 'cache-control': 'no-store' });
 }

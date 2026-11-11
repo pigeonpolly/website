@@ -1333,16 +1333,20 @@ const gamePrices = unit => ({ avg: unit.avg, level: btnOf(RULES.gameLevelPct, un
 // «🤖 Автопилот» в кабинете: что работает само и всё ли в порядке (ok: true — зелёное, false — нужно внимание, null — выключено)
 async function autopilot(env, req) {
   const out = [], day = rigaDay(), y = new Date(Date.now() - 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
-  const cron = Number(await getMeta(env, 'cron_at')) || 0, mins = cron ? Math.round((Date.now() - cron) / 60000) : null;
+  // запросы — разом, ниже только ждём готовые (кабинет открывается быстрее)
+  const pCron = getMeta(env, 'cron_at'), pRl = getMeta(env, 'restock_last'), pCat = catalog(env, req), pStock = env.DB.prepare('SELECT kind, item FROM shop WHERE stock > 0').all(),
+    pUnit = gameUnit(env), pEco = env.DB.prepare('SELECT COALESCE(SUM(COALESCE(buttons, 0)), 0) AS total, COUNT(*) AS birds FROM users WHERE nick IS NOT NULL AND banned = 0').first(), pPl = getMeta(env, 'price_level');
+  [pCron, pRl, pCat, pStock, pUnit, pEco, pPl].forEach(x => Promise.resolve(x).catch(() => {})); // ошибка всплывёт там же, где раньше
+  const cron = Number(await pCron) || 0, mins = cron ? Math.round((Date.now() - cron) / 60000) : null;
   out.push({ ok: mins != null && mins < 180, t: 'Расписание (раз в час)', d: mins == null ? 'ещё не запускалось — на сайте это должно случиться в течение часа после выкладки' : mins < 180 ? `последний запуск ${mins} мин назад` : `не запускалось ${Math.round(mins / 60)} ч — напишите Claude` });
-  const rl = parseJ(await getMeta(env, 'restock_last'), null);
+  const rl = parseJ(await pRl, null);
   out.push(!RULES.restockOn ? { ok: null, t: 'Пополнение магазина', d: 'выключено в правилах' } : { ok: !!rl && (rl.day === day || rl.day === y) || mins == null, t: 'Пополнение магазина каждую ночь', d: rl ? `последний раз ${rl.day}: закончившиеся вещи (${rl.items}) — по ${rl.to} шт.` : 'ещё не было' });
-  const cat = await catalog(env, req), leg = new Set(cat.legend || []), all = Object.entries(cat.items || {}).flatMap(([k, vs]) => vs.map(v => k + '|' + v)).filter(x => !leg.has(x));
-  const inStock = new Set((await env.DB.prepare('SELECT kind, item FROM shop WHERE stock > 0').all()).results.map(r => r.kind + '|' + r.item)), on = all.filter(x => inStock.has(x)).length;
+  const cat = await pCat, leg = new Set(cat.legend || []), all = Object.entries(cat.items || {}).flatMap(([k, vs]) => vs.map(v => k + '|' + v)).filter(x => !leg.has(x));
+  const inStock = new Set((await pStock).results.map(r => r.kind + '|' + r.item)), on = all.filter(x => inStock.has(x)).length;
   out.push({ ok: !all.length || on >= all.length * 0.5, t: 'Вещи в магазине', d: `в продаже ${on} из ${all.length} обычных вещей` + (all.length && on < all.length * 0.5 ? ' — пополнение должно это исправить за ночь' : '') });
-  const unit = await gameUnit(env), eco = await env.DB.prepare('SELECT COALESCE(SUM(COALESCE(buttons, 0)), 0) AS total, COUNT(*) AS birds FROM users WHERE nick IS NOT NULL AND banned = 0').first();
+  const unit = await pUnit, eco = await pEco;
   out.push({ ok: true, t: 'Цены', d: `меняются сами от остатка; «мало / много» — от числа птичек (${STOCK.birds}); вы меняете только % категорий и цены легендарных (раздел «Магазин»)` });
-  const pl = parseJ(await getMeta(env, 'price_level'), null) || PLEVEL;
+  const pl = parseJ(await pPl, null) || PLEVEL;
   out.push({ ok: true, t: 'Уровень цен', d: `подстраивается сам под заработки птичек: ×${pl.L || 1}` + (pl.active >= 3 ? ` (активная птичка зарабатывает ~${pl.income} 🔘 в день — средняя вещь стоит ~${RULES.priceDays} дня)` : ' (пока мало данных — цены не трогаем)') });
   const avgBal = eco.birds ? Math.round(eco.total / eco.birds) : 0;
   out.push({ ok: true, t: 'Кошельки птичек', d: `в среднем ${avgBal} 🔘 — хватит примерно на ${(pl.avg || unit.avg) ? String(Math.round(avgBal / (pl.avg || unit.avg) * 10) / 10).replace('.', ',') : 0} средней вещи` });
@@ -2793,25 +2797,33 @@ async function route(req, env, url) {
       return json({ ok: true });
     }
     const cnt = async (sql, ...v) => { try { return Number((await env.DB.prepare(sql).bind(...v).first())?.n) || 0; } catch (e) { return 0; } };
-    const t = now(), subsSeen = Number(await getMeta(env, 'inbox_subs_seen')) || 0;
-    const sched = await env.DB.prepare("SELECT id, t_ru, t_en, t_lv, published_at FROM blog_posts WHERE status = 'published' AND published_at > ? ORDER BY published_at").bind(t).all().then(r => r.results).catch(() => []);
+    const t = now(), [ry, rm, rd] = rigaDay().split('-').map(Number);
+    // всё разом, а не по очереди — так кабинет открывается быстрее
+    const [subsSeen, sched, filledRows, autoAll] = await Promise.all([
+      getMeta(env, 'inbox_subs_seen').then(v => Number(v) || 0).catch(() => 0),
+      env.DB.prepare("SELECT id, t_ru, t_en, t_lv, published_at FROM blog_posts WHERE status = 'published' AND published_at > ? ORDER BY published_at").bind(t).all().then(r => r.results).catch(() => []),
+      rm >= 10 ? env.DB.prepare('SELECT DISTINCT day FROM advent_plan').all().then(r => r.results).catch(() => []) : [],
+      autopilot(env, req).catch(() => []),
+    ]);
     // адвент: пустые окошки, которые ещё откроются (с октября по декабрь)
-    const [ry, rm, rd] = rigaDay().split('-').map(Number);
     let advent = null;
     if (rm >= 10) {
-      const filled = new Set((await env.DB.prepare('SELECT DISTINCT day FROM advent_plan').all().catch(() => ({ results: [] }))).results.map(r => r.day));
+      const filled = new Set(filledRows.map(r => r.day));
       const days = []; for (let d = rm === 12 ? rd : 1; d <= 31; d++) if (!filled.has(d)) days.push(d);
       advent = days;
     }
-    const auto = (await autopilot(env, req).catch(() => [])).filter(x => x.ok === false).map(x => ({ t: x.t, d: x.d }));
+    const auto = autoAll.filter(x => x.ok === false).map(x => ({ t: x.t, d: x.d }));
+    const [comments, requests, school, asks, subs, edits] = await Promise.all([
+      cnt("SELECT COUNT(*) AS n FROM blog_comments WHERE status = 'pending'"),
+      cnt("SELECT COUNT(*) AS n FROM draw_requests WHERE status = 'open'"),
+      cnt("SELECT COUNT(*) AS n FROM school_works WHERE status = 'wait'"), // «Школа Полли»: работы ждут проверки
+      cnt("SELECT COUNT(*) AS n FROM about_asks WHERE status = 'new'"), // вопросы из чата /about-me/ ждут ответа
+      cnt('SELECT COUNT(*) AS n FROM subscribers WHERE created_at > ?', subsSeen),
+      cnt("SELECT COUNT(*) AS n FROM site_blocks WHERE lang != '*' AND html IS NOT NULL AND id NOT LIKE 'custom-%'"), // свой текст поверх блока из кода
+    ]);
     return json({
-      comments: await cnt("SELECT COUNT(*) AS n FROM blog_comments WHERE status = 'pending'"),
-      requests: await cnt("SELECT COUNT(*) AS n FROM draw_requests WHERE status = 'open'"),
-      school: await cnt("SELECT COUNT(*) AS n FROM school_works WHERE status = 'wait'"), // «Школа Полли»: работы ждут проверки
-      asks: await cnt("SELECT COUNT(*) AS n FROM about_asks WHERE status = 'new'"), // вопросы из чата /about-me/ ждут ответа
-      subs: await cnt('SELECT COUNT(*) AS n FROM subscribers WHERE created_at > ?', subsSeen), subsSeen,
-      auto, advent, adventYear: ry,
-      edits: await cnt("SELECT COUNT(*) AS n FROM site_blocks WHERE lang != '*' AND html IS NOT NULL AND id NOT LIKE 'custom-%'"), // свой текст поверх блока из кода
+      comments, requests, school, asks, subs, subsSeen,
+      auto, advent, adventYear: ry, edits,
       scheduled: sched,
     }, 200, { 'cache-control': 'no-store' });
   }
