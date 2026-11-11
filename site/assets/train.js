@@ -11,9 +11,9 @@
     langs: { en: ['English', 'Английский', 'Angļu'], lv: ['Latvian', 'Латышский', 'Latviešu'], es: ['Spanish', 'Испанский', 'Spāņu'], no: ['Norwegian', 'Норвежский', 'Norvēģu'] },
     support: ['With the support of', 'При поддержке', 'Ar atbalstu no'],
     title: ['Polly’s train', 'Поезд Полли', 'Pollijas vilciens'],
-    intro: ['Polly is going on a trip by train, and Empanadillo is helping with the words. Choose where to go: you will learn the language of that country. At every station, make words out of the letters. The trip never ends.',
-      'Полли едет в путешествие на поезде, а Эмпанадильо помогает со словами. Выбери, куда ехать: язык этой страны и будешь учить. На каждой станции собери слова из букв. Поездка не кончается.',
-      'Pollija dodas ceļojumā ar vilcienu, un Empanadiljo palīdz ar vārdiem. Izvēlies, kurp braukt: tās valsts valodu arī mācīsies. Katrā stacijā saliec vārdus no burtiem. Brauciens nebeidzas.'],
+    intro: ['Polly is leaving Wobbleland on a trip by train, and Empanadillo is helping with the words. Choose where to go: you will learn the language of that country. At every station, make words out of the letters. The trip never ends.',
+      'Полли едет из Воббленда в путешествие на поезде, а Эмпанадильо помогает со словами. Выбери, куда ехать: язык этой страны и будешь учить. На каждой станции собери слова из букв. Поездка не кончается.',
+      'Pollija no Vobllendas dodas ceļojumā ar vilcienu, un Empanadiljo palīdz ar vārdiem. Izvēlies, kurp braukt: tās valsts valodu arī mācīsies. Katrā stacijā saliec vārdus no burtiem. Brauciens nebeidzas.'],
     where: ['Where are we going?', 'Куда едем?', 'Kurp brauksim?'],
     to: { es: ['to Spain', 'в Испанию', 'uz Spāniju'], no: ['to Norway', 'в Норвегию', 'uz Norvēģiju'], en: ['to Great Britain', 'в Великобританию', 'uz Lielbritāniju'], lv: ['to Latvia', 'в Латвию', 'uz Latviju'] },
     land: { es: ['Spain', 'Испания', 'Spānija'], no: ['Norway', 'Норвегия', 'Norvēģija'], en: ['Great Britain', 'Великобритания', 'Lielbritānija'], lv: ['Latvia', 'Латвия', 'Latvija'] },
@@ -132,15 +132,15 @@
   const scoreOf = w => { let s = 0; for (const c of w) s += pts(c); return s * (w.length >= 6 ? 2 : 1); };
 
   // ---------- станции маршрута ----------
-  // маршрут из Риги до страны (первые станции), дальше — по кругу городов страны; в Латвию — из Таллина
+  // маршрут всегда из Воббленда (New Wobbleton и два города острова), потом до страны, дальше — по кругу городов страны
   const ROUTES = {
-    es: [['Rīga', 'Vilnius', 'Warszawa', 'Berlin', 'Köln', 'Paris', 'Lyon', 'Barcelona', 'Madrid'],
+    es: [['New Wobbleton', 'Maplewink', 'Kettleford', 'Paris', 'Lyon', 'Montpellier', 'Perpignan', 'Barcelona', 'Madrid'],
       ['Toledo', 'Córdoba', 'Sevilla', 'Cádiz', 'Málaga', 'Granada', 'Almería', 'Murcia', 'Alicante', 'Valencia', 'Tarragona', 'Girona', 'Zaragoza', 'Pamplona', 'San Sebastián', 'Bilbao', 'Santander', 'Oviedo', 'Santiago', 'León', 'Burgos', 'Salamanca', 'Segovia', 'Ávila', 'Cuenca', 'Ronda', 'Mérida', 'Madrid']],
-    no: [['Rīga', 'Kaunas', 'Warszawa', 'Berlin', 'Hamburg', 'København', 'Göteborg', 'Halden', 'Oslo'],
+    no: [['New Wobbleton', 'Pinecrust', 'Snailhollow', 'Hamburg', 'København', 'Malmö', 'Göteborg', 'Halden', 'Oslo'],
       ['Drammen', 'Kongsberg', 'Geilo', 'Finse', 'Myrdal', 'Flåm', 'Voss', 'Bergen', 'Stavanger', 'Kristiansand', 'Arendal', 'Lillehammer', 'Dombås', 'Åndalsnes', 'Røros', 'Trondheim', 'Steinkjer', 'Mo i Rana', 'Bodø', 'Narvik', 'Tromsø', 'Hamar', 'Oslo']],
-    en: [['Rīga', 'Vilnius', 'Warszawa', 'Berlin', 'Köln', 'Bruxelles', 'Lille', 'Folkestone', 'London'],
+    en: [['New Wobbleton', 'Jamshire', 'Cheddarford', 'Bruxelles', 'Lille', 'Folkestone', 'Canterbury', 'Rochester', 'London'],
       ['Oxford', 'Bath', 'Bristol', 'Cardiff', 'Birmingham', 'Liverpool', 'Manchester', 'York', 'Durham', 'Newcastle', 'Edinburgh', 'Glasgow', 'Fort William', 'Inverness', 'Aberdeen', 'Dundee', 'Carlisle', 'Lancaster', 'Chester', 'Cambridge', 'Norwich', 'Canterbury', 'Brighton', 'London']],
-    lv: [['Tallinn', 'Tartu', 'Valga', 'Valka', 'Valmiera', 'Cēsis', 'Līgatne', 'Sigulda', 'Rīga'],
+    lv: [['New Wobbleton', 'LemonVale', 'Noodleford', 'Tallinn', 'Tartu', 'Valga', 'Valmiera', 'Sigulda', 'Rīga'],
       ['Jūrmala', 'Tukums', 'Kuldīga', 'Ventspils', 'Talsi', 'Liepāja', 'Saldus', 'Jelgava', 'Bauska', 'Ogre', 'Aizkraukle', 'Jēkabpils', 'Daugavpils', 'Krāslava', 'Rēzekne', 'Ludza', 'Gulbene', 'Alūksne', 'Madona', 'Limbaži', 'Salacgrīva', 'Saulkrasti', 'Rīga']],
   };
   const city = n => { const [a, b] = ROUTES[lang] || ROUTES.es; return n < a.length ? a[n] : b[(n - a.length) % b.length]; };
@@ -348,7 +348,7 @@
       if (LS.pine) { R(x + 8, 62, 8, 6, LS.tree); R(x + 5, 68, 14, 7, LS.tree); R(x + 3, 75, 18, 6, LS.tree); } else if (LS.olive) { R(x + 2, 72, 20, 9, LS.tree); R(x + 6, 68, 12, 5, LS.leaf); } else { R(x + 4, 70, 16, 12, LS.tree); R(x + 7, 66, 10, 6, LS.leaf); } }
     // перрон с вывеской станции, когда стоим
     if (state !== 'travel' || travelT < .9 || travelT > 1.8) {
-      const off = state === 'travel' ? (travelT < .9 ? -travelT * 300 : (2.6 - travelT) * 300) : 0, name = city(state === 'travel' && travelT < .9 ? lvl - 1 : lvl);
+      const off = state === 'travel' ? (travelT < .9 ? -travelT * 300 : (2.6 - travelT) * 300) : 0, name = city(state === 'menu' || (state === 'travel' && travelT < .9) ? lvl - 1 : lvl); // в меню — вокзал отправления (New Wobbleton)
       R(20 + off, 120, 320, 6, '#C9C2B6'); R(250 + off, 70, 3, 50, '#4C4369'); R(222 + off, 62, 60, 14, '#22405F');
       ctx.fillStyle = '#F7F1E9'; ctx.font = 'bold 9px Karla, sans-serif'; ctx.textAlign = 'center'; ctx.fillText(name, 252 + off, 72);
     }
