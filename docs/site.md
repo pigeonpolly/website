@@ -129,6 +129,7 @@ _Пункты перенесены дословно из docs/_claude-old.md (э
 - 11.11.2026 Часть 2: A2 (6 уроков, content/nederlands/a2.js, переводы — trans-a2.js, темы и шоу дописаны в topics.js/series.js, главы 7–12).
 - Ведёт саркастичная чайка Йоп из Схевенингена (CROW в engine.js, своя у урока — NOTE.crow; сарказм над языком, погодой и собой, не над учеником; RU без рода). Рубрики «Как говорят голландцы»: spreekwoord / uitdrukking / typisch; шоу «в духе» — flodder, torenc, lubach, klokhuis, boer (series.js). Вместо «лифта» — «🚲 Bij het fietsenrek» (NL_LIFT). Повесть «Joop en de grote fietstocht» (Схевенинген → Амстердам, A1–B2), с C1 — «Joop over de grens».
 - grammar(): инверсия после Vandaag/Morgen…, jij после глагола без -t, ik без -t, hij/zij + -t, возраст через zijn, инфинитив в конец, глагол в конец придаточного, niet после глагола, niet een → geen, -e у прилагательного после de/mijn и без -e у het-слова с een, perfectum zijn/hebben, ’t kofschip, вопрос без инверсии, число + ед. ч. Границы слов — (?<![\wÀ-ÿ]).
+- 11.11.2026 Часть 5: C1 (c1.js, trans-c1.js; темы и шоу C1 дописаны в topics.js/series.js): канцелярит и ясный язык, пассив, нереальное и zou, Фландрия и tussentaal, аргументация, идиомы и er + предлог. Повесть, вторая часть «Joop over de grens», главы 25–30: Баарле → Антверпен → Гент → Брюгге → Остенде, с галкой Лови.
 - Сборка: `python3 tools/nederlands_page.py [--html файл]` → worker/nederlands-page.js; проверка: `node tools/nederlands_check.js файл.html`. Дальше — Часть 2 (A2) по скиллу .claude/skills/textbook.
 
 ## Учебник норвежского /norsk/ (личный)
