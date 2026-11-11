@@ -21,7 +21,7 @@
     dipS: ['All twelve stamps are in. Your diploma lives here.', 'Все двенадцать печатей собраны. Твой диплом лежит здесь.', 'Visi divpadsmit zīmogi savākti. Tavs diploms glabājas šeit.'],
     dipGo: ['Open the diploma →', 'Открыть диплом →', 'Atvērt diplomu →'],
     books: ['📘 My textbooks', '📘 Мои учебники', '📘 Manas mācību grāmatas'],
-    study: ['Drawing textbook', 'Учебник рисования', 'Zīmēšanas mācību grāmata'],
+    study: ['Programming textbook', 'Учебник программирования', 'Programmēšanas mācību grāmata'],
     english: ['English course', 'Учебник английского', 'Angļu valodas kurss'],
     norsk: ['Norwegian course', 'Учебник норвежского', 'Norvēģu valodas kurss'],
     openBook: ['Open →', 'Открыть →', 'Atvērt →'],
@@ -68,7 +68,7 @@
   // Учёба: 📘 учебники книжечками (если доступны) · 📜 дипломы (Школа Полли; пока не пройдена — печати) · 🎬 гайды:
   // новый и последний просмотренный (localStorage pp-yt-last — пишет v2.js при запуске [data-yt]) + «Смотреть все» → /learn/
   const FREE_YT = ['eRa1uB_7s9U', 'VVvLZcIqUbM']; // как в src/pages/preview-learn.html, новое первым
-  const BOOK = { study: ['#2F5F6A', '🎨', '/study/'], english: ['#22405F', '🇬🇧', '/english/'], norsk: ['#8E2F3C', '🇳🇴', '/norsk/'] };
+  const BOOK = { study: ['#2F5F6A', '💻', '/study/'], english: ['#22405F', '🇬🇧', '/english/'], norsk: ['#8E2F3C', '🇳🇴', '/norsk/'] };
   const sec = (k, h, more) => `<section class="cab-sec cab-${k}"${k === 'books' ? ' hidden' : ''}><div class="cab-sh"><h2>${h}</h2>${more || ''}</div><div class="cab-body"></div></section>`;
   function learnPane(el) {
     el.innerHTML = sec('books', t('books'))
