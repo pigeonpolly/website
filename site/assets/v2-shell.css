@@ -99,3 +99,13 @@ html[data-season=summer] body.v2s:has(.wl-map){--wlbg:#2F2622}
 html[data-season=winter]{--pp-ink:#26303A;--pp-deep:#19212A;--pp-card:#313C47;--pp-2:#4C5A68;--pp-acc:#E2544A}
 html[data-season=spring]{--pp-ink:#26302B;--pp-deep:#19211D;--pp-card:#313C36;--pp-2:#4B5A51;--pp-acc:#E85C64}
 html[data-season=summer]{--pp-ink:#2F2622;--pp-deep:#201A17;--pp-card:#3B312C;--pp-2:#5E4E45;--pp-acc:#7CC6E6}
+/* шапка не помещается (вошла птичка: корзина, колокольчик, пуговки, аватар) — v2.js ставит .tight: меню прячется в ☰, как на узком экране */
+.v2s .lg{flex-shrink:0}
+.v2s .hd2.tight .nv,.v2s .hd2.tight .hr .lb,.v2s .hd2.tight .hr .lang-switch{display:none}.v2s .hd2.tight .burger{display:block}
+.v2s .hd2.tight .drawer .w{display:block;height:auto}
+.v2s .hd2.tight .drawer{display:block;position:absolute;left:0;right:0;top:100%;background:var(--sheet);border-bottom:1px solid var(--line);box-shadow:0 20px 30px rgba(0,0,0,.1);padding:10px 0 22px}
+.v2s .hd2.tight .drawer[hidden]{display:none}
+.v2s .hd2.tight .drawer a{display:block;padding:12px 0;font:400 22px Fraunces,Lora,serif;border-bottom:1px solid var(--line)}
+.v2s .hd2.tight .drawer .lb{color:var(--acc)}.v2s .hd2.tight .drawer .lang-switch{margin-top:14px}.v2s .hd2.tight .drawer .lang-switch a{font:500 15px Karla,'Nunito Sans',sans-serif;border:0;padding:4px 10px 4px 0}
+.v2s .hd2.snug .w{max-width:1440px;padding:0 28px;gap:16px}.v2s .hd2.snug .nv{gap:22px;letter-spacing:.14em}.v2s .hd2.snug .hr{gap:10px;margin-left:14px}.v2s .hd2.snug .lg{font-size:21px}
+.v2s .hd2.tight .hr{margin-left:auto}
