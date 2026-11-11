@@ -349,8 +349,8 @@
     // перрон с вывеской станции, когда стоим
     if (state !== 'travel' || travelT < .9 || travelT > 1.8) {
       const off = state === 'travel' ? (travelT < .9 ? -travelT * 300 : (2.6 - travelT) * 300) : 0, name = city(state === 'menu' || (state === 'travel' && travelT < .9) ? lvl - 1 : lvl); // в меню — вокзал отправления (New Wobbleton)
-      R(20 + off, 120, 320, 6, '#C9C2B6'); R(250 + off, 70, 3, 50, '#4C4369'); R(222 + off, 62, 60, 14, '#22405F');
-      ctx.fillStyle = '#F7F1E9'; ctx.font = 'bold 9px Karla, sans-serif'; ctx.textAlign = 'center'; ctx.fillText(name, 252 + off, 72);
+      R(20 + off, 120, 320, 6, '#C9C2B6'); R(250 + off, 70, 3, 50, '#4C4369'); ctx.font = 'bold 9px Karla, sans-serif'; const sw = Math.max(60, Math.ceil(ctx.measureText(name).width) + 12); R(252 - sw / 2 + off, 62, sw, 14, '#22405F'); // вывеска по длине названия
+      ctx.fillStyle = '#F7F1E9'; ctx.textAlign = 'center'; ctx.fillText(name, 252 + off, 72);
     }
     // рельсы и шпалы
     R(0, 138, W, 3, '#5B5670'); for (let i = 0; i < 20; i++) R(i * 20 - (scroll % 20), 141, 10, 3, '#8C5A3C');
