@@ -146,3 +146,4 @@ a.cab-card:hover{transform:translateY(-2px);color:#2A211C}a.cab-card{transition:
 /* телефон, птичка вошла: пуговки — в кабинете и меню аватара, название — только логотип, чтобы всё влезло */
 @media (max-width:700px){.v2s .hr .hd-btns{display:none}}
 @media (max-width:520px){.v2s .hd2:has(.acct-me) .lg span{display:none}}
+.cab-all{display:inline-block;margin:2px 0 8px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--pp-acc);background:none;color:var(--pp-acc);font:700 13px Karla,'Nunito Sans',sans-serif;cursor:pointer}.cab-all:hover{background:var(--pp-acc);color:var(--pp-ink)}

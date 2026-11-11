@@ -31,6 +31,7 @@
     english: ['🇬🇧 English course', '🇬🇧 Учебник английского', '🇬🇧 Angļu valodas kurss'],
     norsk: ['🇳🇴 Norwegian course', '🇳🇴 Учебник норвежского', '🇳🇴 Norvēģu valodas kurss'],
     soon: ['Courses and materials you get will appear here too.', 'Сюда же лягут курсы и материалы, которые у тебя появятся.', 'Šeit parādīsies arī tavi kursi un materiāli.'],
+    all: ['✓ Tick all', '✓ Отметить все', '✓ Atzīmēt visus'], none: ['Untick all', 'Снять все', 'Noņemt visus'],
     play: ['Games', 'Игры', 'Spēles'], shop: ['Shop', 'Магазин', 'Veikals'], flock: ['Other birds’ rooms', 'Комнаты других птичек', 'Citu putniņu istabas'],
   };
   const t = k => T[k][L];
@@ -120,6 +121,22 @@
     if (window.PPNews && window.PPNews.inline) window.PPNews.inline();
     if (window.PPFlockNews) { window.PPFlockNews.mount(pane('mail').querySelector('[data-fn="site"]'), { limit: 5, view: 'site' }); window.PPFlockNews.mount(pane('mail').querySelector('[data-fn="rooms"]'), { limit: 5, view: 'rooms' }); }
     pane('acc').append(...accEls);
+    const mb = pane('acc').querySelector('#mail'); // письма с сайта: «Отметить все» / «Снять все» одной кнопкой
+    if (mb) {
+      const all = document.createElement('button'); all.type = 'button'; all.className = 'cab-all';
+      const boxes = () => [...mb.querySelectorAll('input[type=checkbox]')];
+      const label = () => { all.textContent = boxes().every(b => b.checked) ? t('none') : t('all'); };
+      all.onclick = () => {
+        const on = !boxes().every(b => b.checked);
+        const dm = [...mb.querySelectorAll('[data-mail]')];
+        dm.forEach(b => { b.checked = on; });
+        if (dm[0]) dm[0].dispatchEvent(new Event('change')); // sketch-wall сохраняет все три галочки разом
+        mb.querySelectorAll('input:not([data-mail])').forEach(b => { if (b.checked !== on) { b.checked = on; b.dispatchEvent(new Event('change')); } });
+        label();
+      };
+      mb.addEventListener('change', label); label();
+      mb.querySelector('legend').after(all);
+    }
     root.querySelectorAll('.cab-tabs [data-cab]').forEach(b => b.onclick = () => { show(b.dataset.cab); history.replaceState(null, '', location.pathname + location.search); });
     show(cur);
   });
