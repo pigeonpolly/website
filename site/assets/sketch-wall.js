@@ -439,7 +439,7 @@
   }
   async function refresh(prev) {
     if (!app) return page && renderPage(); // на странице профиля — перерисовать её
-    try { me = (await api('me')).user; } catch (e) { me = null; }
+    try { me = (await api('me?full=1')).user; } catch (e) { me = null; }
     if (me && me.badgeEarned && me.badgeEarned.total && window.PPToast) window.PPToast(t('btnForBadges', me.badgeEarned.total));
     render(prev);
   }
@@ -751,6 +751,7 @@
   const page = document.getElementById('bird-profile');
   async function renderPage() {
     const nick = (new URLSearchParams(location.search).get('nick') || '').replace(/^@/, '');
+    const mineP = nick ? null : api('profile?me=1').catch(() => null); // свой кабинет: профиль грузится вместе с /api/me, а не после
     try { me = (await api('me')).user; } catch (e) { me = null; }
     const who = nick || (me && me.nick);
     if (!who) {
@@ -760,7 +761,7 @@
       return;
     }
     let pr;
-    try { pr = await api('profile?nick=' + encodeURIComponent(who)); } catch (e) { page.innerHTML = `<div class="bp-sign"><p>${t('pNone')}</p><a class="pill-btn" href="${pre}/flock/">${t('pAll')}</a></div>`; return; }
+    try { pr = (mineP && await mineP) || await api('profile?nick=' + encodeURIComponent(who)); } catch (e) { page.innerHTML = `<div class="bp-sign"><p>${t('pNone')}</p><a class="pill-btn" href="${pre}/flock/">${t('pAll')}</a></div>`; return; }
     const mine = !!(me && me.id === pr.id), lv = levelOf(pr.best), got = new Set(pr.badges);
     const st = x => x.k === 'pick' ? (got.has('pick') ? true : got.has('pick_past') ? 'past' : false) : got.has(x.k);
     const newGifts = mine ? (me.gifts || []).filter(g => g.status === 'new') : [];

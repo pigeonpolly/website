@@ -1670,15 +1670,20 @@ async function route(req, env, url) {
   // публичный профиль: ник, серия, рекорд, бейджи и работы на стене (e-mail не отдаём)
   if (m === 'GET' && p === '/api/profile') {
     const nick = String(url.searchParams.get('nick') || '').replace(/^@/, '');
-    const u = await env.DB.prepare('SELECT * FROM users WHERE nick = ? AND banned = 0').bind(nick).first();
+    // ?me=1 — свой профиль («Мой кабинет»): страница грузит его параллельно с /api/me, не дожидаясь ника
+    const u = url.searchParams.get('me') ? await (async () => { const x = await currentUser(req, env); return x && x.nick && !x.banned ? x : null; })()
+      : await env.DB.prepare('SELECT * FROM users WHERE nick = ? AND banned = 0').bind(nick).first();
     if (!u) fail(404, 'user');
-    const rows = (await env.DB.prepare('SELECT id, day, theme, bw, ai, tod, hidden, created_at FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all()).results;
-    const pickUser = Number(await getMeta(env, 'pick_user'));
+    const [rowsR, pickRaw, bagR, unopenedR, doors] = await Promise.all([ // запросы к базе — разом, а не по очереди
+      env.DB.prepare('SELECT id, day, theme, bw, ai, tod, hidden, created_at FROM posts WHERE user_id = ? ORDER BY day DESC').bind(u.id).all(),
+      getMeta(env, 'pick_user'),
+      env.DB.prepare("SELECT DISTINCT kind, item FROM gifts WHERE user_id = ? AND status = 'bag'").bind(u.id).all(), // вещи в сумке — их видят все
+      env.DB.prepare("SELECT COUNT(*) AS n FROM gifts WHERE user_id = ? AND status = 'new'").bind(u.id).first(),
+      doorsOf(env, u)]);
+    const rows = rowsR.results, pickUser = Number(pickRaw), bag = bagR.results, unopened = unopenedR.n;
     const badges = mergedBadges(u, rows).filter(b => b !== 'pick_past' || pickUser !== u.id);
     if (pickUser === u.id) badges.push('pick');
-    const bag = (await env.DB.prepare("SELECT DISTINCT kind, item FROM gifts WHERE user_id = ? AND status = 'bag'").bind(u.id).all()).results; // вещи в сумке — их видят все
-    const unopened = (await env.DB.prepare("SELECT COUNT(*) AS n FROM gifts WHERE user_id = ? AND status = 'new'").bind(u.id).first()).n;
-    return json({ id: u.id, avatar: avatarOf(u), room: roomOf(u), doors: await doorsOf(env, u), bag, unopened, buttons: u.buttons || 0, nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(streakDays(rows)).current,
+    return json({ id: u.id, avatar: avatarOf(u), room: roomOf(u), doors, bag, unopened, buttons: u.buttons || 0, nick: u.nick, gold: (u.picks || 0) >= GOLD_PICKS, picks: u.picks || 0, current: streaks(streakDays(rows)).current,
       best: mergedBest(u, streakDays(rows)), badges, posts: rows.filter(r => !r.hidden).map(({ id, day, theme, bw, ai }) => ({ id, day, theme, bw, ai })) });
   }
 
@@ -2465,8 +2470,9 @@ async function route(req, env, url) {
     const forBadges = u.nick && !u.banned ? await awardBadges(env, u.id, bestNow, kept) : { total: 0, got: [] };
     if (forBadges.total) u.buttons = (u.buttons || 0) + forBadges.total;
     for (const b of forBadges.got) await flockEventDb(env, 'badge', u, { badge: b }); // новости стаи: «У @ник новый бейдж»
-    const storage = admin ? Math.round(await storageUsed(env) * 1000) / 10 : undefined;
-    const migration = admin && env.MEDIA ? await migrationStatus(env) : undefined;
+    const full = admin && url.searchParams.get('full'); // хранилище считается по всей таблице работ — только для строки admin на странице челленджа (?full=1), не в каждом /api/me
+    const [stRaw, migration] = full ? await Promise.all([storageUsed(env), env.MEDIA ? migrationStatus(env) : undefined]) : [];
+    const storage = full ? Math.round(stRaw * 1000) / 10 : undefined;
     return json({ user: { storage, migration, picks: u.picks || 0, gold: (u.picks || 0) >= GOLD_PICKS, nick: u.nick, pw: !!u.pw, mail: mailOn(env), email: !!u.email, adventMail: !!u.advent_mail, wlMail: !u.wl_mail_off, mailPrefs: mailPrefs(u), newsOff: !!u.news_off, adventAsk: adventAsk(rigaDay()), consent: !!u.consent, banned: !!u.banned, admin: await isAdmin(u, env), current: st.current,
       best: mergedBest(u, streakDays(rows)), keptBadges: kept, posts: rows, id: u.id, avatar: avatarOf(u), room: roomOf(u), earned, badgeEarned: forBadges, btn: await buttonStatus(env, u),
       gifts: (await env.DB.prepare('SELECT id, kind, item, note, status, created_at FROM gifts WHERE user_id = ? ORDER BY created_at DESC').bind(u.id).all()).results } });
