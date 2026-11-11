@@ -71,7 +71,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **top_week** (worker/top.js): `game` text nn, `week` text nn, `user_id` int nn, `score` int nn, `at` int; PRIMARY KEY (game, week, user_id)
 - **out_clicks** (worker/week.js): `id` int PK auto, `day` text nn, `ts` int, `vid` text, `target` text, `path` text, `href` text
 
-## Ключи meta (50)
+## Ключи meta (51)
 
 Таблица `meta (key, value)`. Ключ → где используется.
 
@@ -84,6 +84,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `backup_token` — worker/blog.js, worker/index.js
 - `blog_ideas` — worker/ideas.js
 - `blog_salt` — worker/blog.js, worker/index.js
+- `blog_schema_ver` — worker/blog.js
 - `blog_strict` — worker/blog.js
 - `blog_tags_v1` — worker/blog.js
 - `buttons_backfill` — worker/index.js

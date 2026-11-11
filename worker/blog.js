@@ -90,9 +90,22 @@ function footnotes(html, lang) {
 const fmtDate = (ts, lang) => { const d = new Date(ts * 1000); return `${d.getUTCDate()} ${T[lang].months[d.getUTCMonth()]} ${d.getUTCFullYear()}`; };
 const blogUrl = (lang, slug, q = '') => `${PREFIX[lang]}/blog/${slug ? slug + '/' : ''}${q}`;
 
-let ready = false;
-async function ensureBlogSchema(env) {
-  if (ready) return;
+// как ensureSchema в index.js: полная проверка таблиц блога и импорт черновиков — только когда изменился этот код
+// или site/assets/blog-drafts.json (метка blog_schema_ver в meta); иначе — один запрос на «холодный» запуск сервера
+let ready = false, readyWait = null;
+const strHash = t => { let h = 2166136261; for (let i = 0; i < t.length; i++) h = Math.imul(h ^ t.charCodeAt(i), 16777619); return (h >>> 0).toString(36) + '.' + t.length; };
+function ensureBlogSchema(env) {
+  if (ready) return Promise.resolve();
+  if (!readyWait) readyWait = (async () => {
+    let drafts = '';
+    try { const r = await env.ASSETS.fetch(new Request(SITE + '/assets/blog-drafts.json')); if (r.ok) drafts = await r.text(); } catch (e) { /* нет файла */ }
+    const ver = strHash(ensureBlogSchemaRun.toString() + importDrafts.toString() + drafts);
+    try { if (((await env.DB.prepare("SELECT value FROM meta WHERE key = 'blog_schema_ver'").first()) || {}).value === ver) { ready = true; return; } } catch (e) { /* новая база */ }
+    if (await ensureBlogSchemaRun(env)) await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('blog_schema_ver', ?)").bind(ver).run().catch(() => {});
+  })().finally(() => { readyWait = null; });
+  return readyWait;
+}
+async function ensureBlogSchemaRun(env) {
   await env.DB.batch([
     env.DB.prepare(`CREATE TABLE IF NOT EXISTS blog_posts (
       id INTEGER PRIMARY KEY AUTOINCREMENT, slug TEXT UNIQUE NOT NULL, status TEXT DEFAULT 'draft', cover TEXT DEFAULT '',
@@ -145,8 +158,9 @@ async function ensureBlogSchema(env) {
     }
     await env.DB.prepare("INSERT INTO meta (key, value) VALUES ('blog_tags_v1', '1') ON CONFLICT(key) DO UPDATE SET value = '1'").run().catch(() => {});
   }
-  await importDrafts(env).catch(() => {});
+  const ok = await importDrafts(env).then(() => true, e => { console.error('drafts', e); return false; });
   ready = true;
+  return ok; // черновики не загрузились — метку не ставим, попробуем при следующем запуске
 }
 
 // черновики, написанные Claude (доступа к D1 у него нет): site/assets/blog-drafts.json → в «Черновики» редактора, каждый один раз (meta blog_draft:<slug>)

@@ -756,5 +756,14 @@
   "alt=\"Pigeon Polly relaxing in the bath\"": "alt=\"Balodīte Pollija atpūšas vannā\"",
   "Page not found · Pigeon Polly Art Lab": "Lapa nav atrasta · Pigeon Polly Art Lab",
   "Something broke · Pigeon Polly Art Lab": "Kaut kas salūza · Pigeon Polly Art Lab",
-  "Short break · Pigeon Polly Art Lab": "Īss pārtraukums · Pigeon Polly Art Lab"
+  "Short break · Pigeon Polly Art Lab": "Īss pārtraukums · Pigeon Polly Art Lab",
+  "<a href=\"#free\">All lessons</a>": "<a href=\"#free\">Visas nodarbības</a>",
+  "<div class=\"hd5\"><h2>All lessons <em>in one place</em></h2><p>Free ones play for everyone. VIP ones open after a free sign-in.</p></div>": "<div class=\"hd5\"><h2>Visas nodarbības <em>vienuviet</em></h2><p>Bezmaksas var skatīties visi. VIP atveras pēc bezmaksas ienākšanas.</p></div>",
+  "/preview/guides/\">Books<": "/preview/guides/\">Grāmatas<",
+  "<span class=\"k\">Books</span>": "<span class=\"k\">Grāmatas</span>",
+  "<h1>Books to keep <em>on your desk</em></h1>": "<h1>Grāmatas, ko turēt <em>uz rakstāmgalda</em></h1>",
+  "<h2>Books to keep <em>on your desk</em></h2>": "<h2>Grāmatas, ko turēt <em>uz galda</em></h2>",
+  ">Browse the books<": ">Apskatīt grāmatas<",
+  "<b>Books</b><span>Step-by-step books to keep on your desk.</span>": "<b>Grāmatas</b><span>Soli pa solim grāmatas, ko turēt uz galda.</span>",
+  "<title>Books · Pigeon Polly Art Lab</title>": "<title>Grāmatas · Pigeon Polly Art Lab</title>"
 }

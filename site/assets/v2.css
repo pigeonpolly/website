@@ -515,3 +515,22 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 .lang-m .lang-switch a:hover{background:var(--bg)}
 .lang-m .lang-switch a[aria-current]{font-weight:700;color:var(--ink)}.lang-m .lang-switch a[aria-current]:after{content:"✓";margin-left:auto;padding-left:12px;color:var(--acc)}
 @media (max-width:700px){.hr .lang2{display:none}}
+/* /learn/: каталог уроков с фильтрами (v2.js) — закрытое гостю размыто, с замочком */
+.flt{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:-10px 0 28px}
+.flt button{border:1.5px solid var(--ink);background:none;color:var(--ink);border-radius:999px;padding:9px 18px;font:700 13px Karla,'Nunito Sans',sans-serif;cursor:pointer}
+.flt button i{font-style:normal;opacity:.6;margin-left:4px}
+.flt button[aria-pressed=true]{background:var(--ink);color:var(--paper,#fff)}.flt button[aria-pressed=true] i{opacity:.8}
+.flt-st{margin-left:auto;color:var(--mut);font-size:14px}.flt-st a{color:var(--acc);text-decoration:underline}
+.vc[hidden]{display:none}
+.vc.lock .th img,.vl.lock .th img{filter:blur(9px) saturate(.8);transform:scale(1.08)}
+.vc.lock b{filter:blur(3px);user-select:none}.vc.lock .pl{background:rgba(255,255,255,.86)}
+.vl{display:flex;flex-direction:column;gap:12px;max-width:560px}
+.vl-h{font:700 12px Karla,'Nunito Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);margin:0 0 4px!important}
+.vr{display:grid;grid-template-columns:120px 1fr auto;gap:16px;align-items:center;background:#fff;padding:10px 16px 10px 10px;box-shadow:0 10px 24px rgba(31,35,38,.1);transition:transform .2s}
+.vr:hover{transform:translateY(-3px)}
+.vr .th{display:block;aspect-ratio:16/10;overflow:hidden}.vr .th img{width:100%;height:100%;object-fit:cover}
+.vr b{font:400 19px/1.2 Fraunces,Lora,serif}.vl.lock .vr b{filter:blur(3px);user-select:none}
+.vr em{font-style:normal;width:38px;height:38px;border-radius:50%;display:grid;place-items:center;background:var(--sheet);color:var(--acc)}
+@media (max-width:640px){.flt-st{margin-left:0;width:100%}.vr{grid-template-columns:88px 1fr auto;gap:12px}.vr b{font-size:16px}}
+.vc.soon{box-shadow:none;border:1.5px dashed var(--line);background:var(--sheet)}.vc.soon .th{background:var(--line)}.vc.soon .th img{opacity:.75}
+.vr.soon{opacity:.7}.vr.soon .th{background:var(--line)}
