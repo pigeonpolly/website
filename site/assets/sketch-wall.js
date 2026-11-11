@@ -198,6 +198,17 @@
       h: ['Pass {n} levels in the game “Button Rain”', 'Пройти {n} уровней в игре «Пуговичный дождь»', 'Pārvarēt {n} līmeņus spēlē “Pogu lietus”'] },
     { k: 'rain3', s: 'rain3', bg: '#CFD6EA', n: ['Lord of the downpour', 'Повелитель ливня', 'Lietusgāzes valdnieks'], f: ['The clouds ask you before they rain.', 'Тучи спрашивают у вас разрешения, прежде чем пролиться.', 'Mākoņi jautā tev atļauju, pirms līst.'],
       h: ['Pass {n} levels in the game “Button Rain”', 'Пройти {n} уровней в игре «Пуговичный дождь»', 'Pārvarēt {n} līmeņus spēlē “Pogu lietus”'] },
+    // «Поезд в Испанию» (/train/)
+    { k: 'tr1', s: 'tr1', bg: '#F6E7B8', n: ['Ticket punched', 'Билет прокомпостирован', 'Biļete komposterēta'], f: ['Your seat on the train to Spain is waiting.', 'Место в поезде до Испании ждёт.', 'Tava vieta vilcienā uz Spāniju gaida.'],
+      h: ['Reach station {n} in one language in “Train to Spain”', 'Доехать до станции {n} в одном языке в «Поезде в Испанию»', 'Sasniegt {n}. staciju vienā valodā spēlē “Vilciens uz Spāniju”'] },
+    { k: 'tr2', s: 'tr2', bg: '#DCEFF8', n: ['Seasoned traveller', 'Бывалый путешественник', 'Pieredzējis ceļotājs'], f: ['The conductor already knows you by name.', 'Проводник уже знает вас по имени.', 'Konduktors tevi jau pazīst pēc vārda.'],
+      h: ['Reach station {n} in one language in “Train to Spain”', 'Доехать до станции {n} в одном языке в «Поезде в Испанию»', 'Sasniegt {n}. staciju vienā valodā spēlē “Vilciens uz Spāniju”'] },
+    { k: 'tr3', s: 'tr3', bg: '#F9D7C2', n: ['Endless rails', 'Бесконечные рельсы', 'Bezgalīgās sliedes'], f: ['Spain has no more secrets from you.', 'У Испании от вас больше нет секретов.', 'Spānijai no tevis vairs nav noslēpumu.'],
+      h: ['Reach station {n} in one language in “Train to Spain”', 'Доехать до станции {n} в одном языке в «Поезде в Испанию»', 'Sasniegt {n}. staciju vienā valodā spēlē “Vilciens uz Spāniju”'] },
+    { k: 'trpoly', s: 'trpoly', bg: '#E2D3F7', n: ['Polyglot pigeon', 'Голубь-полиглот', 'Poliglots balodis'], f: ['Coo in English, Latvian, Spanish and Norwegian.', 'Курлычет по-английски, по-латышски, по-испански и по-норвежски.', 'Dūdo angliski, latviski, spāniski un norvēģiski.'],
+      h: ['Reach station {n} in all 4 languages of “Train to Spain”', 'Доехать до станции {n} во всех 4 языках «Поезда в Испанию»', 'Sasniegt {n}. staciju visās 4 spēles “Vilciens uz Spāniju” valodās'] },
+    { k: 'trwords', s: 'trwords', bg: '#CDEBD8', n: ['Word collector', 'Собиратель слов', 'Vārdu krājējs'], f: ['Empanadillo writes your words into a little notebook.', 'Эмпанадильо записывает ваши слова в блокнотик.', 'Empanadiljo tavus vārdus pieraksta burtnīciņā.'],
+      h: ['Find {n} words in “Train to Spain”', 'Найти {n} слов в «Поезде в Испанию»', 'Atrast {n} vārdus spēlē “Vilciens uz Spāniju”'] },
     // «Блинная Полли» (/pancakes/)
     { k: 'pan1', s: 'pan1', bg: '#FBE3C2', n: ['Pancake apprentice', 'Блинный подмастерье', 'Pankūku māceklis'], f: ['The first pancake is never lumpy for you.', 'У вас и первый блин не комом.', 'Tev pat pirmā pankūka neizdodas šķība.'],
       h: ['Pass {n} levels in “Polly’s Pancakes”', 'Пройти {n} уровней в «Блинной Полли»', 'Pārvarēt {n} līmeņus spēlē “Pollijas pankūkas”'] },
@@ -287,6 +298,12 @@
     chatA: [[9, -3, '.www.'], [8, -2, 'wwwww'], [8, -1, 'wpwpw'], [8, 0, 'wwwww'], [9, 1, 'w'], [1, 1, 'p']],
     chatP: [[9, -3, '.www.'], [8, -2, 'wwwww'], [8, -1, 'wbwsw'], [8, 0, 'wwwww'], [9, 1, 'w'], [1, 1, 'b']],
     chatAP: [[0, -3, 'www'], [0, -2, 'wpw'], [1, -1, 'w'], [11, -3, 'www'], [11, -2, 'wbw'], [11, -1, 'w'], [9, 9, 'BBBB'], [9, 10, 'BhhB'], [9, 11, 'BBBB'], [8, 12, 'dddddd']],
+    // поезд: билет; вагончик; рельсы до горизонта; облачко «abc»; блокнотик
+    tr1: [[9, 9, 'yyyyy'], [9, 10, 'yrrky'], [9, 11, 'yyyyy'], [12, 7, 'k']],
+    tr2: [[8, 9, 'RRRRRR'], [8, 10, 'RhhRhh'], [8, 11, 'RRRRRR'], [9, 12, 'k..k']],
+    tr3: [[9, 12, 'n.n.n.n'], [9, 11, '.k...k.'], [10, 10, '.k.k.'], [11, 9, 'kk'], [12, -3, 'Y']],
+    trpoly: [[9, -3, '.wwww.'], [8, -2, 'wBwRwG'], [8, -1, 'wwwwww'], [9, 0, 'w'], [1, 1, 'Y']],
+    trwords: [[9, 8, 'ddddd'], [9, 9, 'dwwwd'], [9, 10, 'dwkwd'], [9, 11, 'dwwwd'], [9, 12, 'ddddd'], [13, 6, 'g']],
     pan1: [[9, 9, '.nnnn.'], [9, 10, 'gggggg'], [9, 11, '.nnnn.'], [10, 8, 'll']],
     pan2: [[10, -3, '.gggg'], [10, -2, 'gnnnng'], [11, -1, 'gggg'], [1, 2, 'h'], [12, 2, 'h'], [12, 4, 'k'], [12, 5, 'k'], [12, 6, 'k']],
     pan3: [[4, -3, 'y.y.y'], [4, -2, 'yyyyy'], [9, 8, '.nnnn.'], [9, 9, 'gggggg'], [9, 10, '.nnnn.'], [9, 11, 'gggggg'], [10, 7, 'R.']],
@@ -307,10 +324,10 @@
     return `<svg viewBox="0 0 14 17" shape-rendering="crispEdges">${px.map(([x, y, c]) => `<rect x="${x}" y="${y}" width="1.02" height="1.02" fill="${c}"/>`).join('')}</svg>`;
   }
   // условия бейджей приходят с сервера (me.btn.rules.cond — их меняет Алина в «📜 Правилах»); числа подставляются в описания
-  const COND0 = { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4, alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10, rainA: 5, rainB: 15, rainC: 30, potA: 10, potB: 50, mazeA: 20, panA: 5, panB: 15, panC: 30, panStar: 10 , chatFull: 100};
+  const COND0 = { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4, alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10, rainA: 5, rainB: 15, rainC: 30, trainA: 8, trainB: 25, trainC: 60, trainPoly: 8, trainWords: 300, potA: 10, potB: 50, mazeA: 20, panA: 5, panB: 15, panC: 30, panStar: 10 , chatFull: 100};
   const condVals = k => { const C = Object.assign({}, COND0, (me && me.btn && me.btn.rules && me.btn.rules.cond) || {});
     return ({ alt: { n: C.alt }, monthly: { n: C.monthly }, veteran: { n: C.veteranMonths, p: C.veteranPer }, early: { n: C.early, h: C.earlyBefore }, owl: { n: C.owl, a: C.owlFrom, b: C.owlTo },
-      weekend: { n: C.weekend }, ten: { n: C.ten }, fifty: { n: C.fifty }, hundred: { n: C.hundred }, inkmaster: { n: C.inkmaster }, comeback: { n: C.comeback }, collector: { n: C.collector }, rain1: { n: C.rainA }, rain2: { n: C.rainB }, rain3: { n: C.rainC }, pot2: { n: C.potA }, pot3: { n: C.potB }, maze: { n: C.mazeA }, pan1: { n: C.panA }, pan2: { n: C.panB }, pan3: { n: C.panC }, panstar: { n: C.panStar }, chatA: { n: C.chatFull }, chatP: { n: C.chatFull }, chatAP: { n: C.chatFull }, clock: { n: C.clock, w: C.clockWin }, cpurple: { n: C.colors }, cyellow: { n: C.colors }, cred: { n: C.colors }, cblue: { n: C.colors }, cgreen: { n: C.colors } })[k] || {}; };
+      weekend: { n: C.weekend }, ten: { n: C.ten }, fifty: { n: C.fifty }, hundred: { n: C.hundred }, inkmaster: { n: C.inkmaster }, comeback: { n: C.comeback }, collector: { n: C.collector }, rain1: { n: C.rainA }, rain2: { n: C.rainB }, rain3: { n: C.rainC }, pot2: { n: C.potA }, pot3: { n: C.potB }, maze: { n: C.mazeA }, tr1: { n: C.trainA }, tr2: { n: C.trainB }, tr3: { n: C.trainC }, trpoly: { n: C.trainPoly }, trwords: { n: C.trainWords }, pan1: { n: C.panA }, pan2: { n: C.panB }, pan3: { n: C.panC }, panstar: { n: C.panStar }, chatA: { n: C.chatFull }, chatP: { n: C.chatFull }, chatAP: { n: C.chatFull }, clock: { n: C.clock, w: C.clockWin }, cpurple: { n: C.colors }, cyellow: { n: C.colors }, cred: { n: C.colors }, cblue: { n: C.colors }, cgreen: { n: C.colors } })[k] || {}; };
   const howTo = lv => lv.h ? lv.h[L].replace(/\{(\w)\}/g, (m, x) => { const v = condVals(lv.k)[x]; return v == null ? m : v; }) : HOW_LEVEL[L](lv.d);
   // state: true — есть, false — нет, 'past' — был (чёрно-белый)
   const medal = (lv, on = true, big = false, tag = 'span', picks = me?.picks || 0) => {
@@ -382,7 +399,7 @@
     box.querySelectorAll('.chm-row').forEach(r => { const x = SPECIAL.find(v => v.k === r.dataset.mt); r.querySelector('.sw-medal').onclick = () => showBadge(x, !r.querySelector('.sw-medal').classList.contains('off')); });
   }
   // бейджи не за рисование (игры, адвент) — во вкладке «Остальное»
-  const NOT_DRAW = new Set(['chatA', 'chatP', 'chatAP', 'collector', 'rain1', 'rain2', 'rain3', 'pan1', 'pan2', 'pan3', 'panstar', 'panwash', 'pot1', 'pot2', 'pot3', 'potkid', 'maze']);
+  const NOT_DRAW = new Set(['chatA', 'chatP', 'chatAP', 'collector', 'rain1', 'rain2', 'rain3', 'pan1', 'pan2', 'pan3', 'panstar', 'panwash', 'tr1', 'tr2', 'tr3', 'trpoly', 'trwords', 'pot1', 'pot2', 'pot3', 'potkid', 'maze']);
   const stateOf = (s, got) => s.k === 'pick' ? (got.has('pick') ? true : got.has('pick_past') ? 'past' : false) : got.has(s.k);
   const levelOf = best => [...LEVELS].reverse().find(l => best >= l.d) || null;
   function specials(posts) {

@@ -225,6 +225,9 @@
     propeller: { r: ['rrrr.bbbb', '....k....', '..yyyyy..', '.ybyrygy.', 'yyyyyyyyy', 'ddddddddd'], p: { r: '#E0443A', b: '#4A7BD8', k: '#2A2433', y: '#F5D547', g: '#4CC38A', d: '#C9A72A' }, lo: ['cap', '#E9A93B'] },
     pancakehat: { r: ['...yy...', '.oooooo.', 'OkOOOOOO', '.oooooo.', 'OkOOOkOO', '.oooooo.', 'OOOOOkOO'], p: { y: '#FFF3A8', o: '#E9B86A', O: '#D99A4A', k: '#8B4A20' }, lo: ['top', '#D99A4A'] },
     pancakecrown: { r: ['y..y.y..y', 'yr.yyy.ry', 'yyyyyyyyy', '.ooooooo.', 'OOOOOOOOO', '.ooooooo.'], p: { y: '#E9C14A', r: '#E0443A', o: '#E9B86A', O: '#D99A4A' }, lo: ['crown', '#E9C14A'] },
+    // тема «🚆 Поезд» (игра «Поезд в Испанию»): фуражка проводника, ★ золотая фуражка машиниста
+    conductor: { r: ['..nnnnnn..', '.nnnnnnnn.', 'nnnnynnnnn', 'yyyyyyyyyy', 'kkkkkkk...'], p: { n: '#22405F', y: '#E9C14A', k: '#1E1A26' }, lo: ['cap', '#22405F'] },
+    goldcap: { r: ['....rr....', '..yyyyyy..', '.yyYyyyyy.', 'yyyyryyyyy', 'kkkkkkkkkk', 'dddddddd..'], p: { y: '#E9C14A', Y: '#FFF3A8', r: '#C2305C', k: '#8C5A1E', d: '#2A2433' }, lo: ['crown', '#E9C14A'] },
     sunflowers: { r: ['.y...y...y.', 'yoy.yoy.yoy', '.yg.gyg.gy.', 'ggggggggggg'], p: { y: '#F5D547', o: '#8B5A2B', g: '#4C9A5B' }, lo: ['crown', '#E9A93B'] },
   };
   const HD_ITEMS = {
@@ -277,6 +280,8 @@
     pancake: { r: ['.oooo.', 'oOoroO', 'oooooo', '.dddd.'], p: { o: '#E9B86A', O: '#FFF3A8', r: '#E0443A', d: '#C98A3E' }, dy: -2 },
     syrup: { r: ['..w..', '..k..', '.aaa.', 'aAaaa', 'aaaaa', 'aaaaa', '.aaa.'], p: { w: '#F4F0EA', k: '#8B4A20', a: '#B5651D', A: '#E9A93B' }, dy: -5 },
     goldspatula: { r: ['.....Yy', '....yyy', '....yyy', '...k...', '..k....', '.k.....', 'k......'], p: { y: '#E9C14A', Y: '#FFF3A8', k: '#8C5A3C' }, dy: -6 },
+    ticket: { r: ['yyyyy.yy', 'yrrry.ky', 'yyyyy.yy', 'ykkky.ky', 'yyyyy.yy'], p: { y: '#F6E7B8', r: '#C2305C', k: '#8C7A5A' }, dy: -3 },
+    phrasebook: { r: ['.bbbbb', 'bwwwwb', 'bwrwyb', 'bwwwwb', 'bwbbwb', 'bbbbbb'], p: { b: '#7C1B1B', w: '#F7F1E9', r: '#C2305C', y: '#E9C14A' }, dy: -4 },
     bubbletea: { r: ['...k.', '...k.', 'wwwww', 'wtttw', 'wkktw', 'wtktw', '.www.'], p: { k: '#2A2433', w: '#E8E4F0', t: '#D9B48A' }, dy: -5 },
   };
   function hdHat(put, hat, cx, bottom) {
@@ -367,11 +372,11 @@
   const SVG_FRAMES = ['web', 'candycorn', 'bats', 'autumnwreath', 'mushrooms', 'flowers', 'canestripe', 'lights', 'pixel', 'catears', 'bubbles', 'sunrays', 'clouds', 'jewels'];
   const GIFTS = {
     bg: ['#F5C4B3', '#FBE3A1', '#CDEBD8', '#BFD7F5', '#E2D3F7', '#F7C6DA', '#FFFDF8', '#2B1A51', '#1D6B4F', '#D85A30', '#1B1035', '#E8F4FF', '#FFD6E0', '#F2C27B', '#0F0F2D', '#FFF1A8', '#C7F0F5', '#E9D5C3', '#D6F5C3', '#F4B6A6', '#C8C2D8', '#7FC8F8', '#3A3550', ...BG_PICS],
-    hat: ['halo', 'unicorn', 'flamecrown', 'wizard', 'witch', 'pumpkin', 'santa', 'antlers', 'beanie', 'heartband', 'wreath', 'strawhat', 'leafcrown', 'headset', 'pirate', 'chef', 'graduation', 'cowboy', 'tiara', 'frog', 'viking', 'kittyears', 'bunnyears', 'propeller', 'sunflowers', 'pancakehat', 'pancakecrown', ...HATS.flatMap(h => HAT_C.map((c, i) => h + ':' + i))],
+    hat: ['halo', 'unicorn', 'flamecrown', 'wizard', 'witch', 'pumpkin', 'santa', 'antlers', 'beanie', 'heartband', 'wreath', 'strawhat', 'leafcrown', 'headset', 'pirate', 'chef', 'graduation', 'cowboy', 'tiara', 'frog', 'viking', 'kittyears', 'bunnyears', 'propeller', 'sunflowers', 'pancakehat', 'pancakecrown', 'conductor', 'goldcap', ...HATS.flatMap(h => HAT_C.map((c, i) => h + ':' + i))],
     shoes: ALL_SHOES.flatMap(h => SHOE_C.map((c, i) => h + ':' + i)),
     anim: ['bounce', 'wiggle', 'float', 'spin', 'sparkle', 'heart', 'aurora', 'jelly', 'nod', 'swing', 'disco'],
     frame: ['gold', 'rainbow', 'stars', 'hearts', 'leaves', 'dotted', 'snow', 'magic', 'spooky', 'neon', 'legend', ...SVG_FRAMES, 'pearls', 'ribbon', 'ice', 'sunset', 'ocean', 'berry'],
-    item: ['dragonegg', 'goldfeather', 'comet', 'goldenapple', 'paintbrush', 'palette', 'pencil', 'coffee', 'croissant', 'pizza', 'cherry', 'wand', 'crystal', 'star', 'lollipop', 'minipumpkin', 'candycane', 'giftbox', 'ornament', 'snowflake', 'heart', 'rose', 'letter', 'icecream', 'mapleleaf', 'gamepad', 'coin', 'sword', 'mushroom', 'cheese', 'ring', 'pearl', 'ruby', 'sapphire', 'key', 'spoon', 'donut', 'cookie', 'apple', 'carrot', 'daisy', 'balloon', 'cupcake', 'feather', 'bubbletea', 'spatula', 'pancake', 'syrup', 'goldspatula'],
+    item: ['dragonegg', 'goldfeather', 'comet', 'goldenapple', 'paintbrush', 'palette', 'pencil', 'coffee', 'croissant', 'pizza', 'cherry', 'wand', 'crystal', 'star', 'lollipop', 'minipumpkin', 'candycane', 'giftbox', 'ornament', 'snowflake', 'heart', 'rose', 'letter', 'icecream', 'mapleleaf', 'gamepad', 'coin', 'sword', 'mushroom', 'cheese', 'ring', 'pearl', 'ruby', 'sapphire', 'key', 'spoon', 'donut', 'cookie', 'apple', 'carrot', 'daisy', 'balloon', 'cupcake', 'feather', 'bubbletea', 'spatula', 'pancake', 'syrup', 'goldspatula', 'ticket', 'phrasebook'],
     scarf: ['#E0443A', '#E9A93B', '#4CC38A', '#4A7BD8', '#F08BC0', '#9B5DE5', '#FFFFFF', '#2B2340', '#5FA8A0', '#D85A30', '#7FD1E8', '#F6D04D', '#8E1F2E', '#A0784F', '#C9CDD6', '#1D6B4F', '#F5C4B3', '#B39DDB'],
   };
   const pair = (v, list, cols) => { const [t, i] = String(v || '').split(':'); return list.includes(t) && cols[+i] ? { t, c: cols[+i] } : null; };
@@ -473,6 +478,8 @@
     balloon: ['Balloon', 'Воздушный шарик', 'Balons'], cupcake: ['Cupcake', 'Капкейк', 'Keksiņš'], feather: ['Blue feather', 'Синее пёрышко', 'Zila spalviņa'], bubbletea: ['Bubble tea', 'Бабл-ти', 'Burbuļtēja'],
     spatula: ['Pancake spatula', 'Лопатка для блинов', 'Pankūku lāpstiņa'], pancake: ['Pancake with jam', 'Блинчик с вареньем', 'Pankūka ar ievārījumu'], syrup: ['Maple syrup', 'Кленовый сироп', 'Kļavu sīrups'], goldspatula: ['Polly’s golden spatula', 'Золотая лопатка Полли', 'Pollijas zelta lāpstiņa'],
     pancakehat: ['Pancake stack hat', 'Стопка блинов на голове', 'Pankūku kaudzes cepure'], pancakecrown: ['Pancake master’s crown', 'Корона блинного мастера', 'Pankūku meistara kronis'],
+    conductor: ['Train conductor’s cap', 'Фуражка проводника', 'Konduktora žokejcepure'], goldcap: ['Golden engine driver’s cap', 'Золотая фуражка машиниста', 'Zelta mašīnista cepure'],
+    ticket: ['Train ticket to Spain', 'Билет на поезд в Испанию', 'Vilciena biļete uz Spāniju'], phrasebook: ['Pocket phrasebook', 'Карманный разговорник', 'Kabatas sarunvārdnīca'],
     pearls: ['Pearls', 'Жемчуг', 'Pērles'], ribbon: ['Pink ribbon', 'Розовая лента', 'Rozā lente'], ice: ['Ice', 'Лёд', 'Ledus'], sunset: ['Sunset', 'Закат', 'Saulriets'], ocean: ['Ocean', 'Океан', 'Okeāns'], berry: ['Berry', 'Ягодная', 'Ogu'],
     jelly: ['Jelly', 'Желейка', 'Želeja'], nod: ['Nods', 'Кивает', 'Māj ar galvu'], swing: ['Swings', 'Раскачивается', 'Šūpojas uz auklas'], disco: ['Disco colours', 'Диско-цвета', 'Disko krāsas'],
   };
@@ -480,7 +487,7 @@
 
   // темы и сезоны вещей (для кнопок-фильтров в «Коллекциях» и в кабинете): 'вид|значение'
   // легендарные вещи: редкие, в коллекциях с золотой звездой
-  const LEGEND = new Set(['hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora', 'hat|pancakecrown', 'item|goldspatula']);
+  const LEGEND = new Set(['hat|halo', 'hat|unicorn', 'hat|flamecrown', 'item|dragonegg', 'item|goldfeather', 'item|comet', 'item|goldenapple', 'frame|legend', 'anim|aurora', 'hat|pancakecrown', 'item|goldspatula', 'hat|goldcap']);
   const GIFT_THEMES = [
     ['legendary', ['★ Legendary', '★ Легендарные', '★ Leģendārie'], [...LEGEND]],
     ['art', ['🎨 Artist', '🎨 Художник', '🎨 Mākslinieks'], ['hat|beret:0', 'hat|beret:4', 'item|paintbrush', 'item|palette', 'item|pencil', 'scarf|#9B5DE5', 'frame|catears']],

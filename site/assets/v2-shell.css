@@ -179,3 +179,5 @@ a.cab-card:hover{transform:translateY(-2px);color:#2A211C}a.cab-card{transition:
 @media (max-width:700px){.v2s .hr .lang2{display:none}}
 .v2s .hd2 .hr .lang2{order:3}
 .v2s .hd2 .tight .hr .lang2,.v2s .hd2.tight .hr .lang2{display:none}
+/* подвал: «Наши друзья» — Libertas.study (партнёр, игра /train/) */
+.v2s .ft2 .cols a.ft-friend{display:inline-flex;align-items:center;gap:10px;margin-top:16px;font-size:12px;color:var(--mut)}.v2s .ft2 .ft-friend img{width:86px;height:auto;display:block}.v2s .ft2 .ft-friend:hover{color:var(--acc)}

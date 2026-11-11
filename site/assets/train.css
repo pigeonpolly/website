@@ -1,0 +1,69 @@
+/* «Поезд в Испанию» (/train/, site/assets/train.js) */
+.train{max-width:720px;margin:0 auto 28px;color:#2A211C}
+.tr-stage{position:relative;background:#FBF6EE;border:1px solid #E3D8C8;border-radius:18px;overflow:hidden;box-shadow:0 6px 18px rgba(60,40,20,.08)}
+.tr-scene{display:block;width:100%;height:auto;aspect-ratio:360/150;image-rendering:pixelated;background:#BFE3F5}
+.tr-hud{display:flex;justify-content:space-between;gap:10px;flex-wrap:wrap;padding:8px 14px;background:#22405F;color:#F7F1E9;font:700 13px/1.4 Karla,sans-serif}
+.tr-say{display:flex;align-items:center;gap:10px;padding:10px 14px;border-bottom:1px dashed #E3D8C8;min-height:52px}
+.tr-say img{image-rendering:pixelated;flex:none;width:64px;height:auto}
+.tr-say p{margin:0;background:#fff;border:1px solid #E3D8C8;border-radius:12px;padding:6px 12px;font:500 15px/1.4 Karla,sans-serif;position:relative}
+.tr-play{padding:12px 14px 16px;text-align:center}
+.tr-need{margin:0 0 8px;font:700 13px Karla,sans-serif;color:#6C6058;text-transform:uppercase;letter-spacing:.04em}
+.tr-words{list-style:none;margin:0 0 12px;padding:0;display:flex;flex-direction:column;align-items:center;gap:6px}
+.tr-words li{display:flex;align-items:center;gap:10px;flex-wrap:wrap;justify-content:center}
+.tr-cells{display:inline-flex;gap:3px}
+.tr-cells i{width:26px;height:28px;display:inline-flex;align-items:center;justify-content:center;border:2px solid #D8CCBA;border-radius:6px;background:#fff;font:800 15px Karla,sans-serif;font-style:normal;color:#2A211C}
+.tr-cells i.on{background:#F6D98A;border-color:#C9921F}
+.tr-cells i.hint{background:#FBE9E7;border-color:#C2305C;color:#7C1B1B}
+.tr-gl{font:500 14px Karla,sans-serif;color:#4C4369}
+.tr-cur{min-height:44px;display:flex;justify-content:center;align-items:center;gap:4px;margin:4px 0 10px;cursor:pointer}
+.tr-cur em{color:#9A8F86;font:italic 14px Karla,sans-serif}
+.tr-cur i,.tr-tile{position:relative;width:40px;height:44px;display:inline-flex;align-items:center;justify-content:center;border-radius:8px;font:800 20px Karla,sans-serif;font-style:normal;background:#F2DFB5;border:2px solid #C8955E;color:#3A2410;box-shadow:0 3px 0 #A0673C}
+.tr-cur sub,.tr-tile sub{position:absolute;right:4px;bottom:2px;font-size:10px;font-weight:700}
+.tr-cur.shake{animation:tr-shake .35s}
+@keyframes tr-shake{25%{transform:translateX(-6px)}75%{transform:translateX(6px)}}
+.tr-rack{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:12px}
+.tr-tile{cursor:pointer;padding:0}
+.tr-tile:hover{transform:translateY(-2px)}
+.tr-tile:disabled{opacity:.25;cursor:default;transform:none}
+.tr-btns{display:flex;flex-wrap:wrap;justify-content:center;gap:8px}
+.tr-btns button{font:700 15px Karla,sans-serif;border:1px solid #D8CCBA;background:#fff;border-radius:999px;padding:8px 14px;cursor:pointer;color:#2A211C}
+.tr-btns button:disabled{opacity:.4;cursor:default}
+.tr-btns .tr-ok{background:#22405F;color:#fff;border-color:#22405F}
+.tr-jar{margin:10px 0 0;font:500 13px Karla,sans-serif;color:#6C6058}
+.tr-ov{position:absolute;inset:0;background:rgba(251,246,238,.97);overflow:auto;padding:16px;display:flex;justify-content:center;align-items:flex-start}
+.tr-ov[hidden]{display:none}
+.tr-card{max-width:520px;width:100%;text-align:center;font:500 15px/1.5 Karla,sans-serif}
+.tr-card h2{font:400 26px/1.2 Fraunces,Lora,serif;margin:6px 0 8px}
+.tr-card h3{font:700 13px Karla,sans-serif;text-transform:uppercase;letter-spacing:.05em;color:#6C6058;margin:12px 0 4px}
+.tr-sup{display:inline-flex;flex-direction:column;align-items:center;gap:2px;text-decoration:none;color:#6C6058;font:700 11px Karla,sans-serif;text-transform:uppercase;letter-spacing:.08em}
+.tr-sup img{width:110px;height:auto}
+.tr-emp{image-rendering:pixelated;width:120px;height:auto;display:block;margin:4px auto}
+.tr-lh{margin:12px 0 4px;font-weight:700}
+.tr-langs{display:flex;flex-wrap:wrap;justify-content:center;gap:6px;margin-bottom:10px}
+.tr-lang{border:1px solid #D8CCBA;background:#fff;border-radius:999px;padding:6px 12px;font:700 14px Karla,sans-serif;cursor:pointer;color:#2A211C}
+.tr-lang.on{background:#7C1B1B;border-color:#7C1B1B;color:#fff}
+.tr-best{color:#6C6058;font-size:14px}
+.tr-pay{color:#4C4369;font-size:14px}
+.tr-stars{font-size:26px;margin:0}
+.tr-learn{list-style:none;padding:0;margin:0 auto;display:inline-block;text-align:left}
+.tr-learn li{padding:2px 0}
+.tr-dict{columns:2;column-gap:28px;display:block;max-width:460px}
+.tr-ups{list-style:none;padding:0;text-align:left;margin:10px 0}
+.tr-ups li{border:1px solid #E3D8C8;background:#fff;border-radius:12px;padding:10px 12px;margin-bottom:8px}
+.tr-ups small{color:#6C6058}
+.tr-card .pill-btn{margin:3px}
+.train .rain-top{margin-top:18px}
+.tr-cta{max-width:720px;margin:0 auto 40px;display:flex;align-items:center;gap:18px;flex-wrap:wrap;background:#F7F1E9;border:1px solid #E3D8C8;border-radius:18px;padding:18px 20px}
+.tr-cta h2{font:400 22px/1.2 Fraunces,Lora,serif;margin:0 0 4px}
+.tr-cta p{margin:0;font:500 15px/1.5 Karla,sans-serif;color:#4C4369}
+.tr-cta>div{flex:1 1 240px}
+.tr-cta-logo img{width:120px;height:auto;display:block}
+.tr-cta-btn{flex:none}
+@media (max-width:480px){.tr-cur i,.tr-tile{width:34px;height:40px;font-size:18px}.tr-cells i{width:22px;height:26px;font-size:13px}.tr-dict{columns:1}.tr-play{padding:10px 8px 14px}}
+.train .pill-btn,.tr-cta .pill-btn{background:#fff;color:#2A211C;border:1px solid #D8CCBA;border-radius:999px;padding:10px 18px;font:700 14px Karla,sans-serif;cursor:pointer;text-decoration:none;display:inline-block}
+.train .pill-btn.pill-fill,.tr-cta .pill-btn.pill-fill{background:#7C1B1B;border-color:#7C1B1B;color:#fff}
+.train .pill-btn:disabled{opacity:.45;cursor:default}
+.tr-cta h2{color:#2A211C}
+/* меню и карточка станции — в потоке, под картинкой поезда (на телефоне не обрезаются) */
+.tr-stage.ov .tr-ov{position:relative;inset:auto;background:#FBF6EE}
+.tr-stage.ov .tr-hud,.tr-stage.ov .tr-say,.tr-stage.ov .tr-play{display:none}

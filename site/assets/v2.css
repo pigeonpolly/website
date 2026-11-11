@@ -636,3 +636,5 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
  .sk-g figure:nth-child(odd):before{width:54px;height:16px;top:-8px}.sk-g figure:nth-child(4n+2):before{display:none}
  .sk-lb{padding:20px 8px}.sk-lb-p,.sk-lb-n{top:auto!important;bottom:6px;translate:none!important}.sk-adm-f{grid-template-columns:1fr}
 }
+/* подвал: «Наши друзья» — Libertas.study (партнёр, игра /train/) */
+.ft2 .cols a.ft-friend{display:inline-flex;align-items:center;gap:10px;margin-top:16px;font-size:12px;color:var(--mut)}.ft2 .ft-friend img{width:86px;height:auto;display:block}.ft2 .cols a.ft-friend:hover{color:var(--acc)}

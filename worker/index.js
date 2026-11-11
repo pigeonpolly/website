@@ -24,6 +24,7 @@ import { norskApi, norskOk, NORSK_TABLES } from './norsk.js'; // личный у
 import { notebookApi, NOTEBOOK_TABLES } from './notebook.js'; // 📒 блокнот в учебниках (docs/site.md «Блокнот в учебниках»)
 import { artpillApi, artpillDrop, artpillExport, ARTPILL_TABLES } from './artpill.js'; // «Art-Pill by Polly»: скетчбуки ИИ и отзывы (docs/artpill.md)
 import { schoolApi, schoolNews, schoolCron, SCHOOL_TABLES, SCHOOL_ALTER, SCHOOL_RULES, SCHOOL_RANGE, SCHOOL_INT } from './school.js'; // «Школа Полли»: сдача работ и проверка (docs/challenge.md)
+import { trainApi, TRAIN_TABLES, TRAIN_ALTER, TRAIN_RULES, TRAIN_RANGE, TRAIN_INT, TRAIN_BADGES, TRAIN_COND, TRAIN_ITEMS } from './train.js'; // «Поезд в Испанию» (docs/games.md)
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
 import { gardenApi, gardenDrop, gardenNews, GARDEN_TABLES, GARDEN_ALTER, GARDEN_RULES, GARDEN_RANGE, GARDEN_INT, GARDEN_BOOL, GARDEN_SEASONS } from './garden.js'; // огород птички (этап 22, docs/bird.md «Огород»)
 import { pauseGate, pauseApi } from './pause.js'; // ⏸ пауза сайта: «Ведутся работы» для всех, кроме админа (docs/admin.md)
@@ -76,6 +77,8 @@ export default {
       await autoPrice(env).catch(e => console.error('price', e)); // раз в сутки: уровень цен под заработки птичек
       await autoRestock(env).catch(e => console.error('restock', e)); // раз в сутки (по Риге) пополнить магазин
       await seedLegends(env, 'pan_leg_v1', ['furn|pancaketower', 'furn|magicpan', 'hat|pancakecrown', 'item|goldspatula']).catch(e => console.error('legends', e)); // ★ блинной темы — разово в продажу
+      await seedLegends(env, 'train_leg_v1', ['furn|steamtrain', 'hat|goldcap']).catch(e => console.error('legends', e)); // ★ темы «🚆 Поезд» — разово в продажу
+      await seedLegends(env, 'train_items_v1', TRAIN_ITEMS, STOCK.norm).catch(e => console.error('train items', e)); // вещи темы «🚆 Поезд» (worker/train.js)
       await seedLegends(env, 'garden_leg_v1', ['garden|goldcan', 'garden|orangery']).catch(e => console.error('legends', e)); // ★ вещи для огорода (этап 23)
       await seedLegends(env, 'garden_items_v1', ['garden|?', ...['wcan', 'scarecrow', 'greenhouse', 'barrow', 'gnome', 'birdbath', 'beehive', 'lamp', 'sign', 'bench', 'pinwheel', 'flamingo', 'pond'].map(v => 'garden|' + v)], STOCK.norm).catch(e => console.error('garden items', e)); // вещи для огорода — сразу в продажу, не ждать пополнения
       await reqBackfill(env).catch(e => console.error('req tr', e)); // «Нарисуй мне»: переводы тем на все языки сайта
@@ -605,6 +608,7 @@ async function ensureSchemaRun(env) {
     ...CHALLENGE_TABLES.map(sql => prep(sql)), // план тем челленджа: challenge_days (worker/challenge-days.js)
     ...CARD_TABLES.map(sql => prep(sql)), // карточки: cards, card_sets, card_owner (worker/cards.js)
     ...TOP_TABLES.map(sql => prep(sql)), // доски топа игр: top_week (worker/top.js)
+    ...TRAIN_TABLES.map(sql => prep(sql)), // «Поезд в Испанию»: train_runs (worker/train.js)
     ...PAN_TABLES.map(sql => prep(sql)), // «Блинная Полли»: pan_runs (worker/pancakes.js)
     ...GARDEN_TABLES.map(sql => prep(sql)), // огород: garden (worker/garden.js)
     ...MY_GAMES_TABLES.map(sql => prep(sql)), // «★ Мои игры»: my_games (worker/my-games.js)
@@ -632,7 +636,7 @@ async function ensureSchemaRun(env) {
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_days INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_last TEXT', 'ALTER TABLE users ADD COLUMN cats_alive INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
     'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER, ...NOTE_ALTER,
-    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN atags TEXT DEFAULT ''", ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...SHIFT_ALTER, ...SCHOOL_ALTER, ...ABOUT_CHAT_ALTER, ...CHALLENGE_ALTER, ...GARDEN_ALTER, ...WL_ALTER, ...MAIL_ALTER, ...GUIDES_ALTER];
+    "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN atags TEXT DEFAULT ''", ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...TRAIN_ALTER, ...SHIFT_ALTER, ...SCHOOL_ALTER, ...ABOUT_CHAT_ALTER, ...CHALLENGE_ALTER, ...GARDEN_ALTER, ...WL_ALTER, ...MAIL_ALTER, ...GUIDES_ALTER];
   const ver = strHash(ensureSchemaRun.toString() + '\n' + sig.join('\n') + '\n' + alters.join('\n'));
   try { if (((await env.DB.prepare("SELECT value FROM meta WHERE key = 'schema_ver'").first()) || {}).value === ver) { schemaReady = true; return; } } catch (e) { /* новой базы ещё нет — создать */ }
   await env.DB.batch(stmts);
@@ -707,7 +711,7 @@ const BTN = { daily: 3, upload: 10, comment: 2, commentsPerDay: 3, friend: 20, p
   badges: { bw: 5, extra: 15, bday: 15, triple: 15, early: 15, owl: 15, comeback: 15, ten: 20, weekend: 20, newyear: 20, halloween: 20,
     monthly: 25, inkmaster: 25, alt: 30, clock: 30, veteran: 30, fifty: 50, collector: 50, hundred: 100, robot: 1, mtheme: 50, // mtheme — каждый бейдж тематики месяца (mt2027-02)
     cpurple: 20, cyellow: 20, cred: 20, cblue: 20, cgreen: 20,
-    rain1: 10, rain2: 20, rain3: 40, pot1: 5, pot2: 15, pot3: 50, potkid: 20, maze: 20, ...PAN_BADGES, ...ACHAT_BADGES } }; // игры: «Пуговичный дождь» (rain*) и «Зельеварня» (pot*, maze) // c* — N рисунков в дни, когда в теме дня был этот цвет // robot — загрузил работу с пометкой 🤖 «ИИ-генерация»
+    rain1: 10, rain2: 20, rain3: 40, pot1: 5, pot2: 15, pot3: 50, potkid: 20, maze: 20, ...PAN_BADGES, ...TRAIN_BADGES, ...ACHAT_BADGES } }; // игры: «Пуговичный дождь» (rain*) и «Зельеварня» (pot*, maze) // c* — N рисунков в дни, когда в теме дня был этот цвет // robot — загрузил работу с пометкой 🤖 «ИИ-генерация»
 // легендарные вещи (как LEGEND в birds.js): в магазине по одной штуке на птичку, дарить нельзя; обычных — до трёх одинаковых
 const LEGEND = PPCanDo.LEGEND; // список — в site/assets/can-do.js (один на сервер и браузер)
 // ---------- правила сайта, которые Алина меняет в кабинете (раздел «📜 Правила»): хранятся в meta 'rules', поверх значений по умолчанию ----------
@@ -738,12 +742,13 @@ const RULE_DEFAULTS = {
   // условия бейджей (числа из описаний «как получить»)
   cond: { early: 5, earlyBefore: 8, owl: 5, owlFrom: 23, owlTo: 4, ten: 10, fifty: 50, hundred: 100, inkmaster: 10, comeback: 30, weekend: 4,
     alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10,
-    rainA: 5, rainB: 15, rainC: 30, potA: 10, potB: 50, mazeA: 20, ...PAN_COND, ...ACHAT_COND },
+    rainA: 5, rainB: 15, rainC: 30, potA: 10, potB: 50, mazeA: 20, ...PAN_COND, ...TRAIN_COND, ...ACHAT_COND },
   ...GARDEN_RULES, // огород: грядки, полив, цены семян и урожая, жуки, погода (worker/garden.js)
   ...MAIL_RULES, // уведомления из игр на почту: серия, огород, Титос (worker/mail.js)
   ...SHIFT_RULES, // «Смена с Полли»: 🔘 за каждый отработанный час (worker/shift.js)
   ...SCHOOL_RULES, // «Школа Полли»: 🔘 за диплом (worker/school.js)
   ...ACHAT_RULES, // чат /about-me/: 🔘 за ступени 25/50/75 % (worker/about-chat.js)
+  ...TRAIN_RULES, // «Поезд в Испанию»: пуговки за станцию, рекорд, вещь, улучшения (worker/train.js)
   ...PAN_RULES, // «Блинная Полли»: пуговки за уровень, рекорд, вещь, мытьё сковородки (worker/pancakes.js)
   ...TITOS_RULES, // детектив Титос: кофе, пуговки за уровень (worker/titos.js)
   ...CH_DEFAULTS, // подбор тем челленджа: семья не ближе N дней, категории, колода сложности, доля сезона (worker/challenge-plan.js)
@@ -751,7 +756,7 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { homeKitchen: [0, 1000], homeBedroom: [0, 1000], homeCrypt: [0, 1000], homeBath: [0, 1000], homeOffice: [0, 1], welcomeBtn: [-1, 10000], wlBtn: [-1, 10000], daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potionRevive: [0, 30], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...GARDEN_RANGE, ...SHIFT_RANGE, ...SCHOOL_RANGE, ...ACHAT_RANGE, ...MAIL_RANGE, ...CH_RANGE };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potionRevive: [0, 30], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...TRAIN_RANGE, ...GARDEN_RANGE, ...SHIFT_RANGE, ...SCHOOL_RANGE, ...ACHAT_RANGE, ...MAIL_RANGE, ...CH_RANGE };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -766,9 +771,9 @@ function cleanRules(r) {
   if (!r || typeof r !== 'object') return out;
   for (const [k, [lo, hi]] of Object.entries(RULE_NUM)) if (r[k] != null && Number.isFinite(Number(r[k]))) out[k] = Math.max(lo, Math.min(hi, Number(r[k])));
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
-  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn', 'panOn', 'shiftOn', 'mailGamesOn', ...GARDEN_BOOL]) if (typeof r[k] === 'boolean') out[k] = r[k];
+  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn', 'panOn', 'trainOn', 'shiftOn', 'mailGamesOn', ...GARDEN_BOOL]) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['homeKitchen', 'homeBedroom', 'homeCrypt', 'homeBath', 'homeOffice', 'daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'potionRevive', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...GARDEN_INT, ...SHIFT_INT, ...SCHOOL_INT, ...ACHAT_INT, ...MAIL_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
+  for (const k of ['homeKitchen', 'homeBedroom', 'homeCrypt', 'homeBath', 'homeOffice', 'daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'potionRevive', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...TRAIN_INT, ...GARDEN_INT, ...SHIFT_INT, ...SCHOOL_INT, ...ACHAT_INT, ...MAIL_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
   if (GARDEN_SEASONS.includes(r.gardenSeason)) out.gardenSeason = r.gardenSeason;
@@ -1618,6 +1623,9 @@ async function route(req, env, url) {
   if (p === '/api/top' && url.searchParams.get('g')) { const r = await topApi(req, env, url, { json, fail, currentUser, avatarOf }); if (r) return r; }
   if (p === '/api/pancakes' || p.startsWith('/api/pancakes/')) { const r = await pancakesApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, top: (uid, n) => topScore(env, 'pan', uid, n),
     award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), item: (rq, uid, note) => rainItem(env, rq, uid, 0, note) }); if (r) return r; }
+  if (p === '/api/train' || p.startsWith('/api/train/')) { const r = await trainApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, top: (uid, n) => topScore(env, 'train', uid, n),
+    award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), item: (rq, uid, note) => rainItem(env, rq, uid, 0, note),
+    give: async (uid, key, note) => { const [kind, item] = key.split('|'); await env.DB.prepare('INSERT INTO gifts (user_id, kind, item, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(uid, kind, item, note, now()).run(); return { kind, item }; } }); if (r) return r; }
   if (p === '/api/garden' || p.startsWith('/api/garden/')) { const r = await gardenApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p === '/api/admin/guides' || p === '/api/v2/guides' || p === '/api/v2/seen') { const r = await guidesApi(req, env, url, guidesHelpers(env)); if (r) return r; }
   if (p === '/api/admin/ideas' || p === '/api/admin/ideas/write') { const r = await ideasApi(req, env, url, authHelpers(env)); if (r) return r; }

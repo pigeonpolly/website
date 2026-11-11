@@ -1,7 +1,7 @@
 // Доски топа игр (docs/games.md § Доски топа): одна на каждую игру, вкладки «За всё время» и «Эта неделя».
 // За всё время — из того, что игра и так хранит (рекорд, уровень, книга рецептов); неделя (пн–вс по Риге) — таблица top_week:
 // mode 'max' — лучший результат недели (рекорд забега), 'add' — сколько набрано за неделю (уровни, рецепты, дела).
-// Игры зовут topScore(env, игра, uid, n); API: GET /api/top?g=rain|pan|maze|recipes|titos&p=all|week.
+// Игры зовут topScore(env, игра, uid, n); API: GET /api/top?g=rain|pan|train|maze|recipes|titos&p=all|week.
 
 export const TOP_TABLES = [
   'CREATE TABLE IF NOT EXISTS top_week (game TEXT NOT NULL, week TEXT NOT NULL, user_id INTEGER NOT NULL, score INTEGER NOT NULL, at INTEGER, PRIMARY KEY (game, week, user_id))',
@@ -12,6 +12,7 @@ const OK = "u.banned = 0 AND u.nick IS NOT NULL AND u.nick != ''";
 const GAMES = {
   rain: { mode: 'max', from: 'users u', score: 'u.game_best', at: 'COALESCE(u.game_best_at, 0)' },
   pan: { mode: 'max', from: 'users u', score: 'u.pan_best', at: 'COALESCE(u.pan_best_at, 0)' },
+  train: { mode: 'max', from: 'users u', score: 'u.train_best', at: 'COALESCE(u.train_best_at, 0)' }, // «Поезд в Испанию»: лучшая станция (любой язык)
   maze: { mode: 'add', from: 'users u', score: '(COALESCE(u.maze_level, 1) - 1)', at: 'u.id' },
   recipes: { mode: 'add', from: '(SELECT user_id, COUNT(*) AS n, MAX(created_at) AS at FROM potion_book WHERE tier > 0 GROUP BY user_id) b JOIN users u ON u.id = b.user_id', score: 'b.n', at: 'b.at' },
   titos: { mode: 'add', from: 'titos t JOIN users u ON u.id = t.user_id', score: 't.level', at: 'u.id' },
