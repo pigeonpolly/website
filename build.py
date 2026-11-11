@@ -86,24 +86,24 @@ PAGES = [
      "A video by artist Alina Otkinska: watch, paint along and come back to it any time."),
     ("books", "Books", "preview-guides.html",
      "Creative guides and books by artist Alina Otkinska: ink and watercolour sketching, a free colouring book, palettes and little drawing guides."),
-    ("about", "About Alina", "preview-about.html",
-     "Alina Otkinska: learning experience designer and artist from Riga, the human behind Pigeon Polly."),
+    ("sketchbook", "Sketchbook", "preview-about.html",
+     "Sketchbook of Alina Otkinska, an artist and learning experience designer from Riga, the human behind Pigeon Polly: watercolours, ink and the characters of Pigeon Polly’s world, by theme."),
     ("wobbleland", "Wobbleland", "wobbleland.html",
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
 # готовые, но пока не открытые страницы: не попадают в sitemap
 UNLISTED = {"blog-editor", "admin", "garden", "learn/watch"}
 # редизайн 2.0: страницы на новом шаблоне src/layout-v2.html (шапка, подвал, сезоны — site/assets/v2.css, v2.js)
-V2 = {"", "learn", "learn/watch", "books", "about", "blog"}
+V2 = {"", "learn", "learn/watch", "books", "sketchbook", "blog"}
 # часть 5: все остальные страницы — на src/layout-v2-lab.html (новая шапка и подвал, внутри старые style.css и скрипты как есть)
 # ключ правок «Править страницу» (data-ppb): у новых страниц — прежний, с /preview/, чтобы сохранённые правки не потерялись
-EDIT_KEY = {"": "preview", "learn": "preview-learn", "books": "preview-guides", "about": "preview-about"}
+EDIT_KEY = {"": "preview", "learn": "preview-learn", "books": "preview-guides", "sketchbook": "preview-about"}
 NOINDEX = set()
 # адреса в шаблонах и словарях content/i18n остались с /preview/ — build.py меняет их на настоящие в готовой странице (v2_urls)
 V2_HOME = "/preview/"
 V2_LEARN, V2_GUIDES = "/preview/learn/", "/preview/guides/"
 V2_ABOUT, V2_LAB_URL, V2_WOBBLE = "/preview/about/", "/preview/lab/", "/preview/wobbleland/"
-V2_URLS = [("preview/learn/", "learn/"), ("preview/guides/", "books/"), ("preview/about/", "about/"),
+V2_URLS = [("preview/learn/", "learn/"), ("preview/guides/", "books/"), ("preview/about/", "sketchbook/"),
            ("preview/lab/", "games/"), ("preview/wobbleland/", "wobbleland/"), ("preview/", "")]
 
 
@@ -322,6 +322,38 @@ def gallery_html(name):
             f'<img src="/{it["thumb"]}" width="{it["w"]}" height="{it["h"]}" alt="{alt}" loading="lazy" decoding="async"></a>'
             + (f"<figcaption>{cap}</figcaption>" if cap else "") + "</figure>")
     return f'<div class="gallery" data-gallery="{name}">' + "\n".join(out) + "</div>"
+
+
+SK_T = {"en": ("The sketchbook", "Pick a <em>sketchbook</em>", "every notebook is a theme ↓", "The whole series →", "Themes"),
+        "ru": ("Скетчбук", "Выбери <em>тетрадку</em>", "каждая тетрадка — тема ↓", "Вся серия →", "Темы"),
+        "lv": ("Skiču burtnīca", "Izvēlies <em>burtnīcu</em>", "katra burtnīca ir tēma ↓", "Visa sērija →", "Tēmas")}
+
+
+def sketchbook_html(lang="en"):
+    """Скетчбук /sketchbook/: темы-тетрадки (content/sketchbook.json) → вкладки и галереи. Порядок, скрытие, названия и новые
+    разделы с сайта — meta sketchbook, их подставляет worker (sitePage); картины с сайта и 🗑 — palettes.js; вкладки и просмотр — sketchbook.js."""
+    secs = [s for s in json.loads((CONTENT / "sketchbook.json").read_text())["sections"] if not s.get("hidden")]
+    k, h2, hint, more, aria = SK_T[lang]
+    tabs, panels = [], []
+    for i, s in enumerate(secs):
+        sid, t, note = s["id"], esc(s["title"].get(lang) or s["title"]["en"]), esc(s["note"].get(lang) or s["note"]["en"])
+        f = CONTENT / "galleries" / f'{s["gallery"]}.json'
+        items = json.loads(f.read_text()) if f.exists() else []
+        cover = s.get("cover") or (items[0]["thumb"] if items else "images/home/first-pigeon-polly.jpg")
+        on = i == 0
+        tabs.append(f'<button type="button" class="sk-tab" role="tab" id="skt-{sid}" data-sec="{sid}" aria-controls="sk-{sid}" aria-selected="{str(on).lower()}" style="--c:{esc(s.get("color", "#8A2638"))}">'
+                    f'<span class="sk-cov"><img src="/{esc(cover)}" alt="" loading="lazy" decoding="async"><i class="sk-n">{len(items)}</i></span>'
+                    f'<b data-sec-t="{sid}">{t}</b></button>')
+        link = f'<a class="sk-more" href="{esc(s["page"])}">{more}</a>' if s.get("page") else ""
+        panels.append(f'<div class="sk-p" id="sk-{sid}" role="tabpanel" aria-labelledby="skt-{sid}" data-sec="{sid}" style="--c:{esc(s.get("color", "#8A2638"))}"{"" if on else " hidden"}>'
+                      f'<div class="sk-ph"><h3 data-sec-t="{sid}">{t}</h3><p data-sec-n="{sid}">{note}</p>{link}</div>'
+                      + gallery_html(s["gallery"]).replace('<div class="gallery"', '<div class="gallery sk-g"', 1) + '</div>')
+    # строка начинается с пробела: блок собран из данных, «Править страницу» его не трогает (mark_editable)
+    return (f' <section class="skb" id="sketchbook"><div class="w">'
+            f'<div class="hd5"><span class="k">{k}</span><h2>{h2}</h2><p class="hand sk-hint">{hint}</p></div>'
+            f'<div class="sk-tabs" role="tablist" aria-label="{aria}">{"".join(tabs)}</div>'
+            f'<div class="sk-panels">{"".join(panels)}</div></div></section>'
+            '<noscript><style>.sk-p[hidden]{display:block}</style></noscript>')
 
 
 _bust_cache = {}
@@ -698,6 +730,7 @@ def build():
             canonical, hreflang, switch = lang_bits(path, lang)
             page_body = body.replace("{{projects}}", projects_html(lang)) if "{{projects}}" in body else body
             page_body = page_body.replace("{{cv}}", cv_html(lang)) if "{{cv}}" in page_body else page_body
+            page_body = page_body.replace("{{sketchbook}}", sketchbook_html(lang)) if "{{sketchbook}}" in page_body else page_body
             # отдельный файл страницы для языка (длинные тексты): privacy.ru.html, privacy.lv.html
             alt = SRC / "pages" / f"{pathlib.Path(file).stem}.{lang}.html"
             if lang != "en" and alt.exists():
@@ -728,6 +761,10 @@ def build():
     # книги Алины для стаи (витрина в книжном: обложки кликабельные, птички их читают)
     books = [b for sec in json.loads((CONTENT / "ebooks.json").read_text())["sections"] for b in sec["books"]]
     (OUT / "assets" / "books.json").write_text(json.dumps([{"title": b["title"], "url": b["url"], "cover": "/" + b["cover"]} for b in books if b.get("cover")], ensure_ascii=False))
+    # темы скетчбука для кабинет-режима на /sketchbook/ (sketchbook.js: скрытые темы сервер из страницы вырезает, их названия — отсюда)
+    (OUT / "assets" / "sketchbook.json").write_text(json.dumps([{"id": x["id"], "t": [x["title"].get(l) or x["title"]["en"] for l in ("en", "ru", "lv")],
+        "n": [x["note"].get(l) or x["note"]["en"] for l in ("en", "ru", "lv")], "color": x.get("color", "#8A2638")}
+        for x in json.loads((CONTENT / "sketchbook.json").read_text())["sections"] if not x.get("hidden")], ensure_ascii=False))
     # палитры из артов (страница «Палитры» и кнопка 🎨 в челлендже); данные — content/palettes.json (tools/palettes.py)
     pals = json.loads((CONTENT / "palettes.json").read_text())
     (OUT / "assets" / "palettes.json").write_text(json.dumps(pals, ensure_ascii=False, separators=(",", ":")))

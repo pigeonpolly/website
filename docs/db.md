@@ -80,6 +80,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `admin_pin` — worker/blog.js, worker/index.js
 - `advent_mail_n:` — worker/auth.js, worker/mail.js, worker/wl-holidays.js
 - `anon_names_v1` — worker/index.js
+- `sketchbook` — worker/index.js (разделы /sketchbook/: order, hidden, names, custom, at; docs/site.md)
 - `atag_colors` — worker/index.js
 - `backup_token` — worker/blog.js, worker/index.js
 - `blog_ideas` — worker/ideas.js

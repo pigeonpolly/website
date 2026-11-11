@@ -118,6 +118,53 @@ async function hiddenArt(env) {
   hiddenArtCache = { at: Date.now(), rows };
   return rows;
 }
+// Скетчбук /sketchbook/ (docs/site.md): темы из content/sketchbook.json + правки Алины с сайта в meta sketchbook —
+// { order: [id], hidden: [id], names: { id: { t: [en, ru, lv], n: [en, ru, lv] } }, custom: [{ id: 's-…', color }], at }
+let sketchCache = { at: 0, cfg: null };
+const SK_ID = /^[a-z0-9-]{1,24}$/, SK_CUSTOM = /^s-[a-z0-9]{3,16}$/;
+function cleanSketch(b) {
+  const ids = a => (Array.isArray(a) ? a : []).map(String).filter(x => SK_ID.test(x)).slice(0, 60);
+  const tri = (a, n) => [0, 1, 2].map(i => String((Array.isArray(a) && a[i]) || '').trim().slice(0, n));
+  const names = {};
+  for (const [id, v] of Object.entries((b && typeof b.names === 'object' && b.names) || {}).slice(0, 60))
+    if (SK_ID.test(id) && v && typeof v === 'object') names[id] = { t: tri(v.t, 60), n: tri(v.n, 200) };
+  const custom = (Array.isArray(b && b.custom) ? b.custom : []).filter(c => c && SK_CUSTOM.test(String(c.id))).slice(0, 40)
+    .map(c => ({ id: String(c.id), color: /^#[0-9a-f]{6}$/i.test(c.color || '') ? c.color : '#8A2638' }));
+  return { order: ids(b && b.order), hidden: ids(b && b.hidden), names, custom };
+}
+async function sketchCfg(env) {
+  if (sketchCache.cfg && Date.now() - sketchCache.at < 20000) return sketchCache.cfg;
+  let cfg = null; try { cfg = JSON.parse(await getMeta(env, 'sketchbook') || 'null'); } catch (e) { cfg = null; }
+  cfg = cfg ? { ...cleanSketch(cfg), at: Number(cfg.at) || 0 } : { order: [], hidden: [], names: {}, custom: [], at: 0 };
+  // обложка и число картин у новых разделов — из картин, добавленных с сайта
+  cfg.art = {};
+  if (cfg.custom.length) for (const r of (await env.DB.prepare("SELECT gallery, key FROM art_added WHERE hidden = 0 AND palette = 0 AND gallery LIKE 's-%' ORDER BY id DESC").all()).results)
+    (cfg.art[r.gallery] = cfg.art[r.gallery] || []).push(r.key);
+  sketchCache = { at: Date.now(), cfg };
+  return cfg;
+}
+const escH = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
+function sketchRewrite(rw, cfg, lang) {
+  const li = { en: 0, ru: 1, lv: 2 }[lang] || 0, hid = new Set(cfg.hidden), ord = new Map(cfg.order.map((id, i) => [id, i]));
+  const nm = (id, k) => { const v = cfg.names[id] && cfg.names[id][k]; return v ? (v[li] || v[0]) : ''; };
+  rw.on('[data-sec]', { element(el) {
+    const id = el.getAttribute('data-sec');
+    if (hid.has(id)) return el.remove();
+    if (ord.has(id)) el.setAttribute('style', (el.getAttribute('style') || '') + ';order:' + ord.get(id));
+  } });
+  rw.on('[data-sec-t]', { element(el) { const t = nm(el.getAttribute('data-sec-t'), 't'); if (t) el.setInnerContent(t); } });
+  rw.on('[data-sec-n]', { element(el) { const t = nm(el.getAttribute('data-sec-n'), 'n'); if (t) el.setInnerContent(t); } });
+  const cs = cfg.custom.filter(c => !hid.has(c.id));
+  if (!cs.length) return;
+  const st = c => `--c:${c.color};order:${ord.has(c.id) ? ord.get(c.id) : 999}`;
+  rw.on('.sk-tabs', { element(el) { for (const c of cs) {
+    const art = cfg.art[c.id] || [], t = escH(nm(c.id, 't') || '…');
+    el.append(`<button type="button" class="sk-tab" role="tab" id="skt-${c.id}" data-sec="${c.id}" aria-controls="sk-${c.id}" aria-selected="false" style="${st(c)}"><span class="sk-cov">${art.length ? `<img src="/media/art/${art[art.length - 1]}-800.jpg" alt="" loading="lazy">` : ''}<i class="sk-n">${art.length}</i></span><b data-sec-t="${c.id}">${t}</b></button>`, { html: true });
+  } } });
+  rw.on('.sk-panels', { element(el) { for (const c of cs) {
+    el.append(`<div class="sk-p" id="sk-${c.id}" role="tabpanel" aria-labelledby="skt-${c.id}" data-sec="${c.id}" style="${st(c)}" hidden><div class="sk-ph"><h3 data-sec-t="${c.id}">${escH(nm(c.id, 't') || '…')}</h3><p data-sec-n="${c.id}">${escH(nm(c.id, 'n'))}</p></div><div class="gallery sk-g" data-gallery="${c.id}"></div></div>`, { html: true });
+  } } });
+}
 // страницы сайта (не /api/): блог, учебники, остальное — из site/ через sitePage
 async function pageFetch(req, env, url, p) {
   if (/^\/(?:(?:ru|lv)\/)?blog\//.test(p) || p.startsWith('/media/') || p === '/sitemap-blog.xml') {
@@ -165,13 +212,14 @@ async function sitePage(req, env, url) {
   if (req.method !== 'GET' || !env.DB || url.searchParams.has('raw')) return env.ASSETS.fetch(req);
   let rows, hid = [];
   try { rows = await siteBlocks(env); } catch (e) { console.error(e); return env.ASSETS.fetch(req); }
-  if (/^\/(?:(?:ru|lv)\/)?art-portfolio\//.test(url.pathname)) hid = await hiddenArt(env).catch(() => []);
+  const skPage = /^\/(?:(?:ru|lv)\/)?sketchbook\/$/.test(url.pathname), sk = skPage ? await sketchCfg(env).catch(() => null) : null;
+  if (skPage || /^\/(?:(?:ru|lv)\/)?art-portfolio\//.test(url.pathname)) hid = await hiddenArt(env).catch(() => []);
   // страницу просим целиком (без «If-None-Match»): ответ браузеру зависит ещё и от правок,
   // поэтому метка версии (ETag) = метка файла + версия правок
   const h = new Headers(req.headers); h.delete('if-none-match'); h.delete('if-modified-since');
   const res = await env.ASSETS.fetch(new Request(req, { headers: h }));
   if (res.status !== 200 || !(res.headers.get('content-type') || '').includes('text/html')) return res;
-  const ver = rows.length + '.' + rows.reduce((m, r) => Math.max(m, r.updated_at || 0), 0) + (hid.length ? '.h' + hid.length + '.' + hid.reduce((m, r) => Math.max(m, r.created_at || 0), 0) : '');
+  const ver = rows.length + '.' + rows.reduce((m, r) => Math.max(m, r.updated_at || 0), 0) + (hid.length ? '.h' + hid.length + '.' + hid.reduce((m, r) => Math.max(m, r.created_at || 0), 0) : '') + (sk ? '.s' + sk.at + '.' + Object.values(sk.art).flat().length : '');
   const etag = `W/"${(res.headers.get('etag') || '').replace(/^W\/|"/g, '')}-${ver}"`;
   if ((req.headers.get('if-none-match') || '') === etag) return new Response(null, { status: 304, headers: { etag, 'cache-control': 'no-cache' } });
   const out = new Response(res.body, res);
@@ -186,10 +234,11 @@ async function sitePage(req, env, url) {
   // ссылка «моя птичка» (/flock/?bird=ник): в превью мессенджеров — карточка этой птички
   const bird = /^\/(?:(?:ru|lv)\/)?flock\/$/.test(url.pathname) ? String(url.searchParams.get('bird') || '').replace(/^@/, '') : '';
   const birdOk = /^[\p{L}\p{N}_.-]{2,24}$/u.test(bird);
-  if (!hidden.size && !html.size && !struct && !birdOk && !hid.length) return out;
+  if (!hidden.size && !html.size && !struct && !birdOk && !hid.length && !sk) return out;
   const anyLang = id => html.get(id) ?? (rows.find(r => r.id === id && r.html != null && ['en', 'ru', 'lv'].includes(r.lang)) || {}).html;
   const rw = new HTMLRewriter();
   const hidSet = new Set(hid.map(r => r.src)); // картины, скрытые Алиной в галереях «Мой скетчбук» (вернуть — в самой галерее)
+  if (sk) sketchRewrite(rw, sk, lang);
   if (hidSet.size) rw.on('figure[data-src]', { element(el) { if (hidSet.has(el.getAttribute('data-src'))) el.remove(); } });
   if (birdOk) {
     const og = { en: [`@${bird} lives in the Pigeon Polly flock 🐦`, 'Everyone who signs in gets their own pixel bird. Get yours!'],
@@ -2128,7 +2177,8 @@ async function route(req, env, url) {
     const f = await req.formData(), full = f.get('full'), thumb = f.get('thumb');
     let meta; try { meta = JSON.parse(String(f.get('meta') || '{}')); } catch (e) { fail(400, 'bad'); }
     const gallery = String(meta.gallery || '');
-    if (!ART_GALLERIES.includes(gallery) || !full || !thumb || full.size > 6e6 || thumb.size > 2e6) fail(400, 'bad');
+    const skOwn = SK_CUSTOM.test(gallery) && (await sketchCfg(env)).custom.some(c => c.id === gallery); // новый раздел скетчбука
+    if (!(ART_GALLERIES.includes(gallery) || skOwn) || !full || !thumb || full.size > 6e6 || thumb.size > 2e6) fail(400, 'bad');
     const title = [0, 1, 2].map(i => String((meta.title || [])[i] || (meta.title || [])[0] || '').trim().slice(0, 80));
     const colors = (meta.colors || []).slice(0, 6).map(c => [String(c[0]).toUpperCase(), ...[1, 2, 3].map(i => String(c[i] || '').slice(0, 40))]);
     // из галереи «Мой скетчбук» — просто картина (palette: false); со страницы «Палитры» — с палитрой и в очередь ЭКСТРА (AI-арт — никогда)
@@ -2146,7 +2196,18 @@ async function route(req, env, url) {
     await env.DB.prepare('INSERT INTO art_added (key, gallery, title, colors, w, h, palette, pos, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)')
       .bind(key, gallery, JSON.stringify(title), JSON.stringify(colors), Math.round(Number(meta.w) || 800), Math.round(Number(meta.h) || 600), palette, pos, now()).run();
     const row = await env.DB.prepare('SELECT * FROM art_added WHERE key = ?').bind(key).first();
+    sketchCache.at = 0;
     return json({ ok: true, item: artEntry(row), extraMonth: pos });
+  }
+  // Скетчбук: разделы (порядок, скрытые, названия, новые) — GET всем, POST только Алине
+  if (m === 'GET' && p === '/api/sketchbook') return json(await sketchCfg(env), 200, { 'cache-control': 'no-cache' });
+  if (m === 'POST' && p === '/api/admin/sketchbook') {
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    const cfg = { ...cleanSketch(await req.json().catch(() => ({}))), at: now() };
+    await setMeta(env, 'sketchbook', JSON.stringify(cfg));
+    sketchCache.at = 0;
+    return json({ ok: true, cfg: await sketchCfg(env) });
   }
   if (m === 'POST' && p === '/api/admin/art/hide') { // скрыть / вернуть картину из статики в галерее
     const u = await needUser(req, env);
@@ -2172,6 +2233,7 @@ async function route(req, env, url) {
       await env.DB.prepare('UPDATE art_added SET hidden = 1, removed_at = ? WHERE id = ?').bind(now(), row.id).run();
       if (env.MEDIA) await env.MEDIA.delete([`art/${row.key}.jpg`, `art/${row.key}-800.jpg`]);
     } else await env.DB.prepare('UPDATE art_added SET hidden = 1 WHERE id = ?').bind(row.id).run();
+    sketchCache.at = 0;
     return json({ ok: true });
   }
   if (m === 'GET' && p === '/api/admin/users') {

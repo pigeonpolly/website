@@ -24,7 +24,9 @@
 /preview/guides/ /books/ 301
 /guides/ /books/ 301
 /guides /books/ 301
-/preview/about/ /about/ 301
+/preview/about/ /sketchbook/ 301
+/about/ /sketchbook/ 301
+/about /sketchbook/ 301
 /preview/lab/ /games/ 301
 /preview/wobbleland/ /wobbleland/ 301
 /ru/preview /ru/ 301
@@ -33,7 +35,9 @@
 /ru/preview/guides/ /ru/books/ 301
 /ru/guides/ /ru/books/ 301
 /ru/guides /ru/books/ 301
-/ru/preview/about/ /ru/about/ 301
+/ru/preview/about/ /ru/sketchbook/ 301
+/ru/about/ /ru/sketchbook/ 301
+/ru/about /ru/sketchbook/ 301
 /ru/preview/lab/ /ru/games/ 301
 /ru/preview/wobbleland/ /ru/wobbleland/ 301
 /lv/preview /lv/ 301
@@ -42,6 +46,8 @@
 /lv/preview/guides/ /lv/books/ 301
 /lv/guides/ /lv/books/ 301
 /lv/guides /lv/books/ 301
-/lv/preview/about/ /lv/about/ 301
+/lv/preview/about/ /lv/sketchbook/ 301
+/lv/about/ /lv/sketchbook/ 301
+/lv/about /lv/sketchbook/ 301
 /lv/preview/lab/ /lv/games/ 301
 /lv/preview/wobbleland/ /lv/wobbleland/ 301

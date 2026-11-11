@@ -332,9 +332,13 @@
   });
   // галереи «Мой скетчбук»: картины, добавленные с сайта (новые — первыми). Админ: «➕ Добавить картину» (просто картина, без палитры и челленджа),
   // 🗑 у каждой картины (добавленные удаляются, картины из статики скрываются — сервер вырезает их из страницы) и список скрытых с «↩ Вернуть»
-  const gal = document.querySelector('.gallery[data-gallery]');
-  if (gal && ADD_G.includes(gal.dataset.gallery)) {
+  // на /sketchbook/ галерей несколько (по одной на тему), новые разделы — s-… (worker: meta sketchbook)
+  let addedP = null;
+  const added1 = () => addedP || (addedP = getAdded());
+  document.querySelectorAll('.gallery[data-gallery]').forEach(gal => {
     const name = gal.dataset.gallery;
+    if (!ADD_G.includes(name) && !/^s-[a-z0-9]{3,16}$/.test(name)) return;
+    if (!G[name]) { const t = document.querySelector(`[data-sec-t="${name}"]`)?.textContent || 'Sketchbook'; G[name] = [t, t, t]; }
     const post = (url, body) => fetch(url, { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) }).then(r => { if (!r.ok) throw 0; });
     const trash = (f, fn) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'pal-del'; b.textContent = '🗑'; b.title = b.ariaLabel = T.adDel[L]; b.onclick = e => { e.preventDefault(); fn(); }; f.appendChild(b); };
     const fig = p => {
@@ -344,10 +348,10 @@
       isAdmin().then(a => a && trash(f, () => delArt(p.key, f)));
       return f;
     };
-    getAdded().then(x => x.added.filter(p => p.gallery === name && !p.palette).reverse().forEach(p => gal.prepend(fig(p))));
+    added1().then(x => x.added.filter(p => p.gallery === name && !p.palette).reverse().forEach(p => gal.prepend(fig(p))));
     isAdmin().then(async a => {
       if (!a) return;
-      const x = await getAdded();
+      const x = await added1();
       const wrap = document.createElement('div'); wrap.className = 'pal-adm-wrap';
       wrap.innerHTML = `<label class="pill-btn pill-fill">${T.adAdd[L]}<input type="file" accept="image/*" hidden></label>
         <div class="art-up" hidden><img class="art-up-prev" alt="">
@@ -396,7 +400,7 @@
         post('/api/admin/art/hide', { src, thumb, gallery: name }).then(() => { f.remove(); hiddenRows = [{ src, thumb, gallery: name }, ...hiddenRows]; drawHidden(hiddenRows); }).catch(() => alert(T.adErr[L]));
       }));
     });
-  }
+  });
   // кнопка 🎨 в челлендже: случайная палитра в окне
   const btn = document.getElementById('ch-pal-btn');
   if (btn) btn.onclick = () => load().then(d => {

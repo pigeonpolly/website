@@ -1,0 +1,26 @@
+{
+  "_": "Скетчбук /sketchbook/: темы по порядку. gallery — файл content/galleries/<gallery>.json; cover — обложка тетрадки (по умолчанию первая картина); page — страница серии; hidden: true — не показывать. Разделы, порядок и скрытие с сайта (кабинет-режим на странице) хранятся в meta sketchbook и важнее этого файла (docs/site.md).",
+  "sections": [
+    {"id": "bird", "gallery": "bird", "page": "/art-portfolio/bird/", "color": "#C9A24A",
+     "title": {"en": "Pigeon Polly", "ru": "Голубь Полли", "lv": "Balodis Pollija"},
+     "note": {"en": "Pigeon Polly illustrations, 2019–2026.", "ru": "Иллюстрации с Полли, 2019–2026.", "lv": "Ilustrācijas ar Polliju, 2019–2026."}},
+    {"id": "pages", "gallery": "sketchbook", "page": "/art-portfolio/sketchbook/", "color": "#5E7F8C",
+     "title": {"en": "Sketchbook Pages", "ru": "Страницы скетчбука", "lv": "Skiču lapas"},
+     "note": {"en": "Pages from my sketchbook.", "ru": "Страницы из моего скетчбука.", "lv": "Lapas no manas skiču burtnīcas."}},
+    {"id": "chew", "gallery": "snail", "page": "/art-portfolio/snail/", "color": "#7C8B4E",
+     "title": {"en": "Mr.Chew", "ru": "Мистер Чу", "lv": "Mr.Chew"},
+     "note": {"en": "Mr.Chew the snail, illustrations 2023–2025.", "ru": "Улитка Мистер Чу, иллюстрации 2023–2025.", "lv": "Gliemezis Mr.Chew, ilustrācijas 2023–2025."}},
+    {"id": "pumpkins", "gallery": "halloween", "page": "/art-portfolio/halloween/", "color": "#C2662D",
+     "title": {"en": "Pumpkin Family", "ru": "Семья Тыквоголовых", "lv": "Ķirbju ģimene"},
+     "note": {"en": "Welcome to the Pumpkin-Heads family.", "ru": "Добро пожаловать в семью Тыквоголовых.", "lv": "Laipni lūdzam Ķirbjgalvu ģimenē."}},
+    {"id": "titos", "gallery": "detective", "page": "/art-portfolio/detective/", "color": "#4B4F63",
+     "title": {"en": "Mr.Titos", "ru": "Мистер Титос", "lv": "Mr.Titos"},
+     "note": {"en": "Detective Mr.Titos.", "ru": "Детектив Мистер Титос.", "lv": "Detektīvs Mr.Titos."}},
+    {"id": "anxiety", "gallery": "anxiety", "page": "/art-portfolio/anxiety/", "color": "#8A2638",
+     "title": {"en": "Anxiety", "ru": "Тревога", "lv": "Trauksme"},
+     "note": {"en": "Anxiety, a series in ecolines, 2025.", "ru": "«Тревога», серия эколинами, 2025.", "lv": "«Trauksme», sērija ar ekolīniem, 2025."}},
+    {"id": "ai", "gallery": "ai-art", "page": "/art-portfolio/ai-art/", "color": "#6C5A8E",
+     "title": {"en": "AI Art", "ru": "AI-арт", "lv": "MI māksla"},
+     "note": {"en": "AI art based on the Pigeon Polly traditional art style.", "ru": "AI-арт по мотивам традиционного стиля Pigeon Polly.", "lv": "MI māksla pēc Pigeon Polly tradicionālā stila."}}
+  ]
+}
