@@ -132,15 +132,15 @@
   const scoreOf = w => { let s = 0; for (const c of w) s += pts(c); return s * (w.length >= 6 ? 2 : 1); };
 
   // ---------- станции маршрута ----------
-  // маршрут всегда из Воббленда (New Wobbleton и два города острова), потом до страны, дальше — по кругу городов страны
+  // маршрут всегда из Воббленда (New Wobbleton и два города острова), сразу в страну, дальше — по кругу её городов; чужих городов по пути нет
   const ROUTES = {
-    es: [['New Wobbleton', 'Maplewink', 'Kettleford', 'Paris', 'Lyon', 'Montpellier', 'Perpignan', 'Barcelona', 'Madrid'],
+    es: [['New Wobbleton', 'Maplewink', 'Kettleford', 'Barcelona', 'Madrid'],
       ['Toledo', 'Córdoba', 'Sevilla', 'Cádiz', 'Málaga', 'Granada', 'Almería', 'Murcia', 'Alicante', 'Valencia', 'Tarragona', 'Girona', 'Zaragoza', 'Pamplona', 'San Sebastián', 'Bilbao', 'Santander', 'Oviedo', 'Santiago', 'León', 'Burgos', 'Salamanca', 'Segovia', 'Ávila', 'Cuenca', 'Ronda', 'Mérida', 'Madrid']],
-    no: [['New Wobbleton', 'Pinecrust', 'Snailhollow', 'Hamburg', 'København', 'Malmö', 'Göteborg', 'Halden', 'Oslo'],
+    no: [['New Wobbleton', 'Pinecrust', 'Snailhollow', 'Halden', 'Oslo'],
       ['Drammen', 'Kongsberg', 'Geilo', 'Finse', 'Myrdal', 'Flåm', 'Voss', 'Bergen', 'Stavanger', 'Kristiansand', 'Arendal', 'Lillehammer', 'Dombås', 'Åndalsnes', 'Røros', 'Trondheim', 'Steinkjer', 'Mo i Rana', 'Bodø', 'Narvik', 'Tromsø', 'Hamar', 'Oslo']],
-    en: [['New Wobbleton', 'Jamshire', 'Cheddarford', 'Bruxelles', 'Lille', 'Folkestone', 'Canterbury', 'Rochester', 'London'],
+    en: [['New Wobbleton', 'Jamshire', 'Cheddarford', 'Dover', 'London'],
       ['Oxford', 'Bath', 'Bristol', 'Cardiff', 'Birmingham', 'Liverpool', 'Manchester', 'York', 'Durham', 'Newcastle', 'Edinburgh', 'Glasgow', 'Fort William', 'Inverness', 'Aberdeen', 'Dundee', 'Carlisle', 'Lancaster', 'Chester', 'Cambridge', 'Norwich', 'Canterbury', 'Brighton', 'London']],
-    lv: [['New Wobbleton', 'LemonVale', 'Noodleford', 'Tallinn', 'Tartu', 'Valga', 'Valmiera', 'Sigulda', 'Rīga'],
+    lv: [['New Wobbleton', 'LemonVale', 'Noodleford', 'Valmiera', 'Rīga'],
       ['Jūrmala', 'Tukums', 'Kuldīga', 'Ventspils', 'Talsi', 'Liepāja', 'Saldus', 'Jelgava', 'Bauska', 'Ogre', 'Aizkraukle', 'Jēkabpils', 'Daugavpils', 'Krāslava', 'Rēzekne', 'Ludza', 'Gulbene', 'Alūksne', 'Madona', 'Limbaži', 'Salacgrīva', 'Saulkrasti', 'Rīga']],
   };
   const city = n => { const [a, b] = ROUTES[lang] || ROUTES.es; return n < a.length ? a[n] : b[(n - a.length) % b.length]; };
