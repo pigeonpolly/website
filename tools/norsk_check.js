@@ -8,7 +8,7 @@ const file = path.resolve(process.argv[2] || 'norsk.html');
 const TYPES = ['gap', 'choice', 'order', 'fix', 'tr', 'tf', 'mk'], SHOWS = ['ordtak', 'uttrykk', 'kultur', 'vikingane', 'sideomside', 'dal', 'dag', 'fremvandrerne', 'nytt'];
 (async () => {
   const b = await chromium.launch(); const pg = await b.newPage({ viewport: { width: 1280, height: 900 } });
-  const errs = []; pg.on('pageerror', e => errs.push(String(e))); pg.on('console', m => { if (m.type() === 'error' && !/api\/norsk|Failed to load|ERR_|CORS policy/.test(m.text())) errs.push(m.text()); });
+  const errs = []; pg.on('pageerror', e => errs.push(String(e))); pg.on('console', m => { if (m.type() === 'error' && !/api\/norsk|api\/notebook|Failed to load|ERR_|CORS policy/.test(m.text())) errs.push(m.text()); });
   await pg.goto('file://' + file); await pg.waitForTimeout(100);
   const { units, notes, book, lift } = await pg.evaluate(() => ({ units: UNITS, notes: window.NO_NOTES, book: window.NO_BOOK, lift: window.NO_LIFT }));
   const bad = [], ids = new Set();
