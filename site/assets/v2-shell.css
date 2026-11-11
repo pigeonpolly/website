@@ -12,7 +12,7 @@ html[data-season=summer] .v2s .hd2,html[data-season=summer] .v2s .ft2{--bg:#F7F4
 .v2s .hd2{border-bottom:1px solid var(--line);position:relative;z-index:20;background:var(--bg)}
 .v2s .hd2 .w{display:flex;align-items:center;height:100px;gap:30px}
 .v2s .lg{display:flex;align-items:center;gap:12px;font:400 23px Fraunces,Lora,serif;white-space:nowrap}.v2s .lg i{font-style:italic;font-weight:300;color:var(--acc)}
-.v2s .lg img{width:46px;height:46px;border-radius:50%;box-shadow:0 0 0 1.5px var(--ink)}.v2s .lg .lg-m{width:94px;height:94px;flex:none;display:block;background:url(/assets/logo-badge-autumn.png) center/contain no-repeat}html[data-season=winter] .v2s .lg .lg-m{background-image:url(/assets/logo-badge-winter.png)}html[data-season=spring] .v2s .lg .lg-m{background-image:url(/assets/logo-badge-spring.png)}html[data-season=summer] .v2s .lg .lg-m{background-image:url(/assets/logo-badge-summer.png)}
+.v2s .lg img{width:46px;height:46px;border-radius:50%;box-shadow:0 0 0 1.5px var(--ink)}.v2s .lg .lg-m{width:94px;height:94px;flex:none;display:block;background:url(/assets/logo-badge-purple.png) center/contain no-repeat}
 .v2s .nv{margin-left:auto;display:flex;gap:40px;font:700 12px Karla,'Nunito Sans',sans-serif;letter-spacing:.2em;text-transform:uppercase}
 .v2s .nv a{padding:6px 0;border-bottom:1.5px solid transparent}.v2s .nv a:hover,.v2s .nv a[aria-current]{color:var(--acc);border-color:var(--acc)}
 .v2s .hr{display:flex;align-items:center;gap:18px;margin-left:24px;font-size:14px}

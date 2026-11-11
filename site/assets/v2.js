@@ -18,8 +18,6 @@
     document.querySelectorAll('.switch button').forEach(b => b.setAttribute('aria-pressed', b.dataset.s === s ? 'true' : 'false'));
     document.querySelectorAll('.sea-b i').forEach(i => { i.style.background = COL[s]; });
     document.querySelectorAll('[data-sv]').forEach(el => { el.textContent = T[s][el.dataset.sv][L]; });
-    // значок во вкладке — в цвет сезона (как ободок логотипа в шапке)
-    const ic = document.querySelector('link[rel=icon]'); if (ic) ic.href = `/assets/favicon-${s}.png?v=3`;
     const img = document.getElementById('v2-hero');
     if (img) { img.srcset = `/images/v2/hero-${s}-900.jpg 900w, /images/v2/hero-${s}.jpg 1800w`; img.src = `/images/v2/hero-${s}.jpg`; }
   }
