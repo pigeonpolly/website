@@ -1,0 +1,110 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600;9..144,800&family=Karla:wght@400;700&display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#F4F0EA;font-family:Karla,sans-serif;color:#2A211C;width:1440px}
+h1{font-family:Fraunces,serif;font-weight:600;margin:30px 48px 4px;font-size:32px}
+p.s{margin:0 48px 22px;color:#6C6058;font-size:16px}
+.top{display:grid;grid-template-columns:560px 1fr;gap:24px;padding:0 48px}
+.card{background:#FBF9F5;border:1px solid #DED5CA;border-radius:20px;padding:20px;position:relative}
+.lab{font-size:13px;color:#6C6058;text-transform:uppercase;letter-spacing:.08em;font-weight:700;margin:0 0 12px}
+.hero{display:flex;justify-content:center;align-items:center;height:520px}
+.hero svg{width:480px;height:480px}
+.vars{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+.v{border-radius:16px;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:18px 10px 12px;border:1px solid #DED5CA}
+.v svg{width:190px;height:190px}.v b{font-size:13px;margin-top:10px;opacity:.75;font-weight:700}
+.sea{display:flex;gap:18px;justify-content:space-between;margin-top:16px}
+.sea div{display:flex;flex-direction:column;align-items:center}.sea svg{width:118px;height:118px}.sea b{font-size:13px;color:#6C6058;margin-top:6px}
+.bot{display:grid;grid-template-columns:1fr 1fr;gap:24px;padding:24px 48px 48px}
+.hd{display:flex;align-items:center;gap:12px;background:#2E2521;color:#ECEDEE;border-radius:14px;padding:12px 18px;margin-bottom:12px}
+.hd.l{background:#fff;color:#2A211C;border:1px solid #DED5CA}
+.hd svg{width:46px;height:46px}.hd span{font-family:Fraunces,serif;font-size:22px}.hd i{font-style:normal;opacity:.6;font-family:Karla;font-size:15px;margin-left:4px}
+.sizes{display:flex;align-items:flex-end;gap:22px}.sizes div{display:flex;flex-direction:column;align-items:center;gap:6px;font-size:12px;color:#6C6058}
+.soc{display:flex;gap:16px;align-items:center}
+.ig{width:150px;text-align:center;font-size:13px;color:#6C6058}.ig .ring{width:120px;height:120px;border-radius:50%;margin:0 auto 6px;padding:4px;background:conic-gradient(#E9A93B,#D85A30,#9E1B22,#E9A93B)}
+.ig .ring>div{width:100%;height:100%;border-radius:50%;background:#fff;padding:3px;box-sizing:border-box}.ig svg{width:100%;height:100%}
+</style></head><body>
+<h1>Pigeon Polly — значок</h1>
+<p class="s">Основной знак в круге · одноцветные версии · цвет по сезонам сайта · упрощённый знак для шапки и вкладки</p>
+<div class="top">
+ <div class="card"><p class="lab">Основной</p><div class="hero" id="hero"></div></div>
+ <div>
+  <div class="vars" id="vars"></div>
+  <div class="card" style="margin-top:16px"><p class="lab">Ободок — цвет сезона сайта</p><div class="sea" id="sea"></div></div>
+ </div>
+</div>
+<div class="bot">
+ <div class="card"><p class="lab">В шапке сайта — упрощённый знак без надписи</p>
+  <div class="hd" id="h1"></div><div class="hd l" id="h2"></div>
+  <p class="lab" style="margin-top:16px">Маленькие размеры</p><div class="sizes" id="sz"></div></div>
+ <div class="card"><p class="lab">Аватар в соцсетях</p><div class="soc" id="soc"></div></div>
+</div>
+<script>
+let N=0;
+const T={
+ color:{band:'#3B3352',text:'#FBF5EC',star:'#E9A93B',paper:'#FBF5EC',ink:'#1E1A26',body:'#4C4369',lid:'#4C4369',eyew:'#FFFDF8',iris:'#E8782E',irisS:'none',pupil:'#1E1A26',hi:'#FFFDF8',beak:'#E8782E',cere:'#FBF5EC',cup:'#FFFDF8',stripe:'#93AFCC',coffee:'#7A4E33',dripS:'#1E1A26',sheen:'#6FA597',sheen2:'#8E6FB0'},
+ solid:{band:'#141414',text:'#fff',star:'#fff',paper:'#fff',ink:'#141414',body:'#141414',lid:'#141414',eyew:'#fff',iris:'#fff',irisS:'#141414',pupil:'#141414',hi:'#fff',beak:'#fff',cere:'#fff',cup:'#fff',stripe:'#141414',coffee:'#141414',dripS:'#fff',sheen:'#141414',sheen2:'#141414'},
+};
+T.line=(bg)=>({band:'#fff',text:bg,star:bg,paper:bg,ink:'#fff',body:bg,lid:bg,eyew:'#fff',iris:'#fff',irisS:'none',pupil:bg,hi:bg,beak:bg,cere:bg,cup:bg,stripe:'#fff',coffee:'#fff',dripS:'#fff',sheen:bg,sheen2:bg});
+const star=(x,y,s,c)=>`<path transform="translate(${x} ${y}) scale(${s})" d="M0 -10 Q1.6 -1.6 10 0 Q1.6 1.6 0 10 Q-1.6 1.6 -10 0 Q-1.6 -1.6 0 -10Z" fill="${c}"/>`;
+function polly(c,id){
+ return `<clipPath id="ey${id}"><circle cx="140" cy="124" r="25"/></clipPath>
+ <g transform="translate(0 10)" stroke="${c.ink}" stroke-width="4.5" stroke-linejoin="round" stroke-linecap="round">
+  <path d="M84 116 Q66 122 50 135 Q66 141 82 142 Z" fill="${c.beak}"/>
+  <path d="M62 238 C64 170 82 82 126 72 C170 64 182 150 186 238 Z" fill="${c.body}"/>
+  <path d="M168 168 Q150 192 158 238" fill="none"/>
+  <g stroke="none" opacity=".9" transform="translate(0 -20)"><path d="M78 186 Q104 168 128 178 Q132 196 116 210 Q92 214 74 206 Z" fill="${c.sheen}"/>
+  <path d="M120 180 Q148 166 178 182 L182 206 Q150 214 118 208 Q128 194 120 180 Z" fill="${c.sheen2}"/></g>
+  <path d="M168 168 Q150 192 158 238" fill="none"/>
+  <ellipse cx="79" cy="118" rx="6" ry="4" transform="rotate(-22 79 118)" fill="${c.cere}" stroke-width="3.5"/>
+  <path d="M101 76 C99 86 101 94 97 100 C93 107 102 109 103 101 C105 93 108 85 111 76 Z" fill="${c.coffee}" stroke="${c.dripS}" stroke-width="2.5"/>
+  <circle cx="140" cy="124" r="25" fill="${c.eyew}"/>
+  <g clip-path="url(#ey${id})" stroke="none">
+   <circle cx="137" cy="131" r="17" fill="${c.iris}" stroke="${c.irisS}" stroke-width="3"/>
+   <circle cx="136" cy="128" r="12" fill="${c.pupil}"/>
+   <circle cx="131" cy="124" r="3.6" fill="${c.hi}"/>
+   <path d="M110 90 H170 V117 Q140 101 110 117 Z" fill="${c.lid}"/>
+  </g>
+  <path d="M116.5 117 Q140 103 163.5 117" fill="none"/>
+  <circle cx="140" cy="124" r="25" fill="none"/>
+  <path d="M118 146 Q140 164 162 146" fill="none" stroke-width="3.5"/>
+  <g transform="translate(117 61) rotate(-16) scale(.86)">
+   <path d="M24 -4 C37 -4 37 12 18 11" fill="none"/>
+   <path d="M-24 -12 L24 -12 L17 14 Q0 19 -17 14 Z" fill="${c.cup}"/>
+   <path d="M-21 0 Q0 4 21 0" fill="none" stroke="${c.stripe}" stroke-width="4"/>
+   <ellipse cx="0" cy="-12" rx="24" ry="6" fill="${c.cup}"/>
+   <ellipse cx="0" cy="-11.5" rx="18" ry="3.6" fill="${c.coffee}" stroke="none"/>
+  </g>
+ </g>`;}
+function badge(c,band){const id=++N;const b=band||c.band;
+ return `<svg viewBox="0 0 240 240"><defs>
+  <path id="tt${id}" d="M31 120 A89 89 0 0 1 209 120"/><path id="tb${id}" d="M15 120 A105 105 0 0 0 225 120"/>
+  <clipPath id="ic${id}"><circle cx="120" cy="120" r="82"/></clipPath></defs>
+  <circle cx="120" cy="120" r="116" fill="${b}" stroke="${c.ink}" stroke-width="4"/>
+  <circle cx="120" cy="120" r="110" fill="none" stroke="${c.text}" stroke-width="1.6" stroke-dasharray="2 5" opacity=".7"/>
+  <text font-family="Fraunces" font-weight="800" font-size="25" letter-spacing="3.2" fill="${c.text}" text-anchor="middle"><textPath href="#tt${id}" startOffset="50%">PIGEON POLLY</textPath></text>
+  <text font-family="Fraunces" font-weight="800" font-size="20" letter-spacing="5" fill="${c.text}" text-anchor="middle"><textPath href="#tb${id}" startOffset="50%">ART LAB</textPath></text>
+  ${star(21,120,.95,c.star)}${star(219,120,.95,c.star)}
+  <circle cx="120" cy="120" r="84" fill="${c.paper}" stroke="${c.ink}" stroke-width="4.5"/>
+  <g clip-path="url(#ic${id})">${polly(c,id)}</g>
+  <circle cx="120" cy="120" r="84" fill="none" stroke="${c.ink}" stroke-width="4.5"/>
+  ${star(176,70,.75,c.star==='#fff'?c.ink:(c.star===c.text?c.ink:c.star))}</svg>`;}
+function mark(c,bg){const id=++N;
+ return `<svg viewBox="0 0 240 240"><defs><clipPath id="ic${id}"><circle cx="120" cy="120" r="112"/></clipPath></defs>
+  <circle cx="120" cy="120" r="114" fill="${bg||c.paper}" stroke="${c.ink}" stroke-width="7"/>
+  <g clip-path="url(#ic${id})"><g transform="translate(120 120) scale(1.16) translate(-124 -134)">${polly({...c},id)}</g></g>
+  <circle cx="120" cy="120" r="114" fill="none" stroke="${c.ink}" stroke-width="8"/></svg>`;}
+const G='#2E2521';
+hero.innerHTML=badge(T.color);
+vars.innerHTML=`<div class="v" style="background:#fff"><div>${badge(T.solid)}</div><b>чёрный на светлом</b></div>
+<div class="v" style="background:${G};color:#ECEDEE"><div>${badge(T.line(G))}</div><b>белый на тёмном</b></div>
+<div class="v" style="background:${G};color:#ECEDEE"><div>${badge(T.color)}</div><b>цветной на тёмном</b></div>`;
+sea.innerHTML=[['осень','#22405F'],['зима','#9E1B22'],['весна','#BE2F3A'],['лето','#1F7FAE']].map(([n,c])=>`<div>${badge(T.color,c)}<b>${n}</b></div>`).join('');
+const w='<span>Pigeon Polly<i>Art Lab</i></span>';
+h1.innerHTML=mark(T.color)+w+'<div style="flex:1"></div>'+mark(T.line(G))+w;
+h2.innerHTML=mark(T.color)+w+'<div style="flex:1"></div>'+mark(T.solid)+w;
+sz.innerHTML=[96,64,48,32,16].map(s=>`<div>${mark(T.color).replace('<svg',`<svg width="${s}" height="${s}"`)}${s}px</div>`).join('')
+ +'<div style="width:20px"></div>'+[32,16].map(s=>`<div>${mark(T.solid).replace('<svg',`<svg width="${s}" height="${s}"`)}${s}px</div>`).join('');
+soc.innerHTML=`<div class="ig"><div class="ring"><div>${badge(T.color)}</div></div>Instagram</div>
+<div class="ig"><div class="ring" style="background:#DED5CA"><div>${badge(T.color,'#22405F')}</div></div>Facebook</div>
+<div class="ig"><div class="ring" style="background:none;padding:0"><div style="padding:0;background:none">${mark(T.color)}</div></div>Знак без надписи</div>`;
+</script></body></html>
