@@ -475,6 +475,7 @@ function ensureSchema(env) {
 const strHash = t => { let h = 2166136261; for (let i = 0; i < t.length; i++) h = Math.imul(h ^ t.charCodeAt(i), 16777619); return (h >>> 0).toString(36) + '.' + t.length; };
 async function ensureSchemaRun(env) {
   const sig = [];
+  let bad = false; // разовая правка не удалась — метку не ставим, повторим при следующем запуске
   const prep = sql => { sig.push(sql); return env.DB.prepare(sql); };
   const stmts = [
     prep(`CREATE TABLE IF NOT EXISTS users (
@@ -492,6 +493,8 @@ async function ensureSchemaRun(env) {
     // правки блоков сайта из режима «✏️ Править страницу»: id = data-ppb блока, lang = en/ru/lv; hidden — скрыт на всех языках (lang = '*')
     // подарки-семечки для аватара: Алина выдаёт из кабинета; status: new — ещё не открыт, bag — в сумке (удалить нельзя)
     prep(`CREATE TABLE IF NOT EXISTS gifts (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, kind TEXT NOT NULL, item TEXT NOT NULL, note TEXT, status TEXT DEFAULT 'new', created_at INTEGER, opened_at INTEGER)`),
+    // индексы для частых запросов «вещи птички» и «работы птички» (11.11.2026): без них база перебирала всю таблицу
+    prep('CREATE INDEX IF NOT EXISTS gifts_user ON gifts(user_id, status)'),
     prep(`CREATE TABLE IF NOT EXISTS site_blocks (id TEXT NOT NULL, lang TEXT NOT NULL, html TEXT, hidden INTEGER DEFAULT 0, page TEXT, updated_at INTEGER, PRIMARY KEY (id, lang))`),
     // пуговки: журнал начислений и трат (одно начисление на (кто, за что, ref) — повторно не дать); магазин: цена и сколько осталось
     prep(`CREATE TABLE IF NOT EXISTS button_log (id INTEGER PRIMARY KEY AUTOINCREMENT, user_id INTEGER NOT NULL, kind TEXT NOT NULL, ref TEXT NOT NULL, amount INTEGER NOT NULL, day TEXT, created_at INTEGER, UNIQUE (user_id, kind, ref))`),
@@ -565,7 +568,7 @@ async function ensureSchemaRun(env) {
       await env.DB.prepare("UPDATE users SET buttons = MAX(0, (SELECT COALESCE(SUM(amount), 0) FROM button_log b WHERE b.user_id = users.id)) WHERE id IN (SELECT DISTINCT user_id FROM button_log WHERE kind = 'pick')").run();
       await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('pick_price_11', '1')").run();
     }
-  } catch (e) { console.error('pick price', e); }
+  } catch (e) { bad = true; console.error('pick price', e); }
   // 11.10.2026: зелья получаются чаще — из книги убрать «не сработало» у сочетаний, которые теперь работают (один раз)
   try {
     if (!(await env.DB.prepare("SELECT value FROM meta WHERE key = 'potfail_v2'").first())) {
@@ -573,7 +576,7 @@ async function ensureSchemaRun(env) {
       for (let i = 0; i < bad.length; i += 50) await env.DB.batch(bad.slice(i, i + 50).map(r => env.DB.prepare('DELETE FROM potion_book WHERE user_id = ? AND combo = ? AND tier = 0').bind(r.user_id, r.combo)));
       await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('potfail_v2', '1')").run();
     }
-  } catch (e) { console.error('potfail', e); }
+  } catch (e) { bad = true; console.error('potfail', e); }
   // подписи анонимов не повторяются (19.10.2026): таблица anon_names; один раз — старые подписи из «Нарисуй мне» и комментариев блога
   try {
     await env.DB.prepare('CREATE TABLE IF NOT EXISTS anon_names (vid TEXT PRIMARY KEY, code TEXT UNIQUE NOT NULL, created_at INTEGER)').run();
@@ -588,15 +591,15 @@ async function ensureSchemaRun(env) {
       const cs = (await env.DB.prepare('SELECT DISTINCT anon FROM blog_comments WHERE anon IS NOT NULL').all().catch(() => ({ results: [] }))).results;
       for (const c of cs) await env.DB.prepare('INSERT OR IGNORE INTO anon_names (vid, code, created_at) VALUES (?, ?, ?)').bind('old:' + c.anon, c.anon, now()).run();
     }
-  } catch (e) { console.error('anon names', e); }
+  } catch (e) { bad = true; console.error('anon names', e); }
   // 17.10.2026: коробка при регистрации — птичкам, которые уже были, выдать картонную коробку и письмо о коробках (один раз)
   try {
     if ((await env.DB.prepare("INSERT OR IGNORE INTO meta (key, value) VALUES ('starter_box_v1', '1')").run()).meta.changes) {
       const us = (await env.DB.prepare("SELECT id, room FROM users WHERE nick IS NOT NULL AND COALESCE(box0, '') = ''").all()).results;
       for (let i = 0; i < us.length; i += 25) await env.DB.batch(us.slice(i, i + 25).flatMap(u => starterBoxSql(env, u, 'cardbox', 1)));
     }
-  } catch (e) { console.error('starter box', e); }
-  await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('schema_ver', ?)").bind(ver).run().catch(e => console.error('schema ver', e));
+  } catch (e) { bad = true; console.error('starter box', e); }
+  if (!bad) await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('schema_ver', ?)").bind(ver).run().catch(e => console.error('schema ver', e));
   schemaReady = true;
 }
 
@@ -699,12 +702,16 @@ function cleanRules(r) {
   return out;
 }
 async function loadRules(env) {
-  if (Date.now() - rulesAt < 15000) return RULES;
+  if (Date.now() - rulesAt < 60000) return RULES; // раз в минуту (на этой копии сервера правила из кабинета — сразу: rulesAt = 0)
   rulesAt = Date.now();
-  RULES = cleanRules(parseJ(await getMeta(env, 'rules'), null));
+  // три чтения разом, а не по очереди: на живом сайте каждое — поход в базу
+  const [rulesRaw, birdsN, plRaw] = await Promise.all([getMeta(env, 'rules'),
+    env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE nick IS NOT NULL AND banned = 0').first().then(b => (b ? b.n : 0), () => null),
+    getMeta(env, 'price_level').catch(() => null)]);
+  RULES = cleanRules(parseJ(rulesRaw, null));
   // пуговки — в общий объект BTN (по нему всё начисляется и показывается людям)
-  try { const b = await env.DB.prepare('SELECT COUNT(*) AS n FROM users WHERE nick IS NOT NULL AND banned = 0').first(); STOCK = stockLevels(b ? b.n : 0); } catch (e) { STOCK = stockLevels(STOCK.birds); }
-  try { if (!CAT_P) CAT_P = (await catalog(env, new Request('https://pigeonpolly.com/'))).prices || {}; const pl = parseJ(await getMeta(env, 'price_level'), null); if (pl && pl.L > 0) PLEVEL = pl; else await autoPrice(env); } catch (e) { /* по умолчанию L = 1 */ }
+  STOCK = stockLevels(birdsN == null ? STOCK.birds : birdsN);
+  try { if (!CAT_P) CAT_P = (await catalog(env, new Request('https://pigeonpolly.com/'))).prices || {}; const pl = parseJ(plRaw, null); if (pl && pl.L > 0) PLEVEL = pl; else await autoPrice(env); } catch (e) { /* по умолчанию L = 1 */ }
   // индексация: все пуговки (заход, рисунок, комментарий, друг, «Выбор Полли», уровни, бейджи, адвент) × (средняя цена вещи сегодня ÷ стартовая цена);
   // стартовая — RULES.indexBase или (0) средняя цена в день включения (meta 'index_base'), поэтому сразу после включения ничего не меняется
   let avg = 0, base = 0;
@@ -1077,12 +1084,17 @@ async function needUser(req, env) {
 // ---------- защита админки (12.10.2026) ----------
 // Админ = почта из ADMIN_HASHES (если её не отключил код восстановления) или id из meta admin_ids (кто вошёл кодом восстановления).
 // Если задан PIN (meta admin_pin), админские права работают только в сессии, где PIN введён (sessions.pin_ok = 1).
-let SEC = { at: 0, pin: '', ids: [], emailOff: false };
+let SEC = { at: 0, pin: '', ids: [], emailOff: false }, secWait = null;
 async function loadSec(env, force) {
   if (!force && Date.now() - SEC.at < 15000) return SEC;
-  const [pin, ids, off] = await Promise.all(['admin_pin', 'admin_ids', 'admin_email_off'].map(k => getMeta(env, k).catch(() => null)));
-  SEC = { at: Date.now(), pin: pin || '', ids: parseJ(ids, []) || [], emailOff: off === '1' };
-  return SEC;
+  if (!force && secWait) return secWait; // несколько проверок разом (whoami) — одно чтение на всех
+  const run = (async () => {
+    const [pin, ids, off] = await Promise.all(['admin_pin', 'admin_ids', 'admin_email_off'].map(k => getMeta(env, k).catch(() => null)));
+    SEC = { at: Date.now(), pin: pin || '', ids: parseJ(ids, []) || [], emailOff: off === '1' };
+    return SEC;
+  })();
+  if (!force) secWait = run.finally(() => { secWait = null; });
+  return run;
 }
 async function adminIdentity(u, env) { // «это Алина» — без учёта PIN
   if (!u) return false;
@@ -2263,11 +2275,16 @@ async function route(req, env, url) {
     const earned = u && u.nick && !u.banned ? await award(env, u.id, 'daily', rigaDay(), BTN.daily) : 0; // +3 пуговки за первый заход за сутки (шапка спрашивает на каждой странице)
     // зарплата от «администрации Воббленда»: пуговки уже начислены, а конвертик ещё не открыт (seen = 0)
     const wl = u && wlLang(req); if (wl && wl !== u.lang) await env.DB.prepare('UPDATE users SET lang = ? WHERE id = ?').bind(wl, u.id).run().catch(() => {}); // язык праздничных писем (worker/wl-holidays.js)
-    const news = await newsOf(env, req, u); // «конвертик»: зарплата, подарки, адвент… (site/assets/news.js)
-    // серия челленджа — для меню аватара в шапке (этап 14 Б)
-    const streak = u && u.nick && !u.banned ? streaks(streakDays((await env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(u.id).all()).results)).current : 0;
-    const titos = u && !u.banned ? titosState(await env.DB.prepare('SELECT * FROM titos WHERE user_id = ?').bind(u.id).first(), RULES, titosHelpers(env)) : null; // кофейник Титоса (worker/titos.js)
-    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: await isAdmin(u, env), pin: !(await isAdmin(u, env)) && await adminIdentity(u, env) ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, streak, news, friendBtns: BTN.friend, titos, study: await studyOk(u, env, studyHelpers(env)) ? 1 : 0, english: await englishOk(u, env, studyHelpers(env)) ? 1 : 0, norsk: await norskOk(u, env, studyHelpers(env)) ? 1 : 0, pwTemp: u.pw_temp ? 1 : 0, mailAsk: mailAsk(env, u) ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
+    // дальше — независимые чтения, разом (шапка спрашивает это на каждой странице, по очереди выходило долго)
+    const ok = u && !u.banned;
+    const [news, streak, titos, adm, ident, study, english, norsk] = await Promise.all([
+      newsOf(env, req, u), // «конвертик»: зарплата, подарки, адвент… (site/assets/news.js)
+      // серия челленджа — для меню аватара в шапке (этап 14 Б)
+      ok && u.nick ? env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(u.id).all().then(r => streaks(streakDays(r.results)).current) : 0,
+      ok ? env.DB.prepare('SELECT * FROM titos WHERE user_id = ?').bind(u.id).first().then(t => titosState(t, RULES, titosHelpers(env))) : null, // кофейник Титоса (worker/titos.js)
+      ok ? isAdmin(u, env) : false, ok ? adminIdentity(u, env) : false,
+      ok ? studyOk(u, env, studyHelpers(env)) : false, ok ? englishOk(u, env, studyHelpers(env)) : false, ok ? norskOk(u, env, studyHelpers(env)) : false]);
+    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: adm, pin: !adm && ident ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, streak, news, friendBtns: BTN.friend, titos, study: study ? 1 : 0, english: english ? 1 : 0, norsk: norsk ? 1 : 0, pwTemp: u.pw_temp ? 1 : 0, mailAsk: mailAsk(env, u) ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
   }
   // название видео YouTube (oEmbed), чтобы подписи уроков на сайте совпадали с видео; кэш на сутки
   if (m === 'GET' && p === '/api/v2/yt') {
