@@ -1377,7 +1377,7 @@
   const SUR = ['Surprise', 'Сюрприз', 'Pārsteigums'], SUR_ANY = ['anything', 'что угодно', 'jebkas'], SUR_LEG = ['legendary thing ★', 'легендарная вещь ★', 'leģendāra lieta ★'];
   // «Сюрпризы» отдельной категорией: any|? — что угодно, any|legend — любая легендарная (в сумку попадает уже настоящая вещь)
   B.GIFTS.any = ['legend']; B.GIFT_KINDS.unshift(['any', ['🎲 Surprises', '🎲 Сюрпризы', '🎲 Pārsteigumi']]); B.LEGEND.add('any|legend');
-  const SUR_C = { any: '#4CC38A', hat: '#9B5DE5', item: '#F08A3B', shoes: '#4A7BD8', scarf: '#E5484D', frame: '#E9A93B', bg: '#4CC38A', anim: '#F28AB2', furn: '#B5543C', deco: '#E5484D', wall: '#7FB3E8', floor: '#A0673C', view: '#3F8FC9', curtain: '#B79CF2' };
+  const SUR_C = { card: '#3F8FC9', 'card-common': '#7FB3E8', 'card-rare': '#9B5DE5', any: '#4CC38A', hat: '#9B5DE5', item: '#F08A3B', shoes: '#4A7BD8', scarf: '#E5484D', frame: '#E9A93B', bg: '#4CC38A', anim: '#F28AB2', furn: '#B5543C', deco: '#E5484D', wall: '#7FB3E8', floor: '#A0673C', view: '#3F8FC9', curtain: '#B79CF2' };
   function surpriseIcon(kind, size) {
     const k = 4, c = document.createElement('canvas'), g = c.getContext('2d'); c.width = 16 * k; c.height = 16 * k; g.setTransform(k, 0, 0, k, 0, 0);
     const leg = kind === 'legend', col = leg ? '#E9C46A' : SUR_C[kind] || '#9B5DE5', p = P(g, 1, 1);
@@ -1389,8 +1389,10 @@
   const kindLabel = (k, l) => { const e = B.GIFT_KINDS.find(x => x[0] === k); return e ? e[1][l] : k; };
   const oldName = B.giftName, oldIcon = B.itemIcon, oldPic = B.giftPic;
   const isSur = (k, v) => v === '?' || k === 'any';
-  const surName = (k, v, l) => `🎲 ${SUR[l]}: ${k === 'any' ? (v === 'legend' ? SUR_LEG[l] : SUR_ANY[l]) : kindLabel(k, l).replace(/^🎲\s*/, '')}`;
-  const surIcon = (k, v, size) => surpriseIcon(k === 'any' && v === 'legend' ? 'legend' : k, size);
+  // any|card, any|card-common… — случайная коллекционная карточка (только окно подарка в кабинете, admin.js giftDialog)
+  const SUR_CARD = { card: ['any card', 'любая карточка', 'jebkura kartīte'], 'card-common': ['common card', 'обычная карточка', 'parasta kartīte'], 'card-rare': ['rare card', 'редкая карточка', 'reta kartīte'], 'card-unique': ['unique card', 'уникальная карточка', 'unikāla kartīte'] };
+  const surName = (k, v, l) => `🎲 ${SUR[l]}: ${k === 'any' ? (v === 'legend' ? SUR_LEG[l] : SUR_CARD[v] ? SUR_CARD[v][l] : SUR_ANY[l]) : kindLabel(k, l).replace(/^🎲\s*/, '')}`;
+  const surIcon = (k, v, size) => surpriseIcon(k === 'any' && (v === 'legend' || SUR_CARD[v]) ? (v === 'card-unique' ? 'legend' : v) : k, size);
   B.giftName = (k, v, l) => isSur(k, v) ? surName(k, v, l == null ? L : l) : isRoom(k) ? nameOf(k, v, l == null ? L : l) : oldName(k, v, l);
   B.itemIcon = (k, v, size, id) => isSur(k, v) ? surIcon(k, v, size) : isRoom(k) ? icon(k, v, size) : oldIcon(k, v, size, id);
   B.giftPic = (k, v, id, size, av) => { if (!isRoom(k) && !isSur(k, v)) return oldPic(k, v, id, size, av); const w = document.createElement('span'); w.className = 'gift-pic'; w.appendChild(isSur(k, v) ? surIcon(k, v, size) : icon(k, v, size)); return w; };

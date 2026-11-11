@@ -3,6 +3,7 @@
 // API: GET /api/cards (магазин, альбом), POST /api/cards/buy, кабинет — /api/admin/cards/*. Импорт из репозитория: site/assets/cards/<коллекция>.json
 // (список коллекций — site/assets/cards/index.json, собирает build.py), один раз на коллекцию (метка meta cards_<коллекция>).
 import { translateTo, ABOUT, LANGS } from './translate.js';
+import { audWhere } from './notes.js'; // «кому» из 📣 Рассылки — для gift-all
 
 export const RARITY = ['common', 'rare', 'unique'];
 const DESC = 700; // длина описания (у карточек Алины — до ~420 знаков на EN) // обычная 🤖 (нарисована ИИ) · редкая (пиксель-арт Алины) · уникальная (акварель Алины)
@@ -322,8 +323,8 @@ export async function cardsApi(req, env, url, h) {
   }
   // всем птичкам с ником (кроме заблокированных) — каждой своя случайная свободная карточка, пока карточки не кончатся
   if (m === 'POST' && a === 'gift-all') {
-    const g = giftArgs(await body());
-    const users = (await env.DB.prepare("SELECT id FROM users WHERE banned = 0 AND nick IS NOT NULL AND nick != ''").all()).results.map(x => x.id);
+    const b = await body(), g = giftArgs(b);
+    const users = (await env.DB.prepare(`SELECT id FROM users WHERE ${audWhere(b, now()).sql}`).all()).results.map(x => x.id); // «кому» из 📣 Рассылки (без aud — все с ником)
     const ids = await freeCards(g.rarity, g.coll);
     const mix = arr => { for (let i = arr.length - 1; i > 0; i--) { const j = Math.floor(Math.random() * (i + 1)); [arr[i], arr[j]] = [arr[j], arr[i]]; } return arr; };
     mix(users); mix(ids);

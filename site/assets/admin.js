@@ -864,6 +864,7 @@
     const nameOf = (kd, v) => NAMES[v] || (B.giftName ? B.giftName(kd, v, 1) : v);
     const isLeg = (kd, v) => !!(B.LEGEND && B.LEGEND.has(kd + '|' + v));
     // общий каталог (catalog-ui.js), режим выбора одной вещи; «что нельзя» — у птички уже максимум таких
+    const CARD_SUR = ['card', 'card-common', 'card-rare', 'card-unique'], cardRar = v => v === 'card' ? '' : v.slice(5); // any|card… — случайная свободная карточка (worker/cards.js admin/cards/gift, gift-all)
     const S = giftDialog.f || (giftDialog.f = {}); // вкладка и фильтры — до перезагрузки
     const ui = C.browse(w.querySelector('.adm-gift-cat'), {
       mode: 'pick', state: S, id: u.id,
@@ -873,6 +874,7 @@
       cant: all ? null : (kd, v) => v !== '?' && kd !== 'any' && (copies[kd + '|' + v] || 0) >= (isLeg(kd, v) ? LIM.leg : LIM.max) ? 'У птички уже максимум таких' : '',
       pick: { has: (kd, v) => kd === kind && v === item },
       onOpen: (kd, v, t) => { kind = kd; item = v; C.mark(t, true, true); prev(); },
+      entries: () => { const es = B.GIFT_KINDS.flatMap(k => (B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).map(v => [k[0], v])); if (window.PPCards) es.splice(es.findIndex(x => x[0] === 'any' && x[1] === 'legend') + 1, 0, ...CARD_SUR.map(v => ['any', v])); return es; }, // + «🎲 Сюрприз: карточка» в «Сюрпризах»
       cardsInto: window.PPCards ? box => giftCards(box) : null, onTab: v => w.classList.toggle('adm-gift-oncards', v === 'cards'),
     });
     w.classList.toggle('adm-gift-oncards', S.tab === 'cards');
@@ -933,6 +935,17 @@
     if (!all) api('admin/gifts?uid=' + u.id).then(r => { for (const g of r.gifts) { const k = g.kind + '|' + g.item; owned[k] = owned[k] === 'bag' ? 'bag' : g.status; copies[k] = (copies[k] || 0) + 1; } ui.drawList(); }).catch(() => {});
     w.querySelector('[data-send]').onclick = async e => {
       e.target.disabled = true;
+      if (kind === 'any' && CARD_SUR.includes(item)) { // случайная карточка: каждая — одна на сайт, каждой птичке своя
+        const note = w.querySelector('input').value.trim(), nm = B.giftName(kind, item, 1);
+        try {
+          if (all) {
+            if (!confirm('Подарить «' + nm + '» ' + ((window.PPAud && window.PPAud.label) || 'всем птичкам') + '? Каждой — своя, пока свободные карточки не кончатся.')) { e.target.disabled = false; return; }
+            const r = await api('admin/cards/gift-all', { rarity: cardRar(item), note, ...(window.PPAud || {}) });
+            sentNote(`🃏 ${nm} — отправлено ${r.count} из ${r.birds} птичек` + (r.count < r.birds ? ' (карточки кончились)' : ''));
+          } else { const r = await api('admin/cards/gift', { uid: u.id, rarity: cardRar(item), note }); sentNote('🃏 №' + r.card.n + ' «' + r.card.title + '» — подарено'); }
+        } catch (x) { alert(x.code === 'none' ? 'Свободных карточек такой редкости не осталось.' : err(x)); }
+        e.target.disabled = false; return;
+      }
       try {
         if (all) { if (!confirm('Подарить «' + (B.giftName ? B.giftName(kind, item, 1) : item) + '» ' + ((window.PPAud && window.PPAud.label) || 'всем птичкам') + '?')) { e.target.disabled = false; return; } const r = await api('admin/gift-all', { kind, item, note: w.querySelector('input').value.trim(), ...(window.PPAud || {}) }); sentNote('🎁 ' + (B.giftName ? B.giftName(kind, item, 1) : item) + ' — отправлено ' + r.count + ' птичкам'); e.target.disabled = false; return; }
         const r = await api('admin/gift', { uid: u.id, kind, item, note: w.querySelector('input').value.trim() });
