@@ -94,3 +94,9 @@
 .tr-pat{height:8px;background:#EDE4D6;border-radius:99px;max-width:360px;margin:0 auto 12px;overflow:hidden}
 .tr-pat i{display:block;height:100%;width:100%;background:#3E9B4F;border-radius:99px;transition:width .1s linear}.tr-pat i.low{background:#C2305C}
 @media (max-width:480px){.tr-grid{gap:5px}.tr-mem .face b{font-size:13px}.tr-mem .face .e{font-size:22px}.tr-q b{font-size:24px}}
+/* выбор страны — одна строка, компактно (флаги — svg) */
+.tr-langs{display:grid;grid-template-columns:repeat(auto-fit,minmax(0,1fr));grid-auto-flow:column;gap:6px;max-width:500px;margin:0 auto 10px}
+.tr-lang{min-width:0;padding:7px 4px 6px;border-radius:12px;gap:1px}
+.tr-lang .fl{display:block;width:26px;height:17px;border-radius:3px;overflow:hidden;box-shadow:0 0 0 1px rgba(0,0,0,.12);margin-bottom:2px}.tr-lang .fl svg{display:block;width:100%;height:100%}
+.tr-lang b{font-size:14px;line-height:1.2;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}.tr-lang small{font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:100%}
+@media (max-width:420px){.tr-lang b{font-size:13px}.tr-lang small{font-size:10px}}

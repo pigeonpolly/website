@@ -15,7 +15,7 @@
       'Pollija no Vobllendas dodas ceļojumā ar vilcienu, un Empanadiljo māca vārdus. Izvēlies, kurp braukt: tās valsts valodu arī mācīsies. Katrā stacijā — jauni vārdi un maza spēle. Brauciens nebeidzas.'],
     where: ['Where are we going?', 'Куда едем?', 'Kurp brauksim?'],
     to: { es: ['to Spain', 'в Испанию', 'uz Spāniju'], no: ['to Norway', 'в Норвегию', 'uz Norvēģiju'], en: ['to Great Britain', 'в Великобританию', 'uz Lielbritāniju'], lv: ['to Latvia', 'в Латвию', 'uz Latviju'] },
-    land: { es: ['Spain', 'Испания', 'Spānija'], no: ['Norway', 'Норвегия', 'Norvēģija'], en: ['Great Britain', 'Великобритания', 'Lielbritānija'], lv: ['Latvia', 'Латвия', 'Latvija'] },
+    land: { es: ['Spain', 'Испания', 'Spānija'], no: ['Norway', 'Норвегия', 'Norvēģija'], en: ['Britain', 'Британия', 'Britānija'], lv: ['Latvia', 'Латвия', 'Latvija'] },
     go: ['🚆 All aboard!', '🚆 По вагонам!', '🚆 Iekāpt!'],
     from: ['From station {n}', 'Со станции {n}', 'No {n}. stacijas'],
     ups: ['🛠 Upgrades', '🛠 Улучшения', '🛠 Uzlabojumi'],
@@ -80,7 +80,11 @@
   // ---------- хранилище в браузере ----------
   const store = (() => { let o = {}; try { o = JSON.parse(localStorage.getItem('pp-train') || '{}') || {}; } catch (e) {} return o; })();
   const save = () => { try { localStorage.setItem('pp-train', JSON.stringify(store)); } catch (e) {} };
-  const DEST = ['es', 'no', 'en', 'lv'].filter(l => l !== SL), FLAG = { en: '🇬🇧', lv: '🇱🇻', es: '🇪🇸', no: '🇳🇴' };
+  const DEST = ['es', 'no', 'en', 'lv'].filter(l => l !== SL), FLAG = { // флаги картинкой: эмодзи-флагов нет на Windows (там буквы ES, NO)
+    es: '<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#C60B1E"/><rect y="5" width="30" height="10" fill="#FFC400"/></svg>',
+    no: '<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#BA0C2F"/><path d="M8 0h6v20H8zM0 7h30v6H0z" fill="#fff"/><path d="M9.5 0h3v20h-3zM0 8.5h30v3H0z" fill="#00205B"/></svg>',
+    en: '<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#012169"/><path d="M0 0l30 20M30 0L0 20" stroke="#fff" stroke-width="4"/><path d="M0 0l30 20M30 0L0 20" stroke="#C8102E" stroke-width="1.5"/><path d="M12 0h6v20h-6zM0 7h30v6H0z" fill="#fff"/><path d="M13.5 0h3v20h-3zM0 8.5h30v3H0z" fill="#C8102E"/></svg>',
+    lv: '<svg viewBox="0 0 30 20"><rect width="30" height="20" fill="#9E3039"/><rect y="8" width="30" height="4" fill="#fff"/></svg>' };
   if (!DEST.includes(store.lang)) store.lang = 'es';
   store.best = store.best || {}; store.lv = store.lv || {}; store.dict = store.dict || {}; store.miss = store.miss || {};
 
@@ -292,7 +296,7 @@
     ov.innerHTML = `<div class="tr-card tr-menu">
       <a class="tr-sup" href="https://libertas.study/" target="_blank" rel="noopener"><span>${t('support')}</span><img src="/images/train/libertas.png" alt="Libertas.study" width="129" height="52"></a>
       <h2>${t('title')} ${tr(T.to[lang])}</h2><img class="tr-emp" src="/images/train/emp.png" alt="" width="96" height="48"><p>${t('intro')}</p>
-      <p class="tr-lh">${t('where')}</p><div class="tr-langs">${DEST.map(l => `<button type="button" class="tr-lang${l === lang ? ' on' : ''}" data-l="${l}">${FLAG[l]} <b>${tr(T.land[l])}</b><small>${tr(T.langs[l])}</small></button>`).join('')}</div>
+      <p class="tr-lh">${t('where')}</p><div class="tr-langs">${DEST.map(l => `<button type="button" class="tr-lang${l === lang ? ' on' : ''}" data-l="${l}"><i class="fl">${FLAG[l]}</i><b>${tr(T.land[l])}</b><small>${tr(T.langs[l])}</small></button>`).join('')}</div>
       <p class="tr-best">${best ? t('station', { n: best }) + ' · ' + city(best) + ' · ' : ''}${t('best', { n: store.best[lang] || 0 })}</p>
       <p><button type="button" class="pill-btn pill-fill tr-go" data-f="0">${t('go')}</button>${froms.slice(-3).map(f => ` <button type="button" class="pill-btn tr-go" data-f="${f}">${t('from', { n: f + 1 })}</button>`).join('')}</p>
       <p><button type="button" class="pill-btn tr-upsb">${t('ups')}</button> <button type="button" class="pill-btn tr-dictb">${t('dict')}</button></p>
