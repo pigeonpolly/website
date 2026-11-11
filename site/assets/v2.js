@@ -96,6 +96,7 @@
     const a = e.target.closest('[data-yt]');
     if (!a || e.ctrlKey || e.metaKey || e.shiftKey) return;
     e.preventDefault(); play(a.dataset.yt);
+    try { localStorage.setItem('pp-yt-last', a.dataset.yt); } catch (e2) {} // «последний просмотренный» в кабинете (cabinet.js)
   });
 
   // подписи бесплатных уроков — по названию видео на YouTube (/api/v2/yt); известные — на языке страницы
