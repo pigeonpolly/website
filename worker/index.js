@@ -27,7 +27,8 @@ import { schoolApi, schoolNews, schoolCron, SCHOOL_TABLES, SCHOOL_ALTER, SCHOOL_
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
 import { gardenApi, gardenDrop, gardenNews, GARDEN_TABLES, GARDEN_ALTER, GARDEN_RULES, GARDEN_RANGE, GARDEN_INT, GARDEN_BOOL, GARDEN_SEASONS } from './garden.js'; // огород птички (этап 22, docs/bird.md «Огород»)
 import { weekApi, outClick, WEEK_TABLES } from './week.js'; // кабинет → «🗓 Неделя» и переходы на Amazon (docs/admin.md)
-import { ideasApi } from './ideas.js'; // кабинет → «💡 Темы для блога» (docs/admin.md)
+import { ideasApi } from './ideas.js';
+import { guidesApi, guidesList, guideOut } from './guides.js'; // кабинет → «🎬 Видео и гайды», /api/v2/guides (docs/admin.md) // кабинет → «💡 Темы для блога» (docs/admin.md)
 import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
 
 // sha256 от e-mail администратора (сам адрес в коде не храним)
@@ -451,6 +452,8 @@ const mailHelpers = env => ({ ...authHelpers(env), rules: () => RULES, streakRis
   const days = streakDays((await env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(uid).all()).results), last = Math.max(0, ...days.map(dayNum)), today = utcToday();
   return { current: streaks(days).current, risk: last < today && !isExtraNum(today) };
 } });
+const guidesHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), imgPut, imgDrop: id => imgDrop(env, id), randomHex, now,
+  translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is a short title of an art video lesson or an illustrated drawing guide/book. Keep it short, natural and catchy.') });
 const authHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, sessionCookie, sessionDays: SESSION_DAYS, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), bump: (k, sql) => bump(env, k, sql) });
 const helpers = env => ({ json, fail, cookie, currentUser, needUser, isAdmin, now, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v), awardComment: (uid, cid) => awardComment(env, uid, cid) });
 
@@ -1538,6 +1541,7 @@ async function route(req, env, url) {
   if (p === '/api/pancakes' || p.startsWith('/api/pancakes/')) { const r = await pancakesApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, top: (uid, n) => topScore(env, 'pan', uid, n),
     award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), item: (rq, uid, note) => rainItem(env, rq, uid, 0, note) }); if (r) return r; }
   if (p === '/api/garden' || p.startsWith('/api/garden/')) { const r = await gardenApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
+  if (p === '/api/admin/guides' || p === '/api/v2/guides') { const r = await guidesApi(req, env, url, guidesHelpers(env)); if (r) return r; }
   if (p === '/api/admin/ideas' || p === '/api/admin/ideas/write') { const r = await ideasApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/note/') || p.startsWith('/api/admin/notes')) { const r = await notesApi(req, env, url, helpers(env)); if (r) { if (p === '/api/admin/notes/send') await mailCron(env, authHelpers(env)).catch(() => {}); return r; } }
   if (p.startsWith('/api/mail/') || p.startsWith('/api/admin/mail')) { const r = await mailApi(req, env, url, authHelpers(env)); if (r) return r; }
@@ -2294,7 +2298,8 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/v2/vip') {
     const u = await currentUser(req, env);
     if (!u || u.banned) return json({ login: true, videos: [] }, 200, { 'cache-control': 'no-store' });
-    return json({ videos: VIP_VIDEOS }, 200, { 'cache-control': 'no-store' });
+    const added = (await guidesList(guidesHelpers(env))).filter(x => x.kind === 'video' && x.vip && !x.hidden).map(x => guideOut(x, true)); // добавленные в кабинете — новее
+    return json({ videos: [...added.map(x => ({ id: x.yt, key: x.id, t: x.t, cover: x.cover })), ...VIP_VIDEOS] }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'GET' && p === '/api/news') return json({ news: await newsOf(env, req, await currentUser(req, env)) }, 200, { 'cache-control': 'no-store' });
   if (m === 'GET' && p === '/api/news/history') return json({ items: await newsHistory(env, await currentUser(req, env)) }, 200, { 'cache-control': 'no-store' });

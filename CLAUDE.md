@@ -1,6 +1,6 @@
 # pigeonpolly.com — правила для Claude
 
-Сайт Алины Откинской (Pigeon Polly Art Lab): художница, иллюстратор, learning experience designer из Риги. https://www.pigeonpolly.com (EN), /lv/, /ru/.
+Сайт Алины Откинской (Pigeon Polly Art Lab): художник (не иллюстратор), learning experience designer из Риги. https://www.pigeonpolly.com (EN), /lv/, /ru/.
 
 ## Как общаться с Алиной
 - По-русски, до 5 строк, без технических подробностей, кода и пересказа плана. Вопросы — одним списком; не блокирующее решать самой и писать в «Допущения».
