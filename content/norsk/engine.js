@@ -528,12 +528,29 @@
   }
 
   // ---------- озвучка ----------
-  const canSay = 'speechSynthesis' in window;
-  function say(text, slow) {
-    if (!canSay) return; speechSynthesis.cancel();
+  const canSay = true; // озвучка Gemini (/api/norsk/tts, worker/norsk.js); не вышло — голос браузера
+  const hasVoice = 'speechSynthesis' in window, audioCache = new Map();
+  let player = null, sayN = 0;
+  function hush() { sayN++; if (player) { player.pause(); player = null; } if (hasVoice) speechSynthesis.cancel(); }
+  function sayBrowser(text, slow) {
+    if (!hasVoice) return;
     const m = new SpeechSynthesisUtterance(text); m.lang = 'nb-NO'; m.rate = slow ? .6 : .9;
     const v = speechSynthesis.getVoices().find(v => /^(nb|no)[-_]/i.test(v.lang)) || speechSynthesis.getVoices().find(v => /^(nb|no|nn)/i.test(v.lang)); if (v) m.voice = v;
     speechSynthesis.speak(m);
+  }
+  async function say(text, slow) {
+    hush(); const n = sayN;
+    try {
+      let src = audioCache.get(text);
+      if (!src) {
+        const r = await fetch('/api/norsk/tts?t=' + encodeURIComponent(text), { credentials: 'same-origin' });
+        if (!r.ok) throw new Error('tts');
+        src = URL.createObjectURL(await r.blob()); audioCache.set(text, src);
+      }
+      if (n !== sayN) return; // пока грузилось, нажали другое
+      const a = new Audio(src); a.playbackRate = slow ? .7 : 1; a.preservesPitch = true; player = a;
+      await a.play();
+    } catch (e) { if (n === sayN) sayBrowser(text, slow); }
   }
   const sayBtn = t => canSay ? `<button type="button" class="say" data-say="${esc(t)}" aria-label="Послушать" title="Послушать">🔊</button>` : '';
 
@@ -1145,7 +1162,7 @@
   // ---------- маршрут ----------
   function route() {
     const h = location.hash.slice(1) || 'home';
-    tip.hidden = true; if (canSay) speechSynthesis.cancel();
+    tip.hidden = true; hush();
     const [a, b, c] = h.split('/');
     if (a === 'u' && byId(b)) unitPage(byId(b));
     else if (a === 'test' && LEVELS.some(l => l.id === b)) testPage(b);
