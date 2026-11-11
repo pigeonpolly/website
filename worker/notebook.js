@@ -10,13 +10,13 @@ export const NOTEBOOK_TABLES = [
   'CREATE TABLE IF NOT EXISTS textbook_notes (user_id INTEGER NOT NULL, book TEXT NOT NULL, page_id TEXT NOT NULL, data TEXT, t INTEGER NOT NULL, PRIMARY KEY (user_id, book, page_id))',
 ];
 const BOOKS = { study: studyOk, english: englishOk, norsk: norskOk };
-const ID = /^[a-z0-9]{4,24}$/, MAX_HTML = 600000, MAX_PAGES = 3000, MAX_DEL = 1000;
+const ID = /^[a-z0-9]{4,24}$/, MAX_HTML = 600000, MAX_PAGES = 3000, MAX_DEL = 5000;
 
 const cleanPage = p => {
   if (!p || !ID.test(String(p.id)) || !(+p.t > 0)) return null;
   const html = String(p.html || '');
   if (html.length > MAX_HTML) return null;
-  return { id: String(p.id), title: String(p.title || '').slice(0, 200), html, t: Math.round(+p.t), c: Math.round(+p.c || +p.t), mark: !!p.mark, at: String(p.at || '').slice(0, 200) };
+  return { id: String(p.id), title: String(p.title || '').slice(0, 200), html, t: Math.round(+p.t), c: Math.round(+p.c || +p.t), mark: !!p.mark, at: String(p.at || '').slice(0, 200), nb: ID.test(String(p.nb || '')) ? String(p.nb) : '', kind: p.kind === 'book' ? 'book' : '' }; // kind 'book' — блокнот (title), иначе страница блокнота nb
 };
 
 // h: json, fail, currentUser, isAdmin, adminIdentity
