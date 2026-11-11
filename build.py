@@ -81,7 +81,7 @@ PAGES = [
      "Color palettes from Pigeon Polly watercolors and sketchbook pages: six colors with HEX codes from every artwork. Copy a color, pick a palette and draw."),
     ("learn", "Lessons", "preview-learn.html",
      "Watercolour and ink lessons by Alina Otkinska: free videos open to everyone and extra video lessons for signed-in visitors."),
-    ("guides", "Books", "preview-guides.html",
+    ("books", "Books", "preview-guides.html",
      "Creative guides and books by artist Alina Otkinska: ink and watercolour sketching, a free colouring book, palettes and little drawing guides."),
     ("about", "About Alina", "preview-about.html",
      "Alina Otkinska: learning experience designer and artist from Riga, the human behind Pigeon Polly."),
@@ -91,16 +91,16 @@ PAGES = [
 # готовые, но пока не открытые страницы: не попадают в sitemap
 UNLISTED = {"blog-editor", "admin", "garden"}
 # редизайн 2.0: страницы на новом шаблоне src/layout-v2.html (шапка, подвал, сезоны — site/assets/v2.css, v2.js)
-V2 = {"", "learn", "guides", "about", "blog"}
+V2 = {"", "learn", "books", "about", "blog"}
 # часть 5: все остальные страницы — на src/layout-v2-lab.html (новая шапка и подвал, внутри старые style.css и скрипты как есть)
 # ключ правок «Править страницу» (data-ppb): у новых страниц — прежний, с /preview/, чтобы сохранённые правки не потерялись
-EDIT_KEY = {"": "preview", "learn": "preview-learn", "guides": "preview-guides", "about": "preview-about"}
+EDIT_KEY = {"": "preview", "learn": "preview-learn", "books": "preview-guides", "about": "preview-about"}
 NOINDEX = set()
 # адреса в шаблонах и словарях content/i18n остались с /preview/ — build.py меняет их на настоящие в готовой странице (v2_urls)
 V2_HOME = "/preview/"
 V2_LEARN, V2_GUIDES = "/preview/learn/", "/preview/guides/"
 V2_ABOUT, V2_LAB_URL, V2_WOBBLE = "/preview/about/", "/preview/lab/", "/preview/wobbleland/"
-V2_URLS = [("preview/learn/", "learn/"), ("preview/guides/", "guides/"), ("preview/about/", "about/"),
+V2_URLS = [("preview/learn/", "learn/"), ("preview/guides/", "books/"), ("preview/about/", "about/"),
            ("preview/lab/", "games/"), ("preview/wobbleland/", "wobbleland/"), ("preview/", "")]
 
 
@@ -641,7 +641,7 @@ def v2_shelf():
     for b in out:
         title = b["title"].replace(" (coming soon)", "").replace(" (free)", "")
         ext = ' target="_blank" rel="noopener"' if b["url"].startswith("http") else ""
-        kind = ("soon", "Coming soon", "Read the news →") if b in soon else ("free", "Free PDF", "Download free →") if b in free else ("buy", "Paperback &amp; Kindle", "On Amazon →")
+        kind = ("soon", "Coming soon", "Read the news →") if b in soon else ("free", "Free PDF", "Download free →") if b in free else ("buy", "Amazon", "On Amazon →")
         cards.append(f'<a class="gb {kind[0]}" href="{esc(b["url"])}"{ext}><span class="cvr"><img src="/{esc(b["cover"])}" alt="" loading="lazy"></span>'
                      f'<span class="lbl2">{kind[1]}</span><b>{esc(title)}</b><span class="go">{kind[2]}</span></a>')
     return '<div class="shelf">' + "".join(cards) + "</div>"

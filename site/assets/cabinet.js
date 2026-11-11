@@ -27,14 +27,14 @@
     openBook: ['Open →', 'Открыть →', 'Atvērt →'],
     dips: ['📜 Diplomas', '📜 Дипломы', '📜 Diplomi'],
     dipNext: ['On the way to a diploma', 'На пути к диплому', 'Ceļā uz diplomu'],
-    guidesH: ['🎬 Guides', '🎬 Гайды', '🎬 Ceļveži'],
-    allT: ['All video guides', 'Все видеогайды', 'Visi video ceļveži'],
+    guidesH: ['🎬 Video lessons', '🎬 Видеоуроки', '🎬 Video nodarbības'],
+    allT: ['All video lessons', 'Все видеоуроки', 'Visas video nodarbības'],
     allS: ['Free lessons and VIP lessons — in one place', 'Бесплатные и VIP-уроки — в одном месте', 'Bezmaksas un VIP nodarbības — vienuviet'],
     seeAll: ['See all →', 'Смотреть все →', 'Skatīt visus →'],
     gNew: ['New', 'Новое', 'Jaunākais'], gLast: ['Last watched', 'Последний просмотренный', 'Pēdējais skatītais'],
     gNext: ['Next to watch', 'Посмотреть дальше', 'Skaties tālāk'], gSeen: ['watched', 'просмотрено', 'skatīts'],
     vidT: ['Video lesson', 'Видеоурок', 'Video nodarbība'],
-    pdf: ['PDF guides and books →', 'PDF-гайды и книги →', 'PDF ceļveži un grāmatas →'],
+    pdf: ['Books →', 'Книги →', 'Grāmatas →'],
     soon: ['Courses and materials you get will appear here too.', 'Сюда же лягут курсы и материалы, которые у тебя появятся.', 'Šeit parādīsies arī tavi kursi un materiāli.'],
     all: ['✓ Tick all', '✓ Отметить все', '✓ Atzīmēt visus'], none: ['Untick all', 'Снять все', 'Noņemt visus'],
     play: ['Games', 'Игры', 'Spēles'], shop: ['Shop', 'Магазин', 'Veikals'], flock: ['Other birds’ rooms', 'Комнаты других птичек', 'Citu putniņu istabas'],
@@ -74,7 +74,7 @@
     el.innerHTML = sec('books', t('books'))
       + sec('dips', t('dips'))
       + sec('guides', t('guidesH'))
-      + `<p class="cab-soon">${t('soon')} <a href="${pre}/guides/">${t('pdf')}</a></p>`;
+      + `<p class="cab-soon">${t('soon')} <a href="${pre}/books/">${t('pdf')}</a></p>`;
     const dips = el.querySelector('.cab-dips .cab-body'), guides = el.querySelector('.cab-guides .cab-body');
     dips.innerHTML = `<div class="cab-card cab-school"><span class="cab-k">${t('schT')}</span><b class="cab-sch-t">${t('schT')}</b><p class="cab-sch-s">${t('schNew')}</p>
         <div class="cab-stamps" aria-hidden="true">${'<i></i>'.repeat(12)}</div><a class="cab-btn" href="${pre}/polly-helps/#school">${t('schStart')}</a></div>`;
@@ -96,7 +96,7 @@
     const get = u => fetch(u, { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null);
     Promise.all([get('/api/v2/vip'), get('/api/v2/guides')]).then(([d, g]) => {
       const nm = x => (x.t && (x.t[['en', 'ru', 'lv'][L]] || x.t.en || x.t.ru)) || ''; // добавленные в кабинете «🎬 Видео и гайды» (worker/guides.js)
-      const added = ((g && g.items) || []).filter(x => x.kind === 'video' && !x.vip).map(x => ({ id: x.yt, cover: x.cover, name: nm(x) }));
+      const added = ((g && g.items) || []).filter(x => x.kind === 'video' && !x.vip && !x.soon && x.yt).map(x => ({ id: x.yt, cover: x.cover, name: nm(x) }));
       const vids = [...((d && d.videos) || []).map(v => ({ id: v.id, vip: 1, cover: v.cover, name: v.t ? nm(v) : '' })), ...added, ...FREE_YT.filter(id => !added.some(x => x.id === id)).map(id => ({ id }))];
       let last = null; try { last = localStorage.getItem('pp-yt-last'); } catch (e) {}
       const seen = vids.find(v => v.id === last && v !== vids[0]);

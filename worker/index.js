@@ -2281,7 +2281,7 @@ async function route(req, env, url) {
   if (m === 'GET' && p === '/api/v2/vip') {
     const u = await currentUser(req, env);
     if (!u || u.banned) return json({ login: true, videos: [] }, 200, { 'cache-control': 'no-store' });
-    const added = (await guidesList(guidesHelpers(env))).filter(x => x.kind === 'video' && x.vip && !x.hidden).map(x => guideOut(x, true)); // добавленные в кабинете — новее
+    const added = (await guidesList(guidesHelpers(env))).filter(x => x.kind === 'video' && x.vip && !x.hidden && !x.soon && x.yt).map(x => guideOut(x, true)); // добавленные в кабинете — новее
     return json({ videos: [...added.map(x => ({ id: x.yt, key: x.id, t: x.t, cover: x.cover })), ...VIP_VIDEOS] }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'GET' && p === '/api/news') return json({ news: await newsOf(env, req, await currentUser(req, env)) }, 200, { 'cache-control': 'no-store' });

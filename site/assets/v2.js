@@ -124,8 +124,8 @@
   const G = { free: ['Free', 'Бесплатно', 'Bez maksas'], vid: ['Video lesson · open to everyone', 'Видеоурок · открыт всем', 'Video nodarbība · atvērta visiem'],
     watch: ['Watch →', 'Смотреть →', 'Skatīties →'], lock: ['Sign in to watch', 'Войдите, чтобы смотреть', 'Ienāc, lai skatītos'], signin: ['Sign in →', 'Войти →', 'Ienākt →'],
     pdf: ['Free PDF', 'Бесплатный PDF', 'Bezmaksas PDF'], dl: ['Download free →', 'Скачать бесплатно →', 'Lejupielādēt bez maksas →'],
-    amz: ['Paperback &amp; Kindle', 'Бумажная и Kindle', 'Drukāta un Kindle'], onAmz: ['On Amazon →', 'На Amazon →', 'Amazon →'],
-    guide: ['Book', 'Книга', 'Grāmata'], vipOpen: ['VIP lesson · open for you', 'VIP-урок · открыт для тебя', 'VIP nodarbība · atvērta tev'],
+    amz: ['Amazon', 'Amazon', 'Amazon'], onAmz: ['On Amazon →', 'На Amazon →', 'Amazon →'],
+    guide: ['Book', 'Книга', 'Grāmata'], soon: ['Soon', 'Скоро', 'Drīzumā'], soonS: ['Coming soon to the site', 'Скоро на сайте', 'Drīzumā vietnē'], soonB: ['Coming soon', 'Скоро выйдет', 'Drīzumā'], vipOpen: ['VIP lesson · open for you', 'VIP-урок · открыт для тебя', 'VIP nodarbība · atvērta tev'],
     all: ['All', 'Все', 'Visas'], freeF: ['Free', 'Бесплатные', 'Bezmaksas'], fl: ['Filter lessons', 'Фильтр уроков', 'Filtrēt nodarbības'],
     allOpen: ['🔓 Everything is open for you', '🔓 Тебе открыто всё', '🔓 Tev atvērts viss'],
     vipN: [n => `${n} VIP ${n === 1 ? 'lesson opens' : 'lessons open'} after a free sign-in`, n => `VIP-уроков: ${n} — откроются после бесплатного входа`, n => `VIP nodarbības: ${n} — atvērsies pēc bezmaksas ienākšanas`],
@@ -140,6 +140,8 @@
     const op = !!(d && d.open), fg = document.querySelector('#free .vg2');
     const card = x => {
       const lock = x.vip && !op, nm = esc(tOf(x) || G.vidT[L]);
+      if (x.soon) return `<div class="vc soon" data-f="${x.vip ? 'vip' : 'free'}"><span class="th">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : ''}<span class="bd">${x.vip ? 'VIP · ' : ''}${G.soon[L]}</span><span class="pl" aria-hidden="true">⏳</span></span>`
+        + `<span class="tx"><b>${nm}</b><small>${G.soonS[L]}</small></span></div>`; // «скоро»: видео ещё нет
       return `<a class="vc${lock ? ' lock' : ''}" data-f="${x.vip ? 'vip' : 'free'}" href="${lock ? '#signin' : 'https://youtu.be/' + esc(x.yt)}"${lock ? '' : ` data-yt="${esc(x.yt)}" target="_blank" rel="noopener"`}${own(x)}>`
         + `<span class="th"><img src="${esc(x.cover)}" alt="" loading="lazy"><span class="bd">${x.vip ? 'VIP' : G.free[L]}</span><span class="pl" aria-hidden="true">${lock ? '🔒' : '▶'}</span></span>`
         + `<span class="tx"><b>${nm}</b><small>${x.vip ? (lock ? G.lock[L] : G.vipOpen[L]) : G.vid[L]}</small><span class="go">${lock ? G.signin[L] : G.watch[L]}</span></span></a>`;
@@ -165,33 +167,34 @@
       vg.className = 'vl' + (op ? '' : ' lock');
       vg.innerHTML = `<p class="vl-h">${op ? G.youN[L](vip.length) : G.vipN[L](vip.length)}</p>` + vip.map(x => {
         const nm = esc(tOf(x) || G.vidT[L]);
+        if (x.soon) return `<div class="vr soon"><span class="th">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : ''}</span><b>${nm}</b><em title="${G.soon[L]}">⏳</em></div>`;
         return op ? `<a class="vr" href="https://youtu.be/${esc(x.yt)}" data-yt="${esc(x.yt)}"${own(x)} target="_blank" rel="noopener"><span class="th"><img src="${esc(x.cover)}" alt="" loading="lazy"></span><b>${nm}</b><em>▶</em></a>`
           : `<a class="vr" href="#signin"><span class="th"><img src="${esc(x.cover)}" alt="" loading="lazy"></span><b>${nm}</b><em>🔒</em></a>`;
       }).join('');
       vg.querySelectorAll('[data-yt]').forEach(ytName);
       const al = vg.closest('.al'), k = al && al.querySelector('.k'), pp = al && al.querySelector('h2 + p');
       if (op && k) k.textContent = ['You are signed in', 'Вход выполнен', 'Laipni lūdzam'][L];
-      if (op && pp) pp.innerHTML = [`All VIP lessons are open for you, right here. Want to support my work? <a href="${pre}/guides/">Get one of my books</a>.`, `Все VIP-уроки открыты, смотрите прямо здесь. Хотите поддержать меня? <a href="${pre}/guides/">Купите одну из моих книг</a>.`, `Visas VIP nodarbības ir atvērtas, skaties tepat. Gribi atbalstīt manu darbu? <a href="${pre}/guides/">Iegādājies kādu no manām grāmatām</a>.`][L];
+      if (op && pp) pp.innerHTML = [`All VIP lessons are open for you, right here. Want to support my work? <a href="${pre}/books/">Get one of my books</a>.`, `Все VIP-уроки открыты, смотрите прямо здесь. Хотите поддержать меня? <a href="${pre}/books/">Купите одну из моих книг</a>.`, `Visas VIP nodarbības ir atvērtas, skaties tepat. Gribi atbalstīt manu darbu? <a href="${pre}/books/">Iegādājies kādu no manām grāmatām</a>.`][L];
     }
     // главная: две плитки бесплатных уроков — самые новые
     const tiles = [...document.querySelectorAll('#lessons .t.yt')];
-    free.slice(0, tiles.length).forEach((x, i) => {
+    free.filter(x => !x.soon).slice(0, tiles.length).forEach((x, i) => {
       const a = tiles[i]; a.href = 'https://youtu.be/' + x.yt; a.dataset.yt = x.yt;
       const im = a.querySelector('img'); if (im) { im.src = x.cover; im.alt = tOf(x); }
       const b = a.querySelector('b'); if (b) b.textContent = tOf(x) || G.vidT[L];
       if (tOf(x)) a.dataset.own = 1; else ytName(a);
     });
-    // /guides/: полка — новые книги первыми
+    // /books/: полка — новые книги первыми
     const shelf = document.querySelector('.shelf');
     if (shelf && books.length) shelf.insertAdjacentHTML('afterbegin', books.map(x => {
-      const k = x.free ? ['free', G.pdf[L], G.dl[L]] : /amazon\.|a\.co\//.test(x.url) ? ['buy', G.amz[L], G.onAmz[L]] : ['buy', G.guide[L], G.open[L]];
-      return `<a class="gb ${k[0]}" href="${esc(x.url)}"${ext(x.url)}><span class="cvr"><img src="${esc(x.cover)}" alt="" loading="lazy"></span><span class="lbl2">${k[1]}</span><b>${esc(tOf(x))}</b><span class="go">${k[2]}</span></a>`;
+      const k = x.soon ? ['soon', G.soonB[L], x.url ? G.open[L] : G.soon[L]] : x.free ? ['free', G.pdf[L], G.dl[L]] : /amazon\.|a\.co\//.test(x.url) ? ['buy', G.amz[L], G.onAmz[L]] : ['buy', G.guide[L], G.open[L]];
+      return `<a class="gb ${k[0]}"${x.url ? ` href="${esc(x.url)}"${ext(x.url)}` : ''}><span class="cvr"><img src="${esc(x.cover)}" alt="" loading="lazy"></span><span class="lbl2">${k[1]}</span><b>${esc(tOf(x))}</b><span class="go">${k[2]}</span></a>`;
     }).join(''));
-    // главная: блок «Гайды» — три обложки, новые первыми
+    // главная: блок «Книги» — три обложки, новые первыми
     const bk = document.querySelector('.books');
     if (bk && books.length) {
       const old = [...bk.querySelectorAll('a[class^="b"]')];
-      const add = books.slice(0, 3).map(x => { const a = document.createElement('a'); a.href = x.url; if (/^https?:/.test(x.url)) { a.target = '_blank'; a.rel = 'noopener'; } a.innerHTML = `<img src="${esc(x.cover)}" alt="${esc(tOf(x))}" loading="lazy">`; return a; });
+      const add = books.slice(0, 3).map(x => { const a = document.createElement('a'); if (x.url) a.href = x.url; if (/^https?:/.test(x.url)) { a.target = '_blank'; a.rel = 'noopener'; } a.innerHTML = (x.soon ? `<span class="lbl">${G.soon[L]}</span>` : '') + `<img src="${esc(x.cover)}" alt="${esc(tOf(x))}" loading="lazy">`; return a; });
       const all = [...add, ...old].slice(0, 3);
       old.forEach(a => { if (!all.includes(a)) a.remove(); });
       const hand = bk.querySelector('.hand');

@@ -18,7 +18,7 @@ export async function guidesList(h) {
 }
 const cover = x => x.img ? `/api/img/${x.img}?t=1` : x.kind === 'video' && x.yt ? `https://i.ytimg.com/vi/${x.yt}/hqdefault.jpg` : '';
 // для сайта: VIP-ссылка YouTube — только вошедшим (как /api/v2/vip)
-export const guideOut = (x, open) => ({ id: x.id, kind: x.kind, vip: x.vip ? 1 : 0, t: x.t || {}, cover: cover(x),
+export const guideOut = (x, open) => ({ id: x.id, kind: x.kind, vip: x.vip ? 1 : 0, soon: x.soon ? 1 : 0, t: x.t || {}, cover: cover(x),
   ...(x.kind === 'video' ? (x.vip && !open ? {} : { yt: x.yt }) : { url: x.url }), at: x.at });
 
 // встроенные (были на сайте до кабинета): идут после добавленных; названия бесплатных — с YouTube (v2.js ytName)
@@ -63,15 +63,17 @@ export async function guidesApi(req, env, url, h) {
   const kind = (old && old.kind) || (f.get('kind') === 'book' ? 'book' : 'video');
   const link = cut(f.get('url'), 500), x = { ...(old || { id: h.randomHex(6), kind, at: h.now() }) };
   if (kind === 'video') {
-    x.yt = ytId(link); if (!x.yt) h.fail(400, 'yt');
+    x.soon = f.get('soon') === '1' ? 1 : 0; // «скоро»: видео ещё нет — ссылка не обязательна
+    x.yt = ytId(link); if (!x.yt && !(x.soon && !link)) h.fail(400, 'yt');
     x.vip = f.get('vip') === '1' ? 1 : 0;
   } else {
-    if (!okUrl(link)) h.fail(400, 'url');
+    x.soon = f.get('soon') === '1' ? 1 : 0; // «скоро»: книга ещё не вышла — ссылка не обязательна
+    if (link ? !okUrl(link) : !x.soon) h.fail(400, 'url');
     x.url = link; x.free = f.get('free') === '1' ? 1 : 0;
   }
   const t = {}; for (const l of LANGS) t[l] = cut(f.get('t_' + l), 120);
   const src = LANGS.find(l => t[l]) || '';
-  if (kind === 'book' && !src) h.fail(400, 'title');
+  if ((kind === 'book' || x.soon) && !src) h.fail(400, 'title');
   const need = LANGS.filter(l => !t[l]);
   if (src && need.length) {
     const r = await h.translate([t[src]], src, need).catch(() => ({ tr: {} }));
