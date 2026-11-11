@@ -42,6 +42,21 @@
     drawer.addEventListener('click', e => { if (e.target.closest('a')) { drawer.hidden = true; burger.setAttribute('aria-expanded', 'false'); burger.textContent = '☰'; } });
   }
 
+  // шапка не помещается (у вошедшей птички справа корзина, колокольчик, пуговки): сначала плотнее (.snug), если мало — меню в ☰ (.tight), v2-shell.css
+  const hd = document.querySelector('.hd2'), lgo = hd && hd.querySelector('.lg'), nv = hd && hd.querySelector('.nv'), hrr = hd && hd.querySelector('.hr');
+  if (hd && lgo && nv && hrr) {
+    const fit = () => {
+      hd.classList.remove('snug', 'tight');
+      if (getComputedStyle(nv).display === 'none') return;
+      const w = hd.querySelector('.w');
+      const over = () => lgo.getBoundingClientRect().right + 24 > nv.getBoundingClientRect().left || hrr.getBoundingClientRect().right > w.getBoundingClientRect().right - (parseFloat(getComputedStyle(w).paddingRight) || 0) + 1;
+      if (over()) { hd.classList.add('snug'); if (over()) { hd.classList.remove('snug'); hd.classList.add('tight'); } }
+    };
+    fit(); addEventListener('resize', fit); addEventListener('load', fit);
+    if (document.fonts) document.fonts.ready.then(fit);
+    new MutationObserver(fit).observe(hrr, { childList: true, subtree: true, characterData: true });
+  }
+
   // текущий раздел в шапке; метка pp_v2 — блог (/blog/) тоже показывается в новом стиле (worker/blog.js, ?v2=0 — снять)
   const here = location.pathname.replace(/^\/(ru|lv)\//, '/');
   document.querySelectorAll('.nv a, .drawer a').forEach(a => { const p = a.pathname.replace(/^\/(ru|lv)\//, '/'); if (p !== '/' && p !== '/preview/' && here.startsWith(p)) a.setAttribute('aria-current', 'page'); });
