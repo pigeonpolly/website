@@ -3,6 +3,10 @@
 // Сайт: GET /api/v2/guides → /learn/, /guides/, главная (site/assets/v2.js); VIP — ещё и в /api/v2/vip (кабинет ученика cabinet.js).
 // h: json, fail, needUser, currentUser, isAdmin, getMeta, setMeta, imgPut, imgDrop(id), randomHex, now, translate(texts, from, langs)
 const KEY = 'v2_guides', LANGS = ['en', 'ru', 'lv'], MAX = 200;
+// «✓ Просмотрено» у вошедшего — в профиле: users.yt_seen = id YouTube через запятую (последние SEEN_MAX); у гостя — в браузере (v2.js)
+export const GUIDES_ALTER = ["ALTER TABLE users ADD COLUMN yt_seen TEXT DEFAULT ''"];
+const SEEN_MAX = 500;
+const seenOf = u => String((u && u.yt_seen) || '').split(',').filter(s => /^[\w-]{11}$/.test(s));
 
 export const ytId = s => {
   s = String(s || '').trim();
@@ -40,7 +44,18 @@ export async function guidesApi(req, env, url, h) {
   if (p === '/api/v2/guides' && m === 'GET') {
     const u = await h.currentUser(req, env), open = !!(u && !u.banned);
     const items = (await withBase(h)).filter(x => !x.hidden).map(x => guideOut(x, open));
-    return h.json({ items, open: open ? 1 : 0 }, 200, { 'cache-control': 'no-store' });
+    return h.json({ items, open: open ? 1 : 0, ...(open ? { seen: seenOf(u) } : {}) }, 200, { 'cache-control': 'no-store' });
+  }
+  // отметить / снять «просмотрено»: {add: [id YouTube], del: [...]}; add — ещё и перенос отметок гостя после входа
+  if (p === '/api/v2/seen' && m === 'POST') {
+    const u = await h.needUser(req, env); if (u.banned) h.fail(403, 'banned');
+    const b = await req.json().catch(() => ({})), ok = a => (Array.isArray(a) ? a : []).map(String).filter(s => /^[\w-]{11}$/.test(s)).slice(0, SEEN_MAX);
+    const del = new Set(ok(b.del)), add = ok(b.add).filter(s => !del.has(s));
+    const set = new Set(seenOf(u).filter(s => !del.has(s) && !add.includes(s)));
+    for (const s of add) set.add(s);
+    const seen = [...set].slice(-SEEN_MAX);
+    await h.db.prepare('UPDATE users SET yt_seen = ? WHERE id = ?').bind(seen.join(','), u.id).run();
+    return h.json({ seen }, 200, { 'cache-control': 'no-store' });
   }
   if (p !== '/api/admin/guides') return null;
   const u = await h.needUser(req, env); if (!(await h.isAdmin(u, env))) h.fail(403, 'admin');

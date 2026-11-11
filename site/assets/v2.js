@@ -136,8 +136,15 @@
   const own = x => tOf(x) ? ' data-own="1"' : '';
   // страница видео /learn/v/<id>/ и «просмотрено» (localStorage pp-yt-seen — id YouTube; у каждого браузера свой)
   const vurl = x => `${pre}/learn/v/${encodeURIComponent(x.id)}/`;
+  // вошедшему — в профиле (/api/v2/seen, users.yt_seen), гостю — в браузере; после входа отметки гостя переезжают в профиль
   const SEEN = (() => { try { return new Set(JSON.parse(localStorage.getItem('pp-yt-seen') || '[]')); } catch (e) { return new Set(); } })();
-  const seenSave = () => { try { localStorage.setItem('pp-yt-seen', JSON.stringify([...SEEN].slice(-500))); } catch (e) {} };
+  let seenAcc = false;
+  const seenPost = b => fetch('/api/v2/seen', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify(b) }).catch(() => {});
+  const seenSet = (id, on) => {
+    if (on) SEEN.add(id); else SEEN.delete(id);
+    if (seenAcc) seenPost(on ? { add: [id] } : { del: [id] });
+    else try { localStorage.setItem('pp-yt-seen', JSON.stringify([...SEEN].slice(-500))); } catch (e) {}
+  };
   const isSeen = x => !!(x.yt && SEEN.has(x.yt));
   const W = { seen: ['✓ Watched', '✓ Просмотрено', '✓ Noskatīts'], mark: ['Mark as watched', 'Отметить как просмотренное', 'Atzīmēt kā noskatītu'],
     hide: ['Hide watched', 'Скрыть просмотренные', 'Paslēpt noskatītos'], vid: ['Video', 'Видео', 'Video'], nf: ['This video is not here any more.', 'Этого видео здесь больше нет.', 'Šī video šeit vairs nav.'],
@@ -145,6 +152,13 @@
     lockP: ['This is a VIP video. Sign in for free and it opens right here.', 'Это VIP-видео. Войдите бесплатно — и оно откроется прямо здесь.', 'Šis ir VIP video. Ienāc bez maksas, un tas atvērsies tepat.'],
     signin: ['Sign in for free', 'Войти бесплатно', 'Ienākt bez maksas'], yt: ['Open on YouTube', 'Открыть на YouTube', 'Atvērt YouTube'], play: ['Play the video', 'Включить видео', 'Atskaņot video'] };
   const guidesReady = fetch('/api/v2/guides', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null).then(d => {
+    if (d && Array.isArray(d.seen)) { // вошёл: отметки из профиля + перенос отметок гостя
+      seenAcc = true;
+      const local = [...SEEN].filter(id => !d.seen.includes(id));
+      SEEN.clear(); d.seen.forEach(id => SEEN.add(id)); local.forEach(id => SEEN.add(id));
+      if (local.length) seenPost({ add: local });
+      try { localStorage.removeItem('pp-yt-seen'); } catch (e) {}
+    }
     const items = (d && d.items) || [], vids = items.filter(x => x.kind === 'video'), free = vids.filter(x => !x.vip), vip = vids.filter(x => x.vip), books = items.filter(x => x.kind === 'book');
     const ytCard = x => `<a class="vc yt" href="https://youtu.be/${esc(x.yt)}" data-yt="${esc(x.yt)}"${own(x)} target="_blank" rel="noopener"><span class="th"><img src="${esc(x.cover)}" alt="${esc(tOf(x))}" loading="lazy"><span class="bd">${G.free[L]}</span><span class="pl" aria-hidden="true">▶</span></span><span class="tx"><b>${esc(tOf(x) || G.vidT[L])}</b><small>${G.vid[L]}</small><span class="go">${G.watch[L]}</span></span></a>`;
     // /learn/: каталог всех уроков с фильтрами; VIP гостю — размыто и с замочком, вошедшему — открыто
@@ -224,8 +238,8 @@
           + note + (desc ? `<div class="wv-d">${desc}</div>` : '') + '</div>';
         const tx = wm.querySelector('.wv-tx'); if (tx.dataset.ytn) ytName(tx);
         const sb = wm.querySelector('.wv-seen');
-        const mark = on => { if (on) SEEN.add(x.yt); else SEEN.delete(x.yt); seenSave(); if (sb) { sb.setAttribute('aria-pressed', on ? 'true' : 'false'); sb.textContent = on ? W.seen[L] : W.mark[L]; } };
-        if (sb) { mark(isSeen(x)); sb.addEventListener('click', () => mark(!isSeen(x))); }
+        const mark = (on, save) => { if (save !== false) seenSet(x.yt, on); if (sb) { sb.setAttribute('aria-pressed', on ? 'true' : 'false'); sb.textContent = on ? W.seen[L] : W.mark[L]; } };
+        if (sb) { mark(isSeen(x), false); sb.addEventListener('click', () => mark(!isSeen(x))); }
         const pb = wm.querySelector('button.wv-pl');
         if (pb) pb.addEventListener('click', () => {
           const fr = document.createElement('div'); fr.className = 'wv-pl on';
