@@ -125,7 +125,7 @@
     watch: ['Watch →', 'Смотреть →', 'Skatīties →'], lock: ['Sign in to watch', 'Войдите, чтобы смотреть', 'Ienāc, lai skatītos'], signin: ['Sign in →', 'Войти →', 'Ienākt →'],
     pdf: ['Free PDF', 'Бесплатный PDF', 'Bezmaksas PDF'], dl: ['Download free →', 'Скачать бесплатно →', 'Lejupielādēt bez maksas →'],
     amz: ['Paperback &amp; Kindle', 'Бумажная и Kindle', 'Drukāta un Kindle'], onAmz: ['On Amazon →', 'На Amazon →', 'Amazon →'],
-    guide: ['Guide', 'Гайд', 'Ceļvedis'], vipOpen: ['VIP lesson · open for you', 'VIP-урок · открыт для тебя', 'VIP nodarbība · atvērta tev'],
+    guide: ['Book', 'Книга', 'Grāmata'], vipOpen: ['VIP lesson · open for you', 'VIP-урок · открыт для тебя', 'VIP nodarbība · atvērta tev'],
     all: ['All', 'Все', 'Visas'], freeF: ['Free', 'Бесплатные', 'Bezmaksas'], fl: ['Filter lessons', 'Фильтр уроков', 'Filtrēt nodarbības'],
     allOpen: ['🔓 Everything is open for you', '🔓 Тебе открыто всё', '🔓 Tev atvērts viss'],
     vipN: [n => `${n} VIP ${n === 1 ? 'lesson opens' : 'lessons open'} after a free sign-in`, n => `VIP-уроков: ${n} — откроются после бесплатного входа`, n => `VIP nodarbības: ${n} — atvērsies pēc bezmaksas ienākšanas`],

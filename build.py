@@ -81,7 +81,7 @@ PAGES = [
      "Color palettes from Pigeon Polly watercolors and sketchbook pages: six colors with HEX codes from every artwork. Copy a color, pick a palette and draw."),
     ("learn", "Lessons", "preview-learn.html",
      "Watercolour and ink lessons by Alina Otkinska: free videos open to everyone and extra video lessons for signed-in visitors."),
-    ("guides", "Guides & books", "preview-guides.html",
+    ("guides", "Books", "preview-guides.html",
      "Creative guides and books by artist Alina Otkinska: ink and watercolour sketching, a free colouring book, palettes and little drawing guides."),
     ("about", "About Alina", "preview-about.html",
      "Alina Otkinska: learning experience designer and artist from Riga, the human behind Pigeon Polly."),

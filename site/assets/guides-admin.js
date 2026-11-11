@@ -1,9 +1,9 @@
-// Кабинет → «🎬 Видео и гайды» (admin.js открывает PPGuidesAdmin.mount(main)): добавить видеоурок YouTube (бесплатный или VIP)
+// Кабинет → «🎬 Видео и книги» (admin.js открывает PPGuidesAdmin.mount(main)): добавить видеоурок YouTube (бесплатный или VIP)
 // или гайд/книгу (ссылка + обложка). Сервер — worker/guides.js (/api/admin/guides), на сайте — v2.js и cabinet.js (/api/v2/guides).
 (function () {
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const ERR = { yt: 'Не похоже на ссылку YouTube — скопируйте адрес видео (youtu.be/… или youtube.com/watch?v=…).', url: 'Нужна ссылка, которая начинается с https://',
-    title: 'Напишите название гайда.', cover: 'Добавьте обложку гайда (картинку).', img: 'Картинка слишком большая — до 3 МБ.', admin: 'Нужно войти как админ.' };
+    title: 'Напишите название книги.', cover: 'Добавьте обложку книги (картинку).', img: 'Картинка слишком большая — до 3 МБ.', admin: 'Нужно войти как админ.' };
   const api = async fd => {
     const r = await fetch('/api/admin/guides', fd ? { method: 'POST', credentials: 'same-origin', body: fd } : { credentials: 'same-origin' });
     const d = await r.json().catch(() => ({}));
@@ -24,12 +24,12 @@
 
   function form(box, x, done) {
     const kind = x ? x.kind : box.dataset.kind, v = kind === 'video', t = (x && x.t) || {};
-    box.innerHTML = `<section class="adm-box"><h2>${x ? '✏️ Править' : v ? '🎬 Новое видео' : '📘 Новый гайд или книга'}</h2>
-      <p><label>${v ? 'Ссылка на видео YouTube' : 'Ссылка, куда ведёт гайд (Amazon, Google Drive, статья…)'}<br>
+    box.innerHTML = `<section class="adm-box"><h2>${x ? '✏️ Править' : v ? '🎬 Новое видео' : '📘 Новая книга'}</h2>
+      <p><label>${v ? 'Ссылка на видео YouTube' : 'Ссылка на книгу (Amazon, Google Drive…)'}<br>
         <input ${inp} class="be-input gd-url" value="${esc(x ? (v ? 'https://youtu.be/' + x.yt : x.url) : '')}" placeholder="${v ? 'https://youtu.be/…' : 'https://…'}"></label></p>
       ${v ? `<p class="adm-quick"><label><input type="radio" name="gd-vip" value="0"${x && x.vip ? '' : ' checked'}> Бесплатное — видят все</label>
         <label><input type="radio" name="gd-vip" value="1"${x && x.vip ? ' checked' : ''}> VIP — только тем, кто вошёл</label></p>`
-        : `<p><label><input type="checkbox" class="gd-free"${x && x.free ? ' checked' : ''}> Бесплатный (PDF и т. п.)</label></p>`}
+        : `<p><label><input type="checkbox" class="gd-free"${x && x.free ? ' checked' : ''}> Бесплатная (PDF и т. п.)</label></p>`}
       <p class="be-note">Название — хотя бы на одном языке, остальные переведутся сами.${v ? ' Можно пусто — возьмётся название с YouTube.' : ''}</p>
       ${L3.map(([l, n]) => `<p><label>${n}<br><input ${inp} class="be-input gd-t" data-l="${l}" maxlength="120" value="${esc(t[l] || '')}"></label></p>`).join('')}
       <p><label>${v ? 'Своя обложка (можно пусто — возьмётся кадр с YouTube)' : 'Обложка'}<br><input type="file" accept="image/*" class="gd-pic"></label></p>
@@ -58,7 +58,7 @@
     box.innerHTML = items.map((x, i) => `<div class="adm-box" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap${x.hidden ? ';opacity:.5' : ''}">
       <img src="${esc(x.cover)}" alt="" style="width:96px;height:64px;object-fit:cover;border-radius:8px;background:#eee">
       <div style="flex:1;min-width:180px"><b>${esc((x.t && (x.t.ru || x.t.en)) || 'Название с YouTube')}</b><br>
-        <small class="be-note">${x.kind === 'video' ? (x.vip ? '🔒 VIP-видео' : '🎬 Бесплатное видео') : x.free ? '📘 Бесплатный гайд' : '📘 Гайд / книга'}${x.hidden ? ' · скрыто' : ''} ·
+        <small class="be-note">${x.kind === 'video' ? (x.vip ? '🔒 VIP-видео' : '🎬 Бесплатное видео') : x.free ? '📘 Бесплатная книга' : '📘 Книга'}${x.hidden ? ' · скрыто' : ''} ·
         <a href="${esc(x.kind === 'video' ? 'https://youtu.be/' + x.yt : x.url)}" target="_blank" rel="noopener">ссылка</a></small></div>
       <div class="adm-quick" style="margin:0">
         <button type="button" class="pill-btn" data-a="up" data-i="${i}" title="Выше"${i ? '' : ' disabled'}>↑</button>
@@ -77,8 +77,8 @@
 
   async function mount(main) {
     main.innerHTML = `<section class="adm-box"><h2>➕ Добавить</h2>
-        <p class="be-note">Новое встаёт первым. Бесплатные видео — на «Уроках» и на главной, VIP — в «VIP-уроках» (гостю — замочек и «Войти»), гайды — на полке «Гайды» и на главной. Всё это — и в кабинете ученика.</p>
-        <div class="adm-quick"><button type="button" class="pill-btn pill-fill" data-k="video">🎬 Видео с YouTube</button><button type="button" class="pill-btn pill-fill" data-k="book">📘 Гайд или книга</button></div>
+        <p class="be-note">Новое встаёт первым. Бесплатные видео — на «Уроках» и на главной, VIP — в «VIP-уроках» (гостю — замочек и «Войти»), книги — на полке «Книги» и на главной. Всё это — и в кабинете ученика.</p>
+        <div class="adm-quick"><button type="button" class="pill-btn pill-fill" data-k="video">🎬 Видео с YouTube</button><button type="button" class="pill-btn pill-fill" data-k="book">📘 Книга</button></div>
         <p class="be-note gd-done" aria-live="polite"></p></section>
       <div class="gd-form"></div><h3>На сайте</h3><div class="gd-list"><p class="be-note">Загрузка…</p></div>`;
     const fbox = main.querySelector('.gd-form'), lbox = main.querySelector('.gd-list'), done = main.querySelector('.gd-done');
