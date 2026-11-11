@@ -99,3 +99,5 @@ html[data-season=summer] body.v2s:has(.wl-map){--wlbg:#2F2622}
 html[data-season=winter]{--pp-ink:#26303A;--pp-deep:#19212A;--pp-card:#313C47;--pp-2:#4C5A68;--pp-acc:#E2544A}
 html[data-season=spring]{--pp-ink:#26302B;--pp-deep:#19211D;--pp-card:#313C36;--pp-2:#4B5A51;--pp-acc:#E85C64}
 html[data-season=summer]{--pp-ink:#2F2622;--pp-deep:#201A17;--pp-card:#3B312C;--pp-2:#5E4E45;--pp-acc:#7CC6E6}
+
+.ft2.has-ground{position:relative;padding-bottom:64px}
