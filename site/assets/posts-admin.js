@@ -25,7 +25,7 @@
   async function load() {
     if (data) return data;
     for (const s of ['/assets/challenge-data.js', '/assets/extra-palettes.js', '/api/extra-palettes.js', '/assets/challenge-theme.js']) await script(s);
-    const [pal, tc, logo] = await Promise.all([fetch('/assets/palettes.json').then(r => r.json()).catch(() => []), fetch('/assets/titos-cases.json').then(r => r.json()).catch(() => ({ cases: [] })), img('/assets/logo.png?v=2')]);
+    const [pal, tc, logo] = await Promise.all([fetch('/assets/palettes.json').then(r => r.json()).catch(() => []), fetch('/assets/titos-cases.json').then(r => r.json()).catch(() => ({ cases: [] })), img('/assets/logo.png?v=3')]);
     const titles = {};
     for (const l of LANGS) titles[l] = await fetch('/api/titos?lang=' + l, { credentials: 'same-origin' }).then(r => r.json()).then(d => Object.fromEntries((d.cases || []).map(c => [c.n, c.title]))).catch(() => ({}));
     data = { pal: pal.filter(p => p.thumb && p.colors && p.colors.length), cases: (tc.cases || []).filter(c => (c.scenes || []).some(s => s.img)), titles, logo };
