@@ -26,6 +26,7 @@ import { artpillApi, artpillDrop, artpillExport, ARTPILL_TABLES } from './artpil
 import { schoolApi, schoolNews, schoolCron, SCHOOL_TABLES, SCHOOL_ALTER, SCHOOL_RULES, SCHOOL_RANGE, SCHOOL_INT } from './school.js'; // «Школа Полли»: сдача работ и проверка (docs/challenge.md)
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
 import { gardenApi, gardenDrop, gardenNews, GARDEN_TABLES, GARDEN_ALTER, GARDEN_RULES, GARDEN_RANGE, GARDEN_INT, GARDEN_BOOL, GARDEN_SEASONS } from './garden.js'; // огород птички (этап 22, docs/bird.md «Огород»)
+import { pauseGate, pauseApi } from './pause.js'; // ⏸ пауза сайта: «Ведутся работы» для всех, кроме админа (docs/admin.md)
 import { weekApi, outClick, WEEK_TABLES } from './week.js'; // кабинет → «🗓 Неделя» и переходы на Amazon (docs/admin.md)
 import { ideasApi } from './ideas.js';
 import { guidesApi, guidesList, guideOut } from './guides.js'; // кабинет → «🎬 Видео и гайды», /api/v2/guides (docs/admin.md) // кабинет → «💡 Темы для блога» (docs/admin.md)
@@ -47,7 +48,10 @@ export default {
     const url = new URL(req.url);
     const p = url.pathname;
     if (!p.startsWith('/api/')) { // страницы: при сбое — своя страница «500 · что-то сломалось» вместо голой ошибки Cloudflare
-      try { return await pageFetch(req, env, url, p); } catch (e) { console.error(e); return errorPage(env, url, 500); }
+      try {
+        const run = () => pageFetch(req, env, url, p);
+        return (await pauseGate(req, env, url, { currentUser, isAdmin, errorPage }, run)) || await run();
+      } catch (e) { console.error(e); return errorPage(env, url, 500); }
     }
     if (!env.DB || !env.IMAGES || !env.GOOGLE_CLIENT_ID) return json({ ready: false }, 503);
     try {
@@ -146,8 +150,9 @@ export async function errorPage(env, url, code) {
     try { const r = await env.ASSETS.fetch(new Request(u)); if (r.ok) { text = await r.text(); break; } } catch (e) { /* нет файла */ }
   }
   const h = { 'content-type': text ? 'text/html; charset=utf-8' : 'text/plain; charset=utf-8', 'cache-control': 'no-store' };
-  if (code === 503) h['retry-after'] = '120';
-  return new Response(text || (code === 404 ? 'Not found' : code === 503 ? 'Short break — try again in a few minutes' : 'Something broke — try again in a minute'), { status: code, headers: h });
+  const status = Number(code) || 503; // 'pause' — ⏸ пауза сайта, тоже 503
+  if (status === 503) h['retry-after'] = code === 'pause' ? '1800' : '120';
+  return new Response(text || (code === 404 ? 'Not found' : code === 503 ? 'Short break — try again in a few minutes' : 'Something broke — try again in a minute'), { status, headers: h });
 }
 
 async function sitePage(req, env, url) {
@@ -1571,6 +1576,7 @@ async function route(req, env, url) {
   if (p === '/api/school' || p.startsWith('/api/school/') || p === '/api/admin/school' || p === '/api/admin/school/check') { const r = await schoolApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is a short friendly comment from an art teacher (Polly, a pigeon) on a student\'s drawing made on paper. Keep it warm, simple and encouraging.') }); if (r) return r; }
   if (p === '/api/games/mine' || p === '/api/games/visit') { const r = await myGamesApi(req, env, url, { json, fail, currentUser, needUser }); if (r) return r; }
   if (p === '/api/about-chat' || p.startsWith('/api/about-chat/') || p === '/api/admin/about-asks') { const r = await aboutChatApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), asset: path => env.ASSETS.fetch(new Request(new URL(path, url.origin))).then(r => r.ok ? r.json() : null), ipKey: async r => { let salt = await getMeta(env, 'blog_salt'); if (!salt) { salt = randomHex(16); await setMeta(env, 'blog_salt', salt); } return (await sha256(salt + (r.headers.get('cf-connecting-ip') || '0'))).slice(0, 24); }, translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The strings are a question a visitor asked in a cosy retro chat on an artist\'s website, or the answer of the artist Alina or of her character Polly, a dramatic, funny pigeon from the island of Wobbleland. Keep the casual, playful tone; keep names (Alina, Polly, Milka, Wobbleland) as they are.') }); if (r) return r; }
+  if (m === 'POST' && p === '/api/admin/pause') return pauseApi(req, env, { json, fail, needUser, isAdmin, now });
   if (p === '/api/admin/week') { const r = await weekApi(req, env, url, { json, fail, needUser, isAdmin, getMeta, now }); if (r) return r; }
   if (p === '/api/shift' || p.startsWith('/api/shift/')) { const r = await shiftApi(req, env, url, { json, fail, currentUser, needUser, rules: () => RULES, randomHex, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p.startsWith('/api/titos') || p.startsWith('/api/admin/titos')) { const r = await titosApi(req, env, url, titosHelpers(env)); if (r) return r; }

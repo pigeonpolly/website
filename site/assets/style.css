@@ -5645,3 +5645,9 @@ a.wk-num.wk-n-link:hover, a.wk-num.wk-n-link:focus-visible { border-color: #D964
   .err-page { grid-template-columns: 1fr; gap: 26px; padding: 28px 16px 56px; }
   .err-art img { transform: none; }
 }
+
+/* ⏸ пауза сайта на «Неделе» (worker/pause.js) */
+.wk-pause { display: flex; flex-wrap: wrap; align-items: center; gap: 10px 12px; margin: 0 0 18px; padding: 12px 16px; border: 1px solid #E8E4E2; border-radius: 12px; background: #fff; font: 400 14px/1.4 var(--sans); color: #59524D; }
+.wk-pause span { flex: 1 1 320px; }
+.wk-pause.on { border: 2px solid #D9643A; background: #FFF4EC; color: #272421; }
+.wk-pause.on b { color: #C2502A; }

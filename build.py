@@ -755,7 +755,7 @@ def build():
         (OUT / "assets" / f"search-{lang}.json").write_text(json.dumps(entries, ensure_ascii=False, separators=(",", ":")))
     # 404
     # страницы ошибок на 3 языках: /404.html, /ru/404.html… (Cloudflare берёт ближайший 404.html); 500 и 503 отдаёт worker (errorPage в worker/index.js)
-    for code, title in (("404", "Page not found"), ("500", "Something broke"), ("503", "Short break")):
+    for code, title in (("404", "Page not found"), ("500", "Something broke"), ("503", "Short break"), ("pause", "Work in progress")):  # pause — ⏸ пауза сайта (worker/pause.js)
         for lang, prefix in LANGS.items():
             nf = v2_page(layout_v2_lab, title + " · Pigeon Polly Art Lab", "", SITE_URL + "/", True, (SRC / "pages" / f"{code}.html").read_text())
             nf = v2_urls(localize(nf, lang)).replace("{{hreflang}}", "").replace("{{lang_dd}}", "").replace("{{lang_switch}}", "").replace("{{lang}}", lang)

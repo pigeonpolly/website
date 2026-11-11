@@ -185,11 +185,21 @@
     const more = Object.entries(ADMIN_GROUPS).map(([g, name]) => `<div><b>${name}</b>${inGroup(g).map(x => `<a href="${x.href || '#' + x.id}"${x.href ? ' class="adm-ext"' : ''}>${x.ic} ${x.name}${x.href ? ' ↗' : ''}</a>`).join('')}</div>`).join('');
     main.innerHTML = `<div class="adm-week">
       <header class="wk-hi"><h2>${hello()}, Алина</h2><p>Неделя ${isoWeek()} · всё, что нужно на неделе, — на одном экране</p></header>
+      <div class="wk-pause${d.pause && d.pause.on ? ' on' : ''}">${d.pause && d.pause.on
+        ? `<span><b>⏸ Сайт на паузе</b>${d.pause.at ? ' с ' + wkDay(d.pause.at) : ''}. Посетители видят «🎨 Ведутся работы», вы ходите по сайту как обычно.</span><a class="pill-btn" href="/pause" target="_blank">👀 Как это видят</a><button class="pill-btn pill-fill" type="button" id="wk-pause" data-on="0">▶ Включить сайт</button>`
+        : `<span>Сайт работает. Пауза — для всех, кроме вас, вместо страниц будет «🎨 Ведутся работы, скоро всё будет отлично».</span><a class="pill-btn" href="/pause" target="_blank">👀 Как это выглядит</a><button class="pill-btn" type="button" id="wk-pause" data-on="1">⏸ Поставить на паузу</button>`}</div>
       <div class="wk-nums">${nums.map(([v, t, dl, c, href]) => { const tag = href ? 'a' : 'div'; return `<${tag}${href ? ` href="${href}" title="Открыть список птичек"` : ''} class="wk-num${c ? ' ' + c : ''}"><b>${n(v)}</b><span>${t}</span>${dl}</${tag}>`; }).join('')}</div>
       <div class="wk-acts">${acts.map(a => `<section class="wk-act${a.hot ? ' wk-hot' : ''}"><span class="wk-e" aria-hidden="true">${a.ic}</span><h3>${a.t}${a.badge ? `<span class="wk-badge">${a.badge}</span>` : ''}</h3><p>${a.d}</p><div class="wk-btns">${a.btn}</div></section>`).join('')}</div>
       <details class="wk-more"><summary>⚙ Ещё инструменты</summary><div class="wk-cols">${more}</div></details>
       <p class="be-note wk-foot">Цифры — за последние 7 дней (${esc(d.from.slice(8))}.${esc(d.from.slice(5, 7))}–${esc(d.to.slice(8))}.${esc(d.to.slice(5, 7))}), сравнение — с 7 днями до них. Подробно — 📊 Статистика → <a href="#visitors">Посетители</a>.</p>
     </div>`;
+    // ⏸ пауза сайта (worker/pause.js): для посетителей — страница «Ведутся работы», админа пускает
+    main.querySelector('#wk-pause').onclick = async e => {
+      const on = e.target.dataset.on === '1';
+      if (!confirm(on ? 'Поставить сайт на паузу?\nВсе посетители увидят «Ведутся работы». Вас сайт пускает как обычно.' : 'Включить сайт для всех?')) return;
+      e.target.disabled = true;
+      try { await api('admin/pause', { on }); week(); } catch (x) { e.target.disabled = false; alert(err(x)); }
+    };
     main.querySelector('#wk-restock').onclick = async e => {
       if (!confirm('Пополнить магазин: все закончившиеся вещи (кроме легендарных) — снова в продажу?')) return;
       e.target.disabled = true;

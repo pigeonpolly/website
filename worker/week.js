@@ -32,6 +32,7 @@ export async function weekApi(req, env, url, h) {
   const pair = async (sql, a, b, c, d) => { const [now, prev] = await Promise.all([one(sql, a, b), one(sql, c, d)]); return { now, prev }; };
   const wk = 7 * 86400;
   // все запросы — разом, а не по очереди (раньше кабинет открывался по 2–3 с)
+  const pauseRaw = await Promise.all([h.getMeta(env, 'site_pause'), h.getMeta(env, 'site_pause_at')]).catch(() => [null, null]);
   const [people, shop, amazon, buys, subsT, subsN, subsP, birdsN, birdsP, salary, restockRaw, amazonFirst, birdsT, online] = await Promise.all([
     // люди — уникальные за сутки, как в «👥 Посетителях»
     pair('SELECT COUNT(DISTINCT day || vid) AS n FROM visits WHERE day >= ? AND day <= ?', d0, today, p0, p1),
@@ -51,5 +52,5 @@ export async function weekApi(req, env, url, h) {
   ]);
   const subs = { total: subsT, now: subsN, prev: subsP }, birds = { now: birdsN, prev: birdsP, total: birdsT };
   let restock = null; try { restock = JSON.parse(restockRaw); } catch (e) { /* не пополняли */ }
-  return h.json({ from: d0, to: today, people, shop, amazon, amazonFirst, buys, subs, birds, salary, restock, online }, 200, { 'cache-control': 'no-store' });
+  return h.json({ from: d0, to: today, people, shop, amazon, amazonFirst, buys, subs, birds, salary, restock, online, pause: { on: pauseRaw[0] === '1', at: Number(pauseRaw[1]) || 0 } }, 200, { 'cache-control': 'no-store' });
 }

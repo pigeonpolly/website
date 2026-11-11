@@ -265,3 +265,5 @@ _Сюда следующие этапы дописывают общие свед
 - Редизайн 2.0, старая страница в новой шапке: src/layout-v2-lab.html + site/assets/v2-shell.css (build.py `V2_LAB`: путь → исходная страница).
 - tools/v2_acct_css.py → site/assets/v2-acct.css: стили кнопок шапки (вход, меню аватара, 🔔, 🛒, поиск) из style.css для новых страниц.
 - Видео и гайды без пересборки: worker/guides.js (`guidesApi`, `guidesList`, `guideOut`, `ytId` — id из любой ссылки YouTube), meta `v2_guides`; кабинет — guides-admin.js; сайт — v2.js (`G`, `ytName`, `guidesReady`).
+
+- worker/pause.js — ⏸ пауза сайта: `pauseOn(env)`, `pauseGate` (страницы), `POST /api/admin/pause`.
