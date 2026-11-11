@@ -40,15 +40,19 @@
     b: ['.....o.o......', '....oo.oo.....'],
     fly: ['..............', '..............'],
   };
+  // 23 января (день рождения Полли; проверка ?bday): праздничный колпак над головой и прыжок из тортика
+  const BDAY = location.search.includes('bday') || (() => { const d = new Date(); return d.getMonth() === 0 && d.getDate() === 23; })();
+  const HAT = ['.......y......', '......rr......', '......prr.....', '.....rrpr.....'];
+  const TOP = BDAY ? HAT.length : 0;
   const CLOSED_EYE = row => row.replace('wwb', 'bbb').replace('wkb', 'ddb');
-  const COL = { d: '#1a1528', b: '#7f81bf', s: '#5e5a9c', w: '#ffffff', k: '#1a1528', o: '#f2a73b' };
+  const COL = { d: '#1a1528', b: '#7f81bf', s: '#5e5a9c', w: '#ffffff', k: '#1a1528', o: '#f2a73b', r: '#E5484D', p: '#F6C445', y: '#FFFFFF' };
   const PX = innerWidth < 600 ? 3 : 4;
-  const W = 14 * PX, H = 14 * PX;
+  const W = 14 * PX, H = (14 + TOP) * PX;
   const makeFrame = (legs, closed) => {
     const c = document.createElement('canvas');
     c.width = W; c.height = H;
     const g = c.getContext('2d');
-    const rows = (closed ? BODY.map((r, i) => (i === 2 || i === 3 ? CLOSED_EYE(r) : r)) : BODY).concat(legs);
+    const rows = (BDAY ? HAT : []).concat(closed ? BODY.map((r, i) => (i === 2 || i === 3 ? CLOSED_EYE(r) : r)) : BODY, legs);
     rows.forEach((r, y) => [...r].forEach((ch, x) => { if (COL[ch]) { g.fillStyle = COL[ch]; g.fillRect(x * PX, y * PX, PX, PX); } }));
     return c;
   };
@@ -170,7 +174,8 @@
   // ---------- сезонные вещи в подвале страницы ----------
   const SEASON = (() => {
     const q = (location.search.match(/[?&]season=(\w+)/) || [])[1]; if (q) return q;
-    const m = new Date().getMonth();
+    const m = new Date().getMonth(), ds = document.documentElement.dataset.season; // новый дизайн: сезон из переключателя в шапке
+    if (ds) return ds === 'autumn' && m === 9 ? 'october' : ds;
     return m === 9 ? 'october' : m >= 8 && m <= 10 ? 'autumn' : m === 11 || m <= 1 ? 'winter' : m <= 4 ? 'spring' : 'summer';
   })();
   const sprite = (rows, pal) => {
@@ -199,10 +204,12 @@
       { o: '#E8812E', O: '#C9621C', g: '#4E7A2E', k: Math.random() < .5 ? '#3A1E0E' : '#E8812E' }),
     snowball: () => sprite(['.wwww.', 'wwwwww', 'wwwwbw', 'wwwbbw', '.wbbb.'], { w: '#F4F7FB', b: '#C9D6E6' }),
     icecream: () => { const c = pick(['#F7A8C4', '#A8E6CF', '#F5E6A8', '#8B5A3C']); return sprite(['.ppp.', 'ppppp', 'pphpp', 'ccccc', '.cCc.', '.cCc.', '..c..'], { p: c, h: '#FFFFFF', c: '#D9A45B', C: '#B98236' }); },
+    cake: () => sprite(['...f..f..f...', '...c..c..c...', '...c..c..c...', '.wwwwwwwwwww.', 'wwrwwwwwrwwww', 'wpppwpppwpppw', 'ppppppppppppp', 'pPpPpPpPpPpPp',
+      'kkkkkkkkkkkkk', 'ppppppppppppp', 'PPPPPPPPPPPPP'], { f: '#F6C445', c: '#93AFCC', w: '#FFF8F0', r: '#E5484D', p: '#F2A7B8', P: '#D9788F', k: '#8B5A3C' }),
     flower: () => { const c = pick(['#F28AB2', '#F6C445', '#B79CF2', '#F47C5B', '#FFFFFF']); return sprite(['.p.', 'pyp', '.p.', '.s.', 'ss.', '.s.'], { p: c, y: '#F6D04D', s: '#5E9E45' }); },
   };
   // вещи лежат на дне подвала (.polly-ground, прокручиваются со страницей); когда Полли их несёт или катит — «свободные» (position: fixed)
-  const foot = document.querySelector('.site-footer'), GOFF = 6, props = [];
+  const foot = document.querySelector('.site-footer, .ft2'), GOFF = 6, props = [];
   let ground = null;
   const gRect = () => ground.getBoundingClientRect();
   const gY = () => gRect().bottom - GOFF; // линия земли подвала в координатах экрана
@@ -325,15 +332,21 @@
   const HOME_X = 16;
   // уголок: сезонная вещица лежит рядом с Полли (справа, на «полу» экрана), и Полли играет с ней, не сходя с места
   const CORNER = (() => {
-    const mk = SEASON === 'october' ? (Math.random() < .5 ? SPR.pumpkin() : dome(14, 5, LEAF_C)) : SEASON === 'autumn' ? dome(14, 5, LEAF_C)
+    const mk = BDAY ? SPR.cake() : SEASON === 'october' ? (Math.random() < .5 ? SPR.pumpkin() : dome(14, 5, LEAF_C)) : SEASON === 'autumn' ? dome(14, 5, LEAF_C)
       : SEASON === 'winter' ? dome(14, 5, ['#F4F7FB', '#E6EEF7', '#FFFFFF', '#D3DFEC']) : SEASON === 'summer' ? (Math.random() < .5 ? SPR.icecream() : SPR.flower()) : null;
     if (!mk) return null;
     mk.className = 'polly-prop free'; mk.setAttribute('aria-hidden', 'true'); document.body.appendChild(mk);
     return { el: mk, w: mk.width, h: mk.height, free: true, x: 0, y: 0 };
   })();
   const cornerPlace = () => { if (!CORNER) return; CORNER.x = HOME_X + W + 2; CORNER.y = innerHeight - 8 - CORNER.h; putProp(CORNER); };
+  const PARTY = ['#E5484D', '#F6C445', '#93AFCC', '#F2A7B8', '#7f81bf', '#FFFFFF'];
   async function cornerPlay() {
     const cx = HOME_X + W + 2, top = innerHeight - 8;
+    if (BDAY) { // клюёт тортик — крошки и конфетти
+      face(1); CORNER.el.classList.add('wiggle'); await peck(2);
+      burst(cx + CORNER.w / 2, top - CORNER.h + 2, PARTY, 10, .8);
+      await wait(400); CORNER.el.classList.remove('wiggle'); return;
+    }
     if (SEASON === 'spring') { // лепестки сыплются сверху, Полли хлопает крыльями
       for (let i = 0; i < 8; i++) petal(HOME_X + Math.random() * (W + 30), top - H - 60 - Math.random() * 40);
       for (let i = 0; i < 4; i++) { body.classList.add('flap'); await wait(160); body.classList.remove('flap'); await wait(160); }
@@ -360,6 +373,7 @@
     cornerPlace();
     const roll = Math.random();
     if (roll < 0.35 && (CORNER || SEASON === 'spring')) await cornerPlay();
+    else if (BDAY && roll < 0.42) await say(pick(BDAY_SAY));
     else if (roll < 0.5) await peck(1 + Math.floor(Math.random() * 3));
     else if (roll < 0.7) { face(-dir); await wait(700); face(-dir); }
     else if (roll < 0.8) await sleep();
@@ -446,6 +460,32 @@
     },
   };
 
+  const BDAY_SAY = { ru: ['У меня день рождения!', 'Кто съел свечку?', 'Торт — это тоже искусство.'],
+    lv: ['Man šodien dzimšanas diena!', 'Kurš apēda svecīti?', 'Torte arī ir māksla.'] }[lang] || ['It’s my birthday!', 'Who ate the candle?', 'Cake is art too.'];
+  // день рождения: Полли выпрыгивает из тортика (один раз за заход на сайт, дальше просто сидит в колпаке)
+  async function cakeJump() {
+    let seen = false;
+    try { seen = sessionStorage.getItem('pp-bday-jump') === '1'; sessionStorage.setItem('pp-bday-jump', '1'); } catch (e) {}
+    if (seen || reduce || location.search.includes('bday=0')) return;
+    busy = true; token++;
+    const cake = CORNER, top = innerHeight - 8 - cake.h;
+    // всё, что ниже верха тортика, срезано — Полли «вылезает» из него
+    const clip = () => { pet.style.clipPath = `inset(0 0 ${Math.max(0, Math.min(H, Math.ceil(y + H - top - 2 * PX)))}px 0)`; };
+    x = cake.x + cake.w / 2 - W / 2; y = top + 2 * PX; clip(); place(); face(1);
+    await wait(900);
+    for (let i = 0; i < 3; i++) { cake.el.classList.add('wiggle'); await wait(260); cake.el.classList.remove('wiggle'); await wait(160); }
+    burst(cake.x + cake.w / 2, top, PARTY, 22, 1.4);
+    const x0 = x, y0 = y, up = top - H - 40 * PX / 4;
+    show('fly');
+    await frameLoop(420, k => { y = y0 + (up - y0) * (1 - (1 - k) * (1 - k)); body.classList.toggle('flap', Math.floor(k * 10) % 2 === 0); clip(); place(); });
+    pet.style.clipPath = '';
+    face(-1);
+    await frameLoop(560, k => { x = x0 + (HOME_X - x0) * k; y = up + (floorY() - up) * k * k; body.classList.toggle('flap', Math.floor(k * 12) % 2 === 0); place(); });
+    body.classList.remove('flap'); show('a'); x = HOME_X; y = floorY(); place(); face(1);
+    busy = false;
+    await say(BDAY_SAY[0], 3200);
+  }
+
   x = HOME_X; y = floorY(); place(); cornerPlace();
-  life();
+  (BDAY && CORNER ? cakeJump() : Promise.resolve()).then(life);
 })();

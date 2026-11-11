@@ -1,0 +1,96 @@
+<!doctype html><html lang="ru"><head><meta charset="utf-8">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,wght@0,300;0,600;1,300&family=Karla:wght@400;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#F4F0EA;--sheet:#FBF9F5;--ink:#2A211C;--mut:#6C6058;--line:#DED5CA;--acc:#9E1B22;--gr:#2E2521}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:15px/1.5 Karla,sans-serif;padding:36px 40px}
+h1{font:600 34px Fraunces,serif;margin:0 0 4px}h1 i{font-weight:300;color:var(--acc)}
+.sub{color:var(--mut);margin:0 0 26px}
+.now{display:flex;align-items:center;gap:14px;color:var(--mut);margin-bottom:22px}
+.now canvas{image-rendering:pixelated;width:56px;height:56px}
+.row{display:grid;grid-template-columns:repeat(3,1fr);gap:22px}
+.card{display:flex;flex-direction:column;background:var(--sheet);border:1px solid var(--line);border-radius:6px;overflow:hidden}
+.big{height:270px;display:grid;place-items:center;border-bottom:1px solid var(--line)}
+.big svg,.big img{width:230px;height:230px}
+.t{padding:16px 20px 6px;flex:1}.t b{font:700 11px Karla;letter-spacing:.22em;text-transform:uppercase;color:var(--acc)}
+.t h2{font:600 24px Fraunces,serif;margin:4px 0 6px}.t p{margin:0;color:var(--mut);font-size:14px}
+.corner{margin:14px 20px 20px;height:150px;border-radius:4px;position:relative;overflow:hidden;background:var(--bg);border:1px solid var(--line)}
+.corner .ln{position:absolute;left:18px;right:18px;height:8px;border-radius:4px;background:#E6DED3}
+.corner .pet{position:absolute;left:14px;bottom:6px;width:74px;height:74px}
+.corner .pet svg,.corner .pet img{width:100%;height:100%}
+.bub{position:absolute;left:84px;bottom:58px;background:#fff;border:1.5px solid var(--ink);border-radius:14px 14px 14px 3px;padding:5px 11px;font:700 19px Caveat,cursive;white-space:nowrap}
+.lbl{position:absolute;right:10px;top:8px;font:700 10px Karla;letter-spacing:.18em;color:var(--mut);text-transform:uppercase}
+.sticker{position:relative;width:200px;height:200px;transform:rotate(-5deg)}
+.sticker img{width:200px;height:200px;border-radius:50%;border:7px solid #fff;box-shadow:0 8px 18px rgba(40,25,15,.22)}
+.tape{position:absolute;left:62px;top:-12px;width:80px;height:24px;background:rgba(232,220,196,.82);transform:rotate(4deg);box-shadow:0 1px 2px rgba(0,0,0,.08)}
+.corner .peek{position:absolute;left:10px;bottom:-26px;width:96px;height:96px;transform:rotate(-8deg)}
+.corner .peek img{width:96px;height:96px;border-radius:50%;border:4px solid #fff;box-shadow:0 4px 10px rgba(40,25,15,.25)}
+</style></head><body>
+<svg width="0" height="0" style="position:absolute"><defs>
+ <filter id="wob"><feTurbulence type="fractalNoise" baseFrequency=".035" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="3.2"/></filter>
+ <filter id="wc" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="3" seed="8" result="n"/><feDisplacementMap in="SourceGraphic" in2="n" scale="7" result="d"/><feTurbulence type="fractalNoise" baseFrequency=".9" numOctaves="2" seed="1" result="g"/><feColorMatrix in="g" type="matrix" values="0 0 0 0 0  0 0 0 0 0  0 0 0 0 0  0 0 0 -.45 1.12" result="ga"/><feComposite in="d" in2="ga" operator="in" result="t"/><feGaussianBlur in="t" stdDeviation=".4"/></filter>
+</defs></svg>
+
+<h1>Полли <i>в новом стиле</i></h1>
+<p class="sub">Три способа нарисовать птичку-маскота так, чтобы она жила рядом с акварелью, Fraunces и бумажным фоном. Внизу каждой — как она сидит в уголке страницы.</p>
+<div class="now"><canvas id="px" width="14" height="14"></canvas> Сейчас: пиксельная Полли 14×14 — из старого фиолетового сайта.</div>
+
+<div class="row">
+ <div class="card"><div class="big" id="a1"></div>
+  <div class="t"><b>Вариант 1</b><h2>Тушь и акварель</h2><p>Как на твоих картинах: дрожащая линия тушью, заливка с зерном бумаги, сонный глаз, шапочка цвета сезона. Ближе всего к самой Полли.</p></div>
+  <div class="corner"><span class="lbl">уголок страницы</span><div class="ln" style="top:24px;width:60%"></div><div class="ln" style="top:42px;width:44%"></div><div class="pet" id="a2"></div><div class="bub">Нарисуем что-нибудь?</div></div></div>
+
+ <div class="card"><div class="big" id="b1"></div>
+  <div class="t"><b>Вариант 2</b><h2>Линия и пятно</h2><p>Одна чистая линия графитом и цветное пятно чуть мимо контура — как риза-печать. Самая лёгкая и «дизайнерская», дружит со шрифтами.</p></div>
+  <div class="corner"><span class="lbl">уголок страницы</span><div class="ln" style="top:24px;width:60%"></div><div class="ln" style="top:42px;width:44%"></div><div class="pet" id="b2"></div><div class="bub">Нарисуем что-нибудь?</div></div></div>
+
+ <div class="card"><div class="big"><div class="sticker"><div class="tape"></div><img src="../../site/images/v2/logo-wc.png"></div></div>
+  <div class="t"><b>Вариант 3</b><h2>Наклейка из картины</h2><p>Настоящая Полли, вырезанная из твоей акварели, — круглая наклейка со скотчем. В уголке не сидит, а выглядывает снизу и прячется.</p></div>
+  <div class="corner"><span class="lbl">уголок страницы</span><div class="ln" style="top:24px;width:60%"></div><div class="ln" style="top:42px;width:44%"></div><div class="peek"><img src="../../site/images/v2/logo-wc.png"></div><div class="bub" style="left:104px;bottom:44px">Нарисуем что-нибудь?</div></div></div>
+</div>
+
+<script>
+// пиксельная Полли (как в polly.js)
+const BODY=['......ddd.....','.....dbbbd....','....dbbwwbd...','....dbbwkbdoo.','....dbbbbbdo..','...dbbbbbbd...','..dbbsbbbbd...','.dbbssbbbbd...','dbbssbbbbbd...','dbbbbbbbbd....','.ddbbbbbdd....','...ddddd......','....o..o......','...oo.oo......'];
+const COL={d:'#1a1528',b:'#7f81bf',s:'#5e5a9c',w:'#ffffff',k:'#1a1528',o:'#f2a73b'};
+const g=document.getElementById('px').getContext('2d');BODY.forEach((r,y)=>[...r].forEach((c,x)=>{if(COL[c]){g.fillStyle=COL[c];g.fillRect(x,y,1,1)}}));
+
+// общий силуэт голубя (смотрит вправо)
+const SIL='M146 50 C170 50 180 76 168 96 C161 107 158 114 160 126 C163 160 124 172 92 169 C72 167 57 161 49 151 L17 164 L23 147 L10 139 L50 128 C60 106 88 96 110 90 C110 70 124 50 146 50 Z';
+const WING='M70 122 C92 100 138 104 151 130 C132 151 94 152 70 122 Z';
+const HAT='M118 66 C116 34 176 30 176 62 C160 56 134 56 118 66 Z';
+const BEAK='M167 77 L189 85 L166 92 Z';
+const FEET='M96 168 L93 184 M86 186 L93 184 L99 187 M118 167 L121 183 M114 186 L121 183 L127 185';
+
+function v1(){return `<svg viewBox="0 0 200 200">
+ <g filter="url(#wc)">
+  <path d="${SIL}" fill="#8796BC" opacity=".92"/>
+  <path d="M60 140 C80 168 130 172 158 140 C150 165 110 175 80 166 Z" fill="#5E6C95" opacity=".55"/>
+  <path d="M150 96 C158 104 160 116 156 126 C146 118 140 106 150 96Z" fill="#6C9C8E" opacity=".7"/>
+  <path d="${WING}" fill="#5B6891" opacity=".9"/>
+  <path d="${HAT}" fill="#9E1B22" opacity=".9"/>
+  <circle cx="148" cy="31" r="8" fill="#C63A3F" opacity=".9"/>
+  <path d="${BEAK}" fill="#E8892E"/>
+ </g>
+ <g filter="url(#wob)" fill="none" stroke="#2A211C" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round">
+  <path d="${SIL}"/><path d="${WING}"/><path d="M92 132 C108 128 126 130 140 138 M88 140 C104 138 120 141 132 147"/>
+  <path d="${HAT}"/><circle cx="148" cy="31" r="8"/><path d="M128 46 L130 60 M140 42 L141 57 M152 41 L152 56 M164 44 L162 58"/>
+  <path d="${BEAK}" stroke-width="2.2"/>
+  <circle cx="152" cy="76" r="12.5" fill="#FFFDF8"/><circle cx="154" cy="80" r="6.5" fill="#2A211C"/><circle cx="156.5" cy="77.5" r="1.8" fill="#fff" stroke="none"/>
+  <path d="M139.5 76 C140 62 164 62 164.5 76 Z" fill="#6E7CA5"/>
+  <path d="${FEET}" stroke="#D2742A" stroke-width="3"/>
+ </g></svg>`}
+
+function v2(){return `<svg viewBox="0 0 200 200">
+ <g transform="translate(-7 6)" opacity=".85">
+  <path d="${SIL}" fill="#A9B6D6"/><path d="${HAT}" fill="#E2544A"/><circle cx="148" cy="31" r="8" fill="#E2544A"/>
+ </g>
+ <g fill="none" stroke="#2A211C" stroke-width="3" stroke-linecap="round" stroke-linejoin="round">
+  <path d="${SIL}"/><path d="M76 124 C96 106 134 108 148 130"/><path d="M92 136 C108 132 124 134 136 140"/>
+  <path d="${HAT}"/><circle cx="148" cy="31" r="8"/>
+  <path d="${BEAK}" fill="#E8892E"/>
+  <path d="M141 77 C141 65 163 65 163 77"/><path d="M141 77 C146 84 158 84 163 77"/><circle cx="155" cy="79" r="3.2" fill="#2A211C"/>
+  <path d="${FEET}"/>
+ </g></svg>`}
+
+a1.innerHTML=v1();a2.innerHTML=v1();b1.innerHTML=v2();b2.innerHTML=v2();
+</script></body></html>
