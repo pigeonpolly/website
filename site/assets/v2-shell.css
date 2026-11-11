@@ -1,0 +1,96 @@
+/* Редизайн 2.0, часть 3: только новая шапка и подвал (из v2.css) для страниц, внутри которых — старые стили style.css: все страницы на src/layout-v2-lab.html (части 3 и 5). Правишь шапку в v2.css — поправь и здесь. */
+.v2s .hd2,.v2s .ft2{--bg:#F4F0EA;--sheet:#FBF9F5;--ink:#2A211C;--mut:#6C6058;--line:#DED5CA;--gr:#2E2521;--gr2:#3A302B;--acc:#22405F;--acc2:#93AFCC;--inner:#2A1D16;--grtx:#ECEDEE;--grmut:#A3A8AC;--hero-pos:center 22%}
+html[data-season=winter] .v2s .hd2,html[data-season=winter] .v2s .ft2{--bg:#EEF1F3;--sheet:#F8FAFB;--ink:#1C2430;--mut:#5D6670;--line:#D3DAE0;--gr:#26303A;--gr2:#313C47;--acc:#9E1B22;--acc2:#E2544A;--inner:#1B2632;--hero-pos:center 58%}
+html[data-season=spring] .v2s .hd2,html[data-season=spring] .v2s .ft2{--bg:#F1F4F0;--sheet:#FAFBF9;--ink:#1F2A25;--mut:#5E6A63;--line:#D4DDD6;--gr:#26302B;--gr2:#313C36;--acc:#BE2F3A;--acc2:#E85C64;--inner:#1C2A23;--hero-pos:center 62%}
+html[data-season=summer] .v2s .hd2,html[data-season=summer] .v2s .ft2{--bg:#F7F4EE;--sheet:#FFFDFA;--ink:#2A2420;--mut:#6D635B;--line:#E3DACE;--gr:#2F2622;--gr2:#3B312C;--acc:#1F7FAE;--acc2:#7CC6E6;--inner:#3A1A1C;--hero-pos:center 0%}
+.v2s .hd2 *,.v2s .ft2 *{box-sizing:border-box;margin:0;padding:0}
+.v2s .hd2,.v2s .ft2{font:16px/1.55 Karla,'Nunito Sans',sans-serif;color:var(--ink)}.v2s .ft2{background:var(--bg)}
+.v2s .hd2 a,.v2s .ft2 a{color:inherit;text-decoration:none}.v2s .hd2 img{display:block;max-width:100%}
+.v2s .hd2 .w,.v2s .ft2 .w{max-width:1260px;margin:0 auto;padding:0 44px;position:relative}
+.v2s .hd2 h4,.v2s .ft2 h4{font-family:Fraunces,Lora,serif;font-weight:400;line-height:1.2}.v2s .ft2 em{font-style:italic;color:var(--acc);font-weight:300}
+.v2s .hd2{border-bottom:1px solid var(--line);position:relative;z-index:20;background:var(--bg)}
+.v2s .hd2 .w{display:flex;align-items:center;height:100px;gap:30px}
+.v2s .lg{display:flex;align-items:center;gap:12px;font:400 23px Fraunces,Lora,serif;white-space:nowrap}.v2s .lg i{font-style:italic;font-weight:300;color:var(--acc)}
+.v2s .lg img{width:46px;height:46px;border-radius:50%;box-shadow:0 0 0 1.5px var(--ink)}
+.v2s .nv{margin-left:auto;display:flex;gap:40px;font:700 12px Karla,'Nunito Sans',sans-serif;letter-spacing:.2em;text-transform:uppercase}
+.v2s .nv a{padding:6px 0;border-bottom:1.5px solid transparent}.v2s .nv a:hover,.v2s .nv a[aria-current]{color:var(--acc);border-color:var(--acc)}
+.v2s .hr{display:flex;align-items:center;gap:18px;margin-left:24px;font-size:14px}
+.v2s .hr .lb{color:var(--acc);font-weight:700}
+.v2s .lang-switch{display:flex;gap:2px}.v2s .lang-switch a{padding:4px 5px;color:var(--mut);font-weight:500}.v2s .lang-switch a[aria-current]{color:var(--ink);font-weight:700}
+.v2s .switch{display:flex;gap:6px}.v2s .switch button{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--ink);cursor:pointer;padding:0}
+.v2s .switch button[aria-pressed=true]{box-shadow:0 0 0 3px var(--bg),0 0 0 4.5px var(--acc)}
+.v2s .acct2{padding:11px 22px}.v2s .acct2 canvas{width:26px;height:26px;image-rendering:pixelated;margin:-6px 0 -6px -10px}
+.v2s .burger{display:none;background:none;border:0;font-size:26px;color:var(--ink);cursor:pointer;line-height:1;padding:6px}
+.v2s .drawer{display:none}.v2s .sw-m{display:none}
+
+.v2s .ft2{padding:70px 0 30px}
+.v2s .ft2 .cols{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:30px;font-size:14px;color:var(--mut);line-height:2}
+.v2s .ft2 h4{font:400 20px Fraunces,Lora,serif;color:var(--ink);margin-bottom:8px}
+.v2s .ft2 .cols a{display:block}.v2s .ft2 .cols a:hover{color:var(--acc)}
+.v2s .ft2 .intro p{max-width:24em;line-height:1.6;margin-bottom:16px}
+.v2s .ft2 .soc{display:flex;gap:10px;flex-wrap:wrap}.v2s .ft2 .soc a{border:1px solid var(--line);border-radius:999px;padding:2px 14px;line-height:2}
+.v2s .ft2 .bt{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:40px;padding-top:18px;font-size:12px;color:var(--mut)}
+.v2s .ft2 .bt a{text-decoration:underline}
+
+/* старые кнопки аккаунта (account.js, news.js) в новой шапке */
+.v2s .hr .acct{display:flex;align-items:center}.v2s .hr .bell,.v2s .hr .hd-btns{color:var(--ink)}
+.v2s .hr .acct>a,.v2s .hr .acct>button{font-family:Karla,'Nunito Sans',sans-serif}
+@media (max-width:1180px){.v2s .nv{gap:24px}.v2s .hr{gap:12px;margin-left:12px}.v2s .hd2 .w{gap:18px}}
+@media (max-width:1040px){
+ .v2s .nv,.v2s .hr .lb,.v2s .hr .lang-switch{display:none}.v2s .burger{display:block}
+ .v2s .hd2 .drawer .w{display:block;height:auto}
+ .v2s .drawer{display:block;position:absolute;left:0;right:0;top:100%;background:var(--sheet);border-bottom:1px solid var(--line);box-shadow:0 20px 30px rgba(0,0,0,.1);padding:10px 0 22px}
+ .v2s .drawer[hidden]{display:none}
+ .v2s .drawer a{display:block;padding:12px 0;font:400 22px Fraunces,Lora,serif;border-bottom:1px solid var(--line)}
+ .v2s .drawer .lb{color:var(--acc)}.v2s .drawer .lang-switch{margin-top:14px}.v2s .drawer .lang-switch a{font:500 15px Karla,'Nunito Sans',sans-serif;border:0;padding:4px 10px 4px 0}
+}
+@media (max-width:700px){
+ .v2s .hd2 .w,.v2s .ft2 .w{padding:0 18px}
+ .v2s .hd2 .w{height:72px;gap:10px}.v2s .lg{font-size:19px;gap:9px}.v2s .lg img{width:38px;height:38px}
+ .v2s .hr{margin-left:auto;gap:8px}.v2s .hr .switch{display:none}
+ .v2s .drawer .sw-m{display:flex;gap:12px;margin-top:16px}.v2s .drawer .sw-m button{width:22px;height:22px}
+ .v2s .ft2 .cols{grid-template-columns:1fr 1fr}.v2s .ft2 .cols>div:first-child{grid-column:1/-1}
+}
+@media (max-width:380px){.v2s .lg span{display:none}}
+body.v2s{padding-top:0}
+.v2s .hd2 .lang-switch a{background:none;border:0;box-shadow:none;border-radius:0;font-size:14px}
+
+/* Воббленд в новом стиле (/preview/wobbleland/): тёмный фон сезона вместо фиолетового, карта — лист в бумажной рамке */
+body.v2s:has(.wl-map){--wlbg:#2E2521;background:var(--wlbg)}
+html[data-season=winter] body.v2s:has(.wl-map){--wlbg:#26303A}
+html[data-season=spring] body.v2s:has(.wl-map){--wlbg:#26302B}
+html[data-season=summer] body.v2s:has(.wl-map){--wlbg:#2F2622}
+.v2s main:has(.wl-map) h1,.v2s main:has(.wl-map) h2{font-family:Fraunces,Lora,serif;font-weight:400;letter-spacing:-.015em}
+.v2s .wl-map-sec .wl-map{border-radius:3px;box-shadow:0 0 0 12px #F4EEE3,0 0 0 13px rgba(0,0,0,.12),0 30px 60px rgba(0,0,0,.5);transform:rotate(-.5deg);margin:22px 12px 34px;overflow:hidden}
+.v2s .wl-map-sec{position:relative}
+@media (max-width:700px){.v2s .wl-map-sec .wl-map{box-shadow:0 0 0 7px #F4EEE3,0 18px 34px rgba(0,0,0,.5);margin:14px 6px 24px}}
+/* старая кнопка входа (account.js) в новой шапке: только «Войти», в виде кнопки нового стиля; надписи шапки не переносятся */
+.v2s .nv a,.v2s .hr .lb{white-space:nowrap}
+.v2s .hr .acct .acct-get{display:none}
+.v2s .hr .acct .acct-in{padding:11px 22px;border:1.5px solid var(--ink);border-radius:999px;background:none;color:var(--ink);font:700 14px Karla,'Nunito Sans',sans-serif;white-space:nowrap}
+.v2s .hr .acct .acct-in:hover,.v2s .hr .acct .acct-in[aria-expanded=true]{background:var(--ink);color:var(--bg)}
+.v2s .hr .acct .acct-me{border-color:var(--ink)}
+@media (max-width:700px){.v2s .hr .acct .acct-in{padding:8px 14px;font-size:13px}}
+.v2s .hr .acct{order:8}.v2s .hr .burger{order:9}
+@media (max-width:1120px) and (min-width:1041px){.v2s .nv{gap:16px}.v2s .hr{gap:10px}}
+
+/* выбор сезона: один кружок + список (v2.js seaMenu) */
+.v2s .sea2{position:relative;display:flex}
+.v2s .sea-b{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--ink);padding:2px;background:none;cursor:pointer;display:grid}
+.v2s .sea-b i{display:block;border-radius:50%;width:100%;height:100%}
+.v2s .sea-b:hover,.v2s .sea-b[aria-expanded=true]{box-shadow:0 0 0 3px var(--bg),0 0 0 4.5px var(--acc)}
+.v2s .sea-m{position:absolute;right:-12px;top:calc(100% + 14px);z-index:30;background:var(--sheet);border:1px solid var(--line);border-radius:14px;box-shadow:0 16px 34px rgba(0,0,0,.v2s .14);padding:8px}
+.v2s .sea-m[hidden]{display:none}
+.v2s .sea-m .switch{display:flex;flex-direction:column;gap:2px}
+.v2s .sea-m .switch button{display:flex;align-items:center;gap:10px;width:auto;height:auto;border:0;border-radius:9px;padding:8px 14px 8px 10px;background:none;color:var(--ink);font:500 14px Karla,'Nunito Sans',sans-serif;white-space:nowrap;cursor:pointer;text-align:left}
+.v2s .sea-m .switch button i{width:14px;height:14px;border-radius:50%;flex:none}
+.v2s .sea-m .switch button:hover{background:var(--bg)}
+.v2s .sea-m .switch button[aria-pressed=true]{box-shadow:none;font-weight:700}.sea-m .switch button[aria-pressed=true]:after{content:"✓";margin-left:auto;padding-left:12px;color:var(--acc)}
+@media (max-width:700px){.v2s .hr .sea2{display:none}}
+
+/* часть 5: поиск 🔍 и корзина в новой шапке всех старых страниц */
+.v2s .hr .search-btn{order:0;margin:0;width:36px;height:36px;border:1.5px solid var(--line);color:var(--ink);background:none}
+.v2s .hr .search-btn:hover{background:var(--sheet);border-color:var(--ink)}
+.v2s .hr .search-btn+.lang-switch{margin-left:0}
+.v2s .hr .hd-cart{color:var(--ink)}
+@media (max-width:700px){.v2s .hr .search-btn{width:32px;height:32px}}

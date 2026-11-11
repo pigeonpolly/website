@@ -14,7 +14,7 @@ const T = {
     blog: 'Blog', head: 'Notes from the lab', lead: 'Articles about drawing, learning and creativity: what I try, what works, and what Polly thinks about it.',
     tags: 'Tags', moreTags: 'Show all tags', lessTags: 'Show less', popular: 'Popular', all: 'All posts', empty: 'No posts here yet. The first one is on its way!',
     comments: 'Comments', noComments: 'No comments yet. Be the first!', back: '← All posts', tagged: 'Posts tagged',
-    min: 'min read', share: 'Share', copy: 'Copy link', copied: 'Link copied ✓', email: 'E-mail', draft: 'Draft', read: 'Read →', months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
+    members: 'Members only', lockT: 'This article is for members', lockP: 'Sign in for free to read the whole article. It takes a minute.', lockBtn: 'Sign in for free', accAll: 'All posts', accOpen: 'Open to everyone', accLabel: 'Who can read', min: 'min read', share: 'Share', copy: 'Copy link', copied: 'Link copied ✓', email: 'E-mail', draft: 'Draft', read: 'Read →', months: ['Jan', 'Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec'],
     descr: 'Notes on drawing, learning and creativity by Alina Otkinska and Pigeon Polly.',
     featured: '★ Favourites', archive: 'Archive', inMonth: 'Posts from', onlyFav: 'My favourite posts', allSections: 'All', search: 'Search the blog…', searchBtn: 'Search', found: 'Search results for', nothing: 'Nothing found. Try another word.', prev: '← Newer', next: 'Older →', section: 'Section', sections: 'Sections', scheduled: '⏰ Scheduled', browse: 'Sections, tags & archive', count: n => `${n} ${n === 1 ? 'post' : 'posts'} in the blog`,
     monthsFull: ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'],
@@ -23,7 +23,7 @@ const T = {
     blog: 'Блог', head: 'Заметки из лаборатории', lead: 'Статьи о рисовании, обучении и творчестве: что я пробую, что работает и что об этом думает Полли.',
     tags: 'Теги', moreTags: 'Показать все теги', lessTags: 'Свернуть', popular: 'Популярное', all: 'Все статьи', empty: 'Здесь пока нет статей. Первая уже в пути!',
     comments: 'Комментарии', noComments: 'Комментариев пока нет. Будьте первым!', back: '← Все статьи', tagged: 'Статьи с тегом',
-    min: 'мин чтения', share: 'Поделиться', copy: 'Скопировать ссылку', copied: 'Ссылка скопирована ✓', email: 'Почта', draft: 'Черновик', read: 'Читать →', months: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
+    members: 'Только для своих', lockT: 'Эта статья — для своих', lockP: 'Войдите бесплатно, чтобы прочитать статью целиком. Это займёт минуту.', lockBtn: 'Войти бесплатно', accAll: 'Все статьи', accOpen: 'Открытые всем', accLabel: 'Кто может читать', min: 'мин чтения', share: 'Поделиться', copy: 'Скопировать ссылку', copied: 'Ссылка скопирована ✓', email: 'Почта', draft: 'Черновик', read: 'Читать →', months: ['янв', 'фев', 'мар', 'апр', 'мая', 'июн', 'июл', 'авг', 'сен', 'окт', 'ноя', 'дек'],
     descr: 'Заметки о рисовании, обучении и творчестве от Алины Откинской и голубя Полли.',
     featured: '★ Избранное', archive: 'Архив', inMonth: 'Статьи за', onlyFav: 'Мои избранные статьи', allSections: 'Все', search: 'Поиск по блогу…', searchBtn: 'Найти', found: 'Результаты поиска', nothing: 'Ничего не нашлось. Попробуйте другое слово.', prev: '← Новее', next: 'Старше →', section: 'Раздел', sections: 'Разделы', scheduled: '⏰ Запланирована', browse: 'Разделы, теги и архив', count: n => `В блоге ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'статья' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'статьи' : 'статей'}`,
     monthsFull: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
@@ -32,7 +32,7 @@ const T = {
     blog: 'Blogs', head: 'Piezīmes no laboratorijas', lead: 'Raksti par zīmēšanu, mācīšanos un radošumu: ko es izmēģinu, kas strādā un ko par to domā Pollija.',
     tags: 'Birkas', moreTags: 'Rādīt visas birkas', lessTags: 'Sakļaut', popular: 'Populārākie', all: 'Visi raksti', empty: 'Šeit vēl nav rakstu. Pirmais jau ceļā!',
     comments: 'Komentāri', noComments: 'Komentāru vēl nav. Esi pirmais!', back: '← Visi raksti', tagged: 'Raksti ar birku',
-    min: 'min lasīšanas', share: 'Dalīties', copy: 'Kopēt saiti', copied: 'Saite nokopēta ✓', email: 'E-pasts', draft: 'Melnraksts', read: 'Lasīt →', months: ['janv.', 'febr.', 'marts', 'apr.', 'maijs', 'jūn.', 'jūl.', 'aug.', 'sept.', 'okt.', 'nov.', 'dec.'],
+    members: 'Tikai saviem', lockT: 'Šis raksts ir saviem', lockP: 'Ienāc bez maksas, lai izlasītu visu rakstu. Tas aizņems minūti.', lockBtn: 'Ienākt bez maksas', accAll: 'Visi raksti', accOpen: 'Atvērti visiem', accLabel: 'Kas var lasīt', min: 'min lasīšanas', share: 'Dalīties', copy: 'Kopēt saiti', copied: 'Saite nokopēta ✓', email: 'E-pasts', draft: 'Melnraksts', read: 'Lasīt →', months: ['janv.', 'febr.', 'marts', 'apr.', 'maijs', 'jūn.', 'jūl.', 'aug.', 'sept.', 'okt.', 'nov.', 'dec.'],
     descr: 'Piezīmes par zīmēšanu, mācīšanos un radošumu no Alīnas Otkinskas un baloža Pollijas.',
     featured: '★ Izlase', archive: 'Arhīvs', inMonth: 'Raksti par', onlyFav: 'Mani izlases raksti', allSections: 'Visi', search: 'Meklēt blogā…', searchBtn: 'Meklēt', found: 'Meklēšanas rezultāti', nothing: 'Nekas netika atrasts. Pamēģiniet citu vārdu.', prev: '← Jaunāki', next: 'Vecāki →', section: 'Sadaļa', sections: 'Sadaļas', scheduled: '⏰ Ieplānots', browse: 'Sadaļas, birkas un arhīvs', count: n => `Blogā ir ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'raksts' : 'raksti'}`,
     monthsFull: ['janvāris', 'februāris', 'marts', 'aprīlis', 'maijs', 'jūnijs', 'jūlijs', 'augusts', 'septembris', 'oktobris', 'novembris', 'decembris'],
@@ -108,6 +108,7 @@ async function ensureBlogSchema(env) {
   ]);
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN featured INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ }
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN pinned INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ }
+  try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN members INTEGER DEFAULT 0').run(); } catch (e) { /* уже есть */ } // 🔒 статья только для вошедших (10.11.2026)
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN src_lang TEXT').run(); } catch (e) { /* уже есть */ }
   try { await env.DB.prepare('ALTER TABLE blog_posts ADD COLUMN client_key TEXT').run(); } catch (e) { /* уже есть */ } // метка новой статьи из редактора: повторное «Сохранить» не создаёт копию
   await env.DB.prepare(`CREATE TABLE IF NOT EXISTS blog_tags (en TEXT PRIMARY KEY, ru TEXT DEFAULT '', lv TEXT DEFAULT '')`).run();
@@ -347,7 +348,7 @@ export async function blogApi(req, env, url, h) {
       cover: x.cover, date: fmtDate(x.published_at, lang), tags: tagsOf(x).slice(0, 3).map(g => tagLabel(g, lang)), likes: x.likes });
     const latest = rows[0] || null; // крупно — самая новая статья
     const featured = rows.filter(x => x.featured && x !== latest).slice(0, 3); // справа — три последние со ★ (кроме той, что уже крупно)
-    return json({ latest: latest && pack(latest), featured: featured.map(x => ({ ...pack(x), star: true })) });
+    return json({ latest: latest && pack(latest), featured: featured.map(x => ({ ...pack(x), star: true })), recent: rows.slice(0, 4).map(pack) }); // recent — новая главная (/preview/)
   }
 
   // полная копия сайта: блог + челлендж (аккаунты, работы) + список файлов картинок. Доступ — админ или личный ключ автокопии (?token=)
@@ -363,7 +364,7 @@ export async function blogApi(req, env, url, h) {
     await admin();
     const a = p.slice('/api/blog/admin/'.length);
     if (m === 'GET' && a === 'posts') {
-      const rows = (await env.DB.prepare(`SELECT p.id, p.slug, p.status, p.featured, p.pinned, p.section, p.t_ru, p.t_en, p.t_lv, p.tags_ru, p.tags_en, p.tags_lv, p.cover, p.views, p.likes, p.updated_at, p.published_at,
+      const rows = (await env.DB.prepare(`SELECT p.id, p.slug, p.status, p.featured, p.pinned, p.members, p.section, p.t_ru, p.t_en, p.t_lv, p.tags_ru, p.tags_en, p.tags_lv, p.cover, p.views, p.likes, p.updated_at, p.published_at,
         (SELECT COUNT(*) FROM blog_comments c WHERE c.post_id = p.id) AS comments FROM blog_posts p ORDER BY COALESCE(p.published_at, p.updated_at) DESC`).all()).results;
       const pending = (await env.DB.prepare(`SELECT c.id, c.body, c.anon, c.created_at, c.post_id, p.slug, p.t_ru, u.nick FROM blog_comments c
         JOIN blog_posts p ON p.id = c.post_id LEFT JOIN users u ON u.id = c.user_id WHERE c.status = 'pending' ORDER BY c.created_at DESC LIMIT 100`).all()).results
@@ -392,6 +393,7 @@ export async function blogApi(req, env, url, h) {
       const untranslated = g => !TAGMAP[g] || (!TAGMAP[g].checked && (!TAGMAP[g].ru || !TAGMAP[g].lv || TAGMAP[g].ru === g || TAGMAP[g].lv === g));
       const fresh = tagList.filter(untranslated);
       if (fresh.length) await translateTags(env, fresh);
+      f.members = b.members ? 1 : 0; // 🔒 только для вошедших
       f.section = [...new Set((Array.isArray(b.section) ? b.section : String(b.section || '').split(',')).map(x => slugify(x)).filter(Boolean))].join(',');
       f.tags_en = tagList.join(', ');
       f.tags_ru = tagList.map(g => tagLabel(g, 'ru')).join(', ');
@@ -584,11 +586,11 @@ export async function blogApi(req, env, url, h) {
     if (m === 'POST' && a === 'import') {
       const b = await body();
       if (!b || ![1, 2].includes(b.version) || !Array.isArray(b.posts)) fail(400, 'bad');
-      const COLS = ['slug', 'status', 'cover', 't_ru', 't_en', 't_lv', 'd_ru', 'd_en', 'd_lv', 'b_ru', 'b_en', 'b_lv', 'tags_ru', 'tags_en', 'tags_lv', 'views', 'likes', 'created_at', 'updated_at', 'published_at', 'featured', 'pinned', 'src_lang', 'section'];
+      const COLS = ['slug', 'status', 'cover', 't_ru', 't_en', 't_lv', 'd_ru', 'd_en', 'd_lv', 'b_ru', 'b_en', 'b_lv', 'tags_ru', 'tags_en', 'tags_lv', 'views', 'likes', 'created_at', 'updated_at', 'published_at', 'featured', 'pinned', 'src_lang', 'section', 'members'];
       let posts = 0, comments = 0;
       for (const p of b.posts) {
         if (!p.slug) continue;
-        const vals = COLS.map(c => p[c] ?? (['views', 'likes', 'featured', 'pinned'].includes(c) ? 0 : c.endsWith('_at') ? null : ''));
+        const vals = COLS.map(c => p[c] ?? (['views', 'likes', 'featured', 'pinned', 'members'].includes(c) ? 0 : c.endsWith('_at') ? null : ''));
         await env.DB.prepare(`INSERT INTO blog_posts (${COLS.join(', ')}) VALUES (${COLS.map(() => '?').join(', ')}) ON CONFLICT(slug) DO UPDATE SET ${COLS.filter(c => c !== 'slug').map(c => `${c} = excluded.${c}`).join(', ')}`).bind(...vals).run();
         posts++;
       }
@@ -869,6 +871,12 @@ function commentHtml(c, lang) {
   return `<li class="bc" id="c${c.id}" data-cid="${c.id}"><p class="bc-head">${name} <time>${fmtDate(c.created_at, lang)}</time></p><div class="bc-body"><p>${body}</p></div></li>`;
 }
 
+// начало закрытой статьи: первые 2 абзаца (без картинок и видео)
+function teaser(html) {
+  const ps = String(html).match(/<p\b[^>]*>[\s\S]*?<\/p>/gi) || [];
+  return ps.filter(x => stripTags(x).trim()).slice(0, 2).map(x => x.replace(/<(img|iframe)[^>]*>/gi, '')).join('');
+}
+
 function card(p, lang) {
   const t = T[lang], tags = tagsOf(p);
   const words = stripTags(field(p, 'b', lang)).split(' ').length;
@@ -876,7 +884,7 @@ function card(p, lang) {
   return `<article class="bl-card">
     <a class="bl-cover" href="${blogUrl(lang, p.slug)}" tabindex="-1" aria-hidden="true">${p.cover ? `<img src="${esc(p.cover)}" alt="" loading="lazy">` : '<span class="bl-nocover">🕊</span>'}</a>
     <div class="bl-text">
-      <p class="bl-meta">${p.status === 'draft' ? `<span class="bl-draft">${t.draft}</span> · ` : (p.published_at || 0) > Date.now() / 1000 ? `<span class="bl-draft">${t.scheduled}</span> · ` : ''}${secsOf(p).filter(x => sectionName(x, lang)).map(x => `<a class="bl-sec" href="${blogUrl(lang, '', '?section=' + encodeURIComponent(x))}">${esc(sectionName(x, lang))}</a> · `).join('')}${fmtDate(p.published_at || p.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}</p>
+      <p class="bl-meta">${p.members ? `<span class="bl-lock">🔒 ${t.members}</span> · ` : ''}${p.status === 'draft' ? `<span class="bl-draft">${t.draft}</span> · ` : (p.published_at || 0) > Date.now() / 1000 ? `<span class="bl-draft">${t.scheduled}</span> · ` : ''}${secsOf(p).filter(x => sectionName(x, lang)).map(x => `<a class="bl-sec" href="${blogUrl(lang, '', '?section=' + encodeURIComponent(x))}">${esc(sectionName(x, lang))}</a> · `).join('')}${fmtDate(p.published_at || p.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}</p>
       <h2><a href="${blogUrl(lang, p.slug)}">${esc(field(p, 't', lang))}</a></h2>
       <p class="bl-excerpt">${esc(excerpt)}</p>
       <p class="bl-foot">${tags.map(g => `<a class="bl-tag" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}">#${esc(tagLabel(g, lang))}</a>`).join(' ')}
@@ -916,10 +924,14 @@ function sidebar(posts, lang, activeTag, activeMonth = '', post = false, activeS
   </aside>`;
 }
 
-async function template(env, url, lang) {
+async function template(env, url, lang, v2) {
+  // редизайн 2.0: с меткой pp_v2 — шаблон на новой шапке (build.py → site/<язык>/blog/v2/), без него — обычный
+  if (v2) { const r = await env.ASSETS.fetch(new Request(url.origin + PREFIX[lang] + '/blog/v2/')); if (r.ok) return r.text(); }
   const r = await env.ASSETS.fetch(new Request(url.origin + PREFIX[lang] + '/blog/'));
   return r.ok ? r.text() : null;
 }
+// метка нового стиля: ставит /preview/ (v2.js) или ?v2=1, снимает ?v2=0
+const v2Flag = (req, url) => { const q = url.searchParams.get('v2'); return q === '1' || (q !== '0' && /(?:^|;\s*)pp_v2=1/.test(req.headers.get('cookie') || '')); };
 function fill(tpl, { title, description, canonical, content, image, type, slug, jsonld, noindex }) {
   let s = tpl.replace(/<!--BLOG-->[\s\S]*?<!--\/BLOG-->/, content)
     .replace(/<title>[^<]*<\/title>/, `<title>${esc(title)}</title>`)
@@ -945,10 +957,18 @@ function fill(tpl, { title, description, canonical, content, image, type, slug, 
 const html = (s, status = 200) => new Response(s, { status, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
 
 export async function blogPage(req, env, url, h) {
+  const r = await blogPageInner(req, env, url, h), q = url.searchParams.get('v2');
+  if (q !== '1' && q !== '0') return r;
+  const res = new Response(r.body, r);
+  res.headers.append('set-cookie', `pp_v2=${q === '1' ? '1' : ''}; Path=/; Max-Age=${q === '1' ? 31536000 : 0}; SameSite=Lax`);
+  return res;
+}
+async function blogPageInner(req, env, url, h) {
   const p = url.pathname;
   // картинки блога из R2
   if (p.startsWith('/media/')) {
     if (!env.MEDIA) return new Response('Not found', { status: 404 });
+    if (decodeURIComponent(p.slice(7)).startsWith('notes/')) return new Response('Not found', { status: 404 }); // файлы 📣 Рассылки — только через /api/note/file
     const obj = await env.MEDIA.get(decodeURIComponent(p.slice(7)));
     if (!obj) return new Response('Not found', { status: 404 });
     return new Response(obj.body, { headers: { 'content-type': obj.httpMetadata?.contentType || 'application/octet-stream', 'cache-control': 'public, max-age=31536000, immutable', etag: obj.httpEtag } });
@@ -963,7 +983,7 @@ export async function blogPage(req, env, url, h) {
   const mm = p.match(/^\/(?:(ru|lv)\/)?blog\/(?:([a-z0-9-]+)\/)?$/);
   if (!mm) return env.ASSETS.fetch(req);
   const lang = mm[1] || 'en', slug = mm[2], t = T[lang];
-  const tpl = await template(env, url, lang);
+  const tpl = await template(env, url, lang, v2Flag(req, url));
   if (!tpl) return env.ASSETS.fetch(req);
   const u = await h.currentUser(req, env);
   const isAdm = await h.isAdmin(u, env);
@@ -980,20 +1000,22 @@ export async function blogPage(req, env, url, h) {
     const favOnly = P.get('fav') === '1';
     const section = (P.get('section') || '').trim().toLowerCase();
     const q = (P.get('q') || '').trim().slice(0, 80);
+    const access = ['open', 'members'].includes(P.get('access')) ? P.get('access') : ''; // фильтр: открытые / 🔒 для своих
     let list = posts;
+    if (access) list = list.filter(x => access === 'members' ? !!x.members : !x.members);
     if (section) list = list.filter(x => secsOf(x).includes(section));
     if (tag) list = list.filter(x => tagsOf(x).includes(tag) || splitTags(x['tags_' + lang]).includes(tag)); // старые ссылки с переводом тега тоже работают
     if (month) list = list.filter(x => ym(x) === month);
     if (favOnly) list = list.filter(x => x.featured);
     if (q) { // поиск: заголовок, описание, текст и теги на любом языке
       const words = q.toLowerCase().split(/\s+/).filter(Boolean);
-      list = list.filter(x => { const hay = [...LANGS.flatMap(l => [x['t_' + l], x['d_' + l], stripTags(x['b_' + l])]), ...tagsOf(x).map(g => g + ' ' + tagLabel(g, lang))].join(' ').toLowerCase(); return words.every(w => hay.includes(w)); });
+      list = list.filter(x => { const hay = [...LANGS.flatMap(l => [x['t_' + l], x['d_' + l], x.members && !u ? '' : stripTags(x['b_' + l])]), ...tagsOf(x).map(g => g + ' ' + tagLabel(g, lang))].join(' ').toLowerCase(); return words.every(w => hay.includes(w)); });
     }
     // по 8 статей на странице
     const PER = 8, pages = Math.max(1, Math.ceil(list.length / PER)), page = Math.min(pages, Math.max(1, parseInt(P.get('page')) || 1));
     const shown = list.slice((page - 1) * PER, page * PER);
     const link = (over) => { const u = new URLSearchParams(P); for (const [k, v] of Object.entries(over)) { if (v === '' || v == null) u.delete(k); else u.set(k, v); } const qs = u.toString(); return blogUrl(lang, '', qs ? '?' + qs : ''); };
-    const filtered = tag || month || favOnly || section || q || page > 1;
+    const filtered = tag || month || favOnly || section || q || access || page > 1;
     const label = q ? `${t.found}: <b>«${esc(q)}»</b> (${list.length})` : tag ? `${t.tagged} <b>#${esc(tagLabel(tag, lang))}</b>` : month ? `${t.inMonth} <b>${t.monthsFull[+month.slice(5) - 1]} ${month.slice(0, 4)}</b>` : favOnly ? `<b>${t.featured}</b>` : section ? `${t.section}: <b>${esc(sectionName(section, lang))}</b>` : '';
     const pager = pages > 1 ? `<nav class="bl-pager" aria-label="Pages">${page > 1 ? `<a href="${link({ page: page - 1 > 1 ? page - 1 : '' })}">${t.prev}</a>` : '<span></span>'}
       <span class="bl-pages">${Array.from({ length: pages }, (_, k) => k + 1).map(n => n === page ? `<b aria-current="page">${n}</b>` : `<a href="${link({ page: n > 1 ? n : '' })}">${n}</a>`).join('')}</span>
@@ -1001,7 +1023,7 @@ export async function blogPage(req, env, url, h) {
     const content = `<section class="page-head bl-head"><p class="topics">${t.blog.toLowerCase()}</p><h1>${t.head}</h1><p class="lead">${t.lead}</p><p class="bl-count">📝 ${t.count(published.length)}</p>
       <div class="bl-admin" data-blog-admin hidden><a class="pill-btn" href="/blog-editor/">＋ ${lang === 'ru' ? 'Новая статья' : lang === 'lv' ? 'Jauns raksts' : 'New post'}</a></div></section>
       <div class="bl-tools">
-        <span></span>
+        ${published.some(x => x.members) ? `<nav class="bl-access" aria-label="${t.accLabel}">${[['', t.accAll], ['open', t.accOpen], ['members', '🔒 ' + t.members]].map(([v, n]) => v === access ? `<b aria-current="true">${esc(n)}</b>` : `<a href="${link({ access: v, page: '' })}">${esc(n)}</a>`).join('')}</nav>` : '<span></span>'}
         <form class="bl-search" action="${blogUrl(lang, '')}" method="get" role="search">${section ? `<input type="hidden" name="section" value="${esc(section)}">` : ''}
           <input type="search" name="q" value="${esc(q)}" placeholder="${t.search}" aria-label="${t.search}"><button type="submit" aria-label="${t.searchBtn}">🔍</button></form>
       </div>
@@ -1028,17 +1050,21 @@ export async function blogPage(req, env, url, h) {
   const textLang = langOf(post, lang);
   const words = stripTags(field(post, 'b', lang)).split(' ').length;
   const description = field(post, 'd', lang) || stripTags(field(post, 'b', lang)).slice(0, 160);
+  // 🔒 статья для вошедших: гостю (и поисковику) — начало статьи и приглашение войти
+  const locked = !!post.members && !isAdm && !(u && !u.banned);
+  const fullBody = footnotes(field(post, 'b', lang), lang);
+  const bodyHtml = locked ? teaser(fullBody) + `<div class="bp-lock"><p class="bp-lock-t">🔒 ${t.lockT}</p><p>${t.lockP}</p><button type="button" class="pill-btn bp-signin" onclick="window.PPAccount ? PPAccount.openSignIn() : (location.href = '/games/#signin')">${t.lockBtn}</button></div>` : fullBody;
   const content = `<div class="bp-wrap"><article class="bp" data-post-id="${post.id}" data-status="${post.status}">
     <p class="bp-back"><a href="${blogUrl(lang, '')}">${t.back}</a><a class="bp-pencil" href="/blog-editor/#${post.id}" hidden data-blog-admin title="Редактировать статью">✎ Редактировать</a></p>
     <header class="bp-head"${textLang !== lang ? ` lang="${textLang}"` : ''}>
       ${post.status === 'draft' ? `<p class="bl-draft">${t.draft}</p>` : (post.published_at || 0) > Date.now() / 1000 ? `<p class="bl-draft">${t.scheduled}</p>` : ''}
       ${secsOf(post).some(x => sectionName(x, lang)) ? `<p class="bp-sec">${secsOf(post).filter(x => sectionName(x, lang)).map(x => `<a href="${blogUrl(lang, '', '?section=' + encodeURIComponent(x))}">${esc(sectionName(x, lang))}</a>`).join(' · ')}</p>` : ''}
       <h1>${esc(title)}</h1>
-      <p class="bl-meta">${fmtDate(post.published_at || post.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}
+      <p class="bl-meta">${post.members ? `<span class="bl-lock">🔒 ${t.members}</span> · ` : ''}${fmtDate(post.published_at || post.updated_at, lang)} · ${Math.max(1, Math.round(words / 200))} ${t.min}
         ${tags.length ? ' · ' + tags.map(g => `<a class="bl-tag" href="${blogUrl(lang, '', '?tag=' + encodeURIComponent(g))}">#${esc(tagLabel(g, lang))}</a>`).join(' ') : ''}</p>
     </header>
     ${post.cover ? `<figure class="bp-cover"><img src="${esc(post.cover)}" alt=""></figure>` : ''}
-    <div class="bp-body"${textLang !== lang ? ` lang="${textLang}"` : ''}>${footnotes(field(post, 'b', lang), lang)}${post.src_lang && post.src_lang !== textLang && post['t_' + post.src_lang]
+    <div class="bp-body"${textLang !== lang ? ` lang="${textLang}"` : ''}>${bodyHtml}${post.src_lang && post.src_lang !== textLang && post['t_' + post.src_lang]
       ? `<p class="bp-tr-note">${TR_NOTE[lang](post.src_lang, blogUrl(post.src_lang, post.slug))}</p>` : ''}</div>
     <div class="bp-actions"><button type="button" class="bp-like" aria-pressed="false"><span class="bp-heart">♥</span> <span class="bp-likes">${post.likes || 0}</span></button>
       <div class="bp-share-wrap"><button type="button" class="bp-share" aria-expanded="false" data-url="${SITE + blogUrl(lang, post.slug)}" data-title="${esc(title)}" data-img="${esc(post.cover ? (post.cover.startsWith('/') ? SITE + post.cover : post.cover) : '')}"
@@ -1055,7 +1081,7 @@ export async function blogPage(req, env, url, h) {
   const jsonld = { '@context': 'https://schema.org', '@type': 'BlogPosting', headline: title, description, inLanguage: textLang,
     datePublished: new Date((post.published_at || post.updated_at) * 1000).toISOString(), dateModified: new Date(post.updated_at * 1000).toISOString(),
     author: { '@type': 'Person', name: 'Alina Otkinska', url: SITE + '/about-me/' }, mainEntityOfPage: SITE + blogUrl(lang, post.slug),
-    ...(post.cover ? { image: post.cover.startsWith('/') ? SITE + post.cover : post.cover } : {}), keywords: tags.join(', ') };
+    ...(post.cover ? { image: post.cover.startsWith('/') ? SITE + post.cover : post.cover } : {}), keywords: tags.join(', '), ...(post.members ? { isAccessibleForFree: false, hasPart: { '@type': 'WebPageElement', isAccessibleForFree: false, cssSelector: '.bp-lock' } } : {}) };
   return html(fill(tpl, { title: `${title} · Pigeon Polly Art Lab`, description, canonical: SITE + blogUrl(lang, post.slug), content, image: post.cover,
     type: 'article', slug: post.slug, jsonld, noindex: post.status !== 'published' || (post.published_at || 0) > Date.now() / 1000 }));
 }

@@ -1,0 +1,35 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Wobbleland — mockup</title><link rel="stylesheet" href="m.css"><style>
+body{background:#EDE3CC}
+.wh{text-align:center;padding:54px 0 24px}.wh h1{font-size:72px;font-weight:800}.wh h1 em{font-weight:400;color:var(--burgundy)}
+.wh p{color:var(--ink2);font-size:19px;margin:10px auto 0;max-width:34em}
+.wt{display:flex;justify-content:center;gap:28px;font:600 17px Fraunces;border-bottom:1px solid var(--line);margin:24px 0 34px}
+.wt span{padding:10px 2px}.wt span.on{border-bottom:3px solid var(--burgundy)}
+.mapw{position:relative;background:#F7EEDB;padding:22px;border:1px solid #CDBB98;box-shadow:0 20px 40px rgba(80,50,20,.18);margin-bottom:50px}
+.mapw:before{content:"";position:absolute;inset:10px;border:2px solid #8A6A3A;pointer-events:none;z-index:2}
+.mapw img.m{width:100%;filter:blur(1.6px) sepia(.55) saturate(.7) hue-rotate(-14deg) contrast(.92) brightness(1.08)}
+.mapw:after{content:"";position:absolute;inset:22px;background:radial-gradient(transparent 55%,rgba(120,80,30,.35));mix-blend-mode:multiply;pointer-events:none}
+.pin{position:absolute;z-index:3;display:flex;align-items:center;gap:6px;background:#FBF6EC;border:1px solid #8A6A3A;border-radius:999px;padding:4px 10px 4px 4px;font:600 13px Fraunces;box-shadow:0 3px 8px rgba(0,0,0,.15)}
+.pin img{width:24px;height:28px}
+.compass{position:absolute;right:46px;bottom:40px;z-index:3;font:italic 600 18px Fraunces;color:#6A4A20;background:#FBF6EC;border:1px solid #8A6A3A;padding:8px 14px}
+.res h2{font-size:40px;margin-bottom:20px}
+.rg{display:grid;grid-template-columns:repeat(6,1fr);gap:16px;margin-bottom:60px}
+.rc{background:var(--card);border:1px solid var(--line);padding:14px;text-align:center}
+.rc img{width:100%;border-radius:6px;margin:0 auto 10px;box-shadow:0 6px 14px rgba(60,40,20,.2)}.rc b{font:600 15px Fraunces;display:block}.rc span{font-size:12px;color:var(--ink2)}
+.sets{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-bottom:70px}
+.set{background:var(--burgundy);color:var(--paper);padding:26px;display:flex;gap:20px;align-items:center}
+.set.o{background:#8A5A2B}.set img{width:110px;box-shadow:6px 8px 0 rgba(0,0,0,.25)}.set h3{font-size:24px}.set p{font-size:14px;opacity:.85;margin:6px 0 14px}.set .btn{border-color:var(--paper)}
+@media(max-width:700px){.wh{padding:28px 0 10px}.wh h1{font-size:44px}.wt{gap:16px;font-size:15px;overflow:auto;justify-content:flex-start;margin:16px -16px 20px;padding:0 16px}.wt span{white-space:nowrap}
+.mapw{padding:10px;margin:0 -6px 30px}.mapw:before{inset:5px}.mapw:after{inset:10px}.pin{font-size:10px;padding:2px 6px 2px 2px}.pin img{width:14px;height:16px}.compass{display:none}
+.rg{grid-template-columns:repeat(3,1fr);gap:8px}.rc span{display:none}.sets{grid-template-columns:1fr}.res h2{font-size:30px}}
+</style></head><body><header class="hd"><div class="wrap">
+  <a class="logo" href="home.html"><img src="img/logo-wc.png" alt=""><span>Pigeon Polly<small>Art Lab · Riga</small></span></a>
+  <nav class="nav"><a href="shop.html" >Shop</a><a href="#">Learn</a><a href="wobbleland.html" class="on">Wobbleland</a><a href="#">Journal</a><a href="#">About</a></nav>
+  <div class="hd-r"><span class="lang">EN · LV · RU</span><span>🛒 2</span><a class="door-btn" href="lab.html"><img src="../../site/images/wobbleland/ch-polly.png" alt=""><span>The Lab</span></a><span class="burger">☰</span></div>
+</div></header><div class="wrap"><div class="wh"><div class="eyebrow" style="color:var(--burgundy)">A world by Alina Otkinska</div><h1>Wobble<em>land</em></h1><p>Eleven wobbly towns, their residents, holidays and a collectible card for each of them.</p></div>
+<div class="wt"><span class="on">Map</span><span>Residents</span><span>Card sets</span><span>Comics</span><span>Holidays</span></div>
+<div class="mapw"><img class="m" src="../../site/images/wobbleland/map-pixel.png" alt=""><span class="pin" style="left:30%;top:40%"><img src="../../site/images/wobbleland/crest-newwobbleton.png">New Wobbleton</span><span class="pin" style="left:14%;top:22%"><img src="../../site/images/wobbleland/crest-jamshire.png">Jamshire</span><span class="pin" style="left:52%;top:18%"><img src="../../site/images/wobbleland/crest-maplewink.png">Maplewink</span><span class="pin" style="left:70%;top:56%"><img src="../../site/images/wobbleland/crest-snailhollow.png">Snail Hollow</span><span class="pin" style="left:22%;top:66%"><img src="../../site/images/wobbleland/crest-cheddarford.png">Cheddarford</span><span class="pin" style="left:80%;top:26%"><img src="../../site/images/wobbleland/crest-kettleford.png">Kettleford</span><span class="compass">✦ Map of Wobbleland</span></div>
+<div class="res"><h2>Meet the residents</h2><div class="rg"><div class="rc"><img src="../../site/images/cards/classic/11.jpg"><b>Pigeon Polly</b><span>New Wobbleton</span></div><div class="rc"><img src="../../site/images/cards/classic/13.jpg"><b>Miss Peony</b><span>Bakery seller</span></div><div class="rc"><img src="../../site/images/cards/classic/14.jpg"><b>Mr. Crisper</b><span>Lost-and-found keeper</span></div><div class="rc"><img src="../../site/images/cards/classic/15.jpg"><b>Milka</b><span>Lives in a box</span></div><div class="rc"><img src="../../site/images/cards/classic/17.jpg"><b>Mr. Dr. Fisher III</b><span>Doctor of… something</span></div><div class="rc"><img src="../../site/images/cards/classic/22.jpg"><b>Lady Puddle-Dip</b><span>Gourmet, LemonVale</span></div></div></div>
+<div class="sets"><div class="set"><img src="../../site/images/cards/classic/21.jpg"><div><h3>Classic set</h3><p>19 hand-painted cards · collect in the Lab, or buy the printable set</p><span class="btn sm">Get the set · €6</span></div></div>
+<div class="set o"><img src="../../site/images/cards/classic/12.jpg"><div><h3>Wobbleland comics</h3><p>Short stories from the towns. First issue soon.</p><span class="btn sm">Notify me</span></div></div></div></div><footer class="ft"><div class="wrap"><div><h4>One letter a month</h4><p>New prints, a free mini-lesson and what’s cooking in the Lab.</p><input placeholder="Your email"><span class="btn pri">Subscribe</span></div>
+<div><h4>Shop</h4><ul><li>Prints</li><li>Originals</li><li>Guides</li><li>Card sets</li></ul></div><div><h4>Explore</h4><ul><li>Wobbleland</li><li>Journal</li><li>Palettes</li><li>The Lab 🚪</li></ul></div>
+<div><h4>Alina</h4><ul><li>About</li><li>Work with me</li><li>LinkedIn</li><li>Patreon</li></ul></div><div class="bot"><span>© 2026 Pigeon Polly Art Lab · Riga</span><span>EN · LV · RU</span></div></div></footer></body></html>

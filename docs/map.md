@@ -16,6 +16,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/garden.js` (21K) — Огород птички (этап 22, /garden/, site/assets/garden.js, docs/bird.md «Огород»): грядки, с: CROPS, TIER, DAY, SIMPLE, GARDEN_ALTER, GARDEN_BOOL, out, fnv, grown, prices, bedOk, bugsOf
 - `worker/ideas.js` (9K) — Кабинет → «💡 Темы для блога»: по кнопке собираем, что сейчас ищут и обсуждают в сфере Алин: MONTHS, PAGES, SUBS, SEEDS, reddit, suggest, ask, ideasApi
 - `worker/index.js` (271K) — Worker: site/, страницы через HTMLRewriter, /api (кроме блога), cron: RULES, BTN, STOCK, GIFT_KINDS, GOLD_PICKS, PLEVEL, award, btnOf, catalog, avatarOf, cnt, gameUnit
+- `worker/notes.js` — 📢 Рассылка: сообщения и файлы птичкам, «кому» все/новые/старые: notesApi, noteNews, noteHistory, audWhere, audRange, NOTE_TABLES, NOTE_ALTER, NOTE_FILE_MAX
 - `worker/mail.js` (24K) — Письма с сайта по согласию (docs/bird.md «Письма»): три вида — games (уведомления из игр),: MAIL_DAY_MAX, ORDER, DIGEST, MAIL_CATS, ITEM, CAT, pageUrl, langOf, pre, sendOne, spend, usedToday
 - `worker/my-games.js` (3K) — «★ Мои игры» на главной (вкладка в «Моём дне», docs/site.md): 3 закреплённые игры птички и: MY_GAMES, MY_PINS, MY_GAMES_TABLES, rowOf, myGamesApi
 - `worker/pancakes.js` (12K) — «Блинная Полли» (/pancakes/, site/assets/pancakes.js, docs/games.md): Полли печёт блины жи: PAN_UPS, TOP, PAN_ALTER, PAN_BADGES, PAN_COND, PAN_INT, today, upsOf, price, pancakesApi
@@ -32,7 +33,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/about-admin.js` (6K) — Кабинет → «📮 Вопросы из чата» (admin.js открывает PPAboutAdmin.mount(main)): вопросы, кото: PPAboutAdmin, ERR, LANG, TABS, mount
 - `site/assets/about-desk.js` (52K) — «Стол Алины» на /about-me/ (docs/site.md): пиксельная картинка site/images/about/desk.webp: PAGE, SKIN, PAINT, rnd, box
 - `site/assets/account.js` (41K) — вход в шапке, меню аккаунта, обязательный ник, `html.is-admin`: PPDevH, PPWho, PPAccount, ALINA_MAIL, IN_APP
-- `site/assets/admin.js` (188K) — кабинет /admin/ (все разделы): BADGE_COND, FOLD, ADMIN_GROUPS, pct, shop
+- `site/assets/admin.js` (188K) — кабинет /admin/ (первый экран «🗓 Неделя», все разделы): BADGE_COND, FOLD, ADMIN_GROUPS, pct, shop
 - `site/assets/advent-admin.js` (9K) — кабинет → 🎄 Адвент: план окошек: PPAdventAdmin, ADV_SP, advSet, advBoard, advDayPick
 - `site/assets/advent.js` (17K) — адвент /advent/: отсчёт, окошки: ORDER, tap, goTo, draw, load
 - `site/assets/artpill-claude.js` (20K) — «Art-Pill by Polly»: скетчбук Claude — страницы с первой по последнюю (docs/artpill.md): PP_ARTPILL_CLAUDE
@@ -64,6 +65,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/hatch.js` (9K) — Вылупление (этап 14, docs/site.md «Главная»): пиксельное яйцо, трещины и птичка из скорлуп: PPHatch, EGG, KEY, SPOTS, step
 - `site/assets/home-blog.js` (2K) — блок блога на главной: pic
 - `site/assets/ideas-admin.js` (5K) — Кабинет → «💡 Темы для блога» (admin.js открывает PPIdeasAdmin.mount(main)): кнопка — сайт : PPIdeasAdmin, ERR, fmt, mount, text
+- `site/assets/broadcast-admin.js` — Кабинет → «📢 Рассылка» (PPBroadcast.mount): кому, сообщение + файл, подарок (PPGiftDialog + window.PPAud), пуговки, отправленные
 - `site/assets/mail-admin.js` (9K) — Кабинет → «✉️ Письма» (admin.js открывает PPMailAdmin.mount(main)): кто согласился на пись: PPMailAdmin, CAT, ERR, KEY, mount
 - `site/assets/news.js` (44K) — «Конвертик» — одна очередь новостей птички на всех страницах (этап 4 А).: PPNews, KINDS, COL, BOXES, feed
 - `site/assets/palettes.js` (38K) — страница /palettes/, палитра из фото, добавление палитр админом: NAMES, ADD_G, isAdmin, hue, monthName
@@ -237,3 +239,5 @@ _Сюда следующие этапы дописывают общие свед
 - Главная, вкладки «Моего дня» и «★ Мои игры» — src/pages/home.html (скрипт после полосы «Игр»); worker/my-games.js `myGamesApi` (GET/POST /api/games/mine, POST /api/games/visit, `MY_GAMES`). flock-news.js при `limit` шлёт событие `pp:fn` {view, ts}.
 - /about-me/: site/assets/about-desk.js — сцена со столом (рука на холсте 256×192: `handMat`/`drawHand`, действия `ACTS`, предметы `HOT`) и ретро-чат; worker/about-chat.js `aboutChatApi` (GET/POST /api/about-chat, /api/about-chat/ask, /extra, /api/admin/about-asks), `aboutAskNews` (новость aboutask), `aboutChatNews` (письмо chatnew), `chatRewards` (ступени, бейджи chatA/chatP/chatAP, ноутбук furn|pollychat; правило achatStepBtn, cond.chatFull); кабинет — about-admin.js `PPAboutAdmin`; вопросы базы — tools/about_chat.py.
 - Личная страница только для некоторых птичек — как worker/study.js: HTML в worker (не в site/), проверка `studyOk`, флаг в /api/whoami, пункт в меню аватара по флагу (account.js). Так же устроены worker/english.js (/english/) и worker/norsk.js (/norsk/, движок — копия английского в content/norsk/engine.js).
+- Редизайн 2.0: новые страницы — шаблон src/layout-v2.html + site/assets/v2.css/v2.js (build.py `V2`, `NOINDEX`, `V2_HOME`, `v2_books`); сезон — `html[data-season]`, цвета только через токены сезона.
+- Редизайн 2.0, старая страница в новой шапке: src/layout-v2-lab.html + site/assets/v2-shell.css (build.py `V2_LAB`: путь → исходная страница).

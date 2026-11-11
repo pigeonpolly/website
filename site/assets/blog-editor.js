@@ -36,7 +36,7 @@
   const secsOf = p => String(p && p.section || '').split(',').map(x => x.trim()).filter(Boolean); // у статьи может быть несколько разделов
   const HOME_SECS = ['traditional-art', 'technologies', 'education', 'pollys-life', 'tips-guides', 'stories'];
   let warnedHome = false;
-  const lf = { q: '', sec: '', from: '', to: '', fav: false, sort: 'date', dir: -1 };
+  const lf = { q: '', sec: '', from: '', to: '', fav: false, acc: '', sort: 'date', dir: -1 };
   // на каком языке показывать названия статей и разделов в списке (запоминается)
   let vl = 'ru'; try { vl = localStorage.getItem('pp-admin-lang') || 'ru'; } catch (e) {}
   const VL_ORDER = () => [vl, ...['ru', 'en', 'lv'].filter(x => x !== vl)];
@@ -118,6 +118,7 @@
       const day = p => localDate(p.published_at || p.updated_at);
       const match = p => {
         if (lf.fav && !p.featured) return false;
+        if (lf.acc && (lf.acc === 'members') !== !!p.members) return false; // 🔒 закрытые / открытые
         if (lf.sec && (lf.sec === '-' ? secsOf(p).length : !secsOf(p).includes(lf.sec))) return false;
         if (lf.from && day(p) < lf.from) return false;
         if (lf.to && day(p) > lf.to) return false;
@@ -134,13 +135,13 @@
       list = [...list].sort((a, b) => { const x = SORT[lf.sort](a), y = SORT[lf.sort](b); return (x > y ? 1 : x < y ? -1 : 0) * lf.dir; });
       const months = [...new Set(state.posts.map(day).map(d => d.slice(0, 7)))].sort().reverse();
       const MN = ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'];
-      const active = lf.q || lf.sec || lf.from || lf.to || lf.fav;
+      const active = lf.q || lf.sec || lf.from || lf.to || lf.fav || lf.acc;
       const filters = `<div class="be-filters">
         <input type="search" id="be-q" placeholder="🔍 Поиск: название, тег, адрес…" value="${esc(lf.q)}" aria-label="Поиск по статьям">
         <select id="be-fsec" aria-label="Раздел"><option value="">Все разделы</option>${sections.map(x => `<option value="${esc(x.slug)}"${lf.sec === x.slug ? ' selected' : ''}>${esc(sname(x))}</option>`).join('')}<option value="-"${lf.sec === '-' ? ' selected' : ''}>— без раздела —</option></select>
         <select id="be-fmonth" aria-label="Месяц"><option value="">Любой месяц</option>${months.map(m => { const a = m + '-01', b = m + '-31'; return `<option value="${m}"${lf.from === a && lf.to === b ? ' selected' : ''}>${MN[+m.slice(5) - 1]} ${m.slice(0, 4)}</option>`; }).join('')}</select>
         <span class="be-period"><label>с <input type="date" id="be-from" value="${lf.from}"></label><label>по <input type="date" id="be-to" value="${lf.to}"></label></span>
-        <button type="button" class="be-favf" id="be-fav" aria-pressed="${lf.fav}" title="Только статьи, отмеченные звёздочкой">★ Избранные <span>${(TABS[dashTab] || pub).filter(p => p.featured).length}</span></button>
+        <button type="button" class="be-favf" id="be-fav" aria-pressed="${lf.fav}" title="Только статьи, отмеченные звёздочкой">★ Избранные <span>${(TABS[dashTab] || pub).filter(p => p.featured).length}</span></button><select id="be-acc" title="Кто может читать"><option value="">Все: открытые и 🔒</option><option value="open"${lf.acc === 'open' ? ' selected' : ''}>Открытые всем</option><option value="members"${lf.acc === 'members' ? ' selected' : ''}>🔒 Только для своих (${(TABS[dashTab] || pub).filter(p => p.members).length})</option></select>
         ${active ? '<button type="button" class="bc-link" id="be-freset">✕ сбросить</button>' : ''}</div>`;
       const sum = (k) => list.reduce((n, p) => n + (p[k] || 0), 0);
       const stats = list.length ? `<p class="be-sum">Найдено: <b>${list.length}</b> · 👁 ${sum('views')} просмотров · ♥ ${sum('likes')} · 💬 ${sum('comments')}${list.length > 1 ? ` · в среднем 👁 ${Math.round(sum('views') / list.length)} на статью` : ''}</p>` : '';
@@ -169,7 +170,7 @@
           <button type="button" class="bc-link" data-unpick>снять выбор</button>` : ''}</div>`;
       return head + bulk + `<table class="be-table be-posts"><thead><tr><th class="be-ck"><input type="checkbox" id="be-pickall" aria-label="Выбрать все" ${n && n === list.length ? 'checked' : ''}></th>${th('title', 'Статья')}<th>Языки</th><th>Разделы</th>${th('date', 'Дата')}${th('likes', '♥', 'лайки')}${th('views', '👁', 'просмотры')}${th('comments', '💬', 'комментарии')}<th></th></tr></thead><tbody>
         ${list.map(p => `<tr data-id="${p.id}"${picked.has(p.id) ? ' class="picked"' : ''}><td class="be-ck"><input type="checkbox" data-pick ${picked.has(p.id) ? 'checked' : ''} aria-label="Выбрать"></td>
-          <td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${esc(ptitle(p) || '(без названия)')}${ptitle(p) && !p['t_' + vl] ? ` <small class="be-nolang">(нет на ${vl.toUpperCase()})</small>` : ''}</b></a>${isSched(p) ? `<br><small class="be-schedmark">⏰ Запланирована на ${schedText(p.published_at)}</small>` : ''}</td>
+          <td><button class="be-star" data-star aria-pressed="${!!p.featured}" title="Избранное: показывать справа на главной">${p.featured ? '★' : '☆'}</button> <a href="#${p.id}"><b>${p.members ? '🔒 ' : ''}${esc(ptitle(p) || '(без названия)')}${ptitle(p) && !p['t_' + vl] ? ` <small class="be-nolang">(нет на ${vl.toUpperCase()})</small>` : ''}</b></a>${isSched(p) ? `<br><small class="be-schedmark">⏰ Запланирована на ${schedText(p.published_at)}</small>` : ''}</td>
           <td><span class="be-langs">${['ru', 'en', 'lv'].map(l => p['t_' + l] ? `<i class="on" title="Есть на ${l.toUpperCase()}">✓ ${l.toUpperCase()}</i>` : `<i title="Нет перевода на ${l.toUpperCase()}">${l.toUpperCase()}</i>`).join('')}</span></td>
           <td><details class="be-rowsecs" data-rowsecs><summary>${secsOf(p).length ? secsOf(p).map(x => `<i>${esc(sname(sections.find(r => r.slug === x) || { en: x }))}</i>`).join('') : '<span>— без раздела —</span>'}</summary>
             <div>${sections.map(x => `<label><input type="checkbox" value="${esc(x.slug)}" ${secsOf(p).includes(x.slug) ? 'checked' : ''}> ${esc(sname(x))}</label>`).join('')}</div></details></td>
@@ -247,8 +248,9 @@
       app.querySelector('#be-fmonth').addEventListener('change', e => { const m = e.target.value; lf.from = m ? m + '-01' : ''; lf.to = m ? m + '-31' : ''; dashboardLocal(); });
       app.querySelector('#be-from').addEventListener('change', e => { lf.from = e.target.value; dashboardLocal(); });
       app.querySelector('#be-to').addEventListener('change', e => { lf.to = e.target.value; dashboardLocal(); });
-      const fr = app.querySelector('#be-freset'); fr && fr.addEventListener('click', () => { Object.assign(lf, { q: '', sec: '', from: '', to: '', fav: false }); dashboardLocal(); });
+      const fr = app.querySelector('#be-freset'); fr && fr.addEventListener('click', () => { Object.assign(lf, { q: '', sec: '', from: '', to: '', fav: false, acc: '' }); dashboardLocal(); });
       app.querySelector('#be-fav').addEventListener('click', () => { lf.fav = !lf.fav; dashboardLocal(); });
+      app.querySelector('#be-acc').addEventListener('change', e => { lf.acc = e.target.value; dashboardLocal(); });
     }
     app.querySelectorAll('[data-vl]').forEach(b => b.addEventListener('click', () => { vl = b.dataset.vl; try { localStorage.setItem('pp-admin-lang', vl); } catch (e) {} dashboardLocal(); }));
     app.querySelectorAll('[data-sort]').forEach(b => b.addEventListener('click', () => { const k = b.dataset.sort; lf.dir = lf.sort === k ? -lf.dir : (k === 'title' ? 1 : -1); lf.sort = k; dashboardLocal(); }));
@@ -446,6 +448,7 @@
           <datalist id="be-taglist-en">${(knownTags.en || []).map(x => `<option value="${esc(x)}">`).join('')}</datalist>
           <input type="hidden" data-k="tags_en" value="${esc(post.tags_en || post.tags_ru || post.tags_lv || '')}"></div>
         <label class="be-check"><input type="checkbox" id="be-featured" ${post.featured ? 'checked' : ''}> <b>★ Избранное</b> <small>— показывать справа в блоке блога на главной</small></label>
+        <label class="be-check"><input type="checkbox" id="be-members" ${post.members ? 'checked' : ''}> <b>🔒 Только для своих</b> <small>— гости видят начало и кнопку «Войти»; читать целиком могут все, кто вошёл</small></label>
         <label class="be-f"><span>Адрес статьи <small id="be-slug-note">${post.status === 'published' ? '(статья опубликована — адрес лучше не менять, иначе старые ссылки перестанут работать)' : '(заполняется сам из заголовка; можно поправить)'}</small></span><div class="be-slug"><span>pigeonpolly.com/blog/</span><input type="text" id="be-slug" value="${esc(post.slug)}" spellcheck="false"><span>/</span></div></label>
       </section></aside><div class="be-shade" id="be-shade" hidden></div>
       <div class="be-save">
@@ -469,7 +472,7 @@
     // метка этой новой статьи: если ответ на сохранение потерялся, повторное сохранение обновит ту же статью, а не создаст копию
     if (!post.id && !post.key) post.key = (crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + Math.random().toString(36).slice(2));
     const collect = () => {
-      const d = { id: post.id, client_key: post.key, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, src_lang: $('#be-src').value, published_at: dateTouched || post.status === 'published' ? dateToTs($('#be-date').value, $('#be-time').value, post.published_at) : undefined, section: [...app.querySelectorAll('#be-secs input:checked')].map(i => i.value) };
+      const d = { id: post.id, client_key: post.key, slug: slugify($('#be-slug').value), cover, featured: $('#be-featured').checked, members: $('#be-members').checked, src_lang: $('#be-src').value, published_at: dateTouched || post.status === 'published' ? dateToTs($('#be-date').value, $('#be-time').value, post.published_at) : undefined, section: [...app.querySelectorAll('#be-secs input:checked')].map(i => i.value) };
       app.querySelectorAll('[data-k]').forEach(el => {
         if (!el.isContentEditable) { d[el.dataset.k] = el.value; return; }
         const c = el.cloneNode(true);

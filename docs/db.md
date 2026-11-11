@@ -14,7 +14,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **login_fail** (worker/auth.js): `k` text PK, `n` int nn, `at` int nn
 - **pw_reset** (worker/auth.js): `hash` text PK, `user_id` int nn, `expires` int nn, `created_at` int
 - **funnel** (worker/auth.js): `day` text nn, `name` text nn, `step` text nn, `vid` text nn; PRIMARY KEY (day, name, step, vid)
-- **blog_posts** (worker/blog.js): `id` int PK auto, `slug` text UNIQUE nn, `status` text ='draft', `cover` text ='', `t_ru` text ='', `t_en` text ='', `t_lv` text ='', `d_ru` text ='', `d_en` text ='', `d_lv` text ='', `b_ru` text ='', `b_en` text ='', `b_lv` text ='', `tags_ru` text ='', `tags_en` text ='', `tags_lv` text ='', `views` int =0, `likes` int =0, `created_at` int, `updated_at` int, `published_at` int; + `featured` int =0').run(), `pinned` int =0').run(), `src_lang` text, `client_key` text, `section` text =''
+- **blog_posts** (worker/blog.js): `id` int PK auto, `slug` text UNIQUE nn, `status` text ='draft', `cover` text ='', `t_ru` text ='', `t_en` text ='', `t_lv` text ='', `d_ru` text ='', `d_en` text ='', `d_lv` text ='', `b_ru` text ='', `b_en` text ='', `b_lv` text ='', `tags_ru` text ='', `tags_en` text ='', `tags_lv` text ='', `views` int =0, `likes` int =0, `created_at` int, `updated_at` int, `published_at` int; + `featured` int =0').run(), `pinned` int =0').run(), `src_lang` text, `client_key` text, `section` text ='', `members` int =0 (🔒 только для вошедших)
 - **blog_likes** (worker/blog.js): `post_id` int nn, `who` text nn; PRIMARY KEY (post_id, who)
 - **blog_comments** (worker/blog.js): `id` int PK auto, `post_id` int nn, `user_id` int, `anon` text, `body` text nn, `ip` text, `status` text ='ok', `created_at` int
 - **blog_tags** (worker/blog.js): `en` text PK, `ru` text ='', `lv` text =''; + `checked` int =0, `src` text ='', `created_at` int
@@ -118,3 +118,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `wl_gift:` — worker/wl-holidays.js
 - `wl_mail_n:` — worker/mail.js, worker/wl-holidays.js
 - `works_total` — worker/blog.js, worker/index.js
+- `out_clicks(id, day, ts, vid, target, path, href)` — нажатия на ссылки наружу (пока target = amazon), vid — суточный отпечаток как в visits; worker/week.js, кабинет «🗓 Неделя».
+- **notes** (worker/notes.js): `id` int PK auto, `L` text nn (JSON {en,ru,lv: {s,t}}), `file_key` text, `file_name` text, `file_size` int =0, `file_type` text, `aud` text ='all', `days` int =0, `total` int =0, `mail_id` int, `created_at` int
+- **note_to** (worker/notes.js): `note_id` int nn, `user_id` int nn, `seen_at` int =0; PRIMARY KEY (note_id, user_id); индекс note_to_user
+- mail_out + `aud_from` int =0, `aud_to` int =0 — границы даты регистрации получателей (📢 Рассылка)
