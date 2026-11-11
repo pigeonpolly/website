@@ -21,11 +21,22 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=Karla:wght@400;500;700&family=Caveat:wght@700&family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito+Sans:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/v2.css?v=856f7cd7">
+<link rel="stylesheet" href="/assets/v2.css?v=0a12711f">
+<link rel="stylesheet" href="/assets/v2-acct.css?v=e576fda0">
+<link rel="stylesheet" href="/assets/v2-shell.css?v=57822ba4">
+<!-- шапка как на остальных страницах: вход, меню аватара, пуговки, корзина, колокольчик, поиск (стили — v2-acct.css из tools/v2_acct_css.py) -->
 <script src="/assets/birds.js?v=8b869e67" defer></script>
+<script src="/assets/room.js?v=686e8cfd" defer></script>
+<script src="/assets/toast.js?v=93392a35" defer></script>
+<script src="/assets/day-card.js?v=8fce5fd5" defer></script>
+<script src="/assets/hatch.js?v=6d36422a" defer></script>
+<script src="/assets/cart.js?v=8f90c619" defer></script>
+<script src="/assets/account.js?v=92b521ac" defer></script>
+<script src="/assets/news.js?v=ccd55f0a" defer></script>
+<script src="/assets/search.js?v=fd80358d" defer></script>
 <script src="/assets/v2.js?v=825a1793" defer></script>
 </head>
-<body class="v2">
+<body class="v2 v2s">
 <a class="skip" href="#main">Pāriet uz saturu</a>
 <header class="hd2"><div class="w">
   <a class="lg" href="/lv/"><img src="/images/v2/logo-wc.png" width="46" height="46" alt=""><span>Pigeon Polly <i>Art Lab</i></span></a>
@@ -34,9 +45,13 @@
   </nav>
   <div class="hr">
     <a class="lb" href="/lv/games/">The Lab</a>
+    <button type="button" class="search-btn" aria-label="Meklēt vietnē"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
     <nav class="lang-switch" aria-label="Language"><a href="/blog/" hreflang="en" lang="en">EN</a><a href="/lv/blog/" hreflang="lv" lang="lv" aria-current="true">LV</a><a href="/ru/blog/" hreflang="ru" lang="ru">RU</a></nav>
     <div class="sea2"><button type="button" class="sea-b" aria-expanded="false" aria-controls="sea-m" title="Sezona" aria-label="Sezona"><i></i></button><div class="sea-m" id="sea-m" hidden><span class="switch" role="group" aria-label="Sezona"><button type="button" data-s="winter" title="Ziema" aria-label="Ziema"><i></i>Ziema</button><button type="button" data-s="spring" title="Pavasaris" aria-label="Pavasaris"><i></i>Pavasaris</button><button type="button" data-s="summer" title="Vasara" aria-label="Vasara"><i></i>Vasara</button><button type="button" data-s="autumn" title="Rudens" aria-label="Rudens"><i></i>Rudens</button></span></div></div>
-    <a class="btn acct2" id="acct2" href="/lv/games/#signin">Ienākt</a>
+    <a class="hd-btns" id="hd-btns" href="/lv/shop/" hidden aria-label="Pogas · veikals"><span aria-hidden="true">🔘</span> <b></b></a>
+    <a class="hd-cart bell" id="hd-cart" href="/lv/shop/#cart" hidden aria-label="Cart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.5l2.2 10.5h10L20 7H7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="9.5" cy="19" r="1.6" fill="currentColor"/><circle cx="16.5" cy="19" r="1.6" fill="currentColor"/></svg><b class="bell-n" hidden></b></a>
+    <button type="button" class="bell" id="pp-bell" hidden aria-label="News"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 21h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><b class="bell-n" hidden></b></button>
+    <div class="acct" id="acct"></div>
     <button type="button" class="burger" aria-expanded="false" aria-controls="drawer" aria-label="Izvēlne">☰</button>
   </div>
 </div>
@@ -58,12 +73,14 @@
 
 </main>
 <footer class="ft2"><div class="w">
+  <!-- подвал: все страницы сайта по разделам (11.11, просьба Алины); подписи — ключи data-f>…< в content/i18n -->
   <div class="cols">
     <div class="intro"><h4>Pigeon Polly <em>Art Lab</em></h4><p>Akvareļa un tušas nodarbības, radošas rokasgrāmatas un maza zīmētu varoņu pasaule, radīta Rīgā.</p>
       <div class="soc"><a href="https://www.patreon.com/cw/pigeon_polly" target="_blank" rel="noopener">Patreon</a><a href="https://www.instagram.com/pigeonpolly" target="_blank" rel="noopener">Instagram</a><a href="https://www.tiktok.com/@pigeonpolly" target="_blank" rel="noopener">TikTok</a><a href="https://www.pinterest.com/pigeonpollyart/" target="_blank" rel="noopener">Pinterest</a></div></div>
-    <div><h4>Mācīties</h4><a href="/lv/learn/">Nodarbības</a><a href="/lv/guides/">Ceļveži un grāmatas</a><a href="/lv/blog/">Žurnāls</a><a href="/lv/palettes/">Paletes</a></div>
-    <div><h4>Izpētīt</h4><a href="/lv/wobbleland/">Wobbleland</a><a href="/lv/games/">The Lab</a><a href="/lv/flock/">Putnu bars</a><a href="/lv/challenge/">Izaicinājums</a></div>
-    <div><h4>Alīna</h4><a href="/lv/about/">Par mani</a><a href="/lv/work-with-me/">Sadarbība</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener">LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener">Amazon</a></div>
+    <div><h4 data-f>Mācīties</h4><a href="/lv/learn/" data-f>Nodarbības</a><a href="/lv/guides/" data-f>Rokasgrāmatas un grāmatas</a><a href="/lv/blog/" data-f>Žurnāls</a><a href="/lv/e-books/" data-f>Grāmatas</a><a href="/lv/palettes/" data-f>Paletes</a><a href="/lv/polly-helps/" data-f>Pollija, palīdzi</a></div>
+    <div><h4 data-f>Laboratorija</h4><a href="/lv/games/" data-f>Visas spēles</a><a href="/lv/shop/" data-f>Veikals</a><a href="/lv/advent/" data-f>Adventes kalendārs</a><a href="/lv/rain/" data-f>Pogu lietus</a><a href="/lv/potions/" data-f>Dziru virtuve</a><a href="/lv/pancakes/" data-f>Pollijas pankūkas</a><a href="/lv/titos/" data-f>Detektīvs Titoss</a><a href="/lv/shift/" data-f>Maiņa ar Polliju</a><a href="/lv/polly-office/" data-f>Pollijas birojs</a><a href="/lv/wobbleland/" data-f>Wobbleland</a></div>
+    <div><h4 data-f>Bars</h4><a href="/lv/flock/" data-f>Visi putniņi</a><a href="/lv/flock/news/" data-f>Bara ziņas</a><a href="/lv/challenge/" data-f>Dienas izaicinājums</a><a href="/lv/challenge/#sw-wall" data-f>Bara zīmējumi</a><a href="/lv/requests/" data-f>Uzzīmē man</a><a href="/lv/garden/" data-f>Putniņa dārzs</a></div>
+    <div><h4 data-f>Alīna</h4><a href="/lv/about/" data-f>Par mani</a><a href="/lv/art-portfolio/" data-f>Skiču burtnīca</a><a href="/lv/on-walls-and-pages/" data-f>Uz sienām un lapām</a><a href="/lv/projects/" data-f>Mācības un MI</a><a href="/lv/work-with-me/" data-f>Sadarbība</a><a href="/lv/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
   <div class="bt"><span>© 2026 Alīna Otkinska · Pigeon Polly Art Lab · Rīga</span><span><a href="/lv/privacy/">Privātums</a></span></div>
 </div></footer>

@@ -169,7 +169,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
 
 /* подвал */
 .ft2{padding:70px 0 30px}
-.ft2 .cols{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:30px;font-size:14px;color:var(--mut);line-height:2}
+.ft2 .cols{display:grid;grid-template-columns:1.5fr repeat(4,1fr);gap:30px;font-size:14px;color:var(--mut);line-height:1.85}
 .ft2 h4{font:400 20px Fraunces,Lora,serif;color:var(--ink);margin-bottom:8px}
 .ft2 .cols a{display:block}.ft2 .cols a:hover{color:var(--acc)}
 .ft2 .intro p{max-width:24em;line-height:1.6;margin-bottom:16px}
@@ -266,8 +266,8 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 .v2 .page-head h1{font-size:84px;margin:16px 0 14px}.v2 .page-head .lead{font-size:19px;color:var(--mut);max-width:32em}
 .v2 .bl-count{margin-top:12px;font-size:14px;color:var(--mut)}
 .v2 .page-head:not(.bl-head){max-width:1260px;margin:0 auto;padding:76px 44px 90px}.v2 .page-head .actions{margin-top:24px}
-.v2 .pill-btn{display:inline-flex;align-items:center;gap:8px;font:700 14px Karla,'Nunito Sans',sans-serif;padding:11px 20px;border-radius:999px;border:1.5px solid var(--ink);background:none;color:var(--ink);cursor:pointer}
-.v2 .pill-btn.pill-fill{background:var(--acc);border-color:var(--acc);color:#fff}
+.v2 main .pill-btn{display:inline-flex;align-items:center;gap:8px;font:700 14px Karla,'Nunito Sans',sans-serif;padding:11px 20px;border-radius:999px;border:1.5px solid var(--ink);background:none;color:var(--ink);cursor:pointer}
+.v2 main .pill-btn.pill-fill{background:var(--acc);border-color:var(--acc);color:#fff}
 .v2 .bl-admin{margin-top:16px}
 .v2 .bl-tools,.v2 .bl-grid{max-width:1260px;margin:0 auto;padding:0 44px}
 .v2 .bl-tools{display:flex;justify-content:space-between;margin-bottom:30px}
