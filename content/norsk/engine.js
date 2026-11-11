@@ -470,6 +470,7 @@
       fb.innerHTML = (r.mk ? (r.ok ? '<b class="ok">✓ Принято.</b> ' : `<b class="no">Почти:</b> ${r.mk.join('; ')}. `) + (r.right ? `Пример: <i class="en">${esc(r.right)}</i> ` : '')
         : r.ok ? '<b class="ok">✓ Верно.</b> ' : `<b class="no">✗</b> ${r.noShow ? '' : 'Правильно: '}<span class="ans">${r.noShow ? '' : fmt(r.right)}</span> `)
         + (it.why ? fmt(it.why) : '')
+        + ((it.t === 'order' || it.t === 'ls') && ruOf(it.p[0]) ? `<br><span class="tr-fb">Перевод: ${esc(ruOf(it.p[0]))}</span>` : '')
         + (!r.ok && r.self ? ` <button type="button" class="btn small" data-act="self">Мой вариант тоже верен</button>` : '')
         + (!r.ok && it.t !== 'choice' && it.t !== 'tf' ? '' : '');
       for (const inp of $$('input, textarea', li)) inp.disabled = true;
@@ -703,7 +704,7 @@
   function topicHTML(u) {
     const T = TOPICS[u.id];
     return `<section class="sec topic" id="topic"><details class="tdet"><summary><span class="ic">${T.ic || '🗂'}</span> Тематический словарь: ${esc(T.t)} <span class="note-s">· ${T.w.length} слов — нажмите, чтобы раскрыть</span></summary>
-      <ul class="words">${T.w.map(([w, tr, s], i) => `<li><span><span class="w">${esc(w)}</span> <span class="tr">— ${esc(tr)}</span></span><span class="acts">${sayBtn(w)}${S.v[w.toLowerCase()] ? '<span class="in-dict">в словаре ✓</span>' : `<button type="button" class="btn small" data-addtw="${i}">+</button>`}</span>${s ? `<span class="s">${esc(s)}</span>` : ''}</li>`).join('')}</ul>
+      <ul class="words">${T.w.map(([w, tr, s], i) => `<li><span><span class="w">${esc(w)}</span> <span class="tr">— ${esc(tr)}</span></span><span class="acts">${sayBtn(w)}${S.v[w.toLowerCase()] ? '<span class="in-dict">в словаре ✓</span>' : `<button type="button" class="btn small" data-addtw="${i}">+</button>`}</span>${s ? `<span class="s">${esc(s)}</span>${ruLine(s)}` : ''}</li>`).join('')}</ul>
       <p><button type="button" class="btn" data-addtall>+ Вся тема в словарь</button> <button type="button" class="btn" data-cards>🃏 Карточки</button></p><div class="cards" hidden>${cardsHTML(T.w.map(([w, tr, s]) => ({ w, tr, ex: s })))}</div>
       <p class="note-s">Проверка этих слов — в конце урока, блок «🗂 Слова темы». <a href="#topics">Все темы курса</a></p></details></section>`;
   }
@@ -742,7 +743,7 @@
     if (u.exm) h += `<div class="ex-list">${u.exm.map(([e, r]) => `<p>${sayBtn(e)} <i class="en">${esc(e)}</i><span class="ru">${esc(r)}</span></p>`).join('')}</div>`;
     if (u.conf) h += `<div class="box conf"><h4>⚠ Не путай</h4><dl>${u.conf.map(c => `<dt>${fmt(c[0])}</dt><dd>${c[1]}</dd>`).join('')}</dl></div>`;
     if (u.words) h += `<section class="sec" id="words"><h3><span class="ic">📒</span>Слова урока</h3><p class="note-s">Слово запоминается, когда его используешь: оно встретится в заданиях «Своими словами», в слушании и в повторении следующих уроков.</p>
-      <ul class="words">${u.words.map(([w, tr, s]) => `<li><span><span class="w">${esc(w)}</span> <span class="tr">— ${esc(tr)}</span></span><span class="acts">${sayBtn(w)}${S.v[w.toLowerCase()] ? '<span class="in-dict">в словаре ✓</span>' : `<button type="button" class="btn small" data-addw="${esc(w)}">+</button>`}</span>${s ? `<span class="s">${esc(s)}</span>` : ''}</li>`).join('')}</ul>
+      <ul class="words">${u.words.map(([w, tr, s]) => `<li><span><span class="w">${esc(w)}</span> <span class="tr">— ${esc(tr)}</span></span><span class="acts">${sayBtn(w)}${S.v[w.toLowerCase()] ? '<span class="in-dict">в словаре ✓</span>' : `<button type="button" class="btn small" data-addw="${esc(w)}">+</button>`}</span>${s ? `<span class="s">${esc(s)}</span>${ruLine(s)}` : ''}</li>`).join('')}</ul>
       <p><button type="button" class="btn" data-addall>+ Все слова урока в словарь</button> <button type="button" class="btn" data-cards>🃏 Карточки</button></p><div class="cards" hidden>${cardsHTML(u.words.map(([w, tr, s]) => ({ w, tr, ex: s })))}</div></section>`;
     if (TOPICS[u.id]) h += topicHTML(u);
     if (N.etym) h += `<div class="box etym"><h4>🔎 Откуда слово</h4>${N.etym.map(([w, t]) => `<p><b class="en">${esc(w)}</b> — ${fmt(t)}</p>`).join('')}</div>`;
@@ -803,6 +804,22 @@
       ${N.etb ? `<div class="box etym"><h4>🔎 Слово из книги</h4><p>${fmt(N.etb)}</p></div>` : ''}
       ${bookGroups(u).length ? late(u.id + '-b', 'Задания к книге', () => blockHTML(u.id + '-b', 'Задания к книге', bookGroups(u), { track: true })) : ''}</section>`;
   }
+  let TRX = null;
+  function ruOf(nb) { // русский перевод норвежского предложения учебника или ''
+    if (!nb) return '';
+    if (!TRX) {
+      TRX = {};
+      for (const u of ORIG.u) {
+        for (const [n, r] of u.exm || []) TRX[n.trim()] = r;
+        for (const e of u.ex || []) if (e.t === 'tr') for (const q of e.q) { const p = q.split(' # ')[0].split('|'); for (const a of p.slice(1)) TRX[a.trim()] = TRX[a.trim()] || p[0].replace(/\s*\([^)]*\)\s*$/, ''); } // без пометок вроде «(на букмоле)»
+      }
+      Object.assign(TRX, window.NO_TR || {});
+    }
+    const k = (ME === 'Alina' ? nb : nb.replace(new RegExp(`(?<![\\wæøåÆØÅ])${ME.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')}(?![\\wæøåÆØÅ])`, 'g'), 'Alina')).trim();
+    const r = TRX[k] || TRX[k.replace(/[.!?]+$/, '')] || TRX[k + '.'];
+    return r ? personal(r, ME, nameRu() || ME) : '';
+  }
+  const ruLine = nb => { const r = ruOf(nb); return r ? `<span class="s-ru">${esc(r)}</span>` : ''; };
   function cardsHTML(list) {
     return list.map(c => `<button type="button" class="fcard" data-flip><span class="f"><b class="en">${esc(c.w)}</b><small>нажмите — перевод</small></span><span class="b">${esc(c.tr || '—')}${c.ex ? `<small class="en">${esc(c.ex)}</small>` : ''}</span></button>`).join('');
   }
@@ -991,7 +1008,7 @@
     const n = Object.values(TOPICS).reduce((a, t) => a + t.w.length, 0);
     view.innerHTML = `<div class="uhead"><div class="lv">Справочник</div><h2>Тематический словарь</h2><p class="sub">${Object.keys(TOPICS).length} тем · ${n} слов — по одной теме в каждом уроке. К концу курса — словарь на все случаи жизни.</p></div>
       ${crow('Слова по темам — как рыба по сортам: треска к треске, сельдь к сельди. Так запоминается лучше.')}
-      ${LEVELS.map(l => { const us = unitsOf(l.id).filter(u => TOPICS[u.id]); return us.length ? `<h3>${l.id} · ${esc(l.name)}</h3>${us.map(u => { const T = TOPICS[u.id]; return `<details class="box tdet"><summary>${T.ic || '🗂'} <b>${esc(T.t)}</b> <span class="note-s">· ${T.w.length} слов${isDone(u.id + '-v') ? ' · ✓' : ''} · <a href="#u/${u.id}">урок ${esc(u.lvl)}</a></span></summary><ul class="words">${T.w.map(([w, tr, s]) => `<li><span><span class="w">${esc(w)}</span> <span class="tr">— ${esc(tr)}</span></span><span class="acts">${sayBtn(w)}</span>${s ? `<span class="s">${esc(s)}</span>` : ''}</li>`).join('')}</ul></details>`; }).join('')}` : ''; }).join('')}`;
+      ${LEVELS.map(l => { const us = unitsOf(l.id).filter(u => TOPICS[u.id]); return us.length ? `<h3>${l.id} · ${esc(l.name)}</h3>${us.map(u => { const T = TOPICS[u.id]; return `<details class="box tdet"><summary>${T.ic || '🗂'} <b>${esc(T.t)}</b> <span class="note-s">· ${T.w.length} слов${isDone(u.id + '-v') ? ' · ✓' : ''} · <a href="#u/${u.id}">урок ${esc(u.lvl)}</a></span></summary><ul class="words">${T.w.map(([w, tr, s]) => `<li><span><span class="w">${esc(w)}</span> <span class="tr">— ${esc(tr)}</span></span><span class="acts">${sayBtn(w)}</span>${s ? `<span class="s">${esc(s)}</span>${ruLine(s)}` : ''}</li>`).join('')}</ul></details>`; }).join('')}` : ''; }).join('')}`;
   }
   function seriesPage() {
     const all = UNITS.filter(u => u.series).flatMap(u => u.series.map(s => [u, s]));
@@ -1240,7 +1257,7 @@
     const f = new FormData(e.target); if (addWord(f.get('w'), f.get('tr'), f.get('ex'), 'моё')) dictPage(); else alert('Такое слово уже есть в словаре');
   });
 
-  window.NO_DEBUG = { BLOCKS, state: () => S, grammar }; // для tools/norsk_check.js
+  window.NO_DEBUG = { BLOCKS, state: () => S, grammar, ruOf }; // для tools/norsk_check.js
   buildToc(); route();
   fetch('/api/norsk', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : Promise.reject(r.status))
     .then(j => { const sv = (j && j.state) || {}; S = Object.assign(fresh(RESET_AT), merge(S, sv)); /* недостающие разделы — пустыми */ if ((sv.rv || 0) !== S.rv) save(); /* сброс записываем на сервер один раз — дальше прогресс копится как обычно */ try { localStorage.setItem(LS, JSON.stringify(S)); } catch (e) { /* нет места */ } saveEl.textContent = 'синхронизировано'; synced = true; applyName(S.name); if (S.theme !== undefined) setTheme(S.theme, true); route(); if (!S.name) askName(); })
