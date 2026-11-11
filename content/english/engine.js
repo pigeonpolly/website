@@ -434,9 +434,9 @@
   }
   function weakUnits() { return UNITS.filter(u => (S.m[u.id] || [0, 0])[1] >= 5).map(u => [u, S.m[u.id][0] / S.m[u.id][1]]).filter(x => x[1] >= .15).sort((a, b) => b[1] - a[1]); }
   function fixItems(units, n) { // задания с ошибками (сначала самые частые) + новые задания по тем же урокам, если ошибок мало
-    const refs = Object.entries(S.x).filter(([r]) => { const u = refUnit(r); return u && (!units || units.includes(u)); }).sort((a, b) => b[1] - a[1]).map(x => x[0]);
+    const refs = Object.entries(S.x).filter(([r]) => { const u = refUnit(r); return u && !/-[rb]#/.test(r) && (!units || units.includes(u)); }) /* вопросы к текстам и главам книги — только рядом с текстом */.sort((a, b) => b[1] - a[1]).map(x => x[0]);
     const out = []; for (const r of refs) { if (out.length >= n) break; const it = itemByRef(r); if (it) out.push(variant(it)); }
-    const pool = shuffle((units || weakUnits().map(x => x[0])).flatMap(u => blocksOf(u).filter(b => !/-w$/.test(b)).flatMap(b => itemsOf(b).map((_, i) => b + '#' + i)))).filter(r => !refs.includes(r));
+    const pool = shuffle((units || weakUnits().map(x => x[0])).flatMap(u => blocksOf(u).filter(b => !/-[wrb]$/.test(b)).flatMap(b => itemsOf(b).map((_, i) => b + '#' + i)))).filter(r => !refs.includes(r));
     for (const r of pool) { if (out.length >= n) break; const it = itemByRef(r); if (it && it.t !== 'mk') out.push(variant(it)); }
     return out;
   }
@@ -834,18 +834,20 @@
     if (first && !unitOpen(first)) { view.innerHTML = `<div class="uhead"><div class="lv">Уровень ${lv}</div><h2>🔒 Тест уровня ${lv}</h2></div>${crow(crowPick('lock'))}<p>Тест откроется вместе с первым уроком уровня ${lv}.</p>${pwHTML(first.id, 'уровень')}`; return; }
     const from = (u, tag) => groupsOf(u, tag).flatMap(g => g.q.map((s, i) => ({ ...parse(g.t, s), ref: `${u.id}-${tag}#${i}` })));
     const gram = shuffle(us.flatMap(u => (u.ex || []).flatMap((e, k) => ['gap', 'choice', 'fix'].includes(e.t) ? from(u, 'e' + k) : []))).slice(0, 8);
-    const read = shuffle(us.filter(u => u.read).flatMap(u => from(u, 'r'))).slice(0, 4);
-    const und = shuffle([...us.filter(u => bookOf(u)).flatMap(u => from(u, 'b').filter(x => x.t !== 'mk')), ...us.filter(u => u.series).flatMap(u => from(u, 's'))]).slice(0, 4);
+    const rus = us.filter(u => u.read && u.read.txt && from(u, 'r').length), ru = rus.length ? pick(rus) : null; // чтение: один текст целиком + вопросы только к нему
+    const read = ru ? shuffle(from(ru, 'r')).slice(0, 5) : [];
+    const rdHTML = ru ? `<section class="sec"><h3><span class="ic">📖</span>Текст к разделу «Чтение»</h3><article class="reading"><h4>${esc(ru.read.title)} ${sayBtn(ru.read.title + '. ' + ru.read.txt.join(' '))}</h4><div class="txt">${ru.read.txt.map(x => `<p>${glossText(x, ru.read.gl)}</p>`).join('')}</div></article></section>` : '';
+    const und = shuffle(us.filter(u => u.series).flatMap(u => from(u, 's'))).slice(0, 4); // вопросы к главам книги не берём: без главы на них не ответить
     const ws = shuffle(us.flatMap(u => u.words || []).filter(w => !/[\/…]/.test(w[0]))), trs = ws.map(w => w[1]);
     const sents = shuffle(us.flatMap(u => (u.exm || []).map(x => x[0])).filter(x => x.split(' ').length <= 12));
     const lsn = [...sents.slice(0, 2).map(x => ({ t: 'ls', p: [x, x] })), ...ws.slice(0, 2).map(w => ({ t: 'lc', p: [w[0], w[1], ...shuffle(trs.filter(x => x !== w[1])).slice(0, 2)] }))];
     const trI = shuffle(us.flatMap(u => (u.ex || []).filter(e => e.t === 'tr').flatMap(e => e.q.map(q => parse('tr', q))))).slice(0, 2);
     const spk = [...trI.map(x => ({ t: 'sp', p: [x.p[0], ...x.p.slice(1)], why: x.why })), ...sents.slice(2, 3).map(x => ({ t: 'sp', p: [x, x] }))];
     const sec = (h, items) => items.length ? grouped(items).map((g, i) => ({ ...g, h: (i ? '' : `<b>${h}.</b> `) + HOW[g.t] })) : [];
-    const groups = [...sec('Грамматика', gram), ...sec('Чтение', read), ...sec('Понимание: книга и сериалы', und), ...sec('Слушание', lsn), ...sec('Говорение', spk)];
+    const groups = [...sec('Грамматика', gram), ...sec('Чтение', read), ...sec('Понимание: сериалы', und), ...sec('Слушание', lsn), ...sec('Говорение', spk)];
     view.innerHTML = `<div class="uhead"><div class="lv">Уровень ${lv}</div><h2>Тест уровня ${lv}</h2><p class="sub">Грамматика, чтение, понимание, слушание и говорение — задания из уроков уровня, каждый раз новые. От 85 % уровень можно считать пройденным: откроются все его уроки и следующий уровень.</p></div>
       ${crow('Экзамен. Я надела строгие перья. Без паники: всё это уже было в уроках.')}
-      ${blockHTML('lt-' + lv, 'Тест ' + lv, groups)}<p><a class="btn" href="#test/${lv}" data-retest>Новый набор вопросов</a> <a class="btn" href="#home">На главную</a></p>`;
+      ${rdHTML}${blockHTML('lt-' + lv, 'Тест ' + lv, groups)}<p><a class="btn" href="#test/${lv}" data-retest>Новый набор вопросов</a> <a class="btn" href="#home">На главную</a></p>`;
   }
   function fixPage() {
     const weak = weakUnits(), types = Object.entries(S.m).filter(([k, v]) => k.startsWith('t:') && v[1] >= 5).map(([k, v]) => [k.slice(2), v[0] / v[1]]).sort((a, b) => b[1] - a[1]);
