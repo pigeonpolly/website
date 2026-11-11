@@ -48,7 +48,7 @@ section{position:relative}
 .hero h1 em path{stroke:var(--acc);stroke-width:5;fill:none;stroke-linecap:round;stroke-dasharray:420;stroke-dashoffset:420;animation:draw 1.4s .4s ease-out forwards;opacity:.85}
 @keyframes draw{to{stroke-dashoffset:0}}
 @media (prefers-reduced-motion:reduce){.hero h1 em path{animation:none;stroke-dashoffset:0}}
-.hero p{font-size:19px;color:var(--mut);max-width:32em;margin:0 auto 34px}
+.hero p{font-size:19px;color:var(--mut);max-width:38em;margin:0 auto 34px}
 .ctas{display:flex;gap:14px;justify-content:center}
 .sea{position:absolute;right:44px;top:26px;font:700 24px Caveat,cursive;color:var(--acc);transform:rotate(6deg)}
 .sea:before{content:"";position:absolute;left:-46px;top:12px;width:40px;height:20px;border-top:2px solid var(--acc);border-radius:50% 50% 0 0;transform:rotate(-20deg)}
@@ -196,7 +196,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
  .hr{margin-left:auto;gap:8px}.hr .switch{display:none}.v2 .acct2{padding:8px 14px;font-size:13px}
  .drawer .sw-m{display:flex;gap:12px;margin-top:16px}.drawer .sw-m button{width:22px;height:22px}
  .pill{font-size:9.5px;letter-spacing:.14em;padding:9px 14px}
- .hero{padding:40px 0 0}.hero h1{font-size:48px}.hero p{font-size:17px}.ctas{flex-direction:column;padding:0 20px}.ctas .btn{justify-content:center}
+ .hero{padding:40px 0 0}.hero h1{font-size:48px}.hero p{font-size:17px}.hero p .hb{display:none}.ctas{flex-direction:column;padding:0 20px}.ctas .btn{justify-content:center}
  .sea{position:static;display:block;transform:rotate(-3deg);font-size:21px;margin-top:14px}.sea:before{display:none}
  .pano,html[data-season=summer] .pano{height:300px}.cap2{right:18px;font-size:19px}
  .fl{padding:70px 0}.fl .w{gap:30px}.fl h2{font-size:48px}
