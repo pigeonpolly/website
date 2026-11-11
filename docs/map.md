@@ -23,6 +23,8 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/my-games.js` (3K) — «★ Мои игры» на главной (вкладка в «Моём дне», docs/site.md): 3 закреплённые игры птички и: MY_GAMES, MY_PINS, MY_GAMES_TABLES, rowOf, myGamesApi
 - `worker/norsk-page.js` (932K) — Собрано tools/norsk_page.py из content/norsk/ — руками не править.: NORSK_HTML
 - `worker/norsk.js` (8K) — Личный учебник норвежского (букмол) A1–C2 (/norsk/, docs/site.md «Учебник норвежского») — : AUDIO, LOCKED, MAX, NORSK_NICKS, TTS_VOICE, TTS_MODELS, tts, page, wav, norskOk, norskApi
+- `worker/nederlands-page.js` (310K) — Собрано tools/nederlands_page.py из content/nederlands/ — руками не править.: NEDERLANDS_HTML
+- `worker/nederlands.js` (8K) — Личный учебник нидерландского A1–C2 (/nederlands/, docs/site.md «Учебник нидерландского»), копия worker/norsk.js: NEDERLANDS_NICKS, NEDERLANDS_TABLES, tts, nederlandsOk, nederlandsApi
 - `worker/notebook.js` (5K) — 📒 Блокнот в учебниках (/study/, /english/, /norsk/; docs/site.md «Блокнот в учебниках»): BOOKS, NOTEBOOK_TABLES, cleanPage, metaOf, notebookApi
 - `worker/notes.js` (11K) — 📣 Рассылка (10.11.2026, docs/bird.md «Рассылка»): сообщение от Алины на 3 языках (+ файл д: NOTE_FILE_MAX, LANGS, SITE, NOTE_ALTER, NOTE_TABLES, audWhere, fileOut, pickL, audIds, audRange, noteHistory, noteNews
 - `worker/pancakes.js` (12K) — «Блинная Полли» (/pancakes/, site/assets/pancakes.js, docs/games.md): Полли печёт блины жи: PAN_UPS, TOP, PAN_ALTER, PAN_BADGES, PAN_COND, PAN_INT, today, upsOf, price, pancakesApi
@@ -155,6 +157,8 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `tools/i18n_add.py` (3K) — Дописывает переводы EN → RU, LV в content/i18n/ru.json и lv.json.: LANGS, I18N, ROOT, en_html, load_pack
 - `tools/import_uploads.py` (4K) — раскладывает загрузки из GitHub по галереям: ROOT, EXT, PREFIX, convert, slug
 - `tools/news_shots.js` (6K) — Снимки для новостей блога (скилл .claude/skills/site-news): только картинка сцены (canvas): page
+- `tools/nederlands_check.js` (11K) — Проверка учебника нидерландского (копия tools/norsk_check.js): node tools/nederlands_check.js [страница.html]
+- `tools/nederlands_page.py` (2K) — Учебник нидерландского /nederlands/: content/nederlands/ → worker/nederlands-page.js
 - `tools/norsk_check.js` (11K) — Проверка учебника норвежского (копия tools/english_check.js): node tools/norsk_check.js [с: TYPES, fmtCheck, solve
 - `tools/norsk_page.py` (2K) — Учебник норвежского /norsk/ (worker/norsk.js): content/norsk/shell.html + extra.js + уроки: ROOT, notebook
 - `tools/palette_names.py` (5K) — словарь названий цветов (en, ru, lv, hex): NAMES

@@ -1,6 +1,6 @@
 // 📒 Блокнот в учебниках (docs/site.md «Блокнот в учебниках»): выезжает справа (кнопка-язычок у правого края или Alt+N),
 // страницы без конца, поиск, закладки (⭐ страница и 🔖 метка в тексте), форматирование, автосохранение.
-// Встраивают tools/study_page.py, english_page.py, norsk_page.py: перед ним window.PPNB_BOOK = 'study' | 'english' | 'norsk'.
+// Встраивают tools/study_page.py, english_page.py, norsk_page.py, nederlands_page.py: перед ним window.PPNB_BOOK = 'study' | 'english' | 'norsk' | 'nederlands'.
 // Данные — /api/notebook?book= (worker/notebook.js, своя таблица textbook_notes). С прогрессом учебника НЕ связан:
 // ни S, ни /api/<учебник>, ни его localStorage не трогаем. Копия в браузере — localStorage 'ppnb:<book>' (не потеряется без связи).
 (() => {

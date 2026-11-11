@@ -1,15 +1,16 @@
-// 📒 Блокнот в учебниках (/study/, /english/, /norsk/; docs/site.md «Блокнот в учебниках»). Клиент — content/shared/notebook.js.
+// 📒 Блокнот в учебниках (/study/, /english/, /norsk/, /nederlands/; docs/site.md «Блокнот в учебниках»). Клиент — content/shared/notebook.js.
 // Хранится ОТДЕЛЬНО от прогресса (study_progress / english_progress / norsk_progress не трогаем): своя таблица, строка на страницу.
 // page_id '_' — служебная строка книги: { cleared — когда очистили весь блокнот, del — {id: время удаления} }.
 // Слияние по времени t: старая запись никогда не затирает новую (два устройства, повторная отправка, sendBeacon).
 import { studyOk } from './study.js';
 import { englishOk } from './english.js';
 import { norskOk } from './norsk.js';
+import { nederlandsOk } from './nederlands.js';
 
 export const NOTEBOOK_TABLES = [
   'CREATE TABLE IF NOT EXISTS textbook_notes (user_id INTEGER NOT NULL, book TEXT NOT NULL, page_id TEXT NOT NULL, data TEXT, t INTEGER NOT NULL, PRIMARY KEY (user_id, book, page_id))',
 ];
-const BOOKS = { study: studyOk, english: englishOk, norsk: norskOk };
+const BOOKS = { study: studyOk, english: englishOk, norsk: norskOk, nederlands: nederlandsOk };
 const ID = /^[a-z0-9]{4,24}$/, MAX_HTML = 600000, MAX_PAGES = 3000, MAX_DEL = 5000;
 
 const cleanPage = p => {

@@ -59,6 +59,8 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **my_games** (worker/my-games.js): `user_id` int PK, `pins` text, `visits` text, `updated_at` int
 - **norsk_progress** (worker/norsk.js): `user_id` int PK, `state` text, `updated_at` int
 - **norsk_access** (worker/norsk.js): `user_id` int PK, `added_at` int
+- **nederlands_progress** (worker/nederlands.js): `user_id` int PK, `state` text, `updated_at` int
+- **nederlands_access** (worker/nederlands.js): `user_id` int PK, `added_at` int
 - **textbook_notes** (worker/notebook.js): `user_id` int nn, `book` text nn, `page_id` text nn, `data` text, `t` int nn; PRIMARY KEY (user_id, book, page_id)
 - **notes** (worker/notes.js): `id` int PK auto, `L` text nn, `file_key` text, `file_name` text, `file_size` int =0, `file_type` text, `aud` text =\'all\', `days` int =0, `total` int =0, `mail_id` int, `created_at` int
 - **note_to** (worker/notes.js): `note_id` int nn, `user_id` int nn, `seen_at` int =0; PRIMARY KEY (note_id, user_id)
@@ -122,7 +124,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `site_pause_at` — worker/pause.js, worker/week.js
 - `sketchbook` — worker/index.js
 - `starter_box_v1` — worker/index.js
-- `t:` — worker/english-page.js, worker/norsk-page.js
+- `t:` — worker/english-page.js, worker/norsk-page.js, worker/nederlands-page.js
 - `titos_pot_n` — worker/titos.js
 - `unit` — worker/index.js
 - `users_total` — worker/auth.js, worker/blog.js, worker/index.js

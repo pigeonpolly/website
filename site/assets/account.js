@@ -23,6 +23,7 @@
     study: ['Textbook', 'Учебник', 'Mācību grāmata'],
     english: ['English course', 'Учебник английского', 'Angļu valodas mācību grāmata'],
     norsk: ['Norwegian course', 'Учебник норвежского', 'Norvēģu valodas mācību grāmata'],
+    nederlands: ['Dutch course', 'Учебник нидерландского', 'Nīderlandiešu valodas mācību grāmata'],
     nTitle: ['Meet your bird! Now pick a nickname', 'Знакомься со своей птичкой! Теперь выбери ник', 'Iepazīsties ar savu putniņu! Tagad izvēlies segvārdu'],
     nTitleCat: ['You are a cat! Now pick a nickname', 'Ты котик! Теперь выбери ник', 'Tu esi kaķītis! Tagad izvēlies segvārdu'],
     nTitleCrow: ['You are a crow with a treasure! Now pick a nickname', 'Ты ворона с сокровищем! Теперь выбери ник', 'Tu esi vārna ar dārgumu! Tagad izvēlies segvārdu'],
@@ -163,7 +164,7 @@
   function saveWho(u) {
     try {
       if (!u || !u.nick) return localStorage.removeItem('pp-who');
-      const k = ['id', 'nick', 'admin', 'avatar', 'buttons', 'streak', 'study', 'english', 'norsk'], o = {};
+      const k = ['id', 'nick', 'admin', 'avatar', 'buttons', 'streak', 'study', 'english', 'norsk', 'nederlands'], o = {};
       k.forEach(x => { if (u[x] != null) o[x] = u[x]; });
       localStorage.setItem('pp-who', JSON.stringify(o));
     } catch (e) {}
@@ -260,6 +261,7 @@
             + (u.study ? `<a role="menuitem" href="/study/"><i aria-hidden="true">📘</i>${t('study')}</a>` : '') // личный учебник (worker/study.js)
             + (u.english ? `<a role="menuitem" href="/english/"><i aria-hidden="true">🇬🇧</i>${t('english')}</a>` : '') // учебник английского (worker/english.js)
             + (u.norsk ? `<a role="menuitem" href="/norsk/"><i aria-hidden="true">🇳🇴</i>${t('norsk')}</a>` : '') // учебник норвежского (worker/norsk.js)
+            + (u.nederlands ? `<a role="menuitem" href="/nederlands/"><i aria-hidden="true">🇳🇱</i>${t('nederlands')}</a>` : '') // учебник нидерландского (worker/nederlands.js)
             : `<a role="menuitem" href="${pre}/challenge/">${t('nick')}</a>`}
           ${u.admin ? `<hr><a role="menuitem" href="/admin/"><i aria-hidden="true">⚙</i>${t('cabinet')}</a>${document.querySelector('[data-ppb]') ? `<button type="button" role="menuitem" data-edit><i aria-hidden="true">✏️</i>${t('edit')}</button>` : ''}` : ''}
           <hr><button type="button" role="menuitem" data-out>${t('out')}</button>

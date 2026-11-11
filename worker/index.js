@@ -21,6 +21,7 @@ import { shiftApi, SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_RANGE, SHIFT_IN
 import { studyApi, studyOk, STUDY_TABLES } from './study.js'; // личный учебник /study/ для Mr.Pepe и Алины (docs/site.md «Учебник»)
 import { englishApi, englishOk, ENGLISH_TABLES } from './english.js'; // личный учебник английского /english/ (docs/site.md «Учебник английского»)
 import { norskApi, norskOk, NORSK_TABLES } from './norsk.js'; // личный учебник норвежского /norsk/ (docs/site.md «Учебник норвежского»)
+import { nederlandsApi, nederlandsOk, NEDERLANDS_TABLES } from './nederlands.js'; // личный учебник нидерландского /nederlands/ (docs/site.md «Учебник нидерландского»)
 import { notebookApi, NOTEBOOK_TABLES } from './notebook.js'; // 📒 блокнот в учебниках (docs/site.md «Блокнот в учебниках»)
 import { artpillApi, artpillDrop, artpillExport, ARTPILL_TABLES } from './artpill.js'; // «Art-Pill by Polly»: скетчбуки ИИ и отзывы (docs/artpill.md)
 import { schoolApi, schoolNews, schoolCron, SCHOOL_TABLES, SCHOOL_ALTER, SCHOOL_RULES, SCHOOL_RANGE, SCHOOL_INT } from './school.js'; // «Школа Полли»: сдача работ и проверка (docs/challenge.md)
@@ -189,6 +190,11 @@ async function pageFetch(req, env, url, p) {
     if (!env.DB) return errorPage(env, url, 503);
     await ensureSchema(env);
     return norskApi(req, env, url, studyHelpers(env));
+  }
+  if (p === '/nederlands' || p === '/nederlands/') { // учебник нидерландского: страница из worker (worker/nederlands.js)
+    if (!env.DB) return errorPage(env, url, 503);
+    await ensureSchema(env);
+    return nederlandsApi(req, env, url, studyHelpers(env));
   }
   // страница видео /learn/v/<id>/ (и /ru/, /lv/): одна готовая страница site/learn/watch/, видео по адресу рисует v2.js (docs/site.md)
   const wv = p.match(/^(\/(?:ru|lv))?\/learn\/v\/[\w-]{1,40}\/?$/);
@@ -620,6 +626,7 @@ async function ensureSchemaRun(env) {
     ...ENGLISH_TABLES.map(sql => prep(sql)), // учебник английского: english_progress (worker/english.js)
     ...NOTEBOOK_TABLES.map(sql => prep(sql)), // блокнот в учебниках: textbook_notes (worker/notebook.js)
     ...NORSK_TABLES.map(sql => prep(sql)), // учебник норвежского: norsk_progress, norsk_access (worker/norsk.js)
+    ...NEDERLANDS_TABLES.map(sql => prep(sql)), // учебник нидерландского: nederlands_progress, nederlands_access (worker/nederlands.js)
     ...ARTPILL_TABLES.map(sql => prep(sql)), // «Art-Pill»: ap_books, ap_pages, ap_reviews (worker/artpill.js)
     ...TITOS_TABLES.map(sql => prep(sql)), // детектив Титос: titos, titos_cases (worker/titos.js)
     ...FLOCK_NEWS_TABLES.map(sql => prep(sql)), // новости стаи: flock_events (worker/flock-news.js)
@@ -1635,6 +1642,7 @@ async function route(req, env, url) {
   if (p === '/api/english' || p === '/api/english/access') { const r = await englishApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/notebook') { const r = await notebookApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/norsk' || p === '/api/norsk/access' || p === '/api/norsk/tts') { const r = await norskApi(req, env, url, studyHelpers(env)); if (r) return r; }
+  if (p === '/api/nederlands' || p === '/api/nederlands/access' || p === '/api/nederlands/tts') { const r = await nederlandsApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/artpill' || p.startsWith('/api/artpill/')) { const r = await artpillApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now }); if (r) return r; }
   if (p === '/api/school' || p.startsWith('/api/school/') || p === '/api/admin/school' || p === '/api/admin/school/check') { const r = await schoolApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is a short friendly comment from an art teacher (Polly, a pigeon) on a student\'s drawing made on paper. Keep it warm, simple and encouraging.') }); if (r) return r; }
   if (p === '/api/games/mine' || p === '/api/games/visit') { const r = await myGamesApi(req, env, url, { json, fail, currentUser, needUser }); if (r) return r; }
@@ -2377,14 +2385,14 @@ async function route(req, env, url) {
     const wl = u && wlLang(req); if (wl && wl !== u.lang) await env.DB.prepare('UPDATE users SET lang = ? WHERE id = ?').bind(wl, u.id).run().catch(() => {}); // язык праздничных писем (worker/wl-holidays.js)
     // дальше — независимые чтения, разом (шапка спрашивает это на каждой странице, по очереди выходило долго)
     const ok = u && !u.banned;
-    const [news, streak, titos, adm, ident, study, english, norsk] = await Promise.all([
+    const [news, streak, titos, adm, ident, study, english, norsk, nederlands] = await Promise.all([
       newsOf(env, req, u), // «конвертик»: зарплата, подарки, адвент… (site/assets/news.js)
       // серия челленджа — для меню аватара в шапке (этап 14 Б)
       ok && u.nick ? env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(u.id).all().then(r => streaks(streakDays(r.results)).current) : 0,
       ok ? env.DB.prepare('SELECT * FROM titos WHERE user_id = ?').bind(u.id).first().then(t => titosState(t, RULES, titosHelpers(env))) : null, // кофейник Титоса (worker/titos.js)
       ok ? isAdmin(u, env) : false, ok ? adminIdentity(u, env) : false,
-      ok ? studyOk(u, env, studyHelpers(env)) : false, ok ? englishOk(u, env, studyHelpers(env)) : false, ok ? norskOk(u, env, studyHelpers(env)) : false]);
-    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: adm, pin: !adm && ident ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, streak, news, friendBtns: BTN.friend, titos, study: study ? 1 : 0, english: english ? 1 : 0, norsk: norsk ? 1 : 0, pwTemp: u.pw_temp ? 1 : 0, mailAsk: mailAsk(env, u) ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
+      ok ? studyOk(u, env, studyHelpers(env)) : false, ok ? englishOk(u, env, studyHelpers(env)) : false, ok ? norskOk(u, env, studyHelpers(env)) : false, ok ? nederlandsOk(u, env, studyHelpers(env)) : false]);
+    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: adm, pin: !adm && ident ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, streak, news, friendBtns: BTN.friend, titos, study: study ? 1 : 0, english: english ? 1 : 0, norsk: norsk ? 1 : 0, nederlands: nederlands ? 1 : 0, pwTemp: u.pw_temp ? 1 : 0, mailAsk: mailAsk(env, u) ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
   }
   // название видео YouTube (oEmbed), чтобы подписи уроков на сайте совпадали с видео; кэш на сутки
   if (m === 'GET' && p === '/api/v2/yt') {
