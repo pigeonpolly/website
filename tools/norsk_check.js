@@ -43,6 +43,8 @@ const TYPES = ['gap', 'choice', 'order', 'fix', 'tr', 'tf', 'mk'], SHOWS = ['ord
   }
   const topics = await pg.evaluate(() => window.NO_TOPICS || {});
   for (const u of units) { const T = topics[u.id]; if (!T) { bad.push(u.id + ': нет тематического словаря (topics.js)'); continue; } if (T.w.length < 12) bad.push(u.id + ': в теме мало слов'); for (const w of T.w) if (w.length !== 3 || w.some(x => /\|| # /.test(x))) bad.push(u.id + ': тема, плохое слово ' + w[0]); }
+  const noTr = await pg.evaluate(() => { const out = []; for (const u of UNITS) { const ss = [...(u.ex || []).filter(e => e.t === 'order').flatMap(e => e.q.map(q => q.split('|')[0])), ...(u.words || []).map(w => w[2]), ...(((window.NO_TOPICS || {})[u.id] || {}).w || []).map(w => w[2])].filter(Boolean); for (const x of ss) if (!window.NO_DEBUG.ruOf(x)) out.push(u.id + ': ' + x); } return out; });
+  for (const x of noTr) bad.push('нет перевода (trans-*.js): ' + x);
   for (const [lv, L] of Object.entries(lift || {})) fmtCheck('лифт ' + lv, { t: 'choice', q: L.q });
   if (Object.keys(lift || {}).length !== 6) bad.push('лифт: не все уровни');
   if (book.parts.length !== units.length) bad.push(`частей книги ${book.parts.length}, уроков ${units.length}`);
