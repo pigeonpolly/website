@@ -5651,3 +5651,17 @@ a.wk-num.wk-n-link:hover, a.wk-num.wk-n-link:focus-visible { border-color: #D964
 .wk-pause span { flex: 1 1 320px; }
 .wk-pause.on { border: 2px solid #D9643A; background: #FFF4EC; color: #272421; }
 .wk-pause.on b { color: #C2502A; }
+/* кабинет → Птицы: таблица не вылезает за край — листается вбок внутри рамки; «Вход» компактный */
+.adm-scroll { overflow-x: auto; max-width: 100%; }
+@media (min-width: 801px) {
+  .adm-birds td[data-l="Вход"] { white-space: nowrap; }
+  .adm-birds td[data-l="Вход"] small { display: inline; }
+  .adm-birds td[data-l="Появилась"], .adm-birds td[data-l="Заходила"] { font-size: 13px; min-width: 64px; }
+  .be-table.adm-birds { font-size: 14px; }
+  .be-table.adm-birds th, .be-table.adm-birds td { padding: 8px 5px; }
+  .adm-birds th .adm-sort { font-size: 13px; }
+  .adm-birds td[data-l="✉️ Почта"] { max-width: 150px; font-size: 12px; }
+  .adm-birds td[data-l="🔘 Пуговки"] { white-space: nowrap; }
+  .adm-birds td[data-l="Подарки"] .pill-btn { padding: 4px 10px; min-height: 0; font-size: 13px; white-space: nowrap; }
+}
+#adm-bq { width: min(380px, 100%); box-sizing: border-box; }
