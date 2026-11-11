@@ -48,6 +48,40 @@
 <script src="/assets/v2.js?v=a4e0593e" defer></script>
 </head>
 <body class="inner v2s" data-p="admin">
+<style>/* Полли клюёт семечки, пока грузится страница (src/polly-loader.html, вставляет build.py во все шаблоны) */
+#pp-load{position:fixed;inset:0;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#2B1A51;color:#F6F4F3;font:500 15px/1.4 Karla,system-ui,sans-serif;text-align:center;padding:16px;opacity:1;transition:opacity .35s}
+html.pp-loading #pp-load{display:flex}
+#pp-load.out{opacity:0;pointer-events:none}
+#pp-load svg{width:170px;height:auto;overflow:visible;shape-rendering:crispEdges;filter:drop-shadow(0 3px 0 rgba(0,0,0,.28))}
+#pp-load .pl-b{transform-box:fill-box;transform-origin:50% 95%;animation:pl-peck 1.2s steps(3) infinite}
+#pp-load .pl-s{animation:6s linear infinite}
+@keyframes pl-peck{0%,30%,55%,100%{transform:none}40%{transform:translateY(1.4px) rotate(50deg)}}
+#pp-load .pl-d i{display:inline-block;animation:pl-dot 1.2s infinite;font-style:normal}
+#pp-load .pl-d i:nth-child(2){animation-delay:.2s}#pp-load .pl-d i:nth-child(3){animation-delay:.4s}
+@keyframes pl-dot{0%,60%,100%{opacity:.25}30%{opacity:1}}
+@media (prefers-reduced-motion:reduce){#pp-load .pl-b,#pp-load .pl-s,#pp-load .pl-d i{animation:none}}
+</style>
+<div id="pp-load" aria-hidden="true"></div>
+<script>(function(){
+var d=document,h=d.documentElement,el=d.getElementById('pp-load');if(!el)return;
+var L={en:'Polly is pecking seeds while the page loads',ru:'Полли клюёт семечки, пока грузится страница',lv:'Polly knābā sēkliņas, kamēr lapa ielādējas'};
+var B=['......ddd.....','.....dbbbd....','....dbbwwbd...','....dbbwkbdoo.','....dbbbbbdo..','...dbbbbbbd...','..dbbsbbbbd...','.dbbssbbbbd...','dbbssbbbbbd...','dbbbbbbbbd....','.ddbbbbbdd....','...ddddd......','....o..o......','...oo.oo......'];
+var C={d:'#1a1528',b:'#7f81bf',s:'#5e5a9c',w:'#fff',k:'#1a1528',o:'#f2a73b'},r='',x,y;
+var lg='';for(y=0;y<B.length;y++)for(x=0;x<14;x++){var c=C[B[y][x]];if(c){var q='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+c+'"/>';if(y<12)r+=q;else lg+=q}}
+/* 4 семечки: падают сверху, Полли склёвывает по одной (время клевка — 40% от 1.2 с) */
+var S=[[15,13.1],[16.6,13.3],[15.8,13.5],[17.4,13.1]],s='',k='';
+S.forEach(function(p,i){var t=(27+i*20);
+k+='@keyframes pl-s'+i+'{0%{opacity:0;transform:translateY(-9px)}'+(2+i)+'%{opacity:0;transform:translateY(-9px)}'+(7+i)+'%,'+(t-1)+'%{opacity:1;transform:none}'+t+'%,100%{opacity:0;transform:none}}';
+s+='<g class="pl-s" style="animation-name:pl-s'+i+'"><rect x="'+p[0]+'" y="'+p[1]+'" width="1.4" height=".85" rx=".3" fill="#E6E2DF"/><rect x="'+(p[0]+.3)+'" y="'+(p[1]+.3)+'" width=".8" height=".25" fill="#5e5a9c"/></g>'});
+var st=d.createElement('style');st.textContent=k;el.appendChild(st);
+el.insertAdjacentHTML('beforeend','<svg viewBox="-1 0 20 15"><rect x="-1" y="14" width="20" height=".5" fill="#534AB7"/>'+s+lg+'<g class="pl-b">'+r+'</g></svg><div>'+(L[h.lang]||L.en)+'<span class="pl-d"><i>.</i><i>.</i><i>.</i></span></div>');
+/* показываем, только если загрузка заметная (дольше 0,35 с); прячем по load, но не дольше 4 с после DOMContentLoaded */
+var done=0,on=0,tm=setTimeout(function(){if(!done){on=1;h.classList.add('pp-loading')}},350);
+function hide(){if(done)return;done=1;clearTimeout(tm);if(!on)return;el.classList.add('out');setTimeout(function(){h.classList.remove('pp-loading')},400)}
+addEventListener('load',hide);d.addEventListener('DOMContentLoaded',function(){setTimeout(hide,4000)});el.addEventListener('click',hide);
+addEventListener('pageshow',function(e){if(e.persisted)hide()});
+})();</script>
+
 <a class="skip" href="#main">Pāriet uz saturu</a>
 <header class="hd2"><div class="w">
   <a class="lg" href="/lv/"><span class="lg-m" aria-hidden="true"></span><span>Pigeon Polly <i>Art Lab</i></span></a>

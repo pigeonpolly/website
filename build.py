@@ -707,6 +707,10 @@ def build():
     layout = (SRC / "layout.html").read_text()
     layout_v2 = (SRC / "layout-v2.html").read_text()
     layout_v2_lab = (SRC / "layout-v2-lab.html").read_text()
+    # Полли клюёт семечки, пока грузится страница — сразу после <body …> во всех трёх шаблонах
+    loader = (SRC / "polly-loader.html").read_text()
+    layout, layout_v2, layout_v2_lab = (re.sub(r"(<body[^>]*>)", lambda m: m.group(1) + "\n" + loader, t, count=1)
+                                        for t in (layout, layout_v2, layout_v2_lab))
     search_index = {lang: [] for lang in LANGS}
     for path, title, file, desc in PAGES:
         body = (SRC / "pages" / file).read_text()
