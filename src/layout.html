@@ -28,6 +28,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;500;700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/style.css">
 <link rel="stylesheet" href="/assets/ava-deco.css">
+<script>/* вход: /api/whoami сразу, параллельно с загрузкой скриптов — account.js возьмёт ответ (PPWhoP) */try{if(!/devdate=/.test(location.search)&&!sessionStorage.getItem('pp-devdate'))window.PPWhoP=fetch('/api/whoami',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
 <script src="/assets/site.js" defer></script>
 <script src="/assets/polly.js" defer></script>
 <script src="/assets/can-do.js" defer></script>

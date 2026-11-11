@@ -108,9 +108,11 @@
   }
   window.PPDevH = devH;
   function check() {
-    return fetch('/api/whoami', { credentials: 'same-origin', headers: devH() }).then(r => r.ok ? r.json() : null).then(d => {
+    // первый раз — запрос, начатый ещё в <head> (layout: window.PPWhoP), чтобы не ждать загрузки остальных скриптов
+    const early = window.PPWhoP; window.PPWhoP = null;
+    return (early || fetch('/api/whoami', { credentials: 'same-origin', headers: devH() }).then(r => r.ok ? r.json() : null)).then(d => {
       if (!d) return;
-      info = d; render();
+      info = d; render(); saveWho(d.user);
       document.documentElement.classList.toggle('is-admin', !!(d.user && d.user.admin)); // полоска цифр над шапкой — только Алине
       if (d.user && d.user.admin) adminStrip();
       if (d.user && !d.user.nick) askNick(d.user);
@@ -157,6 +159,16 @@
     if (c) { c.hidden = n == null; c.href = pre + '/shop/#cart'; }
   }
   window.PPAccount = { check, openSignIn, signedIn: () => !!(info && info.user), pwDialog, logoutAll, setButtons };
+  // аватар в шапке сразу, из запомненного прошлого входа; ответ /api/whoami потом перерисует (или покажет «Войти»)
+  function saveWho(u) {
+    try {
+      if (!u || !u.nick) return localStorage.removeItem('pp-who');
+      const k = ['id', 'nick', 'admin', 'avatar', 'buttons', 'streak', 'study', 'english', 'norsk'], o = {};
+      k.forEach(x => { if (u[x] != null) o[x] = u[x]; });
+      localStorage.setItem('pp-who', JSON.stringify(o));
+    } catch (e) {}
+  }
+  try { const c = JSON.parse(localStorage.getItem('pp-who') || 'null'); if (c && c.nick && !info) { info = { user: c }; render(); } } catch (e) {}
   const first = check();
   // /…#signin — сразу окно входа (кнопка «Sign in» на новых страницах /preview/)
   if (location.hash === '#signin') first.then(() => { if (!(info && info.user)) openSignIn(); history.replaceState(null, '', location.pathname + location.search); });
@@ -204,7 +216,7 @@
       }
       st.textContent = t(j.error === 'taken' ? 'nTaken' : j.error === 'nick' ? 'nBad' : j.error === 'ref' ? 'refBad' : 'nErr');
     });
-    d.querySelector('.acct-nick-out').addEventListener('click', async () => { await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }); location.reload(); });
+    d.querySelector('.acct-nick-out').addEventListener('click', async () => { saveWho(null); await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }); location.reload(); });
     d.showModal();
     f.nick.focus();
   }
@@ -281,7 +293,7 @@
     dev && dev.addEventListener('click', () => login('dev:' + (prompt('nick?', 'tester') || 'tester')));
     const out = el.querySelector('[data-out]');
     out && out.addEventListener('click', async () => {
-      await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' });
+      saveWho(null); await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' });
       location.reload();
     });
   }
@@ -375,7 +387,7 @@
     const f = d.querySelector('form'), st = d.querySelector('.acct-nick-st');
     wireEyes(d);
     const x = d.querySelector('[data-x]'); if (x) x.addEventListener('click', () => d.close());
-    const o = d.querySelector('[data-out]'); if (o) o.addEventListener('click', async () => { await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }); location.reload(); });
+    const o = d.querySelector('[data-out]'); if (o) o.addEventListener('click', async () => { saveWho(null); await fetch('/api/logout', { method: 'POST', credentials: 'same-origin' }); location.reload(); });
     f.addEventListener('submit', async e => {
       e.preventDefault();
       const e2 = window.PPPw.check(f.password.value, { nick: me && me.nick });
@@ -391,7 +403,7 @@
   }
   async function logoutAll() {
     if (!confirm(t('outAllAsk'))) return;
-    await fetch('/api/pw/logout-all', { method: 'POST', credentials: 'same-origin' });
+    saveWho(null); await fetch('/api/pw/logout-all', { method: 'POST', credentials: 'same-origin' });
     location.reload();
   }
 
