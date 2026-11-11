@@ -103,10 +103,11 @@
     const li = document.createElement('li'); li.className = 'fn-row fn-' + g.kind;
     const who = g.kind === 'polly' || (g.kind === 'new' || g.kind === 'drawing') && g.more.length ? null : g.nick;
     const href = g.kind === 'polly' ? local(g.url || '') : g.kind === 'drawing' && g.more.length ? '' : prof(g.nick);
-    const btn = g.kind === 'polly' && !g.url ? '' : href ? `<a class="fn-btn" href="${esc(href)}">${T[BTN[g.kind] || 'visit'][L]}</a>` : '';
+    const btn = g.kind === 'polly' && !g.url ? '' : href ? `<a class="fn-btn" href="${esc(href)}" aria-label="${T[BTN[g.kind] || 'visit'][L]}"><span>${T[BTN[g.kind] || 'visit'][L]}</span></a>` : '';
     const strip = g.kind === 'drawing' && g.more.length ? `<span class="fn-strip">${[g, ...g.more].slice(0, 8).map(x => `<a href="${prof(x.nick)}" title="@${esc(x.nick)}"><img src="${esc(x.img)}" alt="" loading="lazy"></a>`).join('')}</span>` : '';
-    const pic = !strip && g.img ? `<a class="fn-pic" href="${esc(href || prof(g.nick))}"><img src="${esc(g.img)}" alt="" loading="lazy"></a>` : '';
-    li.innerHTML = `<span class="fn-ava">${who ? '' : g.kind === 'polly' ? '🕊️' : g.kind === 'drawing' ? '🎨' : '🐣'}</span>
+    const avaPic = g.kind === 'polly' && g.img; // запись блога: в кружке — картинка из самого поста
+    const pic = !strip && g.img && !avaPic ? `<a class="fn-pic" href="${esc(href || prof(g.nick))}"><img src="${esc(g.img)}" alt="" loading="lazy"></a>` : '';
+    li.innerHTML = `<span class="fn-ava">${avaPic ? `<img src="${esc(g.img)}" alt="" loading="lazy">` : who ? '' : g.kind === 'polly' ? '🕊️' : g.kind === 'drawing' ? '🎨' : '🐣'}</span>
       <p class="fn-txt">${text(g)}<time>${today && g.day !== today ? dayName(g.day, today) : time(g.ts)}</time></p>${strip}${pic}${btn}`;
     if (who && window.PPBirds) { const a = document.createElement('a'); a.href = prof(who); a.className = 'fn-ava'; a.title = '@' + who; a.appendChild(PPBirds.avatar(g.uid, g.avatar, 36)); li.querySelector('.fn-ava').replaceWith(a); }
     return li;

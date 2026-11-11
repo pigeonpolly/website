@@ -5604,3 +5604,15 @@ html.ap-lock { overflow: hidden; }
   .wk-e { grid-row: 1; } .wk-act h3 { margin: 0; } .wk-act p, .wk-btns { grid-column: 1 / -1; } .wk-btns { margin-top: 4px; }
   .wk-cols { grid-template-columns: 1fr 1fr; }
 }
+/* записи новостей (flock-news.js, news.js): картинка поста — в кружке, вместо кнопки «Посмотреть» — круглая стрелка справа (11.11, Алина) */
+.fn-polly .fn-ava:has(img) { background: none; }
+.fn-ava img { width: 100%; height: 100%; max-width: none; max-height: none; object-fit: cover; }
+.fn-row { flex-wrap: nowrap; }
+.fn-row:has(.fn-strip) { flex-wrap: wrap; }
+.fn-txt { flex: 1 1 auto; min-width: 0; }
+.fn-btn { flex: 0 0 36px; width: 36px; height: 36px; padding: 0; display: grid; place-items: center; border-radius: 50%; background: none; border: 1.5px solid var(--line); color: var(--text); }
+.fn-btn span { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+.fn-btn::after { content: '→'; font: 700 16px/1 var(--sans); }
+.fn-btn:hover { background: var(--peach); border-color: var(--peach); color: var(--bg); }
+@media (max-width: 600px) { .fn-txt { flex-basis: auto; } }
+.nw-again { flex: 0 0 36px; width: 36px; height: 36px; display: grid; place-items: center; border-radius: 50%; border: 1.5px solid var(--line); color: var(--text); text-decoration: none; font-weight: 700; }

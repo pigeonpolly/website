@@ -71,8 +71,8 @@
   if (acct) fetch('/api/whoami', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => {
     const u = d && d.user;
     if (!u) { acct.textContent = ['Sign in', 'Войти', 'Ienākt'][L]; return; }
-    acct.href = pre + '/bird/#room';
-    acct.innerHTML = `<canvas width="16" height="16" aria-hidden="true"></canvas><span>${esc(u.nick || ['My bird', 'Моя птичка', 'Mans putniņš'][L])}</span>`;
+    acct.href = pre + '/bird/'; // «Мой кабинет» (cabinet.js)
+    acct.innerHTML = `<canvas width="28" height="26" aria-hidden="true"></canvas><span>${esc(u.nick || ['My bird', 'Моя птичка', 'Mans putniņš'][L])}</span>`;
     const draw = () => { if (!window.PPBirds) return; try { acct.querySelector('canvas').getContext('2d').drawImage(window.PPBirds.sprite(window.PPBirds.dress(window.PPBirds.looks(u.id), u.avatar), 0), 0, 0); } catch (e) {} };
     if (window.PPBirds) draw(); else addEventListener('load', draw);
   }).catch(() => {});

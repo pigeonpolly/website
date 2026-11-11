@@ -10,6 +10,8 @@
     why: ['One account for the Daily Challenge, blog comments and your own bird in the flock.', 'Один вход для челленджа, комментариев в блоге и своей птички в стае.', 'Viena ieeja izaicinājumam, bloga komentāriem un savam putniņam barā.'],
     getBird: ['Get a bird', 'Получить птичку', 'Saņem putniņu'],
     streak: [n => `🔥 ${n}-day streak`, n => `🔥 серия ${n} дн.`, n => `🔥 sērija ${n} d.`],
+    space: ['My space', 'Мой кабинет', 'Mans kabinets'],
+    learnT: ['Learning', 'Учёба', 'Mācības'],
     room: ['Bird’s room', 'Комната птички', 'Putniņa istaba'],
     shop: ['Shop', 'Магазин', 'Veikals'], env: ['Envelope', 'Конвертик', 'Aploksnīte'], edit: ['Edit page', 'Править страницу', 'Labot lapu'],
     nick: ['Choose a nickname', 'Выбрать ник', 'Izvēlēties segvārdu'],
@@ -223,7 +225,7 @@
         <div class="acct-pop" hidden role="menu">
           <p class="acct-name">${u.nick ? '@' + esc(u.nick) : `<i>${t('noNick')}</i>`}${u.admin ? ` <span class="acct-badge">★ ${t('admin')}</span>` : ''}</p>
           ${u.nick ? `<p class="acct-btns">${u.streak ? `<span>${t('streak')(u.streak)}</span>` : ''}<span title="${window.PPSew || ''}">🔘 <b>${u.buttons || 0}</b> ${t('btns')}</span></p>` : ''}
-          ${u.nick ? [['/bird/#room', '🏠', 'room'], ['/shop/', '🛍', 'shop']]
+          ${u.nick ? [['/bird/', '🪺', 'space'], ['/bird/#learn', '📚', 'learnT'], ['/bird/#room', '🏠', 'room'], ['/shop/', '🛍', 'shop']]
             .map(([h, i, k]) => `<a role="menuitem" href="${pre}${h}"><i aria-hidden="true">${i}</i>${t(k)}</a>`).join('') + `<button type="button" role="menuitem" data-env><i aria-hidden="true">✉️</i>${t('env')}</button>`
             + (u.study ? `<a role="menuitem" href="/study/"><i aria-hidden="true">📘</i>${t('study')}</a>` : '') // личный учебник (worker/study.js)
             + (u.english ? `<a role="menuitem" href="/english/"><i aria-hidden="true">🇬🇧</i>${t('english')}</a>` : '') // учебник английского (worker/english.js)

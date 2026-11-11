@@ -335,7 +335,7 @@
     els.forEach(el => {
       el.innerHTML = `<h2 class="fn-h">🔔 ${t('title')}</h2>` + '<div class="hd-scroll">' + (items.length ? '' : `<p class="fn-msg">${t('empty')}</p>`) + (items.length || done.length ? `<ul class="fn-list">${items.map(x => {
         const k = KINDS[x.kind];
-        return `<li class="fn-row nw-mini"><span class="fn-ava" aria-hidden="true">${k.icon}</span><p class="fn-txt"><b>${esc(k.title(x))}</b> ${esc(k.text(x))}</p><button type="button" class="fn-btn">${k.act[L]}</button></li>`;
+        return `<li class="fn-row nw-mini"><span class="fn-ava" aria-hidden="true">${k.icon}</span><p class="fn-txt"><b>${esc(k.title(x))}</b> ${esc(k.text(x))}</p><button type="button" class="fn-btn" aria-label="${k.act[L]}"><span>${k.act[L]}</span></button></li>`;
       }).join('')}${done.map(l => `<li class="fn-row nw-mini nw-done"><span class="fn-ava" aria-hidden="true">${l.icon}</span><p class="fn-txt"><b>${esc(l.title)}</b> ${esc(l.text)}<time>✓ ${opened} · ${when(l.at)}</time></p>${l.go ? `<a class="nw-again" href="${esc(l.go)}">→</a>` : ''}</li>`).join('')}</ul>` : '') + '</div>'; // .hd-scroll: колонка не длиннее соседних, лишнее листается
       el.querySelectorAll('.fn-btn').forEach(b => { b.onclick = () => feed(); });
     });
@@ -438,7 +438,7 @@
     return fetch('/api/news', { credentials: 'same-origin', headers: window.PPDevH ? window.PPDevH() : {} }).then(r => r.ok ? r.json() : null)
       .then(j => { if (j) { news = j.news || []; drawBell(); } }).catch(() => {});
   }
-  window.PPNews = { refresh, open: feed, list: () => known().slice(), pickBox: () => me && pickBox(me.box0 || '') };
+  window.PPNews = { refresh, open: feed, inline: () => loadHist(), list: () => known().slice(), pickBox: () => me && pickBox(me.box0 || '') };
   if (window.PPWho) set(window.PPWho);
   document.addEventListener('pp:whoami', e => set(e.detail));
 })();

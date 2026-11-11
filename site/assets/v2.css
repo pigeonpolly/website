@@ -34,7 +34,7 @@ section{position:relative}
 .v2 .lang-switch{display:flex;gap:2px}.v2 .lang-switch a{padding:4px 5px;color:var(--mut);font-weight:500}.v2 .lang-switch a[aria-current]{color:var(--ink);font-weight:700}
 .switch{display:flex;gap:6px}.switch button{width:16px;height:16px;border-radius:50%;border:1.5px solid var(--ink);cursor:pointer;padding:0}
 .switch button[aria-pressed=true]{box-shadow:0 0 0 3px var(--bg),0 0 0 4.5px var(--acc)}
-.acct2{padding:11px 22px}.acct2 canvas{width:26px;height:26px;image-rendering:pixelated;margin:-6px 0 -6px -10px}
+.acct2{padding:11px 22px}.acct2 canvas{width:34px;height:32px;image-rendering:pixelated;margin:-10px -2px -8px -10px}
 .burger{display:none;background:none;border:0;font-size:26px;color:var(--ink);cursor:pointer;line-height:1;padding:6px}
 .drawer{display:none}.sw-m{display:none}
 
