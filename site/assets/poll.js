@@ -11,7 +11,15 @@
     closed: T('This poll is already closed.', 'Опрос уже завершён.', 'Aptauja jau ir slēgta.'),
     idea: T('Write your topic in a few words.', 'Напиши свою тему в паре слов.', 'Uzraksti savu tēmu dažos vārdos.'),
     link: T('No links, please, just the topic.', 'Без ссылок, только тема.', 'Bez saitēm, tikai tēma.'),
+    many: T('Too many votes from this network already. Log in to vote.', 'С этой сети уже много голосов. Войди, чтобы проголосовать.', 'No šī tīkla jau ir daudz balsu. Ienāc, lai balsotu.'),
   };
+  // метка устройства: голос узнаём по ней, а не по адресу (у семьи на одном Wi‑Fi адрес общий) — worker/polls.js voter()
+  try {
+    if (!/(?:^|;\s*)pp_voter=[a-f0-9]{24}/.test(document.cookie)) {
+      const a = new Uint8Array(12); crypto.getRandomValues(a);
+      document.cookie = 'pp_voter=' + [...a].map(x => x.toString(16).padStart(2, '0')).join('') + ';path=/;max-age=63072000;samesite=lax' + (location.protocol === 'https:' ? ';secure' : '');
+    }
+  } catch (e) { /* без куки — голос по адресу, как раньше */ }
   const fmtDate = t => new Date(t * 1000).toLocaleDateString(['en-GB', 'ru-RU', 'lv-LV'][L], { day: 'numeric', month: 'long' });
   let poll = null, t0 = Date.now();
 

@@ -138,4 +138,4 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `wl_gift:` — worker/wl-holidays.js
 - `wl_mail_n:` — worker/mail.js, worker/wl-holidays.js
 - `works_total` — worker/blog.js, worker/index.js
-- 12.11.2026 опросы (worker/polls.js `POLL_TABLES`): `polls` (id, q/opts JSON на 3 языках, status draft|open|closed, ideas, created/opened/closed/ends), `poll_votes` (poll, ip — хеш IP с солью blog_salt, PK (poll, ip); opt, uid, lang, at), `poll_ideas` (свои темы). meta `poll_home`.
+- 12.11.2026 опросы (worker/polls.js `POLL_TABLES`): `polls` (id, q/opts JSON на 3 языках, status draft|open|closed, ideas, created/opened/closed/ends), `poll_votes` (poll, ip — ключ голосующего: 'u:<id>' | 'd:<кука pp_voter>' | хеш IP (без куки, старые), PK (poll, ip); opt, uid, lang, at, ipk — хеш IP с солью blog_salt, `POLL_ALTER`), `poll_ideas` (свои темы). meta `poll_home`.

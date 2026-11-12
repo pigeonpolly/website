@@ -1,19 +1,21 @@
 // Опросы (docs/site.md «Опрос на главной», docs/admin.md «Опросы»): Алина в кабинете → «🗳 Опросы» создаёт опрос
 // (вопрос и варианты на 3 языках — пустые переводятся сами), открывает, завершает, смотрит статистику; блок на главной
-// можно скрыть целиком (meta poll_home = '0'). Голос — один с одного IP в каждом опросе (решение Алины), гостям тоже можно;
-// у вошедшего — ещё и один на аккаунт. Результаты видят проголосовавшие, все — после завершения, админ — всегда.
+// можно скрыть целиком (meta poll_home = '0'). Голос узнаём по аккаунту (вошедший) или по метке устройства (кука pp_voter,
+// её ставит poll.js); не по IP — у семьи на одном Wi‑Fi и у мобильного интернета адрес общий (12.11.2026: «муж не голосовал,
+// а показывает»). Защита от накрутки: гостей с одного IP — не больше GUEST_PER_IP в опросе; без куки — старое правило «один с IP». Результаты видят проголосовавшие, все — после завершения, админ — всегда.
 // На главной (site/assets/poll.js): открытый опрос, а если его нет — последний завершённый (до 14 дней) с итогами.
 // API: GET /api/poll?id=, POST /api/poll/vote {id, opt, idea, lang}; GET/POST /api/admin/polls.
 // h: json, fail, currentUser, needUser, isAdmin, getMeta, setMeta, ipKey(req), randomHex, now, translate(texts, from, langs)
 export const POLL_TABLES = [
   // q — {en, ru, lv}; opts — [{id, t: {en, ru, lv}}]; status: draft | open | closed; ideas — можно предложить свою тему; ends — завершится сам
   'CREATE TABLE IF NOT EXISTS polls (id TEXT PRIMARY KEY, q TEXT, opts TEXT, status TEXT DEFAULT \'draft\', ideas INTEGER DEFAULT 1, created INTEGER, opened INTEGER, closed INTEGER, ends INTEGER)',
-  // ip — хеш IP с солью (сам адрес не храним); один голос с IP в опросе
+  // ip — ключ голосующего: 'u:<id>' (аккаунт), 'd:<метка>' (устройство гостя) или хеш IP (без куки и старые голоса); ipk — хеш IP с солью
   'CREATE TABLE IF NOT EXISTS poll_votes (poll TEXT NOT NULL, ip TEXT NOT NULL, opt TEXT, uid INTEGER, lang TEXT, at INTEGER, PRIMARY KEY (poll, ip))',
   'CREATE INDEX IF NOT EXISTS poll_votes_uid ON poll_votes(poll, uid)',
   'CREATE TABLE IF NOT EXISTS poll_ideas (id INTEGER PRIMARY KEY AUTOINCREMENT, poll TEXT, ip TEXT, uid INTEGER, text TEXT, lang TEXT, at INTEGER)',
 ];
-const LANGS = ['ru', 'en', 'lv'], RESULTS_DAYS = 14, MAX_OPTS = 8;
+export const POLL_ALTER = ['ALTER TABLE poll_votes ADD COLUMN ipk TEXT'];
+const LANGS = ['ru', 'en', 'lv'], RESULTS_DAYS = 14, MAX_OPTS = 8, GUEST_PER_IP = 6;
 const cut = (s, n) => String(s || '').replace(/\s+/g, ' ').trim().slice(0, n);
 const parse = (s, d) => { try { return JSON.parse(s) ?? d; } catch (e) { return d; } };
 const row = r => r && { ...r, q: parse(r.q, {}), opts: parse(r.opts, []) };
@@ -27,13 +29,22 @@ async function counts(h, id) {
   const c = {}; let total = 0; for (const x of r) { c[x.opt] = x.n; total += x.n; }
   return { c, total };
 }
-async function myVote(h, id, ip, u) {
-  const r = await h.db.prepare('SELECT opt FROM poll_votes WHERE poll = ? AND (ip = ? OR (uid IS NOT NULL AND uid = ?)) LIMIT 1').bind(id, ip, u ? u.id : -1).first();
+// кто голосует: вошедший — аккаунт; гость — метка устройства из куки; нет куки — хеш IP (как раньше)
+async function voter(h, req, env) {
+  const u = await h.currentUser(req, env), ipk = await h.ipKey(req), m = (req.headers.get('cookie') || '').match(/(?:^|;\s*)pp_voter=([a-f0-9]{24})\b/);
+  const dev = m ? 'd:' + m[1] : null;
+  return { u, ipk, dev, key: u ? 'u:' + u.id : dev || ipk };
+}
+// свой голос: вошедший — по аккаунту (и по своему устройству, если голосовал гостем), гость — только по устройству
+async function myVote(h, id, v) {
+  const r = v.u
+    ? await h.db.prepare('SELECT opt FROM poll_votes WHERE poll = ? AND (uid = ? OR ip = ?) ORDER BY (uid = ?) DESC LIMIT 1').bind(id, v.u.id, v.dev || '-', v.u.id).first()
+    : await h.db.prepare('SELECT opt FROM poll_votes WHERE poll = ? AND ip = ? LIMIT 1').bind(id, v.key).first();
   return r ? r.opt : null;
 }
 // для сайта: тексты на языке страницы; числа — только если можно
-async function pollOut(h, p, lang, ip, u, adm) {
-  const my = await myVote(h, p.id, ip, u), show = !!my || p.status === 'closed' || adm;
+async function pollOut(h, p, lang, v, adm) {
+  const my = await myVote(h, p.id, v), show = !!my || p.status === 'closed' || adm;
   const t = o => o[lang] || o.en || o.ru || o.lv || '';
   const out = { id: p.id, q: t(p.q), status: p.status, ends: p.ends || 0, ideas: p.ideas ? 1 : 0, my, opts: p.opts.map(o => ({ id: o.id, t: t(o.t) })) };
   if (show) {
@@ -57,8 +68,8 @@ export async function pollsApi(req, env, url, h) {
     if (!id && (await h.getMeta('poll_home')) === '0') return h.json({ poll: null, hidden: 1 });
     const poll = id ? row(await h.db.prepare("SELECT * FROM polls WHERE id = ? AND status != 'draft'").bind(id).first()) : await homePoll(h);
     if (!poll) return h.json({ poll: null });
-    const u = await h.currentUser(req, env), adm = u ? await h.isAdmin(u, env) : false;
-    return h.json({ poll: await pollOut(h, poll, lang, await h.ipKey(req), u, adm) });
+    const v = await voter(h, req, env), adm = v.u ? await h.isAdmin(v.u, env) : false;
+    return h.json({ poll: await pollOut(h, poll, lang, v, adm) });
   }
   if (p === '/api/poll/vote' && m === 'POST') {
     await expire(h);
@@ -72,12 +83,18 @@ export async function pollsApi(req, env, url, h) {
     if (!isIdea && !poll.opts.some(o => o.id === opt)) h.fail(400, 'opt');
     if (isIdea && (!poll.ideas || idea.length < 3)) h.fail(400, 'idea');
     if (isIdea && /https?:|www\.|\.(com|net|org|ru|lv|io)\b/i.test(idea)) h.fail(400, 'link');
-    const u = await h.currentUser(req, env), ip = await h.ipKey(req), uid = u && !u.banned ? u.id : null;
-    if (await myVote(h, poll.id, ip, uid ? u : null)) h.fail(409, 'voted');
-    const r = await h.db.prepare('INSERT OR IGNORE INTO poll_votes (poll, ip, opt, uid, lang, at) VALUES (?, ?, ?, ?, ?, ?)').bind(poll.id, ip, isIdea ? 'idea' : opt, uid, lang, h.now()).run();
+    const v = await voter(h, req, env);
+    if (v.u && v.u.banned) { v.u = null; v.key = v.dev || v.ipk; }
+    const uid = v.u ? v.u.id : null;
+    if (await myVote(h, poll.id, v)) h.fail(409, 'voted');
+    if (!uid) { // гости с одного адреса (семья, кафе) — несколько, но не без конца
+      const g = await h.db.prepare('SELECT COUNT(*) AS n FROM poll_votes WHERE poll = ? AND uid IS NULL AND (ipk = ? OR ip = ?)').bind(poll.id, v.ipk, v.ipk).first();
+      if ((g && g.n) >= GUEST_PER_IP) h.fail(409, 'many');
+    }
+    const r = await h.db.prepare('INSERT OR IGNORE INTO poll_votes (poll, ip, opt, uid, lang, at, ipk) VALUES (?, ?, ?, ?, ?, ?, ?)').bind(poll.id, v.key, isIdea ? 'idea' : opt, uid, lang, h.now(), v.ipk).run();
     if (!r.meta.changes) h.fail(409, 'voted');
-    if (isIdea) await h.db.prepare('INSERT INTO poll_ideas (poll, ip, uid, text, lang, at) VALUES (?, ?, ?, ?, ?, ?)').bind(poll.id, ip, uid, idea, lang, h.now()).run();
-    return h.json({ poll: await pollOut(h, poll, lang, ip, uid ? u : null, false) });
+    if (isIdea) await h.db.prepare('INSERT INTO poll_ideas (poll, ip, uid, text, lang, at) VALUES (?, ?, ?, ?, ?, ?)').bind(poll.id, v.ipk, uid, idea, lang, h.now()).run();
+    return h.json({ poll: await pollOut(h, poll, lang, v, false) });
   }
   if (p !== '/api/admin/polls') return null;
   const u = await h.needUser(req, env); if (!(await h.isAdmin(u, env))) h.fail(403, 'admin');
