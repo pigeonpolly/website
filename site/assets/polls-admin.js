@@ -83,6 +83,7 @@
       main.innerHTML = `<section class="adm-box"><h2>🏠 Блок на главной</h2>
         <p><label><input type="checkbox" class="po-home"${d.home ? ' checked' : ''}> Показывать опрос на главной</label></p>
         <p class="be-note">${d.home ? 'Если есть открытый опрос — он на главной; нет открытого — 14 дней видны итоги последнего завершённого. Снимите галочку — блок исчезнет полностью.' : 'Блок скрыт — на главной опроса нет совсем (голоса и опросы сохранены).'}</p>
+        <p><b>🔗 Ссылка прямо на опрос</b> — для соцсетей, рассылки, сторис: ${['', '/ru', '/lv'].map(l => `<button type="button" class="pill-btn po-link" data-u="https://www.pigeonpolly.com${l}/poll/">📋 ${l ? l.slice(1).toUpperCase() : 'EN'}</button>`).join(' ')}</p>
         <div class="adm-quick"><button type="button" class="pill-btn pill-fill po-new">➕ Новый опрос</button></div><p class="be-note po-note" aria-live="polite">${esc(note || '')}</p></section>
         <div class="po-form"></div>
         ${d.items.length ? '' : '<p class="be-note">Опросов пока нет.</p>'}
@@ -97,6 +98,7 @@
             <button type="button" class="pill-btn" data-act="del">🗑 Удалить</button></div></section>`).join('')}`;
       const nb = main.querySelector('.po-note'), fbox = main.querySelector('.po-form');
       const run = async (b, body) => { try { show(await api(body), '✓ Готово'); } catch (e) { nb.textContent = ERR[e.code] || 'Ошибка: ' + e.message; } };
+      main.querySelectorAll('.po-link').forEach(b => { b.onclick = async () => { try { await navigator.clipboard.writeText(b.dataset.u); nb.textContent = '✓ Скопировано: ' + b.dataset.u; } catch (e) { nb.textContent = b.dataset.u; } }; });
       main.querySelector('.po-home').onchange = e => run(null, { act: 'home', on: e.target.checked ? 1 : 0 });
       main.querySelector('.po-new').onclick = () => { form(fbox, null, show); fbox.scrollIntoView({ behavior: 'smooth', block: 'start' }); };
       main.querySelectorAll('[data-act]').forEach(b => b.addEventListener('click', () => {

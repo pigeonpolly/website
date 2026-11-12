@@ -37,7 +37,7 @@
         + (p.ideas ? `<li><label class="po"><input type="radio" name="pq" value="idea"><span class="bx" aria-hidden="true"></span><span class="pt">${T('My own topic…', 'Своя тема…', 'Sava tēma…')}</span></label>
           <input class="pi" maxlength="120" placeholder="${T('e.g. autumn mushrooms in ink', 'например, осенние грибы тушью', 'piem., rudens sēnes ar tušu')}" aria-label="${T('Your topic', 'Твоя тема', 'Tava tēma')}" hidden></li>` : '');
     const foot = done
-      ? `<p class="pf">${T('Votes', 'Голосов', 'Balsis')}: <b>${total}</b>${p.status === 'open' && p.ends ? ` · ${T('open until', 'до', 'līdz')} ${fmtDate(p.ends)}` : ''}</p>`
+      ? (p.status === 'open' ? `<button type="button" class="btn psh">${T('↗ Invite friends to vote', '↗ Позвать друзей голосовать', '↗ Aicini draugus balsot')}</button>` : '') + `<p class="pf">${T('Votes', 'Голосов', 'Balsis')}: <b>${total}</b>${p.status === 'open' && p.ends ? ` · ${T('open until', 'до', 'līdz')} ${fmtDate(p.ends)}` : ''}</p>`
       : `<input class="hp" tabindex="-1" autocomplete="off" aria-hidden="true"><button type="button" class="btn pri pv" disabled>${T('Vote', 'Голосовать', 'Balsot')}</button>
          <p class="pf">${T('One vote per person: it can’t be changed later.', 'Один голос, изменить потом нельзя.', 'Viena balss, vēlāk to mainīt nevar.')}${p.ends ? ` ${T('Open until', 'Открыт до', 'Atvērta līdz')} ${fmtDate(p.ends)}.` : ''}</p>`;
     box.innerHTML = `<div class="w"><div class="pl-l">${head}</div>
@@ -45,6 +45,8 @@
         <div class="bh"><span>${T('Ballot', 'Бюллетень', 'Biļetens')} · Pigeon Polly Art Lab</span>${p.my ? `<span class="stamp2" aria-hidden="true">${T('I voted', 'Голос', 'Balsoju')}<br>✿</span>` : ''}</div>
         <h3>${esc(p.q)}</h3><ul class="pls">${rows}</ul>${foot}<p class="pm" aria-live="polite">${esc(msg || '')}</p></div></div>`;
     box.hidden = false;
+    if (location.hash === '#poll' && !box.dataset.go) { box.dataset.go = '1'; setTimeout(() => box.scrollIntoView({ behavior: 'smooth', block: 'start' }), 150); }
+    const sh = box.querySelector('.psh'); if (sh) sh.addEventListener('click', share);
     if (done) { requestAnimationFrame(() => box.querySelectorAll('.pb').forEach(b => b.classList.add('on'))); return; }
     const btn = box.querySelector('.pv'), idea = box.querySelector('.pi');
     box.querySelectorAll('input[name=pq]').forEach(r => r.addEventListener('change', () => {
@@ -64,6 +66,14 @@
         poll = d.poll; render(T('Thank you! Your vote is in ✿', 'Спасибо! Голос учтён ✿', 'Paldies! Balss ieskaitīta ✿'));
       } catch (e) { btn.disabled = false; m.textContent = ERR[e.code] || T('Something went wrong, try again.', 'Что-то пошло не так, попробуй ещё раз.', 'Kaut kas nogāja greizi, mēģini vēlreiz.'); }
     });
+  }
+  // поделиться: короткая ссылка /poll/ на языке страницы — телефон откроет «Поделиться», компьютер скопирует
+  async function share() {
+    const url = location.origin + (lang === 'en' ? '' : '/' + lang) + '/poll/', m = box.querySelector('.pm');
+    const text = T('Help choose the topic of the next painting video ✿', 'Помоги выбрать тему следующего видео ✿', 'Palīdzi izvēlēties nākamā zīmēšanas video tēmu ✿');
+    try { if (navigator.share) { await navigator.share({ title: poll.q, text, url }); return; } } catch (e) { if (e.name === 'AbortError') return; }
+    try { await navigator.clipboard.writeText(url); m.textContent = T('Link copied ✿', 'Ссылка скопирована ✿', 'Saite nokopēta ✿'); }
+    catch (e) { m.textContent = url; }
   }
   async function load(msg) {
     try {

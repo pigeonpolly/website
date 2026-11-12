@@ -51,6 +51,8 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     const p = url.pathname;
+    const pollGo = p.match(/^\/(ru\/|lv\/)?poll\/?$/); // короткая ссылка на опрос главной (worker/polls.js) → /#poll
+    if (pollGo) return Response.redirect(`${url.origin}/${pollGo[1] || ''}${url.search}#poll`, 302);
     if (!p.startsWith('/api/')) { // страницы: при сбое — своя страница «500 · что-то сломалось» вместо голой ошибки Cloudflare
       try {
         const run = () => pageFetch(req, env, url, p);
