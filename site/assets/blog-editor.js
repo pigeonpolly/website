@@ -911,15 +911,16 @@
       });
     });
 
-    // картинки из Google Docs живут там по временным ссылкам — копируем их на сайт сразу при вставке
-    const foreign = src => /^(data:image|blob:)/i.test(src) || (/^https?:\/\//i.test(src) && !src.startsWith(location.origin) && /googleusercontent\.com|docs\.google\.com|ggpht\.com/i.test(src));
+    // картинки из Google Docs и Patreon живут там по временным ссылкам — копируем их на сайт сразу при вставке
+    // любая картинка с чужого сайта (Patreon, Google Docs, Pinterest…): их ссылки со временем перестают открываться, поэтому храним только у себя
+    const foreign = src => /^(data:image|blob:)/i.test(src) || (/^(https?:)?\/\//i.test(src) && !src.startsWith(location.origin) && !src.startsWith('https://www.pigeonpolly.com/'));
     const copied = {}; // одна и та же картинка в RU/EN/LV копируется один раз
     async function copyImages(body) {
       const imgs = [...body.querySelectorAll('img')].filter(i => foreign(i.getAttribute('src') || ''));
       if (!imgs.length) return;
       let ok = 0, bad = 0;
       for (const [i, img] of imgs.entries()) {
-        status(`Копирую картинки из Google Docs на сайт: ${i + 1} из ${imgs.length}…`);
+        status(`Копирую картинки на сайт: ${i + 1} из ${imgs.length}…`);
         const src = img.getAttribute('src');
         let local = copied[src] || null;
         if (!local && /^https?:/i.test(src)) { try { local = (await api('blog/admin/fetch-image', { url: src })).url; } catch (e) { /* попробуем через браузер */ } }
@@ -932,13 +933,13 @@
         else { (fig || img).classList.add('be-img-bad'); img.title = 'Не скопировалась — перетащите сюда файл картинки'; bad++; }
       }
       touch();
-      status(bad ? `Скопировано ${ok} из ${imgs.length}. ${bad} не удалось — они обведены красным: сохраните их с Google Docs и перетащите файлами на их место (старую удалите).`
+      status(bad ? `Скопировано ${ok} из ${imgs.length}. ${bad} не удалось — они обведены красным: сохраните их к себе и перетащите файлами на их место (старую удалите).`
         : `Готово: все картинки (${ok}) скопированы на сайт ✓`);
     }
     // если в статье остались картинки со ссылками на Google Docs — предлагаем скопировать их одной кнопкой (не автоматически)
     const leftovers = bodies.reduce((n, b) => n + [...b.querySelectorAll('img')].filter(i => foreign(i.getAttribute('src') || '')).length, 0);
     if (leftovers) {
-      status(`В статье ${leftovers} картин(ки/ок) со ссылками на Google Docs — они могут не показываться читателям. <button type="button" class="bc-link" id="be-copy-left">Скопировать их на сайт</button>`);
+      status(`В статье ${leftovers} картин(ки/ок) со ссылками на другие сайты (Patreon, Google Docs…) — они могут пропасть. <button type="button" class="bc-link" id="be-copy-left">Скопировать их на сайт</button>`);
       $('#be-copy-left').addEventListener('click', async () => { for (const b of bodies) await copyImages(b); });
     }
 
@@ -1040,6 +1041,10 @@
     app.querySelectorAll('[data-save]').forEach(b => b.addEventListener('click', async () => {
       clearTimeout(autoTimer);
       if (saving && savingP) { status('Сохраняю…'); await savingP; } // дождаться автосохранения: у статьи уже будет номер
+      // картинки с чужих сайтов — сначала на сайт; не вышло — предупредить, а не сохранять молча
+      for (const bd of bodies) await copyImages(bd);
+      const left = bodies.reduce((n, bd) => n + [...bd.querySelectorAll('img')].filter(i => foreign(i.getAttribute('src') || '')).length, 0);
+      if (left && !confirm(`${left} картин(ки/ок) не удалось скопировать на сайт — они обведены красным и со временем пропадут. Перетащите на их место файлы.\n\nСохранить всё равно?`)) return;
       const d = collect(); d.status = b.dataset.save;
       if (b.hasAttribute('data-now')) { d.now = true; if (!(d.published_at && d.published_at <= Date.now() / 1000)) delete d.published_at; } // сейчас (или прошедшая дата, выбранная руками)
       if (!d.t_ru.trim() && !d.t_en.trim() && !d.t_lv.trim()) { status(ERR.title); return; }
