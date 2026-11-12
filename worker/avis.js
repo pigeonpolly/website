@@ -16,6 +16,7 @@ export const AVIS_RULES = { avisOn: true, avisHour: 6 };
 export const AVIS_RANGE = { avisHour: [3, 12] };
 export const AVIS_INT = ['avisHour'];
 export const AVIS_CRON = '47 * * * *';
+const V = 3; // версия формата набора и выпуска: старше — за сегодня пересобрать (3 — сплетни Сиссель)
 const LEVELS = ['A', 'B'], KEEP = 30; // два уровня (решение Алины): A = A1–A2, B = B1–B2
 const LNAME = { A: 'A1–A2', B: 'B1–B2' };
 const rigaDay = (t = Date.now()) => new Date(t).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
@@ -28,9 +29,11 @@ const FEEDS = {
   kunst: ['https://www.theartnewspaper.com/rss.xml', 'https://news.artnet.com/feed', 'https://hyperallergic.com/feed/', GN('art exhibition OR museum OR artist')],
   kultur: ['https://www.theguardian.com/culture/rss', 'https://variety.com/feed/', 'https://www.theguardian.com/books/rss', 'https://www.nrk.no/kultur/toppsaker.rss', GN('new book OR new film OR new TV series release')],
   spill: ['https://www.pcgamer.com/rss/', 'https://www.rockpapershotgun.com/feed', 'https://www.eurogamer.net/feed', GN('new video game release Steam')],
+  // сплетни о звёздах — пересказывает маскот, сорока Сиссель (skjære — болтушка), в чате
+  sladder: ['https://people.com/feed/', 'https://www.eonline.com/syndication/feeds/rssfeeds/topstories.xml', 'https://www.seher.no/rss', GN('celebrity news')],
 };
 // norge и mat — не из лент: тему дня выбирает Gemini (с учётом сезона и норвежского календаря, без повторов за 30 дней) и пишет рассказ сам
-export const SECTIONS = { verden: '🌍 Verden', latvia: '🇱🇻 Latvia', kunst: '🎨 Kunst', kultur: '🎬 Bøker, film og serier', spill: '🎮 Spill', norge: '🇳🇴 Historier fra Norge', mat: '🍲 Mat og tradisjoner' };
+export const SECTIONS = { verden: '🌍 Verden', latvia: '🇱🇻 Latvia', kunst: '🎨 Kunst', kultur: '🎬 Bøker, film og serier', spill: '🎮 Spill', sladder: '💬 Sladder med Sissel', norge: '🇳🇴 Historier fra Norge', mat: '🍲 Mat og tradisjoner' };
 const FALLBACK = { // запасные темы рассказов: [тема, запрос фото для Commons]
   norge: [['Hurtigruten — the coastal express along Norway', 'Hurtigruten ship'], ['Bryggen in Bergen — the old Hanseatic wharf', 'Bryggen Bergen'], ['Allemannsretten — the right to roam in Norwegian nature', 'Norway hiking trail'],
     ['Stave churches of Norway', 'Borgund stave church'], ['Friluftsliv — why Norwegians love being outdoors', 'Norway mountain cabin'], ['The Sami people and their culture', 'Sami lavvu'],
@@ -41,7 +44,7 @@ const FALLBACK = { // запасные темы рассказов: [тема, �
     ['Kvikk Lunsj — the hiking chocolate', 'Kvikk Lunsj'], ['Fiskesuppe — Bergen fish soup', 'Bergen fish soup'], ['Rømmegrøt — sour cream porridge', 'rømmegrøt'],
     ['Pinnekjøtt and ribbe — Christmas dinner', 'pinnekjøtt'], ['Sju slag — the seven kinds of Christmas cookies', 'Norwegian christmas cookies'], ['Kaffe — Norway and filter coffee', 'Norwegian coffee kaffe']],
 };
-const PICK = { verden: 3, latvia: 2, kunst: 2, kultur: 2, spill: 1 }; // сколько новостей в разделе (решение Алины: больше о культуре, меньше о войне)
+const PICK = { verden: 3, latvia: 2, kunst: 2, kultur: 2, spill: 1, sladder: 2 }; // сколько новостей в разделе (решение Алины: больше о культуре, меньше о войне)
 
 // ---------- RSS ----------
 const decode = s => String(s || '').replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/<[^>]+>/g, ' ')
@@ -124,8 +127,8 @@ async function buildSrc(env, day) {
   try {
     pick = await ask(env, `You are the editor of a morning digest for a reader in Riga, Latvia, who is an artist and is learning Norwegian. Today is ${WEEKDAY(day)}.
 
-PART 1. From each numbered list of headlines from the last 24 hours choose the most important, interesting and varied stories: WORLD ${PICK.verden}, LATVIA ${PICK.latvia}, ART ${PICK.kunst}, CULTURE ${PICK.kultur}, GAMES ${PICK.spill}.
-Rules: no duplicates of the same event, no clickbait, no horoscopes. NEVER choose medicine, health, diseases, hospitals or drugs stories, and NEVER violent or disturbing crime, murders, abuse, terror, disasters with victims or other triggering content. Keep war and military conflict to a minimum: at most ONE such story in WORLD and none elsewhere; prefer science, climate, society, economy, technology and good news. ART: exhibitions, artists, museums, discoveries, art world. CULTURE: trends and notable new releases in world books, films and TV series (premieres, bestsellers, awards), not celebrity gossip. GAMES: notable new or upcoming video games (Steam, consoles, indie), not hardware deals. Return the numbers.
+PART 1. From each numbered list of headlines from the last 24 hours choose the most important, interesting and varied stories: WORLD ${PICK.verden}, LATVIA ${PICK.latvia}, ART ${PICK.kunst}, CULTURE ${PICK.kultur}, GAMES ${PICK.spill}, CELEBRITY GOSSIP ${PICK.sladder}.
+Rules: no duplicates of the same event, no clickbait, no horoscopes. NEVER choose medicine, health, diseases, hospitals or drugs stories, and NEVER violent or disturbing crime, murders, abuse, terror, disasters with victims or other triggering content. Keep war and military conflict to a minimum: at most ONE such story in WORLD and none elsewhere; prefer science, climate, society, economy, technology and good news. ART: exhibitions, artists, museums, discoveries, art world. CULTURE: trends and notable new releases in world books, films and TV series (premieres, bestsellers, awards), not celebrity gossip. GAMES: notable new or upcoming video games (Steam, consoles, indie), not hardware deals. CELEBRITY GOSSIP: light, fun, harmless stories about stars (new couples, weddings, babies, red carpets, surprising hobbies, comebacks); never death, illness, divorces with fights, abuse, lawsuits or anything sad. Return the numbers.
 
 PART 2. Choose today's topics for two short stories written from general knowledge (no news needed). Each topic: one line in English, specific (not "Norwegian food" but e.g. "Fårikål — the national dish and Fårikålens festdag in September").
 For each topic also give a 2–4 word English photo search query for Wikimedia Commons ("norge_q", "mat_q"), e.g. "fårikål dish", "Bryggen Bergen".
@@ -142,7 +145,7 @@ ${Object.keys(FEEDS).map(k => `${k.toUpperCase()}:\n${list(k)}`).join('\n\n')}`,
   for (const sec of Object.keys(FEEDS)) {
     const idx = [...new Set((pick[sec] || []).filter(i => Number.isInteger(i) && cand[sec][i]))].slice(0, PICK[sec]);
     for (let i = 0; idx.length < PICK[sec] && i < cand[sec].length; i++) if (!idx.includes(i)) idx.push(i);
-    for (const i of idx) items.push({ sec, ...cand[sec][i] });
+    for (const i of idx) items.push({ sec, v: V, ...cand[sec][i] });
   }
   if (!items.length) throw Object.assign(new Error('no_news'), { code: 'no_news' });
   const texts = await Promise.all(items.map(x => article(x.link)));
@@ -182,6 +185,7 @@ For EVERY story below (keep the order, field "i" = the story number) write:
 - "words": the glossed words: "no" = dictionary form (nouns with en/ei/et, verbs with å, e.g. "et tiltak", "å foreslå"), "ru" = short Russian translation (1–4 words). Do not gloss very basic words the level already knows.
 - "ru": 1–2 sentences in Russian: what the story says (for self-check after reading).
 - "q": one short comprehension question in Norwegian at this level.
+For stories in section [sladder] (celebrity gossip) write "title" and "text" as Sissel, a cute chatty magpie (skjære) who gossips with her friend, the reader: informal, warm and playful, speaking directly to "du" ("Hør her!", "Du, vet du hva?", "Jeg sier ikke noe, men…"), one or two emojis at most, still the same level, still only facts from the source. "kort" stays empty for gossip.
 Also:
 - "hilsen": 1–2 friendly Norwegian sentences at this level to start the day (mention the date ${day} naturally, e.g. weekday), no facts that are not in the stories.
 - "dagens": "words of the day" — 3 useful words or expressions from today's stories, with Russian translation and a short Norwegian example sentence at this level.
@@ -193,7 +197,7 @@ ${stories}`, ISSUE, o => o && Array.isArray(o.items) && o.items.length);
   const items = out.items.filter(x => src[x.i]).map(x => ({ sec: src[x.i].sec, link: src[x.i].link, src: src[x.i].src, img: src[x.i].img || '', title: String(x.title).slice(0, 200), kort: String(x.kort || '').slice(0, 300),
     text: String(x.text).slice(0, 3000), words: (x.words || []).slice(0, 12).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80) })), ru: String(x.ru).slice(0, 500), q: String(x.q || '').slice(0, 200) }));
   items.push(...await tales);
-  const data = { day, level, hilsen: String(out.hilsen || '').slice(0, 400), dagens: (out.dagens || []).slice(0, 5).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80), ex: String(w.ex).slice(0, 200) })), items };
+  const data = { v: V, day, level, hilsen: String(out.hilsen || '').slice(0, 400), dagens: (out.dagens || []).slice(0, 5).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80), ex: String(w.ex).slice(0, 200) })), items };
   await env.DB.prepare('INSERT INTO avis (day, level, data, created_at) VALUES (?, ?, ?, ?) ON CONFLICT(day, level) DO UPDATE SET data = excluded.data, created_at = excluded.created_at')
     .bind(day, level, JSON.stringify(data), Date.now()).run();
   return data;
@@ -271,11 +275,11 @@ export async function avisApi(req, env, url, h) {
     const days = (await env.DB.prepare('SELECT day FROM avis_src ORDER BY day DESC LIMIT ?').bind(KEEP).all()).results.map(x => x.day);
     let data = null;
     if (!(m === 'POST' && b.fresh)) { const r = await env.DB.prepare('SELECT data FROM avis WHERE day = ? AND level = ?').bind(day, level).first(); if (r) data = JSON.parse(r.data); }
-    if (data && day === today && !data.items.some(x => x.sec === 'norge' || x.sec === 'mat')) data = null; // выпуск старого формата — переписать
+    if (data && day === today && data.v !== V) data = null; // выпуск старого формата — переписать
     if (!data) {
       try {
         let src = m === 'POST' && b.fresh === 'news' && day === today ? null : await getSrc(env, day);
-        if (src && day === today && !src.some(x => x.topic)) src = null; // набор старого формата (без рассказов и картинок) — собрать заново
+        if (src && day === today && !src.some(x => x.v === V)) src = null; // набор старого формата (без рассказов и картинок) — собрать заново
         if (!src && day !== today) h.fail(404, 'no_day');
         if (!src) src = await buildSrc(env, day);
         data = await buildIssue(env, day, level, src);
@@ -292,6 +296,8 @@ const LOCKED = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta
 <style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#fbfaff;color:#1f1832;font:17px/1.6 system-ui,sans-serif;padding:16px;text-align:center}a{color:#534ab7}</style></head>
 <body><main><h1>Страница закрыта</h1><p>Это личная страница. Войдите на сайт и откройте её снова.</p><p><a href="/">pigeonpolly.com</a></p></main></body></html>`;
 
+// Сиссель — милая сорока-сплетница (маскот раздела «Sladder»)
+const MAGPIE = `<svg viewBox="0 0 72 64" width="60" height="54"><path d="M22 44L2 60c2 3 6 3 8 1l18-12z" fill="#2c3e8f"/><path d="M22 46L6 62" stroke="#4a6fe0" stroke-width="2" stroke-linecap="round"/><ellipse cx="38" cy="38" rx="19" ry="16" fill="#1d1b26"/><ellipse cx="42" cy="43" rx="12" ry="11" fill="#fff"/><path d="M21 35c7-6 17-5 20 4-8 5-18 3-20-4z" fill="#1d1b26" stroke="#3a5bd0" stroke-width="1.6"/><path d="M25 35c4-2 9-2 12 1-4 2-9 2-12-1z" fill="#fff"/><circle cx="44" cy="20" r="13" fill="#1d1b26"/><circle cx="40" cy="19" r="4.4" fill="#fff"/><circle cx="50" cy="19" r="4.4" fill="#fff"/><circle cx="41" cy="20" r="2.3" fill="#1d1b26"/><circle cx="51" cy="20" r="2.3" fill="#1d1b26"/><circle cx="41.8" cy="19" r=".8" fill="#fff"/><circle cx="51.8" cy="19" r=".8" fill="#fff"/><path d="M55 22l11 3-11 3z" fill="#2a2633"/><circle cx="38" cy="26" r="2.3" fill="#ff9fb0" opacity=".75"/><circle cx="52" cy="27" r="2.3" fill="#ff9fb0" opacity=".75"/><path d="M36 53l-2 7M45 53l2 7" stroke="#2a2633" stroke-width="2.4" stroke-linecap="round"/></svg>`;
 const AVIS_HTML = `<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="robots" content="noindex">
 <title>Morgenavis</title><link rel="icon" href="/favicon.ico">
 <style>
@@ -330,6 +336,10 @@ details{font:15px system-ui,sans-serif;margin-top:6px}summary{cursor:pointer;col
 .load{text-align:center;padding:60px 0;color:var(--mute);font:16px system-ui,sans-serif}
 .load b{display:block;font-size:40px;animation:bob 1.2s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-8px)}}
 .read{font:600 15px system-ui,sans-serif}
+.gossip{display:flex;gap:10px;align-items:flex-start;margin:16px 0}.sissel{flex:none;margin-top:4px;animation:bob 2.4s ease-in-out infinite}
+.bubble{position:relative;flex:1;min-width:0;background:var(--acc2);border-radius:4px 18px 18px 18px;padding:10px 14px}
+.bubble .who{display:block;font:700 13px system-ui,sans-serif;color:var(--acc);letter-spacing:.04em}
+.bubble article h3{font-size:20px;margin-top:2px}.bubble .pic{max-height:220px}.bubble .words li{background:var(--card)}
 .toc{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;padding:8px 0;margin:8px 0;background:var(--bg);font:600 14px system-ui,sans-serif;scrollbar-width:none}
 .toc::-webkit-scrollbar{display:none}.toc a{flex:none;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
 .toc a:hover{border-color:var(--acc);color:var(--acc)}
@@ -345,6 +355,7 @@ h2.sec{scroll-margin-top:56px;display:flex;justify-content:space-between;align-i
 <script>
 (() => {
   const $ = s => document.querySelector(s), esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const MAG = ${JSON.stringify(MAGPIE)};
   const SEC = ${JSON.stringify(SECTIONS)}, LN = ${JSON.stringify(LNAME)};
   let level = null, day = null, data = null;
   try { level = localStorage.getItem('avis-level'); } catch (e) {}
@@ -387,11 +398,12 @@ h2.sec{scroll-margin-top:56px;display:flex;justify-content:space-between;align-i
     d.items.forEach((x, i) => {
       if (x.sec !== sec) { sec = x.sec; html += '<h2 class="sec" id="s-' + sec + '">' + esc(SEC[sec] || sec) + '<a class="up" href="#top" aria-label="Наверх">↑</a></h2>'; }
       const plain = x.text.replace(/\\[\\[(.+?)\\]\\]/g, '$1');
+      if (x.sec === 'sladder') html += '<div class="gossip"><span class="sissel" aria-hidden="true">' + MAG + '</span><div class="bubble"><b class="who">Sissel</b>';
       html += '<article data-i="' + i + '">' + (x.img ? '<img class="pic" src="' + esc(x.img) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">' : '') + '<h3 class="tx">' + wrap(x.title) + '</h3>' + (x.kort ? '<p class="kort tx">📌 ' + wrap(x.kort) + '</p>' : '') + '<div class="tx">' + marks(x.text) + '</div>'
         + (x.words.length ? '<ul class="words">' + x.words.map(w => '<li><span><b>' + esc(w.no) + '</b> — ' + esc(w.ru) + '</span>' + addBtn(w.no, w.ru, (plain.split(/(?<=[.!?])\\s+/).find(s => s.toLowerCase().includes(w.no.toLowerCase().replace(/^(en|ei|et|å) /, '').slice(0, 4))) || '')) + '</li>').join('') + '</ul>' : '')
         + (x.q ? '<p class="q tx">❓ ' + wrap(x.q) + '</p>' : '')
         + '<div class="tools"><button class="btn" type="button" data-say="' + i + '">🔊 Les høyt</button>' + (x.link ? '<a href="' + esc(x.link) + '" target="_blank" rel="noopener">kilde: ' + esc(x.src) + '</a>' : '') + (x.photo ? '<a href="' + esc(x.photo) + '" target="_blank" rel="noopener">foto: Wikimedia Commons</a>' : '') + '</div>'
-        + '<details><summary>Проверить себя по-русски</summary><p>' + esc(x.ru) + '</p></details></article>';
+        + '<details><summary>Проверить себя по-русски</summary><p>' + esc(x.ru) + '</p></details></article>' + (x.sec === 'sladder' ? '</div></div>' : '');
     });
     const n = d.items.reduce((s, x) => s + x.text.split(/\\s+/).length, 0);
     html += '<p class="hint" style="margin-top:30px">≈ ' + n + ' ord · ' + Math.max(1, Math.round(n / 110)) + ' min. Godt jobba! 🐧</p>';
