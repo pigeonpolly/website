@@ -366,7 +366,7 @@ export async function blogApi(req, env, url, h) {
     return json({ latest: latest && pack(latest), featured: featured.map(x => ({ ...pack(x), star: true })), recent: [latest, ...side].filter(Boolean).map(pack) }); // recent — новая главная: крупно самая новая, справа три ★, недостающие — следующие по дате
   }
 
-  // список картинок Алины в R2 (блог, картины галерей, карточки) — для еженедельной копии на GitHub (.github/workflows/media-backup.yml); сами картинки и так открыты по /media/
+  // список картинок Алины в R2 (блог, картины галерей, карточки) и состояние копии во втором хранилище; сами картинки и так открыты по /media/
   if (m === 'GET' && p === '/api/blog/media-list') {
     const keys = [];
     if (env.MEDIA) for (const prefix of ['blog/', 'art/', 'cards/']) { let cursor; do { const r = await env.MEDIA.list({ prefix, cursor }); keys.push(...r.objects.map(o => o.key)); cursor = r.truncated ? r.cursor : null; } while (cursor); }
