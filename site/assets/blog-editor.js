@@ -1111,8 +1111,8 @@
       if (saving && savingP) { status('Сохраняю…'); await savingP; } // дождаться автосохранения: у статьи уже будет номер
       // картинки с чужих сайтов — сначала на сайт; не вышло — предупредить, а не сохранять молча
       for (const bd of bodies) await copyImages(bd);
-      const left = bodies.reduce((n, bd) => n + [...bd.querySelectorAll('img')].filter(i => foreign(i.getAttribute('src') || '')).length, 0);
-      if (left && !confirm(`${left} картин(ки/ок) не удалось скопировать на сайт — они обведены красным и со временем пропадут. Перетащите на их место файлы.\n\nСохранить всё равно?`)) return;
+      const notCopied = bodies.reduce((n, bd) => n + [...bd.querySelectorAll('img')].filter(i => foreign(i.getAttribute('src') || '')).length, 0);
+      if (notCopied && !confirm(`${notCopied} картин(ки/ок) не удалось скопировать на сайт — они обведены красным и со временем пропадут. Перетащите на их место файлы.\n\nСохранить всё равно?`)) return;
       const d = collect(); d.status = b.dataset.save;
       if (b.hasAttribute('data-now')) { d.now = true; if (!(d.published_at && d.published_at <= Date.now() / 1000)) delete d.published_at; } // сейчас (или прошедшая дата, выбранная руками)
       if (!d.t_ru.trim() && !d.t_en.trim() && !d.t_lv.trim()) { status(ERR.title); return; }
