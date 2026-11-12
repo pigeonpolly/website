@@ -8,33 +8,33 @@
   const CSS = `
   .rn-wrap{max-width:900px}
   .rn-spreads{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:12px;margin:12px 0}
-  .rn-sp{text-align:left;padding:14px;border-radius:14px;border:2px solid var(--pp-line,#ddd);background:var(--pp-card,#fff);cursor:pointer;font:inherit;color:inherit}
-  .rn-sp:hover,.rn-sp:focus-visible{border-color:var(--pp-acc,#E9A93B)}
+  .rn-sp{text-align:left;padding:14px;border-radius:14px;border:2px solid #E8E4E2;background:#fff;cursor:pointer;font:inherit;color:#2B1A51}
+  .rn-sp:hover,.rn-sp:focus-visible{border-color:#E9A93B}
   .rn-sp b{display:block;font-size:1.05em;margin-bottom:4px}
   .rn-sp small{opacity:.75}
   .rn-how{margin:6px 0 14px 20px;padding:0}
   .rn-how li{margin:4px 0}
   .rn-slots{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
-  .rn-slot{flex:1 1 150px;min-width:140px;max-width:220px;padding:12px;border-radius:14px;border:2px dashed var(--pp-line,#ccc);background:var(--pp-card,#fff);cursor:pointer;font:inherit;color:inherit;text-align:center}
-  .rn-slot.on{border-style:solid;border-color:var(--pp-acc,#E9A93B)}
-  .rn-slot.cur{box-shadow:0 0 0 3px var(--pp-acc,#E9A93B)}
+  .rn-slot{flex:1 1 150px;min-width:140px;max-width:220px;padding:12px;border-radius:14px;border:2px dashed #E8E4E2;background:#fff;cursor:pointer;font:inherit;color:#2B1A51;text-align:center}
+  .rn-slot.on{border-style:solid;border-color:#E9A93B}
+  .rn-slot.cur{box-shadow:0 0 0 3px #E9A93B}
   .rn-slot .rn-pn{font-size:.85em;opacity:.75;display:block;margin-bottom:6px}
   .rn-g{font-size:2em;line-height:1.1;display:block;min-height:1.1em}
   .rn-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(92px,1fr));gap:8px;margin:8px 0 16px}
-  .rn-c{padding:8px 4px;border-radius:12px;border:1px solid var(--pp-line,#ddd);background:var(--pp-card,#fff);cursor:pointer;font:inherit;color:inherit;font-size:.85em}
-  .rn-c:hover:not(:disabled){border-color:var(--pp-acc,#E9A93B)}
+  .rn-c{padding:8px 4px;border-radius:12px;border:1px solid #E8E4E2;background:#fff;cursor:pointer;font:inherit;color:#2B1A51;font-size:.85em}
+  .rn-c:hover:not(:disabled){border-color:#E9A93B}
   .rn-c:disabled{opacity:.35;cursor:default}
   .rn-c .rn-g{font-size:1.6em}
-  .rn-card{padding:16px;border-radius:16px;border:1px solid var(--pp-line,#ddd);background:var(--pp-card,#fff);margin:14px 0}
+  .rn-card{padding:16px;border-radius:16px;border:1px solid #E8E4E2;background:#fff;color:#2B1A51;margin:14px 0}
   .rn-card h3{margin:0 0 4px}
   .rn-kw{opacity:.8;margin:0 0 10px}
   .rn-qa{display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:10px;margin:10px 0}
-  .rn-qa div{padding:10px 12px;border-radius:12px;background:var(--pp-soft,rgba(0,0,0,.05))}
+  .rn-qa div{padding:10px 12px;border-radius:12px;background:#F4EFEA}
   .rn-attrs{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;font-size:.85em}
-  .rn-attrs span{padding:3px 9px;border-radius:99px;background:var(--pp-soft,rgba(0,0,0,.05))}
+  .rn-attrs span{padding:3px 9px;border-radius:99px;background:#F4EFEA}
   .rn-t p{margin:8px 0;line-height:1.55}
-  .rn-pos{font-size:.8em;text-transform:uppercase;letter-spacing:.06em;color:var(--pp-acc,#b9771a);font-weight:700}
-  .rn-sum{padding:16px;border-radius:16px;border:2px solid var(--pp-acc,#E9A93B);margin:14px 0}
+  .rn-pos{font-size:.8em;text-transform:uppercase;letter-spacing:.06em;color:#b9771a;font-weight:700}
+  .rn-sum{background:#fff;color:#2B1A51;padding:16px;border-radius:16px;border:2px solid #E9A93B;margin:14px 0}
   .rn-sum ul{margin:6px 0 6px 20px;padding:0}
   .rn-sum li{margin:5px 0;line-height:1.5}
   @media (max-width:600px){.rn-slot{max-width:none}}`;
@@ -93,7 +93,7 @@
 
   function grid(sp, title, list) {
     const used = new Set(st.picks.filter((n, i) => n && i !== st.cur));
-    return `<p class="be-note" style="margin-bottom:0">${title}</p><div class="rn-grid">${list.map(c => `<button type="button" class="rn-c" data-n="${c.n}" ${used.has(c.n) ? 'disabled' : ''} title="${esc(c.kw)}"${st.picks[st.cur] === c.n ? ' style="border-color:var(--pp-acc,#E9A93B);border-width:2px"' : ''}>
+    return `<p class="be-note" style="margin-bottom:0">${title}</p><div class="rn-grid">${list.map(c => `<button type="button" class="rn-c" data-n="${c.n}" ${used.has(c.n) ? 'disabled' : ''} title="${esc(c.kw)}"${st.picks[st.cur] === c.n ? ' style="border-color:#E9A93B;border-width:2px"' : ''}>
       <span class="rn-g">${esc(c.g || '✦')}</span>${c.n}. ${esc(c.ru)}</button>`).join('')}</div>`;
   }
 
