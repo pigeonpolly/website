@@ -9,6 +9,7 @@ import { geminiKey, GEMINI_MODELS } from './translate.js';
 
 export const AVIS_TABLES = [
   'CREATE TABLE IF NOT EXISTS avis_src (day TEXT PRIMARY KEY, data TEXT NOT NULL, created_at INTEGER)',
+  'CREATE TABLE IF NOT EXISTS avis_read (day TEXT NOT NULL, k TEXT NOT NULL, at INTEGER, PRIMARY KEY (day, k))', // «✓ Прочитано» (ключ — x.link или x.sec)
   'CREATE TABLE IF NOT EXISTS avis (day TEXT NOT NULL, level TEXT NOT NULL, data TEXT NOT NULL, created_at INTEGER, PRIMARY KEY (day, level))',
 ];
 // числа — в «📜 Правилах» (кабинет → Все правила → 📰 Morgenavis)
@@ -279,7 +280,7 @@ export async function avisCron(env, R) {
   await env.DB.prepare("INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(tries, String(n + 1)).run();
   await step(env, day, level);
   const old = rigaDay(Date.now() - KEEP * 86400000);
-  await env.DB.batch([env.DB.prepare('DELETE FROM avis WHERE day < ?').bind(old), env.DB.prepare('DELETE FROM avis_src WHERE day < ?').bind(old),
+  await env.DB.batch([env.DB.prepare('DELETE FROM avis WHERE day < ?').bind(old), env.DB.prepare('DELETE FROM avis_read WHERE day < ?').bind(old), env.DB.prepare('DELETE FROM avis_src WHERE day < ?').bind(old),
     env.DB.prepare("DELETE FROM meta WHERE key LIKE 'avis_try:%' AND key < ?").bind('avis_try:' + old)]);
 }
 
@@ -294,6 +295,13 @@ export async function avisApi(req, env, url, h) {
     const b = await req.json().catch(() => ({}));
     if (!LEVELS.includes(b.level)) h.fail(400, 'level');
     await env.DB.prepare("INSERT INTO meta (key, value) VALUES ('avis_level', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(b.level).run();
+    return h.json({ ok: true });
+  }
+  if (p === '/api/avis/read' && m === 'POST') { // {day, k, on} — отметить статью прочитанной / снять отметку
+    const b = await req.json().catch(() => ({})), k = String(b.k || '').slice(0, 500);
+    if (!/^\d{4}-\d\d-\d\d$/.test(b.day || '') || !k) h.fail(400, 'bad');
+    if (b.on === false) await env.DB.prepare('DELETE FROM avis_read WHERE day = ? AND k = ?').bind(b.day, k).run();
+    else await env.DB.prepare('INSERT OR IGNORE INTO avis_read (day, k, at) VALUES (?, ?, ?)').bind(b.day, k, Date.now()).run();
     return h.json({ ok: true });
   }
   if (p === '/api/avis/word' && m === 'POST') { // «+ в словарь» учебника норвежского
@@ -322,7 +330,8 @@ export async function avisApi(req, env, url, h) {
     } catch (e) { if (e.status) throw e; out = { error: e.code || 'ai' }; }
     const days = (await env.DB.prepare('SELECT day FROM avis_src ORDER BY day DESC LIMIT ?').bind(KEEP).all()).results.map(x => x.day);
     if (!days.includes(day) && day === today) days.unshift(day);
-    return h.json({ ...out, day, level, days, defaultLevel: await getLevel(env) }, 200, nc);
+    const read = (await env.DB.prepare('SELECT k FROM avis_read WHERE day = ?').bind(day).all()).results.map(x => x.k);
+    return h.json({ ...out, day, level, days, read, defaultLevel: await getLevel(env) }, 200, nc);
   }
   return null;
 }
@@ -376,6 +385,13 @@ details{font:15px system-ui,sans-serif;margin-top:6px}summary{cursor:pointer;col
 .ins{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;font:14px system-ui,sans-serif}
 .ins:hover{border-color:var(--acc)}.ins b{font-size:15px}.ins small{color:var(--mute)}.ins .pq{font-size:12px}
 .pal{display:flex;height:54px;border-radius:9px;overflow:hidden;margin-bottom:6px}.pal i{flex:1}
+article .rhead{display:none;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--mute);border-radius:12px;padding:8px 12px;font:600 15px system-ui,sans-serif;cursor:pointer;margin:6px 0}
+article .rhead small{float:right;font-weight:400;color:var(--acc)}
+article.done .rhead{display:block}article.done .body{display:none}article.done.open .body{display:block}article.done.open .rhead small::after{content:''}
+article.done .rd{background:var(--acc2);color:var(--ok)}
+.prog{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;font:14px system-ui,sans-serif;color:var(--mute);margin:0 0 8px}.prog:empty{display:none}
+.prog a{color:var(--acc)}.prog .bar{flex-basis:100%;height:5px;background:var(--line);border-radius:9px;overflow:hidden}.prog .bar i{display:block;height:100%;background:var(--ok)}
+.toc a.ok{color:var(--ok);border-color:var(--ok)}.toc a.ok::after{content:' ✓'}
 .gossip{display:flex;gap:10px;align-items:flex-start;margin:16px 0}.sissel{flex:none;margin-top:4px;animation:bob 2.4s ease-in-out infinite}
 .bubble{position:relative;flex:1;min-width:0;background:var(--acc2);border-radius:4px 18px 18px 18px;padding:10px 14px}
 .bubble .who{display:block;font:700 13px system-ui,sans-serif;color:var(--acc);letter-spacing:.04em}
@@ -433,23 +449,43 @@ h2.sec{scroll-margin-top:56px;display:flex;justify-content:space-between;align-i
     let html = d.hilsen ? '<p class="hilsen tx">' + wrap(d.hilsen) + '</p>' : '';
     if (d.dagens && d.dagens.length) html += '<div class="box dagens"><h3>Dagens ord</h3><ul>' + d.dagens.map(w => '<li><b>' + esc(w.no) + '</b> — ' + esc(w.ru) + ' ' + addBtn(w.no, w.ru, w.ex) + '<br><i class="tx">' + wrap(w.ex) + '</i></li>').join('') + '</ul></div>';
     const secs = [...new Set(d.items.map(x => x.sec))]; if (d.insp && d.insp.length) secs.push('insp');
-    html += '<nav class="toc" aria-label="Разделы">' + secs.map(k => '<a href="#s-' + k + '">' + esc(SEC[k] || k) + '</a>').join('') + '</nav>';
+    READ = new Set(d.read || []);
+    html += '<nav class="toc" aria-label="Разделы">' + secs.map(k => '<a href="#s-' + k + '" data-sec="' + k + '">' + esc(SEC[k] || k) + '</a>').join('') + '</nav><div class="prog" id="prog"></div>';
     let sec = '';
     d.items.forEach((x, i) => {
       if (x.sec !== sec) { sec = x.sec; html += '<h2 class="sec" id="s-' + sec + '">' + esc(SEC[sec] || sec) + '<a class="up" href="#top" aria-label="Наверх">↑</a></h2>'; }
       const plain = x.text.replace(/\\[\\[(.+?)\\]\\]/g, '$1');
       if (x.sec === 'sladder') html += '<div class="gossip"><span class="sissel" aria-hidden="true">' + MAG + '</span><div class="bubble"><b class="who">Sissel</b>';
-      html += '<article data-i="' + i + '">' + (x.img ? '<img class="pic" src="' + esc(x.img) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">' : '') + '<h3 class="tx">' + wrap(x.title) + '</h3>' + (x.kort ? '<p class="kort tx">📌 ' + wrap(x.kort) + '</p>' : '') + '<div class="tx">' + marks(x.text) + '</div>'
+      const done = READ.has(keyOf(x));
+      html += '<article data-i="' + i + '" data-sec="' + x.sec + '"' + (done ? ' class="done"' : '') + '><button class="rhead" type="button" data-open="' + i + '">✓ ' + esc(x.title) + '<small>развернуть</small></button><div class="body">' + (x.img ? '<img class="pic" src="' + esc(x.img) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">' : '') + '<h3 class="tx">' + wrap(x.title) + '</h3>' + (x.kort ? '<p class="kort tx">📌 ' + wrap(x.kort) + '</p>' : '') + '<div class="tx">' + marks(x.text) + '</div>'
         + (x.words.length ? '<ul class="words">' + x.words.map(w => '<li><span><b>' + esc(w.no) + '</b> — ' + esc(w.ru) + '</span>' + addBtn(w.no, w.ru, (plain.split(/(?<=[.!?])\\s+/).find(s => s.toLowerCase().includes(w.no.toLowerCase().replace(/^(en|ei|et|å) /, '').slice(0, 4))) || '')) + '</li>').join('') + '</ul>' : '')
         + (x.q ? '<p class="q tx">❓ ' + wrap(x.q) + '</p>' : '')
-        + '<div class="tools"><button class="btn" type="button" data-say="' + i + '">🔊 Les høyt</button>' + (x.link ? '<a href="' + esc(x.link) + '" target="_blank" rel="noopener">kilde: ' + esc(x.src) + '</a>' : '') + (x.photo ? '<a href="' + esc(x.photo) + '" target="_blank" rel="noopener">foto: Wikimedia Commons</a>' : '') + '</div>'
-        + '<details><summary>Проверить себя по-русски</summary><p>' + esc(x.ru) + '</p></details></article>' + (x.sec === 'sladder' ? '</div></div>' : '');
+        + '<div class="tools"><button class="btn rd" type="button" data-read="' + i + '">' + (done ? '↩ Не прочитано' : '✓ Прочитано') + '</button><button class="btn" type="button" data-say="' + i + '">🔊 Les høyt</button>' + (x.link ? '<a href="' + esc(x.link) + '" target="_blank" rel="noopener">kilde: ' + esc(x.src) + '</a>' : '') + (x.photo ? '<a href="' + esc(x.photo) + '" target="_blank" rel="noopener">foto: Wikimedia Commons</a>' : '') + '</div>'
+        + '<details><summary>Проверить себя по-русски</summary><p>' + esc(x.ru) + '</p></details></div></article>' + (x.sec === 'sladder' ? '</div></div>' : '');
     });
     if (d.insp && d.insp.length) html += '<h2 class="sec" id="s-insp">' + esc(SEC.insp) + '<a class="up" href="#top" aria-label="Наверх">↑</a></h2><p class="hint">Подборка по сезону: нажми — откроется Pinterest с этой темой.</p><div class="insp">'
       + d.insp.map(x => '<a class="ins" href="https://www.pinterest.com/search/pins/?q=' + encodeURIComponent(x.q) + '" target="_blank" rel="noopener"><span class="pal">' + x.colors.map(c => '<i style="background:' + c + '"></i>').join('') + '</span><b>' + esc(x.no) + '</b><small>' + esc(x.ru) + '</small><small class="pq">📌 ' + esc(x.q) + '</small></a>').join('') + '</div>';
     const n = d.items.reduce((s, x) => s + x.text.split(/\\s+/).length, 0);
     html += '<p class="hint" style="margin-top:30px">≈ ' + n + ' ord · ' + Math.max(1, Math.round(n / 110)) + ' min. Godt jobba! 🐧</p>';
     $('#main').innerHTML = html;
+    progress();
+  }
+  // ---------- «✓ Прочитано»: статья сворачивается, отметка — на сервере (на всех устройствах и уровнях) ----------
+  let READ = new Set();
+  const keyOf = x => x.link || x.sec;
+  function progress() {
+    const all = data.items.length, n = data.items.filter(x => READ.has(keyOf(x))).length, el = $('#prog');
+    if (!el) return;
+    el.innerHTML = n ? ('<span>Прочитано ' + n + ' из ' + all + '</span>' + (n < all ? '<a href="#" id="next">→ к непрочитанному</a>' : '<b>Alt lest! Godt jobba! 🎉</b>') + '<span class="bar"><i style="width:' + Math.round(100 * n / all) + '%"></i></span>') : '';
+    document.querySelectorAll('.toc a[data-sec]').forEach(a => { const its = data.items.filter(x => x.sec === a.dataset.sec); a.classList.toggle('ok', its.length > 0 && its.every(x => READ.has(keyOf(x)))); });
+  }
+  function setRead(i, on) {
+    const x = data.items[i], k = keyOf(x), art = document.querySelector('article[data-i="' + i + '"]');
+    if (on) READ.add(k); else READ.delete(k);
+    data.read = [...READ];
+    if (art) { const b = art.querySelector('.rd'); if (b) b.textContent = on ? '↩ Не прочитано' : '✓ Прочитано'; art.classList.toggle('done', on); art.classList.remove('open'); if (on) { const r = art.getBoundingClientRect(); if (r.top < 0) art.scrollIntoView({ block: 'start' }); } }
+    progress();
+    fetch('/api/avis/read', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ day: data.day, k, on }) });
   }
   const addBtn = (w, tr, ex) => added.has(w.toLowerCase()) ? '<button class="add done" type="button" disabled>✓ в словаре</button>' : '<button class="add" type="button" data-w="' + esc(w) + '" data-tr="' + esc(tr) + '" data-ex="' + esc(ex) + '" title="в словарь учебника">+ в словарь</button>';
   function setLevelUi() { document.querySelectorAll('#lv button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.l === level))); }
@@ -503,6 +539,11 @@ h2.sec{scroll-margin-top:56px;display:flex;justify-content:space-between;align-i
     document.querySelectorAll('.add[data-w]').forEach(b => { if (b.dataset.w.toLowerCase() === k) { b.textContent = '✓ в словаре'; b.classList.add('done'); b.disabled = true; } });
   }
   document.addEventListener('click', e => {
+    const rd = e.target.closest('[data-read]');
+    if (rd) { const i = +rd.dataset.read, art = rd.closest('article'); setRead(i, !art.classList.contains('done')); return; }
+    const op = e.target.closest('[data-open]');
+    if (op) { op.closest('article').classList.toggle('open'); return; }
+    if (e.target.id === 'next') { e.preventDefault(); const f = [...document.querySelectorAll('article:not(.done)')][0]; if (f) f.scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     const a = e.target.closest('.add[data-w]');
     if (a) { addWord(a); return; }
     if (e.target.closest('#tip')) return;
