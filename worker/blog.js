@@ -727,6 +727,7 @@ export async function blogApi(req, env, url, h) {
       return json({ url: '/media/' + key });
     }
     // картинка по ссылке (из Google Docs) → сразу в наше хранилище, пока ссылка ещё работает
+    if (a === 'img-check') return json(await blogImgCheck(env, m === 'POST' ? 15 : 0)); // 🖼 «Проверить картинки» в редакторе
     if (m === 'POST' && a === 'fetch-image') {
       const { url: src } = await body();
       if (!/^https:\/\//i.test(String(src || ''))) fail(400, 'bad');
@@ -742,6 +743,44 @@ export async function blogApi(req, env, url, h) {
     }
   }
   fail(404, 'not_found');
+}
+
+// 🖼 проверка картинок всех статей: /media/ без файла в R2 — «пропала», чужая ссылка (Google Docs) — копируем на сайт, пока жива
+// fix=0 — только отчёт; иначе копируем не больше fix ссылок за раз (cron: понемногу каждый час, кнопка в редакторе — пока не кончатся)
+export async function blogImgCheck(env, fix = 0) {
+  const rows = (await env.DB.prepare('SELECT id, slug, status, t_ru, t_en, t_lv, cover, b_ru, b_en, b_lv FROM blog_posts').all()).results;
+  const heads = {}, moved = {}, out = [];
+  const has = async key => (heads[key] ??= env.MEDIA ? !!(await env.MEDIA.head(key).catch(() => null)) : true);
+  let tries = 0, copied = 0, more = false;
+  const deadKey = 'blog_img_dead', dead = new Set(JSON.parse((await env.DB.prepare('SELECT value FROM meta WHERE key = ?').bind(deadKey).first())?.value || '[]')), dead0 = dead.size; // ссылки, которые уже не открылись, — второй раз не пробуем
+  for (const src of dead) moved[src] = null;
+  for (const r of rows) {
+    const rep = { id: r.id, slug: r.slug, status: r.status, title: r.t_ru || r.t_en || r.t_lv || r.slug, total: 0, missing: 0, foreign: 0, dead: 0, copied: 0 };
+    const upd = {};
+    for (const col of ['cover', 'b_ru', 'b_en', 'b_lv']) {
+      const html = String(r[col] || '');
+      const srcs = col === 'cover' ? (html ? [html] : []) : [...html.matchAll(/<img\b[^>]*?\ssrc="([^"]*)"/gi)].map(x => x[1]);
+      let next = html;
+      for (const raw of srcs) {
+        rep.total++;
+        const src = raw.replace(/&amp;/g, '&').trim();
+        const local = src.startsWith(SITE + '/media/') ? src.slice(SITE.length) : src;
+        if (local.startsWith('/media/')) { if (!(await has(decodeURIComponent(local.slice(7))))) rep.missing++; continue; }
+        if (local.startsWith('/')) continue;
+        rep.foreign++;
+        let url = moved[src];
+        if (url === undefined && fix && /^https:\/\//i.test(src)) { if (tries < fix) { tries++; url = await rehostOne(env, src, moved); if (!url) dead.add(src); } else more = true; }
+        if (url) { next = col === 'cover' ? url : next.split(`src="${raw}"`).join(`src="${url}"`); rep.copied++; rep.foreign--; }
+        else if (url === null) { rep.dead++; rep.foreign--; }
+      }
+      if (next !== html) upd[col] = next;
+    }
+    const cols = Object.keys(upd);
+    if (cols.length) { await env.DB.prepare(`UPDATE blog_posts SET ${cols.map(c => c + ' = ?').join(', ')} WHERE id = ?`).bind(...cols.map(c => upd[c]), r.id).run(); copied += rep.copied; }
+    if (rep.missing || rep.foreign || rep.copied) out.push(rep);
+  }
+  if (dead.size !== dead0) await env.DB.prepare('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)').bind(deadKey, JSON.stringify([...dead].slice(-500))).run();
+  return { posts: out, total: rows.length, copied, more };
 }
 
 async function rehostOne(env, src, moved) {

@@ -211,7 +211,9 @@
     app.innerHTML = `${flashHtml}<div class="be-top">
         <a class="pill-btn pill-fill" href="#new">＋ Новая статья</a>
         <button type="button" class="pill-btn" id="be-gkey">⚙ Перевод (Gemini)${state.gemini ? ' ✓' : ''}</button>
+        <button type="button" class="pill-btn" id="be-imgcheck">🖼 Проверить картинки</button>
       </div>
+      <section class="be-card" id="be-imgrep" hidden></section>
       ${pend.length ? `<section class="be-card be-pend"><h2>Комментарии со ссылками ждут проверки (${pend.length})</h2><ol>${pend.map(c => `
         <li data-cid="${c.id}"><p><b>${esc(c.name)}</b> → <a href="/ru/blog/${esc(c.slug)}/#comments" target="_blank">${esc(c.t_ru)}</a> · ${fmt(c.created_at)}</p>
         <p class="be-ctext">${esc(c.body)}</p><p><button class="pill-btn" data-ok>Одобрить</button> <button class="pill-btn be-danger" data-del>Удалить</button></p></li>`).join('')}</ol></section>` : ''}
@@ -224,6 +226,22 @@
         ${dashTab === 'tags' ? tagsHtml() : dashTab === 'sections' ? sectionsHtml() : postsHtml(TABS[dashTab] || pub)}
       </section>
       ${state.media ? '' : '<p class="be-note">⚠ Хранилище картинок (R2) не подключено — загрузка картинок не заработает.</p>'}`;
+    // 🖼 проверка картинок во всех статьях: ссылки на Google Docs копируются на сайт, пропавшие — списком со ссылкой на статью
+    const ic = app.querySelector('#be-imgcheck');
+    ic.addEventListener('click', async () => {
+      const box = app.querySelector('#be-imgrep');
+      ic.disabled = true; box.hidden = false; box.innerHTML = '<p class="be-note">Проверяю картинки во всех статьях…</p>';
+      let d, copied = 0;
+      try { do { d = await api('blog/admin/img-check', {}); copied += d.copied; if (d.more) box.innerHTML = `<p class="be-note">Копирую картинки на сайт… скопировано ${copied}</p>`; } while (d.more); }
+      catch (e) { box.innerHTML = `<p class="be-note">${esc(errText(e))}</p>`; ic.disabled = false; return; }
+      ic.disabled = false;
+      const bad = d.posts.filter(r => r.missing || r.dead || r.foreign);
+      box.innerHTML = `<h2>🖼 Картинки в статьях</h2>
+        ${copied ? `<p class="be-flash">✓ Скопировано на сайт: ${copied} — эти картинки снова видны.</p>` : ''}
+        ${bad.length ? `<p class="be-note">Статей, где картинки не открываются: <b>${bad.length}</b> из ${d.total}. Их нужно вставить заново: откройте статью, удалите пустую картинку и перетащите на её место файл (или скопируйте картинку из Google Docs).</p>
+          <ol>${bad.map(r => `<li><a href="#${r.id}"><b>${esc(r.title)}</b></a>${r.status === 'published' ? '' : ' <small>(черновик)</small>'} — не видно: ${r.missing + r.dead + r.foreign} из ${r.total}</li>`).join('')}</ol>`
+        : `<p class="be-note">Все картинки во всех ${d.total} статьях на месте ✓</p>`}`;
+    });
     const dd = app.querySelector('#be-dedupe');
     dd && dd.addEventListener('click', async () => {
       let groups;
