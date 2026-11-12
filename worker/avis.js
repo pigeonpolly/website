@@ -346,22 +346,22 @@ const MAGPIE = `<svg viewBox="0 0 72 64" width="60" height="54"><path d="M22 44L
 const AVIS_HTML = `<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="robots" content="noindex">
 <title>Morgenavis</title><script>try { const t = localStorage.getItem('avis-paper') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'natt' : ''); if (t && t !== 'blå') document.documentElement.dataset.paper = t; } catch (e) { /* без памяти браузера */ }</script><link rel="icon" href="/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
-<style>
-:root{--bg:#f5f7fd;--card:#fdfdff;--ink:#1f1832;--mute:#6b6480;--line:#d5d8ec;--rule:#1f1832;--acc:#534ab7;--acc2:#e8eaf8;--mark:#fff0a8;--ok:#2f8f5b;--pic:grayscale(.75) contrast(1.08);--f-head:'Playfair Display',Georgia,serif;--f-body:'Source Serif 4',Georgia,serif;--f-ui:system-ui,-apple-system,'Segoe UI',sans-serif}
+<link href="https://fonts.googleapis.com/css2?family=Nunito+Sans:opsz,wght@6..12,600;6..12,800;6..12,900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
+<style id="st-new">
+:root{--bg:#f5f7fd;--card:#fdfdff;--ink:#1f1832;--mute:#6b6480;--line:#d5d8ec;--rule:#1f1832;--acc:#534ab7;--acc2:#e8eaf8;--mark:#fff0a8;--ok:#2f8f5b;--pic:grayscale(.75) contrast(1.08);--f-head:'Nunito Sans',system-ui,sans-serif;--f-body:'Source Serif 4',Georgia,serif;--f-ui:system-ui,-apple-system,'Segoe UI',sans-serif}
 :root[data-paper="krem"]{--bg:#f1ece0;--card:#f7f3ea;--ink:#1c1a16;--mute:#6f685b;--line:#d3cab8;--rule:#1c1a16;--acc:#8f2e1d;--acc2:#e7dfcd;--mark:#efdc93;--ok:#2f7a4d;--pic:grayscale(.85) sepia(.25) contrast(1.1)}
 :root[data-paper="natt"]{--bg:#16131f;--card:#1d1a28;--ink:#eeeaf7;--mute:#a59fb8;--line:#363047;--rule:#cfc8e6;--acc:#a99ff0;--acc2:#2c2742;--mark:#5a4b12;--ok:#6fcf97;--pic:grayscale(.6)}
 .paper{display:inline-flex;gap:4px;align-items:center}.paper button{width:22px;height:22px;border:1px solid var(--mute);border-radius:50%;cursor:pointer;padding:0}
 .paper button[aria-pressed=true]{outline:2px solid var(--acc);outline-offset:2px}
 *{box-sizing:border-box}html{scroll-padding-top:48px}
 body{margin:0;background:var(--bg);color:var(--ink);font:17.5px/1.6 var(--f-body);-webkit-font-smoothing:antialiased}
-.wrap{max-width:1180px;margin:0 auto;padding:10px 20px 80px}
+.wrap{max-width:780px;margin:0 auto;padding:10px 18px 80px}
 a{color:inherit}
 /* шапка — одна тонкая линия сверху и снизу, как в старой газете */
 .mast{text-align:center;padding:4px 0 0}
-.mast .back{display:block;text-align:left;font:13px var(--f-ui);color:var(--mute);text-decoration:none}
+.mast .back{display:block;text-align:left;font:13px var(--f-ui);color:var(--mute)}.mast .back a{text-decoration:none}.mast .back a:hover{color:var(--acc)}
 h1{font:400 clamp(54px,12vw,118px)/1 'UnifrakturMaguntia',var(--f-head);margin:8px 0 4px}
-.mast .meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:3px 2px;font:700 11px var(--f-head);letter-spacing:.14em;text-transform:uppercase}
+.mast .meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:3px 2px;font:800 11px var(--f-head);letter-spacing:.14em;text-transform:uppercase}
 .motto{font:italic 15px var(--f-body);color:var(--mute);margin:6px 0 0}
 .mast .rule2{display:none}
 .bar{display:flex;gap:10px;align-items:center;justify-content:center;flex-wrap:wrap;margin:12px 0 6px;font:13px var(--f-ui)}
@@ -379,14 +379,14 @@ select,.btn{font:13px var(--f-ui);border:1px solid var(--line);background:transp
 .prog a{color:var(--acc)}.prog .pbar{flex-basis:100%;max-width:300px;height:2px;background:var(--line);overflow:hidden}.prog .pbar i{display:block;height:100%;background:var(--ink)}
 /* первая полоса */
 .front{display:grid;gap:24px;margin:18px 0 10px}
-@media (min-width:900px){.front{grid-template-columns:1fr 290px;align-items:start}}
+
 .hilsen{font:italic 21px/1.5 var(--f-body);margin:0 0 14px}
 .idag h3,.dagens h3{font:900 13px var(--f-head);letter-spacing:.16em;text-transform:uppercase;margin:0 0 8px}
-.idag ol{list-style:none;padding:0;margin:0;display:grid;gap:12px 28px}@media (min-width:600px){.idag ol{grid-template-columns:1fr 1fr}}
+.idag ol{list-style:none;padding:0;margin:0;display:grid;gap:10px 28px}@media (min-width:640px){.idag ol{grid-template-columns:1fr 1fr}}
 .idag a{text-decoration:none;display:block}.idag a:hover b{color:var(--acc)}
 .idag small{display:block;font:700 10px var(--f-ui);letter-spacing:.14em;text-transform:uppercase;color:var(--mute)}.idag b{font:700 18px/1.25 var(--f-head)}
 .idag li.ok b{text-decoration:line-through;color:var(--mute)}
-@media (max-width:899px){.idag{display:none}}
+
 .box{background:var(--card);border:1px solid var(--rule);padding:14px 16px}
 .dagens h3{text-align:center}.dagens ul{padding:0;margin:0;list-style:none}.dagens li{margin:10px 0;font-size:16px}.dagens i{color:var(--mute);font-size:15px}
 /* разделы: крупное имя по центру, без полос */
@@ -395,20 +395,16 @@ h2.sec{position:relative;text-align:center;font:900 clamp(26px,4vw,36px)/1.1 var
 h2.sec::after{content:'';display:block;width:64px;height:2px;background:var(--rule);margin:10px auto 0}
 h2.sec .up{position:absolute;right:0;top:50%;font:12px var(--f-ui);letter-spacing:0;text-transform:none;color:var(--mute);text-decoration:none}
 @media (max-width:600px){h2.sec .up{display:none}}
-.cols{display:grid;gap:30px 40px;grid-template-columns:1fr}
-@media (min-width:760px){.cols:not([data-n="1"]){grid-template-columns:repeat(2,1fr)}}
-@media (min-width:1080px){.cols[data-n="3"]{grid-template-columns:repeat(3,1fr)}}
+.cols{display:grid;gap:44px;grid-template-columns:1fr}
+
 .cols>*{min-width:0}
 .cols>.wide,.cols>.gossip:only-child{grid-column:1/-1}
-article h3{font:900 22px/1.15 var(--f-head);margin:2px 0 6px;text-transform:uppercase;letter-spacing:.01em}
-.wide h3{text-align:center;font-size:clamp(26px,3.4vw,40px)}
-@media (min-width:900px){.wide .body{display:grid;grid-template-columns:1.1fr 1fr;gap:0 36px}.wide .pic{grid-row:span 12;max-height:none;height:100%;min-height:240px;aspect-ratio:auto}.wide h3{text-align:left}
-.wide:not(:has(.pic)) .body{display:block;column-count:2;column-gap:36px}.wide:not(:has(.pic)) h3,.wide:not(:has(.pic)) .kort{column-span:all;text-align:center}}
-.lead h3{font-size:clamp(30px,4.2vw,48px)}
-.lead .tx p:first-child::first-letter{font:900 62px/0.82 var(--f-head);float:left;padding:6px 8px 0 0}
-.tx p{margin:0 0 .6em}@media (min-width:760px){.tx p{text-align:justify;hyphens:auto;-webkit-hyphens:auto}}
+article h3{font:800 26px/1.22 var(--f-head);margin:2px 0 8px;letter-spacing:-.005em}
+
+.lead h3{font-size:clamp(30px,5vw,40px)}
+.tx p{margin:0 0 .75em}
 .kort{font:italic 17px/1.4 var(--f-body);color:var(--mute);margin:0 0 10px}
-.pic{display:block;width:100%;aspect-ratio:3/2;max-height:300px;object-fit:cover;margin:0 0 10px;background:var(--acc2);filter:var(--pic);transition:filter .3s}
+.pic{display:block;width:100%;aspect-ratio:16/9;max-height:400px;object-fit:cover;margin:0 0 10px;background:var(--acc2);filter:var(--pic);transition:filter .3s}
 .pic:hover{filter:none}
 mark{background:var(--mark);color:inherit;padding:0 1px;cursor:pointer}
 /* слова и кнопки — тихо, без рамок */
@@ -430,7 +426,7 @@ details{font:13px var(--f-ui);margin-top:6px}summary{cursor:pointer;color:var(--
 article .rhead{display:none;width:100%;text-align:left;border:0;background:none;color:var(--mute);padding:2px 0;font:700 16px/1.3 var(--f-head);text-transform:uppercase;cursor:pointer;opacity:.7}
 article .rhead small{float:right;font:12px var(--f-ui);color:var(--acc);text-transform:none}
 article.done .rhead{display:block}article.done .body{display:none}article.done.open .body{display:block}
-@media (min-width:900px){.wide.done.open .body{display:grid}}
+
 article.done .rd{color:var(--ok)}
 /* сплетни Сиссель */
 .gossip{display:flex;gap:8px;align-items:flex-start}.sissel{flex:none;margin-top:4px;animation:bob 2.4s ease-in-out infinite}
@@ -443,13 +439,86 @@ article.done .rd{color:var(--ok)}
 .ins:hover b{color:var(--acc)}.ins b{font:700 16px var(--f-head)}.ins small{color:var(--mute)}.ins .pq{font-size:11px}
 .pal{display:flex;height:64px;margin-bottom:6px;border-radius:4px;overflow:hidden}.pal i{flex:1}
 .foot{text-align:center;border-top:1px solid var(--rule);margin-top:44px;padding-top:8px;font:italic 15px var(--f-body);color:var(--mute)}
-</style></head><body><div class="wrap">
-<header id="top" class="mast"><a class="back" href="/norsk/">← учебник норвежского</a>
+.look{display:inline-flex;border:1px solid var(--mute);border-radius:999px;overflow:hidden}
+.look button{border:0;background:none;color:var(--ink);padding:4px 10px;font:600 12px var(--f-ui);cursor:pointer}.look button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+</style>
+<style id="st-old" media="not all">
+:root{--bg:#fbfaff;--card:#fff;--ink:#1f1832;--mute:#6b6480;--line:#e6e1f2;--acc:#534ab7;--acc2:#efeafc;--mark:#fff2b8;--ok:#2f8f5b}
+@media (prefers-color-scheme:dark){:root{--bg:#16131f;--card:#211d2d;--ink:#eeeaf7;--mute:#a59fb8;--line:#363047;--acc:#a99ff0;--acc2:#2c2742;--mark:#5a4b12;--ok:#6fcf97}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.65 Georgia,'Times New Roman',serif}
+.wrap{max-width:720px;margin:0 auto;padding:16px 16px 80px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:3px double var(--line);padding-bottom:8px}
+h1{font-size:34px;margin:0;letter-spacing:.5px}h1 small{display:block;font:14px system-ui,sans-serif;color:var(--mute);letter-spacing:0}
+.top a{font:14px system-ui,sans-serif;color:var(--acc)}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0;font:15px system-ui,sans-serif}
+.lv{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
+.lv button{border:0;background:none;color:var(--ink);padding:7px 14px;font:600 15px system-ui,sans-serif;cursor:pointer}
+.lv button[aria-pressed=true]{background:var(--acc);color:#fff}
+select,.btn{font:15px system-ui,sans-serif;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:6px 10px;cursor:pointer}
+.hint{font:14px system-ui,sans-serif;color:var(--mute)}
+.hilsen{font-style:italic;margin:6px 0 14px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0}
+.dagens h3{margin:0 0 6px;font:700 15px system-ui,sans-serif;color:var(--acc);text-transform:uppercase;letter-spacing:.06em}
+.dagens li{margin:4px 0}.dagens i{color:var(--mute)}
+h2.sec{font:700 14px system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin:28px 0 4px;border-top:1px solid var(--line);padding-top:12px}
+article h3{font-size:23px;line-height:1.3;margin:6px 0 6px}
+.kort{font:15px system-ui,sans-serif;background:var(--acc2);border-radius:8px;padding:6px 10px;margin:6px 0}
+mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 2px;cursor:pointer}
+.words{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;font:14px system-ui,sans-serif;padding:0;list-style:none}
+.words li{background:var(--acc2);border-radius:8px;padding:3px 4px 3px 9px;display:flex;align-items:center;gap:6px}
+.words b{font-weight:600}.add{border:1px solid var(--acc);background:var(--card);color:var(--acc);border-radius:6px;cursor:pointer;font:600 13px system-ui,sans-serif;padding:2px 8px;white-space:nowrap}
+.add.done{color:var(--ok);border-color:transparent}
+.w{cursor:pointer;border-radius:3px}.w:hover{background:var(--acc2)}
+#tip .add{margin-top:6px;background:var(--bg);color:var(--acc)}#tip small{opacity:.75}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font:14px system-ui,sans-serif;margin-top:6px}
+.tools a{color:var(--mute)}
+details{font:15px system-ui,sans-serif;margin-top:6px}summary{cursor:pointer;color:var(--acc)}
+.q{font-style:italic;margin:6px 0 0}
+#tip{position:fixed;z-index:9;background:var(--ink);color:var(--bg);font:15px system-ui,sans-serif;padding:6px 10px;border-radius:8px;max-width:260px;box-shadow:0 4px 18px #0003}
+.load{text-align:center;padding:60px 0;color:var(--mute);font:16px system-ui,sans-serif}
+.load b{display:block;font-size:40px;animation:bob 1.2s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-8px)}}
+.read{font:600 15px system-ui,sans-serif}
+.insp{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin:10px 0}
+.ins{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;font:14px system-ui,sans-serif}
+.ins:hover{border-color:var(--acc)}.ins b{font-size:15px}.ins small{color:var(--mute)}.ins .pq{font-size:12px}
+.pal{display:flex;height:54px;border-radius:9px;overflow:hidden;margin-bottom:6px}.pal i{flex:1}
+article .rhead{display:none;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--mute);border-radius:12px;padding:8px 12px;font:600 15px system-ui,sans-serif;cursor:pointer;margin:6px 0}
+article .rhead small{float:right;font-weight:400;color:var(--acc)}
+article.done .rhead{display:block}article.done .body{display:none}article.done.open .body{display:block}article.done.open .rhead small::after{content:''}
+article.done .rd{background:var(--acc2);color:var(--ok)}
+.prog{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;font:14px system-ui,sans-serif;color:var(--mute);margin:0 0 8px}.prog:empty{display:none}
+.prog a{color:var(--acc)}.prog .bar{flex-basis:100%;height:5px;background:var(--line);border-radius:9px;overflow:hidden}.prog .bar i{display:block;height:100%;background:var(--ok)}
+.toc a.ok{color:var(--ok);border-color:var(--ok)}.toc a.ok::after{content:' ✓'}
+.gossip{display:flex;gap:10px;align-items:flex-start;margin:16px 0}.sissel{flex:none;margin-top:4px;animation:bob 2.4s ease-in-out infinite}
+.bubble{position:relative;flex:1;min-width:0;background:var(--acc2);border-radius:4px 18px 18px 18px;padding:10px 14px}
+.bubble .who{display:block;font:700 13px system-ui,sans-serif;color:var(--acc);letter-spacing:.04em}
+.bubble article h3{font-size:20px;margin-top:2px}.bubble .pic{max-height:220px}.bubble .words li{background:var(--card)}
+.toc{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;padding:8px 0;margin:8px 0;background:var(--bg);font:600 14px system-ui,sans-serif;scrollbar-width:none}
+.toc::-webkit-scrollbar{display:none}.toc a{flex:none;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.toc a:hover{border-color:var(--acc);color:var(--acc)}
+h2.sec{scroll-margin-top:56px;display:flex;justify-content:space-between;align-items:center}.up{color:var(--mute);text-decoration:none;font-size:16px}
+.pic{display:block;width:100%;aspect-ratio:16/9;max-height:300px;object-fit:cover;border-radius:12px;margin:8px 0 4px;background:var(--acc2)}
+/* «Первый» дизайн поверх новой разметки: шапка, первая полоса, разделы */
+.mast{display:block;border-bottom:3px double var(--line);padding-bottom:8px}
+.mast .back{display:block;font:14px system-ui,sans-serif;color:var(--mute)}.mast .back a{color:var(--acc)}
+.mast h1{font-size:34px;margin:6px 0 0;letter-spacing:.5px}
+.mast .meta{display:flex;flex-wrap:wrap;gap:4px 12px;font:14px system-ui,sans-serif;color:var(--mute)}.mast .meta span:first-child{display:none}
+.motto,.rule2,.paper{display:none}
+.idag{margin:10px 0}.idag h3{margin:0 0 6px;font:700 15px system-ui,sans-serif;color:var(--acc);text-transform:uppercase;letter-spacing:.06em}
+.idag ol{list-style:none;padding:0;margin:0}.idag li{margin:4px 0}.idag a{text-decoration:none;color:var(--ink);font:15px system-ui,sans-serif}.idag small{color:var(--mute);margin-right:6px}.idag b{font-weight:600}.idag li.ok b{text-decoration:line-through;color:var(--mute)}
+.cols{display:block}.cols>*{margin-bottom:22px}
+.look{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
+.look button{border:0;background:none;color:var(--ink);padding:7px 12px;font:600 14px system-ui,sans-serif;cursor:pointer}.look button[aria-pressed=true]{background:var(--acc);color:#fff}
+.prog .pbar{flex-basis:100%;height:5px;background:var(--line);border-radius:9px;overflow:hidden}.prog .pbar i{display:block;height:100%;background:var(--ok)}
+h2.sec .up{font:13px system-ui,sans-serif;text-transform:none;letter-spacing:0}
+</style>
+<script>try { if (localStorage.getItem('avis-look') === 'forste') { document.getElementById('st-old').media = 'all'; document.getElementById('st-new').media = 'not all'; } } catch (e) { /* без памяти браузера */ }</script></head><body><div class="wrap">
+<header id="top" class="mast"><span class="back"><a href="/ru/">← на сайт</a> · <a href="/norsk/">учебник норвежского</a></span>
 <h1>Morgenavis</h1>
 <div class="meta"><span>Riga</span><span id="date"></span><span id="nr"></span></div><p class="motto">Nyheter, historier og sladder på enkel norsk — hver morgen</p><div class="rule2"></div></header>
 <div class="bar"><span class="lv" id="lv">${LEVELS.map(l => `<button type="button" data-l="${l}">${LNAME[l]}</button>`).join('')}</span>
 <select id="day" aria-label="День"></select><button class="btn" id="again" type="button" title="Написать выпуск заново">↻ заново</button>
-<span class="paper" id="paper" title="Бумага"><button type="button" data-p="" style="background:#f5f7fd" aria-label="Голубая бумага"></button><button type="button" data-p="krem" style="background:#f1ece0" aria-label="Кремовая бумага"></button><button type="button" data-p="natt" style="background:#16131f" aria-label="Ночная газета"></button></span></div>
+<span class="look" id="look" title="Дизайн"><button type="button" data-look="">📰 Газета</button><button type="button" data-look="forste">📄 Первый</button></span><span class="paper" id="paper" title="Бумага"><button type="button" data-p="" style="background:#f5f7fd" aria-label="Голубая бумага"></button><button type="button" data-p="krem" style="background:#f1ece0" aria-label="Кремовая бумага"></button><button type="button" data-p="natt" style="background:#16131f" aria-label="Ночная газета"></button></span></div>
 <p class="hint" id="hint">Нажми на любое слово — перевод и «+ в словарь». Прочитала — «✓ Прочитано», статья свернётся.</p>
 <main id="main"><div class="load"><b>🐧</b>Пелле несёт газету…</div></main>
 </div><div id="tip" hidden></div>
@@ -574,6 +643,12 @@ article.done .rd{color:var(--ok)}
   $('#paper').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const t = b.dataset.p;
     if (t) document.documentElement.dataset.paper = t; else delete document.documentElement.dataset.paper;
     try { localStorage.setItem('avis-paper', t || 'blå'); } catch (x) {} paperUi(); });
+  // дизайн: «Газета» (по умолчанию) или «Первый» (как в первом выпуске) — две таблицы стилей, включена одна
+  const lookUi = () => { const f = $('#st-old').media === 'all'; document.querySelectorAll('#look button').forEach(b => b.setAttribute('aria-pressed', String((b.dataset.look === 'forste') === f))); };
+  lookUi();
+  $('#look').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const f = b.dataset.look === 'forste';
+    $('#st-old').media = f ? 'all' : 'not all'; $('#st-new').media = f ? 'not all' : 'all';
+    try { localStorage.setItem('avis-look', f ? 'forste' : 'avis'); } catch (x) {} lookUi(); });
   $('#day').addEventListener('change', e => { day = e.target.value; data = null; load(); });
   $('#again').addEventListener('click', () => { if (confirm(day === data?.days?.[0] ? 'Собрать сегодняшний выпуск заново — со свежими новостями (около минуты)?' : 'Написать этот выпуск заново (около минуты)?')) load({ fresh: day === data?.days?.[0] ? 'news' : 'text' }); });
   const tip = $('#tip');
