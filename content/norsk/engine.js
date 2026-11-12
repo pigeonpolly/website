@@ -790,7 +790,7 @@
         <p><button type="button" class="btn primary" data-submit="${id}" disabled>Сдать текст</button> <span class="note-s" data-wstat>${S.d[id] ? 'Сдано ✓ — можно дописывать и сдавать снова.' : ''}</span></p>
         ${w.model ? `<details><summary>Пример ответа</summary><div class="model">${w.model.split('\n').map(p => `<p class="en">${esc(p)}</p>`).join('')}</div></details>` : ''}</section>`);
     }
-    if (TOPICS[u.id]) h += `<section class="sec" id="topicq"><h3><span class="ic">🗂</span>Слова темы: ${esc(TOPICS[u.id].t)}</h3>${late(u.id + '-v', 'Слова темы', () => blockHTML(u.id + '-v', 'Проверь себя: слова темы', topicGroups(u), { track: true }))}</section>`;
+    if (TOPICS[u.id]) h += `<section class="sec" id="topicq"><h3><span class="ic">🗂</span>Слова темы: ${esc(TOPICS[u.id].t)}</h3><p class="tgo">Эти слова — в «${TOPICS[u.id].ic || '🗂'} Тематическом словаре» выше. <button type="button" class="btn small" data-topen>↑ Сначала выучить слова</button></p>${late(u.id + '-v', 'Слова темы', () => blockHTML(u.id + '-v', 'Проверь себя: слова темы', topicGroups(u), { track: true }))}</section>`;
     if (Object.keys(S.x).some(r => refUnit(r) === u)) h += `<section class="sec" id="fix"><h3><span class="ic">🩹</span>Работа над ошибками</h3>${crow(crowPick('fix'), 'small')}<p class="note-s">Задания этого урока, где были ошибки, — в другой форме, и новые задания на ту же тему. Ошибка уходит из списка после двух верных ответов подряд.</p>${blockHTML('fx-' + u.id, 'Ещё раз, но по-другому', grouped(fixItems([u], 8)))}</section>`;
     if (u.vid) h += `<section class="sec" id="video"><h3><span class="ic">▶️</span>Видео по теме</h3><ul class="vids">${u.vid.map(([ch, t]) => `<li><a href="${ytq(ch, t)}" target="_blank" rel="noopener"><span><b>${esc(ch)}</b> — ${esc(t)}</span><small>YouTube</small></a></li>`).join('')}</ul><p class="note-s">Ссылки открывают поиск на YouTube по каналу и теме — там всегда свежие уроки этого автора.</p></section>`;
     const pods = PODS[u.lvl] || []; if (pods.length) h += `<div class="box pod"><h4>🎙 Подкаст уровня ${u.lvl}</h4><ul class="pods">${podHTML(pods[unitsOf(u.lvl).indexOf(u) % pods.length])}</ul><p class="note-s"><a href="#pods">Все подкасты</a></p></div>`;
@@ -1228,6 +1228,7 @@
     if (t.closest('[data-addall]')) { const u = byId(view.dataset.unit); let n = 0; for (const w of u.words) if (addWord(w[0], w[1], w[2], u.id)) n++; for (const b of $$('[data-addw]')) b.outerHTML = '<span class="in-dict">в словаре ✓</span>'; t.textContent = n ? `Добавлено слов: ${n} ✓` : 'Все слова уже в словаре ✓'; return; }
     const sub = t.closest('[data-submit]'); if (sub) { submit(sub.dataset.submit); return; }
     const fc = t.closest('[data-flip]'); if (fc) { fc.classList.toggle('on'); if (fc.classList.contains('on')) say($('.f b', fc).textContent); return; }
+    if (t.closest('[data-topen]')) { const d = $('#topic .tdet'); if (d) { d.open = true; d.scrollIntoView({ behavior: 'smooth', block: 'start' }); } return; }
     const cd = t.closest('[data-cards]'); if (cd) { const box = cd.closest('section, .col').querySelector('.cards'); if (box) { box.hidden = !box.hidden; cd.classList.toggle('primary', !box.hidden); } return; }
     if (t.closest('[data-xlate]')) { xlate(); return; }
     if (t.closest('[data-name]')) { askName(); return; }

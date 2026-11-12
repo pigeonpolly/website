@@ -227,6 +227,9 @@ li.no .built { border-color: var(--warm); background: var(--warm-soft); }
 .words .s-ru { grid-column: 1; font: 400 14px/1.4 var(--f-ui); color: var(--muted); margin-top: -2px; }
 .tr-fb { font-family: var(--f-ui); font-size: 14.5px; color: var(--muted); }
 .tdet > summary { cursor: pointer; font: 600 17px var(--f-ui); list-style: none; padding: 10px 0; } .tdet > summary::-webkit-details-marker { display: none; } .tdet > summary::before { content: '▸ '; color: var(--accent); } .tdet[open] > summary::before { content: '▾ '; }
+.topic > .tdet { background: var(--accent-soft); border: 2px solid var(--accent); border-radius: 14px; padding: 6px 16px; }
+.topic > .tdet > summary { color: var(--accent); } .topic > .tdet[open] { background: var(--card); }
+.tgo { font: 15px var(--f-ui); color: var(--muted); display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
 .box.tdet > summary { font-size: 15.5px; padding: 2px 0; }
 .quote .yt { margin: 6px 0 0; font: 500 14px var(--f-ui); }
 
