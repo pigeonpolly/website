@@ -565,8 +565,7 @@ def og_meta(page, path, lang):
         url = f"{SITE_URL}/images/og/{key}-{lang}.jpg?v={ver}"
         page = re.sub(r'(<meta property="og:image" content=")[^"]*', lambda m: m.group(1) + url, page, count=1)
         page = re.sub(r'(<meta name="twitter:image" content=")[^"]*', lambda m: m.group(1) + url, page, count=1)
-        if key not in ("flock", "bird", "garden", "flock-news", "privacy"):
-            page = re.sub(r'(<meta property="og:image:alt" content=")[^"]*', lambda m: m.group(1) + title, page, count=1)
+        page = re.sub(r'(<meta property="og:image:alt" content=")[^"]*', lambda m: m.group(1) + title, page, count=1)
     loc = f'<meta property="og:locale" content="{OG_LOCALE[lang]}">' + "".join(
         f'<meta property="og:locale:alternate" content="{v}">' for k, v in OG_LOCALE.items() if k != lang)
     return page.replace('<meta property="og:site_name"', loc + '\n<meta property="og:site_name"', 1)

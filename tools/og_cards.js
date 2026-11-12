@@ -2,7 +2,7 @@
 // Картинки превью ссылок 1200×630 (og:image) для разделов сайта на EN/RU/LV → site/images/og/<ключ>-<язык>.jpg
 //   node tools/og_cards.js [ключ ...]   — без ключей рисует все; лист — _shots/og-cards.jpg (ImageMagick montage)
 // Ключ = путь страницы, «/» → «-», главная — home. build.py ставит картинку сам, если файл есть.
-// Вид — как у og-flock-*.jpg: слева надпись, справа арка с картинкой раздела.
+// Вид — как новый дизайн (v2): слева значок, надпись и курсив с линией, справа картинка раздела карточкой.
 const fs = require('fs'), path = require('path');
 const { chromium } = require('playwright');
 const ROOT = path.resolve(__dirname, '..'), OUT = path.join(ROOT, 'site/images/og'), SITE = path.join(ROOT, 'site');
@@ -118,7 +118,7 @@ const CARDS = {
     en: ['a little game', 'Polly’s', 'Pancakes', 'Bake pancakes for Wobbleland: flip at the right moment.'],
     ru: ['маленькая игра', 'Блинная', 'Полли', 'Пеки блинчики для жителей Воббленда — переворачивай вовремя.'],
     lv: ['maza spēle', 'Pollijas', 'pankūkas', 'Cep pankūkas Voblendas iedzīvotājiem — apgriez īstajā brīdī.'] },
-  train: { img: 'images/games/train.png', px: 1,
+  train: { img: 'images/games/train.png', px: 1, pos: '50% 85%',
     en: ['a word game', 'Polly’s', 'Train', 'Travel to Spain, Norway, Britain or Latvia and make words from letters.'],
     ru: ['игра со словами', 'Поезд', 'Полли', 'Поезжай в Испанию, Норвегию, Британию или Латвию и собирай слова.'],
     lv: ['vārdu spēle', 'Pollijas', 'vilciens', 'Brauc uz Spāniju, Norvēģiju, Lielbritāniju vai Latviju un liec vārdus.'] },
@@ -146,54 +146,74 @@ const CARDS = {
     en: ['paid in buttons', 'Pigeon Polly', 'shop', 'Hats, scarves, frames and treasures for your pixel bird.'],
     ru: ['за пуговки', 'Магазин', 'Pigeon Polly', 'Шляпы, шарфы, рамки и сокровища для пиксельной птички.'],
     lv: ['par pogām', 'Pigeon Polly', 'veikals', 'Cepures, šalles, rāmji un dārgumi tavam pikseļu putniņam.'] },
+  flock: { img: 'images/og/src/flock-full.jpg', px: 1,
+    en: ['free · fun · one click', 'Get your own', 'pixel bird', 'Sign in, join the flock and support an artist, for free.'],
+    ru: ['бесплатно · весело · в один клик', 'Заведи свою', 'пиксельную птичку', 'Войди на сайт, стань частью стаи и бесплатно поддержи художника.'],
+    lv: ['bez maksas · jautri · vienā klikšķī', 'Iegūsti savu', 'pikseļu putniņu', 'Ienāc vietnē, kļūsti par bara daļu un bez maksas atbalsti mākslinieci.'] },
+  bird: { img: 'images/og/src/flock-full.jpg', px: 1,
+    en: ['a bird of the flock', 'Pixel bird', 'profile', 'Its room, bag of gifts, achievements and sketches.'],
+    ru: ['птичка из стаи', 'Профиль', 'птички', 'Комната, сумка с подарками, достижения и рисунки.'],
+    lv: ['bara putniņš', 'Putniņa', 'profils', 'Istaba, dāvanu soma, sasniegumi un zīmējumi.'] },
+  garden: { img: 'images/og/src/flock-scene.jpg', px: 1,
+    en: ['behind the bird’s house', 'Bird', 'garden', 'Plant seeds, water them every day and sell the harvest for buttons.'],
+    ru: ['за домом птички', 'Огород', 'птички', 'Сажай семена, поливай каждый день и продавай урожай за пуговки.'],
+    lv: ['aiz putniņa mājas', 'Putniņa', 'dārzs', 'Stādi sēklas, laisti katru dienu un pārdod ražu par pogām.'] },
+  'flock-news': { img: 'images/og/src/flock-scene.jpg', px: 1,
+    en: ['what’s new', 'Flock', 'news', 'New birds, drawings of the day, housewarmings and badges.'],
+    ru: ['что нового', 'Новости', 'стаи', 'Новые птички, рисунки дня, новоселья и бейджи.'],
+    lv: ['kas jauns', 'Bara', 'ziņas', 'Jauni putniņi, dienas zīmējumi, ievākšanās un nozīmītes.'] },
+  privacy: { img: 'images/logo/v3/pigeon-polly-color-autumn-1080.png', bg: '#FBF9F5', fit: 'contain',
+    en: ['privacy', 'How we', 'care for data', 'How pigeonpolly.com handles your data.'],
+    ru: ['конфиденциальность', 'Как мы', 'бережём данные', 'Как pigeonpolly.com обращается с твоими данными.'],
+    lv: ['privātums', 'Kā mēs', 'sargājam datus', 'Kā pigeonpolly.com rīkojas ar taviem datiem.'] },
 };
-// Стая, профиль птички, огород, новости стаи — общая картинка стаи (og-flock-*.jpg): она как раз про них
-const COPY = { flock: 'flock', bird: 'flock', garden: 'flock', 'flock-news': 'flock', privacy: 'flock' };
+const COPY = {};
 
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const fileUrl = p => 'file://' + path.join(SITE, p);
 
-function html(c, t) {
+// новый дизайн (редизайн 2.0, v2.css, осень): бумага, значок-логотип, тонкий Fraunces + синий курсив с линией от руки, картинка — карточкой
+const ACC = '#22405F', INK = '#2A211C', MUT = '#6C6058', LINE = '#DED5CA';
+const NOTE = { en: 'come and play', ru: 'заходи в гости', lv: 'nāc ciemos' }, NOTE2 = { en: 'with love, Polly', ru: 'с любовью, Полли', lv: 'ar mīlestību, Pollija' };
+function html(c, t, lang) {
   const art = c.grid
     ? `<div class="grid">${c.grid.map(g => `<img src="${fileUrl(g)}" class="px">`).join('')}</div>`
     : `<img class="art${c.px ? ' px' : ''}" src="${fileUrl(c.img)}" style="object-position:${c.pos || '50% 50%'};object-fit:${c.fit || 'cover'}">`;
   return `<!doctype html><html><head><meta charset="utf-8">
-<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,600&family=Karla:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Lora:ital,wght@0,400;1,400&family=Karla:wght@400;500;700&family=Caveat:wght@700&display=swap" rel="stylesheet">
 <style>
 *{margin:0;box-sizing:border-box}
-body{width:1200px;height:630px;background:#2B1A51;font-family:Karla,sans-serif;position:relative;overflow:hidden}
-.txt{position:absolute;left:72px;top:0;bottom:0;width:590px;display:flex;flex-direction:column;justify-content:center}
-.k{color:#F0A987;font-size:24px;font-weight:500;letter-spacing:.5px;margin-bottom:18px}
-h1{font-family:Fraunces,serif;font-weight:600;color:#F3EFFA;font-size:78px;line-height:1.02;letter-spacing:-.5px}
-h1 b{display:block;color:#E9A93B;font-weight:600}
-.s{color:#D9D3F2;font-size:27px;line-height:1.45;margin-top:26px;max-width:580px}
-.brand{margin-top:44px;font-family:Fraunces,serif;color:#F3EFFA;font-size:30px}
-.url{color:#F0A987;font-size:22px;margin-top:6px}
-.arch{position:absolute;left:700px;top:56px;width:454px;height:520px;border:8px solid #D85A30;border-radius:227px 227px 22px 22px;overflow:hidden;background:${c.bg || '#1b1035'}}
+body{width:1200px;height:630px;background:#F4F0EA;font-family:Karla,sans-serif;position:relative;overflow:hidden;color:${INK}}
+.top{position:absolute;left:64px;top:40px;display:flex;align-items:center;gap:16px;font-family:Fraunces,Lora,serif;font-size:30px;letter-spacing:-.01em}
+.top img{width:66px;height:66px}
+.top i{color:${ACC}}
+.txt{position:absolute;left:72px;top:150px;width:600px}
+.k{display:inline-flex;align-items:center;gap:12px;border:1.5px solid ${LINE};border-radius:999px;padding:9px 20px;font-size:15px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:${MUT};background:#FBF9F5}
+.k:before{content:"";width:9px;height:9px;border-radius:50%;background:${ACC}}
+h1{white-space:nowrap;font-family:Fraunces,Lora,serif;font-weight:400;font-size:86px;line-height:1.02;letter-spacing:-.02em;margin-top:28px}
+h1 em{display:inline-block;white-space:nowrap;position:relative;color:${ACC};font-style:italic}
+h1 em svg{position:absolute;left:-3%;bottom:-.16em;width:106%;height:.32em;overflow:visible}
+h1 em path{stroke:${ACC};stroke-width:5;fill:none;stroke-linecap:round;opacity:.85}
+.s{color:${MUT};font-size:25px;line-height:1.45;margin-top:30px;max-width:560px}
+.url{position:absolute;left:72px;bottom:44px;font-size:15px;font-weight:700;letter-spacing:.22em;text-transform:uppercase;color:${MUT}}
+.card{position:absolute;left:728px;top:62px;width:410px;height:470px;background:#fff;padding:14px;transform:rotate(2.2deg);box-shadow:0 18px 40px rgba(42,33,28,.18),0 2px 6px rgba(42,33,28,.12)}
+.pic{width:100%;height:100%;overflow:hidden;position:relative;background:${c.bg || '#1b1035'}}
 .art{width:100%;height:100%;display:block}
 .px{image-rendering:pixelated}
-.grid{display:grid;grid-template-columns:1fr 1fr;width:100%;height:100%}
+.grid{display:grid;grid-template-columns:1fr 1fr;gap:6px;width:100%;height:100%;background:#fff}
 .grid img{width:100%;height:100%;object-fit:cover}
-.base{position:absolute;left:690px;top:578px;width:470px;height:7px;background:#D85A30;border-radius:4px}
-.star{position:absolute;left:1106px;top:52px;width:64px;height:64px}
-.dot{position:absolute;width:13px;height:13px;border-radius:50%;background:#F5C4B3}
-.sw{position:absolute;left:0;right:0;bottom:0;height:70px;display:flex}
+.note{position:absolute;left:790px;top:548px;font-family:Caveat,cursive;font-size:38px;color:${ACC};transform:rotate(-3deg);display:flex;align-items:center;gap:12px}
+.note svg{width:64px;height:24px}
+.sw{position:absolute;left:0;right:0;bottom:0;height:64px;display:flex}
 .sw i{flex:1}
+.fx{font-family:Lora,serif}
 </style></head><body>
-<div class="txt"><div class="k">${esc(t[0])}</div><h1>${esc(t[1])}<b>${esc(t[2])}</b></h1><div class="s">${esc(t[3])}</div>
-<div class="brand">Pigeon Polly Art Lab</div><div class="url">pigeonpolly.com</div></div>
-<div class="arch">${art}${c.swatch ? '<div class="sw"><i style="background:#3E2A5C"></i><i style="background:#8C5A3C"></i><i style="background:#D85A30"></i><i style="background:#E9A93B"></i><i style="background:#9FB38A"></i><i style="background:#F4E6D0"></i></div>' : ''}</div>
-<div class="base"></div>
-<svg class="star" viewBox="0 0 64 64"><path d="M32 0C34 22 42 30 64 32C42 34 34 42 32 64C30 42 22 34 0 32C22 30 30 22 32 0Z" fill="#E9A93B"/></svg>
-<div class="dot" style="left:668px;top:236px"></div><div class="dot" style="left:1160px;top:390px"></div>
-<script>
-// длинные надписи — мельче, чтобы влезли
-const h=document.querySelector('h1'),s=document.querySelector('.s'),box=document.querySelector('.txt');
-let f=78;
-const fitLine=el=>{const r=document.createRange();r.selectNodeContents(el);return r.getBoundingClientRect().width};
-while(f>44&&(fitLine(h.firstChild)>590||fitLine(h.querySelector('b'))>590||h.getBoundingClientRect().height>f*1.02*2+4)){f-=2;h.style.fontSize=f+'px'}
-let g=27;while(g>20&&s.getBoundingClientRect().height>g*1.45*2+4){g-=1;s.style.fontSize=g+'px'}
-</script></body></html>`;
+<div class="top"><img src="${fileUrl('assets/logo-badge-autumn.png')}"><span>Pigeon Polly <i>Art Lab</i></span></div>
+<div class="txt"><div class="k">${esc(t[0])}</div><h1><span class="l1">${esc(t[1])}</span><br><em>${esc(t[2]).replace(/ā/g, '<span class="fx">ā</span>')}<svg viewBox="0 0 200 20" preserveAspectRatio="none"><path d="M3 13 C 45 4, 90 18, 130 9 S 185 6, 197 11"/></svg></em></h1><div class="s">${esc(t[3])}</div></div>
+<div class="url">pigeonpolly.com</div>
+<div class="card"><div class="pic">${art}${c.swatch ? '<div class="sw"><i style="background:#3E2A5C"></i><i style="background:#8C5A3C"></i><i style="background:#D85A30"></i><i style="background:#E9A93B"></i><i style="background:#9FB38A"></i><i style="background:#F4E6D0"></i></div>' : ''}</div></div>
+<div class="note"><svg viewBox="0 0 64 24"><path d="M2 20 C 18 4, 40 2, 60 8" stroke="${ACC}" stroke-width="3" fill="none" stroke-linecap="round"/></svg>${esc((c.px || c.grid ? NOTE : NOTE2)[lang])}</div>
+</body></html>`;
 }
 
 (async () => {
@@ -206,9 +226,15 @@ let g=27;while(g>20&&s.getBoundingClientRect().height>g*1.45*2+4){g-=1;s.style.f
     if (COPY[key] || (only.length && !only.includes(key))) continue;
     for (const lang of ['en', 'ru', 'lv']) {
       const tmp = path.join(OUT, `_tmp.html`);
-      fs.writeFileSync(tmp, html(c, c[lang]));
+      fs.writeFileSync(tmp, html(c, c[lang], lang));
       await page.goto('file://' + tmp, { waitUntil: 'networkidle' });
-      await page.evaluate(() => document.fonts.ready);
+      await page.evaluate(async () => {
+        await document.fonts.ready;
+        // длинные надписи — мельче, чтобы не залезали на карточку
+        const h = document.querySelector('h1'), s = document.querySelector('.s'), W = 620, w = el => el.getBoundingClientRect().width;
+        let f = 86; while (f > 44 && (w(h.querySelector('.l1')) > W || w(h.querySelector('em')) > W)) { f -= 2; h.style.fontSize = f + 'px'; }
+        let g = 25; while (g > 19 && s.getBoundingClientRect().height > g * 1.45 * 2 + 4) { g -= 1; s.style.fontSize = g + 'px'; }
+      });
       const dest = path.join(OUT, `${key}-${lang}.jpg`);
       await page.screenshot({ path: dest, type: 'jpeg', quality: 86 });
       done.push(dest);

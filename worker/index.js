@@ -1704,7 +1704,7 @@ async function route(req, env, url) {
     const u = nick ? await env.DB.prepare('SELECT id FROM users WHERE nick = ? AND banned = 0').bind(nick).first() : null;
     const o = u && env.MEDIA ? await env.MEDIA.get(`birdcards/${u.id}.png`) : null;
     const ol = ['ru', 'lv'].includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
-    if (!o) return Response.redirect(`${url.origin}/assets/og-flock-${ol}.jpg`, 302); // карточку ещё не делали — общая картинка стаи
+    if (!o) return Response.redirect(`${url.origin}/images/og/bird-${ol}.jpg`, 302); // карточку ещё не делали — общая картинка профиля (tools/og_cards.js)
     return new Response(o.body, { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=600' } });
   }
 
