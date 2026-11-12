@@ -941,15 +941,21 @@
     if (leftovers) {
       status(`В статье ${leftovers} картин(ки/ок) со ссылками на другие сайты (Patreon, Google Docs…) — они могут пропасть. <button type="button" class="bc-link" id="be-copy-left">Скопировать их на сайт</button>`);
       $('#be-copy-left').addEventListener('click', async () => { for (const b of bodies) await copyImages(b); });
-      if (patIds().length) {
-        $('.be-status').insertAdjacentHTML('beforeend', ' <button type="button" class="bc-link" id="be-patfresh">📋 Вернуть картинки из Patreon</button>');
-        $('#be-patfresh').addEventListener('click', patFresh);
-      }
     }
+    fetch('/assets/blog-restore.json').then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => {
+      BLUR = (j && j._blurred) || {};
+      if (!patIds().length || $('#be-patfresh')) return;
+      if (!leftovers) status('В статье есть картинки с Patreon, которые не видно или видно размытыми.');
+      $('.be-status').insertAdjacentHTML('beforeend', ' <button type="button" class="bc-link" id="be-patfresh">📋 Вернуть картинки из Patreon</button>');
+      $('#be-patfresh').addEventListener('click', patFresh);
+    });
     // Patreon: ссылки на картинки со временем гаснут. В каждой есть номер поста и код файла — Алина копирует пост с Patreon целиком,
     // а мы берём из него свежие ссылки на те же файлы (текст статьи не трогаем) и сразу копируем картинки на сайт
     const PAT = /\/p\/post\/(\d+)\/([0-9a-f]{16,})\//i;
-    function patIds() { return [...new Set(bodies.flatMap(b => [...b.querySelectorAll('img')].map(i => (i.getAttribute('src') || '').match(PAT)).filter(Boolean).filter(m => foreign(m.input)).map(m => m[1])))]; }
+    // какую картинку Patreon заменить: чужая ссылка Patreon или размытое превью, которое сайт скопировал по ошибке (site/assets/blog-restore.json → _blurred)
+    let BLUR = {};
+    const patOf = src => { const m = src.match(PAT); if (m && foreign(src)) return { id: m[1], hash: m[2] }; const b = BLUR[src]; return b ? { id: b.post, hash: b.hash } : null; };
+    function patIds() { return [...new Set(bodies.flatMap(b => [...b.querySelectorAll('img')].map(i => patOf(i.getAttribute('src') || '')).filter(Boolean).map(m => m.id)))]; }
     function patFresh() {
       const ids = patIds();
       const d = document.createElement('dialog'); d.className = 'be-dialog';
@@ -968,9 +974,9 @@
         e.preventDefault();
         const html = e.clipboardData.getData('text/html');
         const fresh = {};
-        new DOMParser().parseFromString(html || '', 'text/html').querySelectorAll('img').forEach(i => { const m = (i.getAttribute('src') || '').match(PAT); if (m && !fresh[m[2]]) fresh[m[2]] = i.getAttribute('src'); });
+        new DOMParser().parseFromString(html || '', 'text/html').querySelectorAll('img').forEach(i => { const m = (i.getAttribute('src') || '').match(PAT); if (m && !fresh[m[2]] && !/\/eyJiIj/.test(m.input)) fresh[m[2]] = i.getAttribute('src'); });
         let n = 0;
-        bodies.forEach(b => b.querySelectorAll('img').forEach(i => { const m = (i.getAttribute('src') || '').match(PAT); if (m && fresh[m[2]] && foreign(i.getAttribute('src'))) { i.setAttribute('src', fresh[m[2]]); n++; } }));
+        bodies.forEach(b => b.querySelectorAll('img').forEach(i => { const m = patOf(i.getAttribute('src') || ''); if (m && fresh[m.hash]) { i.setAttribute('src', fresh[m.hash]); n++; } }));
         if (!n) { msg.textContent = Object.keys(fresh).length ? 'В этом посте нет картинок этой статьи — проверьте, тот ли пост открыт.' : 'Картинок во вставленном не нашлось. Откройте пост на Patreon в своём аккаунте и скопируйте его целиком (Ctrl+A, Ctrl+C).'; return; }
         msg.textContent = `Нашла ${n}. Копирую на сайт…`;
         for (const b of bodies) await copyImages(b);

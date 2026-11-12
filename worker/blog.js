@@ -779,6 +779,7 @@ export async function blogImgCheck(env, fix = 0) {
         rep.total++;
         const src = raw.replace(/&amp;/g, '&').trim().replace(/^\/\//, 'https://');
         const local = src.startsWith(SITE + '/media/') ? src.slice(SITE.length) : src;
+        if (local.startsWith('/media/') && restore._blurred && restore._blurred[local]) { rep.dead++; if (!rep.hosts.includes('Patreon — размыта')) rep.hosts.push('Patreon — размыта'); continue; } // скопировалось размытое превью закрытого поста
         if (local.startsWith('/media/')) { if (!(await has(decodeURIComponent(local.slice(7))))) rep.missing++; continue; }
         if (local.startsWith('/')) continue;
         rep.foreign++;
@@ -809,7 +810,8 @@ async function patreonFresh(src) {
     if (!r.ok) return null;
     const txt = (await r.text()).replace(/\\u0026/g, '&').replace(/\\\//g, '/').replace(/&amp;/g, '&');
     const urls = [...txt.matchAll(/https:\/\/[^"'\s<>\\]+/g)].map(x => x[0]).filter(u => u.includes(m[2]));
-    return urls.find(u => !/eyJ3IjoyMDB9|eyJoIjo/.test(u)) || urls[0] || null; // не крошечное превью, если есть
+    const sharp = urls.filter(u => !/\/eyJiIj/.test(u)); // eyJiIj… = {"b":…} — размытое превью закрытого поста, такое не берём
+    return sharp.find(u => !/eyJ3IjoyMDB9|eyJoIjo/.test(u)) || sharp[0] || null; // не крошечное превью, если есть
   } catch (e) { return null; }
 }
 async function rehostOne(env, src, moved) {
