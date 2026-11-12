@@ -169,19 +169,19 @@ const PINS = [
   { n: 282, tpl: 'prompts', type: 'Темы', kick: 'November sketchbook', t: 'What to draw', t2: 'this November', art: 'roofs', c: [0, 0.25, 1], foot: 'a new theme every day',
     items: ['a mug of cocoa', 'a frosty window', 'tangerine peel', 'your warmest scarf', 'a candle', 'a tram stop at night', 'wool socks', 'a teapot', 'a snowy rooftop'], link: L('/challenge/'),
     title: 'What to draw this November: 9 cozy ideas', desc: 'Stuck? Nine small, cozy things to draw or paint this November — from a mug of cocoa to a snowy rooftop. Get a new drawing theme every day on the site.',
-    alt: 'Nine handwritten paper notes with November drawing ideas under a watercolor of winter rooftops.', topics: 'November drawing ideas, drawing prompts, what to draw, sketchbook prompts' },
+    alt: 'A list of nine November drawing ideas in handwritten blue letters on dark brown, under a watercolor of winter rooftops.', topics: 'November drawing ideas, drawing prompts, what to draw, sketchbook prompts' },
   { n: 283, tpl: 'prompts', type: 'Темы', kick: 'December sketchbook', t: 'What to draw', t2: 'in December', art: 'sbNY', c: [0, 0.12, 1], foot: 'a new theme every day',
     items: ['a garland', 'a bowl of tangerines', 'gift wrap', 'a tree ornament', 'the “31” calendar page', 'a sparkler', 'a festive salad', 'a pine cone', 'a snow globe'], link: L('/challenge/'),
     title: 'What to draw in December: 9 festive ideas', desc: 'Garlands, tangerines, sparklers and the calendar page that says 31 — nine December drawing ideas for your sketchbook. New theme every day on the site.',
-    alt: 'Nine handwritten paper notes with December drawing ideas under a photo of a sketchbook page with a New Year table.', topics: 'December drawing ideas, Christmas drawing prompts, advent sketchbook' },
+    alt: 'A list of nine December drawing ideas in handwritten blue letters on dark brown, under a photo of a sketchbook page with a New Year table.', topics: 'December drawing ideas, Christmas drawing prompts, advent sketchbook' },
   { n: 284, tpl: 'prompts', type: 'Темы', kick: 'counting down to midnight', t: 'Draw your', t2: 'New Year’s Eve', art: 'ny22', c: [0.01, 0, 0.96], foot: 'join the drawing challenge',
     items: ['your New Year table', 'what you’ll wear', 'the view at midnight', 'the first person you’ll call', 'your 2026 in one object', 'your bed (like Polly)'], link: L('/challenge/'),
     title: 'Draw your New Year’s Eve: 6 drawing ideas', desc: 'Your table, your outfit, the view at midnight — six New Year’s Eve drawing ideas. Or celebrate in bed, like Pigeon Polly.',
-    alt: 'Six handwritten paper notes with New Year’s Eve drawing ideas under a watercolor of a pigeon in a Santa hat in bed.', topics: 'New Year drawing ideas, drawing prompts, journal ideas' },
+    alt: 'A list of six New Year’s Eve drawing ideas in handwritten blue letters on dark brown, under a watercolor of a pigeon in a Santa hat in bed.', topics: 'New Year drawing ideas, drawing prompts, journal ideas' },
   { n: 285, tpl: 'prompts', type: 'Темы', kick: 'for your OC', t: 'Winter prompts', t2: 'for your character', art: 'chew', c: [0.08, 0, 0.82], foot: 'join the drawing challenge',
     items: ['wrapped in a blanket', 'building a snowman', 'waiting for a tram in the snow', 'ice skating, badly', 'carrying too many gifts', 'asleep before midnight'], link: L('/challenge/'),
     title: 'Winter drawing prompts for your character', desc: 'Six winter situations to draw your character in — from ice skating badly to falling asleep before midnight. Mr.Chew already carries too many gifts.',
-    alt: 'Six handwritten paper notes with winter character drawing prompts under an illustration of a snail with a sack of presents.', topics: 'character drawing prompts, OC prompts, winter art challenge' },
+    alt: 'A list of six winter character drawing prompts in handwritten blue letters on dark brown, under an illustration of a snail with a sack of presents.', topics: 'character drawing prompts, OC prompts, winter art challenge' },
 ];
 
 (async () => {
