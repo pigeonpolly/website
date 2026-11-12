@@ -239,7 +239,7 @@
       box.innerHTML = `<h2>🖼 Картинки в статьях</h2>
         ${copied ? `<p class="be-flash">✓ Скопировано на сайт: ${copied} — эти картинки снова видны.</p>` : ''}
         ${bad.length ? `<p class="be-note">Статей, где картинки не открываются: <b>${bad.length}</b> из ${d.total}. Их нужно вставить заново: откройте статью, удалите пустую картинку и перетащите на её место файл (или скопируйте картинку из Google Docs).</p>
-          <ol>${bad.map(r => `<li><a href="#${r.id}"><b>${esc(r.title)}</b></a>${r.status === 'published' ? '' : ' <small>(черновик)</small>'} — не видно: ${r.missing + r.dead + r.foreign} из ${r.total}</li>`).join('')}</ol>`
+          <ol>${bad.map(r => `<li><a href="#${r.id}"><b>${esc(r.title)}</b></a>${r.status === 'published' ? '' : ' <small>(черновик)</small>'} — не видно: ${r.missing + r.dead + r.foreign} из ${r.total}${r.hosts && r.hosts.length ? ` <small>(были с: ${esc(r.hosts.join(', '))})</small>` : ''}${r.missing ? ' <small>(файл пропал с сайта)</small>' : ''}</li>`).join('')}</ol>`
         : `<p class="be-note">Все картинки во всех ${d.total} статьях на месте ✓</p>`}`;
     });
     const dd = app.querySelector('#be-dedupe');
