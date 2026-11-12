@@ -755,7 +755,7 @@ export async function blogImgCheck(env, fix = 0) {
   const deadKey = 'blog_img_dead', dead = new Set(JSON.parse((await env.DB.prepare('SELECT value FROM meta WHERE key = ?').bind(deadKey).first())?.value || '[]')), dead0 = dead.size; // ссылки, которые уже не открылись, — второй раз не пробуем
   for (const src of dead) moved[src] = null;
   for (const r of rows) {
-    const rep = { id: r.id, slug: r.slug, status: r.status, title: r.t_ru || r.t_en || r.t_lv || r.slug, total: 0, missing: 0, foreign: 0, dead: 0, copied: 0 };
+    const rep = { id: r.id, slug: r.slug, status: r.status, title: r.t_ru || r.t_en || r.t_lv || r.slug, total: 0, missing: 0, foreign: 0, dead: 0, copied: 0, hosts: [] };
     const upd = {};
     for (const col of ['cover', 'b_ru', 'b_en', 'b_lv']) {
       const html = String(r[col] || '');
@@ -772,6 +772,7 @@ export async function blogImgCheck(env, fix = 0) {
         if (url === undefined && fix && /^https:\/\//i.test(src)) { if (tries < fix) { tries++; url = await rehostOne(env, src, moved); if (!url) dead.add(src); } else more = true; }
         if (url) { next = col === 'cover' ? url : next.split(`src="${raw}"`).join(`src="${url}"`); rep.copied++; rep.foreign--; }
         else if (url === null) { rep.dead++; rep.foreign--; }
+        if (!url) { const hst = (src.match(/^https?:\/\/([^/]+)/i) || [, 'data:'])[1].replace(/^www\./, ''); if (!rep.hosts.includes(hst)) rep.hosts.push(hst); } // откуда были картинки — Алине понятнее, где искать
       }
       if (next !== html) upd[col] = next;
     }
