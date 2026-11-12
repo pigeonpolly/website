@@ -763,7 +763,7 @@ export async function blogImgCheck(env, fix = 0) {
       let next = html;
       for (const raw of srcs) {
         rep.total++;
-        const src = raw.replace(/&amp;/g, '&').trim();
+        const src = raw.replace(/&amp;/g, '&').trim().replace(/^\/\//, 'https://');
         const local = src.startsWith(SITE + '/media/') ? src.slice(SITE.length) : src;
         if (local.startsWith('/media/')) { if (!(await has(decodeURIComponent(local.slice(7))))) rep.missing++; continue; }
         if (local.startsWith('/')) continue;
@@ -783,10 +783,29 @@ export async function blogImgCheck(env, fix = 0) {
   return { posts: out, total: rows.length, copied, more };
 }
 
+// Patreon: у картинки ссылка с «token-time», через время она перестаёт открываться. В ссылке есть номер поста и код файла —
+// берём пост заново (у открытых постов Patreon отдаёт свежие ссылки) и ищем там ту же картинку
+async function patreonFresh(src) {
+  const m = src.match(/patreon(?:usercontent)?\.com\/.*?\/p\/post\/(\d+)\/([0-9a-f]{16,})\//i);
+  if (!m) return null;
+  try {
+    const r = await fetch(`https://www.patreon.com/api/posts/${m[1]}`, { signal: AbortSignal.timeout(15000), headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36', Accept: 'application/json' } });
+    if (!r.ok) return null;
+    const txt = (await r.text()).replace(/\\u0026/g, '&').replace(/\\\//g, '/').replace(/&amp;/g, '&');
+    const urls = [...txt.matchAll(/https:\/\/[^"'\s<>\\]+/g)].map(x => x[0]).filter(u => u.includes(m[2]));
+    return urls.find(u => !/eyJ3IjoyMDB9|eyJoIjo/.test(u)) || urls[0] || null; // не крошечное превью, если есть
+  } catch (e) { return null; }
+}
 async function rehostOne(env, src, moved) {
   if (moved[src] !== undefined) return moved[src];
   moved[src] = null;
   if (!env.MEDIA) return null;
+  const got = await rehostFetch(env, src);
+  if (got) return (moved[src] = got);
+  const fresh = await patreonFresh(src);
+  return (moved[src] = fresh ? await rehostFetch(env, fresh) : null);
+}
+async function rehostFetch(env, src) {
   try {
     const r = await fetch(src, { signal: AbortSignal.timeout(15000), headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36', Referer: 'https://docs.google.com/', Accept: 'image/avif,image/webp,image/png,image/jpeg,image/*;q=0.8' } });
     let type = (r.headers.get('content-type') || '').split(';')[0];
@@ -798,7 +817,7 @@ async function rehostOne(env, src, moved) {
     const d = new Date();
     const key = `blog/${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${randomHex(8)}.${ext}`;
     await env.MEDIA.put(key, buf, { httpMetadata: { contentType: type, cacheControl: 'public, max-age=31536000, immutable' } });
-    return (moved[src] = '/media/' + key);
+    return '/media/' + key;
   } catch (e) { return null; }
 }
 
