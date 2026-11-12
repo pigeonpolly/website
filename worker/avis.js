@@ -31,6 +31,16 @@ const FEEDS = {
 };
 // norge и mat — не из лент: тему дня выбирает Gemini (с учётом сезона и норвежского календаря, без повторов за 30 дней) и пишет рассказ сам
 export const SECTIONS = { verden: '🌍 Verden', latvia: '🇱🇻 Latvia', kunst: '🎨 Kunst', kultur: '🎬 Bøker, film og serier', spill: '🎮 Spill', norge: '🇳🇴 Historier fra Norge', mat: '🍲 Mat og tradisjoner' };
+const FALLBACK = { // запасные темы рассказов: [тема, запрос фото для Commons]
+  norge: [['Hurtigruten — the coastal express along Norway', 'Hurtigruten ship'], ['Bryggen in Bergen — the old Hanseatic wharf', 'Bryggen Bergen'], ['Allemannsretten — the right to roam in Norwegian nature', 'Norway hiking trail'],
+    ['Stave churches of Norway', 'Borgund stave church'], ['Friluftsliv — why Norwegians love being outdoors', 'Norway mountain cabin'], ['The Sami people and their culture', 'Sami lavvu'],
+    ['Janteloven — the unwritten rules of modesty', 'Aksel Sandemose'], ['Nynorsk and Bokmål — two written Norwegian languages', 'Ivar Aasen'], ['The Lofoten islands and stockfish', 'Lofoten Reine'],
+    ['Kos og hytteliv — the Norwegian cabin culture', 'Norwegian hytte'], ['Edvard Munch and Oslo', 'Munch museum Oslo'], ['The Vikings and the Oseberg ship', 'Oseberg ship']],
+  mat: [['Brunost — the brown cheese and the cheese slicer', 'brunost'], ['Vafler — Norwegian heart-shaped waffles', 'Norwegian waffles'], ['Kanelboller and skillingsboller from Bergen', 'skillingsboller'],
+    ['Matpakke — the Norwegian packed lunch', 'Norwegian matpakke'], ['Fårikål — the national dish', 'fårikål'], ['Lefse — soft potato flatbread', 'lefse'],
+    ['Kvikk Lunsj — the hiking chocolate', 'Kvikk Lunsj'], ['Fiskesuppe — Bergen fish soup', 'Bergen fish soup'], ['Rømmegrøt — sour cream porridge', 'rømmegrøt'],
+    ['Pinnekjøtt and ribbe — Christmas dinner', 'pinnekjøtt'], ['Sju slag — the seven kinds of Christmas cookies', 'Norwegian christmas cookies'], ['Kaffe — Norway and filter coffee', 'Norwegian coffee kaffe']],
+};
 const PICK = { verden: 3, latvia: 2, kunst: 2, kultur: 2, spill: 1 }; // сколько новостей в разделе (решение Алины: больше о культуре, меньше о войне)
 
 // ---------- RSS ----------
@@ -137,6 +147,8 @@ ${Object.keys(FEEDS).map(k => `${k.toUpperCase()}:\n${list(k)}`).join('\n\n')}`,
   if (!items.length) throw Object.assign(new Error('no_news'), { code: 'no_news' });
   const texts = await Promise.all(items.map(x => article(x.link)));
   items.forEach((x, i) => { x.text = texts[i].text; x.img = texts[i].img || x.img || ''; });
+  const dn = Math.floor(Date.parse(day + 'T12:00:00Z') / 86400000);
+  for (const sec of ['norge', 'mat']) if (!pick[sec]) { const t = FALLBACK[sec][dn % FALLBACK[sec].length]; pick[sec] = t[0]; pick[sec + '_q'] = t[1]; }
   for (const sec of ['norge', 'mat']) if (pick[sec]) items.push({ sec, topic: String(pick[sec]).slice(0, 200), title: '', link: '', src: '', ...await commons(String(pick[sec + '_q'] || '').slice(0, 80)) });
   await env.DB.prepare('INSERT INTO avis_src (day, data, created_at) VALUES (?, ?, ?) ON CONFLICT(day) DO UPDATE SET data = excluded.data, created_at = excluded.created_at')
     .bind(day, JSON.stringify(items), Date.now()).run();
@@ -259,9 +271,11 @@ export async function avisApi(req, env, url, h) {
     const days = (await env.DB.prepare('SELECT day FROM avis_src ORDER BY day DESC LIMIT ?').bind(KEEP).all()).results.map(x => x.day);
     let data = null;
     if (!(m === 'POST' && b.fresh)) { const r = await env.DB.prepare('SELECT data FROM avis WHERE day = ? AND level = ?').bind(day, level).first(); if (r) data = JSON.parse(r.data); }
+    if (data && day === today && !data.items.some(x => x.sec === 'norge' || x.sec === 'mat')) data = null; // выпуск старого формата — переписать
     if (!data) {
       try {
         let src = m === 'POST' && b.fresh === 'news' && day === today ? null : await getSrc(env, day);
+        if (src && day === today && !src.some(x => x.topic)) src = null; // набор старого формата (без рассказов и картинок) — собрать заново
         if (!src && day !== today) h.fail(404, 'no_day');
         if (!src) src = await buildSrc(env, day);
         data = await buildIssue(env, day, level, src);
@@ -398,7 +412,7 @@ h2.sec{scroll-margin-top:56px;display:flex;justify-content:space-between;align-i
   $('#lv').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || b.dataset.l === level) return; level = b.dataset.l; try { localStorage.setItem('avis-level', level); } catch (x) {}
     setLevelUi(); fetch('/api/avis/level', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ level }) }); load(); });
   $('#day').addEventListener('change', e => { day = e.target.value; load(); });
-  $('#again').addEventListener('click', () => { if (confirm('Написать этот выпуск заново? Новости те же, текст новый (около минуты).')) load({ fresh: 'text' }); });
+  $('#again').addEventListener('click', () => { if (confirm(day === data?.days?.[0] ? 'Собрать сегодняшний выпуск заново — со свежими новостями (около минуты)?' : 'Написать этот выпуск заново (около минуты)?')) load({ fresh: day === data?.days?.[0] ? 'news' : 'text' }); });
   const tip = $('#tip');
   const sentOf = el => { const p = el.closest('p, li, h3') || el; const t = p.textContent; return (t.split(/(?<=[.!?])\\s+/).find(x => x.includes(el.textContent.split(' ')[0])) || t).trim().slice(0, 240); };
   function place(rect) { tip.style.left = Math.max(8, Math.min(innerWidth - tip.offsetWidth - 8, rect.left)) + 'px'; tip.style.top = (rect.bottom + 6 + tip.offsetHeight > innerHeight ? rect.top - tip.offsetHeight - 6 : rect.bottom + 6) + 'px'; }
