@@ -1096,6 +1096,12 @@ async function healthMail(env) {
     await setMeta(env, 'health_week_day', day);
     const r = await blogImgCheck(env, 0), bad = r.posts.filter(x => x.missing || x.dead || x.foreign);
     if (bad.length) parts.push(`🖼 В блоге не открываются картинки (${bad.length}):\n` + bad.map(x => `• ${x.title} — не видно ${x.missing + x.dead + x.foreign} из ${x.total}\n  https://www.pigeonpolly.com/blog-editor/#${x.id}`).join('\n') + '\nВсё сразу: редактор блога → «🖼 Проверить картинки».');
+    // место: Cloudflare R2 — бесплатно 10 ГБ, GitHub — репозиторию комфортно до ~5 ГБ; письмо, если занято больше половины
+    if (env.MEDIA) { let size = 0, cursor; do { const r = await env.MEDIA.list({ cursor, limit: 1000 }); size += r.objects.reduce((a, o) => a + (o.size || 0), 0); cursor = r.truncated ? r.cursor : null; } while (cursor);
+      await setMeta(env, 'r2_size', String(size));
+      if (size > 5e9) parts.push(`📦 Хранилище картинок Cloudflare занято на ${(size / 1e9).toFixed(1)} ГБ из 10 ГБ бесплатных.`); }
+    const gh = await fetch('https://api.github.com/repos/pigeonpolly/website', { headers: { 'User-Agent': 'pigeonpolly-health', Accept: 'application/vnd.github+json' } }).then(r => r.ok ? r.json() : null).catch(() => null);
+    if (gh && gh.size) { await setMeta(env, 'github_size', String(gh.size * 1024)); if (gh.size * 1024 > 2.5e9) parts.push(`📦 Репозиторий сайта на GitHub — ${(gh.size / 1048576).toFixed(1)} ГБ (комфортно до ~5 ГБ).`); }
     const seen = Number(await getMeta(env, 'backup_seen')) || 0;
     if (now() - seen > 9 * 86400) parts.push(`💾 Автокопия в Google Drive ${seen ? 'не приходила с ' + new Date(seen * 1000).toLocaleDateString('ru-RU') : 'ещё ни разу не приходила'}. Кабинет → «⚙️ Сервис» → «Копии» → «🔁 Автокопия в Google Drive»: вставить скрипт заново и запустить setup.`);
   }
