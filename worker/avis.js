@@ -344,12 +344,15 @@ const LOCKED = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta
 // Сиссель — милая сорока-сплетница (маскот раздела «Sladder»)
 const MAGPIE = `<svg viewBox="0 0 72 64" width="60" height="54"><path d="M22 44L2 60c2 3 6 3 8 1l18-12z" fill="#2c3e8f"/><path d="M22 46L6 62" stroke="#4a6fe0" stroke-width="2" stroke-linecap="round"/><ellipse cx="38" cy="38" rx="19" ry="16" fill="#1d1b26"/><ellipse cx="42" cy="43" rx="12" ry="11" fill="#fff"/><path d="M21 35c7-6 17-5 20 4-8 5-18 3-20-4z" fill="#1d1b26" stroke="#3a5bd0" stroke-width="1.6"/><path d="M25 35c4-2 9-2 12 1-4 2-9 2-12-1z" fill="#fff"/><circle cx="44" cy="20" r="13" fill="#1d1b26"/><circle cx="40" cy="19" r="4.4" fill="#fff"/><circle cx="50" cy="19" r="4.4" fill="#fff"/><circle cx="41" cy="20" r="2.3" fill="#1d1b26"/><circle cx="51" cy="20" r="2.3" fill="#1d1b26"/><circle cx="41.8" cy="19" r=".8" fill="#fff"/><circle cx="51.8" cy="19" r=".8" fill="#fff"/><path d="M55 22l11 3-11 3z" fill="#2a2633"/><circle cx="38" cy="26" r="2.3" fill="#ff9fb0" opacity=".75"/><circle cx="52" cy="27" r="2.3" fill="#ff9fb0" opacity=".75"/><path d="M36 53l-2 7M45 53l2 7" stroke="#2a2633" stroke-width="2.4" stroke-linecap="round"/></svg>`;
 const AVIS_HTML = `<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="robots" content="noindex">
-<title>Morgenavis</title><link rel="icon" href="/favicon.ico">
+<title>Morgenavis</title><script>try { const t = localStorage.getItem('avis-paper') || (matchMedia('(prefers-color-scheme: dark)').matches ? 'natt' : ''); if (t && t !== 'blå') document.documentElement.dataset.paper = t; } catch (e) { /* без памяти браузера */ }</script><link rel="icon" href="/favicon.ico">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#f3eee2;--card:#faf7ef;--ink:#1c1a16;--mute:#6f685b;--line:#cbc1ad;--rule:#1c1a16;--acc:#9a2f1d;--acc2:#e9e1cf;--mark:#f1df98;--ok:#2f7a4d;--f-head:'Playfair Display',Georgia,serif;--f-body:'Source Serif 4',Georgia,serif;--f-ui:system-ui,-apple-system,'Segoe UI',sans-serif}
-@media (prefers-color-scheme:dark){:root{--bg:#191712;--card:#221f19;--ink:#ece5d4;--mute:#a69d8a;--line:#3f392e;--rule:#cfc6b2;--acc:#e48b6c;--acc2:#2c2820;--mark:#5c4c16;--ok:#76c58f}}
+:root{--bg:#f5f7fd;--card:#fdfdff;--ink:#1f1832;--mute:#6b6480;--line:#d5d8ec;--rule:#1f1832;--acc:#534ab7;--acc2:#e8eaf8;--mark:#fff0a8;--ok:#2f8f5b;--pic:grayscale(.35) contrast(1.04);--f-head:'Playfair Display',Georgia,serif;--f-body:'Source Serif 4',Georgia,serif;--f-ui:system-ui,-apple-system,'Segoe UI',sans-serif}
+:root[data-paper="krem"]{--bg:#f3eee2;--card:#faf7ef;--ink:#1c1a16;--mute:#6f685b;--line:#cbc1ad;--rule:#1c1a16;--acc:#9a2f1d;--acc2:#e9e1cf;--mark:#f1df98;--ok:#2f7a4d;--pic:grayscale(.45) sepia(.12) contrast(1.05)}
+:root[data-paper="natt"]{--bg:#16131f;--card:#211d2d;--ink:#eeeaf7;--mute:#a59fb8;--line:#363047;--rule:#cfc8e6;--acc:#a99ff0;--acc2:#2c2742;--mark:#5a4b12;--ok:#6fcf97;--pic:grayscale(.3)}
+.paper{display:inline-flex;gap:4px;align-items:center}.paper button{width:26px;height:26px;border:1px solid var(--rule);border-radius:50%;cursor:pointer;padding:0}
+.paper button[aria-pressed=true]{outline:2px solid var(--acc);outline-offset:2px}
 *{box-sizing:border-box}html{scroll-padding-top:52px}
 body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.62 var(--f-body);-webkit-font-smoothing:antialiased}
 .wrap{max-width:1180px;margin:0 auto;padding:10px 16px 80px}
@@ -404,7 +407,7 @@ article h3{font:700 23px/1.18 var(--f-head);margin:4px 0 6px}
 .lead .tx p:first-child::first-letter{font:700 58px/0.85 var(--f-head);float:left;padding:6px 8px 0 0}
 .tx p{margin:0 0 .6em}@media (min-width:760px){.tx p{text-align:justify;hyphens:auto;-webkit-hyphens:auto}}
 .kort{font:italic 16px/1.45 var(--f-body);color:var(--mute);border-left:3px solid var(--acc);padding:0 0 0 10px;margin:4px 0 8px}
-.pic{display:block;width:100%;aspect-ratio:3/2;max-height:280px;object-fit:cover;margin:2px 0 8px;background:var(--acc2);filter:grayscale(.45) sepia(.12) contrast(1.05);transition:filter .3s}
+.pic{display:block;width:100%;aspect-ratio:3/2;max-height:280px;object-fit:cover;margin:2px 0 8px;background:var(--acc2);filter:var(--pic);transition:filter .3s}
 .pic:hover{filter:none}
 mark{background:var(--mark);color:inherit;padding:0 1px;cursor:pointer}
 .words{display:flex;flex-wrap:wrap;gap:2px 12px;margin:6px 0;font:13px var(--f-ui);padding:6px 0 0;list-style:none;border-top:1px dotted var(--line)}
@@ -442,7 +445,8 @@ article.done .rd{color:var(--ok)}
 <div class="meta"><span>Riga</span><span id="date"></span><span id="nr"></span></div>
 <h1>Morgenavis</h1><p class="motto">Nyheter, historier og sladder på enkel norsk — hver morgen</p><div class="rule2"></div></header>
 <div class="bar"><span class="lv" id="lv">${LEVELS.map(l => `<button type="button" data-l="${l}">${LNAME[l]}</button>`).join('')}</span>
-<select id="day" aria-label="День"></select><button class="btn" id="again" type="button" title="Написать выпуск заново">↻ заново</button></div>
+<select id="day" aria-label="День"></select><button class="btn" id="again" type="button" title="Написать выпуск заново">↻ заново</button>
+<span class="paper" id="paper" title="Бумага"><button type="button" data-p="" style="background:#f5f7fd" aria-label="Голубая бумага"></button><button type="button" data-p="krem" style="background:#f3eee2" aria-label="Кремовая бумага"></button><button type="button" data-p="natt" style="background:#16131f" aria-label="Ночная газета"></button></span></div>
 <p class="hint" id="hint">Нажми на любое слово — перевод и «+ в словарь». Прочитала — «✓ Прочитано», статья свернётся.</p>
 <main id="main"><div class="load"><b>🐧</b>Пелле несёт газету…</div></main>
 </div><div id="tip" hidden></div>
@@ -562,6 +566,11 @@ article.done .rd{color:var(--ok)}
   }
   $('#lv').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || b.dataset.l === level) return; level = b.dataset.l; try { localStorage.setItem('avis-level', level); } catch (x) {}
     setLevelUi(); data = null; fetch('/api/avis/level', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ level }) }); load(); });
+  const paperUi = () => document.querySelectorAll('#paper button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.p === (document.documentElement.dataset.paper || ''))));
+  paperUi();
+  $('#paper').addEventListener('click', e => { const b = e.target.closest('button'); if (!b) return; const t = b.dataset.p;
+    if (t) document.documentElement.dataset.paper = t; else delete document.documentElement.dataset.paper;
+    try { localStorage.setItem('avis-paper', t || 'blå'); } catch (x) {} paperUi(); });
   $('#day').addEventListener('change', e => { day = e.target.value; data = null; load(); });
   $('#again').addEventListener('click', () => { if (confirm(day === data?.days?.[0] ? 'Собрать сегодняшний выпуск заново — со свежими новостями (около минуты)?' : 'Написать этот выпуск заново (около минуты)?')) load({ fresh: day === data?.days?.[0] ? 'news' : 'text' }); });
   const tip = $('#tip');
