@@ -87,6 +87,7 @@ export default {
       await seedLegends(env, 'train_items_v1', TRAIN_ITEMS, STOCK.norm).catch(e => healthErr(env, 'train items', e)); // вещи темы «🚆 Поезд» (worker/train.js)
       await seedLegends(env, 'garden_leg_v1', ['garden|goldcan', 'garden|orangery']).catch(e => healthErr(env, 'legends', e)); // ★ вещи для огорода (этап 23)
       await seedLegends(env, 'garden_items_v1', ['garden|?', ...['wcan', 'scarecrow', 'greenhouse', 'barrow', 'gnome', 'birdbath', 'beehive', 'lamp', 'sign', 'bench', 'pinwheel', 'flamingo', 'pond'].map(v => 'garden|' + v)], STOCK.norm).catch(e => healthErr(env, 'garden items', e)); // вещи для огорода — сразу в продажу, не ждать пополнения
+      await mediaBackup(env).catch(e => healthErr(env, 'media backup', e)); // новые картинки блога, галерей и карточек — копией во второе хранилище
       await blogImgCheck(env, 5).catch(e => healthErr(env, 'blog img', e)); // картинки статей со ссылками на Google Docs — копируем на сайт, пока ссылки живы
       await reqBackfill(env).catch(e => healthErr(env, 'req tr', e)); // «Нарисуй мне»: переводы тем на все языки сайта
       await importCards(env, new URL('https://www.pigeonpolly.com/')).catch(e => healthErr(env, 'cards', e)); // новые коллекции карточек из репозитория (один раз)
@@ -1072,6 +1073,26 @@ async function dayCard(env, req, u, L, withLog) {
   return out;
 }
 const randomHex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, '0')).join('');
+// ---------- копия картинок: MEDIA (pigeonpolly-media) → MEDIA_BACKUP (pigeonpolly-backup), только новые, по 50 за запуск; из копии ничего не удаляется ----------
+const BACKUP_PREFIXES = ['blog/', 'art/', 'cards/'];
+async function r2Keys(bucket, prefix) { const keys = []; let cursor; do { const r = await bucket.list({ prefix, cursor }); keys.push(...r.objects.map(o => o.key)); cursor = r.truncated ? r.cursor : null; } while (cursor); return keys; }
+async function mediaBackup(env, max = 50) {
+  if (!env.MEDIA || !env.MEDIA_BACKUP) return { copied: 0, left: 0 };
+  let copied = 0, left = 0;
+  for (const prefix of BACKUP_PREFIXES) {
+    const have = new Set(await r2Keys(env.MEDIA_BACKUP, prefix));
+    for (const k of (await r2Keys(env.MEDIA, prefix)).filter(k => !have.has(k))) {
+      if (copied >= max) { left++; continue; }
+      const obj = await env.MEDIA.get(k);
+      if (!obj) continue;
+      await env.MEDIA_BACKUP.put(k, obj.body, { httpMetadata: obj.httpMetadata });
+      copied++;
+    }
+  }
+  await setMeta(env, 'media_backup', JSON.stringify({ at: Date.now(), copied, left }));
+  return { copied, left };
+}
+
 // ---------- 🩺 сбои: ошибки записываются в meta health_log (последние 60), админу приходит письмо ----------
 // новые ошибки — не чаще раза в сутки; по понедельникам (Рига) ещё проверка картинок блога (blogImgCheck) и автокопии в Google Drive (meta backup_seen)
 async function healthErr(env, where, e) {
@@ -1097,9 +1118,13 @@ async function healthMail(env) {
     const r = await blogImgCheck(env, 0), bad = r.posts.filter(x => x.missing || x.dead || x.foreign);
     if (bad.length) parts.push(`🖼 В блоге не открываются картинки (${bad.length}):\n` + bad.map(x => `• ${x.title} — не видно ${x.missing + x.dead + x.foreign} из ${x.total}\n  https://www.pigeonpolly.com/blog-editor/#${x.id}`).join('\n') + '\nВсё сразу: редактор блога → «🖼 Проверить картинки».');
     // место: Cloudflare R2 — бесплатно 10 ГБ, GitHub — репозиторию комфортно до ~5 ГБ; письмо, если занято больше половины
-    if (env.MEDIA) { let size = 0, cursor; do { const r = await env.MEDIA.list({ cursor, limit: 1000 }); size += r.objects.reduce((a, o) => a + (o.size || 0), 0); cursor = r.truncated ? r.cursor : null; } while (cursor);
-      await setMeta(env, 'r2_size', String(size));
-      if (size > 5e9) parts.push(`📦 Хранилище картинок Cloudflare занято на ${(size / 1e9).toFixed(1)} ГБ из 10 ГБ бесплатных.`); }
+    let size = 0; // 10 ГБ бесплатно — на весь аккаунт, оба хранилища вместе
+    for (const b of [env.MEDIA, env.MEDIA_BACKUP].filter(Boolean)) { let cursor; do { const r = await b.list({ cursor, limit: 1000 }); size += r.objects.reduce((a, o) => a + (o.size || 0), 0); cursor = r.truncated ? r.cursor : null; } while (cursor); }
+    await setMeta(env, 'r2_size', String(size));
+    if (size > 5e9) parts.push(`📦 Хранилища Cloudflare заняты на ${(size / 1e9).toFixed(1)} ГБ из 10 ГБ бесплатных.`);
+    const mb = parseJ(await getMeta(env, 'media_backup'), null);
+    if (env.MEDIA && !env.MEDIA_BACKUP) parts.push('🗄 Второе хранилище картинок (pigeonpolly-backup) не подключено — копия картинок не делается.');
+    else if (!mb || Date.now() - mb.at > 2 * 86400000) parts.push('🗄 Копия картинок во второе хранилище не делалась больше двух суток.');
     const gh = await fetch('https://api.github.com/repos/pigeonpolly/website', { headers: { 'User-Agent': 'pigeonpolly-health', Accept: 'application/vnd.github+json' } }).then(r => r.ok ? r.json() : null).catch(() => null);
     if (gh && gh.size) { await setMeta(env, 'github_size', String(gh.size * 1024)); if (gh.size * 1024 > 2.5e9) parts.push(`📦 Репозиторий сайта на GitHub — ${(gh.size / 1048576).toFixed(1)} ГБ (комфортно до ~5 ГБ).`); }
     const seen = Number(await getMeta(env, 'backup_seen')) || 0;

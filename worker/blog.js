@@ -370,7 +370,7 @@ export async function blogApi(req, env, url, h) {
   if (m === 'GET' && p === '/api/blog/media-list') {
     const keys = [];
     if (env.MEDIA) for (const prefix of ['blog/', 'art/', 'cards/']) { let cursor; do { const r = await env.MEDIA.list({ prefix, cursor }); keys.push(...r.objects.map(o => o.key)); cursor = r.truncated ? r.cursor : null; } while (cursor); }
-    return json({ keys }, 200, { 'cache-control': 'no-store' });
+    return json({ keys, backup: !!env.MEDIA_BACKUP, backup_state: JSON.parse((await h.getMeta('media_backup')) || 'null') }, 200, { 'cache-control': 'no-store' }); // backup — второе хранилище подключено (проверка после деплоя)
   }
   // полная копия сайта: блог + челлендж (аккаунты, работы) + список файлов картинок. Доступ — админ или личный ключ автокопии (?token=)
   if (m === 'GET' && p === '/api/blog/backup') {

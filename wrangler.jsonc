@@ -19,7 +19,8 @@
   ],
   // картинки блога (загружаются из редактора, отдаются по адресу /media/...)
   "r2_buckets": [
-    { "binding": "MEDIA", "bucket_name": "pigeonpolly-media" }
+    { "binding": "MEDIA", "bucket_name": "pigeonpolly-media" },
+    { "binding": "MEDIA_BACKUP", "bucket_name": "pigeonpolly-backup" } // копия картинок Алины (блог, галереи, карточки) — cron mediaBackup в worker/index.js
   ],
   // бесплатный переводчик статей (Workers AI, дневной бесплатный лимит)
   "ai": { "binding": "AI" },
