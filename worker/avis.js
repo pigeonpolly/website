@@ -1,6 +1,6 @@
 // «Morgenavis» — личная утренняя газета на норвежском для Алины (/norsk/avis/, docs/site.md «Morgenavis»).
 // Каждое утро (свой cron «47 * * * *» в wrangler.jsonc, с avisHour по Риге): RSS трёх разделов (мир, Латвия, искусство) за последние ~30 ч →
-// Gemini выбирает по 3 главные новости → worker дочитывает статьи → Gemini пересказывает на букмоле уровня A1/A2/B1/B2
+// Gemini выбирает по 3 главные новости → worker дочитывает статьи → Gemini пересказывает на букмоле уровня A1–A2 или B1–B2
 // (сложные и ключевые слова — с переводом на русский, большие новости — коротко и проще). Уровень по умолчанию готовится утром,
 // остальные — по первому нажатию на вкладку (и тоже сохраняются). Без Claude: только ключ Gemini сайта (бесплатный лимит).
 // Таблицы: avis_src (день → выбранные новости с текстами), avis (день + уровень → готовый выпуск). Хранится 30 дней.
@@ -16,7 +16,8 @@ export const AVIS_RULES = { avisOn: true, avisHour: 6 };
 export const AVIS_RANGE = { avisHour: [3, 12] };
 export const AVIS_INT = ['avisHour'];
 export const AVIS_CRON = '47 * * * *';
-const LEVELS = ['A1', 'A2', 'B1', 'B2'], KEEP = 30;
+const LEVELS = ['A', 'B'], KEEP = 30; // два уровня (решение Алины): A = A1–A2, B = B1–B2
+const LNAME = { A: 'A1–A2', B: 'B1–B2' };
 const rigaDay = (t = Date.now()) => new Date(t).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
 const rigaHour = () => +new Date().toLocaleString('en-GB', { timeZone: 'Europe/Riga', hour: '2-digit', hourCycle: 'h23' });
 const GN = (q, hl = 'en', gl = 'US') => `https://news.google.com/rss/search?q=${encodeURIComponent(q + ' when:1d')}&hl=${hl}&gl=${gl}&ceid=${gl}:${hl}`;
@@ -116,10 +117,8 @@ ${list('kunst')}`, PICK_SCHEMA, o => o && Array.isArray(o.verden), 0.2);
 }
 
 const GUIDE = {
-  A1: 'CEFR A1. Very short simple sentences (4–8 words), present tense (some "har + perfektum" is fine), only the most common words, no subordinate clauses. Each story 45–80 words. Gloss 7–9 words per story (all key nouns and verbs that a beginner may not know).',
-  A2: 'CEFR A2. Short clear sentences, present and past tense (preteritum, perfektum), simple connectors (og, men, fordi, så, når). Each story 80–120 words. Gloss 6–8 words per story.',
-  B1: 'CEFR B1. Natural but clear sentences, some subordinate clauses (som, at, hvis, selv om), everyday news vocabulary. Each story 120–170 words. Gloss 5–7 of the hardest or most important words per story.',
-  B2: 'CEFR B2. Natural newspaper-like Bokmål (like NRK), varied syntax, some idioms and fixed expressions, abstract vocabulary is fine. Each story 170–250 words. Gloss 4–6 of the hardest words, idioms or set phrases per story.',
+  A: 'CEFR A1–A2 (beginner to elementary). Short clear sentences (5–12 words), present and simple past tense (preteritum, perfektum), simple connectors (og, men, fordi, så, når), only common everyday words, almost no subordinate clauses. Each story 60–110 words. Gloss 7–9 words per story (all key nouns and verbs a beginner may not know).',
+  B: 'CEFR B1–B2 (intermediate to upper-intermediate). Natural newspaper-like Bokmål (like NRK, a bit simpler), subordinate clauses (som, at, hvis, selv om) and varied syntax, some idioms and fixed expressions, abstract vocabulary is fine. Each story 140–230 words. Gloss 5–6 of the hardest words, idioms or set phrases per story.',
 };
 const WORD = { type: 'OBJECT', required: ['no', 'ru'], properties: { no: { type: 'STRING' }, ru: { type: 'STRING' } } };
 const ISSUE = { type: 'OBJECT', required: ['hilsen', 'items', 'dagens'], properties: {
@@ -158,7 +157,7 @@ ${stories}`, ISSUE, o => o && Array.isArray(o.items) && o.items.length);
   return data;
 }
 const getSrc = async (env, day) => { const r = await env.DB.prepare('SELECT data FROM avis_src WHERE day = ?').bind(day).first(); return r ? JSON.parse(r.data) : null; };
-const getLevel = async env => { const r = await env.DB.prepare("SELECT value FROM meta WHERE key = 'avis_level'").first().catch(() => null); return LEVELS.includes(r && r.value) ? r.value : 'B1'; };
+const getLevel = async env => { const r = await env.DB.prepare("SELECT value FROM meta WHERE key = 'avis_level'").first().catch(() => null); return LEVELS.includes(r && r.value) ? r.value : 'B'; };
 
 // cron (AVIS_CRON, раз в час): с avisHour по Риге — новости дня и выпуск уровня по умолчанию; старше 30 дней — удалить
 export async function avisCron(env, R) {
@@ -265,7 +264,7 @@ details{font:15px system-ui,sans-serif;margin-top:6px}summary{cursor:pointer;col
 .read{font:600 15px system-ui,sans-serif}
 </style></head><body><div class="wrap">
 <header><h1>Morgenavis<small id="date"></small></h1><span class="top"><a href="/norsk/">← учебник норвежского</a></span></header>
-<div class="bar"><span class="lv" id="lv">${LEVELS.map(l => `<button type="button" data-l="${l}">${l}</button>`).join('')}</span>
+<div class="bar"><span class="lv" id="lv">${LEVELS.map(l => `<button type="button" data-l="${l}">${LNAME[l]}</button>`).join('')}</span>
 <select id="day" aria-label="День"></select><button class="btn" id="again" type="button" title="Написать выпуск заново">↻ заново</button></div>
 <p class="hint" id="hint">Нажми на <mark>выделенное слово</mark> — перевод. «+» — слово в словарь учебника. Сначала читай, потом проверяй себя по-русски.</p>
 <main id="main"><div class="load"><b>🐧</b>Пелле несёт газету…</div></main>
@@ -273,7 +272,7 @@ details{font:15px system-ui,sans-serif;margin-top:6px}summary{cursor:pointer;col
 <script>
 (() => {
   const $ = s => document.querySelector(s), esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
-  const SEC = ${JSON.stringify(SECTIONS)};
+  const SEC = ${JSON.stringify(SECTIONS)}, LN = ${JSON.stringify(LNAME)};
   let level = null, day = null, data = null;
   try { level = localStorage.getItem('avis-level'); } catch (e) {}
   const added = new Set(JSON.parse((() => { try { return localStorage.getItem('avis-added') || '[]'; } catch (e) { return '[]'; } })()));
@@ -283,7 +282,7 @@ details{font:15px system-ui,sans-serif;margin-top:6px}summary{cursor:pointer;col
     return t.split(/\\n\\n+/).map(p => '<p>' + esc(p).replace(/\\[\\[(.+?)\\]\\]/g, (_, w) => '<mark data-tr="' + esc(tr(w)) + '">' + w + '</mark>') + '</p>').join('');
   }
   function render() {
-    const d = data; $('#date').textContent = fmt(d.day) + ' · ' + d.level;
+    const d = data; $('#date').textContent = fmt(d.day) + ' · ' + (LN[d.level] || d.level);
     let html = d.hilsen ? '<p class="hilsen">' + esc(d.hilsen) + '</p>' : '';
     if (d.dagens && d.dagens.length) html += '<div class="box dagens"><h3>Dagens ord</h3><ul>' + d.dagens.map(w => '<li><b>' + esc(w.no) + '</b> — ' + esc(w.ru) + ' ' + addBtn(w.no, w.ru, w.ex) + '<br><i>' + esc(w.ex) + '</i></li>').join('') + '</ul></div>';
     let sec = '';
