@@ -1,5 +1,5 @@
 // «Morgenavis» — личная утренняя газета на норвежском для Алины (/norsk/avis/, docs/site.md «Morgenavis»).
-// Каждое утро (свой cron «47 * * * *» в wrangler.jsonc, с avisHour по Риге): RSS трёх разделов (мир, Латвия, искусство) за последние ~30 ч →
+// Каждое утро (свой cron «47 * * * *» в wrangler.jsonc, с avisHour по Риге): RSS пяти разделов (мир, Латвия, искусство, книги/кино/сериалы, игры) + два рассказа (Норвегия; кухня и традиции, по сезону) за последние ~30 ч →
 // Gemini выбирает по 3 главные новости → worker дочитывает статьи → Gemini пересказывает на букмоле уровня A1–A2 или B1–B2
 // (сложные и ключевые слова — с переводом на русский, большие новости — коротко и проще). Уровень по умолчанию готовится утром,
 // остальные — по первому нажатию на вкладку (и тоже сохраняются). Без Claude: только ключ Gemini сайта (бесплатный лимит).
@@ -26,9 +26,12 @@ const FEEDS = {
   verden: ['https://www.nrk.no/urix/toppsaker.rss', 'https://feeds.bbci.co.uk/news/world/rss.xml', GN('world news')],
   latvia: ['https://eng.lsm.lv/rss/', 'https://www.lsm.lv/rss/', GN('Latvia OR Riga', 'en', 'LV')],
   kunst: ['https://www.theartnewspaper.com/rss.xml', 'https://news.artnet.com/feed', 'https://hyperallergic.com/feed/', GN('art exhibition OR museum OR artist')],
+  kultur: ['https://www.theguardian.com/culture/rss', 'https://variety.com/feed/', 'https://www.theguardian.com/books/rss', 'https://www.nrk.no/kultur/toppsaker.rss', GN('new book OR new film OR new TV series release')],
+  spill: ['https://www.pcgamer.com/rss/', 'https://www.rockpapershotgun.com/feed', 'https://www.eurogamer.net/feed', GN('new video game release Steam')],
 };
-export const SECTIONS = { verden: '🌍 Verden', latvia: '🇱🇻 Latvia', kunst: '🎨 Kunst' };
-const PICK = 3;
+// norge и mat — не из лент: тему дня выбирает Gemini (с учётом сезона и норвежского календаря, без повторов за 30 дней) и пишет рассказ сам
+export const SECTIONS = { verden: '🌍 Verden', latvia: '🇱🇻 Latvia', kunst: '🎨 Kunst', kultur: '🎬 Bøker, film og serier', spill: '🎮 Spill', norge: '🇳🇴 Historier fra Norge', mat: '🍲 Mat og tradisjoner' };
+const PICK = { verden: 3, latvia: 2, kunst: 2, kultur: 2, spill: 1 }; // сколько новостей в разделе (решение Алины: больше о культуре, меньше о войне)
 
 // ---------- RSS ----------
 const decode = s => String(s || '').replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/<[^>]+>/g, ' ')
@@ -43,7 +46,8 @@ async function feed(url) {
   return (xml.match(/<(item|entry)[\s>][\s\S]*?<\/\1>/gi) || []).map(x => {
     const link = decode(tag(x, 'link')) || ((x.match(/<link[^>]*href="([^"]+)"/i) || [])[1] || '');
     const when = Date.parse(decode(tag(x, 'pubDate') || tag(x, 'published') || tag(x, 'updated') || tag(x, 'dc:date'))) || 0;
-    return { title: decode(tag(x, 'title')).slice(0, 220), desc: decode(tag(x, 'description') || tag(x, 'summary')).slice(0, 500), link, when, src: host === 'news.google.com' ? decode(tag(x, 'source')) || 'Google News' : host };
+    const img = (x.match(/<media:(?:content|thumbnail)[^>]*url="([^"]+)"/i) || x.match(/<enclosure[^>]*url="([^"]+)"[^>]*type="image/i) || x.match(/<img[^>]*src="([^"]+)"/i) || [])[1] || '';
+    return { img: /^https:\/\//.test(img) ? img.replace(/&amp;/g, '&') : '', title: decode(tag(x, 'title')).slice(0, 220), desc: decode(tag(x, 'description') || tag(x, 'summary')).slice(0, 500), link, when, src: host === 'news.google.com' ? decode(tag(x, 'source')) || 'Google News' : host };
   }).filter(x => x.title && x.link);
 }
 async function collect() {
@@ -55,12 +59,14 @@ async function collect() {
   return out;
 }
 // текст статьи: абзацы <p> со страницы (не вышло — останется описание из RSS)
-async function article(url) {
-  if (/news\.google\.com/.test(url)) return '';
+async function article(url) { // → { text, img } (img — og:image страницы)
+  if (/news\.google\.com/.test(url)) return { text: '', img: '' };
   const r = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; Morgenavis/1.0)' }, signal: AbortSignal.timeout(9000) }).catch(() => null);
-  if (!r || !r.ok || !/html/.test(r.headers.get('content-type') || '')) return '';
-  const html = (await r.text().catch(() => '')).replace(/<(script|style|nav|footer|aside|figure)[\s\S]*?<\/\1>/gi, ' ');
-  return (html.match(/<p[\s>][\s\S]*?<\/p>/gi) || []).map(decode).filter(p => p.length > 50).join('\n').slice(0, 4000);
+  if (!r || !r.ok || !/html/.test(r.headers.get('content-type') || '')) return { text: '', img: '' };
+  const raw = await r.text().catch(() => '');
+  const og = (raw.match(/<meta[^>]+(?:property|name)="(?:og:image|twitter:image)"[^>]+content="([^"]+)"/i) || raw.match(/<meta[^>]+content="([^"]+)"[^>]+(?:property|name)="(?:og:image|twitter:image)"/i) || [])[1] || '';
+  const html = raw.replace(/<(script|style|nav|footer|aside|figure)[\s\S]*?<\/\1>/gi, ' ');
+  return { text: (html.match(/<p[\s>][\s\S]*?<\/p>/gi) || []).map(decode).filter(p => p.length > 50).join('\n').slice(0, 4000), img: /^https:\/\//.test(og) ? og.replace(/&amp;/g, '&') : '' };
 }
 
 // ---------- Gemini ----------
@@ -83,34 +89,55 @@ async function ask(env, prompt, schema, ok, temp = 0.4) {
   throw Object.assign(new Error(err), { code: err });
 }
 const INTS = { type: 'ARRAY', items: { type: 'INTEGER' } };
-const PICK_SCHEMA = { type: 'OBJECT', required: ['verden', 'latvia', 'kunst'], properties: { verden: INTS, latvia: INTS, kunst: INTS } };
+const PICK_SCHEMA = { type: 'OBJECT', required: [...Object.keys(FEEDS), 'norge', 'mat'], properties: { ...Object.fromEntries(Object.keys(FEEDS).map(k => [k, INTS])), norge: { type: 'STRING' }, mat: { type: 'STRING' }, norge_q: { type: 'STRING' }, mat_q: { type: 'STRING' } } };
+// фото к рассказу: Wikimedia Commons (свободная лицензия, без ключа) → { img, photo } (photo — страница файла с автором и лицензией)
+async function commons(q) {
+  if (!q) return {};
+  const u = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=6&prop=imageinfo&iiprop=url|mime&iiurlwidth=900&gsrsearch=' + encodeURIComponent(q + ' filetype:bitmap');
+  const r = await fetch(u, { headers: { 'user-agent': 'Morgenavis/1.0 (personal reading page)' }, signal: AbortSignal.timeout(8000) }).catch(() => null);
+  if (!r || !r.ok) return {};
+  const pages = Object.values(((await r.json().catch(() => ({}))).query || {}).pages || {}).sort((a, b) => (a.index || 0) - (b.index || 0));
+  const f = pages.map(x => (x.imageinfo || [])[0]).find(i => i && /jpeg|png|webp/.test(i.mime || '') && i.thumburl);
+  return f ? { img: f.thumburl, photo: f.descriptionurl || '' } : {};
+}
+const WEEKDAY = d => new Date(d + 'T12:00:00Z').toLocaleDateString('en-GB', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
 
 // утром: собрать новости, выбрать главные, дочитать статьи → avis_src
 async function buildSrc(env, day) {
   const cand = await collect();
   const list = sec => cand[sec].map((x, i) => `${i}. [${x.src}] ${x.title} — ${x.desc.slice(0, 200)}`).join('\n') || '(none)';
-  let pick = { verden: [0, 1, 2], latvia: [0, 1, 2], kunst: [0, 1, 2] };
+  const recent = { norge: [], mat: [] }; // темы рассказов за 30 дней — чтобы не повторяться
+  for (const r of (await env.DB.prepare('SELECT data FROM avis_src WHERE day < ? ORDER BY day DESC LIMIT ?').bind(day, KEEP).all()).results) {
+    try { for (const x of JSON.parse(r.data)) if (x.topic && recent[x.sec]) recent[x.sec].push(x.topic); } catch (e) { /* старый формат */ }
+  }
+  let pick = Object.fromEntries(Object.keys(FEEDS).map(k => [k, [0, 1, 2]]));
   try {
-    pick = await ask(env, `You are the editor of a short morning news digest for a reader living in Riga, Latvia, who is an artist. From each numbered list of headlines from the last 24 hours, choose the ${PICK} most important, newsworthy and varied stories (no duplicates of the same event, no clickbait, no horoscopes, prefer substance over celebrity gossip; for art prefer exhibitions, artists, museums, discoveries, art world news). Return the numbers.
+    pick = await ask(env, `You are the editor of a morning digest for a reader in Riga, Latvia, who is an artist and is learning Norwegian. Today is ${WEEKDAY(day)}.
 
-WORLD:
-${list('verden')}
+PART 1. From each numbered list of headlines from the last 24 hours choose the most important, interesting and varied stories: WORLD ${PICK.verden}, LATVIA ${PICK.latvia}, ART ${PICK.kunst}, CULTURE ${PICK.kultur}, GAMES ${PICK.spill}.
+Rules: no duplicates of the same event, no clickbait, no horoscopes. NEVER choose medicine, health, diseases, hospitals or drugs stories, and NEVER violent or disturbing crime, murders, abuse, terror, disasters with victims or other triggering content. Keep war and military conflict to a minimum: at most ONE such story in WORLD and none elsewhere; prefer science, climate, society, economy, technology and good news. ART: exhibitions, artists, museums, discoveries, art world. CULTURE: trends and notable new releases in world books, films and TV series (premieres, bestsellers, awards), not celebrity gossip. GAMES: notable new or upcoming video games (Steam, consoles, indie), not hardware deals. Return the numbers.
 
-LATVIA:
-${list('latvia')}
+PART 2. Choose today's topics for two short stories written from general knowledge (no news needed). Each topic: one line in English, specific (not "Norwegian food" but e.g. "Fårikål — the national dish and Fårikålens festdag in September").
+For each topic also give a 2–4 word English photo search query for Wikimedia Commons ("norge_q", "mat_q"), e.g. "fårikål dish", "Bryggen Bergen".
+- "norge": an interesting story about Norway — its history, everyday life, customs, places, people, language or society.
+Never choose topics about death, disasters, war or disease.
+- "mat": Norwegian food and traditions — a dish, baking, a custom or a holiday tradition.
+If a Norwegian holiday, tradition day or season-specific custom falls today or within the next 7 days (e.g. Mortensaften, Farsdag, Luciadagen, advent, julebord, Sankthans, 17. mai, påske, Fastelavn, seasonal dishes), prefer it for at least one of the two topics. Do not repeat these recent topics:
+norge: ${recent.norge.slice(0, 30).join(' | ') || '(none)'}
+mat: ${recent.mat.slice(0, 30).join(' | ') || '(none)'}
 
-ART:
-${list('kunst')}`, PICK_SCHEMA, o => o && Array.isArray(o.verden), 0.2);
-  } catch (e) { /* без выбора — первые по порядку ленты */ }
+${Object.keys(FEEDS).map(k => `${k.toUpperCase()}:\n${list(k)}`).join('\n\n')}`, PICK_SCHEMA, o => o && Array.isArray(o.verden), 0.4);
+  } catch (e) { /* без выбора — первые по порядку ленты, без рассказов */ }
   const items = [];
   for (const sec of Object.keys(FEEDS)) {
-    const idx = [...new Set((pick[sec] || []).filter(i => Number.isInteger(i) && cand[sec][i]))].slice(0, PICK);
-    for (let i = 0; idx.length < PICK && i < cand[sec].length; i++) if (!idx.includes(i)) idx.push(i);
+    const idx = [...new Set((pick[sec] || []).filter(i => Number.isInteger(i) && cand[sec][i]))].slice(0, PICK[sec]);
+    for (let i = 0; idx.length < PICK[sec] && i < cand[sec].length; i++) if (!idx.includes(i)) idx.push(i);
     for (const i of idx) items.push({ sec, ...cand[sec][i] });
   }
   if (!items.length) throw Object.assign(new Error('no_news'), { code: 'no_news' });
   const texts = await Promise.all(items.map(x => article(x.link)));
-  items.forEach((x, i) => { x.text = texts[i]; });
+  items.forEach((x, i) => { x.text = texts[i].text; x.img = texts[i].img || x.img || ''; });
+  for (const sec of ['norge', 'mat']) if (pick[sec]) items.push({ sec, topic: String(pick[sec]).slice(0, 200), title: '', link: '', src: '', ...await commons(String(pick[sec + '_q'] || '').slice(0, 80)) });
   await env.DB.prepare('INSERT INTO avis_src (day, data, created_at) VALUES (?, ?, ?) ON CONFLICT(day) DO UPDATE SET data = excluded.data, created_at = excluded.created_at')
     .bind(day, JSON.stringify(items), Date.now()).run();
   return items;
@@ -128,7 +155,9 @@ const ISSUE = { type: 'OBJECT', required: ['hilsen', 'items', 'dagens'], propert
     i: { type: 'INTEGER' }, title: { type: 'STRING' }, kort: { type: 'STRING' }, text: { type: 'STRING' }, words: { type: 'ARRAY', items: WORD }, ru: { type: 'STRING' }, q: { type: 'STRING' } } } } } };
 
 // выпуск уровня: пересказ всех выбранных новостей одним вызовом → avis
-async function buildIssue(env, day, level, src) {
+async function buildIssue(env, day, level, all) {
+  const src = all.filter(x => !x.topic), topics = all.filter(x => x.topic);
+  const tales = topics.length ? buildTales(env, day, level, topics).catch(e => { console.error('avis tales', e); return []; }) : [];
   const stories = src.map((x, i) => `#${i} [${x.sec}] ${x.title}\nSource: ${x.src}\n${x.text || x.desc}`).join('\n\n---\n\n');
   const out = await ask(env, `You write a daily news digest in Norwegian Bokmål for an adult Russian-speaking learner of Norwegian who lives in Riga and is an artist. The goal: read more Norwegian every day and understand it fluently.
 
@@ -149,12 +178,35 @@ Use correct modern Bokmål spelling and grammar. Do not use English words when a
 STORIES:
 
 ${stories}`, ISSUE, o => o && Array.isArray(o.items) && o.items.length);
-  const items = out.items.filter(x => src[x.i]).map(x => ({ sec: src[x.i].sec, link: src[x.i].link, src: src[x.i].src, title: String(x.title).slice(0, 200), kort: String(x.kort || '').slice(0, 300),
+  const items = out.items.filter(x => src[x.i]).map(x => ({ sec: src[x.i].sec, link: src[x.i].link, src: src[x.i].src, img: src[x.i].img || '', title: String(x.title).slice(0, 200), kort: String(x.kort || '').slice(0, 300),
     text: String(x.text).slice(0, 3000), words: (x.words || []).slice(0, 12).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80) })), ru: String(x.ru).slice(0, 500), q: String(x.q || '').slice(0, 200) }));
+  items.push(...await tales);
   const data = { day, level, hilsen: String(out.hilsen || '').slice(0, 400), dagens: (out.dagens || []).slice(0, 5).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80), ex: String(w.ex).slice(0, 200) })), items };
   await env.DB.prepare('INSERT INTO avis (day, level, data, created_at) VALUES (?, ?, ?, ?) ON CONFLICT(day, level) DO UPDATE SET data = excluded.data, created_at = excluded.created_at')
     .bind(day, level, JSON.stringify(data), Date.now()).run();
   return data;
+}
+const STORY = { type: 'OBJECT', required: ['items'], properties: { items: { type: 'ARRAY', items: { type: 'OBJECT', required: ['i', 'title', 'text', 'words', 'ru', 'q'], properties: {
+  i: { type: 'INTEGER' }, title: { type: 'STRING' }, text: { type: 'STRING' }, words: { type: 'ARRAY', items: WORD }, ru: { type: 'STRING' }, q: { type: 'STRING' } } } } } };
+const TALE_LEN = { A: '90–140 words', B: '180–260 words' };
+// рассказы дня (norge, mat) — из общих знаний Gemini, тот же формат, что у новостей
+async function buildTales(env, day, level, topics) {
+  const out = await ask(env, `You write short reading texts in Norwegian Bokmål for an adult Russian-speaking learner of Norwegian (an artist living in Riga). Today is ${WEEKDAY(day)}.
+
+Level: ${GUIDE[level]} Length of each text: ${TALE_LEN[level]}.
+
+Write one text for EVERY topic below (field "i" = the topic number):
+${topics.map((x, i) => `#${i} [${x.sec === 'mat' ? 'Norwegian food and traditions' : 'a story about Norway'}] ${x.topic}`).join('\n')}
+
+Make it vivid and personal, like a friendly magazine column: everyday details, how Norwegians really do it, a small surprising fact. For food: what it is, when and how it is eaten, and if it fits, 3–4 simple steps of how it is made. If the day is today or soon, say so. Use only well-established facts; if unsure about a date, number or name, leave it out.
+- "title": a short Norwegian title.
+- "text": 2–3 short paragraphs separated by "\n\n". Mark every glossed word exactly as it appears in the text with double square brackets, e.g. "Vi [[baker]] [[boller]]."
+- "words": the glossed words: "no" = dictionary form (nouns with en/ei/et, verbs with å), "ru" = short Russian translation (1–4 words).
+- "ru": 1–2 sentences in Russian: what the text says (for self-check).
+- "q": one short comprehension question in Norwegian at this level.
+Use correct modern Bokmål.`, STORY, o => o && Array.isArray(o.items) && o.items.length, 0.6);
+  return out.items.filter(x => topics[x.i]).map(x => ({ sec: topics[x.i].sec, link: '', src: '', img: topics[x.i].img || '', photo: topics[x.i].photo || '', title: String(x.title).slice(0, 200), kort: '', text: String(x.text).slice(0, 3000),
+    words: (x.words || []).slice(0, 12).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80) })), ru: String(x.ru).slice(0, 500), q: String(x.q || '').slice(0, 200) }));
 }
 const getSrc = async (env, day) => { const r = await env.DB.prepare('SELECT data FROM avis_src WHERE day = ?').bind(day).first(); return r ? JSON.parse(r.data) : null; };
 const getLevel = async env => { const r = await env.DB.prepare("SELECT value FROM meta WHERE key = 'avis_level'").first().catch(() => null); return LEVELS.includes(r && r.value) ? r.value : 'B'; };
@@ -264,8 +316,13 @@ details{font:15px system-ui,sans-serif;margin-top:6px}summary{cursor:pointer;col
 .load{text-align:center;padding:60px 0;color:var(--mute);font:16px system-ui,sans-serif}
 .load b{display:block;font-size:40px;animation:bob 1.2s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-8px)}}
 .read{font:600 15px system-ui,sans-serif}
+.toc{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;padding:8px 0;margin:8px 0;background:var(--bg);font:600 14px system-ui,sans-serif;scrollbar-width:none}
+.toc::-webkit-scrollbar{display:none}.toc a{flex:none;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
+.toc a:hover{border-color:var(--acc);color:var(--acc)}
+h2.sec{scroll-margin-top:56px;display:flex;justify-content:space-between;align-items:center}.up{color:var(--mute);text-decoration:none;font-size:16px}
+.pic{display:block;width:100%;aspect-ratio:16/9;max-height:300px;object-fit:cover;border-radius:12px;margin:8px 0 4px;background:var(--acc2)}
 </style></head><body><div class="wrap">
-<header><h1>Morgenavis<small id="date"></small></h1><span class="top"><a href="/norsk/">← учебник норвежского</a></span></header>
+<header id="top"><h1>Morgenavis<small id="date"></small></h1><span class="top"><a href="/norsk/">← учебник норвежского</a></span></header>
 <div class="bar"><span class="lv" id="lv">${LEVELS.map(l => `<button type="button" data-l="${l}">${LNAME[l]}</button>`).join('')}</span>
 <select id="day" aria-label="День"></select><button class="btn" id="again" type="button" title="Написать выпуск заново">↻ заново</button></div>
 <p class="hint" id="hint">Нажми на <mark>выделенное слово</mark> — перевод. «+» — слово в словарь учебника. Сначала читай, потом проверяй себя по-русски.</p>
@@ -310,14 +367,16 @@ details{font:15px system-ui,sans-serif;margin-top:6px}summary{cursor:pointer;col
     $('#date').textContent = fmt(d.day) + ' · ' + (LN[d.level] || d.level);
     let html = d.hilsen ? '<p class="hilsen tx">' + wrap(d.hilsen) + '</p>' : '';
     if (d.dagens && d.dagens.length) html += '<div class="box dagens"><h3>Dagens ord</h3><ul>' + d.dagens.map(w => '<li><b>' + esc(w.no) + '</b> — ' + esc(w.ru) + ' ' + addBtn(w.no, w.ru, w.ex) + '<br><i class="tx">' + wrap(w.ex) + '</i></li>').join('') + '</ul></div>';
+    const secs = [...new Set(d.items.map(x => x.sec))];
+    html += '<nav class="toc" aria-label="Разделы">' + secs.map(k => '<a href="#s-' + k + '">' + esc(SEC[k] || k) + '</a>').join('') + '</nav>';
     let sec = '';
     d.items.forEach((x, i) => {
-      if (x.sec !== sec) { sec = x.sec; html += '<h2 class="sec">' + esc(SEC[sec] || sec) + '</h2>'; }
+      if (x.sec !== sec) { sec = x.sec; html += '<h2 class="sec" id="s-' + sec + '">' + esc(SEC[sec] || sec) + '<a class="up" href="#top" aria-label="Наверх">↑</a></h2>'; }
       const plain = x.text.replace(/\\[\\[(.+?)\\]\\]/g, '$1');
-      html += '<article data-i="' + i + '"><h3 class="tx">' + wrap(x.title) + '</h3>' + (x.kort ? '<p class="kort tx">📌 ' + wrap(x.kort) + '</p>' : '') + '<div class="tx">' + marks(x.text) + '</div>'
+      html += '<article data-i="' + i + '">' + (x.img ? '<img class="pic" src="' + esc(x.img) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">' : '') + '<h3 class="tx">' + wrap(x.title) + '</h3>' + (x.kort ? '<p class="kort tx">📌 ' + wrap(x.kort) + '</p>' : '') + '<div class="tx">' + marks(x.text) + '</div>'
         + (x.words.length ? '<ul class="words">' + x.words.map(w => '<li><span><b>' + esc(w.no) + '</b> — ' + esc(w.ru) + '</span>' + addBtn(w.no, w.ru, (plain.split(/(?<=[.!?])\\s+/).find(s => s.toLowerCase().includes(w.no.toLowerCase().replace(/^(en|ei|et|å) /, '').slice(0, 4))) || '')) + '</li>').join('') + '</ul>' : '')
         + (x.q ? '<p class="q tx">❓ ' + wrap(x.q) + '</p>' : '')
-        + '<div class="tools"><button class="btn" type="button" data-say="' + i + '">🔊 Les høyt</button><a href="' + esc(x.link) + '" target="_blank" rel="noopener">kilde: ' + esc(x.src) + '</a></div>'
+        + '<div class="tools"><button class="btn" type="button" data-say="' + i + '">🔊 Les høyt</button>' + (x.link ? '<a href="' + esc(x.link) + '" target="_blank" rel="noopener">kilde: ' + esc(x.src) + '</a>' : '') + (x.photo ? '<a href="' + esc(x.photo) + '" target="_blank" rel="noopener">foto: Wikimedia Commons</a>' : '') + '</div>'
         + '<details><summary>Проверить себя по-русски</summary><p>' + esc(x.ru) + '</p></details></article>';
     });
     const n = d.items.reduce((s, x) => s + x.text.split(/\\s+/).length, 0);
