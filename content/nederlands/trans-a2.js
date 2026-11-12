@@ -147,4 +147,9 @@ Object.assign(window.NL_TR, {
   "Hier kun je oversteken.": "Здесь можно перейти дорогу.",
   "Met tegenwind fiets je langzaam.": "При встречном ветре едешь медленно.",
   "Ze brengt de kinderen met de bakfiets naar school.": "Она возит детей в школу на грузовом велосипеде.",
+  // Часть 7: новые слова тем после чистки повторов
+  "Mijn oma tuiniert elke dag.": "Бабушка каждый день возится в саду.",
+  "Op zondag gaat hij vissen.": "По воскресеньям он ходит на рыбалку.",
+  "Neem op de rotonde de tweede afslag.": "На кругу — второй съезд.",
+  "Fietsers van rechts hebben voorrang.": "Велосипедисты справа имеют преимущество.",
 });

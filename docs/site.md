@@ -133,6 +133,7 @@ _Пункты перенесены дословно из docs/_claude-old.md (э
 - 11.11.2026 Часть 5: C1 (c1.js, trans-c1.js; темы и шоу C1 дописаны в topics.js/series.js): канцелярит и ясный язык, пассив, нереальное и zou, Фландрия и tussentaal, аргументация, идиомы и er + предлог. Повесть, вторая часть «Joop over de grens», главы 25–30: Баарле → Антверпен → Гент → Брюгге → Остенде, с галкой Лови.
 - Сборка: `python3 tools/nederlands_page.py [--html файл]` → worker/nederlands-page.js; проверка: `node tools/nederlands_check.js файл.html`. Дальше — Часть 2 (A2) по скиллу .claude/skills/textbook.
 - 11.11.2026 Часть 6: C2 (content/nederlands/c2.js, переводы trans-c2.js; темы и шоу — в конце topics.js и series.js). Уроки: синонимы, ирония и прямота, книжный язык и Марсман, игра слов (de/het, ei/ij), канцелярит и речь, язык сегодня (straattaal, англицизмы, фламандский). Главы 31–36 «Joop over de grens»: Ваддензе, финал.
+- 12.11.2026 Часть 7 (шлифовка): шапка главы и оглавление книги делят повесть на две части (`bookTitle(u)` в engine.js: C1–C2 — «Joop over de grens»), ачивка `grens`; описания уровней в LEVELS по фактическим урокам; повторы слов в topics.js убраны (новые примеры — в конце trans-*.js, блок «Часть 7»); стыки повести B1→B2→C1→C2 сглажены.
 - 11.11.2026 Часть 3: B1 (content/nederlands/b1.js, trans-b1.js; темы и шоу B1 — в конце topics.js, series.js), повесть — главы 13–18, Делфт. В engine.js grammar(): правило «zijn + deelwoord» не трогает пассив (только ik/jij/wij/jullie, без door).
 
 ## Учебник норвежского /norsk/ (личный)

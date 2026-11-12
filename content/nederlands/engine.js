@@ -11,11 +11,11 @@
 
   const LEVELS = [
     { id: 'A1', name: 'Начальный', about: 'Звуки ui, ij, g, порядок слов, presens, de и het, niet и geen. С нуля и без паники.' },
-    { id: 'A2', name: 'Элементарный', about: 'Perfectum с hebben и zijn, прошедшее, прилагательные с -e, предлоги, er и первые инверсии.' },
+    { id: 'A2', name: 'Элементарный', about: 'Perfectum с hebben и zijn, imperfectum, прилагательные с -e, модальные и будущее, отделяемые глаголы и er.' },
     { id: 'B1', name: 'Средний', about: 'Придаточные (глагол в конец), отделяемые глаголы, возвратные, пассив, связки. Пословицы и выражения.' },
-    { id: 'B2', name: 'Выше среднего', about: 'Все лица er, порядок глаголов в конце, частицы maar/even/toch/wel, фламандский на слух, эссе.' },
-    { id: 'C1', name: 'Продвинутый', about: 'Регистр и деловой язык, номинализация, нереальное, устойчивые сочетания, аргументация, идиомы.' },
-    { id: 'C2', name: 'Свободный', about: 'Оттенки синонимов, ирония и голландская прямота, литература в оригинале, игра слов, язык сегодня.' },
+    { id: 'B2', name: 'Выше среднего', about: 'Частицы maar/even/toch/wel, пять лиц er, цепочки глаголов в конце, фламандский на слух, косвенная речь, эссе.' },
+    { id: 'C1', name: 'Продвинутый', about: 'Канцелярит и ясный язык, пассив во всех временах, нереальное и zou, Vlaams и tussentaal, аргументация, идиомы.' },
+    { id: 'C2', name: 'Свободный', about: 'Оттенки синонимов, ирония и прямота, литература в оригинале, игра слов, публичная речь и тост, straattaal и англицизмы.' },
   ];
   const SHOWS = { // «Как говорят голландцы»: пословицы, выражения и «типично голландское» (вместо цитат из сериалов в английском учебнике)
     spreekwoord: { name: 'Spreekwoord · пословица', cls: 's-spreekwoord' },
@@ -32,6 +32,8 @@
   const byId = id => UNITS.find(u => u.id === id);
   const EXTRA = window.NL_EXTRA || {}, BOOK = window.NL_BOOK || { parts: [] }, NOTES = window.NL_NOTES || {};
   const bookOf = u => BOOK.parts.find(p => p.u === u.id);
+  const BOOK2 = 'Joop over de grens'; // вторая часть повести — C1–C2
+  const bookTitle = u => (u && /^C/.test(u.lvl) ? BOOK2 : BOOK.title);
   const PICS = window.NL_PICS || {}; // картинок к книге пока нет (в английском — Тенниел); формат как content/english/pics.js
   // линии рисунка — цветом текста темы: картинка служит маской (сама прозрачна и только задаёт размер)
   const picHTML = (x, cls = '') => `<figure class="tenniel ${cls}"><span class="tn" style="-webkit-mask-image:url(/images/english/tenniel-${x.n}.webp);mask-image:url(/images/english/tenniel-${x.n}.webp)"><img src="/images/english/tenniel-${x.n}.webp" alt="${esc(x.alt)}" loading="lazy"></span><figcaption><i class="en">${esc(x.alt)}</i> <span>— John Tenniel, 1865</span></figcaption></figure>`;
@@ -225,8 +227,9 @@
     ['spreekwoord', '🧀', 'Wie het kleine niet eert…', 'Все пословицы из уроков', () => showAny('spreekwoord') && showDone('spreekwoord')],
     ['uitdrukking', '🍟', 'Met de deur in huis', 'Все выражения из уроков', () => showAny('uitdrukking') && showDone('uitdrukking')],
     ['typisch', '🌷', 'Gezellig!', 'Все «Typisch Nederlands» из уроков', () => showAny('typisch') && showDone('typisch')],
-    ['book1', '🚲', 'Eerste rit', 'Первая часть книги курса с заданиями', () => nBook() >= 1],
+    ['book1', '🚲', 'Eerste rit', 'Первая глава книги курса с заданиями', () => nBook() >= 1],
     ['book25', '🗺️', 'Halverwege', 'Половина книги курса', () => nBook() >= Math.ceil(BOOK.parts.length / 2)],
+    ['grens', '🇧🇪', 'Over de grens', 'Первая глава второй части книги — «Joop over de grens»', () => isDone('c1-1-b')],
     ['bookAll', '👑', 'Книга прочитана', 'Вся книга курса по-нидерландски', () => BOOK.parts.length && nBook() >= BOOK.parts.length],
     ['flodder', '🏚️', 'Buren van de hel', 'Все сцены в духе «Flodder»', () => showAny('flodder') && showDone('flodder')],
     ['torenc', '🏢', 'Kantoorleven', 'Все сцены в духе «Toren C»', () => showAny('torenc') && showDone('torenc')],
@@ -828,8 +831,8 @@
   }
   function bookHTML(u, bk, N) {
     const k = BOOK.parts.indexOf(bk);
-    return `<section class="sec" id="book"><span id="book-${u.id}"></span><h3><span class="ic">⛵</span>Книга: «${esc(BOOK.title)}»</h3>${crow(N.bcrow || crowPick('book'), 'small')}
-      <p class="note-s">Часть ${k + 1} из ${BOOK.parts.length} · повесть, написанная для этого учебника: язык растёт вместе с уровнями. ${esc(bk.ch)} · ${bk.n} слов. К концу учебника — вся книга.</p>
+    return `<section class="sec" id="book"><span id="book-${u.id}"></span><h3><span class="ic">⛵</span>Книга: «${esc(bookTitle(u))}»</h3>${crow(N.bcrow || crowPick('book'), 'small')}
+      <p class="note-s">Глава ${k + 1} из ${BOOK.parts.length} · повесть, написанная для этого учебника: язык растёт вместе с уровнями. ${esc(bk.ch)} · ${bk.n} слов. К концу учебника — вся книга.</p>
       ${N.ru ? `<div class="box bk-ru"><h4>${['A1', 'A2'].includes(u.lvl) ? 'Сначала по-русски: что будет в отрывке' : 'Перед чтением'}</h4><p>${fmt(N.ru)}</p></div>` : ''}
       <article class="reading book">${bk.h.map(x => `<h4>${esc(x)}</h4>`).join('')}<div class="txt">${bk.txt.map((p, j) => { const ps = PICS[k] || []; return ps.filter(x => x.at === j && !x.after).map(x => picHTML(x)).join('') + `<p>${glossText(p, N.gl)}</p>` + ps.filter(x => x.at === j && x.after).map(x => picHTML(x)).join(''); }).join('')}</div>
       <p>${sayBtn(bk.txt.join(' ').replace(/<br>/g, ' ').replace(/&amp;/g, '&').slice(0, 3000))} <span class="note-s">послушать отрывок (начало)</span></p>
@@ -896,7 +899,7 @@
       <div class="box fixbox"><h4>🩹 Слабые места</h4>${nx ? `<p>Ошибок к отработке: <b>${nx}</b>.${weak.length ? ' Чаще всего ошибки в уроках: ' + weak.map(([u, r]) => `<a href="#u/${u.id}">${esc(u.lvl + ' · ' + u.t)}</a> (${Math.round(r * 100)} %)`).join(', ') + '.' : ''}</p><p><a class="btn primary small" href="#fix">Работа над ошибками</a></p>` : '<p class="note-s">Пока ошибок нет — или пока нет заданий. Где будут ошибаться чаще всего, там и появятся новые задания.</p>'}</div>
       ${f ? `<div class="box fact"><h4>💡 Факт дня</h4><p>${fmt(f.fact)}</p></div>` : ''}
       ${e1 ? `<div class="box etym"><h4>🔎 Слово дня: откуда оно</h4><p><b class="en">${esc(e1[1][0])}</b> — ${fmt(e1[1][1])}</p><p class="note-s"><a href="#etym">Все истории слов</a></p></div>` : ''}
-      <div class="box bk-ru"><h4>🚲 Книга курса</h4><p>По ходу уроков — повесть «${esc(BOOK.title)}»: чайка Йоп едет на велосипеде из Схевенингена через Гаагу, Делфт и Роттердам в Амстердам, а на C1–C2 — дальше, во Фландрию и на острова Ваддензе. В каждом уроке — следующая глава и задания к ней, язык усложняется вместе с уровнями. Прочитано частей: <b>${nBook()} из ${BOOK.parts.length}</b>. <a href="#book">Оглавление книги</a></p></div>
+      <div class="box bk-ru"><h4>🚲 Книга курса</h4><p>По ходу уроков — повесть «${esc(BOOK.title)}»: чайка Йоп едет на велосипеде из Схевенингена через Гаагу, Делфт и Роттердам в Амстердам, а на C1–C2 — вторая часть, «${BOOK2}»: Фландрия и острова Ваддензе. В каждом уроке — следующая глава и задания к ней, язык усложняется вместе с уровнями. Прочитано глав: <b>${nBook()} из ${BOOK.parts.length}</b>. <a href="#book">Оглавление книги</a></p></div>
       <h2>Уровни</h2><p>Начинаем с нуля. Если уровень уже есть — сдайте тест уровня: от 85 % можно идти дальше.</p>
       <div class="levels">${LEVELS.map(l => { const us = unitsOf(l.id); return `<div class="lvcard"><h3><span>${l.id}</span>${esc(l.name)}</h3><p>${esc(l.about)}</p><p>${us.length} уроков · ${levelPct(l.id)} %${S.d['lt-' + l.id] != null ? ` · тест: ${S.d['lt-' + l.id]} %` : ''}</p><div class="m"><i style="width:${levelPct(l.id)}%"></i></div>
         <div class="row">${us.length ? `<a class="btn small primary" href="#u/${(us.find(u => unitPct(u) < 100) || us[0]).id}">Открыть</a><a class="btn small" href="#test/${l.id}">Тест уровня</a>` : '<span class="note-s">скоро</span>'}</div></div>`; }).join('')}</div>
@@ -931,7 +934,7 @@
     const sec = (h, items) => items.length ? grouped(items).map((g, i) => ({ ...g, h: (i ? '' : `<b>${h}.</b> `) + HOW[g.t] })) : [];
     const groups = [...sec('Грамматика', gram), ...sec('Чтение', read), ...sec('Понимание: выражения', und), ...sec('Слушание', lsn), ...sec('Говорение', spk)];
     view.innerHTML = `<div class="uhead"><div class="lv">Уровень ${lv}</div><h2>Тест уровня ${lv}</h2><p class="sub">Грамматика, чтение, понимание, слушание и говорение — задания из уроков уровня, каждый раз новые. От 85 % уровень можно считать пройденным: откроются все его уроки и следующий уровень.</p></div>
-      ${crow('Экзамен! Я надел праздничный свитер с оленями. Без паники: всё это уже было в уроках.')}
+      ${crow('Экзамен! Я даже картошку фри отложил. Ненадолго. Без паники: всё это уже было в уроках.')}
       ${rdHTML}${blockHTML('lt-' + lv, 'Тест ' + lv, groups)}<p><a class="btn" href="#test/${lv}" data-retest>Новый набор вопросов</a> <a class="btn" href="#home">На главную</a></p>`;
   }
   function fixPage() {
@@ -945,9 +948,9 @@
       ${items.length ? blockHTML('fx-all', 'Набор по слабым местам', grouped(items)) + `<p><a class="btn" href="#fix" data-retest>Новый набор</a></p>` : '<p>Ошибок пока нет. Йоп даже не нашёл, к чему придраться, и ушёл за картошкой фри.</p>'}`;
   }
   function bookPage() {
-    view.innerHTML = `<div class="uhead"><div class="lv">Книга курса</div><h2>${esc(BOOK.title)}</h2><p class="sub">Повесть для учебника · ${BOOK.parts.length} частей — по одной в каждом уроке</p></div>
+    view.innerHTML = `<div class="uhead"><div class="lv">Книга курса</div><h2>${esc(BOOK.title)}</h2><p class="sub">Повесть для учебника в двух частях · ${BOOK.parts.length} глав — по одной в каждом уроке</p></div>
       ${crow('Повесть про чайку, которая едет на велосипеде через всю страну за… ну, читайте сами. Спойлер: там есть картошка фри. И встречный ветер.')}
-      <ol class="booktoc">${BOOK.parts.map((bp, i) => { const u = byId(bp.u); if (!u) return ''; const done = isDone(u.id + '-b'); return `<li class="${done ? 'done' : ''}"><b>${esc(bp.ch)}</b><br>${unitOpen(u) ? `<a href="#u/${u.id}">Часть ${i + 1}</a>` : `🔒 Часть ${i + 1}`} <span class="note-s">· урок ${esc(u.lvl + ' · ' + u.t)} · ${bp.n} слов${done ? ' · ✓' : ''}</span></li>`; }).join('')}</ol>
+      <ol class="booktoc">${BOOK.parts.map((bp, i) => { const u = byId(bp.u); if (!u) return ''; const done = isDone(u.id + '-b'); const prev = i && byId(BOOK.parts[i - 1].u); return `${i === 0 || (prev && bookTitle(prev) !== bookTitle(u)) ? `<li class="bk-part"><h3>${i ? 'Часть вторая' : 'Часть первая'}: «${esc(bookTitle(u))}»</h3></li>` : ''}<li class="${done ? 'done' : ''}"><b>${esc(bp.ch)}</b><br>${unitOpen(u) ? `<a href="#u/${u.id}">Глава ${i + 1}</a>` : `🔒 Глава ${i + 1}`} <span class="note-s">· урок ${esc(u.lvl + ' · ' + u.t)} · ${bp.n} слов${done ? ' · ✓' : ''}</span></li>`; }).join('')}</ol>
       <p class="note-s">Текст написан для учебника: в начале — короткие простые фразы, к B2 — настоящая проза.</p>`;
   }
   function podsPage() {
