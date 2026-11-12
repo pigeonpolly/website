@@ -263,7 +263,7 @@
             + (u.norsk ? `<a role="menuitem" href="/norsk/"><i aria-hidden="true">🇳🇴</i>${t('norsk')}</a>` : '') // учебник норвежского (worker/norsk.js)
             + (u.nederlands ? `<a role="menuitem" href="/nederlands/"><i aria-hidden="true">🇳🇱</i>${t('nederlands')}</a>` : '') // учебник нидерландского (worker/nederlands.js)
             : `<a role="menuitem" href="${pre}/challenge/">${t('nick')}</a>`}
-          ${u.admin ? `<hr><a role="menuitem" href="/admin/"><i aria-hidden="true">⚙</i>${t('cabinet')}</a>${document.querySelector('[data-ppb]') ? `<button type="button" role="menuitem" data-edit><i aria-hidden="true">✏️</i>${t('edit')}</button>` : ''}` : ''}
+          ${u.admin ? `<hr><a role="menuitem" href="/admin/"><i aria-hidden="true">⚙</i>${t('cabinet')}</a><a role="menuitem" href="/admin/#runes"><i aria-hidden="true">🔮</i>Руны</a>${document.querySelector('[data-ppb]') ? `<button type="button" role="menuitem" data-edit><i aria-hidden="true">✏️</i>${t('edit')}</button>` : ''}` : ''}
           <hr><button type="button" role="menuitem" data-out>${t('out')}</button>
         </div>`;
       // админ: режим правки блоков страницы (site-edit.js грузится только для админа)

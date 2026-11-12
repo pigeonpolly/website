@@ -188,7 +188,7 @@
     ];
     const more = Object.entries(ADMIN_GROUPS).map(([g, name]) => `<div><b>${name}</b>${inGroup(g).map(x => `<a href="${x.href || '#' + x.id}"${x.href ? ' class="adm-ext"' : ''}>${x.ic} ${x.name}${x.href ? ' ↗' : ''}</a>`).join('')}</div>`).join('');
     main.innerHTML = `<div class="adm-week">
-      <header class="wk-hi"><h2>${hello()}, Алина</h2><p>Неделя ${isoWeek()} · всё, что нужно на неделе, — на одном экране</p></header>
+      <header class="wk-hi"><h2>${hello()}, Алина</h2><p>Неделя ${isoWeek()} · всё, что нужно на неделе, — на одном экране · <a href="#runes">🔮 Руны</a></p></header>
       <div class="wk-pause${d.pause && d.pause.on ? ' on' : ''}">${d.pause && d.pause.on
         ? `<span><b>⏸ Сайт на паузе</b>${d.pause.at ? ' с ' + wkDay(d.pause.at) : ''}. Посетители видят «🎨 Ведутся работы», вы ходите по сайту как обычно.</span><a class="pill-btn" href="/pause" target="_blank">👀 Как это видят</a><button class="pill-btn pill-fill" type="button" id="wk-pause" data-on="0">▶ Включить сайт</button>`
         : `<span>Сайт работает. Пауза — для всех, кроме вас, вместо страниц будет «🎨 Ведутся работы, скоро всё будет отлично».</span><a class="pill-btn" href="/pause" target="_blank">👀 Как это выглядит</a><button class="pill-btn" type="button" id="wk-pause" data-on="1">⏸ Поставить на паузу</button>`}</div>
