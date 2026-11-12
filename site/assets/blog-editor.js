@@ -944,11 +944,36 @@
     }
     fetch('/assets/blog-restore.json').then(r => r.ok ? r.json() : {}).catch(() => ({})).then(j => {
       BLUR = (j && j._blurred) || {};
+      sameSpot();
       if (!patIds().length || $('#be-patfresh')) return;
       if (!leftovers) status('В статье есть картинки с Patreon, которые не видно или видно размытыми.');
       $('.be-status').insertAdjacentHTML('beforeend', ' <button type="button" class="bc-link" id="be-patfresh">📋 Вернуть картинки из Patreon</button>');
       $('#be-patfresh').addEventListener('click', patFresh);
     });
+    // картинка не открывается (чужая ссылка или размытая), а в другой языковой версии на том же по счёту месте — своя, с сайта: предлагаем взять её
+    const isBad = src => foreign(src) || !!BLUR[src];
+    function sameSpot() {
+      const fix = [];
+      bodies.forEach(b => {
+        const mine = [...b.querySelectorAll('img')];
+        mine.forEach((img, k) => {
+          if (!isBad(img.getAttribute('src') || '')) return;
+          for (const o of bodies) {
+            if (o === b) continue;
+            const src = (o.querySelectorAll('img')[k] || {}).getAttribute?.('src') || '';
+            if (src && !isBad(src) && o.querySelectorAll('img').length === mine.length) { fix.push({ img, src, from: o.dataset.k.slice(2).toUpperCase(), to: b.dataset.k.slice(2).toUpperCase() }); break; }
+          }
+        });
+      });
+      if (!fix.length) return;
+      const where = [...new Set(fix.map(f => `${f.to} (из ${f.from})`))].join(', ');
+      $('.be-status').insertAdjacentHTML('beforeend', ` <span id="be-samespot">· В других языковых версиях на этих местах есть рабочие картинки: ${where}. <button type="button" class="bc-link">↺ Взять их (${fix.length})</button></span>`);
+      $('#be-samespot button').addEventListener('click', () => {
+        fix.forEach(f => { f.img.setAttribute('src', f.src); const fig = f.img.closest('figure'); fig && fig.classList.remove('be-img-bad'); });
+        touch(); $('#be-samespot').remove();
+        status(`Готово: поставлено ${fix.length} — проверьте, что это те же картинки, и нажмите «Сохранить изменения».`);
+      });
+    }
     // Patreon: ссылки на картинки со временем гаснут. В каждой есть номер поста и код файла — Алина копирует пост с Patreon целиком,
     // а мы берём из него свежие ссылки на те же файлы (текст статьи не трогаем) и сразу копируем картинки на сайт
     const PAT = /\/p\/post\/(\d+)\/([0-9a-f]{16,})\//i;
