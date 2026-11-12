@@ -16,7 +16,7 @@ export const AVIS_RULES = { avisOn: true, avisHour: 6 };
 export const AVIS_RANGE = { avisHour: [3, 12] };
 export const AVIS_INT = ['avisHour'];
 export const AVIS_CRON = '47 * * * *';
-const V = 3; // версия формата набора и выпуска: старше — за сегодня пересобрать (3 — сплетни Сиссель)
+const V = 4; // версия формата набора и выпуска: старше — за сегодня пересобрать (4 — вдохновение; 3 — сплетни Сиссель)
 const LEVELS = ['A', 'B'], KEEP = 30; // два уровня (решение Алины): A = A1–A2, B = B1–B2
 const LNAME = { A: 'A1–A2', B: 'B1–B2' };
 const rigaDay = (t = Date.now()) => new Date(t).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
@@ -33,7 +33,7 @@ const FEEDS = {
   sladder: ['https://people.com/feed/', 'https://www.eonline.com/syndication/feeds/rssfeeds/topstories.xml', 'https://www.seher.no/rss', GN('celebrity news')],
 };
 // norge и mat — не из лент: тему дня выбирает Gemini (с учётом сезона и норвежского календаря, без повторов за 30 дней) и пишет рассказ сам
-export const SECTIONS = { verden: '🌍 Verden', latvia: '🇱🇻 Latvia', kunst: '🎨 Kunst', kultur: '🎬 Bøker, film og serier', spill: '🎮 Spill', sladder: '💬 Sladder med Sissel', norge: '🇳🇴 Historier fra Norge', mat: '🍲 Mat og tradisjoner' };
+export const SECTIONS = { verden: '🌍 Verden', latvia: '🇱🇻 Latvia', kunst: '🎨 Kunst', kultur: '🎬 Bøker, film og serier', spill: '🎮 Spill', sladder: '💬 Sladder med Sissel', insp: '📌 Inspirasjon', norge: '🇳🇴 Historier fra Norge', mat: '🍲 Mat og tradisjoner' };
 const FALLBACK = { // запасные темы рассказов: [тема, запрос фото для Commons]
   norge: [['Hurtigruten — the coastal express along Norway', 'Hurtigruten ship'], ['Bryggen in Bergen — the old Hanseatic wharf', 'Bryggen Bergen'], ['Allemannsretten — the right to roam in Norwegian nature', 'Norway hiking trail'],
     ['Stave churches of Norway', 'Borgund stave church'], ['Friluftsliv — why Norwegians love being outdoors', 'Norway mountain cabin'], ['The Sami people and their culture', 'Sami lavvu'],
@@ -172,7 +172,7 @@ const ISSUE = { type: 'OBJECT', required: ['hilsen', 'items', 'dagens'], propert
 // выпуск уровня: пересказ всех выбранных новостей одним вызовом → avis
 async function buildIssue(env, day, level, all) {
   const src = all.filter(x => !x.topic), topics = all.filter(x => x.topic);
-  const tales = topics.length ? buildTales(env, day, level, topics).catch(e => { console.error('avis tales', e); return []; }) : [];
+  const tales = topics.length ? buildTales(env, day, level, topics).catch(e => { console.error('avis tales', e); return { items: [], insp: [] }; }) : { items: [], insp: [] };
   const stories = src.map((x, i) => `#${i} [${x.sec}] ${x.title}\nSource: ${x.src}\n${x.text || x.desc}`).join('\n\n---\n\n');
   const out = await ask(env, `You write a daily news digest in Norwegian Bokmål for an adult Russian-speaking learner of Norwegian who lives in Riga and is an artist. The goal: read more Norwegian every day and understand it fluently.
 
@@ -196,14 +196,15 @@ STORIES:
 ${stories}`, ISSUE, o => o && Array.isArray(o.items) && o.items.length);
   const items = out.items.filter(x => src[x.i]).map(x => ({ sec: src[x.i].sec, link: src[x.i].link, src: src[x.i].src, img: src[x.i].img || '', title: String(x.title).slice(0, 200), kort: String(x.kort || '').slice(0, 300),
     text: String(x.text).slice(0, 3000), words: (x.words || []).slice(0, 12).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80) })), ru: String(x.ru).slice(0, 500), q: String(x.q || '').slice(0, 200) }));
-  items.push(...await tales);
-  const data = { v: V, day, level, hilsen: String(out.hilsen || '').slice(0, 400), dagens: (out.dagens || []).slice(0, 5).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80), ex: String(w.ex).slice(0, 200) })), items };
+  const tl = await tales; items.push(...tl.items);
+  const data = { v: V, insp: tl.insp, day, level, hilsen: String(out.hilsen || '').slice(0, 400), dagens: (out.dagens || []).slice(0, 5).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80), ex: String(w.ex).slice(0, 200) })), items };
   await env.DB.prepare('INSERT INTO avis (day, level, data, created_at) VALUES (?, ?, ?, ?) ON CONFLICT(day, level) DO UPDATE SET data = excluded.data, created_at = excluded.created_at')
     .bind(day, level, JSON.stringify(data), Date.now()).run();
   return data;
 }
 const STORY = { type: 'OBJECT', required: ['items'], properties: { items: { type: 'ARRAY', items: { type: 'OBJECT', required: ['i', 'title', 'text', 'words', 'ru', 'q'], properties: {
-  i: { type: 'INTEGER' }, title: { type: 'STRING' }, text: { type: 'STRING' }, words: { type: 'ARRAY', items: WORD }, ru: { type: 'STRING' }, q: { type: 'STRING' } } } } } };
+  i: { type: 'INTEGER' }, title: { type: 'STRING' }, text: { type: 'STRING' }, words: { type: 'ARRAY', items: WORD }, ru: { type: 'STRING' }, q: { type: 'STRING' } } } },
+  insp: { type: 'ARRAY', items: { type: 'OBJECT', required: ['no', 'ru', 'q', 'colors'], properties: { no: { type: 'STRING' }, ru: { type: 'STRING' }, q: { type: 'STRING' }, colors: { type: 'ARRAY', items: { type: 'STRING' } } } } } } };
 const TALE_LEN = { A: '90–140 words', B: '180–260 words' };
 // рассказы дня (norge, mat) — из общих знаний Gemini, тот же формат, что у новостей
 async function buildTales(env, day, level, topics) {
@@ -220,9 +221,11 @@ Make it vivid and personal, like a friendly magazine column: everyday details, h
 - "words": the glossed words: "no" = dictionary form (nouns with en/ei/et, verbs with å), "ru" = short Russian translation (1–4 words).
 - "ru": 1–2 sentences in Russian: what the text says (for self-check).
 - "q": one short comprehension question in Norwegian at this level.
+Also "insp": 6 seasonal inspiration themes for an artist (illustration, sketchbook, cozy aesthetics, colour palettes, nature, Scandinavian seasonal mood, holidays of this time of year), fitting today's date and season in Northern Europe, varied, no repeats of the stories: "no" = a short Norwegian title at this level (2–5 words), "ru" = its Russian translation, "q" = an English Pinterest search query of 2–5 words that gives beautiful results (e.g. "cozy november illustration", "nordic winter palette"), "colors" = 4 hex colours of a matching palette (e.g. "#a3542c").
 Use correct modern Bokmål.`, STORY, o => o && Array.isArray(o.items) && o.items.length, 0.6);
-  return out.items.filter(x => topics[x.i]).map(x => ({ sec: topics[x.i].sec, link: '', src: '', img: topics[x.i].img || '', photo: topics[x.i].photo || '', title: String(x.title).slice(0, 200), kort: '', text: String(x.text).slice(0, 3000),
-    words: (x.words || []).slice(0, 12).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80) })), ru: String(x.ru).slice(0, 500), q: String(x.q || '').slice(0, 200) }));
+  const insp = (out.insp || []).slice(0, 8).map(x => ({ no: String(x.no).slice(0, 80), ru: String(x.ru).slice(0, 80), q: String(x.q).slice(0, 80), colors: (x.colors || []).filter(c => /^#[0-9a-f]{6}$/i.test(c)).slice(0, 5) }));
+  return { insp, items: out.items.filter(x => topics[x.i]).map(x => ({ sec: topics[x.i].sec, link: '', src: '', img: topics[x.i].img || '', photo: topics[x.i].photo || '', title: String(x.title).slice(0, 200), kort: '', text: String(x.text).slice(0, 3000),
+    words: (x.words || []).slice(0, 12).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80) })), ru: String(x.ru).slice(0, 500), q: String(x.q || '').slice(0, 200) })) };
 }
 const getSrc = async (env, day) => { const r = await env.DB.prepare('SELECT data FROM avis_src WHERE day = ?').bind(day).first(); return r ? JSON.parse(r.data) : null; };
 const getLevel = async env => { const r = await env.DB.prepare("SELECT value FROM meta WHERE key = 'avis_level'").first().catch(() => null); return LEVELS.includes(r && r.value) ? r.value : 'B'; };
@@ -336,6 +339,10 @@ details{font:15px system-ui,sans-serif;margin-top:6px}summary{cursor:pointer;col
 .load{text-align:center;padding:60px 0;color:var(--mute);font:16px system-ui,sans-serif}
 .load b{display:block;font-size:40px;animation:bob 1.2s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-8px)}}
 .read{font:600 15px system-ui,sans-serif}
+.insp{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin:10px 0}
+.ins{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;font:14px system-ui,sans-serif}
+.ins:hover{border-color:var(--acc)}.ins b{font-size:15px}.ins small{color:var(--mute)}.ins .pq{font-size:12px}
+.pal{display:flex;height:54px;border-radius:9px;overflow:hidden;margin-bottom:6px}.pal i{flex:1}
 .gossip{display:flex;gap:10px;align-items:flex-start;margin:16px 0}.sissel{flex:none;margin-top:4px;animation:bob 2.4s ease-in-out infinite}
 .bubble{position:relative;flex:1;min-width:0;background:var(--acc2);border-radius:4px 18px 18px 18px;padding:10px 14px}
 .bubble .who{display:block;font:700 13px system-ui,sans-serif;color:var(--acc);letter-spacing:.04em}
@@ -392,7 +399,7 @@ h2.sec{scroll-margin-top:56px;display:flex;justify-content:space-between;align-i
     $('#date').textContent = fmt(d.day) + ' · ' + (LN[d.level] || d.level);
     let html = d.hilsen ? '<p class="hilsen tx">' + wrap(d.hilsen) + '</p>' : '';
     if (d.dagens && d.dagens.length) html += '<div class="box dagens"><h3>Dagens ord</h3><ul>' + d.dagens.map(w => '<li><b>' + esc(w.no) + '</b> — ' + esc(w.ru) + ' ' + addBtn(w.no, w.ru, w.ex) + '<br><i class="tx">' + wrap(w.ex) + '</i></li>').join('') + '</ul></div>';
-    const secs = [...new Set(d.items.map(x => x.sec))];
+    const secs = [...new Set(d.items.map(x => x.sec))]; if (d.insp && d.insp.length) secs.push('insp');
     html += '<nav class="toc" aria-label="Разделы">' + secs.map(k => '<a href="#s-' + k + '">' + esc(SEC[k] || k) + '</a>').join('') + '</nav>';
     let sec = '';
     d.items.forEach((x, i) => {
@@ -405,6 +412,8 @@ h2.sec{scroll-margin-top:56px;display:flex;justify-content:space-between;align-i
         + '<div class="tools"><button class="btn" type="button" data-say="' + i + '">🔊 Les høyt</button>' + (x.link ? '<a href="' + esc(x.link) + '" target="_blank" rel="noopener">kilde: ' + esc(x.src) + '</a>' : '') + (x.photo ? '<a href="' + esc(x.photo) + '" target="_blank" rel="noopener">foto: Wikimedia Commons</a>' : '') + '</div>'
         + '<details><summary>Проверить себя по-русски</summary><p>' + esc(x.ru) + '</p></details></article>' + (x.sec === 'sladder' ? '</div></div>' : '');
     });
+    if (d.insp && d.insp.length) html += '<h2 class="sec" id="s-insp">' + esc(SEC.insp) + '<a class="up" href="#top" aria-label="Наверх">↑</a></h2><p class="hint">Подборка по сезону: нажми — откроется Pinterest с этой темой.</p><div class="insp">'
+      + d.insp.map(x => '<a class="ins" href="https://www.pinterest.com/search/pins/?q=' + encodeURIComponent(x.q) + '" target="_blank" rel="noopener"><span class="pal">' + x.colors.map(c => '<i style="background:' + c + '"></i>').join('') + '</span><b>' + esc(x.no) + '</b><small>' + esc(x.ru) + '</small><small class="pq">📌 ' + esc(x.q) + '</small></a>').join('') + '</div>';
     const n = d.items.reduce((s, x) => s + x.text.split(/\\s+/).length, 0);
     html += '<p class="hint" style="margin-top:30px">≈ ' + n + ' ord · ' + Math.max(1, Math.round(n / 110)) + ' min. Godt jobba! 🐧</p>';
     $('#main').innerHTML = html;
