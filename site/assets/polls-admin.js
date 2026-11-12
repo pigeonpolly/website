@@ -11,7 +11,7 @@
     if (!r.ok) throw Object.assign(new Error(d.error || r.status), { code: d.error });
     return d;
   };
-  const L3 = [['ru', 'RU'], ['en', 'EN'], ['lv', 'LV']];
+  const L3 = [['ru', 'RU']]; // пишется только по-русски — английский и латышский сервер переводит сам при каждом сохранении
   const inp = 'style="width:100%;padding:9px 12px;font:inherit;box-sizing:border-box"';
   const date = t => t ? new Date(t * 1000).toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' }) : '';
   const ST = { draft: '📝 Черновик', open: '🟢 Идёт на главной', closed: '🏁 Завершён' };
@@ -28,11 +28,11 @@
     };
     const draw = () => {
       box.innerHTML = `<section class="adm-box"><h2>${isNew ? '🗳 Новый опрос' : '✏️ Править опрос'}</h2>
-        <p class="be-note">Вопрос и варианты — хотя бы на одном языке, остальные переведутся сами (можно поправить потом).</p>
-        ${L3.map(([l, n]) => `<p><label>Вопрос ${n}<br><input ${inp} class="be-input po-q" data-l="${l}" maxlength="200" value="${esc(q[l] || '')}"></label></p>`).join('')}
+        <p class="be-note">Пишите по-русски — на английский и латышский сайт переведёт сам.</p>
+        ${L3.map(([l, n]) => `<p><label>Вопрос<br><input ${inp} class="be-input po-q" data-l="${l}" maxlength="200" value="${esc(q[l] || '')}"></label></p>`).join('')}
         <h3>Варианты</h3>
         ${opts.map((o, i) => `<div class="adm-box po-o" data-i="${i}" style="margin:8px 0;padding:10px 12px"><b>${i + 1}.</b>
-          ${L3.map(([l, n]) => `<label style="display:block;margin:4px 0">${n} <input ${inp} class="be-input" data-l="${l}" maxlength="120" value="${esc(o.t[l] || '')}"></label>`).join('')}
+          ${L3.map(([l, n]) => `<label style="display:block;margin:4px 0"><input ${inp} class="be-input" data-l="${l}" maxlength="120" value="${esc(o.t[l] || '')}"></label>`).join('')}
           ${opts.length > 2 ? `<button type="button" class="pill-btn po-rm" data-i="${i}">🗑 Убрать вариант</button>` : ''}</div>`).join('')}
         ${opts.length < 8 ? '<p><button type="button" class="pill-btn po-add">➕ Ещё вариант</button></p>' : ''}
         <p><label><input type="checkbox" class="po-ideas"${ideas ? ' checked' : ''}> Можно предложить свою тему (пункт «Своя тема…» — темы видны здесь)</label></p>
@@ -46,7 +46,7 @@
         keep(); const b = $('.po-save'), msg = $('.po-msg');
         b.disabled = true; msg.textContent = '⏳ Сохраняю и перевожу…';
         try {
-          const d = await api({ act: 'save', id, q, ideas, opts: opts.map(o => ({ id: o.id || '', t: o.t })) });
+          const d = await api({ act: 'save', id, q: { ru: (q.ru || '').trim() }, ideas, opts: opts.map(o => ({ id: o.id || '', t: { ru: (o.t.ru || '').trim() } })) });
           box.innerHTML = ''; done(d, isNew ? '✓ Опрос создан — нажмите «▶ Открыть на главной», когда будете готовы' : '✓ Сохранено');
         } catch (e) { b.disabled = false; msg.textContent = ERR[e.code] || 'Ошибка: ' + e.message; }
       };
