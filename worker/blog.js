@@ -366,6 +366,12 @@ export async function blogApi(req, env, url, h) {
     return json({ latest: latest && pack(latest), featured: featured.map(x => ({ ...pack(x), star: true })), recent: [latest, ...side].filter(Boolean).map(pack) }); // recent — новая главная: крупно самая новая, справа три ★, недостающие — следующие по дате
   }
 
+  // список картинок Алины в R2 (блог, картины галерей, карточки) — для еженедельной копии на GitHub (.github/workflows/media-backup.yml); сами картинки и так открыты по /media/
+  if (m === 'GET' && p === '/api/blog/media-list') {
+    const keys = [];
+    if (env.MEDIA) for (const prefix of ['blog/', 'art/', 'cards/']) { let cursor; do { const r = await env.MEDIA.list({ prefix, cursor }); keys.push(...r.objects.map(o => o.key)); cursor = r.truncated ? r.cursor : null; } while (cursor); }
+    return json({ keys }, 200, { 'cache-control': 'no-store' });
+  }
   // полная копия сайта: блог + челлендж (аккаунты, работы) + список файлов картинок. Доступ — админ или личный ключ автокопии (?token=)
   if (m === 'GET' && p === '/api/blog/backup') {
     const tok = await h.getMeta('backup_token');
@@ -792,6 +798,28 @@ export async function blogImgCheck(env, fix = 0) {
         if (!url) { const hst = (src.match(/^https?:\/\/([^/]+)/i) || [, 'data:'])[1].replace(/^www\./, ''); if (!rep.hosts.includes(hst)) rep.hosts.push(hst); } // откуда были картинки — Алине понятнее, где искать
       }
       if (next !== html) upd[col] = next;
+    }
+    // та же картинка в другой языковой версии: здесь не открывается (чужая ссылка, размытая, пропала), а там на том же по счёту месте — своя, рабочая
+    if (fix) {
+      const LC = ['b_ru', 'b_en', 'b_lv'], cur = c => upd[c] ?? String(r[c] || '');
+      const list = c => [...cur(c).matchAll(/<img\b[^>]*?\ssrc="([^"]*)"/gi)].map(x => x[1]);
+      const bad = async raw => { const v = raw.replace(/&amp;/g, '&').trim(), l = v.startsWith(SITE + '/media/') ? v.slice(SITE.length) : v;
+        if (!l.startsWith('/') || l.startsWith('//')) return true; if (restore._blurred && restore._blurred[l]) return true;
+        return l.startsWith('/media/') && !(await has(decodeURIComponent(l.slice(7)))); };
+      for (const c of LC) {
+        const mine = list(c); if (!mine.length) continue;
+        for (let k = 0; k < mine.length; k++) {
+          if (!(await bad(mine[k]))) continue;
+          for (const o of LC) {
+            if (o === c) continue;
+            const theirs = list(o);
+            if (theirs.length !== mine.length || await bad(theirs[k])) continue;
+            let n = -1; upd[c] = cur(c).replace(/(<img\b[^>]*?\ssrc=")([^"]*)(")/gi, (m0, a, b, z) => (++n === k ? a + theirs[k] + z : m0));
+            rep.copied++; if (rep.dead) rep.dead--; else if (rep.foreign) rep.foreign--; else if (rep.missing) rep.missing--;
+            break;
+          }
+        }
+      }
     }
     const cols = Object.keys(upd);
     if (cols.length) { await env.DB.prepare(`UPDATE blog_posts SET ${cols.map(c => c + ' = ?').join(', ')} WHERE id = ?`).bind(...cols.map(c => upd[c]), r.id).run(); copied += rep.copied; }
