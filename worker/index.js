@@ -1,7 +1,7 @@
 // Сервер сайта: отдаёт статические файлы из site/ и обслуживает /api/* для «Стены рисунков»:
 // вход через Google, ник, загрузка работы дня, серии, стена, топ, модерация, GDPR (экспорт и удаление).
 // Данные — Cloudflare D1 (env.DB), картинки челленджа — R2 (env.MEDIA, папка challenge/), старые ещё и в KV (env.IMAGES), пока идёт перенос. Блог — worker/blog.js (картинки блога в R2, env.MEDIA).
-import { blogApi, blogPage, visitor, anonCode, claimAnon, birdName } from './blog.js';
+import { blogApi, blogPage, blogImgCheck, visitor, anonCode, claimAnon, birdName } from './blog.js';
 import { translateAll, translateTo, ABOUT } from './translate.js';
 import { challengeApi, challengeCron, planDayColors, monthThemeBadges, CHALLENGE_TABLES, CHALLENGE_ALTER } from './challenge-days.js'; // план тем челленджа (docs/challenge.md «Подбор тем»)
 import { CH_DEFAULTS, CH_RANGE } from './challenge-plan.js';
@@ -85,6 +85,7 @@ export default {
       await seedLegends(env, 'train_items_v1', TRAIN_ITEMS, STOCK.norm).catch(e => console.error('train items', e)); // вещи темы «🚆 Поезд» (worker/train.js)
       await seedLegends(env, 'garden_leg_v1', ['garden|goldcan', 'garden|orangery']).catch(e => console.error('legends', e)); // ★ вещи для огорода (этап 23)
       await seedLegends(env, 'garden_items_v1', ['garden|?', ...['wcan', 'scarecrow', 'greenhouse', 'barrow', 'gnome', 'birdbath', 'beehive', 'lamp', 'sign', 'bench', 'pinwheel', 'flamingo', 'pond'].map(v => 'garden|' + v)], STOCK.norm).catch(e => console.error('garden items', e)); // вещи для огорода — сразу в продажу, не ждать пополнения
+      await blogImgCheck(env, 5).catch(e => console.error('blog img', e)); // картинки статей со ссылками на Google Docs — копируем на сайт, пока ссылки живы
       await reqBackfill(env).catch(e => console.error('req tr', e)); // «Нарисуй мне»: переводы тем на все языки сайта
       await importCards(env, new URL('https://www.pigeonpolly.com/')).catch(e => console.error('cards', e)); // новые коллекции карточек из репозитория (один раз)
       await translateMissing(env, 5).catch(e => console.error('cards tr', e)); // карточки без перевода (Gemini не успел при импорте) — по 5 в час
