@@ -30,7 +30,7 @@ import { trainApi, TRAIN_TABLES, TRAIN_ALTER, TRAIN_RULES, TRAIN_RANGE, TRAIN_IN
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
 import { gardenApi, gardenDrop, gardenNews, GARDEN_TABLES, GARDEN_ALTER, GARDEN_RULES, GARDEN_RANGE, GARDEN_INT, GARDEN_BOOL, GARDEN_SEASONS } from './garden.js'; // огород птички (этап 22, docs/bird.md «Огород»)
 import { pauseGate, pauseApi } from './pause.js'; // ⏸ пауза сайта: «Ведутся работы» для всех, кроме админа (docs/admin.md)
-import { pollsApi, POLL_TABLES } from './polls.js'; // 🗳 Опросы: главная и кабинет (docs/admin.md «Опросы»)
+import { pollsApi, pollPage, POLL_TABLES } from './polls.js'; // 🗳 Опросы: главная и кабинет (docs/admin.md «Опросы»)
 import { weekApi, outClick, WEEK_TABLES } from './week.js'; // кабинет → «🗓 Неделя» и переходы на Amazon (docs/admin.md)
 import { ideasApi } from './ideas.js';
 import { guidesApi, guidesList, guideOut, GUIDES_ALTER } from './guides.js'; // кабинет → «🎬 Видео и гайды», /api/v2/guides (docs/admin.md) // кабинет → «💡 Темы для блога» (docs/admin.md)
@@ -51,8 +51,8 @@ export default {
   async fetch(req, env) {
     const url = new URL(req.url);
     const p = url.pathname;
-    const pollGo = p.match(/^\/(ru\/|lv\/)?poll\/?$/); // короткая ссылка на опрос главной (worker/polls.js) → /#poll
-    if (pollGo) return Response.redirect(`${url.origin}/${pollGo[1] || ''}${url.search}#poll`, 302);
+    const pollGo = p.match(/^\/(ru\/|lv\/)?poll\/?$/); // короткая ссылка на опрос главной (worker/polls.js)
+    if (pollGo) return pollPage(env, url, pollGo[1] ? pollGo[1].slice(0, 2) : 'en'); // страница-превью с картинкой опроса → /#poll
     if (!p.startsWith('/api/')) { // страницы: при сбое — своя страница «500 · что-то сломалось» вместо голой ошибки Cloudflare
       try {
         const run = () => pageFetch(req, env, url, p);

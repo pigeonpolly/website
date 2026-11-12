@@ -18,6 +18,10 @@ const CARDS = {
     en: ['free video lessons', 'Paint along', 'with Alina', 'Watercolour and ink sketching, step by step.'],
     ru: ['бесплатные видеоуроки', 'Рисуй вместе', 'с Алиной', 'Скетчи акварелью и тушью, шаг за шагом.'],
     lv: ['bezmaksas video nodarbības', 'Zīmē kopā', 'ar Alīnu', 'Akvareļa un tušas skices soli pa solim.'] },
+  poll: { img: 'images/v2/hero-winter.jpg', pos: '55% 50%', // опрос на главной, ссылка /poll/ (worker/polls.js pollPage)
+    en: ['vote · next video', 'What shall we paint', 'next?', 'Pick the topic of my next video lesson or paint-along. One click, no sign-up.'],
+    ru: ['голосование · следующее видео', 'Что рисуем', 'дальше?', 'Выбери тему следующего видеоурока или «рисуем вместе». Один клик, без входа.'],
+    lv: ['balsojums · nākamais video', 'Ko zīmēsim', 'tālāk?', 'Izvēlies nākamās video nodarbības tēmu. Viens klikšķis, bez reģistrācijas.'] },
   books: { img: 'images/e-books/watercolor-sketches.jpg', bg: '#F4F0FA', fit: 'contain',
     en: ['creative guides', 'Books for', 'sketching', 'Ink and watercolour guides, a free colouring book and palettes.'],
     ru: ['творческие гайды', 'Книги', 'для скетчинга', 'Гайды по туши и акварели, бесплатная раскраска и палитры.'],

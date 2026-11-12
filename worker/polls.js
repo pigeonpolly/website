@@ -138,3 +138,30 @@ export async function pollsApi(req, env, url, h) {
   else await h.db.prepare("INSERT INTO polls (id, q, opts, status, ideas, created) VALUES (?, ?, ?, 'draft', ?, ?)").bind(h.randomHex(6), JSON.stringify(q), JSON.stringify(opts), ideas, h.now()).run();
   return out();
 }
+
+// Ссылка /poll/ (/ru/poll/, /lv/poll/): своя страница-превью для мессенджеров и соцсетей — заголовок = вопрос открытого опроса,
+// описание = варианты, картинка — site/images/og/poll-<язык>.jpg (tools/og_cards.js poll); человека сразу уводит на /#poll.
+export async function pollPage(env, url, lang) {
+  const pre = lang === 'en' ? '' : '/' + lang, go = `${pre}/${url.search}#poll`;
+  const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
+  const T = { en: ['What shall we paint next?', 'Vote for the topic of the next video lesson by Alina Otkinska. One click, no sign-up.', 'Vote:'],
+    ru: ['Что рисуем дальше?', 'Выбери тему следующего видеоурока Алины Откинской. Один клик, без входа.', 'Голосуй:'],
+    lv: ['Ko zīmēsim tālāk?', 'Izvēlies Alīnas Otkinskas nākamās video nodarbības tēmu. Viens klikšķis, bez reģistrācijas.', 'Balso:'] }[lang];
+  let title = T[0], desc = T[1];
+  try {
+    if (env.DB) {
+      const p = row(await env.DB.prepare("SELECT * FROM polls WHERE status = 'open' ORDER BY opened DESC LIMIT 1").first());
+      if (p) { title = p.q[lang] || p.q.en || title; desc = `${T[2]} ${p.opts.map(o => o.t[lang] || o.t.en).join(' · ')}`; }
+    }
+  } catch (e) { /* таблиц ещё нет — общий текст */ }
+  const img = `${url.origin}/images/og/poll-${lang}.jpg`, page = `${url.origin}${pre}/poll/`;
+  const html = `<!doctype html><html lang="${lang}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>${esc(title)} · Pigeon Polly Art Lab</title><meta name="description" content="${esc(desc)}"><meta name="robots" content="noindex">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Pigeon Polly Art Lab"><meta property="og:url" content="${page}">
+<meta property="og:title" content="${esc(title)}"><meta property="og:description" content="${esc(desc)}">
+<meta property="og:image" content="${img}"><meta property="og:image:width" content="1200"><meta property="og:image:height" content="630">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="${esc(title)}"><meta name="twitter:description" content="${esc(desc)}"><meta name="twitter:image" content="${img}">
+<meta http-equiv="refresh" content="0;url=${esc(go)}"><script>location.replace(${JSON.stringify(go)})</script></head>
+<body style="font-family:sans-serif;padding:40px"><a href="${esc(go)}">${esc(title)}</a></body></html>`;
+  return new Response(html, { headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'no-store' } });
+}
