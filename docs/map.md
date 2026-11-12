@@ -30,6 +30,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/notes.js` (11K) — 📣 Рассылка (10.11.2026, docs/bird.md «Рассылка»): сообщение от Алины на 3 языках (+ файл д: NOTE_FILE_MAX, LANGS, SITE, NOTE_ALTER, NOTE_TABLES, audWhere, fileOut, pickL, audIds, audRange, noteHistory, noteNews
 - `worker/pancakes.js` (12K) — «Блинная Полли» (/pancakes/, site/assets/pancakes.js, docs/games.md): Полли печёт блины жи: PAN_UPS, TOP, PAN_ALTER, PAN_BADGES, PAN_COND, PAN_INT, today, upsOf, price, pancakesApi
 - `worker/pause.js` (3K) — ⏸ Пауза сайта (docs/admin.md «Пауза»): meta site_pause = '1' — посетители на любой страниц: TTL, pauseOn, pauseApi, pauseGate
+- `worker/polls.js` (8K) — Опросы: блок на главной (site/assets/poll.js) и кабинет «🗳 Опросы» (site/assets/polls-admin.js); один голос с IP: POLL_TABLES, pollsApi
 - `worker/school.js` (11K) — «Школа Полли» (/polly-helps/, site/assets/polly-school.js, docs/challenge.md): сдача работ: SCHOOL_LESSONS, LANGS, SCHOOL_KEEP_DAYS, SCHOOL_ALTER, SCHOOL_INT, SCHOOL_RANGE, trOf, langOf, last, schoolCron, schoolApi, schoolNews
 - `worker/shift.js` (4K) — «Смена с Полли» (/shift/, этап 29, site/assets/shift.js, docs/rooms.md): таймер работы вме: SHIFT_MIN, SHIFT_ALTER, SHIFT_INT, SHIFT_RANGE, SHIFT_RULES, SHIFT_TABLES, out, shiftApi
 - `worker/study-page.js` (599K) — Собрано tools/study_page.py из content/study/textbook.html — руками не править.: STUDY_HTML

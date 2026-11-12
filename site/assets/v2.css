@@ -638,3 +638,35 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 }
 /* подвал: «Наши друзья» — Libertas.study (партнёр, игра /train/) */
 .ft2 .cols a.ft-friend{display:inline-flex;align-items:center;gap:10px;margin-top:16px;font-size:12px;color:var(--mut)}.ft2 .ft-friend img{width:86px;height:auto;display:block}.ft2 .cols a.ft-friend:hover{color:var(--acc)}
+
+/* опрос на главной (site/assets/poll.js): бюллетень на бумаге, итоги — акварельные полоски */
+.poll{padding:20px 0 110px}
+.poll .w{display:grid;grid-template-columns:1fr 1.1fr;gap:60px;align-items:center}
+.poll h2{font-size:60px;line-height:.95}.poll .hand{display:inline-block;transform:rotate(-3deg);margin-bottom:10px}
+.poll .pl-l p{color:var(--mut);font-size:17px;margin:20px 0 0;max-width:24em}
+.ballot{position:relative;background:var(--sheet);border:1px solid var(--line);padding:34px 36px 26px;transform:rotate(.8deg);box-shadow:0 1px 0 var(--line),0 24px 50px -28px rgba(40,30,20,.35);
+ background-image:repeating-linear-gradient(to bottom,transparent 0 33px,color-mix(in srgb,var(--line) 55%,transparent) 33px 34px)}
+.ballot .tp{position:absolute;left:50%;top:-12px;width:110px;height:26px;transform:translateX(-50%) rotate(-3deg);background:color-mix(in srgb,var(--acc2) 45%,#fff 30%);opacity:.75}
+.ballot .bh{display:flex;justify-content:space-between;align-items:flex-start;font:700 10px Karla,'Nunito Sans',sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--mut);border-bottom:1.5px dashed var(--line);padding-bottom:12px}
+.ballot h3{font-size:28px;margin:18px 0 14px;line-height:1.15}
+.stamp2{display:inline-block;margin:-12px -10px 0 10px;border:2px solid var(--acc);color:var(--acc);border-radius:50%;width:74px;height:74px;display:flex;align-items:center;justify-content:center;flex-direction:column;
+ font:700 11px/1.2 Karla,'Nunito Sans',sans-serif;letter-spacing:.14em;text-align:center;transform:rotate(-14deg);opacity:.85;flex:none}
+.pls{list-style:none;display:grid;gap:6px}
+.po{display:flex;align-items:center;gap:14px;padding:10px 4px;cursor:pointer;font-size:17px;border-radius:6px}
+.po:hover{background:color-mix(in srgb,var(--acc) 6%,transparent)}
+.po input{position:absolute;opacity:0;pointer-events:none}
+.po .bx{flex:none;width:22px;height:22px;border:1.5px solid var(--ink);border-radius:4px;position:relative;transform:rotate(-2deg)}
+.po input:checked+.bx::after{content:'✓';position:absolute;left:2px;top:-12px;font:700 30px Caveat,cursive;color:var(--acc)}
+.po input:focus-visible+.bx{outline:2px solid var(--acc);outline-offset:3px}
+.pi{display:block;width:100%;margin:2px 0 6px 36px;max-width:calc(100% - 36px);font:inherit;padding:9px 12px;border:1.5px solid var(--line);border-radius:8px;background:#fff;color:var(--ink)}
+.ballot .pv{margin-top:18px}.ballot .hp{position:absolute;left:-9999px;width:1px;height:1px}
+.pf{font-size:13px;color:var(--mut);margin-top:14px}.pm{font:700 22px Caveat,cursive;color:var(--acc);min-height:1.2em;margin-top:4px}
+.pr{position:relative;display:flex;align-items:center;gap:12px;padding:11px 14px;font-size:16px;border-radius:8px;overflow:hidden}
+.pr .pb{position:absolute;left:0;top:4px;bottom:4px;width:0;border-radius:3px 14px 6px 10px;background:color-mix(in srgb,var(--acc2) 38%,transparent);transition:width 1s cubic-bezier(.2,.8,.2,1)}
+.pr::before{content:'';position:absolute;left:0;right:0;top:4px;bottom:4px;border-radius:3px 14px 6px 10px;background:color-mix(in srgb,var(--line) 35%,transparent)}
+.pr .pb.on{width:var(--w)}
+.pr.me .pb,.pr.win .pb{background:color-mix(in srgb,var(--acc) 30%,transparent)}
+.pr .pt,.pr b{position:relative}.pr .pt{flex:1}.pr small{font:700 18px Caveat,cursive;color:var(--acc);margin-left:6px;white-space:nowrap}
+.pr b{font:400 22px Fraunces,Lora,serif}
+@media (prefers-reduced-motion:reduce){.pr .pb{transition:none}}
+@media (max-width:900px){.poll{padding:10px 0 80px}.poll .w{grid-template-columns:1fr;gap:34px}.poll h2{font-size:44px}.ballot{padding:30px 20px 20px;transform:none}.ballot h3{font-size:23px}.po{font-size:16px}.stamp2{width:60px;height:60px;font-size:9px}}

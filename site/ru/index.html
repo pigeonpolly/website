@@ -26,7 +26,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=Karla:wght@400;500;700&family=Caveat:wght@700&family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito+Sans:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/v2.css?v=b0042bb1">
+<link rel="stylesheet" href="/assets/v2.css?v=df506627">
 <link rel="stylesheet" href="/assets/v2-acct.css?v=f9f748a5">
 <link rel="stylesheet" href="/assets/v2-shell.css?v=a5c24f2f">
 <!-- шапка как на остальных страницах: вход, меню аватара, пуговки, корзина, колокольчик, поиск (стили — v2-acct.css из tools/v2_acct_css.py) -->
@@ -126,27 +126,21 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </div>
 </div></section>
 
-<section data-ppb="preview.4" class="desk" id="guides"><div class="w">
+<section data-ppb="preview.4" class="poll" id="poll" hidden aria-label="Poll"></section>
+<script src="/assets/poll.js?v=e518b76d" defer></script>
+
+<section data-ppb="preview.5" class="desk" id="guides"><div class="w">
   <div><span class="k">Книги</span><h2>Книги, которые хочется держать <em>на столе</em></h2>
     <p class="dc">Написаны, нарисованы и свёрстаны Алиной. Понятные шаги и настоящие страницы скетчбука: от первой линии до готовой маленькой картины. Талант не нужен, нужно только желание.</p>
     <a class="btn" href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener">Купить на Amazon</a> <a class="btn ghost" href="https://drive.google.com/file/d/1IWMWb0nLOaN2UuJLZA-DqhdmwDh3T9Nx/view?usp=sharing" target="_blank" rel="noopener">Бесплатная раскраска →</a></div>
   <div class="books"><a class="b0" href="https://a.co/d/009gymDC" target="_blank" rel="noopener"><img src="/images/e-books/watercolor-sketches.jpg" alt="Watercolor Sketches: Creative Guide" loading="lazy"></a><a class="b1" href="https://a.co/d/0cJY0kk5" target="_blank" rel="noopener"><img src="/images/e-books/ink-sketching.jpg" alt="Ink Sketching: Creative Guide" loading="lazy"></a><a class="b2" href="/ru/blog/new-book-coming-soon/"><span class="lbl">Скоро</span><img src="/images/e-books/urban-sketching-digital-traveler.jpg" alt="Urban Sketching: Digital Traveler" loading="lazy"></a><span class="hand">начните с этой ↑</span></div>
 </div></section>
 
-<section data-ppb="preview.5" class="jr" id="journal"><div class="w">
+<section data-ppb="preview.6" class="jr" id="journal"><div class="w">
   <span class="doodle" aria-hidden="true">свежее из скетчбука ↓</span>
   <div class="hd3"><div><span class="k">Журнал</span><h2>Заметки <em>из мастерской</em></h2></div><a class="btn" href="/ru/blog/">Все статьи</a></div>
   <div class="jg" id="v2-blog"><div class="feat"><div class="im sk"></div></div><div><div class="post"><div class="sk" style="height:90px"></div></div><div class="post"><div class="sk" style="height:90px"></div></div><div class="post"><div class="sk" style="height:90px"></div></div></div></div>
 </div></section>
-
-<section data-ppb="preview.6" class="dark" id="club"><div class="w"><div class="club">
-  <div class="ph"><img src="/images/v2/club-cat.jpg" alt="Рыжий кот рядом с раскраской и акварелью" loading="lazy"><span class="k">Бесплатно после входа</span><h2>VIP-уроки <em>для друзей Полли</em></h2></div>
-  <div class="tk"><div class="stamp" aria-hidden="true">ADMIT<br>ONE<br>✦ VIP ✦</div><span class="k">VIP-уголок</span>
-    <p>Войдите через Google — это бесплатно, и прямо на сайте откроются дополнительные видеоуроки.</p>
-    <div class="row top"><span>Обзор акварели</span><small>VIP-видео</small></div>
-    <div class="row"><span>Новые VIP-уроки</span><small>уже скоро ✿</small></div>
-    <a class="btn pri vip-go" href="#signin">Войти бесплатно</a><span class="note">Хотите поддержать меня? <a href="#guides">Купите одну из моих книг</a>.</span></div>
-</div></div></section>
 
 <section data-ppb="preview.7" class="ab2" id="about"><div class="w">
   <div class="ph"><img src="/images/home/alina.jpg" alt="Alina Otkinska" loading="lazy"><span>— Алина и Полли</span></div>

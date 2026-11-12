@@ -32,6 +32,7 @@
     { id: 'art', ic: '🎨', name: 'Картины и палитры', group: 'pub', about: 'Картины, добавленные с сайта, скрытые картины и очередь палитр дня ЭКСТРА.' },
     { id: 'posts', ic: '📣', name: 'Посты', group: 'pub', about: 'Готовые картинки и тексты для соцсетей: тема дня, темы на месяц, палитра, загадка Титоса. Всё рисуется само из того, что сейчас на сайте.' },
     { id: 'guides', ic: '🎬', name: 'Видео и книги', group: 'pub', about: 'Новые видеоуроки с YouTube (бесплатные или VIP — только тем, кто вошёл) и книги со ссылкой и обложкой. Добавили — сразу на сайте: «Уроки», «Книги», главная, кабинет ученика.' },
+    { id: 'polls', ic: '🗳', name: 'Опросы', group: 'pub', about: 'Опрос на главной: какую тему следующего видео хотят посетители. Создать, открыть, завершить, статистика; блок на главной можно скрыть.' },
     { id: 'ideas', ic: '💡', name: 'Темы для блога', group: 'pub', about: 'Кнопка: что сейчас ищут в Google и обсуждают на Reddit по вашим темам — и 10 тем статей с ключевыми словами.' },
     { id: 'notes', ic: '📌', name: 'Объявления', group: 'pub', about: 'Объявления в «Новостях стаи» (/flock/news/): закреплены сверху до выбранной даты, потом — обычной строкой «от Полли».' },
     { id: 'birds', ic: '🐦', name: 'Птицы', group: 'birds', about: 'Все птички стаи: пуговки, подарки, зарплата. Нажмите на ник — откроется профиль.' },
@@ -67,6 +68,7 @@
     cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
     posts: () => window.PPPostsAdmin ? window.PPPostsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился posts-admin.js</p>'), // 📣 Посты (posts-admin.js)
     guides: () => window.PPGuidesAdmin ? window.PPGuidesAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился guides-admin.js</p>'), // 🎬 Видео и книги (guides-admin.js)
+    polls: () => window.PPPollsAdmin ? window.PPPollsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился polls-admin.js</p>'), // 🗳 Опросы (polls-admin.js)
     ideas: () => window.PPIdeasAdmin ? window.PPIdeasAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился ideas-admin.js</p>'), // 💡 Темы для блога (ideas-admin.js)
     broadcast: () => window.PPBroadcast ? window.PPBroadcast.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился broadcast-admin.js</p>'), // 📢 Рассылка (broadcast-admin.js)
     mail: () => window.PPMailAdmin ? window.PPMailAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился mail-admin.js</p>'), // ✉️ Письма (mail-admin.js)
