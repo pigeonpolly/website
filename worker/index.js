@@ -21,6 +21,7 @@ import { shiftApi, SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_RANGE, SHIFT_IN
 import { studyApi, studyOk, STUDY_TABLES } from './study.js'; // личный учебник /study/ для Mr.Pepe и Алины (docs/site.md «Учебник»)
 import { englishApi, englishOk, ENGLISH_TABLES } from './english.js'; // личный учебник английского /english/ (docs/site.md «Учебник английского»)
 import { norskApi, norskOk, NORSK_TABLES } from './norsk.js'; // личный учебник норвежского /norsk/ (docs/site.md «Учебник норвежского»)
+import { avisApi, avisCron, AVIS_TABLES, AVIS_RULES, AVIS_RANGE, AVIS_INT, AVIS_CRON } from './avis.js'; // «Morgenavis» — утренняя газета на норвежском для Алины /norsk/avis/ (docs/site.md «Morgenavis»)
 import { nederlandsApi, nederlandsOk, NEDERLANDS_TABLES } from './nederlands.js'; // личный учебник нидерландского /nederlands/ (docs/site.md «Учебник нидерландского»)
 import { notebookApi, NOTEBOOK_TABLES } from './notebook.js'; // 📒 блокнот в учебниках (docs/site.md «Блокнот в учебниках»)
 import { artpillApi, artpillDrop, artpillExport, ARTPILL_TABLES } from './artpill.js'; // «Art-Pill by Polly»: скетчбуки ИИ и отзывы (docs/artpill.md)
@@ -72,6 +73,7 @@ export default {
     if (!env.DB || !env.IMAGES) return;
     await ensureSchema(env);
     await loadRules(env); await loadDayColors(env);
+    if (event.cron === AVIS_CRON) { ctx.waitUntil(avisCron(env, RULES).catch(e => console.error('avis', e))); return; } // отдельный запуск: свой лимит запросов
     await setMeta(env, 'cron_at', String(Date.now())).catch(() => {}); // для «🤖 Автопилота» в кабинете: расписание живо
     ctx.waitUntil((async () => {
       if (!(await getMeta(env, 'buttons_backfill'))) await backfillButtons(env).catch(e => console.error('backfill', e)); // разовое начисление пуговок за прошлое
@@ -185,6 +187,11 @@ async function pageFetch(req, env, url, p) {
     if (!env.DB) return errorPage(env, url, 503);
     await ensureSchema(env);
     return englishApi(req, env, url, studyHelpers(env));
+  }
+  if (p === '/norsk/avis' || p === '/norsk/avis/') { // «Morgenavis»: страница только для Алины (worker/avis.js)
+    if (!env.DB) return errorPage(env, url, 503);
+    await ensureSchema(env);
+    return avisApi(req, env, url, studyHelpers(env));
   }
   if (p === '/norsk' || p === '/norsk/') { // учебник норвежского: страница из worker (worker/norsk.js)
     if (!env.DB) return errorPage(env, url, 503);
@@ -628,6 +635,7 @@ async function ensureSchemaRun(env) {
     ...STUDY_TABLES.map(sql => prep(sql)), // учебник: study_progress (worker/study.js)
     ...ENGLISH_TABLES.map(sql => prep(sql)), // учебник английского: english_progress (worker/english.js)
     ...NOTEBOOK_TABLES.map(sql => prep(sql)), // блокнот в учебниках: textbook_notes (worker/notebook.js)
+    ...AVIS_TABLES.map(sql => prep(sql)), // «Morgenavis»: avis_src, avis (worker/avis.js)
     ...NORSK_TABLES.map(sql => prep(sql)), // учебник норвежского: norsk_progress, norsk_access (worker/norsk.js)
     ...NEDERLANDS_TABLES.map(sql => prep(sql)), // учебник нидерландского: nederlands_progress, nederlands_access (worker/nederlands.js)
     ...ARTPILL_TABLES.map(sql => prep(sql)), // «Art-Pill»: ap_books, ap_pages, ap_reviews (worker/artpill.js)
@@ -754,6 +762,7 @@ const RULE_DEFAULTS = {
     alt: 15, clock: 10, clockWin: 60, monthly: 3, veteranMonths: 36, veteranPer: 2, collector: 31, colors: 10,
     rainA: 5, rainB: 15, rainC: 30, potA: 10, potB: 50, mazeA: 20, ...PAN_COND, ...TRAIN_COND, ...ACHAT_COND },
   ...GARDEN_RULES, // огород: грядки, полив, цены семян и урожая, жуки, погода (worker/garden.js)
+  ...AVIS_RULES, // «Morgenavis»: вкл и с какого часа по Риге готовить утренний выпуск (worker/avis.js)
   ...MAIL_RULES, // уведомления из игр на почту: серия, огород, Титос (worker/mail.js)
   ...SHIFT_RULES, // «Смена с Полли»: 🔘 за каждый отработанный час (worker/shift.js)
   ...SCHOOL_RULES, // «Школа Полли»: 🔘 за диплом (worker/school.js)
@@ -766,7 +775,7 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { homeKitchen: [0, 1000], homeBedroom: [0, 1000], homeCrypt: [0, 1000], homeBath: [0, 1000], homeOffice: [0, 1], welcomeBtn: [-1, 10000], wlBtn: [-1, 10000], daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potionRevive: [0, 30], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...TRAIN_RANGE, ...GARDEN_RANGE, ...SHIFT_RANGE, ...SCHOOL_RANGE, ...ACHAT_RANGE, ...MAIL_RANGE, ...CH_RANGE };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potionRevive: [0, 30], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...TRAIN_RANGE, ...GARDEN_RANGE, ...SHIFT_RANGE, ...SCHOOL_RANGE, ...ACHAT_RANGE, ...MAIL_RANGE, ...AVIS_RANGE, ...CH_RANGE };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -781,9 +790,9 @@ function cleanRules(r) {
   if (!r || typeof r !== 'object') return out;
   for (const [k, [lo, hi]] of Object.entries(RULE_NUM)) if (r[k] != null && Number.isFinite(Number(r[k]))) out[k] = Math.max(lo, Math.min(hi, Number(r[k])));
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
-  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn', 'panOn', 'trainOn', 'shiftOn', 'mailGamesOn', ...GARDEN_BOOL]) if (typeof r[k] === 'boolean') out[k] = r[k];
+  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn', 'panOn', 'trainOn', 'shiftOn', 'mailGamesOn', 'avisOn', ...GARDEN_BOOL]) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['homeKitchen', 'homeBedroom', 'homeCrypt', 'homeBath', 'homeOffice', 'daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'potionRevive', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...TRAIN_INT, ...GARDEN_INT, ...SHIFT_INT, ...SCHOOL_INT, ...ACHAT_INT, ...MAIL_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
+  for (const k of ['homeKitchen', 'homeBedroom', 'homeCrypt', 'homeBath', 'homeOffice', 'daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'potionRevive', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...TRAIN_INT, ...GARDEN_INT, ...SHIFT_INT, ...SCHOOL_INT, ...ACHAT_INT, ...MAIL_INT, ...AVIS_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
   if (GARDEN_SEASONS.includes(r.gardenSeason)) out.gardenSeason = r.gardenSeason;
@@ -1644,6 +1653,7 @@ async function route(req, env, url) {
   if (p === '/api/study') { const r = await studyApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/english' || p === '/api/english/access') { const r = await englishApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/notebook') { const r = await notebookApi(req, env, url, studyHelpers(env)); if (r) return r; }
+  if (p === '/api/avis' || p.startsWith('/api/avis/')) { const r = await avisApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/norsk' || p === '/api/norsk/access' || p === '/api/norsk/tts') { const r = await norskApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/nederlands' || p === '/api/nederlands/access' || p === '/api/nederlands/tts') { const r = await nederlandsApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/artpill' || p.startsWith('/api/artpill/')) { const r = await artpillApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now }); if (r) return r; }

@@ -676,6 +676,10 @@
         row('🥕🌱 Огород — не чаще раза в', num('mailGardenDays', R.mailGardenDays, D.mailGardenDays) + ' дн.', D.mailGardenDays + ' дн.', 'урожай созрел или грядки сухие, а птичка не заходила больше суток'),
         row('🕵️ Титос ждёт — если птичка не заходила', num('mailTitosDays', R.mailTitosDays, D.mailTitosDays) + ' дн.', D.mailTitosDays + ' дн.', 'про каждое следующее дело — одно письмо'),
       ], 'Письма уходят сами раз в час, в пределах бесплатного лимита (90 в сутки вместе с остальными письмами). <a href="#mail">✉️ Письма →</a>')}
+      ${box('📰 Morgenavis', [
+        row(`<label class="adm-r-chk"><input type="checkbox" data-r="avisOn"${R.avisOn ? ' checked' : ''}> Готовить утреннюю газету на норвежском</label>`, '', 'вкл', 'мир, Латвия, искусство за сутки — пересказ на A1–B2 с переводом слов; страница только для вас'),
+        row('🕕 Выпуск готов — с', num('avisHour', R.avisHour, D.avisHour) + ' ч по Риге', D.avisHour + ' ч', 'выпуск уровня, выбранного последним; другие уровни пишутся по нажатию'),
+      ], '<a href="/norsk/avis/">Открыть Morgenavis →</a>')}
       ${box('🎓 «Школа Полли»', [
         row('Диплом (печать у всех 12 уроков)', num('schoolDiplomaBtn', R.schoolDiplomaBtn, D.schoolDiplomaBtn) + ' 🔘', D.schoolDiplomaBtn + ' 🔘', 'один раз, когда вы ставите двенадцатую печать; 0 — без пуговок'),
       ], '<a href="#school">🎓 Работы учеников →</a>')}

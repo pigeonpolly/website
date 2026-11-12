@@ -2,10 +2,12 @@
 
 _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TABLE / ALTER TABLE и обращений к meta в worker/*.js. Руками не править._
 
-## Таблицы (65)
+## Таблицы (67)
 
 Обозначения: PK — первичный ключ, nn — NOT NULL, =x — DEFAULT x; «+» — столбцы, добавленные ALTER TABLE.
 
+- **avis** (worker/avis.js): `day` text, `level` text — PK (day, level), `data` text nn (JSON выпуска), `created_at` int
+- **avis_src** (worker/avis.js): `day` text PK, `data` text nn (JSON выбранных новостей с текстами), `created_at` int
 - **about_chat** (worker/about-chat.js): `user_id` int PK, `opened` text, `updated_at` int
 - **about_asks** (worker/about-chat.js): `id` int PK auto, `user_id` int nn, `text` text nn, `lang` text, `status` text ='new', `tr` text, `created_at` int, `answered_at` int, `seen` int =1; + `anon` int =0, `ip` text
 - **ap_books** (worker/artpill.js): `id` int PK auto, `user_id` int nn, `ai` text nn, `model` text, `pill` text, `style` text, `created_at` int, `updated_at` int
@@ -74,10 +76,12 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **train_runs** (worker/train.js): `id` text PK, `user_id` int nn, `started` int nn, `lang` text nn, `level` int =0, `base` int =0, `words` int =0
 - **out_clicks** (worker/week.js): `id` int PK auto, `day` text nn, `ts` int, `vid` text, `target` text, `path` text, `href` text
 
-## Ключи meta (55)
+## Ключи meta (57)
 
 Таблица `meta (key, value)`. Ключ → где используется.
 
+- `avis_level` — worker/avis.js (уровень утреннего выпуска Morgenavis)
+- `avis_try:<день>` — worker/avis.js (попытки собрать выпуск за день, до 4)
 - `admin_email_off` — worker/index.js
 - `admin_ids` — worker/index.js
 - `admin_pin` — worker/blog.js, worker/index.js

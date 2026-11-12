@@ -1,0 +1,346 @@
+// «Morgenavis» — личная утренняя газета на норвежском для Алины (/norsk/avis/, docs/site.md «Morgenavis»).
+// Каждое утро (свой cron «47 * * * *» в wrangler.jsonc, с avisHour по Риге): RSS трёх разделов (мир, Латвия, искусство) за последние ~30 ч →
+// Gemini выбирает по 3 главные новости → worker дочитывает статьи → Gemini пересказывает на букмоле уровня A1/A2/B1/B2
+// (сложные и ключевые слова — с переводом на русский, большие новости — коротко и проще). Уровень по умолчанию готовится утром,
+// остальные — по первому нажатию на вкладку (и тоже сохраняются). Без Claude: только ключ Gemini сайта (бесплатный лимит).
+// Таблицы: avis_src (день → выбранные новости с текстами), avis (день + уровень → готовый выпуск). Хранится 30 дней.
+// Слова «+ в словарь» уходят в словарь учебника норвежского (norsk_progress.state.v — тот же формат, что addWord в content/norsk/engine.js).
+import { geminiKey, GEMINI_MODELS } from './translate.js';
+
+export const AVIS_TABLES = [
+  'CREATE TABLE IF NOT EXISTS avis_src (day TEXT PRIMARY KEY, data TEXT NOT NULL, created_at INTEGER)',
+  'CREATE TABLE IF NOT EXISTS avis (day TEXT NOT NULL, level TEXT NOT NULL, data TEXT NOT NULL, created_at INTEGER, PRIMARY KEY (day, level))',
+];
+// числа — в «📜 Правилах» (кабинет → Все правила → 📰 Morgenavis)
+export const AVIS_RULES = { avisOn: true, avisHour: 6 };
+export const AVIS_RANGE = { avisHour: [3, 12] };
+export const AVIS_INT = ['avisHour'];
+export const AVIS_CRON = '47 * * * *';
+const LEVELS = ['A1', 'A2', 'B1', 'B2'], KEEP = 30;
+const rigaDay = (t = Date.now()) => new Date(t).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
+const rigaHour = () => +new Date().toLocaleString('en-GB', { timeZone: 'Europe/Riga', hour: '2-digit', hourCycle: 'h23' });
+const GN = (q, hl = 'en', gl = 'US') => `https://news.google.com/rss/search?q=${encodeURIComponent(q + ' when:1d')}&hl=${hl}&gl=${gl}&ceid=${gl}:${hl}`;
+// источники: сначала норвежские и профильные, Google News — запасной (у него нет текста статьи, только заголовок)
+const FEEDS = {
+  verden: ['https://www.nrk.no/urix/toppsaker.rss', 'https://feeds.bbci.co.uk/news/world/rss.xml', GN('world news')],
+  latvia: ['https://eng.lsm.lv/rss/', 'https://www.lsm.lv/rss/', GN('Latvia OR Riga', 'en', 'LV')],
+  kunst: ['https://www.theartnewspaper.com/rss.xml', 'https://news.artnet.com/feed', 'https://hyperallergic.com/feed/', GN('art exhibition OR museum OR artist')],
+};
+export const SECTIONS = { verden: '🌍 Verden', latvia: '🇱🇻 Latvia', kunst: '🎨 Kunst' };
+const PICK = 3;
+
+// ---------- RSS ----------
+const decode = s => String(s || '').replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1').replace(/<[^>]+>/g, ' ')
+  .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#0?39;|&apos;|&#8217;/g, "'")
+  .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/\s+/g, ' ').trim();
+const tag = (x, t) => { const m = x.match(new RegExp(`<${t}[^>]*>([\\s\\S]*?)</${t}>`, 'i')); return m ? m[1] : ''; };
+async function feed(url) {
+  const r = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; Morgenavis/1.0)' }, signal: AbortSignal.timeout(10000) }).catch(() => null);
+  if (!r || !r.ok) return [];
+  const xml = await r.text().catch(() => '');
+  const host = new URL(url).hostname.replace(/^www\./, '');
+  return (xml.match(/<(item|entry)[\s>][\s\S]*?<\/\1>/gi) || []).map(x => {
+    const link = decode(tag(x, 'link')) || ((x.match(/<link[^>]*href="([^"]+)"/i) || [])[1] || '');
+    const when = Date.parse(decode(tag(x, 'pubDate') || tag(x, 'published') || tag(x, 'updated') || tag(x, 'dc:date'))) || 0;
+    return { title: decode(tag(x, 'title')).slice(0, 220), desc: decode(tag(x, 'description') || tag(x, 'summary')).slice(0, 500), link, when, src: host === 'news.google.com' ? decode(tag(x, 'source')) || 'Google News' : host };
+  }).filter(x => x.title && x.link);
+}
+async function collect() {
+  const since = Date.now() - 30 * 3600000, out = {};
+  for (const [sec, urls] of Object.entries(FEEDS)) {
+    const all = (await Promise.all(urls.map(feed))).flat().filter(x => !x.when || x.when >= since), seen = new Set();
+    out[sec] = all.filter(x => { const k = x.title.toLowerCase().slice(0, 60); if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 14);
+  }
+  return out;
+}
+// текст статьи: абзацы <p> со страницы (не вышло — останется описание из RSS)
+async function article(url) {
+  if (/news\.google\.com/.test(url)) return '';
+  const r = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; Morgenavis/1.0)' }, signal: AbortSignal.timeout(9000) }).catch(() => null);
+  if (!r || !r.ok || !/html/.test(r.headers.get('content-type') || '')) return '';
+  const html = (await r.text().catch(() => '')).replace(/<(script|style|nav|footer|aside|figure)[\s\S]*?<\/\1>/gi, ' ');
+  return (html.match(/<p[\s>][\s\S]*?<\/p>/gi) || []).map(decode).filter(p => p.length > 50).join('\n').slice(0, 4000);
+}
+
+// ---------- Gemini ----------
+async function ask(env, prompt, schema, ok, temp = 0.4) {
+  const key = await geminiKey(env);
+  if (!key) throw Object.assign(new Error('no_key'), { code: 'no_key' });
+  let err = 'ai';
+  for (const model of GEMINI_MODELS.slice().reverse()) { // сначала модель поумнее — язык уровня важнее скорости
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+      method: 'POST', headers: { 'x-goog-api-key': key, 'content-type': 'application/json' }, signal: AbortSignal.timeout(100000),
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: temp, responseMimeType: 'application/json', responseSchema: schema } }),
+    }).catch(() => null);
+    if (!r) continue;
+    if (!r.ok) { err = r.status === 429 ? 'ai_limit' : 'ai'; continue; }
+    try {
+      const d = await r.json(), out = JSON.parse(d.candidates[0].content.parts.map(p => p.text || '').join(''));
+      if (ok(out)) return out;
+    } catch (e) { /* не разобрался — следующая модель */ }
+  }
+  throw Object.assign(new Error(err), { code: err });
+}
+const INTS = { type: 'ARRAY', items: { type: 'INTEGER' } };
+const PICK_SCHEMA = { type: 'OBJECT', required: ['verden', 'latvia', 'kunst'], properties: { verden: INTS, latvia: INTS, kunst: INTS } };
+
+// утром: собрать новости, выбрать главные, дочитать статьи → avis_src
+async function buildSrc(env, day) {
+  const cand = await collect();
+  const list = sec => cand[sec].map((x, i) => `${i}. [${x.src}] ${x.title} — ${x.desc.slice(0, 200)}`).join('\n') || '(none)';
+  let pick = { verden: [0, 1, 2], latvia: [0, 1, 2], kunst: [0, 1, 2] };
+  try {
+    pick = await ask(env, `You are the editor of a short morning news digest for a reader living in Riga, Latvia, who is an artist. From each numbered list of headlines from the last 24 hours, choose the ${PICK} most important, newsworthy and varied stories (no duplicates of the same event, no clickbait, no horoscopes, prefer substance over celebrity gossip; for art prefer exhibitions, artists, museums, discoveries, art world news). Return the numbers.
+
+WORLD:
+${list('verden')}
+
+LATVIA:
+${list('latvia')}
+
+ART:
+${list('kunst')}`, PICK_SCHEMA, o => o && Array.isArray(o.verden), 0.2);
+  } catch (e) { /* без выбора — первые по порядку ленты */ }
+  const items = [];
+  for (const sec of Object.keys(FEEDS)) {
+    const idx = [...new Set((pick[sec] || []).filter(i => Number.isInteger(i) && cand[sec][i]))].slice(0, PICK);
+    for (let i = 0; idx.length < PICK && i < cand[sec].length; i++) if (!idx.includes(i)) idx.push(i);
+    for (const i of idx) items.push({ sec, ...cand[sec][i] });
+  }
+  if (!items.length) throw Object.assign(new Error('no_news'), { code: 'no_news' });
+  const texts = await Promise.all(items.map(x => article(x.link)));
+  items.forEach((x, i) => { x.text = texts[i]; });
+  await env.DB.prepare('INSERT INTO avis_src (day, data, created_at) VALUES (?, ?, ?) ON CONFLICT(day) DO UPDATE SET data = excluded.data, created_at = excluded.created_at')
+    .bind(day, JSON.stringify(items), Date.now()).run();
+  return items;
+}
+
+const GUIDE = {
+  A1: 'CEFR A1. Very short simple sentences (4–8 words), present tense (some "har + perfektum" is fine), only the most common words, no subordinate clauses. Each story 45–80 words. Gloss 7–9 words per story (all key nouns and verbs that a beginner may not know).',
+  A2: 'CEFR A2. Short clear sentences, present and past tense (preteritum, perfektum), simple connectors (og, men, fordi, så, når). Each story 80–120 words. Gloss 6–8 words per story.',
+  B1: 'CEFR B1. Natural but clear sentences, some subordinate clauses (som, at, hvis, selv om), everyday news vocabulary. Each story 120–170 words. Gloss 5–7 of the hardest or most important words per story.',
+  B2: 'CEFR B2. Natural newspaper-like Bokmål (like NRK), varied syntax, some idioms and fixed expressions, abstract vocabulary is fine. Each story 170–250 words. Gloss 4–6 of the hardest words, idioms or set phrases per story.',
+};
+const WORD = { type: 'OBJECT', required: ['no', 'ru'], properties: { no: { type: 'STRING' }, ru: { type: 'STRING' } } };
+const ISSUE = { type: 'OBJECT', required: ['hilsen', 'items', 'dagens'], properties: {
+  hilsen: { type: 'STRING' },
+  dagens: { type: 'ARRAY', items: { type: 'OBJECT', required: ['no', 'ru', 'ex'], properties: { no: { type: 'STRING' }, ru: { type: 'STRING' }, ex: { type: 'STRING' } } } },
+  items: { type: 'ARRAY', items: { type: 'OBJECT', required: ['i', 'title', 'kort', 'text', 'words', 'ru', 'q'], properties: {
+    i: { type: 'INTEGER' }, title: { type: 'STRING' }, kort: { type: 'STRING' }, text: { type: 'STRING' }, words: { type: 'ARRAY', items: WORD }, ru: { type: 'STRING' }, q: { type: 'STRING' } } } } } };
+
+// выпуск уровня: пересказ всех выбранных новостей одним вызовом → avis
+async function buildIssue(env, day, level, src) {
+  const stories = src.map((x, i) => `#${i} [${x.sec}] ${x.title}\nSource: ${x.src}\n${x.text || x.desc}`).join('\n\n---\n\n');
+  const out = await ask(env, `You write a daily news digest in Norwegian Bokmål for an adult Russian-speaking learner of Norwegian who lives in Riga and is an artist. The goal: read more Norwegian every day and understand it fluently.
+
+Level: ${GUIDE[level]}
+
+For EVERY story below (keep the order, field "i" = the story number) write:
+- "title": a short Norwegian headline at this level.
+- "kort": if the original story is long or complicated, ONE simple Norwegian sentence "what is it about" (a summary). Otherwise an empty string.
+- "text": a simplified, faithful retelling in Norwegian at this level, 1–3 short paragraphs separated by "\\n\\n". If the source is long, summarise and keep only the essential facts. Never invent facts, numbers or quotes; keep names. Mark every glossed word exactly as it appears in the text with double square brackets, e.g. "Regjeringen [[foreslår]] nye [[tiltak]]."
+- "words": the glossed words: "no" = dictionary form (nouns with en/ei/et, verbs with å, e.g. "et tiltak", "å foreslå"), "ru" = short Russian translation (1–4 words). Do not gloss very basic words the level already knows.
+- "ru": 1–2 sentences in Russian: what the story says (for self-check after reading).
+- "q": one short comprehension question in Norwegian at this level.
+Also:
+- "hilsen": 1–2 friendly Norwegian sentences at this level to start the day (mention the date ${day} naturally, e.g. weekday), no facts that are not in the stories.
+- "dagens": "words of the day" — 3 useful words or expressions from today's stories, with Russian translation and a short Norwegian example sentence at this level.
+Use correct modern Bokmål spelling and grammar. Do not use English words when a Norwegian word exists.
+
+STORIES:
+
+${stories}`, ISSUE, o => o && Array.isArray(o.items) && o.items.length);
+  const items = out.items.filter(x => src[x.i]).map(x => ({ sec: src[x.i].sec, link: src[x.i].link, src: src[x.i].src, title: String(x.title).slice(0, 200), kort: String(x.kort || '').slice(0, 300),
+    text: String(x.text).slice(0, 3000), words: (x.words || []).slice(0, 12).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80) })), ru: String(x.ru).slice(0, 500), q: String(x.q || '').slice(0, 200) }));
+  const data = { day, level, hilsen: String(out.hilsen || '').slice(0, 400), dagens: (out.dagens || []).slice(0, 5).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80), ex: String(w.ex).slice(0, 200) })), items };
+  await env.DB.prepare('INSERT INTO avis (day, level, data, created_at) VALUES (?, ?, ?, ?) ON CONFLICT(day, level) DO UPDATE SET data = excluded.data, created_at = excluded.created_at')
+    .bind(day, level, JSON.stringify(data), Date.now()).run();
+  return data;
+}
+const getSrc = async (env, day) => { const r = await env.DB.prepare('SELECT data FROM avis_src WHERE day = ?').bind(day).first(); return r ? JSON.parse(r.data) : null; };
+const getLevel = async env => { const r = await env.DB.prepare("SELECT value FROM meta WHERE key = 'avis_level'").first().catch(() => null); return LEVELS.includes(r && r.value) ? r.value : 'B1'; };
+
+// cron (AVIS_CRON, раз в час): с avisHour по Риге — новости дня и выпуск уровня по умолчанию; старше 30 дней — удалить
+export async function avisCron(env, R) {
+  if (!R.avisOn || rigaHour() < R.avisHour) return;
+  const day = rigaDay();
+  const tries = 'avis_try:' + day, n = Number(((await env.DB.prepare('SELECT value FROM meta WHERE key = ?').bind(tries).first().catch(() => null)) || {}).value) || 0;
+  if (n >= 4) return; // Gemini занят весь день — не больше 4 попыток
+  let src = await getSrc(env, day);
+  const level = await getLevel(env);
+  if (src && await env.DB.prepare('SELECT 1 FROM avis WHERE day = ? AND level = ?').bind(day, level).first()) return;
+  await env.DB.prepare("INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(tries, String(n + 1)).run();
+  if (!src) src = await buildSrc(env, day);
+  await buildIssue(env, day, level, src);
+  const old = rigaDay(Date.now() - KEEP * 86400000);
+  await env.DB.batch([env.DB.prepare('DELETE FROM avis WHERE day < ?').bind(old), env.DB.prepare('DELETE FROM avis_src WHERE day < ?').bind(old),
+    env.DB.prepare("DELETE FROM meta WHERE key LIKE 'avis_try:%' AND key < ?").bind('avis_try:' + old)]);
+}
+
+// h: json, fail, currentUser, isAdmin, adminIdentity
+export async function avisApi(req, env, url, h) {
+  const p = url.pathname, m = req.method, u = await h.currentUser(req, env);
+  const ok = !!(u && !u.banned && (await h.isAdmin(u, env) || await h.adminIdentity(u, env))); // только Алина
+  if (!p.startsWith('/api/')) return page(ok ? AVIS_HTML : LOCKED, ok ? 200 : 403);
+  if (!ok) h.fail(u ? 403 : 401, u ? 'forbidden' : 'login');
+  const nc = { 'cache-control': 'no-store' };
+  if (p === '/api/avis/level' && m === 'POST') { // какой уровень готовить утром
+    const b = await req.json().catch(() => ({}));
+    if (!LEVELS.includes(b.level)) h.fail(400, 'level');
+    await env.DB.prepare("INSERT INTO meta (key, value) VALUES ('avis_level', ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(b.level).run();
+    return h.json({ ok: true });
+  }
+  if (p === '/api/avis/word' && m === 'POST') { // «+ в словарь» учебника норвежского
+    const b = await req.json().catch(() => ({})), w = String(b.w || '').trim().slice(0, 60), k = w.toLowerCase();
+    if (!k) h.fail(400, 'word');
+    const r = await env.DB.prepare('SELECT state FROM norsk_progress WHERE user_id = ?').bind(u.id).first();
+    let s = {}; try { s = JSON.parse((r && r.state) || '{}') || {}; } catch (e) { s = {}; }
+    s.v = s.v || {};
+    if (!s.v[k]) s.v[k] = { w, tr: String(b.tr || '').slice(0, 120), ex: String(b.ex || '').slice(0, 240), l: 0, due: Math.floor(Date.now() / 86400000), u: 0, src: 'avis' };
+    s.t = Date.now();
+    await env.DB.prepare(`INSERT INTO norsk_progress (user_id, state, updated_at) VALUES (?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET state = excluded.state, updated_at = excluded.updated_at`).bind(u.id, JSON.stringify(s), Date.now()).run();
+    return h.json({ ok: true });
+  }
+  if (p === '/api/avis' && (m === 'GET' || m === 'POST')) { // GET ?day&level — выпуск (нет — собрать сейчас); POST {day, level, fresh} — собрать заново
+    const b = m === 'POST' ? await req.json().catch(() => ({})) : {};
+    const today = rigaDay(), day = /^\d{4}-\d\d-\d\d$/.test(b.day || url.searchParams.get('day') || '') ? (b.day || url.searchParams.get('day')) : today;
+    const want = b.level || url.searchParams.get('level'), level = LEVELS.includes(want) ? want : await getLevel(env);
+    const days = (await env.DB.prepare('SELECT day FROM avis_src ORDER BY day DESC LIMIT ?').bind(KEEP).all()).results.map(x => x.day);
+    let data = null;
+    if (!(m === 'POST' && b.fresh)) { const r = await env.DB.prepare('SELECT data FROM avis WHERE day = ? AND level = ?').bind(day, level).first(); if (r) data = JSON.parse(r.data); }
+    if (!data) {
+      try {
+        let src = m === 'POST' && b.fresh === 'news' && day === today ? null : await getSrc(env, day);
+        if (!src && day !== today) h.fail(404, 'no_day');
+        if (!src) src = await buildSrc(env, day);
+        data = await buildIssue(env, day, level, src);
+      } catch (e) { if (e.status) throw e; return h.json({ error: e.code || 'ai', day, level, days }, 502, nc); }
+    }
+    if (!days.includes(day)) days.unshift(day);
+    return h.json({ ...data, days, defaultLevel: await getLevel(env) }, 200, nc);
+  }
+  return null;
+}
+
+const page = (html, status) => new Response(html, { status, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'private, no-store', 'x-robots-tag': 'noindex, nofollow' } });
+const LOCKED = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><meta name="robots" content="noindex"><title>Страница закрыта</title>
+<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#fbfaff;color:#1f1832;font:17px/1.6 system-ui,sans-serif;padding:16px;text-align:center}a{color:#534ab7}</style></head>
+<body><main><h1>Страница закрыта</h1><p>Это личная страница. Войдите на сайт и откройте её снова.</p><p><a href="/">pigeonpolly.com</a></p></main></body></html>`;
+
+const AVIS_HTML = `<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="robots" content="noindex">
+<title>Morgenavis</title><link rel="icon" href="/favicon.ico">
+<style>
+:root{--bg:#fbfaff;--card:#fff;--ink:#1f1832;--mute:#6b6480;--line:#e6e1f2;--acc:#534ab7;--acc2:#efeafc;--mark:#fff2b8;--ok:#2f8f5b}
+@media (prefers-color-scheme:dark){:root{--bg:#16131f;--card:#211d2d;--ink:#eeeaf7;--mute:#a59fb8;--line:#363047;--acc:#a99ff0;--acc2:#2c2742;--mark:#5a4b12;--ok:#6fcf97}}
+*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.65 Georgia,'Times New Roman',serif}
+.wrap{max-width:720px;margin:0 auto;padding:16px 16px 80px}
+header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:3px double var(--line);padding-bottom:8px}
+h1{font-size:34px;margin:0;letter-spacing:.5px}h1 small{display:block;font:14px system-ui,sans-serif;color:var(--mute);letter-spacing:0}
+.top a{font:14px system-ui,sans-serif;color:var(--acc)}
+.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0;font:15px system-ui,sans-serif}
+.lv{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
+.lv button{border:0;background:none;color:var(--ink);padding:7px 14px;font:600 15px system-ui,sans-serif;cursor:pointer}
+.lv button[aria-pressed=true]{background:var(--acc);color:#fff}
+select,.btn{font:15px system-ui,sans-serif;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:6px 10px;cursor:pointer}
+.hint{font:14px system-ui,sans-serif;color:var(--mute)}
+.hilsen{font-style:italic;margin:6px 0 14px}
+.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0}
+.dagens h3{margin:0 0 6px;font:700 15px system-ui,sans-serif;color:var(--acc);text-transform:uppercase;letter-spacing:.06em}
+.dagens li{margin:4px 0}.dagens i{color:var(--mute)}
+h2.sec{font:700 14px system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin:28px 0 4px;border-top:1px solid var(--line);padding-top:12px}
+article h3{font-size:23px;line-height:1.3;margin:6px 0 6px}
+.kort{font:15px system-ui,sans-serif;background:var(--acc2);border-radius:8px;padding:6px 10px;margin:6px 0}
+mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 2px;cursor:pointer}
+.words{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;font:14px system-ui,sans-serif;padding:0;list-style:none}
+.words li{background:var(--acc2);border-radius:8px;padding:3px 4px 3px 9px;display:flex;align-items:center;gap:6px}
+.words b{font-weight:600}.add{border:0;background:var(--card);color:var(--acc);border-radius:6px;cursor:pointer;font:600 13px system-ui;padding:2px 7px}
+.add.done{color:var(--ok)}
+.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font:14px system-ui,sans-serif;margin-top:6px}
+.tools a{color:var(--mute)}
+details{font:15px system-ui,sans-serif;margin-top:6px}summary{cursor:pointer;color:var(--acc)}
+.q{font-style:italic;margin:6px 0 0}
+#tip{position:fixed;z-index:9;background:var(--ink);color:var(--bg);font:15px system-ui,sans-serif;padding:6px 10px;border-radius:8px;max-width:260px;box-shadow:0 4px 18px #0003}
+.load{text-align:center;padding:60px 0;color:var(--mute);font:16px system-ui,sans-serif}
+.load b{display:block;font-size:40px;animation:bob 1.2s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-8px)}}
+.read{font:600 15px system-ui,sans-serif}
+</style></head><body><div class="wrap">
+<header><h1>Morgenavis<small id="date"></small></h1><span class="top"><a href="/norsk/">← учебник норвежского</a></span></header>
+<div class="bar"><span class="lv" id="lv">${LEVELS.map(l => `<button type="button" data-l="${l}">${l}</button>`).join('')}</span>
+<select id="day" aria-label="День"></select><button class="btn" id="again" type="button" title="Написать выпуск заново">↻ заново</button></div>
+<p class="hint" id="hint">Нажми на <mark>выделенное слово</mark> — перевод. «+» — слово в словарь учебника. Сначала читай, потом проверяй себя по-русски.</p>
+<main id="main"><div class="load"><b>🐧</b>Пелле несёт газету…</div></main>
+</div><div id="tip" hidden></div>
+<script>
+(() => {
+  const $ = s => document.querySelector(s), esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' })[c]);
+  const SEC = ${JSON.stringify(SECTIONS)};
+  let level = null, day = null, data = null;
+  try { level = localStorage.getItem('avis-level'); } catch (e) {}
+  const added = new Set(JSON.parse((() => { try { return localStorage.getItem('avis-added') || '[]'; } catch (e) { return '[]'; } })()));
+  const fmt = d => new Date(d + 'T12:00:00').toLocaleDateString('nb-NO', { weekday: 'long', day: 'numeric', month: 'long', year: 'numeric' });
+  function marks(t, words) {
+    const tr = w => { const k = w.toLowerCase(); const f = words.find(x => x.no.toLowerCase().replace(/^(en|ei|et|å) /, '') === k || x.no.toLowerCase() === k) || words.find(x => k.startsWith(x.no.toLowerCase().replace(/^(en|ei|et|å) /, '').slice(0, Math.max(3, x.no.length - 4)))); return f ? f.ru : ''; };
+    return t.split(/\\n\\n+/).map(p => '<p>' + esc(p).replace(/\\[\\[(.+?)\\]\\]/g, (_, w) => '<mark data-tr="' + esc(tr(w)) + '">' + w + '</mark>') + '</p>').join('');
+  }
+  function render() {
+    const d = data; $('#date').textContent = fmt(d.day) + ' · ' + d.level;
+    let html = d.hilsen ? '<p class="hilsen">' + esc(d.hilsen) + '</p>' : '';
+    if (d.dagens && d.dagens.length) html += '<div class="box dagens"><h3>Dagens ord</h3><ul>' + d.dagens.map(w => '<li><b>' + esc(w.no) + '</b> — ' + esc(w.ru) + ' ' + addBtn(w.no, w.ru, w.ex) + '<br><i>' + esc(w.ex) + '</i></li>').join('') + '</ul></div>';
+    let sec = '';
+    d.items.forEach((x, i) => {
+      if (x.sec !== sec) { sec = x.sec; html += '<h2 class="sec">' + esc(SEC[sec] || sec) + '</h2>'; }
+      const plain = x.text.replace(/\\[\\[(.+?)\\]\\]/g, '$1');
+      html += '<article data-i="' + i + '"><h3>' + esc(x.title) + '</h3>' + (x.kort ? '<p class="kort">📌 ' + esc(x.kort) + '</p>' : '') + marks(x.text, x.words)
+        + (x.words.length ? '<ul class="words">' + x.words.map(w => '<li><span><b>' + esc(w.no) + '</b> — ' + esc(w.ru) + '</span>' + addBtn(w.no, w.ru, (plain.split(/(?<=[.!?])\\s+/).find(s => s.toLowerCase().includes(w.no.toLowerCase().replace(/^(en|ei|et|å) /, '').slice(0, 4))) || '')) + '</li>').join('') + '</ul>' : '')
+        + (x.q ? '<p class="q">❓ ' + esc(x.q) + '</p>' : '')
+        + '<div class="tools"><button class="btn" type="button" data-say="' + i + '">🔊 Les høyt</button><a href="' + esc(x.link) + '" target="_blank" rel="noopener">kilde: ' + esc(x.src) + '</a></div>'
+        + '<details><summary>Проверить себя по-русски</summary><p>' + esc(x.ru) + '</p></details></article>';
+    });
+    const n = d.items.reduce((s, x) => s + x.text.split(/\\s+/).length, 0);
+    html += '<p class="hint" style="margin-top:30px">≈ ' + n + ' ord · ' + Math.max(1, Math.round(n / 110)) + ' min. Godt jobba! 🐧</p>';
+    $('#main').innerHTML = html;
+  }
+  const addBtn = (w, tr, ex) => added.has(w.toLowerCase()) ? '<button class="add done" type="button" disabled>✓</button>' : '<button class="add" type="button" data-w="' + esc(w) + '" data-tr="' + esc(tr) + '" data-ex="' + esc(ex) + '" title="в словарь учебника">+</button>';
+  function setLevelUi() { document.querySelectorAll('#lv button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.l === level))); }
+  async function load(opts = {}) {
+    $('#main').innerHTML = '<div class="load"><b>🐧</b>' + (opts.fresh ? 'Пелле пишет выпуск заново…' : 'Пелле несёт газету… (новый уровень пишется около минуты)') + '</div>';
+    const q = opts.fresh ? fetch('/api/avis', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ day, level, fresh: opts.fresh }) })
+      : fetch('/api/avis?' + new URLSearchParams({ ...(day ? { day } : {}), ...(level ? { level } : {}) }));
+    const r = await q.catch(() => null), j = r ? await r.json().catch(() => ({})) : {};
+    if (!r || !r.ok || j.error) { $('#main').innerHTML = '<div class="load"><b>☕</b>' + ({ ai_limit: 'Gemini сейчас занят (лимит). Попробуй через пару минут.', no_key: 'У сайта нет ключа Gemini.', no_news: 'Ленты новостей не ответили. Попробуй ↻ позже.', no_day: 'За этот день выпуска нет.' }[j.error] || 'Не получилось собрать выпуск. Попробуй ↻ через минуту.') + '</div>'; return; }
+    data = j; day = j.day; level = j.level; setLevelUi();
+    $('#day').innerHTML = j.days.map(d => '<option value="' + d + '"' + (d === day ? ' selected' : '') + '>' + fmt(d) + '</option>').join('');
+    render();
+  }
+  $('#lv').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || b.dataset.l === level) return; level = b.dataset.l; try { localStorage.setItem('avis-level', level); } catch (x) {}
+    setLevelUi(); fetch('/api/avis/level', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ level }) }); load(); });
+  $('#day').addEventListener('change', e => { day = e.target.value; load(); });
+  $('#again').addEventListener('click', () => { if (confirm('Написать этот выпуск заново? Новости те же, текст новый (около минуты).')) load({ fresh: 'text' }); });
+  const tip = $('#tip');
+  document.addEventListener('click', async e => {
+    const m = e.target.closest('mark');
+    if (m && m.dataset.tr) { const r = m.getBoundingClientRect(); tip.textContent = m.dataset.tr; tip.hidden = false; tip.style.left = Math.min(innerWidth - 270, Math.max(8, r.left)) + 'px'; tip.style.top = (r.bottom + 6) + 'px'; return; }
+    tip.hidden = true;
+    const a = e.target.closest('.add[data-w]');
+    if (a) { a.disabled = true; const r = await fetch('/api/avis/word', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ w: a.dataset.w, tr: a.dataset.tr, ex: a.dataset.ex }) }).catch(() => null);
+      if (r && r.ok) { added.add(a.dataset.w.toLowerCase()); try { localStorage.setItem('avis-added', JSON.stringify([...added].slice(-2000))); } catch (x) {} a.textContent = '✓'; a.classList.add('done'); } else a.disabled = false; return; }
+    const s = e.target.closest('[data-say]');
+    if (s) say(s, data.items[+s.dataset.say]);
+  });
+  addEventListener('scroll', () => { tip.hidden = true; }, { passive: true });
+  let audio = null, stop = false;
+  async function say(btn, x) { // голос Gemini (как в учебнике, /api/norsk/tts — до 500 знаков за раз), без него — голос браузера
+    if (audio) { stop = true; audio.pause(); audio = null; speechSynthesis.cancel(); btn.textContent = '🔊 Les høyt'; return; }
+    stop = false; btn.textContent = '⏹ Stopp';
+    const text = x.title + '. ' + x.text.replace(/\\[\\[(.+?)\\]\\]/g, '$1'), parts = [];
+    for (const s of text.split(/(?<=[.!?])\\s+/)) { if (parts.length && (parts[parts.length - 1] + ' ' + s).length < 450) parts[parts.length - 1] += ' ' + s; else parts.push(s.slice(0, 480)); }
+    for (const t of parts) {
+      if (stop) break;
+      const ok = await new Promise(res => { audio = new Audio('/api/norsk/tts?t=' + encodeURIComponent(t)); audio.onended = () => res(true); audio.onerror = () => res(false); audio.play().catch(() => res(false)); });
+      if (!ok && !stop) { await new Promise(res => { const u = new SpeechSynthesisUtterance(t); u.lang = 'nb-NO'; u.onend = res; u.onerror = res; speechSynthesis.speak(u); }); }
+    }
+    audio = null; btn.textContent = '🔊 Les høyt';
+  }
+  load();
+})();
+</script></body></html>`;
