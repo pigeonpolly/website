@@ -8,7 +8,7 @@ import { CH_DEFAULTS, CH_RANGE } from './challenge-plan.js';
 import '../site/assets/can-do.js'; // PPCanDo — что можно с вещью (этап 7)
 const PPCanDo = globalThis.PPCanDo;
 import { cardsApi, importCards, translateMissing, myCards, tradeNews, cardGiftNews, CARD_TABLES, CARD_ALTER } from './cards.js'; // коллекционные карточки (docs/cards.md)
-import { authApi, googleLink, funnelStep, mailOn, adventMail, adventAsk, AUTH_TABLES, AUTH_ALTER } from './auth.js'; // вход с паролем, письма, воронки (этап 12)
+import { authApi, googleLink, funnelStep, mailOn, sendMail, adventMail, adventAsk, AUTH_TABLES, AUTH_ALTER } from './auth.js'; // вход с паролем, письма, воронки (этап 12)
 import { notesApi, noteNews, noteHistory, audWhere, NOTE_TABLES, NOTE_ALTER } from './notes.js'; // 📣 Рассылка: сообщения и файлы птичкам, «кому» (docs/bird.md «Рассылка»)
 import { wlHolidayCron, wlMailApi, wlLang, WL_ALTER } from './wl-holidays.js'; // праздники Воббленда: подарки и письма (docs/wobbleland.md)
 import { flockApi, featherNews, FLOCK_TABLES, FLOCK_ALTER } from './flock.js'; // «Все птички» и пёрышки (этап 13 Б+В, docs/flock.md)
@@ -88,6 +88,7 @@ export default {
       await seedLegends(env, 'garden_leg_v1', ['garden|goldcan', 'garden|orangery']).catch(e => console.error('legends', e)); // ★ вещи для огорода (этап 23)
       await seedLegends(env, 'garden_items_v1', ['garden|?', ...['wcan', 'scarecrow', 'greenhouse', 'barrow', 'gnome', 'birdbath', 'beehive', 'lamp', 'sign', 'bench', 'pinwheel', 'flamingo', 'pond'].map(v => 'garden|' + v)], STOCK.norm).catch(e => console.error('garden items', e)); // вещи для огорода — сразу в продажу, не ждать пополнения
       await blogImgCheck(env, 5).catch(e => console.error('blog img', e)); // картинки статей со ссылками на Google Docs — копируем на сайт, пока ссылки живы
+      await blogImgAlert(env).catch(e => console.error('blog img alert', e)); // раз в неделю: письмо Алине, если в статьях есть картинки, которые не открываются
       await reqBackfill(env).catch(e => console.error('req tr', e)); // «Нарисуй мне»: переводы тем на все языки сайта
       await importCards(env, new URL('https://www.pigeonpolly.com/')).catch(e => console.error('cards', e)); // новые коллекции карточек из репозитория (один раз)
       await translateMissing(env, 5).catch(e => console.error('cards tr', e)); // карточки без перевода (Gemini не успел при импорте) — по 5 в час
@@ -1071,6 +1072,23 @@ async function dayCard(env, req, u, L, withLog) {
   return out;
 }
 const randomHex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, '0')).join('');
+// раз в неделю (понедельник по Риге): проверка картинок всех статей; если что-то не открывается — письмо админу со списком статей
+async function blogImgAlert(env) {
+  const day = rigaDay();
+  if (new Date(day + 'T12:00:00Z').getUTCDay() !== 1 || (await getMeta(env, 'blog_img_alert_day')) === day) return;
+  await setMeta(env, 'blog_img_alert_day', day);
+  const r = await blogImgCheck(env, 0);
+  const bad = r.posts.filter(x => x.missing || x.dead || x.foreign);
+  if (!bad.length || !mailOn(env)) return;
+  const sec = await loadSec(env).catch(() => ({ ids: [] }));
+  const users = (await env.DB.prepare('SELECT id, email, sub FROM users WHERE email IS NOT NULL').all()).results;
+  const to = [];
+  for (const u of users) if ((sec.ids || []).includes(u.id) || (!sec.emailOff && !String(u.sub || '').startsWith('pw:') && ADMIN_HASHES.includes(await sha256(u.email.toLowerCase())))) to.push(u.email);
+  const list = bad.map(x => `• ${x.title} — не видно ${x.missing + x.dead + x.foreign} из ${x.total}\n  https://www.pigeonpolly.com/blog-editor/#${x.id}`).join('\n');
+  for (const e of [...new Set(to)]) await sendMail(env, e, `🖼 В блоге не открываются картинки: ${bad.length} ${bad.length === 1 ? 'статья' : 'статей'}`,
+    `Привет!\n\nЕженедельная проверка блога нашла статьи, где картинки не открываются:\n\n${list}\n\nОткройте статью в редакторе (ссылки выше) — там будет подсказка, что сделать. Проверить всё сразу: редактор блога → «🖼 Проверить картинки».\n\npigeonpolly.com`);
+}
+
 async function sha256(s) {
   const d = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(s));
   return [...new Uint8Array(d)].map(b => b.toString(16).padStart(2, '0')).join('');
