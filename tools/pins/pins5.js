@@ -1,7 +1,7 @@
 // Пины 2.0 «арт впереди» — №262–281, зима и ожидание Нового года (ноябрь/декабрь).
 // 6 шаблонов: label (этикетка), detail (деталь), sketch (страницы скетчбука), comic (комикс из арта), series (серия), meme (мем в стиле v2).
 // Цвета и шрифты — как у сайта v2 зимой (site/assets/v2.css: Fraunces/Karla/Caveat, --bg #EEF1F3, --acc #9E1B22).
-// node tools/pins/pins5.js [номер…] → site/images/pins/pin-NNN.jpg и tools/pins/pins5.json (тексты для Notion «Pinterest pins 2.0»).
+// node tools/pins/pins5.js [номер…] → site/images/pins/pin-NNN.jpg и tools/pins/pins5.json (тексты для Notion «Pinterest pins 3.0»).
 const fs = require('fs'), path = require('path'), { execSync } = require('child_process');
 const { chromium } = require('playwright');
 const ROOT = path.resolve(__dirname, '../..');
