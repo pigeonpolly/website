@@ -12,7 +12,7 @@
     title: ['Polly’s train', 'Поезд Полли', 'Pollijas vilciens'],
     intro: ['Polly is leaving Wobbleland on a trip by train, and Empanadillo is teaching the words. Choose where to go: you will learn the language of that country. At every station there are new words and a little game. The trip never ends.',
       'Полли едет из Воббленда в путешествие на поезде, а Эмпанадильо учит словам. Выбери, куда ехать: язык этой страны и будешь учить. На каждой станции — новые слова и маленькая игра. Поездка не кончается.',
-      'Pollija no Vobllendas dodas ceļojumā ar vilcienu, un Empanadiljo māca vārdus. Izvēlies, kurp braukt: tās valsts valodu arī mācīsies. Katrā stacijā — jauni vārdi un maza spēle. Brauciens nebeidzas.'],
+      'Pollija no Vobllendas dodas ceļojumā ar vilcienu, un Empanadillo māca vārdus. Izvēlies, kurp braukt: tās valsts valodu arī mācīsies. Katrā stacijā — jauni vārdi un maza spēle. Brauciens nebeidzas.'],
     where: ['Where are we going?', 'Куда едем?', 'Kurp brauksim?'],
     to: { es: ['to Spain', 'в Испанию', 'uz Spāniju'], no: ['to Norway', 'в Норвегию', 'uz Norvēģiju'], en: ['to Great Britain', 'в Великобританию', 'uz Lielbritāniju'], lv: ['to Latvia', 'в Латвию', 'uz Latviju'] },
     land: { es: ['Spain', 'Испания', 'Spānija'], no: ['Norway', 'Норвегия', 'Norvēģija'], en: ['Britain', 'Британия', 'Britānija'], lv: ['Latvia', 'Латвия', 'Latvija'] },
@@ -67,7 +67,7 @@
   const shuffle = a => { a = a.slice(); for (let i = a.length - 1; i > 0; i--) { const j = rnd(i + 1); [a[i], a[j]] = [a[j], a[i]]; } return a; };
   // реплики Эмпанадильо
   const SAY = {
-    hi: [['Hola! I’m Empanadillo. Let’s learn some words!', 'Hola! Я Эмпанадильо. Давай учить слова!', 'Hola! Es esmu Empanadiljo. Mācīsimies vārdus!'],
+    hi: [['Hola! I’m Empanadillo. Let’s learn some words!', 'Hola! Я Эмпанадильо. Давай учить слова!', 'Hola! Es esmu Empanadillo. Mācīsimies vārdus!'],
       ['Next stop, new words. ¡Vamos!', 'Новая станция — новые слова. ¡Vamos!', 'Jauna stacija — jauni vārdi. ¡Vamos!']],
     good: [['¡Muy bien!', '¡Muy bien! Отлично!', '¡Muy bien! Lieliski!'], ['You’re a word wizard!', 'Да ты волшебник слов!', 'Tu esi vārdu burvis!'], ['Yum, a tasty word!', 'Ммм, вкусное слово!', 'Mmm, garšīgs vārds!'], ['Polly is proud of you!', 'Полли тобой гордится!', 'Pollija ar tevi lepojas!']],
     hint: [['Psst… one less to think about!', 'Псст… одним вариантом меньше!', 'Psst… par vienu variantu mazāk!'], ['Here’s a little crumb of help.', 'Вот крошечка помощи.', 'Lūk, mazliet palīdzības.']],

@@ -207,7 +207,7 @@
       h: ['Reach station {n} in one language in “Polly’s Train”', 'Доехать до станции {n} в одном языке в «Поезде Полли»', 'Sasniegt {n}. staciju vienā valodā spēlē “Pollijas vilciens”'] },
     { k: 'trpoly', s: 'trpoly', bg: '#E2D3F7', n: ['Polyglot pigeon', 'Голубь-полиглот', 'Poliglots balodis'], f: ['Coos in three languages and counting.', 'Курлычет уже на трёх языках.', 'Dūdo jau trīs valodās.'],
       h: ['Reach station {n} in 3 languages of “Polly’s Train”', 'Доехать до станции {n} в 3 языках «Поезда Полли»', 'Sasniegt {n}. staciju 3 spēles “Pollijas vilciens” valodās'] },
-    { k: 'trwords', s: 'trwords', bg: '#CDEBD8', n: ['Word collector', 'Собиратель слов', 'Vārdu krājējs'], f: ['Empanadillo writes your words into a little notebook.', 'Эмпанадильо записывает ваши слова в блокнотик.', 'Empanadiljo tavus vārdus pieraksta burtnīciņā.'],
+    { k: 'trwords', s: 'trwords', bg: '#CDEBD8', n: ['Word collector', 'Собиратель слов', 'Vārdu krājējs'], f: ['Empanadillo writes your words into a little notebook.', 'Эмпанадильо записывает ваши слова в блокнотик.', 'Empanadillo tavus vārdus pieraksta burtnīciņā.'],
       h: ['Find {n} words in “Polly’s Train”', 'Найти {n} слов в «Поезде Полли»', 'Atrast {n} vārdus spēlē “Pollijas vilciens”'] },
     // «Блинная Полли» (/pancakes/)
     { k: 'pan1', s: 'pan1', bg: '#FBE3C2', n: ['Pancake apprentice', 'Блинный подмастерье', 'Pankūku māceklis'], f: ['The first pancake is never lumpy for you.', 'У вас и первый блин не комом.', 'Tev pat pirmā pankūka neizdodas šķība.'],
