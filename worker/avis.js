@@ -345,67 +345,105 @@ const LOCKED = `<!doctype html><html lang="ru"><head><meta charset="utf-8"><meta
 const MAGPIE = `<svg viewBox="0 0 72 64" width="60" height="54"><path d="M22 44L2 60c2 3 6 3 8 1l18-12z" fill="#2c3e8f"/><path d="M22 46L6 62" stroke="#4a6fe0" stroke-width="2" stroke-linecap="round"/><ellipse cx="38" cy="38" rx="19" ry="16" fill="#1d1b26"/><ellipse cx="42" cy="43" rx="12" ry="11" fill="#fff"/><path d="M21 35c7-6 17-5 20 4-8 5-18 3-20-4z" fill="#1d1b26" stroke="#3a5bd0" stroke-width="1.6"/><path d="M25 35c4-2 9-2 12 1-4 2-9 2-12-1z" fill="#fff"/><circle cx="44" cy="20" r="13" fill="#1d1b26"/><circle cx="40" cy="19" r="4.4" fill="#fff"/><circle cx="50" cy="19" r="4.4" fill="#fff"/><circle cx="41" cy="20" r="2.3" fill="#1d1b26"/><circle cx="51" cy="20" r="2.3" fill="#1d1b26"/><circle cx="41.8" cy="19" r=".8" fill="#fff"/><circle cx="51.8" cy="19" r=".8" fill="#fff"/><path d="M55 22l11 3-11 3z" fill="#2a2633"/><circle cx="38" cy="26" r="2.3" fill="#ff9fb0" opacity=".75"/><circle cx="52" cy="27" r="2.3" fill="#ff9fb0" opacity=".75"/><path d="M36 53l-2 7M45 53l2 7" stroke="#2a2633" stroke-width="2.4" stroke-linecap="round"/></svg>`;
 const AVIS_HTML = `<!doctype html><html lang="nb"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><meta name="robots" content="noindex">
 <title>Morgenavis</title><link rel="icon" href="/favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Source+Serif+4:ital,opsz,wght@0,8..60,400;0,8..60,600;1,8..60,400&family=UnifrakturMaguntia&display=swap" rel="stylesheet">
 <style>
-:root{--bg:#fbfaff;--card:#fff;--ink:#1f1832;--mute:#6b6480;--line:#e6e1f2;--acc:#534ab7;--acc2:#efeafc;--mark:#fff2b8;--ok:#2f8f5b}
-@media (prefers-color-scheme:dark){:root{--bg:#16131f;--card:#211d2d;--ink:#eeeaf7;--mute:#a59fb8;--line:#363047;--acc:#a99ff0;--acc2:#2c2742;--mark:#5a4b12;--ok:#6fcf97}}
-*{box-sizing:border-box}body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.65 Georgia,'Times New Roman',serif}
-.wrap{max-width:720px;margin:0 auto;padding:16px 16px 80px}
-header{display:flex;align-items:baseline;justify-content:space-between;gap:12px;flex-wrap:wrap;border-bottom:3px double var(--line);padding-bottom:8px}
-h1{font-size:34px;margin:0;letter-spacing:.5px}h1 small{display:block;font:14px system-ui,sans-serif;color:var(--mute);letter-spacing:0}
-.top a{font:14px system-ui,sans-serif;color:var(--acc)}
-.bar{display:flex;gap:8px;align-items:center;flex-wrap:wrap;margin:14px 0;font:15px system-ui,sans-serif}
-.lv{display:inline-flex;border:1px solid var(--line);border-radius:999px;overflow:hidden;background:var(--card)}
-.lv button{border:0;background:none;color:var(--ink);padding:7px 14px;font:600 15px system-ui,sans-serif;cursor:pointer}
-.lv button[aria-pressed=true]{background:var(--acc);color:#fff}
-select,.btn{font:15px system-ui,sans-serif;border:1px solid var(--line);background:var(--card);color:var(--ink);border-radius:10px;padding:6px 10px;cursor:pointer}
-.hint{font:14px system-ui,sans-serif;color:var(--mute)}
-.hilsen{font-style:italic;margin:6px 0 14px}
-.box{background:var(--card);border:1px solid var(--line);border-radius:14px;padding:14px 16px;margin:14px 0}
-.dagens h3{margin:0 0 6px;font:700 15px system-ui,sans-serif;color:var(--acc);text-transform:uppercase;letter-spacing:.06em}
-.dagens li{margin:4px 0}.dagens i{color:var(--mute)}
-h2.sec{font:700 14px system-ui,sans-serif;text-transform:uppercase;letter-spacing:.08em;color:var(--mute);margin:28px 0 4px;border-top:1px solid var(--line);padding-top:12px}
-article h3{font-size:23px;line-height:1.3;margin:6px 0 6px}
-.kort{font:15px system-ui,sans-serif;background:var(--acc2);border-radius:8px;padding:6px 10px;margin:6px 0}
-mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 2px;cursor:pointer}
-.words{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;font:14px system-ui,sans-serif;padding:0;list-style:none}
-.words li{background:var(--acc2);border-radius:8px;padding:3px 4px 3px 9px;display:flex;align-items:center;gap:6px}
-.words b{font-weight:600}.add{border:1px solid var(--acc);background:var(--card);color:var(--acc);border-radius:6px;cursor:pointer;font:600 13px system-ui,sans-serif;padding:2px 8px;white-space:nowrap}
+:root{--bg:#f3eee2;--card:#faf7ef;--ink:#1c1a16;--mute:#6f685b;--line:#cbc1ad;--rule:#1c1a16;--acc:#9a2f1d;--acc2:#e9e1cf;--mark:#f1df98;--ok:#2f7a4d;--f-head:'Playfair Display',Georgia,serif;--f-body:'Source Serif 4',Georgia,serif;--f-ui:system-ui,-apple-system,'Segoe UI',sans-serif}
+@media (prefers-color-scheme:dark){:root{--bg:#191712;--card:#221f19;--ink:#ece5d4;--mute:#a69d8a;--line:#3f392e;--rule:#cfc6b2;--acc:#e48b6c;--acc2:#2c2820;--mark:#5c4c16;--ok:#76c58f}}
+*{box-sizing:border-box}html{scroll-padding-top:52px}
+body{margin:0;background:var(--bg);color:var(--ink);font:18px/1.62 var(--f-body);-webkit-font-smoothing:antialiased}
+.wrap{max-width:1180px;margin:0 auto;padding:10px 16px 80px}
+a{color:inherit}
+/* шапка газеты */
+.mast{text-align:center;padding:6px 0 0}
+.mast .back{display:block;text-align:left;font:13px var(--f-ui);color:var(--mute);text-decoration:none}
+.mast .meta{display:flex;justify-content:space-between;gap:8px;flex-wrap:wrap;border-top:1px solid var(--rule);border-bottom:1px solid var(--rule);padding:4px 2px;margin-top:6px;font:600 11px var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--ink)}
+h1{font:400 clamp(52px,12vw,112px)/1 'UnifrakturMaguntia',var(--f-head);margin:10px 0 2px;letter-spacing:.01em}
+.motto{font:italic 15px var(--f-body);color:var(--mute);margin:0 0 6px}
+.mast .rule2{border-top:3px double var(--rule);margin:6px 0 0}
+.bar{display:flex;gap:8px;align-items:center;justify-content:center;flex-wrap:wrap;margin:10px 0;font:14px var(--f-ui)}
+.lv{display:inline-flex;border:1px solid var(--rule)}
+.lv button{border:0;background:none;color:var(--ink);padding:5px 12px;font:600 13px var(--f-ui);letter-spacing:.06em;cursor:pointer}
+.lv button[aria-pressed=true]{background:var(--ink);color:var(--bg)}
+select,.btn{font:13px var(--f-ui);border:1px solid var(--rule);background:transparent;color:var(--ink);border-radius:0;padding:5px 10px;cursor:pointer}
+.btn:hover{background:var(--acc2)}
+.hint{font:13px var(--f-ui);color:var(--mute)}#hint{text-align:center;margin:0 0 6px}
+/* меню разделов */
+.toc{position:sticky;top:0;z-index:5;display:flex;justify-content:safe center;gap:0;overflow-x:auto;padding:7px 0;margin:4px 0 0;background:var(--bg);border-bottom:1px solid var(--rule);font:700 12px var(--f-ui);letter-spacing:.1em;text-transform:uppercase;scrollbar-width:none}
+.toc::-webkit-scrollbar{display:none}
+.toc a{flex:none;text-decoration:none;color:var(--ink);padding:2px 12px;border-left:1px solid var(--line)}.toc a:first-child{border-left:0}
+.toc a:hover{color:var(--acc)}.toc a.ok{color:var(--ok)}.toc a.ok::after{content:' ✓'}
+@media (max-width:700px){.toc{justify-content:flex-start}}
+.prog{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;justify-content:center;font:13px var(--f-ui);color:var(--mute);margin:8px 0}.prog:empty{display:none}
+.prog a{color:var(--acc)}.prog .pbar{flex-basis:100%;max-width:420px;height:3px;background:var(--line);overflow:hidden}.prog .pbar i{display:block;height:100%;background:var(--ink)}
+/* передовица и «Слова дня» */
+.front{display:grid;gap:18px;margin:14px 0 6px}
+@media (min-width:900px){.front{grid-template-columns:1fr 300px;align-items:start}}
+.hilsen{font:italic 20px/1.5 var(--f-body);margin:0 0 10px;padding:4px 0}
+.idag h3{font:700 12px var(--f-ui);letter-spacing:.14em;text-transform:uppercase;margin:0 0 4px;border-bottom:1px solid var(--rule);padding-bottom:4px}
+.idag ol{list-style:none;padding:0;margin:0;display:grid;gap:0 24px}@media (min-width:600px){.idag ol{grid-template-columns:1fr 1fr}}
+.idag li{border-bottom:1px dotted var(--line);padding:6px 0}.idag a{text-decoration:none;display:block}.idag a:hover b{color:var(--acc)}
+.idag small{display:block;font:700 10px var(--f-ui);letter-spacing:.12em;text-transform:uppercase;color:var(--mute)}.idag b{font:700 17px/1.25 var(--f-head)}
+.idag li.ok b{text-decoration:line-through;color:var(--mute)}
+@media (max-width:899px){.idag{display:none}}
+.box{background:var(--card);border:1px solid var(--rule);outline:1px solid var(--rule);outline-offset:3px;padding:12px 14px;margin:4px}
+.dagens h3{margin:0 0 6px;font:700 12px var(--f-ui);letter-spacing:.14em;text-transform:uppercase;text-align:center;border-bottom:1px solid var(--rule);padding-bottom:6px}
+.dagens ul{padding:0;margin:0;list-style:none}.dagens li{margin:8px 0;font-size:16px}.dagens i{color:var(--mute);font-size:15px}
+/* разделы */
+.blk{margin:26px 0 0}
+h2.sec{display:flex;justify-content:space-between;align-items:baseline;font:900 26px/1.1 var(--f-head);letter-spacing:.02em;margin:0 0 4px;border-top:4px solid var(--rule);padding-top:6px;text-transform:uppercase}
+h2.sec .up{font:13px var(--f-ui);color:var(--mute);text-decoration:none}
+.cols{display:grid;gap:0 28px;grid-template-columns:1fr}
+@media (min-width:760px){.cols:not([data-n="1"]){grid-template-columns:repeat(2,1fr)}}
+@media (min-width:1080px){.cols[data-n="3"]{grid-template-columns:repeat(3,1fr)}}
+.cols>*{border-top:1px solid var(--line);padding:12px 0 16px;min-width:0}
+.cols>.wide,.cols>.gossip:only-child{grid-column:1/-1}
+@media (min-width:900px){.wide .body{display:grid;grid-template-columns:1.1fr 1fr;gap:0 28px}.wide .pic{grid-row:span 12;max-height:none;height:100%;min-height:240px;aspect-ratio:auto}.wide h3{font-size:30px}.lead h3{font-size:38px}
+.wide:not(:has(.pic)) .body{display:block;column-count:2;column-gap:28px}.wide:not(:has(.pic)) h3{column-span:all}}
+article h3{font:700 23px/1.18 var(--f-head);margin:4px 0 6px}
+.lead .tx p:first-child::first-letter{font:700 58px/0.85 var(--f-head);float:left;padding:6px 8px 0 0}
+.tx p{margin:0 0 .6em}@media (min-width:760px){.tx p{text-align:justify;hyphens:auto;-webkit-hyphens:auto}}
+.kort{font:italic 16px/1.45 var(--f-body);color:var(--mute);border-left:3px solid var(--acc);padding:0 0 0 10px;margin:4px 0 8px}
+.pic{display:block;width:100%;aspect-ratio:3/2;max-height:280px;object-fit:cover;margin:2px 0 8px;background:var(--acc2);filter:grayscale(.45) sepia(.12) contrast(1.05);transition:filter .3s}
+.pic:hover{filter:none}
+mark{background:var(--mark);color:inherit;padding:0 1px;cursor:pointer}
+.words{display:flex;flex-wrap:wrap;gap:2px 12px;margin:6px 0;font:13px var(--f-ui);padding:6px 0 0;list-style:none;border-top:1px dotted var(--line)}
+.words li{display:flex;align-items:center;gap:6px}.words b{font-weight:700}
+.add{border:1px solid var(--acc);background:transparent;color:var(--acc);border-radius:0;cursor:pointer;font:600 11px var(--f-ui);padding:1px 6px;white-space:nowrap;letter-spacing:.03em}
 .add.done{color:var(--ok);border-color:transparent}
-.w{cursor:pointer;border-radius:3px}.w:hover{background:var(--acc2)}
+.w{cursor:pointer}.w:hover{background:var(--acc2)}
 #tip .add{margin-top:6px;background:var(--bg);color:var(--acc)}#tip small{opacity:.75}
-.tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font:14px system-ui,sans-serif;margin-top:6px}
-.tools a{color:var(--mute)}
-details{font:15px system-ui,sans-serif;margin-top:6px}summary{cursor:pointer;color:var(--acc)}
-.q{font-style:italic;margin:6px 0 0}
-#tip{position:fixed;z-index:9;background:var(--ink);color:var(--bg);font:15px system-ui,sans-serif;padding:6px 10px;border-radius:8px;max-width:260px;box-shadow:0 4px 18px #0003}
-.load{text-align:center;padding:60px 0;color:var(--mute);font:16px system-ui,sans-serif}
+.q{font-style:italic;margin:6px 0 0;font-size:16px}
+.tools{display:flex;gap:6px;flex-wrap:wrap;align-items:center;font:12px var(--f-ui);margin-top:8px}
+.tools .btn{padding:3px 8px;font-size:12px}.tools a{color:var(--mute)}
+details{font:14px var(--f-ui);margin-top:6px}summary{cursor:pointer;color:var(--acc)}
+#tip{position:fixed;z-index:9;background:var(--ink);color:var(--bg);font:15px var(--f-ui);padding:6px 10px;max-width:260px;box-shadow:0 4px 18px #0004}
+.load{text-align:center;padding:60px 0;color:var(--mute);font:15px var(--f-ui)}
 .load b{display:block;font-size:40px;animation:bob 1.2s ease-in-out infinite}@keyframes bob{50%{transform:translateY(-8px)}}
-.read{font:600 15px system-ui,sans-serif}
-.insp{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:10px;margin:10px 0}
-.ins{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:14px;padding:10px;font:14px system-ui,sans-serif}
-.ins:hover{border-color:var(--acc)}.ins b{font-size:15px}.ins small{color:var(--mute)}.ins .pq{font-size:12px}
-.pal{display:flex;height:54px;border-radius:9px;overflow:hidden;margin-bottom:6px}.pal i{flex:1}
-article .rhead{display:none;width:100%;text-align:left;border:1px solid var(--line);background:var(--card);color:var(--mute);border-radius:12px;padding:8px 12px;font:600 15px system-ui,sans-serif;cursor:pointer;margin:6px 0}
-article .rhead small{float:right;font-weight:400;color:var(--acc)}
-article.done .rhead{display:block}article.done .body{display:none}article.done.open .body{display:block}article.done.open .rhead small::after{content:''}
-article.done .rd{background:var(--acc2);color:var(--ok)}
-.prog{display:flex;flex-wrap:wrap;gap:4px 12px;align-items:center;font:14px system-ui,sans-serif;color:var(--mute);margin:0 0 8px}.prog:empty{display:none}
-.prog a{color:var(--acc)}.prog .bar{flex-basis:100%;height:5px;background:var(--line);border-radius:9px;overflow:hidden}.prog .bar i{display:block;height:100%;background:var(--ok)}
-.toc a.ok{color:var(--ok);border-color:var(--ok)}.toc a.ok::after{content:' ✓'}
-.gossip{display:flex;gap:10px;align-items:flex-start;margin:16px 0}.sissel{flex:none;margin-top:4px;animation:bob 2.4s ease-in-out infinite}
-.bubble{position:relative;flex:1;min-width:0;background:var(--acc2);border-radius:4px 18px 18px 18px;padding:10px 14px}
-.bubble .who{display:block;font:700 13px system-ui,sans-serif;color:var(--acc);letter-spacing:.04em}
-.bubble article h3{font-size:20px;margin-top:2px}.bubble .pic{max-height:220px}.bubble .words li{background:var(--card)}
-.toc{position:sticky;top:0;z-index:5;display:flex;gap:6px;overflow-x:auto;padding:8px 0;margin:8px 0;background:var(--bg);font:600 14px system-ui,sans-serif;scrollbar-width:none}
-.toc::-webkit-scrollbar{display:none}.toc a{flex:none;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--line);border-radius:999px;padding:5px 12px}
-.toc a:hover{border-color:var(--acc);color:var(--acc)}
-h2.sec{scroll-margin-top:56px;display:flex;justify-content:space-between;align-items:center}.up{color:var(--mute);text-decoration:none;font-size:16px}
-.pic{display:block;width:100%;aspect-ratio:16/9;max-height:300px;object-fit:cover;border-radius:12px;margin:8px 0 4px;background:var(--acc2)}
+/* прочитано */
+article .rhead{display:none;width:100%;text-align:left;border:0;background:none;color:var(--mute);padding:2px 0;font:700 17px/1.3 var(--f-head);cursor:pointer;text-decoration:line-through;text-decoration-thickness:1px}
+article .rhead small{float:right;font:12px var(--f-ui);color:var(--acc);text-decoration:none}
+article.done .rhead{display:block}article.done .body{display:none}article.done.open .body{display:block}
+@media (min-width:900px){.wide.done.open .body{display:grid}}
+article.done .rd{color:var(--ok)}
+/* сплетни Сиссель */
+.gossip{display:flex;gap:8px;align-items:flex-start}.sissel{flex:none;margin-top:4px;animation:bob 2.4s ease-in-out infinite}
+.bubble{position:relative;flex:1;min-width:0;background:var(--card);border:1px solid var(--rule);border-radius:2px 16px 16px 16px;padding:8px 12px}
+.bubble .who{display:block;font:700 11px var(--f-ui);color:var(--acc);letter-spacing:.12em;text-transform:uppercase}
+.bubble article h3{font-size:20px;margin-top:2px}.bubble .pic{max-height:180px}
+/* вдохновение */
+.insp{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:12px;margin:10px 0}
+.ins{display:flex;flex-direction:column;gap:2px;text-decoration:none;color:var(--ink);background:var(--card);border:1px solid var(--rule);padding:8px;font:13px var(--f-ui)}
+.ins:hover{outline:1px solid var(--rule);outline-offset:2px}.ins b{font:700 16px var(--f-head)}.ins small{color:var(--mute)}.ins .pq{font-size:11px}
+.pal{display:flex;height:60px;margin-bottom:6px}.pal i{flex:1}
+.foot{text-align:center;border-top:3px double var(--rule);margin-top:34px;padding-top:8px;font:italic 15px var(--f-body);color:var(--mute)}
 </style></head><body><div class="wrap">
-<header id="top"><h1>Morgenavis<small id="date"></small></h1><span class="top"><a href="/norsk/">← учебник норвежского</a></span></header>
+<header id="top" class="mast"><a class="back" href="/norsk/">← учебник норвежского</a>
+<div class="meta"><span>Riga</span><span id="date"></span><span id="nr"></span></div>
+<h1>Morgenavis</h1><p class="motto">Nyheter, historier og sladder på enkel norsk — hver morgen</p><div class="rule2"></div></header>
 <div class="bar"><span class="lv" id="lv">${LEVELS.map(l => `<button type="button" data-l="${l}">${LNAME[l]}</button>`).join('')}</span>
 <select id="day" aria-label="День"></select><button class="btn" id="again" type="button" title="Написать выпуск заново">↻ заново</button></div>
-<p class="hint" id="hint">Нажми на <mark>выделенное слово</mark> — перевод. «+» — слово в словарь учебника. Сначала читай, потом проверяй себя по-русски.</p>
+<p class="hint" id="hint">Нажми на любое слово — перевод и «+ в словарь». Прочитала — «✓ Прочитано», статья свернётся.</p>
 <main id="main"><div class="load"><b>🐧</b>Пелле несёт газету…</div></main>
 </div><div id="tip" hidden></div>
 <script>
@@ -445,28 +483,32 @@ h2.sec{scroll-margin-top:56px;display:flex;justify-content:space-between;align-i
   }
   function render() {
     const d = data; GL = {}; for (const w of [...(d.dagens || []), ...d.items.flatMap(x => x.words)]) { GL[w.no.toLowerCase()] = w; GL[base(w.no)] = w; }
-    $('#date').textContent = fmt(d.day) + ' · ' + (LN[d.level] || d.level);
-    let html = d.hilsen ? '<p class="hilsen tx">' + wrap(d.hilsen) + '</p>' : '';
+    $('#date').textContent = fmt(d.day); { const t = new Date(d.day + 'T12:00:00Z'); $('#nr').textContent = 'Nivå ' + (LN[d.level] || d.level) + ' · Nr. ' + Math.floor((t - Date.UTC(t.getUTCFullYear(), 0, 0)) / 86400000); }
+    const firsts = [...new Set(d.items.map(x => x.sec))].map(k => [k, d.items.findIndex(x => x.sec === k)]);
+    let html = '<div class="front"><div>' + (d.hilsen ? '<p class="hilsen tx">' + wrap(d.hilsen) + '</p>' : '')
+      + '<nav class="idag"><h3>I dag i avisen</h3><ol>' + firsts.map(([k, i]) => '<li data-sec="' + k + '"><a href="#s-' + k + '"><small>' + esc(SEC[k] || k) + '</small><b>' + esc(d.items[i].title) + '</b></a></li>').join('') + '</ol></nav></div>';
     if (d.dagens && d.dagens.length) html += '<div class="box dagens"><h3>Dagens ord</h3><ul>' + d.dagens.map(w => '<li><b>' + esc(w.no) + '</b> — ' + esc(w.ru) + ' ' + addBtn(w.no, w.ru, w.ex) + '<br><i class="tx">' + wrap(w.ex) + '</i></li>').join('') + '</ul></div>';
+    html += '</div>';
     const secs = [...new Set(d.items.map(x => x.sec))]; if (d.insp && d.insp.length) secs.push('insp');
     READ = new Set(d.read || []);
     html += '<nav class="toc" aria-label="Разделы">' + secs.map(k => '<a href="#s-' + k + '" data-sec="' + k + '">' + esc(SEC[k] || k) + '</a>').join('') + '</nav><div class="prog" id="prog"></div>';
     let sec = '';
     d.items.forEach((x, i) => {
-      if (x.sec !== sec) { sec = x.sec; html += '<h2 class="sec" id="s-' + sec + '">' + esc(SEC[sec] || sec) + '<a class="up" href="#top" aria-label="Наверх">↑</a></h2>'; }
+      if (x.sec !== sec) { if (sec) html += '</div></section>'; sec = x.sec; const cnt = d.items.filter((y, j) => y.sec === sec && j > 0).length; html += '<section class="blk" id="s-' + sec + '"><h2 class="sec">' + esc(SEC[sec] || sec) + '<a class="up" href="#top" aria-label="Наверх">↑ til toppen</a></h2><div class="cols" data-n="' + Math.min(3, cnt) + '">'; }
       const plain = x.text.replace(/\\[\\[(.+?)\\]\\]/g, '$1');
       if (x.sec === 'sladder') html += '<div class="gossip"><span class="sissel" aria-hidden="true">' + MAG + '</span><div class="bubble"><b class="who">Sissel</b>';
       const done = READ.has(keyOf(x));
-      html += '<article data-i="' + i + '" data-sec="' + x.sec + '"' + (done ? ' class="done"' : '') + '><button class="rhead" type="button" data-open="' + i + '">✓ ' + esc(x.title) + '<small>развернуть</small></button><div class="body">' + (x.img ? '<img class="pic" src="' + esc(x.img) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">' : '') + '<h3 class="tx">' + wrap(x.title) + '</h3>' + (x.kort ? '<p class="kort tx">📌 ' + wrap(x.kort) + '</p>' : '') + '<div class="tx">' + marks(x.text) + '</div>'
+      html += '<article data-i="' + i + '" data-sec="' + x.sec + '" class="' + (i === 0 ? 'lead wide' : d.items.filter((y, j) => y.sec === x.sec && j > 0).length === 1 ? 'wide' : '') + (done ? ' done' : '') + '"><button class="rhead" type="button" data-open="' + i + '">✓ ' + esc(x.title) + '<small>развернуть</small></button><div class="body">' + (x.img ? '<img class="pic" src="' + esc(x.img) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">' : '') + '<h3 class="tx">' + wrap(x.title) + '</h3>' + (x.kort ? '<p class="kort tx">📌 ' + wrap(x.kort) + '</p>' : '') + '<div class="tx">' + marks(x.text) + '</div>'
         + (x.words.length ? '<ul class="words">' + x.words.map(w => '<li><span><b>' + esc(w.no) + '</b> — ' + esc(w.ru) + '</span>' + addBtn(w.no, w.ru, (plain.split(/(?<=[.!?])\\s+/).find(s => s.toLowerCase().includes(w.no.toLowerCase().replace(/^(en|ei|et|å) /, '').slice(0, 4))) || '')) + '</li>').join('') + '</ul>' : '')
         + (x.q ? '<p class="q tx">❓ ' + wrap(x.q) + '</p>' : '')
         + '<div class="tools"><button class="btn rd" type="button" data-read="' + i + '">' + (done ? '↩ Не прочитано' : '✓ Прочитано') + '</button><button class="btn" type="button" data-say="' + i + '">🔊 Les høyt</button>' + (x.link ? '<a href="' + esc(x.link) + '" target="_blank" rel="noopener">kilde: ' + esc(x.src) + '</a>' : '') + (x.photo ? '<a href="' + esc(x.photo) + '" target="_blank" rel="noopener">foto: Wikimedia Commons</a>' : '') + '</div>'
         + '<details><summary>Проверить себя по-русски</summary><p>' + esc(x.ru) + '</p></details></div></article>' + (x.sec === 'sladder' ? '</div></div>' : '');
     });
-    if (d.insp && d.insp.length) html += '<h2 class="sec" id="s-insp">' + esc(SEC.insp) + '<a class="up" href="#top" aria-label="Наверх">↑</a></h2><p class="hint">Подборка по сезону: нажми — откроется Pinterest с этой темой.</p><div class="insp">'
-      + d.insp.map(x => '<a class="ins" href="https://www.pinterest.com/search/pins/?q=' + encodeURIComponent(x.q) + '" target="_blank" rel="noopener"><span class="pal">' + x.colors.map(c => '<i style="background:' + c + '"></i>').join('') + '</span><b>' + esc(x.no) + '</b><small>' + esc(x.ru) + '</small><small class="pq">📌 ' + esc(x.q) + '</small></a>').join('') + '</div>';
+    if (sec) html += '</div></section>';
+    if (d.insp && d.insp.length) html += '<section class="blk" id="s-insp"><h2 class="sec">' + esc(SEC.insp) + '<a class="up" href="#top" aria-label="Наверх">↑ til toppen</a></h2><p class="hint">Подборка по сезону: нажми — откроется Pinterest с этой темой.</p><div class="insp">'
+      + d.insp.map(x => '<a class="ins" href="https://www.pinterest.com/search/pins/?q=' + encodeURIComponent(x.q) + '" target="_blank" rel="noopener"><span class="pal">' + x.colors.map(c => '<i style="background:' + c + '"></i>').join('') + '</span><b>' + esc(x.no) + '</b><small>' + esc(x.ru) + '</small><small class="pq">📌 ' + esc(x.q) + '</small></a>').join('') + '</div></section>';
     const n = d.items.reduce((s, x) => s + x.text.split(/\\s+/).length, 0);
-    html += '<p class="hint" style="margin-top:30px">≈ ' + n + ' ord · ' + Math.max(1, Math.round(n / 110)) + ' min. Godt jobba! 🐧</p>';
+    html += '<p class="foot">≈ ' + n + ' ord · ' + Math.max(1, Math.round(n / 110)) + ' min lesing · Utgitt av Pelle 🐧 og Sissel · Godt jobba!</p>';
     $('#main').innerHTML = html;
     progress();
   }
@@ -476,7 +518,8 @@ h2.sec{scroll-margin-top:56px;display:flex;justify-content:space-between;align-i
   function progress() {
     const all = data.items.length, n = data.items.filter(x => READ.has(keyOf(x))).length, el = $('#prog');
     if (!el) return;
-    el.innerHTML = n ? ('<span>Прочитано ' + n + ' из ' + all + '</span>' + (n < all ? '<a href="#" id="next">→ к непрочитанному</a>' : '<b>Alt lest! Godt jobba! 🎉</b>') + '<span class="bar"><i style="width:' + Math.round(100 * n / all) + '%"></i></span>') : '';
+    el.innerHTML = n ? ('<span>Прочитано ' + n + ' из ' + all + '</span>' + (n < all ? '<a href="#" id="next">→ к непрочитанному</a>' : '<b>Alt lest! Godt jobba! 🎉</b>') + '<span class="pbar"><i style="width:' + Math.round(100 * n / all) + '%"></i></span>') : '';
+    document.querySelectorAll('.idag li[data-sec]').forEach(li => { const its = data.items.filter(x => x.sec === li.dataset.sec); li.classList.toggle('ok', its.every(x => READ.has(keyOf(x)))); });
     document.querySelectorAll('.toc a[data-sec]').forEach(a => { const its = data.items.filter(x => x.sec === a.dataset.sec); a.classList.toggle('ok', its.length > 0 && its.every(x => READ.has(keyOf(x)))); });
   }
   function setRead(i, on) {
