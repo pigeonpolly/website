@@ -57,7 +57,7 @@ export default {
       try {
         const run = () => pageFetch(req, env, url, p);
         return (await pauseGate(req, env, url, { currentUser, isAdmin, errorPage }, run)) || await run();
-      } catch (e) { console.error(e); return errorPage(env, url, 500); }
+      } catch (e) { console.error(e); await healthErr(env, 'страница ' + p, e); return errorPage(env, url, 500); }
     }
     if (!env.DB || !env.IMAGES || !env.GOOGLE_CLIENT_ID) return json({ ready: false }, 503);
     try {
@@ -67,7 +67,7 @@ export default {
       return await route(req, env, url);
     } catch (e) {
       if (e instanceof HttpError) return json({ error: e.code }, e.status);
-      console.error(e);
+      console.error(e); await healthErr(env, req.method + ' ' + p, e);
       return json({ error: 'server' }, 500);
     }
   },
@@ -76,31 +76,30 @@ export default {
     if (!env.DB || !env.IMAGES) return;
     await ensureSchema(env);
     await loadRules(env); await loadDayColors(env);
-    if (event.cron === AVIS_CRON) { ctx.waitUntil(avisCron(env, RULES).catch(e => console.error('avis', e))); return; } // отдельный запуск: свой лимит запросов
+    if (event.cron === AVIS_CRON) { ctx.waitUntil(avisCron(env, RULES).catch(e => healthErr(env, 'avis', e))); return; } // отдельный запуск: свой лимит запросов
     await setMeta(env, 'cron_at', String(Date.now())).catch(() => {}); // для «🤖 Автопилота» в кабинете: расписание живо
     ctx.waitUntil((async () => {
-      if (!(await getMeta(env, 'buttons_backfill'))) await backfillButtons(env).catch(e => console.error('backfill', e)); // разовое начисление пуговок за прошлое
-      await autoPrice(env).catch(e => console.error('price', e)); // раз в сутки: уровень цен под заработки птичек
-      await autoRestock(env).catch(e => console.error('restock', e)); // раз в сутки (по Риге) пополнить магазин
-      await seedLegends(env, 'pan_leg_v1', ['furn|pancaketower', 'furn|magicpan', 'hat|pancakecrown', 'item|goldspatula']).catch(e => console.error('legends', e)); // ★ блинной темы — разово в продажу
-      await seedLegends(env, 'train_leg_v1', ['furn|steamtrain', 'hat|goldcap']).catch(e => console.error('legends', e)); // ★ темы «🚆 Поезд» — разово в продажу
-      await seedLegends(env, 'train_items_v1', TRAIN_ITEMS, STOCK.norm).catch(e => console.error('train items', e)); // вещи темы «🚆 Поезд» (worker/train.js)
-      await seedLegends(env, 'garden_leg_v1', ['garden|goldcan', 'garden|orangery']).catch(e => console.error('legends', e)); // ★ вещи для огорода (этап 23)
-      await seedLegends(env, 'garden_items_v1', ['garden|?', ...['wcan', 'scarecrow', 'greenhouse', 'barrow', 'gnome', 'birdbath', 'beehive', 'lamp', 'sign', 'bench', 'pinwheel', 'flamingo', 'pond'].map(v => 'garden|' + v)], STOCK.norm).catch(e => console.error('garden items', e)); // вещи для огорода — сразу в продажу, не ждать пополнения
-      await blogImgCheck(env, 5).catch(e => console.error('blog img', e)); // картинки статей со ссылками на Google Docs — копируем на сайт, пока ссылки живы
-      await blogImgAlert(env).catch(e => console.error('blog img alert', e)); // раз в неделю: письмо Алине, если в статьях есть картинки, которые не открываются
-      await reqBackfill(env).catch(e => console.error('req tr', e)); // «Нарисуй мне»: переводы тем на все языки сайта
-      await importCards(env, new URL('https://www.pigeonpolly.com/')).catch(e => console.error('cards', e)); // новые коллекции карточек из репозитория (один раз)
-      await translateMissing(env, 5).catch(e => console.error('cards tr', e)); // карточки без перевода (Gemini не успел при импорте) — по 5 в час
-      await importTitos(env, new URL('https://www.pigeonpolly.com/')).catch(e => console.error('titos', e)); // дела Титоса: новый titos-cases.json — в D1 и перевести (один раз на хэш)
-      await challengeCron(env, RULES).catch(e => console.error('challenge plan', e)); // темы челленджа: с 20-го — план следующего месяца
-      await adventMail(env, authHelpers(env)).catch(e => console.error('advent mail', e)); // 1 декабря: письмо «адвент открылся» тем, кто отметил галочку
-      await wlHolidayCron(env, wlHelpers(env)).catch(e => console.error('wl holiday', e)); // праздник Воббленда: подарок всем птичкам и письмо-поздравление
-      await mailCron(env, authHelpers(env)).catch(e => console.error('mail', e)); // письма из кабинета — порциями до лимита в сутки
-      await mailGamesCron(env, mailHelpers(env)).catch(e => console.error('mail games', e)); // уведомления из игр: серия, огород, Титос (worker/mail.js)
-      await flockNewsCron(env).catch(e => console.error('flock news', e)); // новости стаи — 30 дней
-      await schoolCron(env, now(), id => imgDrop(env, id)).catch(e => console.error('school', e)); // «Школа Полли»: фото работ — год после диплома
-      await autoNicks(env).catch(e => console.error('auto nick', e)); // птички без ника — случайный ник
+      if (!(await getMeta(env, 'buttons_backfill'))) await backfillButtons(env).catch(e => healthErr(env, 'backfill', e)); // разовое начисление пуговок за прошлое
+      await autoPrice(env).catch(e => healthErr(env, 'price', e)); // раз в сутки: уровень цен под заработки птичек
+      await autoRestock(env).catch(e => healthErr(env, 'restock', e)); // раз в сутки (по Риге) пополнить магазин
+      await seedLegends(env, 'pan_leg_v1', ['furn|pancaketower', 'furn|magicpan', 'hat|pancakecrown', 'item|goldspatula']).catch(e => healthErr(env, 'legends', e)); // ★ блинной темы — разово в продажу
+      await seedLegends(env, 'train_leg_v1', ['furn|steamtrain', 'hat|goldcap']).catch(e => healthErr(env, 'legends', e)); // ★ темы «🚆 Поезд» — разово в продажу
+      await seedLegends(env, 'train_items_v1', TRAIN_ITEMS, STOCK.norm).catch(e => healthErr(env, 'train items', e)); // вещи темы «🚆 Поезд» (worker/train.js)
+      await seedLegends(env, 'garden_leg_v1', ['garden|goldcan', 'garden|orangery']).catch(e => healthErr(env, 'legends', e)); // ★ вещи для огорода (этап 23)
+      await seedLegends(env, 'garden_items_v1', ['garden|?', ...['wcan', 'scarecrow', 'greenhouse', 'barrow', 'gnome', 'birdbath', 'beehive', 'lamp', 'sign', 'bench', 'pinwheel', 'flamingo', 'pond'].map(v => 'garden|' + v)], STOCK.norm).catch(e => healthErr(env, 'garden items', e)); // вещи для огорода — сразу в продажу, не ждать пополнения
+      await blogImgCheck(env, 5).catch(e => healthErr(env, 'blog img', e)); // картинки статей со ссылками на Google Docs — копируем на сайт, пока ссылки живы
+      await reqBackfill(env).catch(e => healthErr(env, 'req tr', e)); // «Нарисуй мне»: переводы тем на все языки сайта
+      await importCards(env, new URL('https://www.pigeonpolly.com/')).catch(e => healthErr(env, 'cards', e)); // новые коллекции карточек из репозитория (один раз)
+      await translateMissing(env, 5).catch(e => healthErr(env, 'cards tr', e)); // карточки без перевода (Gemini не успел при импорте) — по 5 в час
+      await importTitos(env, new URL('https://www.pigeonpolly.com/')).catch(e => healthErr(env, 'titos', e)); // дела Титоса: новый titos-cases.json — в D1 и перевести (один раз на хэш)
+      await challengeCron(env, RULES).catch(e => healthErr(env, 'challenge plan', e)); // темы челленджа: с 20-го — план следующего месяца
+      await adventMail(env, authHelpers(env)).catch(e => healthErr(env, 'advent mail', e)); // 1 декабря: письмо «адвент открылся» тем, кто отметил галочку
+      await wlHolidayCron(env, wlHelpers(env)).catch(e => healthErr(env, 'wl holiday', e)); // праздник Воббленда: подарок всем птичкам и письмо-поздравление
+      await mailCron(env, authHelpers(env)).catch(e => healthErr(env, 'mail', e)); // письма из кабинета — порциями до лимита в сутки
+      await mailGamesCron(env, mailHelpers(env)).catch(e => healthErr(env, 'mail games', e)); // уведомления из игр: серия, огород, Титос (worker/mail.js)
+      await flockNewsCron(env).catch(e => healthErr(env, 'flock news', e)); // новости стаи — 30 дней
+      await schoolCron(env, now(), id => imgDrop(env, id)).catch(e => healthErr(env, 'school', e)); // «Школа Полли»: фото работ — год после диплома
+      await autoNicks(env).catch(e => healthErr(env, 'auto nick', e)); // птички без ника — случайный ник
       await migrateToR2(env); await cleanupInactive(env);
       await env.DB.prepare('DELETE FROM game_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {}); // старые забеги игр (started — в мс)
       await topCron(env).catch(() => {}); // доски топа: недели старше 8
@@ -108,6 +107,7 @@ export default {
       await env.DB.prepare('DELETE FROM maze_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {});
       await env.DB.prepare('DELETE FROM visits WHERE ts < ?').bind(now() - 400 * 86400).run().catch(() => {}); // статистику храним ~13 месяцев
       await env.DB.prepare('DELETE FROM funnel WHERE day < ?').bind(new Date(Date.now() - 400 * 86400000).toISOString().slice(0, 10)).run().catch(() => {}); // воронки — так же
+      await healthMail(env).catch(e => console.error('health mail', e)); // 🩺 письмо админу о сбоях: новые ошибки — раз в день; по понедельникам ещё картинки блога и автокопия
     })());
   },
 };
@@ -1072,21 +1072,41 @@ async function dayCard(env, req, u, L, withLog) {
   return out;
 }
 const randomHex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, '0')).join('');
-// раз в неделю (понедельник по Риге): проверка картинок всех статей; если что-то не открывается — письмо админу со списком статей
-async function blogImgAlert(env) {
-  const day = rigaDay();
-  if (new Date(day + 'T12:00:00Z').getUTCDay() !== 1 || (await getMeta(env, 'blog_img_alert_day')) === day) return;
-  await setMeta(env, 'blog_img_alert_day', day);
-  const r = await blogImgCheck(env, 0);
-  const bad = r.posts.filter(x => x.missing || x.dead || x.foreign);
-  if (!bad.length || !mailOn(env)) return;
+// ---------- 🩺 сбои: ошибки записываются в meta health_log (последние 60), админу приходит письмо ----------
+// новые ошибки — не чаще раза в сутки; по понедельникам (Рига) ещё проверка картинок блога (blogImgCheck) и автокопии в Google Drive (meta backup_seen)
+async function healthErr(env, where, e) {
+  console.error(where, e);
+  try {
+    const log = parseJ(await getMeta(env, 'health_log'), []) || [];
+    const msg = String((e && e.message) || e).slice(0, 300), last = log[log.length - 1];
+    if (last && last.w === where && last.m === msg) { last.n = (last.n || 1) + 1; last.at = Date.now(); } // одна и та же ошибка подряд — счётчиком
+    else log.push({ at: Date.now(), w: String(where).slice(0, 120), m: msg, n: 1 });
+    await setMeta(env, 'health_log', JSON.stringify(log.slice(-60)));
+  } catch (x) { /* база недоступна — остаётся только лог Cloudflare */ }
+}
+async function healthMail(env) {
+  if (!mailOn(env)) return;
+  const day = rigaDay(), monday = new Date(day + 'T12:00:00Z').getUTCDay() === 1;
+  if ((await getMeta(env, 'health_mail_day')) === day) return;
+  const since = Number(await getMeta(env, 'health_mail_at')) || 0;
+  const errs = (parseJ(await getMeta(env, 'health_log'), []) || []).filter(x => x.at > since);
+  const parts = [];
+  if (errs.length) parts.push('⚠️ Ошибки на сайте:\n' + errs.map(x => `• ${new Date(x.at).toLocaleString('ru-RU', { timeZone: 'Europe/Riga' })} — ${x.w}${x.n > 1 ? ` (×${x.n})` : ''}\n  ${x.m}`).join('\n'));
+  if (monday && (await getMeta(env, 'health_week_day')) !== day) {
+    await setMeta(env, 'health_week_day', day);
+    const r = await blogImgCheck(env, 0), bad = r.posts.filter(x => x.missing || x.dead || x.foreign);
+    if (bad.length) parts.push(`🖼 В блоге не открываются картинки (${bad.length}):\n` + bad.map(x => `• ${x.title} — не видно ${x.missing + x.dead + x.foreign} из ${x.total}\n  https://www.pigeonpolly.com/blog-editor/#${x.id}`).join('\n') + '\nВсё сразу: редактор блога → «🖼 Проверить картинки».');
+    const seen = Number(await getMeta(env, 'backup_seen')) || 0;
+    if (now() - seen > 9 * 86400) parts.push(`💾 Автокопия в Google Drive ${seen ? 'не приходила с ' + new Date(seen * 1000).toLocaleDateString('ru-RU') : 'ещё ни разу не приходила'}. Кабинет → «⚙️ Сервис» → «Копии» → «🔁 Автокопия в Google Drive»: вставить скрипт заново и запустить setup.`);
+  }
+  if (!parts.length) return;
   const sec = await loadSec(env).catch(() => ({ ids: [] }));
   const users = (await env.DB.prepare('SELECT id, email, sub FROM users WHERE email IS NOT NULL').all()).results;
   const to = [];
   for (const u of users) if ((sec.ids || []).includes(u.id) || (!sec.emailOff && !String(u.sub || '').startsWith('pw:') && ADMIN_HASHES.includes(await sha256(u.email.toLowerCase())))) to.push(u.email);
-  const list = bad.map(x => `• ${x.title} — не видно ${x.missing + x.dead + x.foreign} из ${x.total}\n  https://www.pigeonpolly.com/blog-editor/#${x.id}`).join('\n');
-  for (const e of [...new Set(to)]) await sendMail(env, e, `🖼 В блоге не открываются картинки: ${bad.length} ${bad.length === 1 ? 'статья' : 'статей'}`,
-    `Привет!\n\nЕженедельная проверка блога нашла статьи, где картинки не открываются:\n\n${list}\n\nОткройте статью в редакторе (ссылки выше) — там будет подсказка, что сделать. Проверить всё сразу: редактор блога → «🖼 Проверить картинки».\n\npigeonpolly.com`);
+  let ok = false;
+  for (const e of [...new Set(to)]) ok = (await sendMail(env, e, '🩺 pigeonpolly.com: что-то не работает', `Привет!\n\nСайт сам проверил себя и нашёл проблемы:\n\n${parts.join('\n\n')}\n\nПерешли это письмо Claude — он разберётся.\n\npigeonpolly.com`)).ok || ok;
+  if (ok) { await setMeta(env, 'health_mail_day', day); await setMeta(env, 'health_mail_at', String(Date.now())); }
 }
 
 async function sha256(s) {

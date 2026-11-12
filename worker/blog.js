@@ -371,6 +371,7 @@ export async function blogApi(req, env, url, h) {
     const tok = await h.getMeta('backup_token');
     const byToken = tok && url.searchParams.get('token') === tok;
     if (!byToken) await admin();
+    if (byToken) await h.setMeta('backup_seen', String(Math.floor(Date.now() / 1000))); // автокопия из Google Drive жива — для 🩺 письма о сбоях
     return json(await fullBackup(env));
   }
 

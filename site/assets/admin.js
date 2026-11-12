@@ -231,9 +231,11 @@
   }
   function pinForm(note) {
     return `<section class="adm-box"><h2>🔐 Введи PIN админа</h2><p class="be-note">${note || 'На этом устройстве админские права включатся после PIN — один раз.'}</p>
-      <form class="adm-sec-f" id="pin-f"><input type="password" inputmode="numeric" autocomplete="off" maxlength="12" required placeholder="PIN"><button class="pill-btn pill-fill">OK</button></form><p class="be-note" id="pin-st" role="status"></p></section>`;
+      <form class="adm-sec-f" id="pin-f"><input type="password" inputmode="numeric" autocomplete="off" maxlength="12" required placeholder="PIN"><button class="pill-btn pill-fill">OK</button></form><p class="be-note" id="pin-st" role="status"></p>
+      <details class="adm-forgot"><summary>Забыла PIN?</summary><p class="be-note">Введи код восстановления с бумажки — PIN сбросится, и ты задашь новый.</p>${recoverForm().replace(/^<section class="adm-box"><h2>[^<]*<\/h2>\s*<p class="be-note">[^<]*<\/p>/, '').replace(/<\/section>$/, '')}</details></section>`;
   }
   function wirePin() {
+    wireRecover(); // «Забыла PIN?» — тот же вход по коду восстановления
     const f = document.getElementById('pin-f'); if (!f) return;
     f.onsubmit = async e => { e.preventDefault(); const st = document.getElementById('pin-st'); st.textContent = '…';
       try { await api('admin/pin/verify', { pin: f.querySelector('input').value }); location.reload(); }
