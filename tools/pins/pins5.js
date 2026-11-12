@@ -195,6 +195,6 @@ const PINS = [
     await page.goto('file://' + tmp, { waitUntil: 'networkidle' }); await page.evaluate(() => document.fonts.ready);
     await page.screenshot({ path: path.join(ROOT, `site/images/pins/pin-${p.n}.jpg`), type: 'jpeg', quality: 88 });
   }
-  fs.unlinkSync(tmp); fs.writeFileSync(path.join(__dirname, 'pins5.json'), JSON.stringify(out, null, 1));
+  if (fs.existsSync(tmp)) fs.unlinkSync(tmp); fs.writeFileSync(path.join(__dirname, 'pins5.json'), JSON.stringify(out, null, 1));
   await b.close();
 })();
