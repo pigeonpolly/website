@@ -15,7 +15,7 @@ export const AVIS_TABLES = [
 export const AVIS_RULES = { avisOn: true, avisHour: 6 };
 export const AVIS_RANGE = { avisHour: [3, 12] };
 export const AVIS_INT = ['avisHour'];
-export const AVIS_CRON = '47 * * * *';
+export const AVIS_CRON = '*/15 * * * *'; // по шагу за запуск — у каждого запуска свой лимит запросов
 const V = 4; // версия формата набора и выпуска: старше — за сегодня пересобрать (4 — вдохновение; 3 — сплетни Сиссель)
 const LEVELS = ['A', 'B'], KEEP = 30; // два уровня (решение Алины): A = A1–A2, B = B1–B2
 const LNAME = { A: 'A1–A2', B: 'B1–B2' };
@@ -54,7 +54,7 @@ const tag = (x, t) => { const m = x.match(new RegExp(`<${t}[^>]*>([\\s\\S]*?)</$
 async function feed(url) {
   const r = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; Morgenavis/1.0)' }, signal: AbortSignal.timeout(10000) }).catch(() => null);
   if (!r || !r.ok) return [];
-  const xml = await r.text().catch(() => '');
+  const xml = (await r.text().catch(() => '')).slice(0, 400000);
   const host = new URL(url).hostname.replace(/^www\./, '');
   return (xml.match(/<(item|entry)[\s>][\s\S]*?<\/\1>/gi) || []).map(x => {
     const link = decode(tag(x, 'link')) || ((x.match(/<link[^>]*href="([^"]+)"/i) || [])[1] || '');
@@ -66,7 +66,10 @@ async function feed(url) {
 async function collect() {
   const since = Date.now() - 30 * 3600000, out = {};
   for (const [sec, urls] of Object.entries(FEEDS)) {
-    const all = (await Promise.all(urls.map(feed))).flat().filter(x => !x.when || x.when >= since), seen = new Set();
+    const main = urls.filter(u => !/news\.google\.com/.test(u)), gn = urls.filter(u => /news\.google\.com/.test(u));
+    let all = (await Promise.all(main.map(feed))).flat().filter(x => !x.when || x.when >= since);
+    if (all.length < PICK[sec] && gn.length) all = all.concat((await Promise.all(gn.map(feed))).flat().filter(x => !x.when || x.when >= since));
+    const seen = new Set();
     out[sec] = all.filter(x => { const k = x.title.toLowerCase().slice(0, 60); if (seen.has(k)) return false; seen.add(k); return true; }).slice(0, 14);
   }
   return out;
@@ -76,7 +79,7 @@ async function article(url) { // → { text, img } (img — og:image стран�
   if (/news\.google\.com/.test(url)) return { text: '', img: '' };
   const r = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; Morgenavis/1.0)' }, signal: AbortSignal.timeout(9000) }).catch(() => null);
   if (!r || !r.ok || !/html/.test(r.headers.get('content-type') || '')) return { text: '', img: '' };
-  const raw = await r.text().catch(() => '');
+  const raw = (await r.text().catch(() => '')).slice(0, 600000);
   const og = (raw.match(/<meta[^>]+(?:property|name)="(?:og:image|twitter:image)"[^>]+content="([^"]+)"/i) || raw.match(/<meta[^>]+content="([^"]+)"[^>]+(?:property|name)="(?:og:image|twitter:image)"/i) || [])[1] || '';
   const html = raw.replace(/<(script|style|nav|footer|aside|figure)[\s\S]*?<\/\1>/gi, ' ');
   return { text: (html.match(/<p[\s>][\s\S]*?<\/p>/gi) || []).map(decode).filter(p => p.length > 50).join('\n').slice(0, 4000), img: /^https:\/\//.test(og) ? og.replace(/&amp;/g, '&') : '' };
@@ -87,9 +90,11 @@ async function ask(env, prompt, schema, ok, temp = 0.4) {
   const key = await geminiKey(env);
   if (!key) throw Object.assign(new Error('no_key'), { code: 'no_key' });
   let err = 'ai';
+  const t0 = Date.now(), BUDGET = 150000; // один шаг сборки — не дольше ~2.5 мин, иначе страница «висит»
   for (const model of GEMINI_MODELS.slice().reverse()) { // сначала модель поумнее — язык уровня важнее скорости
+    const left = BUDGET - (Date.now() - t0); if (left < 15000) break;
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
-      method: 'POST', headers: { 'x-goog-api-key': key, 'content-type': 'application/json' }, signal: AbortSignal.timeout(100000),
+      method: 'POST', headers: { 'x-goog-api-key': key, 'content-type': 'application/json' }, signal: AbortSignal.timeout(Math.min(90000, left)),
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: temp, responseMimeType: 'application/json', responseSchema: schema } }),
     }).catch(() => null);
     if (!r) continue;
@@ -169,10 +174,8 @@ const ISSUE = { type: 'OBJECT', required: ['hilsen', 'items', 'dagens'], propert
   items: { type: 'ARRAY', items: { type: 'OBJECT', required: ['i', 'title', 'kort', 'text', 'words', 'ru', 'q'], properties: {
     i: { type: 'INTEGER' }, title: { type: 'STRING' }, kort: { type: 'STRING' }, text: { type: 'STRING' }, words: { type: 'ARRAY', items: WORD }, ru: { type: 'STRING' }, q: { type: 'STRING' } } } } } };
 
-// выпуск уровня: пересказ всех выбранных новостей одним вызовом → avis
-async function buildIssue(env, day, level, all) {
-  const src = all.filter(x => !x.topic), topics = all.filter(x => x.topic);
-  const tales = topics.length ? buildTales(env, day, level, topics).catch(e => { console.error('avis tales', e); return { items: [], insp: [] }; }) : { items: [], insp: [] };
+// выпуск уровня, шаг «новости»: пересказ новостей (больше 7 — двумя параллельными вызовами, так быстрее) → avis с tales: 'pending'
+async function newsCall(env, day, level, src) {
   const stories = src.map((x, i) => `#${i} [${x.sec}] ${x.title}\nSource: ${x.src}\n${x.text || x.desc}`).join('\n\n---\n\n');
   const out = await ask(env, `You write a daily news digest in Norwegian Bokmål for an adult Russian-speaking learner of Norwegian who lives in Riga and is an artist. The goal: read more Norwegian every day and understand it fluently.
 
@@ -188,7 +191,7 @@ For EVERY story below (keep the order, field "i" = the story number) write:
 For stories in section [sladder] (celebrity gossip) write "title" and "text" as Sissel, a cute chatty magpie (skjære) who gossips with her friend, the reader: informal, warm and playful, speaking directly to "du" ("Hør her!", "Du, vet du hva?", "Jeg sier ikke noe, men…"), one or two emojis at most, still the same level, still only facts from the source. "kort" stays empty for gossip.
 Also:
 - "hilsen": 1–2 friendly Norwegian sentences at this level to start the day (mention the date ${day} naturally, e.g. weekday), no facts that are not in the stories.
-- "dagens": "words of the day" — 3 useful words or expressions from today's stories, with Russian translation and a short Norwegian example sentence at this level.
+- "dagens": "words of the day" — 3 useful words or expressions from these stories, with Russian translation and a short Norwegian example sentence at this level.
 Use correct modern Bokmål spelling and grammar. Do not use English words when a Norwegian word exists.
 
 STORIES:
@@ -196,10 +199,27 @@ STORIES:
 ${stories}`, ISSUE, o => o && Array.isArray(o.items) && o.items.length);
   const items = out.items.filter(x => src[x.i]).map(x => ({ sec: src[x.i].sec, link: src[x.i].link, src: src[x.i].src, img: src[x.i].img || '', title: String(x.title).slice(0, 200), kort: String(x.kort || '').slice(0, 300),
     text: String(x.text).slice(0, 3000), words: (x.words || []).slice(0, 12).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80) })), ru: String(x.ru).slice(0, 500), q: String(x.q || '').slice(0, 200) }));
-  const tl = await tales; items.push(...tl.items);
-  const data = { v: V, insp: tl.insp, day, level, hilsen: String(out.hilsen || '').slice(0, 400), dagens: (out.dagens || []).slice(0, 5).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80), ex: String(w.ex).slice(0, 200) })), items };
-  await env.DB.prepare('INSERT INTO avis (day, level, data, created_at) VALUES (?, ?, ?, ?) ON CONFLICT(day, level) DO UPDATE SET data = excluded.data, created_at = excluded.created_at')
-    .bind(day, level, JSON.stringify(data), Date.now()).run();
+  return { items, hilsen: String(out.hilsen || '').slice(0, 400), dagens: (out.dagens || []).slice(0, 5).map(w => ({ no: String(w.no).slice(0, 60), ru: String(w.ru).slice(0, 80), ex: String(w.ex).slice(0, 200) })) };
+}
+const saveIssue = (env, data) => env.DB.prepare('INSERT INTO avis (day, level, data, created_at) VALUES (?, ?, ?, ?) ON CONFLICT(day, level) DO UPDATE SET data = excluded.data, created_at = excluded.created_at')
+  .bind(data.day, data.level, JSON.stringify(data), Date.now()).run();
+async function buildNews(env, day, level, all) {
+  const src = all.filter(x => !x.topic), topics = all.filter(x => x.topic), half = src.length > 7 ? Math.ceil(src.length / 2) : src.length;
+  const parts = await Promise.allSettled([newsCall(env, day, level, src.slice(0, half)), ...(half < src.length ? [newsCall(env, day, level, src.slice(half))] : [])]);
+  const ok = parts.filter(x => x.status === 'fulfilled').map(x => x.value);
+  if (!ok.length) throw parts[0].reason;
+  const items = ok.flatMap(x => x.items), order = Object.keys(SECTIONS);
+  items.sort((a, b) => order.indexOf(a.sec) - order.indexOf(b.sec));
+  const data = { v: V, day, level, hilsen: ok[0].hilsen, dagens: ok[0].dagens.slice(0, 3), items, insp: [], ...(topics.length ? { tales: 'pending' } : {}) };
+  await saveIssue(env, data);
+  return data;
+}
+// шаг «рассказы»: Норвегия, кухня и традиции, вдохновение — дописать к готовым новостям
+async function addTales(env, data, all) {
+  const topics = all.filter(x => x.topic);
+  try { const t = await buildTales(env, data.day, data.level, topics); data.items.push(...t.items); data.insp = t.insp; delete data.tales; }
+  catch (e) { data.taleTries = (data.taleTries || 0) + 1; if (data.taleTries >= 3) delete data.tales; console.error('avis tales', e); } // 3 неудачи — выпуск без рассказов
+  await saveIssue(env, data);
   return data;
 }
 const STORY = { type: 'OBJECT', required: ['items'], properties: { items: { type: 'ARRAY', items: { type: 'OBJECT', required: ['i', 'title', 'text', 'words', 'ru', 'q'], properties: {
@@ -230,18 +250,34 @@ Use correct modern Bokmål.`, STORY, o => o && Array.isArray(o.items) && o.items
 const getSrc = async (env, day) => { const r = await env.DB.prepare('SELECT data FROM avis_src WHERE day = ?').bind(day).first(); return r ? JSON.parse(r.data) : null; };
 const getLevel = async env => { const r = await env.DB.prepare("SELECT value FROM meta WHERE key = 'avis_level'").first().catch(() => null); return LEVELS.includes(r && r.value) ? r.value : 'B'; };
 
-// cron (AVIS_CRON, раз в час): с avisHour по Риге — новости дня и выпуск уровня по умолчанию; старше 30 дней — удалить
+// состояние выпуска без сборки: готов (data, может быть с tales: 'pending') или { pending: 'src' | 'news' }
+async function state(env, day, level, today) {
+  const src = await getSrc(env, day);
+  if (!src || (day === today && !src.some(x => x.v === V))) return { pending: 'src' };
+  const r = await env.DB.prepare('SELECT data FROM avis WHERE day = ? AND level = ?').bind(day, level).first();
+  const data = r && JSON.parse(r.data);
+  if (!data || (day === today && data.v !== V)) return { pending: 'news' };
+  return data;
+}
+// ровно один тяжёлый шаг за запрос (свой лимит запросов и времени): набор новостей → пересказ новостей → рассказы
+async function step(env, day, level) {
+  const today = rigaDay(), st = await state(env, day, level, today);
+  if (st.pending === 'src') { if (day !== today) throw Object.assign(new Error('no_day'), { code: 'no_day' }); await buildSrc(env, day); return { pending: 'news' }; }
+  if (st.pending === 'news') return buildNews(env, day, level, await getSrc(env, day));
+  if (st.tales === 'pending') return addTales(env, st, await getSrc(env, day));
+  return st;
+}
+
+// cron (AVIS_CRON, каждые 15 мин): с avisHour по Риге — по шагу, пока выпуск уровня по умолчанию не готов; старше 30 дней — удалить
 export async function avisCron(env, R) {
   if (!R.avisOn || rigaHour() < R.avisHour) return;
-  const day = rigaDay();
+  const day = rigaDay(), level = await getLevel(env);
+  const st = await state(env, day, level, day);
+  if (!st.pending && st.tales !== 'pending') return;
   const tries = 'avis_try:' + day, n = Number(((await env.DB.prepare('SELECT value FROM meta WHERE key = ?').bind(tries).first().catch(() => null)) || {}).value) || 0;
-  if (n >= 4) return; // Gemini занят весь день — не больше 4 попыток
-  let src = await getSrc(env, day);
-  const level = await getLevel(env);
-  if (src && await env.DB.prepare('SELECT 1 FROM avis WHERE day = ? AND level = ?').bind(day, level).first()) return;
+  if (n >= 12) return; // Gemini занят весь день — не больше 12 шагов
   await env.DB.prepare("INSERT INTO meta (key, value) VALUES (?, ?) ON CONFLICT(key) DO UPDATE SET value = excluded.value").bind(tries, String(n + 1)).run();
-  if (!src) src = await buildSrc(env, day);
-  await buildIssue(env, day, level, src);
+  await step(env, day, level);
   const old = rigaDay(Date.now() - KEEP * 86400000);
   await env.DB.batch([env.DB.prepare('DELETE FROM avis WHERE day < ?').bind(old), env.DB.prepare('DELETE FROM avis_src WHERE day < ?').bind(old),
     env.DB.prepare("DELETE FROM meta WHERE key LIKE 'avis_try:%' AND key < ?").bind('avis_try:' + old)]);
@@ -271,25 +307,22 @@ export async function avisApi(req, env, url, h) {
     await env.DB.prepare(`INSERT INTO norsk_progress (user_id, state, updated_at) VALUES (?, ?, ?) ON CONFLICT(user_id) DO UPDATE SET state = excluded.state, updated_at = excluded.updated_at`).bind(u.id, JSON.stringify(s), Date.now()).run();
     return h.json({ ok: true });
   }
-  if (p === '/api/avis' && (m === 'GET' || m === 'POST')) { // GET ?day&level — выпуск (нет — собрать сейчас); POST {day, level, fresh} — собрать заново
+  if (p === '/api/avis' || p === '/api/avis/build') { // GET /api/avis?day&level — что есть (без сборки); POST /api/avis/build {day, level, fresh} — следующий шаг сборки
     const b = m === 'POST' ? await req.json().catch(() => ({})) : {};
-    const today = rigaDay(), day = /^\d{4}-\d\d-\d\d$/.test(b.day || url.searchParams.get('day') || '') ? (b.day || url.searchParams.get('day')) : today;
+    const today = rigaDay(), dq = b.day || url.searchParams.get('day') || '', day = /^\d{4}-\d\d-\d\d$/.test(dq) ? dq : today;
     const want = b.level || url.searchParams.get('level'), level = LEVELS.includes(want) ? want : await getLevel(env);
+    let out;
+    try {
+      if (p === '/api/avis/build') {
+        if (m !== 'POST') return null;
+        if (b.fresh === 'news' && day === today) await env.DB.batch([env.DB.prepare('DELETE FROM avis_src WHERE day = ?').bind(day), env.DB.prepare('DELETE FROM avis WHERE day = ?').bind(day)]);
+        else if (b.fresh) await env.DB.prepare('DELETE FROM avis WHERE day = ? AND level = ?').bind(day, level).run();
+        out = await step(env, day, level);
+      } else out = await state(env, day, level, today);
+    } catch (e) { if (e.status) throw e; out = { error: e.code || 'ai' }; }
     const days = (await env.DB.prepare('SELECT day FROM avis_src ORDER BY day DESC LIMIT ?').bind(KEEP).all()).results.map(x => x.day);
-    let data = null;
-    if (!(m === 'POST' && b.fresh)) { const r = await env.DB.prepare('SELECT data FROM avis WHERE day = ? AND level = ?').bind(day, level).first(); if (r) data = JSON.parse(r.data); }
-    if (data && day === today && data.v !== V) data = null; // выпуск старого формата — переписать
-    if (!data) {
-      try {
-        let src = m === 'POST' && b.fresh === 'news' && day === today ? null : await getSrc(env, day);
-        if (src && day === today && !src.some(x => x.v === V)) src = null; // набор старого формата (без рассказов и картинок) — собрать заново
-        if (!src && day !== today) h.fail(404, 'no_day');
-        if (!src) src = await buildSrc(env, day);
-        data = await buildIssue(env, day, level, src);
-      } catch (e) { if (e.status) throw e; return h.json({ error: e.code || 'ai', day, level, days }, 502, nc); }
-    }
-    if (!days.includes(day)) days.unshift(day);
-    return h.json({ ...data, days, defaultLevel: await getLevel(env) }, 200, nc);
+    if (!days.includes(day) && day === today) days.unshift(day);
+    return h.json({ ...out, day, level, days, defaultLevel: await getLevel(env) }, 200, nc);
   }
   return null;
 }
@@ -420,19 +453,37 @@ h2.sec{scroll-margin-top:56px;display:flex;justify-content:space-between;align-i
   }
   const addBtn = (w, tr, ex) => added.has(w.toLowerCase()) ? '<button class="add done" type="button" disabled>✓ в словаре</button>' : '<button class="add" type="button" data-w="' + esc(w) + '" data-tr="' + esc(tr) + '" data-ex="' + esc(ex) + '" title="в словарь учебника">+ в словарь</button>';
   function setLevelUi() { document.querySelectorAll('#lv button').forEach(b => b.setAttribute('aria-pressed', String(b.dataset.l === level))); }
-  async function load(opts = {}) {
-    $('#main').innerHTML = '<div class="load"><b>🐧</b>' + (opts.fresh ? 'Пелле пишет выпуск заново…' : 'Пелле несёт газету… (новый уровень пишется около минуты)') + '</div>';
-    const q = opts.fresh ? fetch('/api/avis', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ day, level, fresh: opts.fresh }) })
-      : fetch('/api/avis?' + new URLSearchParams({ ...(day ? { day } : {}), ...(level ? { level } : {}) }));
-    const r = await q.catch(() => null), j = r ? await r.json().catch(() => ({})) : {};
-    if (!r || !r.ok || j.error) { $('#main').innerHTML = '<div class="load"><b>☕</b>' + ({ ai_limit: 'Gemini сейчас занят (лимит). Попробуй через пару минут.', no_key: 'У сайта нет ключа Gemini.', no_news: 'Ленты новостей не ответили. Попробуй ↻ позже.', no_day: 'За этот день выпуска нет.' }[j.error] || 'Не получилось собрать выпуск. Попробуй ↻ через минуту.') + '</div>'; return; }
+  let run = 0;
+  const STEP = { src: 'Пелле собирает свежие новости… (шаг 1 из 3, около минуты)', news: 'Пелле пишет выпуск… (шаг 2 из 3, около минуты)' };
+  const ERR = { ai_limit: 'Gemini сейчас занят (лимит).', no_key: 'У сайта нет ключа Gemini.', no_news: 'Ленты новостей не ответили.', no_day: 'За этот день выпуска нет.' };
+  const api = (path, body) => fetch(path, body ? { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) } : {}).then(r => r.json()).catch(() => ({ error: 'net' }));
+  const wait = msg => { $('#main').innerHTML = '<div class="load"><b>🐧</b>' + msg + '</div>'; };
+  function show(j) {
     data = j; day = j.day; level = j.level; setLevelUi();
     $('#day').innerHTML = j.days.map(d => '<option value="' + d + '"' + (d === day ? ' selected' : '') + '>' + fmt(d) + '</option>').join('');
-    render();
+    const y = scrollY; render(); scrollTo(0, y);
+    if (j.tales === 'pending') $('#main').insertAdjacentHTML('beforeend', '<p class="load" id="more"><b>🐧</b>Пелле дописывает рассказы о Норвегии и вдохновение… (шаг 3 из 3)</p>');
+  }
+  async function load(opts = {}) {
+    const me = ++run;
+    wait(opts.fresh ? 'Пелле начинает выпуск заново…' : 'Пелле несёт газету…');
+    let j = await api('/api/avis?' + new URLSearchParams({ ...(day ? { day } : {}), ...(level ? { level } : {}) }));
+    let first = opts.fresh;
+    for (let i = 0; i < 6 && me === run; i++) {
+      if (j.error) break;
+      if (j.items) { show(j); if (j.tales !== 'pending' && !first) return; }
+      else wait(STEP[j.pending] || 'Пелле работает…');
+      j = await api('/api/avis/build', { day: j.day || day, level: j.level || level, ...(first ? { fresh: first } : {}) }); first = null;
+    }
+    if (me !== run) return;
+    if (j.items) { show(j); return; }
+    const fail = '<div class="load"><b>☕</b>' + (ERR[j.error] || 'Не получилось.') + ' <br><button class="btn" type="button" id="retry">Попробовать ещё</button></div>';
+    if (data && data.items && data.day === (j.day || day) && data.level === (j.level || level)) { const m = $('#more'); if (m) m.outerHTML = fail; } else $('#main').innerHTML = fail;
+    const r = $('#retry'); if (r) r.onclick = () => load();
   }
   $('#lv').addEventListener('click', e => { const b = e.target.closest('button'); if (!b || b.dataset.l === level) return; level = b.dataset.l; try { localStorage.setItem('avis-level', level); } catch (x) {}
-    setLevelUi(); fetch('/api/avis/level', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ level }) }); load(); });
-  $('#day').addEventListener('change', e => { day = e.target.value; load(); });
+    setLevelUi(); data = null; fetch('/api/avis/level', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ level }) }); load(); });
+  $('#day').addEventListener('change', e => { day = e.target.value; data = null; load(); });
   $('#again').addEventListener('click', () => { if (confirm(day === data?.days?.[0] ? 'Собрать сегодняшний выпуск заново — со свежими новостями (около минуты)?' : 'Написать этот выпуск заново (около минуты)?')) load({ fresh: day === data?.days?.[0] ? 'news' : 'text' }); });
   const tip = $('#tip');
   const sentOf = el => { const p = el.closest('p, li, h3') || el; const t = p.textContent; return (t.split(/(?<=[.!?])\\s+/).find(x => x.includes(el.textContent.split(' ')[0])) || t).trim().slice(0, 240); };
