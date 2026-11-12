@@ -640,7 +640,9 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 .ft2 .cols a.ft-friend{display:inline-flex;align-items:center;gap:10px;margin-top:16px;font-size:12px;color:var(--mut)}.ft2 .ft-friend img{width:86px;height:auto;display:block}.ft2 .cols a.ft-friend:hover{color:var(--acc)}
 
 /* опрос на главной (site/assets/poll.js): бюллетень на бумаге, итоги — акварельные полоски */
-.poll{padding:20px 0 110px}
+.poll{padding:100px 0 110px;background:var(--gr);color:#EFE9E0}
+.poll .pl-l .k,.poll .pl-l em,.poll .pl-l .hand{color:var(--acc2)}.poll .pl-l p{color:#BDB4AA !important}
+.poll .ballot{color:var(--ink);box-shadow:0 30px 60px -24px rgba(0,0,0,.55)}
 .poll .w{display:grid;grid-template-columns:1fr 1.1fr;gap:60px;align-items:center}
 .poll h2{font-size:60px;line-height:.95}.poll .hand{display:inline-block;transform:rotate(-3deg);margin-bottom:10px}
 .poll .pl-l p{color:var(--mut);font-size:17px;margin:20px 0 0;max-width:24em}
@@ -669,4 +671,4 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 .pr .pt,.pr b{position:relative}.pr .pt{flex:1}.pr small{font:700 18px Caveat,cursive;color:var(--acc);margin-left:6px;white-space:nowrap}
 .pr b{font:400 22px Fraunces,Lora,serif}
 @media (prefers-reduced-motion:reduce){.pr .pb{transition:none}}
-@media (max-width:900px){.poll{padding:10px 0 80px}.poll .w{grid-template-columns:1fr;gap:34px}.poll h2{font-size:44px}.ballot{padding:30px 20px 20px;transform:none}.ballot h3{font-size:23px}.po{font-size:16px}.stamp2{width:60px;height:60px;font-size:9px}}
+@media (max-width:900px){.poll{padding:64px 0 70px}.poll .w{grid-template-columns:1fr;gap:34px}.poll h2{font-size:44px}.ballot{padding:30px 20px 20px;transform:none}.ballot h3{font-size:23px}.po{font-size:16px}.stamp2{width:60px;height:60px;font-size:9px}}
