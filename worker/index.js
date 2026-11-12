@@ -241,7 +241,9 @@ async function sitePage(req, env, url) {
   const pg = rows.find(r => r.lang === '*' && r.id === 'page:' + url.pathname.replace(/^\/(ru|lv)(?=\/)/, ''));
   try { struct = pg && pg.html ? JSON.parse(pg.html) : null; } catch (e) { struct = null; }
   // ссылка «моя птичка» (/flock/?bird=ник): в превью мессенджеров — карточка этой птички
-  const bird = /^\/(?:(?:ru|lv)\/)?flock\/$/.test(url.pathname) ? String(url.searchParams.get('bird') || '').replace(/^@/, '') : '';
+  // и профиль /bird/?nick=ник — тоже
+  const bird = /^\/(?:(?:ru|lv)\/)?flock\/$/.test(url.pathname) ? String(url.searchParams.get('bird') || '').replace(/^@/, '')
+    : /^\/(?:(?:ru|lv)\/)?bird\/$/.test(url.pathname) ? String(url.searchParams.get('nick') || '').replace(/^@/, '') : '';
   const birdOk = /^[\p{L}\p{N}_.-]{2,24}$/u.test(bird);
   if (!hidden.size && !html.size && !struct && !birdOk && !hid.length && !sk) return out;
   const anyLang = id => html.get(id) ?? (rows.find(r => r.id === id && r.html != null && ['en', 'ru', 'lv'].includes(r.lang)) || {}).html;
@@ -254,7 +256,8 @@ async function sitePage(req, env, url) {
       ru: [`@${bird} живёт в стае Pigeon Polly 🐦`, 'Каждый, кто входит на сайт, получает свою пиксельную птичку. Заведи свою!'],
       lv: [`@${bird} dzīvo Pigeon Polly barā 🐦`, 'Katrs, kurš ienāk vietnē, saņem savu pikseļu putniņu. Iegūsti savu!'] }[lang];
     const set = v => ({ element(el) { el.setAttribute('content', v); } });
-    rw.on('meta[property="og:image"]', set(`${url.origin}/api/birdcard?nick=${encodeURIComponent(bird)}`))
+    const card = `${url.origin}/api/birdcard?nick=${encodeURIComponent(bird)}&lang=${lang}`;
+    rw.on('meta[property="og:image"]', set(card)).on('meta[name="twitter:image"]', set(card))
       .on('meta[property="og:title"]', set(og[0])).on('meta[property="og:description"]', set(og[1])).on('meta[name="description"]', set(og[1]))
       .on('meta[property="og:url"]', set(url.href)).on('meta[property="og:image:alt"]', set(og[0]))
       .on('title', { element(el) { el.setInnerContent(og[0]); } });
@@ -1700,7 +1703,8 @@ async function route(req, env, url) {
     const nick = String(url.searchParams.get('nick') || '').replace(/^@/, '');
     const u = nick ? await env.DB.prepare('SELECT id FROM users WHERE nick = ? AND banned = 0').bind(nick).first() : null;
     const o = u && env.MEDIA ? await env.MEDIA.get(`birdcards/${u.id}.png`) : null;
-    if (!o) return Response.redirect(`${url.origin}/assets/og-flock-en.jpg`, 302); // карточку ещё не делали — общая картинка стаи
+    const ol = ['ru', 'lv'].includes(url.searchParams.get('lang')) ? url.searchParams.get('lang') : 'en';
+    if (!o) return Response.redirect(`${url.origin}/assets/og-flock-${ol}.jpg`, 302); // карточку ещё не делали — общая картинка стаи
     return new Response(o.body, { headers: { 'content-type': 'image/png', 'cache-control': 'public, max-age=600' } });
   }
 

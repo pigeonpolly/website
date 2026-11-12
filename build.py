@@ -5,6 +5,7 @@
 В страницах можно писать {{gallery:имя}} — подставится галерея из content/galleries/имя.json,
 и {{ebooks}} — список книг из content/ebooks.json.
 """
+import hashlib
 import html
 import json
 import runpy
@@ -551,6 +552,26 @@ def lang_bits(path, lang):
     return url[lang], hreflang, '<nav class="lang-switch" aria-label="Language">' + "".join(links) + "</nav>"
 
 
+OG_LOCALE = {"en": "en_US", "ru": "ru_RU", "lv": "lv_LV"}
+
+
+def og_meta(page, path, lang):
+    """Превью ссылки: своя картинка раздела на языке страницы (site/images/og/, tools/og_cards.js) и og:locale."""
+    key = {"learn/watch": "learn"}.get(path, path.replace("/", "-") or "home")
+    title = (re.search(r"<title>([^<]*)</title>", page) or [None, ""])[1]
+    img = OUT / "images" / "og" / f"{key}-{lang}.jpg"
+    if img.exists():
+        ver = hashlib.md5(img.read_bytes()).hexdigest()[:8]
+        url = f"{SITE_URL}/images/og/{key}-{lang}.jpg?v={ver}"
+        page = re.sub(r'(<meta property="og:image" content=")[^"]*', lambda m: m.group(1) + url, page, count=1)
+        page = re.sub(r'(<meta name="twitter:image" content=")[^"]*', lambda m: m.group(1) + url, page, count=1)
+        if key not in ("flock", "bird", "garden", "flock-news", "privacy"):
+            page = re.sub(r'(<meta property="og:image:alt" content=")[^"]*', lambda m: m.group(1) + title, page, count=1)
+    loc = f'<meta property="og:locale" content="{OG_LOCALE[lang]}">' + "".join(
+        f'<meta property="og:locale:alternate" content="{v}">' for k, v in OG_LOCALE.items() if k != lang)
+    return page.replace('<meta property="og:site_name"', loc + '\n<meta property="og:site_name"', 1)
+
+
 LANG_NAMES = {"en": "English", "lv": "Latviešu", "ru": "Русский"}
 
 
@@ -749,7 +770,7 @@ def build():
                 page = v2_page(layout_v2_lab, full_title, desc, canonical, path in NOINDEX, section_tabs(path) + page_body).replace('<body class="inner v2s">', '<body class="inner v2s" data-p="%s">' % (path.replace("/", "-") or "home"), 1)  # Д, шаг 2: data-p — какая страница (игры не перекрашиваем)
             page = v2_urls(localize(page, lang))
             page = page.replace("{{hreflang}}", hreflang).replace("{{lang_dd}}", lang_dd(switch, lang)).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
-            page = bust(page)
+            page = og_meta(bust(page), path, lang)
             dest = OUT / prefix / path / "index.html"
             dest.parent.mkdir(parents=True, exist_ok=True)
             dest.write_text(page)
@@ -764,7 +785,7 @@ def build():
         page = v2_urls(localize(page, lang)).replace("{{hreflang}}", hreflang).replace("{{lang_dd}}", lang_dd(switch, lang)).replace("{{lang_switch}}", switch).replace("{{lang}}", lang)
         dest = OUT / prefix / "blog" / "v2" / "index.html"
         dest.parent.mkdir(parents=True, exist_ok=True)
-        dest.write_text(bust(page))
+        dest.write_text(og_meta(bust(page), "blog", lang))
     # книги Алины для стаи (витрина в книжном: обложки кликабельные, птички их читают)
     books = [b for sec in json.loads((CONTENT / "ebooks.json").read_text())["sections"] for b in sec["books"]]
     (OUT / "assets" / "books.json").write_text(json.dumps([{"title": b["title"], "url": b["url"], "cover": "/" + b["cover"]} for b in books if b.get("cover")], ensure_ascii=False))
