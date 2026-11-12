@@ -30,6 +30,7 @@ import { trainApi, TRAIN_TABLES, TRAIN_ALTER, TRAIN_RULES, TRAIN_RANGE, TRAIN_IN
 import { pancakesApi, PAN_TABLES, PAN_ALTER, PAN_RULES, PAN_RANGE, PAN_INT, PAN_BADGES, PAN_COND } from './pancakes.js'; // «Блинная Полли» (docs/games.md)
 import { gardenApi, gardenDrop, gardenNews, GARDEN_TABLES, GARDEN_ALTER, GARDEN_RULES, GARDEN_RANGE, GARDEN_INT, GARDEN_BOOL, GARDEN_SEASONS } from './garden.js'; // огород птички (этап 22, docs/bird.md «Огород»)
 import { pauseGate, pauseApi } from './pause.js'; // ⏸ пауза сайта: «Ведутся работы» для всех, кроме админа (docs/admin.md)
+import { runesApi } from './runes.js'; // 🔮 Руны в кабинете — только админ (docs/admin.md «Руны»)
 import { pollsApi, pollPage, POLL_TABLES } from './polls.js'; // 🗳 Опросы: главная и кабинет (docs/admin.md «Опросы»)
 import { weekApi, outClick, WEEK_TABLES } from './week.js'; // кабинет → «🗓 Неделя» и переходы на Amazon (docs/admin.md)
 import { ideasApi } from './ideas.js';
@@ -1720,6 +1721,7 @@ async function route(req, env, url) {
     award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), item: (rq, uid, note) => rainItem(env, rq, uid, 0, note),
     give: async (uid, key, note) => { const [kind, item] = key.split('|'); await env.DB.prepare('INSERT INTO gifts (user_id, kind, item, note, created_at) VALUES (?, ?, ?, ?, ?)').bind(uid, kind, item, note, now()).run(); return { kind, item }; } }); if (r) return r; }
   if (p === '/api/garden' || p.startsWith('/api/garden/')) { const r = await gardenApi(req, env, url, { ...cardHelpers(env), unit: () => gameUnit(env), btnOf, avatarOf, randomHex, now, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
+  if (p === '/api/admin/runes') { const r = await runesApi(req, env, url, { json, fail, currentUser, isAdmin }); if (r) return r; }
   if (p === '/api/poll' || p === '/api/poll/vote' || p === '/api/admin/polls') { const r = await pollsApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, now, randomHex, db: env.DB, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v),
     ipKey: async r => { let salt = await getMeta(env, 'blog_salt'); if (!salt) { salt = randomHex(16); await setMeta(env, 'blog_salt', salt); } return (await sha256(salt + (r.headers.get('cf-connecting-ip') || '0'))).slice(0, 24); },
     translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The strings are a poll question and its answer options on an artist\'s website: which topic should the next video lesson or "paint along with me" video be about. Keep them short, warm and natural.') }); if (r) return r; }

@@ -26,6 +26,7 @@
   const ADMIN_SECTIONS = [
     { id: 'week', ic: '🗓', name: 'Неделя' }, // первый экран (редизайн 2.0, часть 4): 5 цифр, 5 кнопок, остальное — «⚙ Ещё инструменты»
     { id: 'inbox', ic: '📥', name: 'Входящие', about: 'Только то, что ждёт вас. Пусто — значит, всё спокойно.', count: 'total' },
+    { id: 'runes', ic: '🔮', name: 'Руны', about: 'Ваши руны (колода «Runic Oracle»): выбрать расклад, отметить выпавшие карты — толкование каждой и общее по раскладу. Видите только вы.' },
     { id: 'blog', ic: '✍️', name: 'Блог', group: 'pub', href: '/blog-editor/', count: 'scheduled' },
     { id: 'requests', ic: '🖍', name: 'Нарисуй мне', group: 'pub', href: '/ru/requests/', count: 'requests' },
     { id: 'themes', ic: '🗓', name: 'Темы челленджа', group: 'pub', about: 'Темы челленджа на любой месяц вперёд: тема на трёх языках, цвета, время; банк ваших тем.' },
@@ -68,6 +69,7 @@
     cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
     posts: () => window.PPPostsAdmin ? window.PPPostsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился posts-admin.js</p>'), // 📣 Посты (posts-admin.js)
     guides: () => window.PPGuidesAdmin ? window.PPGuidesAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился guides-admin.js</p>'), // 🎬 Видео и книги (guides-admin.js)
+    runes: () => window.PPRunesAdmin ? window.PPRunesAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился runes-admin.js</p>'), // 🔮 Руны (runes-admin.js)
     polls: () => window.PPPollsAdmin ? window.PPPollsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился polls-admin.js</p>'), // 🗳 Опросы (polls-admin.js)
     ideas: () => window.PPIdeasAdmin ? window.PPIdeasAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился ideas-admin.js</p>'), // 💡 Темы для блога (ideas-admin.js)
     broadcast: () => window.PPBroadcast ? window.PPBroadcast.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился broadcast-admin.js</p>'), // 📢 Рассылка (broadcast-admin.js)
@@ -78,7 +80,7 @@
   // меню слева — только группы (6 строк); разделы группы — вкладками над экраном
   const inGroup = g => ADMIN_SECTIONS.filter(x => !x.hide && x.group === g);
   const cnt = keys => keys.length ? `<span class="adm-count" data-count="${keys.join(',')}" hidden></span>` : '';
-  if (nav) nav.innerHTML = `<a href="#week" data-grp="week">🗓 Неделя</a><a href="#inbox" data-grp="">📥 Входящие${cnt(['total'])}</a>` + Object.entries(ADMIN_GROUPS).map(([g, name]) =>
+  if (nav) nav.innerHTML = `<a href="#week" data-grp="week">🗓 Неделя</a><a href="#inbox" data-grp="">📥 Входящие${cnt(['total'])}</a><a href="#runes" data-grp="runes">🔮 Руны</a>` + Object.entries(ADMIN_GROUPS).map(([g, name]) =>
     `<a href="#${inGroup(g).find(x => !x.href).id}" data-grp="${g}">${name}${cnt(inGroup(g).filter(x => x.count && x.count !== 'total').map(x => x.count))}</a>`).join('');
   const tabLink = (x, cur) => `<a href="${x.href || '#' + x.id}"${x.href ? ' class="adm-ext" title="Откроется на своей странице"' : ''}${x.id === cur ? ' aria-current="page"' : ''}>${x.ic} ${x.name}${x.count ? `<span class="adm-count" data-count="${x.count}"${x.count === 'comments' ? ' id="adm-pend"' : ''} hidden></span>` : ''}</a>`;
   // экран: строка «что здесь делается» сверху, потом сам раздел; focus — прокрутить к нужному месту
@@ -86,7 +88,7 @@
     const id = (location.hash || '#week').slice(1), x = secOf(id) || (SECTIONS[id] ? { id } : secOf('week'));
     const cur = x.hide ? x.open || x.id : x.id, g = (secOf(cur) || x).group || '';
     const adm = document.getElementById('adm'); if (adm) adm.classList.toggle('adm-wk', x.id === 'week'); // «Неделя» — на всю ширину, без меню слева
-    document.querySelectorAll('.adm-nav [data-grp]').forEach(a => a.setAttribute('aria-current', a.dataset.grp === (x.id === 'week' ? 'week' : g) ? 'page' : 'false'));
+    document.querySelectorAll('.adm-nav [data-grp]').forEach(a => a.setAttribute('aria-current', a.dataset.grp === (x.id === 'week' || x.id === 'runes' ? x.id : g) ? 'page' : 'false'));
     const about = document.getElementById('adm-about');
     if (about) about.innerHTML = x.id === 'week' ? '' : (g ? `<nav class="adm-tabs" aria-label="${esc(ADMIN_GROUPS[g])}">${inGroup(g).map(t => tabLink(t, cur)).join('')}</nav>` : x.name ? `<h2>${x.ic} ${x.name}</h2>` : '') + (x.about ? `<p>${x.about}</p>` : '');
     if (inboxData) badges(inboxData);

@@ -24,6 +24,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/norsk-page.js` (932K) — Собрано tools/norsk_page.py из content/norsk/ — руками не править.: NORSK_HTML
 - `worker/norsk.js` (8K) — Личный учебник норвежского (букмол) A1–C2 (/norsk/, docs/site.md «Учебник норвежского») — : AUDIO, LOCKED, MAX, NORSK_NICKS, TTS_VOICE, TTS_MODELS, tts, page, wav, norskOk, norskApi
 - `worker/avis.js` (20K) — «Morgenavis» /norsk/avis/: утренняя газета на норвежском A1–B2 из RSS + Gemini, только Алина (docs/site.md): AVIS_TABLES, AVIS_RULES, AVIS_CRON, avisCron, avisApi
+- `worker/runes.js` + `worker/runes-data.js` — 🔮 Руны в кабинете (только админ): GET /api/admin/runes; экран `site/assets/runes-admin.js` (docs/admin.md «Руны»)
 - `worker/nederlands-page.js` (310K) — Собрано tools/nederlands_page.py из content/nederlands/ — руками не править.: NEDERLANDS_HTML
 - `worker/nederlands.js` (8K) — Личный учебник нидерландского A1–C2 (/nederlands/, docs/site.md «Учебник нидерландского»), копия worker/norsk.js: NEDERLANDS_NICKS, NEDERLANDS_TABLES, tts, nederlandsOk, nederlandsApi
 - `worker/notebook.js` (5K) — 📒 Блокнот в учебниках (/study/, /english/, /norsk/; docs/site.md «Блокнот в учебниках»): BOOKS, NOTEBOOK_TABLES, cleanPage, metaOf, notebookApi
