@@ -29,60 +29,64 @@ posts/ — статьи как обычные HTML-файлы (открываю�
   async function autoPanel(rotate) {
     let t;
     try { t = rotate ? await api('blog/admin/backup-token', {}) : await api('blog/admin/backup-token'); } catch (e) { alert(errText(e)); return; }
-    const code = `// Автокопия ВСЕГО сайта pigeonpolly.com в Google Drive — раз в неделю (понедельник, ~6 утра)
-// Каждую неделю — папка с датой: «данные» (блог, челлендж, все картинки) и «код» (весь сайт с GitHub)
+    const code = `// Автокопия сайта pigeonpolly.com в Google Drive (версия 2 — без предела 50 МБ)
+// Каждый день: новые картинки докачиваются по одной в постоянную папку «файлы» (старые не качаются заново).
+// Раз в неделю (понедельник): папка с датой и data.json — статьи, теги, комментарии, аккаунты.
+// Код сайта хранится на GitHub со всей историей — его отдельно не копируем.
 const SITE = 'https://www.pigeonpolly.com';
 const TOKEN = '${t.token}';            // личный ключ — никому не показывайте
-const CODE = 'https://codeload.github.com/pigeonpolly/website/zip/refs/heads/main';
 const FOLDER = 'pigeonpolly — резервные копии';
-const KEEP = 12;                      // сколько последних недель хранить
+const KEEP = 12;                      // сколько последних недель data.json хранить
 
-// Запустите ОДИН раз: включает еженедельную копию и сразу делает первую
+// Запустите ОДИН раз: включает автокопию и сразу делает первую
 function setup() {
   ScriptApp.getProjectTriggers().forEach(t => ScriptApp.deleteTrigger(t));
-  ScriptApp.newTrigger('backup').timeBased().onWeekDay(ScriptApp.WeekDay.MONDAY).atHour(6).create();
-  backup();
+  ScriptApp.newTrigger('backup').timeBased().everyDays(1).atHour(6).create();
+  backup(true);
 }
 
-function backup() {
-  const date = Utilities.formatDate(new Date(), 'Europe/Riga', 'yyyy-MM-dd');
+function folder(parent, name) { const it = parent.getFoldersByName(name); return it.hasNext() ? it.next() : parent.createFolder(name); }
+
+function backup(force) {
+  const started = Date.now();
   const it = DriveApp.getFoldersByName(FOLDER);
   const root = it.hasNext() ? it.next() : DriveApp.createFolder(FOLDER);
-  const week = root.createFolder(date);
-
-  // 1) данные сайта: статьи, теги, комментарии, аккаунты и рисунки челленджа, все картинки
   const res = UrlFetchApp.fetch(SITE + '/api/blog/backup?token=' + TOKEN, { muteHttpExceptions: true });
   if (res.getResponseCode() !== 200) throw new Error('Сайт не отдал копию данных: ' + res.getResponseCode());
   const text = res.getContentText(), data = JSON.parse(text);
-  const blobs = [Utilities.newBlob(text, 'application/json', 'data.json')];
-  for (let i = 0; i < data.files.length; i += 40) {
-    const part = data.files.slice(i, i + 40);
-    UrlFetchApp.fetchAll(part.map(f => ({ url: SITE + f.url, muteHttpExceptions: true })))
-      .forEach((r, k) => { if (r.getResponseCode() === 200) blobs.push(r.getBlob().setName(part[k].path)); });
+
+  // 1) данные — раз в неделю (и при первом запуске)
+  const now = new Date(), date = Utilities.formatDate(now, 'Europe/Riga', 'yyyy-MM-dd');
+  if (force === true || now.getDay() === 1) {
+    const week = folder(root, date);
+    week.getFilesByName('data.json').hasNext() || week.createFile(Utilities.newBlob(text, 'application/json', 'data.json'));
+    const weeks = []; const fi = root.getFolders(); while (fi.hasNext()) { const f = fi.next(); if (/^\\d{4}-\\d{2}-\\d{2}$/.test(f.getName())) weeks.push(f); }
+    weeks.sort((a, b) => b.getName().localeCompare(a.getName())).slice(KEEP).forEach(f => f.setTrashed(true));
   }
-  week.createFile(Utilities.zip(blobs, 'pigeonpolly-данные-' + date + '.zip'));
 
-  // 2) код и страницы сайта с GitHub
-  const code = UrlFetchApp.fetch(CODE, { muteHttpExceptions: true });
-  if (code.getResponseCode() !== 200) throw new Error('GitHub не отдал код: ' + code.getResponseCode());
-  week.createFile(code.getBlob().setName('pigeonpolly-код-' + date + '.zip'));
-
-  // старые недели — в корзину
-  const weeks = []; const fi = root.getFolders(); while (fi.hasNext()) weeks.push(fi.next());
-  weeks.sort((a, b) => b.getDateCreated() - a.getDateCreated()).slice(KEEP).forEach(f => f.setTrashed(true));
+  // 2) файлы — только новые, по 20 за раз; не успели за 5 минут — продолжим завтра
+  const files = folder(root, 'файлы'), have = {};
+  const fl = files.getFiles(); while (fl.hasNext()) have[fl.next().getName()] = 1;
+  const todo = data.files.filter(f => !have[f.path.replace(/\\//g, '__')]);
+  for (let i = 0; i < todo.length && Date.now() - started < 5 * 60 * 1000; i += 20) {
+    const part = todo.slice(i, i + 20);
+    UrlFetchApp.fetchAll(part.map(f => ({ url: SITE + f.url, muteHttpExceptions: true })))
+      .forEach((r, k) => { if (r.getResponseCode() === 200) files.createFile(r.getBlob().setName(part[k].path.replace(/\\//g, '__'))); });
+  }
 }
 `;
     const d = document.createElement('dialog');
     d.className = 'be-dialog';
-    d.innerHTML = `<h2>🔁 Автокопия всего сайта в Google Drive — раз в неделю</h2>
-      <p>Каждый понедельник в вашем Google Drive будет появляться папка с датой и двумя архивами: <b>данные</b> (статьи на 3 языках, теги, разделы, комментарии, аккаунты и рисунки челленджа, все картинки) и <b>код</b> (весь сайт с GitHub: страницы, игры, Wobbleland, иллюстрации).</p>
+    d.innerHTML = `<h2>🔁 Автокопия сайта в Google Drive</h2>
+      <p>Каждый день в папку <b>«файлы»</b> докачиваются новые картинки сайта (уже скачанные не качаются заново), а каждый понедельник появляется папка с датой и файлом <b>data.json</b> — статьи на 3 языках, теги, разделы, комментарии, аккаунты. Код сайта и так хранится на GitHub со всей историей.</p>
+      <p><b>Уже ставили автокопию раньше?</b> Откройте тот же проект на script.google.com, замените весь текст новым скриптом и снова запустите <b>setup</b> — старый перестал работать, когда сайт вырос больше 50 МБ.</p>
       <ol>
         <li>Нажмите <b>«Скопировать скрипт»</b> ниже.</li>
         <li>Откройте <a href="https://script.google.com/home/projects/create" target="_blank" rel="noopener">script.google.com → Новый проект ↗</a> (тем же Google-аккаунтом, где ваш Google Drive).</li>
         <li>Удалите всё, что там написано, и вставьте скрипт (Ctrl+V). Нажмите 💾 «Сохранить».</li>
         <li>Вверху в списке функций выберите <b>setup</b> и нажмите <b>▶ Выполнить</b>.</li>
         <li>Google попросит разрешения: <i>Проверить разрешения → ваш аккаунт → Дополнительно → Перейти к проекту → Разрешить</i>. Это нормально: скрипт ваш, он только скачивает копию с сайта и кладёт её в ваш Drive.</li>
-        <li>Готово. В Google Drive появится папка <b>«pigeonpolly — резервные копии»</b>, в ней папка с сегодняшней датой и двумя архивами. Дальше — новая каждый понедельник утром (хранятся последние 12 недель). Если копия когда-нибудь не получится, Google сам пришлёт письмо.</li>
+        <li>Готово. В Google Drive в папке <b>«pigeonpolly — резервные копии»</b> появятся папка с сегодняшней датой и папка «файлы». Если картинок много, первый раз они докачиваются за несколько дней (по 5 минут в день). Данные — каждый понедельник, хранятся последние 12 недель. Если копия когда-нибудь не получится, Google сам пришлёт письмо.</li>
       </ol>
       <textarea readonly rows="10">${esc(code)}</textarea>
       <p class="be-dialog-acts"><button type="button" class="pill-btn pill-fill" data-copy>📋 Скопировать скрипт</button>

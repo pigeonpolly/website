@@ -754,6 +754,20 @@ export async function blogImgCheck(env, fix = 0) {
   let tries = 0, copied = 0, more = false;
   const deadKey = 'blog_img_dead', dead = new Set(JSON.parse((await env.DB.prepare('SELECT value FROM meta WHERE key = ?').bind(deadKey).first())?.value || '[]')), dead0 = dead.size; // ссылки, которые уже не открылись, — второй раз не пробуем
   for (const src of dead) moved[src] = null;
+  // картинки, которые Claude скачал сам (Patreon не отдаёт их серверу): site/assets/blog-restore.json — код файла Patreon или старая ссылка → /images/blog-restore/…
+  let restore = {};
+  try { const rr = await env.ASSETS.fetch(new Request(SITE + '/assets/blog-restore.json')); if (rr.ok) restore = await rr.json(); } catch (e) { restore = {}; }
+  const fromRestore = async src => {
+    const k = (src.match(/\/p\/post\/\d+\/([0-9a-f]{16,})\//i) || [])[1] || src, path = restore[k];
+    if (!path || !env.MEDIA) return null;
+    const r = await env.ASSETS.fetch(new Request(SITE + path)).catch(() => null);
+    const type = (r && r.ok && (r.headers.get('content-type') || '').split(';')[0]) || '';
+    const ext = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }[type];
+    if (!ext) return null;
+    const d = new Date(), key = `blog/${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${randomHex(8)}.${ext}`;
+    await env.MEDIA.put(key, await r.arrayBuffer(), { httpMetadata: { contentType: type, cacheControl: 'public, max-age=31536000, immutable' } });
+    return '/media/' + key;
+  };
   for (const r of rows) {
     const rep = { id: r.id, slug: r.slug, status: r.status, title: r.t_ru || r.t_en || r.t_lv || r.slug, total: 0, missing: 0, foreign: 0, dead: 0, copied: 0, hosts: [] };
     const upd = {};
@@ -769,6 +783,7 @@ export async function blogImgCheck(env, fix = 0) {
         if (local.startsWith('/')) continue;
         rep.foreign++;
         let url = moved[src];
+        if (!url && fix) { const rs = await fromRestore(src); if (rs) url = moved[src] = rs; }
         if (url === undefined && fix && /^https:\/\//i.test(src)) { if (tries < fix) { tries++; url = await rehostOne(env, src, moved); if (!url) dead.add(src); } else more = true; }
         if (url) { next = col === 'cover' ? url : next.split(`src="${raw}"`).join(`src="${url}"`); rep.copied++; rep.foreign--; }
         else if (url === null) { rep.dead++; rep.foreign--; }
@@ -778,7 +793,7 @@ export async function blogImgCheck(env, fix = 0) {
     }
     const cols = Object.keys(upd);
     if (cols.length) { await env.DB.prepare(`UPDATE blog_posts SET ${cols.map(c => c + ' = ?').join(', ')} WHERE id = ?`).bind(...cols.map(c => upd[c]), r.id).run(); copied += rep.copied; }
-    if (rep.missing || rep.foreign || rep.copied) out.push(rep);
+    if (rep.missing || rep.foreign || rep.dead || rep.copied) out.push(rep);
   }
   if (dead.size !== dead0) await env.DB.prepare('INSERT OR REPLACE INTO meta (key, value) VALUES (?, ?)').bind(deadKey, JSON.stringify([...dead].slice(-500))).run();
   return { posts: out, total: rows.length, copied, more };

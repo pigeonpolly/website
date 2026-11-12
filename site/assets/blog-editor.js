@@ -941,6 +941,43 @@
     if (leftovers) {
       status(`В статье ${leftovers} картин(ки/ок) со ссылками на другие сайты (Patreon, Google Docs…) — они могут пропасть. <button type="button" class="bc-link" id="be-copy-left">Скопировать их на сайт</button>`);
       $('#be-copy-left').addEventListener('click', async () => { for (const b of bodies) await copyImages(b); });
+      if (patIds().length) {
+        $('.be-status').insertAdjacentHTML('beforeend', ' <button type="button" class="bc-link" id="be-patfresh">📋 Вернуть картинки из Patreon</button>');
+        $('#be-patfresh').addEventListener('click', patFresh);
+      }
+    }
+    // Patreon: ссылки на картинки со временем гаснут. В каждой есть номер поста и код файла — Алина копирует пост с Patreon целиком,
+    // а мы берём из него свежие ссылки на те же файлы (текст статьи не трогаем) и сразу копируем картинки на сайт
+    const PAT = /\/p\/post\/(\d+)\/([0-9a-f]{16,})\//i;
+    function patIds() { return [...new Set(bodies.flatMap(b => [...b.querySelectorAll('img')].map(i => (i.getAttribute('src') || '').match(PAT)).filter(Boolean).filter(m => foreign(m.input)).map(m => m[1])))]; }
+    function patFresh() {
+      const ids = patIds();
+      const d = document.createElement('dialog'); d.className = 'be-dialog';
+      d.innerHTML = `<h2>📋 Вернуть картинки из Patreon</h2>
+        <ol><li>Откройте пост на Patreon (вы должны быть в своём аккаунте): ${ids.map(id => `<a href="https://www.patreon.com/posts/${id}" target="_blank" rel="noopener">пост ${id} ↗</a>`).join(', ')}</li>
+        <li>Нажмите в тексте поста, потом <b>Ctrl+A</b> и <b>Ctrl+C</b>.</li>
+        <li>Вернитесь сюда, нажмите в рамку ниже и <b>Ctrl+V</b>. Текст статьи не изменится — поменяются только пропавшие картинки.</li></ol>
+        <div class="be-body" contenteditable="true" style="min-height:90px;border:2px dashed #b9a7e0;border-radius:10px;padding:12px" aria-label="Вставьте сюда пост с Patreon"></div>
+        <p class="be-note" data-msg></p>
+        <p class="be-dialog-acts"><button type="button" class="pill-btn" data-close>Закрыть</button></p>`;
+      document.body.appendChild(d); d.showModal();
+      const close = () => { d.close(); d.remove(); };
+      d.querySelector('[data-close]').onclick = close;
+      const box = d.querySelector('[contenteditable]'), msg = d.querySelector('[data-msg]');
+      box.addEventListener('paste', async e => {
+        e.preventDefault();
+        const html = e.clipboardData.getData('text/html');
+        const fresh = {};
+        new DOMParser().parseFromString(html || '', 'text/html').querySelectorAll('img').forEach(i => { const m = (i.getAttribute('src') || '').match(PAT); if (m && !fresh[m[2]]) fresh[m[2]] = i.getAttribute('src'); });
+        let n = 0;
+        bodies.forEach(b => b.querySelectorAll('img').forEach(i => { const m = (i.getAttribute('src') || '').match(PAT); if (m && fresh[m[2]] && foreign(i.getAttribute('src'))) { i.setAttribute('src', fresh[m[2]]); n++; } }));
+        if (!n) { msg.textContent = Object.keys(fresh).length ? 'В этом посте нет картинок этой статьи — проверьте, тот ли пост открыт.' : 'Картинок во вставленном не нашлось. Откройте пост на Patreon в своём аккаунте и скопируйте его целиком (Ctrl+A, Ctrl+C).'; return; }
+        msg.textContent = `Нашла ${n}. Копирую на сайт…`;
+        for (const b of bodies) await copyImages(b);
+        const left = bodies.reduce((k, b) => k + [...b.querySelectorAll('img')].filter(i => foreign(i.getAttribute('src') || '')).length, 0);
+        close();
+        status((left ? `Осталось не скопировано: ${left} (обведены красным). ` : 'Готово: картинки на месте ✓ ') + 'Нажмите «Сохранить изменения».');
+      });
     }
 
     // «Картинки из оригинала»: переведённый текст вставили без картинок — ставим картинки оригинала после того же по счёту абзаца
