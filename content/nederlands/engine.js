@@ -639,8 +639,8 @@
     if (!tip.hidden) showTip(el, r.w.includes(' ') ? text : r.w, r.tr || '—', rect, r.src === 'учебник' ? '' : r.src);
   }
   function wrapWords(root) { // каждое слово абзаца — в <span class="w">, кроме уже подсказанных (.gl)
-    for (const p of $$('.reading .txt p', root)) {
-      const tw = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentElement.closest('.gl, .w') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
+    for (const p of [root]) { // весь урок, кроме заданий (li[data-n] — чтобы перевод не подсказывал ответ), кнопок, ссылок и полей; там — выделить слово
+      const tw = document.createTreeWalker(p, NodeFilter.SHOW_TEXT, { acceptNode: n => n.parentElement.closest('.gl, .w, li[data-n], button, a, label, input, textarea, select, script, style, nav, .acts') ? NodeFilter.FILTER_REJECT : NodeFilter.FILTER_ACCEPT });
       const nodes = []; while (tw.nextNode()) nodes.push(tw.currentNode);
       for (const n of nodes) {
         if (!/[A-Za-zÀ-ÿ]/.test(n.nodeValue)) continue;
@@ -653,13 +653,13 @@
   const onSel = () => setTimeout(() => { // выделили несколько слов — перевод фразы
     const sel = getSelection(); if (!sel || sel.isCollapsed) return;
     const txt = sel.toString().trim().replace(/\s+/g, ' ');
-    if (!txt.includes(' ') || txt.length > 200 || !sel.anchorNode || !sel.anchorNode.parentElement || !sel.anchorNode.parentElement.closest('.reading .txt')) return;
+    if (txt.length < 2 || txt.length > 200 || !/[A-Za-zÆØÅæøåÉéÈèÔôÜüËëÏïÖö]/.test(txt) || !sel.anchorNode || !sel.anchorNode.parentElement || !view.contains(sel.anchorNode) || sel.anchorNode.parentElement.closest('input, textarea, #tip') || (!txt.includes(' ') && sel.anchorNode.parentElement.closest('.w'))) return; // любое слово или фраза урока (в заданиях — выделением)
     tapWord(sel.anchorNode.parentElement, txt, sel.getRangeAt(0).getBoundingClientRect());
   }, 10);
   document.addEventListener('mouseup', onSel); document.addEventListener('touchend', () => setTimeout(onSel, 300));
   document.addEventListener('click', e => {
     const g = e.target.closest('.gl'); if (g) { showTip(g); return; }
-    const wd = e.target.closest('.reading .w'); if (wd && getSelection().isCollapsed) { tapWord(wd, wd.textContent); return; }
+    const wd = e.target.closest('.w'); if (wd && getSelection().isCollapsed) { tapWord(wd, wd.textContent); return; }
     if (!e.target.closest('#tip')) tip.hidden = true;
   });
   addEventListener('scroll', () => { tip.hidden = true; }, { passive: true });
