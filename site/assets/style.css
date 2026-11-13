@@ -5581,17 +5581,18 @@ html.ap-lock { overflow: hidden; }
 a.wk-num.wk-n-link { text-decoration: none; color: inherit; cursor: pointer; transition: border-color .15s, box-shadow .15s; }
 a.wk-num.wk-n-link:hover, a.wk-num.wk-n-link:focus-visible { border-color: #D9643A; box-shadow: 0 4px 14px rgba(39,36,33,.08); }
 .wk-up { color: #2E7D4F; } .wk-dn { color: #B4502F; } .wk-eq { color: #99908A; }
-.wk-act { background: #fff; border: 1px solid #E8E4E2; border-radius: 14px; padding: 18px; display: flex; flex-direction: column; gap: 6px; }
+.wk-act { background: #fff; border: 1px solid #E8E4E2; border-radius: 12px; padding: 12px 14px; display: grid; grid-template-columns: auto minmax(0, 1fr); grid-template-rows: auto 1fr auto; column-gap: 8px; row-gap: 4px; align-items: center; }
 .wk-act.wk-hot { border: 2px solid var(--orange); }
-.wk-e { font-size: 30px; line-height: 1; }
-.wk-act h3 { margin: 4px 0 0; font: 600 19px var(--serif); color: #272421; display: flex; align-items: center; gap: 6px; }
-.wk-act p { margin: 0; flex: 1; font: 400 14px/1.45 var(--sans); color: #59524D; }
+.wk-e { font-size: 20px; line-height: 1; }
+.wk-act h3 { margin: 0; font: 600 17px var(--serif); color: #272421; display: flex; align-items: center; gap: 6px; }
+.wk-act p { margin: 0; grid-column: 1 / -1; align-self: start; font: 400 13px/1.4 var(--sans); color: #59524D; }
 .wk-badge { background: var(--orange); color: #fff; border-radius: 999px; font: 700 12px var(--sans); padding: 2px 8px; }
-.wk-btns { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
+.wk-btns { grid-column: 1 / -1; display: flex; flex-wrap: wrap; gap: 6px; align-items: center; margin-top: 4px; }
+.wk-btns .pill-btn { padding: 6px 14px; font-size: 13px; box-shadow: none; }
 .wk-sal { display: inline-flex; align-items: center; gap: 4px; font: 700 15px var(--sans); }
-.wk-sal input { width: 76px; padding: 7px 8px; border: 1px solid #DED9D6; border-radius: 10px; font: 600 15px var(--sans); }
+.wk-sal input { width: 64px; padding: 5px 7px; border: 1px solid #DED9D6; border-radius: 10px; font: 600 15px var(--sans); }
 .wk-more { background: #fff; border: 1px solid #E8E4E2; border-radius: 14px; padding: 16px 20px; margin-bottom: 14px; }
-.wk-more summary { cursor: pointer; font: 600 18px var(--serif); color: #272421; }
+.wk-more h3 { margin: 0; font: 600 18px var(--serif); color: #272421; }
 .wk-cols { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 18px; margin-top: 14px; }
 .wk-cols div { display: flex; flex-direction: column; gap: 4px; }
 .wk-cols b { font: 700 12px var(--sans); letter-spacing: .06em; text-transform: uppercase; color: #99908A; margin-bottom: 4px; }
@@ -5605,8 +5606,6 @@ a.wk-num.wk-n-link:hover, a.wk-num.wk-n-link:focus-visible { border-color: #D964
   .wk-num { padding: 12px; } .wk-num b { font-size: 28px; }
   .wk-num:first-child { grid-column: 1 / -1; }
   .wk-acts { grid-template-columns: 1fr; gap: 10px; }
-  .wk-act { display: grid; grid-template-columns: auto minmax(0, 1fr); column-gap: 12px; align-items: center; padding: 14px; }
-  .wk-e { grid-row: 1; } .wk-act h3 { margin: 0; } .wk-act p, .wk-btns { grid-column: 1 / -1; } .wk-btns { margin-top: 4px; }
   .wk-cols { grid-template-columns: 1fr 1fr; }
 }
 /* записи новостей (flock-news.js, news.js): картинка поста — в кружке, вместо кнопки «Посмотреть» — круглая стрелка справа (11.11, Алина) */
