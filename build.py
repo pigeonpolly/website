@@ -722,8 +722,34 @@ def v2_books():
     return '<div class="books">' + "".join(tiles) + hand + "</div>", link
 
 
+def site_version():
+    """Номер обновления сайта (виден только админу в подвале): +1 при первой сборке после нового коммита,
+    повторные сборки до коммита номер не меняют. Хранится в site/assets/version.json."""
+    import subprocess, datetime
+    f = OUT / "assets" / "version.json"
+    old = {}
+    try:
+        old = json.loads(f.read_text())
+    except Exception:  # нет файла или конфликт слияния — берём наибольший номер из текста
+        try:
+            old = {"n": max(int(x) for x in re.findall(r'"n":\s*(\d+)', f.read_text()))}
+        except Exception:
+            old = {"n": 0}
+    try:
+        head = subprocess.run(["git", "rev-parse", "HEAD"], cwd=ROOT, capture_output=True, text=True).stdout.strip()
+    except Exception:
+        head = ""
+    if old.get("base") == head and old.get("t"):
+        return old
+    riga = datetime.timezone(datetime.timedelta(hours=2))
+    new = {"n": int(old.get("n", 0)) + 1, "base": head, "t": datetime.datetime.now(riga).strftime("%d.%m %H:%M")}
+    f.write_text(json.dumps(new) + "\n")
+    return new
+
+
 def build():
     about_chat()
+    ver = site_version()
     rooms_data()
     wobbleland_data()
     titos_cases()
@@ -734,6 +760,9 @@ def build():
     loader = (SRC / "polly-loader.html").read_text()
     layout, layout_v2, layout_v2_lab = (re.sub(r"(<body[^>]*>)", lambda m: m.group(1) + "\n" + loader, t, count=1)
                                         for t in (layout, layout_v2, layout_v2_lab))
+    # номер версии сайта в подвале (показывает v2.js только админу)
+    vspan = f'<span class="ver" data-ver="{ver["n"]}" hidden>v{ver["n"]} · {ver["t"]}</span><span><a href="/privacy/">Privacy</a></span>'
+    layout_v2, layout_v2_lab = (t.replace('<span><a href="/privacy/">Privacy</a></span>', vspan) for t in (layout_v2, layout_v2_lab))
     search_index = {lang: [] for lang in LANGS}
     for path, title, file, desc in PAGES:
         body = (SRC / "pages" / file).read_text()
