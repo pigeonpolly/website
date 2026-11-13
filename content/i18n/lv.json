@@ -797,5 +797,6 @@
   "<div class=\"hd5\"><h2>All lessons <em>in one place</em></h2><p>Lessons, courses and cheat sheets. Most are open to everyone, and the ones for insiders open after a free sign-in.</p></div>": "<div class=\"hd5\"><h2>Visas nodarbības <em>vienuviet</em></h2><p>Nodarbības, kursi un špikeri. Gandrīz viss ir atvērts visiem, bet nodarbības «saviem» — pēc bezmaksas ienākšanas.</p></div>",
   "<h2>For insiders <em>for friends of Polly</em></h2>": "<h2>Saviem <em>Pollijas draugiem</em></h2>",
   "<span class=\"bd\">For insiders</span>": "<span class=\"bd\">Saviem</span>",
-  "<h2>Lessons <em>for insiders</em></h2>": "<h2>Nodarbības <em>saviem</em></h2>"
+  "<h2>Lessons <em>for insiders</em></h2>": "<h2>Nodarbības <em>saviem</em></h2>",
+  "<span class=\"bd\">Open to all</span>": "<span class=\"bd\">Atvērts visiem</span>"
 }
