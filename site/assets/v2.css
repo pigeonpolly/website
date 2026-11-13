@@ -107,7 +107,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
 .post h3{font-size:23px;line-height:1.15;margin:8px 0 6px}
 .post img{width:130px;height:96px;object-fit:cover;border-radius:3px;background:var(--line)}
 /* Art Coo-rier (13.11.2026): последний выпуск новостей искусства — первым справа, с акцентной плашкой */
-.post.cr{position:relative;align-items:start}.cr-tag{position:absolute;top:2px;right:-24px;z-index:2;transform:rotate(17deg);margin:0;padding:4px 10px 3px;border-radius:2px;background:var(--acc);color:#fff;font:700 11px/1.2 var(--sans,system-ui),system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;box-shadow:0 6px 14px color-mix(in srgb,var(--acc) 26%,transparent)}
+.post.cr{position:relative;align-items:start}.cr-tag{position:absolute;top:2px;right:-24px;z-index:2;transform:rotate(17deg);margin:0;border-radius:2px;background:#FFFDF6;color:var(--acc);outline:1.5px solid var(--acc);outline-offset:-4px;padding:6px 12px 5px;font:700 11px/1.2 var(--sans,system-ui),system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;box-shadow:0 4px 10px rgba(31,35,38,.28),0 1px 2px rgba(31,35,38,.2)}
 .cr-tag::before{content:'✦ ';letter-spacing:0}
 /* заголовки справа — не больше 2 строк, строки ровные (без одинокой цифры или буквы в конце) */
 .post h3{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-wrap:balance}
