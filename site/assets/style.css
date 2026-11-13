@@ -1605,7 +1605,7 @@ html:has(.q-modal:not([hidden])) { overflow: hidden; } /* пока открыт�
 .q-attach li.on button { display: flex; align-items: center; gap: 8px; width: 100%; padding: 6px 10px; border: 0; background: none; color: inherit; font: inherit; text-align: left; cursor: pointer; }
 .q-attach li.on button span { margin-left: auto; color: #B0573A; }
 
-/* «Полли, помоги нарисовать» */
+/* «Школа Полли» (/polly-helps/, кнопки) */
 .ph-open-wrap { text-align: center; margin: 18px 0 0; }
 .ph-open { padding: 11px 20px; border: 2px solid var(--peach); border-radius: 999px; background: rgba(240, 169, 135, .12); color: var(--text); font: 700 15px var(--sans); cursor: pointer; }
 .ph-open:hover { background: var(--peach); color: var(--bg); }

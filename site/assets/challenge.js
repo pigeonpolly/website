@@ -10,7 +10,7 @@
     colors: ['Your colours', 'Ваши цвета', 'Tavas krāsas'],
     time: ['Time', 'Время', 'Laiks'],
     tip: ['Tip of the day', 'Совет дня', 'Dienas padoms'],
-    help: ['🕊 Polly, help me draw', '🕊 Полли, помоги нарисовать', '🕊 Pollija, palīdzi uzzīmēt'],
+    help: ['🕊 See the World Like an Artist', '🕊 Смотри на мир как художник', '🕊 Skaties uz pasauli kā mākslinieks'],
     easy: ['Relaxed', 'Спокойно', 'Mierīgi'],
     pro: ['Challenge me', 'Посложнее', 'Grūtāk'],
     start: ['Start', 'Старт', 'Sākt'], pause: ['Pause', 'Пауза', 'Pauze'], resume: ['Resume', 'Продолжить', 'Turpināt'], reset: ['Reset', 'Сброс', 'No sākuma'],

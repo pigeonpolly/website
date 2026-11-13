@@ -15,11 +15,11 @@
   const N = LS.length;
 
   const T = {
-    title: ['Polly’s Drawing School', 'Школа Полли', 'Pollijas zīmēšanas skola'],
+    title: ['See the World Like an Artist', 'Смотри на мир как художник', 'Skaties uz pasauli kā mākslinieks'],
     lead: ['Pen, paper and twelve small lessons. Every lesson ends with a real client from Wobbleland, and after twelve stamps you get a pixel diploma and buttons.', 'Ручка, бумага и двенадцать маленьких уроков. В конце каждого приходит настоящий клиент из Воббленда, а за двенадцать печатей — пиксельный диплом и пуговки.', 'Pildspalva, papīrs un divpadsmit mazas nodarbības. Katras beigās ierodas īsts klients no Vobllendas, bet par divpadsmit zīmogiem — pikseļu diploms un pogas.'],
-    free: ['The daily challenge is open to everyone — school is just for courage.', 'Челлендж открыт всем — школа просто для смелости.', 'Izaicinājums ir atvērts visiem — skola ir tikai drosmei.'],
+    free: ['The daily challenge is open to everyone — the course is just for courage.', 'Челлендж открыт всем — курс просто для смелости.', 'Izaicinājums ir atvērts visiem — kurss ir tikai drosmei.'],
     freeDip: ['The diploma is just for fun, not an official qualification.', 'Диплом — для радости, а не официальная квалификация.', 'Diploms ir priekam, nevis oficiāla kvalifikācija.'],
-    dipNote: ['Polly’s School is a friendly hobby course. The diploma is a keepsake for fun: it is not an official document, gives no academic credits or qualifications and is not recognised by any educational institution.', 'Школа Полли — дружеский курс для хобби. Диплом — памятная картинка для радости: это не официальный документ, он не даёт кредитных пунктов и квалификации и не признаётся учебными заведениями.', 'Pollijas skola ir draudzīgs hobija kurss. Diploms ir piemiņas attēls priekam: tas nav oficiāls dokuments, nedod kredītpunktus vai kvalifikāciju, un to neatzīst izglītības iestādes.'],
+    dipNote: ['This is a friendly hobby course. The diploma is a keepsake for fun: it is not an official document, gives no academic credits or qualifications and is not recognised by any educational institution.', 'Это дружеский курс для хобби. Диплом — памятная картинка для радости: это не официальный документ, он не даёт кредитных пунктов и квалификации и не признаётся учебными заведениями.', 'Šis ir draudzīgs hobija kurss. Diploms ir piemiņas attēls priekam: tas nav oficiāls dokuments, nedod kredītpunktus vai kvalifikāciju, un to neatzīst izglītības iestādes.'],
     dipFine: ['A keepsake for fun — not an official document, no academic credits or qualification.', 'Памятный диплом для радости — не официальный документ, не даёт кредитных пунктов и квалификации.', 'Piemiņas diploms priekam — nav oficiāls dokuments, nedod kredītpunktus un kvalifikāciju.'],
     path: ['Student path', 'Тропинка ученика', 'Skolēna taka'],
     lesson: ['Lesson', 'Урок', 'Nodarbība'],

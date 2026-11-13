@@ -12,7 +12,7 @@
     acc: ['⚙ Settings', '⚙ Настройки', '⚙ Iestatījumi'],
     vipT: ['Watercolour review', 'Обзор акварели', 'Akvareļu apskats'],
     watch: ['▶ Watch', '▶ Смотреть', '▶ Skatīties'],
-    schT: ['Polly’s School', 'Школа Полли', 'Pollijas skola'],
+    schT: ['See the World Like an Artist', 'Смотри на мир как художник', 'Skaties uz pasauli kā mākslinieks'],
     schS: n => [`Stamps: ${n} of 12`, `Печатей: ${n} из 12`, `Zīmogi: ${n} no 12`][L],
     schNew: ['Twelve small drawing lessons with a pixel diploma at the end', 'Двенадцать маленьких уроков рисования, в конце — пиксельный диплом', 'Divpadsmit mazas zīmēšanas nodarbības, beigās — pikseļu diploms'],
     schGo: ['Continue →', 'Продолжить →', 'Turpināt →'],
