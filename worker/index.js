@@ -3031,14 +3031,15 @@ async function route(req, env, url) {
     if (!(await isAdmin(u, env))) fail(403, 'admin');
     if (m === 'POST') { // «посмотрела» — счётчик новых подписчиков обнуляется
       const b = await req.json().catch(() => ({}));
-      if (b.k === 'subs') await setMeta(env, 'inbox_subs_seen', String(now()));
+      if (['subs', 'req', 'edits'].includes(b.k)) await setMeta(env, 'inbox_' + b.k + '_seen', String(now()));
       return json({ ok: true });
     }
     const cnt = async (sql, ...v) => { try { return Number((await env.DB.prepare(sql).bind(...v).first())?.n) || 0; } catch (e) { return 0; } };
     const t = now(), [ry, rm, rd] = rigaDay().split('-').map(Number);
     // всё разом, а не по очереди — так кабинет открывается быстрее
-    const [subsSeen, sched, filledRows, autoAll] = await Promise.all([
-      getMeta(env, 'inbox_subs_seen').then(v => Number(v) || 0).catch(() => 0),
+    const seen = k => getMeta(env, 'inbox_' + k + '_seen').then(v => Number(v) || 0).catch(() => 0);
+    const [subsSeen, reqSeen, editsSeen, sched, filledRows, autoAll] = await Promise.all([
+      seen('subs'), seen('req'), seen('edits'),
       env.DB.prepare("SELECT id, t_ru, t_en, t_lv, published_at FROM blog_posts WHERE status = 'published' AND published_at > ? ORDER BY published_at").bind(t).all().then(r => r.results).catch(() => []),
       rm >= 10 ? env.DB.prepare('SELECT DISTINCT day FROM advent_plan').all().then(r => r.results).catch(() => []) : [],
       autopilot(env, req).catch(() => []),
@@ -3053,11 +3054,11 @@ async function route(req, env, url) {
     const auto = autoAll.filter(x => x.ok === false).map(x => ({ t: x.t, d: x.d }));
     const [comments, requests, school, asks, subs, edits] = await Promise.all([
       cnt("SELECT COUNT(*) AS n FROM blog_comments WHERE status = 'pending'"),
-      cnt("SELECT COUNT(*) AS n FROM draw_requests WHERE status = 'open'"),
+      cnt("SELECT COUNT(*) AS n FROM draw_requests WHERE status = 'open' AND created_at > ?", reqSeen), // только новые с прошлого просмотра
       cnt("SELECT COUNT(*) AS n FROM school_works WHERE status = 'wait'"), // «Школа Полли»: работы ждут проверки
       cnt("SELECT COUNT(*) AS n FROM about_asks WHERE status = 'new'"), // вопросы из чата /about-me/ ждут ответа
       cnt('SELECT COUNT(*) AS n FROM subscribers WHERE created_at > ?', subsSeen),
-      cnt("SELECT COUNT(*) AS n FROM site_blocks WHERE lang != '*' AND html IS NOT NULL AND id NOT LIKE 'custom-%'"), // свой текст поверх блока из кода
+      cnt("SELECT COUNT(*) AS n FROM site_blocks WHERE lang != '*' AND html IS NOT NULL AND id NOT LIKE 'custom-%' AND updated_at > ?", editsSeen), // свой текст поверх блока из кода — новые с прошлого просмотра
     ]);
     return json({
       comments, requests, school, asks, subs, subsSeen,

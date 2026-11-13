@@ -104,7 +104,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `cron_at` — worker/index.js
 - `dev_last_mail` — worker/auth.js
 - `gemini_key` — worker/blog.js, worker/translate.js
-- `inbox_subs_seen` — worker/index.js
+- `inbox_subs_seen`, `inbox_req_seen`, `inbox_edits_seen` — worker/index.js (Входящие: «новое с прошлого просмотра»)
 - `index_base` — worker/index.js
 - `mail_n:` — worker/mail.js, worker/wl-holidays.js
 - `mail_salt` — worker/wl-holidays.js

@@ -84,7 +84,7 @@
   const cnt = keys => keys.length ? `<span class="adm-count" data-count="${keys.join(',')}" hidden></span>` : '';
   if (nav) nav.innerHTML = `<a href="#week" data-grp="week">🗓 Неделя</a><a href="#inbox" data-grp="">📥 Входящие${cnt(['total'])}</a><a href="#runes" data-grp="runes">🔮 Руны</a>` + Object.entries(ADMIN_GROUPS).map(([g, name]) =>
     `<a href="#${inGroup(g).find(x => !x.href).id}" data-grp="${g}">${name}${cnt(inGroup(g).filter(x => x.count && x.count !== 'total').map(x => x.count))}</a>`).join('');
-  const tabLink = (x, cur) => `<a href="${x.href || '#' + x.id}"${x.href ? ' class="adm-ext" title="Откроется на своей странице"' : ''}${x.id === cur ? ' aria-current="page"' : ''}>${x.ic} ${x.name}${x.count ? `<span class="adm-count" data-count="${x.count}"${x.count === 'comments' ? ' id="adm-pend"' : ''} hidden></span>` : ''}</a>`;
+  const tabLink = (x, cur) => `<a href="${x.href || '#' + x.id}"${x.id === 'requests' ? ' data-seen="req"' : ''}${x.href ? ' class="adm-ext" title="Откроется на своей странице"' : ''}${x.id === cur ? ' aria-current="page"' : ''}>${x.ic} ${x.name}${x.count ? `<span class="adm-count" data-count="${x.count}"${x.count === 'comments' ? ' id="adm-pend"' : ''} hidden></span>` : ''}</a>`;
   // ⭐ «Часто» — полоска над экраном: 6 разделов, куда админ заходит чаще всего (счёт в localStorage этого устройства, pp-adm-freq)
   const FREQ_KEY = 'pp-adm-freq', FREQ_N = 6;
   const freqGet = () => { try { return JSON.parse(localStorage.getItem(FREQ_KEY) || '{}') || {}; } catch (e) { return {}; } };
@@ -102,7 +102,8 @@
     freqAdd(cur);
     if (about) about.innerHTML = freqBar(cur) + (x.id === 'week' ? '' : (g ? `<nav class="adm-tabs" aria-label="${esc(ADMIN_GROUPS[g])}">${inGroup(g).map(t => tabLink(t, cur)).join('')}</nav>` : x.name ? `<h2>${x.ic} ${x.name}</h2>` : '') + (x.about ? `<p>${x.about}</p>` : ''));
     if (inboxData) badges(inboxData);
-    if (x.id === 'subscribers') api('admin/inbox/seen', { k: 'subs' }).then(() => counts()).catch(() => {}); // открыла — новые уже не новые
+    const seenK = { subscribers: 'subs', edits: 'edits' }[x.id];
+    if (seenK) api('admin/inbox/seen', { k: seenK }).then(() => counts()).catch(() => {}); // открыла — новые уже не новые
     await (SECTIONS[x.open || x.id] || week)();
     const f = typeof x.focus === 'function' ? x.focus(main) : x.focus ? main.querySelector(x.focus) : null;
     if (f) {
@@ -131,6 +132,8 @@
 
   // ---------- 📥 входящие: только то, что ждёт Алину ----------
   let inboxData = null;
+  // «Нарисуй мне» открывается на своей странице: нажала — новые заявки уже не новые
+  document.addEventListener('click', e => { const a = e.target.closest('#adm [data-seen]'); if (a) api('admin/inbox/seen', { k: a.dataset.seen }).then(() => counts()).catch(() => {}); });
   function badges(d) {
     const v = { ...d, comments: d.comments, requests: d.requests, school: d.school, asks: d.asks, subs: d.subs, edits: d.edits, advent: (d.advent || []).length, scheduled: (d.scheduled || []).length };
     v.total = inboxItems(d).length; // сколько разных дел ждёт
@@ -142,13 +145,13 @@
   function inboxItems(d) {
     const out = [], adv = d.advent || [], sch = d.scheduled || [];
     if (d.comments) out.push({ ic: '💬', n: d.comments, t: `${plural(d.comments, 'комментарий ждёт', 'комментария ждут', 'комментариев ждут')} проверки`, d: 'в них есть ссылки — одобрить или удалить', href: '#comments', cf: 'pending', go: 'Проверить' });
-    if (d.requests) out.push({ ic: '🖍', n: d.requests, t: `${plural(d.requests, 'заявка', 'заявки', 'заявок')} «Нарисуй мне»`, d: 'темы, которые ещё не нарисованы', href: '/ru/requests/', go: 'Открыть ↗' });
+    if (d.requests) out.push({ ic: '🖍', n: d.requests, t: `${plural(d.requests, 'новая заявка', 'новые заявки', 'новых заявок')} «Нарисуй мне»`, d: 'темы, пришедшие с прошлого раза: открыли — строка уйдёт', href: '/ru/requests/', go: 'Открыть ↗', seen: 'req' });
     if (d.school) out.push({ ic: '🎓', n: d.school, t: `${plural(d.school, 'работа ждёт', 'работы ждут', 'работ ждут')} проверки`, d: 'Школа Полли: печать или на доработку', href: '#school', go: 'Проверить' });
     if (d.asks) out.push({ ic: '📮', n: d.asks, t: `${plural(d.asks, 'вопрос', 'вопроса', 'вопросов')} из чата ${plural(d.asks, 'ждёт', 'ждут', 'ждут')} ответа`, d: 'About me: ответить за себя и Полли — и вопрос появится в игре', href: '#asks', go: 'Ответить' });
     if (d.subs) out.push({ ic: '📬', n: d.subs, t: `${plural(d.subs, 'новый подписчик', 'новых подписчика', 'новых подписчиков')}`, d: 'ждут письма о книге', href: '#subscribers', go: 'Посмотреть' });
     if ((d.auto || []).length) out.push({ ic: '🤖', n: d.auto.length, t: 'автопилот: нужно внимание', d: d.auto.map(a => `${esc(a.t)} — ${esc(a.d)}`).join('<br>'), href: '#rules', go: 'Открыть', raw: 1 });
     if (adv.length) out.push({ ic: '🎄', n: adv.length, t: `${plural(adv.length, 'окошко', 'окошка', 'окошек')} адвента ${plural(adv.length, 'пустое', 'пустые', 'пустые')}`, d: `декабрь: ${adv.length > 12 ? adv.slice(0, 12).join(', ') + '…' : adv.join(', ')} — в пустом окошке будут только пуговки`, href: '#advent', go: 'Заполнить' });
-    if (d.edits) out.push({ ic: '🧩', n: d.edits, t: `${plural(d.edits, 'правка', 'правки', 'правок')} сайта поверх кода`, d: 'ваш текст закрывает блок из кода: если блок обновят в коде, на сайте всё равно будет ваша правка', href: '#edits', go: 'Проверить' });
+    if (d.edits) out.push({ ic: '🧩', n: d.edits, t: `${plural(d.edits, 'новая правка', 'новые правки', 'новых правок')} сайта поверх кода`, d: 'ваш текст закрывает блок из кода: если блок обновят в коде, на сайте всё равно будет ваша правка. Открыли — строка уйдёт', href: '#edits', go: 'Проверить' });
     if (sch.length) out.push({ ic: '⏰', n: sch.length, t: `${plural(sch.length, 'статья запланирована', 'статьи запланированы', 'статей запланировано')}`, d: sch.slice(0, 5).map(p => `«${esc(title(p))}» — ${dm(p.published_at)}`).join('<br>'), href: '/blog-editor/#scheduled', go: 'Открыть', raw: 1 });
     return out;
   }
@@ -158,7 +161,7 @@
     const items = inboxItems(d);
     main.innerHTML = `<div class="adm-quick"><a class="pill-btn pill-fill" href="/blog-editor/#new">＋ Новая статья</a></div>
       ${items.length ? `<ul class="adm-inbox">${items.map(it => `<li><span class="adm-in-ic">${it.ic}</span><span class="adm-in-n">${n(it.n)}</span>
-        <span class="adm-in-t"><b>${it.t}</b><small>${it.raw ? it.d : esc(it.d)}</small></span><a class="pill-btn" href="${it.href}"${it.cf ? ` data-cf-go="${it.cf}"` : ''}>${it.go}</a></li>`).join('')}</ul>`
+        <span class="adm-in-t"><b>${it.t}</b><small>${it.raw ? it.d : esc(it.d)}</small></span><a class="pill-btn" href="${it.href}"${it.cf ? ` data-cf-go="${it.cf}"` : ''}${it.seen ? ` data-seen="${it.seen}"` : ''}>${it.go}</a></li>`).join('')}</ul>`
         : '<p class="adm-calm">Всё спокойно ✓<small>Ничего не ждёт: комментарии проверены, заявок и новых подписчиков нет, автопилот работает.</small></p>'}`;
     main.querySelectorAll('[data-cf-go]').forEach(a => a.addEventListener('click', () => { cFilter = a.dataset.cfGo; }));
   }
