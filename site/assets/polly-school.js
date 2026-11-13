@@ -159,10 +159,10 @@
     return `<li class="ps-b${c ? ' client' : ''}${i === view ? ' cur' : ''}" data-i="${i}">${who}<p>${tr(s.say)}</p>${extra(n, i)}${i === view && i < ls(n).step ? `<span class="ps-eye">👁 ${t('onEasel')}</span>` : ''}</li>`;
   };
 
-  const mark = { wait: '⏳', ok: '✅', redo: '↩' };
+  const mark = { wait: '⏳', ok: '✓', redo: '↩' }; // кружки тропинки: пустые, пройденный — акцентный с белой галочкой
   const path = () => `<ol class="ps-path">${LS.map((l, i) => {
     const n = i + 1, w = srv.works[n], open = isOpen(n);
-    return `<li class="${open ? 'open' : 'lock'}${n === st.cur && mode === 'lesson' ? ' cur' : ''}${w ? ' ' + w.status : ''}" data-n="${n}" title="${open ? '' : esc(t('locked'))}"><span class="ps-dot">${w ? mark[w.status] : open ? l.icon : '🔒'}</span><small>${n}. ${tr(l.name)}</small></li>`;
+    return `<li class="${open ? 'open' : 'lock'}${n === st.cur && mode === 'lesson' ? ' cur' : ''}${w ? ' ' + w.status : ''}" data-n="${n}" title="${open ? '' : esc(t('locked'))}"><span class="ps-dot">${w ? mark[w.status] : ''}</span><small>${n}. ${tr(l.name)}</small></li>`;
   }).join('')}<li class="dip${stamps() >= N ? ' open' : ' lock'}${mode === 'dip' ? ' cur' : ''}" data-n="dip"><span class="ps-dot">📜</span><small>${t('diploma')}</small></li></ol>`;
 
   // урок: слева мольберт, справа только текущая реплика; прежние — в стопочке, раскрываются по кнопке
@@ -250,7 +250,7 @@
 
   const render = () => {
     box.innerHTML = `<div class="ps-head"><h1>${t('title')}</h1><p>${t('lead')}</p><p class="ps-free">${t('free')} ${t('freeDip')}</p></div>
-      <h3 class="ps-h3">${t('path')}</h3>${path()}${mode === 'lesson' && srv.works[st.cur] && srv.works[st.cur].status !== 'wait' ? verdict(st.cur) : ''}
+      <h3 class="ps-h3">${t('path')}</h3>${path()}${mode === 'lesson' && srv.works[st.cur] && srv.works[st.cur].status === 'redo' ? verdict(st.cur) : ''}
       ${mode === 'dip' ? diplomaView() : lessonView()}
       <a class="ps-book" href="${['', '/ru', '/lv'][L]}/e-books/"><img src="${IMG}book-cover.jpg" alt=""><span>${t('book')} <b>Watercolor Sketches: Creative Guide</b><em>${t('bookGo')}</em></span></a>`;
     const pic = box.querySelector('.ps-dip-pic');

@@ -5118,13 +5118,13 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .ps-h3 { margin: 22px 0 10px; font: 600 12px var(--sans); letter-spacing: .14em; text-transform: uppercase; color: var(--peach); }
 .ps-path { display: grid; grid-template-columns: repeat(13, minmax(0, 1fr)); gap: 4px; margin: 0; padding: 4px 2px 6px; list-style: none; }
 .ps-path li { text-align: center; position: relative; }
-.ps-path li:not(:last-child)::after { content: ''; position: absolute; top: 22px; left: calc(50% + 26px); right: calc(-50% + 26px); border-top: 2px dotted var(--line); }
-.ps-dot { display: inline-flex; align-items: center; justify-content: center; width: 44px; height: 44px; border-radius: 50%; background: var(--pp-card, #3A302B); box-shadow: inset 0 0 0 1px var(--line); font-size: 19px; color: #F6F4F3; }
-.ps-path .lock .ps-dot { opacity: .5; font-size: 15px; }
+.ps-path li:not(:last-child)::after { content: ''; position: absolute; top: 20px; left: calc(50% + 26px); right: calc(-50% + 26px); border-top: 2px dotted var(--line); }
+.ps-dot { display: flex; margin: 0 auto; align-items: center; justify-content: center; width: 40px; height: 40px; border-radius: 50%; background: transparent; box-shadow: inset 0 0 0 1.5px var(--line); font: 700 20px var(--sans); color: #fff; box-sizing: border-box; }
+.ps-path .lock .ps-dot { opacity: .5; }
 .ps-path .dip .ps-dot { opacity: .6; }
 .ps-path small { display: block; margin-top: 6px; font-size: 13px; line-height: 1.25; color: var(--muted, #E6E2DF); opacity: .8; }
 .ps-path .cur small { color: #F6F4F3; font-weight: 700; opacity: 1; }
-.ps-class { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 24px; height: clamp(520px, calc(100svh - 32px), 760px); margin-top: 16px; padding: 20px; border-radius: 22px; background: rgba(255, 255, 255, .05); border: 1px solid var(--line); color: #F6F4F3; box-sizing: border-box; }
+.ps-class { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 24px; height: clamp(440px, calc(100svh - 48px), 620px); margin-top: 16px; padding: 20px; border-radius: 22px; background: rgba(255, 255, 255, .05); border: 1px solid var(--line); color: #F6F4F3; box-sizing: border-box; }
 .ps-stage { position: relative; display: flex; flex-direction: column; min-height: 0; }
 .ps-lhead { flex: none; margin-bottom: auto; padding-bottom: 14px; }
 .ps-lhead h2 { margin: 4px 0 10px; font: 400 clamp(26px, 2.4vw, 34px)/1.15 var(--serif); }
@@ -5242,8 +5242,8 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .ps-verdict .ps-note { margin-top: 4px; font-weight: 400; font-size: 14px; line-height: 1.45; }
 .ps-verdict.ok { border-color: #5FA35A; }
 .ps-verdict.redo { border-color: #D85A30; }
-.ps-path .ok .ps-dot { background: #5FA35A; opacity: 1; }
-.ps-path .wait .ps-dot, .ps-path .redo .ps-dot { background: #5C4D44; }
+.ps-path .ok .ps-dot { background: var(--peach); box-shadow: none; opacity: 1; }
+.ps-path .wait .ps-dot, .ps-path .redo .ps-dot { font-size: 16px; }
 .ps-school > .ps-verdict { max-width: 640px; }
 .ps-proto:empty { display: none; }
 .ps-prev[hidden] { display: none; }
@@ -5261,10 +5261,10 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .ps-path li.open { cursor: pointer; }
 .ps-path li.open:hover .ps-dot { transform: translateY(-2px); box-shadow: inset 0 0 0 1.5px var(--peach); }
 .ps-path .ps-dot { transition: transform .15s; }
-.ps-path li.cur .ps-dot { background: var(--peach); color: #2E2521; box-shadow: 0 0 0 3px rgba(246, 244, 243, .25); opacity: 1; }
-.ps-path li.open:not(.cur) .ps-dot { box-shadow: inset 0 0 0 1.5px var(--peach); }
-.ps-path li.ok:not(.cur) .ps-dot { background: #5FA35A; color: #fff; }
-.ps-path .dip.open .ps-dot { background: #E9A93B; opacity: 1; box-shadow: 0 0 0 3px rgba(246, 244, 243, .25), 0 0 18px rgba(233, 169, 59, .6); }
+.ps-path li.cur .ps-dot { box-shadow: inset 0 0 0 2px var(--peach), 0 0 0 4px rgba(246, 244, 243, .14); opacity: 1; }
+.ps-path li.open:not(.cur):not(.ok) .ps-dot { box-shadow: inset 0 0 0 1.5px rgba(246, 244, 243, .45); }
+.ps-path li.ok.cur .ps-dot { background: var(--peach); }
+.ps-path .dip.open .ps-dot { opacity: 1; box-shadow: inset 0 0 0 2px var(--peach); }
 .ps-dipwait, .ps-dip { margin-top: 16px; padding: 28px; border-radius: 22px; background: rgba(255, 255, 255, .05); border: 1px solid var(--line); color: #F6F4F3; text-align: center; }
 .ps-dipwait p { font-size: 18px; }
 .ps-dip-hi { margin: 0 0 16px; font: 600 clamp(18px, 1.6vw, 24px)/1.4 var(--serif); }
