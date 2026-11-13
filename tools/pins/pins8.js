@@ -4,7 +4,7 @@ const fs = require('fs'), path = require('path'), { execSync } = require('child_
 const { chromium } = require('playwright');
 const ROOT = path.resolve(__dirname, '../..');
 const SITE = 'https://www.pigeonpolly.com';
-const L = p => SITE + p + '?utm_source=pinterest&utm_campaign=photos';
+const L = p => SITE + p.replace(/(#.*)?$/, '?utm_source=pinterest&utm_campaign=photos$1');
 const F = p => path.join(ROOT, 'site/images', p);
 const U = p => 'file://' + F(p);
 const dims = {}; const dim = p => dims[p] || (dims[p] = execSync(`identify -format "%w %h" "${F(p)}"`).toString().split(' ').map(Number));
