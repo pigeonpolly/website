@@ -72,6 +72,17 @@ async function loadTags(env) {
   for (const r of (await env.DB.prepare('SELECT en, ru, lv, checked, src, created_at FROM blog_tags').all()).results) TAGMAP[r.en] = r;
   SECTIONS = (await env.DB.prepare('SELECT * FROM blog_sections ORDER BY sort, en').all()).results;
 }
+// раздел «Art Coo-rier: World News» (создан Алиной в редакторе, slug заранее неизвестен) — ищем по названию; нет — создаём art-courier
+const isCourierSec = r => /coo-?rier|courier/i.test([r.slug, r.en, r.ru, r.lv].join(' '));
+export async function courierSlug(env) {
+  if (!SECTIONS.length) await loadTags(env);
+  let r = SECTIONS.find(isCourierSec);
+  if (!r) {
+    await env.DB.prepare("INSERT INTO blog_sections (slug, en, ru, lv, sort) VALUES ('art-courier', 'Art Coo-rier: World News', 'Art Coo-rier: World News', 'Art Coo-rier: World News', (SELECT COALESCE(MAX(sort), 0) + 1 FROM blog_sections)) ON CONFLICT(slug) DO NOTHING").run().catch(() => {});
+    await loadTags(env); r = SECTIONS.find(isCourierSec);
+  }
+  return r ? r.slug : 'art-courier';
+}
 const stripTags = s => String(s || '').replace(/\[\[[\s\S]*?\]\]/g, '').replace(/<[^>]*>/g, ' ').replace(/\s+/g, ' ').trim(); // сноски [[…]] в выдержки не попадают
 // ---------- сноски: в тексте статьи [[пояснение или источник]] → циферка ¹, а внизу свёрнутый список «Источники и примечания» ----------
 const FN = { en: ['Sources and notes', 'Note'], ru: ['Источники и примечания', 'Сноска'], lv: ['Avoti un piezīmes', 'Piezīme'] };
@@ -360,10 +371,16 @@ export async function blogApi(req, env, url, h) {
     const rows = (await env.DB.prepare(`SELECT * FROM blog_posts WHERE status = 'published' AND COALESCE(published_at, 0) <= CAST(strftime('%s', 'now') AS INTEGER) ORDER BY published_at DESC`).all()).results;
     const pack = x => ({ url: blogUrl(lang, x.slug), title: field(x, 't', lang), excerpt: field(x, 'd', lang) || stripTags(field(x, 'b', lang)).slice(0, 200),
       cover: x.cover, date: fmtDate(x.published_at, lang), tags: tagsOf(x).slice(0, 3).map(g => tagLabel(g, lang)), likes: x.likes });
-    const latest = rows[0] || null; // крупно — самая новая статья
-    const featured = rows.filter(x => x.featured && x !== latest).slice(0, 3); // справа — три последние со ★ (кроме той, что уже крупно)
-    const side = [...featured, ...rows.filter(x => x !== latest && !x.featured)].slice(0, 3);
-    return json({ latest: latest && pack(latest), featured: featured.map(x => ({ ...pack(x), star: true })), recent: [latest, ...side].filter(Boolean).map(pack) }); // recent — новая главная: крупно самая новая, справа три ★, недостающие — следующие по дате
+    // Art Coo-rier (13.11.2026, решение Алины): крупно — самая новая статья НЕ из раздела Art Coo-rier; справа первой — последний выпуск Art Coo-rier
+    // с плашкой (courier: true), под ним ★-избранные (без выпусков Coo-rier и без той, что крупно), недостающие — следующие по дате
+    const cs = await courierSlug(env), isC = x => secsOf(x).includes(cs);
+    const latest = rows.find(x => !isC(x)) || null;
+    const courier = rows.find(isC) || null;
+    const rest = rows.filter(x => x !== latest && !isC(x)), n = courier ? 2 : 3;
+    const featured = rest.filter(x => x.featured).slice(0, 3);
+    const side = [...featured, ...rest.filter(x => !x.featured)].slice(0, n);
+    return json({ latest: latest && pack(latest), featured: featured.map(x => ({ ...pack(x), star: true })), courier: courier && { ...pack(courier), courier: true },
+      recent: [latest && pack(latest), courier && { ...pack(courier), courier: true }, ...side.map(pack)].filter(Boolean) }); // recent — новая главная (v2.js): [крупно, справа…]
   }
 
   // список картинок Алины в R2 (блог, картины галерей, карточки) и состояние копии во втором хранилище; сами картинки и так открыты по /media/
@@ -843,7 +860,7 @@ async function patreonFresh(src) {
     return sharp.find(u => !/eyJ3IjoyMDB9|eyJoIjo/.test(u)) || sharp[0] || null; // не крошечное превью, если есть
   } catch (e) { return null; }
 }
-async function rehostOne(env, src, moved) {
+export async function rehostOne(env, src, moved) {
   if (moved[src] !== undefined) return moved[src];
   moved[src] = null;
   if (!env.MEDIA) return null;
@@ -1118,7 +1135,8 @@ async function blogPageInner(req, env, url, h) {
     const tag = (P.get('tag') || '').trim().toLowerCase();
     const month = /^\d{4}-\d{2}$/.test(P.get('month') || '') ? P.get('month') : '';
     const favOnly = P.get('fav') === '1';
-    const section = (P.get('section') || '').trim().toLowerCase();
+    let section = (P.get('section') || '').trim().toLowerCase();
+    if (section === 'art-courier') section = await courierSlug(env); // кнопка на главной ведёт на ?section=art-courier, настоящий slug — у раздела Алины
     const q = (P.get('q') || '').trim().slice(0, 80);
     const access = ['open', 'members'].includes(P.get('access')) ? P.get('access') : ''; // фильтр: открытые / 🔒 для своих
     let list = posts;

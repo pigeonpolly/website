@@ -302,7 +302,7 @@
     const pic = (p, cls) => p.cover ? `<img src="${esc(p.cover)}" alt="" loading="lazy"${cls ? ` class="${cls}"` : ''}>` : '';
     const [a, ...rest] = posts;
     box.innerHTML = `<a class="feat" href="${esc(a.url)}"><div class="im">${pic(a)}</div><div class="card">${meta(a)}<h3>${esc(a.title)}</h3><p>${esc(a.excerpt)}</p></div></a>`
-      + `<div>${rest.map(p => `<a class="post" href="${esc(p.url)}"><div>${meta(p)}<h3>${esc(p.title)}</h3><p>${esc(String(p.excerpt || '').slice(0, 110))}${String(p.excerpt || '').length > 110 ? '…' : ''}</p></div>${pic(p)}</a>`).join('')}</div>`;
+      + `<div>${rest.map(p => `<a class="post${p.courier ? ' cr' : ''}" href="${esc(p.url)}"><div>${p.courier ? '<span class="cr-tag">Art Coo-rier</span>' : ''}${meta(p)}<h3>${esc(p.title)}</h3><p>${esc(String(p.excerpt || '').slice(0, 110))}${String(p.excerpt || '').length > 110 ? '…' : ''}</p></div>${pic(p)}</a>`).join('')}</div>`;
   }).catch(() => { box.closest('section').hidden = true; });
 
   // своя статистика посетителей (как в site.js)
