@@ -797,5 +797,6 @@
   "<div class=\"hd5\"><h2>All lessons <em>in one place</em></h2><p>Lessons, courses and cheat sheets. Most are open to everyone, and the ones for insiders open after a free sign-in.</p></div>": "<div class=\"hd5\"><h2>Все уроки <em>в одном месте</em></h2><p>Уроки, курсы и шпаргалки. Почти всё открыто всем, а уроки «для своих» — после бесплатного входа.</p></div>",
   "<h2>For insiders <em>for friends of Polly</em></h2>": "<h2>Для своих <em>для друзей Полли</em></h2>",
   "<span class=\"bd\">For insiders</span>": "<span class=\"bd\">Для своих</span>",
-  "<h2>Lessons <em>for insiders</em></h2>": "<h2>Уроки <em>для своих</em></h2>"
+  "<h2>Lessons <em>for insiders</em></h2>": "<h2>Уроки <em>для своих</em></h2>",
+  "<span class=\"bd\">Open to all</span>": "<span class=\"bd\">Открыто всем</span>"
 }
