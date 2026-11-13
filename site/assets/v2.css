@@ -183,6 +183,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
 .ft2 .soc{display:flex;gap:10px;flex-wrap:wrap}.ft2 .soc a{border:1px solid var(--line);border-radius:999px;padding:2px 14px;line-height:2}
 .ft2 .bt{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:40px;padding-top:18px;font-size:12px;color:var(--mut)}
 .ft2 .bt a{text-decoration:underline}
+.ft2 .bt .ver{font-variant-numeric:tabular-nums;opacity:.8}
 
 @media (max-width:1180px){.nv{gap:24px}.hr{gap:12px;margin-left:12px}.hd2 .w{gap:18px}}
 @media (max-width:1040px){
