@@ -202,9 +202,9 @@
       fg.innerHTML = COURSES.map(crs).join('') + vids.map(card).join('') + hws.map(hwCard).join(''); if (more) fg.appendChild(more);
       fg.querySelectorAll('[data-ytn]').forEach(ytName);
       // два фильтра вместе: доступ (все / открытые всем / для своих) и вид (видео / курс / шпаргалка); числа — с учётом другого фильтра
-      const FA = [['all', G.all[L]], ['free', G.openAll[L]], ['vip', G.vipB[L]]], FT = [['course', G.course[L]], ['video', G.vidF[L]], ['howto', G.howto[L]], ['all', G.allT[L]]];
+      const FA = [['all', G.all[L]], ['free', G.openAll[L]], ['vip', G.vipB[L]]], FT = [['all', G.allT[L]], ['course', G.course[L]], ['video', G.vidF[L]], ['howto', G.howto[L]]];
       const FL = [['all', ['All languages', 'Все языки', 'Visas valodas'][L]], ['en', 'EN'], ['ru', 'RU'], ['lv', 'LV']];
-      const grp = (g, lb, F) => `<div class="flt-g" role="group" aria-label="${lb}"><span class="flt-l">${lb}</span>${F.map(([k, n], i) => `<button type="button" data-g="${g}" data-k="${k}" aria-pressed="${i ? 'false' : 'true'}">${n} <i></i></button>`).join('')}</div>`;
+      const grp = (g, lb, F) => `<div class="flt-g" role="group" aria-label="${lb}"><span class="flt-l">${lb}</span>${F.map(([k, n], i) => `<button type="button" data-g="${g}" data-k="${k}" aria-pressed="${k === (g === 't' ? 'course' : 'all') ? 'true' : 'false'}">${n} <i></i></button>`).join('')}</div>`;
       fg.insertAdjacentHTML('beforebegin', `<div class="flt">${grp('a', G.accL[L], FA)}${grp('t', G.typL[L], FT)}${grp('l', G.lngL[L], FL)}<div class="flt-g flt-x">`
         + (SEEN.size ? `<label class="flt-sn"><input type="checkbox"> ${W.hide[L]}</label>` : '')
         + `<span class="flt-st">${op ? G.allOpen[L] : `🔒 ${G.vipN[L](vip.length + hws.filter(x => x.vip).length)} · <a href="#signin">${G.signin[L]}</a>`}</span></div></div>`);
