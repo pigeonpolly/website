@@ -91,14 +91,14 @@
   const srv = { me: null, nick: '', works: {} }; // с сервера: вошла ли птичка, последняя сдача по урокам
   const finished = n => ls(n).step >= clientAt(n);
   // следующий урок — только после «Сдать Полли»; пока сервер не ответил, верим своему прогрессу
-  const isOpen = n => n === 1 || !!srv.works[n - 1] || (srv.me === null && finished(n - 1));
+  const isOpen = n => n === 1 || !!srv.works[n - 1] || !!srv.admin || (srv.me === null && finished(n - 1));
   const stamps = () => Object.values(srv.works).filter(w => w.status === 'ok').length;
   if (!(st.cur >= 1 && st.cur <= N) || !isOpen(st.cur)) st.cur = 1;
   let hist = false; // стопочка старых реплик раскрыта
   let mode = 'lesson', view = Math.min(ls(st.cur).step, stepsOf(st.cur).length - 1);
 
   const loadSrv = () => fetch('/api/school?lang=' + ['en', 'ru', 'lv'][L], { credentials: 'same-origin' }).then(r => r.json()).then(d => {
-    srv.me = !!d.me; srv.nick = d.nick || ''; srv.btn = d.diplomaBtn || 0; srv.works = {}; for (const w of d.works || []) srv.works[w.lesson] = w;
+    srv.me = !!d.me; srv.admin = !!d.admin; srv.nick = d.nick || ''; srv.btn = d.diplomaBtn || 0; srv.works = {}; for (const w of d.works || []) srv.works[w.lesson] = w;
     fixCur(); render();
   }).catch(() => { srv.me = false; fixCur(); render(); });
   const fixCur = () => { if (isOpen(st.cur)) return; while (!isOpen(st.cur)) st.cur--; mode = 'lesson'; view = Math.min(ls(st.cur).step, stepsOf(st.cur).length - 1); save(); };
@@ -126,7 +126,7 @@
     if (s.quiz) return p.quiz[i] == null;
     if (s.find) return (p.find[i] || []).length < s.find.parts.length;
     if (s.paper) return p.paper.length < s.paper.min;
-    if (s.client) return !srv.works[n];
+    if (s.client) return !srv.works[n] && !srv.admin;
     return false;
   };
   const pickedOf = n => { const ps = LS[n - 1].steps.find(x => x.paper); return ps ? ps.paper.opts.filter((_, k) => ls(n).paper.includes(k)).map(tr) : []; };

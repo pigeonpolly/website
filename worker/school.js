@@ -80,7 +80,8 @@ export async function schoolApi(req, env, url, h) {
     const works = Object.values(last(rows)).map(r => ({ lesson: r.lesson, status: r.status, comment: trOf(r)[lang] || r.comment || '', img: r.img, note: r.note || '', at: r.created_at, checked: r.checked_at, tries: tries[r.lesson], fresh: !r.seen }));
     if (!url.searchParams.has('peek') && rows.some(r => !r.seen)) await env.DB.prepare(`UPDATE school_works SET seen = 1 WHERE user_id = ? AND seen = 0 AND ${CO} = ?`).bind(u.id, c).run(); // открыл курс — вердикты увидены (?peek — кабинет только смотрит)
     const dip = await dipOf(env, u.id, c);
-    return json({ me: true, nick: u.nick, course: c, of: COURSES[c].n, works, diplomaBtn: dip ? dip.amount : 0 }, 200, { 'cache-control': 'no-store' });
+    const admin = await h.isAdmin(u, env).catch(() => false); // админу (Алине) открыты все уроки — просмотр курса
+    return json({ me: true, nick: u.nick, course: c, of: COURSES[c].n, works, diplomaBtn: dip ? dip.amount : 0, admin: !!admin }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/school/hand') {
     const u = await h.needUser(req, env);

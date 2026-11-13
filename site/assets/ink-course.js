@@ -92,9 +92,9 @@
   let LS = []; // уроки с сервера (на языке страницы)
   let mode = 'lesson', picked = null, answers = {};
   const has = n => n <= LS.length; // урок уже написан
-  const isOpen = n => n === 1 || !!srv.works[n - 1];
+  const isOpen = n => n === 1 || !!srv.works[n - 1] || !!srv.admin; // админу открыто всё
   const stamps = () => Object.values(srv.works).filter(w => w.status === 'ok').length;
-  const passed = n => (st.t[n] || 0) >= PASS * 100 || !!srv.works[n]; // сдал работу — тест уже не нужен
+  const passed = n => (st.t[n] || 0) >= PASS * 100 || !!srv.works[n] || !!srv.admin; // сдал работу — тест уже не нужен
 
   // ---------- гость: обложка курса и план ----------
   const guest = () => {
@@ -188,7 +188,7 @@
     const get = u => fetch(u, { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null);
     const [s, ls] = await Promise.all([get('/api/school?course=ink&lang=' + LG), get('/api/school/lessons?course=ink&lang=' + LG)]);
     if (!s || !s.me || !ls || !ls.me) { srv.me = false; render(); return; }
-    srv.me = true; srv.nick = s.nick || ''; srv.btn = s.diplomaBtn || 0; srv.works = {}; for (const w of s.works || []) srv.works[w.lesson] = w;
+    srv.me = true; srv.admin = !!s.admin; srv.nick = s.nick || ''; srv.btn = s.diplomaBtn || 0; srv.works = {}; for (const w of s.works || []) srv.works[w.lesson] = w;
     LS = ls.lessons || [];
     fixCur(); render();
     if (location.hash === '#diploma') { mode = 'dip'; render(); }
