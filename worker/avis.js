@@ -6,6 +6,7 @@
 // Таблицы: avis_src (день → выбранные новости с текстами), avis (день + уровень → готовый выпуск). Хранится 30 дней.
 // Слова «+ в словарь» уходят в словарь учебника норвежского (norsk_progress.state.v — тот же формат, что addWord в content/norsk/engine.js).
 import { geminiKey, GEMINI_MODELS } from './translate.js';
+import { UTTALE_JS } from './uttale.js'; // 🗣 шпаргалка произношения слева (content/shared/uttale.js)
 
 export const AVIS_TABLES = [
   'CREATE TABLE IF NOT EXISTS avis_src (day TEXT PRIMARY KEY, data TEXT NOT NULL, created_at INTEGER)',
@@ -707,4 +708,4 @@ h2.sec .up{font:13px system-ui,sans-serif;text-transform:none;letter-spacing:0}
   }
   load();
 })();
-</script></body></html>`;
+</script><script>${UTTALE_JS}</script></body></html>`;
