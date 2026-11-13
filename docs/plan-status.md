@@ -380,3 +380,4 @@
 - 13.11: наклейка ART COO-RIER — светлая бумажная (молочный фон, текст и рамка цветом сезона, тень), видна на тёмных картинках во всех 4 сезонах.
 - 13.11: в подвале номер версии сайта (только админу): ✓ — свежая, иначе «на сервере: vN — обнови страницу».
 - 13.11: шапка профиля Pinterest по мотивам новой главной — site/images/pins/pinterest-cover.jpg (tools/pins/cover.js, docs/palettes.md). Допущение: осенние цвета сайта и арт «Polly on the train» — круглый год.
+- 13.11: шапка Pinterest в зимней теме сайта — site/images/pins/pinterest-cover-winter.jpg (осенняя переименована в pinterest-cover-autumn.jpg).
