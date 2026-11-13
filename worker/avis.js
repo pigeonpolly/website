@@ -12,6 +12,8 @@ export const AVIS_TABLES = [
   'CREATE TABLE IF NOT EXISTS avis_src (day TEXT PRIMARY KEY, data TEXT NOT NULL, created_at INTEGER)',
   'CREATE TABLE IF NOT EXISTS avis_read (day TEXT NOT NULL, k TEXT NOT NULL, at INTEGER, PRIMARY KEY (day, k))', // «✓ Прочитано» (ключ — x.link или x.sec)
   'CREATE TABLE IF NOT EXISTS avis (day TEXT NOT NULL, level TEXT NOT NULL, data TEXT NOT NULL, created_at INTEGER, PRIMARY KEY (day, level))',
+  'CREATE TABLE IF NOT EXISTS avis_tr (k TEXT PRIMARY KEY, no TEXT, ru TEXT NOT NULL, at INTEGER)', // перевод слова по нажатию (Gemini → MyMemory), кэш
+  'CREATE TABLE IF NOT EXISTS avis_ru (h TEXT PRIMARY KEY, data TEXT NOT NULL, at INTEGER)', // «🇷🇺 Перевод» статьи по абзацам (ключ — sha1 норвежского текста)
 ];
 // числа — в «📜 Правилах» (кабинет → Все правила → 📰 Morgenavis)
 export const AVIS_RULES = { avisOn: true, avisHour: 6 };
@@ -107,6 +109,49 @@ export async function ask(env, prompt, schema, ok, temp = 0.4) {
     } catch (e) { /* не разобрался — следующая модель */ }
   }
   throw Object.assign(new Error(err), { code: err });
+}
+// быстрый вызов для страницы (перевод по нажатию): сначала лёгкая модель, всего не дольше ~25 с
+async function quick(env, prompt, schema, ok) {
+  const key = await geminiKey(env); if (!key) return null;
+  const t0 = Date.now();
+  for (const model of GEMINI_MODELS) {
+    const left = 25000 - (Date.now() - t0); if (left < 4000) break;
+    const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
+      method: 'POST', headers: { 'x-goog-api-key': key, 'content-type': 'application/json' }, signal: AbortSignal.timeout(left),
+      body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: 0.2, responseMimeType: 'application/json', responseSchema: schema } }),
+    }).catch(() => null);
+    if (!r || !r.ok) continue;
+    try { const d = await r.json(), out = JSON.parse(d.candidates[0].content.parts.map(p => p.text || '').join('')); if (ok(out)) return out; } catch (e) { /* следующая модель */ }
+  }
+  return null;
+}
+async function trWordSrv(env, w, ex) { // слово/фраза → { no: словарная форма, ru } | null
+  const k = w.toLowerCase();
+  const c = await env.DB.prepare('SELECT no, ru FROM avis_tr WHERE k = ?').bind(k).first().catch(() => null);
+  if (c) return c;
+  let out = await quick(env, `Norwegian (bokmål) learner, native Russian. Translate the word or phrase "${w}"${ex ? ` as used in this sentence: "${ex}"` : ''}.
+Return JSON: "no" = dictionary form (nouns with en/ei/et, verbs with å; a phrase or a name stays as is), "ru" = short Russian translation that fits this context (1–5 words; for a name — how it is written in Russian).`,
+    { type: 'OBJECT', required: ['no', 'ru'], properties: { no: { type: 'STRING' }, ru: { type: 'STRING' } } }, o => o && o.ru && String(o.ru).trim());
+  if (!out) { // запасной: MyMemory с сервера (не с браузера — там дневной лимит на IP)
+    const j = await fetch('https://api.mymemory.translated.net/get?langpair=nb|ru&q=' + encodeURIComponent(w), { signal: AbortSignal.timeout(8000) }).then(r => r.json()).catch(() => null);
+    const tr = j && j.responseData && j.responseData.translatedText;
+    if (tr && !/MYMEMORY|INVALID|QUERY LENGTH/i.test(tr) && tr.toLowerCase() !== k) out = { no: w, ru: tr };
+  }
+  if (!out) return null;
+  out = { no: String(out.no || w).trim().slice(0, 60), ru: String(out.ru).trim().slice(0, 120) };
+  await env.DB.prepare('INSERT OR REPLACE INTO avis_tr (k, no, ru, at) VALUES (?, ?, ?, ?)').bind(k, out.no, out.ru, Date.now()).run().catch(() => {});
+  return out;
+}
+async function trTextSrv(env, texts) { // абзацы статьи → такие же абзацы по-русски (кэш по тексту)
+  const h = [...new Uint8Array(await crypto.subtle.digest('SHA-1', new TextEncoder().encode(texts.join('\n\u0001\n'))))].map(b => b.toString(16).padStart(2, '0')).join('');
+  const c = await env.DB.prepare('SELECT data FROM avis_ru WHERE h = ?').bind(h).first().catch(() => null);
+  if (c) return JSON.parse(c.data);
+  const out = await quick(env, `Translate each Norwegian (bokmål) paragraph into natural, simple Russian, close to the original so a learner can compare sentence by sentence. Keep names. Return JSON {"ru": [...]} with exactly ${texts.length} strings, one per paragraph, in the same order.
+${JSON.stringify(texts)}`, { type: 'OBJECT', required: ['ru'], properties: { ru: { type: 'ARRAY', items: { type: 'STRING' } } } }, o => o && Array.isArray(o.ru) && o.ru.length === texts.length);
+  if (!out) return null;
+  const ru = out.ru.map(x => String(x).slice(0, 3000));
+  await env.DB.prepare('INSERT OR REPLACE INTO avis_ru (h, data, at) VALUES (?, ?, ?)').bind(h, JSON.stringify(ru), Date.now()).run().catch(() => {});
+  return ru;
 }
 const INTS = { type: 'ARRAY', items: { type: 'INTEGER' } };
 const PICK_SCHEMA = { type: 'OBJECT', required: [...Object.keys(FEEDS), 'norge', 'mat'], properties: { ...Object.fromEntries(Object.keys(FEEDS).map(k => [k, INTS])), norge: { type: 'STRING' }, mat: { type: 'STRING' }, norge_q: { type: 'STRING' }, mat_q: { type: 'STRING' } } };
@@ -305,6 +350,18 @@ export async function avisApi(req, env, url, h) {
     else await env.DB.prepare('INSERT OR IGNORE INTO avis_read (day, k, at) VALUES (?, ?, ?)').bind(b.day, k, Date.now()).run();
     return h.json({ ok: true });
   }
+  if (p === '/api/avis/tr' && m === 'POST') { // {w, ex} — перевод слова или фразы по нажатию
+    const b = await req.json().catch(() => ({})), w = String(b.w || '').trim().slice(0, 200);
+    if (!w) h.fail(400, 'word');
+    const r = await trWordSrv(env, w, String(b.ex || '').slice(0, 300)).catch(e => { h.healthErr('avis_tr', e); return null; });
+    return h.json(r ? { ok: true, ...r } : { ok: false }, 200, nc);
+  }
+  if (p === '/api/avis/ru' && m === 'POST') { // {t: [заголовок, абзацы…]} — перевод статьи на русский по абзацам
+    const b = await req.json().catch(() => ({})), t = (Array.isArray(b.t) ? b.t : []).slice(0, 20).map(x => String(x).slice(0, 3000));
+    if (!t.length) h.fail(400, 'text');
+    const ru = await trTextSrv(env, t).catch(e => { h.healthErr('avis_ru', e); return null; });
+    return h.json(ru ? { ok: true, ru } : { ok: false }, 200, nc);
+  }
   if (p === '/api/avis/word' && m === 'POST') { // «+ в словарь» учебника норвежского
     const b = await req.json().catch(() => ({})), w = String(b.w || '').trim().slice(0, 60), k = w.toLowerCase();
     if (!k) h.fail(400, 'word');
@@ -414,7 +471,8 @@ mark{background:var(--mark);color:inherit;padding:0 1px;cursor:pointer}
 .add{border:0;background:var(--acc2);color:var(--acc);border-radius:999px;cursor:pointer;font:600 11px var(--f-ui);padding:2px 8px;white-space:nowrap}
 .add.done{color:var(--ok);background:none}
 .w{cursor:pointer}.w:hover{background:var(--acc2)}
-#tip .add{margin-top:6px}#tip small{opacity:.75}
+#tip .add{margin-top:6px}#tip small{opacity:.75}#tip input{font:14px var(--f-ui);padding:3px 6px;border:0;border-radius:4px;margin-top:6px;width:150px}
+.rp{font:14px/1.45 var(--f-ui);color:var(--mute);margin:-6px 0 12px;padding-left:10px;border-left:2px solid var(--acc)}h3+.rp{margin-top:-2px}
 .q{font-style:italic;margin:6px 0 0;font-size:16px}
 .tools{display:flex;gap:4px 16px;flex-wrap:wrap;align-items:center;font:13px var(--f-ui);margin-top:8px}
 .tools .btn{border:0;padding:0;background:none;color:var(--acc);font-size:13px;border-radius:0}.tools .btn:hover{text-decoration:underline;background:none}
@@ -470,7 +528,8 @@ mark{background:var(--mark);color:inherit;border-radius:3px;padding:0 2px;cursor
 .words b{font-weight:600}.add{border:1px solid var(--acc);background:var(--card);color:var(--acc);border-radius:6px;cursor:pointer;font:600 13px system-ui,sans-serif;padding:2px 8px;white-space:nowrap}
 .add.done{color:var(--ok);border-color:transparent}
 .w{cursor:pointer;border-radius:3px}.w:hover{background:var(--acc2)}
-#tip .add{margin-top:6px;background:var(--bg);color:var(--acc)}#tip small{opacity:.75}
+#tip .add{margin-top:6px;background:var(--bg);color:var(--acc)}#tip small{opacity:.75}#tip input{font:14px system-ui,sans-serif;padding:3px 6px;border:0;border-radius:4px;margin-top:6px;width:150px}
+.rp{font:14px/1.45 system-ui,sans-serif;color:var(--mute);margin:-4px 0 10px;padding-left:10px;border-left:2px solid var(--acc)}
 .tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center;font:14px system-ui,sans-serif;margin-top:6px}
 .tools a{color:var(--mute)}
 details{font:15px system-ui,sans-serif;margin-top:6px}summary{cursor:pointer;color:var(--acc)}
@@ -549,14 +608,29 @@ h2.sec .up{font:13px system-ui,sans-serif;text-transform:none;letter-spacing:0}
     return null;
   }
   const TRC = (() => { try { return { ...JSON.parse(localStorage.getItem('norsk-tr') || '{}'), ...JSON.parse(localStorage.getItem('avis-tr') || '{}') }; } catch (e) { return {}; } })();
-  async function trWord(w) { // глоссарий выпуска → кэш переводов (общий с учебником) → MyMemory
+  async function trWord(w, ex) { // глоссарий выпуска → кэш переводов (общий с учебником) → сервер (Gemini по смыслу предложения, запасной — MyMemory)
     const g = gloss(w); if (g) return g;
     const k = w.toLowerCase(); if (TRC[k]) return { no: k, ru: TRC[k], note: 'машинный перевод' };
     try {
-      const j = await (await fetch('https://api.mymemory.translated.net/get?langpair=nb|ru&q=' + encodeURIComponent(w))).json(), tr = j && j.responseData && j.responseData.translatedText;
-      if (tr && !/MYMEMORY|INVALID|QUERY LENGTH/i.test(tr) && tr.toLowerCase() !== k) { TRC[k] = tr.slice(0, 120); try { const c = JSON.parse(localStorage.getItem('avis-tr') || '{}'); c[k] = TRC[k]; localStorage.setItem('avis-tr', JSON.stringify(c)); } catch (e) {} return { no: k, ru: TRC[k], note: 'машинный перевод' }; }
+      const j = await (await fetch('/api/avis/tr', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ w, ex: ex || '' }) })).json();
+      if (j && j.ok && j.ru) { TRC[k] = j.ru; try { const c = JSON.parse(localStorage.getItem('avis-tr') || '{}'); c[k] = j.ru; localStorage.setItem('avis-tr', JSON.stringify(c)); } catch (e) {} return { no: w.includes(' ') ? w : (j.no || k), ru: j.ru, note: 'перевод по смыслу' }; }
     } catch (e) {}
-    return { no: k, ru: '', note: 'перевод не нашёлся' };
+    return { no: k, ru: '', note: 'перевод не нашёлся — впиши свой' };
+  }
+  // «🇷🇺 Перевод»: под каждым абзацем — русский мелко (заголовок, 📌, абзацы, вопрос)
+  async function toggleRu(btn, i) {
+    const art = btn.closest('article'), x = data.items[i];
+    if (art.classList.toggle('ruon')) {
+      btn.textContent = '🇷🇺 Скрыть перевод';
+      if (art.querySelector('.rp')) return;
+      const t = [x.title, ...(x.kort ? [x.kort] : []), ...x.text.replace(/\\[\\[(.+?)\\]\\]/g, '$1').split(/\\n\\n+/), ...(x.q ? [x.q] : [])];
+      const els = [...art.querySelectorAll('.body > h3.tx, .body > .kort, .body > div.tx > p, .body > .q')];
+      btn.disabled = true; const was = btn.textContent; btn.textContent = '🇷🇺 перевожу…';
+      const j = await fetch('/api/avis/ru', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ t }) }).then(r => r.json()).catch(() => null);
+      btn.disabled = false; btn.textContent = was;
+      if (!j || !j.ok || j.ru.length !== els.length) { art.classList.remove('ruon'); btn.textContent = '🇷🇺 Перевод (не вышло — ещё раз)'; return; }
+      els.forEach((el, n) => el.insertAdjacentHTML('afterend', '<p class="rp">' + esc(j.ru[n]) + '</p>'));
+    } else btn.textContent = '🇷🇺 Перевод';
   }
   function render() {
     const d = data; GL = {}; for (const w of [...(d.dagens || []), ...d.items.flatMap(x => x.words)]) { GL[w.no.toLowerCase()] = w; GL[base(w.no)] = w; }
@@ -578,7 +652,7 @@ h2.sec .up{font:13px system-ui,sans-serif;text-transform:none;letter-spacing:0}
       html += '<article data-i="' + i + '" data-sec="' + x.sec + '" class="' + (i === 0 ? 'lead wide' : d.items.filter((y, j) => y.sec === x.sec && j > 0).length === 1 ? 'wide' : '') + (done ? ' done' : '') + '"><button class="rhead" type="button" data-open="' + i + '">✓ ' + esc(x.title) + '<small>развернуть</small></button><div class="body">' + (x.img ? '<img class="pic" src="' + esc(x.img) + '" alt="" loading="lazy" referrerpolicy="no-referrer" onerror="this.remove()">' : '') + '<h3 class="tx">' + wrap(x.title) + '</h3>' + (x.kort ? '<p class="kort tx">📌 ' + wrap(x.kort) + '</p>' : '') + '<div class="tx">' + marks(x.text) + '</div>'
         + (x.words.length ? '<ul class="words">' + x.words.map(w => '<li><span><b>' + esc(w.no) + '</b> — ' + esc(w.ru) + '</span>' + addBtn(w.no, w.ru, (plain.split(/(?<=[.!?])\\s+/).find(s => s.toLowerCase().includes(w.no.toLowerCase().replace(/^(en|ei|et|å) /, '').slice(0, 4))) || '')) + '</li>').join('') + '</ul>' : '')
         + (x.q ? '<p class="q tx">❓ ' + wrap(x.q) + '</p>' : '')
-        + '<div class="tools"><button class="btn rd" type="button" data-read="' + i + '">' + (done ? '↩ Не прочитано' : '✓ Прочитано') + '</button><button class="btn" type="button" data-say="' + i + '">🔊 Les høyt</button>' + (x.link ? '<a href="' + esc(x.link) + '" target="_blank" rel="noopener">kilde: ' + esc(x.src) + '</a>' : '') + (x.photo ? '<a href="' + esc(x.photo) + '" target="_blank" rel="noopener">foto: Wikimedia Commons</a>' : '') + '</div>'
+        + '<div class="tools"><button class="btn rd" type="button" data-read="' + i + '">' + (done ? '↩ Не прочитано' : '✓ Прочитано') + '</button><button class="btn" type="button" data-say="' + i + '">🔊 Les høyt</button><button class="btn" type="button" data-ru="' + i + '">🇷🇺 Перевод</button>' + (x.link ? '<a href="' + esc(x.link) + '" target="_blank" rel="noopener">kilde: ' + esc(x.src) + '</a>' : '') + (x.photo ? '<a href="' + esc(x.photo) + '" target="_blank" rel="noopener">foto: Wikimedia Commons</a>' : '') + '</div>'
         + '<details><summary>Проверить себя по-русски</summary><p>' + esc(x.ru) + '</p></details></div></article>' + (x.sec === 'sladder' ? '</div></div>' : '');
     });
     if (sec) html += '</div></section>';
@@ -657,13 +731,15 @@ h2.sec .up{font:13px system-ui,sans-serif;text-transform:none;letter-spacing:0}
   function place(rect) { tip.style.left = Math.max(8, Math.min(innerWidth - tip.offsetWidth - 8, rect.left)) + 'px'; tip.style.top = (rect.bottom + 6 + tip.offsetHeight > innerHeight ? rect.top - tip.offsetHeight - 6 : rect.bottom + 6) + 'px'; }
   async function showTip(text, rect, ex) { // любое слово или фраза: перевод и «+ в словарь»
     tip.innerHTML = '<b>' + esc(text) + '</b> <small>ищу перевод…</small>'; tip.hidden = false; place(rect);
-    const r = await trWord(text), w = text.includes(' ') ? text : r.no, k = w.toLowerCase();
+    const r = await trWord(text, ex), w = text.includes(' ') ? text : r.no, k = w.toLowerCase();
     if (tip.hidden) return;
     tip.innerHTML = '<b>' + esc(w) + '</b> — ' + esc(r.ru || '—') + (r.note ? '<br><small>' + esc(r.note) + '</small>' : '') + '<br>'
-      + (added.has(k) ? '<small>✓ уже в словаре</small>' : r.ru ? '<button class="add" type="button" data-w="' + esc(w) + '" data-tr="' + esc(r.ru) + '" data-ex="' + esc(ex) + '">+ в словарь</button>' : '');
+      + (added.has(k) ? '<small>✓ уже в словаре</small>' : r.ru ? '<button class="add" type="button" data-w="' + esc(w) + '" data-tr="' + esc(r.ru) + '" data-ex="' + esc(ex) + '">+ в словарь</button>'
+        : '<input id="own" placeholder="свой перевод" maxlength="120" autocomplete="off"> <button class="add" type="button" data-own="1" data-w="' + esc(w) + '" data-tr="" data-ex="' + esc(ex) + '">+ в словарь</button>');
     place(rect);
   }
   async function addWord(a) {
+    if (a.dataset.own) { const v = ($('#own') || {}).value || ''; if (!v.trim()) { $('#own').focus(); return; } a.dataset.tr = v.trim(); }
     a.disabled = true; const r = await fetch('/api/avis/word', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ w: a.dataset.w, tr: a.dataset.tr, ex: a.dataset.ex }) }).catch(() => null);
     if (!r || !r.ok) { a.disabled = false; return; }
     const k = a.dataset.w.toLowerCase(); added.add(k); try { localStorage.setItem('avis-added', JSON.stringify([...added].slice(-2000))); } catch (x) {}
@@ -682,13 +758,15 @@ h2.sec .up{font:13px system-ui,sans-serif;text-transform:none;letter-spacing:0}
     const w = e.target.closest('.w');
     if (w) { showTip(w.textContent, w.getBoundingClientRect(), sentOf(w)); return; }
     tip.hidden = true;
+    const rb = e.target.closest('[data-ru]');
+    if (rb) { toggleRu(rb, +rb.dataset.ru); return; }
     const s = e.target.closest('[data-say]');
     if (s) say(s, data.items[+s.dataset.say]);
   });
   const onSel = () => setTimeout(() => { // выделили несколько слов — перевод фразы
     const sel = getSelection(); if (!sel || sel.isCollapsed) return;
     const txt = sel.toString().trim().replace(/\\s+/g, ' ');
-    if (!txt.includes(' ') || txt.length > 200 || !sel.anchorNode || !sel.anchorNode.parentElement || !sel.anchorNode.parentElement.closest('.tx')) return;
+    if (!txt.includes(' ') || txt.length > 200 || !sel.anchorNode || !sel.anchorNode.parentElement || !sel.anchorNode.parentElement.closest('.tx') || sel.anchorNode.parentElement.closest('.rp')) return;
     showTip(txt, sel.getRangeAt(0).getBoundingClientRect(), sentOf(sel.anchorNode.parentElement));
   }, 10);
   document.addEventListener('mouseup', onSel); document.addEventListener('touchend', () => setTimeout(onSel, 300));

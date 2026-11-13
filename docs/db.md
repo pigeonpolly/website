@@ -8,6 +8,8 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 
 - **avis** (worker/avis.js): `day` text, `level` text — PK (day, level), `data` text nn (JSON выпуска), `created_at` int
 - **avis_read** (worker/avis.js): `day` text, `k` text — PK (day, k), `at` int (отметки «✓ Прочитано»; k — ссылка статьи или раздел рассказа)
+- **avis_ru** (worker/avis.js): `h` text PK (sha1 норвежских абзацев), `data` text nn (JSON-массив абзацев по-русски), `at` int — «🇷🇺 Перевод» статьи
+- **avis_tr** (worker/avis.js): `k` text PK (слово/фраза, строчными), `no` text (словарная форма), `ru` text nn, `at` int — перевод по нажатию (кэш)
 - **avis_src** (worker/avis.js): `day` text PK, `data` text nn (JSON выбранных новостей с текстами), `created_at` int
 - **about_chat** (worker/about-chat.js): `user_id` int PK, `opened` text, `updated_at` int
 - **about_asks** (worker/about-chat.js): `id` int PK auto, `user_id` int nn, `text` text nn, `lang` text, `status` text ='new', `tr` text, `created_at` int, `answered_at` int, `seen` int =1; + `anon` int =0, `ip` text

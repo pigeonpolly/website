@@ -549,7 +549,7 @@ const flockEvent = env => (kind, bird, data) => flockEventDb(env, kind, bird, da
 const cardHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, rigaDay, rules: () => RULES, avgItemPrice: () => avgItemPrice(env), setRules: patch => setRules(env, patch), flockEvent: flockEvent(env) });
 const titosHelpers = env => ({ ...cardHelpers(env), unit: () => gameUnit(env), btnOf, top: (uid, n) => topScore(env, 'titos', uid, n), award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), stamp: (uid, task) => stamp(env, uid, task) });
 const flockHelpers = env => ({ json, fail, currentUser, needUser, rigaDay, flockEvent: flockEvent(env), streakOf: rows => streaks(streakDays(rows)).current });
-const studyHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, adminIdentity });
+const studyHelpers = env => ({ json, fail, currentUser, needUser, isAdmin, adminIdentity, healthErr: (where, e) => healthErr(env, where, e) });
 const newsHelpers = env => ({ json, fail, needUser, isAdmin, rigaMs, getMeta: k => getMeta(env, k) });
 const wlHelpers = env => ({ ...authHelpers(env), surprise: (uid, kind) => surpriseKI(env, new Request('https://www.pigeonpolly.com/'), uid, kind),
   award: async (uid, ref, n) => { const r = await award(env, uid, 'holiday', ref, n); if (r) await env.DB.prepare("UPDATE button_log SET seen = 0 WHERE user_id = ? AND kind = 'holiday' AND ref = ?").bind(uid, ref).run(); return r; }, btnFor: async (kind, item) => RULES.wlBtn >= 0 ? RULES.wlBtn : baseNow(kind, item, ((await catalog(env, new Request('https://www.pigeonpolly.com/'))).prices || {})[kind + '|' + item]) || 30 }); // праздники Воббленда: вещь уже есть — другая того же вида, вещей вида больше нет — пуговки
