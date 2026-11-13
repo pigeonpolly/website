@@ -681,3 +681,14 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 .pr b{font:400 22px Fraunces,Lora,serif}
 @media (prefers-reduced-motion:reduce){.pr .pb{transition:none}}
 @media (max-width:900px){.poll{padding:64px 0 70px}.poll .w{grid-template-columns:1fr;gap:34px}.poll h2{font-size:44px}.ballot{padding:30px 20px 20px;transform:none}.ballot h3{font-size:23px}.po{font-size:16px}.stamp2{width:60px;height:60px;font-size:9px}}
+/* /learn/: пусто в «Курсы» / «Как нарисовать»; карточка курса */
+.flt-empty{margin:0;padding:28px;border:1.5px dashed var(--line,#ccc);border-radius:14px;color:var(--mut);font-size:16px;max-width:640px}
+.vc.crs .th img{object-fit:cover;object-position:center 30%}
+/* шпаргалка на /learn/v/<id>/: страницы-картинки друг под другом или PDF */
+.wv-main.hw-main{display:block}
+.hw-main .wv-tx{max-width:760px;margin-bottom:24px}
+.hw-pages{display:flex;flex-direction:column;gap:18px;max-width:900px}
+.hw-pages img{width:100%;height:auto;background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.12)}
+.hw-pdf iframe{width:100%;max-width:900px;height:80vh;border:0;background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.12)}
+.hw-main .wv-pl.lock{max-width:640px}
+.hw-main .wv-note{margin-top:16px}
