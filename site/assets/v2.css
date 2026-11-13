@@ -95,7 +95,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
 .books .hand{position:absolute;left:30px;bottom:-14px;transform:rotate(-4deg)}
 
 /* журнал */
-.jr{padding:110px 0}
+.jr{padding:110px 0 90px}
 .hd3{display:flex;justify-content:space-between;align-items:end;margin-bottom:44px}.hd3 h2{font-size:56px;margin-top:14px}
 .doodle{position:absolute;left:46%;top:96px;transform:rotate(-4deg);font:700 22px Caveat,cursive;color:var(--mut)}
 .jg{display:grid;grid-template-columns:1.25fr 1fr;gap:50px;align-items:start}
@@ -133,7 +133,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
 .stamp{position:absolute;right:26px;top:20px;width:100px;height:100px;border-radius:50%;border:2px solid var(--acc);color:var(--acc);display:grid;place-items:center;text-align:center;font:700 10px/1.4 Karla,'Nunito Sans',sans-serif;letter-spacing:.16em;transform:rotate(12deg)}
 
 /* обо мне */
-.ab2{padding:110px 0}
+.ab2{padding:110px 0;background:var(--sheet)} /* 13.11.2026: свой фон, как у «Гайдов», — после журнала не кажется, что съехало */
 .ab2 .w{display:grid;grid-template-columns:400px 1fr;gap:80px;align-items:center}
 .ab2 .ph{position:relative;background:#fff;padding:14px 14px 50px;transform:rotate(-2deg);box-shadow:0 20px 40px rgba(31,35,38,.15)}
 .ab2 .ph img{width:100%;aspect-ratio:4/5;object-fit:cover}

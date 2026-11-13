@@ -89,8 +89,8 @@ Return JSON:
 - intro: 2–3 sentences: greeting, the date, what is in today's issue (mention 2–3 highlights).
 - d_ru: one short description of the issue for the blog list (max 160 chars).
 - items: for EVERY news item below, in a good reading order: i (its number), h (a short lively Russian headline, max 90 chars), p (1–2 paragraphs, 2–4 sentences each).
-- facts: exactly 2 "Интересный факт" blocks about art (h — short title, text — 2–4 sentences). Only real, well-known, verifiable facts (famous works, artists, materials, museums); avoid obscure or disputed claims and exact numbers you are not sure about.
-- history: one "Из истории искусств" block (h, text 3–5 sentences): a well-known event in art history that happened on ${ruDate(day)} (any year) if you are sure about it, otherwise a well-known story from art history. No doubtful dates.
+- facts: exactly 2 "Интересный факт" blocks about art (h — short title without the words «Интересный факт», text — 2–4 sentences). Only real, well-known, verifiable facts (famous works, artists, materials, museums); avoid obscure or disputed claims and exact numbers you are not sure about.
+- history: one "Из истории искусств" block (h — only the short subject, e.g. an artist or work, WITHOUT the words «Из истории искусств»; text 3–5 sentences): a well-known event in art history that happened on ${ruDate(day)} (any year) if you are sure about it, otherwise a well-known story from art history. No doubtful dates.
 - joke: one short, kind, light joke about art or artists (in Russian, no gender forms).
 
 Examples of Alina's style (from her blog, for tone only — do not copy the content):
@@ -102,7 +102,8 @@ ${items.map((x, i) => `### ${i}. [${x.src}] ${x.title}\n${(x.text || x.desc || '
 export function buildHtml(day, src, w) {
   const items = src.items, done = new Set(), parts = [`<p>${esc(w.intro)}</p>`];
   const news = (w.items || []).filter(x => items[x.i] && !done.has(x.i) && done.add(x.i));
-  const fact = f => f && f.text ? `<h2>💡 Интересный факт: ${esc(f.h)}</h2><p>${esc(f.text)}</p>` : '';
+  const unpre = (h, re) => String(h || '').replace(re, '').trim(); // Gemini иногда сам повторяет «Из истории искусств:» в заголовке
+  const fact = f => f && f.text ? `<h2>💡 Интересный факт: ${esc(unpre(f.h, /^\s*(💡\s*)?интересный факт\s*[:—-]\s*/i))}</h2><p>${esc(f.text)}</p>` : '';
   const half = Math.ceil(news.length / 2);
   news.forEach((x, k) => {
     const it = items[x.i];
@@ -113,7 +114,7 @@ export function buildHtml(day, src, w) {
     if (k === half - 1) parts.push(fact((w.facts || [])[0]));
   });
   parts.push(fact((w.facts || [])[1]));
-  if (w.history && w.history.text) parts.push(`<h2>📜 Из истории искусств: ${esc(w.history.h)}</h2><p>${esc(w.history.text)}</p>`);
+  if (w.history && w.history.text) parts.push(`<h2>📜 Из истории искусств: ${esc(unpre(w.history.h, /^\s*(📜\s*)?из истории искусств?\s*[:—-]\s*/i))}</h2><p>${esc(w.history.text)}</p>`);
   if (w.joke) parts.push(`<h2>😄 Шутка дня</h2><blockquote>${esc(w.joke)}</blockquote>`);
   return { html: parts.filter(Boolean).join('\n'), cover: (news.map(x => items[x.i]).find(it => it.img) || {}).img || '', n: news.length };
 }
