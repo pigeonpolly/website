@@ -1,0 +1,117 @@
+/* Кабинет /admin/ в стиле редизайна 2.0 (как новые страницы, v2.css): светлый фон сезона, бумага, тонкие линии,
+   Fraunces 400 в заголовках, Karla в подписях, кнопки как .btn. Только body[data-p=admin] — редактор блога и другие .be-app не трогаем.
+   Подключается в src/pages/admin.html после style.css. Цвета сезонов — копия начала v2.css. */
+body[data-p=admin]{--a-bg:#F4F0EA;--a-sheet:#FBF9F5;--a-ink:#2A211C;--a-mut:#6C6058;--a-line:#DED5CA;--a-acc:#22405F;--a-acc2:#93AFCC;--a-soft:#EFE9E1}
+html[data-season=winter] body[data-p=admin]{--a-bg:#EEF1F3;--a-sheet:#F8FAFB;--a-ink:#1C2430;--a-mut:#5D6670;--a-line:#D3DAE0;--a-acc:#9E1B22;--a-acc2:#E2544A;--a-soft:#E6EBEE}
+html[data-season=spring] body[data-p=admin]{--a-bg:#F1F4F0;--a-sheet:#FAFBF9;--a-ink:#1F2A25;--a-mut:#5E6A63;--a-line:#D4DDD6;--a-acc:#BE2F3A;--a-acc2:#E85C64;--a-soft:#E8EEE8}
+html[data-season=summer] body[data-p=admin]{--a-bg:#F7F4EE;--a-sheet:#FFFDFA;--a-ink:#2A2420;--a-mut:#6D635B;--a-line:#E3DACE;--a-acc:#1F7FAE;--a-acc2:#7CC6E6;--a-soft:#F0EBE2}
+
+body[data-p=admin]{background:var(--a-bg);color:var(--a-ink)}
+body[data-p=admin] main{background:var(--a-bg)}
+
+/* шапка страницы: подпись капсом + крупный заголовок, как «Все уроки в одном месте» */
+body[data-p=admin] .adm-head{max-width:1260px;margin:0 auto;padding:56px 44px 22px;box-sizing:border-box;background:none;text-align:left}
+body[data-p=admin] .adm-head .topics{color:var(--a-acc);margin:0 0 14px}
+body[data-p=admin] .adm-head h1{color:var(--a-ink);font:400 clamp(40px,5vw,64px)/1 Fraunces,Lora,serif;letter-spacing:-.02em;margin:0}
+body[data-p=admin] .adm-head h1 em{font-style:italic;font-weight:300;color:var(--a-acc)}
+
+/* сам кабинет: без белой плашки с тенью — прямо на фоне страницы */
+body[data-p=admin] .adm.be-app{--be-ink:var(--a-ink);--be-mute:var(--a-mut);--be-line:var(--a-line);--be-soft:var(--a-soft);--be-field:#fff;
+  max-width:1260px;box-sizing:border-box;padding:8px 44px 90px;background:none;box-shadow:none;border-radius:0;color:var(--a-ink);font-family:Karla,'Nunito Sans',sans-serif;gap:44px;grid-template-columns:200px minmax(0,1fr)}
+body[data-p=admin] .adm.be-app.adm-wk{grid-template-columns:minmax(0,1fr)}
+body[data-p=admin] .be-app a{color:var(--a-acc)}
+body[data-p=admin] .be-app a:hover{color:var(--a-ink)}
+body[data-p=admin] .be-app :focus-visible{outline:2px solid var(--a-acc);outline-offset:3px}
+
+/* меню слева — как верхнее меню сайта: капс с разрядкой, у текущего — линия акцента */
+body[data-p=admin] .adm-nav{gap:2px;padding-top:6px;border-right:1px solid var(--a-line);padding-right:18px}
+body[data-p=admin] .be-app .adm-nav a{font:700 12px/1.3 Karla,'Nunito Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--a-ink);
+  padding:12px 4px 12px 14px;border-radius:0;background:none;border-left:2px solid transparent;transition:border-color .15s,color .15s}
+body[data-p=admin] .be-app .adm-nav a:hover{background:none;color:var(--a-acc);border-left-color:var(--a-line)}
+body[data-p=admin] .be-app .adm-nav a[aria-current=page]{background:none;color:var(--a-acc);border-left-color:var(--a-acc)}
+body[data-p=admin] .adm-nav-g{font:700 11px Karla,sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--a-mut)}
+body[data-p=admin] .adm-count,body[data-p=admin] .wk-badge{background:var(--a-acc);color:#fff;font:700 11px/18px Karla,sans-serif;letter-spacing:0;min-width:18px;padding:0 6px;border-radius:99px}
+
+/* вкладки раздела и «Часто» — как фильтры на /learn/ */
+body[data-p=admin] .adm-tabs{gap:6px}
+body[data-p=admin] .be-app .adm-tabs a{font:700 13px Karla,'Nunito Sans',sans-serif;padding:8px 15px;border:1.5px solid var(--a-line);background:transparent;color:var(--a-ink);border-radius:999px}
+body[data-p=admin] .be-app .adm-tabs a:hover{background:transparent;border-color:var(--a-ink);color:var(--a-ink)}
+body[data-p=admin] .be-app .adm-tabs a[aria-current=page]{background:var(--a-ink);border-color:var(--a-ink);color:var(--a-bg)}
+body[data-p=admin] .adm-freq{border-bottom:1px solid var(--a-line);padding-bottom:14px;margin-bottom:22px}
+body[data-p=admin] .adm-freq-h{font:700 11px Karla,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:var(--a-mut)}
+
+/* заголовок экрана */
+body[data-p=admin] .adm-about{margin:0 0 22px}
+body[data-p=admin] .adm-about h2{font:400 clamp(28px,3vw,38px)/1.1 Fraunces,Lora,serif;letter-spacing:-.015em;color:var(--a-ink);margin:0 0 8px}
+body[data-p=admin] .adm-about p{color:var(--a-mut);font:400 16px/1.5 Karla,'Nunito Sans',sans-serif}
+
+/* заголовки внутри экранов */
+body[data-p=admin] .be-app :is(h2,h3):where(:not(.adm-danger h3)){font-family:Fraunces,Lora,serif;font-weight:400;letter-spacing:-.01em;color:var(--a-ink)}
+body[data-p=admin] .adm-box h2{font-size:22px}
+body[data-p=admin] .wk-hi h2{font:400 clamp(34px,4vw,48px)/1.05 Fraunces,Lora,serif;letter-spacing:-.02em;color:var(--a-ink)}
+body[data-p=admin] .wk-hi p,body[data-p=admin] .wk-foot{color:var(--a-mut)}
+
+/* бумажные карточки: светлый лист, тонкая линия, мягкая тень снизу */
+body[data-p=admin] :is(.adm-box,.wk-num,.wk-act,.wk-more,.wk-pause,.adm-inbox li,.adm-c,.adm-card,.be-card){background:var(--a-sheet);border:1px solid var(--a-line);border-radius:6px;
+  box-shadow:0 18px 30px -24px color-mix(in srgb,var(--a-ink) 45%,transparent)}
+body[data-p=admin] :is(.wk-num,.wk-act){padding:20px 18px}
+body[data-p=admin] .wk-nums,body[data-p=admin] .wk-acts{gap:16px}
+body[data-p=admin] :is(.wk-num b,.adm-card b,.adm-in-n){font-family:Fraunces,Lora,serif;font-weight:400;color:var(--a-ink)}
+body[data-p=admin] .wk-num b{font-size:42px}
+body[data-p=admin] .adm-in-n{color:var(--a-acc);font-size:30px}
+body[data-p=admin] :is(.wk-num span,.wk-act p,.adm-card span,.adm-in-t small){color:var(--a-mut)}
+body[data-p=admin] :is(.wk-num small,.adm-card small){color:var(--a-mut);opacity:.85}
+body[data-p=admin] .adm-in-t b{color:var(--a-ink);font-family:Karla,sans-serif}
+body[data-p=admin] a.wk-num.wk-n-link:hover{border-color:var(--a-ink);box-shadow:0 20px 34px -22px color-mix(in srgb,var(--a-ink) 55%,transparent)}
+body[data-p=admin] .wk-act h3{font-size:20px}
+body[data-p=admin] .wk-act.wk-hot{border:1px solid var(--a-acc);box-shadow:inset 0 3px 0 var(--a-acc),0 18px 30px -24px color-mix(in srgb,var(--a-ink) 45%,transparent)}
+body[data-p=admin] .wk-pause.on{border-color:var(--a-acc2);background:color-mix(in srgb,var(--a-acc2) 14%,var(--a-sheet))}
+body[data-p=admin] .wk-more h3{font-size:24px}
+body[data-p=admin] .wk-cols b{font:700 11px Karla,sans-serif;letter-spacing:.2em;color:var(--a-acc)}
+body[data-p=admin] .be-app .wk-cols a{color:var(--a-ink)}
+body[data-p=admin] .be-app .wk-cols a:hover{color:var(--a-acc);text-decoration:none}
+body[data-p=admin] .adm-c.pending{border-color:var(--a-acc2);background:color-mix(in srgb,var(--a-acc2) 12%,var(--a-sheet))}
+
+/* «Всё спокойно» — рукописной подписью */
+body[data-p=admin] .adm-calm{background:var(--a-sheet);border:1px dashed var(--a-line);border-radius:6px;color:var(--a-acc);font:700 34px Caveat,cursive}
+body[data-p=admin] .adm-calm small{color:var(--a-mut);font:400 15px Karla,sans-serif}
+
+/* кнопки — как .btn на новых страницах: контур чернилами, залитая — тёмным акцентом сезона */
+body[data-p=admin] .be-app .pill-btn{font:700 13px/1 Karla,'Nunito Sans',sans-serif;letter-spacing:.01em;border:1.5px solid var(--a-ink);color:var(--a-ink);background:transparent;border-radius:999px;box-shadow:none;transition:transform .15s,background .15s,color .15s}
+body[data-p=admin] .be-app .pill-btn:hover:not(:disabled){background:var(--a-ink);border-color:var(--a-ink);color:var(--a-bg);transform:translateY(-1px)}
+body[data-p=admin] .be-app :is(.pill-btn.pill-fill,.cta-btn){background:var(--a-acc);border-color:var(--a-acc);color:#fff;box-shadow:0 10px 22px -10px color-mix(in srgb,var(--a-acc) 60%,transparent)}
+body[data-p=admin] .be-app :is(.pill-btn.pill-fill,.cta-btn):hover:not(:disabled){background:var(--a-ink);border-color:var(--a-ink);color:#fff}
+body[data-p=admin] .be-app .be-danger,body[data-p=admin] .adm-danger .pill-btn{color:#B3261E !important;border-color:#B3261E}
+body[data-p=admin] .adm-danger .pill-btn:hover:not(:disabled){background:#B3261E;color:#fff !important}
+
+/* поля ввода */
+body[data-p=admin] .be-app :is(input[type=text],input[type=url],input[type=number],input[type=search],input[type=email],input[type=password],input[type=date],input:not([type]),textarea,select){
+  background:#fff;border:1px solid var(--a-line);border-radius:8px;color:var(--a-ink);font-family:Karla,'Nunito Sans',sans-serif}
+body[data-p=admin] .be-app :is(input,textarea,select):focus{border-color:var(--a-acc);outline:none;box-shadow:0 0 0 3px color-mix(in srgb,var(--a-acc) 16%,transparent)}
+
+/* таблицы: шапка капсом мелко, строки — тонкой линией */
+body[data-p=admin] .be-app .be-table th{font:700 11px Karla,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--a-mut);border-bottom:1px solid var(--a-ink)}
+body[data-p=admin] .be-app .be-table td{border-bottom-color:var(--a-line)}
+body[data-p=admin] .be-app .be-table tbody tr:hover td{background:color-mix(in srgb,var(--a-soft) 60%,transparent)}
+body[data-p=admin] .be-app .be-table a{color:var(--a-ink)}
+
+/* переключатели-сегменты и свёрнутые блоки */
+body[data-p=admin] .be-app .be-seg{border-color:var(--a-ink)}
+body[data-p=admin] .be-app .be-seg button{font:700 13px Karla,sans-serif;color:var(--a-ink)}
+body[data-p=admin] .be-app .be-seg button:hover{background:var(--a-soft)}
+body[data-p=admin] .be-app .be-seg button[aria-pressed=true]{background:var(--a-ink);color:var(--a-bg)}
+body[data-p=admin] .adm-fine>summary{background:transparent;border-top:1px solid var(--a-line);border-bottom:1px solid var(--a-line);border-radius:0;padding:14px 4px;
+  font:700 12px Karla,sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--a-ink)}
+body[data-p=admin] .adm-fine>summary:hover{color:var(--a-acc)}
+body[data-p=admin] .adm-danger{border:1px solid #D9A39C;background:color-mix(in srgb,#B3261E 5%,var(--a-sheet));border-radius:6px}
+body[data-p=admin] .adm-danger h3{font:700 11px Karla,sans-serif;letter-spacing:.2em;text-transform:uppercase;color:#B3261E}
+
+/* телефон: меню — строкой капсом с прокруткой вбок */
+@media (max-width:800px){
+  body[data-p=admin] .adm-head{padding:34px 16px 14px}
+  body[data-p=admin] .adm.be-app{padding:0 16px 70px;gap:18px;grid-template-columns:minmax(0,1fr)}
+  body[data-p=admin] .adm-nav{border-right:0;padding-right:0;border-bottom:1px solid var(--a-line)}
+  body[data-p=admin] .be-app .adm-nav a{border-left:0;border-bottom:2px solid transparent;padding:12px 10px}
+  body[data-p=admin] .be-app .adm-nav a[aria-current=page]{border-bottom-color:var(--a-acc)}
+  body[data-p=admin] .wk-num b{font-size:34px}
+}
