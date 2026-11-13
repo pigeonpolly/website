@@ -52,7 +52,7 @@
     goNext: ['Go to lesson', 'К уроку', 'Uz nodarbību'],
     dipWait: ['The diploma opens when every lesson has a stamp. Stamps so far:', 'Диплом откроется, когда у каждого урока будет печать. Печатей сейчас:', 'Diploms atvērsies, kad katrai nodarbībai būs zīmogs. Zīmogu pagaidām:'],
     dipTitle: ['DIPLOMA', 'ДИПЛОМ', 'DIPLOMS'],
-    dipSchool: ['Polly’s Drawing School', 'Школа Полли', 'Pollijas zīmēšanas skola'],
+    dipSchool: ['See the World Like an Artist', 'Смотри на мир как художник', 'Skaties uz pasauli kā mākslinieks'],
     dipLine: ['12 lessons · 12 stamps · drawing on paper', '12 уроков · 12 печатей · рисунок на бумаге', '12 nodarbības · 12 zīmogi · zīmējums uz papīra'],
     dipMotto: ['Shapes first, details later — and never be afraid of a crooked line!', 'Сначала фигуры, потом детали — и никогда не бойся кривой линии!', 'Vispirms figūras, tad detaļas — un nekad nebaidies no šķības līnijas!'],
     dipSign: ['Teacher Polly', 'Учитель Полли', 'Skolotāja Pollija'],

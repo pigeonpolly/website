@@ -17,7 +17,7 @@
     schNew: ['Twelve small drawing lessons with a pixel diploma at the end', 'Двенадцать маленьких уроков рисования, в конце — пиксельный диплом', 'Divpadsmit mazas zīmēšanas nodarbības, beigās — pikseļu diploms'],
     schGo: ['Continue →', 'Продолжить →', 'Turpināt →'],
     schStart: ['Start →', 'Начать →', 'Sākt →'],
-    dipT: ['📜 Diploma of Polly’s School', '📜 Диплом Школы Полли', '📜 Pollijas skolas diploms'],
+    dipT: ['📜 Diploma: See the World Like an Artist', '📜 Диплом: «Смотри на мир как художник»', '📜 Diploms: «Skaties uz pasauli kā mākslinieks»'],
     dipS: ['All twelve stamps are in. Your diploma lives here.', 'Все двенадцать печатей собраны. Твой диплом лежит здесь.', 'Visi divpadsmit zīmogi savākti. Tavs diploms glabājas šeit.'],
     dipGo: ['Open the diploma →', 'Открыть диплом →', 'Atvērt diplomu →'],
     books: ['📘 My textbooks', '📘 Мои учебники', '📘 Manas mācību grāmatas'],
