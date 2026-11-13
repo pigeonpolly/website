@@ -240,6 +240,8 @@ _правка — кабинет → 📜 Правила (meta `rules`)_
 
 _Сюда следующие этапы дописывают общие сведения о коде._
 
+- ⚠️ Worker: обещание (Promise) НЕ хранить в переменной модуля, чтобы его ждали другие запросы (`xWait = run()`) — с флагом handle_cross_request_promise_resolution чужое обещание не выполняется, запрос виснет (13.11.2026: ensureSchema, loadSec, ensureBlogSchema). Кэшировать можно только готовые значения.
+
 - 📰 Новости из сети: worker/avis.js `feed(url)` (RSS/Atom → {title, desc, link, when, img, src}), `article(url)` (текст + og:image), `ask(env, prompt, schema, ok)` (Gemini JSON с запасными моделями, ошибки ai_limit/ai/no_key), `commons(q)` (фото Wikimedia), `GN(q)` (Google News RSS); чужая картинка → своя копия в R2: `rehostOne(env, src, {})` (worker/blog.js). Пользуются Morgenavis и Art Coo-rier (worker/courier.js).
 - ⌨️ Кнопки особых букв в учебниках: content/shared/keys.js (встраивают tools/{norsk,nederlands}_page.py функцией keys(html, 'å æ ø'), docs/site.md «Кнопки особых букв»).
 - 📒 Блокнот в учебниках: content/shared/notebook.js (клиент, встраивают tools/{study,english,norsk}_page.py функцией notebook(html, book)) + worker/notebook.js (`/api/notebook?book=`, таблица textbook_notes). Новый учебник — книга в `BOOKS` worker/notebook.js и вызов notebook() в его *_page.py.

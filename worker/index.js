@@ -572,11 +572,12 @@ const json = (data, status = 200, headers = {}) =>
 // Устройство базы проверяется полностью (~150 запросов подряд) только когда оно изменилось:
 // метка schema_ver в meta = хэш текста этой функции и всех таблиц; совпала — один запрос вместо полутора сотен
 // (раньше каждый «холодный» запуск сервера ждал их все — сайт открывался по нескольку секунд).
-let schemaReady = false, schemaWait = null;
+// Ожидание НЕ делим между запросами: с флагом handle_cross_request_promise_resolution обещание, созданное
+// другим (уже закончившимся) запросом, никогда не выполнится — запрос зависал (13.11.2026). Каждый запрос проверяет сам (1 запрос к базе).
+let schemaReady = false;
 function ensureSchema(env) {
   if (schemaReady) return Promise.resolve();
-  if (!schemaWait) schemaWait = ensureSchemaRun(env).finally(() => { schemaWait = null; });
-  return schemaWait;
+  return ensureSchemaRun(env);
 }
 const strHash = t => { let h = 2166136261; for (let i = 0; i < t.length; i++) h = Math.imul(h ^ t.charCodeAt(i), 16777619); return (h >>> 0).toString(36) + '.' + t.length; };
 async function ensureSchemaRun(env) {
@@ -1263,17 +1264,15 @@ async function needUser(req, env) {
 // ---------- защита админки (12.10.2026) ----------
 // Админ = почта из ADMIN_HASHES (если её не отключил код восстановления) или id из meta admin_ids (кто вошёл кодом восстановления).
 // Если задан PIN (meta admin_pin), админские права работают только в сессии, где PIN введён (sessions.pin_ok = 1).
-let SEC = { at: 0, pin: '', ids: [], emailOff: false }, secWait = null;
+let SEC = { at: 0, pin: '', ids: [], emailOff: false };
 async function loadSec(env, force) {
   if (!force && Date.now() - SEC.at < 15000) return SEC;
-  if (!force && secWait) return secWait; // несколько проверок разом (whoami) — одно чтение на всех
   const run = (async () => {
     const [pin, ids, off] = await Promise.all(['admin_pin', 'admin_ids', 'admin_email_off'].map(k => getMeta(env, k).catch(() => null)));
     SEC = { at: Date.now(), pin: pin || '', ids: parseJ(ids, []) || [], emailOff: off === '1' };
     return SEC;
   })();
-  if (!force) secWait = run.finally(() => { secWait = null; });
-  return run;
+  return run; // ожидание не делим между запросами (см. ensureSchema)
 }
 async function adminIdentity(u, env) { // «это Алина» — без учёта PIN
   if (!u) return false;
