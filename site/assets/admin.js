@@ -83,6 +83,13 @@
   if (nav) nav.innerHTML = `<a href="#week" data-grp="week">🗓 Неделя</a><a href="#inbox" data-grp="">📥 Входящие${cnt(['total'])}</a><a href="#runes" data-grp="runes">🔮 Руны</a>` + Object.entries(ADMIN_GROUPS).map(([g, name]) =>
     `<a href="#${inGroup(g).find(x => !x.href).id}" data-grp="${g}">${name}${cnt(inGroup(g).filter(x => x.count && x.count !== 'total').map(x => x.count))}</a>`).join('');
   const tabLink = (x, cur) => `<a href="${x.href || '#' + x.id}"${x.href ? ' class="adm-ext" title="Откроется на своей странице"' : ''}${x.id === cur ? ' aria-current="page"' : ''}>${x.ic} ${x.name}${x.count ? `<span class="adm-count" data-count="${x.count}"${x.count === 'comments' ? ' id="adm-pend"' : ''} hidden></span>` : ''}</a>`;
+  // ⭐ «Часто» — полоска над экраном: 6 разделов, куда админ заходит чаще всего (счёт в localStorage этого устройства, pp-adm-freq)
+  const FREQ_KEY = 'pp-adm-freq', FREQ_N = 6;
+  const freqGet = () => { try { return JSON.parse(localStorage.getItem(FREQ_KEY) || '{}') || {}; } catch (e) { return {}; } };
+  const freqAdd = id => { const x = secOf(id); if (!x || x.hide) return; const f = freqGet(); f[id] = (f[id] || 0) + 1; try { localStorage.setItem(FREQ_KEY, JSON.stringify(f)); } catch (e) {} };
+  const freqBar = cur => { const f = freqGet(), top = Object.keys(f).filter(id => f[id] >= 2 && secOf(id) && !secOf(id).hide).sort((a, b) => f[b] - f[a]).slice(0, FREQ_N);
+    return top.length ? `<nav class="adm-tabs adm-freq" aria-label="Часто"><span class="adm-freq-h">⭐ Часто</span>${top.map(id => tabLink(secOf(id), cur)).join('')}</nav>` : ''; };
+  document.addEventListener('click', e => { const a = e.target.closest && e.target.closest('a.adm-ext'); if (a) { const x = ADMIN_SECTIONS.find(t => t.href === a.getAttribute('href')); if (x) freqAdd(x.id); } });
   // экран: строка «что здесь делается» сверху, потом сам раздел; focus — прокрутить к нужному месту
   async function route() {
     const id = (location.hash || '#week').slice(1), x = secOf(id) || (SECTIONS[id] ? { id } : secOf('week'));
@@ -90,7 +97,8 @@
     const adm = document.getElementById('adm'); if (adm) adm.classList.toggle('adm-wk', x.id === 'week'); // «Неделя» — на всю ширину, без меню слева
     document.querySelectorAll('.adm-nav [data-grp]').forEach(a => a.setAttribute('aria-current', a.dataset.grp === (x.id === 'week' || x.id === 'runes' ? x.id : g) ? 'page' : 'false'));
     const about = document.getElementById('adm-about');
-    if (about) about.innerHTML = x.id === 'week' ? '' : (g ? `<nav class="adm-tabs" aria-label="${esc(ADMIN_GROUPS[g])}">${inGroup(g).map(t => tabLink(t, cur)).join('')}</nav>` : x.name ? `<h2>${x.ic} ${x.name}</h2>` : '') + (x.about ? `<p>${x.about}</p>` : '');
+    freqAdd(cur);
+    if (about) about.innerHTML = freqBar(cur) + (x.id === 'week' ? '' : (g ? `<nav class="adm-tabs" aria-label="${esc(ADMIN_GROUPS[g])}">${inGroup(g).map(t => tabLink(t, cur)).join('')}</nav>` : x.name ? `<h2>${x.ic} ${x.name}</h2>` : '') + (x.about ? `<p>${x.about}</p>` : ''));
     if (inboxData) badges(inboxData);
     if (x.id === 'subscribers') api('admin/inbox/seen', { k: 'subs' }).then(() => counts()).catch(() => {}); // открыла — новые уже не новые
     await (SECTIONS[x.open || x.id] || week)();

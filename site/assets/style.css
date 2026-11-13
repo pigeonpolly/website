@@ -2326,6 +2326,8 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .be-app .adm-tabs a.adm-ext::after { content: '↗'; color: #BFBAB6; font-weight: 400; }
 .be-app .adm-nav a.adm-ext > span:first-child::after { content: ' ↗'; color: #BFBAB6; font-weight: 400; }
 .adm-about { margin: 0 0 16px; }
+.adm-freq { align-items: center; padding: 0 0 10px; border-bottom: 1px dashed #EAE7E4; }
+.adm-freq-h { font: 600 13px var(--sans); color: #817871; margin-right: 2px; flex: none; }
 .adm-about h2 { margin: 0 0 4px; font: 700 24px var(--serif); color: var(--pp-ink,#2B1A51); }
 .adm-about p { margin: 0; color: #817871; font: 15px var(--sans); }
 .adm-inbox { list-style: none; margin: 0 0 18px; padding: 0; display: grid; gap: 10px; }
