@@ -5648,3 +5648,7 @@ a.wk-num.wk-n-link:hover, a.wk-num.wk-n-link:focus-visible { border-color: #D964
 @keyframes bp-wait-dot { 40% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .bp-wait img, .bp-wait i { animation: none; opacity: 1; } }
 .crumbs[hidden] { display: none !important; }
+/* кабинет → 🎓 Курсы: «С печатью» по ученикам (school-admin.js byStudent) */
+.sa-stu { border: 1px solid var(--line, #E3DACE); border-radius: 12px; padding: 10px 14px; margin-bottom: 10px; }
+.sa-stu summary { cursor: pointer; font-size: 15px; }
+.sa-stu[open] summary { margin-bottom: 12px; }

@@ -120,12 +120,12 @@
       act: ['Read', 'Прочитать', 'Lasīt'],
       go: () => pre + '/about-me/#chat',
     },
-    school: { // «Школа Полли» (worker/school.js schoolNews): печать или «на доработку» (ставит Алина, ученику — от Полли); гаснет, когда открыта /polly-helps/
+    school: { // «Школа Полли» и курс туши /ink/ (worker/school.js schoolNews, x.course): печать или «на доработку» (ставит Алина, ученику — от Полли); гаснет, когда открыта /polly-helps/
       icon: '🎓',
-      title: x => x.diploma ? ['Your diploma for the course “See the World Like an Artist”! 📜', 'Твой диплом курса «Смотри на мир как художник»! 📜', 'Tavs kursa «Skaties uz pasauli kā mākslinieks» diploms! 📜'][L] : x.redo && !x.ok ? ['Polly left you a note', 'Полли оставила записку', 'Pollija atstāja zīmīti'][L] : x.n > 1 ? [`Polly checked your pages (${x.n})`, `Полли проверила страницы (${x.n})`, `Pollija pārbaudīja lapas (${x.n})`][L] : ['A stamp from Polly!', 'Печать от Полли!', 'Zīmogs no Pollijas!'][L],
-      text: x => x.diploma ? [`All 12 stamps! Your diploma is ready${x.btn ? ` · +${x.btn} 🔘` : ''}.`, `Все 12 печатей! Диплом готов${x.btn ? ` · +${x.btn} 🔘` : ''}.`, `Visi 12 zīmogi! Diploms ir gatavs${x.btn ? ` · +${x.btn} 🔘` : ''}.`][L] : x.redo ? [`Lesson ${x.lesson}: something to try once more.`, `Урок ${x.lesson}: кое-что стоит попробовать ещё раз.`, `${x.lesson}. nodarbība: kaut ko vērts pamēģināt vēlreiz.`][L] : [`Lesson ${x.lesson} at Polly’s school.`, `Урок ${x.lesson} в школе Полли.`, `${x.lesson}. nodarbība Pollijas skolā.`][L],
+      title: x => x.diploma ? (x.course === 'ink' ? ['Your diploma for the ink sketching course! 📜', 'Твой диплом курса скетчинга тушью! 📜', 'Tavs tušas skicēšanas kursa diploms! 📜'] : ['Your diploma for the course “See the World Like an Artist”! 📜', 'Твой диплом курса «Смотри на мир как художник»! 📜', 'Tavs kursa «Skaties uz pasauli kā mākslinieks» diploms! 📜'])[L] : x.redo && !x.ok ? ['Polly left you a note', 'Полли оставила записку', 'Pollija atstāja zīmīti'][L] : x.n > 1 ? [`Polly checked your pages (${x.n})`, `Полли проверила страницы (${x.n})`, `Pollija pārbaudīja lapas (${x.n})`][L] : ['A stamp from Polly!', 'Печать от Полли!', 'Zīmogs no Pollijas!'][L],
+      text: x => x.diploma ? [`All ${x.of || 12} stamps! Your diploma is ready${x.btn ? ` · +${x.btn} 🔘` : ''}.`, `Все ${x.of || 12} печатей! Диплом готов${x.btn ? ` · +${x.btn} 🔘` : ''}.`, `Visi ${x.of || 12} zīmogi! Diploms ir gatavs${x.btn ? ` · +${x.btn} 🔘` : ''}.`][L] : x.redo ? [`Lesson ${x.lesson}: something to try once more.`, `Урок ${x.lesson}: кое-что стоит попробовать ещё раз.`, `${x.lesson}. nodarbība: kaut ko vērts pamēģināt vēlreiz.`][L] : (x.course === 'ink' ? [`Ink course, lesson ${x.lesson}.`, `Курс туши, урок ${x.lesson}.`, `Tušas kurss, ${x.lesson}. nodarbība.`] : [`Lesson ${x.lesson} at Polly’s school.`, `Урок ${x.lesson} в школе Полли.`, `${x.lesson}. nodarbība Pollijas skolā.`])[L],
       act: ['Look', 'Посмотреть', 'Apskatīt'],
-      go: x => pre + '/polly-helps/' + (x.diploma ? '#diploma' : '#school'),
+      go: x => pre + (x.course === 'ink' ? '/ink/' : '/polly-helps/') + (x.diploma ? '#diploma' : '#school'), // курс туши — /ink/
     },
     note: { // 📣 сообщение от Алины из кабинета → «Рассылка» (worker/notes.js noteNews); гаснет после «Прочитать»
       icon: '📣',

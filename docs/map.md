@@ -32,10 +32,11 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/pancakes.js` (12K) — «Блинная Полли» (/pancakes/, site/assets/pancakes.js, docs/games.md): Полли печёт блины жи: PAN_UPS, TOP, PAN_ALTER, PAN_BADGES, PAN_COND, PAN_INT, today, upsOf, price, pancakesApi
 - `worker/pause.js` (3K) — ⏸ Пауза сайта (docs/admin.md «Пауза»): meta site_pause = '1' — посетители на любой страниц: TTL, pauseOn, pauseApi, pauseGate
 - `worker/polls.js` (8K) — Опросы: блок на главной (site/assets/poll.js) и кабинет «🗳 Опросы» (site/assets/polls-admin.js); один голос с IP: POLL_TABLES, pollsApi
-- `worker/school.js` (11K) — «Школа Полли» (/polly-helps/, site/assets/polly-school.js, docs/challenge.md): сдача работ: SCHOOL_LESSONS, LANGS, SCHOOL_KEEP_DAYS, SCHOOL_ALTER, SCHOOL_INT, SCHOOL_RANGE, trOf, langOf, last, schoolCron, schoolApi, schoolNews
+- `worker/school.js` (12K) — курсы со сдачей работ: «Смотри на мир» (/polly-helps/) и «Тушь» (/ink/, docs/ink.md), `COURSES`, `/api/school/lessons`: SCHOOL_LESSONS, LANGS, SCHOOL_KEEP_DAYS, SCHOOL_ALTER, SCHOOL_INT, SCHOOL_RANGE, trOf, langOf, last, schoolCron, schoolApi, schoolNews
 - `worker/shift.js` (4K) — «Смена с Полли» (/shift/, этап 29, site/assets/shift.js, docs/rooms.md): таймер работы вме: SHIFT_MIN, SHIFT_ALTER, SHIFT_INT, SHIFT_RANGE, SHIFT_RULES, SHIFT_TABLES, out, shiftApi
 - `worker/study-page.js` (599K) — Собрано tools/study_page.py из content/study/textbook.html — руками не править.: STUDY_HTML
 - `worker/study.js` (3K) — Личный учебник «Full Stack Java · Angular» (/study/, docs/site.md «Учебник»): только для п: KEY, LOCKED, STUDY_NICKS, STUDY_TABLES, page, studyOk, studyApi
+- `worker/ink/index.js` + `lNN.js` — уроки курса туши (docs/ink.md): INK_LESSONS
 - `worker/titos-sort.js` (13K) — «Разбери дела» (этап 9 А, docs/titos.md): у Титоса упали коробки: SORT_TWISTS, ARCHIVE, shuffle, rng, sortRound
 - `worker/titos.js` (31K) — Детектив Титос (docs/titos.md): 100 уровней-дел, кофе, пуговки за уровень.: MAX, MIN, TITOS_PRIZES, OPEN, TITOS_ITEMS, TR_BUDGET, out, resolve, rowOf, saveRow, caseOf, settle
 - `worker/top.js` (5K) — Доски топа игр (docs/games.md § Доски топа): одна на каждую игру, вкладки «За всё время» и: GAMES, TOP_TABLES, topWeek, prevWeek, topScore, topApi, topCron
@@ -89,6 +90,8 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/palettes.js` (38K) — страница /palettes/, палитра из фото, добавление палитр админом: NAMES, ADD_G, isAdmin, added1, hue
 - `site/assets/pancakes.js` (113K) — Игра «Блинная Полли» (/pancakes/, docs/games.md): Полли печёт блины жителям Воббленда: PAN, SAY, BAKE, setPhase, bakeCol
 - `site/assets/pixel-badge.js` (13K) — Пиксельные бейджи тематик месяцев (кабинет → «🏅 Тематика месяца» → «🎨 Бейдж»; показ — sket: PPPixelBadge, GLYPHS, TEMPLATES, RING, rect
+- `site/assets/ink-course.js` + `ink-course.css` — страница курса туши /ink/ (docs/ink.md): PLAN, T, testView, practice, lessonView
+- `site/assets/diploma.js` — общий пиксельный диплом курсов: PPDiploma {P, C, svg, canvas, mount, save}
 - `site/assets/polly-school.js` (30K) — «Школа Полли» (/polly-helps/, docs/challenge.md): Полли в фартуке у мольберта учит рисоват: IMG, KEY, stepsOf, send, path
 - `site/assets/polly.js` (30K) — Полли-питомец в левом нижнем углу (`PollyPet`): PollyPet, SEASON, CORNER, HOME_X, addProp
 - `site/assets/posts-admin.js` (25K) — Кабинет → «📣 Посты» (admin.js открывает PPPostsAdmin.mount(main)): готовые картинки и подп: PPPostsAdmin, SERIF, LANGS, POSTS, titos
@@ -237,6 +240,8 @@ _правка — кабинет → 📜 Правила (meta `rules`)_
 ## Общее
 
 _Сюда следующие этапы дописывают общие сведения о коде._
+
+- 🎓 Курсы со сдачей фото: worker/school.js `COURSES` (новый курс = запись там, `course` в запросах, страница с PPDiploma из site/assets/diploma.js); проверка — кабинет «🎓 Курсы» (school-admin.js), новость `school` с `x.course` (news.js), карточка — cabinet.js «Дипломы» и v2.js `COURSES` на /learn/.
 
 - ⚠️ Worker: обещание (Promise) НЕ хранить в переменной модуля, чтобы его ждали другие запросы (`xWait = run()`) — с флагом handle_cross_request_promise_resolution чужое обещание не выполняется, запрос виснет (13.11.2026: ensureSchema, loadSec, ensureBlogSchema). Кэшировать можно только готовые значения.
 

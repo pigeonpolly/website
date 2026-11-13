@@ -70,7 +70,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **notes** (worker/notes.js): `id` int PK auto, `L` text nn, `file_key` text, `file_name` text, `file_size` int =0, `file_type` text, `aud` text =\'all\', `days` int =0, `total` int =0, `mail_id` int, `created_at` int
 - **note_to** (worker/notes.js): `note_id` int nn, `user_id` int nn, `seen_at` int =0; PRIMARY KEY (note_id, user_id)
 - **pan_runs** (worker/pancakes.js): `id` text PK, `user_id` int nn, `started` int nn, `level` int =0, `washed` int =0, `stars` int =0, `base` int =0, `spare` int =0
-- **school_works** (worker/school.js): `id` int PK auto, `user_id` int nn, `lesson` int nn, `img` text nn, `note` text, `status` text ='wait', `comment` text, `created_at` int, `checked_at` int, `seen` int =1; + `comment_tr` text
+- **school_works** (worker/school.js): `id` int PK auto, `user_id` int nn, `lesson` int nn, `img` text nn, `note` text, `status` text ='wait', `comment` text, `created_at` int, `checked_at` int, `seen` int =1; + `comment_tr` text, `course` text ='water' (13.11: 'water' — «Смотри на мир», 'ink' — курс туши /ink/; запросы — `IFNULL(course,'water')`)
 - **shift_runs** (worker/shift.js): `id` text PK, `user_id` int nn, `started` int nn, `min` int nn, `done` int =0
 - **study_progress** (worker/study.js): `user_id` int PK, `state` text, `updated_at` int
 - **titos** (worker/titos.js): `user_id` int PK, `level` int =0, `coffee` int =10, `coffee_at` int =0, `drink_at` int =0, `sleep` int =0, `run` int =0, `found` text ='[]', `started` int =0, `bugs` text ='[]', `sell_day` text ='', `sell_n` int =0, `legacy` int =0; + `sort_lv` int =0, `sort_run` text ='', `bugs_run` int =0']

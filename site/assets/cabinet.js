@@ -69,6 +69,7 @@
   // Учёба: 📘 учебники книжечками (если доступны) · 📜 дипломы (Школа Полли; пока не пройдена — печати) · 🎬 гайды:
   // новый и последний просмотренный (localStorage pp-yt-last — пишет v2.js при запуске видео на странице /learn/v/<id>/) + «Смотреть все» → /learn/
   const FREE_YT = ['eRa1uB_7s9U', 'VVvLZcIqUbM']; // как в src/pages/preview-learn.html, новое первым
+  const INK = { t: ['Ink: Sketching Without Fear', 'Тушь: скетчинг без страха', 'Tuša: skicēšana bez bailēm'], s: ['Fifteen lessons from Alina’s ink book, stamps from Polly and a diploma', 'Пятнадцать уроков по книге Алины о туши, печати от Полли и диплом', 'Piecpadsmit nodarbības pēc Alīnas tušas grāmatas, Pollijas zīmogi un diploms'] }; // курс туши в «📜 Дипломах»
   const BOOK = { study: ['#2F5F6A', '💻', '/study/'], english: ['#22405F', '🇬🇧', '/english/'], norsk: ['#8E2F3C', '🇳🇴', '/norsk/'], nederlands: ['#C8601E', '🇳🇱', '/nederlands/'] };
   const sec = (k, h, more) => `<section class="cab-sec cab-${k}"${k === 'books' ? ' hidden' : ''}><div class="cab-sh"><h2>${h}</h2>${more || ''}</div><div class="cab-body"></div></section>`;
   function learnPane(el) {
@@ -92,6 +93,17 @@
         box.querySelector('.cab-sch-s').textContent = T.schS(n);
         box.querySelector('.cab-btn').textContent = t('schGo');
       } else box.querySelector('.cab-k').textContent = t('dipNext');
+    }).catch(() => {});
+    // курс туши /ink/ (для своих, 15 уроков, docs/ink.md): печати из /api/school?course=ink
+    const ink = document.createElement('div'); ink.className = 'cab-card cab-school';
+    ink.innerHTML = `<span class="cab-k">${t('dipNext')}</span><b class="cab-sch-t">${INK.t[L]}</b><p class="cab-sch-s">${INK.s[L]}</p><div class="cab-stamps" aria-hidden="true">${'<i></i>'.repeat(15)}</div><a class="cab-btn" href="${pre}/ink/">${t('schStart')}</a>`;
+    dips.append(ink);
+    fetch('/api/school?peek=1&course=ink&lang=' + ['en', 'ru', 'lv'][L], { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => {
+      if (!d || !d.me) return;
+      const n = (d.works || []).filter(w => w.status === 'ok').length;
+      ink.querySelectorAll('.cab-stamps i').forEach((i, k) => i.classList.toggle('on', k < n));
+      if (n >= 15) { ink.classList.add('cab-dip'); ink.querySelector('.cab-sch-s').textContent = t('dipS'); const b = ink.querySelector('.cab-btn'); b.href = pre + '/ink/#diploma'; b.textContent = t('dipGo'); }
+      else if ((d.works || []).length) { ink.querySelector('.cab-sch-s').textContent = [`Stamps: ${n} of 15`, `Печатей: ${n} из 15`, `Zīmogi: ${n} no 15`][L]; ink.querySelector('.cab-btn').textContent = t('schGo'); }
     }).catch(() => {});
     // гайды: VIP (вошедшим) новее бесплатных
     const get = u => fetch(u, { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null);

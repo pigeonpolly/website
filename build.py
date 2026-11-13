@@ -56,6 +56,8 @@ PAGES = [
      "Help Detective Titos solve 100 cases in Wobbleland: find clues, question suspects and keep the coffee pot from running dry."),
     ("polly-helps", "See the World Like an Artist", "polly-helps.html",
      "See the World Like an Artist: a course of 12 short lessons, from simple shapes to a pixel diploma. Free, in English, Russian and Latvian."),
+    ("ink", "Ink: Sketching Without Fear", "ink.html",
+     "Ink: Sketching Without Fear — a course of 15 lessons from Alina’s book Ink Sketching: Creative Guide. Theory, a test and a task on paper in every lesson, stamps from Polly and a diploma. For signed-in members, in English, Russian and Latvian."),
     ("flock", "The Flock", "flock.html",
      "Our flock of pixel birds: everyone who signs in gets one. Scatter seeds, call the wind or rain, throw a party and watch what happens."),
     ("flock/news", "Flock news", "flock-news.html",

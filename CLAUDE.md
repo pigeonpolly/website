@@ -15,6 +15,7 @@
 | Код, /api, «Общее» | docs/map.md |
 | D1, meta | docs/db.md |
 | Челлендж, стена, ЭКСТРА | docs/challenge.md |
+| Курс туши /ink/: уроки, конспект книги | docs/ink.md |
 | Блог | docs/blog.md |
 | Стая | docs/flock.md |
 | Птичка: вход, профиль, комната, подарки | docs/bird.md |

@@ -187,11 +187,15 @@
         + `<span class="tp">${G.tpV[L]}</span><span class="th"><img src="${esc(x.cover)}" alt="" loading="lazy"><span class="bd">${x.vip ? G.vipB[L] : G.free[L]}</span>${sn ? `<span class="sn">${W.seen[L]}</span>` : ''}<span class="pl" aria-hidden="true">${lock ? '🔒' : '▶'}</span></span>`
         + `<span class="tx"><b>${nm}</b><small>${x.vip ? (lock ? G.lock[L] : G.vipOpen[L]) : G.vid[L]}${lgT(x)}</small><span class="go">${lock ? G.signin[L] : G.watch[L]}</span></span></a>`;
     };
-    // курсы на сайте (не видео): Школа Полли /polly-helps/
+    // курсы на сайте (не видео): Школа Полли /polly-helps/ и курс туши /ink/
     const COURSES = [{ u: '/polly-helps/', img: '/images/school/course-cover.jpg?v=2', t: ['See the World Like an Artist', 'Смотри на мир как художник', 'Skaties uz pasauli kā mākslinieks'],
       d: ['First steps in drawing that help you see the world in a new way.', 'Первые шаги в рисовании, которые помогут увидеть мир по-новому.', 'Pirmie soļi zīmēšanā, kas palīdzēs ieraudzīt pasauli no jauna.'],
-      s: ['Course · 12 short lessons and a diploma', 'Курс · 12 коротких уроков и диплом', 'Kurss · 12 īsas nodarbības un diploms'] }];
-    const crs = x => `<a class="vc crs" data-f="free" data-c="course" data-l="en ru lv" href="${pre}${x.u}"><span class="tp">${G.tpC[L]}</span><span class="th"><img src="${x.img}" alt="" loading="lazy"><span class="bd">${G.free[L]}</span></span>`
+      s: ['Course · 12 short lessons and a diploma', 'Курс · 12 коротких уроков и диплом', 'Kurss · 12 īsas nodarbības un diploms'] },
+      // курс туши /ink/ — для своих (уроки только вошедшим, docs/ink.md)
+      { u: '/ink/', img: '/images/ink/p11-5.jpg', vip: 1, t: ['Ink: Sketching Without Fear', 'Тушь: скетчинг без страха', 'Tuša: skicēšana bez bailēm'],
+      d: ['A full course from Alina’s book: theory, tests and tasks on paper — from the blank page fear to mixed media.', 'Полноценный курс по книге Алины: теория, тесты и задания на бумаге — от страха чистого листа до смешанных техник.', 'Pilns kurss pēc Alīnas grāmatas: teorija, testi un uzdevumi uz papīra — no tukšas lapas bailēm līdz jauktajām tehnikām.'],
+      s: ['Course · 15 lessons, stamps and a diploma', 'Курс · 15 уроков, печати и диплом', 'Kurss · 15 nodarbības, zīmogi un diploms'] }];
+    const crs = x => `<a class="vc crs" data-f="${x.vip ? 'vip' : 'free'}" data-c="course" data-l="en ru lv" href="${pre}${x.u}"><span class="tp">${G.tpC[L]}</span><span class="th"><img src="${x.img}" alt="" loading="lazy"><span class="bd">${x.vip ? G.vipB[L] : G.free[L]}</span></span>`
       + `<span class="tx"><b>${x.t[L]}</b><span class="cd">${x.d[L]}</span><small>${x.s[L]} · 🌍 ${G.l3[L]}</small><span class="go">${G.open[L]}</span></span></a>`;
     // шпаргалки (кабинет → «📝 Шпаргалка»): страницы-картинки или PDF, своя страница /learn/v/<id>/
     const hwCard = x => { const lock = x.vip && !op;
