@@ -29,7 +29,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=Karla:wght@400;500;700&family=Caveat:wght@700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Nunito+Sans:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=e7a05cd9">
+<link rel="stylesheet" href="/assets/style.css?v=ad5fee1a">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <link rel="stylesheet" href="/assets/v2-shell.css?v=a5c24f2f">
 <script>/* вход: /api/whoami сразу, параллельно с загрузкой скриптов — account.js возьмёт ответ (PPWhoP) */try{if(!/devdate=/.test(location.search)&&!sessionStorage.getItem('pp-devdate'))window.PPWhoP=fetch('/api/whoami',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
@@ -96,10 +96,9 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 <header class="hd2"><div class="w">
   <a class="lg" href="/ru/"><span class="lg-m" aria-hidden="true"></span><span>Pigeon Polly <i>Art Lab</i></span></a>
   <nav class="nv" aria-label="Main">
-    <a href="/ru/learn/">Уроки</a><a href="/ru/books/">Книги</a><a href="/ru/blog/">Журнал</a><a href="/ru/sketchbook/">Скетчбук</a>
+    <a href="/ru/learn/">Уроки</a><a href="/ru/books/">Книги</a><a href="/ru/blog/">Журнал</a><a href="/ru/palettes/">Палитры</a><a href="/ru/sketchbook/">Скетчбук</a><a href="/ru/games/">Игры</a>
   </nav>
   <div class="hr">
-    <a class="lb" href="/ru/games/">The Lab</a>
     <button type="button" class="search-btn" aria-label="Поиск по сайту"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
     <div class="lang2"><button type="button" class="lang-b" aria-expanded="false" aria-controls="lang-m" aria-label="Language">RU</button><div class="lang-m" id="lang-m" hidden><nav class="lang-switch" aria-label="Language"><a href="/requests/" hreflang="en" lang="en"><b>EN</b>English</a><a href="/lv/requests/" hreflang="lv" lang="lv"><b>LV</b>Latviešu</a><a href="/ru/requests/" hreflang="ru" lang="ru" aria-current="true"><b>RU</b>Русский</a></nav></div></div>
     <div class="sea2"><button type="button" class="sea-b" aria-expanded="false" aria-controls="sea-m" title="Сезон" aria-label="Сезон"><i></i></button><div class="sea-m" id="sea-m" hidden><span class="switch" role="group" aria-label="Сезон"><button type="button" data-s="winter" title="Зима" aria-label="Зима"><i></i>Зима</button><button type="button" data-s="spring" title="Весна" aria-label="Весна"><i></i>Весна</button><button type="button" data-s="summer" title="Лето" aria-label="Лето"><i></i>Лето</button><button type="button" data-s="autumn" title="Осень" aria-label="Осень"><i></i>Осень</button></span></div></div>
@@ -111,7 +110,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </div>
 </div>
 <div class="drawer" id="drawer" hidden><div class="w">
-  <a href="/ru/learn/">Уроки</a><a href="/ru/books/">Книги</a><a href="/ru/blog/">Журнал</a><a href="/ru/sketchbook/">Скетчбук</a><a class="lb" href="/ru/games/">The Lab</a>
+  <a href="/ru/learn/">Уроки</a><a href="/ru/books/">Книги</a><a href="/ru/blog/">Журнал</a><a href="/ru/palettes/">Палитры</a><a href="/ru/sketchbook/">Скетчбук</a><a href="/ru/games/">Игры</a>
   <nav class="lang-switch" aria-label="Language"><a href="/requests/" hreflang="en" lang="en">EN</a><a href="/lv/requests/" hreflang="lv" lang="lv">LV</a><a href="/ru/requests/" hreflang="ru" lang="ru" aria-current="true">RU</a></nav>
     <span class="switch sw-m" role="group" aria-label="Сезон"><button type="button" data-s="winter" title="Зима" aria-label="Зима"></button><button type="button" data-s="spring" title="Весна" aria-label="Весна"></button><button type="button" data-s="summer" title="Лето" aria-label="Лето"></button><button type="button" data-s="autumn" title="Осень" aria-label="Осень"></button></span>
 </div></div>
@@ -151,11 +150,11 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
       <div class="soc"><a href="https://www.patreon.com/cw/pigeon_polly" target="_blank" rel="noopener">Patreon</a><a href="https://www.instagram.com/pigeonpolly" target="_blank" rel="noopener">Instagram</a><a href="https://www.tiktok.com/@pigeonpolly" target="_blank" rel="noopener">TikTok</a><a href="https://www.pinterest.com/pigeonpollyart/" target="_blank" rel="noopener">Pinterest</a></div>
       <a class="ft-friend" href="https://libertas.study/" target="_blank" rel="noopener" data-f><span>Наши друзья:</span><img src="/images/train/libertas.png" alt="Libertas.study" width="86" height="35" loading="lazy"></a></div>
     <div><h4 data-f>Учиться</h4><a href="/ru/learn/" data-f>Уроки</a><a href="/ru/books/" data-f>Книги</a><a href="/ru/blog/" data-f>Журнал</a><a href="/ru/palettes/" data-f>Палитры</a><a href="/ru/polly-helps/" data-f>Полли, помоги</a></div>
-    <div><h4 data-f>Лаборатория</h4><a href="/ru/games/" data-f>Все игры</a><a href="/ru/shop/" data-f>Магазин</a><a href="/ru/advent/" data-f>Адвент</a><a href="/ru/rain/" data-f>Пуговичный дождь</a><a href="/ru/potions/" data-f>Зельеварня</a><a href="/ru/pancakes/" data-f>Блинная Полли</a><a href="/ru/train/" data-f>Поезд Полли</a><a href="/ru/titos/" data-f>Детектив Титос</a><a href="/ru/shift/" data-f>Смена с Полли</a><a href="/ru/polly-office/" data-f>Офис Полли</a><a href="/ru/wobbleland/" data-f>Воббленд</a></div>
+    <div><h4 data-f>Игры</h4><a href="/ru/games/" data-f>Все игры</a><a href="/ru/shop/" data-f>Магазин</a><a href="/ru/advent/" data-f>Адвент</a><a href="/ru/rain/" data-f>Пуговичный дождь</a><a href="/ru/potions/" data-f>Зельеварня</a><a href="/ru/pancakes/" data-f>Блинная Полли</a><a href="/ru/train/" data-f>Поезд Полли</a><a href="/ru/titos/" data-f>Детектив Титос</a><a href="/ru/shift/" data-f>Смена с Полли</a><a href="/ru/polly-office/" data-f>Офис Полли</a><a href="/ru/wobbleland/" data-f>Воббленд</a></div>
     <div><h4 data-f>Стая</h4><a href="/ru/flock/" data-f>Все птички</a><a href="/ru/flock/news/" data-f>Новости стаи</a><a href="/ru/challenge/" data-f>Челлендж дня</a><a href="/ru/challenge/#sw-wall" data-f>Рисунки стаи</a><a href="/ru/requests/" data-f>Нарисуй мне</a><a href="/ru/garden/" data-f>Огород птички</a></div>
     <div><h4 data-f>Алина</h4><a href="/ru/sketchbook/" data-f>Скетчбук</a><a href="/ru/about-me/" data-f>Обо мне</a><a href="/ru/on-walls-and-pages/" data-f>На стенах и страницах</a><a href="/ru/projects/" data-f>Обучение и AI</a><a href="/ru/work-with-me/" data-f>Сотрудничество</a><a href="/ru/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="9" hidden>v9 · 13.11 13:16</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
+  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="12" hidden>v12 · 13.11 13:19</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
 </div></footer>
 </body>
 </html>

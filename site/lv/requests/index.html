@@ -29,7 +29,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,600;1,9..144,300;1,9..144,400&family=Karla:wght@400;500;700&family=Caveat:wght@700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Nunito+Sans:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=e7a05cd9">
+<link rel="stylesheet" href="/assets/style.css?v=ad5fee1a">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <link rel="stylesheet" href="/assets/v2-shell.css?v=a5c24f2f">
 <script>/* вход: /api/whoami сразу, параллельно с загрузкой скриптов — account.js возьмёт ответ (PPWhoP) */try{if(!/devdate=/.test(location.search)&&!sessionStorage.getItem('pp-devdate'))window.PPWhoP=fetch('/api/whoami',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
@@ -96,10 +96,9 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 <header class="hd2"><div class="w">
   <a class="lg" href="/lv/"><span class="lg-m" aria-hidden="true"></span><span>Pigeon Polly <i>Art Lab</i></span></a>
   <nav class="nv" aria-label="Main">
-    <a href="/lv/learn/">Nodarbības</a><a href="/lv/books/">Grāmatas</a><a href="/lv/blog/">Žurnāls</a><a href="/lv/sketchbook/">Skiču burtnīca</a>
+    <a href="/lv/learn/">Nodarbības</a><a href="/lv/books/">Grāmatas</a><a href="/lv/blog/">Žurnāls</a><a href="/lv/palettes/">Paletes</a><a href="/lv/sketchbook/">Skiču burtnīca</a><a href="/lv/games/">Spēles</a>
   </nav>
   <div class="hr">
-    <a class="lb" href="/lv/games/">The Lab</a>
     <button type="button" class="search-btn" aria-label="Meklēt vietnē"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
     <div class="lang2"><button type="button" class="lang-b" aria-expanded="false" aria-controls="lang-m" aria-label="Language">LV</button><div class="lang-m" id="lang-m" hidden><nav class="lang-switch" aria-label="Language"><a href="/requests/" hreflang="en" lang="en"><b>EN</b>English</a><a href="/lv/requests/" hreflang="lv" lang="lv" aria-current="true"><b>LV</b>Latviešu</a><a href="/ru/requests/" hreflang="ru" lang="ru"><b>RU</b>Русский</a></nav></div></div>
     <div class="sea2"><button type="button" class="sea-b" aria-expanded="false" aria-controls="sea-m" title="Sezona" aria-label="Sezona"><i></i></button><div class="sea-m" id="sea-m" hidden><span class="switch" role="group" aria-label="Sezona"><button type="button" data-s="winter" title="Ziema" aria-label="Ziema"><i></i>Ziema</button><button type="button" data-s="spring" title="Pavasaris" aria-label="Pavasaris"><i></i>Pavasaris</button><button type="button" data-s="summer" title="Vasara" aria-label="Vasara"><i></i>Vasara</button><button type="button" data-s="autumn" title="Rudens" aria-label="Rudens"><i></i>Rudens</button></span></div></div>
@@ -111,7 +110,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </div>
 </div>
 <div class="drawer" id="drawer" hidden><div class="w">
-  <a href="/lv/learn/">Nodarbības</a><a href="/lv/books/">Grāmatas</a><a href="/lv/blog/">Žurnāls</a><a href="/lv/sketchbook/">Skiču burtnīca</a><a class="lb" href="/lv/games/">The Lab</a>
+  <a href="/lv/learn/">Nodarbības</a><a href="/lv/books/">Grāmatas</a><a href="/lv/blog/">Žurnāls</a><a href="/lv/palettes/">Paletes</a><a href="/lv/sketchbook/">Skiču burtnīca</a><a href="/lv/games/">Spēles</a>
   <nav class="lang-switch" aria-label="Language"><a href="/requests/" hreflang="en" lang="en">EN</a><a href="/lv/requests/" hreflang="lv" lang="lv" aria-current="true">LV</a><a href="/ru/requests/" hreflang="ru" lang="ru">RU</a></nav>
     <span class="switch sw-m" role="group" aria-label="Sezona"><button type="button" data-s="winter" title="Ziema" aria-label="Ziema"></button><button type="button" data-s="spring" title="Pavasaris" aria-label="Pavasaris"></button><button type="button" data-s="summer" title="Vasara" aria-label="Vasara"></button><button type="button" data-s="autumn" title="Rudens" aria-label="Rudens"></button></span>
 </div></div>
@@ -151,11 +150,11 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
       <div class="soc"><a href="https://www.patreon.com/cw/pigeon_polly" target="_blank" rel="noopener">Patreon</a><a href="https://www.instagram.com/pigeonpolly" target="_blank" rel="noopener">Instagram</a><a href="https://www.tiktok.com/@pigeonpolly" target="_blank" rel="noopener">TikTok</a><a href="https://www.pinterest.com/pigeonpollyart/" target="_blank" rel="noopener">Pinterest</a></div>
       <a class="ft-friend" href="https://libertas.study/" target="_blank" rel="noopener" data-f><span>Mūsu draugi:</span><img src="/images/train/libertas.png" alt="Libertas.study" width="86" height="35" loading="lazy"></a></div>
     <div><h4 data-f>Mācīties</h4><a href="/lv/learn/" data-f>Nodarbības</a><a href="/lv/books/" data-f>Grāmatas</a><a href="/lv/blog/" data-f>Žurnāls</a><a href="/lv/palettes/" data-f>Paletes</a><a href="/lv/polly-helps/" data-f>Pollija, palīdzi</a></div>
-    <div><h4 data-f>Laboratorija</h4><a href="/lv/games/" data-f>Visas spēles</a><a href="/lv/shop/" data-f>Veikals</a><a href="/lv/advent/" data-f>Adventes kalendārs</a><a href="/lv/rain/" data-f>Pogu lietus</a><a href="/lv/potions/" data-f>Dziru virtuve</a><a href="/lv/pancakes/" data-f>Pollijas pankūkas</a><a href="/lv/train/" data-f>Pollijas vilciens</a><a href="/lv/titos/" data-f>Detektīvs Titoss</a><a href="/lv/shift/" data-f>Maiņa ar Polliju</a><a href="/lv/polly-office/" data-f>Pollijas birojs</a><a href="/lv/wobbleland/" data-f>Wobbleland</a></div>
+    <div><h4 data-f>Spēles</h4><a href="/lv/games/" data-f>Visas spēles</a><a href="/lv/shop/" data-f>Veikals</a><a href="/lv/advent/" data-f>Adventes kalendārs</a><a href="/lv/rain/" data-f>Pogu lietus</a><a href="/lv/potions/" data-f>Dziru virtuve</a><a href="/lv/pancakes/" data-f>Pollijas pankūkas</a><a href="/lv/train/" data-f>Pollijas vilciens</a><a href="/lv/titos/" data-f>Detektīvs Titoss</a><a href="/lv/shift/" data-f>Maiņa ar Polliju</a><a href="/lv/polly-office/" data-f>Pollijas birojs</a><a href="/lv/wobbleland/" data-f>Wobbleland</a></div>
     <div><h4 data-f>Bars</h4><a href="/lv/flock/" data-f>Visi putniņi</a><a href="/lv/flock/news/" data-f>Bara ziņas</a><a href="/lv/challenge/" data-f>Dienas izaicinājums</a><a href="/lv/challenge/#sw-wall" data-f>Bara zīmējumi</a><a href="/lv/requests/" data-f>Uzzīmē man</a><a href="/lv/garden/" data-f>Putniņa dārzs</a></div>
     <div><h4 data-f>Alīna</h4><a href="/lv/sketchbook/" data-f>Skiču burtnīca</a><a href="/lv/about-me/" data-f>Par mani</a><a href="/lv/on-walls-and-pages/" data-f>Uz sienām un lapām</a><a href="/lv/projects/" data-f>Mācības un MI</a><a href="/lv/work-with-me/" data-f>Sadarbība</a><a href="/lv/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Alīna Otkinska · Pigeon Polly Art Lab · Rīga</span><span class="ver" data-ver="9" hidden>v9 · 13.11 13:16</span><span><a href="/lv/privacy/">Privātums</a></span></div>
+  <div class="bt"><span>© 2026 Alīna Otkinska · Pigeon Polly Art Lab · Rīga</span><span class="ver" data-ver="12" hidden>v12 · 13.11 13:19</span><span><a href="/lv/privacy/">Privātums</a></span></div>
 </div></footer>
 </body>
 </html>

@@ -204,7 +204,7 @@
         : `<span>Сайт работает. Пауза — для всех, кроме вас, вместо страниц будет «🎨 Ведутся работы, скоро всё будет отлично».</span><a class="pill-btn" href="/pause" target="_blank">👀 Как это выглядит</a><button class="pill-btn" type="button" id="wk-pause" data-on="1">⏸ Поставить на паузу</button>`}</div>
       <div class="wk-nums">${nums.map(([v, t, dl, c, href]) => { const tag = href ? 'a' : 'div'; return `<${tag}${href ? ` href="${href}" title="Открыть список птичек"` : ''} class="wk-num${c ? ' ' + c : ''}"><b>${n(v)}</b><span>${t}</span>${dl}</${tag}>`; }).join('')}</div>
       <div class="wk-acts">${acts.map(a => `<section class="wk-act${a.hot ? ' wk-hot' : ''}"><span class="wk-e" aria-hidden="true">${a.ic}</span><h3>${a.t}${a.badge ? `<span class="wk-badge">${a.badge}</span>` : ''}</h3><p>${a.d}</p><div class="wk-btns">${a.btn}</div></section>`).join('')}</div>
-      <details class="wk-more"><summary>⚙ Ещё инструменты</summary><div class="wk-cols">${more}</div></details>
+      <section class="wk-more"><h3>⚙ Ещё инструменты</h3><div class="wk-cols">${more}</div></section>
       <p class="be-note wk-foot">Цифры — за последние 7 дней (${esc(d.from.slice(8))}.${esc(d.from.slice(5, 7))}–${esc(d.to.slice(8))}.${esc(d.to.slice(5, 7))}), сравнение — с 7 днями до них. Подробно — 📊 Статистика → <a href="#visitors">Посетители</a>.</p>
     </div>`;
     // ⏸ пауза сайта (worker/pause.js): для посетителей — страница «Ведутся работы», админа пускает
