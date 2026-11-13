@@ -212,6 +212,7 @@
         <a class="pill-btn pill-fill" href="#new">＋ Новая статья</a>
         <button type="button" class="pill-btn" id="be-gkey">⚙ Перевод (Gemini)${state.gemini ? ' ✓' : ''}</button>
         <button type="button" class="pill-btn" id="be-imgcheck">🖼 Проверить картинки</button>
+        <button type="button" class="pill-btn" id="be-courier" title="Свежие новости искусства → черновик в разделе Art Coo-rier">📰 Art Coo-rier</button>
       </div>
       <section class="be-card" id="be-imgrep" hidden></section>
       ${pend.length ? `<section class="be-card be-pend"><h2>Комментарии со ссылками ждут проверки (${pend.length})</h2><ol>${pend.map(c => `
@@ -241,6 +242,26 @@
         ${bad.length ? `<p class="be-note">Статей, где картинки не открываются: <b>${bad.length}</b> из ${d.total}. Их нужно вставить заново: откройте статью, удалите пустую картинку и перетащите на её место файл (или скопируйте картинку из Google Docs).</p>
           <ol>${bad.map(r => `<li><a href="#${r.id}"><b>${esc(r.title)}</b></a>${r.status === 'published' ? '' : ' <small>(черновик)</small>'} — не видно: ${r.missing + r.dead + r.foreign} из ${r.total}${r.hosts && r.hosts.length ? ` <small>(были с: ${esc(r.hosts.join(', '))})</small>` : ''}${r.missing ? ' <small>(файл пропал с сайта)</small>' : ''}</li>`).join('')}</ol>`
         : `<p class="be-note">Все картинки во всех ${d.total} статьях на месте ✓</p>`}`;
+    });
+    // 📰 «Art Coo-rier»: выпуск новостей искусства одной кнопкой — два шага на сервере (worker/courier.js), потом открываем черновик
+    const CR = {
+      ru: { src: 'Собираю новости…', write: 'Пишу выпуск…', ai_limit: 'Лимит Gemini на сегодня, попробуй позже.', no_news: 'Свежих новостей искусства пока мало — попробуй позже.', no_src: 'Новости не собрались — нажми ещё раз.', no_key: 'Gemini не подключён: «⚙ Перевод (Gemini)».', ai: 'Gemini сейчас не отвечает — попробуй через пару минут.', other: 'Не получилось собрать выпуск', ok: 'Черновик готов' },
+      en: { src: 'Collecting news…', write: 'Writing the issue…', ai_limit: 'Gemini limit for today is used up, try later.', no_news: 'Not enough fresh art news yet — try later.', no_src: 'News were not collected — click again.', no_key: 'Gemini is not connected: «⚙ Перевод (Gemini)».', ai: 'Gemini is not answering — try in a couple of minutes.', other: 'Could not build the issue', ok: 'Draft is ready' },
+      lv: { src: 'Vācu ziņas…', write: 'Rakstu numuru…', ai_limit: 'Gemini šodienas limits ir beidzies, mēģini vēlāk.', no_news: 'Svaigu mākslas ziņu vēl par maz — mēģini vēlāk.', no_src: 'Ziņas nesavācās — spied vēlreiz.', no_key: 'Gemini nav pieslēgts: «⚙ Перевод (Gemini)».', ai: 'Gemini neatbild — mēģini pēc pāris minūtēm.', other: 'Neizdevās sagatavot numuru', ok: 'Melnraksts gatavs' },
+    }[['ru', 'en', 'lv'].includes(document.documentElement.lang) ? document.documentElement.lang : 'ru'];
+    const cb = app.querySelector('#be-courier');
+    cb.addEventListener('click', async () => {
+      const box = app.querySelector('#be-imgrep');
+      cb.disabled = true; box.hidden = false;
+      try {
+        box.innerHTML = `<p class="be-note">📰 ${CR.src}</p>`;
+        await api('blog/admin/courier', { step: 'src' });
+        box.innerHTML = `<p class="be-note">📰 ${CR.write}</p>`;
+        const r = await api('blog/admin/courier', { step: 'write' });
+        box.innerHTML = `<p class="be-flash">✓ ${CR.ok}: <a href="#${r.id}">Art Coo-rier</a></p>`;
+        location.hash = '#' + r.id; // открываем черновик в редакторе
+      } catch (e) { box.innerHTML = `<p class="be-note">${esc(CR[e.code] || CR.other + ' (' + (e.code || e.message) + ').')}</p>`; }
+      cb.disabled = false;
     });
     const dd = app.querySelector('#be-dedupe');
     dd && dd.addEventListener('click', async () => {

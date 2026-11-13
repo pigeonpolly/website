@@ -22,7 +22,7 @@ const LEVELS = ['A', 'B'], KEEP = 30; // два уровня (решение А�
 const LNAME = { A: 'A1–A2', B: 'B1–B2' };
 const rigaDay = (t = Date.now()) => new Date(t).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
 const rigaHour = () => +new Date().toLocaleString('en-GB', { timeZone: 'Europe/Riga', hour: '2-digit', hourCycle: 'h23' });
-const GN = (q, hl = 'en', gl = 'US') => `https://news.google.com/rss/search?q=${encodeURIComponent(q + ' when:1d')}&hl=${hl}&gl=${gl}&ceid=${gl}:${hl}`;
+export const GN = (q, hl = 'en', gl = 'US') => `https://news.google.com/rss/search?q=${encodeURIComponent(q + ' when:1d')}&hl=${hl}&gl=${gl}&ceid=${gl}:${hl}`;
 // источники: сначала норвежские и профильные, Google News — запасной (у него нет текста статьи, только заголовок)
 const FEEDS = {
   verden: ['https://www.nrk.no/urix/toppsaker.rss', 'https://feeds.bbci.co.uk/news/world/rss.xml', GN('world news')],
@@ -52,7 +52,7 @@ const decode = s => String(s || '').replace(/<!\[CDATA\[([\s\S]*?)\]\]>/g, '$1')
   .replace(/&nbsp;/g, ' ').replace(/&amp;/g, '&').replace(/&lt;/g, '<').replace(/&gt;/g, '>').replace(/&quot;/g, '"').replace(/&#0?39;|&apos;|&#8217;/g, "'")
   .replace(/&#(\d+);/g, (_, n) => String.fromCharCode(+n)).replace(/\s+/g, ' ').trim();
 const tag = (x, t) => { const m = x.match(new RegExp(`<${t}[^>]*>([\\s\\S]*?)</${t}>`, 'i')); return m ? m[1] : ''; };
-async function feed(url) {
+export async function feed(url) {
   const r = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; Morgenavis/1.0)' }, signal: AbortSignal.timeout(10000) }).catch(() => null);
   if (!r || !r.ok) return [];
   const xml = (await r.text().catch(() => '')).slice(0, 400000);
@@ -76,7 +76,7 @@ async function collect() {
   return out;
 }
 // текст статьи: абзацы <p> со страницы (не вышло — останется описание из RSS)
-async function article(url) { // → { text, img } (img — og:image страницы)
+export async function article(url) { // → { text, img } (img — og:image страницы)
   if (/news\.google\.com/.test(url)) return { text: '', img: '' };
   const r = await fetch(url, { headers: { 'user-agent': 'Mozilla/5.0 (compatible; Morgenavis/1.0)' }, signal: AbortSignal.timeout(9000) }).catch(() => null);
   if (!r || !r.ok || !/html/.test(r.headers.get('content-type') || '')) return { text: '', img: '' };
@@ -87,7 +87,7 @@ async function article(url) { // → { text, img } (img — og:image стран�
 }
 
 // ---------- Gemini ----------
-async function ask(env, prompt, schema, ok, temp = 0.4) {
+export async function ask(env, prompt, schema, ok, temp = 0.4) {
   const key = await geminiKey(env);
   if (!key) throw Object.assign(new Error('no_key'), { code: 'no_key' });
   let err = 'ai';
@@ -110,7 +110,7 @@ async function ask(env, prompt, schema, ok, temp = 0.4) {
 const INTS = { type: 'ARRAY', items: { type: 'INTEGER' } };
 const PICK_SCHEMA = { type: 'OBJECT', required: [...Object.keys(FEEDS), 'norge', 'mat'], properties: { ...Object.fromEntries(Object.keys(FEEDS).map(k => [k, INTS])), norge: { type: 'STRING' }, mat: { type: 'STRING' }, norge_q: { type: 'STRING' }, mat_q: { type: 'STRING' } } };
 // фото к рассказу: Wikimedia Commons (свободная лицензия, без ключа) → { img, photo } (photo — страница файла с автором и лицензией)
-async function commons(q) {
+export async function commons(q) {
   if (!q) return {};
   const u = 'https://commons.wikimedia.org/w/api.php?action=query&format=json&generator=search&gsrnamespace=6&gsrlimit=6&prop=imageinfo&iiprop=url|mime&iiurlwidth=900&gsrsearch=' + encodeURIComponent(q + ' filetype:bitmap');
   const r = await fetch(u, { headers: { 'user-agent': 'Morgenavis/1.0 (personal reading page)' }, signal: AbortSignal.timeout(8000) }).catch(() => null);

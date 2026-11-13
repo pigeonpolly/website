@@ -107,7 +107,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
 .post h3{font-size:23px;line-height:1.15;margin:8px 0 6px}
 .post img{width:130px;height:96px;object-fit:cover;border-radius:3px;background:var(--line)}
 /* Art Coo-rier (13.11.2026): последний выпуск новостей искусства — первым справа, с акцентной плашкой */
-.post.cr{position:relative}.cr-tag{display:inline-block;margin-bottom:8px;padding:4px 10px 3px;border-radius:2px;background:var(--acc);color:#fff;font:700 11px/1.2 var(--sans,system-ui),system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;box-shadow:0 6px 14px color-mix(in srgb,var(--acc) 26%,transparent)}
+.post.cr{position:relative}.cr-tag{display:table;margin-bottom:10px;padding:4px 10px 3px;border-radius:2px;background:var(--acc);color:#fff;font:700 11px/1.2 var(--sans,system-ui),system-ui,sans-serif;letter-spacing:.16em;text-transform:uppercase;box-shadow:0 6px 14px color-mix(in srgb,var(--acc) 26%,transparent)}
 .cr-tag::before{content:'✦ ';letter-spacing:0}
 .jr a:hover h3{color:var(--acc)}
 .jr .sk{background:var(--line);border-radius:4px;animation:sk 1.2s ease-in-out infinite alternate}
