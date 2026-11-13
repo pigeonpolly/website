@@ -1,4 +1,9 @@
 <section class="bp" id="bird-profile" aria-live="polite"><p class="sw-loading">…</p></section>
+<script>/* свой кабинет (/bird/ без ?nick=): пока грузится профиль — сразу «Мой кабинет» и Полли, а не «Стая › Все птички» и «…» (docs/bird.md) */
+(function(){if(new URLSearchParams(location.search).get('nick'))return;var i={ru:1,lv:2}[document.documentElement.lang]||0,
+T=[['My space','Мой кабинет','Mans kabinets'],['Opening your space','Открываю кабинет','Atveru kabinetu']],
+c=document.querySelector('.crumbs [aria-current]'),p=document.querySelector('#bird-profile .sw-loading');if(c)c.textContent=T[0][i];
+if(p){p.className='sw-loading bp-wait';p.innerHTML='<img src="/assets/logo.png" alt="" width="72" height="72"><span>'+T[1][i]+'<i>.</i><i>.</i><i>.</i></span>'}})();</script>
 <script src="/assets/challenge-data.js" defer></script>
 <script src="/assets/catalog-ui.js" defer></script>
 <script src="/assets/cards-ui.js" defer></script>

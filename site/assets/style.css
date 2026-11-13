@@ -5639,3 +5639,11 @@ a.wk-num.wk-n-link:hover, a.wk-num.wk-n-link:focus-visible { border-color: #D964
   .adm-birds td[data-l="Подарки"] .pill-btn { padding: 4px 10px; min-height: 0; font-size: 13px; white-space: nowrap; }
 }
 #adm-bq { width: min(380px, 100%); box-sizing: border-box; }
+/* свой кабинет /bird/, пока грузится профиль (src/pages/bird.html) */
+.bp-wait { display: flex; flex-direction: column; align-items: center; gap: 14px; padding: 48px 0 64px; margin: 0; text-align: center; font: italic 400 20px/1.4 Lora, Georgia, serif; color: inherit; }
+.bp-wait img { border-radius: 50%; animation: bp-wait-bob 1.2s ease-in-out infinite; }
+.bp-wait i { font-style: normal; animation: bp-wait-dot 1.2s infinite; opacity: .2; }
+.bp-wait i:nth-child(2) { animation-delay: .2s; } .bp-wait i:nth-child(3) { animation-delay: .4s; }
+@keyframes bp-wait-bob { 50% { transform: translateY(-6px) rotate(-4deg); } }
+@keyframes bp-wait-dot { 40% { opacity: 1; } }
+@media (prefers-reduced-motion: reduce) { .bp-wait img, .bp-wait i { animation: none; opacity: 1; } }
