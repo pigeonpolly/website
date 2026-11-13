@@ -18,7 +18,7 @@
 |---|---|---|---|
 | Кружки «Мои заметки» на главной (в редакторе блога — 🏠 и предупреждения у разделов) | 13.11.2026 | — | `HOME_SECS` |
 | Старая главная src/pages/home.html («Мой день», полоса игр, «Новости птички»); описание — docs/history.md «Старая главная» | 13.11.2026 | — | `pages/home.html` |
-| «★ Мои игры»: учёт заходов в игры, /api/games/mine, /api/games/visit, /api/games/top, worker/my-games.js | 13.11.2026 | таблица my_games остаётся в D1, никто не читает | `/api/games/visit` |
+| «★ Мои игры»: учёт заходов в игры, /api/games/mine, /api/games/visit, /api/games/top, worker/my-games.js | 13.11.2026 | таблица my_games удаляется сама один раз (meta `drop_my_games`) | `/api/games/visit` |
 | Блок блога старой главной (home-blog.js, home-blog.html); журнал главной — v2.js | 13.11.2026 | — | `home-blog.js` |
 | Блоки today, patreon, titos-case, about, shop-promo, flock-intro, game, sketching-guides, wl-holiday | 13.11.2026 | — | `{{block:today}}` |
 | Файлы wl-holidays.en/ru/lv.json (только для блока wl-holiday). Страница Wobbleland берёт праздники из wobbleland-data.<язык>.js, письма и новости — из wl-holidays.json | 13.11.2026 | — | `wl-holidays.{lang}.json` |

@@ -678,6 +678,13 @@ async function ensureSchemaRun(env) {
       await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('pick_price_11', '1')").run();
     }
   } catch (e) { bad = true; console.error('pick price', e); }
+  // 13.11.2026 (Алина): «★ Мои игры» старой главной убраны — таблицу my_games удалить один раз (docs/retired.md)
+  try {
+    if (!(await env.DB.prepare("SELECT value FROM meta WHERE key = 'drop_my_games'").first())) {
+      await env.DB.prepare('DROP TABLE IF EXISTS my_games').run();
+      await env.DB.prepare("INSERT OR REPLACE INTO meta (key, value) VALUES ('drop_my_games', '1')").run();
+    }
+  } catch (e) { bad = true; console.error('drop my_games', e); }
   // 11.10.2026: зелья получаются чаще — из книги убрать «не сработало» у сочетаний, которые теперь работают (один раз)
   try {
     if (!(await env.DB.prepare("SELECT value FROM meta WHERE key = 'potfail_v2'").first())) {
