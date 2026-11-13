@@ -25,7 +25,7 @@
   });
   // шрифты главной (в кабинете их нет): Fraunces 400 и курсив, Caveat
   const fonts = () => { if (document.getElementById('csb-fonts')) return; const l = document.createElement('link'); l.id = 'csb-fonts'; l.rel = 'stylesheet';
-    l.href = 'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,400;1,9..144,400&family=Caveat:wght@700&family=Nunito+Sans:wght@400;700&display=swap'; document.head.appendChild(l); };
+    l.href = 'https://fonts.googleapis.com/css2?family=Caveat:wght@700&family=Nunito+Sans:wght@400;700&display=swap'; document.head.appendChild(l); const f = document.createElement('link'); f.rel = 'stylesheet'; f.href = '/assets/fraunces.css'; document.head.appendChild(f); };
 
   // предпросмотр — так же, как на сайте (v2.js, страница /learn/v/<id>/)
   function sheet(S, lang) {
