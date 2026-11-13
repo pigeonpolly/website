@@ -11,5 +11,8 @@ import l06 from './l06.js';
 import l07 from './l07.js';
 import l08 from './l08.js';
 import l09 from './l09.js';
+import l10 from './l10.js';
+import l11 from './l11.js';
+import l12 from './l12.js';
 
-export const INK_LESSONS = [l01, l02, l03, l04, l05, l06, l07, l08, l09];
+export const INK_LESSONS = [l01, l02, l03, l04, l05, l06, l07, l08, l09, l10, l11, l12];

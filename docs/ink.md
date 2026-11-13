@@ -22,9 +22,9 @@
 7. ◐ Свет и тень (с. 41–47) — готов (все 7 картинок; Moss McCandle autumn-cozy/84 — «Фитилёк Маккендл» / «Dakts Makkendls», натюрморт со свечой).
 8. 💧 Вода и ошибки (с. 48–49) — готов (p48-85, p30-39, p26-23; Wren Windlow autumn-cozy/88 — «Крапивка Окошкина» / «Čipste Lodziņa», окно в дождь).
 9. ▦ Текстуры (с. 50–53) — готов (все, кроме p50-88; Baron von Worms halloween-2025/48.jpg — «Барон фон Червинс» / «Barons fon Slieka»).
-10. ☕ От чашек до стульев (с. 54–58): p54-104, p54-106, p55-108, p57-116. Клиент: Madame Teabite halloween-remix/63.
-11. ❦ Ботаника (с. 59–63): p61-118, p62-120. Клиент: Petunia Spookworth fall-2025/41.
-12. 🍞 Еда, рецепты, композиция и ритм (с. 64–68): p65-122, p67-125, p68-127. Клиент: Barnaby Burrows autumn-cozy/81.
+10. ☕ От чашек до стульев (с. 54–58) — готов (p54-104, p54-106, p55-108, p57-116; Madame Teabite halloween-remix/63 — «Мадам Тибайт» / «Madāma Teabite», как в room.js/pancakes.js; чайный сервиз и стул).
+11. ❦ Ботаника (с. 59–63) — готов (p61-118, p62-120; Petunia Spookworth fall-2025/41 — «Петуния Спуквёрт» / «Petūnija Spookworth», садовый дневник).
+12. 🍞 Еда, рецепты, композиция и ритм (с. 64–68) — готов (p65-122, p67-125, p68-127; Barnaby Burrows autumn-cozy/81 — «Барнаби Барроуз» / «Barnabijs Burrows», рецепт хлеба). Названия уроков = `PLAN` в ink-course.js.
 13. ⌂ Город (с. 69–72): p71-129, p72-131, p80-144. Клиент: Rusty Roamwell autumn-cozy/80.
 14. 🐦 Быстрые наброски, люди, птицы, животные (с. 73–78): p77-133, p77-135, p77-137, p78-139, p66-124. Клиент: Lady Puddle-Dip? (занята в 1-м курсе) → Mr.Dr.Fisher III classic/17.
 15. ✚ Смешанные техники + «продолжай» (с. 79–81): p79-140, p79-142, p80-144, p81-145. Клиент: Ghostina Gravy halloween-remix/67. После урока — список тем из книги: Forgotten Shoes, People in Line, Kitchen Table Chaos, Hands Holding an Object, Urban Birds and Food, Transport Window View, Bag Contents, A Sleeping Pet, Light and Shadow in a Hallway, Your Breakfast.
