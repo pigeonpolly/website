@@ -181,6 +181,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `tools/rooms/scenes_cases.py` (44K) — Места происшествия дел Титоса — по функции на дело (рисует tools/rooms/scenes.py, там же п: room, park, snailsquare, webcafe, carrotbar
 - `tools/rooms/shift.py` (30K) — «Смена с Полли» (/shift/, этап 29, docs/rooms.md): детальный кабинет 480x270 + передний сл: FLOOR_Y, BACK_HANG, OUT, wing, add
 - `tools/sec.py` (2K) — Печатает один раздел docs-файла.: HEAD, section, headings, find
+- `tools/dead_check.py` — хвосты убранного: маркеры из docs/retired.md в живом коде (ошибка), несобираемые страницы, блоки без страницы, site/assets без ссылок, /api без вызова. Только читает.
 - `tools/shots.py` (8K) — Снимки элемента страницы на нескольких ширинах (Playwright, Chromium из /opt/pw-browsers).: SHEET_W, OUT, ROOT, make_sheet, slug
 - `tools/study_page.py` (1K) — Учебник /study/ (worker/study.js): content/study/textbook.html → worker/study-page.js (стр: ROOT, notebook
 - `tools/titos_cast.py` (2K) — Жители Воббленда для дел Титоса → docs/titos-cast.md (одна строка на жителя: ключ, имя, го: ROOT, cast, slug
