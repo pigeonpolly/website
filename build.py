@@ -760,8 +760,8 @@ def build():
     loader = (SRC / "polly-loader.html").read_text()
     layout, layout_v2, layout_v2_lab = (re.sub(r"(<body[^>]*>)", lambda m: m.group(1) + "\n" + loader, t, count=1)
                                         for t in (layout, layout_v2, layout_v2_lab))
-    # номер версии сайта в подвале (показывает v2.js только админу)
-    vspan = f'<span class="ver" data-ver="{ver["n"]}" hidden>v{ver["n"]} · {ver["t"]}</span><span><a href="/privacy/">Privacy</a></span>'
+    # номер версии сайта в подвале (видно всем; v2.js сверяет со свежим version.json)
+    vspan = f'<span class="ver" data-ver="{ver["n"]}">v{ver["n"]} · {ver["t"]}</span><span><a href="/privacy/">Privacy</a></span>'
     layout_v2, layout_v2_lab = (t.replace('<span><a href="/privacy/">Privacy</a></span>', vspan) for t in (layout_v2, layout_v2_lab))
     search_index = {lang: [] for lang in LANGS}
     for path, title, file, desc in PAGES:
