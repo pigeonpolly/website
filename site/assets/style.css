@@ -2544,7 +2544,6 @@ details.am-art .am-series { padding: 0 24px 24px; }
 .be-app .be-vl button { border: 1px solid #E4DFDC; background: #fff; color: var(--pp-ink,#2B1A51); border-radius: 8px; padding: 5px 9px; font: 700 13px var(--sans); cursor: pointer; }
 .be-app .be-vl button[aria-pressed="true"] { background: var(--pp-ink,#2B1A51); color: #fff; border-color: var(--pp-ink,#2B1A51); }
 .be-nolang { color: #AAA39E; font-weight: 400; }
-.be-homelink { margin-right: 6px; cursor: help; }
 tr[data-s] td:first-child { white-space: nowrap; }
 tr[data-s] td:first-child .be-tr-in { width: calc(100% - 28px); }
 .adm-all { float: right; font: 600 14px var(--sans); color: #C0582F; }
@@ -5246,62 +5245,6 @@ button.gd-chip:hover { background: var(--peach); border-color: var(--peach); col
 .ps-dl2 { background: var(--pp-ink,#2B1A51); }
 .ps-back { background: transparent; color: var(--pp-2,#534AB7); box-shadow: inset 0 0 0 2px #CBC6C3; }
 
-/* Главная, 24.10.2026: «Мой день» вошедшему — вкладками (src/pages/home.html), «Игры» — полосой между блогом и книгой */
-.hd-tabs, .hd-games, .gm-pin { display: none; }
-html.me-in .home-dash { grid-template-columns: minmax(0, 250px) minmax(0, 1fr) minmax(0, 1.4fr); grid-template-rows: auto 1fr; column-gap: 32px; row-gap: 18px; max-width: 1440px; padding-top: 34px; align-items: start; }
-html.me-in .home-dash .myday, html.me-in .home-dash .md-in, html.me-in .hd-side { display: contents; }
-html.me-in .home-dash .md-me { grid-column: 1; grid-row: 1 / span 3; align-self: start; }
-html.me-in .home-dash .md-kick { display: none; }
-html.me-in .hd-tabs { display: flex; grid-column: 2 / -1; grid-row: 1; gap: 4px; border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
-.hd-tabs button { flex: none; display: inline-flex; align-items: center; gap: 6px; margin-bottom: -1px; padding: 10px 16px; border: 1px solid transparent; border-bottom: 0; border-radius: 12px 12px 0 0; background: none; color: var(--muted); font: 700 16px/1.2 var(--sans); cursor: pointer; }
-.hd-tabs button:hover { color: var(--text); }
-.hd-tabs button[aria-selected="true"] { background: var(--bg-card); border-color: var(--line); color: var(--text); }
-.hd-n { min-width: 20px; padding: 1px 7px; border-radius: 99px; background: var(--orange); color: #fff; font-size: 12px; text-align: center; }
-html.me-in .home-dash .md-card { grid-column: 2; grid-row: 2; }
-html.me-in .home-dash #blk-wl-holiday { grid-column: 3; grid-row: 2; }
-html.me-in .hd-news, html.me-in .hd-upd, html.me-in .hd-games { grid-column: 2 / -1; grid-row: 2; }
-html.me-in .hd-games, html.me-in .hd-rooms { display: block; }
-html.me-in .hd-rooms { grid-column: 2 / -1; grid-row: 2; } /* вкладка «Комнаты птичек» (25.10.2026) */
-html.me-in .home-dash:not([data-tab="rooms"]) .hd-rooms, html.me-in .hd-rooms .fn-h { display: none; }
-html.me-in .home-dash:not([data-tab="day"]) .md-card, html.me-in .home-dash:not([data-tab="day"]) #blk-wl-holiday,
-html.me-in .home-dash:not([data-tab="news"]) .hd-news, html.me-in .home-dash:not([data-tab="site"]) .hd-upd,
-html.me-in .home-dash:not([data-tab="games"]) .hd-games { display: none; }
-html.me-in .hd-news, html.me-in .hd-upd { min-height: 0; }
-html.me-in .hd-news .fn-h, html.me-in .hd-upd .fn-h { display: none; }
-html.me-in .hd-news .hd-scroll { position: static; max-height: 380px; }
-.hd-gm { grid-template-columns: repeat(3, minmax(0, 1fr)); padding: 0; max-width: none; margin: 0; }
-.hd-gm-note { margin: 12px 0 0; color: var(--muted); font-size: 15px; }
-.hd-gm-note a { color: var(--star); font-weight: 700; text-decoration: none; white-space: nowrap; }
-html.me-in .gm-pin { display: grid; position: absolute; top: 10px; right: 10px; z-index: 2; width: 36px; height: 36px; place-items: center; border-radius: 50%; background: rgba(43, 26, 81, .78); color: #fff; font-size: 19px; line-height: 1; cursor: pointer; transition: transform .15s; }
-.gm-pin:hover, .gm-pin:focus-visible { transform: scale(1.12); }
-html.me-in .gm-pin.on { background: var(--star); color: var(--pp-ink,#2B1A51); }
-.home-games { position: relative; padding: 46px 0 34px; background: var(--bg); }
-.home-games .hg-all { margin-bottom: 0; }
-@media (min-width: 901px) { /* 24.10.2026: на компьютере все игры в одну линию, без ползунка */
-  .home-games .gm-tiles { grid-auto-columns: minmax(0, 1fr); overflow: visible; scroll-snap-type: none; gap: 12px; }
-  .home-games .gm-tile .am-tile-txt { padding: 7px 9px 8px; }
-  .home-games .gm-tile .am-tile-txt b { font-size: clamp(13px, 1.05vw, 16px); }
-  .home-games .gm-tile .am-tile-txt i { font-size: clamp(10px, .8vw, 12px); }
-  .home-games .gm-tile .am-tile-ico { width: 28px; height: 28px; font-size: 14px; top: 8px; left: 8px; }
-  html.me-in .home-games .gm-pin { width: 30px; height: 30px; font-size: 16px; top: 8px; right: 8px; }
-}
-@media (max-width: 1360px) {
-  html.me-in .home-dash { grid-template-columns: minmax(0, 220px) minmax(0, 1fr); } /* праздник — под карточкой дня, иначе название переносится */
-  html.me-in .home-dash #blk-wl-holiday { grid-column: 2; grid-row: 3; }
-}
-@media (max-width: 760px) {
-  html.me-in .home-dash { grid-template-columns: minmax(0, 1fr); row-gap: 14px; padding-top: 22px; }
-  html.me-in .home-dash .md-me { grid-row: 1; }
-  html.me-in .hd-tabs { grid-column: 1; grid-row: 2; margin: 0 calc(-1 * var(--gutter)); padding: 0 var(--gutter); }
-  .hd-tabs button { padding: 9px 12px; font-size: 15px; }
-  html.me-in .home-dash .md-card, html.me-in .hd-news, html.me-in .hd-upd, html.me-in .hd-games, html.me-in .hd-rooms { grid-column: 1; grid-row: 3; }
-  html.me-in .home-dash #blk-wl-holiday { grid-column: 1; grid-row: 4; }
-  .hd-gm { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 8px; }
-  .hd-gm .am-tile-txt i { display: none; }
-  .hd-gm .gm-tile .am-tile-txt b { font-size: 13px; }
-  .hd-gm .am-tile-ico { display: none; }
-  html.me-in .gm-pin { width: 30px; height: 30px; font-size: 16px; top: 6px; right: 6px; }
-}
 .ps-dip-btn { display: inline-block; margin-left: 6px; padding: 2px 12px; border-radius: 999px; background: #E9A93B; color: var(--pp-ink,#2B1A51); font: 700 .9em var(--sans); }
 
 /* «Стол Алины» на /about-me/ (site/assets/about-desk.js, docs/site.md) */

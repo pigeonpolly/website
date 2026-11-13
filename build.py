@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Собирает сайт: src/layout.html + src/pages/*.html + content/*.json -> site/.
+"""Собирает сайт: src/layout-v2*.html + src/pages/*.html + content/*.json -> site/.
 
 Запуск: python3 build.py
 В страницах можно писать {{gallery:имя}} — подставится галерея из content/galleries/имя.json,
@@ -20,7 +20,7 @@ SITE_URL = "https://www.pigeonpolly.com"
 
 # path, title, file, description
 PAGES = [
-    # редизайн 2.0, часть 5 (11.11): новая главная (бывшая /preview/); старая src/pages/home.html больше не собирается
+    # редизайн 2.0, часть 5 (11.11): новая главная (бывшая /preview/)
     ("", "Pigeon Polly Art Lab", "preview.html",
      "Free watercolour and ink lessons, creative guides and books by artist Alina Otkinska, and a little painted world of Pigeon Polly."),
     ("projects", "Projects", "projects.html",
@@ -607,11 +607,6 @@ def wobbleland_data():
             for v in mp[part].values():
                 v["name"] = names.get(v["name"], v["name"])
         data["map"] = mp
-        # праздники для поздравления на главной (src/blocks/wl-holiday.html) — маленький файл без карты
-        hol = [{"m": h["m"], "d": h["d"], "k": c["key"], "c": c.get("short") or c["name"], "t": h["title"],
-                "x": re.sub(r"(?<![.!?])[;,:]?$", ".", re.split(r"(?<=[.!?;])\s", h.get("desc", ""))[0], count=1) if h.get("desc") else ""}
-               for c in data["cities"] for h in c["holidays"]]
-        (OUT / "assets" / f"wl-holidays.{lang}.json").write_text(json.dumps(hol, ensure_ascii=False, separators=(",", ":")))
         (OUT / "assets" / f"wobbleland-data.{lang}.js").write_text(
             "// Сгенерировано build.py из content/wobbleland.json — не править руками\nwindow.WOBBLELAND = "
             + json.dumps(data, ensure_ascii=False) + ";\n")
@@ -753,13 +748,12 @@ def build():
     rooms_data()
     wobbleland_data()
     titos_cases()
-    layout = (SRC / "layout.html").read_text()
     layout_v2 = (SRC / "layout-v2.html").read_text()
     layout_v2_lab = (SRC / "layout-v2-lab.html").read_text()
-    # Полли клюёт семечки, пока грузится страница — сразу после <body …> во всех трёх шаблонах
+    # Полли клюёт семечки, пока грузится страница — сразу после <body …> в обоих шаблонах
     loader = (SRC / "polly-loader.html").read_text()
-    layout, layout_v2, layout_v2_lab = (re.sub(r"(<body[^>]*>)", lambda m: m.group(1) + "\n" + loader, t, count=1)
-                                        for t in (layout, layout_v2, layout_v2_lab))
+    layout_v2, layout_v2_lab = (re.sub(r"(<body[^>]*>)", lambda m: m.group(1) + "\n" + loader, t, count=1)
+                                        for t in (layout_v2, layout_v2_lab))
     # номер версии сайта в подвале (видно всем; v2.js сверяет со свежим version.json)
     vspan = f'<span class="ver" data-ver="{ver["n"]}">v{ver["n"]} · {ver["t"]}</span><span><a href="/privacy/">Privacy</a></span>'
     layout_v2, layout_v2_lab = (t.replace('<span><a href="/privacy/">Privacy</a></span>', vspan) for t in (layout_v2, layout_v2_lab))

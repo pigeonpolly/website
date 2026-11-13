@@ -5,7 +5,7 @@
 - Стена работ участников (#works) с входом через Google, «Выбор Полли», парад, бейджи и уровни серий.
 - Раз в месяц — день ЭКСТРА: 6 цветов палитры картины Алины (очередь палитр ЭКСТРА).
 - Страница: `src/pages/challenge.html`. Тема: `site/assets/challenge-theme.js` (общий с воркером `extraDay`), `challenge.js`, `challenge-data.js`.
-- Стена и профиль-загрузка: `site/assets/sketch-wall.js`; «Полли, помоги»: `polly-help.js`; карусели: `carousel.js`.
+- Стена и профиль-загрузка: `site/assets/sketch-wall.js`; «Полли, помоги» — «Школа Полли» `polly-school.js`; карусели: `carousel.js`.
 - Сервер: `worker/index.js` (`streaks`, `extraQueue`, `moreBadges`, `/api/wall`, `/api/top`, `/api/img/<id>`).
 - D1: `users`, `posts`, `sessions`, `meta` (works_total, users_total, pick_*); картинки — R2 `MEDIA` (старые — KV `IMAGES`).
 

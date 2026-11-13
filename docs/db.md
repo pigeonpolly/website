@@ -61,7 +61,7 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **anon_names** (worker/index.js): `vid` text PK, `code` text UNIQUE nn, `created_at` int
 - **mail_out** (worker/mail.js): `id` int PK auto, `cat` text nn, `L` text nn, `status` text nn, `total` int =0, `sent` int =0, `created_at` int; + `aud_from` int =0, `aud_to` int =0, `aud_ids` text
 - **mail_sent** (worker/mail.js): `out_id` int nn, `user_id` int nn, `at` int; PRIMARY KEY (out_id, user_id)
-- **my_games** (worker/my-games.js): `user_id` int PK, `pins` text, `visits` text, `updated_at` int
+- **my_games** — не используется с 13.11.2026 («★ Мои игры» старой главной удалены, docs/retired.md); данные остаются: `user_id` int PK, `pins` text, `visits` text, `updated_at` int
 - **norsk_progress** (worker/norsk.js): `user_id` int PK, `state` text, `updated_at` int
 - **norsk_access** (worker/norsk.js): `user_id` int PK, `added_at` int
 - **nederlands_progress** (worker/nederlands.js): `user_id` int PK, `state` text, `updated_at` int

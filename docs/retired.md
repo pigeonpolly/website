@@ -7,19 +7,8 @@
 - Подробная история решений — docs/history.md; здесь — только что убрано и где могли остаться хвосты.
 
 ## Ждёт чистки
-Найдено аудитом 13.11.2026 (tools/dead_check.py + сверка с docs). Ничего ещё не удалено.
-
 | Что | С какого времени | Что осталось | Маркер |
 |---|---|---|---|
-| Кружки «Мои заметки» на главной, ведущие в разделы блога | старая главная, до 11.11 | blog-editor.js: список HOME_SECS, значок 🏠 у разделов, окно «⚠ Этот раздел связан с кружком на главной», лишний вопрос при удалении раздела, подсказка над таблицей разделов; блок src/blocks/patreon.html | `HOME_SECS` |
-| Старая главная src/pages/home.html («Мой день», «★ Мои игры», полоса игр, «Новости птички») | 11.11 (новая — preview.html) | сам файл (15 КБ); docs/site.md и docs/map.md до сих пор описывают её как текущую | `pages/home.html` |
-| «★ Мои игры» на главной | 11.11 | site.js шлёт POST /api/games/visit при каждом заходе в игру — пишет в таблицу my_games, которую никто не показывает; /api/games/mine, /api/games/top, worker/my-games.js | `/api/games/visit` |
-| Блок блога старой главной | 11.11 (журнал — v2.js) | site/assets/home-blog.js, src/blocks/home-blog.html | `home-blog.js` |
-| Блоки главной: today, patreon, titos-case, about, shop-promo, flock-intro, game, sketching-guides, wl-holiday | 18.10–11.11 | 10 файлов в src/blocks/ ни на одной странице | `{{block:today}}` |
-| Поздравление с праздником Воббленда на главной | 11.11 | build.py каждый раз пишет wl-holidays.en/ru/lv.json для блока wl-holiday (письма и новости берут общий wl-holidays.json — его не трогать) | `wl-holidays.{lang}.json` |
-| Кнопка «🕊 Полли, помоги нарисовать» (окно из 6 шагов) | заменена «Школой Полли» /polly-helps/ | site/assets/polly-help.js (17 КБ), нигде не подключён | `polly-help.js` |
-| Старый шаблон страниц src/layout.html | 11.11 (все страницы на layout-v2 / layout-v2-lab) | build.py читает файл и не использует | `SRC / "layout.html"` |
-| Черновые страницы | — | src/pages/bird2.html, src/pages/about-polly.html — build.py их не собирает | `bird2.html` |
 | Адреса /preview/… | 11.11 (301 на настоящие) | в шаблонах и словарях content/i18n остались /preview/…, build.py переписывает их на лету (V2_URLS) — костыль, не ошибка; чистить по желанию | — |
 
 ## Убрано
@@ -27,3 +16,12 @@
 
 | Что | Когда | Данные | Маркер |
 |---|---|---|---|
+| Кружки «Мои заметки» на главной (в редакторе блога — 🏠 и предупреждения у разделов) | 13.11.2026 | — | `HOME_SECS` |
+| Старая главная src/pages/home.html («Мой день», полоса игр, «Новости птички»); описание — docs/history.md «Старая главная» | 13.11.2026 | — | `pages/home.html` |
+| «★ Мои игры»: учёт заходов в игры, /api/games/mine, /api/games/visit, /api/games/top, worker/my-games.js | 13.11.2026 | таблица my_games остаётся в D1, никто не читает | `/api/games/visit` |
+| Блок блога старой главной (home-blog.js, home-blog.html); журнал главной — v2.js | 13.11.2026 | — | `home-blog.js` |
+| Блоки today, patreon, titos-case, about, shop-promo, flock-intro, game, sketching-guides, wl-holiday | 13.11.2026 | — | `{{block:today}}` |
+| Файлы wl-holidays.en/ru/lv.json (только для блока wl-holiday). Страница Wobbleland берёт праздники из wobbleland-data.<язык>.js, письма и новости — из wl-holidays.json | 13.11.2026 | — | `wl-holidays.{lang}.json` |
+| Окно «🕊 Полли, помоги нарисовать» (polly-help.js); теперь «Школа Полли» /polly-helps/ | 13.11.2026 | — | `polly-help.js` |
+| Старый шаблон src/layout.html | 13.11.2026 | — | `SRC / "layout.html"` |
+| Черновики страниц bird2.html, about-polly.html | 13.11.2026 | — | `bird2.html` |

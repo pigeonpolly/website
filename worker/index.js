@@ -16,7 +16,6 @@ import { flockApi, featherNews, FLOCK_TABLES, FLOCK_ALTER } from './flock.js'; /
 import { flockNewsApi, flockEvent as flockEventDb, roomEvent, flockNewsCron, FLOCK_NEWS_TABLES, FLOCK_NEWS_ALTER } from './flock-news.js'; // новости стаи (этап 13 Г, docs/flock.md)
 import { topApi, topScore, topCron, TOP_TABLES } from './top.js'; // доски топа игр (docs/games.md)
 import { mailApi, mailCron, mailGamesCron, mailAsk, mailPrefs, MAIL_TABLES, MAIL_ALTER, MAIL_RULES, MAIL_RANGE, MAIL_INT } from './mail.js'; // письма по согласию: окно, отписка, рассылка из кабинета (docs/bird.md «Письма»)
-import { myGamesApi, MY_GAMES_TABLES } from './my-games.js'; // «★ Мои игры» на главной (docs/site.md)
 import { aboutChatApi, aboutAskNews, aboutChatNews, ABOUT_CHAT_TABLES, ABOUT_CHAT_ALTER, ACHAT_RULES, ACHAT_RANGE, ACHAT_INT, ACHAT_BADGES, ACHAT_COND } from './about-chat.js'; // чат «Поболтать с Алиной и Полли» на /about-me/ (docs/site.md)
 import { shiftApi, SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_RANGE, SHIFT_INT } from './shift.js'; // «Смена с Полли» (этап 29, docs/rooms.md)
 import { studyApi, studyOk, STUDY_TABLES } from './study.js'; // личный учебник /study/ для Mr.Pepe и Алины (docs/site.md «Учебник»)
@@ -637,7 +636,6 @@ async function ensureSchemaRun(env) {
     ...TRAIN_TABLES.map(sql => prep(sql)), // «Поезд Полли»: train_runs (worker/train.js)
     ...PAN_TABLES.map(sql => prep(sql)), // «Блинная Полли»: pan_runs (worker/pancakes.js)
     ...GARDEN_TABLES.map(sql => prep(sql)), // огород: garden (worker/garden.js)
-    ...MY_GAMES_TABLES.map(sql => prep(sql)), // «★ Мои игры»: my_games (worker/my-games.js)
     ...ABOUT_CHAT_TABLES.map(sql => prep(sql)), // чат на /about-me/: about_chat (worker/about-chat.js)
     ...POLL_TABLES.map(sql => prep(sql)), // опросы: polls, poll_votes, poll_ideas (worker/polls.js)
     ...WEEK_TABLES.map(sql => prep(sql)), // переходы на Amazon: out_clicks (worker/week.js)
@@ -1171,8 +1169,6 @@ function uaInfo(ua, w, touch) {
     : /Firefox|FxiOS/.test(ua) ? 'Firefox' : /Chrome|CriOS/.test(ua) ? 'Chrome' : /Safari/.test(ua) ? 'Safari' : 'Другой';
   return { os, device, browser };
 }
-// страницы игр хаба /games/ — для «Игр» на главной (/api/games/top)
-const GAME_PATHS = ['/rain/', '/potions/', '/pancakes/', '/titos/', '/polly-office/', '/wobbleland/', '/advent/'];
 async function hit(req, env) {
   const ok = new Response(null, { status: 204 });
   const ua = req.headers.get('user-agent') || '';
@@ -1738,7 +1734,6 @@ async function route(req, env, url) {
   if (p === '/api/nederlands' || p === '/api/nederlands/access' || p === '/api/nederlands/tts') { const r = await nederlandsApi(req, env, url, studyHelpers(env)); if (r) return r; }
   if (p === '/api/artpill' || p.startsWith('/api/artpill/')) { const r = await artpillApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now }); if (r) return r; }
   if (p === '/api/school' || p.startsWith('/api/school/') || p === '/api/admin/school' || p === '/api/admin/school/check') { const r = await schoolApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is a short friendly comment from an art teacher (Polly, a pigeon) on a student\'s drawing made on paper. Keep it warm, simple and encouraging.') }); if (r) return r; }
-  if (p === '/api/games/mine' || p === '/api/games/visit') { const r = await myGamesApi(req, env, url, { json, fail, currentUser, needUser }); if (r) return r; }
   if (p === '/api/about-chat' || p.startsWith('/api/about-chat/') || p === '/api/admin/about-asks') { const r = await aboutChatApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), asset: path => env.ASSETS.fetch(new Request(new URL(path, url.origin))).then(r => r.ok ? r.json() : null), ipKey: async r => { let salt = await getMeta(env, 'blog_salt'); if (!salt) { salt = randomHex(16); await setMeta(env, 'blog_salt', salt); } return (await sha256(salt + (r.headers.get('cf-connecting-ip') || '0'))).slice(0, 24); }, translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The strings are a question a visitor asked in a cosy retro chat on an artist\'s website, or the answer of the artist Alina or of her character Polly, a dramatic, funny pigeon from the island of Wobbleland. Keep the casual, playful tone; keep names (Alina, Polly, Milka, Wobbleland) as they are.') }); if (r) return r; }
   if (m === 'POST' && p === '/api/admin/pause') return pauseApi(req, env, { json, fail, needUser, isAdmin, now });
   if (p === '/api/admin/week') { const r = await weekApi(req, env, url, { json, fail, needUser, isAdmin, getMeta, now }); if (r) return r; }
@@ -2591,15 +2586,6 @@ async function route(req, env, url) {
     const cards = (await env.DB.prepare('SELECT s.slug, s.en, s.ru, s.lv, s.created_at AS at, COUNT(c.id) AS n FROM card_sets s LEFT JOIN cards c ON c.collection = s.slug AND COALESCE(c.hidden, 0) = 0 WHERE s.created_at > ? GROUP BY s.slug ORDER BY s.created_at DESC').bind(since).all().catch(() => ({ results: [] }))).results
       .filter(s => s.n > 0).map(s => ({ slug: s.slug, title: { en: s.en, ru: s.ru, lv: s.lv }, at: s.at, n: s.n }));
     return json({ items, cards }, 200, { 'cache-control': 'no-store' });
-  }
-  // Игры на главной: популярность за 30 дней — люди в день (visits) на страницах игр, языки вместе (GAME_PATHS)
-  if (m === 'GET' && p === '/api/games/top') {
-    const from = new Date(Date.now() - 29 * 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
-    const all = GAME_PATHS.flatMap(x => [x, '/ru' + x, '/lv' + x]);
-    const rows = (await env.DB.prepare(`SELECT path, COUNT(DISTINCT day || vid) AS n FROM visits WHERE day >= ? AND path IN (${all.map(() => '?').join(',')}) GROUP BY path`).bind(from, ...all).all().catch(() => ({ results: [] }))).results;
-    const top = {};
-    for (const r of rows) { const x = r.path.replace(/^\/(ru|lv)(?=\/)/, ''); top[x] = (top[x] || 0) + r.n; }
-    return json({ top }, 200, { 'cache-control': 'public, max-age=600' });
   }
   if (m === 'POST' && p === '/api/shop/buy') {
     const u = await needUser(req, env);

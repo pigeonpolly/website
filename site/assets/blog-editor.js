@@ -34,8 +34,6 @@
   let flash = '', state = null, dirty = false, knownTags = {}, knownTagCounts = {}, dashTab = 'published', tagFilter = null, langFilter = 'all', picked = new Set();
   // фильтры списка: поиск, раздел, период, сортировка по столбцу
   const secsOf = p => String(p && p.section || '').split(',').map(x => x.trim()).filter(Boolean); // у статьи может быть несколько разделов
-  const HOME_SECS = ['traditional-art', 'technologies', 'education', 'pollys-life', 'tips-guides', 'stories'];
-  let warnedHome = false;
   const lf = { q: '', sec: '', from: '', to: '', fav: false, acc: '', sort: 'date', dir: -1 };
   // на каком языке показывать названия статей и разделов в списке (запоминается)
   let vl = 'ru'; try { vl = localStorage.getItem('pp-admin-lang') || 'ru'; } catch (e) {}
@@ -181,10 +179,10 @@
     };
     // словарь тегов: английский тег (как в статьях) и его перевод — правится прямо в таблице
     // разделы блога (как коллекции на Patreon)
-    const sectionsHtml = () => `<p class="be-note">Разделы — крупные темы блога (как коллекции на Patreon). У каждой статьи один раздел; читатели видят их кнопками над списком статей. Названия на RU и LV подставляются сами — их можно поправить прямо здесь. 🏠 — на раздел ведёт кружок на главной странице.</p>
+    const sectionsHtml = () => `<p class="be-note">Разделы — крупные темы блога (как коллекции на Patreon). У каждой статьи один раздел; читатели видят их кнопками над списком статей. Названия на RU и LV подставляются сами — их можно поправить прямо здесь.</p>
       <form class="be-newsec" id="be-newsec"><input type="text" name="en" placeholder="Название нового раздела (на английском), например Weekly Polly" required maxlength="60"><button class="pill-btn pill-fill" type="submit">＋ Добавить раздел</button></form>
       ${sections.length ? `<table class="be-table be-tagtable"><thead><tr><th>EN</th><th>RU</th><th>LV</th><th>Статей</th><th>Порядок</th><th></th></tr></thead><tbody>
-      ${sections.map((r, i) => `<tr data-s="${esc(r.slug)}"><td>${HOME_SECS.includes(r.slug) ? '<span class="be-homelink" title="На этот раздел ведёт кружок на главной странице">🏠</span>' : ''}<input type="text" class="be-tr-in" data-f="en" value="${esc(r.en)}"></td><td><input type="text" class="be-tr-in" data-f="ru" value="${esc(r.ru)}"></td><td><input type="text" class="be-tr-in" data-f="lv" value="${esc(r.lv)}"></td>
+      ${sections.map((r, i) => `<tr data-s="${esc(r.slug)}"><td><input type="text" class="be-tr-in" data-f="en" value="${esc(r.en)}"></td><td><input type="text" class="be-tr-in" data-f="ru" value="${esc(r.ru)}"></td><td><input type="text" class="be-tr-in" data-f="lv" value="${esc(r.lv)}"></td>
         <td>${r.count}</td><td class="be-acts"><button type="button" class="be-ico" data-move="-1" ${i ? '' : 'disabled'} aria-label="Выше">↑</button><button type="button" class="be-ico" data-move="1" ${i < sections.length - 1 ? '' : 'disabled'} aria-label="Ниже">↓</button></td>
         <td><button type="button" class="be-ico be-danger" data-delsec aria-label="Удалить раздел">✕</button></td></tr>`).join('')}</tbody></table>` : '<p class="be-note">Разделов пока нет.</p>'}`;
     const SRC = { glossary: 'словарь', auto: 'автоперевод', manual: 'вы' };
@@ -338,13 +336,9 @@
       for (const [k, r] of list.entries()) await api('blog/admin/section-set', { slug: r.slug, en: r.en, ru: r.ru, lv: r.lv, sort: k + 1 });
       dashboard();
     }));
-    // разделы, на которые ведут кружки «Мои заметки» на главной (src/blocks/patreon.html, data-section)
-    const warnHome = slug => HOME_SECS.includes(slug) && !warnedHome && (warnedHome = true,
-      alert('⚠ Этот раздел связан с кружком на главной странице («Мои заметки»).\n\nЕсли изменить название здесь, подпись под кружком на главной останется прежней.\nЕсли удалить раздел, кружок на главной будет вести на пустую страницу.\n\nСкажите Claude, чтобы поменять кружки вместе с разделом.'), true);
-    app.querySelectorAll('tr[data-s] .be-tr-in').forEach(inp => inp.addEventListener('focus', () => warnHome(inp.closest('tr').dataset.s)));
     app.querySelectorAll('[data-delsec]').forEach(b => b.addEventListener('click', async () => {
       const r = sections.find(x => x.slug === b.closest('tr').dataset.s);
-      if (!confirm(`Удалить раздел «${r.en}»? Статьи останутся, просто без раздела.${HOME_SECS.includes(r.slug) ? '\n\n⚠ На этот раздел ведёт кружок на главной странице — после удаления он будет вести на пустую страницу.' : ''}`)) return;
+      if (!confirm(`Удалить раздел «${r.en}»? Статьи останутся, просто без раздела.`)) return;
       await api('blog/admin/section-delete', { slug: r.slug }); dashboard();
     }));
     const ts = app.querySelector('#be-tagsort'); ts && ts.addEventListener('change', () => { tagSort = ts.value; dashboard(); });
