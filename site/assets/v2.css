@@ -532,6 +532,16 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 .flt button i{font-style:normal;opacity:.6;margin-left:4px}
 .flt button[aria-pressed=true]{background:var(--ink);color:var(--paper,#fff)}.flt button[aria-pressed=true] i{opacity:.8}
 .flt-st{color:var(--mut);font-size:14px}.flt-st a{color:var(--acc);text-decoration:underline}
+/* 13.11 компактнее: каждая группа — одна таблетка с сегментами, без подписей и чисел; строка о входе — отдельно ниже */
+.flt{gap:10px 12px;margin:-14px 0 28px}
+.flt-g:not(.flt-x){flex-wrap:nowrap;gap:0;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden}
+.flt .flt-g+.flt-g:not(.flt-x){padding-left:0;border-left:1.5px solid var(--ink)}
+.flt-g:not(.flt-x) .flt-l{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+.flt-g:not(.flt-x) button{border:0;border-radius:0;padding:7px 13px;font-size:12.5px;white-space:nowrap}
+.flt-g:not(.flt-x) button+button{border-left:1px solid var(--line,rgba(0,0,0,.15))}
+.flt-g:not(.flt-x) button i{display:none}
+.flt-x{flex-basis:100%;margin-left:0;gap:14px}.flt-st{font-size:13px}
+@media(max-width:700px){.flt-g:not(.flt-x){max-width:100%;overflow-x:auto;scrollbar-width:none}.flt-g:not(.flt-x)::-webkit-scrollbar{display:none}.flt-g:not(.flt-x) button{padding:7px 11px}}
 .vc[hidden]{display:none}
 .vc.lock .th img,.vl.lock .th img{filter:blur(9px) saturate(.8);transform:scale(1.08)}
 .vc.lock b{filter:blur(3px);user-select:none}.vc.lock .pl{background:rgba(255,255,255,.86)}

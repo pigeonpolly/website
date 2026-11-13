@@ -205,7 +205,7 @@
       fg.querySelectorAll('[data-ytn]').forEach(ytName);
       // два фильтра вместе: доступ (все / открытые всем / для своих) и вид (видео / курс / шпаргалка); числа — с учётом другого фильтра
       const FA = [['all', G.all[L]], ['free', G.openAll[L]], ['vip', G.vipB[L]]], FT = [['all', G.allT[L]], ['video', G.vidF[L]], ['course', G.course[L]], ['howto', G.howto[L]]];
-      const FL = [['all', G.all[L]], ['en', 'English'], ['ru', 'Русский'], ['lv', 'Latviešu']];
+      const FL = [['all', ['All languages', 'Все языки', 'Visas valodas'][L]], ['en', 'EN'], ['ru', 'RU'], ['lv', 'LV']];
       const grp = (g, lb, F) => `<div class="flt-g" role="group" aria-label="${lb}"><span class="flt-l">${lb}</span>${F.map(([k, n], i) => `<button type="button" data-g="${g}" data-k="${k}" aria-pressed="${i ? 'false' : 'true'}">${n} <i></i></button>`).join('')}</div>`;
       fg.insertAdjacentHTML('beforebegin', `<div class="flt">${grp('a', G.accL[L], FA)}${grp('t', G.typL[L], FT)}${grp('l', G.lngL[L], FL)}<div class="flt-g flt-x">`
         + (SEEN.size ? `<label class="flt-sn"><input type="checkbox"> ${W.hide[L]}</label>` : '')
