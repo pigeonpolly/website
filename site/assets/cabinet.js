@@ -30,7 +30,7 @@
     dipNext: ['On the way to a diploma', 'На пути к диплому', 'Ceļā uz diplomu'],
     guidesH: ['🎬 Video lessons', '🎬 Видеоуроки', '🎬 Video nodarbības'],
     allT: ['All video lessons', 'Все видеоуроки', 'Visas video nodarbības'],
-    allS: ['Free lessons and VIP lessons — in one place', 'Бесплатные и VIP-уроки — в одном месте', 'Bezmaksas un VIP nodarbības — vienuviet'],
+    allS: ['Free lessons and lessons for insiders — in one place', 'Бесплатные уроки и уроки для своих — в одном месте', 'Bezmaksas nodarbības un nodarbības saviem — vienuviet'],
     seeAll: ['See all →', 'Смотреть все →', 'Skatīt visus →'],
     gNew: ['New', 'Новое', 'Jaunākais'], gLast: ['Last watched', 'Последний просмотренный', 'Pēdējais skatītais'],
     gNext: ['Next to watch', 'Посмотреть дальше', 'Skaties tālāk'], gSeen: ['watched', 'просмотрено', 'skatīts'],
@@ -105,7 +105,7 @@
       if (last && last === vids[0].id) pick[0][1] = t('gNew') + ' · ' + t('gSeen');
       guides.innerHTML = '<div class="cab-grid">' + pick.map(([v, k]) => `<a class="cab-card cab-vid" href="${pre}/learn/v/${encodeURIComponent(v.id)}/" data-ytn="${v.id}">
         <span class="cab-cover"><img src="${v.cover || (v.vip ? '/images/v2/lesson-szmal.jpg' : `https://i.ytimg.com/vi/${v.id}/hqdefault.jpg`)}" alt="" loading="lazy"><i>▶</i></span>
-        <span class="cab-k">${k}${v.vip ? ' · VIP' : ''}</span><b>${esc(v.name || (v.vip ? t('vipT') : '…'))}</b><em>${t('watch')}</em></a>`).join('')
+        <span class="cab-k">${k}${v.vip ? ' · ' + ['For insiders', 'Для своих', 'Saviem'][L] : ''}</span><b>${esc(v.name || (v.vip ? t('vipT') : '…'))}</b><em>${t('watch')}</em></a>`).join('')
         + `<a class="cab-card cab-more" href="${pre}/learn/"><span class="cab-k">${t('guidesH').slice(3)}</span><b>${t('allT')}</b><p>${t('allS')}</p><em class="cab-go">${t('seeAll')}</em></a></div>`;
       guides.querySelectorAll('.cab-vid').forEach((a, i) => {
         if (pick[i][0].vip || pick[i][0].name) return;
