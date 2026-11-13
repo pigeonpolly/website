@@ -22,7 +22,7 @@ body.ppu-open #ppu-tab{opacity:0;pointer-events:none}
 #ppu h3{margin:10px 0 4px;font-size:15px;font-weight:800;color:${A}}
 #ppu p{margin:4px 0 6px}#ppu .tip{background:${S};border-radius:10px;padding:6px 10px;font-size:13px}
 #ppu .r{display:grid;grid-template-columns:5.6em 4.2em 1fr;gap:0 6px;align-items:baseline;padding:3px 0;border-bottom:1px solid ${L}}#ppu .r b{font-size:15px}#ppu .r>span{color:${A};font-weight:800}#ppu .r.n{grid-template-columns:1fr}
-#ppu .m{width:100%;border-collapse:collapse;text-align:center;margin:4px 0 6px;font-size:15px}#ppu .m th,#ppu .m td{border:1px solid ${L};padding:4px}#ppu .m th{font-size:12px;font-weight:600;opacity:.8}#ppu .m td:first-child{color:${A};font-weight:800;font-size:17px}#ppu .m td{font-weight:800}
+#ppu .m{width:100%;border-collapse:collapse;text-align:center;margin:4px 0 6px;font-size:15px}#ppu .m th,#ppu .m td{border:1px solid ${L};padding:4px}#ppu .m th{font-size:12px;font-weight:600;opacity:.8}#ppu .m td{font-weight:800;text-align:left;padding-left:10px}#ppu .m td[rowspan]{color:${A};font-size:20px;text-align:center;width:35%}#ppu .m th{text-transform:none;letter-spacing:0}
 #ppu .ex{display:inline-flex;align-items:center;gap:3px;margin:0 8px 0 0;border:0;background:none;color:inherit;font:inherit;padding:1px 2px;border-radius:6px;cursor:pointer;text-align:left}
 #ppu .ex i{font-style:normal;opacity:.7;font-size:12.5px}
 #ppu .ex::before{content:'🔊';font-size:11px;opacity:.55}
@@ -34,8 +34,10 @@ body.ppu-open #ppu-tab{opacity:0;pointer-events:none}
   const row = (a, s, ...ex) => a || s ? `<div class="r"><b>${a}</b><span>${s.replace(/[[\]]/g, '')}</span><div>${ex.join('')}</div></div>` : `<div class="r n"><div>${ex.join('')}</div></div>`;
   const sec = [
     ['kon', 'Согласные с сюрпризом', `<p class="tip">Запомнить просто: <b>3 звука</b> — хь, ш, й. Каждый получается двумя путями: перед «мягкими» гласными <b>i y ei øy</b> или с буквой <b>j</b>.</p>
-<table class="m"><tr><th>звук</th><th>+ i y ei øy</th><th>с j</th></tr>
-<tr><td>хь</td><td>k</td><td>kj · tj</td></tr><tr><td>ш</td><td>sk</td><td>sj · skj</td></tr><tr><td>й</td><td>g</td><td>gj · hj · lj</td></tr></table><div class="t">
+<table class="m"><tr><th>пишется</th><th>читается</th></tr>
+<tr><td>k + i y ei øy</td><td rowspan="2">хь</td></tr><tr><td>kj · tj</td></tr>
+<tr><td>sk + i y ei øy</td><td rowspan="2">ш</td></tr><tr><td>sj · skj</td></tr>
+<tr><td>g + i y ei øy</td><td rowspan="2">й</td></tr><tr><td>gj · hj · lj</td></tr></table><div class="t">
 ${row('k / kj', 'хь', e('kino', 'хи́ну', 'кино'), e('kjøpe', 'хьё́пе', 'покупать'))}
 ${row('sk / sj', 'ш', e('ski', 'ши', 'лыжи'), e('sjø', 'шё', 'море'))}
 ${row('g / gj', 'й', e('gi', 'йи', 'давать'), e('gjøre', 'йё́ре', 'делать'))}
