@@ -13,17 +13,13 @@
     space: ['My space', 'Мой кабинет', 'Mans kabinets'],
     learnT: ['Learning', 'Учёба', 'Mācības'],
     room: ['Bird’s room', 'Комната птички', 'Putniņa istaba'],
-    shop: ['Shop', 'Магазин', 'Veikals'], env: ['Envelope', 'Конвертик', 'Aploksnīte'], edit: ['Edit page', 'Править страницу', 'Labot lapu'],
+    shop: ['Shop', 'Магазин', 'Veikals'], edit: ['Edit page', 'Править страницу', 'Labot lapu'],
     nick: ['Choose a nickname', 'Выбрать ник', 'Izvēlēties segvārdu'],
     noNick: ['no nickname yet', 'ник ещё не выбран', 'segvārds vēl nav izvēlēts'],
     out: ['Sign out', 'Выйти', 'Iziet'],
     menu: ['Account', 'Аккаунт', 'Konts'],
     admin: ['admin', 'админ', 'admins'],
-    cabinet: ['Admin dashboard', 'Кабинет', 'Kabinets'],
-    study: ['Textbook', 'Учебник', 'Mācību grāmata'],
-    english: ['English course', 'Учебник английского', 'Angļu valodas mācību grāmata'],
-    norsk: ['Norwegian course', 'Учебник норвежского', 'Norvēģu valodas mācību grāmata'],
-    nederlands: ['Dutch course', 'Учебник нидерландского', 'Nīderlandiešu valodas mācību grāmata'],
+    cabinet: ['Admin', 'Админка', 'Admin panelis'],
     nTitle: ['Meet your bird! Now pick a nickname', 'Знакомься со своей птичкой! Теперь выбери ник', 'Iepazīsties ar savu putniņu! Tagad izvēlies segvārdu'],
     nTitleCat: ['You are a cat! Now pick a nickname', 'Ты котик! Теперь выбери ник', 'Tu esi kaķītis! Tagad izvēlies segvārdu'],
     nTitleCrow: ['You are a crow with a treasure! Now pick a nickname', 'Ты ворона с сокровищем! Теперь выбери ник', 'Tu esi vārna ar dārgumu! Tagad izvēlies segvārdu'],
@@ -257,12 +253,8 @@
           <p class="acct-name">${u.nick ? '@' + esc(u.nick) : `<i>${t('noNick')}</i>`}${u.admin ? ` <span class="acct-badge">★ ${t('admin')}</span>` : ''}</p>
           ${u.nick ? `<p class="acct-btns">${u.streak ? `<span>${t('streak')(u.streak)}</span>` : ''}<span title="${window.PPSew || ''}">🔘 <b>${u.buttons || 0}</b> ${t('btns')}</span></p>` : ''}
           ${u.nick ? [['/bird/', '🪺', 'space'], ['/bird/#learn', '📚', 'learnT'], ['/bird/#room', '🏠', 'room'], ['/shop/', '🛍', 'shop']]
-            .map(([h, i, k]) => `<a role="menuitem" href="${pre}${h}"><i aria-hidden="true">${i}</i>${t(k)}</a>`).join('') + `<button type="button" role="menuitem" data-env><i aria-hidden="true">✉️</i>${t('env')}</button>`
-            + (u.study ? `<a role="menuitem" href="/study/"><i aria-hidden="true">📘</i>${t('study')}</a>` : '') // личный учебник (worker/study.js)
-            + (u.english ? `<a role="menuitem" href="/english/"><i aria-hidden="true">🇬🇧</i>${t('english')}</a>` : '') // учебник английского (worker/english.js)
-            + (u.norsk ? `<a role="menuitem" href="/norsk/"><i aria-hidden="true">🇳🇴</i>${t('norsk')}</a>` : '') // учебник норвежского (worker/norsk.js)
-            + (u.nederlands ? `<a role="menuitem" href="/nederlands/"><i aria-hidden="true">🇳🇱</i>${t('nederlands')}</a>` : '') // учебник нидерландского (worker/nederlands.js)
-            : `<a role="menuitem" href="${pre}/challenge/">${t('nick')}</a>`}
+            .map(([h, i, k]) => `<a role="menuitem" href="${pre}${h}"><i aria-hidden="true">${i}</i>${t(k)}</a>`).join('') // учебники — на полке во вкладке «Учёба» (cabinet.js BOOK), конвертик — колокольчик 🔔 (news.js)
+            :`<a role="menuitem" href="${pre}/challenge/">${t('nick')}</a>`}
           ${u.admin ? `<hr><a role="menuitem" href="/admin/"><i aria-hidden="true">⚙</i>${t('cabinet')}</a><a role="menuitem" href="/admin/#runes"><i aria-hidden="true">🔮</i>Руны</a>${document.querySelector('[data-ppb]') ? `<button type="button" role="menuitem" data-edit><i aria-hidden="true">✏️</i>${t('edit')}</button>` : ''}` : ''}
           <hr><button type="button" role="menuitem" data-out>${t('out')}</button>
         </div>`;
@@ -270,8 +262,6 @@
       const ed = el.querySelector('[data-edit]');
       if (ed) ed.addEventListener('click', () => { el.querySelector('.acct-pop').hidden = true; editPage(); });
       if (u.admin && document.querySelector('[data-ppb-hidden]')) document.documentElement.classList.add('pp-admin');
-      const env = el.querySelector('[data-env]'); // конвертик — лента новостей птички (news.js)
-      if (env) env.addEventListener('click', () => { el.querySelector('.acct-pop').hidden = true; if (window.PPNews) window.PPNews.open(); });
       // своя страница профиля: /bird/#room и т.п. меняет только якорь — sketch-wall.js ловит hashchange
       el.querySelectorAll('.acct-pop a[href*="/bird/#"]').forEach(a => a.addEventListener('click', () => { el.querySelector('.acct-pop').hidden = true; }));
       if (window.PPBirds) el.querySelector('canvas').getContext('2d').drawImage(window.PPBirds.spriteHD(window.PPBirds.dress(window.PPBirds.looks(u.id), u.avatar), 0), -8, -2); // детальная птичка
