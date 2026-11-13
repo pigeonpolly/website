@@ -30,7 +30,7 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="/assets/fraunces.css?v=21446b03">
 <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;700&family=Caveat:wght@700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Nunito+Sans:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=232c1161">
+<link rel="stylesheet" href="/assets/style.css?v=3287dbd9">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
 <link rel="stylesheet" href="/assets/v2-shell.css?v=a5c24f2f">
 <script>/* вход: /api/whoami сразу, параллельно с загрузкой скриптов — account.js возьмёт ответ (PPWhoP) */try{if(!/devdate=/.test(location.search)&&!sessionStorage.getItem('pp-devdate'))window.PPWhoP=fetch('/api/whoami',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
@@ -119,10 +119,10 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 <main id="main">
 <nav class="crumbs" aria-label="Kur es esmu"><a href="/lv/flock/"><span class="nm-t">Bars</span></a><span aria-hidden="true">›</span><span aria-current="page" class="ns-t">Visi putniņi</span></nav>
 <section data-ppb="bird.1" class="bp" id="bird-profile" aria-live="polite"><p class="sw-loading">…</p></section>
-<script>/* свой кабинет (/bird/ без ?nick=): пока грузится профиль — сразу «Мой кабинет» и Полли, а не «Стая › Все птички» и «…» (docs/bird.md) */
+<script>/* свой кабинет (/bird/ без ?nick=): пока грузится профиль — без «Стая › Все птички» над страницей и с Полли вместо «…» (docs/bird.md) */
 (function(){if(new URLSearchParams(location.search).get('nick'))return;var i={ru:1,lv:2}[document.documentElement.lang]||0,
-T=[['My space','Мой кабинет','Mans kabinets'],['Opening your space','Открываю кабинет','Atveru kabinetu']],
-c=document.querySelector('.crumbs [aria-current]'),p=document.querySelector('#bird-profile .sw-loading');if(c)c.textContent=T[0][i];
+T=[0,['Opening your space','Открываю кабинет','Atveru kabinetu']],
+c=document.querySelector('.crumbs'),p=document.querySelector('#bird-profile .sw-loading');if(c)c.hidden=true;
 if(p){p.className='sw-loading bp-wait';p.innerHTML='<img src="/assets/logo.png" alt="" width="72" height="72"><span>'+T[1][i]+'<i>.</i><i>.</i><i>.</i></span>'}})();</script>
 <script src="/assets/challenge-data.js?v=221dbfb9" defer></script>
 <script src="/assets/catalog-ui.js?v=4150391c" defer></script>
@@ -130,7 +130,7 @@ if(p){p.className='sw-loading bp-wait';p.innerHTML='<img src="/assets/logo.png" 
 <script src="/assets/feathers.js?v=0250b89b" defer></script>
 <script src="/assets/sketch-wall.js?v=7e8415bc" defer></script>
 <script src="/assets/flock-news.js?v=27b75277" defer></script>
-<script src="/assets/cabinet.js?v=7b67df57" defer></script>
+<script src="/assets/cabinet.js?v=023487af" defer></script>
 
 </main>
 <dialog class="modal" id="contact" aria-labelledby="contact-t">
@@ -161,7 +161,7 @@ if(p){p.className='sw-loading bp-wait';p.innerHTML='<img src="/assets/logo.png" 
     <div><h4 data-f>Bars</h4><a href="/lv/flock/" data-f>Visi putniņi</a><a href="/lv/flock/news/" data-f>Bara ziņas</a><a href="/lv/challenge/" data-f>Dienas izaicinājums</a><a href="/lv/challenge/#sw-wall" data-f>Bara zīmējumi</a><a href="/lv/requests/" data-f>Uzzīmē man</a><a href="/lv/garden/" data-f>Putniņa dārzs</a></div>
     <div><h4 data-f>Alīna</h4><a href="/lv/sketchbook/" data-f>Skiču burtnīca</a><a href="/lv/about-me/" data-f>Par mani</a><a href="/lv/on-walls-and-pages/" data-f>Uz sienām un lapām</a><a href="/lv/projects/" data-f>Mācības un MI</a><a href="/lv/work-with-me/" data-f>Sadarbība</a><a href="/lv/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Alīna Otkinska · Pigeon Polly Art Lab · Rīga</span><span class="ver" data-ver="9">v9 · 13.11 17:33</span><span><a href="/lv/privacy/">Privātums</a></span></div>
+  <div class="bt"><span>© 2026 Alīna Otkinska · Pigeon Polly Art Lab · Rīga</span><span class="ver" data-ver="10">v10 · 13.11 17:36</span><span><a href="/lv/privacy/">Privātums</a></span></div>
 </div></footer>
 </body>
 </html>

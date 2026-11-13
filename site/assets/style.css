@@ -5647,3 +5647,4 @@ a.wk-num.wk-n-link:hover, a.wk-num.wk-n-link:focus-visible { border-color: #D964
 @keyframes bp-wait-bob { 50% { transform: translateY(-6px) rotate(-4deg); } }
 @keyframes bp-wait-dot { 40% { opacity: 1; } }
 @media (prefers-reduced-motion: reduce) { .bp-wait img, .bp-wait i { animation: none; opacity: 1; } }
+.crumbs[hidden] { display: none !important; }

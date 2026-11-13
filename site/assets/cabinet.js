@@ -130,7 +130,7 @@
     if (!page || !e.detail || !e.detail.mine) { document.body.classList.remove('cab-on'); return; }
     document.body.classList.add('cab-on');
     document.title = t('title') + ' · Pigeon Polly';
-    const cr = document.querySelector('.crumbs [aria-current]'); if (cr) cr.textContent = t('title');
+    const cr = document.querySelector('.crumbs'); if (cr) cr.hidden = true; // свой кабинет — не раздел «Стаи»
     const head = page.querySelector('.bp-head');
     const kids = [...page.children].filter(x => x !== head);
     const accAt = kids.findIndex(x => x.classList.contains('bp-acc'));
