@@ -136,11 +136,16 @@
     watch: ['Watch →', 'Смотреть →', 'Skatīties →'], lock: ['Sign in to watch', 'Войдите, чтобы смотреть', 'Ienāc, lai skatītos'], signin: ['Sign in →', 'Войти →', 'Ienākt →'],
     pdf: ['Free PDF', 'Бесплатный PDF', 'Bezmaksas PDF'], dl: ['Download free →', 'Скачать бесплатно →', 'Lejupielādēt bez maksas →'],
     amz: ['Amazon', 'Amazon', 'Amazon'], onAmz: ['On Amazon →', 'На Amazon →', 'Amazon →'],
-    guide: ['Book', 'Книга', 'Grāmata'], soon: ['Soon', 'Скоро', 'Drīzumā'], soonS: ['Coming soon to the site', 'Скоро на сайте', 'Drīzumā vietnē'], soonB: ['Coming soon', 'Скоро выйдет', 'Drīzumā'], vipOpen: ['VIP lesson · open for you', 'VIP-урок · открыт для тебя', 'VIP nodarbība · atvērta tev'],
-    all: ['All', 'Все', 'Visas'], freeF: ['Free', 'Бесплатные', 'Bezmaksas'], fl: ['Filter lessons', 'Фильтр уроков', 'Filtrēt nodarbības'],
+    guide: ['Book', 'Книга', 'Grāmata'], soon: ['Soon', 'Скоро', 'Drīzumā'], soonS: ['Coming soon to the site', 'Скоро на сайте', 'Drīzumā vietnē'], soonB: ['Coming soon', 'Скоро выйдет', 'Drīzumā'], vipOpen: ['Insider lesson · open for you', 'Урок для своих · открыт для тебя', 'Nodarbība saviem · atvērta tev'],
+    all: ['All', 'Все', 'Visas'], course: ['Courses', 'Курсы', 'Kursi'], howto: ['Cheat sheets', 'Шпаргалки', 'Špikeri'], vipB: ['For insiders', 'Для своих', 'Saviem'], openAll: ['Open to all', 'Открытые всем', 'Atvērti visiem'], allT: ['Everything', 'Всё', 'Viss'], vidF: ['Videos', 'Видео', 'Video'],
+    accL: ['Access', 'Доступ', 'Pieeja'], typL: ['Type', 'Вид', 'Veids'], tpV: ['Video', 'Видео', 'Video'], tpC: ['Course', 'Курс', 'Kurss'],
+    noneE: ['Nothing here yet with these filters.', 'С такими фильтрами пока ничего нет.', 'Ar šiem filtriem pagaidām nekā nav.'], cs: ['Cheat sheet', 'Шпаргалка', 'Špikeris'], pg: [n => `${n} ${n === 1 ? 'page' : 'pages'}`, n => `страниц: ${n}`, n => `lpp.: ${n}`],
+    pdfO: ['Open the PDF ↗', 'Открыть PDF ↗', 'Atvērt PDF ↗'], hwLock: ['This cheat sheet is for insiders. Sign in for free and it opens right here.', 'Эта шпаргалка — для своих. Войдите бесплатно — и она откроется прямо здесь.', 'Šis špikeris ir saviem. Ienāc bez maksas, un tas atvērsies tepat.'],
+    courseE: ['Courses are several lessons in a row on one theme. The first one is on its way!', 'Курсы — несколько уроков подряд на одну тему. Первый уже в работе!', 'Kursi ir vairākas nodarbības pēc kārtas par vienu tēmu. Pirmais jau top!'],
+    howtoE: ['Short guides, a couple of pages each: how to draw one thing, step by step. The first ones are on their way!', 'Короткие гайды на пару страниц: как нарисовать что-то одно, шаг за шагом. Первые уже в работе!', 'Īsi ceļveži pa pāris lappusēm: kā soli pa solim uzzīmēt vienu lietu. Pirmie jau top!'], freeF: ['Free', 'Бесплатные', 'Bezmaksas'], fl: ['Filter lessons', 'Фильтр уроков', 'Filtrēt nodarbības'],
     allOpen: ['🔓 Everything is open for you', '🔓 Тебе открыто всё', '🔓 Tev atvērts viss'],
-    vipN: [n => `${n} VIP ${n === 1 ? 'lesson opens' : 'lessons open'} after a free sign-in`, n => `VIP-уроков: ${n} — откроются после бесплатного входа`, n => `VIP nodarbības: ${n} — atvērsies pēc bezmaksas ienākšanas`],
-    youN: [n => `Open for you · ${n} VIP ${n === 1 ? 'lesson' : 'lessons'}`, n => `Тебе открыто · VIP-уроков: ${n}`, n => `Tev atvērts · VIP nodarbības: ${n}`], open: ['Open →', 'Открыть →', 'Atvērt →'], vidT: ['Video lesson', 'Видеоурок', 'Video nodarbība'] };
+    vipN: [n => `${n} insider ${n === 1 ? 'lesson opens' : 'lessons open'} after a free sign-in`, n => `Уроков «для своих»: ${n} — откроются после бесплатного входа`, n => `Nodarbības «saviem»: ${n} — atvērsies pēc bezmaksas ienākšanas`],
+    youN: [n => `Open for you · ${n} insider ${n === 1 ? 'lesson' : 'lessons'}`, n => `Тебе открыто · уроков «для своих»: ${n}`, n => `Tev atvērts · nodarbības «saviem»: ${n}`], open: ['Open →', 'Открыть →', 'Atvērt →'], vidT: ['Video lesson', 'Видеоурок', 'Video nodarbība'] };
   const tOf = x => (x.t && (x.t[lang] || x.t.en || x.t.ru || x.t.lv)) || '';
   const ext = u => /^https?:/.test(u) ? ' target="_blank" rel="noopener"' : '';
   const own = x => tOf(x) ? ' data-own="1"' : '';
@@ -159,7 +164,7 @@
   const W = { seen: ['✓ Watched', '✓ Просмотрено', '✓ Noskatīts'], mark: ['Mark as watched', 'Отметить как просмотренное', 'Atzīmēt kā noskatītu'],
     hide: ['Hide watched', 'Скрыть просмотренные', 'Paslēpt noskatītos'], vid: ['Video', 'Видео', 'Video'], nf: ['This video is not here any more.', 'Этого видео здесь больше нет.', 'Šī video šeit vairs nav.'],
     all: ['See all videos', 'Все видео', 'Visi video'], soonP: ['This video is coming soon. Come back in a little while!', 'Это видео скоро появится. Загляните чуть позже!', 'Šis video drīzumā būs. Ienāc nedaudz vēlāk!'],
-    lockP: ['This is a VIP video. Sign in for free and it opens right here.', 'Это VIP-видео. Войдите бесплатно — и оно откроется прямо здесь.', 'Šis ir VIP video. Ienāc bez maksas, un tas atvērsies tepat.'],
+    lockP: ['This video is for insiders. Sign in for free and it opens right here.', 'Это видео — для своих. Войдите бесплатно — и оно откроется прямо здесь.', 'Šis video ir saviem. Ienāc bez maksas, un tas atvērsies tepat.'],
     signin: ['Sign in for free', 'Войти бесплатно', 'Ienākt bez maksas'], yt: ['Open on YouTube', 'Открыть на YouTube', 'Atvērt YouTube'], play: ['Play the video', 'Включить видео', 'Atskaņot video'] };
   const guidesReady = fetch('/api/v2/guides', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null).then(d => {
     if (d && Array.isArray(d.seen)) { // вошёл: отметки из профиля + перенос отметок гостя
@@ -169,39 +174,55 @@
       if (local.length) seenPost({ add: local });
       try { localStorage.removeItem('pp-yt-seen'); } catch (e) {}
     }
-    const items = (d && d.items) || [], vids = items.filter(x => x.kind === 'video'), free = vids.filter(x => !x.vip), vip = vids.filter(x => x.vip), books = items.filter(x => x.kind === 'book');
+    const items = (d && d.items) || [], vids = items.filter(x => x.kind === 'video'), free = vids.filter(x => !x.vip), vip = vids.filter(x => x.vip), books = items.filter(x => x.kind === 'book'), hws = items.filter(x => x.kind === 'howto');
     const ytCard = x => `<a class="vc yt" href="https://youtu.be/${esc(x.yt)}" data-yt="${esc(x.yt)}"${own(x)} target="_blank" rel="noopener"><span class="th"><img src="${esc(x.cover)}" alt="${esc(tOf(x))}" loading="lazy"><span class="bd">${G.free[L]}</span><span class="pl" aria-hidden="true">▶</span></span><span class="tx"><b>${esc(tOf(x) || G.vidT[L])}</b><small>${G.vid[L]}</small><span class="go">${G.watch[L]}</span></span></a>`;
     // /learn/: каталог всех уроков с фильтрами; VIP гостю — размыто и с замочком, вошедшему — открыто
     const op = !!(d && d.open), fg = document.querySelector('#free .vg2');
     const card = x => {
       const lock = x.vip && !op, nm = esc(tOf(x) || G.vidT[L]);
-      if (x.soon) return `<div class="vc soon" data-f="${x.vip ? 'vip' : 'free'}"><span class="th">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : ''}<span class="bd">${x.vip ? 'VIP · ' : ''}${G.soon[L]}</span><span class="pl" aria-hidden="true">⏳</span></span>`
+      if (x.soon) return `<div class="vc soon" data-f="${x.vip ? 'vip' : 'free'}" data-c="video"><span class="tp">${G.tpV[L]}</span><span class="th">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : ''}<span class="bd">${x.vip ? G.vipB[L] + ' · ' : ''}${G.soon[L]}</span><span class="pl" aria-hidden="true">⏳</span></span>`
         + `<span class="tx"><b>${nm}</b><small>${G.soonS[L]}</small></span></div>`; // «скоро»: видео ещё нет
       const sn = !lock && isSeen(x);
-      return `<a class="vc${lock ? ' lock' : ''}${sn ? ' seen' : ''}" data-f="${x.vip ? 'vip' : 'free'}" href="${vurl(x)}"${lock ? '' : ` data-ytn="${esc(x.yt)}"`}${own(x)}>`
-        + `<span class="th"><img src="${esc(x.cover)}" alt="" loading="lazy"><span class="bd">${x.vip ? 'VIP' : G.free[L]}</span>${sn ? `<span class="sn">${W.seen[L]}</span>` : ''}<span class="pl" aria-hidden="true">${lock ? '🔒' : '▶'}</span></span>`
+      return `<a class="vc${lock ? ' lock' : ''}${sn ? ' seen' : ''}" data-f="${x.vip ? 'vip' : 'free'}" data-c="video" href="${vurl(x)}"${lock ? '' : ` data-ytn="${esc(x.yt)}"`}${own(x)}>`
+        + `<span class="tp">${G.tpV[L]}</span><span class="th"><img src="${esc(x.cover)}" alt="" loading="lazy"><span class="bd">${x.vip ? G.vipB[L] : G.free[L]}</span>${sn ? `<span class="sn">${W.seen[L]}</span>` : ''}<span class="pl" aria-hidden="true">${lock ? '🔒' : '▶'}</span></span>`
         + `<span class="tx"><b>${nm}</b><small>${x.vip ? (lock ? G.lock[L] : G.vipOpen[L]) : G.vid[L]}</small><span class="go">${lock ? G.signin[L] : G.watch[L]}</span></span></a>`;
     };
-    if (fg && vids.length) {
+    // курсы на сайте (не видео): Школа Полли /polly-helps/
+    const COURSES = [{ u: '/polly-helps/', img: '/images/school/book-cover.jpg', t: ['Polly’s Drawing School', 'Школа Полли', 'Pollijas skola'],
+      s: ['Course · 12 short lessons and a diploma', 'Курс · 12 коротких уроков и диплом', 'Kurss · 12 īsas nodarbības un diploms'] }];
+    const crs = x => `<a class="vc crs" data-f="free" data-c="course" href="${pre}${x.u}"><span class="tp">${G.tpC[L]}</span><span class="th"><img src="${x.img}" alt="" loading="lazy"><span class="bd">${G.free[L]}</span><span class="pl" aria-hidden="true">▶</span></span>`
+      + `<span class="tx"><b>${x.t[L]}</b><small>${x.s[L]}</small><span class="go">${G.open[L]}</span></span></a>`;
+    // шпаргалки (кабинет → «📝 Шпаргалка»): страницы-картинки или PDF, своя страница /learn/v/<id>/
+    const hwCard = x => { const lock = x.vip && !op;
+      return `<a class="vc hw${lock ? ' lock' : ''}" data-f="${x.vip ? 'vip' : 'free'}" data-c="howto" href="${vurl(x)}"><span class="tp">${G.cs[L]}</span><span class="th">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : ''}<span class="bd">${x.vip ? G.vipB[L] : G.free[L]}</span><span class="pl" aria-hidden="true">${lock ? '🔒' : '✎'}</span></span>`
+        + `<span class="tx"><b>${esc(tOf(x))}</b><small>${G.cs[L]}${x.pdf ? ' · PDF' : x.pages ? ' · ' + G.pg[L](x.pages) : ''}</small><span class="go">${lock ? G.signin[L] : G.open[L]}</span></span></a>`; };
+    if (fg && (vids.length || hws.length)) {
       const more = fg.querySelector('.vc.more');
-      fg.innerHTML = vids.map(card).join(''); if (more) fg.appendChild(more);
+      fg.innerHTML = vids.map(card).join('') + hws.map(hwCard).join('') + COURSES.map(crs).join(''); if (more) fg.appendChild(more);
       fg.querySelectorAll('[data-ytn]').forEach(ytName);
-      const F = [['all', G.all[L], vids.length], ['free', G.freeF[L], free.length], ['vip', 'VIP', vip.length]];
-      fg.insertAdjacentHTML('beforebegin', `<div class="flt" role="group" aria-label="${G.fl[L]}">${F.map(([k, n, c], i) => `<button type="button" data-k="${k}" aria-pressed="${i ? 'false' : 'true'}">${n} <i>${c}</i></button>`).join('')}`
+      // два фильтра вместе: доступ (все / открытые всем / для своих) и вид (видео / курс / шпаргалка); числа — с учётом другого фильтра
+      const FA = [['all', G.all[L]], ['free', G.openAll[L]], ['vip', G.vipB[L]]], FT = [['all', G.allT[L]], ['video', G.vidF[L]], ['course', G.course[L]], ['howto', G.howto[L]]];
+      const grp = (g, lb, F) => `<div class="flt-g" role="group" aria-label="${lb}"><span class="flt-l">${lb}</span>${F.map(([k, n], i) => `<button type="button" data-g="${g}" data-k="${k}" aria-pressed="${i ? 'false' : 'true'}">${n} <i></i></button>`).join('')}</div>`;
+      fg.insertAdjacentHTML('beforebegin', `<div class="flt">${grp('a', G.accL[L], FA)}${grp('t', G.typL[L], FT)}<div class="flt-g flt-x">`
         + (SEEN.size ? `<label class="flt-sn"><input type="checkbox"> ${W.hide[L]}</label>` : '')
-        + `<span class="flt-st">${op ? G.allOpen[L] : `🔒 ${G.vipN[L](vip.length)} · <a href="#signin">${G.signin[L]}</a>`}</span></div>`);
-      const bar = fg.previousElementSibling, hs = bar.querySelector('.flt-sn input');
-      let k = 'all';
+        + `<span class="flt-st">${op ? G.allOpen[L] : `🔒 ${G.vipN[L](vip.length + hws.filter(x => x.vip).length)} · <a href="#signin">${G.signin[L]}</a>`}</span></div></div>`);
+      fg.insertAdjacentHTML('afterend', '<p class="flt-empty" hidden></p>');
+      const bar = fg.previousElementSibling, hs = bar.querySelector('.flt-sn input'), emp = fg.nextElementSibling;
+      const st = { a: 'all', t: 'all' }, cards = [...fg.querySelectorAll('.vc[data-f]')];
+      const fits = (c, a, t, h) => (a === 'all' || c.dataset.f === a) && (t === 'all' || c.dataset.c === t) && !(h && c.classList.contains('seen'));
       const apply = () => {
         const h = !!(hs && hs.checked);
-        fg.querySelectorAll('.vc[data-f]').forEach(c => { c.hidden = (k !== 'all' && c.dataset.f !== k) || (h && c.classList.contains('seen')); });
-        if (more) more.hidden = k !== 'all';
+        let n = 0;
+        cards.forEach(c => { c.hidden = !fits(c, st.a, st.t, h); if (!c.hidden) n++; });
+        if (more) more.hidden = st.a !== 'all' || st.t !== 'all';
+        bar.querySelectorAll('button').forEach(b => { b.setAttribute('aria-pressed', st[b.dataset.g] === b.dataset.k ? 'true' : 'false');
+          b.querySelector('i').textContent = cards.filter(c => b.dataset.g === 'a' ? fits(c, b.dataset.k, st.t, h) : fits(c, st.a, b.dataset.k, h)).length; });
+        emp.hidden = !!n; if (!n) emp.textContent = (G[st.t + 'E'] || G.noneE)[L];
       };
       if (hs) { try { hs.checked = localStorage.getItem('pp-yt-hide') === '1'; } catch (e) {} hs.addEventListener('change', () => { try { localStorage.setItem('pp-yt-hide', hs.checked ? '1' : '0'); } catch (e) {} apply(); }); }
       bar.addEventListener('click', e => {
-        const b = e.target.closest('button'); if (!b) return;
-        bar.querySelectorAll('button').forEach(x => x.setAttribute('aria-pressed', x === b ? 'true' : 'false'));
-        k = b.dataset.k; apply();
+        const b = e.target.closest('button[data-g]'); if (!b) return;
+        st[b.dataset.g] = b.dataset.k; apply();
       });
       apply();
     }
@@ -218,7 +239,7 @@
       vg.querySelectorAll('[data-ytn]').forEach(ytName);
       const al = vg.closest('.al'), k = al && al.querySelector('.k'), pp = al && al.querySelector('h2 + p');
       if (op && k) k.textContent = ['You are signed in', 'Вход выполнен', 'Laipni lūdzam'][L];
-      if (op && pp) pp.innerHTML = [`All VIP lessons are open for you, right here. Want to support my work? <a href="${pre}/books/">Get one of my books</a>.`, `Все VIP-уроки открыты, смотрите прямо здесь. Хотите поддержать меня? <a href="${pre}/books/">Купите одну из моих книг</a>.`, `Visas VIP nodarbības ir atvērtas, skaties tepat. Gribi atbalstīt manu darbu? <a href="${pre}/books/">Iegādājies kādu no manām grāmatām</a>.`][L];
+      if (op && pp) pp.innerHTML = [`All insider lessons are open for you, right here. Want to support my work? <a href="${pre}/books/">Get one of my books</a>.`, `Все уроки для своих открыты, смотрите прямо здесь. Хотите поддержать меня? <a href="${pre}/books/">Купите одну из моих книг</a>.`, `Visas nodarbības saviem ir atvērtas, skaties tepat. Gribi atbalstīt manu darbu? <a href="${pre}/books/">Iegādājies kādu no manām grāmatām</a>.`][L];
     }
     // главная: две плитки бесплатных уроков — самые новые
     const tiles = [...document.querySelectorAll('#lessons .t.yt')];
@@ -232,8 +253,18 @@
     const wm = document.querySelector('.wv-main');
     if (wm) {
       const key = decodeURIComponent((location.pathname.match(/\/learn\/v\/([\w-]+)/) || [])[1] || '');
-      const x = vids.find(v => v.id === key || (v.yt && v.yt === key));
-      if (!x) { wm.innerHTML = `<p class="wv-wait">${W.nf[L]}</p><a class="btn pri" href="${pre}/learn/">${W.all[L]}</a>`; }
+      const x = vids.find(v => v.id === key || (v.yt && v.yt === key)), hx = !x && hws.find(v => v.id === key);
+      if (hx) { // шпаргалка: страницы друг под другом или PDF во весь блок
+        const lock = hx.vip && !op, nm = tOf(hx), d = (hx.d && (hx.d[lang] || hx.d.en || hx.d.ru || hx.d.lv)) || '';
+        document.title = nm + ' · Pigeon Polly Art Lab';
+        const f = hx.files || [];
+        const body = lock ? `<a class="wv-pl lock" href="#signin">${hx.cover ? `<img src="${esc(hx.cover)}" alt="">` : ''}<span class="pl" aria-hidden="true">🔒</span></a><p class="wv-note">${G.hwLock[L]}</p><a class="btn pri" href="#signin">${W.signin[L]}</a>`
+          : hx.pdf ? `<div class="hw-pdf"><iframe src="${esc(f[0] || '')}" title="${esc(nm)}"></iframe></div><p><a class="btn pri" href="${esc(f[0] || '')}" target="_blank" rel="noopener">${G.pdfO[L]}</a></p>`
+          : `<div class="hw-pages">${f.map((u, i) => `<img src="${esc(u)}" alt="${esc(nm)} · ${i + 1}" loading="${i ? 'lazy' : 'eager'}">`).join('')}</div>`;
+        wm.innerHTML = `<div class="wv-tx" data-own="1"><p class="wv-k"><span class="bd2">${hx.vip ? G.vipB[L] : G.cs[L]}</span></p><h1>${esc(nm)}</h1>`
+          + (d ? `<div class="wv-d">${d.split(/\n\s*\n/).map(p => `<p>${esc(p.trim()).replace(/\n/g, '<br>')}</p>`).join('')}</div>` : '') + '</div>' + body;
+        wm.classList.add('hw-main');
+      } else if (!x) { wm.innerHTML = `<p class="wv-wait">${W.nf[L]}</p><a class="btn pri" href="${pre}/learn/">${W.all[L]}</a>`; }
       else {
         const lock = x.vip && !op, nm = tOf(x) || W.vid[L];
         document.title = nm + ' · Pigeon Polly Art Lab';
@@ -243,7 +274,7 @@
           : lock ? `<a class="wv-pl lock" href="#signin"><img src="${esc(x.cover)}" alt=""><span class="pl" aria-hidden="true">🔒</span></a>`
           : `<button type="button" class="wv-pl" aria-label="${W.play[L]}"><img src="${esc(x.cover)}" alt=""><span class="pl" aria-hidden="true">▶</span></button>`;
         const note = x.soon ? `<p class="wv-note">${W.soonP[L]}</p>` : lock ? `<p class="wv-note">${W.lockP[L]}</p><a class="btn pri" href="#signin">${W.signin[L]}</a>` : '';
-        wm.innerHTML = stage + `<div class="wv-tx"${x.yt && !tOf(x) ? ` data-ytn="${esc(x.yt)}"` : ' data-own="1"'}><p class="wv-k"><span class="bd2">${x.vip ? 'VIP' : G.free[L]}</span>${x.soon ? ` · ${G.soon[L]}` : ''}</p><h1>${esc(nm)}</h1>`
+        wm.innerHTML = stage + `<div class="wv-tx"${x.yt && !tOf(x) ? ` data-ytn="${esc(x.yt)}"` : ' data-own="1"'}><p class="wv-k"><span class="bd2">${x.vip ? G.vipB[L] : G.free[L]}</span>${x.soon ? ` · ${G.soon[L]}` : ''}</p><h1>${esc(nm)}</h1>`
           + (lock || x.soon ? '' : `<div class="wv-act"><button type="button" class="wv-seen" aria-pressed="false"></button><a class="wv-yt" href="https://youtu.be/${esc(x.yt)}" target="_blank" rel="noopener">${W.yt[L]} ↗</a></div>`)
           + note + (desc ? `<div class="wv-d">${desc}</div>` : '') + '</div>';
         const tx = wm.querySelector('.wv-tx'); if (tx.dataset.ytn) ytName(tx);
@@ -292,12 +323,12 @@
   if (document.querySelector('.vip-go, .vc.vip')) guidesReady.then(() => fetch('/api/v2/vip', { credentials: 'same-origin' })).then(r => r.ok ? r.json() : null).then(d => {
     const vs = (d && d.videos) || [], v = vs[0];
     if (!v) return;
-    document.querySelectorAll('.vip-go').forEach(b => { b.dataset.yt = v.id; b.href = 'https://youtu.be/' + v.id; b.textContent = ['▶ Watch the VIP lesson', '▶ Смотреть VIP-урок', '▶ Skatīties VIP nodarbību'][L]; });
+    document.querySelectorAll('.vip-go').forEach(b => { b.dataset.yt = v.id; b.href = 'https://youtu.be/' + v.id; b.textContent = ['▶ Watch the insider lesson', '▶ Смотреть урок для своих', '▶ Skatīties nodarbību saviem'][L]; });
     document.querySelectorAll('.vc.vip').forEach(c => {
       const w = vs.find(x => x.key === (c.dataset.vk || 'review')); if (!w) return; // data-vk — добавленные в кабинете; без него — «Обзор акварели»
       c.dataset.yt = w.id; c.href = 'https://youtu.be/' + w.id;
       c.querySelector('.pl').textContent = '▶';
-      c.querySelector('.vip-st').textContent = ['VIP lesson · open for you', 'VIP-урок · открыт для тебя', 'VIP nodarbība · atvērta tev'][L];
+      c.querySelector('.vip-st').textContent = G.vipOpen[L];
       c.querySelector('.go').textContent = ['Watch →', 'Смотреть →', 'Skatīties →'][L];
     });
   }).catch(() => {});

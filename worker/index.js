@@ -1077,7 +1077,7 @@ async function dayCard(env, req, u, L, withLog) {
 }
 const randomHex = n => [...crypto.getRandomValues(new Uint8Array(n))].map(b => b.toString(16).padStart(2, '0')).join('');
 // ---------- копия картинок: MEDIA (pigeonpolly-media) → MEDIA_BACKUP (pigeonpolly-backup), только новые, по 50 за запуск; из копии ничего не удаляется ----------
-const BACKUP_PREFIXES = ['blog/', 'art/', 'cards/'];
+const BACKUP_PREFIXES = ['blog/', 'art/', 'cards/', 'howto/'];
 async function r2Keys(bucket, prefix) { const keys = []; let cursor; do { const r = await bucket.list({ prefix, cursor }); keys.push(...r.objects.map(o => o.key)); cursor = r.truncated ? r.cursor : null; } while (cursor); return keys; }
 async function mediaBackup(env, max = 50) {
   if (!env.MEDIA || !env.MEDIA_BACKUP) return { copied: 0, left: 0 };
@@ -1727,7 +1727,7 @@ async function route(req, env, url) {
   if (p === '/api/poll' || p === '/api/poll/vote' || p === '/api/admin/polls') { const r = await pollsApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, now, randomHex, db: env.DB, getMeta: k => getMeta(env, k), setMeta: (k, v) => setMeta(env, k, v),
     ipKey: async r => { let salt = await getMeta(env, 'blog_salt'); if (!salt) { salt = randomHex(16); await setMeta(env, 'blog_salt', salt); } return (await sha256(salt + (r.headers.get('cf-connecting-ip') || '0'))).slice(0, 24); },
     translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The strings are a poll question and its answer options on an artist\'s website: which topic should the next video lesson or "paint along with me" video be about. Keep them short, warm and natural.') }); if (r) return r; }
-  if (p === '/api/admin/guides' || p === '/api/v2/guides' || p === '/api/v2/seen') { const r = await guidesApi(req, env, url, guidesHelpers(env)); if (r) return r; }
+  if (p === '/api/admin/guides' || p === '/api/v2/guides' || p === '/api/v2/seen' || p.startsWith('/api/v2/howto/')) { const r = await guidesApi(req, env, url, guidesHelpers(env)); if (r) return r; }
   if (p === '/api/admin/ideas' || p === '/api/admin/ideas/write') { const r = await ideasApi(req, env, url, authHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/note/') || p.startsWith('/api/admin/notes')) { const r = await notesApi(req, env, url, helpers(env)); if (r) { if (p === '/api/admin/notes/send') await mailCron(env, authHelpers(env)).catch(() => {}); return r; } }
   if (p.startsWith('/api/mail/') || p.startsWith('/api/admin/mail')) { const r = await mailApi(req, env, url, authHelpers(env)); if (r) return r; }

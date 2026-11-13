@@ -524,11 +524,14 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 .lang-m .lang-switch a[aria-current]{font-weight:700;color:var(--ink)}.lang-m .lang-switch a[aria-current]:after{content:"✓";margin-left:auto;padding-left:12px;color:var(--acc)}
 @media (max-width:700px){.hr .lang2{display:none}}
 /* /learn/: каталог уроков с фильтрами (v2.js) — закрытое гостю размыто, с замочком */
-.flt{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin:-10px 0 28px}
-.flt button{border:1.5px solid var(--ink);background:none;color:var(--ink);border-radius:999px;padding:9px 18px;font:700 13px Karla,'Nunito Sans',sans-serif;cursor:pointer}
+.flt{display:flex;flex-direction:column;gap:10px;margin:-10px 0 34px}
+.flt-g{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.flt-l{min-width:72px;color:var(--mut);font:700 11px Karla,'Nunito Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase}
+.flt-x{gap:14px}.flt-x:empty{display:none}
+.flt button{border:1.5px solid var(--ink);background:none;color:var(--ink);border-radius:999px;padding:8px 16px;font:700 13px Karla,'Nunito Sans',sans-serif;cursor:pointer}
 .flt button i{font-style:normal;opacity:.6;margin-left:4px}
 .flt button[aria-pressed=true]{background:var(--ink);color:var(--paper,#fff)}.flt button[aria-pressed=true] i{opacity:.8}
-.flt-st{margin-left:auto;color:var(--mut);font-size:14px}.flt-st a{color:var(--acc);text-decoration:underline}
+.flt-st{color:var(--mut);font-size:14px}.flt-st a{color:var(--acc);text-decoration:underline}
 .vc[hidden]{display:none}
 .vc.lock .th img,.vl.lock .th img{filter:blur(9px) saturate(.8);transform:scale(1.08)}
 .vc.lock b{filter:blur(3px);user-select:none}.vc.lock .pl{background:rgba(255,255,255,.86)}
@@ -681,3 +684,21 @@ a.vc:hover{transform:translateY(-4px)}a.vc:nth-child(1){transform:rotate(-1deg)}
 .pr b{font:400 22px Fraunces,Lora,serif}
 @media (prefers-reduced-motion:reduce){.pr .pb{transition:none}}
 @media (max-width:900px){.poll{padding:64px 0 70px}.poll .w{grid-template-columns:1fr;gap:34px}.poll h2{font-size:44px}.ballot{padding:30px 20px 20px;transform:none}.ballot h3{font-size:23px}.po{font-size:16px}.stamp2{width:60px;height:60px;font-size:9px}}
+/* /learn/: пусто в «Курсы» / «Как нарисовать»; карточка курса */
+.flt-empty{margin:0;padding:28px;border:1.5px dashed var(--line,#ccc);border-radius:14px;color:var(--mut);font-size:16px;max-width:640px}
+.vc.crs .th img{object-fit:cover;object-position:center 30%}
+/* шпаргалка на /learn/v/<id>/: страницы-картинки друг под другом или PDF */
+.wv-main.hw-main{display:block}
+.hw-main .wv-tx{max-width:760px;margin-bottom:24px}
+.hw-pages{display:flex;flex-direction:column;gap:18px;max-width:900px}
+.hw-pages img{width:100%;height:auto;background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.12)}
+.hw-pdf iframe{width:100%;max-width:900px;height:80vh;border:0;background:#fff;box-shadow:0 2px 14px rgba(0,0,0,.12)}
+.hw-main .wv-pl.lock{max-width:640px}
+.hw-main .wv-note{margin-top:16px}
+
+/* /learn/: наклейка вида (Видео / Курс / Шпаргалка) — как «✦ Art world news» в журнале (.cr-tag) */
+.vc{position:relative}
+.vc .tp{position:absolute;top:-6px;right:-14px;z-index:3;transform:rotate(12deg);border-radius:2px;background:#FFFDF6;color:var(--acc);outline:1.5px solid var(--acc);outline-offset:-4px;padding:6px 12px 5px;font:700 11px/1.2 Karla,'Nunito Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;box-shadow:0 4px 10px rgba(31,35,38,.28),0 1px 2px rgba(31,35,38,.2);pointer-events:none}
+.vc .tp::before{content:'✦ ';letter-spacing:0}
+.vc .sn{top:auto;bottom:12px}
+@media(max-width:700px){.vc .tp{right:-6px;transform:rotate(9deg)}.flt-l{width:100%}}
