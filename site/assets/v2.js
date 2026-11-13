@@ -188,10 +188,11 @@
         + `<span class="tx"><b>${nm}</b><small>${x.vip ? (lock ? G.lock[L] : G.vipOpen[L]) : G.vid[L]}${lgT(x)}</small><span class="go">${lock ? G.signin[L] : G.watch[L]}</span></span></a>`;
     };
     // курсы на сайте (не видео): Школа Полли /polly-helps/
-    const COURSES = [{ u: '/polly-helps/', img: '/images/school/course-cover.jpg', t: ['Polly’s Drawing School', 'Школа Полли', 'Pollijas skola'],
+    const COURSES = [{ u: '/polly-helps/', img: '/images/school/course-cover.jpg', t: ['See the World Like an Artist', 'Смотри на мир как художник', 'Skaties uz pasauli kā mākslinieks'],
+      d: ['First steps in drawing that help you see the world in a new way.', 'Первые шаги в рисовании, которые помогут увидеть мир по-новому.', 'Pirmie soļi zīmēšanā, kas palīdzēs ieraudzīt pasauli no jauna.'],
       s: ['Course · 12 short lessons and a diploma', 'Курс · 12 коротких уроков и диплом', 'Kurss · 12 īsas nodarbības un diploms'] }];
     const crs = x => `<a class="vc crs" data-f="free" data-c="course" data-l="en ru lv" href="${pre}${x.u}"><span class="tp">${G.tpC[L]}</span><span class="th"><img src="${x.img}" alt="" loading="lazy"><span class="bd">${G.free[L]}</span></span>`
-      + `<span class="tx"><b>${x.t[L]}</b><small>${x.s[L]} · 🌍 ${G.l3[L]}</small><span class="go">${G.open[L]}</span></span></a>`;
+      + `<span class="tx"><b>${x.t[L]}</b><span class="cd">${x.d[L]}</span><small>${x.s[L]} · 🌍 ${G.l3[L]}</small><span class="go">${G.open[L]}</span></span></a>`;
     // шпаргалки (кабинет → «📝 Шпаргалка»): страницы-картинки или PDF, своя страница /learn/v/<id>/
     const hwCard = x => { const lock = x.vip && !op;
       return `<a class="vc hw${lock ? ' lock' : ''}${x.built ? ' blt' : ''}" data-f="${x.vip ? 'vip' : 'free'}" data-c="howto"${dl(x)} href="${vurl(x)}"><span class="tp">${G.cs[L]}</span><span class="th">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : ''}<span class="bd">${x.vip ? G.vipB[L] : G.free[L]}</span><span class="pl" aria-hidden="true">${lock ? '🔒' : '✎'}</span></span>`
