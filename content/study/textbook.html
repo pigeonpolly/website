@@ -213,6 +213,17 @@ p.need { font: 400 15px/1.5 var(--f-ui); background: var(--paper); border-radius
 .howto h5 { font: 600 13px var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 8px 0 4px; }
 .howto p { margin: 6px 0; }
 .howto figure.code { background: var(--paper); margin: 8px 0; }
+/* Подробный разбор: «как запустить и как это работает» — в решениях и в разборах похожих заданий */
+.walk { background: var(--paper-2); border-radius: 8px; padding: 6px 14px 10px; margin: 12px 0 6px; font-size: 16px; }
+.walk h5 { font: 600 13px var(--f-ui); letter-spacing: .08em; text-transform: uppercase; color: var(--accent); margin: 12px 0 4px; }
+.walk p, details .walk p { margin: 6px 0; color: var(--ink); font-size: 16px; }
+.walk ol, .walk ul { margin: 6px 0; padding-left: 1.4em; }
+.walk li { margin: 4px 0; }
+.walk figure.code { background: var(--paper); margin: 8px 0; }
+details.more { border-top: 0; padding: 4px 0; margin: 8px 0; }
+details.more > summary { font: 600 15px var(--f-ui); color: var(--accent); }
+.box.example .walk { background: var(--paper); }
+.box.example .walk figure.code { background: var(--paper-2); }
 .term { border-bottom: 1px dotted var(--accent); cursor: help; }
 .term:hover, .term:focus { background: var(--accent-soft); outline: none; }
 #tip { position: fixed; z-index: 50; background: var(--ink); color: var(--paper); border-radius: 8px; padding: 10px 12px; font: 400 14px/1.45 var(--f-ui); box-shadow: 0 6px 24px rgb(0 0 0 / .25); pointer-events: none; }
@@ -710,6 +721,28 @@ try (var pool = Executors.newVirtualThreadPerTaskExecutor()) {
         .map(Map.Entry::getKey);
 }
 // ["GET /home 200", "GET /x 404", "POST /a 200"] → Optional[200]</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>Откройте проект <code>java-basics</code> в IntelliJ IDEA (<a href="#setup-3">§0.3</a>).</li><li>Правой кнопкой по папке <code>src/main/java</code> → <b>New → Java Class</b> → имя <code>LogStats</code> → Enter.</li><li>Удалите всё, что IntelliJ написала в файле, и вставьте код ниже целиком.</li><li>Нажмите зелёный треугольник ▶ слева от строки <code>public static void main</code> → <b>Run 'LogStats.main()'</b>. Внизу откроется окно Run с выводом.</li></ol><figure class="code"><figcaption>src/main/java/LogStats.java</figcaption><pre><code>import java.util.*;
+import java.util.stream.*;
+
+public class LogStats {
+
+    static Optional&lt;Integer&gt; mostFrequentStatus(List&lt;String&gt; lines) {
+        return lines.stream()
+            .map(l -&gt; l.split(" "))
+            .filter(p -&gt; p.length &gt; 2)
+            .map(p -&gt; Integer.parseInt(p[2]))
+            .collect(Collectors.groupingBy(s -&gt; s, Collectors.counting()))
+            .entrySet().stream()
+            .max(Map.Entry.comparingByValue())
+            .map(Map.Entry::getKey);
+    }
+
+    public static void main(String[] args) {
+        System.out.println(mostFrequentStatus(List.of("GET /home 200", "GET /x 404", "POST /a 200")));
+        System.out.println(mostFrequentStatus(List.of()));
+    }
+}</code></pre></figure><h5>Что вы увидите</h5><figure class="code"><figcaption>Окно Run</figcaption><pre><code>Optional[200]
+Optional.empty</code></pre></figure><h5>Как это работает — по шагам</h5><ol><li><code>lines.stream()</code> — превращает список в «конвейер»: строки по одной поедут через следующие шаги.</li><li><code>map(l -&gt; l.split(" "))</code> — каждую строку режет по пробелам: <code>"GET /home 200"</code> → массив <code>["GET", "/home", "200"]</code>.</li><li><code>filter(p -&gt; p.length &gt; 2)</code> — пропускает дальше только массивы, где есть третья часть. Испорченная строка вроде <code>"GET"</code> просто отбросится, а не уронит программу.</li><li><code>map(p -&gt; Integer.parseInt(p[2]))</code> — берёт третью часть (нумерация с нуля, поэтому <code>[2]</code>) и делает из текста число: <code>"200"</code> → <code>200</code>.</li><li><code>collect(groupingBy(s -&gt; s, counting()))</code> — раскладывает числа по кучкам и считает: получается словарь <code>{200=2, 404=1}</code>.</li><li><code>entrySet().stream()</code> — словарь превращается в поток пар «ключ=значение»: <code>200=2</code>, <code>404=1</code>.</li><li><code>max(Map.Entry.comparingByValue())</code> — находит пару с наибольшим значением: <code>200=2</code>. Результат завёрнут в <code>Optional</code>, потому что в пустом списке максимума нет.</li><li><code>map(Map.Entry::getKey)</code> — из пары оставляет только ключ: <code>Optional[200]</code>. Для пустого списка все шаги пропускаются и выходит <code>Optional.empty</code> — без ошибки.</li></ol></div></details>
     <p><b>Итог:</b> та же схема «разобрать → сгруппировать → отсортировать/выбрать» решает задачу 1.1. Отличия: нужно нормализовать слова и взять три первых, а не один максимум.</p>
   </div>
   <div class="box task"><h4>Задача 1.1. Топ-3 слов</h4>
@@ -735,6 +768,42 @@ try (var pool = Executors.newVirtualThreadPerTaskExecutor()) {
         .toList();
 }</code></pre></figure>
       <p>Регулярное выражение <code>[^\p{L}\p{N}]+</code> режет по всему, что не буква и не цифра, поэтому работает и для кириллицы (обычный <code>\W</code> считает кириллицу «не словом»). <code>groupingBy</code> + <code>counting</code> строят частоты, затем сортировка по значению по убыванию.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>В проекте <code>java-basics</code>: правой кнопкой по <code>src/main/java</code> → <b>New → Java Class</b> → <code>WordStats</code>.</li><li>Замените содержимое файла кодом ниже (решение + метод <code>main</code> для проверки). Строки <code>import</code> вверху обязательны: без них Java не знает, что такое <code>Arrays</code>, <code>Map</code> и <code>Collectors</code>.</li><li>Нажмите ▶ рядом с <code>main</code> → <b>Run</b>.</li></ol><figure class="code"><figcaption>src/main/java/WordStats.java</figcaption><pre><code>import java.util.*;
+import java.util.stream.*;
+
+public class WordStats {
+
+    static List&lt;String&gt; top3(String text) {
+        return Arrays.stream(text.toLowerCase().split("[^\\p{L}\\p{N}]+"))
+            .filter(w -&gt; !w.isBlank())
+            .collect(Collectors.groupingBy(w -&gt; w, Collectors.counting()))
+            .entrySet().stream()
+            .sorted(Map.Entry.&lt;String, Long&gt;comparingByValue().reversed())
+            .limit(3)
+            .map(Map.Entry::getKey)
+            .toList();
+    }
+
+    public static void main(String[] args) {
+        System.out.println(top3("Кот, кот! Кот и пёс. Пёс и ёж"));
+        System.out.println(top3(""));
+    }
+}</code></pre></figure><h5>Что вы увидите</h5><figure class="code"><figcaption>Окно Run</figcaption><pre><code>[кот, и, пёс]
+[]</code></pre></figure><p>«и» и «пёс» встречаются по 2 раза, поэтому между ними порядок может быть и другим — это нормально.</p><h5>Как это работает — по шагам (на примере «Кот, кот! Кот и пёс. Пёс и ёж»)</h5><ol><li><code>toLowerCase()</code> → <code>"кот, кот! кот и пёс. пёс и ёж"</code>.</li><li><code>split("[^\p{L}\p{N}]+")</code> режет строку там, где идут символы, которые <b>не</b> буквы (<code>\p{L}</code>) и <b>не</b> цифры (<code>\p{N}</code>); <code>+</code> значит «один или несколько подряд», поэтому «, » — это один разрез. Получается массив <code>[кот, кот, кот, и, пёс, пёс, и, ёж]</code>. В Java-строке обратную косую черту пишут дважды: <code>\\p</code>.</li><li><code>Arrays.stream(…)</code> делает из массива поток слов.</li><li><code>filter(w -&gt; !w.isBlank())</code> выбрасывает пустые строки. Они появляются, если текст начинается со знака препинания: <code>", кот"</code> режется в <code>["", "кот"]</code>.</li><li><code>groupingBy(w -&gt; w, counting())</code> считает слова: <code>{кот=3, и=2, пёс=2, ёж=1}</code>.</li><li><code>entrySet().stream()</code> — поток пар «слово=сколько».</li><li><code>sorted(…comparingByValue().reversed())</code> — сортирует пары по числу от большего к меньшему: <code>кот=3, и=2, пёс=2, ёж=1</code>. Запись <code>Map.Entry.&lt;String, Long&gt;</code> подсказывает Java типы: без неё вызов <code>.reversed()</code> не скомпилируется — Java «не догадается», что внутри пары.</li><li><code>limit(3)</code> оставляет три первые пары, <code>map(Map.Entry::getKey)</code> — только слова, <code>toList()</code> собирает их в список <code>[кот, и, пёс]</code>.</li></ol><h5>Как оформить проверку тестом</h5><p>Тест проверяет результат сам, без чтения вывода глазами. Правой кнопкой по <code>src/test/java</code> → <b>New → Java Class</b> → <code>WordStatsTest</code>, вставьте код и нажмите ▶ рядом с именем класса. Зелёная галочка — всё верно.</p><figure class="code"><figcaption>src/test/java/WordStatsTest.java</figcaption><pre><code>import org.junit.jupiter.api.Test;
+import java.util.List;
+import static org.junit.jupiter.api.Assertions.assertEquals;
+
+class WordStatsTest {
+    @Test
+    void countsWordsIgnoringCase() {
+        assertEquals(List.of("a", "b"), WordStats.top3("A a, b"));
+    }
+
+    @Test
+    void emptyTextGivesEmptyList() {
+        assertEquals(List.of(), WordStats.top3(""));
+    }
+}</code></pre></figure></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c1-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -752,6 +821,30 @@ static BigDecimal fee(Payment p) {
         case Cash c -&gt; BigDecimal.ZERO;
     };
 }</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>В проекте <code>java-basics</code> создайте класс <code>Fees</code> (<b>New → Java Class</b>) и замените содержимое кодом ниже. В одном файле можно описать несколько типов, если только один из них <code>public</code> и его имя совпадает с именем файла.</li><li>Нажмите ▶ рядом с <code>main</code> → <b>Run</b>.</li></ol><figure class="code"><figcaption>src/main/java/Fees.java</figcaption><pre><code>import java.math.BigDecimal;
+
+sealed interface Payment permits Card, Cash {}
+record Card(BigDecimal amount, boolean foreign) implements Payment {}
+record Cash(BigDecimal amount) implements Payment {}
+
+public class Fees {
+
+    static BigDecimal fee(Payment p) {
+        return switch (p) {
+            case Card(BigDecimal a, boolean foreign) when foreign -&gt; a.multiply(new BigDecimal("0.02"));
+            case Card c -&gt; BigDecimal.ZERO;
+            case Cash c -&gt; BigDecimal.ZERO;
+        };
+    }
+
+    public static void main(String[] args) {
+        System.out.println(fee(new Card(new BigDecimal("100"), true)));    // иностранная карта
+        System.out.println(fee(new Card(new BigDecimal("100"), false)));   // своя карта
+        System.out.println(fee(new Cash(new BigDecimal("100"))));          // наличные
+    }
+}</code></pre></figure><h5>Что вы увидите</h5><figure class="code"><figcaption>Окно Run</figcaption><pre><code>2.00
+0
+0</code></pre></figure><h5>Как это работает — по шагам</h5><ol><li><code>sealed interface Payment permits Card, Cash</code> — «платёж бывает только картой или наличными». Никто другой не сможет реализовать этот интерфейс.</li><li><code>record Card(BigDecimal amount, boolean foreign)</code> — короткая запись класса с данными. Java сама создаёт конструктор, методы <code>amount()</code>, <code>foreign()</code>, <code>equals</code> и <code>toString</code>.</li><li><code>switch (p)</code> проверяет ветки <b>сверху вниз</b> и выполняет первую подходящую.</li><li>Первая ветка: <code>case Card(BigDecimal a, boolean foreign) when foreign</code> — «если это карта, достань из неё сумму в <code>a</code> и флаг в <code>foreign</code>; подходит, только когда <code>foreign</code> равен true». Для первой карты так и есть: 100 × 0.02 = <code>2.00</code>.</li><li>Вторая карта иностранной не является — первая ветка не подошла, срабатывает <code>case Card c</code> → 0.</li><li>Наличные попадают в <code>case Cash c</code> → 0.</li><li>Почему <code>BigDecimal</code>, а не <code>double</code>: деньги в <code>double</code> считаются с погрешностью (<code>100 * 0.07</code> даёт <code>7.000000000000001</code>). Поэтому и число пишут строкой: <code>new BigDecimal("0.02")</code>.</li></ol><h5>Проверьте, что поняли</h5><p>Поменяйте местами первые две ветки и запустите. Компилятор откажется: «this case label is dominated by a preceding case label» — общая ветка <code>case Card c</code> забирает все карты, и особая до неё никогда не дойдёт.</p></div></details>
     <p><b>Итог:</b> в задаче 1.2 нужно то же самое для фигур — без охранников, но с record patterns, чтобы сразу получить размеры.</p>
   </div>
   <div class="box task"><h4>Задача 1.2. Площадь фигур</h4>
@@ -777,6 +870,25 @@ static double area(Shape s) {
     };
 }</code></pre></figure>
       <p>Компилятор знает все разрешённые реализации sealed-интерфейса, поэтому <code>switch</code> исчерпывающий и <code>default</code> не нужен. Если добавить новую фигуру, код перестанет компилироваться, пока её не обработают, — это и есть польза sealed.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>В проекте <code>java-basics</code> создайте класс <code>Shapes</code> и замените содержимое файла кодом ниже.</li><li>Нажмите ▶ рядом с <code>main</code> → <b>Run</b>.</li></ol><figure class="code"><figcaption>src/main/java/Shapes.java</figcaption><pre><code>sealed interface Shape permits Circle, Rect {}
+record Circle(double r) implements Shape {}
+record Rect(double w, double h) implements Shape {}
+
+public class Shapes {
+
+    static double area(Shape s) {
+        return switch (s) {
+            case Circle c -&gt; Math.PI * c.r() * c.r();
+            case Rect(double w, double h) -&gt; w * h;   // record pattern, Java 21
+        };
+    }
+
+    public static void main(String[] args) {
+        System.out.println(area(new Circle(1)));
+        System.out.println(area(new Rect(2, 3)));
+    }
+}</code></pre></figure><h5>Что вы увидите</h5><figure class="code"><figcaption>Окно Run</figcaption><pre><code>3.141592653589793
+6.0</code></pre></figure><h5>Как это работает — по шагам</h5><ol><li><code>new Circle(1)</code> создаёт круг с радиусом 1. Поле радиуса читается методом <code>c.r()</code> — его record создал сам.</li><li>В <code>area</code> выражение <code>switch (s)</code> смотрит, какого типа фигура на самом деле.</li><li>Для круга срабатывает <code>case Circle c</code>: переменная <code>c</code> — та же фигура, но уже с типом <code>Circle</code>, поэтому у неё можно вызвать <code>r()</code>. Результат: π · 1 · 1 = 3.14159…</li><li>Для прямоугольника срабатывает <code>case Rect(double w, double h)</code> — «шаблон записи»: Java сразу достаёт ширину и высоту в переменные <code>w</code> и <code>h</code>. 2 · 3 = 6.0.</li><li>Ветки <code>default</code> нет: компилятор знает из <code>permits</code>, что других фигур не бывает, и проверяет, что обработаны все.</li></ol><h5>Проверьте, что поняли</h5><ol><li>Удалите строку с <code>case Rect</code> — IntelliJ подчеркнёт <code>switch</code> красным: «the switch expression does not cover all possible input values». Верните строку.</li><li>Добавьте <code>record Square(double side) implements Shape {}</code> и впишите <code>Square</code> в <code>permits</code>. Код снова не скомпилируется, пока вы не добавите ветку <code>case Square q -&gt; q.side() * q.side();</code>. Так sealed не даёт забыть новый случай.</li></ol></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c1-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -890,7 +1002,7 @@ DELETE FROM fruit WHERE name = 'груша';            -- удалить</code>
 <p class="src">Источник: <a href="https://www.postgresql.org/docs/current/indexes-multicolumn.html" target="_blank" rel="noopener">PostgreSQL: Multicolumn Indexes</a></p>
 <h4>JPA/Hibernate: когда загружаются связи</h4>
 <p class="simple"><b>Проще говоря:</b> Hibernate загружает списки связанных данных не сразу, а когда вы к ним обратитесь. Если обращаться в цикле, получится много маленьких запросов — лучше сразу попросить всё одним запросом.</p>
-<ul><li>Коллекции (<code>@OneToMany</code>, <code>@ManyToMany</code>) по умолчанию загружаются лениво; связи «к одному» (<code>@ManyToOne</code>, <code>@OneToOne</code>) — по умолчанию сразу (EAGER). Документация рекомендует ленивые связи и явный запрос нужных данных для каждой операции.</li><li><b>N+1</b>: обращение к каждой незагруженной коллекции может выполнить отдельный SELECT. Решение — запросить нужное заранее: fetch join в запросе (<code>join fetch</code>) или entity graph (<code>@EntityGraph</code> в Spring Data).</li><li>Fetch join коллекции и offset/limit-пагинация несовместимы: Hibernate может загрузить все строки и применить лимит в памяти. Для страницы владельцев с коллекциями — сначала выбрать страницу идентификаторов, затем загрузить данные по ним.</li></ul>
+<ul><li>Коллекции (<code>@OneToMany</code>, <code>@ManyToMany</code>) по умолчанию загружаются лениво; связи «к одному» (<code>@ManyToOne</code>, <code>@OneToOne</code>) — по умолчанию сразу (EAGER). Документация рекомендует ленивые связи и явный запрос нужных данных для каждой операции.</li><li><b>N+1</b>: обращение к каждой незагруженной коллекции может выполнить отдельный SELECT. Решение — запросить нужное заранее: fetch join в запросе (<code>join fetch</code>) или entity graph (в главе 3 — аннотация <code>@EntityGraph</code> в Spring Data).</li><li>Fetch join коллекции и offset/limit-пагинация несовместимы: Hibernate может загрузить все строки и применить лимит в памяти. Для страницы владельцев с коллекциями — сначала выбрать страницу идентификаторов, затем загрузить данные по ним.</li></ul>
 <p class="src">Источник: <a href="https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html#fetching" target="_blank" rel="noopener">Hibernate User Guide: Fetching</a></p>
 <h4 class="pit-h">Частые ошибки</h4>
 <ul class="pitfalls"><li><b>Агрегат в WHERE.</b> Условия на <code>count</code>, <code>sum</code> — только в HAVING. <span class="src">(<a href="https://www.postgresql.org/docs/current/tutorial-agg.html" target="_blank" rel="noopener">PostgreSQL tutorial-agg</a>)</span></li><li><b><code>count(*)</code> после LEFT JOIN.</b> Пустая группа даст 1, а не 0. Считайте <code>count(правая.id)</code>. <span class="src">(<a href="https://www.postgresql.org/docs/current/functions-aggregate.html" target="_blank" rel="noopener">Aggregate Functions</a>)</span></li><li><b>Ожидание, что <code>sum</code> пустой выборки равен 0.</b> Он NULL; используйте <code>coalesce</code>. <span class="src">(<a href="https://www.postgresql.org/docs/current/functions-aggregate.html" target="_blank" rel="noopener">Aggregate Functions</a>)</span></li><li><b>Индекс <code>(a, b)</code> для поиска только по <code>b</code>.</b> Нужен отдельный индекс или другой порядок столбцов. <span class="src">(<a href="https://www.postgresql.org/docs/current/indexes-multicolumn.html" target="_blank" rel="noopener">Multicolumn Indexes</a>)</span></li><li><b>N+1 в цикле по ленивым коллекциям.</b> Загружайте нужное fetch join или entity graph. <span class="src">(<a href="https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html#fetching" target="_blank" rel="noopener">Hibernate: Fetching</a>)</span></li><li><b>Пагинация вместе с fetch join коллекции.</b> Два запроса: страница id, затем данные. <span class="src">(<a href="https://docs.jboss.org/hibernate/orm/current/userguide/html_single/Hibernate_User_Guide.html#fetching" target="_blank" rel="noopener">Hibernate: Fetching</a>)</span></li></ul>
@@ -938,6 +1050,20 @@ FROM author a
 LEFT JOIN book b ON b.author_id = a.id
 GROUP BY a.id, a.name
 ORDER BY books DESC;</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>Запустите PostgreSQL и откройте SQL-редактор в DBeaver (<a href="#setup-6">§0.6</a>).</li><li>Вставьте в редактор таблицы и тестовые данные ниже. Чтобы выполнить весь текст сразу, нажмите <b>Alt+X</b> (Execute script). <b>Ctrl+Enter</b> выполняет только один запрос — тот, где стоит курсор.</li><li>Затем вставьте запрос из разбора, поставьте в него курсор и нажмите <b>Ctrl+Enter</b>. Результат появится внизу таблицей.</li></ol><figure class="code"><figcaption>Таблицы и тестовые данные</figcaption><pre><code>CREATE TABLE author (id BIGSERIAL PRIMARY KEY, name TEXT NOT NULL);
+CREATE TABLE book (
+  id        BIGSERIAL PRIMARY KEY,
+  author_id BIGINT NOT NULL REFERENCES author(id),
+  title     TEXT NOT NULL,
+  rating    NUMERIC(2,1)
+);
+INSERT INTO author (name) VALUES ('Толстой'), ('Чехов'), ('Новый автор');
+INSERT INTO book (author_id, title, rating) VALUES
+  (1, 'Война и мир', 4.8), (1, 'Анна Каренина', 4.6), (2, 'Каштанка', 4.3);</code></pre></figure><h5>Что вы увидите</h5><figure class="code"><figcaption>Результат</figcaption><pre><code>name        | books | avg_rating
+------------+-------+-----------
+Толстой     |     2 |       4.70
+Чехов       |     1 |       4.30
+Новый автор |     0 |     [NULL]</code></pre></figure><h5>Как это работает — по шагам</h5><ol><li><code>FROM author a</code> — берём всех авторов; <code>a</code> — короткое имя таблицы, чтобы писать <code>a.name</code>.</li><li><code>LEFT JOIN book b ON b.author_id = a.id</code> — к каждому автору приклеиваем его книги. У Толстого две книги — получится две строки. У «Нового автора» книг нет, но LEFT JOIN его не выбрасывает: получится одна строка, где все столбцы книги пустые (NULL). Всего 4 строки.</li><li><code>GROUP BY a.id, a.name</code> — собираем строки одного автора в одну группу.</li><li><code>COUNT(b.id)</code> считает только непустые значения: у Толстого 2, у Чехова 1, у «Нового автора» 0. Если написать <code>COUNT(*)</code>, «Новый автор» получит 1 — посчитается его строка с пустыми полями. Проверьте сами!</li><li><code>AVG(b.rating)</code> — среднее по непустым оценкам; у автора без книг среднего нет — NULL. <code>ROUND(…, 2)</code> округляет до двух знаков.</li><li><code>ORDER BY books DESC</code> — сортировка по числу книг, от большего (DESC — по убыванию).</li></ol></div></details>
     <p><b>Итог:</b> в задаче 2.1 добавляется подсчёт части строк (<code>FILTER</code>) и процент с защитой от деления на ноль.</p>
   </div>
   <div class="box task"><h4>Задача 2.1. Прогресс проектов</h4>
@@ -965,47 +1091,231 @@ LEFT JOIN task t ON t.project_id = p.id
 GROUP BY p.id, p.name
 ORDER BY done_pct DESC NULLS LAST;</code></pre></figure>
       <p><code>LEFT JOIN</code> оставляет проекты без задач. <code>COUNT(t.id)</code> не считает NULL, поэтому у пустого проекта total = 0. <code>NULLIF</code> защищает от деления на ноль, <code>FILTER</code> — компактная замена <code>SUM(CASE …)</code>.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>В DBeaver откройте SQL-редактор для подключения к PostgreSQL.</li><li>Выполните создание таблиц из листинга 2.1 и тестовые данные из блока «Как понять задание» (выделите весь текст и нажмите <b>Alt+X</b>).</li><li>Вставьте решение, поставьте курсор внутрь запроса и нажмите <b>Ctrl+Enter</b>.</li></ol><h5>Что вы увидите</h5><figure class="code"><figcaption>Результат</figcaption><pre><code>name                 | total | done | done_pct
+---------------------+-------+------+---------
+Сайт                 |     3 |    2 |     66.7
+Мобильное приложение |     2 |    1 |     50.0
+Пустой проект        |     0 |    0 |   [NULL]</code></pre></figure><h5>Как это работает — по шагам</h5><ol><li>Сначала база выполняет <code>FROM project p LEFT JOIN task t …</code>. Чтобы увидеть этот промежуточный шаг, выполните отдельно <code>SELECT p.name, t.title, t.status FROM project p LEFT JOIN task t ON t.project_id = p.id;</code> — будет 6 строк: 3 для «Сайта», 2 для «Мобильного приложения» и 1 для «Пустого проекта» с пустыми title и status.</li><li><code>GROUP BY p.id, p.name</code> складывает эти 6 строк в 3 группы — по одной на проект.</li><li><code>COUNT(t.id)</code> в каждой группе считает непустые id задач: 3, 2 и 0.</li><li><code>COUNT(*) FILTER (WHERE t.status = 'DONE')</code> считает только строки группы, где статус DONE: 2, 1 и 0.</li><li>Процент: <code>100.0 * 2 / 3</code> = 66.666…, <code>ROUND(…, 1)</code> → 66.7. Пишем <code>100.0</code>, а не <code>100</code>: при делении целых чисел дробная часть отбрасывается, и вышло бы 66.</li><li>У пустого проекта всего 0 задач. <code>NULLIF(COUNT(t.id), 0)</code> превращает 0 в NULL, а деление на NULL даёт NULL — вместо ошибки «division by zero».</li><li><code>ORDER BY done_pct DESC NULLS LAST</code> — сортировка по проценту от большего к меньшему; пустые значения ставятся в конец (иначе в PostgreSQL при DESC они идут первыми).</li></ol><h5>Проверьте, что поняли</h5><p>Замените <code>COUNT(t.id)</code> на <code>COUNT(*)</code> и выполните снова: у «Пустого проекта» total станет 1. Это самая частая ошибка с LEFT JOIN.</p></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c2-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
   <div class="box example"><h4>Разбор похожего задания</h4>
     <p><b>Задание:</b> страница «Заказы клиента» тормозит: на каждый заказ отдельный запрос за позициями.</p>
-    <ol><li>Включить лог SQL: <code>logging.level.org.hibernate.SQL=debug</code>.</li><li>Открыть страницу и посчитать запросы: 1 за заказы + N за позиции — это N+1.</li><li>Добавить к методу репозитория <code>@EntityGraph(attributePaths = "lines")</code>.</li><li>Снова посмотреть лог: должен остаться один запрос с JOIN.</li><li>Закрепить тестом: число запросов можно проверить через Hibernate Statistics.</li></ol>
-    <figure class="code"><figcaption>Spring Data JPA</figcaption><pre><code>@Entity
-class Order {
+    <p>Делаем на «чистом» JPA/Hibernate — без Spring: Spring Boot и Spring Data появятся только в главе 3. Нужны PostgreSQL (<a href="#setup-6">§0.6</a>) и IntelliJ IDEA (<a href="#setup-3">§0.3</a>).</p>
+    <ol><li>Включить показ SQL: в настройках Hibernate <code>hibernate.show_sql=true</code> — каждый запрос к базе печатается в консоль.</li><li>Загрузить заказы клиента и в цикле обратиться к позициям каждого. Посчитать запросы: 1 за заказы + N за позиции — это N+1.</li><li>Переписать запрос: <code>left join fetch o.lines</code> — «заказы сразу вместе с позициями».</li><li>Снова посмотреть консоль: должен остаться один запрос с JOIN.</li><li>Закрепить: пусть программа сама считает запросы через Hibernate Statistics — тогда проверка не зависит от внимательности.</li></ol>
+<figure class="code"><figcaption>JPA / Hibernate — главное</figcaption><pre><code>@Entity
+@Table(name = "shop_order")
+public class ShopOrder {
     @Id Long id;
-    Long customerId;
+    @Column(name = "customer_id") Long customerId;
     @OneToMany(mappedBy = "order") List&lt;OrderLine&gt; lines;   // LAZY по умолчанию
 }
 
-interface OrderRepository extends JpaRepository&lt;Order, Long&gt; {
-    @EntityGraph(attributePaths = "lines")
-    List&lt;Order&gt; findByCustomerId(Long customerId);
-}</code></pre></figure>
-    <p><b>Итог:</b> в задаче 2.2 тот же приём для проектов и задач, плюс вариант через <code>join fetch</code>.</p>
+// было: 1 + N запросов
+em.createQuery("select o from ShopOrder o where o.customerId = :c", ShopOrder.class)
+
+// стало: один запрос с JOIN
+em.createQuery("select o from ShopOrder o left join fetch o.lines where o.customerId = :c", ShopOrder.class)</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Шаг 1. Проект</h5><ol><li>IntelliJ IDEA → <b>New Project</b> → <b>Java</b>, Name: <code>jpa-basics</code>, Build system: <b>Gradle</b>, Gradle DSL: <b>Kotlin</b>, JDK 21 → <b>Create</b> (как в <a href="#setup-3">§0.3</a>).</li><li>Откройте <code>build.gradle.kts</code> и добавьте в блок <code>dependencies { … }</code> две строки: сам Hibernate (он и есть реализация JPA) и драйвер, через который Java разговаривает с PostgreSQL. Нажмите появившийся значок слона — Gradle скачает библиотеки.</li></ol><figure class="code"><figcaption>build.gradle.kts — в блок dependencies</figcaption><pre><code>implementation("org.hibernate.orm:hibernate-core:6.6.4.Final")
+implementation("org.postgresql:postgresql:42.7.4")</code></pre></figure><h5>Шаг 2. Таблицы и данные</h5><p>В DBeaver (<a href="#setup-6">§0.6</a>) выполните скрипт целиком (<b>Alt+X</b>). У клиента 7 три заказа, у клиента 8 — один.</p><figure class="code"><figcaption>SQL</figcaption><pre><code>CREATE TABLE shop_order (id BIGINT PRIMARY KEY, customer_id BIGINT NOT NULL);
+CREATE TABLE order_line (
+  id       BIGINT PRIMARY KEY,
+  order_id BIGINT NOT NULL REFERENCES shop_order(id),
+  product  TEXT NOT NULL,
+  qty      INT NOT NULL
+);
+INSERT INTO shop_order VALUES (1, 7), (2, 7), (3, 7), (4, 8);
+INSERT INTO order_line VALUES
+  (1, 1, 'Чай', 2), (2, 1, 'Мёд', 1), (3, 2, 'Кофе', 1),
+  (4, 3, 'Сахар', 3), (5, 3, 'Молоко', 2), (6, 4, 'Хлеб', 1);</code></pre></figure><p>Почему не <code>Order</code> и <code>orders</code>: <code>ORDER</code> — служебное слово SQL (<code>ORDER BY</code>), с таким именем таблицы и класса легко получить странные ошибки.</p><h5>Шаг 3. Настройки JPA</h5><p>Создайте папку <code>src/main/resources/META-INF</code> (правой кнопкой по <code>resources</code> → <b>New → Directory</b>) и в ней файл <code>persistence.xml</code>. Здесь — адрес базы, пароль из §0.6 и список классов-сущностей. Последние три строки: печатать SQL, считать запросы и не засорять консоль подробной статистикой.</p><figure class="code"><figcaption>src/main/resources/META-INF/persistence.xml</figcaption><pre><code>&lt;?xml version="1.0" encoding="UTF-8"?&gt;
+&lt;persistence xmlns="https://jakarta.ee/xml/ns/persistence" version="3.0"&gt;
+  &lt;persistence-unit name="shop"&gt;
+    &lt;class&gt;ShopOrder&lt;/class&gt;
+    &lt;class&gt;OrderLine&lt;/class&gt;
+    &lt;properties&gt;
+      &lt;property name="jakarta.persistence.jdbc.url" value="jdbc:postgresql://localhost:5432/postgres"/&gt;
+      &lt;property name="jakarta.persistence.jdbc.user" value="postgres"/&gt;
+      &lt;property name="jakarta.persistence.jdbc.password" value="dev"/&gt;
+      &lt;property name="hibernate.show_sql" value="true"/&gt;
+      &lt;property name="hibernate.generate_statistics" value="true"/&gt;
+      &lt;property name="hibernate.session.events.log" value="false"/&gt;
+    &lt;/properties&gt;
+  &lt;/persistence-unit&gt;
+&lt;/persistence&gt;</code></pre></figure><h5>Шаг 4. Сущности и программа</h5><p>В <code>src/main/java</code> создайте три класса. Сущность — обычный Java-класс, который Hibernate связывает с таблицей: <code>@Entity</code> — «это сущность», <code>@Table</code> — имя таблицы, <code>@Id</code> — первичный ключ, <code>@Column</code> — имя столбца, если оно отличается от имени поля.</p><figure class="code"><figcaption>src/main/java/ShopOrder.java</figcaption><pre><code>import jakarta.persistence.*;
+import java.util.List;
+
+@Entity
+@Table(name = "shop_order")
+public class ShopOrder {
+    @Id Long id;
+
+    @Column(name = "customer_id")
+    Long customerId;
+
+    @OneToMany(mappedBy = "order")      // LAZY по умолчанию
+    List&lt;OrderLine&gt; lines;
+}</code></pre></figure><figure class="code"><figcaption>src/main/java/OrderLine.java</figcaption><pre><code>import jakarta.persistence.*;
+
+@Entity
+@Table(name = "order_line")
+public class OrderLine {
+    @Id Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "order_id")
+    ShopOrder order;
+
+    String product;
+    int qty;
+}</code></pre></figure><figure class="code"><figcaption>src/main/java/OrdersPage.java</figcaption><pre><code>import jakarta.persistence.*;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
+import java.util.List;
+
+public class OrdersPage {
+    public static void main(String[] args) {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("shop");
+        Statistics stats = emf.unwrap(SessionFactory.class).getStatistics();
+
+        System.out.println("=== Было: N+1 ===");
+        try (EntityManager em = emf.createEntityManager()) {
+            stats.clear();
+            List&lt;ShopOrder&gt; orders = em.createQuery(
+                    "select o from ShopOrder o where o.customerId = :c", ShopOrder.class)
+                .setParameter("c", 7L)
+                .getResultList();
+            for (ShopOrder o : orders) {
+                System.out.println("Заказ " + o.id + ": позиций " + o.lines.size());
+            }
+            System.out.println("Запросов к базе: " + stats.getPrepareStatementCount());
+        }
+
+        System.out.println("=== Стало: join fetch ===");
+        try (EntityManager em = emf.createEntityManager()) {
+            stats.clear();
+            List&lt;ShopOrder&gt; orders = em.createQuery(
+                    "select o from ShopOrder o left join fetch o.lines where o.customerId = :c",
+                    ShopOrder.class)
+                .setParameter("c", 7L)
+                .getResultList();
+            for (ShopOrder o : orders) {
+                System.out.println("Заказ " + o.id + ": позиций " + o.lines.size());
+            }
+            System.out.println("Запросов к базе: " + stats.getPrepareStatementCount());
+        }
+        emf.close();
+    }
+}</code></pre></figure><p>Нажмите ▶ рядом с <code>main</code> в <code>OrdersPage</code> → <b>Run</b>. Красные строки <code>INFO</code> в начале — это не ошибки, а сообщения Hibernate о запуске.</p><h5>Что вы увидите</h5><figure class="code"><figcaption>Окно Run (без строк INFO)</figcaption><pre><code>=== Было: N+1 ===
+Hibernate: select so1_0.id,so1_0.customer_id from shop_order so1_0 where so1_0.customer_id=?
+Hibernate: select l1_0.order_id,l1_0.id,l1_0.product,l1_0.qty from order_line l1_0 where l1_0.order_id=?
+Заказ 1: позиций 2
+Hibernate: select l1_0.order_id,l1_0.id,l1_0.product,l1_0.qty from order_line l1_0 where l1_0.order_id=?
+Заказ 2: позиций 1
+Hibernate: select l1_0.order_id,l1_0.id,l1_0.product,l1_0.qty from order_line l1_0 where l1_0.order_id=?
+Заказ 3: позиций 2
+Запросов к базе: 4
+=== Стало: join fetch ===
+Hibernate: select so1_0.id,so1_0.customer_id,l1_0.order_id,l1_0.id,l1_0.product,l1_0.qty from shop_order so1_0 left join order_line l1_0 on so1_0.id=l1_0.order_id where so1_0.customer_id=?
+Заказ 1: позиций 2
+Заказ 2: позиций 1
+Заказ 3: позиций 2
+Запросов к базе: 1</code></pre></figure><h5>Как это работает — по шагам</h5><ol><li><code>Persistence.createEntityManagerFactory("shop")</code> читает <code>persistence.xml</code> (блок с <code>name="shop"</code>), подключается к базе и запоминает, какой класс какой таблице соответствует. Это делается один раз на всю программу.</li><li><code>emf.createEntityManager()</code> открывает «сеанс работы» с базой. Через него выполняют запросы. <code>try (…)</code> закрывает сеанс автоматически.</li><li>Запрос написан на <b>JPQL</b> — это почти SQL, но про классы и поля, а не таблицы и столбцы: <code>ShopOrder o</code>, <code>o.customerId</code>. Hibernate сам переводит его в SQL — этот перевод и печатается после слова <code>Hibernate:</code>. <code>:c</code> — параметр, его значение задаёт <code>setParameter("c", 7L)</code>.</li><li>Первый запрос загружает только сами заказы. Поле <code>lines</code> пока не заполнено: связь <code>@OneToMany</code> по умолчанию <b>ленивая</b> (LAZY) — Hibernate подставляет «заглушку» и пойдёт в базу, только когда к списку обратятся.</li><li>В цикле <code>o.lines.size()</code> — то самое обращение. Для каждого заказа Hibernate делает отдельный <code>select … from order_line where order_id=?</code>. Заказов 3 — значит 1 + 3 = 4 запроса. При 1000 заказов было бы 1001 — отсюда и тормоза.</li><li>Во втором варианте <code>left join fetch o.lines</code> говорит: «соедини заказы с позициями и сразу заполни списки <code>lines</code>». В консоли — один SQL с <code>left join</code>, а цикл уже ничего не запрашивает. <code>left</code> нужен, чтобы заказ без позиций тоже попал в результат.</li><li><code>stats.getPrepareStatementCount()</code> — сколько SQL-запросов отправлено после <code>stats.clear()</code>. Так программа сама показывает «было 4 — стало 1».</li></ol><h5>Второй способ — entity graph</h5><p>Тот же результат без изменения текста запроса: «граф» перечисляет, какие связи загрузить сразу. Добавьте третий блок в <code>main</code> — в консоли снова будет один запрос с JOIN.</p><figure class="code"><figcaption>Java</figcaption><pre><code>EntityGraph&lt;ShopOrder&gt; graph = em.createEntityGraph(ShopOrder.class);
+graph.addAttributeNodes("lines");                       // загрузить lines сразу
+List&lt;ShopOrder&gt; orders = em.createQuery(
+        "select o from ShopOrder o where o.customerId = :c", ShopOrder.class)
+    .setParameter("c", 7L)
+    .setHint("jakarta.persistence.fetchgraph", graph)
+    .getResultList();</code></pre></figure></div></details>
+    <p><b>Итог:</b> в задаче 2.2 тот же приём для проектов и задач из задачи 2.1 — в том же проекте <code>jpa-basics</code>.</p>
   </div>
   <div class="box task"><h4>Задача 2.2. Убрать N+1</h4>
-    <p>Метод <code>projectRepository.findAll()</code>, а затем <code>project.getTasks()</code> в цикле даёт 1 + N запросов. Исправьте одним запросом.</p>
+    <p>Программа загружает все проекты запросом <code>select p from Project p</code>, а затем в цикле обращается к <code>p.tasks</code> — получается 1 + N запросов. Исправьте так, чтобы проекты и их задачи загружались одним запросом.</p>
     <div class="howto">
       <h5>Как понять задание</h5>
       <p><b>Простыми словами.</b> программа загружает список проектов, а потом для каждого проекта отдельно ходит в базу за его задачами. При 100 проектах — 101 запрос, и страница тормозит. Нужно, чтобы проекты и задачи загружались одним запросом.</p>
-      <p><b>Что на входе и что на выходе.</b> вход — код, который вызывает <code>findAll()</code> и в цикле <code>getTasks()</code>. Выход — метод репозитория, после которого в логе SQL виден <b>один</b> запрос вместо многих.</p>
-      <p><b>Где писать и как запустить.</b> эту задачу удобнее делать после главы 3 — в проекте <code>taskhub-api</code> с базой PostgreSQL. Включите показ SQL в <code>src/main/resources/application.properties</code>: <code>spring.jpa.show-sql=true</code>. Запросы будут видны в консоли при запуске.</p>
+      <p><b>Что на входе и что на выходе.</b> вход — программа <code>ProjectReport</code> ниже: она печатает «Запросов к базе: 4» (1 за проекты + 3 за задачи). Выход — та же программа с исправленным запросом: строки про проекты те же, а «Запросов к базе: 1». «Пустой проект» с нулём задач не должен пропасть.</p>
+      <p><b>Где писать и как запустить.</b> проект <code>jpa-basics</code> из разбора похожего задания (там уже настроены <code>build.gradle.kts</code> и <code>persistence.xml</code>). Таблицы <code>project</code> и <code>task</code> с данными уже есть в базе после задачи 2.1. Сделайте три шага:</p>
+      <ol><li>В <code>persistence.xml</code> рядом с остальными строками <code>&lt;class&gt;</code> добавьте <code>&lt;class&gt;Project&lt;/class&gt;</code> и <code>&lt;class&gt;Task&lt;/class&gt;</code>.</li><li>Создайте в <code>src/main/java</code> две сущности и программу (код ниже).</li><li>Запустите <code>ProjectReport</code> (▶ рядом с <code>main</code>) и посмотрите на консоль: сколько строк <code>Hibernate: select</code> и что напечатано в «Запросов к базе».</li></ol>
+<figure class="code"><figcaption>src/main/java/Project.java</figcaption><pre><code>import jakarta.persistence.*;
+import java.util.List;
+
+@Entity
+@Table(name = "project")
+public class Project {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+
+    String name;
+
+    @OneToMany(mappedBy = "project")     // LAZY по умолчанию
+    List&lt;Task&gt; tasks;
+}</code></pre></figure>
+      <figure class="code"><figcaption>src/main/java/Task.java</figcaption><pre><code>import jakarta.persistence.*;
+
+@Entity
+@Table(name = "task")
+public class Task {
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    Long id;
+
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "project_id")
+    Project project;
+
+    String title;
+    String status;
+}</code></pre></figure>
+      <figure class="code"><figcaption>src/main/java/ProjectReport.java — с проблемой N+1</figcaption><pre><code>import jakarta.persistence.*;
+import org.hibernate.SessionFactory;
+import org.hibernate.stat.Statistics;
+import java.util.List;
+
+public class ProjectReport {
+    public static void main(String[] args) {
+        EntityManagerFactory emf = Persistence.createEntityManagerFactory("shop");
+        Statistics stats = emf.unwrap(SessionFactory.class).getStatistics();
+
+        try (EntityManager em = emf.createEntityManager()) {
+            stats.clear();
+            List&lt;Project&gt; projects = em.createQuery(
+                    "select p from Project p order by p.id", Project.class)
+                .getResultList();
+            for (Project p : projects) {
+                System.out.println(p.name + ": задач " + p.tasks.size());
+            }
+            System.out.println("Запросов к базе: " + stats.getPrepareStatementCount());
+        }
+        emf.close();
+    }
+}</code></pre></figure>
       <p><b>Подсказки по шагам</b> (без готового решения):</p>
-      <ol><li>Вызовите старый вариант (например, в тесте или временном эндпоинте) и посчитайте строки <code>select</code> в консоли.</li><li>Добавьте в интерфейс <code>ProjectRepository</code> новый метод с аннотацией <code>@Query</code> и словами <code>join fetch</code>.</li><li>Вызовите новый метод вместо <code>findAll()</code> и снова посчитайте запросы.</li></ol>
-      <p><b>Как проверить себя.</b> в консоли — один запрос с <code>join</code>, а данные те же.</p>
+      <ol><li>Найдите в консоли повторяющийся запрос <code>select … from task … where project_id=?</code> — сколько раз он выполняется и почему?</li><li>Менять нужно только текст JPQL-запроса. Присоедините к проекту его задачи — так, чтобы проекты без задач не пропали (какой JOIN оставляет все строки левой таблицы?).</li><li>Добавьте слово, которое просит Hibernate сразу заполнить список задач, а не просто соединить таблицы.</li><li>Запустите снова и сравните.</li></ol>
+      <p><b>Как проверить себя.</b> в консоли один запрос с <code>left join</code>, «Запросов к базе: 1», а строки «Сайт: задач 3», «Мобильное приложение: задач 2», «Пустой проект: задач 0» — те же, что были.</p>
     </div>
     <details class="sol"><summary>Показать решение</summary>
-      <figure class="code"><figcaption>Spring Data JPA</figcaption><pre><code>public interface ProjectRepository extends JpaRepository&lt;Project, Long&gt; {
+      <figure class="code"><figcaption>ProjectReport.java — исправленный запрос</figcaption><pre><code>List&lt;Project&gt; projects = em.createQuery(
+        "select p from Project p left join fetch p.tasks order by p.id", Project.class)
+    .getResultList();</code></pre></figure>
+      <p><code>join fetch</code> загружает проекты и их задачи одним SQL-запросом. <code>left</code> оставляет проекты без задач. В Hibernate 6 повторы проектов в результате убираются сами; в старых версиях писали <code>select distinct p</code>. Для постраничного вывода fetch join по коллекции не подходит — там используют batch fetching (<code>@BatchSize</code>).</p>
 
-    @Query("select distinct p from Project p left join fetch p.tasks")
+      <div class="walk"><h5>Что вы увидите</h5><figure class="code"><figcaption>Окно Run (без строк INFO)</figcaption><pre><code>Hibernate: select p1_0.id,p1_0.name,t1_0.project_id,t1_0.id,t1_0.status,t1_0.title from project p1_0 left join task t1_0 on p1_0.id=t1_0.project_id order by p1_0.id
+Сайт: задач 3
+Мобильное приложение: задач 2
+Пустой проект: задач 0
+Запросов к базе: 1</code></pre></figure><h5>Как это работает — по шагам</h5><ol><li>Было: <code>select p from Project p</code> загружал только проекты, а список <code>tasks</code> оставался ленивой «заглушкой». Каждое <code>p.tasks.size()</code> в цикле отправляло свой <code>select … from task where project_id=?</code>: 1 + 3 = 4 запроса.</li><li>Стало: <code>left join fetch p.tasks</code>. Слово <code>join</code> соединяет проекты с задачами, <code>fetch</code> просит сразу положить найденные задачи в списки <code>tasks</code>, <code>left</code> — не терять проекты без задач.</li><li>База возвращает 6 строк (как в промежуточном шаге задачи 2.1). Hibernate раскладывает их по объектам: три объекта <code>Project</code>, у каждого заполненный список задач; у «Пустого проекта» — пустой.</li><li>Цикл обращается к уже загруженным спискам — новых запросов нет. Статистика показывает 1.</li></ol><h5>Второй способ — entity graph</h5><p>Текст запроса не меняется, а нужные связи перечисляются отдельно. Результат тот же — один запрос.</p><figure class="code"><figcaption>Java</figcaption><pre><code>EntityGraph&lt;Project&gt; graph = em.createEntityGraph(Project.class);
+graph.addAttributeNodes("tasks");
+List&lt;Project&gt; projects = em.createQuery("select p from Project p order by p.id", Project.class)
+    .setHint("jakarta.persistence.fetchgraph", graph)
+    .getResultList();</code></pre></figure><h5>Забегая вперёд: то же самое в Spring Data (глава 3)</h5><p>В главе 3 вы будете писать не <code>em.createQuery(…)</code>, а интерфейсы-репозитории Spring Data. Spring сам создаёт их реализацию и внутри делает ровно то, что вы сейчас написали руками: <code>@Query</code> — тот же JPQL с <code>join fetch</code>, <code>@EntityGraph</code> — тот же граф. Сейчас это просто для узнавания — вернётесь к этому после главы 3.</p><figure class="code"><figcaption>Spring Data JPA (глава 3)</figcaption><pre><code>public interface ProjectRepository extends JpaRepository&lt;Project, Long&gt; {
+
+    @Query("select p from Project p left join fetch p.tasks")
     List&lt;Project&gt; findAllWithTasks();
 
-    // или то же через EntityGraph:
     @EntityGraph(attributePaths = "tasks")
     List&lt;Project&gt; findAllBy();
-}</code></pre></figure>
-      <p><code>join fetch</code> загружает проекты и их задачи одним SQL-запросом. <code>distinct</code> убирает дубликаты проектов в результате. Для пагинации fetch join по коллекции не подходит — там используют batch fetching (<code>@BatchSize</code>).</p>
+}</code></pre></figure></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c2-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -1178,6 +1488,21 @@ class UserErrors {
         return pd;
     }
 }</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><p><b>Куда класть файлы.</b> Все классы — в ту же папку (пакет), где лежит главный класс приложения с <code>@SpringBootApplication</code>, например <code>src/main/java/com/example/taskhub/</code>, или во вложенные папки. Spring ищет свои классы только там; класс в другом месте он просто не заметит. Первая строка каждого файла — <code>package …;</code> — IntelliJ впишет её сама. Недостающие <code>import</code> добавляются так: курсор на красное слово → <b>Alt+Enter</b> → <b>Import class</b>.</p><ol><li>Создайте файл исключения <code>EmailTakenException.java</code> и обработчик <code>UserErrors.java</code> из разбора.</li><li>Для проверки нужен адрес регистрации. Если его ещё нет, добавьте учебный контроллер ниже: он помнит почты в памяти и при повторе бросает исключение. В настоящем проекте эта проверка живёт в сервисе, а почты — в базе.</li><li>Запустите приложение: ▶ рядом с классом <code>…Application</code> или в терминале <code>./gradlew bootRun</code>. Дождитесь строки <code>Started …Application</code>.</li><li>Отправьте один и тот же запрос два раза (в Windows вместо <code>curl</code> пишите <code>curl.exe</code>, подробности — <a href="#setup-11">§0.11</a>).</li></ol><figure class="code"><figcaption>UserController.java — учебный</figcaption><pre><code>@RestController
+@RequestMapping("/api/v1/users")
+class UserController {
+    private final Set&lt;String&gt; emails = ConcurrentHashMap.newKeySet();
+
+    @PostMapping
+    ResponseEntity&lt;Void&gt; register(@RequestBody Map&lt;String, String&gt; body) {
+        String email = body.get("email");
+        if (!emails.add(email)) throw new EmailTakenException(email);   // add вернёт false, если такая почта уже есть
+        return ResponseEntity.status(HttpStatus.CREATED).build();
+    }
+}</code></pre></figure><figure class="code"><figcaption>Терминал</figcaption><pre><code>curl -i -X POST http://localhost:8080/api/v1/users -H "Content-Type: application/json" -d '{"email":"a@b.lv"}'</code></pre></figure><h5>Что вы увидите</h5><p>Первый раз — <code>HTTP/1.1 201</code>. Второй раз:</p><figure class="code"><figcaption>Ответ</figcaption><pre><code>HTTP/1.1 409
+Content-Type: application/problem+json
+
+{"type":"about:blank","title":"Email taken","status":409,"detail":"Email already registered: a@b.lv","instance":"/api/v1/users"}</code></pre></figure><h5>Как это работает — по шагам</h5><ol><li>Запрос приходит в Spring, тот находит метод с <code>@PostMapping</code> в контроллере для адреса <code>/api/v1/users</code> и превращает JSON-тело в <code>Map</code>.</li><li>Второй раз <code>emails.add(…)</code> возвращает false, и метод бросает <code>EmailTakenException</code>. Метод прерывается — до <code>return</code> дело не доходит.</li><li>Исключение «всплывает» из контроллера в Spring. Spring ищет метод с <code>@ExceptionHandler</code>, который умеет такое исключение, — и находит его в классе <code>UserErrors</code>, помеченном <code>@RestControllerAdvice</code> («советник» для всех контроллеров).</li><li><code>ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, …)</code> создаёт ответ стандартного формата (RFC 9457) со статусом 409 и текстом исключения в поле <code>detail</code>; <code>setTitle</code> задаёт короткий заголовок.</li><li>Spring превращает <code>ProblemDetail</code> в JSON и сам ставит заголовок <code>Content-Type: application/problem+json</code>. Поле <code>instance</code> — адрес запроса — тоже заполняется само.</li><li>Контроллер ничего не знает о кодах ошибок — он просто бросает исключение. Поэтому все ошибки приложения оформляются в одном месте и одинаково.</li></ol></div></details>
     <p><b>Итог:</b> в задаче 3.1 два обработчика: для валидации (список полей) и для «не найдено».</p>
   </div>
   <div class="box task"><h4>Задача 3.1. Единый формат ошибок</h4>
@@ -1211,6 +1536,53 @@ class ApiErrors {
     }
 }</code></pre></figure>
       <p><code>@RestControllerAdvice</code> применяется ко всем контроллерам. Spring сам выставит <code>Content-Type: application/problem+json</code>. Третий аргумент <code>toMap</code> нужен, если у поля две ошибки — иначе будет исключение о дубликате ключа.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><p><b>Куда класть файлы.</b> Все классы — в ту же папку (пакет), где лежит главный класс приложения с <code>@SpringBootApplication</code>, например <code>src/main/java/com/example/taskhub/</code>, или во вложенные папки. Spring ищет свои классы только там; класс в другом месте он просто не заметит. Первая строка каждого файла — <code>package …;</code> — IntelliJ впишет её сама. Недостающие <code>import</code> добавляются так: курсор на красное слово → <b>Alt+Enter</b> → <b>Import class</b>.</p><ol><li>Убедитесь, что в <code>build.gradle.kts</code> есть <code>implementation("org.springframework.boot:spring-boot-starter-validation")</code>; если добавили — нажмите значок слона.</li><li>Создайте файлы ниже. Если в вашем <code>taskhub-api</code> контроллер и сервис уже есть (листинг 3.1) — возьмите из этих файлов только недостающее: <code>@Valid</code> перед <code>@RequestBody</code>, <code>@NotBlank</code> в <code>CreateTask</code> и выброс <code>TaskNotFoundException</code>. Учебный сервис хранит задачи в памяти, чтобы проверка не зависела от базы.</li><li>Добавьте <code>ApiErrors.java</code> из решения.</li><li>Запустите приложение (<code>./gradlew bootRun</code> или ▶ рядом с классом <code>…Application</code>) и отправьте два запроса.</li></ol><figure class="code"><figcaption>CreateTask.java, TaskDto.java, TaskNotFoundException.java</figcaption><pre><code>public record CreateTask(@NotBlank String title) {}
+
+public record TaskDto(long id, String title) {}
+
+public class TaskNotFoundException extends RuntimeException {
+    public TaskNotFoundException(long id) { super("Task " + id + " not found"); }
+}</code></pre></figure><figure class="code"><figcaption>TaskService.java и TaskController.java — минимальные</figcaption><pre><code>@Service
+public class TaskService {
+    private final Map&lt;Long, TaskDto&gt; tasks = new ConcurrentHashMap&lt;&gt;();
+    private final AtomicLong seq = new AtomicLong();
+
+    public TaskDto create(CreateTask cmd) {
+        TaskDto t = new TaskDto(seq.incrementAndGet(), cmd.title());
+        tasks.put(t.id(), t);
+        return t;
+    }
+
+    public TaskDto get(long id) {
+        TaskDto t = tasks.get(id);
+        if (t == null) throw new TaskNotFoundException(id);
+        return t;
+    }
+}
+
+@RestController
+@RequestMapping("/api/v1/tasks")
+class TaskController {
+    private final TaskService service;
+
+    TaskController(TaskService service) { this.service = service; }
+
+    @PostMapping
+    ResponseEntity&lt;TaskDto&gt; create(@Valid @RequestBody CreateTask cmd) {
+        TaskDto saved = service.create(cmd);
+        return ResponseEntity.created(URI.create("/api/v1/tasks/" + saved.id())).body(saved);
+    }
+
+    @GetMapping("/{id}")
+    TaskDto get(@PathVariable long id) { return service.get(id); }
+}</code></pre></figure><p>Каждый <code>public</code> класс или record — в своём файле с тем же именем.</p><figure class="code"><figcaption>Терминал (macOS, Linux; в Windows — curl.exe)</figcaption><pre><code>curl -i -X POST http://localhost:8080/api/v1/tasks -H "Content-Type: application/json" -d '{"title":""}'
+curl -i http://localhost:8080/api/v1/tasks/999</code></pre></figure><h5>Что вы увидите</h5><figure class="code"><figcaption>Ответы</figcaption><pre><code>HTTP/1.1 400
+Content-Type: application/problem+json
+{"type":"about:blank","title":"Validation failed","status":400,"instance":"/api/v1/tasks","errors":{"title":"must not be blank"}}
+
+HTTP/1.1 404
+Content-Type: application/problem+json
+{"type":"about:blank","title":"Not Found","status":404,"detail":"Task 999 not found","instance":"/api/v1/tasks/999"}</code></pre></figure><p>Если в системе русский язык, вместо «must not be blank» может прийти «не должно быть пустым» — это нормально.</p><h5>Как это работает — по шагам: ошибка валидации</h5><ol><li>Spring получает POST и превращает JSON <code>{"title":""}</code> в объект <code>CreateTask("")</code>.</li><li>Из-за <code>@Valid</code> перед параметром Spring проверяет объект <b>до</b> вызова метода. Правило <code>@NotBlank</code> на поле <code>title</code> нарушено.</li><li>Метод контроллера даже не вызывается: Spring бросает <code>MethodArgumentNotValidException</code> и ищет для него <code>@ExceptionHandler</code> — находит метод <code>invalid</code> в <code>ApiErrors</code>.</li><li><code>ex.getBindingResult().getFieldErrors()</code> — список нарушений; у каждого есть поле (<code>getField()</code> → <code>"title"</code>) и сообщение (<code>getDefaultMessage()</code> → <code>"must not be blank"</code>).</li><li><code>Collectors.toMap(…)</code> превращает список в словарь <code>{"title": "must not be blank"}</code>. Третий аргумент <code>(a, b) -&gt; a</code> говорит, что делать, если у одного поля две ошибки: оставить первую. Без него будет исключение «Duplicate key».</li><li><code>pd.setProperty("errors", …)</code> добавляет словарь в ответ: Spring выводит такие свойства на верхний уровень JSON, рядом с <code>status</code> и <code>title</code>.</li></ol><h5>Как это работает — по шагам: «не найдено»</h5><ol><li>GET <code>/api/v1/tasks/999</code> попадает в метод <code>get</code>; <code>@PathVariable</code> берёт 999 из адреса.</li><li>Сервис не находит задачу и бросает <code>TaskNotFoundException</code>.</li><li>Spring находит обработчик <code>notFound</code> и отдаёт 404 с текстом исключения в <code>detail</code>.</li></ol></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c3-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -1230,6 +1602,17 @@ class TaskNotFoundTest {
            .andExpect(jsonPath("$.status").value(404));
     }
 }</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>Нужны контроллер, сервис и <code>ApiErrors</code> из задачи 3.1 — тест проверяет именно их.</li><li>Откройте <code>src/test/java</code>, дойдите до той же папки-пакета, что и у приложения (например, <code>com/example/taskhub</code>), правой кнопкой → <b>New → Java Class</b> → <code>TaskNotFoundTest</code>.</li><li>Вставьте код из разбора и над ним — строки <code>import</code> ниже (полный список, чтобы не искать по одной).</li><li>Нажмите ▶ рядом с именем класса → <b>Run 'TaskNotFoundTest'</b>. Или в терминале: <code>./gradlew test</code>.</li></ol><figure class="code"><figcaption>Импорты для тестов MockMvc</figcaption><pre><code>import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.http.MediaType;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.mockito.Mockito.when;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.*;
+import static org.springframework.test.web.servlet.result.MockMvcResultHandlers.print;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.*;</code></pre></figure><h5>Что вы увидите</h5><p>Внизу окно Run: зелёная галочка и «Tests passed: 1». Через <code>./gradlew test</code> — <code>BUILD SUCCESSFUL</code>, а подробный отчёт открывается в браузере из файла <code>build/reports/tests/test/index.html</code>.</p><h5>Как это работает — по шагам</h5><ol><li><code>@WebMvcTest(TaskController.class)</code> запускает «маленький» Spring: только веб-часть — этот контроллер, все <code>@RestControllerAdvice</code>, превращение в JSON, валидацию. Сервисы и база не создаются, поэтому тест запускается за секунды.</li><li>Контроллеру нужен <code>TaskService</code>, а его в маленьком Spring нет. <code>@MockitoBean</code> подставляет вместо него «мок» — пустышку, которой можно приказать, как себя вести.</li><li><code>when(service.get(42L)).thenThrow(new TaskNotFoundException(42L))</code> — приказ: «когда спросят задачу 42, брось исключение». Настоящий сервис тут не важен: проверяем, как контроллер и обработчик ошибок отвечают на исключение.</li><li><code>mvc.perform(get("/api/v1/tasks/42"))</code> — MockMvc «отправляет» запрос прямо внутрь Spring, без сети и без запуска сервера.</li><li>Запрос проходит обычный путь: контроллер → мок бросает исключение → <code>ApiErrors</code> превращает его в 404.</li><li><code>andExpect(status().isNotFound())</code> проверяет код ответа, <code>jsonPath("$.status").value(404)</code> — поле <code>status</code> в JSON (<code>$</code> — весь JSON целиком). Если хоть одна проверка не совпадёт, тест станет красным и напишет, что ожидалось и что пришло.</li></ol><h5>Если тест красный</h5><p>Добавьте после <code>perform(…)</code> строку <code>.andDo(print())</code> и запустите снова: в консоли напечатаются весь запрос и весь ответ — сразу видно, что вернулось на самом деле.</p></div></details>
     <p><b>Итог:</b> в задаче 3.2 вместо мока с исключением отправляется неверное тело запроса, а проверяется список ошибок полей.</p>
   </div>
   <div class="box task"><h4>Задача 3.2. Тест контроллера</h4>
@@ -1260,6 +1643,7 @@ class TaskControllerTest {
     }
 }</code></pre></figure>
       <p><code>@WebMvcTest</code> поднимает только веб-слой и ваш <code>@RestControllerAdvice</code>. Сервис заменён моком: тест проверяет именно валидацию и формат ошибки, а не бизнес-логику. В <code>CreateTask</code> на поле title должна стоять аннотация <code>@NotBlank</code>.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>В <code>src/test/java</code>, в той же папке-пакете, что и приложение, создайте класс <code>TaskControllerTest</code>.</li><li>Вставьте строки <code>import</code> (список — в подробном разборе похожего задания выше) и код решения.</li><li>Нажмите ▶ рядом с именем класса → <b>Run</b>. Или <code>./gradlew test</code> в терминале.</li></ol><h5>Что вы увидите</h5><p>Зелёная галочка у <code>rejectsEmptyTitle</code>, «Tests passed: 1».</p><h5>Как это работает — по шагам</h5><ol><li><code>@WebMvcTest(TaskController.class)</code> поднимает только веб-слой: <code>TaskController</code>, ваш <code>ApiErrors</code>, Jackson и валидацию.</li><li><code>@MockitoBean TaskService service</code> — пустышка вместо сервиса. Здесь ей даже не нужно ничего приказывать: до сервиса запрос не дойдёт.</li><li><code>post("/api/v1/tasks")</code> готовит POST-запрос, <code>contentType(MediaType.APPLICATION_JSON)</code> говорит, что в теле JSON, <code>content("{\"title\":\"\"}")</code> — само тело. Обратные косые черты нужны, чтобы вписать кавычки внутрь Java-строки; на самом деле уходит <code>{"title":""}</code>.</li><li>Spring превращает тело в <code>CreateTask("")</code>, видит <code>@Valid</code> и <code>@NotBlank</code> и бросает <code>MethodArgumentNotValidException</code>. Ваш обработчик из 3.1 строит ответ 400 с <code>errors.title</code>.</li><li><code>status().isBadRequest()</code> проверяет код 400, <code>jsonPath("$.errors.title").exists()</code> — что в JSON есть объект <code>errors</code> с полем <code>title</code>.</li></ol><h5>Проверьте, что поняли</h5><ol><li>Удалите <code>@NotBlank</code> у поля <code>title</code> в <code>CreateTask</code> и запустите тест: он станет красным с сообщением «Status expected:&lt;400&gt; but was:…» — валидации больше нет, и придёт другой код. Значит, тест действительно проверяет валидацию. Верните аннотацию.</li><li>Добавьте <code>.andDo(print())</code> после <code>perform(…)</code> — в консоли будет виден весь ответ 400.</li></ol></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c3-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -1460,6 +1844,53 @@ export class TaskListComponent {
     { initialValue: 'short' as const },
   );
 }</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>В папке Angular-проекта (<a href="#setup-7">§0.7</a>) выполните <code>ng generate component nick-field</code>. Появится папка <code>src/app/nick-field/</code>.</li><li>Создайте в <code>src/app</code> файл <code>user-api.ts</code> — учебная замена сервера: «заняты» ники alina, pepe и admin.</li><li>Откройте главный файл нового компонента (<code>nick-field.ts</code> или <code>nick-field.component.ts</code>) и замените содержимое кодом ниже. Шаблон здесь записан прямо в компоненте, поэтому файлы <code>.html</code> и <code>.css</code> рядом не нужны.</li><li>Покажите компонент на странице. Откройте главный компонент — <code>src/app/app.ts</code> (в Angular до 20-й версии — <code>app.component.ts</code>): в массив <code>imports</code> добавьте класс компонента, а в его шаблон (<code>app.html</code> или <code>app.component.html</code>) — тег. Всё остальное из шаблона-заготовки можно удалить. Класс — <code>NickField</code>, тег — <code>&lt;app-nick-field /&gt;</code>.</li><li>Запустите <code>ng serve</code>, откройте <code>http://localhost:4200</code> и консоль браузера (F12 → Console).</li></ol><figure class="code"><figcaption>src/app/user-api.ts</figcaption><pre><code>import { Injectable } from '@angular/core';
+import { of, delay } from 'rxjs';
+
+const TAKEN = ['alina', 'pepe', 'admin'];
+
+@Injectable({ providedIn: 'root' })
+export class UserApi {
+  isFree(nick: string) {
+    console.log('проверяю на сервере:', nick);
+    return of(!TAKEN.includes(nick.toLowerCase())).pipe(delay(300));   // ответ через 0,3 с
+  }
+}</code></pre></figure><figure class="code"><figcaption>src/app/nick-field/nick-field.ts</figcaption><pre><code>import { Component, inject } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged, switchMap, map, catchError, of } from 'rxjs';
+import { UserApi } from '../user-api';
+
+@Component({
+  selector: 'app-nick-field',
+  imports: [ReactiveFormsModule],
+  template: `
+    &lt;input [formControl]="nick" placeholder="Ник" /&gt;
+    @switch (status()) {
+      @case ('short') { &lt;p&gt;Минимум 3 символа&lt;/p&gt; }
+      @case ('free')  { &lt;p&gt;✓ Свободен&lt;/p&gt; }
+      @case ('taken') { &lt;p&gt;✗ Занят&lt;/p&gt; }
+      @case ('error') { &lt;p&gt;Не удалось проверить&lt;/p&gt; }
+    }
+  `,
+})
+export class NickField {
+  private api = inject(UserApi);
+  nick = new FormControl('', { nonNullable: true });
+
+  status = toSignal(
+    this.nick.valueChanges.pipe(
+      debounceTime(400),
+      distinctUntilChanged(),
+      switchMap(n =&gt; n.length &lt; 3
+        ? of('short' as const)
+        : this.api.isFree(n).pipe(
+            map(free =&gt; (free ? 'free' : 'taken') as 'free' | 'taken'),
+            catchError(() =&gt; of('error' as const)))),
+    ),
+    { initialValue: 'short' as const },
+  );
+}</code></pre></figure><h5>Что вы увидите</h5><p>Быстро наберите «alina». В консоли — одна строка <code>проверяю на сервере: alina</code>, а под полем через полсекунды — «✗ Занят». Наберите «alina2» — «✓ Свободен». Сотрите до двух букв — «Минимум 3 символа», и в консоли ничего нового.</p><h5>Как это работает — по шагам (вы быстро набираете «alina»)</h5><ol><li><code>nick.valueChanges</code> — поток значений поля: при каждом нажатии клавиши в него приходит новое значение: «a», «al», «ali», «alin», «alina».</li><li><code>debounceTime(400)</code> держит значение у себя и запускает таймер на 400 мс. Новое значение сбрасывает таймер. Дальше проходит только «alina» — когда вы перестали печатать.</li><li><code>distinctUntilChanged()</code> не пропускает значение, если оно такое же, как прошлое (например, набрали букву и тут же стёрли).</li><li><code>switchMap</code> на каждое значение запускает новый поток. Для коротких ников это сразу <code>of('short')</code>, для остальных — запрос <code>isFree</code>. Если во время запроса пришёл новый ник, switchMap <b>отписывается</b> от старого запроса — его ответ уже не придёт.</li><li><code>map</code> превращает ответ true/false в слова <code>'free'</code> или <code>'taken'</code>.</li><li><code>catchError</code> стоит <b>внутри</b> switchMap: ошибка одного запроса превращается в <code>'error'</code>, а сам поток ввода продолжает работать.</li><li><code>toSignal</code> подписывается на поток и кладёт последнее значение в сигнал <code>status</code>; <code>initialValue</code> — что показывать, пока ничего не пришло. Шаблон читает <code>status()</code> и с помощью <code>@switch</code> показывает нужную строку.</li></ol></div></details>
     <p><b>Итог:</b> в задаче 4.1 та же цепочка, только результат — список задач, а не одно состояние.</p>
   </div>
   <div class="box task"><h4>Задача 4.1. Живой поиск</h4>
@@ -1511,6 +1942,11 @@ export class SearchComponent {
   );
 }</code></pre></figure>
       <p><code>debounceTime</code> ждёт паузу в вводе, <code>distinctUntilChanged</code> не повторяет тот же запрос, <code>switchMap</code> отменяет предыдущий HTTP-запрос. <code>catchError</code> стоит внутри <code>switchMap</code>: иначе одна ошибка навсегда завершит весь поток. <code>toSignal</code> сам отписывается при уничтожении компонента.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>Создайте компонент: <code>ng generate component search</code> (появится папка <code>src/app/search/</code>).</li><li>Положите учебный сервис <code>task-api.ts</code> из блока «Как понять задание» в папку <code>src/app</code>.</li><li>Откройте главный файл компонента (<code>search.ts</code> или <code>search.component.ts</code>) и замените содержимое: строки <code>import</code> ниже + код решения. Если в вашей версии Angular класс называется <code>Search</code>, переименуйте его в коде — главное, чтобы имя совпадало там, где вы его подключаете.</li><li>Покажите компонент на странице. Откройте главный компонент — <code>src/app/app.ts</code> (в Angular до 20-й версии — <code>app.component.ts</code>): в массив <code>imports</code> добавьте класс компонента, а в его шаблон (<code>app.html</code> или <code>app.component.html</code>) — тег. Всё остальное из шаблона-заготовки можно удалить. Класс — <code>SearchComponent</code>, тег — <code>&lt;app-search /&gt;</code>.</li><li><code>ng serve</code>, откройте <code>http://localhost:4200</code> и консоль (F12 → Console).</li></ol><figure class="code"><figcaption>Начало файла компонента — импорты</figcaption><pre><code>import { Component, inject } from '@angular/core';
+import { FormControl, ReactiveFormsModule } from '@angular/forms';
+import { toSignal } from '@angular/core/rxjs-interop';
+import { debounceTime, distinctUntilChanged, map, switchMap, catchError, of } from 'rxjs';
+import { TaskApi, Task } from '../task-api';</code></pre></figure><h5>Что вы увидите</h5><ol><li>Быстро наберите «купить» — в консоли одна строка <code>запрос: купить</code>, через полсекунды под полем «Купить молоко» и «Купить хлеб».</li><li>Наберите «к» — список пустой, запроса нет (меньше двух символов).</li><li>Добавьте пробел в конце «купить » — нового запроса нет: <code>trim()</code> убрал пробел, и <code>distinctUntilChanged</code> увидел то же слово.</li></ol><h5>Как это работает — по шагам</h5><ol><li><code>[formControl]="q"</code> в шаблоне связывает поле ввода с объектом <code>q</code>. Каждое изменение текста попадает в поток <code>q.valueChanges</code>.</li><li><code>debounceTime(300)</code> пропускает значение только после 300 мс тишины. Шесть нажатий при наборе «купить» дают одно значение.</li><li><code>map(s =&gt; s.trim())</code> убирает пробелы по краям, <code>distinctUntilChanged()</code> не пускает повтор того же слова.</li><li><code>switchMap</code>: для строки короче двух символов сразу отдаёт пустой список <code>of([])</code>, иначе вызывает <code>api.search(s)</code>. Новое слово отменяет старый незавершённый поиск, поэтому устаревший ответ не перезапишет свежий.</li><li><code>catchError(() =&gt; of([]))</code> внутри switchMap: при ошибке поиска показывается пустой список, а поле продолжает работать. Если поставить catchError снаружи, после первой же ошибки поток завершится и поиск «умрёт» до перезагрузки страницы.</li><li><code>toSignal(…, { initialValue: [] })</code> превращает поток в сигнал <code>results</code>; шаблон перерисовывает список при каждом новом значении. При уничтожении компонента подписка снимается сама.</li><li><code>@for (t of results(); track t.id)</code> выводит задачи; <code>track</code> помогает Angular перерисовывать только изменённые строки.</li></ol><h5>Проверьте, что поняли</h5><p>Временно замените в <code>task-api.ts</code> тело <code>search</code> на <code>return throwError(() =&gt; new Error('сбой'));</code> (импорт <code>throwError</code> из <code>rxjs</code>). Список станет пустым, но поле продолжит отправлять запросы — смотрите консоль. Теперь перенесите <code>catchError</code> из switchMap в конец внешнего <code>pipe</code>: после первой ошибки запросы прекратятся совсем.</p></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c4-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -1522,6 +1958,26 @@ export class SearchComponent {
 
 // app.config.ts
 provideHttpClient(withInterceptors([requestIdInterceptor, errorInterceptor]))</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Подготовка: настоящие HTTP-запросы</h5><p>Interceptor видит только запросы через <code>HttpClient</code>, а учебный <code>TaskApi</code> из задачи 4.1 в сеть не ходит. Поэтому подключим Angular к серверу из главы 3: Angular-сервер (порт 4200) будет пересылать все адреса <code>/api…</code> на Spring Boot (порт 8080). Так не нужно настраивать CORS.</p><figure class="code"><figcaption>proxy.conf.json — в корне Angular-проекта</figcaption><pre><code>{
+  "/api": { "target": "http://localhost:8080", "secure": false }
+}</code></pre></figure><ol><li>Создайте этот файл рядом с <code>package.json</code>.</li><li>Запустите Spring-приложение из главы 3 (<code>./gradlew bootRun</code>).</li><li>Запустите Angular с прокси: <code>ng serve --proxy-config proxy.conf.json</code>.</li></ol><h5>Запускаем по шагам</h5><ol><li>Создайте файл <code>src/app/request-id.interceptor.ts</code> с кодом из разбора и строкой импорта сверху: <code>import { HttpInterceptorFn } from '@angular/common/http';</code>.</li><li>Откройте <code>src/app/app.config.ts</code>. В нём уже есть массив <code>providers: [ … ]</code> — добавьте в него <code>provideHttpClient(withInterceptors([requestIdInterceptor]))</code> (не заменяя то, что там было), а сверху — импорты ниже. <code>errorInterceptor</code> допишете в задаче 4.2.</li><li>Добавьте в главный компонент кнопку и метод <code>ping</code>, который отправляет запрос (пример ниже). Если в шаблоне уже есть, например, <code>&lt;app-search /&gt;</code> — оставьте его и просто допишите кнопку; <code>HttpClient</code> получите через <code>inject</code>.</li><li>Откройте страницу, F12 → вкладка <b>Network</b>, нажмите кнопку. Нажмите на появившуюся строку запроса → <b>Headers</b> → раздел <b>Request Headers</b>.</li></ol><figure class="code"><figcaption>src/app/app.config.ts — импорты</figcaption><pre><code>import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { requestIdInterceptor } from './request-id.interceptor';</code></pre></figure><figure class="code"><figcaption>Главный компонент (app.ts или app.component.ts) — кнопка для проверки</figcaption><pre><code>import { Component, inject } from '@angular/core';
+import { HttpClient } from '@angular/common/http';
+
+@Component({
+  selector: 'app-root',
+  template: `&lt;button (click)="ping()"&gt;Отправить запрос&lt;/button&gt;`,
+})
+export class App {
+  private http = inject(HttpClient);
+
+  ping() {
+    this.http.get('/api/v1/tasks/1').subscribe({
+      next: r =&gt; console.log('ответ', r),
+      error: e =&gt; console.log('ошибка', e.status),
+    });
+  }
+}</code></pre></figure><p>Если класс в вашем файле называется <code>AppComponent</code> — оставьте старое имя.</p><h5>Что вы увидите</h5><p>В Request Headers есть строка <code>X-Request-Id: 3f1c…</code> — каждый раз новая. Если задачи 1 нет, в консоли будет «ошибка 404» — для проверки заголовка это не важно.</p><h5>Как это работает — по шагам</h5><ol><li><code>http.get(…)</code> создаёт объект запроса <code>HttpRequest</code>, но не отправляет его сразу: запрос уходит, когда кто-то подписывается (<code>subscribe</code>).</li><li>Перед отправкой Angular пропускает запрос через цепочку interceptors в том порядке, в каком они перечислены в <code>withInterceptors([…])</code>.</li><li>Interceptor — функция от двух аргументов: <code>req</code> — запрос, <code>next</code> — «передать дальше по цепочке».</li><li>Запрос в Angular неизменяемый: его нельзя поправить на месте. <code>req.clone({ setHeaders: {…} })</code> создаёт копию с новым заголовком; <code>crypto.randomUUID()</code> — случайный уникальный номер.</li><li><code>next(копия)</code> отдаёт копию следующему interceptor или, если их больше нет, отправляет в сеть. Interceptor возвращает поток ответа — через него пойдёт и ответ, и ошибка (это пригодится в задаче 4.2).</li></ol></div></details>
     <p><b>Итог:</b> в задаче 4.2 interceptor работает не с запросом, а с ответом: <code>next(req).pipe(catchError(...))</code>.</p>
   </div>
   <div class="box task"><h4>Задача 4.2. Interceptor ошибок</h4>
@@ -1551,6 +2007,23 @@ export const appConfig: ApplicationConfig = {
   providers: [provideHttpClient(withInterceptors([errorInterceptor]))],
 };</code></pre></figure>
       <p>Функциональные interceptors — современный способ вместо классов с <code>HttpInterceptor</code>. <code>inject()</code> работает внутри них, потому что Angular вызывает их в контексте внедрения. <code>throwError</code> возвращает ошибку вызывающему коду, чтобы компонент тоже мог отреагировать.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>Создайте <code>src/app/toast.service.ts</code> — простейший сервис уведомлений (пока через <code>alert</code>).</li><li>Создайте <code>src/app/error.interceptor.ts</code>: строки импорта ниже + код решения.</li><li>В <code>app.config.ts</code> добавьте <code>errorInterceptor</code> в <code>withInterceptors([…])</code> (если делали разбор выше — рядом с <code>requestIdInterceptor</code>).</li><li>В Spring-проект из главы 3 добавьте временный контроллер, который всегда падает, и перезапустите сервер.</li><li>Запустите Angular с прокси из разбора: <code>ng serve --proxy-config proxy.conf.json</code>. В кнопке главного компонента отправляйте запрос на <code>/api/v1/boom</code>.</li></ol><figure class="code"><figcaption>src/app/toast.service.ts</figcaption><pre><code>import { Injectable } from '@angular/core';
+
+@Injectable({ providedIn: 'root' })
+export class ToastService {
+  show(text: string) {
+    alert(text);
+  }
+}</code></pre></figure><figure class="code"><figcaption>src/app/error.interceptor.ts — импорты</figcaption><pre><code>import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
+import { inject } from '@angular/core';
+import { catchError, throwError } from 'rxjs';
+import { ToastService } from './toast.service';</code></pre></figure><figure class="code"><figcaption>BoomController.java — временно, в Spring-проекте</figcaption><pre><code>@RestController
+class BoomController {
+    @GetMapping("/api/v1/boom")
+    String boom() {
+        throw new IllegalStateException("учебная ошибка");   // Spring ответит 500
+    }
+}</code></pre></figure><h5>Что вы увидите</h5><ol><li>Запрос на <code>/api/v1/boom</code>: окно «Сервер недоступен, попробуйте позже», во вкладке Network — статус 500, в консоли — «ошибка 500» из компонента.</li><li>Запрос на <code>/api/v1/tasks/999</code>: окна нет, в консоли «ошибка 404» — с ошибками 4xx разбирается сам компонент.</li></ol><h5>Как это работает — по шагам</h5><ol><li><code>next(req)</code> отправляет запрос и возвращает поток, в который позже придёт ответ.</li><li><code>HttpClient</code> считает ответ с кодом 400 и выше ошибкой: вместо обычного значения в поток приходит <code>HttpErrorResponse</code>.</li><li><code>catchError</code> перехватывает эту ошибку. <code>err.status</code> — код ответа; для 500–599 вызываем <code>toast.show(…)</code>.</li><li><code>inject(ToastService)</code> работает внутри функции-interceptor, потому что Angular вызывает её в своём «контексте внедрения» — там, где знает все сервисы.</li><li><code>return throwError(() =&gt; err)</code> отдаёт ту же ошибку дальше — до <code>subscribe</code> в компоненте. Если вместо этого вернуть, например, <code>EMPTY</code>, компонент никогда не узнает об ошибке и, скажем, будет вечно показывать «Загрузка…».</li></ol><p>Не забудьте удалить <code>BoomController</code>, когда закончите.</p></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c4-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -1743,6 +2216,23 @@ setItems([...items, b]);
 // стало
 setItems(prev =&gt; [...prev, a]);
 setItems(prev =&gt; [...prev, b]);</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>В React-проекте (<a href="#setup-7">§0.7</a>) замените содержимое <code>src/App.tsx</code> кодом ниже — сначала <b>с ошибкой</b>, как в строке «было».</li><li>Запустите <code>npm run dev</code> и откройте адрес из терминала (обычно <code>http://localhost:5173</code>). Нажмите кнопку — в корзине только «Мёд».</li><li>Замените две строки на вариант «стало» и сохраните файл — страница обновится сама. Нажмите кнопку — «Чай, Мёд».</li></ol><figure class="code"><figcaption>src/App.tsx</figcaption><pre><code>import { useState } from 'react';
+
+export default function App() {
+  const [items, setItems] = useState&lt;string[]&gt;([]);
+
+  function addTwo() {
+    setItems([...items, 'Чай']);    // было
+    setItems([...items, 'Мёд']);    // было
+  }
+
+  return (
+    &lt;&gt;
+      &lt;button onClick={addTwo}&gt;Добавить два товара&lt;/button&gt;
+      &lt;p&gt;В корзине: {items.join(', ') || 'пусто'}&lt;/p&gt;
+    &lt;/&gt;
+  );
+}</code></pre></figure><h5>Как это работает — по шагам</h5><ol><li>При отрисовке React вызывает функцию <code>App</code>. <code>useState</code> отдаёт текущее значение — пустой массив — в константу <code>items</code>. Это «снимок»: внутри этой отрисовки <code>items</code> не изменится.</li><li>По нажатию <code>setItems([...items, 'Чай'])</code> не меняет <code>items</code> сразу, а ставит в очередь: «замени на <code>[Чай]</code>».</li><li>Второй вызов видит тот же пустой <code>items</code> и ставит: «замени на <code>[Мёд]</code>».</li><li>Когда обработчик закончился, React выполняет очередь по порядку: <code>[Чай]</code>, затем <code>[Мёд]</code> — побеждает последнее. Одна новая отрисовка — «Мёд».</li><li>С функцией: в очередь кладутся не значения, а правила «возьми предыдущее и добавь». React применяет их по цепочке: <code>[]</code> → <code>[Чай]</code> → <code>[Чай, Мёд]</code>.</li></ol></div></details>
     <p><b>Итог:</b> в задаче 4Б.1 та же ошибка со счётчиком.</p>
   </div>
   <div class="box task"><h4>Задача 4Б.1. Почему +1, а не +3?</h4>
@@ -1776,6 +2266,13 @@ setCount(c =&gt; c + 1);
 setCount(c =&gt; c + 1);
 setCount(c =&gt; c + 1);</code></pre></figure>
       <p>Внутри одной отрисовки <code>count</code> — константа (например, 0), поэтому три раза ставится 0 + 1. Обновления состояния собираются в очередь; функция-обновлятор получает результат предыдущего шага, и получается 3. Правило: если новое состояние зависит от старого — передавайте функцию.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>Вставьте в <code>src/App.tsx</code> код с ошибкой из блока «Как понять задание», запустите <code>npm run dev</code>, нажмите кнопку три раза: 1, 2, 3.</li><li>Замените три вызова на <code>setCount(c =&gt; c + 1)</code> и сохраните. Страница обновится сама; счётчик начнётся с 0.</li><li>Нажмите три раза: 3, 6, 9.</li></ol><h5>Как это работает — по шагам (первое нажатие)</h5><p><b>Было.</b> В этой отрисовке <code>count</code> = 0. Каждый вызов <code>setCount(count + 1)</code> кладёт в очередь «замени на 0 + 1»:</p><figure class="code"><figcaption>Очередь обновлений</figcaption><pre><code>setCount(count + 1)   → «замени на 1»
+setCount(count + 1)   → «замени на 1»
+setCount(count + 1)   → «замени на 1»
+итог: 1</code></pre></figure><p><b>Стало.</b> В очередь кладутся функции; React передаёт каждой результат предыдущей:</p><figure class="code"><figcaption>Очередь обновлений</figcaption><pre><code>setCount(c =&gt; c + 1)   c = 0 → 1
+setCount(c =&gt; c + 1)   c = 1 → 2
+setCount(c =&gt; c + 1)   c = 2 → 3
+итог: 3</code></pre></figure><ol><li>Все три вызова собираются в очередь, а перерисовка происходит один раз — после окончания обработчика нажатия. Это и есть «пакетное обновление».</li><li>Имя <code>c</code> — любое; принято называть по первой букве состояния или <code>prev</code>.</li></ol><h5>Проверьте, что поняли</h5><p>Добавьте после трёх вызовов строку <code>console.log(count);</code> и откройте консоль (F12). При первом нажатии напечатается 0, а не 3: внутри обработчика <code>count</code> — всё ещё значение из снимка, новое появится только при следующей отрисовке.</p></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c4b-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -1798,6 +2295,39 @@ function Categories() {
   });
   return isPending ? &lt;p&gt;Загрузка…&lt;/p&gt; : &lt;ul&gt;{data.map(c =&gt; &lt;li key={c.id}&gt;{c.name}&lt;/li&gt;)}&lt;/ul&gt;;
 }</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>Установите библиотеку и подключите провайдер в <code>src/main.tsx</code>, как в блоке «Как понять задание» задачи 4Б.2 ниже.</li><li>Замените <code>src/App.tsx</code> кодом ниже. Вместо настоящего сервера — функция, которая «отвечает» через 0,8 секунды.</li><li><code>npm run dev</code> и откройте адрес из терминала.</li></ol><figure class="code"><figcaption>src/App.tsx</figcaption><pre><code>import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+
+type Category = { id: number; name: string };
+
+function useNow(ms = 1000) {
+  const [now, setNow] = useState(() =&gt; new Date());
+  useEffect(() =&gt; {
+    const id = setInterval(() =&gt; setNow(new Date()), ms);
+    return () =&gt; clearInterval(id);
+  }, [ms]);
+  return now;
+}
+
+function loadCategories(): Promise&lt;Category[]&gt; {     // временно вместо fetch('/api/categories')
+  return new Promise(resolve =&gt;
+    setTimeout(() =&gt; resolve([{ id: 1, name: 'Еда' }, { id: 2, name: 'Транспорт' }]), 800));
+}
+
+function Categories() {
+  const { data = [], isPending } = useQuery({ queryKey: ['categories'], queryFn: loadCategories });
+  return isPending ? &lt;p&gt;Загрузка…&lt;/p&gt; : &lt;ul&gt;{data.map(c =&gt; &lt;li key={c.id}&gt;{c.name}&lt;/li&gt;)}&lt;/ul&gt;;
+}
+
+export default function App() {
+  const now = useNow();
+  return (
+    &lt;&gt;
+      &lt;h1&gt;{now.toLocaleTimeString()}&lt;/h1&gt;
+      &lt;Categories /&gt;
+    &lt;/&gt;
+  );
+}</code></pre></figure><h5>Что вы увидите</h5><p>Часы идут каждую секунду; под ними сначала «Загрузка…», потом список «Еда, Транспорт».</p><h5>Как это работает — по шагам</h5><ol><li><code>useState(() =&gt; new Date())</code> — начальное время. Функция внутри вызывается только при первой отрисовке.</li><li><code>useEffect</code> выполняется <b>после</b> отрисовки: запускает <code>setInterval</code>, который раз в секунду кладёт новое время в состояние. Новое состояние → новая отрисовка → новые часы на экране.</li><li>Функция, которую возвращает эффект (<code>clearInterval</code>), — «уборка». React вызывает её, когда компонент исчезает или меняется <code>ms</code>. Без неё таймеры копились бы. В режиме разработки React специально запускает эффект дважды (запуск → уборка → запуск), чтобы вы заметили забытую уборку.</li><li><code>useNow</code> — свой хук: обычная функция, имя которой начинается с <code>use</code> и которая внутри вызывает другие хуки. Его можно использовать в любом компоненте.</li><li><code>useQuery</code> сам вызывает <code>queryFn</code>, хранит результат и состояние: пока ответа нет, <code>isPending</code> = true. Ключ <code>['categories']</code> — имя записи в кэше: другой компонент с тем же ключом получит данные сразу, без нового запроса.</li></ol></div></details>
     <p><b>Итог:</b> в задаче 4Б.2 оба приёма соединяются: свой хук с таймером даёт задержку, а useQuery — запрос с отменой.</p>
   </div>
   <div class="box task"><h4>Задача 4Б.2. Живой поиск на React</h4>
@@ -1847,6 +2377,33 @@ export function TaskSearch() {
   );
 }</code></pre></figure>
       <p>Функция очистки в <code>useEffect</code> отменяет таймер при каждом новом вводе — это аналог debounceTime. TanStack Query передаёт <code>signal</code>: если запрос стал не нужен (сменился <code>queryKey</code>), fetch прерывается — аналог switchMap. <code>enabled</code> не даёт искать по короткой строке, а кэш по ключу мгновенно показывает уже найденное.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li><code>npm install @tanstack/react-query</code> и провайдер в <code>src/main.tsx</code> — как в блоке «Как понять задание».</li><li>Создайте файл <code>src/TaskSearch.tsx</code>: вверху импорты и учебная функция поиска ниже, затем код решения. В решении замените строку с <code>fetch(…)</code> на вызов <code>searchTasks(term, signal)</code> — пока нет сервера.</li><li>В <code>src/App.tsx</code> оставьте только вывод поиска (код ниже).</li><li><code>npm run dev</code>, откройте адрес из терминала и консоль (F12 → Console).</li></ol><figure class="code"><figcaption>src/TaskSearch.tsx — начало файла</figcaption><pre><code>import { useEffect, useState } from 'react';
+import { useQuery } from '@tanstack/react-query';
+
+type Task = { id: number; title: string };
+const ALL: Task[] = [
+  { id: 1, title: 'Купить молоко' }, { id: 2, title: 'Купить хлеб' }, { id: 3, title: 'Позвонить маме' },
+];
+
+// Учебная замена сервера: отвечает через 0,5 с и умеет отменяться
+function searchTasks(q: string, signal: AbortSignal): Promise&lt;Task[]&gt; {
+  console.log('запрос:', q);
+  return new Promise((resolve, reject) =&gt; {
+    const id = setTimeout(
+      () =&gt; resolve(ALL.filter(t =&gt; t.title.toLowerCase().includes(q.toLowerCase()))), 500);
+    signal.addEventListener('abort', () =&gt; {
+      clearTimeout(id);
+      console.log('отменён:', q);
+      reject(new DOMException('Aborted', 'AbortError'));
+    });
+  });
+}
+
+// queryFn в решении:  queryFn: ({ signal }) =&gt; searchTasks(term, signal),</code></pre></figure><figure class="code"><figcaption>src/App.tsx</figcaption><pre><code>import { TaskSearch } from './TaskSearch';
+
+export default function App() {
+  return &lt;TaskSearch /&gt;;
+}</code></pre></figure><h5>Что вы увидите</h5><ol><li>Быстро наберите «купить» — в консоли одна строка <code>запрос: купить</code>, затем «Ищу…» и два результата.</li><li>Наберите «куп», подождите чуть больше 0,3 с и сразу допишите «и». В консоли: <code>запрос: куп</code>, <code>отменён: куп</code>, <code>запрос: купи</code> — старый поиск отменился.</li><li>Сотрите до «куп» — результаты появятся мгновенно: они уже в кэше.</li></ol><h5>Как это работает — по шагам</h5><ol><li>Каждое нажатие клавиши вызывает <code>setQ</code> → компонент перерисовывается с новым <code>q</code>.</li><li><code>useDebounce</code>: при каждом новом <code>value</code> эффект сначала убирает старый таймер (<code>clearTimeout</code> из функции-уборки), потом ставит новый на 300 мс. Пока вы печатаете, таймер не успевает сработать. После паузы <code>setV(value)</code> обновляет <code>term</code>.</li><li><code>queryKey: ['tasks', term]</code> — у каждого слова своя запись в кэше. Новый <code>term</code> → новый ключ → TanStack Query вызывает <code>queryFn</code>.</li><li><code>enabled: term.length &gt;= 2</code> — при коротком слове запрос не выполняется вообще.</li><li>TanStack Query передаёт в <code>queryFn</code> объект <code>signal</code>. Когда ключ сменился, а старый запрос ещё идёт, библиотека «дёргает» signal — <code>fetch(url, { signal })</code> или учебная функция прерываются. Это аналог <code>switchMap</code> из Angular.</li><li><code>isFetching</code> — идёт ли сейчас запрос («Ищу…»), <code>isError</code> — закончился ли он ошибкой, <code>data = []</code> — пустой список, пока данных нет.</li></ol><h5>С настоящим сервером</h5><p>Верните в <code>queryFn</code> строку с <code>fetch(…)</code>. Чтобы адрес <code>/api/…</code> дошёл до Spring на порту 8080, добавьте в <code>vite.config.ts</code> внутрь <code>defineConfig({ … })</code>: <code>server: { proxy: { '/api': 'http://localhost:8080' } }</code> и перезапустите <code>npm run dev</code>.</p></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c4b-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -2013,6 +2570,60 @@ SecurityFilterChain api(HttpSecurity http) throws Exception {
 mvc.perform(get("/api/reports/monthly")
         .with(jwt().authorities(new SimpleGrantedAuthority("SCOPE_reports:read"))))
    .andExpect(status().isOk());</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>В <code>build.gradle.kts</code> проекта <code>taskhub-api</code> нужны <code>implementation("org.springframework.boot:spring-boot-starter-oauth2-resource-server")</code> и для тестов <code>testImplementation("org.springframework.security:spring-security-test")</code>. Нажмите значок слона.</li><li>Создайте класс настроек безопасности и учебный контроллер отчётов (код ниже) в пакете приложения.</li><li>Создайте тест в <code>src/test/java</code> (тот же пакет) и запустите его ▶. Keycloak для теста не нужен: подставной токен создаётся прямо в тесте.</li></ol><figure class="code"><figcaption>SecurityConfig.java</figcaption><pre><code>@Configuration
+@EnableWebSecurity
+class SecurityConfig {
+
+    @Bean
+    SecurityFilterChain api(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(a -&gt; a
+                .requestMatchers(HttpMethod.GET, "/api/reports/**").hasAuthority("SCOPE_reports:read")
+                .anyRequest().authenticated())
+            .oauth2ResourceServer(o -&gt; o.jwt(Customizer.withDefaults()));
+        return http.build();
+    }
+}</code></pre></figure><figure class="code"><figcaption>ReportController.java — учебный</figcaption><pre><code>@RestController
+class ReportController {
+    @GetMapping("/api/reports/monthly")
+    String monthly() { return "отчёт за месяц"; }
+}</code></pre></figure><figure class="code"><figcaption>src/test/java/…/ReportSecurityTest.java</figcaption><pre><code>import org.junit.jupiter.api.Test;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
+import org.springframework.context.annotation.Import;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.oauth2.jwt.JwtDecoder;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.test.web.servlet.MockMvc;
+
+import static org.springframework.security.test.web.servlet.request.SecurityMockMvcRequestPostProcessors.jwt;
+import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
+import static org.springframework.test.web.servlet.result.MockMvcResultMatchers.status;
+
+@WebMvcTest(ReportController.class)
+@Import(SecurityConfig.class)
+class ReportSecurityTest {
+    @Autowired MockMvc mvc;
+    @MockitoBean JwtDecoder jwtDecoder;   // чтобы тест не обращался к Keycloak
+
+    @Test
+    void withScopeAllowed() throws Exception {
+        mvc.perform(get("/api/reports/monthly")
+                .with(jwt().authorities(new SimpleGrantedAuthority("SCOPE_reports:read"))))
+           .andExpect(status().isOk());
+    }
+
+    @Test
+    void withoutScopeForbidden() throws Exception {
+        mvc.perform(get("/api/reports/monthly").with(jwt()))
+           .andExpect(status().isForbidden());
+    }
+
+    @Test
+    void withoutTokenUnauthorized() throws Exception {
+        mvc.perform(get("/api/reports/monthly"))
+           .andExpect(status().isUnauthorized());
+    }
+}</code></pre></figure><h5>Что вы увидите</h5><p>Три зелёные галочки: 200 со scope, 403 без нужного scope, 401 без токена.</p><h5>Как это работает — по шагам</h5><ol><li>Каждый запрос сначала проходит цепочку фильтров Spring Security — ещё до контроллера.</li><li>Фильтр Resource Server ищет заголовок <code>Authorization: Bearer &lt;токен&gt;</code>. Нет заголовка → для защищённого адреса ответ 401 («не представились»).</li><li>Если токен есть, <code>JwtDecoder</code> проверяет подпись (по открытым ключам сервера, который выдал токен), срок действия и издателя.</li><li>Затем стандартный конвертер берёт из токена поле <code>scope</code> (например, <code>"reports:read profile"</code>), режет по пробелам и делает права с приставкой: <code>SCOPE_reports:read</code>, <code>SCOPE_profile</code>.</li><li>Правила <code>authorizeHttpRequests</code> проверяются сверху вниз. Для <code>GET /api/reports/…</code> нужно право <code>SCOPE_reports:read</code>; если его нет — 403 («вы известны, но нельзя»).</li><li>В тесте <code>.with(jwt())</code> пропускает расшифровку и сразу кладёт «вошедшего пользователя» с указанными правами. Без <code>authorities(…)</code> у подставного токена есть только <code>SCOPE_read</code> — поэтому второй тест получает 403.</li></ol></div></details>
     <p><b>Итог:</b> в задаче 5.1 права лежат не в scope, а в <code>realm_access.roles</code>, поэтому нужен свой конвертер.</p>
   </div>
   <div class="box task"><h4>Задача 5.1. Роли из Keycloak</h4>
@@ -2043,6 +2654,51 @@ JwtAuthenticationConverter jwtAuthenticationConverter() {
     return conv;
 }</code></pre></figure>
       <p>Бин <code>JwtAuthenticationConverter</code> Spring Security подхватывает сам при <code>oauth2ResourceServer(o -> o.jwt(...))</code>. Префикс <code>ROLE_</code> нужен, потому что <code>hasRole("ADMIN")</code> ищет полномочие <code>ROLE_ADMIN</code>.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>Запустите Keycloak (<a href="#setup-8">§0.8</a>) и подготовьте realm, роли, пользователей и клиента, как в блоке «Как понять задание».</li><li>Создайте <code>SecurityConfig</code> (код ниже) — правила доступа и конвертер из решения в одном классе.</li><li>Добавьте в <code>TaskController</code> метод удаления, чтобы было что защищать.</li><li>Запустите приложение (<code>./gradlew bootRun</code>). Получите токены alice и bob командой из «Как понять задание» и скопируйте значение <code>access_token</code> из ответа (длинная строка в кавычках).</li><li>Отправьте три запроса: с токеном alice, с токеном bob и без токена.</li></ol><figure class="code"><figcaption>SecurityConfig.java</figcaption><pre><code>@Configuration
+@EnableWebSecurity
+class SecurityConfig {
+
+    @Bean
+    SecurityFilterChain api(HttpSecurity http) throws Exception {
+        http.authorizeHttpRequests(a -&gt; a
+                .requestMatchers(HttpMethod.DELETE, "/api/**").hasRole("ADMIN")
+                .anyRequest().authenticated())
+            .oauth2ResourceServer(o -&gt; o.jwt(Customizer.withDefaults()));
+        return http.build();
+    }
+
+    @Bean
+    JwtAuthenticationConverter jwtAuthenticationConverter() {
+        // … код из решения …
+    }
+}</code></pre></figure><figure class="code"><figcaption>TaskController.java — метод для проверки</figcaption><pre><code>@DeleteMapping("/{id}")
+ResponseEntity&lt;Void&gt; delete(@PathVariable long id) {
+    return ResponseEntity.noContent().build();   // 204
+}</code></pre></figure><figure class="code"><figcaption>Терминал (в Windows — curl.exe)</figcaption><pre><code>curl -i -X DELETE http://localhost:8080/api/v1/tasks/1 -H "Authorization: Bearer ТОКЕН_ALICE"
+curl -i -X DELETE http://localhost:8080/api/v1/tasks/1 -H "Authorization: Bearer ТОКЕН_BOB"
+curl -i -X DELETE http://localhost:8080/api/v1/tasks/1</code></pre></figure><h5>Что вы увидите</h5><p><code>HTTP/1.1 204</code> для alice, <code>403</code> для bob, <code>401</code> без токена. Если и alice вдруг получила 401 — токен истёк (в Keycloak он живёт 5 минут), получите новый.</p><h5>Как посмотреть, что внутри токена</h5><p>Токен — три части через точку; средняя — данные в кодировке base64url. Не вставляйте настоящие токены на чужие сайты: расшифруйте у себя в консоли браузера (F12 → Console):</p><figure class="code"><figcaption>Консоль браузера</figcaption><pre><code>const t = 'ВСТАВЬТЕ_ТОКЕН';
+JSON.parse(atob(t.split('.')[1].replace(/-/g, '+').replace(/_/g, '/')))</code></pre></figure><figure class="code"><figcaption>Примерно так выглядит нужная часть</figcaption><pre><code>{
+  "iss": "http://localhost:8081/realms/taskhub",
+  "preferred_username": "alice",
+  "realm_access": { "roles": ["ADMIN", "default-roles-taskhub", "offline_access", "uma_authorization"] },
+  "scope": "profile email"
+}</code></pre></figure><h5>Как это работает — по шагам</h5><ol><li>Фильтр Resource Server находит токен в заголовке и проверяет его подпись. Открытые ключи Spring сам скачивает у Keycloak по адресу из <code>issuer-uri</code>.</li><li>Проверенный токен передаётся вашему бину <code>JwtAuthenticationConverter</code> — Spring находит его по типу и использует вместо стандартного.</li><li><code>jwt.getClaimAsMap("realm_access")</code> → <code>{roles=[ADMIN, default-roles-taskhub, …]}</code>. Если поля нет (токен не от Keycloak) — пустой список прав.</li><li><code>realm.getOrDefault("roles", List.of())</code> достаёт список ролей; приведение <code>(List&lt;String&gt;)</code> нужно, потому что в карте лежит просто <code>Object</code>.</li><li><code>map(r -&gt; new SimpleGrantedAuthority("ROLE_" + r))</code> → <code>ROLE_ADMIN</code>, <code>ROLE_default-roles-taskhub</code>…</li><li>Правило <code>hasRole("ADMIN")</code> само добавляет приставку и ищет <code>ROLE_ADMIN</code>. У alice оно есть → 204, у bob нет → 403.</li><li>Важно: свой конвертер <b>заменяет</b> стандартный, поэтому права <code>SCOPE_…</code> из поля scope больше не создаются. Если нужны и роли, и scope — соберите оба списка в одном конвертере.</li></ol><h5>Проверка без Keycloak — обычный тест</h5><p>Конвертер можно проверить отдельно: создать токен прямо в коде и посмотреть, какие права получились.</p><figure class="code"><figcaption>src/test/java/…/KeycloakRolesTest.java</figcaption><pre><code>import org.junit.jupiter.api.Test;
+import org.springframework.security.oauth2.jwt.Jwt;
+import java.util.List;
+import java.util.Map;
+import static org.junit.jupiter.api.Assertions.assertTrue;
+
+class KeycloakRolesTest {
+    @Test
+    void mapsRealmRolesToSpringRoles() {
+        Jwt jwt = Jwt.withTokenValue("test").header("alg", "none")
+            .claim("realm_access", Map.of("roles", List.of("ADMIN")))
+            .build();
+        var auth = new SecurityConfig().jwtAuthenticationConverter().convert(jwt);
+        assertTrue(auth.getAuthorities().stream()
+            .anyMatch(a -&gt; a.getAuthority().equals("ROLE_ADMIN")));
+    }
+}</code></pre></figure></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c5-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -2058,6 +2714,26 @@ List&lt;Task&gt; list(long projectId, String sort) {
     return jdbc.query("SELECT * FROM task WHERE project_id = ? ORDER BY " + col,
                       mapper, projectId);
 }</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>Нужен проект <code>taskhub-api</code>, подключённый к PostgreSQL, где есть таблица <code>task</code> из главы 2. <code>JdbcTemplate</code> Spring создаёт сам, если в проекте есть Spring Data JPA или <code>spring-boot-starter-jdbc</code>.</li><li>Добавьте учебный контроллер ниже, запустите приложение и откройте адреса в браузере.</li></ol><figure class="code"><figcaption>TaskListController.java</figcaption><pre><code>@RestController
+class TaskListController {
+    private static final Map&lt;String, String&gt; SORT = Map.of(
+        "date", "created_at",
+        "title", "title");
+
+    private final JdbcTemplate jdbc;
+
+    TaskListController(JdbcTemplate jdbc) { this.jdbc = jdbc; }
+
+    @GetMapping("/api/v1/projects/{projectId}/tasks")
+    List&lt;Map&lt;String, Object&gt;&gt; list(@PathVariable long projectId,
+                                   @RequestParam(defaultValue = "date") String sort) {
+        String col = SORT.getOrDefault(sort, "created_at");   // только из белого списка
+        return jdbc.queryForList(
+            "SELECT id, title, created_at FROM task WHERE project_id = ? ORDER BY " + col, projectId);
+    }
+}</code></pre></figure><figure class="code"><figcaption>Адреса для проверки</figcaption><pre><code>http://localhost:8080/api/v1/projects/1/tasks?sort=title
+http://localhost:8080/api/v1/projects/1/tasks?sort=date
+http://localhost:8080/api/v1/projects/1/tasks?sort=title;DROP TABLE task</code></pre></figure><h5>Что вы увидите</h5><p>Первый адрес — задачи по алфавиту, второй — по дате создания. Третий — тоже по дате: незнакомое значение молча заменилось безопасным, а таблица цела.</p><h5>Как это работает — по шагам</h5><ol><li><code>queryForList</code> возвращает строки как список словарей «столбец → значение» — Spring превращает его в JSON. Свой класс-маппер для учебного примера не нужен.</li><li>Номер проекта — <b>значение</b>, поэтому он передаётся через <code>?</code>: база получает его отдельно от текста SQL.</li><li>Имя столбца для сортировки так передать нельзя: <code>?</code> подставляет только значения. <code>ORDER BY ?</code> со строкой <code>"title"</code> сортировал бы по одинаковой для всех строк константе — то есть никак.</li><li>Поэтому имя столбца вклеивается в текст, но <b>не</b> из того, что прислал пользователь, а из своего словаря <code>SORT</code>. Пользователь лишь выбирает ключ; всё, чего нет в словаре, превращается в <code>"created_at"</code>.</li></ol></div></details>
     <p><b>Итог:</b> в задаче 5.2 пользовательское значение — данные (строка поиска), поэтому оно передаётся параметром.</p>
   </div>
   <div class="box task"><h4>Задача 5.2. Найди уязвимость</h4>
@@ -2078,6 +2754,21 @@ List&lt;Task&gt; list(long projectId, String sort) {
 // Исправлено: значение передаётся параметром, а не склеивается в SQL
 jdbc.query("SELECT * FROM task WHERE title LIKE ?", mapper, "%" + q + "%");</code></pre></figure>
       <p>Это SQL-инъекция: пользовательский ввод становится частью SQL-кода. Параметр <code>?</code> передаётся базе отдельно от текста запроса, поэтому никогда не исполняется как код. Это пункт A03 Injection в OWASP Top 10.</p>
+      <div class="walk"><h5>Сначала увидеть уязвимость своими глазами</h5><ol><li>В DBeaver, где есть таблица <code>task</code> из главы 2, выполните «склеенный» запрос — так он выглядит после подстановки <code>x' OR 1=1 --</code>:</li></ol><figure class="code"><figcaption>SQL — выделите строку и нажмите Ctrl+Enter</figcaption><pre><code>SELECT * FROM task WHERE title LIKE '%x' OR 1=1 --%';</code></pre></figure><p>Вернутся <b>все</b> задачи, хотя ни в одном названии нет «x».</p><h5>Запускаем по шагам</h5><ol><li>Добавьте в Spring-проект контроллер поиска (код ниже) — сначала с уязвимой строкой, потом с исправленной.</li><li>Запустите приложение и выполните оба запроса. Ключ <code>-G --data-urlencode</code> сам закодирует кавычки и пробелы для адреса.</li></ol><figure class="code"><figcaption>TaskSearchController.java</figcaption><pre><code>@RestController
+class TaskSearchController {
+    private final JdbcTemplate jdbc;
+
+    TaskSearchController(JdbcTemplate jdbc) { this.jdbc = jdbc; }
+
+    @GetMapping("/api/v1/tasks/search")
+    List&lt;Map&lt;String, Object&gt;&gt; search(@RequestParam String q) {
+        // уязвимо:
+        // return jdbc.queryForList("SELECT id, title FROM task WHERE title LIKE '%" + q + "%'");
+        // исправлено:
+        return jdbc.queryForList("SELECT id, title FROM task WHERE title LIKE ?", "%" + q + "%");
+    }
+}</code></pre></figure><figure class="code"><figcaption>Терминал (в Windows — curl.exe)</figcaption><pre><code>curl -G http://localhost:8080/api/v1/tasks/search --data-urlencode "q=Ма"
+curl -G http://localhost:8080/api/v1/tasks/search --data-urlencode "q=x' OR 1=1 --"</code></pre></figure><h5>Что вы увидите</h5><p>Уязвимая версия: на второй запрос приходят все задачи. Исправленная: первый запрос находит «Макет», второй возвращает <code>[]</code> — задачи с таким странным названием нет.</p><h5>Как это работает — по шагам</h5><ol><li>При склейке строки база получает <b>один текст</b>, в котором уже не отличить вашу часть от пользовательской: кавычка из ввода закрывает строку, <code>OR 1=1</code> становится условием, <code>--</code> превращает хвост в комментарий.</li><li>С <code>?</code> драйвер отправляет базе <b>отдельно</b> текст запроса (<code>… LIKE $1</code>) и <b>отдельно</b> значение. База разбирает и планирует SQL ещё до того, как увидит значение, поэтому любые кавычки внутри значения — просто символы, которые ищутся в названии.</li><li>Знаки <code>%</code> для LIKE добавляются к значению в Java (<code>"%" + q + "%"</code>), а не к тексту SQL. Если пользователь сам введёт <code>%</code>, он найдёт всё — но это лишь поиск, а не выполнение чужого кода.</li></ol></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c5-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -2265,6 +2956,10 @@ spec:
 
 # в Deployment, в описании контейнера:
 #   envFrom: [{ configMapRef: { name: taskhub-config } }]</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><p>Этот пример проверяется вместе с задачей 6.1: Service и ConfigMap работают с подами, которые создаёт Deployment. Удобный порядок — сначала сделать задачу 6.1, потом вернуться сюда.</p><ol><li>Сохраните ConfigMap и Service из разбора в файлы <code>k8s/config.yaml</code> и <code>k8s/service.yaml</code>.</li><li>В <code>k8s/deployment.yaml</code> из задачи 6.1 в описание контейнера (на одном уровне с <code>image</code> и <code>ports</code>) добавьте строку <code>envFrom: [{ configMapRef: { name: taskhub-config } }]</code>.</li><li>Примените всю папку и проверьте.</li></ol><figure class="code"><figcaption>Терминал</figcaption><pre><code>kubectl apply -f k8s/
+kubectl get svc
+kubectl exec deploy/taskhub-api -- printenv SPRING_PROFILES_ACTIVE
+kubectl port-forward svc/taskhub-api 8080:80</code></pre></figure><p>Последняя команда работает, пока открыта; в другом окне терминала выполните <code>curl http://localhost:8080/actuator/health</code>. Остановить — Ctrl+C.</p><h5>Что вы увидите</h5><ol><li><code>kubectl get svc</code> показывает сервис <code>taskhub-api</code> с внутренним адресом (CLUSTER-IP) и портом 80.</li><li><code>printenv</code> печатает <code>prod</code> — настройка из ConfigMap попала внутрь контейнера.</li><li><code>curl</code> через port-forward отвечает <code>{"status":"UP"}</code>.</li></ol><h5>Как это работает — по шагам</h5><ol><li><b>ConfigMap</b> — именованный набор пар «ключ: значение». <code>envFrom</code> превращает каждую пару в переменную окружения контейнера. Spring читает переменную <code>SPRING_PROFILES_ACTIVE</code> как настройку <code>spring.profiles.active</code> (большие буквы и подчёркивания он понимает сам).</li><li>Поды появляются и исчезают, их адреса меняются. <b>Service</b> даёт постоянное имя (<code>taskhub-api</code>) и адрес внутри кластера.</li><li>Service находит свои поды по меткам: <code>selector: { app: taskhub-api }</code> должен совпадать с <code>labels</code> в шаблоне подов Deployment. Опечатка в метке — и сервис «пустой», запросы никуда не идут.</li><li><code>port: 80</code> — порт сервиса, <code>targetPort: 8080</code> — порт приложения в контейнере. Запросы распределяются между всеми готовыми (ready) подами.</li><li><code>port-forward</code> временно пробрасывает порт сервиса на ваш компьютер — только для проверки; снаружи кластер по-прежнему закрыт.</li><li>ConfigMap читается при запуске контейнера. После его изменения поды надо перезапустить: <code>kubectl rollout restart deployment taskhub-api</code>.</li></ol></div></details>
     <p><b>Итог:</b> в задаче 6.1 описывается сам Deployment: реплики, ресурсы и пробы.</p>
   </div>
   <div class="box task"><h4>Задача 6.1. Deployment с пробами</h4>
@@ -2293,7 +2988,7 @@ spec:
     spec:
       containers:
         - name: api
-          image: ghcr.io/USER/taskhub-api:1.0.0
+          image: taskhub-api:1.0.0          # образ, загруженный в kind
           ports: [{ containerPort: 8080 }]
           resources:
             requests: { cpu: 250m, memory: 384Mi }
@@ -2305,6 +3000,17 @@ spec:
             httpGet: { path: /actuator/health/liveness, port: 8080 }
             initialDelaySeconds: 30</code></pre></figure>
       <p>Spring Boot сам включает группы <code>liveness</code> и <code>readiness</code>, когда видит, что запущен в Kubernetes. Лимит CPU специально не задан: он часто тормозит JVM на старте, а памяти лимит нужен обязательно. Тег образа — конкретная версия, а не <code>latest</code>.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>Добавьте в проект зависимость <code>implementation("org.springframework.boot:spring-boot-starter-actuator")</code> и положите в корень <code>Dockerfile</code> из листинга 6.1.</li><li>Создайте учебный кластер: <code>kind create cluster</code> (один раз; нужен запущенный Docker).</li><li>Сохраните решение в <code>k8s/deployment.yaml</code>.</li><li>Если приложению нужна база (Spring Data JPA, Flyway), без неё под упадёт на старте. Для учёбы запустите PostgreSQL прямо в кластере и добавьте адрес базы в контейнер (блоки ниже).</li><li>Соберите образ, загрузите его в kind и примените файлы (команды из «Как понять задание»).</li></ol><figure class="code"><figcaption>Терминал — учебная база в кластере</figcaption><pre><code>kubectl run pg --image=postgres:16 --env=POSTGRES_PASSWORD=dev --port=5432
+kubectl expose pod pg --port=5432</code></pre></figure><figure class="code"><figcaption>k8s/deployment.yaml — добавить в контейнер, на уровне image</figcaption><pre><code>          env:
+            - { name: SPRING_DATASOURCE_URL, value: "jdbc:postgresql://pg:5432/postgres" }
+            - { name: SPRING_DATASOURCE_USERNAME, value: postgres }
+            - { name: SPRING_DATASOURCE_PASSWORD, value: dev }</code></pre></figure><figure class="code"><figcaption>Терминал — наблюдать за запуском</figcaption><pre><code>kubectl get pods -w
+kubectl describe pod &lt;имя-пода&gt;
+kubectl logs &lt;имя-пода&gt;</code></pre></figure><p><code>-w</code> — «следить»: строки обновляются сами, выход — Ctrl+C. Имя пода берите из вывода <code>get pods</code>.</p><h5>Что вы увидите</h5><figure class="code"><figcaption>kubectl get pods</figcaption><pre><code>NAME                           READY   STATUS    RESTARTS   AGE
+taskhub-api-6d8f7c9b5d-4k2xq   0/1     Running   0          8s
+taskhub-api-6d8f7c9b5d-r7m9p   0/1     Running   0          8s
+taskhub-api-6d8f7c9b5d-4k2xq   1/1     Running   0          21s
+taskhub-api-6d8f7c9b5d-r7m9p   1/1     Running   0          22s</code></pre></figure><p>Сначала <code>0/1</code>: контейнер запущен, но readiness-проба ещё не прошла — Spring стартует. Потом <code>1/1</code>.</p><h5>Как это работает — по шагам</h5><ol><li><code>kubectl apply</code> отправляет описание в кластер. Kubernetes сравнивает «как должно быть» (2 реплики) с «как есть» (0) и создаёт два пода.</li><li><code>selector.matchLabels</code> и <code>template.metadata.labels</code> должны совпадать: по меткам Deployment узнаёт «свои» поды.</li><li><code>image: taskhub-api:1.0.0</code> — образ, который вы загрузили в kind командой <code>kind load</code>. Конкретная версия, а не <code>latest</code>: всегда понятно, что запущено, и можно откатиться.</li><li><code>requests</code> — сколько памяти и процессора планировщик резервирует для пода на узле. <code>limits.memory</code> — потолок: если приложение превысит 512 МБ, контейнер убьют (статус <code>OOMKilled</code>) и перезапустят.</li><li><code>readinessProbe</code>: через 10 секунд после старта и затем каждые 10 секунд Kubernetes делает GET <code>/actuator/health/readiness</code>. Пока ответ не 200, под не получает запросов от Service.</li><li><code>livenessProbe</code>: с 30-й секунды проверяет <code>/actuator/health/liveness</code>. Три неудачи подряд — контейнер перезапускается (растёт RESTARTS). Задержка больше, чтобы медленный старт JVM не выглядел как «завис».</li><li>Эти адреса Spring Boot включает сам, когда видит, что работает в Kubernetes. На своём компьютере они отвечают 404 — чтобы проверить локально, добавьте <code>management.endpoint.health.probes.enabled=true</code>.</li></ol><h5>Проверьте, что поняли</h5><p>Удалите один под: <code>kubectl delete pod &lt;имя&gt;</code> — и сразу <code>kubectl get pods</code>. Kubernetes уже создаёт замену: Deployment следит, чтобы подов всегда было два.</p></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c6-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -2321,6 +3027,7 @@ spec:
       SPRING_DATA_REDIS_HOST: redis
     depends_on:
       redis: { condition: service_healthy }</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>Положите <code>docker-compose.yml</code> в корень проекта, рядом с <code>Dockerfile</code> (листинг 6.1).</li><li>Остановите приложение, если оно запущено из IntelliJ, чтобы не занимать порты.</li><li>Выполните <code>docker compose up --build</code> и смотрите логи. Отдельно, в другом окне терминала, — <code>docker compose ps</code>.</li></ol><h5>Что вы увидите</h5><p>В <code>docker compose ps</code> у redis сначала <code>(health: starting)</code>, через несколько секунд — <code>(healthy)</code>. Только после этого в логах появляются строки сервиса <code>app</code>. Остановка — Ctrl+C, затем <code>docker compose down</code>.</p><h5>Как это работает — по шагам</h5><ol><li>Compose создаёт общую сеть для всех сервисов файла. Внутри неё имя сервиса — это имя хоста: приложение подключается к <code>redis</code>, а не к <code>localhost</code> (localhost внутри контейнера — сам этот контейнер).</li><li><code>healthcheck</code> каждые 5 секунд выполняет внутри контейнера <code>redis-cli ping</code>. Ответ PONG — «здоров»; 10 неудач подряд — «нездоров».</li><li><code>depends_on: { redis: { condition: service_healthy } }</code> — запускать <code>app</code> только после статуса healthy. Обычный <code>depends_on: [redis]</code> ждал бы лишь запуска контейнера, а Redis внутри мог ещё не принимать подключения.</li><li><code>build: .</code> — собрать образ из Dockerfile в этой папке; <code>--build</code> в команде заставляет пересобрать его после изменений кода.</li><li>Переменная <code>SPRING_DATA_REDIS_HOST</code> становится настройкой <code>spring.data.redis.host</code>. Она нужна, если в проекте есть <code>spring-boot-starter-data-redis</code>; без него приложение просто стартует после Redis — порядок запуска виден всё равно.</li></ol></div></details>
     <p><b>Итог:</b> в задаче 6.2 то же для PostgreSQL: healthcheck через <code>pg_isready</code>.</p>
   </div>
   <div class="box task"><h4>Задача 6.2. Compose: API и база</h4>
@@ -2353,6 +3060,8 @@ spec:
     depends_on:
       db: { condition: service_healthy }</code></pre></figure>
       <p>Простой <code>depends_on</code> ждёт только запуска контейнера, а не готовности базы. <code>condition: service_healthy</code> вместе с <code>healthcheck</code> ждёт, пока <code>pg_isready</code> ответит успешно. Имя сервиса <code>db</code> работает как имя хоста внутри сети Compose.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>Убедитесь, что в проекте есть Actuator (<code>spring-boot-starter-actuator</code>) и <code>Dockerfile</code> из листинга 6.1.</li><li>Сохраните решение в <code>docker-compose.yml</code> в корне проекта.</li><li>Остановите приложение в IntelliJ, если оно запущено: порт 8080 должен быть свободен. Учебный контейнер <code>pg</code> из §0.6 мешать не будет — база в Compose не открывает порт наружу.</li><li>Выполните <code>docker compose up --build</code>. Первый раз сборка займёт несколько минут: внутри Docker скачивается Gradle и собирается jar.</li><li>В другом окне терминала: <code>curl http://localhost:8080/actuator/health</code>.</li></ol><h5>Что вы увидите</h5><figure class="code"><figcaption>Логи (сокращённо)</figcaption><pre><code>db-1   | LOG:  database system is ready to accept connections
+api-1  | Started TaskhubApiApplication in 5.1 seconds</code></pre></figure><p><code>curl</code> отвечает <code>{"status":"UP"}</code>. Остановка — Ctrl+C, затем <code>docker compose down</code> (контейнеры удаляются; данные базы тоже, ведь отдельный том мы не описывали).</p><h5>Как это работает — по шагам</h5><ol><li>Сервис <code>db</code> запускается из готового образа <code>postgres:16</code>. Переменные <code>POSTGRES_DB</code>, <code>POSTGRES_USER</code>, <code>POSTGRES_PASSWORD</code> при первом старте создают базу <code>taskhub</code> и пользователя <code>app</code>.</li><li>Первый запуск PostgreSQL занимает несколько секунд: база создаёт файлы и перезапускается. В это время подключиться нельзя.</li><li><code>healthcheck</code> каждые 5 секунд выполняет <code>pg_isready -U app -d taskhub</code> — она отвечает «успех», только когда база принимает подключения. <code>CMD-SHELL</code> значит «выполнить строку через оболочку».</li><li><code>api</code> собирается из Dockerfile (<code>build: .</code>) и ждёт <code>condition: service_healthy</code>.</li><li>Переменные <code>SPRING_DATASOURCE_URL</code>, <code>…_USERNAME</code>, <code>…_PASSWORD</code> перекрывают настройки из <code>application.properties</code>. В адресе <code>jdbc:postgresql://db:5432/taskhub</code> хост — имя сервиса <code>db</code> в сети Compose.</li><li><code>ports: ["8080:8080"]</code> — порт вашего компьютера : порт контейнера. Поэтому <code>localhost:8080</code> у вас попадает в приложение.</li></ol><h5>Проверьте, что поняли</h5><p>Замените <code>depends_on</code> на простой <code>depends_on: [db]</code>, выполните <code>docker compose down</code> и снова <code>up</code>. Приложение может упасть с «Connection refused»: оно стартовало раньше, чем база была готова.</p></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c6-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -2504,6 +3213,23 @@ public void on(OrderPaid e) {
         ON CONFLICT (order_id) DO NOTHING
         """, e.orderId(), e.customerId(), e.amount().intValue() / 10);
 }</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>Запустите Kafka (<a href="#setup-8">§0.8</a>) и PostgreSQL (<a href="#setup-6">§0.6</a>).</li><li>В Spring-проект добавьте зависимость <code>implementation("org.springframework.kafka:spring-kafka")</code> (на start.spring.io — «Spring for Apache Kafka»). Для <code>JdbcTemplate</code> нужен <code>spring-boot-starter-jdbc</code> или уже подключённый Spring Data JPA.</li><li>Допишите в <code>src/main/resources/application.properties</code> настройки ниже. <code>group-id</code> — имя группы читателей: Kafka запоминает, до какого сообщения дочитала группа. <code>earliest</code> — новой группе читать топик с самого начала.</li><li>Чтобы сообщения в формате JSON сами превращались в Java-record, добавьте в любой класс с <code>@Configuration</code> (или в класс приложения) бин-конвертер — Spring Boot 3 подключит его к слушателям сам.</li></ol><figure class="code"><figcaption>application.properties</figcaption><pre><code>spring.kafka.bootstrap-servers=localhost:9092
+spring.kafka.consumer.group-id=taskhub
+spring.kafka.consumer.auto-offset-reset=earliest</code></pre></figure><figure class="code"><figcaption>Конвертер JSON</figcaption><pre><code>@Bean
+RecordMessageConverter kafkaJsonConverter() {
+    return new JsonMessageConverter();   // org.springframework.kafka.support.converter
+}</code></pre></figure><p>Затем — таблица, событие и слушатель:</p><figure class="code"><figcaption>SQL (DBeaver)</figcaption><pre><code>CREATE TABLE bonus (order_id BIGINT PRIMARY KEY, customer_id BIGINT NOT NULL, points INT NOT NULL);</code></pre></figure><figure class="code"><figcaption>OrderPaid.java и BonusListener.java</figcaption><pre><code>public record OrderPaid(long orderId, long customerId, BigDecimal amount) {}
+
+@Component
+class BonusListener {
+    private final JdbcTemplate jdbc;
+
+    BonusListener(JdbcTemplate jdbc) { this.jdbc = jdbc; }
+
+    // сюда — метод on(OrderPaid e) из разбора
+}</code></pre></figure><p>Запустите приложение и отправьте одно и то же событие <b>два раза</b>: команда открывает ввод, вставьте строку JSON и нажмите Enter, потом вставьте её же ещё раз. Выход — Ctrl+C.</p><figure class="code"><figcaption>Терминал</figcaption><pre><code>docker exec -it kafka /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic orders.paid
+{"orderId":1,"customerId":7,"amount":250}
+{"orderId":1,"customerId":7,"amount":250}</code></pre></figure><h5>Что вы увидите</h5><p>В DBeaver <code>SELECT * FROM bonus;</code> — одна строка: заказ 1, клиент 7, 25 баллов.</p><h5>Как это работает — по шагам</h5><ol><li><code>@KafkaListener(topics = "orders.paid")</code>: Spring сам подключается к Kafka и вызывает метод на каждое новое сообщение в топике.</li><li>Конвертер превращает текст <code>{"orderId":1,…}</code> в объект <code>OrderPaid</code> — по совпадению имён полей.</li><li>Первая доставка: строки с <code>order_id = 1</code> нет — вставка проходит, 250 / 10 = 25 баллов.</li><li>Вторая доставка: <code>order_id</code> — первичный ключ, второй такой строки быть не может. <code>ON CONFLICT (order_id) DO NOTHING</code> говорит базе: «если такая уже есть — молча ничего не делай» (без него была бы ошибка).</li><li>Когда метод закончился без ошибки, Spring сообщает Kafka: «группа дочитала до этого места». Если метод упал, сообщение придёт снова — поэтому обработчик и должен спокойно переносить повторы.</li></ol></div></details>
     <p><b>Итог:</b> в задаче 7.1 естественного ключа «одно событие — одна строка» нет (счётчик растёт), поэтому нужна отдельная таблица обработанных событий.</p>
   </div>
   <div class="box task"><h4>Задача 7.1. Идемпотентный консьюмер</h4>
@@ -2533,6 +3259,27 @@ public void on(UsageEvent e) {
         """, e.apiId(), e.day());
 }</code></pre></figure>
       <p>Таблица <code>processed_event</code> с первичным ключом по id события запоминает обработанные события. Обе вставки в одной транзакции: либо засчитано и запомнено, либо ни то ни другое. Повторная доставка увидит <code>inserted == 0</code> и ничего не изменит.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>Запустите Kafka (<a href="#setup-8">§0.8</a>) и PostgreSQL (<a href="#setup-6">§0.6</a>).</li><li>В Spring-проект добавьте зависимость <code>implementation("org.springframework.kafka:spring-kafka")</code> (на start.spring.io — «Spring for Apache Kafka»). Для <code>JdbcTemplate</code> нужен <code>spring-boot-starter-jdbc</code> или уже подключённый Spring Data JPA.</li><li>Допишите в <code>src/main/resources/application.properties</code> настройки ниже. <code>group-id</code> — имя группы читателей: Kafka запоминает, до какого сообщения дочитала группа. <code>earliest</code> — новой группе читать топик с самого начала.</li><li>Чтобы сообщения в формате JSON сами превращались в Java-record, добавьте в любой класс с <code>@Configuration</code> (или в класс приложения) бин-конвертер — Spring Boot 3 подключит его к слушателям сам.</li></ol><figure class="code"><figcaption>application.properties</figcaption><pre><code>spring.kafka.bootstrap-servers=localhost:9092
+spring.kafka.consumer.group-id=taskhub
+spring.kafka.consumer.auto-offset-reset=earliest</code></pre></figure><figure class="code"><figcaption>Конвертер JSON</figcaption><pre><code>@Bean
+RecordMessageConverter kafkaJsonConverter() {
+    return new JsonMessageConverter();   // org.springframework.kafka.support.converter
+}</code></pre></figure><ol><li>Создайте таблицы из блока «Как понять задание» в DBeaver.</li><li>Создайте record события и класс-слушатель (код ниже), вставьте в него метод из решения. <code>@Transactional</code> берите из пакета <code>org.springframework.transaction.annotation</code>.</li><li>Запустите приложение и отправьте сообщения: два одинаковых и одно с другим <code>eventId</code>.</li></ol><figure class="code"><figcaption>UsageEvent.java и UsageListener.java</figcaption><pre><code>public record UsageEvent(String eventId, long apiId, LocalDate day) {}
+
+@Component
+class UsageListener {
+    private final JdbcTemplate jdbc;
+
+    UsageListener(JdbcTemplate jdbc) { this.jdbc = jdbc; }
+
+    // сюда — метод on(UsageEvent e) из решения
+}</code></pre></figure><figure class="code"><figcaption>Терминал</figcaption><pre><code>docker exec -it kafka /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server localhost:9092 --topic api-usage
+{"eventId":"e1","apiId":1,"day":"2026-11-13"}
+{"eventId":"e1","apiId":1,"day":"2026-11-13"}
+{"eventId":"e2","apiId":1,"day":"2026-11-13"}</code></pre></figure><h5>Что вы увидите</h5><figure class="code"><figcaption>SELECT * FROM usage_daily; и SELECT * FROM processed_event;</figcaption><pre><code>api_id | day        | calls        id
+-------+------------+------      ----
+     1 | 2026-11-13 |     2      e1
+                                  e2</code></pre></figure><p>Три сообщения, но два разных события — <code>calls = 2</code>.</p><h5>Как это работает — по шагам</h5><ol><li><code>@Transactional</code>: обе команды SQL выполняются в одной транзакции — сохранятся обе или ни одна.</li><li>«e1» первый раз: <code>INSERT INTO processed_event</code> вставляет строку, <code>jdbc.update</code> возвращает число вставленных строк — 1. Идём дальше.</li><li>Вторая команда — «вставь или обнови»: строки за (api 1, 13 ноября) ещё нет → вставляется <code>calls = 1</code>.</li><li>«e1» второй раз: id уже есть, <code>ON CONFLICT DO NOTHING</code> → вставлено 0 строк → <code>return</code>. Счётчик не трогаем.</li><li>«e2»: id новый → 1 строка; строка за день уже есть, поэтому срабатывает <code>ON CONFLICT (api_id, day) DO UPDATE SET calls = usage_daily.calls + 1</code> → 2. Обновление делает сама база одной командой, поэтому два параллельных обработчика не потеряют прибавку.</li><li>Зачем транзакция: если программа упадёт между двумя командами, без транзакции событие осталось бы «запомненным», а счётчик — не увеличенным, и повтор его бы уже не засчитал. С транзакцией откатится всё, Kafka доставит сообщение снова, и оно обработается полностью.</li></ol></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c7-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -2554,6 +3301,43 @@ public User register(NewUser cmd) {
     outbox.save(new OutboxEvent("user.registered", u.getId().toString(), toJson(u)));
     return u;
 }</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Зачем всё это</h5><p>Наивный вариант: сохранить пользователя, затем <code>kafka.send(…)</code>. Если Kafka в этот момент недоступна — пользователь есть, события нет, письмо «добро пожаловать» не уйдёт никогда. Если сначала отправить, а потом база откатит транзакцию — событие есть, пользователя нет. Это проблема «двойной записи»: две системы нельзя изменить одной транзакцией.</p><h5>Запускаем по шагам</h5><ol><li>Выполните в DBeaver <code>CREATE TABLE outbox …</code> из разбора и добавьте столбец для отметки: <code>ALTER TABLE outbox ADD COLUMN sent BOOLEAN NOT NULL DEFAULT false;</code></li><li>Создайте сущность и репозиторий (код ниже). Он понадобится и в задаче 7.2.</li><li>В вашем сервисе регистрации добавьте строку <code>outbox.save(…)</code>, как в разборе. Превратить объект в JSON можно через <code>ObjectMapper</code>, который Spring уже создал (код ниже).</li><li>Зарегистрируйте пользователя и посмотрите таблицу: <code>SELECT * FROM outbox;</code></li></ol><figure class="code"><figcaption>OutboxEvent.java и OutboxRepository.java</figcaption><pre><code>@Entity
+@Table(name = "outbox")
+public class OutboxEvent {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String topic;
+    @Column(name = "msg_key")
+    private String key;
+    @JdbcTypeCode(SqlTypes.JSON)          // столбец JSONB
+    private String payload;
+    private Instant createdAt = Instant.now();
+    private Instant sentAt;
+    private boolean sent;
+
+    protected OutboxEvent() {}            // нужен Hibernate
+
+    public OutboxEvent(String topic, String key, String payload) {
+        this.topic = topic; this.key = key; this.payload = payload;
+    }
+
+    public String getTopic() { return topic; }
+    public String getKey() { return key; }
+    public String getPayload() { return payload; }
+    public void markSent() { sent = true; sentAt = Instant.now(); }
+}
+
+public interface OutboxRepository extends JpaRepository&lt;OutboxEvent, Long&gt; {
+    List&lt;OutboxEvent&gt; findTop100BySentFalseOrderById();
+}</code></pre></figure><figure class="code"><figcaption>В сервисе — превращение в JSON</figcaption><pre><code>private final ObjectMapper json;   // получите через конструктор, как остальные зависимости
+
+private String toJson(Object o) {
+    try {
+        return json.writeValueAsString(o);
+    } catch (JsonProcessingException e) {
+        throw new IllegalStateException(e);
+    }
+}</code></pre></figure><h5>Что вы увидите</h5><p>Строка в <code>outbox</code>: topic <code>user.registered</code>, ключ — id пользователя, payload — JSON, <code>sent = false</code>. Отправлять её будет отдельная задача — её вы напишете в задаче 7.2.</p><h5>Как это работает — по шагам</h5><ol><li><code>@Transactional</code> на методе: всё, что метод сохраняет в базу, фиксируется одним <code>COMMIT</code> в конце.</li><li><code>users.save</code> и <code>outbox.save</code> пишут в одну и ту же базу — значит, в одну транзакцию. Либо есть и пользователь, и событие, либо ни того ни другого.</li><li>Kafka в этом методе вообще не участвует — её недоступность регистрации не мешает.</li><li><code>msg_key</code> — ключ сообщения Kafka: события с одинаковым ключом (одного пользователя) попадут в одну партицию и будут прочитаны по порядку.</li></ol></div></details>
     <p><b>Итог:</b> в задаче 7.2 та же схема для одобрения подписки, плюс сама задача-отправитель.</p>
   </div>
   <div class="box task"><h4>Задача 7.2. Outbox</h4>
@@ -2572,7 +3356,7 @@ public User register(NewUser cmd) {
 public Subscription approve(long id) {
     Subscription s = repo.findById(id).orElseThrow();
     s.approve();
-    outbox.save(new OutboxEvent("subscription.approved", s.getId(), toJson(s)));
+    outbox.save(new OutboxEvent("subscription.approved", s.getId().toString(), toJson(s)));
     return s;   // данные и событие сохраняются в одной транзакции
 }
 
@@ -2585,6 +3369,43 @@ public void publish() throws Exception {
     }
 }</code></pre></figure>
       <p>Событие пишется в таблицу outbox в той же транзакции, что и данные, — двойной записи больше нет. Отдельная задача публикует неотправленные события. Если она упадёт после отправки, но до <code>markSent</code>, событие уйдёт ещё раз — поэтому консьюмеры и должны быть идемпотентными (задача 7.1).</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>Сущность <code>OutboxEvent</code>, репозиторий и <code>toJson</code> — из подробного разбора выше; Kafka и <code>application.properties</code> — как в задаче 7.1.</li><li>Если сущности подписки ещё нет — учебная ниже; таблица: <code>CREATE TABLE subscription (id BIGSERIAL PRIMARY KEY, status TEXT NOT NULL); INSERT INTO subscription (status) VALUES ('PENDING');</code></li><li>Создайте сервис с двумя методами из решения и контроллер для вызова <code>approve</code>. <code>KafkaTemplate&lt;String, String&gt;</code> Spring Boot создаёт сам: ключ и тело отправляются строками.</li><li>Добавьте <code>@EnableScheduling</code> на класс приложения — без неё <code>@Scheduled</code> не запускается.</li><li>Чтобы при выключенной Kafka отправка не висела минуту, добавьте в <code>application.properties</code>: <code>spring.kafka.producer.properties.max.block.ms=5000</code>.</li></ol><figure class="code"><figcaption>Subscription.java — учебная</figcaption><pre><code>@Entity
+public class Subscription {
+    @Id @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
+    private String status;
+
+    public Long getId() { return id; }
+    public String getStatus() { return status; }
+    public void approve() { status = "APPROVED"; }
+}
+
+public interface SubscriptionRepository extends JpaRepository&lt;Subscription, Long&gt; {}</code></pre></figure><figure class="code"><figcaption>SubscriptionService.java — каркас</figcaption><pre><code>@Service
+public class SubscriptionService {
+    private final SubscriptionRepository repo;
+    private final OutboxRepository outbox;
+    private final KafkaTemplate&lt;String, String&gt; kafka;
+    private final ObjectMapper json;
+
+    SubscriptionService(SubscriptionRepository repo, OutboxRepository outbox,
+                        KafkaTemplate&lt;String, String&gt; kafka, ObjectMapper json) {
+        this.repo = repo; this.outbox = outbox; this.kafka = kafka; this.json = json;
+    }
+
+    // сюда — approve(long id) и publish() из решения, и toJson из разбора
+}
+
+@RestController
+class SubscriptionController {
+    private final SubscriptionService service;
+    SubscriptionController(SubscriptionService service) { this.service = service; }
+
+    @PostMapping("/api/v1/subscriptions/{id}/approve")
+    String approve(@PathVariable long id) { return service.approve(id).getStatus(); }
+}</code></pre></figure><p>Ключ сообщения Kafka — строка, поэтому в решении id превращается в текст: <code>s.getId().toString()</code>.</p><figure class="code"><figcaption>Терминал — проверка</figcaption><pre><code>docker stop kafka
+curl -i -X POST http://localhost:8080/api/v1/subscriptions/1/approve
+docker start kafka
+docker exec -it kafka /opt/kafka/bin/kafka-console-consumer.sh --bootstrap-server localhost:9092 --topic subscriptions --from-beginning --property print.key=true</code></pre></figure><h5>Что вы увидите</h5><ol><li>Kafka выключена, а ответ всё равно <code>200 APPROVED</code>. В DBeaver: подписка одобрена, в <code>outbox</code> строка с <code>sent = false</code>. В логе приложения раз в несколько секунд — ошибки отправки: задача пытается и откатывается.</li><li>После <code>docker start kafka</code> строка становится <code>sent = true</code>, а читатель из последней команды печатает ключ <code>1</code> и JSON подписки.</li></ol><h5>Как это работает — по шагам</h5><ol><li><code>approve</code>: подписка меняет статус и событие пишется в <code>outbox</code> одной транзакцией. Kafka в этот момент не нужна.</li><li><code>@Scheduled(fixedDelay = 1000)</code>: Spring вызывает <code>publish</code> снова через секунду после окончания предыдущего вызова.</li><li><code>findTop100BySentFalseOrderById</code> — Spring Data строит запрос по имени метода: первые 100 строк, где <code>sent = false</code>, по возрастанию id (по порядку появления).</li><li><code>kafka.send(…)</code> отправляет асинхронно и сразу возвращает «обещание»; <code>.get()</code> ждёт, пока Kafka подтвердит запись. Если Kafka недоступна — через 5 секунд исключение.</li><li>Исключение откатывает транзакцию <code>publish</code>: отметки <code>markSent</code> не сохраняются, через секунду попытка повторится. Изменённые сущности Hibernate сохраняет сам при успешном окончании транзакции — отдельный <code>save</code> не нужен.</li><li>Поэтому возможна повторная отправка (отправили, но упали до сохранения отметки). Отсюда правило: консьюмеры событий должны быть идемпотентными — как в задаче 7.1.</li></ol></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c7-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -2702,6 +3523,28 @@ public void publish() throws Exception {
     }
     return new int[0];
 }</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>В любом Java-проекте создайте класс <code>TwoSum</code>, вставьте код ниже и запустите ▶.</li></ol><figure class="code"><figcaption>src/main/java/TwoSum.java</figcaption><pre><code>import java.util.*;
+
+public class TwoSum {
+
+    static int[] twoSum(int[] a, int target) {
+        Map&lt;Integer, Integer&gt; seen = new HashMap&lt;&gt;();
+        for (int i = 0; i &lt; a.length; i++) {
+            Integer j = seen.get(target - a[i]);
+            if (j != null) return new int[] { j, i };
+            seen.put(a[i], i);
+        }
+        return new int[0];
+    }
+
+    public static void main(String[] args) {
+        System.out.println(Arrays.toString(twoSum(new int[] {2, 7, 11, 15}, 9)));
+        System.out.println(Arrays.toString(twoSum(new int[] {3, 3}, 6)));
+        System.out.println(Arrays.toString(twoSum(new int[] {1, 2}, 10)));
+    }
+}</code></pre></figure><h5>Что вы увидите</h5><figure class="code"><figcaption>Окно Run</figcaption><pre><code>[0, 1]
+[0, 1]
+[]</code></pre></figure><h5>Как это работает — по шагам (массив [2, 7, 11, 15], сумма 9)</h5><ol><li><code>seen</code> — словарь «число → его номер в массиве». Пока пуст.</li><li>i = 0, число 2. Нужна пара 9 − 2 = 7. В <code>seen</code> её нет (<code>get</code> вернул null). Запоминаем: <code>{2=0}</code>.</li><li>i = 1, число 7. Нужна пара 9 − 7 = 2. Она есть, номер 0 → ответ <code>[0, 1]</code>.</li><li>Для <code>[3, 3]</code> важен порядок «сначала искать, потом запоминать»: на i = 0 тройки в словаре ещё нет, поэтому число не сложится само с собой. На i = 1 находится первая тройка.</li><li>Поиск в <code>HashMap</code> занимает примерно одинаковое время при любом размере, поэтому весь проход — O(n). Два вложенных цикла сделали бы n·n сравнений.</li></ol></div></details>
     <p><b>Итог:</b> в задаче 8.1 вместо HashMap нужен стек — ключевой вопрос тот же: «какая структура данных ответит на мой вопрос быстро?».</p>
   </div>
   <div class="box task"><h4>Задача 8.1. Скобки</h4>
@@ -2730,6 +3573,30 @@ public void publish() throws Exception {
     return st.isEmpty();
 }</code></pre></figure>
       <p>Открывающая скобка кладётся в стек, закрывающая должна совпасть с верхушкой стека. В конце стек должен быть пустым. <code>ArrayDeque</code> — рекомендуемая замена устаревшему классу <code>Stack</code>.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>Создайте класс <code>Brackets</code>, вставьте импорт, решение и <code>main</code> ниже, запустите ▶.</li></ol><figure class="code"><figcaption>src/main/java/Brackets.java — начало и main</figcaption><pre><code>import java.util.*;
+
+public class Brackets {
+
+    // сюда — метод balanced(String s) из решения
+
+    public static void main(String[] args) {
+        for (String s : List.of("([]{})", "([)]", "((", "", "a(b)c")) {
+            System.out.println("\"" + s + "\" -&gt; " + balanced(s));
+        }
+    }
+}</code></pre></figure><h5>Что вы увидите</h5><figure class="code"><figcaption>Окно Run</figcaption><pre><code>"([]{})" -&gt; true
+"([)]" -&gt; false
+"((" -&gt; false
+"" -&gt; true
+"a(b)c" -&gt; true</code></pre></figure><h5>Как это работает — по шагам: «([]{})»</h5><figure class="code"><figcaption>Стек после каждого символа (верхушка справа)</figcaption><pre><code>(   положили           → (
+[   положили           → ( [
+]   сняли [ — совпало  → (
+{   положили           → ( {
+}   сняли { — совпало  → (
+)   сняли ( — совпало  → пусто
+конец: стек пуст → true</code></pre></figure><h5>Как это работает — по шагам: «([)]»</h5><figure class="code"><figcaption>Стек</figcaption><pre><code>(   положили                       → (
+[   положили                       → ( [
+)   сняли [, а нужна ( → сразу false</code></pre></figure><ol><li><code>ArrayDeque</code> как стек: <code>push</code> кладёт наверх, <code>pop</code> снимает верхний. Последняя открытая скобка закрывается первой — ровно так и вложены скобки.</li><li><code>st.isEmpty() ||</code> стоит первым: для строки <code>")"</code> стек пуст, и <code>pop()</code> упал бы с ошибкой. Оператор <code>||</code> не вычисляет правую часть, если левая уже true.</li><li><code>st.pop() != '('</code>: слева <code>Character</code> (объект), справа <code>char</code> — Java сравнит значения. А вот два <code>Character</code> через <code>!=</code> сравнивались бы как ссылки — частая ловушка.</li><li><code>default -&gt; { }</code> пропускает все остальные символы — поэтому <code>"a(b)c"</code> тоже проверяется верно.</li><li>В конце <code>"(("</code> оставляет в стеке две скобки → false: открыли и не закрыли.</li></ol></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="c8-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -3089,6 +3956,10 @@ PostgreSQL · Prometheus + Grafana · CI/CD → Kubernetes (k3s или EKS)</pre
     WHERE id = ? AND seats_left &gt; 0
     """, eventId);
 if (updated == 0) throw new SoldOutException(eventId);   // → 409 Conflict</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>В DBeaver создайте таблицу и событие с двумя местами, затем выполните «покупку» три раза подряд (<b>Ctrl+Enter</b> на строке UPDATE).</li></ol><figure class="code"><figcaption>SQL</figcaption><pre><code>CREATE TABLE event (id BIGSERIAL PRIMARY KEY, title TEXT NOT NULL, seats_left INT NOT NULL CHECK (seats_left &gt;= 0));
+INSERT INTO event (title, seats_left) VALUES ('Концерт', 2);
+
+UPDATE event SET seats_left = seats_left - 1 WHERE id = 1 AND seats_left &gt; 0;</code></pre></figure><h5>Что вы увидите</h5><p>Внизу DBeaver пишет «Updated Rows»: 1, 1, затем 0 — мест больше нет, и <code>seats_left</code> остался 0, а не −1.</p><h5>Как увидеть одновременные покупки</h5><ol><li>Откройте вторую вкладку SQL-редактора. В первой переключите режим на ручной (кнопка <b>Auto-Commit</b> на панели) и верните 1 место: <code>UPDATE event SET seats_left = 1 WHERE id = 1;</code> → <b>Commit</b>.</li><li>В первой вкладке выполните покупку, но <b>не</b> нажимайте Commit.</li><li>Во второй вкладке выполните ту же покупку — запрос «повиснет»: он ждёт.</li><li>В первой нажмите <b>Commit</b>. Вторая тут же закончится с «Updated Rows: 0».</li></ol><h5>Как это работает — по шагам</h5><ol><li>Ошибочный вариант — три шага: прочитать остаток, проверить в Java, записать. Два запроса одновременно читают «1», оба проверяют «больше нуля», оба записывают — продано два билета на одно место.</li><li><code>UPDATE … WHERE seats_left &gt; 0</code> — проверка и изменение в одной команде. Перед изменением база блокирует строку.</li><li>Второй UPDATE той же строки ждёт, пока первая транзакция завершится. Затем PostgreSQL <b>заново проверяет условие</b> на новой версии строки: <code>seats_left</code> уже 0 → условие ложно → изменено 0 строк.</li><li><code>jdbc.update</code> возвращает число изменённых строк. 0 → бросаем <code>SoldOutException</code>, а обработчик в <code>@RestControllerAdvice</code> (как в задаче 3.1) превращает его в 409 Conflict.</li><li><code>CHECK (seats_left &gt;= 0)</code> — страховка: даже ошибочный код не сможет записать минус.</li></ol></div></details>
     <p><b>Итог:</b> в задаче 11.1 «остатка» нет — запрещено пересечение интервалов, поэтому вместо условного UPDATE используется ограничение EXCLUDE.</p>
   </div>
   <div class="box task"><h4>Задача 11.1. Никаких двойных записей</h4>
@@ -3126,6 +3997,9 @@ ProblemDetail taken() {
     return ProblemDetail.forStatusAndDetail(HttpStatus.CONFLICT, "Это время уже занято");
 }</code></pre></figure>
       <p>Ограничение запрещает две активные записи одного мастера с пересекающимися интервалами (<code>&amp;&amp;</code>). Расширение <code>btree_gist</code> нужно, чтобы в одном GiST-индексе сравнивать и число (<code>=</code>), и интервал. Отменённые записи (<code>status</code> не ACTIVE) не мешают занять время снова. Гонка решена там, где она возникает, — в базе.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>В DBeaver выполните <code>CREATE TABLE master …</code> и <code>INSERT</code> мастера из блока «Как понять задание».</li><li>Выполните SQL-часть решения: <code>CREATE EXTENSION</code> и <code>CREATE TABLE booking</code> (Java-код — отдельно, в Spring-проект).</li><li>Выполните три проверочные вставки по одной (<b>Ctrl+Enter</b> на каждой строке).</li><li>Проверьте отмену: <code>UPDATE booking SET status = 'CANCELLED' WHERE client = 'Анна';</code> — и снова вставьте Бориса на 15:00–16:00.</li><li>В Spring-проекте добавьте обработчик из решения в класс с <code>@RestControllerAdvice</code> (например, <code>ApiErrors</code> из задачи 3.1).</li></ol><h5>Что вы увидите</h5><figure class="code"><figcaption>Вторая вставка</figcaption><pre><code>ERROR: conflicting key value violates exclusion constraint "booking_master_id_slot_excl"
+DETAIL: Key (master_id, slot)=(1, ["2026-11-02 13:30:00+00","2026-11-02 14:30:00+00"))
+        conflicts with existing key (master_id, slot)=(1, ["2026-11-02 13:00:00+00","2026-11-02 14:00:00+00")).</code></pre></figure><p>Время в сообщении — в UTC (15:00 по Риге в ноябре = 13:00 UTC). Третья вставка (Вера, 16:00) проходит. После отмены записи Анны Борис на 15:00 тоже проходит.</p><h5>Как это работает — по шагам</h5><ol><li><code>TSTZRANGE</code> — один столбец «интервал времени с часовым поясом». Запись <code>[15:00, 16:00)</code>: квадратная скобка — начало входит, круглая — конец не входит. Поэтому 15:00–16:00 и 16:00–17:00 не пересекаются: в 16:00 первая запись уже закончилась.</li><li>Оператор <code>&amp;&amp;</code> — «интервалы пересекаются»: 15:00–16:00 и 15:30–16:30 пересекаются на получасе.</li><li><code>EXCLUDE USING gist (master_id WITH =, slot WITH &amp;&amp;)</code>: при каждой вставке база ищет уже существующую строку, для которой <b>все</b> условия истинны — тот же мастер <b>и</b> пересекающееся время. Нашла — ошибка. Для быстрого поиска база сама строит индекс GiST.</li><li>GiST «из коробки» умеет интервалы, но не обычное равенство чисел. Расширение <code>btree_gist</code> добавляет ему <code>=</code> для <code>BIGINT</code> — без него <code>CREATE TABLE</code> выдаст ошибку.</li><li><code>WHERE (status = 'ACTIVE')</code> — правило действует только на активные записи; отменённые не мешают.</li><li>Если две вставки идут одновременно, вторая дождётся окончания первой транзакции и только потом получит ошибку — гонки нет.</li><li>В Spring ошибка базы приходит как <code>DataIntegrityViolationException</code>; обработчик превращает её в 409 «Это время уже занято». Обратите внимание: этот обработчик поймает и другие нарушения ограничений (например, NOT NULL). В настоящем проекте проверяют имя ограничения в тексте ошибки.</li></ol></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="f2-t1"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -3135,6 +4009,16 @@ ProblemDetail taken() {
     <figure class="code"><figcaption>Java</figcaption><pre><code>Instant start = Instant.parse("2026-03-29T08:00:00Z");
 ZonedDateTime riga = start.atZone(ZoneId.of("Europe/Riga"));      // 11:00 (уже летнее время, UTC+3)
 ZonedDateTime ny   = start.atZone(ZoneId.of("America/New_York"));  // 04:00 (летнее время, UTC−4)</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>В Java-проекте создайте класс <code>Meeting</code>, вставьте код и запустите ▶.</li></ol><figure class="code"><figcaption>src/main/java/Meeting.java</figcaption><pre><code>import java.time.*;
+
+public class Meeting {
+    public static void main(String[] args) {
+        Instant start = Instant.parse("2026-03-29T08:00:00Z");
+        System.out.println(start.atZone(ZoneId.of("Europe/Riga")));
+        System.out.println(start.atZone(ZoneId.of("America/New_York")));
+    }
+}</code></pre></figure><h5>Что вы увидите</h5><figure class="code"><figcaption>Окно Run</figcaption><pre><code>2026-03-29T11:00+03:00[Europe/Riga]
+2026-03-29T04:00-04:00[America/New_York]</code></pre></figure><h5>Как это работает — по шагам</h5><ol><li><code>Instant</code> — точка на шкале времени, одинаковая для всей планеты; хранится в UTC (буква Z в строке). Его и кладут в базу.</li><li><code>ZoneId.of("Europe/Riga")</code> — не просто «+2», а вся история правил этого места: когда переводят часы. Java берёт её из встроенной базы часовых поясов.</li><li><code>atZone</code> переводит момент в местное время по правилам на эту дату. 29 марта Европа уже перешла на летнее время: Рига — UTC+3, поэтому 08:00 UTC = 11:00. США перешли 8 марта: Нью-Йорк — UTC−4, 04:00.</li><li>Попробуйте дату <code>2026-03-20T08:00:00Z</code>: Рига 10:00 (+2), Нью-Йорк 04:00 (−4) — разница 6 часов вместо обычных 7. Именно в эти три недели чаще всего ошибаются, если хранить «местное время» вместо Instant.</li></ol></div></details>
     <p><b>Итог:</b> в задаче 11.2 идём в обратную сторону: от местного рабочего дня в Риге к моментам <code>Instant</code> и сравниваем их с занятыми интервалами.</p>
   </div>
   <div class="box task"><h4>Задача 11.2. Свободные слоты с учётом часового пояса</h4>
@@ -3164,6 +4048,35 @@ static List&lt;ZonedDateTime&gt; freeSlots(LocalDate day, LocalTime open, LocalT
     return out;
 }</code></pre></figure>
       <p>Интервалы [s, e) и [b.start, b.end) пересекаются, если каждый начинается раньше конца другого. Сравнение идёт по <code>Instant</code> (UTC), поэтому переход на летнее время не ломает расчёт: <code>atZone</code> сам сдвигает несуществующее время 03:30 на 04:30. Тест обязательно для 29 марта 2026 года — дня перехода.</p>
+      <div class="walk"><h5>Запускаем по шагам</h5><ol><li>Создайте класс <code>Slots</code>: импорты, решение (record <code>Busy</code> и метод <code>freeSlots</code>) и <code>main</code> ниже.</li><li>Запустите ▶.</li></ol><figure class="code"><figcaption>src/main/java/Slots.java — импорты и main</figcaption><pre><code>import java.time.*;
+import java.util.*;
+
+public class Slots {
+
+    // сюда — record Busy и метод freeSlots из решения
+
+    public static void main(String[] args) {
+        ZoneId riga = ZoneId.of("Europe/Riga");
+        LocalDate day = LocalDate.of(2026, 11, 2);
+        Busy lunch = new Busy(
+            ZonedDateTime.of(day, LocalTime.of(11, 0), riga).toInstant(),
+            ZonedDateTime.of(day, LocalTime.of(12, 0), riga).toInstant());
+
+        freeSlots(day, LocalTime.of(10, 0), LocalTime.of(14, 0), Duration.ofHours(1), List.of(lunch))
+            .forEach(t -&gt; System.out.println(t.toLocalTime() + "  (UTC: " + t.toInstant() + ")"));
+
+        System.out.println("--- 29 марта 2026 ---");
+        freeSlots(LocalDate.of(2026, 3, 29), LocalTime.of(2, 0), LocalTime.of(6, 0),
+                  Duration.ofHours(1), List.of())
+            .forEach(System.out::println);
+    }
+}</code></pre></figure><h5>Что вы увидите</h5><figure class="code"><figcaption>Окно Run</figcaption><pre><code>10:00  (UTC: 2026-11-02T08:00:00Z)
+12:00  (UTC: 2026-11-02T10:00:00Z)
+13:00  (UTC: 2026-11-02T11:00:00Z)
+--- 29 марта 2026 ---
+2026-03-29T02:00+02:00[Europe/Riga]
+2026-03-29T04:00+03:00[Europe/Riga]
+2026-03-29T05:00+03:00[Europe/Riga]</code></pre></figure><h5>Как это работает — по шагам (2 ноября, занято 11:00–12:00)</h5><ol><li><code>day.atTime(open).atZone(riga)</code> — «2 ноября 10:00 в Риге». <code>end</code> — 14:00 там же.</li><li>Цикл: начинаем с 10:00, шаг — длительность услуги; продолжаем, пока конец слота (<code>t.plus(len)</code>) не позже закрытия.</li><li>10:00–11:00: занятость начинается в 11:00 — это не раньше конца слота (11:00), значит не пересекаются → свободно.</li><li>11:00–12:00: 11:00 раньше 12:00 и 11:00 раньше 12:00 → пересекается → занято.</li><li>12:00–13:00 и 13:00–14:00 свободны. Слот 14:00–15:00 кончается после закрытия — цикл останавливается. Итого 10:00, 12:00, 13:00.</li><li>Условие пересечения <code>b.start() &lt; e &amp;&amp; s &lt; b.end()</code> — «каждый начинается раньше, чем кончается другой». Оно покрывает все случаи: частичное наложение, вложение, полное совпадение.</li><li>Сравнение идёт по <code>Instant</code>, поэтому занятые интервалы могут прийти из базы в UTC — часовой пояс уже не важен.</li></ol><h5>Что случилось 29 марта</h5><p>В 03:00 часы в Риге переводятся сразу на 04:00 — времени 03:00–03:59 в этот день нет. Слот 02:00 длится один настоящий час и заканчивается в 04:00 по новому времени. Поэтому между «02:00» и «06:00» оказалось только 3 часа и 3 слота. Код не сломался: <code>ZonedDateTime.plus</code> прибавляет настоящий час, а не «+1 к цифре на часах».</p></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="f2-t2"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
@@ -3179,6 +4092,13 @@ WHERE id = (
   FOR UPDATE SKIP LOCKED
 )
 RETURNING id, payload;</code></pre></figure>
+    <details class="more"><summary>Подробно: как это запустить и как это работает</summary><div class="walk"><h5>Запускаем по шагам</h5><ol><li>В DBeaver создайте очередь из трёх заданий.</li><li>Откройте две вкладки SQL-редактора. В первой переключите <b>Auto-Commit</b> на ручной режим и выполните запрос из разбора — не нажимая Commit.</li><li>Во второй (обычный режим) выполните тот же запрос.</li><li>В первой нажмите <b>Commit</b>.</li></ol><figure class="code"><figcaption>SQL</figcaption><pre><code>CREATE TABLE job (
+  id       BIGSERIAL PRIMARY KEY,
+  payload  TEXT NOT NULL,
+  status   TEXT NOT NULL DEFAULT 'NEW',
+  taken_at TIMESTAMPTZ
+);
+INSERT INTO job (payload) VALUES ('письмо 1'), ('письмо 2'), ('письмо 3');</code></pre></figure><h5>Что вы увидите</h5><p>Первая вкладка получает задание 1, вторая — сразу (без ожидания) задание 2. Ни одно задание не взято дважды.</p><h5>Как это работает — по шагам</h5><ol><li>Внутренний <code>SELECT … ORDER BY id LIMIT 1</code> ищет самое старое новое задание.</li><li><code>FOR UPDATE</code> блокирует найденную строку до конца транзакции: другие не смогут её изменить или тоже заблокировать.</li><li><code>SKIP LOCKED</code> — «если строка уже заблокирована, не жди, а бери следующую». Без него вторая вкладка повисла бы в ожидании задания 1.</li><li>Внешний <code>UPDATE … WHERE id = (…)</code> помечает задание как RUNNING, а <code>RETURNING id, payload</code> сразу возвращает его данные — не нужен отдельный SELECT.</li><li>После COMMIT у задания 1 статус RUNNING, и запрос его больше не найдёт: условие <code>status = 'NEW'</code>.</li></ol></div></details>
     <p><b>Итог:</b> в задаче 11.3 тот же приём, но берётся пачка строк и отметка ставится в Java-коде.</p>
   </div>
   <div class="box task"><h4>Задача 11.3. Напоминания без дублей</h4>
@@ -3210,6 +4130,13 @@ public void remind() {
     }
 }</code></pre></figure>
       <p><code>FOR UPDATE</code> блокирует выбранные строки до конца транзакции, а <code>SKIP LOCKED</code> заставляет второй экземпляр пропустить их и взять другие. Отметка <code>reminded_at</code> и событие в outbox сохраняются в той же транзакции, поэтому повторного напоминания не будет даже после перезапуска.</p>
+      <div class="walk"><h5>Проверка в DBeaver</h5><ol><li>Добавьте столбец и тестовую запись, которая начнётся через 23,5 часа (мастер 1 и таблица <code>booking</code> — из задачи 11.1).</li><li>Вкладка 1 (ручной режим): выполните SELECT из решения — вернётся id новой записи. Не нажимайте Commit.</li><li>Вкладка 2: тот же SELECT — пусто: строка заблокирована, и <code>SKIP LOCKED</code> её пропустил.</li><li>Вкладка 1: <code>UPDATE booking SET reminded_at = now() WHERE id = …;</code> → <b>Commit</b>.</li><li>Вкладка 2: SELECT ещё раз — снова пусто, теперь потому что <code>reminded_at</code> заполнен.</li></ol><figure class="code"><figcaption>SQL</figcaption><pre><code>ALTER TABLE booking ADD COLUMN reminded_at TIMESTAMPTZ;
+INSERT INTO booking (master_id, client, slot) VALUES
+  (1, 'Дина', tstzrange(now() + interval '23 hours 30 minutes', now() + interval '24 hours 30 minutes'));</code></pre></figure><h5>Проверка в Spring: два экземпляра</h5><ol><li>Добавьте <code>@EnableScheduling</code> на класс приложения и строку в лог внутри цикла, чтобы видеть, кто что отправил: <code>log.info("напоминание для записи {}", id);</code> (<code>private static final Logger log = LoggerFactory.getLogger(…)</code> из <code>org.slf4j</code>).</li><li>В <code>OutboxEvent</code> из главы 7 добавьте фабричный метод (код ниже).</li><li>Добавьте несколько записей «через 23,5 часа» и запустите два экземпляра в двух терминалах на разных портах.</li></ol><figure class="code"><figcaption>OutboxEvent.java — добавить</figcaption><pre><code>public static OutboxEvent reminder(long bookingId) {
+    return new OutboxEvent("booking.reminder", String.valueOf(bookingId),
+                           "{\"bookingId\":" + bookingId + "}");
+}</code></pre></figure><figure class="code"><figcaption>Терминал 1 и терминал 2</figcaption><pre><code>./gradlew bootRun
+./gradlew bootRun --args='--server.port=8081'</code></pre></figure><h5>Что вы увидите</h5><p>Каждый id записи встречается в логах только один раз — в одном из двух терминалов. В <code>outbox</code> по одной строке на запись.</p><h5>Как это работает — по шагам</h5><ol><li>Оба экземпляра раз в минуту вызывают <code>remind</code>. Каждый вызов — своя транзакция (<code>@Transactional</code>).</li><li>SELECT отбирает активные записи без напоминания, которые начнутся через 23–24 часа (<code>lower(slot)</code> — начало интервала), не больше 100 за раз.</li><li><code>FOR UPDATE SKIP LOCKED</code>: первый экземпляр блокирует свои строки, второй их не ждёт и не видит — берёт только незаблокированные.</li><li>В цикле: событие в outbox (его отправит задача-публикатор из главы 7) и отметка <code>reminded_at</code>. Всё в той же транзакции.</li><li>После COMMIT блокировки снимаются, но у строк уже есть <code>reminded_at</code> — ни один экземпляр их больше не выберет, даже после перезапуска.</li><li>Если экземпляр упадёт посреди цикла, транзакция откатится: ни отметок, ни событий — через минуту эти записи возьмёт кто-то снова. Дублей не будет, потерь тоже.</li></ol></div>
     </details>
     <ul class="todo"><li><label><input type="checkbox" data-k="f2-t3"><span>Решено самостоятельно, прежде чем открыть решение</span></label></li></ul>
   </div>
