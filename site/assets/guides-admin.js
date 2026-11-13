@@ -34,6 +34,7 @@
       ${v ? `<p class="adm-quick"><label><input type="radio" name="gd-vip" value="0"${x && x.vip ? '' : ' checked'}> Бесплатное — видят все</label>
         <label><input type="radio" name="gd-vip" value="1"${x && x.vip ? ' checked' : ''}> VIP — только тем, кто вошёл</label></p>`
         : `<p><label><input type="checkbox" class="gd-free"${x && x.free ? ' checked' : ''}> Бесплатная (PDF и т. п.)</label></p>`}`}
+      ${v || hw ? `<p class="adm-quick">На каком языке ${v ? 'видео' : 'шпаргалка'} (можно несколько; для фильтра «Язык» на «Уроках»): ${L3.map(([l, n]) => `<label><input type="checkbox" class="gd-lg" value="${l}"${x && (x.langs || []).includes(l) ? ' checked' : ''}> ${n}</label>`).join(' ')}</p>` : ''}
       ${hw ? '' : `<p><label><input type="checkbox" class="gd-soon"${x && x.soon ? ' checked' : ''}> ⏳ Скоро — ${v ? 'видео ещё нет: на сайте карточка «Скоро», ссылку можно не вставлять (нужны название и обложка)' : 'книга ещё не вышла: на сайте пометка «Скоро», ссылку можно не вставлять'}</label></p>`}
       <p class="be-note">Название — хотя бы на одном языке, остальные переведутся сами.${v ? ' Можно пусто — возьмётся название с YouTube.' : ''}</p>
       ${L3.map(([l, n]) => `<p><label>${n}<br><input ${inp} class="be-input gd-t" data-l="${l}" maxlength="120" value="${esc(t[l] || '')}"></label></p>`).join('')}
@@ -54,6 +55,7 @@
       box.querySelectorAll('.gd-d').forEach(i => fd.set('d_' + i.dataset.l, i.value.trim()));
       if ($('.gd-nocov') && $('.gd-nocov').checked) fd.set('nocover', '1');
       if (!hw) fd.set('soon', $('.gd-soon').checked ? '1' : '0');
+      fd.set('langs', [...box.querySelectorAll('.gd-lg:checked')].map(i => i.value).join(','));
       b.disabled = true; msg.textContent = '⏳ Сохраняю и перевожу…';
       try {
         if (hw) { // страницы: PDF — как есть, картинки — JPEG до 1800 px, по порядку имён файлов
@@ -74,7 +76,7 @@
     box.innerHTML = items.map((x, i) => `<div class="adm-box" style="display:flex;gap:14px;align-items:center;flex-wrap:wrap${x.hidden ? ';opacity:.5' : ''}">
       <img src="${esc(x.cover)}" alt="" style="width:96px;height:64px;object-fit:cover;border-radius:8px;background:#eee">
       <div style="flex:1;min-width:180px"><b>${esc((x.t && (x.t.ru || x.t.en)) || 'Название с YouTube')}</b><br>
-        <small class="be-note">${x.kind === 'howto' ? `📝 Шпаргалка${x.vip ? ' · 🔒 для своих' : ''} · ${x.pdf ? 'PDF' : (x.pages || 0) + ' стр.'}` : x.kind === 'video' ? (x.vip ? '🔒 VIP-видео' : '🎬 Бесплатное видео') : x.free ? '📘 Бесплатная книга' : '📘 Книга'}${x.soon ? ' · ⏳ скоро' : ''}${x.hidden ? ' · скрыто' : ''}${x.d && (x.d.ru || x.d.en) ? ' · 📝 есть описание' : ''} ·
+        <small class="be-note">${x.built ? `🧩 Шпаргалка из конструктора${x.vip ? ' · 🔒 для своих' : ''} · 🌍 EN RU LV` : x.kind === 'howto' ? `📝 Шпаргалка${x.vip ? ' · 🔒 для своих' : ''} · ${x.pdf ? 'PDF' : (x.pages || 0) + ' стр.'}` : x.kind === 'video' ? (x.vip ? '🔒 VIP-видео' : '🎬 Бесплатное видео') : x.free ? '📘 Бесплатная книга' : '📘 Книга'}${x.soon ? ' · ⏳ скоро' : ''}${!x.built && (x.langs || []).length ? ' · ' + x.langs.map(l => l.toUpperCase()).join(' ') : ''}${x.hidden ? ' · скрыто' : ''}${x.d && (x.d.ru || x.d.en) ? ' · 📝 есть описание' : ''} ·
         ${x.kind !== 'book' && !x.soon ? `<a href="/ru/learn/v/${esc(x.id)}/" target="_blank" rel="noopener">страница на сайте</a> · ` : ''}${x.kind === 'howto' ? '' : (x.kind === 'video' ? x.yt : x.url) ? `<a href="${esc(x.kind === 'video' ? 'https://youtu.be/' + x.yt : x.url)}" target="_blank" rel="noopener">ссылка</a>` : 'без ссылки'}</small></div>
       <div class="adm-quick" style="margin:0">
         <button type="button" class="pill-btn" data-a="up" data-i="${i}" title="Выше"${i ? '' : ' disabled'}>↑</button>
@@ -84,6 +86,7 @@
         <button type="button" class="pill-btn" data-a="del" data-i="${i}">🗑</button></div></div>`).join('');
     box.querySelectorAll('[data-a]').forEach(b => b.onclick = async () => {
       const x = items[b.dataset.i], a = b.dataset.a;
+      if (a === 'edit' && x.built) { alert('Эта шпаргалка собрана в конструкторе — правьте её в «🧩 Конструктор шпаргалок».'); return; }
       if (a === 'edit') return onEdit(x);
       if (a === 'del' && !confirm('Убрать с сайта насовсем?')) return;
       const fd = new FormData(); fd.set('act', a); fd.set('id', x.id); b.disabled = true;

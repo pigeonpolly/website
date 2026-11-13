@@ -1,0 +1,63 @@
+/* Шпаргалка из конструктора (кабинет → «🧩 Конструктор шпаргалок», cheatsheet-admin.js): страница /learn/v/<id>/ (v2.js) и предпросмотр в кабинете.
+   Стиль главной 2.0: цвета сезона из v2.css (--sheet, --ink, --acc…), в кабинете — зимние (.csb). */
+.cs-sheet{display:grid;grid-template-columns:1fr 1fr;gap:28px 40px;max-width:1040px;padding:48px 56px 56px;background:var(--sheet,#F8FAFB);color:var(--ink,#1C2430);box-shadow:0 18px 40px rgba(31,35,38,.12),0 1px 2px rgba(31,35,38,.08);font-family:Karla,'Nunito Sans',system-ui,sans-serif;font-size:17px;line-height:1.6;align-items:start}
+.cs-b{grid-column:1/-1;margin:0;min-width:0}
+.cs-b.half{grid-column:span 1}
+.cs-h{font:400 clamp(26px,2.8vw,36px)/1.12 Fraunces,Lora,serif;margin:14px 0 0;padding-bottom:10px;border-bottom:1px solid var(--line,#D3DAE0)}
+.cs-h::before{content:'✦';display:block;margin-bottom:8px;color:var(--acc,#9E1B22);font:700 13px Karla,'Nunito Sans',sans-serif;letter-spacing:.16em}
+.cs-h:first-child{margin-top:0}
+.cs-p p,.cs-st p,.cs-tip p{margin:0 0 12px}.cs-p p:last-child,.cs-st p:last-child,.cs-tip p:last-child{margin:0}
+.cs-sheet>.cs-p:first-of-type>p:first-child::first-letter{float:left;font:400 64px/.82 Fraunces,Lora,serif;color:var(--acc,#9E1B22);margin:6px 10px 0 0}
+.cs-img img,.cs-step img{display:block;width:100%;height:auto;background:#fff}
+.cs-img{background:#fff;padding:12px 12px 10px;box-shadow:0 10px 24px rgba(31,35,38,.16);transform:rotate(-.8deg)}
+.cs-img:nth-of-type(2n){transform:rotate(.9deg)}
+.cs-img figcaption{font:700 22px/1.2 Caveat,cursive;color:var(--acc,#9E1B22);margin-top:8px;text-align:center}
+.cs-step{position:relative;padding-left:58px}
+.cs-n{position:absolute;left:0;top:0;width:42px;height:42px;border-radius:50%;background:var(--acc,#9E1B22);color:#fff;display:grid;place-items:center;font:italic 400 22px/1 Fraunces,Lora,serif}
+.cs-step img{margin-bottom:12px;box-shadow:0 6px 16px rgba(31,35,38,.14)}
+.cs-tip{position:relative;background:#FFFDF6;outline:1.5px solid var(--acc,#9E1B22);outline-offset:-6px;padding:30px 26px 22px;transform:rotate(-1deg);box-shadow:0 4px 10px rgba(31,35,38,.2),0 1px 2px rgba(31,35,38,.14)}
+.cs-tip::before{content:'✦ Tip';position:absolute;top:-12px;left:20px;background:var(--acc,#9E1B22);color:#fff;padding:5px 10px 4px;font:700 11px/1.2 Karla,'Nunito Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase}
+html[lang=ru] .cs-tip::before{content:'✦ Совет'}html[lang=lv] .cs-tip::before{content:'✦ Padoms'}
+.cs-list{list-style:none;padding:0}
+.cs-list li{position:relative;padding:8px 0 8px 28px;border-bottom:1px dashed var(--line,#D3DAE0)}
+.cs-list li::before{content:'✦';position:absolute;left:4px;top:8px;color:var(--acc,#9E1B22)}
+.cs-l3{margin:-6px 0 16px;font:700 12px Karla,'Nunito Sans',sans-serif;letter-spacing:.12em;text-transform:uppercase;color:var(--mut,#5D6670)}
+.cs-l3 a{color:var(--acc,#9E1B22);text-decoration:underline}
+@media(max-width:760px){.cs-sheet{grid-template-columns:1fr;padding:26px 18px 30px;gap:22px}.cs-b.half{grid-column:1/-1}.cs-step{padding-left:52px}}
+
+/* конструктор в кабинете: зимние цвета главной */
+.csb{--bg:#EEF1F3;--sheet:#F8FAFB;--ink:#1C2430;--mut:#5D6670;--line:#D3DAE0;--acc:#9E1B22;--acc2:#E2544A;background:var(--bg);color:var(--ink);padding:26px;border-radius:4px;font-family:Karla,'Nunito Sans',system-ui,sans-serif}
+.csb h2.csb-t{font:400 34px/1.1 Fraunces,Lora,serif;margin:0 0 6px}.csb h2.csb-t em{color:var(--acc);font-style:italic}
+.csb-k{margin:0 0 6px;color:var(--acc);font:700 11px Karla,'Nunito Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase}
+.csb-note{color:var(--mut);font-size:14px;margin:6px 0 14px}
+.csb-row{display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:12px 0}
+.csb button,.csb .csb-btn{border:1.5px solid var(--ink);background:none;color:var(--ink);border-radius:999px;padding:8px 16px;font:700 13px Karla,'Nunito Sans',sans-serif;cursor:pointer}
+.csb button:disabled{opacity:.4;cursor:default}
+.csb button.fill,.csb button[aria-pressed=true]{background:var(--ink);color:#fff}
+.csb button.acc{background:var(--acc);border-color:var(--acc);color:#fff}
+.csb input[type=text],.csb textarea{width:100%;box-sizing:border-box;border:1px solid var(--line);background:#fff;color:var(--ink);padding:10px 12px;font:inherit;border-radius:2px}
+.csb .csb-title{font:400 28px/1.2 Fraunces,Lora,serif}
+.csb label.csb-l{display:block;font:700 11px Karla,'Nunito Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mut);margin:14px 0 6px}
+.csb-lang{display:inline-flex;gap:0;border:1.5px solid var(--ink);border-radius:999px;overflow:hidden}
+.csb .csb-lang button{border:0;border-radius:0;padding:8px 14px}
+.csb-ed{display:grid;grid-template-columns:1fr 1fr;gap:18px 24px;max-width:1040px;padding:28px;background:var(--sheet);box-shadow:0 18px 40px rgba(31,35,38,.12);margin-top:16px}
+.csb-blk{grid-column:1/-1;position:relative;border:1.5px dashed var(--line);padding:34px 14px 14px;background:var(--sheet)}
+.csb-blk.half{grid-column:span 1}
+.csb-blk.drag{opacity:.4}.csb-blk.over{border-color:var(--acc)}
+.csb-bar{position:absolute;top:6px;left:10px;right:8px;display:flex;gap:6px;align-items:center}
+.csb-bar b{flex:1;font:700 11px Karla,'Nunito Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--acc);cursor:grab}
+.csb .csb-bar button{padding:2px 9px;font-size:12px;border-width:1px}
+.csb-blk .pic{display:block;max-width:100%;max-height:260px;margin:0 0 10px;background:#fff;box-shadow:0 4px 12px rgba(31,35,38,.14)}
+.csb-blk textarea{min-height:70px}
+.csb-blk.k-h textarea{font:400 24px/1.2 Fraunces,Lora,serif;min-height:0}
+.csb-blk.k-tip{background:#FFFDF6;outline:1.5px solid var(--acc);outline-offset:-6px}
+.csb-add{grid-column:1/-1;display:flex;flex-wrap:wrap;gap:8px;justify-content:center;padding:14px;border:1.5px dashed var(--acc)}
+.csb-prev{margin-top:16px}
+.csb-msg{min-height:1.4em;color:var(--acc);font-weight:700}
+.csb-list{display:grid;gap:12px;margin-top:14px}
+.csb-it{display:flex;gap:14px;align-items:center;flex-wrap:wrap;background:var(--sheet);padding:12px;box-shadow:0 2px 8px rgba(31,35,38,.08)}
+.csb-it img{width:84px;height:60px;object-fit:cover;background:#fff}
+.csb-it .nm{flex:1;min-width:180px}.csb-it .nm b{font:400 19px Fraunces,Lora,serif}
+.csb-tag{display:inline-block;background:var(--acc);color:#fff;padding:3px 8px;font:700 10px Karla,'Nunito Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;margin-right:6px}
+.csb-tag.dr{background:var(--mut)}
+@media(max-width:760px){.csb{padding:16px 12px}.csb-ed{grid-template-columns:1fr;padding:14px}.csb-blk.half{grid-column:1/-1}}

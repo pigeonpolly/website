@@ -82,6 +82,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/garden-items.js` (13K) — Вещи для огорода (этап 23, docs/bird.md «Огород»): вид подарка garden — в магазине, сумке,: PPGardenItems, ITEMS, LEG, ORDER, layout
 - `site/assets/garden.js` (43K) — Огород птички (этап 22, /garden/?nick=, docs/bird.md «Огород»): пиксельная сцена 192×120 (: PPGardenPlants, CROP, NIGHT_ON, TALL, float
 - `site/assets/guides-admin.js` (11K) — Кабинет → «🎬 Видео и книги» (admin.js открывает PPGuidesAdmin.mount(main)): добавить видео: PPGuidesAdmin, ERR, form, jpeg, mount
+- `site/assets/cheatsheet-admin.js` — Кабинет → «🧩 Конструктор шпаргалок» (PPCheatAdmin.mount): блоки, RU/EN/LV + PPTranslateBtn, предпросмотр `sheet()` (копия рендера из v2.js — менять оба), черновик / выложить. Стиль — `site/assets/cheatsheet.css` (.cs-sheet — и на сайте, .csb — кабинет в зимних цветах)
 - `site/assets/hatch.js` (9K) — Вылупление (этап 14, docs/site.md «Главная»): пиксельное яйцо, трещины и птичка из скорлуп: PPHatch, EGG, KEY, SPOTS, step
 - `site/assets/home-blog.js` (2K) — блок блога на главной: pic
 - `site/assets/ideas-admin.js` (9K) — Кабинет → «💡 Темы для блога» (admin.js открывает PPIdeasAdmin.mount(main)): кнопка — сайт : PPIdeasAdmin, ERR, fmt, mount, text

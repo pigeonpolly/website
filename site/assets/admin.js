@@ -32,6 +32,7 @@
     { id: 'themes', ic: '🗓', name: 'Темы челленджа', group: 'pub', about: 'Темы челленджа на любой месяц вперёд: тема на трёх языках, цвета, время; банк ваших тем.' },
     { id: 'art', ic: '🎨', name: 'Картины и палитры', group: 'pub', about: 'Картины, добавленные с сайта, скрытые картины и очередь палитр дня ЭКСТРА.' },
     { id: 'posts', ic: '📣', name: 'Посты', group: 'pub', about: 'Готовые картинки и тексты для соцсетей: тема дня, темы на месяц, палитра, загадка Титоса. Всё рисуется само из того, что сейчас на сайте.' },
+    { id: 'cheats', ic: '🧩', name: 'Конструктор шпаргалок', group: 'pub', about: 'Собрать шпаргалку из блоков: картинки, шаги, текст, советы. Переставлять, делать широкими или в полстроки, перевести на EN/RU/LV и выложить в «Шпаргалки» на «Уроках» — для всех или для своих.' },
     { id: 'guides', ic: '🎬', name: 'Видео и книги', group: 'pub', about: 'Новые видеоуроки с YouTube (бесплатные или VIP — только тем, кто вошёл) и книги со ссылкой и обложкой. Добавили — сразу на сайте: «Уроки», «Книги», главная, кабинет ученика.' },
     { id: 'polls', ic: '🗳', name: 'Опросы', group: 'pub', about: 'Опрос на главной: какую тему следующего видео хотят посетители. Создать, открыть, завершить, статистика; блок на главной можно скрыть.' },
     { id: 'ideas', ic: '💡', name: 'Темы для блога', group: 'pub', about: 'Кнопка: что сейчас ищут в Google и обсуждают на Reddit по вашим темам — и 10 тем статей с ключевыми словами.' },
@@ -68,6 +69,7 @@
     school: () => window.PPSchoolAdmin ? window.PPSchoolAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился school-admin.js</p>'), // 🎓 Школа Полли (school-admin.js)
     cards: () => window.PPCardsAdmin && window.PPCards ? window.PPCardsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cards-admin.js</p>'), // 🃏 Карточки (cards-admin.js)
     posts: () => window.PPPostsAdmin ? window.PPPostsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился posts-admin.js</p>'), // 📣 Посты (posts-admin.js)
+    cheats: () => window.PPCheatAdmin ? window.PPCheatAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился cheatsheet-admin.js</p>'), // 🧩 Конструктор шпаргалок (cheatsheet-admin.js)
     guides: () => window.PPGuidesAdmin ? window.PPGuidesAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился guides-admin.js</p>'), // 🎬 Видео и книги (guides-admin.js)
     runes: () => window.PPRunesAdmin ? window.PPRunesAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился runes-admin.js</p>'), // 🔮 Руны (runes-admin.js)
     polls: () => window.PPPollsAdmin ? window.PPPollsAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился polls-admin.js</p>'), // 🗳 Опросы (polls-admin.js)
