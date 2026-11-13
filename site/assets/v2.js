@@ -132,7 +132,7 @@
   document.querySelectorAll('[data-yt]').forEach(ytName);
 
   // добавленное в кабинете «🎬 Видео и гайды» (/api/v2/guides, worker/guides.js): новое — первым
-  const G = { free: ['Free', 'Бесплатно', 'Bez maksas'], vid: ['Video lesson · open to everyone', 'Видеоурок · открыт всем', 'Video nodarbība · atvērta visiem'],
+  const G = { free: ['Open to all', 'Открыто всем', 'Atvērts visiem'], vid: ['Video lesson · open to everyone', 'Видеоурок · открыт всем', 'Video nodarbība · atvērta visiem'],
     watch: ['Watch →', 'Смотреть →', 'Skatīties →'], lock: ['Sign in to watch', 'Войдите, чтобы смотреть', 'Ienāc, lai skatītos'], signin: ['Sign in →', 'Войти →', 'Ienākt →'],
     pdf: ['Free PDF', 'Бесплатный PDF', 'Bezmaksas PDF'], dl: ['Download free →', 'Скачать бесплатно →', 'Lejupielādēt bez maksas →'],
     amz: ['Amazon', 'Amazon', 'Amazon'], onAmz: ['On Amazon →', 'На Amazon →', 'Amazon →'],
@@ -188,9 +188,9 @@
         + `<span class="tx"><b>${nm}</b><small>${x.vip ? (lock ? G.lock[L] : G.vipOpen[L]) : G.vid[L]}</small><span class="go">${lock ? G.signin[L] : G.watch[L]}</span></span></a>`;
     };
     // курсы на сайте (не видео): Школа Полли /polly-helps/
-    const COURSES = [{ u: '/polly-helps/', img: '/images/school/book-cover.jpg', t: ['Polly’s Drawing School', 'Школа Полли', 'Pollijas skola'],
+    const COURSES = [{ u: '/polly-helps/', img: '/images/school/course-cover.jpg', t: ['Polly’s Drawing School', 'Школа Полли', 'Pollijas skola'],
       s: ['Course · 12 short lessons and a diploma', 'Курс · 12 коротких уроков и диплом', 'Kurss · 12 īsas nodarbības un diploms'] }];
-    const crs = x => `<a class="vc crs" data-f="free" data-c="course" href="${pre}${x.u}"><span class="tp">${G.tpC[L]}</span><span class="th"><img src="${x.img}" alt="" loading="lazy"><span class="bd">${G.free[L]}</span><span class="pl" aria-hidden="true">▶</span></span>`
+    const crs = x => `<a class="vc crs" data-f="free" data-c="course" href="${pre}${x.u}"><span class="tp">${G.tpC[L]}</span><span class="th"><img src="${x.img}" alt="" loading="lazy"><span class="bd">${G.free[L]}</span></span>`
       + `<span class="tx"><b>${x.t[L]}</b><small>${x.s[L]}</small><span class="go">${G.open[L]}</span></span></a>`;
     // шпаргалки (кабинет → «📝 Шпаргалка»): страницы-картинки или PDF, своя страница /learn/v/<id>/
     const hwCard = x => { const lock = x.vip && !op;
