@@ -75,20 +75,17 @@
   const fold = document.querySelector('.fold');
   if (fold) fold.querySelector('.cv').addEventListener('click', () => fold.classList.add('open'));
 
+  // номер версии сайта в подвале (видно всем); если на сервере уже новее — подсказка обновить страницу
+  const verEl = document.querySelector('.ft2 .ver');
+  if (verEl) fetch('/assets/version.json?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(v => {
+    if (v && v.n > +verEl.dataset.ver) verEl.textContent += ' · ' + ['on server: v', 'на сервере: v', 'serverī: v'][L] + v.n + ' — ' + ['reload', 'обнови страницу', 'pārlādē'][L];
+    else if (v) verEl.textContent += ' ✓';
+  }).catch(() => {});
+
   // вход: вошедшему — птичка и ник (→ профиль), гостю — «Войти» (окно входа на старых страницах, /games/#signin)
-  const acct = document.getElementById('acct2'), verEl = document.querySelector('.ft2 .ver');
-  if (acct || verEl) fetch('/api/whoami', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => {
+  const acct = document.getElementById('acct2');
+  if (acct) fetch('/api/whoami', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => {
     const u = d && d.user;
-    // номер версии сайта в подвале — только админу; если на сервере уже новее — подсказка обновить страницу
-    const vEl = u && u.admin && verEl;
-    if (vEl) {
-      vEl.hidden = false;
-      fetch('/assets/version.json?t=' + Date.now(), { cache: 'no-store' }).then(r => r.ok ? r.json() : null).then(v => {
-        if (v && v.n > +vEl.dataset.ver) vEl.textContent += ' · ' + ['on server: v', 'на сервере: v', 'serverī: v'][L] + v.n + ' — ' + ['reload', 'обнови страницу', 'pārlādē'][L];
-        else if (v) vEl.textContent += ' ✓';
-      }).catch(() => {});
-    }
-    if (!acct) return;
     if (!u) { acct.textContent = ['Sign in', 'Войти', 'Ienākt'][L]; return; }
     acct.href = pre + '/bird/'; // «Мой кабинет» (cabinet.js)
     acct.innerHTML = `<canvas width="28" height="26" aria-hidden="true"></canvas><span>${esc(u.nick || ['My bird', 'Моя птичка', 'Mans putniņš'][L])}</span>`;
