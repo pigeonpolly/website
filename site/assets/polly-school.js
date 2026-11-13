@@ -27,7 +27,9 @@
     locked: ['Opens after the previous lesson', 'Откроется после предыдущего урока', 'Atvērsies pēc iepriekšējās nodarbības'],
     next: ['Next →', 'Дальше →', 'Tālāk →'],
     again: ['↺ From the start', '↺ Сначала', '↺ No sākuma'],
-    log: ['Polly’s words stay here — tap any of them to put its picture back on the easel.', 'Слова Полли остаются здесь — нажми на любую реплику, и её картинка вернётся на мольберт.', 'Pollijas vārdi paliek šeit — pieskaries jebkuram, un tā attēls atgriezīsies uz molberta.'],
+    log: ['Tap a line to put its picture back on the easel.', 'Нажми на реплику — её картинка вернётся на мольберт.', 'Pieskaries replikai — tās attēls atgriezīsies uz molberta.'],
+    more: ['What Polly said before', 'Что Полли говорила раньше', 'Ko Pollija teica iepriekš'],
+    fold: ['Put back in the stack', 'Сложить в стопочку', 'Salikt kaudzītē'],
     onEasel: ['on the easel', 'на мольберте', 'uz molberta'],
     found: ['Found', 'Найдено', 'Atrasts'],
     upload: ['📷 Photo of your page', '📷 Фото твоей страницы', '📷 Tavas lapas foto'],
@@ -94,6 +96,7 @@
   const isOpen = n => n === 1 || !!srv.works[n - 1] || (srv.me === null && finished(n - 1));
   const stamps = () => Object.values(srv.works).filter(w => w.status === 'ok').length;
   if (!(st.cur >= 1 && st.cur <= N) || !isOpen(st.cur)) st.cur = 1;
+  let hist = false; // стопочка старых реплик раскрыта
   let mode = 'lesson', view = Math.min(ls(st.cur).step, stepsOf(st.cur).length - 1);
 
   const loadSrv = () => fetch('/api/school?lang=' + ['en', 'ru', 'lv'][L], { credentials: 'same-origin' }).then(r => r.json()).then(d => {
@@ -153,7 +156,7 @@
   const bubble = (n, i) => {
     const s = stepsOf(n)[i], c = s.client;
     const who = c ? `<div class="ps-who"><i style="background-image:url(/images/cards/${c.card})"></i><b>${tr(c.name)}</b><span>${tr(c.job)}</span></div>` : '';
-    return `<li class="ps-b${c ? ' client' : ''}${i === view ? ' cur' : ''}" data-i="${i}">${who}<p>${tr(s.say)}</p>${extra(n, i)}${i === view ? `<span class="ps-eye">👁 ${t('onEasel')}</span>` : ''}</li>`;
+    return `<li class="ps-b${c ? ' client' : ''}${i === view ? ' cur' : ''}" data-i="${i}">${who}<p>${tr(s.say)}</p>${extra(n, i)}${i === view && i < ls(n).step ? `<span class="ps-eye">👁 ${t('onEasel')}</span>` : ''}</li>`;
   };
 
   const mark = { wait: '⏳', ok: '✅', redo: '↩' };
@@ -162,36 +165,42 @@
     return `<li class="${open ? 'open' : 'lock'}${n === st.cur && mode === 'lesson' ? ' cur' : ''}${w ? ' ' + w.status : ''}" data-n="${n}" title="${open ? '' : esc(t('locked'))}"><span class="ps-dot">${w ? mark[w.status] : open ? l.icon : '🔒'}</span><small>${n}. ${tr(l.name)}</small></li>`;
   }).join('')}<li class="dip${stamps() >= N ? ' open' : ' lock'}${mode === 'dip' ? ' cur' : ''}" data-n="dip"><span class="ps-dot">📜</span><small>${t('diploma')}</small></li></ol>`;
 
+  // урок: слева мольберт, справа только текущая реплика; прежние — в стопочке, раскрываются по кнопке
   const lessonView = () => {
-    const n = st.cur, S = stepsOf(n), p = ls(n);
-    return `<div class="ps-class">
-        <div class="ps-stage"><div class="ps-easel"><div class="ps-paperbox">${easelArt(n, view)}</div></div>${polly}<span class="ps-tag">${t('lesson')} ${n} · ${tr(LS[n - 1].name)}</span></div>
-        <div class="ps-chat"><p class="ps-hint">${t('log')}</p><ol class="ps-log">${S.slice(0, p.step + 1).map((_, i) => bubble(n, i)).join('')}</ol>
-          <div class="ps-bar"><button type="button" class="ps-again">${t('again')}</button>${p.step < S.length - 1 ? `<button type="button" class="ps-next"${blocked(n, p.step) ? ' disabled' : ''}>${t('next')}</button>` : ''}</div></div>
+    const n = st.cur, S = stepsOf(n), p = ls(n), old = p.step;
+    const stack = old ? `<button type="button" class="ps-stack${hist ? ' open' : ''}" aria-expanded="${hist}"><b>${old}</b><span>${hist ? t('fold') : t('more')}</span><i>${hist ? '▾' : '▴'}</i></button>` : '';
+    const oldLog = hist && old ? `<p class="ps-hint">${t('log')}</p><ol class="ps-log ps-old">${S.slice(0, old).map((_, i) => bubble(n, i)).join('')}</ol>` : '';
+    return `<div class="ps-class${hist && old ? ' hist' : ''}">
+        <div class="ps-stage"><div class="ps-paperbox">${easelArt(n, view)}</div></div>
+        <div class="ps-chat"><div class="ps-lhead"><span class="ps-tag">${t('lesson')} ${n}</span><h2>${LS[n - 1].icon} ${tr(LS[n - 1].name)}</h2><i class="ps-prog"><b style="width:${Math.round((old + 1) / S.length * 100)}%"></b></i></div>${stack}${oldLog}<ol class="ps-log ps-now">${bubble(n, old)}</ol>
+          <div class="ps-bar">${polly}<button type="button" class="ps-again">${t('again')}</button>${p.step < S.length - 1 ? `<button type="button" class="ps-next"${blocked(n, p.step) ? ' disabled' : ''}>${t('next')}</button>` : ''}</div></div>
       </div>`;
   };
+  // окно урока целиком на экране: если верх ушёл за край или окно далеко внизу — подвинуть
+  const fit = () => { const c = box.querySelector('.ps-class'); if (!c) return; const r = c.getBoundingClientRect(); if (r.top < 0 || r.top > innerHeight * .35) c.scrollIntoView({ block: 'start', behavior: 'smooth' }); };
 
   // ---------- диплом: пиксельная картинка (canvas), скачать PNG ----------
   function diplomaCanvas() {
     const c = document.createElement('canvas'), W = 1200, H = 850, x = c.getContext('2d');
     c.width = W; c.height = H;
     x.imageSmoothingEnabled = false;
-    const INK = '#2B1A51', SOFT = '#6A5F86', GOLD = '#B8862E', RED = '#C2502A', PAPER = '#FBF4E2';
+    const INK = '#2E2521', SOFT = '#7A6C63', GOLD = '#C98A5B', RED = '#D85A30', PAPER = '#FBF7F0'; // цвета сайта: графит, бумага, охра, оранжевый
     x.fillStyle = INK; x.fillRect(0, 0, W, H);
     x.fillStyle = PAPER; x.fillRect(28, 28, W - 56, H - 56);
     // зерно бумаги — редкие пиксели
     let seed = 7; const rnd = () => (seed = (seed * 16807) % 2147483647) / 2147483647;
-    x.fillStyle = 'rgba(184,134,46,.10)'; for (let i = 0; i < 2600; i++) x.fillRect(28 + Math.floor(rnd() * (W - 56) / 4) * 4, 28 + Math.floor(rnd() * (H - 56) / 4) * 4, 4, 4);
+    x.fillStyle = 'rgba(201,138,91,.09)'; for (let i = 0; i < 2600; i++) x.fillRect(28 + Math.floor(rnd() * (W - 56) / 4) * 4, 28 + Math.floor(rnd() * (H - 56) / 4) * 4, 4, 4);
     // двойная золотая рамка и пиксельные уголки
-    x.strokeStyle = GOLD; x.lineWidth = 4; x.strokeRect(58, 58, W - 116, H - 116);
+    x.strokeStyle = INK; x.lineWidth = 3; x.strokeRect(58, 58, W - 116, H - 116);
+    x.strokeStyle = GOLD;
     x.lineWidth = 2; x.strokeRect(70, 70, W - 140, H - 140);
     const corner = (cx, cy, sx, sy) => { x.fillStyle = GOLD; for (const [i, j] of [[0, 0], [1, 0], [2, 0], [0, 1], [0, 2], [2, 2], [3, 3]]) x.fillRect(cx + sx * i * 8 - (sx < 0 ? 8 : 0), cy + sy * j * 8 - (sy < 0 ? 8 : 0), 8, 8); };
     corner(84, 84, 1, 1); corner(W - 84, 84, -1, 1); corner(84, H - 84, 1, -1); corner(W - 84, H - 84, -1, -1);
-    const serif = (sz, it) => `${it ? 'italic 400' : '600'} ${sz}px Fraunces, Georgia, serif`, sans = (sz, w = 400) => `${w} ${sz}px Karla, system-ui, sans-serif`;
+    const serif = (sz, it, w = 600) => `${it ? 'italic 400' : w} ${sz}px Fraunces, Georgia, serif`, sans = (sz, w = 400) => `${w} ${sz}px Karla, system-ui, sans-serif`;
     const spaced = (txt, y, gap) => { x.letterSpacing = gap + 'px'; x.fillText(txt, W / 2 + gap / 2, y); x.letterSpacing = '0px'; };
     x.textAlign = 'center';
     x.fillStyle = RED; x.font = sans(17, 700); spaced(t('dipSchool').toUpperCase() + '  ·  PIGEON POLLY ART LAB', 140, 5);
-    x.fillStyle = INK; x.font = serif(110, true); x.fillText(t('dipTitle'), W / 2, 252);
+    x.fillStyle = INK; x.font = serif(104, false, 400); x.fillText(t('dipTitle'), W / 2, 250);
     // ромбик-разделитель
     x.fillStyle = GOLD; x.fillRect(W / 2 - 150, 284, 120, 2); x.fillRect(W / 2 + 30, 284, 120, 2);
     x.save(); x.translate(W / 2, 285); x.rotate(Math.PI / 4); x.fillRect(-7, -7, 14, 14); x.restore();
@@ -201,7 +210,7 @@
     // 12 печатей в ряд: кружок-штемпель
     LS.forEach((l, i) => {
       const cx = W / 2 + (i - 5.5) * 64, cy = 530;
-      x.strokeStyle = 'rgba(194,80,42,.85)'; x.lineWidth = 3; x.beginPath(); x.arc(cx, cy, 25, 0, 7); x.stroke();
+      x.strokeStyle = 'rgba(216,90,48,.85)'; x.lineWidth = 3; x.beginPath(); x.arc(cx, cy, 25, 0, 7); x.stroke();
       x.lineWidth = 1; x.beginPath(); x.arc(cx, cy, 20, 0, 7); x.stroke();
       x.fillStyle = RED; x.font = sans(20, 700); x.fillText(l.icon, cx, cy + 7);
     });
@@ -214,7 +223,7 @@
     x.font = sans(24, 500); x.fillText(date, 280, ly - 14);
     x.fillStyle = SOFT; x.font = sans(13, 700); x.letterSpacing = '3px'; x.fillText(t('dipSign').toUpperCase(), W - 280 + 1.5, ly + 28); x.fillText(t('dipDate').toUpperCase(), 280 + 1.5, ly + 28); x.letterSpacing = '0px';
     // подпись — отпечаток голубиной лапки (подушечки пальцев и коготки)
-    x.save(); x.translate(W - 280, ly - 34); x.rotate(-0.22); x.fillStyle = 'rgba(43,26,81,.88)';
+    x.save(); x.translate(W - 280, ly - 34); x.rotate(-0.22); x.fillStyle = 'rgba(46,37,33,.88)';
     const pad = (d, a, rx, ry) => { x.beginPath(); x.ellipse(d * Math.sin(a), -d * Math.cos(a), rx, ry, a, 0, 7); x.fill(); };
     pad(0, 0, 10, 9);
     for (const [a, n] of [[-0.75, 3], [0, 3], [0.75, 3], [Math.PI, 2]]) {
@@ -223,7 +232,7 @@
     }
     x.restore();
     // мелкая оговорка на тёмном поле снизу
-    x.fillStyle = 'rgba(251,244,226,.6)'; x.font = sans(13, 500); x.fillText(t('dipFine'), W / 2, H - 9);
+    x.fillStyle = 'rgba(251,247,240,.6)'; x.font = sans(13, 500); x.fillText(t('dipFine'), W / 2, H - 9);
     // восковая печать с Полли
     const sx = W / 2, sy = 702;
     x.fillStyle = '#9E3A1E'; x.beginPath(); for (let k = 0; k < 24; k++) { const r = k % 2 ? 62 : 68, a = k / 24 * Math.PI * 2; x.lineTo(sx + r * Math.cos(a), sy + r * Math.sin(a)); } x.fill();
@@ -248,10 +257,10 @@
     if (pic) {
       const c = diplomaCanvas(); c.className = 'ps-dip-canvas'; pic.append(c);
       // шрифты сайта могут догрузиться позже — перерисовать
-      document.fonts && Promise.all(['600 70px Fraunces', 'italic 400 70px Fraunces', '700 20px Karla', '500 20px Karla'].map(f => document.fonts.load(f))).then(() => c.getContext('2d').drawImage(diplomaCanvas(), 0, 0)).catch(() => {});
+      document.fonts && Promise.all(['600 70px Fraunces', '400 70px Fraunces', 'italic 400 70px Fraunces', '700 20px Karla', '500 20px Karla'].map(f => document.fonts.load(f))).then(() => c.getContext('2d').drawImage(diplomaCanvas(), 0, 0)).catch(() => {});
     }
   };
-  const openLesson = n => { st.cur = n; mode = 'lesson'; view = Math.min(ls(n).step, stepsOf(n).length - 1); save(); render(); box.querySelector('.ps-class').scrollIntoView({ block: 'start', behavior: 'smooth' }); };
+  const openLesson = n => { st.cur = n; mode = 'lesson'; hist = false; view = Math.min(ls(n).step, stepsOf(n).length - 1); save(); render(); fit(); };
 
   box.addEventListener('click', e => {
     const el = e.target, n = st.cur;
@@ -267,8 +276,9 @@
     if (mode !== 'lesson') return;
     const p = ls(n);
     const toEasel = () => innerWidth <= 820 && box.querySelector('.ps-stage').scrollIntoView({ block: 'start', behavior: 'smooth' }); // телефон: мольберт выше ленты
-    if (el.closest('.ps-next')) { p.step++; view = p.step; save(); render(); if (stepsOf(n)[view].find) toEasel(); else { const nb = box.querySelector('.ps-log > li:last-child'); nb && nb.scrollIntoView({ block: 'nearest', behavior: 'smooth' }); } return; }
-    if (el.closest('.ps-again')) { st.l[n] = { step: 0, quiz: {}, find: {}, paper: [] }; view = 0; save(); render(); return; }
+    if (el.closest('.ps-next')) { p.step++; view = p.step; hist = false; save(); render(); fit(); return; }
+    if (el.closest('.ps-again')) { st.l[n] = { step: 0, quiz: {}, find: {}, paper: [] }; view = 0; hist = false; save(); render(); return; }
+    if (el.closest('.ps-stack')) { hist = !hist; if (!hist) view = p.step; render(); if (hist) { const o = box.querySelector('.ps-old'); o && (o.scrollTop = o.scrollHeight); } return; }
     const q = el.closest('[data-q]');
     if (q) { p.quiz[q.closest('.ps-b').dataset.i] = +q.dataset.q; save(); render(); return; }
     const g = el.closest('.ps-find g[data-k]');
@@ -277,7 +287,7 @@
     if (el.closest('.ps-send')) { send(el.closest('.ps-hand')); return; }
     if (el.closest('input, textarea, label, form')) return;
     const b = el.closest('.ps-b');
-    if (b) { view = +b.dataset.i; render(); toEasel(); }
+    if (b) { const o = box.querySelector('.ps-old'), y = o ? o.scrollTop : 0; view = +b.dataset.i; render(); const o2 = box.querySelector('.ps-old'); o2 && (o2.scrollTop = y); toEasel(); }
   });
   box.addEventListener('change', e => {
     const n = st.cur, p = ls(n);
