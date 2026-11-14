@@ -41,7 +41,7 @@ tour(bird('2026-pigeon-polly-seven-years-later'), G.bird, { intro: 'seven years 
   title: 'Seven Years Later: Still Studying — Watercolor Pigeon Comic', topics: 'lifelong learning, student humor, watercolor illustration',
   desc: 'Diplomas on the wall, a new university application on the laptop. Pigeon Polly, seven years later.',
   alt: 'Video moving over a watercolor of a pigeon in a red hat at a laptop with a university application, diplomas framed on the wall.' });
-tour(bird('2026-pigeon-polly-sam-milka-cat-and-horse-of-the-year-celebrate-new-year'), G.bird, { intro: 'the party guest list', outro: 'Pigeon Polly, Sam, Milka and the Horse',
+tour(bird('2026-pigeon-polly-sam-milka-cat-and-horse-of-the-year-celebrates-new-year'), G.bird, { intro: 'the party guest list', outro: 'Pigeon Polly, Sam, Milka and the Horse',
   stops: [[.1, .4, .5, 'the Horse of the year ✓'], [.45, .35, .45, 'champagne, in bed'], [.75, .62, .45, 'Milka the cat: busy'], [.58, .86, .4, 'dinner: on the blanket']],
   title: 'A Party in Bed: Pigeon Polly, Sam, Milka the Cat and the Horse', topics: 'cozy party, funny illustration, cat art',
   desc: 'A horse by the tree, champagne in bed, a cat on the blanket and dinner right there. The coziest guest list.',
