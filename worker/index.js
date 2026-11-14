@@ -57,7 +57,6 @@ export default {
     const p = url.pathname;
     const pollGo = p.match(/^\/(ru\/|lv\/)?poll\/?$/); // короткая ссылка на опрос главной (worker/polls.js)
     if (pollGo) return pollPage(env, url, pollGo[1] ? pollGo[1].slice(0, 2) : 'en'); // страница-превью с картинкой опроса → /#poll
-    if (p.startsWith('/members/')) return membersFile(req, env, url); // файлы «для своих» (раскраски vip): только вошедшим
     if (!p.startsWith('/api/')) { // страницы: при сбое — своя страница «500 · что-то сломалось» вместо голой ошибки Cloudflare
       try {
         const run = () => pageFetch(req, env, url, p);
@@ -1267,17 +1266,6 @@ async function currentUser(req, env) {
   // «был недавно» для стаи на главной: обновляем не чаще раза в 10 минут
   if (u && (u.last_seen || 0) < now() - 600) await env.DB.prepare('UPDATE users SET last_seen = ? WHERE id = ?').bind(now(), u.id).run();
   return u;
-}
-// /members/… — статические файлы только для вошедших (site/members/, docs/coloring.md); гостю — на /learn/?c=<id> с окном входа
-async function membersFile(req, env, url) {
-  const id = (url.pathname.match(/\/([\w-]+)\.\w+$/) || [])[1] || '';
-  const back = Response.redirect(new URL('/learn/' + (id ? '?c=' + id : '') + '#signin', url.origin).toString(), 302);
-  if (!env.DB) return back;
-  const u = await currentUser(req, env).catch(() => null);
-  if (!u || u.banned) return back;
-  const r = await env.ASSETS.fetch(req), h = new Headers(r.headers);
-  h.set('cache-control', 'private, no-store');
-  return new Response(r.body, { status: r.status, headers: h });
 }
 async function needUser(req, env) {
   const u = await currentUser(req, env);

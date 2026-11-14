@@ -1,6 +1,6 @@
 // Новые форматы пинов (14.11.2026): №377 — бесплатная раскраска для печати, №378 — видео-пин 9:16 («камера по арту»).
 // node tools/pins/pins9.js [coloring|pin|video]… (без аргументов — всё) →
-//   site/images/coloring/pigeon-polly-christmas-lights.{pdf,png} (с 14.11 — в «Уроки → Раскраски», tools/coloring/data.json),
+//   site/images/coloring/pigeon-polly-christmas-lights.{pdf,png} + обложка .jpg (полка «Гайды и книги», content/ebooks.json),
 //   site/images/pins/pin-377.jpg, site/images/pins/pin-378.mp4 (+ pin-378.jpg — обложка видео), tools/pins/pins9.json (тексты для Notion).
 // Контуры раскраски — из рисунка Алины site/images/photos/garland.jpg (порог по светлоте: чёрные линии остаются, заливка уходит).
 const fs = require('fs'), path = require('path'), { execSync } = require('child_process');
@@ -21,7 +21,7 @@ const PINS = [
   { n: 377, type: 'Раскраска', title: 'Free Christmas Coloring Page: Pigeon Polly Tangled in Fairy Lights (Printable PDF)',
     desc: 'A free printable Christmas coloring page: a cute pigeon in a Santa hat, tangled in fairy lights, holding a paintbrush. A4 PDF, print at home and color with pencils, markers or watercolor.',
     alt: 'Black and white coloring page of a cartoon pigeon in a Santa hat wrapped in Christmas lights, next to the colored original illustration.',
-    link: SITE + '/learn/?c=polly-christmas-lights&utm_source=pinterest&utm_campaign=newformats', topics: 'christmas coloring pages, free printable, coloring pages for adults, cute coloring page' },
+    link: L('/books/'), topics: 'christmas coloring pages, free printable, coloring pages for adults, cute coloring page' },
   { n: 378, type: 'Видео', title: 'New Year’s Eve, But Make It Cozy — Pigeon Polly Makes Salad in Bed',
     desc: 'December 31st, a laptop, a cutting board on the blanket and the most important ingredient on the windowsill. A little look around Pigeon Polly’s New Year’s Eve.',
     alt: 'Short video panning over an illustration of a pigeon in a sleep mask cutting carrots in bed on December 31st, with a laptop and a jar of mayo nearby.',
@@ -58,6 +58,7 @@ async function coloring(b) {
   await render(p, sheet(img), F(CN + '.pdf'), { pdf: true, css: '@page{size:A4;margin:0}' }); await p.close();
   p = await newPage(b, 2480, 3508);
   await render(p, sheet(img, 2480 / 794), F(CN + '.png')); await p.close();
+  sh(`convert "${F(CN + '.png')}" -resize 488x680^ -gravity center -extent 488x680 -quality 88 "${F(CN + '.jpg')}"`);
   fs.unlinkSync(F('coloring/_lines.png'));
 }
 

@@ -25,7 +25,6 @@
 | Детектив Титос /titos/: дела, кофе. Новое дело — всегда с вещью-наградой и картинкой места происшествия (важные улики — приколоть, мелочи — узнать); перед пушем — titos_check.py и tools/titos_clicks.py (все улики нажимаются) | docs/titos.md, docs/titos-cast.md, content/titos/index.md |
 | Wobbleland | docs/wobbleland.md |
 | Палитры | docs/palettes.md |
-| Раскраски (Уроки → Раскраски, PDF для своих) | docs/coloring.md |
 | Коллекционные карточки | docs/cards.md |
 | Кабинет, статистика | docs/admin.md |
 | Полли-питомец | docs/polly-pet.md |
