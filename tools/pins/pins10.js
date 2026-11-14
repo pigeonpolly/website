@@ -1,4 +1,4 @@
-// Пины №429–471 «Арт-лаборатория»: ведут на статьи блога, видеоуроки, курс туши, галереи; мокапы на стене, процесс, арт крупно.
+// Пины №429–475 «Арт-лаборатория»: ведут на статьи блога, видеоуроки, курс туши, галереи; мокапы на стене, процесс, арт крупно.
 // Фото — с Google Диска Алины 14.11 (site/images/photos2/, до 1200 px). Стиль — коричневый фон + голубой Caveat (лучше всего заходят).
 // node tools/pins/pins10.js [номер…] → site/images/pins/pin-NNN.jpg + tools/pins/pins10.json (тексты для Notion).
 const fs = require('fs'), path = require('path'), { execSync } = require('child_process');
@@ -50,6 +50,13 @@ const T = {
     <div class="fr" style="position:absolute;left:50px;top:${H + 180}px;overflow:hidden;width:900px;height:${1230 - H - 180}px"><img src="${U(p.art)}" style="position:absolute;width:${880 / c[2]}px;left:${-c[0] * 880 / c[2]}px;top:${-c[1] * 880 * r / c[2]}px;max-width:none"></div>
     <div class="hand" style="position:absolute;left:60px;right:60px;top:1258px;font-size:58px">${esc(p.hand)}</div>
     <div style="position:absolute;left:62px;top:1335px;font:400 26px Karla;color:${C.mut};letter-spacing:.04em">${esc(p.sub)}</div>${url(C.mut)}`; },
+  // палитра как p01–p59: арт сверху, 6 плашек с HEX на тёмном
+  pal: p => `<div style="position:absolute;inset:0;background:#2A1B1E"></div>
+    <div style="position:absolute;left:0;right:0;top:0;height:780px">${cov(p.art, 1000, 780, p.pos)}<div style="position:absolute;inset:0;background:linear-gradient(180deg,rgba(42,27,30,0) 52%,rgba(42,27,30,.75) 80%,#2A1B1E)"></div></div>
+    <div style="position:absolute;left:70px;right:70px;top:680px"><div style="font:700 26px Karla;letter-spacing:.24em;color:#E0A13A">COLOR PALETTE</div>
+    <h1 style="font-size:${p.name.length > 18 ? 68 : 80}px;margin-top:12px;color:#F6ECDF">${esc(p.name)}</h1>
+    <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:30px 22px;margin-top:40px">${p.cols.map(([n, h]) => `<div><div style="height:118px;border-radius:12px;background:${h};box-shadow:inset 0 0 0 1px rgba(255,255,255,.08)"></div><b style="display:block;font:700 26px Karla;margin-top:12px;color:#F6ECDF">${esc(n)}</b><span style="display:block;font:500 21px Karla;color:#BFAEA6;letter-spacing:.06em;margin-top:6px">${h.toUpperCase()}</span></div>`).join('')}</div></div>
+    <div style="position:absolute;left:70px;right:70px;bottom:52px;display:flex;align-items:baseline"><i style="font:italic 400 30px Fraunces;color:#BFAEA6">from my painting</i><b style="margin-left:auto;font:700 30px Karla;color:#F6ECDF">pigeonpolly.com</b></div>`,
   // процесс: 2–3 шага с номерами
   steps: p => { const n = p.items.length, H = n === 2 ? 470 : 300, G = 40;
     return `<div class="kick" style="top:58px">${esc(p.kick || 'from start to finish')}</div>
