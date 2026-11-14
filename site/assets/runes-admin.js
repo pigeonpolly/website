@@ -37,9 +37,24 @@
   .rn-sum{background:#fff;color:#2B1A51;padding:16px;border-radius:16px;border:2px solid #E9A93B;margin:14px 0}
   .rn-sum ul{margin:6px 0 6px 20px;padding:0}
   .rn-sum li{margin:5px 0;line-height:1.5}
+  .rn-q{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:2px solid #E8E4E2;font:inherit;color:#2B1A51;background:#fff;resize:vertical;min-height:2.6em}
+  .rn-q:focus{outline:none;border-color:#E9A93B}
+  .rn-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0;padding:0;list-style:none;counter-reset:s}
+  .rn-steps li{padding:10px 12px;border-radius:12px;background:#F4EFEA;counter-increment:s;line-height:1.45}
+  .rn-steps li::before{content:counter(s);display:inline-grid;place-items:center;width:1.6em;height:1.6em;border-radius:50%;background:#E9A93B;color:#fff;font-weight:700;margin-right:6px}
+  .rn-ans{list-style:none;margin:10px 0;padding:0}
+  .rn-ans li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid #F0EBE7}
+  .rn-ans li:first-child{border-top:0}
+  .rn-ans .rn-g{font-size:1.8em;min-width:1.2em;text-align:center}
+  .rn-ask{display:block;font-size:.85em;color:#b9771a;font-weight:700}
+  .rn-do{padding:12px 14px;border-radius:12px;background:#FFF4DC;margin:12px 0;line-height:1.5}
+  .rn-do b{display:block;margin-bottom:2px}
+  .rn-plain{font-size:1.08em;line-height:1.5;margin:6px 0}
+  .rn-card details,.rn-sum details{margin-top:10px}
+  .rn-card summary,.rn-sum summary{cursor:pointer}
   @media (max-width:600px){.rn-slot{max-width:none}}`;
 
-  let D = null, st = { sp: null, picks: [], cur: 0 };
+  let D = null, st = { sp: null, picks: [], cur: 0, q: '' };
   const card = n => D.cards.find(c => c.n === n);
   const isGod = c => c.n > 24;
   const allowed = sp => sp.id === 'track' ? D.cards.filter(c => !isGod(c)) : D.cards;
@@ -50,7 +65,7 @@
     fetch('/api/admin/runes', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : Promise.reject(r.status)).then(d => {
       D = d;
       const last = ls.get();
-      if (last && D.spreads.find(s => s.id === last.sp)) { st = { sp: last.sp, picks: last.picks || [], cur: 0 }; }
+      if (last && D.spreads.find(s => s.id === last.sp)) { st = { sp: last.sp, picks: last.picks || [], cur: 0, q: last.q || '' }; }
       draw(box);
     }).catch(e => { box.innerHTML = `<p class="be-note">Не получилось открыть руны (${esc(e)}). Раздел только для админа — проверьте вход и PIN.</p>`; });
   }
@@ -66,16 +81,20 @@
       <h3>Как делать</h3>
       <ol class="rn-how">${sp.how.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
       <details><summary class="be-note">Перед раскладом — настроиться</summary><ul class="rn-how">${D.prep.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>
+      <h3>Ваш вопрос</h3>
+      <textarea class="rn-q" rows="2" maxlength="300" placeholder="Например: «Что будет, если я сменю работу?»">${esc(st.q)}</textarea>
+      <p class="be-note" style="margin-top:4px">Необязательно, но так ответ будет понятнее: каждую строку толкования читайте как ответ именно на этот вопрос.</p>
       <h3>Какие карты выпали</h3>
       <p class="be-note">Нажмите на место, потом на карту. Повторное нажатие на выбранную карту — убрать.</p>
       <div class="rn-slots">${sp.pos.map((p, i) => { const c = st.picks[i] && card(st.picks[i]); return `<button type="button" class="rn-slot${c ? ' on' : ''}${i === st.cur ? ' cur' : ''}" data-i="${i}">
-        <span class="rn-pn">${i + 1}. ${esc(p.name)}</span><span class="rn-g">${c ? esc(c.g || '✦') : '?'}</span>${c ? `<b>${esc(c.ru)}</b>` : '<span class="be-note">выбрать</span>'}</button>`; }).join('')}</div>
+        <span class="rn-pn">${i + 1}. ${esc(p.name)}<br><small>${esc(p.ask)}</small></span><span class="rn-g">${c ? esc(c.g || '✦') : '?'}</span>${c ? `<b>${esc(c.ru)}</b>` : '<span class="be-note">выбрать</span>'}</button>`; }).join('')}</div>
       ${grid(sp, 'Руны', allowed(sp).filter(c => !isGod(c)))}
       ${sp.id === 'track' ? '' : grid(sp, 'Боги', allowed(sp).filter(isGod))}
       <p>${full ? '' : '<span class="be-note">Выберите все карты — появится толкование.</span>'} ${st.picks.some(Boolean) ? '<button type="button" class="pill-btn rn-clear">Очистить</button>' : ''}</p>
     </section>
     ${full ? reading(sp) : ''}`;
-    box.querySelector('.rn-back').onclick = () => { st = { sp: null, picks: [], cur: 0 }; save(); draw(box); };
+    box.querySelector('.rn-back').onclick = () => { st = { sp: null, picks: [], cur: 0, q: '' }; save(); draw(box); };
+    const qa = box.querySelector('.rn-q'); qa.oninput = () => { st.q = qa.value; save(); const o = box.querySelector('.rn-myq'); if (o) o.textContent = st.q.trim() ? `«${st.q.trim()}»` : ''; };
     box.querySelectorAll('.rn-slot').forEach(b => b.onclick = () => { st.cur = +b.dataset.i; draw(box); });
     box.querySelectorAll('.rn-c').forEach(b => b.onclick = () => {
       const n = +b.dataset.n;
@@ -88,7 +107,7 @@
       save(); draw(box);
       if (st.picks.length === sp.cards && st.picks.every(Boolean)) { const r = box.querySelector('.rn-sum'); if (r) r.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     });
-    const cl = box.querySelector('.rn-clear'); if (cl) cl.onclick = () => { st.picks = []; st.cur = 0; save(); draw(box); };
+    const cl = box.querySelector('.rn-clear'); if (cl) cl.onclick = () => { st.picks = []; st.cur = 0; st.q = ''; save(); draw(box); };
   }
 
   function grid(sp, title, list) {
@@ -99,23 +118,29 @@
 
   function drawChoose(box) {
     box.innerHTML = `<section class="adm-box"><h2>🔮 Руны</h2>
-      <p class="be-note">Колода «Runic Oracle»: 24 руны и 20 карт богов. Выберите расклад — покажу, как его делать, потом отметите выпавшие карты и получите толкование.</p>
+      <p class="be-note">Колода «Runic Oracle»: 24 руны и 20 карт богов.</p>
+      <ol class="rn-steps"><li>Выберите расклад и запишите вопрос.</li><li>Вытяните карты из настоящей колоды и отметьте их здесь.</li><li>Прочитайте ответ простыми словами и выберите один шаг.</li></ol>
+      <p class="be-note">Не знаете, какой расклад? Начните с «Одной карты».</p>
       <div class="rn-spreads">${D.spreads.map(s => `<button type="button" class="rn-sp" data-id="${s.id}"><b>${esc(s.name)}</b><small>${s.cards} ${s.cards === 1 ? 'карта' : 'карты'} · ${esc(s.deck)}</small></button>`).join('')}</div>
       <details><summary class="be-note">Как настроиться перед раскладом</summary><ul class="rn-how">${D.prep.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>
       <details><summary class="be-note">Все карты колоды</summary>${D.cards.map(c => cardHtml(c)).join('')}</details></section>`;
-    box.querySelectorAll('.rn-sp').forEach(b => b.onclick = () => { st = { sp: b.dataset.id, picks: [], cur: 0 }; save(); draw(box); });
+    box.querySelectorAll('.rn-sp').forEach(b => b.onclick = () => { st = { sp: b.dataset.id, picks: [], cur: 0, q: '' }; save(); draw(box); });
   }
 
-  const save = () => ls.set({ sp: st.sp, picks: st.picks });
+  const save = () => ls.set({ sp: st.sp, picks: st.picks, q: st.q });
 
   function cardHtml(c, pos) {
     const at = [['Знак', c.z], ['Тотем', c.tot], ['Цвет', c.col], ['Кристалл', c.cr], ['Стихия', c.el], ['Планета', c.pl], ['Бог', c.god]].filter(x => x[1]);
-    return `<article class="rn-card">${pos ? `<div class="rn-pos">${esc(pos.i)}. ${esc(pos.name)}</div><p class="be-note" style="margin:2px 0 10px">${esc(pos.about)}</p>` : ''}
+    return `<article class="rn-card">${pos ? `<div class="rn-pos">${esc(pos.i)}. ${esc(pos.name)} — ${esc(pos.ask)}</div>` : ''}
       <h3><span class="rn-g" style="display:inline;font-size:1.3em">${esc(c.g)}</span> ${c.n}. ${esc(c.ru)} <small style="opacity:.6;font-weight:400">${esc(c.name)}</small></h3>
       <p class="rn-kw">${esc(c.kw)}</p>
-      <div class="rn-attrs"><span>🎁 Дар: ${esc(c.gift)}</span><span>⚔️ Вызов: ${esc(c.ch)}</span>${at.map(([k, v]) => `<span>${k}: ${esc(v)}</span>`).join('')}</div>
-      <div class="rn-qa"><div><b>Вопрос себе</b><br>${esc(c.q)}</div><div><b>Аффирмация</b><br>«${esc(c.a)}»</div></div>
-      <div class="rn-t">${c.t.split('\n').map(p => `<p>${esc(p)}</p>`).join('')}</div></article>`;
+      <p class="rn-plain">${esc(c.s)}</p>
+      <div class="rn-do"><b>👣 Что сделать</b>${esc(c.do)}</div>
+      <div class="rn-qa"><div><b>Спросите себя</b><br>${esc(c.q)}</div><div><b>Скажите себе</b><br>«${esc(c.a)}»</div></div>
+      <details><summary class="be-note">Подробнее: полное толкование и символы</summary>
+        <div class="rn-attrs"><span>🎁 Помогает: ${esc(c.gift)}</span><span>⚔️ Мешает: ${esc(c.ch)}</span>${at.map(([k, v]) => `<span>${k}: ${esc(v)}</span>`).join('')}</div>
+        ${pos ? `<p class="be-note">Это место расклада: ${esc(pos.about)}</p>` : ''}
+        <div class="rn-t">${c.t.split('\n').map(p => `<p>${esc(p)}</p>`).join('')}</div></details></article>`;
   }
 
   // общее толкование: что выпало на каждом месте, стихии, руны/боги, дары и вызовы, аффирмации
@@ -130,12 +155,18 @@
     // покровитель: бог руны (c.god) или карта бога, встретившиеся в раскладе дважды и больше
     const gc = {}; cs.forEach(c => { const g = isGod(c) ? c.ru : c.god; if (g) gc[g] = (gc[g] || 0) + 1; });
     const patron = Object.entries(gc).filter(x => x[1] > 1).map(x => x[0]);
-    return `<section class="rn-sum adm-box"><h2>✨ Общее по раскладу</h2>
-      <ul>${sp.pos.map((p, i) => `<li><b>${esc(p.name)}</b> — ${esc(cs[i].ru)}: ${esc(cs[i].kw.toLowerCase())}. <span class="be-note">${esc(cs[i].q)}</span></li>`).join('')}</ul>
-      ${top || godTxt || patron.length ? `<p>${[top, godTxt, patron.length ? `Повторяется покровитель: ${patron.map(esc).join(', ')} — эта энергия ведёт весь расклад.` : ''].filter(Boolean).join(' ')}</p>` : ''}
-      ${cs.length > 1 ? `<p><b>Что поможет:</b> ${cs.map(c => esc(c.gift.toLowerCase())).join(' · ')}<br><b>Чего остерегаться:</b> ${cs.map(c => esc(c.ch.toLowerCase())).join(' · ')}</p>` : ''}
-      <p><b>Аффирмации расклада:</b> ${cs.map(c => `«${esc(c.a)}»`).join(' ')}</p>
-      <p class="be-note">Значения не абсолютны — читайте их в свете своего вопроса и прислушайтесь, что откликается в теле.</p></section>
+    const ai = Math.max(0, sp.pos.findIndex(p => p.act)), act = cs[ai];
+    const extra = [top, godTxt, patron.length ? `Повторяется покровитель: ${patron.map(esc).join(', ')} — эта энергия ведёт весь расклад.` : ''].filter(Boolean);
+    return `<section class="rn-sum adm-box"><h2>✨ Ответ простыми словами</h2>
+      <p class="rn-myq" style="font-style:italic;margin:0 0 4px">${st.q.trim() ? `«${esc(st.q.trim())}»` : ''}</p>
+      <ul class="rn-ans">${sp.pos.map((p, i) => `<li><span class="rn-g">${esc(cs[i].g || '✦')}</span><div><span class="rn-ask">${esc(p.ask)}</span><b>${esc(cs[i].ru)}:</b> ${esc(cs[i].s)}</div></li>`).join('')}</ul>
+      <div class="rn-do"><b>👣 Главный шаг${cs.length > 1 ? ` (карта «${esc(act.ru)}», место «${esc(sp.pos[ai].name)}»)` : ''}</b>${esc(act.do)}</div>
+      <p><b>Как пользоваться:</b> прочитайте строки выше как ответ на свой вопрос; что откликается — важно, что нет — пропустите. Сделайте главный шаг в ближайшие 1–3 дня, а через неделю вернитесь и посмотрите, что изменилось.</p>
+      <details><summary class="be-note">Ещё по раскладу: помогает, мешает, аффирмации</summary>
+        ${extra.length ? `<p>${extra.join(' ')}</p>` : ''}
+        <p><b>Что поможет:</b> ${cs.map(c => esc(c.gift.toLowerCase())).join(' · ')}<br><b>Чего остерегаться:</b> ${cs.map(c => esc(c.ch.toLowerCase())).join(' · ')}</p>
+        <p><b>Аффирмации:</b> ${cs.map(c => `«${esc(c.a)}»`).join(' ')}</p></details></section>
+      <h3>Каждая карта отдельно</h3>
       ${cs.map((c, i) => cardHtml(c, { i: i + 1, ...sp.pos[i] })).join('')}`;
   }
 
