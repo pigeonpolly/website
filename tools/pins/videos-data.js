@@ -235,7 +235,7 @@ tour('anxiety/anxiety-2.jpg', G.anx, { intro: 'It arrives unnoticed.', outro: 'S
   alt: 'Video moving over an abstract painting of red, orange and yellow ink spreading like roots.' });
 
 // --- Палитры
-pal('2022-pigeon-polly-celebrates-dia-de-muertos', { title: 'Día de Muertos Color Palette with HEX Codes — Pigeon Polly', topics: 'color palette, dia de muertos, hex codes',
+pal('2022-pigeon-polly-celebrates-dia-de-muertos', { name: 'Día de Muertos', title: 'Día de Muertos Color Palette with HEX Codes — Pigeon Polly', topics: 'color palette, dia de muertos, hex codes',
   desc: 'Marigold, purple and bone white from a Día de Muertos pigeon illustration. Every color with its HEX code.',
   alt: 'Video of a Día de Muertos pigeon illustration followed by its color swatches with names and HEX codes.' });
 pal('2024-mr-chew-rainbow-candy-edition', { title: 'Rainbow Candy Color Palette with HEX Codes — Cute Snail', topics: 'color palette, pastel rainbow, hex codes',
@@ -253,8 +253,8 @@ pal('halloween-in-blue', { title: 'Halloween in Blue Color Palette with HEX Code
 pal('challenge-pigeonpolly-cactus-4-10-2026', { name: 'Cactus', title: 'Cactus Green Color Palette with HEX Codes', topics: 'color palette, plant colors, hex codes',
   desc: 'Greens and warm pot colors from a cactus drawing. Every color with its HEX code.',
   alt: 'Video of a cactus drawing followed by its color swatches with names and HEX codes.' });
-pal('anxiety-4', { title: 'Abstract Ink Color Palette with HEX Codes — Purple and Orange', topics: 'color palette, abstract art, hex codes',
+pal('anxiety-4', { title: 'Abstract Ink Color Palette with HEX Codes', topics: 'color palette, abstract art, hex codes',
   desc: 'Electric purple, orange and red from an abstract ink painting. Every color with its HEX code.',
-  alt: 'Video of an abstract purple and orange ink painting followed by its color swatches with names and HEX codes.' });
+  alt: 'Video of an abstract yellow and black ink painting followed by its color swatches with names and HEX codes.' });
 
 module.exports = { V, FIRST: 379 };

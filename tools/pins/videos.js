@@ -95,7 +95,7 @@ async function render(page, p, n) {
   const only = process.argv.slice(2).map(Number);
   const out = V.map((p, i) => {
     const n = FIRST + i;
-    if (p.tpl === 'pal') { const P = PAL[p.key], name = (p.name || P.title.en).split(' ').map(w => w[0].toUpperCase() + w.slice(1)).join(' '), names = P.colors.slice(0, 6).map(c => c.en);
+    if (p.tpl === 'pal') { const P = PAL[p.key], name = p.name || P.title.en.split(' ').map(w => w[0].toUpperCase() + w.slice(1)).join(' '), names = P.colors.slice(0, 6).map(c => c.en);
       return { n, type: 'Видео', tpl: 'pal', title: `${name} Color Palette with HEX Codes | Pigeon Polly`, link: L(p.link),
         desc: `${names.slice(0, -1).join(', ')} and ${names.at(-1)} — a color palette from an illustration by Alina Otkinska. Every color with its HEX code.`,
         alt: p.alt, topics: p.topics }; }
