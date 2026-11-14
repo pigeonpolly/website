@@ -221,7 +221,7 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
  .cv .clbl{font-size:18px;padding:14px 24px}.cv .hand{right:24px;bottom:24px;font-size:22px}.cv .tie{right:14px}
  .ft2 .cols{grid-template-columns:1fr 1fr}.ft2 .cols>div:first-child{grid-column:1/-1}
 }
-@media (max-width:380px){.lg span{display:none}}
+@media (max-width:400px){.lg span{display:none}}
 
 /* ===== Часть 2: страницы «Уроки» (/preview/learn/), «Гайды» (/preview/guides/), блог в новом стиле (/blog/ с меткой pp_v2) ===== */
 .ph3{padding:76px 0 40px;border-bottom:1px solid var(--line)}
