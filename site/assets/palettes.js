@@ -163,6 +163,8 @@
   }
   const setName = (c, e) => { c.nm = e; c.n = e[gi]; };
   function nameAll(cols) { const used = new Set(); cols.forEach(c => { setName(c, nameOf(c.hex, used)); used.add(c.n); }); return cols; }
+  // для генератора пинов в кабинете (posts-admin.js): цвета фото + английские названия из словаря
+  window.PPPalette = { extract, named: async img => { await loadNames(); return nameAll(extract(img)).map(c => ({ hex: c.hex, en: c.nm[0] })); } };
   // пиксельная Полли для плашки сайта (как в блоке «Тема дня»)
   const PP = ['......ddd.....', '.....dbbbd....', '....dbbwwbd...', '....dbbwkbdoo.', '....dbbbbbdo..', '...dbbbbbbd...', '..dbbsbbbbd...',
     '.dbbssbbbbd...', 'dbbssbbbbbd...', 'dbbbbbbbbd....', '.ddbbbbbdd....', '...ddddd......', '....o..o......', '...oo.oo......'];
