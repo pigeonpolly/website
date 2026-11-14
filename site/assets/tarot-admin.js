@@ -37,16 +37,21 @@
   .tr-kw{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:#FFF4DC;font-weight:700;line-height:1.4}
   .tr-t p{margin:8px 0;line-height:1.55}
   .tr-side{font-size:.8em;font-weight:700;margin:14px 0 6px;opacity:.7}
+  .tr-cnt{display:flex;align-items:center;gap:10px;margin:8px 0 4px}
+  .tr-cnt b{font-size:1.3em;min-width:1.5em;text-align:center}
   @media (max-width:600px){.tr-slot{max-width:none}}`;
 
   const SUITS = [['wands', 'Жезлы', 'Огонь'], ['cups', 'Кубки', 'Вода'], ['swords', 'Мечи', 'Воздух'], ['pent', 'Пентакли', 'Земля']];
 
-  let D = null, st = { sp: null, picks: [], rev: [], cur: 0 };
+  let D = null, st = { sp: null, picks: [], rev: [], cur: 0, n: 3 };
+  const FREE_MAX = 15;
+  // места расклада; у свободного — «Карта 1…N» по выбранному числу
+  const places = sp => sp.free ? Array.from({ length: st.n }, (_, i) => ({ name: `Карта ${i + 1}`, about: '', free: true })) : sp.pos;
   const card = n => D.cards.find(c => c.n === n);
   const picked = i => st.picks[i] !== undefined && st.picks[i] !== null && st.picks[i] >= 0;
   const nCards = k => `${k} ${k === 1 ? 'карта' : k < 5 ? 'карты' : 'карт'}`;
   const paras = t => String(t || '').split('\n').map(p => `<p>${esc(p)}</p>`).join('');
-  const save = () => ls.set({ sp: st.sp, picks: st.picks, rev: st.rev });
+  const save = () => ls.set({ sp: st.sp, picks: st.picks, rev: st.rev, n: st.n });
 
   function mount(main) {
     main.innerHTML = `<style>${CSS}</style><div class="tr-wrap"><p class="be-note">Загружаю колоду…</p></div>`;
@@ -54,7 +59,7 @@
     fetch('/api/admin/tarot', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : Promise.reject(r.status)).then(d => {
       D = d;
       const last = ls.get();
-      if (last && D.spreads.find(s => s.id === last.sp)) st = { sp: last.sp, picks: last.picks || [], rev: last.rev || [], cur: 0 };
+      if (last && D.spreads.find(s => s.id === last.sp)) st = { sp: last.sp, picks: last.picks || [], rev: last.rev || [], cur: 0, n: Math.min(FREE_MAX, Math.max(1, +last.n || 3)) };
       draw(box);
     }).catch(e => { box.innerHTML = `<p class="be-note">Не получилось открыть таро (${esc(e)}). Раздел только для админа — проверьте вход и PIN.</p>`; });
   }
@@ -62,22 +67,28 @@
   function draw(box) {
     const sp = D.spreads.find(s => s.id === st.sp);
     if (!sp) return drawChoose(box);
-    const full = sp.pos.every((_, i) => picked(i));
+    const pl = places(sp);
+    const full = pl.every((_, i) => picked(i));
     box.innerHTML = `<section class="adm-box">
       <p><button type="button" class="pill-btn tr-back">← Другой расклад</button></p>
       <h2>🃏 ${esc(sp.name)}</h2>
       <details><summary class="be-note">Как делать этот расклад</summary><ol class="tr-how">${sp.how.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
         <ul class="tr-how">${D.prep.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>
+      ${sp.free ? `<h3>Сколько карт</h3><div class="tr-cnt"><button type="button" class="pill-btn tr-n" data-d="-1" ${st.n <= 1 ? 'disabled' : ''} aria-label="Меньше">−</button><b>${st.n}</b><button type="button" class="pill-btn tr-n" data-d="1" ${st.n >= FREE_MAX ? 'disabled' : ''} aria-label="Больше">+</button></div>` : ''}
       <h3>Какие карты выпали</h3>
       <p class="be-note">Нажмите на место, потом на карту. «↺ Перевёрнута» — если карта легла вверх ногами.</p>
-      <div class="tr-slots">${sp.pos.map((p, i) => { const c = picked(i) && card(st.picks[i]); return `<div class="tr-slot${c ? ' on' : ''}${i === st.cur ? ' cur' : ''}">
+      <div class="tr-slots">${pl.map((p, i) => { const c = picked(i) && card(st.picks[i]); return `<div class="tr-slot${c ? ' on' : ''}${i === st.cur ? ' cur' : ''}">
         <button type="button" class="tr-pick" data-i="${i}"><span class="tr-pn">${i + 1}. ${esc(p.name)}</span><span class="tr-g${c && st.rev[i] ? ' rev' : ''}">${c ? esc(c.g) : '?'}</span><br>${c ? `<b>${esc(c.ru)}</b>` : '<span class="be-note">выбрать</span>'}</button>
         ${c ? `<button type="button" class="tr-flip" data-i="${i}" aria-pressed="${st.rev[i] ? 'true' : 'false'}">↺ Перевёрнута</button>` : ''}</div>`; }).join('')}</div>
       ${full ? '' : grid('Старшие арканы', D.cards.filter(c => c.ar === 'major')) + SUITS.map(([id, name]) => grid(name, D.cards.filter(c => c.suit === id))).join('')}
       <p>${st.picks.some((_, i) => picked(i)) ? '<button type="button" class="pill-btn tr-clear">Очистить</button>' : ''}</p>
     </section>
-    ${full ? `<section class="tr-read">${sp.pos.map((p, i) => cardHtml(card(st.picks[i]), { i: i + 1, rev: !!st.rev[i], ...p })).join('')}</section>` : ''}`;
-    box.querySelector('.tr-back').onclick = () => { st = { sp: null, picks: [], rev: [], cur: 0 }; save(); draw(box); };
+    ${full ? `<section class="tr-read">${pl.map((p, i) => cardHtml(card(st.picks[i]), { i: i + 1, rev: !!st.rev[i], ...p })).join('')}</section>` : ''}`;
+    box.querySelector('.tr-back').onclick = () => { st = { sp: null, picks: [], rev: [], cur: 0, n: st.n }; save(); draw(box); };
+    box.querySelectorAll('.tr-n').forEach(b => b.onclick = () => { // меньше карт — лишние места убираются
+      st.n = Math.min(FREE_MAX, Math.max(1, st.n + +b.dataset.d)); st.picks = st.picks.slice(0, st.n); st.rev = st.rev.slice(0, st.n);
+      const nx = places(sp).findIndex((_, i) => !picked(i)); st.cur = nx >= 0 ? nx : Math.min(st.cur, st.n - 1); save(); draw(box);
+    });
     box.querySelectorAll('.tr-pick').forEach(b => b.onclick = () => {
       st.cur = +b.dataset.i;
       if (full) { st.picks[st.cur] = -1; st.rev[st.cur] = false; save(); } // при полном раскладе место открывает выбор заново
@@ -89,11 +100,11 @@
       if (st.picks[st.cur] === n) { st.picks[st.cur] = -1; st.rev[st.cur] = false; }
       else {
         st.picks[st.cur] = n; st.rev[st.cur] = false;
-        const next = sp.pos.findIndex((_, i) => !picked(i));
+        const next = pl.findIndex((_, i) => !picked(i));
         if (next >= 0) st.cur = next;
       }
       save(); draw(box);
-      if (sp.pos.every((_, i) => picked(i))) { const r = box.querySelector('.tr-read'); if (r) r.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      if (pl.every((_, i) => picked(i))) { const r = box.querySelector('.tr-read'); if (r) r.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     });
     const cl = box.querySelector('.tr-clear'); if (cl) cl.onclick = () => { st.picks = []; st.rev = []; st.cur = 0; save(); draw(box); };
   }
@@ -107,9 +118,9 @@
   function drawChoose(box) {
     box.innerHTML = `<section class="adm-box"><h2>🃏 Таро</h2>
       <p class="be-note">«Таро кошек», 78 карт. Выберите расклад и отметьте выпавшие карты.</p>
-      <div class="tr-spreads">${D.spreads.map(s => `<button type="button" class="tr-sp" data-id="${s.id}"><b>${esc(s.name)}</b><small>${nCards(s.cards)}</small></button>`).join('')}</div>
+      <div class="tr-spreads">${D.spreads.map(s => `<button type="button" class="tr-sp" data-id="${s.id}"><b>${esc(s.name)}</b><small>${s.free ? 'сколько хотите карт' : nCards(s.cards)}</small></button>`).join('')}</div>
       <details><summary class="be-note">Все карты колоды</summary>${D.cards.map(c => cardHtml(c)).join('')}</details></section>`;
-    box.querySelectorAll('.tr-sp').forEach(b => b.onclick = () => { st = { sp: b.dataset.id, picks: [], rev: [], cur: 0 }; save(); draw(box); });
+    box.querySelectorAll('.tr-sp').forEach(b => b.onclick = () => { st = { sp: b.dataset.id, picks: [], rev: [], cur: 0, n: st.n }; save(); draw(box); });
   }
 
   // карта: место (в раскладе), название, одна выделенная строка ключевых слов, описание из колоды
@@ -117,7 +128,7 @@
     const title = rev => `<h3><span class="tr-g${rev ? ' rev' : ''}">${esc(c.g)}</span> ${esc(c.ru)}${rev ? ' — перевёрнута' : ''}</h3>`;
     if (!pos) return `<article class="tr-card">${title(false)}<p class="tr-kw">${esc(c.kw)}</p><div class="tr-t">${paras(c.t)}</div>
       <p class="tr-side">↺ Перевёрнутая</p><p class="tr-kw">${esc(c.kwr)}</p><div class="tr-t">${paras(c.r)}</div></article>`;
-    return `<article class="tr-card"><div class="tr-pos">${esc(pos.i)}. ${esc(pos.name)}</div>${title(pos.rev)}
+    return `<article class="tr-card"><div class="tr-pos">${pos.free ? '' : `${esc(pos.i)}. `}${esc(pos.name)}</div>${title(pos.rev)}
       <p class="tr-kw">${esc(pos.rev ? c.kwr : c.kw)}</p><div class="tr-t">${paras(pos.rev ? c.r : c.t)}</div></article>`;
   }
 
