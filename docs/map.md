@@ -26,6 +26,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/uttale.js` — собирается tools/norsk_page.py из content/shared/uttale.js (шпаргалка произношения норвежского, встраивается в учебник и Morgenavis)
 - `worker/avis.js` (20K) — «Morgenavis» /norsk/avis/: утренняя газета на норвежском A1–B2 из RSS + Gemini, только Алина (docs/site.md): AVIS_TABLES, AVIS_RULES, AVIS_CRON, avisCron, avisApi
 - `worker/runes.js` + `worker/runes-data.js` — 🔮 Руны в кабинете (только админ): GET /api/admin/runes; экран `site/assets/runes-admin.js` (docs/admin.md «Руны»)
+- `worker/tarot.js` + `worker/tarot-data.js` — 🃏 Таро в кабинете (только админ): GET /api/admin/tarot; экран `site/assets/tarot-admin.js` (docs/admin.md «Таро»)
 - `worker/nederlands-page.js` (310K) — Собрано tools/nederlands_page.py из content/nederlands/ — руками не править.: NEDERLANDS_HTML
 - `worker/nederlands.js` (8K) — Личный учебник нидерландского A1–C2 (/nederlands/, docs/site.md «Учебник нидерландского»), копия worker/norsk.js: NEDERLANDS_NICKS, NEDERLANDS_TABLES, tts, nederlandsOk, nederlandsApi
 - `worker/notebook.js` (5K) — 📒 Блокнот в учебниках (/study/, /english/, /norsk/; docs/site.md «Блокнот в учебниках»): BOOKS, NOTEBOOK_TABLES, cleanPage, metaOf, notebookApi
