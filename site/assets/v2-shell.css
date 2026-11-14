@@ -52,7 +52,7 @@ html[data-season=summer] .v2s .hd2,html[data-season=summer] .v2s .ft2{--bg:#F7F4
  .v2s .drawer .sw-m{display:flex;gap:12px;margin-top:16px}.v2s .drawer .sw-m button{width:22px;height:22px}
  .v2s .ft2 .cols{grid-template-columns:1fr 1fr}.v2s .ft2 .cols>div:first-child{grid-column:1/-1}
 }
-@media (max-width:380px){.v2s .lg span{display:none}}
+@media (max-width:380px){.v2s .lg span:not(.lg-m){display:none}}
 body.v2s{padding-top:0}
 .v2s .hd2 .lang-switch a{background:none;border:0;box-shadow:none;border-radius:0;font-size:14px}
 
@@ -146,7 +146,7 @@ a.cab-card:hover{transform:translateY(-2px);color:#2A211C}a.cab-card{transition:
 @media (max-width:760px){.cab-grid,.cab-mail,.cab-guides .cab-grid{grid-template-columns:1fr}.cab-shelf{gap:14px}.cab-book,.cab-bk-c{width:104px}.cab-bk-c{padding:10px 8px 10px 16px}.cab-bk-c i{font-size:22px}.cab-bk-c b{font-size:14px}.cab-vip{grid-row:auto}.cab-tabs{flex-wrap:nowrap;overflow-x:auto;scrollbar-width:none}.cab-tabs button{padding:9px 14px;font-size:13px}}
 /* телефон, птичка вошла: пуговки — в кабинете и меню аватара, название — только логотип, чтобы всё влезло */
 @media (max-width:700px){.v2s .hr .hd-btns{display:none}}
-@media (max-width:520px){.v2s .hd2:has(.acct-me) .lg span{display:none}}
+@media (max-width:520px){.v2s .hd2:has(.acct-me) .lg span:not(.lg-m){display:none}}
 .cab-all{display:inline-block;margin:2px 0 8px;padding:7px 14px;border-radius:999px;border:1.5px solid var(--pp-acc);background:none;color:var(--pp-acc);font:700 13px Karla,'Nunito Sans',sans-serif;cursor:pointer}.cab-all:hover{background:var(--pp-acc);color:var(--pp-ink)}
 /* меню аватара (account.js) внутри новой шапки: вернуть отступы, которые снимает обнуление .hd2 * */
 .v2s .hd2 .acct-pop{padding:16px}
