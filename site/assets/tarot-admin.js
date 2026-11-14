@@ -41,13 +41,29 @@
   .tr-sum{background:#fff;color:#2B1A51;padding:16px;border-radius:16px;border:2px solid #E9A93B;margin:14px 0}
   .tr-sum ul{margin:6px 0 6px 20px;padding:0}
   .tr-sum li{margin:5px 0;line-height:1.5}
+  .tr-q{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:2px solid #E8E4E2;font:inherit;color:#2B1A51;background:#fff;resize:vertical;min-height:2.6em}
+  .tr-q:focus{outline:none;border-color:#E9A93B}
+  .tr-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0;padding:0;list-style:none;counter-reset:s}
+  .tr-steps li{padding:10px 12px;border-radius:12px;background:#F4EFEA;counter-increment:s;line-height:1.45}
+  .tr-steps li::before{content:counter(s);display:inline-grid;place-items:center;width:1.6em;height:1.6em;border-radius:50%;background:#E9A93B;color:#fff;font-weight:700;margin-right:6px}
+  .tr-ans{list-style:none;margin:10px 0;padding:0}
+  .tr-ans li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid #F0EBE7}
+  .tr-ans li:first-child{border-top:0}
+  .tr-ans .tr-g{font-size:1.3em;min-width:1.8em;text-align:center}
+  .tr-ask{display:block;font-size:.85em;color:#b9771a;font-weight:700}
+  .tr-pn small{display:block;margin-top:2px}
+  .tr-do{padding:12px 14px;border-radius:12px;background:#FFF4DC;margin:12px 0;line-height:1.5}
+  .tr-do b{display:block;margin-bottom:2px}
+  .tr-plain{font-size:1.08em;line-height:1.5;margin:6px 0}
+  .tr-card details,.tr-sum details{margin-top:10px}
+  .tr-card summary,.tr-sum summary{cursor:pointer}
   @media (max-width:600px){.tr-slot{max-width:none}}`;
 
   const SUITS = [['wands', 'Жезлы', 'Огонь'], ['cups', 'Кубки', 'Вода'], ['swords', 'Мечи', 'Воздух'], ['pent', 'Пентакли', 'Земля']];
   const EL = { 'Огонь': 'действие, страсть, творчество', 'Вода': 'чувства, отношения, интуиция', 'Воздух': 'мысли, решения, конфликты', 'Земля': 'деньги, работа, тело, быт' };
   const RANK = { 1: 'Туз', 11: 'Паж', 12: 'Рыцарь', 13: 'Королева', 14: 'Король' };
 
-  let D = null, st = { sp: null, picks: [], rev: [], cur: 0 };
+  let D = null, st = { sp: null, picks: [], rev: [], cur: 0, q: '' };
   const card = n => D.cards.find(c => c.n === n);
   const picked = i => st.picks[i] !== undefined && st.picks[i] !== null && st.picks[i] >= 0;
 
@@ -57,7 +73,7 @@
     fetch('/api/admin/tarot', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : Promise.reject(r.status)).then(d => {
       D = d;
       const last = ls.get();
-      if (last && D.spreads.find(s => s.id === last.sp)) st = { sp: last.sp, picks: last.picks || [], rev: last.rev || [], cur: 0 };
+      if (last && D.spreads.find(s => s.id === last.sp)) st = { sp: last.sp, picks: last.picks || [], rev: last.rev || [], cur: 0, q: last.q || '' };
       draw(box);
     }).catch(e => { box.innerHTML = `<p class="be-note">Не получилось открыть таро (${esc(e)}). Раздел только для админа — проверьте вход и PIN.</p>`; });
   }
@@ -75,17 +91,21 @@
       <h3>Как делать</h3>
       <ol class="tr-how">${sp.how.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
       <details><summary class="be-note">Перед раскладом — настроиться</summary><ul class="tr-how">${D.prep.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>
+      <h3>Ваш вопрос</h3>
+      <textarea class="tr-q" rows="2" maxlength="300" placeholder="Например: «Что мне важно понять о новой работе?»">${esc(st.q)}</textarea>
+      <p class="be-note" style="margin-top:4px">Необязательно, но так ответ будет понятнее: каждую строку читайте как ответ именно на этот вопрос.</p>
       <h3>Какие карты выпали</h3>
       <p class="be-note">Нажмите на место, потом на карту. Повторное нажатие на выбранную карту — убрать. «↺ Перевёрнута» — если карта легла вверх ногами.</p>
       <div class="tr-slots">${sp.pos.map((p, i) => { const c = picked(i) && card(st.picks[i]); return `<div class="tr-slot${c ? ' on' : ''}${i === st.cur ? ' cur' : ''}">
-        <button type="button" class="tr-pick" data-i="${i}"><span class="tr-pn">${i + 1}. ${esc(p.name)}</span><span class="tr-g${c && st.rev[i] ? ' rev' : ''}">${c ? esc(c.g) : '?'}</span>${c ? `<b>${esc(c.ru)}</b>` : '<span class="be-note">выбрать</span>'}</button>
+        <button type="button" class="tr-pick" data-i="${i}"><span class="tr-pn">${i + 1}. ${esc(p.name)}<small>${esc(p.ask)}</small></span><span class="tr-g${c && st.rev[i] ? ' rev' : ''}">${c ? esc(c.g) : '?'}</span>${c ? `<b>${esc(c.ru)}</b>` : '<span class="be-note">выбрать</span>'}</button>
         ${c ? `<button type="button" class="tr-flip" data-i="${i}" aria-pressed="${st.rev[i] ? 'true' : 'false'}">↺ Перевёрнута</button>` : ''}</div>`; }).join('')}</div>
       ${grid('Старшие арканы', D.cards.filter(c => c.ar === 'major'))}
       ${SUITS.map(([id, name, el]) => grid(`${name} · ${el}`, D.cards.filter(c => c.suit === id))).join('')}
       <p>${full ? '' : '<span class="be-note">Выберите все карты — появится толкование.</span>'} ${st.picks.some((_, i) => picked(i)) ? '<button type="button" class="pill-btn tr-clear">Очистить</button>' : ''}</p>
     </section>
     ${full ? reading(sp) : ''}`;
-    box.querySelector('.tr-back').onclick = () => { st = { sp: null, picks: [], rev: [], cur: 0 }; save(); draw(box); };
+    box.querySelector('.tr-back').onclick = () => { st = { sp: null, picks: [], rev: [], cur: 0, q: '' }; save(); draw(box); };
+    const qa = box.querySelector('.tr-q'); qa.oninput = () => { st.q = qa.value; save(); const o = box.querySelector('.tr-myq'); if (o) o.textContent = st.q.trim() ? `«${st.q.trim()}»` : ''; };
     box.querySelectorAll('.tr-pick').forEach(b => b.onclick = () => { st.cur = +b.dataset.i; draw(box); });
     box.querySelectorAll('.tr-flip').forEach(b => b.onclick = () => { const i = +b.dataset.i; st.rev[i] = !st.rev[i]; save(); draw(box); });
     box.querySelectorAll('.tr-c').forEach(b => b.onclick = () => {
@@ -99,7 +119,7 @@
       save(); draw(box);
       if (sp.pos.every((_, i) => picked(i))) { const r = box.querySelector('.tr-sum'); if (r) r.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     });
-    const cl = box.querySelector('.tr-clear'); if (cl) cl.onclick = () => { st.picks = []; st.rev = []; st.cur = 0; save(); draw(box); };
+    const cl = box.querySelector('.tr-clear'); if (cl) cl.onclick = () => { st.picks = []; st.rev = []; st.cur = 0; st.q = ''; save(); draw(box); };
   }
 
   function grid(title, list) {
@@ -110,27 +130,38 @@
 
   function drawChoose(box) {
     box.innerHTML = `<section class="adm-box"><h2>🃏 Таро</h2>
-      <p class="be-note">«Таро кошек»: 22 старших аркана и 56 младших (жезлы, кубки, мечи, пентакли). Выберите расклад — покажу, как его делать, потом отметите выпавшие карты и получите толкование.</p>
+      <p class="be-note">«Таро кошек»: 22 старших аркана и 56 младших (жезлы, кубки, мечи, пентакли).</p>
+      <ol class="tr-steps"><li>Выберите расклад и запишите вопрос.</li><li>Вытяните карты из настоящей колоды и отметьте их здесь (и перевёрнутые).</li><li>Прочитайте ответ простыми словами и выберите один шаг.</li></ol>
+      <p class="be-note">Не знаете, какой расклад? Начните с «Одной карты».</p>
       <div class="tr-spreads">${D.spreads.map(s => `<button type="button" class="tr-sp" data-id="${s.id}"><b>${esc(s.name)}</b><small>${nCards(s.cards)}</small></button>`).join('')}</div>
       <details><summary class="be-note">Как настроиться перед раскладом</summary><ul class="tr-how">${D.prep.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>
       <details><summary class="be-note">Все карты колоды</summary>${D.cards.map(c => cardHtml(c)).join('')}</details></section>`;
-    box.querySelectorAll('.tr-sp').forEach(b => b.onclick = () => { st = { sp: b.dataset.id, picks: [], rev: [], cur: 0 }; save(); draw(box); });
+    box.querySelectorAll('.tr-sp').forEach(b => b.onclick = () => { st = { sp: b.dataset.id, picks: [], rev: [], cur: 0, q: '' }; save(); draw(box); });
   }
 
-  const save = () => ls.set({ sp: st.sp, picks: st.picks, rev: st.rev });
+  const save = () => ls.set({ sp: st.sp, picks: st.picks, rev: st.rev, q: st.q });
+  const plain = (c, rev) => rev ? c.sr : c.s, todo = (c, rev) => rev ? c.dr : c.do;
   const paras = t => String(t || '').split('\n').map(p => `<p>${esc(p)}</p>`).join('');
 
-  // карта: в раскладе — главное значение по положению, второе свернуто; в списке колоды — оба
+  // карта: сверху «простыми словами» и «что сделать» по положению; полный текст колоды и символы — под раскрытием
   function cardHtml(c, pos) {
     const at = [c.ar === 'major' ? 'Старший аркан' : 'Младший аркан', c.suit && SUITS.find(s => s[0] === c.suit)[1], c.el && `Стихия: ${c.el}`].filter(Boolean);
-    const rev = pos && pos.rev;
-    const main = pos ? `<p class="tr-side">${rev ? '↺ ПЕРЕВЁРНУТАЯ' : '↑ ПРЯМАЯ'}</p><div class="tr-t">${paras(rev ? c.r : c.t)}</div>
-      <details class="tr-other"><summary class="be-note">${rev ? 'Прямое значение' : 'Перевёрнутое значение'}</summary><div class="tr-t">${paras(rev ? c.t : c.r)}</div></details>`
-      : `<p class="tr-side">↑ ПРЯМАЯ</p><div class="tr-t">${paras(c.t)}</div><p class="tr-side">↺ ПЕРЕВЁРНУТАЯ</p><div class="tr-t">${paras(c.r)}</div>`;
-    return `<article class="tr-card">${pos ? `<div class="tr-pos">${esc(pos.i)}. ${esc(pos.name)}</div><p class="be-note" style="margin:2px 0 10px">${esc(pos.about)}</p>` : ''}
-      <h3><span class="tr-g${rev ? ' rev' : ''}" style="display:inline-block;font-size:1em">${esc(c.g)}</span> ${esc(c.ru)} <small style="opacity:.6;font-weight:400">${esc(c.name)}</small></h3>
-      <p class="tr-kw">${esc(c.kw)}</p>
-      <div class="tr-attrs">${at.map(v => `<span>${esc(v)}</span>`).join('')}</div>${main}</article>`;
+    const rev = !!(pos && pos.rev);
+    const head = `<h3><span class="tr-g${rev ? ' rev' : ''}" style="display:inline-block;font-size:1em">${esc(c.g)}</span> ${esc(c.ru)}${rev ? ' <small>(перевёрнута)</small>' : ''} <small style="opacity:.6;font-weight:400">${esc(c.name)}</small></h3>
+      <p class="tr-kw">${esc(c.kw)}</p>`;
+    if (!pos) return `<article class="tr-card">${head}
+      <p class="tr-side">↑ ПРЯМАЯ</p><p class="tr-plain">${esc(c.s)}</p><div class="tr-do"><b>👣 Что сделать</b>${esc(c.do)}</div>
+      <p class="tr-side">↺ ПЕРЕВЁРНУТАЯ</p><p class="tr-plain">${esc(c.sr)}</p><div class="tr-do"><b>👣 Что сделать</b>${esc(c.dr)}</div>
+      <details><summary class="be-note">Подробнее: текст колоды</summary><div class="tr-attrs">${at.map(v => `<span>${esc(v)}</span>`).join('')}</div>
+        <p class="tr-side">↑ ПРЯМАЯ</p><div class="tr-t">${paras(c.t)}</div><p class="tr-side">↺ ПЕРЕВЁРНУТАЯ</p><div class="tr-t">${paras(c.r)}</div></details></article>`;
+    return `<article class="tr-card"><div class="tr-pos">${esc(pos.i)}. ${esc(pos.name)} — ${esc(pos.ask)}</div>${head}
+      <p class="tr-plain">${esc(plain(c, rev))}</p>
+      <div class="tr-do"><b>👣 Что сделать</b>${esc(todo(c, rev))}</div>
+      <details><summary class="be-note">Подробнее: текст колоды и символы</summary>
+        <div class="tr-attrs">${at.map(v => `<span>${esc(v)}</span>`).join('')}</div>
+        <p class="be-note">Это место расклада: ${esc(pos.about)}</p>
+        <p class="tr-side">${rev ? '↺ ПЕРЕВЁРНУТАЯ' : '↑ ПРЯМАЯ'}</p><div class="tr-t">${paras(rev ? c.r : c.t)}</div>
+        <p class="tr-side">${rev ? '↑ Прямое значение' : '↺ Перевёрнутое значение'}</p><div class="tr-t tr-other">${paras(rev ? c.t : c.r)}</div></details></article>`;
   }
 
   // общее толкование: что на каждом месте, старшие/младшие, масти и стихии, перевёрнутые, придворные, тузы, повтор достоинств
@@ -156,11 +187,18 @@
       const rk = {}; cs.forEach(c => { if (c.rank) rk[c.rank] = (rk[c.rank] || 0) + 1; });
       Object.entries(rk).filter(x => x[1] > 1 && x[0] !== '1').forEach(([r, m]) => lines.push(`Повторяется достоинство «${RANK[r] || r}» (${m} раза) — эта тема звучит громче остальных.`));
     }
-    return `<section class="tr-sum adm-box"><h2>✨ Общее по раскладу</h2>
-      <ul>${sp.pos.map((p, i) => `<li><b>${esc(p.name)}</b> — ${esc(cs[i].ru)}${st.rev[i] ? ' (перевёрнута)' : ''}: ${esc(cs[i].kw.toLowerCase())}.</li>`).join('')}</ul>
-      ${lines.length ? `<p>${lines.join(' ')}</p>` : ''}
-      <p class="be-note">Значения не абсолютны — читайте их в свете своего вопроса и прислушайтесь, что откликается.</p></section>
-      ${cs.map((c, i) => cardHtml(c, { i: i + 1, rev: !!st.rev[i], ...sp.pos[i] })).join('')}`;
+    const rv = i => !!st.rev[i];
+    const ai = sp.pos.findIndex(p => p.act);
+    const step = ai >= 0 ? `<div class="tr-do"><b>👣 Главный шаг${k > 1 ? ` (карта «${esc(cs[ai].ru)}», место «${esc(sp.pos[ai].name)}»)` : ''}</b>${esc(todo(cs[ai], rv(ai)))}</div>`
+      : `<div class="tr-do"><b>👣 Главный шаг</b>Сравните строки «Итог А» и «Итог Б»: какой путь откликается сильнее? Сделайте в ближайшие дни маленький пробный шаг по нему (что сделать — в карте этого пути ниже).</div>`;
+    return `<section class="tr-sum adm-box"><h2>✨ Ответ простыми словами</h2>
+      <p class="tr-myq" style="font-style:italic;margin:0 0 4px">${st.q.trim() ? `«${esc(st.q.trim())}»` : ''}</p>
+      <ul class="tr-ans">${sp.pos.map((p, i) => `<li><span class="tr-g${rv(i) ? ' rev' : ''}">${esc(cs[i].g)}</span><div><span class="tr-ask">${esc(p.ask)}</span><b>${esc(cs[i].ru)}${rv(i) ? ' (перевёрнута)' : ''}:</b> ${esc(plain(cs[i], rv(i)))}</div></li>`).join('')}</ul>
+      ${step}
+      <p><b>Как пользоваться:</b> прочитайте строки выше как ответ на свой вопрос; что откликается — важно, что нет — пропустите. Сделайте главный шаг в ближайшие 1–3 дня, а через неделю вернитесь и посмотрите, что изменилось.</p>
+      ${lines.length ? `<details><summary class="be-note">Ещё по раскладу: арканы, масти, перевёрнутые</summary><p>${lines.join(' ')}</p></details>` : ''}</section>
+      <h3>Каждая карта отдельно</h3>
+      ${cs.map((c, i) => cardHtml(c, { i: i + 1, rev: rv(i), ...sp.pos[i] })).join('')}`;
   }
 
   window.PPTarotAdmin = { mount };
