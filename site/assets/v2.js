@@ -129,7 +129,10 @@
   document.querySelectorAll('[data-yt]').forEach(ytName);
 
   // добавленное в кабинете «🎬 Видео и гайды» (/api/v2/guides, worker/guides.js): новое — первым
-  const G = { free: ['Open to all', 'Открыто всем', 'Atvērts visiem'], vid: ['Video lesson · open to everyone', 'Видеоурок · открыт всем', 'Video nodarbība · atvērta visiem'],
+  const G = { colF: ['Coloring pages', 'Раскраски', 'Krāsojamās lapas'], colT: ['Coloring page', 'Раскраска', 'Krāsojamā lapa'], colDl: ['Download PDF ↓', 'Скачать PDF ↓', 'Lejupielādēt PDF ↓'],
+    colX: ['Close', 'Закрыть', 'Aizvērt'], colLock: ['This coloring page is for insiders. Sign in for free and the download opens.', 'Эта раскраска — для своих. Войдите бесплатно — и скачивание откроется.', 'Šī krāsojamā lapa ir saviem. Ienāc bez maksas, un lejupielāde atvērsies.'],
+    coloringE: ['No coloring pages here yet.', 'Раскрасок тут пока нет.', 'Krāsojamo lapu te vēl nav.'],
+    free: ['Open to all', 'Открыто всем', 'Atvērts visiem'], vid: ['Video lesson · open to everyone', 'Видеоурок · открыт всем', 'Video nodarbība · atvērta visiem'],
     watch: ['Watch →', 'Смотреть →', 'Skatīties →'], lock: ['Sign in to watch', 'Войдите, чтобы смотреть', 'Ienāc, lai skatītos'], signin: ['Sign in →', 'Войти →', 'Ienākt →'],
     pdf: ['Free PDF', 'Бесплатный PDF', 'Bezmaksas PDF'], dl: ['Download free →', 'Скачать бесплатно →', 'Lejupielādēt bez maksas →'],
     amz: ['Amazon', 'Amazon', 'Amazon'], onAmz: ['On Amazon →', 'На Amazon →', 'Amazon →'],
@@ -166,7 +169,10 @@
     all: ['See all videos', 'Все видео', 'Visi video'], soonP: ['This video is coming soon. Come back in a little while!', 'Это видео скоро появится. Загляните чуть позже!', 'Šis video drīzumā būs. Ienāc nedaudz vēlāk!'],
     lockP: ['This video is for insiders. Sign in for free and it opens right here.', 'Это видео — для своих. Войдите бесплатно — и оно откроется прямо здесь.', 'Šis video ir saviem. Ienāc bez maksas, un tas atvērsies tepat.'],
     signin: ['Sign in for free', 'Войти бесплатно', 'Ienākt bez maksas'], yt: ['Open on YouTube', 'Открыть на YouTube', 'Atvērt YouTube'], play: ['Play the video', 'Включить видео', 'Atskaņot video'] };
-  const guidesReady = fetch('/api/v2/guides', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null).then(d => {
+  // раскраски (docs/coloring.md): список — site/assets/coloring.json (tools/coloring/make.py), только на /learn/; vip — PDF в /members/ (worker пускает вошедших)
+  const COLS = document.querySelector('#free .vg2') ? fetch('/assets/coloring.json').then(r => r.ok ? r.json() : []).catch(() => []) : Promise.resolve([]);
+  const guidesReady = Promise.all([fetch('/api/v2/guides', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null), COLS]).then(([d, cols]) => {
+    cols = Array.isArray(cols) ? cols : [];
     if (d && Array.isArray(d.seen)) { // вошёл: отметки из профиля + перенос отметок гостя
       seenAcc = true;
       const local = [...SEEN].filter(id => !d.seen.includes(id));
@@ -201,17 +207,21 @@
     const hwCard = x => { const lock = x.vip && !op;
       return `<a class="vc hw${lock ? ' lock' : ''}${x.built ? ' blt' : ''}" data-f="${x.vip ? 'vip' : 'free'}" data-c="howto"${dl(x)} href="${vurl(x)}"><span class="tp">${G.cs[L]}</span><span class="th">${x.cover ? `<img src="${esc(x.cover)}" alt="" loading="lazy">` : ''}<span class="bd">${x.vip ? G.vipB[L] : G.free[L]}</span><span class="pl" aria-hidden="true">${lock ? '🔒' : '✎'}</span></span>`
         + `<span class="tx"><b>${esc(tOf(x))}</b><small>${G.cs[L]}${x.pdf ? ' · PDF' : x.pages ? ' · ' + G.pg[L](x.pages) : ''}${lgT(x)}</small><span class="go">${lock ? G.signin[L] : G.open[L]}</span></span></a>`; };
-    if (fg && (vids.length || hws.length)) {
+    // раскраски: открытые — PDF сразу, «для своих» гостю — 🔒 и вход
+    const colCard = x => { const lock = x.vip && !op;
+      return `<a class="vc col${lock ? ' lock' : ''}" id="c-${esc(x.id)}" data-f="${x.vip ? 'vip' : 'free'}" data-c="coloring" data-l="en ru lv" href="${lock ? '#signin' : esc(x.pdf)}"${lock ? '' : ' target="_blank" rel="noopener"'}><span class="tp">${G.colT[L]}</span><span class="th"><img src="${esc(x.cover)}" alt="${lock ? '' : esc(tOf(x))}" loading="lazy"><span class="bd">${x.vip ? G.vipB[L] : G.free[L]}</span><span class="pl" aria-hidden="true">${lock ? '🔒' : '↓'}</span></span>`
+        + `<span class="tx"><b>${esc(tOf(x))}</b><small>${G.colT[L]} · PDF A4</small><span class="go">${lock ? G.signin[L] : G.colDl[L]}</span></span></a>`; };
+    if (fg && (vids.length || hws.length || cols.length)) {
       const more = fg.querySelector('.vc.more');
-      fg.innerHTML = COURSES.map(crs).join('') + vids.map(card).join('') + hws.map(hwCard).join(''); if (more) fg.appendChild(more);
+      fg.innerHTML = COURSES.map(crs).join('') + vids.map(card).join('') + hws.map(hwCard).join('') + cols.map(colCard).join(''); if (more) fg.appendChild(more);
       fg.querySelectorAll('[data-ytn]').forEach(ytName);
       // два фильтра вместе: доступ (все / открытые всем / для своих) и вид (видео / курс / шпаргалка); числа — с учётом другого фильтра
-      const FA = [['all', G.all[L]], ['free', G.openAll[L]], ['vip', G.vipB[L]]], FT = [['all', G.allT[L]], ['course', G.course[L]], ['video', G.vidF[L]], ['howto', G.howto[L]]];
+      const FA = [['all', G.all[L]], ['free', G.openAll[L]], ['vip', G.vipB[L]]], FT = [['all', G.allT[L]], ['course', G.course[L]], ['video', G.vidF[L]], ['howto', G.howto[L]], ['coloring', G.colF[L]]];
       const FL = [['all', ['All languages', 'Все языки', 'Visas valodas'][L]], ['en', 'EN'], ['ru', 'RU'], ['lv', 'LV']];
       const grp = (g, lb, F) => `<div class="flt-g" role="group" aria-label="${lb}"><span class="flt-l">${lb}</span>${F.map(([k, n], i) => `<button type="button" data-g="${g}" data-k="${k}" aria-pressed="${k === 'all' ? 'true' : 'false'}">${n} <i></i></button>`).join('')}</div>`;
       fg.insertAdjacentHTML('beforebegin', `<div class="flt">${grp('t', G.typL[L], FT)}${grp('l', G.lngL[L], FL)}${grp('a', G.accL[L], FA)}<div class="flt-g flt-x">`
         + (SEEN.size ? `<label class="flt-sn"><input type="checkbox"> ${W.hide[L]}</label>` : '')
-        + `<span class="flt-st">${op ? G.allOpen[L] : `🔒 ${G.vipN[L](vip.length + hws.filter(x => x.vip).length)} · <a href="#signin">${G.signin[L]}</a>`}</span></div></div>`);
+        + `<span class="flt-st">${op ? G.allOpen[L] : `🔒 ${G.vipN[L](vip.length + hws.filter(x => x.vip).length + cols.filter(x => x.vip).length)} · <a href="#signin">${G.signin[L]}</a>`}</span></div></div>`);
       fg.insertAdjacentHTML('afterend', '<p class="flt-empty" hidden></p>');
       const bar = fg.previousElementSibling, hs = bar.querySelector('.flt-sn input'), emp = fg.nextElementSibling;
       const st = { a: 'all', t: 'all', l: 'all' }, cards = [...fg.querySelectorAll('.vc[data-f]')];
@@ -231,6 +241,20 @@
         st[b.dataset.g] = b.dataset.k; apply();
       });
       apply();
+      // пин раскраски ведёт сюда: /learn/?c=<id> — фильтр «Раскраски», карточка подсвечена, окно «Скачать»
+      const cq = new URLSearchParams(location.search).get('c'), cx = cq && cols.find(x => x.id === cq);
+      if (cx) {
+        st.t = 'coloring'; apply();
+        const c = document.getElementById('c-' + cx.id), lock = cx.vip && !op;
+        if (c) { c.classList.add('hl'); setTimeout(() => c.scrollIntoView({ block: 'center' }), 60); }
+        const bx = document.createElement('div'); bx.className = 'colbox'; bx.setAttribute('role', 'dialog'); bx.setAttribute('aria-label', tOf(cx));
+        bx.innerHTML = `<div class="colbox-in"><button type="button" class="colbox-x" aria-label="${G.colX[L]}">×</button><img src="${esc(cx.cover)}" alt="${esc(tOf(cx))}"><p class="colbox-k">${G.colT[L]} · PDF A4 · ${cx.vip ? G.vipB[L] : G.free[L]}</p><h3>${esc(tOf(cx))}</h3>`
+          + (lock ? `<p>${G.colLock[L]}</p><a class="btn pri" href="#signin">${G.signin[L]}</a>` : `<a class="btn pri" href="${esc(cx.pdf)}" target="_blank" rel="noopener">${G.colDl[L]}</a>`) + `</div>`;
+        document.body.appendChild(bx);
+        const close = () => bx.remove();
+        bx.addEventListener('click', e => { if (e.target === bx || e.target.closest('.colbox-x') || e.target.closest('a[href="#signin"]')) close(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); }, { once: true });
+      }
     }
     // /learn/: блок VIP — список VIP-уроков: вошедшему открыт («тебе открыто»), гостю размыт
     const vg = document.querySelector('.vg2.vip1');
