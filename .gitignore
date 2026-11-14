@@ -3,3 +3,5 @@ __pycache__/
 _shots/
 .dev.vars
 .wrangler/
+tools/pins/shots/_frames/
+tools/pins/shots/_video.html
