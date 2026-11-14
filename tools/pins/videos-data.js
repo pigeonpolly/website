@@ -203,18 +203,18 @@ tour(SK(14), G.sk, { intro: 'a street in Mérida, Mexico', outro: 'travel sketch
   title: 'Travel Sketchbook: a Street in Mérida, Mexico — Watercolor', topics: 'travel sketching, mexico, urban sketching',
   desc: 'A patterned gate, a tree in loose green washes and the address written by hand. A travel sketchbook page.',
   alt: 'Video moving over a watercolor sketch of a pink wall with a patterned gate, a tree and plants, with a handwritten address.' });
-tour(SK(20), G.sk, { intro: 'sketching in a café', outro: 'order a coffee, open your sketchbook',
-  stops: [[.45, .42, .4, 'the counter, in one wash'], [.72, .48, .35, 'the menu board'], [.5, .85, .4, 'and my own cup']],
+tour(SK(12), G.sk, { intro: 'sketching in a café', outro: 'order a coffee, open your sketchbook',
+  stops: [[.45, .45, .55, 'the counter, in one wash'], [.68, .45, .5, 'the menu board'], [.5, .88, .45, 'and my own cup']],
   title: 'Sketching in a Café: Draw the Counter and Your Cup', topics: 'cafe sketching, urban sketching, watercolor sketchbook',
   desc: 'The counter in one wash, the menu board and your own cup. The easiest place to start urban sketching.',
   alt: 'Video moving over a watercolor sketchbook spread of a café counter with a coffee machine and a cup on the table.' });
-tour(SK(21), G.sk, { intro: 'draw your breakfast', outro: 'kitchen sketchbook',
-  stops: [[.3, .7, .45, 'something in the pan'], [.8, .55, .4, 'a big bowl'], [.6, .3, .4, 'jars on the shelf']],
+tour(SK(13), G.sk, { intro: 'draw your breakfast', outro: 'kitchen sketchbook',
+  stops: [[.3, .7, .55, 'something in the pan'], [.78, .62, .55, 'a big bowl'], [.5, .3, .55, 'jars on the shelf']],
   title: 'Draw Your Breakfast: a Kitchen Sketchbook Spread', topics: 'food sketching, kitchen art, sketchbook ideas',
   desc: 'A pan, a bowl and jars on the shelf. Breakfast is the easiest still life of the day.',
   alt: 'Video moving over a watercolor sketchbook spread of a kitchen counter with a frying pan, a bowl and jars.' });
-tour(SK(19), G.sk, { intro: 'a quick street sketch', outro: 'loose and fast',
-  stops: [[.3, .5, .45, 'the bus: a simple box'], [.62, .35, .4, 'stripes of the tower'], [.5, .75, .4, 'let the colors run']],
+tour(SK(20), G.sk, { intro: 'a quick street sketch', outro: 'loose and fast',
+  stops: [[.25, .48, .45, 'the bus: a simple box'], [.55, .32, .45, 'stripes of the tower'], [.5, .7, .45, 'let the colors run']],
   title: 'A Quick Street Sketch: Loose Watercolor in Minutes', topics: 'loose watercolor, urban sketching, sketchbook',
   desc: 'Draw the bus as a simple box, add the striped tower and let the colors run.',
   alt: 'Video moving over a loose watercolor sketch of a street with a bus and a red and white striped tower.' });
