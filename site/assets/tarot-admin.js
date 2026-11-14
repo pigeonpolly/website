@@ -1,5 +1,5 @@
 // Кабинет → «🃏 Таро» (только админ; admin.js открывает PPTarotAdmin.mount(main)). «Таро кошек»:
-// 1) выбрать расклад → 2) отметить выпавшие карты по местам (прямо/перевёрнуто) → 3) у каждой карты: место, одна выделенная строка
+// 1) выбрать расклад → 2) у каждого места — выпадающий список карт и галочка «перевёрнута»; сразу под ним одна выделенная строка
 // ключевых слов и описание из колоды. Больше ничего — Алина просила просто (14.11.2026).
 // Данные — GET /api/admin/tarot (worker/tarot.js, worker/tarot-data.js). Сохраняется только последний расклад в localStorage.
 (function () {
@@ -15,23 +15,13 @@
   .tr-sp small{opacity:.75}
   .tr-how{margin:6px 0 14px 20px;padding:0}
   .tr-how li{margin:4px 0}
-  .tr-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;margin:8px 0}
-  .tr-slot{padding:6px 8px;border-radius:12px;border:2px dashed #E8E4E2;background:#fff;color:#2B1A51;text-align:center}
-  .tr-slot.on{border-style:solid;border-color:#E9A93B}
-  .tr-slot.cur{box-shadow:0 0 0 2px #E9A93B}
-  .tr-slot b{font-size:.85em;display:block;line-height:1.25}
-  .tr-slot>button.tr-pick{all:unset;cursor:pointer;display:block;width:100%}
-  .tr-slot .tr-pn{font-size:.75em;opacity:.75;display:block}
-  .tr-slot .tr-g{font-size:1.15em}
   .tr-g{font-size:1.6em;line-height:1.2;display:inline-block;min-height:1.2em;font-weight:700}
   .tr-g.rev{transform:rotate(180deg)}
-  .tr-flip{white-space:nowrap;margin-top:4px;font:inherit;font-size:.72em;padding:1px 8px;border-radius:99px;border:1px solid #E8E4E2;background:#F4EFEA;color:#2B1A51;cursor:pointer}
-  .tr-flip[aria-pressed="true"]{background:#2B1A51;color:#fff;border-color:#2B1A51}
-  .tr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px;margin:4px 0 12px}
-  .tr-c{padding:5px 3px;border-radius:10px;line-height:1.2;border:1px solid #E8E4E2;background:#fff;cursor:pointer;font:inherit;color:#2B1A51;font-size:.85em}
-  .tr-c:hover:not(:disabled){border-color:#E9A93B}
-  .tr-c:disabled{opacity:.35;cursor:default}
-  .tr-c .tr-g{font-size:1em;display:block}
+  .tr-pickrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:4px 0 10px}
+  .tr-sel{font:inherit;font-weight:700;color:#2B1A51;padding:8px 10px;border-radius:10px;border:2px solid #E8E4E2;background:#fff;max-width:100%;cursor:pointer}
+  .tr-sel:focus{outline:none;border-color:#E9A93B}
+  .tr-flip{white-space:nowrap;cursor:pointer;font-size:.9em;user-select:none}
+  .tr-flip input{accent-color:#2B1A51;width:16px;height:16px;vertical-align:-3px}
   .tr-card{padding:16px;border-radius:16px;border:1px solid #E8E4E2;background:#fff;color:#2B1A51;margin:14px 0}
   .tr-card h3{margin:0 0 8px}
   .tr-card h3 .tr-g{font-size:1em}
@@ -49,8 +39,7 @@
   .tr-cnt button{all:unset;cursor:pointer;width:30px;height:30px;text-align:center;font-weight:700;font-size:1.1em;border-radius:50%}
   .tr-cnt button:hover:not(:disabled){background:#F4EFEA}
   .tr-cnt button:disabled{opacity:.3;cursor:default}
-  .tr-cnt b{min-width:1.6em;text-align:center}
-  @media (max-width:600px){.tr-slot{max-width:none}}`;
+  .tr-cnt b{min-width:1.6em;text-align:center}`;
 
   const SUITS = [['wands', 'Жезлы', 'Огонь'], ['cups', 'Кубки', 'Вода'], ['swords', 'Мечи', 'Воздух'], ['pent', 'Пентакли', 'Земля']];
 
@@ -79,50 +68,32 @@
     const sp = D.spreads.find(s => s.id === st.sp);
     if (!sp) return drawChoose(box);
     const pl = places(sp);
-    const full = pl.every((_, i) => picked(i));
+    const opt = (c, i) => `<option value="${c.n}"${st.picks[i] === c.n ? ' selected' : ''}${used(i).has(c.n) ? ' disabled' : ''}>${esc(c.g)} ${esc(c.ru)}</option>`;
+    const select = i => `<select class="tr-sel" data-i="${i}" aria-label="Карта для места ${i + 1}"><option value="-1">— выберите карту —</option>
+      <optgroup label="Старшие арканы">${D.cards.filter(c => c.ar === 'major').map(c => opt(c, i)).join('')}</optgroup>
+      ${SUITS.map(([id, name]) => `<optgroup label="${name}">${D.cards.filter(c => c.suit === id).map(c => opt(c, i)).join('')}</optgroup>`).join('')}</select>`;
     box.innerHTML = `<section class="adm-box">
       <div class="tr-top"><h2>🃏 ${esc(sp.name)}</h2><button type="button" class="tr-back">← другой расклад</button></div>
       <details><summary class="be-note">Как делать этот расклад</summary><ol class="tr-how">${sp.how.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
         <ul class="tr-how">${D.prep.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>
-      <div class="tr-row"><h3>Карты</h3>${sp.free ? `<span class="tr-cnt" title="Сколько карт"><button type="button" class="tr-n" data-d="-1" ${st.n <= 1 ? 'disabled' : ''} aria-label="Меньше карт">−</button><b>${st.n}</b><button type="button" class="tr-n" data-d="1" ${st.n >= FREE_MAX ? 'disabled' : ''} aria-label="Больше карт">+</button></span>` : ''}
-        <span class="be-note">место → карта; ↺ — если вверх ногами</span></div>
-      <div class="tr-slots">${pl.map((p, i) => { const c = picked(i) && card(st.picks[i]); return `<div class="tr-slot${c ? ' on' : ''}${i === st.cur ? ' cur' : ''}">
-        <button type="button" class="tr-pick" data-i="${i}"><span class="tr-pn">${p.free ? esc(p.name) : `${i + 1}. ${esc(p.name)}`}</span><span class="tr-g${c && st.rev[i] ? ' rev' : ''}">${c ? esc(c.g) : '?'}</span>${c ? `<b>${esc(c.ru)}</b>` : ''}</button>
-        ${c ? `<button type="button" class="tr-flip" data-i="${i}" aria-pressed="${st.rev[i] ? 'true' : 'false'}">↺ перевёрнута</button>` : ''}</div>`; }).join('')}</div>
-      ${full ? '' : grid('Старшие арканы', D.cards.filter(c => c.ar === 'major')) + SUITS.map(([id, name]) => grid(name, D.cards.filter(c => c.suit === id))).join('')}
-      ${st.picks.some((_, i) => picked(i)) ? '<p style="margin:4px 0 0"><button type="button" class="pill-btn tr-clear">Очистить</button></p>' : ''}
+      ${sp.free ? `<div class="tr-row"><h3>Карты</h3><span class="tr-cnt" title="Сколько карт"><button type="button" class="tr-n" data-d="-1" ${st.n <= 1 ? 'disabled' : ''} aria-label="Меньше карт">−</button><b>${st.n}</b><button type="button" class="tr-n" data-d="1" ${st.n >= FREE_MAX ? 'disabled' : ''} aria-label="Больше карт">+</button></span></div>` : ''}
+      ${st.picks.some((_, i) => picked(i)) ? '<p style="margin:6px 0 0"><button type="button" class="tr-back tr-clear">очистить всё</button></p>' : ''}
     </section>
-    ${full ? `<section class="tr-read">${pl.map((p, i) => cardHtml(card(st.picks[i]), { i: i + 1, rev: !!st.rev[i], ...p })).join('')}</section>` : ''}`;
+    ${pl.map((p, i) => { const c = picked(i) && card(st.picks[i]), rev = !!st.rev[i];
+      return `<article class="tr-card"><div class="tr-pos">${p.free ? esc(p.name) : `${i + 1}. ${esc(p.name)}`}</div>
+        <div class="tr-pickrow">${select(i)}${c ? `<label class="tr-flip"><input type="checkbox" data-i="${i}"${rev ? ' checked' : ''}> ↺ перевёрнута</label>` : ''}</div>
+        ${c ? `<p class="tr-kw">${esc(rev ? c.kwr : c.kw)}</p><div class="tr-t">${paras(rev ? c.r : c.t)}</div>` : `<p class="be-note" style="margin:6px 0 0">${esc(p.about || '')}</p>`}</article>`; }).join('')}`;
     box.querySelector('.tr-back').onclick = () => { st = { sp: null, picks: [], rev: [], cur: 0, n: st.n }; save(); draw(box); };
-    box.querySelectorAll('.tr-n').forEach(b => b.onclick = () => { // меньше карт — лишние места убираются
-      st.n = Math.min(FREE_MAX, Math.max(1, st.n + +b.dataset.d)); st.picks = st.picks.slice(0, st.n); st.rev = st.rev.slice(0, st.n);
-      const nx = places(sp).findIndex((_, i) => !picked(i)); st.cur = nx >= 0 ? nx : Math.min(st.cur, st.n - 1); save(); draw(box);
+    box.querySelectorAll('.tr-n').forEach(b => b.onclick = () => { // меньше карт — последние места убираются
+      st.n = Math.min(FREE_MAX, Math.max(1, st.n + +b.dataset.d)); st.picks = st.picks.slice(0, st.n); st.rev = st.rev.slice(0, st.n); save(); draw(box);
     });
-    box.querySelectorAll('.tr-pick').forEach(b => b.onclick = () => {
-      st.cur = +b.dataset.i;
-      if (full) { st.picks[st.cur] = -1; st.rev[st.cur] = false; save(); } // при полном раскладе место открывает выбор заново
-      draw(box);
-    });
-    box.querySelectorAll('.tr-flip').forEach(b => b.onclick = () => { const i = +b.dataset.i; st.rev[i] = !st.rev[i]; save(); draw(box); });
-    box.querySelectorAll('.tr-c').forEach(b => b.onclick = () => {
-      const n = +b.dataset.n;
-      if (st.picks[st.cur] === n) { st.picks[st.cur] = -1; st.rev[st.cur] = false; }
-      else {
-        st.picks[st.cur] = n; st.rev[st.cur] = false;
-        const next = pl.findIndex((_, i) => !picked(i));
-        if (next >= 0) st.cur = next;
-      }
-      save(); draw(box);
-      if (pl.every((_, i) => picked(i))) { const r = box.querySelector('.tr-read'); if (r) r.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
-    });
-    const cl = box.querySelector('.tr-clear'); if (cl) cl.onclick = () => { st.picks = []; st.rev = []; st.cur = 0; save(); draw(box); };
+    box.querySelectorAll('.tr-sel').forEach(s => s.onchange = () => { const i = +s.dataset.i; st.picks[i] = +s.value; st.rev[i] = false; save(); draw(box); });
+    box.querySelectorAll('.tr-flip input').forEach(x => x.onchange = () => { st.rev[+x.dataset.i] = x.checked; save(); draw(box); });
+    const cl = box.querySelector('.tr-clear'); if (cl) cl.onclick = () => { st.picks = []; st.rev = []; save(); draw(box); };
   }
 
-  function grid(title, list) {
-    const used = new Set(st.picks.filter((n, i) => n >= 0 && n !== null && i !== st.cur));
-    return `<p class="be-note" style="margin-bottom:0">${esc(title)}</p><div class="tr-grid">${list.map(c => `<button type="button" class="tr-c" data-n="${c.n}" ${used.has(c.n) ? 'disabled' : ''}${st.picks[st.cur] === c.n ? ' style="border-color:#E9A93B;border-width:2px"' : ''}>
-      <span class="tr-g">${esc(c.g)}</span>${esc(c.ru)}</button>`).join('')}</div>`;
-  }
+  // карты, уже выбранные на других местах (в списке недоступны — карта не повторяется)
+  const used = i => new Set(st.picks.filter((n, j) => n >= 0 && n !== null && j !== i));
 
   function drawChoose(box) {
     box.innerHTML = `<section class="adm-box"><h2>🃏 Таро</h2>
