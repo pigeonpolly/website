@@ -17,7 +17,18 @@
   .tr-how li{margin:4px 0}
   .tr-g{font-size:1.6em;line-height:1.2;display:inline-block;min-height:1.2em;font-weight:700}
   .tr-g.rev{transform:rotate(180deg)}
-  .tr-pickrow{display:flex;flex-wrap:wrap;align-items:center;gap:8px 14px;margin:4px 0 10px}
+  .tr-deal{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:16px;margin:14px 0;align-items:start}
+  .tr-tcard{width:100%;box-sizing:border-box;aspect-ratio:2/3;display:flex;flex-direction:column;gap:8px;padding:14px;border-radius:18px;border:2px solid #E9A93B;background:#fff;color:#2B1A51;box-shadow:inset 0 0 0 5px #fff,inset 0 0 0 6px #F0D9A8,0 4px 14px rgba(43,26,81,.08)}
+  .tr-tcard.tr-none{border-style:dashed;border-color:#E8E4E2;box-shadow:none}
+  .tr-tcard .tr-pos{text-align:center;margin:2px 0 0}
+  .tr-tcard .tr-sel{width:100%;text-align:center}
+  .tr-face{display:grid;place-items:center;min-height:64px;border-radius:12px;background:#F4EFEA}
+  .tr-big{font-size:2em;font-weight:800;line-height:1;display:inline-block}
+  .tr-big.rev{transform:rotate(180deg)}
+  .tr-tcard .tr-flip{align-self:center}
+  .tr-tcard .tr-kw{margin:0;text-align:center}
+  .tr-tcard .tr-t{font-size:.92em}
+  .tr-tcard .tr-t p{margin:0 0 6px;line-height:1.5}
   .tr-sel{font:inherit;font-weight:700;color:#2B1A51;padding:8px 10px;border-radius:10px;border:2px solid #E8E4E2;background:#fff;max-width:100%;cursor:pointer}
   .tr-sel:focus{outline:none;border-color:#E9A93B}
   .tr-flip{white-space:nowrap;cursor:pointer;font-size:.9em;user-select:none}
@@ -79,10 +90,12 @@
       ${sp.free ? `<div class="tr-row"><h3>Карты</h3><span class="tr-cnt" title="Сколько карт"><button type="button" class="tr-n" data-d="-1" ${st.n <= 1 ? 'disabled' : ''} aria-label="Меньше карт">−</button><b>${st.n}</b><button type="button" class="tr-n" data-d="1" ${st.n >= FREE_MAX ? 'disabled' : ''} aria-label="Больше карт">+</button></span></div>` : ''}
       ${st.picks.some((_, i) => picked(i)) ? '<p style="margin:6px 0 0"><button type="button" class="tr-back tr-clear">очистить всё</button></p>' : ''}
     </section>
-    ${pl.map((p, i) => { const c = picked(i) && card(st.picks[i]), rev = !!st.rev[i];
-      return `<article class="tr-card"><div class="tr-pos">${p.free ? esc(p.name) : `${i + 1}. ${esc(p.name)}`}</div>
-        <div class="tr-pickrow">${select(i)}${c ? `<label class="tr-flip"><input type="checkbox" data-i="${i}"${rev ? ' checked' : ''}> ↺ перевёрнута</label>` : ''}</div>
-        ${c ? `<p class="tr-kw">${esc(rev ? c.kwr : c.kw)}</p><div class="tr-t">${paras(rev ? c.r : c.t)}</div>` : `<p class="be-note" style="margin:6px 0 0">${esc(p.about || '')}</p>`}</article>`; }).join('')}`;
+    <div class="tr-deal">${pl.map((p, i) => { const c = picked(i) && card(st.picks[i]), rev = !!st.rev[i];
+      return `<article class="tr-tcard${c ? '' : ' tr-none'}"><div class="tr-pos">${p.free ? esc(p.name) : `${i + 1}. ${esc(p.name)}`}</div>
+        ${select(i)}
+        <div class="tr-face"><span class="tr-big${rev ? ' rev' : ''}">${c ? esc(c.g) : '?'}</span></div>
+        ${c ? `<label class="tr-flip"><input type="checkbox" data-i="${i}"${rev ? ' checked' : ''}> ↺ перевёрнута</label>
+        <p class="tr-kw">${esc(rev ? c.kwr : c.kw)}</p><div class="tr-t">${paras(rev ? c.r : c.t)}</div>` : `<p class="be-note" style="text-align:center;margin:6px 0 0">${esc(p.about || '')}</p>`}</article>`; }).join('')}</div>`;
     box.querySelector('.tr-back').onclick = () => { st = { sp: null, picks: [], rev: [], cur: 0, n: st.n }; save(); draw(box); };
     box.querySelectorAll('.tr-n').forEach(b => b.onclick = () => { // меньше карт — последние места убираются
       st.n = Math.min(FREE_MAX, Math.max(1, st.n + +b.dataset.d)); st.picks = st.picks.slice(0, st.n); st.rev = st.rev.slice(0, st.n); save(); draw(box);
@@ -103,13 +116,11 @@
     box.querySelectorAll('.tr-sp').forEach(b => b.onclick = () => { st = { sp: b.dataset.id, picks: [], rev: [], cur: 0, n: st.n }; save(); draw(box); });
   }
 
-  // карта: место (в раскладе), название, одна выделенная строка ключевых слов, описание из колоды
-  function cardHtml(c, pos) {
+  // карта в списке «Все карты колоды»: название, строка ключевых слов и описание — прямое и перевёрнутое
+  function cardHtml(c) {
     const title = rev => `<h3><span class="tr-g${rev ? ' rev' : ''}">${esc(c.g)}</span> ${esc(c.ru)}${rev ? ' — перевёрнута' : ''}</h3>`;
-    if (!pos) return `<article class="tr-card">${title(false)}<p class="tr-kw">${esc(c.kw)}</p><div class="tr-t">${paras(c.t)}</div>
+    return `<article class="tr-card">${title(false)}<p class="tr-kw">${esc(c.kw)}</p><div class="tr-t">${paras(c.t)}</div>
       <p class="tr-side">↺ Перевёрнутая</p><p class="tr-kw">${esc(c.kwr)}</p><div class="tr-t">${paras(c.r)}</div></article>`;
-    return `<article class="tr-card"><div class="tr-pos">${pos.free ? '' : `${esc(pos.i)}. `}${esc(pos.name)}</div>${title(pos.rev)}
-      <p class="tr-kw">${esc(pos.rev ? c.kwr : c.kw)}</p><div class="tr-t">${paras(pos.rev ? c.r : c.t)}</div></article>`;
   }
 
   window.PPTarotAdmin = { mount };
