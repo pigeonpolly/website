@@ -15,21 +15,23 @@
   .tr-sp small{opacity:.75}
   .tr-how{margin:6px 0 14px 20px;padding:0}
   .tr-how li{margin:4px 0}
-  .tr-slots{display:flex;flex-wrap:wrap;gap:12px;margin:12px 0}
-  .tr-slot{flex:1 1 150px;min-width:140px;max-width:220px;padding:12px;border-radius:14px;border:2px dashed #E8E4E2;background:#fff;color:#2B1A51;text-align:center}
+  .tr-slots{display:grid;grid-template-columns:repeat(auto-fill,minmax(118px,1fr));gap:8px;margin:8px 0}
+  .tr-slot{padding:6px 8px;border-radius:12px;border:2px dashed #E8E4E2;background:#fff;color:#2B1A51;text-align:center}
   .tr-slot.on{border-style:solid;border-color:#E9A93B}
-  .tr-slot.cur{box-shadow:0 0 0 3px #E9A93B}
+  .tr-slot.cur{box-shadow:0 0 0 2px #E9A93B}
+  .tr-slot b{font-size:.85em;display:block;line-height:1.25}
   .tr-slot>button.tr-pick{all:unset;cursor:pointer;display:block;width:100%}
-  .tr-slot .tr-pn{font-size:.85em;opacity:.75;display:block;margin-bottom:6px}
+  .tr-slot .tr-pn{font-size:.75em;opacity:.75;display:block}
+  .tr-slot .tr-g{font-size:1.15em}
   .tr-g{font-size:1.6em;line-height:1.2;display:inline-block;min-height:1.2em;font-weight:700}
   .tr-g.rev{transform:rotate(180deg)}
-  .tr-flip{margin-top:8px;font:inherit;font-size:.8em;padding:3px 10px;border-radius:99px;border:1px solid #E8E4E2;background:#F4EFEA;color:#2B1A51;cursor:pointer}
+  .tr-flip{white-space:nowrap;margin-top:4px;font:inherit;font-size:.72em;padding:1px 8px;border-radius:99px;border:1px solid #E8E4E2;background:#F4EFEA;color:#2B1A51;cursor:pointer}
   .tr-flip[aria-pressed="true"]{background:#2B1A51;color:#fff;border-color:#2B1A51}
-  .tr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(112px,1fr));gap:8px;margin:8px 0 16px}
-  .tr-c{padding:8px 4px;border-radius:12px;border:1px solid #E8E4E2;background:#fff;cursor:pointer;font:inherit;color:#2B1A51;font-size:.85em}
+  .tr-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(96px,1fr));gap:6px;margin:4px 0 12px}
+  .tr-c{padding:5px 3px;border-radius:10px;line-height:1.2;border:1px solid #E8E4E2;background:#fff;cursor:pointer;font:inherit;color:#2B1A51;font-size:.85em}
   .tr-c:hover:not(:disabled){border-color:#E9A93B}
   .tr-c:disabled{opacity:.35;cursor:default}
-  .tr-c .tr-g{font-size:1.2em;display:block}
+  .tr-c .tr-g{font-size:1em;display:block}
   .tr-card{padding:16px;border-radius:16px;border:1px solid #E8E4E2;background:#fff;color:#2B1A51;margin:14px 0}
   .tr-card h3{margin:0 0 8px}
   .tr-card h3 .tr-g{font-size:1em}
@@ -37,8 +39,17 @@
   .tr-kw{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:#FFF4DC;font-weight:700;line-height:1.4}
   .tr-t p{margin:8px 0;line-height:1.55}
   .tr-side{font-size:.8em;font-weight:700;margin:14px 0 6px;opacity:.7}
-  .tr-cnt{display:flex;align-items:center;gap:10px;margin:8px 0 4px}
-  .tr-cnt b{font-size:1.3em;min-width:1.5em;text-align:center}
+  .tr-top{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;margin:0 0 6px}
+  .tr-top h2{margin:0}
+  .tr-back{all:unset;cursor:pointer;font-size:.9em;opacity:.75}
+  .tr-back:hover{opacity:1;text-decoration:underline}
+  .tr-row{display:flex;align-items:center;flex-wrap:wrap;gap:6px 14px;margin:10px 0 0}
+  .tr-row h3{margin:0}
+  .tr-cnt{display:inline-flex;align-items:center;gap:2px;border:1px solid #E8E4E2;border-radius:99px;background:#fff}
+  .tr-cnt button{all:unset;cursor:pointer;width:30px;height:30px;text-align:center;font-weight:700;font-size:1.1em;border-radius:50%}
+  .tr-cnt button:hover:not(:disabled){background:#F4EFEA}
+  .tr-cnt button:disabled{opacity:.3;cursor:default}
+  .tr-cnt b{min-width:1.6em;text-align:center}
   @media (max-width:600px){.tr-slot{max-width:none}}`;
 
   const SUITS = [['wands', 'Жезлы', 'Огонь'], ['cups', 'Кубки', 'Вода'], ['swords', 'Мечи', 'Воздух'], ['pent', 'Пентакли', 'Земля']];
@@ -70,18 +81,16 @@
     const pl = places(sp);
     const full = pl.every((_, i) => picked(i));
     box.innerHTML = `<section class="adm-box">
-      <p><button type="button" class="pill-btn tr-back">← Другой расклад</button></p>
-      <h2>🃏 ${esc(sp.name)}</h2>
+      <div class="tr-top"><h2>🃏 ${esc(sp.name)}</h2><button type="button" class="tr-back">← другой расклад</button></div>
       <details><summary class="be-note">Как делать этот расклад</summary><ol class="tr-how">${sp.how.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
         <ul class="tr-how">${D.prep.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>
-      ${sp.free ? `<h3>Сколько карт</h3><div class="tr-cnt"><button type="button" class="pill-btn tr-n" data-d="-1" ${st.n <= 1 ? 'disabled' : ''} aria-label="Меньше">−</button><b>${st.n}</b><button type="button" class="pill-btn tr-n" data-d="1" ${st.n >= FREE_MAX ? 'disabled' : ''} aria-label="Больше">+</button></div>` : ''}
-      <h3>Какие карты выпали</h3>
-      <p class="be-note">Нажмите на место, потом на карту. «↺ Перевёрнута» — если карта легла вверх ногами.</p>
+      <div class="tr-row"><h3>Карты</h3>${sp.free ? `<span class="tr-cnt" title="Сколько карт"><button type="button" class="tr-n" data-d="-1" ${st.n <= 1 ? 'disabled' : ''} aria-label="Меньше карт">−</button><b>${st.n}</b><button type="button" class="tr-n" data-d="1" ${st.n >= FREE_MAX ? 'disabled' : ''} aria-label="Больше карт">+</button></span>` : ''}
+        <span class="be-note">место → карта; ↺ — если вверх ногами</span></div>
       <div class="tr-slots">${pl.map((p, i) => { const c = picked(i) && card(st.picks[i]); return `<div class="tr-slot${c ? ' on' : ''}${i === st.cur ? ' cur' : ''}">
-        <button type="button" class="tr-pick" data-i="${i}"><span class="tr-pn">${i + 1}. ${esc(p.name)}</span><span class="tr-g${c && st.rev[i] ? ' rev' : ''}">${c ? esc(c.g) : '?'}</span><br>${c ? `<b>${esc(c.ru)}</b>` : '<span class="be-note">выбрать</span>'}</button>
-        ${c ? `<button type="button" class="tr-flip" data-i="${i}" aria-pressed="${st.rev[i] ? 'true' : 'false'}">↺ Перевёрнута</button>` : ''}</div>`; }).join('')}</div>
+        <button type="button" class="tr-pick" data-i="${i}"><span class="tr-pn">${p.free ? esc(p.name) : `${i + 1}. ${esc(p.name)}`}</span><span class="tr-g${c && st.rev[i] ? ' rev' : ''}">${c ? esc(c.g) : '?'}</span>${c ? `<b>${esc(c.ru)}</b>` : ''}</button>
+        ${c ? `<button type="button" class="tr-flip" data-i="${i}" aria-pressed="${st.rev[i] ? 'true' : 'false'}">↺ перевёрнута</button>` : ''}</div>`; }).join('')}</div>
       ${full ? '' : grid('Старшие арканы', D.cards.filter(c => c.ar === 'major')) + SUITS.map(([id, name]) => grid(name, D.cards.filter(c => c.suit === id))).join('')}
-      <p>${st.picks.some((_, i) => picked(i)) ? '<button type="button" class="pill-btn tr-clear">Очистить</button>' : ''}</p>
+      ${st.picks.some((_, i) => picked(i)) ? '<p style="margin:4px 0 0"><button type="button" class="pill-btn tr-clear">Очистить</button></p>' : ''}
     </section>
     ${full ? `<section class="tr-read">${pl.map((p, i) => cardHtml(card(st.picks[i]), { i: i + 1, rev: !!st.rev[i], ...p })).join('')}</section>` : ''}`;
     box.querySelector('.tr-back').onclick = () => { st = { sp: null, picks: [], rev: [], cur: 0, n: st.n }; save(); draw(box); };
