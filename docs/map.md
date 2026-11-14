@@ -290,3 +290,5 @@ _Сюда следующие этапы дописывают общие свед
 - Видео и гайды без пересборки: worker/guides.js (`guidesApi`, `guidesList`, `guideOut`, `ytId` — id из любой ссылки YouTube), meta `v2_guides`; кабинет — guides-admin.js; сайт — v2.js (`G`, `ytName`, `guidesReady`).
 
 - worker/pause.js — ⏸ пауза сайта: `pauseOn(env)`, `pauseGate` (страницы), `POST /api/admin/pause`.
+
+- Файлы только для вошедших: положить в `site/members/…` — worker `membersFile` (worker/index.js) пускает вошедших, гостя уводит на /learn/?c=<имя>#signin (docs/coloring.md).
