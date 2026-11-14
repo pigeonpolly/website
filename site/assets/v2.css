@@ -170,9 +170,13 @@ html[data-season=summer] .pano img{-webkit-mask-image:linear-gradient(to bottom,
 .cv .hand{position:absolute;right:60px;bottom:50px;color:#5A4026;transform:rotate(-4deg)}
 .cv .tie{position:absolute;right:28px;top:50%;width:34px;height:34px;border-radius:50%;border:2px solid #6B4E2E;transform:translateY(-50%)}
 .cv .tie:after{content:"";position:absolute;left:14px;top:30px;width:2px;height:70px;background:#6B4E2E;transform:rotate(14deg);transform-origin:top}
-@media (hover:hover){.fold:hover .cv{transform:rotateY(-158deg)}}
+@media (hover:hover) and (pointer:fine){.fold:hover .cv{transform:rotateY(-158deg)}}
 .fold.open .cv{transform:rotateY(-158deg)}
-.fold.open .cv,.fold:hover .cv{pointer-events:none}
+.fold.open .cv{pointer-events:none}@media (hover:hover) and (pointer:fine){.fold:hover .cv{pointer-events:none}}
+@keyframes cvPeek{0%,70%,100%{transform:none}78%{transform:rotateY(-24deg)}86%{transform:rotateY(-6deg)}92%{transform:rotateY(-14deg)}}
+@keyframes cvTap{0%,100%{transform:translateX(-50%) scale(1)}50%{transform:translateX(-50%) scale(1.07)}}
+@media (hover:none),(pointer:coarse),(max-width:700px){.fold:not(.open) .cv{animation:cvPeek 4.5s ease-in-out 1s infinite}.fold .cv .hand{right:auto;left:50%;bottom:auto;top:calc(50% + 120px);transform:translateX(-50%);white-space:nowrap;background:#FBF6EA;color:#3E2C18;border:2px solid #6B4E2E;border-radius:999px;padding:6px 22px 8px;box-shadow:0 4px 12px rgba(0,0,0,.2);animation:cvTap 1.6s ease-in-out infinite}.fold .cv .hand:before{content:"👆 "}}
+@media (prefers-reduced-motion:reduce){.fold:not(.open) .cv,.fold .cv .hand{animation:none}}
 
 /* подвал */
 .ft2{padding:70px 0 30px}
