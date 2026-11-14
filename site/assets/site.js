@@ -201,6 +201,26 @@
     if (!(navigator.sendBeacon && navigator.sendBeacon('/api/hit', new Blob([body], { type: 'application/json' })))) fetch('/api/hit', { method: 'POST', body, keepalive: true, headers: { 'content-type': 'application/json' } }).catch(() => {});
   } catch (e) { /* статистика не должна ломать сайт */ }
 
+  // статья блога: докуда прокрутили (% статьи) и сколько секунд вкладка была открыта на виду — кабинет → «📊 Аналитика» → «📰 Блог» (worker/analytics.js)
+  try {
+    const art = document.querySelector('article.bp[data-post-id]');
+    if (art && art.dataset.status !== 'draft' && !(navigator.webdriver || /^(localhost|127\.)/.test(location.hostname) && !/[?&]track=1/.test(location.search))) {
+      let depth = 0, sec = 0, shown = document.visibilityState === 'visible' ? Date.now() : 0, sent = '';
+      const measure = () => { const r = art.getBoundingClientRect(); if (r.height > 0) depth = Math.max(depth, Math.min(100, Math.round((innerHeight - r.top) * 100 / r.height))); };
+      const send = () => {
+        if (shown) { sec += (Date.now() - shown) / 1000; shown = document.visibilityState === 'visible' ? Date.now() : 0; }
+        measure();
+        const body = JSON.stringify({ e: 'read', p: location.pathname, s: depth, t: Math.round(Math.min(sec, 1800)) });
+        if (body === sent || sec < 1) return; sent = body;
+        if (!(navigator.sendBeacon && navigator.sendBeacon('/api/hit', new Blob([body], { type: 'application/json' })))) fetch('/api/hit', { method: 'POST', body, keepalive: true, headers: { 'content-type': 'application/json' } }).catch(() => {});
+      };
+      measure();
+      addEventListener('scroll', measure, { passive: true });
+      document.addEventListener('visibilitychange', () => { if (document.visibilityState === 'hidden') send(); else shown = Date.now(); });
+      addEventListener('pagehide', send);
+    }
+  } catch (e) { /* статистика не должна ломать сайт */ }
+
   // нажатие на ссылку книги на Amazon — для «🗓 Недели» в кабинете (worker/week.js); один обработчик на страницу
   try {
     if (!window.PPOut && !navigator.webdriver && !/^(localhost|127\.)/.test(location.hostname)) {

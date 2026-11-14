@@ -16,6 +16,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/flock-news.js` (10K) — Новости стаи (этап 13 Г, docs/flock.md): /flock/news/ и 3 строки на главной.: KEEP, BIRD_KINDS, REF, FLOCK_NEWS_ALTER, FLOCK_NEWS_TABLES, note, rigaDayOf, flockEvent, flockNewsCron, roomEvent, flockNewsApi
 - `worker/flock.js` (10K) — «Все птички» (/flock/) и пёрышки комнат (этап 13 Б+В, docs/flock.md).: BIRD, PER, COLS, SORTS, FLOCK_ALTER, FLOCK_TABLES, ownerOf, stateOf, featherNews, flockApi
 - `worker/garden.js` (21K) — Огород птички (этап 22, /garden/, site/assets/garden.js, docs/bird.md «Огород»): грядки, с: CROPS, TIER, DAY, SIMPLE, GARDEN_ALTER, GARDEN_BOOL, out, fnv, grown, prices, bedOk, bugsOf
+- `worker/analytics.js` — «📊 Аналитика → 📰 Блог»: чтение статей (таблица reads, visits.rpath), GET /api/admin/blogstats: ANALYTICS_TABLES, ANALYTICS_ALTER, isArticle, readHit, blogStatsApi
 - `worker/guides.js` (8K) — Кабинет → «🎬 Видео и гайды» (site/assets/guides-admin.js, docs/admin.md): Алина сама добав: KEY, SEEN_MAX, BASE, GUIDES_ALTER, cut, out, seenOf, withBase, guideOut, guidesList, okUrl, ytId
 - `worker/ideas.js` (17K) — Кабинет → «💡 Темы для блога»: по кнопке собираем, что сейчас ищут и обсуждают в сфере Алин: PAGES, IDEAS, MONTHS, SITE, SUBS, ARTICLE, write, ask, suggest, reddit, plain, redditSearch
 - `worker/index.js` (289K) — Worker: site/, страницы через HTMLRewriter, /api (кроме блога), cron: RULES, BTN, STOCK, GIFT_KINDS, GOLD_PICKS, PLEVEL, prep, award, run, btnOf, catalog, avatarOf

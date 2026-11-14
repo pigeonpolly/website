@@ -3079,6 +3079,17 @@ button.adm-tag.adm-tag-none { background: #fff; border-style: dashed; }
   .be-table.adm-shop td { display: block !important; }
   .be-table.adm-shop thead { display: none; }
 }
+/* 📊 Аналитика → 📰 Блог: таблица статей на телефоне — карточками (сортировка — списком над таблицей) */
+.adm-bstat .adm-bpost { font-weight: 700; text-align: left; }
+.adm-bh { margin: 4px 0 12px; font: 700 22px/1.25 var(--serif); color: var(--pp-ink,#2B1A51); }
+@media (max-width: 800px) {
+  .be-table.adm-bstat { min-width: 0; }
+  .be-table.adm-bstat thead { display: none; }
+  .adm-bstat tr { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 6px 10px; padding: 12px 4px; border-bottom: 1px solid #F0EDEB; }
+  .be-table.adm-bstat td { display: block !important; padding: 0; border: 0; }
+  .adm-bstat td:first-child, .adm-bstat td:last-child { grid-column: 1 / -1; }
+  .adm-bstat td[data-l]:not(:first-child)::before { content: attr(data-l); display: block; font: 700 11px var(--sans); color: #99908A; }
+}
 @media (max-width: 800px) {
   .be-table.adm-birds { min-width: 0; display: block; }
   .be-table.adm-birds tbody { display: block; }

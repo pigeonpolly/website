@@ -32,7 +32,8 @@ import { gardenApi, gardenDrop, gardenNews, GARDEN_TABLES, GARDEN_ALTER, GARDEN_
 import { pauseGate, pauseApi } from './pause.js'; // ⏸ пауза сайта: «Ведутся работы» для всех, кроме админа (docs/admin.md)
 import { runesApi } from './runes.js'; // 🔮 Руны в кабинете — только админ (docs/admin.md «Руны»)
 import { pollsApi, pollPage, POLL_TABLES, POLL_ALTER } from './polls.js'; // 🗳 Опросы: главная и кабинет (docs/admin.md «Опросы»)
-import { weekApi, outClick, WEEK_TABLES } from './week.js'; // кабинет → «🗓 Неделя» и переходы на Amazon (docs/admin.md)
+import { weekApi, outClick, WEEK_TABLES } from './week.js';
+import { blogStatsApi, readHit, ANALYTICS_TABLES, ANALYTICS_ALTER } from './analytics.js'; // кабинет → «📊 Аналитика» → «📰 Блог»: чтение статей (docs/admin.md) // кабинет → «🗓 Неделя» и переходы на Amazon (docs/admin.md)
 import { ideasApi } from './ideas.js';
 import { guidesApi, guidesList, guideOut, GUIDES_ALTER } from './guides.js'; // кабинет → «🎬 Видео и гайды», /api/v2/guides (docs/admin.md) // кабинет → «💡 Темы для блога» (docs/admin.md)
 import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
@@ -109,6 +110,7 @@ export default {
       await env.DB.prepare('DELETE FROM pan_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {});
       await env.DB.prepare('DELETE FROM maze_runs WHERE started < ?').bind(Date.now() - 2 * 86400000).run().catch(() => {});
       await env.DB.prepare('DELETE FROM visits WHERE ts < ?').bind(now() - 400 * 86400).run().catch(() => {}); // статистику храним ~13 месяцев
+      await env.DB.prepare('DELETE FROM reads WHERE ts < ?').bind(now() - 400 * 86400).run().catch(() => {}); // чтение статей — так же
       await env.DB.prepare('DELETE FROM funnel WHERE day < ?').bind(new Date(Date.now() - 400 * 86400000).toISOString().slice(0, 10)).run().catch(() => {}); // воронки — так же
       await healthMail(env).catch(e => console.error('health mail', e)); // 🩺 письмо админу о сбоях: новые ошибки — раз в день; по понедельникам ещё картинки блога и автокопия
     })());
@@ -639,6 +641,7 @@ async function ensureSchemaRun(env) {
     ...ABOUT_CHAT_TABLES.map(sql => prep(sql)), // чат на /about-me/: about_chat (worker/about-chat.js)
     ...POLL_TABLES.map(sql => prep(sql)), // опросы: polls, poll_votes, poll_ideas (worker/polls.js)
     ...WEEK_TABLES.map(sql => prep(sql)), // переходы на Amazon: out_clicks (worker/week.js)
+    ...ANALYTICS_TABLES.map(sql => prep(sql)), // чтение статей: reads (worker/analytics.js)
     ...SHIFT_TABLES.map(sql => prep(sql)), // «Смена с Полли»: shift_runs (worker/shift.js)
     ...SCHOOL_TABLES.map(sql => prep(sql)), // «Школа Полли»: school_works (worker/school.js)
     ...STUDY_TABLES.map(sql => prep(sql)), // учебник: study_progress (worker/study.js)
@@ -662,7 +665,7 @@ async function ensureSchemaRun(env) {
     "ALTER TABLE users ADD COLUMN mcount TEXT DEFAULT ''", 'ALTER TABLE posts ADD COLUMN bytes INTEGER', 'ALTER TABLE users ADD COLUMN last_seen INTEGER',
     // перенос картинок в R2: store = 'r2' — картинка уже в R2; kv = 1 — копия ещё лежит в KV
     'ALTER TABLE posts ADD COLUMN store TEXT', 'ALTER TABLE posts ADD COLUMN ai INTEGER DEFAULT 0', 'ALTER TABLE shop ADD COLUMN added_at INTEGER', 'ALTER TABLE button_log ADD COLUMN seen INTEGER DEFAULT 1', 'ALTER TABLE users ADD COLUMN game_best INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN game_best_at INTEGER', 'ALTER TABLE users ADD COLUMN maze_level INTEGER DEFAULT 1', "ALTER TABLE users ADD COLUMN inv TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN pot_fails INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_days INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN pot_last TEXT', 'ALTER TABLE users ADD COLUMN cats_alive INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eyes INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN eye_next INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN eye INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN safe INTEGER DEFAULT 0', 'ALTER TABLE maze_runs ADD COLUMN hint INTEGER DEFAULT 0', 'ALTER TABLE cards ADD COLUMN game TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_en TEXT', 'ALTER TABLE draw_requests ADD COLUMN ip TEXT', 'ALTER TABLE sessions ADD COLUMN pin_ok INTEGER DEFAULT 0', 'ALTER TABLE draw_requests ADD COLUMN text_ru TEXT', 'ALTER TABLE draw_requests ADD COLUMN text_lv TEXT', 'ALTER TABLE users ADD COLUMN room_at INTEGER', 'ALTER TABLE users ADD COLUMN req_n INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN req_mid INTEGER DEFAULT 0', 'ALTER TABLE posts ADD COLUMN kv INTEGER DEFAULT 1',
-    'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...TITOS_ALTER, ...NOTE_ALTER, ...POLL_ALTER,
+    'ALTER TABLE users ADD COLUMN buttons INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN referrer INTEGER', ...ANALYTICS_ALTER, ...TITOS_ALTER, ...NOTE_ALTER, ...POLL_ALTER,
     "ALTER TABLE users ADD COLUMN box0 TEXT DEFAULT ''", 'ALTER TABLE users ADD COLUMN box_mail INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN office_task INTEGER DEFAULT 0', "ALTER TABLE users ADD COLUMN atags TEXT DEFAULT ''", ...AUTH_ALTER, ...FLOCK_ALTER, ...FLOCK_NEWS_ALTER, ...CARD_ALTER, ...PAN_ALTER, ...TRAIN_ALTER, ...SHIFT_ALTER, ...SCHOOL_ALTER, ...ABOUT_CHAT_ALTER, ...CHALLENGE_ALTER, ...GARDEN_ALTER, ...WL_ALTER, ...MAIL_ALTER, ...GUIDES_ALTER];
   const ver = strHash(ensureSchemaRun.toString() + '\n' + sig.join('\n') + '\n' + alters.join('\n'));
   try { if (((await env.DB.prepare("SELECT value FROM meta WHERE key = 'schema_ver'").first()) || {}).value === ver) { schemaReady = true; return; } } catch (e) { /* новой базы ещё нет — создать */ }
@@ -1201,9 +1204,12 @@ async function hit(req, env) {
   const day = rigaDay();
   const vid = (await sha256(salt + day + (req.headers.get('cf-connecting-ip') || '') + ua)).slice(0, 16);
   if (b.o) { await outClick(env, b, day, now(), vid); return ok; } // нажатие на ссылку наружу (Amazon) — не просмотр страницы
+  if (b.e === 'read') { await readHit(env, b, day, now(), vid); return ok; } // сколько прочитали статью (worker/analytics.js)
+  let rpath = null; // с какой страницы нашего сайта перешли
+  if (ref === 'self') try { rpath = new URL(String(b.r)).pathname.slice(0, 200); } catch (e) { /* не адрес */ }
   const lang = /^\/ru(\/|$)/.test(path) ? 'RU' : /^\/lv(\/|$)/.test(path) ? 'LV' : 'EN';
-  await env.DB.prepare('INSERT INTO visits (day, ts, vid, entry, path, lang, src, ref, campaign, device, os, browser, country) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-    .bind(day, now(), vid, entry, path, lang, src, ref && ref !== 'self' ? ref.slice(0, 80) : null, campaign, info.device, info.os, info.browser, (req.cf && req.cf.country) || null).run();
+  await env.DB.prepare('INSERT INTO visits (day, ts, vid, entry, path, lang, src, ref, campaign, device, os, browser, country, rpath) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+    .bind(day, now(), vid, entry, path, lang, src, ref && ref !== 'self' ? ref.slice(0, 80) : null, campaign, info.device, info.os, info.browser, (req.cf && req.cf.country) || null, rpath).run();
   return ok;
 }
 async function visitStats(env, days) {
@@ -1743,6 +1749,7 @@ async function route(req, env, url) {
   if (p === '/api/school' || p.startsWith('/api/school/') || p === '/api/admin/school' || p === '/api/admin/school/check') { const r = await schoolApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is a short friendly comment from an art teacher (Polly, a pigeon) on a student\'s drawing made on paper. Keep it warm, simple and encouraging.') }); if (r) return r; }
   if (p === '/api/about-chat' || p.startsWith('/api/about-chat/') || p === '/api/admin/about-asks') { const r = await aboutChatApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), asset: path => env.ASSETS.fetch(new Request(new URL(path, url.origin))).then(r => r.ok ? r.json() : null), ipKey: async r => { let salt = await getMeta(env, 'blog_salt'); if (!salt) { salt = randomHex(16); await setMeta(env, 'blog_salt', salt); } return (await sha256(salt + (r.headers.get('cf-connecting-ip') || '0'))).slice(0, 24); }, translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The strings are a question a visitor asked in a cosy retro chat on an artist\'s website, or the answer of the artist Alina or of her character Polly, a dramatic, funny pigeon from the island of Wobbleland. Keep the casual, playful tone; keep names (Alina, Polly, Milka, Wobbleland) as they are.') }); if (r) return r; }
   if (m === 'POST' && p === '/api/admin/pause') return pauseApi(req, env, { json, fail, needUser, isAdmin, now });
+  if (p === '/api/admin/blogstats') { const r = await blogStatsApi(req, env, url, { json, fail, needUser, isAdmin }); if (r) return r; }
   if (p === '/api/admin/week') { const r = await weekApi(req, env, url, { json, fail, needUser, isAdmin, getMeta, now }); if (r) return r; }
   if (p === '/api/shift' || p.startsWith('/api/shift/')) { const r = await shiftApi(req, env, url, { json, fail, currentUser, needUser, rules: () => RULES, randomHex, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p.startsWith('/api/titos') || p.startsWith('/api/admin/titos')) { const r = await titosApi(req, env, url, titosHelpers(env)); if (r) return r; }

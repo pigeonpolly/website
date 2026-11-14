@@ -45,7 +45,8 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - **gifts** (worker/index.js): `id` int PK auto, `user_id` int nn, `kind` text nn, `item` text nn, `note` text, `status` text ='new', `created_at` int, `opened_at` int
 - **site_blocks** (worker/index.js): `id` text nn, `lang` text nn, `html` text, `hidden` int =0, `page` text, `updated_at` int; PRIMARY KEY (id, lang)
 - **button_log** (worker/index.js): `id` int PK auto, `user_id` int nn, `kind` text nn, `ref` text nn, `amount` int nn, `day` text, `created_at` int; + `seen` int =1; UNIQUE (user_id, kind, ref)
-- **visits** (worker/index.js): `id` int PK auto, `day` text nn, `ts` int, `vid` text, `entry` int =0, `path` text, `lang` text, `src` text, `ref` text, `campaign` text, `device` text, `os` text, `browser` text, `country` text
+- **visits** (worker/index.js): `id` int PK auto, `day` text nn, `ts` int, `vid` text, `entry` int =0, `path` text, `lang` text, `src` text, `ref` text, `campaign` text, `device` text, `os` text, `browser` text, `country` text, `rpath` text (с какой страницы сайта перешли, с 14.11.2026)
+- **reads** (worker/analytics.js): `day` text nn, `vid` text nn, `path` text nn, `ts` int, `sec` int =0, `depth` int =0; PK (day, vid, path) — чтение статьи блога: секунд на экране и % прокрутки (наибольшие за день); cron удаляет старше 400 дней. Индекс `visits_path` (path, day)
 - **utm_links** (worker/index.js): `id` int PK auto, `path` text nn, `source` text nn, `campaign` text nn, `note` text, `created_at` int; UNIQUE (path, source, campaign)
 - **art_added** (worker/index.js): `id` int PK auto, `key` text UNIQUE nn, `gallery` text nn, `title` text, `colors` text, `w` int, `h` int, `palette` int =1, `pos` int, `hidden` int =0, `created_at` int, `removed_at` int
 - **art_hidden** (worker/index.js): `src` text PK, `thumb` text, `gallery` text, `created_at` int

@@ -21,7 +21,7 @@
   // id — адрес /admin/#id · open — какой экран показать (если не тот же id) · href — раздел живёт на другой странице
   // focus — к чему прокрутить экран (свёрнутое раскроется) · about — одна строка «что здесь делается» · count — счётчик из «Входящих»
   // hide — старый адрес (ссылки на него работают), но в меню его нет: экран тот же, что у другого пункта
-  const ADMIN_GROUPS = { pub: '✍️ Публиковать', birds: '🐦 Птицы', shop: '🛍 Магазин и игры', stats: '📊 Статистика', service: '⚙️ Сервис' };
+  const ADMIN_GROUPS = { pub: '✍️ Публиковать', birds: '🐦 Птицы', shop: '🛍 Магазин и игры', stats: '📊 Аналитика', service: '⚙️ Сервис' };
   const rulesBox = re => m => [...m.querySelectorAll('.adm-rules h3')].find(h => re.test(h.textContent));
   const ADMIN_SECTIONS = [
     { id: 'week', ic: '🗓', name: 'Неделя' }, // первый экран (редизайн 2.0, часть 4): 5 цифр, 5 кнопок, остальное — «⚙ Ещё инструменты»
@@ -52,18 +52,20 @@
     { id: 'titos', ic: '🕵️', name: 'Дела Титоса', group: 'shop', about: 'Какие дела детектива Титоса на сайте и переведены ли они. Новые дела заносятся сами раз в час после выкладки.' },
     { id: 'titos-rules', hide: 1, ic: '📜', name: 'Правила Титоса', open: 'rules', focus: rulesBox(/Детектив Титос/), about: 'Кофе детектива Титоса и пуговки за раскрытые дела.' },
     { id: 'games', hide: 1, ic: '🎮', name: 'Награды игр', open: 'rules', focus: rulesBox(/Пуговичный дождь/), about: 'Сколько пуговок дают игры.' },
-    { id: 'overview', ic: '📊', name: 'Обзор', group: 'stats', about: 'Главные цифры сайта: статьи, комментарии, птицы, работы в челлендже.' },
+    { id: 'overview', ic: '📊', name: 'Сводка', group: 'stats', about: 'Главные цифры сайта: статьи, комментарии, птицы, работы в челлендже. Подробно — во вкладках рядом.' },
+    { id: 'blogstats', ic: '📰', name: 'Блог', group: 'stats', about: 'Какие статьи читают и какие нет, откуда на них приходят, сколько времени читают и дочитывают ли. Нажмите на статью — всё о ней.' },
     { id: 'challenge', hide: 1, ic: '📊', name: 'Обзор', open: 'overview', about: 'Главные цифры сайта: статьи, комментарии, птицы, работы в челлендже.' },
     { id: 'flock', hide: 1, ic: '📊', name: 'Обзор', open: 'overview', about: 'Главные цифры сайта: статьи, комментарии, птицы, работы в челлендже.' },
     { id: 'visitors', ic: '👥', name: 'Посетители', group: 'stats', about: 'Сколько людей заходит на сайт, откуда и с каких устройств.' },
-    { id: 'analytics', ic: '📈', name: 'Статьи', group: 'stats', about: 'Просмотры, лайки и комментарии каждой статьи.' },
+    { id: 'funnels', ic: '🔻', name: 'Воронки', group: 'stats', about: 'Сколько людей проходит каждый шаг: например, открыли окно входа → вошли.' },
+    { id: 'analytics', hide: 1, ic: '📰', name: 'Блог', open: 'blogstats' }, // старый адрес «📈 Статьи»
     { id: 'rules', ic: '📜', name: 'Правила', group: 'service', about: 'Что сайт делает сам (автопилот) и все числа: пуговки, бейджи, игры.' },
     { id: 'backup', ic: '💾', name: 'Копии', group: 'service', about: 'Полная копия сайта: скачать, настроить автокопию, восстановить.' },
     { id: 'security', ic: '🔐', name: 'Защита', group: 'service', about: 'PIN админа и код восстановления на случай, если потеряете Google.' },
     { id: 'edits', ic: '🧩', name: 'Правки страниц', group: 'service', about: 'Блоки, которые вы поменяли или скрыли прямо на сайте («✏️ Править страницу»), — здесь их можно вернуть как было.', count: 'edits' },
     { id: 'gemini', hide: 1, ic: '🔑', name: 'Ключ Gemini', href: '/blog-editor/#gemini' },
   ];
-  const SECTIONS = { week, notes, titos, inbox, security, overview: () => overview(), visitors, comments, analytics, backup, subscribers, birds, shop, edits, advent, rules, art,
+  const SECTIONS = { week, notes, titos, inbox, security, overview: () => overview(), visitors, comments, blogstats, funnels: () => funnelsScreen(), backup, subscribers, birds, shop, edits, advent, rules, art,
     themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
     asks: () => window.PPAboutAdmin ? window.PPAboutAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился about-admin.js</p>'), // 📮 Вопросы из чата (about-admin.js)
     school: () => window.PPSchoolAdmin ? window.PPSchoolAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился school-admin.js</p>'), // 🎓 Школа Полли (school-admin.js)
@@ -208,7 +210,7 @@
       <div class="wk-nums">${nums.map(([v, t, dl, c, href]) => { const tag = href ? 'a' : 'div'; return `<${tag}${href ? ` href="${href}" title="Открыть список птичек"` : ''} class="wk-num${c ? ' ' + c : ''}"><b>${n(v)}</b><span>${t}</span>${dl}</${tag}>`; }).join('')}</div>
       <div class="wk-acts">${acts.map(a => `<section class="wk-act${a.hot ? ' wk-hot' : ''}"><span class="wk-e" aria-hidden="true">${a.ic}</span><h3>${a.t}${a.badge ? `<span class="wk-badge">${a.badge}</span>` : ''}</h3><p>${a.d}</p><div class="wk-btns">${a.btn}</div></section>`).join('')}</div>
       <section class="wk-more"><h3>⚙ Ещё инструменты</h3><div class="wk-cols">${more}</div></section>
-      <p class="be-note wk-foot">Цифры — за последние 7 дней (${esc(d.from.slice(8))}.${esc(d.from.slice(5, 7))}–${esc(d.to.slice(8))}.${esc(d.to.slice(5, 7))}), сравнение — с 7 днями до них. Подробно — 📊 Статистика → <a href="#visitors">Посетители</a>.</p>
+      <p class="be-note wk-foot">Цифры — за последние 7 дней (${esc(d.from.slice(8))}.${esc(d.from.slice(5, 7))}–${esc(d.to.slice(8))}.${esc(d.to.slice(5, 7))}), сравнение — с 7 днями до них. Подробно — <a href="#overview">📊 Аналитика</a> (сайт, блог, посетители, воронки).</p>
     </div>`;
     // ⏸ пауза сайта (worker/pause.js): для посетителей — страница «Ведутся работы», админа пускает
     main.querySelector('#wk-pause').onclick = async e => {
@@ -423,7 +425,6 @@
         <div class="adm-card"><span class="adm-ic">📱</span><b>${pct(N.mobile, N.people)}%</b><span>с телефона</span></div>
       </div>
       ${chart}
-      <div data-funnels></div>
       <div class="adm-cols">
         <section class="adm-box"><h2>Откуда пришли</h2><p class="be-note">Каждый заход на сайт: с какого сайта или приложения. «Напрямую» — набрали адрес, закладка или ссылка из мессенджера (WhatsApp, Viber не сообщают, откуда).</p>
           ${bars(d.sources, r => `${SRC_IC[r.k] || '🌐'} ${esc(r.k)}`, srcTotal, mob)}</section>
@@ -452,7 +453,6 @@
         ${(() => { const other = d.campaigns.filter(r => !d.links.some(l => l.campaign === r.k)); return other.length ? `<h3>Другие метки (не сохранены)</h3>${bars(other, r => `${esc(r.k)} <small>(${esc(r.s || '')})</small>`, sum(other))}` : ''; })()}</section>
       <p class="be-note">Считается без cookie: один человек за сутки — один раз (по зашифрованному отпечатку, сам IP не сохраняется). Ваши собственные заходы (когда вы вошли как админ) и роботы не считаются. Статистика копится с ${esc(d.first || 'момента включения')}.</p>`;
     main.querySelectorAll('[data-days]').forEach(b => b.onclick = () => { vDays = Number(b.dataset.days); visitors(); });
-    funnels(main.querySelector('[data-funnels]'), Math.max(vDays, 7));
     const tip = main.querySelector('.adm-chart-tip');
     main.querySelectorAll('.adm-col').forEach(c => { const show = () => { tip.textContent = c.dataset.tip; main.querySelectorAll('.adm-col.on').forEach(x => x.classList.remove('on')); c.classList.add('on'); }; c.onmouseenter = show; c.onfocus = show; c.onclick = show; });
     const copy = (link, btn, label) => (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(() => { btn.textContent = '✓ Скопировано'; setTimeout(() => btn.textContent = label, 1600); }).catch(() => prompt('Скопируйте ссылку:', link));
@@ -480,24 +480,120 @@
     };
   }
 
-  // ---------- аналитика: статьи ----------
-  let aSort = 'views';
-  async function analytics() {
+  // ---------- 🔻 воронки — своя вкладка «Аналитики» (раньше были внизу «Посетителей») ----------
+  let fDays = 30;
+  async function funnelsScreen() {
+    const per = [[7, '7 дней'], [30, '30 дней'], [90, '3 месяца']];
+    main.innerHTML = `<div class="adm-filter" role="toolbar" aria-label="Период">${per.map(([k, l]) => `<button type="button" class="pill-btn" data-fdays="${k}" aria-pressed="${fDays === k}">${l}</button>`).join('')}</div><div data-funnels><p class="be-note">Загрузка…</p></div>`;
+    main.querySelectorAll('[data-fdays]').forEach(b => b.onclick = () => { fDays = Number(b.dataset.fdays); funnelsScreen(); });
+    await funnels(main.querySelector('[data-funnels]'), fDays);
+  }
+
+  // ---------- 📰 аналитика блога (/api/admin/blogstats, worker/analytics.js) ----------
+  let bDays = 30, bsSort = 'views', bsSec = '', bPost = 0, bList = null;
+  const mmss = s => s == null ? '—' : s < 60 ? `${s}\u00a0с` : `${Math.floor(s / 60)}\u00a0мин ${String(s % 60).padStart(2, '0')}\u00a0с`;
+  const trend = (a, b) => !b ? (a ? '<small class="adm-up">новое</small>' : '') : (d => `<small class="${d >= 0 ? 'adm-up' : 'adm-down'}">${d >= 0 ? '▲' : '▼'}${Math.abs(d)}%</small>`)(Math.round((a - b) * 100 / b));
+  // столбики по дням (все дни периода, даже пустые); подпись — наведением или нажатием
+  function dayChart(series, days, h) {
+    if (days === 1) return '';
+    const byDay = Object.fromEntries(series.map(r => [r.day, r]));
+    const xs = []; for (let i = days - 1; i >= 0; i--) { const s = new Date(Date.now() - i * 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }); xs.push({ day: s, people: (byDay[s] || {}).people || 0, views: (byDay[s] || {}).views || 0 }); }
+    const max = Math.max(1, ...xs.map(x => x.views));
+    const dd = s => new Date(s + 'T12:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', weekday: days <= 14 ? 'short' : undefined });
+    return `<section class="adm-box"><h2>${h}</h2>
+      <div class="adm-chart" role="img" aria-label="${esc(h)}">${xs.map(x => `<div class="adm-col" tabindex="0" data-tip="${esc(dd(x.day))}: ${n(x.views)} просм. · ${n(x.people)} чел."><i style="height:${x.views ? Math.max(3, x.views * 100 / max) : 0}%"></i></div>`).join('')}</div>
+      <div class="adm-chart-x"><span>${dd(xs[0].day)}</span><span class="adm-chart-tip" aria-live="polite">Наведите или нажмите на столбик</span><span>${dd(xs[xs.length - 1].day)}</span></div></section>`;
+  }
+  const chartTips = () => { const tip = main.querySelector('.adm-chart-tip'); if (tip) main.querySelectorAll('.adm-col').forEach(c => { const show = () => { tip.textContent = c.dataset.tip; main.querySelectorAll('.adm-col.on').forEach(x => x.classList.remove('on')); c.classList.add('on'); }; c.onmouseenter = show; c.onfocus = show; c.onclick = show; }); };
+  const perBar = (cur, attr) => `<div class="adm-filter" role="toolbar" aria-label="Период">${[[7, '7 дней'], [30, '30 дней'], [90, '3 месяца'], [365, 'Год']].map(([k, l]) => `<button type="button" class="pill-btn" ${attr}="${k}" aria-pressed="${cur === k}">${l}</button>`).join('')}</div>`;
+  const readNote = first => `<p class="be-note">«Читали» и «дочитали» считаются с ${first ? esc(new Date(first + 'T12:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })) : 'сегодняшнего дня'}: время — сколько статья была открыта на экране (свёрнутая вкладка не считается), «дочитали» — прокрутили хотя бы до последней четверти. Просмотры — все языки статьи вместе; один человек за сутки — один раз. Ваши заходы и роботы не считаются.</p>`;
+  async function blogstats() {
+    if (bPost) return blogPost();
     main.innerHTML = '<p class="be-note">Загрузка…</p>';
-    let d; try { d = await api('blog/admin/posts'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    const posts = d.posts.filter(p => p.status === 'published').sort((a, b) => (b[aSort] || 0) - (a[aSort] || 0));
-    const sum = k => posts.reduce((s, p) => s + (p[k] || 0), 0);
-    main.innerHTML = `
+    let d; try { d = await api('admin/blogstats?days=' + bDays); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    bList = d;
+    const T = d.totals, secName = Object.fromEntries(d.sections.map(s => [s.slug, s.name]));
+    const secsOf = p => String(p.section || '').split(',').map(x => x.trim()).filter(Boolean);
+    const usedSecs = [...new Set(d.posts.flatMap(secsOf))].filter(s => secName[s]);
+    const SORTS = { views: ['📄 Просмотры', p => p.views], people: ['👥 Люди', p => p.people], entries: ['🚪 Извне', p => p.entries], trend: ['📈 Рост', p => p.views - p.prev],
+      avgSec: ['⏱ Время', p => p.avgSec ?? -1], donePct: ['✅ Дочитали', p => p.donePct ?? -1], likes: ['♥', p => p.likes], comments: ['💬', p => p.comments], total: ['👁 Всего', p => p.total], date: ['🗓 Новые', p => p.published_at || 0] };
+    const list = d.posts.filter(p => !bsSec || secsOf(p).includes(bsSec)).sort((a, b) => SORTS[bsSort][1](b) - SORTS[bsSort][1](a));
+    const quiet = d.posts.filter(p => !p.views && (p.published_at || 0) < Date.now() / 1000 - 14 * 86400);
+    const sum = a => a.reduce((s, r) => s + r.n, 0);
+    const head = [['views'], ['people'], ['entries'], ['avgSec'], ['donePct'], ['likes'], ['comments'], ['total']];
+    main.innerHTML = `${perBar(bDays, 'data-bdays')}
       <div class="adm-cards">
-        <div class="adm-card"><span class="adm-ic">👁</span><b>${n(sum('views'))}</b><span>просмотров всех статей</span></div>
-        <div class="adm-card"><span class="adm-ic">♥</span><b>${n(sum('likes'))}</b><span>лайков</span></div>
-        <div class="adm-card"><span class="adm-ic">💬</span><b>${n(sum('comments'))}</b><span>комментариев</span></div>
+        <div class="adm-card"><span class="adm-ic">📄</span><b>${n(T.views)}</b><span>просмотров статей</span>${delta(T.views, T.prev)}</div>
+        <div class="adm-card"><span class="adm-ic">👥</span><b>${n(T.people)}</b><span>человек читали</span></div>
+        <div class="adm-card"><span class="adm-ic">🚪</span><b>${n(T.entries)}</b><span>пришли сразу на статью</span><small>извне: поиск, соцсети, ссылки</small></div>
+        <div class="adm-card"><span class="adm-ic">⏱</span><b>${mmss(T.avgSec)}</b><span>в среднем читают</span></div>
+        <div class="adm-card"><span class="adm-ic">✅</span><b>${T.donePct == null ? '—' : T.donePct + '%'}</b><span>дочитали до конца</span></div>
+        <div class="adm-card"><span class="adm-ic">🗂</span><b>${n(T.list)}</b><span>раз открыли список блога</span></div>
       </div>
-      <p class="be-note">Посетители всего сайта (сколько людей, откуда, с каких устройств) — в разделе <a href="#visitors">👥 Посетители</a>.</p>
+      ${dayChart(d.series, d.days, 'Просмотры статей по дням')}
+      <div class="adm-cols">
+        <section class="adm-box"><h2>Откуда приходят на статьи</h2><p class="be-note">Заходы извне прямо на статью: поиск, соцсети, другие сайты. «Напрямую» — ссылка из мессенджера, закладка.</p>
+          ${bars(d.sources, r => `${SRC_IC[r.k] || '🌐'} ${esc(r.k)}`, sum(d.sources))}</section>
+        <section class="adm-box"><h2>Переходы по сайту</h2><p class="be-note">С какой страницы сайта открыли статью.</p>
+          ${bars(d.inner, r => esc(r.k), sum(d.inner))}</section>
+      </div>
       <section class="adm-box"><h2>Статьи</h2>
-        <table class="be-table adm-table"><thead><tr><th>Статья</th>${[['views', '👁 Просмотры'], ['likes', '♥ Лайки'], ['comments', '💬 Комментарии']].map(([k, l]) => `<th><button type="button" class="adm-sort" data-sort="${k}" aria-pressed="${aSort === k}">${l}${aSort === k ? ' ↓' : ''}</button></th>`).join('')}<th></th></tr></thead>
-        <tbody>${posts.map(p => `<tr><td><a href="/ru/blog/${esc(p.slug)}/" target="_blank">${esc(title(p))}</a></td><td>${n(p.views)}</td><td>${n(p.likes)}</td><td>${n(p.comments)}</td><td><a href="/blog-editor/#${p.id}" title="Редактировать">✎</a></td></tr>`).join('')}</tbody></table></section>`;
-    main.querySelectorAll('[data-sort]').forEach(b => b.onclick = () => { aSort = b.dataset.sort; analytics(); });
+        <div class="adm-filter">${usedSecs.length ? `<label>Раздел: <select data-bsec><option value="">все разделы</option>${usedSecs.map(s => `<option value="${esc(s)}"${bsSec === s ? ' selected' : ''}>${esc(secName[s])}</option>`).join('')}</select></label>` : ''}
+          <label>Сортировка: <select data-bsort>${Object.entries(SORTS).map(([k, [l]]) => `<option value="${k}"${bsSort === k ? ' selected' : ''}>${l}</option>`).join('')}</select></label></div>
+        <p class="be-note">За выбранный период. «Извне» — пришли сразу на статью; «👁 Всего» — счётчик за всё время. Нажмите на название — откроется всё о статье.</p>
+        <table class="be-table adm-table adm-bstat"><thead><tr><th>Статья</th>${head.map(([k]) => `<th><button type="button" class="adm-sort" data-bs="${k}" aria-pressed="${bsSort === k}">${SORTS[k][0]}${bsSort === k ? ' ↓' : ''}</button></th>`).join('')}<th>Главный источник</th></tr></thead>
+        <tbody>${list.map(p => `<tr><td data-l="Статья"><button type="button" class="bc-link adm-bpost" data-bpost="${p.id}">${esc(title(p))}</button><br><small>${p.published_at ? new Date(p.published_at * 1000).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}${secsOf(p).filter(s => secName[s]).map(s => ' · ' + esc(secName[s])).join('')}${p.members ? ' · 🔒' : ''}</small></td>
+          <td data-l="Просмотры"><b>${n(p.views)}</b> ${trend(p.views, p.prev)}</td><td data-l="Люди">${n(p.people)}</td><td data-l="Извне">${n(p.entries)}</td>
+          <td data-l="Время">${mmss(p.avgSec)}</td><td data-l="Дочитали">${p.donePct == null ? '—' : p.donePct + '%'}</td><td data-l="♥">${n(p.likes)}</td><td data-l="💬">${n(p.comments)}</td><td data-l="Всего">${n(p.total)}</td>
+          <td data-l="Источник">${p.top ? `${SRC_IC[p.top.k] || '🌐'} ${esc(p.top.k)} <small>${n(p.top.n)}</small>` : '—'}</td></tr>`).join('') || '<tr><td colspan="10">Статей пока нет.</td></tr>'}</tbody></table></section>
+      ${quiet.length ? `<section class="adm-box"><h2>😴 Не открывали за этот период</h2><p class="be-note">Статьи старше двух недель без единого просмотра. Можно поделиться ими в соцсетях, обновить название или картинку, поставить ссылку из свежей статьи.</p>
+        <ul class="adm-list">${quiet.map(p => `<li><button type="button" class="bc-link" data-bpost="${p.id}">${esc(title(p))}</button> <small>👁 всего ${n(p.total)}</small> <a href="/blog-editor/#${p.id}" title="Редактировать">✎</a></li>`).join('')}</ul></section>` : ''}
+      ${readNote(d.first)}`;
+    main.querySelectorAll('[data-bdays]').forEach(b => b.onclick = () => { bDays = Number(b.dataset.bdays); blogstats(); });
+    main.querySelectorAll('[data-bs]').forEach(b => b.onclick = () => { bsSort = b.dataset.bs; blogstats(); });
+    const ss = main.querySelector('[data-bsort]'); if (ss) ss.onchange = () => { bsSort = ss.value; blogstats(); };
+    const sc = main.querySelector('[data-bsec]'); if (sc) sc.onchange = () => { bsSec = sc.value; blogstats(); };
+    main.querySelectorAll('[data-bpost]').forEach(b => b.onclick = () => { bPost = Number(b.dataset.bpost); blogstats(); scrollTo(0, 0); });
+    chartTips();
+  }
+  async function blogPost() {
+    main.innerHTML = '<p class="be-note">Загрузка…</p>';
+    let d; try { d = await api(`admin/blogstats?days=${bDays}&post=${bPost}`); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    if (d.error) { bPost = 0; return blogstats(); }
+    const P = d.post, T = d.totals, sum = a => a.reduce((s, r) => s + r.n, 0);
+    const bySlug = {}; ((bList && bList.posts) || []).forEach(p => { bySlug[p.slug] = p; });
+    const pathName = p => { const m = /^\/(?:(?:ru|lv)\/)?blog\/([^/]+)\/$/.exec(p); return m && bySlug[m[1]] ? '📰 ' + title(bySlug[m[1]]) : pageName(p); };
+    const lang = { RU: 'ru', LV: 'lv', EN: 'en' };
+    main.innerHTML = `<p class="adm-quick"><button type="button" class="pill-btn" data-bback>← Все статьи</button> <a class="pill-btn" href="/ru/blog/${esc(P.slug)}/" target="_blank">Открыть статью ↗</a> <a class="pill-btn" href="/blog-editor/#${P.id}">✎ Редактировать</a></p>
+      <h2 class="adm-bh">${esc(title(P))}</h2>
+      ${perBar(bDays, 'data-bdays')}
+      <div class="adm-cards">
+        <div class="adm-card"><span class="adm-ic">📄</span><b>${n(T.views)}</b><span>просмотров</span>${delta(T.views, T.prev)}</div>
+        <div class="adm-card"><span class="adm-ic">👥</span><b>${n(T.people)}</b><span>человек</span></div>
+        <div class="adm-card"><span class="adm-ic">🚪</span><b>${n(T.entries)}</b><span>пришли извне</span></div>
+        <div class="adm-card"><span class="adm-ic">⏱</span><b>${mmss(T.avgSec)}</b><span>в среднем читают</span></div>
+        <div class="adm-card"><span class="adm-ic">✅</span><b>${T.donePct == null ? '—' : T.donePct + '%'}</b><span>дочитали</span></div>
+        <div class="adm-card"><span class="adm-ic">👁</span><b>${n(P.total)}</b><span>просмотров за всё время</span><small>♥ ${n(P.likes)} · 💬 ${n(P.comments)}</small></div>
+      </div>
+      ${dayChart(d.series, d.days, 'Просмотры по дням')}
+      <div class="adm-cols">
+        <section class="adm-box"><h2>Откуда пришли</h2>${bars(d.sources, r => `${SRC_IC[r.k] || '🌐'} ${esc(r.k)}`, sum(d.sources))}
+          ${d.refs.length ? `<h3>Сайты-ссылки</h3>${bars(d.refs, r => esc(r.k), sum(d.refs))}` : ''}
+          ${d.campaigns.length ? `<h3>Ссылки с метками</h3>${bars(d.campaigns, r => esc(r.k), sum(d.campaigns))}` : ''}</section>
+        <section class="adm-box"><h2>Переходы по сайту</h2><p class="be-note">С какой страницы сайта открыли статью.</p>${bars(d.inner, r => esc(r.k), sum(d.inner))}
+          <h3>Куда пошли после статьи</h3>${bars(d.next, r => `<a href="${esc(r.k)}" target="_blank">${esc(pathName(r.k))}</a>`, sum(d.next))}</section>
+      </div>
+      <div class="adm-cols">
+        <section class="adm-box"><h2>Докуда дочитали</h2>${T.reads ? bars(d.depth, r => esc(r.k), T.reads) : '<p class="be-note">Пока нет данных.</p>'}
+          <h3>Сколько времени читали</h3>${T.reads ? bars(d.time, r => esc(r.k), T.reads) : '<p class="be-note">Пока нет данных.</p>'}</section>
+        <section class="adm-box"><h2>Язык статьи</h2>${bars(d.langs, r => esc(r.k) + (P['t_' + lang[r.k]] ? '' : ' <small>(перевода нет — показан другой язык)</small>'), sum(d.langs))}
+          <h3>Устройства</h3>${bars(d.devices, r => `${DEV_IC[r.k] || ''} ${esc(r.k)}`, sum(d.devices))}
+          <h3>Страны</h3>${bars(d.countries, r => `${flag(r.k)} ${esc(regionName(r.k))}`, sum(d.countries))}</section>
+      </div>
+      ${readNote(bList && bList.first)}`;
+    main.querySelector('[data-bback]').onclick = () => { bPost = 0; blogstats(); };
+    main.querySelectorAll('[data-bdays]').forEach(b => b.onclick = () => { bDays = Number(b.dataset.bdays); blogPost(); });
+    chartTips();
   }
 
   // ---------- правки блоков сайта (режим «✏️ Править страницу») ----------
