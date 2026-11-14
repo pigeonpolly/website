@@ -1,0 +1,382 @@
+{
+"mushroom_house": [
+{
+"hex": "#C9453B",
+"en": "Cherry",
+"ru": "\u0412\u0438\u0448\u043d\u044f",
+"lv": "\u0136irsis"
+},
+{
+"hex": "#BF8E4F",
+"en": "Ochre",
+"ru": "\u041e\u0445\u0440\u0430",
+"lv": "Okers"
+},
+{
+"hex": "#52ACC0",
+"en": "Summer Sky",
+"ru": "\u041b\u0435\u0442\u043d\u0435\u0435 \u043d\u0435\u0431\u043e",
+"lv": "Vasaras debesis"
+},
+{
+"hex": "#2B2B27",
+"en": "Charcoal",
+"ru": "\u0423\u0433\u043e\u043b\u044c",
+"lv": "Ogle"
+},
+{
+"hex": "#2F5862",
+"en": "Deep Teal",
+"ru": "\u0413\u043b\u0443\u0431\u043e\u043a\u0430\u044f \u0431\u0438\u0440\u044e\u0437\u0430",
+"lv": "Dzi\u013ci tirk\u012bzs"
+},
+{
+"hex": "#BCDCE4",
+"en": "Duck Egg",
+"ru": "\u0423\u0442\u0438\u043d\u043e\u0435 \u044f\u0439\u0446\u043e",
+"lv": "P\u012bles ola"
+}
+],
+"impasto_flowers": [
+{
+"hex": "#D74A42",
+"en": "Tomato",
+"ru": "\u0422\u043e\u043c\u0430\u0442",
+"lv": "Tom\u0101ts"
+},
+{
+"hex": "#D77A9B",
+"en": "Jelly Pink",
+"ru": "\u0416\u0435\u043b\u0435\u0439\u043d\u044b\u0439 \u0440\u043e\u0437\u043e\u0432\u044b\u0439",
+"lv": "\u017delejas roz\u0101"
+},
+{
+"hex": "#4E7546",
+"en": "Moss",
+"ru": "\u041c\u043e\u0445",
+"lv": "S\u016bna"
+},
+{
+"hex": "#9D6D73",
+"en": "Mauve",
+"ru": "\u041c\u0430\u043b\u044c\u0432\u0430",
+"lv": "Malva"
+},
+{
+"hex": "#CFA2A9",
+"en": "Dusty Rose",
+"ru": "\u041f\u044b\u043b\u044c\u043d\u0430\u044f \u0440\u043e\u0437\u0430",
+"lv": "Putek\u013cain\u0101 roze"
+},
+{
+"hex": "#D6D9D8",
+"en": "Ice",
+"ru": "\u041b\u0451\u0434",
+"lv": "Ledus"
+}
+],
+"cupcake": [
+{
+"hex": "#BB3B25",
+"en": "Tomato",
+"ru": "\u0422\u043e\u043c\u0430\u0442",
+"lv": "Tom\u0101ts"
+},
+{
+"hex": "#D58F4F",
+"en": "Ochre",
+"ru": "\u041e\u0445\u0440\u0430",
+"lv": "Okers"
+},
+{
+"hex": "#28858D",
+"en": "Teal",
+"ru": "\u0411\u0438\u0440\u044e\u0437\u0430",
+"lv": "Zilganza\u013c\u0161"
+},
+{
+"hex": "#0F1419",
+"en": "Ink Black",
+"ru": "\u0427\u0435\u0440\u043d\u0438\u043b\u0430",
+"lv": "Tinte"
+},
+{
+"hex": "#1B4D4F",
+"en": "Deep Teal",
+"ru": "\u0413\u043b\u0443\u0431\u043e\u043a\u0430\u044f \u0431\u0438\u0440\u044e\u0437\u0430",
+"lv": "Dzi\u013ci tirk\u012bzs"
+},
+{
+"hex": "#E0CAB7",
+"en": "Oat Milk",
+"ru": "\u041e\u0432\u0441\u044f\u043d\u043e\u0435 \u043c\u043e\u043b\u043e\u043a\u043e",
+"lv": "Auzu piens"
+}
+],
+"beetle": [
+{
+"hex": "#80351D",
+"en": "Rust",
+"ru": "\u0420\u0436\u0430\u0432\u0447\u0438\u043d\u0430",
+"lv": "R\u016bsa"
+},
+{
+"hex": "#D89E6A",
+"en": "Biscuit",
+"ru": "\u041f\u0435\u0447\u0435\u043d\u044c\u0435",
+"lv": "Cepums"
+},
+{
+"hex": "#1F1823",
+"en": "Ink Black",
+"ru": "\u0427\u0435\u0440\u043d\u0438\u043b\u0430",
+"lv": "Tinte"
+},
+{
+"hex": "#675D5F",
+"en": "Smoke",
+"ru": "\u0414\u044b\u043c",
+"lv": "D\u016bmi"
+},
+{
+"hex": "#96634C",
+"en": "Cinnamon",
+"ru": "\u041a\u043e\u0440\u0438\u0446\u0430",
+"lv": "Kan\u0113lis"
+},
+{
+"hex": "#D9C0A3",
+"en": "Oat Milk",
+"ru": "\u041e\u0432\u0441\u044f\u043d\u043e\u0435 \u043c\u043e\u043b\u043e\u043a\u043e",
+"lv": "Auzu piens"
+}
+],
+"birdhouse": [
+{
+"hex": "#C48761",
+"en": "Clay",
+"ru": "\u0413\u043b\u0438\u043d\u0430",
+"lv": "M\u0101ls"
+},
+{
+"hex": "#7E0F15",
+"en": "Cherry",
+"ru": "\u0412\u0438\u0448\u043d\u044f",
+"lv": "\u0136irsis"
+},
+{
+"hex": "#6D7D3D",
+"en": "Moss",
+"ru": "\u041c\u043e\u0445",
+"lv": "S\u016bna"
+},
+{
+"hex": "#725A3B",
+"en": "Bark",
+"ru": "\u041a\u043e\u0440\u0430",
+"lv": "Miza"
+},
+{
+"hex": "#A38E73",
+"en": "Driftwood",
+"ru": "\u041f\u043b\u0430\u0432\u043d\u0438\u043a",
+"lv": "Dreifkoks"
+},
+{
+"hex": "#CFCDC1",
+"en": "Linen",
+"ru": "\u041b\u0451\u043d",
+"lv": "Lins"
+}
+],
+"winter_field": [
+{
+"hex": "#B57F4C",
+"en": "Toast",
+"ru": "\u0422\u043e\u0441\u0442",
+"lv": "Grauzdi\u0146\u0161"
+},
+{
+"hex": "#1F1A11",
+"en": "Ink Black",
+"ru": "\u0427\u0435\u0440\u043d\u0438\u043b\u0430",
+"lv": "Tinte"
+},
+{
+"hex": "#534733",
+"en": "Bark",
+"ru": "\u041a\u043e\u0440\u0430",
+"lv": "Miza"
+},
+{
+"hex": "#81725D",
+"en": "Mushroom",
+"ru": "\u0413\u0440\u0438\u0431\u043d\u043e\u0439",
+"lv": "S\u0113\u0146u"
+},
+{
+"hex": "#A29987",
+"en": "Driftwood",
+"ru": "\u041f\u043b\u0430\u0432\u043d\u0438\u043a",
+"lv": "Dreifkoks"
+},
+{
+"hex": "#E5DED3",
+"en": "Linen",
+"ru": "\u041b\u0451\u043d",
+"lv": "Lins"
+}
+],
+"cookies": [
+{
+"hex": "#AE3D2C",
+"en": "Cherry",
+"ru": "\u0412\u0438\u0448\u043d\u044f",
+"lv": "\u0136irsis"
+},
+{
+"hex": "#D19A6B",
+"en": "Biscuit",
+"ru": "\u041f\u0435\u0447\u0435\u043d\u044c\u0435",
+"lv": "Cepums"
+},
+{
+"hex": "#181818",
+"en": "Ink Black",
+"ru": "\u0427\u0435\u0440\u043d\u0438\u043b\u0430",
+"lv": "Tinte"
+},
+{
+"hex": "#4B332B",
+"en": "Coffee Bean",
+"ru": "\u041a\u043e\u0444\u0435\u0439\u043d\u043e\u0435 \u0437\u0435\u0440\u043d\u043e",
+"lv": "Kafijas pupi\u0146a"
+},
+{
+"hex": "#6D7673",
+"en": "Smoke",
+"ru": "\u0414\u044b\u043c",
+"lv": "D\u016bmi"
+},
+{
+"hex": "#E5D0C1",
+"en": "Linen",
+"ru": "\u041b\u0451\u043d",
+"lv": "Lins"
+}
+],
+"apple_creature": [
+{
+"hex": "#DDD657",
+"en": "Lemon",
+"ru": "\u041b\u0438\u043c\u043e\u043d",
+"lv": "Citrons"
+},
+{
+"hex": "#B56F41",
+"en": "Copper",
+"ru": "\u041c\u0435\u0434\u044c",
+"lv": "Var\u0161"
+},
+{
+"hex": "#8B8548",
+"en": "Olive",
+"ru": "\u041e\u043b\u0438\u0432\u0430",
+"lv": "Ol\u012bva"
+},
+{
+"hex": "#5F402E",
+"en": "Cocoa",
+"ru": "\u041a\u0430\u043a\u0430\u043e",
+"lv": "Kakao"
+},
+{
+"hex": "#938474",
+"en": "Mushroom",
+"ru": "\u0413\u0440\u0438\u0431\u043d\u043e\u0439",
+"lv": "S\u0113\u0146u"
+},
+{
+"hex": "#E5D5BB",
+"en": "Oat Milk",
+"ru": "\u041e\u0432\u0441\u044f\u043d\u043e\u0435 \u043c\u043e\u043b\u043e\u043a\u043e",
+"lv": "Auzu piens"
+}
+],
+"pbj": [
+{
+"hex": "#8E1522",
+"en": "Cherry",
+"ru": "\u0412\u0438\u0448\u043d\u044f",
+"lv": "\u0136irsis"
+},
+{
+"hex": "#BD7119",
+"en": "Honey",
+"ru": "\u041c\u0451\u0434",
+"lv": "Medus"
+},
+{
+"hex": "#3D7363",
+"en": "Fir Tree",
+"ru": "\u0415\u043b\u044c",
+"lv": "Egle"
+},
+{
+"hex": "#2C1D1A",
+"en": "Coffee Bean",
+"ru": "\u041a\u043e\u0444\u0435\u0439\u043d\u043e\u0435 \u0437\u0435\u0440\u043d\u043e",
+"lv": "Kafijas pupi\u0146a"
+},
+{
+"hex": "#E1CEA6",
+"en": "Oat Milk",
+"ru": "\u041e\u0432\u0441\u044f\u043d\u043e\u0435 \u043c\u043e\u043b\u043e\u043a\u043e",
+"lv": "Auzu piens"
+},
+{
+"hex": "#D3DED9",
+"en": "Duck Egg",
+"ru": "\u0423\u0442\u0438\u043d\u043e\u0435 \u044f\u0439\u0446\u043e",
+"lv": "P\u012bles ola"
+}
+],
+"field_acrylic": [
+{
+"hex": "#3B8618",
+"en": "Potion Green",
+"ru": "\u0417\u0435\u043b\u044c\u0435",
+"lv": "Dzira"
+},
+{
+"hex": "#276ED7",
+"en": "Cobalt",
+"ru": "\u041a\u043e\u0431\u0430\u043b\u044c\u0442",
+"lv": "Kobalts"
+},
+{
+"hex": "#79430B",
+"en": "Cinnamon",
+"ru": "\u041a\u043e\u0440\u0438\u0446\u0430",
+"lv": "Kan\u0113lis"
+},
+{
+"hex": "#0D110C",
+"en": "Ink Black",
+"ru": "\u0427\u0435\u0440\u043d\u0438\u043b\u0430",
+"lv": "Tinte"
+},
+{
+"hex": "#1A452D",
+"en": "Bottle Green",
+"ru": "\u0411\u0443\u0442\u044b\u043b\u043e\u0447\u043d\u044b\u0439",
+"lv": "Pude\u013cza\u013c\u0161"
+},
+{
+"hex": "#83C2E0",
+"en": "Sky",
+"ru": "\u041d\u0435\u0431\u043e",
+"lv": "Debesis"
+}
+]
+}
