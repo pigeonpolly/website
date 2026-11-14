@@ -1,231 +1,263 @@
-// Кабинет → «📣 Посты» (admin.js открывает PPPostsAdmin.mount(main)): готовые картинки и подписи для соцсетей (docs/growth.md).
-// Всё рисуется в браузере из того, что уже есть на сайте, поэтому всегда свежее: тема дня (ChallengeTheme — план из D1),
-// темы на месяц, палитра (/assets/palettes.json), дело Титоса (titos-cases.json + названия из /api/titos).
-// Формат: 4:5 Instagram/Threads, 2:3 Pinterest, 9:16 сторис/TikTok. Язык картинки и подписи — EN/RU/LV.
-// Ссылка в подписи — с utm_source площадки (кабинет → 👥 Посетители покажет, откуда пришли).
+// Кабинет → «🖼 Пины» (admin.js открывает PPPostsAdmin.mount(main); раньше тут был генератор постов — docs/retired.md).
+// Одна карточка: тип пина → дизайн (10 вариантов в стиле пинов №429–475: коричневый фон, голубой Caveat, палитры как p01–p59)
+// → фото (своё или из базы сайта /assets/pin-base.json) → тексты (✨ Gemini: POST /api/admin/pin-text) → «⬇ Скачать JPG» 1000×1500
+// и поля для Pinterest (Title, Description, Link, Alt text, Topics) с кнопками «копировать». Всё на английском.
 (function () {
-  const C = { ink: '#2B1A51', cream: '#FFFDF8', peach: '#F0A987', gold: '#E9A93B', lilac: '#7F81BF', soft: '#8A7FA8', paper: '#F4F0FA' };
-  const SERIF = '"Fraunces", Georgia, serif', SANS = '"Karla", system-ui, sans-serif';
-  const SIZES = { ig: [1080, 1350, '4:5 · Instagram, Threads, Facebook'], pin: [1000, 1500, '2:3 · Pinterest'], story: [1080, 1920, '9:16 · сторис, TikTok, Shorts'] };
-  const PLAT = { instagram: 'Instagram', threads: 'Threads', pinterest: 'Pinterest', tiktok: 'TikTok', facebook: 'Facebook' };
-  const LANGS = ['en', 'ru', 'lv'], SITE = 'https://www.pigeonpolly.com';
+  const W = 1000, H = 1500, SITE = 'https://www.pigeonpolly.com';
+  const C = { bg: '#2E2521', blue: '#93AFCC', cream: '#F1ECE4', tan: '#C9A27A', mut: '#B9AEA4', pal: '#2A1B1E', gold: '#E0A13A', ink: '#2E2521', paper: '#F4EDE3' };
+  const FR = '"Fraunces", Georgia, serif', KA = '"Karla", system-ui, sans-serif', CV = '"Caveat", cursive';
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
-  const S = { lang: 'en', size: 'ig', plat: 'instagram', day: null, month: 0, pal: 0, cas: 0 };
-  try { Object.assign(S, JSON.parse(localStorage.getItem('pp_posts') || '{}'), { day: null }); } catch (e) { /* нет хранилища */ }
-  const keep = () => { try { const { lang, size, plat } = S; localStorage.setItem('pp_posts', JSON.stringify({ lang, size, plat })); } catch (e) { /* нет хранилища */ } };
-  const Li = () => LANGS.indexOf(S.lang);
-  const pre = () => S.lang === 'en' ? '' : '/' + S.lang;
-  const link = (path, kind) => `${SITE}${pre()}${path}?utm_source=${S.plat}&utm_campaign=post-${kind}`;
-  const short = path => `pigeonpolly.com${pre()}${path}`.replace(/\/$/, '');
+
+  // ---------- типы и дизайны ----------
+  const TYPES = [
+    { id: 'art', ic: '🖼', name: 'Арт крупно', n: 1, about: 'Одна работа во всей красе.' },
+    { id: 'palette', ic: '🎨', name: 'Палитра', n: 1, about: 'Цвета из работы с HEX — лучше всего заходят.' },
+    { id: 'meme', ic: '😄', name: 'Мем', n: 1, about: 'Узнаваемая шутка про художников.' },
+    { id: 'read', ic: '✍️', name: 'Статья / урок', n: 1, about: 'Ведёт на статью блога или видео.' },
+    { id: 'prompts', ic: '📝', name: 'Темы для рисования', n: 2, about: 'Список идей «что нарисовать».' },
+    { id: 'grid', ic: '🧩', name: 'Серия / процесс', n: 4, about: '2–6 фото: процесс по шагам или серия работ.' },
+  ];
+  const DESIGNS = [
+    { id: 'full', type: 'art', name: 'Во весь пин' },
+    { id: 'closer', type: 'art', name: 'Вся работа + деталь' },
+    { id: 'paldark', type: 'palette', name: 'Тёмная палитра' },
+    { id: 'palcream', type: 'palette', name: 'Светлая палитра' },
+    { id: 'memewhite', type: 'meme', name: 'Белый мем' },
+    { id: 'memedark', type: 'meme', name: 'Мем-записка' },
+    { id: 'read', type: 'read', name: 'Статья блога' },
+    { id: 'video', type: 'read', name: 'Видеоурок ▶' },
+    { id: 'prompts', type: 'prompts', name: 'Список тем' },
+    { id: 'grid', type: 'grid', name: 'Сетка / шаги' },
+  ];
+  const LINKS = [['/', 'Главная'], ['/blog/', 'Блог'], ['/learn/', 'Уроки'], ['/ink/', 'Курс туши'], ['/palettes/', 'Палитры'], ['/challenge/', 'Челлендж'],
+    ['/art-portfolio/', 'Портфолио'], ['/art-portfolio/bird/', 'Полли'], ['/art-portfolio/snail/', 'Мистер Чу'], ['/art-portfolio/sketchbook/', 'Скетчбук'],
+    ['/art-portfolio/halloween/', 'Хеллоуин'], ['/titos/', 'Титос'], ['/books/', 'Книги']];
+  const DEF = { // тексты по умолчанию — пока не нажали ✨
+    art: { kicker: '', headline: 'A small painting, a big mood', hand: 'A small painting, a big mood', sub: 'Watercolor · Alina Otkinska · Pigeon Polly Art Lab' },
+    palette: { name: 'Cozy Studio', headline: 'Cozy Studio', sub: 'from my painting' },
+    meme: { headline: 'Me: just one quick sketch. Also me, four hours later:', hand: 'worth it' },
+    read: { kicker: 'on the blog ✎', headline: 'How to find your *signature style*', hand: 'A simple framework that helped me when I was starting out.', tag: 'free video lesson' },
+    prompts: { kicker: 'draw this week', headline: 'Tiny things *worth painting*', items: ['a cup of tea', 'your keys', 'a window at night', 'a houseplant', 'old sneakers', 'a jar of jam', 'your pet asleep', 'one red apple'] },
+    grid: { kicker: 'from start to finish', headline: 'From pencil *to paint*', items: ['pencil', 'ink', 'color', 'done', '', ''] },
+  };
+
+  // ---------- состояние ----------
+  const S = { type: 'art', design: 'full', photos: [], f: JSON.parse(JSON.stringify(DEF.art)), cols: null, link: '/art-portfolio/', custom: '', hint: '', pin: null };
+  const photo = i => S.photos[i] || null;
 
   // ---------- загрузка ----------
   const script = src => new Promise(ok => { if (document.querySelector(`script[src="${src}"]`)) return ok(); const s = document.createElement('script'); s.src = src; s.onload = s.onerror = ok; document.head.appendChild(s); });
-  const img = src => new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; });
-  let data = null;
+  const loadImg = src => new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; });
+  let base = null, fontsOk = false;
   async function load() {
-    if (data) return data;
-    for (const s of ['/assets/challenge-data.js', '/assets/extra-palettes.js', '/api/extra-palettes.js', '/assets/challenge-theme.js']) await script(s);
-    const [pal, tc, logo] = await Promise.all([fetch('/assets/palettes.json').then(r => r.json()).catch(() => []), fetch('/assets/titos-cases.json').then(r => r.json()).catch(() => ({ cases: [] })), img('/assets/logo.png?v=3')]);
-    const titles = {};
-    for (const l of LANGS) titles[l] = await fetch('/api/titos?lang=' + l, { credentials: 'same-origin' }).then(r => r.json()).then(d => Object.fromEntries((d.cases || []).map(c => [c.n, c.title]))).catch(() => ({}));
-    data = { pal: pal.filter(p => p.thumb && p.colors && p.colors.length), cases: (tc.cases || []).filter(c => (c.scenes || []).some(s => s.img)), titles, logo };
-    try { await document.fonts.load(`600 40px ${SERIF}`); await document.fonts.load(`400 40px ${SANS}`); await document.fonts.load(`700 40px ${SANS}`); } catch (e) { /* без шрифтов — системные */ }
-    return data;
-  }
-
-  // ---------- рисование ----------
-  function fit(x, text, font, max, start, min) { // самый крупный кегль, при котором строка влезает
-    let s = start; for (; s > min; s -= 2) { x.font = font.replace('#', s); if (x.measureText(text).width <= max) break; }
-    return s;
-  }
-  function wrap(x, text, max) { // строки по ширине
-    const out = []; let line = '';
-    for (const w of String(text).split(/\s+/)) { const t = line ? line + ' ' + w : w; if (x.measureText(t).width > max && line) { out.push(line); line = w; } else line = t; }
-    if (line) out.push(line); return out;
-  }
-  function cover(x, im, X, Y, W, H, pixel) {
-    if (!im) { x.fillStyle = C.paper; x.fillRect(X, Y, W, H); return; }
-    const k = Math.max(W / im.width, H / im.height), w = im.width * k, h = im.height * k;
-    x.save(); x.beginPath(); x.rect(X, Y, W, H); x.clip(); x.imageSmoothingEnabled = !pixel;
-    x.drawImage(im, X + (W - w) / 2, Y + (H - h) / 2, w, h); x.restore();
-  }
-  function frame(cv, label) { // фон, шапка с логотипом и подписью, нижняя полоса — возвращает рабочую область
-    const [W, H] = SIZES[S.size], x = cv.getContext('2d'); cv.width = W; cv.height = H;
-    x.fillStyle = C.cream; x.fillRect(0, 0, W, H);
-    const top = S.size === 'story' ? 150 : 40;
-    if (data.logo) x.drawImage(data.logo, 60, top, 72, 72);
-    x.fillStyle = C.ink; x.font = `600 34px ${SERIF}`; x.textBaseline = 'middle'; x.fillText('Pigeon Polly Art Lab', 150, top + 36);
-    x.fillStyle = C.soft; x.font = `700 26px ${SANS}`; x.textAlign = 'right'; x.fillText(label.toUpperCase(), W - 60, top + 36); x.textAlign = 'left';
-    return { x, W, H, y0: top + 120, y1: H - (S.size === 'story' ? 430 : 140) }; // y1 — над нижней полосой (footer)
-  }
-  function footer(f, text) {
-    const { x, W, H } = f, h = S.size === 'story' ? 150 : 110, y = H - (S.size === 'story' ? 260 : 0) - h;
-    x.fillStyle = C.ink; x.fillRect(0, y, W, h);
-    x.fillStyle = C.cream; x.textAlign = 'center'; x.textBaseline = 'middle';
-    fit(x, text, `700 #px ${SANS}`, W - 120, 40, 22); x.fillText(text, W / 2, y + h / 2); x.textAlign = 'left';
-  }
-  function swatches(f, cols, y, names) { // кружки цветов с подписями, по центру
-    const { x, W } = f, n = cols.length; if (!n) return y;
-    const r = Math.min(70, (W - 120) / n / 2 - 14), step = (W - 120) / n;
-    cols.forEach((c, i) => {
-      const cx = 60 + step * (i + .5);
-      x.beginPath(); x.arc(cx, y + r, r, 0, Math.PI * 2); x.fillStyle = c.hex; x.fill(); x.lineWidth = 4; x.strokeStyle = '#fff'; x.stroke();
-      if (names) { x.fillStyle = C.ink; x.textAlign = 'center'; x.textBaseline = 'top'; const nm = c.n ? c.n[Li()] || c.n[0] : ''; fit(x, nm, `500 #px ${SANS}`, step - 12, 28, 16); x.fillText(nm, cx, y + 2 * r + 14); x.textAlign = 'left'; }
-    });
-    return y + 2 * r + (names ? 60 : 0);
-  }
-  const fmtDay = d => d.toLocaleDateString(['en-GB', 'ru-RU', 'lv-LV'][Li()], { day: 'numeric', month: 'long' });
-  const T = (en, ru, lv) => [en, ru, lv][Li()];
-
-  // ---------- 1. тема дня ----------
-  const dayOf = () => { const d = S.day ? new Date(S.day + 'T12:00') : new Date(); d.setHours(12); return d; };
-  function theme(cv) {
-    const d = dayOf(), th = window.ChallengeTheme.themeFor(d, Li());
-    const f = frame(cv, T('Drawing prompt', 'Тема дня', 'Dienas tēma') + ' · ' + fmtDay(d)), { x, W } = f;
-    const mid = (f.y0 + f.y1) / 2, cols = (th.colors || []).slice(0, 6);
-    x.fillStyle = C.soft; x.textAlign = 'center'; x.textBaseline = 'alphabetic'; x.font = `italic 400 44px ${SERIF}`;
-    x.fillText(T('Today, draw…', 'Сегодня рисуем…', 'Šodien zīmējam…'), W / 2, mid - 250);
-    x.fillStyle = C.ink; const sz = fit(x, th.subject, `600 #px ${SERIF}`, W - 120, 150, 60);
-    const lines = sz <= 62 ? wrap(x, th.subject, W - 120) : [th.subject];
-    lines.slice(0, 3).forEach((l, i) => x.fillText(l, W / 2, mid - 90 + i * sz * 1.05));
-    let y = mid - 40 + (Math.min(lines.length, 3) - 1) * sz;
-    if (th.twist) { x.fillStyle = C.lilac; x.font = `italic 400 36px ${SERIF}`; wrap(x, th.twist, W - 160).slice(0, 2).forEach((l, i) => x.fillText(l, W / 2, y + 30 + i * 46)); y += 40 + 46 * Math.min(2, wrap(x, th.twist, W - 160).length); }
-    x.textAlign = 'left';
-    y = swatches(f, cols, y + 40, true);
-    x.fillStyle = C.soft; x.textAlign = 'center'; x.font = `500 32px ${SANS}`;
-    x.fillText(`⏱ ${th.time || 10} ${T('min', 'мин', 'min')} · ${T('a new theme every day', 'новая тема каждый день', 'jauna tēma katru dienu')}`, W / 2, y + 30); x.textAlign = 'left';
-    footer(f, T('Draw with us → ', 'Рисуй с нами → ', 'Zīmē ar mums → ') + short('/challenge/'));
-    const names = cols.map(c => c.n ? c.n[Li()] || c.n[0] : c.hex).join(', ');
-    return { file: `theme-${ChallengeTheme.keyOf(d)}`, loading: th.loading, text: T(
-      `Today’s drawing prompt: ${th.subject} 🎨\n${names ? 'Colors: ' + names + '\n' : ''}${th.twist ? th.twist + '\n' : ''}\nDraw it in ${th.time || 10} minutes and post it on the wall — your first drawing hatches your own pixel bird 🐣\n${S.plat === 'instagram' ? 'Link in bio' : link('/challenge/', 'theme')}\n\n#drawingprompt #dailydrawing #drawingchallenge #sketchbook #artprompt #cozyart`,
-      `Тема дня: ${th.subject} 🎨\n${names ? 'Цвета: ' + names + '\n' : ''}${th.twist ? th.twist + '\n' : ''}\nНарисуй за ${th.time || 10} минут и выложи на стену — за первый рисунок вылупится твоя пиксельная птичка 🐣\n${S.plat === 'instagram' ? 'Ссылка в профиле' : link('/challenge/', 'theme')}\n\n#темадня #рисуемкаждыйдень #челлендж #скетчбук #идеидлярисования`,
-      `Dienas tēma: ${th.subject} 🎨\n${names ? 'Krāsas: ' + names + '\n' : ''}${th.twist ? th.twist + '\n' : ''}\nUzzīmē ${th.time || 10} minūtēs un ieliec sienā — par pirmo zīmējumu izšķilsies tavs pikseļu putniņš 🐣\n${S.plat === 'instagram' ? 'Saite profilā' : link('/challenge/', 'theme')}\n\n#zīmēšana #ikdienaszīmējums #skiču_burtnīca #māksla`) };
-  }
-
-  // ---------- 2. темы на месяц ----------
-  function month(cv) {
-    const now = new Date(), y = now.getFullYear(), m = now.getMonth() + S.month, first = new Date(y, m, 1, 12), days = new Date(y, m + 1, 0).getDate();
-    const mName = first.toLocaleString(['en-GB', 'ru-RU', 'lv-LV'][Li()], { month: 'long' }), mCap = mName[0].toUpperCase() + mName.slice(1);
-    const f = frame(cv, T('Save this list', 'Сохрани список', 'Saglabā sarakstu')), { x, W } = f;
-    x.fillStyle = C.ink; x.textAlign = 'center'; x.textBaseline = 'alphabetic';
-    const title = T(`${mCap} drawing prompts`, `Темы для рисования: ${mName}`, `Zīmēšanas tēmas: ${mName}`);
-    fit(x, title, `600 #px ${SERIF}`, W - 120, 76, 40); x.fillText(title, W / 2, f.y0 + 60);
-    x.fillStyle = C.soft; x.font = `italic 400 32px ${SERIF}`; x.fillText(T('one small theme a day', 'одна маленькая тема в день', 'viena maza tēma dienā'), W / 2, f.y0 + 112); x.textAlign = 'left';
-    const top = f.y0 + 160, rows = Math.ceil(days / 2), rh = Math.min(S.size === 'story' ? 84 : 64, (f.y1 - top - 20) / rows), colW = (W - 140) / 2;
-    let loading = false;
-    for (let i = 0; i < days; i++) {
-      const th = window.ChallengeTheme.themeFor(new Date(y, m, i + 1, 12), Li()); if (th.loading) loading = true;
-      const cx = 60 + (i < rows ? 0 : colW + 20), cy = top + (i % rows) * rh;
-      x.fillStyle = i % 2 ? C.cream : C.paper; x.fillRect(cx, cy, colW, rh - 6);
-      x.fillStyle = C.peach; x.font = `700 ${Math.round(rh * .42)}px ${SANS}`; x.textBaseline = 'middle'; x.fillText(String(i + 1), cx + 14, cy + rh / 2 - 3);
-      x.fillStyle = C.ink; const t = th.loading ? '…' : th.subject, fs = Math.round(rh * .46);
-      if (fit(x, t, `500 #px ${SANS}`, colW - 90, fs, 14) >= fs * .8) x.fillText(t, cx + 74, cy + rh / 2 - 3);
-      else { const s2 = Math.round(rh * .32); x.font = `500 ${s2}px ${SANS}`; const ls = wrap(x, t, colW - 90).slice(0, 2); ls.forEach((l, j) => x.fillText(l, cx + 74, cy + rh / 2 - 3 + (j - (ls.length - 1) / 2) * s2 * 1.1)); } // длинная тема — в две строки
+    if (!document.querySelector('link[data-pinfonts]')) {
+      const l = document.createElement('link'); l.rel = 'stylesheet'; l.dataset.pinfonts = 1;
+      l.href = 'https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,600;1,9..144,400&family=Karla:wght@400;700&family=Caveat:wght@700&display=swap';
+      document.head.appendChild(l);
     }
-    footer(f, T('Colors for every day → ', 'Цвета на каждый день → ', 'Krāsas katrai dienai → ') + short('/challenge/'));
-    return { file: `prompts-${y}-${String(first.getMonth() + 1).padStart(2, '0')}`, loading, text: T(
-      `${mCap} drawing prompts ✏️ One small theme a day — save this list and draw along!\nEvery day on the site: the theme, colors to use and a timer. Your first drawing hatches your own pixel bird 🐣\n${S.plat === 'instagram' ? 'Link in bio' : link('/challenge/', 'month')}\n\n#drawingprompts #${mName.toLowerCase()}drawingchallenge #artchallenge #sketchbookideas #30daychallenge #drawingideas`,
-      `Темы для рисования на ${['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'][first.getMonth()]} ✏️ Одна маленькая тема в день — сохрани и рисуй вместе с нами!\nКаждый день на сайте: тема, цвета и таймер. За первый рисунок вылупится твоя пиксельная птичка 🐣\n${S.plat === 'instagram' ? 'Ссылка в профиле' : link('/challenge/', 'month')}\n\n#темыдлярисования #челлендж #рисуемкаждыйдень #идеидлярисования #скетчбук`,
-      `Zīmēšanas tēmas: ${mName} ✏️ Viena maza tēma dienā — saglabā un zīmē kopā ar mums!\n${S.plat === 'instagram' ? 'Saite profilā' : link('/challenge/', 'month')}\n\n#zīmēšana #izaicinājums #skiču_burtnīca`) };
+    if (!base) base = await fetch('/assets/pin-base.json').then(r => r.json()).catch(() => []);
+    if (!fontsOk) { try { await Promise.all([`600 40px ${FR}`, `italic 400 40px ${FR}`, `400 40px ${KA}`, `700 40px ${KA}`, `700 40px ${CV}`].map(f => document.fonts.load(f))); } catch (e) { /* системные */ } fontsOk = true; }
   }
 
-  // ---------- 3. палитра ----------
-  async function palette(cv) {
-    const p = data.pal[((S.pal % data.pal.length) + data.pal.length) % data.pal.length]; if (!p) return null;
-    const im = await img('/' + p.thumb.replace(/^\//, ''));
-    const f = frame(cv, T('Free palette', 'Палитра', 'Palete')), { x, W } = f, L = S.lang;
-    const ih = Math.round((f.y1 - f.y0) * .5);
-    cover(x, im, 60, f.y0, W - 120, ih);
-    const title = (p.title && (p.title[L] || p.title.en)) || '';
-    x.fillStyle = C.ink; x.textAlign = 'center'; x.textBaseline = 'alphabetic'; fit(x, title, `600 #px ${SERIF}`, W - 120, 64, 34); x.fillText(title, W / 2, f.y0 + ih + 80); x.textAlign = 'left';
-    const cols = p.colors.slice(0, 6), top = f.y0 + ih + 120, sh = (f.y1 - top - 10) / cols.length;
-    cols.forEach((c, i) => {
-      const y = top + i * sh; x.fillStyle = c.hex; x.fillRect(60, y, W - 120, sh - 8);
-      const dark = (() => { const n = parseInt(c.hex.slice(1), 16); return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000 < 140; })();
-      x.fillStyle = dark ? '#fff' : C.ink; x.textBaseline = 'middle'; x.font = `700 ${Math.round(Math.min(40, sh * .38))}px ${SANS}`; x.fillText(c[L] || c.en || '', 90, y + sh / 2 - 4);
-      x.textAlign = 'right'; x.font = `500 ${Math.round(Math.min(34, sh * .32))}px ${SANS}`; x.fillText(c.hex.toUpperCase(), W - 90, y + sh / 2 - 4); x.textAlign = 'left';
-    });
-    footer(f, T('More free palettes → ', 'Ещё палитры → ', 'Vairāk palešu → ') + short('/palettes/'));
-    const list = cols.map(c => `${c[L] || c.en} ${c.hex.toUpperCase()}`).join('\n');
-    return { file: `palette-${p.key}`, text: T(
-      `Color palette from my painting “${title}” 🎨\n\n${list}\n\nSave it for your next piece! More free palettes from my art — and one from your own photo:\n${S.plat === 'instagram' ? 'Link in bio' : link('/palettes/', 'palette')}\n\n#colorpalette #colorinspiration #palette #colorscheme #artinspiration #watercolor`,
-      `Палитра из моей картины «${title}» 🎨\n\n${list}\n\nСохрани для следующего рисунка! Ещё палитры из моих картин — и палитра из твоего фото:\n${S.plat === 'instagram' ? 'Ссылка в профиле' : link('/palettes/', 'palette')}\n\n#палитра #цветоваяпалитра #сочетаниецветов #вдохновение #акварель`,
-      `Krāsu palete no manas gleznas “${title}” 🎨\n\n${list}\n\n${S.plat === 'instagram' ? 'Saite profilā' : link('/palettes/', 'palette')}\n\n#krāsas #palete #iedvesma`) };
+  // ---------- рисование: общие ----------
+  const rr = (x, X, Y, w, h, r) => { x.beginPath(); x.moveTo(X + r, Y); x.arcTo(X + w, Y, X + w, Y + h, r); x.arcTo(X + w, Y + h, X, Y + h, r); x.arcTo(X, Y + h, X, Y, r); x.arcTo(X, Y, X + w, Y, r); x.closePath(); };
+  // картинка «обложкой» в рамку с точкой фокуса fx/fy (0..1); zoom > 1 — крупнее (деталь)
+  function pic(x, p, X, Y, w, h, o = {}) {
+    const r = o.r ?? 8;
+    x.save();
+    if (o.rot) { x.translate(X + w / 2, Y + h / 2); x.rotate(o.rot * Math.PI / 180); x.translate(-X - w / 2, -Y - h / 2); }
+    if (o.shadow !== false) { x.save(); x.shadowColor = 'rgba(0,0,0,.42)'; x.shadowBlur = 50; x.shadowOffsetY = 24; x.fillStyle = '#000'; rr(x, X, Y, w, h, r); x.fill(); x.restore(); }
+    rr(x, X, Y, w, h, r); x.clip();
+    if (!p || !p.im) { x.fillStyle = '#5a4d47'; x.fillRect(X, Y, w, h); x.fillStyle = C.mut; x.font = `700 40px ${CV}`; x.textAlign = 'center'; x.fillText('your photo here', X + w / 2, Y + h / 2); x.textAlign = 'left'; x.restore(); return; }
+    const im = p.im, z = o.zoom || 1, k = Math.max(w / im.width, h / im.height) * z, iw = im.width * k, ih = im.height * k;
+    const fx = p.fx ?? .5, fy = p.fy ?? .5;
+    const dx = Math.min(0, Math.max(w - iw, w / 2 - fx * iw)), dy = Math.min(0, Math.max(h - ih, h / 2 - fy * ih));
+    x.drawImage(im, X + dx, Y + dy, iw, ih); x.restore();
+  }
+  // слова с *курсивом* → строки; italic — голубым
+  function rich(x, text, maxW, size, o = {}) {
+    const words = []; String(text || '').split(/(\*[^*]+\*)/).forEach(part => { const it = /^\*.*\*$/.test(part); (it ? part.slice(1, -1) : part).split(/\s+/).filter(Boolean).forEach(w => words.push({ w, it })); });
+    const font = it => it ? `italic 400 ${size}px ${FR}` : `600 ${size}px ${FR}`;
+    const lines = [[]]; let lw = 0;
+    for (const t of words) { x.font = font(t.it); const ww = x.measureText(t.w + ' ').width; if (lw + ww > maxW && lines[lines.length - 1].length) { lines.push([]); lw = 0; } lines[lines.length - 1].push({ ...t, ww }); lw += ww; }
+    return { lines, size, draw(X, Y, col = o.col || C.cream, it = o.it || C.blue) {
+      lines.forEach((l, i) => { let cx = X; l.forEach(t => { x.font = font(t.it); x.fillStyle = t.it ? it : col; x.fillText(t.w, cx, Y + i * size * 1.02); cx += t.ww; }); });
+      return Y + lines.length * size * 1.02; } };
+  }
+  function fitRich(x, text, maxW, start, maxLines, min = 40) { let s = start, r; do { r = rich(x, text, maxW, s); s -= 4; } while (r.lines.length > maxLines && s >= min); return r; }
+  function wrap(x, text, maxW) { const out = []; let line = ''; for (const w of String(text || '').split(/\s+/)) { const t = line ? line + ' ' + w : w; if (x.measureText(t).width > maxW && line) { out.push(line); line = w; } else line = t; } if (line) out.push(line); return out; }
+  function hand(x, text, X, Y, maxW, size = 50, col = C.blue, maxLines = 3) { x.font = `700 ${size}px ${CV}`; x.fillStyle = col; const ls = wrap(x, text, maxW).slice(0, maxLines); ls.forEach((l, i) => x.fillText(l, X, Y + i * size * 1.1)); return Y + ls.length * size * 1.1; }
+  function url(x, col = C.mut, pre = '') { x.font = `700 36px ${CV}`; x.fillStyle = col; x.textAlign = 'center'; x.fillText((pre ? pre + ' · ' : '') + 'pigeonpolly.com', W / 2, H - 46); x.textAlign = 'left'; }
+  function kicker(x, t, X, Y) { if (!t) return; x.save(); x.translate(X, Y); x.rotate(-2 * Math.PI / 180); x.font = `700 46px ${CV}`; x.fillStyle = C.blue; x.fillText(t, 0, 0); x.restore(); }
+  const bg = (x, c) => { x.fillStyle = c; x.fillRect(0, 0, W, H); };
+  const textOn = hex => { const n = parseInt(hex.slice(1), 16); return ((n >> 16) * 299 + ((n >> 8) & 255) * 587 + (n & 255) * 114) / 1000 < 140 ? '#F6ECDF' : C.ink; };
+
+  // ---------- 10 дизайнов ----------
+  const DRAW = {
+    full(x, f) { bg(x, C.bg); pic(x, photo(0), 60, 56, 880, 1150); hand(x, f.hand || f.headline, 64, 1290, 870, 56, C.blue, 1);
+      x.font = `400 26px ${KA}`; x.fillStyle = C.mut; x.fillText(f.sub || '', 66, 1345); url(x); },
+    closer(x, f) { bg(x, C.bg); const p = photo(0), r = p && p.im ? p.im.height / p.im.width : .7, h1 = Math.round(Math.min(660, Math.max(420, 880 * r)));
+      pic(x, p, 60, 56, 880, h1, { shadow: true }); kicker(x, 'look closer ↓', 66, h1 + 128);
+      pic(x, p, 60, h1 + 170, 880, 1225 - h1 - 170, { zoom: 2.4 });
+      hand(x, f.hand || f.headline, 64, 1290, 870, 56, C.blue, 1); x.font = `400 26px ${KA}`; x.fillStyle = C.mut; x.fillText(f.sub || '', 66, 1345); url(x); },
+    paldark(x, f, cols) { bg(x, C.pal); pic(x, photo(0), 0, 0, W, 780, { r: 0, shadow: false });
+      const g = x.createLinearGradient(0, 400, 0, 780); g.addColorStop(0, 'rgba(42,27,30,0)'); g.addColorStop(.7, 'rgba(42,27,30,.75)'); g.addColorStop(1, C.pal); x.fillStyle = g; x.fillRect(0, 400, W, 381);
+      x.font = `700 26px ${KA}`; x.fillStyle = C.gold; x.fillText('C O L O R   P A L E T T E', 70, 700);
+      const nm = f.name || f.headline || ''; x.fillStyle = '#F6ECDF'; let s = 80; do { x.font = `600 ${s}px ${FR}`; s -= 4; } while (x.measureText(nm).width > 860 && s > 40); x.fillText(nm, 70, 790);
+      (cols || []).slice(0, 6).forEach((c, i) => { const cx = 70 + (i % 3) * 294, cy = 850 + Math.floor(i / 3) * 228;
+        x.fillStyle = c.hex; rr(x, cx, cy, 272, 118, 12); x.fill();
+        x.fillStyle = '#F6ECDF'; x.font = `700 26px ${KA}`; x.fillText(c.en || '', cx, cy + 156); x.fillStyle = '#BFAEA6'; x.font = `400 21px ${KA}`; x.fillText(c.hex.toUpperCase(), cx, cy + 188); });
+      x.font = `italic 400 30px ${FR}`; x.fillStyle = '#BFAEA6'; x.fillText(f.sub || 'from my painting', 70, 1440);
+      x.font = `700 30px ${KA}`; x.fillStyle = '#F6ECDF'; x.textAlign = 'right'; x.fillText('pigeonpolly.com', 930, 1440); x.textAlign = 'left'; },
+    palcream(x, f, cols) { bg(x, C.paper); pic(x, photo(0), 70, 70, 860, 700, { r: 14 });
+      x.font = `700 24px ${KA}`; x.fillStyle = '#A0745A'; x.fillText('C O L O R   P A L E T T E', 70, 850);
+      const nm = f.name || f.headline || ''; x.fillStyle = C.ink; let s = 76; do { x.font = `600 ${s}px ${FR}`; s -= 4; } while (x.measureText(nm).width > 860 && s > 40); x.fillText(nm, 70, 930);
+      (cols || []).slice(0, 6).forEach((c, i) => { const cx = 70 + (i % 3) * 294 + 136, cy = 1050 + Math.floor(i / 3) * 190;
+        x.beginPath(); x.arc(cx, cy, 62, 0, Math.PI * 2); x.fillStyle = c.hex; x.fill(); x.lineWidth = 6; x.strokeStyle = '#fff'; x.stroke();
+        x.textAlign = 'center'; x.fillStyle = C.ink; x.font = `700 25px ${KA}`; x.fillText(c.en || '', cx, cy + 100); x.fillStyle = '#8A7C72'; x.font = `400 21px ${KA}`; x.fillText(c.hex.toUpperCase(), cx, cy + 128); x.textAlign = 'left'; });
+      url(x, '#8A7C72', f.sub || 'from my painting'); },
+    memewhite(x, f) { bg(x, '#FFFFFF'); x.fillStyle = '#1A1A1A'; let s = 66, ls; do { x.font = `700 ${s}px ${KA}`; ls = wrap(x, f.headline, 880); s -= 4; } while (ls.length > 4 && s > 40); s += 4;
+      ls.forEach((l, i) => x.fillText(l, 60, 120 + i * s * 1.15)); const top = 120 + ls.length * s * 1.15 + 20;
+      pic(x, photo(0), 60, top, 880, 1330 - top, { rot: -1.2 });
+      if (f.hand) { x.save(); x.translate(700, 1260); x.rotate(2.5 * Math.PI / 180); x.font = `700 46px ${CV}`; const w = x.measureText(f.hand).width + 52; x.fillStyle = '#FFF4C7'; x.shadowColor = 'rgba(0,0,0,.25)'; x.shadowBlur = 16; x.shadowOffsetY = 6; x.fillRect(-w / 2, -44, w, 76); x.shadowColor = 'transparent'; x.fillStyle = '#1A1A1A'; x.textAlign = 'center'; x.fillText(f.hand, 0, 10); x.restore(); }
+      url(x, '#777'); },
+    memedark(x, f) { bg(x, C.bg); pic(x, photo(0), 60, 60, 880, 980, { rot: 1 });
+      x.fillStyle = C.cream; let s = 60, ls; do { x.font = `700 ${s}px ${KA}`; ls = wrap(x, f.headline, 870); s -= 4; } while (ls.length > 3 && s > 36); s += 4;
+      ls.forEach((l, i) => x.fillText(l, 64, 1120 + i * s * 1.15));
+      if (f.hand) hand(x, '— ' + f.hand, 64, 1140 + ls.length * s * 1.15, 870, 52); url(x); },
+    read(x, f) { bg(x, C.bg); kicker(x, f.kicker || 'on the blog ✎', 64, 100); const t = fitRich(x, f.headline, 880, 84, 2); t.draw(62, 200);
+      const top = 200 + t.lines.length * t.size * 1.02; pic(x, photo(0), 62, top + 10, 876, 1190 - top - 10, { rot: -1 });
+      hand(x, f.hand, 66, 1265, 870, 44, C.blue, 2); url(x, C.mut, 'read it on'); },
+    video(x, f) { bg(x, C.bg); x.font = `700 24px ${KA}`; const tag = (f.tag || 'free video lesson').toUpperCase(), tw = x.measureText(tag).width + 44; x.fillStyle = C.blue; rr(x, 62, 62, tw, 50, 25); x.fill(); x.fillStyle = C.bg; x.fillText(tag, 84, 96);
+      const t = fitRich(x, f.headline, 880, 84, 2); t.draw(62, 210); const top = 210 + t.lines.length * t.size * 1.02;
+      const h = 1190 - top - 10; pic(x, photo(0), 62, top + 10, 876, h);
+      const cx = 500, cy = top + 10 + h / 2; x.beginPath(); x.arc(cx, cy, 85, 0, Math.PI * 2); x.fillStyle = 'rgba(46,37,33,.82)'; x.fill(); x.lineWidth = 6; x.strokeStyle = C.cream; x.stroke();
+      x.beginPath(); x.moveTo(cx - 24, cy - 40); x.lineTo(cx + 40, cy); x.lineTo(cx - 24, cy + 40); x.closePath(); x.fillStyle = C.cream; x.fill();
+      hand(x, f.hand, 66, 1265, 870, 44, C.blue, 2); url(x, C.mut, 'watch on'); },
+    prompts(x, f) { bg(x, C.bg); kicker(x, f.kicker, 64, 100); const t = fitRich(x, f.headline, 880, 84, 2); t.draw(62, 200);
+      const n = Math.min(2, Math.max(1, S.photos.length)); for (let i = 0; i < n; i++) pic(x, photo(i), n === 1 ? 62 : 62 + i * 440, 370 + i * 18, n === 1 ? 876 : 416, 460, { rot: i ? 2 : -2 });
+      const items = (f.items || []).filter(Boolean).slice(0, 8);
+      items.forEach((it, i) => { const cx = 62 + (i % 2) * 450, cy = 950 + Math.floor(i / 2) * 84; x.beginPath(); x.arc(cx + 12, cy - 14, 8, 0, Math.PI * 2); x.fillStyle = C.tan; x.fill(); x.font = `700 48px ${CV}`; x.fillStyle = C.blue; x.fillText(it, cx + 40, cy); });
+      url(x, C.mut, 'more ideas'); },
+    grid(x, f) { bg(x, C.bg); kicker(x, f.kicker, 64, 100); const t = fitRich(x, f.headline, 880, 78, 2); t.draw(62, 196);
+      const top = 196 + t.lines.length * t.size * 1.02 + 10, n = Math.max(1, Math.min(6, S.photos.length || 4));
+      if (n <= 3) { const h = (1380 - top - (n - 1) * 34) / n; for (let i = 0; i < n; i++) { const X = i % 2 ? 110 : 70, Y = top + i * (h + 34);
+          pic(x, photo(i), X, Y, 820, h, { rot: i % 2 ? 1 : -1 }); x.beginPath(); x.arc(X + 14, Y + 10, 32, 0, Math.PI * 2); x.fillStyle = C.blue; x.fill(); x.fillStyle = C.bg; x.font = `700 40px ${CV}`; x.textAlign = 'center'; x.fillText(String(i + 1), X + 14, Y + 24); x.textAlign = 'left';
+          const lab = (f.items || [])[i]; if (lab) { x.font = `700 36px ${CV}`; const lw = x.measureText(lab).width + 32; x.fillStyle = C.cream; x.fillRect(X + 820 - lw + 14, Y + h - 30, lw, 52); x.fillStyle = C.bg; x.fillText(lab, X + 820 - lw + 30, Y + h + 8); } } }
+      else { const rows = Math.ceil(n / 2), h = (1390 - top - (rows - 1) * 22) / rows; for (let i = 0; i < n; i++) { const X = 50 + (i % 2) * 461, Y = top + Math.floor(i / 2) * (h + 22); pic(x, photo(i), X, Y, 439, h, { shadow: false });
+          const lab = (f.items || [])[i]; if (lab) { x.font = `700 32px ${CV}`; const lw = x.measureText(lab).width + 24; x.fillStyle = C.cream; x.fillRect(X + 10, Y + h - 56, lw, 46); x.fillStyle = C.bg; x.fillText(lab, X + 22, Y + h - 22); } } }
+      url(x); },
+  };
+
+  async function colors() {
+    const p = photo(0); if (!p) return [];
+    if (p.cols) return p.cols;
+    await script('/assets/palettes.js');
+    if (window.PPPalette && p.im) { p.cols = await window.PPPalette.named(p.im); return p.cols; }
+    return [];
+  }
+  async function render(cv, design = S.design) {
+    cv.width = W; cv.height = H; const x = cv.getContext('2d'); x.textBaseline = 'alphabetic';
+    const d = DESIGNS.find(z => z.id === design), cols = d.type === 'palette' ? await colors() : null;
+    DRAW[design](x, S.f, cols);
   }
 
-  // ---------- 4. дело Титоса ----------
-  async function titos(cv) {
-    const ok = data.cases.filter(c => S.lang === 'ru' || !/[а-яё]/i.test(data.titles[S.lang][c.n] || '')); // без перевода названия — не показывать
-    const c = ok[((S.cas % ok.length) + ok.length) % ok.length]; if (!c) return null;
-    const sc = c.scenes.find(s => s.img), im = await img(sc.img);
-    const title = data.titles[S.lang][c.n] || (c.title || {}).ru || '';
-    const f = frame(cv, T('Case', 'Дело', 'Lieta') + ' #' + c.n), { x, W } = f;
-    const ih = Math.round((f.y1 - f.y0) * .62);
-    cover(x, im, 60, f.y0, W - 120, ih, true);
-    x.textAlign = 'center'; x.textBaseline = 'alphabetic';
-    x.fillStyle = C.soft; x.font = `700 30px ${SANS}`; x.fillText(T('🕵️ DETECTIVE TITOS', '🕵️ ДЕТЕКТИВ ТИТОС', '🕵️ DETEKTĪVS TITOSS'), W / 2, f.y0 + ih + 60);
-    x.fillStyle = C.ink; const sz = fit(x, title, `600 #px ${SERIF}`, W - 120, 72, 36); x.fillText(title, W / 2, f.y0 + ih + 60 + sz * 1.2);
-    x.fillStyle = C.lilac; x.font = `italic 400 44px ${SERIF}`; x.fillText(T('Can you solve it?', 'Сможешь раскрыть?', 'Vai tu to atrisināsi?'), W / 2, Math.min(f.y1 - 20, f.y0 + ih + 60 + sz * 1.2 + 80)); x.textAlign = 'left';
-    footer(f, T('Play free → ', 'Играть бесплатно → ', 'Spēlē bez maksas → ') + short('/titos/'));
-    return { file: `titos-${c.n}`, text: T(
-      `🕵️ Detective Titos, case #${c.n}: “${title}”\nLook closely at the picture. Find the clues, question the suspects and name the culprit. Can you solve it?\n\nA free cozy mystery game in your browser — no download, 100 cases.\n${S.plat === 'instagram' ? 'Link in bio' : link('/titos/', 'titos')}\n\n#cozygames #mysterygame #detectivegame #browsergame #indiegame #pixelart`,
-      `🕵️ Детектив Титос, дело №${c.n}: «${title}»\nПрисмотрись к картинке. Найди улики, допроси подозреваемых и назови виновного. Сможешь раскрыть?\n\nБесплатная уютная детективная игра прямо в браузере — без скачивания, 100 дел.\n${S.plat === 'instagram' ? 'Ссылка в профиле' : link('/titos/', 'titos')}\n\n#уютныеигры #детектив #головоломка #браузернаяигра #пиксельарт`,
-      `🕵️ Detektīvs Titoss, lieta Nr. ${c.n}: “${title}”\nAtrodi pierādījumus un nosauc vainīgo. Vai tu to atrisināsi?\n${S.plat === 'instagram' ? 'Saite profilā' : link('/titos/', 'titos')}\n\n#spēles #detektīvs #pikseļmāksla`) };
+  // ---------- тексты для Pinterest ----------
+  const linkFull = () => { const path = S.custom.trim() || S.link; const u = /^https?:/.test(path) ? path : SITE + (path.startsWith('/') ? '' : '/') + path; return u + (u.includes('?') ? '&' : '?') + 'utm_source=pinterest&utm_campaign=pin-' + S.type; };
+  function fallbackPin() { // без ИИ — из надписей на пине
+    const f = S.f, h = (f.name || f.headline || '').replace(/\*/g, ''), cols = (photo(0) && photo(0).cols) || [];
+    if (S.type === 'palette') return { title: `${h} Color Palette with HEX Codes | Pigeon Polly`, desc: `Six colors from my painting “${h}”: ${cols.map(c => c.en + ' ' + c.hex.toUpperCase()).join(', ')}. More palettes from my art on my site.`, alt: `A color palette of six swatches (${cols.map(c => c.en).join(', ')}) with HEX codes under a painting by Pigeon Polly.`, topics: 'color palette, hex codes, color inspiration, watercolor palette' };
+    return { title: h, desc: [f.hand, f.sub].filter(Boolean).join(' ').replace(/\*/g, ''), alt: '', topics: '' };
   }
-
-  const POSTS = [
-    { id: 'theme', ic: '🎨', name: 'Тема дня', draw: theme, about: 'Каждый день: Instagram, сторис, Threads, Pinterest.' },
-    { id: 'month', ic: '📅', name: 'Темы на месяц', draw: month, about: 'Главный пост 1-го числа: список сохраняют и рисуют по нему. Лучше всего — Pinterest (2:3).' },
-    { id: 'palette', ic: '🌈', name: 'Палитра', draw: palette, about: 'Pinterest обожает палитры: 2–3 пина в неделю.' },
-    { id: 'titos', ic: '🕵️', name: 'Загадка Титоса', draw: titos, about: 'Раз в неделю: «Сможешь раскрыть?» — люди любят отвечать в комментариях.' },
-  ];
 
   // ---------- экран ----------
   async function mount(main) {
-    main.innerHTML = '<p class="be-note">Рисую посты…</p>';
+    main.innerHTML = '<p class="be-note">Загружаю генератор пинов…</p>';
     await load();
-    const chips = (k, obj) => Object.entries(obj).map(([v, t]) => `<button type="button" class="pill-btn${S[k] === v ? ' pill-fill' : ''}" data-set="${k}" data-v="${v}">${esc(Array.isArray(t) ? t[2] : t)}</button>`).join('');
-    const today = new Date(), iso = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
-    main.innerHTML = `<section class="adm-box"><p class="be-note">Картинки рисуются сами из того, что сейчас на сайте. Выберите язык, формат и куда выкладываете — потом «⬇ Скачать» и «📋 Скопировать текст». Ссылка в тексте помечена площадкой: в «👥 Посетителях» будет видно, откуда пришли.</p>
-      <div class="adm-quick">${chips('lang', { en: 'EN', ru: 'RU', lv: 'LV' })}</div>
-      <div class="adm-quick">${chips('size', SIZES)}</div>
-      <div class="adm-quick">${chips('plat', PLAT)}</div></section>
-      <div class="pp-posts">${POSTS.map(p => `<section class="adm-box pp-post" data-p="${p.id}"><h2>${p.ic} ${p.name}</h2><p class="be-note">${p.about}</p>
-        <div class="adm-quick pp-post-ctl">${p.id === 'theme' ? `<label>День: <input type="date" class="be-input" data-day value="${S.day || iso(today)}"></label>` : ''}
-          ${p.id === 'month' ? `<button type="button" class="pill-btn" data-mon="0">Этот месяц</button><button type="button" class="pill-btn" data-mon="1">Следующий</button>` : ''}
-          ${p.id === 'palette' || p.id === 'titos' ? `<button type="button" class="pill-btn" data-prev>←</button><button type="button" class="pill-btn" data-rnd>🎲 Другая</button><button type="button" class="pill-btn" data-next>→</button>` : ''}</div>
-        <canvas class="pp-post-cv"></canvas><p class="be-note pp-post-wait" hidden>⏳ Темы ещё загружаются — картинка обновится сама.</p>
-        <textarea class="be-input pp-post-tx" rows="8" readonly></textarea>
-        <div class="adm-quick"><button type="button" class="pill-btn pill-fill" data-dl>⬇ Скачать картинку</button><button type="button" class="pill-btn" data-cp>📋 Скопировать текст</button></div></section>`).join('')}</div>`;
-    const draw = async sec => {
-      const p = POSTS.find(x => x.id === sec.dataset.p), cv = sec.querySelector('canvas');
-      const r = await p.draw(cv); if (!r) return;
-      sec.dataset.file = `pp-${r.file}-${S.lang}-${S.size}.png`;
-      sec.querySelector('.pp-post-tx').value = r.text;
-      sec.querySelector('.pp-post-wait').hidden = !r.loading;
+    main.innerHTML = `<section class="adm-box pp-pin">
+      <h2>🖼 Генератор пинов</h2>
+      <p class="be-note">1 — тип, 2 — дизайн, 3 — фото (своё или из базы сайта), 4 — ✨ тексты. Потом «⬇ Скачать» и поля для Pinterest. Всё на английском.</p>
+      <h3>1. Тип пина</h3><div class="adm-quick" data-types></div>
+      <h3>2. Дизайн</h3><div class="pp-pin-designs" data-designs></div>
+      <h3>3. Фото <small class="be-note" data-need></small></h3>
+      <div class="adm-quick"><label class="pill-btn">📁 Загрузить фото<input type="file" accept="image/*" multiple hidden data-file></label><button type="button" class="pill-btn" data-base>🖼 Из базы сайта</button><button type="button" class="pill-btn" data-clear>✕ Убрать все</button></div>
+      <div class="pp-pin-photos" data-photos></div><p class="be-note">Нажмите на фото — туда сдвинется центр кадра (что главное на картинке).</p>
+      <div class="pp-pin-base" data-basebox hidden></div>
+      <div class="pp-pin-main">
+        <div><canvas class="pp-pin-cv" data-cv></canvas>
+          <div class="adm-quick"><button type="button" class="pill-btn pill-fill" data-dl>⬇ Скачать JPG</button></div></div>
+        <div class="pp-pin-side">
+          <h3>4. Тексты</h3>
+          <label>Куда ведёт пин<select class="be-input" data-link>${LINKS.map(([p, t]) => `<option value="${p}">${t} — ${p}</option>`).join('')}</select></label>
+          <label>…или своя ссылка (статья, видео)<input class="be-input" data-custom placeholder="/blog/how-did-sketching-begin/"></label>
+          <label>Подсказка для ✨ (что на картинке, о чём пин — по-русски можно)<textarea class="be-input" rows="2" data-hint></textarea></label>
+          <div class="adm-quick"><button type="button" class="pill-btn pill-fill" data-ai>✨ Сгенерировать тексты</button><span class="be-note" data-aimsg></span></div>
+          <div data-fields></div>
+          <h3>Для Pinterest</h3><div data-pin></div>
+        </div></div></section>`;
+    const $ = s => main.querySelector(s), cv = $('[data-cv]');
+    const redraw = () => render(cv).then(drawThumbs);
+    // типы
+    const types = () => { $('[data-types]').innerHTML = TYPES.map(t => `<button type="button" class="pill-btn${S.type === t.id ? ' pill-fill' : ''}" data-t="${t.id}" title="${esc(t.about)}">${t.ic} ${t.name}</button>`).join('');
+      $('[data-types]').querySelectorAll('[data-t]').forEach(b => b.onclick = () => { S.type = b.dataset.t; S.design = DESIGNS.find(d => d.type === S.type).id; S.f = JSON.parse(JSON.stringify(DEF[S.type])); S.pin = null; types(); designs(); fields(); pinBox(); redraw(); }); };
+    // дизайны: маленькие превью
+    const designs = () => { const list = DESIGNS.filter(d => d.type === S.type);
+      $('[data-designs]').innerHTML = list.map(d => `<button type="button" class="pp-pin-d${S.design === d.id ? ' on' : ''}" data-d="${d.id}"><canvas></canvas><span>${d.name}</span></button>`).join('');
+      $('[data-designs]').querySelectorAll('[data-d]').forEach(b => b.onclick = () => { S.design = b.dataset.d; $('[data-designs]').querySelectorAll('.pp-pin-d').forEach(z => z.classList.toggle('on', z === b)); redraw(); });
+      const t = TYPES.find(z => z.id === S.type); $('[data-need]').textContent = t.n > 1 ? `· можно до 6 фото (${t.about})` : '· одно фото'; };
+    const drawThumbs = async () => { for (const b of main.querySelectorAll('.pp-pin-d')) { const c = b.querySelector('canvas'); const tmp = document.createElement('canvas'); await render(tmp, b.dataset.d); c.width = 200; c.height = 300; c.getContext('2d').drawImage(tmp, 0, 0, 200, 300); } };
+    // фото
+    const addPhoto = async (src, meta = {}) => { const im = await loadImg(src); if (!im) return; const max = TYPES.find(t => t.id === S.type).n > 1 ? 6 : 1;
+      const p = { src, im, fx: .5, fy: .5, t: meta.t || '', cols: meta.c ? meta.c.map(([hex, en]) => ({ hex, en })) : null };
+      if (max === 1) S.photos = [p]; else { S.photos.push(p); S.photos = S.photos.slice(-6); }
+      if (S.type === 'palette' && meta.t) S.f.name = S.f.headline = meta.t.replace(/(^|\s)\S/g, c => c.toUpperCase());
+      photos(); fields(); redraw(); };
+    const photos = () => { $('[data-photos]').innerHTML = S.photos.map((p, i) => `<div class="pp-pin-ph" data-i="${i}"><img src="${esc(p.src)}" alt=""><i style="left:${p.fx * 100}%;top:${p.fy * 100}%"></i><button type="button" data-x title="Убрать">✕</button>${i ? `<button type="button" data-up title="Раньше">↑</button>` : ''}</div>`).join('');
+      $('[data-photos]').querySelectorAll('.pp-pin-ph').forEach(d => { const i = +d.dataset.i, img = d.querySelector('img');
+        img.onclick = e => { const r = img.getBoundingClientRect(); S.photos[i].fx = (e.clientX - r.left) / r.width; S.photos[i].fy = (e.clientY - r.top) / r.height; photos(); redraw(); };
+        d.querySelector('[data-x]').onclick = () => { S.photos.splice(i, 1); photos(); redraw(); };
+        const up = d.querySelector('[data-up]'); if (up) up.onclick = () => { [S.photos[i - 1], S.photos[i]] = [S.photos[i], S.photos[i - 1]]; photos(); redraw(); }; }); };
+    $('[data-file]').onchange = e => { [...e.target.files].forEach(f => { const r = new FileReader(); r.onload = () => addPhoto(r.result, { t: f.name.replace(/\.[^.]+$/, '').replace(/^IMG_\d+$/i, '') }); r.readAsDataURL(f); }); e.target.value = ''; };
+    $('[data-clear]').onclick = () => { S.photos = []; photos(); redraw(); };
+    $('[data-base]').onclick = () => { const box = $('[data-basebox]'); box.hidden = !box.hidden; if (box.hidden || box.dataset.ok) return; box.dataset.ok = 1;
+      const G = { all: 'Все', bird: 'Полли', snail: 'Мистер Чу', sketchbook: 'Скетчбук', halloween: 'Хеллоуин', detective: 'Детектив', anxiety: 'Тревога', photo: 'Фото', challenge: 'Челлендж', exhibitions: 'Выставки', publications: 'Публикации' };
+      const show = g => { box.querySelector('[data-grid]').innerHTML = base.filter(b => g === 'all' || b.g === g).map(b => `<button type="button" data-src="${esc(b.src)}" title="${esc(b.t)}"><img src="${esc(b.th)}" alt="" loading="lazy"></button>`).join('');
+        box.querySelectorAll('[data-grid] button').forEach(b => b.onclick = () => { const it = base.find(z => z.src === b.dataset.src); addPhoto(it.src, it); if (TYPES.find(t => t.id === S.type).n === 1) box.hidden = true; }); };
+      box.innerHTML = `<div class="adm-quick">${Object.entries(G).filter(([k]) => k === 'all' || base.some(b => b.g === k)).map(([k, t]) => `<button type="button" class="pill-btn" data-g="${k}">${t}</button>`).join('')}</div><div class="pp-pin-grid" data-grid></div>`;
+      box.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { box.querySelectorAll('[data-g]').forEach(z => z.classList.toggle('pill-fill', z === b)); show(b.dataset.g); });
+      box.querySelector('[data-g]').classList.add('pill-fill'); show('all'); };
+    // поля надписей на пине
+    const LABEL = { kicker: 'Маленькая надпись сверху', headline: 'Заголовок (*слово* — голубым курсивом)', name: 'Название палитры', hand: 'Строка от руки', sub: 'Подпись (техника, имя)', tag: 'Метка', items: 'Пункты (каждый с новой строки)' };
+    const FIELDS = { art: ['hand', 'sub'], palette: ['name', 'sub'], meme: ['headline', 'hand'], read: ['kicker', 'headline', 'hand', 'tag'], prompts: ['kicker', 'headline', 'items'], grid: ['kicker', 'headline', 'items'] };
+    const fields = () => { $('[data-fields]').innerHTML = FIELDS[S.type].map(k => k === 'items' ? `<label>${LABEL[k]}<textarea class="be-input" rows="5" data-f="items">${esc((S.f.items || []).join('\n'))}</textarea></label>` : `<label>${LABEL[k]}<input class="be-input" data-f="${k}" value="${esc(S.f[k] || '')}"></label>`).join('');
+      $('[data-fields]').querySelectorAll('[data-f]').forEach(el => el.oninput = () => { const k = el.dataset.f; S.f[k] = k === 'items' ? el.value.split('\n') : el.value; if (k === 'name') S.f.headline = el.value; clearTimeout(fields.t); fields.t = setTimeout(redraw, 150); }); };
+    // поля Pinterest
+    const pinBox = () => { const p = S.pin || fallbackPin(), rows = [['Title', p.title], ['Description', p.desc], ['Link', linkFull()], ['Alt text', p.alt], ['Topics', p.topics]];
+      $('[data-pin]').innerHTML = rows.map(([k, v]) => `<label>${k}<div class="pp-pin-row"><textarea class="be-input" rows="${k === 'Description' ? 4 : 2}" data-pk="${k}">${esc(v || '')}</textarea><button type="button" class="pill-btn" data-cp>📋</button></div></label>`).join('');
+      $('[data-pin]').querySelectorAll('[data-cp]').forEach(b => b.onclick = async () => { const t = b.previousElementSibling; try { await navigator.clipboard.writeText(t.value); b.textContent = '✓'; setTimeout(() => { b.textContent = '📋'; }, 1500); } catch (e) { t.select(); } }); };
+    $('[data-link]').value = S.link; $('[data-link]').onchange = e => { S.link = e.target.value; pinBox(); };
+    $('[data-custom]').oninput = e => { S.custom = e.target.value; pinBox(); };
+    $('[data-hint]').oninput = e => { S.hint = e.target.value; };
+    // ✨ Gemini
+    $('[data-ai]').onclick = async () => {
+      const msg = $('[data-aimsg]'), p = photo(0); if (!p) { msg.textContent = 'Сначала фото'; return; }
+      msg.textContent = '⏳ Смотрю на картинку…';
+      const sm = document.createElement('canvas'), k = Math.min(1, 768 / Math.max(p.im.width, p.im.height)); sm.width = Math.round(p.im.width * k); sm.height = Math.round(p.im.height * k); sm.getContext('2d').drawImage(p.im, 0, 0, sm.width, sm.height);
+      const cols = S.type === 'palette' ? (await colors()).map(c => c.en + ' ' + c.hex).join(', ') : '';
+      const kind = S.design === 'video' ? 'video' : S.type === 'grid' ? (S.photos.length <= 3 ? 'steps' : 'grid') : S.type;
+      const r = await fetch('/api/admin/pin-text', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' },
+        body: JSON.stringify({ img: sm.toDataURL('image/jpeg', .82), kind, hint: S.hint, link: linkFull(), colors: cols }) }).then(async x => x.ok ? x.json() : { error: (await x.json().catch(() => ({}))).error || x.status }).catch(() => ({ error: 'net' }));
+      if (r.error) { msg.textContent = r.error === 'ai_limit' || r.error === 429 ? '⚠ Лимит ИИ на сегодня — заполните руками' : '⚠ Не получилось, попробуйте ещё раз'; return; }
+      const f = S.f; if (r.kicker && 'kicker' in DEF[S.type]) f.kicker = r.kicker; if (r.headline) f.headline = r.headline; if (r.hand) f.hand = r.hand;
+      if (S.type === 'palette' && (r.name || r.headline)) f.name = f.headline = r.name || r.headline;
+      if (S.type === 'art' && r.hand) f.hand = r.hand; else if (S.type === 'art' && r.headline) f.hand = r.headline;
+      if (Array.isArray(r.items) && r.items.length && f.items) f.items = r.items.slice(0, S.type === 'prompts' ? 8 : 6);
+      S.pin = { title: r.title, desc: r.desc, alt: r.alt, topics: r.topics };
+      if (S.type === 'palette') { const cs = await colors(); S.pin.desc = `${r.desc} Colors: ${cs.map(c => c.en + ' ' + c.hex.toUpperCase()).join(', ')}.`; }
+      msg.textContent = '✓ Готово — можно поправить'; fields(); pinBox(); redraw();
     };
-    const all = () => main.querySelectorAll('.pp-post').forEach(draw);
-    main.querySelectorAll('[data-set]').forEach(b => b.onclick = () => {
-      S[b.dataset.set] = b.dataset.v; keep();
-      main.querySelectorAll(`[data-set="${b.dataset.set}"]`).forEach(x => x.classList.toggle('pill-fill', x === b)); all();
-    });
-    main.querySelectorAll('.pp-post').forEach(sec => {
-      const id = sec.dataset.p, again = () => draw(sec);
-      const day = sec.querySelector('[data-day]'); if (day) day.onchange = () => { S.day = day.value; again(); };
-      sec.querySelectorAll('[data-mon]').forEach(b => { b.classList.toggle('pill-fill', +b.dataset.mon === S.month); b.onclick = () => { S.month = +b.dataset.mon; sec.querySelectorAll('[data-mon]').forEach(x => x.classList.toggle('pill-fill', x === b)); again(); }; });
-      const k = id === 'palette' ? 'pal' : 'cas', n = () => (id === 'palette' ? data.pal : data.cases).length;
-      if (id === 'palette' || id === 'titos') {
-        if (!S['_' + k]) { S[k] = Math.floor(Math.random() * n()); S['_' + k] = 1; }
-        sec.querySelector('[data-prev]').onclick = () => { S[k]--; again(); };
-        sec.querySelector('[data-next]').onclick = () => { S[k]++; again(); };
-        sec.querySelector('[data-rnd]').onclick = () => { S[k] = Math.floor(Math.random() * n()); again(); };
-      }
-      sec.querySelector('[data-dl]').onclick = () => sec.querySelector('canvas').toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = sec.dataset.file || 'pp-post.png'; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }, 'image/png');
-      const cp = sec.querySelector('[data-cp]');
-      cp.onclick = async () => { const t = sec.querySelector('.pp-post-tx').value; try { await navigator.clipboard.writeText(t); cp.textContent = '✓ Скопировано'; setTimeout(() => { cp.textContent = '📋 Скопировать текст'; }, 2000); } catch (e) { sec.querySelector('.pp-post-tx').select(); } };
-    });
-    if (!mount.on) mount.on = 1, document.addEventListener('pp:chplan', () => { if (main.querySelector('.pp-posts')) main.querySelectorAll('.pp-post[data-p="theme"], .pp-post[data-p="month"]').forEach(draw); });
-    all();
+    $('[data-dl]').onclick = () => cv.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `pin-${S.type}-${S.design}-${Date.now().toString(36)}.jpg`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }, 'image/jpeg', .9);
+    types(); designs(); fields(); pinBox(); photos(); redraw();
   }
   window.PPPostsAdmin = { mount };
 })();

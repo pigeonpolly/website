@@ -96,7 +96,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/diploma.js` — общий пиксельный диплом курсов: PPDiploma {P, C, svg, canvas, mount, save}
 - `site/assets/polly-school.js` (30K) — «Школа Полли» (/polly-helps/, docs/challenge.md): Полли в фартуке у мольберта учит рисоват: IMG, KEY, stepsOf, send, path
 - `site/assets/polly.js` (30K) — Полли-питомец в левом нижнем углу (`PollyPet`): PollyPet, SEASON, CORNER, HOME_X, addProp
-- `site/assets/posts-admin.js` (25K) — Кабинет → «📣 Посты» (admin.js открывает PPPostsAdmin.mount(main)): готовые картинки и подп: PPPostsAdmin, SERIF, LANGS, POSTS, titos
+- `site/assets/posts-admin.js` — Кабинет → «🖼 Пины»: генератор пинов (тип → дизайн → фото → ✨ тексты → JPG + поля Pinterest): PPPostsAdmin, DESIGNS, DRAW
 - `site/assets/potion-names.js` (27K) — общие данные Зельеварни: ингредиенты, названия зелий (`PPPotion`): PPPotion, ADJ, FALL, ING, potion
 - `site/assets/potions.js` (57K) — игра «Зельеварня» /potions/: лабиринт, котёл, рецепты: DIRS, HUD, play, overlay, brew
 - `site/assets/pw-rules.js` (2K) — Правила пароля — одни для сервера (worker/index.js) и браузера (account.js): от 8 символов: COMMON, norm, check
@@ -252,7 +252,7 @@ _Сюда следующие этапы дописывают общие свед
 - 📒 Блокнот в учебниках: content/shared/notebook.js (клиент, встраивают tools/{study,english,norsk}_page.py функцией notebook(html, book)) + worker/notebook.js (`/api/notebook?book=`, таблица textbook_notes). Новый учебник — книга в `BOOKS` worker/notebook.js и вызов notebook() в его *_page.py.
 
 - Письма птичкам на почту — только через согласие worker/mail.js: новое автоматическое письмо = проверка `users.mail_games` (или feat/news), подвал и отписка — `sendOne`, общий суточный лимит — `usedToday` (meta `mail_n:`, `advent_mail_n:`, `wl_mail_n:`). Рассылки Алины — кабинет ✉️ Письма (mail-admin.js `PPMailAdmin`).
-- Картинки для соцсетей — кабинет 📣 Посты (posts-admin.js `PPPostsAdmin`): новый вид поста = запись в `POSTS` (draw(canvas) → {file, text, loading}); общие `frame`/`footer`/`swatches`/`fit`/`wrap`/`cover`.
+- Пины — кабинет 🖼 Пины (posts-admin.js `PPPostsAdmin`): новый дизайн = запись в `DESIGNS` + функция в `DRAW` (x, f, cols); общие `pic` (фото с фокусом/зумом), `fitRich` (*курсив* голубым), `hand`, `url`, `kicker`. Тексты — worker/pins.js `pinTextApi`. Цвета фото в браузере — palettes.js `window.PPPalette.named(img)`.
 
 - Новости птички: `NEWS_KINDS` (worker) → `news` в /api/whoami, /api/news; news.js `KINDS`. Новый вид — по записи там и тут. Открытые — `newsHistory` → GET /api/news/history (из gifts, button_log, potion_gifts, card_owner, card_trades; новому виду с историей — строка и там).
 - Тема дня челленджа: всегда `ChallengeTheme.themeFor(d, L)` (план месяца из D1, `theme.loading`, событие `pp:chplan`); подбор и план — worker/challenge-plan.js + challenge-days.js.

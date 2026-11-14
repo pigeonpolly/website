@@ -820,6 +820,19 @@ def build():
     # палитры из артов (страница «Палитры» и кнопка 🎨 в челлендже); данные — content/palettes.json (tools/palettes.py)
     pals = json.loads((CONTENT / "palettes.json").read_text())
     (OUT / "assets" / "palettes.json").write_text(json.dumps(pals, ensure_ascii=False, separators=(",", ":")))
+    # база картинок для генератора пинов (кабинет → 📌 Пины, posts-admin.js): все галереи + фото Алины (photos/, photos2/)
+    pin_base, pal_by_img = [], {p["img"]: p for p in pals}
+    for g in ("bird", "snail", "sketchbook", "halloween", "detective", "anxiety", "challenge", "exhibitions", "publications"):
+        f = CONTENT / "galleries" / f"{g}.json"
+        if not f.exists(): continue
+        for it in json.loads(f.read_text()):
+            p = pal_by_img.get(it["full"])
+            pin_base.append({"g": g, "src": "/" + it["full"], "th": "/" + it["thumb"], "t": (p["title"]["en"] if p else it.get("caption", "")),
+                             "c": [[c["hex"], c["en"]] for c in p["colors"]] if p else None})
+    for d in ("photos", "photos2"):
+        for f in sorted((OUT / "images" / d).glob("*.jpg")) if (OUT / "images" / d).exists() else []:
+            pin_base.append({"g": "photo", "src": f"/images/{d}/{f.name}", "th": f"/images/{d}/{f.name}", "t": f.stem.replace("_", " ")})
+    (OUT / "assets" / "pin-base.json").write_text(json.dumps(pin_base, ensure_ascii=False, separators=(",", ":")))
     # названия цветов для «Палитры из своего фото» (palettes.js); список — tools/palette_names.py
     names = runpy.run_path(str(ROOT / "tools" / "palette_names.py"))["NAMES"]
     (OUT / "assets" / "palette-names.json").write_text(json.dumps([list(n) for n in names], ensure_ascii=False, separators=(",", ":")))

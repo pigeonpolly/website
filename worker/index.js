@@ -3,6 +3,7 @@
 // Данные — Cloudflare D1 (env.DB), картинки челленджа — R2 (env.MEDIA, папка challenge/), старые ещё и в KV (env.IMAGES), пока идёт перенос. Блог — worker/blog.js (картинки блога в R2, env.MEDIA).
 import { blogApi, blogPage, blogImgCheck, visitor, anonCode, claimAnon, birdName } from './blog.js';
 import { courierApi } from './courier.js'; // «Art Coo-rier»: выпуск новостей искусства черновиком в блог (docs/blog.md)
+import { pinTextApi } from './pins.js'; // кабинет → 📌 Пины: тексты для Pinterest по картинке (Gemini)
 import { translateAll, translateTo, ABOUT } from './translate.js';
 import { challengeApi, challengeCron, planDayColors, monthThemeBadges, CHALLENGE_TABLES, CHALLENGE_ALTER } from './challenge-days.js'; // план тем челленджа (docs/challenge.md «Подбор тем»)
 import { CH_DEFAULTS, CH_RANGE } from './challenge-plan.js';
@@ -66,6 +67,7 @@ export default {
     try {
       await ensureSchema(env);
       await loadRules(env); await loadDayColors(env);
+      if (p === '/api/admin/pin-text') return await pinTextApi(req, env, helpers(env));
       if (p === '/api/blog/admin/courier') return await courierApi(req, env, { ...helpers(env), healthErr: (w, e) => healthErr(env, w, e) });
       if (p.startsWith('/api/blog/')) return await blogApi(req, env, url, helpers(env));
       return await route(req, env, url);
