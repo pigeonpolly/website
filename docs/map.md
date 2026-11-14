@@ -20,6 +20,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/guides.js` (8K) — Кабинет → «🎬 Видео и гайды» (site/assets/guides-admin.js, docs/admin.md): Алина сама добав: KEY, SEEN_MAX, BASE, GUIDES_ALTER, cut, out, seenOf, withBase, guideOut, guidesList, okUrl, ytId
 - `worker/ideas.js` (17K) — Кабинет → «💡 Темы для блога»: по кнопке собираем, что сейчас ищут и обсуждают в сфере Алин: PAGES, IDEAS, MONTHS, SITE, SUBS, ARTICLE, write, ask, suggest, reddit, plain, redditSearch
 - `worker/index.js` (289K) — Worker: site/, страницы через HTMLRewriter, /api (кроме блога), cron: RULES, BTN, STOCK, GIFT_KINDS, GOLD_PICKS, PLEVEL, prep, award, run, btnOf, catalog, avatarOf
+- `worker/mail-html.js` (6K) — оформление писем: `mailHtml(subject, text)` делает HTML в стиле сайта из текста письма (sendMail добавляет сам; просмотр — tools/mail_preview.mjs): mailHtml
 - `worker/mail.js` (25K) — Письма с сайта по согласию (docs/bird.md «Письма»): три вида — games (уведомления из игр),: MAIL_DAY_MAX, ORDER, DIGEST, MAIL_CATS, ITEM, CAT, pageUrl, langOf, pre, sendOne, spend, usedToday
 - `worker/norsk-page.js` (932K) — Собрано tools/norsk_page.py из content/norsk/ — руками не править.: NORSK_HTML
 - `worker/norsk.js` (8K) — Личный учебник норвежского (букмол) A1–C2 (/norsk/, docs/site.md «Учебник норвежского») — : AUDIO, LOCKED, MAX, NORSK_NICKS, TTS_VOICE, TTS_MODELS, tts, page, wav, norskOk, norskApi
@@ -251,7 +252,7 @@ _Сюда следующие этапы дописывают общие свед
 - ⌨️ Кнопки особых букв в учебниках: content/shared/keys.js (встраивают tools/{norsk,nederlands}_page.py функцией keys(html, 'å æ ø'), docs/site.md «Кнопки особых букв»).
 - 📒 Блокнот в учебниках: content/shared/notebook.js (клиент, встраивают tools/{study,english,norsk}_page.py функцией notebook(html, book)) + worker/notebook.js (`/api/notebook?book=`, таблица textbook_notes). Новый учебник — книга в `BOOKS` worker/notebook.js и вызов notebook() в его *_page.py.
 
-- Письма птичкам на почту — только через согласие worker/mail.js: новое автоматическое письмо = проверка `users.mail_games` (или feat/news), подвал и отписка — `sendOne`, общий суточный лимит — `usedToday` (meta `mail_n:`, `advent_mail_n:`, `wl_mail_n:`). Рассылки Алины — кабинет ✉️ Письма (mail-admin.js `PPMailAdmin`).
+- Письма птичкам на почту — только через согласие worker/mail.js: новое автоматическое письмо = проверка `users.mail_games` (или feat/news), подвал и отписка — `sendOne`, общий суточный лимит — `usedToday` (meta `mail_n:`, `advent_mail_n:`, `wl_mail_n:`). Рассылки Алины — кабинет ✉️ Письма (mail-admin.js `PPMailAdmin`). Вид всех писем — worker/mail-html.js (текст: абзацы через пустую строку, ссылка одна на строке = кнопка, «—» = подвал).
 - Пины — кабинет 🖼 Пины (posts-admin.js `PPPostsAdmin`): новый дизайн = запись в `DESIGNS` + функция в `DRAW` (x, f, cols); общие `pic` (фото с фокусом/зумом), `fitRich` (*курсив* голубым), `hand`, `url`, `kicker`. Тексты — worker/pins.js `pinTextApi`. Цвета фото в браузере — palettes.js `window.PPPalette.named(img)`.
 
 - Новости птички: `NEWS_KINDS` (worker) → `news` в /api/whoami, /api/news; news.js `KINDS`. Новый вид — по записи там и тут. Открытые — `newsHistory` → GET /api/news/history (из gifts, button_log, potion_gifts, card_owner, card_trades; новому виду с историей — строка и там).
