@@ -1,6 +1,7 @@
-// Кабинет → «🃏 Таро» (только админ; admin.js открывает PPTarotAdmin.mount(main)). «Таро кошек», устроено как runes-admin.js:
-// 1) выбрать расклад → 2) как его делать + какие карты выпали (по позициям, прямо/перевёрнуто) → 3) значение каждой карты и общее по раскладу.
-// Данные — GET /api/admin/tarot (worker/tarot.js, worker/tarot-data.js). Ничего не сохраняется, кроме последнего расклада в localStorage.
+// Кабинет → «🃏 Таро» (только админ; admin.js открывает PPTarotAdmin.mount(main)). «Таро кошек»:
+// 1) выбрать расклад → 2) отметить выпавшие карты по местам (прямо/перевёрнуто) → 3) у каждой карты: место, одна выделенная строка
+// ключевых слов и описание из колоды. Больше ничего — Алина просила просто (14.11.2026).
+// Данные — GET /api/admin/tarot (worker/tarot.js, worker/tarot-data.js). Сохраняется только последний расклад в localStorage.
 (function () {
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
   const KEY = 'pp-tarot-last';
@@ -20,7 +21,7 @@
   .tr-slot.cur{box-shadow:0 0 0 3px #E9A93B}
   .tr-slot>button.tr-pick{all:unset;cursor:pointer;display:block;width:100%}
   .tr-slot .tr-pn{font-size:.85em;opacity:.75;display:block;margin-bottom:6px}
-  .tr-g{font-size:1.6em;line-height:1.2;display:block;min-height:1.2em;font-weight:700}
+  .tr-g{font-size:1.6em;line-height:1.2;display:inline-block;min-height:1.2em;font-weight:700}
   .tr-g.rev{transform:rotate(180deg)}
   .tr-flip{margin-top:8px;font:inherit;font-size:.8em;padding:3px 10px;border-radius:99px;border:1px solid #E8E4E2;background:#F4EFEA;color:#2B1A51;cursor:pointer}
   .tr-flip[aria-pressed="true"]{background:#2B1A51;color:#fff;border-color:#2B1A51}
@@ -28,44 +29,24 @@
   .tr-c{padding:8px 4px;border-radius:12px;border:1px solid #E8E4E2;background:#fff;cursor:pointer;font:inherit;color:#2B1A51;font-size:.85em}
   .tr-c:hover:not(:disabled){border-color:#E9A93B}
   .tr-c:disabled{opacity:.35;cursor:default}
-  .tr-c .tr-g{font-size:1.2em}
+  .tr-c .tr-g{font-size:1.2em;display:block}
   .tr-card{padding:16px;border-radius:16px;border:1px solid #E8E4E2;background:#fff;color:#2B1A51;margin:14px 0}
-  .tr-card h3{margin:0 0 4px}
-  .tr-kw{opacity:.8;margin:0 0 10px}
-  .tr-attrs{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0;font-size:.85em}
-  .tr-attrs span{padding:3px 9px;border-radius:99px;background:#F4EFEA}
+  .tr-card h3{margin:0 0 8px}
+  .tr-card h3 .tr-g{font-size:1em}
+  .tr-pos{font-size:.8em;text-transform:uppercase;letter-spacing:.06em;color:#b9771a;font-weight:700;margin-bottom:4px}
+  .tr-kw{margin:0 0 10px;padding:8px 12px;border-radius:10px;background:#FFF4DC;font-weight:700;line-height:1.4}
   .tr-t p{margin:8px 0;line-height:1.55}
-  .tr-side{font-size:.8em;font-weight:700;margin:12px 0 0;opacity:.7}
-  .tr-other{opacity:.7}
-  .tr-pos{font-size:.8em;text-transform:uppercase;letter-spacing:.06em;color:#b9771a;font-weight:700}
-  .tr-sum{background:#fff;color:#2B1A51;padding:16px;border-radius:16px;border:2px solid #E9A93B;margin:14px 0}
-  .tr-sum ul{margin:6px 0 6px 20px;padding:0}
-  .tr-sum li{margin:5px 0;line-height:1.5}
-  .tr-q{width:100%;box-sizing:border-box;padding:10px 12px;border-radius:12px;border:2px solid #E8E4E2;font:inherit;color:#2B1A51;background:#fff;resize:vertical;min-height:2.6em}
-  .tr-q:focus{outline:none;border-color:#E9A93B}
-  .tr-steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:12px 0;padding:0;list-style:none;counter-reset:s}
-  .tr-steps li{padding:10px 12px;border-radius:12px;background:#F4EFEA;counter-increment:s;line-height:1.45}
-  .tr-steps li::before{content:counter(s);display:inline-grid;place-items:center;width:1.6em;height:1.6em;border-radius:50%;background:#E9A93B;color:#fff;font-weight:700;margin-right:6px}
-  .tr-ans{list-style:none;margin:10px 0;padding:0}
-  .tr-ans li{display:flex;gap:12px;align-items:flex-start;padding:10px 0;border-top:1px solid #F0EBE7}
-  .tr-ans li:first-child{border-top:0}
-  .tr-ans .tr-g{font-size:1.3em;min-width:1.8em;text-align:center}
-  .tr-ask{display:block;font-size:.85em;color:#b9771a;font-weight:700}
-  .tr-pn small{display:block;margin-top:2px}
-  .tr-do{padding:12px 14px;border-radius:12px;background:#FFF4DC;margin:12px 0;line-height:1.5}
-  .tr-do b{display:block;margin-bottom:2px}
-  .tr-plain{font-size:1.08em;line-height:1.5;margin:6px 0}
-  .tr-card details,.tr-sum details{margin-top:10px}
-  .tr-card summary,.tr-sum summary{cursor:pointer}
+  .tr-side{font-size:.8em;font-weight:700;margin:14px 0 6px;opacity:.7}
   @media (max-width:600px){.tr-slot{max-width:none}}`;
 
   const SUITS = [['wands', 'Жезлы', 'Огонь'], ['cups', 'Кубки', 'Вода'], ['swords', 'Мечи', 'Воздух'], ['pent', 'Пентакли', 'Земля']];
-  const EL = { 'Огонь': 'действие, страсть, творчество', 'Вода': 'чувства, отношения, интуиция', 'Воздух': 'мысли, решения, конфликты', 'Земля': 'деньги, работа, тело, быт' };
-  const RANK = { 1: 'Туз', 11: 'Паж', 12: 'Рыцарь', 13: 'Королева', 14: 'Король' };
 
-  let D = null, st = { sp: null, picks: [], rev: [], cur: 0, q: '' };
+  let D = null, st = { sp: null, picks: [], rev: [], cur: 0 };
   const card = n => D.cards.find(c => c.n === n);
   const picked = i => st.picks[i] !== undefined && st.picks[i] !== null && st.picks[i] >= 0;
+  const nCards = k => `${k} ${k === 1 ? 'карта' : k < 5 ? 'карты' : 'карт'}`;
+  const paras = t => String(t || '').split('\n').map(p => `<p>${esc(p)}</p>`).join('');
+  const save = () => ls.set({ sp: st.sp, picks: st.picks, rev: st.rev });
 
   function mount(main) {
     main.innerHTML = `<style>${CSS}</style><div class="tr-wrap"><p class="be-note">Загружаю колоду…</p></div>`;
@@ -73,12 +54,10 @@
     fetch('/api/admin/tarot', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : Promise.reject(r.status)).then(d => {
       D = d;
       const last = ls.get();
-      if (last && D.spreads.find(s => s.id === last.sp)) st = { sp: last.sp, picks: last.picks || [], rev: last.rev || [], cur: 0, q: last.q || '' };
+      if (last && D.spreads.find(s => s.id === last.sp)) st = { sp: last.sp, picks: last.picks || [], rev: last.rev || [], cur: 0 };
       draw(box);
     }).catch(e => { box.innerHTML = `<p class="be-note">Не получилось открыть таро (${esc(e)}). Раздел только для админа — проверьте вход и PIN.</p>`; });
   }
-
-  const nCards = k => `${k} ${k === 1 ? 'карта' : k < 5 ? 'карты' : 'карт'}`;
 
   function draw(box) {
     const sp = D.spreads.find(s => s.id === st.sp);
@@ -87,26 +66,23 @@
     box.innerHTML = `<section class="adm-box">
       <p><button type="button" class="pill-btn tr-back">← Другой расклад</button></p>
       <h2>🃏 ${esc(sp.name)}</h2>
-      <p class="be-note">${nCards(sp.cards)} · вся колода, 78 карт</p>
-      <h3>Как делать</h3>
-      <ol class="tr-how">${sp.how.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
-      <details><summary class="be-note">Перед раскладом — настроиться</summary><ul class="tr-how">${D.prep.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>
-      <h3>Ваш вопрос</h3>
-      <textarea class="tr-q" rows="2" maxlength="300" placeholder="Например: «Что мне важно понять о новой работе?»">${esc(st.q)}</textarea>
-      <p class="be-note" style="margin-top:4px">Необязательно, но так ответ будет понятнее: каждую строку читайте как ответ именно на этот вопрос.</p>
+      <details><summary class="be-note">Как делать этот расклад</summary><ol class="tr-how">${sp.how.map(x => `<li>${esc(x)}</li>`).join('')}</ol>
+        <ul class="tr-how">${D.prep.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>
       <h3>Какие карты выпали</h3>
-      <p class="be-note">Нажмите на место, потом на карту. Повторное нажатие на выбранную карту — убрать. «↺ Перевёрнута» — если карта легла вверх ногами.</p>
+      <p class="be-note">Нажмите на место, потом на карту. «↺ Перевёрнута» — если карта легла вверх ногами.</p>
       <div class="tr-slots">${sp.pos.map((p, i) => { const c = picked(i) && card(st.picks[i]); return `<div class="tr-slot${c ? ' on' : ''}${i === st.cur ? ' cur' : ''}">
-        <button type="button" class="tr-pick" data-i="${i}"><span class="tr-pn">${i + 1}. ${esc(p.name)}<small>${esc(p.ask)}</small></span><span class="tr-g${c && st.rev[i] ? ' rev' : ''}">${c ? esc(c.g) : '?'}</span>${c ? `<b>${esc(c.ru)}</b>` : '<span class="be-note">выбрать</span>'}</button>
+        <button type="button" class="tr-pick" data-i="${i}"><span class="tr-pn">${i + 1}. ${esc(p.name)}</span><span class="tr-g${c && st.rev[i] ? ' rev' : ''}">${c ? esc(c.g) : '?'}</span><br>${c ? `<b>${esc(c.ru)}</b>` : '<span class="be-note">выбрать</span>'}</button>
         ${c ? `<button type="button" class="tr-flip" data-i="${i}" aria-pressed="${st.rev[i] ? 'true' : 'false'}">↺ Перевёрнута</button>` : ''}</div>`; }).join('')}</div>
-      ${grid('Старшие арканы', D.cards.filter(c => c.ar === 'major'))}
-      ${SUITS.map(([id, name, el]) => grid(`${name} · ${el}`, D.cards.filter(c => c.suit === id))).join('')}
-      <p>${full ? '' : '<span class="be-note">Выберите все карты — появится толкование.</span>'} ${st.picks.some((_, i) => picked(i)) ? '<button type="button" class="pill-btn tr-clear">Очистить</button>' : ''}</p>
+      ${full ? '' : grid('Старшие арканы', D.cards.filter(c => c.ar === 'major')) + SUITS.map(([id, name]) => grid(name, D.cards.filter(c => c.suit === id))).join('')}
+      <p>${st.picks.some((_, i) => picked(i)) ? '<button type="button" class="pill-btn tr-clear">Очистить</button>' : ''}</p>
     </section>
-    ${full ? reading(sp) : ''}`;
-    box.querySelector('.tr-back').onclick = () => { st = { sp: null, picks: [], rev: [], cur: 0, q: '' }; save(); draw(box); };
-    const qa = box.querySelector('.tr-q'); qa.oninput = () => { st.q = qa.value; save(); const o = box.querySelector('.tr-myq'); if (o) o.textContent = st.q.trim() ? `«${st.q.trim()}»` : ''; };
-    box.querySelectorAll('.tr-pick').forEach(b => b.onclick = () => { st.cur = +b.dataset.i; draw(box); });
+    ${full ? `<section class="tr-read">${sp.pos.map((p, i) => cardHtml(card(st.picks[i]), { i: i + 1, rev: !!st.rev[i], ...p })).join('')}</section>` : ''}`;
+    box.querySelector('.tr-back').onclick = () => { st = { sp: null, picks: [], rev: [], cur: 0 }; save(); draw(box); };
+    box.querySelectorAll('.tr-pick').forEach(b => b.onclick = () => {
+      st.cur = +b.dataset.i;
+      if (full) { st.picks[st.cur] = -1; st.rev[st.cur] = false; save(); } // при полном раскладе место открывает выбор заново
+      draw(box);
+    });
     box.querySelectorAll('.tr-flip').forEach(b => b.onclick = () => { const i = +b.dataset.i; st.rev[i] = !st.rev[i]; save(); draw(box); });
     box.querySelectorAll('.tr-c').forEach(b => b.onclick = () => {
       const n = +b.dataset.n;
@@ -117,88 +93,32 @@
         if (next >= 0) st.cur = next;
       }
       save(); draw(box);
-      if (sp.pos.every((_, i) => picked(i))) { const r = box.querySelector('.tr-sum'); if (r) r.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+      if (sp.pos.every((_, i) => picked(i))) { const r = box.querySelector('.tr-read'); if (r) r.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
     });
-    const cl = box.querySelector('.tr-clear'); if (cl) cl.onclick = () => { st.picks = []; st.rev = []; st.cur = 0; st.q = ''; save(); draw(box); };
+    const cl = box.querySelector('.tr-clear'); if (cl) cl.onclick = () => { st.picks = []; st.rev = []; st.cur = 0; save(); draw(box); };
   }
 
   function grid(title, list) {
     const used = new Set(st.picks.filter((n, i) => n >= 0 && n !== null && i !== st.cur));
-    return `<p class="be-note" style="margin-bottom:0">${esc(title)}</p><div class="tr-grid">${list.map(c => `<button type="button" class="tr-c" data-n="${c.n}" ${used.has(c.n) ? 'disabled' : ''} title="${esc(c.kw)}"${st.picks[st.cur] === c.n ? ' style="border-color:#E9A93B;border-width:2px"' : ''}>
+    return `<p class="be-note" style="margin-bottom:0">${esc(title)}</p><div class="tr-grid">${list.map(c => `<button type="button" class="tr-c" data-n="${c.n}" ${used.has(c.n) ? 'disabled' : ''}${st.picks[st.cur] === c.n ? ' style="border-color:#E9A93B;border-width:2px"' : ''}>
       <span class="tr-g">${esc(c.g)}</span>${esc(c.ru)}</button>`).join('')}</div>`;
   }
 
   function drawChoose(box) {
     box.innerHTML = `<section class="adm-box"><h2>🃏 Таро</h2>
-      <p class="be-note">«Таро кошек»: 22 старших аркана и 56 младших (жезлы, кубки, мечи, пентакли).</p>
-      <ol class="tr-steps"><li>Выберите расклад и запишите вопрос.</li><li>Вытяните карты из настоящей колоды и отметьте их здесь (и перевёрнутые).</li><li>Прочитайте ответ простыми словами и выберите один шаг.</li></ol>
-      <p class="be-note">Не знаете, какой расклад? Начните с «Одной карты».</p>
+      <p class="be-note">«Таро кошек», 78 карт. Выберите расклад и отметьте выпавшие карты.</p>
       <div class="tr-spreads">${D.spreads.map(s => `<button type="button" class="tr-sp" data-id="${s.id}"><b>${esc(s.name)}</b><small>${nCards(s.cards)}</small></button>`).join('')}</div>
-      <details><summary class="be-note">Как настроиться перед раскладом</summary><ul class="tr-how">${D.prep.map(x => `<li>${esc(x)}</li>`).join('')}</ul></details>
       <details><summary class="be-note">Все карты колоды</summary>${D.cards.map(c => cardHtml(c)).join('')}</details></section>`;
-    box.querySelectorAll('.tr-sp').forEach(b => b.onclick = () => { st = { sp: b.dataset.id, picks: [], rev: [], cur: 0, q: '' }; save(); draw(box); });
+    box.querySelectorAll('.tr-sp').forEach(b => b.onclick = () => { st = { sp: b.dataset.id, picks: [], rev: [], cur: 0 }; save(); draw(box); });
   }
 
-  const save = () => ls.set({ sp: st.sp, picks: st.picks, rev: st.rev, q: st.q });
-  const plain = (c, rev) => rev ? c.sr : c.s, todo = (c, rev) => rev ? c.dr : c.do;
-  const paras = t => String(t || '').split('\n').map(p => `<p>${esc(p)}</p>`).join('');
-
-  // карта: сверху «простыми словами» и «что сделать» по положению; полный текст колоды и символы — под раскрытием
+  // карта: место (в раскладе), название, одна выделенная строка ключевых слов, описание из колоды
   function cardHtml(c, pos) {
-    const at = [c.ar === 'major' ? 'Старший аркан' : 'Младший аркан', c.suit && SUITS.find(s => s[0] === c.suit)[1], c.el && `Стихия: ${c.el}`].filter(Boolean);
-    const rev = !!(pos && pos.rev);
-    const head = `<h3><span class="tr-g${rev ? ' rev' : ''}" style="display:inline-block;font-size:1em">${esc(c.g)}</span> ${esc(c.ru)}${rev ? ' <small>(перевёрнута)</small>' : ''} <small style="opacity:.6;font-weight:400">${esc(c.name)}</small></h3>
-      <p class="tr-kw">${esc(c.kw)}</p>`;
-    if (!pos) return `<article class="tr-card">${head}
-      <p class="tr-side">↑ ПРЯМАЯ</p><p class="tr-plain">${esc(c.s)}</p><div class="tr-do"><b>👣 Что сделать</b>${esc(c.do)}</div>
-      <p class="tr-side">↺ ПЕРЕВЁРНУТАЯ</p><p class="tr-plain">${esc(c.sr)}</p><div class="tr-do"><b>👣 Что сделать</b>${esc(c.dr)}</div>
-      <details><summary class="be-note">Подробнее: текст колоды</summary><div class="tr-attrs">${at.map(v => `<span>${esc(v)}</span>`).join('')}</div>
-        <p class="tr-side">↑ ПРЯМАЯ</p><div class="tr-t">${paras(c.t)}</div><p class="tr-side">↺ ПЕРЕВЁРНУТАЯ</p><div class="tr-t">${paras(c.r)}</div></details></article>`;
-    return `<article class="tr-card"><div class="tr-pos">${esc(pos.i)}. ${esc(pos.name)} — ${esc(pos.ask)}</div>${head}
-      <p class="tr-plain">${esc(plain(c, rev))}</p>
-      <div class="tr-do"><b>👣 Что сделать</b>${esc(todo(c, rev))}</div>
-      <details><summary class="be-note">Подробнее: текст колоды и символы</summary>
-        <div class="tr-attrs">${at.map(v => `<span>${esc(v)}</span>`).join('')}</div>
-        <p class="be-note">Это место расклада: ${esc(pos.about)}</p>
-        <p class="tr-side">${rev ? '↺ ПЕРЕВЁРНУТАЯ' : '↑ ПРЯМАЯ'}</p><div class="tr-t">${paras(rev ? c.r : c.t)}</div>
-        <p class="tr-side">${rev ? '↑ Прямое значение' : '↺ Перевёрнутое значение'}</p><div class="tr-t tr-other">${paras(rev ? c.t : c.r)}</div></details></article>`;
-  }
-
-  // общее толкование: что на каждом месте, старшие/младшие, масти и стихии, перевёрнутые, придворные, тузы, повтор достоинств
-  function reading(sp) {
-    const cs = st.picks.map(card), k = cs.length;
-    const lines = [];
-    if (k > 1) {
-      const maj = cs.filter(c => c.ar === 'major').length;
-      lines.push(maj === 0 ? 'Только младшие арканы — речь о повседневных делах, всё в ваших руках.'
-        : maj * 2 > k ? `Старших арканов ${maj} из ${k} — важный, судьбоносный период: события больше вас самих, их стоит прожить, а не торопить.`
-          : `Старших арканов ${maj} из ${k}: большие силы переплетаются с повседневными делами.`);
-      const su = {}; cs.forEach(c => { if (c.suit) su[c.suit] = (su[c.suit] || 0) + 1; });
-      const top = Object.entries(su).sort((a, b) => b[1] - a[1]);
-      if (top[0] && top[0][1] > 1 && !(top[1] && top[1][1] === top[0][1])) { const s = SUITS.find(x => x[0] === top[0][0]); lines.push(`Больше всего мастей «${s[1]}» (${top[0][1]} из ${k}, стихия ${s[2]}) — в вопросе главное ${EL[s[2]]}.`); }
-      const miss = SUITS.filter(s => !su[s[0]]);
-      if (k >= 5 && miss.length && miss.length < 4) lines.push(`Нет ни одной карты масти ${miss.map(s => `«${s[1]}»`).join(', ')} — эта сторона жизни (${miss.map(s => EL[s[2]]).join('; ')}) сейчас в тени.`);
-      const rv = st.rev.slice(0, k).filter(Boolean).length;
-      if (rv) lines.push(rv * 2 > k ? `Перевёрнутых ${rv} из ${k} — много задержек и внутреннего сопротивления; ответ, скорее, внутри вас, чем снаружи.` : `Перевёрнутых ${rv} из ${k} — где-то энергия застряла или повёрнута внутрь.`);
-      const court = cs.filter(c => c.rank > 10);
-      if (court.length) lines.push(`Придворные карты (${court.map(c => esc(c.ru)).join(', ')}) — в ситуации важны люди или роли, которые вы сами примеряете.`);
-      const aces = cs.filter(c => c.rank === 1);
-      if (aces.length) lines.push(`${aces.length > 1 ? 'Несколько тузов' : 'Туз'} — начало чего-то нового.`);
-      const rk = {}; cs.forEach(c => { if (c.rank) rk[c.rank] = (rk[c.rank] || 0) + 1; });
-      Object.entries(rk).filter(x => x[1] > 1 && x[0] !== '1').forEach(([r, m]) => lines.push(`Повторяется достоинство «${RANK[r] || r}» (${m} раза) — эта тема звучит громче остальных.`));
-    }
-    const rv = i => !!st.rev[i];
-    const ai = sp.pos.findIndex(p => p.act);
-    const step = ai >= 0 ? `<div class="tr-do"><b>👣 Главный шаг${k > 1 ? ` (карта «${esc(cs[ai].ru)}», место «${esc(sp.pos[ai].name)}»)` : ''}</b>${esc(todo(cs[ai], rv(ai)))}</div>`
-      : `<div class="tr-do"><b>👣 Главный шаг</b>Сравните строки «Итог А» и «Итог Б»: какой путь откликается сильнее? Сделайте в ближайшие дни маленький пробный шаг по нему (что сделать — в карте этого пути ниже).</div>`;
-    return `<section class="tr-sum adm-box"><h2>✨ Ответ простыми словами</h2>
-      <p class="tr-myq" style="font-style:italic;margin:0 0 4px">${st.q.trim() ? `«${esc(st.q.trim())}»` : ''}</p>
-      <ul class="tr-ans">${sp.pos.map((p, i) => `<li><span class="tr-g${rv(i) ? ' rev' : ''}">${esc(cs[i].g)}</span><div><span class="tr-ask">${esc(p.ask)}</span><b>${esc(cs[i].ru)}${rv(i) ? ' (перевёрнута)' : ''}:</b> ${esc(plain(cs[i], rv(i)))}</div></li>`).join('')}</ul>
-      ${step}
-      <p><b>Как пользоваться:</b> прочитайте строки выше как ответ на свой вопрос; что откликается — важно, что нет — пропустите. Сделайте главный шаг в ближайшие 1–3 дня, а через неделю вернитесь и посмотрите, что изменилось.</p>
-      ${lines.length ? `<details><summary class="be-note">Ещё по раскладу: арканы, масти, перевёрнутые</summary><p>${lines.join(' ')}</p></details>` : ''}</section>
-      <h3>Каждая карта отдельно</h3>
-      ${cs.map((c, i) => cardHtml(c, { i: i + 1, rev: rv(i), ...sp.pos[i] })).join('')}`;
+    const title = rev => `<h3><span class="tr-g${rev ? ' rev' : ''}">${esc(c.g)}</span> ${esc(c.ru)}${rev ? ' — перевёрнута' : ''}</h3>`;
+    if (!pos) return `<article class="tr-card">${title(false)}<p class="tr-kw">${esc(c.kw)}</p><div class="tr-t">${paras(c.t)}</div>
+      <p class="tr-side">↺ Перевёрнутая</p><p class="tr-kw">${esc(c.kwr)}</p><div class="tr-t">${paras(c.r)}</div></article>`;
+    return `<article class="tr-card"><div class="tr-pos">${esc(pos.i)}. ${esc(pos.name)}</div>${title(pos.rev)}
+      <p class="tr-kw">${esc(pos.rev ? c.kwr : c.kw)}</p><div class="tr-t">${paras(pos.rev ? c.r : c.t)}</div></article>`;
   }
 
   window.PPTarotAdmin = { mount };
