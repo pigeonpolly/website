@@ -174,19 +174,19 @@
   async function mount(main) {
     main.innerHTML = '<p class="be-note">Загружаю генератор пинов…</p>';
     await load();
-    main.innerHTML = `<section class="adm-box pp-pin">
+    main.innerHTML = `<section class="adm-box pp-pg">
       <h2>🖼 Генератор пинов</h2>
       <p class="be-note">1 — тип, 2 — дизайн, 3 — фото (своё или из базы сайта), 4 — ✨ тексты. Потом «⬇ Скачать» и поля для Pinterest. Всё на английском.</p>
       <h3>1. Тип пина</h3><div class="adm-quick" data-types></div>
-      <h3>2. Дизайн</h3><div class="pp-pin-designs" data-designs></div>
+      <h3>2. Дизайн</h3><div class="pp-pg-designs" data-designs></div>
       <h3>3. Фото <small class="be-note" data-need></small></h3>
       <div class="adm-quick"><label class="pill-btn">📁 Загрузить фото<input type="file" accept="image/*" multiple hidden data-file></label><button type="button" class="pill-btn" data-base>🖼 Из базы сайта</button><button type="button" class="pill-btn" data-clear>✕ Убрать все</button></div>
-      <div class="pp-pin-photos" data-photos></div><p class="be-note">Нажмите на фото — туда сдвинется центр кадра (что главное на картинке).</p>
-      <div class="pp-pin-base" data-basebox hidden></div>
-      <div class="pp-pin-main">
-        <div><canvas class="pp-pin-cv" data-cv></canvas>
+      <div class="pp-pg-photos" data-photos></div><p class="be-note">Нажмите на фото — туда сдвинется центр кадра (что главное на картинке).</p>
+      <div class="pp-pg-base" data-basebox hidden></div>
+      <div class="pp-pg-main">
+        <div><canvas class="pp-pg-cv" data-cv></canvas>
           <div class="adm-quick"><button type="button" class="pill-btn pill-fill" data-dl>⬇ Скачать JPG</button></div></div>
-        <div class="pp-pin-side">
+        <div class="pp-pg-side">
           <h3>4. Тексты</h3>
           <label>Куда ведёт пин<select class="be-input" data-link>${LINKS.map(([p, t]) => `<option value="${p}">${t} — ${p}</option>`).join('')}</select></label>
           <label>…или своя ссылка (статья, видео)<input class="be-input" data-custom placeholder="/blog/how-did-sketching-begin/"></label>
@@ -202,18 +202,18 @@
       $('[data-types]').querySelectorAll('[data-t]').forEach(b => b.onclick = () => { S.type = b.dataset.t; S.design = DESIGNS.find(d => d.type === S.type).id; S.f = JSON.parse(JSON.stringify(DEF[S.type])); S.pin = null; types(); designs(); fields(); pinBox(); redraw(); }); };
     // дизайны: маленькие превью
     const designs = () => { const list = DESIGNS.filter(d => d.type === S.type);
-      $('[data-designs]').innerHTML = list.map(d => `<button type="button" class="pp-pin-d${S.design === d.id ? ' on' : ''}" data-d="${d.id}"><canvas></canvas><span>${d.name}</span></button>`).join('');
-      $('[data-designs]').querySelectorAll('[data-d]').forEach(b => b.onclick = () => { S.design = b.dataset.d; $('[data-designs]').querySelectorAll('.pp-pin-d').forEach(z => z.classList.toggle('on', z === b)); redraw(); });
+      $('[data-designs]').innerHTML = list.map(d => `<button type="button" class="pp-pg-d${S.design === d.id ? ' on' : ''}" data-d="${d.id}"><canvas></canvas><span>${d.name}</span></button>`).join('');
+      $('[data-designs]').querySelectorAll('[data-d]').forEach(b => b.onclick = () => { S.design = b.dataset.d; $('[data-designs]').querySelectorAll('.pp-pg-d').forEach(z => z.classList.toggle('on', z === b)); redraw(); });
       const t = TYPES.find(z => z.id === S.type); $('[data-need]').textContent = t.n > 1 ? `· можно до 6 фото (${t.about})` : '· одно фото'; };
-    const drawThumbs = async () => { for (const b of main.querySelectorAll('.pp-pin-d')) { const c = b.querySelector('canvas'); const tmp = document.createElement('canvas'); await render(tmp, b.dataset.d); c.width = 200; c.height = 300; c.getContext('2d').drawImage(tmp, 0, 0, 200, 300); } };
+    const drawThumbs = async () => { for (const b of main.querySelectorAll('.pp-pg-d')) { const c = b.querySelector('canvas'); const tmp = document.createElement('canvas'); await render(tmp, b.dataset.d); c.width = 200; c.height = 300; c.getContext('2d').drawImage(tmp, 0, 0, 200, 300); } };
     // фото
     const addPhoto = async (src, meta = {}) => { const im = await loadImg(src); if (!im) return; const max = TYPES.find(t => t.id === S.type).n > 1 ? 6 : 1;
       const p = { src, im, fx: .5, fy: .5, t: meta.t || '', cols: meta.c ? meta.c.map(([hex, en]) => ({ hex, en })) : null };
       if (max === 1) S.photos = [p]; else { S.photos.push(p); S.photos = S.photos.slice(-6); }
       if (S.type === 'palette' && meta.t) S.f.name = S.f.headline = meta.t.replace(/(^|\s)\S/g, c => c.toUpperCase());
       photos(); fields(); redraw(); };
-    const photos = () => { $('[data-photos]').innerHTML = S.photos.map((p, i) => `<div class="pp-pin-ph" data-i="${i}"><img src="${esc(p.src)}" alt=""><i style="left:${p.fx * 100}%;top:${p.fy * 100}%"></i><button type="button" data-x title="Убрать">✕</button>${i ? `<button type="button" data-up title="Раньше">↑</button>` : ''}</div>`).join('');
-      $('[data-photos]').querySelectorAll('.pp-pin-ph').forEach(d => { const i = +d.dataset.i, img = d.querySelector('img');
+    const photos = () => { $('[data-photos]').innerHTML = S.photos.map((p, i) => `<div class="pp-pg-ph" data-i="${i}"><img src="${esc(p.src)}" alt=""><i style="left:${p.fx * 100}%;top:${p.fy * 100}%"></i><button type="button" data-x title="Убрать">✕</button>${i ? `<button type="button" data-up title="Раньше">↑</button>` : ''}</div>`).join('');
+      $('[data-photos]').querySelectorAll('.pp-pg-ph').forEach(d => { const i = +d.dataset.i, img = d.querySelector('img');
         img.onclick = e => { const r = img.getBoundingClientRect(); S.photos[i].fx = (e.clientX - r.left) / r.width; S.photos[i].fy = (e.clientY - r.top) / r.height; photos(); redraw(); };
         d.querySelector('[data-x]').onclick = () => { S.photos.splice(i, 1); photos(); redraw(); };
         const up = d.querySelector('[data-up]'); if (up) up.onclick = () => { [S.photos[i - 1], S.photos[i]] = [S.photos[i], S.photos[i - 1]]; photos(); redraw(); }; }); };
@@ -223,7 +223,7 @@
       const G = { all: 'Все', bird: 'Полли', snail: 'Мистер Чу', sketchbook: 'Скетчбук', halloween: 'Хеллоуин', detective: 'Детектив', anxiety: 'Тревога', photo: 'Фото', challenge: 'Челлендж', exhibitions: 'Выставки', publications: 'Публикации' };
       const show = g => { box.querySelector('[data-grid]').innerHTML = base.filter(b => g === 'all' || b.g === g).map(b => `<button type="button" data-src="${esc(b.src)}" title="${esc(b.t)}"><img src="${esc(b.th)}" alt="" loading="lazy"></button>`).join('');
         box.querySelectorAll('[data-grid] button').forEach(b => b.onclick = () => { const it = base.find(z => z.src === b.dataset.src); addPhoto(it.src, it); if (TYPES.find(t => t.id === S.type).n === 1) box.hidden = true; }); };
-      box.innerHTML = `<div class="adm-quick">${Object.entries(G).filter(([k]) => k === 'all' || base.some(b => b.g === k)).map(([k, t]) => `<button type="button" class="pill-btn" data-g="${k}">${t}</button>`).join('')}</div><div class="pp-pin-grid" data-grid></div>`;
+      box.innerHTML = `<div class="adm-quick">${Object.entries(G).filter(([k]) => k === 'all' || base.some(b => b.g === k)).map(([k, t]) => `<button type="button" class="pill-btn" data-g="${k}">${t}</button>`).join('')}</div><div class="pp-pg-grid" data-grid></div>`;
       box.querySelectorAll('[data-g]').forEach(b => b.onclick = () => { box.querySelectorAll('[data-g]').forEach(z => z.classList.toggle('pill-fill', z === b)); show(b.dataset.g); });
       box.querySelector('[data-g]').classList.add('pill-fill'); show('all'); };
     // поля надписей на пине
@@ -233,7 +233,7 @@
       $('[data-fields]').querySelectorAll('[data-f]').forEach(el => el.oninput = () => { const k = el.dataset.f; S.f[k] = k === 'items' ? el.value.split('\n') : el.value; if (k === 'name') S.f.headline = el.value; clearTimeout(fields.t); fields.t = setTimeout(redraw, 150); }); };
     // поля Pinterest
     const pinBox = () => { const p = S.pin || fallbackPin(), rows = [['Title', p.title], ['Description', p.desc], ['Link', linkFull()], ['Alt text', p.alt], ['Topics', p.topics]];
-      $('[data-pin]').innerHTML = rows.map(([k, v]) => `<label>${k}<div class="pp-pin-row"><textarea class="be-input" rows="${k === 'Description' ? 4 : 2}" data-pk="${k}">${esc(v || '')}</textarea><button type="button" class="pill-btn" data-cp>📋</button></div></label>`).join('');
+      $('[data-pin]').innerHTML = rows.map(([k, v]) => `<label>${k}<div class="pp-pg-row"><textarea class="be-input" rows="${k === 'Description' ? 4 : 2}" data-pk="${k}">${esc(v || '')}</textarea><button type="button" class="pill-btn" data-cp>📋</button></div></label>`).join('');
       $('[data-pin]').querySelectorAll('[data-cp]').forEach(b => b.onclick = async () => { const t = b.previousElementSibling; try { await navigator.clipboard.writeText(t.value); b.textContent = '✓'; setTimeout(() => { b.textContent = '📋'; }, 1500); } catch (e) { t.select(); } }); };
     $('[data-link]').value = S.link; $('[data-link]').onchange = e => { S.link = e.target.value; pinBox(); };
     $('[data-custom]').oninput = e => { S.custom = e.target.value; pinBox(); };
