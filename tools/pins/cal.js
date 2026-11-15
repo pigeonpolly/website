@@ -1,20 +1,25 @@
 // Календари на месяц и заставки на телефон для раздела /freebies/ + пины Pinterest с ними (docs/freebies.md).
 // 3 дизайна × неделя с понедельника (EU) и с воскресенья (US) × 12 месяцев; цвета — из палитры арта, сайт — только маленьким знаком.
-// node tools/pins/cal.js [cal|wall|year|all] [месяц…]  (year — только календари на год)
+// node tools/pins/cal.js [cal|wall|year|extra|all] [месяц…]  (year — только календари на год, extra — доп. календари из cal-data.js)
 //  → site/images/freebies/cal/<год>-<мм>-<mon|sun>-<дизайн>.jpg (1600×2400) + t/… (480×720)
 //  → site/images/pins/pin-NNN.jpg (1000×1500), site/images/freebies/wall/<key>.jpg (1179×2556) + t/…
 //  → site/assets/freebies.json (страница /freebies/), tools/pins/cal.json (тексты пинов для Notion)
 const fs = require('fs'), path = require('path'), { execFileSync } = require('child_process');
 const { chromium } = require('playwright');
 const ROOT = path.resolve(__dirname, '../..');
-const ART = require('./cal-data'), WALLS = ART.walls;
+const ART = require('./cal-data'), WALLS = ART.walls, EXTRA = ART.extra || [];
 const YEAR = 2027, FIRST_PIN = 488;
+// номер пина: месяцы YEAR — подряд с FIRST_PIN, доп. календари (extra) — со своего first
+const DS = a => a.ds || [0, 1, 2]; // какие дизайны есть у вещи (у доп. арта может быть не все)
+const pinN = (a, d, w) => (a.first || FIRST_PIN + (a.m - 1) * 6) + DS(a).indexOf(d) * 2 + (w === 'sun' ? 1 : 0);
 const SITE = 'https://www.pigeonpolly.com', UTM = 'utm_source=pinterest&utm_campaign=calendar27';
+const utm = a => a.y && a.y !== YEAR ? `utm_source=pinterest&utm_campaign=calendar${String(a.y).slice(2)}` : UTM;
 const PALS = JSON.parse(fs.readFileSync(path.join(ROOT, 'content/palettes.json'), 'utf8'));
 const OUT = path.join(ROOT, 'site/images/freebies');
 const MON = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const WD = { mon: ['Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat', 'Sun'], sun: ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'] };
 const pad = n => String(n).padStart(2, '0');
+const YR = a => a.y || YEAR, CID = a => `${YR(a)}-${pad(a.m)}${a.v || ''}`; // год и id вещи (доп. календари — cal-data.js extra)
 
 // цвета
 const rgb = h => [1, 3, 5].map(i => parseInt(h.slice(i, i + 2), 16));
@@ -52,7 +57,7 @@ const src = a => 'file://' + path.join(ROOT, 'site/images', a.dir, a.key + '.jpg
 
 // 1 «Ночь»: арт сверху растворяется в тёмном фоне, клетки-окошки
 const D1 = (a, wk, c) => {
-  const g = grid(YEAR, a.m, wk), ink = c.light, bg = c.dark, acc = c.accD;
+  const g = grid(YR(a), a.m, wk), ink = c.light, bg = c.dark, acc = c.accD;
   return `<style>${BASE}body{background:${bg};color:${ink}}
 .art{position:absolute;left:0;right:0;top:0;height:800px}.art img{width:100%;height:100%;object-fit:cover;object-position:${a.pos};display:block}
 .art:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,${bg}00 60%,${bg} 99%)}
@@ -62,7 +67,7 @@ const D1 = (a, wk, c) => {
 .wd,.g{display:grid;grid-template-columns:repeat(7,1fr);gap:8px}.wd{margin-top:34px;text-align:center;font:700 19px Karla;letter-spacing:.2em;text-transform:uppercase;opacity:.75}
 .g{margin-top:14px}.c{height:${g.rows > 5 ? 82 : 92}px;border-radius:6px;background:${ink}1F;border:1.5px solid ${ink}40;padding:8px 10px}
 .c b{font:500 24px Fraunces}.c.we b{color:${acc}}.c.e{background:none;border-color:${ink}1A}${MK(ink)}</style>
-<div class="art"><img src="${src(a)}"></div><div class="cal"><div class="hd"><span class="st">✻</span><h1>${MON[a.m - 1]}</h1><span>${YEAR}</span><span class="st">✻</span></div>
+<div class="art"><img src="${src(a)}"></div><div class="cal"><div class="hd"><span class="st">✻</span><h1>${MON[a.m - 1]}</h1><span>${YR(a)}</span><span class="st">✻</span></div>
 <div class="wd">${WD[wk].map(d => `<div>${d}</div>`).join('')}</div><div class="g">${g.cells.map(x => x ? `<div class="c${x.we ? ' we' : ''}"><b>${x.d}</b></div>` : '<div class="c e"></div>').join('')}</div></div>${mark()}`;
 };
 
@@ -72,7 +77,7 @@ const edge = (y0, seed) => { const pts = ['0 0', '100% 0'];
   for (let i = 40; i >= 0; i--) { const x = i / 40, y = y0 + 16 * Math.sin(x * 9 + seed) + 7 * Math.sin(x * 23 + seed * 2) + 4 * Math.sin(x * 51 + seed);
     pts.push(`${(x * 100).toFixed(1)}% ${y.toFixed(0)}px`); } return `polygon(${pts.join(',')})`; };
 const D2 = (a, wk, c) => {
-  const g = grid(YEAR, a.m, wk), ink = c.inkL, acc = c.accL;
+  const g = grid(YR(a), a.m, wk), ink = c.inkL, acc = c.accL;
   return `<style>${BASE}body{background:#FBF9F4;color:${ink}}body:after{content:'';position:absolute;inset:0;background:${NOISE};opacity:.16;mix-blend-mode:multiply;pointer-events:none}
 .art{position:absolute;left:0;right:0;top:0;height:${g.rows > 5 ? 860 : 900}px;clip-path:${edge(g.rows > 5 ? 830 : 870, a.m)}}
 .art img{width:100%;height:100%;object-fit:cover;object-position:${a.pos};display:block}
@@ -80,13 +85,13 @@ h1{position:absolute;left:0;right:0;top:${g.rows > 5 ? 900 : 945}px;text-align:c
 .cal{position:absolute;left:50%;transform:translateX(-50%);top:${g.rows > 5 ? 1040 : 1085}px;width:580px}
 .wd,.g{display:grid;grid-template-columns:repeat(7,1fr);text-align:center}.wd{font:400 26px 'Patrick Hand';opacity:.55;margin-bottom:4px}
 .g div{font:400 46px/1.3 'Patrick Hand'}.g .we{color:${acc}}${MK(ink, .5)}.mk{bottom:40px;right:44px}</style>
-<div class="art"><img src="${src(a)}"></div><h1>${MON[a.m - 1]} ${YEAR}</h1>
+<div class="art"><img src="${src(a)}"></div><h1>${MON[a.m - 1]} ${YR(a)}</h1>
 <div class="cal"><div class="wd">${WD[wk].map(d => `<div>${d[0]}</div>`).join('')}</div><div class="g">${g.cells.map(x => x ? `<div${x.we ? ' class="we"' : ''}>${x.d}</div>` : '<div></div>').join('')}</div></div>${mark()}`;
 };
 
 // 3 «Арка»: пастельный фон из палитры, арт в арке, крупный гротеск, выходные — цветные кружки палитры
 const D3 = (a, wk, c) => {
-  const g = grid(YEAR, a.m, wk), mids = c.pal.filter(h => lum(h) > .04 && lum(h) < .5).sort((x, y) => sat(y) - sat(x));
+  const g = grid(YR(a), a.m, wk), mids = c.pal.filter(h => lum(h) > .04 && lum(h) < .5).sort((x, y) => sat(y) - sat(x));
   const bg = mix(mids[0] || c.pal[0], '#ffffff', .8), ink = c.inkL;
   const dots = c.pal.filter(h => contrast(h, bg) > 1.6); let k = 0;
   return `<style>${BASE}body{background:${bg};color:${ink}}
@@ -99,7 +104,7 @@ const D3 = (a, wk, c) => {
 .wd,.g{display:grid;grid-template-columns:repeat(7,1fr);justify-items:center}.wd{font:700 22px 'Bricolage Grotesque';letter-spacing:.1em;opacity:.6;margin-bottom:8px}
 .g{row-gap:6px}.g div{width:${g.rows > 5 ? 60 : 68}px;height:${g.rows > 5 ? 60 : 68}px;border-radius:50%;display:grid;place-items:center;font:600 31px 'Bricolage Grotesque'}
 ${MK(ink, .55)}.mk{bottom:36px}</style>
-<div class="ol"></div><div class="ar"><img src="${src(a)}"></div><div class="hd"><h1>${MON[a.m - 1]}</h1><span>${YEAR}</span></div>
+<div class="ol"></div><div class="ar"><img src="${src(a)}"></div><div class="hd"><h1>${MON[a.m - 1]}</h1><span>${YR(a)}</span></div>
 <div class="cal"><div class="wd">${WD[wk].map(d => `<div>${d.slice(0, 2).toUpperCase()}</div>`).join('')}</div><div class="g">${g.cells.map(x => {
     if (!x) return '<div></div>'; if (!x.we) return `<div>${x.d}</div>`;
     const h = dots[k++ % dots.length] || ink; return `<div style="background:${h};color:${lum(h) > .35 ? ink : '#fff'}">${x.d}</div>`; }).join('')}</div></div>${mark()}`;
@@ -149,18 +154,18 @@ body{background:${c.dark};position:relative}
 // тексты пинов
 const WK = { mon: ['Monday Start', 'week starts on Monday (European style)'], sun: ['Sunday Start', 'week starts on Sunday (US style)'] };
 const TITLE = [
-  (mo, w) => `${mo} ${YEAR} Calendar Printable, ${WK[w][0]} | Cozy Illustrated Calendar`,
-  (mo, w) => `Aesthetic ${mo} ${YEAR} Calendar (${WK[w][0]}) | Free Printable Art Calendar`,
-  (mo, w) => `Free ${mo} ${YEAR} Calendar, ${WK[w][0]} | Cute Wallpaper & Printable`,
+  (mo, w, y) => `${mo} ${y} Calendar Printable, ${WK[w][0]} | Cozy Illustrated Calendar`,
+  (mo, w, y) => `Aesthetic ${mo} ${y} Calendar (${WK[w][0]}) | Free Printable Art Calendar`,
+  (mo, w, y) => `Free ${mo} ${y} Calendar, ${WK[w][0]} | Cute Wallpaper & Printable`,
 ];
 const STYLE = ['dark moody', 'hand-drawn paper', 'pastel arch'];
 const pinText = (a, d, w, n) => {
-  const mo = MON[a.m - 1], id = `${YEAR}-${pad(a.m)}-${w}`;
-  return { n, type: 'Календарь', season: `${a.season} ${YEAR}`, title: TITLE[d](mo, w),
-    desc: `A free ${mo} ${YEAR} calendar with my illustration: ${a.scene}. ${STYLE[d][0].toUpperCase() + STYLE[d].slice(1)} design, ${WK[w][1]}. Download it free in high resolution to print or use as a desktop or phone background. More months, US and EU versions on my site.`,
-    alt: `${mo} ${YEAR} monthly calendar, ${WK[w][0]}, in a ${STYLE[d]} style under an illustration of ${a.scene}.`,
-    link: `${SITE}/freebies/?f=${id}&d=${d + 1}&${UTM}`, media: `${SITE}/images/pins/pin-${n}.jpg`,
-    topics: `${mo} calendar ${YEAR}, Printable calendar, Aesthetic calendar, ${WK[w][0]} calendar, ${a.tags}` };
+  const mo = MON[a.m - 1], Y = YR(a), id = `${CID(a)}-${w}`;
+  return { n, type: 'Календарь', season: `${a.season} ${Y}`, title: a.titles ? a.titles[DS(a).indexOf(d)].replace('{mo}', mo).replace('{y}', Y).replace('{wk}', WK[w][0]) : TITLE[d](mo, w, Y),
+    desc: `A free ${mo} ${Y} calendar with my illustration: ${a.scene}. ${STYLE[d][0].toUpperCase() + STYLE[d].slice(1)} design, ${WK[w][1]}. Download it free in high resolution to print or use as a desktop or phone background. More months, US and EU versions on my site.`,
+    alt: `${mo} ${Y} monthly calendar, ${WK[w][0]}, in a ${STYLE[d]} style under an illustration of ${a.scene}.`,
+    link: `${SITE}/freebies/?f=${id}&d=${d + 1}&${utm(a)}`, media: `${SITE}/images/pins/pin-${n}.jpg`,
+    topics: `${mo} calendar ${Y}, Printable calendar, Aesthetic calendar, ${WK[w][0]} calendar, ${a.tags}` };
 };
 
 const YT = [w => `${YEAR} Yearly Calendar Printable, ${WK[w][0]} | Cozy Illustrated Year at a Glance`,
@@ -173,7 +178,7 @@ const yearText = (d, w, n) => ({ n, type: 'Календарь', season: `Вес�
 
 (async () => {
   const [mode = 'all', ...ms] = process.argv.slice(2), want = ms.map(Number);
-  const list = mode === 'year' ? [] : ART.filter(a => !want.length || want.includes(a.m));
+  const list = mode === 'year' ? [] : mode === 'extra' ? EXTRA : ART.filter(a => !want.length || want.includes(a.m));
   ['cal', 'cal/t', 'wall', 'wall/t'].forEach(d => fs.mkdirSync(path.join(OUT, d), { recursive: true }));
   const b = await chromium.launch(), f = path.join(__dirname, 'cal-out.html');
   const shoot = async (page, html, out) => {
@@ -185,15 +190,15 @@ const yearText = (d, w, n) => ({ n, type: 'Календарь', season: `Вес�
   if (mode !== 'wall') {
     const page = await b.newPage({ viewport: { width: 1000, height: 1500 }, deviceScaleFactor: 1.6 });
     for (const a of list) { const c = colors(a);
-      for (let d = 0; d < 3; d++) for (const w of ['mon', 'sun']) {
-        const nm = `${YEAR}-${pad(a.m)}-${w}-${d + 1}.jpg`, full = path.join(OUT, 'cal', nm);
+      for (const d of DS(a)) for (const w of ['mon', 'sun']) {
+        const nm = `${CID(a)}-${w}-${d + 1}.jpg`, full = path.join(OUT, 'cal', nm);
         await shoot(page, DESIGNS[d](a, w, c), full);
         mg(full, path.join(OUT, 'cal/t', nm), 480);
-        const n = FIRST_PIN + (a.m - 1) * 6 + d * 2 + (w === 'sun' ? 1 : 0);
+        const n = pinN(a, d, w);
         mg(full, path.join(ROOT, 'site/images/pins', `pin-${n}.jpg`), 1000);
         console.log(nm, '→ pin', n);
       } }
-    if (!want.length || mode === 'year') { const c = colors(YART);
+    if ((!want.length && mode !== 'extra') || mode === 'year') { const c = colors(YART);
       for (let d = 0; d < 3; d++) for (const w of ['mon', 'sun']) {
         const nm = `${YEAR}-year-${w}-${d + 1}.jpg`, full = path.join(OUT, 'cal', nm);
         await shoot(page, Y[d](YART, w, c), full); mg(full, path.join(OUT, 'cal/t', nm), 480);
@@ -214,12 +219,12 @@ const yearText = (d, w, n) => ({ n, type: 'Календарь', season: `Вес�
   const data = {
     year: ['mon', 'sun'].map(w => ({ id: `${YEAR}-year-${w}`, y: YEAR, w, art: YART.t,
       d: [1, 2, 3].map(k => ({ full: im(`cal/${YEAR}-year-${w}-${k}.jpg`), th: im(`cal/t/${YEAR}-year-${w}-${k}.jpg`) })) })),
-    cal: ART.flatMap(a => ['mon', 'sun'].map(w => ({ id: `${YEAR}-${pad(a.m)}-${w}`, y: YEAR, m: a.m, w, art: a.t,
-      d: [1, 2, 3].map(k => ({ full: im(`cal/${YEAR}-${pad(a.m)}-${w}-${k}.jpg`), th: im(`cal/t/${YEAR}-${pad(a.m)}-${w}-${k}.jpg`) })) }))),
+    cal: [...EXTRA, ...ART].flatMap(a => ['mon', 'sun'].map(w => ({ id: `${CID(a)}-${w}`, y: YR(a), m: a.m, w, art: a.t,
+      d: DS(a).map(i => i + 1).map(k => ({ full: im(`cal/${CID(a)}-${w}-${k}.jpg`), th: im(`cal/t/${CID(a)}-${w}-${k}.jpg`) })) }))),
     wall: WALLS.map(a => ({ id: a.key, t: a.t, full: im(`wall/${a.key}.jpg`), th: im(`wall/t/${a.key}.jpg`) })),
   };
   fs.writeFileSync(path.join(ROOT, 'site/assets/freebies.json'), JSON.stringify(data));
-  const pins = ART.flatMap(a => [0, 1, 2].flatMap(d => ['mon', 'sun'].map(w => pinText(a, d, w, FIRST_PIN + (a.m - 1) * 6 + d * 2 + (w === 'sun' ? 1 : 0)))));
+  const pins = [...ART, ...EXTRA].flatMap(a => DS(a).flatMap(d => ['mon', 'sun'].map(w => pinText(a, d, w, pinN(a, d, w)))));
   pins.push(...[0, 1, 2].flatMap(d => ['mon', 'sun'].map(w => yearText(d, w, FIRST_PIN + 72 + d * 2 + (w === 'sun' ? 1 : 0)))));
   fs.writeFileSync(path.join(__dirname, 'cal.json'), JSON.stringify(pins, null, 1));
 })();

@@ -54,3 +54,14 @@ module.exports.walls = [
   { dir: 'sketchbook', key: 'sketchbook-15', wpos: '45% 50%', t: ['Flowers at night', 'Ночные цветы', 'Nakts ziedi'] },
   { dir: 'photos2', key: 'cupcake', wpos: '50% 50%', t: ['Cherry cupcake', 'Кекс с вишней', 'Ķiršu kēksiņš'] },
 ];
+
+// доп. календари вне YEAR (Алина 15.11: декабрь 2026), v — буква второго арта того же месяца, first — номер первого пина (по 2 на дизайн), ds — дизайны (по умолчанию все 3)
+module.exports.extra = [
+  { y: 2026, m: 12, v: '', first: 566, dir: 'bird', key: '2022-pigeon-polly-celebrates-new-year-first-time-in-the-bed', pos: '35% 40%', season: 'Зима',
+    scene: 'Polly the pigeon in a Santa hat, celebrating New Year in bed with a bowl of salad and tangerines', tags: 'christmas, new year, cozy, night in',
+    t: ['New Year in bed', 'Новый год в кровати', 'Jaunais gads gultā'] },
+  { y: 2026, m: 12, v: 'b', first: 572, ds: [0, 1], dir: 'snail', key: '2024-mr-chew-celebrates-new-year', pos: '60% 50%', season: 'Зима', // «Арка» режет надпись арта — без дизайна 3
+    scene: 'Mr. Chew the snail in a Santa hat with a snowman, a cat and a big red sack of presents', tags: 'christmas, new year, presents, cute',
+    titles: ['Christmas {mo} {y} Calendar, {wk} | Cute Snail Illustration Printable', 'Cute {mo} {y} Calendar ({wk}) | Free Hand-Drawn Christmas Printable'],
+    t: ['Mr. Chew’s sack of presents', 'Мешок подарков Мистера Чу', 'Mistera Čū dāvanu maiss'] },
+];

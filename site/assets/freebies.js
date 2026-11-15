@@ -10,7 +10,7 @@
     yr: ['Year', 'Год', 'Gads'], rs: ['Reset filters', 'Сбросить фильтры', 'Notīrīt filtrus'], ally: ['All years', 'Все годы', 'Visi gadi'],
     tpC: ['Calendar', 'Календарь', 'Kalendārs'], tpY: ['Whole year', 'Весь год', 'Viss gads'], tpW: ['Wallpaper', 'Заставка', 'Fona attēls'], free: ['Free', 'Бесплатно', 'Bez maksas'],
     monS: ['Week starts on Monday', 'Неделя с понедельника', 'Nedēļa sākas pirmdienā'], sunS: ['Week starts on Sunday', 'Неделя с воскресенья', 'Nedēļa sākas svētdienā'],
-    d3: ['3 designs', '3 дизайна', '3 dizaini'], dl: ['Download', 'Скачать', 'Lejupielādēt'], open: ['Choose & download →', 'Выбрать и скачать →', 'Izvēlēties un lejupielādēt →'],
+    d3: n => [`${n} designs`, `${n} дизайна`, `${n} dizaini`][L], dl: ['Download', 'Скачать', 'Lejupielādēt'], open: ['Choose & download →', 'Выбрать и скачать →', 'Izvēlēties un lejupielādēt →'],
     year: y => [`${y}: the whole year`, `${y}: весь год`, `${y}: viss gads`][L], phone: ['For your phone · 1179×2556', 'Для телефона · 1179×2556', 'Tālrunim · 1179×2556'],
     hi: ['High resolution · 1600×2400 JPG · print or use as a background', 'Высокое разрешение · 1600×2400 JPG · печать или фон', 'Augsta izšķirtspēja · 1600×2400 JPG · drukai vai fonam'],
     use: ['Free for personal use. Please don’t sell or reupload it.', 'Бесплатно для личного пользования. Пожалуйста, не продавайте и не выкладывайте как своё.', 'Bez maksas personīgai lietošanai. Lūdzu, nepārdodiet un nepublicējiet kā savu.'],
@@ -26,7 +26,7 @@
     const name = x => x.k === 'wall' ? x.t[L] : x.yr ? T.year(x.y) : `${MON[x.m - 1]} ${x.y}`;
     const card = x => `<a class="vc fb-c ${x.k}${x.yr ? ' yr' : ''}" href="#${esc(x.id)}" data-id="${esc(x.id)}" data-c="${x.k}"${x.k === 'cal' ? ` data-p="${x.yr ? 'year' : 'month'}"` : ''}${x.w ? ` data-w="${x.w}"` : ''}${x.y ? ` data-y="${x.y}"` : ''}>`
       + `<span class="tp">${x.k === 'wall' ? T.tpW[L] : x.yr ? T.tpY[L] : T.tpC[L]}</span><span class="th">${x.k === 'wall' ? `<img src="${esc(x.th)}" alt="" loading="lazy">` : x.d.map((d, i) => `<img src="${esc(d.th)}" alt="" loading="lazy" class="d${i + 1}">`).join('')}<span class="bd">${T.free[L]}</span></span>`
-      + `<span class="tx"><b>${esc(name(x))}</b><small>${x.k === 'wall' ? T.phone[L] : `${x.w === 'sun' ? T.sunS[L] : T.monS[L]} · ${T.d3[L]}`}</small><span class="go">${x.k === 'wall' ? T.dl[L] + ' →' : T.open[L]}</span></span></a>`;
+      + `<span class="tx"><b>${esc(name(x))}</b><small>${x.k === 'wall' ? T.phone[L] : `${x.w === 'sun' ? T.sunS[L] : T.monS[L]} · ${T.d3(x.d.length)}`}</small><span class="go">${x.k === 'wall' ? T.dl[L] + ' →' : T.open[L]}</span></span></a>`;
     g.innerHTML = items.map(card).join('');
     const more = document.querySelector('.fb-more'); if (more) g.appendChild(more);
     // фильтр: неделя по умолчанию — по языку браузера (en-US, en-CA… → воскресенье), «Любая» тоже есть
