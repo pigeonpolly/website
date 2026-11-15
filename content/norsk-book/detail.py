@@ -560,3 +560,32 @@ def arcticcathedral(x, y, s=1):
         t += f'<path d="M{-w/2+i*6} 0 L{i*6} {-h} L{w/2+i*6} 0Z" fill="{["#eef2f6", "#e2e8ee", "#d6dde5", "#cad3dc"][i]}"/>'
     t += '<path d="M-10 0 v-20 h20 v20Z" fill="#f6d36b"/><path d="M0 -60 l-8 30 h16Z" fill="#f6d36b" opacity=".8"/>'
     return t + '</g>'
+
+def ptarmigan(x, y, s=1, flip=False):
+    sx = -s if flip else s
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="0" cy="6" rx="30" ry="5" fill="#000" opacity=".08" stroke="none"/>
+ <path d="M-10 -6 c-4 8 -8 10 -12 12 h14Z M8 -6 c0 8 2 10 6 12 h-12Z" fill="#fbf8f1"/>
+ <path d="M-30 -24 L-46 -30 L-42 -18Z" fill="#33363f"/>
+ <path d="M-32 -26 C-34 -48 -10 -56 12 -52 C28 -48 36 -38 34 -24 C32 -10 16 -4 -2 -4 C-20 -4 -30 -12 -32 -26Z" fill="#fbf8f1"/>
+ <path d="M-22 -40 C-8 -48 10 -46 22 -40 C14 -30 -8 -28 -26 -32Z" fill="#a8835c"/>
+ <path d="M-16 -42 l6 4 M-4 -44 l6 4 M8 -44 l5 4" stroke="#7a5a3e" stroke-width="1.4"/>
+ <path d="M12 -52 C14 -66 24 -74 34 -72 C44 -70 48 -60 44 -52 C40 -46 30 -44 22 -46Z" fill="#a8835c"/>
+ <path d="M44 -62 L54 -58 L44 -55Z" fill="#33363f"/>
+ <path d="M28 -70 q6 -6 12 0" fill="#d8453c" stroke-width="1.4"/><circle cx="34" cy="-62" r="2.4" fill="{LINE}" stroke="none"/>
+</g>"""
+
+def carving(x, y, kind='rein', s=1, c='#b8432f'):
+    shapes = {
+        'rein': 'M-20 0 l4 -14 h26 l4 14 M-16 -14 l-2 14 M6 -14 l2 14 M10 -14 l8 -8 l2 -8 M18 -22 l-6 -6 M20 -24 l6 -6 M-16 -14 l-6 -6',
+        'boat': 'M-30 -6 q30 12 60 0 M-30 -6 l-6 -10 M30 -6 l6 -10 M-18 -6 v-10 M-6 -6 v-10 M6 -6 v-10 M18 -6 v-10',
+        'man': 'M0 -6 v-14 M0 -20 m-4 -4 a4 4 0 1 0 8 0 a4 4 0 1 0 -8 0 M-8 -16 h16 M0 -6 l-6 8 M0 -6 l6 8',
+        'bear': 'M-18 0 v-10 q0 -8 10 -8 h14 q8 0 10 6 l6 2 M-10 -18 v18 M8 -18 v18',
+    }
+    return f'<path transform="translate({x} {y}) scale({s})" d="{shapes[kind]}" stroke="{c}" stroke-width="3" fill="none" stroke-linecap="round" stroke-linejoin="round"/>'
+
+def birch(x, y, h=70):
+    t = f'<path d="M{x-3} {y} L{x-2} {y-h} H{x+2} L{x+3} {y}Z" fill="#f4f1ea" stroke="{LINE}" stroke-width="1.4"/>'
+    t += ''.join(f'<path d="M{x-2} {y-k} h3" stroke="{LINE}" stroke-width="1.6"/>' for k in range(10, h, 14))
+    t += ''.join(f'<circle cx="{x+dx}" cy="{y-h+dy}" r="{r}" fill="#9bbf6a" stroke="{LINE}" stroke-width="1.2"/>' for dx, dy, r in [(-10, 4, 11), (8, 2, 12), (0, -10, 12), (-4, 14, 9), (10, 14, 9)])
+    return t + ''.join(f'<circle cx="{x+dx}" cy="{y-h+dy}" r="{r}" fill="#b5d07e"/>' for dx, dy, r in [(-6, -4, 4), (8, 0, 3)])

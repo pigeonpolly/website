@@ -406,6 +406,23 @@ def u18():
     b += bubble(60, 184, 'Se, nordlyset!')
     return svg(600, 340, 'Pollijs suņu kamanās ar haskijiem Tromsē zem ziemeļblāzmas; aiz upes Arktiskā katedrāle', b)
 
+@scene(19)
+def u19():
+    b = sky(600, 340, '#a9c9e2', '#f3eee4', 'u19')
+    b += cloud(100, 40) + cloud(480, 30, .7)
+    b += ridge([(0, 150), (90, 110), (180, 140), (270, 100), (360, 130), (450, 96), (540, 130), (600, 110)], '#a6b8c6', 170, snow=112)
+    b += water(168, c='#7aa0b8') + '<path d="M0 196 C150 186 300 194 450 188 C520 186 570 190 600 188 V340 H0Z" fill="#8fa77a" stroke="#1f2442" stroke-width="1.4"/>'
+    b += ''.join(birch(x, y, h) for x, y, h in [(30, 230, 80), (70, 236, 66), (540, 228, 84), (580, 234, 70)])
+    b += '<path d="M90 300 C120 240 250 226 420 234 C480 238 520 260 520 300 C440 320 200 326 90 300Z" fill="#9c958a" stroke="#1f2442" stroke-width="1.8"/>'
+    b += '<path d="M140 270 C200 256 300 250 400 258" stroke="#b4ad9f" stroke-width="2" fill="none"/>'
+    b += carving(170, 280, 'rein', 1) + carving(230, 268, 'boat', 1) + carving(300, 282, 'rein', .9) + carving(350, 262, 'man', 1) + carving(400, 286, 'bear', .9) + carving(250, 298, 'man', .9) + carving(450, 276, 'rein', .8) + carving(190, 304, 'boat', .7)
+    b += '<path d="M0 318 H600 V340 H0Z" fill="#a8774a" stroke="#1f2442" stroke-width="1.6"/>' + ''.join(f'<path d="M{x} 318 V340" stroke="#8b5f37" stroke-width="1.4"/>' for x in range(10, 600, 18))
+    b += '<path d="M0 306 H600" stroke="#1f2442" stroke-width="2.4"/>' + ''.join(f'<path d="M{x} 306 V318" stroke="#1f2442" stroke-width="2"/>' for x in range(14, 600, 40))
+    b += polly(480, 316, .4, flip=True) + '<g transform="translate(424 280) rotate(-8)" stroke="#1f2442" stroke-width="1.4"><rect width="34" height="26" fill="#fbf6ea"/><path d="M6 18 l6 -6 h10 l4 6 M9 12 l-2 -4" stroke="#b8432f" stroke-width="1.6" fill="none"/></g>'
+    b += ptarmigan(560, 318, .55, flip=True)
+    b += bubble(150, 200, 'Hva synes du?')
+    return svg(600, 340, 'Pollijs zīmē Altas klinšu zīmējumus — ziemeļbriežus, laivas, cilvēkus; blakus irbe Aile', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():
