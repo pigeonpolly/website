@@ -146,3 +146,8 @@ table.abc td{padding:5px 5px}
 .bubble .nw{font-size:13.5px!important}
 .map .city{font-family:var(--body)!important;font-weight:600}
 table.abc td:nth-child(1),table.abc td:nth-child(4){white-space:nowrap;width:15mm;font-size:15px!important}table.abc td:nth-child(2),table.abc td:nth-child(5){white-space:nowrap}
+.bubble .nw{display:inline}.bubble>.nw:first-child{display:block}
+table.pair{border-collapse:collapse;margin-top:6px;width:100%}
+table.pair td{padding:3px 8px 3px 0;border-top:1px solid #d5e1ee;vertical-align:baseline}
+table.pair td.w{font-weight:700;color:var(--accent)}
+table.pair td.pr{color:var(--soft);font-size:11.5px;white-space:nowrap}
