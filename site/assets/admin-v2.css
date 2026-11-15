@@ -137,3 +137,6 @@ body[data-p=admin] .adm-danger h3{font:700 11px Karla,sans-serif;letter-spacing:
 .pp-pg-side .be-input{width:100%;margin-top:4px;box-sizing:border-box}
 .pp-pg-row{display:flex;gap:6px;align-items:flex-start}
 @media (max-width:760px){.pp-pg-main{grid-template-columns:1fr}.pp-pg-d canvas{width:90px;height:135px}}
+/* генератор пинов: точки цветов палитры (кружки .pal-pin — стили из style.css) */
+.pp-pg-pal{margin:10px 0 14px}
+.pp-pg-pal .pal-mk-photo img{max-height:420px}

@@ -161,14 +161,15 @@
     for (const [x, xl] of NAMES) if (!used.has(x[gi])) { const d = dE(l, xl); if (d < bd) { bd = d; best = x; } }
     return best; // [en, ru, lv, hex]
   }
-  const setName = (c, e) => { c.nm = e; c.n = e[gi]; };
+  const setName = (c, e) => { c.nm = e; c.n = e[gi]; c.en = e[0]; };
   function nameAll(cols) { const used = new Set(); cols.forEach(c => { setName(c, nameOf(c.hex, used)); used.add(c.n); }); return cols; }
   // для генератора пинов в кабинете (posts-admin.js): цвета фото + английские названия из словаря
-  window.PPPalette = { extract, named: async img => { await loadNames(); return nameAll(extract(img)).map(c => ({ hex: c.hex, en: c.nm[0] })); } };
-  // пиксельная Полли для плашки сайта (как в блоке «Тема дня»)
-  const PP = ['......ddd.....', '.....dbbbd....', '....dbbwwbd...', '....dbbwkbdoo.', '....dbbbbbdo..', '...dbbbbbbd...', '..dbbsbbbbd...',
-    '.dbbssbbbbd...', 'dbbssbbbbbd...', 'dbbbbbbbbd....', '.ddbbbbbdd....', '...ddddd......', '....o..o......', '...oo.oo......'];
-  const PC = { d: '#1a1528', b: '#7f81bf', s: '#5e5a9c', w: '#ffffff', k: '#1a1528', o: '#f2a73b' };
+  window.PPPalette = { extract, named: async img => { await loadNames(); return nameAll(extract(img)).map(c => ({ hex: c.hex, en: c.nm[0], u: c.u, v: c.v })); },
+    // пипетки на фото для генератора пинов: cols меняются на месте ({hex, en, u, v}), onChange — после каждого сдвига
+    editor: async (box, img, cols, onChange) => { await loadNames(); cols.forEach(c => { c.n = c.n || c.en; }); locate(img, cols); return pinEditor(box, img, () => cols, onChange); } };
+  // значок-логотип v3 для подвала карточки (как на пинах pins4: кружок-значок + адрес)
+  let BADGE = null;
+  const badge = () => BADGE || (BADGE = new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = '/assets/logo-badge-purple.png'; }));
   const rr = (g, x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
   async function drawCard(img, cols, title) {
     await Promise.all(["600 80px Fraunces", "italic 400 28px Fraunces", "700 26px Karla", "500 21px Karla"].map(f => document.fonts ? document.fonts.load(f).catch(() => 0) : 0));
@@ -194,13 +195,65 @@
       g.fillText(col.hex, x, y + 186); if ('letterSpacing' in g) g.letterSpacing = '0px';
     });
     g.fillStyle = '#C9B8B0'; g.font = 'italic 400 28px Fraunces, Georgia, serif'; g.fillText(T.made[L], 70, 1440);
-    // плашка сайта справа внизу: пиксельная Полли + адрес
-    g.font = '700 26px Karla, sans-serif';
-    const tw = g.measureText('pigeonpolly.com').width, bw = 30 + 42 + 14 + tw + 30, bh = 70, bx = W - 70 - bw, by = 1394;
-    g.fillStyle = '#F0A987'; rr(g, bx, by, bw, bh, 35); g.fill();
-    const ps = 3; PP.forEach((row, yy) => [...row].forEach((ch, xx) => { if (PC[ch]) { g.fillStyle = PC[ch]; g.fillRect(bx + 28 + xx * ps, by + 14 + yy * ps, ps, ps); } }));
-    g.fillStyle = '#2A1B1F'; g.fillText('pigeonpolly.com', bx + 30 + 42 + 14, by + 44);
+    // подвал справа внизу: значок Pigeon Polly + адрес (старую пиксельную плашку убрали 15.11.2026)
+    const bd = await badge(), D = 84, tx = W - 70;
+    g.font = '700 30px Karla, sans-serif'; g.textAlign = 'right'; g.fillStyle = '#FBF4E2'; g.fillText('pigeonpolly.com', tx, 1440);
+    if (bd) { const bx = tx - g.measureText('pigeonpolly.com').width - 18 - D; g.drawImage(bd, bx, 1429 - D / 2, D, D); }
+    g.textAlign = 'left';
     return c;
+  }
+  // пипетки: фото с 6 кружками; тянем кружок (или выбираем его и тапаем по фото) — цвет берётся из этой точки.
+  // Общее: «Палитра из своего фото» (maker) и генератор пинов в кабинете (PPPalette.editor). cols() — текущий массив цветов {hex,u,v,…}
+  function pinEditor(photo, im, cols, onChange) {
+    let sample = null, cur = 0;
+    function pickAt(u, v) {
+      const { data, w, h } = sample, x0 = Math.min(w - 1, Math.max(0, Math.floor(u * w))), y0 = Math.min(h - 1, Math.max(0, Math.floor(v * h)));
+      let r = 0, g = 0, b = 0, n = 0;
+      for (let y = Math.max(0, y0 - 2); y <= Math.min(h - 1, y0 + 2); y++) for (let x = Math.max(0, x0 - 2); x <= Math.min(w - 1, x0 + 2); x++) { const i = (y * w + x) * 4; r += data[i]; g += data[i + 1]; b += data[i + 2]; n++; }
+      const hex = '#' + [r, g, b].map(c => Math.round(c / n).toString(16).padStart(2, '0')).join('').toUpperCase();
+      const cs = cols(), c = cs[cur]; c.hex = hex; c.u = u; c.v = v;
+      setName(c, nameOf(hex, new Set(cs.filter((_, i) => i !== cur).map(x => x.n))));
+      drawPins(); onChange();
+    }
+    function drawPins() {
+      photo.querySelectorAll('.pal-pin').forEach((el, i) => {
+        const c = cols()[i]; el.style.left = c.u * 100 + '%'; el.style.top = c.v * 100 + '%'; el.style.setProperty('--c', c.hex);
+        el.classList.toggle('on', i === cur); el.title = `${c.n} ${c.hex}`;
+      });
+    }
+    const s = Math.min(1, 800 / Math.max(im.naturalWidth, im.naturalHeight)), cv = document.createElement('canvas');
+    cv.width = Math.max(1, Math.round(im.naturalWidth * s)); cv.height = Math.max(1, Math.round(im.naturalHeight * s));
+    const g = cv.getContext('2d'); g.drawImage(im, 0, 0, cv.width, cv.height);
+    sample = { data: g.getImageData(0, 0, cv.width, cv.height).data, w: cv.width, h: cv.height };
+    const view = new Image(); view.src = im.src; view.alt = ''; view.draggable = false;
+    photo.replaceChildren(view, ...cols().map((c, i) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'pal-pin'; b.textContent = i + 1; b.setAttribute('aria-label', T.mkPin[L] + ' ' + (i + 1)); return b; }));
+    drawPins();
+    const pos = e => { const r = view.getBoundingClientRect(); return [Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), Math.min(1, Math.max(0, (e.clientY - r.top) / r.height))]; };
+    let drag = false;
+    photo.onpointerdown = e => {
+      const pin = e.target.closest('.pal-pin');
+      if (pin) { cur = [...photo.querySelectorAll('.pal-pin')].indexOf(pin); drawPins(); drag = true; photo.setPointerCapture(e.pointerId); e.preventDefault(); return; }
+      if (e.target === view) { e.preventDefault(); pickAt(...pos(e)); drag = true; photo.setPointerCapture(e.pointerId); }
+    };
+    photo.onpointermove = e => { if (drag) pickAt(...pos(e)); };
+    photo.onpointerup = photo.onpointercancel = () => { drag = false; };
+    photo.onkeydown = e => { // стрелками двигаем выбранную пипетку
+      const k = { ArrowLeft: [-.01, 0], ArrowRight: [.01, 0], ArrowUp: [0, -.01], ArrowDown: [0, .01] }[e.key]; if (!k) return;
+      const pin = e.target.closest('.pal-pin'); if (!pin) return;
+      cur = [...photo.querySelectorAll('.pal-pin')].indexOf(pin); e.preventDefault();
+      const c = cols()[cur]; pickAt(Math.min(1, Math.max(0, c.u + k[0])), Math.min(1, Math.max(0, c.v + k[1])));
+    };
+    return { draw: drawPins };
+  }
+  // где на фото цвет hex — ближайший пиксель (для готовых палитр из базы, у них нет точек)
+  function locate(img, cols) {
+    const s = Math.min(1, 180 / Math.max(img.naturalWidth, img.naturalHeight)), cv = document.createElement('canvas');
+    cv.width = Math.max(1, Math.round(img.naturalWidth * s)); cv.height = Math.max(1, Math.round(img.naturalHeight * s));
+    const g = cv.getContext('2d'); g.drawImage(img, 0, 0, cv.width, cv.height);
+    const d = g.getImageData(0, 0, cv.width, cv.height).data, W = cv.width, H = cv.height, px = [];
+    for (let i = 0; i < d.length; i += 4) px.push(toLab(d[i], d[i + 1], d[i + 2]));
+    cols.forEach(c => { if (c.u != null) return; const l = hexLab(c.hex); let bi = 0, bd = Infinity; px.forEach((p, i) => { const e = dE(p, l); if (e < bd) { bd = e; bi = i; } }); c.u = (bi % W + .5) / W; c.v = (Math.floor(bi / W) + .5) / H; });
+    return cols;
   }
   function maker(o = {}) {
     const box = document.createElement('section'); box.className = 'pal-mk';
@@ -217,7 +270,7 @@
     const inp = box.querySelector('input[type=file]'), opts = box.querySelector('.pal-mk-opts'), name = box.querySelector('input[type=text]');
     const out = box.querySelector('.pal-mk-out'), msg = box.querySelector('.pal-mk-msg'), pick = box.querySelector('.pal-mk-pick');
     const edit = box.querySelector('.pal-mk-edit'), photo = box.querySelector('.pal-mk-photo');
-    let img = null, cols = null, auto = null, canvas = null, timer = 0, sample = null, cur = 0;
+    let img = null, cols = null, auto = null, canvas = null, timer = 0;
     const render = () => drawCard(img, cols, name.value.trim() || T.mkDef[L]).then(c => { canvas = c; c.className = 'pal-mk-card'; out.replaceChildren(c); });
     const later = () => { clearTimeout(timer); timer = setTimeout(render, 200); };
     const ad = box.querySelector('.pal-mk-ad'), adMsg = box.querySelector('.pal-mk-admsg'), tIn = l => ad.querySelector(`[data-t="${l}"]`);
@@ -251,54 +304,15 @@
       } catch (err) { adMsg.textContent = T.adErr[L]; }
       btn.disabled = false;
     };
-    // пипетки: фото с 6 кружками; тянем кружок (или выбираем его и тапаем по фото) — цвет берётся из этой точки
-    function pickAt(u, v) {
-      const { data, w, h } = sample, x0 = Math.min(w - 1, Math.max(0, Math.floor(u * w))), y0 = Math.min(h - 1, Math.max(0, Math.floor(v * h)));
-      let r = 0, g = 0, b = 0, n = 0;
-      for (let y = Math.max(0, y0 - 2); y <= Math.min(h - 1, y0 + 2); y++) for (let x = Math.max(0, x0 - 2); x <= Math.min(w - 1, x0 + 2); x++) { const i = (y * w + x) * 4; r += data[i]; g += data[i + 1]; b += data[i + 2]; n++; }
-      const hex = '#' + [r, g, b].map(c => Math.round(c / n).toString(16).padStart(2, '0')).join('').toUpperCase();
-      const c = cols[cur]; c.hex = hex; c.u = u; c.v = v;
-      setName(c, nameOf(hex, new Set(cols.filter((_, i) => i !== cur).map(x => x.n))));
-      drawPins(); later();
-    }
-    function drawPins() {
-      photo.querySelectorAll('.pal-pin').forEach((el, i) => {
-        const c = cols[i]; el.style.left = c.u * 100 + '%'; el.style.top = c.v * 100 + '%'; el.style.setProperty('--c', c.hex);
-        el.classList.toggle('on', i === cur); el.title = `${c.n} ${c.hex}`;
-      });
-    }
-    function setupPhoto(im) {
-      const s = Math.min(1, 800 / Math.max(im.naturalWidth, im.naturalHeight)), cv = document.createElement('canvas');
-      cv.width = Math.max(1, Math.round(im.naturalWidth * s)); cv.height = Math.max(1, Math.round(im.naturalHeight * s));
-      const g = cv.getContext('2d'); g.drawImage(im, 0, 0, cv.width, cv.height);
-      sample = { data: g.getImageData(0, 0, cv.width, cv.height).data, w: cv.width, h: cv.height };
-      const view = new Image(); view.src = im.src; view.alt = ''; view.draggable = false;
-      photo.replaceChildren(view, ...cols.map((c, i) => { const b = document.createElement('button'); b.type = 'button'; b.className = 'pal-pin'; b.textContent = i + 1; b.setAttribute('aria-label', T.mkPin[L] + ' ' + (i + 1)); return b; }));
-      cur = 0; drawPins();
-      const pos = e => { const r = view.getBoundingClientRect(); return [Math.min(1, Math.max(0, (e.clientX - r.left) / r.width)), Math.min(1, Math.max(0, (e.clientY - r.top) / r.height))]; };
-      let drag = false;
-      photo.onpointerdown = e => {
-        const pin = e.target.closest('.pal-pin');
-        if (pin) { cur = [...photo.querySelectorAll('.pal-pin')].indexOf(pin); drawPins(); drag = true; photo.setPointerCapture(e.pointerId); e.preventDefault(); return; }
-        if (e.target === view) { e.preventDefault(); pickAt(...pos(e)); drag = true; photo.setPointerCapture(e.pointerId); }
-      };
-      photo.onpointermove = e => { if (drag) pickAt(...pos(e)); };
-      photo.onpointerup = photo.onpointercancel = () => { drag = false; };
-      photo.onkeydown = e => { // стрелками двигаем выбранную пипетку
-        const k = { ArrowLeft: [-.01, 0], ArrowRight: [.01, 0], ArrowUp: [0, -.01], ArrowDown: [0, .01] }[e.key]; if (!k) return;
-        const pin = e.target.closest('.pal-pin'); if (!pin) return;
-        cur = [...photo.querySelectorAll('.pal-pin')].indexOf(pin); e.preventDefault();
-        pickAt(Math.min(1, Math.max(0, cols[cur].u + k[0])), Math.min(1, Math.max(0, cols[cur].v + k[1])));
-      };
-    }
-    box.querySelector('[data-reset]').onclick = () => { cols = auto.map(c => ({ ...c })); drawPins(); render(); };
+    let ed = null;
+    box.querySelector('[data-reset]').onclick = () => { cols = auto.map(c => ({ ...c })); ed && ed.draw(); render(); };
     inp.onchange = () => {
       const f = inp.files[0]; if (!f) return;
       msg.textContent = T.mkWait[L];
       const url = URL.createObjectURL(f), im = new Image();
       im.onload = () => loadNames().then(() => {
         img = im; auto = nameAll(extract(im)); cols = auto.map(c => ({ ...c }));
-        setupPhoto(im); edit.hidden = false; name.value = T.mkDef[L];
+        ed = pinEditor(photo, im, () => cols, later); edit.hidden = false; name.value = T.mkDef[L];
         const base = f.name.replace(/\.[^.]+$/, '').replace(/[_-]+/g, ' ').trim();
         if (base && !/^(img|dsc|photo|image|pxl|screenshot)\b/i.test(base) && !/^\d/.test(base)) name.value = base.slice(0, 40);
         opts.hidden = false; pick.firstChild.textContent = T.mkOther[L]; msg.textContent = '';

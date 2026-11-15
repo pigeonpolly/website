@@ -182,6 +182,7 @@
       <h3>3. Фото <small class="be-note" data-need></small></h3>
       <div class="adm-quick"><label class="pill-btn">📁 Загрузить фото<input type="file" accept="image/*" multiple hidden data-file></label><button type="button" class="pill-btn" data-base>🖼 Из базы сайта</button><button type="button" class="pill-btn" data-clear>✕ Убрать все</button></div>
       <div class="pp-pg-photos" data-photos></div><p class="be-note">Нажмите на фото — туда сдвинется центр кадра (что главное на картинке).</p>
+      <div class="pp-pg-pal" data-palbox hidden></div>
       <div class="pp-pg-base" data-basebox hidden></div>
       <div class="pp-pg-main">
         <div><canvas class="pp-pg-cv" data-cv></canvas>
@@ -199,7 +200,7 @@
     const redraw = () => render(cv).then(drawThumbs);
     // типы
     const types = () => { $('[data-types]').innerHTML = TYPES.map(t => `<button type="button" class="pill-btn${S.type === t.id ? ' pill-fill' : ''}" data-t="${t.id}" title="${esc(t.about)}">${t.ic} ${t.name}</button>`).join('');
-      $('[data-types]').querySelectorAll('[data-t]').forEach(b => b.onclick = () => { S.type = b.dataset.t; S.design = DESIGNS.find(d => d.type === S.type).id; S.f = JSON.parse(JSON.stringify(DEF[S.type])); S.pin = null; types(); designs(); fields(); pinBox(); redraw(); }); };
+      $('[data-types]').querySelectorAll('[data-t]').forEach(b => b.onclick = () => { S.type = b.dataset.t; S.design = DESIGNS.find(d => d.type === S.type).id; S.f = JSON.parse(JSON.stringify(DEF[S.type])); S.pin = null; types(); designs(); fields(); pinBox(); palBox(); redraw(); }); };
     // дизайны: маленькие превью
     const designs = () => { const list = DESIGNS.filter(d => d.type === S.type);
       $('[data-designs]').innerHTML = list.map(d => `<button type="button" class="pp-pg-d${S.design === d.id ? ' on' : ''}" data-d="${d.id}"><canvas></canvas><span>${d.name}</span></button>`).join('');
@@ -216,7 +217,19 @@
       $('[data-photos]').querySelectorAll('.pp-pg-ph').forEach(d => { const i = +d.dataset.i, img = d.querySelector('img');
         img.onclick = e => { const r = img.getBoundingClientRect(); S.photos[i].fx = (e.clientX - r.left) / r.width; S.photos[i].fy = (e.clientY - r.top) / r.height; photos(); redraw(); };
         d.querySelector('[data-x]').onclick = () => { S.photos.splice(i, 1); photos(); redraw(); };
-        const up = d.querySelector('[data-up]'); if (up) up.onclick = () => { [S.photos[i - 1], S.photos[i]] = [S.photos[i], S.photos[i - 1]]; photos(); redraw(); }; }); };
+        const up = d.querySelector('[data-up]'); if (up) up.onclick = () => { [S.photos[i - 1], S.photos[i]] = [S.photos[i], S.photos[i - 1]]; photos(); redraw(); }; }); palBox(); };
+    // точки цветов палитры: пипетки на фото (общий редактор из palettes.js — как в «Палитре из своего фото»)
+    const palBox = async () => { const box = $('[data-palbox]'), p = photo(0), n = (palBox.n = (palBox.n || 0) + 1);
+      if (S.type !== 'palette' || !p || !p.im) { box.hidden = true; box.innerHTML = ''; return; }
+      const cols = await colors(); if (n !== palBox.n || !cols.length) return;
+      box.innerHTML = `<h3>Цвета палитры</h3><p class="be-note">Перетащите кружок по фото (или выберите кружок и нажмите на фото) — цвет возьмётся из этой точки.</p>
+        <div class="pal-mk-photo" data-palph></div><div class="adm-quick"><button type="button" class="pill-btn" data-palreset>↺ Как было</button></div>`;
+      box.hidden = false;
+      const upd = () => { clearTimeout(palBox.t); palBox.t = setTimeout(() => { if (S.pin && S.pin.base) S.pin.desc = palDesc(S.pin.base, cols); pinBox(); redraw(); }, 150); };
+      await window.PPPalette.editor(box.querySelector('[data-palph]'), p.im, cols, upd);
+      if (!p.auto) p.auto = cols.map(c => ({ ...c }));
+      box.querySelector('[data-palreset]').onclick = () => { p.cols = p.auto.map(c => ({ ...c })); palBox(); if (S.pin && S.pin.base) S.pin.desc = palDesc(S.pin.base, p.cols); pinBox(); redraw(); }; };
+    const palDesc = (d, cs) => `${d} Colors: ${cs.map(c => c.en + ' ' + c.hex.toUpperCase()).join(', ')}.`;
     $('[data-file]').onchange = e => { [...e.target.files].forEach(f => { const r = new FileReader(); r.onload = () => addPhoto(r.result, { t: f.name.replace(/\.[^.]+$/, '').replace(/^IMG_\d+$/i, '') }); r.readAsDataURL(f); }); e.target.value = ''; };
     $('[data-clear]').onclick = () => { S.photos = []; photos(); redraw(); };
     $('[data-base]').onclick = () => { const box = $('[data-basebox]'); box.hidden = !box.hidden; if (box.hidden || box.dataset.ok) return; box.dataset.ok = 1;
@@ -253,7 +266,7 @@
       if (S.type === 'art' && r.hand) f.hand = r.hand; else if (S.type === 'art' && r.headline) f.hand = r.headline;
       if (Array.isArray(r.items) && r.items.length && f.items) f.items = r.items.slice(0, S.type === 'prompts' ? 8 : 6);
       S.pin = { title: r.title, desc: r.desc, alt: r.alt, topics: r.topics };
-      if (S.type === 'palette') { const cs = await colors(); S.pin.desc = `${r.desc} Colors: ${cs.map(c => c.en + ' ' + c.hex.toUpperCase()).join(', ')}.`; }
+      if (S.type === 'palette') { S.pin.base = r.desc; S.pin.desc = palDesc(r.desc, await colors()); }
       msg.textContent = '✓ Готово — можно поправить'; fields(); pinBox(); redraw();
     };
     $('[data-dl]').onclick = () => cv.toBlob(b => { const a = document.createElement('a'); a.href = URL.createObjectURL(b); a.download = `pin-${S.type}-${S.design}-${Date.now().toString(36)}.jpg`; a.click(); setTimeout(() => URL.revokeObjectURL(a.href), 4000); }, 'image/jpeg', .9);
