@@ -5,7 +5,7 @@
   const lang = document.documentElement.lang || 'en', L = { en: 0, ru: 1, lv: 2 }[lang] ?? 0;
   const T = {
     typ: ['Type', 'Вид', 'Veids'], all: ['All', 'Всё', 'Viss'], cal: ['Calendars', 'Календари', 'Kalendāri'], wall: ['Phone wallpapers', 'Заставки на телефон', 'Tālruņa fona attēli'],
-    wk: ['Week starts', 'Неделя с', 'Nedēļa sākas'], any: ['Any week', 'Любая неделя', 'Jebkura'], mon: ['Monday start · EU', 'С понедельника · EU', 'No pirmdienas · EU'], sun: ['Sunday start · US', 'С воскресенья · US', 'No svētdienas · US'],
+    wk: ['Week starts', 'Неделя с', 'Nedēļa sākas'], mon: ['Monday start · EU', 'С понедельника · EU', 'No pirmdienas · EU'], sun: ['Sunday start · US', 'С воскресенья · US', 'No svētdienas · US'],
     per: ['Calendar', 'Календарь', 'Kalendārs'], allP: ['Month & year', 'Месяц и год', 'Mēnesis un gads'], pM: ['Monthly', 'На месяц', 'Mēneša'], pY: ['Yearly', 'На год', 'Gada'],
     yr: ['Year', 'Год', 'Gads'], ally: ['All years', 'Все годы', 'Visi gadi'],
     tpC: ['Calendar', 'Календарь', 'Kalendārs'], tpY: ['Whole year', 'Весь год', 'Viss gads'], tpW: ['Wallpaper', 'Заставка', 'Fona attēls'], free: ['Free', 'Бесплатно', 'Bez maksas'],
@@ -34,7 +34,7 @@
     const sunLoc = /-(US|CA|MX|BR|JP|PH|IL)$/i.test(navigator.language || '');
     const st = { c: 'all', p: 'all', w: sunLoc ? 'sun' : 'mon', y: 'all' };
     const grp = (k, lb, F) => `<div class="flt-g" role="group" aria-label="${lb}" data-gr="${k}"><span class="flt-l">${lb}</span>${F.map(([v, n]) => `<button type="button" data-g="${k}" data-k="${v}">${n} <i></i></button>`).join('')}</div>`;
-    g.insertAdjacentHTML('beforebegin', `<div class="flt">${grp('c', T.typ[L], [['all', T.all[L]], ['cal', T.cal[L]], ['wall', T.wall[L]]])}${grp('p', T.per[L], [['all', T.allP[L]], ['month', T.pM[L]], ['year', T.pY[L]]])}${grp('w', T.wk[L], [['mon', T.mon[L]], ['sun', T.sun[L]], ['all', T.any[L]]])}`
+    g.insertAdjacentHTML('beforebegin', `<div class="flt">${grp('c', T.typ[L], [['all', T.all[L]], ['cal', T.cal[L]], ['wall', T.wall[L]]])}${grp('p', T.per[L], [['all', T.allP[L]], ['month', T.pM[L]], ['year', T.pY[L]]])}${grp('w', T.wk[L], [['mon', T.mon[L]], ['sun', T.sun[L]]])}`
       + (years.length ? grp('y', T.yr[L], [['all', T.ally[L]], ...years.map(y => [String(y), y])]) : '') + `</div>`);
     g.insertAdjacentHTML('afterend', `<p class="flt-empty" hidden>${T.none[L]}</p>`);
     const bar = g.previousElementSibling, emp = g.nextElementSibling, cards = [...g.querySelectorAll('.fb-c')];
