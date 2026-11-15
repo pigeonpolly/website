@@ -385,6 +385,27 @@ def u17():
     b += bubble(60, 160, 'Atsjo! Jeg er forkjølet…')
     return svg(600, 340, 'Saaukstējies Pollijs ar šalli un termometru Lofotos pie sarkanajām zvejnieku mājiņām un žāvētu mencu statīviem; blakus tupiks Pelle', b)
 
+@scene(18)
+def u18():
+    b = sky(600, 340, '#0f1a3a', '#2f4a72', 'u18') + stars() + aurora()
+    b += '<circle cx="520" cy="50" r="14" fill="#f3efe0" stroke="#1f2442" stroke-width="1.4"/><circle cx="526" cy="46" r="13" fill="#1a2a50"/>'
+    b += ridge([(0, 200), (60, 150), (130, 180), (210, 130), (290, 176), (370, 140), (440, 180), (520, 146), (600, 176)], '#41557a', 230)
+    b += '<path d="M140 156 L210 130 L240 146 M350 150 L370 140 L392 152" stroke="#e8eef5" stroke-width="5" fill="none"/>'
+    b += water(222, c='#2e4566', c2='#4a6488')
+    b += '<path d="M60 222 Q240 170 420 222" stroke="#1f2442" stroke-width="6" fill="none"/><path d="M60 222 Q240 170 420 222" stroke="#c9d2da" stroke-width="3" fill="none"/>'
+    b += ''.join(f'<circle cx="{80 + i*28}" cy="{222 - 52*4*((i*28+20)/360)*(1-(i*28+20)/360):.1f}" r="2.2" fill="#f6d36b"/>' for i in range(12))
+    b += arcticcathedral(500, 240, .7)
+    b += ''.join(f'<rect x="{x}" y="{226-h}" width="14" height="{h}" fill="#33405a" stroke="#1f2442"/><rect x="{x+4}" y="{230-h}" width="5" height="5" fill="#f6d36b"/>' for x, h in [(20, 18), (36, 24), (430, 20), (580, 22)])
+    b += '<path d="M0 252 C120 240 260 262 400 248 C480 242 560 250 600 246 V340 H0Z" fill="#eef3f8" stroke="#1f2442" stroke-width="1.6"/>'
+    b += ''.join(spruce_snow(x, y, h, '#2f5a4a') for x, y, h in [(20, 266, 54), (56, 270, 40), (580, 268, 50)])
+    b += '<path d="M80 320 C200 300 340 296 520 292" stroke="#d3dde8" stroke-width="2" fill="none"/>'
+    b += husky(360, 304, .5) + husky(420, 300, .5) + husky(380, 322, .52) + husky(440, 318, .5)
+    b += '<path d="M300 300 L360 296 M300 314 L380 314" stroke="#c8323c" stroke-width="2"/>'
+    b += sled(250, 320, 1.1)
+    b += polly(230, 282, .36, extra=VEST)
+    b += bubble(60, 184, 'Se, nordlyset!')
+    return svg(600, 340, 'Pollijs suņu kamanās ar haskijiem Tromsē zem ziemeļblāzmas; aiz upes Arktiskā katedrāle', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():

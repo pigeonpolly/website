@@ -522,3 +522,41 @@ def eider(x, y, s=1, flip=False):
  <circle cx="40" cy="-68" r="2.6" fill="{LINE}" stroke="none"/>
  <path d="M26 -84 c4 -8 18 -8 20 0" fill="#fff"/><path d="M34 -90 v-6 M30 -93 h8" stroke="#c8323c" stroke-width="2"/>
 </g>"""
+
+def husky(x, y, s=1, flip=False):
+    sx = -s if flip else s
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M-26 -22 L-30 2 M-14 -20 L-14 2 M16 -20 L18 2 M28 -22 L32 2" stroke="#7d8697" stroke-width="5"/>
+ <path d="M-26 -22 L-30 2 M-14 -20 L-14 2 M16 -20 L18 2 M28 -22 L32 2" stroke="#e8ebef" stroke-width="2.4"/>
+ <path d="M-38 -38 C-50 -50 -54 -66 -44 -70 C-40 -60 -34 -52 -30 -44" fill="#7d8697"/>
+ <path d="M-36 -30 C-38 -48 -18 -54 8 -52 C28 -50 38 -42 36 -28 C34 -16 18 -14 0 -14 C-22 -14 -34 -18 -36 -30Z" fill="#7d8697"/>
+ <path d="M-30 -26 C-14 -20 14 -20 32 -26 C30 -16 16 -14 0 -14 C-18 -14 -28 -18 -30 -26Z" fill="#f1f3f5" stroke="none"/>
+ <path d="M26 -48 C28 -62 38 -70 50 -68 C60 -66 66 -58 64 -50 L72 -46 C70 -40 62 -38 56 -40 C48 -36 36 -38 30 -40Z" fill="#7d8697"/>
+ <path d="M46 -56 C52 -58 60 -54 64 -50 L72 -46 C70 -40 62 -38 56 -40 C50 -38 44 -44 46 -56Z" fill="#f1f3f5"/>
+ <path d="M34 -64 L32 -80 L44 -68Z M48 -68 L52 -84 L58 -66Z" fill="#7d8697"/>
+ <circle cx="72" cy="-46" r="2.6" fill="{LINE}" stroke="none"/><circle cx="50" cy="-58" r="2.6" fill="#7fb6e8" stroke="{LINE}" stroke-width="1"/>
+ <path d="M28 -44 C24 -36 22 -30 24 -24" stroke="#c8323c" stroke-width="4" fill="none"/>
+</g>"""
+
+def aurora(w=600):
+    t = '<defs><linearGradient id="aur" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#7ef0b8" stop-opacity="0"/><stop offset=".5" stop-color="#7ef0b8" stop-opacity=".75"/><stop offset="1" stop-color="#b48cf0" stop-opacity=".1"/></linearGradient></defs>'
+    t += '<path d="M0 90 C80 40 160 120 260 70 C360 20 440 110 600 50 L600 130 C440 190 360 100 260 150 C160 200 80 120 0 170Z" fill="url(#aur)"/>'
+    t += '<path d="M60 60 C140 20 220 90 320 40 C400 10 480 70 560 30 L560 70 C480 110 400 50 320 90 C220 140 140 70 60 110Z" fill="url(#aur)" opacity=".7"/>'
+    return t
+
+def stars(seed=5, n=40, w=600, h=150):
+    import random
+    random.seed(seed)
+    return ''.join(f'<circle cx="{random.uniform(0,w):.1f}" cy="{random.uniform(0,h):.1f}" r="{random.uniform(.6,1.6):.1f}" fill="#fff" opacity="{random.uniform(.5,1):.2f}"/>' for _ in range(n))
+
+def sled(x, y, s=1):
+    return (f'<g transform="translate({x} {y}) scale({s})" stroke="{LINE}" stroke-width="2" stroke-linejoin="round">'
+            f'<path d="M-60 0 H40 q16 0 16 -14" fill="none" stroke-width="3"/><path d="M-50 -2 v-30 M30 -2 v-30" stroke-width="3"/>'
+            f'<path d="M-54 -32 H34 v-10 H-54Z" fill="#a8774a"/><path d="M-58 -42 v-40 h10 v40" fill="#a8774a"/></g>')
+
+def arcticcathedral(x, y, s=1):
+    t = f'<g transform="translate({x} {y}) scale({s})" stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round">'
+    for i, (w, h) in enumerate([(100, 120), (84, 100), (68, 80), (52, 60)]):
+        t += f'<path d="M{-w/2+i*6} 0 L{i*6} {-h} L{w/2+i*6} 0Z" fill="{["#eef2f6", "#e2e8ee", "#d6dde5", "#cad3dc"][i]}"/>'
+    t += '<path d="M-10 0 v-20 h20 v20Z" fill="#f6d36b"/><path d="M0 -60 l-8 30 h16Z" fill="#f6d36b" opacity=".8"/>'
+    return t + '</g>'
