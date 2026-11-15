@@ -141,3 +141,8 @@ table.abc td{padding:5px 5px}
 .lines{display:grid;grid-template-columns:1fr 1fr;gap:2px 16px}
 .lines .blank.l{min-width:40mm}
 .say.tip{margin-top:14px}.say.tip .bubble{background:var(--sky)}
+/* Алина: DM Serif Display в мелком размере плохо читается — только для крупных заголовков */
+.bubble .nw,.keygrid b,.copy b,table.abc td:nth-child(1),table.abc td:nth-child(4),table.combo td:nth-child(2),.clock .tm,.nums b,.stamp,.sub3,.formula span{font-family:var(--body)!important;font-weight:600!important}
+.bubble .nw{font-size:13.5px!important}
+.map .city{font-family:var(--body)!important;font-weight:600}
+table.abc td:nth-child(1),table.abc td:nth-child(4){white-space:nowrap;width:15mm;font-size:15px!important}table.abc td:nth-child(2),table.abc td:nth-child(5){white-space:nowrap}
