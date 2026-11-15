@@ -1,0 +1,54 @@
+/* Вариант C «Fjords»: светлая северная простота, много воздуха, один цвет фьорда + мягкий коралл */
+:root{--paper:#ffffff;--ink:#26333a;--soft:#86939a;--accent:#2f6670;--accent2:#d9826b;--line:#e4eaec;--r:6px;
+ --body:'DM Sans',sans-serif;--head:'DM Serif Display',Georgia,serif;--desk:#d6dcdd;--pale:#f1f5f5}
+body{font-weight:400}
+.page{padding-left:22mm}
+.page.left{box-shadow:inset -12px 0 20px -18px rgba(20,40,50,.18)}
+.page.right{box-shadow:inset 12px 0 20px -18px rgba(20,40,50,.18)}
+.left .run,.left .folio{left:22mm}
+h1,h2,.sub3,.letter .L,.nums b,.clock .tm,.stamp,.story{font-family:var(--head)}
+.opener{padding:4mm 0 6mm;border-bottom:1px solid var(--ink)}
+.kicker{font-size:9px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);font-weight:500}
+.num{position:absolute;left:-15mm;top:4mm;font:300 13px var(--body);letter-spacing:.1em;color:var(--accent)}
+.num:before{content:"0";}
+.opener h1{font-size:40px;margin:10px 0 4px;color:var(--ink)}
+.sub{font-size:14px;color:var(--soft);font-weight:300}
+.goals h3{color:var(--accent)}
+.goals{border-left:2px solid var(--accent2);padding-left:10px}
+.map{background:var(--pale);border-radius:2px}
+.map .sea{fill:#eaf1f2}.map .land{fill:#fff;stroke:#c8d4d6;stroke-width:.5}.map .land.no{fill:#d5e5e6}.map .land.lv{fill:#f6ddd5}
+.map .trip{fill:none;stroke:var(--accent2);stroke-width:1.3;stroke-dasharray:3 3}
+.map .dotA{fill:var(--accent)}.map .dotB{fill:var(--accent2)}
+.map .city{font:13px var(--head);fill:var(--ink)}.map .small{font:300 9.5px var(--body);fill:var(--soft)}
+.map .country{font:500 7px var(--body);letter-spacing:2px;fill:#93a3a8}.map .water{font:italic 300 8.5px var(--body);fill:#8fb0b5}
+.bubble{background:var(--pale);border-radius:2px 12px 12px 12px}
+.bubble .nw{font-family:var(--head);font-size:15px;font-weight:400}
+.sec,.dh{border-bottom:1px solid var(--line);position:relative}
+.sec .tag,.dh .tag{position:absolute;left:-15mm;font-size:10px;letter-spacing:.1em;color:var(--accent);font-weight:500;top:8px}
+.sec h2,.dh h2{font-size:22px}
+.ex .q{font-weight:500}
+.ex .q .n{background:var(--accent);color:#fff;border-radius:3px;font-weight:500}
+.ans{border-top:1px solid var(--line)}
+.clock{background:var(--pale);border-radius:2px}
+.clock .tm{font-size:20px;color:var(--accent)}
+.scene{border-radius:2px}
+.dialog{background:var(--pale);border-radius:2px}
+.dialog .who{color:var(--accent2);font-weight:500}.dialog .who.m{color:var(--accent)}
+.gbox{background:#fff;border:1px solid var(--line)}
+.gbox.alt{background:var(--pale);border-color:transparent}
+.gtable th{border-bottom:1px solid var(--ink)}
+.gtable .hl{color:var(--accent2)}
+.cmp{background:var(--pale)}.cmp h3{color:var(--accent)}
+.warn{border-left:2px solid var(--accent2);border-radius:0;padding-left:10px}.warn h3{color:var(--accent2)}
+.formula span{border:1px solid var(--accent);color:var(--accent);font-weight:500}
+.sub3{font-size:17px}
+.story{font-size:17px;line-height:1.6;padding:6px 0 6px 14px;border-left:2px solid var(--accent);border-radius:0}
+.daily{background:#fbf3ef;border-radius:2px}
+.letter{border:1px solid var(--line);border-radius:2px}
+.letter .L{color:var(--accent2)}
+.nums div{background:var(--pale);border-radius:2px}
+.nums b{color:var(--accent)}
+.notes{background:var(--pale);border-radius:2px}.notes h3{color:var(--accent)}
+.write{border:1px solid var(--line);border-radius:2px}
+.stamp{border:1px solid var(--accent);color:var(--accent);font-size:16px}
+.stamp small{font-family:var(--body);font-size:9px;letter-spacing:.1em}

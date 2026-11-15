@@ -1,0 +1,97 @@
+/* Norsk med Polly — общая вёрстка страниц A4; цвета и шрифты — в theme-*.css */
+*{box-sizing:border-box}
+@page{size:A4;margin:0}
+body{margin:0;background:var(--desk,#d9d4cc);color:var(--ink);font-family:var(--body);font-size:12.6px;line-height:1.5;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+.book{display:grid;grid-template-columns:repeat(2,210mm);row-gap:24px;justify-content:center;padding:24px 0}
+.page{width:210mm;height:297mm;background:var(--paper);position:relative;overflow:hidden;padding:16mm 16mm 17mm}
+@media print{body{background:none}.book{display:block;padding:0}.page{page-break-after:always;box-shadow:none!important}}
+.run{position:absolute;top:8mm;font-size:9.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--soft)}
+.left .run{left:16mm}.right .run{right:16mm}
+.folio{position:absolute;bottom:8mm;font-size:10.5px;color:var(--soft)}
+.left .folio{left:16mm}.right .folio{right:16mm}
+h1,h2,h3{margin:0;font-weight:normal;line-height:1.1}
+p{margin:0 0 6px}
+.nw{color:var(--accent);font-weight:600}
+i.pr{font-style:normal;color:var(--soft);font-size:10.5px}
+.opener{position:relative}
+.route{display:grid;grid-template-columns:1.15fr 1fr;gap:12px;margin-top:10px}
+.goals ul{margin:0;padding-left:16px}.goals li{margin:2px 0}
+.map{border-radius:var(--r);overflow:hidden;min-height:50mm}
+.map svg{display:block;width:100%;height:100%}
+.scene svg{display:block;width:100%;height:auto}
+.say{display:flex;gap:10px;align-items:flex-start;margin-top:10px}
+.say img{width:52px;height:52px;border-radius:50%;flex:none}
+.bubble{flex:1;padding:8px 12px;border-radius:var(--r)}
+.bubble .nw{display:block}
+.sec,.dh{display:flex;align-items:baseline;gap:10px;margin:14px 0 8px;padding-bottom:4px}
+.sec.first{margin-top:2px}
+.sec .no,.dh .no{margin-left:auto;font-style:italic;color:var(--soft);font-size:11.5px;text-align:right}
+.vocab{display:grid;grid-template-columns:1fr 1fr;gap:0 16px}
+.vocab div{display:flex;justify-content:space-between;gap:8px;padding:3px 0;border-bottom:1px solid var(--line)}
+.vocab .n{font-weight:600;color:var(--accent)}
+.vocab .t{text-align:right}
+.ex{margin:12px 0 4px}
+.ex .q{font-weight:600;margin-bottom:4px}
+.ex .q .n{display:inline-grid;place-items:center;min-width:19px;height:19px;border-radius:50%;font-size:10.5px;margin-right:7px;padding:0 4px}
+ol.items{margin:4px 0 0;padding-left:20px}
+ol.items li{margin:3px 0}
+ol.items.wide li{margin:6px 0}
+.blank{display:inline-block;min-width:60px;border-bottom:1px solid var(--soft);height:1em;vertical-align:baseline;opacity:.7}
+.blank.l{min-width:62mm}
+.ans{margin-top:8px;padding-top:4px;transform:rotate(180deg);font-size:10px;color:var(--soft)}
+.ans span{font-style:italic}
+.ans b{color:var(--ink);font-weight:600}
+.clocks{display:grid;grid-template-columns:repeat(4,1fr);gap:10px}
+.clock{text-align:center;padding:6px;border-radius:var(--r)}
+.clock .tm{font-size:17px}
+.clock .cap{font-size:10.5px;color:var(--soft);margin-bottom:6px}
+.clock .blank{min-width:80%}
+.scene{border-radius:var(--r);overflow:hidden;margin-bottom:8px}
+.dialog{padding:8px 14px;border-radius:var(--r)}
+.dialog p{margin:2px 0;display:grid;grid-template-columns:42px 1fr;gap:6px}
+.dialog .who{font-size:10px;letter-spacing:.08em;text-transform:uppercase;padding-top:2px}
+.gloss{display:flex;flex-wrap:wrap;gap:2px 14px;font-size:10.8px;margin-top:6px;color:var(--soft)}
+.gloss b{color:var(--ink);font-weight:600}
+.tf{width:100%;border-collapse:collapse}
+.tf td{border-bottom:1px solid var(--line);padding:3px 2px}
+.tf td.box{width:60px;text-align:center;color:var(--soft)}
+.lines p{margin:3px 0}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+.gbox{padding:8px 10px;border-radius:var(--r);margin:6px 0}
+.gtable{width:100%;border-collapse:collapse}
+.gtable th{text-align:left;font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);padding:3px 6px;font-weight:600}
+.gtable td{padding:3px 6px;border-bottom:1px solid var(--line)}
+.gtable td:first-child{font-weight:600;color:var(--accent)}
+.gtable .hl{text-align:center;font-weight:700}
+.cmp,.warn{padding:8px 10px;border-radius:var(--r);margin:6px 0}
+.cmp h3,.warn h3,.goals h3,.notes h3,.fact h3{font-family:var(--body);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;margin-bottom:4px}
+.formula{display:flex;flex-wrap:wrap;gap:6px;justify-content:center;margin:5px 0}
+.formula span{padding:1px 8px;border-radius:20px}
+.sub3{font-size:15px;margin:10px 0 2px}
+.hint{font-size:11px;color:var(--soft)}
+.story{padding:10px 16px;border-radius:var(--r);font-size:13.6px;line-height:1.7}
+.story p{margin:0 0 4px;text-indent:1.2em}
+.story p:first-child{text-indent:0}
+.daily{margin-top:14px;padding:4px 14px 10px;border-radius:var(--r)}
+.dcols{display:grid;grid-template-columns:1.35fr 1fr;gap:14px}
+.dwords div{padding:3px 0;border-bottom:1px solid var(--line);font-size:11.5px}
+.dwords b{display:block;color:var(--accent);font-weight:600}
+.letters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.letter{text-align:center;padding:6px;border-radius:var(--r)}
+.letter .L{font-size:28px;line-height:1.1}
+.letter small{display:block;color:var(--soft);font-size:10.5px}
+.nums{display:grid;grid-template-columns:repeat(11,1fr);gap:4px;margin-top:8px}
+.nums div{text-align:center;padding:3px 0;font-size:10.5px;border-radius:6px}
+.nums b{display:block;font-size:17px;font-weight:normal}
+.notes{padding:8px 14px;border-radius:var(--r);margin-top:12px}
+.notes ul{margin:0;padding-left:16px}.notes li{margin:0 0 4px}
+.write{padding:6px 12px;line-height:2.3;border-radius:var(--r)}
+.write .blank.l{min-width:100mm}
+.write.tall{height:34mm;background-image:repeating-linear-gradient(transparent 0 25px,var(--line) 25px 26px)}
+.ordbank{display:grid;grid-template-columns:repeat(3,1fr);gap:4px 16px}
+.ordbank div{display:flex;gap:8px;align-items:baseline;border-bottom:1px solid var(--line);padding:5px 0}
+.ordbank b{color:var(--accent);font-weight:600;white-space:nowrap}
+.check{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px}
+.check div:before{content:"○  ";color:var(--accent2)}
+.stamp{position:absolute;right:16mm;bottom:16mm;width:26mm;height:26mm;border-radius:50%;display:grid;place-items:center;text-align:center;line-height:1.1;transform:rotate(-10deg)}
+.daily.first{margin-top:2px}.daily+.sec{margin-top:16px}
