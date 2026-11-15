@@ -1,8 +1,9 @@
 // Нарисованные эмодзи в стиле сайта (черновик, волна 1 — 30 частых). PPEmojiArt.svg(ch) → строка <svg> или null.
 // Рисунок 32×32, обводка #2B1A51; новый значок = строка в ART.
 (() => {
-  const O = '#2B1A51', P = '#534AB7', PD = '#3E3590', PE = '#F0A987', OR = '#D85A30', ST = '#E9A93B', LI = '#F4F0FA', MU = '#D9D3F2',
-    GR = '#4F9A6A', GL = '#7CC493', BR = '#7A5634', PA = '#F2E6C9', PA2 = '#E3CC9A', SK = '#BFD3F2';
+  // Тушь + акварель (дизайн v2): линия — цвет текста (на тёмном светлеет), заливка — акварель чуть мимо контура.
+  const O = '#2A211C', P = '#5B7A9C', PD = '#3D5675', PE = '#EDB797', OR = '#C8643C', ST = '#DDA640', LI = '#FBF7F0', MU = '#D9CFC2',
+    GR = '#7FA06E', GL = '#ABC694', BR = '#8A6243', PA = '#F1E4C8', PA2 = '#DFC796', SK = '#BCD3E6', BI = '#7470A3', BD = '#55518A';
   const sp = (cx, cy, r) => `M${cx} ${cy - r}Q${cx} ${cy} ${cx + r} ${cy}Q${cx} ${cy} ${cx} ${cy + r}Q${cx} ${cy} ${cx - r} ${cy}Q${cx} ${cy} ${cx} ${cy - r}Z`;
   const hl = (d) => `<path d="${d}" fill="none" stroke="#fff" stroke-opacity=".7" stroke-width="1.6"/>`;
   const ART = {
@@ -21,8 +22,8 @@
       <path d="M16 10V28" fill="none" stroke="none"/><path d="M16 10Q9 4 8.5 7.5Q8 10.5 16 10ZM16 10Q23 4 23.5 7.5Q24 10.5 16 10Z" fill="${ST}"/>`,
     '🛒': `<path d="M2.5 6.5H7L10.5 21H25" fill="none"/><path d="M8.5 10.5H28L25.5 19.5H10.5Z" fill="${PE}"/><path d="M15 10.5L15.8 19.5M21 10.5L20.6 19.5M9.6 15H26.7" stroke="${OR}" stroke-width="1.3"/>
       <circle cx="12.5" cy="25.5" r="2.5" fill="${O}"/><circle cx="23" cy="25.5" r="2.5" fill="${O}"/>`,
-    '🐦': `<path d="M4 15L1.5 19.5L7 19.5" fill="${PD}"/><ellipse cx="14" cy="18.5" rx="10.5" ry="7.5" fill="${P}"/><path d="M8 22Q14 27 21 22.5Q23 19 22 16Q17 22 8 22Z" fill="${PE}" stroke="none"/>
-      <path d="M7 15Q13 11 18 16Q13 20.5 7 15Z" fill="${PD}"/><circle cx="22" cy="10.5" r="5.5" fill="${P}"/><path d="M27 9.5L30.5 11.3L27 13Z" fill="${ST}"/>
+    '🐦': `<path d="M4 15L1.5 19.5L7 19.5" fill="${BD}"/><ellipse cx="14" cy="18.5" rx="10.5" ry="7.5" fill="${BI}"/><path d="M8 22Q14 27 21 22.5Q23 19 22 16Q17 22 8 22Z" fill="${PE}" stroke="none"/>
+      <path d="M7 15Q13 11 18 16Q13 20.5 7 15Z" fill="${BD}"/><circle cx="22" cy="10.5" r="5.5" fill="${BI}"/><path d="M27 9.5L30.5 11.3L27 13Z" fill="${ST}"/>
       <circle cx="23.3" cy="9.6" r="1.4" fill="${O}" stroke="none"/><circle cx="23.7" cy="9.1" r=".5" fill="#fff" stroke="none"/><path d="M12 26V29M17 26V29" stroke="${OR}"/>`,
     '📒': `<rect x="6.5" y="3.5" width="20" height="25" rx="2" fill="${ST}"/><path d="M11.5 3.5V28.5" /><rect x="6.5" y="3.5" width="5" height="25" rx="2" fill="${OR}"/>
       <rect x="15" y="9" width="8.5" height="5" rx="1" fill="${LI}"/><path d="M15 18H23.5M15 21.5H21" stroke="${OR}" stroke-width="1.3"/>`,
@@ -58,12 +59,30 @@
     '🔊': `<path d="M4.5 12H10L17 6V26L10 20H4.5Z" fill="${MU}"/><path d="M21 12.5Q23.5 16 21 19.5M24.5 9Q29.5 16 24.5 23" fill="none" stroke="${OR}" stroke-width="2.2"/>`,
     '📸': `<rect x="10" y="6" width="9" height="5" rx="1.5" fill="${P}"/><rect x="3.5" y="9.5" width="25" height="17" rx="3" fill="${P}"/><circle cx="16" cy="18" r="6" fill="${MU}"/><circle cx="16" cy="18" r="3" fill="${O}"/>
       <circle cx="17" cy="17" r=".9" fill="#fff" stroke="none"/><rect x="22" y="12" width="3.5" height="2.5" rx=".8" fill="${ST}"/><path d="M26 3.5L27.5 6M29.5 7L27 7.5M23 3L24 5.5" stroke="${ST}" stroke-width="1.5"/>`,
-    '💬': `<path d="M6.5 5.5H25.5Q29 5.5 29 9V19Q29 22.5 25.5 22.5H14L8 27.5L9 22.5H6.5Q3 22.5 3 19V9Q3 5.5 6.5 5.5Z" fill="${LI}"/><g fill="${P}" stroke="none"><circle cx="10.5" cy="14" r="2"/><circle cx="16" cy="14" r="2"/><circle cx="21.5" cy="14" r="2"/></g>`,
+    '💬': `<path d="M6.5 5.5H25.5Q29 5.5 29 9V19Q29 22.5 25.5 22.5H14L8 27.5L9 22.5H6.5Q3 22.5 3 19V9Q3 5.5 6.5 5.5Z" fill="${LI}"/><g fill="${O}" stroke="none"><circle cx="10.5" cy="14" r="2"/><circle cx="16" cy="14" r="2"/><circle cx="21.5" cy="14" r="2"/></g>`,
     '⭐': `<path d="M16 3L19.6 11.2L28.5 12L21.8 17.9L23.8 26.6L16 22L8.2 26.6L10.2 17.9L3.5 12L12.4 11.2Z" fill="${ST}"/>${hl('M11.5 14.5L14 12.5')}`,
   };
+  let ready = false;
+  const setup = () => {
+    if (ready || typeof document === 'undefined' || !document.head) return;
+    ready = true;
+    const st = document.createElement('style');
+    st.textContent = '.pp-emo{width:1.3em;height:1.3em;vertical-align:-.28em;overflow:visible}'
+      + '.pp-emo .w *{stroke:none!important}.pp-emo .w .i,.pp-emo .w .i *{fill:none!important}.pp-emo .w{opacity:.88;filter:url(#pp-emo-wash)}'
+      + '.pp-emo .k{stroke:currentColor;filter:url(#pp-emo-ink)}.pp-emo .k *{fill:none!important}.pp-emo .k .i,.pp-emo .k .i *{fill:currentColor!important}';
+    document.head.appendChild(st);
+    const d = document.createElement('div');
+    d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
+    d.innerHTML = '<svg aria-hidden="true"><filter id="pp-emo-ink" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".09" numOctaves="2" seed="3"/><feDisplacementMap in="SourceGraphic" scale="1.1"/></filter>'
+      + '<filter id="pp-emo-wash" x="-10%" y="-10%" width="120%" height="120%"><feTurbulence type="fractalNoise" baseFrequency=".05" numOctaves="2" seed="7"/><feDisplacementMap in="SourceGraphic" scale="2.2"/></filter></svg>';
+    (document.body || document.head).appendChild(d);
+  };
   const svg = (ch) => {
-    const a = ART[ch.replace(/️/g, '')];
-    return a ? `<svg class="pp-emo" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke="${O}" stroke-width="1.8" stroke-linejoin="round" stroke-linecap="round">${a}</svg>` : null;
+    let a = ART[ch.replace(/\uFE0F/g, '')];
+    if (!a) return null;
+    setup();
+    a = a.split(`fill="${O}"`).join('class="i"');
+    return `<svg class="pp-emo" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><g class="w" transform="translate(.9 1)">${a}</g><g class="k">${a}</g></svg>`;
   };
   window.PPEmojiArt = { svg, list: Object.keys(ART) };
 })();
