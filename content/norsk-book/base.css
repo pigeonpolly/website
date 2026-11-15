@@ -210,3 +210,4 @@ ol.items.tr .blank.l{min-width:100%;margin-top:14px}
 .testscore div:nth-child(2){background:var(--sun)}.testscore div:nth-child(3){background:var(--rose)}
 .testscore b{display:inline-block;min-width:48px;color:var(--accent)}
 .write.tall{height:32mm}
+.grid2>div,.grid3>div,.grid4>div{display:flex;gap:4px;align-items:baseline;min-width:0}.grid2 .blank.l,.grid3 .blank.l,.grid4 .blank.l{min-width:8mm;flex:1}.grid3>div,.grid4>div{white-space:nowrap}
