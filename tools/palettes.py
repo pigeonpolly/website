@@ -100,6 +100,17 @@ for gal in ['bird', 'snail', 'sketchbook', 'halloween', 'detective', 'anxiety', 
         if key not in T or key == 'anxiety-7': continue
         cols = [{'hex': h, 'en': e, 'ru': r, 'lv': l} for e, r, l, h in O[key]] if key in O else palette(W / 'site' / it['thumb'])
         out.append({'key': key, 'gallery': gal, 'img': it['full'], 'thumb': it['thumb'], 'w': it['w'], 'h': it['h'], 'title': dict(zip(['en', 'ru', 'lv'], T[key])), 'colors': cols})
+# серия studio: фото работ из мастерской (site/images/photos2/), только те, у кого есть название в palette_titles.py;
+# превью 800 px — site/images/photos2/800/ (подпапка: build.py берёт в базу пинов только photos2/*.jpg)
+for key in [k for k in T if k.startswith('studio-')]:
+    name = key[len('studio-'):]
+    full, th = W / 'site' / 'images' / 'photos2' / f'{name}.jpg', W / 'site' / 'images' / 'photos2' / '800' / f'{name}.jpg'
+    im = Image.open(full)
+    if not th.exists():
+        th.parent.mkdir(exist_ok=True); t = im.convert('RGB'); t.thumbnail((800, 800)); t.save(th, quality=84, optimize=True)
+    cols = [{'hex': h, 'en': e, 'ru': r, 'lv': l} for e, r, l, h in O[key]] if key in O else palette(th)
+    out.append({'key': key, 'gallery': 'studio', 'img': f'images/photos2/{name}.jpg', 'thumb': f'images/photos2/800/{name}.jpg', 'w': im.width, 'h': im.height,
+                'title': dict(zip(['en', 'ru', 'lv'], T[key])), 'colors': cols})
 json.dump(out, open(W / 'content' / 'palettes.json', 'w'), ensure_ascii=False, indent=0)
 # очередь палитр для дней ЭКСТРА: порядок уже показанных не трогаем, новые картины — в конец
 eo = W / 'content' / 'extra-order.json'

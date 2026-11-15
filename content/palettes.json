@@ -3670,5 +3670,2555 @@
 "lv": "Lins"
 }
 ]
+},
+{
+"key": "studio-apple_creature",
+"gallery": "studio",
+"img": "images/photos2/apple_creature.jpg",
+"thumb": "images/photos2/800/apple_creature.jpg",
+"w": 870,
+"h": 819,
+"title": {
+"en": "Apple creature",
+"ru": "Яблочное существо",
+"lv": "Ābolu radījums"
+},
+"colors": [
+{
+"hex": "#DCD657",
+"en": "Lemon",
+"ru": "Лимон",
+"lv": "Citrons"
+},
+{
+"hex": "#AE6A3F",
+"en": "Copper",
+"ru": "Медь",
+"lv": "Varš"
+},
+{
+"hex": "#817D40",
+"en": "Olive",
+"ru": "Олива",
+"lv": "Olīva"
+},
+{
+"hex": "#62412F",
+"en": "Cocoa",
+"ru": "Какао",
+"lv": "Kakao"
+},
+{
+"hex": "#B5A290",
+"en": "Driftwood",
+"ru": "Плавник",
+"lv": "Dreifkoks"
+},
+{
+"hex": "#F3E6CE",
+"en": "Ivory",
+"ru": "Слоновая кость",
+"lv": "Ziloņkauls"
+}
+]
+},
+{
+"key": "studio-bee_rider",
+"gallery": "studio",
+"img": "images/photos2/bee_rider.jpg",
+"thumb": "images/photos2/800/bee_rider.jpg",
+"w": 1200,
+"h": 1200,
+"title": {
+"en": "Bee on a beetle",
+"ru": "Пчела верхом на жуке",
+"lv": "Bite uz vaboles"
+},
+"colors": [
+{
+"hex": "#E5CD45",
+"en": "Lemon",
+"ru": "Лимон",
+"lv": "Citrons"
+},
+{
+"hex": "#E18F35",
+"en": "Tangerine",
+"ru": "Мандарин",
+"lv": "Mandarīns"
+},
+{
+"hex": "#B84D3B",
+"en": "Brick",
+"ru": "Кирпич",
+"lv": "Ķieģelis"
+},
+{
+"hex": "#1C1412",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#586065",
+"en": "Slate",
+"ru": "Сланец",
+"lv": "Slāneklis"
+},
+{
+"hex": "#E3E1CF",
+"en": "Ivory",
+"ru": "Слоновая кость",
+"lv": "Ziloņkauls"
+}
+]
+},
+{
+"key": "studio-beetle",
+"gallery": "studio",
+"img": "images/photos2/beetle.jpg",
+"thumb": "images/photos2/800/beetle.jpg",
+"w": 885,
+"h": 1200,
+"title": {
+"en": "Rhino beetle",
+"ru": "Жук-носорог",
+"lv": "Degunradžvabole"
+},
+"colors": [
+{
+"hex": "#A94F28",
+"en": "Terracotta",
+"ru": "Терракота",
+"lv": "Terakota"
+},
+{
+"hex": "#C8A586",
+"en": "Latte",
+"ru": "Латте",
+"lv": "Late"
+},
+{
+"hex": "#1F1823",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#665C5E",
+"en": "Slate",
+"ru": "Сланец",
+"lv": "Slāneklis"
+},
+{
+"hex": "#956149",
+"en": "Cinnamon",
+"ru": "Корица",
+"lv": "Kanēlis"
+},
+{
+"hex": "#EDDDC9",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
+}
+]
+},
+{
+"key": "studio-birdhouse",
+"gallery": "studio",
+"img": "images/photos2/birdhouse.jpg",
+"thumb": "images/photos2/800/birdhouse.jpg",
+"w": 1058,
+"h": 1200,
+"title": {
+"en": "Birdhouse in bloom",
+"ru": "Скворечник в цветах",
+"lv": "Putnu būrītis ziedos"
+},
+"colors": [
+{
+"hex": "#C78963",
+"en": "Clay",
+"ru": "Глина",
+"lv": "Māls"
+},
+{
+"hex": "#7C1218",
+"en": "Cherry",
+"ru": "Вишня",
+"lv": "Ķirsis"
+},
+{
+"hex": "#6D733E",
+"en": "Olive",
+"ru": "Олива",
+"lv": "Olīva"
+},
+{
+"hex": "#34241A",
+"en": "Coffee Bean",
+"ru": "Кофейное зерно",
+"lv": "Kafijas pupiņa"
+},
+{
+"hex": "#838EA5",
+"en": "Rain",
+"ru": "Дождь",
+"lv": "Lietus"
+},
+{
+"hex": "#E0C0A7",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
+}
+]
+},
+{
+"key": "studio-blocks",
+"gallery": "studio",
+"img": "images/photos2/blocks.jpg",
+"thumb": "images/photos2/800/blocks.jpg",
+"w": 1200,
+"h": 850,
+"title": {
+"en": "Blue sky over the blocks",
+"ru": "Синее небо над панельками",
+"lv": "Zilas debesis virs mājām"
+},
+"colors": [
+{
+"hex": "#10A6E8",
+"en": "Summer Sky",
+"ru": "Летнее небо",
+"lv": "Vasaras debesis"
+},
+{
+"hex": "#3AD5F2",
+"en": "Sky",
+"ru": "Небо",
+"lv": "Debesis"
+},
+{
+"hex": "#909C95",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
+},
+{
+"hex": "#0A0D11",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#294253",
+"en": "Storm Cloud",
+"ru": "Грозовая туча",
+"lv": "Negaisa mākonis"
+},
+{
+"hex": "#638391",
+"en": "Rain",
+"ru": "Дождь",
+"lv": "Lietus"
+}
+]
+},
+{
+"key": "studio-bookshop",
+"gallery": "studio",
+"img": "images/photos2/bookshop.jpg",
+"thumb": "images/photos2/800/bookshop.jpg",
+"w": 900,
+"h": 1200,
+"title": {
+"en": "Bookshop window at night",
+"ru": "Витрина книжного ночью",
+"lv": "Grāmatnīcas logs naktī"
+},
+"colors": [
+{
+"hex": "#C08648",
+"en": "Toast",
+"ru": "Тост",
+"lv": "Grauzdiņš"
+},
+{
+"hex": "#5485D2",
+"en": "Cornflower",
+"ru": "Василёк",
+"lv": "Rudzupuķe"
+},
+{
+"hex": "#0A090C",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#47423A",
+"en": "Charcoal",
+"ru": "Уголь",
+"lv": "Ogle"
+},
+{
+"hex": "#786B4C",
+"en": "Olive",
+"ru": "Олива",
+"lv": "Olīva"
+},
+{
+"hex": "#E2CC98",
+"en": "Sand",
+"ru": "Песок",
+"lv": "Smiltis"
+}
+]
+},
+{
+"key": "studio-breakfast_cuba",
+"gallery": "studio",
+"img": "images/photos2/breakfast_cuba.jpg",
+"thumb": "images/photos2/800/breakfast_cuba.jpg",
+"w": 900,
+"h": 1200,
+"title": {
+"en": "Breakfasts of the world",
+"ru": "Завтраки мира",
+"lv": "Pasaules brokastis"
+},
+"colors": [
+{
+"hex": "#BD7523",
+"en": "Ochre",
+"ru": "Охра",
+"lv": "Okers"
+},
+{
+"hex": "#67452D",
+"en": "Bark",
+"ru": "Кора",
+"lv": "Miza"
+},
+{
+"hex": "#CCB090",
+"en": "Sand",
+"ru": "Песок",
+"lv": "Smiltis"
+},
+{
+"hex": "#110F0C",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#5B7185",
+"en": "Steel Blue",
+"ru": "Стальной",
+"lv": "Tērauda zils"
+},
+{
+"hex": "#E3DED1",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
+}
+]
+},
+{
+"key": "studio-breakfast_us",
+"gallery": "studio",
+"img": "images/photos2/breakfast_us.jpg",
+"thumb": "images/photos2/800/breakfast_us.jpg",
+"w": 900,
+"h": 1200,
+"title": {
+"en": "Pancake breakfast",
+"ru": "Завтрак с блинчиками",
+"lv": "Pankūku brokastis"
+},
+"colors": [
+{
+"hex": "#AA7145",
+"en": "Toast",
+"ru": "Тост",
+"lv": "Grauzdiņš"
+},
+{
+"hex": "#BC6170",
+"en": "Jelly Pink",
+"ru": "Желейный розовый",
+"lv": "Želejas rozā"
+},
+{
+"hex": "#45466A",
+"en": "Twilight",
+"ru": "Сумерки",
+"lv": "Krēsla"
+},
+{
+"hex": "#151111",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#443325",
+"en": "Coffee Bean",
+"ru": "Кофейное зерно",
+"lv": "Kafijas pupiņa"
+},
+{
+"hex": "#C7B6A2",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
+}
+]
+},
+{
+"key": "studio-burger",
+"gallery": "studio",
+"img": "images/photos2/burger.jpg",
+"thumb": "images/photos2/800/burger.jpg",
+"w": 1186,
+"h": 1200,
+"title": {
+"en": "Big burger",
+"ru": "Большой бургер",
+"lv": "Lielais burgers"
+},
+"colors": [
+{
+"hex": "#CBA429",
+"en": "Mustard",
+"ru": "Горчица",
+"lv": "Sinepes"
+},
+{
+"hex": "#A23439",
+"en": "Cherry",
+"ru": "Вишня",
+"lv": "Ķirsis"
+},
+{
+"hex": "#529B2B",
+"en": "Potion Green",
+"ru": "Зелье",
+"lv": "Dzira"
+},
+{
+"hex": "#221D21",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#B08784",
+"en": "Dusty Rose",
+"ru": "Пыльная роза",
+"lv": "Putekļainā roze"
+},
+{
+"hex": "#E0CEB1",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
+}
+]
+},
+{
+"key": "studio-cactus",
+"gallery": "studio",
+"img": "images/photos2/cactus.jpg",
+"thumb": "images/photos2/800/cactus.jpg",
+"w": 1200,
+"h": 900,
+"title": {
+"en": "Cactus and a paint box",
+"ru": "Кактус и палитра",
+"lv": "Kaktuss un krāsu kastīte"
+},
+"colors": [
+{
+"hex": "#EAC242",
+"en": "Lemon",
+"ru": "Лимон",
+"lv": "Citrons"
+},
+{
+"hex": "#D65A26",
+"en": "Poppy",
+"ru": "Мак",
+"lv": "Magone"
+},
+{
+"hex": "#873726",
+"en": "Brick",
+"ru": "Кирпич",
+"lv": "Ķieģelis"
+},
+{
+"hex": "#504C3E",
+"en": "Swamp",
+"ru": "Болото",
+"lv": "Purvs"
+},
+{
+"hex": "#9E7D57",
+"en": "Latte",
+"ru": "Латте",
+"lv": "Late"
+},
+{
+"hex": "#EBDCC3",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
+}
+]
+},
+{
+"key": "studio-caffeine_cup",
+"gallery": "studio",
+"img": "images/photos2/caffeine_cup.jpg",
+"thumb": "images/photos2/800/caffeine_cup.jpg",
+"w": 900,
+"h": 1200,
+"title": {
+"en": "Holiday latte",
+"ru": "Праздничный латте",
+"lv": "Svētku late"
+},
+"colors": [
+{
+"hex": "#C65C2C",
+"en": "Terracotta",
+"ru": "Терракота",
+"lv": "Terakota"
+},
+{
+"hex": "#8A7A2F",
+"en": "Brass",
+"ru": "Латунь",
+"lv": "Misiņš"
+},
+{
+"hex": "#3467A4",
+"en": "Denim",
+"ru": "Деним",
+"lv": "Džinss"
+},
+{
+"hex": "#413C40",
+"en": "Charcoal",
+"ru": "Уголь",
+"lv": "Ogle"
+},
+{
+"hex": "#817053",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
+},
+{
+"hex": "#C8C3B5",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
+}
+]
+},
+{
+"key": "studio-cat_lights",
+"gallery": "studio",
+"img": "images/photos2/cat_lights.jpg",
+"thumb": "images/photos2/800/cat_lights.jpg",
+"w": 1200,
+"h": 1200,
+"title": {
+"en": "Cat in the lights",
+"ru": "Кот в огоньках",
+"lv": "Kaķis gaismiņās"
+},
+"colors": [
+{
+"hex": "#E3CD45",
+"en": "Lemon",
+"ru": "Лимон",
+"lv": "Citrons"
+},
+{
+"hex": "#8A8139",
+"en": "Olive",
+"ru": "Олива",
+"lv": "Olīva"
+},
+{
+"hex": "#0F0D0F",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#494855",
+"en": "Storm Cloud",
+"ru": "Грозовая туча",
+"lv": "Negaisa mākonis"
+},
+{
+"hex": "#8C9294",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
+},
+{
+"hex": "#E6DCC5",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
+}
+]
+},
+{
+"key": "studio-central_perk",
+"gallery": "studio",
+"img": "images/photos2/central_perk.jpg",
+"thumb": "images/photos2/800/central_perk.jpg",
+"w": 1200,
+"h": 899,
+"title": {
+"en": "Coffee with friends",
+"ru": "Кофе с друзьями",
+"lv": "Kafija ar draugiem"
+},
+"colors": [
+{
+"hex": "#D3802A",
+"en": "Tangerine",
+"ru": "Мандарин",
+"lv": "Mandarīns"
+},
+{
+"hex": "#AB2918",
+"en": "Tomato",
+"ru": "Томат",
+"lv": "Tomāts"
+},
+{
+"hex": "#819657",
+"en": "Pistachio",
+"ru": "Фисташка",
+"lv": "Pistācija"
+},
+{
+"hex": "#252424",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#908B81",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
+},
+{
+"hex": "#ECE0C9",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
+}
+]
+},
+{
+"key": "studio-cereal",
+"gallery": "studio",
+"img": "images/photos2/cereal.jpg",
+"thumb": "images/photos2/800/cereal.jpg",
+"w": 1104,
+"h": 1104,
+"title": {
+"en": "Milk splash",
+"ru": "Молочный всплеск",
+"lv": "Piena šļakatas"
+},
+"colors": [
+{
+"hex": "#C7372A",
+"en": "Tomato",
+"ru": "Томат",
+"lv": "Tomāts"
+},
+{
+"hex": "#C7D16C",
+"en": "Pistachio",
+"ru": "Фисташка",
+"lv": "Pistācija"
+},
+{
+"hex": "#AA5661",
+"en": "Jelly Pink",
+"ru": "Желейный розовый",
+"lv": "Želejas rozā"
+},
+{
+"hex": "#0A141A",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#15486A",
+"en": "Harbor",
+"ru": "Гавань",
+"lv": "Osta"
+},
+{
+"hex": "#D8DAD5",
+"en": "Paper White",
+"ru": "Белая бумага",
+"lv": "Papīra balts"
+}
+]
+},
+{
+"key": "studio-chars",
+"gallery": "studio",
+"img": "images/photos2/chars.jpg",
+"thumb": "images/photos2/800/chars.jpg",
+"w": 1200,
+"h": 737,
+"title": {
+"en": "Pigeon character sheet",
+"ru": "Голуби-персонажи",
+"lv": "Baložu tēli"
+},
+"colors": [
+{
+"hex": "#F4AD3D",
+"en": "Marigold",
+"ru": "Бархатец",
+"lv": "Samtene"
+},
+{
+"hex": "#95361C",
+"en": "Rust",
+"ru": "Ржавчина",
+"lv": "Rūsa"
+},
+{
+"hex": "#7D2648",
+"en": "Berry",
+"ru": "Ягода",
+"lv": "Oga"
+},
+{
+"hex": "#242343",
+"en": "Deep Navy",
+"ru": "Глубокий синий",
+"lv": "Dziļi zils"
+},
+{
+"hex": "#506D7C",
+"en": "Slate",
+"ru": "Сланец",
+"lv": "Slāneklis"
+},
+{
+"hex": "#9A7B81",
+"en": "Mauve",
+"ru": "Мальва",
+"lv": "Malva"
+}
+]
+},
+{
+"key": "studio-checker_coffee",
+"gallery": "studio",
+"img": "images/photos2/checker_coffee.jpg",
+"thumb": "images/photos2/800/checker_coffee.jpg",
+"w": 900,
+"h": 1200,
+"title": {
+"en": "Checkered coffee",
+"ru": "Кофе в клеточку",
+"lv": "Rūtainā kafija"
+},
+"colors": [
+{
+"hex": "#B06E18",
+"en": "Ochre",
+"ru": "Охра",
+"lv": "Okers"
+},
+{
+"hex": "#B09375",
+"en": "Latte",
+"ru": "Латте",
+"lv": "Late"
+},
+{
+"hex": "#230D0D",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#554240",
+"en": "Cocoa",
+"ru": "Какао",
+"lv": "Kakao"
+},
+{
+"hex": "#D5B998",
+"en": "Sand",
+"ru": "Песок",
+"lv": "Smiltis"
+},
+{
+"hex": "#EBDBCB",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
+}
+]
+},
+{
+"key": "studio-cookies",
+"gallery": "studio",
+"img": "images/photos2/cookies.jpg",
+"thumb": "images/photos2/800/cookies.jpg",
+"w": 662,
+"h": 694,
+"title": {
+"en": "Milk and cookies",
+"ru": "Молоко и печенье",
+"lv": "Piens un cepumi"
+},
+"colors": [
+{
+"hex": "#B53F2D",
+"en": "Cherry",
+"ru": "Вишня",
+"lv": "Ķirsis"
+},
+{
+"hex": "#D29868",
+"en": "Biscuit",
+"ru": "Печенье",
+"lv": "Cepums"
+},
+{
+"hex": "#181818",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#4B332B",
+"en": "Coffee Bean",
+"ru": "Кофейное зерно",
+"lv": "Kafijas pupiņa"
+},
+{
+"hex": "#6D7673",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
+},
+{
+"hex": "#E5D0C1",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
+}
+]
+},
+{
+"key": "studio-cupcake",
+"gallery": "studio",
+"img": "images/photos2/cupcake.jpg",
+"thumb": "images/photos2/800/cupcake.jpg",
+"w": 1166,
+"h": 1200,
+"title": {
+"en": "Cherry cupcake",
+"ru": "Кекс с вишней",
+"lv": "Ķiršu kēksiņš"
+},
+"colors": [
+{
+"hex": "#B93720",
+"en": "Tomato",
+"ru": "Томат",
+"lv": "Tomāts"
+},
+{
+"hex": "#D1884A",
+"en": "Copper",
+"ru": "Медь",
+"lv": "Varš"
+},
+{
+"hex": "#28858D",
+"en": "Teal",
+"ru": "Бирюза",
+"lv": "Zilganzaļš"
+},
+{
+"hex": "#0F1519",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#1B4D4F",
+"en": "Deep Teal",
+"ru": "Глубокая бирюза",
+"lv": "Dziļi tirkīzs"
+},
+{
+"hex": "#E0CBB7",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
+}
+]
+},
+{
+"key": "studio-desk_night",
+"gallery": "studio",
+"img": "images/photos2/desk_night.jpg",
+"thumb": "images/photos2/800/desk_night.jpg",
+"w": 1200,
+"h": 1200,
+"title": {
+"en": "Desk at night",
+"ru": "Стол ночью",
+"lv": "Galds naktī"
+},
+"colors": [
+{
+"hex": "#BF7D4E",
+"en": "Copper",
+"ru": "Медь",
+"lv": "Varš"
+},
+{
+"hex": "#419049",
+"en": "Emerald",
+"ru": "Изумруд",
+"lv": "Smaragds"
+},
+{
+"hex": "#715E94",
+"en": "Pigeon Purple",
+"ru": "Голубиный фиолетовый",
+"lv": "Baložvioleta"
+},
+{
+"hex": "#20141A",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#674233",
+"en": "Cocoa",
+"ru": "Какао",
+"lv": "Kakao"
+},
+{
+"hex": "#D7BFA5",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
+}
+]
+},
+{
+"key": "studio-doors_framed",
+"gallery": "studio",
+"img": "images/photos2/doors_framed.jpg",
+"thumb": "images/photos2/800/doors_framed.jpg",
+"w": 961,
+"h": 1200,
+"title": {
+"en": "Red door",
+"ru": "Красная дверь",
+"lv": "Sarkanās durvis"
+},
+"colors": [
+{
+"hex": "#C2A057",
+"en": "Brass",
+"ru": "Латунь",
+"lv": "Misiņš"
+},
+{
+"hex": "#7A2428",
+"en": "Burgundy",
+"ru": "Бордо",
+"lv": "Burgundietis"
+},
+{
+"hex": "#71513C",
+"en": "Bark",
+"ru": "Кора",
+"lv": "Miza"
+},
+{
+"hex": "#362B29",
+"en": "Charcoal",
+"ru": "Уголь",
+"lv": "Ogle"
+},
+{
+"hex": "#9A8E80",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
+},
+{
+"hex": "#D2D7D7",
+"en": "Ice",
+"ru": "Лёд",
+"lv": "Ledus"
+}
+]
+},
+{
+"key": "studio-espresso_palette",
+"gallery": "studio",
+"img": "images/photos2/espresso_palette.jpg",
+"thumb": "images/photos2/800/espresso_palette.jpg",
+"w": 900,
+"h": 1200,
+"title": {
+"en": "Espresso machine",
+"ru": "Кофемашина",
+"lv": "Espresso automāts"
+},
+"colors": [
+{
+"hex": "#B0341B",
+"en": "Tomato",
+"ru": "Томат",
+"lv": "Tomāts"
+},
+{
+"hex": "#F2D44E",
+"en": "Lemon",
+"ru": "Лимон",
+"lv": "Citrons"
+},
+{
+"hex": "#623697",
+"en": "Violet Ink",
+"ru": "Фиолетовые чернила",
+"lv": "Violetā tinte"
+},
+{
+"hex": "#0B0505",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#4B3C40",
+"en": "Charcoal",
+"ru": "Уголь",
+"lv": "Ogle"
+},
+{
+"hex": "#CCBBA0",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
+}
+]
+},
+{
+"key": "studio-field_acrylic",
+"gallery": "studio",
+"img": "images/photos2/field_acrylic.jpg",
+"thumb": "images/photos2/800/field_acrylic.jpg",
+"w": 1100,
+"h": 1097,
+"title": {
+"en": "Green field",
+"ru": "Зелёное поле",
+"lv": "Zaļais lauks"
+},
+"colors": [
+{
+"hex": "#418A1C",
+"en": "Potion Green",
+"ru": "Зелье",
+"lv": "Dzira"
+},
+{
+"hex": "#286ED7",
+"en": "Cobalt",
+"ru": "Кобальт",
+"lv": "Kobalts"
+},
+{
+"hex": "#76410C",
+"en": "Cinnamon",
+"ru": "Корица",
+"lv": "Kanēlis"
+},
+{
+"hex": "#102F18",
+"en": "Forest",
+"ru": "Лес",
+"lv": "Mežs"
+},
+{
+"hex": "#30665E",
+"en": "Deep Teal",
+"ru": "Глубокая бирюза",
+"lv": "Dziļi tirkīzs"
+},
+{
+"hex": "#84C2E0",
+"en": "Sky",
+"ru": "Небо",
+"lv": "Debesis"
+}
+]
+},
+{
+"key": "studio-finland",
+"gallery": "studio",
+"img": "images/photos2/finland.jpg",
+"thumb": "images/photos2/800/finland.jpg",
+"w": 1200,
+"h": 1200,
+"title": {
+"en": "Polly in Finland",
+"ru": "Полли в Финляндии",
+"lv": "Pollija Somijā"
+},
+"colors": [
+{
+"hex": "#A24D4E",
+"en": "Brick",
+"ru": "Кирпич",
+"lv": "Ķieģelis"
+},
+{
+"hex": "#CE8B43",
+"en": "Ochre",
+"ru": "Охра",
+"lv": "Okers"
+},
+{
+"hex": "#382120",
+"en": "Coffee Bean",
+"ru": "Кофейное зерно",
+"lv": "Kafijas pupiņa"
+},
+{
+"hex": "#516979",
+"en": "Slate",
+"ru": "Сланец",
+"lv": "Slāneklis"
+},
+{
+"hex": "#ABBFD3",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
+},
+{
+"hex": "#D7B896",
+"en": "Sand",
+"ru": "Песок",
+"lv": "Smiltis"
+}
+]
+},
+{
+"key": "studio-fuji",
+"gallery": "studio",
+"img": "images/photos2/fuji.jpg",
+"thumb": "images/photos2/800/fuji.jpg",
+"w": 1200,
+"h": 1200,
+"title": {
+"en": "Mount Fuji",
+"ru": "Гора Фудзи",
+"lv": "Fudzi kalns"
+},
+"colors": [
+{
+"hex": "#DC8646",
+"en": "Copper",
+"ru": "Медь",
+"lv": "Varš"
+},
+{
+"hex": "#2AB0E0",
+"en": "Summer Sky",
+"ru": "Летнее небо",
+"lv": "Vasaras debesis"
+},
+{
+"hex": "#714428",
+"en": "Chestnut",
+"ru": "Каштан",
+"lv": "Kastanis"
+},
+{
+"hex": "#323736",
+"en": "Charcoal",
+"ru": "Уголь",
+"lv": "Ogle"
+},
+{
+"hex": "#6B766F",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
+},
+{
+"hex": "#B7B5A7",
+"en": "Lichen",
+"ru": "Лишайник",
+"lv": "Ķērpis"
+}
+]
+},
+{
+"key": "studio-ikra",
+"gallery": "studio",
+"img": "images/photos2/ikra.jpg",
+"thumb": "images/photos2/800/ikra.jpg",
+"w": 1200,
+"h": 1200,
+"title": {
+"en": "Caviar jar",
+"ru": "Банка икры",
+"lv": "Ikru burciņa"
+},
+"colors": [
+{
+"hex": "#C86D38",
+"en": "Terracotta",
+"ru": "Терракота",
+"lv": "Terakota"
+},
+{
+"hex": "#D6B33A",
+"en": "Mustard",
+"ru": "Горчица",
+"lv": "Sinepes"
+},
+{
+"hex": "#654D28",
+"en": "Bark",
+"ru": "Кора",
+"lv": "Miza"
+},
+{
+"hex": "#171414",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#6F877F",
+"en": "Rain",
+"ru": "Дождь",
+"lv": "Lietus"
+},
+{
+"hex": "#DBDBD5",
+"en": "Paper White",
+"ru": "Белая бумага",
+"lv": "Papīra balts"
+}
+]
+},
+{
+"key": "studio-impasto_flowers",
+"gallery": "studio",
+"img": "images/photos2/impasto_flowers.jpg",
+"thumb": "images/photos2/800/impasto_flowers.jpg",
+"w": 851,
+"h": 1200,
+"title": {
+"en": "Impasto flowers",
+"ru": "Цветы пастозом",
+"lv": "Impasto ziedi"
+},
+"colors": [
+{
+"hex": "#D4483F",
+"en": "Tomato",
+"ru": "Томат",
+"lv": "Tomāts"
+},
+{
+"hex": "#D05E81",
+"en": "Jelly Pink",
+"ru": "Желейный розовый",
+"lv": "Želejas rozā"
+},
+{
+"hex": "#4B7344",
+"en": "Moss",
+"ru": "Мох",
+"lv": "Sūna"
+},
+{
+"hex": "#9B676E",
+"en": "Mauve",
+"ru": "Мальва",
+"lv": "Malva"
+},
+{
+"hex": "#DA939B",
+"en": "Dusty Rose",
+"ru": "Пыльная роза",
+"lv": "Putekļainā roze"
+},
+{
+"hex": "#D7DAD9",
+"en": "Ice",
+"ru": "Лёд",
+"lv": "Ledus"
+}
+]
+},
+{
+"key": "studio-karums_girl",
+"gallery": "studio",
+"img": "images/photos2/karums_girl.jpg",
+"thumb": "images/photos2/800/karums_girl.jpg",
+"w": 900,
+"h": 1200,
+"title": {
+"en": "Girl in a headscarf",
+"ru": "Девушка в платке",
+"lv": "Meitene lakatā"
+},
+"colors": [
+{
+"hex": "#B33419",
+"en": "Tomato",
+"ru": "Томат",
+"lv": "Tomāts"
+},
+{
+"hex": "#7074B4",
+"en": "Pigeon Purple",
+"ru": "Голубиный фиолетовый",
+"lv": "Baložvioleta"
+},
+{
+"hex": "#BD725A",
+"en": "Clay",
+"ru": "Глина",
+"lv": "Māls"
+},
+{
+"hex": "#350A06",
+"en": "Wine",
+"ru": "Вино",
+"lv": "Vīns"
+},
+{
+"hex": "#8A798C",
+"en": "Mauve",
+"ru": "Мальва",
+"lv": "Malva"
+},
+{
+"hex": "#E9C9C6",
+"en": "Blush",
+"ru": "Румянец",
+"lv": "Sārtums"
+}
+]
+},
+{
+"key": "studio-lanterns",
+"gallery": "studio",
+"img": "images/photos2/lanterns.jpg",
+"thumb": "images/photos2/800/lanterns.jpg",
+"w": 900,
+"h": 1200,
+"title": {
+"en": "Paper lanterns",
+"ru": "Бумажные фонарики",
+"lv": "Papīra laternas"
+},
+"colors": [
+{
+"hex": "#BF4B29",
+"en": "Poppy",
+"ru": "Мак",
+"lv": "Magone"
+},
+{
+"hex": "#B4C144",
+"en": "Potion Green",
+"ru": "Зелье",
+"lv": "Dzira"
+},
+{
+"hex": "#D5A05D",
+"en": "Biscuit",
+"ru": "Печенье",
+"lv": "Cepums"
+},
+{
+"hex": "#86715A",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
+},
+{
+"hex": "#8B8E92",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
+},
+{
+"hex": "#E8DBBA",
+"en": "Cream",
+"ru": "Сливки",
+"lv": "Krējums"
+}
+]
+},
+{
+"key": "studio-mcd_still",
+"gallery": "studio",
+"img": "images/photos2/mcd_still.jpg",
+"thumb": "images/photos2/800/mcd_still.jpg",
+"w": 968,
+"h": 992,
+"title": {
+"en": "Fast food still life",
+"ru": "Натюрморт с фастфудом",
+"lv": "Ātro uzkodu klusā daba"
+},
+"colors": [
+{
+"hex": "#E0512F",
+"en": "Poppy",
+"ru": "Мак",
+"lv": "Magone"
+},
+{
+"hex": "#EBA63B",
+"en": "Marigold",
+"ru": "Бархатец",
+"lv": "Samtene"
+},
+{
+"hex": "#983F38",
+"en": "Brick",
+"ru": "Кирпич",
+"lv": "Ķieģelis"
+},
+{
+"hex": "#0C0A0E",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#3A3540",
+"en": "Charcoal",
+"ru": "Уголь",
+"lv": "Ogle"
+},
+{
+"hex": "#80767E",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
+}
+]
+},
+{
+"key": "studio-moka_rust",
+"gallery": "studio",
+"img": "images/photos2/moka_rust.jpg",
+"thumb": "images/photos2/800/moka_rust.jpg",
+"w": 960,
+"h": 1200,
+"title": {
+"en": "Moka pot",
+"ru": "Гейзерная кофеварка",
+"lv": "Mokas kanniņa"
+},
+"colors": [
+{
+"hex": "#E7613C",
+"en": "Poppy",
+"ru": "Мак",
+"lv": "Magone"
+},
+{
+"hex": "#DF896A",
+"en": "Salmon",
+"ru": "Лосось",
+"lv": "Lasis"
+},
+{
+"hex": "#693F30",
+"en": "Chestnut",
+"ru": "Каштан",
+"lv": "Kastanis"
+},
+{
+"hex": "#0B0803",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#75665F",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
+},
+{
+"hex": "#DDD8D2",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
+}
+]
+},
+{
+"key": "studio-mushroom_house",
+"gallery": "studio",
+"img": "images/photos2/mushroom_house.jpg",
+"thumb": "images/photos2/800/mushroom_house.jpg",
+"w": 612,
+"h": 1074,
+"title": {
+"en": "Mushroom house",
+"ru": "Домик-гриб",
+"lv": "Sēņu mājiņa"
+},
+"colors": [
+{
+"hex": "#C13E36",
+"en": "Cherry",
+"ru": "Вишня",
+"lv": "Ķirsis"
+},
+{
+"hex": "#DDBD75",
+"en": "Candle Glow",
+"ru": "Свеча",
+"lv": "Svece"
+},
+{
+"hex": "#52ACC0",
+"en": "Summer Sky",
+"ru": "Летнее небо",
+"lv": "Vasaras debesis"
+},
+{
+"hex": "#2A2A26",
+"en": "Charcoal",
+"ru": "Уголь",
+"lv": "Ogle"
+},
+{
+"hex": "#E1C0B2",
+"en": "Blush",
+"ru": "Румянец",
+"lv": "Sārtums"
+},
+{
+"hex": "#B2DAE4",
+"en": "Duck Egg",
+"ru": "Утиное яйцо",
+"lv": "Pīles ola"
+}
+]
+},
+{
+"key": "studio-myth_beach",
+"gallery": "studio",
+"img": "images/photos2/myth_beach.jpg",
+"thumb": "images/photos2/800/myth_beach.jpg",
+"w": 1080,
+"h": 1080,
+"title": {
+"en": "Beach gossip",
+"ru": "Сплетни на пляже",
+"lv": "Tenkas pludmalē"
+},
+"colors": [
+{
+"hex": "#C1322B",
+"en": "Tomato",
+"ru": "Томат",
+"lv": "Tomāts"
+},
+{
+"hex": "#D89F56",
+"en": "Ochre",
+"ru": "Охра",
+"lv": "Okers"
+},
+{
+"hex": "#CF806E",
+"en": "Salmon",
+"ru": "Лосось",
+"lv": "Lasis"
+},
+{
+"hex": "#5C77A0",
+"en": "Steel Blue",
+"ru": "Стальной",
+"lv": "Tērauda zils"
+},
+{
+"hex": "#BCC5CA",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
+},
+{
+"hex": "#F3D09E",
+"en": "Sand",
+"ru": "Песок",
+"lv": "Smiltis"
+}
+]
+},
+{
+"key": "studio-myth_read",
+"gallery": "studio",
+"img": "images/photos2/myth_read.jpg",
+"thumb": "images/photos2/800/myth_read.jpg",
+"w": 1080,
+"h": 1080,
+"title": {
+"en": "Polly reads",
+"ru": "Полли читает",
+"lv": "Pollija lasa"
+},
+"colors": [
+{
+"hex": "#C73735",
+"en": "Cherry",
+"ru": "Вишня",
+"lv": "Ķirsis"
+},
+{
+"hex": "#3F4798",
+"en": "Cobalt",
+"ru": "Кобальт",
+"lv": "Kobalts"
+},
+{
+"hex": "#F3B941",
+"en": "Marigold",
+"ru": "Бархатец",
+"lv": "Samtene"
+},
+{
+"hex": "#776260",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
+},
+{
+"hex": "#A97F69",
+"en": "Latte",
+"ru": "Латте",
+"lv": "Late"
+},
+{
+"hex": "#D3D4CF",
+"en": "Duck Egg",
+"ru": "Утиное яйцо",
+"lv": "Pīles ola"
+}
+]
+},
+{
+"key": "studio-myth_worm",
+"gallery": "studio",
+"img": "images/photos2/myth_worm.jpg",
+"thumb": "images/photos2/800/myth_worm.jpg",
+"w": 1080,
+"h": 1080,
+"title": {
+"en": "Worm chips",
+"ru": "Чипсы из червяков",
+"lv": "Tārpu čipsi"
+},
+"colors": [
+{
+"hex": "#EA6D54",
+"en": "Coral",
+"ru": "Коралл",
+"lv": "Korallis"
+},
+{
+"hex": "#EDC148",
+"en": "Lemon",
+"ru": "Лимон",
+"lv": "Citrons"
+},
+{
+"hex": "#565BA1",
+"en": "Pigeon Purple",
+"ru": "Голубиный фиолетовый",
+"lv": "Baložvioleta"
+},
+{
+"hex": "#824C48",
+"en": "Chestnut",
+"ru": "Каштан",
+"lv": "Kastanis"
+},
+{
+"hex": "#EDB2A4",
+"en": "Blush",
+"ru": "Румянец",
+"lv": "Sārtums"
+},
+{
+"hex": "#CAC0C1",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
+}
+]
+},
+{
+"key": "studio-nailpolish",
+"gallery": "studio",
+"img": "images/photos2/nailpolish.jpg",
+"thumb": "images/photos2/800/nailpolish.jpg",
+"w": 1195,
+"h": 1200,
+"title": {
+"en": "Red nail polish",
+"ru": "Красный лак",
+"lv": "Sarkanā nagu laka"
+},
+"colors": [
+{
+"hex": "#C53930",
+"en": "Tomato",
+"ru": "Томат",
+"lv": "Tomāts"
+},
+{
+"hex": "#C87573",
+"en": "Salmon",
+"ru": "Лосось",
+"lv": "Lasis"
+},
+{
+"hex": "#A87C5A",
+"en": "Latte",
+"ru": "Латте",
+"lv": "Late"
+},
+{
+"hex": "#070408",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#754E40",
+"en": "Bark",
+"ru": "Кора",
+"lv": "Miza"
+},
+{
+"hex": "#D8C8B6",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
+}
+]
+},
+{
+"key": "studio-oil_stilllife",
+"gallery": "studio",
+"img": "images/photos2/oil_stilllife.jpg",
+"thumb": "images/photos2/800/oil_stilllife.jpg",
+"w": 900,
+"h": 1200,
+"title": {
+"en": "Oil still life",
+"ru": "Натюрморт маслом",
+"lv": "Klusā daba eļļā"
+},
+"colors": [
+{
+"hex": "#B08A3A",
+"en": "Ochre",
+"ru": "Охра",
+"lv": "Okers"
+},
+{
+"hex": "#B24431",
+"en": "Brick",
+"ru": "Кирпич",
+"lv": "Ķieģelis"
+},
+{
+"hex": "#56732C",
+"en": "Moss",
+"ru": "Мох",
+"lv": "Sūna"
+},
+{
+"hex": "#0F0807",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#6A5848",
+"en": "Bark",
+"ru": "Кора",
+"lv": "Miza"
+},
+{
+"hex": "#BCC3C3",
+"en": "Fog",
+"ru": "Туман",
+"lv": "Migla"
+}
+]
+},
+{
+"key": "studio-old_house",
+"gallery": "studio",
+"img": "images/photos2/old_house.jpg",
+"thumb": "images/photos2/800/old_house.jpg",
+"w": 1200,
+"h": 640,
+"title": {
+"en": "Old house",
+"ru": "Старый дом",
+"lv": "Vecā māja"
+},
+"colors": [
+{
+"hex": "#903D34",
+"en": "Brick",
+"ru": "Кирпич",
+"lv": "Ķieģelis"
+},
+{
+"hex": "#C69748",
+"en": "Ochre",
+"ru": "Охра",
+"lv": "Okers"
+},
+{
+"hex": "#352D22",
+"en": "Coffee Bean",
+"ru": "Кофейное зерно",
+"lv": "Kafijas pupiņa"
+},
+{
+"hex": "#80744F",
+"en": "Olive",
+"ru": "Олива",
+"lv": "Olīva"
+},
+{
+"hex": "#BBB68F",
+"en": "Lichen",
+"ru": "Лишайник",
+"lv": "Ķērpis"
+},
+{
+"hex": "#D3DEDC",
+"en": "Duck Egg",
+"ru": "Утиное яйцо",
+"lv": "Pīles ola"
+}
+]
+},
+{
+"key": "studio-park_pond",
+"gallery": "studio",
+"img": "images/photos2/park_pond.jpg",
+"thumb": "images/photos2/800/park_pond.jpg",
+"w": 900,
+"h": 1200,
+"title": {
+"en": "Park pond",
+"ru": "Пруд в парке",
+"lv": "Parka dīķis"
+},
+"colors": [
+{
+"hex": "#B2974B",
+"en": "Brass",
+"ru": "Латунь",
+"lv": "Misiņš"
+},
+{
+"hex": "#B5391F",
+"en": "Tomato",
+"ru": "Томат",
+"lv": "Tomāts"
+},
+{
+"hex": "#A36DAB",
+"en": "Orchid",
+"ru": "Орхидея",
+"lv": "Orhideja"
+},
+{
+"hex": "#0C0606",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#3F2919",
+"en": "Coffee Bean",
+"ru": "Кофейное зерно",
+"lv": "Kafijas pupiņa"
+},
+{
+"hex": "#694C24",
+"en": "Bark",
+"ru": "Кора",
+"lv": "Miza"
+}
+]
+},
+{
+"key": "studio-pbj",
+"gallery": "studio",
+"img": "images/photos2/pbj.jpg",
+"thumb": "images/photos2/800/pbj.jpg",
+"w": 1200,
+"h": 837,
+"title": {
+"en": "Peanut butter and jam",
+"ru": "Арахисовая паста и джем",
+"lv": "Zemesriekstu sviests un džems"
+},
+"colors": [
+{
+"hex": "#8E1522",
+"en": "Cherry",
+"ru": "Вишня",
+"lv": "Ķirsis"
+},
+{
+"hex": "#AA5812",
+"en": "Terracotta",
+"ru": "Терракота",
+"lv": "Terakota"
+},
+{
+"hex": "#D2AF7F",
+"en": "Sand",
+"ru": "Песок",
+"lv": "Smiltis"
+},
+{
+"hex": "#59291A",
+"en": "Chestnut",
+"ru": "Каштан",
+"lv": "Kastanis"
+},
+{
+"hex": "#447A69",
+"en": "Teal",
+"ru": "Бирюза",
+"lv": "Zilganzaļš"
+},
+{
+"hex": "#D6E0DB",
+"en": "Duck Egg",
+"ru": "Утиное яйцо",
+"lv": "Pīles ola"
+}
+]
+},
+{
+"key": "studio-plants_tin",
+"gallery": "studio",
+"img": "images/photos2/plants_tin.jpg",
+"thumb": "images/photos2/800/plants_tin.jpg",
+"w": 1200,
+"h": 1200,
+"title": {
+"en": "Plants in tins",
+"ru": "Растения в баночках",
+"lv": "Augi bundžās"
+},
+"colors": [
+{
+"hex": "#868437",
+"en": "Brass",
+"ru": "Латунь",
+"lv": "Misiņš"
+},
+{
+"hex": "#A5553D",
+"en": "Brick",
+"ru": "Кирпич",
+"lv": "Ķieģelis"
+},
+{
+"hex": "#404185",
+"en": "Violet Ink",
+"ru": "Фиолетовые чернила",
+"lv": "Violetā tinte"
+},
+{
+"hex": "#0B0A0A",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#A59782",
+"en": "Driftwood",
+"ru": "Плавник",
+"lv": "Dreifkoks"
+},
+{
+"hex": "#D9D8D2",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
+}
+]
+},
+{
+"key": "studio-poirot",
+"gallery": "studio",
+"img": "images/photos2/poirot.jpg",
+"thumb": "images/photos2/800/poirot.jpg",
+"w": 1200,
+"h": 1200,
+"title": {
+"en": "Little grey cells",
+"ru": "Серые клеточки",
+"lv": "Pelēkās šūniņas"
+},
+"colors": [
+{
+"hex": "#BA876A",
+"en": "Clay",
+"ru": "Глина",
+"lv": "Māls"
+},
+{
+"hex": "#725168",
+"en": "Mauve",
+"ru": "Мальва",
+"lv": "Malva"
+},
+{
+"hex": "#2C201C",
+"en": "Coffee Bean",
+"ru": "Кофейное зерно",
+"lv": "Kafijas pupiņa"
+},
+{
+"hex": "#584C47",
+"en": "Cocoa",
+"ru": "Какао",
+"lv": "Kakao"
+},
+{
+"hex": "#888078",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
+},
+{
+"hex": "#C4C2B0",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
+}
+]
+},
+{
+"key": "studio-pumpkin_color",
+"gallery": "studio",
+"img": "images/photos2/pumpkin_color.jpg",
+"thumb": "images/photos2/800/pumpkin_color.jpg",
+"w": 900,
+"h": 1200,
+"title": {
+"en": "Pumpkins in purple",
+"ru": "Тыквы в фиолетовом",
+"lv": "Ķirbji violetā"
+},
+"colors": [
+{
+"hex": "#373BAB",
+"en": "Cobalt",
+"ru": "Кобальт",
+"lv": "Kobalts"
+},
+{
+"hex": "#A6502D",
+"en": "Terracotta",
+"ru": "Терракота",
+"lv": "Terakota"
+},
+{
+"hex": "#839CE4",
+"en": "Cornflower",
+"ru": "Василёк",
+"lv": "Rudzupuķe"
+},
+{
+"hex": "#161218",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#BD9FAB",
+"en": "Dusty Rose",
+"ru": "Пыльная роза",
+"lv": "Putekļainā roze"
+},
+{
+"hex": "#D7C8B9",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
+}
+]
+},
+{
+"key": "studio-pumpkin_stop",
+"gallery": "studio",
+"img": "images/photos2/pumpkin_stop.jpg",
+"thumb": "images/photos2/800/pumpkin_stop.jpg",
+"w": 1200,
+"h": 951,
+"title": {
+"en": "Pumpkin bus stop",
+"ru": "Тыквенная остановка",
+"lv": "Ķirbju pietura"
+},
+"colors": [
+{
+"hex": "#A55421",
+"en": "Terracotta",
+"ru": "Терракота",
+"lv": "Terakota"
+},
+{
+"hex": "#7C6B21",
+"en": "Olive",
+"ru": "Олива",
+"lv": "Olīva"
+},
+{
+"hex": "#10110E",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#3D3B24",
+"en": "Coffee Bean",
+"ru": "Кофейное зерно",
+"lv": "Kafijas pupiņa"
+},
+{
+"hex": "#58421D",
+"en": "Bark",
+"ru": "Кора",
+"lv": "Miza"
+},
+{
+"hex": "#57514B",
+"en": "Slate",
+"ru": "Сланец",
+"lv": "Slāneklis"
+}
+]
+},
+{
+"key": "studio-redhair",
+"gallery": "studio",
+"img": "images/photos2/redhair.jpg",
+"thumb": "images/photos2/800/redhair.jpg",
+"w": 900,
+"h": 1200,
+"title": {
+"en": "Red hair",
+"ru": "Рыжие волосы",
+"lv": "Rudi mati"
+},
+"colors": [
+{
+"hex": "#BE5140",
+"en": "Brick",
+"ru": "Кирпич",
+"lv": "Ķieģelis"
+},
+{
+"hex": "#C28C57",
+"en": "Biscuit",
+"ru": "Печенье",
+"lv": "Cepums"
+},
+{
+"hex": "#6C93AC",
+"en": "Rain",
+"ru": "Дождь",
+"lv": "Lietus"
+},
+{
+"hex": "#504747",
+"en": "Charcoal",
+"ru": "Уголь",
+"lv": "Ogle"
+},
+{
+"hex": "#908480",
+"en": "Mushroom",
+"ru": "Грибной",
+"lv": "Sēņu"
+},
+{
+"hex": "#F3D3AE",
+"en": "Vanilla",
+"ru": "Ваниль",
+"lv": "Vaniļa"
+}
+]
+},
+{
+"key": "studio-rembrandt",
+"gallery": "studio",
+"img": "images/photos2/rembrandt.jpg",
+"thumb": "images/photos2/800/rembrandt.jpg",
+"w": 1200,
+"h": 1200,
+"title": {
+"en": "Paint tubes",
+"ru": "Тюбики краски",
+"lv": "Krāsu tūbiņas"
+},
+"colors": [
+{
+"hex": "#20339A",
+"en": "Cobalt",
+"ru": "Кобальт",
+"lv": "Kobalts"
+},
+{
+"hex": "#BBA658",
+"en": "Brass",
+"ru": "Латунь",
+"lv": "Misiņš"
+},
+{
+"hex": "#B94930",
+"en": "Terracotta",
+"ru": "Терракота",
+"lv": "Terakota"
+},
+{
+"hex": "#0B0A10",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#A38565",
+"en": "Latte",
+"ru": "Латте",
+"lv": "Late"
+},
+{
+"hex": "#E2DDD1",
+"en": "Linen",
+"ru": "Лён",
+"lv": "Lins"
+}
+]
+},
+{
+"key": "studio-retro_tv",
+"gallery": "studio",
+"img": "images/photos2/retro_tv.jpg",
+"thumb": "images/photos2/800/retro_tv.jpg",
+"w": 900,
+"h": 1200,
+"title": {
+"en": "Retro TV corner",
+"ru": "Уголок с ретро-телевизором",
+"lv": "Retro televizora stūrītis"
+},
+"colors": [
+{
+"hex": "#DDBF74",
+"en": "Candle Glow",
+"ru": "Свеча",
+"lv": "Svece"
+},
+{
+"hex": "#46599D",
+"en": "Cobalt",
+"ru": "Кобальт",
+"lv": "Kobalts"
+},
+{
+"hex": "#AB3E40",
+"en": "Cherry",
+"ru": "Вишня",
+"lv": "Ķirsis"
+},
+{
+"hex": "#6B625B",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
+},
+{
+"hex": "#AD826A",
+"en": "Latte",
+"ru": "Латте",
+"lv": "Late"
+},
+{
+"hex": "#D3D3D1",
+"en": "Duck Egg",
+"ru": "Утиное яйцо",
+"lv": "Pīles ola"
+}
+]
+},
+{
+"key": "studio-rock_orange",
+"gallery": "studio",
+"img": "images/photos2/rock_orange.jpg",
+"thumb": "images/photos2/800/rock_orange.jpg",
+"w": 1076,
+"h": 1076,
+"title": {
+"en": "Rock on orange",
+"ru": "Камень на оранжевом",
+"lv": "Akmens uz oranža"
+},
+"colors": [
+{
+"hex": "#DB522B",
+"en": "Poppy",
+"ru": "Мак",
+"lv": "Magone"
+},
+{
+"hex": "#7C301E",
+"en": "Brick",
+"ru": "Кирпич",
+"lv": "Ķieģelis"
+},
+{
+"hex": "#211210",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#4C231B",
+"en": "Coffee Bean",
+"ru": "Кофейное зерно",
+"lv": "Kafijas pupiņa"
+},
+{
+"hex": "#D53412",
+"en": "Tomato",
+"ru": "Томат",
+"lv": "Tomāts"
+},
+{
+"hex": "#EF410D",
+"en": "Persimmon",
+"ru": "Хурма",
+"lv": "Hurma"
+}
+]
+},
+{
+"key": "studio-sardines",
+"gallery": "studio",
+"img": "images/photos2/sardines.jpg",
+"thumb": "images/photos2/800/sardines.jpg",
+"w": 900,
+"h": 1200,
+"title": {
+"en": "Tin of sardines",
+"ru": "Банка сардин",
+"lv": "Sardīņu kārba"
+},
+"colors": [
+{
+"hex": "#D37A97",
+"en": "Jelly Pink",
+"ru": "Желейный розовый",
+"lv": "Želejas rozā"
+},
+{
+"hex": "#99563F",
+"en": "Cinnamon",
+"ru": "Корица",
+"lv": "Kanēlis"
+},
+{
+"hex": "#AB9372",
+"en": "Driftwood",
+"ru": "Плавник",
+"lv": "Dreifkoks"
+},
+{
+"hex": "#110E0B",
+"en": "Ink Black",
+"ru": "Чернила",
+"lv": "Tinte"
+},
+{
+"hex": "#777070",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
+},
+{
+"hex": "#D8D9D5",
+"en": "Paper White",
+"ru": "Белая бумага",
+"lv": "Papīra balts"
+}
+]
+},
+{
+"key": "studio-snail_adam",
+"gallery": "studio",
+"img": "images/photos2/snail_adam.jpg",
+"thumb": "images/photos2/800/snail_adam.jpg",
+"w": 1200,
+"h": 848,
+"title": {
+"en": "Snail and pigeon",
+"ru": "Улитка и голубь",
+"lv": "Gliemezis un balodis"
+},
+"colors": [
+{
+"hex": "#669DE3",
+"en": "Cornflower",
+"ru": "Василёк",
+"lv": "Rudzupuķe"
+},
+{
+"hex": "#283F83",
+"en": "Cobalt",
+"ru": "Кобальт",
+"lv": "Kobalts"
+},
+{
+"hex": "#49712D",
+"en": "Moss",
+"ru": "Мох",
+"lv": "Sūna"
+},
+{
+"hex": "#A78483",
+"en": "Dusty Rose",
+"ru": "Пыльная роза",
+"lv": "Putekļainā roze"
+},
+{
+"hex": "#8A94A4",
+"en": "Pigeon Grey",
+"ru": "Голубиный серый",
+"lv": "Baložpelēks"
+},
+{
+"hex": "#CEE3F9",
+"en": "Ice",
+"ru": "Лёд",
+"lv": "Ledus"
+}
+]
+},
+{
+"key": "studio-yoga",
+"gallery": "studio",
+"img": "images/photos2/yoga.jpg",
+"thumb": "images/photos2/800/yoga.jpg",
+"w": 1200,
+"h": 1200,
+"title": {
+"en": "Yoga pigeon",
+"ru": "Голубь на йоге",
+"lv": "Balodis jogā"
+},
+"colors": [
+{
+"hex": "#303492",
+"en": "Cobalt",
+"ru": "Кобальт",
+"lv": "Kobalts"
+},
+{
+"hex": "#BF4F37",
+"en": "Terracotta",
+"ru": "Терракота",
+"lv": "Terakota"
+},
+{
+"hex": "#356997",
+"en": "Denim",
+"ru": "Деним",
+"lv": "Džinss"
+},
+{
+"hex": "#302F3B",
+"en": "Charcoal",
+"ru": "Уголь",
+"lv": "Ogle"
+},
+{
+"hex": "#7C6868",
+"en": "Smoke",
+"ru": "Дым",
+"lv": "Dūmi"
+},
+{
+"hex": "#EDD0BC",
+"en": "Oat Milk",
+"ru": "Овсяное молоко",
+"lv": "Auzu piens"
+}
+]
 }
 ]
