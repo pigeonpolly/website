@@ -24,7 +24,7 @@ const sat = h => { const c = rgb(h), mx = Math.max(...c), mn = Math.min(...c); r
 const mix = (h, to, k) => hex(rgb(h).map((v, i) => v + (rgb(to)[i] - v) * k));
 const contrast = (a, b) => { const x = lum(a), y = lum(b); return (Math.max(x, y) + .05) / (Math.min(x, y) + .05); };
 const colors = a => {
-  const pal = PALS.find(p => p.key === a.key).colors.map(c => c.hex);
+  const pal = (PALS.find(p => p.key === a.key) || { colors: ['#2B1A51', '#534AB7', '#D85A30', '#EDAE3F', '#C9C1E6', '#F7F1E7'].map(hex => ({ hex })) }).colors.map(c => c.hex); // нет палитры (фото работ) — цвета сайта
   const byL = [...pal].sort((x, y) => lum(x) - lum(y));
   let dark = byL[0]; while (lum(dark) > .035) dark = mix(dark, '#000000', .2);
   let light = byL[byL.length - 1]; if (lum(light) < .55) light = mix(light, '#ffffff', .55);
