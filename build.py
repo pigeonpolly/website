@@ -564,6 +564,8 @@ def og_meta(page, path, lang):
     key = {"learn/watch": "learn"}.get(path, path.replace("/", "-") or "home")
     title = (re.search(r"<title>([^<]*)</title>", page) or [None, ""])[1]
     img = OUT / "images" / "og" / f"{key}-{lang}.jpg"
+    if not img.exists():  # у раздела нет своей — общая картинка сайта в новом дизайне (как у главной)
+        key, img = "home", OUT / "images" / "og" / f"home-{lang}.jpg"
     if img.exists():
         ver = hashlib.md5(img.read_bytes()).hexdigest()[:8]
         url = f"{SITE_URL}/images/og/{key}-{lang}.jpg?v={ver}"
