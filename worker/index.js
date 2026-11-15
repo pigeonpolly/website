@@ -1779,7 +1779,7 @@ async function route(req, env, url) {
     const langs = ['en', 'ru', 'lv'], from = langs.includes(b.from) ? b.from : null;
     if (!from || !Array.isArray(b.texts) || !b.texts.length) fail(400, 'bad');
     const to = (Array.isArray(b.to) ? b.to : langs).filter(l => langs.includes(l) && l !== from);
-    const r = await translateTo(env, b.texts.slice(0, 100).map(x => String(x ?? '').slice(0, 4000)), from, to, ABOUT[b.about] || ABOUT.short);
+    const r = await translateTo(env, b.texts.slice(0, 100).map(x => String(x ?? '').slice(0, 4000)), from, to, ABOUT[b.about] || ABOUT.short, b.strict === true);
     if (!Object.keys(r.tr).length) { const c = Object.values(r.errors)[0] || 'ai'; fail(c === 'ai_limit' ? 429 : c === 'no_key' || c === 'bad_key' ? 400 : 502, c); }
     return json(r);
   }

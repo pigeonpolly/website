@@ -1,5 +1,6 @@
 // «🌐 Перевести» — одна кнопка для всех разделов кабинета. Сервер: POST /api/admin/translate (worker/translate.js, Gemini; запасной — Workers AI).
 // PPTranslateBtn({ from: () => 'ru', texts: () => [...], fill: (lang, texts) => {}, about: 'cards', to: ['en', 'lv'] }) → <button>
+// strict: true — только Gemini, без запасного переводчика (рассылки)
 // texts — что переводить (на языке from), fill — куда положить перевод для каждого языка; потом перевод можно поправить руками.
 (function () {
   const LANGS = ['ru', 'en', 'lv'];
@@ -15,7 +16,7 @@
       if (!texts.some(t => String(t || '').trim())) { alert('Сначала напишите текст на ' + from.toUpperCase() + '.'); return; }
       b.disabled = true; b.textContent = '🌐 Перевожу…';
       try {
-        const r = await fetch('/api/admin/translate', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ texts, from, to, about: o.about || 'short' }) });
+        const r = await fetch('/api/admin/translate', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ texts, from, to, about: o.about || 'short', strict: !!o.strict }) });
         const d = await r.json().catch(() => ({}));
         if (!r.ok) throw Object.assign(new Error(d.error || r.status), { code: d.error });
         for (const l of Object.keys(d.tr || {})) o.fill(l, d.tr[l]);

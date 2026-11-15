@@ -75,7 +75,7 @@
     $$('.ml-tabs [data-l]').forEach(b => b.onclick = () => { $$('.ml-tabs [data-l]').forEach(x => x.classList.toggle('pill-fill', x === b)); $$('.ml-lang').forEach(x => x.hidden = x.dataset.l !== b.dataset.l); });
     $$('.ml-s, .ml-t').forEach(i => i.addEventListener('input', save));
     const src = () => (main.querySelector('.ml-tabs .pill-fill') || {}).dataset?.l || 'en';
-    if (window.PPTranslateBtn) $('.bc-tr').appendChild(window.PPTranslateBtn({ from: src, texts: () => [f(src()).querySelector('.ml-s').value, f(src()).querySelector('.ml-t').value], fill: (l, t) => { f(l).querySelector('.ml-s').value = t[0] || ''; f(l).querySelector('.ml-t').value = t[1] || ''; save(); } }));
+    if (window.PPTranslateBtn) $('.bc-tr').appendChild(window.PPTranslateBtn({ from: src, strict: true, texts: () => [f(src()).querySelector('.ml-s').value, f(src()).querySelector('.ml-t').value], fill: (l, t) => { f(l).querySelector('.ml-s').value = t[0] || ''; f(l).querySelector('.ml-t').value = t[1] || ''; save(); } }));
     $('.bc-file').onchange = () => {
       const x = $('.bc-file').files[0]; st.file = null;
       if (!x) { $('.bc-fname').textContent = ''; return; }

@@ -11,10 +11,10 @@ export const ABOUT = {
   short: 'The strings are short interface texts and labels of an artist\'s website.',
 };
 // несколько языков сразу: { en: [...], lv: [...] }; не вышло для языка — его нет в ответе (поле можно перевести позже)
-export async function translateTo(env, texts, from, langs, about = BLOG) {
+export async function translateTo(env, texts, from, langs, about = BLOG, strict = false) { // strict — только Gemini (рассылки: запасной переводчик выдумывает)
   const out = {}, errs = {};
   await Promise.all(langs.filter(l => l !== from && LANGS.includes(l)).map(async l => {
-    try { out[l] = (await translateAll(env, texts, from, l, false, about)).texts.map(x => String(x ?? '')); } catch (e) { errs[l] = e.code || 'ai'; }
+    try { out[l] = (await translateAll(env, texts, from, l, strict ? 'only' : false, about)).texts.map(x => String(x ?? '')); } catch (e) { errs[l] = e.code || 'ai'; }
   }));
   return { tr: out, errors: errs };
 }
@@ -114,6 +114,7 @@ export async function translateAll(env, texts, from, to, strict = false, about =
       // пустой ответ на непустой абзац — этот абзац переводим запасным переводчиком
       for (let i = 0; i < res.length; i++) {
         if (texts[i].trim() && !res[i].trim()) {
+          if (strict === 'only') throw err('ai'); // рассылки: пустой абзац — ошибка, а не запасной переводчик
           try { res[i] = await translateOne(env, texts[i], from, to); } catch (e) { res[i] = texts[i]; }
         }
       }
