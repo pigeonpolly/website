@@ -5,12 +5,13 @@ import os
 D = os.path.dirname(os.path.abspath(__file__))
 LINE = '#1f2442'
 
+VEST = '<path d="M-44 -70 C-30 -60 -10 -58 10 -60 L18 -10 C0 -2 -26 -2 -40 -20 C-46 -36 -48 -54 -44 -70Z" fill="#c8323c"/><path d="M-26 -58 L-22 -6" stroke="#f2c13d" stroke-width="3"/><circle cx="-14" cy="-46" r="2.5" fill="#f2c13d"/><circle cx="-12" cy="-32" r="2.5" fill="#f2c13d"/><circle cx="-10" cy="-18" r="2.5" fill="#f2c13d"/><path d="M-44 -70 C-30 -64 -10 -62 10 -64" stroke="#1f3a68" stroke-width="5" fill="none"/>'
 NECK = '<path d="M-40 -100 C-20 -92 14 -92 36 -102 L37 -84 C12 -76 -20 -76 -42 -84Z" fill="#5f9a8a" opacity=".75" stroke="none"/><path d="M-41 -92 C-20 -84 14 -84 37 -93 L37 -84 C12 -76 -20 -76 -42 -84Z" fill="#8a6aa0" opacity=".6" stroke="none"/>'
 BERET = '<ellipse cx="6" cy="-160" rx="27" ry="9" fill="#b8324f" transform="rotate(-8 6 -160)"/><path d="M4 -168 q2 -8 9 -8" fill="none"/>'
 GREY = dict(b="#8c95a6", sh="#7a8394", w="#6b7486", lid="#7d8697", h1="#b5bccb", h2="#a2aabb", neck=True)
 BLUE = dict(b="#2f55a0", sh="#26478a", w="#23427a", lid="#284a8e", h1="#5f86c8", h2="#4a73b9")
 
-def polly(x, y, s=1, flip=False, wave=False, beret=True, c=BLUE):
+def polly(x, y, s=1, flip=False, wave=False, beret=True, c=BLUE, extra=''):
     sx = -s if flip else s
     wing = (f'<path d="M30 -96 C50 -86 58 -66 62 -50 C56 -48 48 -54 40 -62 C38 -40 30 -22 18 -12 C22 -36 22 -64 14 -88 C18 -96 24 -98 30 -96Z" fill="{c["w"]}"/>'
             if wave else
@@ -35,6 +36,7 @@ def polly(x, y, s=1, flip=False, wave=False, beret=True, c=BLUE):
  <path d="M-23 -131 Q-12 -126 -1 -131" fill="none" stroke-width="2.4"/>
  <path d="M-23 -131 l-4 -2 M-22 -129 l-4 1" stroke-width="1.6"/>
  {BERET if beret else ''}
+ {extra}
 </g>'''
 
 def gull(x, y, s=1, flip=False):

@@ -244,3 +244,37 @@ def fence(x0, x1, y, h=22):
 def brunost(x, y):
     return (f'<g stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round"><path d="M{x} {y} h34 v-20 h-34Z" fill="#b8733a"/><path d="M{x} {y-20} l8 -6 h34 l-8 6Z" fill="#c98a4e"/>'
             f'<path d="M{x+34} {y} l8 -6 v-20 l-8 6Z" fill="#9c5f2e"/></g>')
+
+def gable(x, y, w=50, h=80, c='#e8d9b8', roof='#3a3f55'):
+    """бергенский дом с щипцом: y — низ"""
+    t = f'<path d="M{x} {y} V{y-h} L{x+w/2} {y-h-w*.45} L{x+w} {y-h} V{y}Z" fill="{c}" stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round"/>'
+    t += f'<path d="M{x-3} {y-h+2} L{x+w/2} {y-h-w*.45-2} L{x+w+3} {y-h+2}" fill="none" stroke="{roof}" stroke-width="5" stroke-linejoin="round"/>'
+    for j in range(int(h / 26)):
+        for i in range(2):
+            t += f'<rect x="{x+w*.16+i*w*.42:.1f}" y="{y-h+8+j*26:.1f}" width="{w*.26:.1f}" height="15" fill="#fbf6ea" stroke="{LINE}" stroke-width="1.2"/><path d="M{x+w*.29+i*w*.42:.1f} {y-h+8+j*26:.1f} v15" stroke="{LINE}" stroke-width=".8"/>'
+    t += f'<rect x="{x+w*.3:.1f}" y="{y-h*.08-10:.1f}" width="{w*.4:.1f}" height="{h*.08+10:.1f}" fill="#fbf6ea" stroke="{LINE}" stroke-width="1"/>'
+    return t
+
+def person(x, y, s=1, coat='#c8323c', hair='#7a5a3e', flagged=False, skirt=None):
+    t = f'<g transform="translate({x} {y}) scale({s})" stroke="{LINE}" stroke-width="1.4" stroke-linejoin="round" stroke-linecap="round">'
+    t += f'<path d="M-4 -14 v14 M4 -14 v14" stroke-width="3"/>'
+    if skirt:
+        t += f'<path d="M-10 -12 L-6 -34 H6 L10 -12Z" fill="{skirt}"/>'
+    t += f'<path d="M-7 -14 C-8 -26 -7 -34 0 -36 C7 -34 8 -26 7 -14Z" fill="{coat}"/>'
+    t += f'<circle cx="0" cy="-42" r="6" fill="#f0d2b4"/><path d="M-6 -44 q6 -8 12 0 q-6 -3 -12 0Z" fill="{hair}"/>'
+    if flagged:
+        t += '<path d="M7 -30 L12 -58" stroke-width="1.4"/><rect x="10" y="-66" width="14" height="9" fill="#c8323c" stroke-width="1"/><path d="M10 -61.5 h14 M15 -66 v9" stroke="#fff" stroke-width="2.6"/><path d="M10 -61.5 h14 M15 -66 v9" stroke="#1f3a68" stroke-width="1.2"/>'
+    return t + '</g>'
+
+def balloon(x, y, c='#c8323c'):
+    return f'<path d="M{x} {y} q-4 20 2 40" stroke="{LINE}" stroke-width="1" fill="none"/><ellipse cx="{x}" cy="{y-10}" rx="9" ry="11" fill="{c}" stroke="{LINE}" stroke-width="1.4"/><ellipse cx="{x-3}" cy="{y-14}" rx="2" ry="3" fill="#fff" opacity=".6"/>'
+
+def bunting(x0, x1, y, sag=14):
+    import math
+    n = int((x1 - x0) / 16)
+    t = f'<path d="M{x0} {y} Q{(x0+x1)/2} {y+sag*2} {x1} {y}" stroke="{LINE}" stroke-width="1.2" fill="none"/>'
+    cols = ['#c8323c', '#fff', '#1f3a68']
+    for i in range(n):
+        tt = (i + .5) / n; xx = x0 + (x1 - x0) * tt; yy = y + sag * 2 * 2 * tt * (1 - tt)
+        t += f'<path d="M{xx-5:.1f} {yy:.1f} h10 l-5 10Z" fill="{cols[i%3]}" stroke="{LINE}" stroke-width=".8"/>'
+    return t

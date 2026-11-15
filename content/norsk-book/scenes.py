@@ -173,6 +173,28 @@ def u07():
     b += bubble(330, 190, 'Vil du smake brunost?')
     return svg(600, 340, 'Pollijs un kaza Gro saimniecībā Gudbrandsdālenē nogaršo brūno sieru', b)
 
+@scene(8)
+def u08():
+    b = sky(600, 340, '#a7cbe6', '#f6efe2', 'u8')
+    b += cloud(90, 40) + cloud(500, 50, .8)
+    b += '<path d="M0 170 C80 80 180 60 280 90 C360 112 440 70 520 90 C560 100 590 120 600 130 V260 H0Z" fill="#7f9f84" stroke="#1f2442" stroke-width="1.6"/>'
+    b += ''.join(tree(x, y, 10, '#6a9566', '#86b07f') for x, y in [(60, 150), (90, 130), (140, 112), (200, 104), (330, 110), (380, 100), (450, 96), (520, 108), (560, 120)])
+    b += '<path d="M120 210 L300 92" stroke="#1f2442" stroke-width="2" stroke-dasharray="5 4"/><rect x="236" y="124" width="22" height="14" rx="3" fill="#2f6fb0" stroke="#1f2442" stroke-width="1.4" transform="rotate(-33 247 131)"/>'
+    for i, (w, h, c) in enumerate([(52, 90, '#e8d9b8'), (48, 104, '#c8323c'), (54, 86, '#f2d68e'), (46, 98, '#fbf6ea'), (52, 92, '#9fb7c9'), (50, 110, '#e1a85a'), (48, 88, '#f3e6d0'), (54, 100, '#c96f5a'), (50, 94, '#e8d9b8'), (48, 102, '#fbf6ea'), (52, 92, '#d9825f'), (50, 96, '#9fc2b8')]):
+        b += gable(i * 50 - 2, 252, w, h, c)
+    b += bunting(0, 300, 120) + bunting(300, 600, 126)
+    b += flag(30, 252, 70) + flag(570, 252, 70)
+    b += '<rect y="252" width="600" height="88" fill="#d8d2c4"/>' + ''.join(f'<path d="M{x} 252 L{x-18} 340" stroke="#c4bdae" stroke-width="1.4"/>' for x in range(30, 640, 40))
+    for i, x in enumerate(range(70, 560, 34)):
+        b += person(x, 286 + (i % 2) * 4, .8, ['#c8323c', '#1f3a68', '#2f6f8a', '#e1a85a'][i % 4], ['#7a5a3e', '#e6c27a', '#3a2a20'][i % 3], flagged=True, skirt='#1f3a68' if i % 3 == 0 else None)
+    b += balloon(120, 230) + balloon(132, 222, '#1f3a68') + balloon(470, 226, '#fff')
+    b += '<g stroke="#1f2442" stroke-width="1.6"><rect x="508" y="290" width="70" height="34" rx="4" fill="#fbf6ea"/><path d="M508 290 l10 -16 h50 l10 16" fill="#c8323c"/><circle cx="522" cy="330" r="6" fill="#33333c"/><circle cx="564" cy="330" r="6" fill="#33333c"/></g>'
+    b += '<text x="516" y="311" font-family="DM Sans,sans-serif" font-size="8.5" font-weight="700" fill="#c8323c">IS · PØLSER</text>'
+    b += polly(200, 336, .48, flip=True, extra='<path d="M44 -60 L60 -140" stroke="#1f2442" stroke-width="2"/><rect x="58" y="-160" width="34" height="22" fill="#c8323c" stroke="#1f2442" stroke-width="1.4"/><path d="M58 -149 h34 M70 -160 v22" stroke="#fff" stroke-width="6"/><path d="M58 -149 h34 M70 -160 v22" stroke="#1f3a68" stroke-width="3"/>')
+    b += polly(300, 336, .48, beret=False, c=GREY, extra=VEST)
+    b += bubble(300, 186, 'Gratulerer med dagen!')
+    return svg(600, 340, 'Pollijs un balodis Bjērns 17. maijā Bergenā vēro bērnu gājienu', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():

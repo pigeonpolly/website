@@ -4,7 +4,7 @@ const {chromium}=require('playwright');
 const p=await b.newPage({viewport:{width:1640,height:1000},deviceScaleFactor:2});
 await p.goto('file://'+__dirname+'/book.html');await p.waitForTimeout(2500);
 const o=await p.evaluate(()=>[...document.querySelectorAll('.page')].map(e=>{const r=e.getBoundingClientRect();let m=0;
- e.querySelectorAll('*').forEach(c=>{if(c.closest('.stamp')||c.closest('svg')||c.classList.contains('folio'))return;const q=c.getBoundingClientRect();if(q.height)m=Math.max(m,q.bottom-r.top)});
+ e.querySelectorAll('*').forEach(c=>{if(c.closest('.stamp')||c.closest('svg')||c.closest('.fill')||c.classList.contains('folio'))return;const q=c.getBoundingClientRect();if(q.height)m=Math.max(m,q.bottom-r.top)});
  return e.dataset.p+':'+Math.round(m/r.height*100)}));
 console.log(o.join(' '));
 const pages=await p.$$('.page');
