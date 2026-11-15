@@ -43,6 +43,9 @@ rows = ''.join(f'<div class="toc-row"><span class="tn">{a}</span><span class="tt
 body = body.replace('{{TOC}}', rows)
 SCRIPT = '<script>document.fonts.ready.then(()=>document.querySelectorAll(".fill").forEach(f=>{if(f.getBoundingClientRect().height<110)f.style.display="none"}))</script>'
 open(os.path.join(D, 'book.html'), 'w').write(HEAD + body + '\n</div>' + SCRIPT + '</body></html>\n')
+# печатная (облегчённая) версия: белый фон, контурные картинки — theme-print.css
+PHEAD = HEAD.replace('<link rel="stylesheet" href="theme-d.css">', '<link rel="stylesheet" href="theme-d.css"><link rel="stylesheet" href="theme-print.css">')
+open(os.path.join(D, 'book-print.html'), 'w').write(PHEAD + body + '\n</div>' + SCRIPT + '</body></html>\n')
 print('pages', n[0])
 for a, b, c, d in toc:
     print(' ', a, b, d)
