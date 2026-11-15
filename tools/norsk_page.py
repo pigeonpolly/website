@@ -26,6 +26,7 @@ if '</script' in UT.lower(): raise SystemExit('шпаргалка: не встр
 html = html.replace('</body>', f"<script>{UT}</script>\n</body>")
 (ROOT / 'worker/uttale.js').write_text('// Собрано tools/norsk_page.py из content/shared/uttale.js — руками не править.\nexport const UTTALE_JS = ' + json.dumps(UT, ensure_ascii=False) + ';\n', encoding='utf-8')
 out = ROOT / 'worker/norsk-page.js'
+html = html.replace('</body>', '<script src="/assets/emoji-art.js" defer></script>\n</body>', 1)  # нарисованные эмодзи (docs/site.md «Нарисованные эмодзи»): только вид, тексты и прогресс не трогает
 out.write_text('// Собрано tools/norsk_page.py из content/norsk/ — руками не править.\nexport const NORSK_HTML = ' + json.dumps(html, ensure_ascii=False) + ';\n', encoding='utf-8')
 if '--html' in sys.argv: pathlib.Path(sys.argv[sys.argv.index('--html') + 1]).write_text(html, encoding='utf-8')
 print(out, len(html))

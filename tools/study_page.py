@@ -9,5 +9,6 @@ def notebook(html, book):
 html = (ROOT / 'content/study/textbook.html').read_text(encoding='utf-8')
 html = notebook(html, 'study')
 out = ROOT / 'worker/study-page.js'
+html = html.replace('</body>', '<script src="/assets/emoji-art.js" defer></script>\n</body>', 1)  # нарисованные эмодзи (docs/site.md «Нарисованные эмодзи»): только вид, тексты и прогресс не трогает
 out.write_text('// Собрано tools/study_page.py из content/study/textbook.html — руками не править.\nexport const STUDY_HTML = ' + json.dumps(html, ensure_ascii=False) + ';\n', encoding='utf-8')
 print(out, len(html))

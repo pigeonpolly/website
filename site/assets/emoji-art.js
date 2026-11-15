@@ -544,7 +544,7 @@
   const KEYS = Object.keys(ART).sort((x, y) => y.length - x.length).map(k => k.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'));
   const RE = new RegExp(`(?<!\\u200D)(?:${KEYS.join('|')})\\uFE0F?(?![\\u200D\\u{1F3FB}-\\u{1F3FF}])`, 'gu');
   const SKIP = /^(SCRIPT|STYLE|TEXTAREA|INPUT|SELECT|OPTION|CODE|PRE|SVG|CANVAS|NOSCRIPT|TITLE|svg|text|tspan)$/;
-  const BAD = '[contenteditable],.pp-e,.pp-noemo';
+  const BAD = '[contenteditable],.pp-e,.pp-noemo,#ppnb'; // #ppnb — блокнот учебников
   let on = false, mo = null, queue = new Set(), raf = 0;
   const okText = (n) => {
     const p = n.parentNode;

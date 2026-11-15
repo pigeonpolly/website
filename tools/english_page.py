@@ -17,6 +17,7 @@ def notebook(html, book):
 html = shell.replace('/*UNITS*/', units).replace('/*ENGINE*/', engine)
 html = notebook(html, 'english')
 out = ROOT / 'worker/english-page.js'
+html = html.replace('</body>', '<script src="/assets/emoji-art.js" defer></script>\n</body>', 1)  # нарисованные эмодзи (docs/site.md «Нарисованные эмодзи»): только вид, тексты и прогресс не трогает
 out.write_text('// Собрано tools/english_page.py из content/english/ — руками не править.\nexport const ENGLISH_HTML = ' + json.dumps(html, ensure_ascii=False) + ';\n', encoding='utf-8')
 if '--html' in sys.argv: pathlib.Path(sys.argv[sys.argv.index('--html') + 1]).write_text(html, encoding='utf-8')
 print(out, len(html))
