@@ -61,7 +61,7 @@
       <path d="M7 23L13 15L17 20L19.5 17.5L25 23Z" fill="${GR}"/><rect x="7" y="9" width="18" height="14" fill="none"/>`,
     '🔊': `<path d="M4.5 12H10L17 6V26L10 20H4.5Z" fill="${MU}"/><path d="M21 12.5Q23.5 16 21 19.5M24.5 9Q29.5 16 24.5 23" fill="none" stroke="${OR}" stroke-width="2.2"/>`,
     '📸': `<rect x="10" y="6" width="9" height="5" rx="1.5" fill="${P}"/><rect x="3.5" y="9.5" width="25" height="17" rx="3" fill="${P}"/><circle cx="16" cy="18" r="6" fill="${MU}"/><circle cx="16" cy="18" r="3" fill="${O}"/>
-      <circle cx="17" cy="17" r=".9" fill="#fff" stroke="none"/><rect x="22" y="12" width="3.5" height="2.5" rx=".8" fill="${ST}"/><path d="M26 3.5L27.5 6M29.5 7L27 7.5M23 3L24 5.5" stroke="${ST}" stroke-width="1.5"/>`,
+      <circle cx="17" cy="17" r=".9" fill="#fff" stroke="none"/><rect x="22" y="12" width="3.5" height="2.5" rx=".8" fill="${ST}"/><g class="fl"><path d="${sp(26.5, 5.5, 5)}" fill="${ST}"/><circle cx="21" cy="2.5" r="1" fill="${ST}" stroke="none"/></g>`,
     '💬': `<path d="M6.5 5.5H25.5Q29 5.5 29 9V19Q29 22.5 25.5 22.5H14L8 27.5L9 22.5H6.5Q3 22.5 3 19V9Q3 5.5 6.5 5.5Z" fill="${LI}"/><g fill="${O}" stroke="none"><circle cx="10.5" cy="14" r="2"/><circle cx="16" cy="14" r="2"/><circle cx="21.5" cy="14" r="2"/></g>`,
     '⭐': `<path d="M16 3L19.6 11.2L28.5 12L21.8 17.9L23.8 26.6L16 22L8.2 26.6L10.2 17.9L3.5 12L12.4 11.2Z" fill="${ST}"/>${hl('M11.5 14.5L14 12.5')}`,
   };
@@ -153,10 +153,11 @@
     '🥚': `<path d="M16 3Q25 3 25.5 17Q25.5 29 16 29Q6.5 29 6.5 17Q7 3 16 3Z" fill="#F6EEDF"/><g fill="${PA2}" stroke="none"><circle cx="19" cy="11" r="1.1"/><circle cx="12" cy="19" r="1.2"/><circle cx="20" cy="22" r=".9"/></g>${hl('M10.5 14Q11 9 13.5 6.5')}`,
     '📄': `<path d="M7 3H19L26 10V29H7Z" fill="${LI}"/><path d="M19 3V10H26Z" fill="${MU}"/><path d="M10.5 14H22.5M10.5 18H22.5M10.5 22H18" stroke="${MU}" stroke-width="1.5"/>`,
   });
-  // одинаковые по смыслу эмодзи — один рисунок
-  ART['🔎'] = ART['🔍'];
-  ART['✎'] = ART['✏'];
-  ART['📷'] = ART['📸'];
+  // пары: тот же рисунок, но с отличием, как у настоящих эмодзи
+  const flip = (a) => `<g transform="matrix(-1 0 0 1 32 0)">${a}</g>`;
+  ART['🔎'] = flip(ART['🔍']); // лупа наклонена вправо
+  ART['✎'] = flip(ART['✏']); // карандаш остриём вправо вниз
+  ART['📷'] = ART['📸'].replace(/<g class="fl">.*?<\/g>/, ''); // без вспышки
   let ready = false;
   const setup = () => {
     if (ready || typeof document === 'undefined' || !document.head) return;
