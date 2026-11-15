@@ -290,6 +290,26 @@ def u12():
     b += bubble(40, 170, 'Kan jeg prøve den røde genseren?')
     return svg(600, 340, 'Pollijs Olesunnā pie vilnas veikala starp jūgendstila namiem; pārdevēja — aita Marita', b)
 
+@scene(13)
+def u13():
+    b = sky(600, 340, '#9fc3de', '#eef1ea', 'u13')
+    b += sun(90, 60) + raincloud(470, 60, 1.1) + cloud(260, 40, .7)
+    b += '<path d="M0 340 V90 C40 80 90 100 130 140 C170 180 200 230 230 250 L240 340Z" fill="#7d8f9c" stroke="#1f2442" stroke-width="1.6"/>'
+    b += '<path d="M600 340 V80 C560 70 500 100 460 150 C420 200 380 230 350 250 L340 340Z" fill="#8a9ca8" stroke="#1f2442" stroke-width="1.6"/>'
+    b += '<path d="M60 92 l20 4 l-12 6Z M540 82 l22 4 l-14 8Z" fill="#fff"/>'
+    b += ''.join(f'<path d="M{x} {y0} C{x-2} {(y0+y1)/2} {x+2} {y1-10} {x-1} {y1}" stroke="#eaf3f8" stroke-width="4" fill="none"/>' for x, y0, y1 in [(430, 160, 238), (440, 156, 236), (450, 150, 234), (460, 146, 230), (470, 140, 228), (480, 136, 224), (490, 132, 220)])
+    b += '<path d="M150 150 C150 190 152 220 150 246" stroke="#eaf3f8" stroke-width="5" fill="none"/>'
+    b += '<path d="M230 250 C260 244 320 244 350 250 V340 H240Z" fill="#6f9fb8"/>' + ''.join(f'<path d="M{x} {262+k*14} h20" stroke="#9cc3d6" stroke-width="2"/>' for k in range(4) for x in range(250, 340, 40))
+    b += '<g transform="translate(270 262) scale(.6)" stroke="#1f2442" stroke-width="1.8"><path d="M0 0 h80 l-8 12 h-66Z" fill="#fff"/><rect x="14" y="-12" width="50" height="12" fill="#fff"/><rect x="34" y="-22" width="10" height="10" fill="#c8323c"/></g>'
+    b += ''.join(spruce(x, y, h, '#4f7a64') for x, y, h in [(30, 300, 50), (70, 310, 40), (560, 300, 50), (520, 312, 36)])
+    # skatu platforma
+    b += '<path d="M0 300 H600 V340 H0Z" fill="#9b8a72"/><path d="M0 300 H600" stroke="#1f2442" stroke-width="2"/>'
+    b += '<path d="M0 286 H600" stroke="#1f2442" stroke-width="3"/>' + ''.join(f'<path d="M{x} 286 V300" stroke="#1f2442" stroke-width="2"/>' for x in range(20, 600, 30))
+    b += polly(250, 336, .45, flip=True, extra='<path d="M44 -60 V-200" stroke="#1f2442" stroke-width="3"/><path d="M-26 -196 C-20 -246 108 -246 114 -196 q-17 -8 -35 0 q-17 -8 -35 0 q-17 -8 -35 0 q-17 -8 -35 0Z" fill="#c8323c" stroke="#1f2442" stroke-width="2.4" stroke-linejoin="round"/><path d="M44 -60 q0 10 -8 10" fill="none" stroke="#1f2442" stroke-width="3"/>')
+    b += troll(380, 336, .62, flip=True)
+    b += bubble(170, 150, 'Det regner og det er sol!')
+    return svg(600, 340, 'Pollijs ar lietussargu un trollis Trulte virs Geirangerfjorda pie Septiņu māsu ūdenskrituma', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():

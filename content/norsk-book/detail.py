@@ -371,3 +371,28 @@ def sweater(x, y, c='#c8323c', s=1, pattern=True):
         t += '<path d="M-22 -26 H22" stroke="#fff" stroke-width="5"/><path d="M-20 -26 l4 -3 l4 3 l4 -3 l4 3 l4 -3 l4 3 l4 -3 l4 3 l4 -3" stroke="#1f2442" stroke-width="1.2" fill="none"/>'
         t += ''.join(f'<circle cx="{-16+i*8}" cy="{-12+(i%2)*6}" r="1.2" fill="#fff" stroke="none"/>' for i in range(5))
     return t + '</g>'
+
+def troll(x, y, s=1, flip=False):
+    sx = -s if flip else s
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="0" cy="6" rx="44" ry="6" fill="#000" opacity=".08" stroke="none"/>
+ <path d="M-16 -10 l-4 14 h14 Z M10 -10 l2 14 h14Z" fill="#8b7a62"/>
+ <path d="M-34 -30 C-50 -10 -60 0 -70 -6 C-64 -12 -56 -20 -48 -34" fill="none" stroke-width="4"/><circle cx="-72" cy="-8" r="6" fill="#6f8a5a"/>
+ <path d="M-30 -60 C-34 -100 -14 -120 6 -120 C30 -120 40 -96 36 -60 C34 -24 22 -6 0 -6 C-20 -6 -28 -24 -30 -60Z" fill="#a39a7e"/>
+ <path d="M-22 -50 C-20 -30 -10 -18 4 -18 C18 -18 26 -34 24 -54" fill="#7e9a5f"/>
+ <path d="M-26 -112 C-36 -126 -20 -140 -6 -132 C0 -146 22 -144 24 -130 C40 -132 44 -114 32 -108Z" fill="#6f8a5a"/>
+ <path d="M4 -140 v-22 M4 -154 l-10 -8 M4 -150 l10 -10" stroke="#7a5a3e" stroke-width="3"/><circle cx="-6" cy="-164" r="6" fill="#6a9566"/><circle cx="14" cy="-162" r="7" fill="#6a9566"/>
+ <path d="M16 -96 C40 -96 50 -80 42 -72 C34 -66 22 -74 16 -82Z" fill="#b5ab8e"/>
+ <circle cx="-4" cy="-98" r="5" fill="#fff"/><circle cx="12" cy="-100" r="5" fill="#fff"/><circle cx="-3" cy="-98" r="2.4" fill="{LINE}" stroke="none"/><circle cx="13" cy="-100" r="2.4" fill="{LINE}" stroke="none"/>
+ <path d="M-6 -70 q12 8 22 0" fill="none"/><path d="M-2 -70 v4 M10 -70 v4" stroke-width="1.6"/>
+ <path d="M30 -64 C46 -70 52 -84 56 -96" fill="none" stroke-width="4"/>
+</g>"""
+
+def raincloud(x, y, s=1):
+    return (f'<g transform="translate({x} {y}) scale({s})"><g fill="#c3ccd6" stroke="{LINE}" stroke-width="1.4"><ellipse cx="0" cy="0" rx="40" ry="14"/><ellipse cx="-14" cy="-10" rx="18" ry="12"/><ellipse cx="12" cy="-12" rx="22" ry="15"/></g>'
+            f'<ellipse cx="0" cy="0" rx="38" ry="12" fill="#c3ccd6"/>' + ''.join(f'<path d="M{dx} {14+dy} l-4 10" stroke="#6f9cc0" stroke-width="2" stroke-linecap="round"/>' for dx, dy in [(-24, 0), (-12, 6), (0, 0), (12, 6), (24, 0), (-18, 18), (6, 18)]) + '</g>')
+
+def sun(x, y, r=18):
+    import math
+    rays = ''.join(f'<path d="M{x+math.cos(a)*(r+4):.1f} {y+math.sin(a)*(r+4):.1f} L{x+math.cos(a)*(r+12):.1f} {y+math.sin(a)*(r+12):.1f}" stroke="#e9a73a" stroke-width="3" stroke-linecap="round"/>' for a in [k*math.pi/4 for k in range(8)])
+    return rays + f'<circle cx="{x}" cy="{y}" r="{r}" fill="#f6d36b" stroke="{LINE}" stroke-width="1.6"/>'
