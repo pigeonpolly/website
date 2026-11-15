@@ -5,19 +5,25 @@ import os
 D = os.path.dirname(os.path.abspath(__file__))
 LINE = '#1f2442'
 
-def polly(x, y, s=1, flip=False, wave=False):
+NECK = '<path d="M-40 -100 C-20 -92 14 -92 36 -102 L37 -84 C12 -76 -20 -76 -42 -84Z" fill="#5f9a8a" opacity=".75" stroke="none"/><path d="M-41 -92 C-20 -84 14 -84 37 -93 L37 -84 C12 -76 -20 -76 -42 -84Z" fill="#8a6aa0" opacity=".6" stroke="none"/>'
+BERET = '<ellipse cx="6" cy="-160" rx="27" ry="9" fill="#b8324f" transform="rotate(-8 6 -160)"/><path d="M4 -168 q2 -8 9 -8" fill="none"/>'
+GREY = dict(b="#8c95a6", sh="#7a8394", w="#6b7486", lid="#7d8697", h1="#b5bccb", h2="#a2aabb", neck=True)
+BLUE = dict(b="#2f55a0", sh="#26478a", w="#23427a", lid="#284a8e", h1="#5f86c8", h2="#4a73b9")
+
+def polly(x, y, s=1, flip=False, wave=False, beret=True, c=BLUE):
     sx = -s if flip else s
-    wing = ('<path d="M30 -96 C50 -86 58 -66 62 -50 C56 -48 48 -54 40 -62 C38 -40 30 -22 18 -12 C22 -36 22 -64 14 -88 C18 -96 24 -98 30 -96Z" fill="#23427a"/>'
+    wing = (f'<path d="M30 -96 C50 -86 58 -66 62 -50 C56 -48 48 -54 40 -62 C38 -40 30 -22 18 -12 C22 -36 22 -64 14 -88 C18 -96 24 -98 30 -96Z" fill="{c["w"]}"/>'
             if wave else
-            '<path d="M30 -98 C46 -82 46 -42 30 -16 C24 -8 14 -6 8 -10 C20 -32 22 -62 14 -88 C18 -96 24 -100 30 -98Z" fill="#23427a"/>'
+            f'<path d="M30 -98 C46 -82 46 -42 30 -16 C24 -8 14 -6 8 -10 C20 -32 22 -62 14 -88 C18 -96 24 -100 30 -98Z" fill="{c["w"]}"/>'
             '<path d="M10 -12 l-2 8 M17 -12 l1 8 M24 -16 l4 7" stroke="#c9d3e3" stroke-width="2"/>')
     return f'''<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
  <ellipse cx="0" cy="9" rx="34" ry="5" fill="#000" opacity=".08" stroke="none"/>
  <path d="M-12 -4 L-14 8 M-14 8 l-8 1 M-14 8 l-3 5 M-14 8 l6 2 M10 -4 L11 8 M11 8 l-8 1 M11 8 l-2 5 M11 8 l7 2" stroke="#e8892c" stroke-width="2.6" fill="none"/>
- <path d="M2 -160 C-24 -160 -36 -136 -38 -108 C-40 -88 -48 -70 -46 -48 C-44 -20 -30 -4 -4 -2 C20 0 36 -14 38 -44 C40 -80 36 -120 28 -142 C22 -154 14 -160 2 -160Z" fill="#2f55a0"/>
- <path d="M28 -142 C36 -120 40 -80 38 -44 C36 -14 20 0 -4 -2 C14 -12 24 -40 24 -80 C24 -110 22 -130 28 -142Z" fill="#26478a" stroke="none"/>
- <path d="M-29 -122 C-31 -110 -32 -100 -33 -92" stroke="#5f86c8" stroke-width="4" fill="none"/>
- <path d="M-40 -84 C-38 -70 -36 -60 -38 -50" stroke="#4a73b9" stroke-width="3" fill="none"/>
+ <path d="M2 -160 C-24 -160 -36 -136 -38 -108 C-40 -88 -48 -70 -46 -48 C-44 -20 -30 -4 -4 -2 C20 0 36 -14 38 -44 C40 -80 36 -120 28 -142 C22 -154 14 -160 2 -160Z" fill="{c["b"]}"/>
+ <path d="M28 -142 C36 -120 40 -80 38 -44 C36 -14 20 0 -4 -2 C14 -12 24 -40 24 -80 C24 -110 22 -130 28 -142Z" fill="{c["sh"]}" stroke="none"/>
+ <path d="M-29 -122 C-31 -110 -32 -100 -33 -92" stroke="{c["h1"]}" stroke-width="4" fill="none"/>
+ <path d="M-40 -84 C-38 -70 -36 -60 -38 -50" stroke="{c["h2"]}" stroke-width="3" fill="none"/>
+ {NECK if c.get('neck') else ''}
  {wing}
  <path d="M-35 -123 L-57 -114 L-34 -110 C-32 -114 -32 -119 -35 -123Z" fill="#f2a33a"/>
  <path d="M-56 -114 L-34 -112" stroke-width="1.4"/>
@@ -25,11 +31,10 @@ def polly(x, y, s=1, flip=False, wave=False):
  <ellipse cx="-12" cy="-127" rx="11" ry="12" fill="#f6c445"/>
  <ellipse cx="-17" cy="-124" rx="3.6" ry="6.4" fill="{LINE}" stroke="none"/>
  <circle cx="-18.5" cy="-127" r="1.4" fill="#fff" stroke="none"/>
- <path d="M-22.4 -131 A11.5 12.5 0 0 1 -1.6 -131 Q-12 -126.5 -22.4 -131Z" fill="#284a8e"/>
+ <path d="M-22.4 -131 A11.5 12.5 0 0 1 -1.6 -131 Q-12 -126.5 -22.4 -131Z" fill="{c["lid"]}"/>
  <path d="M-23 -131 Q-12 -126 -1 -131" fill="none" stroke-width="2.4"/>
  <path d="M-23 -131 l-4 -2 M-22 -129 l-4 1" stroke-width="1.6"/>
- <ellipse cx="6" cy="-160" rx="27" ry="9" fill="#b8324f" transform="rotate(-8 6 -160)"/>
- <path d="M4 -168 q2 -8 9 -8" fill="none"/>
+ {BERET if beret else ''}
 </g>'''
 
 def gull(x, y, s=1, flip=False):
@@ -300,6 +305,7 @@ def u02():
     b += bubble(36, 132, 'Hvor kommer du fra?')
     return svg(600, 340, 'Pollijs, vārna Ina un zvirbulis Bens uz Oslo operas jumta', b)
 
-for name, fn in [('scene-cover.svg', cover), ('scenes/u02.svg', u02), ('scene-u0.svg', u0), ('scene-u1.svg', u1), ('polly-head.svg', head)]:
-    open(os.path.join(D, name), 'w').write(fn())
-print('ok')
+if __name__ == '__main__':
+    for name, fn in [('scene-cover.svg', cover), ('scene-u0.svg', u0), ('scene-u1.svg', u1), ('polly-head.svg', head)]:
+        open(os.path.join(D, name), 'w').write(fn())
+    print('ok')

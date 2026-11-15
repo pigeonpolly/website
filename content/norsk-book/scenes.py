@@ -1,0 +1,79 @@
+#!/usr/bin/env python3
+"""Сцены глав 3–20 (svg 600×340) из деталей art.py. python3 scenes.py → scenes/uNN.svg"""
+import os
+from art import *
+from detail import *
+D = os.path.dirname(os.path.abspath(__file__))
+S = {}
+def scene(n):
+    def deco(f):
+        S[n] = f
+        return f
+    return deco
+
+@scene(2)
+def u02():
+    b = sky(600, 340, '#9fc6e2', '#f4ece0', 'u2')
+    b += cloud(100, 50) + cloud(430, 40, .8) + cloud(560, 80, .5, .6)
+    # Barcode ēkas ar logiem
+    for x, y, w, c in [(300, 104, 26, '#c7d2dd'), (330, 80, 22, '#aebdcb'), (356, 112, 28, '#d5dde4'), (388, 70, 24, '#b8c6d3'), (416, 96, 26, '#cbd5df'), (446, 86, 22, '#a9b9c8'), (472, 108, 26, '#d0d9e2')]:
+        b += f'<rect x="{x}" y="{y}" width="{w}" height="{260-y}" fill="{c}" stroke="#1f2442" stroke-width="1.4"/>'
+        b += ''.join(f'<rect x="{x+3+i*7}" y="{y+6+j*10}" width="4" height="5" fill="#8fa3b6"/>' for i in range(int(w/7)) for j in range(int((240-y)/10)))
+    b += '<path d="M520 260 V150 h30 V120 h26 V260Z" fill="#e2c9a0" stroke="#1f2442" stroke-width="1.4"/>'
+    b += water(250, c='#86adc4')
+    b += boat(80, 300, .9) + boat(560, 286, .6, '#2f55a0')
+    b += '<g stroke="#1f2442" stroke-width="1.6"><path d="M150 262 h40 l-6 8 h-30Z" fill="#fff"/><path d="M160 262 v-10 h18 v10" fill="#c8323c"/></g>'
+    # operas jumts
+    b += '<path d="M40 252 L300 118 L570 150 L600 252Z" fill="#f4f2ec" stroke="#1f2442" stroke-width="2" stroke-linejoin="round"/>'
+    b += '<path d="M300 118 L570 150 L548 172 L312 140Z" fill="#e2dfd6" stroke="#1f2442" stroke-width="1.6" stroke-linejoin="round"/>'
+    b += ''.join(f'<path d="M{60+i*40} 252 L{300+i*8} {124+i*3}" stroke="#e1ddd2" stroke-width="1.5"/>' for i in range(8))
+    b += '<rect x="420" y="92" width="74" height="64" fill="#6d8299" stroke="#1f2442" stroke-width="2"/>'
+    b += ''.join(f'<line x1="{x}" y1="94" x2="{x}" y2="154" stroke="#8ea3b8"/>' for x in range(428, 494, 8))
+    b += '<path d="M424 100 L490 150" stroke="#b9c8d6" stroke-width="3" opacity=".6"/>'
+    # cilvēki uz jumta (mazi)
+    for x, y, c in [(470, 178, '#c8323c'), (486, 182, '#e1a85a'), (520, 196, '#5f8a72'), (230, 168, '#2f55a0')]:
+        b += f'<g stroke="#1f2442" stroke-width="1.2"><rect x="{x-3}" y="{y-12}" width="6" height="10" rx="2" fill="{c}"/><circle cx="{x}" cy="{y-15}" r="3" fill="#f0d2b4"/><path d="M{x-2} {y-2} v5 M{x+2} {y-2} v5"/></g>'
+    b += '<path d="M0 252 H600" stroke="#1f2442" stroke-width="2"/>'
+    b += '<g stroke="#1f2442" stroke-width="1.6"><path d="M100 230 v-50" stroke-width="2"/><path d="M100 180 h26 v16 h-26Z" fill="#c8323c"/><path d="M100 188 h26 M108 180 v16" stroke="#fff" stroke-width="3"/><path d="M100 188 h26 M108 180 v16" stroke="#1f3a68" stroke-width="1.4"/></g>'
+    b += crow(160, 226, .55) + polly(268, 194, .6) + sparrow(350, 166, .62, flip=True)
+    b += bubble(30, 132, 'Hvor kommer du fra?')
+    return svg(600, 340, 'Pollijs, vārna Ina un zvirbulis Bens uz Oslo operas jumta', b)
+
+@scene(3)
+def u03():
+    b = sky(600, 340, '#a9cde6', '#f2efe4', 'u3')
+    b += cloud(90, 44) + cloud(520, 60, .8) + cloud(300, 30, .5, .6)
+    # tālā koku rinda
+    b += ''.join(tree(x, 168, 22, '#8fb48a', '#a9c9a0') for x in range(-10, 640, 38))
+    b += '<path d="M0 166 H600 V340 H0Z" fill="#a8c68e"/>'
+    # monolīts uz pakāpieniem ar figūrām
+    b += '<g stroke="#1f2442" stroke-width="2" stroke-linejoin="round">'
+    b += '<path d="M200 186 H400 L388 176 H212Z" fill="#cdc4b0"/><path d="M220 176 H380 L370 166 H230Z" fill="#d6cdb9"/><path d="M242 166 H358 L350 158 H250Z" fill="#ded6c3"/>'
+    b += '<path d="M284 158 C281 110 283 60 291 28 C295 18 305 18 309 28 C317 60 319 110 316 158Z" fill="#d8d1c3"/></g>'
+    b += ''.join(f'<path d="M{288 + (k % 2) * 3} {150 - k * 9} q6 -5 12 0 q6 5 12 0" stroke="#a69f92" stroke-width="1.3" fill="none"/>' for k in range(13))
+    b += ''.join(f'<circle cx="{292 + (k * 7) % 22}" cy="{146 - k * 8.5}" r="2.2" fill="#c4bcab" stroke="#a69f92" stroke-width=".8"/>' for k in range(14))
+    b += ''.join(figure(x, y, .42, '#cdc4b0', i) for i, (x, y) in enumerate([(222, 174), (244, 165), (262, 158), (338, 158), (356, 165), (378, 174)]))
+    # celiņš ar oļiem
+    b += '<path d="M250 186 L350 186 L430 340 L170 340Z" fill="#ebe2cf"/>'
+    b += pebbles(lambda r: (r.uniform(200, 400), r.uniform(200, 338)), 90, 5)
+    # dzīvžogi, koki, krūmi, puķes
+    b += hedge(20, 206, 190) + hedge(390, 206, 190)
+    b += tree(30, 214, 30) + tree(570, 214, 30, '#6a9566') + tree(150, 200, 22, '#7ea877')
+    b += flowers(30, 200, 222, 1) + flowers(400, 580, 222, 2)
+    b += grass(0, 190, 230, 338, 7, '#89ab78', 35) + grass(440, 600, 230, 338, 8, '#89ab78', 30)
+    # Sinnataggen uz postamenta
+    b += '<rect x="96" y="232" width="34" height="34" fill="#cfc6b4" stroke="#1f2442" stroke-width="2"/>' + figure(113, 232, .7, '#b9b0a0', 2)
+    b += lamp(560, 300, 110) + bench(456, 262, 74)
+    # pikniks: baložu ģimene uz pleda
+    b += blanket(360, 318, 150, 30) + basket(476, 300) + crumbs(420, 308)
+    b += polly(170, 322, .6, flip=True)
+    b += polly(392, 312, .52, beret=False, c=GREY) + polly(438, 316, .48, beret=False, c=GREY)
+    b += polly(470, 322, .26, beret=False, c=GREY, flip=True) + polly(498, 326, .24, beret=False, c=GREY) + polly(524, 328, .2, beret=False, c=GREY, flip=True)
+    b += bubble(300, 214, 'Dette er familien min!')
+    return svg(600, 340, 'Pollijs un baložu ģimene piknikā Vīgelanna parkā pie Monolīta', b)
+
+if __name__ == '__main__':
+    os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
+    for n, f in S.items():
+        open(os.path.join(D, 'scenes', f'u{n:02d}.svg'), 'w').write(f())
+    print('scenes', sorted(S))

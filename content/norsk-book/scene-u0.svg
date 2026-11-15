@@ -56,6 +56,7 @@
  <path d="M28 -142 C36 -120 40 -80 38 -44 C36 -14 20 0 -4 -2 C14 -12 24 -40 24 -80 C24 -110 22 -130 28 -142Z" fill="#26478a" stroke="none"/>
  <path d="M-29 -122 C-31 -110 -32 -100 -33 -92" stroke="#5f86c8" stroke-width="4" fill="none"/>
  <path d="M-40 -84 C-38 -70 -36 -60 -38 -50" stroke="#4a73b9" stroke-width="3" fill="none"/>
+ 
  <path d="M30 -96 C50 -86 58 -66 62 -50 C56 -48 48 -54 40 -62 C38 -40 30 -22 18 -12 C22 -36 22 -64 14 -88 C18 -96 24 -98 30 -96Z" fill="#23427a"/>
  <path d="M-35 -123 L-57 -114 L-34 -110 C-32 -114 -32 -119 -35 -123Z" fill="#f2a33a"/>
  <path d="M-56 -114 L-34 -112" stroke-width="1.4"/>
@@ -66,7 +67,6 @@
  <path d="M-22.4 -131 A11.5 12.5 0 0 1 -1.6 -131 Q-12 -126.5 -22.4 -131Z" fill="#284a8e"/>
  <path d="M-23 -131 Q-12 -126 -1 -131" fill="none" stroke-width="2.4"/>
  <path d="M-23 -131 l-4 -2 M-22 -129 l-4 1" stroke-width="1.6"/>
- <ellipse cx="6" cy="-160" rx="27" ry="9" fill="#b8324f" transform="rotate(-8 6 -160)"/>
- <path d="M4 -168 q2 -8 9 -8" fill="none"/>
+ <ellipse cx="6" cy="-160" rx="27" ry="9" fill="#b8324f" transform="rotate(-8 6 -160)"/><path d="M4 -168 q2 -8 9 -8" fill="none"/>
 </g>
 </svg>
