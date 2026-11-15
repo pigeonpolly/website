@@ -167,9 +167,9 @@
   window.PPPalette = { extract, named: async img => { await loadNames(); return nameAll(extract(img)).map(c => ({ hex: c.hex, en: c.nm[0], u: c.u, v: c.v })); },
     // пипетки на фото для генератора пинов: cols меняются на месте ({hex, en, u, v}), onChange — после каждого сдвига
     editor: async (box, img, cols, onChange) => { await loadNames(); cols.forEach(c => { c.n = c.n || c.en; }); locate(img, cols); return pinEditor(box, img, () => cols, onChange); } };
-  // значок-логотип v3 для подвала карточки (как на пинах pins4: кружок-значок + адрес)
+  // значок-логотип v3 (белый, для тёмного фона) для подвала карточки (как на пинах pins4: кружок-значок + адрес)
   let BADGE = null;
-  const badge = () => BADGE || (BADGE = new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = '/assets/logo-badge-purple.png'; }));
+  const badge = () => BADGE || (BADGE = new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = '/assets/logo-badge-white.png'; }));
   const rr = (g, x, y, w, h, r) => { g.beginPath(); g.moveTo(x + r, y); g.arcTo(x + w, y, x + w, y + h, r); g.arcTo(x + w, y + h, x, y + h, r); g.arcTo(x, y + h, x, y, r); g.arcTo(x, y, x + w, y, r); g.closePath(); };
   async function drawCard(img, cols, title) {
     await Promise.all(["600 80px Fraunces", "italic 400 28px Fraunces", "700 26px Karla", "500 21px Karla"].map(f => document.fonts ? document.fonts.load(f).catch(() => 0) : 0));
