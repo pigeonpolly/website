@@ -131,6 +131,8 @@ def stamp(place, n, total=20):
     return f'<div class="stamp">{place}<br><small>{n} / {total}</small></div>'
 
 
+FILL = '<div class="fill"><h3>✎ Manas piezīmes</h3></div>'
+
 # ---------- разворот самопроверки ----------
 def ctrl(ch, words, sents, text_title, text, qs, qa, gram_q, gram_items, gram_a, gl=None, qtitle="Atbildi uz jautājumiem norvēģu valodā."):
     """words: [(no, pr, lv)] → перевести на латышский; sents: [(lv, no)] → перевести на норвежский;
@@ -144,7 +146,7 @@ def ctrl(ch, words, sents, text_title, text, qs, qa, gram_q, gram_items, gram_a,
   <div class="ctrlhead"><span class="tag">{n}✓</span><div><h2>Pārbaudi sevi</h2><span>Kontrolē, ko esi iemācījies. Atbildes — apgrieztas zem uzdevuma.</span></div></div>
   {ex("Iztulko vārdus latviešu valodā.", f'<div class="ordbank tr">{w}</div>', wa)}
   {ex("Iztulko teikumus norvēģu valodā.", f'<ol class="items wide tr">{s}</ol>', sa)}
-  <div class="folio"></div></section>'''
+  {FILL}<div class="folio"></div></section>'''
     tx = ''.join(f'<p>{x}</p>' for x in text)
     qq = ''.join(f'<li>{q}<span class="blank l"></span></li>' for q in qs)
     right = f'''<section class="page"><div class="run">Norsk med Polly · {ch["lvl"]}</div>
@@ -163,7 +165,8 @@ def render_pages(ch, pages):
     for i, blocks in enumerate(pages):
         run = '' if i == 0 else (f'<div class="run">{ch["n"]}. nodaļa · {ch["title"]}</div>' if i % 2 == 0
                                  else f'<div class="run">Norsk med Polly · {ch["lvl"]}</div>')
-        out.append(f'<section class="page">{run}\n' + '\n'.join(blocks) + '\n<div class="folio"></div></section>')
+        fill = '' if i == 0 else FILL
+        out.append(f'<section class="page">{run}\n' + '\n'.join(blocks) + f'\n{fill}<div class="folio"></div></section>')
     return '\n'.join(out)
 
 

@@ -41,7 +41,8 @@ for m in re.finditer(r'data-p="(\d+)">\s*<div class="testhead"><h1>(.*?)</h1>', 
 toc.sort(key=lambda x: int(x[3]))
 rows = ''.join(f'<div class="toc-row"><span class="tn">{a}</span><span class="tt"><b>{b}</b><i>{c}</i></span><span class="tp">{d}</span></div>' for a, b, c, d in toc)
 body = body.replace('{{TOC}}', rows)
-open(os.path.join(D, 'book.html'), 'w').write(HEAD + body + '\n</div></body></html>\n')
+SCRIPT = '<script>document.fonts.ready.then(()=>document.querySelectorAll(".fill").forEach(f=>{if(f.getBoundingClientRect().height<110)f.style.display="none"}))</script>'
+open(os.path.join(D, 'book.html'), 'w').write(HEAD + body + '\n</div>' + SCRIPT + '</body></html>\n')
 print('pages', n[0])
 for a, b, c, d in toc:
     print(' ', a, b, d)
