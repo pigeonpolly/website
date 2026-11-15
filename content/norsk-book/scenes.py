@@ -348,6 +348,26 @@ def u15():
     b += bubble(220, 150, 'Ben! Hva gjør du her?')
     return svg(600, 340, 'Pollijs satiek zvirbuli Benu uz Vecā pilsētas tilta Trondheimā; aiz upes — Nidarosas katedrāle', b)
 
+@scene(16)
+def u16():
+    b = sky(600, 340, '#9cc0dc', '#f3ede2', 'u16')
+    b += cloud(100, 46) + cloud(460, 30, .8)
+    b += ridge([(0, 140), (80, 100), (160, 130), (240, 90), (330, 126), (420, 96), (520, 130), (600, 104)], '#a6b8c6', 170, snow=110)
+    b += '<path d="M0 170 C80 160 160 172 230 166 L230 200 H0Z M370 170 C440 160 520 170 600 164 V200 H370Z" fill="#7d9a7a" stroke="#1f2442" stroke-width="1.4"/>'
+    b += water(186, c='#6f9cbc')
+    b += whirl(260, 230, 40) + whirl(360, 214, 26) + whirl(330, 262, 30) + whirl(430, 244, 20)
+    b += '<path d="M130 186 Q300 60 470 186" stroke="#1f2442" stroke-width="12" fill="none"/><path d="M130 186 Q300 60 470 186" stroke="#e8e4da" stroke-width="8" fill="none"/>'
+    b += ''.join(f'<path d="M{x} 114 V{186 - 63*4*((x-130)/340)*(1-(x-130)/340):.1f}" stroke="#1f2442" stroke-width="2"/>' for x in range(150, 460, 30)) + '<path d="M90 114 H510" stroke="#1f2442" stroke-width="7"/><path d="M90 114 H510" stroke="#e8e4da" stroke-width="4"/>'
+    b += eagle(200, 70, .6) + eagle(420, 50, .45)
+    b += '<path d="M0 290 C80 270 160 280 220 300 V340 H0Z" fill="#8a8a7e" stroke="#1f2442" stroke-width="1.6"/><path d="M600 286 C520 270 440 280 400 300 V340 H600Z" fill="#8a8a7e" stroke="#1f2442" stroke-width="1.6"/>'
+    b += person(60, 286, .8, '#e1a85a') + '<path d="M66 260 L120 210" stroke="#1f2442" stroke-width="1.6"/><path d="M120 210 Q140 230 150 250" stroke="#1f2442" stroke-width=".8" fill="none"/>'
+    b += polly(160, 330, .48, extra='<path d="M-46 -96 C-40 -70 -40 -30 -36 -8 L36 -8 C40 -40 40 -80 30 -100 C10 -94 -20 -92 -46 -96Z" fill="#f2c13d" opacity=".9"/>')
+    b += '<g stroke="#1f2442" stroke-width="1.6"><rect x="432" y="250" width="126" height="46" rx="4" fill="#fbf6ea"/><path d="M450 296 v30 M540 296 v30" stroke-width="3"/></g>'
+    b += '<text x="495" y="270" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="12" font-weight="700" fill="#c8323c">TILBUD −20 %</text><text x="495" y="288" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9.5" fill="#1f2442">Regnjakke 1 290 kr</text>'
+    b += raven(560, 330, .5, flip=True)
+    b += bubble(240, 300, 'Hvor mye koster jakka?')
+    return svg(600, 340, 'Pollijs jaunā dzeltenā lietusjakā pie Saltstraumena virpuļiem un tilta; krauklis Kore pārdod jakas', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():

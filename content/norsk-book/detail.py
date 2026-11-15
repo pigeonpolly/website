@@ -454,3 +454,31 @@ def bybro(x, y, w=260):
 def stilthouse(x, y, w=44, h=46, c='#e1a85a'):
     t = ''.join(f'<path d="M{x+i} {y} v24" stroke="{LINE}" stroke-width="4"/><path d="M{x+i} {y} v24" stroke="#7a5a3e" stroke-width="2.4"/>' for i in (4, w / 2, w - 4))
     return t + gable(x, y, w, h, c)
+
+
+def raven(x, y, s=1, flip=False):
+    """krauklis — melns, ar lielu knābi"""
+    return crowc(x, y, s, flip, '#26282f')
+
+def crowc(x, y, s=1, flip=False, body='#26282f'):
+    from art import LINE as L
+    sx = -s if flip else s
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{L}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M-6 -12 L-8 8 M-8 8 l-7 1 M-8 8 l6 1 M8 -12 L9 8 M9 8 l-7 1 M9 8 l6 1" stroke="#33333c" stroke-width="2.6" fill="none"/>
+ <path d="M-34 -40 L-64 -26 L-56 -16 L-30 -24Z" fill="{body}"/>
+ <path d="M-36 -36 C-38 -60 -14 -70 10 -66 C24 -64 34 -58 38 -48 C40 -26 24 -12 0 -12 C-22 -12 -34 -22 -36 -36Z" fill="{body}"/>
+ <path d="M-26 -48 C-10 -58 12 -56 24 -46" stroke="#4a5068" stroke-width="2" fill="none"/>
+ <path d="M10 -66 C14 -84 28 -94 42 -92 C56 -90 62 -78 58 -66 C52 -54 34 -50 20 -54Z" fill="{body}"/>
+ <path d="M56 -82 C66 -82 80 -78 84 -72 C78 -70 66 -68 56 -68Z" fill="#33363f"/>
+ <circle cx="46" cy="-80" r="3.4" fill="#fff" stroke-width="1.2"/><circle cx="47" cy="-80" r="1.8" fill="{L}" stroke="none"/>
+ <path d="M14 -60 l4 6 l4 -6 l4 6" stroke="#4a5068" stroke-width="1.4" fill="none"/>
+</g>"""
+
+def whirl(x, y, r=30):
+    return (f'<ellipse cx="{x}" cy="{y}" rx="{r}" ry="{r*.35}" fill="#5f8fae" stroke="#1f2442" stroke-width="1.4"/>'
+            f'<path d="M{x-r*.8} {y} C{x-r*.6} {y-r*.3} {x+r*.6} {y-r*.3} {x+r*.6} {y} C{x+r*.6} {y+r*.2} {x-r*.3} {y+r*.2} {x-r*.3} {y} C{x-r*.3} {y-r*.1} {x+r*.2} {y-r*.12} {x+r*.15} {y}" stroke="#d6e8f2" stroke-width="2" fill="none"/>')
+
+def eagle(x, y, s=1):
+    return (f'<g transform="translate({x} {y}) scale({s})" stroke="#1f2442" stroke-width="1.6" stroke-linejoin="round">'
+            f'<path d="M-60 -6 C-40 -20 -20 -16 -6 -8 C6 -16 30 -22 60 -8 C40 -6 20 -2 8 2 L0 10 L-8 2 C-24 -2 -44 -2 -60 -6Z" fill="#6a4e36"/>'
+            f'<path d="M-6 -8 C-4 -16 6 -16 8 -8Z" fill="#f6efe0"/><path d="M-6 6 l6 10 l6 -10Z" fill="#f6efe0"/></g>')
