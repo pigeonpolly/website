@@ -299,3 +299,30 @@ def bryggehus(x, y, w=40, h=96, c='#c8323c'):
         t += f'<rect x="{x+w*.3:.1f}" y="{y-h+10+j*24:.1f}" width="{w*.4:.1f}" height="13" fill="#fbf6ea" stroke="{LINE}" stroke-width="1.1"/>'
     t += f'<rect x="{x+w*.36:.1f}" y="{y-h-w*.45:.1f}" width="{w*.28:.1f}" height="10" fill="#fbf6ea" stroke="{LINE}" stroke-width="1.1"/>'
     return t
+
+def sheep(x, y, s=1, flip=False):
+    sx = -s if flip else s
+    wool = ''.join(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="#f6f2ea" stroke="{LINE}" stroke-width="1.8"/>' for cx, cy, r in [(-26, -40, 14), (-10, -50, 15), (8, -50, 15), (24, -40, 14), (-16, -28, 14), (6, -26, 15), (22, -26, 12)])
+    wool += ''.join(f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="#f6f2ea"/>' for cx, cy, r in [(-26, -40, 13), (-10, -50, 14), (8, -50, 14), (24, -40, 13), (-16, -28, 13), (6, -26, 14), (22, -26, 11), (0, -38, 16)])
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M-18 -16 v20 M-6 -14 v20 M8 -14 v20 M20 -16 v20" stroke="#33333c" stroke-width="4"/>
+ {wool}
+ <path d="M30 -54 C30 -66 40 -72 48 -70 C56 -68 60 -58 58 -48 C56 -40 48 -36 40 -38 C34 -40 30 -46 30 -54Z" fill="#3a3a40"/>
+ <path d="M32 -64 l-10 -4 l6 8Z" fill="#3a3a40"/><circle cx="48" cy="-58" r="2.6" fill="#fff" stroke="none"/><circle cx="49" cy="-58" r="1.3" fill="{LINE}" stroke="none"/>
+</g>"""
+
+def waterfall(x, y0, y1, w=40):
+    t = f'<path d="M{x} {y0} C{x-6} {(y0+y1)/2} {x-4} {y1-20} {x-10} {y1} H{x+w+10} C{x+w+4} {y1-20} {x+w+6} {(y0+y1)/2} {x+w} {y0}Z" fill="#e8f2f8" stroke="{LINE}" stroke-width="1.6"/>'
+    t += ''.join(f'<path d="M{x+i} {y0+4} C{x+i-3} {(y0+y1)/2} {x+i-2} {y1-16} {x+i-5} {y1-2}" stroke="#a9c7d8" stroke-width="1.6" fill="none"/>' for i in range(6, w, 8))
+    t += ''.join(f'<circle cx="{x-10+i*12}" cy="{y1+2}" r="7" fill="#fff" stroke="#c9dbe6" stroke-width="1.2"/>' for i in range(int(w / 10) + 3))
+    return t
+
+def train(x, y, n=3, c='#3f6e4f', s=1):
+    t = f'<g transform="translate({x} {y}) scale({s})" stroke="{LINE}" stroke-width="1.8" stroke-linejoin="round">'
+    for k in range(n):
+        ox = k * 108
+        t += f'<rect x="{ox}" y="-50" width="100" height="44" rx="6" fill="{c}"/><rect x="{ox}" y="-18" width="100" height="5" fill="#e9eef3"/>'
+        t += ''.join(f'<rect x="{ox+8+i*23}" y="-42" width="17" height="16" rx="2" fill="#d9e8f2"/>' for i in range(4))
+        t += f'<circle cx="{ox+20}" cy="-4" r="5" fill="#33333c"/><circle cx="{ox+80}" cy="-4" r="5" fill="#33333c"/>'
+        if k: t += f'<path d="M{ox-8} -24 h8" stroke-width="3"/>'
+    return t + '</g>'

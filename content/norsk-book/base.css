@@ -205,3 +205,8 @@ ol.items.tr .blank.l{min-width:100%;margin-top:14px}
 .fill{flex:1 1 0!important;min-height:0;margin:12px 0 4mm;border-radius:var(--r);border:1px solid var(--line);background:#fff repeating-linear-gradient(transparent 0 25px,#e6edf3 25px 26px);background-origin:content-box;padding:28px 14px 6px;position:relative;overflow:hidden}
 .fill h3{position:absolute;top:7px;left:14px;font:600 10px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
 .citymap{display:block;width:100%;height:auto;border-radius:var(--r);border:1px solid var(--line);margin:6px 0}
+.testscore{display:grid;gap:4px;margin-top:10px;font-size:12px}
+.testscore div{padding:5px 10px;border-radius:6px;background:var(--sky)}
+.testscore div:nth-child(2){background:var(--sun)}.testscore div:nth-child(3){background:var(--rose)}
+.testscore b{display:inline-block;min-width:48px;color:var(--accent)}
+.write.tall{height:32mm}

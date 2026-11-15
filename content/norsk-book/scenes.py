@@ -216,6 +216,31 @@ def u09():
     b += bubble(300, 186, 'Unnskyld, hvor er Fløibanen?')
     return svg(600, 340, 'Pollijs ar karti Bergenā pie Brigenas namiem un zivju tirgus, kur strādā kaija Knuts', b)
 
+@scene(10)
+def u10():
+    b = sky(600, 340, '#a6c9e2', '#eef1ea', 'u10')
+    b += cloud(300, 36, .8) + cloud(520, 26, .6)
+    b += '<path d="M0 0 H190 C180 80 160 150 130 220 L0 236Z" fill="#7d8f9c" stroke="#1f2442" stroke-width="1.6"/>'
+    b += '<path d="M600 0 H420 C430 90 460 160 510 210 L600 220Z" fill="#8a9ca8" stroke="#1f2442" stroke-width="1.6"/>'
+    b += ''.join(f'<path d="M{x} {y} l{dx} {dy}" stroke="#6d7f8b" stroke-width="2" stroke-linecap="round"/>' for x, y, dx, dy in [(20, 30, 40, 26), (60, 110, 34, 20), (30, 170, 30, 16), (120, 60, 26, 30), (470, 50, 30, 26), (520, 120, 34, 22), (560, 60, 20, 30)])
+    b += '<path d="M40 10 l20 10 l-14 4Z M500 14 l24 8 l-16 6Z" fill="#fff" opacity=".85"/>'
+    b += '<path d="M190 0 C210 40 236 52 254 62 M300 62 C326 52 400 40 420 0" stroke="#1f2442" stroke-width="1.6" fill="none"/>'
+    b += '<path d="M190 0 C210 40 236 52 254 62 L300 62 C326 52 400 40 420 0Z" fill="#9aacb8"/>'
+    b += '<path d="M130 220 C200 196 360 196 510 210 L600 220 V340 H0 V236Z" fill="#7aa36a" stroke="#1f2442" stroke-width="1.6"/>'
+    b += waterfall(254, 62, 200, 46)
+    b += ''.join(spruce(x, y, h, '#4f7a64') for x, y, h in [(160, 222, 34), (188, 214, 28), (370, 212, 32), (404, 218, 40), (446, 222, 30), (560, 226, 36)])
+    b += person(226, 214, .75, '#c8323c', '#e6c27a', skirt='#c8323c')
+    b += '<g stroke="#1f2442" stroke-width="1.6"><path d="M330 214 h60 v-14 h-60Z" fill="#c9b79c"/><path d="M336 200 v-6 h48 v6" fill="#8b5f37"/><text x="340" y="210" font-family="DM Sans,sans-serif" font-size="7.5" font-weight="700" fill="#1f2442" stroke="none">KJOSFOSSEN</text></g>'
+    b += '<path d="M0 312 L600 300" stroke="#5f5a52" stroke-width="12"/><path d="M0 312 L600 300" stroke="#8b847a" stroke-width="5" stroke-dasharray="12 7"/>'
+    b += '<path d="M540 300 V230 q30 -40 60 -40 V300Z" fill="#33333c" stroke="#1f2442" stroke-width="2"/><path d="M528 300 V226 q42 -56 84 -52" fill="none" stroke="#9aa0a8" stroke-width="10"/>'
+    b += train(150, 306, 3, s=1.3)
+    b += '<g transform="translate(150 306) scale(1.3)">' + polly(36, -24, .24) + sheep(162, -26, .3, flip=True) + '</g>'
+    b += sheep(70, 330, .55) + sheep(30, 326, .42, flip=True)
+    b += grass(0, 600, 314, 338, 13, '#5f8a52', 40) + flowers(80, 160, 300, 21, ('#fff', '#f2c13d'))
+    b += '<path d="M330 80 q6 -5 12 0 q6 -5 12 0 M360 100 q5 -4 10 0 q5 -4 10 0" stroke="#1f2442" stroke-width="1.4" fill="none"/>'
+    b += bubble(30, 246, 'Se! Kjosfossen!')
+    return svg(600, 340, 'Flåmas dzelzceļa vilciens pie Kjosfosena ūdenskrituma; Pollijs un aita vagona logos', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():
