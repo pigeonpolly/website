@@ -589,3 +589,10 @@ def birch(x, y, h=70):
     t += ''.join(f'<path d="M{x-2} {y-k} h3" stroke="{LINE}" stroke-width="1.6"/>' for k in range(10, h, 14))
     t += ''.join(f'<circle cx="{x+dx}" cy="{y-h+dy}" r="{r}" fill="#9bbf6a" stroke="{LINE}" stroke-width="1.2"/>' for dx, dy, r in [(-10, 4, 11), (8, 2, 12), (0, -10, 12), (-4, 14, 9), (10, 14, 9)])
     return t + ''.join(f'<circle cx="{x+dx}" cy="{y-h+dy}" r="{r}" fill="#b5d07e"/>' for dx, dy, r in [(-6, -4, 4), (8, 0, 3)])
+
+def globe(x, y, s=1):
+    t = f'<g transform="translate({x} {y}) scale({s})" stroke="{LINE}" stroke-width="2">'
+    t += '<path d="M-24 0 h48 l-6 -16 h-36Z" fill="#7d838c"/><path d="M-4 -16 v-10 h8 v10" fill="#7d838c"/>'
+    t += '<circle cx="0" cy="-60" r="34" fill="none" stroke-width="3.5"/><ellipse cx="0" cy="-60" rx="14" ry="34" fill="none" stroke-width="2.4"/><ellipse cx="0" cy="-60" rx="34" ry="12" fill="none" stroke-width="2.4"/>'
+    t += '<path d="M0 -94 v68 M-34 -60 h68" stroke-width="2"/></g>'
+    return t

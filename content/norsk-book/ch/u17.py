@@ -3,7 +3,7 @@ CH = dict(n=17, lvl='A2', place='Lofoten, Røst', title='Hodet mitt gjør vondt'
 PAGES = [
  [opener(CH), scene('scenes/u17.svg'),
   goals(['nosaukt ķermeņa daļas;', 'pastāstīt, kas sāp, un runāt ar ārstu;', 'piederības vietniekvārdus: <span class="nw">min, mi, mitt, mine</span>;',
-         'vārdu kārtību: <span class="nw">huset mitt</span>;', 'atšķirību <span class="nw">hans</span> / <span class="nw">sin</span> (latviski — „savs”!).'], 'maps/route-17.svg'),
+         'vārdu kārtību: <span class="nw">huset mitt</span>;', 'atšķirību <span class="nw">hans</span> / <span class="nw">sin</span> (latviešu valodā — „savs”!).'], 'maps/route-17.svg'),
   say('<span class="nw">Atsjo!</span> Lofotu salas ir neticami skaistas — asi kalni tieši no jūras, sarkanas zvejnieku mājiņas, žāvētas mencas uz koka statīviem. Bet vējš un lietus izdarīja savu: esmu saaukstējies. Par laimi, Rēstā mani sagaidīja vecs draugs — tupiks Pelle!')],
 
  [sec('17A', 'Ordforråd', 'Vārdu krājums: ķermenis un veselība', first=True),

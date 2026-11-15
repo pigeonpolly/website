@@ -423,6 +423,23 @@ def u19():
     b += bubble(150, 200, 'Hva synes du?')
     return svg(600, 340, 'Pollijs zīmē Altas klinšu zīmējumus — ziemeļbriežus, laivas, cilvēkus; blakus irbe Aile', b)
 
+@scene(20)
+def u20():
+    b = sky(600, 340, '#7f9cc8', '#f6c89a', 'u20')
+    b += '<circle cx="420" cy="186" r="30" fill="#f8d36b" stroke="#1f2442" stroke-width="1.6"/><circle cx="420" cy="186" r="44" fill="#f8d36b" opacity=".25"/>'
+    b += cloud(120, 70, .9, .6) + cloud(300, 110, .6, .5)
+    b += '<rect y="200" width="600" height="140" fill="#5f7fa8"/>' + '<path d="M380 212 h80 M370 228 h100 M360 246 h120" stroke="#f8d36b" stroke-width="3" opacity=".8"/>'
+    b += ''.join(f'<path d="M{x} {212+k*16} h26" stroke="#7d9cc0" stroke-width="2"/>' for k in range(6) for x in range(20 + (k % 2) * 40, 340, 110))
+    b += '<path d="M0 340 V176 C40 170 120 172 200 178 C250 182 280 200 300 230 C310 260 316 300 320 340Z" fill="#6f6a62" stroke="#1f2442" stroke-width="2"/>'
+    b += '<path d="M0 176 C40 170 120 172 200 178 C230 180 250 186 266 194 L0 194Z" fill="#8d9a6e" stroke="#1f2442" stroke-width="1.4"/>'
+    b += ''.join(f'<path d="M{x} 260 l{20} {30}" stroke="#57534c" stroke-width="2"/>' for x in (230, 260, 280))
+    b += globe(150, 180, .9)
+    b += person(60, 186, .6, '#c8323c') + person(80, 188, .55, '#2f55a0') + person(250, 190, .6, '#e1a85a')
+    b += polly(200, 194, .4, flip=True) + gull(270, 196, .32, flip=True)
+    b += '<path d="M480 100 q6 -5 12 0 q6 -5 12 0 M520 120 q5 -4 10 0 q5 -4 10 0" stroke="#1f2442" stroke-width="1.4" fill="none"/>'
+    b += bubble(290, 60, 'Klokka er tolv, og sola skinner!')
+    return svg(600, 340, 'Pollijs un kaija Mia Nordkapā pie globusa zem pusnakts saules', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():

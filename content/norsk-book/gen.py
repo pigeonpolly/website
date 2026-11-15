@@ -155,7 +155,7 @@ def ctrl(ch, words, sents, text_title, text, qs, qa, gram_q, gram_items, gram_a,
   {ex(qtitle, f'<ol class="items wide">{qq}</ol>', numans(qa))}
   {ex(gram_q, items(gram_items, wide=True), numans(gram_a))}
   <div class="score">Mans rezultāts: <span></span> / {len(words) + len(sents) + len(qs) + len(gram_items)}</div>
-  <div class="folio"></div></section>'''
+  {FILL}<div class="folio"></div></section>'''
     return left + '\n' + right
 
 
@@ -165,7 +165,7 @@ def render_pages(ch, pages):
     for i, blocks in enumerate(pages):
         run = '' if i == 0 else (f'<div class="run">{ch["n"]}. nodaļa · {ch["title"]}</div>' if i % 2 == 0
                                  else f'<div class="run">Norsk med Polly · {ch["lvl"]}</div>')
-        fill = '' if i == 0 else FILL
+        fill = FILL
         out.append(f'<section class="page">{run}\n' + '\n'.join(blocks) + f'\n{fill}<div class="folio"></div></section>')
     return '\n'.join(out)
 
@@ -194,3 +194,66 @@ def main():
 
 if __name__ == '__main__':
     main()
+
+
+# ---------- pielikums: darbības vārdu tabula un vārdnīca ----------
+VERBS = [
+ ('å være', 'er', 'var', 'har vært', 'būt'), ('å ha', 'har', 'hadde', 'har hatt', 'būt (kādam), turēt'), ('å gjøre', 'gjør', 'gjorde', 'har gjort', 'darīt'),
+ ('å si', 'sier', 'sa', 'har sagt', 'teikt'), ('å gå', 'går', 'gikk', 'har gått', 'iet'), ('å komme', 'kommer', 'kom', 'har kommet', 'nākt'),
+ ('å se', 'ser', 'så', 'har sett', 'redzēt'), ('å ta', 'tar', 'tok', 'har tatt', 'ņemt'), ('å få', 'får', 'fikk', 'har fått', 'saņemt; drīkstēt'),
+ ('å gi', 'gir', 'ga', 'har gitt', 'dot'), ('å vite', 'vet', 'visste', 'har visst', 'zināt'), ('å stå', 'står', 'sto', 'har stått', 'stāvēt'),
+ ('å sitte', 'sitter', 'satt', 'har sittet', 'sēdēt'), ('å ligge', 'ligger', 'lå', 'har ligget', 'gulēt, atrasties'), ('å sove', 'sover', 'sov', 'har sovet', 'gulēt (miegā)'),
+ ('å drikke', 'drikker', 'drakk', 'har drukket', 'dzert'), ('å spise', 'spiser', 'spiste', 'har spist', 'ēst'), ('å skrive', 'skriver', 'skrev', 'har skrevet', 'rakstīt'),
+ ('å finne', 'finner', 'fant', 'har funnet', 'atrast'), ('å fly', 'flyr', 'fløy', 'har fløyet', 'lidot'), ('å bli', 'blir', 'ble', 'har blitt', 'kļūt, palikt'),
+ ('å dra', 'drar', 'dro', 'har dratt', 'doties'), ('å hjelpe', 'hjelper', 'hjalp', 'har hjulpet', 'palīdzēt'), ('å synge', 'synger', 'sang', 'har sunget', 'dziedāt'),
+ ('å selge', 'selger', 'solgte', 'har solgt', 'pārdot'), ('å spørre', 'spør', 'spurte', 'har spurt', 'jautāt'), ('å fortelle', 'forteller', 'fortalte', 'har fortalt', 'stāstīt'),
+ ('å vinne', 'vinner', 'vant', 'har vunnet', 'uzvarēt'), ('å gråte', 'gråter', 'gråt', 'har grått', 'raudāt'), ('å le', 'ler', 'lo', 'har ledd', 'smieties'),
+ ('å kunne', 'kan', 'kunne', 'har kunnet', 'varēt, prast'), ('å ville', 'vil', 'ville', 'har villet', 'gribēt'), ('å måtte', 'må', 'måtte', 'har måttet', 'vajadzēt'),
+ ('å skulle', 'skal', 'skulle', 'har skullet', 'grasīties'), ('å snakke', 'snakker', 'snakket', 'har snakket', 'runāt (1. gr.)'), ('å lese', 'leser', 'leste', 'har lest', 'lasīt (2. gr.)'),
+ ('å prøve', 'prøver', 'prøvde', 'har prøvd', 'mēģināt (3. gr.)'), ('å bo', 'bor', 'bodde', 'har bodd', 'dzīvot (4. gr.)'),
+]
+ORDER = 'abcdefghijklmnopqrstuvwxyzæøå'
+
+def _key(w):
+    w = re.sub(r'^(ei/en|en|ei|et|å)\s+', '', w.lower())
+    return [ORDER.index(ch) if ch in ORDER else 99 for ch in w]
+
+def appendix():
+    rows = ''.join(f'<tr><td>{a}</td><td>{b}</td><td>{c}</td><td>{d}</td><td>{e}</td></tr>' for a, b, c, d, e in VERBS)
+    half = len(VERBS) // 2 + 1
+    def vt(lst):
+        r = ''.join(f'<tr><td class="n">{a}</td><td>{b}</td><td>{c}</td><td>{d}</td><td class="lv">{e}</td></tr>' for a, b, c, d, e in lst)
+        return f'<table class="verbs"><tr><th>Infinitiv</th><th>Presens</th><th>Preteritum</th><th>Perfektum</th><th>Latviešu valodā</th></tr>{r}</table>'
+    out = f'''<section class="page"><div class="testhead"><h1>Verbtabell</h1><p>Svarīgākie neregulārie darbības vārdi un pa vienam piemēram no katras regulārās grupas.</p></div>
+{vt(VERBS[:half])}<div class="folio"></div></section>
+<section class="page"><div class="run">Verbtabell</div>{vt(VERBS[half:])}
+<div class="cmp" style="margin-top:12px"><h3>Regulārās grupas</h3>1. <b>-et</b>: snakke — snakket — har snakket · 2. <b>-te</b>: spise — spiste — har spist · 3. <b>-de</b>: prøve — prøvde — har prøvd · 4. <b>-dde</b>: bo — bodde — har bodd</div>
+{FILL}<div class="folio"></div></section>'''
+    ents = {}
+    for f in sorted(glob.glob(os.path.join(D, 'part-*.html'))):
+        if os.path.basename(f).startswith('part-9'):
+            continue
+        s = open(f).read()
+        found = re.findall(r'<tr><td class="n">(.*?)</td><td class="pr">\[(.*?)\]</td><td>(.*?)</td></tr>', s)
+        found += re.findall(r'<span><b>(.*?)</b> <i class="pr">\[(.*?)\]</i> — (.*?)</span>', s)
+        found += re.findall(r'<div><b>(.*?)</b> <i class="pr">\[(.*?)\]</i> (.*?)</div>', s)
+        for a, b, c in found:
+            a = re.sub('<.*?>', '', a).strip(); c = re.sub('<.*?>', '', c).strip()
+            if '?' in a or '!' in a or len(a.split()) > 4 or a.isupper():
+                continue
+            ents.setdefault(a.lower(), (a, b, c))
+    items_ = sorted(ents.values(), key=lambda e: _key(e[0]))
+    per = 96
+    first = 84
+    pages = [items_[:first]] + [items_[i:i + per] for i in range(first, len(items_), per)]
+    for k, chunk in enumerate(pages):
+        body = ''.join(f'<div><b>{a}</b> <i>[{b}]</i> {c}</div>' for a, b, c in chunk)
+        head = ('<div class="testhead"><h1>Ordliste</h1><p>Norvēģu–latviešu vārdnīca: visi grāmatas jaunie vārdi ar transkripciju.</p></div>' if k == 0
+                else '<div class="run">Ordliste</div>')
+        out += f'\n<section class="page">{head}<div class="gloss-list">{body}</div><div class="folio"></div></section>'
+    open(os.path.join(D, 'part-900-appendix.html'), 'w').write(out + '\n')
+    return len(items_), len(pages)
+
+
+if __name__ == '__main__':
+    print('appendix', appendix())

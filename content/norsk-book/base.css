@@ -211,3 +211,12 @@ ol.items.tr .blank.l{min-width:100%;margin-top:14px}
 .testscore b{display:inline-block;min-width:48px;color:var(--accent)}
 .write.tall{height:32mm}
 .grid2>div,.grid3>div,.grid4>div{display:flex;gap:4px;align-items:baseline;min-width:0}.grid2 .blank.l,.grid3 .blank.l,.grid4 .blank.l{min-width:8mm;flex:1}.grid3>div,.grid4>div{white-space:nowrap}
+table.verbs{width:100%;border-collapse:collapse;font-size:12px}
+table.verbs th{text-align:left;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);font-weight:600;padding:4px 6px;border-bottom:1.5px solid var(--accent)}
+table.verbs td{padding:4.5px 6px;border-bottom:1px solid var(--line)}
+table.verbs td.n{font-weight:600;color:var(--accent)}
+table.verbs td.lv{color:var(--soft)}
+.gloss-list{columns:2;column-gap:8mm;font-size:10.6px;line-height:1.35}
+.gloss-list div{break-inside:avoid;padding:1.6px 0;border-bottom:1px solid #f1ece2}
+.gloss-list b{color:var(--accent);font-weight:600}
+.gloss-list i{font-style:normal;color:var(--soft);font-size:9.6px}

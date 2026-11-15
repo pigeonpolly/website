@@ -39,7 +39,7 @@ PAGES = [
      'Først står Ina opp. Så spiser hun frokost. Og så flyr hun på jobb.', 'Piemērs')],
 
  [sec('4C', 'Grammatikk', 'Gramatika: darbības vārdu tagadne', first=True),
-  p('Vārdnīcā darbības vārds ir <b>nenoteiksmē</b> — ar vārdiņu <span class="nw">å</span> priekšā (latviski: ēs<b>t</b>, dzer<b>t</b>). Lai iegūtu <b>tagadni</b>, pievieno <b>-r</b>. Un forma visām personām ir viena!'),
+  p('Vārdnīcā darbības vārds ir <b>nenoteiksmē</b> — ar vārdiņu <span class="nw">å</span> priekšā (latviešu valodā: ēs<b>t</b>, dzer<b>t</b>). Lai iegūtu <b>tagadni</b>, pievieno <b>-r</b>. Un forma visām personām ir viena!'),
   formula('å spise → spiser', 'å lese → leser', 'å bo → bor', 'å gå → går'),
   gtable([('jeg', 'spiser', 'es ēdu'), ('du', 'spiser', 'tu ēd'), ('han / hun', 'spiser', 'viņš / viņa ēd'), ('vi', 'spiser', 'mēs ēdam'),
           ('dere', 'spiser', 'jūs ēdat'), ('de', 'spiser', 'viņi ēd')], head=['Persona', 'Tagadne', 'Latviešu valodā'], hl_last=False),

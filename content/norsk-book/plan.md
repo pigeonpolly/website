@@ -53,3 +53,9 @@ Grammatikk (объяснение, сравнение с латышским, «Uz
 - Latviešu tekstā nerakstīt „norvēģiski”, „latviski” — tikai „norvēģu valodā”, „latviešu valodā” (Алина).
 - DM Serif Display — только крупные заголовки (h1, h2, большие буквы); в мелком тексте и репликах — DM Sans (Алина: плохо читается).
 - Советы Полли: прямо и понятно; пары похожих слов — таблицей: слово, транскрипция, перевод, простой пример с переводом.
+
+## Сборка (15.11)
+- Главы 2–20 — данные в ch/uNN.py (блоки из gen.py); главы 0–1 — part-010-a.html, part-020-a.html (руками); разворот самопроверки — CTRL в ch/uNN.py.
+- Тесты: EXTRA в ch/u10.py (A1→A2) и ch/u20.py (A2). Приложение (глаголы, словарь) — gen.py appendix().
+- Картинки: art.py (Полли, чайка, сцены 0–1, обложка), detail.py (детали и персонажи), scenes.py (сцены 2–20), карты маршрута — maps/route-NN.svg (world-atlas).
+- `python3 make_book.py` → book.html; `node shoot.js ПАПКА pdf` → norsk-med-polly.pdf + проверка переполнения.

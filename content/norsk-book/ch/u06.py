@@ -45,7 +45,7 @@ PAGES = [
   cols(warn('Īsie et-vārdi — bez galotnes!', 'Vienzilbes <b>et</b>-vārdiem daudzskaitlī galotnes <b>nav</b>:<br><span class="nw">et hus → hus</span> · <span class="nw">et rom → rom</span> · <span class="nw">et bord → bord</span> · <span class="nw">et barn → barn</span><br><i>to hus</i> = divas mājas.'),
        cmp('Neregulārie', 'Daži vārdi mainās paši:<br><span class="nw">en mann → menn</span> (vīrieši)<br><span class="nw">ei bok → bøker</span> (grāmatas)<br><span class="nw">en bror → brødre</span> (brāļi)<br><span class="nw">ei datter → døtre</span> (meitas)')),
   h3('2. Det er … / Det finnes … — „ir”'),
-  p('Lai pateiktu, ka kaut kas kaut kur <b>ir</b> (latviski: <i>istabā ir gulta</i>), saka <span class="nw">det er</span> vai — mazliet formālāk — <span class="nw">det finnes</span> [ˈfines]:'),
+  p('Lai pateiktu, ka kaut kas kaut kur <b>ir</b> (latviešu valodā: <i>istabā ir gulta</i>), saka <span class="nw">det er</span> vai — mazliet formālāk — <span class="nw">det finnes</span> [ˈfines]:'),
   formula('Det er ei seng i rommet.', 'Det finnes ikke strøm.', 'I hytta er det en peis.'),
   p('Atceries V2: ja teikums sākas ar vietu, <span class="nw">det</span> stāv aiz darbības vārda — <span class="nw">I hytta <b>er det</b> en peis.</span>', 'hint'),
   ex('Uzraksti daudzskaitli.', grid(['en stol → ___', 'ei seng → ___', 'et hus → ___', 'en lampe → ___', 'et vindu → ___', 'en mann → ___', 'ei bok → ___', 'et rom → ___'], 4),

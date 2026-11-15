@@ -10,5 +10,5 @@ console.log(o.join(' '));
 const pages=await p.$$('.page');
 for(const spec of (process.env.SHEETS||'').split(',').filter(Boolean)){const [name,r]=spec.split(':');const [from,to]=r.split('-').map(x=>+x-1);const a=await pages[from].boundingBox(),z=await pages[to].boundingBox();
  await p.screenshot({path:out+'/'+name+'.png',clip:{x:0,y:a.y-10,width:1640,height:z.y+z.height-a.y+20},fullPage:true});}
-if(process.argv[3]){await p.emulateMedia({media:'print'});await p.pdf({path:__dirname+'/norsk-med-polly-0-1.pdf',format:'A4',printBackground:true,preferCSSPageSize:true});}
+if(process.argv[3]){await p.emulateMedia({media:'print'});await p.pdf({path:__dirname+'/norsk-med-polly.pdf',format:'A4',printBackground:true,preferCSSPageSize:true});}
 await b.close()})()
