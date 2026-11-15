@@ -124,6 +124,34 @@ def u05():
     b += bubble(60, 190, 'Går du på ski?')
     return svg(600, 340, 'Pollijs un žagata Sigrīda pie Holmenkollen tramplīna ziemā', b)
 
+@scene(6)
+def u06():
+    b = logs(0, 0, 600, 260)
+    b += '<path d="M0 0 H600 V18 H0Z" fill="#8b5f37"/>'
+    out = sky(600, 340, '#c4d6e6', '#f2f5f8', 'u6s') + '<rect y="120" width="600" height="220" fill="#fbfdff"/>' + ''.join(spruce_snow(x, y, h) for x, y, h in [(30, 150, 70), (70, 160, 60), (110, 150, 80)])
+    b += window(40, 50, 130, 110, out, '#f6efe0')
+    b += '<g stroke="#1f2442" stroke-width="1.6"><path d="M30 46 C60 70 50 120 66 170 H24 V46Z" fill="#c8323c"/><path d="M180 46 C150 70 160 120 144 170 H186 V46Z" fill="#c8323c"/></g>'
+    b += '<g fill="#fff" opacity=".9">' + ''.join(f'<path d="M{x} {y} l3 -3 l3 3 l-3 3Z"/>' for x, y in [(44, 60), (90, 72), (140, 64), (120, 100), (60, 110)]) + '</g>'
+    # kamīns
+    b += '<g stroke="#1f2442" stroke-width="2" stroke-linejoin="round"><path d="M300 260 V120 h120 V260Z" fill="#9aa0a8"/><path d="M290 120 h140 v-12 h-140Z" fill="#7d838c"/>'
+    b += '<path d="M322 260 V180 q0 -24 38 -24 q38 0 38 24 V260Z" fill="#33333c"/></g>'
+    b += ''.join(f'<path d="M300 {y} h120" stroke="#858b94" stroke-width="1.2"/>' for y in range(134, 260, 18))
+    b += fire(334, 252, 52)
+    b += candle(310, 108, 18) + candle(330, 108, 26) + candle(410, 108, 14)
+    b += '<g stroke="#1f2442" stroke-width="1.6"><rect x="350" y="70" width="40" height="30" fill="#e9d6b4"/><path d="M356 94 l10 -14 l8 8 l6 -6 l6 12Z" fill="#7fa3c4"/></g>'
+    # grāmatu plaukts
+    b += shelf(460, 90, 120, ''.join(f'<rect x="{464+i*12}" y="{90-h}" width="10" height="{h}" fill="{c}" stroke="#1f2442" stroke-width="1.2"/>' for i, (h, c) in enumerate([(26, '#c8323c'), (22, '#2f55a0'), (28, '#e1a85a'), (20, '#5f8a72'), (24, '#9b7650')])) + candle(560, 90, 14))
+    b += shelf(460, 140, 120, jar(470, 140, '#c8323c') + jar(490, 140, '#e9b45f') + cup(520, 140, '#c8d7e6', False) + plant(556, 140, .5))
+    b += skis(200, 262)
+    b += '<rect y="260" width="600" height="80" fill="#b98a58"/>' + ''.join(f'<path d="M{x} 260 L{x-20} 340" stroke="#a37548" stroke-width="2"/>' for x in range(60, 640, 60))
+    b += rug(330, 300, 220, 40)
+    b += armchair(460, 290, '#2f6f8a') + owl(496, 262, .55)
+    b += '<g stroke="#1f2442" stroke-width="1.6"><path d="M548 252 c10 -10 20 -10 30 0 l-6 20 h-18Z" fill="#f6efe0"/><path d="M552 260 h22 M554 266 h18" stroke="#c8323c" stroke-width="2"/></g>'
+    b += polly(260, 318, .55, flip=True)
+    b += '<g stroke="#1f2442" stroke-width="1.6"><rect x="140" y="276" width="44" height="34" rx="4" fill="#e1a85a"/><path d="M146 276 v-8 h32 v8" fill="none"/></g>'
+    b += bubble(60, 210, 'Så koselig!')
+    return svg(600, 340, 'Pollijs un pūce Ulfs omulīgā kalnu mājiņā pie kamīna', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():

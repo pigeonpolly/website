@@ -68,7 +68,7 @@ PAGES = [
         ['Lielākā daļa norvēģu uz darbu un skolu ņem līdzi <span class="nw">matpakke</span> — maizītes ar sieru, desu vai aknu pastēti, ietītas īpašā papīrā. Karstas pusdienas dienas vidū ēd retāk.',
          'Darba diena bieži beidzas ap 16:00, un ap 17:00 visa ģimene ēd <span class="nw">middag</span> — vienīgo silto maltīti. Vēlāk vakarā vēl ir <span class="nw">kveldsmat</span>: tēja un maizītes.'],
         [('ei/en matpakke', 'æi ˈma:tpake', 'līdzpaņemtās maizītes'), ('matpapir', 'ˈma:tpapi:r', 'pārtikas papīrs'),
-         ('ei/en brødskive', 'æi ˈbrø:ši:ve', 'maizes šķēle'), ('leverpostei', 'ˈlevərpustæi', 'aknu pastēte'), ('pålegg', 'ˈpo:leg', 'tas, ko liek uz maizes')],
+         ('ei/en brødskive', 'æi ˈbrø:ši:ve', 'maizes šķēle'), ('leverpostei', 'ˈleverpustæi', 'aknu pastēte'), ('pålegg', 'ˈpo:leg', 'tas, ko liek uz maizes')],
         ex('Kas ir tavā matpakke? Uzraksti norvēģu valodā.', write(['I matpakken min har jeg ___']),
            'I matpakken min har jeg to brødskiver med ost og et eple.', 'Piemērs')),
   fact('☕', 'Norvēģi ir vieni no lielākajiem kafijas dzērājiem pasaulē — gandrīz 10 kg kafijas uz cilvēku gadā. Kafiju dzer no rīta, darbā, pēc vakariņām un pat vakarā. Populārākā ir parasta filtra kafija, ko sauc vienkārši <span class="nw">kaffe</span>.'),

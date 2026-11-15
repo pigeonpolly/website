@@ -163,3 +163,47 @@ def flag(x, y, h=50, s=1):
     return (f'<g transform="translate({x} {y}) scale({s})"><path d="M0 0 v-{h}" stroke="{LINE}" stroke-width="2"/>'
             f'<rect x="0" y="-{h}" width="26" height="18" fill="#c8323c" stroke="{LINE}" stroke-width="1.2"/>'
             f'<path d="M0 -{h-9} h26 M9 -{h} v18" stroke="#fff" stroke-width="5"/><path d="M0 -{h-9} h26 M9 -{h} v18" stroke="#1f3a68" stroke-width="2.4"/></g>')
+
+def owl(x, y, s=1, flip=False):
+    sx = -s if flip else s
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M-8 -2 l-4 8 M-8 -2 l0 9 M-8 -2 l4 8 M8 -2 l-4 8 M8 -2 l0 9 M8 -2 l4 8" stroke="#e1a85a" stroke-width="2.4"/>
+ <path d="M-30 -40 C-32 -80 -20 -100 0 -100 C20 -100 32 -80 30 -40 C28 -10 16 0 0 0 C-16 0 -28 -10 -30 -40Z" fill="#9b7650"/>
+ <path d="M-18 -50 C-18 -26 -10 -8 0 -8 C10 -8 18 -26 18 -50 C12 -56 -12 -56 -18 -50Z" fill="#e9d6b4"/>
+ <path d="M-10 -44 l4 4 l4 -4 M2 -44 l4 4 l4 -4 M-8 -30 l4 4 l4 -4 M4 -30 l4 4 l4 -4 M-4 -18 l4 4 l4 -4" stroke="#b9956a" stroke-width="1.4" fill="none"/>
+ <path d="M-22 -96 L-28 -112 L-12 -100Z M22 -96 L28 -112 L12 -100Z" fill="#7a5a3e"/>
+ <circle cx="-12" cy="-78" r="11" fill="#f6efe0"/><circle cx="12" cy="-78" r="11" fill="#f6efe0"/>
+ <circle cx="-12" cy="-78" r="6" fill="#f2b23d"/><circle cx="12" cy="-78" r="6" fill="#f2b23d"/>
+ <circle cx="-11" cy="-78" r="3" fill="{LINE}" stroke="none"/><circle cx="13" cy="-78" r="3" fill="{LINE}" stroke="none"/>
+ <path d="M-4 -70 L0 -60 L4 -70Z" fill="#e1a85a"/>
+ <path d="M-30 -60 C-40 -40 -34 -18 -22 -8" fill="none"/><path d="M30 -60 C40 -40 34 -18 22 -8" fill="none"/>
+ <path d="M-14 -66 h-8 M14 -66 h8" stroke-width="1.2"/>
+ <circle cx="-12" cy="-78" r="13" fill="none" stroke-width="1.6"/><circle cx="12" cy="-78" r="13" fill="none" stroke-width="1.6"/><path d="M1 -78 h-2" stroke-width="1.6"/>
+</g>"""
+
+def candle(x, y, h=20, c='#f6efe0'):
+    return (f'<g stroke="{LINE}" stroke-width="1.4"><rect x="{x-3}" y="{y-h}" width="6" height="{h}" fill="{c}"/>'
+            f'<path d="M{x} {y-h-2} q4 -6 0 -12 q-4 6 0 12Z" fill="#f2b23d"/><path d="M{x-6} {y} h12" stroke-width="2"/></g>')
+
+def fire(x, y, w=50):
+    return (f'<g stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round"><path d="M{x} {y} C{x-4} {y-24} {x+10} {y-30} {x+8} {y-46} C{x+22} {y-34} {x+28} {y-22} {x+26} {y-34} C{x+40} {y-20} {x+w} {y-10} {x+w} {y}Z" fill="#f2a33a"/>'
+            f'<path d="M{x+12} {y} C{x+10} {y-14} {x+18} {y-18} {x+18} {y-26} C{x+28} {y-16} {x+34} {y-10} {x+36} {y}Z" fill="#f6d36b" stroke="none"/>'
+            f'<path d="M{x-6} {y+2} h{w+12}" stroke="#7a5a3e" stroke-width="5"/></g>')
+
+def logs(x, y, w, h, c='#c99a64', c2='#b7864f'):
+    t = f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="{c}"/>'
+    t += ''.join(f'<path d="M{x} {y+i} H{x+w}" stroke="{c2}" stroke-width="2"/>' for i in range(14, int(h), 16))
+    return t
+
+def rug(x, y, w=140, h=24, c='#c8323c'):
+    return (f'<ellipse cx="{x}" cy="{y}" rx="{w/2}" ry="{h/2}" fill="{c}" stroke="{LINE}" stroke-width="1.6"/>'
+            f'<ellipse cx="{x}" cy="{y}" rx="{w/2-12}" ry="{h/2-5}" fill="none" stroke="#f3e6d0" stroke-width="2" stroke-dasharray="6 4"/>')
+
+def armchair(x, y, c='#2f6f8a'):
+    return (f'<g stroke="{LINE}" stroke-width="2" stroke-linejoin="round"><path d="M{x} {y} v-60 q0 -14 14 -14 h44 q14 0 14 14 v60" fill="{c}"/>'
+            f'<rect x="{x-8}" y="{y-34}" width="16" height="34" rx="6" fill="{c}"/><rect x="{x+64}" y="{y-34}" width="16" height="34" rx="6" fill="{c}"/>'
+            f'<rect x="{x+6}" y="{y-26}" width="60" height="18" rx="4" fill="#e9d6b4"/><path d="M{x} {y} v8 M{x+72} {y} v8" stroke-width="3"/></g>')
+
+def skis(x, y):
+    return (f'<g stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round"><path d="M{x} {y} l6 -110 l6 0 l-4 110Z" fill="#c8323c"/>'
+            f'<path d="M{x+14} {y} l8 -108 l6 2 l-6 106Z" fill="#c8323c"/><path d="M{x+30} {y} l-2 -96 M{x+38} {y} l2 -96" stroke-width="2"/></g>')
