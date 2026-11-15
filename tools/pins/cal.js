@@ -161,7 +161,7 @@ const pinText = (a, d, w, n) => {
   const mo = MON[a.m - 1], id = `${YEAR}-${pad(a.m)}-${w}`;
   return { n, type: 'Календарь', season: a.season, title: TITLE[d](mo, w),
     desc: `A free ${mo} ${YEAR} calendar with my illustration: ${a.scene}. ${STYLE[d][0].toUpperCase() + STYLE[d].slice(1)} design, ${WK[w][1]}. Download it free in high resolution to print or use as a desktop or phone background. More months, US and EU versions on my site.`,
-    alt: `${mo} ${YEAR} monthly calendar, ${WK[w][0].toLowerCase()}, in a ${STYLE[d]} style under an illustration of ${a.scene.charAt(0).toLowerCase() + a.scene.slice(1)}.`,
+    alt: `${mo} ${YEAR} monthly calendar, ${WK[w][0]}, in a ${STYLE[d]} style under an illustration of ${a.scene}.`,
     link: `${SITE}/freebies/?f=${id}&d=${d + 1}&${UTM}`, media: `${SITE}/images/pins/pin-${n}.jpg`,
     topics: `${mo} calendar ${YEAR}, Printable calendar, Aesthetic calendar, ${WK[w][0]} calendar, ${a.tags}` };
 };
@@ -169,8 +169,8 @@ const pinText = (a, d, w, n) => {
 const YT = [w => `${YEAR} Yearly Calendar Printable, ${WK[w][0]} | Cozy Illustrated Year at a Glance`,
   w => `Aesthetic ${YEAR} Calendar, ${WK[w][0]} | Free Printable Year Planner`, w => `Free ${YEAR} Year at a Glance Calendar (${WK[w][0]}) | Cute Printable`];
 const yearText = (d, w, n) => ({ n, type: 'Календарь', season: 'Круглый год', title: YT[d](w),
-  desc: `A free ${YEAR} calendar, all twelve months on one page, with my illustration of ${YART.scene.charAt(0).toLowerCase() + YART.scene.slice(1)}. ${STYLE[d][0].toUpperCase() + STYLE[d].slice(1)} design, ${WK[w][1]}. Download it free in high resolution to print for your wall, desk or planner. Monthly calendars, US and EU versions on my site.`,
-  alt: `${YEAR} yearly calendar with all twelve months, ${WK[w][0].toLowerCase()}, in a ${STYLE[d]} style under an illustration of ${YART.scene.charAt(0).toLowerCase() + YART.scene.slice(1)}.`,
+  desc: `A free ${YEAR} calendar, all twelve months on one page, with my illustration: ${YART.scene}. ${STYLE[d][0].toUpperCase() + STYLE[d].slice(1)} design, ${WK[w][1]}. Download it free in high resolution to print for your wall, desk or planner. Monthly calendars, US and EU versions on my site.`,
+  alt: `${YEAR} yearly calendar with all twelve months, ${WK[w][0]}, in a ${STYLE[d]} style under an illustration of ${YART.scene}.`,
   link: `${SITE}/freebies/?f=${YEAR}-year-${w}&d=${d + 1}&${UTM}`, media: `${SITE}/images/pins/pin-${n}.jpg`,
   topics: `${YEAR} calendar, Yearly calendar printable, Year at a glance, ${WK[w][0]} calendar, Aesthetic planner` });
 
@@ -211,7 +211,7 @@ const yearText = (d, w, n) => ({ n, type: 'Календарь', season: 'Кру�
       await shoot(page, WALL(a, colors(a)), full); mg(full, path.join(OUT, 'wall/t', a.key + '.jpg'), 300); console.log('wall', a.key); }
     await page.close();
   }
-  fs.unlinkSync(f); await b.close();
+  if (fs.existsSync(f)) fs.unlinkSync(f); await b.close();
   // данные страницы и тексты пинов — всегда по всем месяцам
   const im = p => '/images/freebies/' + p;
   const data = {
