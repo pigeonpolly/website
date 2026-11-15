@@ -1,0 +1,21 @@
+/* /freebies/ (docs/freebies.md): карточки как на /learn/ (.vc из v2.css), превью — веер из 3 дизайнов */
+.fb-g{grid-template-columns:repeat(4,minmax(0,1fr))}
+.fb-c .th{aspect-ratio:1/1;background:var(--sheet,#F3EEE6)}
+.fb-c .th img{position:absolute;top:12%;width:46%;height:auto;aspect-ratio:2/3;object-fit:cover;box-shadow:0 8px 18px rgba(31,35,38,.22);transition:transform .25s}
+.fb-c .th .d1{left:6%;transform:rotate(-7deg)}.fb-c .th .d3{right:6%;transform:rotate(7deg)}.fb-c .th .d2{left:27%;z-index:1;top:9%}
+a.fb-c:hover .th .d1{transform:rotate(-11deg) translateX(-6px)}a.fb-c:hover .th .d3{transform:rotate(11deg) translateX(6px)}
+.fb-c.wall .th img{left:50%;top:7%;width:42%;aspect-ratio:1179/2556;transform:translateX(-50%);border-radius:10px;border:3px solid #1C2430}
+.fb-c .bd{z-index:2}.fb-c b{font-size:21px}
+.fb-g a.vc:nth-child(n){transform:none}.fb-g a.vc:hover{transform:translateY(-4px)}
+.fb-g .fb-more{grid-column:span 2}
+.fb-wait{color:var(--mut)}
+.fb-box .colbox-in{max-width:520px}
+.fb-box .fb-big{aspect-ratio:2/3;object-fit:contain;max-height:52vh;width:auto;margin:0 auto;background:#F3EEE6}
+.fb-ds{display:flex;justify-content:center;gap:10px;margin-top:12px}
+.fb-ds button{border:2px solid transparent;border-radius:6px;padding:2px;background:none;cursor:pointer;width:62px}
+.fb-ds button img{display:block;width:100%;aspect-ratio:2/3;object-fit:cover;border-radius:3px}
+.fb-ds button[aria-pressed=true]{border-color:var(--acc,#534AB7)}
+.fb-s{font-size:14px;color:#5D6670}.fb-use{font-size:12px;color:#5D6670;margin-top:12px !important}
+@media(max-width:1100px){.fb-g{grid-template-columns:repeat(3,minmax(0,1fr))}.fb-g .fb-more{grid-column:auto}}
+@media(max-width:900px){.fb-g{grid-template-columns:repeat(2,minmax(0,1fr))}}
+@media(max-width:560px){.fb-g{gap:16px}.fb-c b{font-size:17px}.fb-c .tx{padding:12px 12px 14px}.fb-c .go{display:none}.fb-g .fb-more{grid-column:span 2}}

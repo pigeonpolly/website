@@ -84,6 +84,8 @@ PAGES = [
      "The Pigeon Polly advent calendar: from December 1 to 31 open a window a day and a pixel bird flies out with a gift for your profile."),
     ("palettes", "Palettes", "palettes.html",
      "Color palettes from Pigeon Polly watercolors and sketchbook pages: six colors with HEX codes from every artwork. Copy a color, pick a palette and draw."),
+    ("freebies", "Freebies", "freebies.html",
+     "Free printable calendars and phone wallpapers with the art of Alina Otkinska and Pigeon Polly: monthly and yearly 2027 calendars, week starting on Monday or Sunday."),
     ("learn", "Lessons", "preview-learn.html",
      "Watercolour and ink lessons by Alina Otkinska: free videos open to everyone and extra video lessons for signed-in visitors."),
     # страница одного видео: адрес /learn/v/<id>/ (worker отдаёт этот файл), видео рисует v2.js по адресу
@@ -99,7 +101,7 @@ PAGES = [
 # готовые, но пока не открытые страницы: не попадают в sitemap
 UNLISTED = {"blog-editor", "admin", "garden", "learn/watch"}
 # редизайн 2.0: страницы на новом шаблоне src/layout-v2.html (шапка, подвал, сезоны — site/assets/v2.css, v2.js)
-V2 = {"", "learn", "learn/watch", "books", "sketchbook", "blog"}
+V2 = {"", "learn", "learn/watch", "books", "sketchbook", "blog", "freebies"}
 # часть 5: все остальные страницы — на src/layout-v2-lab.html (новая шапка и подвал, внутри старые style.css и скрипты как есть)
 # ключ правок «Править страницу» (data-ppb): у новых страниц — прежний, с /preview/, чтобы сохранённые правки не потерялись
 EDIT_KEY = {"": "preview", "learn": "preview-learn", "books": "preview-guides", "sketchbook": "preview-about"}
