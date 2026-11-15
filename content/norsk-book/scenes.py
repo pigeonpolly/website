@@ -368,6 +368,23 @@ def u16():
     b += bubble(240, 300, 'Hvor mye koster jakka?')
     return svg(600, 340, 'Pollijs jaunā dzeltenā lietusjakā pie Saltstraumena virpuļiem un tilta; krauklis Kore pārdod jakas', b)
 
+@scene(17)
+def u17():
+    b = sky(600, 340, '#a9c6de', '#f1ece2', 'u17')
+    b += cloud(120, 36) + cloud(500, 46, .7)
+    b += '<path d="M0 220 L40 120 L70 160 L110 60 L150 140 L190 90 L230 170 L270 110 L320 200 L360 120 L400 70 L440 150 L480 100 L530 180 L570 120 L600 160 V240 H0Z" fill="#7d8f9c" stroke="#1f2442" stroke-width="1.6" stroke-linejoin="round"/>'
+    b += '<path d="M100 76 L110 60 L120 78 M390 86 L400 70 L412 88" fill="none" stroke="#fff" stroke-width="5"/>'
+    b += '<path d="M0 220 C120 210 260 222 400 214 C480 210 560 216 600 212 V240 H0Z" fill="#6f8f6a" stroke="#1f2442" stroke-width="1.4"/>'
+    b += water(236, c='#6f9cbc')
+    b += rorbu(20, 232, 62) + rorbu(96, 236, 56) + rorbu(166, 232, 64) + rorbu(450, 234, 58)
+    b += '<path d="M0 268 C100 260 200 274 300 270 C400 266 500 276 600 270 V340 H0Z" fill="#9b968a" stroke="#1f2442" stroke-width="1.6"/>'
+    b += hjell(330, 300, 170, 66)
+    b += grass(0, 320, 280, 336, 41, '#7f8a58', 30)
+    b += puffin(260, 330, .62, flip=True)
+    b += polly(150, 332, .5, extra='<path d="M-44 -96 Q-4 -84 36 -98 L38 -84 Q0 -72 -46 -82Z" fill="#2f6f8a"/><path d="M-24 -86 l-4 26" stroke="#2f6f8a" stroke-width="8"/><path d="M-60 -122 l26 4" stroke="#1f2442" stroke-width="3"/><path d="M-62 -123 l6 1" stroke="#c8323c" stroke-width="4"/>')
+    b += bubble(60, 160, 'Atsjo! Jeg er forkjølet…')
+    return svg(600, 340, 'Saaukstējies Pollijs ar šalli un termometru Lofotos pie sarkanajām zvejnieku mājiņām un žāvētu mencu statīviem; blakus tupiks Pelle', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():

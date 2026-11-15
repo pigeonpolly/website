@@ -482,3 +482,43 @@ def eagle(x, y, s=1):
     return (f'<g transform="translate({x} {y}) scale({s})" stroke="#1f2442" stroke-width="1.6" stroke-linejoin="round">'
             f'<path d="M-60 -6 C-40 -20 -20 -16 -6 -8 C6 -16 30 -22 60 -8 C40 -6 20 -2 8 2 L0 10 L-8 2 C-24 -2 -44 -2 -60 -6Z" fill="#6a4e36"/>'
             f'<path d="M-6 -8 C-4 -16 6 -16 8 -8Z" fill="#f6efe0"/><path d="M-6 6 l6 10 l6 -10Z" fill="#f6efe0"/></g>')
+
+def puffin(x, y, s=1, flip=False):
+    sx = -s if flip else s
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="0" cy="8" rx="30" ry="5" fill="#000" opacity=".08" stroke="none"/>
+ <path d="M-8 -2 l-4 10 h12Z M8 -2 l0 10 h12Z" fill="#f08a3c"/>
+ <path d="M-26 -40 C-30 -76 -12 -96 6 -96 C26 -96 34 -76 32 -44 C30 -14 18 0 2 0 C-14 0 -24 -14 -26 -40Z" fill="#26282f"/>
+ <path d="M-16 -50 C-18 -30 -10 -8 2 -8 C16 -8 22 -28 20 -50 C12 -56 -8 -56 -16 -50Z" fill="#fbf8f1"/>
+ <path d="M-12 -92 C-22 -84 -22 -66 -12 -60 C0 -54 18 -58 22 -70 C24 -82 16 -92 6 -94Z" fill="#f2efe6"/>
+ <path d="M18 -82 C30 -84 38 -78 40 -70 C38 -62 30 -60 18 -64Z" fill="#e8562f"/><path d="M20 -74 C26 -76 32 -74 36 -71" stroke="#f6c445" stroke-width="2" fill="none"/>
+ <path d="M18 -82 v18" stroke="#9aa0a8" stroke-width="3"/>
+ <circle cx="6" cy="-78" r="3" fill="{LINE}" stroke="none"/><path d="M0 -84 l4 2 M8 -72 l6 4" stroke="#c8323c" stroke-width="1.4"/>
+ <path d="M24 -40 C30 -30 28 -18 20 -10" fill="none"/>
+</g>"""
+
+def hjell(x, y, w=140, h=60):
+    t = f'<g stroke="{LINE}" stroke-width="2.4"><path d="M{x} {y} L{x+10} {y-h} M{x+w} {y} L{x+w-10} {y-h} M{x+w/2} {y} V{y-h}" stroke="#7a5a3e"/>'
+    t += f'<path d="M{x+6} {y-h} H{x+w-6} M{x+8} {y-h*.55} H{x+w-8}" stroke="#7a5a3e"/></g>'
+    for row, yy in ((0, y - h), (1, y - h * .55)):
+        for i in range(int((w - 20) / 10)):
+            fx = x + 12 + i * 10
+            t += f'<path d="M{fx} {yy+2} q-4 14 0 26 l3 4 l3 -4 q4 -12 0 -26Z" fill="#cdb796" stroke="{LINE}" stroke-width=".9"/>'
+    return t
+
+def rorbu(x, y, w=60, h=34):
+    from art import house
+    t = ''.join(f'<path d="M{x+i} {y} v22" stroke="{LINE}" stroke-width="4"/><path d="M{x+i} {y} v22" stroke="#7a5a3e" stroke-width="2.4"/>' for i in (4, w / 2, w - 4))
+    return t + house(x, y, w, h, '#b8322f', '#3a3f55')
+
+def eider(x, y, s=1, flip=False):
+    sx = -s if flip else s
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M-6 -8 l-6 8 h12Z M8 -8 l0 8 h12Z" fill="#7a7a70"/>
+ <path d="M-34 -30 C-36 -54 -10 -60 14 -56 C32 -52 40 -42 36 -28 C32 -12 16 -8 -2 -8 C-22 -8 -32 -16 -34 -30Z" fill="#9b7650"/>
+ <path d="M-24 -40 C-10 -50 10 -48 22 -40" stroke="#7a5a3e" stroke-width="2" fill="none"/>
+ <path d="M14 -56 C16 -74 28 -82 40 -80 C52 -78 56 -66 50 -56 C44 -48 30 -46 22 -48Z" fill="#a8835c"/>
+ <path d="M50 -70 C60 -70 70 -66 72 -60 C64 -58 56 -58 50 -60Z" fill="#7d8a7a"/>
+ <circle cx="40" cy="-68" r="2.6" fill="{LINE}" stroke="none"/>
+ <path d="M26 -84 c4 -8 18 -8 20 0" fill="#fff"/><path d="M34 -90 v-6 M30 -93 h8" stroke="#c8323c" stroke-width="2"/>
+</g>"""
