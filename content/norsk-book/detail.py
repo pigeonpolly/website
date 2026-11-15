@@ -207,3 +207,40 @@ def armchair(x, y, c='#2f6f8a'):
 def skis(x, y):
     return (f'<g stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round"><path d="M{x} {y} l6 -110 l6 0 l-4 110Z" fill="#c8323c"/>'
             f'<path d="M{x+14} {y} l8 -108 l6 2 l-6 106Z" fill="#c8323c"/><path d="M{x+30} {y} l-2 -96 M{x+38} {y} l2 -96" stroke-width="2"/></g>')
+
+def goat(x, y, s=1, flip=False, c='#f1ece2'):
+    sx = -s if flip else s
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="0" cy="6" rx="46" ry="6" fill="#000" opacity=".08" stroke="none"/>
+ <path d="M-30 -30 L-32 4 M-18 -28 L-18 4 M18 -28 L20 4 M30 -30 L32 4" stroke-width="5"/>
+ <path d="M-30 -30 L-32 4 M-18 -28 L-18 4 M18 -28 L20 4 M30 -30 L32 4" stroke="{c}" stroke-width="2.4"/>
+ <path d="M-42 -46 C-44 -66 -20 -72 10 -70 C34 -68 42 -56 40 -40 C38 -26 20 -22 0 -22 C-24 -22 -40 -28 -42 -46Z" fill="{c}"/>
+ <path d="M-42 -54 l-8 -6 l4 10Z" fill="{c}"/>
+ <path d="M30 -64 C34 -80 44 -92 56 -92 C68 -92 72 -80 70 -70 C68 -60 60 -54 50 -56 C42 -58 36 -60 30 -60Z" fill="{c}"/>
+ <path d="M52 -92 C48 -106 40 -112 32 -112 M60 -92 C60 -106 54 -114 46 -116" fill="none" stroke="#9b8a72" stroke-width="3"/>
+ <path d="M48 -86 l-14 -4 l6 10Z" fill="{c}"/>
+ <path d="M66 -60 C64 -48 60 -44 56 -40" fill="none" stroke-width="1.8"/><path d="M58 -56 l-4 18 l8 -6Z" fill="#d9cfbd"/>
+ <circle cx="60" cy="-80" r="3" fill="{LINE}" stroke="none"/><path d="M68 -70 l2 2" />
+ <path d="M-10 -60 C0 -64 10 -64 20 -60" stroke="#d9cfbd" stroke-width="1.6" fill="none"/>
+</g>"""
+
+def turfhouse(x, y, w=90, h=50, c='#8b5f37'):
+    t = f'<rect x="{x}" y="{y-h}" width="{w}" height="{h}" fill="{c}" stroke="{LINE}" stroke-width="1.8"/>'
+    t += ''.join(f'<path d="M{x} {y-h+i} H{x+w}" stroke="#6f4a2a" stroke-width="1.6"/>' for i in range(8, h, 9))
+    t += f'<path d="M{x-8} {y-h} L{x+w/2} {y-h-h*.55} L{x+w+8} {y-h}Z" fill="#7aa36a" stroke="{LINE}" stroke-width="1.8" stroke-linejoin="round"/>'
+    t += ''.join(f'<path d="M{x+i} {y-h-h*.1} l-2 -6 M{x+i} {y-h-h*.1} l3 -6" stroke="#5f8a52" stroke-width="1.4"/>' for i in range(10, w, 14))
+    t += f'<rect x="{x+w*.12}" y="{y-h*.7}" width="{w*.2}" height="{h*.3}" fill="#f6e7c4" stroke="{LINE}" stroke-width="1.4"/><rect x="{x+w*.6}" y="{y-h*.6}" width="{w*.18}" height="{h*.6}" fill="#c8323c" stroke="{LINE}" stroke-width="1.4"/>'
+    return t
+
+def stabbur(x, y):
+    t = turfhouse(x, y - 18, 56, 40, '#9b6a3e')
+    t += ''.join(f'<path d="M{x+i} {y} v-18" stroke="{LINE}" stroke-width="5"/><path d="M{x+i} {y} v-18" stroke="#7a5a3e" stroke-width="3"/>' for i in (8, 28, 48))
+    return t
+
+def fence(x0, x1, y, h=22):
+    t = ''.join(f'<path d="M{x} {y} l0 -{h}" stroke="{LINE}" stroke-width="4"/><path d="M{x} {y} l0 -{h}" stroke="#a87a42" stroke-width="2"/>' for x in range(x0, x1, 18))
+    return t + f'<path d="M{x0} {y-h*.75} H{x1} M{x0} {y-h*.35} H{x1}" stroke="#a87a42" stroke-width="3"/><path d="M{x0} {y-h*.75} H{x1} M{x0} {y-h*.35} H{x1}" stroke="{LINE}" stroke-width=".8" opacity=".5"/>'
+
+def brunost(x, y):
+    return (f'<g stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round"><path d="M{x} {y} h34 v-20 h-34Z" fill="#b8733a"/><path d="M{x} {y-20} l8 -6 h34 l-8 6Z" fill="#c98a4e"/>'
+            f'<path d="M{x+34} {y} l8 -6 v-20 l-8 6Z" fill="#9c5f2e"/></g>')

@@ -152,6 +152,27 @@ def u06():
     b += bubble(60, 210, 'Så koselig!')
     return svg(600, 340, 'Pollijs un pūce Ulfs omulīgā kalnu mājiņā pie kamīna', b)
 
+@scene(7)
+def u07():
+    b = sky(600, 340, '#a9cbe3', '#f1efe4', 'u7')
+    b += cloud(120, 46) + cloud(470, 36, .8)
+    b += ridge([(0, 150), (80, 90), (150, 130), (230, 70), (300, 120), (380, 80), (460, 130), (540, 76), (600, 110)], '#9fb3c4', 190, snow=95)
+    b += ridge([(0, 190), (100, 140), (200, 175), (300, 130), (420, 170), (520, 140), (600, 165)], '#7d9a7a', 230)
+    b += '<path d="M0 200 C120 186 260 196 380 186 C470 180 540 190 600 186 V340 H0Z" fill="#a8c68e"/>'
+    b += ''.join(spruce(x, y, h, '#5f8a72') for x, y, h in [(30, 198, 40), (60, 200, 30), (560, 194, 44), (590, 196, 34)])
+    b += turfhouse(90, 230, 110, 58) + stabbur(240, 226) + turfhouse(420, 222, 80, 44, '#a0703e')
+    b += fence(0, 600, 262)
+    b += grass(0, 600, 268, 336, 9, '#89ab78', 50) + flowers(320, 420, 270, 11, ('#f2c13d', '#fff', '#c58ad8'))
+    b += goat(470, 300, .62, flip=True) + goat(550, 270, .38)
+    # galds ar brunost
+    b += '<g stroke="#1f2442" stroke-width="2" stroke-linejoin="round"><rect x="180" y="268" width="170" height="10" rx="3" fill="#b07f4f"/><path d="M196 278 v52 M334 278 v52" stroke-width="5" stroke="#8b5f37"/></g>'
+    b += brunost(200, 268) + '<path d="M244 254 l16 -12 l4 4 l-14 12Z" fill="#c9d2da" stroke="#1f2442" stroke-width="1.4"/>'
+    b += '<g stroke="#1f2442" stroke-width="1.6"><ellipse cx="300" cy="266" rx="30" ry="5" fill="#f6efe0"/></g>' + waffle(292, 262, .7) + waffle(310, 263, .6)
+    b += cup(330, 268, '#c8323c')
+    b += polly(140, 330, .55, flip=True)
+    b += bubble(330, 190, 'Vil du smake brunost?')
+    return svg(600, 340, 'Pollijs un kaza Gro saimniecībā Gudbrandsdālenē nogaršo brūno sieru', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():
