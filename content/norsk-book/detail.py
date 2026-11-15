@@ -349,3 +349,25 @@ def lighthouse(x, y, h=60):
     return (f'<g stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round"><path d="M{x-8} {y} L{x-5} {y-h} H{x+5} L{x+8} {y}Z" fill="#fff"/>'
             f'<path d="M{x-7} {y-h*.3} H{x+7} L{x+6.5} {y-h*.5} H{x-6.5}Z M{x-5.5} {y-h*.75} H{x+5.5} L{x+5} {y-h*.9} H{x-5}Z" fill="#c8323c"/>'
             f'<rect x="{x-6}" y="{y-h-10}" width="12" height="10" fill="#f6d36b"/><path d="M{x-8} {y-h-10} L{x} {y-h-18} L{x+8} {y-h-10}Z" fill="#c8323c"/></g>')
+
+def jugend(x, y, w=70, h=110, c='#f2d68e', tower=False, roof='#5f8a8a'):
+    t = f'<rect x="{x}" y="{y-h}" width="{w}" height="{h}" fill="{c}" stroke="{LINE}" stroke-width="1.6"/>'
+    t += f'<path d="M{x-3} {y-h} h{w+6} v-6 q{-(w+6)/2} -16 {-(w+6)} 0Z" fill="{roof}" stroke="{LINE}" stroke-width="1.6"/>'
+    for j in range(int((h - 20) / 30)):
+        for i in range(3):
+            wx = x + 8 + i * (w - 16) / 3; wy = y - h + 14 + j * 30
+            t += f'<path d="M{wx:.1f} {wy+18:.1f} v-12 q{(w-16)/6-2:.1f} -8 {(w-16)/3-4:.1f} 0 v12Z" fill="#fbf6ea" stroke="{LINE}" stroke-width="1.1"/>'
+    t += f'<path d="M{x} {y-h+8} h{w}" stroke="#fff" stroke-width="2" opacity=".6"/>'
+    if tower:
+        tx = x + w - 10
+        t += f'<rect x="{tx-10}" y="{y-h-30}" width="20" height="30" fill="{c}" stroke="{LINE}" stroke-width="1.6"/><path d="M{tx-13} {y-h-30} L{tx} {y-h-58} L{tx+13} {y-h-30}Z" fill="{roof}" stroke="{LINE}" stroke-width="1.6"/>'
+        t += f'<rect x="{tx-4}" y="{y-h-24}" width="8" height="12" rx="4" fill="#fbf6ea" stroke="{LINE}" stroke-width="1"/>'
+    return t
+
+def sweater(x, y, c='#c8323c', s=1, pattern=True):
+    t = (f'<g transform="translate({x} {y}) scale({s})" stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round">'
+         f'<path d="M-14 -40 L-30 -32 L-36 -8 L-26 -6 L-22 -22 L-22 0 H22 L22 -22 L26 -6 L36 -8 L30 -32 L14 -40 Q0 -32 -14 -40Z" fill="{c}"/>')
+    if pattern:
+        t += '<path d="M-22 -26 H22" stroke="#fff" stroke-width="5"/><path d="M-20 -26 l4 -3 l4 3 l4 -3 l4 3 l4 -3 l4 3 l4 -3 l4 3 l4 -3" stroke="#1f2442" stroke-width="1.2" fill="none"/>'
+        t += ''.join(f'<circle cx="{-16+i*8}" cy="{-12+(i%2)*6}" r="1.2" fill="#fff" stroke="none"/>' for i in range(5))
+    return t + '</g>'

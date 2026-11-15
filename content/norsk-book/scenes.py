@@ -267,6 +267,29 @@ def u11():
     b += bubble(110, 112, 'Er du kokken på skipet?')
     return svg(600, 340, 'Pollijs un jūraskraukļa pavārs Ūle uz Hurtigruten kuģa klāja; krastā bāka un mājiņas', b)
 
+@scene(12)
+def u12():
+    b = sky(600, 340, '#a6c9e2', '#f4ede0', 'u12')
+    b += cloud(80, 36) + cloud(500, 30, .7)
+    b += '<path d="M0 120 C100 60 200 50 300 70 C380 86 460 60 600 90 V200 H0Z" fill="#86a37f" stroke="#1f2442" stroke-width="1.4"/>'
+    b += ''.join(tree(x, y, 9, '#6a9566', '#86b07f') for x, y in [(60, 104), (130, 80), (220, 70), (380, 76), (470, 70), (540, 82)])
+    b += '<rect x="292" y="60" width="26" height="12" fill="#fbf6ea" stroke="#1f2442" stroke-width="1.2"/>'
+    cols = [('#f2d68e', 0), ('#e9a07a', 1), ('#9fc2b8', 0), ('#fbf6ea', 1), ('#c9b0d6', 0), ('#f6c9a8', 1), ('#b8cfe0', 0), ('#f2d68e', 1)]
+    for i, (c, t) in enumerate(cols):
+        b += jugend(i * 76 - 4, 236, 74, 100 + (i % 3) * 12, c, tower=bool(t), roof=['#5f8a8a', '#c8323c', '#3a3f55'][i % 3])
+    b += water(236, c='#7fa6c0')
+    b += boat(120, 262, .7, '#fbf6ea') + boat(450, 266, .9)
+    b += '<rect y="272" width="600" height="68" fill="#d8d2c4"/><path d="M0 272 H600" stroke="#1f2442" stroke-width="2"/>'
+    # veikala logs
+    b += '<g stroke="#1f2442" stroke-width="2"><rect x="300" y="214" width="190" height="58" fill="#fbf6ea"/><rect x="306" y="220" width="178" height="46" fill="#d9e8f2"/></g>'
+    b += sweater(340, 262, '#c8323c', .9) + sweater(392, 262, '#33405a', .9) + sweater(444, 262, '#f6efe0', .9)
+    b += '<rect x="350" y="198" width="90" height="16" fill="#33405a" stroke="#1f2442" stroke-width="1.6"/><text x="395" y="210" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="10" font-weight="700" fill="#fff">ULL &amp; STRIKK</text>'
+    b += sheep(540, 330, .6, flip=True)
+    b += polly(230, 334, .5, flip=True)
+    b += person(80, 324, .85, '#e1a85a') + person(110, 326, .8, '#2f6f8a', '#3a2a20', skirt='#2f6f8a')
+    b += bubble(40, 170, 'Kan jeg prøve den røde genseren?')
+    return svg(600, 340, 'Pollijs Olesunnā pie vilnas veikala starp jūgendstila namiem; pārdevēja — aita Marita', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():
