@@ -327,6 +327,27 @@ def u14():
     b += bubble(150, 130, 'Se! Moskus!')
     return svg(600, 340, 'Pollijs ar binokli aiz akmens un ziemeļbriedis gide vēro jaku vēršus Doverfjellā', b)
 
+@scene(15)
+def u15():
+    b = sky(600, 340, '#a9c9e2', '#f3ede2', 'u15')
+    b += cloud(80, 40) + cloud(520, 34, .7)
+    b += cathedral(470, 170, .9)
+    b += '<path d="M0 170 H600 V200 H0Z" fill="#8fa98a"/>' + ''.join(tree(x, 196, 12, '#6a9566', '#86b07f') for x in (20, 60, 100, 140, 330, 360, 590))
+    cols = ['#c8323c', '#f2d68e', '#fbf6ea', '#e1a85a', '#9fc2b8', '#c96f5a', '#f3e6d0', '#c8323c']
+    b += ''.join(stilthouse(10 + i * 50, 214, 46, 40 + (i % 3) * 8, c) for i, c in enumerate(cols))
+    b += water(232, c='#7aa0b8')
+    b += ''.join(f'<path d="M{10 + i*50} 236 h46" stroke="#8fb3c8" stroke-width="2"/>' for i in range(8))
+    b += bybro(170, 288, 300)
+    b += '<g stroke="#1f2442" stroke-width="2"><rect x="150" y="226" width="16" height="66" fill="#c8323c"/><rect x="190" y="226" width="16" height="66" fill="#c8323c"/><path d="M144 226 h68 v-14 h-68Z" fill="#7a5a3e"/></g>'
+    b += '<text x="178" y="222" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="6.5" font-weight="700" fill="#fff">LYKKENS PORTAL</text>'
+    b += '<rect y="300" width="600" height="40" fill="#d8d2c4"/><path d="M0 300 H600" stroke="#1f2442" stroke-width="2"/>'
+    b += polly(300, 270, .4) + sparrow(352, 268, .7, flip=True)
+    b += '<rect x="370" y="236" width="18" height="16" rx="4" fill="#2f6f8a" stroke="#1f2442" stroke-width="1.4" transform="rotate(10 379 244)"/>'
+    b += '<g stroke="#1f2442" stroke-width="1.6"><circle cx="70" cy="324" r="12" fill="none"/><circle cx="114" cy="324" r="12" fill="none"/><path d="M70 324 l16 -18 h20 l8 18 M86 306 l-6 -6 h-6 M106 306 l2 -8 h8" fill="none" stroke-width="2"/></g>'
+    b += person(540, 330, .85, '#c8323c', '#e6c27a') + person(500, 334, .8, '#2f55a0')
+    b += bubble(220, 150, 'Ben! Hva gjør du her?')
+    return svg(600, 340, 'Pollijs satiek zvirbuli Benu uz Vecā pilsētas tilta Trondheimā; aiz upes — Nidarosas katedrāle', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():

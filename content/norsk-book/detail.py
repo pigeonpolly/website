@@ -433,3 +433,24 @@ def rock(x, y, w=60, h=30, c='#a9a49a'):
 
 def binoculars(x, y):
     return f'<g stroke="{LINE}" stroke-width="1.6"><rect x="{x}" y="{y}" width="9" height="14" rx="3" fill="#33333c"/><rect x="{x+11}" y="{y}" width="9" height="14" rx="3" fill="#33333c"/><path d="M{x+9} {y+5} h2"/></g>'
+
+def cathedral(x, y, s=1):
+    t = f'<g transform="translate({x} {y}) scale({s})" stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round">'
+    t += '<rect x="-90" y="-60" width="180" height="60" fill="#9fa9a6"/><path d="M-90 -60 L0 -90 L90 -60Z" fill="#5f7f78"/>'
+    t += '<rect x="-30" y="-110" width="60" height="110" fill="#aab3b0"/><path d="M-30 -110 L0 -150 L30 -110Z" fill="#5f7f78"/>'
+    t += '<path d="M-6 -150 L0 -190 L6 -150Z" fill="#5f7f78"/>'
+    t += '<circle cx="0" cy="-74" r="14" fill="#cfd8e0"/><path d="M0 -88 v28 M-14 -74 h28 M-10 -84 l20 20 M10 -84 l-20 20" stroke-width="1"/>'
+    t += ''.join(f'<path d="M{x0} -8 v-26 q6 -10 12 0 v26Z" fill="#cfd8e0"/>' for x0 in (-80, -60, 48, 68))
+    t += '<path d="M-10 0 v-30 q10 -14 20 0 v30Z" fill="#6a5a4a"/>'
+    return t + '</g>'
+
+def bybro(x, y, w=260):
+    t = f'<path d="M{x} {y} Q{x+w/2} {y-30} {x+w} {y}" stroke="{LINE}" stroke-width="16" fill="none"/><path d="M{x} {y} Q{x+w/2} {y-30} {x+w} {y}" stroke="#c8323c" stroke-width="12" fill="none"/>'
+    t += ''.join(f'<path d="M{x+i} {y-30*4*(i/w)*(1-i/w)-6} v-18" stroke="{LINE}" stroke-width="3"/>' for i in range(10, w, 20))
+    t += f'<path d="M{x} {y-24} Q{x+w/2} {y-54} {x+w} {y-24}" stroke="{LINE}" stroke-width="3" fill="none"/>'
+    t += ''.join(f'<path d="M{x+i} {y} v40" stroke="{LINE}" stroke-width="6"/><path d="M{x+i} {y} v40" stroke="#7a5a3e" stroke-width="4"/>' for i in (30, w / 2, w - 30))
+    return t
+
+def stilthouse(x, y, w=44, h=46, c='#e1a85a'):
+    t = ''.join(f'<path d="M{x+i} {y} v24" stroke="{LINE}" stroke-width="4"/><path d="M{x+i} {y} v24" stroke="#7a5a3e" stroke-width="2.4"/>' for i in (4, w / 2, w - 4))
+    return t + gable(x, y, w, h, c)
