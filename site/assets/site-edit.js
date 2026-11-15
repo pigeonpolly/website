@@ -103,7 +103,8 @@
     });
   }
 
-  async function load() { try { server = (await api('admin/blocks')).blocks; } catch (e) { server = []; } drawBar(); }
+  async function load() { if (window.PPEmojiArt) window.PPEmojiArt.off(); // правка берёт innerHTML — рисунки эмодзи не должны попасть в базу
+    try { server = (await api('admin/blocks')).blocks; } catch (e) { server = []; } drawBar(); }
   function drawBar() {
     if (!bar) { bar = document.createElement('div'); bar.className = 'pp-bar'; document.body.appendChild(bar); }
     const mine = server.filter(x => x.page === basePath && (x.lang === lang || x.lang === '*'));

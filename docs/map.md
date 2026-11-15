@@ -290,6 +290,8 @@ _Сюда следующие этапы дописывают общие свед
 - tools/v2_acct_css.py → site/assets/v2-acct.css: стили кнопок шапки (вход, меню аватара, 🔔, 🛒, поиск) из style.css для новых страниц.
 - Видео и гайды без пересборки: worker/guides.js (`guidesApi`, `guidesList`, `guideOut`, `ytId` — id из любой ссылки YouTube), meta `v2_guides`; кабинет — guides-admin.js; сайт — v2.js (`G`, `ytName`, `guidesReady`).
 
+- 🎨 Нарисованные эмодзи: site/assets/emoji-art.js `PPEmojiArt` (svg, start, off, scan) — на всех страницах v2 сам меняет эмодзи на рисунки (docs/site.md «Нарисованные эмодзи»). Код, который сохраняет innerHTML страницы в базу, — сначала `PPEmojiArt.off()`.
+
 - worker/pause.js — ⏸ пауза сайта: `pauseOn(env)`, `pauseGate` (страницы), `POST /api/admin/pause`.
 
 - Файлы только для вошедших: положить в `site/members/…` — worker `membersFile` (worker/index.js) пускает вошедших, гостя уводит на /learn/?c=<имя>#signin (docs/coloring.md).
