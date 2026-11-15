@@ -19,3 +19,4 @@ a.fb-c:hover .th .d1{transform:rotate(-11deg) translateX(-6px)}a.fb-c:hover .th 
 @media(max-width:1100px){.fb-g{grid-template-columns:repeat(3,minmax(0,1fr))}.fb-g .fb-more{grid-column:auto}}
 @media(max-width:900px){.fb-g{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:560px){.fb-g{gap:16px}.fb-c b{font-size:17px}.fb-c .tx{padding:12px 12px 14px}.fb-c .go{display:none}.fb-g .fb-more{grid-column:span 2}}
+.flt .fb-rs{border:0;background:none;padding:7px 4px;font:700 12.5px Karla,sans-serif;color:var(--acc);text-decoration:underline;cursor:pointer}.flt .fb-rs[hidden]{display:none}
