@@ -70,7 +70,6 @@
   const ring = (cx, cy, n, R, f) => Array.from({ length: n }, (_, i) => { const a = (i / n) * Math.PI * 2 - Math.PI / 2; return f(cx + R * Math.cos(a), cy + R * Math.sin(a), a); }).join('');
   const gear = (cx, cy, r1, r2, n) => { let d = ''; for (let i = 0; i < n * 2; i++) { const r = i % 2 ? r1 : r2, a0 = (i / (n * 2)) * Math.PI * 2, a1 = ((i + 1) / (n * 2)) * Math.PI * 2; d += `${i ? 'L' : 'M'}${(cx + r * Math.cos(a0)).toFixed(1)} ${(cy + r * Math.sin(a0)).toFixed(1)}L${(cx + r * Math.cos(a1)).toFixed(1)} ${(cy + r * Math.sin(a1)).toFixed(1)}`; } return d + 'Z'; };
   const dbl = (d, c, w = 1.6) => `<path d="${d}" fill="none" stroke-width="${w + 2}"/><path d="${d}" fill="none" stroke="${c}" stroke-width="${w}"/>`;
-  const CAM = `<rect x="10" y="6" width="9" height="5" rx="1.5" fill="${P}"/><rect x="3.5" y="9.5" width="25" height="17" rx="3" fill="${P}"/><circle cx="16" cy="18" r="6" fill="${MU}"/><circle cx="16" cy="18" r="3" fill="${O}"/><circle cx="17" cy="17" r=".9" fill="#fff" stroke="none"/><rect x="22" y="12" width="3.5" height="2.5" rx=".8" fill="${ST}"/>`;
   Object.assign(ART, {
     '⚠': `<path d="M16 3.5L29.5 27.5H2.5Z" fill="${ST}"/><path d="M16 11V19" stroke-width="3"/><circle cx="16" cy="23.5" r="1.8" fill="${O}"/>`,
     '✍': `<path d="M13 16L25 4L28 7L16 19Z" fill="${ST}"/><path d="M13 16L16 19L10.5 21.5Z" fill="#F2D9A0"/><path d="M6 20Q5 14 11 13L18 12Q21 12 21 15Q21 17 18 17H15.5Q19 18.5 18 22Q17 26.5 12 26.5Q7 26.5 6 20Z" fill="${PE}"/><path d="M11 21Q13 20 15.5 17" fill="none"/>`,
@@ -88,7 +87,6 @@
     '🕊': `<path d="M12 14Q9.5 5 19 3Q19.5 11 16 15Z" fill="${LI}"/><path d="M3.5 18Q8 12 15 14L20 10Q24 7 27 9L30.5 10.5L27 12.5Q26 20.5 16 22.5Q9 23.5 3.5 18Z" fill="${LI}"/><path d="M8 18.5Q12 17 15 18" fill="none"/>
       <circle cx="25" cy="10" r="1" fill="${O}"/>` + dbl('M27 14Q25 19 21 22', GR, 1.4) + `<path d="M24 18Q27.5 18 28 21Q24.5 21.5 24 18Z" fill="${GL}"/>`,
     '☀': ring(16, 16, 8, 10.5, (x, y, a) => `<path d="M${(16 + 9.5 * Math.cos(a)).toFixed(1)} ${(16 + 9.5 * Math.sin(a)).toFixed(1)}L${(16 + 13.5 * Math.cos(a)).toFixed(1)} ${(16 + 13.5 * Math.sin(a)).toFixed(1)}" stroke="${OR}" stroke-width="2.2"/>`) + `<circle cx="16" cy="16" r="7" fill="${ST}"/>${hl('M12 14Q12.5 12 14.5 11.5')}`,
-    '📷': CAM,
     '🎒': `<path d="M13 5Q16 1 19 5" fill="none" stroke-width="2"/><path d="M8 11Q8 5 16 5Q24 5 24 11V26Q24 28.5 21.5 28.5H10.5Q8 28.5 8 26Z" fill="${OR}"/><path d="M8 12.5Q16 16 24 12.5" fill="none"/><rect x="11" y="18" width="10" height="7.5" rx="2" fill="${PE}"/><path d="M11 21H21" />`,
     '📋': `<rect x="6" y="5" width="20" height="24" rx="2" fill="${TN}"/><rect x="9" y="8.5" width="14" height="18" fill="${LI}"/><rect x="12" y="3" width="8" height="5" rx="1.5" fill="${MU}"/><path d="M12 14H20M12 18H20M12 22H17" stroke="${MU}" stroke-width="1.5"/>`,
     '⏳': `<path d="M9 6Q9 13 16 16Q9 19 9 26H23Q23 19 16 16Q23 13 23 6Z" fill="${SK}"/><path d="M11.5 9H20.5Q19 13 16 14.5Q13 13 11.5 9Z" fill="${ST}" stroke="none"/><path d="M10.5 25Q13 20 16 19.5Q19 20 21.5 25Z" fill="${ST}" stroke="none"/>
@@ -155,8 +153,10 @@
     '🥚': `<path d="M16 3Q25 3 25.5 17Q25.5 29 16 29Q6.5 29 6.5 17Q7 3 16 3Z" fill="#F6EEDF"/><g fill="${PA2}" stroke="none"><circle cx="19" cy="11" r="1.1"/><circle cx="12" cy="19" r="1.2"/><circle cx="20" cy="22" r=".9"/></g>${hl('M10.5 14Q11 9 13.5 6.5')}`,
     '📄': `<path d="M7 3H19L26 10V29H7Z" fill="${LI}"/><path d="M19 3V10H26Z" fill="${MU}"/><path d="M10.5 14H22.5M10.5 18H22.5M10.5 22H18" stroke="${MU}" stroke-width="1.5"/>`,
   });
-  ART['🔎'] = `<g transform="matrix(-1 0 0 1 32 0)">${ART['🔍']}</g>`;
+  // одинаковые по смыслу эмодзи — один рисунок
+  ART['🔎'] = ART['🔍'];
   ART['✎'] = ART['✏'];
+  ART['📷'] = ART['📸'];
   let ready = false;
   const setup = () => {
     if (ready || typeof document === 'undefined' || !document.head) return;
