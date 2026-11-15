@@ -50,3 +50,4 @@ Grammatikk (объяснение, сравнение с латышским, «Uz
 - У каждого нового слова — транскрипция (система — глава 0, «Kā lasīt transkripciju»).
 - В каждой главе: блок «Vai zināji?» с картинкой-эмодзи на жёлтом фоне (как вафли) и «Som en nordmann».
 - Рисунки — svg из art.py в стиле Алины (синий Полли, сонный жёлтый глаз, берет), она одобрила.
+- Latviešu tekstā nerakstīt „norvēģiski”, „latviski” — tikai „norvēģu valodā”, „latviešu valodā” (Алина).
