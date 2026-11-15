@@ -95,3 +95,49 @@ ol.items.wide li{margin:6px 0}
 .check div:before{content:"○  ";color:var(--accent2)}
 .stamp{position:absolute;right:16mm;bottom:16mm;width:26mm;height:26mm;border-radius:50%;display:grid;place-items:center;text-align:center;line-height:1.1;transform:rotate(-10deg)}
 .daily.first{margin-top:2px}.daily+.sec{margin-top:16px}
+/* глава 0 и общие мелочи */
+p,li{text-wrap:pretty}
+.book>.page:first-child.right{grid-column-start:2}
+.scene.big{margin:8mm 0 0}
+.route.one{grid-template-columns:1fr}
+table.abc,table.combo{width:100%;border-collapse:collapse;font-size:11.6px}
+table.abc th,table.combo th{text-align:left;font-size:9px;letter-spacing:.1em;text-transform:uppercase;color:var(--soft);font-weight:600;padding:3px 5px;border-bottom:1.5px solid var(--accent)}
+table.abc td,table.combo td{padding:3.5px 5px;border-bottom:1px solid var(--line);vertical-align:top}
+table.abc td:nth-child(1),table.abc td:nth-child(4){font-family:var(--head);font-size:17px;color:var(--accent2);width:13mm}
+table.abc td:nth-child(2),table.abc td:nth-child(5){color:var(--soft);width:16mm}
+table.abc td:nth-child(4){border-left:1px solid var(--line);padding-left:10px}
+table.abc b,table.combo b{color:var(--accent);font-weight:600}
+table.combo td:first-child{font-weight:600;width:44mm}
+table.combo td:nth-child(2){font-family:var(--head);font-size:16px;color:var(--accent2);width:14mm;text-align:center}
+.key{margin-top:12px;padding:10px 14px;border-radius:var(--r);background:var(--sun,#fbeecf)}
+.key h3{font-family:var(--body);font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:#a0661a;margin-bottom:6px}
+.keygrid{display:grid;grid-template-columns:1fr 1fr;gap:4px 16px;font-size:11.6px}
+.keygrid b{font-family:var(--head);font-weight:400;font-size:14px;color:var(--accent2);display:inline-block;min-width:22px}
+.boxh{font-family:var(--body)!important;font-size:10px;letter-spacing:.14em;text-transform:uppercase;font-weight:700;color:var(--accent2);margin-bottom:4px}
+.letters.three{grid-template-columns:repeat(3,1fr)}
+.grid4,.grid3{display:grid;grid-template-columns:repeat(4,1fr);gap:6px 14px;margin-top:4px}
+.grid3{grid-template-columns:repeat(3,1fr)}
+.blank.s{min-width:28px}
+.opts{font-size:12px;color:var(--accent);margin-top:6px}
+.readlines p{display:flex;flex-direction:column;margin:0 0 6px;padding-left:10px;border-left:2px solid var(--line)}
+.readlines b{font-weight:600;font-size:14px}
+.signs{display:grid;grid-template-columns:repeat(4,1fr);gap:7px}
+.signs div{border-radius:6px;padding:6px 6px 5px;text-align:center;font-size:10.5px;color:var(--soft);background:#fff;border:1px solid var(--line);line-height:1.35}
+.signs b{display:block;background:var(--accent);color:#fff;border-radius:3px;font-size:11px;letter-spacing:.08em;padding:3px 0;margin-bottom:3px}
+.copy{display:grid;grid-template-columns:repeat(3,1fr);gap:6px 16px}
+.copy div{display:flex;gap:8px;align-items:baseline;border-bottom:1px solid var(--soft);padding:6px 0 2px}
+.copy b{font-family:var(--head);font-weight:400;font-size:17px;color:var(--accent2);white-space:nowrap}
+.copy span{flex:1}
+body{font-size:13px}
+.scene{height:58mm}.scene svg{height:100%}
+.scene.big{height:84mm}
+table.vtab{width:100%;border-collapse:collapse}
+table.vtab td{padding:3px 6px;border-bottom:1px solid var(--line)}
+table.vtab td.n{font-weight:600;color:var(--accent);width:52mm}
+table.vtab td.pr{color:var(--soft);font-size:11.5px;width:44mm}
+.scene{height:50mm}
+.scene.big{height:100mm}
+table.abc td{padding:5px 5px}
+.lines{display:grid;grid-template-columns:1fr 1fr;gap:2px 16px}
+.lines .blank.l{min-width:40mm}
+.say.tip{margin-top:14px}.say.tip .bubble{background:var(--sky)}
