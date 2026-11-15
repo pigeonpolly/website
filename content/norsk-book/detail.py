@@ -278,3 +278,24 @@ def bunting(x0, x1, y, sag=14):
         tt = (i + .5) / n; xx = x0 + (x1 - x0) * tt; yy = y + sag * 2 * 2 * tt * (1 - tt)
         t += f'<path d="M{xx-5:.1f} {yy:.1f} h10 l-5 10Z" fill="{cols[i%3]}" stroke="{LINE}" stroke-width=".8"/>'
     return t
+
+def fishstall(x, y, w=150):
+    t = (f'<g stroke="{LINE}" stroke-width="1.8" stroke-linejoin="round"><rect x="{x}" y="{y-40}" width="{w}" height="40" fill="#e9eef1"/>'
+         f'<path d="M{x-6} {y-70} h{w+12} l-10 18 h{-(w-8)}Z" fill="#c8323c"/>' + ''.join(f'<path d="M{x-6+i} {y-70} l10 18" stroke="#fff" stroke-width="5"/>' for i in range(14, w + 6, 28)) +
+         f'<path d="M{x+4} {y-52} v12 M{x+w-4} {y-52} v12" stroke-width="3"/>'
+         f'<rect x="{x+6}" y="{y-46}" width="{w-12}" height="10" fill="#dfe8ee"/></g>')
+    fish = ''
+    for i in range(int((w - 20) / 22)):
+        fx = x + 14 + i * 22
+        fish += f'<g stroke="{LINE}" stroke-width="1.2"><path d="M{fx} {y-41} q8 -6 16 0 q-8 6 -16 0Z M{fx+16} {y-41} l5 -4 v8Z" fill="{["#c9d2da", "#e9a07a", "#b8c4ce"][i%3]}"/><circle cx="{fx+3}" cy="{y-42}" r=".9" fill="{LINE}"/></g>'
+    return t + fish
+
+def bryggehus(x, y, w=40, h=96, c='#c8323c'):
+    """Bryggen: augsts, šaurs koka nams ar stāvu jumtu un vertikāliem dēļiem"""
+    t = f'<path d="M{x} {y} V{y-h} L{x+w/2} {y-h-w*.8} L{x+w} {y-h} V{y}Z" fill="{c}" stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round"/>'
+    t += ''.join(f'<path d="M{x+i} {y} V{y-h}" stroke="{LINE}" stroke-width=".5" opacity=".35"/>' for i in range(5, int(w), 6))
+    t += f'<path d="M{x-3} {y-h+2} L{x+w/2} {y-h-w*.8-2} L{x+w+3} {y-h+2}" fill="none" stroke="#3a3f55" stroke-width="4"/>'
+    for j in range(3):
+        t += f'<rect x="{x+w*.3:.1f}" y="{y-h+10+j*24:.1f}" width="{w*.4:.1f}" height="13" fill="#fbf6ea" stroke="{LINE}" stroke-width="1.1"/>'
+    t += f'<rect x="{x+w*.36:.1f}" y="{y-h-w*.45:.1f}" width="{w*.28:.1f}" height="10" fill="#fbf6ea" stroke="{LINE}" stroke-width="1.1"/>'
+    return t

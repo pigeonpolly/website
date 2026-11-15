@@ -204,3 +204,4 @@ ol.items.tr .blank.l{min-width:100%;margin-top:14px}
 .page>*{flex:none}
 .fill{flex:1 1 0!important;min-height:0;margin:12px 0 4mm;border-radius:var(--r);border:1px solid var(--line);background:#fff repeating-linear-gradient(transparent 0 25px,#e6edf3 25px 26px);background-origin:content-box;padding:28px 14px 6px;position:relative;overflow:hidden}
 .fill h3{position:absolute;top:7px;left:14px;font:600 10px var(--body);letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.citymap{display:block;width:100%;height:auto;border-radius:var(--r);border:1px solid var(--line);margin:6px 0}

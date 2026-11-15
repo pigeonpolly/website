@@ -195,6 +195,27 @@ def u08():
     b += bubble(300, 186, 'Gratulerer med dagen!')
     return svg(600, 340, 'Pollijs un balodis Bjērns 17. maijā Bergenā vēro bērnu gājienu', b)
 
+@scene(9)
+def u09():
+    b = sky(600, 340, '#b2cde0', '#f2efe6', 'u9')
+    b += cloud(80, 34, .9) + cloud(420, 28, .7)
+    b += '<path d="M0 150 C60 70 140 40 220 70 C300 96 340 40 420 50 C500 60 560 90 600 110 V230 H0Z" fill="#7f9f84" stroke="#1f2442" stroke-width="1.6"/>'
+    b += ''.join(tree(x, y, 9, '#6a9566', '#86b07f') for x, y in [(40, 130), (90, 100), (150, 80), (250, 84), (330, 70), (410, 64), (480, 76), (540, 96)])
+    cols = ['#c8323c', '#e1a85a', '#fbf6ea', '#c8323c', '#f2d68e', '#d9825f', '#fbf6ea', '#c8323c', '#e1a85a', '#fbf6ea', '#b8432f']
+    for i, c in enumerate(cols):
+        b += bryggehus(10 + i * 38, 232, 40, 92 + (i % 3) * 8, c)
+    b += water(232, c='#86adc4')
+    b += boat(500, 244, .7, '#fbf6ea') + boat(570, 242, .5)
+    b += '<rect y="250" width="600" height="90" fill="#d8d2c4"/><path d="M0 250 H600" stroke="#1f2442" stroke-width="2"/>'
+    b += ''.join(f'<path d="M{x} 250 L{x-14} 340" stroke="#c4bdae" stroke-width="1.4"/>' for x in range(20, 640, 40))
+    b += fishstall(330, 318, 170)
+    b += gull(450, 268, .42, flip=True)
+    b += person(110, 316, .9, '#2f6f8a') + person(140, 318, .85, '#e1a85a', '#3a2a20') + person(560, 322, .9, '#5f8a72', '#e6c27a')
+    b += polly(250, 334, .5)
+    b += '<g transform="translate(186 292) rotate(-8)" stroke="#1f2442" stroke-width="1.4"><rect width="44" height="30" fill="#fbf6ea"/><path d="M14 0 v30 M30 0 v30" stroke="#d6cbb6"/><path d="M4 22 L16 10 L28 18 L40 6" stroke="#c8323c" stroke-width="2" fill="none"/></g>'
+    b += bubble(300, 186, 'Unnskyld, hvor er Fløibanen?')
+    return svg(600, 340, 'Pollijs ar karti Bergenā pie Brigenas namiem un zivju tirgus, kur strādā kaija Knuts', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():
