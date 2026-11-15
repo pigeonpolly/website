@@ -73,3 +73,57 @@ def basket(x, y):
 def crumbs(x, y, seed=4, n=10):
     r = rnd(seed)
     return ''.join(f'<circle cx="{x+r.uniform(-20,20):.1f}" cy="{y+r.uniform(-4,4):.1f}" r="{r.uniform(1,2):.1f}" fill="#e9c27a" stroke="{LINE}" stroke-width=".6"/>' for _ in range(n))
+
+def window(x, y, w, h, inner='', frame='#fff'):
+    """окно с переплётом; inner — пейзаж за окном (рисуется с клипом)"""
+    cid = f'w{x}{y}'
+    return (f'<defs><clipPath id="{cid}"><rect x="{x}" y="{y}" width="{w}" height="{h}"/></clipPath></defs>'
+            f'<g clip-path="url(#{cid})">{inner}</g>'
+            f'<rect x="{x}" y="{y}" width="{w}" height="{h}" fill="none" stroke="{frame}" stroke-width="7"/>'
+            f'<path d="M{x+w/2} {y} V{y+h} M{x} {y+h*.45} H{x+w}" stroke="{frame}" stroke-width="5"/>'
+            f'<rect x="{x-4}" y="{y-4}" width="{w+8}" height="{h+8}" fill="none" stroke="{LINE}" stroke-width="2"/>'
+            f'<rect x="{x-10}" y="{y+h+2}" width="{w+20}" height="7" rx="2" fill="#efe6d8" stroke="{LINE}" stroke-width="1.6"/>')
+
+def clock(x, y, r=16, hh=10, mm=0):
+    import math
+    ah = math.radians((hh % 12) * 30 + mm * .5 - 90); am = math.radians(mm * 6 - 90)
+    ticks = ''.join(f'<path d="M{x+math.cos(math.radians(k*30))*r*.8:.1f} {y+math.sin(math.radians(k*30))*r*.8:.1f} L{x+math.cos(math.radians(k*30))*r*.95:.1f} {y+math.sin(math.radians(k*30))*r*.95:.1f}" stroke="{LINE}" stroke-width="1.2"/>' for k in range(12))
+    return (f'<circle cx="{x}" cy="{y}" r="{r}" fill="#fff" stroke="{LINE}" stroke-width="2.2"/>{ticks}'
+            f'<path d="M{x} {y} L{x+math.cos(ah)*r*.5:.1f} {y+math.sin(ah)*r*.5:.1f}" stroke="{LINE}" stroke-width="2.2" stroke-linecap="round"/>'
+            f'<path d="M{x} {y} L{x+math.cos(am)*r*.75:.1f} {y+math.sin(am)*r*.75:.1f}" stroke="{LINE}" stroke-width="1.6" stroke-linecap="round"/>')
+
+def shelf(x, y, w, items=''):
+    return f'<rect x="{x}" y="{y}" width="{w}" height="5" fill="#a8774a" stroke="{LINE}" stroke-width="1.6"/>{items}'
+
+def jar(x, y, c='#e9b45f', h=18, lid='#c8323c'):
+    return (f'<g stroke="{LINE}" stroke-width="1.4"><rect x="{x}" y="{y-h}" width="12" height="{h}" rx="3" fill="#eef3f4"/>'
+            f'<rect x="{x+1.5}" y="{y-h*.7}" width="9" height="{h*.6}" rx="2" fill="{c}" stroke="none"/><rect x="{x-1}" y="{y-h-4}" width="14" height="4" rx="1" fill="{lid}"/></g>')
+
+def plant(x, y, s=1):
+    return (f'<g transform="translate({x} {y}) scale({s})" stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round">'
+            f'<path d="M0 -20 C-14 -34 -16 -50 -6 -58 C0 -46 2 -32 0 -20Z" fill="#6f9a76"/><path d="M2 -20 C10 -40 26 -46 32 -44 C28 -30 16 -22 4 -18Z" fill="#7fae86"/>'
+            f'<path d="M-2 -18 C-14 -26 -28 -24 -32 -20 C-22 -12 -10 -12 0 -14Z" fill="#5f8a68"/><path d="M-12 -18 h26 l-4 18 h-18Z" fill="#d9825f"/></g>')
+
+def cup(x, y, c='#9fc2b8', steam=True):
+    st = f'<path d="M{x+3} {y-14} q3 -5 0 -10 M{x+9} {y-14} q3 -5 0 -10" stroke="#b9a58c" stroke-width="1.4" fill="none"/>' if steam else ''
+    return (f'<g stroke="{LINE}" stroke-width="1.6"><path d="M{x-2} {y-12} h16 l-2 12 h-12Z" fill="{c}"/><path d="M{x+14} {y-9} q7 1 0 7" fill="none"/></g>{st}')
+
+def tram(x, y, s=1):
+    return (f'<g transform="translate({x} {y}) scale({s})" stroke="{LINE}" stroke-width="1.8" stroke-linejoin="round">'
+            f'<rect x="0" y="-40" width="150" height="34" rx="6" fill="#2f6fb0"/><rect x="0" y="-16" width="150" height="6" fill="#e9eef3"/>'
+            + ''.join(f'<rect x="{8+i*24}" y="-34" width="16" height="14" rx="2" fill="#d9e8f2"/>' for i in range(6)) +
+            f'<path d="M60 -40 l10 -12 l10 12" fill="none"/><circle cx="25" cy="-4" r="5" fill="#33333c"/><circle cx="125" cy="-4" r="5" fill="#33333c"/></g>')
+
+def facade(x, y, w, h, c, wc='#f6e7c4', rows=3, cols=3):
+    t = f'<rect x="{x}" y="{y-h}" width="{w}" height="{h}" fill="{c}" stroke="{LINE}" stroke-width="1.6"/>'
+    t += f'<rect x="{x-2}" y="{y-h-6}" width="{w+4}" height="6" fill="#ece3d4" stroke="{LINE}" stroke-width="1.4"/>'
+    for i in range(cols):
+        for j in range(rows):
+            t += f'<rect x="{x+6+i*(w-12)/cols+2:.1f}" y="{y-h+10+j*(h-16)/rows:.1f}" width="{(w-12)/cols-6:.1f}" height="{(h-16)/rows-8:.1f}" fill="{wc}" stroke="{LINE}" stroke-width="1"/>'
+    return t
+
+def cheese(x, y, c='#e8c46a'):
+    return f'<g stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round"><path d="M{x} {y} h30 v-14 l-30 -6Z" fill="{c}"/><path d="M{x} {y-20} l30 6 l8 -4 l-30 -6Z" fill="#f2d68e"/><path d="M{x+30} {y} l8 -4 v-14" fill="#d9b459"/></g>'
+
+def bread(x, y):
+    return f'<g stroke="{LINE}" stroke-width="1.6"><path d="M{x} {y} v-14 q0 -8 10 -8 h4 q10 0 10 8 v14Z" fill="#e9c98f"/><path d="M{x+3} {y-2} v-11 q0 -5 7 -5 h4 q7 0 7 5 v11Z" fill="#f6e6c4" stroke="none"/></g>'

@@ -198,3 +198,4 @@ ol.items.tr .blank.l{min-width:100%;margin-top:14px}
 .howto div{display:block;padding-left:10mm;text-indent:-10mm}
 .howto .tag{display:inline-block;text-indent:0;margin-right:3mm}
 .scene.cover-art{height:180mm}
+.grid1,.grid2{display:grid;gap:4px 14px;margin-top:4px}.grid1{grid-template-columns:1fr}.grid2{grid-template-columns:1fr 1fr}

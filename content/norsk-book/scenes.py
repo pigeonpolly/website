@@ -72,6 +72,30 @@ def u03():
     b += bubble(300, 214, 'Dette er familien min!')
     return svg(600, 340, 'Pollijs un baložu ģimene piknikā Vīgelanna parkā pie Monolīta', b)
 
+@scene(4)
+def u04():
+    b = '<rect width="600" height="340" fill="#f2e9dc"/>'
+    b += ''.join(f'<rect x="{x}" y="{y}" width="20" height="14" fill="none" stroke="#e3d6c3" stroke-width="1"/>' for x in range(300, 600, 20) for y in range(150, 230, 14))
+    out = sky(600, 340, '#cfe2ef', '#eef2ee', 'u4s') + facade(10, 200, 70, 150, '#e1a85a') + facade(84, 200, 60, 130, '#c96f5a') + facade(148, 200, 70, 160, '#9fb7c9')
+    out += '<rect x="0" y="200" width="300" height="100" fill="#b8b2a6"/><path d="M0 214 H300" stroke="#8e887d" stroke-width="2"/>' + tram(30, 214, .9)
+    b += window(30, 40, 230, 170, out)
+    b += crow(205, 213, .38, flip=True)
+    b += clock(330, 60, 22, 10, 0)
+    b += shelf(380, 80, 160, jar(392, 80) + jar(410, 80, '#d8453c') + jar(428, 80, '#f2d68e', lid='#2f55a0') + cup(460, 80, '#e8c46a', False) + cup(484, 80, '#c8d7e6', False) + plant(522, 80, .6))
+    b += '<g stroke="#1f2442" stroke-width="2"><rect x="520" y="110" width="66" height="134" rx="6" fill="#e9eef1"/><path d="M520 160 h66" /><path d="M528 120 v24 M528 170 v30" stroke-width="3"/></g>'
+    b += '<g stroke="#1f2442" stroke-width="1.2"><rect x="540" y="124" width="10" height="8" fill="#e86a7a"/><circle cx="566" cy="130" r="5" fill="#f2c13d"/><rect x="552" y="176" width="14" height="10" fill="#fff"/></g>'
+    b += '<path d="M380 12 v40" stroke="#1f2442" stroke-width="1.6"/><path d="M364 52 h32 l-6 -14 h-20Z" fill="#c8323c" stroke="#1f2442" stroke-width="1.8"/>'
+    b += '<rect y="244" width="600" height="96" fill="#d9b88c"/><g stroke="#c49f6f">' + ''.join(f'<line x1="{x}" y1="244" x2="{x-30}" y2="340"/>' for x in range(40, 640, 70)) + '</g>'
+    b += '<g stroke="#1f2442" stroke-width="2" stroke-linejoin="round"><rect x="270" y="236" width="230" height="12" rx="3" fill="#b07f4f"/><path d="M286 248 v76 M484 248 v76" stroke-width="6" stroke="#8b5f37"/></g>'
+    b += '<path d="M290 236 l10 -8 h60 l-10 8Z" fill="#f6f1e6" stroke="#1f2442" stroke-width="1.4"/>' + bread(305, 230)
+    b += cheese(380, 236) + '<path d="M418 222 l14 -12 l4 4 l-12 12Z" fill="#c9d2da" stroke="#1f2442" stroke-width="1.4"/>'
+    b += jar(446, 236, '#c8323c', 16) + cup(468, 236, '#9fc2b8')
+    b += '<g stroke="#1f2442" stroke-width="1.6"><path d="M330 236 h34 l-4 -16 h-26Z" fill="#33405a"/><path d="M364 226 q8 0 6 8" fill="none"/></g>'
+    b += polly(230, 318, .62, flip=True)
+    b += plant(40, 300, .9) + '<g stroke="#1f2442" stroke-width="1.6"><rect x="90" y="266" width="44" height="24" rx="4" fill="#c8323c"/><circle cx="104" cy="278" r="6" fill="#f2e9dc"/><path d="M118 272 h10 M118 278 h10 M118 284 h10"/><path d="M96 266 l10 -14"/></g>'
+    b += bubble(60, 222, 'God morgen!')
+    return svg(600, 340, 'Pollijs no rīta virtuvē Oslo gatavo matpakke; aiz loga vārna Ina un tramvajs', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():
