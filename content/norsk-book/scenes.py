@@ -96,6 +96,34 @@ def u04():
     b += bubble(60, 222, 'God morgen!')
     return svg(600, 340, 'Pollijs no rīta virtuvē Oslo gatavo matpakke; aiz loga vārna Ina un tramvajs', b)
 
+@scene(5)
+def u05():
+    b = sky(600, 340, '#9ec3df', '#eef3f6', 'u5')
+    b += cloud(80, 40) + cloud(330, 30, .6, .7) + cloud(200, 90, .5, .6)
+    b += '<path d="M0 200 L60 150 L110 180 L170 130 L230 175 L290 140 L350 185 L420 160 V260 H0Z" fill="#c9d9e6"/>' + '<path d="M160 138 L170 130 L180 138 M280 148 L290 140 L300 148" stroke="#fff" stroke-width="4" fill="none"/>'
+    b += '<path d="M0 230 C80 200 160 214 240 196 C300 184 360 200 420 190 L420 340 H0Z" fill="#dfe9f1"/>'
+    b += '<path d="M0 250 C60 236 120 246 190 240 C240 236 260 250 300 246 V340 H0Z" fill="#a7c1d4"/>'
+    b += ''.join(f'<rect x="{x}" y="{246-h}" width="8" height="{h}" fill="#c2d2de" stroke="#8ea3b8" stroke-width=".8"/>' for x, h in [(40, 14), (52, 20), (64, 12), (78, 18), (96, 10), (120, 16)])
+    # lēciena tramplīns
+    b += '<path d="M600 40 L560 40 C520 120 470 200 380 262 L600 262Z" fill="#f4f6f8" stroke="#1f2442" stroke-width="2" stroke-linejoin="round"/>'
+    b += '<path d="M600 40 L560 40 L548 50 L600 50Z" fill="#c9d2da" stroke="#1f2442" stroke-width="1.6"/>'
+    b += '<path d="M566 40 C526 120 476 200 388 262" stroke="#9fb0c2" stroke-width="2" fill="none"/>'
+    b += '<g stroke="#1f2442" stroke-width="1.6">' + ''.join(f'<path d="M{x} 262 V{y}" />' for x, y in [(560, 50), (540, 96), (520, 136), (500, 170), (480, 200)]) + '</g>'
+    b += '<path d="M548 30 h24 v10 h-24Z" fill="#c8323c" stroke="#1f2442" stroke-width="1.6"/>'
+    b += flag(430, 230, 40, .8) + flag(470, 236, 40, .8)
+    # sniegota zeme, egles
+    b += '<path d="M0 262 C120 250 240 270 360 258 C460 250 540 262 600 256 V340 H0Z" fill="#fbfdff" stroke="#1f2442" stroke-width="2"/>'
+    b += ''.join(spruce_snow(x, y, h) for x, y, h in [(20, 268, 60), (60, 270, 46), (250, 264, 40), (290, 266, 52), (580, 270, 50)])
+    b += '<path d="M60 340 C140 300 260 290 420 300" stroke="#cfdbe6" stroke-width="2" fill="none"/><path d="M80 340 C160 304 270 296 430 306" stroke="#cfdbe6" stroke-width="2" fill="none"/>'
+    b += skier(330, 296, .8) + skier(400, 300, .7, '#2f6fb0', '#33333c') + skier(150, 318, .9, '#e1a85a')
+    b += '<rect x="196" y="268" width="6" height="40" fill="#8b5f37" stroke="#1f2442" stroke-width="1.6"/>' + magpie(199, 268, .5)
+    b += '<g stroke="#1f2442" stroke-width="1.6"><rect x="462" y="276" width="86" height="22" rx="3" fill="#2f3c58"/><path d="M474 298 v20 M536 298 v20" stroke-width="3"/></g>'
+    b += '<text x="469" y="291" font-family="DM Sans,sans-serif" font-size="9" font-weight="700" fill="#fff">HOLMENKOLLEN</text>'
+    b += polly(250, 330, .52)
+    b += '<path d="M231 281 Q250 288 269 280" stroke="#c8323c" stroke-width="7" stroke-linecap="round" fill="none"/><path d="M258 285 l5 18" stroke="#c8323c" stroke-width="6" stroke-linecap="round"/>'
+    b += bubble(60, 190, 'Går du på ski?')
+    return svg(600, 340, 'Pollijs un žagata Sigrīda pie Holmenkollen tramplīna ziemā', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():

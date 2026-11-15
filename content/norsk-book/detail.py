@@ -127,3 +127,39 @@ def cheese(x, y, c='#e8c46a'):
 
 def bread(x, y):
     return f'<g stroke="{LINE}" stroke-width="1.6"><path d="M{x} {y} v-14 q0 -8 10 -8 h4 q10 0 10 8 v14Z" fill="#e9c98f"/><path d="M{x+3} {y-2} v-11 q0 -5 7 -5 h4 q7 0 7 5 v11Z" fill="#f6e6c4" stroke="none"/></g>'
+
+def magpie(x, y, s=1, flip=False):
+    """skjære: melnbalta, gara aste; skatās pa labi"""
+    sx = -s if flip else s
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M-4 -12 L-6 8 M-6 8 l-6 1 M-6 8 l5 1 M8 -12 L9 8 M9 8 l-6 1 M9 8 l5 1" stroke="#33333c" stroke-width="2.4" fill="none"/>
+ <path d="M-30 -36 L-96 -60 L-92 -48 L-28 -26Z" fill="#26304a"/>
+ <path d="M-34 -34 C-36 -58 -12 -68 12 -64 C26 -62 34 -54 36 -44 C38 -24 22 -12 0 -12 C-20 -12 -32 -22 -34 -34Z" fill="#fff"/>
+ <path d="M-30 -44 C-10 -60 18 -58 30 -46 C16 -32 -12 -28 -40 -34Z" fill="#26304a"/>
+ <path d="M-22 -44 C-10 -50 4 -50 14 -46" stroke="#5f7fb8" stroke-width="2" fill="none"/>
+ <path d="M10 -64 C12 -84 26 -92 40 -90 C54 -88 58 -76 54 -64 C48 -54 30 -50 18 -54Z" fill="#26304a"/>
+ <path d="M53 -78 L72 -74 L53 -70Z" fill="#26304a"/>
+ <circle cx="43" cy="-78" r="2.6" fill="#fff" stroke="none"/>
+</g>"""
+
+def skier(x, y, s=1, c='#c8323c', c2='#2f55a0'):
+    return (f'<g transform="translate({x} {y}) scale({s})" stroke="{LINE}" stroke-width="1.4" stroke-linecap="round" stroke-linejoin="round">'
+            f'<path d="M-16 0 h34" stroke-width="2"/><path d="M-4 -2 l-4 -14 M4 -2 l2 -14" stroke="{c2}" stroke-width="4"/>'
+            f'<path d="M-6 -16 C-8 -26 -4 -32 2 -32 C6 -30 6 -22 4 -16Z" fill="{c}"/><circle cx="1" cy="-37" r="4.5" fill="#f0d2b4"/>'
+            f'<path d="M-3 -40 q4 -6 8 0" fill="{c}"/><path d="M-6 -24 l-10 22 M4 -24 l12 22" stroke="#555" stroke-width="1.2"/></g>')
+
+def snowtree(x, y, h=40):
+    return spruce_snow(x, y, h)
+
+def spruce_snow(x, y, h=40, c='#4f7a64'):
+    w = h * .38
+    t = (f'<path d="M{x} {y-h} L{x+w*.6} {y-h*.55} L{x+w*.3} {y-h*.55} L{x+w} {y-h*.12} L{x+w*.4} {y-h*.12} L{x+w*.4} {y} L{x-w*.4} {y} '
+         f'L{x-w*.4} {y-h*.12} L{x-w} {y-h*.12} L{x-w*.3} {y-h*.55} L{x-w*.6} {y-h*.55}Z" fill="{c}" stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round"/>')
+    t += f'<path d="M{x-w*.55} {y-h*.55} q{w*.3} -4 {w*.55} 0 q{w*.3} -4 {w*.55} 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>'
+    t += f'<path d="M{x-w*.9} {y-h*.13} q{w*.45} -5 {w*.9} 0 q{w*.45} -5 {w*.9} 0" stroke="#fff" stroke-width="3" fill="none" stroke-linecap="round"/>'
+    return t + f'<path d="M{x-4} {y-h+6} L{x} {y-h} L{x+4} {y-h+6}" stroke="#fff" stroke-width="3" fill="none"/>'
+
+def flag(x, y, h=50, s=1):
+    return (f'<g transform="translate({x} {y}) scale({s})"><path d="M0 0 v-{h}" stroke="{LINE}" stroke-width="2"/>'
+            f'<rect x="0" y="-{h}" width="26" height="18" fill="#c8323c" stroke="{LINE}" stroke-width="1.2"/>'
+            f'<path d="M0 -{h-9} h26 M9 -{h} v18" stroke="#fff" stroke-width="5"/><path d="M0 -{h-9} h26 M9 -{h} v18" stroke="#1f3a68" stroke-width="2.4"/></g>')
