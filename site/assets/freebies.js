@@ -6,6 +6,7 @@
   const T = {
     typ: ['Type', 'Вид', 'Veids'], all: ['All', 'Всё', 'Viss'], cal: ['Calendars', 'Календари', 'Kalendāri'], wall: ['Phone wallpapers', 'Заставки на телефон', 'Tālruņa fona attēli'],
     wk: ['Week starts', 'Неделя с', 'Nedēļa sākas'], any: ['Any week', 'Любая неделя', 'Jebkura'], mon: ['Monday start · EU', 'С понедельника · EU', 'No pirmdienas · EU'], sun: ['Sunday start · US', 'С воскресенья · US', 'No svētdienas · US'],
+    per: ['Calendar', 'Календарь', 'Kalendārs'], allP: ['Month & year', 'Месяц и год', 'Mēnesis un gads'], pM: ['Monthly', 'На месяц', 'Mēneša'], pY: ['Yearly', 'На год', 'Gada'],
     yr: ['Year', 'Год', 'Gads'], ally: ['All years', 'Все годы', 'Visi gadi'],
     tpC: ['Calendar', 'Календарь', 'Kalendārs'], tpY: ['Whole year', 'Весь год', 'Viss gads'], tpW: ['Wallpaper', 'Заставка', 'Fona attēls'], free: ['Free', 'Бесплатно', 'Bez maksas'],
     monS: ['Week starts on Monday', 'Неделя с понедельника', 'Nedēļa sākas pirmdienā'], sunS: ['Week starts on Sunday', 'Неделя с воскресенья', 'Nedēļa sākas svētdienā'],
@@ -23,7 +24,7 @@
   fetch('/assets/freebies.json').then(r => r.json()).then(D => {
     const items = [...(D.year || []).map(x => ({ ...x, k: 'cal', yr: 1 })), ...(D.cal || []).map(x => ({ ...x, k: 'cal' })), ...(D.wall || []).map(x => ({ ...x, k: 'wall' }))];
     const name = x => x.k === 'wall' ? x.t[L] : x.yr ? T.year(x.y) : `${MON[x.m - 1]} ${x.y}`;
-    const card = x => `<a class="vc fb-c ${x.k}${x.yr ? ' yr' : ''}" href="#${esc(x.id)}" data-id="${esc(x.id)}" data-c="${x.k}"${x.w ? ` data-w="${x.w}"` : ''}${x.y ? ` data-y="${x.y}"` : ''}>`
+    const card = x => `<a class="vc fb-c ${x.k}${x.yr ? ' yr' : ''}" href="#${esc(x.id)}" data-id="${esc(x.id)}" data-c="${x.k}"${x.k === 'cal' ? ` data-p="${x.yr ? 'year' : 'month'}"` : ''}${x.w ? ` data-w="${x.w}"` : ''}${x.y ? ` data-y="${x.y}"` : ''}>`
       + `<span class="tp">${x.k === 'wall' ? T.tpW[L] : x.yr ? T.tpY[L] : T.tpC[L]}</span><span class="th">${x.k === 'wall' ? `<img src="${esc(x.th)}" alt="" loading="lazy">` : x.d.map((d, i) => `<img src="${esc(d.th)}" alt="" loading="lazy" class="d${i + 1}">`).join('')}<span class="bd">${T.free[L]}</span></span>`
       + `<span class="tx"><b>${esc(name(x))}</b><small>${x.k === 'wall' ? T.phone[L] : `${x.w === 'sun' ? T.sunS[L] : T.monS[L]} · ${T.d3[L]}`}</small><span class="go">${x.k === 'wall' ? T.dl[L] + ' →' : T.open[L]}</span></span></a>`;
     g.innerHTML = items.map(card).join('');
@@ -31,18 +32,18 @@
     // фильтр: неделя по умолчанию — по языку браузера (en-US, en-CA… → воскресенье), «Любая» тоже есть
     const years = [...new Set(items.filter(x => x.y).map(x => x.y))].sort();
     const sunLoc = /-(US|CA|MX|BR|JP|PH|IL)$/i.test(navigator.language || '');
-    const st = { c: 'all', w: sunLoc ? 'sun' : 'mon', y: 'all' };
+    const st = { c: 'all', p: 'all', w: sunLoc ? 'sun' : 'mon', y: 'all' };
     const grp = (k, lb, F) => `<div class="flt-g" role="group" aria-label="${lb}" data-gr="${k}"><span class="flt-l">${lb}</span>${F.map(([v, n]) => `<button type="button" data-g="${k}" data-k="${v}">${n} <i></i></button>`).join('')}</div>`;
-    g.insertAdjacentHTML('beforebegin', `<div class="flt">${grp('c', T.typ[L], [['all', T.all[L]], ['cal', T.cal[L]], ['wall', T.wall[L]]])}${grp('w', T.wk[L], [['mon', T.mon[L]], ['sun', T.sun[L]], ['all', T.any[L]]])}`
+    g.insertAdjacentHTML('beforebegin', `<div class="flt">${grp('c', T.typ[L], [['all', T.all[L]], ['cal', T.cal[L]], ['wall', T.wall[L]]])}${grp('p', T.per[L], [['all', T.allP[L]], ['month', T.pM[L]], ['year', T.pY[L]]])}${grp('w', T.wk[L], [['mon', T.mon[L]], ['sun', T.sun[L]], ['all', T.any[L]]])}`
       + (years.length ? grp('y', T.yr[L], [['all', T.ally[L]], ...years.map(y => [String(y), y])]) : '') + `</div>`);
     g.insertAdjacentHTML('afterend', `<p class="flt-empty" hidden>${T.none[L]}</p>`);
     const bar = g.previousElementSibling, emp = g.nextElementSibling, cards = [...g.querySelectorAll('.fb-c')];
-    const fits = (c, s) => (s.c === 'all' || c.dataset.c === s.c) && (c.dataset.c !== 'cal' || ((s.w === 'all' || c.dataset.w === s.w) && (s.y === 'all' || c.dataset.y === s.y)));
+    const fits = (c, s) => (s.c === 'all' || c.dataset.c === s.c) && !(c.dataset.c === 'wall' && s.p !== 'all') && (c.dataset.c !== 'cal' || ((s.p === 'all' || c.dataset.p === s.p) && (s.w === 'all' || c.dataset.w === s.w) && (s.y === 'all' || c.dataset.y === s.y)));
     const apply = () => {
       let n = 0; cards.forEach(c => { c.hidden = !fits(c, st); if (!c.hidden) n++; });
       bar.querySelectorAll('button').forEach(b => { b.setAttribute('aria-pressed', st[b.dataset.g] === b.dataset.k ? 'true' : 'false');
         b.querySelector('i').textContent = cards.filter(c => fits(c, { ...st, [b.dataset.g]: b.dataset.k })).length; });
-      bar.querySelectorAll('[data-gr=w],[data-gr=y]').forEach(x => { x.hidden = st.c === 'wall'; });
+      bar.querySelectorAll('[data-gr=p],[data-gr=w],[data-gr=y]').forEach(x => { x.hidden = st.c === 'wall'; });
       emp.hidden = !!n;
     };
     bar.addEventListener('click', e => { const b = e.target.closest('button[data-g]'); if (b) { st[b.dataset.g] = b.dataset.k; apply(); } });
@@ -75,7 +76,7 @@
     // пин ведёт сюда: ?f=<id>&d=<дизайн>
     const q = new URLSearchParams(location.search), x = items.find(v => v.id === q.get('f'));
     if (x) {
-      st.c = x.k; if (x.w) st.w = x.w; apply();
+      st.c = x.k; if (x.w) st.w = x.w; if (x.k === 'cal') st.p = x.yr ? 'year' : 'month'; apply();
       const c = g.querySelector(`[data-id="${x.id}"]`); if (c) { c.classList.add('hl'); setTimeout(() => c.scrollIntoView({ block: 'center' }), 60); }
       box(x, +q.get('d') || 1);
     }
