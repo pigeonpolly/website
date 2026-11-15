@@ -18,7 +18,7 @@
     else if (body) Object.assign(opt, { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify(body) });
     const r = await fetch('/api/' + path, opt);
     const d = await r.json().catch(() => ({}));
-    if (!r.ok) { const e = new Error(d.error || r.status); e.code = d.error || String(r.status); throw e; }
+    if (!r.ok) { const e = new Error(d.error || r.status); e.code = d.error || String(r.status); e.why = d.why; e.step = d.step; throw e; }
     return d;
   };
   const fmt = ts => ts ? new Date(ts * 1000).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }) : '—';
@@ -243,9 +243,9 @@
     });
     // 📰 «Art Coo-rier»: выпуск новостей искусства одной кнопкой — два шага на сервере (worker/courier.js), потом открываем черновик
     const CR = {
-      ru: { src: 'Собираю новости…', write: 'Пишу выпуск…', ai_limit: 'Лимит Gemini на сегодня, попробуй позже.', no_news: 'Свежих новостей искусства пока мало — попробуй позже.', no_src: 'Новости не собрались — нажми ещё раз.', no_key: 'Gemini не подключён: «⚙ Перевод (Gemini)».', ai: 'Gemini сейчас не отвечает — попробуй через пару минут.', other: 'Не получилось собрать выпуск', ok: 'Черновик готов' },
-      en: { src: 'Collecting news…', write: 'Writing the issue…', ai_limit: 'Gemini limit for today is used up, try later.', no_news: 'Not enough fresh art news yet — try later.', no_src: 'News were not collected — click again.', no_key: 'Gemini is not connected: «⚙ Перевод (Gemini)».', ai: 'Gemini is not answering — try in a couple of minutes.', other: 'Could not build the issue', ok: 'Draft is ready' },
-      lv: { src: 'Vācu ziņas…', write: 'Rakstu numuru…', ai_limit: 'Gemini šodienas limits ir beidzies, mēģini vēlāk.', no_news: 'Svaigu mākslas ziņu vēl par maz — mēģini vēlāk.', no_src: 'Ziņas nesavācās — spied vēlreiz.', no_key: 'Gemini nav pieslēgts: «⚙ Перевод (Gemini)».', ai: 'Gemini neatbild — mēģini pēc pāris minūtēm.', other: 'Neizdevās sagatavot numuru', ok: 'Melnraksts gatavs' },
+      ru: { src: 'Собираю новости…', write: 'Пишу выпуск…', ai_limit: 'Лимит Gemini на сегодня, попробуй позже.', no_news: 'Свежих новостей искусства пока мало — попробуй позже.', no_src: 'Новости не собрались — нажми ещё раз.', no_key: 'Gemini не подключён: «⚙ Перевод (Gemini)».', ai: 'Gemini сейчас не отвечает — попробуй через пару минут.', other: 'Не получилось собрать выпуск', ok: 'Черновик готов', step_src: 'шаг «собираю новости»', step_write: 'шаг «пишу выпуск»', why: { limit: 'лимит на сегодня', busy: 'перегружена у Google', timeout: 'не успела ответить', net: 'нет связи', bad: 'ответила непонятно', short: 'ответ не подошёл (мало новостей или пустой выпуск)', time: 'не дошла очередь — кончилось время', http: 'ошибка Google' } },
+      en: { src: 'Collecting news…', write: 'Writing the issue…', ai_limit: 'Gemini limit for today is used up, try later.', no_news: 'Not enough fresh art news yet — try later.', no_src: 'News were not collected — click again.', no_key: 'Gemini is not connected: «⚙ Перевод (Gemini)».', ai: 'Gemini is not answering — try in a couple of minutes.', other: 'Could not build the issue', ok: 'Draft is ready', step_src: 'step “collecting news”', step_write: 'step “writing the issue”', why: { limit: 'daily limit', busy: 'overloaded at Google', timeout: 'did not answer in time', net: 'no connection', bad: 'unreadable answer', short: 'answer did not fit (too few news or empty issue)', time: 'skipped — time ran out', http: 'Google error' } },
+      lv: { src: 'Vācu ziņas…', write: 'Rakstu numuru…', ai_limit: 'Gemini šodienas limits ir beidzies, mēģini vēlāk.', no_news: 'Svaigu mākslas ziņu vēl par maz — mēģini vēlāk.', no_src: 'Ziņas nesavācās — spied vēlreiz.', no_key: 'Gemini nav pieslēgts: «⚙ Перевод (Gemini)».', ai: 'Gemini neatbild — mēģini pēc pāris minūtēm.', other: 'Neizdevās sagatavot numuru', ok: 'Melnraksts gatavs', step_src: 'solis «vācu ziņas»', step_write: 'solis «rakstu numuru»', why: { limit: 'šodienas limits', busy: 'Google pārslogots', timeout: 'neatbildēja laikā', net: 'nav savienojuma', bad: 'nesaprotama atbilde', short: 'atbilde neder (par maz ziņu vai tukšs numurs)', time: 'netika līdz — beidzās laiks', http: 'Google kļūda' } },
     }[['ru', 'en', 'lv'].includes(document.documentElement.lang) ? document.documentElement.lang : 'ru'];
     const cb = app.querySelector('#be-courier');
     cb.addEventListener('click', async () => {
@@ -258,7 +258,12 @@
         const r = await api('blog/admin/courier', { step: 'write' });
         box.innerHTML = `<p class="be-flash">✓ ${CR.ok}: <a href="#${r.id}">Art Coo-rier</a></p>`;
         location.hash = '#' + r.id; // открываем черновик в редакторе
-      } catch (e) { box.innerHTML = `<p class="be-note">${esc(CR[e.code] || CR.other + ' (' + (e.code || e.message) + ').')}</p>`; }
+      } catch (e) {
+        // точная причина: шаг и что ответила каждая модель Gemini (worker/avis.js ask → why)
+        const why = Array.isArray(e.why) && e.why.length ? `<ul>${e.why.map(w => `<li>${esc(w.m)} — ${esc(CR.why[w.r] || (/^http_\d+$/.test(w.r) ? CR.why.http + ' ' + w.r.slice(5) : w.r))}</li>`).join('')}</ul>` : '';
+        const st = CR['step_' + e.step] ? ` <small>(${CR['step_' + e.step]})</small>` : '';
+        box.innerHTML = `<p class="be-note">${esc(CR[e.code] || CR.other + ' (' + (e.code || e.message) + ').')}${st}</p>${why}`;
+      }
       cb.disabled = false;
     });
     const dd = app.querySelector('#be-dedupe');

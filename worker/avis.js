@@ -94,21 +94,24 @@ export async function ask(env, prompt, schema, ok, temp = 0.4) {
   const key = await geminiKey(env);
   if (!key) throw Object.assign(new Error('no_key'), { code: 'no_key' });
   let err = 'ai';
+  const why = []; // по каждой модели — почему не вышло: limit / busy (5xx) / timeout / net / http_NNN / bad (не JSON) / short (ответ не прошёл проверку) / time (кончилось время шага)
   const t0 = Date.now(), BUDGET = 150000; // один шаг сборки — не дольше ~2.5 мин, иначе страница «висит»
   for (const model of GEMINI_MODELS.slice().reverse()) { // сначала модель поумнее — язык уровня важнее скорости
-    const left = BUDGET - (Date.now() - t0); if (left < 15000) break;
+    const left = BUDGET - (Date.now() - t0); if (left < 15000) { why.push({ m: model, r: 'time' }); continue; }
+    let fe = null;
     const r = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`, {
       method: 'POST', headers: { 'x-goog-api-key': key, 'content-type': 'application/json' }, signal: AbortSignal.timeout(Math.min(90000, left)),
       body: JSON.stringify({ contents: [{ parts: [{ text: prompt }] }], generationConfig: { temperature: temp, responseMimeType: 'application/json', responseSchema: schema } }),
-    }).catch(() => null);
-    if (!r) continue;
-    if (!r.ok) { err = r.status === 429 ? 'ai_limit' : 'ai'; continue; }
-    try {
-      const d = await r.json(), out = JSON.parse(d.candidates[0].content.parts.map(p => p.text || '').join(''));
-      if (ok(out)) return out;
-    } catch (e) { /* не разобрался — следующая модель */ }
+    }).catch(e => { fe = e; return null; });
+    if (!r) { why.push({ m: model, r: fe && /timeout|abort/i.test(fe.name + ' ' + fe.message) ? 'timeout' : 'net' }); continue; }
+    if (!r.ok) { err = r.status === 429 ? 'ai_limit' : 'ai'; why.push({ m: model, r: r.status === 429 ? 'limit' : r.status >= 500 ? 'busy' : 'http_' + r.status }); continue; }
+    let out;
+    try { const d = await r.json(); out = JSON.parse(d.candidates[0].content.parts.map(p => p.text || '').join('')); }
+    catch (e) { why.push({ m: model, r: 'bad' }); continue; } // не разобрался — следующая модель
+    if (ok(out)) return out;
+    why.push({ m: model, r: 'short' });
   }
-  throw Object.assign(new Error(err), { code: err });
+  throw Object.assign(new Error(err), { code: err, why });
 }
 // быстрый вызов для страницы (перевод по нажатию): сначала лёгкая модель, всего не дольше ~25 с
 async function quick(env, prompt, schema, ok) {

@@ -180,7 +180,8 @@ export async function courierApi(req, env, h) {
     if (step === 'write') return h.json(await stepWrite(env, h));
   } catch (e) {
     if (e && e.status) throw e; // HttpError (fail) — как есть
-    if (e && ['ai_limit', 'ai', 'no_key'].includes(e.code)) h.fail(e.code === 'ai_limit' ? 429 : 502, e.code);
+    // причина по каждой модели (why) и шаг — чтобы в редакторе было видно, ждать или чинить
+    if (e && ['ai_limit', 'ai', 'no_key'].includes(e.code)) return h.json({ error: e.code, step, why: e.why || [] }, e.code === 'ai_limit' ? 429 : 502);
     await h.healthErr('courier', e);
     h.fail(500, 'courier');
   }
