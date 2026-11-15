@@ -396,3 +396,40 @@ def sun(x, y, r=18):
     import math
     rays = ''.join(f'<path d="M{x+math.cos(a)*(r+4):.1f} {y+math.sin(a)*(r+4):.1f} L{x+math.cos(a)*(r+12):.1f} {y+math.sin(a)*(r+12):.1f}" stroke="#e9a73a" stroke-width="3" stroke-linecap="round"/>' for a in [k*math.pi/4 for k in range(8)])
     return rays + f'<circle cx="{x}" cy="{y}" r="{r}" fill="#f6d36b" stroke="{LINE}" stroke-width="1.6"/>'
+
+def muskox(x, y, s=1, flip=False):
+    sx = -s if flip else s
+    hair = ''.join(f'<path d="M{-40+i*7} -24 q-2 14 1 26" stroke="#3a2a20" stroke-width="1.4" fill="none"/>' for i in range(12))
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="0" cy="4" rx="50" ry="5" fill="#000" opacity=".08" stroke="none"/>
+ <path d="M-30 0 v-10 M-14 0 v-10 M16 0 v-10 M30 0 v-10" stroke="#d9cfbd" stroke-width="5"/>
+ <path d="M-46 -20 C-50 -50 -30 -66 0 -66 C24 -66 40 -56 44 -40 C48 -20 40 -6 30 -2 L-40 -2 C-46 -6 -46 -14 -46 -20Z" fill="#5b4330"/>
+ <path d="M-20 -60 C-10 -70 10 -70 20 -62 C10 -58 -10 -58 -20 -60Z" fill="#a08a6e"/>
+ {hair}
+ <path d="M36 -44 C46 -50 60 -48 64 -36 C66 -26 60 -18 52 -18 C44 -18 38 -26 36 -34Z" fill="#4a3526"/>
+ <path d="M40 -50 C30 -56 30 -40 40 -38 M56 -50 C66 -56 68 -40 58 -38" fill="none" stroke="#e9e1d0" stroke-width="5"/>
+ <path d="M40 -50 C30 -56 30 -40 40 -38 M56 -50 C66 -56 68 -40 58 -38" fill="none" stroke="{LINE}" stroke-width="1"/>
+ <path d="M56 -24 q4 3 8 0" fill="#d9cfbd"/><circle cx="54" cy="-34" r="2" fill="#fff" stroke="none"/>
+</g>"""
+
+def reindeer(x, y, s=1, flip=False, pack=False):
+    sx = -s if flip else s
+    p = '<rect x="-20" y="-62" width="22" height="20" rx="4" fill="#c8323c"/><path d="M-16 -58 h14" stroke="#fff" stroke-width="1.6"/>' if pack else ''
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="0" cy="4" rx="40" ry="5" fill="#000" opacity=".08" stroke="none"/>
+ <path d="M-24 -30 L-28 2 M-12 -28 L-12 2 M14 -28 L16 2 M26 -30 L30 2" stroke="#7a5a3e" stroke-width="4"/>
+ <path d="M-34 -40 C-36 -58 -14 -62 10 -60 C30 -58 38 -48 36 -36 C34 -24 18 -22 0 -22 C-22 -22 -32 -28 -34 -40Z" fill="#b39274"/>
+ <path d="M-30 -36 C-14 -30 14 -30 32 -36 C30 -26 16 -22 0 -22 C-18 -22 -28 -28 -30 -36Z" fill="#efe6d6" stroke="none"/>
+ {p}
+ <path d="M28 -54 C30 -70 38 -80 48 -80 C56 -80 60 -72 58 -64 C56 -56 48 -54 42 -50 C38 -46 34 -44 30 -44Z" fill="#b39274"/>
+ <path d="M44 -80 C40 -96 30 -104 22 -104 M38 -94 l-8 -2 M50 -80 C54 -98 64 -104 72 -104 M58 -96 l8 -6 M46 -86 l4 -8" fill="none" stroke="#8b6a4e" stroke-width="3"/>
+ <circle cx="58" cy="-62" r="3" fill="{LINE}" stroke="none"/><circle cx="48" cy="-70" r="2.4" fill="{LINE}" stroke="none"/>
+ <path d="M40 -76 l-8 -6 l2 8Z" fill="#b39274"/>
+</g>"""
+
+def rock(x, y, w=60, h=30, c='#a9a49a'):
+    return (f'<path d="M{x} {y} C{x} {y-h*.7} {x+w*.2} {y-h} {x+w*.5} {y-h} C{x+w*.8} {y-h} {x+w} {y-h*.6} {x+w} {y}Z" fill="{c}" stroke="{LINE}" stroke-width="1.6"/>'
+            f'<path d="M{x+w*.3} {y-h*.7} q{w*.1} -4 {w*.25} -2" stroke="#c9c4ba" stroke-width="2" fill="none"/>')
+
+def binoculars(x, y):
+    return f'<g stroke="{LINE}" stroke-width="1.6"><rect x="{x}" y="{y}" width="9" height="14" rx="3" fill="#33333c"/><rect x="{x+11}" y="{y}" width="9" height="14" rx="3" fill="#33333c"/><path d="M{x+9} {y+5} h2"/></g>'

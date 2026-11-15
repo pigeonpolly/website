@@ -310,6 +310,23 @@ def u13():
     b += bubble(170, 150, 'Det regner og det er sol!')
     return svg(600, 340, 'Pollijs ar lietussargu un trollis Trulte virs Geirangerfjorda pie Septiņu māsu ūdenskrituma', b)
 
+@scene(14)
+def u14():
+    b = sky(600, 340, '#a4c3dc', '#f1eee4', 'u14')
+    b += cloud(140, 50) + cloud(420, 36, .8)
+    b += ridge([(0, 160), (90, 120), (170, 150), (260, 70), (330, 100), (380, 80), (450, 140), (540, 110), (600, 140)], '#9fb0bf', 190, snow=130)
+    b += '<path d="M240 90 L260 70 L282 92 L270 88 L260 96 L250 88Z" fill="#fff"/>'
+    b += '<path d="M0 190 C100 170 200 190 300 180 C400 170 500 186 600 176 V340 H0Z" fill="#b7b48a" stroke="#1f2442" stroke-width="1.4"/>'
+    b += '<path d="M0 230 C120 214 260 236 400 222 C480 214 560 226 600 220 V340 H0Z" fill="#a3a074"/>'
+    b += grass(0, 600, 236, 338, 31, '#7f8a58', 60) + ''.join(f'<circle cx="{x}" cy="{y}" r="2.4" fill="#c8323c" stroke="#1f2442" stroke-width=".6"/>' for x, y in [(60, 300), (140, 320), (210, 296), (520, 310), (470, 330)])
+    b += rock(60, 330, 90, 44) + rock(520, 236, 50, 20) + rock(150, 230, 40, 16)
+    b += muskox(340, 236, .5) + muskox(420, 242, .55, flip=True) + muskox(480, 232, .42) + muskox(380, 250, .35)
+    b += reindeer(240, 316, .7, pack=True)
+    b += polly(110, 300, .45, flip=True) + binoculars(116, 236)
+    b += '<g stroke="#1f2442" stroke-width="1.4"><path d="M560 300 v-40" stroke-width="3"/><rect x="540" y="250" width="40" height="22" fill="#fff"/></g><text x="560" y="265" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="9" font-weight="700" fill="#c8323c">200 m!</text>'
+    b += bubble(150, 130, 'Se! Moskus!')
+    return svg(600, 340, 'Pollijs ar binokli aiz akmens un ziemeļbriedis gide vēro jaku vēršus Doverfjellā', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():
