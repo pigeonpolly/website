@@ -241,6 +241,32 @@ def u10():
     b += bubble(30, 246, 'Se! Kjosfossen!')
     return svg(600, 340, 'Flåmas dzelzceļa vilciens pie Kjosfosena ūdenskrituma; Pollijs un aita vagona logos', b)
 
+@scene(11)
+def u11():
+    b = sky(600, 340, '#9cc0dc', '#f3ece0', 'u11')
+    b += cloud(120, 40) + cloud(420, 30, .8) + cloud(560, 70, .5)
+    b += ridge([(0, 150), (60, 90), (120, 130), (190, 70), (260, 120), (330, 84), (400, 130), (470, 96), (540, 120), (600, 100)], '#a6b8c6', 180, snow=110)
+    b += '<path d="M0 180 C60 166 110 176 170 168 C230 160 260 176 320 172 L320 190 H0Z" fill="#7d9a7a" stroke="#1f2442" stroke-width="1.4"/>'
+    b += ''.join(house(x, 184, 18, 13, c) for x, c in [(30, '#c8323c'), (56, '#fbf6ea'), (84, '#e1a85a'), (200, '#c8323c'), (226, '#fbf6ea')])
+    b += lighthouse(300, 184, 46)
+    b += water(184, c='#7fa6c0')
+    b += '<path d="M420 160 q6 -5 12 0 q6 -5 12 0 M470 140 q5 -4 10 0 q5 -4 10 0" stroke="#1f2442" stroke-width="1.4" fill="none"/>'
+    # kuģa klājs
+    b += '<path d="M0 250 H600 V340 H0Z" fill="#c8b48e"/>' + ''.join(f'<path d="M0 {y} H600" stroke="#b49f78" stroke-width="1.4"/>' for y in range(262, 340, 12))
+    b += '<path d="M0 214 H600" stroke="#1f2442" stroke-width="3"/><path d="M0 214 H600" stroke="#fff" stroke-width="1.4"/>'
+    b += ''.join(f'<path d="M{x} 214 V250" stroke="#1f2442" stroke-width="2.4"/>' for x in range(10, 600, 40)) + '<path d="M0 232 H600" stroke="#1f2442" stroke-width="1.4"/>'
+    b += '<g stroke="#1f2442" stroke-width="2"><path d="M470 250 V120 h70 V250Z" fill="#fbf6ea"/><path d="M490 120 v-50 h34 v50Z" fill="#c8323c"/><path d="M490 70 h34 v14 h-34Z" fill="#33333c"/></g>'
+    b += ''.join(f'<circle cx="{486 + i*18}" cy="{150 + j*30}" r="6" fill="#bcd3e4" stroke="#1f2442" stroke-width="1.4"/>' for i in range(3) for j in range(3))
+    b += lifebuoy(440, 236)
+    b += '<g stroke="#1f2442" stroke-width="1.6"><rect x="60" y="268" width="60" height="8" fill="#a87a42"/><path d="M66 276 v24 M114 276 v24" stroke-width="3"/><rect x="70" y="254" width="40" height="14" fill="#fff"/></g>'
+    b += '<text x="90" y="246" text-anchor="middle" font-family="DM Sans,sans-serif" font-size="8" font-weight="700" fill="#1f2442">HURTIGRUTEN</text>'
+    b += polly(220, 330, .55)
+    b += '<g transform="translate(160 296) rotate(-10)" stroke="#1f2442" stroke-width="1.4"><rect width="40" height="30" fill="#fbf6ea"/><path d="M6 22 L14 10 L20 16 L28 6 L34 20" stroke="#2f55a0" stroke-width="1.6" fill="none"/></g>'
+    b += cormorant(350, 332, .78, flip=True, hat=True)
+    b += '<g stroke="#1f2442" stroke-width="1.6"><ellipse cx="380" cy="268" rx="22" ry="5" fill="#c9d2da"/><path d="M362 266 q18 -18 36 0" fill="#e9a07a"/></g>'
+    b += bubble(110, 112, 'Er du kokken på skipet?')
+    return svg(600, 340, 'Pollijs un jūraskraukļa pavārs Ūle uz Hurtigruten kuģa klāja; krastā bāka un mājiņas', b)
+
 if __name__ == '__main__':
     os.makedirs(os.path.join(D, 'scenes'), exist_ok=True)
     for n, f in S.items():

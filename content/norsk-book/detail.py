@@ -326,3 +326,26 @@ def train(x, y, n=3, c='#3f6e4f', s=1):
         t += f'<circle cx="{ox+20}" cy="-4" r="5" fill="#33333c"/><circle cx="{ox+80}" cy="-4" r="5" fill="#33333c"/>'
         if k: t += f'<path d="M{ox-8} -24 h8" stroke-width="3"/>'
     return t + '</g>'
+
+def cormorant(x, y, s=1, flip=False, hat=False):
+    sx = -s if flip else s
+    h = ('<path d="M24 -108 c-8 -14 4 -24 14 -18 c4 -10 18 -8 18 2 c10 -2 14 10 6 16 v10 h-34Z" fill="#fff"/><path d="M26 -98 h32" />' if hat else '')
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+ <path d="M-6 -10 L-8 6 M-8 6 l-8 2 M-8 6 l6 2 M8 -10 L9 6 M9 6 l-8 2 M9 6 l6 2" stroke="#33333c" stroke-width="3" fill="none"/>
+ <path d="M-30 -30 L-52 -6 L-40 -4 L-24 -20Z" fill="#26282f"/>
+ <path d="M-28 -40 C-30 -64 -10 -72 10 -66 C24 -62 30 -48 28 -34 C26 -18 12 -8 -4 -8 C-18 -8 -26 -20 -28 -40Z" fill="#33363f"/>
+ <path d="M-20 -48 C-6 -58 10 -56 20 -46" stroke="#5a6a5a" stroke-width="2" fill="none"/>
+ <path d="M14 -64 C18 -84 22 -96 30 -100 C40 -104 50 -98 50 -90 C50 -82 40 -80 34 -78 C30 -70 26 -64 24 -58Z" fill="#33363f"/>
+ <path d="M48 -92 L72 -88 q4 2 0 6 l-4 -2 L48 -86Z" fill="#9b8a72"/>
+ <circle cx="40" cy="-92" r="3" fill="#2bb3a0" stroke="none"/><circle cx="40.5" cy="-92" r="1.3" fill="{LINE}" stroke="none"/>
+ {h}
+</g>"""
+
+def lifebuoy(x, y, r=16):
+    return (f'<circle cx="{x}" cy="{y}" r="{r}" fill="#fff" stroke="{LINE}" stroke-width="1.8"/><circle cx="{x}" cy="{y}" r="{r*.5}" fill="#c9d6e0" stroke="{LINE}" stroke-width="1.6"/>'
+            + ''.join(f'<path d="M{x+r*.55*__import__("math").cos(a)} {y+r*.55*__import__("math").sin(a)} L{x+r*__import__("math").cos(a)} {y+r*__import__("math").sin(a)}" stroke="#c8323c" stroke-width="7"/>' for a in (0.4, 2.0, 3.6, 5.2)))
+
+def lighthouse(x, y, h=60):
+    return (f'<g stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round"><path d="M{x-8} {y} L{x-5} {y-h} H{x+5} L{x+8} {y}Z" fill="#fff"/>'
+            f'<path d="M{x-7} {y-h*.3} H{x+7} L{x+6.5} {y-h*.5} H{x-6.5}Z M{x-5.5} {y-h*.75} H{x+5.5} L{x+5} {y-h*.9} H{x-5}Z" fill="#c8323c"/>'
+            f'<rect x="{x-6}" y="{y-h-10}" width="12" height="10" fill="#f6d36b"/><path d="M{x-8} {y-h-10} L{x} {y-h-18} L{x+8} {y-h-10}Z" fill="#c8323c"/></g>')
