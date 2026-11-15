@@ -80,8 +80,26 @@ const TXT = { type: 'STRING' }, BLOCK = { type: 'OBJECT', required: ['h', 'text'
 const WRITE_SCHEMA = { type: 'OBJECT', required: ['intro', 'd_ru', 'items', 'facts', 'history', 'joke'], properties: {
   intro: TXT, d_ru: TXT,
   items: { type: 'ARRAY', items: { type: 'OBJECT', required: ['i', 'h', 'p'], properties: { i: { type: 'INTEGER' }, h: TXT, p: { type: 'ARRAY', items: TXT } } } },
-  facts: { type: 'ARRAY', items: BLOCK }, history: BLOCK, joke: TXT } };
-const writePrompt = (day, items, samples) => `Write today's issue of "Art Coo-rier" — a digest of world art news for the blog of Alina Otkinska, an artist and learning experience designer from Riga. Date: ${ruDate(day)} ${day.slice(0, 4)}.
+  facts: { type: 'ARRAY', items: BLOCK }, history: BLOCK, jokes: { type: 'ARRAY', items: TXT } } };
+// прошлые выпуски: факты, «Из истории» и шутки — чтобы не повторяться (берём из самих статей, meta не нужна)
+const STOP = new Set('карти худож работ музей котор этого также время более свои своей очень много можно после была было были стала стало кисти однаж всего самых самый искус'.split(' '));
+const words = s => new Set((String(s || '').toLowerCase().replace(/ё/g, 'е').match(/[a-zа-я]{4,}/g) || []).map(w => w.slice(0, 5)).filter(w => !STOP.has(w)));
+const alike = (a, b) => { const A = words(a), B = words(b); if (!A.size || !B.size) return false; let n = 0; for (const w of A) if (B.has(w)) n++; return n >= 2 && n / Math.min(A.size, B.size) >= 0.34; };
+export function pastBits(htmls) {
+  const out = { facts: [], history: [], jokes: [] }, txt = s => strip(s);
+  for (const h of htmls) {
+    for (const m of String(h || '').matchAll(/<h2[^>]*>([\s\S]*?)<\/h2>\s*(?:<p[^>]*>([\s\S]*?)<\/p>|<blockquote[^>]*>([\s\S]*?)<\/blockquote>)?/gi)) {
+      const t = txt(m[1]), body = txt(m[2] || m[3] || '');
+      if (/интересный факт/i.test(t)) out.facts.push(t.replace(/^.*?интересный факт\s*[:—-]\s*/i, '') + ' — ' + body.slice(0, 160));
+      else if (/из истории искусств/i.test(t)) out.history.push(t.replace(/^.*?из истории искусств\s*[:—-]\s*/i, '') + ' — ' + body.slice(0, 120));
+      else if (/шутка дня/i.test(t)) out.jokes.push(body.slice(0, 200));
+    }
+  }
+  return out;
+}
+const fresh = (x, old) => !old.some(o => alike(x, o));
+const isNewFact = (f, past) => f && f.text && fresh(`${f.h} ${f.text}`, past.facts);
+const writePrompt = (day, items, samples, past = { facts: [], history: [], jokes: [] }) => `Write today's issue of "Art Coo-rier" — a digest of world art news for the blog of Alina Otkinska, an artist and learning experience designer from Riga. Date: ${ruDate(day)} ${day.slice(0, 4)}.
 LANGUAGE: Russian. VOICE: Alina's — warm, lively, curious, addressing the reader as «ты»; but it is an art NEWS digest, not chatter: clear facts first, a light personal touch at most once per story.
 STRICT RULE: Russian WITHOUT grammatical gender of the author or the reader — never write forms like «я сделала», «я рад», «ты открыл», «ты увидела»; use present tense, «мне кажется», «хочется», «стоит посмотреть», «ты можешь», impersonal phrases.
 FACTS: retell only what is in the source text below — no invented names, numbers, dates, quotes or places. If the text is short, write less. Keep names of artists, museums and works correct (Russian transliteration, original in brackets once if helpful).
@@ -89,9 +107,14 @@ Return JSON:
 - intro: 2–3 sentences: greeting, the date, what is in today's issue (mention 2–3 highlights).
 - d_ru: one short description of the issue for the blog list (max 160 chars).
 - items: for EVERY news item below, in a good reading order: i (its number), h (a short lively Russian headline, max 90 chars), p (1–2 paragraphs, 2–4 sentences each).
-- facts: exactly 2 "Интересный факт" blocks about art (h — short title without the words «Интересный факт», text — 2–4 sentences). Only real, well-known, verifiable facts (famous works, artists, materials, museums); avoid obscure or disputed claims and exact numbers you are not sure about.
+- facts: exactly 4 "Интересный факт" blocks about art, each about a DIFFERENT artist/work/subject (h — short title without the words «Интересный факт», text — 2–4 sentences). Only real, well-known, verifiable facts (famous works, artists, materials, museums); avoid obscure or disputed claims and exact numbers you are not sure about. They must NOT repeat any fact or subject from previous issues (list below).
 - history: one "Из истории искусств" block (h — only the short subject, e.g. an artist or work, WITHOUT the words «Из истории искусств»; text 3–5 sentences): a well-known event in art history that happened on ${ruDate(day)} (any year) if you are sure about it, otherwise a well-known story from art history. No doubtful dates.
-- joke: one short, kind, light joke about art or artists (in Russian, no gender forms).
+- jokes: 3 different short, kind, light jokes about art or artists, best first. Each must be genuinely funny and instantly clear to a Russian reader WITHOUT explanation: a short dialogue or a one-liner with an obvious punchline. Write natural, literate Russian (correct spelling, cases and agreement; characters inside the joke — «художник», «Ван Гог» — use normal grammar). No wordplay that only works in English, no translated puns, no forced rhymes, nothing confusing. Re-read each joke; if it needs explaining, replace it. Do not repeat jokes from previous issues.
+
+PREVIOUS ISSUES — already used, do NOT repeat these facts, subjects, history stories or jokes:
+Facts: ${past.facts.slice(0, 40).join(' | ') || '(none)'}
+History: ${past.history.slice(0, 20).join(' | ') || '(none)'}
+Jokes: ${past.jokes.slice(0, 20).join(' | ') || '(none)'}
 
 Examples of Alina's style (from her blog, for tone only — do not copy the content):
 ${samples.map((s, i) => `--- sample ${i + 1} ---\n${s}`).join('\n') || '(no samples)'}
@@ -126,8 +149,12 @@ async function stepWrite(env, h) {
   const rows = (await env.DB.prepare("SELECT b_ru, section FROM blog_posts WHERE status = 'published' AND b_ru != '' ORDER BY published_at DESC LIMIT 8").all()).results;
   const samples = rows.filter(r => !String(r.section || '').split(',').map(x => x.trim()).includes(cs)).slice(0, 2).map(r => strip(r.b_ru).slice(0, 1500));
   const day = src.day || rigaDay(), need = Math.min(MIN_N, src.items.length);
-  const w = await ask(env, writePrompt(day, src.items, samples), WRITE_SCHEMA,
-    o => Array.isArray(o.items) && o.items.filter(x => src.items[x.i] && x.p && x.p.length).length >= need && Array.isArray(o.facts) && o.facts.length >= 2 && o.history && o.history.text && o.joke, 0.6);
+  const prev = (await env.DB.prepare("SELECT b_ru FROM blog_posts WHERE slug LIKE 'art-coo-rier-%' ORDER BY created_at DESC LIMIT 30").all()).results;
+  const past = pastBits(prev.map(r => r.b_ru));
+  const w = await ask(env, writePrompt(day, src.items, samples, past), WRITE_SCHEMA,
+    o => Array.isArray(o.items) && o.items.filter(x => src.items[x.i] && x.p && x.p.length).length >= need && Array.isArray(o.facts) && o.facts.filter(f => isNewFact(f, past)).length >= 2 && o.history && o.history.text && Array.isArray(o.jokes) && o.jokes.some(j => String(j).trim()), 0.6);
+  w.facts = w.facts.filter(f => isNewFact(f, past)).filter((f, i, a) => !a.slice(0, i).some(g => alike(`${f.h} ${f.text}`, `${g.h} ${g.text}`)));
+  w.joke = (w.jokes.map(j => String(j).trim()).filter(Boolean).find(j => fresh(j, past.jokes)) || '');
   const { html, cover } = buildHtml(day, src, w);
   const b = await cleanHtml(html);
   let slug = `art-coo-rier-${day}`;
