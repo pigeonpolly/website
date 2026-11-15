@@ -68,8 +68,8 @@
     ready = true;
     const st = document.createElement('style');
     st.textContent = '.pp-emo{width:1.3em;height:1.3em;vertical-align:-.28em;overflow:visible}'
-      + '.pp-emo .w *{stroke:none!important}.pp-emo .w .i,.pp-emo .w .i *{fill:none!important}.pp-emo .w{opacity:.88;filter:url(#pp-emo-wash)}'
-      + '.pp-emo .k{stroke:currentColor;filter:url(#pp-emo-ink)}.pp-emo .k *{fill:none!important}.pp-emo .k .i,.pp-emo .k .i *{fill:currentColor!important}';
+      + '.pp-emo .w *{stroke:none!important}.pp-emo .w .i,.pp-emo .w .i *{fill:none!important}.pp-emo .w{opacity:.75;filter:url(#pp-emo-wash)}'
+      + '.pp-emo .k{stroke:currentColor;filter:url(#pp-emo-ink)}.pp-emo .k .i,.pp-emo .k .i *{fill:currentColor!important}';
     document.head.appendChild(st);
     const d = document.createElement('div');
     d.style.cssText = 'position:absolute;width:0;height:0;overflow:hidden';
@@ -82,7 +82,7 @@
     if (!a) return null;
     setup();
     a = a.split(`fill="${O}"`).join('class="i"');
-    return `<svg class="pp-emo" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke-width="1.6" stroke-linejoin="round" stroke-linecap="round"><g class="w" transform="translate(.9 1)">${a}</g><g class="k">${a}</g></svg>`;
+    return `<svg class="pp-emo" viewBox="0 0 32 32" aria-hidden="true" fill="none" stroke-width="1.35" stroke-linejoin="round" stroke-linecap="round"><g class="w" transform="translate(.9 1)">${a}</g><g class="k">${a}</g></svg>`;
   };
   window.PPEmojiArt = { svg, list: Object.keys(ART) };
 })();
