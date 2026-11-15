@@ -183,6 +183,123 @@ def head():
 <g clip-path="url(#hc)">{polly(4, 0, 1)}</g>
 </svg>'''
 
-for name, fn in [('scene-u0.svg', u0), ('scene-u1.svg', u1), ('polly-head.svg', head)]:
+
+# ---------- общие детали пейзажей (для глав 2–20) ----------
+def svg(w, h, label, body):
+    return f'<svg preserveAspectRatio="xMidYMid slice" viewBox="0 0 {w} {h}" xmlns="http://www.w3.org/2000/svg" aria-label="{label}">{body}</svg>'
+
+def sky(w, h, top='#bcd5e8', bot='#f3efe6', gid='sk'):
+    return (f'<defs><linearGradient id="{gid}" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="{top}"/>'
+            f'<stop offset="1" stop-color="{bot}"/></linearGradient></defs><rect width="{w}" height="{h}" fill="url(#{gid})"/>')
+
+def cloud(x, y, s=1, op=.8):
+    return (f'<g transform="translate({x} {y}) scale({s})" fill="#fff" opacity="{op}"><ellipse cx="0" cy="0" rx="40" ry="11"/>'
+            f'<ellipse cx="-14" cy="-8" rx="16" ry="10"/><ellipse cx="10" cy="-10" rx="20" ry="13"/></g>')
+
+def ridge(pts, fill, y0, w=600, stroke=None, snow=None):
+    d = f'M0 {y0} ' + ' '.join(f'L{x} {y}' for x, y in pts) + f' L{w} {y0} V900 H0Z'
+    st = f' stroke="{stroke}" stroke-width="1.5" stroke-linejoin="round"' if stroke else ''
+    out = f'<path d="{d}" fill="{fill}"{st}/>'
+    if snow:
+        for x, y in pts:
+            if y < snow:
+                out += f'<path d="M{x-12} {y+14} L{x} {y} L{x+12} {y+14} L{x+5} {y+10} L{x} {y+15} L{x-5} {y+10}Z" fill="#fff" opacity=".9"/>'
+    return out
+
+def spruce(x, y, h=30, c='#5f8a72'):
+    w = h * .38
+    return (f'<g stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round"><path d="M{x} {y-h} L{x+w*.6} {y-h*.55} L{x+w*.3} {y-h*.55} '
+            f'L{x+w} {y-h*.12} L{x+w*.4} {y-h*.12} L{x+w*.4} {y} L{x-w*.4} {y} L{x-w*.4} {y-h*.12} L{x-w} {y-h*.12} '
+            f'L{x-w*.3} {y-h*.55} L{x-w*.6} {y-h*.55}Z" fill="{c}"/></g>')
+
+def house(x, y, w=40, h=30, c='#c8323c', roof='#3a3f55', door=True):
+    """деревянный домик: y — низ"""
+    win = f'<rect x="{x+w*.15}" y="{y-h*.7}" width="{w*.22}" height="{h*.28}" fill="#fbe7a6"/>'
+    win += f'<rect x="{x+w*.63}" y="{y-h*.7}" width="{w*.22}" height="{h*.28}" fill="#fbe7a6"/>'
+    dr = f'<rect x="{x+w*.42}" y="{y-h*.45}" width="{w*.16}" height="{h*.45}" fill="#fff"/>' if door else ''
+    return (f'<g stroke="{LINE}" stroke-width="1.6" stroke-linejoin="round"><rect x="{x}" y="{y-h}" width="{w}" height="{h}" fill="{c}"/>'
+            f'<path d="M{x-4} {y-h} L{x+w/2} {y-h-h*.6} L{x+w+4} {y-h}Z" fill="{roof}"/>{win}{dr}</g>')
+
+def water(y, w=600, h=900, c='#8fb3c8', c2='#a9c7d8'):
+    lines = ''.join(f'<path d="M{x} {y+12+k*14} h{30}" stroke="{c2}" stroke-width="2" stroke-linecap="round"/>'
+                    for k in range(4) for x in range(20 + (k % 2) * 40, w, 120))
+    return f'<rect x="0" y="{y}" width="{w}" height="{h}" fill="{c}"/>{lines}'
+
+def boat(x, y, s=1, c='#c8323c'):
+    return (f'<g transform="translate({x} {y}) scale({s})" stroke="{LINE}" stroke-width="1.8" stroke-linejoin="round">'
+            f'<path d="M-30 0 L30 0 L22 12 L-24 12Z" fill="{c}"/><path d="M0 0 V-36" /><path d="M2 -34 L22 -6 L2 -6Z" fill="#fff"/></g>')
+
+def ground(y, c='#9dbb8a', w=600, h=900):
+    return f'<path d="M0 {y} C150 {y-8} 300 {y+6} 450 {y-4} C520 {y-8} 570 {y} {w} {y-2} V{h} H0Z" fill="{c}"/>'
+
+def bubble(x, y, text, w=None):
+    w = w or (len(text) * 8 + 24)
+    return (f'<g><rect x="{x}" y="{y}" width="{w}" height="26" rx="10" fill="#fff" stroke="#b8aa96" stroke-width="1.2"/>'
+            f'<text x="{x+12}" y="{y+18}" font-family="DM Sans,sans-serif" font-weight="600" font-size="13" fill="{LINE}">{text}</text></g>')
+
+def cover():
+    b = sky(600, 430, '#9cc3e0', '#f6e7cf', 'cv')
+    b += cloud(120, 70, 1.2) + cloud(470, 50, .9) + cloud(330, 110, .7, .6)
+    b += ridge([(0, 230), (70, 150), (130, 200), (200, 120), (260, 190), (330, 140), (400, 200), (470, 110), (540, 180), (600, 150)], '#8aa7bf', 260, snow=170)
+    b += ridge([(0, 270), (90, 210), (160, 250), (240, 200), (330, 260), (420, 215), (520, 250), (600, 220)], '#6f8fa6', 300)
+    b += water(280)
+    b += boat(250, 312, .8)
+    b += '<path d="M600 250 C560 252 520 270 500 300 C480 330 470 380 470 430 H600Z" fill="#7d6b5d" stroke="#1f2442" stroke-width="2"/>'
+    b += '<path d="M600 240 H420 C400 240 390 250 392 262 L400 290 C470 286 540 284 600 288Z" fill="#a58d78" stroke="#1f2442" stroke-width="2" stroke-linejoin="round"/>'
+    b += '<path d="M0 330 C40 300 80 320 120 300 C150 286 170 300 200 330 C215 360 220 400 225 430 H0Z" fill="#6d8f6e" stroke="#1f2442" stroke-width="2"/>'
+    b += spruce(40, 320, 40) + spruce(70, 316, 34) + spruce(110, 306, 44) + spruce(150, 312, 30)
+    b += house(20, 360, 46, 32, '#c8323c') + house(84, 372, 40, 28, '#e1a85a')
+    b += polly(470, 248, .72, flip=False)
+    b += ('<g transform="translate(497 158)" stroke="#1f2442" stroke-width="2" stroke-linejoin="round"><rect x="0" y="0" width="22" height="34" rx="6" fill="#d9a55b"/>'
+          '<path d="M4 6 h14" stroke="#b9813a"/></g>')
+    return svg(600, 430, 'Pollijs uz klints virs fjorda', b)
+
+def crow(x, y, s=1, flip=False):
+    """серая ворона (kråke): серое тело, чёрные голова, крылья, хвост; смотрит вправо"""
+    sx = -s if flip else s
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="0" cy="9" rx="34" ry="5" fill="#000" opacity=".08" stroke="none"/>
+ <path d="M-6 -12 L-8 8 M-8 8 l-7 1 M-8 8 l6 1 M8 -12 L9 8 M9 8 l-7 1 M9 8 l6 1" stroke="#33333c" stroke-width="2.6" fill="none"/>
+ <path d="M-34 -40 L-62 -30 L-56 -20 L-30 -24Z" fill="#2a2b33"/>
+ <path d="M-36 -36 C-38 -60 -14 -70 10 -66 C24 -64 34 -58 38 -48 C40 -26 24 -12 0 -12 C-22 -12 -34 -22 -36 -36Z" fill="#a9aab3"/>
+ <path d="M-30 -46 C-12 -60 14 -58 26 -48 C18 -30 -10 -24 -40 -32Z" fill="#2a2b33"/>
+ <path d="M10 -66 C14 -84 28 -94 42 -92 C56 -90 62 -78 58 -66 C52 -54 34 -50 20 -54Z" fill="#2a2b33"/>
+ <path d="M56 -80 L78 -74 L56 -68Z" fill="#2a2b33"/>
+ <circle cx="46" cy="-80" r="4" fill="#fff" stroke-width="1.4"/><circle cx="47" cy="-80" r="2" fill="{LINE}" stroke="none"/>
+</g>"""
+
+def sparrow(x, y, s=1, flip=False):
+    """zvirbulis (spurv): brūns, apaļš; skatās pa labi"""
+    sx = -s if flip else s
+    return f"""<g transform="translate({x} {y}) scale({sx} {s})" stroke="{LINE}" stroke-width="2.2" stroke-linejoin="round" stroke-linecap="round">
+ <ellipse cx="0" cy="7" rx="22" ry="4" fill="#000" opacity=".08" stroke="none"/>
+ <path d="M-4 -8 L-5 6 M-5 6 l-5 1 M-5 6 l4 1 M6 -8 L7 6 M7 6 l-5 1 M7 6 l4 1" stroke="#c98a5a" stroke-width="2.2" fill="none"/>
+ <path d="M-24 -26 L-40 -34 L-36 -20 L-20 -16Z" fill="#7a5a3e"/>
+ <path d="M-24 -24 C-24 -46 -4 -54 14 -50 C30 -46 32 -30 28 -20 C22 -8 6 -6 -6 -8 C-18 -10 -24 -16 -24 -24Z" fill="#d9c3a5"/>
+ <path d="M-20 -34 C-6 -44 12 -42 20 -32 C10 -22 -8 -20 -26 -24Z" fill="#8b6845"/>
+ <path d="M-10 -32 l6 4 M0 -34 l6 4 M10 -34 l5 4" stroke="#d9c3a5" stroke-width="1.4"/>
+ <path d="M2 -50 C6 -62 18 -66 26 -62 C34 -58 34 -46 28 -40 C22 -36 12 -38 6 -44Z" fill="#9b7650"/>
+ <path d="M14 -48 C20 -50 26 -48 30 -44 C26 -40 18 -40 14 -44Z" fill="#a7a7ae" stroke="none"/>
+ <path d="M32 -52 L42 -48 L32 -45Z" fill="#3a3a40"/>
+ <circle cx="25" cy="-53" r="2.2" fill="{LINE}" stroke="none"/>
+</g>"""
+
+def u02():
+    b = sky(600, 340, '#a8cbe4', '#f4efe6', 'u2')
+    b += cloud(110, 60) + cloud(440, 46, .8)
+    b += '<g fill="#b9c6d3" stroke="#1f2442" stroke-width="1.4">' + ''.join(f'<rect x="{x}" y="{y}" width="{w}" height="{340-y}"/>' for x, y, w in [(330, 120, 24), (358, 96, 20), (382, 130, 26), (412, 88, 22), (438, 116, 24), (466, 104, 20)]) + '</g>'
+    b += '<g stroke="#9fb0c2" stroke-width="1">' + ''.join(f'<line x1="{x}" y1="140" x2="{x}" y2="200"/>' for x in range(336, 486, 6)) + '</g>'
+    b += water(250)
+    b += '<path d="M40 250 L300 120 L560 150 L600 250Z" fill="#f4f2ec" stroke="#1f2442" stroke-width="2" stroke-linejoin="round"/>'
+    b += '<path d="M300 120 L560 150 L540 170 L310 140Z" fill="#e2dfd6" stroke="#1f2442" stroke-width="1.6" stroke-linejoin="round"/>'
+    b += '<path d="M60 250 L300 130" stroke="#d8d4ca" stroke-width="2"/><path d="M140 250 L330 150" stroke="#d8d4ca" stroke-width="2"/>'
+    b += '<rect x="420" y="96" width="70" height="60" fill="#6d8299" stroke="#1f2442" stroke-width="2"/>'
+    b += '<g stroke="#8ea3b8" stroke-width="1">' + ''.join(f'<line x1="{x}" y1="98" x2="{x}" y2="154"/>' for x in range(428, 490, 10)) + '</g>'
+    b += '<path d="M0 250 H600" stroke="#1f2442" stroke-width="2"/>'
+    b += crow(150, 228, .55) + polly(262, 196, .6, flip=False) + sparrow(345, 168, .62, flip=True)
+    b += bubble(36, 132, 'Hvor kommer du fra?')
+    return svg(600, 340, 'Pollijs, vārna Ina un zvirbulis Bens uz Oslo operas jumta', b)
+
+for name, fn in [('scene-cover.svg', cover), ('scenes/u02.svg', u02), ('scene-u0.svg', u0), ('scene-u1.svg', u1), ('polly-head.svg', head)]:
     open(os.path.join(D, name), 'w').write(fn())
 print('ok')

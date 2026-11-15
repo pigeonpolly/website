@@ -151,3 +151,50 @@ table.pair{border-collapse:collapse;margin-top:6px;width:100%}
 table.pair td{padding:3px 8px 3px 0;border-top:1px solid #d5e1ee;vertical-align:baseline}
 table.pair td.w{font-weight:700;color:var(--accent)}
 table.pair td.pr{color:var(--soft);font-size:11.5px;white-space:nowrap}
+/* полная книга: карта маршрута, самопроверка, тесты, обложка, содержание */
+.route.r2{grid-template-columns:1fr 44mm}
+.route.one{grid-template-columns:1fr}
+.map.tall{min-height:54mm}
+.map .tripdone{fill:none;stroke:var(--accent2);stroke-width:1.6}
+.map .trip{stroke-width:1!important}
+.map .dotv{fill:var(--accent2)}.map .dotn{fill:#9aa6b4}
+.ctrlhead{display:flex;gap:12px;align-items:center;padding:10px 14px;border-radius:var(--r);background:var(--accent);color:#fff;margin:2px 0 12px}
+.ctrlhead.red{background:var(--accent2)}
+.ctrlhead .tag{font:600 18px var(--body);background:rgba(255,255,255,.18);border-radius:8px;padding:6px 10px}
+.ctrlhead h2{font-size:22px}
+.ctrlhead span{font-size:11.5px;opacity:.85}
+.ordbank.tr{grid-template-columns:repeat(2,1fr)}
+.ordbank.tr div{padding:7px 0}
+ol.items.tr li{display:flex;flex-direction:column;margin:4px 0 10px}
+ol.items.tr .blank.l{min-width:100%;margin-top:14px}
+.stitle{font-size:17px;margin:0 0 6px;color:var(--accent)}
+.score{margin-top:14px;text-align:right;font-weight:600;color:var(--accent)}
+.score span{display:inline-block;width:20mm;border-bottom:1.5px solid var(--accent)}
+.testhead{padding:12px 16px;border-radius:var(--r);background:var(--accent);color:#fff;margin-bottom:12px}
+.testhead h1{font-size:30px}
+.testhead p{margin:4px 0 0;opacity:.9}
+.part{font-family:var(--head);font-size:17px;color:var(--accent);margin:12px 0 4px;border-bottom:1px solid var(--line)}
+.part small{font-family:var(--body);font-size:11px;color:var(--soft);float:right;margin-top:6px}
+.toc{columns:2;column-gap:10mm;margin-top:6px}
+.toc-row{display:grid;grid-template-columns:9mm 1fr 9mm;gap:4px;padding:5px 0;border-bottom:1px solid var(--line);break-inside:avoid;font-size:12px}
+.toc-row .tn{font:600 15px var(--body);color:var(--accent2)}
+.toc-row .tt b{display:block;font-weight:600;color:var(--accent)}
+.toc-row .tt i{font-size:11px;color:var(--soft)}
+.toc-row .tp{text-align:right;color:var(--soft)}
+.howto{display:grid;gap:5px;margin:4px 0 10px}
+.howto div{display:grid;grid-template-columns:9mm 1fr;align-items:baseline}
+.howto .tag{font-size:10.5px;font-weight:700;color:#fff;background:var(--accent);border-radius:4px;padding:1px 0;text-align:center;width:7mm}
+.page.cover{padding:0;background:var(--accent);color:#fff;display:flex;flex-direction:column}
+.cover-top{padding:22mm 18mm 8mm}
+.cover-top .kicker{opacity:.8}
+.cover-top h1{font-size:58px;margin:8px 0 6px}
+.cover-top .sub{font-size:18px;opacity:.9;font-weight:300}
+.scene.cover-art{height:150mm;border-radius:0;margin:0}
+.cover-bottom{padding:8mm 18mm;flex:1;position:relative;border-top:5px solid var(--accent2)}
+.cover-bottom .lvls{display:flex;gap:8px;margin-bottom:8px}
+.cover-bottom .lvls span{font:700 14px var(--body);background:var(--accent2);border-radius:6px;padding:3px 10px}
+.cover-bottom p{opacity:.9;max-width:150mm}
+.cover-bottom .brand{position:absolute;right:18mm;bottom:10mm;font-size:11px;letter-spacing:.2em;text-transform:uppercase;opacity:.75}
+.howto div{display:block;padding-left:10mm;text-indent:-10mm}
+.howto .tag{display:inline-block;text-indent:0;margin-right:3mm}
+.scene.cover-art{height:180mm}

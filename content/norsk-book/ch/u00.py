@@ -1,0 +1,17 @@
+CH = dict(n=0, lvl='A1', place='Rīga', title='Hei, norsk!', lv='Mācāmies lasīt')
+CTRL = ctrl(CH,
+  words=[('hus','hu:s','māja'),('katt','kat','kaķis'),('brød','brø:','maize'),('båt','bo:t','laiva'),('eple','ˈeple','ābols'),
+         ('sol','su:l','saule'),('melk','melk','piens'),('by','bü:','pilsēta'),('ost','ust','siers'),('natt','nat','nakts')],
+  sents=[('Mani sauc Pollijs.','Jeg heter Polly.'),('Es mācos norvēģu valodu.','Jeg lærer norsk.'),
+         ('Es nāku no Rīgas.','Jeg kommer fra Riga.'),('Liels paldies!','Tusen takk!')],
+  text_title='Polly lærer norsk',
+  text=['Hei! Jeg heter Polly. Jeg er en due fra Riga.',
+        'I dag lærer jeg norsk. Jeg leser ord: hus, båt, sol, ost.',
+        'Norsk er ikke lett, men det er gøy!'],
+  gl=[('leser','ˈle:ser','lasa'),('ord','u:r','vārdi'),('ikke lett','ˈike let','nav viegls'),('gøy','gøi','jautri')],
+  qtitle='Atbildi uz jautājumiem latviešu valodā.',
+  qs=['Kā sauc balodi?','No kurienes viņš ir?','Ko viņš šodien dara?','Kādus vārdus viņš lasa? Uzraksti tos ar transkripciju.'],
+  qa=['Pollijs.','No Rīgas.','Mācās norvēģu valodu.','hus [hu:s], båt [bo:t], sol [su:l], ost [ust]'],
+  gram_q='Garš (G) vai īss (Ī) patskanis? Ieraksti.',
+  gram_items=['takk __','tak __','hatt __','hat __','vin __','vind __'],
+  gram_a=['Ī','G','Ī','G','G','Ī'])
