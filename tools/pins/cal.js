@@ -156,7 +156,7 @@ const TITLE = [
 const STYLE = ['dark moody', 'hand-drawn paper', 'pastel arch'];
 const pinText = (a, d, w, n) => {
   const mo = MON[a.m - 1], id = `${YEAR}-${pad(a.m)}-${w}`;
-  return { n, type: 'Календарь', season: a.m === 12 ? `Зима ${YEAR}/${String(YEAR + 1).slice(2)}` : `${a.season} ${YEAR}`, title: TITLE[d](mo, w),
+  return { n, type: 'Календарь', season: `${a.season} ${YEAR}`, title: TITLE[d](mo, w),
     desc: `A free ${mo} ${YEAR} calendar with my illustration: ${a.scene}. ${STYLE[d][0].toUpperCase() + STYLE[d].slice(1)} design, ${WK[w][1]}. Download it free in high resolution to print or use as a desktop or phone background. More months, US and EU versions on my site.`,
     alt: `${mo} ${YEAR} monthly calendar, ${WK[w][0]}, in a ${STYLE[d]} style under an illustration of ${a.scene}.`,
     link: `${SITE}/freebies/?f=${id}&d=${d + 1}&${UTM}`, media: `${SITE}/images/pins/pin-${n}.jpg`,
