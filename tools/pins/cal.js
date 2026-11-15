@@ -7,7 +7,7 @@
 const fs = require('fs'), path = require('path'), { execFileSync } = require('child_process');
 const { chromium } = require('playwright');
 const ROOT = path.resolve(__dirname, '../..');
-const ART = require('./cal-data');
+const ART = require('./cal-data'), WALLS = ART.walls;
 const YEAR = 2027, FIRST_PIN = 488;
 const SITE = 'https://www.pigeonpolly.com', UTM = 'utm_source=pinterest&utm_campaign=calendar27';
 const PALS = JSON.parse(fs.readFileSync(path.join(ROOT, 'content/palettes.json'), 'utf8'));
@@ -204,7 +204,7 @@ const yearText = (d, w, n) => ({ n, type: 'Календарь', season: 'Кру�
   }
   if (mode !== 'cal') {
     const page = await b.newPage({ viewport: { width: 393, height: 852 }, deviceScaleFactor: 3 });
-    for (const a of list) { const full = path.join(OUT, 'wall', a.key + '.jpg');
+    for (const a of (mode === 'wall' && !want.length ? WALLS : [])) { const full = path.join(OUT, 'wall', a.key + '.jpg');
       await shoot(page, WALL(a, colors(a)), full); mg(full, path.join(OUT, 'wall/t', a.key + '.jpg'), 300); console.log('wall', a.key); }
     await page.close();
   }
@@ -216,7 +216,7 @@ const yearText = (d, w, n) => ({ n, type: 'Календарь', season: 'Кру�
       d: [1, 2, 3].map(k => ({ full: im(`cal/${YEAR}-year-${w}-${k}.jpg`), th: im(`cal/t/${YEAR}-year-${w}-${k}.jpg`) })) })),
     cal: ART.flatMap(a => ['mon', 'sun'].map(w => ({ id: `${YEAR}-${pad(a.m)}-${w}`, y: YEAR, m: a.m, w, art: a.t,
       d: [1, 2, 3].map(k => ({ full: im(`cal/${YEAR}-${pad(a.m)}-${w}-${k}.jpg`), th: im(`cal/t/${YEAR}-${pad(a.m)}-${w}-${k}.jpg`) })) }))),
-    wall: ART.map(a => ({ id: a.key, t: a.t, full: im(`wall/${a.key}.jpg`), th: im(`wall/t/${a.key}.jpg`) })),
+    wall: WALLS.map(a => ({ id: a.key, t: a.t, full: im(`wall/${a.key}.jpg`), th: im(`wall/t/${a.key}.jpg`) })),
   };
   fs.writeFileSync(path.join(ROOT, 'site/assets/freebies.json'), JSON.stringify(data));
   const pins = ART.flatMap(a => [0, 1, 2].flatMap(d => ['mon', 'sun'].map(w => pinText(a, d, w, FIRST_PIN + (a.m - 1) * 6 + d * 2 + (w === 'sun' ? 1 : 0)))));

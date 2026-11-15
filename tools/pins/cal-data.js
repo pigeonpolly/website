@@ -38,3 +38,19 @@ module.exports = [
     scene: 'Polly the pigeon, Sam, Milka the cat and a laughing horse by the Christmas tree', tags: 'christmas, cozy, new year',
     t: ['A very merry New Year', 'Самый весёлый Новый год', 'Jautrākais Jaunais gads'] },
 ];
+
+// заставки на телефон — свои арты (не те, что в календарях; Алина 15.11), wpos — кадр, чтобы герой был по центру
+module.exports.walls = [
+  { dir: 'halloween', key: 'halloween-in-blue', wpos: '50% 50%', t: ['Pumpkin lady in blue', 'Тыквенная дама в голубом', 'Ķirbju dāma zilā'] },
+  { dir: 'halloween', key: 'halloween-lady', wpos: '50% 50%', t: ['Pumpkin lady', 'Тыквенная дама', 'Ķirbju dāma'] },
+  { dir: 'challenge', key: 'challenge-pigeonpolly-cactus-4-10-2026', wpos: '22% 50%', t: ['Polly’s cactus', 'Кактус Полли', 'Pollijas kaktuss'] },
+  { dir: 'snail', key: '2023-mr-chew-coffee-passion', wpos: '72% 50%', t: ['Mr. Chew’s coffee passion', 'Кофейная страсть Мистера Чу', 'Mistera Čū kafijas kaislība'] },
+  { dir: 'snail', key: '2023-mr-chew-take-away-coffee', wpos: '62% 50%', t: ['Mr. Chew, coffee to go', 'Мистер Чу: кофе с собой', 'Misters Čū: kafija līdzņemšanai'] },
+  { dir: 'snail', key: '2024-mr-chew-dnd-edition', wpos: '40% 50%', t: ['Mr. Chew plays D&D', 'Мистер Чу играет в D&D', 'Misters Čū spēlē D&D'] },
+  { dir: 'snail', key: '2024-mr-chew-steamphunk-edition', wpos: '70% 50%', t: ['Steampunk Mr. Chew', 'Стимпанк Мистер Чу', 'Stīmpanka Misters Čū'] },
+  { dir: 'snail', key: '2024-mr-chew-rainbow-candy-edition', wpos: '66% 50%', t: ['Rainbow candy Mr. Chew', 'Радужный Мистер Чу', 'Varavīksnes Misters Čū'] },
+  { dir: 'snail', key: '2025-mr-chew-opened-pumpkin-spice-latte-season', wpos: '63% 50%', t: ['Pumpkin spice latte season', 'Сезон тыквенного латте', 'Ķirbju latte sezona'] },
+  { dir: 'bird', key: '2023-pigeon-polly-thinking-about-relocation-to-mars', wpos: '52% 50%', t: ['Polly on Mars', 'Полли на Марсе', 'Pollija uz Marsa'] },
+  { dir: 'bird', key: '2022-pigeon-polly-graphic-designer', wpos: '46% 50%', t: ['Polly the designer', 'Полли-дизайнер', 'Pollija dizainere'] },
+  { dir: 'snail', key: '2024-mr-chew-celebrates-new-year', wpos: '22% 50%', t: ['Mr. Chew’s New Year', 'Новый год Мистера Чу', 'Mistera Čū Jaunais gads'] },
+];
