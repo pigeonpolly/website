@@ -77,7 +77,7 @@ async function stepSrc(env, h) {
 
 // ---------- шаг 2: Gemini пишет выпуск → черновик ----------
 const TXT = { type: 'STRING' }, BLOCK = { type: 'OBJECT', required: ['h', 'text'], properties: { h: TXT, text: TXT } };
-const WRITE_SCHEMA = { type: 'OBJECT', required: ['intro', 'd_ru', 'items', 'facts', 'history', 'joke'], properties: {
+const WRITE_SCHEMA = { type: 'OBJECT', required: ['intro', 'd_ru', 'items', 'facts', 'history', 'jokes'], properties: {
   intro: TXT, d_ru: TXT,
   items: { type: 'ARRAY', items: { type: 'OBJECT', required: ['i', 'h', 'p'], properties: { i: { type: 'INTEGER' }, h: TXT, p: { type: 'ARRAY', items: TXT } } } },
   facts: { type: 'ARRAY', items: BLOCK }, history: BLOCK, jokes: { type: 'ARRAY', items: TXT } } };
