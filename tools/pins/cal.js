@@ -141,13 +141,10 @@ ${[...Array(12)].map((_, i) => `.mm:nth-child(${i + 1}) b,.mm:nth-child(${i + 1}
 
 // заставка на телефон 393×852 (×3): сверху место под часы, арт в рамке, палитра точками
 const WALL = (a, c) => `<style>*{box-sizing:border-box;margin:0;padding:0}html,body{width:393px;height:852px;overflow:hidden}
-body{background:${c.dark};position:relative;font-family:Karla}
-.bg{position:absolute;inset:-40px;background:url('${src(a)}') center/cover;filter:blur(22px) saturate(1.15)}.bg:after{content:'';position:absolute;inset:0;background:linear-gradient(180deg,${c.dark}99,${c.dark}40 45%,${c.dark}B3)}
-.art{position:absolute;left:22px;right:22px;top:330px;height:400px;border-radius:22px;overflow:hidden;box-shadow:0 18px 40px rgba(0,0,0,.45);border:2px solid ${c.light}55}
-.art img{display:block;width:100%;height:100%;object-fit:cover;object-position:${a.pos}}
-.dots{position:absolute;left:0;right:0;bottom:84px;display:flex;justify-content:center;gap:9px}.dots i{width:13px;height:13px;border-radius:50%;border:1.5px solid ${c.light}66}
-.mk{position:absolute;left:0;right:0;bottom:62px;text-align:center;font:700 7px Karla;letter-spacing:.3em;color:${c.light};opacity:.45}</style>
-<div class="bg"></div><div class="art"><img src="${src(a)}"></div><div class="dots">${c.pal.map(h => `<i style="background:${h}"></i>`).join('')}</div><div class="mk">PIGEONPOLLY.COM</div>`;
+body{background:${c.dark};position:relative}
+.art{position:absolute;inset:0}.art img{display:block;width:100%;height:100%;object-fit:cover;object-position:${a.wpos || a.pos}}
+.lg{position:absolute;left:50%;bottom:22px;width:22px;height:22px;margin-left:-11px;opacity:.85;filter:drop-shadow(0 1px 2px rgba(0,0,0,.35))}</style>
+<div class="art"><img src="${src(a)}"></div><img class="lg" src="file://${path.join(ROOT, 'site/assets/logo-badge-white.png')}">`;
 
 // тексты пинов
 const WK = { mon: ['Monday Start', 'week starts on Monday (European style)'], sun: ['Sunday Start', 'week starts on Sunday (US style)'] };
