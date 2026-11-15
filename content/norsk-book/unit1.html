@@ -1,0 +1,389 @@
+<!doctype html>
+<html lang="lv">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Norsk med Polly · 1</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500;9..144,700;9..144,900&family=Nunito:ital,wght@0,400;0,600;0,700;0,800;1,400&display=swap" rel="stylesheet">
+<style>
+:root{
+  --paper:#fbf6ee; --ink:#2a2438; --soft:#6d6580;
+  --navy:#1f3a68; --red:#c8323c; --beret:#c4325a; --plum:#4b4170;
+  --sky:#e3eef8; --mint:#e6f2ea; --sun:#fbeccb; --rose:#f8e3e6;
+  --line:#e2d8c6;
+}
+*{box-sizing:border-box}
+body{margin:0;background:#cfc8bd;font:400 13.2px/1.5 Nunito,system-ui,sans-serif;color:var(--ink)}
+.book{display:grid;grid-template-columns:repeat(2,210mm);gap:0;justify-content:center;padding:24px 0}
+.spread-gap{grid-column:1/-1;height:24px}
+.page{width:210mm;height:297mm;background:var(--paper);position:relative;overflow:hidden;padding:15mm 15mm 16mm}
+.page.left{box-shadow:inset -18px 0 24px -20px rgba(0,0,0,.25)}
+.page.right{box-shadow:inset 18px 0 24px -20px rgba(0,0,0,.25)}
+.folio{position:absolute;bottom:7mm;font:700 11px Nunito;color:var(--soft);letter-spacing:.08em}
+.left .folio{left:15mm}.right .folio{right:15mm}
+.run{position:absolute;top:7mm;font:700 10px Nunito;letter-spacing:.14em;text-transform:uppercase;color:var(--soft)}
+.left .run{left:15mm}.right .run{right:15mm}
+h1,h2,h3{font-family:Fraunces,Georgia,serif;margin:0;line-height:1.1}
+.sec{display:flex;align-items:baseline;gap:10px;margin:14px 0 8px;border-bottom:2px solid var(--ink);padding-bottom:4px}
+.sec .tag{font:800 12px Nunito;color:#fff;background:var(--navy);border-radius:4px;padding:2px 7px}
+.sec h2{font-size:21px;font-weight:700}
+.sec .no{font:italic 400 13px Nunito;color:var(--soft);margin-left:auto}
+p{margin:0 0 7px}
+.ex{margin:12px 0 4px}
+.ex .q{font-weight:800}
+.ex .q b{display:inline-grid;place-items:center;width:20px;height:20px;border-radius:50%;background:var(--beret);color:#fff;font-size:11px;margin-right:6px}
+ol.items{margin:6px 0 0;padding-left:22px}
+ol.items li{margin:2px 0}
+.blank{display:inline-block;min-width:58px;border-bottom:1.5px dotted var(--soft);height:1em}
+.ans{margin-top:8px;border-top:1.5px dashed var(--line);padding-top:4px;transform:rotate(180deg);font-size:10.5px;color:var(--soft);text-align:left}
+.ans b{color:var(--ink)}
+.no-w{font-weight:700;color:var(--navy)}
+i.pr{font-style:normal;color:var(--soft);font-size:11.5px}
+/* opener */
+.opener{margin:-15mm -15mm 0;padding:13mm 15mm 9mm;background:var(--navy);color:#fff;position:relative;overflow:hidden}
+.opener .lvl{font:800 11px Nunito;letter-spacing:.16em;opacity:.8}
+.opener .num{font:900 120px/0.8 Fraunces;color:var(--red);position:absolute;right:13mm;top:12mm;opacity:.95}
+.opener h1{font-size:38px;font-weight:900;margin:8px 0 4px;max-width:120mm}
+.opener .lv{font:italic 400 16px Nunito;opacity:.9}
+.flag-strip{height:6px;background:linear-gradient(90deg,var(--red) 0 30%,#fff 30% 34%,var(--navy) 34% 38%,#fff 38% 42%,var(--red) 42% 100%);margin:0 -15mm}
+.route{display:grid;grid-template-columns:1.1fr 1fr;gap:12px;margin-top:10px}
+.goals{background:#fff;border-radius:10px;padding:10px 12px;border:1.5px solid var(--line)}
+.goals h3{font:800 12px Nunito;letter-spacing:.1em;text-transform:uppercase;color:var(--beret);margin-bottom:4px}
+.goals ul{margin:0;padding-left:18px}
+.goals li{margin:2px 0}
+.map{background:var(--sky);border-radius:10px;position:relative;overflow:hidden}
+.polly-say{display:flex;gap:10px;align-items:flex-start;margin:10px 0 0}
+.polly-say img{width:58px;height:58px;flex:none;border-radius:50%;border:2.5px solid var(--plum);background:var(--paper)}
+.bubble{background:#fff;border:1.5px solid var(--plum);border-radius:14px;padding:8px 12px;position:relative}
+.bubble:before{content:"";position:absolute;left:-8px;top:18px;width:12px;height:12px;background:#fff;border-left:1.5px solid var(--plum);border-bottom:1.5px solid var(--plum);transform:rotate(45deg)}
+.bubble .no-w{display:block}
+/* vocab cards */
+.vocab{display:grid;grid-template-columns:1fr 1fr;gap:5px 12px}
+.vocab div{display:flex;justify-content:space-between;gap:8px;border-bottom:1px solid var(--line);padding:3px 0}
+.vocab .n{font-weight:800;color:var(--navy)}
+.vocab .t{text-align:right;color:var(--ink)}
+.clocks{display:flex;gap:10px;margin-top:6px}
+.clock{flex:1;background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:6px;text-align:center;font-size:12px}
+.clock .ic{font-size:22px;line-height:1}
+.clock .tm{font:700 15px Fraunces}
+/* reading */
+.scene{height:62mm;border-radius:12px;background:linear-gradient(#cfe3f3,#eef5fb 60%,#d9d2c4 60%);position:relative;overflow:hidden;margin-bottom:8px}
+.dialog{background:#fff;border-radius:12px;border:1.5px solid var(--line);padding:10px 14px}
+.dialog p{margin:3px 0;display:grid;grid-template-columns:44px 1fr;gap:6px}
+.dialog .who{font:800 11px Nunito;color:var(--beret);text-transform:uppercase;padding-top:2px}
+.dialog .who.m{color:var(--navy)}
+.gloss{display:flex;flex-wrap:wrap;gap:4px 14px;font-size:11.5px;margin-top:6px;color:var(--soft)}
+.gloss b{color:var(--ink)}
+.tf{width:100%;border-collapse:collapse;margin-top:6px}
+.tf td{border-bottom:1px solid var(--line);padding:4px 2px}
+.tf td.box{width:62px;text-align:center;font-weight:700;color:var(--soft)}
+.fact{background:var(--sun);border-radius:12px;padding:10px 12px;margin-top:12px;display:grid;grid-template-columns:auto 1fr;gap:10px;align-items:start}
+.fact .ic{font-size:30px;line-height:1}
+.fact h3{font:800 12px Nunito;letter-spacing:.1em;text-transform:uppercase;color:#a0661a;margin-bottom:2px}
+/* grammar */
+.gbox{background:#fff;border:2px solid var(--navy);border-radius:12px;padding:10px 12px;margin:6px 0}
+.gtable{width:100%;border-collapse:collapse;font-size:13px}
+.gtable th{text-align:left;font:800 11px Nunito;letter-spacing:.08em;text-transform:uppercase;color:var(--soft);border-bottom:2px solid var(--navy);padding:3px 6px}
+.gtable td{padding:3px 6px;border-bottom:1px solid var(--line)}
+.gtable td:first-child{font-weight:800;color:var(--navy)}
+.gtable .hl{background:var(--rose);font-weight:800;color:var(--red);text-align:center}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+.warn{background:var(--rose);border-left:5px solid var(--red);border-radius:6px;padding:8px 10px;margin:8px 0}
+.warn b:first-child{color:var(--red)}
+.cmp{background:var(--mint);border-radius:10px;padding:8px 10px;margin:8px 0}
+.cmp h3,.warn h3{font:800 11.5px Nunito;letter-spacing:.08em;text-transform:uppercase;margin-bottom:3px}
+.formula{font:700 15px Fraunces;text-align:center;margin:6px 0;color:var(--navy)}
+.formula span{background:var(--sky);border-radius:6px;padding:2px 8px}
+/* letters & numbers */
+.letters{display:grid;grid-template-columns:repeat(4,1fr);gap:8px}
+.letter{background:#fff;border:1.5px solid var(--line);border-radius:10px;padding:6px 8px;text-align:center}
+.letter .L{font:900 30px/1 Fraunces;color:var(--red)}
+.letter small{display:block;color:var(--soft);font-size:11px}
+.nums{display:grid;grid-template-columns:repeat(11,1fr);gap:4px;margin-top:6px}
+.nums div{background:#fff;border:1.5px solid var(--line);border-radius:8px;text-align:center;padding:4px 0;font-size:11px}
+.nums b{display:block;font:900 18px Fraunces;color:var(--navy)}
+.notes{background:#fff;border-radius:12px;padding:10px 12px;margin-top:10px;background-image:repeating-linear-gradient(transparent 0 21px,#dfe8f1 21px 22px);border:1.5px solid var(--line);position:relative}
+.notes h3{font:800 12px Nunito;letter-spacing:.1em;text-transform:uppercase;color:var(--plum);margin-bottom:4px}
+.notes ul{margin:0;padding-left:16px}
+.notes li{margin:0 0 4px}
+.tape{position:absolute;top:-8px;right:20px;width:60px;height:18px;background:rgba(228,184,74,.55);transform:rotate(4deg)}
+.write{border:1.5px dashed var(--soft);border-radius:10px;padding:8px 12px;margin-top:8px;line-height:2.1}
+.check{display:grid;grid-template-columns:1fr 1fr;gap:4px 14px;margin-top:6px}
+.check div:before{content:"☐ ";color:var(--beret);font-weight:800}
+.stamp{position:absolute;right:15mm;bottom:15mm;width:30mm;height:30mm;border-radius:50%;border:2.5px dashed var(--red);color:var(--red);display:grid;place-items:center;text-align:center;font:900 12px/1.15 Fraunces;transform:rotate(-12deg);opacity:.85}
+</style>
+</head>
+<body>
+<div class="book">
+
+<!-- ============ 1. lappa ============ -->
+<section class="page left">
+  <div class="opener">
+    <div class="lvl">A1 · 1. NODAĻA · OSLO, GARDERMOEN</div>
+    <div class="num">1</div>
+    <h1>Hei! Jeg heter Polly</h1>
+    <div class="lv">Sveiki! Mani sauc Pollija</div>
+  </div>
+  <div class="flag-strip"></div>
+
+  <div class="route">
+    <div class="goals">
+      <h3>Šajā nodaļā tu iemācīsies</h3>
+      <ul>
+        <li>sasveicināties, atvadīties un pateikt paldies;</li>
+        <li>iepazīstināt ar sevi: <span class="no-w">Jeg heter …</span>, <span class="no-w">Jeg kommer fra …</span>;</li>
+        <li>personu vietniekvārdus: <span class="no-w">jeg, du, han, hun …</span>;</li>
+        <li>izrunāt burtus <span class="no-w">æ, ø, å</span>;</li>
+        <li>skaitīt no 0 līdz 10.</li>
+      </ul>
+    </div>
+    <div class="map">
+      <svg viewBox="0 0 300 190" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" aria-label="Pollijas ceļš: Rīga – Oslo">
+        <path d="M60 190 C70 150 40 120 70 95 C95 70 80 40 110 20 L130 0 L0 0 L0 190Z" fill="#f4efe4" stroke="#c9bfa9"/>
+        <path d="M300 120 C270 125 250 140 235 160 C228 175 240 190 240 190 L300 190Z" fill="#f4efe4" stroke="#c9bfa9"/>
+        <path d="M95 118 Q170 70 248 150" fill="none" stroke="#c4325a" stroke-width="2.5" stroke-dasharray="6 5"/>
+        <circle cx="95" cy="118" r="5" fill="#1f3a68"/><circle cx="248" cy="150" r="5" fill="#9e3039"/>
+        <text x="60" y="140" font-family="Fraunces" font-weight="700" font-size="15" fill="#1f3a68">Oslo</text>
+        <text x="228" y="176" font-family="Fraunces" font-weight="700" font-size="15" fill="#9e3039">Rīga</text>
+        <text x="132" y="78" font-family="Nunito" font-weight="700" font-size="11" fill="#6d6580">~ 850 km</text>
+        <text x="20" y="40" font-family="Nunito" font-weight="800" font-size="10" fill="#6d6580" letter-spacing="2">NORGE</text>
+        <text x="236" y="136" font-family="Nunito" font-weight="800" font-size="10" fill="#6d6580" letter-spacing="2">LATVIJA</text>
+        <text x="150" y="160" font-family="Nunito" font-style="italic" font-size="10" fill="#7fa3c4">Baltijas jūra</text>
+      </svg>
+    </div>
+  </div>
+
+  <div class="polly-say">
+    <img src="polly.png" alt="Pollija">
+    <div class="bubble"><span class="no-w">Hei! Jeg heter Polly.</span>
+      Es esmu balode no Rīgas, un šodien lidoju uz Norvēģiju. Esmu dzirdējusi, ka tur ir fjordi, ziemeļblāzma un brūnais siers. Lido man līdzi — mācīsimies norvēģu valodu kopā!</div>
+  </div>
+
+  <div class="sec"><span class="tag">1A</span><h2>Ordforråd</h2><span class="no">Vārdu krājums: sasveicināšanās</span></div>
+  <div class="vocab">
+    <div><span class="n">Hei! / Hallo!</span><span class="t">Sveiki! Čau!</span></div>
+    <div><span class="n">Ha det (bra)!</span><span class="t">Uz redzēšanos! <i class="pr">[ha de]</i></span></div>
+    <div><span class="n">God morgen!</span><span class="t">Labrīt! <i class="pr">[gu morn]</i></span></div>
+    <div><span class="n">Vi ses!</span><span class="t">Tiksimies!</span></div>
+    <div><span class="n">God dag!</span><span class="t">Labdien! <i class="pr">[gu dāg]</i></span></div>
+    <div><span class="n">Takk! / Tusen takk!</span><span class="t">Paldies! / Liels paldies!</span></div>
+    <div><span class="n">God kveld!</span><span class="t">Labvakar!</span></div>
+    <div><span class="n">Vær så god!</span><span class="t">Lūdzu! (pasniedzot)</span></div>
+    <div><span class="n">God natt!</span><span class="t">Ar labu nakti!</span></div>
+    <div><span class="n">Unnskyld!</span><span class="t">Atvainojiet! <i class="pr">[unšil]</i></span></div>
+    <div><span class="n">Hvordan går det?</span><span class="t">Kā iet? <i class="pr">[vurdan gor de]</i></span></div>
+    <div><span class="n">Bra, takk! Og med deg?</span><span class="t">Labi, paldies! Un tev?</span></div>
+  </div>
+
+  <div class="ex">
+    <div class="q"><b>1</b>Kā sveicināties? Pievieno katram pulkstenim pareizo sveicienu.</div>
+    <div class="clocks">
+      <div class="clock"><div class="ic">🌅</div><div class="tm">07:30</div><span class="blank"></span></div>
+      <div class="clock"><div class="ic">☀️</div><div class="tm">13:00</div><span class="blank"></span></div>
+      <div class="clock"><div class="ic">🌆</div><div class="tm">19:00</div><span class="blank"></span></div>
+      <div class="clock"><div class="ic">🌙</div><div class="tm">23:45</div><span class="blank"></span></div>
+    </div>
+    <div class="ans">Atbildes: <b>07:30</b> God morgen! · <b>13:00</b> God dag! · <b>19:00</b> God kveld! · <b>23:45</b> God natt!</div>
+  </div>
+  <div class="folio">1</div>
+</section>
+
+<!-- ============ 2. lappa ============ -->
+<section class="page right">
+  <div class="run">Norsk med Polly · A1</div>
+  <div class="sec" style="margin-top:4px"><span class="tag">1B</span><h2>Les! På Gardermoen</h2><span class="no">Lasām: lidostā</span></div>
+
+  <div class="scene">
+    <svg viewBox="0 0 600 240" width="100%" height="100%" preserveAspectRatio="xMidYMid slice" aria-label="Lidosta">
+      <rect x="0" y="0" width="600" height="146" fill="#cfe3f3"/>
+      <path d="M0 146 L80 90 L140 130 L210 70 L290 135 L360 95 L430 140 L520 80 L600 130 L600 146Z" fill="#9fb9cf"/>
+      <rect x="0" y="146" width="600" height="94" fill="#d9d2c4"/>
+      <rect x="40" y="96" width="250" height="56" rx="6" fill="#fff" stroke="#c9bfa9"/>
+      <text x="60" y="130" font-family="Fraunces" font-weight="900" font-size="24" fill="#1f3a68">OSLO LUFTHAVN</text>
+      <rect x="320" y="104" width="120" height="30" rx="4" fill="#1f3a68"/>
+      <text x="330" y="124" font-family="Nunito" font-weight="800" font-size="13" fill="#fff">Velkommen!</text>
+      <g transform="translate(470 40) rotate(-12)"><path d="M0 12 L70 8 L90 0 L95 4 L84 14 L95 24 L90 28 L70 20 L0 16Z" fill="#fff" stroke="#6d6580"/></g>
+      <image href="polly.png" x="150" y="160" width="70" height="70"/>
+      <g transform="translate(400 170)"><ellipse cx="30" cy="34" rx="30" ry="24" fill="#fff" stroke="#2a2438" stroke-width="3"/><circle cx="48" cy="12" r="15" fill="#fff" stroke="#2a2438" stroke-width="3"/><path d="M60 12 L76 16 L60 19Z" fill="#f2c13d" stroke="#2a2438" stroke-width="2"/><circle cx="51" cy="9" r="2.5" fill="#2a2438"/><path d="M8 30 L-8 26 L4 40Z" fill="#8c9aa8" stroke="#2a2438" stroke-width="2"/></g>
+      <text x="228" y="200" font-family="Nunito" font-weight="800" font-size="13" fill="#c4325a">Polly</text>
+      <text x="350" y="232" font-family="Nunito" font-weight="800" font-size="13" fill="#1f3a68">måken Mia</text>
+    </svg>
+  </div>
+
+  <div class="dialog">
+    <p><span class="who">Polly</span><span>Hei! Jeg heter Polly. Hva heter du?</span></p>
+    <p><span class="who m">Mia</span><span>Hei, Polly! Jeg heter Mia. Jeg er en måke. Hvor kommer du fra?</span></p>
+    <p><span class="who">Polly</span><span>Jeg kommer fra Riga, i Latvia.</span></p>
+    <p><span class="who m">Mia</span><span>Velkommen til Norge!</span></p>
+    <p><span class="who">Polly</span><span>Tusen takk! Er dette Oslo?</span></p>
+    <p><span class="who m">Mia</span><span>Nei, dette er Gardermoen. Oslo er ikke langt herfra.</span></p>
+    <p><span class="who">Polly</span><span>Hvordan går det, Mia?</span></p>
+    <p><span class="who m">Mia</span><span>Bra, takk! Og med deg?</span></p>
+    <p><span class="who">Polly</span><span>Veldig bra! Men jeg er litt sulten.</span></p>
+    <p><span class="who m">Mia</span><span>Vil du ha en vaffel? … Vær så god!</span></p>
+    <p><span class="who">Polly</span><span>Mmm! Takk, Mia. Ha det!</span></p>
+    <p><span class="who m">Mia</span><span>Ha det bra! Vi ses!</span></p>
+  </div>
+  <div class="gloss">
+    <span><b>en måke</b> — kaija</span><span><b>hvor</b> — kur</span><span><b>velkommen til</b> — laipni lūgti</span>
+    <span><b>dette</b> — šis, šī</span><span><b>ikke langt herfra</b> — netālu no šejienes</span>
+    <span><b>veldig</b> — ļoti</span><span><b>men</b> — bet</span><span><b>litt sulten</b> — mazliet izsalcis/-usi</span><span><b>vil du ha …?</b> — vai gribi …?</span>
+  </div>
+
+  <div class="ex">
+    <div class="q"><b>2</b>Riktig eller galt? Patiesi (R) vai nepatiesi (G)?</div>
+    <table class="tf">
+      <tr><td>1. Mia ir balode.</td><td class="box">R / G</td></tr>
+      <tr><td>2. Pollija ir no Latvijas.</td><td class="box">R / G</td></tr>
+      <tr><td>3. Gardermoen ir Oslo centrā.</td><td class="box">R / G</td></tr>
+      <tr><td>4. Mia jūtas labi.</td><td class="box">R / G</td></tr>
+      <tr><td>5. Pollija ir izsalkusi un saņem vafeli.</td><td class="box">R / G</td></tr>
+    </table>
+    <div class="ans">Atbildes: <b>1</b> G (Mia ir kaija — <i>en måke</i>) · <b>2</b> R · <b>3</b> G (Oslo ir <i>ikke langt herfra</i>) · <b>4</b> R (<i>Bra, takk!</i>) · <b>5</b> R</div>
+  </div>
+
+  <div class="fact">
+    <div class="ic">🧇</div>
+    <div><h3>Vai zināji?</h3>
+    Norvēģu vafeles ir mīkstas un cep tās sirsniņu formā. Norvēģi tās ēd ar ievārījumu, skābo krējumu vai… ar brūno sieru <span class="no-w">brunost</span>. Vafeles ir gandrīz katrā kafejnīcā, prāmī un pat slēpošanas trasē.</div>
+  </div>
+  <div class="folio">2</div>
+</section>
+
+<div class="spread-gap"></div>
+
+<!-- ============ 3. lappa ============ -->
+<section class="page left">
+  <div class="run">1. nodaļa · Hei! Jeg heter Polly</div>
+  <div class="sec" style="margin-top:4px"><span class="tag">1C</span><h2>Grammatikk</h2><span class="no">Gramatika: es, tu, viņa …</span></div>
+
+  <p>Lai pastāstītu par sevi, vajag <b>personu vietniekvārdus</b> un trīs ļoti noderīgus darbības vārdus: <span class="no-w">å hete</span> (saukties), <span class="no-w">å være</span> (būt) un <span class="no-w">å komme</span> (nākt).</p>
+
+  <div class="cols">
+    <div class="gbox">
+      <table class="gtable">
+        <tr><th>Norsk</th><th>Latviski</th><th>være</th></tr>
+        <tr><td>jeg <i class="pr">[jai]</i></td><td>es</td><td class="hl">er</td></tr>
+        <tr><td>du</td><td>tu</td><td class="hl">er</td></tr>
+        <tr><td>han</td><td>viņš</td><td class="hl">er</td></tr>
+        <tr><td>hun</td><td>viņa</td><td class="hl">er</td></tr>
+        <tr><td>den / det</td><td>tas, tā (lietas)</td><td class="hl">er</td></tr>
+        <tr><td>vi</td><td>mēs</td><td class="hl">er</td></tr>
+        <tr><td>dere</td><td>jūs (vairāki)</td><td class="hl">er</td></tr>
+        <tr><td>de <i class="pr">[di]</i></td><td>viņi, viņas</td><td class="hl">er</td></tr>
+      </table>
+    </div>
+    <div>
+      <div class="cmp"><h3>🇱🇻 Latviski ↔ 🇳🇴 norvēģiski</h3>
+        Latviešu valodā darbības vārds mainās: <i>es esmu, tu esi, viņš ir, mēs esam</i>…<br>
+        Norvēģu valodā <b>forma visām personām ir viena!</b> Tagadnē gandrīz visi darbības vārdi beidzas ar <b>-r</b>:</div>
+      <div class="formula"><span>jeg heter</span> · <span>du heter</span> · <span>vi heter</span></div>
+      <div class="formula"><span>jeg kommer</span> · <span>hun kommer</span></div>
+      <div class="warn"><h3>Uzmanību!</h3>
+        Norvēģi gandrīz vienmēr saka <span class="no-w">du</span> — arī svešiniekam, skolotājam, ārstam un pat karalim intervijā. Pieklājīgais <span class="no-w">De</span> mūsdienās ir ļoti rets.</div>
+    </div>
+  </div>
+
+  <h3 style="font-size:16px;margin:10px 0 4px">Jautājumi: jautājuma vārds + darbības vārds + persona</h3>
+  <div class="gbox" style="border-color:var(--beret)">
+    <table class="gtable">
+      <tr><td>Hva heter du?</td><td>Kā tevi sauc? <i class="pr">(burtiski: Kas saucies tu?)</i></td><td>— Jeg heter Polly.</td></tr>
+      <tr><td>Hvor kommer du fra?</td><td>No kurienes tu esi?</td><td>— Jeg kommer fra Latvia.</td></tr>
+      <tr><td>Hvem er det?</td><td>Kas tas ir? (par cilvēku)</td><td>— Det er Mia.</td></tr>
+    </table>
+  </div>
+  <p style="font-size:12px;color:var(--soft)">Burti <b>hv</b> vārda sākumā izrunā kā <b>v</b>: <span class="no-w">hva</span> [va], <span class="no-w">hvor</span> [vur], <span class="no-w">hvem</span> [vem].</p>
+
+  <div class="ex">
+    <div class="q"><b>3</b>Ieraksti <span class="no-w">er</span>, <span class="no-w">heter</span> vai <span class="no-w">kommer</span>.</div>
+    <ol class="items">
+      <li>Jeg <span class="blank"></span> Polly.</li>
+      <li>Mia <span class="blank"></span> en måke.</li>
+      <li>Hun <span class="blank"></span> fra Norge.</li>
+      <li>Vi <span class="blank"></span> på Gardermoen.</li>
+      <li>Hva <span class="blank"></span> du?</li>
+      <li>Hvor <span class="blank"></span> dere fra?</li>
+    </ol>
+    <div class="ans">Atbildes: <b>1</b> heter · <b>2</b> er · <b>3</b> kommer · <b>4</b> er · <b>5</b> heter · <b>6</b> kommer</div>
+  </div>
+
+  <div class="ex">
+    <div class="q"><b>4</b>Kurš vietniekvārds? Aizstāj iekavās rakstīto.</div>
+    <ol class="items">
+      <li>(Polly) <span class="blank"></span> kommer fra Riga.</li>
+      <li>(Polly og Mia) <span class="blank"></span> er på Gardermoen.</li>
+      <li>(Du og Mia) <span class="blank"></span> er venner.</li>
+      <li>(Polly og jeg) <span class="blank"></span> lærer norsk.</li>
+      <li>(en vaffel) <span class="blank"></span> er god!</li>
+    </ol>
+    <div class="ans">Atbildes: <b>1</b> Hun · <b>2</b> De · <b>3</b> Dere · <b>4</b> Vi · <b>5</b> Den</div>
+  </div>
+  <div class="folio">3</div>
+</section>
+
+<!-- ============ 4. lappa ============ -->
+<section class="page right">
+  <div class="run">Norsk med Polly · A1</div>
+  <div class="sec" style="margin-top:4px"><span class="tag">1D</span><h2>Uttale og tall</h2><span class="no">Izruna un skaitļi</span></div>
+
+  <div class="letters">
+    <div class="letter"><div class="L">Æ æ</div><small>plats «e»</small><span class="no-w">lære</span> — mācīties</div>
+    <div class="letter"><div class="L">Ø ø</div><small>«e» ar apaļām lūpām</small><span class="no-w">brød</span> — maize</div>
+    <div class="letter"><div class="L">Å å</div><small>garš «o»</small><span class="no-w">gå</span> — iet</div>
+    <div class="letter"><div class="L">O o</div><small>bieži kā «u»!</small><span class="no-w">god</span> [gu] — labs</div>
+  </div>
+
+  <div class="nums">
+    <div><b>0</b>null</div><div><b>1</b>en</div><div><b>2</b>to <i class="pr">[tu]</i></div><div><b>3</b>tre</div><div><b>4</b>fire</div><div><b>5</b>fem</div>
+    <div><b>6</b>seks</div><div><b>7</b>sju <i class="pr">[šū]</i></div><div><b>8</b>åtte</div><div><b>9</b>ni</div><div><b>10</b>ti</div>
+  </div>
+
+  <div class="ex">
+    <div class="q"><b>5</b>Pollija skaita vafeles. Atrisini un uzraksti atbildi vārdos.</div>
+    <ol class="items">
+      <li>to + tre = <span class="blank"></span></li>
+      <li>fire + fire = <span class="blank"></span></li>
+      <li>ti − ni = <span class="blank"></span></li>
+      <li>seks + en = <span class="blank"></span></li>
+      <li>fem + fem − to = <span class="blank"></span></li>
+    </ol>
+    <div class="ans">Atbildes: <b>1</b> fem · <b>2</b> åtte · <b>3</b> en · <b>4</b> sju · <b>5</b> åtte</div>
+  </div>
+
+  <div class="notes">
+    <div class="tape"></div>
+    <h3>✏️ Pollijas piezīmes · Interesanti fakti</h3>
+    <ul>
+      <li>Norvēģijā ir <b>divas rakstu valodas</b>: <span class="no-w">bokmål</span> («grāmatu valoda») un <span class="no-w">nynorsk</span> («jaunnorvēģu»). Bokmål raksta apmēram 85–90 % norvēģu — to mācāmies arī mēs.</li>
+      <li>Lofotu salās ir ciems ar vārdu <b>Å</b> — viens no īsākajiem vietu nosaukumiem pasaulē.</li>
+      <li>No Rīgas līdz Oslo ir apmēram 850 km taisnā līnijā. Pasta balodis tos varētu nolidot vienas dienas laikā!</li>
+    </ul>
+  </div>
+
+  <div class="ex">
+    <div class="q"><b>6</b>Skriv! Uzraksti par sevi 3 teikumus — kā Pollija.</div>
+    <div class="write">
+      Hei! Jeg heter <span class="blank" style="min-width:120px"></span>.<br>
+      Jeg kommer fra <span class="blank" style="min-width:120px"></span>.<br>
+      Hvordan går det? <span class="blank" style="min-width:160px"></span>
+    </div>
+  </div>
+
+  <div class="sec"><span class="tag">✓</span><h2>Sjekk deg selv</h2><span class="no">Pārbaudi sevi</span></div>
+  <div class="check">
+    <div>Es protu sasveicināties dažādos dienas laikos.</div>
+    <div>Es protu pateikt, kā mani sauc un no kurienes esmu.</div>
+    <div>Es zinu 9 personu vietniekvārdus.</div>
+    <div>Es protu izrunāt <b>æ, ø, å</b>.</div>
+    <div>Es protu skaitīt no 0 līdz 10.</div>
+    <div>Es protu pajautāt: <span class="no-w">Hvordan går det?</span></div>
+  </div>
+
+  <div class="stamp">OSLO<br>✈<br>1/20</div>
+  <div class="folio">4</div>
+</section>
+
+</div>
+</body>
+</html>
