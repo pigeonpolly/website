@@ -427,8 +427,8 @@
   addEventListener('resize', reset);
 
   // связка ключей в клюве: открыли кабинет в шапке (v2.js) — Полли прилетает и садится на край списка, закрыли — летит обратно в угол
-  const KEYS = ['...ssss...', '..s....s..', '..s....s..', '...ssss...', '..yyy.ccc.', '..y.y.c.c.', '..yyy.ccc.', '...y...c..',
-    '...y...c..', '...yy..cc.', '...y...c..', '...yy..cc.'];
+  const KEYS = ['...sss....', '..s...s...', '.s.....s..', '.s.....s..', '.s.....s..', '..s...ccc.', '...sssc.c.', '...yyyccc.', '...y.y.c..',
+    '...yyy.c..', '....y..cc.', '....y..c..', '....yy.cc.', '....y.....', '....yy....']; // круглое тонкое колечко, медный ключ позади золотого
   const KPX = Math.max(2, PX - 1), KW = 10 * KPX;
   const keysEl = document.createElement('div'), keysCv = document.createElement('canvas');
   keysEl.className = 'polly-keys'; keysCv.width = KW; keysCv.height = KEYS.length * KPX;
@@ -436,7 +436,7 @@
     KEYS.forEach((r, j) => [...r].forEach((ch, i) => { if (KC[ch]) { kg.fillStyle = KC[ch]; kg.fillRect(i * KPX, j * KPX, KPX, KPX); } })); }
   const KL = Math.round(11.5 * PX - 4.5 * KPX);
   keysEl.style.cssText = `position:absolute;left:${KL}px;top:${(4 + TOP) * PX - KPX}px;display:none;pointer-events:none;filter:drop-shadow(1px 0 0 #1a1528) drop-shadow(-1px 0 0 #1a1528) drop-shadow(0 1px 0 #1a1528) drop-shadow(0 -1px 0 #1a1528)`;
-  keysCv.style.cssText = 'display:block;image-rendering:pixelated;transform-origin:45% 8%';
+  keysCv.style.cssText = 'display:block;image-rendering:pixelated;transform-origin:45% 3%';
   keysEl.appendChild(keysCv); body.style.position = 'relative'; body.appendChild(keysEl);
   if (!reduce && keysCv.animate) keysCv.animate([{ transform: 'rotate(-16deg)' }, { transform: 'rotate(16deg)' }], { duration: 650, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out' }); // ключи болтаются
   const keysFlip = () => { keysEl.style.left = (dir > 0 ? KL : W - KL - KW) + 'px'; keysEl.style.transform = dir > 0 ? '' : 'scaleX(-1)'; };
