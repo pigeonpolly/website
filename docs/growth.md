@@ -78,6 +78,9 @@
 - Из соцсетей и Google: 18 % → 50 %.
 - Вернулись через неделю: замерить после этапа 2, цель — каждый пятый.
 
+## Facebook LV (16.11.2026)
+- База Notion «Facebook posti LV» (`collection://41a34395-245b-81ec-8f5f-000b664f677f`): пост = картинка с сайта + текст на латышском в блоке txt + «Почему так». Поля: Когда, Тема, Ссылка, Картинки, Опубликован. Ссылки — /lv/…?utm_source=facebook&utm_medium=social&utm_campaign=fb_lv&utm_content=post-NN. Что заходит у латышей: живое фото автора, вопрос в конце (грибы, погода, «откуда вы», коты, вязание), праздники (18 ноября, Рождество), «отметь друга»; продающий пост — не чаще 1 из 10.
+
 ## Google (24.10.2026)
 - Search Console: старый ресурс удалён, добавлен «Доменный ресурс» pigeonpolly.com (подтверждён через Cloudflare). Sitemap — полным адресом: `https://www.pigeonpolly.com/sitemap.xml` и `…/sitemap-blog.xml`.
 - Причина «не находится в поиске»: Cloudflare «Managed rules» отвечали Googlebot 403 (в индексе было 3 страницы из 23). Исправлено в Cloudflare → Security rules: своё правило «Allow Google» — Known Bots (`cf.client.bot`) → Skip all managed rules. Предупреждение про php2shell — нормально (правило пускает только проверенных ботов).
