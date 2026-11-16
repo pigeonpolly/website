@@ -81,6 +81,16 @@
   document.addEventListener('click', e => { if (!e.target.closest('.nv .nr')) shut(); });
   document.addEventListener('keydown', e => { if (e.key === 'Escape') shut(); });
   document.querySelectorAll('.drawer details.dr-nr').forEach(d => { if (d.querySelector('a[aria-current]')) d.open = true; });
+  // Полли со связкой ключей (polly.js PollyPet.keys) прилетает к открытому кабинету и улетает в угол, когда он закрылся
+  const keys = el => { if (window.PollyPet && PollyPet.keys) PollyPet.keys(el); };
+  const sync = () => requestAnimationFrame(() => {
+    const d = [...document.querySelectorAll('.nv .nr-d')].find(e => getComputedStyle(e).display !== 'none' && e.offsetParent);
+    const dr = document.getElementById('drawer'), sm = dr && !dr.hidden && getComputedStyle(dr).display !== 'none' && dr.querySelector('details.dr-nr[open] > summary');
+    keys(d || sm || null);
+  });
+  rooms.forEach(r => { r.addEventListener('mouseenter', sync); r.addEventListener('mouseleave', sync); r.addEventListener('focusin', sync); r.addEventListener('focusout', sync); });
+  document.addEventListener('click', () => setTimeout(sync, 0));
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') setTimeout(sync, 0); });
   try { if (!/(^|;\s*)pp_v2=1/.test(document.cookie)) document.cookie = 'pp_v2=1; path=/; max-age=31536000; samesite=lax'; } catch (e) {}
 
   // папка Лаборатории: на телефоне открывается нажатием

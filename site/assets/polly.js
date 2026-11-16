@@ -78,7 +78,7 @@
     if (carry) { carry.x = dir > 0 ? x + 11 * PX : x + 3 * PX - carry.w; carry.y = y + 3 * PX; putProp(carry); }
     if (push) { const nx = dir > 0 ? x + 12 * PX : x + 2 * PX - push.w; push.rot = (push.rot || 0) + (nx - push.x) * 6; push.x = nx; putProp(push); }
   };
-  const face = d => { dir = d; body.classList.toggle('flip', d < 0); };
+  let face = d => { dir = d; body.classList.toggle('flip', d < 0); };
   show('a'); place();
 
   // ---------- места ----------
@@ -419,14 +419,52 @@
   // при прокрутке и изменении окна — обратно на «пол»
   let st;
   const reset = () => {
+    if (keysOn) { const el = keysOn; keysOn = null; keysTo(el); return; } // Полли с ключами у открытого кабинета — подлететь заново
     if (ground) layoutProps();
     spot = 'floor'; perch = null; x = HOME_X; y = floorY(); place(); cornerPlace();
   };
 
   addEventListener('resize', reset);
 
+  // связка ключей в клюве: открыли кабинет в шапке (v2.js) — Полли прилетает и садится на край списка, закрыли — летит обратно в угол
+  const KEYS = ['.ss...', 's..s..', '.ss...', '.yc...', '.y.c..', '.yy.c.', '.y..cc', '.yy...'];
+  const keysCv = document.createElement('canvas');
+  keysCv.className = 'polly-keys'; keysCv.width = 6 * PX; keysCv.height = KEYS.length * PX;
+  { const kg = keysCv.getContext('2d'), KC = { s: '#C9CCD6', y: '#F6C445', c: '#D98A4A' };
+    KEYS.forEach((r, j) => [...r].forEach((ch, i) => { if (KC[ch]) { kg.fillStyle = KC[ch]; kg.fillRect(i * PX, j * PX, PX, PX); } })); }
+  keysCv.style.cssText = `position:absolute;left:${10 * PX}px;top:${(4 + TOP) * PX}px;image-rendering:pixelated;display:none;pointer-events:none`;
+  body.style.position = 'relative'; body.appendChild(keysCv);
+  const keysFlip = () => { keysCv.style.left = (dir > 0 ? 10 * PX : W - 16 * PX) + 'px'; keysCv.style.transform = dir > 0 ? '' : 'scaleX(-1)'; };
+  let keysOn = null, keysBack = null;
+  async function keysTo(el) {
+    clearTimeout(keysBack);
+    if (pet.classList.contains('hidden')) return;
+    if (!el) { // список закрыт — чуть подождать (мышь могла перейти на соседний кабинет), потом домой
+      if (!keysOn) return;
+      keysBack = setTimeout(async () => {
+        keysOn = null; token++;
+        await flyTo(HOME_X, floorY()); face(1); keysCv.style.display = 'none';
+        spot = 'floor'; perch = null; busy = false;
+      }, 350);
+      return;
+    }
+    if (keysOn === el) return;
+    keysOn = el; busy = true; token++;
+    body.classList.remove('sleeping', 'peck', 'flap'); zzz.classList.remove('show'); bubble.classList.remove('show');
+    if (carry) { const p = carry; carry = null; drop(p); }
+    keysCv.style.display = 'block';
+    spot = 'keys'; perch = null;
+    const target = () => { const r = el.getBoundingClientRect(); return el.tagName === 'SUMMARY' ? [r.right - W - 40, r.bottom - H - 4] : [Math.min(innerWidth - W - 6, r.right - W - 14), r.bottom - H - 10]; }; // в списке — в правом нижнем углу, в ☰ — у стрелки
+    await flyTo(...target());
+    if (keysOn !== el) return;
+    const [tx, ty] = target(); x = tx; y = ty; face(-1); keysFlip(); place();
+  }
+  const faceKeys = face;
+  face = d => { faceKeys(d); keysFlip(); };
+
   // Полли сама прилетает клевать печать конверта на главной (today.js)
   window.PollyPet = {
+    keys: el => keysTo(el),
     play: () => { token++; busy = false; return seasonal(); }, // проверка сезонных игр из консоли
     corner: () => cornerPlay(), // проверка игры в уголке (?season=winter и т. п.)
     // для «Выбора Полли» на странице «Нарисуй мне»: кадры спрайта (стоит / в полёте), где она сидит, спрятать/показать
