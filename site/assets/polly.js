@@ -448,6 +448,12 @@
   const KL = Math.round(11.5 * PX - 4 * KPX);
   keysEl.style.cssText = `position:absolute;left:${KL}px;top:${Math.round((4 + TOP) * PX - KPX * 0.4)}px;display:none;pointer-events:none;filter:drop-shadow(1px 0 0 #1a1528) drop-shadow(-1px 0 0 #1a1528) drop-shadow(0 1px 0 #1a1528) drop-shadow(0 -1px 0 #1a1528)`;
   keysEl.appendChild(swing); body.style.position = 'relative'; body.appendChild(keysEl);
+  // клюв поверх колечка: отдельный слой только с клювом (строки 3–4 спрайта), отражается вместе с Полли (.polly-body.flip canvas)
+  const beak = document.createElement('canvas'); beak.width = W; beak.height = H;
+  { const bg = beak.getContext('2d'); bg.fillStyle = COL.o;
+    BODY.slice(0, 5).forEach((r, j) => [...r].forEach((ch, i) => { if (ch === 'o') bg.fillRect(i * PX, (j + TOP) * PX, PX, PX); })); }
+  beak.style.cssText = 'position:absolute;left:0;top:0;display:none;pointer-events:none;image-rendering:pixelated';
+  body.appendChild(beak);
   if (!reduce && swing.animate) swing.animate([{ transform: 'rotate(-14deg)' }, { transform: 'rotate(14deg)' }], { duration: 650, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out' }); // ключи болтаются
   const keysFlip = () => { keysEl.style.left = (dir > 0 ? KL : W - KL - KW) + 'px'; keysEl.style.transform = dir > 0 ? '' : 'scaleX(-1)'; };
   let keysOn = null, keysBack = null;
@@ -458,7 +464,7 @@
       if (!keysOn) return;
       keysBack = setTimeout(async () => {
         keysOn = null; token++;
-        await flyTo(HOME_X, floorY()); face(1); keysEl.style.display = 'none';
+        await flyTo(HOME_X, floorY()); face(1); keysEl.style.display = beak.style.display = 'none';
         spot = 'floor'; perch = null; busy = false;
       }, 350);
       return;
@@ -467,7 +473,7 @@
     keysOn = el; busy = true; token++;
     body.classList.remove('sleeping', 'peck', 'flap'); zzz.classList.remove('show'); bubble.classList.remove('show');
     if (carry) { const p = carry; carry = null; drop(p); }
-    keysEl.style.display = 'block';
+    keysEl.style.display = beak.style.display = 'block';
     spot = 'keys'; perch = null;
     const target = () => { const r = el.getBoundingClientRect(); return el.tagName === 'SUMMARY' ? [r.right - W - 40, r.bottom - H - 4] : [Math.min(innerWidth - W - 6, r.right - W - 14), r.bottom - H - 10]; }; // в списке — в правом нижнем углу, в ☰ — у стрелки
     await flyTo(...target());
