@@ -80,6 +80,7 @@
 
 ## Facebook LV (16.11.2026)
 - База Notion «Facebook posti LV» (`collection://41a34395-245b-81ec-8f5f-000b664f677f`): пост = картинка с сайта + текст на латышском в блоке txt + «Почему так». Поля: Когда, Тема, Ссылка, Картинки, Опубликован. Ссылки — /lv/…?utm_source=facebook&utm_medium=social&utm_campaign=fb_lv&utm_content=post-NN. Что заходит у латышей: живое фото автора, вопрос в конце (грибы, погода, «откуда вы», коты, вязание), праздники (18 ноября, Рождество), «отметь друга»; продающий пост — не чаще 1 из 10.
+- №11–60 (16.11): без дат, поле «Сезон». Палитры — картинкой: `node tools/fb/fb_pal.js [ключ…]` (ключи в KEYS) → site/images/fb/pal-<ключ>.jpg; ссылка /lv/palettes/?utm…#<ключ>. Скриншоты страниц для постов — site/images/fb/ (advent, course-world, course-ink).
 
 ## Google (24.10.2026)
 - Search Console: старый ресурс удалён, добавлен «Доменный ресурс» pigeonpolly.com (подтверждён через Cloudflare). Sitemap — полным адресом: `https://www.pigeonpolly.com/sitemap.xml` и `…/sitemap-blog.xml`.
