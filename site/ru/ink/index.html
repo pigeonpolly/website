@@ -32,7 +32,7 @@
 <link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;700&family=Caveat:wght@700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Nunito+Sans:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="/assets/style.css?v=a51f0a4d">
 <link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
-<link rel="stylesheet" href="/assets/v2-shell.css?v=abe90bcd">
+<link rel="stylesheet" href="/assets/v2-shell.css?v=50e34ffb">
 <script>/* вход: /api/whoami сразу, параллельно с загрузкой скриптов — account.js возьмёт ответ (PPWhoP) */try{if(!/devdate=/.test(location.search)&&!sessionStorage.getItem('pp-devdate'))window.PPWhoP=fetch('/api/whoami',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
 <script src="/assets/site.js?v=78c13562" defer></script>
 <script src="/assets/polly.js?v=b092bea5" defer></script>
@@ -49,7 +49,7 @@
 <script src="/assets/news.js?v=8261d086" defer></script>
 <script src="/assets/search.js?v=fd80358d" defer></script>
 <script src="/assets/emoji-art.js?v=6375cb5b" defer></script>
-<script src="/assets/v2.js?v=8847f021" defer></script>
+<script src="/assets/v2.js?v=3a388485" defer></script>
 </head>
 <body class="inner v2s" data-p="ink">
 <style>/* Полли клюёт семечки, пока грузится страница (src/polly-loader.html, вставляет build.py во все шаблоны). Вид — редизайн 2.0: бумага и акцент сезона (html[data-season], как site/assets/v2.css) */
@@ -98,7 +98,10 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 <header class="hd2"><div class="w">
   <a class="lg" href="/ru/"><span class="lg-m" aria-hidden="true"></span><span>Pigeon Polly <i>Art Lab</i></span></a>
   <nav class="nv" aria-label="Main">
-    <a href="/ru/learn/">Уроки</a><a href="/ru/books/">Книги</a><a href="/ru/blog/">Журнал</a><a href="/ru/freebies/">Бесплатно</a><a href="/ru/sketchbook/">Скетчбук</a><a href="/ru/games/">Игры</a>
+    <div class="nr"><button type="button" class="nr-b" aria-expanded="false"><small>Кабинет 511</small><span>Арт</span></button><div class="nr-d"><p class="nr-h"><em>Кабинет 511</em> — Арт</p><a class="nr-a" href="/ru/blog/">Арт-заметки</a><a class="nr-a" href="/ru/learn/">Уроки</a><a class="nr-a" href="/ru/challenge/">Челлендж</a><a class="nr-a" href="/ru/books/">Книги</a><a class="nr-a" href="/ru/freebies/">Бесплатно</a><a class="nr-a" href="/ru/palettes/">Палитры</a><a class="nr-a" href="/ru/sketchbook/">Скетчбук</a></div></div>
+    <div class="nr"><button type="button" class="nr-b" aria-expanded="false"><small>Кабинет 781</small><span>Игры</span></button><div class="nr-d"><p class="nr-h"><em>Кабинет 781</em> — Игры</p><a class="nr-a" href="/ru/games/">Все игры</a><a class="nr-a" href="/ru/shop/">Магазин</a><a class="nr-a" href="/ru/titos/">Детектив Титос</a><a class="nr-a" href="/ru/wobbleland/">Воббленд</a></div></div>
+    <a class="nr-b" href="/ru/norway/"><small>Кабинет 811</small><span>Полли в Норвегии</span></a>
+    <div class="nr"><button type="button" class="nr-b" aria-expanded="false"><small>Кабинет 101</small><span>Директор</span></button><div class="nr-d"><p class="nr-h"><em>Кабинет 101</em> — Директор</p><a class="nr-a" href="/ru/about-me/">Обо мне</a><a class="nr-a" href="/ru/work-with-me/">Связаться</a><a class="nr-a" href="/ru/about-me/#am-desk">Поболтать</a></div></div>
   </nav>
   <div class="hr">
     <button type="button" class="search-btn" aria-label="Поиск по сайту"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
@@ -112,7 +115,10 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </div>
 </div>
 <div class="drawer" id="drawer" hidden><div class="w">
-  <a href="/ru/learn/">Уроки</a><a href="/ru/books/">Книги</a><a href="/ru/blog/">Журнал</a><a href="/ru/freebies/">Бесплатно</a><a href="/ru/sketchbook/">Скетчбук</a><a href="/ru/games/">Игры</a>
+  <details class="dr-nr"><summary><small>Кабинет 511</small>Арт</summary><div><a class="nr-a" href="/ru/blog/">Арт-заметки</a><a class="nr-a" href="/ru/learn/">Уроки</a><a class="nr-a" href="/ru/challenge/">Челлендж</a><a class="nr-a" href="/ru/books/">Книги</a><a class="nr-a" href="/ru/freebies/">Бесплатно</a><a class="nr-a" href="/ru/palettes/">Палитры</a><a class="nr-a" href="/ru/sketchbook/">Скетчбук</a></div></details>
+  <details class="dr-nr"><summary><small>Кабинет 781</small>Игры</summary><div><a class="nr-a" href="/ru/games/">Все игры</a><a class="nr-a" href="/ru/shop/">Магазин</a><a class="nr-a" href="/ru/titos/">Детектив Титос</a><a class="nr-a" href="/ru/wobbleland/">Воббленд</a></div></details>
+  <a class="dr-nr dr-l" href="/ru/norway/"><small>Кабинет 811</small>Полли в Норвегии</a>
+  <details class="dr-nr"><summary><small>Кабинет 101</small>Директор</summary><div><a class="nr-a" href="/ru/about-me/">Обо мне</a><a class="nr-a" href="/ru/work-with-me/">Связаться</a><a class="nr-a" href="/ru/about-me/#am-desk">Поболтать</a></div></details>
   <nav class="lang-switch" aria-label="Language"><a href="/ink/" hreflang="en" lang="en">EN</a><a href="/lv/ink/" hreflang="lv" lang="lv">LV</a><a href="/ru/ink/" hreflang="ru" lang="ru" aria-current="true">RU</a></nav>
     <span class="switch sw-m" role="group" aria-label="Сезон"><button type="button" data-s="winter" title="Зима" aria-label="Зима"></button><button type="button" data-s="spring" title="Весна" aria-label="Весна"></button><button type="button" data-s="summer" title="Лето" aria-label="Лето"></button><button type="button" data-s="autumn" title="Осень" aria-label="Осень"></button></span>
 </div></div>
@@ -152,7 +158,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>Стая</h4><a href="/ru/flock/" data-f>Все птички</a><a href="/ru/flock/news/" data-f>Новости стаи</a><a href="/ru/challenge/" data-f>Челлендж дня</a><a href="/ru/challenge/#sw-wall" data-f>Рисунки стаи</a><a href="/ru/requests/" data-f>Нарисуй мне</a><a href="/ru/garden/" data-f>Огород птички</a></div>
     <div><h4 data-f>Алина</h4><a href="/ru/sketchbook/" data-f>Скетчбук</a><a href="/ru/about-me/" data-f>Обо мне</a><a href="/ru/on-walls-and-pages/" data-f>На стенах и страницах</a><a href="/ru/projects/" data-f>Обучение и AI</a><a href="/ru/work-with-me/" data-f>Сотрудничество</a><a href="/ru/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="77">v77 · 16.11 11:18</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
+  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="78">v78 · 16.11 17:34</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
 </div></footer>
 </body>
 </html>

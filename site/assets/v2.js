@@ -69,6 +69,18 @@
   // текущий раздел в шапке; метка pp_v2 — блог (/blog/) тоже показывается в новом стиле (worker/blog.js, ?v2=0 — снять)
   const here = location.pathname.replace(/^\/(ru|lv)\//, '/');
   document.querySelectorAll('.nv a, .drawer a').forEach(a => { const p = a.pathname.replace(/^\/(ru|lv)\//, '/'); if (p !== '/' && p !== '/preview/' && here.startsWith(p)) a.setAttribute('aria-current', 'page'); });
+  // комнаты в шапке: на компьютере список открывается наведением (v2-shell.css), нажатием — тоже (телефон, планшет, клавиатура)
+  const rooms = [...document.querySelectorAll('.nv .nr')];
+  const shut = except => rooms.forEach(r => { if (r !== except) { r.classList.remove('on'); r.querySelector('.nr-b').setAttribute('aria-expanded', 'false'); } });
+  rooms.forEach(r => {
+    const b = r.querySelector('.nr-b');
+    if (r.querySelector('.nr-d a[aria-current]')) b.setAttribute('aria-current', 'true');
+    b.addEventListener('click', () => { const o = !r.classList.contains('on'); shut(r); r.classList.toggle('on', o); r.classList.toggle('off', !o); b.setAttribute('aria-expanded', String(o)); });
+    r.addEventListener('mouseleave', () => r.classList.remove('off'));
+  });
+  document.addEventListener('click', e => { if (!e.target.closest('.nv .nr')) shut(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') shut(); });
+  document.querySelectorAll('.drawer details.dr-nr').forEach(d => { if (d.querySelector('a[aria-current]')) d.open = true; });
   try { if (!/(^|;\s*)pp_v2=1/.test(document.cookie)) document.cookie = 'pp_v2=1; path=/; max-age=31536000; samesite=lax'; } catch (e) {}
 
   // папка Лаборатории: на телефоне открывается нажатием
