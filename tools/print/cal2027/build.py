@@ -80,8 +80,9 @@ page = art[:H].copy()
 yy = np.arange(H, dtype=np.float32)[:, None]; xs = np.arange(W) / W
 e = n1(W, mm(12)) * mm(2.5) + n1(W, mm(3)) * mm(.8)
 g = np.clip(1 - (yy - mm(29) - e[None, :]) / mm(8), 0, 1) ** 1.1 * 0.84 * (1 + 0.07 * n2(H, W, mm(7)))
-dx = (xs[None, :] * W - .505 * W) / 1.35; dy = yy - mm(42); tt = np.clip((mm(29.5) - np.sqrt(dx * dx + dy * dy)) / mm(8.5), 0, 1)
-g = g * (1 - 0.92 * tt * tt * (3 - 2 * tt))   # мягкий светлый полукруг над флюгером
+dx = (xs[None, :] * W - .505 * W) / 1.5; dy = yy - mm(40)
+clear = np.exp(-(np.clip(np.sqrt(dx * dx + dy * dy) - mm(14), 0, None) / mm(11)) ** 2)
+g = g * (1 - 0.92 * clear)   # мягкий светлый полукруг над флюгером, без углов
 col = np.stack([np.interp(xs, [0, .5, 1], c) for c in zip(hexf('#2f2b4a'), hexf('#25405e'), hexf('#3a3940'))], -1)[None]
 page = page * (1 - g[..., None]) + col * g[..., None]
 e2 = n1(W, mm(10)) * mm(2) + n1(W, mm(2)) * mm(.6); d = yy - (mm(392.6) + e2[None, :])
