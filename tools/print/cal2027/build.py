@@ -21,7 +21,7 @@ from enhance import enhance
 ap = argparse.ArgumentParser()
 ap.add_argument('src'); ap.add_argument('--out', default='cal2027_out')
 ap.add_argument('--crop'); ap.add_argument('--rot', type=float); ap.add_argument('--nocrop', action='store_true')
-ap.add_argument('--vib', type=float, default=0.30); ap.add_argument('--dpi', type=int, default=400)
+ap.add_argument('--vib', type=float, default=0.30); ap.add_argument('--vscale', type=float, default=1.0); ap.add_argument('--dpi', type=int, default=400)
 A = ap.parse_args(); os.makedirs(A.out, exist_ok=True)
 
 DPI = A.dpi; F = DPI / 25.4; mm = lambda v: int(round(v * F)); B = 3
@@ -68,7 +68,7 @@ cv2.imwrite(os.path.join(A.out, 'check_sheet.jpg'), cv2.cvtColor(cv2.resize(img,
 
 # ---------- 2. под ширину листа с вылетами, в линейном свете ----------
 a = img.astype(np.float32) / 255
-ah = int(round(W * a.shape[0] / a.shape[1]))
+ah = int(round(W * a.shape[0] / a.shape[1] * A.vscale))   # vscale<1 — чуть сжать по высоте, чтобы низ (кружка) не уходил под полосу
 interp = cv2.INTER_AREA if a.shape[1] >= W else cv2.INTER_LANCZOS4
 art = np.clip(to_gam(cv2.resize(to_lin(a), (W, ah), interpolation=interp)), 0, 1).astype(np.float32)
 print(f'исходник {img.shape[1]} px по ширине → {img.shape[1] / (303 / 25.4):.0f} dpi на A3')
