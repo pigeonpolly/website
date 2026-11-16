@@ -33,7 +33,7 @@
    "p": {
     "ru": "Мне не нужно прозвище. Я Полли. Этого достаточно.",
     "en": "I don’t need a nickname. I’m Polly. That’s enough.",
-    "lv": "Man nevajag iesauku. Es esmu Pollija. Ar to pietiek."
+    "lv": "Man nevajag iesauku. Es esmu Pollijs. Ar to pietiek."
    }
   },
   {
@@ -213,7 +213,7 @@
    "p": {
     "ru": "Королевой. Или хотя бы начальницей отдела. Пока я офисный клерк, но это временно. Уже лет десять как временно.",
     "en": "A queen. Or at least head of department. For now I’m an office clerk, but that’s temporary. It’s been temporary for about ten years.",
-    "lv": "Par karalieni. Vai vismaz nodaļas vadītāju. Pagaidām esmu biroja ierēdne, bet tas ir uz laiku. Jau kādus desmit gadus uz laiku."
+    "lv": "Par karalieni. Vai vismaz nodaļas vadītāju. Pagaidām esmu biroja ierēdnis, bet tas ir uz laiku. Jau kādus desmit gadus uz laiku."
    }
   },
   {
@@ -247,7 +247,7 @@
     "lv": "„Toms un Džerijs”. A, un vēl „Karalis Lauva”. Bet tā ir gan silta atmiņa, gan trauma. 90. gadu bērni sapratīs, par ko es runāju."
    },
    "p": {
-    "ru": "«Птичья лапка». Это я сама придумала. Его никто не видел, но он прекрасен.",
+    "ru": "«Птичья лапка». Это я сам придумал. Его никто не видел, но он прекрасен.",
     "en": "“The Bird’s Foot”. I made it up myself. Nobody’s seen it, but it’s wonderful.",
     "lv": "„Putna ķepiņa”. To es izdomāju pati. Neviens to nav redzējis, bet tā ir brīnišķīga."
    }
@@ -319,7 +319,7 @@
     "lv": "Ļoti daudz kas: gan apkārtējie cilvēki, gan lietas, gan notikumi."
    },
    "p": {
-    "ru": "Я сама. Иногда Мистер Чу, когда приносит пирожное.",
+    "ru": "Я сам. Иногда Мистер Чу, когда приносит пирожное.",
     "en": "Myself. Sometimes Mr. Chew, when he brings a pastry.",
     "lv": "Es pati. Reizēm Misters Čū, kad atnes kūciņu."
    }
@@ -329,15 +329,15 @@
    "q": {
     "en": "How was Polly born?",
     "ru": "Как появилась Полли?",
-    "lv": "Kā radās Pollija?"
+    "lv": "Kā radās Pollijs?"
    },
    "a": {
     "ru": "Я рисовала и смотрела телевизор. Там шел сериал Бруклин 9-9. Очень крутой, советую к просмотру. Так вот, в нем обсуждали как назвать полицейского голубя. И один из вариантов был - голубь Полли. Мы с мужем посмеялись и дальше как-то уже я нарисовала голубя и пошло поехало.",
     "en": "I was drawing and watching TV. Brooklyn Nine-Nine was on. Great show, I recommend it. In that episode they were discussing what to name a police pigeon, and one of the options was Polly the pigeon. My husband and I laughed, then somehow I drew a pigeon, and off it went.",
-    "lv": "Es zīmēju un skatījos televizoru. Rādīja seriālu „Bruklina 9-9”. Ļoti foršs, iesaku. Tajā sērijā sprieda, kā nosaukt policijas balodi, un viens no variantiem bija balodis Pollija. Mēs ar vīru pasmējāmies, tad es kaut kā uzzīmēju balodi, un tā tas aizgāja."
+    "lv": "Es zīmēju un skatījos televizoru. Rādīja seriālu „Bruklina 9-9”. Ļoti foršs, iesaku. Tajā sērijā sprieda, kā nosaukt policijas balodi, un viens no variantiem bija balodis Pollijs. Mēs ar vīru pasmējāmies, tad es kaut kā uzzīmēju balodi, un tā tas aizgāja."
    },
    "p": {
-    "ru": "Ну как. Однажды Алина взяла кисть, а дальше я всё сделала сама.",
+    "ru": "Ну как. Однажды Алина взяла кисть, а дальше я всё сделал сам.",
     "en": "Well. One day Alina picked up a brush, and I did the rest myself.",
     "lv": "Nu kā. Kādu dienu Alīna paņēma otu, bet tālāk visu izdarīju es pati."
    }
@@ -352,7 +352,7 @@
    "a": {
     "ru": "Конечно Полли.",
     "en": "Polly, of course.",
-    "lv": "Protams, Pollija."
+    "lv": "Protams, Pollijs."
    },
    "p": {
     "ru": "Это даже не обсуждается. Я.",
@@ -365,12 +365,12 @@
    "q": {
     "en": "How are Alina and Polly alike?",
     "ru": "Чем Алина и Полли похожи?",
-    "lv": "Ar ko Alīna un Pollija ir līdzīgas?"
+    "lv": "Ar ko Alīna un Pollijs ir līdzīgi?"
    },
    "a": {
     "ru": "У нас очень много общих пороков. Мы обе любим драматизировать. Не говорите Полли.",
     "en": "We share a lot of vices. We both love to be dramatic. Don’t tell Polly.",
-    "lv": "Mums ir ļoti daudz kopīgu netikumu. Mēs abas mīlam dramatizēt. Tikai nesakiet Pollijai."
+    "lv": "Mums ir ļoti daudz kopīgu netikumu. Mēs abi mīlam dramatizēt. Tikai nesakiet Pollijam."
    },
    "p": {
     "ru": "Мы обе любим кофе, драматизм и выглядеть так, будто всё под контролем.",
@@ -383,12 +383,12 @@
    "q": {
     "en": "How are Alina and Polly different?",
     "ru": "Чем Алина и Полли отличаются?",
-    "lv": "Ar ko Alīna un Pollija atšķiras?"
+    "lv": "Ar ko Alīna un Pollijs atšķiras?"
    },
    "a": {
-    "ru": "Ну наверное все же у Полли ее черты гиперболизированы. У людей все не так однозначно.",
+    "ru": "Ну наверное все же у Полли его черты гиперболизированы. У людей все не так однозначно.",
     "en": "I guess Polly’s traits are exaggerated. With people, nothing is that clear-cut.",
-    "lv": "Laikam jau Pollijai viņas īpašības ir pārspīlētas. Cilvēkiem viss nav tik viennozīmīgi."
+    "lv": "Laikam jau Pollijam viņa īpašības ir pārspīlētas. Cilvēkiem viss nav tik viennozīmīgi."
    },
    "p": {
     "ru": "У неё нет крыльев. Я её жалею.",
@@ -409,9 +409,9 @@
     "lv": "Milka ir mūsu mīļā kaķe. Mēs dzīvojam viņas dzīvoklī kā apkalpojošais personāls."
    },
    "p": {
-    "ru": "Соседка. Живёт на улице Вчерашнего Завтра, 9, в коробке. Я видела только её хвост. Этого хватило, чтобы её уважать.",
+    "ru": "Соседка. Живёт на улице Вчерашнего Завтра, 9, в коробке. Я видел только её хвост. Этого хватило, чтобы её уважать.",
     "en": "My neighbour. She lives at 9 Yesterday’s Tomorrow Street, in a box. I’ve only ever seen her tail. That was enough to respect her.",
-    "lv": "Kaimiņiene. Dzīvo Vakardienas Rītdienas ielā 9, kastē. Esmu redzējusi tikai viņas asti. Ar to pietika, lai viņu cienītu."
+    "lv": "Kaimiņiene. Dzīvo Vakardienas Rītdienas ielā 9, kastē. Esmu redzējis tikai viņas asti. Ar to pietika, lai viņu cienītu."
    }
   },
   {
@@ -805,9 +805,9 @@
     "lv": "Katru gadu skatos „Riebīgo astotnieku”."
    },
    "p": {
-    "ru": "Тот, где голубь спасает город. Его ещё не сняли, но я готова. Свяжитесь со мной.",
+    "ru": "Тот, где голубь спасает город. Его ещё не сняли, но я готов. Свяжитесь со мной.",
     "en": "The one where a pigeon saves the city. It hasn’t been filmed yet, but I’m ready. Get in touch.",
-    "lv": "Tā, kur balodis izglābj pilsētu. To vēl nav uzņēmuši, bet es esmu gatava. Sazinieties ar mani."
+    "lv": "Tā, kur balodis izglābj pilsētu. To vēl nav uzņēmuši, bet es esmu gatavs. Sazinieties ar mani."
    }
   },
   {
@@ -856,12 +856,12 @@
    "a": {
     "ru": "Блинная Полли наверное.",
     "en": "Polly’s Pancakes, probably.",
-    "lv": "Laikam „Pollijas pankūkas”."
+    "lv": "Laikam „Pollija pankūkas”."
    },
    "p": {
     "ru": "Блинная Полли, конечно. В названии же моё имя.",
     "en": "Polly’s Pancakes, of course. My name is in the title.",
-    "lv": "„Pollijas pankūkas”, protams. Nosaukumā taču ir mans vārds."
+    "lv": "„Pollija pankūkas”, protams. Nosaukumā taču ir mans vārds."
    }
   },
   {
@@ -897,7 +897,7 @@
    "p": {
     "ru": "Сижу на подоконнике и делаю вид, что занята важными мыслями.",
     "en": "I sit on the windowsill pretending to be busy with important thoughts.",
-    "lv": "Sēžu uz palodzes un izliekos, ka esmu aizņemta ar svarīgām domām."
+    "lv": "Sēžu uz palodzes un izliekos, ka esmu aizņemts ar svarīgām domām."
    }
   },
   {
@@ -949,9 +949,9 @@
     "lv": "Ak, tur ir tāda nekārtība, ka pat nezinu. Kaut kur zem grēdām noteikti bija klēpjdators."
    },
    "p": {
-    "ru": "Пуговки, крошки и важные бумаги с работы, которые я не читала.",
+    "ru": "Пуговки, крошки и важные бумаги с работы, которые я не читал.",
     "en": "Buttons, crumbs and important papers from work that I haven’t read.",
-    "lv": "Pogas, drupatas un svarīgi darba papīri, kurus neesmu lasījusi."
+    "lv": "Pogas, drupatas un svarīgi darba papīri, kurus neesmu lasījis."
    }
   },
   {
@@ -1201,7 +1201,7 @@
     "lv": "Nevaru sevi nosaukt par drosmīgu. Bet laikam no pēdējā laika — aizbraukt vienai mācību braucienā. Biju vēl saaukstējusies, bet bija ļoti forši."
    },
    "p": {
-    "ru": "Однажды я забрала круассан у чайки. Город об этом до сих пор говорит.",
+    "ru": "Однажды я забрал круассан у чайки. Город об этом до сих пор говорит.",
     "en": "Once I took a croissant from a seagull. The city still talks about it.",
     "lv": "Reiz es atņēmu kaijai kruasānu. Pilsēta par to runā joprojām."
    }
@@ -1219,7 +1219,7 @@
     "lv": "Es esmu ļoti neveikla, tāpēc tos visus nesaskaitīt."
    },
    "p": {
-    "ru": "Как-то я заснула на работе прямо в лотке «Входящие». Меня отправили почтой в соседний отдел.",
+    "ru": "Как-то я заснул на работе прямо в лотке «Входящие». Меня отправили почтой в соседний отдел.",
     "en": "Once I fell asleep at work right in the “In” tray. They sent me by post to the next department.",
     "lv": "Reiz aizmigu darbā tieši plauktiņā „Ienākošie”. Mani ar pastu aizsūtīja uz blakus nodaļu."
    }
@@ -1414,7 +1414,7 @@
    "a": {
     "ru": "Даже не знаю. Мне бы хотелось, чтобы он у меня был. Но пока что есть только у Полли. Там очень широкий ассортимент. Все продается за пуговки.",
     "en": "I don’t even know. I’d love to have one. But for now only Polly has a shop. It has a very wide range. Everything is sold for buttons.",
-    "lv": "Pat nezinu. Man gribētos, lai man tāds būtu. Bet pagaidām veikals ir tikai Pollijai. Tur ir ļoti plašs sortiments. Viss tiek pārdots par pogām."
+    "lv": "Pat nezinu. Man gribētos, lai man tāds būtu. Bet pagaidām veikals ir tikai Pollijam. Tur ir ļoti plašs sortiments. Viss tiek pārdots par pogām."
    },
    "p": {
     "ru": "У меня уже есть магазин! Шляпы, шарфики, всё за пуговки. Заходи, и захвати пуговки.",
@@ -1597,7 +1597,7 @@
     "lv": "Es teiktu, ka mākslinieka ceļš ir viena gara krīze un tās pārvarēšana. Tiklīdz atrodi to, ko meklēji, tā uzreiz sāc meklēt kaut ko citu."
    },
    "p": {
-    "ru": "Был. Я посмотрела в зеркало, всё прошло.",
+    "ru": "Был. Я посмотрел в зеркало, всё прошло.",
     "en": "I did. I looked in the mirror and it passed.",
     "lv": "Bija. Paskatījos spogulī — un viss pārgāja."
    }
@@ -1669,9 +1669,9 @@
     "lv": "Man šķiet, tā man deva lauku fantāzijām, kas dzīvoja manā galvā. Iemācījos paust neapmierinātību ekoloģiskāk. Tāpēc, ja jūs mani sadusmosiet, es uzzīmēšu, kā uz jums krīt māja. (Joks.)"
    },
    "p": {
-    "ru": "Я стала ещё прекраснее. Куда уж больше.",
+    "ru": "Я стал ещё прекраснее. Куда уж больше.",
     "en": "I became even more beautiful. As if that were possible.",
-    "lv": "Es kļuvu vēl skaistāka. Kur nu vēl vairāk."
+    "lv": "Es kļuvu vēl skaistāks. Kur nu vēl vairāk."
    }
   },
   {
@@ -1684,12 +1684,12 @@
    "a": {
     "ru": "С осознания что весь мир состоит из геометрических фигур. А еще можно пройти первый уровень школы Полли.",
     "en": "With realising that the whole world is made of geometric shapes. You can also take the first level of Polly’s School.",
-    "lv": "Ar apziņu, ka visa pasaule sastāv no ģeometriskām figūrām. Var arī iziet Pollijas skolas pirmo līmeni."
+    "lv": "Ar apziņu, ka visa pasaule sastāv no ģeometriskām figūrām. Var arī iziet Pollija skolas pirmo līmeni."
    },
    "p": {
     "ru": "С моей школы. Первый урок — фигуры. Я там лично объясняю, так что слушай внимательно.",
     "en": "With my school. Lesson one is shapes. I explain it personally, so listen carefully.",
-    "lv": "Ar manu skolu. Pirmā nodarbība — figūras. Tur es pati visu skaidroju, tāpēc klausies uzmanīgi."
+    "lv": "Ar manu skolu. Pirmā nodarbība — figūras. Tur es pats visu skaidroju, tāpēc klausies uzmanīgi."
    }
   },
   {
@@ -1939,9 +1939,9 @@
     "lv": "Vienotību."
    },
    "p": {
-    "ru": "Что я не одна в своём гениальном безумии.",
+    "ru": "Что я не один в своём гениальном безумии.",
     "en": "That I’m not alone in my brilliant madness.",
-    "lv": "Ka neesmu viena savā ģeniālajā trakumā."
+    "lv": "Ka neesmu viens savā ģeniālajā trakumā."
    }
   },
   {

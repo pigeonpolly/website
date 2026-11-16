@@ -5,7 +5,7 @@
 // После клиента движок сам добавляет прощальную реплику Полли (печать, следующий урок).
 (() => {
   const W = (x, y, w, h) => `<rect class="hit" x="${x}" y="${y}" width="${w}" height="${h}"/>`; // невидимая зона нажатия для тонких линий
-  const PHOTO = ['Take a photo of the page and press “Hand in to Polly”.', 'Сфотографируй страницу и нажми «Сдать Полли».', 'Nofotografē lapu un nospied “Iesniegt Pollijai”.'];
+  const PHOTO = ['Take a photo of the page and press “Hand in to Polly”.', 'Сфотографируй страницу и нажми «Сдать Полли».', 'Nofotografē lapu un nospied “Iesniegt Pollijam”.'];
   const svg = (inner, h = 190) => `<svg viewBox="0 0 200 ${h}" class="ps-art" aria-hidden="true"><rect width="200" height="${h}" fill="#fff"/>${inner}</svg>`;
   const ink = 'fill="none" stroke="#2B1A51" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"';
   // эллипсы (урок 9): отверстие кружки сверху, наискосок, сбоку
@@ -16,7 +16,7 @@
     { // 1 — Фигуры
       name: ['Shapes', 'Фигуры', 'Figūras'], icon: '◯',
       steps: [
-        { img: 'l1-s1.png', say: ['Coo! I’m Polly, and today I’m your teacher. Grab any paper and a pen — a napkin works too.', 'Курлык! Я Полли, и сегодня я твой учитель. Возьми любую бумагу и ручку — салфетка тоже подойдёт.', 'Kū! Es esmu Pollija, un šodien es esmu tava skolotāja. Paņem jebkuru papīru un pildspalvu — der arī salvete.'] },
+        { img: 'l1-s1.png', say: ['Coo! I’m Polly, and today I’m your teacher. Grab any paper and a pen — a napkin works too.', 'Курлык! Я Полли, и сегодня я твой учитель. Возьми любую бумагу и ручку — салфетка тоже подойдёт.', 'Kū! Es esmu Pollijs, un šodien es esmu tavs skolotājs. Paņem jebkuru papīru un pildspalvu — der arī salvete.'] },
         { img: 'l1-s1.png', say: ['My secret: everything in the world is made of a few shapes. Circle, square, triangle and two ovals — one standing, one lying.', 'Мой секрет: всё на свете собрано из нескольких фигур. Круг, квадрат, треугольник и два овала — один стоит, другой лежит.', 'Mans noslēpums: viss pasaulē ir salikts no dažām figūrām. Aplis, kvadrāts, trīsstūris un divi ovāli — viens stāv, otrs guļ.'] },
         { img: 'l1-s1.png', say: ['Warm-up: draw each shape five times. Crooked ones count! A wobbly circle is still a circle — and much more alive.', 'Разминка: нарисуй каждую фигуру пять раз. Кривые тоже считаются! Кривой круг — всё равно круг, и он гораздо живее.', 'Iesildīšanās: uzzīmē katru figūru piecas reizes. Šķības arī skaitās! Šķībs aplis tik un tā ir aplis — un daudz dzīvāks.'] },
         { img: 'l1-c1.png', say: ['Now look. Just a circle. Boring?', 'А теперь смотри. Просто круг. Скучно?', 'Tagad skaties. Vienkārši aplis. Garlaicīgi?'] },
@@ -24,7 +24,7 @@
         { img: 'l1-c3.png', say: ['Another circle, a bit lopsided. Guess what it becomes?', 'Ещё один круг, чуть кривой. Угадай, во что он превратится?', 'Vēl viens aplis, mazliet šķībs. Uzmini, par ko tas pārvērtīsies?'],
           quiz: { opts: [[['🌙 The moon', '🌙 Луна', '🌙 Mēness'], 0], [['🍳 A frying pan', '🍳 Сковородка', '🍳 Panna'], 1], [['🔘 A button', '🔘 Пуговка', '🔘 Poga'], 0]],
             yes: ['Yes! You think like an artist already.', 'Да! Ты уже думаешь как художник.', 'Jā! Tu jau domā kā mākslinieks.'],
-            no: ['Could be! But I had something tastier in mind…', 'Тоже можно! Но я задумала кое-что повкуснее…', 'Arī var! Bet es biju iedomājusies ko garšīgāku…'] } },
+            no: ['Could be! But I had something tastier in mind…', 'Тоже можно! Но я задумал кое-что повкуснее…', 'Arī var! Bet es biju iedomājies ko garšīgāku…'] } },
         { img: 'l1-c4.png', say: ['A frying pan with a fried egg! See? Shapes first, details later — that’s the whole trick.', 'Сковородка с яичницей! Видишь? Сначала фигуры, потом детали — вот и весь фокус.', 'Panna ar ceptu olu! Redzi? Vispirms figūras, pēc tam detaļas — tas ir viss triks.'] },
         { say: ['Game time! This lamp hides three shapes. Tap all of them.', 'Игра! В этой лампе спрятаны три фигуры. Найди и нажми все.', 'Spēle! Šajā lampā paslēptas trīs figūras. Atrodi un pieskaries visām.'],
           find: { parts: [
@@ -59,7 +59,7 @@
             deco: '<path d="M20 140 C60 132 90 146 180 138" fill="none" stroke="#2B1A51" stroke-width="1.5"/>' } },
         { img: 'l2-a.png', say: ['On paper: fill half a page with lines — straight, curvy, zigzag, dashed, light and heavy. Don’t try to make them perfect. Which ones will you surely try?', 'На бумаге: заполни полстраницы линиями — прямыми, изогнутыми, зигзагами, пунктиром, лёгкими и жирными. Не старайся сделать их идеальными. Какие точно попробуешь?', 'Uz papīra: aizpildi pus lapu ar līnijām — taisnām, izliektām, zigzagiem, punktētām, vieglām un treknām. Necenties tās padarīt perfektas. Kuras noteikti pamēģināsi?'],
           paper: { min: 3, opts: [['wave', 'волна', 'vilnis'], ['zigzag', 'зигзаг', 'zigzags'], ['dashed', 'пунктир', 'punktēta'], ['line with knots', 'линия с узелками', 'līnija ar mezgliņiem'], ['heavy line', 'жирная линия', 'trekna līnija']] } },
-        { say: ['Ah, someone from Polly’s school! I tie the knots on the noodle lanterns, and I’ve run out of ideas. Draw me ribbons — each one with a different line!', 'А, из школы Полли! Я завязываю узлы на фонариках из лапши, и у меня кончились идеи. Нарисуй мне ленточки — каждую другой линией!', 'Ā, no Pollijas skolas! Es sienu mezglus nūdeļu laternām, un man ir beigušās idejas. Uzzīmē man lentītes — katru ar citu līniju!'],
+        { say: ['Ah, someone from Polly’s school! I tie the knots on the noodle lanterns, and I’ve run out of ideas. Draw me ribbons — each one with a different line!', 'А, из школы Полли! Я завязываю узлы на фонариках из лапши, и у меня кончились идеи. Нарисуй мне ленточки — каждую другой линией!', 'Ā, no Pollija skolas! Es sienu mezglus nūdeļu laternām, un man ir beigušās idejas. Uzzīmē man lentītes — katru ar citu līniju!'],
           client: { card: 'classic/24.jpg', name: ['Sir Pickleknot', 'Сэр Пиклнот', 'Sers Pickleknot'], job: ['knot master, noodle lanterns', 'мастер узлов, фонарики из лапши', 'mezglu meistars, nūdeļu laternas'],
             task: [['Draw 6 long ribbons across the page, one under another. Each ribbon is a different kind of line: straight, wave, zigzag, dashed, shaky, heavy.', 'Нарисуй 6 длинных ленточек поперёк листа, одну под другой. Каждая ленточка — другой вид линии: прямая, волна, зигзаг, пунктир, дрожащая, жирная.', 'Uzzīmē 6 garas lentītes pāri lapai, vienu zem otras. Katra lentīte — cits līnijas veids: taisna, vilnis, zigzags, punktēta, drebuļaina, trekna.'],
               ['Make sure the lines ticked earlier are there: {picked}.', 'Среди них обязательно линии, отмеченные раньше: {picked}.', 'Starp tām noteikti jābūt iepriekš atzīmētajām līnijām: {picked}.'],
@@ -188,7 +188,7 @@
     { // 8 — Цилиндры
       name: ['Cylinders', 'Цилиндры', 'Cilindri'], icon: '▥',
       steps: [
-        { img: 'l8-b.png', say: ['I forgot to tell you about cylinders! It’s simple: a rectangle and two ovals.', 'Я забыла рассказать про цилиндры! Это просто: прямоугольник и два овала.', 'Es aizmirsu pastāstīt par cilindriem! Tas ir vienkārši: taisnstūris un divi ovāli.'] },
+        { img: 'l8-b.png', say: ['I forgot to tell you about cylinders! It’s simple: a rectangle and two ovals.', 'Я забыл рассказать про цилиндры! Это просто: прямоугольник и два овала.', 'Es aizmirsu pastāstīt par cilindriem! Tas ir vienkārši: taisnstūris un divi ovāli.'] },
         { img: 'l8-b.png', say: ['The top oval is seen whole, the bottom one only by its front half. The back half — skip it or erase it.', 'Верхний овал виден целиком, нижний — только передняя половинка. Заднюю — не рисуй или сотри.', 'Augšējais ovāls redzams viss, apakšējais — tikai priekšējā puse. Aizmugurējo — nezīmē vai izdzēs.'] },
         { img: 'l8-a.png', say: ['A cylinder has a shadow too: light on one side, shadow on the other. Hatch along the cylinder — or try dots and stripes.', 'У цилиндра тоже есть тень: свет с одной стороны, тень с другой. Штрихуй вдоль цилиндра — или попробуй точки и полоски.', 'Arī cilindram ir ēna: gaisma no vienas puses, ēna no otras. Svītro gar cilindru — vai pamēģini punktus un strīpas.'] },
         { img: 'l8-a.png', say: ['Which of these is a cylinder?', 'Что из этого — цилиндр?', 'Kas no šī ir cilindrs?'],

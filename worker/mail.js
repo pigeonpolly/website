@@ -47,7 +47,7 @@ const offUrl = async (env, h, uid) => `${SITE}/api/mail/off?u=${uid}&k=${await t
 const CAT = {
   games: ['game notifications', 'уведомления из игр', 'paziņojumi no spēlēm'],
   feat: ['new things on the site', 'новые фишки на сайте', 'jaunumi vietnē'],
-  news: ['news from Polly', 'новости от Полли', 'ziņas no Pollijas'],
+  news: ['news from Polly', 'новости от Полли', 'ziņas no Pollija'],
 };
 const FOOT = {
   en: (c, set, off) => `—\nYou get this because you turned on “${c}” on pigeonpolly.com.\nChoose what we send: ${set}\nUnsubscribe from all: ${off}`,
@@ -95,7 +95,7 @@ const ITEM = {
 const DIGEST = {
   subj: { en: s => `🐦 Waiting for you: ${s}`, ru: s => `🐦 Тебя ждут: ${s}`, lv: s => `🐦 Tevi gaida: ${s}` },
   hi: { en: n => `Hi, ${n}!`, ru: n => `Привет, ${n}!`, lv: n => `Sveiki, ${n}!` },
-  bye: { en: 'Polly 🐦', ru: 'Полли 🐦', lv: 'Pollija 🐦' },
+  bye: { en: 'Polly 🐦', ru: 'Полли 🐦', lv: 'Pollijs 🐦' },
 };
 const ORDER = ['streak', 'garden', 'titos'];
 

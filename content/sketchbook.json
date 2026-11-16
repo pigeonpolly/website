@@ -2,7 +2,7 @@
   "_": "Скетчбук /sketchbook/: темы по порядку. gallery — файл content/galleries/<gallery>.json; cover — обложка тетрадки (по умолчанию первая картина); page — страница серии; hidden: true — не показывать. Разделы, порядок и скрытие с сайта (кабинет-режим на странице) хранятся в meta sketchbook и важнее этого файла (docs/site.md).",
   "sections": [
     {"id": "bird", "gallery": "bird", "page": "/art-portfolio/bird/", "color": "#C9A24A",
-     "title": {"en": "Pigeon Polly", "ru": "Голубь Полли", "lv": "Balodis Pollija"},
+     "title": {"en": "Pigeon Polly", "ru": "Голубь Полли", "lv": "Balodis Pollijs"},
      "note": {"en": "Pigeon Polly illustrations, 2019–2026.", "ru": "Иллюстрации с Полли, 2019–2026.", "lv": "Ilustrācijas ar Polliju, 2019–2026."}},
     {"id": "pages", "gallery": "sketchbook", "page": "/art-portfolio/sketchbook/", "color": "#5E7F8C",
      "title": {"en": "Sketchbook Pages", "ru": "Страницы скетчбука", "lv": "Skiču lapas"},

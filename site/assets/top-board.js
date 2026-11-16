@@ -24,7 +24,7 @@
     pan: { name: ['🥞 Pancakes', '🥞 Блины', '🥞 Pankūkas'], unit: lvl,
       all: ['Best level in one game', 'Лучший уровень за одну игру', 'Labākais līmenis vienā spēlē'],
       week: ['Best game of the week', 'Лучшая игра недели', 'Nedēļas labākā spēle'] },
-    train: { name: ['🚆 Polly’s Train', '🚆 Поезд Полли', '🚆 Pollijas vilciens'], unit: ['🚉', '🚉', '🚉'],
+    train: { name: ['🚆 Polly’s Train', '🚆 Поезд Полли', '🚆 Pollija vilciens'], unit: ['🚉', '🚉', '🚉'],
       all: ['Most stations in one language', 'Больше всего станций в одном языке', 'Visvairāk staciju vienā valodā'],
       week: ['Best trip of the week', 'Лучшая поездка недели', 'Nedēļas labākais brauciens'] },
     maze: { name: ['🗺 Mazes', '🗺 Лабиринты', '🗺 Labirinti'], unit: lvl,

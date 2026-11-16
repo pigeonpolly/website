@@ -128,7 +128,7 @@ ${F('p31-45.jpg', 'Svītrojums veido seju, fons paliek kluss')}`,
       ['Kas svītrojuma ritmā ir baltais papīrs starp vilcieniem?', 'Pauze', 'Kļūda', 'Nepabeigta vieta', 'Kā klusums mūzikā, baltais dod svītrojumam gaisu.']],
     task: { h: 'Piecu pakāpju toņu skala', need: 'viens lainers vai pildspalva, lineāls vai stingra roka, skiču burtnīcas lapa', time: '20 min',
       steps: ['Uzzīmē garu taisnstūri un sadali to piecās daļās.', 'Pirmo atstāj baltu. Pārējās aizpildi tikai ar paralēlām līnijām — bez krusteniskā svītrojuma!', 'Katra daļa tumšāka par iepriekšējo: maini tikai attālumu starp līnijām, ne spiedienu.', 'Piemiedz acis: vai piecas pakāpes nolasās vienmērīgi? Izlabo to, kas “lec”.', 'Blakus uzzīmē bumbu ar svītrojumu pa formu — pēc savas skalas: gaisma — 1.–2. daļa, ēna — 4.–5. Pievieno mazliet trokšņa (punktus) ēnas malā.'] },
-    client: { name: 'Adītāja Pollija', job: 'ada rudeni cilpu pa cilpai', say: 'Katra mana šalle ir ritms: labiskā, kreiliskā, labiskā, kreiliskā — blīvāk, kur jāsilda, brīvāk, kur jāelpo. Tavs svītrojums taču ir tāds pats? Uzzīmē man skalu no gaišā uz tumšo, un tad manu kamolu — apaļu, mājīgu, ar pareizu ēnu.',
+    client: { name: 'Adītājs Pollijs', job: 'ada rudeni cilpu pa cilpai', say: 'Katra mana šalle ir ritms: labiskā, kreiliskā, labiskā, kreiliskā — blīvāk, kur jāsilda, brīvāk, kur jāelpo. Tavs svītrojums taču ir tāds pats? Uzzīmē man skalu no gaišā uz tumšo, un tad manu kamolu — apaļu, mājīgu, ar pareizu ēnu.',
       ask: ['Piecu pakāpju skala, tikai paralēlas līnijas', 'Kamols (vai jebkura bumba) ar svītrojumu pa formu', 'Mazliet trokšņa — tikai tur, kur vajag'] },
   },
 };

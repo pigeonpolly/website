@@ -10,10 +10,10 @@
   if (!app) return;
   const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
   const T = {
-    title: ['Polly’s Pancakes', 'Блинная Полли', 'Pollijas pankūkas'],
+    title: ['Polly’s Pancakes', 'Блинная Полли', 'Pollija pankūkas'],
     how: ['Wobbleland residents come to Polly’s window one by one, and everyone wants something different. Pick the pan for the shape, pour the batter, flip at the right moment and add exactly the toppings from the order.',
       'К окошку Полли по одному приходят жители Воббленда, и у каждого свой заказ. Выбери сковородку под форму, налей тесто, переверни вовремя и добавь ровно те топпинги, что в заказе.',
-      'Pie Pollijas lodziņa pa vienam nāk Wobbleland iedzīvotāji, un katram ir savs pasūtījums. Izvēlies pannu formai, ielej mīklu, apgriez īstajā brīdī un pieliec tieši tās piedevas, kas pasūtījumā.'],
+      'Pie Pollija lodziņa pa vienam nāk Wobbleland iedzīvotāji, un katram ir savs pasūtījums. Izvēlies pannu formai, ielej mīklu, apgriez īstajā brīdī un pieliec tieši tās piedevas, kas pasūtījumā.'],
     rules: ['A mistake is not the end: the customer is just less happy. A very unhappy customer takes a heart ❤️, and there are 3. Every 5 levels a heart comes back.',
       'Ошибка — не конец: клиент просто доволен меньше. Совсем недовольный забирает сердечко ❤️, их 3. Каждые 5 уровней сердечко возвращается.',
       'Kļūda nav beigas: klients vienkārši ir mazāk apmierināts. Ļoti neapmierināts klients atņem sirsniņu ❤️, to ir 3. Ik pēc 5 līmeņiem sirsniņa atgriežas.'],
@@ -201,7 +201,7 @@
   const C = (img, city, n, fav, shape, bake, hi, yum) => ({ img, city, n, fav, shape, bake, hi, yum });
   const PEOPLE = [
     C('miss-peony', 'newwobbleton', ['Miss Peony', 'Мисс Пиони', 'Miss Peony'], ['sugar', 'berry'], 'heart', 'gold',
-      ['Polly, dear! Something sweet for my bakery break, please.', 'Полли, дорогая! Что-нибудь сладкое к перерыву в пекарне.', 'Pollij, dārgā! Kaut ko saldu pārtraukumam maiznīcā, lūdzu.'],
+      ['Polly, dear! Something sweet for my bakery break, please.', 'Полли, дорогой! Что-нибудь сладкое к перерыву в пекарне.', 'Pollij, dārgais! Kaut ko saldu pārtraukumam maiznīcā, lūdzu.'],
       ['Lovely! I’ll give half to someone who looks sad.', 'Чудесно! Половинку отдам тому, у кого грустный вид.', 'Brīnišķīgi! Pusīti atdošu kādam, kurš izskatās bēdīgs.']),
     C('professor-owlistair-tweed', 'newwobbleton', ['Professor Owlistair Tweed', 'Профессор Совлистер Твид', 'Profesors Owlistair Tweed'], ['honey', 'nuts'], 'square', 'gold',
       ['A square one, like a page. I am not sleepy, I’m resting my eyes.', 'Квадратный, как страница. Я не сплю, я даю глазам отдохнуть.', 'Kvadrātveida, kā lappuse. Es neguļu, es ļauju acīm atpūsties.'],
@@ -367,7 +367,7 @@
   const BEAR = { bear: true, img: 'bear', n: ['Bear the Courier', 'Медведь-курьер', 'Lācis kurjers'],
     hi: [[n => `Delivery for ${n}! Sorry, a bit of jam got on the order…`, n => `Заказ навынос для: ${n}! Простите, чуть-чуть заляпал вареньем…`, n => `Līdzņemšanai: ${n}! Atvainojiet, mazliet notraipīju pasūtījumu ar ievārījumu…`],
       [n => `Sticky paws, smudged order. It’s for ${n}, they know what they like!`, n => `Лапы липкие, заказ смазался. Это для: ${n}, там знают, что любят!`, n => `Lipīgas ķepas, nosmērēts pasūtījums. Tas ir priekš: ${n}, tur zina, ko mīl!`]],
-    win: ['You guessed it! I’ll tell everyone: Polly reads jam!', 'Угадано! Всем расскажу: Полли читает по варенью!', 'Uzminēts! Visiem pastāstīšu: Pollija lasa pa ievārījumu!'],
+    win: ['You guessed it! I’ll tell everyone: Polly reads jam!', 'Угадано! Всем расскажу: Полли читает по варенью!', 'Uzminēts! Visiem pastāstīšu: Pollijs lasa pa ievārījumu!'],
     lose: ['Hmm, not quite… Never mind, it was my jam. No hard feelings!', 'Хм, не совсем… Ничего, варенье-то моё. Без обид!', 'Hmm, ne gluži… Nekas, ievārījums taču mans. Bez aizvainojuma!'] };
   // медведь в кепке курьера: левая половина 10 пикселей, правая — зеркально
   const BEAR_PX = ['..........', '......oooo', '....oocccc', '...ocrcccc', '...occccyy', '...occccyy', 'oo.ooooooo', 'oaoovvvvvv', 'oahooooooo', '.oaaaaaaaa', '.oahaaaaaa', '.oaawkaaaa',

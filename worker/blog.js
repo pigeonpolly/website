@@ -29,11 +29,11 @@ const T = {
     monthsFull: ['январь', 'февраль', 'март', 'апрель', 'май', 'июнь', 'июль', 'август', 'сентябрь', 'октябрь', 'ноябрь', 'декабрь'],
   },
   lv: {
-    blog: 'Blogs', head: 'Piezīmes no laboratorijas', lead: 'Raksti par zīmēšanu, mācīšanos un radošumu: ko es izmēģinu, kas strādā un ko par to domā Pollija.',
+    blog: 'Blogs', head: 'Piezīmes no laboratorijas', lead: 'Raksti par zīmēšanu, mācīšanos un radošumu: ko es izmēģinu, kas strādā un ko par to domā Pollijs.',
     tags: 'Birkas', moreTags: 'Rādīt visas birkas', lessTags: 'Sakļaut', popular: 'Populārākie', all: 'Visi raksti', empty: 'Šeit vēl nav rakstu. Pirmais jau ceļā!',
     comments: 'Komentāri', noComments: 'Komentāru vēl nav. Esi pirmais!', back: '← Visi raksti', tagged: 'Raksti ar birku',
     members: 'Tikai saviem', lockT: 'Šis raksts ir saviem', lockP: 'Ienāc bez maksas, lai izlasītu visu rakstu. Tas aizņems minūti.', lockBtn: 'Ienākt bez maksas', accAll: 'Visi raksti', accOpen: 'Atvērti visiem', accLabel: 'Kas var lasīt', min: 'min lasīšanas', share: 'Dalīties', copy: 'Kopēt saiti', copied: 'Saite nokopēta ✓', email: 'E-pasts', draft: 'Melnraksts', read: 'Lasīt →', months: ['janv.', 'febr.', 'marts', 'apr.', 'maijs', 'jūn.', 'jūl.', 'aug.', 'sept.', 'okt.', 'nov.', 'dec.'],
-    descr: 'Piezīmes par zīmēšanu, mācīšanos un radošumu no Alīnas Otkinskas un baloža Pollijas.',
+    descr: 'Piezīmes par zīmēšanu, mācīšanos un radošumu no Alīnas Otkinskas un baloža Pollija.',
     featured: '★ Izlase', archive: 'Arhīvs', inMonth: 'Raksti par', onlyFav: 'Mani izlases raksti', allSections: 'Visi', search: 'Meklēt blogā…', searchBtn: 'Meklēt', found: 'Meklēšanas rezultāti', nothing: 'Nekas netika atrasts. Pamēģiniet citu vārdu.', prev: '← Jaunāki', next: 'Vecāki →', section: 'Sadaļa', sections: 'Sadaļas', scheduled: '⏰ Ieplānots', browse: 'Sadaļas, birkas un arhīvs', count: n => `Blogā ir ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'raksts' : 'raksti'}`,
     monthsFull: ['janvāris', 'februāris', 'marts', 'aprīlis', 'maijs', 'jūnijs', 'jūlijs', 'augusts', 'septembris', 'oktobris', 'novembris', 'decembris'],
   },
@@ -141,7 +141,7 @@ async function ensureBlogSchemaRun(env) {
   // один раз (октябрь 2026): новые темы блога вместо коллекций Patreon; разделы со всех статей сняты — Алина назначит заново
   if (!(await env.DB.prepare("SELECT value FROM meta WHERE key = 'sections_v2'").first().catch(() => null))) {
     const NEW = [['traditional-art', 'Traditional Art', 'Традиционное искусство', 'Tradicionālā māksla'], ['technologies', 'Technologies', 'Технологии', 'Tehnoloģijas'],
-      ['education', 'Education', 'Обучение', 'Izglītība'], ['pollys-life', "Polly's Life", 'Жизнь Полли', 'Pollijas dzīve'], ['tips-guides', 'Tips & Guides', 'Советы и полезное', 'Padomi un noderīgais']];
+      ['education', 'Education', 'Обучение', 'Izglītība'], ['pollys-life', "Polly's Life", 'Жизнь Полли', 'Pollija dzīve'], ['tips-guides', 'Tips & Guides', 'Советы и полезное', 'Padomi un noderīgais']];
     await env.DB.batch([env.DB.prepare('DELETE FROM blog_sections'), env.DB.prepare("UPDATE blog_posts SET section = ''"),
       ...NEW.map((r, i) => env.DB.prepare('INSERT INTO blog_sections (slug, en, ru, lv, sort) VALUES (?, ?, ?, ?, ?)').bind(...r, i + 1)),
       env.DB.prepare("INSERT INTO meta (key, value) VALUES ('sections_v2', '1') ON CONFLICT(key) DO UPDATE SET value = '1'")]);

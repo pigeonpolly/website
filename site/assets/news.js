@@ -63,7 +63,7 @@
     card: { // карточки, подаренные из кабинета (worker/cards.js cardGiftNews); гаснет после «Посмотреть» — открывается свой альбом
       icon: '🃏',
       title: x => x.n > 1 ? [`Cards for you! (${x.n})`, `Тебе карточки! (${x.n})`, `Tev kartītes! (${x.n})`][L] : ['A card for you!', 'Тебе карточка!', 'Tev kartīte!'][L],
-      text: x => x.note ? '«' + x.note + '»' : ['A gift from Polly — it is already in your album.', 'Подарок от Полли — уже в твоём альбоме.', 'Dāvana no Pollijas — tā jau ir tavā albumā.'][L],
+      text: x => x.note ? '«' + x.note + '»' : ['A gift from Polly — it is already in your album.', 'Подарок от Полли — уже в твоём альбоме.', 'Dāvana no Pollija — tā jau ir tavā albumā.'][L],
       act: ['Look', 'Посмотреть', 'Apskatīt'],
       open: cardGift,
     },
@@ -100,7 +100,7 @@
       title: x => x.tier === 'magic' ? ['A magic seed!', 'Волшебное семечко!', 'Burvju sēkla!'][L] : x.tier === 'rare' ? ['A rare seed!', 'Редкое семечко!', 'Reta sēkla!'][L]
         : x.n > 1 ? [`${x.n} new seeds`, `Новых семян: ${x.n}`, `Jaunas sēklas: ${x.n}`][L] : ['A seed for your garden', 'Семечко для огорода', 'Sēkla tavam dārzam'][L],
       text: x => ({ game: ['Found in the Button Rain.', 'Нашлось в Пуговичном дожде.', 'Atrasta Pogu lietū.'], potion: ['Found in the potion shop.', 'Нашлось в Зельеварне.', 'Atrasta dziru darbnīcā.'],
-        pan: ['Found in Polly’s Pancakes.', 'Нашлось в Блинной Полли.', 'Atrasta Pollijas pankūkās.'], titos: ['Found at Titos’ office.', 'Нашлось у Титоса.', 'Atrasta pie Tito.'], bugs: ['Found while catching bugs for Titos.', 'Нашлось, пока ловились жуки для Титоса.', 'Atrasta, ķerot vaboles Tito.'],
+        pan: ['Found in Polly’s Pancakes.', 'Нашлось в Блинной Полли.', 'Atrasta Pollija pankūkās.'], titos: ['Found at Titos’ office.', 'Нашлось у Титоса.', 'Atrasta pie Tito.'], bugs: ['Found while catching bugs for Titos.', 'Нашлось, пока ловились жуки для Титоса.', 'Atrasta, ķerot vaboles Tito.'],
         shift: ['Found during the shift with Polly.', 'Нашлось на смене с Полли.', 'Atrasta maiņā ar Polliju.'], rare: ['For a whole week of stamps on the card of the day.', 'За неделю штампов в карточке дня.', 'Par veselu nedēļu zīmogu dienas kartītē.'],
         magic: ['For watering the garden every day for a week.', 'За неделю полива каждый день.', 'Par dārza laistīšanu katru dienu nedēļas garumā.'] }[x.src] || ['It is waiting in your garden.', 'Оно ждёт в огороде.', 'Tā gaida dārzā.'])[L],
       act: ['Plant it', 'Посадить', 'Iestādīt'],
@@ -109,7 +109,7 @@
     chatnew: { // письмо о новом чате на /about-me/ (worker/about-chat.js aboutChatNews) — гаснет, когда птичка открыла чат
       icon: '💬',
       title: () => ['New: chat with Alina and Polly!', 'Новое: поболтай с Алиной и Полли!', 'Jaunums: parunājies ar Alīnu un Polliju!'][L],
-      text: () => ['A retro chat on the “About me” page: over a hundred answers from Alina and Polly, your own questions — and buttons, badges and a laptop for your room as rewards.', 'Ретро-чат на странице «Обо мне»: больше сотни ответов Алины и Полли, свои вопросы — а в награду пуговки, бейджи и ноутбук для комнаты.', 'Retro čats lapā “Par mani”: vairāk nekā simts Alīnas un Pollijas atbilžu, savi jautājumi — un balvā pogas, nozīmītes un klēpjdators istabai.'][L],
+      text: () => ['A retro chat on the “About me” page: over a hundred answers from Alina and Polly, your own questions — and buttons, badges and a laptop for your room as rewards.', 'Ретро-чат на странице «Обо мне»: больше сотни ответов Алины и Полли, свои вопросы — а в награду пуговки, бейджи и ноутбук для комнаты.', 'Retro čats lapā “Par mani”: vairāk nekā simts Alīnas un Pollija atbilžu, savi jautājumi — un balvā pogas, nozīmītes un klēpjdators istabai.'][L],
       act: ['Open the chat', 'Открыть чат', 'Atvērt čatu'],
       go: () => pre + '/about-me/#chat',
     },
@@ -122,8 +122,8 @@
     },
     school: { // «Школа Полли» и курс туши /ink/ (worker/school.js schoolNews, x.course): печать или «на доработку» (ставит Алина, ученику — от Полли); гаснет, когда открыта /polly-helps/
       icon: '🎓',
-      title: x => x.diploma ? (x.course === 'ink' ? ['Your diploma for the ink sketching course! 📜', 'Твой диплом курса скетчинга тушью! 📜', 'Tavs tušas skicēšanas kursa diploms! 📜'] : ['Your diploma for the course “See the World Like an Artist”! 📜', 'Твой диплом курса «Смотри на мир как художник»! 📜', 'Tavs kursa «Skaties uz pasauli kā mākslinieks» diploms! 📜'])[L] : x.redo && !x.ok ? ['Polly left you a note', 'Полли оставила записку', 'Pollija atstāja zīmīti'][L] : x.n > 1 ? [`Polly checked your pages (${x.n})`, `Полли проверила страницы (${x.n})`, `Pollija pārbaudīja lapas (${x.n})`][L] : ['A stamp from Polly!', 'Печать от Полли!', 'Zīmogs no Pollijas!'][L],
-      text: x => x.diploma ? [`All ${x.of || 12} stamps! Your diploma is ready${x.btn ? ` · +${x.btn} 🔘` : ''}.`, `Все ${x.of || 12} печатей! Диплом готов${x.btn ? ` · +${x.btn} 🔘` : ''}.`, `Visi ${x.of || 12} zīmogi! Diploms ir gatavs${x.btn ? ` · +${x.btn} 🔘` : ''}.`][L] : x.redo ? [`Lesson ${x.lesson}: something to try once more.`, `Урок ${x.lesson}: кое-что стоит попробовать ещё раз.`, `${x.lesson}. nodarbība: kaut ko vērts pamēģināt vēlreiz.`][L] : (x.course === 'ink' ? [`Ink course, lesson ${x.lesson}.`, `Курс туши, урок ${x.lesson}.`, `Tušas kurss, ${x.lesson}. nodarbība.`] : [`Lesson ${x.lesson} at Polly’s school.`, `Урок ${x.lesson} в школе Полли.`, `${x.lesson}. nodarbība Pollijas skolā.`])[L],
+      title: x => x.diploma ? (x.course === 'ink' ? ['Your diploma for the ink sketching course! 📜', 'Твой диплом курса скетчинга тушью! 📜', 'Tavs tušas skicēšanas kursa diploms! 📜'] : ['Your diploma for the course “See the World Like an Artist”! 📜', 'Твой диплом курса «Смотри на мир как художник»! 📜', 'Tavs kursa «Skaties uz pasauli kā mākslinieks» diploms! 📜'])[L] : x.redo && !x.ok ? ['Polly left you a note', 'Полли оставил записку', 'Pollijs atstāja zīmīti'][L] : x.n > 1 ? [`Polly checked your pages (${x.n})`, `Полли проверил страницы (${x.n})`, `Pollijs pārbaudīja lapas (${x.n})`][L] : ['A stamp from Polly!', 'Печать от Полли!', 'Zīmogs no Pollija!'][L],
+      text: x => x.diploma ? [`All ${x.of || 12} stamps! Your diploma is ready${x.btn ? ` · +${x.btn} 🔘` : ''}.`, `Все ${x.of || 12} печатей! Диплом готов${x.btn ? ` · +${x.btn} 🔘` : ''}.`, `Visi ${x.of || 12} zīmogi! Diploms ir gatavs${x.btn ? ` · +${x.btn} 🔘` : ''}.`][L] : x.redo ? [`Lesson ${x.lesson}: something to try once more.`, `Урок ${x.lesson}: кое-что стоит попробовать ещё раз.`, `${x.lesson}. nodarbība: kaut ko vērts pamēģināt vēlreiz.`][L] : (x.course === 'ink' ? [`Ink course, lesson ${x.lesson}.`, `Курс туши, урок ${x.lesson}.`, `Tušas kurss, ${x.lesson}. nodarbība.`] : [`Lesson ${x.lesson} at Polly’s school.`, `Урок ${x.lesson} в школе Полли.`, `${x.lesson}. nodarbība Pollija skolā.`])[L],
       act: ['Look', 'Посмотреть', 'Apskatīt'],
       go: x => pre + (x.course === 'ink' ? '/ink/' : '/polly-helps/') + (x.diploma ? '#diploma' : '#school'), // курс туши — /ink/
     },
@@ -209,12 +209,12 @@
   }
   // письма по согласию (worker/mail.js): окно при первом входе — «Да, присылать всё», мелко «Выбрать» и «Не сейчас»; галочки не стоят заранее
   const MT = {
-    t: ['📮 May Polly write to you?', '📮 Можно писать тебе на почту?', '📮 Vai Pollija drīkst tev rakstīt?'],
+    t: ['📮 May Polly write to you?', '📮 Можно писать тебе на почту?', '📮 Vai Pollijs drīkst tev rakstīt?'],
     p: ['Now and then: a short letter about your bird, the games and what’s new on the site. Unsubscribe in one click from any letter.', 'Иногда — короткое письмо про птичку, игры и новое на сайте. Отписаться можно в один клик из любого письма.', 'Reizēm — īsa vēstule par putniņu, spēlēm un jaunumiem vietnē. Atrakstīties var ar vienu klikšķi no jebkuras vēstules.'],
     games: ['🎮 Game notifications', '🎮 Уведомления из игр', '🎮 Paziņojumi no spēlēm'],
     gamesD: ['your garden is drying out, a new case is open…', 'сохнут грядки, открылось новое дело…', 'izkalst dobes, atvērta jauna lieta…'],
     feat: ['✨ New things on the site', '✨ Новые фишки на сайте', '✨ Jaunumi vietnē'],
-    news: ['🐦 News from Polly', '🐦 Новости от Полли', '🐦 Ziņas no Pollijas'],
+    news: ['🐦 News from Polly', '🐦 Новости от Полли', '🐦 Ziņas no Pollija'],
     all: ['✅ Yes, send me everything', '✅ Да, присылать всё', '✅ Jā, sūtīt visu'],
     pick: ['Choose what to send', 'Выбрать, что присылать', 'Izvēlēties, ko sūtīt'],
     save: ['Save', 'Сохранить', 'Saglabāt'],

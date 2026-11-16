@@ -42,7 +42,7 @@
     pausedAdm: ['New ideas are paused: visitors see a note instead of the form.', 'Приём тем на паузе: посетители видят записку вместо поля.', 'Tēmu pieņemšana ir pauzē: apmeklētāji redz zīmīti formas vietā.'],
     cWait: ['waiting', 'ждут', 'gaida'], cDone: ['drawn', 'нарисовано', 'uzzīmēti'],
     hidden: n => [`🙈 Hidden (${n})`, `🙈 Скрытые (${n})`, `🙈 Paslēptās (${n})`][L], back: ['↩ Bring back', '↩ Вернуть', '↩ Atgriezt'],
-    pick: ['🐦 Polly’s pick', '🐦 Выбор Полли', '🐦 Pollijas izvēle'], pickH: ['Polly brought you this one:', 'Полли принесла тебе:', 'Pollija tev atnesa:'], again: ['🐦 Again', '🐦 Ещё раз', '🐦 Vēlreiz'],
+    pick: ['🐦 Polly’s pick', '🐦 Выбор Полли', '🐦 Pollija izvēle'], pickH: ['Polly brought you this one:', 'Полли принёс тебе:', 'Pollijs tev atnesa:'], again: ['🐦 Again', '🐦 Ещё раз', '🐦 Vēlreiz'],
   };
   const t = (k, ...a) => { const v = T[k]; const x = Array.isArray(v) ? v[L] : v; return typeof x === 'function' ? x(...a) : x; };
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

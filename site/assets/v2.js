@@ -5,8 +5,8 @@
   const T = {
     winter: { tag: ['winter edition', 'зимний выпуск', 'ziemas izdevums'], note: ['rooftops and towers ❄', 'крыши и башни ❄', 'jumti un torņi ❄'] },
     spring: { tag: ['spring edition', 'весенний выпуск', 'pavasara izdevums'], note: ['on my desk: strawberries ❀', 'на моём столе: земляника ❀', 'uz mana galda: zemenes ❀'] },
-    summer: { tag: ['summer edition', 'летний выпуск', 'vasaras izdevums'], note: ['Polly, summer lover ☀', 'Полли обожает лето ☀', 'Pollija mīl vasaru ☀'] },
-    autumn: { tag: ['autumn edition', 'осенний выпуск', 'rudens izdevums'], note: ['Polly on the train ✿', 'Полли в поезде ✿', 'Pollija vilcienā ✿'] },
+    summer: { tag: ['summer edition', 'летний выпуск', 'vasaras izdevums'], note: ['Polly, summer lover ☀', 'Полли обожает лето ☀', 'Pollijs mīl vasaru ☀'] },
+    autumn: { tag: ['autumn edition', 'осенний выпуск', 'rudens izdevums'], note: ['Polly on the train ✿', 'Полли в поезде ✿', 'Pollijs vilcienā ✿'] },
   };
   const COL = { winter: '#9E1B22', spring: '#BE2F3A', summer: '#1F7FAE', autumn: '#22405F' };
   const esc = s => String(s ?? '').replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));

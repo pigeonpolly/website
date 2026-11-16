@@ -9,7 +9,7 @@
   if (!app) return;
   const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, pre = ['', '/ru', '/lv'][L];
   const T = {
-    title: ['Polly’s Potion Lab', 'Зельеварня Полли', 'Pollijas dziru virtuve'],
+    title: ['Polly’s Potion Lab', 'Зельеварня Полли', 'Pollija dziru virtuve'],
     tabMaze: ['🗺 Maze', '🗺 Лабиринт', '🗺 Labirints'], tabPot: ['🧪 Cauldron', '🧪 Котёл', '🧪 Katls'], tabBook: ['📖 Recipes', '📖 Рецепты', '📖 Receptes'],
     login: ['Sign in to walk the mazes, brew potions and earn buttons.', 'Войдите, чтобы ходить по лабиринтам, варить зелья и получать пуговки.', 'Ienāc, lai staigātu pa labirintiem, vārītu dziras un saņemtu pogas.'],
     signin: ['Sign in', 'Войти', 'Ienākt'],

@@ -114,7 +114,7 @@
     ['You remember where every lost thing is', 'Вспоминаешь, где лежат все потерянные вещи'], ['Houseplants start growing faster', 'Комнатные цветы начинают расти быстрее'],
     ['You urgently need to build a blanket fort', 'Срочно хочется построить шалаш из одеял'], ['It smells like grandma’s kitchen', 'Пахнет бабушкиной кухней'],
     ['You want summer holidays again', 'Снова хочется на каникулы'], ['Your knees stop being afraid of slides', 'Коленки перестают бояться горок']];
-  const FAILS = [['The cauldron sneezed and spat out a sock.', 'Котёл чихнул и выплюнул носок.'], ['A suspicious grey goo. Polly poured it into a plant, and the plant got offended.', 'Вышла подозрительная серая жижа. Полли вылила её в цветок — цветок обиделся.'],
+  const FAILS = [['The cauldron sneezed and spat out a sock.', 'Котёл чихнул и выплюнул носок.'], ['A suspicious grey goo. Polly poured it into a plant, and the plant got offended.', 'Вышла подозрительная серая жижа. Полли вылил её в цветок — цветок обиделся.'],
     ['Bloop… and nothing. Just a smell of old slippers.', 'Бульк… и ничего. Только запах старых тапок.'], ['The potion ran out of the cauldron and hid under the cupboard.', 'Зелье убежало из котла и спряталось под шкаф.'],
     ['The steam spelled out “NO”.', 'Пар сложился в слово «НЕТ».'], ['The cauldron gurgled, offended, and turned away.', 'Котёл обиженно булькнул и отвернулся.'],
     ['It turned into jelly. Just jelly.', 'Вышел кисель. Просто кисель.'], ['A bat flew out and asked you never to do that again.', 'Из котла вылетела летучая мышь и попросила больше так не делать.'],

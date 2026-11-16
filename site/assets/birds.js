@@ -476,7 +476,7 @@
     slippers: ['Fluffy slippers', 'Пушистые тапочки', 'Pūkainas čības'], skates: ['Roller skates', 'Ролики', 'Skrituļslidas'], ballet: ['Ballet flats', 'Балетки', 'Baletkurpes'],
     donut: ['Donut', 'Пончик', 'Virtulis'], cookie: ['Cookie', 'Печенька', 'Cepums'], apple: ['Apple', 'Яблочко', 'Ābols'], carrot: ['Carrot', 'Морковка', 'Burkāns'], daisy: ['Daisy', 'Ромашка', 'Margrietiņa'],
     balloon: ['Balloon', 'Воздушный шарик', 'Balons'], cupcake: ['Cupcake', 'Капкейк', 'Keksiņš'], feather: ['Blue feather', 'Синее пёрышко', 'Zila spalviņa'], bubbletea: ['Bubble tea', 'Бабл-ти', 'Burbuļtēja'],
-    spatula: ['Pancake spatula', 'Лопатка для блинов', 'Pankūku lāpstiņa'], pancake: ['Pancake with jam', 'Блинчик с вареньем', 'Pankūka ar ievārījumu'], syrup: ['Maple syrup', 'Кленовый сироп', 'Kļavu sīrups'], goldspatula: ['Polly’s golden spatula', 'Золотая лопатка Полли', 'Pollijas zelta lāpstiņa'],
+    spatula: ['Pancake spatula', 'Лопатка для блинов', 'Pankūku lāpstiņa'], pancake: ['Pancake with jam', 'Блинчик с вареньем', 'Pankūka ar ievārījumu'], syrup: ['Maple syrup', 'Кленовый сироп', 'Kļavu sīrups'], goldspatula: ['Polly’s golden spatula', 'Золотая лопатка Полли', 'Pollija zelta lāpstiņa'],
     pancakehat: ['Pancake stack hat', 'Стопка блинов на голове', 'Pankūku kaudzes cepure'], pancakecrown: ['Pancake master’s crown', 'Корона блинного мастера', 'Pankūku meistara kronis'],
     conductor: ['Train conductor’s cap', 'Фуражка проводника', 'Konduktora žokejcepure'], goldcap: ['Golden engine driver’s cap', 'Золотая фуражка машиниста', 'Zelta mašīnista cepure'],
     ticket: ['Train ticket to Spain', 'Билет на поезд в Испанию', 'Vilciena biļete uz Spāniju'], phrasebook: ['Pocket phrasebook', 'Карманный разговорник', 'Kabatas sarunvārdnīca'],

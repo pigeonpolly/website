@@ -24,7 +24,7 @@
     show: ['Show on the map', 'Показать на карте', 'Parādīt kartē'],
     again: ['Try again', 'Пройти ещё раз', 'Mēģināt vēlreiz'],
     start: ['Start the quiz', 'Начать квиз', 'Sākt testu'],
-    startNote: ['Six questions, zero wrong answers. Polly will tell you where you truly belong.', 'Шесть вопросов, ни одного неправильного ответа. Полли подскажет, где ваше место.', 'Seši jautājumi, neviena nepareiza atbilde. Pollija pateiks, kur ir tava īstā vieta.'],
+    startNote: ['Six questions, zero wrong answers. Polly will tell you where you truly belong.', 'Шесть вопросов, ни одного неправильного ответа. Полли подскажет, где ваше место.', 'Seši jautājumi, neviena nepareiza atbilde. Pollijs pateiks, kur ir tava īstā vieta.'],
   };
   const t = (k, ...a) => { const v = T[k][L]; return typeof v === 'function' ? v(...a) : v; };
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
@@ -268,9 +268,9 @@
       polly: [['Coo! Welcome to Wobbleland. Mind the seagulls, they bite pastries.', 'Hello! I’m off to the office. Number 11, it’s just down the street.', 'Have you had coffee yet? I’ve had three.'],
               ['Курлык! Добро пожаловать в Wobbleland. Осторожно с чайками, они кусают пирожки.', 'Привет! Бегу в офис, дом 11, тут рядом.', 'Вы уже пили кофе? Я уже три чашки.'],
               ['Kū! Laipni lūdzam Wobbleland. Uzmanies no kaijām, tās kož pīrādziņos.', 'Sveiks! Skrienu uz biroju, 11. māja, tepat blakus.', 'Vai jau dzēri kafiju? Es jau trīs tases.']],
-      chew: [['Good day! Mail’s on its way. Slowly, but it’s on its way.', 'Hello, neighbour. Polly lives right next door, don’t tell her I said hi.', 'No rush. There’s never any rush.'],
+      chew: [['Good day! Mail’s on its way. Slowly, but it’s on its way.', 'Hello, neighbour. Polly lives right next door, don’t tell him I said hi.', 'No rush. There’s never any rush.'],
              ['Добрый день! Почта уже в пути. Медленно, но в пути.', 'Здравствуйте, соседи! Полли живёт прямо за стенкой.', 'Не торопитесь. Торопиться некуда.'],
-             ['Labdien! Pasts jau ceļā. Lēnām, bet ceļā.', 'Sveiki, kaimiņi! Pollija dzīvo tepat aiz sienas.', 'Nesteidzies. Nav kur steigties.']],
+             ['Labdien! Pasts jau ceļā. Lēnām, bet ceļā.', 'Sveiki, kaimiņi! Pollijs dzīvo tepat aiz sienas.', 'Nesteidzies. Nav kur steigties.']],
       titos: [['Detective Titos. Lovely day for a little investigation.', 'Evening. Seen anything suspicious? Anything at all?', 'Every clue counts. Even crumbs.'],
               ['Детектив Титос. Отличный день для небольшого расследования.', 'Добрый вечер. Ничего подозрительного не видели? Совсем ничего?', 'Важна каждая улика. Даже крошки.'],
               ['Detektīvs Titoss. Lieliska diena nelielai izmeklēšanai.', 'Labvakar. Neko aizdomīgu neesi redzējis? Pilnīgi neko?', 'Svarīga ir katra pierādījuma druska. Pat drupačas.']],

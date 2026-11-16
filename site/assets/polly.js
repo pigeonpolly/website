@@ -9,12 +9,12 @@
     en: { say: ['Need more coffee.', 'I’m not lost, I’m exploring.', 'Have you seen my worm chips?', 'Sketch first, worry later.',
       'This is my office now.', 'Coo.', 'Don’t tell Mr.Chew I was here.', 'Five more minutes…', 'Is that a crumb?', 'This button tastes like design.'],
       wake: ['Huh?! I wasn’t sleeping.', 'Five more minutes…'] },
-    lv: { say: ['Vajag vēl kafiju.', 'Es neesmu apmaldījusies, es pētu.', 'Vai neesi redzējis manus tārpu čipsus?', 'Vispirms skicē, uztraucies vēlāk.',
+    lv: { say: ['Vajag vēl kafiju.', 'Es neesmu apmaldījies, es pētu.', 'Vai neesi redzējis manus tārpu čipsus?', 'Vispirms skicē, uztraucies vēlāk.',
       'Tagad šis ir mans birojs.', 'Kū.', 'Nesaki Mr.Chew, ka es te biju.', 'Vēl piecas minūtes…', 'Vai tā ir drupačiņa?', 'Šī poga garšo pēc dizaina.'],
       wake: ['Ko?! Es negulēju.', 'Vēl piecas minūtes…'] },
-    ru: { say: ['Нужно больше кофе.', 'Я не заблудилась, я исследую.', 'Ты не видел мои червячковые чипсы?', 'Сначала скетч, переживания потом.',
-      'Теперь это мой офис.', 'Курлык.', 'Не говори Мистеру Чу, что я тут была.', 'Ещё пять минуточек…', 'Это что, крошка?', 'Эта кнопка на вкус как дизайн.'],
-      wake: ['Ой! Я не спала.', 'Ещё пять минуточек…'] },
+    ru: { say: ['Нужно больше кофе.', 'Я не заблудился, я исследую.', 'Ты не видел мои червячковые чипсы?', 'Сначала скетч, переживания потом.',
+      'Теперь это мой офис.', 'Курлык.', 'Не говори Мистеру Чу, что я тут был.', 'Ещё пять минуточек…', 'Это что, крошка?', 'Эта кнопка на вкус как дизайн.'],
+      wake: ['Ой! Я не спал.', 'Ещё пять минуточек…'] },
   }[lang] || null;
   const TXT = T || { say: ['Coo.'], wake: ['Huh?!'] };
   const pick = a => a[Math.floor(Math.random() * a.length)];
