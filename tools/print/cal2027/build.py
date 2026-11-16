@@ -80,7 +80,8 @@ page = art[:H].copy()
 yy = np.arange(H, dtype=np.float32)[:, None]; xs = np.arange(W) / W
 e = n1(W, mm(12)) * mm(2.5) + n1(W, mm(3)) * mm(.8)
 g = np.clip(1 - (yy - mm(29) - e[None, :]) / mm(8), 0, 1) ** 1.1 * 0.84 * (1 + 0.07 * n2(H, W, mm(7)))
-g = g * (1 - 0.9 * np.exp(-((xs[None, :] - .505) / .045) ** 2 / 2) * np.clip((yy - mm(14.5)) / mm(3), 0, 1))   # флюгер виден
+dx = (xs[None, :] * W - .505 * W) / 1.35; dy = yy - mm(42); tt = np.clip((mm(29.5) - np.sqrt(dx * dx + dy * dy)) / mm(8.5), 0, 1)
+g = g * (1 - 0.92 * tt * tt * (3 - 2 * tt))   # мягкий светлый полукруг над флюгером
 col = np.stack([np.interp(xs, [0, .5, 1], c) for c in zip(hexf('#2f2b4a'), hexf('#25405e'), hexf('#3a3940'))], -1)[None]
 page = page * (1 - g[..., None]) + col * g[..., None]
 e2 = n1(W, mm(10)) * mm(2) + n1(W, mm(2)) * mm(.6); d = yy - (mm(392.6) + e2[None, :])
@@ -109,7 +110,7 @@ def month(mo, x, y, w, fm, fd, lh):
 MW = (297 - 14 - 6 * 6) / 7
 for c, mo in enumerate([1, 2, 3, None, 4, 5, 6]):
     x = B + 7 + c * (MW + 6)
-    if mo is None: t(NUM, x + MW / 2, B + 13.5, '2027', font('CaveatBrush.ttf', 34)); continue
+    if mo is None: t(NUM, x + MW / 2, B + 12.3, '2027', font('CaveatBrush.ttf', 34)); continue
     month(mo, x, B + 8, MW, 13.5, 10.8, 2.75)
 MW2 = (297 - 14 - 5 * 7) / 6
 for c in range(6): month(7 + c, B + 7 + c * (MW2 + 7), B + 393.8, MW2, 14, 10.4, 2.7)
