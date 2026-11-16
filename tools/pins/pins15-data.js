@@ -157,7 +157,7 @@ const MEM = [
 ];
 const mems = MEM.map(([tpl, k, top, sub, title], i) => base(891 + i, {
   tpl, th: ['blush', 'paper', 'sage', 'clay', 'white'][i % 5], art: F(k), t: top, ...(tpl === 'meme' ? { top } : { top: 320 }), sub, h: 900, at: 320, fs: tpl === 'pov' ? 58 : 50, pos: '50% 30%', type: 'Мем', topics: TM, title,
-  desc: desc(`A relatable artist moment: ${top.replace(/^Me:?\s*/, '').replace(/[“”]/g, '"')} — ${sub}.`), alt: `A meme photo of ${PH[k]} with the caption “${top}”.`, _ph: [k],
+  desc: desc(`A relatable artist moment: ${top.replace(/^Me:?\s*/, '').replace(/[“”]/g, '"')} — ${sub.replace(/[.?!]$/, '')}.`), alt: `A meme photo of ${PH[k]} with the caption “${top}”.`, _ph: [k],
 }));
 
 // 4) мудборды 2×2 (14)
@@ -205,7 +205,7 @@ const MORE = [
   { tpl: 'polaroid', art: F('life-childhood'), ah: 560, q: 'the curious kid is still in charge', kick: 'my childhood', blob: 'greenwash', bx: 480, by: 960,
     title: 'My Childhood: The Curious Kid Is Still in Charge', desc: 'A childhood photo with my little cactus. The curious kid is still the one choosing what I draw. Behind the artist camera at Pigeon Polly Art Lab.', alt: 'A polaroid of the artist as a little girl holding a cactus.', _ph: ['life-childhood'] },
   { tpl: 'polaroid', art: F('life-firsttrip'), ah: 520, q: 'my first trip (I bought a fish)', kick: 'artist throwback', blob: 'bluewash', bx: 480, by: 960,
-    title: 'Artist Throwback: My First Trip', desc: 'A throwback to my first trip — holding a plush fish in a ferry shop. Every trip since has filled a sketchbook. Behind the scenes at Pigeon Polly Art Lab.', alt: 'A polaroid of the young artist holding a plush fish in a shop.', _ph: ['life-firsttrip'] },
+    title: 'Artist Throwback: My First Trip', desc: 'A throwback to my first trip — holding a plush fish in a shop. Every trip since has filled a sketchbook. Behind the scenes at Pigeon Polly Art Lab.', alt: 'A polaroid of the young artist holding a plush fish in a shop.', _ph: ['life-firsttrip'] },
   { tpl: 'frame', th: 'night', art: F('selfie-bw'), ah: 820, aw: 600, q: 'Some moods don’t need color.', qs: 58, kick: 'black and white',
     title: 'Some Moods Don’t Need Color', desc: 'A black-and-white winter selfie and a reminder: not every mood needs color. Behind the artist camera at Pigeon Polly Art Lab.', alt: 'A black-and-white selfie of the artist in a knit scarf in a white frame.', _ph: ['selfie-bw'] },
   { tpl: 'full', art: F('life-ferry'), pos: '50% 50%', kick: 'sea days', q: 'Salt air, cold hands, open sketchbook.', qs: 74,
