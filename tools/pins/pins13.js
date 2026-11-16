@@ -3,12 +3,13 @@
 // Картинки: страницы и вырезки из PDF книг (tools/pins/book/), страницы туши (site/images/ink/), скетчи (site/images/photos2/), обложки (e-books/).
 // node tools/pins/pins13.js [номер…] → site/images/pins/pin-NNN.jpg + tools/pins/pins13.json (тексты для Notion).
 // SET=14 node tools/pins/pins13.js — тот же движок для №726–825 (данные pins14-data.js → pins14.json).
+// SET=15 — №826–945 «Artist lifestyle» из фото Алины (tools/pins/life/), шаблоны pal, palside, duo, inset.
 const fs = require('fs'), path = require('path');
 const { chromium } = require('playwright');
 const ROOT = path.resolve(__dirname, '../..');
 const SET = process.env.SET || '13';
 const PINS = require(`./pins${SET}-data.js`);
-const U = k => 'file://' + (k.startsWith('book/') ? path.join(__dirname, k) : path.join(ROOT, 'site/images', k));
+const U = k => 'file://' + (/^(book|life)\//.test(k) ? path.join(__dirname, k) : path.join(ROOT, 'site/images', k));
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const TH = {
   paper: { bg: '#F6F1EB', fg: '#1E1A18', acc: '#B8473C', hand: '#B8473C', mut: '#8A7F78', dot: '#1E1A18', card: '#fff' },
@@ -79,7 +80,7 @@ const T = {
   // сетка 2×2
   grid: p => `${blob(p)}${head(p)}
     <div style="position:absolute;left:50px;right:50px;top:${p.top || 340}px;display:grid;grid-template-columns:1fr 1fr;gap:22px">
-    ${p.items.map(q => `<div style="position:relative;border-radius:8px;overflow:hidden;background:${q.cut ? 'transparent' : '#fff'}">${img(q.art, 439, p.ch || 400, q.pos, q.fit || (q.cut ? 'contain' : 'cover'), q.cut ? '' : '#fff')}<span class="lbl" style="left:10px;bottom:10px">${esc(q.say)}</span></div>`).join('')}</div>
+    ${p.items.map(q => `<div style="position:relative;border-radius:8px;overflow:hidden;background:${q.cut ? 'transparent' : '#fff'}">${img(q.art, 439, p.ch || 400, q.pos, q.fit || (q.cut ? 'contain' : 'cover'), q.cut ? '' : '#fff')}${q.say ? `<span class="lbl" style="left:10px;bottom:10px">${esc(q.say)}</span>` : ''}</div>`).join('')}</div>
     <div class="hand" style="position:absolute;left:66px;right:60px;top:${(p.top || 340) + 2 * (p.ch || 400) + 66}px;text-align:center">${esc(p.hand)}</div>${foot(p)}`,
   // две картинки + 10 тем в 2 колонки
   prompts: p => `${blob(p)}${head(p)}
@@ -142,6 +143,25 @@ const T = {
     ${cut(p.art, p.aw || 520, p.ah || 720, p.ax ?? 440, p.ay ?? 560, p.ar || 0)}
     <div class="q" style="position:absolute;left:70px;width:${p.qw || 440}px;top:${p.qy || 400}px;font-size:${p.qs || 50}px">“${esc(p.q)}”</div>
     <div class="hand" style="position:absolute;left:70px;width:400px;top:${p.hy || 1150}px">${esc(p.hand)}</div>${foot(p)}`,
+  // палитра из фото: фото, ниже кружки с HEX
+  pal: p => `${head(p)}
+    ${fr(p.art, 860, p.h || 700, 70, p.top || 330, -1, { pos: p.pos })}
+    <div style="position:absolute;left:50px;right:50px;top:${(p.top || 330) + (p.h || 700) + 50}px;display:flex;justify-content:center;gap:18px">${p.cols.map(c => `<div style="text-align:center"><div style="width:132px;height:132px;border-radius:50%;background:${c};box-shadow:0 8px 18px rgba(0,0,0,.18);border:5px solid #fff"></div><div style="font:700 24px Karla;color:${TH[p.th].mut};margin-top:12px;letter-spacing:.04em">${c}</div></div>`).join('')}</div>
+    ${p.hand ? `<div class="hand" style="position:absolute;left:66px;right:60px;top:${(p.top || 330) + (p.h || 700) + 235}px;text-align:center;font-size:40px">${esc(p.hand)}</div>` : ''}${foot(p)}`,
+  // палитра сбоку: фото высоко слева, полосы цветов справа
+  palside: p => `<div style="position:absolute;left:56px;top:60px;right:56px"><div class="kick" style="position:static;margin-bottom:6px">${esc(p.kick || 'color palette')}</div><h1 style="font-size:${p.fs || 64}px">${p.t}</h1></div>
+    ${fr(p.art, 560, 1020, 56, 330, 0, { pos: p.pos })}
+    <div style="position:absolute;left:650px;right:56px;top:330px;height:1020px;display:flex;flex-direction:column;gap:12px">${p.cols.map(c => `<div style="flex:1;border-radius:10px;background:${c};display:flex;align-items:flex-end;padding:12px 14px;font:700 24px Karla;color:${parseInt(c.slice(1, 3), 16) * .3 + parseInt(c.slice(3, 5), 16) * .59 + parseInt(c.slice(5, 7), 16) * .11 > 150 ? '#2B2622' : '#fff'}">${c}</div>`).join('')}</div>${foot(p)}`,
+  // художник и работа: два фото рядом с подписями
+  duo: p => `${blob(p)}${head(p)}
+    <div style="position:absolute;left:46px;top:${p.top || 380}px;width:450px;transform:rotate(-3deg)"><div class="fr">${img(p.me, 450, p.h || 640, p.mpos)}</div><div class="hand" style="text-align:center;margin-top:16px;font-size:44px">${esc(p.l1 || 'the artist')}</div></div>
+    <div style="position:absolute;left:510px;top:${(p.top || 380) + 50}px;width:446px;transform:rotate(2.5deg)"><div class="fr">${img(p.art, 446, p.h || 640, p.apos, p.afit || 'cover', '#fff')}</div><div class="hand" style="text-align:center;margin-top:16px;font-size:44px">${esc(p.l2 || 'the art')}</div></div>
+    ${p.hand ? `<div style="position:absolute;left:66px;right:60px;top:${(p.top || 380) + (p.h || 640) + 160}px;text-align:center;font:400 italic 40px/1.2 Fraunces;color:${TH[p.th].fg}">${esc(p.hand)}</div>` : ''}${foot(p)}`,
+  // арт крупно + фото художника кружком в углу
+  inset: p => `${head(p)}
+    ${fr(p.art, 880, p.h || 760, 60, p.top || 330, 0, { pos: p.apos, fit: p.afit || 'cover' })}
+    <div style="position:absolute;left:${p.ix ?? 600}px;top:${(p.top || 330) + (p.h || 760) - 230}px;width:330px;height:330px;border-radius:50%;overflow:hidden;border:10px solid ${TH[p.th].bg};box-shadow:0 16px 36px rgba(0,0,0,.3)">${img(p.me, 330, 330, p.mpos)}</div>
+    <div class="hand" style="position:absolute;left:70px;width:${(p.ix ?? 600) - 90}px;top:${(p.top || 330) + (p.h || 760) + 30}px;font-size:46px">${esc(p.hand)}</div>${foot(p)}`,
   // арт во весь пин + цитата поверх (затемнение снизу или сверху)
   full: p => `${img(p.art, 1000, 1500, p.pos || '50% 50%')}
     <div style="position:absolute;left:0;right:0;${p.top ? 'top:0;height:760px;background:linear-gradient(rgba(15,12,10,.82),rgba(15,12,10,0))' : 'bottom:0;height:860px;background:linear-gradient(rgba(15,12,10,0),rgba(15,12,10,.85) 55%)'}"></div>
