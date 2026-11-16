@@ -427,19 +427,28 @@
   addEventListener('resize', reset);
 
   // связка ключей в клюве: открыли кабинет в шапке (v2.js) — Полли прилетает и садится на край списка, закрыли — летит обратно в угол
-  const KEYS = ['..........', '..........', '..........', '......ccc.', '......c.c.', '...yyyccc.', '...y.y.c..', '...yyy.c..', '....y..cc.',
-    '....y..c..', '....yy.cc.', '....y.....', '....yy....']; // медный ключ позади золотого; колечко рисуется тонкой линией сверху
-  const KPX = Math.max(2, PX - 1), KW = 10 * KPX;
-  const keysEl = document.createElement('div'), keysCv = document.createElement('canvas');
-  keysEl.className = 'polly-keys'; keysCv.width = KW; keysCv.height = KEYS.length * KPX;
-  { const kg = keysCv.getContext('2d'), KC = { s: '#B9BDCB', y: '#F2B530', c: '#D27A3C' };
-    KEYS.forEach((r, j) => [...r].forEach((ch, i) => { if (KC[ch]) { kg.fillStyle = KC[ch]; kg.fillRect(i * KPX, j * KPX, KPX, KPX); } }));
-    kg.strokeStyle = '#8E93A3'; kg.lineWidth = Math.max(1.2, KPX * 0.45); kg.beginPath(); kg.arc(5.5 * KPX, 2 * KPX, 1.7 * KPX, 0, Math.PI * 2); kg.stroke(); }
-  const KL = Math.round(11.5 * PX - 5.5 * KPX);
-  keysEl.style.cssText = `position:absolute;left:${KL}px;top:${Math.round((4 + TOP) * PX - KPX * 0.5)}px;display:none;pointer-events:none;filter:drop-shadow(1px 0 0 #1a1528) drop-shadow(-1px 0 0 #1a1528) drop-shadow(0 1px 0 #1a1528) drop-shadow(0 -1px 0 #1a1528)`;
-  keysCv.style.cssText = 'display:block;image-rendering:pixelated;transform-origin:55% 5%';
-  keysEl.appendChild(keysCv); body.style.position = 'relative'; body.appendChild(keysEl);
-  if (!reduce && keysCv.animate) keysCv.animate([{ transform: 'rotate(-16deg)' }, { transform: 'rotate(16deg)' }], { duration: 650, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out' }); // ключи болтаются
+  // связка: тонкое колечко у клюва, на нём два ключа (медный позади золотого) концами в разные стороны; вся связка качается
+  const KEY = ['XXX', 'X.X', 'XXX', '.X.', '.X.', '.XX', '.X.', '.XX'];
+  const KPX = Math.max(2, PX - 1), KW = 8 * KPX;
+  const keysEl = document.createElement('div'), swing = document.createElement('div');
+  keysEl.className = 'polly-keys';
+  const keyCv = (col, rot) => {
+    const c = document.createElement('canvas'), kg = c.getContext('2d');
+    c.width = 3 * KPX; c.height = KEY.length * KPX; kg.fillStyle = col;
+    KEY.forEach((r, j) => [...r].forEach((ch, i) => { if (ch === 'X') kg.fillRect(i * KPX, j * KPX, KPX, KPX); }));
+    c.style.cssText = `position:absolute;left:${2.5 * KPX}px;top:${3 * KPX}px;image-rendering:pixelated;transform-origin:50% 0;transform:rotate(${rot}deg)`;
+    return c;
+  };
+  const ring = document.createElement('canvas');
+  ring.width = KW; ring.height = 4 * KPX;
+  { const rg = ring.getContext('2d'); rg.strokeStyle = '#8E93A3'; rg.lineWidth = Math.max(1.2, KPX * 0.45); rg.beginPath(); rg.arc(4 * KPX, 1.9 * KPX, 1.6 * KPX, 0, Math.PI * 2); rg.stroke(); }
+  ring.style.cssText = 'position:absolute;left:0;top:0';
+  swing.style.cssText = `position:relative;width:${KW}px;height:${12 * KPX}px;transform-origin:50% ${1.9 * KPX}px`;
+  swing.append(keyCv('#D27A3C', 30), keyCv('#F2B530', -12), ring);
+  const KL = Math.round(11.5 * PX - 4 * KPX);
+  keysEl.style.cssText = `position:absolute;left:${KL}px;top:${Math.round((4 + TOP) * PX - KPX * 0.4)}px;display:none;pointer-events:none;filter:drop-shadow(1px 0 0 #1a1528) drop-shadow(-1px 0 0 #1a1528) drop-shadow(0 1px 0 #1a1528) drop-shadow(0 -1px 0 #1a1528)`;
+  keysEl.appendChild(swing); body.style.position = 'relative'; body.appendChild(keysEl);
+  if (!reduce && swing.animate) swing.animate([{ transform: 'rotate(-14deg)' }, { transform: 'rotate(14deg)' }], { duration: 650, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out' }); // ключи болтаются
   const keysFlip = () => { keysEl.style.left = (dir > 0 ? KL : W - KL - KW) + 'px'; keysEl.style.transform = dir > 0 ? '' : 'scaleX(-1)'; };
   let keysOn = null, keysBack = null;
   async function keysTo(el) {
