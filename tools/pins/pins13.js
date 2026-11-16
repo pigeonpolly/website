@@ -2,10 +2,12 @@
 // У каждой книги 25 пинов ведут на сайт (/books/, utm_campaign=books2, utm_content=pin-NNN), 25 — прямо на Amazon (a.co).
 // Картинки: страницы и вырезки из PDF книг (tools/pins/book/), страницы туши (site/images/ink/), скетчи (site/images/photos2/), обложки (e-books/).
 // node tools/pins/pins13.js [номер…] → site/images/pins/pin-NNN.jpg + tools/pins/pins13.json (тексты для Notion).
+// SET=14 node tools/pins/pins13.js — тот же движок для №726–825 (данные pins14-data.js → pins14.json).
 const fs = require('fs'), path = require('path');
 const { chromium } = require('playwright');
 const ROOT = path.resolve(__dirname, '../..');
-const PINS = require('./pins13-data.js');
+const SET = process.env.SET || '13';
+const PINS = require(`./pins${SET}-data.js`);
 const U = k => 'file://' + (k.startsWith('book/') ? path.join(__dirname, k) : path.join(ROOT, 'site/images', k));
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
 const TH = {
@@ -14,16 +16,19 @@ const TH = {
   wash: { bg: '#FFFDFA', fg: '#2B2622', acc: '#B8473C', hand: '#3E7FA0', mut: '#8C8580', dot: '#E3A44F', card: '#fff' },
   blush: { bg: '#FBECE4', fg: '#2B2622', acc: '#B8473C', hand: '#B8473C', mut: '#9A8A82', dot: '#7FB0C8', card: '#fff' },
   white: { bg: '#FFFFFF', fg: '#2B2622', acc: '#3E7FA0', hand: '#B8473C', mut: '#8C8580', dot: '#B8473C', card: '#F6F1EB' },
+  night: { bg: '#1E2433', fg: '#F3EDE2', acc: '#E3B567', hand: '#E3B567', mut: '#A7A3A0', dot: '#E3B567', card: '#fff' },
+  sage: { bg: '#E8ECE2', fg: '#2F3A2E', acc: '#6F8A5E', hand: '#6F8A5E', mut: '#7E8A7A', dot: '#B8473C', card: '#fff' },
+  clay: { bg: '#F0E4D7', fg: '#3A2A22', acc: '#A4553A', hand: '#A4553A', mut: '#9A8778', dot: '#6F8A5E', card: '#fff' },
 };
 const img = (k, W, H, pos = '50% 50%', fit = 'cover', bg = '') => `<img src="${U(k)}" style="width:${W}px;height:${H}px;object-fit:${fit};object-position:${pos};display:block;${bg ? 'background:' + bg : ''}">`;
 const fr = (k, W, H, x, y, r = 0, o = {}) => `<div class="fr" style="position:absolute;left:${x}px;top:${y}px;transform:rotate(${r}deg)">${img(k, W, H, o.pos, o.fit || 'cover', o.bg || '#fff')}</div>`;
 const cut = (k, W, H, x, y, r = 0, op = 1) => `<img src="${U(k)}" style="position:absolute;left:${x}px;top:${y}px;width:${W}px;height:${H}px;object-fit:contain;transform:rotate(${r}deg);opacity:${op}">`;
 const COVER = { ink: 'e-books/ink-sketching.jpg', wc: 'e-books/watercolor-sketches.jpg' };
 const NAME = { ink: 'Ink Sketching: Creative Guide', wc: 'Watercolor Sketches: Creative Guide' };
-const foot = p => `<div class="url">${p.to === 'a' ? esc(NAME[p.book]) + ' · on Amazon' : 'more books → pigeonpolly.com/books'}</div>`;
+const foot = p => p.foot ? `<div class="url">${esc(p.foot)}</div>` : `<div class="url">${p.to === 'a' ? esc(NAME[p.book]) + ' · on Amazon' : 'more books → pigeonpolly.com/books'}</div>`;
 const head = (p, top = 60) => `${p.kick ? `<div class="kick" style="top:${top}px">${esc(p.kick)}</div>` : ''}<h1 style="position:absolute;left:62px;right:56px;top:${top + 64}px;font-size:${p.fs || 78}px">${p.t}</h1>`;
 const blob = p => p.blob ? cut('book/' + p.blob + '.png', p.bw || 620, p.bh || 520, p.bx ?? 420, p.by ?? -80, p.br || 0, p.bo || .55) : '';
-const mini = (p, x = 770, y = 1170, w = 170) => `<div class="fr" style="position:absolute;left:${x}px;top:${y}px;transform:rotate(4deg)">${img(COVER[p.book], w, Math.round(w * 1.393))}</div>`;
+const mini = (p, x = 770, y = 1170, w = 170) => !COVER[p.book] ? "" : `<div class="fr" style="position:absolute;left:${x}px;top:${y}px;transform:rotate(4deg)">${img(COVER[p.book], w, Math.round(w * 1.393))}</div>`;
 const li = (a, b) => `<div class="li">${esc(a)}${b ? `<small>${esc(b)}</small>` : ''}</div>`;
 
 const CSS = t => `
@@ -137,12 +142,52 @@ const T = {
     ${cut(p.art, p.aw || 520, p.ah || 720, p.ax ?? 440, p.ay ?? 560, p.ar || 0)}
     <div class="q" style="position:absolute;left:70px;width:${p.qw || 440}px;top:${p.qy || 400}px;font-size:${p.qs || 50}px">“${esc(p.q)}”</div>
     <div class="hand" style="position:absolute;left:70px;width:400px;top:${p.hy || 1150}px">${esc(p.hand)}</div>${foot(p)}`,
+  // арт во весь пин + цитата поверх (затемнение снизу или сверху)
+  full: p => `${img(p.art, 1000, 1500, p.pos || '50% 50%')}
+    <div style="position:absolute;left:0;right:0;${p.top ? 'top:0;height:760px;background:linear-gradient(rgba(15,12,10,.82),rgba(15,12,10,0))' : 'bottom:0;height:860px;background:linear-gradient(rgba(15,12,10,0),rgba(15,12,10,.85) 55%)'}"></div>
+    <div style="position:absolute;left:70px;right:70px;${p.top ? 'top:90px' : 'bottom:150px'};color:#F6F1EB">
+      ${p.kick ? `<div style="font:700 26px Karla;letter-spacing:.24em;text-transform:uppercase;color:#E3C9A0;margin-bottom:22px">${esc(p.kick)}</div>` : ''}
+      <div style="font:400 italic ${p.qs || 74}px/1.1 Fraunces;letter-spacing:-.01em">${esc(p.q)}</div>
+      ${p.hand ? `<div style="font:700 44px Caveat;color:#E3C9A0;margin-top:22px">${esc(p.hand)}</div>` : ''}</div>
+    <div class="url" style="color:#E3C9A0;${p.top ? '' : 'z-index:3'}">${esc(p.foot || 'pigeonpolly.com')}</div>`,
+  // арт в паспарту + подпись как в музее
+  frame: p => `${blob(p)}<div style="position:absolute;left:${(1000 - (p.aw || 740)) / 2 - 24}px;top:${p.at || 110}px;background:#fff;padding:24px;box-shadow:0 26px 50px rgba(0,0,0,.22);transform:rotate(${p.ar || 0}deg)">${img(p.art, p.aw || 740, p.ah || 800, p.pos)}</div>
+    <div style="position:absolute;left:80px;right:80px;top:${(p.at || 110) + (p.ah || 800) + 110}px;text-align:center">
+      <div style="font:400 italic ${p.qs || 56}px/1.15 Fraunces;color:${TH[p.th].fg}">${esc(p.q)}</div>
+      ${p.kick ? `<div style="font:700 24px Karla;letter-spacing:.24em;text-transform:uppercase;color:${TH[p.th].acc};margin-top:26px">${esc(p.kick)}</div>` : ''}</div>${foot(p)}`,
+  // цветной верх с текстом + арт снизу
+  split: p => `<div style="position:absolute;left:0;right:0;top:0;height:${p.sh || 640}px;background:${TH[p.th].bg}"></div>
+    ${blob(p)}<div style="position:absolute;left:70px;right:70px;top:${p.ty || 110}px">
+      ${p.kick ? `<div style="font:700 26px Karla;letter-spacing:.24em;text-transform:uppercase;color:${TH[p.th].acc};margin-bottom:26px">${esc(p.kick)}</div>` : ''}
+      <div style="font:600 ${p.qs || 76}px/1.05 Fraunces;letter-spacing:-.02em;color:${TH[p.th].fg}">${p.t}</div></div>
+    <div style="position:absolute;left:0;top:${p.sh || 640}px">${img(p.art, 1000, 1500 - (p.sh || 640), p.pos)}</div>
+    <div class="url" style="color:#fff;text-shadow:0 2px 10px rgba(0,0,0,.6)">${esc(p.foot || 'pigeonpolly.com')}</div>`,
+  // только цитата: пятно акварели, подпись
+  qmin: p => `${blob(p)}<div style="position:absolute;left:90px;right:90px;top:0;bottom:120px;display:flex;flex-direction:column;justify-content:center;text-align:center">
+      <div style="font:400 120px/0.6 Fraunces;color:${TH[p.th].acc}">“</div>
+      <div style="font:400 italic ${p.qs || 78}px/1.12 Fraunces;color:${TH[p.th].fg};margin-top:30px">${esc(p.q)}</div>
+      <div style="width:80px;height:3px;background:${TH[p.th].acc};margin:46px auto 26px"></div>
+      <div style="font:700 26px Karla;letter-spacing:.24em;text-transform:uppercase;color:${TH[p.th].mut}">${esc(p.kick || 'pigeon polly art lab')}</div></div>${foot(p)}`,
+  // полароид с подписью от руки
+  polaroid: p => `${blob(p)}<div style="position:absolute;left:110px;top:${p.at || 150}px;width:780px;background:#fff;padding:30px 30px 0;box-shadow:0 26px 50px rgba(0,0,0,.25);transform:rotate(${p.ar ?? -3}deg)">
+      ${img(p.art, 720, p.ah || 760, p.pos)}
+      <div style="font:700 ${p.qs || 56}px/1.08 Caveat;color:#2B2622;text-align:center;padding:30px 10px 40px">${esc(p.q)}</div></div>
+    ${p.kick ? `<div class="hand" style="position:absolute;left:70px;right:70px;top:${p.ky || 1240}px;text-align:center">${esc(p.kick)}</div>` : ''}${foot(p)}`,
+  // мини-эссе: заголовок, картинка, 3 абзаца
+  essay: p => `${blob(p)}${head(p)}
+    ${fr(p.art, 876, p.h || 430, 62, p.top || 330, -1, { pos: p.pos })}
+    <div style="position:absolute;left:66px;right:60px;top:${(p.top || 330) + (p.h || 430) + 56}px">${p.paras.map(t => `<p style="font:400 ${p.ps || 34}px/1.38 Karla;color:${TH[p.th].fg};margin-bottom:22px">${t}</p>`).join('')}</div>${foot(p)}`,
+  // дыхание: круги
+  breathe: p => `${blob(p)}${head(p)}
+    <div style="position:absolute;left:200px;top:380px;width:600px;height:600px">${[600, 470, 340, 210].map((d, i) => `<div style="position:absolute;left:${(600 - d) / 2}px;top:${(600 - d) / 2}px;width:${d}px;height:${d}px;border-radius:50%;border:${4 + i}px solid ${TH[p.th].acc};opacity:${.25 + i * .22}"></div>`).join('')}
+      <div style="position:absolute;inset:0;display:flex;align-items:center;justify-content:center;font:700 54px/1 Caveat;color:${TH[p.th].fg};text-align:center">${esc(p.center)}</div></div>
+    <div style="position:absolute;left:70px;right:70px;top:1040px">${p.items.map(([a, b]) => li(a, b)).join('')}</div>${foot(p)}`,
 };
 
 (async () => {
   const only = process.argv.slice(2).map(Number);
   const b = await chromium.launch(); const page = await b.newPage({ viewport: { width: 1000, height: 1500 } });
-  const tmp = path.join(__dirname, 'shots', '_pin13.html'); fs.mkdirSync(path.dirname(tmp), { recursive: true }); const out = [];
+  const tmp = path.join(__dirname, 'shots', `_pin${SET}.html`); fs.mkdirSync(path.dirname(tmp), { recursive: true }); const out = [];
   const cnt = {};
   for (const p of PINS) {
     cnt[p.book + p.to] = (cnt[p.book + p.to] || 0) + 1;
@@ -155,6 +200,6 @@ const T = {
     await page.screenshot({ path: path.join(ROOT, `site/images/pins/pin-${p.n}.jpg`), type: 'jpeg', quality: 86 });
   }
   console.log('ссылки:', JSON.stringify(cnt));
-  if (fs.existsSync(tmp)) fs.unlinkSync(tmp); fs.writeFileSync(path.join(__dirname, 'pins13.json'), JSON.stringify(out, null, 1));
+  if (fs.existsSync(tmp)) fs.unlinkSync(tmp); fs.writeFileSync(path.join(__dirname, `pins${SET}.json`), JSON.stringify(out, null, 1));
   await b.close();
 })();
