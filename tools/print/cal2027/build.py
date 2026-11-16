@@ -21,7 +21,7 @@ from enhance import enhance
 ap = argparse.ArgumentParser()
 ap.add_argument('src'); ap.add_argument('--out', default='cal2027_out')
 ap.add_argument('--crop'); ap.add_argument('--rot', type=float); ap.add_argument('--nocrop', action='store_true')
-ap.add_argument('--vib', type=float, default=0.30); ap.add_argument('--vscale', type=float, default=1.0); ap.add_argument('--dpi', type=int, default=400)
+ap.add_argument('--vib', type=float, default=0.30); ap.add_argument('--vscale', type=float, default=1.0); ap.add_argument('--tint', default='0,0'); ap.add_argument('--match', type=float, default=0.0); ap.add_argument('--dpi', type=int, default=400)
 A = ap.parse_args(); os.makedirs(A.out, exist_ok=True)
 
 DPI = A.dpi; F = DPI / 25.4; mm = lambda v: int(round(v * F)); B = 3
@@ -72,7 +72,26 @@ ah = int(round(W * a.shape[0] / a.shape[1] * A.vscale))   # vscale<1 — чут�
 interp = cv2.INTER_AREA if a.shape[1] >= W else cv2.INTER_LANCZOS4
 art = np.clip(to_gam(cv2.resize(to_lin(a), (W, ah), interpolation=interp)), 0, 1).astype(np.float32)
 print(f'исходник {img.shape[1]} px по ширине → {img.shape[1] / (303 / 25.4):.0f} dpi на A3')
+if A.match:   # цвета (не детали) наполовину к фото с телефона ref_phone.jpg: совмещение + перенос размытых a/b в Lab
+    ref = np.asarray(Image.open(os.path.join(HERE, 'ref_phone.jpg')).convert('RGB')).astype(np.float32) / 255
+    sw = 1400; sh = int(round(sw * art.shape[0] / art.shape[1]))
+    s_small = cv2.resize(art, (sw, sh), interpolation=cv2.INTER_AREA); r_small = cv2.resize(ref, (sw, sh), interpolation=cv2.INTER_AREA)
+    wp = np.eye(2, 3, dtype=np.float32)
+    _, wp = cv2.findTransformECC(cv2.cvtColor(s_small, cv2.COLOR_RGB2GRAY), cv2.cvtColor(r_small, cv2.COLOR_RGB2GRAY), wp, cv2.MOTION_AFFINE,
+                                 (cv2.TERM_CRITERIA_EPS | cv2.TERM_CRITERIA_COUNT, 300, 1e-7), None, 5)
+    r_al = cv2.warpAffine(r_small, wp, (sw, sh), flags=cv2.INTER_LINEAR + cv2.WARP_INVERSE_MAP, borderMode=cv2.BORDER_REFLECT)
+    ls, lr = cv2.cvtColor(s_small, cv2.COLOR_RGB2Lab), cv2.cvtColor(r_al, cv2.COLOR_RGB2Lab)
+    dab = cv2.GaussianBlur(lr[..., 1:] - ls[..., 1:], (0, 0), 6)
+    dab = cv2.resize(dab, (art.shape[1], art.shape[0]), interpolation=cv2.INTER_CUBIC)
+    la = cv2.cvtColor(art, cv2.COLOR_RGB2Lab); la[..., 1:] += A.match * dab
+    art = np.clip(cv2.cvtColor(la, cv2.COLOR_Lab2RGB), 0, 1).astype(np.float32)
 art = enhance(art, vib=A.vib, px=1.6 * DPI / 400)
+da, db = map(float, A.tint.split(','))   # сдвиг тона в Lab (a: −зелёный/+пурпур, b: −синий/+жёлтый); белое не трогаем
+if da or db:
+    lab = cv2.cvtColor(art, cv2.COLOR_RGB2Lab); Lc = lab[..., 0]
+    wgt = np.clip((96 - Lc) / 10, 0, 1) * np.clip(Lc / 12, 0, 1)
+    lab[..., 1] += da * wgt; lab[..., 2] += db * wgt
+    art = np.clip(cv2.cvtColor(lab, cv2.COLOR_Lab2RGB), 0, 1).astype(np.float32)
 if art.shape[0] < H: art = np.concatenate([art, art[::-1][:H - art.shape[0]]], 0)
 page = art[:H].copy()
 
