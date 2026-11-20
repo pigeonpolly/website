@@ -111,6 +111,20 @@ for key in [k for k in T if k.startswith('studio-')]:
     cols = [{'hex': h, 'en': e, 'ru': r, 'lv': l} for e, r, l, h in O[key]] if key in O else palette(th)
     out.append({'key': key, 'gallery': 'studio', 'img': f'images/photos2/{name}.jpg', 'thumb': f'images/photos2/800/{name}.jpg', 'w': im.width, 'h': im.height,
                 'title': dict(zip(['en', 'ru', 'lv'], T[key])), 'colors': cols})
+# серия details «Палитры деталей» (21.11.2026, пины №1125–1174): кадр детали арта [x,y,w,h] в долях → site/images/palettes/details/<key>.jpg
+# (+ 800/ превью); список, кадры и названия на 3 языках — content/palette-details.json
+DD = W / 'site' / 'images' / 'palettes' / 'details'
+for d in json.load(open(W / 'content' / 'palette-details.json')):
+    full, th = DD / f"{d['key']}.jpg", DD / '800' / f"{d['key']}.jpg"
+    if not th.exists():
+        th.parent.mkdir(parents=True, exist_ok=True)
+        src = Image.open(W / 'site' / 'images' / d['art']).convert('RGB'); w, h = src.size; x, y, cw, ch = d['crop']
+        c = src.crop((int(x * w), int(y * h), int((x + cw) * w), int((y + ch) * h))); c.thumbnail((1400, 1400)); c.save(full, quality=86, optimize=True)
+        t = c.copy(); t.thumbnail((800, 800)); t.save(th, quality=84, optimize=True)
+    im = Image.open(full)
+    cols = [{'hex': hx, 'en': e, 'ru': r, 'lv': l} for e, r, l, hx in O[d['key']]] if d['key'] in O else palette(th)
+    out.append({'key': d['key'], 'gallery': 'details', 'img': f"images/palettes/details/{d['key']}.jpg", 'thumb': f"images/palettes/details/800/{d['key']}.jpg",
+                'w': im.width, 'h': im.height, 'title': dict(zip(['en', 'ru', 'lv'], d['t'])), 'colors': cols})
 json.dump(out, open(W / 'content' / 'palettes.json', 'w'), ensure_ascii=False, indent=0)
 # очередь палитр для дней ЭКСТРА: порядок уже показанных не трогаем, новые картины — в конец
 eo = W / 'content' / 'extra-order.json'

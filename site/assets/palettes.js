@@ -48,7 +48,7 @@
   };
   const G = { bird: ['Pigeon Polly', 'Pigeon Polly', 'Pigeon Polly'], snail: ['Mr.Chew', 'Mr.Chew', 'Mr.Chew'], sketchbook: ['Sketchbook', 'Скетчбук', 'Skiču burtnīca'],
     halloween: ['Pumpkin Family', 'Тыквенная семья', 'Ķirbju ģimene'], detective: ['Mr.Titos', 'Мистер Титос', 'Mr.Titos'], anxiety: ['Anxiety', 'Тревога', 'Trauksme'], challenge: ['Challenge', 'Челлендж', 'Izaicinājums'],
-    studio: ['From the studio', 'Из мастерской', 'No darbnīcas'], 'ai-art': ['AI Art', 'AI-арт', 'AI māksla'], other: ['Other', 'Другое', 'Citi'] };
+    studio: ['From the studio', 'Из мастерской', 'No darbnīcas'], details: ['Detail palettes', 'Палитры деталей', 'Detaļu paletes'],'ai-art': ['AI Art', 'AI-арт', 'AI māksla'], other: ['Other', 'Другое', 'Citi'] };
   const ADD_G = ['sketchbook', 'anxiety', 'bird', 'snail', 'detective', 'halloween', 'ai-art', 'other']; // куда админ может добавить картину (как ART_GALLERIES в worker)
   const gi = { en: 0, ru: 1, lv: 2 }[L], pre = L === 'en' ? '' : '/' + L;
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
