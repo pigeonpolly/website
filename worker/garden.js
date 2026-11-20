@@ -5,6 +5,8 @@
 // волшебные — раз в gardenMagicDays дней подряд с поливом; найденное копится в found → новость «🌱» (gardenNews) до захода в огород. Вещи для огорода — подарки вида garden (site/assets/garden-items.js).
 // API: GET /api/garden?nick=, POST /api/garden/{plant,water,harvest,sell,buy,bug,hide}.
 
+import { dishOf } from './kitchen.js'; // блюдо «быстрее растёт» при поливе (этап 89)
+
 export const GARDEN_TABLES = [
   // beds — JSON [{p: растение, t: посажено, g: накоплено роста (мс) к моменту w, w: последний полив} | null]; seeds/crop — {растение: штук}
   // bug_day / bug_got — жуки: за какой день и какие номера уже собраны; harvests — собрано урожаев всего
@@ -144,16 +146,17 @@ export async function gardenApi(req, env, url, h) {
   }
   if (p === '/api/garden/water') { // одну грядку (bed) или все (all: true) — каждую раз в сутки по Риге
     const today = h.rigaDay(), list = b.all ? s.beds.map((_, j) => j) : (bedOk(), [i]);
+    const dish = h.rules().cookOn ? await dishOf(env, u.id).catch(() => null) : null, boost = dish && dish.t === 'grow' && dish.pct > 0 ? dish.pct * HOUR : 0; // блюдо с кухни (этап 89): полив сразу добавляет часы роста
     let n = 0;
     for (const j of list) {
       const x = s.beds[j];
       if (!x || !CROPS[x.p] || (x.w && dayOf(x.w) === today) || grown(x, now, R.gardenWetH) >= CROPS[x.p] * DAY) continue;
-      x.g = grown(x, now, R.gardenWetH); x.w = now; n++;
+      x.g = Math.min(CROPS[x.p] * DAY, grown(x, now, R.gardenWetH) + boost); x.w = now; n++;
     }
     if (!n) fail(409, 'watered');
     const wd = parse(r0.water_days, []); if (!wd.includes(today)) wd.push(today); // дни с поливом — для волшебного семечка
     await save({ beds: s.beds, water_days: wd.slice(-40) });
-    return out({ watered: n });
+    return out({ watered: n, boost: boost / HOUR });
   }
   if (p === '/api/garden/harvest') {
     bedOk();

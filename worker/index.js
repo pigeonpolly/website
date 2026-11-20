@@ -18,6 +18,7 @@ import { flockNewsApi, flockEvent as flockEventDb, roomEvent, flockNewsCron, FLO
 import { topApi, topScore, topCron, TOP_TABLES } from './top.js'; // доски топа игр (docs/games.md)
 import { mailApi, mailCron, mailGamesCron, mailAsk, mailPrefs, MAIL_TABLES, MAIL_ALTER, MAIL_RULES, MAIL_RANGE, MAIL_INT } from './mail.js'; // письма по согласию: окно, отписка, рассылка из кабинета (docs/bird.md «Письма»)
 import { aboutChatApi, aboutAskNews, aboutChatNews, ABOUT_CHAT_TABLES, ABOUT_CHAT_ALTER, ACHAT_RULES, ACHAT_RANGE, ACHAT_INT, ACHAT_BADGES, ACHAT_COND } from './about-chat.js'; // чат «Поболтать с Алиной и Полли» на /about-me/ (docs/site.md)
+import { kitchenApi, dishOf, dishBonus, KITCHEN_TABLES, KITCHEN_RULES, KITCHEN_RANGE, KITCHEN_INT, KITCHEN_BOOL } from './kitchen.js'; // кухня: книга рецептов, блюда с эффектами (этап 89, docs/bird.md)
 import { shiftApi, SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_RANGE, SHIFT_INT } from './shift.js'; // «Смена с Полли» (этап 29, docs/rooms.md)
 import { studyApi, studyOk, STUDY_TABLES } from './study.js'; // личный учебник /study/ для Mr.Pepe и Алины (docs/site.md «Учебник»)
 import { englishApi, englishOk, ENGLISH_TABLES } from './english.js'; // личный учебник английского /english/ (docs/site.md «Учебник английского»)
@@ -646,6 +647,7 @@ async function ensureSchemaRun(env) {
     ...POLL_TABLES.map(sql => prep(sql)), // опросы: polls, poll_votes, poll_ideas (worker/polls.js)
     ...WEEK_TABLES.map(sql => prep(sql)), // переходы на Amazon: out_clicks (worker/week.js)
     ...ANALYTICS_TABLES.map(sql => prep(sql)), // чтение статей: reads (worker/analytics.js)
+    ...KITCHEN_TABLES.map(sql => prep(sql)), // кухня: kitchen (worker/kitchen.js)
     ...SHIFT_TABLES.map(sql => prep(sql)), // «Смена с Полли»: shift_runs (worker/shift.js)
     ...SCHOOL_TABLES.map(sql => prep(sql)), // «Школа Полли»: school_works (worker/school.js)
     ...STUDY_TABLES.map(sql => prep(sql)), // учебник: study_progress (worker/study.js)
@@ -787,6 +789,7 @@ const RULE_DEFAULTS = {
   ...GARDEN_RULES, // огород: грядки, полив, цены семян и урожая, жуки, погода (worker/garden.js)
   ...AVIS_RULES, // «Morgenavis»: вкл и с какого часа по Риге готовить утренний выпуск (worker/avis.js)
   ...MAIL_RULES, // уведомления из игр на почту: серия, огород, Титос (worker/mail.js)
+  ...KITCHEN_RULES, // кухня: сила и длительность блюд, неудачное блюдо (worker/kitchen.js)
   ...SHIFT_RULES, // «Смена с Полли»: 🔘 за каждый отработанный час (worker/shift.js)
   ...SCHOOL_RULES, // «Школа Полли»: 🔘 за диплом (worker/school.js)
   ...ACHAT_RULES, // чат /about-me/: 🔘 за ступени 25/50/75 % (worker/about-chat.js)
@@ -798,7 +801,7 @@ const RULE_DEFAULTS = {
 const COND_RANGE = { earlyBefore: [1, 23], owlFrom: [0, 23], owlTo: [0, 23], clockWin: [1, 720], collector: [1, 31] };
 const RULE_NUM = { homeKitchen: [0, 1000], homeBedroom: [0, 1000], homeCrypt: [0, 1000], homeBath: [0, 1000], homeOffice: [0, 1], welcomeBtn: [-1, 10000], wlBtn: [-1, 10000], daily: [0, 1000], upload: [0, 1000], comment: [0, 1000], commentsPerDay: [0, 100], friend: [0, 1000], pick: [0, 1000],
   shopMax: [1, 99], legendMax: [1, 99], lowPct: [0.1, 1000], normPct: [0.1, 1000], manyPct: [0.1, 10000], legendPct: [1, 100], priceMin: [0.1, 1], priceMax: [1, 10],
-  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potionRevive: [0, 30], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...TRAIN_RANGE, ...GARDEN_RANGE, ...SHIFT_RANGE, ...SCHOOL_RANGE, ...ACHAT_RANGE, ...MAIL_RANGE, ...AVIS_RANGE, ...CH_RANGE };
+  adventLastJan: [0, 31], adventButtons: [0, 1000], adventSpecialButtons: [0, 1000], sellPrice: [0, 10000], restockTo: [0, 10000], indexBase: [0, 100000], priceDays: [1, 60], gameLevelPct: [0, 100], gameRecordPct: [0, 100], gameDayMaxPct: [0, 10000], gameMinSec: [1, 60], gameItemEvery: [0, 1000], gameKingPct: [0, 1000], potionRevive: [0, 30], potion1Pct: [0, 1000], potion2Pct: [0, 1000], potion3Pct: [0, 1000], potionAgainPct: [0, 1000], potionDayMaxPct: [0, 10000], potionMinSec: [1, 120], cardMult: [10, 1000], cardsFirstDay: [0, 1000], tradeDays: [1, 60], cardSurprisePct: [10, 1000], dayBonusNeed: [1, 20], dayBonusOf: [1, 20], dayBonusPct: [0, 1000], ...TITOS_RANGE, ...PAN_RANGE, ...TRAIN_RANGE, ...GARDEN_RANGE, ...SHIFT_RANGE, ...KITCHEN_RANGE, ...SCHOOL_RANGE, ...ACHAT_RANGE, ...MAIL_RANGE, ...AVIS_RANGE, ...CH_RANGE };
 let RULES = JSON.parse(JSON.stringify(RULE_DEFAULTS)), rulesAt = 0;
 // сколько штук — «мало», «обычно» (цена = ценности), «много» — по числу птичек; считается в loadRules (раз в 15 с)
 function stockLevels(birds) {
@@ -813,9 +816,9 @@ function cleanRules(r) {
   if (!r || typeof r !== 'object') return out;
   for (const [k, [lo, hi]] of Object.entries(RULE_NUM)) if (r[k] != null && Number.isFinite(Number(r[k]))) out[k] = Math.max(lo, Math.min(hi, Number(r[k])));
   for (const g of ['levels', 'badges']) for (const k of Object.keys(out[g])) if (r[g] && r[g][k] != null && Number.isFinite(Number(r[g][k]))) out[g][k] = Math.max(0, Math.min(10000, Math.round(Number(r[g][k]))));
-  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn', 'panOn', 'trainOn', 'shiftOn', 'mailGamesOn', 'avisOn', ...GARDEN_BOOL]) if (typeof r[k] === 'boolean') out[k] = r[k];
+  for (const k of ['aiStreak', 'aiUpload', 'sellOn', 'restockOn', 'gameOn', 'potionOn', 'potionShelf', 'indexOn', 'titosOn', 'panOn', 'trainOn', 'shiftOn', 'mailGamesOn', 'avisOn', ...GARDEN_BOOL, ...KITCHEN_BOOL]) if (typeof r[k] === 'boolean') out[k] = r[k];
   for (const k of Object.keys(out.cond)) if (r.cond && r.cond[k] != null && Number.isFinite(Number(r.cond[k]))) { const [lo, hi] = COND_RANGE[k] || [1, 10000]; out.cond[k] = Math.max(lo, Math.min(hi, Math.round(Number(r.cond[k])))); }
-  for (const k of ['homeKitchen', 'homeBedroom', 'homeCrypt', 'homeBath', 'homeOffice', 'daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'potionRevive', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...TRAIN_INT, ...GARDEN_INT, ...SHIFT_INT, ...SCHOOL_INT, ...ACHAT_INT, ...MAIL_INT, ...AVIS_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
+  for (const k of ['homeKitchen', 'homeBedroom', 'homeCrypt', 'homeBath', 'homeOffice', 'daily', 'upload', 'comment', 'commentsPerDay', 'friend', 'pick', 'shopMax', 'legendMax', 'adventLastJan', 'adventButtons', 'adventSpecialButtons', 'sellPrice', 'restockTo', 'gameMinSec', 'gameItemEvery', 'potionMinSec', 'potionRevive', 'cardMult', 'cardsFirstDay', 'tradeDays', 'cardSurprisePct', 'dayBonusNeed', 'dayBonusOf', ...TITOS_INT, ...PAN_INT, ...TRAIN_INT, ...GARDEN_INT, ...SHIFT_INT, ...KITCHEN_INT, ...SCHOOL_INT, ...ACHAT_INT, ...MAIL_INT, ...AVIS_INT, ...Object.keys(CH_RANGE)]) out[k] = Math.round(out[k]);
   for (const k of Object.keys(out)) if (k.endsWith('Pct')) out[k] = Math.round(out[k] * 10) / 10; // проценты — с точностью до 0.1
   if (['auto', 'autumn', 'winter', 'spring', 'summer'].includes(r.potionSeason)) out.potionSeason = r.potionSeason;
   if (GARDEN_SEASONS.includes(r.gardenSeason)) out.gardenSeason = r.gardenSeason;
@@ -981,8 +984,18 @@ async function award(env, uid, kind, ref, amount) {
   const r = await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(uid, kind, String(ref), amount, rigaDay(), now()).run();
   if (!r.meta.changes) return 0;
   await env.DB.prepare('UPDATE users SET buttons = COALESCE(buttons, 0) + ? WHERE id = ?').bind(amount, uid).run();
-  if (amount > 0 && SEED_GAMES.includes(kind)) await gardenDrop(env, uid, kind, RULES, rigaDay()).catch(e => console.error('seed', e)); // иногда — семечко для огорода (этап 23)
-  return amount;
+  let extra = 0;
+  if (amount > 0 && SEED_GAMES.includes(kind)) {
+    const dish = RULES.cookOn ? await dishOf(env, uid).catch(e => { healthErr(env, 'dish', e); return null; }) : null; // блюдо с кухни (этап 89): ±% пуговок, чаще семечко
+    extra = dishBonus(dish, kind, amount);
+    if (extra) {
+      const q = await env.DB.prepare('INSERT OR IGNORE INTO button_log (user_id, kind, ref, amount, day, created_at) VALUES (?, ?, ?, ?, ?, ?)').bind(uid, 'dish', kind + ':' + ref, extra, rigaDay(), now()).run();
+      if (q.meta.changes) await env.DB.prepare('UPDATE users SET buttons = MAX(0, COALESCE(buttons, 0) + ?) WHERE id = ?').bind(extra, uid).run(); else extra = 0;
+    }
+    const R2 = dish && dish.t === 'seed' ? { ...RULES, gardenDropPct: Math.min(100, RULES.gardenDropPct * (1 + dish.pct / 100)) } : RULES;
+    await gardenDrop(env, uid, kind, R2, rigaDay()).catch(e => console.error('seed', e)); // иногда — семечко для огорода (этап 23)
+  }
+  return amount + extra;
 }
 const SEED_GAMES = ['game', 'potion', 'pan', 'titos', 'shift']; // награды игр, за которые может выпасть семечко (и жуки Титоса — в stamp)
 // комментарий: пуговки только за первые три в сутки
@@ -1767,6 +1780,7 @@ async function route(req, env, url) {
   if (m === 'POST' && p === '/api/admin/pause') return pauseApi(req, env, { json, fail, needUser, isAdmin, now });
   if (p === '/api/admin/blogstats') { const r = await blogStatsApi(req, env, url, { json, fail, needUser, isAdmin }); if (r) return r; }
   if (p === '/api/admin/week') { const r = await weekApi(req, env, url, { json, fail, needUser, isAdmin, getMeta, now }); if (r) return r; }
+  if (p === '/api/kitchen' || p.startsWith('/api/kitchen/')) { const r = await kitchenApi(req, env, url, { json, fail, currentUser, needUser, rules: () => RULES }); if (r) return r; }
   if (p === '/api/shift' || p.startsWith('/api/shift/')) { const r = await shiftApi(req, env, url, { json, fail, currentUser, needUser, rules: () => RULES, randomHex, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p.startsWith('/api/titos') || p.startsWith('/api/admin/titos')) { const r = await titosApi(req, env, url, titosHelpers(env)); if (r) return r; }
   if (p.startsWith('/api/cards') || p.startsWith('/api/admin/cards')) { const r = await cardsApi(req, env, url, cardHelpers(env)); if (r) return r; }
@@ -1977,7 +1991,7 @@ async function route(req, env, url) {
       const first = await env.DB.prepare('SELECT id FROM users WHERE game_best > 0 AND banned = 0 AND nick IS NOT NULL ORDER BY game_best DESC, COALESCE(game_best_at, 0), id LIMIT 1').first();
       if (first && first.id === u.id) king = await award(env, u.id, 'rainking', day, btnOf(RULES.gameKingPct, unit));
     }
-    return json({ ok: true, got, rec, today: today + got, max: cap, best: Math.max(lv, oldBest), badges, item, king });
+    return json({ ok: true, got, rec, today: today + (got ? n : 0), max: cap, best: Math.max(lv, oldBest), badges, item, king });
   }
   if (m === 'GET' && p === '/api/potion') {
     const u = await currentUser(req, env);
@@ -2127,13 +2141,13 @@ async function route(req, env, url) {
       env.DB.prepare('INSERT INTO potion_book (user_id, combo, tier, n, created_at) VALUES (?, ?, ?, 1, ?) ON CONFLICT(user_id, combo) DO UPDATE SET n = n + 1').bind(u.id, combo, pot.tier, now()),
       env.DB.prepare('UPDATE users SET pot_fails = ? WHERE id = ?').bind(pot.tier ? 0 : (u.pot_fails || 0) + 1, u.id),
     ]);
-    let got = 0; const badges = [];
+    let got = 0, paid = 0; const badges = [];
     if (pot.tier > 0 && !was) await topScore(env, 'recipes', u.id, 1); // доска топа: новые рецепты за неделю
     if (pot.tier > 0) {
       const today = (await env.DB.prepare("SELECT COALESCE(SUM(amount), 0) AS n FROM button_log WHERE user_id = ? AND kind = 'potion' AND day = ?").bind(u.id, rigaDay()).first()).n;
       const gp = gamePrices(await gameUnit(env)), price = was ? gp.again : [0, gp.p1, gp.p2, gp.p3][pot.tier];
       const n = RULES.potionOn ? (gp.pmax > 0 ? Math.max(0, Math.min(price, gp.pmax - today)) : price) : 0;
-      if (n > 0) got = await award(env, u.id, 'potion', combo + ':' + ((was ? was.n : 0) + 1), n);
+      if (n > 0) { got = await award(env, u.id, 'potion', combo + ':' + ((was ? was.n : 0) + 1), n); paid = got ? n : 0; } // got — с бонусом блюда, paid — для лимита дня
       const kinds = (await env.DB.prepare('SELECT COUNT(*) AS n FROM potion_book WHERE user_id = ? AND tier > 0').bind(u.id).first()).n;
       for (const [k, ok] of [['pot1', kinds >= 1], ['pot2', kinds >= RULES.cond.potA], ['pot3', kinds >= RULES.cond.potB], ['potkid', pot.tier === 3]]) if (ok && await gameBadge(env, u, k)) badges.push(k);
     }
@@ -2144,7 +2158,7 @@ async function route(req, env, url) {
       await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, ?, 'bag', ?, ?)").bind(u.id, item.kind, item.item, 'potion:' + pot.season + ':' + pot.ix, now(), now()).run();
     }
     const revive = await potDay(env, u);
-    return json({ ok: true, combo, tier: pot.tier, ix: pot.ix, season: pot.season, first: !was, got, inv, badges, item, back, sure: !pot.tier && (u.pot_fails || 0) + 1 >= 2, pity, revive });
+    return json({ ok: true, combo, tier: pot.tier, ix: pot.ix, season: pot.season, first: !was, got, paid, inv, badges, item, back, sure: !pot.tier && (u.pot_fails || 0) + 1 >= 2, pity, revive });
   }
   // ---------- «Нарисуй мне» ----------
   if (m === 'GET' && p === '/api/requests') {
@@ -2509,14 +2523,15 @@ async function route(req, env, url) {
     const wl = u && wlLang(req); if (wl && wl !== u.lang) await env.DB.prepare('UPDATE users SET lang = ? WHERE id = ?').bind(wl, u.id).run().catch(() => {}); // язык праздничных писем (worker/wl-holidays.js)
     // дальше — независимые чтения, разом (шапка спрашивает это на каждой странице, по очереди выходило долго)
     const ok = u && !u.banned;
-    const [news, streak, titos, adm, ident, study, english, norsk, nederlands] = await Promise.all([
+    const [news, streak, titos, adm, ident, study, english, norsk, nederlands, dish] = await Promise.all([
       newsOf(env, req, u), // «конвертик»: зарплата, подарки, адвент… (site/assets/news.js)
       // серия челленджа — для меню аватара в шапке (этап 14 Б)
       ok && u.nick ? env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(u.id).all().then(r => streaks(streakDays(r.results)).current) : 0,
       ok ? env.DB.prepare('SELECT * FROM titos WHERE user_id = ?').bind(u.id).first().then(t => titosState(t, RULES, titosHelpers(env))) : null, // кофейник Титоса (worker/titos.js)
       ok ? isAdmin(u, env) : false, ok ? adminIdentity(u, env) : false,
-      ok ? studyOk(u, env, studyHelpers(env)) : false, ok ? englishOk(u, env, studyHelpers(env)) : false, ok ? norskOk(u, env, studyHelpers(env)) : false, ok ? nederlandsOk(u, env, studyHelpers(env)) : false]);
-    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: adm, pin: !adm && ident ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, streak, news, friendBtns: BTN.friend, titos, study: study ? 1 : 0, english: english ? 1 : 0, norsk: norsk ? 1 : 0, nederlands: nederlands ? 1 : 0, pwTemp: u.pw_temp ? 1 : 0, mailAsk: mailAsk(env, u) ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
+      ok ? studyOk(u, env, studyHelpers(env)) : false, ok ? englishOk(u, env, studyHelpers(env)) : false, ok ? norskOk(u, env, studyHelpers(env)) : false, ok ? nederlandsOk(u, env, studyHelpers(env)) : false,
+      ok && u.nick && RULES.cookOn ? dishOf(env, u.id).catch(() => null) : null]); // блюдо с кухни — значок в играх (site/assets/dish-chip.js)
+    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: adm, pin: !adm && ident ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, streak, news, friendBtns: BTN.friend, dish, titos, study: study ? 1 : 0, english: english ? 1 : 0, norsk: norsk ? 1 : 0, nederlands: nederlands ? 1 : 0, pwTemp: u.pw_temp ? 1 : 0, mailAsk: mailAsk(env, u) ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
   }
   // название видео YouTube (oEmbed), чтобы подписи уроков на сайте совпадали с видео; кэш на сутки
   if (m === 'GET' && p === '/api/v2/yt') {
@@ -3006,6 +3021,7 @@ async function route(req, env, url) {
       env.DB.prepare('DELETE FROM pw_reset WHERE user_id = ?').bind(u.id),
       env.DB.prepare('DELETE FROM login_fail WHERE k = ?').bind('u:' + u.id),
       env.DB.prepare('DELETE FROM button_log WHERE user_id = ?').bind(u.id),
+      env.DB.prepare('DELETE FROM kitchen WHERE user_id = ?').bind(u.id), // кухня: блюдо и книга рецептов (этап 89)
       env.DB.prepare('DELETE FROM card_owner WHERE user_id = ?').bind(u.id), // карточки снова свободны
       env.DB.prepare('DELETE FROM card_trades WHERE from_id = ? OR to_id = ?').bind(u.id, u.id), // и предложения обмена
       env.DB.prepare('UPDATE users SET feathers = MAX(0, COALESCE(feathers, 0) - (SELECT COUNT(*) FROM feathers f WHERE f.owner_id = users.id AND f.from_id = ?)) WHERE id IN (SELECT owner_id FROM feathers WHERE from_id = ?)').bind(u.id, u.id), // пёрышки этой птички
