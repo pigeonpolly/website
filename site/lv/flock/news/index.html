@@ -44,10 +44,10 @@
 <script src="/assets/garden-items.js?v=0e83e9e3" defer></script>
 <script src="/assets/potion-names.js?v=15a9d262" defer></script>
 <script src="/assets/toast.js?v=93392a35" defer></script>
-<script src="/assets/day-card.js?v=9077e626" defer></script>
+<script src="/assets/day-card.js?v=d0702261" defer></script>
 <script src="/assets/hatch.js?v=6d36422a" defer></script>
-<script src="/assets/cart.js?v=8f90c619" defer></script>
-<script src="/assets/account.js?v=c16f9f17" defer></script>
+<script src="/assets/cart.js?v=553808d0" defer></script>
+<script src="/assets/account.js?v=383f13aa" defer></script>
 <script src="/assets/news.js?v=1d2af66b" defer></script>
 <script src="/assets/search.js?v=fd80358d" defer></script>
 <script src="/assets/emoji-art.js?v=6375cb5b" defer></script>
@@ -109,7 +109,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <button type="button" class="search-btn" aria-label="Meklēt vietnē"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
     <div class="lang2"><button type="button" class="lang-b" aria-expanded="false" aria-controls="lang-m" aria-label="Language">LV</button><div class="lang-m" id="lang-m" hidden><nav class="lang-switch" aria-label="Language"><a href="/flock/news/" hreflang="en" lang="en"><b>EN</b>English</a><a href="/lv/flock/news/" hreflang="lv" lang="lv" aria-current="true"><b>LV</b>Latviešu</a><a href="/ru/flock/news/" hreflang="ru" lang="ru"><b>RU</b>Русский</a></nav></div></div>
     <div class="sea2"><button type="button" class="sea-b" aria-expanded="false" aria-controls="sea-m" title="Sezona" aria-label="Sezona"><i></i></button><div class="sea-m" id="sea-m" hidden><span class="switch" role="group" aria-label="Sezona"><button type="button" data-s="winter" title="Ziema" aria-label="Ziema"><i></i>Ziema</button><button type="button" data-s="spring" title="Pavasaris" aria-label="Pavasaris"><i></i>Pavasaris</button><button type="button" data-s="summer" title="Vasara" aria-label="Vasara"><i></i>Vasara</button><button type="button" data-s="autumn" title="Rudens" aria-label="Rudens"><i></i>Rudens</button></span></div></div>
-    <a class="hd-btns" id="hd-btns" href="/lv/shop/" hidden aria-label="Pogas · veikals"><span aria-hidden="true">🔘</span> <b></b></a>
+    <a class="hd-btns" id="hd-btns" href="/lv/shop/" hidden aria-label="Pogas · tirgus"><span aria-hidden="true">🔘</span> <b></b></a>
     <a class="hd-cart bell" id="hd-cart" href="/lv/shop/#cart" hidden aria-label="Cart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.5l2.2 10.5h10L20 7H7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="9.5" cy="19" r="1.6" fill="currentColor"/><circle cx="16.5" cy="19" r="1.6" fill="currentColor"/></svg><b class="bell-n" hidden></b></a>
     <button type="button" class="bell" id="pp-bell" hidden aria-label="News"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 21h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><b class="bell-n" hidden></b></button>
     <div class="acct" id="acct"></div>
@@ -133,7 +133,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   <p class="lead">Kas notiek barā: jauni putniņi, dienas zīmējumi, ievākšanās svētki, nozīmītes un kartītes. <a href="/lv/flock/">Visi putniņi</a></p>
 </section>
 <section data-ppb="flock-news.2" class="fn-page"><div data-flock-news></div></section>
-<script src="/assets/flock-news.js?v=83c1d562" defer></script>
+<script src="/assets/flock-news.js?v=be52c343" defer></script>
 
 </main>
 <dialog class="modal" id="contact" aria-labelledby="contact-t">
@@ -164,7 +164,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>Bars</h4><a href="/lv/flock/" data-f>Visi putniņi</a><a href="/lv/flock/news/" data-f>Bara ziņas</a><a href="/lv/challenge/" data-f>Dienas izaicinājums</a><a href="/lv/challenge/#sw-wall" data-f>Bara zīmējumi</a><a href="/lv/requests/" data-f>Uzzīmē man</a><a href="/lv/garden/" data-f>Putniņa dārzs</a></div>
     <div><h4 data-f>Alīna</h4><a href="/lv/sketchbook/" data-f>Skiču burtnīca</a><a href="/lv/about-me/" data-f>Par mani</a><a href="/lv/on-walls-and-pages/" data-f>Uz sienām un lapām</a><a href="/lv/projects/" data-f>Mācības un MI</a><a href="/lv/work-with-me/" data-f>Sadarbība</a><a href="/lv/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Alīna Otkinska · Pigeon Polly Art Lab · Rīga</span><span class="ver" data-ver="97">v97 · 20.11 18:03</span><span><a href="/lv/privacy/">Privātums</a></span></div>
+  <div class="bt"><span>© 2026 Alīna Otkinska · Pigeon Polly Art Lab · Rīga</span><span class="ver" data-ver="98">v98 · 20.11 18:11</span><span><a href="/lv/privacy/">Privātums</a></span></div>
 </div></footer>
 </body>
 </html>

@@ -13,7 +13,7 @@
     space: ['My space', 'Мой кабинет', 'Mans kabinets'],
     learnT: ['Learning', 'Учёба', 'Mācības'],
     room: ['Bird’s room', 'Комната птички', 'Putniņa istaba'],
-    shop: ['Shop', 'Магазин', 'Veikals'],
+    shop: ['Bird market', 'Птичий рынок', 'Putnu tirgus'],
     nick: ['Choose a nickname', 'Выбрать ник', 'Izvēlēties segvārdu'],
     noNick: ['no nickname yet', 'ник ещё не выбран', 'segvārds vēl nav izvēlēts'],
     out: ['Sign out', 'Выйти', 'Iziet'],
@@ -146,7 +146,7 @@
     setTimeout(() => { if (btn.getAttribute('aria-expanded') !== 'true') btn.click(); btn.focus({ preventScroll: true }); }, 0);
     return true;
   }
-  // «🔘 N» в шапке (→ магазин), только у вошедших с ником; другие скрипты могут обновить число после покупки
+  // «🔘 N» в шапке (→ рынок), только у вошедших с ником; другие скрипты могут обновить число после покупки
   function setButtons(n) {
     const a = document.getElementById('hd-btns');
     if (!a) return;
@@ -406,7 +406,7 @@
     if (!bar || bar.querySelector('.sb-adm') || /^\/admin\//.test(location.pathname)) return;
     const path = location.pathname.replace(/^\/(ru|lv)(?=\/)/, ''), post = document.querySelector('article.bp[data-post-id]');
     const [href, name] = post ? ['/blog-editor/#' + post.dataset.postId, 'редактор этой статьи']
-      : [[/^\/shop\//, '#shop', 'Магазин'], [/^\/(art-portfolio|palettes)\//, '#art', 'Картины'], [/^\/challenge\//, '#themes', 'Темы челленджа'], [/^\/advent\//, '#advent', 'Адвент'],
+      : [[/^\/shop\//, '#shop', 'Птичий рынок'], [/^\/(art-portfolio|palettes)\//, '#art', 'Картины'], [/^\/challenge\//, '#themes', 'Темы челленджа'], [/^\/advent\//, '#advent', 'Адвент'],
         [/^\/flock\//, '#birds', 'Птицы'], [/^\/(rain|potions)\//, '#games', 'Правила игр'], [/^\/bird\//, '#birds', 'Птицы'], [/^\/blog(-editor)?\//, '/blog-editor/', 'Блог']]
         .map(([re, h, n]) => re.test(path) && [h[0] === '#' ? '/admin/' + h : h, n]).find(Boolean) || ['/admin/', 'Входящие'];
     const box = document.createElement('span'); box.className = 'sb-adm';

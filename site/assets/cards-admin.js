@@ -41,10 +41,10 @@
         <span class="be-note">${D.cards.length} карт., куплено ${D.cards.filter(c => c.owner_id).length}</span></div></div>
       <div class="pc-grid" data-grid></div></section>
       <details class="adm-fine"><summary>⚙️ Цена обычных карточек</summary><section class="adm-box">
-        <p class="be-note">Обычная карточка 🤖 стоит как средняя вещь в магазине прямо сейчас (${D.avg} 🔘) × множитель, с округлением до 5. Редким и уникальным цену ставите вы в самой карточке.</p>
+        <p class="be-note">Обычная карточка 🤖 стоит как средняя вещь на рынке прямо сейчас (${D.avg} 🔘) × множитель, с округлением до 5. Редким и уникальным цену ставите вы в самой карточке.</p>
         <p class="adm-r-bar">Множитель <input type="number" min="10" max="1000" step="5" value="${D.mult}" data-mult style="width:80px"> % → обычная карточка сейчас <b data-mp>${D.common}</b> 🔘
           <button type="button" class="pill-btn" data-a="mult">💾 Сохранить</button></p>
-        <p class="be-note">«Карточек одной коллекции в одни руки в первые сутки» — в <a href="#rules">📜 Все правила</a> → Магазин (сейчас: ${D.firstDay ? D.firstDay : 'без лимита'}).</p></section></details>`;
+        <p class="be-note">«Карточек одной коллекции в одни руки в первые сутки» — в <a href="#rules">📜 Все правила</a> → Птичий рынок (сейчас: ${D.firstDay ? D.firstDay : 'без лимита'}).</p></section></details>`;
     const grid = main.querySelector('[data-grid]');
     D.cards.filter(c => (!F.collection || c.collection === F.collection) && (!F.rarity || c.rarity === F.rarity)).forEach(c => {
       const t = P.tile(view(c), { admin: true, onOpen: () => edit(c) });

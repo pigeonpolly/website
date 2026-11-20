@@ -1,6 +1,6 @@
-// Коллекционные карточки (docs/cards.md): плитка, окно карточки и раздел «🃏 Карточки» в магазине. Один модуль на магазин, альбом и кабинет.
+// Коллекционные карточки (docs/cards.md): плитка, окно карточки и раздел «🃏 Карточки» на рынке. Один модуль на рынок, альбом и кабинет.
 // Рамка, номер и пометка (🤖 / «нарисовала Алина») — CSS (.pc-* в style.css), в картинке только рисунок. Обычные — пиксель-арт 120×168 с image-rendering: pixelated.
-// window.PPCards: card(c) — сама карточка; tile(c, o) — карточка + подпись + «Купить» или ник владельца; open(c, o) — окно; buy(c, o); album(nick) — разворот альбома; mount(el) — раздел магазина;
+// window.PPCards: card(c) — сама карточка; tile(c, o) — карточка + подпись + «Купить» или ник владельца; open(c, o) — окно; buy(c, o); album(nick) — разворот альбома; mount(el) — раздел рынка;
 // обмен (этап 7 В): trade(c, o) — окно «что хочу / что отдаю» с проверкой схемы на лету (tradeCheck); profile(el, {nick, mine}) — вкладка «🃏 Карточки» в профиле: обмены + карточки птички.
 (function () {
   var L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, LANG = ['en', 'ru', 'lv'][L], pre = ['', '/ru', '/lv'][L];
@@ -34,7 +34,7 @@
     offer: ['🔁 Offer a trade', '🔁 Предложить обмен', '🔁 Piedāvāt maiņu'], offerShort: ['🔁 Trade', '🔁 Обмен', '🔁 Maiņa'],
     trWith: ['🔁 Trade with @{n}', '🔁 Обмен с @{n}', '🔁 Maiņa ar @{n}'],
     trWant: ['What I want · cards of @{n}', 'Что хочу · карточки @{n}', 'Ko es gribu · @{n} kartītes'], trGive: ['What I give · my cards', 'Что отдаю · мои карточки', 'Ko es dodu · manas kartītes'],
-    trNoMine: ['You have no cards to trade yet.', 'Пока нечего отдать: у вас нет карточек.', 'Tev vēl nav kartīšu, ko mainīt.'], toShop: ['🛍 To the shop', '🛍 В магазин', '🛍 Uz veikalu'],
+    trNoMine: ['You have no cards to trade yet.', 'Пока нечего отдать: у вас нет карточек.', 'Tev vēl nav kartīšu, ko mainīt.'], toShop: ['🛍 To the market', '🛍 На рынок', '🛍 Uz tirgu'],
     trSend: ['🔁 Offer', '🔁 Предложить', '🔁 Piedāvāt'],
     trSent: ['Offer sent to @{n}. It is valid for {d} days.', 'Предложение отправлено @{n}. Оно действует {d} дн.', 'Piedāvājums nosūtīts @{n}. Tas ir spēkā {d} d.'],
     trErr: { scheme: ['This trade does not fit any of the five schemes.', 'Такой обмен не подходит ни под одну из пяти схем.', 'Šī maiņa neatbilst nevienai no piecām shēmām.'],
@@ -423,7 +423,7 @@
   var TA = {
     album: ['🃏 Album of @{n}', '🃏 Альбом @{n}', '🃏 @{n} albums'], count: ['{n} cards', 'Карточек: {n}', 'Kartītes: {n}'],
     prev: ['Previous page', 'Предыдущая страница', 'Iepriekšējā lapa'], next: ['Next page', 'Следующая страница', 'Nākamā lapa'],
-    empty: ['No cards yet — they are in the shop.', 'Карточек пока нет — они есть в магазине.', 'Kartīšu vēl nav — tās ir veikalā.'], shop: ['🃏 To the cards in the shop', '🃏 К карточкам в магазине', '🃏 Uz kartītēm veikalā'],
+    empty: ['No cards yet — they are at the market.', 'Карточек пока нет — они есть на рынке.', 'Kartīšu vēl nav — tās ir tirgū.'], shop: ['🃏 Cards at the market', '🃏 К карточкам на рынке', '🃏 Uz kartītēm tirgū'],
   };
   var PER = 6;
   function albumPages(cards) {
@@ -484,7 +484,7 @@
     return d;
   }
 
-  // раздел магазина: фильтры коллекция · редкость · все / свободные / купленные / мои
+  // раздел рынка: фильтры коллекция · редкость · все / свободные / купленные / мои
   function mount(root) {
     var F = { collection: '', rarity: '', show: 'all' };
     try { var sv = JSON.parse(localStorage.getItem('pp-cards-f') || 'null'); if (sv) F = Object.assign(F, sv); } catch (e) { /* нет хранилища */ }

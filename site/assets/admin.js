@@ -21,7 +21,7 @@
   // id — адрес /admin/#id · open — какой экран показать (если не тот же id) · href — раздел живёт на другой странице
   // focus — к чему прокрутить экран (свёрнутое раскроется) · about — одна строка «что здесь делается» · count — счётчик из «Входящих»
   // hide — старый адрес (ссылки на него работают), но в меню его нет: экран тот же, что у другого пункта
-  const ADMIN_GROUPS = { pub: '✍️ Публиковать', birds: '🐦 Птицы', shop: '🛍 Магазин и игры', stats: '📊 Аналитика', service: '⚙️ Сервис' };
+  const ADMIN_GROUPS = { pub: '✍️ Публиковать', birds: '🐦 Птицы', shop: '🛍 Птичий рынок и игры', stats: '📊 Аналитика', service: '⚙️ Сервис' };
   const rulesBox = re => m => [...m.querySelectorAll('.adm-rules h3')].find(h => re.test(h.textContent));
   const ADMIN_SECTIONS = [
     { id: 'week', ic: '🗓', name: 'Неделя' }, // первый экран (редизайн 2.0, часть 4): 5 цифр, 5 кнопок, остальное — «⚙ Ещё инструменты»
@@ -47,7 +47,7 @@
     { id: 'broadcast', ic: '📢', name: 'Рассылка', group: 'birds', about: 'Одной кнопкой: сообщение с файлом, подарок или пуговки — всем, новым или старым птичкам. На почту — только тем, кто согласился.' },
     { id: 'mail', ic: '✉️', name: 'Письма', group: 'birds', about: 'Письма птичкам на почту — только тем, кто согласился: уведомления из игр, новые фишки, новости от Полли.' },
     { id: 'subscribers', ic: '📬', name: 'Подписчики', group: 'birds', about: 'Адреса людей, которые ждут письма о новой книге.', count: 'subs' },
-    { id: 'shop', ic: '🛍', name: 'Магазин', group: 'shop', about: 'Сколько штук каждой вещи в продаже; цены считаются сами.' },
+    { id: 'shop', ic: '🛍', name: 'Птичий рынок', group: 'shop', about: 'Сколько штук каждой вещи в продаже; цены считаются сами.' },
     { id: 'cards', ic: '🃏', name: 'Карточки', group: 'shop', about: 'Коллекционные карточки: каждая — в одном экземпляре. Новая карточка, правка, номер, скрыть, удалить; цена обычных; импорт коллекций с сайта.' },
     { id: 'advent', ic: '🎄', name: 'Адвент', group: 'shop', about: 'Что лежит в каком окошке адвент-календаря.', count: 'advent' },
     { id: 'titos', ic: '🕵️', name: 'Дела Титоса', group: 'shop', about: 'Какие дела детектива Титоса на сайте и переведены ли они. Новые дела заносятся сами раз в час после выкладки.' },
@@ -122,7 +122,7 @@
     }
   }
   addEventListener('hashchange', route);
-  // длинные таблицы и списки — первые 10 строк, остальное по кнопке «Показать все» (кроме таблицы остатков магазина: в ней кнопка «Поставить»)
+  // длинные таблицы и списки — первые 10 строк, остальное по кнопке «Показать все» (кроме таблицы остаткона рынока: в ней кнопка «Поставить»)
   const FOLD = 10;
   function foldLong() {
     main.querySelectorAll('table.be-table:not(.adm-stock):not([data-fold]), .adm-box > ol:not([data-fold]), .adm-box > ul:not([data-fold]), ol.adm-comments:not([data-fold]), ul.adm-bars:not([data-fold])').forEach(t => {
@@ -194,8 +194,8 @@
     const since = d.amazonFirst && d.amazonFirst > Date.now() / 1000 - 14 * 86400 ? ` · Amazon считается с ${wkDay(d.amazonFirst)}` : !d.amazonFirst ? ' · Amazon считается с этой недели' : '';
     const nums = [
       [d.people.now, plural(d.people.now, 'посетитель', 'посетителя', 'посетителей') + ' за 7 дней', wkDelta(d.people.now, d.people.prev, 1), 'wk-n-vis'],
-      [go, plural(go, 'переход', 'перехода', 'переходов') + ' в магазин и на Amazon', wkDelta(go, goPrev) + `<small>магазин ${n(d.shop.now)} · Amazon ${n(d.amazon.now)}${since}</small>`],
-      [d.buys.now, plural(d.buys.now, 'покупка', 'покупки', 'покупок') + ' в магазине птичек', wkDelta(d.buys.now, d.buys.prev)],
+      [go, plural(go, 'переход', 'перехода', 'переходов') + ' на рынок и на Amazon', wkDelta(go, goPrev) + `<small>рынок ${n(d.shop.now)} · Amazon ${n(d.amazon.now)}${since}</small>`],
+      [d.buys.now, plural(d.buys.now, 'покупка', 'покупки', 'покупок') + ' на Птичьем рынке', wkDelta(d.buys.now, d.buys.prev)],
       [d.subs.total, 'в списке ожидания книги', d.subs.now ? `<i class="wk-up">▲ +${n(d.subs.now)} за неделю</i>` : '<i class="wk-eq">новых нет</i>'],
       [d.birds.total, plural(d.birds.total, 'птичка', 'птички', 'птичек') + ' на сайте', (d.birds.now ? `<i class="wk-up">▲ +${n(d.birds.now)} за неделю</i>` : '<i class="wk-eq">новых нет</i>') + `<small>🟢 сейчас на сайте: ${n(d.online)} · список →</small>`, 'wk-n-link', '#birds'],
     ];
@@ -204,7 +204,7 @@
     const acts = [
       { ic: '📥', t: 'Входящие', badge: items.length, d: inboxTxt, btn: `<a class="pill-btn${items.length ? ' pill-fill' : ''}" href="#inbox">Открыть</a>`, hot: items.length },
       { ic: '✍️', t: 'Написать статью', d: 'Редактор с переводчиком на три языка. Темы подскажет «💡 Темы для блога».', btn: '<a class="pill-btn pill-fill" href="/blog-editor/#new">＋ Новая статья</a><a class="pill-btn" href="#ideas">💡 Темы</a>' },
-      { ic: '🛍', t: 'Магазин', d: rs && rs.at ? `Последнее пополнение — ${wkDay(rs.at)}${rs.items ? `, ${n(rs.items)} ${plural(rs.items, 'вещь', 'вещи', 'вещей')}` : ''}.` : 'Закончившиеся вещи пополняются одной кнопкой.', btn: '<button class="pill-btn pill-fill" type="button" id="wk-restock">🔄 Пополнить</button><a class="pill-btn" href="#shop">Открыть</a>' },
+      { ic: '🛍', t: 'Птичий рынок', d: rs && rs.at ? `Последнее пополнение — ${wkDay(rs.at)}${rs.items ? `, ${n(rs.items)} ${plural(rs.items, 'вещь', 'вещи', 'вещей')}` : ''}.` : 'Закончившиеся вещи пополняются одной кнопкой.', btn: '<button class="pill-btn pill-fill" type="button" id="wk-restock">🔄 Пополнить</button><a class="pill-btn" href="#shop">Открыть</a>' },
       { ic: '🔘', t: 'Зарплата птичкам', d: sal ? `Последняя — ${wkDay(sal.at)}: по ${n(sal.amount)} 🔘, ${n(sal.birds)} ${plural(sal.birds, 'птичке', 'птичкам', 'птичкам')}.` : 'Ещё не выдавалась.', btn: `<label class="wk-sal"><input type="number" min="1" max="10000" value="${sal ? sal.amount : 10}" id="wk-sal-n" aria-label="Сколько пуговок каждой"> 🔘</label><button class="pill-btn pill-fill" type="button" id="wk-salary">Выдать всем</button><a class="pill-btn" href="#broadcast" title="Выбрать, кому: новым, старым, выбранным">📢 Кому…</a>` },
       { ic: '🎨', t: 'Челлендж сезона', d: 'Темы челленджа на месяц вперёд: три языка, цвета, банк ваших тем.', btn: '<a class="pill-btn pill-fill" href="#themes">Темы</a>' },
     ];
@@ -227,7 +227,7 @@
       try { await api('admin/pause', { on }); week(); } catch (x) { e.target.disabled = false; alert(err(x)); }
     };
     main.querySelector('#wk-restock').onclick = async e => {
-      if (!confirm('Пополнить магазин: все закончившиеся вещи (кроме легендарных) — снова в продажу?')) return;
+      if (!confirm('Пополнить рынок: все закончившиеся вещи (кроме легендарных) — снова в продажу?')) return;
       e.target.disabled = true;
       try { const r = await api('admin/shop/autorestock', {}); alert(`🔄 Готово: пополнено ${r.items || 0} закончившихся вещей, по ${r.to} шт.`); week(); } catch (x) { e.target.disabled = false; alert(err(x)); }
     };
@@ -301,7 +301,7 @@
   // ---------- обзор ----------
   // «🤖 Автопилот»: что работает само; зелёное — всё хорошо, жёлтое (warn) — стоит заглянуть, красное — нужно внимание
   const autoCard = list => { const bad = list.filter(x => x.ok === false); return `<section class="adm-box adm-auto${bad.length ? ' warn' : ''}"><h3>🤖 Автопилот: ${bad.length ? `нужно внимание (${bad.length})` : 'всё работает само ✓'}</h3>
-    <p class="be-note">${bad.length ? 'Ниже красным — что не так. Остальное по-прежнему работает само.' : 'Магазин пополняется, цены и награды подстраиваются, сезоны меняются — ничего настраивать не нужно.'}</p>
+    <p class="be-note">${bad.length ? 'Ниже красным — что не так. Остальное по-прежнему работает само.' : 'Птичий рынок пополняется, цены и награды подстраиваются, сезоны меняются — ничего настраивать не нужно.'}</p>
     <ul>${list.map(x => `<li class="${x.ok === false ? 'bad' : x.ok === null ? 'off' : x.warn ? 'warn' : 'ok'}"><b>${x.ok === false ? '⚠️' : x.ok === null ? '⏸' : x.warn ? '🟡' : '✓'} ${esc(x.t)}</b> — ${esc(x.d)}</li>`).join('')}</ul></section>`; };
 
   // ---------- 🎨 картины и палитры, добавленные с сайта (/api/palettes; добавляют и скрывают их на страницах галерей) ----------
@@ -791,7 +791,7 @@
     const shopRows = [
       row('Сколько одинаковых обычных вещей можно иметь', num('shopMax', R.shopMax, D.shopMax) + ' шт.', D.shopMax, 'и купить, и получить в подарок'),
       row('Сколько одинаковых легендарных', num('legendMax', R.legendMax, D.legendMax) + ' шт.', D.legendMax),
-      row('<b>«Мало»</b> — не больше … % от числа птичек', num('lowPct', R.lowPct, D.lowPct, 0.5) + ` % → сейчас <b>1–${S.low} шт.</b>`, D.lowPct + ' %', 'фильтр «Мало» в магазине; цена выше ценности'),
+      row('<b>«Мало»</b> — не больше … % от числа птичек', num('lowPct', R.lowPct, D.lowPct, 0.5) + ` % → сейчас <b>1–${S.low} шт.</b>`, D.lowPct + ' %', 'фильтр «Мало» на рынке; цена выше ценности'),
       row('<b>Обычный запас</b> — … % от числа птичек', num('normPct', R.normPct, D.normPct, 0.5) + ` % → сейчас <b>${S.norm} шт.</b>`, D.normPct + ' %', 'при нём цена = ценности; меньше штук — дороже, больше — дешевле'),
       row('<b>«Много»</b> — от … % от числа птичек', num('manyPct', R.manyPct, D.manyPct, 1) + ` % → сейчас <b>от ${S.many} шт.</b>`, D.manyPct + ' %', 'фильтр «Много»; цена ниже ценности'),
       row('Легендарных — … % от этих чисел', num('legendPct', R.legendPct, D.legendPct) + ` % → сейчас мало 1–${S.lowLeg}, обычно ${S.normLeg}, много от ${S.manyLeg}`, D.legendPct + ' %'),
@@ -802,7 +802,7 @@
       row('🃏 Карточек одной коллекции в одни руки в первые сутки', num('cardsFirstDay', R.cardsFirstDay, D.cardsFirstDay) + ' шт.', D.cardsFirstDay ? D.cardsFirstDay + ' шт.' : 'без лимита', '0 — без лимита; сутки — с появления первой карточки коллекции'),
       row('🎲 Карточка-сюрприз стоит', num('cardSurprisePct', R.cardSurprisePct, D.cardSurprisePct) + ' %', D.cardSurprisePct + ' %', 'от средней цены свободных карточек этой редкости; выпадает случайная свободная — такой ни у кого нет'),
       row('🔁 Предложение обмена карточками живёт', num('tradeDays', R.tradeDays, D.tradeDays) + ' дн.', D.tradeDays + ' дн.', 'потом оно истекает само; принять уже нельзя'),
-      row(`<label class="adm-r-chk"><input type="checkbox" data-r="sellOn"${R.sellOn ? ' checked' : ''}> Птички могут продавать вещи обратно в магазин</label>`, 'за ' + num('sellPrice', R.sellPrice, D.sellPrice) + ' 🔘', D.sellPrice + ' 🔘', 'одна цена за любую вещь; проданная вещь возвращается в магазин (+1 шт.)'),
+      row(`<label class="adm-r-chk"><input type="checkbox" data-r="sellOn"${R.sellOn ? ' checked' : ''}> Птички могут продавать вещи обратно на рынок</label>`, 'за ' + num('sellPrice', R.sellPrice, D.sellPrice) + ' 🔘', D.sellPrice + ' 🔘', 'одна цена за любую вещь; проданная вещь возвращается на рынок (+1 шт.)'),
     ];
     const advRows = [
       row('Пропущенные окошки можно открыть до … января', num('adventLastJan', R.adventLastJan, D.adventLastJan) + ' января', D.adventLastJan, '0 — в январе уже нельзя'),
@@ -811,25 +811,25 @@
     ];
     const chk = (k, l, note) => `<label class="adm-r-chk"><input type="checkbox" data-r="${k}"${R[k] ? ' checked' : ''}> ${l}${note ? ` <small class="be-note">${note}</small>` : ''}</label>`;
     main.innerHTML = `${autoCard(d.auto || [])}<details class="adm-fine"${sessionStorage.getItem('pp-fine') ? ' open' : ''}><summary>⚙️ Тонкая настройка — можно не трогать</summary><section class="adm-box"><h2>📜 Правила</h2>
-      <p class="be-note">Здесь можно поменять пуговки, бейджи, магазин, адвент и ИИ-работы. Изменения действуют сразу после «Сохранить» (до минуты на всех страницах). Поле с жёлтой рамкой отличается от значения по умолчанию. Уже полученные бейджи и пуговки при изменениях не отнимаются; если снизить условие бейджа, птички, которые ему уже соответствуют, получат его при следующем заходе.</p>
+      <p class="be-note">Здесь можно поменять пуговки, бейджи, рынок, адвент и ИИ-работы. Изменения действуют сразу после «Сохранить» (до минуты на всех страницах). Поле с жёлтой рамкой отличается от значения по умолчанию. Уже полученные бейджи и пуговки при изменениях не отнимаются; если снизить условие бейджа, птички, которые ему уже соответствуют, получат его при следующем заходе.</p>
       <p class="adm-r-bar"><button type="button" class="pill-btn pill-fill" id="adm-r-save">💾 Сохранить правила</button> <span class="be-note" id="adm-r-st"></span></p></section>
       ${box('🔘 Пуговки', btnRows)}
       ${box('🥚 Уровни (рекордная серия) — пуговки один раз за уровень', lvRows)}
       ${box('🏅 Бейджи — награда и условия', bRows, 'Числа в условиях можно менять прямо в тексте. Описание «как получить» у птичек подстраивается само.')}
-      ${box('🛍 Магазин', shopRows)}
-      <section class="adm-box adm-rules adm-unit"><h3>💡 Как устроена экономика</h3><p>Пуговки за действия и игры — <b>постоянные</b> (награды игр — в % от опорной цены ${G.avg} 🔘, она не меняется). А <b>цены в магазине подстраиваются сами</b>: раз в сутки сайт смотрит, сколько зарабатывает обычная активная птичка, и ставит уровень цен так, чтобы средняя вещь стоила примерно столько, сколько она зарабатывает за ${R.priceDays} дн. Если птички много накопили — чуть дороже. За день цены меняются не больше чем на 10 %. Вы меняете только % категорий и цены легендарных (раздел «🛍 Магазин»).</p></section>
+      ${box('🛍 Птичий рынок', shopRows)}
+      <section class="adm-box adm-rules adm-unit"><h3>💡 Как устроена экономика</h3><p>Пуговки за действия и игры — <b>постоянные</b> (награды игр — в % от опорной цены ${G.avg} 🔘, она не меняется). А <b>цены на рынке подстраиваются сами</b>: раз в сутки сайт смотрит, сколько зарабатывает обычная активная птичка, и ставит уровень цен так, чтобы средняя вещь стоила примерно столько, сколько она зарабатывает за ${R.priceDays} дн. Если птички много накопили — чуть дороже. За день цены меняются не больше чем на 10 %. Вы меняете только % категорий и цены легендарных (раздел «🛍 Птичий рынок»).</p></section>
       ${box('🔘 Игра «Пуговичный дождь»', [
         row(`<label class="adm-r-chk"><input type="checkbox" data-r="gameOn"${R.gameOn ? ' checked' : ''}> Давать пуговки за игру</label>`, 'за уровень ' + pct('gameLevelPct') + ` → сейчас ${G.level} 🔘`, D.gameLevelPct + ' %', `уровни 1–10 — столько, 11–20 — вдвое (${G.level * 2}), 21–30 — втрое (${G.level * 3}) и т. д.; каждый номер уровня платит раз в сутки`),
         row('🏆 Новый личный рекорд — за каждый уровень выше прежнего', pct('gameRecordPct') + ` → сейчас ${G.record} 🔘`, D.gameRecordPct + ' %', 'один раз навсегда: стимул становиться лучше, а не переигрывать'),
         row('Лимит пуговок за игру в сутки', pct('gameDayMaxPct') + (G.max ? ` → сейчас ${G.max} 🔘` : ''), D.gameDayMaxPct ? D.gameDayMaxPct + ' %' : 'без лимита', '0 — без лимита (каждый уровень всё равно платит только раз в день)'),
-        row('Вещь из магазина каждые … уровней', num('gameItemEvery', R.gameItemEvery, D.gameItemEvery) + ' ур.', D.gameItemEvery + ' ур.', 'вещь, которой у птички нет (не легендарная), неоткрытым подарком; за один уровень — раз в сутки; 0 — выключено'),
+        row('Вещь с рынка каждые … уровней', num('gameItemEvery', R.gameItemEvery, D.gameItemEvery) + ' ур.', D.gameItemEvery + ' ур.', 'вещь, которой у птички нет (не легендарная), неоткрытым подарком; за один уровень — раз в сутки; 0 — выключено'),
         row('👑 Первое место в рекордах — каждый день, когда играет', pct('gameKingPct') + ` → сейчас ${G.king} 🔘`, D.gameKingPct + ' %', 'кто первый в таблице рекордов и прошёл в этот день хоть один уровень; 0 — выключено'),
         row('Уровень не засчитывается, если пройден быстрее', num('gameMinSec', R.gameMinSec, D.gameMinSec) + ' с', D.gameMinSec + ' с', 'защита от подделки: столько секунд на каждый уровень от начала игры (честно — дольше)'),
       ], '<a href="/ru/rain/">Открыть игру →</a>')}
       ${box('🥞 Игра «Блинная Полли»', [
         row(`<label class="adm-r-chk"><input type="checkbox" data-r="panOn"${R.panOn ? ' checked' : ''}> Давать пуговки за игру</label>`, 'за уровень ' + pct('panLevelPct') + ` → сейчас ${btnPct(R.panLevelPct)} 🔘`, D.panLevelPct + ' %', 'уровни 1–10 — столько, 11–20 — вдвое, 21–30 — втрое и т. д.; каждый номер уровня платит раз в сутки'),
         row('🏆 Новый личный рекорд — за каждый уровень выше прежнего', pct('panRecordPct') + ` → сейчас ${btnPct(R.panRecordPct)} 🔘`, D.panRecordPct + ' %', 'один раз навсегда'),
-        row('Подарок из магазина каждые … уровней', num('panItemEvery', R.panItemEvery, D.panItemEvery) + ' ур.', D.panItemEvery + ' ур.', 'вещь, которой у птички нет (не легендарная), неоткрытым подарком; за один уровень — раз в сутки; 0 — выключено'),
+        row('Подарок с рынка каждые … уровней', num('panItemEvery', R.panItemEvery, D.panItemEvery) + ' ур.', D.panItemEvery + ' ур.', 'вещь, которой у птички нет (не легендарная), неоткрытым подарком; за один уровень — раз в сутки; 0 — выключено'),
         row('Мыть сковородку каждые … уровней', num('panWashEvery', R.panWashEvery, D.panWashEvery) + ' ур.', D.panWashEvery + ' ур.', 'пальцем по экрану; без мытья следующий уровень не засчитывается'),
         row('Средство для мытья', num('panSoapBtn', R.panSoapBtn, D.panSoapBtn) + ' 🔘', D.panSoapBtn + ' 🔘', 'списывается при мытье; без средства — водой, тереть дольше, бесплатно; 0 — средство бесплатное'),
         row('Старт не с начала — рубежи каждые … уровней', num('panStartEvery', R.panStartEvery, D.panStartEvery) + ' ур.', D.panStartEvery + ' ур.', 'можно начать с 11-го, 21-го… уровня, если рекорд не ниже; пропущенные уровни пуговок не дают; 0 — всегда с 1-го'),
@@ -841,7 +841,7 @@
       ${box('🚆 Игра «Поезд Полли»', [
         row(`<label class="adm-r-chk"><input type="checkbox" data-r="trainOn"${R.trainOn ? ' checked' : ''}> Давать пуговки за игру</label>`, 'за станцию ' + pct('trainLevelPct') + ` → сейчас ${btnPct(R.trainLevelPct)} 🔘`, D.trainLevelPct + ' %', 'станции 1–10 — столько, 11–20 — вдвое и т. д.; каждая станция каждого языка платит раз в сутки'),
         row('🏆 Новый рекорд языка — за каждую станцию выше прежней', pct('trainRecordPct') + ` → сейчас ${btnPct(R.trainRecordPct)} 🔘`, D.trainRecordPct + ' %', 'один раз навсегда, у каждого из 4 языков свой рекорд'),
-        row('Подарок каждые … станций', num('trainItemEvery', R.trainItemEvery, D.trainItemEvery) + ' ст.', D.trainItemEvery + ' ст.', 'сначала — вещь темы «🚆 Поезд», которой у птички нет; когда все есть — любая из магазина; 0 — выключено'),
+        row('Подарок каждые … станций', num('trainItemEvery', R.trainItemEvery, D.trainItemEvery) + ' ст.', D.trainItemEvery + ' ст.', 'сначала — вещь темы «🚆 Поезд», которой у птички нет; когда все есть — любая с рынка; 0 — выключено'),
         row('Старт не с начала — рубежи каждые … станций', num('trainStartEvery', R.trainStartEvery, D.trainStartEvery) + ' ст.', D.trainStartEvery + ' ст.', 'можно начать с 11-й, 21-й… станции, если рекорд языка не ниже; 0 — всегда с 1-й'),
         ...[['trainUpHintPct', '🥟 Улучшение «Больше эмпанад» (3 уровня)', '+1 подсказка на станции: убирает лишние варианты или показывает пару'], ['trainUpWordPct', '🛡 Улучшение «Второй шанс» (2 уровня)', '+1 ошибка на станции не считается'],
           ['trainUpJarPct', '⏳ Улучшение «Терпеливые пассажиры» (2 уровня)', 'в вагоне-ресторане ждут на 25 % дольше за уровень']]
@@ -898,7 +898,7 @@
       ${box('🧪 Игра «Зельеварня Полли»', [
         row(`<label class="adm-r-chk"><input type="checkbox" data-r="potionOn"${R.potionOn ? ' checked' : ''}> Давать пуговки за зелья</label>`, '', 'вкл', 'выключено — варят только для коллекции'),
         row('Сезон зельеварни', `<select data-r="potionSeason">${[['auto', 'по календарю'], ['autumn', '🎃 осень · Хеллоуин'], ['winter', '❄️ зима · Новый год'], ['spring', '🌷 весна'], ['summer', '☀️ лето']].map(([k, l]) => `<option value="${k}"${R.potionSeason === k ? ' selected' : ''}>${l}</option>`).join('')}</select>`, 'по календарю', 'по календарю: дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень; от сезона зависят ингредиенты и цвет лабиринта'),
-        row(`<label class="adm-r-chk"><input type="checkbox" data-r="potionShelf"${R.potionShelf ? ' checked' : ''}> Бутылочка в комнату за новое зелье «Вкус детства»</label>`, '', 'вкл', 'появляется в сумке, её можно поставить в комнату; в магазине таких нет'),
+        row(`<label class="adm-r-chk"><input type="checkbox" data-r="potionShelf"${R.potionShelf ? ' checked' : ''}> Бутылочка в комнату за новое зелье «Вкус детства»</label>`, '', 'вкл', 'появляется в сумке, её можно поставить в комнату; на рынке таких нет'),
         row('Новое <b>обычное</b> зелье', pct('potion1Pct') + ` → сейчас ${G.p1} 🔘`, D.potion1Pct + ' %'),
         row('Новое <b>вкусное</b> зелье', pct('potion2Pct') + ` → сейчас ${G.p2} 🔘`, D.potion2Pct + ' %', 'два сладких ингредиента в котле'),
         row('Новое зелье <b>«Вкус детства»</b>', pct('potion3Pct') + ` → сейчас ${G.p3} 🔘`, D.potion3Pct + ' %', 'три сладких ингредиента'),
@@ -922,7 +922,7 @@
         row('«☕ Долить» полный кофейник', pct('titosRefillPct') + ` → сейчас ${G.titosRefill} 🔘`, D.titosRefillPct + ' %'),
         row('Лишний кофе (кофейник полный) — пуговки за чашку', pct('titosSellPct') + ` → сейчас ${G.titosSell} 🔘`, D.titosSellPct + ' %', 'не меньше 1 🔘'),
         row('…не больше чашек в сутки', num('titosSellDayMax', R.titosSellDayMax, D.titosSellDayMax) + ' чаш.', D.titosSellDayMax, '0 — лишний кофе не продаётся'),
-      ], 'Награды за уровни 30, 50, 90 и 100 — вещи для комнаты: их нет в магазине, подарить и продать нельзя. <a href="/ru/titos/">Открыть игру →</a>')}
+      ], 'Награды за уровни 30, 50, 90 и 100 — вещи для комнаты: их нет на рынке, подарить и продать нельзя. <a href="/ru/titos/">Открыть игру →</a>')}
       ${box('🚪 Дом птички — что открывает комнату', [
         row('🍳 Кухня: уровень в «Блинной Полли»', num('homeKitchen', R.homeKitchen, D.homeKitchen), D.homeKitchen, 'считается рекорд'),
         row('🛏 Спальня: пёрышек в чужих комнатах', num('homeBedroom', R.homeBedroom, D.homeBedroom), D.homeBedroom),
@@ -958,30 +958,30 @@
         <li>Первый заход за сутки — ${pc(R.daily)}; рисунок — ${pc(R.upload)} (за день один раз)${R.aiUpload ? '' : ', за работу с 🤖 — 0'}; комментарий — ${pc(R.comment)} (первые ${R.commentsPerDay} в день); друг указал тебя при регистрации — ${pc(R.friend)}; «Выбор Полли» — ${pc(R.pick)}.</li>
         <li>Уровни: ${Object.keys(R.levels).map(k => `${LEVEL_RU[k]} (${k}) — ${R.levels[k]}`).join(', ')}.</li>
         <li>Бейджи: ${Object.keys(R.badges).map(k => `${BADGE_RU[k] || k} — ${R.badges[k]}`).join(', ')}. За каждый бейдж и уровень пуговки дают один раз.</li></ul>
-      <h4>Магазин</h4><ul>
+      <h4>Птичий рынок</h4><ul>
         <li>Одинаковых обычных вещей — до ${R.shopMax} шт., легендарных — до ${R.legendMax}. Легендарные дарить нельзя.</li>
         <li>«Мало», «обычно» и «много» считаются от числа птичек с ником (сейчас ${S.birds}): мало — до ${R.lowPct} % (1–${S.low} шт.), обычный запас — ${R.normPct} % (${S.norm} шт.), много — от ${R.manyPct} % (${S.many} шт.); у легендарных — ${R.legendPct} % от этих чисел (1–${S.lowLeg} / ${S.normLeg} / от ${S.manyLeg}). Птичек становится больше — числа растут сами.</li>
         <li>Цена обычной вещи = ценность × % категории × уровень цен (сам, раз в сутки: средняя вещь ≈ заработок активной птички за ${R.priceDays} дн.; не больше ±10 % в день) × остаток: (обычный запас ÷ остаток)^0.4, от ×${R.priceMin} до ×${R.priceMax}, округление до 5. Легендарные — ровно та цена, что поставлена вручную.</li>
         <li>«🎲 Сюрприз» — случайная вещь категории, которой у птички ещё нет; если всё есть — любая вещь, которой нет.</li>
         <li>Любую вещь из сумки, кроме легендарных, можно подарить другой птичке (если у неё ещё нет максимума). Админ может дарить что угодно.</li>
-        <li>${R.restockOn ? `Каждый день (ночью по Риге) закончившиеся вещи (кроме легендарных) пополняются сами — по ${R.restockTo > 0 ? R.restockTo + ' шт.' : 'обычному запасу (' + S.norm + ' шт.)'}; у остальных остаток не меняется.` : 'Ежедневное пополнение магазина выключено.'}</li>
-        <li>${R.sellOn ? `Любую вещь можно продать обратно в магазин за ${pc(R.sellPrice)} — она снова появится в продаже.` : 'Продажа вещей обратно в магазин выключена.'}</li></ul>
+        <li>${R.restockOn ? `Каждый день (ночью по Риге) закончившиеся вещи (кроме легендарных) пополняются сами — по ${R.restockTo > 0 ? R.restockTo + ' шт.' : 'обычному запасу (' + S.norm + ' шт.)'}; у остальных остаток не меняется.` : 'Ежедневное пополнение рынка выключено.'}</li>
+        <li>${R.sellOn ? `Любую вещь можно продать обратно на рынок за ${pc(R.sellPrice)} — она снова появится в продаже.` : 'Продажа вещей обратно на рынок выключена.'}</li></ul>
       <h4>Игра «Пуговичный дождь»</h4><ul>
         <li>Птичка ловит пуговки и уворачивается от клякс; 3 сердечка, клякса или 5 упущенных пуговок — минус сердечко; каждые 5 уровней — +1 сердечко. Уровни бесконечные, каждый быстрее.</li>
         <li>Сложность растёт ступенями: каждые 10 уровней заметно быстрее и больше клякс (с 11-го — ветер, с 21-го — зигзаг).</li>
         <li>Награды игр — в % от опорной цены ${G.avg} 🔘 (постоянная), поэтому не скачут.</li>
-        <li>${R.gameOn && R.gameLevelPct > 0 ? `За уровень — ${R.gameLevelPct} % (сейчас ${pc(G.level)}) × (1 + каждый пройденный десяток): 1–10 — ${G.level}, 11–20 — ${G.level * 2}, 21–30 — ${G.level * 3}… Каждый номер уровня платит раз в сутки${G.max > 0 ? `, всего не больше ${pc(G.max)} в сутки` : ''}. Новый личный рекорд — ещё ${R.gameRecordPct} % (${pc(G.record)}) за каждый уровень выше прежнего.` : 'Пуговки за игру выключены.'}${R.gameItemEvery > 0 ? ` Каждые ${R.gameItemEvery} уровней — вещь из магазина, которой у птички нет (не легендарная).` : ''}${R.gameKingPct > 0 ? ` 👑 Первое место в рекордах — ${R.gameKingPct} % (${pc(G.king)}) в каждый день, когда держится и играет.` : ''}</li></ul>
+        <li>${R.gameOn && R.gameLevelPct > 0 ? `За уровень — ${R.gameLevelPct} % (сейчас ${pc(G.level)}) × (1 + каждый пройденный десяток): 1–10 — ${G.level}, 11–20 — ${G.level * 2}, 21–30 — ${G.level * 3}… Каждый номер уровня платит раз в сутки${G.max > 0 ? `, всего не больше ${pc(G.max)} в сутки` : ''}. Новый личный рекорд — ещё ${R.gameRecordPct} % (${pc(G.record)}) за каждый уровень выше прежнего.` : 'Пуговки за игру выключены.'}${R.gameItemEvery > 0 ? ` Каждые ${R.gameItemEvery} уровней — вещь с рынка, которой у птички нет (не легендарная).` : ''}${R.gameKingPct > 0 ? ` 👑 Первое место в рекордах — ${R.gameKingPct} % (${pc(G.king)}) в каждый день, когда держится и играет.` : ''}</li></ul>
       <h4>Игра «Блинная Полли»</h4><ul>
         <li>К окошку приходят жители Воббленда (уровень — один житель): выбрать сковородку (форма), налить тесто, перевернуть и снять вовремя (прожарка из заказа), добавить топпинги. Ошибки снижают довольство; совсем недовольный клиент — минус сердечко (3, каждые 5 уровней одно возвращается).</li>
         <li>Сложнее с каждым десятком: быстрее печётся, уже «идеальная» полоса, больше блинов и топпингов в заказе, с 11-го уровня клиенты ждут ограниченное время; новые формы и топпинги открываются по уровням.</li>
-        <li>${R.panOn && R.panLevelPct > 0 ? `За уровень — ${R.panLevelPct} % (сейчас ${pc(btnPct(R.panLevelPct))}) × (1 + каждый пройденный десяток), каждый номер уровня раз в сутки; новый рекорд — ещё ${R.panRecordPct} % за уровень.` : 'Пуговки за игру выключены.'}${R.panItemEvery > 0 ? ` Каждые ${R.panItemEvery} уровней — подарок из магазина.` : ''} Каждые ${R.panWashEvery} уровней — мыть сковородку пальцем: средство ${pc(R.panSoapBtn)}, водой — бесплатно, но дольше.</li></ul>
+        <li>${R.panOn && R.panLevelPct > 0 ? `За уровень — ${R.panLevelPct} % (сейчас ${pc(btnPct(R.panLevelPct))}) × (1 + каждый пройденный десяток), каждый номер уровня раз в сутки; новый рекорд — ещё ${R.panRecordPct} % за уровень.` : 'Пуговки за игру выключены.'}${R.panItemEvery > 0 ? ` Каждые ${R.panItemEvery} уровней — подарок с рынка.` : ''} Каждые ${R.panWashEvery} уровней — мыть сковородку пальцем: средство ${pc(R.panSoapBtn)}, водой — бесплатно, но дольше.</li></ul>
       <h4>Огород птички</h4><ul>
         <li>Вход — дверь 🚪 в комнате → «Огород». ${R.gardenBeds} грядок; посадить семечко, поливать каждый день (раз в сутки по Риге): растение растёт, только пока земля влажная (${R.gardenWetH} ч после полива).</li>
         <li>Семечко — ${R.gardenSeedPct} % (${pc(btnPct(R.gardenSeedPct))}) за каждый день роста, урожай — ${R.gardenSellPct} % (${pc(btnPct(R.gardenSellPct))}) за день${R.gardenOn ? '' : ' (продажа сейчас выключена)'}. При первом заходе — по ${R.gardenStarter} семян редиски, салата, моркови и тюльпана.</li>
         <li>Жуки: в ${R.gardenBugChance} % дней — от 1 до ${R.gardenBugMax}, вылезают в разное время днём; каждый — ${pc(R.gardenBugBtn)}.</li>
         <li>🍳 Кухня: блюда из урожая (книга 📖 в кухне). Одно блюдо за раз: +пуговки в своей игре (или во всех), быстрее рост при поливе, чаще семечки — на 2–24 ч (сила ${R.cookPower} %, время ${R.cookTime} %, «идеально» +${R.cookPerfectPct} %). Сырое или подгоревшее — −${R.cookBadPct} % пуговок на ${R.cookBadH} ч.${R.cookOn ? '' : ' (сейчас выключено)'}</li>
-        <li>Семена: простые — в лавке огорода и в магазине; в играх с шансом ${R.gardenDropPct} % за награду (до ${R.gardenDropDay} в сутки). Редкое — за ${R.gardenRareDays} дней подряд с бонусом карточки дня, волшебное — за ${R.gardenMagicDays} дней подряд с поливом; их урожай дороже в ${R.gardenRareMul} и ${R.gardenMagicMul} раз. Найденное семечко — новость 🌱 в конвертике.</li>
-        <li>Вещи для огорода (лейка, пугало, теплица, тачка…, ★ золотая лейка и оранжерея, «🎲 Сюрприз») — в магазине; купленная вещь сама стоит в огороде.</li>
+        <li>Семена: простые — в лавке огорода и на рынке; в играх с шансом ${R.gardenDropPct} % за награду (до ${R.gardenDropDay} в сутки). Редкое — за ${R.gardenRareDays} дней подряд с бонусом карточки дня, волшебное — за ${R.gardenMagicDays} дней подряд с поливом; их урожай дороже в ${R.gardenRareMul} и ${R.gardenMagicMul} раз. Найденное семечко — новость 🌱 в конвертике.</li>
+        <li>Вещи для огорода (лейка, пугало, теплица, тачка…, ★ золотая лейка и оранжерея, «🎲 Сюрприз») — на рынке; купленная вещь сама стоит в огороде.</li>
         <li>Погода — ${R.gardenSeason === 'auto' ? 'по календарю' : 'вручную: ' + R.gardenSeason}: осенью листья, дождик или туман, зимой снег, весной лепестки, летом солнце и бабочки; вечером (с 19 до 7) — звёзды.</li></ul>
       <h4>«Смена с Полли»</h4><ul>
         <li>Таймер 20 мин – 3 ч, Полли работает рядом. Засчитывается только смена, доведённая до конца; минуты копятся: каждый полный час — повышение (новая должность, лестница бесконечная)${R.shiftOn && R.shiftBtn > 0 ? ` и ${pc(R.shiftBtn)}` : ''}.</li></ul>
@@ -1066,7 +1066,7 @@
     let av = {}; try { av = JSON.parse(u.avatar || '{}') || {}; } catch (e) { /* пусто */ }
     const NAMES = { halo: 'нимб ★', unicorn: 'рог единорога ★', flamecrown: 'корона феникса ★', dragonegg: 'яйцо дракона ★', goldfeather: 'золотое перо ★', comet: 'комета ★', goldenapple: 'золотое яблоко ★', legend: 'легендарная ★', aurora: 'сияние ★', pirate: 'пиратская шляпа', chef: 'колпак повара', graduation: 'шапочка выпускника', paintbrush: 'кисточка', palette: 'палитра', pencil: 'карандаш', coffee: 'кофе', croissant: 'круассан', bounce: 'прыгает', wiggle: 'качается', float: 'парит', spin: 'кружится', sparkle: 'сияет', heart: 'сердечко', wizard: 'шляпа волшебника', witch: 'шляпа ведьмы', pumpkin: 'тыква', santa: 'колпак Санты', antlers: 'рожки оленя', beanie: 'зимняя шапка', heartband: 'ободок с сердцем', wreath: 'весенний венок', strawhat: 'летняя шляпа', leafcrown: 'осенний венок', wand: 'волшебная палочка', crystal: 'хрустальный шар', star: 'звёздочка', lollipop: 'леденец', minipumpkin: 'тыковка', candycane: 'карамельная трость', giftbox: 'подарок', ornament: 'ёлочный шар', snowflake: 'снежинка', heart: 'сердечко', rose: 'роза', letter: 'валентинка', icecream: 'мороженое', mapleleaf: 'кленовый лист', snow: 'снежинки', magic: 'волшебная', spooky: 'хеллоуин', headset: 'игровые наушники', gamepad: 'геймпад', coin: 'монетка', sword: 'пиксельный меч', mushroom: 'грибок', neon: 'неон', pizza: 'пицца', cherry: 'вишенка', cheese: 'сыр', ring: 'колечко', pearl: 'жемчужина', ruby: 'рубин', sapphire: 'сапфир', key: 'ключик', spoon: 'ложечка', gold: 'золотая', rainbow: 'радуга', stars: 'звёзды', hearts: 'сердечки', leaves: 'листики', dotted: 'пунктир' };
     let kind = 'hat', item = B.GIFTS.hat[0], owned = {}, copies = {};
-    // цены: как сейчас в магазине (с учётом остатка); у вещей не из магазина — ценность (base)
+    // цены: как сейчас на рынке (с учётом остатка); у вещей не с рынка — ценность (base)
     let price = {}, LIM = { max: 3, leg: 1 };
     const priceOf = (kd, v) => price[kd + '|' + v] || 0;
     const w = document.createElement('div'); w.className = 'adm-gift';
@@ -1107,9 +1107,9 @@
     function giftCards(box) {
       box.innerHTML = '<p class="be-note">Загрузка карточек…</p>';
       api('cards?show=free&lang=ru').then(d => {
-        const free = d.cards.filter(c => c.rarity === 'common' || c.price > 0); // как в сюрпризе магазина: редкие и уникальные без цены ещё не готовы
+        const free = d.cards.filter(c => c.rarity === 'common' || c.price > 0); // как в сюрпризе рынка: редкие и уникальные без цены ещё не готовы
         const left = () => free.filter(c => (!CS.rarity || c.rarity === CS.rarity) && (!CS.coll || c.collection === CS.coll)).length;
-        box.innerHTML = `<div class="adm-gc"><p class="be-note">Каждая карточка — одна на весь сайт: подаренная уходит из магазина к птичке в альбом. Пуговки не списываются, птичка увидит «🃏 Тебе карточка!» в новостях.</p>
+        box.innerHTML = `<div class="adm-gc"><p class="be-note">Каждая карточка — одна на весь сайт: подаренная уходит с рынка к птичке в альбом. Пуговки не списываются, птичка увидит «🃏 Тебе карточка!» в новостях.</p>
           <div class="adm-gc-row"><select data-r aria-label="Редкость">${RAR.map(r => `<option value="${r[0]}"${r[0] === CS.rarity ? ' selected' : ''}>${r[1]}</option>`).join('')}</select>
           <select data-c aria-label="Коллекция"><option value="">Все коллекции</option>${d.sets.map(x => `<option value="${esc(x.slug)}"${x.slug === CS.coll ? ' selected' : ''}>${esc(x.name)}</option>`).join('')}</select></div>
           <p class="adm-gc-left"></p><button type="button" class="pill-btn pill-fill" data-rnd></button>
@@ -1178,7 +1178,7 @@
     prev();
   }
 
-  // ---------- магазин: цена и количество каждой вещи из коллекций ----------
+  // ---------- рынок: цена и количество каждой вещи из коллекций ----------
   // цена от остатка — как effPrice в worker/index.js: ценность × (обычный запас / остаток)^0.4, от ×0.75 до ×2.5; «мало / обычно / много» — от числа птичек (STOCK на сервере)
   let PR = { birds: 0, low: 3, norm: 10, many: 25, lowLeg: 1, normLeg: 3, manyLeg: 7, priceMin: 0.75, priceMax: 2.5 }; // формула цены — из «📜 Правил» (приходит с admin/shop)
   const effPrice = (base, stock, leg) => base > 0 ? Math.max(5, Math.round(base * Math.max(PR.priceMin, Math.min(PR.priceMax, Math.pow((leg ? PR.normLeg : PR.norm) / Math.max(1, stock || 0), 0.4))) / 5) * 5) : 0;
@@ -1225,7 +1225,7 @@
       const sum = B.GIFT_KINDS.map(k => { const xs = all.filter(x => x.kind === k[0]); const on = xs.filter(x => cnt(x) > 0); return { k: k[0], name: k[1][1], total: xs.length, on: on.length, pcs: on.reduce((a, x) => a + cnt(x), 0), low: on.filter(x => cnt(x) <= lowN(x)).length, txt: stockTxt(xs), hit: xs.filter(only).length, value: xs.reduce((a, x) => a + cnt(x) * ((rows[x.kind + '|' + x.item] || {}).price || 0), 0), each: (ns => ns.length ? (Math.min(...ns) === Math.max(...ns) ? String(ns[0]) : Math.min(...ns) + '–' + Math.max(...ns)) : '—')(xs.filter(x => !(B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item))).map(cnt)) }; });
       const onSale = all.filter(x => (rows[x.kind + '|' + x.item] || {}).stock > 0).length;
       const fb = (k, l) => `<button type="button" class="pill-btn" data-sf="${k}" aria-pressed="${sFilter === k}">${l}</button>`;
-      main.innerHTML = `<section class="adm-box"><h2>🛍 Магазин</h2>
+      main.innerHTML = `<section class="adm-box"><h2>🛍 Птичий рынок</h2>
         <p class="be-note">Цены считаются сами: <b>ценность вещи × % категории × уровень цен</b> (он сам подстраивается под то, сколько птички зарабатывают и копят — сейчас ×${(d.level && d.level.L) || 1}), а ещё дороже, когда штук мало, и дешевле, когда много. Вы меняете только <b>% категорий</b> и <b>цены легендарных</b> — они ниже. Остаток меняется сам (пополнение каждую ночь), но его можно поставить и вручную. Сейчас в продаже: <b>${onSale}</b> из ${all.length}.</p>
         <p class="adm-refill">↻ Пополнить <b>все закончившиеся, кроме легендарных</b> (сейчас ${all.filter(x => !isLeg(x) && cnt(x) === 0).length} ${pl1(all.filter(x => !isLeg(x) && cnt(x) === 0).length)}) — по <input type="number" id="adm-refill-n" min="1" max="10000" inputmode="numeric" value="${PR.norm}" style="width:70px"> шт. <button type="button" class="pill-btn pill-fill" id="adm-refill">Пополнить</button> <small class="be-note">обычный запас сейчас — ${PR.norm} шт.</small></p>
         <details class="adm-fine"><summary>⚙️ Тонкая настройка цен — можно не трогать</summary>${catBox()}${legBox()}</details>
@@ -1244,7 +1244,7 @@
           ${sOnly !== 'all' && !sum.some(r => r.hit) ? '<p class="be-note">Таких вещей нет 🎉</p>' : ''}
           <table class="be-table adm-table adm-stock"><thead><tr><th>Категория</th><th>Сейчас в продаже</th><th title="Сколько пуговок нужно, чтобы купить всё, что сейчас есть в продаже (по сегодняшним ценам)">Всё вместе стоит</th><th>Сколько штук поставить</th></tr></thead><tbody>
           ${sum.filter(r => sOnly === 'all' || r.hit).map(r => `<tr data-sk="${r.k}"><td><button type="button" class="adm-exp" data-exp="${r.k}" aria-expanded="${sOpen.has(r.k)}">${sOpen.has(r.k) ? '▾' : '▸'} ${esc(r.name)}</button><small class="adm-sk-n">${r.total} ${pl1(r.total)}</small></td><td>${sOnly === 'all' ? r.txt : `<span class="adm-sk-0">${r.hit} ${pl1(r.hit)} ${sOnly === 'empty' ? 'закончились' : sOnly === 'low' ? 'мало' : 'много'}</span><br><small>${r.txt}</small>`}</td><td>${r.value ? '🔘 ' + n(r.value) : '—'}</td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток: ${esc(r.name)}"></td></tr>${sOpen.has(r.k) ? `<tr class="adm-sk-items"><td colspan="4"><div class="adm-sk-grid">${all.filter(x => x.kind === r.k && only(x)).map(x => { const w = rows[x.kind + '|' + x.item] || { price: 0, base: (d.suggested || {})[x.kind + '|' + x.item] || 0, stock: 0 }, leg = B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item); return `<div class="adm-sk-it${leg ? ' adm-legend' : ''}${(w.stock || 0) > 0 ? '' : ' off'}" data-k="${esc(x.kind)}" data-i="${esc(x.item)}"><span class="adm-shop-pic"></span><span class="adm-sk-nm">${esc(x.name)}${leg && !x.name.includes('★') ? ' ★' : ''}</span><label>Остаток <input type="number" min="0" max="100000" inputmode="numeric" value="${w.stock || 0}" data-f="stock"></label>${leg ? `<label>Цена <input type="number" min="0" max="100000" inputmode="numeric" value="${w.base ?? w.price ?? 0}" data-f="price"></label>` : ''}<small class="adm-shop-st">${w.stock > 0 ? '🔘 ' + w.price : '—'}</small></div>`; }).join('')}</div></td></tr>` : ''}`).join('')}
-          <tr data-sk="*"><td><b>Весь магазин</b><small class="adm-sk-n">каждой вещи (кроме легендарных) станет ровно столько штук</small><small class="adm-sk-n">${all.length} ${pl1(all.length)}</small></td><td>${sum.reduce((a, r) => a + r.on, 0)} в продаже, ${sum.reduce((a, r) => a + r.pcs, 0)} шт. всего</td><td><b>🔘 ${n(sum.reduce((a, r) => a + r.value, 0))}</b></td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток всем"></td></tr></tbody></table>
+          <tr data-sk="*"><td><b>Весь рынок</b><small class="adm-sk-n">каждой вещи (кроме легендарных) станет ровно столько штук</small><small class="adm-sk-n">${all.length} ${pl1(all.length)}</small></td><td>${sum.reduce((a, r) => a + r.on, 0)} в продаже, ${sum.reduce((a, r) => a + r.pcs, 0)} шт. всего</td><td><b>🔘 ${n(sum.reduce((a, r) => a + r.value, 0))}</b></td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток всем"></td></tr></tbody></table>
           <p><button type="button" class="pill-btn pill-fill" id="adm-set-all">💾 Поставить</button> <small class="be-note">— всем строкам, где вписано число</small></p></section>
         <details class="adm-fine" id="adm-list"${sList || sq || sFilter !== 'all' || sSort !== 'cat' ? ' open' : ''}><summary>📋 Все вещи одним списком — поиск, темы, порядок</summary>
         <div class="be-filters"><input type="search" id="adm-sq" placeholder="🔍 Найти вещь" value="${esc(sq)}"></div>
@@ -1254,7 +1254,7 @@
         <table class="be-table adm-table adm-shop"><thead><tr><th>Вещь</th><th>Вид</th><th>Ценность 🔘</th><th>Остаток</th><th>Цена сейчас</th></tr></thead><tbody>
         ${list.map(x => { const r = rows[x.kind + '|' + x.item] || { price: 0, base: (d.suggested || {})[x.kind + '|' + x.item] || 0, stock: 0 }; const leg = B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item); return `<tr data-k="${esc(x.kind)}" data-i="${esc(x.item)}"${leg ? ' class="adm-legend"' : ''}><td class="adm-shop-it"><span class="adm-shop-pic"></span>${esc(x.name)}${leg ? ' <span class="adm-leg-tag" title="Легендарная: 1 штука на птичку, дарить нельзя">★ легендарная</span>' : ''}</td><td>${esc(x.kindName)}</td>
           <td data-l="Цена 🔘">${leg ? `<input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.base ?? r.price}" data-f="price" aria-label="Цена легендарной">` : `<span class="be-note" title="ценность × % категории × уровень цен">${r.base || '—'}</span>`}</td><td data-l="Количество"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.stock}" data-f="stock" aria-label="Количество"></td><td class="adm-shop-st">${r.stock > 0 ? '🔘 ' + r.price : '—'}</td></tr>`; }).join('')}</tbody></table></details></section>
-        <section class="adm-danger"><h3>⚠️ Осторожно</h3><button type="button" class="pill-btn be-danger adm-empty" id="adm-empty-all">🧹 Опустошить полки</button><p class="be-note">У всех вещей (и легендарных) остаток станет 0 — в магазине ничего не будет в продаже.</p></section>`;
+        <section class="adm-danger"><h3>⚠️ Осторожно</h3><button type="button" class="pill-btn be-danger adm-empty" id="adm-empty-all">🧹 Опустошить полки</button><p class="be-note">У всех вещей (и легендарных) остаток станет 0 — на рынке ничего не будет в продаже.</p></section>`;
       main.querySelectorAll('[data-cat]').forEach(i => i.onchange = async () => {
         const v = Math.max(10, Math.min(1000, Math.round(+i.value) || 100)); i.disabled = true;
         try { const r = await api('admin/shop/cats', { mult: { [i.dataset.cat]: v } }); d.catMult = r.catMult; Object.keys(rows).forEach(k => delete rows[k]); r.items.forEach(x => { rows[x.kind + '|' + x.item] = x; }); draw(); }
@@ -1284,10 +1284,10 @@
       main.querySelectorAll('[data-ss]').forEach(b => b.onclick = () => { sStock = b.dataset.ss; draw(); });
       main.querySelector('#adm-sort').onchange = e => { sSort = e.target.value; draw(); };
       main.querySelector('#adm-list').addEventListener('toggle', e => { sList = e.target.open; });
-      // поставить остаток: категории (или всему магазину) — каждой вещи ровно столько штук
+      // поставить остаток: категории (или всему рынку) — каждой вещи ровно столько штук
       const setStock = async (pairs, btn) => {
         const items = []; let what = [];
-        for (const [k, n] of pairs) { const xs = (k === '*' ? all : all.filter(x => x.kind === k)).filter(x => only(x) && (sOnly !== 'all' || !(B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item)))); xs.forEach(x => items.push([x.kind, x.item, n])); what.push((k === '*' ? 'весь магазин' : (sum.find(r => r.k === k) || {}).name) + ' — по ' + n + ' шт. (' + xs.length + ')'); }
+        for (const [k, n] of pairs) { const xs = (k === '*' ? all : all.filter(x => x.kind === k)).filter(x => only(x) && (sOnly !== 'all' || !(B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item)))); xs.forEach(x => items.push([x.kind, x.item, n])); what.push((k === '*' ? 'весь рынок' : (sum.find(r => r.k === k) || {}).name) + ' — по ' + n + ' шт. (' + xs.length + ')'); }
         if (!items.length) return alert(pairs.length ? (sOnly === 'all' ? 'Здесь нечего менять: в категории только легендарные (их меняют по одной или с фильтром).' : 'Под этот фильтр («' + { empty: 'Закончились', low: 'Мало', many: 'Много' }[sOnly] + '») в категории сейчас нет вещей — возможно, вы их уже пополнили. Нажмите «Все», чтобы поставить остаток всей категории.') : 'Впишите остаток хотя бы для одной категории.');
         if (!confirm((sOnly === 'empty' ? 'Пополнить только ЗАКОНЧИВШИЕСЯ вещи:\n' : sOnly === 'low' ? 'Пополнить только вещи, которых МАЛО:\n' : sOnly === 'many' ? 'Поставить остаток только вещам, которых МНОГО:\n' : 'Поставить остаток ВСЕМ вещам:\n') + what.join('\n'))) return;
         if (btn) btn.disabled = true;
@@ -1297,7 +1297,7 @@
       const val = tr => { const v = tr.querySelector('input').value.trim(); return v === '' ? null : Math.max(0, Math.min(10000, Math.floor(+v) || 0)); };
       // опустошить полки: остаток 0 у всех вещей (и легендарных); ценность остаётся — цены снова посчитаются при пополнении
       main.querySelector('#adm-empty-all').onclick = async e => {
-        if (!confirm('Опустошить полки? У всех ' + all.length + ' вещей (и легендарных) остаток станет 0 — в магазине ничего не будет в продаже. Ценность вещей не изменится.')) return;
+        if (!confirm('Опустошить полки? У всех ' + all.length + ' вещей (и легендарных) остаток станет 0 — на рынке ничего не будет в продаже. Ценность вещей не изменится.')) return;
         if (!confirm('Точно? Это нельзя отменить одной кнопкой — пополнять придётся заново.')) return;
         e.target.disabled = true;
         try { const r = await api('admin/shop/restock', { items: all.map(x => [x.kind, x.item, 0]), set: true }); Object.keys(rows).forEach(k => delete rows[k]); r.items.forEach(x => { rows[x.kind + '|' + x.item] = x; }); draw(); }

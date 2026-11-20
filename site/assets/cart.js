@@ -1,6 +1,6 @@
-// 🛒 Корзина магазина: вещи откладываются, а не покупаются сразу. Хранится в браузере (localStorage `pp-cart`: [[kind, item, n]]).
+// 🛒 Корзина: вещи откладываются, а не покупаются сразу. Хранится в браузере (localStorage `pp-cart`: [[kind, item, n]]).
 // В шапке — #hd-cart рядом с «🔘 N» (src/layout.html; виден, когда видны пуговки — account.js setButtons) с числом вещей → /shop/#cart.
-// Окно корзины (сумма, количество, «Купить всё») рисует магазин (src/pages/shop.html). PPCart: list, add, set, clear, count, total
+// Окно корзины (сумма, количество, «Купить всё») рисует рынок (src/pages/shop.html). PPCart: list, add, set, clear, count, total
 (() => {
   const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
   const KEY = 'pp-cart';
@@ -18,7 +18,7 @@
   }
   const add = (k, v, n) => set(k, v, has(k, v) + (n || 1));
   const clear = () => write([]);
-  // сумма по ценам магазина: price(k, v) → число
+  // сумма по ценам рынка: price(k, v) → число
   const total = price => list().reduce((s, x) => s + (price(x.kind, x.item) || 0) * x.n, 0);
 
   function draw() {
@@ -28,7 +28,7 @@
     b.textContent = n ? String(n) : ''; b.hidden = !n;
     a.classList.toggle('has', n > 0);
     a.setAttribute('aria-label', ['Cart', 'Корзина', 'Grozs'][L] + (n ? ` (${n})` : ''));
-    a.title = ['Shop cart', 'Корзина магазина', 'Veikala grozs'][L];
+    a.title = ['Cart', 'Корзина', 'Grozs'][L];
   }
   // в другой вкладке поменяли корзину — число в шапке тоже
   addEventListener('storage', e => { if (e.key === KEY) { draw(); dispatchEvent(new CustomEvent('pp-cart')); } });
