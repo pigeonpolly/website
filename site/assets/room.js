@@ -2143,11 +2143,12 @@
     cv.addEventListener('pointerdown', e => { if (e.pointerType !== 'mouse') { showTip(e); clearTimeout(tip._t); tip._t = setTimeout(() => { tip.hidden = true; }, 1800); } }); // на телефоне — по касанию
     // ---------- дом (этап 20): дверь справа внизу → план дома; закрытые видно, по нажатию — замок и условие; гости ходят по открытым ----------
     const capEl = box.querySelector('.room-cap');
+    let showBook = () => {}; // 📖 книга рецептов — только в своей кухне (этап 89, site/assets/cookbook.js)
     function switchTo(id) {
       if (id === cur || !HOMES[id]) return;
       cur = id; room = id === 'living' ? house : ((house.rooms = house.rooms || {})[id] = prep(house.rooms[id] || { items: [] }));
       fixBoxes(); setEdit(false); tidy = null; sel = -1; drag = null; jumps.clear(); lids.clear(); pops.clear(); parts.length = 0;
-      showTidy(); showLight(); dkLv = dkTo(); paintBg();
+      showTidy(); showLight(); showBook(); dkLv = dkTo(); paintBg();
       capEl.textContent = (id === 'living' ? '🏠 ' + t('of') : HOMES[id].ic + ' ' + HOMES[id].n[L] + ' · @{n}').replace('{n}', o.nick);
       // Полли прибегает из двери справа
       Object.assign(bird, { x: RW + 8, y: GY, zz: false, act: null, actQ: null, scene: null }); walk(performance.now(), 60 + Math.random() * 80, GY, .07);
@@ -2175,6 +2176,12 @@
       plan.addEventListener('click', e => { if (e.target === plan) openPlan(false); });
       box.addEventListener('keydown', e => { if (e.key === 'Escape' && !plan.hidden) openPlan(false); });
       stage.appendChild(plan); stage.appendChild(doorBtn);
+      if (o.mine) {
+        const bookBtn = document.createElement('button'); bookBtn.type = 'button'; bookBtn.className = 'room-book-btn'; bookBtn.textContent = '📖';
+        bookBtn.title = ['Recipe book', 'Книга рецептов', 'Recepšu grāmata'][L]; bookBtn.setAttribute('aria-label', bookBtn.title);
+        bookBtn.onclick = e => { e.stopPropagation(); const go = () => window.PPCookbook && window.PPCookbook.open(); if (window.PPCookbook) return go(); const sc = document.createElement('script'); sc.src = '/assets/cookbook.js'; sc.onload = go; document.head.appendChild(sc); };
+        stage.appendChild(bookBtn); showBook = () => { bookBtn.hidden = cur !== 'kitchen'; }; showBook();
+      }
     }
     paintBg();
     if (!o.film) raf = requestAnimationFrame(frame);

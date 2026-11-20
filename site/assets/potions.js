@@ -496,7 +496,7 @@
       S.inv = r.inv; slots = []; brewing = false;
       const b = S.book.find(x => x.combo === r.combo); if (b) b.n++; else S.book.unshift({ combo: r.combo, tier: r.tier, n: 1, ix: r.ix, season: r.season });
       if (!b && r.tier > 0 && window.PPTop) PPTop.refresh(); // новое зелье — на доске «📖 Рецепты»
-      if (r.got) S.today += r.got;
+      if (r.got) S.today += r.paid != null ? r.paid : r.got; // в счётчик дня — без бонуса блюда с кухни (этап 89)
       drawBar(); dayPlayed(r); showBadges(r.badges);
       const rv = r.revive ? `<p class="pot-revive">${t('revive')}</p>` : '';
       let html;
