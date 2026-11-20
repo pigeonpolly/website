@@ -92,10 +92,11 @@
   // ⭐ «Часто» — полоска над экраном: 6 разделов, куда админ заходит чаще всего (счёт в localStorage этого устройства, pp-adm-freq)
   const FREQ_KEY = 'pp-adm-freq', FREQ_N = 6;
   const freqGet = () => { try { return JSON.parse(localStorage.getItem(FREQ_KEY) || '{}') || {}; } catch (e) { return {}; } };
+  { const f = freqGet(); if (f.blog == null) { f.blog = Math.max(2, ...Object.values(f).map(Number).filter(n => n > 0)); try { localStorage.setItem(FREQ_KEY, JSON.stringify(f)); } catch (e) {} } } // 20.11: заходы в редактор блога раньше не считались — стартовый счёт, чтобы «Блог» сразу был в «Часто»
   const freqAdd = id => { const x = secOf(id); if (!x || x.hide) return; const f = freqGet(); f[id] = (f[id] || 0) + 1; try { localStorage.setItem(FREQ_KEY, JSON.stringify(f)); } catch (e) {} };
   const freqBar = cur => { const f = freqGet(), top = Object.keys(f).filter(id => f[id] >= 2 && secOf(id) && !secOf(id).hide).sort((a, b) => f[b] - f[a]).slice(0, FREQ_N);
     return top.length ? `<nav class="adm-tabs adm-freq" aria-label="Часто"><span class="adm-freq-h">⭐ Часто</span>${top.map(id => tabLink(secOf(id), cur)).join('')}</nav>` : ''; };
-  document.addEventListener('click', e => { const a = e.target.closest && e.target.closest('a.adm-ext'); if (a) { const x = ADMIN_SECTIONS.find(t => t.href === a.getAttribute('href')); if (x) freqAdd(x.id); } });
+  document.addEventListener('click', e => { const a = e.target.closest && e.target.closest('a.adm-ext'); if (a) { const x = ADMIN_SECTIONS.find(t => t.href === a.getAttribute('href')); if (x && x.id !== 'blog') freqAdd(x.id); } }); // блог считает сам blog-editor.js
   // экран: строка «что здесь делается» сверху, потом сам раздел; focus — прокрутить к нужному месту
   async function route() {
     const id = (location.hash || '#week').slice(1), x = secOf(id) || (SECTIONS[id] ? { id } : secOf('week'));
