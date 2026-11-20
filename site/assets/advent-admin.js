@@ -113,7 +113,7 @@
           '<label>' + T.fcap[L] + '<input class="fl-adv-in" data-c maxlength="160"></label></div>' +
         '<div class="fl-adv-more" data-more hidden><input class="fl-adv-in" data-ce placeholder="EN" maxlength="160"><input class="fl-adv-in" data-cl placeholder="LV" maxlength="160"></div>' +
         '<p class="fl-adv-note"><button type="button" class="fl-adv-link" data-show3>🌐 ' + T.more3[L] + '</button></p>' +
-        '<label class="fl-adv-drop fl-adv-drop-sm" data-prevbox hidden><input type="file" data-p accept="image/jpeg,image/png,image/webp,image/gif" hidden><b>🖼 ' + T.fprev[L] + '</b></label>' +
+        '<label class="fl-adv-drop fl-adv-drop-sm" data-prevbox hidden><input type="file" data-pv accept="image/jpeg,image/png,image/webp,image/gif" hidden><b>🖼 ' + T.fprev[L] + '</b></label>' +
         '<p class="fl-adv-msg" data-msg aria-live="polite"></p>' +
         '<p><button type="button" class="pill-btn pill-fill" data-send>' + T.put[L] + '</button></p>' +
         '<div class="fl-adv-files" data-files></div>' +
@@ -150,7 +150,7 @@
     }
     function setFile(f) {
       up.file = f || null; up.prev = null;
-      var pbox = $('[data-prevbox]'), pin = $('[data-p]');
+      var pbox = $('[data-prevbox]'), pin = $('[data-pv]');
       $('[data-f]').value = ''; pbox.hidden = true; pin.value = ''; pb.innerHTML = ''; pb.hidden = true;
       if (!up.file) { $('[data-n]').value = ''; say(''); chosen(); return; }
       if (up.file.size > FILE_MAX) { up.file = null; $('[data-f]').value = ''; say(T.errBig[L], true); chosen(); return; }
@@ -159,7 +159,7 @@
       say(''); chosen();
     }
     $('[data-f]').onchange = function () { setFile(this.files && this.files[0]); };
-    $('[data-p]').onchange = function () {
+    $('[data-pv]').onchange = function () {
       var f = this.files && this.files[0]; up.prev = null; pb.innerHTML = ''; pb.hidden = true;
       if (!f) return chosen();
       if (!IMG.test(f.type || '')) { this.value = ''; return say(T.errType[L], true); }
@@ -176,7 +176,7 @@
       var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) setFile(f);
     });
     function resetUp() {
-      up.file = null; up.prev = null; $('[data-f]').value = ''; $('[data-p]').value = '';
+      up.file = null; up.prev = null; $('[data-f]').value = ''; $('[data-pv]').value = '';
       $('[data-prevbox]').hidden = true; pb.innerHTML = ''; pb.hidden = true;
       ['[data-n]', '[data-c]', '[data-ce]', '[data-cl]'].forEach(function (s) { d.querySelector(s).value = ''; });
       chosen();
