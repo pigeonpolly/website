@@ -120,7 +120,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 </div></div>
 </header>
 <main id="main">
-<section data-ppb="preview.1" class="hero"><div class="w">
+﻿<section class="hero"><div class="w">
   <span class="pill">Watercolour &amp; ink · free lessons</span>
   <span class="sea" data-sv="tag">autumn edition</span>
   <h1>Paint small, <em>joyful<svg viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M5 20 C 60 6, 120 28, 180 14 S 270 10, 295 18"/></svg></em> things</h1>
@@ -136,7 +136,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <span class="advpromo-go">Open →</span>
   </a>
 </div>
-<div data-ppb="preview.2" class="pano"><img id="v2-hero" src="/images/v2/hero-autumn.jpg" srcset="/images/v2/hero-autumn-900.jpg 900w, /images/v2/hero-autumn.jpg 1800w" sizes="100vw" alt="Watercolour by Alina Otkinska" fetchpriority="high"><span class="cap2" data-sv="note">Polly on the train ✿</span></div>
+<div data-ppb="preview.1" class="pano"><img id="v2-hero" src="/images/v2/hero-autumn.jpg" srcset="/images/v2/hero-autumn-900.jpg 900w, /images/v2/hero-autumn.jpg 1800w" sizes="100vw" alt="Watercolour by Alina Otkinska" fetchpriority="high"><span class="cap2" data-sv="note">Polly on the train ✿</span></div>
 </section>
 
 <style>
@@ -158,9 +158,9 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 </style>
 
 <script>/* ссылка на адвент видна до 1 января включительно, потом прячется */
-(function () { var b = document.getElementById('advpromo'); if (!b) return; var n = new Date(), m = n.getMonth(), d = n.getDate(); if (!(m >= 10 || (m === 0 && d === 1))) b.remove(); })();</script>
+(function () { var a = document.getElementById('advpromo'), c = document.querySelector('.hero .ctas'); if (!a) return; var n = new Date(), m = n.getMonth(), d = n.getDate(); var on = m === 10 || m === 11 || (m === 0 && d <= 10); if (c) c.style.display = on ? 'none' : ''; a.style.display = on ? '' : 'none'; })();</script>
 
-<section data-ppb="preview.3" class="fl" id="lessons"><div class="w">
+<section data-ppb="preview.2" class="fl" id="lessons"><div class="w">
   <div><span class="hand">hi! let’s paint something small ✿</span>
     <h2>Free lessons, <i>open to everyone</i></h2>
     <p>Video lessons you can watch right here, with no sign-up. Grab a brush and paint along.</p>
@@ -173,30 +173,30 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </div>
 </div></section>
 
-<section data-ppb="preview.4" class="poll" id="poll" hidden aria-label="Poll"></section>
+<section data-ppb="preview.3" class="poll" id="poll" hidden aria-label="Poll"></section>
 <script src="/assets/poll.js?v=64a1687c" defer></script>
 
-<section data-ppb="preview.5" class="desk" id="guides"><div class="w">
+<section data-ppb="preview.4" class="desk" id="guides"><div class="w">
   <div><span class="k">Books</span><h2>Books to keep <em>on your desk</em></h2>
     <p class="dc">Written, illustrated and designed by Alina. Clear steps and real sketchbook pages, from the first line to a finished little painting. No talent required, just the wish to draw.</p>
     <a class="btn" href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener">Buy on Amazon</a> <a class="btn ghost" href="https://drive.google.com/file/d/1IWMWb0nLOaN2UuJLZA-DqhdmwDh3T9Nx/view?usp=sharing" target="_blank" rel="noopener">Free colouring book →</a></div>
   <div class="books"><a class="b0" href="https://a.co/d/009gymDC" target="_blank" rel="noopener"><img src="/images/e-books/watercolor-sketches.jpg" alt="Watercolor Sketches: Creative Guide" loading="lazy"></a><a class="b1" href="https://a.co/d/0cJY0kk5" target="_blank" rel="noopener"><img src="/images/e-books/ink-sketching.jpg" alt="Ink Sketching: Creative Guide" loading="lazy"></a><a class="b2" href="/blog/new-book-coming-soon/"><span class="lbl">Soon</span><img src="/images/e-books/urban-sketching-digital-traveler.jpg" alt="Urban Sketching: Digital Traveler" loading="lazy"></a><span class="hand">start with this one ↑</span></div>
 </div></section>
 
-<section data-ppb="preview.6" class="jr" id="journal"><div class="w">
+<section data-ppb="preview.5" class="jr" id="journal"><div class="w">
   <span class="doodle" aria-hidden="true">fresh from the sketchbook ↓</span>
   <div class="hd3"><div><span class="k">Journal</span><h2>Notes from <em>the studio</em></h2></div><a class="btn" href="/blog/">All articles</a></div>
   <div class="jg" id="v2-blog"><div class="feat"><div class="im sk"></div></div><div><div class="post"><div class="sk" style="height:90px"></div></div><div class="post"><div class="sk" style="height:90px"></div></div><div class="post"><div class="sk" style="height:90px"></div></div></div></div>
 </div></section>
 
-<section data-ppb="preview.7" class="ab2" id="about"><div class="w">
+<section data-ppb="preview.6" class="ab2" id="about"><div class="w">
   <div class="ph"><img src="/images/home/alina.jpg" alt="Alina Otkinska" loading="lazy"><span>— Alina &amp; Polly</span></div>
   <div><span class="k">Hi, I’m Alina</span><h2>Talent is <em>a marketing trick</em></h2>
     <p>I was sure only people born with a gift could learn to draw. I was wrong. It’s just like building muscle at the gym: all it takes is wanting to. And you’ve already found the gym — right here on my site.</p>
     <a class="btn" href="/sketchbook/">More about me →</a></div>
 </div></section>
 
-<section data-ppb="preview.8" class="lab3" id="lab"><div class="w">
+<section data-ppb="preview.7" class="lab3" id="lab"><div class="w">
   <div class="hd4"><span class="k">Psst… there’s another side</span><h2>Top secret: <em>the Lab</em></h2><span class="hand">open the folder to peek inside</span></div>
   <div class="fold"><div class="bk"></div><span class="tb">case file · the lab</span>
     <div class="ins">
@@ -211,6 +211,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 </div></section>
 
 
+
 </main>
 <footer class="ft2"><div class="w">
   <!-- подвал: все страницы сайта по разделам (11.11, просьба Алины); подписи — ключи data-f>…< в content/i18n -->
@@ -223,7 +224,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>The Flock</h4><a href="/flock/" data-f>All birds</a><a href="/flock/news/" data-f>Flock news</a><a href="/challenge/" data-f>Daily Challenge</a><a href="/challenge/#sw-wall" data-f>Flock drawings</a><a href="/requests/" data-f>Draw this for me</a><a href="/garden/" data-f>Bird garden</a></div>
     <div><h4 data-f>Alina</h4><a href="/sketchbook/" data-f>Sketchbook</a><a href="/about-me/" data-f>About me</a><a href="/on-walls-and-pages/" data-f>On Walls &amp; Pages</a><a href="/projects/" data-f>Learning &amp; AI</a><a href="/work-with-me/" data-f>Work with me</a><a href="/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Alina Otkinska · Pigeon Polly Art Lab · Riga</span><span class="ver" data-ver="109">v109 · 20.11 20:24</span><span><a href="/privacy/">Privacy</a></span></div>
+  <div class="bt"><span>© 2026 Alina Otkinska · Pigeon Polly Art Lab · Riga</span><span class="ver" data-ver="110">v110 · 20.11 20:35</span><span><a href="/privacy/">Privacy</a></span></div>
 </div></footer>
 </body>
 </html>

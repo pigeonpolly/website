@@ -80,19 +80,25 @@
       const cls = ['adv-win', sp ? 'sp' : '', d === 31 ? 'leg' : '', o || pd ? 'open' : '', pd ? 'past' : '', can && !o ? 'ready' : '', d === S.today ? 'today' : '', !can && !o && !pd ? 'lock' : ''].filter(Boolean).join(' ');
       return `<button type="button" class="${cls}" data-d="${d}" aria-label="${d}${sp ? ' — ' + t('special') : ''}"><span class="adv-in"></span><span class="adv-door l"></span><span class="adv-door r"></span><b>${d}</b>${sp ? '<i class="adv-star">★</i>' : ''}${S.plan && plan[d] ? `<em class="adv-n">${plan[d].length}</em>` : ''}</button>`;
     }).join('')}</div>`;
+    // клики — сразу, до картинок и отсчёта: даже если что-то ниже упадёт, окна открываются
+    app.querySelectorAll('.adv-win').forEach(b => { b.onclick = () => {
+      const d = +b.dataset.d;
+      try {
+        if (opened[d]) return show(b, opened[d], false);
+        if (S.plan) return showAdm(b, d, plan[d] || []);
+        if (isPast(d)) return showPast(b, d, past[d] || []);
+        tap(b, d, null);
+      } catch (e) { showLocked(d); }
+    }; });
+
     // открытые окошки: внутри картинка подарка
     // открытые окошки: внутри картинка подарка (прошедшие дни — видны всем)
-    app.querySelectorAll('.adv-win.open').forEach(b => { const d = +b.dataset.d, o = opened[d] || (past[d] ? { kind: past[d][0][0], item: past[d][0][1] } : { buttons: 1 }); b.querySelector('.adv-in').appendChild(prize(o, 40)); if ((past[d] || []).length > 1 || (o.got || []).length > 1) b.classList.add('many'); });
-    if (before && !S.catchUp) countdown(app.querySelector('.adv-cd'));
-    const lg = app.querySelector('[data-login]'); if (lg) lg.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
+    try {
+      app.querySelectorAll('.adv-win.open').forEach(b => { const d = +b.dataset.d, o = opened[d] || (past[d] ? { kind: past[d][0][0], item: past[d][0][1] } : { buttons: 1 }); b.querySelector('.adv-in').appendChild(prize(o, 40)); if ((past[d] || []).length > 1 || (o.got || []).length > 1) b.classList.add('many'); });
+      if (before && !S.catchUp) countdown(app.querySelector('.adv-cd'));
+      const lg = app.querySelector('[data-login]'); if (lg) lg.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
+    } catch (e) { /* декор не должен ломать клики */ }
     if (S.plan) app.querySelectorAll('.adv-win').forEach(b => b.classList.remove('lock')); // админу видно всё
-    app.querySelectorAll('.adv-win').forEach(b => b.onclick = () => {
-      const d = +b.dataset.d;
-      if (opened[d]) return show(b, opened[d], false);
-      if (S.plan) return showAdm(b, d, plan[d] || []);
-      if (isPast(d)) return showPast(b, d, past[d] || []);
-      tap(b, d, null);
-    });
   }
   // /advent/#d=N: прокрутить к окошку N и, если его можно открыть, открыть (один раз)
   function goTo() {
@@ -136,7 +142,7 @@
     const dlg = document.createElement('div'); dlg.className = 'adv-modal'; dlg.setAttribute('role', 'dialog');
     dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button><p class="adv-kick">${d} · ${t('admPreview')}</p><div class="adv-list"></div>${items.length ? '' : `<p>${t('emptyWin')}</p>`}<div class="adv-act"><a class="pill-btn" href="/admin/#advent">${t('toColl')}</a></div></div>`;
     const list = dlg.querySelector('.adv-list');
-    items.forEach(([k, v]) => { const f = document.createElement('figure'); if (B) f.appendChild(B.itemIcon(k, v, 64, S.user ? S.user.id : 2)); const c = document.createElement('figcaption'); c.textContent = B ? B.giftName(k, v, L) : (k + '|' + v); f.appendChild(c); list.appendChild(f); });
+    items.forEach(([k, v]) => { const f = document.createElement('figure'); try { if (B) f.appendChild(B.itemIcon(k, v, 64, S.user ? S.user.id : 2)); } catch (e) { /* без иконки */ } const c = document.createElement('figcaption'); let nm = k + '|' + v; try { if (B) nm = B.giftName(k, v, L); } catch (e) { /* без имени */ } c.textContent = nm; f.appendChild(c); list.appendChild(f); });
     const close = () => dlg.remove();
     dlg.querySelector('.adv-x').onclick = close; dlg.onclick = e => { if (e.target === dlg) close(); };
     document.body.appendChild(dlg); dlg.querySelector('.adv-x').focus();

@@ -1,4 +1,4 @@
-<section class="hero"><div class="w">
+﻿<section class="hero"><div class="w">
   <span class="pill">Watercolour &amp; ink · free lessons</span>
   <span class="sea" data-sv="tag">autumn edition</span>
   <h1>Paint small, <em>joyful<svg viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M5 20 C 60 6, 120 28, 180 14 S 270 10, 295 18"/></svg></em> things</h1>
@@ -36,7 +36,7 @@
 </style>
 
 <script>/* ссылка на адвент видна до 1 января включительно, потом прячется */
-(function () { var b = document.getElementById('advpromo'); if (!b) return; var n = new Date(), m = n.getMonth(), d = n.getDate(); if (!(m >= 10 || (m === 0 && d === 1))) b.remove(); })();</script>
+(function () { var a = document.getElementById('advpromo'), c = document.querySelector('.hero .ctas'); if (!a) return; var n = new Date(), m = n.getMonth(), d = n.getDate(); var on = m === 10 || m === 11 || (m === 0 && d <= 10); if (c) c.style.display = on ? 'none' : ''; a.style.display = on ? '' : 'none'; })();</script>
 
 <section class="fl" id="lessons"><div class="w">
   <div><span class="hand">hi! let’s paint something small ✿</span>
@@ -87,4 +87,5 @@
     <button type="button" class="cv" aria-label="Open the folder"><span class="f"><span class="clbl">THE LAB</span><span class="stp">FOR CURIOUS BIRDS ONLY</span><span class="hand">psst… open me →</span><span class="tie"></span></span><span class="b"></span></button>
   </div>
 </div></section>
+
 
