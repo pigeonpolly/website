@@ -1,0 +1,295 @@
+/* ==========================================================================
+   A1 English · Template Pack — Swiss minimal + kaķis Oskars
+   Viena tēmas krāsa: --accent (iestata <html style="--accent:#...">).
+   Fonti: Grandstander (virsraksti, visi LV burti), Inter (teksts), Caveat (piezīmes).
+   ========================================================================== */
+@font-face{font-family:"Grandstander";src:url(fonts/Grandstander-700.ttf) format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Grandstander";src:url(fonts/Grandstander-900.ttf) format("truetype");font-weight:900;font-display:swap}
+@font-face{font-family:"Inter";src:url(fonts/Inter-400.ttf) format("truetype");font-weight:400;font-display:swap}
+@font-face{font-family:"Inter";src:url(fonts/Inter-600.ttf) format("truetype");font-weight:600;font-display:swap}
+@font-face{font-family:"Inter";src:url(fonts/Inter-700.ttf) format("truetype");font-weight:700;font-display:swap}
+@font-face{font-family:"Caveat";src:url(fonts/Caveat-700.ttf) format("truetype");font-weight:700;font-display:swap}
+
+:root{
+  --accent:#FF5A36;
+  --accent-soft:color-mix(in srgb,var(--accent) 12%,#fff);
+  --accent-ink:color-mix(in srgb,var(--accent) 70%,#000);
+  --ink:#111;--paper:#fff;--muted:#666;--line:#111;--hair:#d9d9d9;
+  --f-display:"Grandstander","Comic Sans MS",system-ui,sans-serif;
+  --f-text:"Inter","Helvetica Neue",Arial,sans-serif;
+  --f-hand:"Caveat","Segoe Print",cursive;
+  --s1:4px;--s2:8px;--s3:16px;--s4:24px;--s5:40px;--s6:64px;--s7:96px;
+  --r:2px;
+  color-scheme:light;
+}
+*,*::before,*::after{box-sizing:border-box}
+html{-webkit-text-size-adjust:100%;print-color-adjust:exact;-webkit-print-color-adjust:exact}
+body{margin:0;background:var(--paper);color:var(--ink);font:400 16px/1.6 var(--f-text);font-feature-settings:"ss01","cv11";hyphens:manual}
+img,svg{max-width:100%;display:block}
+a{color:inherit;text-decoration-thickness:1px;text-underline-offset:3px}
+h1,h2,h3,h4{margin:0;line-height:1.1;letter-spacing:-.01em;text-wrap:balance}
+p{margin:0 0 var(--s3);text-wrap:pretty}
+.display{font-family:var(--f-display);font-weight:900;letter-spacing:-.02em}
+.kicker{font:600 11px/1.3 var(--f-text);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.hand{font-family:var(--f-hand);font-weight:700;font-size:1.35em;line-height:1.1;color:var(--accent-ink)}
+.muted{color:var(--muted)}
+.mark{background:linear-gradient(transparent 58%,var(--accent-soft) 58%);padding:0 .1em}
+.acc{color:var(--accent-ink)}
+.en{font-weight:600}
+.lv{color:var(--muted)}
+.sr{position:absolute;width:1px;height:1px;overflow:hidden;clip:rect(0 0 0 0)}
+
+/* ---------- Dokuments (A4) ---------- */
+.doc{max-width:860px;margin:0 auto;padding:var(--s5) var(--s4) var(--s7)}
+.doc-head{display:flex;justify-content:space-between;align-items:baseline;gap:var(--s3);border-bottom:1px solid var(--line);padding-bottom:var(--s2);margin-bottom:var(--s5)}
+.doc-head .kicker:last-child{color:var(--ink)}
+.title-block{display:grid;grid-template-columns:1fr auto;gap:var(--s4);align-items:end;margin-bottom:var(--s5)}
+.title-block h1{font-family:var(--f-display);font-weight:900;font-size:clamp(40px,7vw,68px);line-height:.95}
+.title-block .sub{margin-top:var(--s3);font-size:18px;color:var(--muted);max-width:52ch}
+.title-block .oscar{width:150px}
+.badge-lvl{display:inline-flex;align-items:center;gap:var(--s2);margin-bottom:var(--s3)}
+.chip{display:inline-block;border:1px solid var(--line);border-radius:99px;padding:2px 10px;font:600 12px/1.6 var(--f-text);letter-spacing:.04em}
+.chip.fill{background:var(--accent);border-color:var(--accent);color:#fff}
+.section{margin-top:var(--s6)}
+.section>h2{display:flex;align-items:center;gap:var(--s3);font-family:var(--f-display);font-weight:900;font-size:30px;margin-bottom:var(--s4)}
+.section>.lead{color:var(--muted);margin-top:calc(-1 * var(--s3));margin-bottom:var(--s4)}
+.num{flex:none;display:inline-grid;place-items:center;width:34px;height:34px;border-radius:50%;background:var(--ink);color:#fff;font:700 14px/1 var(--f-text)}
+.num.acc{background:var(--accent)}
+.rule{border:0;border-top:1px solid var(--line);margin:var(--s5) 0}
+.grid{display:grid;gap:var(--s3)}
+.g2{grid-template-columns:repeat(2,minmax(0,1fr))}
+.g3{grid-template-columns:repeat(3,minmax(0,1fr))}
+.card{border:1px solid var(--line);border-radius:var(--r);padding:var(--s3) var(--s4)}
+.card.soft{background:var(--accent-soft);border-color:transparent}
+.card h3{font-size:17px;margin-bottom:var(--s2)}
+.oscar{color:var(--ink)}
+.oscar svg{width:100%;height:auto}
+.note{display:grid;grid-template-columns:72px 1fr;gap:var(--s3);align-items:center;border-left:3px solid var(--accent);padding:var(--s2) 0 var(--s2) var(--s3);margin:var(--s4) 0}
+.note p{margin:0}
+
+/* tabula (likumi, vārdi) */
+.tbl{width:100%;border-collapse:collapse;font-size:15px}
+.tbl th,.tbl td{border-top:1px solid var(--line);padding:10px 12px 10px 0;text-align:left;vertical-align:top}
+.tbl tr:last-child td{border-bottom:1px solid var(--line)}
+.tbl th{font:600 11px/1.3 var(--f-text);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);border-top:0;padding-bottom:6px}
+.tbl td.k{font-weight:700}
+
+/* students */
+.student{display:grid;grid-template-columns:2fr 1fr;gap:var(--s4);margin-bottom:var(--s5)}
+.field{display:flex;flex-direction:column;gap:2px}
+.field label{font:600 11px/1.3 var(--f-text);letter-spacing:.12em;text-transform:uppercase;color:var(--muted)}
+
+/* ievades lauki */
+input[type=text],input[type=date],select,textarea{font:inherit;color:var(--ink);background:transparent;border:0;border-bottom:1px solid var(--line);border-radius:0;padding:4px 2px;outline:none}
+input[type=text]:focus,input[type=date]:focus,select:focus,textarea:focus{border-color:var(--accent);box-shadow:0 1px 0 var(--accent)}
+input.gap{width:9ch;text-align:center;font-weight:600;color:var(--accent-ink)}
+input.gap.w{width:16ch}
+select{appearance:none;-webkit-appearance:none;padding-right:20px;background:linear-gradient(45deg,transparent 50%,var(--ink) 50%) right 6px top 55%/5px 5px no-repeat,linear-gradient(-45deg,transparent 50%,var(--ink) 50%) right 1px top 55%/5px 5px no-repeat;font-weight:600;color:var(--accent-ink)}
+textarea{width:100%;min-height:8.5em;resize:vertical;border:1px solid var(--line);padding:8px 12px;line-height:2;background:repeating-linear-gradient(transparent 0 calc(2em - 1px),var(--hair) calc(2em - 1px) 2em);background-origin:content-box}
+.printval{display:none;white-space:pre-wrap}
+
+/* uzdevumi */
+.ex{border-top:1px solid var(--line);padding-top:var(--s4);margin-top:var(--s5)}
+.ex-h{display:flex;gap:var(--s3);align-items:flex-start;margin-bottom:var(--s3)}
+.ex-h h3{font-size:20px;line-height:1.25}
+.ex-h .instr{color:var(--muted);font-size:14px;margin-top:2px}
+.ex-h .pts{margin-left:auto;flex:none}
+.items{list-style:none;margin:0;padding:0;counter-reset:it}
+.items>li{counter-increment:it;display:grid;grid-template-columns:28px 1fr;gap:var(--s2);padding:10px 0;border-bottom:1px solid var(--hair);align-items:baseline}
+.items>li::before{content:counter(it) ".";font-weight:600;color:var(--muted);font-size:14px}
+.items>li:last-child{border-bottom:0}
+.match{display:grid;grid-template-columns:1fr auto;gap:var(--s2) var(--s4);align-items:center}
+.bank{display:flex;flex-wrap:wrap;gap:var(--s2);margin-bottom:var(--s3)}
+.bank span{border:1px dashed var(--line);padding:2px 10px;border-radius:99px;font-size:14px}
+.words{font-family:var(--f-hand);font-size:22px;color:var(--muted)}
+
+/* atbildes, detaļas */
+details{border:1px solid var(--line);border-radius:var(--r);margin:var(--s2) 0}
+details>summary{cursor:pointer;list-style:none;padding:10px 14px;font-weight:600;display:flex;gap:var(--s2);align-items:center}
+details>summary::-webkit-details-marker{display:none}
+details>summary::after{content:"+";margin-left:auto;font:400 22px/1 var(--f-text)}
+details[open]>summary::after{content:"–"}
+details[open]>summary{border-bottom:1px solid var(--hair)}
+details>.body{padding:12px 14px}
+details.ans{border-style:dashed}
+details.ans>summary{font-weight:500;color:var(--muted);font-size:14px}
+
+/* tests */
+.q{border:1px solid var(--line);border-radius:var(--r);padding:var(--s3) var(--s4);margin-bottom:var(--s3)}
+.q .qt{font-weight:600;margin-bottom:var(--s2)}
+.opts{display:flex;flex-wrap:wrap;gap:var(--s2)}
+.opts button{font:inherit;border:1px solid var(--line);background:#fff;border-radius:99px;padding:4px 14px;cursor:pointer}
+.opts button:hover{background:var(--accent-soft)}
+.opts button.ok{background:var(--ink);color:#fff;border-color:var(--ink)}
+.opts button.no{text-decoration:line-through;color:var(--muted);border-color:var(--hair)}
+.q .fb{min-height:1.5em;font-size:14px;margin-top:var(--s2)}
+
+/* kļūdu detektīvs */
+.detective .row{display:grid;grid-template-columns:1fr 1fr;gap:var(--s3);padding:12px 0;border-bottom:1px solid var(--hair)}
+.wrong{text-decoration:line-through;text-decoration-color:var(--accent);text-decoration-thickness:2px}
+.right{font-weight:600}
+.right::before{content:"✓ ";color:var(--accent-ink)}
+
+/* fakti, video */
+.fact{display:grid;grid-template-columns:110px 1fr;gap:var(--s4);align-items:center;border:1px solid var(--line);border-radius:var(--r);padding:var(--s3) var(--s4)}
+.fact h3{font-size:18px;margin-bottom:6px}
+.fact p{margin:0;font-size:15px}
+.video{border:1px solid var(--line);border-radius:var(--r);overflow:hidden}
+.video .frame{position:relative;aspect-ratio:16/9;background:var(--accent-soft)}
+.video iframe{position:absolute;inset:0;width:100%;height:100%;border:0}
+.video .ph{position:absolute;inset:0;display:grid;place-items:center;text-align:center;padding:var(--s4)}
+.video .cap{padding:var(--s3) var(--s4)}
+.video .cap h3{font-size:16px;margin-bottom:4px}
+.video .cap p{margin:0;font-size:14px;color:var(--muted)}
+
+/* biežākās kļūdas */
+.mist{display:grid;grid-template-columns:1fr 1fr;gap:0;border:1px solid var(--line);border-radius:var(--r);margin-bottom:var(--s3)}
+.mist>div{padding:var(--s3) var(--s4)}
+.mist>div+div{border-left:1px solid var(--line)}
+.mist .why{grid-column:1/-1;border-top:1px solid var(--line);border-left:0!important;font-size:14px;background:var(--accent-soft)}
+.mist .lab{font:600 11px/1.3 var(--f-text);letter-spacing:.12em;text-transform:uppercase;color:var(--muted);margin-bottom:4px}
+.remind{border:1px solid var(--line);border-radius:var(--r);padding:var(--s3) var(--s4);display:grid;grid-template-columns:90px 1fr;gap:var(--s4);align-items:center}
+.remind ul{margin:0;padding-left:1.1em}
+
+/* laika josla (metodika) */
+.timeline .tbl td:first-child{white-space:nowrap;font-weight:700;width:90px}
+
+/* pogas */
+.bar{display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s5) 0}
+.btn{font:600 14px/1 var(--f-text);border:1px solid var(--ink);background:var(--ink);color:#fff;border-radius:99px;padding:12px 20px;cursor:pointer;text-decoration:none;display:inline-flex;gap:8px;align-items:center}
+.btn.ghost{background:#fff;color:var(--ink)}
+.btn:hover{background:var(--accent);border-color:var(--accent);color:#fff}
+.foot{margin-top:var(--s7);padding-top:var(--s2);border-top:1px solid var(--line);display:flex;justify-content:space-between;gap:var(--s3);font-size:12px;color:var(--muted)}
+
+/* rādītājs (index) */
+.packlist{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:var(--s3)}
+.packlist a{display:block;border:1px solid var(--line);border-radius:var(--r);padding:var(--s4);text-decoration:none;min-height:150px;position:relative}
+.packlist a:hover{background:var(--accent-soft)}
+.packlist .t{font-family:var(--f-display);font-weight:900;font-size:22px;margin:var(--s2) 0 6px}
+.packlist .d{font-size:14px;color:var(--muted)}
+.packlist .f{position:absolute;right:16px;top:16px;font-size:11px}
+
+/* dekori */
+.deco{position:absolute;pointer-events:none;color:var(--ink)}
+
+/* ---------- Prezentācija (16:9) ---------- */
+.deck-body{background:#f3f3f1}
+.deck{display:flex;flex-direction:column;gap:24px;align-items:center;padding:24px 16px 80px}
+.slide{position:relative;width:min(100%,1280px);aspect-ratio:16/9;background:#fff;border:1px solid var(--line);overflow:hidden;container-type:inline-size;font-size:1.6cqw;line-height:1.45}
+.slide .in{position:absolute;inset:6cqw 7cqw 5.5cqw}
+.slide .sh{position:absolute;left:7cqw;right:7cqw;top:2.4cqw;display:flex;justify-content:space-between;font:600 .62em/1 var(--f-text);letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.slide .pg{position:absolute;right:3cqw;bottom:2.2cqw;font:600 .62em/1 var(--f-text);color:var(--muted)}
+.slide .bar-acc{position:absolute;left:0;bottom:0;height:.5cqw;background:var(--accent)}
+.slide h1{font-family:var(--f-display);font-weight:900;font-size:7.6em;line-height:.92;letter-spacing:-.03em}
+.slide h2{font-family:var(--f-display);font-weight:900;font-size:3.3em;line-height:1;margin-bottom:.6em}
+.slide h3{font-size:1.25em;margin-bottom:.3em}
+.slide p,.slide li{font-size:1.15em}
+.slide ul{margin:0;padding-left:1.1em}
+.slide li+li{margin-top:.35em}
+.slide .oscar{position:absolute}
+.slide .big{font-size:2.2em;line-height:1.25;font-weight:600}
+.slide .hand{font-size:1.9em}
+.slide .lv{font-size:.95em}
+/* cover */
+.s-cover .in{display:grid;grid-template-columns:1.25fr 1fr;align-items:center;gap:3cqw}
+.s-cover .meta{margin-top:2.4em;font-size:.95em}
+.s-cover .meta b{display:block}
+/* section */
+.s-section{background:var(--ink);color:#fff}
+.s-section .sh,.s-section .pg{color:#bbb}
+.s-section .in{display:flex;flex-direction:column;justify-content:center}
+.s-section .n{font:900 10em/1 var(--f-display);color:var(--accent);margin-bottom:.1em}
+.s-section h2{font-size:4.6em;margin:0}
+.s-section .oscar svg *[fill="#111"]{fill:#fff}
+/* agenda */
+.agenda{list-style:none;padding:0;margin:0;display:grid;grid-template-columns:1fr 1fr;gap:1em 3em;counter-reset:a}
+.agenda li{counter-increment:a;display:flex;gap:.8em;align-items:center;font-size:1.3em!important;margin:0!important}
+.agenda li::before{content:counter(a,decimal-leading-zero);display:inline-grid;place-items:center;width:2.2em;height:2.2em;border-radius:50%;background:var(--ink);color:#fff;font:700 .7em/1 var(--f-text);flex:none}
+/* split */
+.split{display:grid;grid-template-columns:1fr 1fr;gap:4cqw;height:100%}
+.split.wide{grid-template-columns:1.4fr 1fr}
+.boxed{border:1px solid var(--line);padding:1.2em 1.4em}
+/* rule table on slide */
+.slide .tbl{font-size:1.25em}
+.slide .tbl th{font-size:.55em}
+.slide .tbl td{padding:.45em .8em .45em 0}
+/* examples */
+.exl{list-style:none;padding:0;margin:0}
+.exl li{display:grid;grid-template-columns:1fr 1fr;gap:2em;padding:.55em 0;border-top:1px solid var(--line);font-size:1.3em!important;margin:0!important}
+.exl li:last-child{border-bottom:1px solid var(--line)}
+/* vocab cards */
+.vgrid{display:grid;grid-template-columns:repeat(var(--cols,4),1fr);gap:1em}
+.vcard{border:1px solid var(--line);padding:1em;min-height:7em;display:flex;flex-direction:column;justify-content:space-between}
+.vcard .w{font:900 1.9em/1.05 var(--f-display)}
+.vcard .ipa{font-size:.85em;color:var(--muted)}
+.vcard .t{font-size:1em;border-top:1px solid var(--hair);padding-top:.4em;margin-top:.6em}
+/* quiz slide */
+.qopts{display:grid;grid-template-columns:repeat(2,1fr);gap:1em;margin-top:1.4em}
+.qopts div{border:1px solid var(--line);padding:.7em 1em;font-size:1.4em;font-weight:600;display:flex;gap:.8em;align-items:center}
+.qopts div b{display:inline-grid;place-items:center;width:1.6em;height:1.6em;border-radius:50%;border:1px solid var(--line);font-size:.7em}
+.slide.revealed .qopts div.ok{background:var(--accent);border-color:var(--accent);color:#fff}
+.slide.revealed .qopts div.ok b{border-color:#fff}
+/* task */
+.timer{display:inline-flex;gap:.5em;align-items:center;border:1px solid var(--line);border-radius:99px;padding:.3em 1em;font-weight:700}
+.steps{list-style:none;padding:0;margin:0;counter-reset:s}
+.steps li{counter-increment:s;display:grid;grid-template-columns:2.4em 1fr;gap:.6em;align-items:start;font-size:1.25em!important;margin:0 0 .7em!important}
+.steps li::before{content:counter(s,decimal-leading-zero);display:inline-grid;place-items:center;width:2em;height:2em;border-radius:50%;background:var(--accent);color:#fff;font:700 .7em/1 var(--f-text)}
+/* story */
+.story{display:grid;grid-template-columns:1fr 1.3fr;gap:4cqw;align-items:center;height:100%}
+.bubble{border:1px solid var(--line);border-radius:1.2em;padding:1.2em 1.4em;position:relative;font-size:1.25em}
+.bubble::before{content:"";position:absolute;left:-.75em;top:2em;width:1.4em;height:1.4em;background:#fff;border-left:1px solid var(--line);border-bottom:1px solid var(--line);transform:rotate(45deg)}
+/* thanks */
+.s-thanks .in{display:grid;grid-template-columns:1.2fr 1fr;align-items:center}
+.s-thanks h1{font-size:9em}
+
+/* prezentācijas vadība */
+.deck-ui{position:fixed;left:50%;bottom:16px;transform:translateX(-50%);display:flex;gap:8px;background:#fff;border:1px solid var(--line);border-radius:99px;padding:6px;z-index:5}
+.deck-ui button{font:600 13px/1 var(--f-text);border:0;background:none;padding:8px 12px;border-radius:99px;cursor:pointer}
+.deck-ui button:hover{background:var(--accent-soft)}
+body.present{background:#000;overflow:hidden}
+body.present .deck{padding:0;height:100vh;justify-content:center}
+body.present .slide{display:none;width:min(100vw,177.78vh);border:0}
+body.present .slide.cur{display:block}
+body.present .deck-ui{opacity:0;transition:opacity .2s}
+body.present .deck-ui:hover{opacity:1}
+.speaker{display:none}
+
+/* ---------- Telefons ---------- */
+@media (max-width:640px){
+  .doc{padding:var(--s4) 16px var(--s6)}
+  .title-block{grid-template-columns:1fr}
+  .title-block .oscar{width:110px;order:-1}
+  .g2,.g3,.student,.detective .row,.mist,.fact,.remind,.note{grid-template-columns:1fr}
+  .mist>div+div{border-left:0;border-top:1px solid var(--line)}
+  .fact .oscar,.remind .oscar{width:90px}
+  .section>h2{font-size:24px}
+  .deck{padding:12px 8px 80px;gap:12px}
+}
+
+/* ---------- Druka / PDF ---------- */
+@page{size:A4;margin:16mm 16mm 18mm}
+@page deck{size:297mm 167.06mm;margin:0}
+@media print{
+  body{font-size:10.5pt;background:#fff}
+  .no-print,.bar,.deck-ui{display:none!important}
+  .doc{max-width:none;padding:0}
+  .section,.ex,.q,.fact,.mist,.video,.card,.remind{break-inside:avoid}
+  h2,h3{break-after:avoid}
+  textarea{display:none}
+  .printval{display:block;border:1px solid var(--line);padding:8px 12px;min-height:6em;line-height:2;background:repeating-linear-gradient(transparent 0 calc(2em - 1px),var(--hair) calc(2em - 1px) 2em)}
+  details{border-style:solid}
+  details:not(.ans)>.body{display:block}
+  .video .frame{display:none}
+  .opts button{border-color:var(--hair)}
+  a[href^="http"]::after{content:" (" attr(href) ")";font-size:8pt;color:var(--muted);word-break:break-all}
+  .deck-body{background:#fff}
+  .deck-body .deck{display:block;padding:0}
+  .deck-body .slide{page:deck;width:297mm;height:167.06mm;aspect-ratio:auto;border:0;break-after:page;font-size:4.75mm}
+  .deck-body .slide .in{inset:17.8mm 20.8mm 16.3mm}
+  .deck-body .slide .sh{top:7mm;left:20.8mm;right:20.8mm}
+  body.present .slide{display:block}
+}
+/* atbilžu režīms (master PDF): rāda atbildes */
+.show-ans details.ans>.body{display:block}
+.show-ans details.ans{border-color:var(--accent)}
+.key{color:var(--accent-ink);font-weight:700}
