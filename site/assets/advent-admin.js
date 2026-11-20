@@ -69,11 +69,11 @@
           var f = fileOf(p.item) || {};
           it.className = 'fl-adv-it fl-adv-file'; it.title = (f.n || '') + ((f.c && f.c.ru) ? ' · ' + f.c.ru : '');
           it.appendChild(fthumb(f, 44));
-          x.onclick = function () { var done = delFile(n, p.item); if (done) done.then(function () { draw(); }).catch(function () {}); };
+          x.onclick = function () { var done = delFile(p.day, p.item); if (done) done.then(function () { draw(); }).catch(function () {}); };
         } else {
           it.className = 'fl-adv-it'; it.title = gname(p.kind, p.item);
           it.appendChild(window.PPBirds.itemIcon(p.kind, p.item, 44, id));
-          x.onclick = function () { advSet(n, p.kind, p.item, false).then(function () { draw(); }).catch(function () {}); };
+          x.onclick = function () { advSet(p.day, p.kind, p.item, false).then(function () { draw(); }).catch(function () {}); };
         }
         x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', '✕ ' + it.title);
         it.appendChild(x); row.appendChild(it);
