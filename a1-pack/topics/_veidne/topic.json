@@ -1,0 +1,48 @@
+{
+  "meta": {
+    "slug": "veidne", "title_en": "[Topic title]", "title_lv": "[Tēmas nosaukums latviski]",
+    "course": "English A1", "level": "A1", "lesson": "[Nr.]", "minutes": 45, "accent": "#FF5A36", "teacher": "",
+    "materials": ["slides", "homework", "selfcheck", "answers", "guide", "reserve", "mistakes"],
+    "sources": [
+      {"name": "British Council LearnEnglish", "url": "https://learnenglish.britishcouncil.org/"},
+      {"name": "Cambridge English", "url": "https://www.cambridgeenglish.org/learning-english/"},
+      {"name": "BBC Learning English", "url": "https://www.bbc.co.uk/learningenglish/"}
+    ]
+  },
+  "slides": [
+    {"type": "cover", "title": "[Topic]", "subtitle": "[apakšvirsraksts]", "text": "Nodarbība [Nr.] · [min] min", "notes": "[Piezīmes skolotājam]"},
+    {"type": "agenda", "title": "Today", "items": ["[Punkts 1]", "[Punkts 2]", "[Punkts 3]", "[Punkts 4]"]},
+    {"type": "story", "title": "[Oskara kļūda]", "pose": "oops", "text": ["[Neveikla situācija ar Oskaru, kurā redzama kļūda.]"], "lesson": "[Ko atcerēties]"},
+    {"type": "vocab", "title": "[Vocabulary]", "items": [{"en": "[word]", "lv": "[tulkojums]", "ipa": "/…/"}, {"en": "[word]", "lv": "[tulkojums]"}, {"en": "[word]", "lv": "[tulkojums]"}, {"en": "[word]", "lv": "[tulkojums]"}]},
+    {"type": "rule", "title": "[Grammar rule]", "pose": "teacher", "head": ["[Kolonna]", "[Kolonna]", "[Kolonna]"], "rows": [["[…]", "[…]", "[…]"], ["[…]", "[…]", "[…]"]], "note": "[Atgādne rokrakstā]"},
+    {"type": "examples", "title": "Examples", "items": [{"en": "[English sentence]", "lv": "[Tulkojums]"}, {"en": "[English sentence]", "lv": "[Tulkojums]"}, {"en": "[English sentence]", "lv": "[Tulkojums]"}]},
+    {"type": "text", "title": "[Virsraksts]", "body": "[Teksts]", "bullets": ["[Punkts]", "[Punkts]"], "note": "[Piezīme]", "pose": "idea"},
+    {"type": "quiz", "question": "[Sentence with ___]", "options": ["[A]", "[B]", "[C]"], "answer": 0, "lv": "[Tulkojums]"},
+    {"type": "section", "num": "02", "title": "[Daļas nosaukums]", "text": "[latviski]"},
+    {"type": "compare", "title": "Latviski vs English", "left": {"title": "Latviski", "items": ["[…]", "[…]"]}, "right": {"title": "English", "items": ["[…]", "[…]"]}, "note": "[Piezīme]"},
+    {"type": "task", "title": "[Aktivitāte]", "minutes": 5, "mode": "Pāros", "steps": ["[Solis]", "[Solis]", "[Solis]"], "box": "[Frāzes / kartīte]"},
+    {"type": "big", "kicker": "Oskars saka", "text": "[Viena doma lieliem burtiem]", "lv": "[Tulkojums]", "pose": "hello"},
+    {"type": "thanks", "title": "Thank you!", "text": "[Mājasdarbs]"}
+  ],
+  "homework": {"intro": "[Ievads]", "reminder": ["[Kļūda] → **[Pareizi]**", "[Kļūda] → **[Pareizi]**"], "exercises": [
+    {"type": "gap", "title": "[Uzdevums 1]", "instruction": "[Instrukcija]", "points": 5, "items": [{"text": "[Sentence ___ .]", "answer": "[…]"}, {"text": "[Sentence ___ .]", "answer": "[…]"}, {"text": "[Sentence ___ .]", "answer": "[…]"}]},
+    {"type": "choice", "title": "[Uzdevums 2]", "instruction": "[Instrukcija]", "points": 5, "items": [{"text": "[Sentence ___ .]", "options": ["[a]", "[b]", "[c]"], "answer": "[a]"}, {"text": "[Sentence ___ .]", "options": ["[a]", "[b]", "[c]"], "answer": "[b]"}]},
+    {"type": "match", "title": "[Uzdevums 3]", "instruction": "[Instrukcija]", "points": 4, "items": [{"left": "[…]", "answer": "[…]"}, {"left": "[…]", "answer": "[… ]"}]},
+    {"type": "order", "title": "[Uzdevums 4]", "instruction": "[Instrukcija]", "points": 4, "items": [{"words": "[a / b / c]", "answer": "[…]"}, {"words": "[a / b / c]", "answer": "[…]"}]},
+    {"type": "write", "title": "[Uzdevums 5]", "instruction": "[Instrukcija]", "points": 5, "prompt": "[Ko uzrakstīt]", "lines": 6, "checklist": ["[…]", "[…]"], "model": ["[Paraugs]"]}
+  ]},
+  "selfcheck": {"intro": "[Ievads]",
+    "quiz": [{"q": "[Jautājums ___]", "options": ["[a]", "[b]", "[c]"], "answer": "[a]", "why": "[Paskaidrojums]"}, {"q": "[Jautājums ___]", "options": ["[a]", "[b]", "[c]"], "answer": "[b]", "why": "[Paskaidrojums]"}],
+    "detective": [{"wrong": "[Teikums ar kļūdu]", "right": "[Pareizi]", "why": "[Kāpēc]"}, {"wrong": "[Teikums ar kļūdu]", "right": "[Pareizi]", "why": "[Kāpēc]"}, {"wrong": "[Teikums ar kļūdu]", "right": "[Pareizi]", "why": "[Kāpēc]"}, {"wrong": "[Teikums ar kļūdu]", "right": "[Pareizi]", "why": "[Kāpēc]"}],
+    "facts": [{"title": "[Fakts]", "text": "[Pārbaudāms fakts]", "pose": "idea"}, {"title": "[Fakts]", "text": "[Pārbaudāms fakts]", "pose": "confused"}],
+    "videos": [{"title": "[Video nosaukums]", "search": "[meklēšanas vārdi]", "url": "https://www.bbc.co.uk/learningenglish/", "source": "BBC Learning English", "lv": "[Paskaidrojums latviski]"}]},
+  "reserve": [
+    {"title": "[Lomu spēle]", "kind": "roleplay", "minutes": 8, "mode": "Pāros", "instruction": "[Instrukcija]", "roles": [{"role": "[Loma A]", "card": "[Kartīte]"}, {"role": "[Loma B]", "card": "[Kartīte]"}], "useful": ["[Frāze]"]},
+    {"title": "[Mini-vēstule]", "kind": "letter", "minutes": 10, "mode": "Individuāli", "instruction": "[Instrukcija]", "answers": "[Paraugs]"},
+    {"title": "[Atrodi kļūdas]", "kind": "errors", "minutes": 6, "mode": "Pāros", "instruction": "[Instrukcija]", "items": ["[Teikums]", "[Teikums]"], "answers": ["[Pareizi]", "[Pareizi]"]}
+  ],
+  "mistakes": [{"wrong": "[Kļūda]", "right": "[Pareizi]", "why": "[Kāpēc latviešu runātājs tā kļūdās]", "tip": "[Atgādne]"}, {"wrong": "[Kļūda]", "right": "[Pareizi]", "why": "[Kāpēc]"}, {"wrong": "[Kļūda]", "right": "[Pareizi]", "why": "[Kāpēc]"}],
+  "guide": {"aims": ["[Mērķis]"], "outcomes": ["[Can-do A1]"], "grammar": ["[…]"], "vocabulary": ["[…]"],
+    "timeline": [{"min": "0–5", "stage": "[Posms]", "what": "[Ko dara]", "slides": "1–3"}, {"min": "5–45", "stage": "[Posms]", "what": "[Ko dara]", "slides": "4–13"}],
+    "tips": ["[Padoms]"], "differentiation": {"weaker": ["[…]"], "stronger": ["[…]"]}, "assessment": "[Vērtēšana]"}
+}

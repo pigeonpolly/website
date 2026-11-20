@@ -5,3 +5,6 @@ _shots/
 .wrangler/
 tools/pins/shots/_frames/
 tools/pins/shots/_video.html
+
+# A1 Pack: būvējumi (rezultāts — <slug>-pack.zip blakus topic.json)
+a1-pack/topics/*/out/
