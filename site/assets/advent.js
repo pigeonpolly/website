@@ -137,7 +137,7 @@
     const dlg = document.createElement('div'); dlg.className = 'adv-modal'; dlg.setAttribute('role', 'dialog');
     const text = S.month >= 1 && S.month <= 2 ? t('tooLate') : (LATE_CLOSED.includes(d) && d <= (S.claimTo || 0) ? t('missedIt') : t('locked').replace('{d}', d));
     msg(d + ' · ' + text);
-    dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button><p class="adv-kick">${d} December</p><p>${text}</p><div class="adv-act">${S.user ? '' : `<button type="button" class="pill-btn pill-fill" data-lg>${t('signin')}</button>`}</div></div>`;
+    dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button><p class="adv-kick">${d} December</p><p>${text}</p>${S.user ? `<p class="adv-small">@${S.user.nick}</p>` : ''}<div class="adv-act">${S.user ? '' : `<button type="button" class="pill-btn pill-fill" data-lg>${t('signin')}</button>`}</div></div>`;
     const close = () => dlg.remove();
     dlg.querySelector('.adv-x').onclick = close; dlg.onclick = e => { if (e.target === dlg) close(); };
     const lg = dlg.querySelector('[data-lg]'); if (lg) lg.onclick = () => { try { location.hash = '#d=' + d; } catch (e) { /* ок */ } window.PPAccount && window.PPAccount.openSignIn(); };

@@ -2238,7 +2238,7 @@ async function route(req, env, url) {
     return json({ ok: true });
   }
   if (m === 'GET' && p === '/api/advent') {
-    const t = adventNow(req, env), u = await currentUser(req, env), admin = await adminIdentity(u, env); // без PIN: план окон видит только аккаунт Алины
+    const t = adventNow(req, env), u = await currentUser(req, env); const admin = (await adminIdentity(u, env)) || !!(u && String(u.nick || '').toLowerCase() === 'pigeonpolly'); // без PIN: план окон видит аккаунт Алины
     const opened = u ? (await env.DB.prepare('SELECT day, kind, item, buttons, got FROM advent_open WHERE user_id = ? AND year = ?').bind(u.id, t.year).all()).results.map(o => ({ ...o, got: parseJ(o.got, o.kind ? [[o.kind, o.item]] : []) })) : [];
     const all = (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results;
     // прошедшие окошки открыты для всех (и для гостей): в декабре — дни до сегодняшнего, в январе — все; будущее — секрет (целиком видит только админ)
@@ -3112,5 +3112,6 @@ async function route(req, env, url) {
 
   return json({ error: 'not_found' }, 404);
 }
+
 
 
