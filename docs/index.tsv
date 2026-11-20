@@ -4,7 +4,7 @@
 #       sym — имя в коде; doc — раздел docs/*.md.
 # Читать целиком не нужно: grep по нужному виду, или python3 tools/index.py find СЛОВО / where ФАЙЛ.
 # Свежесть: python3 tools/index.py check (перед пушем).
-# файлов 396, страниц 55, маршрутов 215, таблиц 76, ключей meta 68, имён 5470, разделов доков 243
+# файлов 400, страниц 55, маршрутов 215, таблиц 76, ключей meta 68, имён 5511, разделов доков 243
 file	build.py	build.py	0	890 строк, 60 КБ
 file	content/english/a1.js	content/english/a1.js	0	239 строк, 45 КБ
 file	content/english/a2.js	content/english/a2.js	0	229 строк, 46 КБ
@@ -71,9 +71,9 @@ file	docs/history.md	docs/history.md	0	105 строк, 25 КБ
 file	docs/index.md	docs/index.md	0	44 строк, 5 КБ
 file	docs/ink.md	docs/ink.md	0	52 строк, 29 КБ
 file	docs/map.md	docs/map.md	0	341 строк, 69 КБ
-file	docs/palettes.md	docs/palettes.md	0	55 строк, 24 КБ
+file	docs/palettes.md	docs/palettes.md	0	56 строк, 25 КБ
 file	docs/pinterest-dec2026.md	docs/pinterest-dec2026.md	0	55 строк, 4 КБ
-file	docs/plan-status.md	docs/plan-status.md	0	178 строк, 42 КБ
+file	docs/plan-status.md	docs/plan-status.md	0	179 строк, 42 КБ
 file	docs/polly-pet.md	docs/polly-pet.md	0	40 строк, 9 КБ
 file	docs/requests.md	docs/requests.md	0	31 строк, 14 КБ
 file	docs/retired.md	docs/retired.md	0	36 строк, 6 КБ
@@ -88,7 +88,7 @@ file	site/assets/about-desk.js	site/assets/about-desk.js	0	738 строк, 52 К
 file	site/assets/account.js	site/assets/account.js	0	434 строк, 44 КБ
 file	site/assets/admin-v2.css	site/assets/admin-v2.css	0	185 строк, 18 КБ
 file	site/assets/admin.js	site/assets/admin.js	0	1539 строк, 230 КБ
-file	site/assets/advent-admin.js	site/assets/advent-admin.js	0	336 строк, 27 КБ
+file	site/assets/advent-admin.js	site/assets/advent-admin.js	0	241 строк, 20 КБ
 file	site/assets/advent.css	site/assets/advent.css	0	302 строк, 28 КБ
 file	site/assets/advent.js	site/assets/advent.js	0	248 строк, 20 КБ
 file	site/assets/artpill-claude.js	site/assets/artpill-claude.js	0	245 строк, 50 КБ
@@ -118,7 +118,7 @@ file	site/assets/day-card.js	site/assets/day-card.js	0	167 строк, 16 КБ
 file	site/assets/diploma.js	site/assets/diploma.js	0	79 строк, 7 КБ
 file	site/assets/dish-chip.js	site/assets/dish-chip.js	0	50 строк, 5 КБ
 file	site/assets/emoji-art.js	site/assets/emoji-art.js	0	693 строк, 139 КБ
-file	site/assets/extra-palettes.js	site/assets/extra-palettes.js	0	2 строк, 56 КБ · СОБРАН, руками не править
+file	site/assets/extra-palettes.js	site/assets/extra-palettes.js	0	2 строк, 80 КБ · СОБРАН, руками не править
 file	site/assets/feathers.js	site/assets/feathers.js	0	55 строк, 5 КБ
 file	site/assets/flock-list.js	site/assets/flock-list.js	0	104 строк, 8 КБ
 file	site/assets/flock-news.js	site/assets/flock-news.js	0	153 строк, 19 КБ
@@ -168,7 +168,7 @@ file	site/assets/site-edit.js	site/assets/site-edit.js	0	288 строк, 24 КБ
 file	site/assets/site.js	site/assets/site.js	0	265 строк, 16 КБ
 file	site/assets/sketch-wall.js	site/assets/sketch-wall.js	0	955 строк, 121 КБ
 file	site/assets/sketchbook.js	site/assets/sketchbook.js	0	138 строк, 13 КБ
-file	site/assets/style.css	site/assets/style.css	0	5716 строк, 508 КБ
+file	site/assets/style.css	site/assets/style.css	0	5703 строк, 512 КБ
 file	site/assets/tarot-admin.js	site/assets/tarot-admin.js	0	127 строк, 11 КБ
 file	site/assets/titos-bugs.js	site/assets/titos-bugs.js	0	229 строк, 21 КБ
 file	site/assets/titos-sort.js	site/assets/titos-sort.js	0	337 строк, 35 КБ
@@ -293,7 +293,7 @@ file	tools/ornaments/render.js	tools/ornaments/render.js	0	14 строк, 1 КБ
 file	tools/palette_names.py	tools/palette_names.py	0	23 строк, 5 КБ
 file	tools/palette_overrides.py	tools/palette_overrides.py	0	15 строк, 6 КБ
 file	tools/palette_titles.py	tools/palette_titles.py	0	128 строк, 12 КБ
-file	tools/palettes.py	tools/palettes.py	0	120 строк, 7 КБ
+file	tools/palettes.py	tools/palettes.py	0	134 строк, 9 КБ
 file	tools/pins/cal-data.js	tools/pins/cal-data.js	0	67 строк, 8 КБ
 file	tools/pins/cal.js	tools/pins/cal.js	0	230 строк, 22 КБ
 file	tools/pins/cover.js	tools/pins/cover.js	0	54 строк, 5 КБ
@@ -311,6 +311,10 @@ file	tools/pins/pins15-data.js	tools/pins/pins15-data.js	0	228 строк, 43 К
 file	tools/pins/pins16-data.js	tools/pins/pins16-data.js	0	280 строк, 51 КБ
 file	tools/pins/pins16.js	tools/pins/pins16.js	0	163 строк, 19 КБ
 file	tools/pins/pins16_prep.py	tools/pins/pins16_prep.py	0	115 строк, 7 КБ
+file	tools/pins/pins17-data.js	tools/pins/pins17-data.js	0	332 строк, 53 КБ
+file	tools/pins/pins17.js	tools/pins/pins17.js	0	231 строк, 32 КБ
+file	tools/pins/pins17_pal.py	tools/pins/pins17_pal.py	0	26 строк, 2 КБ
+file	tools/pins/pins17_shots.js	tools/pins/pins17_shots.js	0	21 строк, 2 КБ
 file	tools/pins/pins2.js	tools/pins/pins2.js	0	532 строк, 60 КБ
 file	tools/pins/pins3.js	tools/pins/pins3.js	0	189 строк, 17 КБ
 file	tools/pins/pins4.js	tools/pins/pins4.js	0	197 строк, 19 КБ
@@ -1845,22 +1849,21 @@ sym	subscribers	site/assets/admin.js	1494	fn
 sym	backupBox	site/assets/admin.js	1519	const
 sym	wireBackup	site/assets/admin.js	1525	fn
 sym	backup	site/assets/admin.js	1531	fn
-sym	ADV_SP	site/assets/advent-admin.js	38	const
-sym	FILE_MAX	site/assets/advent-admin.js	39	const
-sym	advSet	site/assets/advent-admin.js	40	fn
-sym	fileOf	site/assets/advent-admin.js	45	fn
-sym	extOf	site/assets/advent-admin.js	46	fn
-sym	aday	site/assets/advent-admin.js	47	fn
-sym	gname	site/assets/advent-admin.js	48	fn
-sym	kb	site/assets/advent-admin.js	49	const
-sym	fthumb	site/assets/advent-admin.js	51	fn
-sym	errText	site/assets/advent-admin.js	57	fn
-sym	delFile	site/assets/advent-admin.js	62	fn
-sym	advBoard	site/assets/advent-admin.js	68	fn
-sym	dayState	site/assets/advent-admin.js	103	const
-sym	advDayPick	site/assets/advent-admin.js	104	fn
-sym	advFileEdit	site/assets/advent-admin.js	244	fn
-sym	PPAdventAdmin	site/assets/advent-admin.js	328	win
+sym	ADV_SP	site/assets/advent-admin.js	33	const
+sym	FILE_MAX	site/assets/advent-admin.js	34	const
+sym	advSet	site/assets/advent-admin.js	35	fn
+sym	fileOf	site/assets/advent-admin.js	40	fn
+sym	extOf	site/assets/advent-admin.js	41	fn
+sym	aday	site/assets/advent-admin.js	42	fn
+sym	gname	site/assets/advent-admin.js	43	fn
+sym	kb	site/assets/advent-admin.js	44	const
+sym	fthumb	site/assets/advent-admin.js	46	fn
+sym	errText	site/assets/advent-admin.js	52	fn
+sym	delFile	site/assets/advent-admin.js	57	fn
+sym	advBoard	site/assets/advent-admin.js	63	fn
+sym	dayState	site/assets/advent-admin.js	96	const
+sym	advDayPick	site/assets/advent-admin.js	97	fn
+sym	PPAdventAdmin	site/assets/advent-admin.js	233	win
 sym	app	site/assets/advent.js	3	const
 sym	LATE	site/assets/advent.js	31	const
 sym	HOUSES	site/assets/advent.js	34	const
@@ -4745,6 +4748,48 @@ sym	crop	tools/pins/pins16_prep.py	59	fn
 sym	pals	tools/pins/pins16_prep.py	63	fn
 sym	diff	tools/pins/pins16_prep.py	70	fn
 sym	spec	tools/pins/pins16_prep.py	94	fn
+sym	SITE	tools/pins/pins17-data.js	7	const
+sym	PALS	tools/pins/pins17-data.js	11	const
+sym	DET	tools/pins/pins17-data.js	12	const
+sym	NICE	tools/pins/pins17-data.js	14	const
+sym	nice	tools/pins/pins17-data.js	18	const
+sym	day	tools/pins/pins17-data.js	19	const
+sym	MN	tools/pins/pins17-data.js	20	const
+sym	out	tools/pins/pins17-data.js	21	const
+sym	push	tools/pins/pins17-data.js	22	const
+sym	PL	tools/pins/pins17-data.js	26	const
+sym	PD	tools/pins/pins17-data.js	49	const
+sym	PW	tools/pins/pins17-data.js	66	const
+sym	TW	tools/pins/pins17-data.js	78	const
+sym	OL	tools/pins/pins17-data.js	93	const
+sym	P8	tools/pins/pins17-data.js	165	const
+sym	MOOD	tools/pins/pins17-data.js	166	const
+sym	FMT	tools/pins/pins17-data.js	167	const
+sym	SEAS	tools/pins/pins17-data.js	168	const
+sym	ST	tools/pins/pins17-data.js	183	const
+sym	cap	tools/pins/pins17-data.js	215	const
+sym	PCH	tools/pins/pins17-data.js	225	const
+sym	BG	tools/pins/pins17-data.js	237	const
+sym	ADV	tools/pins/pins17-data.js	263	const
+sym	AL	tools/pins/pins17-data.js	264	const
+sym	fs	tools/pins/pins17.js	5	const
+sym	ROOT	tools/pins/pins17.js	8	const
+sym	PINS	tools/pins/pins17.js	9	const
+sym	esc	tools/pins/pins17.js	11	const
+sym	TH	tools/pins/pins17.js	13	const
+sym	LOGO	tools/pins/pins17.js	27	const
+sym	img	tools/pins/pins17.js	28	const
+sym	lum	tools/pins/pins17.js	29	const
+sym	ink	tools/pins/pins17.js	30	const
+sym	foot	tools/pins/pins17.js	31	const
+sym	CSS	tools/pins/pins17.js	32	const
+sym	snow	tools/pins/pins17.js	60	const
+sym	bow	tools/pins/pins17.js	61	const
+sym	awin	tools/pins/pins17.js	63	const
+sym	sz	tools/pins/pins17.js	207	const
+sym	ROOT	tools/pins/pins17_pal.py	6	const
+sym	path	tools/pins/pins17_shots.js	4	const
+sym	OUT	tools/pins/pins17_shots.js	5	const
 sym	fs	tools/pins/pins2.js	4	const
 sym	ROOT	tools/pins/pins2.js	6	const
 sym	img	tools/pins/pins2.js	7	const
@@ -6449,8 +6494,8 @@ doc	Порядок	docs/pinterest-dec2026.md	48	h2
 doc	Статус плана	docs/plan-status.md	1	h1
 doc	Открыто	docs/plan-status.md	6	h2
 doc	Этапы (готовые — одной строкой)	docs/plan-status.md	20	h2
-doc	Решения Алины	docs/plan-status.md	135	h2
-doc	Допущения (по открытым этапам)	docs/plan-status.md	143	h2
+doc	Решения Алины	docs/plan-status.md	136	h2
+doc	Допущения (по открытым этапам)	docs/plan-status.md	144	h2
 doc	Полли-питомец	docs/polly-pet.md	1	h1
 doc	Кратко	docs/polly-pet.md	3	h2
 doc	Оглавление	docs/polly-pet.md	9	h2

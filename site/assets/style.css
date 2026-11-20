@@ -4592,19 +4592,6 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 .fl-adv-frow { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 12px; background: #fff; box-shadow: inset 0 0 0 1px #E9E6E3; }
 .fl-adv-frow .nm { flex: 1; min-width: 0; font: 600 13px/1.35 'Karla', sans-serif; overflow-wrap: anywhere; }
 .fl-adv-frow > button { flex: none; width: 22px; height: 22px; border: 0; border-radius: 50%; background: #E5484D; color: #fff; font-size: 11px; cursor: pointer; }
-.fl-adv-frow:hover { box-shadow: inset 0 0 0 1.5px #DAD7D5; }
-/* окно файла в кабинете: посмотреть приложенный файл, поправить имя и подпись, заменить файл или картинку */
-.fl-adv-filedlg { width: min(560px, calc(100% - 24px)); }
-.fl-adv-fview { display: flex; align-items: center; gap: 12px; margin: 0 0 12px; padding: 10px; border-radius: 14px; background: #FFFDF8; box-shadow: inset 0 0 0 1px #E9E6E3; }
-.fl-adv-fview .nm { flex: 1; min-width: 0; font: 600 14px/1.45 'Karla', sans-serif; overflow-wrap: anywhere; }
-.fl-adv-fview .nm b { font-size: 15px; }
-.fl-adv-fview .nm small { color: #9F9690; }
-.fl-adv-fview a { color: #C0582F; font: 700 13px 'Karla', sans-serif; text-decoration: none; }
-.fl-adv-replace { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; margin-top: 10px; }
-.fl-adv-drop-x { padding: 9px 14px; border-width: 1.5px; border-radius: 12px; }
-.fl-adv-drop-x b { font-size: 14px; }
-.fl-adv-drop-x small { font-size: 12px; }
-.fl-adv-acts { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
 .fl-adv-it.fl-adv-file .fl-adv-fthumb { box-shadow: 0 1px 3px rgba(0,0,0,.18); }
 
 /* ---------- карточка дня (day-card.js, этап 13 А): открытка со штампами ---------- */
