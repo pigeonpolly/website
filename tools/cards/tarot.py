@@ -39,10 +39,11 @@ def build():
             lines = wrap(txt)
             if len(lines) > MAX_LINES:
                 raise SystemExit('%s/%s: %d строк (макс %d)' % (key, lang, len(lines), MAX_LINES))
-            im = SKINS[skin](name, lines, hat=hat or 'scarf', prop=(prop or None) if skin != 'c' else None, seed=i + 1)
+            im = SKINS[skin](name, lines, hat=hat or 'scarf', prop=(prop or None) if skin != 'c' else None, seed=i + 1, lang=lang)
             im.save(os.path.join(OUT, '%s-%s.png' % (key, lang)), optimize=True)
-    back_c().save(os.path.join(OUT, 'back.png'), optimize=True)
-    print('ok', len(CARDS) * 3 + 1, OUT)
+    for lang in LANGS:
+        back_c(lang).save(os.path.join(OUT, 'back-%s.png' % lang), optimize=True)
+    print('ok', len(CARDS) * 3 + 3, OUT)
 
 
 if __name__ == '__main__':

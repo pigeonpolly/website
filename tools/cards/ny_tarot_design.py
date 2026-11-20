@@ -117,6 +117,11 @@ def inner_line(im, m, col):
     im.paste(Image.new('RGB', (CW, CH), col), (0, 0), ImageChops.subtract(m, small))
 
 
+# надписи на карте по языку
+TITLE = {'ru': 'ПТИЧЬЕ ТАРО', 'en': 'BIRD TAROT', 'lv': 'PUTNU TARO'}
+GREET = {'ru': ('С НОВЫМ', 'ГОДОМ!'), 'en': ('HAPPY', 'NEW YEAR!'), 'lv': ('AR JAUNO', 'GADU!')}
+
+
 def check_width(t, maxw, what=''):
     w = width(t)
     if w > maxw:
@@ -131,7 +136,7 @@ def text_block(d, lines, color, top=TEXT_TOP):
 
 
 # ---------------- A. «Классическое таро» ----------------
-def skin_a(name='КОРМУШКА УДАЧИ', lines=(), hat='scarf', prop=None, seed=1):
+def skin_a(name='КОРМУШКА УДАЧИ', lines=(), hat='scarf', prop=None, seed=1, lang='ru'):
     check_width(name, 140, 'A name')
     im = Image.new('RGB', (CW, CH))
     vgrad(im, (46, 33, 78), (20, 14, 38))
@@ -139,7 +144,7 @@ def skin_a(name='КОРМУШКА УДАЧИ', lines=(), hat='scarf', prop=None,
     stars(d, 70, seed, CH - 10)
     frame(im, GOLD, GOLD_D)
 
-    ctext(d, 80, 12, 'ПТИЧЬЕ ТАРО', GOLD)
+    ctext(d, 80, 12, TITLE[lang], GOLD)
     d.line([(48, 24), (64, 24)], fill=GOLD_D)
     d.line([(96, 24), (112, 24)], fill=GOLD_D)
     diamond(d, 80, 24, GOLD, 1)
@@ -182,7 +187,7 @@ def skin_a(name='КОРМУШКА УДАЧИ', lines=(), hat='scarf', prop=None,
 
 
 # ---------------- B. «Новогодняя открытка» ----------------
-def skin_b(name='СИНИЦА В РУКАХ', lines=(), hat='santa', prop=None, seed=1):
+def skin_b(name='СИНИЦА В РУКАХ', lines=(), hat='santa', prop=None, seed=1, lang='ru'):
     check_width(name, 140, 'B name')
     im = Image.new('RGB', (CW, CH), CREAM)
     d = ImageDraw.Draw(im)
@@ -203,7 +208,7 @@ def skin_b(name='СИНИЦА В РУКАХ', lines=(), hat='santa', prop=None, 
         d.point((x - 1, y + 1), fill=(255, 240, 200))
 
     shadow = (150, 60, 90)
-    for i, (t, y) in enumerate((('С НОВЫМ', 36), ('ГОДОМ!', 54))):
+    for i, (t, y) in enumerate(((GREET[lang][0], 36), (GREET[lang][1], 54))):
         text(d, 80 - width(t, 2) // 2 + 1, y + 1, t, shadow, 2)
         text(d, 80 - width(t, 2) // 2, y, t, BERRY, 2)
 
@@ -243,14 +248,14 @@ def skin_b(name='СИНИЦА В РУКАХ', lines=(), hat='santa', prop=None, 
 
 
 # ---------------- C. «Минимал» ----------------
-def skin_c(name='ПОЛУНОЧНАЯ СОВА', lines=(), hat='beret', prop=None, seed=1):
+def skin_c(name='ПОЛУНОЧНАЯ СОВА', lines=(), hat='beret', prop=None, seed=1, lang='ru'):
     check_width(name, 140, 'C name')
     im = Image.new('RGB', (CW, CH))
     vgrad(im, (24, 74, 68), (11, 42, 42))
     d = ImageDraw.Draw(im)
     d.rectangle((2, 2, CW - 3, CH - 3), outline=GOLD)
 
-    ctext(d, 80, 12, 'ПТИЧЬЕ ТАРО', GOLD, 1, 2)
+    ctext(d, 80, 12, TITLE[lang], GOLD, 1, 2)
     ctext(d, 80, 26, name, CREAM)
 
     d.ellipse((32, 40, 128, 136), outline=GOLD_D)

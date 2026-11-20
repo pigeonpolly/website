@@ -6,13 +6,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 sys.path.insert(0, os.path.dirname(HERE))
 from ny_tarot_design import (CW, CH, GOLD, GOLD_D, diamond, sparkle, stars, vgrad,  # noqa: E402
-                             ctext)
+                             ctext, TITLE)
 from pixfont import width  # noqa: E402
 
 OUT = os.path.join(HERE, '..', '..', 'site', 'images', 'cards', 'tarot-2027')
 
 
-def back_c():
+def back_c(lang='ru'):
     im = Image.new('RGB', (CW, CH))
     vgrad(im, (30, 22, 50), (58, 34, 74))
     d = ImageDraw.Draw(im)
@@ -36,7 +36,7 @@ def back_c():
             a = math.radians(ang + r)
             d.point((int(cx + math.cos(a) * r), int(cy + math.sin(a) * r)), fill=(226, 214, 176))
 
-    ctext(d, 80, 206, 'ПТИЧЬЕ ТАРО', GOLD)
+    ctext(d, 80, 206, TITLE[lang], GOLD)
     ctext(d, 80, 222, '2027', GOLD_D)
     sparkle(d, 80, 40, 7, GOLD_D)
     return im
@@ -44,6 +44,7 @@ def back_c():
 
 if __name__ == '__main__':
     os.makedirs(OUT, exist_ok=True)
-    back_c().save(os.path.join(OUT, 'back.png'), optimize=True)
+    for lang in TITLE:
+        back_c(lang).save(os.path.join(OUT, 'back-%s.png' % lang), optimize=True)
     back_c().save(os.path.join(OUT, '..', '..', '..', '..', '_held', 'ny-tarot', 'back.png'))
     print('ok')
