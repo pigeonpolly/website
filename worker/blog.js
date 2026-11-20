@@ -868,7 +868,24 @@ export async function rehostOne(env, src, moved) {
   const fresh = await patreonFresh(src);
   return (moved[src] = fresh ? await rehostFetch(env, fresh) : null);
 }
-async function rehostFetch(env, src) {
+// ширина картинки по заголовку файла (JPEG/PNG/GIF/WebP); 0 — не поняли
+export function imgWidth(buf) {
+  const b = new Uint8Array(buf), u16 = i => (b[i] << 8) | b[i + 1], l16 = i => b[i] | (b[i + 1] << 8);
+  if (b[0] === 0x89 && b[1] === 0x50) return (b[16] << 24 | b[17] << 16 | b[18] << 8 | b[19]) >>> 0;
+  if (b[0] === 0x47 && b[1] === 0x49) return l16(6);
+  if (b[0] === 0x52 && b[8] === 0x57) { const t = String.fromCharCode(b[12], b[13], b[14], b[15]);
+    if (t === 'VP8 ') return l16(26) & 0x3fff; if (t === 'VP8L') return 1 + (b[21] | ((b[22] & 0x3f) << 8)); if (t === 'VP8X') return 1 + (b[24] | b[25] << 8 | b[26] << 16); return 0; }
+  if (b[0] === 0xff && b[1] === 0xd8) for (let i = 2; i + 9 < b.length;) {
+    if (b[i] !== 0xff) { i++; continue; }
+    const m = b[i + 1]; if (m === 0xd8 || m === 0x01 || (m >= 0xd0 && m <= 0xd7) || m === 0xff) { i += m === 0xff ? 1 : 2; continue; }
+    if (m >= 0xc0 && m <= 0xcf && m !== 0xc4 && m !== 0xc8 && m !== 0xcc) return u16(i + 7);
+    i += 2 + u16(i + 2);
+  }
+  return 0;
+}
+// как rehostOne, но картинка уже minW px — иначе null, а ширина найденной — в info.w (Art Coo-rier: не брать превьюшки)
+export async function rehostWide(env, src, minW, info = {}) { return env.MEDIA ? rehostFetch(env, src, minW, info) : null; }
+async function rehostFetch(env, src, minW = 0, info = {}) {
   try {
     const r = await fetch(src, { signal: AbortSignal.timeout(15000), headers: { 'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36', Referer: 'https://docs.google.com/', Accept: 'image/avif,image/webp,image/png,image/jpeg,image/*;q=0.8' } });
     let type = (r.headers.get('content-type') || '').split(';')[0];
@@ -877,6 +894,7 @@ async function rehostFetch(env, src) {
     if (!r.ok || !ext) return null;
     const buf = await r.arrayBuffer();
     if (buf.byteLength > MAX_IMG) return null;
+    if (minW) { const w = imgWidth(buf); info.w = w; if (w && w < minW) return null; }
     const d = new Date();
     const key = `blog/${d.getUTCFullYear()}/${String(d.getUTCMonth() + 1).padStart(2, '0')}/${randomHex(8)}.${ext}`;
     await env.MEDIA.put(key, buf, { httpMetadata: { contentType: type, cacheControl: 'public, max-age=31536000, immutable' } });
