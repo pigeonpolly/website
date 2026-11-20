@@ -29,6 +29,8 @@ PAGES = [
      "Learning design, AI in education and sketching workshops by Alina Otkinska."),
     ("challenge", "Daily Challenge", "challenge.html",
      "A daily sketch challenge with Pigeon Polly: one subject, a few colours, a few minutes."),
+    ("prompts", "Monthly drawing prompts", "prompts.html",
+     "Thirty small drawing prompts for this month: three colours, a timer of five to fifteen minutes and a free printable list."),
     ("e-books", "E-Books", "e-books.html", "E-books by Alina Otkinska."),
     ("on-walls-and-pages", "On Walls & Pages", "on-walls-and-pages.html",
      "Exhibitions and publications of Pigeon Polly art: on gallery walls and printed pages."),
@@ -106,7 +108,7 @@ PAGES = [
 # готовые, но пока не открытые страницы: не попадают в sitemap
 UNLISTED = {"blog-editor", "admin", "garden", "learn/watch", "norway", "norway/workshop"}
 # редизайн 2.0: страницы на новом шаблоне src/layout-v2.html (шапка, подвал, сезоны — site/assets/v2.css, v2.js)
-V2 = {"", "learn", "learn/watch", "books", "sketchbook", "blog", "freebies", "norway", "norway/workshop"}
+V2 = {"", "learn", "learn/watch", "books", "sketchbook", "blog", "freebies", "norway", "norway/workshop", "prompts"}
 # часть 5: все остальные страницы — на src/layout-v2-lab.html (новая шапка и подвал, внутри старые style.css и скрипты как есть)
 # ключ правок «Править страницу» (data-ppb): у новых страниц — прежний, с /preview/, чтобы сохранённые правки не потерялись
 EDIT_KEY = {"": "preview", "learn": "preview-learn", "books": "preview-guides", "sketchbook": "preview-about"}
