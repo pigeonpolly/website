@@ -2,6 +2,8 @@
 // визуальный редактор с вкладками RU/EN/LV, перевод RU → EN/LV (Workers AI), картинки в R2.
 (function () {
   const app = document.getElementById('be-app');
+  // кабинет → «⭐ Часто»: заход в редактор считается здесь (раз за вкладку), как бы ни пришли — из кабинета, полоски или закладки (admin.js pp-adm-freq)
+  try { if (!sessionStorage.getItem('pp-be-freq')) { sessionStorage.setItem('pp-be-freq', '1'); const f = JSON.parse(localStorage.getItem('pp-adm-freq') || '{}') || {}; f.blog = (f.blog || 0) + 1; localStorage.setItem('pp-adm-freq', JSON.stringify(f)); } } catch (e) {}
   const LANGS = [['ru', 'RU'], ['en', 'EN'], ['lv', 'LV']];
   const PANE_NAME = { ru: '🇷🇺 Русская версия', en: '🇬🇧 English version', lv: '🇱🇻 Latviešu versija' };
   const esc = s => String(s ?? '').replace(/[&<>"']/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));

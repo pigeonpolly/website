@@ -13,7 +13,7 @@
     space: ['My space', 'Мой кабинет', 'Mans kabinets'],
     learnT: ['Learning', 'Учёба', 'Mācības'],
     room: ['Bird’s room', 'Комната птички', 'Putniņa istaba'],
-    shop: ['Shop', 'Магазин', 'Veikals'], edit: ['Edit page', 'Править страницу', 'Labot lapu'],
+    shop: ['Shop', 'Магазин', 'Veikals'],
     nick: ['Choose a nickname', 'Выбрать ник', 'Izvēlēties segvārdu'],
     noNick: ['no nickname yet', 'ник ещё не выбран', 'segvārds vēl nav izvēlēts'],
     out: ['Sign out', 'Выйти', 'Iziet'],
@@ -255,12 +255,9 @@
           ${u.nick ? [['/bird/', '🪺', 'space'], ['/bird/#learn', '📚', 'learnT'], ['/bird/#room', '🏠', 'room'], ['/shop/', '🛍', 'shop']]
             .map(([h, i, k]) => `<a role="menuitem" href="${pre}${h}"><i aria-hidden="true">${i}</i>${t(k)}</a>`).join('') // учебники — на полке во вкладке «Учёба» (cabinet.js BOOK), конвертик — колокольчик 🔔 (news.js)
             :`<a role="menuitem" href="${pre}/challenge/">${t('nick')}</a>`}
-          ${u.admin ? `<hr><a role="menuitem" href="/admin/"><i aria-hidden="true">⚙</i>${t('cabinet')}</a><a role="menuitem" href="/admin/#runes"><i aria-hidden="true">🔮</i>Руны</a>${document.querySelector('[data-ppb]') ? `<button type="button" role="menuitem" data-edit><i aria-hidden="true">✏️</i>${t('edit')}</button>` : ''}` : ''}
+          ${u.admin ? `<hr><a role="menuitem" href="/admin/"><i aria-hidden="true">⚙</i>${t('cabinet')}</a>` : ''}
           <hr><button type="button" role="menuitem" data-out>${t('out')}</button>
         </div>`;
-      // админ: режим правки блоков страницы (site-edit.js грузится только для админа)
-      const ed = el.querySelector('[data-edit]');
-      if (ed) ed.addEventListener('click', () => { el.querySelector('.acct-pop').hidden = true; editPage(); });
       if (u.admin && document.querySelector('[data-ppb-hidden]')) document.documentElement.classList.add('pp-admin');
       // своя страница профиля: /bird/#room и т.п. меняет только якорь — sketch-wall.js ловит hashchange
       el.querySelectorAll('.acct-pop a[href*="/bird/#"]').forEach(a => a.addEventListener('click', () => { el.querySelector('.acct-pop').hidden = true; }));
