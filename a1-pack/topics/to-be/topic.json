@@ -44,7 +44,7 @@
     "am · is · are",
     "Short forms",
     "Not & questions",
-    "Speaking"
+    "Your turn"
    ],
    "notes": "1 min. Neesi detalizēts."
   },
@@ -354,7 +354,7 @@
    "type": "picker",
    "title": "Your turn",
    "hint": "Nospied «Griezt»",
-   "lv": "Atbildi ar īso atbildi: Yes, I am. / No, I'm not.",
+   "lv": "Atbildi par sevi skaļi vai pierakstos: Yes, I am. / No, I'm not. + viens teikums.",
    "pose": "idea",
    "items": [
     "Are you from Riga?",
@@ -366,29 +366,29 @@
     "Are you on holiday?",
     "Is your phone new?"
    ],
-   "notes": "Griez — jautā konkrētam studentam. Pēc tam viņš griež un jautā nākamajam."
+   "notes": "Griez — katrs students pats atbild par sevi (skaļi vai pierakstos)."
   },
   {
    "type": "task",
-   "title": "Find someone who…",
-   "minutes": 7,
-   "mode": "Visa grupa",
+   "title": "Your *profile*",
+   "minutes": 5,
+   "mode": "Individuāli",
    "steps": [
-    "Staigā pa telpu.",
-    "Jautā: **Are you…?**",
-    "Atbilde: **Yes, I am. / No, I'm not.**",
-    "Ieraksti vārdu, ja atbilde ir Yes."
+    "Atver piezīmes vai paņem lapu.",
+    "Uzraksti 5 teikumus par sevi ar **am / is / are**.",
+    "Vismaz vienu — ar **not**.",
+    "Izlasi tos skaļi sev — klausies īsās formas."
    ],
-   "box": "…from Riga? · …a coffee lover? · …a morning person? · …married? · …on Instagram?",
-   "notes": "Parādi piemēru ar vienu studentu. Beigās: Who is from Riga? — Anna is from Riga."
+   "box": "I'm … · I'm from … · I'm a … · I'm not … · My … is …",
+   "notes": "Individuāls darbs ar taimeri. Pēc tam vari palūgt 2–3 brīvprātīgos nolasīt vienu teikumu."
   },
   {
    "type": "big",
    "kicker": "Oscar says",
    "text": "I'm Oscar. I'm a tour guide. I'm not perfect — but I'm *happy!*",
-   "lv": "Katrs pasaka trīs teikumus par sevi: I'm … . I'm a … . I'm not … .",
+   "lv": "Tagad tu: I'm … . I'm a … . I'm not … .",
    "pose": "hello",
-   "notes": "Personalizācija: katrs dalībnieks — 3 teikumi."
+   "notes": "Personalizācija: katrs pats pasaka vai uzraksta 3 teikumus par sevi."
   },
   {
    "type": "thanks",

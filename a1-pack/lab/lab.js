@@ -81,7 +81,7 @@
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     var c = h("canvas", { class: "conf" }); document.body.appendChild(c);
     var ctx = c.getContext("2d"), W = c.width = innerWidth, H = c.height = innerHeight;
-    var cols = [M.accent, "#F2C94C", "#14915F", "#2F7DD1"], ps = [];
+    var cols = [M.accent, "#F2C94C", "#4E8068", "#2F7DD1"], ps = [];
     for (var i = 0; i < 90; i++) ps.push({ x: W / 2, y: H * 0.35, vx: (Math.random() - 0.5) * 14, vy: -Math.random() * 12 - 4, r: Math.random() * 6 + 4, c: cols[i % 4], a: Math.random() * 6 });
     var t = 0;
     (function f() {
@@ -496,7 +496,7 @@
       html += '<table style="width:100%;border-collapse:collapse;font-size:13px">';
       rows.forEach(function (r) {
         var g = r[2] !== "" && same(r[1], r[2]); tot++; if (g) ok++;
-        html += '<tr><td style="padding:6px 8px 6px 0;border-top:1px solid #eee">' + md(r[0]) + '</td><td style="padding:6px 0;border-top:1px solid #eee;font-weight:600;color:' + (g ? "#14915F" : "#D6453D") + '">' + esc(r[1] || "—") + "</td></tr>";
+        html += '<tr><td style="padding:6px 8px 6px 0;border-top:1px solid #eee">' + md(r[0]) + '</td><td style="padding:6px 0;border-top:1px solid #eee;font-weight:600;color:' + (g ? "#4E8068" : "#D6453D") + '">' + esc(r[1] || "—") + "</td></tr>";
       });
       html += "</table>";
     });

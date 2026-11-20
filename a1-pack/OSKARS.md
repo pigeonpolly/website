@@ -22,6 +22,7 @@ Big Ben (Elizabeth Tower), Tower Bridge, metro (the Tube), divstāvu autobuss, t
 
 ## Noteikumi
 - Auditorija — **pieaugušie**: ceļojumi, darbs, pilsēta, pakalpojumi, sadzīve. Nekādu skolu, «ieskrēja klasē», bērnu spēļu.
+- Uzdevumi — **individuāli**: bez darba pāros, grupās un «pajautā kaimiņam» (Alina 20.11). Runāšana — sev skaļi, ierakstā vai atbildot uz ekrāna jautājumu.
 - Oskars uz **tu** ar studentu (instrukcijas: Ieraksti, Izvēlies, Pārbaudi).
 - Fakti — tikai pārbaudāmi (avots: British Council, BBC, oficiālās vietnes). Ja šaubas — neraksti.
 - Viena situācija — viens likums. Humors maigs, par situāciju, nevis par studentu.

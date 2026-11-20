@@ -24,7 +24,7 @@ Pozas: `hello confused oops tangled spill idea teacher sleep celebrate peek`.
 | quiz | question ar ___, options[], answer (indekss), why | klikšķis / A |
 | build | title, words "a / b / c", answer, lv | saliek teikumu |
 | picker | title, items[] (jautājumi), lv, hint | nejaušs jautājums |
-| task | title, steps[], minutes (taimeris), mode, box | taimeris |
+| task | title, steps[], minutes (taimeris), mode «Individuāli», box | taimeris; tikai individuāls darbs |
 | compare | title, left{title,items}, right{…}, note | |
 | text | title, body, bullets, note | |
 | big | kicker, text, lv | izruna |

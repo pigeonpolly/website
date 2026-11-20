@@ -2,7 +2,7 @@
 """A1 English Lab — satura pārbaude pirms būvēšanas.
   python3 a1-pack/tools/check_lab.py a1-pack/topics/<slug>
 ✗ — jālabo; ! — jāizvērtē."""
-import math, re, sys
+import json, math, re, sys
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).parent))
@@ -92,6 +92,9 @@ def main():
                 E.append(f"slaids {i}: quiz.answer — indekss")
             if t == "build":
                 ex({"type": "build", "title": "x", "items": [{"words": s.get("words", ""), "answer": s.get("answer", "")}]}, f"slaids {i}")
+            txt = json.dumps(s, ensure_ascii=False).lower()
+            if re.search(r"pāros|grupā|kaimiņ|staigā pa|lomu spēl|in pairs|your partner", txt):
+                E.append(f"slaids {i}: uzdevumi tikai individuāli (atrasts pāru/grupu darbs)")
             if t not in ("cover", "thanks", "section") and not s.get("notes"):
                 W.append(f"slaids {i}: nav notes")
     wb = d.get("workbook")
