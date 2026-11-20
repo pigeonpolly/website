@@ -31,8 +31,9 @@
   const sub = x => x.k === 'prompts' ? T.days(x.items.length) : x.k === 'bingo' ? '5 × 5' : x.k === 'pal' || x.k === 'palch' ? x.cols.map(c => `<i style="background:${c.hex}"></i>`).join('') : x.k === 'steps' ? `4 ${tr(['steps', 'шага', 'soļi'])}` : '';
   const store = { get: k => { try { return JSON.parse(localStorage.getItem(k) || 'null'); } catch (e) { return null; } }, set: (k, v) => { try { localStorage.setItem(k, JSON.stringify(v)); } catch (e) { } } };
   fetch('/assets/draw.json').then(r => r.json()).then(D => {
-    const kinds = Object.keys(K).filter(k => D.some(x => x.k === k));
-    g.innerHTML = D.map(x => `<a class="vc dr-c k-${x.k}" href="?f=${x.id}" data-id="${x.id}" data-k="${x.k}"><span class="tp">${esc(tr(K[x.k]))}</span><span class="th"><img src="${esc(thumb(x))}" alt="" loading="lazy"></span><span class="tx"><b>${esc(x.t)}</b><small>${sub(x)}</small><span class="go">${T.open[L]}</span></span></a>`).join('');
+    const G = D.filter(x => x.k !== 'pal' && x.k !== 'palch'); // палитры — в разделе «Палитры»
+    const kinds = Object.keys(K).filter(k => G.some(x => x.k === k));
+    g.innerHTML = G.map(x => `<a class="vc dr-c k-${x.k}" href="?f=${x.id}" data-id="${x.id}" data-k="${x.k}"><span class="tp">${esc(tr(K[x.k]))}</span><span class="th"><img src="${esc(thumb(x))}" alt="" loading="lazy"></span><span class="tx"><b>${esc(x.t)}</b><small>${sub(x)}</small><span class="go">${T.open[L]}</span></span></a>`).join('');
     const st = { k: 'all' };
     g.insertAdjacentHTML('beforebegin', `<div class="flt"><div class="flt-g" role="group" aria-label="${T.typ[L]}"><span class="flt-l">${T.typ[L]}</span>${[['all', T.all[L]], ...kinds.map(k => [k, tr(K[k])])].map(([v, n]) => `<button type="button" data-k="${v}">${esc(n)} <i>${v === 'all' ? D.length : D.filter(x => x.k === v).length}</i></button>`).join('')}</div></div>`);
     const bar = g.previousElementSibling, cards = [...g.querySelectorAll('.dr-c')];
