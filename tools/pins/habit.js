@@ -56,13 +56,27 @@ h1{font:400 64px/1 'Caveat Brush';text-align:center}h2{font:400 30px/1 'Caveat B
 .box h2{color:var(--acc);margin-bottom:6px}
 .lines{background:repeating-linear-gradient(180deg,transparent 0 29px,color-mix(in srgb,var(--ink) 22%,#fff) 29px 30px)}`;
 
-const cover = () => { const c = colors(COVER);
-  return `<section class="pg" style="--ink:${c.ink};--acc:${c.acc}">${bleed(COVER, 3)}
-<div style="position:absolute;left:0;right:0;top:575px;text-align:center"><div style="font:400 150px/1 'Caveat Brush';color:${c.acc}">${YEAR}</div>
-<div style="font:400 64px/1.1 'Caveat Brush'">Habit Tracker</div><div class="sub" style="margin-top:14px">small steps · every day · all year</div></div>
-<div class="box" style="position:absolute;left:110px;right:110px;top:880px;font-size:19px;line-height:1.5">
-<h2>How to use it</h2>1. Pick up to 12 habits for the month and write them on the left.<br>2. Fill in a circle every day you keep a habit — colour it, tick it, doodle it.<br>3. Count your days on the right and celebrate the small wins.</div>
-<div style="position:absolute;left:0;right:0;bottom:26px;text-align:center;font-size:16px;opacity:.6">Illustrations by Alina Otkinska · Pigeon Polly Art Lab</div></section>`; };
+// обложка: цвета сайта (зима: ink + ягодный красный), а не палитра арта — у арта самый яркий цвет кислотно-зелёный (Алина 20.11)
+// арт на всю ширину, «2027» на бумажной наклейке со скотчем, полароиды всех 12 месяцев, 3 шага
+const cover = () => { const ink = '#1C2430', acc = '#9E1B22', gold = '#E0A33A';
+  const pol = ART.map((a, i) => `<div class="po" style="transform:rotate(${[-4, 3, -2, 4, -3, 2][i % 6] + (i > 5 ? 1 : 0)}deg)"><img src="${img(a)}"><span>${MON[a.m - 1].slice(0, 3)}</span></div>`).join('');
+  const st = [['Pick your habits', 'up to 12 a month'], ['Fill a circle a day', 'colour it, tick it, doodle it'], ['Celebrate little wins', 'count your days, be proud']];
+  return `<section class="pg" style="--ink:${ink};--acc:${acc}">${bleed(COVER, 3)}
+<style>.tg{position:absolute;left:50%;top:488px;width:330px;margin-left:-165px;transform:rotate(-3deg);background:#FBF6EC;border-radius:6px;box-shadow:0 6px 18px #0004;padding:10px 0 2px;text-align:center}
+.tg b{display:block;font:400 128px/1 'Caveat Brush';color:${acc}}.tg i{position:absolute;top:-14px;width:92px;height:30px;background:${gold}B0}
+.ttl{position:absolute;left:0;right:0;top:660px;text-align:center;font:400 72px/1 'Caveat Brush'}
+.ttl small{display:block;margin-top:10px;font:400 19px 'Patrick Hand';letter-spacing:.24em;text-transform:uppercase;opacity:.6}
+.pp{position:absolute;left:60px;right:60px;top:785px;display:grid;grid-template-columns:repeat(6,1fr);gap:16px 18px}
+.po{background:#fff;padding:6px 6px 0;box-shadow:0 3px 10px #0003;border-radius:2px}.po img{display:block;width:100%;height:58px;object-fit:cover}
+.po span{display:block;text-align:center;font:400 19px/1.3 'Caveat Brush';color:${acc}}
+.sp{position:absolute;left:50px;right:50px;top:993px;display:grid;grid-template-columns:repeat(3,1fr);gap:14px;text-align:center}
+.sp b{display:inline-grid;place-items:center;width:30px;height:30px;border-radius:50%;background:${acc};color:#fff;font:400 20px 'Caveat Brush';margin-bottom:4px}
+.sp div{font:400 20px/1.15 'Caveat Brush'}.sp small{display:block;font:400 14px 'Patrick Hand';opacity:.6;margin-top:2px}</style>
+<div class="tg"><i style="left:-26px;transform:rotate(-28deg)"></i><i style="right:-26px;transform:rotate(28deg)"></i><b>${YEAR}</b></div>
+<div class="ttl">Habit Tracker<small>small steps · every day · all year</small></div>
+<div class="pp">${pol}</div>
+<div class="sp">${st.map(([t, d], i) => `<div><b>${i + 1}</b><br>${t}<small>${d}</small></div>`).join('')}</div>
+<div style="position:absolute;left:0;right:0;bottom:16px;text-align:center;font-size:14px;opacity:.55">Illustrations by Alina Otkinska · Pigeon Polly Art Lab · pigeonpolly.com</div></section>`; };
 
 // год по клеточкам: одна привычка или настроение, 365 клеток
 const pixels = () => { const c = colors(PIX), cell = 18;
