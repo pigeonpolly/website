@@ -378,8 +378,9 @@
     h += `<p class="gd-note gd-how">${t('how')}</p>`;
     box.innerHTML = h;
     const on = (sel2, f) => box.querySelectorAll(sel2).forEach(b => { b.onclick = () => f(b); });
-    on('.gd-water-all', () => act('water', { all: true }, r => float('💧 ×' + r.watered)));
-    on('[data-water]', () => act('water', { bed: sel }, () => float('💧')));
+    const boost = r => r.boost > 0 ? ' 🍵 +' + r.boost + ['h', 'ч', 'h'][L] : ''; // блюдо с кухни «быстрее растёт» (этап 89)
+    on('.gd-water-all', () => act('water', { all: true }, r => float('💧 ×' + r.watered + boost(r))));
+    on('[data-water]', () => act('water', { bed: sel }, r => float('💧' + boost(r))));
     on('[data-harvest]', () => { const p = D.beds[sel] && D.beds[sel].p; act('harvest', { bed: sel }, () => { const m = p === 'mandrake' ? t('mandrake') : t('gotCrop', cname(p)); float(m); toast(m); }); });
     on('[data-plant]', b => act('plant', { bed: sel, seed: b.dataset.plant }, () => float('🌱')));
     on('[data-sell]', b => act('sell', { crop: b.dataset.sell }, r => { const m = t('sold', r.got || 0); float(m); toast(m); }));
