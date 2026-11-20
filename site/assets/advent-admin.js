@@ -11,9 +11,9 @@
     inkChipT: ['Every bird who opens this window on 24 December also gets the ink course (/ink/, 15 lessons) — it is not a thing in the plan, it opens by itself.',
       'Каждая птичка, открывшая окно 24 декабря, получает доступ к курсу туши (/ink/, 15 уроков) — это не вещь из плана, окно открывает его само.',
       'Katrs putniņš, kas 24. decembrī atver šo lodziņu, saņem arī tušas kursu (/ink/, 15 nodarbības) — tā nav lieta no plāna, lodziņš to atver pats.'],
-    hint: ['Tap a day or “＋ Add”: you can put things from the shop into the window or upload your own file. ★ — special windows, the 31st is the legendary one. An empty window gives buttons. 🎁 — gifts for the birds, 📎 — files.',
-      'Нажмите на день или «＋ Добавить»: в окно можно положить вещи из магазина или загрузить свой файл. ★ — особые окошки, 31-е — легендарное. Пустое окошко даёт пуговки. 🎁 — подарки для птичек, 📎 — файлы.',
-      'Pieskaries dienai vai “＋ Pievienot”: lodziņā var ielikt lietas no veikala vai augšupielādēt savu failu. ★ — īpašie lodziņi, 31. — leģendārais. Tukšs lodziņš dod pogas. 🎁 — dāvanas putniņiem, 📎 — faili.'],
+    hint: ['Tap a day or “＋ Add”: you can put things from the shop into the window or upload your own file. ★ — special windows, the 31st is the legendary one. An empty window gives buttons. 🎁 — gifts for the birds, 📎 — files. Things already in a window can be dragged to another day.',
+      'Нажмите на день или «＋ Добавить»: в окно можно положить вещи из магазина или загрузить свой файл. ★ — особые окошки, 31-е — легендарное. Пустое окошко даёт пуговки. 🎁 — подарки для птичек, 📎 — файлы. То, что уже лежит в окошке, можно перетащить в другой день.',
+      'Pieskaries dienai vai “＋ Pievienot”: lodziņā var ielikt lietas no veikala vai augšupielādēt savu failu. ★ — īpašie lodziņi, 31. — leģendārais. Tukšs lodziņš dod pogas. 🎁 — dāvanas putniņiem, 📎 — faili. To, kas jau ir lodziņā, var pārvilkt uz citu dienu.'],
     grpGifts: ['gifts', 'подарки', 'dāvanas'], grpFiles: ['files', 'файлы', 'faili'],
     tabsShop: ['🎁 Things from the shop', '🎁 Вещи из магазина', '🎁 Lietas no veikala'], tabsFile: ['📎 Upload a file', '📎 Загрузить файл', '📎 Augšupielādēt failu'],
     upHint: ['Choose a file from your computer — any file up to 20 MB. The window will show a picture, a caption and “Download”. An image is its own preview; for an archive you can pick a picture.',
@@ -65,15 +65,21 @@
     return advSet(day, 'file', item, false);
   }
 
-  // «📅 Адвент»: по датам — что лежит в каждом окошке (✕ убрать); подарки для птичек и файлы — отдельными группами
+  // «📅 Адвент»: по датам — что лежит в каждом окошке (✕ убрать); подарки для птичек и файлы — отдельными группами;
+  // то, что уже лежит, можно перетащить в другой день (moveItem: сначала кладём в новый, потом убираем из старого)
+  var dragging = null; // что тащат: {day, kind, item}
+  function advMove(src, day) {
+    var same = (plan || []).some(function (p) { return p.day === day && p.kind === src.kind && p.item === src.item; });
+    return (same ? Promise.resolve() : advSet(day, src.kind, src.item, true)) // уже лежит в этом дне — просто убираем из старого
+      .then(function () { return advSet(src.day, src.kind, src.item, false); });
+  }
   function advBoard() {
     var id = me ? me.id : 2;
     function chip(p) {
       var it = document.createElement('span'), x = document.createElement('button');
-      if (p.kind === 'file') { // файл в окне — превью или значок формата, при наведении — имя и подпись; нажатие — окно файла
+      if (p.kind === 'file') { // файл в окне — превью или значок формата; нажатие — окно файла, перетащить — в другой день
         var f = fileOf(p.item) || {};
         it.className = 'fl-adv-it fl-adv-file'; it.title = (f.n || '') + ((f.c && f.c.ru) ? ' · ' + f.c.ru : '');
-        it.style.cursor = 'pointer';
         it.appendChild(fthumb(f, 44));
         it.onclick = function () { advFileEdit(p.day, p.item, draw); };
         x.onclick = function (e) { e.stopPropagation(); var done = delFile(p.day, p.item); if (done) done.then(function () { draw(); }).catch(function () {}); };
@@ -82,7 +88,15 @@
         it.appendChild(window.PPBirds.itemIcon(p.kind, p.item, 44, id));
         x.onclick = function () { advSet(p.day, p.kind, p.item, false).then(function () { draw(); }).catch(function () {}); };
       }
+      it.draggable = true;
+      it.addEventListener('dragstart', function (e) {
+        dragging = { day: p.day, kind: p.kind, item: p.item };
+        try { e.dataTransfer.setData('text/plain', JSON.stringify(dragging)); e.dataTransfer.effectAllowed = 'move'; } catch (err) { /* без dataTransfer */ }
+        it.classList.add('drag');
+      });
+      it.addEventListener('dragend', function () { dragging = null; it.classList.remove('drag'); });
       x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', '✕ ' + it.title);
+      x.draggable = false;
       it.appendChild(x);
       return it;
     }
@@ -94,8 +108,46 @@
       list.forEach(function (p) { g.appendChild(chip(p)); });
       return g;
     }
+    // куда бросать: вся строка дня — перетащенную вещь/файл или файл с компьютера (сразу загрузится в этот день)
+    function hasFiles(dt) { try { return Array.prototype.indexOf.call(dt.types || [], 'Files') >= 0; } catch (err) { return false; } }
+    function uploadTo(day, file, row) {
+      if (file.size > FILE_MAX) return alert(T.errBig[L]);
+      var fd = new FormData();
+      fd.append('day', String(day)); fd.append('file', file, file.name);
+      fd.append('name', file.name.slice(0, 120));
+      fd.append('c', JSON.stringify({ ru: '', en: '', lv: '' }));
+      row.classList.add('busy');
+      fetch('/api/admin/advent/file', { method: 'POST', credentials: 'same-origin', body: fd })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (x) { if (!r.ok) throw x; return x; }); })
+        .then(function (x) { plan = x.plan || plan; draw(); })
+        .catch(function (e) { row.classList.remove('busy'); alert(errText(e)); });
+    }
+    function dropZone(row, day) {
+      row.dataset.day = String(day);
+      row.addEventListener('dragover', function (e) {
+        if (!dragging && !hasFiles(e.dataTransfer)) return;
+        e.preventDefault(); e.dataTransfer.dropEffect = dragging ? 'move' : 'copy'; row.classList.add('over');
+      });
+      row.addEventListener('dragleave', function (e) { if (!row.contains(e.relatedTarget)) row.classList.remove('over'); });
+      row.addEventListener('drop', function (e) {
+        e.preventDefault(); row.classList.remove('over');
+        var src = dragging; dragging = null;
+        if (src) { // то, что уже лежит, — переложить
+          if (src.day === day) return;
+          advMove(src, day).then(function () {
+            draw();
+            var r = box.querySelector('.fl-adv-row[data-day="' + day + '"]'); // мигнём, куда переложили
+            if (r) { r.classList.add('moved'); setTimeout(function () { r.classList.remove('moved'); }, 700); }
+          }).catch(function () { draw(); });
+          return;
+        }
+        var files = e.dataTransfer && e.dataTransfer.files;
+        if (files && files.length) uploadTo(day, files[0], row); // файл с компьютера — сразу в это окно
+      });
+    }
     for (var n = 1; n <= 31; n++) {
       var row = document.createElement('div'); row.className = 'fl-adv-row' + (ADV_SP.indexOf(n) >= 0 ? ' sp' : '') + (n === 31 ? ' leg' : '');
+      dropZone(row, n);
       var h = document.createElement('b'); h.textContent = aday(n); row.appendChild(h);
       var list = (plan || []).filter(function (p) { return p.day === n; });
       if (!list.length) { var e = document.createElement('small'); e.textContent = T.advEmpty[L]; row.appendChild(e); }

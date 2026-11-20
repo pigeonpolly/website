@@ -3404,6 +3404,15 @@ button.adm-tag.adm-tag-none { background: #fff; border-style: dashed; }
 .fl-adv-grp { display: inline-flex; flex-wrap: wrap; align-items: center; gap: 6px; }
 .fl-adv-grp.sep { padding-left: 12px; border-left: 1px dashed rgba(0, 0, 0, .16); }
 .fl-adv-gl { font: 600 11px 'Karla', sans-serif; font-style: normal; text-transform: uppercase; letter-spacing: .04em; color: #9F9690; white-space: nowrap; }
+/* перетаскивание: вещь или файл из одного дня в другой */
+.fl-adv-row { transition: background .15s ease, box-shadow .15s ease; border-radius: 12px; }
+.fl-adv-it { cursor: grab; }
+.fl-adv-it:active { cursor: grabbing; }
+.fl-adv-it.drag { opacity: .35; }
+.fl-adv-row.over { background: rgba(240, 169, 135, .16); box-shadow: inset 0 0 0 2px rgba(240, 169, 135, .55); }
+.fl-adv-row.moved { animation: advMoved .7s ease-out; }
+.fl-adv-row.busy { opacity: .55; }
+@keyframes advMoved { from { background: rgba(76, 195, 138, .35); } to { background: transparent; } }
 .fl-adv-daydlg { width: min(860px, calc(100% - 24px)); max-height: calc(100dvh - 40px); display: flex; flex-direction: column; }
 .fl-adv-daydlg:not([open]) { display: none; }
 .fl-adv-q { width: 100%; padding: 8px 12px; margin-bottom: 8px; border-radius: 10px; border: 1px solid #DAD7D5; font: inherit; }

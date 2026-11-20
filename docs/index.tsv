@@ -4,7 +4,7 @@
 #       sym — имя в коде; doc — раздел docs/*.md.
 # Читать целиком не нужно: grep по нужному виду, или python3 tools/index.py find СЛОВО / where ФАЙЛ.
 # Свежесть: python3 tools/index.py check (перед пушем).
-# файлов 400, страниц 55, маршрутов 215, таблиц 76, ключей meta 68, имён 5512, разделов доков 243
+# файлов 400, страниц 55, маршрутов 215, таблиц 76, ключей meta 68, имён 5514, разделов доков 243
 file	build.py	build.py	0	890 строк, 60 КБ
 file	content/english/a1.js	content/english/a1.js	0	239 строк, 45 КБ
 file	content/english/a2.js	content/english/a2.js	0	229 строк, 46 КБ
@@ -73,7 +73,7 @@ file	docs/ink.md	docs/ink.md	0	52 строк, 29 КБ
 file	docs/map.md	docs/map.md	0	341 строк, 69 КБ
 file	docs/palettes.md	docs/palettes.md	0	56 строк, 25 КБ
 file	docs/pinterest-dec2026.md	docs/pinterest-dec2026.md	0	55 строк, 4 КБ
-file	docs/plan-status.md	docs/plan-status.md	0	180 строк, 43 КБ
+file	docs/plan-status.md	docs/plan-status.md	0	181 строк, 44 КБ
 file	docs/polly-pet.md	docs/polly-pet.md	0	40 строк, 9 КБ
 file	docs/requests.md	docs/requests.md	0	31 строк, 14 КБ
 file	docs/retired.md	docs/retired.md	0	36 строк, 6 КБ
@@ -88,7 +88,7 @@ file	site/assets/about-desk.js	site/assets/about-desk.js	0	738 строк, 52 К
 file	site/assets/account.js	site/assets/account.js	0	434 строк, 44 КБ
 file	site/assets/admin-v2.css	site/assets/admin-v2.css	0	185 строк, 18 КБ
 file	site/assets/admin.js	site/assets/admin.js	0	1539 строк, 230 КБ
-file	site/assets/advent-admin.js	site/assets/advent-admin.js	0	351 строк, 29 КБ
+file	site/assets/advent-admin.js	site/assets/advent-admin.js	0	403 строк, 32 КБ
 file	site/assets/advent.css	site/assets/advent.css	0	302 строк, 28 КБ
 file	site/assets/advent.js	site/assets/advent.js	0	248 строк, 20 КБ
 file	site/assets/artpill-claude.js	site/assets/artpill-claude.js	0	245 строк, 50 КБ
@@ -168,7 +168,7 @@ file	site/assets/site-edit.js	site/assets/site-edit.js	0	288 строк, 24 КБ
 file	site/assets/site.js	site/assets/site.js	0	265 строк, 16 КБ
 file	site/assets/sketch-wall.js	site/assets/sketch-wall.js	0	955 строк, 121 КБ
 file	site/assets/sketchbook.js	site/assets/sketchbook.js	0	138 строк, 13 КБ
-file	site/assets/style.css	site/assets/style.css	0	5720 строк, 514 КБ
+file	site/assets/style.css	site/assets/style.css	0	5729 строк, 514 КБ
 file	site/assets/tarot-admin.js	site/assets/tarot-admin.js	0	127 строк, 11 КБ
 file	site/assets/titos-bugs.js	site/assets/titos-bugs.js	0	229 строк, 21 КБ
 file	site/assets/titos-sort.js	site/assets/titos-sort.js	0	337 строк, 35 КБ
@@ -1860,11 +1860,13 @@ sym	kb	site/assets/advent-admin.js	50	const
 sym	fthumb	site/assets/advent-admin.js	52	fn
 sym	errText	site/assets/advent-admin.js	58	fn
 sym	delFile	site/assets/advent-admin.js	63	fn
-sym	advBoard	site/assets/advent-admin.js	69	fn
-sym	dayState	site/assets/advent-admin.js	118	const
-sym	advDayPick	site/assets/advent-admin.js	119	fn
-sym	advFileEdit	site/assets/advent-admin.js	259	fn
-sym	PPAdventAdmin	site/assets/advent-admin.js	343	win
+sym	dragging	site/assets/advent-admin.js	70	const
+sym	advMove	site/assets/advent-admin.js	71	fn
+sym	advBoard	site/assets/advent-admin.js	76	fn
+sym	dayState	site/assets/advent-admin.js	170	const
+sym	advDayPick	site/assets/advent-admin.js	171	fn
+sym	advFileEdit	site/assets/advent-admin.js	311	fn
+sym	PPAdventAdmin	site/assets/advent-admin.js	395	win
 sym	app	site/assets/advent.js	3	const
 sym	LATE	site/assets/advent.js	31	const
 sym	HOUSES	site/assets/advent.js	34	const
