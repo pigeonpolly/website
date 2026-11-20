@@ -126,14 +126,11 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   <h1>Paint small, <em>joyful<svg viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M5 20 C 60 6, 120 28, 180 14 S 270 10, 295 18"/></svg></em> things</h1>
   <p>Free lessons, full paint-alongs and creative guides<br class="hb"> by artist Alina Otkinska.</p>
   <div class="ctas"><a class="btn pri" href="/blog/?section=art-courier">✦ Art Coo-rier: World News</a><a class="btn" href="#lessons">▶ Watch a free lesson</a></div>
-  <a class="advpromo-c hero-adv" href="/advent/" id="advpromo">
-    <span class="advpromo-ic" aria-hidden="true">🗓</span>
-    <span class="advpromo-tx">
-      <small>1–31 December</small>
-      <b>An advent for drawing</b>
-      <i>A prompt, a palette and a little gift behind every door.</i>
-    </span>
-    <span class="advpromo-go">Open →</span>
+  <a class="xmas" href="/advent/" id="advpromo">
+    <span class="xmas-row" aria-hidden="true">🏠 🎀 🍪 🎄 🍬 🎁 ☕</span>
+    <span class="xmas-title">Advent calendar</span>
+    <span class="xmas-sub">1–31 December · one window a day</span>
+    <span class="xmas-bar" aria-hidden="true"></span>
   </a>
 </div>
 <div data-ppb="preview.1" class="pano"><img id="v2-hero" src="/images/v2/hero-autumn.jpg" srcset="/images/v2/hero-autumn-900.jpg 900w, /images/v2/hero-autumn.jpg 1800w" sizes="100vw" alt="Watercolour by Alina Otkinska" fetchpriority="high"><span class="cap2" data-sv="note">Polly on the train ✿</span></div>
@@ -147,6 +144,13 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   box-shadow: inset 0 0 0 1px #C6D4DE, 0 8px 22px rgba(28, 36, 48, .08); transition: transform .15s ease, box-shadow .15s ease; }
 .advpromo-c:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px #C6D4DE, 0 14px 30px rgba(28, 36, 48, .14); }
 .hero-adv { margin: 26px auto 6px; max-width: 640px; position: relative; border: 2px solid #C9A227; background: linear-gradient(180deg, #FFFDF8, #FFF3E0); box-shadow: 0 0 0 4px #fff, 0 14px 30px rgba(28, 36, 48, .10); }`n.hero-adv::before { content: ""; position: absolute; left: 16px; right: 16px; top: -8px; height: 7px; border-radius: 6px; background-image: radial-gradient(circle, #C9A227 2.3px, transparent 2.7px); background-size: 22px 7px; }`n.hero-adv .advpromo-ic { background: #9E1B22; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .3), 0 0 0 3px rgba(201, 162, 39, .35); }
+.xmas { display: grid; justify-items: center; gap: 10px; margin: 26px auto 8px; max-width: 660px; padding: 20px 26px 24px; border-radius: 22px; background: #FFFFFF; border: 2px solid #8E2B2B; text-decoration: none; box-shadow: 0 10px 28px rgba(106, 42, 42, .14); transition: transform .15s ease; }
+.xmas:hover { transform: translateY(-2px); }
+.xmas-row { font-size: clamp(20px, 3.4vw, 30px); letter-spacing: .18em; line-height: 1; }
+.xmas-title { font: 700 clamp(26px, 3.6vw, 42px)/1.05 Fraunces, Georgia, serif; color: #6B2A2A; }
+.xmas-sub { font: 500 13px/1.2 Karla, sans-serif; letter-spacing: .1em; text-transform: uppercase; color: #8A5A3C; }
+.xmas-bar { width: 78%; height: 14px; margin-top: 4px; border-radius: 999px; border: 2px solid #8E2B2B; background: repeating-linear-gradient(45deg, #8E2B2B 0 12px, #FFFFFF 12px 24px); }
+@media (max-width: 560px) { .xmas { padding: 16px 16px 20px; } .xmas-row { letter-spacing: .1em; } }
 .advpromo-ic { flex: none; width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font-size: 24px;
   background: #9E1B22; color: #FFF6E5; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .25); }
 .advpromo-tx { flex: 1; min-width: 0; display: grid; gap: 2px; }
@@ -213,6 +217,9 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 
 
 
+
+
+
 </main>
 <footer class="ft2"><div class="w">
   <!-- подвал: все страницы сайта по разделам (11.11, просьба Алины); подписи — ключи data-f>…< в content/i18n -->
@@ -225,7 +232,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>The Flock</h4><a href="/flock/" data-f>All birds</a><a href="/flock/news/" data-f>Flock news</a><a href="/challenge/" data-f>Daily Challenge</a><a href="/challenge/#sw-wall" data-f>Flock drawings</a><a href="/requests/" data-f>Draw this for me</a><a href="/garden/" data-f>Bird garden</a></div>
     <div><h4 data-f>Alina</h4><a href="/sketchbook/" data-f>Sketchbook</a><a href="/about-me/" data-f>About me</a><a href="/on-walls-and-pages/" data-f>On Walls &amp; Pages</a><a href="/projects/" data-f>Learning &amp; AI</a><a href="/work-with-me/" data-f>Work with me</a><a href="/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Alina Otkinska · Pigeon Polly Art Lab · Riga</span><span class="ver" data-ver="112">v112 · 20.11 20:44</span><span><a href="/privacy/">Privacy</a></span></div>
+  <div class="bt"><span>© 2026 Alina Otkinska · Pigeon Polly Art Lab · Riga</span><span class="ver" data-ver="113">v113 · 20.11 20:51</span><span><a href="/privacy/">Privacy</a></span></div>
 </div></footer>
 </body>
 </html>
