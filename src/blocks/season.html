@@ -28,7 +28,7 @@
 <section class="ss" id="season" hidden aria-live="polite"></section>
 <script>
   // сезонный блок под приветствием (этап 4 Б): 1.10–30.11 — домик адвента с отсчётом; 1–31.12 — окошко дня; 1–23.01 — пропущенные; иначе пусто.
-  // Этап 6: когда адвента нет (кроме ноября–января), а идёт сезон (SEASONS) — витрина «🎃 Хеллоуин · ещё N дней · все вещи →» (магазин с этой темой). Блок и на главной, и в магазине.
+  // Этап 6: когда адвента нет (кроме ноября–января), а идёт сезон (SEASONS) — витрина «🎃 Хеллоуин · ещё N дней · все вещи →» (рынок с этой темой). Блок и на главной, и на рынке.
   // Данные — /api/advent (startsAt, now, nextAt, date, opened); ?devdate= — проверка дат на локальном сервере (account.js, PPDevH)
   document.addEventListener('DOMContentLoaded', () => {
     const box = document.getElementById('season');
@@ -48,7 +48,7 @@
       next: [c => `the next one in ${c}`, c => `следующее через ${c}`, c => `nākamais pēc ${c}`],
       last: ['that was the last one!', 'это было последнее!', 'tas bija pēdējais!'],
       miss: [n => `+${n} missed — you can still take ${n === 1 ? 'it' : 'them'}`, n => `+${n} ${n % 10 === 1 && n % 100 !== 11 ? 'пропущенное' : 'пропущенных'} — тоже можно забрать`, n => `+${n} ${n % 10 === 1 && n % 100 !== 11 ? 'izlaists' : 'izlaisti'} — arī var paņemt`],
-      shopKick: ['Season in the shop', 'Сезон в магазине', 'Sezona veikalā'],
+      shopKick: ['Season at the market', 'Сезон на рынке', 'Sezona tirgū'],
       left: [n => n ? `${n} more day${n === 1 ? '' : 's'}` : 'last day', n => n ? `ещё ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'день' : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 'дня' : 'дней'}` : 'последний день', n => n ? `vēl ${n} ${n % 10 === 1 && n % 100 !== 11 ? 'diena' : 'dienas'}` : 'pēdējā diena'],
       shopSub: [n => `${n} things for the season — while they last`, n => `Вещей к сезону: ${n} — пока не разобрали`, n => `Sezonas lietas: ${n} — kamēr vēl ir`],
       allThings: ['All the things →', 'Все вещи →', 'Visas lietas →'],
@@ -80,7 +80,7 @@
       }
       return `<svg viewBox="0 0 64 52" shape-rendering="crispEdges" role="img" aria-label="${t('kick')}">${s}</svg>`;
     }
-    // сезоны магазина: тема (PPBirds.GIFT_THEMES), с какого и по какое число (ММ-ДД)
+    // сезоны рынка: тема (PPBirds.GIFT_THEMES), с какого и по какое число (ММ-ДД)
     const SEASONS = [['halloween', '10-01', '10-31'], ['valentine', '02-01', '02-14'], ['spring', '03-01', '05-31'], ['summer', '06-01', '08-31'], ['autumn', '09-01', '09-30']];
     function seasonNow() {
       const ymd = new Intl.DateTimeFormat('en-CA', { timeZone: 'Europe/Riga' }).format(new Date(now())), md = ymd.slice(5), y = +ymd.slice(0, 4);
@@ -109,7 +109,7 @@
       const guestLine = guest ? `<p class="ss-guest"><button type="button" data-in>${t('guest')}</button>${t('guestTail')}</p>` : '';
       let st = () => 'shut', html = '', live = null, star = false;
       const sn = S.month !== 11 && S.month !== 12 && !S.catchUp && seasonNow(); // адвента нет — витрина сезона
-      if (sn && !/\/shop\/?$/.test(location.pathname)) { box.hidden = true; return; } // витрина сезона — только в магазине, не на главной
+      if (sn && !/\/shop\/?$/.test(location.pathname)) { box.hidden = true; return; } // витрина сезона — только на рынке, не на главной
       if (sn) { showcase(sn); if (S.nextAt) { const ms = S.nextAt - now(); if (ms > 0 && ms < 2e9) wake = setTimeout(load, ms + 1500); } return; }
       if (S.month === 10 || S.month === 11) { // до 1 декабря: отсчёт
         html = `<p class="ss-main">${T.soon[L]('<b data-cd></b>')}</p><p class="ss-sub">${t('soonSub')}</p><a class="ss-btn" href="${pre}/advent/">${t('peek')}</a>${guestLine}`;

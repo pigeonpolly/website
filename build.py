@@ -29,6 +29,8 @@ PAGES = [
      "Learning design, AI in education and sketching workshops by Alina Otkinska."),
     ("challenge", "Daily Challenge", "challenge.html",
      "A daily sketch challenge with Pigeon Polly: one subject, a few colours, a few minutes."),
+    ("prompts", "Monthly drawing prompts", "prompts.html",
+     "Thirty small drawing prompts for this month: three colours, a timer of five to fifteen minutes and a free printable list."),
     ("e-books", "E-Books", "e-books.html", "E-books by Alina Otkinska."),
     ("on-walls-and-pages", "On Walls & Pages", "on-walls-and-pages.html",
      "Exhibitions and publications of Pigeon Polly art: on gallery walls and printed pages."),
@@ -62,7 +64,7 @@ PAGES = [
      "Our flock of pixel birds: everyone who signs in gets one. Scatter seeds, call the wind or rain, throw a party and watch what happens."),
     ("flock/news", "Flock news", "flock-news.html",
      "Flock news: new pixel birds, drawings of the day, housewarmings, badges, collectible cards and news from Polly."),
-    ("shop", "Shop", "shop.html",
+    ("shop", "Bird market", "shop.html",
      "The Pigeon Polly shop: hats, scarves, frames and treasures for your pixel bird, paid for with buttons you earn on the site."),
     ("games", "Games", "games.html",
      "Pigeon Polly games: Button Rain, Polly’s Potion Lab, Polly’s Pancakes, Polly’s Train, Detective Titos, Polly’s Office, Wobbleland and the advent calendar. Earn buttons and spend them in the shop."),
@@ -82,10 +84,15 @@ PAGES = [
      "Polly’s Potion Lab: a Halloween game. Walk endless mazes with your pixel bird, collect ingredients, discover potion recipes by trial and error and earn buttons."),
     ("advent", "Advent calendar", "advent.html",
      "The Pigeon Polly advent calendar: from December 1 to 31 open a window a day and a pixel bird flies out with a gift for your profile."),
+    ("advent-2026", "Advent for drawing · preview", "advent-2026.html",
+     "A quieter advent for drawing: 24 doors with a prompt, three colours and a small bonus, and the ink course on the 24th."),
     ("palettes", "Palettes", "palettes.html",
      "Color palettes from Pigeon Polly watercolors and sketchbook pages: six colors with HEX codes from every artwork. Copy a color, pick a palette and draw."),
     ("norway", "Polly in Norway", "norway.html",
      "Polly in Norway: a new room of Pigeon Polly Art Lab. Polly is packing her suitcase, the room opens soon."),
+    # личная «Мастерская» Room 811: пустая комната для черновиков, открывается только Алине (worker/index.js, pageFetch)
+    ("norway/workshop", "Workshop · Room 811", "norway-workshop.html",
+     "A private workshop in Room 811: new things being made for Polly in Norway."),
     ("freebies", "Freebies", "freebies.html",
      "Free printable calendars and phone wallpapers with the art of Alina Otkinska and Pigeon Polly: monthly and yearly 2027 calendars, week starting on Monday or Sunday."),
     ("draw", "Things to draw", "draw.html",
@@ -103,13 +110,13 @@ PAGES = [
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
 # готовые, но пока не открытые страницы: не попадают в sitemap
-UNLISTED = {"blog-editor", "admin", "garden", "learn/watch", "norway"}
+UNLISTED = {"blog-editor", "admin", "garden", "learn/watch", "norway", "norway/workshop", "advent-2026"}
 # редизайн 2.0: страницы на новом шаблоне src/layout-v2.html (шапка, подвал, сезоны — site/assets/v2.css, v2.js)
-V2 = {"", "learn", "learn/watch", "books", "sketchbook", "blog", "freebies", "draw", "norway"}
+V2 = {"", "learn", "learn/watch", "books", "sketchbook", "blog", "freebies", "draw", "norway", "norway/workshop", "prompts", "advent-2026"}
 # часть 5: все остальные страницы — на src/layout-v2-lab.html (новая шапка и подвал, внутри старые style.css и скрипты как есть)
 # ключ правок «Править страницу» (data-ppb): у новых страниц — прежний, с /preview/, чтобы сохранённые правки не потерялись
 EDIT_KEY = {"": "preview", "learn": "preview-learn", "books": "preview-guides", "sketchbook": "preview-about"}
-NOINDEX = set()
+NOINDEX = {"norway/workshop", "advent-2026"}
 # адреса в шаблонах и словарях content/i18n остались с /preview/ — build.py меняет их на настоящие в готовой странице (v2_urls)
 V2_HOME = "/preview/"
 V2_LEARN, V2_GUIDES = "/preview/learn/", "/preview/guides/"
@@ -169,6 +176,7 @@ SECTIONS = {
              ("polly-office", "Polly’s Office", "📮", "Help Polly with the Council of Towns’ mail"),
              ("wobbleland", "Wobbleland", "🗺", "Map, holidays and recipes of eleven towns")],
     "draw": [("challenge", "Daily Challenge", "✏️", "A theme, a few colours and a timer — every day"),
+             ("prompts", "Monthly prompts", "🗓", "30 themes to save to your phone or print"),
              ("requests", "Draw this for me", "💡", "Suggest an idea and I’ll draw it"),
              ("palettes", "Palettes", "🎨", "Colours from my paintings and from your photos"),
              ("polly-helps", "Polly, help me", "🕊", "How to draw anything from simple shapes"),
@@ -184,7 +192,7 @@ SECTION_HUB = {"play": ("games", "All games and the shop →"), "draw": ("challe
 # страницы не из меню: в каком они разделе и какой подпункт подсвечен («Стая › Все птички» над заголовком)
 TAB_ALIAS = {"bird": "flock", "garden": "flock", "shop": "games", "games": "games"}
 # подпись над заголовком для страниц раздела, которых нет в подменю
-CRUMB_ONLY = {"shop": ("play", "Shop")}
+CRUMB_ONLY = {"shop": ("play", "Bird market")}
 for _p in ("anxiety", "sketchbook", "snail", "bird", "detective", "halloween", "ai-art"):
     TAB_ALIAS["art-portfolio/" + _p] = "art-portfolio"
 # подпункты, которых нет в выпадающем меню (а в подвале есть)

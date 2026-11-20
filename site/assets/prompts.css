@@ -1,0 +1,32 @@
+/* /prompts/ — печатный список тем месяца: 30 карточек, чекбоксы, печать */
+
+.pr .hd5 { max-width: 760px; }
+.pr-bar { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin: 18px 0 22px; }
+.pr-bar b { font-family: var(--serif, Fraunces, serif); font-size: 1.35rem; letter-spacing: .01em; text-transform: capitalize; }
+.pr-nav { min-width: 46px; padding: 6px 12px; }
+.pr-save { margin-left: auto; background: #C4552D; border-color: #C4552D; color: #fff; }
+.pr-save:hover { background: #A8451F; border-color: #A8451F; }
+.pr-print { padding: 6px 12px; }
+.pr-g { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; }
+.pr-d { display: flex; align-items: baseline; gap: 10px; background: var(--paper, #FFFDF8); color: var(--ink, #2A2620); border: 1px solid rgba(42,38,32,.14); border-radius: 12px; padding: 12px 14px; }
+.pr-d .pr-n { font-family: var(--serif, Fraunces, serif); font-weight: 700; font-size: 1.05rem; min-width: 1.6em; color: #C4552D; }
+.pr-d .pr-t { flex: 1; line-height: 1.25; }
+.pr-d .pr-time { font-size: .8rem; opacity: .6; white-space: nowrap; }
+.pr-d .pr-box { width: 15px; height: 15px; border: 1.5px solid rgba(42,38,32,.45); border-radius: 3px; flex: none; }
+.pr-d.pr-x .pr-box { border-color: #C4552D; }
+.pr-wait { opacity: .6; }
+.pr-note { max-width: 640px; margin: 18px 0 6px; opacity: .75; font-size: .95rem; }
+.pr-more { margin-top: 18px; }
+
+@media (max-width: 900px) { .pr-g { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+
+/* печать: только список, три колонки, без шапки и подвала */
+@media print {
+  html, body { background: #fff !important; }
+  .hd2, .hd3, footer, .pr-bar, .pr-more, .pr-note, .crumbs, .skip, .polly-tab { display: none !important; }
+  .pr .hd5 p { display: none; }
+  .pr-g { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .pr-d { break-inside: avoid; border-color: #ccc; padding: 8px 10px; }
+  .pr-d .pr-time { display: none; }
+  @page { margin: 14mm; }
+}

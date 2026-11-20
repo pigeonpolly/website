@@ -1,5 +1,5 @@
 // Каталог вещей: плитка, вкладки, чипы, переключатель; режим «сумка» (профиль птички).
-// Магазин и карточки потом берут отсюда же (PPCatalog.tile / tabs / chips / grid).
+// Птичий рынок и карточки потом берут отсюда же (PPCatalog.tile / tabs / chips / grid).
 (() => {
   const LANG = /\/admin\//.test(location.pathname) || document.documentElement.lang === 'ru' ? 1 : document.documentElement.lang === 'lv' ? 2 : 0; // кабинет — всегда по-русски
   const tr = a => a[LANG] != null ? a[LANG] : a[0];
@@ -44,7 +44,7 @@
 
   // плитка: картинка, название (≤ 2 строки), вид; отметка слева сверху, «⋯» справа сверху
   // o = { kind, item, name, legend, mark, markOn, menu: [{label, on}], onUse, id, size, title,
-  //       price — подпись цены внизу (магазин), badges: [[текст, класс]] — значки сверху слева, pressed — выбрана (режим выбора), off — нельзя (тусклая), dim — нет в наличии }
+  //       price — подпись цены внизу (рынок), badges: [[текст, класс]] — значки сверху слева, pressed — выбрана (режим выбора), off — нельзя (тусклая), dim — нет в наличии }
   function tile(o) {
     const el = document.createElement('div');
     el.className = 'cat-tile' + (o.legend ? ' cat-leg' : '') + (o.markOn ? ' on' : '') + (o.pressed ? ' sel' : '') + (o.off ? ' off' : '') + (o.dim ? ' dim' : '');
@@ -93,7 +93,7 @@
   // ---------- режим «сумка» ----------
   // o = { items: [{kind, item, n, u, legend, gid}], id, state, sell (цена или null), cards (число или null — вкладка появится с карточками),
   //       onUse(g), onGive(g), onSell(g), onMore(g), onSwap(g) — другая коробка (у вещи starter: коробка при регистрации, fixed — только она), cardsInto(box), onCards() — вкладка «Карточки» открывает альбом, empty, top,
-  //       undo: { can(), run() } — кнопка «↶ Отменить»; shopUrl(tab, kind) — плитка «＋ в магазин»; shopCount(kind) — сколько таких вещей в продаже (для пустого вида) }
+  //       undo: { can(), run() } — кнопка «↶ Отменить»; shopUrl(tab, kind) — плитка «＋ на рынок»; shopCount(kind) — сколько таких вещей в продаже (для пустого вида) }
   function bag(box, o) {
     const S = o.state || (o.state = {});
     S.tab = S.tab || 'all'; S.kind = S.kind || ''; if (S.free === undefined) S.free = true; // «Только неиспользуемые» включено по умолчанию
@@ -117,14 +117,14 @@
       box.appendChild(head);
       if (S.tab === 'cards') { const c = document.createElement('div'); box.appendChild(c); o.cardsInto && o.cardsInto(c); return; }
       const group = S.tab === 'bird' ? bird : S.tab === 'room' ? room : null;
-      if (group) { // все виды группы — и пустые: в пустом виде подсказка про магазин
+      if (group) { // все виды группы — и пустые: в пустом виде подсказка про рынок
         const ks = (S.tab === 'bird' ? BIRD_KINDS : ROOM_KINDS).filter(k => o.shopUrl || group.some(g => g.kind === k));
         if (ks.length > 1) box.appendChild(chips([{ v: '', label: tr(['All', 'Все', 'Visas']) }, ...ks.map(k => ({ v: k, label: kindsLabel(k) }))], S.kind, v => { S.kind = v; draw(); }));
       }
-      if (group && S.kind && o.shopUrl && !group.some(g => g.kind === S.kind)) { // пустой вид: «В магазине есть N таких вещей →»
+      if (group && S.kind && o.shopUrl && !group.some(g => g.kind === S.kind)) { // пустой вид: «На рынке есть N таких вещей →»
         const n = o.shopCount ? o.shopCount(S.kind) : null, a = document.createElement('a'); a.className = 'cat-toshop'; a.href = o.shopUrl(S.tab, S.kind);
-        a.textContent = n ? tr([`The shop has ${n} things like this: ${kindsLabel(S.kind).toLowerCase()} →`, `В магазине есть ${n} таких вещей: ${kindsLabel(S.kind).toLowerCase()} →`, `Veikalā ir ${n} tādas lietas: ${kindsLabel(S.kind).toLowerCase()} →`])
-          : tr([`Look for ${kindsLabel(S.kind).toLowerCase()} in the shop →`, `Поискать в магазине: ${kindsLabel(S.kind).toLowerCase()} →`, `Meklēt veikalā: ${kindsLabel(S.kind).toLowerCase()} →`]);
+        a.textContent = n ? tr([`The market has ${n} things like this: ${kindsLabel(S.kind).toLowerCase()} →`, `На рынке есть ${n} таких вещей: ${kindsLabel(S.kind).toLowerCase()} →`, `Tirgū ir ${n} tādas lietas: ${kindsLabel(S.kind).toLowerCase()} →`])
+          : tr([`Look for ${kindsLabel(S.kind).toLowerCase()} at the market →`, `Поискать на рынке: ${kindsLabel(S.kind).toLowerCase()} →`, `Meklēt tirgū: ${kindsLabel(S.kind).toLowerCase()} →`]);
         box.insertAdjacentHTML('beforeend', `<p class="bag-empty">${esc(tr(['Nothing of this kind yet.', 'Такого пока нет.', 'Tāda pagaidām nav.']))}</p>`); box.appendChild(a); return;
       }
       const ok = g => (!S.free || g.u < g.n) && (!S.kind || g.kind === S.kind);
@@ -158,11 +158,11 @@
           title: it.kind === 'garden' ? tr(['See it in the garden', 'Посмотреть в огороде', 'Apskatīt dārzā']) : room ? tr(['Put it in the room', 'Поставить в комнату', 'Novietot istabā']) : used ? tr(['Take it off', 'Снять', 'Novilkt']) : tr(['Put it on', 'Надеть', 'Uzvilkt']),
           onUse: () => o.onUse && o.onUse(it) }));
       }
-      // в конце ленты — «＋ в магазин» (магазин с этим видом)
+      // в конце ленты — «＋ на рынок» (рынок с этим видом)
       if (o.shopUrl) for (const [g, list] of grids) {
         const k = S.kind || '', tab = S.tab === 'all' ? (isRoom(list[0].kind) ? 'room' : 'bird') : S.tab;
         const a = document.createElement('a'); a.className = 'cat-tile cat-plus'; a.href = o.shopUrl(tab, k);
-        a.innerHTML = `<span class="cat-plus-in"><b aria-hidden="true">＋</b>${esc(tr(['to the shop', 'в магазин', 'uz veikalu']))}</span>`; g.appendChild(a);
+        a.innerHTML = `<span class="cat-plus-in"><b aria-hidden="true">＋</b>${esc(tr(['to the market', 'на рынок', 'uz tirgu']))}</span>`; g.appendChild(a);
       }
       box.insertAdjacentHTML('beforeend', `<p class="cat-legend">${esc(tr([
         '✓ worn or in the room · 1/3 — how many are in use · ×2 — copies · ★ legendary · ⋯ give, sell, details',
@@ -183,7 +183,7 @@
     return Math.min(n, all.reduce((a, r) => a + ((r && r.items) || []).filter(it => it.k === kind && it.v === item).length, 0));
   }
 
-  // ---------- «нажал — появилось» (этап 5 Б; в этап 6 переехало сюда из sketch-wall.js — нужно и магазину) ----------
+  // ---------- «нажал — появилось» (этап 5 Б; в этап 6 переехало сюда из sketch-wall.js — нужно и рынку) ----------
   // Вещь для комнаты — в свою комнату на странице (PPRoom.live; нет её — в профиль с #use=), вещь птички — надеть / снять. Тост с «Отменить» (5 с).
   // o = { me (птичка: avatar, gifts, nick), after() }. Возвращает отмену (функцию) или null; последняя отмена — PPCatalog.lastUndo
   const pre = ['', '/ru', '/lv'][LANG];
@@ -260,14 +260,14 @@
       b.onclick = () => o.action.on(b, d); d.querySelector('.cat-item-act').appendChild(b);
       if (!b.disabled) setTimeout(() => b.focus(), 0);
     }
-    if (o.action2) { // вторая кнопка под главной (магазин: «🛒 В корзину»)
+    if (o.action2) { // вторая кнопка под главной (рынок: «🛒 В корзину»)
       const b = document.createElement('button'); b.type = 'button'; b.className = 'cat-item-btn cat-item-btn2'; b.textContent = o.action2.label; b.disabled = !!o.action2.disabled;
       b.onclick = () => o.action2.on(b, d); d.querySelector('.cat-item-act').appendChild(b);
     }
     return d;
   }
 
-  // ---------- общий каталог (этап 6): магазин, адвент-окно и подарки в кабинете ----------
+  // ---------- общий каталог (этап 6): рынок, адвент-окно и подарки в кабинете ----------
   // все вещи: [kind, item], «🎲 Сюрприз» первым в каждой категории
   const allEntries = () => { const B = window.PPBirds; return B.GIFT_KINDS.flatMap(k => (B.withSurprise ? B.withSurprise(k[0]) : B.GIFTS[k[0]] || []).map(v => [k[0], v])); };
   const grpOf = k => k === 'any' ? 'any' : isRoom(k) ? 'room' : 'bird';
@@ -281,9 +281,9 @@
   //       tile(k, v) → доп. поля плитки, onOpen(k, v, плитка) — нажатие,
   //       price(k, v) → цена (фильтр и порядок «Цена»), added(k, v) → когда появилась (порядок «сначала новые»),
   //       mine(k, v) → есть ли (фильтр «что у меня есть»), mineLabel, notMineLabel,
-  //       afford(k, v) → хватает ли пуговок (переключатель «💰 Хватает пуговок» — только магазин),
+  //       afford(k, v) → хватает ли пуговок (переключатель «💰 Хватает пуговок» — только рынок),
   //       cant(k, v) → причина, почему нельзя ('' — можно): такие скрыты, в «Фильтрах» — «Показать то, что нельзя»,
-  //       rest: { title, test(k, v) } — блок внизу, свёрнутый (магазин: «Нет в наличии»),
+  //       rest: { title, test(k, v) } — блок внизу, свёрнутый (рынок: «Нет в наличии»),
   //       cardsInto(box) — вкладка «Карточки», empty(S) → текст, когда пусто, lead — строка над списком,
   //       pick: { multi, has(k, v) } — режим выбора: выбранные вещи отмечены }
   function browse(box, o) {

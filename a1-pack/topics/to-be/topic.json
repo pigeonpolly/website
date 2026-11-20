@@ -1,0 +1,1337 @@
+{
+ "meta": {
+  "slug": "to-be",
+  "title_en": "Verb *to be*",
+  "title_lv": "am · is · are — es esmu, tu esi, viņš ir",
+  "course": "English A1",
+  "level": "A1",
+  "lesson": 1,
+  "minutes": 45,
+  "accent": "#FF5A36",
+  "sources": [
+   {
+    "name": "British Council LearnEnglish",
+    "url": "https://learnenglish.britishcouncil.org/"
+   },
+   {
+    "name": "Cambridge English",
+    "url": "https://www.cambridgeenglish.org/learning-english/"
+   },
+   {
+    "name": "BBC Learning English",
+    "url": "https://www.bbc.co.uk/learningenglish/"
+   },
+   {
+    "name": "CEFR",
+    "url": "https://www.coe.int/en/web/common-european-framework-reference-languages"
+   }
+  ]
+ },
+ "deck": [
+  {
+   "type": "cover",
+   "title": "Verb *to be*",
+   "subtitle": "am · is · are",
+   "text": "Tēma 1 · 45 min",
+   "pose": "hello",
+   "notes": "Sasveicinies: Hello! I'm … . Iepazīstini ar Oskaru — britu kaķis, gids Londonā. Zina visu par Britāniju, bet ir ļoti neveikls."
+  },
+  {
+   "type": "agenda",
+   "title": "Today",
+   "items": [
+    "Personal pronouns",
+    "am · is · are",
+    "Short forms",
+    "Not & questions",
+    "Your turn"
+   ],
+   "notes": "1 min. Neesi detalizēts."
+  },
+  {
+   "type": "oscar",
+   "kind": "story",
+   "pose": "guide",
+   "text": "Sveiks! Esmu Oskars, gids Londonā. Katru rītu sagaidu tūristus pie Tower Bridge — un katru rītu kāds saka «I is…». Šodien to salabosim!",
+   "en": "Hello! I'm Oscar. I'm your guide.",
+   "notes": "Oskara ievads. Nospied skaļruni — lai grupa dzird britu izrunu un atkārto."
+  },
+  {
+   "type": "story",
+   "title": "Hello, London!",
+   "pose": "oops",
+   "tag": "Story",
+   "messages": [
+    {
+     "who": "note",
+     "text": "Tower Bridge, 10:00. Oskars sagaida grupu no Rīgas… un paklūp pār savu lietussargu."
+    },
+    {
+     "who": "oscar",
+     "name": "Oscar",
+     "text": "Oops! Sorry! Hello, everyone! I'm **Oscar**. I'm your guide."
+    },
+    {
+     "who": "janis",
+     "name": "Jānis",
+     "text": "Hello! **I is Jānis.** I is from Riga."
+    },
+    {
+     "who": "oscar",
+     "name": "Oscar",
+     "text": "Nice to meet you, Jānis! *I am* Oscar — and *you are* Jānis."
+    }
+   ],
+   "lesson": "Ar **I** vienmēr ir **am**: I am Jānis. I'm from Riga.",
+   "notes": "Ar → atklāj replikas pa vienai. Pajautā: kas Jānim nav pareizi? Ļauj grupai atrast pašai."
+  },
+  {
+   "type": "vocab",
+   "title": "Who? — *pronouns*",
+   "cols": 4,
+   "items": [
+    {
+     "en": "I",
+     "lv": "es"
+    },
+    {
+     "en": "you",
+     "lv": "tu / jūs"
+    },
+    {
+     "en": "he",
+     "lv": "viņš"
+    },
+    {
+     "en": "she",
+     "lv": "viņa"
+    },
+    {
+     "en": "it",
+     "lv": "tas / tā"
+    },
+    {
+     "en": "we",
+     "lv": "mēs"
+    },
+    {
+     "en": "they",
+     "lv": "viņi / viņas"
+    }
+   ],
+   "notes": "Klikšķis uz kartītes — tulkojums, skaļrunis — izruna. I vienmēr ar lielo burtu. you = gan tu, gan jūs."
+  },
+  {
+   "type": "rule",
+   "title": "am · is · *are*",
+   "pose": "teacher",
+   "head": [
+    "Who",
+    "be",
+    "Short"
+   ],
+   "rows": [
+    [
+     "I",
+     "**am**",
+     "I'm"
+    ],
+    [
+     "he · she · it",
+     "**is**",
+     "he's · she's · it's"
+    ],
+    [
+     "you · we · they",
+     "**are**",
+     "you're · we're · they're"
+    ]
+   ],
+   "note": "Latviski: esmu, esi, ir, esam… Angliski — tikai trīs formas!",
+   "notes": "Lai grupa skaļi atkārto katru rindu. Runā ar īsajām formām — tā runā briti."
+  },
+  {
+   "type": "oscar",
+   "kind": "tip",
+   "pose": "tea",
+   "side": "right",
+   "text": "Briti runā īsi: nevis *I am tired*, bet *I'm tired*. Tējas pauzē — tikai īsās formas!",
+   "en": "I'm tired. It's tea time!",
+   "notes": "Uzsver īsās formas: I'm, you're, he's, it's."
+  },
+  {
+   "type": "switcher",
+   "title": "Try it: + − ?",
+   "pose": "idea",
+   "modes": [
+    "+",
+    "−",
+    "?"
+   ],
+   "rows": {
+    "I": [
+     "I'm from London.",
+     "I'm **not** from London.",
+     "**Am** I from London?"
+    ],
+    "you": [
+     "You're on holiday.",
+     "You **aren't** on holiday.",
+     "**Are** you on holiday?"
+    ],
+    "he": [
+     "He's a tour guide.",
+     "He **isn't** a tour guide.",
+     "**Is** he a tour guide?"
+    ],
+    "she": [
+     "She's tired.",
+     "She **isn't** tired.",
+     "**Is** she tired?"
+    ],
+    "it": [
+     "It's a red bus.",
+     "It **isn't** a red bus.",
+     "**Is** it a red bus?"
+    ],
+    "we": [
+     "We're late.",
+     "We **aren't** late.",
+     "**Are** we late?"
+    ],
+    "they": [
+     "They're in London.",
+     "They **aren't** in London.",
+     "**Are** they in London?"
+    ]
+   },
+   "lv": {
+    "I": [
+     "Es esmu no Londonas.",
+     "Es neesmu no Londonas.",
+     "Vai es esmu no Londonas?"
+    ],
+    "you": [
+     "Tu esi atvaļinājumā.",
+     "Tu neesi atvaļinājumā.",
+     "Vai tu esi atvaļinājumā?"
+    ],
+    "he": [
+     "Viņš ir gids.",
+     "Viņš nav gids.",
+     "Vai viņš ir gids?"
+    ],
+    "she": [
+     "Viņa ir nogurusi.",
+     "Viņa nav nogurusi.",
+     "Vai viņa ir nogurusi?"
+    ],
+    "it": [
+     "Tas ir sarkans autobuss.",
+     "Tas nav sarkans autobuss.",
+     "Vai tas ir sarkans autobuss?"
+    ],
+    "we": [
+     "Mēs kavējam.",
+     "Mēs nekavējam.",
+     "Vai mēs kavējam?"
+    ],
+    "they": [
+     "Viņi ir Londonā.",
+     "Viņi nav Londonā.",
+     "Vai viņi ir Londonā?"
+    ]
+   },
+   "notes": "Klikšķini personas un +/−/? — teikums mainās. Lai studenti saka skaļi, pirms tu klikšķini."
+  },
+  {
+   "type": "examples",
+   "title": "On the tour",
+   "pose": "hello",
+   "items": [
+    {
+     "en": "I'm your guide.",
+     "lv": "Es esmu jūsu gids."
+    },
+    {
+     "en": "You're from Riga.",
+     "lv": "Tu esi no Rīgas."
+    },
+    {
+     "en": "She's a doctor.",
+     "lv": "Viņa ir ārste."
+    },
+    {
+     "en": "It's a red bus.",
+     "lv": "Tas ir sarkans autobuss."
+    },
+    {
+     "en": "We're on Tower Bridge.",
+     "lv": "Mēs esam uz Tauera tilta."
+    },
+    {
+     "en": "They're very tired.",
+     "lv": "Viņi ir ļoti noguruši."
+    }
+   ],
+   "notes": "Ar → atklāj tulkojumus. Pievērs uzmanību: a doctor — profesijai vajag a."
+  },
+  {
+   "type": "quiz",
+   "question": "Oscar ___ a tour guide.",
+   "options": [
+    "am",
+    "is",
+    "are"
+   ],
+   "answer": 1,
+   "why": "Oscar = he → **is**",
+   "notes": "Lai visi parāda atbildi ar pirkstiem (1/2/3), tad klikšķini vai A."
+  },
+  {
+   "type": "facts",
+   "kicker": "Oscar's Britain · Dzīve",
+   "title": "Life in *Britain*",
+   "items": [
+    {
+     "tag": "Dzīve",
+     "big": "Left",
+     "title": "Brauc pa kreisi",
+     "text": "Lielbritānijā automašīnas brauc pa kreiso ceļa pusi. Londonā pie pārejām uz asfalta bieži rakstīts LOOK RIGHT.",
+     "en": "In the UK, cars drive on the left."
+    },
+    {
+     "tag": "Dzīve",
+     "big": "cuppa",
+     "title": "Tēja ar pienu",
+     "text": "Briti tēju visbiežāk dzer ar pienu. Neformāli tasi tējas sauc *a cuppa*.",
+     "en": "It's tea time! A cuppa?"
+    },
+    {
+     "tag": "Dzīve",
+     "big": "sorry",
+     "title": "Sorry — visur",
+     "text": "Briti ļoti bieži saka *sorry* — arī tad, ja vainīgs ir kāds cits. Tā ir pieklājība.",
+     "en": "Oh, sorry! — No, I'm sorry!"
+    },
+    {
+     "tag": "Dzīve",
+     "big": "weather",
+     "title": "Laikapstākļi — labākā tēma",
+     "text": "Sarunu ar svešinieku briti bieži sāk ar laikapstākļiem: autobusa pieturā, veikalā, darbā.",
+     "en": "It's cold today!"
+    }
+   ],
+   "pose": "tea",
+   "notes": "Klikšķini kartīti pēc kārtas; lai studenti vispirms min. Nospied, lai izlasītu angļu teikumu skaļi."
+  },
+  {
+   "type": "section",
+   "num": "02",
+   "title": "Not & *questions*",
+   "text": "noliegums un jautājumi",
+   "notes": "Pāreja."
+  },
+  {
+   "type": "oscar",
+   "kind": "story",
+   "pose": "map",
+   "text": "Vakar apmaldījos metro. Pajautāju: «*Is this the Central line?*» Atbilde: «*No, it isn't.*» Jautājumā **be** — uz priekšu!",
+   "en": "Is this the Central line? — No, it isn't.",
+   "notes": "Pāreja uz jautājumiem. Lai grupa atkārto jautājumu un īso atbildi."
+  },
+  {
+   "type": "rule",
+   "title": "Questions & short answers",
+   "head": [
+    "Question",
+    "Yes",
+    "No"
+   ],
+   "rows": [
+    [
+     "**Are** you from Riga?",
+     "Yes, I am.",
+     "No, I'm not."
+    ],
+    [
+     "**Is** she tired?",
+     "Yes, she is.",
+     "No, she isn't."
+    ],
+    [
+     "**Are** they late?",
+     "Yes, they are.",
+     "No, they aren't."
+    ]
+   ],
+   "note": "Jautājumā **be** — pirmajā vietā. «Yes, I am.» — bez saīsinājuma!",
+   "pose": "confused",
+   "notes": "Kļūda «Yes, I'm.» — apstiprinošā īsajā atbildē nesaīsina."
+  },
+  {
+   "type": "build",
+   "title": "Build the question",
+   "words": "you / from / are / London",
+   "answer": "Are you from London?",
+   "lv": "Vai tu esi no Londonas? — saliec angliski.",
+   "notes": "Aicini vienu studentu pie ekrāna. Pārbaudīt — vai A rāda atbildi."
+  },
+  {
+   "type": "compare",
+   "title": "Latviski vs *English*",
+   "left": {
+    "title": "Latviski",
+    "items": [
+     "Es esmu gids.",
+     "Man ir 30 gadu.",
+     "Tu esi no Rīgas?"
+    ]
+   },
+   "right": {
+    "title": "English",
+    "items": [
+     "I'm **a** guide.",
+     "I **am** 30.",
+     "**Are you** from Riga?"
+    ]
+   },
+   "note": "Vecumu angliski «esam», nevis «mums ir».",
+   "notes": "Trīs biežākās latviešu runātāju kļūdas šajā tēmā."
+  },
+  {
+   "type": "mistakes",
+   "title": "Typical *mistakes*",
+   "items": [
+    {
+     "wrong": "I is / I are",
+     "right": "I am",
+     "why": "Ar I — tikai am."
+    },
+    {
+     "wrong": "I have 30 years.",
+     "right": "I am 30.",
+     "why": "Latviski «man ir», angliski — be."
+    },
+    {
+     "wrong": "She is doctor.",
+     "right": "She is a doctor.",
+     "why": "Profesijai vienskaitlī vajag a / an."
+    },
+    {
+     "wrong": "You are from Riga?",
+     "right": "Are you from Riga?",
+     "why": "Jautājumā be — pirmais."
+    },
+    {
+     "wrong": "Yes, I'm.",
+     "right": "Yes, I am.",
+     "why": "Īsajā «Yes» atbildē nesaīsina."
+    },
+    {
+     "wrong": "I amn't tired.",
+     "right": "I'm not tired.",
+     "why": "Formas «amn't» nav."
+    }
+   ],
+   "pose": "oops",
+   "notes": "Lai grupa vispirms pati izlabo kļūdu, tad klikšķini kartīti. A — apgriež visas."
+  },
+  {
+   "type": "quiz",
+   "question": "___ you on holiday?",
+   "options": [
+    "Is",
+    "Am",
+    "Are"
+   ],
+   "answer": 2,
+   "why": "you → **Are** you…?",
+   "pose": "spill",
+   "notes": "Ātrā pārbaude pirms runāšanas. Klikšķis uz varianta vai A."
+  },
+  {
+   "type": "oscar",
+   "kind": "fact",
+   "pose": "bigben",
+   "text": "Big Ben nav tornis — tas ir zvans! Tornis kopš 2012. gada saucas Elizabeth Tower.",
+   "en": "Big Ben is a bell. It isn't a tower.",
+   "notes": "Fakts + noliegums: It isn't a tower."
+  },
+  {
+   "type": "picker",
+   "title": "Your turn",
+   "hint": "Nospied «Griezt»",
+   "lv": "Atbildi par sevi skaļi vai pierakstos: Yes, I am. / No, I'm not. + viens teikums.",
+   "pose": "idea",
+   "items": [
+    "Are you from Riga?",
+    "Are you a morning person?",
+    "Are you tired today?",
+    "Is your job interesting?",
+    "Are you a tea person?",
+    "Is your best friend funny?",
+    "Are you on holiday?",
+    "Is your phone new?"
+   ],
+   "notes": "Griez — katrs students pats atbild par sevi (skaļi vai pierakstos)."
+  },
+  {
+   "type": "task",
+   "title": "Your *profile*",
+   "minutes": 5,
+   "mode": "Individuāli",
+   "steps": [
+    "Atver piezīmes vai paņem lapu.",
+    "Uzraksti 5 teikumus par sevi ar **am / is / are**.",
+    "Vismaz vienu — ar **not**.",
+    "Izlasi tos skaļi sev — klausies īsās formas."
+   ],
+   "box": "I'm … · I'm from … · I'm a … · I'm not … · My … is …",
+   "notes": "Individuāls darbs ar taimeri. Pēc tam vari palūgt 2–3 brīvprātīgos nolasīt vienu teikumu."
+  },
+  {
+   "type": "oscar",
+   "kind": "joke",
+   "pose": "umbrella",
+   "side": "right",
+   "text": "Londonā lietussargs ir mans labākais draugs. Viņš vienmēr ir ar mani… un vienmēr aizmirsts autobusā.",
+   "en": "My umbrella is my best friend. It's always with me!",
+   "notes": "Viegls brīdis pirms personalizācijas."
+  },
+  {
+   "type": "facts",
+   "kicker": "Oscar's Britain · Valoda",
+   "title": "Words & *quirks*",
+   "items": [
+    {
+     "tag": "Valoda",
+     "big": "you",
+     "title": "Viens you visiem",
+     "text": "Angliski nav atsevišķas pieklājības formas: *you* = tu un jūs — draugam, kolēģim, priekšniekam.",
+     "en": "You are my friend. You are my boss."
+    },
+    {
+     "tag": "Valoda",
+     "big": "it's",
+     "title": "Apostrofs maina visu",
+     "text": "*it's* = it is (tas ir). *its* = tā/tās (piederība, bez apostrofa).",
+     "en": "It's a cat. Its name is Oscar."
+    },
+    {
+     "tag": "Valoda",
+     "big": "flat",
+     "title": "Britu vārdi",
+     "text": "Britānijā dzīvoklis ir *flat*, atvaļinājums — *holiday*. Amerikā saka *apartment* un *vacation*.",
+     "en": "I'm on holiday. My flat is in Riga."
+    },
+    {
+     "tag": "Valoda",
+     "big": "cheers",
+     "title": "Cheers = paldies",
+     "text": "Neformāli briti *cheers* saka ne tikai pie glāzes — arī kā «paldies» un «uz redzēšanos». *Mate* = draugs.",
+     "en": "Cheers, mate!"
+    }
+   ],
+   "pose": "book",
+   "notes": "Valodas interesantumi A1 līmenī. Pie it's / its — uzraksti abus uz tāfeles."
+  },
+  {
+   "type": "big",
+   "kicker": "Oscar says",
+   "text": "I'm Oscar. I'm a tour guide. I'm not perfect — but I'm *happy!*",
+   "lv": "Tagad tu: I'm … . I'm a … . I'm not … .",
+   "pose": "hello",
+   "notes": "Personalizācija: katrs pats pasaka vai uzraksta 3 teikumus par sevi."
+  },
+  {
+   "type": "thanks",
+   "title": "Thank *you!*",
+   "text": "Mājasdarbs — tēmas failā",
+   "pose": "celebrate"
+  }
+ ],
+ "workbook": {
+  "title": "Verb *to be*",
+  "lead": "am · is · are — pirmais solis angļu valodā. Kopā ar Oskaru, gidu no Londonas.",
+  "chips": [
+   "⏱ ~30 min",
+   "8 interaktīvi uzdevumi",
+   "🎧 ar izrunu",
+   "📝 mājasdarbs → PDF"
+  ],
+  "hello": "Sveiks! Es esmu Oskars, gids Londonā. Šodien — **to be**. Neuztraucies, es kļūdos biežāk par tevi.",
+  "pose": "hello",
+  "sections": [
+   {
+    "type": "story",
+    "title": "Hello, London!",
+    "nav": "Stāsts",
+    "lead": "Tower Bridge, 10:00. Oskars sagaida grupu no Rīgas.",
+    "messages": [
+     {
+      "who": "note",
+      "text": "Oskars paklūp pār savu lietussargu. Tēja — uz bruģa."
+     },
+     {
+      "who": "oscar",
+      "name": "Oscar",
+      "text": "Oops! Sorry! Hello, everyone! I'm **Oscar**. I'm your guide today.",
+      "say": true
+     },
+     {
+      "who": "janis",
+      "name": "Jānis",
+      "text": "Hello! I is Jānis. I is from Riga."
+     },
+     {
+      "who": "liga",
+      "name": "Līga",
+      "text": "Jāni… *I am* Jānis! 😅"
+     },
+     {
+      "who": "oscar",
+      "name": "Oscar",
+      "text": "Nice to meet you, Jānis! And you are…?",
+      "say": true
+     },
+     {
+      "who": "liga",
+      "name": "Līga",
+      "text": "I'm Līga. We're from Riga. We're very happy to be here!"
+     }
+    ],
+    "lesson": "Ar **I** vienmēr ir **am**. Īsāk: **I'm**. Līga to zina — tagad arī tu."
+   },
+   {
+    "type": "rule",
+    "title": "am · is · *are*",
+    "nav": "Likums",
+    "lead": "Angliski darbības vārdam *be* tagadnē ir tikai trīs formas.",
+    "text": [
+     "Latviski mēs sakām *esmu, esi, ir, esam, esat*. Angliski — vienkāršāk:"
+    ],
+    "table": {
+     "head": [
+      "Kas?",
+      "Forma",
+      "Īsi"
+     ],
+     "rows": [
+      [
+       "I",
+       "**am**",
+       "I'm"
+      ],
+      [
+       "he · she · it",
+       "**is**",
+       "he's · she's · it's"
+      ],
+      [
+       "you · we · they",
+       "**are**",
+       "you're · we're · they're"
+      ]
+     ]
+    },
+    "note": "Noliegums: **not** aiz be — I'm **not**, she **isn't**, they **aren't**. Jautājums: be uz priekšu — **Are** you…?",
+    "switcher": {
+     "title": "Pamēģini: izvēlies personu un + − ?",
+     "modes": [
+      "+",
+      "−",
+      "?"
+     ],
+     "rows": {
+      "I": [
+       "I'm from London.",
+       "I'm **not** from London.",
+       "**Am** I from London?"
+      ],
+      "you": [
+       "You're on holiday.",
+       "You **aren't** on holiday.",
+       "**Are** you on holiday?"
+      ],
+      "he": [
+       "He's a tour guide.",
+       "He **isn't** a tour guide.",
+       "**Is** he a tour guide?"
+      ],
+      "she": [
+       "She's tired.",
+       "She **isn't** tired.",
+       "**Is** she tired?"
+      ],
+      "it": [
+       "It's a red bus.",
+       "It **isn't** a red bus.",
+       "**Is** it a red bus?"
+      ],
+      "we": [
+       "We're late.",
+       "We **aren't** late.",
+       "**Are** we late?"
+      ],
+      "they": [
+       "They're in London.",
+       "They **aren't** in London.",
+       "**Are** they in London?"
+      ]
+     },
+     "lv": {
+      "I": [
+       "Es esmu no Londonas.",
+       "Es neesmu no Londonas.",
+       "Vai es esmu no Londonas?"
+      ],
+      "you": [
+       "Tu esi atvaļinājumā.",
+       "Tu neesi atvaļinājumā.",
+       "Vai tu esi atvaļinājumā?"
+      ],
+      "he": [
+       "Viņš ir gids.",
+       "Viņš nav gids.",
+       "Vai viņš ir gids?"
+      ],
+      "she": [
+       "Viņa ir nogurusi.",
+       "Viņa nav nogurusi.",
+       "Vai viņa ir nogurusi?"
+      ],
+      "it": [
+       "Tas ir sarkans autobuss.",
+       "Tas nav sarkans autobuss.",
+       "Vai tas ir sarkans autobuss?"
+      ],
+      "we": [
+       "Mēs kavējam.",
+       "Mēs nekavējam.",
+       "Vai mēs kavējam?"
+      ],
+      "they": [
+       "Viņi ir Londonā.",
+       "Viņi nav Londonā.",
+       "Vai viņi ir Londonā?"
+      ]
+     }
+    }
+   },
+   {
+    "type": "oscar",
+    "kind": "tip",
+    "pose": "tea",
+    "text": "Briti runā īsi: **I'm, you're, he's, it's**. Pilno formu *I am* dzirdēsi, kad kāds ļoti uzsver — *I AM ready!*",
+    "en": "I'm ready! It's tea time."
+   },
+   {
+    "type": "vocab",
+    "title": "Who is *who*",
+    "nav": "Vārdi",
+    "lead": "Pieskaries kartītei — tulkojums. Skaļrunis — izruna (britu).",
+    "items": [
+     {
+      "en": "I",
+      "ipa": "/aɪ/",
+      "lv": "es",
+      "ex": "I'm Līga."
+     },
+     {
+      "en": "you",
+      "ipa": "/juː/",
+      "lv": "tu / jūs",
+      "ex": "You're late!"
+     },
+     {
+      "en": "he",
+      "ipa": "/hiː/",
+      "lv": "viņš",
+      "ex": "He's my guide."
+     },
+     {
+      "en": "she",
+      "ipa": "/ʃiː/",
+      "lv": "viņa",
+      "ex": "She's from Riga."
+     },
+     {
+      "en": "it",
+      "ipa": "/ɪt/",
+      "lv": "tas / tā",
+      "ex": "It's a red bus."
+     },
+     {
+      "en": "we",
+      "ipa": "/wiː/",
+      "lv": "mēs",
+      "ex": "We're tourists."
+     },
+     {
+      "en": "they",
+      "ipa": "/ðeɪ/",
+      "lv": "viņi / viņas",
+      "ex": "They're tired."
+     },
+     {
+      "en": "tour guide",
+      "ipa": "/ˈtʊə ɡaɪd/",
+      "lv": "gids",
+      "ex": "Oscar is a tour guide."
+     }
+    ]
+   },
+   {
+    "type": "practice",
+    "title": "Practice with *Oscar*",
+    "nav": "Prakse",
+    "lead": "Katrā uzdevumā — «Pārbaudīt». Pareizi = XP un Oskara prieks.",
+    "exercises": [
+     {
+      "type": "sort",
+      "title": "am, is vai are?",
+      "buckets": [
+       {
+        "title": "am",
+        "items": [
+         "I"
+        ]
+       },
+       {
+        "title": "is",
+        "items": [
+         "he",
+         "she",
+         "Oscar",
+         "the bus"
+        ]
+       },
+       {
+        "title": "are",
+        "items": [
+         "you",
+         "we",
+         "they",
+         "Līga and Jānis"
+        ]
+       }
+      ]
+     },
+     {
+      "type": "gap",
+      "title": "On the tour",
+      "items": [
+       {
+        "text": "Oscar ___ our guide.",
+        "answer": "is"
+       },
+       {
+        "text": "We ___ from Riga.",
+        "answer": "are"
+       },
+       {
+        "text": "I ___ hungry!",
+        "answer": "am"
+       },
+       {
+        "text": "The bus ___ red.",
+        "answer": "is"
+       },
+       {
+        "text": "Līga and Jānis ___ on Tower Bridge.",
+        "answer": "are"
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "title": "Not!",
+      "items": [
+       {
+        "text": "I ___ tired.",
+        "options": [
+         "'m not",
+         "isn't",
+         "aren't"
+        ],
+        "answer": "'m not"
+       },
+       {
+        "text": "It ___ cold today.",
+        "options": [
+         "'m not",
+         "isn't",
+         "aren't"
+        ],
+        "answer": "isn't"
+       },
+       {
+        "text": "They ___ late.",
+        "options": [
+         "'m not",
+         "isn't",
+         "aren't"
+        ],
+        "answer": "aren't"
+       },
+       {
+        "text": "Oscar ___ from Riga.",
+        "options": [
+         "'m not",
+         "isn't",
+         "aren't"
+        ],
+        "answer": "isn't"
+       }
+      ]
+     },
+     {
+      "type": "build",
+      "title": "Build the question",
+      "items": [
+       {
+        "words": "you / are / from Riga",
+        "answer": "Are you from Riga?",
+        "lv": "Vai tu esi no Rīgas?"
+       },
+       {
+        "words": "is / a tour guide / Oscar",
+        "answer": "Is Oscar a tour guide?",
+        "lv": "Vai Oskars ir gids?"
+       },
+       {
+        "words": "they / tired / are",
+        "answer": "Are they tired?",
+        "lv": "Vai viņi ir noguruši?"
+       }
+      ]
+     },
+     {
+      "type": "listen",
+      "title": "Listen & write",
+      "items": [
+       {
+        "text": "I am from Riga."
+       },
+       {
+        "text": "She is a doctor."
+       },
+       {
+        "text": "We are not late."
+       },
+       {
+        "text": "Are you on holiday?"
+       }
+      ]
+     },
+     {
+      "type": "detective",
+      "title": "Kļūdu detektīvs",
+      "instruction": "Jāņa piezīmes ekskursijā. Pieskaries kļūdainajam vārdam un ieraksti pareizo teikumu.",
+      "items": [
+       {
+        "wrong": "I is from Riga.",
+        "bad": 1,
+        "right": "I am from Riga.",
+        "why": "I → am"
+       },
+       {
+        "wrong": "Līga are my friend.",
+        "bad": 1,
+        "right": "Līga is my friend.",
+        "why": "Līga = she → is"
+       },
+       {
+        "wrong": "I have 30 years.",
+        "bad": 1,
+        "right": "I am 30 years old.",
+        "why": "vecums — ar be"
+       },
+       {
+        "wrong": "You are from London?",
+        "bad": 0,
+        "right": "Are you from London?",
+        "why": "jautājumā be — pirmais"
+       }
+      ]
+     },
+     {
+      "type": "match",
+      "title": "Who is who?",
+      "items": [
+       {
+        "left": "Jānis",
+        "right": "he"
+       },
+       {
+        "left": "Līga",
+        "right": "she"
+       },
+       {
+        "left": "the bus",
+        "right": "it"
+       },
+       {
+        "left": "Līga and I",
+        "right": "we"
+       },
+       {
+        "left": "the tourists",
+        "right": "they"
+       }
+      ]
+     }
+    ]
+   },
+   {
+    "type": "oscar",
+    "kind": "joke",
+    "pose": "umbrella",
+    "side": "right",
+    "text": "Londonā lietussargs ir mans labākais draugs. Viņš vienmēr ir ar mani… un vienmēr aizmirsts autobusā.",
+    "en": "My umbrella is my best friend!"
+   },
+   {
+    "type": "facts",
+    "title": "Oscar's *Britain*",
+    "nav": "Fakti",
+    "lead": "Britu dzīve un valodas interesantumi. Visi fakti — pārbaudīti.",
+    "items": [
+     {
+      "big": "13,7 t",
+      "title": "Big Ben ir zvans",
+      "text": "Big Ben ir lielā zvana nosaukums, nevis torņa. Tornis kopš 2012. gada saucas Elizabeth Tower. Zvans sver 13,7 tonnas.",
+      "pose": "bigben",
+      "tag": "Dzīve"
+     },
+     {
+      "big": "1863",
+      "title": "Vecākais metro pasaulē",
+      "text": "Londonas metro — *the Tube* — atvērts 1863. gadā. Oskars tajā joprojām apmaldās.",
+      "pose": "map",
+      "tag": "Dzīve"
+     },
+     {
+      "big": "I",
+      "title": "Vienmēr ar lielo burtu",
+      "text": "Vietniekvārdu **I** angliski raksta ar lielo burtu jebkurā teikuma vietā: *Oscar and I are friends.*",
+      "pose": "confused",
+      "tag": "Valoda"
+     },
+     {
+      "big": "is · are",
+      "title": "Visbiežākais darbības vārds",
+      "text": "*Be* ir visbiežāk lietotais darbības vārds angļu valodā — tu to dzirdēsi gandrīz katrā teikumā.",
+      "pose": "book",
+      "tag": "Valoda"
+     },
+     {
+      "tag": "Dzīve",
+      "big": "Left",
+      "title": "Brauc pa kreisi",
+      "text": "Lielbritānijā automašīnas brauc pa kreiso ceļa pusi. Londonā pie pārejām uz asfalta bieži rakstīts LOOK RIGHT. — *In the UK, cars drive on the left.*",
+      "pose": "guide"
+     },
+     {
+      "tag": "Dzīve",
+      "big": "cuppa",
+      "title": "Tēja ar pienu",
+      "text": "Briti tēju visbiežāk dzer ar pienu. Neformāli tasi tējas sauc *a cuppa*. — *It's tea time! A cuppa?*",
+      "pose": "tea"
+     },
+     {
+      "tag": "Valoda",
+      "big": "you",
+      "title": "Viens you visiem",
+      "text": "Angliski nav atsevišķas pieklājības formas: *you* = tu un jūs — draugam, kolēģim, priekšniekam. — *You are my friend. You are my boss.*",
+      "pose": "hello"
+     },
+     {
+      "tag": "Valoda",
+      "big": "it's",
+      "title": "Apostrofs maina visu",
+      "text": "*it's* = it is (tas ir). *its* = tā/tās (piederība, bez apostrofa). — *It's a cat. Its name is Oscar.*",
+      "pose": "confused"
+     }
+    ]
+   },
+   {
+    "type": "video",
+    "title": "Watch & *listen*",
+    "nav": "Video",
+    "lead": "Īsi video iesācējiem. Ieslēdz angļu subtitrus.",
+    "items": [
+     {
+      "title": "Verb be — BBC Learning English",
+      "search": "BBC Learning English verb to be beginners",
+      "url": "https://www.bbc.co.uk/learningenglish/",
+      "source": "BBC Learning English",
+      "lv": "Klausies, kā izrunā I'm, you're, he's."
+     },
+     {
+      "title": "Verb be — British Council",
+      "search": "British Council LearnEnglish verb be A1",
+      "url": "https://learnenglish.britishcouncil.org/",
+      "source": "British Council",
+      "lv": "Gramatikas skaidrojums un vingrinājumi."
+     }
+    ]
+   },
+   {
+    "type": "mistakes",
+    "title": "Typical *mistakes*",
+    "nav": "Kļūdas",
+    "lead": "Tās, ko latviešu runātāji pieļauj visbiežāk. Pieskaries kartītei.",
+    "items": [
+     {
+      "wrong": "I is / I are",
+      "right": "I am",
+      "why": "Ar I — tikai am."
+     },
+     {
+      "wrong": "I have 30 years.",
+      "right": "I am 30.",
+      "why": "Latviski «man ir», angliski — be."
+     },
+     {
+      "wrong": "She is doctor.",
+      "right": "She is a doctor.",
+      "why": "Profesijai vienskaitlī vajag a / an."
+     },
+     {
+      "wrong": "You are from Riga?",
+      "right": "Are you from Riga?",
+      "why": "Jautājumā be — pirmais."
+     },
+     {
+      "wrong": "Yes, I'm.",
+      "right": "Yes, I am.",
+      "why": "Īsajā «Yes» atbildē nesaīsina."
+     },
+     {
+      "wrong": "I amn't tired.",
+      "right": "I'm not tired.",
+      "why": "Formas «amn't» nav."
+     }
+    ]
+   },
+   {
+    "type": "quiz",
+    "title": "Check *yourself*",
+    "nav": "Tests",
+    "lead": "8 jautājumi. 80 % — tēma apgūta.",
+    "items": [
+     {
+      "q": "I ___ hungry.",
+      "options": [
+       "am",
+       "is",
+       "are"
+      ],
+      "answer": "am",
+      "why": "I → am."
+     },
+     {
+      "q": "My friends ___ in London.",
+      "options": [
+       "is",
+       "are",
+       "am"
+      ],
+      "answer": "are",
+      "why": "my friends = they → are."
+     },
+     {
+      "q": "___ he your guide?",
+      "options": [
+       "Are",
+       "Is",
+       "Am"
+      ],
+      "answer": "Is",
+      "why": "he → is; jautājumā be — pirmais."
+     },
+     {
+      "q": "Are you OK? — Yes, I ___.",
+      "options": [
+       "am",
+       "'m",
+       "are"
+      ],
+      "answer": "am",
+      "why": "Yes, I am. — bez saīsinājuma."
+     },
+     {
+      "q": "It ___ sunny today.",
+      "options": [
+       "isn't",
+       "aren't",
+       "'m not"
+      ],
+      "answer": "isn't",
+      "why": "it → is not → isn't."
+     },
+     {
+      "q": "I ___ 30 years old.",
+      "options": [
+       "have",
+       "am",
+       "is"
+      ],
+      "answer": "am",
+      "why": "Vecumu izsaka ar be."
+     },
+     {
+      "q": "She is ___ doctor.",
+      "options": [
+       "—",
+       "a",
+       "an"
+      ],
+      "answer": "a",
+      "why": "Profesijai vajag a: a doctor."
+     },
+     {
+      "q": "We ___ late! Run!",
+      "options": [
+       "are",
+       "is",
+       "am"
+      ],
+      "answer": "are",
+      "why": "we → are."
+     }
+    ]
+   },
+   {
+    "type": "oscar",
+    "kind": "lesson",
+    "pose": "laptop",
+    "text": "Mājasdarbs — apmēram 15 minūtes. Kad pabeigsi, nospied «Lejupielādēt» un nosūti PDF skolotājam. Es pa to laiku iedzeršu tēju.",
+    "en": "Good luck! You're great."
+   },
+   {
+    "type": "homework",
+    "title": "Your *homework*",
+    "lead": "Aizpildi, nospied «Lejupielādēt» un nosūti PDF skolotājam. Šeit pārbaudes nav — tikai tavs darbs.",
+    "exercises": [
+     {
+      "type": "gap",
+      "title": "am, is, are",
+      "points": 6,
+      "items": [
+       {
+        "text": "My name ___ Līga.",
+        "answer": "is"
+       },
+       {
+        "text": "I ___ a designer.",
+        "answer": "am"
+       },
+       {
+        "text": "My parents ___ in Riga.",
+        "answer": "are"
+       },
+       {
+        "text": "London ___ big.",
+        "answer": "is"
+       },
+       {
+        "text": "You ___ my best friend.",
+        "answer": "are"
+       },
+       {
+        "text": "Oscar and I ___ on the bus.",
+        "answer": "are"
+       }
+      ]
+     },
+     {
+      "type": "choice",
+      "title": "Negative",
+      "points": 4,
+      "items": [
+       {
+        "text": "I ___ a student.",
+        "options": [
+         "'m not",
+         "isn't",
+         "aren't"
+        ],
+        "answer": "'m not"
+       },
+       {
+        "text": "The hotel ___ cheap.",
+        "options": [
+         "'m not",
+         "isn't",
+         "aren't"
+        ],
+        "answer": "isn't"
+       },
+       {
+        "text": "We ___ tired.",
+        "options": [
+         "'m not",
+         "isn't",
+         "aren't"
+        ],
+        "answer": "aren't"
+       },
+       {
+        "text": "My boss ___ British.",
+        "options": [
+         "'m not",
+         "isn't",
+         "aren't"
+        ],
+        "answer": "isn't"
+       }
+      ]
+     },
+     {
+      "type": "build",
+      "title": "Questions",
+      "points": 4,
+      "items": [
+       {
+        "words": "your job / is / interesting",
+        "answer": "Is your job interesting?"
+       },
+       {
+        "words": "are / you / married",
+        "answer": "Are you married?"
+       },
+       {
+        "words": "is / from Riga / she",
+        "answer": "Is she from Riga?"
+       },
+       {
+        "words": "they / at work / are",
+        "answer": "Are they at work?"
+       }
+      ]
+     },
+     {
+      "type": "write",
+      "title": "A message to Oscar",
+      "points": 6,
+      "prompt": "Uzraksti Oskaram 5–6 teikumus par sevi pirms ekskursijas. Izmanto am / is / are un vismaz vienu noliegumu.",
+      "checklist": [
+       "I'm … (vārds)",
+       "I'm from …",
+       "I'm a … (darbs)",
+       "I'm not …",
+       "My friend … is …"
+      ],
+      "minWords": 25,
+      "model": [
+       "Hi Oscar! I'm Līga. I'm from Riga. I'm a designer. I'm not a morning person. My friend Anna is with me. She's a doctor. See you at Tower Bridge!"
+      ]
+     }
+    ]
+   }
+  ]
+ }
+}

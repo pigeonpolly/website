@@ -1,12 +1,12 @@
 <section class="page-head">
   <p class="topics">buttons and gifts</p>
-  <h1>Shop</h1>
+  <h1>Bird market</h1>
   <p class="lead">Things for your bird, paid for with buttons 🔘. Quantities are limited: when an item is gone, it’s gone.</p>
   <p class="shop-me"></p>
 </section>
 <!-- витрина сезона (Хеллоуин…) или адвент — блок season (src/blocks/season.html) -->
 {{block:season}}
-<!-- магазин (этап 6): «Новое в магазине», каталог на общем компоненте catalog-ui.js (вкладки Всё · Птичке · Комнате · Карточки · Сюрпризы, «Фильтры»), «Нет в наличии» внизу -->
+<!-- рынок (этап 6): «Новое на рынке», каталог на общем компоненте catalog-ui.js (вкладки Всё · Птичке · Комнате · Карточки · Сюрпризы, «Фильтры»), «Нет в наличии» внизу -->
 <section class="fl-all shop cat-shop" id="shop">
   <div class="shop-new" hidden></div>
   <div class="shop-seeds" id="seeds" hidden></div>
@@ -16,7 +16,7 @@
 <script src="/assets/garden.js" defer></script>
 <script src="/assets/cards-ui.js" defer></script>
 <script>
-// Магазин: каталог вещей (PPBirds) с ценой и остатком из /api/shop; нажатие — окно вещи с примеркой и «Купить за N»; после покупки тост «В сумке · Надеть / Поставить сейчас»
+// Птичий рынок: каталог вещей (PPBirds) с ценой и остатком из /api/shop; нажатие — окно вещи с примеркой и «Купить за N»; после покупки тост «В сумке · Надеть / Поставить сейчас»
 (function () {
   var L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, pre = ['', '/ru', '/lv'][L];
   var T = {
@@ -40,7 +40,7 @@
     upWhy: ['▲ Few left, so the price went up', '▲ Осталось мало — поэтому дороже', '▲ Palicis maz — tāpēc dārgāk'], downWhy: ['▼ Plenty in stock, so it is cheaper', '▼ Много в наличии — поэтому дешевле', '▼ Daudz noliktavā — tāpēc lētāk'],
     changed: ['The price has just changed: now {p} 🔘. Take a look and buy again.', 'Цена только что изменилась: теперь {p} 🔘. Посмотрите и купите ещё раз.', 'Cena tikko mainījās: tagad {p} 🔘. Paskaties un pērc vēlreiz.'],
     rule: ['You can buy up to 3 of the same thing (legendary ones: just 1). Prices follow the stock: the fewer left, the pricier; the more in stock, the cheaper.', 'Одну и ту же вещь можно купить до 3 штук (легендарные — только 1). Цена зависит от остатка: чем меньше осталось, тем дороже, чем больше — тем дешевле.', 'Vienu un to pašu lietu var nopirkt līdz 3 gab. (leģendārās — tikai 1). Cena atkarīga no atlikuma: jo mazāk palicis, jo dārgāk; jo vairāk, jo lētāk.'],
-    newH: ['✨ New in the shop', '✨ Новое в магазине', '✨ Jaunums veikalā'], newB: ['new', 'новое', 'jauns'],
+    newH: ['✨ New at the bird market', '✨ Новое на рынке', '✨ Jaunums tirgū'], newB: ['new', 'новое', 'jauns'],
     newCards: ['🃏 New card collections:', '🃏 Новые коллекции карточек:', '🃏 Jaunas kartīšu kolekcijas:'],
     toCart: ['🛒 Add to cart', '🛒 В корзину', '🛒 Ielikt grozā'], moreCart: ['🛒 In the cart: {n} · add one more', '🛒 В корзине: {n} · ещё одну', '🛒 Grozā: {n} · vēl vienu'], fullCart: ['🛒 In the cart: {n}', '🛒 В корзине: {n}', '🛒 Grozā: {n}'],
     inCart: ['In the cart 🛒 {n}', 'В корзине 🛒 {n}', 'Grozā 🛒 {n}'], openCart: ['Open the cart', 'Открыть корзину', 'Atvērt grozu'], cartBtn: ['🛒 Cart', '🛒 Корзина', '🛒 Grozs'],
@@ -87,7 +87,7 @@
       meEl.querySelector('.shop-cart-btn').onclick = openCart;
     } else meEl.textContent = t('login');
   }
-  // плитка магазина: вместо отметки — цена; значки «мало», «новое», «у тебя N из 3» (★ легендарной рисует сама плитка)
+  // плитка рынка: вместо отметки — цена; значки «мало», «новое», «у тебя N из 3» (★ легендарной рисует сама плитка)
   function tileOf(k, v) {
     var s = row(k, v), have = owned[key(k, v)] || 0, b = [];
     if (few(k, v, s)) b.push([t('few'), 'few']);
@@ -254,7 +254,7 @@
       d.appendChild(b); row.appendChild(d);
     });
   }
-  // «Новое в магазине» — GET /api/new: вещи в продаже и новые коллекции карточек
+  // «Новое на рынке» — GET /api/new: вещи в продаже и новые коллекции карточек
   function drawNew() {
     var B = window.PPBirds, C = window.PPCatalog, list = Object.keys(NEW).filter(function (x) { var p = x.split('|'); return row(p[0], p[1]).stock > 0; }).slice(0, 12);
     newBox.innerHTML = '';

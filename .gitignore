@@ -6,3 +6,6 @@ _shots/
 tools/pins/shots/_frames/
 tools/pins/shots/_video.html
 tools/pins/p16/
+
+# A1 Pack: būvējumi (rezultāts — <slug>-pack.zip blakus topic.json)
+a1-pack/topics/*/out/

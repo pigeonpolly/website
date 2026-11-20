@@ -21,7 +21,7 @@
   // id — адрес /admin/#id · open — какой экран показать (если не тот же id) · href — раздел живёт на другой странице
   // focus — к чему прокрутить экран (свёрнутое раскроется) · about — одна строка «что здесь делается» · count — счётчик из «Входящих»
   // hide — старый адрес (ссылки на него работают), но в меню его нет: экран тот же, что у другого пункта
-  const ADMIN_GROUPS = { pub: '✍️ Публиковать', birds: '🐦 Птицы', shop: '🛍 Магазин и игры', stats: '📊 Аналитика', service: '⚙️ Сервис' };
+  const ADMIN_GROUPS = { pub: '✍️ Публиковать', birds: '🐦 Птицы', shop: '🛍 Птичий рынок и игры', stats: '📊 Аналитика', service: '⚙️ Сервис' };
   const rulesBox = re => m => [...m.querySelectorAll('.adm-rules h3')].find(h => re.test(h.textContent));
   const ADMIN_SECTIONS = [
     { id: 'week', ic: '🗓', name: 'Неделя' }, // первый экран (редизайн 2.0, часть 4): 5 цифр, 5 кнопок, остальное — «⚙ Ещё инструменты»
@@ -31,6 +31,7 @@
     { id: 'blog', ic: '✍️', name: 'Блог', group: 'pub', href: '/blog-editor/', count: 'scheduled' },
     { id: 'requests', ic: '🖍', name: 'Нарисуй мне', group: 'pub', href: '/ru/requests/', count: 'requests' },
     { id: 'themes', ic: '🗓', name: 'Темы челленджа', group: 'pub', about: 'Темы челленджа на любой месяц вперёд: тема на трёх языках, цвета, время; банк ваших тем.' },
+    { id: 'prompts', ic: '📋', name: 'Страница тем', group: 'pub', about: 'Как /prompts/ видят посетители: 30 тем месяца, картинка для телефона и печать. Темы берутся из «🎨 Темы челленджа».' },
     { id: 'art', ic: '🎨', name: 'Картины и палитры', group: 'pub', about: 'Картины, добавленные с сайта, скрытые картины и очередь палитр дня ЭКСТРА.' },
     { id: 'posts', ic: '🖼', name: 'Пины', group: 'pub', about: 'Генератор пинов для Pinterest: тип → дизайн (10 вариантов) → ваше фото или из базы сайта → ✨ тексты. Скачать JPG и скопировать поля для Pinterest.' },
     { id: 'cheats', ic: '🧩', name: 'Конструктор шпаргалок', group: 'pub', about: 'Собрать шпаргалку из блоков: картинки, шаги, текст, советы. Переставлять, делать широкими или в полстроки, перевести на EN/RU/LV и выложить в «Шпаргалки» на «Уроках» — для всех или для своих.' },
@@ -47,26 +48,26 @@
     { id: 'broadcast', ic: '📢', name: 'Рассылка', group: 'birds', about: 'Одной кнопкой: сообщение с файлом, подарок или пуговки — всем, новым или старым птичкам. На почту — только тем, кто согласился.' },
     { id: 'mail', ic: '✉️', name: 'Письма', group: 'birds', about: 'Письма птичкам на почту — только тем, кто согласился: уведомления из игр, новые фишки, новости от Полли.' },
     { id: 'subscribers', ic: '📬', name: 'Подписчики', group: 'birds', about: 'Адреса людей, которые ждут письма о новой книге.', count: 'subs' },
-    { id: 'shop', ic: '🛍', name: 'Магазин', group: 'shop', about: 'Сколько штук каждой вещи в продаже; цены считаются сами.' },
+    { id: 'shop', ic: '🛍', name: 'Птичий рынок', group: 'shop', about: 'Сколько штук каждой вещи в продаже; цены считаются сами.' },
     { id: 'cards', ic: '🃏', name: 'Карточки', group: 'shop', about: 'Коллекционные карточки: каждая — в одном экземпляре. Новая карточка, правка, номер, скрыть, удалить; цена обычных; импорт коллекций с сайта.' },
     { id: 'advent', ic: '🎄', name: 'Адвент', group: 'shop', about: 'Что лежит в каком окошке адвент-календаря.', count: 'advent' },
     { id: 'titos', ic: '🕵️', name: 'Дела Титоса', group: 'shop', about: 'Какие дела детектива Титоса на сайте и переведены ли они. Новые дела заносятся сами раз в час после выкладки.' },
     { id: 'titos-rules', hide: 1, ic: '📜', name: 'Правила Титоса', open: 'rules', focus: rulesBox(/Детектив Титос/), about: 'Кофе детектива Титоса и пуговки за раскрытые дела.' },
     { id: 'games', hide: 1, ic: '🎮', name: 'Награды игр', open: 'rules', focus: rulesBox(/Пуговичный дождь/), about: 'Сколько пуговок дают игры.' },
-    { id: 'overview', ic: '📊', name: 'Сводка', group: 'stats', about: 'Главные цифры сайта: статьи, комментарии, птицы, работы в челлендже. Подробно — во вкладках рядом.' },
-    { id: 'blogstats', ic: '📰', name: 'Блог', group: 'stats', about: 'Какие статьи читают и какие нет, откуда на них приходят, сколько времени читают и дочитывают ли. Нажмите на статью — всё о ней.' },
-    { id: 'challenge', hide: 1, ic: '📊', name: 'Обзор', open: 'overview', about: 'Главные цифры сайта: статьи, комментарии, птицы, работы в челлендже.' },
-    { id: 'flock', hide: 1, ic: '📊', name: 'Обзор', open: 'overview', about: 'Главные цифры сайта: статьи, комментарии, птицы, работы в челлендже.' },
-    { id: 'visitors', ic: '👥', name: 'Посетители', group: 'stats', about: 'Сколько людей заходит на сайт, откуда и с каких устройств.' },
+    { id: 'analytics', ic: '📊', name: 'Аналитика', group: 'stats', about: 'Одна таблица: страницы, статьи, дни, источники — период, фильтры, сравнение. Нажмите на строку — подробнее.' },
     { id: 'funnels', ic: '🔻', name: 'Воронки', group: 'stats', about: 'Сколько людей проходит каждый шаг: например, открыли окно входа → вошли.' },
-    { id: 'analytics', hide: 1, ic: '📰', name: 'Блог', open: 'blogstats' }, // старый адрес «📈 Статьи»
+    { id: 'visitors', hide: 1, ic: '👥', name: 'Посетители', open: 'analytics', by: 'page' }, // старый адрес: теперь одна таблица
+    { id: 'blogstats', hide: 1, ic: '📰', name: 'Блог', open: 'analytics', by: 'article' }, // старый адрес
+    { id: 'overview', hide: 1, ic: '📊', name: 'Сводка', open: 'analytics', by: 'page' }, // старый адрес
+    { id: 'challenge', hide: 1, ic: '📊', name: 'Обзор', open: 'analytics', by: 'page' },
+    { id: 'flock', hide: 1, ic: '📊', name: 'Обзор', open: 'analytics', by: 'page' },
     { id: 'rules', ic: '📜', name: 'Правила', group: 'service', about: 'Что сайт делает сам (автопилот) и все числа: пуговки, бейджи, игры.' },
     { id: 'backup', ic: '💾', name: 'Копии', group: 'service', about: 'Полная копия сайта: скачать, настроить автокопию, восстановить.' },
     { id: 'security', ic: '🔐', name: 'Защита', group: 'service', about: 'PIN админа и код восстановления на случай, если потеряете Google.' },
     { id: 'edits', ic: '🧩', name: 'Правки страниц', group: 'service', about: 'Блоки, которые вы поменяли или скрыли прямо на сайте («✏️ Править страницу»), — здесь их можно вернуть как было.', count: 'edits' },
     { id: 'gemini', hide: 1, ic: '🔑', name: 'Ключ Gemini', href: '/blog-editor/#gemini' },
   ];
-  const SECTIONS = { week, notes, titos, inbox, security, overview: () => overview(), visitors, comments, blogstats, funnels: () => funnelsScreen(), backup, subscribers, birds, shop, edits, advent, rules, art,
+  const SECTIONS = { week, notes, titos, prompts: promptsScreen, inbox, security, analytics, comments, funnels: () => funnelsScreen(), backup, subscribers, birds, shop, edits, advent, rules, art,
     themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
     asks: () => window.PPAboutAdmin ? window.PPAboutAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился about-admin.js</p>'), // 📮 Вопросы из чата (about-admin.js)
     school: () => window.PPSchoolAdmin ? window.PPSchoolAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился school-admin.js</p>'), // 🎓 Школа Полли (school-admin.js)
@@ -92,13 +93,18 @@
   // ⭐ «Часто» — полоска над экраном: 6 разделов, куда админ заходит чаще всего (счёт в localStorage этого устройства, pp-adm-freq)
   const FREQ_KEY = 'pp-adm-freq', FREQ_N = 6;
   const freqGet = () => { try { return JSON.parse(localStorage.getItem(FREQ_KEY) || '{}') || {}; } catch (e) { return {}; } };
+  { const f = freqGet(); if (f.blog == null) { f.blog = Math.max(2, ...Object.values(f).map(Number).filter(n => n > 0)); try { localStorage.setItem(FREQ_KEY, JSON.stringify(f)); } catch (e) {} } } // 20.11: заходы в редактор блога раньше не считались — стартовый счёт, чтобы «Блог» сразу был в «Часто»
   const freqAdd = id => { const x = secOf(id); if (!x || x.hide) return; const f = freqGet(); f[id] = (f[id] || 0) + 1; try { localStorage.setItem(FREQ_KEY, JSON.stringify(f)); } catch (e) {} };
   const freqBar = cur => { const f = freqGet(), top = Object.keys(f).filter(id => f[id] >= 2 && secOf(id) && !secOf(id).hide).sort((a, b) => f[b] - f[a]).slice(0, FREQ_N);
     return top.length ? `<nav class="adm-tabs adm-freq" aria-label="Часто"><span class="adm-freq-h">⭐ Часто</span>${top.map(id => tabLink(secOf(id), cur)).join('')}</nav>` : ''; };
-  document.addEventListener('click', e => { const a = e.target.closest && e.target.closest('a.adm-ext'); if (a) { const x = ADMIN_SECTIONS.find(t => t.href === a.getAttribute('href')); if (x) freqAdd(x.id); } });
+  document.addEventListener('click', e => { const a = e.target.closest && e.target.closest('a.adm-ext'); if (a) { const x = ADMIN_SECTIONS.find(t => t.href === a.getAttribute('href')); if (x && x.id !== 'blog') freqAdd(x.id); } }); // блог считает сам blog-editor.js
   // экран: строка «что здесь делается» сверху, потом сам раздел; focus — прокрутить к нужному месту
   async function route() {
-    const id = (location.hash || '#week').slice(1), x = secOf(id) || (SECTIONS[id] ? { id } : secOf('week'));
+    const raw = (location.hash || '#week').slice(1), qi = raw.indexOf('?');
+    const id = qi < 0 ? raw : raw.slice(0, qi);
+    const x = secOf(id) || (SECTIONS[id] ? { id } : secOf('week'));
+    if (qi >= 0) anParse(raw.slice(qi + 1)); // период и фильтры из ссылки (#analytics?p=7&by=src…)
+    if (x.by) { const s = anState(); s.by = x.by; s.row = ''; } // старые адреса: #visitors → таблица по страницам, #blogstats → по статьям
     const cur = x.hide ? x.open || x.id : x.id, g = (secOf(cur) || x).group || '';
     const adm = document.getElementById('adm'); if (adm) adm.classList.toggle('adm-wk', x.id === 'week'); // «Неделя» — на всю ширину, без меню слева
     document.querySelectorAll('.adm-nav [data-grp]').forEach(a => a.setAttribute('aria-current', a.dataset.grp === (x.id === 'week' || x.id === 'runes' || x.id === 'tarot' ? x.id : g) ? 'page' : 'false'));
@@ -117,7 +123,7 @@
     }
   }
   addEventListener('hashchange', route);
-  // длинные таблицы и списки — первые 10 строк, остальное по кнопке «Показать все» (кроме таблицы остатков магазина: в ней кнопка «Поставить»)
+  // длинные таблицы и списки — первые 10 строк, остальное по кнопке «Показать все» (кроме таблицы остаткона рынока: в ней кнопка «Поставить»)
   const FOLD = 10;
   function foldLong() {
     main.querySelectorAll('table.be-table:not(.adm-stock):not([data-fold]), .adm-box > ol:not([data-fold]), .adm-box > ul:not([data-fold]), ol.adm-comments:not([data-fold]), ul.adm-bars:not([data-fold])').forEach(t => {
@@ -189,8 +195,8 @@
     const since = d.amazonFirst && d.amazonFirst > Date.now() / 1000 - 14 * 86400 ? ` · Amazon считается с ${wkDay(d.amazonFirst)}` : !d.amazonFirst ? ' · Amazon считается с этой недели' : '';
     const nums = [
       [d.people.now, plural(d.people.now, 'посетитель', 'посетителя', 'посетителей') + ' за 7 дней', wkDelta(d.people.now, d.people.prev, 1), 'wk-n-vis'],
-      [go, plural(go, 'переход', 'перехода', 'переходов') + ' в магазин и на Amazon', wkDelta(go, goPrev) + `<small>магазин ${n(d.shop.now)} · Amazon ${n(d.amazon.now)}${since}</small>`],
-      [d.buys.now, plural(d.buys.now, 'покупка', 'покупки', 'покупок') + ' в магазине птичек', wkDelta(d.buys.now, d.buys.prev)],
+      [go, plural(go, 'переход', 'перехода', 'переходов') + ' на рынок и на Amazon', wkDelta(go, goPrev) + `<small>рынок ${n(d.shop.now)} · Amazon ${n(d.amazon.now)}${since}</small>`],
+      [d.buys.now, plural(d.buys.now, 'покупка', 'покупки', 'покупок') + ' на Птичьем рынке', wkDelta(d.buys.now, d.buys.prev)],
       [d.subs.total, 'в списке ожидания книги', d.subs.now ? `<i class="wk-up">▲ +${n(d.subs.now)} за неделю</i>` : '<i class="wk-eq">новых нет</i>'],
       [d.birds.total, plural(d.birds.total, 'птичка', 'птички', 'птичек') + ' на сайте', (d.birds.now ? `<i class="wk-up">▲ +${n(d.birds.now)} за неделю</i>` : '<i class="wk-eq">новых нет</i>') + `<small>🟢 сейчас на сайте: ${n(d.online)} · список →</small>`, 'wk-n-link', '#birds'],
     ];
@@ -199,7 +205,7 @@
     const acts = [
       { ic: '📥', t: 'Входящие', badge: items.length, d: inboxTxt, btn: `<a class="pill-btn${items.length ? ' pill-fill' : ''}" href="#inbox">Открыть</a>`, hot: items.length },
       { ic: '✍️', t: 'Написать статью', d: 'Редактор с переводчиком на три языка. Темы подскажет «💡 Темы для блога».', btn: '<a class="pill-btn pill-fill" href="/blog-editor/#new">＋ Новая статья</a><a class="pill-btn" href="#ideas">💡 Темы</a>' },
-      { ic: '🛍', t: 'Магазин', d: rs && rs.at ? `Последнее пополнение — ${wkDay(rs.at)}${rs.items ? `, ${n(rs.items)} ${plural(rs.items, 'вещь', 'вещи', 'вещей')}` : ''}.` : 'Закончившиеся вещи пополняются одной кнопкой.', btn: '<button class="pill-btn pill-fill" type="button" id="wk-restock">🔄 Пополнить</button><a class="pill-btn" href="#shop">Открыть</a>' },
+      { ic: '🛍', t: 'Птичий рынок', d: rs && rs.at ? `Последнее пополнение — ${wkDay(rs.at)}${rs.items ? `, ${n(rs.items)} ${plural(rs.items, 'вещь', 'вещи', 'вещей')}` : ''}.` : 'Закончившиеся вещи пополняются одной кнопкой.', btn: '<button class="pill-btn pill-fill" type="button" id="wk-restock">🔄 Пополнить</button><a class="pill-btn" href="#shop">Открыть</a>' },
       { ic: '🔘', t: 'Зарплата птичкам', d: sal ? `Последняя — ${wkDay(sal.at)}: по ${n(sal.amount)} 🔘, ${n(sal.birds)} ${plural(sal.birds, 'птичке', 'птичкам', 'птичкам')}.` : 'Ещё не выдавалась.', btn: `<label class="wk-sal"><input type="number" min="1" max="10000" value="${sal ? sal.amount : 10}" id="wk-sal-n" aria-label="Сколько пуговок каждой"> 🔘</label><button class="pill-btn pill-fill" type="button" id="wk-salary">Выдать всем</button><a class="pill-btn" href="#broadcast" title="Выбрать, кому: новым, старым, выбранным">📢 Кому…</a>` },
       { ic: '🎨', t: 'Челлендж сезона', d: 'Темы челленджа на месяц вперёд: три языка, цвета, банк ваших тем.', btn: '<a class="pill-btn pill-fill" href="#themes">Темы</a>' },
     ];
@@ -212,7 +218,7 @@
       <div class="wk-nums">${nums.map(([v, t, dl, c, href]) => { const tag = href ? 'a' : 'div'; return `<${tag}${href ? ` href="${href}" title="Открыть список птичек"` : ''} class="wk-num${c ? ' ' + c : ''}"><b>${n(v)}</b><span>${t}</span>${dl}</${tag}>`; }).join('')}</div>
       <div class="wk-acts">${acts.map(a => `<section class="wk-act${a.hot ? ' wk-hot' : ''}"><span class="wk-e" aria-hidden="true">${a.ic}</span><h3>${a.t}${a.badge ? `<span class="wk-badge">${a.badge}</span>` : ''}</h3><p>${a.d}</p><div class="wk-btns">${a.btn}</div></section>`).join('')}</div>
       <section class="wk-more"><h3>⚙ Ещё инструменты</h3><div class="wk-cols">${more}</div></section>
-      <p class="be-note wk-foot">Цифры — за последние 7 дней (${esc(d.from.slice(8))}.${esc(d.from.slice(5, 7))}–${esc(d.to.slice(8))}.${esc(d.to.slice(5, 7))}), сравнение — с 7 днями до них. Подробно — <a href="#overview">📊 Аналитика</a> (сайт, блог, посетители, воронки).</p>
+      <p class="be-note wk-foot">Цифры — за последние 7 дней (${esc(d.from.slice(8))}.${esc(d.from.slice(5, 7))}–${esc(d.to.slice(8))}.${esc(d.to.slice(5, 7))}), сравнение — с 7 днями до них. Подробно — <a href="#analytics">📊 Аналитика</a>: одна таблица по страницам, статьям, дням и источникам.</p>
     </div>`;
     // ⏸ пауза сайта (worker/pause.js): для посетителей — страница «Ведутся работы», админа пускает
     main.querySelector('#wk-pause').onclick = async e => {
@@ -222,7 +228,7 @@
       try { await api('admin/pause', { on }); week(); } catch (x) { e.target.disabled = false; alert(err(x)); }
     };
     main.querySelector('#wk-restock').onclick = async e => {
-      if (!confirm('Пополнить магазин: все закончившиеся вещи (кроме легендарных) — снова в продажу?')) return;
+      if (!confirm('Пополнить рынок: все закончившиеся вещи (кроме легендарных) — снова в продажу?')) return;
       e.target.disabled = true;
       try { const r = await api('admin/shop/autorestock', {}); alert(`🔄 Готово: пополнено ${r.items || 0} закончившихся вещей, по ${r.to} шт.`); week(); } catch (x) { e.target.disabled = false; alert(err(x)); }
     };
@@ -296,26 +302,8 @@
   // ---------- обзор ----------
   // «🤖 Автопилот»: что работает само; зелёное — всё хорошо, жёлтое (warn) — стоит заглянуть, красное — нужно внимание
   const autoCard = list => { const bad = list.filter(x => x.ok === false); return `<section class="adm-box adm-auto${bad.length ? ' warn' : ''}"><h3>🤖 Автопилот: ${bad.length ? `нужно внимание (${bad.length})` : 'всё работает само ✓'}</h3>
-    <p class="be-note">${bad.length ? 'Ниже красным — что не так. Остальное по-прежнему работает само.' : 'Магазин пополняется, цены и награды подстраиваются, сезоны меняются — ничего настраивать не нужно.'}</p>
+    <p class="be-note">${bad.length ? 'Ниже красным — что не так. Остальное по-прежнему работает само.' : 'Птичий рынок пополняется, цены и награды подстраиваются, сезоны меняются — ничего настраивать не нужно.'}</p>
     <ul>${list.map(x => `<li class="${x.ok === false ? 'bad' : x.ok === null ? 'off' : x.warn ? 'warn' : 'ok'}"><b>${x.ok === false ? '⚠️' : x.ok === null ? '⏸' : x.warn ? '🟡' : '✓'} ${esc(x.t)}</b> — ${esc(x.d)}</li>`).join('')}</ul></section>`; };
-  async function overview(el = main) {
-    el.innerHTML = '<p class="be-note">Загрузка…</p>';
-    let d; try { d = await api('blog/admin/overview'); } catch (e) { el.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    const card = (icon, label, big, small) => `<div class="adm-card"><span class="adm-ic">${icon}</span><b>${big}</b><span>${label}</span>${small ? `<small>${small}</small>` : ''}</div>`;
-    el.innerHTML = `<div class="adm-cards">
-        ${card('📝', 'статей опубликовано', n(d.posts.pub), d.posts.draft ? `черновиков: ${n(d.posts.draft)}` : '')}
-        ${card('👁', 'просмотров статей', n(d.posts.views), `лайков: ${n(d.posts.likes)}`)}
-        ${card('💬', 'комментариев', n(d.comments.total), `за неделю: ${n(d.comments.week)}`)}
-        ${card('🐦', 'птиц в стае', n(d.totals.users), `новых за неделю: ${n(d.users.week)} · заходили: ${n(d.users.active)}`)}
-        ${card('🎨', 'работ в челлендже', n(d.totals.works), `за неделю: ${n(d.works.week)}`)}
-      </div>
-      <div class="adm-cols">
-        <section class="adm-box"><h2>Популярные статьи</h2>${d.top.length ? `<ol class="adm-top">${d.top.map(p => `<li><a href="/ru/blog/${esc(p.slug)}/" target="_blank">${esc(title(p))}</a><span>👁 ${n(p.views)} · ♥ ${n(p.likes)} · 💬 ${n(p.comments)}</span><a class="adm-edit" href="/blog-editor/#${p.id}" title="Редактировать">✎</a></li>`).join('')}</ol>` : '<p class="be-note">Пока нет опубликованных статей.</p>'}</section>
-        <section class="adm-box"><h2>Новые птицы <a class="adm-all" href="#birds">все →</a></h2>${d.newUsers.length ? `<ul class="adm-list">${d.newUsers.map(u => `<li>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}<span>${fmt(u.created_at)}</span></li>`).join('')}</ul>` : '<p class="be-note">Пока никого.</p>'}</section>
-      </div>
-      <section class="adm-box"><h2>Новые работы в челлендже</h2>${d.newWorks.length ? `<div class="adm-works">${d.newWorks.map(w => `<a href="/api/img/${w.id}" target="_blank" title="@${esc(w.nick)} · ${esc(w.theme || '')} · ${esc(w.day)}"><img src="/api/img/${w.id}?t=1" alt="" loading="lazy"><span>@${esc(w.nick)}</span></a>`).join('')}</div>` : '<p class="be-note">Пока нет работ.</p>'}</section>`;
-  }
-  function pend(k) { const b = document.getElementById('adm-pend'); if (b) { b.hidden = !k; b.textContent = k || ''; } }
 
   // ---------- 🎨 картины и палитры, добавленные с сайта (/api/palettes; добавляют и скрывают их на страницах галерей) ----------
   async function art() {
@@ -371,8 +359,10 @@
     });
   }
 
-  // ---------- посетители сайта (своя статистика: /api/admin/visits) ----------
-  let vDays = 7;
+  // ---------- 📊 Аналитика: одна таблица (20.11.2026) ----------
+  // Было три экрана (Сводка, Блог, Посетители) — стало одно место: период, фильтры, разрез и таблица.
+  // Разрез: страницы / статьи / дни / источники / страны / устройства / язык / метки; строка раскрывается — по дням и откуда пришли.
+  // Период, сравнение и фильтры остаются в адресе (#analytics?…) и в localStorage — ссылку можно сохранить.
   const SRC_IC = { 'Google': '🔎', 'Bing': '🔎', 'Yandex': '🔎', 'DuckDuckGo': '🔎', 'Другие поисковики': '🔎', 'Instagram': '📸', 'Facebook': '👥', 'Pinterest': '📌', 'TikTok': '🎵', 'Threads': '🧵',
     'LinkedIn': '💼', 'Telegram': '✈️', 'YouTube': '▶️', 'Patreon': '🎨', 'X (Twitter)': '✖️', 'VK': '🅥', 'Reddit': '👽', 'ChatGPT и др. ИИ': '🤖', 'Почта': '✉️', 'Напрямую': '🔗', 'Другие сайты': '🌐' };
   const DEV_IC = { 'Телефон': '📱', 'Компьютер': '💻', 'Планшет': '📲' };
@@ -382,220 +372,311 @@
   const pageName = p => p === '/' ? 'Главная' : p === '/ru/' ? 'Главная (RU)' : p === '/lv/' ? 'Главная (LV)' : p;
   const utmUrl = (p, s, c) => `https://www.pigeonpolly.com${p}${p.includes('?') ? '&' : '?'}utm_source=${encodeURIComponent(s)}&utm_campaign=${encodeURIComponent(c)}`;
   const pct = (a, b) => b ? Math.round(a * 100 / b) : 0;
-  const delta = (a, b) => { if (!b) return a ? '<small class="adm-up">новое</small>' : ''; const d = Math.round((a - b) * 100 / b); return `<small class="${d >= 0 ? 'adm-up' : 'adm-down'}">${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}% к прошлому периоду</small>`; };
-  // горизонтальные полоски: подпись, полоска, число и доля
+  const delta = (a, b) => { if (b == null) return ''; if (!b) return a ? '<small class="adm-up">новое</small>' : ''; const d = Math.round((a - b) * 100 / b); return `<small class="${d >= 0 ? 'adm-up' : 'adm-down'}">${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}% к прошлому периоду</small>`; };
+  const mmss = s => s == null ? '—' : s < 60 ? `${s}\u00a0с` : `${Math.floor(s / 60)}\u00a0мин ${String(s % 60).padStart(2, '0')}\u00a0с`;
+  // горизонтальные полоски: подпись, полоска, число и доля (для раскрытой строки)
   const bars = (rows, label, total, extra) => rows.length ? `<ul class="adm-bars">${rows.map(r => `<li><span class="adm-bl">${label(r)}</span><span class="adm-bt"><i style="width:${Math.max(2, pct(r.n, rows[0].n))}%"></i></span><b>${n(r.n)}</b><small>${pct(r.n, total)}%</small>${extra ? extra(r) : ''}</li>`).join('')}</ul>` : '<p class="be-note">Пока нет данных.</p>';
-  // воронки (этап 12): один вид для любой воронки из worker/auth.js FUNNELS — шаги по дням, доля от первого шага
-  async function funnels(box, days) {
-    if (!box) return;
-    let d; try { d = await api('admin/funnels?days=' + days); } catch (e) { box.innerHTML = ''; return; }
-    box.innerHTML = d.funnels.map(f => {
-      const tot = {}; f.days.forEach(r => f.steps.forEach(s => { tot[s.k] = (tot[s.k] || 0) + (r.n[s.k] || 0); }));
-      const first = f.steps[0].k;
-      const cell = (row, s, i) => `<td data-l="${esc(s.label)}"><b>${n(row[s.k] || 0)}</b>${i && row[first] ? ` <small>${pct(row[s.k] || 0, row[first])}%</small>` : ''}</td>`;
-      return `<section class="adm-box adm-funnel"><h2>🔻 Воронка: ${esc(f.name)}</h2>
-        <p class="be-note">За ${d.days} дн. Один человек за сутки на каждом шаге считается один раз; % — от первого шага.</p>
-        ${f.days.length ? `<table class="be-table adm-table"><thead><tr><th>День</th>${f.steps.map(s => `<th>${esc(s.label)}</th>`).join('')}</tr></thead><tbody>
-          <tr class="adm-total"><td data-l="День"><b>Всего</b></td>${f.steps.map((s, i) => cell(tot, s, i)).join('')}</tr>
-          ${f.days.map(r => `<tr><td data-l="День">${new Date(r.day + 'T12:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', weekday: 'short' })}</td>${f.steps.map((s, i) => cell(r.n, s, i)).join('')}</tr>`).join('')}</tbody></table>` : '<p class="be-note">Пока нет данных.</p>'}</section>`;
-    }).join('');
+
+  const RIGA = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
+  const dAdd = (day, k) => { const x = new Date(day + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + k); return x.toISOString().slice(0, 10); };
+  const dLoc = (day, o) => new Date(day + 'T12:00').toLocaleDateString('ru-RU', o);
+  const dOne = day => dLoc(day, { day: 'numeric', month: 'long', year: 'numeric' });
+  const dShort = day => dLoc(day, { day: 'numeric', month: 'short' });
+  const AN_KEY = 'pp-an';
+  const AN_BY = [['page', 'Страницы'], ['article', 'Статьи'], ['day', 'Дни'], ['src', 'Источники'], ['ref', 'Сайты-ссылки'], ['country', 'Страны'], ['device', 'Устройства'], ['lang', 'Язык'], ['campaign', 'Метки']];
+  const AN_CMP = [['prev', 'прошлый период'], ['year', 'год назад'], ['none', 'не сравнивать']];
+  const AN_PRE = [['today', 'Сегодня'], ['7', '7 дней'], ['30', '30 дней'], ['month', 'Этот месяц'], ['lastmonth', 'Прошлый месяц'], ['365', 'Год'], ['custom', 'Свой…']];
+  let A = null, anData = null, anMode = 'table';
+
+  function anState() {
+    if (A) return A;
+    A = { preset: '7', from: '', to: '', cmp: 'prev', by: 'page', src: '', device: '', country: '', lang: '', q: '', row: '', sort: 'people', desc: true, all: false };
+    try { const s = JSON.parse(localStorage.getItem(AN_KEY) || 'null'); if (s && typeof s === 'object') A = { ...A, ...s, row: '', all: false }; } catch (e) {}
+    return A;
   }
-  async function visitors() {
-    main.innerHTML = '<p class="be-note">Загрузка…</p>';
-    let d; try { d = await api('admin/visits?days=' + vDays); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    const N = d.now, P = d.prev, sum = a => a.reduce((s, r) => s + r.n, 0);
-    const srcTotal = sum(d.sources), devTotal = sum(d.devices);
-    // по каждому источнику: какая доля пришла с телефона
-    const sd = {}; d.sourceDevices.forEach(r => { (sd[r.k] = sd[r.k] || {})[r.d] = r.n; });
-    const mob = r => { const x = sd[r.k] || {}, t = Object.values(x).reduce((a, b) => a + b, 0); return `<em title="с телефона">📱 ${pct(x['Телефон'] || 0, t)}%</em>`; };
-    // график по дням: все дни периода, даже пустые
-    const byDay = Object.fromEntries(d.series.map(r => [r.day, r]));
-    const days = []; for (let i = d.days - 1; i >= 0; i--) { const s = new Date(Date.now() - i * 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }); days.push({ day: s, people: (byDay[s] || {}).people || 0, views: (byDay[s] || {}).views || 0 }); }
-    const max = Math.max(1, ...days.map(x => x.people));
-    const dd = s => new Date(s + 'T12:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', weekday: d.days <= 14 ? 'short' : undefined });
-    const chart = d.days === 1 ? '' : `<section class="adm-box"><h2>Люди по дням</h2>
-      <div class="adm-chart" role="img" aria-label="Посетители по дням">${days.map(x => `<div class="adm-col" tabindex="0" data-tip="${esc(dd(x.day))}: ${n(x.people)} чел. · ${n(x.views)} просм."><i style="height:${x.people ? Math.max(3, x.people * 100 / max) : 0}%"></i></div>`).join('')}</div>
-      <div class="adm-chart-x"><span>${dd(days[0].day)}</span><span class="adm-chart-tip" aria-live="polite">Наведите или нажмите на столбик</span><span>${dd(days[days.length - 1].day)}</span></div></section>`;
-    const per = [[1, 'Сегодня'], [7, '7 дней'], [30, '30 дней'], [90, '3 месяца'], [365, 'Год']];
-    main.innerHTML = `
-      <div class="adm-filter" role="toolbar" aria-label="Период">${per.map(([k, l]) => `<button type="button" class="pill-btn" data-days="${k}" aria-pressed="${vDays === k}">${l}</button>`).join('')}
-        <span class="adm-live">🟢 сейчас на сайте: <b>${n(d.online)}</b></span></div>
-      <div class="adm-cards">
-        <div class="adm-card"><span class="adm-ic">👥</span><b>${n(N.people)}</b><span>человек</span>${delta(N.people, P.people)}</div>
-        <div class="adm-card"><span class="adm-ic">🚪</span><b>${n(N.visits)}</b><span>заходов на сайт</span>${delta(N.visits, P.visits)}</div>
-        <div class="adm-card"><span class="adm-ic">📄</span><b>${n(N.views)}</b><span>просмотров страниц</span><small>${N.visits ? (N.views / N.visits).toFixed(1).replace('.', ',') + ' стр. за заход' : ''}</small></div>
-        <div class="adm-card"><span class="adm-ic">📱</span><b>${pct(N.mobile, N.people)}%</b><span>с телефона</span></div>
+  const anSave = () => { const a = anState(); try { localStorage.setItem(AN_KEY, JSON.stringify({ preset: a.preset, from: a.from, to: a.to, cmp: a.cmp, by: a.by, src: a.src, device: a.device, country: a.country, lang: a.lang, sort: a.sort, desc: a.desc })); } catch (e) {} };
+  function anRange() {
+    const a = anState(), today = RIGA();
+    if (a.preset === 'custom' && a.from && a.to) return { from: a.from, to: a.to };
+    if (a.preset === 'today') return { from: today, to: today };
+    if (a.preset === 'month') return { from: today.slice(0, 8) + '01', to: today };
+    if (a.preset === 'lastmonth') {
+      const [y, m] = today.split('-').map(Number), ly = m === 1 ? y - 1 : y, lm = m === 1 ? 12 : m - 1;
+      return { from: `${ly}-${String(lm).padStart(2, '0')}-01`, to: new Date(Date.UTC(ly, lm, 0)).toISOString().slice(0, 10) };
+    }
+    const days = Number(a.preset) || 7;
+    return { from: dAdd(today, 1 - days), to: today };
+  }
+  function anQuery() {
+    const a = anState(), r = anRange(), q = new URLSearchParams({ from: r.from, to: r.to, cmp: a.cmp, by: a.by });
+    for (const k of ['src', 'device', 'country', 'lang']) if (a[k]) q.set(k, a[k]);
+    if (a.row) q.set('row', a.row);
+    q.set('limit', '300');
+    return q.toString();
+  }
+  function anHash() {
+    const a = anState(), q = new URLSearchParams({ p: a.preset, cmp: a.cmp, by: a.by });
+    if (a.preset === 'custom') { q.set('from', a.from); q.set('to', a.to); }
+    for (const k of ['src', 'device', 'country', 'lang', 'q']) if (a[k]) q.set(k, a[k]);
+    if (a.row) q.set('row', a.row);
+    return '#' + (anMode === 'funnels' ? 'funnels' : 'analytics') + '?' + q.toString();
+  }
+  function anSync() { try { history.replaceState(null, '', anHash()); } catch (e) {} anSave(); }
+  function anParse(qs) {
+    const a = anState(), q = new URLSearchParams(qs || '');
+    if (![...q.keys()].length) return;
+    a.preset = q.get('p') || '7';
+    if (a.preset === 'custom') { a.from = q.get('from') || ''; a.to = q.get('to') || ''; if (!a.from || !a.to) a.preset = '7'; }
+    if (q.get('cmp')) a.cmp = q.get('cmp');
+    if (q.get('by')) a.by = q.get('by');
+    for (const k of ['src', 'device', 'country', 'lang', 'q']) a[k] = q.get(k) || '';
+    a.row = q.get('row') || ''; a.all = false;
+  }
+  const anGo = () => anMode === 'funnels' ? funnelsScreen() : analytics();
+
+  // панель: период, сравнение, разрез и фильтры (only=1 — только период: для «Воронок»)
+  function anBar(only) {
+    const a = anState(), r = anRange(), d = anData;
+    const span = r.from === r.to ? dOne(r.from) : `${dShort(r.from)} – ${dShort(r.to)} ${r.to.slice(0, 4)}`;
+    const opt = (list, cur) => list.map(([k, l]) => `<option value="${esc(k)}"${k === cur ? ' selected' : ''}>${esc(l)}</option>`).join('');
+    const fac = (key, title) => {
+      const list = (d && d.facets && d.facets[key]) || [];
+      return `<select data-an="${key}" aria-label="${esc(title)}"><option value="">${esc(title)}: все</option>${list.map(x => `<option value="${esc(x.k)}"${a[key] === x.k ? ' selected' : ''}>${esc(x.k)} (${n(x.n)})</option>`).join('')}</select>`;
+    };
+    return `<div class="an-bar">
+      <div class="an-row">
+        <span class="an-lbl">Период</span>
+        <button type="button" class="an-date" data-an="cal">📅 ${esc(span)} ▾</button>
+        ${AN_PRE.map(([k, l]) => `<button type="button" class="an-pill${a.preset === k ? ' on' : ''}" data-pre="${k}">${l}</button>`).join('')}
+        <span class="an-sp"></span>
+        <label class="an-field">⇄ <select data-an="cmp" aria-label="С чем сравнивать">${opt(AN_CMP, a.cmp)}</select></label>
+        ${only ? '' : '<button type="button" class="pill-btn" data-an="csv">⬇ CSV</button>'}
       </div>
-      ${chart}
-      <div class="adm-cols">
-        <section class="adm-box"><h2>Откуда пришли</h2><p class="be-note">Каждый заход на сайт: с какого сайта или приложения. «Напрямую» — набрали адрес, закладка или ссылка из мессенджера (WhatsApp, Viber не сообщают, откуда).</p>
-          ${bars(d.sources, r => `${SRC_IC[r.k] || '🌐'} ${esc(r.k)}`, srcTotal, mob)}</section>
-        <section class="adm-box"><h2>Устройства</h2>${bars(d.devices, r => `${DEV_IC[r.k] || ''} ${esc(r.k)}`, devTotal)}
-          <h3>Система</h3>${bars(d.os, r => esc(r.k), sum(d.os))}</section>
+      ${only ? '' : `<div class="an-row">
+        <span class="an-lbl">Показывать</span>
+        <select data-an="by" aria-label="Разрез">${opt(AN_BY, a.by)}</select>
+        ${fac('src', '🌐 Источник')}${fac('device', '📱 Устройство')}${fac('country', '🌍 Страна')}${fac('lang', '🗣 Язык')}
+        <input type="search" class="an-q" data-an="q" value="${esc(a.q)}" placeholder="🔍 поиск" aria-label="Поиск по названию">
+        <button type="button" class="bc-link" data-an="reset">✕ Сбросить</button>
       </div>
-      <div class="adm-cols">
-        <section class="adm-box"><h2>Страны</h2>${bars(d.countries, r => `${flag(r.k)} ${esc(regionName(r.k))}`, sum(d.countries))}</section>
-        <section class="adm-box"><h2>Браузер / приложение</h2><p class="be-note">«Внутри приложения» — открыли ссылку прямо в Instagram, TikTok и т.п.</p>${bars(d.browsers, r => esc(r.k), sum(d.browsers))}</section>
+      <div class="an-row an-custom"${a.preset === 'custom' ? '' : ' hidden'}>
+        <span class="an-lbl">Свои даты</span>
+        <input type="date" data-an="from" value="${esc(r.from)}"><span>—</span><input type="date" data-an="to" value="${esc(r.to)}">
+        <button type="button" class="pill-btn pill-fill" data-an="apply">Показать</button>
       </div>
-      <div class="adm-cols">
-        <section class="adm-box"><h2>С какой страницы начали</h2>${bars(d.landing, r => `<a href="${esc(r.k)}" target="_blank">${esc(pageName(r.k))}</a>`, sum(d.landing))}</section>
-        <section class="adm-box"><h2>Сайты, которые на вас ссылаются</h2>${bars(d.refs, r => esc(r.k), sum(d.refs))}
-          <h3>Язык сайта</h3>${bars(d.langs, r => esc(r.k), sum(d.langs))}</section>
-      </div>
-      <section class="adm-box"><h2>Популярные страницы</h2>
-        <table class="be-table adm-table"><thead><tr><th>Страница</th><th>📄 Просмотры</th><th>👥 Люди</th></tr></thead>
-        <tbody>${d.pages.map(r => `<tr><td data-l="Страница"><a href="${esc(r.k)}" target="_blank">${esc(pageName(r.k))}</a></td><td data-l="Просмотры">${n(r.n)}</td><td data-l="Люди">${n(r.p)}</td></tr>`).join('') || '<tr><td colspan="4">Пока нет данных.</td></tr>'}</tbody></table></section>
-      <section class="adm-box"><h2>🏷 Ваши ссылки с метками</h2>
-        <p class="be-note">Ставьте такую ссылку в пост, пин или сторис — и здесь будет видно, сколько людей пришло именно по ней. Заполните страницу сайта, где выложите ссылку, и название (например, <code>pin-001</code>) и нажмите «Сохранить».</p>
-        <div class="adm-utm"><input type="text" placeholder="Страница сайта, например /flock/" data-utm-p value="/"><select data-utm-s aria-label="Где выложите">${['pinterest', 'instagram', 'tiktok', 'facebook', 'threads', 'telegram', 'linkedin', 'patreon', 'email'].map(x => `<option>${x}</option>`).join('')}</select><input type="text" placeholder="Название (pin-001)" data-utm-c><input type="text" placeholder="Заметка (необязательно)" data-utm-n><button type="button" class="pill-btn pill-fill" data-utm-go>＋ Сохранить</button></div>
-        <p class="be-note" data-utm-out></p>
-        ${d.links.length ? `<table class="be-table adm-table adm-links"><thead><tr><th>Ссылка</th><th>🚪 Заходов всего</th><th>👥 Людей</th><th>За период</th><th></th></tr></thead><tbody>
-        ${d.links.map(l => { const url = utmUrl(l.path, l.source, l.campaign); return `<tr><td data-l="Ссылка"><b>${esc(l.campaign)}</b> <small>· ${esc(l.source)} → ${esc(pageName(l.path))}</small>${l.note ? `<br><small>${esc(l.note)}</small>` : ''}<br><button type="button" class="bc-link" data-copy="${esc(url)}">📋 Скопировать ссылку</button></td>
-          <td data-l="Заходов всего"><b>${n(l.all)}</b></td><td data-l="Людей">${n(l.people)}</td><td data-l="За период">${n(l.period)}</td><td><button type="button" class="bc-link be-danger" data-del="${l.id}" title="Удалить">🗑</button></td></tr>`; }).join('')}</tbody></table>` : '<p class="be-note">Сохранённых ссылок пока нет.</p>'}
-        ${(() => { const other = d.campaigns.filter(r => !d.links.some(l => l.campaign === r.k)); return other.length ? `<h3>Другие метки (не сохранены)</h3>${bars(other, r => `${esc(r.k)} <small>(${esc(r.s || '')})</small>`, sum(other))}` : ''; })()}</section>
-      <p class="be-note">Считается без cookie: один человек за сутки — один раз (по зашифрованному отпечатку, сам IP не сохраняется). Ваши собственные заходы (когда вы вошли как админ) и роботы не считаются. Статистика копится с ${esc(d.first || 'момента включения')}.</p>`;
-    main.querySelectorAll('[data-days]').forEach(b => b.onclick = () => { vDays = Number(b.dataset.days); visitors(); });
-    const tip = main.querySelector('.adm-chart-tip');
-    main.querySelectorAll('.adm-col').forEach(c => { const show = () => { tip.textContent = c.dataset.tip; main.querySelectorAll('.adm-col.on').forEach(x => x.classList.remove('on')); c.classList.add('on'); }; c.onmouseenter = show; c.onfocus = show; c.onclick = show; });
+      <p class="be-note">Дни — по Риге; сегодняшний день ещё идёт. Период и фильтры остаются в адресе — ссылку можно сохранить.</p>`}
+    </div>`;
+  }
+
+  function anWire() {
+    const a = anState();
+    main.querySelectorAll('[data-pre]').forEach(b => b.onclick = () => {
+      a.preset = b.dataset.pre; a.row = '';
+      if (a.preset !== 'custom') { a.from = ''; a.to = ''; }
+      anSync();
+      if (a.preset === 'custom') { const c = main.querySelector('.an-custom'); if (c) { c.hidden = false; c.querySelector('input').focus(); } }
+      else anGo();
+    });
+    const cal = main.querySelector('[data-an="cal"]');
+    if (cal) cal.onclick = () => { a.preset = 'custom'; const c = main.querySelector('.an-custom'); if (c) { c.hidden = false; c.querySelector('input').focus(); } anSync(); };
+    const apply = main.querySelector('[data-an="apply"]');
+    if (apply) apply.onclick = () => {
+      const f = main.querySelector('[data-an="from"]').value, t = main.querySelector('[data-an="to"]').value;
+      if (!f || !t) return;
+      a.preset = 'custom'; a.from = f; a.to = t; a.row = ''; anSync(); anGo();
+    };
+    ['cmp', 'by', 'src', 'device', 'country', 'lang'].forEach(k => {
+      const el = main.querySelector(`[data-an="${k}"]`); if (!el) return;
+      el.onchange = () => { a[k] = el.value; a.row = ''; anSync(); anGo(); };
+    });
+    const q = main.querySelector('[data-an="q"]');
+    if (q) { let t = 0; q.oninput = () => { clearTimeout(t); t = setTimeout(() => { a.q = q.value.trim(); anRender(); }, 220); }; }
+    const reset = main.querySelector('[data-an="reset"]');
+    if (reset) reset.onclick = () => { Object.assign(a, { src: '', device: '', country: '', lang: '', q: '', row: '' }); anSync(); anGo(); };
+    main.querySelectorAll('[data-an="sort"]').forEach(th => th.onclick = () => {
+      const k = th.dataset.id;
+      if (a.sort === k) a.desc = !a.desc; else { a.sort = k; a.desc = true; }
+      anSave(); anRender();
+    });
+    main.querySelectorAll('[data-an="row"]').forEach(tr => tr.onclick = e => {
+      if (e.target.closest('a') || e.target.closest('button')) return;
+      const k = tr.dataset.k; a.row = a.row === k ? '' : k; anSync(); analytics();
+    });
+    const csv = main.querySelector('[data-an="csv"]'); if (csv) csv.onclick = anCsv;
+    const all = main.querySelector('[data-an="all"]'); if (all) all.onclick = () => { a.all = true; anRender(); };
+    const less = main.querySelector('[data-an="less"]'); if (less) less.onclick = () => { a.all = false; anRender(); };
+    anLinksWire();
+  }
+
+  // подпись строки, значение для сортировки, ячейки
+  const anText = (r, a) => {
+    if (a.by === 'page') return pageName(r.k);
+    if (a.by === 'article') return r.post ? title(r.post) : r.k;
+    if (a.by === 'day') return dLoc(r.k, { weekday: 'short', day: 'numeric', month: 'long' });
+    if (a.by === 'country') return regionName(r.k);
+    return r.k;
+  };
+  const anVal = (r, id) => id === 'dPeople' ? r.people - (r.prevPeople || 0)
+    : id === 'donePct' ? (r.donePct == null ? -1 : r.donePct)
+      : id === 'avgSec' ? (r.avgSec == null ? -1 : r.avgSec) : (r[id] || 0);
+  function anCols(a, d) {
+    const c = [['people', '👥 Люди'], ['views', '📄 Просмотры']];
+    if (['page', 'article', 'day'].includes(a.by)) c.push(['entries', '🚪 Извне']);
+    if (d.withReads) c.push(['avgSec', '⏱ Время'], ['donePct', '✅ Дочитали']);
+    c.push(['mobile', '📱 Телефон']);
+    if (d.cmp !== 'none') c.push(['dPeople', 'Δ люди']);
+    return c;
+  }
+  function anRows(a, d) {
+    const q = a.q.toLowerCase();
+    const list = d.rows.filter(r => !q || anText(r, a).toLowerCase().includes(q));
+    const pick = r => a.sort === 'name' ? anText(r, a) : anVal(r, a.sort);
+    return list.sort((x, y) => {
+      const p = pick(x), s = pick(y);
+      const c = typeof p === 'string' ? p.localeCompare(s, 'ru') : p - s;
+      return c * (a.desc ? 1 : -1);
+    });
+  }
+  function anCell(r, id) {
+    if (id === 'people' || id === 'views' || id === 'entries') return n(r[id]);
+    if (id === 'avgSec') return r.avgSec == null ? '—' : mmss(r.avgSec);
+    if (id === 'donePct') return r.donePct == null ? '—' : r.donePct + '%';
+    if (id === 'mobile') return r.people ? pct(r.mobile, r.people) + '%' : '—';
+    if (id === 'dPeople') return delta(r.people, r.prevPeople);
+    return '';
+  }
+  const anName = (r, a) => {
+    if (a.by === 'page') return `<a href="${esc(r.k)}" target="_blank">${esc(pageName(r.k))}</a>`;
+    if (a.by === 'article') return r.post
+      ? `<a href="/ru/blog/${esc(r.post.slug)}/" target="_blank">📰 ${esc(title(r.post))}</a><small>${r.post.published_at ? dLoc(new Date(r.post.published_at * 1000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }), { day: 'numeric', month: 'short', year: 'numeric' }) : ''}${r.post.likes || r.post.comments ? ` · ♥ ${n(r.post.likes)} · 💬 ${n(r.post.comments)}` : ''}</small>`
+      : esc(r.k);
+    if (a.by === 'day') return `<b>${esc(dLoc(r.k, { weekday: 'long', day: 'numeric', month: 'long' }))}</b>`;
+    if (a.by === 'src') return `${SRC_IC[r.k] || '🌐'} ${esc(r.k)}`;
+    if (a.by === 'ref') return `🌐 ${esc(r.k)}`;
+    if (a.by === 'country') return `${flag(r.k)} ${esc(regionName(r.k))}`;
+    if (a.by === 'device') return `${DEV_IC[r.k] || ''} ${esc(r.k)}`;
+    if (a.by === 'campaign') return `🏷 ${esc(r.k)}`;
+    return esc(r.k);
+  };
+  // раскрытая строка: по дням, откуда пришли, куда пошли дальше
+  function anDetail(d) {
+    if (!d.detail) return '';
+    const s = d.detail.series || [], max = Math.max(1, ...s.map(x => x.views));
+    const list = (arr, f) => arr && arr.length ? `<ul class="an-bars">${arr.slice(0, 6).map(x => `<li><span>${f ? f(x) : esc(x.k)}</span><i style="width:${Math.max(4, x.n * 100 / arr[0].n)}%"></i><b>${n(x.n)}</b></li>`).join('')}</ul>` : '<p class="be-note">Нет данных за период.</p>';
+    return `<div class="an-det">
+      <div><h4>По дням</h4>${s.length ? `<div class="an-mini" role="img" aria-label="Просмотры по дням">${s.map(x => `<i style="height:${x.views ? Math.max(4, x.views * 100 / max) : 2}%" title="${esc(dShort(x.day))}: ${n(x.views)} просм."></i>`).join('')}</div><p class="be-note">${esc(dShort(s[0].day))} – ${esc(dShort(s[s.length - 1].day))} · всего ${n(s.reduce((a, x) => a + x.views, 0))} просмотров</p>` : '<p class="be-note">Пока нет данных.</p>'}</div>
+      <div><h4>Откуда пришли</h4>${list(d.detail.sources, x => `${SRC_IC[x.k] || '🌐'} ${esc(x.k)}`)}
+        ${d.detail.inner && d.detail.inner.length ? `<h4>С какой страницы сайта</h4>${list(d.detail.inner, x => esc(pageName(x.k)))}` : ''}
+        ${d.detail.next && d.detail.next.length ? `<h4>Куда пошли дальше</h4>${list(d.detail.next, x => esc(pageName(x.k)))}` : ''}
+        <p class="be-note">${(d.detail.devices || []).map(x => `${DEV_IC[x.k] || ''} ${esc(x.k)} ${n(x.n)}`).join(' · ')}</p></div>
+    </div>`;
+  }
+
+  async function analytics() {
+    anMode = 'table';
+    main.innerHTML = anBar() + '<p class="be-note">Загрузка…</p>';
+    try { anData = await api('admin/analytics?' + anQuery()); }
+    catch (e) { main.innerHTML = anBar() + `<p class="be-note">${err(e)}</p>`; anWire(); return; }
+    anRender();
+  }
+  function anRender() {
+    const a = anState(), d = anData;
+    if (!d) return;
+    const T = d.totals, cols = anCols(a, d), list = anRows(a, d), show = a.all ? list : list.slice(0, 40);
+    const head = `<tr><th><button type="button" class="an-sort${a.sort === 'name' ? ' on' : ''}" data-an="sort" data-id="name">${esc(AN_BY.find(x => x[0] === a.by)[1])}</button></th>
+      ${cols.map(([id, l]) => `<th class="n"><button type="button" class="an-sort${a.sort === id ? ' on' : ''}" data-an="sort" data-id="${id}">${l}${a.sort === id ? (a.desc ? ' ↓' : ' ↑') : ''}</button></th>`).join('')}</tr>`;
+    const rowHtml = r => {
+      const key = esc(r.k);
+      const tr = `<tr class="an-tr${a.row === r.k ? ' on' : ''}" data-an="row" data-k="${key}" tabindex="0">`;
+      return tr + `<td>${anName(r, a)}</td>${cols.map(([id]) => `<td class="n">${anCell(r, id)}</td>`).join('')}</tr>`
+        + (a.row === r.k ? `<tr class="an-det-row"><td colspan="${cols.length + 1}">${anDetail(d)}</td></tr>` : '');
+    };
+    const sum = `<p class="an-sum"><b>${n(T.people)}</b> человек · <b>${n(T.views)}</b> просмотров${T.entries ? ` · <b>${n(T.entries)}</b> заходов извне` : ''}${T.avgSec != null ? ` · <b>${mmss(T.avgSec)}</b> в среднем читают` : ''} · <b>${T.people ? pct(T.mobile, T.people) : 0}%</b> с телефона ${delta(T.people, T.prevPeople)}</p>`;
+    const ev = (d.events || []).length ? `<p class="an-ev"><b>Что было</b>${d.events.map(e => `${e.ic} ${esc(dShort(e.day))} — ${esc(e.t)}`).join(' · ')}</p>` : '';
+    const note = d.filtered && !d.withReads ? '<p class="be-note">Время и «дочитали» считаются без фильтров: в статистике чтения нет источника и устройства.</p>' : '';
+    const links = d.links || [];
+    const utm = `<details class="an-utm"><summary>🏷 Ссылки с метками — <b>${links.length}</b>${links.length ? '' : ' (пока нет)'}</summary>
+      <p class="be-note">Ставьте такую ссылку в пост, пин или сторис — и здесь будет видно, сколько людей пришло именно по ней.</p>
+      <div class="adm-utm"><input type="text" data-utm-p value="/" placeholder="Страница, например /flock/">
+        <select data-utm-s aria-label="Где выложите">${['pinterest', 'instagram', 'tiktok', 'facebook', 'threads', 'telegram', 'linkedin', 'patreon', 'email'].map(x => `<option>${x}</option>`).join('')}</select>
+        <input type="text" data-utm-c placeholder="Название (pin-001)"><input type="text" data-utm-n placeholder="Заметка (необязательно)">
+        <button type="button" class="pill-btn pill-fill" data-utm-go>＋ Сохранить</button></div>
+      <p class="be-note" data-utm-out></p>
+      ${links.length ? `<table class="be-table adm-table adm-links"><thead><tr><th>Ссылка</th><th>👥 Людей за период</th><th>🚪 Заходов</th><th></th></tr></thead><tbody>
+        ${links.map(l => { const url = utmUrl(l.path, l.source, l.campaign); return `<tr><td data-l="Ссылка"><b>${esc(l.campaign)}</b> <small>· ${esc(l.source)} → ${esc(pageName(l.path))}</small>${l.note ? `<br><small>${esc(l.note)}</small>` : ''}<br><button type="button" class="bc-link" data-copy="${esc(url)}">📋 Скопировать ссылку</button></td>
+          <td data-l="Людей">${n(l.periodPeople)}</td><td data-l="Заходов">${n(l.period)}</td><td><button type="button" class="bc-link be-danger" data-del="${l.id}" title="Удалить">🗑</button></td></tr>`; }).join('')}
+      </tbody></table>` : ''}</details>`;
+    main.innerHTML = anBar()
+      + sum
+      + `<div class="an-tbl"><table class="be-table adm-table an-table"><thead>${head}</thead>
+          <tbody>${list.length ? show.map(rowHtml).join('') : `<tr><td colspan="${cols.length + 1}">За этот период и фильтры ничего нет.</td></tr>`}</tbody></table></div>`
+      + `<p class="an-foot">${list.length > show.length ? `<button type="button" class="pill-btn" data-an="all">▾ Показать все (${list.length})</button>` : ''}${a.all && list.length > 40 ? '<button type="button" class="bc-link" data-an="less">▴ Свернуть</button>' : ''}
+        <span>${list.length ? `Показано ${show.length} из ${list.length}` : ''}${d.first ? ` · статистика с ${esc(dShort(d.first))}` : ''}</span></p>`
+      + ev + note + utm;
+    anWire();
+  }
+  // CSV текущего вида: что видно в таблице, с фильтрами и сортировкой
+  function anCsv() {
+    const a = anState(), d = anData;
+    if (!d) return;
+    const cols = anCols(a, d), list = anRows(a, d);
+    const head = [AN_BY.find(x => x[0] === a.by)[1], ...cols.map(([, l]) => l.replace(/^\S+\s+/, ''))];
+    const lines = [head, ...list.map(r => [anText(r, a), ...cols.map(([id]) => id === 'dPeople' ? r.people - (r.prevPeople || 0) : (r[id] ?? ''))])];
+    const text = lines.map(l => l.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';')).join('\r\n');
+    const f = document.createElement('a');
+    f.href = URL.createObjectURL(new Blob(['\ufeff' + text], { type: 'text/csv;charset=utf-8' }));
+    f.download = `pigeonpolly-${d.from}-${d.to}-${a.by}.csv`;
+    f.click();
+  }
+  // «🏷 Ссылки с метками»: сохранить, скопировать, удалить
+  function anLinksWire() {
     const copy = (link, btn, label) => (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(() => { btn.textContent = '✓ Скопировано'; setTimeout(() => btn.textContent = label, 1600); }).catch(() => prompt('Скопируйте ссылку:', link));
     main.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => copy(b.dataset.copy, b, '📋 Скопировать ссылку'));
     main.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
       if (!confirm('Удалить эту ссылку из списка? Заходы по ней останутся в общей статистике.')) return;
-      try { await api('admin/links', { delete: Number(b.dataset.del) }); visitors(); } catch (e) { alert(err(e)); }
+      try { await api('admin/links', { delete: Number(b.dataset.del) }); anGo(); } catch (e) { alert(err(e)); }
     });
-    const go = main.querySelector('[data-utm-go]'), out = main.querySelector('[data-utm-out]');
+    const go = main.querySelector('[data-utm-go]'); if (!go) return;
+    const out = main.querySelector('[data-utm-out]');
     go.onclick = async () => {
       let p = main.querySelector('[data-utm-p]').value.trim() || '/'; p = p.replace(/^https?:\/\/[^/]+/, '').split('#')[0]; if (!p.startsWith('/')) p = '/' + p;
       if (!/[?.]/.test(p) && !p.endsWith('/')) p += '/';
       const c = main.querySelector('[data-utm-c]').value.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9а-яё_-]/gi, '');
       if (!c) { out.textContent = 'Напишите название ссылки, например pin-001.'; return; }
-      // проверяем, что такая страница есть на сайте
       const ok = await fetch(p.split('?')[0], { method: 'HEAD' }).then(r => r.ok).catch(() => true);
-      if (!ok) { out.innerHTML = `Страницы <code>${esc(p)}</code> на сайте нет — проверьте адрес (например, <code>/flock/</code>, <code>/challenge/</code>, <code>/shop/</code>).`; return; }
+      if (!ok) { out.innerHTML = `Страницы <code>${esc(p)}</code> на сайте нет — проверьте адрес (например, <code>/flock/</code>, <code>/challenge/</code>).`; return; }
       go.disabled = true;
       try { await api('admin/links', { path: p, source: main.querySelector('[data-utm-s]').value, campaign: c, note: main.querySelector('[data-utm-n]').value.trim() }); }
       catch (e) { go.disabled = false; out.textContent = err(e); return; }
       const link = utmUrl(p, main.querySelector('[data-utm-s]').value, c);
-      await visitors();
+      await anGo();
       const o = main.querySelector('[data-utm-out]'); if (o) o.innerHTML = `Сохранено и скопировано: <code>${esc(link)}</code>`;
       navigator.clipboard && navigator.clipboard.writeText(link).catch(() => {});
     };
   }
 
-  // ---------- 🔻 воронки — своя вкладка «Аналитики» (раньше были внизу «Посетителей») ----------
-  let fDays = 30;
+  // ---------- 🔻 воронки: шаги по дням (та же панель периода и сравнения) ----------
+  async function funnels(box, qs) {
+    if (!box) return;
+    let d; try { d = await api('admin/funnels?' + qs); } catch (e) { box.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    const first = f => f.steps[0].k;
+    box.innerHTML = d.funnels.map(f => {
+      const tot = f.tot || {}, prev = f.prev || {}, k0 = first(f);
+      const cell = (row, s, i) => `<td data-l="${esc(s.label)}"><b>${n(row[s.k] || 0)}</b>${i && row[k0] ? ` <small>${pct(row[s.k] || 0, row[k0])}%</small>` : ''}</td>`;
+      return `<section class="adm-box"><h2>🔻 ${esc(f.name)}</h2>
+        <p class="be-note">За ${d.days} дн. (${esc(dShort(d.from))} – ${esc(dShort(d.to))}). Один человек за сутки на каждом шаге считается один раз; % — от первого шага.</p>
+        ${f.days.length ? `<table class="be-table adm-table"><thead><tr><th>День</th>${f.steps.map(s => `<th>${esc(s.label)}</th>`).join('')}</tr></thead><tbody>
+          <tr class="adm-total"><td data-l="День"><b>Всего</b></td>${f.steps.map((s, i) => cell(tot, s, i)).join('')}</tr>
+          ${f.days.map(r => `<tr><td data-l="День">${esc(dLoc(r.day, { day: 'numeric', month: 'short', weekday: 'short' }))}</td>${f.steps.map((s, i) => cell(r.n, s, i)).join('')}</tr>`).join('')}</tbody></table>
+          <p class="be-note">Дошли до последнего шага: <b>${tot[f.steps[f.steps.length - 1].k] || 0}</b> из ${n(tot[k0] || 0)} (${pct(tot[f.steps[f.steps.length - 1].k] || 0, tot[k0] || 0)}%) ${prev[k0] ? delta(tot[f.steps[f.steps.length - 1].k] || 0, prev[f.steps[f.steps.length - 1].k] || 0) : ''}</p>`
+          : '<p class="be-note">За этот период шагов нет.</p>'}</section>`;
+    }).join('');
+  }
   async function funnelsScreen() {
-    const per = [[7, '7 дней'], [30, '30 дней'], [90, '3 месяца']];
-    main.innerHTML = `<div class="adm-filter" role="toolbar" aria-label="Период">${per.map(([k, l]) => `<button type="button" class="pill-btn" data-fdays="${k}" aria-pressed="${fDays === k}">${l}</button>`).join('')}</div><div data-funnels><p class="be-note">Загрузка…</p></div>`;
-    main.querySelectorAll('[data-fdays]').forEach(b => b.onclick = () => { fDays = Number(b.dataset.fdays); funnelsScreen(); });
-    await funnels(main.querySelector('[data-funnels]'), fDays);
-  }
-
-  // ---------- 📰 аналитика блога (/api/admin/blogstats, worker/analytics.js) ----------
-  let bDays = 30, bsSort = 'views', bsSec = '', bPost = 0, bList = null;
-  const mmss = s => s == null ? '—' : s < 60 ? `${s}\u00a0с` : `${Math.floor(s / 60)}\u00a0мин ${String(s % 60).padStart(2, '0')}\u00a0с`;
-  const trend = (a, b) => !b ? (a ? '<small class="adm-up">новое</small>' : '') : (d => `<small class="${d >= 0 ? 'adm-up' : 'adm-down'}">${d >= 0 ? '▲' : '▼'}${Math.abs(d)}%</small>`)(Math.round((a - b) * 100 / b));
-  // столбики по дням (все дни периода, даже пустые); подпись — наведением или нажатием
-  function dayChart(series, days, h) {
-    if (days === 1) return '';
-    const byDay = Object.fromEntries(series.map(r => [r.day, r]));
-    const xs = []; for (let i = days - 1; i >= 0; i--) { const s = new Date(Date.now() - i * 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }); xs.push({ day: s, people: (byDay[s] || {}).people || 0, views: (byDay[s] || {}).views || 0 }); }
-    const max = Math.max(1, ...xs.map(x => x.views));
-    const dd = s => new Date(s + 'T12:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', weekday: days <= 14 ? 'short' : undefined });
-    return `<section class="adm-box"><h2>${h}</h2>
-      <div class="adm-chart" role="img" aria-label="${esc(h)}">${xs.map(x => `<div class="adm-col" tabindex="0" data-tip="${esc(dd(x.day))}: ${n(x.views)} просм. · ${n(x.people)} чел."><i style="height:${x.views ? Math.max(3, x.views * 100 / max) : 0}%"></i></div>`).join('')}</div>
-      <div class="adm-chart-x"><span>${dd(xs[0].day)}</span><span class="adm-chart-tip" aria-live="polite">Наведите или нажмите на столбик</span><span>${dd(xs[xs.length - 1].day)}</span></div></section>`;
-  }
-  const chartTips = () => { const tip = main.querySelector('.adm-chart-tip'); if (tip) main.querySelectorAll('.adm-col').forEach(c => { const show = () => { tip.textContent = c.dataset.tip; main.querySelectorAll('.adm-col.on').forEach(x => x.classList.remove('on')); c.classList.add('on'); }; c.onmouseenter = show; c.onfocus = show; c.onclick = show; }); };
-  const perBar = (cur, attr) => `<div class="adm-filter" role="toolbar" aria-label="Период">${[[7, '7 дней'], [30, '30 дней'], [90, '3 месяца'], [365, 'Год']].map(([k, l]) => `<button type="button" class="pill-btn" ${attr}="${k}" aria-pressed="${cur === k}">${l}</button>`).join('')}</div>`;
-  const readNote = first => `<p class="be-note">«Читали» и «дочитали» считаются с ${first ? esc(new Date(first + 'T12:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })) : 'сегодняшнего дня'}: время — сколько статья была открыта на экране (свёрнутая вкладка не считается), «дочитали» — прокрутили хотя бы до последней четверти. Просмотры — все языки статьи вместе; один человек за сутки — один раз. Ваши заходы и роботы не считаются.</p>`;
-  async function blogstats() {
-    if (bPost) return blogPost();
-    main.innerHTML = '<p class="be-note">Загрузка…</p>';
-    let d; try { d = await api('admin/blogstats?days=' + bDays); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    bList = d;
-    const T = d.totals, secName = Object.fromEntries(d.sections.map(s => [s.slug, s.name]));
-    const secsOf = p => String(p.section || '').split(',').map(x => x.trim()).filter(Boolean);
-    const usedSecs = [...new Set(d.posts.flatMap(secsOf))].filter(s => secName[s]);
-    const SORTS = { views: ['📄 Просмотры', p => p.views], people: ['👥 Люди', p => p.people], entries: ['🚪 Извне', p => p.entries], trend: ['📈 Рост', p => p.views - p.prev],
-      avgSec: ['⏱ Время', p => p.avgSec ?? -1], donePct: ['✅ Дочитали', p => p.donePct ?? -1], likes: ['♥', p => p.likes], comments: ['💬', p => p.comments], total: ['👁 Всего', p => p.total], date: ['🗓 Новые', p => p.published_at || 0] };
-    const list = d.posts.filter(p => !bsSec || secsOf(p).includes(bsSec)).sort((a, b) => SORTS[bsSort][1](b) - SORTS[bsSort][1](a));
-    const quiet = d.posts.filter(p => !p.views && (p.published_at || 0) < Date.now() / 1000 - 14 * 86400);
-    const sum = a => a.reduce((s, r) => s + r.n, 0);
-    const head = [['views'], ['people'], ['entries'], ['avgSec'], ['donePct'], ['likes'], ['comments'], ['total']];
-    main.innerHTML = `${perBar(bDays, 'data-bdays')}
-      <div class="adm-cards">
-        <div class="adm-card"><span class="adm-ic">📄</span><b>${n(T.views)}</b><span>просмотров статей</span>${delta(T.views, T.prev)}</div>
-        <div class="adm-card"><span class="adm-ic">👥</span><b>${n(T.people)}</b><span>человек читали</span></div>
-        <div class="adm-card"><span class="adm-ic">🚪</span><b>${n(T.entries)}</b><span>пришли сразу на статью</span><small>извне: поиск, соцсети, ссылки</small></div>
-        <div class="adm-card"><span class="adm-ic">⏱</span><b>${mmss(T.avgSec)}</b><span>в среднем читают</span></div>
-        <div class="adm-card"><span class="adm-ic">✅</span><b>${T.donePct == null ? '—' : T.donePct + '%'}</b><span>дочитали до конца</span></div>
-        <div class="adm-card"><span class="adm-ic">🗂</span><b>${n(T.list)}</b><span>раз открыли список блога</span></div>
-      </div>
-      ${dayChart(d.series, d.days, 'Просмотры статей по дням')}
-      <div class="adm-cols">
-        <section class="adm-box"><h2>Откуда приходят на статьи</h2><p class="be-note">Заходы извне прямо на статью: поиск, соцсети, другие сайты. «Напрямую» — ссылка из мессенджера, закладка.</p>
-          ${bars(d.sources, r => `${SRC_IC[r.k] || '🌐'} ${esc(r.k)}`, sum(d.sources))}</section>
-        <section class="adm-box"><h2>Переходы по сайту</h2><p class="be-note">С какой страницы сайта открыли статью.</p>
-          ${bars(d.inner, r => esc(r.k), sum(d.inner))}</section>
-      </div>
-      <section class="adm-box"><h2>Статьи</h2>
-        <div class="adm-filter">${usedSecs.length ? `<label>Раздел: <select data-bsec><option value="">все разделы</option>${usedSecs.map(s => `<option value="${esc(s)}"${bsSec === s ? ' selected' : ''}>${esc(secName[s])}</option>`).join('')}</select></label>` : ''}
-          <label>Сортировка: <select data-bsort>${Object.entries(SORTS).map(([k, [l]]) => `<option value="${k}"${bsSort === k ? ' selected' : ''}>${l}</option>`).join('')}</select></label></div>
-        <p class="be-note">За выбранный период. «Извне» — пришли сразу на статью; «👁 Всего» — счётчик за всё время. Нажмите на название — откроется всё о статье.</p>
-        <table class="be-table adm-table adm-bstat"><thead><tr><th>Статья</th>${head.map(([k]) => `<th><button type="button" class="adm-sort" data-bs="${k}" aria-pressed="${bsSort === k}">${SORTS[k][0]}${bsSort === k ? ' ↓' : ''}</button></th>`).join('')}<th>Главный источник</th></tr></thead>
-        <tbody>${list.map(p => `<tr><td data-l="Статья"><button type="button" class="bc-link adm-bpost" data-bpost="${p.id}">${esc(title(p))}</button><br><small>${p.published_at ? new Date(p.published_at * 1000).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}${secsOf(p).filter(s => secName[s]).map(s => ' · ' + esc(secName[s])).join('')}${p.members ? ' · 🔒' : ''}</small></td>
-          <td data-l="Просмотры"><b>${n(p.views)}</b> ${trend(p.views, p.prev)}</td><td data-l="Люди">${n(p.people)}</td><td data-l="Извне">${n(p.entries)}</td>
-          <td data-l="Время">${mmss(p.avgSec)}</td><td data-l="Дочитали">${p.donePct == null ? '—' : p.donePct + '%'}</td><td data-l="♥">${n(p.likes)}</td><td data-l="💬">${n(p.comments)}</td><td data-l="Всего">${n(p.total)}</td>
-          <td data-l="Источник">${p.top ? `${SRC_IC[p.top.k] || '🌐'} ${esc(p.top.k)} <small>${n(p.top.n)}</small>` : '—'}</td></tr>`).join('') || '<tr><td colspan="10">Статей пока нет.</td></tr>'}</tbody></table></section>
-      ${quiet.length ? `<section class="adm-box"><h2>😴 Не открывали за этот период</h2><p class="be-note">Статьи старше двух недель без единого просмотра. Можно поделиться ими в соцсетях, обновить название или картинку, поставить ссылку из свежей статьи.</p>
-        <ul class="adm-list">${quiet.map(p => `<li><button type="button" class="bc-link" data-bpost="${p.id}">${esc(title(p))}</button> <small>👁 всего ${n(p.total)}</small> <a href="/blog-editor/#${p.id}" title="Редактировать">✎</a></li>`).join('')}</ul></section>` : ''}
-      ${readNote(d.first)}`;
-    main.querySelectorAll('[data-bdays]').forEach(b => b.onclick = () => { bDays = Number(b.dataset.bdays); blogstats(); });
-    main.querySelectorAll('[data-bs]').forEach(b => b.onclick = () => { bsSort = b.dataset.bs; blogstats(); });
-    const ss = main.querySelector('[data-bsort]'); if (ss) ss.onchange = () => { bsSort = ss.value; blogstats(); };
-    const sc = main.querySelector('[data-bsec]'); if (sc) sc.onchange = () => { bsSec = sc.value; blogstats(); };
-    main.querySelectorAll('[data-bpost]').forEach(b => b.onclick = () => { bPost = Number(b.dataset.bpost); blogstats(); scrollTo(0, 0); });
-    chartTips();
-  }
-  async function blogPost() {
-    main.innerHTML = '<p class="be-note">Загрузка…</p>';
-    let d; try { d = await api(`admin/blogstats?days=${bDays}&post=${bPost}`); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    if (d.error) { bPost = 0; return blogstats(); }
-    const P = d.post, T = d.totals, sum = a => a.reduce((s, r) => s + r.n, 0);
-    const bySlug = {}; ((bList && bList.posts) || []).forEach(p => { bySlug[p.slug] = p; });
-    const pathName = p => { const m = /^\/(?:(?:ru|lv)\/)?blog\/([^/]+)\/$/.exec(p); return m && bySlug[m[1]] ? '📰 ' + title(bySlug[m[1]]) : pageName(p); };
-    const lang = { RU: 'ru', LV: 'lv', EN: 'en' };
-    main.innerHTML = `<p class="adm-quick"><button type="button" class="pill-btn" data-bback>← Все статьи</button> <a class="pill-btn" href="/ru/blog/${esc(P.slug)}/" target="_blank">Открыть статью ↗</a> <a class="pill-btn" href="/blog-editor/#${P.id}">✎ Редактировать</a></p>
-      <h2 class="adm-bh">${esc(title(P))}</h2>
-      ${perBar(bDays, 'data-bdays')}
-      <div class="adm-cards">
-        <div class="adm-card"><span class="adm-ic">📄</span><b>${n(T.views)}</b><span>просмотров</span>${delta(T.views, T.prev)}</div>
-        <div class="adm-card"><span class="adm-ic">👥</span><b>${n(T.people)}</b><span>человек</span></div>
-        <div class="adm-card"><span class="adm-ic">🚪</span><b>${n(T.entries)}</b><span>пришли извне</span></div>
-        <div class="adm-card"><span class="adm-ic">⏱</span><b>${mmss(T.avgSec)}</b><span>в среднем читают</span></div>
-        <div class="adm-card"><span class="adm-ic">✅</span><b>${T.donePct == null ? '—' : T.donePct + '%'}</b><span>дочитали</span></div>
-        <div class="adm-card"><span class="adm-ic">👁</span><b>${n(P.total)}</b><span>просмотров за всё время</span><small>♥ ${n(P.likes)} · 💬 ${n(P.comments)}</small></div>
-      </div>
-      ${dayChart(d.series, d.days, 'Просмотры по дням')}
-      <div class="adm-cols">
-        <section class="adm-box"><h2>Откуда пришли</h2>${bars(d.sources, r => `${SRC_IC[r.k] || '🌐'} ${esc(r.k)}`, sum(d.sources))}
-          ${d.refs.length ? `<h3>Сайты-ссылки</h3>${bars(d.refs, r => esc(r.k), sum(d.refs))}` : ''}
-          ${d.campaigns.length ? `<h3>Ссылки с метками</h3>${bars(d.campaigns, r => esc(r.k), sum(d.campaigns))}` : ''}</section>
-        <section class="adm-box"><h2>Переходы по сайту</h2><p class="be-note">С какой страницы сайта открыли статью.</p>${bars(d.inner, r => esc(r.k), sum(d.inner))}
-          <h3>Куда пошли после статьи</h3>${bars(d.next, r => `<a href="${esc(r.k)}" target="_blank">${esc(pathName(r.k))}</a>`, sum(d.next))}</section>
-      </div>
-      <div class="adm-cols">
-        <section class="adm-box"><h2>Докуда дочитали</h2>${T.reads ? bars(d.depth, r => esc(r.k), T.reads) : '<p class="be-note">Пока нет данных.</p>'}
-          <h3>Сколько времени читали</h3>${T.reads ? bars(d.time, r => esc(r.k), T.reads) : '<p class="be-note">Пока нет данных.</p>'}</section>
-        <section class="adm-box"><h2>Язык статьи</h2>${bars(d.langs, r => esc(r.k) + (P['t_' + lang[r.k]] ? '' : ' <small>(перевода нет — показан другой язык)</small>'), sum(d.langs))}
-          <h3>Устройства</h3>${bars(d.devices, r => `${DEV_IC[r.k] || ''} ${esc(r.k)}`, sum(d.devices))}
-          <h3>Страны</h3>${bars(d.countries, r => `${flag(r.k)} ${esc(regionName(r.k))}`, sum(d.countries))}</section>
-      </div>
-      ${readNote(bList && bList.first)}`;
-    main.querySelector('[data-bback]').onclick = () => { bPost = 0; blogstats(); };
-    main.querySelectorAll('[data-bdays]').forEach(b => b.onclick = () => { bDays = Number(b.dataset.bdays); blogPost(); });
-    chartTips();
+    anMode = 'funnels';
+    main.innerHTML = anBar(1) + '<div data-funnels><p class="be-note">Загрузка…</p></div>';
+    anWire();
+    await funnels(main.querySelector('[data-funnels]'), anQuery());
   }
 
   // ---------- правки блоков сайта (режим «✏️ Править страницу») ----------
@@ -628,6 +709,36 @@
       if (!confirm(l === '*' ? 'Снова показать этот блок посетителям?' : 'Убрать правку и вернуть оригинал этого блока?')) return;
       try { await api('admin/blocks', id.startsWith('page:') ? { id, lang: '*', html: null } : l === '*' ? { id, lang: '*', hidden: false } : { id, lang: l, html: null }); edits(); } catch (e) { alert(err(e)); }
     });
+  }
+
+  // ---------- 📋 страница тем месяца (/prompts/): как её видят посетители + предпросмотр ----------
+  async function promptsScreen() {
+    const lang = (document.documentElement.lang || 'en').slice(0, 2);
+    const pre = lang === 'en' || lang === '' ? '' : '/' + lang;
+    const url = pre + '/prompts/';
+    const now = new Date();
+    const nxt = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const nm = nxt.getFullYear() + '-' + String(nxt.getMonth() + 1).padStart(2, '0');
+    const nName = nxt.toLocaleString('ru', { month: 'long' });
+    main.innerHTML = `<section class="adm-box"><h2>📋 Страница тем</h2>
+      <p class="be-note">Так её видят посетители: 30 тем месяца, кнопка «Сохранить список картинкой» (без принтера) и печать. Темы, цвета и время берутся из «🎨 Темы челленджа» — правка там меняет и эту страницу.</p>
+      <p style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 0">
+        <a class="pill-btn" href="${url}" target="_blank" rel="noopener">Открыть на сайте ↗</a>
+        <button type="button" class="pill-btn" id="adm-pr-fill">📚 Заполнить ${nName} из банка тем</button>
+      </p>
+      <div style="margin-top:14px;border:1px solid rgba(0,0,0,.12);border-radius:12px;overflow:hidden;background:#fff">
+        <iframe src="${url}" title="Страница тем" loading="lazy" style="display:block;width:100%;height:72vh;border:0"></iframe>
+      </div></section>`;
+    const b = main.querySelector('#adm-pr-fill');
+    if (!b) return;
+    b.onclick = async () => {
+      b.disabled = true;
+      try {
+        const r = await api('admin/challenge/fillmonth', { m: nm });
+        alert(r.filled ? `Заполнено дней: ${r.filled}${r.filled < r.empty ? ` из ${r.empty} — в банке не хватило тем` : ''}.` : 'Пустых дней нет — все темы на месте.');
+        promptsScreen();
+      } catch (e) { alert(err(e)); b.disabled = false; }
+    };
   }
 
   // ---------- 📣 объявления в «Новостях стаи» (worker/flock-news.js, /api/admin/flock-notes) ----------
@@ -711,7 +822,7 @@
     const shopRows = [
       row('Сколько одинаковых обычных вещей можно иметь', num('shopMax', R.shopMax, D.shopMax) + ' шт.', D.shopMax, 'и купить, и получить в подарок'),
       row('Сколько одинаковых легендарных', num('legendMax', R.legendMax, D.legendMax) + ' шт.', D.legendMax),
-      row('<b>«Мало»</b> — не больше … % от числа птичек', num('lowPct', R.lowPct, D.lowPct, 0.5) + ` % → сейчас <b>1–${S.low} шт.</b>`, D.lowPct + ' %', 'фильтр «Мало» в магазине; цена выше ценности'),
+      row('<b>«Мало»</b> — не больше … % от числа птичек', num('lowPct', R.lowPct, D.lowPct, 0.5) + ` % → сейчас <b>1–${S.low} шт.</b>`, D.lowPct + ' %', 'фильтр «Мало» на рынке; цена выше ценности'),
       row('<b>Обычный запас</b> — … % от числа птичек', num('normPct', R.normPct, D.normPct, 0.5) + ` % → сейчас <b>${S.norm} шт.</b>`, D.normPct + ' %', 'при нём цена = ценности; меньше штук — дороже, больше — дешевле'),
       row('<b>«Много»</b> — от … % от числа птичек', num('manyPct', R.manyPct, D.manyPct, 1) + ` % → сейчас <b>от ${S.many} шт.</b>`, D.manyPct + ' %', 'фильтр «Много»; цена ниже ценности'),
       row('Легендарных — … % от этих чисел', num('legendPct', R.legendPct, D.legendPct) + ` % → сейчас мало 1–${S.lowLeg}, обычно ${S.normLeg}, много от ${S.manyLeg}`, D.legendPct + ' %'),
@@ -722,7 +833,7 @@
       row('🃏 Карточек одной коллекции в одни руки в первые сутки', num('cardsFirstDay', R.cardsFirstDay, D.cardsFirstDay) + ' шт.', D.cardsFirstDay ? D.cardsFirstDay + ' шт.' : 'без лимита', '0 — без лимита; сутки — с появления первой карточки коллекции'),
       row('🎲 Карточка-сюрприз стоит', num('cardSurprisePct', R.cardSurprisePct, D.cardSurprisePct) + ' %', D.cardSurprisePct + ' %', 'от средней цены свободных карточек этой редкости; выпадает случайная свободная — такой ни у кого нет'),
       row('🔁 Предложение обмена карточками живёт', num('tradeDays', R.tradeDays, D.tradeDays) + ' дн.', D.tradeDays + ' дн.', 'потом оно истекает само; принять уже нельзя'),
-      row(`<label class="adm-r-chk"><input type="checkbox" data-r="sellOn"${R.sellOn ? ' checked' : ''}> Птички могут продавать вещи обратно в магазин</label>`, 'за ' + num('sellPrice', R.sellPrice, D.sellPrice) + ' 🔘', D.sellPrice + ' 🔘', 'одна цена за любую вещь; проданная вещь возвращается в магазин (+1 шт.)'),
+      row(`<label class="adm-r-chk"><input type="checkbox" data-r="sellOn"${R.sellOn ? ' checked' : ''}> Птички могут продавать вещи обратно на рынок</label>`, 'за ' + num('sellPrice', R.sellPrice, D.sellPrice) + ' 🔘', D.sellPrice + ' 🔘', 'одна цена за любую вещь; проданная вещь возвращается на рынок (+1 шт.)'),
     ];
     const advRows = [
       row('Пропущенные окошки можно открыть до … января', num('adventLastJan', R.adventLastJan, D.adventLastJan) + ' января', D.adventLastJan, '0 — в январе уже нельзя'),
@@ -731,25 +842,25 @@
     ];
     const chk = (k, l, note) => `<label class="adm-r-chk"><input type="checkbox" data-r="${k}"${R[k] ? ' checked' : ''}> ${l}${note ? ` <small class="be-note">${note}</small>` : ''}</label>`;
     main.innerHTML = `${autoCard(d.auto || [])}<details class="adm-fine"${sessionStorage.getItem('pp-fine') ? ' open' : ''}><summary>⚙️ Тонкая настройка — можно не трогать</summary><section class="adm-box"><h2>📜 Правила</h2>
-      <p class="be-note">Здесь можно поменять пуговки, бейджи, магазин, адвент и ИИ-работы. Изменения действуют сразу после «Сохранить» (до минуты на всех страницах). Поле с жёлтой рамкой отличается от значения по умолчанию. Уже полученные бейджи и пуговки при изменениях не отнимаются; если снизить условие бейджа, птички, которые ему уже соответствуют, получат его при следующем заходе.</p>
+      <p class="be-note">Здесь можно поменять пуговки, бейджи, рынок, адвент и ИИ-работы. Изменения действуют сразу после «Сохранить» (до минуты на всех страницах). Поле с жёлтой рамкой отличается от значения по умолчанию. Уже полученные бейджи и пуговки при изменениях не отнимаются; если снизить условие бейджа, птички, которые ему уже соответствуют, получат его при следующем заходе.</p>
       <p class="adm-r-bar"><button type="button" class="pill-btn pill-fill" id="adm-r-save">💾 Сохранить правила</button> <span class="be-note" id="adm-r-st"></span></p></section>
       ${box('🔘 Пуговки', btnRows)}
       ${box('🥚 Уровни (рекордная серия) — пуговки один раз за уровень', lvRows)}
       ${box('🏅 Бейджи — награда и условия', bRows, 'Числа в условиях можно менять прямо в тексте. Описание «как получить» у птичек подстраивается само.')}
-      ${box('🛍 Магазин', shopRows)}
-      <section class="adm-box adm-rules adm-unit"><h3>💡 Как устроена экономика</h3><p>Пуговки за действия и игры — <b>постоянные</b> (награды игр — в % от опорной цены ${G.avg} 🔘, она не меняется). А <b>цены в магазине подстраиваются сами</b>: раз в сутки сайт смотрит, сколько зарабатывает обычная активная птичка, и ставит уровень цен так, чтобы средняя вещь стоила примерно столько, сколько она зарабатывает за ${R.priceDays} дн. Если птички много накопили — чуть дороже. За день цены меняются не больше чем на 10 %. Вы меняете только % категорий и цены легендарных (раздел «🛍 Магазин»).</p></section>
+      ${box('🛍 Птичий рынок', shopRows)}
+      <section class="adm-box adm-rules adm-unit"><h3>💡 Как устроена экономика</h3><p>Пуговки за действия и игры — <b>постоянные</b> (награды игр — в % от опорной цены ${G.avg} 🔘, она не меняется). А <b>цены на рынке подстраиваются сами</b>: раз в сутки сайт смотрит, сколько зарабатывает обычная активная птичка, и ставит уровень цен так, чтобы средняя вещь стоила примерно столько, сколько она зарабатывает за ${R.priceDays} дн. Если птички много накопили — чуть дороже. За день цены меняются не больше чем на 10 %. Вы меняете только % категорий и цены легендарных (раздел «🛍 Птичий рынок»).</p></section>
       ${box('🔘 Игра «Пуговичный дождь»', [
         row(`<label class="adm-r-chk"><input type="checkbox" data-r="gameOn"${R.gameOn ? ' checked' : ''}> Давать пуговки за игру</label>`, 'за уровень ' + pct('gameLevelPct') + ` → сейчас ${G.level} 🔘`, D.gameLevelPct + ' %', `уровни 1–10 — столько, 11–20 — вдвое (${G.level * 2}), 21–30 — втрое (${G.level * 3}) и т. д.; каждый номер уровня платит раз в сутки`),
         row('🏆 Новый личный рекорд — за каждый уровень выше прежнего', pct('gameRecordPct') + ` → сейчас ${G.record} 🔘`, D.gameRecordPct + ' %', 'один раз навсегда: стимул становиться лучше, а не переигрывать'),
         row('Лимит пуговок за игру в сутки', pct('gameDayMaxPct') + (G.max ? ` → сейчас ${G.max} 🔘` : ''), D.gameDayMaxPct ? D.gameDayMaxPct + ' %' : 'без лимита', '0 — без лимита (каждый уровень всё равно платит только раз в день)'),
-        row('Вещь из магазина каждые … уровней', num('gameItemEvery', R.gameItemEvery, D.gameItemEvery) + ' ур.', D.gameItemEvery + ' ур.', 'вещь, которой у птички нет (не легендарная), неоткрытым подарком; за один уровень — раз в сутки; 0 — выключено'),
+        row('Вещь с рынка каждые … уровней', num('gameItemEvery', R.gameItemEvery, D.gameItemEvery) + ' ур.', D.gameItemEvery + ' ур.', 'вещь, которой у птички нет (не легендарная), неоткрытым подарком; за один уровень — раз в сутки; 0 — выключено'),
         row('👑 Первое место в рекордах — каждый день, когда играет', pct('gameKingPct') + ` → сейчас ${G.king} 🔘`, D.gameKingPct + ' %', 'кто первый в таблице рекордов и прошёл в этот день хоть один уровень; 0 — выключено'),
         row('Уровень не засчитывается, если пройден быстрее', num('gameMinSec', R.gameMinSec, D.gameMinSec) + ' с', D.gameMinSec + ' с', 'защита от подделки: столько секунд на каждый уровень от начала игры (честно — дольше)'),
       ], '<a href="/ru/rain/">Открыть игру →</a>')}
       ${box('🥞 Игра «Блинная Полли»', [
         row(`<label class="adm-r-chk"><input type="checkbox" data-r="panOn"${R.panOn ? ' checked' : ''}> Давать пуговки за игру</label>`, 'за уровень ' + pct('panLevelPct') + ` → сейчас ${btnPct(R.panLevelPct)} 🔘`, D.panLevelPct + ' %', 'уровни 1–10 — столько, 11–20 — вдвое, 21–30 — втрое и т. д.; каждый номер уровня платит раз в сутки'),
         row('🏆 Новый личный рекорд — за каждый уровень выше прежнего', pct('panRecordPct') + ` → сейчас ${btnPct(R.panRecordPct)} 🔘`, D.panRecordPct + ' %', 'один раз навсегда'),
-        row('Подарок из магазина каждые … уровней', num('panItemEvery', R.panItemEvery, D.panItemEvery) + ' ур.', D.panItemEvery + ' ур.', 'вещь, которой у птички нет (не легендарная), неоткрытым подарком; за один уровень — раз в сутки; 0 — выключено'),
+        row('Подарок с рынка каждые … уровней', num('panItemEvery', R.panItemEvery, D.panItemEvery) + ' ур.', D.panItemEvery + ' ур.', 'вещь, которой у птички нет (не легендарная), неоткрытым подарком; за один уровень — раз в сутки; 0 — выключено'),
         row('Мыть сковородку каждые … уровней', num('panWashEvery', R.panWashEvery, D.panWashEvery) + ' ур.', D.panWashEvery + ' ур.', 'пальцем по экрану; без мытья следующий уровень не засчитывается'),
         row('Средство для мытья', num('panSoapBtn', R.panSoapBtn, D.panSoapBtn) + ' 🔘', D.panSoapBtn + ' 🔘', 'списывается при мытье; без средства — водой, тереть дольше, бесплатно; 0 — средство бесплатное'),
         row('Старт не с начала — рубежи каждые … уровней', num('panStartEvery', R.panStartEvery, D.panStartEvery) + ' ур.', D.panStartEvery + ' ур.', 'можно начать с 11-го, 21-го… уровня, если рекорд не ниже; пропущенные уровни пуговок не дают; 0 — всегда с 1-го'),
@@ -761,7 +872,7 @@
       ${box('🚆 Игра «Поезд Полли»', [
         row(`<label class="adm-r-chk"><input type="checkbox" data-r="trainOn"${R.trainOn ? ' checked' : ''}> Давать пуговки за игру</label>`, 'за станцию ' + pct('trainLevelPct') + ` → сейчас ${btnPct(R.trainLevelPct)} 🔘`, D.trainLevelPct + ' %', 'станции 1–10 — столько, 11–20 — вдвое и т. д.; каждая станция каждого языка платит раз в сутки'),
         row('🏆 Новый рекорд языка — за каждую станцию выше прежней', pct('trainRecordPct') + ` → сейчас ${btnPct(R.trainRecordPct)} 🔘`, D.trainRecordPct + ' %', 'один раз навсегда, у каждого из 4 языков свой рекорд'),
-        row('Подарок каждые … станций', num('trainItemEvery', R.trainItemEvery, D.trainItemEvery) + ' ст.', D.trainItemEvery + ' ст.', 'сначала — вещь темы «🚆 Поезд», которой у птички нет; когда все есть — любая из магазина; 0 — выключено'),
+        row('Подарок каждые … станций', num('trainItemEvery', R.trainItemEvery, D.trainItemEvery) + ' ст.', D.trainItemEvery + ' ст.', 'сначала — вещь темы «🚆 Поезд», которой у птички нет; когда все есть — любая с рынка; 0 — выключено'),
         row('Старт не с начала — рубежи каждые … станций', num('trainStartEvery', R.trainStartEvery, D.trainStartEvery) + ' ст.', D.trainStartEvery + ' ст.', 'можно начать с 11-й, 21-й… станции, если рекорд языка не ниже; 0 — всегда с 1-й'),
         ...[['trainUpHintPct', '🥟 Улучшение «Больше эмпанад» (3 уровня)', '+1 подсказка на станции: убирает лишние варианты или показывает пару'], ['trainUpWordPct', '🛡 Улучшение «Второй шанс» (2 уровня)', '+1 ошибка на станции не считается'],
           ['trainUpJarPct', '⏳ Улучшение «Терпеливые пассажиры» (2 уровня)', 'в вагоне-ресторане ждут на 25 % дольше за уровень']]
@@ -786,6 +897,14 @@
         row('Урожай волшебных дороже в', num('gardenMagicMul', R.gardenMagicMul, D.gardenMagicMul) + ' раз', D.gardenMagicMul + ' раз'),
         row('Сезон огорода', `<select data-r="gardenSeason">${[['auto', 'по календарю'], ['autumn', '🍂 осень'], ['winter', '❄️ зима'], ['spring', '🌸 весна'], ['summer', '☀️ лето']].map(([k, l]) => `<option value="${k}"${R.gardenSeason === k ? ' selected' : ''}>${l}</option>`).join('')}</select>`, 'по календарю', 'погода и вид: дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень'),
       ], 'Вход — дверь 🚪 в комнате птички → «Огород» (/garden/)')}
+      ${box('🍳 Кухня: книга рецептов', [
+        row(`<label class="adm-r-chk"><input type="checkbox" data-r="cookOn"${R.cookOn ? ' checked' : ''}> Блюда дают эффекты</label>`, '', 'вкл', 'выключено — книга видна, но готовить нельзя и эффекты не действуют'),
+        row('Сила хороших эффектов', num('cookPower', R.cookPower, D.cookPower) + ' %', D.cookPower + ' %', '100 % — как в рецепте (например, салат с редиской +25 % пуговок в Пуговичном дожде); 200 % — вдвое сильнее'),
+        row('Длительность хороших эффектов', num('cookTime', R.cookTime, D.cookTime) + ' %', D.cookTime + ' %', 'от часов в рецепте (2–24 ч)'),
+        row('«Идеально» сильнее на', num('cookPerfectPct', R.cookPerfectPct, D.cookPerfectPct) + ' %', D.cookPerfectPct + ' %', 'если снять сковородку в золотой серединке'),
+        row('Сырое или подгоревшее: пуговок меньше на', num('cookBadPct', R.cookBadPct, D.cookBadPct) + ' %', D.cookBadPct + ' %', 'в тех же играх, что у блюда (у чая и тортов — во всех)'),
+        row('…на столько часов', num('cookBadH', R.cookBadH, D.cookBadH) + ' ч', D.cookBadH + ' ч', 'пока эффект идёт, новое блюдо не приготовить'),
+      ], 'Вход — кухня птички → кнопка 📖 (рецепты — worker/kitchen.js RECIPES)')}
       ${box('✉️ Уведомления из игр на почту', [
         row(`<label class="adm-r-chk"><input type="checkbox" data-r="mailGamesOn"${R.mailGamesOn ? ' checked' : ''}> Присылать уведомления из игр</label>`, '', 'вкл', 'только птичкам, которые включили «🎮 Уведомления из игр»; одно письмо-сводка в день: всё, что ждёт птичку в играх; и вообще не больше одного письма в день (рассылка, праздник, адвент); что не уместилось — завтра'),
         row('🔥 Серия сгорит сегодня — серия от', num('mailStreakMin', R.mailStreakMin, D.mailStreakMin) + ' дн.', D.mailStreakMin + ' дн.', 'если сегодня ещё нет рисунка и сегодня не день свободы'),
@@ -810,7 +929,7 @@
       ${box('🧪 Игра «Зельеварня Полли»', [
         row(`<label class="adm-r-chk"><input type="checkbox" data-r="potionOn"${R.potionOn ? ' checked' : ''}> Давать пуговки за зелья</label>`, '', 'вкл', 'выключено — варят только для коллекции'),
         row('Сезон зельеварни', `<select data-r="potionSeason">${[['auto', 'по календарю'], ['autumn', '🎃 осень · Хеллоуин'], ['winter', '❄️ зима · Новый год'], ['spring', '🌷 весна'], ['summer', '☀️ лето']].map(([k, l]) => `<option value="${k}"${R.potionSeason === k ? ' selected' : ''}>${l}</option>`).join('')}</select>`, 'по календарю', 'по календарю: дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень; от сезона зависят ингредиенты и цвет лабиринта'),
-        row(`<label class="adm-r-chk"><input type="checkbox" data-r="potionShelf"${R.potionShelf ? ' checked' : ''}> Бутылочка в комнату за новое зелье «Вкус детства»</label>`, '', 'вкл', 'появляется в сумке, её можно поставить в комнату; в магазине таких нет'),
+        row(`<label class="adm-r-chk"><input type="checkbox" data-r="potionShelf"${R.potionShelf ? ' checked' : ''}> Бутылочка в комнату за новое зелье «Вкус детства»</label>`, '', 'вкл', 'появляется в сумке, её можно поставить в комнату; на рынке таких нет'),
         row('Новое <b>обычное</b> зелье', pct('potion1Pct') + ` → сейчас ${G.p1} 🔘`, D.potion1Pct + ' %'),
         row('Новое <b>вкусное</b> зелье', pct('potion2Pct') + ` → сейчас ${G.p2} 🔘`, D.potion2Pct + ' %', 'два сладких ингредиента в котле'),
         row('Новое зелье <b>«Вкус детства»</b>', pct('potion3Pct') + ` → сейчас ${G.p3} 🔘`, D.potion3Pct + ' %', 'три сладких ингредиента'),
@@ -834,7 +953,7 @@
         row('«☕ Долить» полный кофейник', pct('titosRefillPct') + ` → сейчас ${G.titosRefill} 🔘`, D.titosRefillPct + ' %'),
         row('Лишний кофе (кофейник полный) — пуговки за чашку', pct('titosSellPct') + ` → сейчас ${G.titosSell} 🔘`, D.titosSellPct + ' %', 'не меньше 1 🔘'),
         row('…не больше чашек в сутки', num('titosSellDayMax', R.titosSellDayMax, D.titosSellDayMax) + ' чаш.', D.titosSellDayMax, '0 — лишний кофе не продаётся'),
-      ], 'Награды за уровни 30, 50, 90 и 100 — вещи для комнаты: их нет в магазине, подарить и продать нельзя. <a href="/ru/titos/">Открыть игру →</a>')}
+      ], 'Награды за уровни 30, 50, 90 и 100 — вещи для комнаты: их нет на рынке, подарить и продать нельзя. <a href="/ru/titos/">Открыть игру →</a>')}
       ${box('🚪 Дом птички — что открывает комнату', [
         row('🍳 Кухня: уровень в «Блинной Полли»', num('homeKitchen', R.homeKitchen, D.homeKitchen), D.homeKitchen, 'считается рекорд'),
         row('🛏 Спальня: пёрышек в чужих комнатах', num('homeBedroom', R.homeBedroom, D.homeBedroom), D.homeBedroom),
@@ -870,29 +989,30 @@
         <li>Первый заход за сутки — ${pc(R.daily)}; рисунок — ${pc(R.upload)} (за день один раз)${R.aiUpload ? '' : ', за работу с 🤖 — 0'}; комментарий — ${pc(R.comment)} (первые ${R.commentsPerDay} в день); друг указал тебя при регистрации — ${pc(R.friend)}; «Выбор Полли» — ${pc(R.pick)}.</li>
         <li>Уровни: ${Object.keys(R.levels).map(k => `${LEVEL_RU[k]} (${k}) — ${R.levels[k]}`).join(', ')}.</li>
         <li>Бейджи: ${Object.keys(R.badges).map(k => `${BADGE_RU[k] || k} — ${R.badges[k]}`).join(', ')}. За каждый бейдж и уровень пуговки дают один раз.</li></ul>
-      <h4>Магазин</h4><ul>
+      <h4>Птичий рынок</h4><ul>
         <li>Одинаковых обычных вещей — до ${R.shopMax} шт., легендарных — до ${R.legendMax}. Легендарные дарить нельзя.</li>
         <li>«Мало», «обычно» и «много» считаются от числа птичек с ником (сейчас ${S.birds}): мало — до ${R.lowPct} % (1–${S.low} шт.), обычный запас — ${R.normPct} % (${S.norm} шт.), много — от ${R.manyPct} % (${S.many} шт.); у легендарных — ${R.legendPct} % от этих чисел (1–${S.lowLeg} / ${S.normLeg} / от ${S.manyLeg}). Птичек становится больше — числа растут сами.</li>
         <li>Цена обычной вещи = ценность × % категории × уровень цен (сам, раз в сутки: средняя вещь ≈ заработок активной птички за ${R.priceDays} дн.; не больше ±10 % в день) × остаток: (обычный запас ÷ остаток)^0.4, от ×${R.priceMin} до ×${R.priceMax}, округление до 5. Легендарные — ровно та цена, что поставлена вручную.</li>
         <li>«🎲 Сюрприз» — случайная вещь категории, которой у птички ещё нет; если всё есть — любая вещь, которой нет.</li>
         <li>Любую вещь из сумки, кроме легендарных, можно подарить другой птичке (если у неё ещё нет максимума). Админ может дарить что угодно.</li>
-        <li>${R.restockOn ? `Каждый день (ночью по Риге) закончившиеся вещи (кроме легендарных) пополняются сами — по ${R.restockTo > 0 ? R.restockTo + ' шт.' : 'обычному запасу (' + S.norm + ' шт.)'}; у остальных остаток не меняется.` : 'Ежедневное пополнение магазина выключено.'}</li>
-        <li>${R.sellOn ? `Любую вещь можно продать обратно в магазин за ${pc(R.sellPrice)} — она снова появится в продаже.` : 'Продажа вещей обратно в магазин выключена.'}</li></ul>
+        <li>${R.restockOn ? `Каждый день (ночью по Риге) закончившиеся вещи (кроме легендарных) пополняются сами — по ${R.restockTo > 0 ? R.restockTo + ' шт.' : 'обычному запасу (' + S.norm + ' шт.)'}; у остальных остаток не меняется.` : 'Ежедневное пополнение рынка выключено.'}</li>
+        <li>${R.sellOn ? `Любую вещь можно продать обратно на рынок за ${pc(R.sellPrice)} — она снова появится в продаже.` : 'Продажа вещей обратно на рынок выключена.'}</li></ul>
       <h4>Игра «Пуговичный дождь»</h4><ul>
         <li>Птичка ловит пуговки и уворачивается от клякс; 3 сердечка, клякса или 5 упущенных пуговок — минус сердечко; каждые 5 уровней — +1 сердечко. Уровни бесконечные, каждый быстрее.</li>
         <li>Сложность растёт ступенями: каждые 10 уровней заметно быстрее и больше клякс (с 11-го — ветер, с 21-го — зигзаг).</li>
         <li>Награды игр — в % от опорной цены ${G.avg} 🔘 (постоянная), поэтому не скачут.</li>
-        <li>${R.gameOn && R.gameLevelPct > 0 ? `За уровень — ${R.gameLevelPct} % (сейчас ${pc(G.level)}) × (1 + каждый пройденный десяток): 1–10 — ${G.level}, 11–20 — ${G.level * 2}, 21–30 — ${G.level * 3}… Каждый номер уровня платит раз в сутки${G.max > 0 ? `, всего не больше ${pc(G.max)} в сутки` : ''}. Новый личный рекорд — ещё ${R.gameRecordPct} % (${pc(G.record)}) за каждый уровень выше прежнего.` : 'Пуговки за игру выключены.'}${R.gameItemEvery > 0 ? ` Каждые ${R.gameItemEvery} уровней — вещь из магазина, которой у птички нет (не легендарная).` : ''}${R.gameKingPct > 0 ? ` 👑 Первое место в рекордах — ${R.gameKingPct} % (${pc(G.king)}) в каждый день, когда держится и играет.` : ''}</li></ul>
+        <li>${R.gameOn && R.gameLevelPct > 0 ? `За уровень — ${R.gameLevelPct} % (сейчас ${pc(G.level)}) × (1 + каждый пройденный десяток): 1–10 — ${G.level}, 11–20 — ${G.level * 2}, 21–30 — ${G.level * 3}… Каждый номер уровня платит раз в сутки${G.max > 0 ? `, всего не больше ${pc(G.max)} в сутки` : ''}. Новый личный рекорд — ещё ${R.gameRecordPct} % (${pc(G.record)}) за каждый уровень выше прежнего.` : 'Пуговки за игру выключены.'}${R.gameItemEvery > 0 ? ` Каждые ${R.gameItemEvery} уровней — вещь с рынка, которой у птички нет (не легендарная).` : ''}${R.gameKingPct > 0 ? ` 👑 Первое место в рекордах — ${R.gameKingPct} % (${pc(G.king)}) в каждый день, когда держится и играет.` : ''}</li></ul>
       <h4>Игра «Блинная Полли»</h4><ul>
         <li>К окошку приходят жители Воббленда (уровень — один житель): выбрать сковородку (форма), налить тесто, перевернуть и снять вовремя (прожарка из заказа), добавить топпинги. Ошибки снижают довольство; совсем недовольный клиент — минус сердечко (3, каждые 5 уровней одно возвращается).</li>
         <li>Сложнее с каждым десятком: быстрее печётся, уже «идеальная» полоса, больше блинов и топпингов в заказе, с 11-го уровня клиенты ждут ограниченное время; новые формы и топпинги открываются по уровням.</li>
-        <li>${R.panOn && R.panLevelPct > 0 ? `За уровень — ${R.panLevelPct} % (сейчас ${pc(btnPct(R.panLevelPct))}) × (1 + каждый пройденный десяток), каждый номер уровня раз в сутки; новый рекорд — ещё ${R.panRecordPct} % за уровень.` : 'Пуговки за игру выключены.'}${R.panItemEvery > 0 ? ` Каждые ${R.panItemEvery} уровней — подарок из магазина.` : ''} Каждые ${R.panWashEvery} уровней — мыть сковородку пальцем: средство ${pc(R.panSoapBtn)}, водой — бесплатно, но дольше.</li></ul>
+        <li>${R.panOn && R.panLevelPct > 0 ? `За уровень — ${R.panLevelPct} % (сейчас ${pc(btnPct(R.panLevelPct))}) × (1 + каждый пройденный десяток), каждый номер уровня раз в сутки; новый рекорд — ещё ${R.panRecordPct} % за уровень.` : 'Пуговки за игру выключены.'}${R.panItemEvery > 0 ? ` Каждые ${R.panItemEvery} уровней — подарок с рынка.` : ''} Каждые ${R.panWashEvery} уровней — мыть сковородку пальцем: средство ${pc(R.panSoapBtn)}, водой — бесплатно, но дольше.</li></ul>
       <h4>Огород птички</h4><ul>
         <li>Вход — дверь 🚪 в комнате → «Огород». ${R.gardenBeds} грядок; посадить семечко, поливать каждый день (раз в сутки по Риге): растение растёт, только пока земля влажная (${R.gardenWetH} ч после полива).</li>
         <li>Семечко — ${R.gardenSeedPct} % (${pc(btnPct(R.gardenSeedPct))}) за каждый день роста, урожай — ${R.gardenSellPct} % (${pc(btnPct(R.gardenSellPct))}) за день${R.gardenOn ? '' : ' (продажа сейчас выключена)'}. При первом заходе — по ${R.gardenStarter} семян редиски, салата, моркови и тюльпана.</li>
         <li>Жуки: в ${R.gardenBugChance} % дней — от 1 до ${R.gardenBugMax}, вылезают в разное время днём; каждый — ${pc(R.gardenBugBtn)}.</li>
-        <li>Семена: простые — в лавке огорода и в магазине; в играх с шансом ${R.gardenDropPct} % за награду (до ${R.gardenDropDay} в сутки). Редкое — за ${R.gardenRareDays} дней подряд с бонусом карточки дня, волшебное — за ${R.gardenMagicDays} дней подряд с поливом; их урожай дороже в ${R.gardenRareMul} и ${R.gardenMagicMul} раз. Найденное семечко — новость 🌱 в конвертике.</li>
-        <li>Вещи для огорода (лейка, пугало, теплица, тачка…, ★ золотая лейка и оранжерея, «🎲 Сюрприз») — в магазине; купленная вещь сама стоит в огороде.</li>
+        <li>🍳 Кухня: блюда из урожая (книга 📖 в кухне). Одно блюдо за раз: +пуговки в своей игре (или во всех), быстрее рост при поливе, чаще семечки — на 2–24 ч (сила ${R.cookPower} %, время ${R.cookTime} %, «идеально» +${R.cookPerfectPct} %). Сырое или подгоревшее — −${R.cookBadPct} % пуговок на ${R.cookBadH} ч.${R.cookOn ? '' : ' (сейчас выключено)'}</li>
+        <li>Семена: простые — в лавке огорода и на рынке; в играх с шансом ${R.gardenDropPct} % за награду (до ${R.gardenDropDay} в сутки). Редкое — за ${R.gardenRareDays} дней подряд с бонусом карточки дня, волшебное — за ${R.gardenMagicDays} дней подряд с поливом; их урожай дороже в ${R.gardenRareMul} и ${R.gardenMagicMul} раз. Найденное семечко — новость 🌱 в конвертике.</li>
+        <li>Вещи для огорода (лейка, пугало, теплица, тачка…, ★ золотая лейка и оранжерея, «🎲 Сюрприз») — на рынке; купленная вещь сама стоит в огороде.</li>
         <li>Погода — ${R.gardenSeason === 'auto' ? 'по календарю' : 'вручную: ' + R.gardenSeason}: осенью листья, дождик или туман, зимой снег, весной лепестки, летом солнце и бабочки; вечером (с 19 до 7) — звёзды.</li></ul>
       <h4>«Смена с Полли»</h4><ul>
         <li>Таймер 20 мин – 3 ч, Полли работает рядом. Засчитывается только смена, доведённая до конца; минуты копятся: каждый полный час — повышение (новая должность, лестница бесконечная)${R.shiftOn && R.shiftBtn > 0 ? ` и ${pc(R.shiftBtn)}` : ''}.</li></ul>
@@ -977,7 +1097,7 @@
     let av = {}; try { av = JSON.parse(u.avatar || '{}') || {}; } catch (e) { /* пусто */ }
     const NAMES = { halo: 'нимб ★', unicorn: 'рог единорога ★', flamecrown: 'корона феникса ★', dragonegg: 'яйцо дракона ★', goldfeather: 'золотое перо ★', comet: 'комета ★', goldenapple: 'золотое яблоко ★', legend: 'легендарная ★', aurora: 'сияние ★', pirate: 'пиратская шляпа', chef: 'колпак повара', graduation: 'шапочка выпускника', paintbrush: 'кисточка', palette: 'палитра', pencil: 'карандаш', coffee: 'кофе', croissant: 'круассан', bounce: 'прыгает', wiggle: 'качается', float: 'парит', spin: 'кружится', sparkle: 'сияет', heart: 'сердечко', wizard: 'шляпа волшебника', witch: 'шляпа ведьмы', pumpkin: 'тыква', santa: 'колпак Санты', antlers: 'рожки оленя', beanie: 'зимняя шапка', heartband: 'ободок с сердцем', wreath: 'весенний венок', strawhat: 'летняя шляпа', leafcrown: 'осенний венок', wand: 'волшебная палочка', crystal: 'хрустальный шар', star: 'звёздочка', lollipop: 'леденец', minipumpkin: 'тыковка', candycane: 'карамельная трость', giftbox: 'подарок', ornament: 'ёлочный шар', snowflake: 'снежинка', heart: 'сердечко', rose: 'роза', letter: 'валентинка', icecream: 'мороженое', mapleleaf: 'кленовый лист', snow: 'снежинки', magic: 'волшебная', spooky: 'хеллоуин', headset: 'игровые наушники', gamepad: 'геймпад', coin: 'монетка', sword: 'пиксельный меч', mushroom: 'грибок', neon: 'неон', pizza: 'пицца', cherry: 'вишенка', cheese: 'сыр', ring: 'колечко', pearl: 'жемчужина', ruby: 'рубин', sapphire: 'сапфир', key: 'ключик', spoon: 'ложечка', gold: 'золотая', rainbow: 'радуга', stars: 'звёзды', hearts: 'сердечки', leaves: 'листики', dotted: 'пунктир' };
     let kind = 'hat', item = B.GIFTS.hat[0], owned = {}, copies = {};
-    // цены: как сейчас в магазине (с учётом остатка); у вещей не из магазина — ценность (base)
+    // цены: как сейчас на рынке (с учётом остатка); у вещей не с рынка — ценность (base)
     let price = {}, LIM = { max: 3, leg: 1 };
     const priceOf = (kd, v) => price[kd + '|' + v] || 0;
     const w = document.createElement('div'); w.className = 'adm-gift';
@@ -1018,9 +1138,9 @@
     function giftCards(box) {
       box.innerHTML = '<p class="be-note">Загрузка карточек…</p>';
       api('cards?show=free&lang=ru').then(d => {
-        const free = d.cards.filter(c => c.rarity === 'common' || c.price > 0); // как в сюрпризе магазина: редкие и уникальные без цены ещё не готовы
+        const free = d.cards.filter(c => c.rarity === 'common' || c.price > 0); // как в сюрпризе рынка: редкие и уникальные без цены ещё не готовы
         const left = () => free.filter(c => (!CS.rarity || c.rarity === CS.rarity) && (!CS.coll || c.collection === CS.coll)).length;
-        box.innerHTML = `<div class="adm-gc"><p class="be-note">Каждая карточка — одна на весь сайт: подаренная уходит из магазина к птичке в альбом. Пуговки не списываются, птичка увидит «🃏 Тебе карточка!» в новостях.</p>
+        box.innerHTML = `<div class="adm-gc"><p class="be-note">Каждая карточка — одна на весь сайт: подаренная уходит с рынка к птичке в альбом. Пуговки не списываются, птичка увидит «🃏 Тебе карточка!» в новостях.</p>
           <div class="adm-gc-row"><select data-r aria-label="Редкость">${RAR.map(r => `<option value="${r[0]}"${r[0] === CS.rarity ? ' selected' : ''}>${r[1]}</option>`).join('')}</select>
           <select data-c aria-label="Коллекция"><option value="">Все коллекции</option>${d.sets.map(x => `<option value="${esc(x.slug)}"${x.slug === CS.coll ? ' selected' : ''}>${esc(x.name)}</option>`).join('')}</select></div>
           <p class="adm-gc-left"></p><button type="button" class="pill-btn pill-fill" data-rnd></button>
@@ -1089,7 +1209,7 @@
     prev();
   }
 
-  // ---------- магазин: цена и количество каждой вещи из коллекций ----------
+  // ---------- рынок: цена и количество каждой вещи из коллекций ----------
   // цена от остатка — как effPrice в worker/index.js: ценность × (обычный запас / остаток)^0.4, от ×0.75 до ×2.5; «мало / обычно / много» — от числа птичек (STOCK на сервере)
   let PR = { birds: 0, low: 3, norm: 10, many: 25, lowLeg: 1, normLeg: 3, manyLeg: 7, priceMin: 0.75, priceMax: 2.5 }; // формула цены — из «📜 Правил» (приходит с admin/shop)
   const effPrice = (base, stock, leg) => base > 0 ? Math.max(5, Math.round(base * Math.max(PR.priceMin, Math.min(PR.priceMax, Math.pow((leg ? PR.normLeg : PR.norm) / Math.max(1, stock || 0), 0.4))) / 5) * 5) : 0;
@@ -1136,7 +1256,7 @@
       const sum = B.GIFT_KINDS.map(k => { const xs = all.filter(x => x.kind === k[0]); const on = xs.filter(x => cnt(x) > 0); return { k: k[0], name: k[1][1], total: xs.length, on: on.length, pcs: on.reduce((a, x) => a + cnt(x), 0), low: on.filter(x => cnt(x) <= lowN(x)).length, txt: stockTxt(xs), hit: xs.filter(only).length, value: xs.reduce((a, x) => a + cnt(x) * ((rows[x.kind + '|' + x.item] || {}).price || 0), 0), each: (ns => ns.length ? (Math.min(...ns) === Math.max(...ns) ? String(ns[0]) : Math.min(...ns) + '–' + Math.max(...ns)) : '—')(xs.filter(x => !(B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item))).map(cnt)) }; });
       const onSale = all.filter(x => (rows[x.kind + '|' + x.item] || {}).stock > 0).length;
       const fb = (k, l) => `<button type="button" class="pill-btn" data-sf="${k}" aria-pressed="${sFilter === k}">${l}</button>`;
-      main.innerHTML = `<section class="adm-box"><h2>🛍 Магазин</h2>
+      main.innerHTML = `<section class="adm-box"><h2>🛍 Птичий рынок</h2>
         <p class="be-note">Цены считаются сами: <b>ценность вещи × % категории × уровень цен</b> (он сам подстраивается под то, сколько птички зарабатывают и копят — сейчас ×${(d.level && d.level.L) || 1}), а ещё дороже, когда штук мало, и дешевле, когда много. Вы меняете только <b>% категорий</b> и <b>цены легендарных</b> — они ниже. Остаток меняется сам (пополнение каждую ночь), но его можно поставить и вручную. Сейчас в продаже: <b>${onSale}</b> из ${all.length}.</p>
         <p class="adm-refill">↻ Пополнить <b>все закончившиеся, кроме легендарных</b> (сейчас ${all.filter(x => !isLeg(x) && cnt(x) === 0).length} ${pl1(all.filter(x => !isLeg(x) && cnt(x) === 0).length)}) — по <input type="number" id="adm-refill-n" min="1" max="10000" inputmode="numeric" value="${PR.norm}" style="width:70px"> шт. <button type="button" class="pill-btn pill-fill" id="adm-refill">Пополнить</button> <small class="be-note">обычный запас сейчас — ${PR.norm} шт.</small></p>
         <details class="adm-fine"><summary>⚙️ Тонкая настройка цен — можно не трогать</summary>${catBox()}${legBox()}</details>
@@ -1155,7 +1275,7 @@
           ${sOnly !== 'all' && !sum.some(r => r.hit) ? '<p class="be-note">Таких вещей нет 🎉</p>' : ''}
           <table class="be-table adm-table adm-stock"><thead><tr><th>Категория</th><th>Сейчас в продаже</th><th title="Сколько пуговок нужно, чтобы купить всё, что сейчас есть в продаже (по сегодняшним ценам)">Всё вместе стоит</th><th>Сколько штук поставить</th></tr></thead><tbody>
           ${sum.filter(r => sOnly === 'all' || r.hit).map(r => `<tr data-sk="${r.k}"><td><button type="button" class="adm-exp" data-exp="${r.k}" aria-expanded="${sOpen.has(r.k)}">${sOpen.has(r.k) ? '▾' : '▸'} ${esc(r.name)}</button><small class="adm-sk-n">${r.total} ${pl1(r.total)}</small></td><td>${sOnly === 'all' ? r.txt : `<span class="adm-sk-0">${r.hit} ${pl1(r.hit)} ${sOnly === 'empty' ? 'закончились' : sOnly === 'low' ? 'мало' : 'много'}</span><br><small>${r.txt}</small>`}</td><td>${r.value ? '🔘 ' + n(r.value) : '—'}</td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток: ${esc(r.name)}"></td></tr>${sOpen.has(r.k) ? `<tr class="adm-sk-items"><td colspan="4"><div class="adm-sk-grid">${all.filter(x => x.kind === r.k && only(x)).map(x => { const w = rows[x.kind + '|' + x.item] || { price: 0, base: (d.suggested || {})[x.kind + '|' + x.item] || 0, stock: 0 }, leg = B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item); return `<div class="adm-sk-it${leg ? ' adm-legend' : ''}${(w.stock || 0) > 0 ? '' : ' off'}" data-k="${esc(x.kind)}" data-i="${esc(x.item)}"><span class="adm-shop-pic"></span><span class="adm-sk-nm">${esc(x.name)}${leg && !x.name.includes('★') ? ' ★' : ''}</span><label>Остаток <input type="number" min="0" max="100000" inputmode="numeric" value="${w.stock || 0}" data-f="stock"></label>${leg ? `<label>Цена <input type="number" min="0" max="100000" inputmode="numeric" value="${w.base ?? w.price ?? 0}" data-f="price"></label>` : ''}<small class="adm-shop-st">${w.stock > 0 ? '🔘 ' + w.price : '—'}</small></div>`; }).join('')}</div></td></tr>` : ''}`).join('')}
-          <tr data-sk="*"><td><b>Весь магазин</b><small class="adm-sk-n">каждой вещи (кроме легендарных) станет ровно столько штук</small><small class="adm-sk-n">${all.length} ${pl1(all.length)}</small></td><td>${sum.reduce((a, r) => a + r.on, 0)} в продаже, ${sum.reduce((a, r) => a + r.pcs, 0)} шт. всего</td><td><b>🔘 ${n(sum.reduce((a, r) => a + r.value, 0))}</b></td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток всем"></td></tr></tbody></table>
+          <tr data-sk="*"><td><b>Весь рынок</b><small class="adm-sk-n">каждой вещи (кроме легендарных) станет ровно столько штук</small><small class="adm-sk-n">${all.length} ${pl1(all.length)}</small></td><td>${sum.reduce((a, r) => a + r.on, 0)} в продаже, ${sum.reduce((a, r) => a + r.pcs, 0)} шт. всего</td><td><b>🔘 ${n(sum.reduce((a, r) => a + r.value, 0))}</b></td><td class="adm-setst"><input type="number" min="0" max="10000" inputmode="numeric" placeholder="—" aria-label="Остаток всем"></td></tr></tbody></table>
           <p><button type="button" class="pill-btn pill-fill" id="adm-set-all">💾 Поставить</button> <small class="be-note">— всем строкам, где вписано число</small></p></section>
         <details class="adm-fine" id="adm-list"${sList || sq || sFilter !== 'all' || sSort !== 'cat' ? ' open' : ''}><summary>📋 Все вещи одним списком — поиск, темы, порядок</summary>
         <div class="be-filters"><input type="search" id="adm-sq" placeholder="🔍 Найти вещь" value="${esc(sq)}"></div>
@@ -1165,7 +1285,7 @@
         <table class="be-table adm-table adm-shop"><thead><tr><th>Вещь</th><th>Вид</th><th>Ценность 🔘</th><th>Остаток</th><th>Цена сейчас</th></tr></thead><tbody>
         ${list.map(x => { const r = rows[x.kind + '|' + x.item] || { price: 0, base: (d.suggested || {})[x.kind + '|' + x.item] || 0, stock: 0 }; const leg = B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item); return `<tr data-k="${esc(x.kind)}" data-i="${esc(x.item)}"${leg ? ' class="adm-legend"' : ''}><td class="adm-shop-it"><span class="adm-shop-pic"></span>${esc(x.name)}${leg ? ' <span class="adm-leg-tag" title="Легендарная: 1 штука на птичку, дарить нельзя">★ легендарная</span>' : ''}</td><td>${esc(x.kindName)}</td>
           <td data-l="Цена 🔘">${leg ? `<input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.base ?? r.price}" data-f="price" aria-label="Цена легендарной">` : `<span class="be-note" title="ценность × % категории × уровень цен">${r.base || '—'}</span>`}</td><td data-l="Количество"><input type="number" inputmode="numeric" min="0" max="100000" step="1" value="${r.stock}" data-f="stock" aria-label="Количество"></td><td class="adm-shop-st">${r.stock > 0 ? '🔘 ' + r.price : '—'}</td></tr>`; }).join('')}</tbody></table></details></section>
-        <section class="adm-danger"><h3>⚠️ Осторожно</h3><button type="button" class="pill-btn be-danger adm-empty" id="adm-empty-all">🧹 Опустошить полки</button><p class="be-note">У всех вещей (и легендарных) остаток станет 0 — в магазине ничего не будет в продаже.</p></section>`;
+        <section class="adm-danger"><h3>⚠️ Осторожно</h3><button type="button" class="pill-btn be-danger adm-empty" id="adm-empty-all">🧹 Опустошить полки</button><p class="be-note">У всех вещей (и легендарных) остаток станет 0 — на рынке ничего не будет в продаже.</p></section>`;
       main.querySelectorAll('[data-cat]').forEach(i => i.onchange = async () => {
         const v = Math.max(10, Math.min(1000, Math.round(+i.value) || 100)); i.disabled = true;
         try { const r = await api('admin/shop/cats', { mult: { [i.dataset.cat]: v } }); d.catMult = r.catMult; Object.keys(rows).forEach(k => delete rows[k]); r.items.forEach(x => { rows[x.kind + '|' + x.item] = x; }); draw(); }
@@ -1195,10 +1315,10 @@
       main.querySelectorAll('[data-ss]').forEach(b => b.onclick = () => { sStock = b.dataset.ss; draw(); });
       main.querySelector('#adm-sort').onchange = e => { sSort = e.target.value; draw(); };
       main.querySelector('#adm-list').addEventListener('toggle', e => { sList = e.target.open; });
-      // поставить остаток: категории (или всему магазину) — каждой вещи ровно столько штук
+      // поставить остаток: категории (или всему рынку) — каждой вещи ровно столько штук
       const setStock = async (pairs, btn) => {
         const items = []; let what = [];
-        for (const [k, n] of pairs) { const xs = (k === '*' ? all : all.filter(x => x.kind === k)).filter(x => only(x) && (sOnly !== 'all' || !(B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item)))); xs.forEach(x => items.push([x.kind, x.item, n])); what.push((k === '*' ? 'весь магазин' : (sum.find(r => r.k === k) || {}).name) + ' — по ' + n + ' шт. (' + xs.length + ')'); }
+        for (const [k, n] of pairs) { const xs = (k === '*' ? all : all.filter(x => x.kind === k)).filter(x => only(x) && (sOnly !== 'all' || !(B.LEGEND && B.LEGEND.has(x.kind + '|' + x.item)))); xs.forEach(x => items.push([x.kind, x.item, n])); what.push((k === '*' ? 'весь рынок' : (sum.find(r => r.k === k) || {}).name) + ' — по ' + n + ' шт. (' + xs.length + ')'); }
         if (!items.length) return alert(pairs.length ? (sOnly === 'all' ? 'Здесь нечего менять: в категории только легендарные (их меняют по одной или с фильтром).' : 'Под этот фильтр («' + { empty: 'Закончились', low: 'Мало', many: 'Много' }[sOnly] + '») в категории сейчас нет вещей — возможно, вы их уже пополнили. Нажмите «Все», чтобы поставить остаток всей категории.') : 'Впишите остаток хотя бы для одной категории.');
         if (!confirm((sOnly === 'empty' ? 'Пополнить только ЗАКОНЧИВШИЕСЯ вещи:\n' : sOnly === 'low' ? 'Пополнить только вещи, которых МАЛО:\n' : sOnly === 'many' ? 'Поставить остаток только вещам, которых МНОГО:\n' : 'Поставить остаток ВСЕМ вещам:\n') + what.join('\n'))) return;
         if (btn) btn.disabled = true;
@@ -1208,7 +1328,7 @@
       const val = tr => { const v = tr.querySelector('input').value.trim(); return v === '' ? null : Math.max(0, Math.min(10000, Math.floor(+v) || 0)); };
       // опустошить полки: остаток 0 у всех вещей (и легендарных); ценность остаётся — цены снова посчитаются при пополнении
       main.querySelector('#adm-empty-all').onclick = async e => {
-        if (!confirm('Опустошить полки? У всех ' + all.length + ' вещей (и легендарных) остаток станет 0 — в магазине ничего не будет в продаже. Ценность вещей не изменится.')) return;
+        if (!confirm('Опустошить полки? У всех ' + all.length + ' вещей (и легендарных) остаток станет 0 — на рынке ничего не будет в продаже. Ценность вещей не изменится.')) return;
         if (!confirm('Точно? Это нельзя отменить одной кнопкой — пополнять придётся заново.')) return;
         e.target.disabled = true;
         try { const r = await api('admin/shop/restock', { items: all.map(x => [x.kind, x.item, 0]), set: true }); Object.keys(rows).forEach(k => delete rows[k]); r.items.forEach(x => { rows[x.kind + '|' + x.item] = x; }); draw(); }

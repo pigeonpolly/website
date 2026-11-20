@@ -1,7 +1,7 @@
 // Огород птички (этап 22, /garden/?nick=, docs/bird.md «Огород»): пиксельная сцена 192×120 (canvas ×4), грядки, птичка, жуки, погода по сезону.
 // Нажал грядку → панель под сценой: посадить (свои семена), полить (раз в сутки), собрать. Корзинка — продать урожай за пуговки; «🛒 Семена» — купить.
 // Всё считает сервер (worker/garden.js): GET /api/garden?nick=, POST /api/garden/{plant,water,harvest,sell,buy,bug}. Гость только смотрит.
-// Рисунки и названия растений — и для магазина (window.PPGardenPlants: icon, name — блок «🌱 Семена» в src/pages/shop.html); без #garden на странице — только это.
+// Рисунки и названия растений — и для рынка (window.PPGardenPlants: icon, name — блок «🌱 Семена» в src/pages/shop.html); без #garden на странице — только это.
 (() => {
   const app = document.getElementById('garden');
   const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0;
@@ -58,9 +58,9 @@
     rare: [(a, b) => `✨ Rare seed: ${a} of ${b} days in a row with the bonus of the card of the day`, (a, b) => `✨ Редкое семечко: ${a} из ${b} дней подряд с бонусом карточки дня`, (a, b) => `✨ Reta sēkla: ${a} no ${b} dienām pēc kārtas ar dienas kartītes bonusu`],
     magic: [(a, b) => `🔮 Magic seed: ${a} of ${b} days in a row of watering`, (a, b) => `🔮 Волшебное семечко: ${a} из ${b} дней полива подряд`, (a, b) => `🔮 Burvju sēkla: ${a} no ${b} laistīšanas dienām pēc kārtas`],
     gotSeed: [n => `🎁 Today: ${n}!`, n => `🎁 Сегодня: ${n}!`, n => `🎁 Šodien: ${n}!`],
-    specialNote: ['Simple seeds are sold in the stall and the shop and sometimes drop in games. Rare and magic ones are not sold.', 'Простые семена продаются в лавке и в магазине и иногда выпадают в играх. Редкие и волшебные не продаются.', 'Vienkāršās sēklas pārdod kioskā un veikalā, un tās dažreiz izkrīt spēlēs. Retās un burvju sēklas nepārdod.'],
+    specialNote: ['Simple seeds are sold in the stall and the market and sometimes drop in games. Rare and magic ones are not sold.', 'Простые семена продаются в лавке и на рынке и иногда выпадают в играх. Редкие и волшебные не продаются.', 'Vienkāršās sēklas pārdod kioskā un tirgū, un tās dažreiz izkrīt spēlēs. Retās un burvju sēklas nepārdod.'],
     itemsHead: ['🪴 Garden things', '🪴 Вещи огорода', '🪴 Dārza lietas'],
-    items0: ['Watering cans, a scarecrow, a greenhouse and more are in the shop — bought things stand in the garden by themselves.', 'Лейки, пугало, теплица и другое — в магазине; купленная вещь сама встанет в огороде.', 'Lejkannas, putnubiedēklis, siltumnīca un citas lietas ir veikalā — nopirktā lieta pati nostāsies dārzā.'],
+    items0: ['Watering cans, a scarecrow, a greenhouse and more are at the market — bought things stand in the garden by themselves.', 'Лейки, пугало, теплица и другое — на рынке; купленная вещь сама встанет в огороде.', 'Lejkannas, putnubiedēklis, siltumnīca un citas lietas ir tirgū — nopirktā lieta pati nostāsies dārzā.'],
     itemsNote: ['Tap a thing to hide it or put it back.', 'Нажми на вещь — спрятать или вернуть.', 'Pieskaries lietai — paslēpt vai atgriezt.'],
     itemsShop: ['🛒 Things for the garden', '🛒 Вещи для огорода', '🛒 Lietas dārzam'],
     how: ['Plant a seed, water it every day and it grows: plants grow only while the soil is damp. Harvest goes into the basket and sells for buttons 🔘.',
@@ -378,8 +378,9 @@
     h += `<p class="gd-note gd-how">${t('how')}</p>`;
     box.innerHTML = h;
     const on = (sel2, f) => box.querySelectorAll(sel2).forEach(b => { b.onclick = () => f(b); });
-    on('.gd-water-all', () => act('water', { all: true }, r => float('💧 ×' + r.watered)));
-    on('[data-water]', () => act('water', { bed: sel }, () => float('💧')));
+    const boost = r => r.boost > 0 ? ' 🍵 +' + r.boost + ['h', 'ч', 'h'][L] : ''; // блюдо с кухни «быстрее растёт» (этап 89)
+    on('.gd-water-all', () => act('water', { all: true }, r => float('💧 ×' + r.watered + boost(r))));
+    on('[data-water]', () => act('water', { bed: sel }, r => float('💧' + boost(r))));
     on('[data-harvest]', () => { const p = D.beds[sel] && D.beds[sel].p; act('harvest', { bed: sel }, () => { const m = p === 'mandrake' ? t('mandrake') : t('gotCrop', cname(p)); float(m); toast(m); }); });
     on('[data-plant]', b => act('plant', { bed: sel, seed: b.dataset.plant }, () => float('🌱')));
     on('[data-sell]', b => act('sell', { crop: b.dataset.sell }, r => { const m = t('sold', r.got || 0); float(m); toast(m); }));

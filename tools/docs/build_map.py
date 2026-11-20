@@ -273,7 +273,7 @@ def main():
     files = sorted((ROOT / 'worker').glob('*.js')) + sorted((ROOT / 'site' / 'assets').glob('*.js')) + [ROOT / 'build.py']
     files += sorted(p for p in (ROOT / 'tools').rglob('*') if p.suffix in ('.py', '.js') and 'source' not in p.parts)
     out = ['# Карта кода', '',
-           '_`python3 tools/docs/build_map.py`: файл (размер) — что в нём: главные имена (первыми — то, что кладётся в `window`). Номеров строк нет — искать grep-ом. «Общее» внизу при пересборке сохраняется._', '']
+           '_`python3 tools/docs/build_map.py`: файл (размер) — что в нём: главные имена (первыми — то, что кладётся в `window`). Номера строк нет — искать grep-ом; номера строк, маршруты и разделы доков — `docs/index.tsv` (`python3 tools/index.py find …`), см. `docs/index.md`. «Общее» внизу при пересборке сохраняется._', '']
     groups = [('worker/', 'Сервер'), ('site/assets/', 'Браузер (site/assets)'), ('build.py', 'Сборка'), ('tools/', 'Инструменты (tools)')]
     for prefix, title in groups:
         out += [f'## {title}', '']

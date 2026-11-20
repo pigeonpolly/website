@@ -273,16 +273,26 @@ export async function authApi(req, env, url, h) {
     }
     if (m === 'GET' && p === '/api/admin/funnels') { // таблица шагов по дням для любой воронки
       const a = await h.needUser(req, env); if (!(await h.isAdmin(a, env))) h.fail(403, 'admin');
-      const days = Math.min(Math.max(Number(url.searchParams.get('days')) || 30, 1), 400);
-      const from = new Date(Date.now() - (days - 1) * 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
+      // период — как в «Аналитике»: from/to (любые даты) или days; сравнение — с таким же периодом до него
+      const iso = s => /^\d{4}-\d{2}-\d{2}$/.test(String(s || '')) ? String(s) : null;
+      const today = new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
+      const want = Math.min(Math.max(Number(url.searchParams.get('days')) || 7, 1), 400);
+      let to = iso(url.searchParams.get('to')) || today;
+      let from = iso(url.searchParams.get('from')) || new Date(Date.now() - (want - 1) * 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
+      if (from > to) { const t = from; from = to; to = t; }
+      const shift = (d, k) => { const x = new Date(d + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + k); return x.toISOString().slice(0, 10); };
+      const days = Math.round((Date.parse(to + 'T12:00:00Z') - Date.parse(from + 'T12:00:00Z')) / 86400000) + 1;
+      const pFrom = shift(from, -days), pTo = shift(from, -1);
       const out = [];
       for (const [id, f] of Object.entries(FUNNELS)) {
-        const rows = (await env.DB.prepare('SELECT day, step, COUNT(*) AS n FROM funnel WHERE name = ? AND day >= ? GROUP BY day, step ORDER BY day DESC').bind(id, from).all()).results;
-        const byDay = {};
-        for (const r of rows) (byDay[r.day] = byDay[r.day] || {})[r.step] = r.n;
-        out.push({ id, name: f.name, steps: f.steps.map(([k, label]) => ({ k, label })), days: Object.entries(byDay).map(([day, n]) => ({ day, n })) });
+        const rows = (await env.DB.prepare('SELECT day, step, COUNT(*) AS n FROM funnel WHERE name = ? AND day >= ? AND day <= ? GROUP BY day, step ORDER BY day DESC').bind(id, from, to).all()).results;
+        const byDay = {}, tot = {};
+        for (const r of rows) { (byDay[r.day] = byDay[r.day] || {})[r.step] = r.n; tot[r.step] = (tot[r.step] || 0) + r.n; }
+        const prev = {};
+        for (const r of (await env.DB.prepare('SELECT step, COUNT(*) AS n FROM funnel WHERE name = ? AND day >= ? AND day <= ? GROUP BY step').bind(id, pFrom, pTo).all()).results) prev[r.step] = r.n;
+        out.push({ id, name: f.name, steps: f.steps.map(([k, label]) => ({ k, label })), days: Object.entries(byDay).map(([day, n]) => ({ day, n })), tot, prev });
       }
-      return h.json({ from, days, funnels: out });
+      return h.json({ from, to, days, funnels: out });
     }
   }
   return null;

@@ -10,6 +10,7 @@
 ## Где что
 | Тема | Файл |
 |---|---|
+| Индекс: где имя в коде, маршрут, раздел доков (со строками) | docs/index.md, docs/index.tsv — ищет `tools/index.py` |
 | Статус этапов, решения, допущения | docs/plan-status.md |
 | Устройство, языки, картинки, дизайн, деплой, проверка | docs/basics.md |
 | Код, /api, «Общее» | docs/map.md |
@@ -34,17 +35,18 @@
 | Меню, шапка, главная | docs/site.md |
 | Продвижение, рост посетителей | docs/growth.md |
 | ArtPill — «таблетка рисования» для ИИ | docs/artpill.md |
+| A1 English Pack: курс английского A1, кот Оскар, скилл `a1-pack` | docs/a1-pack.md, a1-pack/SCHEMA.md |
 | Убранное: от чего отказались, хвосты, маркеры | docs/retired.md |
 | Устаревшее | docs/history.md |
 
-Помощники: `tools/sec.py файл "заголовок"`; `tools/dead_check.py` (хвосты убранного); `tools/i18n_add.py`; `tools/shots.py URL селектор [--w 390,1440] [--login dev:ник] [--check]`.
+Помощники: `tools/index.py find|where|check` (где имя, маршрут, раздел — со строками); `tools/sec.py файл "заголовок"`; `tools/dead_check.py` (хвосты убранного); `tools/i18n_add.py`; `tools/shots.py URL селектор [--w 390,1440] [--login dev:ник] [--check]`.
 
 ## Как выполнять этап
 - **Начало.** docs/plan-status.md, потом только разделы из строки «Читай» — через tools/sec.py, docs/map.md, для базы — docs/db.md. history.md — только если что-то не сходится. Перед работой — «Общее» в map.md, готовое заново не делать; новые общие модули — строкой туда же.
 - **Части.** Есть «Сессии:» и Алина написала «Часть X» — только её. В конце: строка в plan-status, коммит, пуш и Алине: «Часть X готова. Новая сессия: вставь блок и сверху „Часть Y“».
 - **«Продолжи»** — по plan-status с первого несделанного пункта.
 - **Перед вопросом или листом Алине** — записать в plan-status, что сделано и что дальше.
-- **Большие файлы** (worker/index.js, worker/blog.js, room.js, birds.js, sketch-wall.js, flock.js, admin.js, style.css…) целиком не читать: `grep -n` → ±40 строк. Explore — только если 2–3 grep не нашли.
+- **Большие файлы** (worker/index.js, worker/blog.js, room.js, birds.js, sketch-wall.js, flock.js, admin.js, style.css…) целиком не читать: `grep -n` → ±40 строк (где именно — `python3 tools/index.py find имя`). Explore — только если 2–3 grep не нашли.
 - **Правки** — точечно (Edit), целиком не переписывать. Данные из deny (.claude/settings.json) — только python3 -c / node -e.
 - **Тексты.** Шаблоны src/ — через tools/i18n_add.py, сразу 3 языка. В JS — en/ru/lv рядом с кодом, не в словари. RU — без рода.
 - **Вывод** — `| tail -20`; изменения — `git diff --stat`.
@@ -57,3 +59,10 @@
 - **Сбои — Алине.** Ошибки на сервере пишутся через `healthErr` (worker/index.js) и раз в день приходят ей письмом (`healthMail`); новая фоновая механика — с `.catch(e => healthErr(env, 'имя', e))`, не молча.
 - **Границы** — только блок этапа; «Не трогать» не трогать.
 - **Конец этапа:** 3–5 строк в нужный docs/*.md, новые таблицы — в db.md, строка в plan-status, коммит, пуш.
+
+## Локальная среда (только Windows-компьютер Алины, сессии DSH)
+Раздел не для Claude Code и других Linux-сред: там всё как раньше — `python3 build.py`, `tools/shots.py --check`, обычный `git push`.
+- **Сборка:** `powershell -ExecutionPolicy Bypass -File .tools\build.ps1` — ставит UTF-8 и Node из `.tools\` (папка в git не попадает).
+- **Пуш:** перед git-командой `$env:GIT_SSH = '.tools\ssh.cmd'` (в песочнице DSH ssh иначе падает), либо `powershell -ExecutionPolicy Bypass -File .tools\push.ps1 push origin main`.
+- **Просмотр:** `python -m http.server 8766 --directory site` → http://127.0.0.1:8766 (обновляется после сборки).
+- **Скриншоты** `tools/shots.py` здесь не работают (браузер блокируется песочницей) — показывать Алине ссылку на локальный просмотр.

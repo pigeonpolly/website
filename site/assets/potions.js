@@ -68,11 +68,11 @@
     hint: ['🔦 Hint', '🔦 Подсказка', '🔦 Padoms'],
     hintOn: ['🔦 A glowing path shows the way: to the nearest ingredient, then to the door.', '🔦 Светящаяся дорожка ведёт к ближайшему ингредиенту, потом к двери.', '🔦 Mirdzošs celiņš ved uz tuvāko sastāvdaļu, pēc tam uz durvīm.'],
     hintH: ['🔦 A hint for this level', '🔦 Подсказка на этот уровень', '🔦 Padoms šim līmenim'],
-    hintLead: ['Give one thing from your bag: it goes back to the shop (no buttons for it). Until the end of the level a glowing path will lead you to the ingredients and the door — even in the fog.', 'Отдай одну вещь из сумки: она вернётся в магазин (пуговок за неё не будет). До конца уровня светящаяся дорожка поведёт к ингредиентам и к двери — даже в тумане.', 'Atdod vienu lietu no somas: tā atgriezīsies veikalā (pogas par to nebūs). Līdz līmeņa beigām mirdzošs celiņš vedīs pie sastāvdaļām un durvīm — pat miglā.'],
+    hintLead: ['Give one thing from your bag: it goes back to the market (no buttons for it). Until the end of the level a glowing path will lead you to the ingredients and the door — even in the fog.', 'Отдай одну вещь из сумки: она вернётся на рынок (пуговок за неё не будет). До конца уровня светящаяся дорожка поведёт к ингредиентам и к двери — даже в тумане.', 'Atdod vienu lietu no somas: tā atgriezīsies tirgū (pogas par to nebūs). Līdz līmeņa beigām mirdzošs celiņš vedīs pie sastāvdaļām un durvīm — pat miglā.'],
     hintPick: ['Choose a thing', 'Выбери вещь', 'Izvēlies lietu'],
     hintGive: [n => `🔦 Give «${n}» for a hint`, n => `🔦 Отдать «${n}» за подсказку`, n => `🔦 Atdot «${n}» par padomu`],
     hintNone: ['There is nothing in your bag you could give. Legendary things, game prizes and the card album can’t be given.', 'В сумке нет вещей, которые можно отдать. Легендарные вещи, призы из игр и альбом карточек отдать нельзя.', 'Somā nav lietu, ko varētu atdot. Leģendāras lietas, spēļu balvas un kartīšu albumu atdot nevar.'],
-    hintGone: [n => `🔦 «${n}» went back to the shop. Follow the glowing path!`, n => `🔦 «${n}» — снова в магазине. Иди по светящейся дорожке!`, n => `🔦 «${n}» atkal veikalā. Ej pa mirdzošo celiņu!`],
+    hintGone: [n => `🔦 «${n}» went back to the market. Follow the glowing path!`, n => `🔦 «${n}» — снова на рынке. Иди по светящейся дорожке!`, n => `🔦 «${n}» atkal tirgū. Ej pa mirdzošo celiņu!`],
     worn: ['worn', 'надето', 'uzvilkts'],
     eyesN: ['Eyes of rescue', 'Глаза спасения', 'Glābšanas acis'],
     ingsN: ['Ingredients:', 'Ингредиентов:', 'Sastāvdaļas:'], potsN: ['Potions:', 'Зелий:', 'Dziras:'],
@@ -232,7 +232,7 @@
     catch (e) { toast(t('saveErr')); }
     startCard();
   }
-  // 🔦 подсказка: окно выбора вещи из сумки (catalog-ui.js, режим выбора); вещь уходит в магазин, до конца уровня — дорожка
+  // 🔦 подсказка: окно выбора вещи из сумки (catalog-ui.js, режим выбора); вещь уходит на рынок, до конца уровня — дорожка
   async function askHint() {
     if (!M || M.hint || !run || !['ready', 'play', 'pause'].includes(state)) return;
     const C = window.PPCatalog, B = window.PPBirds; if (!C || !B) return;
@@ -496,7 +496,7 @@
       S.inv = r.inv; slots = []; brewing = false;
       const b = S.book.find(x => x.combo === r.combo); if (b) b.n++; else S.book.unshift({ combo: r.combo, tier: r.tier, n: 1, ix: r.ix, season: r.season });
       if (!b && r.tier > 0 && window.PPTop) PPTop.refresh(); // новое зелье — на доске «📖 Рецепты»
-      if (r.got) S.today += r.got;
+      if (r.got) S.today += r.paid != null ? r.paid : r.got; // в счётчик дня — без бонуса блюда с кухни (этап 89)
       drawBar(); dayPlayed(r); showBadges(r.badges);
       const rv = r.revive ? `<p class="pot-revive">${t('revive')}</p>` : '';
       let html;

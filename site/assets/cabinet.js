@@ -38,7 +38,7 @@
     pdf: ['Books →', 'Книги →', 'Grāmatas →'],
     soon: ['Courses and materials you get will appear here too.', 'Сюда же лягут курсы и материалы, которые у тебя появятся.', 'Šeit parādīsies arī tavi kursi un materiāli.'],
     all: ['✓ Tick all', '✓ Отметить все', '✓ Atzīmēt visus'], none: ['Untick all', 'Снять все', 'Noņemt visus'],
-    play: ['Games', 'Игры', 'Spēles'], shop: ['Shop', 'Магазин', 'Veikals'], flock: ['Other birds’ rooms', 'Комнаты других птичек', 'Citu putniņu istabas'],
+    play: ['Games', 'Игры', 'Spēles'], shop: ['Bird market', 'Птичий рынок', 'Putnu tirgus'], flock: ['Other birds’ rooms', 'Комнаты других птичек', 'Citu putniņu istabas'],
   };
   const t = k => T[k][L];
   const NAMES = [[/pepper|перец|перц/i, ['Pepper sketching', 'Скетч перца', 'Pipara skice']], [/caf[eé]|outdoor|кафе/i, ['Outdoor sketching in a cafe', 'Скетч на выезде: кафе', 'Skices ārpus mājām: kafejnīca']]]; // как в v2.js

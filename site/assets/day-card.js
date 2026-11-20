@@ -24,7 +24,7 @@
     open: ['Open the card', 'Открыть карточку', 'Atvērt kartīti'],
     hist: ['🔘 Buttons history', '🔘 История пуговок', '🔘 Pogu vēsture'],
     histNone: ['Nothing yet.', 'Пока пусто.', 'Pagaidām tukšs.'],
-    shop: ['🛍 Shop', '🛍 Магазин', '🛍 Veikals'],
+    shop: ['🛍 Bird market', '🛍 Птичий рынок', '🛍 Putnu tirgus'],
     copied: ['Link copied', 'Ссылка скопирована', 'Saite nokopēta'],
   };
   const t = (k, ...a) => { const v = T[k][L]; return typeof v === 'function' ? v(...a) : v; };
@@ -38,9 +38,9 @@
   const KIND = { daily: ['Visit', 'Заход', 'Apmeklējums'], upload: ['Drawing', 'Рисунок', 'Zīmējums'], comment: ['Comment', 'Комментарий', 'Komentārs'], friend: ['Friend', 'Друг', 'Draugs'], welcome: ['Welcome gift', 'Подарок новичку', 'Dāvana jaunpienācējam'], holiday: ['Wobbleland holiday', 'Праздник Воббленда', 'Vobblendas svētki'],
     pick: ['Polly’s pick', 'Выбор Полли', 'Pollija izvēle'], badge: ['Badge', 'Бейдж', 'Nozīmīte'], game: ['Button Rain', 'Пуговичный дождь', 'Pogu lietus'], gamerec: ['Rain record', 'Рекорд дождя', 'Lietus rekords'],
     rainking: ['Rain king', 'Король дождя', 'Lietus karalis'], pan: ['Polly’s Pancakes', 'Блинная Полли', 'Pollija pankūkas'], panrec: ['Pancake record', 'Блинный рекорд', 'Pankūku rekords'], pansoap: ['Washing-up liquid', 'Средство для мытья', 'Trauku līdzeklis'], panup: ['Pancake upgrade', 'Улучшение блинной', 'Pankūku uzlabojums'], potion: ['Potion', 'Зелье', 'Dzira'], titos: ['Titos case', 'Дело Титоса', 'Tito lieta'], titossell: ['Titos coffee', 'Кофе Титоса', 'Tito kafija'],
-    advent: ['Advent', 'Адвент', 'Advente'], buy: ['Shop', 'Покупка', 'Pirkums'], sell: ['Sold', 'Продажа', 'Pārdots'], card: ['Card', 'Карточка', 'Kartīte'], admin: ['From Polly', 'От Полли', 'No Pollija'],
+    advent: ['Advent', 'Адвент', 'Advente'], buy: ['Purchase', 'Покупка', 'Pirkums'], sell: ['Sold', 'Продажа', 'Pārdots'], card: ['Card', 'Карточка', 'Kartīte'], admin: ['From Polly', 'От Полли', 'No Pollija'],
     salary: ['Salary', 'Зарплата', 'Alga'], tax: ['Tax', 'Налог', 'Nodoklis'], daybonus: ['Bonus of the day', 'Бонус дня', 'Dienas bonuss'],
-    gsell: ['Harvest sold', 'Урожай продан', 'Raža pārdota'], gseed: ['Seeds', 'Семена', 'Sēklas'], gbug: ['Garden bug', 'Жук в огороде', 'Vabole dārzā'],
+    gsell: ['Harvest sold', 'Урожай продан', 'Raža pārdota'], gseed: ['Seeds', 'Семена', 'Sēklas'], gbug: ['Garden bug', 'Жук в огороде', 'Vabole dārzā'], dish: ['Dish from the kitchen', 'Блюдо с кухни', 'Ēdiens no virtuves'],
     achat: ['Chat with Alina & Polly', 'Чат с Алиной и Полли', 'Čats ar Alīnu un Polliju'] };
 
   // пиксельная Полли (как в today.js) — одним цветом чернил

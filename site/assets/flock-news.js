@@ -42,8 +42,8 @@
   };
   const POLLY = {
     post: ['New blog post: “{t}”.', 'Новая статья в блоге: «{t}».', 'Jauns raksts blogā: “{t}”.'],
-    set: ['New collection in the shop: {t}.', 'В магазине новая коллекция: {t}.', 'Veikalā jauna kolekcija: {t}.'],
-    restock: [N => `The shop has been restocked: ${N} ${N === 1 ? 'item is' : 'items are'} back in stock.`, N => `Магазин пополнился: ${N} ${ru(N, 'вещь', 'вещи', 'вещей')} снова в наличии.`, N => `Veikals papildināts: ${N} ${lvp(N, 'lieta', 'lietas')} atkal pieejamas.`],
+    set: ['New collection at the market: {t}.', 'На рынке новая коллекция: {t}.', 'Tirgū jauna kolekcija: {t}.'],
+    restock: [N => `The market has been restocked: ${N} ${N === 1 ? 'item is' : 'items are'} back in stock.`, N => `Птичий рынок пополнился: ${N} ${ru(N, 'вещь', 'вещи', 'вещей')} снова в наличии.`, N => `Putnu tirgus papildināts: ${N} ${lvp(N, 'lieta', 'lietas')} atkal pieejamas.`],
     advent: ['Advent is open! Window No. {N} is waiting.', 'Адвент открыт! Окошко №{N} ждёт.', 'Advente atvērta! Lodziņš Nr. {N} gaida.'],
   };
   const T = {
