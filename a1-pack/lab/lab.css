@@ -463,3 +463,16 @@ body.ov .dui,body.ov .notes{display:none}
   .os-block .big-os{width:170px;margin:auto;order:-1!important}
   .os-block .say-b::before{left:50%!important;top:-11px;margin-left:-13px}
 }
+
+/* slaidi: kļūdas un fakti */
+.slide .mg .flip,.slide .mg .flip .fi{min-height:250px}
+.slide .mflip .w,.slide .mflip .fb .w{font-size:40px}
+.slide .mflip .why{font-size:22px}
+.slide .mflip .tiny{font-size:16px}
+.slide .fg .flip,.slide .fg .flip .fi{min-height:430px}
+.fflip .tag{font:500 15px var(--f);letter-spacing:.12em;text-transform:uppercase;color:var(--acc-ink)}
+.fflip .big{font-family:var(--serif);font-style:italic;font-size:96px;line-height:1;color:var(--acc-ink);letter-spacing:-.02em}
+.fflip .fa .w{font-size:32px;line-height:1.15}
+.fflip .fb .txt{font-size:26px;line-height:1.4;color:var(--ink)}
+.fflip .fb .en{font-size:24px;font-weight:600;color:var(--acc-ink);border-top:1px solid var(--acc-mid);padding-top:14px}
+.slide .fg .fa,.slide .fg .fb{padding:30px}

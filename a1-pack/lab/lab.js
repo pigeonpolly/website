@@ -464,7 +464,7 @@
         }
       } else if (s.type === "facts") {
         var fs = h("div", { class: "facts" });
-        s.items.forEach(function (f) { fs.appendChild(h("article", { class: "fact" }, (f.big ? '<div class="k">' + md(f.big) + "</div>" : "") + "<h3>" + md(f.title) + "</h3><p>" + md(f.text) + "</p>" + oscar(f.pose || "idea"))); });
+        s.items.forEach(function (f) { fs.appendChild(h("article", { class: "fact" }, (f.tag ? '<span class="chip acc" style="align-self:flex-start">' + md(f.tag) + "</span>" : "") + (f.big ? '<div class="k">' + md(f.big) + "</div>" : "") + "<h3>" + md(f.title) + "</h3><p>" + md(f.text) + "</p>" + oscar(f.pose || "idea"))); });
         body.appendChild(fs);
       } else if (s.type === "video") {
         body.appendChild(h("div", { class: "grid g2" }, s.items.map(video).join("")));
@@ -698,6 +698,20 @@
       });
       col.appendChild(spin); col.appendChild(h("div", { class: "tiny", style: "font-size:16px;max-width:220px" }, md(s.lv || "")));
       os = place(s.pose || "idea", "right:120px;bottom:90px;width:180px");
+    } else if (t === "mistakes") {
+      pad.innerHTML = "<h2>" + md(s.title || "Typical *mistakes*") + "</h2>";
+      var mg = h("div", { class: "vg mg", style: "--c:" + (s.cols || Math.min(3, arr(s.items).length)) });
+      arr(s.items).forEach(function (m) { mg.appendChild(flipCard('<span class="tiny">✗ Kļūda</span><span class="w">' + md(m.wrong) + '</span><span class="tiny">klikšķis ↻</span>', '<span class="tiny">✓ Pareizi</span><span class="w">' + md(m.right) + '</span><span class="why">' + md(m.why || "") + "</span>", { cls: "mflip" })); });
+      pad.appendChild(mg);
+      el._answer = function () { $$(".flip", mg).forEach(function (x) { x.classList.add("on"); }); };
+      os = place(s.pose || "oops", "right:90px;top:50px;width:150px");
+    } else if (t === "facts") {
+      pad.innerHTML = '<div class="kicker" style="font-size:18px;margin-bottom:12px">' + md(s.kicker || "Oscar's Britain") + "</div><h2>" + md(s.title) + "</h2>";
+      var fg = h("div", { class: "vg fg", style: "--c:" + Math.min(4, arr(s.items).length) });
+      arr(s.items).forEach(function (f) { fg.appendChild(flipCard('<span class="tag">' + md(f.tag || "") + '</span><span class="big">' + md(f.big || "") + '</span><span class="w">' + md(f.title) + "</span>", '<span class="txt">' + md(f.text) + "</span>" + (f.en ? '<span class="en">' + md(f.en) + "</span>" : ""), { cls: "fflip" })); });
+      pad.appendChild(fg);
+      el._answer = function () { $$(".flip", fg).forEach(function (x) { x.classList.add("on"); }); };
+      os = place(s.pose, "right:90px;top:50px;width:140px");
     } else if (t === "oscar") {
       if (s.side === "right") el.classList.add("flip-side");
       var bo = osBlock(s, "x"); pad.appendChild(bo.firstChild); pad.appendChild(bo.firstChild);

@@ -24,6 +24,8 @@ Pozas: `hello confused oops tangled spill idea teacher sleep celebrate peek` + s
 | quiz | question ar ___, options[], answer (indekss), why | klikšķis / A |
 | build | title, words "a / b / c", answer, lv | saliek teikumu |
 | picker | title, items[] (jautājumi), lv, hint | nejaušs jautājums |
+| mistakes | title, items[{wrong, right, why}] ≤ 6, pose | **obligāts** ≥ 1; apgriežamas kartītes, A — visas |
+| facts | kicker, title, items[{tag «Dzīve»/«Valoda», big, title, text, en}] 3–4, pose | **obligāti** ≥ 2 (britu dzīve + valodas interesantumi A1); kartīte apgriežas |
 | oscar | kind (story/tip/fact/joke/lesson/news) vai kicker, text, en (+ izruna), lv?, pose, side «right»? | liels Oskars + runas burbulis; ≥ 1 uz 6 slaidiem, dažādas pozas |
 | task | title, steps[], minutes (taimeris), mode «Individuāli», box | taimeris; tikai individuāls darbs |
 | compare | title, left{title,items}, right{…}, note | |
@@ -40,7 +42,7 @@ Vadība: ←/→/atstarpe, F pilnekrāns, N piezīmes, O pārskats, A atbilde.
 | rule | text[], table{head, rows}, note, switcher{title, modes, rows, lv} |
 | vocab | items[{en, ipa, lv, ex}] |
 | practice | exercises[] — ar «Pārbaudīt», XP, Oskara reakcijām (≥ 5 dažādi tipi) |
-| facts | items[{big, title, text, pose}] — tikai pārbaudāmi fakti par Britāniju/valodu |
+| facts | items[{tag «Dzīve»/«Valoda», big, title, text, pose}] ≥ 6 — britu dzīve un valodas interesantumi A1; tikai pārbaudāmi fakti |
 | video | items[{title, lv, youtube?, verified?, search, url, source}] |
 | mistakes | items[{wrong, right, why}] — apgriežamas kartītes |
 | quiz | items[{q, options[], answer (teksts), why}] — pa vienam, rezultāts |

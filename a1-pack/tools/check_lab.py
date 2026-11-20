@@ -8,7 +8,7 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from build_lab import load  # noqa: E402
 
-SLIDES = {"cover", "agenda", "section", "text", "big", "rule", "examples", "vocab", "quiz", "task", "story", "compare", "switcher", "build", "picker", "oscar", "thanks"}
+SLIDES = {"cover", "agenda", "section", "text", "big", "rule", "examples", "vocab", "quiz", "task", "story", "compare", "switcher", "build", "picker", "oscar", "mistakes", "facts", "thanks"}
 SECS = {"oscar", "story", "rule", "vocab", "practice", "facts", "video", "mistakes", "quiz", "text", "homework"}
 EXT = {"gap", "choice", "truefalse", "sort", "build", "match", "detective", "listen", "write"}
 POSES = {p.stem for p in (Path(__file__).resolve().parent.parent / "design" / "oscar").glob("*.svg") if not p.stem.startswith("d-")}
@@ -79,7 +79,15 @@ def main():
         types = [s.get("type") for s in deck]
         if types[0] != "cover":
             W.append("1. slaids nav cover")
-        inter = sum(1 for t in types if t in ("quiz", "switcher", "build", "picker", "task", "vocab", "examples", "story"))
+        inter = sum(1 for t in types if t in ("quiz", "switcher", "build", "picker", "task", "vocab", "examples", "story", "facts", "mistakes", "oscar"))
+        if "mistakes" not in types:
+            E.append("prezentācijā nav slaida «mistakes» (biežākās kļūdas)")
+        fs = [s for s in deck if s.get("type") == "facts"]
+        if len(fs) < 2:
+            E.append("prezentācijā vajag ≥ 2 slaidus «facts» (britu dzīve + valoda)")
+        tags = {str(x.get("tag", "")).lower() for s in fs for x in s.get("items", [])}
+        if fs and not ({"dzīve", "valoda"} <= tags):
+            E.append("facts kartītēm vajag abus tag: «Dzīve» un «Valoda»")
         if types.count("oscar") < max(2, len(deck) // 6):
             W.append(f"maz lielo Oskara slaidu (oscar): {types.count('oscar')} — ieteicams ≥ {max(2, len(deck) // 6)}")
         if inter < len(deck) * 0.4:
@@ -128,6 +136,9 @@ def main():
                     if q.get("answer") not in q.get("options", []):
                         E.append(f"tests {j}: answer nav starp options")
             if s.get("type") == "facts":
+                tg = {str(x.get("tag", "")).lower() for x in s.get("items", [])}
+                if len(s.get("items", [])) < 6 or not ({"dzīve", "valoda"} <= tg):
+                    E.append("burtnīcas faktos vajag ≥ 6 ar tag «Dzīve» un «Valoda»")
                 for f in s.get("items", []):
                     pose(f.get("pose"), "fakts")
             if s.get("type") == "video":

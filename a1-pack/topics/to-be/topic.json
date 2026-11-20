@@ -289,6 +289,43 @@
    "notes": "Lai visi parāda atbildi ar pirkstiem (1/2/3), tad klikšķini vai A."
   },
   {
+   "type": "facts",
+   "kicker": "Oscar's Britain · Dzīve",
+   "title": "Life in *Britain*",
+   "items": [
+    {
+     "tag": "Dzīve",
+     "big": "Left",
+     "title": "Brauc pa kreisi",
+     "text": "Lielbritānijā automašīnas brauc pa kreiso ceļa pusi. Londonā pie pārejām uz asfalta bieži rakstīts LOOK RIGHT.",
+     "en": "In the UK, cars drive on the left."
+    },
+    {
+     "tag": "Dzīve",
+     "big": "cuppa",
+     "title": "Tēja ar pienu",
+     "text": "Briti tēju visbiežāk dzer ar pienu. Neformāli tasi tējas sauc *a cuppa*.",
+     "en": "It's tea time! A cuppa?"
+    },
+    {
+     "tag": "Dzīve",
+     "big": "sorry",
+     "title": "Sorry — visur",
+     "text": "Briti ļoti bieži saka *sorry* — arī tad, ja vainīgs ir kāds cits. Tā ir pieklājība.",
+     "en": "Oh, sorry! — No, I'm sorry!"
+    },
+    {
+     "tag": "Dzīve",
+     "big": "weather",
+     "title": "Laikapstākļi — labākā tēma",
+     "text": "Sarunu ar svešinieku briti bieži sāk ar laikapstākļiem: autobusa pieturā, veikalā, darbā.",
+     "en": "It's cold today!"
+    }
+   ],
+   "pose": "tea",
+   "notes": "Klikšķini kartīti pēc kārtas; lai studenti vispirms min. Nospied, lai izlasītu angļu teikumu skaļi."
+  },
+  {
    "type": "section",
    "num": "02",
    "title": "Not & *questions*",
@@ -363,6 +400,44 @@
    "notes": "Trīs biežākās latviešu runātāju kļūdas šajā tēmā."
   },
   {
+   "type": "mistakes",
+   "title": "Typical *mistakes*",
+   "items": [
+    {
+     "wrong": "I is / I are",
+     "right": "I am",
+     "why": "Ar I — tikai am."
+    },
+    {
+     "wrong": "I have 30 years.",
+     "right": "I am 30.",
+     "why": "Latviski «man ir», angliski — be."
+    },
+    {
+     "wrong": "She is doctor.",
+     "right": "She is a doctor.",
+     "why": "Profesijai vienskaitlī vajag a / an."
+    },
+    {
+     "wrong": "You are from Riga?",
+     "right": "Are you from Riga?",
+     "why": "Jautājumā be — pirmais."
+    },
+    {
+     "wrong": "Yes, I'm.",
+     "right": "Yes, I am.",
+     "why": "Īsajā «Yes» atbildē nesaīsina."
+    },
+    {
+     "wrong": "I amn't tired.",
+     "right": "I'm not tired.",
+     "why": "Formas «amn't» nav."
+    }
+   ],
+   "pose": "oops",
+   "notes": "Lai grupa vispirms pati izlabo kļūdu, tad klikšķini kartīti. A — apgriež visas."
+  },
+  {
    "type": "quiz",
    "question": "___ you on holiday?",
    "options": [
@@ -423,6 +498,43 @@
    "text": "Londonā lietussargs ir mans labākais draugs. Viņš vienmēr ir ar mani… un vienmēr aizmirsts autobusā.",
    "en": "My umbrella is my best friend. It's always with me!",
    "notes": "Viegls brīdis pirms personalizācijas."
+  },
+  {
+   "type": "facts",
+   "kicker": "Oscar's Britain · Valoda",
+   "title": "Words & *quirks*",
+   "items": [
+    {
+     "tag": "Valoda",
+     "big": "you",
+     "title": "Viens you visiem",
+     "text": "Angliski nav atsevišķas pieklājības formas: *you* = tu un jūs — draugam, kolēģim, priekšniekam.",
+     "en": "You are my friend. You are my boss."
+    },
+    {
+     "tag": "Valoda",
+     "big": "it's",
+     "title": "Apostrofs maina visu",
+     "text": "*it's* = it is (tas ir). *its* = tā/tās (piederība, bez apostrofa).",
+     "en": "It's a cat. Its name is Oscar."
+    },
+    {
+     "tag": "Valoda",
+     "big": "flat",
+     "title": "Britu vārdi",
+     "text": "Britānijā dzīvoklis ir *flat*, atvaļinājums — *holiday*. Amerikā saka *apartment* un *vacation*.",
+     "en": "I'm on holiday. My flat is in Riga."
+    },
+    {
+     "tag": "Valoda",
+     "big": "cheers",
+     "title": "Cheers = paldies",
+     "text": "Neformāli briti *cheers* saka ne tikai pie glāzes — arī kā «paldies» un «uz redzēšanos». *Mate* = draugs.",
+     "en": "Cheers, mate!"
+    }
+   ],
+   "pose": "book",
+   "notes": "Valodas interesantumi A1 līmenī. Pie it's / its — uzraksti abus uz tāfeles."
   },
   {
    "type": "big",
@@ -884,31 +996,63 @@
     "type": "facts",
     "title": "Oscar's *Britain*",
     "nav": "Fakti",
-    "lead": "Oskars stāsta katrā ekskursijā. Visi fakti — pārbaudīti.",
+    "lead": "Britu dzīve un valodas interesantumi. Visi fakti — pārbaudīti.",
     "items": [
      {
       "big": "13,7 t",
       "title": "Big Ben ir zvans",
       "text": "Big Ben ir lielā zvana nosaukums, nevis torņa. Tornis kopš 2012. gada saucas Elizabeth Tower. Zvans sver 13,7 tonnas.",
-      "pose": "bigben"
+      "pose": "bigben",
+      "tag": "Dzīve"
      },
      {
       "big": "1863",
       "title": "Vecākais metro pasaulē",
       "text": "Londonas metro — *the Tube* — atvērts 1863. gadā. Oskars tajā joprojām apmaldās.",
-      "pose": "map"
+      "pose": "map",
+      "tag": "Dzīve"
      },
      {
       "big": "I",
       "title": "Vienmēr ar lielo burtu",
-      "text": "Vietniekvārdu **I** angliski raksta ar lielo burtu jebkurā teikuma vietā: *Yesterday I was…*",
-      "pose": "confused"
+      "text": "Vietniekvārdu **I** angliski raksta ar lielo burtu jebkurā teikuma vietā: *Oscar and I are friends.*",
+      "pose": "confused",
+      "tag": "Valoda"
      },
      {
       "big": "is · are",
       "title": "Visbiežākais darbības vārds",
       "text": "*Be* ir visbiežāk lietotais darbības vārds angļu valodā — tu to dzirdēsi gandrīz katrā teikumā.",
-      "pose": "book"
+      "pose": "book",
+      "tag": "Valoda"
+     },
+     {
+      "tag": "Dzīve",
+      "big": "Left",
+      "title": "Brauc pa kreisi",
+      "text": "Lielbritānijā automašīnas brauc pa kreiso ceļa pusi. Londonā pie pārejām uz asfalta bieži rakstīts LOOK RIGHT. — *In the UK, cars drive on the left.*",
+      "pose": "guide"
+     },
+     {
+      "tag": "Dzīve",
+      "big": "cuppa",
+      "title": "Tēja ar pienu",
+      "text": "Briti tēju visbiežāk dzer ar pienu. Neformāli tasi tējas sauc *a cuppa*. — *It's tea time! A cuppa?*",
+      "pose": "tea"
+     },
+     {
+      "tag": "Valoda",
+      "big": "you",
+      "title": "Viens you visiem",
+      "text": "Angliski nav atsevišķas pieklājības formas: *you* = tu un jūs — draugam, kolēģim, priekšniekam. — *You are my friend. You are my boss.*",
+      "pose": "hello"
+     },
+     {
+      "tag": "Valoda",
+      "big": "it's",
+      "title": "Apostrofs maina visu",
+      "text": "*it's* = it is (tas ir). *its* = tā/tās (piederība, bez apostrofa). — *It's a cat. Its name is Oscar.*",
+      "pose": "confused"
      }
     ]
    },
