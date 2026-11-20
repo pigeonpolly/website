@@ -59,7 +59,8 @@
 - **Границы** — только блок этапа; «Не трогать» не трогать.
 - **Конец этапа:** 3–5 строк в нужный docs/*.md, новые таблицы — в db.md, строка в plan-status, коммит, пуш.
 
-## Локальная среда (этот компьютер, DSH + Windows)
+## Локальная среда (только Windows-компьютер Алины, сессии DSH)
+Раздел не для Claude Code и других Linux-сред: там всё как раньше — `python3 build.py`, `tools/shots.py --check`, обычный `git push`.
 - **Сборка:** `powershell -ExecutionPolicy Bypass -File .tools\build.ps1` — ставит UTF-8 и Node из `.tools\` (папка в git не попадает).
 - **Пуш:** перед git-командой `$env:GIT_SSH = '.tools\ssh.cmd'` (в песочнице DSH ssh иначе падает), либо `powershell -ExecutionPolicy Bypass -File .tools\push.ps1 push origin main`.
 - **Просмотр:** `python -m http.server 8766 --directory site` → http://127.0.0.1:8766 (обновляется после сборки).
