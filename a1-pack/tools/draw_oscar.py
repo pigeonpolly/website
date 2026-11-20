@@ -1,141 +1,161 @@
-"""Kaķis Oskars — oriģināls maskots (melns, apaļš, neveikls) + doodle dekori.
-Palaid: python3 a1-pack/tools/draw_oscar.py  → a1-pack/design/oscar/*.svg
-Šalle un konfeti — var(--accent) (tēmas krāsa)."""
+"""Kaķis Oskars — oriģināls maskots: viens plūstošs melns siluets, lielas baltas acis ar punktiņiem,
+garā aste, tievas ķepas. Neveikls. Akcenta krāsa (šalle, dzija, kafija) — var(--accent).
+Palaid: python3 a1-pack/tools/draw_oscar.py  → a1-pack/design/oscar/*.svg"""
 from pathlib import Path
 OUT = Path(__file__).resolve().parent.parent / "design" / "oscar"
 A = "var(--accent,#FF5A36)"
 K = "#111"
-S = f'fill="none" stroke="{K}" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"'
+L = f'fill="none" stroke="{K}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"'
 
-def head(x, y, rot=0, eyes="open", s=1.0):
-    e = ""
-    if eyes == "open":
-        e = (f'<circle cx="-16" cy="-2" r="11" fill="#fff"/><circle cx="16" cy="-2" r="11" fill="#fff"/>'
-             f'<circle cx="-14" cy="0" r="4.5" fill="{K}"/><circle cx="18" cy="0" r="4.5" fill="{K}"/>'
-             f'<circle cx="-12.5" cy="-2" r="1.4" fill="#fff"/><circle cx="19.5" cy="-2" r="1.4" fill="#fff"/>')
-    elif eyes == "worried":
-        e = (f'<circle cx="-16" cy="-2" r="13" fill="#fff"/><circle cx="16" cy="-2" r="13" fill="#fff"/>'
-             f'<circle cx="-16" cy="-4" r="3" fill="{K}"/><circle cx="16" cy="-4" r="3" fill="{K}"/>'
-             f'<path d="M-28,-22 L-8,-17 M28,-22 L8,-17" stroke="#fff" stroke-width="1.8" stroke-linecap="round"/>')
-    elif eyes == "odd":
-        e = (f'<circle cx="-16" cy="-2" r="12" fill="#fff"/><circle cx="17" cy="-1" r="8" fill="#fff"/>'
-             f'<circle cx="-13" cy="-4" r="4.5" fill="{K}"/><circle cx="18" cy="1" r="3" fill="{K}"/>')
-    elif eyes == "dizzy":
-        e = ('<path d="M-16,-2 m-8,0 a8,8 0 1,1 8,8 a5,5 0 1,1 -5,-5 a2,2 0 1,1 2,2" fill="none" stroke="#fff" stroke-width="1.6"/>'
-             '<path d="M16,-2 m-8,0 a8,8 0 1,1 8,8 a5,5 0 1,1 -5,-5 a2,2 0 1,1 2,2" fill="none" stroke="#fff" stroke-width="1.6"/>')
-    elif eyes == "closed":
-        e = '<path d="M-26,0 Q-16,8 -6,0 M6,0 Q16,8 26,0" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>'
-    elif eyes == "happy":
-        e = '<path d="M-26,2 Q-16,-10 -6,2 M6,2 Q16,-10 26,2" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>'
-    mouth = '<path d="M-6,16 Q-3,20 0,16 Q3,20 6,16" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round"/>'
-    if eyes in ("worried", "dizzy"):
-        mouth = '<ellipse cx="0" cy="19" rx="4" ry="5" fill="#fff"/>'
-    wh = f'<path d="M-40,8 L-58,4 M-40,14 L-57,16 M40,8 L58,4 M40,14 L57,16" {S} stroke-width="1.2"/>'
-    return (f'<g transform="translate({x},{y}) rotate({rot}) scale({s})">{wh}'
-            f'<path d="M-36,-14 Q-38,-34 -32,-46 Q-20,-38 -10,-30 Z M36,-14 Q38,-34 32,-46 Q20,-38 10,-30 Z" fill="{K}" stroke="{K}" stroke-width="2" stroke-linejoin="round"/>'
-            f'<ellipse cx="0" cy="0" rx="34" ry="31" fill="{K}"/>{e}{mouth}</g>')
 
-def scarf(x, y, w=64, rot=0):
-    return (f'<g transform="translate({x},{y}) rotate({rot})"><rect x="{-w/2}" y="-4.5" width="{w}" height="9" rx="4.5" fill="{A}" stroke="{K}" stroke-width="1.4"/>'
-            f'<path d="M{w/2-18},4 l5,24 l8,-3 l-5,-22 Z" fill="{A}" stroke="{K}" stroke-width="1.4" stroke-linejoin="round"/></g>')
+def sil(d):
+    return f'<path d="{d}" fill="{K}"/>'
 
-def tail(d, w=7):
-    return f'<path d="{d}" fill="none" stroke="{K}" stroke-width="{w}" stroke-linecap="round"/>'
 
-def paw(x1, y1, x2, y2, w=10):
-    return f'<path d="M{x1},{y1} L{x2},{y2}" stroke="{K}" stroke-width="{w}" stroke-linecap="round"/>'
+def limb(d, w=9):
+    return f'<path d="{d}" fill="none" stroke="{K}" stroke-width="{w}" stroke-linecap="round" stroke-linejoin="round"/>'
+
+
+# sēdošs kaķis: galva + kakls + bumbierveida ķermenis — viena kontūra
+SIT = ("M70,26 C76,36 82,43 89,45 C96,43 104,43 111,45 C118,43 124,36 130,26 "
+       "C137,38 140,52 139,66 C138,82 131,93 126,100 C141,117 149,143 146,168 "
+       "C145,181 137,187 126,187 L74,187 C63,187 55,181 54,168 C51,143 59,117 74,100 "
+       "C69,93 62,82 61,66 C60,52 63,38 70,26 Z")
+
+
+def face(cx=100, cy=66, kind="open", rot=0):
+    w = "#fff"
+    if kind == "open":
+        e = (f'<ellipse cx="-12" cy="0" rx="10" ry="11" fill="{w}"/><ellipse cx="12" cy="0" rx="10" ry="11" fill="{w}"/>'
+             f'<circle cx="-9" cy="1" r="2.6" fill="{K}"/><circle cx="9" cy="1" r="2.6" fill="{K}"/>')
+    elif kind == "side":
+        e = (f'<ellipse cx="-12" cy="0" rx="10" ry="11" fill="{w}"/><ellipse cx="12" cy="0" rx="10" ry="11" fill="{w}"/>'
+             f'<circle cx="-6" cy="0" r="2.6" fill="{K}"/><circle cx="18" cy="0" r="2.6" fill="{K}"/>')
+    elif kind == "up":
+        e = (f'<ellipse cx="-12" cy="0" rx="10" ry="11" fill="{w}"/><ellipse cx="12" cy="0" rx="10" ry="11" fill="{w}"/>'
+             f'<circle cx="-10" cy="-5" r="2.6" fill="{K}"/><circle cx="10" cy="-5" r="2.6" fill="{K}"/>')
+    elif kind == "odd":
+        e = (f'<ellipse cx="-12" cy="0" rx="11" ry="12" fill="{w}"/><ellipse cx="12" cy="1" rx="7.5" ry="8" fill="{w}"/>'
+             f'<circle cx="-12" cy="-2" r="2.6" fill="{K}"/><circle cx="13" cy="2" r="2" fill="{K}"/>')
+    elif kind == "wide":
+        e = (f'<ellipse cx="-12" cy="0" rx="11" ry="12" fill="{w}"/><ellipse cx="12" cy="0" rx="11" ry="12" fill="{w}"/>'
+             f'<circle cx="-12" cy="0" r="1.8" fill="{K}"/><circle cx="12" cy="0" r="1.8" fill="{K}"/>')
+    elif kind == "closed":
+        e = f'<path d="M-20,1 Q-12,6 -4,1 M4,1 Q12,6 20,1" fill="none" stroke="{w}" stroke-width="1.8" stroke-linecap="round"/>'
+    elif kind == "happy":
+        e = f'<path d="M-20,3 Q-12,-6 -4,3 M4,3 Q12,-6 20,3" fill="none" stroke="{w}" stroke-width="2" stroke-linecap="round"/>'
+    elif kind == "dizzy":
+        e = (f'<path d="M-17,-4 l9,8 M-8,-4 l-9,8 M8,-4 l9,8 M17,-4 l-9,8" fill="none" stroke="{w}" stroke-width="1.8" stroke-linecap="round"/>')
+    nose = f'<path d="M-2,13 L2,13 L0,15.5 Z" fill="{w}"/>'
+    return f'<g transform="translate({cx},{cy}) rotate({rot})">{e}{nose}</g>'
+
+
+def scarf(path="M73,99 Q100,113 127,99", tail="M118,104 q4,14 -1,26"):
+    return (f'<path d="{path}" fill="none" stroke="{A}" stroke-width="7" stroke-linecap="round"/>'
+            f'<path d="{tail}" fill="none" stroke="{A}" stroke-width="6" stroke-linecap="round"/>')
+
+
+def legline(x=100, y1=150, y2=186):
+    return f'<path d="M{x},{y1} L{x},{y2}" stroke="#fff" stroke-width="1.4" stroke-linecap="round"/>'
+
 
 def qmark(x, y, s=1):
-    return f'<g transform="translate({x},{y}) scale({s})"><path d="M-8,-10 Q-8,-22 2,-22 Q12,-22 12,-12 Q12,-4 2,0 L2,8" {S}/><circle cx="2" cy="17" r="2.5" fill="{K}"/></g>'
+    return f'<g transform="translate({x},{y}) scale({s})"><path d="M-7,-9 Q-7,-20 2,-20 Q11,-20 11,-11 Q11,-4 2,0 L2,7" {L}/><circle cx="2" cy="15" r="2" fill="{K}"/></g>'
 
-def star(x, y, s=1, fill="none"):
-    return f'<path transform="translate({x},{y}) scale({s})" d="M0,-12 L3,-3 L12,0 L3,3 L0,12 L-3,3 L-12,0 L-3,-3 Z" fill="{fill}" stroke="{K}" stroke-width="1.6" stroke-linejoin="round"/>'
 
-def motion(x, y, rot=0):
-    return f'<path transform="translate({x},{y}) rotate({rot})" d="M0,0 l10,-6 M2,10 l12,-4 M4,20 l10,-2" {S} stroke-width="1.6"/>'
+def spark(x, y, s=1):
+    return f'<path transform="translate({x},{y}) scale({s})" d="M0,-10 Q1,-1 10,0 Q1,1 0,10 Q-1,1 -10,0 Q-1,-1 0,-10 Z" {L}/>'
+
+
+def lines(x, y, rot=0):
+    return f'<path transform="translate({x},{y}) rotate({rot})" d="M0,0 l9,-5 M2,9 l11,-3 M3,18 l9,-1" {L}/>'
+
+
+TAIL_R = limb("M138,180 C166,186 182,166 178,144 C175,128 164,120 170,104", 8)
+TAIL_L = limb("M62,180 C34,186 18,166 22,144 C25,128 36,120 30,104", 8)
 
 P = {}
-P["hello"] = ("0 0 200 200",
-    tail("M138,178 C178,182 192,140 170,124 C160,118 154,128 162,134") +
-    '<ellipse cx="100" cy="152" rx="39" ry="39" fill="#111"/>' + paw(132, 140, 160, 84) +
-    '<ellipse cx="82" cy="190" rx="14" ry="7" fill="#111"/><ellipse cx="118" cy="190" rx="14" ry="7" fill="#111"/>' +
-    scarf(100, 116) + head(98, 84) + motion(168, 66, 10))
-P["oops"] = ("0 0 200 200",
-    '<g transform="translate(16,8) scale(.9)">' + tail("M150,160 C170,150 160,128 178,118") +
-    '<ellipse cx="110" cy="168" rx="58" ry="22" fill="#111"/>' + paw(150, 176, 186, 184, 10) + paw(70, 178, 92, 192, 9) +
-    head(52, 150, -24, "dizzy") + star(36, 98, .9) + star(70, 90, .7) + star(18, 118, .6) +
-    '<g transform="translate(140,52) rotate(-25)"><path d="M-26,0 L0,-10 L0,22 L-26,30 Z M26,0 L0,-10 L0,22 L26,30 Z" fill="#fff" stroke="#111" stroke-width="2" stroke-linejoin="round"/>'
-    '<path d="M-20,6 L-6,1 M-20,13 L-6,8 M6,1 L20,6 M6,8 L20,13" stroke="#111" stroke-width="2"/></g>' + motion(102, 52, -40) +
-    scarf(80, 158, 40, -70) + "</g>")
-P["tangled"] = ("0 0 200 200",
-    head(92, 70, -8, "worried") +
-    f'<circle cx="104" cy="140" r="52" fill="{A}" stroke="#111" stroke-width="2"/>'
-    f'<path d="M60,112 Q104,150 150,108 M54,140 Q104,176 156,138 M70,178 Q90,120 64,104 M110,90 Q150,140 128,188 M80,96 Q120,150 92,192" {S} stroke-width="1.6"/>'
-    + paw(60, 128, 44, 150, 10) + paw(150, 150, 168, 168, 10) +
-    f'<path d="M156,150 C182,150 190,176 168,182 C150,186 160,196 186,196" {S} stroke-width="1.6"/>' + qmark(150, 40, .9))
-P["teacher"] = ("0 0 200 200",
-    '<rect x="10" y="22" width="100" height="78" rx="4" fill="#fff" stroke="#111" stroke-width="2"/>'
-    '<path d="M24,80 L36,44 L48,80 M29,66 L43,66 M60,50 L68,44 L68,80 M60,80 L76,80" fill="none" stroke="#111" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
-    f'<path d="M84,52 Q92,46 100,52 M84,66 L100,66" {S} stroke-width="1.6"/>'
-    '<path d="M30,100 L22,140 M90,100 L98,140" stroke="#111" stroke-width="2" stroke-linecap="round"/>' +
-    tail("M178,182 C198,170 196,138 182,132") +
-    '<ellipse cx="150" cy="160" rx="32" ry="34" fill="#111"/>' + paw(124, 146, 110, 118, 9) +
-    '<path d="M112,122 Q90,96 76,92" stroke="#111" stroke-width="2" fill="none" stroke-linecap="round"/>' +
-    scarf(150, 128, 54) + head(150, 96, 6, "open", .85))
-P["confused"] = ("0 0 200 200",
-    tail("M140,180 C176,184 186,150 168,140") +
-    '<ellipse cx="100" cy="154" rx="37" ry="38" fill="#111"/>' + paw(70, 150, 76, 116, 10) +
-    '<ellipse cx="84" cy="192" rx="13" ry="6" fill="#111"/><ellipse cx="116" cy="192" rx="13" ry="6" fill="#111"/>' +
-    scarf(100, 120, 60, 6) + head(102, 86, 16, "odd") + qmark(158, 46, 1.2) + qmark(40, 40, .8) + qmark(176, 96, .6))
-P["sleep"] = ("0 0 200 200",
-    '<g transform="translate(10,0) scale(.94)"><ellipse cx="104" cy="160" rx="64" ry="30" fill="#111"/>' +
-    tail("M160,170 C190,170 184,190 140,190 C110,190 92,186 80,184", 11) +
-    head(64, 140, -10, "closed", .9) +
-    f'<path d="M110,92 h14 l-14,16 h14 M136,66 h18 l-18,20 h18 M164,38 h22 l-22,24 h22" {S} stroke-width="2"/>' +
-    scarf(96, 150, 36, -60) + "</g>")
-P["spill"] = ("0 0 200 200",
-    tail("M60,180 C24,184 18,150 34,140") +
-    '<ellipse cx="96" cy="154" rx="37" ry="38" fill="#111"/>' + paw(128, 144, 150, 116, 10) +
-    '<g transform="translate(160,98) rotate(60)"><path d="M-14,-16 L14,-16 L10,16 L-10,16 Z" fill="#fff" stroke="#111" stroke-width="2" stroke-linejoin="round"/>'
-    '<path d="M14,-8 Q26,-6 24,6 Q22,12 12,10" fill="none" stroke="#111" stroke-width="2"/></g>'
-    f'<path d="M150,118 Q160,150 150,170 Q170,186 190,176" fill="none" stroke="#111" stroke-width="2" stroke-dasharray="1 7" stroke-linecap="round"/>'
-    f'<ellipse cx="166" cy="190" rx="26" ry="6" fill="{A}" stroke="#111" stroke-width="1.6"/>' +
-    '<ellipse cx="80" cy="192" rx="13" ry="6" fill="#111"/><ellipse cx="112" cy="192" rx="13" ry="6" fill="#111"/>' +
-    scarf(96, 118, 60) + head(94, 84, -6, "worried") + motion(150, 60, 0))
-P["idea"] = ("0 0 200 200",
-    tail("M140,180 C178,184 190,150 170,138") +
-    '<ellipse cx="100" cy="158" rx="37" ry="36" fill="#111"/>' + paw(130, 150, 150, 120, 10) +
-    '<ellipse cx="84" cy="194" rx="13" ry="5" fill="#111"/><ellipse cx="116" cy="194" rx="13" ry="5" fill="#111"/>' +
-    scarf(100, 126, 60) + head(100, 96, 0, "happy") +
-    f'<g transform="translate(100,30)"><circle r="16" fill="{A}" stroke="#111" stroke-width="2"/><path d="M-6,16 L-6,24 L6,24 L6,16 M-4,29 L4,29" {S} stroke-width="2"/>'
-    f'<path d="M-28,-4 l-10,-2 M28,-4 l10,-2 M-20,-22 l-7,-7 M20,-22 l7,-7 M0,-26 l0,-9" {S} stroke-width="2"/></g>')
-P["peek"] = ("0 0 200 110",
-    head(100, 74, 0, "open", 1.05) + '<ellipse cx="62" cy="108" rx="16" ry="9" fill="#111"/><ellipse cx="138" cy="108" rx="16" ry="9" fill="#111"/>'
-    '<path d="M57,103 l0,6 M67,103 l0,6 M133,103 l0,6 M143,103 l0,6" stroke="#fff" stroke-width="2" stroke-linecap="round"/>')
-P["celebrate"] = ("0 0 200 200",
-    tail("M128,160 C170,170 176,130 160,120") +
-    '<ellipse cx="100" cy="140" rx="35" ry="36" fill="#111"/>' + paw(70, 124, 44, 82, 10) + paw(130, 124, 156, 82, 10) +
-    '<path d="M86,172 L76,194 M114,172 L124,194" stroke="#111" stroke-width="10" stroke-linecap="round"/>' +
-    scarf(100, 108, 58) + head(100, 76, 0, "happy") +
-    f'<g fill="{A}" stroke="#111" stroke-width="2"><rect x="24" y="40" width="10" height="6" transform="rotate(30 29 43)"/><rect x="164" y="34" width="10" height="6" transform="rotate(-25 169 37)"/>'
-    f'<circle cx="40" cy="160" r="5"/><circle cx="176" cy="150" r="5"/><rect x="100" y="8" width="10" height="6" transform="rotate(15 105 11)"/></g>' +
-    star(30, 100, .7) + star(178, 100, .7))
+P["hello"] = ("0 0 200 200", TAIL_L + sil(SIT) + limb("M128,118 C140,108 148,92 152,72", 9) +
+              limb("M152,72 l2,-4", 11) + legline() + scarf() + face() + lines(160, 60, 10))
+P["confused"] = ("0 0 200 200", f'<g transform="rotate(-8 100 186)">' + TAIL_R + sil(SIT) + legline() + scarf() + face(kind="odd") + "</g>"
+                 + qmark(156, 36, 1.2) + qmark(30, 36, .8) + qmark(172, 80, .6))
+P["idea"] = ("0 0 200 200", TAIL_R + sil(SIT.replace("M70,26", "M70,26")) + legline() + scarf() + face(kind="up") +
+             f'<g transform="translate(100,0)"><circle cx="0" cy="12" r="0" fill="none"/></g>')
+# idea: spuldze virs galvas — maza, tieva
+P["idea"] = ("0 0 220 220", '<g transform="translate(10,22)">' + TAIL_R + sil(SIT) + legline() + scarf() + face(kind="up") + "</g>" +
+             f'<g transform="translate(110,22)"><circle r="11" fill="{A}"/><path d="M-4,11 v5 h8 v-5 M-3,20 h6" {L}/>'
+             f'<path d="M-20,-2 l-7,-1 M20,-2 l7,-1 M-14,-15 l-5,-5 M14,-15 l5,-5 M0,-19 v-6" {L}/></g>')
+# guļus uz muguras, ķepas gaisā — siluets vienā gabalā
+OOPS = ("M30,150 C26,134 32,120 44,114 L40,96 C50,100 56,106 60,112 C66,110 72,110 78,112 "
+        "C100,116 130,126 152,132 C170,137 178,148 172,160 C166,172 140,172 110,170 "
+        "C88,168 66,170 54,168 C42,166 32,160 30,150 Z")
+P["oops"] = ("0 0 200 200", limb("M168,148 C184,140 186,118 176,104 C170,96 176,86 186,88", 8) + sil(OOPS) + sil("M34,126 L14,118 L30,140 Z") +
+             limb("M100,128 C96,108 104,96 96,80", 8) + limb("M124,134 C126,112 136,104 132,88", 8) +
+             limb("M150,140 C162,124 160,112 168,100", 8) + face(54, 140, "dizzy", -70) +
+             spark(30, 92, .9) + spark(62, 72, .7) +
+             f'<g transform="translate(150,52) rotate(-22)"><path d="M-22,0 L0,-8 L0,18 L-22,26 Z M22,0 L0,-8 L0,18 L22,26 Z" fill="#fff" {L[10:]}/>'
+             f'<path d="M-17,6 L-5,2 M-17,12 L-5,8 M5,2 L17,6 M5,8 L17,12" {L}/></g>' + lines(112, 52, -40) +
+             f'<path d="M76,118 Q72,132 82,146" fill="none" stroke="{A}" stroke-width="6" stroke-linecap="round"/>')
+# apķēries ap dzijas kamolu, dzija apvijusies
+P["tangled"] = ("0 0 200 200", TAIL_R + sil(SIT) + face(kind="wide") +
+                f'<circle cx="100" cy="150" r="34" fill="{A}"/>'
+                f'<path d="M72,136 Q100,152 128,132 M68,152 Q100,170 132,150 M76,172 Q92,140 84,120 M108,118 Q130,150 112,182 M92,120 Q118,148 96,183" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="1.4"/>'
+                + limb("M70,118 C62,130 64,146 72,150", 8) + limb("M130,118 C138,130 136,146 128,150", 8) +
+                f'<path d="M64,104 C80,96 92,120 110,104 C124,92 140,106 136,120 M132,168 C150,176 150,190 170,188 C182,187 186,194 182,198" fill="none" stroke="{A}" stroke-width="2" stroke-linecap="round"/>'
+                + qmark(150, 30, .9))
+# izlej kafiju
+P["spill"] = ("0 0 200 200", TAIL_L + sil(SIT) + legline() + scarf() + face(kind="wide") +
+              limb("M126,118 C140,118 150,110 156,100", 9) +
+              f'<g transform="translate(166,92) rotate(55)"><path d="M-11,-13 L11,-13 L8,13 L-8,13 Z" fill="#fff" {L[10:]}/>'
+              f'<path d="M11,-6 Q21,-4 19,5 Q17,10 9,8" {L}/></g>'
+              f'<path d="M168,108 C172,130 160,150 166,176" fill="none" stroke="{A}" stroke-width="2.4" stroke-dasharray="2 6" stroke-linecap="round"/>'
+              f'<ellipse cx="166" cy="188" rx="20" ry="4.5" fill="{A}"/>' + lines(150, 58))
+# pie tāfeles (stāv uz pakaļkājām, rāda)
+P["teacher"] = ("0 0 270 200",
+                f'<rect x="8" y="20" width="96" height="72" rx="3" fill="#fff" {L[10:]}/>'
+                f'<path d="M22,74 L33,40 L44,74 M27,62 L39,62 M56,46 L63,40 L63,74 M56,74 L70,74 M80,52 q8,-6 16,0 M80,64 h16" {L}/>'
+                f'<path d="M28,92 L20,132 M84,92 L92,132" {L}/>' +
+                '<g transform="translate(70,0)">' + TAIL_R + sil(SIT) + legline() + scarf() + face(kind="side") +
+                limb("M76,116 C62,106 50,96 44,84", 9) + "</g>")
+# guļ saritinājies, aste apvijusies
+SLEEP = ("M40,170 C34,150 44,128 64,122 L60,104 C70,108 76,114 80,120 C88,118 94,120 100,122 "
+         "C130,118 162,128 168,150 C174,170 152,182 110,182 C80,182 46,184 40,170 Z")
+P["sleep"] = ("0 0 200 200", sil(SLEEP) + sil("M80,124 L90,104 L98,124 Z") + limb("M166,160 C176,178 150,190 110,188 C84,187 62,188 56,180", 8) +
+              face(76, 150, "closed", -8) +
+              f'<path d="M66,128 Q80,140 98,132" fill="none" stroke="{A}" stroke-width="6" stroke-linecap="round"/>'
+              f'<path d="M112,90 h12 l-12,13 h12 M134,66 h15 l-15,16 h15 M160,40 h18 l-18,20 h18" {L}/>')
+# prieks — stāv, abas ķepas augšā
+P["celebrate"] = ("0 0 200 200", TAIL_R + sil(SIT) + legline() + scarf() + face(kind="happy") +
+                  limb("M76,114 C64,100 58,84 56,66", 9) + limb("M124,114 C136,100 142,84 144,66", 9) +
+                  f'<g fill="{A}"><rect x="30" y="40" width="8" height="5" rx="1" transform="rotate(30 34 42)"/><rect x="164" y="34" width="8" height="5" rx="1" transform="rotate(-25 168 36)"/>'
+                  f'<circle cx="40" cy="150" r="3.5"/><circle cx="170" cy="140" r="3.5"/><rect x="98" y="6" width="8" height="5" rx="1" transform="rotate(15 102 8)"/></g>' +
+                  spark(26, 100, .7) + spark(176, 96, .7))
+# lūr no apakšas (galva + ķepiņas uz malas)
+PEEK = ("M58,110 C56,96 58,80 64,70 C62,56 64,42 70,30 C78,40 84,46 90,48 C97,46 103,46 110,48 "
+        "C116,46 122,40 130,30 C136,42 138,56 136,70 C142,80 144,96 142,110 Z")
+P["peek"] = ("0 0 200 110", sil(PEEK) + face(100, 76) +
+             '<ellipse cx="66" cy="106" rx="14" ry="7" fill="#111"/><ellipse cx="134" cy="106" rx="14" ry="7" fill="#111"/>'
+             '<path d="M62,103 v5 M70,103 v5 M130,103 v5 M138,103 v5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/>')
 
 D = {}
-D["sun"] = ("0 0 60 60", f'<circle cx="30" cy="30" r="11" {S}/><path d="M30,4 v8 M30,48 v8 M4,30 h8 M48,30 h8 M12,12 l6,6 M42,42 l6,6 M48,12 l-6,6 M12,48 l6,-6" {S}/>')
-D["cloud"] = ("0 0 90 50", f'<path d="M14,40 Q2,40 4,30 Q6,20 18,22 Q20,8 36,10 Q46,2 58,12 Q74,8 76,24 Q88,26 86,36 Q84,42 74,40 Z" {S} stroke-width="2"/>')
-D["sparkle"] = ("0 0 40 40", f'<path d="M20,4 Q22,18 36,20 Q22,22 20,36 Q18,22 4,20 Q18,18 20,4 Z" {S} stroke-width="2"/>')
-D["star"] = ("0 0 40 40", f'<path d="M20,4 L24,15 L36,16 L27,24 L30,36 L20,29 L10,36 L13,24 L4,16 L16,15 Z" {S} stroke-width="2"/>')
-D["arrow"] = ("0 0 90 40", f'<path d="M4,30 C20,4 40,40 60,16 Q66,10 80,14 M70,6 L82,14 L72,22" {S} stroke-width="2"/>')
-D["pencil"] = ("0 0 60 60", f'<path d="M10,50 L14,38 L42,10 L50,18 L22,46 Z M38,14 L46,22 M10,50 L22,46" {S} stroke-width="2"/>')
-D["moon"] = ("0 0 50 50", f'<path d="M34,8 A18,18 0 1,0 42,36 A14,14 0 1,1 34,8 Z" {S} stroke-width="2"/>')
-D["bulb"] = ("0 0 50 60", f'<circle cx="25" cy="22" r="13" {S} stroke-width="2"/><path d="M19,36 v8 h12 v-8 M21,50 h8" {S} stroke-width="2"/>')
+D["sun"] = ("0 0 60 60", f'<circle cx="30" cy="30" r="10" {L}/><path d="M30,6 v8 M30,46 v8 M6,30 h8 M46,30 h8 M13,13 l6,6 M41,41 l6,6 M47,13 l-6,6 M13,47 l6,-6" {L}/>')
+D["cloud"] = ("0 0 90 50", f'<path d="M14,40 Q2,40 4,30 Q6,20 18,22 Q20,8 36,10 Q46,2 58,12 Q74,8 76,24 Q88,26 86,36 Q84,42 74,40 Z" {L}/>')
+D["sparkle"] = ("0 0 40 40", f'<path d="M20,4 Q22,18 36,20 Q22,22 20,36 Q18,22 4,20 Q18,18 20,4 Z" {L}/>')
+D["star"] = ("0 0 40 40", f'<path d="M20,4 L24,15 L36,16 L27,24 L30,36 L20,29 L10,36 L13,24 L4,16 L16,15 Z" {L}/>')
+D["arrow"] = ("0 0 90 40", f'<path d="M4,30 C20,4 40,40 60,16 Q66,10 80,14 M70,6 L82,14 L72,22" {L}/>')
+D["pencil"] = ("0 0 60 60", f'<path d="M10,50 L14,38 L42,10 L50,18 L22,46 Z M38,14 L46,22 M10,50 L22,46" {L}/>')
+D["moon"] = ("0 0 50 50", f'<path d="M34,8 A18,18 0 1,0 42,36 A14,14 0 1,1 34,8 Z" {L}/>')
+D["bulb"] = ("0 0 50 60", f'<circle cx="25" cy="22" r="13" {L}/><path d="M19,36 v8 h12 v-8 M21,50 h8" {L}/>')
+
 
 def main():
     OUT.mkdir(parents=True, exist_ok=True)
+    for f in OUT.glob("*.svg"):
+        f.unlink()
     for name, (vb, body) in {**P, **{"d-" + k: v for k, v in D.items()}}.items():
         (OUT / f"{name}.svg").write_text(f'<svg xmlns="http://www.w3.org/2000/svg" viewBox="{vb}" role="img" aria-label="Oskars">{body}</svg>\n')
     print("svg:", len(P) + len(D))
+
 
 if __name__ == "__main__":
     main()
