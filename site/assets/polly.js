@@ -464,7 +464,9 @@
       if (!keysOn) return;
       keysBack = setTimeout(async () => {
         keysOn = null; token++;
-        await flyTo(HOME_X, floorY()); face(1); keysEl.style.display = beak.style.display = 'none';
+        const ok = await flyTo(HOME_X, floorY());
+        if (!ok || keysOn) return; // по пути домой снова открыли меню — ключи остаются в клюве
+        face(1); keysEl.style.display = beak.style.display = 'none';
         spot = 'floor'; perch = null; busy = false;
       }, 350);
       return;
