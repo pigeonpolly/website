@@ -72,7 +72,7 @@ def paras(x):
 def bullets(x, cls=""):
     if not x:
         return ""
-    return f'<ul class="{cls}">' + "".join(f"<li>{inl(i)}</li>" for i in x) + "</ul>"
+    return f'<ul class="{cls}">' + "".join(f"<li><span>{inl(i)}</span></li>" for i in x) + "</ul>"
 
 
 _SVG = {}
@@ -143,18 +143,18 @@ def slide_html(d, s, i, total):
         x = (f'<div class="in"><div><div class="kicker">{esc(m["course"])} · {esc(m["level"])}</div>'
              f'<h1>{inl(s.get("title", m["title_en"]))}</h1><p class="hand">{inl(s.get("subtitle", m.get("title_lv", "")))}</p>'
              f'<div class="meta">{"<b>" + esc(m.get("teacher")) + "</b>" if m.get("teacher") else ""}{inl(s.get("text", ""))}</div></div>'
-             f'{oscar(pose or "hello", "oscar", "position:static;width:100%")}</div>'
+             f'{oscar(pose or "hello", "oscar", "position:static;width:62%;margin:auto")}</div>'
              + oscar("d-sun", "oscar", "right:4cqw;top:3cqw;width:6cqw") + oscar("d-sparkle", "oscar", "left:46cqw;top:9cqw;width:3cqw"))
     elif t == "agenda":
         x = (f'<div class="in"><h2>{inl(s.get("title", "Šodien"))}</h2><ol class="agenda">'
-             + "".join(f"<li>{inl(it)}</li>" for it in s.get("items", [])) + "</ol></div>"
-             + oscar(pose or "teacher", "oscar", "right:5cqw;bottom:4cqw;width:16cqw"))
+             + "".join(f"<li><span>{inl(it)}</span></li>" for it in s.get("items", [])) + "</ol></div>"
+             + oscar(pose or "teacher", "oscar", "right:6cqw;bottom:5cqw;width:12cqw"))
     elif t == "section":
         x = (f'<div class="in"><div class="n">{esc(s.get("num", ""))}</div><h2>{inl(s["title"])}</h2>'
-             f'<p class="hand" style="color:#fff;margin-top:.6em">{inl(s.get("text", ""))}</p></div>'
-             + oscar(pose or "peek", "oscar", "right:6cqw;bottom:0;width:22cqw"))
+             f'<p class="hand" style="margin-top:.6em">{inl(s.get("text", ""))}</p></div>'
+             + oscar(pose or "peek", "oscar", "right:8cqw;bottom:0;width:15cqw"))
     elif t == "text":
-        side = oscar(pose, "oscar", "position:static;width:80%;margin:auto") if pose else ""
+        side = oscar(pose, "oscar", "position:static;width:58%;margin:auto") if pose else ""
         body = paras(s.get("body")) + bullets(s.get("bullets"))
         hand = f'<p class="hand">{inl(s["note"])}</p>' if s.get("note") else ""
         if side:
@@ -164,20 +164,20 @@ def slide_html(d, s, i, total):
     elif t == "big":
         x = (f'<div class="in" style="display:flex;flex-direction:column;justify-content:center">'
              f'<div class="kicker">{inl(s.get("kicker", ""))}</div><p class="big">{inl(s["text"])}</p>'
-             f'<p class="lv">{inl(s.get("lv", ""))}</p></div>' + (oscar(pose, "oscar", "right:5cqw;bottom:4cqw;width:18cqw") if pose else ""))
+             f'<p class="lv">{inl(s.get("lv", ""))}</p></div>' + (oscar(pose, "oscar", "right:7cqw;bottom:5cqw;width:13cqw") if pose else ""))
     elif t == "rule":
         hd = "".join(f"<th>{inl(h)}</th>" for h in s.get("head", []))
         rows = "".join("<tr>" + "".join(f'<td class="{"k" if j == 0 else ""}">{inl(c)}</td>' for j, c in enumerate(r)) + "</tr>"
                        for r in s.get("rows", []))
         note = f'<p class="hand" style="margin-top:.8em">{inl(s["note"])}</p>' if s.get("note") else ""
-        side = oscar(pose, "oscar", "position:static;width:90%;margin:auto") if pose else ""
+        side = oscar(pose, "oscar", "position:static;width:62%;margin:auto") if pose else ""
         tbl = f'<table class="tbl"><thead><tr>{hd}</tr></thead><tbody>{rows}</tbody></table>{note}'
         x = (f'<div class="in"><h2>{inl(s["title"])}</h2>'
              + (f'<div class="split wide"><div>{tbl}</div><div>{side}</div></div>' if side else tbl) + "</div>")
     elif t == "examples":
         x = (f'<div class="in"><h2>{inl(s["title"])}</h2><ul class="exl">'
              + "".join(f'<li><span class="en">{inl(e["en"])}</span><span class="lv">{inl(e.get("lv", ""))}</span></li>' for e in s.get("items", []))
-             + "</ul></div>" + (oscar(pose, "oscar", "right:3cqw;bottom:3cqw;width:12cqw") if pose else ""))
+             + "</ul></div>" + (oscar(pose, "oscar", "right:6cqw;top:3.5cqw;width:9cqw") if pose else ""))
     elif t == "vocab":
         items = s.get("items", [])
         cols = s.get("cols") or (3 if len(items) <= 6 else 4)
@@ -189,18 +189,18 @@ def slide_html(d, s, i, total):
         opts = "".join(f'<div class="{"ok" if j == ans else ""}"><b>{"ABCD"[j]}</b>{inl(o)}</div>' for j, o in enumerate(s.get("options", [])))
         x = (f'<div class="in"><div class="kicker">{inl(s.get("kicker", "Ātrais tests"))}</div><h2 style="margin-top:.3em">{inl(s["question"])}</h2>'
              f'<div class="qopts">{opts}</div><p class="lv" style="margin-top:1em">{inl(s.get("lv", ""))}</p></div>'
-             + oscar(pose or "confused", "oscar", "right:4cqw;top:4cqw;width:11cqw"))
+             + oscar(pose or "confused", "oscar", "right:6cqw;top:5cqw;width:9cqw"))
         cls += " quiz"
     elif t == "task":
         mins = f'<span class="timer">⏱ {esc(s["minutes"])} min</span>' if s.get("minutes") else ""
         mode = f'<span class="chip">{inl(s["mode"])}</span>' if s.get("mode") else ""
         x = (f'<div class="in"><div style="display:flex;gap:.8em;align-items:center;margin-bottom:.6em">{mins}{mode}</div>'
              f'<h2>{inl(s["title"])}</h2><div class="split wide"><div><ol class="steps">'
-             + "".join(f"<li>{inl(st)}</li>" for st in s.get("steps", [])) + "</ol>"
+             + "".join(f"<li><span>{inl(st)}</span></li>" for st in s.get("steps", [])) + "</ol>"
              + (f'<div class="boxed" style="margin-top:.6em">{paras(s.get("box"))}</div>' if s.get("box") else "")
-             + f'</div><div>{oscar(pose or "idea", "oscar", "position:static;width:70%;margin:auto")}</div></div></div>')
+             + f'</div><div>{oscar(pose or "idea", "oscar", "position:static;width:52%;margin:auto")}</div></div></div>')
     elif t == "story":
-        x = (f'<div class="in"><div class="story"><div>{oscar(pose or "oops", "oscar", "position:static;width:100%")}</div>'
+        x = (f'<div class="in"><div class="story"><div>{oscar(pose or "oops", "oscar", "position:static;width:78%;margin:auto")}</div>'
              f'<div><div class="kicker">Oskara stāsts</div><h2 style="margin-top:.2em">{inl(s["title"])}</h2>'
              f'<div class="bubble">{paras(s.get("text"))}</div>'
              + (f'<p class="hand" style="margin-top:.8em">→ {inl(s["lesson"])}</p>' if s.get("lesson") else "") + "</div></div></div>")
@@ -211,7 +211,7 @@ def slide_html(d, s, i, total):
              + (f'<p class="hand" style="margin-top:.8em">{inl(s["note"])}</p>' if s.get("note") else "") + "</div>")
     elif t == "thanks":
         x = (f'<div class="in"><div><h1>{inl(s.get("title", "Thank you!"))}</h1><p class="hand">{inl(s.get("text", "Paldies!"))}</p></div>'
-             f'{oscar(pose or "celebrate", "oscar", "position:static;width:90%")}</div>'
+             f'{oscar(pose or "celebrate", "oscar", "position:static;width:58%;margin:auto")}</div>'
              + oscar("d-moon", "oscar", "right:4cqw;top:4cqw;width:5cqw") + oscar("d-cloud", "oscar", "left:40cqw;top:4cqw;width:9cqw"))
     else:
         raise SystemExit(f"Nezināms slaida tips: {t} (slaids {i})")
@@ -301,7 +301,7 @@ def remind_block(d, items=None):
     items = items or d.get("homework", {}).get("reminder") or [f'{m["wrong"]} → **{m["right"]}**' for m in d.get("mistakes", [])[:3]]
     if not items:
         return ""
-    return (f'<div class="remind">{oscar("spill")}<div><div class="kicker">Pirms sāc — Oskars jau kļūdījās šeit</div>'
+    return (f'<div class="remind">{oscar("spill")}<div><div class="kicker">Pirms sāc — Oskara padoms</div>'
             f'{bullets(items)}</div></div>')
 
 
@@ -354,7 +354,7 @@ def render_selfcheck(d, show=False):
         nonlocal n
         n += 1
         return f"{n:02d}"
-    secs = ((sec(nx(), "Tests", qs, "Klikšķini uz atbildes. Pēc tam atver paskaidrojumu.") if qs else "")
+    secs = ((sec(nx(), "Tests", qs, "Noklikšķini uz atbildes, pēc tam atver paskaidrojumu.") if qs else "")
             + (sec(nx(), "Kļūdu detektīvs", f'<div class="detective">{det}</div>', "Katrā teikumā ir viena kļūda. Uzraksti pareizi un pārbaudi.", True) if det else "")
             + (sec(nx(), "Interesanti fakti", f'<div class="grid">{facts}</div>') if facts else "")
             + (sec(nx(), "Video", f'<div class="grid g2">{vids}</div>', "Īsi video A1 līmenim. Skaties ar subtitriem angļu valodā.") if vids and not show else "")
@@ -388,7 +388,7 @@ def render_reserve(d, show=False):
     body = "".join(reserve_task(t, i + 1, show) for i, t in enumerate(d["reserve"]))
     if show:
         return body
-    return page(d, "reserve", f'<main class="doc">{head(d, "reserve")}{title_block(d, "reserve", "celebrate", "Kad laiks paliek pāri vai grupai vajag vairāk kustības.")}'
+    return page(d, "reserve", f'<main class="doc">{head(d, "reserve")}{title_block(d, "reserve", "celebrate", "Kad laiks paliek pāri vai grupai vajag vairāk prakses.")}'
                 f'{body}<div class="bar no-print"><button class="btn" data-act="print">⤓ PDF</button></div>{foot(d)}</main>')
 
 
@@ -501,6 +501,14 @@ def main():
         print("office:", make_office.build(d, out))
     if only in ("all", "pdf"):
         subprocess.run(["node", str(Path(__file__).parent / "render.js"), "pdf", str(out)] + [str(f) for f in files], check=True)
+    if only == "all":
+        import zipfile
+        z = topic / f"{d['meta']['slug']}-pack.zip"
+        with zipfile.ZipFile(z, "w", zipfile.ZIP_DEFLATED) as zf:
+            for f in sorted(out.rglob("*")):
+                if f.is_file() and f != z and "/png/" not in str(f):
+                    zf.write(f, f"{d['meta']['slug']}/{f.relative_to(out)}")
+        print("zip:", z.name, f"{z.stat().st_size // 1024} KB")
 
 
 if __name__ == "__main__":

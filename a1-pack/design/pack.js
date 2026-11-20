@@ -29,7 +29,7 @@
       b.addEventListener("click", function () {
         var ok = b.dataset.ok === "1";
         b.classList.add(ok ? "ok" : "no");
-        if (fb) fb.textContent = ok ? "✓ Pareizi!" : "✗ Vēl reiz — Oskars arī nekļūdās tikai miegā.";
+        if (fb) fb.textContent = ok ? "✓ Pareizi!" : "✗ Gandrīz. Pamēģini vēlreiz.";
         if (ok) { var d = q.querySelector("details"); if (d) d.open = true; }
       });
     });
