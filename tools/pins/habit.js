@@ -10,7 +10,7 @@ const PALS = JSON.parse(fs.readFileSync(path.join(ROOT, 'content/palettes.json')
 const MON = ['January', 'February', 'March', 'April', 'May', 'June', 'July', 'August', 'September', 'October', 'November', 'December'];
 const WL = ['S', 'M', 'T', 'W', 'T', 'F', 'S'];
 const COVER = { dir: 'bird', key: '2025-pigeon-polly-celebrates-new-year', pos: '50% 45%' };
-const PIX = { dir: 'snail', key: '2025-mr-chew-opened-pumpkin-spice-latte-season', pos: '60% 50%' };
+const PIX = { dir: 'snail', key: '2023-mr-chew-take-away-coffee', pos: '50% 50%' }; // круглый год, не сезонный
 const REVIEW = { dir: 'bird', key: '2023-pigeon-polly-thinking-about-relocation-to-mars', pos: '50% 50%' };
 
 // цвета (как в cal.js): чернила и акцент, читаемые на белой бумаге
@@ -36,7 +36,11 @@ const img = a => { const o = path.join(TMP, a.key + '.jpg');
 const edge = (y0, seed) => { const pts = ['0 0', '100% 0'];
   for (let i = 40; i >= 0; i--) { const x = i / 40, y = y0 + 9 * Math.sin(x * 9 + seed) + 4 * Math.sin(x * 23 + seed * 2) + 2 * Math.sin(x * 51 + seed);
     pts.push(`${(x * 100).toFixed(1)}% ${y.toFixed(0)}px`); } return `polygon(${pts.join(',')})`; };
-const art = (a, h, seed) => `<div class="art" style="height:${h + 14}px;clip-path:${edge(h, seed)}"><img src="${img(a)}" style="object-position:${a.pos}"></div>`;
+// арт целиком, без обрезки (Алина 20.11: не резать головы): высота h, ширина — по пропорциям картинки
+const ratio = a => { const [w, h] = execFileSync('identify', ['-format', '%w %h', path.join(ROOT, 'site/images', a.dir, a.key + '.jpg')]).toString().split(' ').map(Number); return w / h; };
+const art = (a, h) => `<img src="${img(a)}" style="position:absolute;top:30px;left:50%;height:${h}px;width:${Math.round(h * ratio(a))}px;margin-left:${-Math.round(h * ratio(a) / 2)}px;border-radius:16px;display:block">`;
+// обложка — на всю ширину, неровный край режет только низ (пол), не героев
+const bleed = (a, seed) => { const h = Math.round(794 / ratio(a)); return `<div class="art" style="height:${h}px;clip-path:${edge(h - 12, seed)}"><img src="${img(a)}"></div>`; };
 const mark = `<div class="mk"><i>pp</i>PIGEONPOLLY.COM</div>`;
 
 // страница A4 = 794×1123 px
@@ -53,8 +57,8 @@ h1{font:400 64px/1 'Caveat Brush';text-align:center}h2{font:400 30px/1 'Caveat B
 .lines{background:repeating-linear-gradient(180deg,transparent 0 29px,color-mix(in srgb,var(--ink) 22%,#fff) 29px 30px)}`;
 
 const cover = () => { const c = colors(COVER);
-  return `<section class="pg" style="--ink:${c.ink};--acc:${c.acc}">${art(COVER, 560, 3)}
-<div style="position:absolute;left:0;right:0;top:600px;text-align:center"><div style="font:400 150px/1 'Caveat Brush';color:${c.acc}">${YEAR}</div>
+  return `<section class="pg" style="--ink:${c.ink};--acc:${c.acc}">${bleed(COVER, 3)}
+<div style="position:absolute;left:0;right:0;top:575px;text-align:center"><div style="font:400 150px/1 'Caveat Brush';color:${c.acc}">${YEAR}</div>
 <div style="font:400 64px/1.1 'Caveat Brush'">Habit Tracker</div><div class="sub" style="margin-top:14px">small steps · every day · all year</div></div>
 <div class="box" style="position:absolute;left:110px;right:110px;top:880px;font-size:19px;line-height:1.5">
 <h2>How to use it</h2>1. Pick up to 12 habits for the month and write them on the left.<br>2. Fill in a circle every day you keep a habit — colour it, tick it, doodle it.<br>3. Count your days on the right and celebrate the small wins.</div>
@@ -65,13 +69,13 @@ const pixels = () => { const c = colors(PIX), cell = 18;
   const rows = MON.map((m, i) => { const n = new Date(YEAR, i + 1, 0).getDate();
     return `<div class="pr"><b>${m.slice(0, 3)}</b>${[...Array(31)].map((_, d) => d < n ? `<i${[0, 6].includes(new Date(YEAR, i, d + 1).getDay()) ? ' class="we"' : ''}></i>` : '<i class="x"></i>').join('')}</div>`; }).join('');
   const key = c.pal.slice(0, 6).map(h => `<div style="display:flex;align-items:center;gap:10px;margin:4px 0"><span style="width:22px;height:22px;border-radius:5px;border:1.5px solid ${h}"></span><span style="flex:1;border-bottom:1px solid ${c.ink}40;height:20px"></span></div>`).join('');
-  return `<section class="pg" style="--ink:${c.ink};--acc:${c.acc}">${art(PIX, 250, 7)}
-<h1 style="position:absolute;left:0;right:0;top:275px">${YEAR} in Little Squares</h1><div class="sub" style="position:absolute;left:0;right:0;top:345px">one habit or mood · one square a day</div>
+  return `<section class="pg" style="--ink:${c.ink};--acc:${c.acc}">${art(PIX, 280)}
+<h1 style="position:absolute;left:0;right:0;top:325px">${YEAR} in Little Squares</h1><div class="sub" style="position:absolute;left:0;right:0;top:392px">one habit or mood · one square a day</div>
 <style>.pr{display:flex;align-items:center;gap:3px;margin-bottom:4px;height:${cell}px}.pr b{width:46px;font:400 18px/1 'Patrick Hand'}
 .pr i{width:${cell}px;height:${cell}px;border:1.2px solid color-mix(in srgb,var(--ink) 45%,#fff);border-radius:4px}.pr i.we{background:color-mix(in srgb,var(--acc) 9%,#fff)}.pr i.x{border:none}
 .dn{display:flex;gap:3px;margin-left:49px;margin-bottom:4px}.dn span{width:${cell}px;text-align:center;font-size:12px;opacity:.55}</style>
-<div style="position:absolute;left:50px;top:400px"><div class="dn">${[...Array(31)].map((_, d) => `<span>${d + 1}</span>`).join('')}</div>${rows}</div>
-<div class="box" style="position:absolute;left:50px;right:50px;top:745px;height:150px"><h2>Tracking:</h2><div class="lines" style="height:80px"></div></div>
+<div style="position:absolute;left:50px;top:440px"><div class="dn">${[...Array(31)].map((_, d) => `<span>${d + 1}</span>`).join('')}</div>${rows}</div>
+<div class="box" style="position:absolute;left:50px;right:50px;top:760px;height:140px"><h2>Tracking:</h2><div class="lines" style="height:70px"></div></div>
 <div class="box" style="position:absolute;left:50px;right:50px;top:910px;height:160px"><h2>Colour key</h2><div style="display:grid;grid-template-columns:1fr 1fr;column-gap:30px">${key}</div></div>
 ${mark}</section>`; };
 
@@ -80,23 +84,23 @@ const month = a => { const c = colors(a), n = new Date(YEAR, a.m, 0).getDate(), 
   const days = [...Array(31)].map((_, i) => i + 1);
   const head = `<div class="hr hh"><b></b>${days.map(d => d <= n ? `<span class="${we(d) ? 'we' : ''}"><em>${WL[new Date(YEAR, a.m - 1, d).getDay()]}</em>${d}</span>` : '<span class="x"></span>').join('')}<u>total</u></div>`;
   const row = `<div class="hr"><b></b>${days.map(d => d <= n ? `<span class="${we(d) ? 'we' : ''}"><i></i></span>` : '<span class="x"></span>').join('')}<u></u></div>`;
-  return `<section class="pg" style="--ink:${c.ink};--acc:${c.acc}">${art(a, 300, a.m)}
-<h1 style="position:absolute;left:0;right:0;top:318px">${MON[a.m - 1]} ${YEAR}</h1><div class="sub" style="position:absolute;left:0;right:0;top:386px">habit tracker</div>
-<style>.tb{position:absolute;left:36px;right:36px;top:420px}.hr{display:flex;align-items:stretch;height:30px;border-bottom:1px solid color-mix(in srgb,var(--ink) 18%,#fff)}
+  return `<section class="pg" style="--ink:${c.ink};--acc:${c.acc}">${art(a, 360)}
+<h1 style="position:absolute;left:0;right:0;top:402px">${MON[a.m - 1]} ${YEAR}</h1><div class="sub" style="position:absolute;left:0;right:0;top:468px">habit tracker</div>
+<style>.tb{position:absolute;left:36px;right:36px;top:500px}.hr{display:flex;align-items:stretch;height:30px;border-bottom:1px solid color-mix(in srgb,var(--ink) 18%,#fff)}
 .hr b{width:150px;flex:none;border-right:1.5px solid color-mix(in srgb,var(--ink) 35%,#fff)}.hr span{width:17.4px;flex:none;display:grid;place-items:center}.hr span.we{background:color-mix(in srgb,var(--acc) 11%,#fff)}
 .hr i{width:12px;height:12px;border-radius:50%;border:1.2px solid color-mix(in srgb,var(--ink) 50%,#fff)}.hr u{flex:1;text-decoration:none;border-left:1.5px solid color-mix(in srgb,var(--ink) 35%,#fff);text-align:center;font-size:13px;opacity:.6}
 .hh{height:38px;border-bottom:1.5px solid color-mix(in srgb,var(--ink) 35%,#fff)}.hh span{font-size:12.5px;line-height:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.hh em{font-style:normal;opacity:.5;font-size:11px}.hh span.we{color:var(--acc)}
 .hh b{font:400 22px 'Caveat Brush';display:flex;align-items:center;color:var(--acc)}.hh u{display:flex;align-items:center;justify-content:center}</style>
 <div class="tb">${head.replace('<b></b>', '<b>my habits</b>')}${row.repeat(H)}</div>
-<div class="box" style="position:absolute;left:36px;top:875px;width:353px;height:200px"><h2>This month I want to…</h2><div class="lines" style="height:135px"></div></div>
-<div class="box" style="position:absolute;right:36px;top:875px;width:353px;height:200px"><h2>Little wins</h2><div class="lines" style="height:135px"></div></div>
+<div class="box" style="position:absolute;left:36px;top:918px;width:353px;height:150px"><h2>This month I want to…</h2><div class="lines" style="height:90px"></div></div>
+<div class="box" style="position:absolute;right:36px;top:918px;width:353px;height:150px"><h2>Little wins</h2><div class="lines" style="height:90px"></div></div>
 ${mark}</section>`; };
 
 const review = () => { const c = colors(REVIEW);
   const q = ['The habit I’m proudest of', 'What was harder than I thought', 'My favourite month and why', 'Habits I’m taking into 2028'];
-  return `<section class="pg" style="--ink:${c.ink};--acc:${c.acc}">${art(REVIEW, 280, 5)}
-<h1 style="position:absolute;left:0;right:0;top:300px">My ${YEAR} in Review</h1><div class="sub" style="position:absolute;left:0;right:0;top:368px">look back · be kind · keep going</div>
-<div style="position:absolute;left:40px;right:40px;top:410px;display:grid;grid-template-columns:1fr 1fr;gap:18px">${q.map(t => `<div class="box" style="height:315px"><h2>${t}</h2><div class="lines" style="height:250px"></div></div>`).join('')}</div>
+  return `<section class="pg" style="--ink:${c.ink};--acc:${c.acc}">${art(REVIEW, 300)}
+<h1 style="position:absolute;left:0;right:0;top:345px">My ${YEAR} in Review</h1><div class="sub" style="position:absolute;left:0;right:0;top:412px">look back · be kind · keep going</div>
+<div style="position:absolute;left:40px;right:40px;top:450px;display:grid;grid-template-columns:1fr 1fr;gap:18px">${q.map(t => `<div class="box" style="height:300px"><h2>${t}</h2><div class="lines" style="height:235px"></div></div>`).join('')}</div>
 ${mark}</section>`; };
 
 (async () => {
