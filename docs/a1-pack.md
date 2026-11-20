@@ -6,4 +6,5 @@
 - Домашка → PDF: html2pdf.js 0.10.1 (MIT) встроен в tema.html как `text/x-lazy`, рендер в отдельном iframe (весь документ html2canvas вешает); запасной путь — печать `body.print-rep`.
 - Сборка: `tools/build_lab.py` (инлайнит CSS/JS/шрифты woff2 из `fonts/web/`/SVG Оскара), проверка `tools/check_lab.py`.
 - Кот: `tools/draw_oscar.py` → `design/oscar/*.svg`, лист `design/oscar-sheet.png`; персонаж — `OSKARS.md` (британец, гид Hop & Hat Tours).
-- `a1-pack/veidnes/` — пустые Word/PowerPoint прежнего вида, ждут решения Алины.
+- Word/PowerPoint не делаем (Алина 20.11: не нужны). Проверка всего: `node a1-pack/tools/lab_test.js a1-pack/topics/<slug> <папка>` (ошибки JS, все слайды, все упражнения, PDF домашки, скролл 390) + `tools/sheet.py` — контактный лист.
+- Обязательно в каждой теме: слайд «mistakes», ≥ 2 слайда «facts» (Dzīve + Valoda), крупный Оскар (oscar) ≥ 1 на 6 слайдов; задания только индивидуальные.

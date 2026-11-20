@@ -15,4 +15,3 @@
 ## Без ИИ
 Текст темы — в `topics/<тема>/topic.json` (формат — `SCHEMA.md`). Поменять текст и выполнить
 `python3 a1-pack/tools/build_lab.py a1-pack/topics/<тема>`.
-Старые пустые шаблоны Word/PowerPoint (прежний вид) — `veidnes/`, шрифты для них — `fonts/*.ttf`.

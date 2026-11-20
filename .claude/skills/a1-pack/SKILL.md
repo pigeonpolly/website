@@ -12,7 +12,7 @@ Paraugs: `a1-pack/topics/to-be/topic.json` — skaties fragmentos (`python3 -c` 
 1. **Tēma** — ja nav skaidra.
 2. **Krāsa** — 3 varianti tēmas noskaņā (vārds + HEX), pirmais ieteiktais; kontrasts pret baltu ≥ 3:1.
 3. **Ilgums** — 45 / 90 / 180 min. Slaidi ≥ minūtes / 3 (3 h → ≥ 60).
-4. **Kas vajag** (multiSelect): «Prezentācija», «Tēmas fails ar mājasdarbu». Pēc noklusējuma — abi.
+4. **Kas vajag** (multiSelect): «Prezentācija», «Tēmas fails ar mājasdarbu». Pēc noklusējuma — abi. Word/PowerPoint netaisām.
 
 ## 1. Plāns (pats) → `topics/<slug>/plan.md` + `topic.json` ar `meta`
 - **CEFR A1** robežas; orientieri: British Council LearnEnglish (A1–A2 grammar), Cambridge English A1/A2, BBC Learning English, English Vocabulary Profile A1. **Neizdomā** gramatikas likumus vai izņēmumus; ja šaubies — neraksti. Britu angļu.
@@ -43,11 +43,14 @@ Noteikumi aģentiem (kopēt):
 ## 3. Pārbaude
 `python3 a1-pack/tools/check_lab.py a1-pack/topics/<slug>` — ✗ labo. Pats izlasi 5–6 slaidus un 2 uzdevumus: valoda, A1, latviešu gramatika.
 
-## 4. Būvēšana un skats
+## 4. Būvēšana un pārbaude
 ```
 python3 a1-pack/tools/build_lab.py a1-pack/topics/<slug>
+node a1-pack/tools/lab_test.js a1-pack/topics/<slug> <scratchpad>/shots
+python3 a1-pack/tools/sheet.py <scratchpad>/deck.png 5 400 <scratchpad>/shots/d-*.png
+python3 a1-pack/tools/sheet.py <scratchpad>/tema.png 4 480 <scratchpad>/shots/w-*.png
 ```
-Ekrānuzņēmumi (Playwright, `require('playwright')`): prezentācija — 8 slaidi (`…-prezentacija.html#N`), tēmas fails — 1440 un 390 (pirms tam `.reveal-up,.msg` → klase `in`). Pārbaudi: nav JS kļūdu, nav horizontālā skrola uz 390, «Pārbaudīt» strādā, mājasdarba PDF lejupielādējas. Pats apskati, izlabo, Alinai ≤ 2 lapas + abi HTML (SendUserFile).
+`lab_test.js` beidzas ar kodu 0 tikai, ja: nav JS kļūdu, visi slaidi un uzdevumi strādā, mājasdarba PDF lejupielādējas, uz 390 nav horizontālā skrola. Pats apskati lapas (Read), izlabo redzamo. Alinai — ≤ 2 lapas + abi HTML (SendUserFile), krieviski ≤ 5 rindas.
 
 ## 5. Beigas
 Rinda `docs/plan-status.md`; `git add a1-pack/topics/<slug>`; commit; push (CLAUDE.md).
