@@ -120,106 +120,52 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 </div></div>
 </header>
 <main id="main">
-<link rel="stylesheet" href="/assets/advent.css?v=c355987b">
-<section data-ppb="advent.1" class="adv-hero"><div class="w">
-  <p class="adv-kick">1–31 декабря · одно окошко в день</p>
-  <h1>Адвент <em>для рисующих</em></h1>
-  <p class="adv-lead">Каждое утро открывается новое окошко: маленькое дело для рисования и подарок внутри — палитра, обои, урок или что-то для твоей птички. Заглянуть можно бесплатно; чтобы забрать — войдите.</p>
-  <p class="adv-note">Пропустили день? За пропущенными окошками можно вернуться до 1 марта — кроме окон 24 и 31 декабря.</p>
-</div></section>
+<link rel="stylesheet" href="/assets/advent.css?v=6b0776f6">
+<div data-ppb="advent.1" class="advw" id="advw">
+  <section class="sky">
+    <div class="stars" id="stars"></div>
+    <div class="moon"></div>
+    <div class="snow" id="snow"></div>
+    <div class="head">
+      <p class="kick">1–31 декабря · одно окошко в день</p>
+      <h1>A street of <em>31 windows</em></h1>
+      <p class="lead">Every day a window lights up in one of the houses. Inside is a file to keep: a wallpaper, a colouring page, a calendar or a palette — and a little thing for your bird.</p>
+      <div class="garland" aria-hidden="true"><svg id="garland" viewBox="0 0 900 40" preserveAspectRatio="none"></svg></div>
+      <p class="gcount" id="gcount"></p>
+      <p class="hint"><span class="mini"><i></i></span>A window with a ribbon is yours: tap it and the shutters open</p>
+    </div>
+    <div class="street" id="street"></div>
+    <div class="ground-snow"></div>
+  </section>
 
-<div data-ppb="advent.2" class="adv-village" aria-hidden="true">
-  <svg viewBox="0 0 1440 260" preserveAspectRatio="xMidYMax slice">
-    <ellipse class="adv-shadow" cx="120" cy="212" rx="90" ry="8" fill="#DCE7EF"/>
-    <ellipse class="adv-shadow" cx="420" cy="214" rx="110" ry="9" fill="#DCE7EF"/>
-    <ellipse class="adv-shadow" cx="930" cy="214" rx="100" ry="8" fill="#DCE7EF"/>
-    <!-- дом 1 -->
-    <g>
-      <rect x="40" y="120" width="112" height="92" fill="#F6F1E7"/>
-      <path d="M28 120 L96 70 L164 120 Z" fill="#8E2B2B"/>
-      <rect x="92" y="176" width="20" height="36" fill="#7A4A28"/>
-      <rect class="lit" x="56" y="136" width="22" height="26" rx="2" fill="#F4C95D"/>
-      <rect x="52" y="136" width="5" height="26" fill="#D8B27A"/><rect x="77" y="136" width="5" height="26" fill="#D8B27A"/>
-      <rect x="120" y="136" width="22" height="26" rx="2" fill="#2A3B4C"/>
-      <rect x="132" y="92" width="10" height="20" fill="#6B4329"/>
-    </g>
-    <!-- ель -->
-    <path d="M186 210 l16 -40 l16 40 z" fill="#23503F"/><rect x="199" y="210" width="5" height="8" fill="#7A4A28"/>
-    <!-- дом 2 -->
-    <g>
-      <rect x="226" y="142" width="96" height="70" fill="#EAF0F4"/>
-      <path d="M214 142 L274 98 L334 142 Z" fill="#23503F"/>
-      <rect class="lit" x="244" y="158" width="20" height="24" rx="2" fill="#F4C95D"/>
-      <rect x="240" y="158" width="4" height="24" fill="#D8B27A"/><rect x="264" y="158" width="4" height="24" fill="#D8B27A"/>
-      <rect x="288" y="158" width="20" height="24" rx="2" fill="#2A3B4C"/>
-    </g>
-    <!-- дом 3, высокий -->
-    <g>
-      <rect x="356" y="100" width="120" height="112" fill="#F8F0E4"/>
-      <path d="M344 100 L416 46 L488 100 Z" fill="#7E141B"/>
-      <rect class="lit" x="372" y="118" width="24" height="28" rx="2" fill="#F4C95D"/>
-      <rect class="lit" x="404" y="118" width="24" height="28" rx="2" fill="#F4C95D"/>
-      <rect x="368" y="118" width="5" height="28" fill="#D8B27A"/><rect x="395" y="118" width="5" height="28" fill="#D8B27A"/>
-      <rect x="400" y="118" width="5" height="28" fill="#D8B27A"/><rect x="427" y="118" width="5" height="28" fill="#D8B27A"/>
-      <rect x="452" y="160" width="20" height="24" rx="2" fill="#2A3B4C"/>
-      <rect x="368" y="166" width="24" height="46" fill="#F4EFE5" opacity=".6"/>
-    </g>
-    <!-- ели -->
-    <path d="M506 214 l15 -36 l15 36 z" fill="#23503F"/><rect x="518" y="214" width="5" height="7" fill="#7A4A28"/>
-    <path d="M540 216 l12 -28 l12 28 z" fill="#2C5F4B"/>
-    <!-- дом 4 -->
-    <g>
-      <rect x="590" y="130" width="100" height="82" fill="#FFFFFF"/>
-      <path d="M578 130 L640 86 L702 130 Z" fill="#C9A227"/>
-      <rect class="lit" x="608" y="148" width="22" height="26" rx="2" fill="#F4C95D"/>
-      <rect x="604" y="148" width="4" height="26" fill="#D8B27A"/><rect x="630" y="148" width="4" height="26" fill="#D8B27A"/>
-      <rect class="lit" x="648" y="148" width="22" height="26" rx="2" fill="#F4C95D"/>
-    </g>
-    <!-- дом 5 -->
-    <g>
-      <rect x="740" y="150" width="110" height="62" fill="#EAF0F4"/>
-      <path d="M728 150 L795 108 L862 150 Z" fill="#23503F"/>
-      <rect x="762" y="164" width="20" height="22" rx="2" fill="#2A3B4C"/>
-      <rect class="lit" x="802" y="164" width="20" height="22" rx="2" fill="#F4C95D"/>
-    </g>
-    <!-- ели -->
-    <path d="M876 214 l16 -42 l16 42 z" fill="#23503F"/><rect x="889" y="214" width="5" height="8" fill="#7A4A28"/>
-    <!-- дом 6, с башней -->
-    <g>
-      <rect x="930" y="112" width="130" height="100" fill="#F6F1E7"/>
-      <path d="M918 112 L995 62 L1072 112 Z" fill="#8E2B2B"/>
-      <rect x="966" y="132" width="24" height="28" rx="2" fill="#F4C95D" class="lit"/>
-      <rect x="1006" y="132" width="24" height="28" rx="2" fill="#F4C95D" class="lit"/>
-      <rect x="962" y="132" width="5" height="28" fill="#D8B27A"/><rect x="989" y="132" width="5" height="28" fill="#D8B27A"/>
-      <rect x="1002" y="132" width="5" height="28" fill="#D8B27A"/><rect x="1029" y="132" width="5" height="28" fill="#D8B27A"/>
-      <rect x="990" y="176" width="22" height="36" fill="#7A4A28"/>
-    </g>
-    <!-- дом 7 -->
-    <g>
-      <rect x="1100" y="146" width="96" height="66" fill="#FFFFFF"/>
-      <path d="M1088 146 L1148 104 L1208 146 Z" fill="#7E141B"/>
-      <rect x="1120" y="160" width="20" height="24" rx="2" fill="#2A3B4C"/>
-      <rect x="1156" y="160" width="20" height="24" rx="2" fill="#2A3B4C"/>
-    </g>
-    <!-- ель -->
-    <path d="M1226 214 l15 -34 l15 34 z" fill="#23503F"/><rect x="1238" y="214" width="5" height="7" fill="#7A4A28"/>
-    <!-- дом 8 -->
-    <g>
-      <rect x="1270" y="126" width="104" height="86" fill="#F8F0E4"/>
-      <path d="M1258 126 L1322 82 L1386 126 Z" fill="#23503F"/>
-      <rect class="lit" x="1288" y="144" width="22" height="26" rx="2" fill="#F4C95D"/>
-      <rect class="lit" x="1326" y="144" width="22" height="26" rx="2" fill="#F4C95D"/>
-      <rect x="1284" y="144" width="4" height="26" fill="#D8B27A"/><rect x="1311" y="144" width="4" height="26" fill="#D8B27A"/>
-    </g>
-    <!-- снег -->
-    <path d="M0 212 Q 240 196 470 214 T 980 210 T 1440 206 L1440 260 L0 260 Z" fill="#EAF2F7"/>
-    <circle cx="120" cy="238" r="2.4" fill="#FFFFFF"/><circle cx="360" cy="244" r="2" fill="#FFFFFF"/>
-    <circle cx="700" cy="236" r="2.2" fill="#FFFFFF"/><circle cx="1040" cy="242" r="2" fill="#FFFFFF"/>
-  </svg>
+  <section class="below">
+    <div class="cards">
+      <div class="card">
+        <div class="k">📥 My files</div>
+        <h2 id="fcount"></h2>
+        <div class="files" id="files"></div>
+        <p class="note">Files stay here until 1 March — download them whenever you like.</p>
+      </div>
+      <div class="card">
+        <div class="k">🎁 For your bird</div>
+        <h2 id="bcount"></h2>
+        <div class="bonus" id="bonus"></div>
+        <div class="acts"><a class="pill" href="/ru/bird/#bp-room">🏠 To the bird's room</a><a class="pill ghost" href="/ru/bird/">🎒 Bag</a></div>
+        <p class="note">All 31 windows — the 🏅 “Collector” badge and +50 🔘</p>
+      </div>
+    </div>
+    <div class="legend">
+      <span><i style="background:#FFCC6E"></i>open — shutters are open</span>
+      <span><i style="background:linear-gradient(0deg,#B3222C 42%,#E9C46A 42% 58%,#B3222C 58%);box-shadow:0 0 0 2px #E9C46A,0 0 10px 2px rgba(255,190,90,.8)"></i>today</span>
+      <span><i style="background:linear-gradient(0deg,#B3222C 42%,#E9C46A 42% 58%,#B3222C 58%)"></i>with a ribbon — you can open it</span>
+      <span><i style="background:#4C6283"></i>frosted — not yet</span>
+      <span><i class="r" style="background:#4C6283;box-shadow:0 0 0 2px #C9A227"></i>round — special</span>
+    </div>
+  </section>
+
+  <div class="modal" id="modal" role="dialog" aria-modal="true"><div class="mcard"><div class="confetti" id="conf"></div><button class="x" aria-label="Закрыть">✕</button><div id="mbody"></div></div></div>
 </div>
-
-<section data-ppb="advent.3" class="adv" id="advent" aria-live="polite"></section>
-<script src="/assets/advent.js?v=98c51587" defer></script>
+<script src="/assets/advent.js?v=cdc6939a" defer></script>
 
 </main>
 <footer class="ft2"><div class="w">
@@ -233,7 +179,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>Стая</h4><a href="/ru/flock/" data-f>Все птички</a><a href="/ru/flock/news/" data-f>Новости стаи</a><a href="/ru/challenge/" data-f>Челлендж дня</a><a href="/ru/challenge/#sw-wall" data-f>Рисунки стаи</a><a href="/ru/requests/" data-f>Нарисуй мне</a><a href="/ru/garden/" data-f>Огород птички</a></div>
     <div><h4 data-f>Алина</h4><a href="/ru/sketchbook/" data-f>Скетчбук</a><a href="/ru/about-me/" data-f>Обо мне</a><a href="/ru/on-walls-and-pages/" data-f>На стенах и страницах</a><a href="/ru/projects/" data-f>Обучение и AI</a><a href="/ru/work-with-me/" data-f>Сотрудничество</a><a href="/ru/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="119">v119 · 20.11 21:26</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
+  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="120">v120 · 20.11 21:33</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
 </div></footer>
 </body>
 </html>

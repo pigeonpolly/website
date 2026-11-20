@@ -1,110 +1,299 @@
-﻿/* Адвент-календарь (/advent/): белая страница в снегу, красные дверцы, золото.
-   Классы те же, что в advent.js: adv-board, adv-win, adv-door, adv-modal, adv-card и т. д. */
-
-.adv-hero { position: relative; color: #1C2430; padding: clamp(30px, 5vw, 58px) 0 clamp(18px, 3vw, 28px);
-  background:
-    radial-gradient(circle at 85% 0%, rgba(233, 196, 106, .18) 0%, transparent 45%),
-    radial-gradient(circle at 10% 10%, rgba(158, 27, 34, .08) 0%, transparent 40%),
-    #FFFFFF; }
-.adv-hero::after { content: ''; position: absolute; inset: 0; pointer-events: none; opacity: .55;
-  background-image: radial-gradient(circle, rgba(120, 160, 190, .55) 1px, transparent 1.5px), radial-gradient(circle, rgba(120, 160, 190, .35) 1.2px, transparent 1.7px);
-  background-size: 58px 58px, 96px 96px; background-position: 0 0, 29px 19px; }
-.adv-hero .w { position: relative; z-index: 1; max-width: 1100px; margin: 0 auto; padding: 0 20px; }
-.adv-kick { font: 700 12px/1 Karla, sans-serif; letter-spacing: .18em; text-transform: uppercase; color: #9E1B22; margin: 0 0 14px; }
-.adv-hero h1 { font-family: Fraunces, Georgia, serif; font-weight: 700; font-size: clamp(38px, 6.6vw, 72px); line-height: 1.02; margin: 0 0 14px; color: #1C2430; }
-.adv-hero h1 em { font-style: italic; color: #9E1B22; }
-.adv-lead { font: 400 clamp(16px, 2vw, 19px)/1.55 Karla, sans-serif; max-width: 760px; margin: 0 0 10px; color: #3A4550; }
-.adv-note { font: 400 14px/1.5 Karla, sans-serif; max-width: 720px; margin: 0; color: #6B7884; }
-
-.adv { position: relative; padding: 0 20px 64px; max-width: 1100px; margin: 0 auto; background: #FFFFFF; }
-.adv > * { position: relative; }
-.adv-soon { text-align: center; margin: 0 0 18px; padding-top: 18px; display: grid; gap: 10px; justify-items: center; }
-.adv-soon p { margin: 0; font: 600 clamp(19px, 2.3vw, 25px)/1.25 Fraunces, serif; color: #1C2430; }
-.adv-soon small { opacity: .75; color: #5D6670; }
-.adv-cd { display: flex; gap: 12px; justify-content: center; flex-wrap: wrap; }
-.adv-cd span { display: grid; min-width: 76px; padding: 12px 8px; border-radius: 16px; background: #FFFFFF; color: #3A4550; box-shadow: inset 0 0 0 2px rgba(158, 27, 34, .35), 0 8px 20px rgba(28, 36, 48, .10); }
-.adv-cd b { font: 700 clamp(26px, 4vw, 38px)/1 Fraunces, serif; color: #9E1B22; }
-.adv-cd small { font-size: 13px; opacity: .85; }
-.adv-adm { margin: 0 0 14px; font-size: 14px; text-align: center; color: #9E1B22; }
-.adv-adm a { color: #1C2430; }
-
-.adv-board { position: relative; display: grid; grid-template-columns: repeat(7, minmax(0, 1fr)); gap: 12px; padding: 26px 22px 22px; border-radius: 24px;
-  background:
-    radial-gradient(circle at 50% -30%, rgba(233, 196, 106, .18), transparent 60%),
-    linear-gradient(180deg, #F7FAFC, #EAF0F4);
-  box-shadow: inset 0 0 0 1px #C6D4DE, inset 0 2px 0 #fff, 0 18px 40px rgba(28, 36, 48, .12); }
-.adv-win { position: relative; aspect-ratio: 1; border: 0; padding: 0; border-radius: 12px; background: #FFF7E8; cursor: pointer; perspective: 600px; overflow: visible; color: #14261F; font: inherit;
-  box-shadow: inset 0 0 0 1px rgba(20, 38, 31, .22), 0 3px 0 rgba(28, 36, 48, .12); }
-.adv-in { position: absolute; inset: 6px; border-radius: 8px; background: #FFFDF6; display: grid; place-items: center; overflow: hidden; }
-.adv-door { position: absolute; top: 6px; bottom: 6px; width: calc(50% - 6px);
-  background: repeating-linear-gradient(90deg, #B3222C 0 10px, #991A23 10px 20px);
-  transition: transform .65s cubic-bezier(.5, 0, .3, 1); box-shadow: inset 0 0 0 2px rgba(0, 0, 0, .18); }
-.adv-door.l { left: 6px; border-radius: 8px 0 0 8px; transform-origin: left center; }
-.adv-door.r { right: 6px; border-radius: 0 8px 8px 0; transform-origin: right center; }
-.adv-win b { position: absolute; inset: 0; display: grid; place-items: center; font: 700 clamp(20px, 2.6vw, 28px)/1 Fraunces, serif; color: #FFEFC9; text-shadow: 0 2px 0 rgba(0, 0, 0, .3); pointer-events: none; transition: opacity .3s; }
-.adv-win.sp .adv-door { background: repeating-linear-gradient(90deg, #D8A93E 0 10px, #BF8F27 10px 20px); }
-.adv-win.sp b { color: #3B2A10; text-shadow: 0 1px 0 rgba(255, 255, 255, .4); }
-.adv-win.leg { box-shadow: inset 0 0 0 2px #C9A227, 0 0 18px rgba(201, 162, 39, .4); }
-.adv-win.leg .adv-door { background: repeating-linear-gradient(135deg, #1B2634 0 8px, #2A3A4C 8px 16px); }
-.adv-win.leg b { color: #FFFFFF; }
-.adv-star { position: absolute; top: -8px; right: -6px; font-style: normal; font-size: 18px; color: #C9A227; text-shadow: 0 1px 3px rgba(0, 0, 0, .25); }
-.adv-n { position: absolute; bottom: -6px; left: -6px; min-width: 20px; padding: 1px 6px; border-radius: 10px; background: #C9A227; color: #3B2A10; font: 700 12px/18px Karla, sans-serif; font-style: normal; }
-.adv-win.lock { cursor: default; filter: saturate(.55) brightness(.99); opacity: .9; }
-.adv-win.ready { animation: adv-glow 2.4s ease-in-out infinite; }
-.adv-win.today { box-shadow: 0 0 0 3px #C9A227, 0 0 26px rgba(201, 162, 39, .45); }
-.adv-win.open .adv-door.l, .adv-win.opening .adv-door.l { transform: rotateY(-105deg); }
-.adv-win.open .adv-door.r, .adv-win.opening .adv-door.r { transform: rotateY(105deg); }
-.adv-win.open b, .adv-win.opening b { opacity: 0; }
-.adv-win.open::after { content: attr(data-d); position: absolute; left: 6px; top: 4px; font: 700 12px Karla, sans-serif; color: #8A97A3; }
-.adv-prize { display: grid; place-items: center; font-size: 24px; }
-.adv-win.shake { animation: adv-shake .4s; }
-@keyframes adv-glow { 50% { box-shadow: 0 0 0 2px rgba(201, 162, 39, .75), 0 0 22px rgba(201, 162, 39, .35); } }
-.adv-win.pulse { outline: 3px solid #C9A227; outline-offset: 3px; }
-@keyframes adv-shake { 25% { translate: -4px 0; } 75% { translate: 4px 0; } }
-
-.adv-modal { position: fixed; inset: 0; z-index: 9999; display: grid; place-items: center; padding: 16px; background: rgba(18, 24, 30, .55); }
-.adv-card { position: relative; width: min(430px, 100%); padding: 22px 22px 24px; border-radius: 22px; background: #FFFFFF; color: #1C2430; text-align: center; box-shadow: 0 0 0 2px #C9A227, 0 24px 60px rgba(0, 0, 0, .35); }
-.adv-modal.leg .adv-card { background: linear-gradient(160deg, #FFF9EC, #F6E9CC); }
-.adv-card h2 { margin: 4px 0 6px; font: 600 27px/1.15 Fraunces, serif; color: #1C2430; }
-.adv-card p { margin: 0 0 8px; }
-.adv-kick { color: #9E1B22; font-weight: 700; }
-.adv-leg { color: #8A6A12; font-weight: 700; }
-.adv-x { position: absolute; z-index: 3; top: 10px; right: 10px; width: 36px; height: 36px; border-radius: 50%; border: 0; background: rgba(28, 36, 48, .08); color: #1C2430; font-size: 16px; cursor: pointer; }
-.adv-stage { position: relative; height: 200px; pointer-events: none; display: grid; place-items: center; }
-.adv-bird { display: grid; justify-items: center; gap: 2px; transform: translate(var(--fx), var(--fy)) scale(.3); opacity: 0; }
-.adv-bird.fly { animation: adv-fly 1.1s cubic-bezier(.3, .7, .3, 1) forwards, adv-bob .5s ease-in-out 1.1s infinite alternate; }
-.adv-bird-c { image-rendering: pixelated; }
-.adv-bird .adv-prize { margin-top: -6px; }
-@keyframes adv-fly { 0% { transform: translate(var(--fx), var(--fy)) scale(.3); opacity: 0; } 15% { opacity: 1; } 60% { transform: translate(calc(var(--fx) * .3), calc(var(--fy) * .3 - 60px)) scale(.9); } 100% { transform: none; opacity: 1; } }
-@keyframes adv-bob { to { translate: 0 -8px; } }
-.adv-spark { position: absolute; left: 50%; top: 50%; width: 8px; height: 8px; background: #C9A227; opacity: 0; animation: adv-spark 1s ease-out forwards; }
-@keyframes adv-spark { 0% { opacity: 1; transform: rotate(var(--a)) translateX(0); } 100% { opacity: 0; transform: rotate(var(--a)) translateX(var(--d)); } }
-.adv-act { display: flex; flex-wrap: wrap; gap: 8px; justify-content: center; margin-top: 12px; }
-@media (max-width: 900px) { .adv-board { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
-@media (max-width: 620px) { .adv-board { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 20px 14px 14px; border-radius: 18px; } .adv-cd span { min-width: 62px; } .adv-win b { font-size: 18px; } }
-@media (prefers-reduced-motion: reduce) { .adv-bird.fly { animation: none; transform: none; opacity: 1; } .adv-win.ready { animation: none; } }
-
-.adv-msg { margin: 14px auto 0; max-width: 680px; text-align: center; font: 500 15px/1.5 Karla, sans-serif; color: #9E1B22; background: #FFF6E5; border: 1px solid rgba(158, 27, 34, .25); border-radius: 12px; padding: 10px 14px; }
-
-
-/* шапка по центру, под ней деревня: дома с окнами, где горит свет */
-.adv-hero { text-align: center; padding-bottom: 0; }
-.adv-hero .adv-kick, .adv-hero .adv-lead, .adv-hero .adv-note { margin-left: auto; margin-right: auto; }
-.adv-village { line-height: 0; background: #fff; margin-top: -8px; }
-.adv-village svg { display: block; width: 100%; height: clamp(150px, 22vw, 250px); }
-.adv-village .lit { animation: advFlicker 5.5s ease-in-out infinite; }
-.adv-village .adv-shadow { animation: advShadow 16s ease-in-out infinite alternate; }
-@keyframes advFlicker { 50% { opacity: .66; } }
-@keyframes advShadow { to { transform: translateX(22px); opacity: .55; } }
-.adv { padding-top: 10px; }
-
-
-
-.adv-small { font: 400 12px/1.4 Karla, sans-serif; color: #8A97A3; margin: 8px 0 0; }
-
-/* файл в окне */
-.adv-files { display: grid; gap: 14px; }
-.adv-file { margin: 0; display: grid; gap: 8px; justify-items: center; }
-.adv-file img { max-width: 100%; border-radius: 12px; display: block; }
-.adv-file figcaption { font: 400 14px/1.5 Karla, sans-serif; color: #3A4550; }
+/* Адвент-календарь: дизайн Алины (макет «Улица 31 окошка»), ограничен .advw */
+.advw{--night:#0F1B2D;--ink:#1C2430;--red:#9E1B22;--gold:#E9C46A;--gold2:#C9A227;--snow:#F3F7FA;--pine:#23503F;--frame:#F4EFE6;background:var(--night);color:#fff;font:400 16px/1.5 Karla,system-ui,sans-serif;overflow-x:hidden}
+.advw *{box-sizing:border-box}
+.advw{--night:#0F1B2D;--ink:#1C2430;--red:#9E1B22;--gold:#E9C46A;--gold2:#C9A227;--snow:#F3F7FA;--pine:#23503F;--frame:#F4EFE6}
+.advw, .advw *{box-sizing:border-box}
+.advw{margin:0;background:var(--night);color:#fff;font:400 16px/1.5 Karla,system-ui,sans-serif;overflow-x:hidden}
+.advw .mock{position:absolute;left:10px;top:10px;z-index:50;background:#fff;color:var(--red);font:700 11px/1 Karla;letter-spacing:.12em;text-transform:uppercase;padding:7px 10px;border-radius:99px;box-shadow:0 4px 14px rgba(0,0,0,.3)}
+.advw /* ===== небо ===== */
+.sky{position:relative;padding:60px 16px 0;text-align:center;overflow:hidden;
+  background:radial-gradient(ellipse at 50% 115%,#3A4E78 0%,transparent 60%),
+             radial-gradient(circle at 84% 14%,rgba(233,196,106,.2),transparent 28%),
+             linear-gradient(180deg,#0B1422 0%,#15233A 55%,#22355A 100%)}
+.advw .stars, .advw .snow{position:absolute;inset:0;pointer-events:none}
+.advw .stars i{position:absolute;width:2px;height:2px;background:#fff;border-radius:50%;opacity:.7;animation:aw-tw 3s infinite alternate}
+@keyframes aw-tw{to{opacity:.15}}
+.advw .moon{position:absolute;right:8%;top:40px;width:64px;height:64px;border-radius:50%;box-shadow:inset 16px -6px 0 0 #FFF4D6;filter:drop-shadow(0 0 22px rgba(255,228,160,.5))}
+.advw .snow i{position:absolute;top:-10px;border-radius:50%;background:#fff;animation:aw-fall linear infinite}
+@keyframes aw-fall{to{transform:translate3d(30px,110vh,0)}}
+.advw .head{position:relative;max-width:720px;margin:0 auto}
+.advw .kick{font:700 12px/1 Karla;letter-spacing:.2em;text-transform:uppercase;color:var(--gold);margin:0 0 14px}
+.advw h1{font:700 clamp(40px,7vw,80px)/1 Fraunces,Georgia,serif;margin:0 0 16px}
+.advw h1 em{color:var(--gold);font-style:italic;font-weight:500}
+.advw .lead{margin:0 auto;color:#C9D4E3;font-size:clamp(16px,2vw,18px);max-width:620px}
+.advw /* гирлянда-прогресс */
+.garland{position:relative;max-width:900px;margin:30px auto 0;height:40px}
+.advw .garland svg{position:absolute;left:0;top:0;width:100%;height:40px;overflow:visible}
+.advw .gcount{position:relative;margin:10px 0 0;color:#C9D4E3;font-size:14px}
+.advw .gcount strong{color:var(--gold);font:700 18px Fraunces}
+.advw /* ===== улица ===== */
+.street{position:relative;width:max-content;margin:50px auto 0;padding:0 12px;display:flex;align-items:flex-end;justify-content:center;z-index:2}
+.advw .house{position:relative;display:flex;flex-direction:column;align-items:center;flex:none;width:max-content}
+.advw .house .facade{width:auto;min-width:100%}
+.advw .house.church{width:250px}
+.advw .roof{position:relative;width:100%}
+.advw .roof>svg{display:block;width:100%;height:auto;overflow:visible}
+.advw .attic{position:absolute;left:50%;transform:translateX(-50%)}
+.advw .facade{position:relative;width:100%;background-color:var(--c);padding:30px 16px 0;display:grid;gap:30px;
+  background-image:
+    linear-gradient(90deg,rgba(255,255,255,.07) 0 6px,transparent 6px calc(100% - 6px),rgba(0,0,0,.1) calc(100% - 6px)),
+    radial-gradient(circle at 20% 30%,rgba(255,255,255,.05) 0 2px,transparent 3px),
+    radial-gradient(circle at 70% 60%,rgba(0,0,0,.05) 0 2px,transparent 3px),
+    linear-gradient(180deg,transparent 70%,rgba(0,0,0,.12));
+  background-size:auto,14px 14px,18px 18px,auto}
+.advw /* сосульки под крышей */
+.facade::before{content:'';position:absolute;top:0;left:4px;right:4px;height:12px;
+  background:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='22' height='12'%3E%3Cpath d='M0 0h22v2l-3 10-3-10-3 6-3-6-4 8-3-8z' fill='%23EAF3FA'/%3E%3C/svg%3E") repeat-x}
+.advw /* карниз между этажами */
+.row, .advw .ground{position:relative;display:flex;justify-content:center;gap:26px}
+.advw .row::after{content:'';position:absolute;left:-16px;right:-16px;bottom:-17px;height:4px;background:rgba(0,0,0,.1);box-shadow:0 -2px 0 rgba(255,255,255,.12)}
+.advw .ground{align-items:flex-end}
+.advw .door{position:relative;flex:none;width:46px;height:76px;border-radius:24px 24px 0 0;background:repeating-linear-gradient(90deg,#6A3F27 0 9px,#5A3420 9px 11px);box-shadow:inset 0 0 0 4px #3E2214,0 0 0 4px var(--frame)}
+.advw .door::after{content:'';position:absolute;right:9px;top:44px;width:5px;height:5px;border-radius:50%;background:var(--gold)}
+.advw .door i{position:absolute;left:50%;top:10px;transform:translateX(-50%);width:24px;height:24px;border-radius:50%;border:5px solid #2C5F4B}
+.advw .door i::after{content:'';position:absolute;left:50%;bottom:-7px;transform:translateX(-50%);width:8px;height:6px;background:var(--red);border-radius:2px}
+.advw .step{position:absolute;bottom:0;left:-8px;right:-8px;height:5px;background:#fff}
+.advw /* окошко */
+.win{--w:60px;position:relative;flex:none;width:var(--w);aspect-ratio:3/4;border:0;padding:0;cursor:pointer;border-radius:30px 30px 3px 3px;
+  background:none;box-shadow:0 0 0 5px var(--frame),0 0 0 7px rgba(0,0,0,.2);font:inherit;color:var(--ink);perspective:300px;transition:transform .2s}
+.advw .win:hover{transform:translateY(-2px)}
+.advw .win:focus-visible{outline:3px solid var(--gold);outline-offset:10px}
+.advw .glass{position:absolute;inset:0;border-radius:inherit;overflow:hidden;display:grid;place-items:center;background:linear-gradient(160deg,#3A5174,#22334F)}
+.advw /* переплёт */
+.glass::before{content:'';position:absolute;inset:0;z-index:2;background:linear-gradient(90deg,transparent calc(50% - 2px),var(--frame) calc(50% - 2px) calc(50% + 2px),transparent calc(50% + 2px)),linear-gradient(0deg,transparent 56%,var(--frame) 56% calc(56% + 4px),transparent calc(56% + 4px))}
+.advw /* иней на будущих */
+.lock .glass::after{content:'';position:absolute;inset:0;opacity:.75;
+  background:radial-gradient(circle at 20% 30%,rgba(255,255,255,.4) 0 1.5px,transparent 2.5px),radial-gradient(circle at 70% 70%,rgba(255,255,255,.3) 0 1.5px,transparent 2.5px),linear-gradient(200deg,rgba(255,255,255,.18),transparent 45%);
+  background-size:16px 16px,22px 22px,auto}
+.advw /* подоконник со снегом */
+.sill{position:absolute;left:-10px;right:-10px;bottom:-11px;height:7px;background:#D9D2C4;border-radius:2px;z-index:3}
+.advw .sill::before{content:'';position:absolute;left:1px;right:1px;top:-5px;height:7px;background:#fff;border-radius:6px 6px 2px 2px}
+.advw /* номер — на табличке-замковом камне над окном, .advw никогда не на стекле */
+.key{position:absolute;z-index:4;left:50%;top:-21px;transform:translateX(-50%);min-width:30px;height:22px;padding:0 6px;border-radius:7px;
+  background:var(--frame);color:var(--ink);font:700 13px/22px Fraunces,serif;text-align:center;box-shadow:0 2px 0 rgba(0,0,0,.18)}
+.advw /* открыто: занавески раздвинуты, .advw тёплый свет, .advw подарок */
+.open .glass{background:radial-gradient(circle at 50% 72%,#FFF0BF 0%,#FFCC6E 55%,#E39A3B 100%)}
+.advw .open .glass::before{display:none}
+.advw .open .glass::after{content:'';position:absolute;inset:0;z-index:1;pointer-events:none;
+  background:linear-gradient(100deg,#B3222C 0 14%,transparent 14%),linear-gradient(260deg,#B3222C 0 14%,transparent 14%);
+  clip-path:polygon(0 0,100% 0,100% 100%,0 100%)}
+.advw .open{box-shadow:0 0 0 5px var(--frame),0 0 0 7px rgba(0,0,0,.2),0 0 30px 6px rgba(255,200,103,.45)}
+.advw .gift{position:relative;z-index:2;font-size:24px;line-height:1;margin-top:8px}
+.advw /* сегодня: свеча и мягкое мерцание */
+.today .glass{background:radial-gradient(circle at 50% 78%,#FFF1C2 0%,#FFB648 42%,#7E3219 100%);animation:aw-flick 1.6s infinite alternate}
+.advw .today{box-shadow:0 0 0 5px var(--gold),0 0 0 7px rgba(0,0,0,.2),0 0 46px 14px rgba(255,190,90,.55)}
+.advw .today .key{background:var(--gold)}
+@keyframes aw-flick{40%{filter:brightness(1.15)}70%{filter:brightness(.92)}100%{filter:brightness(1.08)}}
+.advw .candle{position:absolute;z-index:1;bottom:10%;left:50%;transform:translateX(-50%);width:8px;height:18px;background:#FFFDF6;border-radius:2px}
+.advw .candle::before{content:'';position:absolute;left:50%;top:-12px;width:8px;height:12px;transform:translateX(-50%);background:radial-gradient(ellipse at 50% 70%,#fff 0 20%,#FFD36B 40%,#FF8A2A 70%,transparent 72%);border-radius:50% 50% 45% 45%;animation:aw-flame .25s infinite alternate}
+@keyframes aw-flame{to{transform:translateX(-50%) scaleY(1.15) rotate(3deg)}}
+.advw /* пропущено, .advw но можно забрать: шторы задёрнуты, .advw табличка розовая */
+.ready .glass{background:linear-gradient(160deg,#FFD9A8,#E8A25A)}
+.advw .ready .glass::after{content:'';position:absolute;inset:0;z-index:1;background:repeating-linear-gradient(90deg,#B3222C 0 5px,#991A23 5px 10px)}
+.advw .ready{box-shadow:0 0 0 5px var(--frame),0 0 0 7px rgba(0,0,0,.2),0 0 20px 4px rgba(255,160,120,.45)}
+.advw .ready .key{background:#FF9C8C}
+.advw /* особые — круглые мансардные */
+.win.sp{--w:62px;aspect-ratio:1;border-radius:50%;box-shadow:0 0 0 6px var(--gold2),0 0 0 9px rgba(0,0,0,.22)}
+.advw .sp .glass::before{background:radial-gradient(circle,transparent 0 28%,var(--gold2) 28% calc(28% + 3px),transparent calc(28% + 3px)),linear-gradient(90deg,transparent calc(50% - 1.5px),var(--gold2) calc(50% - 1.5px) calc(50% + 1.5px),transparent calc(50% + 1.5px)),linear-gradient(0deg,transparent calc(50% - 1.5px),var(--gold2) calc(50% - 1.5px) calc(50% + 1.5px),transparent calc(50% + 1.5px))}
+.advw .sp .key{top:auto;bottom:-24px;background:var(--gold);}
+.advw .sp .sill{display:none}
+.advw /* 24 — дверь собора */
+.win.d24{--w:96px;aspect-ratio:2/3;border-radius:48px 48px 0 0;box-shadow:0 0 0 7px var(--gold2),0 0 0 11px #4A2A18}
+.advw .d24 .glass{background:repeating-linear-gradient(90deg,#8E1A22 0 11px,#761219 11px 13px)}
+.advw .d24 .glass::before{background:linear-gradient(90deg,transparent calc(50% - 1.5px),var(--gold2) calc(50% - 1.5px) calc(50% + 1.5px),transparent calc(50% + 1.5px))}
+.advw .d24 .key{top:-34px;background:var(--gold);font-size:15px}
+.advw .d24 .sill{display:none}
+.advw .wreath{position:absolute;z-index:3;top:20%;left:50%;transform:translateX(-50%);width:40px;height:40px;border-radius:50%;
+  background:radial-gradient(circle,transparent 0 11px,#2C5F4B 12px 20px,transparent 20px);}
+.advw .wreath::before{content:'';position:absolute;inset:0;background:radial-gradient(circle at 30% 20%,#D33 0 2.5px,transparent 3px),radial-gradient(circle at 78% 34%,#D33 0 2.5px,transparent 3px),radial-gradient(circle at 60% 88%,#D33 0 2.5px,transparent 3px),radial-gradient(circle at 12% 66%,#D33 0 2.5px,transparent 3px)}
+.advw .wreath::after{content:'';position:absolute;bottom:-6px;left:50%;transform:translateX(-50%);width:12px;height:9px;background:var(--red);clip-path:polygon(0 0,100% 0,70% 50%,100% 100%,50% 70%,0 100%,30% 50%)}
+.advw .d24.open .glass{background:radial-gradient(circle at 50% 70%,#FFF0BF,#E39A3B)}
+.advw /* 31 — круглое окно башни, .advw над ним золотой петушок */
+.win.d31{--w:76px;aspect-ratio:1;border-radius:50%;box-shadow:0 0 0 6px var(--gold),0 0 0 10px #0B0E14,0 0 40px 10px rgba(233,196,106,.3)}
+.advw .d31 .glass{background:radial-gradient(circle,#2A2F3A,#0B0E14)}
+.advw .d31 .glass::before{background:conic-gradient(from 0deg,transparent 0 5%,rgba(233,196,106,.5) 5% 5.6%,transparent 5.6% 30%,rgba(233,196,106,.5) 30% 30.6%,transparent 30.6% 55%,rgba(233,196,106,.5) 55% 55.6%,transparent 55.6% 80%,rgba(233,196,106,.5) 80% 80.6%,transparent 80.6%);border-radius:50%}
+.advw .d31 .key{top:auto;bottom:-26px;background:var(--gold)}
+.advw .d31 .sill{display:none}
+.advw /* ставни: распахиваются при открытии */
+/* ===== ставни: закрытое окошко = закрытые ставни, .advw сразу видно, .advw что его открывают =====
+   открытое окошко — ставни распахнуты и лежат по бокам на стене */
+.sh{position:absolute;top:0;bottom:0;width:50%;z-index:5;pointer-events:none;
+  background:linear-gradient(90deg,rgba(0,0,0,.18),transparent 30%),repeating-linear-gradient(0deg,var(--shc,#2E5A4B) 0 6px,var(--shd,#24493D) 6px 8px);
+  box-shadow:inset 0 0 0 2px rgba(0,0,0,.28);transition:transform .8s cubic-bezier(.3,1.25,.5,1)}
+.advw .sh.l{left:0;transform-origin:left center;border-radius:30px 0 0 3px}
+.advw .sh.r{right:0;transform-origin:right center;border-radius:0 30px 3px 0;background:linear-gradient(270deg,rgba(0,0,0,.18),transparent 30%),repeating-linear-gradient(0deg,var(--shc,#2E5A4B) 0 6px,var(--shd,#24493D) 6px 8px)}
+.advw /* ручки-кольца */
+.sh.l::after, .advw .sh.r::after{content:'';position:absolute;top:58%;width:7px;height:7px;border-radius:50%;border:2px solid var(--gold);box-sizing:border-box}
+.advw .sh.l::after{right:3px}
+.advw .sh.r::after{left:3px}
+.advw .sp .sh.l, .advw .d31 .sh.l{border-radius:999px 0 0 999px}
+.advw .sp .sh.r, .advw .d31 .sh.r{border-radius:0 999px 999px 0}
+.advw /* распахнутые: тонкие ставни на стене по бокам */
+.open .sh.l, .advw .opening .sh.l{transform:rotateY(-180deg) scaleX(.3)}
+.advw .open .sh.r, .advw .opening .sh.r{transform:rotateY(180deg) scaleX(.3)}
+.advw .open .sh.l::after, .advw .open .sh.r::after, .advw .opening .sh::after{display:none}
+.advw .d24 .sh{display:none}
+.advw /* будущее: ставни в инее, .advw с замочком */
+.lock{--shc:#4C6283;--shd:#3F5473}
+.advw .lock .sh::before{content:'';position:absolute;inset:0;border-radius:inherit;background:radial-gradient(circle at 30% 20%,rgba(255,255,255,.45) 0 1.5px,transparent 2.5px),radial-gradient(circle at 70% 70%,rgba(255,255,255,.35) 0 1.5px,transparent 2.5px);background-size:12px 12px,16px 16px}
+.advw .lock .sh.l::after, .advw .lock .sh.r::after{border-color:#9FB0C8}
+.advw .lock .bow{display:none}
+.advw /* сегодня и пропущенные: красные ставни, .advw золотая лента с бантиком — подарок, .advw который ждёт */
+.today, .advw .ready{--shc:#B3222C;--shd:#991A23}
+.advw .today .sh{width:calc(50% - 1px)}
+.advw .bow{position:absolute;z-index:6;inset:0;pointer-events:none;border-radius:inherit;overflow:visible}
+.advw .bow::before{content:'';position:absolute;inset:0;border-radius:inherit;background:linear-gradient(0deg,transparent 47%,var(--gold) 47% 57%,transparent 57%)}
+.advw .bow i{position:absolute;left:50%;top:52%;width:30px;height:18px;transform:translate(-50%,-50%)}
+.advw .bow i::before, .advw .bow i::after{content:'';position:absolute;top:0;width:15px;height:16px;background:var(--gold);border:2px solid #A8831A;box-sizing:border-box}
+.advw .bow i::before{left:0;border-radius:50% 10% 10% 50%;transform:rotate(-12deg)}
+.advw .bow i::after{right:0;border-radius:10% 50% 50% 10%;transform:rotate(12deg)}
+.advw .bow i b{position:absolute;left:50%;top:3px;width:8px;height:10px;transform:translateX(-50%);background:#F4D78A;border:2px solid #A8831A;border-radius:3px;z-index:1}
+.advw .open .bow, .advw .opening .bow{display:none}
+.advw .sp .bow i, .advw .d31 .bow i{top:50%}
+.advw /* сегодня: ставни подрагивают, .advw из щели пробивается свет; при наведении — чуть приоткрываются */
+.today .sh.l{animation:aw-peekL 3.2s ease-in-out infinite}
+.advw .today .sh.r{animation:aw-peekR 3.2s ease-in-out infinite}
+@keyframes aw-peekL{0%,70%,100%{transform:none}80%{transform:rotateY(-24deg)}90%{transform:rotateY(-8deg)}}
+@keyframes aw-peekR{0%,70%,100%{transform:none}80%{transform:rotateY(24deg)}90%{transform:rotateY(8deg)}}
+.advw .opening .sh{animation:none!important}
+.advw .ready:hover .sh.l, .advw .today:hover .sh.l{transform:rotateY(-30deg)}
+.advw .ready:hover .sh.r, .advw .today:hover .sh.r{transform:rotateY(30deg)}
+.advw .lock:hover .sh.l{transform:rotateY(-6deg)}
+.advw .lock:hover .sh.r{transform:rotateY(6deg)}
+.advw .win:not(.lock){cursor:pointer}
+.advw .win.lock{cursor:help}
+.advw /* дверь 24 закрыта: лента и бант прямо на двери */
+.d24:not(.open) .bow::before{background:linear-gradient(0deg,transparent 60%,var(--gold) 60% 66%,transparent 66%)}
+.advw .d24 .bow i{top:63%}
+@keyframes aw-rattle{20%,60%{transform:translateX(-3px)}40%,80%{transform:translateX(3px)}}
+.advw .rattle{animation:aw-rattle .4s}
+.advw /* подсказка над улицей */
+.hint{position:relative;display:inline-flex;align-items:center;gap:10px;margin:14px 0 0;padding:8px 14px;border-radius:99px;background:rgba(255,255,255,.08);color:#E8EEF6;font-size:14px}
+.advw .hint .mini{position:relative;width:20px;height:26px;border-radius:10px 10px 2px 2px;overflow:hidden;flex:none;box-shadow:0 0 0 2px var(--frame)}
+.advw .hint .mini::before, .advw .hint .mini::after{content:'';position:absolute;top:0;bottom:0;width:50%;background:#B3222C}
+.advw .hint .mini::before{left:0;animation:aw-peekL 3.2s ease-in-out infinite;transform-origin:left}
+.advw .hint .mini::after{right:0;animation:aw-peekR 3.2s ease-in-out infinite;transform-origin:right}
+.advw .hint .mini i{position:absolute;left:0;right:0;top:46%;height:3px;background:var(--gold);z-index:1}
+.advw /* ===== файлы в окошках ===== */
+.fpic{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;filter:saturate(1.05)}
+.advw .open .fpic~.gift{display:none}
+.advw .fbadge{position:absolute;z-index:3;right:3px;bottom:3px;font:700 8px/1 Karla;letter-spacing:.06em;background:#fff;color:var(--ink);padding:3px 4px;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.advw /* карточка файла в окне подарка */
+.file{display:grid;justify-items:center;gap:10px;margin:8px 0 4px}
+.advw .prev{position:relative;animation:aw-fly .9s ease-out}
+.advw .prev img{display:block}
+.advw .prev-phone{width:128px;padding:7px;border-radius:24px;background:#1C2430;box-shadow:0 18px 36px rgba(28,36,48,.28)}
+.advw .prev-phone img{width:100%;aspect-ratio:9/19.5;object-fit:cover;border-radius:18px}
+.advw .prev-phone::before{content:'';position:absolute;left:50%;top:12px;transform:translateX(-50%);width:34px;height:8px;border-radius:6px;background:#1C2430;z-index:1}
+.advw .prev-paper{width:200px;background:#fff;padding:10px;box-shadow:0 1px 0 #E3E8EE,0 16px 32px rgba(28,36,48,.22);clip-path:polygon(0 0,calc(100% - 22px) 0,100% 22px,100% 100%,0 100%);transform:rotate(-2deg)}
+.advw .prev-paper::before{content:'';position:absolute;inset:0;background:#fff;transform:translate(8px,6px) rotate(4deg);box-shadow:0 8px 20px rgba(28,36,48,.15);z-index:-1}
+.advw .prev-paper::after{content:'';position:absolute;right:0;top:0;width:22px;height:22px;background:linear-gradient(225deg,transparent 50%,#E3E8EE 50%)}
+.advw .prev-paper img{width:100%;height:auto}
+.advw .prev-paper.tall{width:150px}
+.advw .fmt{display:inline-block;font:700 11px/1 Karla;letter-spacing:.12em;padding:5px 8px;border-radius:6px;background:#FDECEA;color:var(--red)}
+.advw .fmt.img{background:#E8F1EC;color:#2C5F4B}
+.advw .fname{font:700 22px/1.2 Fraunces;margin:2px 0 0}
+.advw .fmeta{font-size:14px;color:#6B7884}
+.advw .more{margin:18px 0 0;padding-top:14px;border-top:1px dashed #DCE5EC;text-align:left}
+.advw .more .k{display:block;margin-bottom:8px}
+.advw .item{display:grid;grid-template-columns:52px 1fr auto;gap:12px;align-items:center;padding:8px;border-radius:14px;background:#F7FAFC}
+.advw .item+.item{margin-top:8px}
+.advw .item .th{width:52px;height:52px;border-radius:10px;background:#FFF4D6;display:grid;place-items:center;font-size:28px;overflow:hidden}
+.advw .item .th img{width:100%;height:100%;object-fit:cover}
+.advw .item b{display:block;font:700 15px/1.25 Fraunces}
+.advw .item small{color:#6B7884;font-size:13px}
+.advw .item .mini-btn{border:0;background:#fff;box-shadow:inset 0 0 0 1.5px #DCE5EC;border-radius:99px;padding:7px 10px;font:700 12px Karla;color:var(--red);white-space:nowrap;text-decoration:none}
+.advw /* дым из труб */
+.smoke{position:absolute;width:12px;height:12px;border-radius:50%;background:rgba(220,230,240,.35);animation:aw-smoke 4s ease-out infinite}
+@keyframes aw-smoke{0%{transform:translate(0,0) scale(.6);opacity:0}20%{opacity:.8}100%{transform:translate(18px,-60px) scale(2.2);opacity:0}}
+.advw /* фонари и ели — между домами, .advw не поверх */
+.prop{position:relative;flex:none;align-self:flex-end}
+.advw .lamp{width:36px;height:140px}
+.advw .lamp::before{content:'';position:absolute;left:15px;bottom:0;width:6px;height:120px;background:#1B2430;border-radius:2px}
+.advw .lamp b{position:absolute;left:6px;top:0;width:24px;height:22px;background:#FFE3A0;border:3px solid #1B2430;border-radius:4px 4px 2px 2px;box-shadow:0 0 30px 12px rgba(255,215,122,.35)}
+.advw .lamp b::before{content:'';position:absolute;left:-6px;right:-6px;top:-9px;height:7px;background:#1B2430;border-radius:4px 4px 0 0}
+.advw .lamp b::after{content:'';position:absolute;left:-7px;right:-7px;top:-14px;height:6px;background:#fff;border-radius:6px}
+.advw .fir{width:70px;height:120px}
+.advw .fir svg{position:absolute;inset:0;width:100%;height:100%}
+.advw .ground-snow{position:relative;z-index:3;margin-top:-8px;height:80px;background:var(--snow);border-radius:50% 50% 0 0/24px 24px 0 0}
+.advw .ground-snow::before{content:'';position:absolute;left:12%;right:12%;top:26px;height:12px;opacity:.5;
+  background:radial-gradient(ellipse at 50% 50%,#C9D6E2 0 3px,transparent 4px) 0 0/34px 12px repeat-x}
+.advw /* ===== под улицей ===== */
+.below{background:var(--snow);color:var(--ink);padding:0 16px 70px}
+.advw .cards{max-width:1100px;margin:0 auto;display:grid;grid-template-columns:1.25fr 1fr;gap:22px;align-items:start}
+.advw .card{background:#fff;border-radius:22px;padding:24px;box-shadow:0 1px 0 #DCE5EC,0 14px 34px rgba(28,36,48,.08);min-width:0}
+.advw .card h2{font:700 24px/1.2 Fraunces;margin:6px 0 10px;overflow-wrap:anywhere}
+.advw .k{font:700 11px/1.3 Karla;letter-spacing:.16em;text-transform:uppercase;color:var(--red)}
+.advw .prompt{display:grid;grid-template-columns:120px 1fr;gap:20px;align-items:start}
+.advw .prompt .pic{width:120px;height:120px;border-radius:16px;background:#FBF7F0;box-shadow:inset 0 0 0 2px #EADBC3;display:grid;place-items:center;font-size:62px}
+.advw .prompt p{margin:0;color:#4A5663}
+.advw .acts{display:flex;flex-wrap:wrap;gap:10px;margin-top:14px}
+.advw .pill{display:inline-flex;align-items:center;gap:6px;background:var(--red);color:#fff;border-radius:99px;padding:10px 18px;font:700 14px/1.2 Karla;text-decoration:none;border:0;cursor:pointer;white-space:nowrap}
+.advw .pill.ghost{background:#fff;color:var(--red);box-shadow:inset 0 0 0 2px var(--red)}
+.advw .note{margin:12px 0 0;font-size:14px;color:#6B7884}
+.advw .legend{max-width:1100px;margin:24px auto 0;display:flex;flex-wrap:wrap;gap:10px 24px;justify-content:center;font-size:14px;color:#4A5663}
+.advw .legend span{display:inline-flex;align-items:center;gap:8px;white-space:nowrap}
+.advw .legend i{flex:none;width:14px;height:18px;border-radius:7px 7px 2px 2px;box-shadow:0 0 0 2px var(--frame),0 0 0 3px #CBD5DE}
+.advw .legend .r{border-radius:50%;height:14px}
+.advw /* мои файлы */
+.files{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;margin-top:12px}
+.advw .fcard{display:grid;grid-template-rows:auto 1fr auto;gap:6px;padding:8px;border-radius:14px;background:#F7FAFC;box-shadow:inset 0 0 0 1.5px #E3E8EE;min-width:0}
+.advw .fcard .th{position:relative;aspect-ratio:4/3;border-radius:10px;overflow:hidden;background:#fff}
+.advw .fcard .th img{width:100%;height:100%;object-fit:cover}
+.advw .fcard .th .fbadge{font-size:9px}
+.advw .fcard b{font:700 14px/1.25 Fraunces;overflow-wrap:anywhere}
+.advw .fcard small{color:#6B7884;font-size:12px;line-height:1.3}
+.advw .fcard a{justify-self:start;display:inline-flex;align-items:center;gap:4px;font:700 13px Karla;color:var(--red);text-decoration:none;padding:6px 10px;border-radius:99px;background:#fff;box-shadow:inset 0 0 0 1.5px #E3C9C9}
+.advw .fcard.wait{place-items:center;text-align:center;color:#9AA7B4;font-size:13px;background:repeating-linear-gradient(135deg,#F7FAFC 0 8px,#F1F5F8 8px 16px);grid-template-rows:1fr;min-height:150px}
+.advw .fcard.wait.miss{color:var(--red);background:#FFF4F2;box-shadow:inset 0 0 0 1.5px #F5C9C2;cursor:pointer;border:0;font:inherit}
+.advw .bonus{display:flex;flex-wrap:wrap;gap:10px;margin:12px 0 4px}
+.advw .bonus span{width:52px;height:52px;border-radius:14px;display:grid;place-items:center;font-size:28px;background:#FFF4D6;box-shadow:inset 0 0 0 1.5px var(--gold)}
+.advw .bonus span.no{background:#F7FAFC;box-shadow:inset 0 0 0 1.5px #DCE5EC;font:700 11px Karla;color:#9AA7B4}
+.advw /* тема для рисования — внизу, .advw лёгкая */
+.fun{max-width:1100px;margin:30px auto 0;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;padding:16px 20px;border-radius:18px;border:1.5px dashed #CBD5DE;background:transparent}
+.advw .fun-ic{font-size:36px}
+.advw .fun p{margin:4px 0 0;color:#4A5663}
+.advw /* окно подарка */
+.modal{position:fixed;inset:0;z-index:40;background:rgba(9,15,26,.72);display:none;place-items:center;padding:16px;backdrop-filter:blur(3px)}
+.advw .modal.on{display:grid}
+.advw .mcard{position:relative;width:min(440px,100%);max-height:calc(100vh - 32px);overflow-y:auto;background:#fff;color:var(--ink);border-radius:26px;padding:34px 26px 26px;text-align:center;box-shadow:0 30px 80px rgba(0,0,0,.5);animation:aw-pop .5s cubic-bezier(.3,1.5,.5,1)}
+@keyframes aw-pop{from{transform:scale(.7) translateY(30px);opacity:0}}
+.advw .mcard .big{font-size:84px;line-height:1;margin:10px 0 8px;animation:aw-fly 1s ease-out}
+@keyframes aw-fly{from{transform:translateY(60px) scale(.4) rotate(-20deg);opacity:0}}
+.advw .mcard h3{font:700 26px/1.2 Fraunces;margin:4px 0 6px}
+.advw .mcard p{margin:6px 0;color:#4A5663}
+.advw .mcard .x{position:absolute;top:12px;right:14px;border:0;background:none;font-size:20px;cursor:pointer;color:#8A96A3;width:36px;height:36px}
+.advw .confetti{position:absolute;inset:0;pointer-events:none;z-index:0}
+.advw #mbody{position:relative;z-index:1}
+.advw .confetti i{position:absolute;top:-12px;width:8px;height:12px;border-radius:2px;animation:aw-conf 1.6s ease-out forwards}
+@keyframes aw-conf{to{transform:translateY(460px) rotate(540deg);opacity:0}}
+.advw /* ===== телефон ===== */
+@media (max-width:760px){
+  .advw .sky{padding-top:64px}
+  .advw .moon{width:40px;height:40px;top:14px;right:16px;box-shadow:inset 10px -4px 0 0 #FFF4D6}
+  .advw .garland{margin-top:22px}
+  .advw .street{flex-wrap:wrap;padding:0;margin-top:130px;align-items:flex-end;width:auto}
+  .advw .prop{display:none}
+  .advw .house{width:50%!important;border-bottom:8px solid #fff;margin-bottom:34px}
+  .advw .house .facade{padding-left:6px;padding-right:6px}
+  .advw .house.church{order:-1;width:100%!important}
+  .advw .house.church .facade{width:64%;margin:0 auto}
+  .advw .win{--w:44px}
+  .advw .win.sp{--w:50px}
+  .advw .row,.ground{gap:14px}
+  .advw .facade{padding:28px 8px 0;gap:30px}
+  .advw .row::after{left:-8px;right:-8px}
+  .advw .door{width:32px;height:56px}
+  .advw .door::after{top:34px;right:6px}
+  .advw .door i{width:18px;height:18px;border-width:4px}
+  .advw .gift{font-size:20px}
+  .advw .key{font-size:12px;min-width:26px;height:20px;line-height:20px;top:-19px}
+  .advw .cards{grid-template-columns:1fr}
+  .advw .prompt{grid-template-columns:1fr}
+  .advw .prompt .pic{width:100%;height:110px}
+  .advw .card{padding:20px}
+  .advw .files{grid-template-columns:1fr 1fr}
+  .advw .fun{grid-template-columns:1fr;justify-items:start}
+  .advw .fun-ic{display:none}
+}
 

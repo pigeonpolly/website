@@ -1,230 +1,226 @@
-﻿// Адвент-календарь (/advent/, вкладка в «Играх»): до 1 декабря — обратный отсчёт; 1–31 декабря вошедший открывает окошки
-// (сегодняшнее и пропущенные), из окошка вылетает птичка с подарком в клюве — вещь сразу в сумке. Что в каком окошке — Алина
-// отмечает в «Коллекциях» на странице стаи (кнопка 📅 у вещи). Сервер: /api/advent, /api/advent/open (worker/index.js).
+// Адвент «Улица 31 окошка» (/advent/): дизайн Алины, данные — /api/advent.
 (() => {
-  const app = document.getElementById('advent');
+  const app = document.getElementById('advw');
   if (!app) return;
-  const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, pre = ['', '/ru', '/lv'][L], LG = ['en', 'ru', 'lv'][L];
+  const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, LG = ['en', 'ru', 'lv'][L];
   const T = {
-    soon: ['The calendar opens on December 1', 'Календарь откроется 1 декабря', 'Kalendārs atvērsies 1. decembrī'],
-    units: [['days', 'hours', 'min', 'sec'], ['дней', 'часов', 'минут', 'секунд'], ['dienas', 'stundas', 'min', 'sek']],
-    login: ['Sign in to open the windows and collect gifts', 'Войдите, чтобы открывать окошки и собирать подарки', 'Ienāc, lai atvērtu lodziņus un vāktu dāvanas'],
-    signin: ['Sign in', 'Войти', 'Ienākt'],
-    today: ['Today’s window is waiting!', 'Сегодняшнее окошко ждёт!', 'Šodienas lodziņš gaida!'],
-    missed: ['See you tomorrow! Missed a day? You can open missed windows until 1 March — except 24 and 31 December.', 'До завтра! Пропустили день? Пропущенные окошки можно открыть до 1 марта — кроме 24 и 31 декабря.', 'Līdz rītam! Izlaidi dienu? Izlaistos lodziņus var atvērt līdz 1. martam — izņemot 24. un 31. decembri.'],
-    catchUp: ['Didn’t make it in December? Until 1 March you can still open the windows you missed — except 24 and 31.', 'Не успели в декабре? До 1 марта ещё можно открыть пропущенные окошки — кроме 24 и 31 декабря.', 'Nepaguvi decembrī? Līdz 1. martam vēl var atvērt izlaistos lodziņus — izņemot 24. un 31. decembri.'],
-    was: ['This window held:', 'В этом окошке было:', 'Šajā lodziņā bija:'], wasBtns: ['This window held buttons 🔘', 'В этом окошке были пуговки 🔘', 'Šajā lodziņā bija pogas 🔘'],
-    youGot: ['✓ You got it', '✓ Ты это получил(а)', '✓ Tu to saņēmi'], missedIt: ['This day has passed: its window can no longer be opened.', 'Этот день прошёл: окошко больше не открыть.', 'Šī diena ir pagājusi: lodziņu vairs nevar atvērt.'],
-    todayOnly: ['Missed windows can be opened until 1 March.', 'Пропущенные окошки можно открыть до 1 марта.', 'Izlaistos lodziņus var atvērt līdz 1. martam.'],
-    tooLate: ['Too late: missed windows could be opened until 1 March.', 'Уже поздно: пропущенные окошки можно было открыть до 1 марта.', 'Par vēlu: izlaistos lodziņus varēja atvērt līdz 1. martam.'],
-    locked: ['Not yet! This window opens on December {d}.', 'Ещё рано! Это окошко откроется {d} декабря.', 'Vēl par agru! Šis lodziņš atvērsies {d}. decembrī.'],
-    got: ['A gift for you:', 'Тебе подарок:', 'Dāvana tev:'],
-    inBag: ['It is already in your bag 🎒', 'Он уже у тебя в сумке 🎒', 'Tā jau ir tavā somā 🎒'],
-    btns: ['+{n} 🔘 buttons!', '+{n} 🔘 пуговок!', '+{n} 🔘 pogas!'],
-    btnsWhy: ['This window had buttons inside. Spend them at the market.', 'В этом окошке были пуговки. Их можно потратить на рынке.', 'Šajā lodziņā bija pogas. Tās var iztērēt tirgū.'],
-    bag: ['Open my bag', 'Открыть сумку', 'Atvērt somu'], shop: ['Bird market', 'Птичий рынок', 'Putnu tirgus'], close: ['Close', 'Закрыть', 'Aizvērt'],
-    legend: ['★ Legendary!', '★ Легендарная!', '★ Leģendāra!'], special: ['Special window', 'Особое окошко', 'Īpašs lodziņš'],
-    admPreview: ['What is inside this window', 'Что лежит в этом окне', 'Kas ir šajā lodziņā'], emptyWin: ['Empty window — buttons inside', 'Пустое окно — внутри пуговки', 'Tukšs lodziņš — iekšā pogas'],
-    err: ['Could not open, please try again.', 'Не получилось открыть, попробуйте ещё раз.', 'Neizdevās atvērt, mēģini vēlreiz.'],
-    over: ['This year’s calendar is over. See you in December!', 'Календарь этого года закончился. До встречи в декабре!', 'Šī gada kalendārs ir beidzies. Tiekamies decembrī!'],
-    collector: ['🏅 All 31 windows are open! New achievement: “Collector” (+50 🔘)', '🏅 Все 31 окошко открыты! Новое достижение — «Коллекционер» (+50 🔘)', '🏅 Visi 31 lodziņi atvērti! Jauns sasniegums — “Kolekcionārs” (+50 🔘)'],
-        count: ['Opened {n} of 31', 'Открыто {n} из 31', 'Atvērti {n} no 31'],
-    adm: ['🔒 You see this because you are the admin: how many gifts are in each window. Put things in windows in the admin panel.', '🔒 Видите только вы: сколько вещей лежит в каждом окошке. Класть вещи в окошки — в кабинете.', '🔒 Redzi tikai tu: cik lietu ir katrā lodziņā. Lietas lodziņos liek kabinetā.'],
-    toColl: ['🎄 Advent in the admin panel →', '🎄 Адвент в кабинете →', '🎄 Advente kabinetā →'],
+    signin: ['Sign in to open the windows', 'Войдите, чтобы открывать окошки', 'Ienāc, lai atvērtu lodziņus'],
+    soon: ['Not yet! This window opens on December {d}.', 'Ещё рано! Это окошко откроется {d} декабря.', 'Vēl par agru! Šis lodziņš atvērsies {d}. decembrī.'],
+    late: ['24 and 31 December can only be opened on the day.', 'Окна 24 и 31 декабря открываются только в свой день.', '24. un 31. decembri var atvērt tikai tajā dienā.'],
+    over: ['This year’s calendar is over. See you in December!', 'Календарь этого года закончился. До встречи в декабре!', 'Šī gada kalendārs ir beidzis. Tiekamies decembrī!'],
+    gift: ['A gift for your bird', 'Подарок для птички', 'Dāvana putniņam'],
+    inBag: ['already in your bag', 'уже в сумке', 'jau somā'],
+    buttons: ['Buttons inside', 'Внутри пуговки', 'Iekšā pogas'],
     download: ['Download', 'Скачать', 'Lejupielādēt'],
+    view: ['Open', 'Посмотреть', 'Atvērt'],
+    admin: ['What is inside this window', 'Что лежит в этом окне', 'Kas ir šajā lodziņā'],
+    empty: ['Empty window — buttons inside', 'Пустое окно — внутри пуговки', 'Tukšs lodziņš — iekšā pogas'],
+    toAdmin: ['Advent in the admin panel →', 'Адвент в кабинете →', 'Advente kabinetā →'],
+    err: ['Could not open, please try again.', 'Не получилось открыть, попробуйте ещё раз.', 'Neizdevās atvērt, mēģini vēlreiz.'],
+    lit: ['Lit', 'Зажжено', 'Iedegts'],
+    of: ['of 31 · windows to Christmas', 'из 31 · окошек до Рождества', 'no 31 · lodziņi līdz Ziemassvētkiem'],
   };
   const t = k => T[k][L];
-  const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
-  const H = () => (window.PPDevH ? window.PPDevH() : {}); // ?devdate= — проверка на локальном сервере (DEV_FAKE_LOGIN), см. account.js
-  let S = null, skew = 0, timer = 0, midnight = 0, wantDay = +((location.hash.match(/^#d=(\d+)$/) || [])[1] || 0); // /advent/#d=5 — сразу на 5-м окошке (из блока на главной и новостей)
-  // 31 окна по порядку: 1 декабря — первое, 31 — последнее
-  const ORDER = [...Array(31)].map((_, i) => i + 1);
-  // эти окна забирают только в свой день: позже они закрыты
-  const LATE_CLOSED = [24, 31];
+  const LATE = [24, 31];
+  let S = null, skew = 0, opened = {}, planBy = {}, pastBy = {};
+
+  const HOUSES = [
+    { c: '#B4473D', w: 200, roof: 'step', attic: 6, rows: [[1, 2], [3, 4], [5]], chim: 1 },
+    { c: '#F1E3C8', w: 236, roof: 'tri', attic: 12, rows: [[7, 8, 9], [10, 11]], rc: '#2C5F4B', chim: 1 },
+    { church: 1, c: '#EDE6DA', w: 250 },
+    { c: '#3E6B5A', w: 200, roof: 'step', attic: 19, rows: [[13, 14], [15, 16], [17, 18]] },
+    { c: '#E3B95A', w: 184, roof: 'tri', rows: [[20, 21], [22, 23]], rc: '#8E1A22', chim: 1 },
+    { c: '#5B7FA3', w: 200, roof: 'round', rows: [[25, 26], [27, 28], [29, 30]], rc: '#2C5F4B' },
+  ];
+  const FIR = `<svg viewBox="0 0 70 120"><rect x="31" y="104" width="8" height="16" fill="#5A3420"/><path d="M35 4 L58 44 H46 L64 76 H50 L68 106 H2 L20 76 H6 L24 44 H12Z" fill="#23503F"/><path d="M35 4 L46 24 H24Z M24 44 h22 l-6-8 h-10z M20 76 h30 l-5-7 h-20z M2 106 h66 l-4-6 h-58z" fill="#fff" opacity=".9"/><circle cx="30" cy="60" r="3" fill="#E9C46A"/><circle cx="44" cy="88" r="3" fill="#C8463C"/></svg>`;
+  const ROOSTER = `<svg viewBox="0 0 80 110" width="66" height="90" style="position:absolute;left:50%;top:-112px;transform:translateX(-50%);overflow:visible;filter:drop-shadow(0 0 8px rgba(233,196,106,.7))"><g style="transform-origin:40px 104px;animation:aw-swing 5s ease-in-out infinite"><path d="M40 104 V58" stroke="#C9A227" stroke-width="3"/><circle cx="40" cy="74" r="5" fill="#E9C46A" stroke="#8C6A12" stroke-width="1.5"/><path d="M14 66 H66 M58 61 L68 66 L58 71 M14 62 L20 66 L14 70" stroke="#C9A227" stroke-width="2.5" fill="none" stroke-linejoin="round"/><path d="M30 56 C24 50 20 40 22 30 C24 22 30 18 36 20 C38 14 42 10 48 10 C54 10 56 16 54 20 L60 22 L54 26 C56 32 54 40 50 46 C56 44 60 38 60 30 C66 34 66 44 62 50 C58 56 50 58 42 58 Z" fill="#E9C46A" stroke="#8C6A12" stroke-width="2" stroke-linejoin="round"/><circle cx="49" cy="16" r="1.8" fill="#2A211C"/></g></svg>`;
+
+  const esc = s => String(s == null ? '' : s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
 
   function load() {
-    return fetch('/api/advent', { credentials: 'same-origin', headers: H() }).then(r => r.ok ? r.json() : null).then(d => {
-      if (d) { S = d; skew = d.now - Date.now(); }
-      draw(); goTo();
-      // окошки открываются сами по дате (Рига): в полночь — заново спросить сервер
-      clearTimeout(midnight);
-      if (S && S.nextAt && (S.month >= 10 || S.catchUp)) { const ms = S.nextAt - (Date.now() + skew); if (ms > 0 && ms < 2e9) midnight = setTimeout(load, ms + 1500); }
-    }).catch(draw);
+    fetch('/api/advent', { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).then(d => {
+      if (!d) throw 0;
+      S = d; skew = d.now - Date.now(); build(); draw();
+    }).catch(() => { app.style.display = 'none'; });
   }
-  function countdown(box) {
-    const tick = () => {
-      const ms = Math.max(0, S.startsAt - (Date.now() + skew));
-      if (!ms) { clearInterval(timer); load(); return; }
-      const v = [Math.floor(ms / 864e5), Math.floor(ms / 36e5) % 24, Math.floor(ms / 6e4) % 60, Math.floor(ms / 1e3) % 60];
-      box.innerHTML = v.map((n, i) => `<span><b>${String(n).padStart(i ? 2 : 1, '0')}</b><small>${T.units[L][i]}</small></span>`).join('');
-    };
-    clearInterval(timer); tick(); timer = setInterval(tick, 1000);
+  function build() {
+    opened = {}; (S.opened || []).forEach(o => opened[o.day] = o);
+    planBy = {}; (S.plan || []).forEach(p => (planBy[p.day] = planBy[p.day] || []).push(p));
+    pastBy = {}; (S.past || []).forEach(p => (pastBy[p.day] = pastBy[p.day] || []).push([p.kind, p.item]));
   }
-  function draw() {
-    if (!S) { app.innerHTML = ''; return; }
-    const opened = Object.fromEntries((S.opened || []).map(o => [o.day, o]));
-    const past = {}; (S.past || []).forEach(p => (past[p.day] = past[p.day] || []).push([p.kind, p.item]));
-    const claim = d => !!S.user && d <= (S.claimTo || 0) && !opened[d] && (!LATE_CLOSED.includes(d) || d === S.today); // сегодняшнее и пропущенные; 24 и 31 — только в свой день
-    const isPast = d => d <= (S.shownTo || 0) && !claim(d);
-    const plan = {}; (S.plan || []).forEach(p => (plan[p.day] = plan[p.day] || []).push(p));
-    const before = !S.today && (Date.now() + skew) < S.startsAt;
-    let head = '';
-    if (S.catchUp) head = `<div class="adv-soon"><p>${t('catchUp').replace('{j}', S.lastJan)}</p>${S.user ? '' : `<button type="button" class="pill-btn pill-fill" data-login>${t('signin')}</button>`}</div>`;
-    else if (before) head = `<div class="adv-soon"><p>${t('soon')}</p><div class="adv-cd" role="timer"></div></div>`;
-    else if (!S.today && S.catchUp) head = `<div class="adv-soon"><p>${t('catchUp').replace('{j}', S.lastJan)}</p>${S.user ? '' : `<button type="button" class="pill-btn pill-fill" data-login>${t('signin')}</button>`}</div>`;
-    else if (!S.today) head = `<div class="adv-soon"><p>${t('over')}</p></div>`;
-    else if (!S.user) head = `<div class="adv-soon"><p>${t('login')}</p><button type="button" class="pill-btn pill-fill" data-login>${t('signin')}</button></div>`;
-    else head = `<div class="adv-soon"><p>${opened[S.today] ? t('missed').replace('{j}', S.lastJan) : t('today')}</p><small>${t('todayOnly').replace('{j}', S.lastJan)}</small></div>`;
-    if (S.plan) head += `<p class="adv-adm">${t('adm')} <a href="/admin/#advent">${t('toColl')}</a></p>`;
-    app.innerHTML = head + `<div class="adv-board">${ORDER.map(d => {
-      const o = opened[d], sp = S.special.includes(d), pd = isPast(d), can = claim(d) || (!S.user && d <= (S.claimTo || 0) && !pd);
-      const cls = ['adv-win', sp ? 'sp' : '', d === 31 ? 'leg' : '', o || pd ? 'open' : '', pd ? 'past' : '', can && !o ? 'ready' : '', d === S.today ? 'today' : '', !can && !o && !pd ? 'lock' : ''].filter(Boolean).join(' ');
-      return `<button type="button" class="${cls}" data-d="${d}" aria-label="${d}${sp ? ' — ' + t('special') : ''}"><span class="adv-in"></span><span class="adv-door l"></span><span class="adv-door r"></span><b>${d}</b>${sp ? '<i class="adv-star">★</i>' : ''}${S.plan && plan[d] ? `<em class="adv-n">${plan[d].length}</em>` : ''}</button>`;
-    }).join('')}</div>`;
-    // клики — сразу, до картинок и отсчёта: даже если что-то ниже упадёт, окна открываются
-    app.querySelectorAll('.adv-win').forEach(b => { b.onclick = () => {
-      const d = +b.dataset.d;
-      try {
-        if (opened[d]) return show(b, opened[d], false);
-        if (S.plan) return showAdm(b, d, plan[d] || []);
-        if (isPast(d)) return showPast(b, d, past[d] || []);
-        tap(b, d, null);
-      } catch (e) {
-        const dlg = document.createElement('div'); dlg.className = 'adv-modal';
-        dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x">✕</button><p class="adv-kick">${d} December</p><p style="word-break:break-word">${String((e && e.message) || e)}</p></div>`;
-        dlg.querySelector('.adv-x').onclick = () => dlg.remove(); dlg.onclick = ev => { if (ev.target === dlg) dlg.remove(); };
-        document.body.appendChild(dlg);
-      }
-    }; });
-
-    // открытые окошки: внутри картинка подарка
-    // открытые окошки: внутри картинка подарка (прошедшие дни — видны всем)
-    try {
-      app.querySelectorAll('.adv-win.open').forEach(b => { const d = +b.dataset.d, o = opened[d] || (past[d] ? { kind: past[d][0][0], item: past[d][0][1] } : { buttons: 1 }); b.querySelector('.adv-in').appendChild(prize(o, 40)); if ((past[d] || []).length > 1 || (o.got || []).length > 1) b.classList.add('many'); });
-      if (before && !S.catchUp) countdown(app.querySelector('.adv-cd'));
-      const lg = app.querySelector('[data-login]'); if (lg) lg.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
-    } catch (e) { /* декор не должен ломать клики */ }
-    if (S.plan) app.querySelectorAll('.adv-win').forEach(b => b.classList.remove('lock')); // админу видно всё
+  const claimable = d => !!S.user && d <= (S.claimTo || 0) && !opened[d] && (!LATE.includes(d) || d === S.today);
+  function stateOf(d) {
+    if (opened[d]) return 'open';
+    if (d === S.today) return 'today';
+    if (claimable(d)) return 'ready';
+    return 'lock';
   }
-  // /advent/#d=N: прокрутить к окошку N и, если его можно открыть, открыть (один раз)
-  function goTo() {
-    if (!wantDay || !S) return;
-    const b = app.querySelector(`.adv-win[data-d="${wantDay}"]`), d = wantDay; wantDay = 0;
-    if (!b) return;
-    b.scrollIntoView({ block: 'center', behavior: 'smooth' }); b.classList.add('pulse');
-    if (S.user && S.user.nick && b.classList.contains('ready')) setTimeout(() => tap(b, d, null), 700);
-  }
-  // строка-сообщение под календарём: видно всегда, даже если окно не открылось
-  function msg(text) {
-    let p = app.querySelector('.adv-msg');
-    if (!p) { p = document.createElement('p'); p.className = 'adv-msg'; p.setAttribute('role', 'status'); app.appendChild(p); }
-    p.textContent = text;
-  }
-
-  function prize(o, size) {
-    const B = window.PPBirds, s = document.createElement('span'); s.className = 'adv-prize';
-    if (o && o.kind === 'file') { s.textContent = '📎'; return s; }
-    if (o && o.kind && B) s.appendChild(B.itemIcon(o.kind, o.item, size, S.user ? S.user.id : 2));
-    else if (o && o.buttons) s.textContent = '🔘';
-    return s;
-  }
-  function tap(btn, d, o) {
-    if (o) return show(btn, o, false);
-    if (d > (S.claimTo || 0) || (LATE_CLOSED.includes(d) && d !== S.today)) { showLocked(d); btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); return; }
-    if (!S.user) { try { location.hash = '#d=' + d; } catch (e) { /* ок */ } window.PPAccount && window.PPAccount.openSignIn(); return; }
-    if (btn.disabled) return;
-    btn.disabled = true;
-    fetch('/api/advent/open', { method: 'POST', credentials: 'same-origin', headers: Object.assign({ 'content-type': 'application/json' }, H()), body: JSON.stringify({ day: d }) })
-      .then(r => { if (!r.ok) throw 0; return r.json(); })
-      .then(x => { S.opened = (S.opened || []).filter(q => q.day !== d).concat([x]); btn.classList.add('opening'); setTimeout(() => show(btn, x, true), 650); if (window.PPNews) window.PPNews.refresh(); })
-      .catch(() => { btn.disabled = false; toast(t('err')); });
-  }
-  // закрытое окно: объясняем, когда откроется (всегда видимое окно, не тост)
-  function showLocked(d) {
-    const dlg = document.createElement('div'); dlg.className = 'adv-modal'; dlg.setAttribute('role', 'dialog');
-    const text = S.month >= 1 && S.month <= 2 ? t('tooLate') : (LATE_CLOSED.includes(d) && d <= (S.claimTo || 0) ? t('missedIt') : t('locked').replace('{d}', d));
-    msg(d + ' · ' + text);
-    dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button><p class="adv-kick">${d} December</p><p>${text}</p>${S.user ? `<p class="adv-small">@${S.user.nick}</p>` : ''}<div class="adv-act">${S.user ? '' : `<button type="button" class="pill-btn pill-fill" data-lg>${t('signin')}</button>`}</div></div>`;
-    const close = () => dlg.remove();
-    dlg.querySelector('.adv-x').onclick = close; dlg.onclick = e => { if (e.target === dlg) close(); };
-    const lg = dlg.querySelector('[data-lg]'); if (lg) lg.onclick = () => { try { location.hash = '#d=' + d; } catch (e) { /* ок */ } window.PPAccount && window.PPAccount.openSignIn(); };
-    document.body.appendChild(dlg); dlg.querySelector('.adv-x').focus();
-  }
-  const toast = m => window.PPToast ? window.PPToast(m) : alert(m);
-  // админ: что лежит в окне (предпросмотр, ничего не забирает)
-  function showAdm(btn, d, items) {
-    items = (items || []).map(it => Array.isArray(it) ? it : [it && it.kind, it && it.item]);
-    const B = window.PPBirds;
-    const dlg = document.createElement('div'); dlg.className = 'adv-modal'; dlg.setAttribute('role', 'dialog');
-    dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button><p class="adv-kick">${d} · ${t('admPreview')}</p><div class="adv-list"></div>${items.length ? '' : `<p>${t('emptyWin')}</p>`}<div class="adv-act"><a class="pill-btn" href="/admin/#advent">${t('toColl')}</a></div></div>`;
-    const list = dlg.querySelector('.adv-list');
-    items.forEach(([k, v]) => { const f = document.createElement('figure'); try { if (B) f.appendChild(B.itemIcon(k, v, 64, S.user ? S.user.id : 2)); } catch (e) { /* без иконки */ } const c = document.createElement('figcaption'); let nm = k + '|' + v; try { if (B) nm = B.giftName(k, v, L); } catch (e) { /* без имени */ } c.textContent = nm; f.appendChild(c); list.appendChild(f); });
-    const close = () => dlg.remove();
-    dlg.querySelector('.adv-x').onclick = close; dlg.onclick = e => { if (e.target === dlg) close(); };
-    document.body.appendChild(dlg); dlg.querySelector('.adv-x').focus();
-  }
-
-  // прошедший день: что было в окошке (видно всем)
-  function showPast(btn, d, items) {
-    const B = window.PPBirds;
-    const dlg = document.createElement('div'); dlg.className = 'adv-modal'; dlg.setAttribute('role', 'dialog'); dlg.setAttribute('aria-modal', 'true');
-    dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button><p class="adv-kick">${d} · ${items.length ? t('was') : t('wasBtns')}</p><div class="adv-list"></div><p>${t('missedIt')}</p></div>`;
-    const list = dlg.querySelector('.adv-list');
-    items.forEach(([k, v]) => { const f = document.createElement('figure'); f.appendChild(B.itemIcon(k, v, 64, S.user ? S.user.id : 2)); const c = document.createElement('figcaption'); c.textContent = B.giftName(k, v, L); f.appendChild(c); list.appendChild(f); });
-    const close = () => dlg.remove();
-    dlg.querySelector('.adv-x').onclick = close; dlg.onclick = e => { if (e.target === dlg) close(); };
-    document.body.appendChild(dlg); dlg.querySelector('.adv-x').focus();
-  }
-  // окно с файлом: превью, подпись и «Скачать»
-  function showFiles(d, files) {
-    const dlg = document.createElement('div'); dlg.className = 'adv-modal'; dlg.setAttribute('role', 'dialog');
-    const list = files.map(raw => { try { return JSON.parse(raw); } catch (e) { return null; } }).filter(Boolean);
-    dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button><p class="adv-kick">${d} December</p><div class="adv-files"></div></div>`;
-    const box = dlg.querySelector('.adv-files');
-    list.forEach(f => {
-      const cap = (f.c && (f.c[LG] || f.c.en)) || f.n || '';
-      const fig = document.createElement('figure'); fig.className = 'adv-file';
-      if (f.p) { const im = document.createElement('img'); im.src = f.p; im.alt = ''; im.loading = 'lazy'; fig.appendChild(im); }
-      const c = document.createElement('figcaption'); c.textContent = cap; fig.appendChild(c);
-      const a = document.createElement('a'); a.className = 'pill-btn pill-fill'; a.href = f.u; a.setAttribute('download', f.n || ''); a.textContent = '⬇ ' + (f.n || t('download')); fig.appendChild(a);
-      box.appendChild(fig);
-    });
-    const close = () => dlg.remove();
-    dlg.querySelector('.adv-x').onclick = close; dlg.onclick = e => { if (e.target === dlg) close(); };
-    document.body.appendChild(dlg); dlg.querySelector('.adv-x').focus();
-  }
-
-  // окно: птичка вылетает из окошка и приносит подарок
-  function show(btn, o, fresh) {
-    if (o && o.files && o.files.length) return showFiles(o.day, o.files);
-    const B = window.PPBirds, leg = o.kind && B && B.LEGEND && B.LEGEND.has(o.kind + '|' + o.item);
-    const dlg = document.createElement('div'); dlg.className = 'adv-modal' + (leg ? ' leg' : ''); dlg.setAttribute('role', 'dialog'); dlg.setAttribute('aria-modal', 'true');
-    const name = o.kind && B ? B.giftName(o.kind, o.item, L) : '';
-    dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button>
-      <div class="adv-stage"><div class="adv-bird"></div></div>
-      <p class="adv-kick">${o.kind ? t('got') : t('btns').replace('{n}', o.buttons || 0)}</p>${o.kind ? '' : `<p class="pp-sew">${window.PPSew || ''}</p>`}
-      ${o.kind ? `<h2>${esc(name)}</h2>${(o.got || []).length > 1 ? `<div class="adv-list">${o.got.slice(1).map(() => '<figure></figure>').join('')}</div>` : ''}${leg ? `<p class="adv-leg">${t('legend')}</p>` : ''}<p>${t('inBag')}</p>` : `<p>${t('btnsWhy')}</p>`}
-      ${o.collector ? `<p class="adv-leg adv-coll">${t('collector').replace(/\(\+\d+ 🔘\)/, o.collectorBtns ? `(+${o.collectorBtns} 🔘)` : '').trim()}</p>` : ''}
-      <div class="adv-act">${S.user && S.user.nick ? `<a class="pill-btn pill-fill" href="${pre}/bird/">${t('bag')}</a>` : ''}<a class="pill-btn" href="${pre}/shop/">${t('shop')}</a></div></div>`;
-    const bird = dlg.querySelector('.adv-bird');
-    (o.got || []).slice(1).forEach(([k, v], i) => { const f = dlg.querySelectorAll('.adv-list figure')[i]; if (f && B) { f.appendChild(B.itemIcon(k, v, 56, S.user ? S.user.id : 2)); const c = document.createElement('figcaption'); c.textContent = B.giftName(k, v, L); f.appendChild(c); } });
-    if (B) {
-      const id = 5 + o.day * 37, lk = o.kind === 'item' ? B.dress(B.looks(id), { item: o.item }) : B.looks(id);
-      const c = B.crop(B.spriteHD(lk, 0)); c.className = 'adv-bird-c'; c.style.width = c.width * 3 + 'px'; c.style.height = c.height * 3 + 'px'; bird.appendChild(c);
-      if (o.kind !== 'item') bird.appendChild(prize(o, 64)); // шапку, фон, рамку и т. п. птичка несёт под собой
+  const isFile = it => it && it.kind === 'file';
+  function fileOf(item) { try { return JSON.parse(item); } catch (e) { return null; } }
+  function itemsOf(d, admin) {
+    if (admin && planBy[d]) return planBy[d].map(p => [p.kind, p.item]);
+    if (opened[d]) {
+      const o = opened[d];
+      if (o.kind === 'file') return (o.got && o.got.length ? o.got : [o.item]).map(x => ['file', x]);
+      if (o.kind) return (o.got || [[o.kind, o.item]]).map(x => Array.isArray(x) ? x : [x.kind, x.item]);
+      return [];
     }
-    const close = () => { dlg.remove(); removeEventListener('keydown', key); if (fresh) draw(); };
-    const key = e => { if (e.key === 'Escape') close(); };
-    dlg.querySelector('.adv-x').onclick = close; dlg.onclick = e => { if (e.target === dlg) close(); };
-    addEventListener('keydown', key); document.body.appendChild(dlg);
-    // вылет: от окошка к центру окна
-    const r = btn.getBoundingClientRect(), st = dlg.querySelector('.adv-stage').getBoundingClientRect();
-    bird.style.setProperty('--fx', Math.round(r.left + r.width / 2 - (st.left + st.width / 2)) + 'px');
-    bird.style.setProperty('--fy', Math.round(r.top + r.height / 2 - (st.top + st.height / 2)) + 'px');
-    requestAnimationFrame(() => bird.classList.add('fly'));
-    if (leg) for (let i = 0; i < 18; i++) { const s = document.createElement('i'); s.className = 'adv-spark'; s.style.cssText = `--a:${i * 20}deg;--d:${80 + (i % 3) * 30}px;animation-delay:${.7 + (i % 4) * .08}s`; dlg.querySelector('.adv-stage').appendChild(s); }
-    dlg.querySelector('.adv-x').focus();
+    return pastBy[d] || [];
   }
-  load();
-})();
 
+  // ---------- окна ----------
+  function win(d, extra) {
+    const s = stateOf(d), sp = (S.special || []).includes(d);
+    const items = itemsOf(d, false);
+    let inner = '';
+    if (s === 'open' && items.length) {
+      const [k, v] = items[0];
+      if (k === 'file') { const f = fileOf(v); if (f && f.p) inner = `<img class="fpic" src="${esc(f.p)}" alt=""><span class="fbadge">${esc((f.n || '').split('.').pop().toUpperCase())}</span>`; }
+      else inner = '<span class="gift">🎁</span>';
+    }
+    return `<button class="win ${s}${sp ? ' sp' : ''}${d === 24 ? ' d24' : ''}${d === 31 ? ' d31' : ''} ${extra || ''}" data-d="${d}" aria-label="${d}">
+      <span class="glass">${inner}${s === 'today' ? '<span class="candle"></span>' : ''}</span>
+      <span class="sh l"></span><span class="sh r"></span><span class="bow"><i><b></b></i></span><span class="sill"></span><span class="key">${d}</span></button>`;
+  }
+  const chimney = (x, y) => `<rect x="${x}" y="${y}" width="16" height="30" fill="#6B3A2A"/><rect x="${x - 3}" y="${y - 4}" width="22" height="6" rx="2" fill="#fff"/>`;
+  function roofSvg(h) {
+    const rc = h.rc || '#7E141B';
+    if (h.roof === 'step') return `<svg viewBox="0 0 200 120">${h.chim ? chimney(150, 10) : ''}<path d="M0 120 V78 H20 V58 H40 V38 H60 V18 H140 V38 H160 V58 H180 V78 H200 V120Z" fill="${h.c}"/><path d="M0 78 H20 V58 H40 V38 H60 V18 H140 V38 H160 V58 H180 V78 H200" fill="none" stroke="#fff" stroke-width="7" stroke-linejoin="round"/><circle cx="100" cy="6" r="3" fill="#E9C46A"/></svg>`;
+    if (h.roof === 'round') return `<svg viewBox="0 0 200 92"><path d="M0 92 V62 Q100 -18 200 62 V92Z" fill="${rc}"/><path d="M8 60 Q100 -12 192 60" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round"/><circle cx="100" cy="46" r="10" fill="#F4EFE6"/></svg>`;
+    return `<svg viewBox="0 0 200 104">${h.chim ? chimney(140, 24) : ''}<path d="M-6 104 L100 12 L206 104Z" fill="${rc}"/><path d="M8 94 L100 18 L192 94" fill="none" stroke="#fff" stroke-width="8" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  }
+  function house(h) {
+    if (h.church) return `<div class="house church" style="width:${h.w}px">
+      <div style="position:relative;height:170px;width:100%;display:grid;place-items:end center">
+        <svg viewBox="0 0 250 170" style="position:absolute;inset:0;width:100%;height:100%"><path d="M90 170 V84 L125 0 L160 84 V170Z" fill="#2C5F4B"/><path d="M93 84 L125 8 L157 84" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round"/><rect x="86" y="80" width="78" height="8" rx="2" fill="#E3DACB"/><path d="M60 170 L90 120 H160 L190 170Z" fill="#8E1A22"/><path d="M66 166 L92 124 H158 L184 166" fill="none" stroke="#fff" stroke-width="5" stroke-linejoin="round"/></svg>
+        <div style="position:relative;margin-bottom:46px">${win(31, 'd31')}${ROOSTER}</div>
+      </div>
+      <div class="facade" style="--c:${h.c};padding-top:48px"><div class="ground" style="gap:22px">
+        <span style="width:30px;height:60px;border-radius:15px 15px 0 0;background:linear-gradient(160deg,#3A5174,#22334F);box-shadow:0 0 0 4px var(--frame);align-self:center;margin-bottom:30px"></span>
+        ${win(24, 'd24')}
+        <span style="width:30px;height:60px;border-radius:15px 15px 0 0;background:linear-gradient(160deg,#3A5174,#22334F);box-shadow:0 0 0 4px var(--frame);align-self:center;margin-bottom:30px"></span>
+      </div><span class="step"></span></div></div>`;
+    const rows = h.rows.map((r, i) => i === h.rows.length - 1
+      ? `<div class="ground">${r.map(d => win(d)).join('')}<span class="door"><i></i></span></div>`
+      : `<div class="row">${r.map(d => win(d)).join('')}</div>`).join('');
+    const smoke = h.chim ? `<span class="smoke" style="left:${h.roof === 'step' ? 78 : 73}%;top:-6px"></span><span class="smoke" style="left:${h.roof === 'step' ? 78 : 73}%;top:-6px;animation-delay:1.3s"></span>` : '';
+    return `<div class="house"><div class="roof">${smoke}${roofSvg(h)}${h.attic ? `<div class="attic" style="bottom:${h.roof === 'step' ? 30 : 18}px">${win(h.attic)}</div>` : ''}</div>
+      <div class="facade" style="--c:${h.c}">${rows}<span class="step"></span></div></div>`;
+  }
+
+  // ---------- гирлянда ----------
+  function garland() {
+    const g = document.getElementById('garland');
+    if (!g) return;
+    let gs = '<path d="M0 6 Q 112 34 225 8 T 450 8 T 675 8 T 900 6" fill="none" stroke="#5A6478" stroke-width="2" vector-effect="non-scaling-stroke"/>';
+    const col = ['#FFD77A', '#FF8A7A', '#9FE3C1'];
+    for (let i = 1; i <= 31; i++) {
+      const x = 8 + (i - 1) * (884 / 30), y = 7 + 12 * Math.abs(Math.sin((x / 225) * Math.PI));
+      const on = !!opened[i], c = col[i % 3];
+      gs += `<g transform="translate(${x.toFixed(1)} ${y.toFixed(1)})"><rect x="-2.5" y="0" width="5" height="4" fill="#5A6478"/>${on ? `<circle cx="0" cy="10" r="10" fill="${c}" opacity=".25"/>` : ''}<ellipse cx="0" cy="10" rx="4.5" ry="6.5" fill="${on ? c : '#34415A'}"/></g>`;
+    }
+    g.innerHTML = gs;
+    const n = Object.keys(opened).length;
+    const gc = document.getElementById('gcount');
+    if (gc) gc.innerHTML = `${t('lit')} <strong>${n}</strong> ${t('of')}`;
+  }
+
+  // ---------- файлы и бонусы ----------
+  function drawBelow() {
+    const days = Object.keys(opened).map(Number).sort((a, b) => a - b);
+    const fs = days.filter(d => itemsOf(d, false).some(([k]) => k === 'file'));
+    const fc = document.getElementById('fcount');
+    if (fc) fc.textContent = `${fs.length} of 31`;
+    const files = document.getElementById('files');
+    if (files) files.innerHTML = fs.map(d => {
+      const f = fileOf(itemsOf(d, false)[0][1]);
+      if (!f) return '';
+      const fmt = (f.n || '').split('.').pop().toUpperCase();
+      return `<div class="fcard"><span class="th"><img src="${esc(f.p || '')}" alt=""><span class="fbadge">${esc(fmt)}</span></span><span><b>${esc(f.n || '')}</b><br><small>${d} · ${esc((f.c && (f.c[LG] || f.c.en)) || '')}</small></span><a href="${esc(f.u)}" download>📥 ${t('download')}</a></div>`;
+    }).join('') || '<div class="fcard wait">Files appear here as you open the windows</div>';
+
+    const bs = days.filter(d => itemsOf(d, false).some(([k]) => k !== 'file'));
+    const bc = document.getElementById('bcount');
+    if (bc) bc.textContent = `${bs.length} of 31`;
+    const bonus = document.getElementById('bonus');
+    if (bonus) bonus.innerHTML = bs.map(() => '<span>🎁</span>').join('') + '<span class="no">+27</span>';
+  }
+
+  // ---------- отрисовка ----------
+  function draw() {
+    const street = document.getElementById('street');
+    if (street) street.innerHTML = `<div class="prop fir">${FIR}</div><div class="prop lamp"><b></b></div>` + HOUSES.map(house).join('') + `<div class="prop lamp"><b></b></div><div class="prop fir">${FIR}</div>`;
+    fit(); garland(); drawBelow();
+  }
+  function fit() {
+    const st = document.getElementById('street'); if (!st) return;
+    st.style.zoom = 1;
+    if (innerWidth <= 760) return;
+    const need = st.getBoundingClientRect().width, have = document.documentElement.clientWidth - 24;
+    if (need > have) st.style.zoom = (have / need).toFixed(3);
+  }
+  addEventListener('resize', () => fit());
+
+  // ---------- окно ----------
+  const modal = document.getElementById('modal'), mbody = document.getElementById('mbody');
+  function show(html, conf) {
+    mbody.innerHTML = html; modal.classList.add('on');
+    const c = document.getElementById('conf'); if (!c) return; c.innerHTML = '';
+    if (conf) for (let i = 0; i < 40; i++) c.insertAdjacentHTML('beforeend', `<i style="left:${Math.random() * 100}%;background:${['#E9C46A','#9E1B22','#2C5F4B','#FF8A7A'][i % 4]};animation-delay:${Math.random() * .4}s"></i>`);
+  }
+  const kick = d => `<p class="k" style="margin:0">${d} December</p>`;
+  function fileCard(f) {
+    const fmt = (f.n || '').split('.').pop().toUpperCase();
+    return `<div class="file"><div class="prev prev-paper"><img src="${esc(f.p || '')}" alt=""></div><span class="fmt">${esc(fmt)}</span><p class="fname">${esc(f.n || '')}</p><p class="fmeta" style="margin:0">${esc((f.c && (f.c[LG] || f.c.en)) || '')}</p><div class="acts" style="justify-content:center"><a class="pill" href="${esc(f.u)}" download>📥 ${t('download')}</a></div></div>`;
+  }
+  function giftRow(name) {
+    return `<div class="more"><span class="k">🎁 ${t('gift')}</span><div class="item"><span class="th">🎁</span><span><b>${esc(name)}</b><small>${t('inBag')}</small></span><a class="mini-btn" href="/bird/#bp-room">🏠</a></div></div>`;
+  }
+  function inside(d, admin) {
+    const items = itemsOf(d, admin);
+    if (!items.length) return kick(d) + `<div class="big">🔘</div><p>${t('buttons')}</p>`;
+    return kick(d) + items.map(([k, v]) => {
+      if (k === 'file') { const f = fileOf(v); return f ? fileCard(f) : ''; }
+      let name = k + ' ' + v;
+      try { if (window.PPBirds) name = window.PPBirds.giftName(k, v, L); } catch (e) { /* как есть */ }
+      return giftRow(name);
+    }).join('');
+  }
+  function openDay(d) {
+    const s = stateOf(d);
+    if (S.plan) return show(inside(d, true) + `<div class="acts" style="justify-content:center;margin-top:10px"><a class="pill ghost" href="/admin/#advent">🎄 ${t('toAdmin')}</a></div>`);
+    if (s === 'lock') {
+      const b = document.querySelector(`#street .win[data-d="${d}"]`);
+      if (b) { b.classList.remove('rattle'); void b.offsetWidth; b.classList.add('rattle'); }
+      const msg = (LATE.includes(d) && d <= (S.claimTo || 0)) ? t('late') : (!S.today && S.month >= 1 && S.month <= 2 ? t('over') : t('soon').replace('{d}', d));
+      return show(`${kick(d)}<div class="big">⛄</div><h3>${t('soon').replace('{d}', d).split('!')[0]}</h3><p>${msg}</p>`);
+    }
+    if (s === 'open') return show(inside(d, false));
+    if (!S.user) {
+      try { location.hash = '#d=' + d; } catch (e) { /* ок */ }
+      return show(`${kick(d)}<div class="big">🔑</div><p>${t('signin')}</p><div class="acts" style="justify-content:center"><button class="pill" id="adv-signin">${t('signin')}</button></div>`);
+    }
+    const b = document.querySelector(`#street .win[data-d="${d}"]`);
+    if (b) b.classList.add('opening');
+    fetch('/api/advent/open', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ day: d }) })
+      .then(r => { if (!r.ok) throw 0; return r.json(); })
+      .then(x => setTimeout(() => { build(); draw(); show(inside(d, false), true); if (window.PPNews) window.PPNews.refresh(); }, 850))
+      .catch(() => { if (b) b.classList.remove('opening'); show(`${kick(d)}<p>${t('err')}</p>`); });
+  }
+  app.addEventListener('click', e => {
+    const b = e.target.closest('.win'); if (b) return openDay(+b.dataset.d);
+    const sg = e.target.closest('#adv-signin');
+    if (sg) { window.PPAccount && window.PPAccount.openSignIn(); return; }
+    if (e.target === modal || e.target.closest('.x')) modal.classList.remove('on');
+  });
+  addEventListener('keydown', e => { if (e.key === 'Escape') modal.classList.remove('on'); });
+
+  // снег и звёзды
+  const st = document.getElementById('stars');
+  if (st) for (let i = 0; i < 70; i++) st.insertAdjacentHTML('beforeend', `<i style="left:${Math.random() * 100}%;top:${Math.random() * 45}%;animation-delay:${Math.random() * 3}s"></i>`);
+  const sn = document.getElementById('snow');
+  if (sn) for (let i = 0; i < 46; i++) { const s = 2 + Math.random() * 4; sn.insertAdjacentHTML('beforeend', `<i style="left:${Math.random() * 100}%;width:${s}px;height:${s}px;animation-duration:${8 + Math.random() * 9}s;animation-delay:-${Math.random() * 14}s;opacity:${.35 + Math.random() * .5}"></i>`); }
+
+  load();
+  document.addEventListener('pp:whoami', () => { if (!S || !S.user) load(); });
+})();
