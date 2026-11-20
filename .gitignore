@@ -9,3 +9,4 @@ tools/pins/p16/
 
 # A1 Pack: būvējumi (rezultāts — <slug>-pack.zip blakus topic.json)
 a1-pack/topics/*/out/
+tools/ornaments/out/
