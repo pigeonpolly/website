@@ -91,3 +91,11 @@
 
 .adv-msg { margin: 14px auto 0; max-width: 680px; text-align: center; font: 500 15px/1.5 Karla, sans-serif; color: #9E1B22; background: #FFF6E5; border: 1px solid rgba(158, 27, 34, .25); border-radius: 12px; padding: 10px 14px; }
 
+
+/* шапка по центру и снежные горы под ней */
+.adv-hero { text-align: center; padding-bottom: 0; }
+.adv-hero .adv-kick, .adv-hero .adv-lead, .adv-hero .adv-note { margin-left: auto; margin-right: auto; }
+.adv-hills { line-height: 0; background: #fff; }
+.adv-hills svg { display: block; width: 100%; height: clamp(96px, 15vw, 210px); }
+.adv { padding-top: 12px; }
+
