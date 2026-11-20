@@ -17,8 +17,11 @@
   function ym(o) { return o.y + '-' + ('0' + o.m).slice(-2); }
   function before(a, b) { return a.y < b.y || (a.y === b.y && a.m < b.m); }
   function label(o) {
-    try { return new Date(o.y, o.m - 1, 1).toLocaleString(L, { month: 'long', year: 'numeric' }); }
+    var mn;
+    try { mn = new Date(o.y, o.m - 1, 1).toLocaleString(L, { month: 'long' }); }
     catch (e) { return ym(o); }
+    mn = mn.charAt(0).toUpperCase() + mn.slice(1);
+    return mn + ' ' + o.y;
   }
   function esc(s) { return String(s).replace(/[<>&]/g, function (c) { return { '<': '&lt;', '>': '&gt;', '&': '&amp;' }[c]; }); }
 
