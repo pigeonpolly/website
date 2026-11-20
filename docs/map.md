@@ -96,7 +96,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/ink-course.js` + `ink-course.css` — страница курса туши /ink/ (docs/ink.md): PLAN, T, testView, practice, lessonView
 - `site/assets/diploma.js` — общий пиксельный диплом курсов: PPDiploma {P, C, svg, canvas, mount, save}
 - `site/assets/polly-school.js` (30K) — «Школа Полли» (/polly-helps/, docs/challenge.md): Полли в фартуке у мольберта учит рисоват: IMG, KEY, stepsOf, send, path
-- `site/assets/polly.js` (30K) — Полли-питомец в левом нижнем углу (`PollyPet`): PollyPet, SEASON, CORNER, HOME_X, addProp
+- `site/assets/polly.js` (47K) — Полли-питомец в левом нижнем углу (`PollyPet`): PollyPet, PL/PCOL (слои спрайта), NOW, MONTH, HATW, ACC, MSAY, SEASON, CORNER, HOME_X
 - `site/assets/posts-admin.js` — Кабинет → «🖼 Пины»: генератор пинов (тип → дизайн → фото → ✨ тексты → JPG + поля Pinterest): PPPostsAdmin, DESIGNS, DRAW
 - `site/assets/potion-names.js` (27K) — общие данные Зельеварни: ингредиенты, названия зелий (`PPPotion`): PPPotion, ADJ, FALL, ING, potion
 - `site/assets/potions.js` (57K) — игра «Зельеварня» /potions/: лабиринт, котёл, рецепты: DIRS, HUD, play, overlay, brew
@@ -185,6 +185,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `tools/rooms/shift.py` (30K) — «Смена с Полли» (/shift/, этап 29, docs/rooms.md): детальный кабинет 480x270 + передний сл: FLOOR_Y, BACK_HANG, OUT, wing, add
 - `tools/sec.py` (2K) — Печатает один раздел docs-файла.: HEAD, section, headings, find
 - `tools/dead_check.py` — хвосты убранного: маркеры из docs/retired.md в живом коде (ошибка), несобираемые страницы, блоки без страницы, site/assets без ссылок, /api без вызова. Только читает.
+- `tools/polly_sprite.py` (5K) — слои спрайта новой Полли (тело, лапки, глаз, шапки, вещи) → layers.js (PCOL/PL для polly.js) и превью layers.png; рисовалка — `tools/polly_px.py` (G: ell, poly, rect, outline)
 - `tools/shots.py` (8K) — Снимки элемента страницы на нескольких ширинах (Playwright, Chromium из /opt/pw-browsers).: SHEET_W, OUT, ROOT, make_sheet, slug
 - `tools/study_page.py` (1K) — Учебник /study/ (worker/study.js): content/study/textbook.html → worker/study-page.js (стр: ROOT, notebook
 - `tools/titos_cast.py` (2K) — Жители Воббленда для дел Титоса → docs/titos-cast.md (одна строка на жителя: ключ, имя, го: ROOT, cast, slug

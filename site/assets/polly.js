@@ -2,6 +2,7 @@
 // озирается, спит пузом кверху (z z Z). По клику говорит фразу и перелетает.
 // По сезонам в подвале страницы лежат вещи, и Полли с ними играет: осень — листья и куча листьев (в октябре ещё тыквы),
 // зима — снежки и сугроб, лето — мороженое и цветочки, весной из Полли в полёте сыплются лепестки. Проверка: ?season=autumn|october|winter|spring|summer
+// С 20.11.2026 в уголке — вещица, шапка и фразы месяца (MONTH, HATW, ACC, MSAY). Проверка: ?month=1…12, ?day=ММ-ДД, ?bday
 (() => {
   const reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
   const lang = document.documentElement.lang;
@@ -21,42 +22,54 @@
   const wait = ms => new Promise(r => setTimeout(r, ms));
 
   // ---------- спрайт ----------
-  const BODY = [
-    '......ddd.....',
-    '.....dbbbd....',
-    '....dbbwwbd...',
-    '....dbbwkbdoo.',
-    '....dbbbbbdo..',
-    '...dbbbbbbd...',
-    '..dbbsbbbbd...',
-    '.dbbssbbbbd...',
-    'dbbssbbbbbd...',
-    'dbbbbbbbbd....',
-    '.ddbbbbbdd....',
-    '...ddddd......',
-  ];
-  const LEGS = {
-    a: ['....o..o......', '...oo.oo......'],
-    b: ['.....o.o......', '....oo.oo.....'],
-    fly: ['..............', '..............'],
+  // 20.11.2026 новая Полли: детальнее, в малиновом берете, как на логотипе (вариант «Б» Алины). Слои рисует tools/polly_sprite.py:
+  // тело, лапки, закрытый глаз, головные уборы (берет, колпак, венок, ведьмина шляпа, шапка Санты) и вещи (шарф, очки, «нос с усами», ленточка)
+  const PCOL = {a: '#1a1528', b: '#544a8e', c: '#ffffff', d: '#f08a3c', e: '#f2a7b8', f: '#c8642a', g: '#7d75b8', h: '#3e3673', i: '#6a61a3', j: '#2e2860', k: '#c8335f', l: '#e0517a', m: '#a82a50', n: '#5ba3d9', o: '#f6c445', p: '#e5484d', q: '#4e7a2e', r: '#6a9a3a', s: '#f6d04d', t: '#f28ab2', u: '#2b2440', v: '#8a63b8', w: '#d63a3a', x: '#f4f1ea', y: '#1f1b2e', z: '#8fb3d9', A: '#e8a07a', B: '#3a2a1e', C: '#9e3039'};
+  const PL = {
+    body: [5,['............aaaaaa','...........abbbbbba','..........abbbbbbbba','.........abbbbbbbbbba','........abbbbbbbbbbbba','........abbbbbbcccccba','........abbbbbbcccaabaaa','........abbbbbbccaaabdddaa','........abbbbbbccaaabddddda','........abbbbbbbbbbbbddaaa','.......aabbbbbbeeebbbfffa','......abbbbbbbbbbbbbbaaa','....aabbbbbbbbbggbbbba','...abbhhhhbbbggggggbba','..abbhhiihbbggggggggba','.abbhhiihhhbggggggggba','abbhhiihhjhbggggggggba','bbhhiihhhjbbggggggggba','bhhhhhhjjbbbggggggggba','abhhjjjhbbbbgggggggga','.abbbbbbbbbbbgggggga','..aabbbbbbbbbbbggba','....aabbbbbbaaaaaa','......aaaaaa']],
+    legA: [28,['...............a','.........ada..ada','.........ada..ada','.........ada..ada','........aada.aada','.......adddaaddda','........aaa..aaa']],
+    legB: [28,['...............a','..........ada.ada','..........ada.ada','..........ada.ada','.........aada.adda','........addda..aa','.........aaa']],
+    closed: [10,['...............bbbbb','...............bbbbb','...............bbbbb','...............aa']],
+    beret: [0,['.........aaaaakka','.......aakkkkkkkaa','......aklllllkkkkkaa','......akkklllllkkkkka','.......akkkkkkkkkkkkka','........ammmmmmmkkkkkka','.........aammmmmmmmkkka','..............mmmmmmma']],
+    party: [0,['..............acca','.............annna','............aoooooa','............annnnna','...........annnpnnaa','..........aoooooooooa','..........annpnnnpna']],
+    wreath: [3,['..........aaaaaaaaaaaa','........aaqqrrqqrrqqrraa','.......arqssrqttrqccrssqa','......arrrqqrrqqrrqqrqqqqa','.......arr..........aaqqa','........a.............aa']],
+    witch: [0,['.............auua','.............auuua','..............auuua','............aauuuuaa','.........aaavvvvvvvvaa','.......aauuuuuuuuuuuuuaa','......auuuuuuuuuuuuuuuuua','.......auuuuuuuuuuuuuuua','........a............aa']],
+    santa: [0,['........acaaaaaa','.......acccwwwwwa','.......acccwwwwwwa','........acwwwwwwwa','.........awwwwwwwwa','.........awwwwwwwwwaaa','.........acccccccccccca','.........acccccccccccca','.....................a']],
+    scarf: [16,['.........xppxxppxxppxxp','.........xppxxppxxppxxpa','..................pp..a','..................pp','..................xx','..................pp','..................pp','..................oo']],
+    shades: [10,['..............yyyyyyy','.............yyzyyyzy','..............yyyyyyy','..............yyyyyyy']],
+    groucho: [10,['..............yyyyyyy','..............y..a.cy','..............y....cyAA','..............yyyyyyAAAA','....................AAAA','.....................AA','...................BBBBBBa','......................aaa']],
+    ribbon: [18,['...............CCC','...............ccc','...............CCC','...............C.C','...............C.C']]
   };
-  // 23 января (день рождения Полли; проверка ?bday): праздничный колпак над головой и прыжок из тортика
-  const BDAY = location.search.includes('bday') || (() => { const d = new Date(); return d.getMonth() === 0 && d.getDate() === 23; })();
-  const HAT = ['.......y......', '......rr......', '......prr.....', '.....rrpr.....'];
-  const TOP = BDAY ? HAT.length : 0;
-  const CLOSED_EYE = row => row.replace('wwb', 'bbb').replace('wkb', 'ddb');
-  const COL = { d: '#1a1528', b: '#7f81bf', s: '#5e5a9c', w: '#ffffff', k: '#1a1528', o: '#f2a73b', r: '#E5484D', p: '#F6C445', y: '#FFFFFF' };
-  const PX = innerWidth < 600 ? 3 : 4;
-  const W = 14 * PX, H = (14 + TOP) * PX;
+  // дата (Рига не важна — по часам гостя); проверка: ?month=6, ?day=06-23, ?bday
+  const NOW = (() => {
+    const q = location.search, d = new Date(), md = q.match(/[?&]day=(\d\d?)-(\d\d?)/), mm = q.match(/[?&]month=(\d\d?)/);
+    const sm = { winter: 1, spring: 4, summer: 7, autumn: 9, october: 10 }[(q.match(/[?&]season=(\w+)/) || [])[1]];
+    if (md) return { m: +md[1], d: +md[2] };
+    if (mm) return { m: +mm[1], d: 10 };
+    if (sm) return { m: sm, d: 10 };
+    return { m: d.getMonth() + 1, d: d.getDate() };
+  })();
+  // 23 января (день рождения Полли; проверка ?bday): праздничный колпак вместо берета и прыжок из тортика
+  const BDAY = location.search.includes('bday') || (NOW.m === 1 && NOW.d === 23);
+  const { m: MM, d: DD } = NOW;
+  // головной убор и вещь месяца: Лиго — венок (15–30.06), Хеллоуин — шляпа ведьмы (24–31.10), Рождество — шапка Санты (15–31.12),
+  // январь и декабрь — шарф, июль — тёмные очки, 1 апреля — очки с носом и усами, 11–18.11 — латвийская ленточка
+  const HATW = BDAY ? 'party' : MM === 6 && DD >= 15 ? 'wreath' : MM === 10 && DD >= 24 ? 'witch' : MM === 12 && DD >= 15 ? 'santa' : 'beret';
+  const ACC = MM === 4 && DD === 1 ? 'groucho' : MM === 7 ? 'shades' : MM === 11 && DD >= 11 && DD <= 18 ? 'ribbon' : MM === 1 || MM === 12 ? 'scarf' : null;
+  const SP = 2; // пиксель Полли
+  const PX = innerWidth < 600 ? 3 : 4; // пиксель вещиц и частиц
+  const W = 30 * SP, H = 35 * SP;
   const makeFrame = (legs, closed) => {
     const c = document.createElement('canvas');
     c.width = W; c.height = H;
     const g = c.getContext('2d');
-    const rows = (BDAY ? HAT : []).concat(closed ? BODY.map((r, i) => (i === 2 || i === 3 ? CLOSED_EYE(r) : r)) : BODY, legs);
-    rows.forEach((r, y) => [...r].forEach((ch, x) => { if (COL[ch]) { g.fillStyle = COL[ch]; g.fillRect(x * PX, y * PX, PX, PX); } }));
+    ['body', legs, closed && 'closed', HATW, ACC].forEach(k => {
+      const L = k && PL[k]; if (!L) return;
+      L[1].forEach((r, y) => [...r].forEach((ch, x) => { if (PCOL[ch]) { g.fillStyle = PCOL[ch]; g.fillRect(x * SP, (L[0] + y) * SP, SP, SP); } }));
+    });
     return c;
   };
-  const F = { a: makeFrame(LEGS.a), b: makeFrame(LEGS.b), fly: makeFrame(LEGS.fly), sleep: makeFrame(LEGS.a, true) };
+  const F = { a: makeFrame('legA'), b: makeFrame('legB'), fly: makeFrame(null), sleep: makeFrame('legA', true) };
 
   // ---------- DOM ----------
   const pet = document.createElement('div');
@@ -174,7 +187,7 @@
   // ---------- сезонные вещи в подвале страницы ----------
   const SEASON = (() => {
     const q = (location.search.match(/[?&]season=(\w+)/) || [])[1]; if (q) return q;
-    const m = new Date().getMonth(); // погода — по настоящей дате, не по переключателю цветов в шапке
+    const m = NOW.m - 1; // погода — по дате (или ?month= / ?day=), не по переключателю цветов в шапке
     return m === 9 ? 'october' : m >= 8 && m <= 10 ? 'autumn' : m === 11 || m <= 1 ? 'winter' : m <= 4 ? 'spring' : 'summer';
   })();
   const sprite = (rows, pal) => {
@@ -206,6 +219,21 @@
     cake: () => sprite(['...f..f..f...', '...c..c..c...', '...c..c..c...', '.wwwwwwwwwww.', 'wwrwwwwwrwwww', 'wpppwpppwpppw', 'ppppppppppppp', 'pPpPpPpPpPpPp',
       'kkkkkkkkkkkkk', 'ppppppppppppp', 'PPPPPPPPPPPPP'], { f: '#F6C445', c: '#93AFCC', w: '#FFF8F0', r: '#E5484D', p: '#F2A7B8', P: '#D9788F', k: '#8B5A3C' }),
     flower: () => { const c = pick(['#F28AB2', '#F6C445', '#B79CF2', '#F47C5B', '#FFFFFF']); return sprite(['.p.', 'pyp', '.p.', '.s.', 'ss.', '.s.'], { p: c, y: '#F6D04D', s: '#5E9E45' }); },
+    // 20.11.2026 вещицы месяцев для уголка
+    snowman: () => sprite(['...hhh...', '...hhh...', '..hhhhh..', '...www...', '..wkwkw..', '..wwoow..', '...www...', '..wwwww..', '.wwwkwww.', '.wwwwwww.', '.wwwkwww.', '..wwwww..'],
+      { h: '#2b2440', w: '#F4F7FB', k: '#1a1528', o: '#F08A3C' }),
+    heart: () => sprite(['.rr...rr.', 'rhrr.rrrr', 'rhrrrrrrr', 'rrrrrrrrr', '.rrrrrrr.', '..rrrrr..', '...rrr...', '....r....'], { r: '#E5484D', h: '#F7A8C4' }),
+    tulip: () => sprite(['...rrr...', '..rrrrr..', '..rRrRr..', '...rrr...', '..g.G.g..', '...gGg...', '....G....', '.ttttttt.', '..ttttt..', '..tTTTt..', '...ttt...'],
+      { r: pick(['#F28AB2', '#F6C445', '#F47C5B']), R: '#D9608F', g: '#6a9a3a', G: '#4E7A2E', t: '#C8642A', T: '#A3592A' }),
+    egg: () => sprite(['...yyy...', '..yyyyy..', '.ywyyywy.', '.bbbbbbb.', 'bbwbbbwbb', 'bbbbbbbbb', 'ppppppppp', '.ppwppwp.', '..ppppp..'],
+      { y: '#F6C445', b: '#5ba3d9', p: '#F28AB2', w: '#FFFFFF' }),
+    can: () => sprite(['..hhhh.....', '.h....h....', '.bbbbbb...s', '.bbbbbb..s.', 'bbbBbbbbss.', '.bbBbbb.s..', '.bbbbbb....', '.bbbbbb....'], { b: '#8fb3d9', B: '#5ba3d9', h: '#5b6b80', s: '#8fb3d9' }),
+    cheese: () => sprite(['..yyyyyyy..', '.yykyyykyy.', 'yyyyykyyyyy', 'ykyyyyyykyy', 'yyyykyyyyyy', '.yyyyyyyky.', '..yyyyyyy..'], { y: '#F2C14E', k: '#7a4a1e' }),
+    melon: () => sprite(['rrrrrrrrrrrrr', 'rrkrrrkrrrkrr', '.rrrrrrrrrrr.', '.wrrkrrrkrrw.', '..wwrrrrrww..', '..ggwwwwwgg..', '....ggggg....'], { r: '#E5484D', k: '#1a1528', w: '#F4F1EA', g: '#4E9A3A' }),
+    apple: () => sprite(['....s.l.', '....sll.', '.rrrsrr.', 'rrhrrrrr', 'rhrrrrrr', 'rrrrrrrr', 'rrrrrrrr', '.rrrrrr.', '..rr.rr.'], { r: '#D93B3B', h: '#F7A8A8', s: '#5B3A1E', l: '#6a9a3a' }),
+    mug: () => sprite(['..s.s....', '.s.s.....', '..s.s....', 'wwwwwww..', 'wbbbbbwww', 'wwwwwww.w', 'wrwrwrw.w', 'wwwwwwwww', 'wwwwwww..', '.wwwww...'],
+      { w: '#F4F1EA', b: '#7a4a2e', r: '#E5484D', s: '#cfc7bd' }),
+    gift: () => sprite(['...r.r...', '....r....', 'ggggrgggg', 'gGggrggGg', 'rrrrrrrrr', 'ggggrgggg', 'gGggrggGg', 'ggggrgggg'], { g: '#4E9A3A', G: '#3d7a2d', r: '#E5484D' }),
   };
   // вещи лежат на дне подвала (.polly-ground, прокручиваются со страницей); когда Полли их несёт или катит — «свободные» (position: fixed)
   const foot = document.querySelector('.site-footer, .ft2'), GOFF = 6, props = [];
@@ -330,9 +358,51 @@
   // и только клюёт, оглядывается и иногда засыпает; никуда не летает и не ходит
   const HOME_X = 16;
   // уголок: сезонная вещица лежит рядом с Полли (справа, на «полу» экрана), и Полли играет с ней, не сходя с места
+  // 20.11.2026: вещица и погода — по месяцу (MONTH), фразы месяца — к обычным
+  const SNOW = ['#FFFFFF', '#E6EEF7', '#D3DFEC'], PINK = ['#F7B6C8', '#FCE1E8', '#F28AB2', '#FFFFFF'];
+  const MONTH = {
+    1: { mk: () => Math.random() < .5 ? SPR.snowman() : dome(14, 5, ['#F4F7FB', '#E6EEF7', '#FFFFFF', '#D3DFEC']), fall: SNOW, bits: SNOW },
+    2: { mk: SPR.heart, fall: ['#E5484D', '#F28AB2', '#F7A8C4'], bits: ['#E5484D', '#F28AB2', '#FFFFFF'] },
+    3: { mk: SPR.tulip, fall: ['#FFFFFF', '#E9F4E2', '#B9DC9A'], bits: ['#6a9a3a', '#F28AB2'] },
+    4: { mk: SPR.egg, fall: PINK, bits: ['#F6C445', '#5ba3d9', '#F28AB2'] },
+    5: { mk: SPR.can, fall: ['#B79CF2', '#D7C6F7', '#9A7FD9', '#FFFFFF'], bits: ['#8fb3d9', '#B9DCF2', '#FFFFFF'] },
+    6: { mk: () => Math.random() < .5 ? SPR.cheese() : SPR.flower(), fall: ['#F6D04D', '#F28AB2', '#FFFFFF', '#6a9a3a'], bits: ['#F6D04D', '#6a9a3a'] },
+    7: { mk: SPR.icecream, fall: null, bits: ['#F28AB2', '#E5484D', '#F6C445'] },
+    8: { mk: SPR.melon, fall: ['#F6C445', '#FFF3B0', '#FFFFFF'], bits: ['#E5484D', '#1a1528', '#4E9A3A'] },
+    9: { mk: SPR.apple, fall: LEAF_C, bits: LEAF_C },
+    10: { mk: () => Math.random() < .5 ? SPR.pumpkin() : dome(14, 5, LEAF_C), fall: LEAF_C, bits: LEAF_C },
+    11: { mk: SPR.mug, fall: ['#A3592A', '#D9952F', '#8fb3d9'], bits: ['#cfc7bd', '#FFFFFF'] },
+    12: { mk: SPR.gift, fall: SNOW, bits: ['#E5484D', '#F6C445', '#FFFFFF'] },
+  }[MM] || { mk: () => null, fall: null, bits: LEAF_C };
+  // фразы месяца (и особых дней) — en / ru / lv
+  const MSAY = (() => {
+    const L = lang === 'ru' ? 1 : lang === 'lv' ? 2 : 0;
+    const A = {
+      1: [['New year, new sketchbook.', 'Новый год — новый скетчбук.', 'Jauns gads — jauna skiču burtnīca.'], ['Snow is just paper falling from the sky.', 'Снег — это бумага, которая падает с неба.', 'Sniegs ir papīrs, kas krīt no debesīm.']],
+      2: [['I love you more than crumbs.', 'Люблю тебя больше, чем крошки.', 'Mīlu tevi vairāk nekā drupačas.'], ['Draw a heart. Any heart.', 'Нарисуй сердечко. Любое.', 'Uzzīmē sirsniņu. Jebkādu.']],
+      3: [['Something is sprouting. Maybe an idea.', 'Что-то прорастает. Может, идея.', 'Kaut kas dīgst. Varbūt ideja.'], ['Spring smells like fresh paint.', 'Весна пахнет свежей краской.', 'Pavasaris smaržo pēc svaigas krāsas.']],
+      4: [['This egg is my work.', 'Это яйцо — моя работа.', 'Šī ola ir mans darbs.'], ['Pastel season is open.', 'Сезон пастели открыт.', 'Pasteļu sezona ir atklāta.']],
+      5: [['Watering my ideas.', 'Поливаю идеи.', 'Laistu idejas.'], ['Lilac season! Grab your purples.', 'Сезон сирени! Доставай фиолетовые.', 'Ceriņu laiks! Ņem violetās krāsas.']],
+      6: [['Līgo, līgo!', 'Лиго, лиго!', 'Līgo, līgo!'], ['Don’t touch my Jāņi cheese.', 'Не трогай мой сыр Яню.', 'Neaiztiec manu Jāņu sieru.']],
+      7: [['Too hot to draw. Drawing anyway.', 'Слишком жарко, чтобы рисовать. Рисую всё равно.', 'Par karstu zīmēšanai. Zīmēju tik un tā.'], ['Ice cream counts as a palette.', 'Мороженое — тоже палитра.', 'Saldējums arī ir palete.']],
+      8: [['Make a wish, a star is falling!', 'Загадай желание — звезда падает!', 'Iedomājies vēlēšanos — krīt zvaigzne!'], ['Watermelon: green, red and dots.', 'Арбуз: зелёный, красный и точки.', 'Arbūzs: zaļš, sarkans un punktiņi.']],
+      9: [['Back to school. I brought an apple.', 'Снова в школу. Яблоко уже есть.', 'Atpakaļ uz skolu. Ābols jau ir.'], ['Sharpen your pencils!', 'Точи карандаши!', 'Uzasini zīmuļus!']],
+      10: [['Inktober? Inktober.', 'Инктобер? Инктобер.', 'Inktober? Inktober.'], ['This pumpkin is staring at me.', 'Эта тыква на меня смотрит.', 'Šis ķirbis skatās uz mani.']],
+      11: [['Tea, blanket, sketchbook.', 'Чай, плед, скетчбук.', 'Tēja, pleds, skiču burtnīca.'], ['Cocoa is a warm colour.', 'Какао — тёплый цвет.', 'Kakao ir silta krāsa.']],
+      12: [['Have you opened today’s window?', 'Окошко на сегодня уже открыто?', 'Vai šodienas lodziņš jau atvērts?'], ['I wrapped a gift. For me.', 'Подарок упакован. Для себя.', 'Dāvana iesaiņota. Sev.']],
+    }[MM] || [];
+    const D = MM === 4 && DD === 1 ? [['Who? Me? I’m a totally different bird.', 'Кто? Я? Это совсем другая птица.', 'Kas? Es? Šis ir pavisam cits putns.']]
+      : MM === 10 && DD >= 24 ? [['Boo! Did I scare you?', 'Бу! Страшно?', 'Bū! Bail?']]
+      : MM === 11 && DD === 18 ? [['Happy birthday, Latvia!', 'С днём рождения, Латвия!', 'Daudz laimes, Latvija!']]
+      : MM === 11 && DD === 11 ? [['Lāčplēsis Day. Light a candle.', 'День Лачплесиса. Зажги свечу.', 'Lāčplēša diena. Iededz svecīti.']]
+      : MM === 12 && DD >= 24 && DD <= 26 ? [['Merry Christmas!', 'Счастливого Рождества!', 'Priecīgus Ziemassvētkus!']]
+      : MM === 12 && DD === 31 ? [['See you next year!', 'До встречи в новом году!', 'Tiekamies nākamgad!']]
+      : MM === 1 && DD === 1 ? [['Happy New Year!', 'С Новым годом!', 'Laimīgu Jauno gadu!']] : [];
+    return { day: D.map(r => r[L]), month: A.map(r => r[L]) };
+  })();
+  const sayLine = () => MSAY.day.length && Math.random() < .5 ? pick(MSAY.day) : MSAY.month.length && Math.random() < .4 ? pick(MSAY.month) : pick(TXT.say);
   const CORNER = (() => {
-    const mk = BDAY ? SPR.cake() : SEASON === 'october' ? (Math.random() < .5 ? SPR.pumpkin() : dome(14, 5, LEAF_C)) : SEASON === 'autumn' ? dome(14, 5, LEAF_C)
-      : SEASON === 'winter' ? dome(14, 5, ['#F4F7FB', '#E6EEF7', '#FFFFFF', '#D3DFEC']) : SEASON === 'summer' ? (Math.random() < .5 ? SPR.icecream() : SPR.flower()) : null;
+    const mk = BDAY ? SPR.cake() : MONTH.mk();
     if (!mk) return null;
     mk.className = 'polly-prop free'; mk.setAttribute('aria-hidden', 'true'); document.body.appendChild(mk);
     return { el: mk, w: mk.width, h: mk.height, free: true, x: 0, y: 0 };
@@ -346,32 +416,23 @@
       burst(cx + CORNER.w / 2, top - CORNER.h + 2, PARTY, 10, .8);
       await wait(400); CORNER.el.classList.remove('wiggle'); return;
     }
-    if (SEASON === 'spring') { // лепестки сыплются сверху, Полли хлопает крыльями
-      for (let i = 0; i < 8; i++) petal(HOME_X + Math.random() * (W + 30), top - H - 60 - Math.random() * 40);
-      for (let i = 0; i < 4; i++) { body.classList.add('flap'); await wait(160); body.classList.remove('flap'); await wait(160); }
-      return;
-    }
     if (!CORNER) return;
     face(1);
     const mid = cx + CORNER.w / 2, ty = top - CORNER.h + 2;
-    if (SEASON === 'winter' && Math.random() < .4) { // снежинки падают на Полли
-      for (let i = 0; i < 10; i++) petal(HOME_X + Math.random() * (W + 30), top - H - 70 - Math.random() * 40, ['#FFFFFF', '#E6EEF7', '#D3DFEC']);
-      await wait(900); await peck(1); return;
-    }
-    if ((SEASON === 'autumn' || SEASON === 'october') && Math.random() < .35) { // листик падает сверху
-      for (let i = 0; i < 3; i++) petal(HOME_X + Math.random() * (W + 20), top - H - 60 - Math.random() * 30, LEAF_C);
-      await wait(800); await peck(2); return;
+    if (MONTH.fall && Math.random() < .4) { // сверху падают снежинки / сердечки / лепестки / листья / звёздочки месяца
+      for (let i = 0; i < 9; i++) petal(HOME_X + Math.random() * (W + 30), top - H - 60 - Math.random() * 40, MONTH.fall);
+      if (Math.random() < .5) for (let i = 0; i < 3; i++) { body.classList.add('flap'); await wait(160); body.classList.remove('flap'); await wait(160); }
+      await wait(700); await peck(1); return;
     }
     CORNER.el.classList.add('wiggle'); await peck(2 + Math.floor(Math.random() * 2));
-    const cols = SEASON === 'winter' ? ['#FFFFFF', '#E6EEF7', '#D3DFEC'] : SEASON === 'summer' ? ['#F28AB2', '#E5484D', '#F6C445'] : LEAF_C;
-    burst(mid, ty, cols, SEASON === 'summer' ? 4 : 10, SEASON === 'summer' ? .4 : .7);
+    burst(mid, ty, MONTH.bits, 8, .6);
     await wait(400); CORNER.el.classList.remove('wiggle');
   }
   async function act() {
     if (x !== HOME_X || spot !== 'floor') { spot = 'floor'; perch = null; x = HOME_X; y = floorY(); place(); }
     cornerPlace();
     const roll = Math.random();
-    if (roll < 0.35 && (CORNER || SEASON === 'spring')) await cornerPlay();
+    if (roll < 0.35 && CORNER) await cornerPlay();
     else if (BDAY && roll < 0.42) await say(pick(BDAY_SAY));
     else if (roll < 0.5) await peck(1 + Math.floor(Math.random() * 3));
     else if (roll < 0.7) { face(-dir); await wait(700); face(-dir); }
@@ -411,7 +472,7 @@
     zzz.classList.remove('show');
     show('a');
     if (wasSleeping) { body.classList.add('startle'); setTimeout(() => body.classList.remove('startle'), 400); }
-    await say(wasSleeping ? pick(TXT.wake) : pick(TXT.say));
+    await say(wasSleeping ? pick(TXT.wake) : sayLine());
     await peck(1); // остаётся на месте
     busy = false;
   });
@@ -429,7 +490,7 @@
   // связка ключей в клюве: открыли кабинет в шапке (v2.js) — Полли прилетает и садится на край списка, закрыли — летит обратно в угол
   // связка: тонкое колечко у клюва, на нём два ключа (медный позади золотого) концами в разные стороны; вся связка качается
   const KEY = ['XXX', 'X.X', 'XXX', '.X.', '.X.', '.XX', '.X.', '.XX'];
-  const KPX = Math.max(2, PX - 1), KW = 8 * KPX;
+  const KPX = PX - 1, KW = 8 * KPX;
   const keysEl = document.createElement('div'), swing = document.createElement('div');
   keysEl.className = 'polly-keys';
   const keyCv = (col, rot) => {
@@ -445,13 +506,13 @@
   ring.style.cssText = 'position:absolute;left:0;top:0';
   swing.style.cssText = `position:relative;width:${KW}px;height:${12 * KPX}px;transform-origin:50% ${1.9 * KPX}px`;
   swing.append(keyCv('#D27A3C', 30), keyCv('#F2B530', -12), ring);
-  const KL = Math.round(11.5 * PX - 4 * KPX);
-  keysEl.style.cssText = `position:absolute;left:${KL}px;top:${Math.round((4 + TOP) * PX - KPX * 0.4)}px;display:none;pointer-events:none;filter:drop-shadow(1px 0 0 #1a1528) drop-shadow(-1px 0 0 #1a1528) drop-shadow(0 1px 0 #1a1528) drop-shadow(0 -1px 0 #1a1528)`;
+  const KL = Math.round(23.5 * SP - 4 * KPX); // колечко — у середины клюва (столбцы 21–27 спрайта)
+  keysEl.style.cssText = `position:absolute;left:${KL}px;top:${Math.round(14.5 * SP - 1.9 * KPX)}px;display:none;pointer-events:none;filter:drop-shadow(1px 0 0 #1a1528) drop-shadow(-1px 0 0 #1a1528) drop-shadow(0 1px 0 #1a1528) drop-shadow(0 -1px 0 #1a1528)`;
   keysEl.appendChild(swing); body.style.position = 'relative'; body.appendChild(keysEl);
-  // клюв поверх колечка: отдельный слой только с клювом (строки 3–4 спрайта), отражается вместе с Полли (.polly-body.flip canvas)
+  // клюв поверх колечка: отдельный слой только с клювом, отражается вместе с Полли (.polly-body.flip canvas)
   const beak = document.createElement('canvas'); beak.width = W; beak.height = H;
-  { const bg = beak.getContext('2d'); bg.fillStyle = COL.o;
-    BODY.slice(0, 5).forEach((r, j) => [...r].forEach((ch, i) => { if (ch === 'o') bg.fillRect(i * PX, (j + TOP) * PX, PX, PX); })); }
+  { const bg = beak.getContext('2d'), BEAK = ['#f08a3c', '#c8642a'], L = PL.body;
+    L[1].forEach((r, j) => [...r].forEach((ch, i) => { if (i >= 21 && BEAK.includes(PCOL[ch])) { bg.fillStyle = PCOL[ch]; bg.fillRect(i * SP, (L[0] + j) * SP, SP, SP); } })); }
   beak.style.cssText = 'position:absolute;left:0;top:0;display:none;pointer-events:none;image-rendering:pixelated';
   body.appendChild(beak);
   if (!reduce && swing.animate) swing.animate([{ transform: 'rotate(-14deg)' }, { transform: 'rotate(14deg)' }], { duration: 650, iterations: Infinity, direction: 'alternate', easing: 'ease-in-out' }); // ключи болтаются
