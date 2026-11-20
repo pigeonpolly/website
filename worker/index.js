@@ -1,4 +1,4 @@
-// Сервер сайта: отдаёт статические файлы из site/ и обслуживает /api/* для «Стены рисунков»:
+﻿// Сервер сайта: отдаёт статические файлы из site/ и обслуживает /api/* для «Стены рисунков»:
 // вход через Google, ник, загрузка работы дня, серии, стена, топ, модерация, GDPR (экспорт и удаление).
 // Данные — Cloudflare D1 (env.DB), картинки челленджа — R2 (env.MEDIA, папка challenge/), старые ещё и в KV (env.IMAGES), пока идёт перенос. Блог — worker/blog.js (картинки блога в R2, env.MEDIA).
 import { blogApi, blogPage, blogImgCheck, visitor, anonCode, claimAnon, birdName } from './blog.js';
@@ -2238,7 +2238,7 @@ async function route(req, env, url) {
     return json({ ok: true });
   }
   if (m === 'GET' && p === '/api/advent') {
-    const t = adventNow(req, env), u = await currentUser(req, env), admin = await isAdmin(u, env);
+    const t = adventNow(req, env), u = await currentUser(req, env), admin = await adminIdentity(u, env); // без PIN: план окон видит только аккаунт Алины
     const opened = u ? (await env.DB.prepare('SELECT day, kind, item, buttons, got FROM advent_open WHERE user_id = ? AND year = ?').bind(u.id, t.year).all()).results.map(o => ({ ...o, got: parseJ(o.got, o.kind ? [[o.kind, o.item]] : []) })) : [];
     const all = (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results;
     // прошедшие окошки открыты для всех (и для гостей): в декабре — дни до сегодняшнего, в январе — все; будущее — секрет (целиком видит только админ)
@@ -3112,4 +3112,5 @@ async function route(req, env, url) {
 
   return json({ error: 'not_found' }, 404);
 }
+
 

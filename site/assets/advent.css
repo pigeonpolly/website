@@ -1,4 +1,4 @@
-/* Адвент-календарь (/advent/): белая страница в снегу, красные дверцы, золото.
+﻿/* Адвент-календарь (/advent/): белая страница в снегу, красные дверцы, золото.
    Классы те же, что в advent.js: adv-board, adv-win, adv-door, adv-modal, adv-card и т. д. */
 
 .adv-hero { position: relative; color: #1C2430; padding: clamp(30px, 5vw, 58px) 0 clamp(18px, 3vw, 28px);
@@ -92,10 +92,15 @@
 .adv-msg { margin: 14px auto 0; max-width: 680px; text-align: center; font: 500 15px/1.5 Karla, sans-serif; color: #9E1B22; background: #FFF6E5; border: 1px solid rgba(158, 27, 34, .25); border-radius: 12px; padding: 10px 14px; }
 
 
-/* шапка по центру и снежные горы под ней */
+/* шапка по центру, под ней деревня: дома с окнами, где горит свет */
 .adv-hero { text-align: center; padding-bottom: 0; }
 .adv-hero .adv-kick, .adv-hero .adv-lead, .adv-hero .adv-note { margin-left: auto; margin-right: auto; }
-.adv-hills { line-height: 0; background: #fff; }
-.adv-hills svg { display: block; width: 100%; height: clamp(96px, 15vw, 210px); }
-.adv { padding-top: 12px; }
+.adv-village { line-height: 0; background: #fff; margin-top: -8px; }
+.adv-village svg { display: block; width: 100%; height: clamp(150px, 22vw, 250px); }
+.adv-village .lit { animation: advFlicker 5.5s ease-in-out infinite; }
+.adv-village .adv-shadow { animation: advShadow 16s ease-in-out infinite alternate; }
+@keyframes advFlicker { 50% { opacity: .66; } }
+@keyframes advShadow { to { transform: translateX(22px); opacity: .55; } }
+.adv { padding-top: 10px; }
+
 

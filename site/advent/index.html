@@ -120,7 +120,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 </div></div>
 </header>
 <main id="main">
-<link rel="stylesheet" href="/assets/advent.css?v=6771bbef">
+<link rel="stylesheet" href="/assets/advent.css?v=3dbfdde0">
 <section data-ppb="advent.1" class="adv-hero"><div class="w">
   <p class="adv-kick">1–31 December · one window a day</p>
   <h1>An advent <em>for drawing</em></h1>
@@ -128,18 +128,93 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   <p class="adv-note">Missed a day? You can come back for the windows you missed until 1 March — except the windows of 24 and 31 December.</p>
 </div></section>
 
-<div data-ppb="advent.2" class="adv-hills" aria-hidden="true">
-  <svg viewBox="0 0 1440 240" preserveAspectRatio="none">
-    <path d="M0 240 L0 150 L150 70 L260 130 L420 45 L560 140 L700 75 L860 155 L1010 85 L1170 160 L1320 95 L1440 140 L1440 240 Z" fill="#DEEAF3"/>
-    <path d="M420 45 L462 78 L438 72 L420 96 L402 72 L378 78 Z" fill="#FFFFFF"/>
-    <path d="M700 75 L736 104 L716 99 L700 118 L684 99 L664 104 Z" fill="#FFFFFF"/>
-    <path d="M1010 85 L1046 114 L1026 109 L1010 128 L994 109 L974 114 Z" fill="#FFFFFF"/>
-    <path d="M0 240 L0 195 L190 125 L330 185 L500 115 L650 195 L820 135 L980 205 L1140 145 L1300 205 L1440 165 L1440 240 Z" fill="#FFFFFF"/>
-    <path d="M150 205 l12 -34 l12 34 z" fill="#23503F"/>
-    <path d="M186 212 l10 -26 l10 26 z" fill="#2C5F4B"/>
-    <path d="M1180 214 l11 -30 l11 30 z" fill="#23503F"/>
-    <path d="M1216 208 l9 -24 l9 24 z" fill="#2C5F4B"/>
-    <path d="M900 216 l10 -28 l10 28 z" fill="#23503F"/>
+<div data-ppb="advent.2" class="adv-village" aria-hidden="true">
+  <svg viewBox="0 0 1440 260" preserveAspectRatio="xMidYMax slice">
+    <ellipse class="adv-shadow" cx="120" cy="212" rx="90" ry="8" fill="#DCE7EF"/>
+    <ellipse class="adv-shadow" cx="420" cy="214" rx="110" ry="9" fill="#DCE7EF"/>
+    <ellipse class="adv-shadow" cx="930" cy="214" rx="100" ry="8" fill="#DCE7EF"/>
+    <!-- дом 1 -->
+    <g>
+      <rect x="40" y="120" width="112" height="92" fill="#F6F1E7"/>
+      <path d="M28 120 L96 70 L164 120 Z" fill="#8E2B2B"/>
+      <rect x="92" y="176" width="20" height="36" fill="#7A4A28"/>
+      <rect class="lit" x="56" y="136" width="22" height="26" rx="2" fill="#F4C95D"/>
+      <rect x="52" y="136" width="5" height="26" fill="#D8B27A"/><rect x="77" y="136" width="5" height="26" fill="#D8B27A"/>
+      <rect x="120" y="136" width="22" height="26" rx="2" fill="#2A3B4C"/>
+      <rect x="132" y="92" width="10" height="20" fill="#6B4329"/>
+    </g>
+    <!-- ель -->
+    <path d="M186 210 l16 -40 l16 40 z" fill="#23503F"/><rect x="199" y="210" width="5" height="8" fill="#7A4A28"/>
+    <!-- дом 2 -->
+    <g>
+      <rect x="226" y="142" width="96" height="70" fill="#EAF0F4"/>
+      <path d="M214 142 L274 98 L334 142 Z" fill="#23503F"/>
+      <rect class="lit" x="244" y="158" width="20" height="24" rx="2" fill="#F4C95D"/>
+      <rect x="240" y="158" width="4" height="24" fill="#D8B27A"/><rect x="264" y="158" width="4" height="24" fill="#D8B27A"/>
+      <rect x="288" y="158" width="20" height="24" rx="2" fill="#2A3B4C"/>
+    </g>
+    <!-- дом 3, высокий -->
+    <g>
+      <rect x="356" y="100" width="120" height="112" fill="#F8F0E4"/>
+      <path d="M344 100 L416 46 L488 100 Z" fill="#7E141B"/>
+      <rect class="lit" x="372" y="118" width="24" height="28" rx="2" fill="#F4C95D"/>
+      <rect class="lit" x="404" y="118" width="24" height="28" rx="2" fill="#F4C95D"/>
+      <rect x="368" y="118" width="5" height="28" fill="#D8B27A"/><rect x="395" y="118" width="5" height="28" fill="#D8B27A"/>
+      <rect x="400" y="118" width="5" height="28" fill="#D8B27A"/><rect x="427" y="118" width="5" height="28" fill="#D8B27A"/>
+      <rect x="452" y="160" width="20" height="24" rx="2" fill="#2A3B4C"/>
+      <rect x="368" y="166" width="24" height="46" fill="#F4EFE5" opacity=".6"/>
+    </g>
+    <!-- ели -->
+    <path d="M506 214 l15 -36 l15 36 z" fill="#23503F"/><rect x="518" y="214" width="5" height="7" fill="#7A4A28"/>
+    <path d="M540 216 l12 -28 l12 28 z" fill="#2C5F4B"/>
+    <!-- дом 4 -->
+    <g>
+      <rect x="590" y="130" width="100" height="82" fill="#FFFFFF"/>
+      <path d="M578 130 L640 86 L702 130 Z" fill="#C9A227"/>
+      <rect class="lit" x="608" y="148" width="22" height="26" rx="2" fill="#F4C95D"/>
+      <rect x="604" y="148" width="4" height="26" fill="#D8B27A"/><rect x="630" y="148" width="4" height="26" fill="#D8B27A"/>
+      <rect class="lit" x="648" y="148" width="22" height="26" rx="2" fill="#F4C95D"/>
+    </g>
+    <!-- дом 5 -->
+    <g>
+      <rect x="740" y="150" width="110" height="62" fill="#EAF0F4"/>
+      <path d="M728 150 L795 108 L862 150 Z" fill="#23503F"/>
+      <rect x="762" y="164" width="20" height="22" rx="2" fill="#2A3B4C"/>
+      <rect class="lit" x="802" y="164" width="20" height="22" rx="2" fill="#F4C95D"/>
+    </g>
+    <!-- ели -->
+    <path d="M876 214 l16 -42 l16 42 z" fill="#23503F"/><rect x="889" y="214" width="5" height="8" fill="#7A4A28"/>
+    <!-- дом 6, с башней -->
+    <g>
+      <rect x="930" y="112" width="130" height="100" fill="#F6F1E7"/>
+      <path d="M918 112 L995 62 L1072 112 Z" fill="#8E2B2B"/>
+      <rect x="966" y="132" width="24" height="28" rx="2" fill="#F4C95D" class="lit"/>
+      <rect x="1006" y="132" width="24" height="28" rx="2" fill="#F4C95D" class="lit"/>
+      <rect x="962" y="132" width="5" height="28" fill="#D8B27A"/><rect x="989" y="132" width="5" height="28" fill="#D8B27A"/>
+      <rect x="1002" y="132" width="5" height="28" fill="#D8B27A"/><rect x="1029" y="132" width="5" height="28" fill="#D8B27A"/>
+      <rect x="990" y="176" width="22" height="36" fill="#7A4A28"/>
+    </g>
+    <!-- дом 7 -->
+    <g>
+      <rect x="1100" y="146" width="96" height="66" fill="#FFFFFF"/>
+      <path d="M1088 146 L1148 104 L1208 146 Z" fill="#7E141B"/>
+      <rect x="1120" y="160" width="20" height="24" rx="2" fill="#2A3B4C"/>
+      <rect x="1156" y="160" width="20" height="24" rx="2" fill="#2A3B4C"/>
+    </g>
+    <!-- ель -->
+    <path d="M1226 214 l15 -34 l15 34 z" fill="#23503F"/><rect x="1238" y="214" width="5" height="7" fill="#7A4A28"/>
+    <!-- дом 8 -->
+    <g>
+      <rect x="1270" y="126" width="104" height="86" fill="#F8F0E4"/>
+      <path d="M1258 126 L1322 82 L1386 126 Z" fill="#23503F"/>
+      <rect class="lit" x="1288" y="144" width="22" height="26" rx="2" fill="#F4C95D"/>
+      <rect class="lit" x="1326" y="144" width="22" height="26" rx="2" fill="#F4C95D"/>
+      <rect x="1284" y="144" width="4" height="26" fill="#D8B27A"/><rect x="1311" y="144" width="4" height="26" fill="#D8B27A"/>
+    </g>
+    <!-- снег -->
+    <path d="M0 212 Q 240 196 470 214 T 980 210 T 1440 206 L1440 260 L0 260 Z" fill="#EAF2F7"/>
+    <circle cx="120" cy="238" r="2.4" fill="#FFFFFF"/><circle cx="360" cy="244" r="2" fill="#FFFFFF"/>
+    <circle cx="700" cy="236" r="2.2" fill="#FFFFFF"/><circle cx="1040" cy="242" r="2" fill="#FFFFFF"/>
   </svg>
 </div>
 
@@ -158,7 +233,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>The Flock</h4><a href="/flock/" data-f>All birds</a><a href="/flock/news/" data-f>Flock news</a><a href="/challenge/" data-f>Daily Challenge</a><a href="/challenge/#sw-wall" data-f>Flock drawings</a><a href="/requests/" data-f>Draw this for me</a><a href="/garden/" data-f>Bird garden</a></div>
     <div><h4 data-f>Alina</h4><a href="/sketchbook/" data-f>Sketchbook</a><a href="/about-me/" data-f>About me</a><a href="/on-walls-and-pages/" data-f>On Walls &amp; Pages</a><a href="/projects/" data-f>Learning &amp; AI</a><a href="/work-with-me/" data-f>Work with me</a><a href="/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Alina Otkinska · Pigeon Polly Art Lab · Riga</span><span class="ver" data-ver="113">v113 · 20.11 20:51</span><span><a href="/privacy/">Privacy</a></span></div>
+  <div class="bt"><span>© 2026 Alina Otkinska · Pigeon Polly Art Lab · Riga</span><span class="ver" data-ver="114">v114 · 20.11 21:01</span><span><a href="/privacy/">Privacy</a></span></div>
 </div></footer>
 </body>
 </html>
