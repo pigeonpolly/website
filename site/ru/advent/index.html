@@ -120,7 +120,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 </div></div>
 </header>
 <main id="main">
-<link rel="stylesheet" href="/assets/advent.css?v=6b0776f6">
+﻿<link rel="stylesheet" href="/assets/advent.css?v=8795a8b4">
 <div data-ppb="advent.1" class="advw" id="advw">
   <section class="sky">
     <div class="stars" id="stars"></div>
@@ -128,11 +128,11 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div class="snow" id="snow"></div>
     <div class="head">
       <p class="kick">1–31 декабря · одно окошко в день</p>
-      <h1>A street of <em>31 windows</em></h1>
-      <p class="lead">Every day a window lights up in one of the houses. Inside is a file to keep: a wallpaper, a colouring page, a calendar or a palette — and a little thing for your bird.</p>
+      <h1>Улица <em>31 окошка</em></h1>
+      <p class="lead">Каждый день в одном из домов загорается окно. Внутри — файл, который остаётся у вас: обои, раскраска, календарь или палитра, — и маленький подарок для птички.</p>
       <div class="garland" aria-hidden="true"><svg id="garland" viewBox="0 0 900 40" preserveAspectRatio="none"></svg></div>
       <p class="gcount" id="gcount"></p>
-      <p class="hint"><span class="mini"><i></i></span>A window with a ribbon is yours: tap it and the shutters open</p>
+      <p class="hint"><span class="mini"><i></i></span>Окно с бантиком — ваше: нажмите, и ставни откроются</p>
     </div>
     <div class="street" id="street"></div>
     <div class="ground-snow"></div>
@@ -141,31 +141,32 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   <section class="below">
     <div class="cards">
       <div class="card">
-        <div class="k">📥 My files</div>
+        <div class="k">📥 Мои файлы</div>
         <h2 id="fcount"></h2>
         <div class="files" id="files"></div>
-        <p class="note">Files stay here until 1 March — download them whenever you like.</p>
+        <p class="note">Файлы лежат здесь до 1 марта — скачивайте, когда удобно.</p>
       </div>
       <div class="card">
-        <div class="k">🎁 For your bird</div>
+        <div class="k">🎁 Для птички</div>
         <h2 id="bcount"></h2>
         <div class="bonus" id="bonus"></div>
-        <div class="acts"><a class="pill" href="/ru/bird/#bp-room">🏠 To the bird's room</a><a class="pill ghost" href="/ru/bird/">🎒 Bag</a></div>
+        <div class="acts"><a class="pill" href="/ru/bird/#bp-room">🏠 В комнату птички</a><a class="pill ghost" href="/ru/bird/">🎒 Сумка</a></div>
         <p class="note">All 31 windows — the 🏅 “Collector” badge and +50 🔘</p>
       </div>
     </div>
     <div class="legend">
-      <span><i style="background:#FFCC6E"></i>open — shutters are open</span>
-      <span><i style="background:linear-gradient(0deg,#B3222C 42%,#E9C46A 42% 58%,#B3222C 58%);box-shadow:0 0 0 2px #E9C46A,0 0 10px 2px rgba(255,190,90,.8)"></i>today</span>
-      <span><i style="background:linear-gradient(0deg,#B3222C 42%,#E9C46A 42% 58%,#B3222C 58%)"></i>with a ribbon — you can open it</span>
-      <span><i style="background:#4C6283"></i>frosted — not yet</span>
-      <span><i class="r" style="background:#4C6283;box-shadow:0 0 0 2px #C9A227"></i>round — special</span>
+      <span><i style="background:#FFCC6E"></i>открыто — ставни распахнуты</span>
+      <span><i style="background:linear-gradient(0deg,#B3222C 42%,#E9C46A 42% 58%,#B3222C 58%);box-shadow:0 0 0 2px #E9C46A,0 0 10px 2px rgba(255,190,90,.8)"></i>сегодня — окно ждёт вас</span>
+      <span><i style="background:linear-gradient(0deg,#B3222C 42%,#E9C46A 42% 58%,#B3222C 58%)"></i>с бантиком — можно открыть</span>
+      <span><i style="background:#4C6283"></i>в инее — ещё рано</span>
+      <span><i class="r" style="background:#4C6283;box-shadow:0 0 0 2px #C9A227"></i>круглое — особое окно</span>
     </div>
   </section>
 
   <div class="modal" id="modal" role="dialog" aria-modal="true"><div class="mcard"><div class="confetti" id="conf"></div><button class="x" aria-label="Закрыть">✕</button><div id="mbody"></div></div></div>
 </div>
-<script src="/assets/advent.js?v=cdc6939a" defer></script>
+<script src="/assets/advent.js?v=5af5611b" defer></script>
+
 
 </main>
 <footer class="ft2"><div class="w">
@@ -179,7 +180,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>Стая</h4><a href="/ru/flock/" data-f>Все птички</a><a href="/ru/flock/news/" data-f>Новости стаи</a><a href="/ru/challenge/" data-f>Челлендж дня</a><a href="/ru/challenge/#sw-wall" data-f>Рисунки стаи</a><a href="/ru/requests/" data-f>Нарисуй мне</a><a href="/ru/garden/" data-f>Огород птички</a></div>
     <div><h4 data-f>Алина</h4><a href="/ru/sketchbook/" data-f>Скетчбук</a><a href="/ru/about-me/" data-f>Обо мне</a><a href="/ru/on-walls-and-pages/" data-f>На стенах и страницах</a><a href="/ru/projects/" data-f>Обучение и AI</a><a href="/ru/work-with-me/" data-f>Сотрудничество</a><a href="/ru/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="120">v120 · 20.11 21:33</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
+  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="121">v121 · 20.11 21:42</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
 </div></footer>
 </body>
 </html>

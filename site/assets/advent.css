@@ -178,6 +178,7 @@
 .fpic{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;z-index:0;filter:saturate(1.05)}
 .advw .open .fpic~.gift{display:none}
 .advw .fbadge{position:absolute;z-index:3;right:3px;bottom:3px;font:700 8px/1 Karla;letter-spacing:.06em;background:#fff;color:var(--ink);padding:3px 4px;border-radius:4px;box-shadow:0 1px 2px rgba(0,0,0,.25)}
+.advw .fbig{position:absolute;inset:0;display:grid;place-items:center;font:700 10px/1 Karla;letter-spacing:.08em;color:var(--ink);background:linear-gradient(160deg,#FFF8E8,#F2E3C3);z-index:0}
 .advw /* карточка файла в окне подарка */
 .file{display:grid;justify-items:center;gap:10px;margin:8px 0 4px}
 .advw .prev{position:relative;animation:aw-fly .9s ease-out}
@@ -192,6 +193,7 @@
 .advw .prev-paper.tall{width:150px}
 .advw .fmt{display:inline-block;font:700 11px/1 Karla;letter-spacing:.12em;padding:5px 8px;border-radius:6px;background:#FDECEA;color:var(--red)}
 .advw .fmt.img{background:#E8F1EC;color:#2C5F4B}
+.advw .fcard .th .ffmt{position:absolute;inset:0;display:grid;place-items:center;font:700 13px/1 Karla;letter-spacing:.08em;color:var(--red);background:repeating-linear-gradient(135deg,#FFF4F2 0 8px,#FDECEA 8px 16px)}
 .advw .fname{font:700 22px/1.2 Fraunces;margin:2px 0 0}
 .advw .fmeta{font-size:14px;color:#6B7884}
 .advw .more{margin:18px 0 0;padding-top:14px;border-top:1px dashed #DCE5EC;text-align:left}

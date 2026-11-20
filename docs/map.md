@@ -58,7 +58,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/about-desk.js` (52K) — «Стол Алины» на /about-me/ (docs/site.md): пиксельная картинка site/images/about/desk.webp: PAGE, SKIN, PAINT, rnd, box
 - `site/assets/account.js` (43K) — вход в шапке, меню аккаунта, обязательный ник, `html.is-admin`: PPDevH, PPWhoP, PPWho, ALINA_MAIL, IN_APP
 - `site/assets/admin.js` (225K) — кабинет /admin/ (все разделы): PPGiftDialog, PPAud, BADGE_COND, ADMIN_GROUPS, ADMIN_SECTIONS
-- `site/assets/advent-admin.js` (9K) — кабинет → 🎄 Адвент: план окошек: PPAdventAdmin, ADV_SP, advSet, advBoard, advDayPick
+- `site/assets/advent-admin.js` (19K) — кабинет → 🎄 Адвент: план окошек: PPAdventAdmin, ADV_SP, advSet, advBoard, advDayPick (окно дня: «вещи из магазина» / «загрузить файл» с компьютера → POST /api/admin/advent/file)
 - `site/assets/advent.js` (17K) — адвент /advent/: отсчёт, окошки: ORDER, tap, goTo, draw, load
 - `site/assets/artpill-claude.js` (50K) — «Art-Pill by Polly»: скетчбук Claude — страницы с первой по последнюю (docs/artpill.md): PP_ARTPILL_CLAUDE, FIRST, SECOND, THIRD
 - `site/assets/artpill.js` (40K) — «Art-Pill by Polly» (/art-pill/, docs/artpill.md): версии таблетки, «почему это не просто : VERSIONS, img, pic, openBook, reader

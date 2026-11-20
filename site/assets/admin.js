@@ -50,8 +50,8 @@
     { id: 'subscribers', ic: '📬', name: 'Подписчики', group: 'birds', about: 'Адреса людей, которые ждут письма о новой книге.', count: 'subs' },
     { id: 'shop', ic: '🛍', name: 'Птичий рынок', group: 'shop', about: 'Сколько штук каждой вещи в продаже; цены считаются сами.' },
     { id: 'cards', ic: '🃏', name: 'Карточки', group: 'shop', about: 'Коллекционные карточки: каждая — в одном экземпляре. Новая карточка, правка, номер, скрыть, удалить; цена обычных; импорт коллекций с сайта.' },
-    { id: 'advent', ic: '🎄', name: 'Адвент', group: 'shop', about: 'Что лежит в каком окошке адвент-календаря.', count: 'advent' },
-    { id: 'adventfiles', ic: '📎', name: 'Файлы в адвент', group: 'shop', about: 'Положить в окно адвента файл: ссылка на архив, превью и подпись. В окне будет картинка, подпись и «Скачать».' },
+    { id: 'advent', ic: '🎄', name: 'Адвент', group: 'shop', about: 'Что лежит в каком окошке адвент-календаря. В окно можно положить вещи из магазина или загрузить свой файл — с компьютера, без ссылок.', count: 'advent' },
+    { id: 'adventfiles', hide: 1, ic: '📎', name: 'Файлы в адвент', open: 'advent' }, // старый адрес: файл теперь кладётся в окно в «🎄 Адвенте»
     { id: 'titos', ic: '🕵️', name: 'Дела Титоса', group: 'shop', about: 'Какие дела детектива Титоса на сайте и переведены ли они. Новые дела заносятся сами раз в час после выкладки.' },
     { id: 'titos-rules', hide: 1, ic: '📜', name: 'Правила Титоса', open: 'rules', focus: rulesBox(/Детектив Титос/), about: 'Кофе детектива Титоса и пуговки за раскрытые дела.' },
     { id: 'games', hide: 1, ic: '🎮', name: 'Награды игр', open: 'rules', focus: rulesBox(/Пуговичный дождь/), about: 'Сколько пуговок дают игры.' },
@@ -68,7 +68,7 @@
     { id: 'edits', ic: '🧩', name: 'Правки страниц', group: 'service', about: 'Блоки, которые вы поменяли или скрыли прямо на сайте («✏️ Править страницу»), — здесь их можно вернуть как было.', count: 'edits' },
     { id: 'gemini', hide: 1, ic: '🔑', name: 'Ключ Gemini', href: '/blog-editor/#gemini' },
   ];
-  const SECTIONS = { week, notes, titos, prompts: promptsScreen, adventfiles: adventFiles, inbox, security, analytics, comments, funnels: () => funnelsScreen(), backup, subscribers, birds, shop, edits, advent, rules, art,
+  const SECTIONS = { week, notes, titos, prompts: promptsScreen, inbox, security, analytics, comments, funnels: () => funnelsScreen(), backup, subscribers, birds, shop, edits, advent, rules, art,
     themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
     asks: () => window.PPAboutAdmin ? window.PPAboutAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился about-admin.js</p>'), // 📮 Вопросы из чата (about-admin.js)
     school: () => window.PPSchoolAdmin ? window.PPSchoolAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился school-admin.js</p>'), // 🎓 Школа Полли (school-admin.js)
@@ -709,39 +709,6 @@
       const tr = btn.closest('tr'), id = tr.dataset.id, l = tr.dataset.lang;
       if (!confirm(l === '*' ? 'Снова показать этот блок посетителям?' : 'Убрать правку и вернуть оригинал этого блока?')) return;
       try { await api('admin/blocks', id.startsWith('page:') ? { id, lang: '*', html: null } : l === '*' ? { id, lang: '*', hidden: false } : { id, lang: l, html: null }); edits(); } catch (e) { alert(err(e)); }
-    });
-  }
-
-  // ---------- 📎 файлы в окнах адвента ----------
-  async function adventFiles() {
-    main.innerHTML = '<p class="be-note">Загрузка…</p>';
-    let d; try { d = await api('advent'); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    const list = (d.plan || []).filter(p => p.kind === 'file');
-    const rows = list.map(p => {
-      let o = {}; try { o = JSON.parse(p.item); } catch (e) { o = {}; }
-      return `<tr><td>${p.day}</td><td>${(o.n || o.u || '').replace(/[<>&]/g, '')}</td><td>${o.p ? '✓' : '—'}</td><td>${((o.c && (o.c.ru || o.c.en)) || '').replace(/[<>&]/g, '')}</td><td><button type="button" class="pill-btn" data-del="${p.day}" data-item="${encodeURIComponent(p.item)}">Убрать</button></td></tr>`;
-    }).join('') || '<tr><td colspan="5">Пока пусто — ни в одном окне нет файла.</td></tr>';
-    main.innerHTML = `<section class="adm-box"><h2>📎 Файлы в окнах адвента</h2>
-      <p class="be-note">Ссылки — на файл и на превью: можно свои адреса сайта (<code>/files/…</code>, <code>/images/…</code>) или внешние. Подпись показывается в окне под картинкой.</p>
-      <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;margin:14px 0">
-        <label>День (1–31)<input type="number" min="1" max="31" value="24" id="af-day"></label>
-        <label>Файл (адрес)<input id="af-u" placeholder="/files/brushes.zip"></label>
-        <label>Превью (адрес картинки)<input id="af-p" placeholder="/images/...jpg"></label>
-        <label>Имя файла<input id="af-n" placeholder="brushes.zip"></label>
-        <label>Подпись RU<input id="af-cr"></label>
-        <label>Подпись EN<input id="af-ce"></label>
-        <label>Подпись LV<input id="af-cl"></label>
-      </div>
-      <p><button type="button" class="pill-btn pill-fill" id="af-add">Положить в окно</button></p>
-      <table class="be-table"><thead><tr><th>День</th><th>Файл</th><th>Превью</th><th>Подпись</th><th></th></tr></thead><tbody>${rows}</tbody></table></section>`;
-    const q = id => main.querySelector('#' + id).value.trim();
-    main.querySelector('#af-add').onclick = async () => {
-      const u = q('af-u'); if (!/^(\/|https?:\/\/)/.test(u)) return alert('Нужен адрес файла: /files/… или https://…');
-      const item = JSON.stringify({ u, p: q('af-p'), n: q('af-n') || u.split('/').pop(), c: { ru: q('af-cr'), en: q('af-ce'), lv: q('af-cl') } });
-      try { await api('admin/advent', { day: +q('af-day'), kind: 'file', item, on: true }); adventFiles(); } catch (e) { alert(err(e)); }
-    };
-    main.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
-      try { await api('admin/advent', { day: +b.dataset.del, kind: 'file', item: decodeURIComponent(b.dataset.item), on: false }); adventFiles(); } catch (e) { alert(err(e)); }
     });
   }
 

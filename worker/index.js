@@ -1,4 +1,4 @@
-﻿// Сервер сайта: отдаёт статические файлы из site/ и обслуживает /api/* для «Стены рисунков»:
+// Сервер сайта: отдаёт статические файлы из site/ и обслуживает /api/* для «Стены рисунков»:
 // вход через Google, ник, загрузка работы дня, серии, стена, топ, модерация, GDPR (экспорт и удаление).
 // Данные — Cloudflare D1 (env.DB), картинки челленджа — R2 (env.MEDIA, папка challenge/), старые ещё и в KV (env.IMAGES), пока идёт перенос. Блог — worker/blog.js (картинки блога в R2, env.MEDIA).
 import { blogApi, blogPage, blogImgCheck, visitor, anonCode, claimAnon, birdName } from './blog.js';
@@ -556,6 +556,16 @@ const okFile = (s) => {
   const url = v => typeof v === 'string' && v.length < 600 && /^(\/|https?:\/\/)/.test(v);
   return !!o && url(o.u) && (!o.p || url(o.p)) && typeof o.n === 'string' && o.n.length < 140;
 }; // '?' — «🎲 Сюрприз» этой категории
+// файл в окно адвента Алина загружает с компьютера: файл и превью — в R2 (advent/…), отдаются по /media/… (worker/blog.js)
+const ADVENT_FILE_MAX = 20 * 1024 * 1024; // до 20 МБ, превью — до 6 МБ (как вложение рассылки, worker/notes.js)
+// файл убрали из всех окон: из хранилища удаляем, только если его ещё никто не открывал (иначе у птичек будет битая картинка)
+async function adventFileDrop(env, item) {
+  if (!env.MEDIA) return;
+  if (await env.DB.prepare("SELECT 1 FROM advent_plan WHERE kind = 'file' AND item = ? LIMIT 1").bind(item).first()) return;
+  let o; try { o = JSON.parse(item); } catch (e) { return; }
+  const keys = [...new Set([o && o.u, o && o.p].map(v => String(v || '')).filter(v => v.startsWith('/media/advent/')).map(v => { try { return decodeURIComponent(v.slice(7)); } catch (e) { return ''; } }))].filter(Boolean);
+  for (const k of keys) if (!(await env.DB.prepare('SELECT 1 FROM advent_open WHERE item = ? OR got LIKE ? LIMIT 1').bind(item, '%' + k + '%').first())) await env.MEDIA.delete(k).catch(() => {});
+}
 
 // общие функции для worker/blog.js
 // карточкам: средняя «цена сейчас» обычной вещи в продаже (без легендарных, сюрпризов и игровых), правила, лента событий стаи
@@ -2287,15 +2297,47 @@ async function route(req, env, url) {
     await env.DB.prepare('UPDATE advent_open SET buttons = ? WHERE user_id = ? AND year = ? AND day = ?').bind(n, u.id, t.year, day).run();
     return json({ ok: true, day, buttons: n, collector: await adventCollector(env, u.id, t.year), collectorBtns: BTN.badges.collector });
   }
-  if (m === 'POST' && p === '/api/admin/advent') { // Алина отмечает в «Коллекциях», какую вещь положить в какое окошко
+  if (m === 'POST' && p === '/api/admin/advent') { // Алина отмечает в кабинете, какую вещь или файл положить в какое окошко
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');
     const b = await req.json().catch(() => ({})), day = Math.floor(Number(b.day));
     const isFile = b.kind === 'file';
     if (!(day >= 1 && day <= 31) || (isFile ? !okFile(String(b.item)) : !okItem(b.kind, b.item))) fail(400, 'bad');
-    if (b.on === false) await env.DB.prepare('DELETE FROM advent_plan WHERE day = ? AND kind = ? AND item = ?').bind(day, b.kind, String(b.item)).run();
-    else await env.DB.prepare('INSERT OR IGNORE INTO advent_plan (day, kind, item) VALUES (?, ?, ?)').bind(day, b.kind, String(b.item)).run();
+    if (b.on === false) {
+      await env.DB.prepare('DELETE FROM advent_plan WHERE day = ? AND kind = ? AND item = ?').bind(day, b.kind, String(b.item)).run();
+      if (isFile) await adventFileDrop(env, String(b.item));
+    } else await env.DB.prepare('INSERT OR IGNORE INTO advent_plan (day, kind, item) VALUES (?, ?, ?)').bind(day, b.kind, String(b.item)).run();
     return json({ ok: true, plan: (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results });
+  }
+  if (m === 'POST' && p === '/api/admin/advent/file') { // файл в окно адвента — с компьютера (не ссылкой): в R2 (advent/…) и сразу в план окна
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    if (!env.MEDIA) fail(503, 'storage');
+    const f = await req.formData().catch(() => null);
+    if (!f) fail(400, 'bad');
+    const day = Math.floor(Number(f.get('day'))), file = f.get('file'), prev = f.get('preview');
+    if (!(day >= 1 && day <= 31)) fail(400, 'day');
+    if (!(file instanceof File) || !file.size) fail(400, 'file');
+    if (file.size > ADVENT_FILE_MAX) fail(413, 'big');
+    const name = String(f.get('name') || file.name || 'file').replace(/[\\/\u0000-\u001f"]/g, '_').trim().slice(0, 120) || 'file';
+    const cap = { en: '', ru: '', lv: '' };
+    try { const c = JSON.parse(String(f.get('c') || '{}')); for (const l of ['en', 'ru', 'lv']) cap[l] = String(c && c[l] || '').trim().slice(0, 160); } catch (e) { /* без подписи */ }
+    const IMG = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }; // только картинки отдаём как картинки; остальное — файлом вниз
+    const id = randomHex(16), img = IMG[String(file.type || '')], ext = (name.match(/\.([a-z0-9]{1,5})$/i) || [])[1];
+    const hasPrev = prev instanceof File && prev.size > 0, ptype = hasPrev ? String(prev.type || '') : '', pext = IMG[ptype] || '';
+    if (hasPrev && !pext) fail(400, 'type'); // превью — только jpg, png, webp или gif
+    if (hasPrev && prev.size > 6e6) fail(413, 'big');
+    const key = 'advent/' + id + '.' + (img || (ext ? ext.toLowerCase() : 'bin'));
+    const meta = { httpMetadata: { contentType: img ? String(file.type) : 'application/octet-stream', cacheControl: 'public, max-age=31536000, immutable' } };
+    await env.MEDIA.put(key, await file.arrayBuffer(), meta);
+    let pv = img ? key : ''; // картинка сама себе превью
+    if (hasPrev) {
+      pv = 'advent/' + id + '-p.' + pext;
+      await env.MEDIA.put(pv, await prev.arrayBuffer(), { httpMetadata: { contentType: ptype, cacheControl: 'public, max-age=31536000, immutable' } });
+    }
+    const item = JSON.stringify({ u: '/media/' + key, p: pv ? '/media/' + pv : '', n: name, c: cap });
+    await env.DB.prepare("INSERT OR IGNORE INTO advent_plan (day, kind, item) VALUES (?, 'file', ?)").bind(day, item).run();
+    return json({ ok: true, day, item, plan: (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results });
   }
   // картины и палитры, добавленные с сайта (галереи «Мой скетчбук», раздел «Палитры», очередь дней ЭКСТРА)
   if (m === 'GET' && p === '/api/palettes') {

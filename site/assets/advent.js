@@ -1,4 +1,4 @@
-// Адвент «Улица 31 окошка» (/advent/): дизайн Алины, данные — /api/advent.
+﻿// Адвент «Улица 31 окошка» (/advent/): дизайн Алины, данные — /api/advent.
 (() => {
   const app = document.getElementById('advw');
   if (!app) return;
@@ -57,6 +57,7 @@
   }
   const isFile = it => it && it.kind === 'file';
   function fileOf(item) { try { return JSON.parse(item); } catch (e) { return null; } }
+  const extOf = f => { const p = String((f && f.n) || '').split('.'); return p.length > 1 ? p.pop().toUpperCase().slice(0, 5) : 'FILE'; };
   function itemsOf(d, admin) {
     if (admin && planBy[d]) return planBy[d].map(p => [p.kind, p.item]);
     if (opened[d]) {
@@ -75,7 +76,7 @@
     let inner = '';
     if (s === 'open' && items.length) {
       const [k, v] = items[0];
-      if (k === 'file') { const f = fileOf(v); if (f && f.p) inner = `<img class="fpic" src="${esc(f.p)}" alt=""><span class="fbadge">${esc((f.n || '').split('.').pop().toUpperCase())}</span>`; }
+      if (k === 'file') { const f = fileOf(v); if (f) inner = f.p ? `<img class="fpic" src="${esc(f.p)}" alt=""><span class="fbadge">${esc(extOf(f))}</span>` : `<span class="fbig">${esc(extOf(f))}</span>`; }
       else inner = '<span class="gift">🎁</span>';
     }
     return `<button class="win ${s}${sp ? ' sp' : ''}${d === 24 ? ' d24' : ''}${d === 31 ? ' d31' : ''} ${extra || ''}" data-d="${d}" aria-label="${d}">
@@ -135,8 +136,8 @@
     if (files) files.innerHTML = fs.map(d => {
       const f = fileOf(itemsOf(d, false)[0][1]);
       if (!f) return '';
-      const fmt = (f.n || '').split('.').pop().toUpperCase();
-      return `<div class="fcard"><span class="th"><img src="${esc(f.p || '')}" alt=""><span class="fbadge">${esc(fmt)}</span></span><span><b>${esc(f.n || '')}</b><br><small>${d} · ${esc((f.c && (f.c[LG] || f.c.en)) || '')}</small></span><a href="${esc(f.u)}" download>📥 ${t('download')}</a></div>`;
+      const fmt = extOf(f);
+      return `<div class="fcard"><span class="th">${f.p ? `<img src="${esc(f.p)}" alt=""><span class="fbadge">${esc(fmt)}</span>` : `<span class="ffmt">${esc(fmt)}</span>`}</span><span><b>${esc(f.n || '')}</b><br><small>${d} · ${esc((f.c && (f.c[LG] || f.c.en)) || '')}</small></span><a href="${esc(f.u)}" download="${esc(f.n || '')}">📥 ${t('download')}</a></div>`;
     }).join('') || '<div class="fcard wait">Files appear here as you open the windows</div>';
 
     const bs = days.filter(d => itemsOf(d, false).some(([k]) => k !== 'file'));
@@ -168,10 +169,11 @@
     const c = document.getElementById('conf'); if (!c) return; c.innerHTML = '';
     if (conf) for (let i = 0; i < 40; i++) c.insertAdjacentHTML('beforeend', `<i style="left:${Math.random() * 100}%;background:${['#E9C46A','#9E1B22','#2C5F4B','#FF8A7A'][i % 4]};animation-delay:${Math.random() * .4}s"></i>`);
   }
-  const kick = d => `<p class="k" style="margin:0">${d} December</p>`;
+  const MON = ["December", "декабря", ". decembrī"];
+  const kick = d => `<p class="k" style="margin:0">${d} ${MON[L]}</p>`;
   function fileCard(f) {
-    const fmt = (f.n || '').split('.').pop().toUpperCase();
-    return `<div class="file"><div class="prev prev-paper"><img src="${esc(f.p || '')}" alt=""></div><span class="fmt">${esc(fmt)}</span><p class="fname">${esc(f.n || '')}</p><p class="fmeta" style="margin:0">${esc((f.c && (f.c[LG] || f.c.en)) || '')}</p><div class="acts" style="justify-content:center"><a class="pill" href="${esc(f.u)}" download>📥 ${t('download')}</a></div></div>`;
+    const fmt = extOf(f);
+    return `<div class="file">${f.p ? `<div class="prev prev-paper"><img src="${esc(f.p)}" alt=""></div>` : ''}<span class="fmt">${esc(fmt)}</span><p class="fname">${esc(f.n || '')}</p><p class="fmeta" style="margin:0">${esc((f.c && (f.c[LG] || f.c.en)) || '')}</p><div class="acts" style="justify-content:center"><a class="pill" href="${esc(f.u)}" download="${esc(f.n || '')}">📥 ${t('download')}</a></div></div>`;
   }
   function giftRow(name) {
     return `<div class="more"><span class="k">🎁 ${t('gift')}</span><div class="item"><span class="th">🎁</span><span><b>${esc(name)}</b><small>${t('inBag')}</small></span><a class="mini-btn" href="/bird/#bp-room">🏠</a></div></div>`;
@@ -224,3 +226,4 @@
   load();
   document.addEventListener('pp:whoami', () => { if (!S || !S.user) load(); });
 })();
+

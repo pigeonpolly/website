@@ -1,4 +1,4 @@
-﻿/* Pigeon Polly Art Lab */
+/* Pigeon Polly Art Lab */
 :root {
   --bg: var(--pp-ink,#2B1A51);
   --bg-2: var(--pp-2,#534AB7);
@@ -4556,6 +4556,42 @@ html[lang="lv"] .pc-rare .pc-mark::after, html[lang="lv"] .pc-unique .pc-mark::a
 @media (min-width: 761px) { .adm-gift-cat { max-height: calc(100vh - 200px); } .adm-gift-card { grid-template-areas: "t t" "w w" "i p" "i n" "i b" "i s" "i ."; } .adm-gift-sent { grid-area: s; } }
 .fl-adv-cat { flex: 1 1 auto; min-height: 200px; overflow: auto; margin-bottom: 12px; background: #FFFDF8; border-radius: 14px; padding: 10px; }
 .fl-adv-daydlg h3 .fl-adv-n { font: 600 14px var(--sans); color: #9F9690; }
+/* окно дня адвента: «вещи из магазина» | «загрузить файл» (advent-admin.js) */
+.fl-adv-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 12px; }
+.fl-adv-tab { padding: 7px 14px; border-radius: 999px; border: 1px solid #DAD7D5; background: #fff; color: var(--pp-ink,#2B1A51); font: 600 14px 'Karla', sans-serif; cursor: pointer; }
+.fl-adv-tab.on { background: var(--pp-ink,#2B1A51); color: #fff; border-color: var(--pp-ink,#2B1A51); }
+.fl-adv-daydlg > .fl-adv-pane { flex: 1 1 auto; flex-shrink: 1; min-height: 0; display: flex; flex-direction: column; }
+.fl-adv-daydlg > .fl-adv-pane[hidden] { display: none; }
+.fl-adv-pane[data-p="file"] { display: block; overflow: auto; padding-right: 4px; }
+.fl-adv-pane > p { margin: 0 0 10px; font-size: 14px; color: #706862; }
+.fl-adv-drop { display: grid; justify-items: center; gap: 4px; padding: 18px 12px; border: 2px dashed #DAD7D5; border-radius: 16px; background: #FFFDF8; cursor: pointer; text-align: center; }
+.fl-adv-drop.over { border-color: var(--pp-acc,#F0A987); background: #FFF6EC; }
+.fl-adv-drop b { font: 600 16px 'Karla', sans-serif; }
+.fl-adv-drop small { font-size: 13px; color: #9F9690; }
+.fl-adv-drop-sm { padding: 10px; margin-top: 10px; }
+.fl-adv-drop-sm b { font-size: 14px; }
+.fl-adv-chosen { display: flex; align-items: center; gap: 10px; margin-top: 10px; padding: 8px 10px; border-radius: 12px; background: #fff; box-shadow: inset 0 0 0 1px #E9E6E3; }
+.fl-adv-chosen .nm { flex: 1; min-width: 0; font: 600 13px/1.35 'Karla', sans-serif; overflow-wrap: anywhere; }
+.fl-adv-x { border: 0; background: none; color: #9F9690; font: 700 15px/1 'Karla', sans-serif; cursor: pointer; padding: 2px 4px; }
+.fl-adv-link { border: 0; background: none; color: #C0582F; font: 600 13px 'Karla', sans-serif; cursor: pointer; padding: 0; text-decoration: underline; }
+.fl-adv-chosen[hidden], .fl-adv-pthumb[hidden], .fl-adv-more[hidden], .fl-adv-drop[hidden] { display: none !important; }
+.fl-adv-fthumb { flex: none; display: grid; place-items: center; border-radius: 10px; overflow: hidden; background: #FDECEA; color: var(--red,#B4473D); font: 700 11px 'Karla', sans-serif; letter-spacing: .04em; }
+.fl-adv-fthumb img { width: 100%; height: 100%; object-fit: cover; }
+.fl-adv-fields { display: grid; gap: 10px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); margin-top: 12px; }
+.fl-adv-fields label { display: grid; gap: 4px; font: 600 13px 'Karla', sans-serif; color: #706862; }
+.fl-adv-in { padding: 8px 12px; border-radius: 10px; border: 1px solid #DAD7D5; background: #fff; color: var(--pp-ink,#2B1A51); font: inherit; }
+.fl-adv-more { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-top: 8px; }
+.fl-adv-note { margin: 8px 0 0; }
+.fl-adv-pthumb { display: inline-flex; margin-top: 8px; }
+.fl-adv-msg { min-height: 18px; margin: 10px 0 0; font: 600 13px 'Karla', sans-serif; color: #2C5F4B; }
+.fl-adv-msg.bad { color: #B4473D; }
+.fl-adv-files { margin-top: 16px; display: grid; gap: 6px; }
+.fl-adv-files:empty { display: none; }
+.fl-adv-files h4 { margin: 0 0 2px; font: 700 12px 'Karla', sans-serif; color: #9F9690; text-transform: uppercase; letter-spacing: .06em; }
+.fl-adv-frow { display: flex; align-items: center; gap: 10px; padding: 6px 10px; border-radius: 12px; background: #fff; box-shadow: inset 0 0 0 1px #E9E6E3; }
+.fl-adv-frow .nm { flex: 1; min-width: 0; font: 600 13px/1.35 'Karla', sans-serif; overflow-wrap: anywhere; }
+.fl-adv-frow > button { flex: none; width: 22px; height: 22px; border: 0; border-radius: 50%; background: #E5484D; color: #fff; font-size: 11px; cursor: pointer; }
+.fl-adv-it.fl-adv-file .fl-adv-fthumb { box-shadow: 0 1px 3px rgba(0,0,0,.18); }
 
 /* ---------- карточка дня (day-card.js, этап 13 А): открытка со штампами ---------- */
 .bp-day { margin: 18px 0 20px; }
