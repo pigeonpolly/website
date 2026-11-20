@@ -101,3 +101,10 @@
 
 
 .adv-small { font: 400 12px/1.4 Karla, sans-serif; color: #8A97A3; margin: 8px 0 0; }
+
+/* файл в окне */
+.adv-files { display: grid; gap: 14px; }
+.adv-file { margin: 0; display: grid; gap: 8px; justify-items: center; }
+.adv-file img { max-width: 100%; border-radius: 12px; display: block; }
+.adv-file figcaption { font: 400 14px/1.5 Karla, sans-serif; color: #3A4550; }
+

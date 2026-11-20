@@ -548,7 +548,14 @@ async function extraQueue(env, req) {
 const GIFT_KINDS = ['bg', 'shoes', 'hat', 'anim', 'frame', 'item', 'scarf', 'wall', 'floor', 'view', 'curtain', 'furn', 'deco', 'garden', 'any']; // any — «🎲 Сюрприз»: any|legend, any|? (в сумку попадает уже настоящая вещь)
 const ROOM_KINDS = ['wall', 'floor', 'view', 'curtain', 'furn', 'deco', 'garden']; // вещи для комнаты (room.js) и огорода (garden-items.js), не надеваются
 const avatarOf = u => { try { const a = JSON.parse(u && u.avatar || '{}'); return a && typeof a === 'object' ? a : {}; } catch (e) { return {}; } };
-const okItem = (kind, item) => GIFT_KINDS.includes(kind) && (kind === 'any' ? ['?', 'legend'].includes(item) : item === '?' || /^[#a-z0-9:-]{1,24}$/i.test(String(item || ''))); // '?' — «🎲 Сюрприз» этой категории
+const okItem = (kind, item) => GIFT_KINDS.includes(kind) && (kind === 'any' ? ['?', 'legend'].includes(item) : item === '?' || /^[#a-z0-9:-]{1,24}$/i.test(String(item || '')));
+// «файл» в окне адвента: {u: адрес файла, p: адрес превью, n: имя файла, c: {en, ru, lv} — подпись}
+const okFile = (s) => {
+  if (!s || String(s).length > 2000) return false;
+  let o; try { o = JSON.parse(s); } catch (e) { return false; }
+  const url = v => typeof v === 'string' && v.length < 600 && /^(\/|https?:\/\/)/.test(v);
+  return !!o && url(o.u) && (!o.p || url(o.p)) && typeof o.n === 'string' && o.n.length < 140;
+}; // '?' — «🎲 Сюрприз» этой категории
 
 // общие функции для worker/blog.js
 // карточкам: средняя «цена сейчас» обычной вещи в продаже (без легендарных, сюрпризов и игровых), правила, лента событий стаи
@@ -2257,14 +2264,19 @@ async function route(req, env, url) {
     // у всех одинаково: птичка получает все вещи окошка (кроме тех, которых у неё уже максимум); пустое окошко — пуговки
     if (day === INK_DAY) await env.DB.prepare('UPDATE users SET ink_ok = 1 WHERE id = ?').bind(u.id).run(); // сюрприз: курс туши
     const plan = (await env.DB.prepare('SELECT kind, item FROM advent_plan WHERE day = ?').bind(day).all()).results;
-    const got = [];
+    const got = [], files = [];
     for (const r of plan) {
+      if (r.kind === 'file') { files.push(r.item); continue; }
       const isSur = r.item === '?' || r.kind === 'any';
       const ki = isSur ? await surpriseKI(env, req, u.id, r.kind, r.item) : [r.kind, r.item]; // «🎲 Сюрприз» — своя случайная вещь каждой птичке
       if (!ki || (!isSur && await copies(env, u.id, ki[0], ki[1]) >= legMax(ki[0], ki[1]))) continue;
       const ag = await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'advent', 'bag', ?, ?)").bind(u.id, ki[0], ki[1], now(), now()).run();
       if (isLeg(ki[0], ki[1])) await flockEventDb(env, 'legend', u, { kind: ki[0], item: ki[1], key: 'g' + ag.meta.last_row_id });
       got.push(ki);
+    }
+    if (files.length) {
+      await env.DB.prepare('UPDATE advent_open SET kind = \'file\', item = ?, got = ? WHERE user_id = ? AND year = ? AND day = ?').bind(files[0], JSON.stringify(files), u.id, t.year, day).run();
+      return json({ ok: true, day, kind: 'file', files, collector: await adventCollector(env, u.id, t.year), collectorBtns: BTN.badges.collector });
     }
     if (got.length) {
       await env.DB.prepare('UPDATE advent_open SET kind = ?, item = ?, got = ? WHERE user_id = ? AND year = ? AND day = ?').bind(got[0][0], got[0][1], JSON.stringify(got), u.id, t.year, day).run();
@@ -2279,7 +2291,8 @@ async function route(req, env, url) {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');
     const b = await req.json().catch(() => ({})), day = Math.floor(Number(b.day));
-    if (!(day >= 1 && day <= 31) || !okItem(b.kind, b.item)) fail(400, 'bad');
+    const isFile = b.kind === 'file';
+    if (!(day >= 1 && day <= 31) || (isFile ? !okFile(String(b.item)) : !okItem(b.kind, b.item))) fail(400, 'bad');
     if (b.on === false) await env.DB.prepare('DELETE FROM advent_plan WHERE day = ? AND kind = ? AND item = ?').bind(day, b.kind, String(b.item)).run();
     else await env.DB.prepare('INSERT OR IGNORE INTO advent_plan (day, kind, item) VALUES (?, ?, ?)').bind(day, b.kind, String(b.item)).run();
     return json({ ok: true, plan: (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results });

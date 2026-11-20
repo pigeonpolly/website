@@ -4,7 +4,7 @@
 (() => {
   const app = document.getElementById('advent');
   if (!app) return;
-  const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, pre = ['', '/ru', '/lv'][L];
+  const L = { ru: 1, lv: 2 }[document.documentElement.lang] || 0, pre = ['', '/ru', '/lv'][L], LG = ['en', 'ru', 'lv'][L];
   const T = {
     soon: ['The calendar opens on December 1', 'Календарь откроется 1 декабря', 'Kalendārs atvērsies 1. decembrī'],
     units: [['days', 'hours', 'min', 'sec'], ['дней', 'часов', 'минут', 'секунд'], ['dienas', 'stundas', 'min', 'sek']],
@@ -31,6 +31,7 @@
         count: ['Opened {n} of 31', 'Открыто {n} из 31', 'Atvērti {n} no 31'],
     adm: ['🔒 You see this because you are the admin: how many gifts are in each window. Put things in windows in the admin panel.', '🔒 Видите только вы: сколько вещей лежит в каждом окошке. Класть вещи в окошки — в кабинете.', '🔒 Redzi tikai tu: cik lietu ir katrā lodziņā. Lietas lodziņos liek kabinetā.'],
     toColl: ['🎄 Advent in the admin panel →', '🎄 Адвент в кабинете →', '🎄 Advente kabinetā →'],
+    download: ['Download', 'Скачать', 'Lejupielādēt'],
   };
   const t = k => T[k][L];
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
@@ -117,6 +118,7 @@
 
   function prize(o, size) {
     const B = window.PPBirds, s = document.createElement('span'); s.className = 'adv-prize';
+    if (o && o.kind === 'file') { s.textContent = '📎'; return s; }
     if (o && o.kind && B) s.appendChild(B.itemIcon(o.kind, o.item, size, S.user ? S.user.id : 2));
     else if (o && o.buttons) s.textContent = '🔘';
     return s;
@@ -167,8 +169,28 @@
     dlg.querySelector('.adv-x').onclick = close; dlg.onclick = e => { if (e.target === dlg) close(); };
     document.body.appendChild(dlg); dlg.querySelector('.adv-x').focus();
   }
+  // окно с файлом: превью, подпись и «Скачать»
+  function showFiles(d, files) {
+    const dlg = document.createElement('div'); dlg.className = 'adv-modal'; dlg.setAttribute('role', 'dialog');
+    const list = files.map(raw => { try { return JSON.parse(raw); } catch (e) { return null; } }).filter(Boolean);
+    dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button><p class="adv-kick">${d} December</p><div class="adv-files"></div></div>`;
+    const box = dlg.querySelector('.adv-files');
+    list.forEach(f => {
+      const cap = (f.c && (f.c[LG] || f.c.en)) || f.n || '';
+      const fig = document.createElement('figure'); fig.className = 'adv-file';
+      if (f.p) { const im = document.createElement('img'); im.src = f.p; im.alt = ''; im.loading = 'lazy'; fig.appendChild(im); }
+      const c = document.createElement('figcaption'); c.textContent = cap; fig.appendChild(c);
+      const a = document.createElement('a'); a.className = 'pill-btn pill-fill'; a.href = f.u; a.setAttribute('download', f.n || ''); a.textContent = '⬇ ' + (f.n || t('download')); fig.appendChild(a);
+      box.appendChild(fig);
+    });
+    const close = () => dlg.remove();
+    dlg.querySelector('.adv-x').onclick = close; dlg.onclick = e => { if (e.target === dlg) close(); };
+    document.body.appendChild(dlg); dlg.querySelector('.adv-x').focus();
+  }
+
   // окно: птичка вылетает из окошка и приносит подарок
   function show(btn, o, fresh) {
+    if (o && o.files && o.files.length) return showFiles(o.day, o.files);
     const B = window.PPBirds, leg = o.kind && B && B.LEGEND && B.LEGEND.has(o.kind + '|' + o.item);
     const dlg = document.createElement('div'); dlg.className = 'adv-modal' + (leg ? ' leg' : ''); dlg.setAttribute('role', 'dialog'); dlg.setAttribute('aria-modal', 'true');
     const name = o.kind && B ? B.giftName(o.kind, o.item, L) : '';
