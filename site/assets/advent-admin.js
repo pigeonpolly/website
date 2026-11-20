@@ -23,6 +23,11 @@
     more3: ['also EN and LV', 'ещё EN и LV', 'vēl EN un LV'], fprev: ['Picture for the window (optional)', 'Картинка для окна (не обязательно)', 'Attēls lodziņam (nav obligāti)'],
     put: ['Put in the window', 'Положить в окно', 'Ielikt lodziņā'], putOk: ['Added to December {d}', 'Добавлено в {d} декабря', 'Pievienots {d}. decembrim'],
     uploading: ['Uploading…', 'Загружаю…', 'Augšupielādēju…'], filesHere: ['Files in this window', 'Файлы в этом окошке', 'Faili šajā lodziņā'],
+    fileH: ['📎 File in window {d}', '📎 Файл в окне {d}', '📎 Fails lodziņā {d}'],
+    fileOpen: ['Open the file', 'Открыть файл', 'Atvērt failu'],
+    save: ['Save', 'Сохранить', 'Saglabāt'], saved: ['✓ Saved', '✓ Сохранено', '✓ Saglabāts'],
+    repFile: ['Replace the file', 'Заменить файл', 'Aizstāt failu'], repPrev: ['Replace the picture', 'Заменить картинку', 'Aizstāt attēlu'],
+    dropPrev: ['Remove the picture', 'Убрать картинку', 'Noņemt attēlu'], delWin: ['Remove from the window', 'Убрать из окна', 'Noņemt no lodziņa'],
     errBig: ['The file is bigger than 20 MB.', 'Файл больше 20 МБ.', 'Fails ir lielāks par 20 MB.'],
     errFile: ['Could not upload. Try again.', 'Не получилось. Попробуйте ещё раз.', 'Neizdevās. Mēģiniet vēlreiz.'],
     errType: ['The picture must be a JPG, PNG, WebP or GIF.', 'Картинка — только JPG, PNG, WebP или GIF.', 'Attēls — tikai JPG, PNG, WebP vai GIF.'],
@@ -69,11 +74,13 @@
       if (!list.length) { var e = document.createElement('small'); e.textContent = T.advEmpty[L]; row.appendChild(e); }
       list.forEach(function (p) {
         var it = document.createElement('span'), x = document.createElement('button');
-        if (p.kind === 'file') { // файл в окне — превью или значок формата, при наведении — имя и подпись
+        if (p.kind === 'file') { // файл в окне — превью или значок формата, при наведении — имя и подпись; нажатие — окно файла
           var f = fileOf(p.item) || {};
           it.className = 'fl-adv-it fl-adv-file'; it.title = (f.n || '') + ((f.c && f.c.ru) ? ' · ' + f.c.ru : '');
+          it.style.cursor = 'pointer';
           it.appendChild(fthumb(f, 44));
-          x.onclick = function () { var done = delFile(p.day, p.item); if (done) done.then(function () { draw(); }).catch(function () {}); };
+          it.onclick = function () { advFileEdit(p.day, p.item, draw); };
+          x.onclick = function (e) { e.stopPropagation(); var done = delFile(p.day, p.item); if (done) done.then(function () { draw(); }).catch(function () {}); };
         } else {
           it.className = 'fl-adv-it'; it.title = gname(p.kind, p.item);
           it.appendChild(window.PPBirds.itemIcon(p.kind, p.item, 44, id));
@@ -206,12 +213,15 @@
       list.forEach(function (p) {
         var f = fileOf(p.item) || {};
         var r = document.createElement('div'); r.className = 'fl-adv-frow';
+        r.style.cursor = 'pointer'; r.title = T.fileOpen[L];
+        r.onclick = function () { advFileEdit(day, p.item, function () { upd(); files(); draw(); }); };
         r.appendChild(fthumb(f, 38));
         var nm = document.createElement('span'); nm.className = 'nm';
         nm.textContent = (f.n || '') + ((f.c && f.c.ru) ? ' · ' + f.c.ru : '');
         r.appendChild(nm);
         var x = document.createElement('button'); x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', '✕ ' + (f.n || ''));
-        x.onclick = function () {
+        x.onclick = function (e) {
+          e.stopPropagation();
           var done = delFile(day, p.item);
           if (done) done.then(function () { upd(); files(); draw(); }).catch(function () { say(T.errFile[L], true); });
         };
@@ -228,6 +238,91 @@
     });
     d.querySelector('[data-x]').onclick = function () { d.close(); d.remove(); draw(); };
     d.addEventListener('cancel', function () { d.remove(); draw(); });
+  }
+
+  // окно файла: посмотреть приложенный файл, поправить имя и подпись, заменить сам файл или картинку
+  function advFileEdit(day, item, after) {
+    var f0 = fileOf(item); if (!f0) return;
+    var st = { file: null, prev: null, noPrev: false };
+    var d = document.createElement('dialog'); d.className = 'fl-adv-dlg fl-adv-filedlg';
+    var c = f0.c || {};
+    d.innerHTML = '<h3>' + T.fileH[L].replace('{d}', day) + '</h3>' +
+      '<div class="fl-adv-fview" data-view></div>' +
+      '<div class="fl-adv-fields"><label>' + T.fname[L] + '<input class="fl-adv-in" data-n maxlength="120"></label>' +
+        '<label>' + T.fcap[L] + '<input class="fl-adv-in" data-c maxlength="160"></label></div>' +
+      '<div class="fl-adv-more" data-more hidden><input class="fl-adv-in" data-ce placeholder="EN" maxlength="160"><input class="fl-adv-in" data-cl placeholder="LV" maxlength="160"></div>' +
+      '<p class="fl-adv-note"><button type="button" class="fl-adv-link" data-show3>🌐 ' + T.more3[L] + '</button></p>' +
+      '<div class="fl-adv-replace">' +
+        '<label class="fl-adv-drop fl-adv-drop-x"><input type="file" data-nf hidden><b>📎 ' + T.repFile[L] + '</b><small data-nfn></small></label>' +
+        '<label class="fl-adv-drop fl-adv-drop-x"><input type="file" data-np accept="image/jpeg,image/png,image/webp,image/gif" hidden><b>🖼 ' + T.repPrev[L] + '</b><small data-npn></small></label>' +
+        '<button type="button" class="fl-adv-link" data-nop hidden>' + T.dropPrev[L] + '</button>' +
+      '</div>' +
+      '<p class="fl-adv-msg" data-msg aria-live="polite"></p>' +
+      '<div class="fl-adv-acts"><button type="button" class="pill-btn pill-fill" data-save>' + T.save[L] + '</button>' +
+        '<button type="button" class="pill-btn" data-del>' + T.delWin[L] + '</button>' +
+        '<button type="button" class="pill-btn" data-x>' + T.done[L] + '</button></div>';
+    var $ = function (s) { return d.querySelector(s); };
+    var say = function (t, bad) { var m = $('[data-msg]'); m.textContent = t || ''; m.classList.toggle('bad', !!bad); };
+    function view() { // что за файл: картинка или значок формата, имя, размер, «открыть»
+      var v = $('[data-view]'); v.innerHTML = '';
+      v.appendChild(fthumb(f0, 96));
+      var nm = document.createElement('span'); nm.className = 'nm';
+      var b = document.createElement('b'); b.textContent = f0.n || ''; nm.appendChild(b);
+      var sz = document.createElement('small'); sz.textContent = Number(f0.s) ? ' · ' + kb(Number(f0.s)) : ''; nm.appendChild(sz);
+      nm.appendChild(document.createElement('br'));
+      var a = document.createElement('a'); a.href = f0.u; a.target = '_blank'; a.rel = 'noopener'; a.textContent = '↗ ' + T.fileOpen[L];
+      nm.appendChild(a);
+      v.appendChild(nm);
+      $('[data-nop]').hidden = !(f0.p && f0.p !== f0.u); // «убрать картинку» — только если картинка отдельная
+    }
+    $('[data-n]').value = f0.n || '';
+    $('[data-c]').value = c.ru || c.en || '';
+    $('[data-ce]').value = c.en || ''; $('[data-cl]').value = c.lv || '';
+    $('[data-show3]').onclick = function () { var m = $('[data-more]'); m.hidden = !m.hidden; this.hidden = m.hidden; if (!m.hidden) m.querySelector('input').focus(); };
+    $('[data-nf]').onchange = function () {
+      var f = this.files && this.files[0]; st.file = null; $('[data-nfn]').textContent = '';
+      if (!f) return;
+      if (f.size > FILE_MAX) { this.value = ''; return say(T.errBig[L], true); }
+      st.file = f; $('[data-nfn]').textContent = f.name + ' · ' + kb(f.size); say('');
+    };
+    $('[data-np]').onchange = function () {
+      var f = this.files && this.files[0]; st.prev = null; $('[data-npn]').textContent = '';
+      if (!f) return;
+      if (!IMG.test(f.type || '')) { this.value = ''; return say(T.errType[L], true); }
+      if (f.size > PREV_MAX) { this.value = ''; return say(T.errBig[L], true); }
+      st.prev = f; st.noPrev = false; $('[data-npn]').textContent = f.name; say('');
+    };
+    $('[data-nop]').onclick = function () { st.noPrev = true; st.prev = null; $('[data-np]').value = ''; $('[data-npn]').textContent = ''; this.hidden = true; say(T.dropPrev[L] + ' ✓'); };
+    $('[data-save]').onclick = function () {
+      var btn = this;
+      var ru = $('[data-c]').value.trim(), en = $('[data-ce]').value.trim(), lv = $('[data-cl]').value.trim();
+      var fd = new FormData();
+      fd.append('day', String(day)); fd.append('item', item);
+      fd.append('name', $('[data-n]').value.trim() || f0.n || 'file');
+      fd.append('c', JSON.stringify({ ru: ru, en: en || ru, lv: lv || ru }));
+      if (st.file) fd.append('file', st.file, st.file.name);
+      if (st.prev) fd.append('preview', st.prev, st.prev.name);
+      if (st.noPrev) fd.append('noPreview', '1');
+      btn.disabled = true; say(T.uploading[L]);
+      fetch('/api/admin/advent/file/edit', { method: 'POST', credentials: 'same-origin', body: fd })
+        .then(function (r) { return r.json().catch(function () { return {}; }).then(function (x) { if (!r.ok) throw x; return x; }); })
+        .then(function (x) {
+          plan = x.plan || plan; item = x.item || item; f0 = fileOf(item) || f0;
+          st.file = null; st.prev = null; st.noPrev = false;
+          $('[data-nf]').value = ''; $('[data-np]').value = ''; $('[data-nfn]').textContent = ''; $('[data-npn]').textContent = '';
+          view(); say('✓ ' + T.saved[L]); if (after) after(); // доска и список файлов обновятся сразу
+        })
+        .catch(function (e) { say(errText(e), true); })
+        .then(function () { btn.disabled = false; });
+    };
+    $('[data-del]').onclick = function () {
+      var done = delFile(day, item);
+      if (!done) return;
+      done.then(function () { d.close(); d.remove(); if (after) after(); }).catch(function () { say(T.errFile[L], true); });
+    };
+    $('[data-x]').onclick = function () { d.close(); d.remove(); if (after) after(); };
+    d.addEventListener('cancel', function () { d.remove(); if (after) after(); });
+    document.body.appendChild(d); d.showModal(); view();
   }
 
   window.PPAdventAdmin = {
