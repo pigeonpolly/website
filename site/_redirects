@@ -51,3 +51,6 @@
 /lv/about /lv/sketchbook/ 301
 /lv/preview/lab/ /lv/games/ 301
 /lv/preview/wobbleland/ /lv/wobbleland/ 301
+/draw /prompts/ 302
+/draw/ /prompts/ 302
+/draw/* /prompts/ 302

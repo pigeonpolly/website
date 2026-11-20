@@ -93,8 +93,6 @@ PAGES = [
      "A private workshop in Room 811: new things being made for Polly in Norway."),
     ("freebies", "Freebies", "freebies.html",
      "Free printable calendars and phone wallpapers with the art of Alina Otkinska and Pigeon Polly: monthly and yearly 2027 calendars, week starting on Monday or Sunday."),
-    ("draw", "Things to draw", "draw.html",
-     "Things to draw: free drawing prompt lists, drawing bingo cards, color palettes from paintings with HEX codes, step-by-step watercolor breakdowns, puzzles and line art by Pigeon Polly."),
     ("learn", "Lessons", "preview-learn.html",
      "Watercolour and ink lessons by Alina Otkinska: free videos open to everyone and extra video lessons for signed-in visitors."),
     # страница одного видео: адрес /learn/v/<id>/ (worker отдаёт этот файл), видео рисует v2.js по адресу
@@ -110,7 +108,7 @@ PAGES = [
 # готовые, но пока не открытые страницы: не попадают в sitemap
 UNLISTED = {"blog-editor", "admin", "garden", "learn/watch", "norway", "norway/workshop"}
 # редизайн 2.0: страницы на новом шаблоне src/layout-v2.html (шапка, подвал, сезоны — site/assets/v2.css, v2.js)
-V2 = {"", "learn", "learn/watch", "books", "sketchbook", "blog", "freebies", "draw", "norway", "norway/workshop", "prompts", "advent"}
+V2 = {"", "learn", "learn/watch", "books", "sketchbook", "blog", "freebies", "norway", "norway/workshop", "prompts", "advent"}
 # часть 5: все остальные страницы — на src/layout-v2-lab.html (новая шапка и подвал, внутри старые style.css и скрипты как есть)
 # ключ правок «Править страницу» (data-ppb): у новых страниц — прежний, с /preview/, чтобы сохранённые правки не потерялись
 EDIT_KEY = {"": "preview", "learn": "preview-learn", "books": "preview-guides", "sketchbook": "preview-about"}

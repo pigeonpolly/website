@@ -4,6 +4,15 @@
   <h1>Paint small, <em>joyful<svg viewBox="0 0 300 30" preserveAspectRatio="none" aria-hidden="true"><path d="M5 20 C 60 6, 120 28, 180 14 S 270 10, 295 18"/></svg></em> things</h1>
   <p>Free lessons, full paint-alongs and creative guides<br class="hb"> by artist Alina Otkinska.</p>
   <div class="ctas"><a class="btn pri" href="/blog/?section=art-courier">✦ Art Coo-rier: World News</a><a class="btn" href="#lessons">▶ Watch a free lesson</a></div>
+  <a class="advpromo-c hero-adv" href="/advent/" id="advpromo">
+    <span class="advpromo-ic" aria-hidden="true">🗓</span>
+    <span class="advpromo-tx">
+      <small>1–31 December</small>
+      <b>An advent for drawing</b>
+      <i>A prompt, a palette and a little gift behind every door.</i>
+    </span>
+    <span class="advpromo-go">Open →</span>
+  </a>
 </div>
 <div class="pano"><img id="v2-hero" src="/images/v2/hero-autumn.jpg" srcset="/images/v2/hero-autumn-900.jpg 900w, /images/v2/hero-autumn.jpg 1800w" sizes="100vw" alt="Watercolour by Alina Otkinska" fetchpriority="high"><span class="cap2" data-sv="note">Polly on the train ✿</span></div>
 </section>
@@ -15,6 +24,7 @@
   background: linear-gradient(120deg, #FBFDFE, #EDF3F6); color: var(--ink, #1C2430);
   box-shadow: inset 0 0 0 1px #C6D4DE, 0 8px 22px rgba(28, 36, 48, .08); transition: transform .15s ease, box-shadow .15s ease; }
 .advpromo-c:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px #C6D4DE, 0 14px 30px rgba(28, 36, 48, .14); }
+.hero-adv { margin: 22px 0 4px; max-width: 580px; }
 .advpromo-ic { flex: none; width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font-size: 24px;
   background: #9E1B22; color: #FFF6E5; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .25); }
 .advpromo-tx { flex: 1; min-width: 0; display: grid; gap: 2px; }
@@ -24,17 +34,7 @@
 .advpromo-go { flex: none; font: 700 14px/1 Karla, sans-serif; color: #9E1B22; white-space: nowrap; }
 @media (max-width: 560px) { .advpromo-c { gap: 12px; padding: 13px 14px; } .advpromo-tx i { display: none; } .advpromo-ic { width: 40px; height: 40px; font-size: 20px; } }
 </style>
-<section class="advpromo" id="advpromo"><div class="w">
-  <a class="advpromo-c" href="/advent/">
-    <span class="advpromo-ic" aria-hidden="true">🗓</span>
-    <span class="advpromo-tx">
-      <small>1–31 December</small>
-      <b>An advent for drawing</b>
-      <i>A prompt, a palette and a little gift behind every door — one window a day.</i>
-    </span>
-    <span class="advpromo-go">Open →</span>
-  </a>
-</div></section>
+
 <script>/* ссылка на адвент видна до 1 января включительно, потом прячется */
 (function () { var b = document.getElementById('advpromo'); if (!b) return; var n = new Date(), m = n.getMonth(), d = n.getDate(); if (!(m >= 10 || (m === 0 && d === 1))) b.remove(); })();</script>
 
@@ -87,3 +87,4 @@
     <button type="button" class="cv" aria-label="Open the folder"><span class="f"><span class="clbl">THE LAB</span><span class="stp">FOR CURIOUS BIRDS ONLY</span><span class="hand">psst… open me →</span><span class="tie"></span></span><span class="b"></span></button>
   </div>
 </div></section>
+

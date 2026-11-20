@@ -110,7 +110,7 @@
   }
   function tap(btn, d, o) {
     if (o) return show(btn, o, false);
-    if (d > (S.claimTo || 0) || (LATE_CLOSED.includes(d) && d !== S.today)) { toast(S.month >= 1 && S.month <= 2 ? t('tooLate') : (LATE_CLOSED.includes(d) && d <= (S.claimTo || 0) ? t('missedIt') : t('locked').replace('{d}', d))); btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); return; }
+    if (d > (S.claimTo || 0) || (LATE_CLOSED.includes(d) && d !== S.today)) { showLocked(d); btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); return; }
     if (!S.user) { try { location.hash = '#d=' + d; } catch (e) { /* ок */ } window.PPAccount && window.PPAccount.openSignIn(); return; }
     if (btn.disabled) return;
     btn.disabled = true;
@@ -118,6 +118,16 @@
       .then(r => { if (!r.ok) throw 0; return r.json(); })
       .then(x => { S.opened = (S.opened || []).filter(q => q.day !== d).concat([x]); btn.classList.add('opening'); setTimeout(() => show(btn, x, true), 650); if (window.PPNews) window.PPNews.refresh(); })
       .catch(() => { btn.disabled = false; toast(t('err')); });
+  }
+  // закрытое окно: объясняем, когда откроется (всегда видимое окно, не тост)
+  function showLocked(d) {
+    const dlg = document.createElement('div'); dlg.className = 'adv-modal'; dlg.setAttribute('role', 'dialog');
+    const msg = S.month >= 1 && S.month <= 2 ? t('tooLate') : (LATE_CLOSED.includes(d) && d <= (S.claimTo || 0) ? t('missedIt') : t('locked').replace('{d}', d));
+    dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button><p class="adv-kick">${d} December</p><p>${msg}</p><div class="adv-act">${S.user ? '' : `<button type="button" class="pill-btn pill-fill" data-lg>${t('signin')}</button>`}</div></div>`;
+    const close = () => dlg.remove();
+    dlg.querySelector('.adv-x').onclick = close; dlg.onclick = e => { if (e.target === dlg) close(); };
+    const lg = dlg.querySelector('[data-lg]'); if (lg) lg.onclick = () => { try { location.hash = '#d=' + d; } catch (e) { /* ок */ } window.PPAccount && window.PPAccount.openSignIn(); };
+    document.body.appendChild(dlg); dlg.querySelector('.adv-x').focus();
   }
   const toast = m => window.PPToast ? window.PPToast(m) : alert(m);
   // админ: что лежит в окне (предпросмотр, ничего не забирает)
