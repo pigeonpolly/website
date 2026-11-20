@@ -848,5 +848,7 @@
   "<h1>Workshop</h1>": "<h1>Мастерская</h1>",
   "<p>A private room: only you can see it.</p>": "<p>Личная комната: её видите только вы.</p>",
   "<p>Empty for now — a place to make new things for Room 811, then move them to the big room.</p>": "<p>Пока пусто — здесь делаем новое для Кабинета 811, а потом переносим в большой кабинет.</p>",
-  "<a class=\"btn\" href=\"/norway/\">Back to Room 811</a>": "<a class=\"btn\" href=\"/norway/\">← Назад в Кабинет 811</a>"
+  "<a class=\"btn\" href=\"/norway/\">Back to Room 811</a>": "<a class=\"btn\" href=\"/norway/\">← Назад в Кабинет 811</a>",
+  ">Bird market<": ">Птичий рынок<",
+  "Bird market · Pigeon Polly Art Lab": "Птичий рынок · Pigeon Polly Art Lab"
 }

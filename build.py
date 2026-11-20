@@ -62,7 +62,7 @@ PAGES = [
      "Our flock of pixel birds: everyone who signs in gets one. Scatter seeds, call the wind or rain, throw a party and watch what happens."),
     ("flock/news", "Flock news", "flock-news.html",
      "Flock news: new pixel birds, drawings of the day, housewarmings, badges, collectible cards and news from Polly."),
-    ("shop", "Shop", "shop.html",
+    ("shop", "Bird market", "shop.html",
      "The Pigeon Polly shop: hats, scarves, frames and treasures for your pixel bird, paid for with buttons you earn on the site."),
     ("games", "Games", "games.html",
      "Pigeon Polly games: Button Rain, Polly’s Potion Lab, Polly’s Pancakes, Polly’s Train, Detective Titos, Polly’s Office, Wobbleland and the advent calendar. Earn buttons and spend them in the shop."),
@@ -185,7 +185,7 @@ SECTION_HUB = {"play": ("games", "All games and the shop →"), "draw": ("challe
 # страницы не из меню: в каком они разделе и какой подпункт подсвечен («Стая › Все птички» над заголовком)
 TAB_ALIAS = {"bird": "flock", "garden": "flock", "shop": "games", "games": "games"}
 # подпись над заголовком для страниц раздела, которых нет в подменю
-CRUMB_ONLY = {"shop": ("play", "Shop")}
+CRUMB_ONLY = {"shop": ("play", "Bird market")}
 for _p in ("anxiety", "sketchbook", "snail", "bird", "detective", "halloween", "ai-art"):
     TAB_ALIAS["art-portfolio/" + _p] = "art-portfolio"
 # подпункты, которых нет в выпадающем меню (а в подвале есть)
