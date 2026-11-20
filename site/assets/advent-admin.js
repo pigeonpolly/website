@@ -11,9 +11,10 @@
     inkChipT: ['Every bird who opens this window on 24 December also gets the ink course (/ink/, 15 lessons) — it is not a thing in the plan, it opens by itself.',
       'Каждая птичка, открывшая окно 24 декабря, получает доступ к курсу туши (/ink/, 15 уроков) — это не вещь из плана, окно открывает его само.',
       'Katrs putniņš, kas 24. decembrī atver šo lodziņu, saņem arī tušas kursu (/ink/, 15 nodarbības) — tā nav lieta no plāna, lodziņš to atver pats.'],
-    hint: ['Tap a day or “＋ Add”: you can put things from the shop into the window or upload your own file. ★ — special windows, the 31st is the legendary one. An empty window gives buttons.',
-      'Нажмите на день или «＋ Добавить»: в окно можно положить вещи из магазина или загрузить свой файл. ★ — особые окошки, 31-е — легендарное. Пустое окошко даёт пуговки.',
-      'Pieskaries dienai vai “＋ Pievienot”: lodziņā var ielikt lietas no veikala vai augšupielādēt savu failu. ★ — īpašie lodziņi, 31. — leģendārais. Tukšs lodziņš dod pogas.'],
+    hint: ['Tap a day or “＋ Add”: you can put things from the shop into the window or upload your own file. ★ — special windows, the 31st is the legendary one. An empty window gives buttons. 🎁 — gifts for the birds, 📎 — files.',
+      'Нажмите на день или «＋ Добавить»: в окно можно положить вещи из магазина или загрузить свой файл. ★ — особые окошки, 31-е — легендарное. Пустое окошко даёт пуговки. 🎁 — подарки для птичек, 📎 — файлы.',
+      'Pieskaries dienai vai “＋ Pievienot”: lodziņā var ielikt lietas no veikala vai augšupielādēt savu failu. ★ — īpašie lodziņi, 31. — leģendārais. Tukšs lodziņš dod pogas. 🎁 — dāvanas putniņiem, 📎 — faili.'],
+    grpGifts: ['gifts', 'подарки', 'dāvanas'], grpFiles: ['files', 'файлы', 'faili'],
     tabsShop: ['🎁 Things from the shop', '🎁 Вещи из магазина', '🎁 Lietas no veikala'], tabsFile: ['📎 Upload a file', '📎 Загрузить файл', '📎 Augšupielādēt failu'],
     upHint: ['Choose a file from your computer — any file up to 20 MB. The window will show a picture, a caption and “Download”. An image is its own preview; for an archive you can pick a picture.',
       'Выберите файл с компьютера — любой, до 20 МБ. В окне будет картинка, подпись и «Скачать». Картинка сама себе превью, для архива можно выбрать картинку.',
@@ -64,31 +65,45 @@
     return advSet(day, 'file', item, false);
   }
 
-  // «📅 Адвент»: по датам — что лежит в каждом окошке (✕ убрать)
+  // «📅 Адвент»: по датам — что лежит в каждом окошке (✕ убрать); подарки для птичек и файлы — отдельными группами
   function advBoard() {
     var id = me ? me.id : 2;
+    function chip(p) {
+      var it = document.createElement('span'), x = document.createElement('button');
+      if (p.kind === 'file') { // файл в окне — превью или значок формата, при наведении — имя и подпись; нажатие — окно файла
+        var f = fileOf(p.item) || {};
+        it.className = 'fl-adv-it fl-adv-file'; it.title = (f.n || '') + ((f.c && f.c.ru) ? ' · ' + f.c.ru : '');
+        it.style.cursor = 'pointer';
+        it.appendChild(fthumb(f, 44));
+        it.onclick = function () { advFileEdit(p.day, p.item, draw); };
+        x.onclick = function (e) { e.stopPropagation(); var done = delFile(p.day, p.item); if (done) done.then(function () { draw(); }).catch(function () {}); };
+      } else {
+        it.className = 'fl-adv-it'; it.title = gname(p.kind, p.item);
+        it.appendChild(window.PPBirds.itemIcon(p.kind, p.item, 44, id));
+        x.onclick = function () { advSet(p.day, p.kind, p.item, false).then(function () { draw(); }).catch(function () {}); };
+      }
+      x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', '✕ ' + it.title);
+      it.appendChild(x);
+      return it;
+    }
+    // группа «в этом окошке»: 🎁 подарки и 📎 файлы — по отдельности, с подписями
+    function group(kind, list, sep) {
+      var g = document.createElement('span'); g.className = 'fl-adv-grp ' + kind + (sep ? ' sep' : '');
+      var lab = document.createElement('i'); lab.className = 'fl-adv-gl'; lab.textContent = kind === 'files' ? '📎 ' + T.grpFiles[L] : '🎁 ' + T.grpGifts[L];
+      g.appendChild(lab);
+      list.forEach(function (p) { g.appendChild(chip(p)); });
+      return g;
+    }
     for (var n = 1; n <= 31; n++) {
       var row = document.createElement('div'); row.className = 'fl-adv-row' + (ADV_SP.indexOf(n) >= 0 ? ' sp' : '') + (n === 31 ? ' leg' : '');
       var h = document.createElement('b'); h.textContent = aday(n); row.appendChild(h);
       var list = (plan || []).filter(function (p) { return p.day === n; });
       if (!list.length) { var e = document.createElement('small'); e.textContent = T.advEmpty[L]; row.appendChild(e); }
-      list.forEach(function (p) {
-        var it = document.createElement('span'), x = document.createElement('button');
-        if (p.kind === 'file') { // файл в окне — превью или значок формата, при наведении — имя и подпись; нажатие — окно файла
-          var f = fileOf(p.item) || {};
-          it.className = 'fl-adv-it fl-adv-file'; it.title = (f.n || '') + ((f.c && f.c.ru) ? ' · ' + f.c.ru : '');
-          it.style.cursor = 'pointer';
-          it.appendChild(fthumb(f, 44));
-          it.onclick = function () { advFileEdit(p.day, p.item, draw); };
-          x.onclick = function (e) { e.stopPropagation(); var done = delFile(p.day, p.item); if (done) done.then(function () { draw(); }).catch(function () {}); };
-        } else {
-          it.className = 'fl-adv-it'; it.title = gname(p.kind, p.item);
-          it.appendChild(window.PPBirds.itemIcon(p.kind, p.item, 44, id));
-          x.onclick = function () { advSet(p.day, p.kind, p.item, false).then(function () { draw(); }).catch(function () {}); };
-        }
-        x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', '✕ ' + it.title);
-        it.appendChild(x); row.appendChild(it);
-      });
+      else {
+        var gifts = list.filter(function (p) { return p.kind !== 'file'; }), files = list.filter(function (p) { return p.kind === 'file'; });
+        if (gifts.length) row.appendChild(group('gifts', gifts));
+        if (files.length) row.appendChild(group('files', files, gifts.length));
+      }
       // 24-е окно само открывает курс туши (INK_DAY в worker/index.js) — не вещь из плана, но видно, что окно не пустое
       if (n === 24) { var inkc = document.createElement('span'); inkc.className = 'fl-adv-ink'; inkc.textContent = '✒️ ' + T.inkChip[L]; inkc.title = T.inkChipT[L]; row.appendChild(inkc); }
       // «＋» и клик по дню — окно дня: вещи из магазина или свой файл

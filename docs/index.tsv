@@ -54,7 +54,7 @@ file	content/shared/keys.js	content/shared/keys.js	0	65 строк, 5 КБ
 file	content/shared/notebook.js	content/shared/notebook.js	0	587 строк, 49 КБ
 file	content/shared/uttale.js	content/shared/uttale.js	0	117 строк, 14 КБ · СОБРАН, руками не править
 file	docs/a1-pack.md	docs/a1-pack.md	0	10 строк, 2 КБ
-file	docs/admin.md	docs/admin.md	0	180 строк, 51 КБ
+file	docs/admin.md	docs/admin.md	0	180 строк, 52 КБ
 file	docs/artpill.md	docs/artpill.md	0	66 строк, 12 КБ
 file	docs/basics.md	docs/basics.md	0	47 строк, 9 КБ
 file	docs/bird.md	docs/bird.md	0	112 строк, 59 КБ
@@ -73,7 +73,7 @@ file	docs/ink.md	docs/ink.md	0	52 строк, 29 КБ
 file	docs/map.md	docs/map.md	0	341 строк, 69 КБ
 file	docs/palettes.md	docs/palettes.md	0	56 строк, 25 КБ
 file	docs/pinterest-dec2026.md	docs/pinterest-dec2026.md	0	55 строк, 4 КБ
-file	docs/plan-status.md	docs/plan-status.md	0	179 строк, 42 КБ
+file	docs/plan-status.md	docs/plan-status.md	0	180 строк, 43 КБ
 file	docs/polly-pet.md	docs/polly-pet.md	0	40 строк, 9 КБ
 file	docs/requests.md	docs/requests.md	0	31 строк, 14 КБ
 file	docs/retired.md	docs/retired.md	0	36 строк, 6 КБ
@@ -88,7 +88,7 @@ file	site/assets/about-desk.js	site/assets/about-desk.js	0	738 строк, 52 К
 file	site/assets/account.js	site/assets/account.js	0	434 строк, 44 КБ
 file	site/assets/admin-v2.css	site/assets/admin-v2.css	0	185 строк, 18 КБ
 file	site/assets/admin.js	site/assets/admin.js	0	1539 строк, 230 КБ
-file	site/assets/advent-admin.js	site/assets/advent-admin.js	0	336 строк, 28 КБ
+file	site/assets/advent-admin.js	site/assets/advent-admin.js	0	351 строк, 29 КБ
 file	site/assets/advent.css	site/assets/advent.css	0	302 строк, 28 КБ
 file	site/assets/advent.js	site/assets/advent.js	0	248 строк, 20 КБ
 file	site/assets/artpill-claude.js	site/assets/artpill-claude.js	0	245 строк, 50 КБ
@@ -168,7 +168,7 @@ file	site/assets/site-edit.js	site/assets/site-edit.js	0	288 строк, 24 КБ
 file	site/assets/site.js	site/assets/site.js	0	265 строк, 16 КБ
 file	site/assets/sketch-wall.js	site/assets/sketch-wall.js	0	955 строк, 121 КБ
 file	site/assets/sketchbook.js	site/assets/sketchbook.js	0	138 строк, 13 КБ
-file	site/assets/style.css	site/assets/style.css	0	5716 строк, 513 КБ
+file	site/assets/style.css	site/assets/style.css	0	5720 строк, 514 КБ
 file	site/assets/tarot-admin.js	site/assets/tarot-admin.js	0	127 строк, 11 КБ
 file	site/assets/titos-bugs.js	site/assets/titos-bugs.js	0	229 строк, 21 КБ
 file	site/assets/titos-sort.js	site/assets/titos-sort.js	0	337 строк, 35 КБ
@@ -1849,22 +1849,22 @@ sym	subscribers	site/assets/admin.js	1494	fn
 sym	backupBox	site/assets/admin.js	1519	const
 sym	wireBackup	site/assets/admin.js	1525	fn
 sym	backup	site/assets/admin.js	1531	fn
-sym	ADV_SP	site/assets/advent-admin.js	38	const
-sym	FILE_MAX	site/assets/advent-admin.js	39	const
-sym	advSet	site/assets/advent-admin.js	40	fn
-sym	fileOf	site/assets/advent-admin.js	45	fn
-sym	extOf	site/assets/advent-admin.js	46	fn
-sym	aday	site/assets/advent-admin.js	47	fn
-sym	gname	site/assets/advent-admin.js	48	fn
-sym	kb	site/assets/advent-admin.js	49	const
-sym	fthumb	site/assets/advent-admin.js	51	fn
-sym	errText	site/assets/advent-admin.js	57	fn
-sym	delFile	site/assets/advent-admin.js	62	fn
-sym	advBoard	site/assets/advent-admin.js	68	fn
-sym	dayState	site/assets/advent-admin.js	103	const
-sym	advDayPick	site/assets/advent-admin.js	104	fn
-sym	advFileEdit	site/assets/advent-admin.js	244	fn
-sym	PPAdventAdmin	site/assets/advent-admin.js	328	win
+sym	ADV_SP	site/assets/advent-admin.js	39	const
+sym	FILE_MAX	site/assets/advent-admin.js	40	const
+sym	advSet	site/assets/advent-admin.js	41	fn
+sym	fileOf	site/assets/advent-admin.js	46	fn
+sym	extOf	site/assets/advent-admin.js	47	fn
+sym	aday	site/assets/advent-admin.js	48	fn
+sym	gname	site/assets/advent-admin.js	49	fn
+sym	kb	site/assets/advent-admin.js	50	const
+sym	fthumb	site/assets/advent-admin.js	52	fn
+sym	errText	site/assets/advent-admin.js	58	fn
+sym	delFile	site/assets/advent-admin.js	63	fn
+sym	advBoard	site/assets/advent-admin.js	69	fn
+sym	dayState	site/assets/advent-admin.js	118	const
+sym	advDayPick	site/assets/advent-admin.js	119	fn
+sym	advFileEdit	site/assets/advent-admin.js	259	fn
+sym	PPAdventAdmin	site/assets/advent-admin.js	343	win
 sym	app	site/assets/advent.js	3	const
 sym	LATE	site/assets/advent.js	31	const
 sym	HOUSES	site/assets/advent.js	34	const
