@@ -270,7 +270,7 @@
 .advw #mbody{position:relative;z-index:1}
 .advw .confetti i{position:absolute;top:-12px;width:8px;height:12px;border-radius:2px;animation:aw-conf 1.6s ease-out forwards}
 @keyframes aw-conf{to{transform:translateY(460px) rotate(540deg);opacity:0}}
-.advw /* ===== телефон ===== */
+/* ===== телефон ===== */
 @media (max-width:760px){
   .advw .sky{padding-top:64px}
   .advw .moon{width:40px;height:40px;top:14px;right:16px;box-shadow:inset 10px -4px 0 0 #FFF4D6}
@@ -281,9 +281,11 @@
   .advw .house .facade{padding-left:6px;padding-right:6px}
   .advw .house.church{order:-1;width:100%!important}
   .advw .house.church .facade{width:64%;margin:0 auto}
-  .advw .win{--w:44px}
-  .advw .win.sp{--w:50px}
-  .advw .row,.ground{gap:14px}
+  .advw .win{--w:min(46px,11vw)}
+  .advw .win.sp{--w:min(50px,12vw)}
+  .advw .win.d24{--w:min(78px,19vw)}
+  .advw .win.d31{--w:min(68px,17vw)}
+  .advw .row,.advw .ground{gap:min(14px,3.2vw)}
   .advw .facade{padding:28px 8px 0;gap:30px}
   .advw .row::after{left:-8px;right:-8px}
   .advw .door{width:32px;height:56px}
