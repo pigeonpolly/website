@@ -1,4 +1,4 @@
-﻿// Сервер сайта: отдаёт статические файлы из site/ и обслуживает /api/* для «Стены рисунков»:
+// Сервер сайта: отдаёт статические файлы из site/ и обслуживает /api/* для «Стены рисунков»:
 // вход через Google, ник, загрузка работы дня, серии, стена, топ, модерация, GDPR (экспорт и удаление).
 // Данные — Cloudflare D1 (env.DB), картинки челленджа — R2 (env.MEDIA, папка challenge/), старые ещё и в KV (env.IMAGES), пока идёт перенос. Блог — worker/blog.js (картинки блога в R2, env.MEDIA).
 import { blogApi, blogPage, blogImgCheck, visitor, anonCode, claimAnon, birdName } from './blog.js';
@@ -410,6 +410,7 @@ const surprise = async (env, req, uid, kind) => { const r = await surpriseKI(env
 
 // ---------- адвент-календарь (/advent/): окошки 1–31 декабря, сутки по Риге ----------
 const ADVENT_SPECIAL = [6, 12, 19, 24, 31];
+const INK_DAY = 24; // окно, которое открывает курс туши (users.ink_ok)
 const ADVENT_LAST_JAN_DEFAULT = 23; // теперь RULES.adventLastJan; // до 23 января (включительно) можно открыть пропущенные окошки // особые окошки (31-е — легендарное); то же в site/assets/advent.js
 // бейдж «Коллекционер»: открыты все 31 окошко адвента одного года (пропущенные — до 23 января). true — только что получен
 async function adventCollector(env, uid, year) {
@@ -2254,6 +2255,7 @@ async function route(req, env, url) {
     const ins = await env.DB.prepare('INSERT OR IGNORE INTO advent_open (user_id, year, day, created_at) VALUES (?, ?, ?, ?)').bind(u.id, t.year, day, now()).run();
     if (!ins.meta.changes) { const o = await env.DB.prepare('SELECT day, kind, item, buttons, got FROM advent_open WHERE user_id = ? AND year = ? AND day = ?').bind(u.id, t.year, day).first(); return json({ ok: true, again: true, ...o, got: parseJ(o.got, o.kind ? [[o.kind, o.item]] : []) }); }
     // у всех одинаково: птичка получает все вещи окошка (кроме тех, которых у неё уже максимум); пустое окошко — пуговки
+    if (day === INK_DAY) await env.DB.prepare('UPDATE users SET ink_ok = 1 WHERE id = ?').bind(u.id).run(); // сюрприз: курс туши
     const plan = (await env.DB.prepare('SELECT kind, item FROM advent_plan WHERE day = ?').bind(day).all()).results;
     const got = [];
     for (const r of plan) {

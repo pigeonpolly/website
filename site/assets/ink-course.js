@@ -22,10 +22,9 @@
   const T = {
     title: ['Ink: Sketching Without Fear', 'Тушь: скетчинг без страха', 'Tuša: skicēšana bez bailēm'],
     lead: ['A full course from Alina’s book “Ink Sketching: Creative Guide”: fifteen lessons with theory, pictures from the book, a quick test and a real task on paper. Polly looks at every page and puts his stamp — and at the end there is a diploma.', 'Полноценный курс по книге Алины «Ink Sketching: Creative Guide»: пятнадцать уроков с теорией, рисунками из книги, коротким тестом и настоящим заданием на бумаге. Полли смотрит каждую страницу и ставит печать — а в конце ждёт диплом.', 'Pilns kurss pēc Alīnas grāmatas «Ink Sketching: Creative Guide»: piecpadsmit nodarbības ar teoriju, zīmējumiem no grāmatas, īsu testu un īstu uzdevumu uz papīra. Pollijs apskata katru lapu un uzliek zīmogu — bet beigās gaida diploms.'],
-    soonK: ['opens on 24 December', 'откроется 24 декабря', 'atvērsies 24. decembrī'],
-    soonTitle: ['The ink course opens on 24 December', 'Курс туши откроется 24 декабря', 'Tušas kurss atvērsies 24. decembrī'],
-    soonLead: ['It is the big window of this year’s advent: one door, the whole course. Look at the advent — behind every other door there is a small drawing task.', 'Это главное окно адвента этого года: одна дверь — весь курс. Загляните в адвент: за каждой другой дверью — маленькое дело для рисования.', 'Šī ir šī gada adventes galvenās durvis: vienas durvis — viss kurss. Ielūkojies adventē: aiz katrām citām durvīm ir mazs zīmēšanas darbiņš.'],
-    soonBtn: ['Open the advent →', 'Открыть адвент →', 'Atvērt adventi →'],
+    closedK: ['by invitation', 'по приглашению', 'tikai ar ielūgumu'],
+    closedTitle: ['The ink course', 'Курс туши', 'Tušas kurss'],
+    closedLead: ['This course is open by invitation. If you already have access, sign in — the lessons will open right away.', 'Курс открыт по приглашению. Если доступ уже есть — войдите, и уроки откроются.', 'Kurss ir atvērts tikai ar ielūgumu. Ja tev jau ir piekļuve, ienāc — nodarbības atvērsies.'],
     members: ['For our flock: open to everyone who signs in.', 'Для своих: открыт всем, кто вошёл на сайт.', 'Saviem: atvērts visiem, kas ienākuši vietnē.'],
     how: ['How a lesson works', 'Как устроен урок', 'Kā notiek nodarbība'],
     howList: [['Theory with pictures from the book', 'A short test — 80 % opens the task', 'A task on paper and an order from Wobbleland', 'A photo of your page — Polly answers with a stamp or a note'], ['Теория с рисунками из книги', 'Короткий тест — 80 % открывают задание', 'Задание на бумаге и заказ из Воббленда', 'Фото страницы — Полли ответит печатью или запиской'], ['Teorija ar zīmējumiem no grāmatas', 'Īss tests — 80 % atver uzdevumu', 'Uzdevums uz papīra un pasūtījums no Vobllendas', 'Lapas foto — Pollijs atbildēs ar zīmogu vai zīmīti']],
@@ -100,11 +99,10 @@
   const stamps = () => Object.values(srv.works).filter(w => w.status === 'ok').length;
   const passed = n => (st.t[n] || 0) >= PASS * 100 || !!srv.works[n] || !!srv.admin; // сдал работу — тест уже не нужен
 
-  // ---------- до 24 декабря курс закрыт для всех (кроме админа) ----------
-  const OPEN_AT = Date.UTC(2026, 11, 23, 22); // полночь 24 декабря по Риге
-  const soon = () => {
-    box.innerHTML = `<div class="ik-hero"><div><p class="ik-k">🎄 ${t('soonK')}</p><h1>${t('soonTitle')}</h1><p class="ik-lead">${t('soonLead')}</p>
-      <a class="ik-btn" href="${pre}/advent/">${t('soonBtn')}</a></div><img src="/images/ink/p01-0.jpg" alt=""></div>`;
+  // ---------- курс закрыт: доступ только по приглашению (users.ink_ok) ----------
+  const closed = () => {
+    box.innerHTML = `<div class="ik-hero"><div><p class="ik-k">🖋 ${t('closedK')}</p><h1>${t('closedTitle')}</h1><p class="ik-lead">${t('closedLead')}</p>
+      ${srv.me === false ? `<button type="button" class="ik-btn ik-login">${t('signin')}</button>` : ''}</div><img src="/images/ink/p01-0.jpg" alt=""></div>`;
   };
 
   // ---------- гость: обложка курса и план ----------
@@ -186,8 +184,8 @@
   };
 
   const render = () => {
-    if (srv.me !== null && !srv.admin && Date.now() < OPEN_AT) return soon();
-    if (srv.me === false) return guest();
+    if (srv.me === false) return closed();
+    if (srv.me !== null && !srv.admin && !srv.ink) return closed();
     if (srv.me === null || !LS.length) { box.innerHTML = `<p class="ik-loading">${t('loading')}</p>`; return; }
     box.innerHTML = `<div class="ik-top"><h1>${t('title')}</h1>${path()}</div>${mode === 'dip' ? diplomaView() : lessonView()}${bookLink()}`;
     const pic = box.querySelector('.ik-dip-pic');
@@ -199,8 +197,9 @@
   const load = async () => {
     const get = u => fetch(u, { credentials: 'same-origin' }).then(r => r.ok ? r.json() : null).catch(() => null);
     const [s, ls] = await Promise.all([get('/api/school?course=ink&lang=' + LG), get('/api/school/lessons?course=ink&lang=' + LG)]);
-    if (!s || !s.me || !ls || !ls.me) { srv.me = false; render(); return; }
-    srv.me = true; srv.admin = !!s.admin; srv.nick = s.nick || ''; srv.btn = s.diplomaBtn || 0; srv.works = {}; for (const w of s.works || []) srv.works[w.lesson] = w;
+    if (!s || !s.me) { srv.me = false; render(); return; }
+    srv.me = true; srv.admin = !!s.admin; srv.ink = !!s.ink; srv.nick = s.nick || ''; srv.btn = s.diplomaBtn || 0; srv.works = {}; for (const w of s.works || []) srv.works[w.lesson] = w;
+    if (!ls || !ls.me) { LS = []; render(); return; }
     LS = ls.lessons || [];
     fixCur(); render();
     if (location.hash === '#diploma') { mode = 'dip'; render(); }

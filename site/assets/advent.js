@@ -24,6 +24,7 @@
     btnsWhy: ['This window had buttons inside. Spend them at the market.', 'В этом окошке были пуговки. Их можно потратить на рынке.', 'Šajā lodziņā bija pogas. Tās var iztērēt tirgū.'],
     bag: ['Open my bag', 'Открыть сумку', 'Atvērt somu'], shop: ['Bird market', 'Птичий рынок', 'Putnu tirgus'], close: ['Close', 'Закрыть', 'Aizvērt'],
     legend: ['★ Legendary!', '★ Легендарная!', '★ Leģendāra!'], special: ['Special window', 'Особое окошко', 'Īpašs lodziņš'],
+    admPreview: ['What is inside this window', 'Что лежит в этом окне', 'Kas ir šajā lodziņā'], emptyWin: ['Empty window — buttons inside', 'Пустое окно — внутри пуговки', 'Tukšs lodziņš — iekšā pogas'],
     err: ['Could not open, please try again.', 'Не получилось открыть, попробуйте ещё раз.', 'Neizdevās atvērt, mēģini vēlreiz.'],
     over: ['This year’s calendar is over. See you in December!', 'Календарь этого года закончился. До встречи в декабре!', 'Šī gada kalendārs ir beidzies. Tiekamies decembrī!'],
     collector: ['🏅 All 31 windows are open! New achievement: “Collector” (+50 🔘)', '🏅 Все 31 окошко открыты! Новое достижение — «Коллекционер» (+50 🔘)', '🏅 Visi 31 lodziņi atvērti! Jauns sasniegums — “Kolekcionārs” (+50 🔘)'],
@@ -84,7 +85,14 @@
     app.querySelectorAll('.adv-win.open').forEach(b => { const d = +b.dataset.d, o = opened[d] || (past[d] ? { kind: past[d][0][0], item: past[d][0][1] } : { buttons: 1 }); b.querySelector('.adv-in').appendChild(prize(o, 40)); if ((past[d] || []).length > 1 || (o.got || []).length > 1) b.classList.add('many'); });
     if (before && !S.catchUp) countdown(app.querySelector('.adv-cd'));
     const lg = app.querySelector('[data-login]'); if (lg) lg.onclick = () => window.PPAccount && window.PPAccount.openSignIn();
-    app.querySelectorAll('.adv-win').forEach(b => b.onclick = () => { const d = +b.dataset.d; if (!opened[d] && isPast(d)) return showPast(b, d, past[d] || []); tap(b, d, opened[d]); });
+    if (S.plan) app.querySelectorAll('.adv-win').forEach(b => b.classList.remove('lock')); // админу видно всё
+    app.querySelectorAll('.adv-win').forEach(b => b.onclick = () => {
+      const d = +b.dataset.d;
+      if (opened[d]) return show(b, opened[d], false);
+      if (S.plan) return showAdm(b, d, plan[d] || []);
+      if (isPast(d)) return showPast(b, d, past[d] || []);
+      tap(b, d, null);
+    });
   }
   // /advent/#d=N: прокрутить к окошку N и, если его можно открыть, открыть (один раз)
   function goTo() {
@@ -112,6 +120,18 @@
       .catch(() => { btn.disabled = false; toast(t('err')); });
   }
   const toast = m => window.PPToast ? window.PPToast(m) : alert(m);
+  // админ: что лежит в окне (предпросмотр, ничего не забирает)
+  function showAdm(btn, d, items) {
+    const B = window.PPBirds;
+    const dlg = document.createElement('div'); dlg.className = 'adv-modal'; dlg.setAttribute('role', 'dialog');
+    dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button><p class="adv-kick">${d} · ${t('admPreview')}</p><div class="adv-list"></div>${items.length ? '' : `<p>${t('emptyWin')}</p>`}<div class="adv-act"><a class="pill-btn" href="/admin/#advent">${t('toColl')}</a></div></div>`;
+    const list = dlg.querySelector('.adv-list');
+    items.forEach(([k, v]) => { const f = document.createElement('figure'); if (B) f.appendChild(B.itemIcon(k, v, 64, S.user ? S.user.id : 2)); const c = document.createElement('figcaption'); c.textContent = B ? B.giftName(k, v, L) : (k + '|' + v); f.appendChild(c); list.appendChild(f); });
+    const close = () => dlg.remove();
+    dlg.querySelector('.adv-x').onclick = close; dlg.onclick = e => { if (e.target === dlg) close(); };
+    document.body.appendChild(dlg); dlg.querySelector('.adv-x').focus();
+  }
+
   // прошедший день: что было в окошке (видно всем)
   function showPast(btn, d, items) {
     const B = window.PPBirds;

@@ -36,7 +36,7 @@
   </a>
 </div></section>
 <script>/* ссылка на адвент видна до 1 января включительно, потом прячется */
-(function () { var b = document.getElementById('advpromo'); if (!b) return; var n = new Date(), m = n.getMonth(), d = n.getDate(); if (!(m === 11 || (m === 0 && d === 1))) b.remove(); })();</script>
+(function () { var b = document.getElementById('advpromo'); if (!b) return; var n = new Date(), m = n.getMonth(), d = n.getDate(); if (!(m >= 10 || (m === 0 && d === 1))) b.remove(); })();</script>
 
 <section class="fl" id="lessons"><div class="w">
   <div><span class="hand">hi! let’s paint something small ✿</span>
