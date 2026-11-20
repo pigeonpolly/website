@@ -108,6 +108,13 @@
     b.scrollIntoView({ block: 'center', behavior: 'smooth' }); b.classList.add('pulse');
     if (S.user && S.user.nick && b.classList.contains('ready')) setTimeout(() => tap(b, d, null), 700);
   }
+  // строка-сообщение под календарём: видно всегда, даже если окно не открылось
+  function msg(text) {
+    let p = app.querySelector('.adv-msg');
+    if (!p) { p = document.createElement('p'); p.className = 'adv-msg'; p.setAttribute('role', 'status'); app.appendChild(p); }
+    p.textContent = text;
+  }
+
   function prize(o, size) {
     const B = window.PPBirds, s = document.createElement('span'); s.className = 'adv-prize';
     if (o && o.kind && B) s.appendChild(B.itemIcon(o.kind, o.item, size, S.user ? S.user.id : 2));
@@ -128,8 +135,9 @@
   // закрытое окно: объясняем, когда откроется (всегда видимое окно, не тост)
   function showLocked(d) {
     const dlg = document.createElement('div'); dlg.className = 'adv-modal'; dlg.setAttribute('role', 'dialog');
-    const msg = S.month >= 1 && S.month <= 2 ? t('tooLate') : (LATE_CLOSED.includes(d) && d <= (S.claimTo || 0) ? t('missedIt') : t('locked').replace('{d}', d));
-    dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button><p class="adv-kick">${d} December</p><p>${msg}</p><div class="adv-act">${S.user ? '' : `<button type="button" class="pill-btn pill-fill" data-lg>${t('signin')}</button>`}</div></div>`;
+    const text = S.month >= 1 && S.month <= 2 ? t('tooLate') : (LATE_CLOSED.includes(d) && d <= (S.claimTo || 0) ? t('missedIt') : t('locked').replace('{d}', d));
+    msg(d + ' · ' + text);
+    dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button><p class="adv-kick">${d} December</p><p>${text}</p><div class="adv-act">${S.user ? '' : `<button type="button" class="pill-btn pill-fill" data-lg>${t('signin')}</button>`}</div></div>`;
     const close = () => dlg.remove();
     dlg.querySelector('.adv-x').onclick = close; dlg.onclick = e => { if (e.target === dlg) close(); };
     const lg = dlg.querySelector('[data-lg]'); if (lg) lg.onclick = () => { try { location.hash = '#d=' + d; } catch (e) { /* ок */ } window.PPAccount && window.PPAccount.openSignIn(); };

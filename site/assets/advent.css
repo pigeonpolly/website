@@ -88,3 +88,6 @@
 @media (max-width: 900px) { .adv-board { grid-template-columns: repeat(6, minmax(0, 1fr)); } }
 @media (max-width: 620px) { .adv-board { grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 8px; padding: 20px 14px 14px; border-radius: 18px; } .adv-cd span { min-width: 62px; } .adv-win b { font-size: 18px; } }
 @media (prefers-reduced-motion: reduce) { .adv-bird.fly { animation: none; transform: none; opacity: 1; } .adv-win.ready { animation: none; } }
+
+.adv-msg { margin: 14px auto 0; max-width: 680px; text-align: center; font: 500 15px/1.5 Karla, sans-serif; color: #9E1B22; background: #FFF6E5; border: 1px solid rgba(158, 27, 34, .25); border-radius: 12px; padding: 10px 14px; }
+
