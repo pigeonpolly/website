@@ -169,7 +169,7 @@ def skin_a(name='КОРМУШКА УДАЧИ', lines=('СОСЕДИ ДОБРЫЕ
     if prop:
         from props import draw as prop_draw
         p = prop_draw(prop)
-        if p: im.paste(p, (92, 124) if seed % 2 else (12, 124), p)
+        if p: im.paste(p, (84, 124) if seed % 2 else (12, 124), p)
         d = ImageDraw.Draw(im)
     rnd = random.Random(seed + 4)
     for _ in range(44):

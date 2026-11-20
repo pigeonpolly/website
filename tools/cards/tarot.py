@@ -22,7 +22,7 @@ def build():
             check_width(name, 104, '%s/%s name' % (key, lang))
             for l in (l1, l2, l3):
                 check_width(l, 104, '%s/%s line' % (key, lang))
-            im = SKINS[skin](name, (l1, l2, l3), hat=hat or 'scarf', prop=prop or None, seed=i + 1)
+            im = SKINS[skin](name, (l1, l2, l3), hat=hat or 'scarf', prop=(prop or None) if skin != 'c' else None, seed=i + 1)
             im.save(os.path.join(OUT, '%s-%s.png' % (key, lang)), optimize=True)
     back_c().save(os.path.join(OUT, 'back.png'), optimize=True)
     print('ok', len(CARDS) * 3 + 1, OUT)
