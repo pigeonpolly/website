@@ -1,19 +1,23 @@
-# Вырезные ёлочные шары с пиксельной Полли (20.11.2026, docs/coloring.md «Ёлочные шары»).
-# python3 tools/ornaments/make.py → tools/ornaments/out/ornaments.html; потом node tools/ornaments/render.js (PDF + обложка).
+# Вырезные ёлочные украшения с пиксельной Полли (20.11.2026, docs/coloring.md «Ёлочные украшения»).
+# 3 файла, 3 дизайна, всё на английском: ball (плоские шары, колпак Санты), garland (флажки JOY/NOEL, шапка с помпоном),
+# star3d (объёмный шар из двух кругов, оленьи рожки).
+# python3 tools/ornaments/make.py → out/<id>.html; node tools/ornaments/render.js → out/<id>.pdf, out/<id>-p1.png; python3 tools/ornaments/cover.py → site/images/coloring/.
 import math, os, sys
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, os.path.join(HERE, '..'))
 src = open(os.path.join(HERE, '..', 'polly_sprite.py'), encoding='utf-8').read().split('ref=full()')[0]
 NS = {}
 exec(compile(src, 'polly_sprite', 'exec'), NS)
-base, full, rell, DY = NS['base'], NS['full'], NS['rell'], NS['DY']
+full, DY = NS['full'], NS['DY']
+
+CREAM, INK, GOLD, GOLDD = '#f4f1ea', '#231f1c', '#e3b04b', '#b8862e'
+NAVY, NAVY2, RED, RED2, GRN, GRN2 = '#2e2860', '#544a8e', '#a3242e', '#c8335f', '#2f5d46', '#3f8f5a'
 
 # ---- новые головные уборы (сетка спрайта 30×35, голова сверху на y≈6)
 def beanie(g):  # вязаная шапка с помпоном
     g.ell(15.5, 6.2, 6.2, 4.6, '#3f8f5a')
-    g.rect(9, 7, 22, 7, None)
     for x in range(10, 22, 2): g.rect(x, 3, x, 6, '#2f7048')
-    g.rect(9, 6, 22, 7, '#f4f1ea'); [g.p(x, 6, '#e0d8c8') for x in range(10, 22, 2)]
+    g.rect(9, 6, 22, 7, CREAM); [g.p(x, 6, '#e0d8c8') for x in range(10, 22, 2)]
     g.ell(15.5, 1.4, 1.9, 1.7, '#e5484d'); g.p(15, 0, '#f28a8f')
 def antlers(g):  # оленьи рожки и красный нос
     BR, LB = '#8a5a3a', '#b07a50'
@@ -22,13 +26,15 @@ def antlers(g):  # оленьи рожки и красный нос
     g.ell(26.4, 13.4, 1.6, 1.5, '#e5484d'); g.p(26, 12, '#ff9a9a')
 def scarf_g(g):  # зелёный шарф
     for x in range(9, 23):
-        c = '#3f8f5a' if (x // 2) % 2 else '#f4f1ea'; g.p(x, 11 + DY, c); g.p(x, 12 + DY, c)
-    g.rect(18, 13 + DY, 19, 17 + DY, '#3f8f5a'); g.rect(18, 15 + DY, 19, 15 + DY, '#f4f1ea')
+        c = '#3f8f5a' if (x // 2) % 2 else CREAM; g.p(x, 11 + DY, c); g.p(x, 12 + DY, c)
+    g.rect(18, 13 + DY, 19, 17 + DY, '#3f8f5a'); g.rect(18, 15 + DY, 19, 15 + DY, CREAM)
 def bell(g):  # бубенчик на шее
     g.rect(9, 11 + DY, 22, 11 + DY, '#c8335f'); g.ell(15.5, 13.6 + DY, 1.6, 1.5, '#f6c445'); g.p(15, 14 + DY, '#8a6a1a')
+SANTA = [NS['santa'], NS['scarf']]; BEANIE = [beanie, scarf_g]; ANTLERS = [antlers, bell]
 
-def polly_svg(fs, px, x0, y0):
+def polly(fs, px, cx, cy, flip=False):  # Полли по центру (cx, cy); flip — смотрит влево
     g = full(NS['legs_a'], *fs)
+    x0, y0 = cx - 15 * px, cy - 18 * px
     out = []
     for y, row in enumerate(g.a):
         x = 0
@@ -37,205 +43,252 @@ def polly_svg(fs, px, x0, y0):
             if not c: x += 1; continue
             x1 = x
             while x1 + 1 < g.w and row[x1 + 1] == c: x1 += 1
-            out.append(f'<rect x="{x0 + x * px:.3f}" y="{y0 + y * px:.3f}" width="{(x1 - x + 1) * px + .06:.3f}" height="{px + .08:.3f}" fill="{c}"/>')
+            xs = (g.w - 1 - x1) if flip else x
+            out.append(f'<rect x="{x0 + xs * px:.3f}" y="{y0 + y * px:.3f}" width="{(x1 - x + 1) * px + .06:.3f}" height="{px + .08:.3f}" fill="{c}"/>')
             x = x1 + 1
     return '<g shape-rendering="crispEdges">' + ''.join(out) + '</g>'
 
-def snowflake(cx, cy, s, c):  # пиксельная снежинка 5×5
-    pts = [(0, -2), (0, -1), (0, 0), (0, 1), (0, 2), (-2, 0), (-1, 0), (1, 0), (2, 0), (-1, -1), (1, -1), (-1, 1), (1, 1)]
-    pts = [(0, -2), (0, 2), (-2, 0), (2, 0), (0, 0), (-1, -1), (1, -1), (-1, 1), (1, 1)]
+def pix(cx, cy, s, c, pts):
     return ''.join(f'<rect x="{cx + (dx - .5) * s:.2f}" y="{cy + (dy - .5) * s:.2f}" width="{s:.2f}" height="{s:.2f}" fill="{c}"/>' for dx, dy in pts)
-def star(cx, cy, s, c):  # пиксельная звёздочка-крестик
-    return ''.join(f'<rect x="{cx + (dx - .5) * s:.2f}" y="{cy + (dy - .5) * s:.2f}" width="{s:.2f}" height="{s:.2f}" fill="{c}"/>' for dx, dy in [(0, -1), (0, 0), (0, 1), (-1, 0), (1, 0)])
+def snowflake(cx, cy, s, c): return pix(cx, cy, s, c, [(0, -2), (0, 2), (-2, 0), (2, 0), (0, 0), (-1, -1), (1, -1), (-1, 1), (1, 1)])
+def star(cx, cy, s, c): return pix(cx, cy, s, c, [(0, -1), (0, 0), (0, 1), (-1, 0), (1, 0)])
+def gloss(cx, cy, R, op=.35):
+    return f'<path d="M{cx - R * .74} {cy - R * .37} A{R * .84} {R * .84} 0 0 1 {cx - R * .32} {cy - R * .79}" fill="none" stroke="#fff" stroke-opacity="{op}" stroke-width="{R * .07:.2f}" stroke-linecap="round"/>'
 
-CREAM, INK, GOLD, GOLDD = '#f4f1ea', '#231f1c', '#e3b04b', '#b8862e'
-BALLS = [
-    dict(id='santa', fs=[NS['santa'], NS['scarf']], col='#2e2860', col2='#544a8e', acc='#e5484d',
-         t={'en': 'Santa hat', 'ru': 'Колпак Санты', 'lv': 'Salaveča cepure'}, greet='Merry Christmas!', g2='from Polly'),
-    dict(id='beanie', fs=[beanie, scarf_g], col='#a3242e', col2='#c8335f', acc='#3f8f5a',
-         t={'en': 'Pompom beanie', 'ru': 'Шапка с помпоном', 'lv': 'Cepure ar bumbuli'}, greet='Priecīgus Ziemassvētkus!', g2='no Pollija'),
-    dict(id='antlers', fs=[antlers, bell], col='#2f5d46', col2='#3f8f5a', acc='#f6c445',
-         t={'en': 'Reindeer antlers', 'ru': 'Оленьи рожки', 'lv': 'Ziemeļbrieža ragi'}, greet='С Новым годом!', g2='от Полли'),
-]
-R, CW, CH = 38, 17, 7      # радиус шара, ширина и высота «шапочки» шара, мм
-FOLD = 105                 # линия сгиба (середина листа)
+def cut(d): return f'<path d="{d}" fill="none" stroke="{INK}" stroke-width=".35"/>'
+def fold(x1, y1, x2, y2): return f'<line x1="{x1}" y1="{y1}" x2="{x2}" y2="{y2}" stroke="{INK}" stroke-width=".35" stroke-dasharray="1.6 1"/>'
+def hole(cx, cy): return f'<circle cx="{cx}" cy="{cy}" r="1.6" fill="#fff" stroke="{INK}" stroke-width=".3"/>'
 
-def ball_front(b, cx, cy, i, blank=False):
-    cid = f'cf{i}{"b" if blank else ""}'
-    s = [f'<clipPath id="{cid}"><circle cx="{cx}" cy="{cy}" r="{R}"/></clipPath>']
-    if blank:
-        s.append(f'<circle cx="{cx}" cy="{cy}" r="{R}" fill="#fff"/>')
-        s.append(f'<circle cx="{cx}" cy="{cy}" r="{R - 4}" fill="none" stroke="#c9c2b4" stroke-width=".35" stroke-dasharray="1 1.4"/>')
-        s.append(f'<text x="{cx}" y="{cy + 2}" text-anchor="middle" class="hint">draw your Polly</text>')
-        return ''.join(s)
-    g = [f'<rect x="{cx - R}" y="{cy - R}" width="{2 * R}" height="{2 * R}" fill="{b["col"]}"/>']
-    # верхняя полоса: снежинки, нижняя: зигзаг и точки
-    g.append(f'<rect x="{cx - R}" y="{cy - R}" width="{2 * R}" height="{R * .42}" fill="{b["col2"]}"/>')
-    for k in range(-3, 4): g.append(snowflake(cx + k * 9.5, cy - R * .79, .95, CREAM))
-    zz = ' '.join(f'{cx - R + k * 4:.2f},{cy + R * .62 + (0 if k % 2 else 3)}' for k in range(0, 21))
-    g.append(f'<rect x="{cx - R}" y="{cy + R * .62}" width="{2 * R}" height="{R}" fill="{b["col2"]}"/>')
+# ================= 1. BALL: плоские шары, лицо + оборот, сгиб по «шапочке» =================
+R1, CW, CH, FOLD = 38, 17, 7, 105
+BALL_COLS = [(NAVY, NAVY2, '#e5484d'), (RED, RED2, GRN2), (GRN, GRN2, '#f6c445')]
+BACKS = [('Merry Christmas!', 'love, Polly'), ('Happy New Year!', 'love, Polly'), ('Make a wish!', 'love, Polly')]
+
+def ball_front(i, cx, cy):
+    col, col2, acc = BALL_COLS[i]
+    g = [f'<rect x="{cx - R1}" y="{cy - R1}" width="{2 * R1}" height="{2 * R1}" fill="{col}"/>',
+         f'<rect x="{cx - R1}" y="{cy - R1}" width="{2 * R1}" height="{R1 * .42}" fill="{col2}"/>']
+    for k in range(-3, 4): g.append(snowflake(cx + k * 9.5, cy - R1 * .79, .95, CREAM))
+    zz = ' '.join(f'{cx - R1 + k * 4:.2f},{cy + R1 * .62 + (0 if k % 2 else 3)}' for k in range(21))
+    g.append(f'<rect x="{cx - R1}" y="{cy + R1 * .62}" width="{2 * R1}" height="{R1}" fill="{col2}"/>')
     g.append(f'<polyline points="{zz}" fill="none" stroke="{GOLD}" stroke-width="1.1" stroke-linejoin="round"/>')
-    for k in range(-4, 5): g.append(f'<circle cx="{cx + k * 7.5}" cy="{cy + R * .86}" r="1.15" fill="{CREAM if k % 2 else b["acc"]}"/>')
+    for k in range(-4, 5): g.append(f'<circle cx="{cx + k * 7.5}" cy="{cy + R1 * .86}" r="1.15" fill="{CREAM if k % 2 else acc}"/>')
     for dx, dy in [(-31, -6), (30, -10), (-27, 14), (29, 12), (-17, -20), (20, -21)]: g.append(star(cx + dx, cy + dy, .9, GOLD))
-    # медальон с Полли
     g.append(f'<circle cx="{cx}" cy="{cy + 1}" r="22.5" fill="{CREAM}" stroke="{GOLD}" stroke-width="1.4"/>')
-    g.append(f'<circle cx="{cx}" cy="{cy + 1}" r="20.6" fill="none" stroke="{b["col"]}" stroke-width=".35" stroke-dasharray=".1 1.3" stroke-linecap="round"/>')
-    px = 1.18
-    g.append(polly_svg(b['fs'], px, cx - 15 * px + .8, cy + 1 - 17.5 * px - .6))
-    g.append(f'<rect x="{cx - 13}" y="{cy + 18.4}" width="26" height=".5" fill="#d9d0bf"/>')  # «пол»
-    # блик
-    g.append(f'<path d="M{cx - 28} {cy - 14} A{R - 6} {R - 6} 0 0 1 {cx - 12} {cy - 30}" fill="none" stroke="#fff" stroke-opacity=".35" stroke-width="2.6" stroke-linecap="round"/>')
-    s.append(f'<g clip-path="url(#{cid})">{"".join(g)}</g>')
-    return ''.join(s)
+    g.append(f'<circle cx="{cx}" cy="{cy + 1}" r="20.6" fill="none" stroke="{col}" stroke-width=".35" stroke-dasharray=".1 1.3" stroke-linecap="round"/>')
+    g.append(polly(SANTA, 1.18, cx + .8, cy + .6, flip=(i == 1)))
+    g.append(f'<rect x="{cx - 13}" y="{cy + 18.4}" width="26" height=".5" fill="#d9d0bf"/>')
+    g.append(gloss(cx, cy, R1))
+    return f'<clipPath id="bf{i}"><circle cx="{cx}" cy="{cy}" r="{R1}"/></clipPath><g clip-path="url(#bf{i})">{"".join(g)}</g>'
 
-def ball_back(b, cx, cy, i, blank=False):  # рисуется вверх ногами (после сгиба — правильно)
-    cid = f'cb{i}{"b" if blank else ""}'
-    s = [f'<g transform="rotate(180 {cx} {cy})"><clipPath id="{cid}"><circle cx="{cx}" cy="{cy}" r="{R}"/></clipPath>']
-    if blank:
-        s.append(f'<circle cx="{cx}" cy="{cy}" r="{R}" fill="#fff"/>')
-        s.append(f'<circle cx="{cx}" cy="{cy}" r="{R - 4}" fill="none" stroke="#c9c2b4" stroke-width=".35" stroke-dasharray="1 1.4"/>')
-        s.append(f'<text x="{cx}" y="{cy + 2}" text-anchor="middle" class="hint">write a wish</text></g>')
-        return ''.join(s)
-    g = [f'<rect x="{cx - R}" y="{cy - R}" width="{2 * R}" height="{2 * R}" fill="{b["col"]}"/>']
+def ball_back(i, cx, cy):  # печатается вверх ногами — после сгиба читается правильно
+    col, col2, _ = BALL_COLS[i]; t1, t2 = BACKS[i]
+    g = [f'<rect x="{cx - R1}" y="{cy - R1}" width="{2 * R1}" height="{2 * R1}" fill="{col}"/>']
     k = 0
     for yy in range(-36, 40, 9):
         for xx in range(-36, 40, 9):
             off = 4.5 if (yy // 9) % 2 else 0
-            g.append(snowflake(cx + xx + off, cy + yy, .7, b['col2']) if k % 2 else star(cx + xx + off, cy + yy, .7, b['col2'])); k += 1
+            g.append((snowflake if k % 2 else star)(cx + xx + off, cy + yy, .7, col2)); k += 1
     g.append(f'<rect x="{cx - 29}" y="{cy - 14}" width="58" height="28" rx="6" fill="{CREAM}" stroke="{GOLD}" stroke-width="1.2"/>')
-    fs = 8.4 if len(b['greet']) < 18 else 6.6
-    g.append(f'<text x="{cx}" y="{cy - 0.5}" text-anchor="middle" class="greet" style="font-size:{fs}px" fill="{b["col"]}">{b["greet"]}</text>')
-    g.append(f'<text x="{cx}" y="{cy + 7}" text-anchor="middle" class="from" fill="{INK}">{b["g2"]} ♥</text>')
+    g.append(f'<text x="{cx}" y="{cy}" text-anchor="middle" class="hand" style="font-size:8.6px" fill="{col}">{t1}</text>')
+    g.append(f'<text x="{cx}" y="{cy + 7.5}" text-anchor="middle" class="ph" style="font-size:4.4px" fill="{INK}">{t2} ♥</text>')
     g.append(f'<text x="{cx}" y="{cy + 25}" text-anchor="middle" class="url" fill="{CREAM}">pigeonpolly.com</text>')
-    g.append(f'<path d="M{cx - 28} {cy - 14} A{R - 6} {R - 6} 0 0 1 {cx - 12} {cy - 30}" fill="none" stroke="#fff" stroke-opacity=".3" stroke-width="2.6" stroke-linecap="round"/>')
-    s.append(f'<g clip-path="url(#{cid})">{"".join(g)}</g></g>')
+    g.append(gloss(cx, cy, R1, .3))
+    return f'<g transform="rotate(180 {cx} {cy})"><clipPath id="bb{i}"><circle cx="{cx}" cy="{cy}" r="{R1}"/></clipPath><g clip-path="url(#bb{i})">{"".join(g)}</g></g>'
+
+def ball_piece(i, cx):
+    cyF, cyB = FOLD + CH + R1 - .6, FOLD - CH - R1 + .6
+    s = f'<rect x="{cx - CW / 2}" y="{FOLD - CH - 1.2}" width="{CW}" height="{2 * CH + 2.4}" fill="{GOLD}"/>'
+    for k in range(1, 5): s += f'<rect x="{cx - CW / 2 + k * CW / 5 - .3}" y="{FOLD - CH - 1.2}" width=".6" height="{2 * CH + 2.4}" fill="{GOLDD}" opacity=".55"/>'
+    s += ball_front(i, cx, cyF) + ball_back(i, cx, cyB)
+    a = math.degrees(math.asin((CW / 2) / R1))
+    def pt(cy, ang): return cx + R1 * math.sin(math.radians(ang)), cy - R1 * math.cos(math.radians(ang))
+    x1, y1 = pt(cyF, -a); x2, y2 = pt(cyF, a); x3, y3 = pt(cyB, 180 - a); x4, y4 = pt(cyB, 180 + a)
+    s += cut(f'M{x2:.2f} {y2:.2f} A{R1} {R1} 0 1 1 {x1:.2f} {y1:.2f} L{x4:.2f} {y4:.2f} A{R1} {R1} 0 1 1 {x3:.2f} {y3:.2f} Z')
+    return s + fold(cx - CW / 2 - 4, FOLD, cx + CW / 2 + 4, FOLD) + hole(cx, FOLD + 3.3)
+
+def sheet_ball():
+    return ''.join(ball_piece(i, 49.5 + i * 99) for i in range(3))
+
+# ================= 2. GARLAND: флажки, клапан сверху загибается через нитку =================
+FW, FH, TAB = 52, 70, 11
+def flag(cx, top, kind, n):
+    x0, x1, yb = cx - FW / 2, cx + FW / 2, top + TAB
+    pts = f'{x0},{yb} {x1},{yb} {x1},{yb + FH * .72} {cx},{yb + FH} {x0},{yb + FH * .72}'
+    cid = f'fl{n}'
+    s = [f'<rect x="{x0}" y="{top}" width="{FW}" height="{TAB + .3}" fill="#ece5d6"/>',
+         f'<text x="{cx}" y="{top + 6.8}" text-anchor="middle" class="tab">glue ↓ fold over the string</text>',
+         f'<clipPath id="{cid}"><polygon points="{pts}"/></clipPath>']
+    g = []
+    if kind[0] == 'p':  # Полли
+        g.append(f'<rect x="{x0}" y="{yb}" width="{FW}" height="{FH}" fill="{CREAM}"/>')
+        g.append(f'<rect x="{x0}" y="{yb}" width="{FW}" height="7" fill="{RED}"/>')
+        for k in range(-2, 3): g.append(snowflake(cx + k * 9, yb + 3.5, .7, CREAM))
+        g.append(f'<polygon points="{x0 + 3},{yb + 10} {x1 - 3},{yb + 10} {x1 - 3},{yb + FH * .72 - 1.4} {cx},{yb + FH - 5} {x0 + 3},{yb + FH * .72 - 1.4}" fill="none" stroke="{RED}" stroke-width=".5" stroke-dasharray=".1 1.4" stroke-linecap="round"/>')
+        g.append(polly(BEANIE, 1.12, cx + (-.8 if kind == 'pl' else .8), yb + 31, flip=(kind == 'pl')))
+        g.append(f'<rect x="{cx - 13}" y="{yb + 49.8}" width="26" height=".5" fill="#d9d0bf"/>')
+        g.append(f'<text x="{cx}" y="{yb + 57}" text-anchor="middle" class="hand" style="font-size:5.2px" fill="{RED}">ho ho ho</text>')
+    else:  # буква
+        col, col2 = (RED, RED2) if n % 2 else (GRN, GRN2)
+        g.append(f'<rect x="{x0}" y="{yb}" width="{FW}" height="{FH}" fill="{col}"/>')
+        for yy in range(4, 70, 8):
+            for xx in range(-24, 28, 8):
+                off = 4 if (yy // 8) % 2 else 0
+                g.append(star(cx + xx + off, yb + yy, .6, col2))
+        g.append(f'<circle cx="{cx}" cy="{yb + 29}" r="17" fill="{CREAM}" stroke="{GOLD}" stroke-width="1.2"/>')
+        g.append(f'<text x="{cx}" y="{yb + 40.5}" text-anchor="middle" class="big" fill="{col}">{kind}</text>')
+        for k in (-1, 1): g.append(snowflake(cx + k * 12, yb + 54, .8, CREAM))
+    s.append(f'<g clip-path="url(#{cid})">{"".join(g)}</g>')
+    s.append(cut(f'M{x0} {top} L{x1} {top} L{x1} {yb + FH * .72} L{cx} {yb + FH} L{x0} {yb + FH * .72} Z'))
+    s.append(fold(x0 - 2, yb, x1 + 2, yb))
     return ''.join(s)
 
-def cap(cx, y, up, blank=False):  # металлическая шапочка шара; up — к сгибу сверху вниз
-    y0 = y if up else y - CH
-    f = '#fff' if blank else GOLD
-    s = f'<rect x="{cx - CW / 2}" y="{y0}" width="{CW}" height="{CH + 1.2}" fill="{f}"/>' if up else f'<rect x="{cx - CW / 2}" y="{y0 - 1.2}" width="{CW}" height="{CH + 1.2}" fill="{f}"/>'
-    if not blank:
-        for k in range(1, 5): s += f'<rect x="{cx - CW / 2 + k * CW / 5 - .3}" y="{y0 + (0 if up else -1.2)}" width=".6" height="{CH + 1.2}" fill="{GOLDD}" opacity=".55"/>'
+def sheet_garland():
+    s, n = [], 0
+    for r, row in enumerate([['p', 'J', 'O', 'Y', 'pl'], ['p', 'N', 'O', 'E', 'L']]):
+        top = 18 + r * 92
+        for c, k in enumerate(row):
+            s.append(flag(148.5 + (c - 2) * 56, top, k, n)); n += 1
+    return ''.join(s)
+
+# ================= 3. STAR3D: объёмный шар из двух кругов с прорезями =================
+R3, HW = 38, 10   # радиус круга, ширина перемычки-сгиба
+def disc_face(cx, cy, n, flipP, letters):
+    g = [f'<rect x="{cx - R3}" y="{cy - R3}" width="{2 * R3}" height="{2 * R3}" fill="{GRN}"/>']
+    g.append(f'<circle cx="{cx}" cy="{cy}" r="{R3 - 3}" fill="none" stroke="{GOLD}" stroke-width=".9"/>')
+    for k in range(36):
+        a = k * math.pi / 18; g.append(f'<circle cx="{cx + (R3 - 5.6) * math.cos(a):.2f}" cy="{cy + (R3 - 5.6) * math.sin(a):.2f}" r=".9" fill="{CREAM if k % 2 else "#e5484d"}"/>')
+    # левая половина (по виду спереди): медальон с Полли; правая — снежинки и слово
+    side = -1
+    g.append(f'<circle cx="{cx + side * 17}" cy="{cy}" r="15.2" fill="{CREAM}" stroke="{GOLD}" stroke-width="1"/>')
+    g.append(polly(ANTLERS, .82, cx + side * 17 + (-.5 if flipP else .5), cy - .4, flip=flipP))
+    g.append(f'<rect x="{cx + side * 17 - 9}" y="{cy + 11.6}" width="18" height=".4" fill="#d9d0bf"/>')
+    for dx, dy in [(10, -20), (24, -12), (12, 18), (26, 10), (8, 0)]: g.append(snowflake(cx + dx, cy + dy, .75, '#cfe6d6'))
+    g.append(f'<text x="{cx + 19}" y="{cy + 2.4}" text-anchor="middle" class="hand" style="font-size:7px" fill="{CREAM}">{letters}</text>')
+    g.append(gloss(cx, cy, R3, .28))
+    return f'<clipPath id="d{n}"><circle cx="{cx}" cy="{cy}" r="{R3}"/></clipPath><g clip-path="url(#d{n})">{"".join(g)}</g>'
+
+def disc_pair(cy, n, slot, word):
+    # лицо слева, оборот справа (зеркально), между ними — перемычка-сгиб
+    cxF, cxB = 148.5 - R3 - HW / 2 + .6, 148.5 + R3 + HW / 2 - .6
+    hx = 148.5
+    s = f'<rect x="{hx - HW / 2 - 1}" y="{cy - 7}" width="{HW + 2}" height="14" fill="{GRN}"/>'
+    s += disc_face(cxF, cy, n, False, word[0])
+    s += f'<g transform="translate({2 * cxB} 0) scale(-1 1)">' + disc_face(cxB, cy, n + 1, True, '') + '</g>'
+    a = math.degrees(math.asin(7 / R3))
+    def pt(cx, ang): return cx + R3 * math.sin(math.radians(ang)), cy - R3 * math.cos(math.radians(ang))
+    p1 = pt(cxF, 90 - a); p2 = pt(cxF, 90 + a); p3 = pt(cxB, 270 + a); p4 = pt(cxB, 270 - a)
+    s += cut(f'M{p1[0]:.2f} {p1[1]:.2f} L{p3[0]:.2f} {p3[1]:.2f} A{R3} {R3} 0 1 1 {p4[0]:.2f} {p4[1]:.2f} L{p2[0]:.2f} {p2[1]:.2f} A{R3} {R3} 0 1 1 {p1[0]:.2f} {p1[1]:.2f} Z')
+    s += fold(hx, cy - 10, hx, cy + 10)
+    # прорезь на лице: A — сверху до центра, B — снизу до центра
+    y1, y2 = (cy - R3, cy) if slot == 'top' else (cy, cy + R3)
+    s += f'<line x1="{cxF}" y1="{y1}" x2="{cxF}" y2="{y2}" stroke="#e5484d" stroke-width=".9"/><line x1="{cxF}" y1="{y1}" x2="{cxF}" y2="{y2}" stroke="#fff" stroke-width=".25" stroke-dasharray="1 1"/>'
+    lab = 'A · cut slot from the top to the centre' if slot == 'top' else 'B · cut slot from the bottom to the centre'
+    s += f'<text x="{cxF - R3 - 2}" y="{cy - R3 + 3}" text-anchor="end" class="lbl">{lab.split(" · ")[0]}</text>'
+    s += f'<text x="{cxB + R3 + 3}" y="{cy}" class="lbl2">{lab.split(" · ")[1]}</text>' if False else ''
+    if slot == 'bottom': s += hole(cxF, cy - R3 + 3.5)
     return s
 
-def piece(b, cx, i, blank=False):
-    cyF = FOLD + CH + R - .6
-    cyB = FOLD - CH - R + .6
-    s = cap(cx, FOLD, True, blank) + cap(cx, FOLD, False, blank)
-    s += ball_front(b, cx, cyF, i, blank) + ball_back(b, cx, cyB, i, blank)
-    # линия реза: контур (два круга + шапочки)
-    a = math.degrees(math.asin((CW / 2) / R))
-    def pt(cy, ang): return cx + R * math.sin(math.radians(ang)), cy - R * math.cos(math.radians(ang))
-    x1, y1 = pt(cyF, -a); x2, y2 = pt(cyF, a)
-    x3, y3 = pt(cyB, 180 - a); x4, y4 = pt(cyB, 180 + a)
-    d = (f'M{x2:.2f} {y2:.2f} A{R} {R} 0 1 1 {x1:.2f} {y1:.2f} L{cx - CW / 2:.2f} {FOLD - CH - .6:.2f} '
-         f'L{x4:.2f} {y4:.2f} A{R} {R} 0 1 1 {x3:.2f} {y3:.2f} L{cx + CW / 2:.2f} {FOLD + CH + .6:.2f} Z')
-    s += f'<path d="{d}" fill="none" stroke="{INK}" stroke-width=".35"/>'
-    s += f'<line x1="{cx - CW / 2 - 4}" y1="{FOLD}" x2="{cx + CW / 2 + 4}" y2="{FOLD}" stroke="{INK}" stroke-width=".35" stroke-dasharray="1.6 1"/>'
-    s += f'<circle cx="{cx}" cy="{FOLD + 3.3}" r="1.6" fill="#fff" stroke="{INK}" stroke-width=".3"/>'
-    return s
+def sheet_star3d():
+    return disc_pair(60, 0, 'top', ('JOY', 'JOY')) + disc_pair(150, 2, 'bottom', ('NOEL', 'NOEL'))
 
-def scissors(x, y):
-    return f'<text x="{x}" y="{y}" class="sc">✂</text>'
-
+# ================= страницы =================
 CSS = '''
 @page{size:297mm 210mm;margin:0}
 *{margin:0;padding:0;box-sizing:border-box}
 html,body{background:#fff}
 .pg{width:297mm;height:210mm;position:relative;overflow:hidden;page-break-after:always;background:#fff}
 .pg:last-child{page-break-after:auto}
-svg{position:absolute;inset:0;width:297mm;height:210mm}
-.hint{font:400 3.6px 'Patrick Hand';fill:#a49c8d}
-.greet{font-family:'Caveat';font-weight:700}
-.from{font:400 4.2px 'Patrick Hand'}
-.url{font:700 2.6px 'Karla','Nunito Sans';letter-spacing:.25px}
-.sc{font-size:4px;fill:#8a8275}
-.hd{position:absolute;left:12mm;right:12mm;top:6mm;display:flex;justify-content:space-between;align-items:baseline;font:500 3.4mm 'Karla','Nunito Sans';color:#6b6458}
-.hd b{font:500 5.4mm 'Fraunces','Lora';color:#231f1c}
+.pg>svg{position:absolute;inset:0;width:297mm;height:210mm}
+.hand{font-family:'Caveat';font-weight:700}
+.ph{font-family:'Patrick Hand'}
+.url{font:700 2.6px 'Karla';letter-spacing:.25px}
+.tab{font:500 2.3px 'Karla';fill:#8a8275;letter-spacing:.1px}
+.big{font:500 27px 'Fraunces'}
+.lbl{font:400 9px 'Caveat Brush';fill:#a3242e}
+.hd{position:absolute;left:12mm;right:12mm;top:6mm;display:flex;justify-content:space-between;align-items:baseline;font:500 3.4mm 'Karla';color:#6b6458}
+.hd b{font:500 5.4mm 'Fraunces';color:#231f1c}
 .hd i{font:400 4.6mm 'Caveat Brush';color:#a3242e;font-style:normal}
-.ft{position:absolute;left:12mm;right:12mm;bottom:5mm;display:flex;justify-content:space-between;font:500 2.7mm 'Karla','Nunito Sans';color:#8a8275}
-.lab{position:absolute;bottom:11mm;width:99mm;text-align:center;font:400 4.2mm 'Caveat Brush';color:#544a8e}
-/* инструкция */
+.ft{position:absolute;left:12mm;right:12mm;bottom:5mm;display:flex;justify-content:space-between;font:500 2.7mm 'Karla';color:#8a8275}
 .ins{padding:15mm 14mm 0}
-.ins h1{font:500 11mm/1 'Fraunces','Lora';color:#231f1c}
+.ins h1{font:500 11mm/1 'Fraunces';color:#231f1c}
 .ins h1 em{font-family:'Caveat Brush';font-style:normal;color:#a3242e;font-size:10mm}
-.ins .sub{font:500 3.6mm 'Karla','Nunito Sans';color:#6b6458;margin:2.5mm 0 7mm}
+.ins .sub{font:500 3.8mm 'Karla';color:#6b6458;margin:2.5mm 0 8mm}
 .steps{display:grid;grid-template-columns:repeat(5,1fr);gap:5mm}
-.st{border:.35mm solid #e2dbcd;border-radius:4mm;padding:4mm 3.5mm;background:#faf8f3}
-.st svg{position:static;width:100%;height:30mm;display:block;margin-bottom:3mm}
+.st{border:.35mm solid #e2dbcd;border-radius:4mm;padding:4mm 3.5mm 5mm;background:#faf8f3}
+.st svg{width:100%;height:32mm;display:block;margin-bottom:3mm}
 .st .n{font:400 7mm/1 'Caveat Brush';color:#a3242e}
-.st p{font:500 2.9mm/1.35 'Karla','Nunito Sans';color:#3a352e;margin-top:1.6mm}
-.st p.ru,.st p.lv{color:#6b6458}
-.tips{margin-top:7mm;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6mm;font:500 2.9mm/1.45 'Karla','Nunito Sans';color:#3a352e}
-.tips b{font:500 3.6mm 'Fraunces','Lora';display:block;margin-bottom:1mm}
+.st p{font:500 3.4mm/1.4 'Karla';color:#3a352e;margin-top:1.6mm}
+.tips{margin-top:9mm;display:grid;grid-template-columns:1fr 1fr 1fr;gap:6mm;font:500 3.2mm/1.5 'Karla';color:#3a352e}
+.tips b{font:500 3.9mm 'Fraunces';display:block;margin-bottom:1mm}
 '''
+FONTS = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=Karla:wght@500;700&family=Caveat:wght@700&family=Caveat+Brush&family=Patrick+Hand&display=swap">'
+FT = '<div class="ft"><span>© Alina Otkinska · Pigeon Polly Art Lab · pigeonpolly.com</span><span>free for personal use</span></div>'
 
-def sheet(blank=False):
-    s = []
-    for i, b in enumerate(BALLS):
-        cx = 49.5 + i * 99
-        s.append(piece(b, cx, i, blank))
-    for i in range(3): s.append(scissors(49.5 + i * 99 - 46, FOLD + CH + 2 * R - 6))
-    return f'<svg viewBox="0 0 297 210" xmlns="http://www.w3.org/2000/svg">{"".join(s)}</svg>'
+def mini(k):  # маленькие схемы шагов, viewBox 60×46
+    B = lambda cx, cy, r, c: f'<circle cx="{cx}" cy="{cy}" r="{r}" fill="{c}"/>'
+    sc = lambda x, y: f'<text x="{x}" y="{y}" style="font-size:9px">✂</text>'
+    dash = lambda d: f'<path d="{d}" fill="none" stroke="{INK}" stroke-width=".6" stroke-dasharray="1.6 1"/>'
+    arrow = lambda d, e: f'<path d="{d}" fill="none" stroke="#a3242e" stroke-width="1.1"/><path d="{e}" fill="none" stroke="#a3242e" stroke-width="1.1"/>'
+    M = {
+        'b_cut': B(30, 34, 9, NAVY) + f'<rect x="27" y="19" width="6" height="7" fill="{GOLD}"/>' + B(30, 11, 9, NAVY2) + dash('M30 43.6 A9.6 9.6 0 1 1 30.1 43.6 M30 20.4 A9.6 9.6 0 1 1 30.1 20.4') + sc(42, 38),
+        'b_fold': B(30, 32, 10, RED) + f'<rect x="27" y="18" width="6" height="4" fill="{GOLD}"/>' + dash('M18 18 L42 18') + arrow('M30 16 C 48 16 52 25 46 35', 'M43.5 33 l2.6 2.6 l1.4 -3.4'),
+        'glue': B(24, 24, 11, RED2) + B(36, 24, 11, RED) + '<path d="M18 24 q3 -4 6 0 t6 0" fill="none" stroke="#fff" stroke-width="1.3"/>' + f'<text x="44" y="10" style="font:400 7px Caveat Brush" fill="#a3242e">glue</text>',
+        'b_hang': B(30, 31, 11, GRN) + f'<rect x="27" y="16" width="6" height="5" fill="{GOLD}"/><circle cx="30" cy="18.5" r="1.3" fill="#fff"/>' + '<path d="M30 18.5 C 22 8 38 8 30 18.5 M30 10 L30 2" fill="none" stroke="#a3242e" stroke-width="1"/>',
+        'tree': '<path d="M30 3 L46 40 L14 40 Z" fill="#3f8f5a"/>' + B(24, 30, 3.4, NAVY) + B(36, 24, 3.4, RED) + B(31, 36, 3.4, '#f6c445'),
+        'g_cut': f'<path d="M14 6 L46 6 L46 32 L30 42 L14 32 Z" fill="{CREAM}" stroke="{INK}" stroke-width=".6" stroke-dasharray="1.6 1"/><rect x="14" y="6" width="32" height="7" fill="#ece5d6"/>' + sc(47, 30),
+        'g_fold': '<path d="M4 9 L56 9" stroke="#a3242e" stroke-width="1"/>' + f'<path d="M14 9 L46 9 L46 34 L30 44 L14 34 Z" fill="{RED}"/><path d="M14 9 L46 9 L46 3 L14 3 Z" fill="#ece5d6" stroke="{INK}" stroke-width=".4"/>' + arrow('M48 3 C 54 6 54 12 48 15', 'M48.5 12.5 l-.6 2.8 l2.6 .6'),
+        'g_string': '<path d="M0 8 Q30 20 60 8" fill="none" stroke="#a3242e" stroke-width=".9"/>' + ''.join(f'<path d="M{3 + j * 14} {9 + 4 * math.sin(j * 1.1)} l11 0 l0 16 l-5.5 7 l-5.5 -7 Z" fill="{[CREAM, RED, GRN, RED][j]}" stroke="#d9d0bf" stroke-width=".3"/>' for j in range(4)),
+        'g_tip': '<text x="30" y="30" text-anchor="middle" style="font:500 22px Fraunces" fill="#a3242e">JOY</text>',
+        's_cut': B(17, 23, 11, GRN) + f'<rect x="28" y="19" width="4" height="8" fill="{GRN}"/>' + B(43, 23, 11, GRN2) + dash('M30 12 L30 34') + sc(48, 42),
+        's_fold': B(24, 24, 11, GRN2) + B(36, 24, 11, GRN) + '<path d="M18 24 q3 -4 6 0 t6 0" fill="none" stroke="#fff" stroke-width="1.3"/>' + f'<text x="44" y="10" style="font:400 7px Caveat Brush" fill="#a3242e">glue</text>',
+        's_slot': B(17, 24, 11, GRN) + '<path d="M17 13 L17 24" stroke="#e5484d" stroke-width="1.4"/>' + B(43, 24, 11, GRN) + '<path d="M43 24 L43 35" stroke="#e5484d" stroke-width="1.4"/>' + '<text x="17" y="43" text-anchor="middle" style="font:400 6px Caveat Brush" fill="#a3242e">A</text><text x="43" y="9" text-anchor="middle" style="font:400 6px Caveat Brush" fill="#a3242e">B</text>',
+        's_join': f'<ellipse cx="30" cy="25" rx="5" ry="15" fill="{GRN2}"/>' + B(30, 25, 15, GRN) + f'<ellipse cx="30" cy="25" rx="5" ry="15" fill="{GRN2}" opacity=".9"/>' + arrow('M48 4 L48 18', 'M45.5 15.5 l2.5 3 l2.5 -3'),
+        's_hang': f'<ellipse cx="30" cy="29" rx="4" ry="13" fill="{GRN2}"/>' + B(30, 29, 13, GRN) + f'<ellipse cx="30" cy="29" rx="4" ry="13" fill="{GRN2}" opacity=".9"/>' + '<path d="M30 17.5 C 23 8 37 8 30 17.5 M30 10 L30 2" fill="none" stroke="#a3242e" stroke-width="1"/>',
+    }
+    return f'<svg viewBox="0 0 60 46">{M[k]}</svg>'
 
-def step_svg(k, b):
-    # маленькие схемы: 1 вырезать, 2 согнуть, 3 склеить, 4 дырочка и нитка, 5 гирлянда
-    c, c2 = b['col'], b['col2']
-    if k == 1:
-        return f'''<svg viewBox="0 0 60 46"><circle cx="30" cy="34" r="9" fill="{c}"/><rect x="27" y="22" width="6" height="4" fill="{GOLD}"/><rect x="27" y="18.5" width="6" height="3.5" fill="{GOLD}"/><circle cx="30" cy="10" r="9" fill="{c2}"/>
-<path d="M27 22 L27 18.5 M33 18.5 L33 25.5" stroke="{INK}" stroke-width=".6" stroke-dasharray="1.6 1"/><circle cx="30" cy="34" r="9.6" fill="none" stroke="{INK}" stroke-width=".6" stroke-dasharray="1.6 1"/><circle cx="30" cy="10" r="9.6" fill="none" stroke="{INK}" stroke-width=".6" stroke-dasharray="1.6 1"/><text x="42" y="38" style="font-size:9px">✂</text></svg>'''
-    if k == 2:
-        return f'''<svg viewBox="0 0 60 40"><circle cx="30" cy="28" r="10" fill="{c}"/><rect x="27" y="15" width="6" height="4" fill="{GOLD}"/><line x1="18" y1="15" x2="42" y2="15" stroke="{INK}" stroke-width=".7" stroke-dasharray="2 1.2"/>
-<path d="M30 13 C 48 13 52 22 46 32" fill="none" stroke="#a3242e" stroke-width="1.1"/><path d="M43.5 30 l2.6 2.6 l1.4 -3.4" fill="none" stroke="#a3242e" stroke-width="1.1"/><circle cx="30" cy="4" r="0" /></svg>'''
-    if k == 3:
-        return f'''<svg viewBox="0 0 60 40"><circle cx="24" cy="22" r="11" fill="{c2}"/><circle cx="36" cy="22" r="11" fill="{c}" opacity=".95"/>
-<path d="M18 22 q3 -4 6 0 t6 0" fill="none" stroke="#fff" stroke-width="1.3"/><text x="44" y="10" style="font:400 7px Caveat Brush" fill="#a3242e">glue</text></svg>'''
-    if k == 4:
-        return f'''<svg viewBox="0 0 60 40"><circle cx="30" cy="27" r="11" fill="{c}"/><rect x="27" y="12" width="6" height="5" fill="{GOLD}"/><circle cx="30" cy="14.5" r="1.3" fill="#fff"/>
-<path d="M30 14.5 C 22 4 38 4 30 14.5" fill="none" stroke="#a3242e" stroke-width="1"/><path d="M30 6 L30 0" stroke="#a3242e" stroke-width="1"/></svg>'''
-    dots = ''.join(f'<circle cx="{8 + j * 15}" cy="{22 + 4 * math.sin(j)}" r="6" fill="{BALLS[j % 3]["col"]}"/><rect x="{6 + j * 15}" y="{13.5 + 4 * math.sin(j)}" width="4" height="3" fill="{GOLD}"/>' for j in range(4))
-    return f'''<svg viewBox="0 0 60 40"><path d="M0 8 Q30 22 60 8" fill="none" stroke="#a3242e" stroke-width=".9"/>{dots}</svg>'''
-
-STEPS = [
-    ('Cut out along the solid line — the front and the back stay joined at the gold caps.',
-     'Вырезать по сплошной линии — лицо и оборот остаются соединены золотыми «шапочками».',
-     'Izgriez pa nepārtraukto līniju — priekšpuse un aizmugure paliek savienotas pie zelta cepurītēm.'),
-    ('Fold along the dashed line, picture side out.', 'Согнуть по пунктиру, картинкой наружу.', 'Pārloki pa raustīto līniju, ar zīmējumu uz āru.'),
-    ('Glue the two halves back to back. Press under a book for 10 minutes.', 'Склеить половинки спинками. Подержать под книгой 10 минут.', 'Salīmē abas puses kopā. Paturi zem grāmatas 10 minūtes.'),
-    ('Punch the little circle on the cap and tie a ribbon or thread.', 'Проколоть кружок на «шапочке» и продеть ленточку или нитку.', 'Izdur caurumiņu uz cepurītes un iever lentīti vai diegu.'),
-    ('Hang one on the tree — or string all three into a garland.', 'Повесить на ёлку — или нанизать все три в гирлянду.', 'Pakar eglītē — vai savēr visas trīs virtenē.'),
+FILES = [
+    dict(id='polly-ornament-balls', title='Polly Christmas balls', tag='cut · fold · glue · hang', sheet=sheet_ball,
+         sub='Three flat paper ornaments with Polly in a Santa hat. Each has a message on the back.',
+         steps=[('b_cut', 'Cut out each ornament along the solid line. The front and the back stay joined at the gold cap.'),
+                ('b_fold', 'Fold along the dashed line, picture side out.'),
+                ('glue', 'Glue the two halves back to back. Press under a book for 10 minutes.'),
+                ('b_hang', 'Punch the little circle on the cap and tie a ribbon or thread.'),
+                ('tree', 'Hang them on the tree, a window or a gift box.')],
+         tips=[('Paper', 'Print at 100% (“actual size”) on thick paper, 160–220 g/m².'), ('Glue', 'A glue stick works best: liquid glue makes the paper wavy.'), ('A garland', 'Thread all three on one long ribbon, a hand’s width apart.')],
+         t={'en': 'Polly Christmas balls to cut out', 'ru': 'Ёлочные шары с Полли (EN)', 'lv': 'Eglītes bumbas ar Polliju (EN)'}),
+    dict(id='polly-garland', title='Polly JOY & NOEL garland', tag='cut · fold · string', sheet=sheet_garland,
+         sub='Ten paper flags with Polly in a pompom beanie: one string says JOY, the other NOEL.',
+         steps=[('g_cut', 'Cut out each flag along the solid line, together with its grey tab.'),
+                ('g_fold', 'Lay a string along the dashed line and fold the tab back over it.'),
+                ('glue', 'Glue the tab to the back of the flag. Let it dry.'),
+                ('g_string', 'Slide the flags so the letters read JOY and NOEL, Polly at the ends.'),
+                ('g_tip', 'Hang it on a shelf, a window or above the bed.')],
+         tips=[('Paper', 'Print at 100% (“actual size”) on thick paper, 160–220 g/m².'), ('String', 'Baker’s twine, yarn or a thin ribbon, about 1.5 m for both words.'), ('Longer', 'Print the sheet twice for a longer garland.')],
+         t={'en': 'Polly JOY & NOEL garland', 'ru': 'Гирлянда с Полли JOY & NOEL (EN)', 'lv': 'Virtene ar Polliju JOY & NOEL (EN)'}),
+    dict(id='polly-3d-ornament', title='Polly 3D ornament', tag='cut · glue · slot · hang', sheet=sheet_star3d,
+         sub='Two paper circles slot together into a 3D ornament: Polly in reindeer antlers peeks out from all sides.',
+         steps=[('s_cut', 'Cut out both pieces, A and B, along the solid line.'),
+                ('s_fold', 'Fold each piece along the dashed line, picture out, and glue back to back.'),
+                ('s_slot', 'Cut along the red line: A from the top to the centre, B from the bottom to the centre.'),
+                ('s_join', 'Slide A down onto B so the slots lock. Open into a cross.'),
+                ('s_hang', 'Punch the circle on top of B and tie a ribbon.')],
+         tips=[('Paper', 'Print at 100% (“actual size”) on thick paper, 160–220 g/m².'), ('Slots', 'Make each slot a hair wider than the paper (cut twice, close together).'), ('Tight fit', 'A drop of glue in the centre keeps the ornament from turning.')],
+         t={'en': 'Polly 3D ornament', 'ru': 'Объёмный шар с Полли (EN)', 'lv': 'Telpisks rotājums ar Polliju (EN)'}),
 ]
 
-def instructions():
-    st = ''.join(f'<div class="st">{step_svg(k + 1, BALLS[k % 3])}<span class="n">{k + 1}</span><p>{e}</p><p class="ru">{r}</p><p class="lv">{l}</p></div>' for k, (e, r, l) in enumerate(STEPS))
-    return f'''<div class="pg"><div class="ins"><h1>Polly ornaments <em>· cut, fold, hang</em></h1>
-<p class="sub">Ёлочные шары с Полли · Eglītes rotājumi ar Polliju · 3 hats: {" · ".join(b["t"]["en"] for b in BALLS)}</p>
-<div class="steps">{st}</div>
-<div class="tips"><div><b>Paper</b>Print at 100% (“actual size”) on thick paper, 160–220 g/m². A glue stick works best — liquid glue makes paper wavy.</div>
-<div><b>Бумага</b>Печатать в масштабе 100% на плотной бумаге 160–220 г/м². Лучше клей-карандаш — от жидкого бумага идёт волнами.</div>
-<div><b>Papīrs</b>Drukā 100% mērogā uz bieza papīra, 160–220 g/m². Labāk zīmuļveida līme — no šķidrās papīrs viļņojas.</div></div>
-<div class="tips"><div><b>Make your own</b>The last page has blank ornaments — draw Polly in your own hat and write a wish on the back.</div>
-<div><b>Свой шар</b>На последнем листе — пустые шары: нарисовать Полли в своей шапке, а на обороте написать пожелание.</div>
-<div><b>Savs rotājums</b>Pēdējā lapā — tukši rotājumi: uzzīmē Polliju savā cepurē un aizmugurē uzraksti vēlējumu.</div></div>
-</div><div class="ft"><span>© Alina Otkinska · Pigeon Polly Art Lab · pigeonpolly.com</span><span>free for personal use</span></div></div>'''
-
-FONTS = '<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,500&family=Karla:wght@500;700&family=Caveat:wght@700&family=Caveat+Brush&family=Patrick+Hand&family=Lora:wght@500&family=Nunito+Sans:wght@600&display=swap">'
-
-def page(svg, title, blank=False):
-    labs = ''.join(f'<div class="lab" style="left:{i * 99}mm">{"" if blank else b["t"]["en"]}</div>' for i, b in enumerate(BALLS))
-    return f'''<div class="pg"><div class="hd"><b>{title}</b><i>{"cut · fold · glue · hang" if not blank else "draw · cut · fold · hang"}</i><span>A4 · print at 100%</span></div>{svg}
-<div class="ft"><span>© Alina Otkinska · Pigeon Polly Art Lab · pigeonpolly.com</span><span>free for personal use</span></div></div>'''
+def html_for(f):
+    st = ''.join(f'<div class="st">{mini(k)}<span class="n">{i + 1}</span><p>{t}</p></div>' for i, (k, t) in enumerate(f['steps']))
+    tips = ''.join(f'<div><b>{a}</b>{b}</div>' for a, b in f['tips'])
+    p1 = f'<div class="pg"><div class="hd"><b>{f["title"]}</b><i>{f["tag"]}</i><span>A4 · print at 100%</span></div><svg viewBox="0 0 297 210" xmlns="http://www.w3.org/2000/svg">{f["sheet"]()}</svg>{FT}</div>'
+    p2 = f'<div class="pg"><div class="ins"><h1>{f["title"]} <em>· how to make it</em></h1><p class="sub">{f["sub"]}</p><div class="steps">{st}</div><div class="tips">{tips}</div></div>{FT}</div>'
+    return f'<!doctype html><html><head><meta charset="utf-8">{FONTS}<style>{CSS}</style></head><body>{p1}{p2}</body></html>'
 
 def main():
     out = os.path.join(HERE, 'out'); os.makedirs(out, exist_ok=True)
-    html = f'''<!doctype html><html><head><meta charset="utf-8">{FONTS}<style>{CSS}</style></head><body>
-{page(sheet(), "Polly Christmas ornaments")}
-{instructions()}
-{page(sheet(True), "Draw your own Polly ornament", True)}
-</body></html>'''
-    open(os.path.join(out, 'ornaments.html'), 'w', encoding='utf-8').write(html)
-    print('ok', out)
+    for f in FILES: open(os.path.join(out, f['id'] + '.html'), 'w', encoding='utf-8').write(html_for(f))
+    print('ok', [f['id'] for f in FILES])
 
 if __name__ == '__main__':
     main()
