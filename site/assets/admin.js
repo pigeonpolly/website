@@ -31,6 +31,7 @@
     { id: 'blog', ic: '✍️', name: 'Блог', group: 'pub', href: '/blog-editor/', count: 'scheduled' },
     { id: 'requests', ic: '🖍', name: 'Нарисуй мне', group: 'pub', href: '/ru/requests/', count: 'requests' },
     { id: 'themes', ic: '🗓', name: 'Темы челленджа', group: 'pub', about: 'Темы челленджа на любой месяц вперёд: тема на трёх языках, цвета, время; банк ваших тем.' },
+    { id: 'prompts', ic: '📋', name: 'Страница тем', group: 'pub', about: 'Как /prompts/ видят посетители: 30 тем месяца, картинка для телефона и печать. Темы берутся из «🎨 Темы челленджа».' },
     { id: 'art', ic: '🎨', name: 'Картины и палитры', group: 'pub', about: 'Картины, добавленные с сайта, скрытые картины и очередь палитр дня ЭКСТРА.' },
     { id: 'posts', ic: '🖼', name: 'Пины', group: 'pub', about: 'Генератор пинов для Pinterest: тип → дизайн (10 вариантов) → ваше фото или из базы сайта → ✨ тексты. Скачать JPG и скопировать поля для Pinterest.' },
     { id: 'cheats', ic: '🧩', name: 'Конструктор шпаргалок', group: 'pub', about: 'Собрать шпаргалку из блоков: картинки, шаги, текст, советы. Переставлять, делать широкими или в полстроки, перевести на EN/RU/LV и выложить в «Шпаргалки» на «Уроках» — для всех или для своих.' },
@@ -66,7 +67,7 @@
     { id: 'edits', ic: '🧩', name: 'Правки страниц', group: 'service', about: 'Блоки, которые вы поменяли или скрыли прямо на сайте («✏️ Править страницу»), — здесь их можно вернуть как было.', count: 'edits' },
     { id: 'gemini', hide: 1, ic: '🔑', name: 'Ключ Gemini', href: '/blog-editor/#gemini' },
   ];
-  const SECTIONS = { week, notes, titos, inbox, security, analytics, comments, funnels: () => funnelsScreen(), backup, subscribers, birds, shop, edits, advent, rules, art,
+  const SECTIONS = { week, notes, titos, prompts: promptsScreen, inbox, security, analytics, comments, funnels: () => funnelsScreen(), backup, subscribers, birds, shop, edits, advent, rules, art,
     themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
     asks: () => window.PPAboutAdmin ? window.PPAboutAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился about-admin.js</p>'), // 📮 Вопросы из чата (about-admin.js)
     school: () => window.PPSchoolAdmin ? window.PPSchoolAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился school-admin.js</p>'), // 🎓 Школа Полли (school-admin.js)
@@ -708,6 +709,36 @@
       if (!confirm(l === '*' ? 'Снова показать этот блок посетителям?' : 'Убрать правку и вернуть оригинал этого блока?')) return;
       try { await api('admin/blocks', id.startsWith('page:') ? { id, lang: '*', html: null } : l === '*' ? { id, lang: '*', hidden: false } : { id, lang: l, html: null }); edits(); } catch (e) { alert(err(e)); }
     });
+  }
+
+  // ---------- 📋 страница тем месяца (/prompts/): как её видят посетители + предпросмотр ----------
+  async function promptsScreen() {
+    const lang = (document.documentElement.lang || 'en').slice(0, 2);
+    const pre = lang === 'en' || lang === '' ? '' : '/' + lang;
+    const url = pre + '/prompts/';
+    const now = new Date();
+    const nxt = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+    const nm = nxt.getFullYear() + '-' + String(nxt.getMonth() + 1).padStart(2, '0');
+    const nName = nxt.toLocaleString('ru', { month: 'long' });
+    main.innerHTML = `<section class="adm-box"><h2>📋 Страница тем</h2>
+      <p class="be-note">Так её видят посетители: 30 тем месяца, кнопка «Сохранить список картинкой» (без принтера) и печать. Темы, цвета и время берутся из «🎨 Темы челленджа» — правка там меняет и эту страницу.</p>
+      <p style="display:flex;flex-wrap:wrap;gap:10px;align-items:center;margin:14px 0 0">
+        <a class="pill-btn" href="${url}" target="_blank" rel="noopener">Открыть на сайте ↗</a>
+        <button type="button" class="pill-btn" id="adm-pr-fill">📚 Заполнить ${nName} из банка тем</button>
+      </p>
+      <div style="margin-top:14px;border:1px solid rgba(0,0,0,.12);border-radius:12px;overflow:hidden;background:#fff">
+        <iframe src="${url}" title="Страница тем" loading="lazy" style="display:block;width:100%;height:72vh;border:0"></iframe>
+      </div></section>`;
+    const b = main.querySelector('#adm-pr-fill');
+    if (!b) return;
+    b.onclick = async () => {
+      b.disabled = true;
+      try {
+        const r = await api('admin/challenge/fillmonth', { m: nm });
+        alert(r.filled ? `Заполнено дней: ${r.filled}${r.filled < r.empty ? ` из ${r.empty} — в банке не хватило тем` : ''}.` : 'Пустых дней нет — все темы на месте.');
+        promptsScreen();
+      } catch (e) { alert(err(e)); b.disabled = false; }
+    };
   }
 
   // ---------- 📣 объявления в «Новостях стаи» (worker/flock-news.js, /api/admin/flock-notes) ----------

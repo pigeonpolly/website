@@ -4,7 +4,7 @@
 - Ежедневная тема для рисования `/challenge/`: тема дня, календарь, таймер, карточка «поделиться».
 - Стена работ участников (#works) с входом через Google, «Выбор Полли», парад, бейджи и уровни серий.
 - Раз в месяц — день ЭКСТРА: 6 цветов палитры картины Алины (очередь палитр ЭКСТРА).
-- `/prompts/` (20.11.2026) — печатный список тем месяца, вход для Pinterest: 30 карточек с темой и временем, ‹ › (текущий месяц и следующий с 20-го), «🖨 Распечатать месяц» (print CSS прячет шапку и подвал), данные — `GET /api/challenge/month` (темы уже на 3 языках). Кнопка «🖨 Print the month» на /challenge/. Файлы: `src/pages/prompts.html` (V2), `site/assets/prompts.js`, `prompts.css`.
+- `/prompts/` (20.11.2026) — список тем месяца, вход для Pinterest: 30 карточек с темой и временем; ‹ › листают месяцы, **с 20-го числа страница открывается на следующий месяц**; **«⬇ Сохранить список картинкой»** — canvas 1080×1350 (номер дня, тема, подпись pigeonpolly.com), принтер не нужен; «🖨 Печать» — print CSS прячет шапку и подвал. Данные — `GET /api/challenge/month` (темы на 3 языках). Входы: меню Art → «Monthly prompts» / «Темы месяца», подвал, кнопка «🗓 Month list» на /challenge/. Кабинет → «📋 Страница тем»: предпросмотр в iframe, «Открыть на сайте», «📚 Заполнить <месяц> из банка тем». Файлы: `src/pages/prompts.html` (V2), `site/assets/prompts.js`, `prompts.css`.
 - Страница: `src/pages/challenge.html`. Тема: `site/assets/challenge-theme.js` (общий с воркером `extraDay`), `challenge.js`, `challenge-data.js`.
 - Стена и профиль-загрузка: `site/assets/sketch-wall.js`; «Полли, помоги» — «Школа Полли» `polly-school.js`; карусели: `carousel.js`.
 - Сервер: `worker/index.js` (`streaks`, `extraQueue`, `moreBadges`, `/api/wall`, `/api/top`, `/api/img/<id>`).

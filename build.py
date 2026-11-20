@@ -172,6 +172,7 @@ SECTIONS = {
              ("polly-office", "Polly’s Office", "📮", "Help Polly with the Council of Towns’ mail"),
              ("wobbleland", "Wobbleland", "🗺", "Map, holidays and recipes of eleven towns")],
     "draw": [("challenge", "Daily Challenge", "✏️", "A theme, a few colours and a timer — every day"),
+             ("prompts", "Monthly prompts", "🗓", "30 themes to save to your phone or print"),
              ("requests", "Draw this for me", "💡", "Suggest an idea and I’ll draw it"),
              ("palettes", "Palettes", "🎨", "Colours from my paintings and from your photos"),
              ("polly-helps", "Polly, help me", "🕊", "How to draw anything from simple shapes"),
