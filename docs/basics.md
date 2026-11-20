@@ -8,6 +8,7 @@
 - `src/layout-v2.html` и `src/layout-v2-lab.html` — шаблоны (шапка, меню, подвал, «Write to me», мета, Person schema). `src/pages/*.html` — страницы: `{{gallery:имя}}`, `{{ebooks}}`, `{{projects}}`, `{{cv}}`, `{{block:имя}}`. `src/blocks/*.html` — блоки, их `<style>` ограничивается `#blk-имя`, `html, body` → на блок.
 - `content/galleries/*.json` (full, thumb, w, h, caption), `content/ebooks.json`, `content/projects.json` (полка проектов), `content/cv.json` (`"current": true` — мигающий кружок; переводы — `content/i18n/cv.<lang>.json`, английская строка → перевод).
 - `build.py`: `PAGES`, меню `NAV` + `SECTIONS`, `LANGS`.
+- Индекс кода: `docs/index.md` (как искать) + `docs/index.tsv` (файлы, имена в коде, маршруты `/api`, разделы доков — со строками). Ищет `python3 tools/index.py find СЛОВО` / `where ФАЙЛ`, свежесть — `check`.
 - Сервер `worker/index.js` (site/ через ASSETS + /api/*): D1 `pigeonpolly` (`DB`, таблицы создаются сами), KV `IMAGES`, `GOOGLE_CLIENT_ID` в `wrangler.jsonc` (`main`); 503 {ready:false} — пропала привязка. Стена — `site/assets/sketch-wall.js`.
 - `ensureSchema`: полная проверка таблиц (~150 запросов) только при смене метки `schema_ver` в meta (хэш текста функции и таблиц) — новые таблицы/ALTER добавлять как раньше, метка сменится сама. Иначе каждый холодный запуск тормозил все страницы.
 - Скорость (11.11.2026): то же для блога — `ensureBlogSchema`, метка `blog_schema_ver` (хэш кода + blog-drafts.json: новый черновик в файле → импорт сам). Разовая правка в ensureSchema упала — метка не ставится, повтор при следующем запуске. `loadRules` — раз в минуту, чтения разом; `/api/whoami` — чтения разом (Promise.all). `placement: smart` в wrangler.jsonc — сервер рядом с D1.
@@ -40,5 +41,6 @@
 
 ## Проверка перед пушем
 1. `python3 build.py`
-2. `cd site && python3 -m http.server 8766`, Playwright (`/opt/pw-browsers/chromium`), 390 и 1440: скриншоты, без ошибок консоли и горизонтальной прокрутки.
-3. `git add -A && git commit && git push origin main`.
+2. `python3 tools/index.py` — если менял код, маршруты или доки; затем `python3 tools/index.py check` (индекс свеж).
+3. `cd site && python3 -m http.server 8766`, Playwright (`/opt/pw-browsers/chromium`), 390 и 1440: скриншоты, без ошибок консоли и горизонтальной прокрутки.
+4. `git add -A && git commit && git push origin main`.
