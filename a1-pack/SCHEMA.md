@@ -5,7 +5,7 @@ Būvē: `python3 a1-pack/tools/build_lab.py a1-pack/topics/<slug>` → `<slug>-p
 
 Teksta iezīmes: `**treknais**`, `*serif-akcents*` (slīpraksts tēmas krāsā — virsrakstos 1 vārds), `==izcelts==`, `___` — atstarpe.
 Valoda: instrukcijas un skaidrojumi — latviski, uz **tu**; piemēri — britu angļu A1. Pieaugušie. Oskars — `OSKARS.md`.
-Pozas: `hello confused oops tangled spill idea teacher sleep celebrate peek`.
+Pozas: `hello confused oops tangled spill idea teacher sleep celebrate peek` + situācijas `tea umbrella map suitcase phone laptop guide bigben book`.
 
 ## meta
 `slug, title_en, title_lv, course, level, lesson, minutes, accent (#RRGGBB), sources[{name,url}]` (British Council, Cambridge, BBC obligāti).
@@ -24,6 +24,7 @@ Pozas: `hello confused oops tangled spill idea teacher sleep celebrate peek`.
 | quiz | question ar ___, options[], answer (indekss), why | klikšķis / A |
 | build | title, words "a / b / c", answer, lv | saliek teikumu |
 | picker | title, items[] (jautājumi), lv, hint | nejaušs jautājums |
+| oscar | kind (story/tip/fact/joke/lesson/news) vai kicker, text, en (+ izruna), lv?, pose, side «right»? | liels Oskars + runas burbulis; ≥ 1 uz 6 slaidiem, dažādas pozas |
 | task | title, steps[], minutes (taimeris), mode «Individuāli», box | taimeris; tikai individuāls darbs |
 | compare | title, left{title,items}, right{…}, note | |
 | text | title, body, bullets, note | |
@@ -44,6 +45,7 @@ Vadība: ←/→/atstarpe, F pilnekrāns, N piezīmes, O pārskats, A atbilde.
 | mistakes | items[{wrong, right, why}] — apgriežamas kartītes |
 | quiz | items[{q, options[], answer (teksts), why}] — pa vienam, rezultāts |
 | text | text[] |
+| oscar | kā slaidā (kind, text, en, pose, side) — liels Oskars starp sadaļām, izvēlnē neparādās; 2–4 uz tēmu |
 | homework | exercises[] 4–5 (viens `write`), bez pārbaudes; «Lejupielādēt izpildīto (PDF)» ar vārdu, datumu, auto-rezultātu |
 
 ## Uzdevumu tipi (practice / homework)

@@ -17,6 +17,9 @@ Angliski — **Oscar**, latviskajos tekstos — **Oskars** (locās: Oskara, Oska
 | Līga un Jānis | tūristi no Rīgas, mācās angliski kopā ar studentiem | kļūdas, jautājumi, iepazīšanās |
 | Grupas | tūristi no Latvijas, Vācijas, Japānas, Spānijas… | valstis, tautības, skaitļi |
 
+## Pozas
+Pamata: hello, confused, oops, tangled, spill, idea, teacher, sleep, celebrate, peek. Situācijas: tea (tējas pauze), umbrella (lietus), map (apmaldījies), suitcase (ceļojums), phone (zvans), laptop (darbs), guide (gids ar karodziņu), bigben (pie Elizabeth Tower), book (lasa). Lapa: `design/oscar-sheet.png`.
+
 ## Situācijas un vietas
 Big Ben (Elizabeth Tower), Tower Bridge, metro (the Tube), divstāvu autobuss, tējas pauze, krogs (pub), tirgus, lietus, rindas, muzeji, vilciens uz Jorku vai Edinburgu.
 

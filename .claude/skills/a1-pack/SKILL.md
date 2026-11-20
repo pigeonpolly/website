@@ -17,6 +17,7 @@ Paraugs: `a1-pack/topics/to-be/topic.json` — skaties fragmentos (`python3 -c` 
 ## 1. Plāns (pats) → `topics/<slug>/plan.md` + `topic.json` ar `meta`
 - **CEFR A1** robežas; orientieri: British Council LearnEnglish (A1–A2 grammar), Cambridge English A1/A2, BBC Learning English, English Vocabulary Profile A1. **Neizdomā** gramatikas likumus vai izņēmumus; ja šaubies — neraksti. Britu angļu.
 - **Pieaugušie**: ceļojumi, darbs, pilsēta, pakalpojumi. Oskars — britu gids Londonā; kļūdas pieļauj tūristi Jānis/Līga; fakti par Britāniju — tikai pārbaudāmi.
+- **Lielais Oskars** (`oscar`): prezentācijā ≥ 1 uz 6 slaidiem, tēmas failā 2–4 — stāsts, padoms, fakts par Britāniju, joks; katru reizi cita poza/situācija (tea, umbrella, map, guide, bigben…), `en` — teikums ar tēmas gramatiku.
 - **Prezentācija**: ievads → Oskara stāsts → forma (vocab, rule, switcher, examples) → quiz → build → section → … → picker/task (individuāla prakse) → personalizācija (big) → thanks. Interaktīvi ≥ 40 % slaidu, ik ~10 slaidiem quiz, ik ~15 min task ar taimeri. 3 h — 3–4 daļas, pauze, atkārtojums.
 - **Visi uzdevumi individuāli**: nekāda darba pāros/grupās, lomu spēļu, «pajautā kaimiņam», «staigā pa telpu». Runāšana — sev skaļi, ierakstā, atbilde uz picker jautājumu par sevi.
 - **Tēmas fails**: story → rule (+switcher) → vocab → practice (6–8 uzdevumi, ≥ 5 tipi: sort, gap, choice, build, listen, detective, match, truefalse) → facts → video → mistakes → quiz (8–10) → homework (4–5, viens write).

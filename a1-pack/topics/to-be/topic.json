@@ -49,6 +49,14 @@
    "notes": "1 min. Neesi detalizēts."
   },
   {
+   "type": "oscar",
+   "kind": "story",
+   "pose": "guide",
+   "text": "Sveiks! Esmu Oskars, gids Londonā. Katru rītu sagaidu tūristus pie Tower Bridge — un katru rītu kāds saka «I is…». Šodien to salabosim!",
+   "en": "Hello! I'm Oscar. I'm your guide.",
+   "notes": "Oskara ievads. Nospied skaļruni — lai grupa dzird britu izrunu un atkārto."
+  },
+  {
    "type": "story",
    "title": "Hello, London!",
    "pose": "oops",
@@ -141,6 +149,15 @@
    ],
    "note": "Latviski: esmu, esi, ir, esam… Angliski — tikai trīs formas!",
    "notes": "Lai grupa skaļi atkārto katru rindu. Runā ar īsajām formām — tā runā briti."
+  },
+  {
+   "type": "oscar",
+   "kind": "tip",
+   "pose": "tea",
+   "side": "right",
+   "text": "Briti runā īsi: nevis *I am tired*, bet *I'm tired*. Tējas pauzē — tikai īsās formas!",
+   "en": "I'm tired. It's tea time!",
+   "notes": "Uzsver īsās formas: I'm, you're, he's, it's."
   },
   {
    "type": "switcher",
@@ -279,6 +296,14 @@
    "notes": "Pāreja."
   },
   {
+   "type": "oscar",
+   "kind": "story",
+   "pose": "map",
+   "text": "Vakar apmaldījos metro. Pajautāju: «*Is this the Central line?*» Atbilde: «*No, it isn't.*» Jautājumā **be** — uz priekšu!",
+   "en": "Is this the Central line? — No, it isn't.",
+   "notes": "Pāreja uz jautājumiem. Lai grupa atkārto jautājumu un īso atbildi."
+  },
+  {
    "type": "rule",
    "title": "Questions & short answers",
    "head": [
@@ -351,6 +376,14 @@
    "notes": "Ātrā pārbaude pirms runāšanas. Klikšķis uz varianta vai A."
   },
   {
+   "type": "oscar",
+   "kind": "fact",
+   "pose": "bigben",
+   "text": "Big Ben nav tornis — tas ir zvans! Tornis kopš 2012. gada saucas Elizabeth Tower.",
+   "en": "Big Ben is a bell. It isn't a tower.",
+   "notes": "Fakts + noliegums: It isn't a tower."
+  },
+  {
    "type": "picker",
    "title": "Your turn",
    "hint": "Nospied «Griezt»",
@@ -381,6 +414,15 @@
    ],
    "box": "I'm … · I'm from … · I'm a … · I'm not … · My … is …",
    "notes": "Individuāls darbs ar taimeri. Pēc tam vari palūgt 2–3 brīvprātīgos nolasīt vienu teikumu."
+  },
+  {
+   "type": "oscar",
+   "kind": "joke",
+   "pose": "umbrella",
+   "side": "right",
+   "text": "Londonā lietussargs ir mans labākais draugs. Viņš vienmēr ir ar mani… un vienmēr aizmirsts autobusā.",
+   "en": "My umbrella is my best friend. It's always with me!",
+   "notes": "Viegls brīdis pirms personalizācijas."
   },
   {
    "type": "big",
@@ -564,6 +606,13 @@
       ]
      }
     }
+   },
+   {
+    "type": "oscar",
+    "kind": "tip",
+    "pose": "tea",
+    "text": "Briti runā īsi: **I'm, you're, he's, it's**. Pilno formu *I am* dzirdēsi, kad kāds ļoti uzsver — *I AM ready!*",
+    "en": "I'm ready! It's tea time."
    },
    {
     "type": "vocab",
@@ -824,6 +873,14 @@
     ]
    },
    {
+    "type": "oscar",
+    "kind": "joke",
+    "pose": "umbrella",
+    "side": "right",
+    "text": "Londonā lietussargs ir mans labākais draugs. Viņš vienmēr ir ar mani… un vienmēr aizmirsts autobusā.",
+    "en": "My umbrella is my best friend!"
+   },
+   {
     "type": "facts",
     "title": "Oscar's *Britain*",
     "nav": "Fakti",
@@ -833,13 +890,13 @@
       "big": "13,7 t",
       "title": "Big Ben ir zvans",
       "text": "Big Ben ir lielā zvana nosaukums, nevis torņa. Tornis kopš 2012. gada saucas Elizabeth Tower. Zvans sver 13,7 tonnas.",
-      "pose": "teacher"
+      "pose": "bigben"
      },
      {
       "big": "1863",
       "title": "Vecākais metro pasaulē",
       "text": "Londonas metro — *the Tube* — atvērts 1863. gadā. Oskars tajā joprojām apmaldās.",
-      "pose": "oops"
+      "pose": "map"
      },
      {
       "big": "I",
@@ -851,7 +908,7 @@
       "big": "is · are",
       "title": "Visbiežākais darbības vārds",
       "text": "*Be* ir visbiežāk lietotais darbības vārds angļu valodā — tu to dzirdēsi gandrīz katrā teikumā.",
-      "pose": "idea"
+      "pose": "book"
      }
     ]
    },
@@ -1002,6 +1059,13 @@
       "why": "we → are."
      }
     ]
+   },
+   {
+    "type": "oscar",
+    "kind": "lesson",
+    "pose": "laptop",
+    "text": "Mājasdarbs — apmēram 15 minūtes. Kad pabeigsi, nospied «Lejupielādēt» un nosūti PDF skolotājam. Es pa to laiku iedzeršu tēju.",
+    "en": "Good luck! You're great."
    },
    {
     "type": "homework",

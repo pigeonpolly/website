@@ -388,6 +388,20 @@
     return '<div class="vid"><div class="fr">' + fr + '</div><div class="cap"><h3>' + md(v.title) + "</h3><p>" + md(v.lv || "") + "</p>" + (v.url ? '<p style="margin-top:6px"><a href="' + esc(v.url) + '" target="_blank" rel="noopener">' + esc(v.source || "Avots") + " ↗</a></p>" : "") + "</div></div>";
   }
 
+  var KIND = { fact: "Oskara fakts", tip: "Oskara padoms", story: "Oskars stāsta", joke: "Oskara joks", lesson: "Atceries", news: "Jaunumi no Londonas" };
+  function osSay(s) {
+    var b = h("div", { class: "say-b" }, '<div class="k">' + esc(s.kicker || KIND[s.kind] || "Oskars saka") + '</div><div class="tx">' + arr(s.text).map(md).join("<br>") + "</div>");
+    if (s.en) { var en = h("div", { class: "en" }, "<span>" + md(s.en) + "</span>"); en.insertBefore(sayBtn(s.en), en.firstChild); b.appendChild(en); }
+    if (s.lv) b.appendChild(h("div", { class: "lv tiny" }, md(s.lv)));
+    return b;
+  }
+  function osBlock(s, cls) {
+    var w = h("div", { class: cls + (s.side === "right" ? " flip-side" : "") });
+    w.appendChild(h("div", { class: "big-os" }, oscar(s.pose || "hello")));
+    w.appendChild(osSay(s));
+    return w;
+  }
+
   var navEl, secs = [];
   function markNav() {
     if (!navEl) return;
@@ -417,6 +431,7 @@
     wrap.appendChild(hero);
     var n = 0;
     W.sections.forEach(function (s, si) {
+      if (s.type === "oscar") { var ob = h("section", { class: "sec reveal-up" }); ob.appendChild(osBlock(s, "os-block")); wrap.appendChild(ob); return; }
       var id = s.type === "homework" ? "hw" : "s" + (++n);
       var sec = h("section", { class: "sec reveal-up" + (s.type === "homework" ? " hw" : ""), id: id });
       sec.innerHTML = '<div class="sec-h"><div><span class="n">' + (s.type === "homework" ? "MĀJASDARBS" : String(n).padStart(2, "0") + " · " + esc((s.kicker || TYPEN[s.type] || "").toUpperCase())) + "</span><h2>" + md(s.title) + "</h2>" + (s.lead ? "<p>" + md(s.lead) + "</p>" : "") + "</div></div>";
@@ -459,6 +474,8 @@
         body.appendChild(mg);
       } else if (s.type === "quiz") {
         body.appendChild(quiz(s.items));
+      } else if (s.type === "oscar") {
+        body.appendChild(osBlock(s, "os-block"));
       } else if (s.type === "text") {
         body.appendChild(h("div", { class: "card" }, arr(s.text).map(function (p) { return "<p>" + md(p) + "</p>"; }).join("")));
       }
@@ -681,6 +698,9 @@
       });
       col.appendChild(spin); col.appendChild(h("div", { class: "tiny", style: "font-size:16px;max-width:220px" }, md(s.lv || "")));
       os = place(s.pose || "idea", "right:120px;bottom:90px;width:180px");
+    } else if (t === "oscar") {
+      if (s.side === "right") el.classList.add("flip-side");
+      var bo = osBlock(s, "x"); pad.appendChild(bo.firstChild); pad.appendChild(bo.firstChild);
     } else if (t === "thanks") {
       pad.innerHTML = "<h1>" + md(s.title || "Thank you!") + '</h1><div class="sub" style="font-family:var(--serif);font-style:italic;font-size:56px;color:var(--acc-ink);margin-top:16px">' + md(s.text || "") + "</div>";
       os = place(s.pose || "celebrate", "right:150px;bottom:120px;width:320px");

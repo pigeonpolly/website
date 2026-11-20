@@ -8,8 +8,8 @@ from pathlib import Path
 sys.path.insert(0, str(Path(__file__).parent))
 from build_lab import load  # noqa: E402
 
-SLIDES = {"cover", "agenda", "section", "text", "big", "rule", "examples", "vocab", "quiz", "task", "story", "compare", "switcher", "build", "picker", "thanks"}
-SECS = {"story", "rule", "vocab", "practice", "facts", "video", "mistakes", "quiz", "text", "homework"}
+SLIDES = {"cover", "agenda", "section", "text", "big", "rule", "examples", "vocab", "quiz", "task", "story", "compare", "switcher", "build", "picker", "oscar", "thanks"}
+SECS = {"oscar", "story", "rule", "vocab", "practice", "facts", "video", "mistakes", "quiz", "text", "homework"}
 EXT = {"gap", "choice", "truefalse", "sort", "build", "match", "detective", "listen", "write"}
 POSES = {p.stem for p in (Path(__file__).resolve().parent.parent / "design" / "oscar").glob("*.svg") if not p.stem.startswith("d-")}
 
@@ -80,6 +80,8 @@ def main():
         if types[0] != "cover":
             W.append("1. slaids nav cover")
         inter = sum(1 for t in types if t in ("quiz", "switcher", "build", "picker", "task", "vocab", "examples", "story"))
+        if types.count("oscar") < max(2, len(deck) // 6):
+            W.append(f"maz lielo Oskara slaidu (oscar): {types.count('oscar')} — ieteicams ≥ {max(2, len(deck) // 6)}")
         if inter < len(deck) * 0.4:
             W.append(f"maz interaktīvu slaidu ({inter}/{len(deck)}) — mērķis ≥ 40 %")
         for i, s in enumerate(deck, 1):

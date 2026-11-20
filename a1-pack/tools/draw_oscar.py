@@ -40,6 +40,9 @@ def face(cx=100, cy=64, kind="open", rot=0, sc=.86):
     elif kind == "wide":
         e = (f'<ellipse cx="-12" cy="0" rx="11" ry="12" fill="{w}"/><ellipse cx="12" cy="0" rx="11" ry="12" fill="{w}"/>'
              f'<circle cx="-12" cy="0" r="1.8" fill="{K}"/><circle cx="12" cy="0" r="1.8" fill="{K}"/>')
+    elif kind == "down":
+        e = (f'<ellipse cx="-12" cy="0" rx="10" ry="11" fill="{w}"/><ellipse cx="12" cy="0" rx="10" ry="11" fill="{w}"/>'
+             f'<circle cx="-11" cy="5" r="2.6" fill="{K}"/><circle cx="11" cy="5" r="2.6" fill="{K}"/>')
     elif kind == "closed":
         e = f'<path d="M-20,1 Q-12,6 -4,1 M4,1 Q12,6 20,1" fill="none" stroke="{w}" stroke-width="1.8" stroke-linecap="round"/>'
     elif kind == "happy":
@@ -136,6 +139,45 @@ PEEK = ("M62,110 C60,98 62,86 68,78 C66,66 67,56 70,48 Q73,42 78,46 C83,50 88,53
 P["peek"] = ("0 0 200 110", sil(PEEK) + face(100, 80) +
              '<ellipse cx="66" cy="106" rx="14" ry="7" fill="#111"/><ellipse cx="134" cy="106" rx="14" ry="7" fill="#111"/>'
              '<path d="M62,103 v5 M70,103 v5 M130,103 v5 M138,103 v5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/>')
+
+# ---- situācijas (Britānija, ceļojumi, darbs) ----
+CAT = TAIL_R + sil(SIT) + legline() + scarf()
+CATL = TAIL_L + sil(SIT) + legline() + scarf()
+P["tea"] = ("0 0 200 200", CATL + face(kind="closed") +
+            limb("M124,118 C136,126 140,134 142,138", 9) + limb("M76,118 C88,132 112,140 132,140", 9) +
+            f'<path d="M128,124 h28 l-3,26 a6,6 0 0 1 -6,5 h-10 a6,6 0 0 1 -6,-5 Z" fill="#fff" {L}/>'
+            f'<path d="M128,132 h28" stroke="{A}" stroke-width="5"/><path d="M156,130 q10,0 9,9 q-1,7 -10,6" {L}/>'
+            f'<path d="M136,116 q-5,-7 0,-13 q5,-6 0,-13 M147,116 q-5,-7 0,-13 q5,-6 0,-13" {L}/>')
+P["umbrella"] = ("0 0 220 210", '<g transform="translate(0,10)">' + CATL + face(kind="up") + limb("M124,116 C134,104 140,92 142,84", 9) +
+                 f'<path d="M144,92 L144,18" {L}/><path d="M144,92 q0,8 -7,8" {L}/>'
+                 f'<path d="M86,30 Q144,-26 202,30 Q190,22 179,30 Q167,22 156,30 Q144,22 132,30 Q121,22 109,30 Q98,22 86,30 Z" fill="{A}"/>'
+                 f'<path d="M30,40 l-3,8 M48,70 l-3,8 M24,100 l-3,8 M196,70 l-3,8 M206,110 l-3,8 M180,140 l-3,8" {L}/></g>')
+P["map"] = ("0 0 200 200", CAT + face(kind="side") +
+            f'<path d="M58,112 L82,104 L104,112 L128,104 L148,112 L148,166 L128,158 L104,166 L82,158 L58,166 Z" fill="#fff" {L}/>'
+            f'<path d="M82,104 V158 M104,112 V166 M128,104 V158" {L} stroke-width="1"/>'
+            f'<path d="M66,140 q14,-20 26,-6 t24,-10 t22,4" fill="none" stroke="{A}" stroke-width="2" stroke-dasharray="3 4"/>'
+            f'<path d="M134,128 l6,6 m0,-6 l-6,6" stroke="{A}" stroke-width="2.4" stroke-linecap="round"/>'
+            + limb("M74,112 l-12,6", 8) + limb("M126,112 l14,6", 8) + qmark(158, 40, .9))
+P["suitcase"] = ("0 0 220 200", CAT + face() + limb("M124,118 C138,124 150,128 158,128", 9) +
+                 f'<rect x="150" y="128" width="56" height="58" rx="7" fill="#fff" {L}/><path d="M168,128 v-10 h20 v10" {L}/>'
+                 f'<path d="M158,140 v38 M198,140 v38" {L} stroke-width="1"/><circle cx="178" cy="157" r="8" fill="{A}"/>'
+                 f'<circle cx="160" cy="190" r="3" fill="#111"/><circle cx="196" cy="190" r="3" fill="#111"/>')
+P["phone"] = ("0 0 200 200", CAT + face(kind="side") + limb("M124,118 C140,108 140,90 132,80", 9) +
+              f'<rect x="126" y="56" width="13" height="24" rx="3" fill="#fff" {L} transform="rotate(18 132 68)"/>'
+              f'<path d="M150,50 q8,8 0,18 M158,44 q13,14 0,30" {L}/>')
+P["laptop"] = ("0 0 200 200", CAT + face(kind="down") +
+               limb("M76,118 C70,134 72,146 78,150", 9) + limb("M124,118 C130,134 128,146 122,150", 9) +
+               f'<path d="M58,120 h84 v54 h-84 Z" fill="#fff" {L}/><circle cx="100" cy="146" r="4" fill="{A}"/>'
+               f'<path d="M46,176 h108 l-8,10 h-92 Z" fill="#fff" {L}/>')
+P["guide"] = ("0 0 200 200", CATL + face(kind="happy") + limb("M124,116 C136,100 144,84 146,74", 9) +
+              f'<path d="M148,80 L154,12" {L}/><path d="M154,12 L188,22 L152,34 Z" fill="{A}"/>' + lines(166, 52, 20))
+P["bigben"] = ("0 0 265 210", f'<g {L}><path d="M18,206 V70 h40 V206 M18,70 l20,-36 l20,36 M38,34 V20"/><circle cx="38" cy="96" r="12"/>'
+               f'<path d="M38,96 v-7 M38,96 l5,3 M18,124 h40 M18,150 h40 M18,176 h40 M28,124 v82 M48,124 v82"/></g>' +
+               '<g transform="translate(70,18)">' + CAT + face(kind="side") + limb("M76,118 C60,108 46,96 38,86", 9) + "</g>")
+P["book"] = ("0 0 200 200", CAT + face(kind="down") +
+             f'<path d="M64,118 Q82,110 100,120 Q118,110 136,118 V154 Q118,146 100,156 Q82,146 64,154 Z" fill="#fff" {L}/>'
+             f'<path d="M100,120 V156" {L}/><path d="M72,128 q12,-4 22,0 M72,136 q12,-4 22,0 M106,128 q12,-4 22,0 M106,136 q12,-4 22,0" {L} stroke-width="1"/>'
+             + limb("M76,118 l-10,14", 8) + limb("M124,118 l10,14", 8))
 
 D = {}
 D["sun"] = ("0 0 60 60", f'<circle cx="30" cy="30" r="10" {L}/><path d="M30,6 v8 M30,46 v8 M6,30 h8 M46,30 h8 M13,13 l6,6 M41,41 l6,6 M47,13 l-6,6 M13,47 l6,-6" {L}/>')
