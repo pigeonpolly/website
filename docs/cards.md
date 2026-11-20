@@ -96,3 +96,11 @@
 - Сервер (worker/cards.js): `POST /api/admin/cards/gift {uid, id | rarity, collection, note}` (409 sold/none), `POST /api/admin/cards/gift-all {rarity, collection, note}` → `{count, birds, left}` — птички перемешаны, каждой своя карточка, пока свободные не кончатся. Берутся свободные нескрытые, редкие/уникальные — только с ценой (как сюрприз). Пуговки и лимит «в первые сутки» не считаются; в `card_owner` price 0, `ref gift:…`, `gift` = записка, `seen = 0`.
 - В «🎲 Сюрпризах» окна подарка — ещё 4 плитки `any|card`, `any|card-common|rare|unique` (только кабинет: `entries` в giftDialog, имена и значки — room.js `SUR_CARD`): «Подарить» шлёт тот же admin/cards/gift(-all) с редкостью. gift-all карточек учитывает «кому» из 📣 Рассылки (`audWhere`).
 - Птичке — новость `card` (NEWS_KINDS → `cardGiftNews`, news.js `cardGift`): «🃏 Тебе карточка!», «Посмотреть» → `POST /api/cards/gift-seen` и свой альбом. При обмене `seen = 1`.
+
+
+## Птичье таро 2027 — колода в шапке (21.11.2026)
+
+- 100 карт, три лица (a «классика», b «открытка», c «минимал»), один оборот: `site/images/cards/tarot-2027/<ключ>-<en|ru|lv>.png` (120×206, текст запечён — 300 картинок) + `back.png`. Тексты — `tools/cards/tarot_content.py`: (ключ, лицо, шапка Полли, предмет, RU, EN, LV), в тройке название + 3 строки; название и строка ≤ 17 знаков (проверяет `tools/cards/tarot.py`). Предметы — `tools/cards/props.py`, шрифт 5×7 с кириллицей и латышской диакритикой — `tools/cards/pixfont.py`.
+- Сборка: `python tools/cards/tarot.py` (301 файл), ключи для JS — `python tools/cards/write_tarot_js.py`.
+- Шапка: `<div class="td" id="td">` в `src/layout-v2.html` и `src/layout-v2-lab.html`, стили `site/assets/tarot.css`, логика `site/assets/tarot.js`. Одна карта в сутки на браузер: `localStorage.pp_tarot = {d, i, seen}`; повторы не выпадают, пока не кончатся все 100. На экранах <1200px колода скрыта.
+- Модалка: «Открыть карту» → карта; в тот же день сразу показывает ту же карту с подписью «Новая карта — завтра».

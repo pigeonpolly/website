@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="lv">
 <head>
 <meta charset="utf-8">
@@ -32,18 +32,20 @@
 <link rel="stylesheet" href="/assets/v2.css?v=1cb6e811">
 <link rel="stylesheet" href="/assets/v2-acct.css?v=f9f748a5">
 <link rel="stylesheet" href="/assets/v2-shell.css?v=d338ed59">
+<link rel="stylesheet" href="/assets/tarot.css?v=70580010">
 <!-- шапка как на остальных страницах: вход, меню аватара, пуговки, корзина, колокольчик, поиск (стили — v2-acct.css из tools/v2_acct_css.py) -->
 <script>/* вход: /api/whoami сразу, параллельно с загрузкой скриптов — account.js возьмёт ответ (PPWhoP) */try{if(!/devdate=/.test(location.search)&&!sessionStorage.getItem('pp-devdate'))window.PPWhoP=fetch('/api/whoami',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
 <script src="/assets/birds.js?v=c4476bda" defer></script>
 <script src="/assets/room.js?v=dfd6fe8d" defer></script>
 <script src="/assets/toast.js?v=93392a35" defer></script>
-<script src="/assets/day-card.js?v=00ac769a" defer></script>
+<script src="/assets/day-card.js?v=d0702261" defer></script>
 <script src="/assets/hatch.js?v=6d36422a" defer></script>
-<script src="/assets/cart.js?v=5d81e85a" defer></script>
-<script src="/assets/account.js?v=807d4892" defer></script>
+<script src="/assets/cart.js?v=553808d0" defer></script>
+<script src="/assets/account.js?v=383f13aa" defer></script>
 <script src="/assets/news.js?v=1d2af66b" defer></script>
 <script src="/assets/search.js?v=fd80358d" defer></script>
 <script src="/assets/emoji-art.js?v=6375cb5b" defer></script>
+<script src="/assets/tarot.js?v=3d0fda41" defer></script>
 <script src="/assets/v2.js?v=cc8a542a" defer></script>
 <script src="/assets/polly.js?v=9077e6a9" defer></script>
 </head>
@@ -93,6 +95,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 <a class="skip" href="#main">Pāriet uz saturu</a>
 <header class="hd2"><div class="w">
   <a class="lg" href="/lv/"><span class="lg-m" aria-hidden="true"></span><span>Pigeon Polly <i>Art Lab</i></span></a>
+  <div class="td" id="td" hidden><button type="button" class="td-b" id="td-b" aria-haspopup="dialog" aria-label="Bird tarot"><span class="td-st" aria-hidden="true"><i></i><i></i><i></i></span><b class="td-n" id="td-n" hidden>1</b></button></div>
   <nav class="nv" aria-label="Main">
     <div class="nr"><button type="button" class="nr-b" aria-expanded="false"><small>Kabinets 511</small><span>Māksla</span></button><div class="nr-d"><p class="nr-h"><em>Kabinets 511</em> — Māksla</p><a class="nr-a" href="/lv/blog/">Mākslas piezīmes</a><a class="nr-a" href="/lv/learn/">Nodarbības</a><a class="nr-a" href="/lv/challenge/">Izaicinājums</a><a class="nr-a" href="/lv/books/">Grāmatas</a><a class="nr-a" href="/lv/freebies/">Bez maksas</a><a class="nr-a" href="/lv/palettes/">Paletes</a><a class="nr-a" href="/lv/sketchbook/">Skiču burtnīca</a></div></div>
     <div class="nr"><button type="button" class="nr-b" aria-expanded="false"><small>Kabinets 781</small><span>Spēles</span></button><div class="nr-d"><p class="nr-h"><em>Kabinets 781</em> — Spēles</p><a class="nr-a" href="/lv/games/">Visas spēles</a><a class="nr-a" href="/lv/shop/">Putnu tirgus</a><a class="nr-a" href="/lv/titos/">Detektīvs Titoss</a><a class="nr-a" href="/lv/wobbleland/">Wobbleland</a></div></div>
@@ -141,7 +144,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>Bars</h4><a href="/lv/flock/" data-f>Visi putniņi</a><a href="/lv/flock/news/" data-f>Bara ziņas</a><a href="/lv/challenge/" data-f>Dienas izaicinājums</a><a href="/lv/challenge/#sw-wall" data-f>Bara zīmējumi</a><a href="/lv/requests/" data-f>Uzzīmē man</a><a href="/lv/garden/" data-f>Putniņa dārzs</a></div>
     <div><h4 data-f>Alīna</h4><a href="/lv/sketchbook/" data-f>Skiču burtnīca</a><a href="/lv/about-me/" data-f>Par mani</a><a href="/lv/on-walls-and-pages/" data-f>Uz sienām un lapām</a><a href="/lv/projects/" data-f>Mācības un MI</a><a href="/lv/work-with-me/" data-f>Sadarbība</a><a href="/lv/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Alīna Otkinska · Pigeon Polly Art Lab · Rīga</span><span class="ver" data-ver="127">v127 · 20.11 22:22</span><span><a href="/lv/privacy/">Privātums</a></span></div>
+  <div class="bt"><span>© 2026 Alīna Otkinska · Pigeon Polly Art Lab · Rīga</span><span class="ver" data-ver="133">v133 · 21.11 00:16</span><span><a href="/lv/privacy/">Privātums</a></span></div>
 </div></footer>
 </body>
 </html>

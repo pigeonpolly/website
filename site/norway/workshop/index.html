@@ -1,4 +1,4 @@
-﻿<!doctype html>
+<!doctype html>
 <html lang="en">
 <head>
 <meta charset="utf-8">
@@ -33,18 +33,20 @@
 <link rel="stylesheet" href="/assets/v2.css?v=1cb6e811">
 <link rel="stylesheet" href="/assets/v2-acct.css?v=f9f748a5">
 <link rel="stylesheet" href="/assets/v2-shell.css?v=d338ed59">
+<link rel="stylesheet" href="/assets/tarot.css?v=70580010">
 <!-- шапка как на остальных страницах: вход, меню аватара, пуговки, корзина, колокольчик, поиск (стили — v2-acct.css из tools/v2_acct_css.py) -->
 <script>/* вход: /api/whoami сразу, параллельно с загрузкой скриптов — account.js возьмёт ответ (PPWhoP) */try{if(!/devdate=/.test(location.search)&&!sessionStorage.getItem('pp-devdate'))window.PPWhoP=fetch('/api/whoami',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
 <script src="/assets/birds.js?v=c4476bda" defer></script>
 <script src="/assets/room.js?v=dfd6fe8d" defer></script>
 <script src="/assets/toast.js?v=93392a35" defer></script>
-<script src="/assets/day-card.js?v=00ac769a" defer></script>
+<script src="/assets/day-card.js?v=d0702261" defer></script>
 <script src="/assets/hatch.js?v=6d36422a" defer></script>
-<script src="/assets/cart.js?v=5d81e85a" defer></script>
-<script src="/assets/account.js?v=807d4892" defer></script>
+<script src="/assets/cart.js?v=553808d0" defer></script>
+<script src="/assets/account.js?v=383f13aa" defer></script>
 <script src="/assets/news.js?v=1d2af66b" defer></script>
 <script src="/assets/search.js?v=fd80358d" defer></script>
 <script src="/assets/emoji-art.js?v=6375cb5b" defer></script>
+<script src="/assets/tarot.js?v=3d0fda41" defer></script>
 <script src="/assets/v2.js?v=cc8a542a" defer></script>
 <script src="/assets/polly.js?v=9077e6a9" defer></script>
 </head>
@@ -94,6 +96,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 <a class="skip" href="#main">Skip to content</a>
 <header class="hd2"><div class="w">
   <a class="lg" href="/"><span class="lg-m" aria-hidden="true"></span><span>Pigeon Polly <i>Art Lab</i></span></a>
+  <div class="td" id="td" hidden><button type="button" class="td-b" id="td-b" aria-haspopup="dialog" aria-label="Bird tarot"><span class="td-st" aria-hidden="true"><i></i><i></i><i></i></span><b class="td-n" id="td-n" hidden>1</b></button></div>
   <nav class="nv" aria-label="Main">
     <div class="nr"><button type="button" class="nr-b" aria-expanded="false"><small>Room 511</small><span>Art</span></button><div class="nr-d"><p class="nr-h"><em>Room 511</em> — Art</p><a class="nr-a" href="/blog/">Art Notes</a><a class="nr-a" href="/learn/">Lessons</a><a class="nr-a" href="/challenge/">Art Challenge</a><a class="nr-a" href="/books/">Books</a><a class="nr-a" href="/freebies/">Freebies</a><a class="nr-a" href="/palettes/">Palettes</a><a class="nr-a" href="/sketchbook/">Sketchbook</a></div></div>
     <div class="nr"><button type="button" class="nr-b" aria-expanded="false"><small>Room 781</small><span>Games</span></button><div class="nr-d"><p class="nr-h"><em>Room 781</em> — Games</p><a class="nr-a" href="/games/">All games</a><a class="nr-a" href="/shop/">Bird market</a><a class="nr-a" href="/titos/">Detective Titos</a><a class="nr-a" href="/wobbleland/">Wobbleland</a></div></div>
@@ -144,7 +147,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>The Flock</h4><a href="/flock/" data-f>All birds</a><a href="/flock/news/" data-f>Flock news</a><a href="/challenge/" data-f>Daily Challenge</a><a href="/challenge/#sw-wall" data-f>Flock drawings</a><a href="/requests/" data-f>Draw this for me</a><a href="/garden/" data-f>Bird garden</a></div>
     <div><h4 data-f>Alina</h4><a href="/sketchbook/" data-f>Sketchbook</a><a href="/about-me/" data-f>About me</a><a href="/on-walls-and-pages/" data-f>On Walls &amp; Pages</a><a href="/projects/" data-f>Learning &amp; AI</a><a href="/work-with-me/" data-f>Work with me</a><a href="/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Alina Otkinska · Pigeon Polly Art Lab · Riga</span><span class="ver" data-ver="127">v127 · 20.11 22:22</span><span><a href="/privacy/">Privacy</a></span></div>
+  <div class="bt"><span>© 2026 Alina Otkinska · Pigeon Polly Art Lab · Riga</span><span class="ver" data-ver="133">v133 · 21.11 00:16</span><span><a href="/privacy/">Privacy</a></span></div>
 </div></footer>
 </body>
 </html>

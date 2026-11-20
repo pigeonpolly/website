@@ -558,13 +558,27 @@ const okFile = (s) => {
 }; // '?' — «🎲 Сюрприз» этой категории
 // файл в окно адвента Алина загружает с компьютера: файл и превью — в R2 (advent/…), отдаются по /media/… (worker/blog.js)
 const ADVENT_FILE_MAX = 20 * 1024 * 1024; // до 20 МБ, превью — до 6 МБ (как вложение рассылки, worker/notes.js)
-// файл убрали из всех окон: из хранилища удаляем, только если его ещё никто не открывал (иначе у птичек будет битая картинка)
+const ADVENT_IMG = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }; // только картинки отдаём как картинки, остальное — файлом вниз
+// ключи файла и превью из записи окна ({u, p}) — только то, что лежит у нас в R2 (advent/…)
+const advFileKeys = item => {
+  let o; try { o = JSON.parse(item); } catch (e) { return []; }
+  return [...new Set([o && o.u, o && o.p].map(v => String(v || '')).filter(v => v.startsWith('/media/advent/')).map(v => { try { return decodeURIComponent(v.slice(7)); } catch (e) { return ''; } }))].filter(Boolean);
+};
+// этот файл ещё кому-то нужен — в плане окон или в уже открытых окнах (тогда из R2 его не удаляем: будет битая картинка)
+const advFileUsed = async (env, key) => !!(await env.DB.prepare("SELECT 1 FROM advent_plan WHERE kind = 'file' AND item LIKE ? LIMIT 1").bind('%' + key + '%').first()
+  || await env.DB.prepare('SELECT 1 FROM advent_open WHERE item LIKE ? OR got LIKE ? LIMIT 1').bind('%' + key + '%', '%' + key + '%').first());
+// файл убрали из всех окон — чистим хранилище
 async function adventFileDrop(env, item) {
   if (!env.MEDIA) return;
-  if (await env.DB.prepare("SELECT 1 FROM advent_plan WHERE kind = 'file' AND item = ? LIMIT 1").bind(item).first()) return;
-  let o; try { o = JSON.parse(item); } catch (e) { return; }
-  const keys = [...new Set([o && o.u, o && o.p].map(v => String(v || '')).filter(v => v.startsWith('/media/advent/')).map(v => { try { return decodeURIComponent(v.slice(7)); } catch (e) { return ''; } }))].filter(Boolean);
-  for (const k of keys) if (!(await env.DB.prepare('SELECT 1 FROM advent_open WHERE item = ? OR got LIKE ? LIMIT 1').bind(item, '%' + k + '%').first())) await env.MEDIA.delete(k).catch(() => {});
+  for (const k of advFileKeys(item)) if (!(await advFileUsed(env, k))) await env.MEDIA.delete(k).catch(() => {});
+}
+// положить файл в R2: advent/<id>[-p].<ext> (имя ключа — только латиница и цифры, в адресе безопасно)
+async function adventPut(env, file, id, name, preview) {
+  const t = String(file.type || ''), ext = ADVENT_IMG[t] || (preview ? '' : ((String(name).match(/\.([a-z0-9]{1,5})$/i) || [])[1] || 'bin'));
+  if (!ext) throw new HttpError(400, 'type'); // превью — только jpg, png, webp или gif
+  const key = 'advent/' + id + (preview ? '-p' : '') + '.' + ext.toLowerCase();
+  await env.MEDIA.put(key, await file.arrayBuffer(), { httpMetadata: { contentType: preview || ADVENT_IMG[t] ? t : 'application/octet-stream', cacheControl: 'public, max-age=31536000, immutable' } });
+  return key;
 }
 
 // общие функции для worker/blog.js
@@ -2330,21 +2344,50 @@ async function route(req, env, url) {
     const name = String(f.get('name') || file.name || 'file').replace(/[\\/\u0000-\u001f"]/g, '_').trim().slice(0, 120) || 'file';
     const cap = { en: '', ru: '', lv: '' };
     try { const c = JSON.parse(String(f.get('c') || '{}')); for (const l of ['en', 'ru', 'lv']) cap[l] = String(c && c[l] || '').trim().slice(0, 160); } catch (e) { /* без подписи */ }
-    const IMG = { 'image/jpeg': 'jpg', 'image/png': 'png', 'image/webp': 'webp', 'image/gif': 'gif' }; // только картинки отдаём как картинки; остальное — файлом вниз
-    const id = randomHex(16), img = IMG[String(file.type || '')], ext = (name.match(/\.([a-z0-9]{1,5})$/i) || [])[1];
-    const hasPrev = prev instanceof File && prev.size > 0, ptype = hasPrev ? String(prev.type || '') : '', pext = IMG[ptype] || '';
-    if (hasPrev && !pext) fail(400, 'type'); // превью — только jpg, png, webp или gif
+    const hasPrev = prev instanceof File && prev.size > 0;
+    if (hasPrev && !ADVENT_IMG[String(prev.type || '')]) fail(400, 'type'); // превью — только jpg, png, webp или gif
     if (hasPrev && prev.size > 6e6) fail(413, 'big');
-    const key = 'advent/' + id + '.' + (img || (ext ? ext.toLowerCase() : 'bin'));
-    const meta = { httpMetadata: { contentType: img ? String(file.type) : 'application/octet-stream', cacheControl: 'public, max-age=31536000, immutable' } };
-    await env.MEDIA.put(key, await file.arrayBuffer(), meta);
-    let pv = img ? key : ''; // картинка сама себе превью
-    if (hasPrev) {
-      pv = 'advent/' + id + '-p.' + pext;
-      await env.MEDIA.put(pv, await prev.arrayBuffer(), { httpMetadata: { contentType: ptype, cacheControl: 'public, max-age=31536000, immutable' } });
-    }
-    const item = JSON.stringify({ u: '/media/' + key, p: pv ? '/media/' + pv : '', n: name, c: cap });
+    const id = randomHex(16);
+    const key = await adventPut(env, file, id, name, false);
+    const pv = hasPrev ? await adventPut(env, prev, id, name, true) : (ADVENT_IMG[String(file.type || '')] ? key : ''); // картинка сама себе превью
+    const item = JSON.stringify({ u: '/media/' + key, p: pv ? '/media/' + pv : '', n: name, c: cap, s: file.size });
     await env.DB.prepare("INSERT OR IGNORE INTO advent_plan (day, kind, item) VALUES (?, 'file', ?)").bind(day, item).run();
+    return json({ ok: true, day, item, plan: (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results });
+  }
+  if (m === 'POST' && p === '/api/admin/advent/file/edit') { // файл в окне: посмотреть, поправить имя и подпись, заменить сам файл или картинку
+    const u = await needUser(req, env);
+    if (!(await isAdmin(u, env))) fail(403, 'admin');
+    if (!env.MEDIA) fail(503, 'storage');
+    const f = await req.formData().catch(() => null);
+    if (!f) fail(400, 'bad');
+    const day = Math.floor(Number(f.get('day'))), oldItem = String(f.get('item') || '');
+    if (!(day >= 1 && day <= 31) || !okFile(oldItem)) fail(400, 'bad');
+    if (!(await env.DB.prepare("SELECT 1 FROM advent_plan WHERE day = ? AND kind = 'file' AND item = ?").bind(day, oldItem).first())) fail(404, 'file');
+    const old = JSON.parse(oldItem), file = f.get('file'), prev = f.get('preview');
+    const name = String(f.get('name') || old.n || 'file').replace(/[\\/\u0000-\u001f"]/g, '_').trim().slice(0, 120) || 'file';
+    const cap = { en: '', ru: '', lv: '' };
+    try { const c = JSON.parse(String(f.get('c') || '{}')); for (const l of ['en', 'ru', 'lv']) cap[l] = String(c && c[l] || '').trim().slice(0, 160); } catch (e) { /* без подписи */ }
+    let url = String(old.u), pv = String(old.p || ''), size = Number(old.s) || 0;
+    if (file instanceof File && file.size) { // новый файл — новое имя в адресе, старое превью к нему не подходит
+      if (file.size > ADVENT_FILE_MAX) fail(413, 'big');
+      url = '/media/' + await adventPut(env, file, randomHex(16), name, false); size = file.size;
+      pv = ADVENT_IMG[String(file.type || '')] ? url : '';
+    }
+    if (prev instanceof File && prev.size) {
+      if (!ADVENT_IMG[String(prev.type || '')]) fail(400, 'type');
+      if (prev.size > 6e6) fail(413, 'big');
+      pv = '/media/' + await adventPut(env, prev, randomHex(16), name, true);
+    }
+    if (String(f.get('noPreview') || '') === '1') pv = '';
+    const item = JSON.stringify({ u: url, p: pv, n: name, c: cap, s: size });
+    if (item !== oldItem) {
+      await env.DB.batch([
+        env.DB.prepare("DELETE FROM advent_plan WHERE day = ? AND kind = 'file' AND item = ?").bind(day, oldItem),
+        env.DB.prepare("INSERT OR IGNORE INTO advent_plan (day, kind, item) VALUES (?, 'file', ?)").bind(day, item),
+      ]);
+      const keep = new Set(advFileKeys(item)), drop = advFileKeys(oldItem);
+      for (const k of drop) if (!keep.has(k) && !(await advFileUsed(env, k))) await env.MEDIA.delete(k).catch(() => {}); // старый файл/картинка больше не нужны
+    }
     return json({ ok: true, day, item, plan: (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results });
   }
   // картины и палитры, добавленные с сайта (галереи «Мой скетчбук», раздел «Палитры», очередь дней ЭКСТРА)
