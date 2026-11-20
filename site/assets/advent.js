@@ -89,7 +89,12 @@
         if (S.plan) return showAdm(b, d, plan[d] || []);
         if (isPast(d)) return showPast(b, d, past[d] || []);
         tap(b, d, null);
-      } catch (e) { showLocked(d); }
+      } catch (e) {
+        const dlg = document.createElement('div'); dlg.className = 'adv-modal';
+        dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x">✕</button><p class="adv-kick">${d} December</p><p style="word-break:break-word">${String((e && e.message) || e)}</p></div>`;
+        dlg.querySelector('.adv-x').onclick = () => dlg.remove(); dlg.onclick = ev => { if (ev.target === dlg) dlg.remove(); };
+        document.body.appendChild(dlg);
+      }
     }; });
 
     // открытые окошки: внутри картинка подарка
@@ -148,6 +153,7 @@
   const toast = m => window.PPToast ? window.PPToast(m) : alert(m);
   // админ: что лежит в окне (предпросмотр, ничего не забирает)
   function showAdm(btn, d, items) {
+    items = (items || []).map(it => Array.isArray(it) ? it : [it && it.kind, it && it.item]);
     const B = window.PPBirds;
     const dlg = document.createElement('div'); dlg.className = 'adv-modal'; dlg.setAttribute('role', 'dialog');
     dlg.innerHTML = `<div class="adv-card"><button type="button" class="adv-x" aria-label="${t('close')}">✕</button><p class="adv-kick">${d} · ${t('admPreview')}</p><div class="adv-list"></div>${items.length ? '' : `<p>${t('emptyWin')}</p>`}<div class="adv-act"><a class="pill-btn" href="/admin/#advent">${t('toColl')}</a></div></div>`;
