@@ -41,6 +41,8 @@ const ratio = a => { const [w, h] = execFileSync('identify', ['-format', '%w %h'
 const art = (a, h) => `<img src="${img(a)}" style="position:absolute;top:30px;left:50%;height:${h}px;width:${Math.round(h * ratio(a))}px;margin-left:${-Math.round(h * ratio(a) / 2)}px;border-radius:16px;display:block">`;
 // обложка — на всю ширину, неровный край режет только низ (пол), не героев
 const bleed = (a, seed) => { const h = Math.round(794 / ratio(a)); return `<div class="art" style="height:${h}px;clip-path:${edge(h - 12, seed)}"><img src="${img(a)}"></div>`; };
+// CSS-переменные цветов страницы: чернила/акцент и их светлые смеси с белым (готовые hex)
+const vars = (ink, acc) => `--ink:${ink};--acc:${acc};` + [18, 22, 35, 45, 50].map(k => `--b${k}:${mix(ink, '#ffffff', 1 - k / 100)}`).join(';') + ';' + [9, 11].map(k => `--w${k}:${mix(acc, '#ffffff', 1 - k / 100)}`).join(';');
 const mark = `<div class="mk"><i>pp</i>PIGEONPOLLY.COM</div>`;
 
 // страница A4 = 794×1123 px
@@ -52,16 +54,16 @@ h1{font:400 64px/1 'Caveat Brush';text-align:center}h2{font:400 30px/1 'Caveat B
 .sub{text-align:center;font-size:20px;letter-spacing:.18em;text-transform:uppercase;opacity:.6}
 .mk{position:absolute;right:40px;bottom:26px;display:flex;align-items:center;gap:8px;opacity:.5;font:700 11px Karla;letter-spacing:.22em}
 .mk i{width:26px;height:26px;border-radius:50%;border:1px solid var(--ink);display:grid;place-items:center;font:italic 400 12px Fraunces;letter-spacing:0}
-.box{border:1.5px solid color-mix(in srgb,var(--ink) 35%,#fff);border-radius:12px;padding:12px 16px}
+.box{border:1.5px solid var(--b35);border-radius:12px;padding:12px 16px}
 .box h2{color:var(--acc);margin-bottom:6px}
-.lines{background:repeating-linear-gradient(180deg,transparent 0 29px,color-mix(in srgb,var(--ink) 22%,#fff) 29px 30px)}`;
+.lines{overflow:hidden}.lines div{height:30px;border-bottom:1px solid var(--b22)}`;
 
 // обложка: цвета сайта (зима: ink + ягодный красный), а не палитра арта — у арта самый яркий цвет кислотно-зелёный (Алина 20.11)
 // арт на всю ширину, «2027» на бумажной наклейке со скотчем, полароиды всех 12 месяцев, 3 шага
 const cover = () => { const ink = '#1C2430', acc = '#9E1B22', gold = '#E0A33A';
   const pol = ART.map((a, i) => `<div class="po" style="transform:rotate(${[-4, 3, -2, 4, -3, 2][i % 6] + (i > 5 ? 1 : 0)}deg)"><img src="${img(a)}"><span>${MON[a.m - 1].slice(0, 3)}</span></div>`).join('');
   const st = [['Pick your habits', 'up to 12 a month'], ['Fill a circle a day', 'colour it, tick it, doodle it'], ['Celebrate little wins', 'count your days, be proud']];
-  return `<section class="pg" style="--ink:${ink};--acc:${acc}">${bleed(COVER, 3)}
+  return `<section class="pg" style="${vars(ink, acc)}">${bleed(COVER, 3)}
 <style>.tg{position:absolute;left:50%;top:488px;width:330px;margin-left:-165px;transform:rotate(-3deg);background:#FBF6EC;border-radius:6px;box-shadow:0 6px 18px #0004;padding:10px 0 2px;text-align:center}
 .tg b{display:block;font:400 128px/1 'Caveat Brush';color:${acc}}.tg i{position:absolute;top:-14px;width:92px;height:30px;background:${gold}B0}
 .ttl{position:absolute;left:0;right:0;top:660px;text-align:center;font:400 72px/1 'Caveat Brush'}
@@ -82,14 +84,14 @@ const cover = () => { const ink = '#1C2430', acc = '#9E1B22', gold = '#E0A33A';
 const pixels = () => { const c = colors(PIX), cell = 18;
   const rows = MON.map((m, i) => { const n = new Date(YEAR, i + 1, 0).getDate();
     return `<div class="pr"><b>${m.slice(0, 3)}</b>${[...Array(31)].map((_, d) => d < n ? `<i${[0, 6].includes(new Date(YEAR, i, d + 1).getDay()) ? ' class="we"' : ''}></i>` : '<i class="x"></i>').join('')}</div>`; }).join('');
-  const key = c.pal.slice(0, 6).map(h => `<div style="display:flex;align-items:center;gap:10px;margin:4px 0"><span style="width:22px;height:22px;border-radius:5px;border:1.5px solid ${h}"></span><span style="flex:1;border-bottom:1px solid ${c.ink}40;height:20px"></span></div>`).join('');
-  return `<section class="pg" style="--ink:${c.ink};--acc:${c.acc}">${art(PIX, 280)}
+  const key = [...c.pal.filter(h => contrast(h, '#ffffff') > 1.6), c.acc, c.ink].slice(0, 6).map(h => `<div style="display:flex;align-items:center;gap:10px;margin:4px 0"><span style="width:22px;height:22px;border-radius:5px;border:1.5px solid ${h}"></span><span style="flex:1;border-bottom:1px solid ${c.ink}40;height:20px"></span></div>`).join('');
+  return `<section class="pg" style="${vars(c.ink, c.acc)}">${art(PIX, 280)}
 <h1 style="position:absolute;left:0;right:0;top:325px">${YEAR} in Little Squares</h1><div class="sub" style="position:absolute;left:0;right:0;top:392px">one habit or mood · one square a day</div>
 <style>.pr{display:flex;align-items:center;gap:3px;margin-bottom:4px;height:${cell}px}.pr b{width:46px;font:400 18px/1 'Patrick Hand'}
-.pr i{width:${cell}px;height:${cell}px;border:1.2px solid color-mix(in srgb,var(--ink) 45%,#fff);border-radius:4px}.pr i.we{background:color-mix(in srgb,var(--acc) 9%,#fff)}.pr i.x{border:none}
+.pr i{width:${cell}px;height:${cell}px;border:1.2px solid var(--b45);border-radius:4px}.pr i.we{background:var(--w9)}.pr i.x{border:none}
 .dn{display:flex;gap:3px;margin-left:49px;margin-bottom:4px}.dn span{width:${cell}px;text-align:center;font-size:12px;opacity:.55}</style>
 <div style="position:absolute;left:50px;top:440px"><div class="dn">${[...Array(31)].map((_, d) => `<span>${d + 1}</span>`).join('')}</div>${rows}</div>
-<div class="box" style="position:absolute;left:50px;right:50px;top:760px;height:140px"><h2>Tracking:</h2><div class="lines" style="height:70px"></div></div>
+<div class="box" style="position:absolute;left:50px;right:50px;top:760px;height:140px"><h2>Tracking:</h2><div class="lines" style="height:70px"><div></div><div></div></div></div>
 <div class="box" style="position:absolute;left:50px;right:50px;top:910px;height:160px"><h2>Colour key</h2><div style="display:grid;grid-template-columns:1fr 1fr;column-gap:30px">${key}</div></div>
 ${mark}</section>`; };
 
@@ -98,23 +100,23 @@ const month = a => { const c = colors(a), n = new Date(YEAR, a.m, 0).getDate(), 
   const days = [...Array(31)].map((_, i) => i + 1);
   const head = `<div class="hr hh"><b></b>${days.map(d => d <= n ? `<span class="${we(d) ? 'we' : ''}"><em>${WL[new Date(YEAR, a.m - 1, d).getDay()]}</em>${d}</span>` : '<span class="x"></span>').join('')}<u>total</u></div>`;
   const row = `<div class="hr"><b></b>${days.map(d => d <= n ? `<span class="${we(d) ? 'we' : ''}"><i></i></span>` : '<span class="x"></span>').join('')}<u></u></div>`;
-  return `<section class="pg" style="--ink:${c.ink};--acc:${c.acc}">${art(a, 360)}
+  return `<section class="pg" style="${vars(c.ink, c.acc)}">${art(a, 360)}
 <h1 style="position:absolute;left:0;right:0;top:402px">${MON[a.m - 1]} ${YEAR}</h1><div class="sub" style="position:absolute;left:0;right:0;top:468px">habit tracker</div>
-<style>.tb{position:absolute;left:36px;right:36px;top:500px}.hr{display:flex;align-items:stretch;height:30px;border-bottom:1px solid color-mix(in srgb,var(--ink) 18%,#fff)}
-.hr b{width:150px;flex:none;border-right:1.5px solid color-mix(in srgb,var(--ink) 35%,#fff)}.hr span{width:17.4px;flex:none;display:grid;place-items:center}.hr span.we{background:color-mix(in srgb,var(--acc) 11%,#fff)}
-.hr i{width:12px;height:12px;border-radius:50%;border:1.2px solid color-mix(in srgb,var(--ink) 50%,#fff)}.hr u{flex:1;text-decoration:none;border-left:1.5px solid color-mix(in srgb,var(--ink) 35%,#fff);text-align:center;font-size:13px;opacity:.6}
-.hh{height:38px;border-bottom:1.5px solid color-mix(in srgb,var(--ink) 35%,#fff)}.hh span{font-size:12.5px;line-height:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.hh em{font-style:normal;opacity:.5;font-size:11px}.hh span.we{color:var(--acc)}
+<style>.tb{position:absolute;left:36px;right:36px;top:500px}.hr{display:flex;align-items:stretch;height:30px;border-bottom:1px solid var(--b18)}
+.hr b{width:150px;flex:none;border-right:1.5px solid var(--b35)}.hr span{width:17.4px;flex:none;display:grid;place-items:center}.hr span.we{background:var(--w11)}
+.hr i{width:12px;height:12px;border-radius:50%;border:1.2px solid var(--b50)}.hr u{flex:1;text-decoration:none;border-left:1.5px solid var(--b35);text-align:center;font-size:13px;opacity:.6}
+.hh{height:38px;border-bottom:1.5px solid var(--b35)}.hh span{font-size:12.5px;line-height:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px}.hh em{font-style:normal;opacity:.5;font-size:11px}.hh span.we{color:var(--acc)}
 .hh b{font:400 22px 'Caveat Brush';display:flex;align-items:center;color:var(--acc)}.hh u{display:flex;align-items:center;justify-content:center}</style>
 <div class="tb">${head.replace('<b></b>', '<b>my habits</b>')}${row.repeat(H)}</div>
-<div class="box" style="position:absolute;left:36px;top:918px;width:353px;height:150px"><h2>This month I want to…</h2><div class="lines" style="height:90px"></div></div>
-<div class="box" style="position:absolute;right:36px;top:918px;width:353px;height:150px"><h2>Little wins</h2><div class="lines" style="height:90px"></div></div>
+<div class="box" style="position:absolute;left:36px;top:918px;width:353px;height:150px"><h2>This month I want to…</h2><div class="lines" style="height:90px"><div></div><div></div><div></div></div></div>
+<div class="box" style="position:absolute;right:36px;top:918px;width:353px;height:150px"><h2>Little wins</h2><div class="lines" style="height:90px"><div></div><div></div><div></div></div></div>
 ${mark}</section>`; };
 
 const review = () => { const c = colors(REVIEW);
   const q = ['The habit I’m proudest of', 'What was harder than I thought', 'My favourite month and why', 'Habits I’m taking into 2028'];
-  return `<section class="pg" style="--ink:${c.ink};--acc:${c.acc}">${art(REVIEW, 300)}
+  return `<section class="pg" style="${vars(c.ink, c.acc)}">${art(REVIEW, 300)}
 <h1 style="position:absolute;left:0;right:0;top:345px">My ${YEAR} in Review</h1><div class="sub" style="position:absolute;left:0;right:0;top:412px">look back · be kind · keep going</div>
-<div style="position:absolute;left:40px;right:40px;top:450px;display:grid;grid-template-columns:1fr 1fr;gap:18px">${q.map(t => `<div class="box" style="height:300px"><h2>${t}</h2><div class="lines" style="height:235px"></div></div>`).join('')}</div>
+<div style="position:absolute;left:40px;right:40px;top:450px;display:grid;grid-template-columns:1fr 1fr;gap:18px">${q.map(t => `<div class="box" style="height:300px"><h2>${t}</h2><div class="lines" style="height:235px"><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div></div>`).join('')}</div>
 ${mark}</section>`; };
 
 (async () => {
