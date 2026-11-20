@@ -105,7 +105,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/poll.js` (10K) — Опрос на главной (worker/polls.js, docs/site.md «Опрос на главной»): бюллетень на бумаге —: ERR, fmtDate, share, load, render
 - `site/assets/polls-admin.js` (13K) — Кабинет → «🗳 Опросы» (admin.js открывает PPPollsAdmin.mount(main)): создать опрос (вопрос : PPPollsAdmin, ERR, date, form, mount
 - `site/assets/polly-school.js` (25K) — «Школа Полли» (/polly-helps/, docs/challenge.md): Полли в фартуке у мольберта учит рисоват: IMG, KEY, stepsOf, send, path
-- `site/assets/polly.js` (34K) — Полли-питомец в левом нижнем углу (`PollyPet`): PollyPet, SEASON, CORNER, KPX, floorY
+- `site/assets/polly.js` (46K) — Полли-питомец в левом нижнем углу (`PollyPet`): PollyPet, CORNER, SPR, KPX, sprite
 - `site/assets/posts-admin.js` (32K) — Кабинет → «🖼 Пины» (admin.js открывает PPPostsAdmin.mount(main); раньше тут был генератор : PPPostsAdmin, TYPES, DEF, DESIGNS, photo
 - `site/assets/potion-names.js` (27K) — общие данные Зельеварни: ингредиенты, названия зелий (`PPPotion`): PPPotion, ADJ, FALL, ING, potion
 - `site/assets/potions.js` (57K) — игра «Зельеварня» /potions/: лабиринт, котёл, рецепты: DIRS, HUD, play, overlay, brew
@@ -213,6 +213,8 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `tools/pins/pins9.js` (12K) — Новые форматы пинов (14.11.2026): №377 — бесплатная раскраска для печати, №378 — видео-пин: KEYS, FONTS, SITE, coloring, newPage
 - `tools/pins/videos-data.js` (31K) — Данные 50 видео-пинов №379–428 (14.11.2026) для tools/pins/videos.js: tour, bird, pal
 - `tools/pins/videos.js` (9K) — Видео-пины 9:16 (1080×1920, 30 к/с) — движок для tools/pins/videos-data.js (№379–428): MOVE, PAL, ROOT, clamp01, cam
+- `tools/polly_px.py` (2K) — 
+- `tools/polly_sprite.py` (5K) — Новая Полли (20.11.2026): слои спрайта для site/assets/polly.js (PCOL, PL): OUT, beret, full, groucho, legs_a
 - `tools/rooms/detective.py` (16K) — рисует кабинет Титоса (день/вечер, зоны): HOT, OUT, hot, titos, scene
 - `tools/rooms/kit.py` (4K) — набор для пиксельных комнат: слои, шрифт 3×5, вечер: INK, evening, sprite
 - `tools/rooms/office.py` (20K) — рисует кабинет Полли (день/вечер, зоны): OUT, HOT, hot, polly, scene
