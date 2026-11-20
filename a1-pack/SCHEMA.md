@@ -1,70 +1,61 @@
-# A1 Pack — satura shēma
+# A1 English Lab — satura shēma (2 faili)
 
-Viena tēma = mape `a1-pack/topics/<slug>/`:
-- `topic.json` — `meta` (+ var būt viss saturs);
-- `parts/*.json` — daļas no aģentiem; apvieno alfabēta secībā (`slides` saraksti saliek kopā, pārējās atslēgas pārraksta/papildina).
+Tēma = `a1-pack/topics/<slug>/topic.json` (+ `parts/*.json` no aģentiem: `deck` saraksti saliek kopā failu secībā, `workbook.sections` — arī).
+Būvē: `python3 a1-pack/tools/build_lab.py a1-pack/topics/<slug>` → `<slug>-prezentacija.html` un `<slug>-tema.html` (viss iekšā).
 
-Teksta iezīmes visur: `**treknais**`, `*slīpais*`, `==izcelts==` (tēmas krāsā), `___` — atstarpe uzdevumā.
-Valoda: instrukcijas un skaidrojumi — **latviski**; mācību piemēri — angliski (British English).
-Oskara pozas (`pose`): `hello confused oops tangled spill idea teacher sleep celebrate peek`.
+Teksta iezīmes: `**treknais**`, `*serif-akcents*` (slīpraksts tēmas krāsā — virsrakstos 1 vārds), `==izcelts==`, `___` — atstarpe.
+Valoda: instrukcijas un skaidrojumi — latviski, uz **tu**; piemēri — britu angļu A1. Pieaugušie. Oskars — `OSKARS.md`.
+Pozas: `hello confused oops tangled spill idea teacher sleep celebrate peek`.
 
 ## meta
-```json
-{"slug":"to-be","title_en":"Verb to be: am / is / are","title_lv":"…","course":"English A1","level":"A1",
- "lesson":1,"minutes":45,"accent":"#FF5A36","teacher":"",
- "materials":["slides","homework","selfcheck","answers","guide","reserve","mistakes"],
- "sources":[{"name":"British Council LearnEnglish","url":"https://learnenglish.britishcouncil.org/","note":"…"}]}
-```
-`sources` obligāti: British Council, Cambridge, BBC (+ CEFR, English Vocabulary Profile pēc vajadzības).
-Slaidu skaits ≥ `minutes / 3` (45 → 15, 90 → 30, 180 → 60).
+`slug, title_en, title_lv, course, level, lesson, minutes, accent (#RRGGBB), sources[{name,url}]` (British Council, Cambridge, BBC obligāti).
 
-## slides — saraksts; katram var būt `notes` (skolotājam, LV), `pose`, `tag`
+## deck — slaidi (≥ minutes/3; ≥ 40 % interaktīvi). Katram: `notes` (skolotājam), `pose?`, `tag?`
+| type | lauki | interaktīvs |
+|---|---|---|
+| cover | title, subtitle, text | |
+| agenda | title, items[] | |
+| section | num, title, text | |
+| story | title, messages[{who: oscar/note/vārds, name, text}], lesson | → atklāj pa replikai |
+| vocab | title, items[{en, lv, ipa?}] ≤ 8, cols | apgriež, izruna |
+| rule | title, head[], rows[[]], note | |
+| switcher | title, modes[], rows{persona: [teikumi pa režīmiem]}, lv{…} | pārslēdz + − ? |
+| examples | title, items[{en, lv}] ≤ 6 | → atklāj tulkojumu, izruna |
+| quiz | question ar ___, options[], answer (indekss), why | klikšķis / A |
+| build | title, words "a / b / c", answer, lv | saliek teikumu |
+| picker | title, items[] (jautājumi), lv, hint | nejaušs jautājums |
+| task | title, steps[], minutes (taimeris), mode, box | taimeris |
+| compare | title, left{title,items}, right{…}, note | |
+| text | title, body, bullets, note | |
+| big | kicker, text, lv | izruna |
+| thanks | title, text | |
+Vadība: ←/→/atstarpe, F pilnekrāns, N piezīmes, O pārskats, A atbilde.
+
+## workbook — tēmas fails
+`{title, lead, chips[], hello (Oskara sveiciens), pose, sections[…]}`; sadaļai: `type, title, nav (īss vārds izvēlnē), lead, kicker?`
 | type | lauki |
 |---|---|
-| cover | title, subtitle, text |
-| agenda | title, items[] |
-| section | num ("02"), title, text |
-| text | title, body (str/[]), bullets[], note (rokraksts) |
-| big | kicker, text (viena doma lieliem burtiem), lv |
-| rule | title, head[], rows[[]], note |
-| examples | title, items[{en, lv}] (≤ 6) |
-| vocab | title, items[{en, lv, ipa?}] (≤ 8), cols |
-| quiz | question, options[2–4], answer (indekss), lv, kicker |
-| task | title, steps[], minutes, mode (Pāros / Grupās / Individuāli / Visa grupa), box |
-| story | title, text[], lesson — Oskara neveiklā situācija, kas palīdz atcerēties likumu |
-| compare | title, left{title, items[]}, right{title, items[]}, note |
-| thanks | title, text |
+| story | messages[{who, name, text, say?}], lesson |
+| rule | text[], table{head, rows}, note, switcher{title, modes, rows, lv} |
+| vocab | items[{en, ipa, lv, ex}] |
+| practice | exercises[] — ar «Pārbaudīt», XP, Oskara reakcijām (≥ 5 dažādi tipi) |
+| facts | items[{big, title, text, pose}] — tikai pārbaudāmi fakti par Britāniju/valodu |
+| video | items[{title, lv, youtube?, verified?, search, url, source}] |
+| mistakes | items[{wrong, right, why}] — apgriežamas kartītes |
+| quiz | items[{q, options[], answer (teksts), why}] — pa vienam, rezultāts |
+| text | text[] |
+| homework | exercises[] 4–5 (viens `write`), bez pārbaudes; «Lejupielādēt izpildīto (PDF)» ar vārdu, datumu, auto-rezultātu |
 
-## homework
-```json
-{"intro":"…","reminder":["…"],   // reminder nav obligāts — citādi pirmās 3 no mistakes
- "exercises":[ … 4–5 gab. … ]}
-```
-| type | items | HTML |
-|---|---|---|
-| gap | {text ar ___, answer, hint?} | input |
-| choice | {text ar ___, options[], answer} | select |
-| truefalse | text (lasāmteksts), items {text, answer: true/false} | select |
-| match | {left, answer}, extra[] | select |
-| order | {words "a / b / c", answer} | input |
-| transform | {text, answer} | input |
-| write | prompt, lines, checklist[], model[] | textarea |
-Kopā ar `title`, `instruction`, `example?`, `points`.
-
-## selfcheck
-`intro`, `quiz[{q, options[], answer (teksts), why}]`, `detective[{wrong, right, why}]` (≥ 4),
-`facts[{title, text, pose}]` (tikai pārbaudāmi fakti), `videos[{title, lv, youtube?, verified?, search, url, source}]`.
-YouTube ID — tikai pārbaudīts (`verified: true`); citādi `search` (meklēšanas saite) + `url` uz avota lapu.
-
-## reserve — 3–4
-`{title, kind: roleplay|letter|errors|game, minutes, mode, instruction, roles[{role, card}]?, items[]?, useful[]?, answers (str/[])}`
-
-## mistakes — ≥ 5
-`{wrong, right, why (LV, kāpēc latviešu runātājs tā kļūdās), tip? (atgādne)}`
-
-## guide
-`aims[]`, `outcomes[]` (CEFR A1 can-do), `grammar[]`, `vocabulary[]`,
-`timeline[{min "0–5", stage, what, slides "1–3"}]` (beidzas ar `minutes`), `tips[]`,
-`differentiation{weaker[], stronger[]}`, `assessment` (str/[]).
-
-`answers` neraksta — to saliek automātiski no slaidu testiem, mājasdarba, pašpārbaudes un rezervēm.
+## Uzdevumu tipi (practice / homework)
+Visiem: `type, title, instruction?, points?`
+| type | items |
+|---|---|
+| gap | {text ar ___, answer (str vai [] variantu), hint?} |
+| choice | {text ar ___, options[], answer} |
+| truefalse | text? (lasāmteksts), items {text, answer: true/false} |
+| sort | buckets[{title, items[]}] |
+| build | {words "a / b / c", answer, lv?} — vārdi = atbildes vārdi |
+| match | {left, right} |
+| detective | {wrong, bad (kļūdainā vārda indekss, no 0), right, why} |
+| listen | {text} — izruna en-GB, students raksta |
+| write | prompt, checklist[], minWords, model[] |
