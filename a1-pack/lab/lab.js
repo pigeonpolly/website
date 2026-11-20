@@ -81,7 +81,7 @@
     if (window.matchMedia && matchMedia("(prefers-reduced-motion: reduce)").matches) return;
     var c = h("canvas", { class: "conf" }); document.body.appendChild(c);
     var ctx = c.getContext("2d"), W = c.width = innerWidth, H = c.height = innerHeight;
-    var cols = [M.accent, "#16161A", "#F2C94C", "#14915F"], ps = [];
+    var cols = [M.accent, "#F2C94C", "#14915F", "#2F7DD1"], ps = [];
     for (var i = 0; i < 90; i++) ps.push({ x: W / 2, y: H * 0.35, vx: (Math.random() - 0.5) * 14, vy: -Math.random() * 12 - 4, r: Math.random() * 6 + 4, c: cols[i % 4], a: Math.random() * 6 });
     var t = 0;
     (function f() {
@@ -191,7 +191,7 @@
 
   EX.match = function (e, id) {
     var w = h("div", { class: "pairs" }), L1 = h("div", { class: "col" }), R1 = h("div", { class: "col" }), sel = null, pairs = {}, hue = 0;
-    var cols = ["#16161A", M.accent, "#2F7DD1", "#6E9B76", "#B07CC6", "#C9A227", "#E07A5F", "#3D405B"];
+    var cols = [M.accent, "#2F7DD1", "#6E9B76", "#B07CC6", "#C9A227", "#E07A5F", "#3D405B"];
     var lefts = e.items.map(function (it, i) { var b = h("button", { class: "tok", type: "button" }, md(it.left)); b._i = i; L1.appendChild(b); return b; });
     var rights = shuffle(e.items.map(function (it, i) { return { t: it.right || it.answer, i: i }; }), e.items.length + 2).map(function (o) { var b = h("button", { class: "tok", type: "button" }, md(o.t)); b._i = o.i; R1.appendChild(b); return b; });
     function clear(i) { var p = pairs[i]; if (!p) return; [lefts[i], p].forEach(function (b) { b.classList.remove("m", "ok", "no"); b.style.background = ""; }); delete pairs[i]; }
