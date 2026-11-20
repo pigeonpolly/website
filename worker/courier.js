@@ -3,7 +3,7 @@
 // worker дочитывает статьи и копирует картинки в R2 (meta courier_src); {step:'write'} — Gemini пишет выпуск голосом Алины →
 // черновик в blog_posts (только RU, раздел courierSlug). Ссылки и картинки берём из своих данных, не от Gemini. Использованные ссылки — meta courier_used (300).
 import { feed, article, ask, commons, GN } from './avis.js';
-import { courierSlug, cleanHtml, rehostOne } from './blog.js';
+import { courierSlug, cleanHtml, rehostWide } from './blog.js';
 
 const FEEDS = [
   ['The Art Newspaper', 'https://www.theartnewspaper.com/rss.xml'],
@@ -48,14 +48,28 @@ For each chosen story give its number "i" and "q" — a short English search que
 
 ${list.map((x, i) => `${i}. [${x.src}] ${x.title}${x.desc ? ' — ' + x.desc.slice(0, 220) : ''}`).join('\n')}`;
 
-async function picture(env, it, q, moved) { // своя копия картинки в R2: og:image → картинка из RSS → Wikimedia Commons; ничего — без картинки
-  for (const u of [it.og, it.img].filter(Boolean)) {
-    const local = await rehostOne(env, u, moved);
+// превьюшка из ленты → адрес полного размера (WordPress «-300x200.jpg», ?w=/resize=/fit=)
+export const bigger = u => { try { const x = new URL(u);
+  x.pathname = x.pathname.replace(/-\d{2,4}x\d{2,4}(\.(?:jpe?g|png|webp|gif))$/i, '$1');
+  for (const k of ['w', 'h', 'width', 'height', 'resize', 'fit', 'crop', 'quality']) x.searchParams.delete(k);
+  return x.toString(); } catch (e) { return u; } };
+const MIN_W = 640, OK_W = 360; // крупное фото — от 640 px; если крупного нигде нет — хотя бы 360, мельче — без фото
+export async function picture(env, it, q) { // своя копия картинки в R2: og:image → картинка из RSS (полный размер) → Wikimedia Commons; ничего крупного — без картинки
+  const tries = [...new Set([it.og, it.img && bigger(it.img), it.img].filter(Boolean))], small = [];
+  for (const u of tries) {
+    const info = {}, local = await rehostWide(env, u, MIN_W, info);
     if (local) return { img: local, credit: it.src, photo: '' };
+    if (info.w) small.push({ u, w: info.w, credit: it.src, photo: '' });
   }
   const c = await commons(q).catch(() => ({}));
-  if (c.img) { const local = await rehostOne(env, c.img, moved); if (local) return { img: local, credit: 'Wikimedia Commons', photo: c.photo || '' }; }
-  return { img: '', credit: '', photo: '' };
+  if (c.img) {
+    const info = {}, local = await rehostWide(env, c.img, MIN_W, info);
+    if (local) return { img: local, credit: 'Wikimedia Commons', photo: c.photo || '' };
+    if (info.w) small.push({ u: c.img, w: info.w, credit: 'Wikimedia Commons', photo: c.photo || '' });
+  }
+  const best = small.filter(x => x.w >= OK_W).sort((a, b) => b.w - a.w)[0];
+  const local = best && await rehostWide(env, best.u, OK_W);
+  return local ? { img: local, credit: best.credit, photo: best.photo } : { img: '', credit: '', photo: '' };
 }
 
 async function stepSrc(env, h) {
@@ -67,7 +81,7 @@ async function stepSrc(env, h) {
   for (const p of out.picks) if (list[p.i] && !took.has(p.i) && picks.length < PICK_N) { took.add(p.i); picks.push({ ...list[p.i], q: String(p.q || '').slice(0, 80) }); }
   const items = await Promise.all(picks.map(async it => {
     const a = await article(it.link).catch(() => ({ text: '', img: '' }));
-    const pic = await picture(env, { ...it, og: a.img }, it.q, {}); // свой кэш у каждой: общий при параллельной загрузке отдаёт null
+    const pic = await picture(env, { ...it, og: a.img }, it.q);
     return { title: it.title, src: it.src, link: it.link, when: it.when, desc: it.desc, text: (a.text || '').slice(0, 3000), ...pic };
   }));
   const day = rigaDay();
