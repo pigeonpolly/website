@@ -61,10 +61,10 @@ def crop(k, box):
     return im.crop((int(x * w), int(y * h), int((x + cw) * w), int((y + ch) * h)))
 
 def pals(spec):
-    res = {}
+    f0 = OUT / 'palettes.json'; res = json.load(open(f0)) if f0.exists() else {}  # все наборы в одном файле
     for n, k, box in spec:
         c = crop(k, box); c.thumbnail((1200, 1200)); f = OUT / f'crop-{n}.jpg'; c.save(f, quality=88)
-        res[n] = _g['palette'](f)
+        res[str(n)] = _g['palette'](f)
     json.dump(res, open(OUT / 'palettes.json', 'w'), ensure_ascii=False, indent=1)
 
 def diff(k, name, seed):
@@ -93,7 +93,7 @@ def diff(k, name, seed):
 
 def spec():
     import subprocess
-    return json.loads(subprocess.check_output(['node', '-e', "console.log(JSON.stringify(require('./tools/pins/pins16-data.js')))"], cwd=ROOT))
+    import os; return json.loads(subprocess.check_output(['node', '-e', f"console.log(JSON.stringify(require('./tools/pins/pins{os.environ.get('SET', '16')}-data.js')))"], cwd=ROOT, env={**__import__('os').environ}))
 
 if __name__ == '__main__':
     what = sys.argv[1] if len(sys.argv) > 1 else 'all'

@@ -224,14 +224,14 @@ for (const [t, kick, art, pos, th, season, topics, ...items] of PR) {
 for (const [t, art, crop, mood, topics, season] of PA) {
   out.push({ n, tpl: 'pal', th: 'dark', t, art: A(art), crop, season, mood,
     title: `${cap(t)} Color Palette with HEX Codes | Pigeon Polly`,
-    desc: `${mood} Six colors from a detail of my painting. Tap through for the HEX codes (one click to copy) and five things to paint with this palette.`,
+    desc: `${mood} Six colors from a detail of my painting. Tap through for the HEX codes — one click copies them — and more palettes from my paintings.`,
     alt: `A color palette “${cap(t)}”: six named color swatches under a detail of a painting by Pigeon Polly.`,
     link: L('/palettes/', n), topics: topics + ', HEX codes, Color palette from painting' });
   n++;
 }
 for (const [what, art, alt, topics, season, tip] of ST) {
   out.push({ n, tpl: 'steps', th: 'paper', what, art: A(art), name: art.replace(/[^a-z0-9]+/gi, '_').slice(0, 40), tip, season,
-    title: `How to Paint ${what.replace(/(^|\s)[a-z]/g, s => s.toUpperCase())} in 4 Steps — Watercolor & Ink`,
+    title: `How to Paint ${what.replace(/(^|[\s-])[a-z]/g, s => s.toUpperCase()).replace(/ (A|An|With|Of|On|In|The)(?= )/g, m => m.toLowerCase()).replace(/^(A|An) /, m => m.toLowerCase())} in 4 Steps — Watercolor & Ink`,
     desc: `My painting of ${alt}, broken into 4 steps: light pencil shapes, ink lines, a first pale wash… and the last step — darks, details and my tips — is on pigeonpolly.com.`,
     alt: `Steps of painting ${alt}: pencil sketch, ink outline and first pale wash, the finished painting by Pigeon Polly hidden until you visit the site.`,
     link: L('/learn/', n), topics: topics + ', Watercolor for beginners, Painting tutorial' });

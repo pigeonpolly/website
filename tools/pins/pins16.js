@@ -8,7 +8,8 @@ const { chromium } = require('playwright');
 const { execFileSync } = require('child_process');
 const ROOT = path.resolve(__dirname, '../..');
 const P16 = path.join(__dirname, 'p16');
-const PINS = require('./pins16-data.js');
+const SET = process.env.SET || '16';  // новый набор: tools/pins/pins<SET>-data.js, тот же движок
+const PINS = require(`./pins${SET}-data.js`);
 const PAL = JSON.parse(fs.readFileSync(path.join(P16, 'palettes.json'), 'utf8'));
 const U = k => 'file://' + (k.startsWith('p16/') ? path.join(__dirname, k) : path.join(ROOT, 'site/images', k));
 const esc = s => String(s).replace(/&/g, '&amp;').replace(/</g, '&lt;');
@@ -65,7 +66,7 @@ const T = {
     <div style="position:absolute;left:60px;right:60px;top:700px"><div style="font:700 22px Karla;letter-spacing:.24em;text-transform:uppercase;color:${t.acc2}">color palette</div><h1 style="margin-top:10px;font-size:${p.t.length > 26 ? 66 : 76}px">${p.t}</h1></div>
     <div style="position:absolute;left:60px;right:60px;top:920px;display:grid;grid-template-columns:repeat(3,1fr);gap:18px 22px">
       ${cols.map(c => `<div><div style="height:118px;border-radius:12px;background:${c.hex};box-shadow:0 8px 18px rgba(0,0,0,.25)"></div><div style="font:700 25px Karla;color:${t.fg};margin-top:10px">${esc(c.en)}</div><div style="font:700 21px Karla;color:${t.mut};letter-spacing:.08em">#<span class="blur" style="display:inline-block;filter:blur(5px)">${c.hex.slice(1)}</span></div></div>`).join('')}</div>
-    ${foot(t, 'HEX codes + what to paint')}`;
+    ${foot(t, 'Copy the HEX codes')}`;
   },
   // 4 шага: 1–3 видны, 4 спрятан
   steps: (p, t) => {
@@ -114,7 +115,7 @@ const T = {
     ${foot(t, 'Check the answers')}`,
   // нарисуй в своём стиле: контур (низ тает) + оригинал полароидом
   dtiys: (p, t) => `<div style="position:absolute;left:56px;right:56px;top:46px"><span class="pill">draw this in your style</span><h1 style="margin-top:18px;font-size:${p.who.length > 24 ? 60 : 68}px">Redraw <em>${esc(p.who)}</em> your way</h1></div>
-    <div style="position:absolute;left:44px;top:330px;width:912px;height:820px;background:#fff;border-radius:10px;box-shadow:0 16px 36px rgba(0,0,0,.14);overflow:hidden">${img(`p16/${p.name}-line.png`, 912, 820, '50% 50%', 'contain')}<div style="position:absolute;left:0;right:0;bottom:0;height:330px;background:linear-gradient(rgba(255,255,255,0),#fff 85%)"></div>
+    <div style="position:absolute;left:44px;top:330px;width:912px;height:1000px;background:#fff;border-radius:10px;box-shadow:0 16px 36px rgba(0,0,0,.14);overflow:hidden">${img(`p16/${p.name}-line.png`, 912, 1000, '50% 50%', 'contain')}<div style="position:absolute;left:0;right:0;bottom:0;height:330px;background:linear-gradient(rgba(255,255,255,0),#fff 85%)"></div>
       <div class="lock" style="left:0;right:0;bottom:40px;height:120px"><span><b>printable line art</b>download it free</span></div></div>
     <div style="position:absolute;right:50px;top:250px;background:#fff;padding:14px 14px 0;box-shadow:0 18px 36px rgba(0,0,0,.25);transform:rotate(5deg)">${img(p.art, 250, 200)}<div style="font:700 30px/1 Caveat;color:#2A211C;text-align:center;padding:10px 0 14px">the original</div></div>
     ${foot(t, 'Get the line art')}`,
@@ -133,11 +134,11 @@ const save = (src, dst, max = 1000) => { if (!fs.existsSync(dst)) execFileSync('
   for (const p of PINS) {
     const t = TH[p.th];
     // полные версии для /draw/
-    const id = 'p' + p.n, it = { id, n: p.n, k: p.tpl, t: p.t ? p.t.replace(/<[^>]+>/g, '') : (p.what || p.who || ''), season: p.season };
+    const id = 'p' + p.n, it = { id, n: p.n, k: p.tpl, t: p.t ? p.t.replace(/<[^>]+>/g, '') : p.what ? `How to paint ${p.what}` : p.who ? `Draw ${p.who} in your style` : p.tpl === 'ispy' ? `Look closer #${p.n - 1066}: find 5 details` : `Spot 5 differences #${p.n - 1072}`, season: p.season };
     if (p.tpl === 'prompts' || p.tpl === 'bingo') { save(path.join(ROOT, 'site/images', p.art), path.join(OUTI, `${id}.jpg`), 900); it.img = `/images/draw/${id}.jpg`; it.items = p.items; it.kick = p.kick; }
     if (p.tpl === 'pal' || p.tpl === 'palch') { save(path.join(P16, `crop-${p.n}.jpg`), path.join(OUTI, `${id}.jpg`), 900); it.img = `/images/draw/${id}.jpg`; it.cols = PAL[p.n].map(c => ({ hex: c.hex, n: [c.en, c.ru, c.lv] })); if (p.items) it.items = p.items; if (p.mood) it.mood = p.mood; }
     if (p.tpl === 'steps') { it.steps = [1, 2, 3, 4].map(i => { save(path.join(P16, `${p.name}-${i}.jpg`), path.join(OUTI, `${id}-${i}.jpg`), 900); return `/images/draw/${id}-${i}.jpg`; }); it.tip = p.tip; it.what = p.what; }
-    if (p.tpl === 'ispy') { const [w0, h0] = sz(path.join(ROOT, 'site/images', p.art)); const k = Math.max(908 / w0, 700 / h0) * 2.2; p.iw = w0 * k; p.ih = h0 * k; save(path.join(ROOT, 'site/images', p.art), path.join(OUTI, `${id}.jpg`), 1200); it.img = `/images/draw/${id}.jpg`; it.pts = p.pts; }
+    if (p.tpl === 'ispy') { const [w0, h0] = sz(path.join(ROOT, 'site/images', p.art)); const k = Math.max(908 / w0, 700 / h0) * 1.7; p.iw = w0 * k; p.ih = h0 * k; save(path.join(ROOT, 'site/images', p.art), path.join(OUTI, `${id}.jpg`), 1200); it.img = `/images/draw/${id}.jpg`; it.pts = p.pts; }
     if (p.tpl === 'diff') { const [w, h] = sz(path.join(P16, `diff-${p.name}-a.jpg`)); const s = Math.min(912 / w, 560 / h); p.dw = Math.round(w * s); p.dh = Math.round(h * s);
       ['a', 'b'].forEach(x => save(path.join(P16, `diff-${p.name}-${x}.jpg`), path.join(OUTI, `${id}-${x}.jpg`), 1000)); it.ab = [`/images/draw/${id}-a.jpg`, `/images/draw/${id}-b.jpg`];
       it.spots = JSON.parse(fs.readFileSync(path.join(P16, `diff-${p.name}.json`))).map(([x, y, r]) => [x / w, y / h, r / w]); }
@@ -153,7 +154,10 @@ const save = (src, dst, max = 1000) => { if (!fs.existsSync(dst)) execFileSync('
     await page.screenshot({ path: path.join(ROOT, `site/images/pins/pin-${p.n}.jpg`), type: 'jpeg', quality: 85 });
   }
   if (fs.existsSync(tmp)) fs.unlinkSync(tmp);
-  fs.writeFileSync(path.join(__dirname, 'pins16.json'), JSON.stringify(out, null, 1));
-  fs.writeFileSync(path.join(ROOT, 'site/assets/draw.json'), JSON.stringify(site));
+  fs.writeFileSync(path.join(__dirname, `pins${SET}.json`), JSON.stringify(out, null, 1));
+  // /draw/ — общий список всех наборов: свои записи заменяем, чужие оставляем, порядок по номеру пина
+  const DJ = path.join(ROOT, 'site/assets/draw.json'), old = fs.existsSync(DJ) ? JSON.parse(fs.readFileSync(DJ, 'utf8')) : [];
+  const mine = new Set(site.map(x => x.id));
+  fs.writeFileSync(DJ, JSON.stringify([...old.filter(x => !mine.has(x.id)), ...site].sort((a, b) => a.n - b.n)));
   await b.close();
 })();
