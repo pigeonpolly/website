@@ -2523,14 +2523,15 @@ async function route(req, env, url) {
     const wl = u && wlLang(req); if (wl && wl !== u.lang) await env.DB.prepare('UPDATE users SET lang = ? WHERE id = ?').bind(wl, u.id).run().catch(() => {}); // язык праздничных писем (worker/wl-holidays.js)
     // дальше — независимые чтения, разом (шапка спрашивает это на каждой странице, по очереди выходило долго)
     const ok = u && !u.banned;
-    const [news, streak, titos, adm, ident, study, english, norsk, nederlands] = await Promise.all([
+    const [news, streak, titos, adm, ident, study, english, norsk, nederlands, dish] = await Promise.all([
       newsOf(env, req, u), // «конвертик»: зарплата, подарки, адвент… (site/assets/news.js)
       // серия челленджа — для меню аватара в шапке (этап 14 Б)
       ok && u.nick ? env.DB.prepare('SELECT day, ai FROM posts WHERE user_id = ?').bind(u.id).all().then(r => streaks(streakDays(r.results)).current) : 0,
       ok ? env.DB.prepare('SELECT * FROM titos WHERE user_id = ?').bind(u.id).first().then(t => titosState(t, RULES, titosHelpers(env))) : null, // кофейник Титоса (worker/titos.js)
       ok ? isAdmin(u, env) : false, ok ? adminIdentity(u, env) : false,
-      ok ? studyOk(u, env, studyHelpers(env)) : false, ok ? englishOk(u, env, studyHelpers(env)) : false, ok ? norskOk(u, env, studyHelpers(env)) : false, ok ? nederlandsOk(u, env, studyHelpers(env)) : false]);
-    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: adm, pin: !adm && ident ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, streak, news, friendBtns: BTN.friend, titos, study: study ? 1 : 0, english: english ? 1 : 0, norsk: norsk ? 1 : 0, nederlands: nederlands ? 1 : 0, pwTemp: u.pw_temp ? 1 : 0, mailAsk: mailAsk(env, u) ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
+      ok ? studyOk(u, env, studyHelpers(env)) : false, ok ? englishOk(u, env, studyHelpers(env)) : false, ok ? norskOk(u, env, studyHelpers(env)) : false, ok ? nederlandsOk(u, env, studyHelpers(env)) : false,
+      ok && u.nick && RULES.cookOn ? dishOf(env, u.id).catch(() => null) : null]); // блюдо с кухни — значок в играх (site/assets/dish-chip.js)
+    return json({ user: u && !u.banned ? { id: u.id, nick: u.nick || null, admin: adm, pin: !adm && ident ? 1 : 0, avatar: avatarOf(u), box0: u.box0 || '', buttons: (u.buttons || 0) + earned, earned, streak, news, friendBtns: BTN.friend, dish, titos, study: study ? 1 : 0, english: english ? 1 : 0, norsk: norsk ? 1 : 0, nederlands: nederlands ? 1 : 0, pwTemp: u.pw_temp ? 1 : 0, mailAsk: mailAsk(env, u) ? 1 : 0 } : null, clientId: env.GOOGLE_CLIENT_ID, dev: env.DEV_FAKE_LOGIN === '1', mail: mailOn(env) });
   }
   // название видео YouTube (oEmbed), чтобы подписи уроков на сайте совпадали с видео; кэш на сутки
   if (m === 'GET' && p === '/api/v2/yt') {

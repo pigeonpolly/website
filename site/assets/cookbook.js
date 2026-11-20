@@ -107,7 +107,7 @@
     if (e.t === 'grow') return t('grow', { n: e.pct });
     if (e.t === 'seed') return t('seed', { n: Math.round((1 + e.pct / 100) * 10) / 10 });
     const where = (e.g || []).length >= Object.keys(GAME).length ? t('all') : (e.g || []).map(k => GAME[k] ? `<a href="${pre}${GAME[k][1]}">${GAME[k][0][L]}</a>` : k).join(', ');
-    return `${e.pct > 0 ? '+' : '−'}${Math.abs(e.pct)} % 🔘 ${where}`;
+    return `${e.pct > 0 ? '+' : '−'}${Math.round(Math.abs(e.pct))} % 🔘 ${where}`;
   }
 
   // ---------- окно ----------

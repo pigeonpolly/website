@@ -21,7 +21,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `worker/garden.js` (22K) — Огород птички (этап 22, /garden/, site/assets/garden.js, docs/bird.md «Огород»): грядки, с: CROPS, TIER, DAY, SIMPLE, GARDEN_ALTER, GARDEN_BOOL, out, fnv, grown, prices, bedOk, bugsOf
 - `worker/guides.js` (15K) — Кабинет → «🎬 Видео и гайды» (site/assets/guides-admin.js, docs/admin.md): Алина сама добав: KEY, SEEN_MAX, BASE, HOWTO_MAX, GUIDES_ALTER, cut, out, bImg, hwDrop, hwFiles, hwUrl, langsOf
 - `worker/ideas.js` (17K) — Кабинет → «💡 Темы для блога»: по кнопке собираем, что сейчас ищут и обсуждают в сфере Алин: PAGES, IDEAS, MONTHS, SITE, SUBS, ARTICLE, write, ask, suggest, reddit, plain, redditSearch
-- `worker/index.js` (305K) — Worker: site/, страницы через HTMLRewriter, /api (кроме блога), cron: RULES, BTN, STOCK, GIFT_KINDS, GOLD_PICKS, PLEVEL, prep, award, healthErr, run, btnOf, catalog
+- `worker/index.js` (306K) — Worker: site/, страницы через HTMLRewriter, /api (кроме блога), cron: RULES, BTN, STOCK, GIFT_KINDS, GOLD_PICKS, PLEVEL, prep, award, healthErr, run, btnOf, catalog
 - `worker/kitchen.js` (10K) — Кухня птички: книга рецептов (этап 89, docs/bird.md «Кухня: книга рецептов»): RECIPES, DISH_GAMES, LATE, HOUR, PERFECT, KITCHEN_BOOL, recipes, rowOf, state, settle, cropOf, effectOf
 - `worker/mail-html.js` (9K) — Оформление писем: из обычного текста письма — HTML в стиле сайта (sendMail в worker/auth.j: SITE, SERIF, URL_RE, ACC, BTN, KICK, button, langOf, seasonOf, short, mailHtml
 - `worker/mail.js` (25K) — Письма с сайта по согласию (docs/bird.md «Письма»): три вида — games (уведомления из игр),: MAIL_DAY_MAX, ORDER, DIGEST, MAIL_CATS, ITEM, CAT, pageUrl, langOf, pre, sendOne, spend, usedToday
@@ -83,6 +83,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/cookbook.js` (23K) — Книга рецептов на кухне птички (этап 89, docs/bird.md «Кухня: книга рецептов»): window.PPC: PPCookbook, DISH, GAME, inner, bookView
 - `site/assets/day-card.js` (16K) — Карточка дня (этап 13 А): «почтовая открытка» с ячейками-штампами — задания на сегодня из : PPDay, ICON, KIND, cell, two
 - `site/assets/diploma.js` (7K) — Пиксельный диплом курсов (общий): «Смотри на мир как художник» (polly-school.js) и курс ту: PPDiploma, svg, mount, canvas, save
+- `site/assets/dish-chip.js` (5K) — Значок действующего блюда с кухни в играх и огороде (этап 89, docs/bird.md «Кухня: книга р: PAGE, here, css, take, dur
 - `site/assets/emoji-art.js` (139K) — Нарисованные эмодзи в стиле сайта (docs/site.md «Нарисованные эмодзи»): PPEmojiArt, ART, BAD, SKIP, dbl
 - `site/assets/extra-palettes.js` (56K) — палитры ЭКСТРА (build.py): EXTRA_PALETTES
 - `site/assets/feathers.js` (5K) — Пёрышки комнаты (этап 13 В, docs/flock.md): полоска под комнатой в профиле /bird/.: PPFeathers, lv1, fall, mount, post
