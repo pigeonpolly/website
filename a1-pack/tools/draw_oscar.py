@@ -17,13 +17,13 @@ def limb(d, w=9):
 
 
 # sēdošs kaķis: galva + kakls + bumbierveida ķermenis — viena kontūra
-SIT = ("M70,26 C76,36 82,43 89,45 C96,43 104,43 111,45 C118,43 124,36 130,26 "
-       "C137,38 140,52 139,66 C138,82 131,93 126,100 C141,117 149,143 146,168 "
-       "C145,181 137,187 126,187 L74,187 C63,187 55,181 54,168 C51,143 59,117 74,100 "
-       "C69,93 62,82 61,66 C60,52 63,38 70,26 Z")
+SIT = ("M70,62 C69,50 70,43 72,38 Q75,32 80,36 C84,40 88,43 92,45 C97,44 103,44 108,45 "
+       "C112,43 116,40 120,36 Q125,32 128,38 C130,43 131,50 130,62 C130,77 125,87 120,93 "
+       "C139,112 150,141 147,168 C146,181 138,187 127,187 L73,187 C62,187 54,181 53,168 "
+       "C50,141 61,112 80,93 C75,87 70,77 70,62 Z")
 
 
-def face(cx=100, cy=66, kind="open", rot=0):
+def face(cx=100, cy=64, kind="open", rot=0, sc=.86):
     w = "#fff"
     if kind == "open":
         e = (f'<ellipse cx="-12" cy="0" rx="10" ry="11" fill="{w}"/><ellipse cx="12" cy="0" rx="10" ry="11" fill="{w}"/>'
@@ -47,10 +47,10 @@ def face(cx=100, cy=66, kind="open", rot=0):
     elif kind == "dizzy":
         e = (f'<path d="M-17,-4 l9,8 M-8,-4 l-9,8 M8,-4 l9,8 M17,-4 l-9,8" fill="none" stroke="{w}" stroke-width="1.8" stroke-linecap="round"/>')
     nose = f'<path d="M-2,13 L2,13 L0,15.5 Z" fill="{w}"/>'
-    return f'<g transform="translate({cx},{cy}) rotate({rot})">{e}{nose}</g>'
+    return f'<g transform="translate({cx},{cy}) rotate({rot}) scale({sc})">{e}{nose}</g>'
 
 
-def scarf(path="M73,99 Q100,113 127,99", tail="M118,104 q4,14 -1,26"):
+def scarf(path="M79,93 Q100,106 121,93", tail="M113,99 q4,14 -1,26"):
     return (f'<path d="{path}" fill="none" stroke="{A}" stroke-width="7" stroke-linecap="round"/>'
             f'<path d="{tail}" fill="none" stroke="{A}" stroke-width="6" stroke-linecap="round"/>')
 
@@ -86,10 +86,10 @@ P["idea"] = ("0 0 220 220", '<g transform="translate(10,22)">' + TAIL_R + sil(SI
              f'<g transform="translate(110,22)"><circle r="11" fill="{A}"/><path d="M-4,11 v5 h8 v-5 M-3,20 h6" {L}/>'
              f'<path d="M-20,-2 l-7,-1 M20,-2 l7,-1 M-14,-15 l-5,-5 M14,-15 l5,-5 M0,-19 v-6" {L}/></g>')
 # guļus uz muguras, ķepas gaisā — siluets vienā gabalā
-OOPS = ("M30,150 C26,134 32,120 44,114 L40,96 C50,100 56,106 60,112 C66,110 72,110 78,112 "
+OOPS = ("M30,150 C26,134 32,120 44,114 C42,106 40,100 41,98 Q43,94 47,97 C52,101 56,106 60,112 C66,110 72,110 78,112 "
         "C100,116 130,126 152,132 C170,137 178,148 172,160 C166,172 140,172 110,170 "
         "C88,168 66,170 54,168 C42,166 32,160 30,150 Z")
-P["oops"] = ("0 0 200 200", limb("M168,148 C184,140 186,118 176,104 C170,96 176,86 186,88", 8) + sil(OOPS) + sil("M34,126 L14,118 L30,140 Z") +
+P["oops"] = ("0 0 200 200", limb("M168,148 C184,140 186,118 176,104 C170,96 176,86 186,88", 8) + sil(OOPS) + sil("M34,126 Q20,118 17,120 Q15,124 30,140 Z") +
              limb("M100,128 C96,108 104,96 96,80", 8) + limb("M124,134 C126,112 136,104 132,88", 8) +
              limb("M150,140 C162,124 160,112 168,100", 8) + face(54, 140, "dizzy", -70) +
              spark(30, 92, .9) + spark(62, 72, .7) +
@@ -118,9 +118,9 @@ P["teacher"] = ("0 0 270 200",
                 '<g transform="translate(70,0)">' + TAIL_R + sil(SIT) + legline() + scarf() + face(kind="side") +
                 limb("M76,116 C62,106 50,96 44,84", 9) + "</g>")
 # guļ saritinājies, aste apvijusies
-SLEEP = ("M40,170 C34,150 44,128 64,122 L60,104 C70,108 76,114 80,120 C88,118 94,120 100,122 "
+SLEEP = ("M40,170 C34,150 44,128 64,122 C62,114 60,108 61,106 Q63,102 67,105 C71,109 76,114 80,120 C88,118 94,120 100,122 "
          "C130,118 162,128 168,150 C174,170 152,182 110,182 C80,182 46,184 40,170 Z")
-P["sleep"] = ("0 0 200 200", sil(SLEEP) + sil("M80,124 L90,104 L98,124 Z") + limb("M166,160 C176,178 150,190 110,188 C84,187 62,188 56,180", 8) +
+P["sleep"] = ("0 0 200 200", sil(SLEEP) + sil("M80,124 Q88,106 91,106 Q95,110 98,124 Z") + limb("M166,160 C176,178 150,190 110,188 C84,187 62,188 56,180", 8) +
               face(76, 150, "closed", -8) +
               f'<path d="M66,128 Q80,140 98,132" fill="none" stroke="{A}" stroke-width="6" stroke-linecap="round"/>'
               f'<path d="M112,90 h12 l-12,13 h12 M134,66 h15 l-15,16 h15 M160,40 h18 l-18,20 h18" {L}/>')
@@ -131,9 +131,9 @@ P["celebrate"] = ("0 0 200 200", TAIL_R + sil(SIT) + legline() + scarf() + face(
                   f'<circle cx="40" cy="150" r="3.5"/><circle cx="170" cy="140" r="3.5"/><rect x="98" y="6" width="8" height="5" rx="1" transform="rotate(15 102 8)"/></g>' +
                   spark(26, 100, .7) + spark(176, 96, .7))
 # lūr no apakšas (galva + ķepiņas uz malas)
-PEEK = ("M58,110 C56,96 58,80 64,70 C62,56 64,42 70,30 C78,40 84,46 90,48 C97,46 103,46 110,48 "
-        "C116,46 122,40 130,30 C136,42 138,56 136,70 C142,80 144,96 142,110 Z")
-P["peek"] = ("0 0 200 110", sil(PEEK) + face(100, 76) +
+PEEK = ("M62,110 C60,98 62,86 68,78 C66,66 67,56 70,48 Q73,42 78,46 C83,50 88,53 92,55 C97,54 103,54 108,55 "
+        "C112,53 117,50 122,46 Q127,42 130,48 C133,56 134,66 132,78 C138,86 140,98 138,110 Z")
+P["peek"] = ("0 0 200 110", sil(PEEK) + face(100, 80) +
              '<ellipse cx="66" cy="106" rx="14" ry="7" fill="#111"/><ellipse cx="134" cy="106" rx="14" ry="7" fill="#111"/>'
              '<path d="M62,103 v5 M70,103 v5 M130,103 v5 M138,103 v5" stroke="#fff" stroke-width="1.2" stroke-linecap="round"/>')
 
