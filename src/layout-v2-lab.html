@@ -34,6 +34,7 @@
 <link rel="stylesheet" href="/assets/style.css">
 <link rel="stylesheet" href="/assets/ava-deco.css">
 <link rel="stylesheet" href="/assets/v2-shell.css">
+<link rel="stylesheet" href="/assets/tarot.css">
 <script>/* вход: /api/whoami сразу, параллельно с загрузкой скриптов — account.js возьмёт ответ (PPWhoP) */try{if(!/devdate=/.test(location.search)&&!sessionStorage.getItem('pp-devdate'))window.PPWhoP=fetch('/api/whoami',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
 <script src="/assets/site.js" defer></script>
 <script src="/assets/polly.js" defer></script>
@@ -50,12 +51,14 @@
 <script src="/assets/news.js" defer></script>
 <script src="/assets/search.js" defer></script>
 <script src="/assets/emoji-art.js" defer></script>
+<script src="/assets/tarot.js" defer></script>
 <script src="/assets/v2.js" defer></script>
 </head>
 <body class="inner v2s">
 <a class="skip" href="#main">Skip to content</a>
 <header class="hd2"><div class="w">
   <a class="lg" href="{{home}}"><span class="lg-m" aria-hidden="true"></span><span>Pigeon Polly <i>Art Lab</i></span></a>
+  <div class="td" id="td" hidden><button type="button" class="td-b" id="td-b" aria-haspopup="dialog" aria-label="Bird tarot"><span class="td-st" aria-hidden="true"><i></i><i></i><i></i></span><b class="td-n" id="td-n" hidden>1</b></button></div>
   <nav class="nv" aria-label="Main">
     <div class="nr"><button type="button" class="nr-b" aria-expanded="false"><small>Room 511</small><span>Art</span></button><div class="nr-d"><p class="nr-h"><em>Room 511</em> — Art</p><a class="nr-a" href="/blog/">Art Notes</a><a class="nr-a" href="{{learn}}">Lessons</a><a class="nr-a" href="/challenge/">Art Challenge</a><a class="nr-a" href="{{guides}}">Books</a><a class="nr-a" href="/freebies/">Freebies</a><a class="nr-a" href="/palettes/">Palettes</a><a class="nr-a" href="{{about}}">Sketchbook</a></div></div>
     <div class="nr"><button type="button" class="nr-b" aria-expanded="false"><small>Room 781</small><span>Games</span></button><div class="nr-d"><p class="nr-h"><em>Room 781</em> — Games</p><a class="nr-a" href="{{lab}}">All games</a><a class="nr-a" href="/shop/">Bird market</a><a class="nr-a" href="/titos/">Detective Titos</a><a class="nr-a" href="{{wobble}}">Wobbleland</a></div></div>
@@ -117,5 +120,3 @@
 </div></footer>
 </body>
 </html>
-
-

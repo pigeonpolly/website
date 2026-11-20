@@ -1,0 +1,40 @@
+/* Птичье таро — колода в шапке и окно карты. Только пиксельные картинки 120x206. */
+.td{position:relative;display:flex;align-items:center;flex:0 0 auto}
+.td[hidden]{display:none}
+.td-b{position:relative;width:92px;height:84px;padding:0;border:0;background:none;cursor:pointer;display:flex;align-items:center;justify-content:center}
+.td-st{position:relative;display:block;width:46px;height:79px;animation:td-float 4.5s ease-in-out infinite}
+.td-st i{position:absolute;inset:0;display:block;background:url(/images/cards/tarot-2027/back.png) center/100% 100% no-repeat;image-rendering:pixelated;border-radius:2px;box-shadow:0 2px 5px rgba(26,21,40,.22);transform-origin:50% 92%;transition:transform .35s ease}
+.td-st i:nth-child(1){transform:rotate(-13deg) translate(-12px,1px)}
+.td-st i:nth-child(2){transform:rotate(-5deg) translate(-4px,0)}
+.td-st i:nth-child(3){transform:rotate(4deg)}
+.td-b:hover .td-st i:nth-child(1),.td-b:focus-visible .td-st i:nth-child(1){transform:rotate(-19deg) translate(-17px,2px)}
+.td-b:hover .td-st i:nth-child(2),.td-b:focus-visible .td-st i:nth-child(2){transform:rotate(-7deg) translate(-6px,0)}
+.td-b:hover .td-st i:nth-child(3),.td-b:focus-visible .td-st i:nth-child(3){transform:rotate(7deg) translate(3px,-1px)}
+.td-b:focus-visible{outline:2px solid #c8335f;outline-offset:3px;border-radius:8px}
+.td-n{position:absolute;right:6px;top:2px;min-width:17px;height:17px;border-radius:9px;background:#c8335f;color:#fff;font:700 10px/17px Karla,sans-serif;text-align:center;box-shadow:0 1px 3px rgba(0,0,0,.25)}
+.td-n[hidden]{display:none}
+.td.is-done .td-st i{filter:saturate(.55) brightness(.9)}
+.td.is-done .td-st{animation:none}
+@keyframes td-float{0%,100%{transform:translateY(0)}50%{transform:translateY(-3px)}}
+@media (prefers-reduced-motion:reduce){.td-st{animation:none}}
+
+.tdm{position:fixed;inset:0;z-index:120;display:flex;align-items:center;justify-content:center;padding:18px}
+.tdm[hidden]{display:none}
+.tdm-bg{position:absolute;inset:0;background:rgba(18,12,30,.76)}
+.tdm-w{position:relative;text-align:center;color:#f6ecd9;max-width:min(420px,100%)}
+.tdm-x{position:absolute;right:0;top:-6px;width:34px;height:34px;border:0;border-radius:50%;background:rgba(246,236,217,.14);color:#f6ecd9;font:400 16px/1 Karla,sans-serif;cursor:pointer}
+.tdm-x:hover{background:rgba(246,236,217,.26)}
+.tdm-card{position:relative;width:min(240px,72vw);aspect-ratio:120/206;margin:10px auto 16px;filter:drop-shadow(0 18px 30px rgba(0,0,0,.45))}
+.tdm-back,.tdm-face{position:absolute;inset:0;border-radius:5px;overflow:hidden}
+.tdm-back{background:url(/images/cards/tarot-2027/back.png) center/100% 100% no-repeat;image-rendering:pixelated;transition:opacity .18s}
+.tdm-face{background:#fff;opacity:0;transform:scale(.92);transition:opacity .4s ease,transform .45s cubic-bezier(.2,.8,.2,1)}
+.tdm-face img{width:100%;height:100%;display:block;image-rendering:pixelated}
+.tdm-card.is-open .tdm-back{opacity:0}
+.tdm-card.is-open .tdm-face{opacity:1;transform:none}
+.tdm.shake .tdm-card{animation:tdm-shake .55s ease}
+@keyframes tdm-shake{0%,100%{transform:rotate(0)}20%{transform:rotate(-3deg)}40%{transform:rotate(2.4deg)}60%{transform:rotate(-1.6deg)}80%{transform:rotate(1deg)}}
+.tdm-t{margin:0 0 4px;font:400 21px/1.2 Fraunces,Lora,serif}
+.tdm-s{margin:0 0 14px;font:400 14px/1.35 Karla,sans-serif;color:#cdc3df}
+.tdm-go{border:0;border-radius:999px;padding:12px 26px;background:#f2c14e;color:#2a1f45;font:700 13px/1 Karla,sans-serif;letter-spacing:.08em;text-transform:uppercase;cursor:pointer}
+.tdm-go:hover{background:#ffd36b}
+@media (max-width:1199px){.td{display:none}}
