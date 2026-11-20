@@ -58,3 +58,9 @@
 - **Сбои — Алине.** Ошибки на сервере пишутся через `healthErr` (worker/index.js) и раз в день приходят ей письмом (`healthMail`); новая фоновая механика — с `.catch(e => healthErr(env, 'имя', e))`, не молча.
 - **Границы** — только блок этапа; «Не трогать» не трогать.
 - **Конец этапа:** 3–5 строк в нужный docs/*.md, новые таблицы — в db.md, строка в plan-status, коммит, пуш.
+
+## Локальная среда (этот компьютер, DSH + Windows)
+- **Сборка:** `powershell -ExecutionPolicy Bypass -File .tools\build.ps1` — ставит UTF-8 и Node из `.tools\` (папка в git не попадает).
+- **Пуш:** перед git-командой `$env:GIT_SSH = '.tools\ssh.cmd'` (в песочнице DSH ssh иначе падает), либо `powershell -ExecutionPolicy Bypass -File .tools\push.ps1 push origin main`.
+- **Просмотр:** `python -m http.server 8766 --directory site` → http://127.0.0.1:8766 (обновляется после сборки).
+- **Скриншоты** `tools/shots.py` здесь не работают (браузер блокируется песочницей) — показывать Алине ссылку на локальный просмотр.
