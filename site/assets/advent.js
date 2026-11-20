@@ -23,7 +23,8 @@
     inkL: ['Access to the course', 'Доступ к курсу', 'Pieeja kursam'],
     inkT: ['Ink: Sketching Without Fear', 'Тушь: скетчинг без страха', 'Tuša: skicēšana bez bailēm'],
     inkS: ['The whole course is open for you — 15 lessons, stamps and a diploma.', 'Тебе открыт весь курс — 15 уроков, печати и диплом.', 'Tev atvērts viss kurss — 15 nodarbības, zīmogi un diploms.'],
-    inkA: ['Opens for every bird who opens this window on that day.', 'Открывается всем, кто в этот день откроет окно.', 'Atveras visiem, kas atvēra lodziņu tajā dienā.'],
+    inkU: ['Access until {d}.', 'Доступ до {d}.', 'Pieeja līdz {d}.'],
+    inkA: ['Opens for every bird who opens this window on that day — for a year.', 'Открывается всем, кто в этот день откроет окно — на год.', 'Atveras visiem, kas atvēra lodziņu tajā dienā — uz gadu.'],
     inkGo: ['Open', 'Открыть', 'Atvērt'],
   };
   const t = k => T[k][L];
@@ -184,9 +185,11 @@
   function giftRow(name) {
     return `<div class="more"><span class="k">🎁 ${t('gift')}</span><div class="item"><span class="th">🎁</span><span><b>${esc(name)}</b><small>${t('inBag')}</small></span><a class="mini-btn" href="/bird/#bp-room">🏠</a></div></div>`;
   }
-  // окно 24 декабря: доступ к курсу туши — карточкой в окне (доступ даёт users.ink_ok, /ink/ для своих)
+  // окно 24 декабря: доступ к курсу туши — карточкой в окне (users.ink_ok + срок ink_until — на год; /ink/ для своих)
+  function inkDate(ts) { try { return ts > 0 ? new Date(ts * 1000).toLocaleDateString(LG, { day: 'numeric', month: 'long', year: 'numeric' }) : ''; } catch (e) { return ''; } }
   function inkRow(admin) {
-    return `<div class="more"><span class="k">✒️ ${t('inkL')}</span><div class="item"><span class="th inkth">✒️</span><span><b>${esc(t('inkT'))}</b><small>${t(admin ? 'inkA' : 'inkS')}</small></span><a class="mini-btn" href="${(L ? '/' + LG : '')}/ink/">${t('inkGo')}</a></div></div>`;
+    const till = !admin ? inkDate(S.inkUntil) : '';
+    return `<div class="more"><span class="k">✒️ ${t('inkL')}</span><div class="item"><span class="th inkth">✒️</span><span><b>${esc(t('inkT'))}</b><small>${t(admin ? 'inkA' : 'inkS')}${till ? ' ' + t('inkU').replace('{d}', till) : ''}</small></span><a class="mini-btn" href="${(L ? '/' + LG : '')}/ink/">${t('inkGo')}</a></div></div>`;
   }
   function inside(d, admin) {
     const items = itemsOf(d, admin);
@@ -218,7 +221,7 @@
     fetch('/api/advent/open', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ day: d }) })
       .then(r => { if (!r.ok) throw 0; return r.json(); })
       .then(x => setTimeout(() => {
-        if (x.ink) S.ink = true; // окно 24 декабря открыло курс туши
+        if (x.ink) { S.ink = true; S.inkUntil = x.inkUntil || 0; } // окно 24 декабря открыло курс туши на год
         const rec = { day: d, kind: x.kind, item: x.item || (x.files && x.files[0]) || '', buttons: x.buttons || 0, got: x.kind === 'file' ? (x.files || []) : (x.got || []) };
         S.opened = (S.opened || []).filter(o => o.day !== d).concat([rec]); // открытое только что окошко — сразу со всем, что в нём есть
         build(); draw(); show(inside(d, false), true); if (window.PPNews) window.PPNews.refresh();

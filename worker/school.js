@@ -14,7 +14,10 @@ export const SCHOOL_TABLES = [
 ];
 // комментарий Алины переводится при проверке на все языки сайта: comment_tr = {en, ru, lv} (оригинал — на своём языке)
 // course: 'water' — первый курс (старые строки), 'ink' — курс туши
-export const SCHOOL_ALTER = ['ALTER TABLE school_works ADD COLUMN comment_tr TEXT', "ALTER TABLE school_works ADD COLUMN course TEXT DEFAULT 'water'", 'ALTER TABLE users ADD COLUMN ink_ok INTEGER DEFAULT 0'];
+export const SCHOOL_ALTER = ['ALTER TABLE school_works ADD COLUMN comment_tr TEXT', "ALTER TABLE school_works ADD COLUMN course TEXT DEFAULT 'water'", 'ALTER TABLE users ADD COLUMN ink_ok INTEGER DEFAULT 0', 'ALTER TABLE users ADD COLUMN ink_until INTEGER DEFAULT 0'];
+// курс туши по приглашению — доступ на год: ink_ok = 1 (флаг) и ink_until (когда кончается, секунды); выдаёт окно адвента №24
+export const INK_YEAR = 365 * 86400;
+export const inkOn = (u, t) => !!(u && u.ink_ok && (u.ink_until || 0) > t); // старые записи без срока (ink_until = 0) — доступ кончился
 const LANGS = ['en', 'ru', 'lv'];
 const langOf = t => /[а-яё]/i.test(t) ? 'ru' : /[āēīūčšžņļķģ]/i.test(t) ? 'lv' : 'en'; // на каком языке написала Алина
 const trOf = r => { try { return JSON.parse(r.comment_tr || '{}'); } catch (e) { return {}; } };
@@ -68,8 +71,8 @@ export async function schoolApi(req, env, url, h) {
     if (c !== 'ink') fail(404, 'course');
     const u = await h.currentUser(req, env);
     if (!u || !u.nick || u.banned) return json({ me: false }, 401, { 'cache-control': 'no-store' });
-    // курс туши закрыт: доступ только у тех, кому он достался (users.ink_ok), и админу
-    if (!u.ink_ok && !(await h.isAdmin(u, env).catch(() => false))) return json({ me: false, closed: true }, 403, { 'cache-control': 'no-store' });
+    // курс туши закрыт: доступ только у тех, кому он достался (users.ink_ok + срок ink_until — на год), и админу
+    if (!inkOn(u, h.now()) && !(await h.isAdmin(u, env).catch(() => false))) return json({ me: false, closed: true }, 403, { 'cache-control': 'no-store' });
     const lessons = INK_LESSONS.map((l, i) => { const x = l[lang] || l.en; return { n: i + 1, icon: l.icon, card: l.card, cover: l.cover, ...x }; });
     return json({ me: true, of: COURSES.ink.n, lessons }, 200, { 'cache-control': 'no-store' });
   }
@@ -83,7 +86,7 @@ export async function schoolApi(req, env, url, h) {
     if (!url.searchParams.has('peek') && rows.some(r => !r.seen)) await env.DB.prepare(`UPDATE school_works SET seen = 1 WHERE user_id = ? AND seen = 0 AND ${CO} = ?`).bind(u.id, c).run(); // открыл курс — вердикты увидены (?peek — кабинет только смотрит)
     const dip = await dipOf(env, u.id, c);
     const admin = await h.isAdmin(u, env).catch(() => false); // админу (Алине) открыты все уроки — просмотр курса
-    return json({ me: true, nick: u.nick, course: c, of: COURSES[c].n, works, diplomaBtn: dip ? dip.amount : 0, admin: !!admin, ink: !!u.ink_ok }, 200, { 'cache-control': 'no-store' });
+    return json({ me: true, nick: u.nick, course: c, of: COURSES[c].n, works, diplomaBtn: dip ? dip.amount : 0, admin: !!admin, ink: inkOn(u, h.now()), inkUntil: u.ink_until || 0 }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/school/hand') {
     const u = await h.needUser(req, env);
