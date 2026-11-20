@@ -34,6 +34,7 @@
 | Меню, шапка, главная | docs/site.md |
 | Продвижение, рост посетителей | docs/growth.md |
 | ArtPill — «таблетка рисования» для ИИ | docs/artpill.md |
+| A1 English Pack: курс английского A1, кот Оскар, скилл `a1-pack` | docs/a1-pack.md, a1-pack/SCHEMA.md |
 | Убранное: от чего отказались, хвосты, маркеры | docs/retired.md |
 | Устаревшее | docs/history.md |
 
