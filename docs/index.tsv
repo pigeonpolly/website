@@ -4,8 +4,8 @@
 #       sym — имя в коде; doc — раздел docs/*.md.
 # Читать целиком не нужно: grep по нужному виду, или python3 tools/index.py find СЛОВО / where ФАЙЛ.
 # Свежесть: python3 tools/index.py check (перед пушем).
-# файлов 385, страниц 54, маршрутов 213, таблиц 76, ключей meta 68, имён 5314, разделов доков 238
-file	build.py	build.py	0	887 строк, 59 КБ
+# файлов 396, страниц 55, маршрутов 214, таблиц 76, ключей meta 68, имён 5461, разделов доков 242
+file	build.py	build.py	0	890 строк, 60 КБ
 file	content/english/a1.js	content/english/a1.js	0	239 строк, 45 КБ
 file	content/english/a2.js	content/english/a2.js	0	229 строк, 46 КБ
 file	content/english/b1.js	content/english/b1.js	0	262 строк, 69 КБ
@@ -54,41 +54,43 @@ file	content/shared/keys.js	content/shared/keys.js	0	65 строк, 5 КБ
 file	content/shared/notebook.js	content/shared/notebook.js	0	587 строк, 49 КБ
 file	content/shared/uttale.js	content/shared/uttale.js	0	117 строк, 14 КБ · СОБРАН, руками не править
 file	docs/a1-pack.md	docs/a1-pack.md	0	10 строк, 2 КБ
-file	docs/admin.md	docs/admin.md	0	173 строк, 48 КБ
+file	docs/admin.md	docs/admin.md	0	178 строк, 50 КБ
 file	docs/artpill.md	docs/artpill.md	0	66 строк, 12 КБ
-file	docs/basics.md	docs/basics.md	0	46 строк, 9 КБ
+file	docs/basics.md	docs/basics.md	0	47 строк, 9 КБ
 file	docs/bird.md	docs/bird.md	0	112 строк, 59 КБ
 file	docs/blog.md	docs/blog.md	0	121 строк, 38 КБ
 file	docs/cards.md	docs/cards.md	0	98 строк, 20 КБ
-file	docs/challenge.md	docs/challenge.md	0	151 строк, 62 КБ
-file	docs/coloring.md	docs/coloring.md	0	6 строк, 1 КБ
+file	docs/challenge.md	docs/challenge.md	0	152 строк, 63 КБ
+file	docs/coloring.md	docs/coloring.md	0	7 строк, 2 КБ
 file	docs/db.md	docs/db.md	0	157 строк, 16 КБ
 file	docs/flock.md	docs/flock.md	0	35 строк, 16 КБ
-file	docs/freebies.md	docs/freebies.md	0	9 строк, 4 КБ
-file	docs/games.md	docs/games.md	0	87 строк, 35 КБ
-file	docs/growth.md	docs/growth.md	0	88 строк, 13 КБ
+file	docs/freebies.md	docs/freebies.md	0	10 строк, 5 КБ
+file	docs/games.md	docs/games.md	0	90 строк, 36 КБ
+file	docs/growth.md	docs/growth.md	0	89 строк, 14 КБ
 file	docs/history.md	docs/history.md	0	105 строк, 25 КБ
 file	docs/index.md	docs/index.md	0	44 строк, 5 КБ
-file	docs/ink.md	docs/ink.md	0	49 строк, 28 КБ
-file	docs/map.md	docs/map.md	0	341 строк, 68 КБ
-file	docs/palettes.md	docs/palettes.md	0	54 строк, 22 КБ
-file	docs/plan-status.md	docs/plan-status.md	0	170 строк, 35 КБ
+file	docs/ink.md	docs/ink.md	0	52 строк, 29 КБ
+file	docs/map.md	docs/map.md	0	341 строк, 69 КБ
+file	docs/palettes.md	docs/palettes.md	0	55 строк, 24 КБ
+file	docs/pinterest-dec2026.md	docs/pinterest-dec2026.md	0	55 строк, 4 КБ
+file	docs/plan-status.md	docs/plan-status.md	0	173 строк, 36 КБ
 file	docs/polly-pet.md	docs/polly-pet.md	0	40 строк, 9 КБ
 file	docs/requests.md	docs/requests.md	0	31 строк, 14 КБ
-file	docs/retired.md	docs/retired.md	0	34 строк, 6 КБ
+file	docs/retired.md	docs/retired.md	0	36 строк, 6 КБ
 file	docs/rooms.md	docs/rooms.md	0	34 строк, 12 КБ
-file	docs/shop.md	docs/shop.md	0	65 строк, 34 КБ
+file	docs/shop.md	docs/shop.md	0	66 строк, 35 КБ
 file	docs/site.md	docs/site.md	0	225 строк, 92 КБ
 file	docs/titos-cast.md	docs/titos-cast.md	0	48 строк, 7 КБ
 file	docs/titos.md	docs/titos.md	0	147 строк, 24 КБ
 file	docs/wobbleland.md	docs/wobbleland.md	0	42 строк, 13 КБ
 file	site/assets/about-admin.js	site/assets/about-admin.js	0	47 строк, 6 КБ
 file	site/assets/about-desk.js	site/assets/about-desk.js	0	738 строк, 52 КБ
-file	site/assets/account.js	site/assets/account.js	0	434 строк, 43 КБ
+file	site/assets/account.js	site/assets/account.js	0	434 строк, 44 КБ
 file	site/assets/admin-v2.css	site/assets/admin-v2.css	0	185 строк, 18 КБ
-file	site/assets/admin.js	site/assets/admin.js	0	1507 строк, 225 КБ
-file	site/assets/advent-admin.js	site/assets/advent-admin.js	0	102 строк, 9 КБ
-file	site/assets/advent.js	site/assets/advent.js	0	155 строк, 17 КБ
+file	site/assets/admin.js	site/assets/admin.js	0	1539 строк, 230 КБ
+file	site/assets/advent-admin.js	site/assets/advent-admin.js	0	235 строк, 19 КБ
+file	site/assets/advent.css	site/assets/advent.css	0	301 строк, 28 КБ
+file	site/assets/advent.js	site/assets/advent.js	0	229 строк, 17 КБ
 file	site/assets/artpill-claude.js	site/assets/artpill-claude.js	0	245 строк, 50 КБ
 file	site/assets/artpill.js	site/assets/artpill.js	0	332 строк, 40 КБ
 file	site/assets/ava-deco.css	site/assets/ava-deco.css	0	31 строк, 90 КБ
@@ -104,7 +106,7 @@ file	site/assets/cards-admin.js	site/assets/cards-admin.js	0	161 строк, 18 
 file	site/assets/cards-ui.js	site/assets/cards-ui.js	0	547 строк, 49 КБ
 file	site/assets/carousel.js	site/assets/carousel.js	0	182 строк, 19 КБ
 file	site/assets/cart.js	site/assets/cart.js	0	37 строк, 3 КБ
-file	site/assets/catalog-ui.js	site/assets/catalog-ui.js	0	448 строк, 41 КБ
+file	site/assets/catalog-ui.js	site/assets/catalog-ui.js	0	448 строк, 42 КБ
 file	site/assets/challenge-admin.js	site/assets/challenge-admin.js	0	630 строк, 77 КБ
 file	site/assets/challenge-data.js	site/assets/challenge-data.js	0	1915 строк, 155 КБ
 file	site/assets/challenge-theme.js	site/assets/challenge-theme.js	0	168 строк, 12 КБ
@@ -131,12 +133,12 @@ file	site/assets/guides-admin.js	site/assets/guides-admin.js	0	110 строк, 1
 file	site/assets/hatch.js	site/assets/hatch.js	0	123 строк, 9 КБ
 file	site/assets/ideas-admin.js	site/assets/ideas-admin.js	0	79 строк, 9 КБ
 file	site/assets/ink-course.css	site/assets/ink-course.css	0	113 строк, 7 КБ
-file	site/assets/ink-course.js	site/assets/ink-course.js	0	243 строк, 26 КБ
+file	site/assets/ink-course.js	site/assets/ink-course.js	0	254 строк, 27 КБ
 file	site/assets/mail-admin.js	site/assets/mail-admin.js	0	73 строк, 9 КБ
 file	site/assets/news.js	site/assets/news.js	0	444 строк, 46 КБ
 file	site/assets/norway.css	site/assets/norway.css	0	16 строк, 1 КБ
 file	site/assets/palettes.js	site/assets/palettes.js	0	439 строк, 40 КБ
-file	site/assets/pancakes.js	site/assets/pancakes.js	0	1016 строк, 113 КБ
+file	site/assets/pancakes.js	site/assets/pancakes.js	0	1016 строк, 114 КБ
 file	site/assets/pixel-badge.js	site/assets/pixel-badge.js	0	105 строк, 13 КБ
 file	site/assets/poll.js	site/assets/poll.js	0	94 строк, 10 КБ
 file	site/assets/polls-admin.js	site/assets/polls-admin.js	0	116 строк, 13 КБ
@@ -144,7 +146,9 @@ file	site/assets/polly-school.js	site/assets/polly-school.js	0	250 строк, 2
 file	site/assets/polly.js	site/assets/polly.js	0	692 строк, 57 КБ
 file	site/assets/posts-admin.js	site/assets/posts-admin.js	0	276 строк, 32 КБ
 file	site/assets/potion-names.js	site/assets/potion-names.js	0	145 строк, 27 КБ
-file	site/assets/potions.js	site/assets/potions.js	0	558 строк, 57 КБ
+file	site/assets/potions.js	site/assets/potions.js	0	558 строк, 58 КБ
+file	site/assets/prompts.css	site/assets/prompts.css	0	32 строк, 2 КБ
+file	site/assets/prompts.js	site/assets/prompts.js	0	116 строк, 5 КБ
 file	site/assets/pw-rules.js	site/assets/pw-rules.js	0	25 строк, 2 КБ
 file	site/assets/quest-polly.js	site/assets/quest-polly.js	0	120 строк, 15 КБ
 file	site/assets/quest-titos.js	site/assets/quest-titos.js	0	317 строк, 33 КБ
@@ -162,9 +166,9 @@ file	site/assets/shift-music.js	site/assets/shift-music.js	0	151 строк, 11 
 file	site/assets/shift.js	site/assets/shift.js	0	408 строк, 30 КБ
 file	site/assets/site-edit.js	site/assets/site-edit.js	0	288 строк, 24 КБ
 file	site/assets/site.js	site/assets/site.js	0	265 строк, 16 КБ
-file	site/assets/sketch-wall.js	site/assets/sketch-wall.js	0	955 строк, 120 КБ
+file	site/assets/sketch-wall.js	site/assets/sketch-wall.js	0	955 строк, 121 КБ
 file	site/assets/sketchbook.js	site/assets/sketchbook.js	0	138 строк, 13 КБ
-file	site/assets/style.css	site/assets/style.css	0	5666 строк, 503 КБ
+file	site/assets/style.css	site/assets/style.css	0	5702 строк, 507 КБ
 file	site/assets/tarot-admin.js	site/assets/tarot-admin.js	0	127 строк, 11 КБ
 file	site/assets/titos-bugs.js	site/assets/titos-bugs.js	0	229 строк, 21 КБ
 file	site/assets/titos-sort.js	site/assets/titos-sort.js	0	337 строк, 35 КБ
@@ -188,14 +192,14 @@ file	site/assets/wobbleland.js	site/assets/wobbleland.js	0	530 строк, 41 К
 file	src/blocks/coming-soon.html	src/blocks/coming-soon.html	0	94 строк, 8 КБ
 file	src/blocks/flock.html	src/blocks/flock.html	0	80 строк, 12 КБ
 file	src/blocks/season.html	src/blocks/season.html	0	149 строк, 15 КБ
-file	src/layout-v2-lab.html	src/layout-v2-lab.html	0	117 строк, 14 КБ
-file	src/layout-v2.html	src/layout-v2.html	0	94 строк, 12 КБ
+file	src/layout-v2-lab.html	src/layout-v2-lab.html	0	121 строк, 14 КБ
+file	src/layout-v2.html	src/layout-v2.html	0	98 строк, 12 КБ
 file	src/pages/404.html	src/pages/404.html	0	9 строк, 1 КБ
 file	src/pages/500.html	src/pages/500.html	0	9 строк, 1 КБ
 file	src/pages/503.html	src/pages/503.html	0	9 строк, 1 КБ
 file	src/pages/about-me.html	src/pages/about-me.html	0	38 строк, 3 КБ
 file	src/pages/admin.html	src/pages/admin.html	0	32 строк, 2 КБ
-file	src/pages/advent.html	src/pages/advent.html	0	7 строк, 1 КБ
+file	src/pages/advent.html	src/pages/advent.html	0	47 строк, 3 КБ
 file	src/pages/ai-art.html	src/pages/ai-art.html	0	7 строк, 0 КБ
 file	src/pages/anxiety.html	src/pages/anxiety.html	0	7 строк, 0 КБ
 file	src/pages/art-pill.html	src/pages/art-pill.html	0	8 строк, 1 КБ
@@ -203,7 +207,7 @@ file	src/pages/art-portfolio.html	src/pages/art-portfolio.html	0	14 строк, 
 file	src/pages/bird.html	src/pages/bird.html	0	13 строк, 1 КБ
 file	src/pages/blog-editor.html	src/pages/blog-editor.html	0	8 строк, 0 КБ
 file	src/pages/blog.html	src/pages/blog.html	0	8 строк, 0 КБ
-file	src/pages/challenge.html	src/pages/challenge.html	0	115 строк, 7 КБ
+file	src/pages/challenge.html	src/pages/challenge.html	0	116 строк, 7 КБ
 file	src/pages/detective.html	src/pages/detective.html	0	7 строк, 0 КБ
 file	src/pages/e-books.html	src/pages/e-books.html	0	7 строк, 0 КБ
 file	src/pages/flock-news.html	src/pages/flock-news.html	0	7 строк, 0 КБ
@@ -228,15 +232,16 @@ file	src/pages/potions.html	src/pages/potions.html	0	11 строк, 1 КБ
 file	src/pages/preview-about.html	src/pages/preview-about.html	0	35 строк, 3 КБ
 file	src/pages/preview-guides.html	src/pages/preview-guides.html	0	20 строк, 1 КБ
 file	src/pages/preview-learn.html	src/pages/preview-learn.html	0	8 строк, 1 КБ
-file	src/pages/preview.html	src/pages/preview.html	0	59 строк, 5 КБ
+file	src/pages/preview.html	src/pages/preview.html	0	133 строк, 12 КБ
 file	src/pages/privacy.html	src/pages/privacy.html	0	58 строк, 9 КБ
 file	src/pages/privacy.lv.html	src/pages/privacy.lv.html	0	58 строк, 10 КБ
 file	src/pages/privacy.ru.html	src/pages/privacy.ru.html	0	58 строк, 15 КБ
 file	src/pages/projects.html	src/pages/projects.html	0	13 строк, 1 КБ
+file	src/pages/prompts.html	src/pages/prompts.html	0	16 строк, 1 КБ
 file	src/pages/rain.html	src/pages/rain.html	0	9 строк, 1 КБ
 file	src/pages/requests.html	src/pages/requests.html	0	7 строк, 1 КБ
 file	src/pages/shift.html	src/pages/shift.html	0	10 строк, 1 КБ
-file	src/pages/shop.html	src/pages/shop.html	0	323 строк, 30 КБ
+file	src/pages/shop.html	src/pages/shop.html	0	323 строк, 31 КБ
 file	src/pages/sketchbook.html	src/pages/sketchbook.html	0	7 строк, 0 КБ
 file	src/pages/snail.html	src/pages/snail.html	0	7 строк, 0 КБ
 file	src/pages/titos.html	src/pages/titos.html	0	25 строк, 1 КБ
@@ -283,6 +288,8 @@ file	tools/news_shots.js	tools/news_shots.js	0	71 строк, 6 КБ
 file	tools/norsk_check.js	tools/norsk_check.js	0	107 строк, 11 КБ
 file	tools/norsk_page.py	tools/norsk_page.py	0	32 строк, 4 КБ
 file	tools/og_cards.js	tools/og_cards.js	0	259 строк, 27 КБ
+file	tools/ornaments/make.py	tools/ornaments/make.py	0	294 строк, 24 КБ
+file	tools/ornaments/render.js	tools/ornaments/render.js	0	14 строк, 1 КБ
 file	tools/palette_names.py	tools/palette_names.py	0	23 строк, 5 КБ
 file	tools/palette_overrides.py	tools/palette_overrides.py	0	15 строк, 6 КБ
 file	tools/palette_titles.py	tools/palette_titles.py	0	128 строк, 12 КБ
@@ -290,6 +297,7 @@ file	tools/palettes.py	tools/palettes.py	0	120 строк, 7 КБ
 file	tools/pins/cal-data.js	tools/pins/cal-data.js	0	67 строк, 8 КБ
 file	tools/pins/cal.js	tools/pins/cal.js	0	230 строк, 22 КБ
 file	tools/pins/cover.js	tools/pins/cover.js	0	54 строк, 5 КБ
+file	tools/pins/dec2026.py	tools/pins/dec2026.py	0	154 строк, 7 КБ
 file	tools/pins/life_pal.py	tools/pins/life_pal.py	0	22 строк, 1 КБ
 file	tools/pins/pins10-data.js	tools/pins/pins10-data.js	0	160 строк, 31 КБ
 file	tools/pins/pins10.js	tools/pins/pins10.js	0	103 строк, 11 КБ
@@ -300,6 +308,9 @@ file	tools/pins/pins13-wc.js	tools/pins/pins13-wc.js	0	181 строк, 40 КБ
 file	tools/pins/pins13.js	tools/pins/pins13.js	0	225 строк, 26 КБ
 file	tools/pins/pins14-data.js	tools/pins/pins14-data.js	0	210 строк, 38 КБ
 file	tools/pins/pins15-data.js	tools/pins/pins15-data.js	0	228 строк, 43 КБ
+file	tools/pins/pins16-data.js	tools/pins/pins16-data.js	0	280 строк, 51 КБ
+file	tools/pins/pins16.js	tools/pins/pins16.js	0	163 строк, 19 КБ
+file	tools/pins/pins16_prep.py	tools/pins/pins16_prep.py	0	115 строк, 7 КБ
 file	tools/pins/pins2.js	tools/pins/pins2.js	0	532 строк, 60 КБ
 file	tools/pins/pins3.js	tools/pins/pins3.js	0	189 строк, 17 КБ
 file	tools/pins/pins4.js	tools/pins/pins4.js	0	197 строк, 19 КБ
@@ -360,7 +371,7 @@ file	worker/flock.js	worker/flock.js	0	124 строк, 10 КБ
 file	worker/garden.js	worker/garden.js	0	243 строк, 22 КБ
 file	worker/guides.js	worker/guides.js	0	199 строк, 15 КБ
 file	worker/ideas.js	worker/ideas.js	0	197 строк, 17 КБ
-file	worker/index.js	worker/index.js	0	3111 строк, 302 КБ
+file	worker/index.js	worker/index.js	0	3173 строк, 311 КБ
 file	worker/kitchen.js	worker/kitchen.js	0	135 строк, 10 КБ
 file	worker/mail-html.js	worker/mail-html.js	0	86 строк, 9 КБ
 file	worker/mail.js	worker/mail.js	0	280 строк, 25 КБ
@@ -376,7 +387,7 @@ file	worker/pins.js	worker/pins.js	0	52 строк, 4 КБ
 file	worker/polls.js	worker/polls.js	0	184 строк, 15 КБ
 file	worker/runes-data.js	worker/runes-data.js	0	252 строк, 78 КБ
 file	worker/runes.js	worker/runes.js	0	15 строк, 1 КБ
-file	worker/school.js	worker/school.js	0	143 строк, 14 КБ
+file	worker/school.js	worker/school.js	0	145 строк, 14 КБ
 file	worker/shift.js	worker/shift.js	0	54 строк, 4 КБ
 file	worker/study-page.js	worker/study-page.js	0	2 строк, 771 КБ · СОБРАН, руками не править
 file	worker/study.js	worker/study.js	0	43 строк, 3 КБ
@@ -392,7 +403,7 @@ file	worker/week.js	worker/week.js	0	56 строк, 5 КБ
 file	worker/wl-holidays.js	worker/wl-holidays.js	0	125 строк, 12 КБ
 page	/about-me/	src/pages/about-me.html	0	en,ru,lv; скрипты: about-desk.js; lab-шаблон
 page	/admin/	src/pages/admin.html	0	en,ru,lv; скрипты: about-admin.js, admin.js, advent-admin.js, backup.js, broadcast-admin.js, cards-admin.js, cards-ui.js, carousel.js, catalog-ui.js, challenge-admin.js, cheatsheet-admin.js, guides-admin.js, ideas-admin.js, mail-admin.js, pixel-badge.js, polls-admin.js, posts-admin.js, runes-admin.js, school-admin.js, tarot-admin.js, translate-btn.js; lab-шаблон
-page	/advent/	src/pages/advent.html	0	en,ru,lv; скрипты: advent.js; lab-шаблон
+page	/advent/	src/pages/advent.html	0	en,ru,lv; v2; скрипты: advent.js
 page	/art-portfolio/ai-art/	src/pages/ai-art.html	0	en,ru,lv; скрипты: palettes.js; lab-шаблон
 page	/art-portfolio/anxiety/	src/pages/anxiety.html	0	en,ru,lv; скрипты: palettes.js; lab-шаблон
 page	/art-pill/	src/pages/art-pill.html	0	en,ru,lv; скрипты: artpill-claude.js, artpill.js; lab-шаблон
@@ -425,6 +436,7 @@ page	/learn/	src/pages/preview-learn.html	0	en,ru,lv; v2
 page	/	src/pages/preview.html	0	en,ru,lv; v2; скрипты: poll.js
 page	/privacy/	src/pages/privacy.html	0	en,ru,lv; lab-шаблон
 page	/projects/	src/pages/projects.html	0	en,ru,lv; lab-шаблон
+page	/prompts/	src/pages/prompts.html	0	en,ru,lv; v2; скрипты: prompts.js
 page	/rain/	src/pages/rain.html	0	en,ru,lv; скрипты: dish-chip.js, rain.js, top-board.js; lab-шаблон
 page	/requests/	src/pages/requests.html	0	en,ru,lv; скрипты: requests.js; lab-шаблон
 page	/shift/	src/pages/shift.html	0	en,ru,lv; скрипты: dish-chip.js, shift-music.js, shift.js; lab-шаблон
@@ -484,179 +496,180 @@ route	/sitemap-blog.xml	worker/blog.js	1132	~v2Flag
 route	/api/admin/pin-text	worker/index.js	72	→ pinTextApi
 route	/api/blog/admin/courier	worker/index.js	73	→ courierApi
 route	/api/blog/*	worker/index.js	74	→ blogApi
-route	/api/admin/funnels	worker/index.js	1723	~authApi
-route	/api/admin/pw-reset	worker/index.js	1723	—
-route	/api/funnel	worker/index.js	1723	—
-route	/api/pw/*	worker/index.js	1723	—
-route	/api/admin/flock-notes	worker/index.js	1724	~flockNewsApi
-route	/api/flock/news	worker/index.js	1724	—
-route	/api/news-off	worker/index.js	1724	—
-route	/api/admin/wl-holiday	worker/index.js	1725	~wlMailApi
-route	/api/wl-mail*	worker/index.js	1725	—
-route	/api/birds	worker/index.js	1726	—
-route	/api/feather	worker/index.js	1726	~flockApi
-route	/api/feathers	worker/index.js	1726	—
-route	/api/top	worker/index.js	1727	~topApi
-route	/api/pancakes	worker/index.js	1728	—
-route	/api/pancakes/*	worker/index.js	1728	~pancakesApi
-route	/api/train	worker/index.js	1730	—
-route	/api/train/*	worker/index.js	1730	~trainApi
-route	/api/garden	worker/index.js	1733	—
-route	/api/garden/*	worker/index.js	1733	~gardenApi
-route	/api/admin/runes	worker/index.js	1734	~runesApi
-route	/api/admin/tarot	worker/index.js	1735	~tarotApi
-route	/api/admin/polls	worker/index.js	1736	~pollsApi
-route	/api/poll	worker/index.js	1736	—
-route	/api/poll/vote	worker/index.js	1736	—
-route	/api/admin/guides	worker/index.js	1739	—
-route	/api/v2/guides	worker/index.js	1739	—
-route	/api/v2/howto/*	worker/index.js	1739	~guidesApi
-route	/api/v2/seen	worker/index.js	1739	—
-route	/api/admin/ideas	worker/index.js	1740	—
-route	/api/admin/ideas/write	worker/index.js	1740	~ideasApi
-route	/api/admin/notes*	worker/index.js	1741	~notesApi
-route	/api/admin/notes/send	worker/index.js	1741	~mailCron
-route	/api/note/*	worker/index.js	1741	—
-route	/api/admin/mail*	worker/index.js	1742	~mailApi
-route	/api/mail/*	worker/index.js	1742	—
-route	/api/study	worker/index.js	1743	~studyApi
-route	/api/english	worker/index.js	1744	—
-route	/api/english/access	worker/index.js	1744	~englishApi
-route	/api/notebook	worker/index.js	1745	~notebookApi
-route	/api/avis	worker/index.js	1746	—
-route	/api/avis/*	worker/index.js	1746	~avisApi
-route	/api/norsk	worker/index.js	1747	—
-route	/api/norsk/access	worker/index.js	1747	—
-route	/api/norsk/tts	worker/index.js	1747	~norskApi
-route	/api/nederlands	worker/index.js	1748	—
-route	/api/nederlands/access	worker/index.js	1748	—
-route	/api/nederlands/tts	worker/index.js	1748	~nederlandsApi
-route	/api/artpill	worker/index.js	1749	—
-route	/api/artpill/*	worker/index.js	1749	~artpillApi
-route	/api/admin/school	worker/index.js	1750	—
-route	/api/admin/school/check	worker/index.js	1750	~schoolApi
-route	/api/school	worker/index.js	1750	—
-route	/api/school/*	worker/index.js	1750	—
-route	/api/about-chat	worker/index.js	1751	—
-route	/api/about-chat/*	worker/index.js	1751	—
-route	/api/admin/about-asks	worker/index.js	1751	~aboutChatApi
-route	POST /api/admin/pause	worker/index.js	1752	→ pauseApi
-route	/api/admin/analytics	worker/index.js	1753	~tableApi
-route	/api/admin/week	worker/index.js	1754	~weekApi
-route	/api/kitchen	worker/index.js	1755	—
-route	/api/kitchen/*	worker/index.js	1755	~kitchenApi
-route	/api/shift	worker/index.js	1756	—
-route	/api/shift/*	worker/index.js	1756	~shiftApi
-route	/api/admin/titos*	worker/index.js	1757	~titosApi
-route	/api/titos*	worker/index.js	1757	—
-route	/api/admin/cards*	worker/index.js	1758	~cardsApi
-route	/api/cards*	worker/index.js	1758	—
-route	/api/admin/challenge*	worker/index.js	1759	~challengeApi
-route	/api/challenge/*	worker/index.js	1759	—
-route	POST /api/admin/translate	worker/index.js	1761	~translateTo
-route	POST /api/dev/migrate	worker/index.js	1772	→ migrateToR2
-route	POST /api/dev/cleanup	worker/index.js	1773	→ cleanupInactive
-route	GET /api/profile	worker/index.js	1775	~doorsOf
-route	POST /api/birdcard	worker/index.js	1795	—
-route	GET /api/birdcard	worker/index.js	1803	—
-route	GET /api/stats	worker/index.js	1812	—
-route	GET /api/flock	worker/index.js	1820	~avatarOf
-route	POST /api/subscribe	worker/index.js	1830	—
-route	POST /api/unsubscribe	worker/index.js	1841	—
-route	POST /api/hit	worker/index.js	1848	→ hit
-route	POST /api/admin/links	worker/index.js	1849	—
-route	POST /api/office/done	worker/index.js	1861	—
-route	POST /api/room	worker/index.js	1866	~roomEvent
-route	POST /api/box0	worker/index.js	1879	~roomItems
-route	POST /api/box0/seen	worker/index.js	1898	—
-route	GET /api/rooms	worker/index.js	1904	~roomOf
-route	GET /api/game	worker/index.js	1914	~gamePrices
-route	POST /api/game/start	worker/index.js	1921	—
-route	POST /api/game/level	worker/index.js	1928	~rainItem
-route	GET /api/potion	worker/index.js	1963	~comboSeason
-route	POST /api/potion/level	worker/index.js	1974	~mazeItems
-route	POST /api/potion/done	worker/index.js	1990	~potDay
-route	POST /api/potion/eye	worker/index.js	2010	—
-route	GET /api/potion/bag	worker/index.js	2022	~hintOk
-route	POST /api/potion/hint	worker/index.js	2028	~hintOk
-route	POST /api/potion/give	worker/index.js	2046	~invOf
-route	POST /api/potion/revive	worker/index.js	2065	~cleanRoom
-route	POST /api/potion/seen	worker/index.js	2080	—
-route	POST /api/potion/brew	worker/index.js	2086	~potionOf
-route	GET /api/requests	worker/index.js	2131	~anonCode
-route	POST /api/requests/tr	worker/index.js	2151	~reqFill
-route	POST /api/requests	worker/index.js	2161	~anonCode
-route	POST /api/requests/like	worker/index.js	2192	~visitor
-route	POST /api/admin/requests/answer	worker/index.js	2206	~reqReward
-route	POST /api/admin/requests/closed	worker/index.js	2223	—
-route	POST /api/admin/requests/hide	worker/index.js	2230	—
-route	GET /api/advent	worker/index.js	2239	~adventNow
-route	POST /api/advent/open	worker/index.js	2248	~adventCollector
-route	POST /api/admin/advent	worker/index.js	2275	~okItem
-route	GET /api/palettes	worker/index.js	2285	~extraQueue
-route	GET /api/extra-palettes.js	worker/index.js	2290	~extraQueue
-route	POST /api/admin/art	worker/index.js	2294	~artEntry
-route	GET /api/sketchbook	worker/index.js	2324	→ sketchCfg
-route	POST /api/admin/sketchbook	worker/index.js	2325	~sketchCfg
-route	POST /api/admin/art/hide	worker/index.js	2333	—
-route	POST /api/admin/art/delete	worker/index.js	2345	~extraQueue
-route	GET /api/admin/users	worker/index.js	2360	~tagColors
-route	POST /api/admin/tag-color	worker/index.js	2369	~tagColors
-route	POST /api/admin/tags	worker/index.js	2379	—
-route	/api/admin/blocks	worker/index.js	2387	—
-route	/api/admin/subscribers	worker/index.js	2411	—
-route	GET /api/flock/find	worker/index.js	2417	—
-route	GET /api/admin/sec	worker/index.js	2427	~secLocked
-route	POST /api/admin/pin/verify	worker/index.js	2432	~pinHash
-route	POST /api/admin/pin/set	worker/index.js	2444	~pinHash
-route	POST /api/admin/recovery/new	worker/index.js	2456	~loadSec
-route	POST /api/recover	worker/index.js	2465	~rcNorm
-route	GET /api/whoami	worker/index.js	2486	~englishOk
-route	GET /api/v2/yt	worker/index.js	2504	—
-route	GET /api/v2/vip	worker/index.js	2512	~guideOut
-route	GET /api/news	worker/index.js	2518	~newsOf
-route	GET /api/news/history	worker/index.js	2519	~newsHistory
-route	GET /api/config	worker/index.js	2520	~mailOn
-route	POST /api/login	worker/index.js	2522	~funnelStep
-route	POST /api/logout	worker/index.js	2547	~sessionCookie
-route	GET /api/today	worker/index.js	2553	→ dayCard
-route	GET /api/me	worker/index.js	2559	~adventAsk
-route	GET /api/shop	worker/index.js	2583	~ensurePrices
-route	GET /api/new	worker/index.js	2589	~catalog
-route	POST /api/shop/buy	worker/index.js	2602	~legMax
-route	POST /api/admin/shop/cats	worker/index.js	2629	~cleanRules
-route	POST /api/admin/shop/reprice	worker/index.js	2637	~gameUnit
-route	POST /api/admin/shop/restock	worker/index.js	2653	~ensurePrices
-route	/api/admin/shop	worker/index.js	2671	~shopRow
-route	POST /api/gift/give	worker/index.js	2690	~cleanRoom
-route	POST /api/gift/sell	worker/index.js	2711	~toShop
-route	POST /api/salary/seen	worker/index.js	2726	—
-route	POST /api/admin/salary	worker/index.js	2732	~audWhere
-route	POST /api/admin/tax	worker/index.js	2746	—
-route	POST /api/admin/buttons-backfill	worker/index.js	2765	~backfillButtons
-route	POST /api/admin/buttons	worker/index.js	2771	—
-route	POST /api/gift	worker/index.js	2783	~avatarOf
-route	POST /api/avatar	worker/index.js	2793	~avatarOf
-route	GET /api/admin/gifts	worker/index.js	2808	—
-route	POST /api/admin/gift-all	worker/index.js	2814	~audWhere
-route	POST /api/admin/gift	worker/index.js	2833	~okItem
-route	GET /api/nick/random	worker/index.js	2845	~freeNick
-route	POST /api/nick	worker/index.js	2846	~welcomeOf
-route	POST /api/upload	worker/index.js	2873	~monthThemeBadges
-route	POST /api/delete-post	worker/index.js	2913	~imgDelete
-route	GET /api/wall	worker/index.js	2923	—
-route	GET /api/top	worker/index.js	2932	~utcToday
-route	GET /api/export	worker/index.js	2965	~artpillExport
-route	POST /api/delete-account	worker/index.js	2978	~artpillDrop
-route	POST /api/admin/pick	worker/index.js	3003	~addBadge
-route	POST /api/admin/shop/autorestock	worker/index.js	3029	~autoRestock
-route	/api/admin/inbox	worker/index.js	3035	—
-route	/api/admin/inbox/seen	worker/index.js	3035	~autopilot
-route	GET /api/admin/autopilot	worker/index.js	3075	~autopilot
-route	/api/admin/rules	worker/index.js	3080	~welcomeCheap
-route	POST /api/admin/ai	worker/index.js	3091	—
-route	POST /api/admin/ban	worker/index.js	3098	—
-route	POST /api/admin/hide	worker/index.js	3098	—
+route	/api/admin/funnels	worker/index.js	1741	~authApi
+route	/api/admin/pw-reset	worker/index.js	1741	—
+route	/api/funnel	worker/index.js	1741	—
+route	/api/pw/*	worker/index.js	1741	—
+route	/api/admin/flock-notes	worker/index.js	1742	~flockNewsApi
+route	/api/flock/news	worker/index.js	1742	—
+route	/api/news-off	worker/index.js	1742	—
+route	/api/admin/wl-holiday	worker/index.js	1743	~wlMailApi
+route	/api/wl-mail*	worker/index.js	1743	—
+route	/api/birds	worker/index.js	1744	—
+route	/api/feather	worker/index.js	1744	~flockApi
+route	/api/feathers	worker/index.js	1744	—
+route	/api/top	worker/index.js	1745	~topApi
+route	/api/pancakes	worker/index.js	1746	—
+route	/api/pancakes/*	worker/index.js	1746	~pancakesApi
+route	/api/train	worker/index.js	1748	—
+route	/api/train/*	worker/index.js	1748	~trainApi
+route	/api/garden	worker/index.js	1751	—
+route	/api/garden/*	worker/index.js	1751	~gardenApi
+route	/api/admin/runes	worker/index.js	1752	~runesApi
+route	/api/admin/tarot	worker/index.js	1753	~tarotApi
+route	/api/admin/polls	worker/index.js	1754	~pollsApi
+route	/api/poll	worker/index.js	1754	—
+route	/api/poll/vote	worker/index.js	1754	—
+route	/api/admin/guides	worker/index.js	1757	—
+route	/api/v2/guides	worker/index.js	1757	—
+route	/api/v2/howto/*	worker/index.js	1757	~guidesApi
+route	/api/v2/seen	worker/index.js	1757	—
+route	/api/admin/ideas	worker/index.js	1758	—
+route	/api/admin/ideas/write	worker/index.js	1758	~ideasApi
+route	/api/admin/notes*	worker/index.js	1759	~notesApi
+route	/api/admin/notes/send	worker/index.js	1759	~mailCron
+route	/api/note/*	worker/index.js	1759	—
+route	/api/admin/mail*	worker/index.js	1760	~mailApi
+route	/api/mail/*	worker/index.js	1760	—
+route	/api/study	worker/index.js	1761	~studyApi
+route	/api/english	worker/index.js	1762	—
+route	/api/english/access	worker/index.js	1762	~englishApi
+route	/api/notebook	worker/index.js	1763	~notebookApi
+route	/api/avis	worker/index.js	1764	—
+route	/api/avis/*	worker/index.js	1764	~avisApi
+route	/api/norsk	worker/index.js	1765	—
+route	/api/norsk/access	worker/index.js	1765	—
+route	/api/norsk/tts	worker/index.js	1765	~norskApi
+route	/api/nederlands	worker/index.js	1766	—
+route	/api/nederlands/access	worker/index.js	1766	—
+route	/api/nederlands/tts	worker/index.js	1766	~nederlandsApi
+route	/api/artpill	worker/index.js	1767	—
+route	/api/artpill/*	worker/index.js	1767	~artpillApi
+route	/api/admin/school	worker/index.js	1768	—
+route	/api/admin/school/check	worker/index.js	1768	~schoolApi
+route	/api/school	worker/index.js	1768	—
+route	/api/school/*	worker/index.js	1768	—
+route	/api/about-chat	worker/index.js	1769	—
+route	/api/about-chat/*	worker/index.js	1769	—
+route	/api/admin/about-asks	worker/index.js	1769	~aboutChatApi
+route	POST /api/admin/pause	worker/index.js	1770	→ pauseApi
+route	/api/admin/analytics	worker/index.js	1771	~tableApi
+route	/api/admin/week	worker/index.js	1772	~weekApi
+route	/api/kitchen	worker/index.js	1773	—
+route	/api/kitchen/*	worker/index.js	1773	~kitchenApi
+route	/api/shift	worker/index.js	1774	—
+route	/api/shift/*	worker/index.js	1774	~shiftApi
+route	/api/admin/titos*	worker/index.js	1775	~titosApi
+route	/api/titos*	worker/index.js	1775	—
+route	/api/admin/cards*	worker/index.js	1776	~cardsApi
+route	/api/cards*	worker/index.js	1776	—
+route	/api/admin/challenge*	worker/index.js	1777	~challengeApi
+route	/api/challenge/*	worker/index.js	1777	—
+route	POST /api/admin/translate	worker/index.js	1779	~translateTo
+route	POST /api/dev/migrate	worker/index.js	1790	→ migrateToR2
+route	POST /api/dev/cleanup	worker/index.js	1791	→ cleanupInactive
+route	GET /api/profile	worker/index.js	1793	~doorsOf
+route	POST /api/birdcard	worker/index.js	1813	—
+route	GET /api/birdcard	worker/index.js	1821	—
+route	GET /api/stats	worker/index.js	1830	—
+route	GET /api/flock	worker/index.js	1838	~avatarOf
+route	POST /api/subscribe	worker/index.js	1848	—
+route	POST /api/unsubscribe	worker/index.js	1859	—
+route	POST /api/hit	worker/index.js	1866	→ hit
+route	POST /api/admin/links	worker/index.js	1867	—
+route	POST /api/office/done	worker/index.js	1879	—
+route	POST /api/room	worker/index.js	1884	~roomEvent
+route	POST /api/box0	worker/index.js	1897	~roomItems
+route	POST /api/box0/seen	worker/index.js	1916	—
+route	GET /api/rooms	worker/index.js	1922	~roomOf
+route	GET /api/game	worker/index.js	1932	~gamePrices
+route	POST /api/game/start	worker/index.js	1939	—
+route	POST /api/game/level	worker/index.js	1946	~rainItem
+route	GET /api/potion	worker/index.js	1981	~comboSeason
+route	POST /api/potion/level	worker/index.js	1992	~mazeItems
+route	POST /api/potion/done	worker/index.js	2008	~potDay
+route	POST /api/potion/eye	worker/index.js	2028	—
+route	GET /api/potion/bag	worker/index.js	2040	~hintOk
+route	POST /api/potion/hint	worker/index.js	2046	~hintOk
+route	POST /api/potion/give	worker/index.js	2064	~invOf
+route	POST /api/potion/revive	worker/index.js	2083	~cleanRoom
+route	POST /api/potion/seen	worker/index.js	2098	—
+route	POST /api/potion/brew	worker/index.js	2104	~potionOf
+route	GET /api/requests	worker/index.js	2149	~anonCode
+route	POST /api/requests/tr	worker/index.js	2169	~reqFill
+route	POST /api/requests	worker/index.js	2179	~anonCode
+route	POST /api/requests/like	worker/index.js	2210	~visitor
+route	POST /api/admin/requests/answer	worker/index.js	2224	~reqReward
+route	POST /api/admin/requests/closed	worker/index.js	2241	—
+route	POST /api/admin/requests/hide	worker/index.js	2248	—
+route	GET /api/advent	worker/index.js	2257	~adminIdentity
+route	POST /api/advent/open	worker/index.js	2266	~legMax
+route	POST /api/admin/advent	worker/index.js	2300	~okFile
+route	POST /api/admin/advent/file	worker/index.js	2312	—
+route	GET /api/palettes	worker/index.js	2343	~extraQueue
+route	GET /api/extra-palettes.js	worker/index.js	2348	~extraQueue
+route	POST /api/admin/art	worker/index.js	2352	~artEntry
+route	GET /api/sketchbook	worker/index.js	2382	→ sketchCfg
+route	POST /api/admin/sketchbook	worker/index.js	2383	~sketchCfg
+route	POST /api/admin/art/hide	worker/index.js	2391	—
+route	POST /api/admin/art/delete	worker/index.js	2403	~extraQueue
+route	GET /api/admin/users	worker/index.js	2418	~tagColors
+route	POST /api/admin/tag-color	worker/index.js	2427	~tagColors
+route	POST /api/admin/tags	worker/index.js	2437	—
+route	/api/admin/blocks	worker/index.js	2445	—
+route	/api/admin/subscribers	worker/index.js	2469	—
+route	GET /api/flock/find	worker/index.js	2475	—
+route	GET /api/admin/sec	worker/index.js	2485	~secLocked
+route	POST /api/admin/pin/verify	worker/index.js	2490	~pinHash
+route	POST /api/admin/pin/set	worker/index.js	2502	~pinHash
+route	POST /api/admin/recovery/new	worker/index.js	2514	~loadSec
+route	POST /api/recover	worker/index.js	2523	~rcNorm
+route	GET /api/whoami	worker/index.js	2544	~englishOk
+route	GET /api/v2/yt	worker/index.js	2562	—
+route	GET /api/v2/vip	worker/index.js	2570	~guideOut
+route	GET /api/news	worker/index.js	2576	~newsOf
+route	GET /api/news/history	worker/index.js	2577	~newsHistory
+route	GET /api/config	worker/index.js	2578	~mailOn
+route	POST /api/login	worker/index.js	2580	~funnelStep
+route	POST /api/logout	worker/index.js	2605	~sessionCookie
+route	GET /api/today	worker/index.js	2611	→ dayCard
+route	GET /api/me	worker/index.js	2617	~adventAsk
+route	GET /api/shop	worker/index.js	2641	~ensurePrices
+route	GET /api/new	worker/index.js	2647	~catalog
+route	POST /api/shop/buy	worker/index.js	2660	~legMax
+route	POST /api/admin/shop/cats	worker/index.js	2687	~cleanRules
+route	POST /api/admin/shop/reprice	worker/index.js	2695	~gameUnit
+route	POST /api/admin/shop/restock	worker/index.js	2711	~ensurePrices
+route	/api/admin/shop	worker/index.js	2729	~shopRow
+route	POST /api/gift/give	worker/index.js	2748	~cleanRoom
+route	POST /api/gift/sell	worker/index.js	2769	~toShop
+route	POST /api/salary/seen	worker/index.js	2784	—
+route	POST /api/admin/salary	worker/index.js	2790	~audWhere
+route	POST /api/admin/tax	worker/index.js	2804	—
+route	POST /api/admin/buttons-backfill	worker/index.js	2823	~backfillButtons
+route	POST /api/admin/buttons	worker/index.js	2829	—
+route	POST /api/gift	worker/index.js	2841	~avatarOf
+route	POST /api/avatar	worker/index.js	2851	~avatarOf
+route	GET /api/admin/gifts	worker/index.js	2866	—
+route	POST /api/admin/gift-all	worker/index.js	2872	~audWhere
+route	POST /api/admin/gift	worker/index.js	2891	~okItem
+route	GET /api/nick/random	worker/index.js	2903	~freeNick
+route	POST /api/nick	worker/index.js	2904	~welcomeOf
+route	POST /api/upload	worker/index.js	2931	~monthThemeBadges
+route	POST /api/delete-post	worker/index.js	2971	~imgDelete
+route	GET /api/wall	worker/index.js	2981	—
+route	GET /api/top	worker/index.js	2990	~utcToday
+route	GET /api/export	worker/index.js	3023	~artpillExport
+route	POST /api/delete-account	worker/index.js	3036	~artpillDrop
+route	POST /api/admin/pick	worker/index.js	3061	~addBadge
+route	POST /api/admin/shop/autorestock	worker/index.js	3087	~autoRestock
+route	/api/admin/inbox	worker/index.js	3093	—
+route	/api/admin/inbox/seen	worker/index.js	3093	~autopilot
+route	GET /api/admin/autopilot	worker/index.js	3133	~autopilot
+route	/api/admin/rules	worker/index.js	3138	~welcomeCheap
+route	POST /api/admin/ai	worker/index.js	3149	—
+route	POST /api/admin/ban	worker/index.js	3156	—
+route	POST /api/admin/hide	worker/index.js	3156	—
 tbl	about_chat	docs/db.md	9	worker/about-chat.js
 tbl	about_asks	docs/db.md	10	worker/about-chat.js
 tbl	reads	docs/db.md	11	worker/analytics.js
@@ -807,60 +820,60 @@ sym	CONTENT	build.py	17	const
 sym	OUT	build.py	18	const
 sym	SITE_URL	build.py	19	const
 sym	PAGES	build.py	22	const
-sym	UNLISTED	build.py	107	const
-sym	EDIT_KEY	build.py	112	const
-sym	NOINDEX	build.py	113	const
-sym	V2_HOME	build.py	115	const
-sym	V2_URLS	build.py	118	const
-sym	v2_urls	build.py	122	fn
-sym	v2_page	build.py	129	fn
-sym	PORTFOLIO	build.py	138	const
-sym	SOCIAL	build.py	149	const
-sym	SECTIONS	build.py	159	const
-sym	SECTION_HUB	build.py	184	const
-sym	TAB_ALIAS	build.py	186	const
-sym	CRUMB_ONLY	build.py	188	const
-sym	MENU_HIDE	build.py	192	const
-sym	NAV	build.py	193	const
-sym	SEASONAL	build.py	201	const
-sym	section_of	build.py	204	fn
-sym	section_tabs	build.py	215	fn
-sym	href	build.py	229	fn
-sym	nav_link	build.py	236	fn
-sym	nav_subs	build.py	243	fn
-sym	nav_html	build.py	247	fn
-sym	footer_html	build.py	272	fn
-sym	GALLERY_LABELS	build.py	283	const
-sym	POLLY_ROWS	build.py	292	const
-sym	POLLY_COL	build.py	295	const
-sym	POLLY_SVG	build.py	296	const
-sym	wall_html	build.py	301	fn
-sym	gallery_html	build.py	319	fn
-sym	SK_T	build.py	340	const
-sym	sketchbook_html	build.py	345	fn
-sym	bust	build.py	373	fn
-sym	ebooks_html	build.py	386	fn
-sym	scope_css	build.py	402	fn
-sym	block_html	build.py	431	fn
-sym	mark_editable	build.py	438	fn
-sym	projects_html	build.py	449	fn
-sym	cv_html	build.py	509	fn
-sym	LANGS	build.py	537	const
-sym	localize	build.py	540	fn
-sym	lang_bits	build.py	552	fn
-sym	OG_LOCALE	build.py	564	const
-sym	og_meta	build.py	567	fn
-sym	LANG_NAMES	build.py	585	const
-sym	lang_dd	build.py	588	fn
-sym	wobbleland_data	build.py	595	fn
-sym	rooms_data	build.py	626	fn
-sym	search_entry	build.py	632	fn
-sym	titos_cases	build.py	648	fn
-sym	about_chat	build.py	691	fn
-sym	v2_shelf	build.py	698	fn
-sym	v2_books	build.py	714	fn
-sym	site_version	build.py	731	fn
-sym	build	build.py	756	fn
+sym	UNLISTED	build.py	109	const
+sym	EDIT_KEY	build.py	114	const
+sym	NOINDEX	build.py	115	const
+sym	V2_HOME	build.py	117	const
+sym	V2_URLS	build.py	120	const
+sym	v2_urls	build.py	124	fn
+sym	v2_page	build.py	131	fn
+sym	PORTFOLIO	build.py	140	const
+sym	SOCIAL	build.py	151	const
+sym	SECTIONS	build.py	161	const
+sym	SECTION_HUB	build.py	187	const
+sym	TAB_ALIAS	build.py	189	const
+sym	CRUMB_ONLY	build.py	191	const
+sym	MENU_HIDE	build.py	195	const
+sym	NAV	build.py	196	const
+sym	SEASONAL	build.py	204	const
+sym	section_of	build.py	207	fn
+sym	section_tabs	build.py	218	fn
+sym	href	build.py	232	fn
+sym	nav_link	build.py	239	fn
+sym	nav_subs	build.py	246	fn
+sym	nav_html	build.py	250	fn
+sym	footer_html	build.py	275	fn
+sym	GALLERY_LABELS	build.py	286	const
+sym	POLLY_ROWS	build.py	295	const
+sym	POLLY_COL	build.py	298	const
+sym	POLLY_SVG	build.py	299	const
+sym	wall_html	build.py	304	fn
+sym	gallery_html	build.py	322	fn
+sym	SK_T	build.py	343	const
+sym	sketchbook_html	build.py	348	fn
+sym	bust	build.py	376	fn
+sym	ebooks_html	build.py	389	fn
+sym	scope_css	build.py	405	fn
+sym	block_html	build.py	434	fn
+sym	mark_editable	build.py	441	fn
+sym	projects_html	build.py	452	fn
+sym	cv_html	build.py	512	fn
+sym	LANGS	build.py	540	const
+sym	localize	build.py	543	fn
+sym	lang_bits	build.py	555	fn
+sym	OG_LOCALE	build.py	567	const
+sym	og_meta	build.py	570	fn
+sym	LANG_NAMES	build.py	588	const
+sym	lang_dd	build.py	591	fn
+sym	wobbleland_data	build.py	598	fn
+sym	rooms_data	build.py	629	fn
+sym	search_entry	build.py	635	fn
+sym	titos_cases	build.py	651	fn
+sym	about_chat	build.py	694	fn
+sym	v2_shelf	build.py	701	fn
+sym	v2_books	build.py	717	fn
+sym	site_version	build.py	734	fn
+sym	build	build.py	759	fn
 sym	esc	content/english/engine.js	6	const
 sym	fmt	content/english/engine.js	7	const
 sym	shuffle	content/english/engine.js	8	const
@@ -1728,129 +1741,156 @@ sym	err	site/assets/admin.js	18	const
 sym	ADMIN_GROUPS	site/assets/admin.js	24	const
 sym	rulesBox	site/assets/admin.js	25	const
 sym	ADMIN_SECTIONS	site/assets/admin.js	26	const
-sym	SECTIONS	site/assets/admin.js	69	const
-sym	secOf	site/assets/admin.js	84	const
-sym	nav	site/assets/admin.js	85	const
-sym	inGroup	site/assets/admin.js	87	const
-sym	cnt	site/assets/admin.js	88	const
-sym	tabLink	site/assets/admin.js	91	const
-sym	FREQ_KEY	site/assets/admin.js	93	const
-sym	freqGet	site/assets/admin.js	94	const
-sym	freqAdd	site/assets/admin.js	96	const
-sym	freqBar	site/assets/admin.js	97	const
-sym	route	site/assets/admin.js	101	fn
-sym	FOLD	site/assets/admin.js	126	const
-sym	foldLong	site/assets/admin.js	127	fn
-sym	foldT	site/assets/admin.js	139	const
-sym	inboxData	site/assets/admin.js	143	const
-sym	badges	site/assets/admin.js	146	fn
-sym	counts	site/assets/admin.js	151	const
-sym	plural	site/assets/admin.js	152	const
-sym	dm	site/assets/admin.js	153	const
-sym	inboxItems	site/assets/admin.js	154	fn
-sym	inbox	site/assets/admin.js	167	fn
-sym	isoWeek	site/assets/admin.js	179	const
-sym	hello	site/assets/admin.js	181	const
-sym	wkDay	site/assets/admin.js	183	const
-sym	wkDelta	site/assets/admin.js	185	const
-sym	week	site/assets/admin.js	190	fn
-sym	recoverForm	site/assets/admin.js	245	fn
-sym	wireRecover	site/assets/admin.js	250	fn
-sym	pinForm	site/assets/admin.js	256	fn
-sym	wirePin	site/assets/admin.js	261	fn
-sym	security	site/assets/admin.js	268	fn
-sym	autoCard	site/assets/admin.js	303	const
-sym	art	site/assets/admin.js	308	fn
-sym	cFilter	site/assets/admin.js	321	const
-sym	comments	site/assets/admin.js	322	fn
-sym	SRC_IC	site/assets/admin.js	365	const
-sym	DEV_IC	site/assets/admin.js	367	const
-sym	regionName	site/assets/admin.js	368	const
-sym	flag	site/assets/admin.js	370	const
-sym	pageName	site/assets/admin.js	371	const
-sym	utmUrl	site/assets/admin.js	372	const
-sym	pct	site/assets/admin.js	373	const
-sym	delta	site/assets/admin.js	374	const
-sym	mmss	site/assets/admin.js	375	const
-sym	bars	site/assets/admin.js	377	const
-sym	RIGA	site/assets/admin.js	379	const
-sym	dAdd	site/assets/admin.js	380	const
-sym	dLoc	site/assets/admin.js	381	const
-sym	dOne	site/assets/admin.js	382	const
-sym	dShort	site/assets/admin.js	383	const
-sym	AN_KEY	site/assets/admin.js	384	const
-sym	AN_BY	site/assets/admin.js	385	const
-sym	AN_CMP	site/assets/admin.js	386	const
-sym	AN_PRE	site/assets/admin.js	387	const
-sym	anState	site/assets/admin.js	390	fn
-sym	anSave	site/assets/admin.js	396	const
-sym	anRange	site/assets/admin.js	397	fn
-sym	anQuery	site/assets/admin.js	409	fn
-sym	anHash	site/assets/admin.js	416	fn
-sym	anSync	site/assets/admin.js	423	fn
-sym	anParse	site/assets/admin.js	424	fn
-sym	anGo	site/assets/admin.js	434	const
-sym	anBar	site/assets/admin.js	437	fn
-sym	anWire	site/assets/admin.js	470	fn
-sym	anText	site/assets/admin.js	511	const
-sym	anVal	site/assets/admin.js	518	const
-sym	anCols	site/assets/admin.js	521	fn
-sym	anRows	site/assets/admin.js	529	fn
-sym	anCell	site/assets/admin.js	539	fn
-sym	anName	site/assets/admin.js	547	const
-sym	anDetail	site/assets/admin.js	561	fn
-sym	analytics	site/assets/admin.js	574	fn
-sym	anRender	site/assets/admin.js	581	fn
-sym	anCsv	site/assets/admin.js	618	fn
-sym	anLinksWire	site/assets/admin.js	631	fn
-sym	funnels	site/assets/admin.js	658	fn
-sym	funnelsScreen	site/assets/admin.js	674	fn
-sym	titos	site/assets/admin.js	683	fn
-sym	edits	site/assets/admin.js	696	fn
-sym	notes	site/assets/admin.js	714	fn
-sym	advent	site/assets/admin.js	742	fn
-sym	BADGE_RU	site/assets/admin.js	749	const
-sym	LEVEL_RU	site/assets/admin.js	752	const
-sym	BADGE_COND	site/assets/admin.js	754	const
-sym	BADGE_FIXED	site/assets/admin.js	768	const
-sym	rules	site/assets/admin.js	769	fn
-sym	taxDialog	site/assets/admin.js	1026	fn
-sym	PPGiftDialog	site/assets/admin.js	1061	win
-sym	giftDialog	site/assets/admin.js	1062	fn
-sym	PR	site/assets/admin.js	1183	const
-sym	effPrice	site/assets/admin.js	1184	const
-sym	sFilter	site/assets/admin.js	1185	const
-sym	shop	site/assets/admin.js	1186	fn
-sym	bSort	site/assets/admin.js	1323	const
-sym	bPick	site/assets/admin.js	1324	const
-sym	sendDialog	site/assets/admin.js	1326	const
-sym	pickLabel	site/assets/admin.js	1336	const
-sym	birds	site/assets/admin.js	1337	fn
-sym	subscribers	site/assets/admin.js	1462	fn
-sym	backupBox	site/assets/admin.js	1487	const
-sym	wireBackup	site/assets/admin.js	1493	fn
-sym	backup	site/assets/admin.js	1499	fn
-sym	ADV_SP	site/assets/advent-admin.js	16	const
-sym	advKey	site/assets/advent-admin.js	17	const
-sym	advDays	site/assets/advent-admin.js	18	fn
-sym	advSet	site/assets/advent-admin.js	19	fn
-sym	advPick	site/assets/advent-admin.js	24	fn
-sym	advBoard	site/assets/advent-admin.js	48	fn
-sym	dayState	site/assets/advent-admin.js	70	const
-sym	advDayPick	site/assets/advent-admin.js	71	fn
-sym	PPAdventAdmin	site/assets/advent-admin.js	94	win
-sym	app	site/assets/advent.js	5	const
-sym	esc	site/assets/advent.js	35	const
-sym	ORDER	site/assets/advent.js	39	const
-sym	load	site/assets/advent.js	41	fn
-sym	countdown	site/assets/advent.js	50	fn
-sym	draw	site/assets/advent.js	59	fn
-sym	goTo	site/assets/advent.js	88	fn
-sym	prize	site/assets/advent.js	95	fn
-sym	tap	site/assets/advent.js	101	fn
-sym	toast	site/assets/advent.js	112	const
-sym	showPast	site/assets/advent.js	114	fn
-sym	show	site/assets/advent.js	125	fn
+sym	SECTIONS	site/assets/admin.js	71	const
+sym	secOf	site/assets/admin.js	86	const
+sym	nav	site/assets/admin.js	87	const
+sym	inGroup	site/assets/admin.js	89	const
+sym	cnt	site/assets/admin.js	90	const
+sym	tabLink	site/assets/admin.js	93	const
+sym	FREQ_KEY	site/assets/admin.js	95	const
+sym	freqGet	site/assets/admin.js	96	const
+sym	freqAdd	site/assets/admin.js	98	const
+sym	freqBar	site/assets/admin.js	99	const
+sym	route	site/assets/admin.js	103	fn
+sym	FOLD	site/assets/admin.js	128	const
+sym	foldLong	site/assets/admin.js	129	fn
+sym	foldT	site/assets/admin.js	141	const
+sym	inboxData	site/assets/admin.js	145	const
+sym	badges	site/assets/admin.js	148	fn
+sym	counts	site/assets/admin.js	153	const
+sym	plural	site/assets/admin.js	154	const
+sym	dm	site/assets/admin.js	155	const
+sym	inboxItems	site/assets/admin.js	156	fn
+sym	inbox	site/assets/admin.js	169	fn
+sym	isoWeek	site/assets/admin.js	181	const
+sym	hello	site/assets/admin.js	183	const
+sym	wkDay	site/assets/admin.js	185	const
+sym	wkDelta	site/assets/admin.js	187	const
+sym	week	site/assets/admin.js	192	fn
+sym	recoverForm	site/assets/admin.js	247	fn
+sym	wireRecover	site/assets/admin.js	252	fn
+sym	pinForm	site/assets/admin.js	258	fn
+sym	wirePin	site/assets/admin.js	263	fn
+sym	security	site/assets/admin.js	270	fn
+sym	autoCard	site/assets/admin.js	305	const
+sym	art	site/assets/admin.js	310	fn
+sym	cFilter	site/assets/admin.js	323	const
+sym	comments	site/assets/admin.js	324	fn
+sym	SRC_IC	site/assets/admin.js	367	const
+sym	DEV_IC	site/assets/admin.js	369	const
+sym	regionName	site/assets/admin.js	370	const
+sym	flag	site/assets/admin.js	372	const
+sym	pageName	site/assets/admin.js	373	const
+sym	utmUrl	site/assets/admin.js	374	const
+sym	pct	site/assets/admin.js	375	const
+sym	delta	site/assets/admin.js	376	const
+sym	mmss	site/assets/admin.js	377	const
+sym	bars	site/assets/admin.js	379	const
+sym	RIGA	site/assets/admin.js	381	const
+sym	dAdd	site/assets/admin.js	382	const
+sym	dLoc	site/assets/admin.js	383	const
+sym	dOne	site/assets/admin.js	384	const
+sym	dShort	site/assets/admin.js	385	const
+sym	AN_KEY	site/assets/admin.js	386	const
+sym	AN_BY	site/assets/admin.js	387	const
+sym	AN_CMP	site/assets/admin.js	388	const
+sym	AN_PRE	site/assets/admin.js	389	const
+sym	anState	site/assets/admin.js	392	fn
+sym	anSave	site/assets/admin.js	398	const
+sym	anRange	site/assets/admin.js	399	fn
+sym	anQuery	site/assets/admin.js	411	fn
+sym	anHash	site/assets/admin.js	418	fn
+sym	anSync	site/assets/admin.js	425	fn
+sym	anParse	site/assets/admin.js	426	fn
+sym	anGo	site/assets/admin.js	436	const
+sym	anBar	site/assets/admin.js	439	fn
+sym	anWire	site/assets/admin.js	472	fn
+sym	anText	site/assets/admin.js	513	const
+sym	anVal	site/assets/admin.js	520	const
+sym	anCols	site/assets/admin.js	523	fn
+sym	anRows	site/assets/admin.js	531	fn
+sym	anCell	site/assets/admin.js	541	fn
+sym	anName	site/assets/admin.js	549	const
+sym	anDetail	site/assets/admin.js	563	fn
+sym	analytics	site/assets/admin.js	576	fn
+sym	anRender	site/assets/admin.js	583	fn
+sym	anCsv	site/assets/admin.js	620	fn
+sym	anLinksWire	site/assets/admin.js	633	fn
+sym	funnels	site/assets/admin.js	660	fn
+sym	funnelsScreen	site/assets/admin.js	676	fn
+sym	titos	site/assets/admin.js	685	fn
+sym	edits	site/assets/admin.js	698	fn
+sym	promptsScreen	site/assets/admin.js	716	fn
+sym	notes	site/assets/admin.js	746	fn
+sym	advent	site/assets/admin.js	774	fn
+sym	BADGE_RU	site/assets/admin.js	781	const
+sym	LEVEL_RU	site/assets/admin.js	784	const
+sym	BADGE_COND	site/assets/admin.js	786	const
+sym	BADGE_FIXED	site/assets/admin.js	800	const
+sym	rules	site/assets/admin.js	801	fn
+sym	taxDialog	site/assets/admin.js	1058	fn
+sym	PPGiftDialog	site/assets/admin.js	1093	win
+sym	giftDialog	site/assets/admin.js	1094	fn
+sym	PR	site/assets/admin.js	1215	const
+sym	effPrice	site/assets/admin.js	1216	const
+sym	sFilter	site/assets/admin.js	1217	const
+sym	shop	site/assets/admin.js	1218	fn
+sym	bSort	site/assets/admin.js	1355	const
+sym	bPick	site/assets/admin.js	1356	const
+sym	sendDialog	site/assets/admin.js	1358	const
+sym	pickLabel	site/assets/admin.js	1368	const
+sym	birds	site/assets/admin.js	1369	fn
+sym	subscribers	site/assets/admin.js	1494	fn
+sym	backupBox	site/assets/admin.js	1519	const
+sym	wireBackup	site/assets/admin.js	1525	fn
+sym	backup	site/assets/admin.js	1531	fn
+sym	ADV_SP	site/assets/advent-admin.js	29	const
+sym	FILE_MAX	site/assets/advent-admin.js	30	const
+sym	advSet	site/assets/advent-admin.js	31	fn
+sym	fileOf	site/assets/advent-admin.js	36	fn
+sym	extOf	site/assets/advent-admin.js	37	fn
+sym	aday	site/assets/advent-admin.js	38	fn
+sym	gname	site/assets/advent-admin.js	39	fn
+sym	kb	site/assets/advent-admin.js	40	const
+sym	fthumb	site/assets/advent-admin.js	42	fn
+sym	errText	site/assets/advent-admin.js	48	fn
+sym	delFile	site/assets/advent-admin.js	53	fn
+sym	advBoard	site/assets/advent-admin.js	59	fn
+sym	dayState	site/assets/advent-admin.js	90	const
+sym	advDayPick	site/assets/advent-admin.js	91	fn
+sym	PPAdventAdmin	site/assets/advent-admin.js	227	win
+sym	app	site/assets/advent.js	3	const
+sym	LATE	site/assets/advent.js	24	const
+sym	HOUSES	site/assets/advent.js	27	const
+sym	FIR	site/assets/advent.js	35	const
+sym	ROOSTER	site/assets/advent.js	36	const
+sym	esc	site/assets/advent.js	38	const
+sym	load	site/assets/advent.js	40	fn
+sym	build	site/assets/advent.js	46	fn
+sym	claimable	site/assets/advent.js	51	const
+sym	stateOf	site/assets/advent.js	52	fn
+sym	isFile	site/assets/advent.js	58	const
+sym	fileOf	site/assets/advent.js	59	fn
+sym	extOf	site/assets/advent.js	60	const
+sym	itemsOf	site/assets/advent.js	61	fn
+sym	win	site/assets/advent.js	73	fn
+sym	chimney	site/assets/advent.js	86	const
+sym	roofSvg	site/assets/advent.js	87	fn
+sym	house	site/assets/advent.js	93	fn
+sym	garland	site/assets/advent.js	113	fn
+sym	drawBelow	site/assets/advent.js	130	fn
+sym	draw	site/assets/advent.js	151	fn
+sym	fit	site/assets/advent.js	156	fn
+sym	modal	site/assets/advent.js	166	const
+sym	show	site/assets/advent.js	167	fn
+sym	MON	site/assets/advent.js	172	const
+sym	kick	site/assets/advent.js	173	const
+sym	fileCard	site/assets/advent.js	174	fn
+sym	giftRow	site/assets/advent.js	178	fn
+sym	inside	site/assets/advent.js	181	fn
+sym	openDay	site/assets/advent.js	191	fn
+sym	st	site/assets/advent.js	221	const
+sym	sn	site/assets/advent.js	223	const
 sym	FIRST	site/assets/artpill-claude.js	3	const
 sym	SECOND	site/assets/artpill-claude.js	129	const
 sym	THIRD	site/assets/artpill-claude.js	157	const
@@ -2735,35 +2775,36 @@ sym	pre	site/assets/ink-course.js	11	const
 sym	KEY	site/assets/ink-course.js	12	const
 sym	esc	site/assets/ink-course.js	13	const
 sym	PLAN	site/assets/ink-course.js	15	const
-sym	ICONS	site/assets/ink-course.js	83	const
-sym	polly	site/assets/ink-course.js	84	const
-sym	st	site/assets/ink-course.js	87	const
-sym	save	site/assets/ink-course.js	90	const
-sym	srv	site/assets/ink-course.js	91	const
-sym	LS	site/assets/ink-course.js	92	const
-sym	mode	site/assets/ink-course.js	93	const
-sym	has	site/assets/ink-course.js	94	const
-sym	isOpen	site/assets/ink-course.js	95	const
-sym	stamps	site/assets/ink-course.js	96	const
-sym	passed	site/assets/ink-course.js	97	const
-sym	guest	site/assets/ink-course.js	100	const
-sym	bookLink	site/assets/ink-course.js	106	const
-sym	mark	site/assets/ink-course.js	109	const
-sym	path	site/assets/ink-course.js	110	const
-sym	testView	site/assets/ink-course.js	116	const
-sym	order	site/assets/ink-course.js	133	const
-sym	verdict	site/assets/ink-course.js	135	const
-sym	practice	site/assets/ink-course.js	140	const
-sym	lessonView	site/assets/ink-course.js	150	const
-sym	dipOpts	site/assets/ink-course.js	170	const
-sym	diplomaView	site/assets/ink-course.js	171	const
-sym	render	site/assets/ink-course.js	177	const
-sym	fixCur	site/assets/ink-course.js	184	const
-sym	open	site/assets/ink-course.js	185	const
-sym	load	site/assets/ink-course.js	187	const
-sym	reload	site/assets/ink-course.js	196	const
-sym	jpeg	site/assets/ink-course.js	226	const
-sym	send	site/assets/ink-course.js	227	fn
+sym	ICONS	site/assets/ink-course.js	86	const
+sym	polly	site/assets/ink-course.js	87	const
+sym	st	site/assets/ink-course.js	90	const
+sym	save	site/assets/ink-course.js	93	const
+sym	srv	site/assets/ink-course.js	94	const
+sym	LS	site/assets/ink-course.js	95	const
+sym	mode	site/assets/ink-course.js	96	const
+sym	has	site/assets/ink-course.js	97	const
+sym	isOpen	site/assets/ink-course.js	98	const
+sym	stamps	site/assets/ink-course.js	99	const
+sym	passed	site/assets/ink-course.js	100	const
+sym	closed	site/assets/ink-course.js	103	const
+sym	guest	site/assets/ink-course.js	109	const
+sym	bookLink	site/assets/ink-course.js	115	const
+sym	mark	site/assets/ink-course.js	118	const
+sym	path	site/assets/ink-course.js	119	const
+sym	testView	site/assets/ink-course.js	125	const
+sym	order	site/assets/ink-course.js	142	const
+sym	verdict	site/assets/ink-course.js	144	const
+sym	practice	site/assets/ink-course.js	149	const
+sym	lessonView	site/assets/ink-course.js	159	const
+sym	dipOpts	site/assets/ink-course.js	179	const
+sym	diplomaView	site/assets/ink-course.js	180	const
+sym	render	site/assets/ink-course.js	186	const
+sym	fixCur	site/assets/ink-course.js	194	const
+sym	open	site/assets/ink-course.js	195	const
+sym	load	site/assets/ink-course.js	197	const
+sym	reload	site/assets/ink-course.js	207	const
+sym	jpeg	site/assets/ink-course.js	237	const
+sym	send	site/assets/ink-course.js	238	fn
 sym	CAT	site/assets/mail-admin.js	4	const
 sym	ST	site/assets/mail-admin.js	5	const
 sym	esc	site/assets/mail-admin.js	6	const
@@ -3229,6 +3270,27 @@ sym	brew	site/assets/potions.js	490	fn
 sym	giveIng	site/assets/potions.js	516	fn
 sym	incoming	site/assets/potions.js	532	fn
 sym	drawBook	site/assets/potions.js	539	fn
+sym	LI	site/assets/prompts.js	6	const
+sym	now	site/assets/prompts.js	7	const
+sym	first	site/assets/prompts.js	8	const
+sym	last	site/assets/prompts.js	9	const
+sym	days	site/assets/prompts.js	10	const
+sym	cur	site/assets/prompts.js	11	const
+sym	mEl	site/assets/prompts.js	12	const
+sym	prev	site/assets/prompts.js	13	const
+sym	next	site/assets/prompts.js	14	const
+sym	pr	site/assets/prompts.js	15	const
+sym	save	site/assets/prompts.js	16	const
+sym	shift	site/assets/prompts.js	18	fn
+sym	ym	site/assets/prompts.js	19	fn
+sym	before	site/assets/prompts.js	20	fn
+sym	label	site/assets/prompts.js	21	fn
+sym	esc	site/assets/prompts.js	28	fn
+sym	draw	site/assets/prompts.js	30	fn
+sym	load	site/assets/prompts.js	40	fn
+sym	wrap	site/assets/prompts.js	55	fn
+sym	makeImage	site/assets/prompts.js	67	fn
+sym	download	site/assets/prompts.js	93	fn
 sym	COMMON	site/assets/pw-rules.js	4	const
 sym	norm	site/assets/pw-rules.js	13	const
 sym	check	site/assets/pw-rules.js	14	fn
@@ -4444,6 +4506,38 @@ sym	fileUrl	tools/og_cards.js	181	const
 sym	ACC	tools/og_cards.js	184	const
 sym	NOTE	tools/og_cards.js	185	const
 sym	html	tools/og_cards.js	186	fn
+sym	HERE	tools/ornaments/make.py	6	const
+sym	beanie	tools/ornaments/make.py	17	fn
+sym	antlers	tools/ornaments/make.py	22	fn
+sym	scarf_g	tools/ornaments/make.py	27	fn
+sym	bell	tools/ornaments/make.py	31	fn
+sym	SANTA	tools/ornaments/make.py	33	const
+sym	polly	tools/ornaments/make.py	35	fn
+sym	pix	tools/ornaments/make.py	51	fn
+sym	snowflake	tools/ornaments/make.py	53	fn
+sym	star	tools/ornaments/make.py	54	fn
+sym	gloss	tools/ornaments/make.py	55	fn
+sym	cut	tools/ornaments/make.py	58	fn
+sym	fold	tools/ornaments/make.py	59	fn
+sym	hole	tools/ornaments/make.py	60	fn
+sym	BALL_COLS	tools/ornaments/make.py	64	const
+sym	BACKS	tools/ornaments/make.py	65	const
+sym	ball_front	tools/ornaments/make.py	67	fn
+sym	ball_back	tools/ornaments/make.py	84	fn
+sym	ball_piece	tools/ornaments/make.py	99	fn
+sym	sheet_ball	tools/ornaments/make.py	110	fn
+sym	flag	tools/ornaments/make.py	115	fn
+sym	sheet_garland	tools/ornaments/make.py	146	fn
+sym	disc_face	tools/ornaments/make.py	156	fn
+sym	disc_pair	tools/ornaments/make.py	171	fn
+sym	sheet_star3d	tools/ornaments/make.py	192	fn
+sym	CSS	tools/ornaments/make.py	196	const
+sym	FONTS	tools/ornaments/make.py	225	const
+sym	mini	tools/ornaments/make.py	228	fn
+sym	FILES	tools/ornaments/make.py	251	const
+sym	html_for	tools/ornaments/make.py	281	fn
+sym	main	tools/ornaments/make.py	288	fn
+sym	out	tools/ornaments/render.js	4	const
 sym	NAMES	tools/palette_names.py	2	const
 sym	HERE	tools/palettes.py	8	const
 sym	to_lab	tools/palettes.py	16	fn
@@ -4498,6 +4592,29 @@ sym	fs	tools/pins/cover.js	3	const
 sym	ROOT	tools/pins/cover.js	5	const
 sym	SEASON	tools/pins/cover.js	7	const
 sym	html	tools/pins/cover.js	14	const
+sym	ROOT	tools/pins/dec2026.py	9	const
+sym	IMG	tools/pins/dec2026.py	10	const
+sym	OUT	tools/pins/dec2026.py	11	const
+sym	PAPER	tools/pins/dec2026.py	14	const
+sym	INK	tools/pins/dec2026.py	15	const
+sym	ACCENT	tools/pins/dec2026.py	16	const
+sym	MUTED	tools/pins/dec2026.py	17	const
+sym	CREAM	tools/pins/dec2026.py	18	const
+sym	PEACH	tools/pins/dec2026.py	19	const
+sym	WARM	tools/pins/dec2026.py	20	const
+sym	F_SERIF_B	tools/pins/dec2026.py	22	const
+sym	F_SERIF_I	tools/pins/dec2026.py	23	const
+sym	F_SANS	tools/pins/dec2026.py	24	const
+sym	F_SANS_B	tools/pins/dec2026.py	25	const
+sym	font	tools/pins/dec2026.py	28	fn
+sym	cover	tools/pins/dec2026.py	32	fn
+sym	band	tools/pins/dec2026.py	41	fn
+sym	scrim	tools/pins/dec2026.py	51	fn
+sym	save	tools/pins/dec2026.py	63	fn
+sym	gift	tools/pins/dec2026.py	70	fn
+sym	pin_list	tools/pins/dec2026.py	80	fn
+sym	pin_one	tools/pins/dec2026.py	115	fn
+sym	pin_challenge	tools/pins/dec2026.py	135	fn
 sym	SB	tools/pins/pins10-data.js	5	const
 sym	by	tools/pins/pins10-data.js	8	const
 sym	fs	tools/pins/pins10.js	4	const
@@ -4585,6 +4702,45 @@ sym	more	tools/pins/pins15-data.js	220	const
 sym	ALL	tools/pins/pins15-data.js	222	const
 sym	use	tools/pins/pins15-data.js	224	const
 sym	few	tools/pins/pins15-data.js	225	const
+sym	SITE	tools/pins/pins16-data.js	6	const
+sym	PR	tools/pins/pins16-data.js	11	const
+sym	PA	tools/pins/pins16-data.js	95	const
+sym	ST	tools/pins/pins16-data.js	139	const
+sym	PCH	tools/pins/pins16-data.js	174	const
+sym	BG	tools/pins/pins16-data.js	183	const
+sym	ISPY	tools/pins/pins16-data.js	192	const
+sym	DF	tools/pins/pins16-data.js	201	const
+sym	DT	tools/pins/pins16-data.js	203	const
+sym	out	tools/pins/pins16-data.js	212	const
+sym	cap	tools/pins/pins16-data.js	214	const
+sym	fs	tools/pins/pins16.js	6	const
+sym	ROOT	tools/pins/pins16.js	9	const
+sym	P16	tools/pins/pins16.js	10	const
+sym	SET	tools/pins/pins16.js	11	const
+sym	PINS	tools/pins/pins16.js	12	const
+sym	PAL	tools/pins/pins16.js	13	const
+sym	esc	tools/pins/pins16.js	15	const
+sym	TH	tools/pins/pins16.js	16	const
+sym	img	tools/pins/pins16.js	26	const
+sym	lum	tools/pins/pins16.js	27	const
+sym	foot	tools/pins/pins16.js	29	const
+sym	CSS	tools/pins/pins16.js	30	const
+sym	sz	tools/pins/pins16.js	124	const
+sym	OUTI	tools/pins/pins16.js	125	const
+sym	save	tools/pins/pins16.js	126	const
+sym	ROOT	tools/pins/pins16_prep.py	6	const
+sym	OUT	tools/pins/pins16_prep.py	7	const
+sym	IMG	tools/pins/pins16_prep.py	8	const
+sym	load	tools/pins/pins16_prep.py	10	fn
+sym	lines	tools/pins/pins16_prep.py	13	fn
+sym	paper	tools/pins/pins16_prep.py	21	fn
+sym	steps	tools/pins/pins16_prep.py	26	fn
+sym	lineart	tools/pins/pins16_prep.py	44	fn
+sym	logo	tools/pins/pins16_prep.py	49	fn
+sym	crop	tools/pins/pins16_prep.py	59	fn
+sym	pals	tools/pins/pins16_prep.py	63	fn
+sym	diff	tools/pins/pins16_prep.py	70	fn
+sym	spec	tools/pins/pins16_prep.py	94	fn
 sym	fs	tools/pins/pins2.js	4	const
 sym	ROOT	tools/pins/pins2.js	6	const
 sym	img	tools/pins/pins2.js	7	const
@@ -5662,180 +5818,184 @@ sym	catalog	worker/index.js	392	fn
 sym	surpriseKI	worker/index.js	399	fn
 sym	surprise	worker/index.js	409	const
 sym	ADVENT_SPECIAL	worker/index.js	412	const
-sym	ADVENT_LAST_JAN_DEFAULT	worker/index.js	413	const
-sym	adventCollector	worker/index.js	415	fn
-sym	rigaMs	worker/index.js	425	fn
-sym	adventNow	worker/index.js	430	fn
-sym	NEWS_KINDS	worker/index.js	448	const
-sym	newsOf	worker/index.js	488	fn
-sym	newsHistory	worker/index.js	497	fn
-sym	ART_GALLERIES	worker/index.js	520	const
-sym	EXTRA0	worker/index.js	521	const
-sym	extraMonth	worker/index.js	522	const
-sym	parseJ	worker/index.js	523	const
-sym	artEntry	worker/index.js	524	fn
-sym	extraQueue	worker/index.js	531	fn
-sym	GIFT_KINDS	worker/index.js	547	const
-sym	ROOM_KINDS	worker/index.js	548	const
-sym	avatarOf	worker/index.js	549	const
-sym	okItem	worker/index.js	550	const
-sym	avgItemPrice	worker/index.js	554	fn
-sym	setRules	worker/index.js	559	fn
-sym	flockEvent	worker/index.js	561	const
-sym	cardHelpers	worker/index.js	562	const
-sym	titosHelpers	worker/index.js	563	const
-sym	flockHelpers	worker/index.js	564	const
-sym	studyHelpers	worker/index.js	565	const
-sym	newsHelpers	worker/index.js	566	const
-sym	wlHelpers	worker/index.js	567	const
-sym	mailHelpers	worker/index.js	570	const
-sym	guidesHelpers	worker/index.js	574	const
-sym	authHelpers	worker/index.js	576	const
-sym	helpers	worker/index.js	577	const
-sym	HttpError	worker/index.js	579	class
-sym	fail	worker/index.js	580	const
-sym	json	worker/index.js	581	const
-sym	schemaReady	worker/index.js	590	const
-sym	ensureSchema	worker/index.js	591	fn
-sym	strHash	worker/index.js	595	const
-sym	ensureSchemaRun	worker/index.js	596	fn
-sym	now	worker/index.js	738	const
-sym	NICK_A	worker/index.js	740	const
-sym	NICK_B	worker/index.js	741	const
-sym	pickOne	worker/index.js	742	const
-sym	freeNick	worker/index.js	743	fn
-sym	autoNicks	worker/index.js	750	fn
-sym	BTN	worker/index.js	758	const
-sym	LEGEND	worker/index.js	766	const
-sym	RULE_DEFAULTS	worker/index.js	768	const
-sym	COND_RANGE	worker/index.js	808	const
-sym	RULE_NUM	worker/index.js	809	const
-sym	RULES	worker/index.js	812	const
-sym	stockLevels	worker/index.js	814	fn
-sym	STOCK	worker/index.js	820	const
-sym	cleanRules	worker/index.js	821	fn
-sym	loadRules	worker/index.js	839	fn
-sym	DAYCOL	worker/index.js	863	const
-sym	loadDayColors	worker/index.js	864	fn
-sym	toShop	worker/index.js	873	fn
-sym	hintOk	worker/index.js	885	const
-sym	legMax	worker/index.js	886	const
-sym	streakDays	worker/index.js	888	const
-sym	effPrice	worker/index.js	891	fn
-sym	PLEVEL	worker/index.js	899	const
-sym	isLeg	worker/index.js	900	const
-sym	catMul	worker/index.js	901	const
-sym	baseNow	worker/index.js	902	fn
-sym	priceNow	worker/index.js	907	fn
-sym	WELCOME_MAX	worker/index.js	914	const
-sym	welcomeCheap	worker/index.js	915	fn
-sym	welcomeOf	worker/index.js	919	fn
-sym	shopRow	worker/index.js	924	const
-sym	autoPrice	worker/index.js	927	fn
-sym	autoRestock	worker/index.js	957	fn
-sym	seedLegends	worker/index.js	973	fn
-sym	ensurePrices	worker/index.js	980	fn
-sym	copies	worker/index.js	988	const
-sym	rigaDay	worker/index.js	989	const
-sym	award	worker/index.js	990	fn
-sym	SEED_GAMES	worker/index.js	1007	const
-sym	awardComment	worker/index.js	1009	fn
-sym	awardBadges	worker/index.js	1014	fn
-sym	backfillButtons	worker/index.js	1025	fn
-sym	buttonStatus	worker/index.js	1045	fn
-sym	TASKS	worker/index.js	1054	const
-sym	stamp	worker/index.js	1067	fn
-sym	dayCard	worker/index.js	1071	fn
-sym	randomHex	worker/index.js	1111	const
-sym	BACKUP_PREFIXES	worker/index.js	1113	const
-sym	r2Keys	worker/index.js	1114	fn
-sym	mediaBackup	worker/index.js	1115	fn
-sym	healthErr	worker/index.js	1134	fn
-sym	healthMail	worker/index.js	1144	fn
-sym	sha256	worker/index.js	1179	fn
-sym	BOT_RE	worker/index.js	1186	const
-sym	SOURCES	worker/index.js	1187	const
-sym	sourceOf	worker/index.js	1193	const
-sym	utmSource	worker/index.js	1194	const
-sym	uaInfo	worker/index.js	1195	fn
-sym	hit	worker/index.js	1206	fn
-sym	cookie	worker/index.js	1241	fn
-sym	sessionCookie	worker/index.js	1245	const
-sym	VIP_VIDEOS	worker/index.js	1246	const
-sym	currentUser	worker/index.js	1247	fn
-sym	membersFile	worker/index.js	1257	fn
-sym	needUser	worker/index.js	1267	fn
-sym	SEC	worker/index.js	1276	const
-sym	loadSec	worker/index.js	1277	fn
-sym	adminIdentity	worker/index.js	1286	fn
-sym	isAdmin	worker/index.js	1294	const
-sym	pinHash	worker/index.js	1300	fn
-sym	secLocked	worker/index.js	1306	fn
-sym	secFail	worker/index.js	1307	fn
-sym	RC_ABC	worker/index.js	1308	const
-sym	rcNorm	worker/index.js	1309	const
-sym	jwks	worker/index.js	1312	const
-sym	b64url	worker/index.js	1313	const
-sym	verifyGoogle	worker/index.js	1314	fn
-sym	dayNum	worker/index.js	1332	const
-sym	utcToday	worker/index.js	1333	const
-sym	streaks	worker/index.js	1334	fn
-sym	rngFor	worker/index.js	1344	fn
-sym	extraMemo	worker/index.js	1352	const
-sym	extraDay	worker/index.js	1353	fn
-sym	isExtraNum	worker/index.js	1366	const
-sym	bridged	worker/index.js	1367	const
-sym	badgesOf	worker/index.js	1368	fn
-sym	mergedBest	worker/index.js	1398	const
-sym	monthsOf	worker/index.js	1399	const
-sym	VETERAN_MONTHS	worker/index.js	1401	const
-sym	mcountOf	worker/index.js	1402	const
-sym	isVeteran	worker/index.js	1403	fn
-sym	moreBadges	worker/index.js	1410	fn
-sym	mergedBadges	worker/index.js	1434	const
-sym	r2Key	worker/index.js	1437	const
-sym	R2_LIMIT	worker/index.js	1438	const
-sym	imgPut	worker/index.js	1439	fn
-sym	imgGet	worker/index.js	1449	fn
-sym	imgDrop	worker/index.js	1454	const
-sym	imgDelete	worker/index.js	1456	fn
-sym	migrateToR2	worker/index.js	1464	fn
-sym	migrationStatus	worker/index.js	1481	fn
-sym	storageUsed	worker/index.js	1486	fn
-sym	KV_LIMIT	worker/index.js	1493	const
-sym	cleanupInactive	worker/index.js	1494	fn
-sym	getMeta	worker/index.js	1526	const
-sym	setMeta	worker/index.js	1527	const
-sym	bump	worker/index.js	1529	fn
-sym	UNIT	worker/index.js	1536	const
-sym	gameUnit	worker/index.js	1537	fn
-sym	btnOf	worker/index.js	1545	const
-sym	gamePrices	worker/index.js	1547	const
-sym	autopilot	worker/index.js	1551	fn
-sym	rainItem	worker/index.js	1581	fn
-sym	guessLang	worker/index.js	1594	const
-sym	REQ_COL	worker/index.js	1596	const
-sym	reqTranslate	worker/index.js	1597	fn
-sym	REQ_FAIL	worker/index.js	1607	const
-sym	reqFill	worker/index.js	1608	fn
-sym	reqBackfill	worker/index.js	1630	fn
-sym	reqReward	worker/index.js	1636	fn
-sym	gameBadge	worker/index.js	1654	fn
-sym	potDay	worker/index.js	1662	fn
-sym	ING	worker/index.js	1676	const
-sym	SEASON_ING	worker/index.js	1678	const
-sym	ALL_ING	worker/index.js	1682	const
-sym	SWEET	worker/index.js	1683	const
-sym	seasonNow	worker/index.js	1685	fn
-sym	fnv	worker/index.js	1690	const
-sym	combosOf	worker/index.js	1693	const
-sym	COMBO_IX	worker/index.js	1694	const
-sym	comboSeason	worker/index.js	1695	const
-sym	potionOf	worker/index.js	1697	fn
-sym	invOf	worker/index.js	1703	const
-sym	mazeItems	worker/index.js	1705	fn
-sym	addBadge	worker/index.js	1713	fn
-sym	route	worker/index.js	1721	fn
+sym	INK_DAY	worker/index.js	413	const
+sym	ADVENT_LAST_JAN_DEFAULT	worker/index.js	414	const
+sym	adventCollector	worker/index.js	416	fn
+sym	rigaMs	worker/index.js	426	fn
+sym	adventNow	worker/index.js	431	fn
+sym	NEWS_KINDS	worker/index.js	449	const
+sym	newsOf	worker/index.js	489	fn
+sym	newsHistory	worker/index.js	498	fn
+sym	ART_GALLERIES	worker/index.js	521	const
+sym	EXTRA0	worker/index.js	522	const
+sym	extraMonth	worker/index.js	523	const
+sym	parseJ	worker/index.js	524	const
+sym	artEntry	worker/index.js	525	fn
+sym	extraQueue	worker/index.js	532	fn
+sym	GIFT_KINDS	worker/index.js	548	const
+sym	ROOM_KINDS	worker/index.js	549	const
+sym	avatarOf	worker/index.js	550	const
+sym	okItem	worker/index.js	551	const
+sym	okFile	worker/index.js	553	const
+sym	ADVENT_FILE_MAX	worker/index.js	560	const
+sym	adventFileDrop	worker/index.js	562	fn
+sym	avgItemPrice	worker/index.js	572	fn
+sym	setRules	worker/index.js	577	fn
+sym	flockEvent	worker/index.js	579	const
+sym	cardHelpers	worker/index.js	580	const
+sym	titosHelpers	worker/index.js	581	const
+sym	flockHelpers	worker/index.js	582	const
+sym	studyHelpers	worker/index.js	583	const
+sym	newsHelpers	worker/index.js	584	const
+sym	wlHelpers	worker/index.js	585	const
+sym	mailHelpers	worker/index.js	588	const
+sym	guidesHelpers	worker/index.js	592	const
+sym	authHelpers	worker/index.js	594	const
+sym	helpers	worker/index.js	595	const
+sym	HttpError	worker/index.js	597	class
+sym	fail	worker/index.js	598	const
+sym	json	worker/index.js	599	const
+sym	schemaReady	worker/index.js	608	const
+sym	ensureSchema	worker/index.js	609	fn
+sym	strHash	worker/index.js	613	const
+sym	ensureSchemaRun	worker/index.js	614	fn
+sym	now	worker/index.js	756	const
+sym	NICK_A	worker/index.js	758	const
+sym	NICK_B	worker/index.js	759	const
+sym	pickOne	worker/index.js	760	const
+sym	freeNick	worker/index.js	761	fn
+sym	autoNicks	worker/index.js	768	fn
+sym	BTN	worker/index.js	776	const
+sym	LEGEND	worker/index.js	784	const
+sym	RULE_DEFAULTS	worker/index.js	786	const
+sym	COND_RANGE	worker/index.js	826	const
+sym	RULE_NUM	worker/index.js	827	const
+sym	RULES	worker/index.js	830	const
+sym	stockLevels	worker/index.js	832	fn
+sym	STOCK	worker/index.js	838	const
+sym	cleanRules	worker/index.js	839	fn
+sym	loadRules	worker/index.js	857	fn
+sym	DAYCOL	worker/index.js	881	const
+sym	loadDayColors	worker/index.js	882	fn
+sym	toShop	worker/index.js	891	fn
+sym	hintOk	worker/index.js	903	const
+sym	legMax	worker/index.js	904	const
+sym	streakDays	worker/index.js	906	const
+sym	effPrice	worker/index.js	909	fn
+sym	PLEVEL	worker/index.js	917	const
+sym	isLeg	worker/index.js	918	const
+sym	catMul	worker/index.js	919	const
+sym	baseNow	worker/index.js	920	fn
+sym	priceNow	worker/index.js	925	fn
+sym	WELCOME_MAX	worker/index.js	932	const
+sym	welcomeCheap	worker/index.js	933	fn
+sym	welcomeOf	worker/index.js	937	fn
+sym	shopRow	worker/index.js	942	const
+sym	autoPrice	worker/index.js	945	fn
+sym	autoRestock	worker/index.js	975	fn
+sym	seedLegends	worker/index.js	991	fn
+sym	ensurePrices	worker/index.js	998	fn
+sym	copies	worker/index.js	1006	const
+sym	rigaDay	worker/index.js	1007	const
+sym	award	worker/index.js	1008	fn
+sym	SEED_GAMES	worker/index.js	1025	const
+sym	awardComment	worker/index.js	1027	fn
+sym	awardBadges	worker/index.js	1032	fn
+sym	backfillButtons	worker/index.js	1043	fn
+sym	buttonStatus	worker/index.js	1063	fn
+sym	TASKS	worker/index.js	1072	const
+sym	stamp	worker/index.js	1085	fn
+sym	dayCard	worker/index.js	1089	fn
+sym	randomHex	worker/index.js	1129	const
+sym	BACKUP_PREFIXES	worker/index.js	1131	const
+sym	r2Keys	worker/index.js	1132	fn
+sym	mediaBackup	worker/index.js	1133	fn
+sym	healthErr	worker/index.js	1152	fn
+sym	healthMail	worker/index.js	1162	fn
+sym	sha256	worker/index.js	1197	fn
+sym	BOT_RE	worker/index.js	1204	const
+sym	SOURCES	worker/index.js	1205	const
+sym	sourceOf	worker/index.js	1211	const
+sym	utmSource	worker/index.js	1212	const
+sym	uaInfo	worker/index.js	1213	fn
+sym	hit	worker/index.js	1224	fn
+sym	cookie	worker/index.js	1259	fn
+sym	sessionCookie	worker/index.js	1263	const
+sym	VIP_VIDEOS	worker/index.js	1264	const
+sym	currentUser	worker/index.js	1265	fn
+sym	membersFile	worker/index.js	1275	fn
+sym	needUser	worker/index.js	1285	fn
+sym	SEC	worker/index.js	1294	const
+sym	loadSec	worker/index.js	1295	fn
+sym	adminIdentity	worker/index.js	1304	fn
+sym	isAdmin	worker/index.js	1312	const
+sym	pinHash	worker/index.js	1318	fn
+sym	secLocked	worker/index.js	1324	fn
+sym	secFail	worker/index.js	1325	fn
+sym	RC_ABC	worker/index.js	1326	const
+sym	rcNorm	worker/index.js	1327	const
+sym	jwks	worker/index.js	1330	const
+sym	b64url	worker/index.js	1331	const
+sym	verifyGoogle	worker/index.js	1332	fn
+sym	dayNum	worker/index.js	1350	const
+sym	utcToday	worker/index.js	1351	const
+sym	streaks	worker/index.js	1352	fn
+sym	rngFor	worker/index.js	1362	fn
+sym	extraMemo	worker/index.js	1370	const
+sym	extraDay	worker/index.js	1371	fn
+sym	isExtraNum	worker/index.js	1384	const
+sym	bridged	worker/index.js	1385	const
+sym	badgesOf	worker/index.js	1386	fn
+sym	mergedBest	worker/index.js	1416	const
+sym	monthsOf	worker/index.js	1417	const
+sym	VETERAN_MONTHS	worker/index.js	1419	const
+sym	mcountOf	worker/index.js	1420	const
+sym	isVeteran	worker/index.js	1421	fn
+sym	moreBadges	worker/index.js	1428	fn
+sym	mergedBadges	worker/index.js	1452	const
+sym	r2Key	worker/index.js	1455	const
+sym	R2_LIMIT	worker/index.js	1456	const
+sym	imgPut	worker/index.js	1457	fn
+sym	imgGet	worker/index.js	1467	fn
+sym	imgDrop	worker/index.js	1472	const
+sym	imgDelete	worker/index.js	1474	fn
+sym	migrateToR2	worker/index.js	1482	fn
+sym	migrationStatus	worker/index.js	1499	fn
+sym	storageUsed	worker/index.js	1504	fn
+sym	KV_LIMIT	worker/index.js	1511	const
+sym	cleanupInactive	worker/index.js	1512	fn
+sym	getMeta	worker/index.js	1544	const
+sym	setMeta	worker/index.js	1545	const
+sym	bump	worker/index.js	1547	fn
+sym	UNIT	worker/index.js	1554	const
+sym	gameUnit	worker/index.js	1555	fn
+sym	btnOf	worker/index.js	1563	const
+sym	gamePrices	worker/index.js	1565	const
+sym	autopilot	worker/index.js	1569	fn
+sym	rainItem	worker/index.js	1599	fn
+sym	guessLang	worker/index.js	1612	const
+sym	REQ_COL	worker/index.js	1614	const
+sym	reqTranslate	worker/index.js	1615	fn
+sym	REQ_FAIL	worker/index.js	1625	const
+sym	reqFill	worker/index.js	1626	fn
+sym	reqBackfill	worker/index.js	1648	fn
+sym	reqReward	worker/index.js	1654	fn
+sym	gameBadge	worker/index.js	1672	fn
+sym	potDay	worker/index.js	1680	fn
+sym	ING	worker/index.js	1694	const
+sym	SEASON_ING	worker/index.js	1696	const
+sym	ALL_ING	worker/index.js	1700	const
+sym	SWEET	worker/index.js	1701	const
+sym	seasonNow	worker/index.js	1703	fn
+sym	fnv	worker/index.js	1708	const
+sym	combosOf	worker/index.js	1711	const
+sym	COMBO_IX	worker/index.js	1712	const
+sym	comboSeason	worker/index.js	1713	const
+sym	potionOf	worker/index.js	1715	fn
+sym	invOf	worker/index.js	1721	const
+sym	mazeItems	worker/index.js	1723	fn
+sym	addBadge	worker/index.js	1731	fn
+sym	route	worker/index.js	1739	fn
 sym	KITCHEN_TABLES	worker/kitchen.js	7	const
 sym	KITCHEN_RULES	worker/kitchen.js	11	const
 sym	KITCHEN_RANGE	worker/kitchen.js	17	const
@@ -6127,13 +6287,14 @@ doc	Аналитика (20.11.2026 — одна таблица)	docs/admin.md	52
 doc	Защита админки	docs/admin.md	62	h2
 doc	Как устроено	docs/admin.md	71	h2
 doc	Неделя (редизайн 2.0, часть 4)	docs/admin.md	84	h2
-doc	Меню	docs/admin.md	90	h2
-doc	Хочу сделать X → где это	docs/admin.md	102	h2
-doc	🐦 Птицы: почты и «📢 Отправить» (11.11.2026)	docs/admin.md	146	h2
-doc	⏸ Пауза сайта (11.11.2026)	docs/admin.md	152	h2
-doc	🗳 Опросы (12.11.2026)	docs/admin.md	159	h2
-doc	Руны	docs/admin.md	164	h2
-doc	Вид кабинета в стиле сайта (13.11.2026)	docs/admin.md	171	h2
+doc	Адвент (🎄, `#advent`)	docs/admin.md	90	h2
+doc	Меню	docs/admin.md	95	h2
+doc	Хочу сделать X → где это	docs/admin.md	107	h2
+doc	🐦 Птицы: почты и «📢 Отправить» (11.11.2026)	docs/admin.md	151	h2
+doc	⏸ Пауза сайта (11.11.2026)	docs/admin.md	157	h2
+doc	🗳 Опросы (12.11.2026)	docs/admin.md	164	h2
+doc	Руны	docs/admin.md	169	h2
+doc	Вид кабинета в стиле сайта (13.11.2026)	docs/admin.md	176	h2
 doc	ArtPill — «таблетка рисования» для ИИ	docs/artpill.md	1	h1
 doc	Устройство (договорённость)	docs/artpill.md	5	h2
 doc	Источник: работы Алины	docs/artpill.md	13	h2
@@ -6149,7 +6310,7 @@ doc	Языки	docs/basics.md	20	h2
 doc	Картинки	docs/basics.md	28	h2
 doc	Дизайн	docs/basics.md	32	h2
 doc	Подключено	docs/basics.md	37	h2
-doc	Проверка перед пушем	docs/basics.md	42	h2
+doc	Проверка перед пушем	docs/basics.md	43	h2
 doc	Птичка: вход, профиль, комната, сумка, подарки	docs/bird.md	1	h1
 doc	Кратко	docs/bird.md	3	h2
 doc	Оглавление	docs/bird.md	10	h2
@@ -6186,20 +6347,20 @@ doc	Autumn Cozy — 30 обычных карточек «осень и уют» 
 doc	Подарок карточки из кабинета (17.10.2026)	docs/cards.md	94	h2
 doc	Daily Challenge, стена работ, бейджи, ЭКСТРА	docs/challenge.md	1	h1
 doc	Кратко	docs/challenge.md	3	h2
-doc	Оглавление	docs/challenge.md	12	h2
-doc	Тема дня, календарь, таймер, карточка	docs/challenge.md	24	h2
-doc	Стена работ (#works)	docs/challenge.md	39	h2
-doc	Бейджи и уровни	docs/challenge.md	55	h2
-doc	«Смотри на мир как художник» (/polly-helps/)	docs/challenge.md	60	h2
-doc	Страница челленджа	docs/challenge.md	72	h2
-doc	День ЭКСТРА и палитры ЭКСТРА	docs/challenge.md	78	h2
-doc	Карусели	docs/challenge.md	86	h2
-doc	Подбор тем (этап 3)	docs/challenge.md	91	h2
-doc	ТЗ (этап 3, до 1.11.2026)	docs/challenge.md	93	h3
-doc	Как устроено	docs/challenge.md	110	h3
-doc	Разметка (часть 1)	docs/challenge.md	112	h4
-doc	Темы, цвета и Ч/Б с 1.11.2026 (18.10.2026, по просьбе Алины)	docs/challenge.md	119	h4
-doc	Генератор, план в D1, сайт, кабинет (части 2–5)	docs/challenge.md	128	h4
+doc	Оглавление	docs/challenge.md	13	h2
+doc	Тема дня, календарь, таймер, карточка	docs/challenge.md	25	h2
+doc	Стена работ (#works)	docs/challenge.md	40	h2
+doc	Бейджи и уровни	docs/challenge.md	56	h2
+doc	«Смотри на мир как художник» (/polly-helps/)	docs/challenge.md	61	h2
+doc	Страница челленджа	docs/challenge.md	73	h2
+doc	День ЭКСТРА и палитры ЭКСТРА	docs/challenge.md	79	h2
+doc	Карусели	docs/challenge.md	87	h2
+doc	Подбор тем (этап 3)	docs/challenge.md	92	h2
+doc	ТЗ (этап 3, до 1.11.2026)	docs/challenge.md	94	h3
+doc	Как устроено	docs/challenge.md	111	h3
+doc	Разметка (часть 1)	docs/challenge.md	113	h4
+doc	Темы, цвета и Ч/Б с 1.11.2026 (18.10.2026, по просьбе Алины)	docs/challenge.md	120	h4
+doc	Генератор, план в D1, сайт, кабинет (части 2–5)	docs/challenge.md	129	h4
 doc	Раскраски (Уроки → Раскраски)	docs/coloring.md	1	h1
 doc	База D1 и ключи meta	docs/db.md	1	h1
 doc	Таблицы (76)	docs/db.md	5	h2
@@ -6210,30 +6371,29 @@ doc	Оглавление	docs/flock.md	13	h2
 doc	Стая на главной и /flock/	docs/flock.md	19	h2
 doc	Локации и действия	docs/flock.md	31	h2
 doc	Freebies /freebies/ — бесплатное для скачивания	docs/freebies.md	1	h1
-doc	Игры: Пуговичный дождь, Зельеварня, Блинная Полли, Адвент	docs/games.md	1	h1
 doc	Кратко	docs/games.md	3	h2
 doc	Оглавление	docs/games.md	11	h2
 doc	Адвент-календарь	docs/games.md	22	h2
-doc	Пуговичный дождь	docs/games.md	32	h2
-doc	Зельеварня	docs/games.md	38	h2
-doc	Блинная Полли	docs/games.md	55	h2
-doc	Поезд Полли	docs/games.md	69	h2
-doc	Бейджи игр	docs/games.md	79	h2
-doc	Доски топа	docs/games.md	83	h2
+doc	Пуговичный дождь	docs/games.md	33	h2
+doc	Зельеварня	docs/games.md	39	h2
+doc	Блинная Полли	docs/games.md	56	h2
+doc	Поезд Полли	docs/games.md	70	h2
+doc	Бейджи игр	docs/games.md	80	h2
+doc	Доски топа	docs/games.md	84	h2
 doc	Как бесплатно привести людей и заставить их возвращаться	docs/growth.md	1	h1
 doc	Что показали цифры (30 дней)	docs/growth.md	5	h2
 doc	Для кого (предлагаю решить так)	docs/growth.md	11	h2
 doc	1. Мостик: ссылки (один раз, ~1 час)	docs/growth.md	17	h2
 doc	2. Контент без съёмки — его делает сайт (главная идея)	docs/growth.md	22	h2
 doc	3. Pinterest — главный канал для тебя	docs/growth.md	33	h2
-doc	4. Бесплатные места, куда люди сами ищут	docs/growth.md	44	h2
-doc	5. Чтобы возвращались (у тебя уже очень много)	docs/growth.md	50	h2
-doc	6. Поводы на ближайшие месяцы	docs/growth.md	56	h2
-doc	Час в день — расписание	docs/growth.md	63	h2
-doc	Что сделать на сайте (этапы, по порядку)	docs/growth.md	68	h2
-doc	Как поймём, что работает (через 3 месяца)	docs/growth.md	76	h2
-doc	Facebook LV (16.11.2026)	docs/growth.md	81	h2
-doc	Google (24.10.2026)	docs/growth.md	85	h2
+doc	4. Бесплатные места, куда люди сами ищут	docs/growth.md	45	h2
+doc	5. Чтобы возвращались (у тебя уже очень много)	docs/growth.md	51	h2
+doc	6. Поводы на ближайшие месяцы	docs/growth.md	57	h2
+doc	Час в день — расписание	docs/growth.md	64	h2
+doc	Что сделать на сайте (этапы, по порядку)	docs/growth.md	69	h2
+doc	Как поймём, что работает (через 3 месяца)	docs/growth.md	77	h2
+doc	Facebook LV (16.11.2026)	docs/growth.md	82	h2
+doc	Google (24.10.2026)	docs/growth.md	86	h2
 doc	История: устаревшее и заменённое	docs/history.md	1	h1
 doc	Кратко	docs/history.md	3	h2
 doc	Оглавление	docs/history.md	9	h2
@@ -6251,10 +6411,9 @@ doc	Страницы	docs/index.md	18	h2
 doc	Общее — не искать заново	docs/index.md	24	h2
 doc	Большие файлы	docs/index.md	33	h2
 doc	Перед пушем	docs/index.md	43	h2
-doc	Курс «Тушь: скетчинг без страха» (/ink/)	docs/ink.md	1	h1
 doc	Устройство	docs/ink.md	5	h2
-doc	План уроков (картинки → клиент)	docs/ink.md	16	h2
-doc	Конспект глав 4–15 (из книги; пересказ, не цитаты)	docs/ink.md	33	h2
+doc	План уроков (картинки → клиент)	docs/ink.md	17	h2
+doc	Конспект глав 4–15 (из книги; пересказ, не цитаты)	docs/ink.md	34	h2
 doc	Карта кода	docs/map.md	1	h1
 doc	Сервер	docs/map.md	5	h2
 doc	Браузер (site/assets)	docs/map.md	55	h2
@@ -6271,11 +6430,16 @@ doc	Палитры из артов	docs/palettes.md	18	h2
 doc	Pinterest	docs/palettes.md	23	h2
 doc	Палитра из своего фото	docs/palettes.md	33	h2
 doc	Картины и палитры, добавленные с сайта	docs/palettes.md	38	h2
+doc	Пины на декабрь 2026: три штуки + тексты	docs/pinterest-dec2026.md	1	h1
+doc	Пин 1 — список тем (бумажная карточка, фото скетчбука на подоконнике)	docs/pinterest-dec2026.md	11	h2
+doc	Пин 2 — одна тема (акварель с чашками какао)	docs/pinterest-dec2026.md	22	h2
+doc	Пин 3 — челлендж (акварель: кот в гирлянде)	docs/pinterest-dec2026.md	33	h2
+doc	Порядок	docs/pinterest-dec2026.md	48	h2
 doc	Статус плана	docs/plan-status.md	1	h1
 doc	Открыто	docs/plan-status.md	6	h2
-doc	Этапы (готовые — одной строкой)	docs/plan-status.md	19	h2
-doc	Решения Алины	docs/plan-status.md	132	h2
-doc	Допущения (по открытым этапам)	docs/plan-status.md	140	h2
+doc	Этапы (готовые — одной строкой)	docs/plan-status.md	20	h2
+doc	Решения Алины	docs/plan-status.md	135	h2
+doc	Допущения (по открытым этапам)	docs/plan-status.md	143	h2
 doc	Полли-питомец	docs/polly-pet.md	1	h1
 doc	Кратко	docs/polly-pet.md	3	h2
 doc	Оглавление	docs/polly-pet.md	9	h2
@@ -6287,10 +6451,10 @@ doc	«Нарисуй мне»	docs/requests.md	1	h1
 doc	Кратко	docs/requests.md	3	h2
 doc	Оглавление	docs/requests.md	8	h2
 doc	«Нарисуй мне»	docs/requests.md	13	h2
-doc	Убранное: от чего отказались	docs/retired.md	1	h1
-doc	Кратко	docs/retired.md	3	h2
-doc	Ждёт чистки	docs/retired.md	9	h2
-doc	Убрано	docs/retired.md	14	h2
+doc	Убранное: от чего отказались	docs/retired.md	2	h1
+doc	Кратко	docs/retired.md	4	h2
+doc	Ждёт чистки	docs/retired.md	10	h2
+doc	Убрано	docs/retired.md	15	h2
 doc	Комнаты: офис Полли, детектив Титос, квесты	docs/rooms.md	1	h1
 doc	Кратко	docs/rooms.md	3	h2
 doc	Оглавление	docs/rooms.md	9	h2
@@ -6302,10 +6466,10 @@ doc	Кратко	docs/shop.md	3	h2
 doc	Оглавление	docs/shop.md	10	h2
 doc	Пуговки	docs/shop.md	20	h2
 doc	Магазин	docs/shop.md	27	h2
-doc	Цены и экономика	docs/shop.md	46	h2
-doc	Правила (кабинет → 📜)	docs/shop.md	53	h2
-doc	Зарплата и пополнение	docs/shop.md	56	h2
-doc	Автопилот	docs/shop.md	62	h2
+doc	Цены и экономика	docs/shop.md	47	h2
+doc	Правила (кабинет → 📜)	docs/shop.md	54	h2
+doc	Зарплата и пополнение	docs/shop.md	57	h2
+doc	Автопилот	docs/shop.md	63	h2
 doc	Сайт: меню, шапка, главная, общие страницы	docs/site.md	1	h1
 doc	Кратко	docs/site.md	3	h2
 doc	Оглавление	docs/site.md	9	h2
