@@ -174,7 +174,7 @@ DET.forEach((d, i) => {
   const word = { 3: 'three', 4: 'four', 5: 'five', 6: 'six', 8: 'eight' }[k];
   push({ tpl, th: i % 10 >= 5 && th === 'dark' ? 'night' : th, t: t.replace(/(\S+)$/, '<em>$1</em>'), img: p.img, key: d.key, cols, k, season: d.s,
     title: `${t} — ${k}-Color Palette with HEX Codes | Pigeon Polly`,
-    desc: `A ${word}-color palette from a detail of my painting: ${cols.map(c => `${c.en} ${c.hex}`).join(', ')}. ${MOOD[d.s].replace(/^./, c => c.toUpperCase())} mood. More palettes from my paintings — one click copies the HEX — on pigeonpolly.com.`,
+    desc: `${k === 8 ? "An" : "A"} ${word}-color palette from a detail of my painting: ${cols.map(c => `${c.en} ${c.hex}`).join(', ')}. ${MOOD[d.s].replace(/^./, c => c.toUpperCase())} mood. More palettes from my paintings — one click copies the HEX — on pigeonpolly.com.`,
     alt: `${word.replace(/^./, c => c.toUpperCase())}-color palette “${t}” with names and HEX codes next to a close-up detail of a painting by Pigeon Polly.`,
     link: U(`/palettes/#${d.key}`, n), topics: `${t} color palette, ${k} color palette, Color palette from painting, HEX codes, ${SEAS[d.s] || 'Aesthetic'} color palette` });
 });
@@ -319,7 +319,7 @@ const AL = (o) => push({ season: 'Зима', link: U(ADV, n, 'advent26'), topics
  ['Things that are <em>NOT</em> inside', ['chocolate (sorry)', 'ads', 'homework', 'spam', 'stress', 'spoilers in this pin']],
 ].forEach(([t, items], i) => AL({ tpl: 'alist', th: ['adv', 'pine', 'wine'][i % 3], t, items,
   title: `${t.replace(/<\/?em>/g, '')} — Free Advent Calendar 2026 | Pigeon Polly`,
-  desc: `${items.slice(0, 4).join(', ')}… My free illustrated advent calendar opens on 1 December on pigeonpolly.com. What exactly is inside stays a secret until each window opens.`,
+  desc: `${items.slice(0, 4).join(', ').replace(/^./, c => c.toUpperCase())}… My free illustrated advent calendar opens on 1 December on pigeonpolly.com. What exactly is inside stays a secret until each window opens.`,
   alt: 'A checklist teaser for the Pigeon Polly advent calendar on a dark festive card with a little illustrated window.' }));
 // календарь-сетка: все 31 закрыты
 [['Save the date: <em>1 December</em>', 'pine'], ['31 windows, <em>all still closed</em>', 'adv'], ['Mark your calendar: <em>advent opens</em>', 'paper'],
