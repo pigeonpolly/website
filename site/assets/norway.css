@@ -7,4 +7,10 @@
 .nw p{font-size:18px;color:var(--mut);max-width:480px;margin:0 0 14px}
 .nw .nw-soon{font:700 26px Caveat,cursive;color:var(--acc);margin:22px 0 28px}
 .nw-go{display:flex;gap:12px;flex-wrap:wrap}
+/* личная «Мастерская» Room 811: кнопка и её страница — только Алине (account.js ставит html.is-admin) */
+html:not(.is-admin) .nw-adm{display:none!important}
+.nw .btn.nw-adm{border-style:dashed;color:var(--mut)}
+.nw .btn.nw-adm:hover{color:var(--ink);border-color:var(--ink)}
+/* Мастерская — пустая комната: одна колонка, без картинки */
+.nw-ws .w{grid-template-columns:1fr;max-width:720px}
 @media (max-width:860px){.nw{padding:34px 0 60px}.nw .w{grid-template-columns:1fr;gap:30px}.nw h1{font-size:44px}}

@@ -23,7 +23,7 @@ import { shiftApi, SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_RANGE, SHIFT_IN
 import { studyApi, studyOk, STUDY_TABLES } from './study.js'; // личный учебник /study/ для Mr.Pepe и Алины (docs/site.md «Учебник»)
 import { englishApi, englishOk, ENGLISH_TABLES } from './english.js'; // личный учебник английского /english/ (docs/site.md «Учебник английского»)
 import { norskApi, norskOk, NORSK_TABLES } from './norsk.js'; // личный учебник норвежского /norsk/ (docs/site.md «Учебник норвежского»)
-import { avisApi, avisCron, AVIS_TABLES, AVIS_RULES, AVIS_RANGE, AVIS_INT, AVIS_CRON } from './avis.js'; // «Morgenavis» — утренняя газета на норвежском для Алины /norsk/avis/ (docs/site.md «Morgenavis»)
+import { avisApi, avisCron, AVIS_TABLES, AVIS_RULES, AVIS_RANGE, AVIS_INT, AVIS_CRON, LOCKED } from './avis.js'; // «Morgenavis» — утренняя газета на норвежском для Алины /norsk/avis/ (docs/site.md «Morgenavis»)
 import { nederlandsApi, nederlandsOk, NEDERLANDS_TABLES } from './nederlands.js'; // личный учебник нидерландского /nederlands/ (docs/site.md «Учебник нидерландского»)
 import { notebookApi, NOTEBOOK_TABLES } from './notebook.js'; // 📒 блокнот в учебниках (docs/site.md «Блокнот в учебниках»)
 import { artpillApi, artpillDrop, artpillExport, ARTPILL_TABLES } from './artpill.js'; // «Art-Pill by Polly»: скетчбуки ИИ и отзывы (docs/artpill.md)
@@ -223,6 +223,13 @@ async function pageFetch(req, env, url, p) {
   if (wv) {
     const u2 = new URL((wv[1] || '') + '/learn/watch/', url);
     return await sitePage(new Request(u2, req), env, u2);
+  }
+  // /norway/workshop/ — личная «Мастерская» Room 811 (пустая комната для черновиков): открыта только Алине (как /norsk/avis)
+  if (/^\/(?:ru\/|lv\/)?norway\/workshop(?:\/index\.html)?\/?$/.test(p)) {
+    const u = env.DB ? await currentUser(req, env).catch(() => null) : null;
+    if (!(u && await isAdmin(u, env).catch(() => false))) {
+      return new Response(LOCKED, { status: 403, headers: { 'content-type': 'text/html; charset=utf-8', 'cache-control': 'private, no-store', 'x-robots-tag': 'noindex, nofollow' } });
+    }
   }
   return await sitePage(req, env, url);
 }

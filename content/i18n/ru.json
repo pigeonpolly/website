@@ -842,5 +842,11 @@
   "class=\"nr-a\" href=\"/preview/guides/\">Books<": "class=\"nr-a\" href=\"/preview/guides/\">Книги<",
   "class=\"nr-a\" href=\"/preview/about/\">Sketchbook<": "class=\"nr-a\" href=\"/preview/about/\">Скетчбук<",
   "class=\"nr-a\" href=\"/preview/lab/\">All games<": "class=\"nr-a\" href=\"/preview/lab/\">Все игры<",
-  "class=\"nr-a\" href=\"/preview/wobbleland/\">Wobbleland<": "class=\"nr-a\" href=\"/preview/wobbleland/\">Воббленд<"
+  "class=\"nr-a\" href=\"/preview/wobbleland/\">Wobbleland<": "class=\"nr-a\" href=\"/preview/wobbleland/\">Воббленд<",
+  "<a class=\"btn nw-adm\" href=\"/norway/workshop/\">✏️ Workshop</a>": "<a class=\"btn nw-adm\" href=\"/norway/workshop/\">✏️ Мастерская</a>",
+  "<span class=\"k\">Room 811 · workshop</span>": "<span class=\"k\">Кабинет 811 · мастерская</span>",
+  "<h1>Workshop</h1>": "<h1>Мастерская</h1>",
+  "<p>A private room: only you can see it.</p>": "<p>Личная комната: её видите только вы.</p>",
+  "<p>Empty for now — a place to make new things for Room 811, then move them to the big room.</p>": "<p>Пока пусто — здесь делаем новое для Кабинета 811, а потом переносим в большой кабинет.</p>",
+  "<a class=\"btn\" href=\"/norway/\">Back to Room 811</a>": "<a class=\"btn\" href=\"/norway/\">← Назад в Кабинет 811</a>"
 }
