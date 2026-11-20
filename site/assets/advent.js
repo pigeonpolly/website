@@ -1,4 +1,4 @@
-﻿// Адвент «Улица 31 окошка» (/advent/): дизайн Алины, данные — /api/advent.
+// Адвент «Улица 31 окошка» (/advent/): дизайн Алины, данные — /api/advent.
 (() => {
   const app = document.getElementById('advw');
   if (!app) return;
@@ -19,6 +19,13 @@
     err: ['Could not open, please try again.', 'Не получилось открыть, попробуйте ещё раз.', 'Neizdevās atvērt, mēģini vēlreiz.'],
     lit: ['Lit', 'Зажжено', 'Iedegts'],
     of: ['of 31 · windows to Christmas', 'из 31 · окошек до Рождества', 'no 31 · lodziņi līdz Ziemassvētkiem'],
+    // окно 24 декабря: доступ к курсу туши (user.ink_ok, /ink/)
+    inkL: ['Access to the course', 'Доступ к курсу', 'Pieeja kursam'],
+    inkT: ['Ink: Sketching Without Fear', 'Тушь: скетчинг без страха', 'Tuša: skicēšana bez bailēm'],
+    inkS: ['The whole course is open for you — 15 lessons, stamps and a diploma.', 'Тебе открыт весь курс — 15 уроков, печати и диплом.', 'Tev atvērts viss kurss — 15 nodarbības, zīmogi un diploms.'],
+    inkU: ['Access until {d}.', 'Доступ до {d}.', 'Pieeja līdz {d}.'],
+    inkA: ['Opens for every bird who opens this window on that day — for a year.', 'Открывается всем, кто в этот день откроет окно — на год.', 'Atveras visiem, kas atvēra lodziņu tajā dienā — uz gadu.'],
+    inkGo: ['Open', 'Открыть', 'Atvērt'],
   };
   const t = k => T[k][L];
   const LATE = [24, 31];
@@ -78,7 +85,7 @@
       const [k, v] = items[0];
       if (k === 'file') { const f = fileOf(v); if (f) inner = f.p ? `<img class="fpic" src="${esc(f.p)}" alt=""><span class="fbadge">${esc(extOf(f))}</span>` : `<span class="fbig">${esc(extOf(f))}</span>`; }
       else inner = '<span class="gift">🎁</span>';
-    }
+    } else if (s === 'open' && d === 24 && S.ink) inner = '<span class="gift">✒️</span>'; // доступ к курсу туши — тоже подарок
     return `<button class="win ${s}${sp ? ' sp' : ''}${d === 24 ? ' d24' : ''}${d === 31 ? ' d31' : ''} ${extra || ''}" data-d="${d}" aria-label="${d}">
       <span class="glass">${inner}${s === 'today' ? '<span class="candle"></span>' : ''}</span>
       <span class="sh l"></span><span class="sh r"></span><span class="bow"><i><b></b></i></span><span class="sill"></span><span class="key">${d}</span></button>`;
@@ -178,15 +185,22 @@
   function giftRow(name) {
     return `<div class="more"><span class="k">🎁 ${t('gift')}</span><div class="item"><span class="th">🎁</span><span><b>${esc(name)}</b><small>${t('inBag')}</small></span><a class="mini-btn" href="/bird/#bp-room">🏠</a></div></div>`;
   }
+  // окно 24 декабря: доступ к курсу туши — карточкой в окне (users.ink_ok + срок ink_until — на год; /ink/ для своих)
+  function inkDate(ts) { try { return ts > 0 ? new Date(ts * 1000).toLocaleDateString(LG, { day: 'numeric', month: 'long', year: 'numeric' }) : ''; } catch (e) { return ''; } }
+  function inkRow(admin) {
+    const till = !admin ? inkDate(S.inkUntil) : '';
+    return `<div class="more"><span class="k">✒️ ${t('inkL')}</span><div class="item"><span class="th inkth">✒️</span><span><b>${esc(t('inkT'))}</b><small>${t(admin ? 'inkA' : 'inkS')}${till ? ' ' + t('inkU').replace('{d}', till) : ''}</small></span><a class="mini-btn" href="${(L ? '/' + LG : '')}/ink/">${t('inkGo')}</a></div></div>`;
+  }
   function inside(d, admin) {
     const items = itemsOf(d, admin);
-    if (!items.length) return kick(d) + `<div class="big">🔘</div><p>${t('buttons')}</p>`;
-    return kick(d) + items.map(([k, v]) => {
+    let html = !items.length ? kick(d) + `<div class="big">🔘</div><p>${t('buttons')}</p>` : kick(d) + items.map(([k, v]) => {
       if (k === 'file') { const f = fileOf(v); return f ? fileCard(f) : ''; }
       let name = k + ' ' + v;
       try { if (window.PPBirds) name = window.PPBirds.giftName(k, v, L); } catch (e) { /* как есть */ }
       return giftRow(name);
     }).join('');
+    if (d === 24 && (admin || S.ink)) html += inkRow(admin); // 24-е всегда открывает курс туши (INK_DAY в worker/index.js)
+    return html;
   }
   function openDay(d) {
     const s = stateOf(d);
@@ -206,7 +220,12 @@
     if (b) b.classList.add('opening');
     fetch('/api/advent/open', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ day: d }) })
       .then(r => { if (!r.ok) throw 0; return r.json(); })
-      .then(x => setTimeout(() => { build(); draw(); show(inside(d, false), true); if (window.PPNews) window.PPNews.refresh(); }, 850))
+      .then(x => setTimeout(() => {
+        if (x.ink) { S.ink = true; S.inkUntil = x.inkUntil || 0; } // окно 24 декабря открыло курс туши на год
+        const rec = { day: d, kind: x.kind, item: x.item || (x.files && x.files[0]) || '', buttons: x.buttons || 0, got: x.kind === 'file' ? (x.files || []) : (x.got || []) };
+        S.opened = (S.opened || []).filter(o => o.day !== d).concat([rec]); // открытое только что окошко — сразу со всем, что в нём есть
+        build(); draw(); show(inside(d, false), true); if (window.PPNews) window.PPNews.refresh();
+      }, 850))
       .catch(() => { if (b) b.classList.remove('opening'); show(`${kick(d)}<p>${t('err')}</p>`); });
   }
   app.addEventListener('click', e => {

@@ -3399,6 +3399,7 @@ button.adm-tag.adm-tag-none { background: #fff; border-style: dashed; }
 .fl-adv-day { cursor: pointer; }
 .fl-adv-day:hover { text-decoration: underline; }
 .fl-adv-add { margin-left: auto; padding: 5px 12px; border-radius: 999px; border: 1px dashed rgba(240, 169, 135, .8); background: transparent; color: inherit; font: 600 13px 'Karla', sans-serif; cursor: pointer; }
+.fl-adv-ink { padding: 3px 10px; border-radius: 999px; background: rgba(76, 195, 138, .16); color: #2C5F4B; font: 600 12px 'Karla', sans-serif; cursor: help; }
 .fl-adv-daydlg { width: min(860px, calc(100% - 24px)); max-height: calc(100dvh - 40px); display: flex; flex-direction: column; }
 .fl-adv-daydlg:not([open]) { display: none; }
 .fl-adv-q { width: 100%; padding: 8px 12px; margin-bottom: 8px; border-radius: 10px; border: 1px solid #DAD7D5; font: inherit; }

@@ -202,6 +202,7 @@
 .advw .item+.item{margin-top:8px}
 .advw .item .th{width:52px;height:52px;border-radius:10px;background:#FFF4D6;display:grid;place-items:center;font-size:28px;overflow:hidden}
 .advw .item .th img{width:100%;height:100%;object-fit:cover}
+.advw .item .th.inkth{background:#F3EFE4}
 .advw .item b{display:block;font:700 15px/1.25 Fraunces}
 .advw .item small{color:#6B7884;font-size:13px}
 .advw .item .mini-btn{border:0;background:#fff;box-shadow:inset 0 0 0 1.5px #DCE5EC;border-radius:99px;padding:7px 10px;font:700 12px Karla;color:var(--red);white-space:nowrap;text-decoration:none}

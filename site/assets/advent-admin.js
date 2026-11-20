@@ -7,6 +7,10 @@
     advAdd: ['＋ Add', '＋ Добавить', '＋ Pievienot'], advIn: ['In this window', 'В этом окошке', 'Šajā lodziņā'],
     advDayH: ['Tap things to put them in this window or take them out. Every bird who opens it on that day gets all of them.', 'Нажимайте на вещи, чтобы положить их в это окошко или убрать. Каждая птичка, открывшая окошко в этот день, получит их все.', 'Pieskaries lietām, lai ieliktu tās šajā lodziņā vai izņemtu. Katrs putniņš, kas atver lodziņu tajā dienā, saņem tās visas.'],
     advEmpty: ['empty — buttons', 'пусто — пуговки', 'tukšs — pogas'], advDec: ['December {d}', '{d} декабря', '{d}. decembris'], done: ['Done', 'Готово', 'Gatavs'],
+    inkChip: ['ink course', 'курс туши', 'tušas kurss'],
+    inkChipT: ['Every bird who opens this window on 24 December also gets the ink course (/ink/, 15 lessons) — it is not a thing in the plan, it opens by itself.',
+      'Каждая птичка, открывшая окно 24 декабря, получает доступ к курсу туши (/ink/, 15 уроков) — это не вещь из плана, окно открывает его само.',
+      'Katrs putniņš, kas 24. decembrī atver šo lodziņu, saņem arī tušas kursu (/ink/, 15 nodarbības) — tā nav lieta no plāna, lodziņš to atver pats.'],
     hint: ['Tap a day or “＋ Add”: you can put things from the shop into the window or upload your own file. ★ — special windows, the 31st is the legendary one. An empty window gives buttons.',
       'Нажмите на день или «＋ Добавить»: в окно можно положить вещи из магазина или загрузить свой файл. ★ — особые окошки, 31-е — легендарное. Пустое окошко даёт пуговки.',
       'Pieskaries dienai vai “＋ Pievienot”: lodziņā var ielikt lietas no veikala vai augšupielādēt savu failu. ★ — īpašie lodziņi, 31. — leģendārais. Tukšs lodziņš dod pogas.'],
@@ -78,6 +82,8 @@
         x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', '✕ ' + it.title);
         it.appendChild(x); row.appendChild(it);
       });
+      // 24-е окно само открывает курс туши (INK_DAY в worker/index.js) — не вещь из плана, но видно, что окно не пустое
+      if (n === 24) { var inkc = document.createElement('span'); inkc.className = 'fl-adv-ink'; inkc.textContent = '✒️ ' + T.inkChip[L]; inkc.title = T.inkChipT[L]; row.appendChild(inkc); }
       // «＋» и клик по дню — окно дня: вещи из магазина или свой файл
       var addB = document.createElement('button'); addB.type = 'button'; addB.className = 'fl-adv-add'; addB.textContent = T.advAdd[L];
       addB.onclick = (function (d) { return function () { advDayPick(d); }; })(n);
@@ -107,7 +113,7 @@
           '<label>' + T.fcap[L] + '<input class="fl-adv-in" data-c maxlength="160"></label></div>' +
         '<div class="fl-adv-more" data-more hidden><input class="fl-adv-in" data-ce placeholder="EN" maxlength="160"><input class="fl-adv-in" data-cl placeholder="LV" maxlength="160"></div>' +
         '<p class="fl-adv-note"><button type="button" class="fl-adv-link" data-show3>🌐 ' + T.more3[L] + '</button></p>' +
-        '<label class="fl-adv-drop fl-adv-drop-sm" data-prevbox hidden><input type="file" data-p accept="image/jpeg,image/png,image/webp,image/gif" hidden><b>🖼 ' + T.fprev[L] + '</b></label>' +
+        '<label class="fl-adv-drop fl-adv-drop-sm" data-prevbox hidden><input type="file" data-pv accept="image/jpeg,image/png,image/webp,image/gif" hidden><b>🖼 ' + T.fprev[L] + '</b></label>' +
         '<p class="fl-adv-msg" data-msg aria-live="polite"></p>' +
         '<p><button type="button" class="pill-btn pill-fill" data-send>' + T.put[L] + '</button></p>' +
         '<div class="fl-adv-files" data-files></div>' +
@@ -144,7 +150,7 @@
     }
     function setFile(f) {
       up.file = f || null; up.prev = null;
-      var pbox = $('[data-prevbox]'), pin = $('[data-p]');
+      var pbox = $('[data-prevbox]'), pin = $('[data-pv]');
       $('[data-f]').value = ''; pbox.hidden = true; pin.value = ''; pb.innerHTML = ''; pb.hidden = true;
       if (!up.file) { $('[data-n]').value = ''; say(''); chosen(); return; }
       if (up.file.size > FILE_MAX) { up.file = null; $('[data-f]').value = ''; say(T.errBig[L], true); chosen(); return; }
@@ -153,7 +159,7 @@
       say(''); chosen();
     }
     $('[data-f]').onchange = function () { setFile(this.files && this.files[0]); };
-    $('[data-p]').onchange = function () {
+    $('[data-pv]').onchange = function () {
       var f = this.files && this.files[0]; up.prev = null; pb.innerHTML = ''; pb.hidden = true;
       if (!f) return chosen();
       if (!IMG.test(f.type || '')) { this.value = ''; return say(T.errType[L], true); }
@@ -170,7 +176,7 @@
       var f = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0]; if (f) setFile(f);
     });
     function resetUp() {
-      up.file = null; up.prev = null; $('[data-f]').value = ''; $('[data-p]').value = '';
+      up.file = null; up.prev = null; $('[data-f]').value = ''; $('[data-pv]').value = '';
       $('[data-prevbox]').hidden = true; pb.innerHTML = ''; pb.hidden = true;
       ['[data-n]', '[data-c]', '[data-ce]', '[data-cl]'].forEach(function (s) { d.querySelector(s).value = ''; });
       chosen();
