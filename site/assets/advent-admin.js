@@ -7,6 +7,10 @@
     advAdd: ['＋ Add', '＋ Добавить', '＋ Pievienot'], advIn: ['In this window', 'В этом окошке', 'Šajā lodziņā'],
     advDayH: ['Tap things to put them in this window or take them out. Every bird who opens it on that day gets all of them.', 'Нажимайте на вещи, чтобы положить их в это окошко или убрать. Каждая птичка, открывшая окошко в этот день, получит их все.', 'Pieskaries lietām, lai ieliktu tās šajā lodziņā vai izņemtu. Katrs putniņš, kas atver lodziņu tajā dienā, saņem tās visas.'],
     advEmpty: ['empty — buttons', 'пусто — пуговки', 'tukšs — pogas'], advDec: ['December {d}', '{d} декабря', '{d}. decembris'], done: ['Done', 'Готово', 'Gatavs'],
+    inkChip: ['ink course', 'курс туши', 'tušas kurss'],
+    inkChipT: ['Every bird who opens this window on 24 December also gets the ink course (/ink/, 15 lessons) — it is not a thing in the plan, it opens by itself.',
+      'Каждая птичка, открывшая окно 24 декабря, получает доступ к курсу туши (/ink/, 15 уроков) — это не вещь из плана, окно открывает его само.',
+      'Katrs putniņš, kas 24. decembrī atver šo lodziņu, saņem arī tušas kursu (/ink/, 15 nodarbības) — tā nav lieta no plāna, lodziņš to atver pats.'],
     hint: ['Tap a day or “＋ Add”: you can put things from the shop into the window or upload your own file. ★ — special windows, the 31st is the legendary one. An empty window gives buttons.',
       'Нажмите на день или «＋ Добавить»: в окно можно положить вещи из магазина или загрузить свой файл. ★ — особые окошки, 31-е — легендарное. Пустое окошко даёт пуговки.',
       'Pieskaries dienai vai “＋ Pievienot”: lodziņā var ielikt lietas no veikala vai augšupielādēt savu failu. ★ — īpašie lodziņi, 31. — leģendārais. Tukšs lodziņš dod pogas.'],
@@ -78,6 +82,8 @@
         x.type = 'button'; x.textContent = '✕'; x.setAttribute('aria-label', '✕ ' + it.title);
         it.appendChild(x); row.appendChild(it);
       });
+      // 24-е окно само открывает курс туши (INK_DAY в worker/index.js) — не вещь из плана, но видно, что окно не пустое
+      if (n === 24) { var inkc = document.createElement('span'); inkc.className = 'fl-adv-ink'; inkc.textContent = '✒️ ' + T.inkChip[L]; inkc.title = T.inkChipT[L]; row.appendChild(inkc); }
       // «＋» и клик по дню — окно дня: вещи из магазина или свой файл
       var addB = document.createElement('button'); addB.type = 'button'; addB.className = 'fl-adv-add'; addB.textContent = T.advAdd[L];
       addB.onclick = (function (d) { return function () { advDayPick(d); }; })(n);

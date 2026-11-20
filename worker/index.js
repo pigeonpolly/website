@@ -2260,7 +2260,7 @@ async function route(req, env, url) {
     const all = (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results;
     // прошедшие окошки открыты для всех (и для гостей): в декабре — дни до сегодняшнего, в январе — все; будущее — секрет (целиком видит только админ)
     const shownTo = t.day ? t.day - 1 : t.month === 1 ? 31 : 0;
-    return json({ v: 2, year: t.year, month: t.month, today: t.day, claimTo: t.claimTo, catchUp: t.catchUp, lastJan: RULES.adventLastJan, startsAt: t.startsAt, now: t.nowMs, nextAt: t.nextAt, date: t.date, special: ADVENT_SPECIAL, user: u ? { id: u.id, nick: u.nick } : null, opened,
+    return json({ v: 2, year: t.year, month: t.month, today: t.day, claimTo: t.claimTo, catchUp: t.catchUp, lastJan: RULES.adventLastJan, startsAt: t.startsAt, now: t.nowMs, nextAt: t.nextAt, date: t.date, special: ADVENT_SPECIAL, user: u ? { id: u.id, nick: u.nick } : null, ink: !!(u && u.ink_ok), opened,
       past: all.filter(r => r.day <= shownTo), shownTo, plan: admin ? all : undefined }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/advent/open') {
@@ -2270,9 +2270,14 @@ async function route(req, env, url) {
     if (!(day >= 1 && day <= t.claimTo)) fail(403, 'locked');
     if ((day === 24 || day === 31) && day !== t.day) fail(403, 'locked'); // 24 и 31 — только в свой день // сегодняшнее и пропущенные (до 23 января), будущие — нет
     const ins = await env.DB.prepare('INSERT OR IGNORE INTO advent_open (user_id, year, day, created_at) VALUES (?, ?, ?, ?)').bind(u.id, t.year, day, now()).run();
-    if (!ins.meta.changes) { const o = await env.DB.prepare('SELECT day, kind, item, buttons, got FROM advent_open WHERE user_id = ? AND year = ? AND day = ?').bind(u.id, t.year, day).first(); return json({ ok: true, again: true, ...o, got: parseJ(o.got, o.kind ? [[o.kind, o.item]] : []) }); }
+    if (!ins.meta.changes) {
+      if (day === INK_DAY && !u.ink_ok) await env.DB.prepare('UPDATE users SET ink_ok = 1 WHERE id = ?').bind(u.id).run().catch(() => {}); // окно 24 открыли раньше, чем появился курс — доступ выдаём сейчас
+      const o = await env.DB.prepare('SELECT day, kind, item, buttons, got FROM advent_open WHERE user_id = ? AND year = ? AND day = ?').bind(u.id, t.year, day).first();
+      return json({ ok: true, again: true, ink: day === INK_DAY || !!u.ink_ok, ...o, got: parseJ(o.got, o.kind ? [[o.kind, o.item]] : []) });
+    }
     // у всех одинаково: птичка получает все вещи окошка (кроме тех, которых у неё уже максимум); пустое окошко — пуговки
     if (day === INK_DAY) await env.DB.prepare('UPDATE users SET ink_ok = 1 WHERE id = ?').bind(u.id).run(); // сюрприз: курс туши
+    const inkOk = day === INK_DAY || !!u.ink_ok; // в окне 24 — доступ к курсу туши (/ink/), показываем его карточкой
     const plan = (await env.DB.prepare('SELECT kind, item FROM advent_plan WHERE day = ?').bind(day).all()).results;
     const got = [], files = [];
     for (const r of plan) {
@@ -2286,16 +2291,16 @@ async function route(req, env, url) {
     }
     if (files.length) {
       await env.DB.prepare('UPDATE advent_open SET kind = \'file\', item = ?, got = ? WHERE user_id = ? AND year = ? AND day = ?').bind(files[0], JSON.stringify(files), u.id, t.year, day).run();
-      return json({ ok: true, day, kind: 'file', files, collector: await adventCollector(env, u.id, t.year), collectorBtns: BTN.badges.collector });
+      return json({ ok: true, day, kind: 'file', files, ink: inkOk, collector: await adventCollector(env, u.id, t.year), collectorBtns: BTN.badges.collector });
     }
     if (got.length) {
       await env.DB.prepare('UPDATE advent_open SET kind = ?, item = ?, got = ? WHERE user_id = ? AND year = ? AND day = ?').bind(got[0][0], got[0][1], JSON.stringify(got), u.id, t.year, day).run();
-      return json({ ok: true, day, kind: got[0][0], item: got[0][1], got, collector: await adventCollector(env, u.id, t.year), collectorBtns: BTN.badges.collector });
+      return json({ ok: true, day, kind: got[0][0], item: got[0][1], got, ink: inkOk, collector: await adventCollector(env, u.id, t.year), collectorBtns: BTN.badges.collector });
     }
     const n = ADVENT_SPECIAL.includes(day) ? BTN.adventSpecial : BTN.advent;
     await award(env, u.id, 'advent', `${t.year}-${day}`, n);
     await env.DB.prepare('UPDATE advent_open SET buttons = ? WHERE user_id = ? AND year = ? AND day = ?').bind(n, u.id, t.year, day).run();
-    return json({ ok: true, day, buttons: n, collector: await adventCollector(env, u.id, t.year), collectorBtns: BTN.badges.collector });
+    return json({ ok: true, day, buttons: n, ink: inkOk, collector: await adventCollector(env, u.id, t.year), collectorBtns: BTN.badges.collector });
   }
   if (m === 'POST' && p === '/api/admin/advent') { // Алина отмечает в кабинете, какую вещь или файл положить в какое окошко
     const u = await needUser(req, env);
