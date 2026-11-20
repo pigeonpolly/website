@@ -36,7 +36,7 @@ import { runesApi } from './runes.js'; // 🔮 Руны в кабинете — 
 import { tarotApi } from './tarot.js'; // 🃏 Таро в кабинете — только админ (docs/admin.md «Таро»)
 import { pollsApi, pollPage, POLL_TABLES, POLL_ALTER } from './polls.js'; // 🗳 Опросы: главная и кабинет (docs/admin.md «Опросы»)
 import { weekApi, outClick, WEEK_TABLES } from './week.js';
-import { blogStatsApi, readHit, ANALYTICS_TABLES, ANALYTICS_ALTER } from './analytics.js'; // кабинет → «📊 Аналитика» → «📰 Блог»: чтение статей (docs/admin.md) // кабинет → «🗓 Неделя» и переходы на Amazon (docs/admin.md)
+import { tableApi, readHit, ANALYTICS_TABLES, ANALYTICS_ALTER } from './analytics.js'; // кабинет → «📊 Аналитика» одной таблицей + чтение статей (docs/admin.md) // кабинет → «🗓 Неделя» и переходы на Amazon (docs/admin.md)
 import { ideasApi } from './ideas.js';
 import { guidesApi, guidesList, guideOut, GUIDES_ALTER } from './guides.js'; // кабинет → «🎬 Видео и гайды», /api/v2/guides (docs/admin.md) // кабинет → «💡 Темы для блога» (docs/admin.md)
 import { titosApi, titosState, importTitos, rewardNews, TITOS_TABLES, TITOS_RULES, TITOS_RANGE, TITOS_INT, TITOS_ALTER } from './titos.js'; // детектив Титос (docs/titos.md) // общий перевод (кнопка «🌐 Перевести» в кабинете, карточки, «Нарисуй мне»)
@@ -1236,41 +1236,6 @@ async function hit(req, env) {
     .bind(day, now(), vid, entry, path, lang, src, ref && ref !== 'self' ? ref.slice(0, 80) : null, campaign, info.device, info.os, info.browser, (req.cf && req.cf.country) || null, rpath).run();
   return ok;
 }
-async function visitStats(env, days) {
-  const dayAgo = n => new Date(Date.now() - n * 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
-  const from = dayAgo(days - 1), prevFrom = dayAgo(2 * days - 1);
-  const q = async (sql, ...a) => (await env.DB.prepare(sql).bind(...a).all()).results;
-  // люди = уникальные за каждые сутки (один человек за день считается один раз)
-  const people = async (where, ...a) => q(`SELECT COUNT(DISTINCT day || vid) AS n FROM visits WHERE ${where}`, ...a).then(r => r[0].n);
-  const totals = async (a, b) => ({
-    people: await people('day >= ? AND day <= ?', a, b),
-    views: (await q('SELECT COUNT(*) AS n FROM visits WHERE day >= ? AND day <= ?', a, b))[0].n,
-    visits: (await q('SELECT COUNT(*) AS n FROM visits WHERE entry = 1 AND day >= ? AND day <= ?', a, b))[0].n,
-  });
-  const today = dayAgo(0);
-  // разбивки: по людям (уникальным за сутки), а «откуда» — по визитам (каждый заход с другого сайта/приложения)
-  const by = col => q(`SELECT ${col} AS k, COUNT(DISTINCT day || vid) AS n FROM visits WHERE day >= ? AND ${col} IS NOT NULL GROUP BY ${col} ORDER BY n DESC LIMIT 30`, from);
-  const series = await q('SELECT day, COUNT(DISTINCT vid) AS people, COUNT(*) AS views FROM visits WHERE day >= ? GROUP BY day ORDER BY day', from);
-  return {
-    days, from, to: today, first: (await q('SELECT MIN(day) AS d FROM visits'))[0].d,
-    now: { ...(await totals(from, today)), mobile: (await q("SELECT COUNT(DISTINCT day || vid) AS n FROM visits WHERE day >= ? AND device = 'Телефон'", from))[0].n },
-    prev: await totals(prevFrom, dayAgo(days)),
-    online: (await q('SELECT COUNT(DISTINCT vid) AS n FROM visits WHERE ts > ?', now() - 300))[0].n,
-    series,
-    sources: await q('SELECT src AS k, COUNT(*) AS n FROM visits WHERE entry = 1 AND day >= ? GROUP BY src ORDER BY n DESC', from),
-    sourceDevices: await q('SELECT src AS k, device AS d, COUNT(*) AS n FROM visits WHERE entry = 1 AND day >= ? GROUP BY src, device', from),
-    refs: await q('SELECT ref AS k, COUNT(*) AS n FROM visits WHERE entry = 1 AND ref IS NOT NULL AND day >= ? GROUP BY ref ORDER BY n DESC LIMIT 30', from),
-    campaigns: await q('SELECT campaign AS k, src AS s, COUNT(*) AS n FROM visits WHERE entry = 1 AND campaign IS NOT NULL AND day >= ? GROUP BY campaign, src ORDER BY n DESC LIMIT 30', from),
-    // сохранённые ссылки: заходы и люди всего и за выбранный период (заход засчитывается по utm_campaign + utm_source)
-    links: await Promise.all((await q('SELECT * FROM utm_links ORDER BY id DESC')).map(async l => {
-      const c = (await q("SELECT COUNT(*) AS n, COUNT(DISTINCT day || vid) AS p, SUM(day >= ?) AS np, COUNT(DISTINCT CASE WHEN day >= ? THEN day || vid END) AS pp FROM visits WHERE entry = 1 AND campaign = ? AND src = ?", from, from, l.campaign, utmSource(l.source)))[0];
-      return { ...l, all: c.n || 0, people: c.p || 0, period: c.np || 0, periodPeople: c.pp || 0 };
-    })),
-    landing: await q('SELECT path AS k, COUNT(*) AS n FROM visits WHERE entry = 1 AND day >= ? GROUP BY path ORDER BY n DESC LIMIT 20', from),
-    pages: await q('SELECT path AS k, COUNT(*) AS n, COUNT(DISTINCT day || vid) AS p FROM visits WHERE day >= ? GROUP BY path ORDER BY n DESC LIMIT 40', from),
-    devices: await by('device'), os: await by('os'), browsers: await by('browser'), countries: await by('country'), langs: await by('lang'),
-  };
-}
 
 // ---------- сессия ----------
 function cookie(req, name) {
@@ -1785,7 +1750,7 @@ async function route(req, env, url) {
   if (p === '/api/school' || p.startsWith('/api/school/') || p === '/api/admin/school' || p === '/api/admin/school/check') { const r = await schoolApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, imgPut, imgDrop: id => imgDrop(env, id), randomHex, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The string is a short friendly comment from an art teacher (Polly, a pigeon) on a student\'s drawing made on paper. Keep it warm, simple and encouraging.') }); if (r) return r; }
   if (p === '/api/about-chat' || p.startsWith('/api/about-chat/') || p === '/api/admin/about-asks') { const r = await aboutChatApi(req, env, url, { json, fail, currentUser, needUser, isAdmin, now, rules: () => RULES, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n), badge: (u, k) => gameBadge(env, u, k), asset: path => env.ASSETS.fetch(new Request(new URL(path, url.origin))).then(r => r.ok ? r.json() : null), ipKey: async r => { let salt = await getMeta(env, 'blog_salt'); if (!salt) { salt = randomHex(16); await setMeta(env, 'blog_salt', salt); } return (await sha256(salt + (r.headers.get('cf-connecting-ip') || '0'))).slice(0, 24); }, translate: (texts, from, langs) => translateTo(env, texts, from, langs, 'The strings are a question a visitor asked in a cosy retro chat on an artist\'s website, or the answer of the artist Alina or of her character Polly, a dramatic, funny pigeon from the island of Wobbleland. Keep the casual, playful tone; keep names (Alina, Polly, Milka, Wobbleland) as they are.') }); if (r) return r; }
   if (m === 'POST' && p === '/api/admin/pause') return pauseApi(req, env, { json, fail, needUser, isAdmin, now });
-  if (p === '/api/admin/blogstats') { const r = await blogStatsApi(req, env, url, { json, fail, needUser, isAdmin }); if (r) return r; }
+  if (p === '/api/admin/analytics') { const r = await tableApi(req, env, url, { json, fail, needUser, isAdmin }); if (r) return r; }
   if (p === '/api/admin/week') { const r = await weekApi(req, env, url, { json, fail, needUser, isAdmin, getMeta, now }); if (r) return r; }
   if (p === '/api/kitchen' || p.startsWith('/api/kitchen/')) { const r = await kitchenApi(req, env, url, { json, fail, currentUser, needUser, rules: () => RULES }); if (r) return r; }
   if (p === '/api/shift' || p.startsWith('/api/shift/')) { const r = await shiftApi(req, env, url, { json, fail, currentUser, needUser, rules: () => RULES, randomHex, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
@@ -1881,11 +1846,6 @@ async function route(req, env, url) {
   }
   // все птицы (аккаунты) для кабинета: ник, когда появились, когда заходили, сколько работ
   if (m === 'POST' && p === '/api/hit') return await hit(req, env);
-  if (m === 'GET' && p === '/api/admin/visits') {
-    const u = await needUser(req, env);
-    if (!(await isAdmin(u, env))) fail(403, 'admin');
-    return json(await visitStats(env, Math.min(Math.max(Number(url.searchParams.get('days')) || 7, 1), 365)));
-  }
   if (m === 'POST' && p === '/api/admin/links') {
     const u = await needUser(req, env);
     if (!(await isAdmin(u, env))) fail(403, 'admin');

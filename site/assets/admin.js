@@ -53,20 +53,20 @@
     { id: 'titos', ic: '🕵️', name: 'Дела Титоса', group: 'shop', about: 'Какие дела детектива Титоса на сайте и переведены ли они. Новые дела заносятся сами раз в час после выкладки.' },
     { id: 'titos-rules', hide: 1, ic: '📜', name: 'Правила Титоса', open: 'rules', focus: rulesBox(/Детектив Титос/), about: 'Кофе детектива Титоса и пуговки за раскрытые дела.' },
     { id: 'games', hide: 1, ic: '🎮', name: 'Награды игр', open: 'rules', focus: rulesBox(/Пуговичный дождь/), about: 'Сколько пуговок дают игры.' },
-    { id: 'overview', ic: '📊', name: 'Сводка', group: 'stats', about: 'Главные цифры сайта: статьи, комментарии, птицы, работы в челлендже. Подробно — во вкладках рядом.' },
-    { id: 'blogstats', ic: '📰', name: 'Блог', group: 'stats', about: 'Какие статьи читают и какие нет, откуда на них приходят, сколько времени читают и дочитывают ли. Нажмите на статью — всё о ней.' },
-    { id: 'challenge', hide: 1, ic: '📊', name: 'Обзор', open: 'overview', about: 'Главные цифры сайта: статьи, комментарии, птицы, работы в челлендже.' },
-    { id: 'flock', hide: 1, ic: '📊', name: 'Обзор', open: 'overview', about: 'Главные цифры сайта: статьи, комментарии, птицы, работы в челлендже.' },
-    { id: 'visitors', ic: '👥', name: 'Посетители', group: 'stats', about: 'Сколько людей заходит на сайт, откуда и с каких устройств.' },
+    { id: 'analytics', ic: '📊', name: 'Аналитика', group: 'stats', about: 'Одна таблица: страницы, статьи, дни, источники — период, фильтры, сравнение. Нажмите на строку — подробнее.' },
     { id: 'funnels', ic: '🔻', name: 'Воронки', group: 'stats', about: 'Сколько людей проходит каждый шаг: например, открыли окно входа → вошли.' },
-    { id: 'analytics', hide: 1, ic: '📰', name: 'Блог', open: 'blogstats' }, // старый адрес «📈 Статьи»
+    { id: 'visitors', hide: 1, ic: '👥', name: 'Посетители', open: 'analytics', by: 'page' }, // старый адрес: теперь одна таблица
+    { id: 'blogstats', hide: 1, ic: '📰', name: 'Блог', open: 'analytics', by: 'article' }, // старый адрес
+    { id: 'overview', hide: 1, ic: '📊', name: 'Сводка', open: 'analytics', by: 'page' }, // старый адрес
+    { id: 'challenge', hide: 1, ic: '📊', name: 'Обзор', open: 'analytics', by: 'page' },
+    { id: 'flock', hide: 1, ic: '📊', name: 'Обзор', open: 'analytics', by: 'page' },
     { id: 'rules', ic: '📜', name: 'Правила', group: 'service', about: 'Что сайт делает сам (автопилот) и все числа: пуговки, бейджи, игры.' },
     { id: 'backup', ic: '💾', name: 'Копии', group: 'service', about: 'Полная копия сайта: скачать, настроить автокопию, восстановить.' },
     { id: 'security', ic: '🔐', name: 'Защита', group: 'service', about: 'PIN админа и код восстановления на случай, если потеряете Google.' },
     { id: 'edits', ic: '🧩', name: 'Правки страниц', group: 'service', about: 'Блоки, которые вы поменяли или скрыли прямо на сайте («✏️ Править страницу»), — здесь их можно вернуть как было.', count: 'edits' },
     { id: 'gemini', hide: 1, ic: '🔑', name: 'Ключ Gemini', href: '/blog-editor/#gemini' },
   ];
-  const SECTIONS = { week, notes, titos, inbox, security, overview: () => overview(), visitors, comments, blogstats, funnels: () => funnelsScreen(), backup, subscribers, birds, shop, edits, advent, rules, art,
+  const SECTIONS = { week, notes, titos, inbox, security, analytics, comments, funnels: () => funnelsScreen(), backup, subscribers, birds, shop, edits, advent, rules, art,
     themes: () => window.PPChallengeAdmin ? window.PPChallengeAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился challenge-admin.js</p>'), // 🎨 Темы челленджа (challenge-admin.js)
     asks: () => window.PPAboutAdmin ? window.PPAboutAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился about-admin.js</p>'), // 📮 Вопросы из чата (about-admin.js)
     school: () => window.PPSchoolAdmin ? window.PPSchoolAdmin.mount(main) : (main.innerHTML = '<p class="be-note">Не загрузился school-admin.js</p>'), // 🎓 Школа Полли (school-admin.js)
@@ -99,7 +99,11 @@
   document.addEventListener('click', e => { const a = e.target.closest && e.target.closest('a.adm-ext'); if (a) { const x = ADMIN_SECTIONS.find(t => t.href === a.getAttribute('href')); if (x && x.id !== 'blog') freqAdd(x.id); } }); // блог считает сам blog-editor.js
   // экран: строка «что здесь делается» сверху, потом сам раздел; focus — прокрутить к нужному месту
   async function route() {
-    const id = (location.hash || '#week').slice(1), x = secOf(id) || (SECTIONS[id] ? { id } : secOf('week'));
+    const raw = (location.hash || '#week').slice(1), qi = raw.indexOf('?');
+    const id = qi < 0 ? raw : raw.slice(0, qi);
+    const x = secOf(id) || (SECTIONS[id] ? { id } : secOf('week'));
+    if (qi >= 0) anParse(raw.slice(qi + 1)); // период и фильтры из ссылки (#analytics?p=7&by=src…)
+    if (x.by) { const s = anState(); s.by = x.by; s.row = ''; } // старые адреса: #visitors → таблица по страницам, #blogstats → по статьям
     const cur = x.hide ? x.open || x.id : x.id, g = (secOf(cur) || x).group || '';
     const adm = document.getElementById('adm'); if (adm) adm.classList.toggle('adm-wk', x.id === 'week'); // «Неделя» — на всю ширину, без меню слева
     document.querySelectorAll('.adm-nav [data-grp]').forEach(a => a.setAttribute('aria-current', a.dataset.grp === (x.id === 'week' || x.id === 'runes' || x.id === 'tarot' ? x.id : g) ? 'page' : 'false'));
@@ -213,7 +217,7 @@
       <div class="wk-nums">${nums.map(([v, t, dl, c, href]) => { const tag = href ? 'a' : 'div'; return `<${tag}${href ? ` href="${href}" title="Открыть список птичек"` : ''} class="wk-num${c ? ' ' + c : ''}"><b>${n(v)}</b><span>${t}</span>${dl}</${tag}>`; }).join('')}</div>
       <div class="wk-acts">${acts.map(a => `<section class="wk-act${a.hot ? ' wk-hot' : ''}"><span class="wk-e" aria-hidden="true">${a.ic}</span><h3>${a.t}${a.badge ? `<span class="wk-badge">${a.badge}</span>` : ''}</h3><p>${a.d}</p><div class="wk-btns">${a.btn}</div></section>`).join('')}</div>
       <section class="wk-more"><h3>⚙ Ещё инструменты</h3><div class="wk-cols">${more}</div></section>
-      <p class="be-note wk-foot">Цифры — за последние 7 дней (${esc(d.from.slice(8))}.${esc(d.from.slice(5, 7))}–${esc(d.to.slice(8))}.${esc(d.to.slice(5, 7))}), сравнение — с 7 днями до них. Подробно — <a href="#overview">📊 Аналитика</a> (сайт, блог, посетители, воронки).</p>
+      <p class="be-note wk-foot">Цифры — за последние 7 дней (${esc(d.from.slice(8))}.${esc(d.from.slice(5, 7))}–${esc(d.to.slice(8))}.${esc(d.to.slice(5, 7))}), сравнение — с 7 днями до них. Подробно — <a href="#analytics">📊 Аналитика</a>: одна таблица по страницам, статьям, дням и источникам.</p>
     </div>`;
     // ⏸ пауза сайта (worker/pause.js): для посетителей — страница «Ведутся работы», админа пускает
     main.querySelector('#wk-pause').onclick = async e => {
@@ -299,24 +303,6 @@
   const autoCard = list => { const bad = list.filter(x => x.ok === false); return `<section class="adm-box adm-auto${bad.length ? ' warn' : ''}"><h3>🤖 Автопилот: ${bad.length ? `нужно внимание (${bad.length})` : 'всё работает само ✓'}</h3>
     <p class="be-note">${bad.length ? 'Ниже красным — что не так. Остальное по-прежнему работает само.' : 'Магазин пополняется, цены и награды подстраиваются, сезоны меняются — ничего настраивать не нужно.'}</p>
     <ul>${list.map(x => `<li class="${x.ok === false ? 'bad' : x.ok === null ? 'off' : x.warn ? 'warn' : 'ok'}"><b>${x.ok === false ? '⚠️' : x.ok === null ? '⏸' : x.warn ? '🟡' : '✓'} ${esc(x.t)}</b> — ${esc(x.d)}</li>`).join('')}</ul></section>`; };
-  async function overview(el = main) {
-    el.innerHTML = '<p class="be-note">Загрузка…</p>';
-    let d; try { d = await api('blog/admin/overview'); } catch (e) { el.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    const card = (icon, label, big, small) => `<div class="adm-card"><span class="adm-ic">${icon}</span><b>${big}</b><span>${label}</span>${small ? `<small>${small}</small>` : ''}</div>`;
-    el.innerHTML = `<div class="adm-cards">
-        ${card('📝', 'статей опубликовано', n(d.posts.pub), d.posts.draft ? `черновиков: ${n(d.posts.draft)}` : '')}
-        ${card('👁', 'просмотров статей', n(d.posts.views), `лайков: ${n(d.posts.likes)}`)}
-        ${card('💬', 'комментариев', n(d.comments.total), `за неделю: ${n(d.comments.week)}`)}
-        ${card('🐦', 'птиц в стае', n(d.totals.users), `новых за неделю: ${n(d.users.week)} · заходили: ${n(d.users.active)}`)}
-        ${card('🎨', 'работ в челлендже', n(d.totals.works), `за неделю: ${n(d.works.week)}`)}
-      </div>
-      <div class="adm-cols">
-        <section class="adm-box"><h2>Популярные статьи</h2>${d.top.length ? `<ol class="adm-top">${d.top.map(p => `<li><a href="/ru/blog/${esc(p.slug)}/" target="_blank">${esc(title(p))}</a><span>👁 ${n(p.views)} · ♥ ${n(p.likes)} · 💬 ${n(p.comments)}</span><a class="adm-edit" href="/blog-editor/#${p.id}" title="Редактировать">✎</a></li>`).join('')}</ol>` : '<p class="be-note">Пока нет опубликованных статей.</p>'}</section>
-        <section class="adm-box"><h2>Новые птицы <a class="adm-all" href="#birds">все →</a></h2>${d.newUsers.length ? `<ul class="adm-list">${d.newUsers.map(u => `<li>${u.nick ? `<a href="/bird/?nick=${encodeURIComponent(u.nick)}" target="_blank">@${esc(u.nick)}</a>` : '<i>без ника</i>'}<span>${fmt(u.created_at)}</span></li>`).join('')}</ul>` : '<p class="be-note">Пока никого.</p>'}</section>
-      </div>
-      <section class="adm-box"><h2>Новые работы в челлендже</h2>${d.newWorks.length ? `<div class="adm-works">${d.newWorks.map(w => `<a href="/api/img/${w.id}" target="_blank" title="@${esc(w.nick)} · ${esc(w.theme || '')} · ${esc(w.day)}"><img src="/api/img/${w.id}?t=1" alt="" loading="lazy"><span>@${esc(w.nick)}</span></a>`).join('')}</div>` : '<p class="be-note">Пока нет работ.</p>'}</section>`;
-  }
-  function pend(k) { const b = document.getElementById('adm-pend'); if (b) { b.hidden = !k; b.textContent = k || ''; } }
 
   // ---------- 🎨 картины и палитры, добавленные с сайта (/api/palettes; добавляют и скрывают их на страницах галерей) ----------
   async function art() {
@@ -372,8 +358,10 @@
     });
   }
 
-  // ---------- посетители сайта (своя статистика: /api/admin/visits) ----------
-  let vDays = 7;
+  // ---------- 📊 Аналитика: одна таблица (20.11.2026) ----------
+  // Было три экрана (Сводка, Блог, Посетители) — стало одно место: период, фильтры, разрез и таблица.
+  // Разрез: страницы / статьи / дни / источники / страны / устройства / язык / метки; строка раскрывается — по дням и откуда пришли.
+  // Период, сравнение и фильтры остаются в адресе (#analytics?…) и в localStorage — ссылку можно сохранить.
   const SRC_IC = { 'Google': '🔎', 'Bing': '🔎', 'Yandex': '🔎', 'DuckDuckGo': '🔎', 'Другие поисковики': '🔎', 'Instagram': '📸', 'Facebook': '👥', 'Pinterest': '📌', 'TikTok': '🎵', 'Threads': '🧵',
     'LinkedIn': '💼', 'Telegram': '✈️', 'YouTube': '▶️', 'Patreon': '🎨', 'X (Twitter)': '✖️', 'VK': '🅥', 'Reddit': '👽', 'ChatGPT и др. ИИ': '🤖', 'Почта': '✉️', 'Напрямую': '🔗', 'Другие сайты': '🌐' };
   const DEV_IC = { 'Телефон': '📱', 'Компьютер': '💻', 'Планшет': '📲' };
@@ -383,220 +371,311 @@
   const pageName = p => p === '/' ? 'Главная' : p === '/ru/' ? 'Главная (RU)' : p === '/lv/' ? 'Главная (LV)' : p;
   const utmUrl = (p, s, c) => `https://www.pigeonpolly.com${p}${p.includes('?') ? '&' : '?'}utm_source=${encodeURIComponent(s)}&utm_campaign=${encodeURIComponent(c)}`;
   const pct = (a, b) => b ? Math.round(a * 100 / b) : 0;
-  const delta = (a, b) => { if (!b) return a ? '<small class="adm-up">новое</small>' : ''; const d = Math.round((a - b) * 100 / b); return `<small class="${d >= 0 ? 'adm-up' : 'adm-down'}">${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}% к прошлому периоду</small>`; };
-  // горизонтальные полоски: подпись, полоска, число и доля
+  const delta = (a, b) => { if (b == null) return ''; if (!b) return a ? '<small class="adm-up">новое</small>' : ''; const d = Math.round((a - b) * 100 / b); return `<small class="${d >= 0 ? 'adm-up' : 'adm-down'}">${d >= 0 ? '▲' : '▼'} ${Math.abs(d)}% к прошлому периоду</small>`; };
+  const mmss = s => s == null ? '—' : s < 60 ? `${s}\u00a0с` : `${Math.floor(s / 60)}\u00a0мин ${String(s % 60).padStart(2, '0')}\u00a0с`;
+  // горизонтальные полоски: подпись, полоска, число и доля (для раскрытой строки)
   const bars = (rows, label, total, extra) => rows.length ? `<ul class="adm-bars">${rows.map(r => `<li><span class="adm-bl">${label(r)}</span><span class="adm-bt"><i style="width:${Math.max(2, pct(r.n, rows[0].n))}%"></i></span><b>${n(r.n)}</b><small>${pct(r.n, total)}%</small>${extra ? extra(r) : ''}</li>`).join('')}</ul>` : '<p class="be-note">Пока нет данных.</p>';
-  // воронки (этап 12): один вид для любой воронки из worker/auth.js FUNNELS — шаги по дням, доля от первого шага
-  async function funnels(box, days) {
-    if (!box) return;
-    let d; try { d = await api('admin/funnels?days=' + days); } catch (e) { box.innerHTML = ''; return; }
-    box.innerHTML = d.funnels.map(f => {
-      const tot = {}; f.days.forEach(r => f.steps.forEach(s => { tot[s.k] = (tot[s.k] || 0) + (r.n[s.k] || 0); }));
-      const first = f.steps[0].k;
-      const cell = (row, s, i) => `<td data-l="${esc(s.label)}"><b>${n(row[s.k] || 0)}</b>${i && row[first] ? ` <small>${pct(row[s.k] || 0, row[first])}%</small>` : ''}</td>`;
-      return `<section class="adm-box adm-funnel"><h2>🔻 Воронка: ${esc(f.name)}</h2>
-        <p class="be-note">За ${d.days} дн. Один человек за сутки на каждом шаге считается один раз; % — от первого шага.</p>
-        ${f.days.length ? `<table class="be-table adm-table"><thead><tr><th>День</th>${f.steps.map(s => `<th>${esc(s.label)}</th>`).join('')}</tr></thead><tbody>
-          <tr class="adm-total"><td data-l="День"><b>Всего</b></td>${f.steps.map((s, i) => cell(tot, s, i)).join('')}</tr>
-          ${f.days.map(r => `<tr><td data-l="День">${new Date(r.day + 'T12:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', weekday: 'short' })}</td>${f.steps.map((s, i) => cell(r.n, s, i)).join('')}</tr>`).join('')}</tbody></table>` : '<p class="be-note">Пока нет данных.</p>'}</section>`;
-    }).join('');
+
+  const RIGA = () => new Date().toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' });
+  const dAdd = (day, k) => { const x = new Date(day + 'T12:00:00Z'); x.setUTCDate(x.getUTCDate() + k); return x.toISOString().slice(0, 10); };
+  const dLoc = (day, o) => new Date(day + 'T12:00').toLocaleDateString('ru-RU', o);
+  const dOne = day => dLoc(day, { day: 'numeric', month: 'long', year: 'numeric' });
+  const dShort = day => dLoc(day, { day: 'numeric', month: 'short' });
+  const AN_KEY = 'pp-an';
+  const AN_BY = [['page', 'Страницы'], ['article', 'Статьи'], ['day', 'Дни'], ['src', 'Источники'], ['ref', 'Сайты-ссылки'], ['country', 'Страны'], ['device', 'Устройства'], ['lang', 'Язык'], ['campaign', 'Метки']];
+  const AN_CMP = [['prev', 'прошлый период'], ['year', 'год назад'], ['none', 'не сравнивать']];
+  const AN_PRE = [['today', 'Сегодня'], ['7', '7 дней'], ['30', '30 дней'], ['month', 'Этот месяц'], ['lastmonth', 'Прошлый месяц'], ['365', 'Год'], ['custom', 'Свой…']];
+  let A = null, anData = null, anMode = 'table';
+
+  function anState() {
+    if (A) return A;
+    A = { preset: '7', from: '', to: '', cmp: 'prev', by: 'page', src: '', device: '', country: '', lang: '', q: '', row: '', sort: 'people', desc: true, all: false };
+    try { const s = JSON.parse(localStorage.getItem(AN_KEY) || 'null'); if (s && typeof s === 'object') A = { ...A, ...s, row: '', all: false }; } catch (e) {}
+    return A;
   }
-  async function visitors() {
-    main.innerHTML = '<p class="be-note">Загрузка…</p>';
-    let d; try { d = await api('admin/visits?days=' + vDays); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    const N = d.now, P = d.prev, sum = a => a.reduce((s, r) => s + r.n, 0);
-    const srcTotal = sum(d.sources), devTotal = sum(d.devices);
-    // по каждому источнику: какая доля пришла с телефона
-    const sd = {}; d.sourceDevices.forEach(r => { (sd[r.k] = sd[r.k] || {})[r.d] = r.n; });
-    const mob = r => { const x = sd[r.k] || {}, t = Object.values(x).reduce((a, b) => a + b, 0); return `<em title="с телефона">📱 ${pct(x['Телефон'] || 0, t)}%</em>`; };
-    // график по дням: все дни периода, даже пустые
-    const byDay = Object.fromEntries(d.series.map(r => [r.day, r]));
-    const days = []; for (let i = d.days - 1; i >= 0; i--) { const s = new Date(Date.now() - i * 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }); days.push({ day: s, people: (byDay[s] || {}).people || 0, views: (byDay[s] || {}).views || 0 }); }
-    const max = Math.max(1, ...days.map(x => x.people));
-    const dd = s => new Date(s + 'T12:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', weekday: d.days <= 14 ? 'short' : undefined });
-    const chart = d.days === 1 ? '' : `<section class="adm-box"><h2>Люди по дням</h2>
-      <div class="adm-chart" role="img" aria-label="Посетители по дням">${days.map(x => `<div class="adm-col" tabindex="0" data-tip="${esc(dd(x.day))}: ${n(x.people)} чел. · ${n(x.views)} просм."><i style="height:${x.people ? Math.max(3, x.people * 100 / max) : 0}%"></i></div>`).join('')}</div>
-      <div class="adm-chart-x"><span>${dd(days[0].day)}</span><span class="adm-chart-tip" aria-live="polite">Наведите или нажмите на столбик</span><span>${dd(days[days.length - 1].day)}</span></div></section>`;
-    const per = [[1, 'Сегодня'], [7, '7 дней'], [30, '30 дней'], [90, '3 месяца'], [365, 'Год']];
-    main.innerHTML = `
-      <div class="adm-filter" role="toolbar" aria-label="Период">${per.map(([k, l]) => `<button type="button" class="pill-btn" data-days="${k}" aria-pressed="${vDays === k}">${l}</button>`).join('')}
-        <span class="adm-live">🟢 сейчас на сайте: <b>${n(d.online)}</b></span></div>
-      <div class="adm-cards">
-        <div class="adm-card"><span class="adm-ic">👥</span><b>${n(N.people)}</b><span>человек</span>${delta(N.people, P.people)}</div>
-        <div class="adm-card"><span class="adm-ic">🚪</span><b>${n(N.visits)}</b><span>заходов на сайт</span>${delta(N.visits, P.visits)}</div>
-        <div class="adm-card"><span class="adm-ic">📄</span><b>${n(N.views)}</b><span>просмотров страниц</span><small>${N.visits ? (N.views / N.visits).toFixed(1).replace('.', ',') + ' стр. за заход' : ''}</small></div>
-        <div class="adm-card"><span class="adm-ic">📱</span><b>${pct(N.mobile, N.people)}%</b><span>с телефона</span></div>
+  const anSave = () => { const a = anState(); try { localStorage.setItem(AN_KEY, JSON.stringify({ preset: a.preset, from: a.from, to: a.to, cmp: a.cmp, by: a.by, src: a.src, device: a.device, country: a.country, lang: a.lang, sort: a.sort, desc: a.desc })); } catch (e) {} };
+  function anRange() {
+    const a = anState(), today = RIGA();
+    if (a.preset === 'custom' && a.from && a.to) return { from: a.from, to: a.to };
+    if (a.preset === 'today') return { from: today, to: today };
+    if (a.preset === 'month') return { from: today.slice(0, 8) + '01', to: today };
+    if (a.preset === 'lastmonth') {
+      const [y, m] = today.split('-').map(Number), ly = m === 1 ? y - 1 : y, lm = m === 1 ? 12 : m - 1;
+      return { from: `${ly}-${String(lm).padStart(2, '0')}-01`, to: new Date(Date.UTC(ly, lm, 0)).toISOString().slice(0, 10) };
+    }
+    const days = Number(a.preset) || 7;
+    return { from: dAdd(today, 1 - days), to: today };
+  }
+  function anQuery() {
+    const a = anState(), r = anRange(), q = new URLSearchParams({ from: r.from, to: r.to, cmp: a.cmp, by: a.by });
+    for (const k of ['src', 'device', 'country', 'lang']) if (a[k]) q.set(k, a[k]);
+    if (a.row) q.set('row', a.row);
+    q.set('limit', '300');
+    return q.toString();
+  }
+  function anHash() {
+    const a = anState(), q = new URLSearchParams({ p: a.preset, cmp: a.cmp, by: a.by });
+    if (a.preset === 'custom') { q.set('from', a.from); q.set('to', a.to); }
+    for (const k of ['src', 'device', 'country', 'lang', 'q']) if (a[k]) q.set(k, a[k]);
+    if (a.row) q.set('row', a.row);
+    return '#' + (anMode === 'funnels' ? 'funnels' : 'analytics') + '?' + q.toString();
+  }
+  function anSync() { try { history.replaceState(null, '', anHash()); } catch (e) {} anSave(); }
+  function anParse(qs) {
+    const a = anState(), q = new URLSearchParams(qs || '');
+    if (![...q.keys()].length) return;
+    a.preset = q.get('p') || '7';
+    if (a.preset === 'custom') { a.from = q.get('from') || ''; a.to = q.get('to') || ''; if (!a.from || !a.to) a.preset = '7'; }
+    if (q.get('cmp')) a.cmp = q.get('cmp');
+    if (q.get('by')) a.by = q.get('by');
+    for (const k of ['src', 'device', 'country', 'lang', 'q']) a[k] = q.get(k) || '';
+    a.row = q.get('row') || ''; a.all = false;
+  }
+  const anGo = () => anMode === 'funnels' ? funnelsScreen() : analytics();
+
+  // панель: период, сравнение, разрез и фильтры (only=1 — только период: для «Воронок»)
+  function anBar(only) {
+    const a = anState(), r = anRange(), d = anData;
+    const span = r.from === r.to ? dOne(r.from) : `${dShort(r.from)} – ${dShort(r.to)} ${r.to.slice(0, 4)}`;
+    const opt = (list, cur) => list.map(([k, l]) => `<option value="${esc(k)}"${k === cur ? ' selected' : ''}>${esc(l)}</option>`).join('');
+    const fac = (key, title) => {
+      const list = (d && d.facets && d.facets[key]) || [];
+      return `<select data-an="${key}" aria-label="${esc(title)}"><option value="">${esc(title)}: все</option>${list.map(x => `<option value="${esc(x.k)}"${a[key] === x.k ? ' selected' : ''}>${esc(x.k)} (${n(x.n)})</option>`).join('')}</select>`;
+    };
+    return `<div class="an-bar">
+      <div class="an-row">
+        <span class="an-lbl">Период</span>
+        <button type="button" class="an-date" data-an="cal">📅 ${esc(span)} ▾</button>
+        ${AN_PRE.map(([k, l]) => `<button type="button" class="an-pill${a.preset === k ? ' on' : ''}" data-pre="${k}">${l}</button>`).join('')}
+        <span class="an-sp"></span>
+        <label class="an-field">⇄ <select data-an="cmp" aria-label="С чем сравнивать">${opt(AN_CMP, a.cmp)}</select></label>
+        ${only ? '' : '<button type="button" class="pill-btn" data-an="csv">⬇ CSV</button>'}
       </div>
-      ${chart}
-      <div class="adm-cols">
-        <section class="adm-box"><h2>Откуда пришли</h2><p class="be-note">Каждый заход на сайт: с какого сайта или приложения. «Напрямую» — набрали адрес, закладка или ссылка из мессенджера (WhatsApp, Viber не сообщают, откуда).</p>
-          ${bars(d.sources, r => `${SRC_IC[r.k] || '🌐'} ${esc(r.k)}`, srcTotal, mob)}</section>
-        <section class="adm-box"><h2>Устройства</h2>${bars(d.devices, r => `${DEV_IC[r.k] || ''} ${esc(r.k)}`, devTotal)}
-          <h3>Система</h3>${bars(d.os, r => esc(r.k), sum(d.os))}</section>
+      ${only ? '' : `<div class="an-row">
+        <span class="an-lbl">Показывать</span>
+        <select data-an="by" aria-label="Разрез">${opt(AN_BY, a.by)}</select>
+        ${fac('src', '🌐 Источник')}${fac('device', '📱 Устройство')}${fac('country', '🌍 Страна')}${fac('lang', '🗣 Язык')}
+        <input type="search" class="an-q" data-an="q" value="${esc(a.q)}" placeholder="🔍 поиск" aria-label="Поиск по названию">
+        <button type="button" class="bc-link" data-an="reset">✕ Сбросить</button>
       </div>
-      <div class="adm-cols">
-        <section class="adm-box"><h2>Страны</h2>${bars(d.countries, r => `${flag(r.k)} ${esc(regionName(r.k))}`, sum(d.countries))}</section>
-        <section class="adm-box"><h2>Браузер / приложение</h2><p class="be-note">«Внутри приложения» — открыли ссылку прямо в Instagram, TikTok и т.п.</p>${bars(d.browsers, r => esc(r.k), sum(d.browsers))}</section>
+      <div class="an-row an-custom"${a.preset === 'custom' ? '' : ' hidden'}>
+        <span class="an-lbl">Свои даты</span>
+        <input type="date" data-an="from" value="${esc(r.from)}"><span>—</span><input type="date" data-an="to" value="${esc(r.to)}">
+        <button type="button" class="pill-btn pill-fill" data-an="apply">Показать</button>
       </div>
-      <div class="adm-cols">
-        <section class="adm-box"><h2>С какой страницы начали</h2>${bars(d.landing, r => `<a href="${esc(r.k)}" target="_blank">${esc(pageName(r.k))}</a>`, sum(d.landing))}</section>
-        <section class="adm-box"><h2>Сайты, которые на вас ссылаются</h2>${bars(d.refs, r => esc(r.k), sum(d.refs))}
-          <h3>Язык сайта</h3>${bars(d.langs, r => esc(r.k), sum(d.langs))}</section>
-      </div>
-      <section class="adm-box"><h2>Популярные страницы</h2>
-        <table class="be-table adm-table"><thead><tr><th>Страница</th><th>📄 Просмотры</th><th>👥 Люди</th></tr></thead>
-        <tbody>${d.pages.map(r => `<tr><td data-l="Страница"><a href="${esc(r.k)}" target="_blank">${esc(pageName(r.k))}</a></td><td data-l="Просмотры">${n(r.n)}</td><td data-l="Люди">${n(r.p)}</td></tr>`).join('') || '<tr><td colspan="4">Пока нет данных.</td></tr>'}</tbody></table></section>
-      <section class="adm-box"><h2>🏷 Ваши ссылки с метками</h2>
-        <p class="be-note">Ставьте такую ссылку в пост, пин или сторис — и здесь будет видно, сколько людей пришло именно по ней. Заполните страницу сайта, где выложите ссылку, и название (например, <code>pin-001</code>) и нажмите «Сохранить».</p>
-        <div class="adm-utm"><input type="text" placeholder="Страница сайта, например /flock/" data-utm-p value="/"><select data-utm-s aria-label="Где выложите">${['pinterest', 'instagram', 'tiktok', 'facebook', 'threads', 'telegram', 'linkedin', 'patreon', 'email'].map(x => `<option>${x}</option>`).join('')}</select><input type="text" placeholder="Название (pin-001)" data-utm-c><input type="text" placeholder="Заметка (необязательно)" data-utm-n><button type="button" class="pill-btn pill-fill" data-utm-go>＋ Сохранить</button></div>
-        <p class="be-note" data-utm-out></p>
-        ${d.links.length ? `<table class="be-table adm-table adm-links"><thead><tr><th>Ссылка</th><th>🚪 Заходов всего</th><th>👥 Людей</th><th>За период</th><th></th></tr></thead><tbody>
-        ${d.links.map(l => { const url = utmUrl(l.path, l.source, l.campaign); return `<tr><td data-l="Ссылка"><b>${esc(l.campaign)}</b> <small>· ${esc(l.source)} → ${esc(pageName(l.path))}</small>${l.note ? `<br><small>${esc(l.note)}</small>` : ''}<br><button type="button" class="bc-link" data-copy="${esc(url)}">📋 Скопировать ссылку</button></td>
-          <td data-l="Заходов всего"><b>${n(l.all)}</b></td><td data-l="Людей">${n(l.people)}</td><td data-l="За период">${n(l.period)}</td><td><button type="button" class="bc-link be-danger" data-del="${l.id}" title="Удалить">🗑</button></td></tr>`; }).join('')}</tbody></table>` : '<p class="be-note">Сохранённых ссылок пока нет.</p>'}
-        ${(() => { const other = d.campaigns.filter(r => !d.links.some(l => l.campaign === r.k)); return other.length ? `<h3>Другие метки (не сохранены)</h3>${bars(other, r => `${esc(r.k)} <small>(${esc(r.s || '')})</small>`, sum(other))}` : ''; })()}</section>
-      <p class="be-note">Считается без cookie: один человек за сутки — один раз (по зашифрованному отпечатку, сам IP не сохраняется). Ваши собственные заходы (когда вы вошли как админ) и роботы не считаются. Статистика копится с ${esc(d.first || 'момента включения')}.</p>`;
-    main.querySelectorAll('[data-days]').forEach(b => b.onclick = () => { vDays = Number(b.dataset.days); visitors(); });
-    const tip = main.querySelector('.adm-chart-tip');
-    main.querySelectorAll('.adm-col').forEach(c => { const show = () => { tip.textContent = c.dataset.tip; main.querySelectorAll('.adm-col.on').forEach(x => x.classList.remove('on')); c.classList.add('on'); }; c.onmouseenter = show; c.onfocus = show; c.onclick = show; });
+      <p class="be-note">Дни — по Риге; сегодняшний день ещё идёт. Период и фильтры остаются в адресе — ссылку можно сохранить.</p>`}
+    </div>`;
+  }
+
+  function anWire() {
+    const a = anState();
+    main.querySelectorAll('[data-pre]').forEach(b => b.onclick = () => {
+      a.preset = b.dataset.pre; a.row = '';
+      if (a.preset !== 'custom') { a.from = ''; a.to = ''; }
+      anSync();
+      if (a.preset === 'custom') { const c = main.querySelector('.an-custom'); if (c) { c.hidden = false; c.querySelector('input').focus(); } }
+      else anGo();
+    });
+    const cal = main.querySelector('[data-an="cal"]');
+    if (cal) cal.onclick = () => { a.preset = 'custom'; const c = main.querySelector('.an-custom'); if (c) { c.hidden = false; c.querySelector('input').focus(); } anSync(); };
+    const apply = main.querySelector('[data-an="apply"]');
+    if (apply) apply.onclick = () => {
+      const f = main.querySelector('[data-an="from"]').value, t = main.querySelector('[data-an="to"]').value;
+      if (!f || !t) return;
+      a.preset = 'custom'; a.from = f; a.to = t; a.row = ''; anSync(); anGo();
+    };
+    ['cmp', 'by', 'src', 'device', 'country', 'lang'].forEach(k => {
+      const el = main.querySelector(`[data-an="${k}"]`); if (!el) return;
+      el.onchange = () => { a[k] = el.value; a.row = ''; anSync(); anGo(); };
+    });
+    const q = main.querySelector('[data-an="q"]');
+    if (q) { let t = 0; q.oninput = () => { clearTimeout(t); t = setTimeout(() => { a.q = q.value.trim(); anRender(); }, 220); }; }
+    const reset = main.querySelector('[data-an="reset"]');
+    if (reset) reset.onclick = () => { Object.assign(a, { src: '', device: '', country: '', lang: '', q: '', row: '' }); anSync(); anGo(); };
+    main.querySelectorAll('[data-an="sort"]').forEach(th => th.onclick = () => {
+      const k = th.dataset.id;
+      if (a.sort === k) a.desc = !a.desc; else { a.sort = k; a.desc = true; }
+      anSave(); anRender();
+    });
+    main.querySelectorAll('[data-an="row"]').forEach(tr => tr.onclick = e => {
+      if (e.target.closest('a') || e.target.closest('button')) return;
+      const k = tr.dataset.k; a.row = a.row === k ? '' : k; anSync(); analytics();
+    });
+    const csv = main.querySelector('[data-an="csv"]'); if (csv) csv.onclick = anCsv;
+    const all = main.querySelector('[data-an="all"]'); if (all) all.onclick = () => { a.all = true; anRender(); };
+    const less = main.querySelector('[data-an="less"]'); if (less) less.onclick = () => { a.all = false; anRender(); };
+    anLinksWire();
+  }
+
+  // подпись строки, значение для сортировки, ячейки
+  const anText = (r, a) => {
+    if (a.by === 'page') return pageName(r.k);
+    if (a.by === 'article') return r.post ? title(r.post) : r.k;
+    if (a.by === 'day') return dLoc(r.k, { weekday: 'short', day: 'numeric', month: 'long' });
+    if (a.by === 'country') return regionName(r.k);
+    return r.k;
+  };
+  const anVal = (r, id) => id === 'dPeople' ? r.people - (r.prevPeople || 0)
+    : id === 'donePct' ? (r.donePct == null ? -1 : r.donePct)
+      : id === 'avgSec' ? (r.avgSec == null ? -1 : r.avgSec) : (r[id] || 0);
+  function anCols(a, d) {
+    const c = [['people', '👥 Люди'], ['views', '📄 Просмотры']];
+    if (['page', 'article', 'day'].includes(a.by)) c.push(['entries', '🚪 Извне']);
+    if (d.withReads) c.push(['avgSec', '⏱ Время'], ['donePct', '✅ Дочитали']);
+    c.push(['mobile', '📱 Телефон']);
+    if (d.cmp !== 'none') c.push(['dPeople', 'Δ люди']);
+    return c;
+  }
+  function anRows(a, d) {
+    const q = a.q.toLowerCase();
+    const list = d.rows.filter(r => !q || anText(r, a).toLowerCase().includes(q));
+    const pick = r => a.sort === 'name' ? anText(r, a) : anVal(r, a.sort);
+    return list.sort((x, y) => {
+      const p = pick(x), s = pick(y);
+      const c = typeof p === 'string' ? p.localeCompare(s, 'ru') : p - s;
+      return c * (a.desc ? 1 : -1);
+    });
+  }
+  function anCell(r, id) {
+    if (id === 'people' || id === 'views' || id === 'entries') return n(r[id]);
+    if (id === 'avgSec') return r.avgSec == null ? '—' : mmss(r.avgSec);
+    if (id === 'donePct') return r.donePct == null ? '—' : r.donePct + '%';
+    if (id === 'mobile') return r.people ? pct(r.mobile, r.people) + '%' : '—';
+    if (id === 'dPeople') return delta(r.people, r.prevPeople);
+    return '';
+  }
+  const anName = (r, a) => {
+    if (a.by === 'page') return `<a href="${esc(r.k)}" target="_blank">${esc(pageName(r.k))}</a>`;
+    if (a.by === 'article') return r.post
+      ? `<a href="/ru/blog/${esc(r.post.slug)}/" target="_blank">📰 ${esc(title(r.post))}</a><small>${r.post.published_at ? dLoc(new Date(r.post.published_at * 1000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }), { day: 'numeric', month: 'short', year: 'numeric' }) : ''}${r.post.likes || r.post.comments ? ` · ♥ ${n(r.post.likes)} · 💬 ${n(r.post.comments)}` : ''}</small>`
+      : esc(r.k);
+    if (a.by === 'day') return `<b>${esc(dLoc(r.k, { weekday: 'long', day: 'numeric', month: 'long' }))}</b>`;
+    if (a.by === 'src') return `${SRC_IC[r.k] || '🌐'} ${esc(r.k)}`;
+    if (a.by === 'ref') return `🌐 ${esc(r.k)}`;
+    if (a.by === 'country') return `${flag(r.k)} ${esc(regionName(r.k))}`;
+    if (a.by === 'device') return `${DEV_IC[r.k] || ''} ${esc(r.k)}`;
+    if (a.by === 'campaign') return `🏷 ${esc(r.k)}`;
+    return esc(r.k);
+  };
+  // раскрытая строка: по дням, откуда пришли, куда пошли дальше
+  function anDetail(d) {
+    if (!d.detail) return '';
+    const s = d.detail.series || [], max = Math.max(1, ...s.map(x => x.views));
+    const list = (arr, f) => arr && arr.length ? `<ul class="an-bars">${arr.slice(0, 6).map(x => `<li><span>${f ? f(x) : esc(x.k)}</span><i style="width:${Math.max(4, x.n * 100 / arr[0].n)}%"></i><b>${n(x.n)}</b></li>`).join('')}</ul>` : '<p class="be-note">Нет данных за период.</p>';
+    return `<div class="an-det">
+      <div><h4>По дням</h4>${s.length ? `<div class="an-mini" role="img" aria-label="Просмотры по дням">${s.map(x => `<i style="height:${x.views ? Math.max(4, x.views * 100 / max) : 2}%" title="${esc(dShort(x.day))}: ${n(x.views)} просм."></i>`).join('')}</div><p class="be-note">${esc(dShort(s[0].day))} – ${esc(dShort(s[s.length - 1].day))} · всего ${n(s.reduce((a, x) => a + x.views, 0))} просмотров</p>` : '<p class="be-note">Пока нет данных.</p>'}</div>
+      <div><h4>Откуда пришли</h4>${list(d.detail.sources, x => `${SRC_IC[x.k] || '🌐'} ${esc(x.k)}`)}
+        ${d.detail.inner && d.detail.inner.length ? `<h4>С какой страницы сайта</h4>${list(d.detail.inner, x => esc(pageName(x.k)))}` : ''}
+        ${d.detail.next && d.detail.next.length ? `<h4>Куда пошли дальше</h4>${list(d.detail.next, x => esc(pageName(x.k)))}` : ''}
+        <p class="be-note">${(d.detail.devices || []).map(x => `${DEV_IC[x.k] || ''} ${esc(x.k)} ${n(x.n)}`).join(' · ')}</p></div>
+    </div>`;
+  }
+
+  async function analytics() {
+    anMode = 'table';
+    main.innerHTML = anBar() + '<p class="be-note">Загрузка…</p>';
+    try { anData = await api('admin/analytics?' + anQuery()); }
+    catch (e) { main.innerHTML = anBar() + `<p class="be-note">${err(e)}</p>`; anWire(); return; }
+    anRender();
+  }
+  function anRender() {
+    const a = anState(), d = anData;
+    if (!d) return;
+    const T = d.totals, cols = anCols(a, d), list = anRows(a, d), show = a.all ? list : list.slice(0, 40);
+    const head = `<tr><th><button type="button" class="an-sort${a.sort === 'name' ? ' on' : ''}" data-an="sort" data-id="name">${esc(AN_BY.find(x => x[0] === a.by)[1])}</button></th>
+      ${cols.map(([id, l]) => `<th class="n"><button type="button" class="an-sort${a.sort === id ? ' on' : ''}" data-an="sort" data-id="${id}">${l}${a.sort === id ? (a.desc ? ' ↓' : ' ↑') : ''}</button></th>`).join('')}</tr>`;
+    const rowHtml = r => {
+      const key = esc(r.k);
+      const tr = `<tr class="an-tr${a.row === r.k ? ' on' : ''}" data-an="row" data-k="${key}" tabindex="0">`;
+      return tr + `<td>${anName(r, a)}</td>${cols.map(([id]) => `<td class="n">${anCell(r, id)}</td>`).join('')}</tr>`
+        + (a.row === r.k ? `<tr class="an-det-row"><td colspan="${cols.length + 1}">${anDetail(d)}</td></tr>` : '');
+    };
+    const sum = `<p class="an-sum"><b>${n(T.people)}</b> человек · <b>${n(T.views)}</b> просмотров${T.entries ? ` · <b>${n(T.entries)}</b> заходов извне` : ''}${T.avgSec != null ? ` · <b>${mmss(T.avgSec)}</b> в среднем читают` : ''} · <b>${T.people ? pct(T.mobile, T.people) : 0}%</b> с телефона ${delta(T.people, T.prevPeople)}</p>`;
+    const ev = (d.events || []).length ? `<p class="an-ev"><b>Что было</b>${d.events.map(e => `${e.ic} ${esc(dShort(e.day))} — ${esc(e.t)}`).join(' · ')}</p>` : '';
+    const note = d.filtered && !d.withReads ? '<p class="be-note">Время и «дочитали» считаются без фильтров: в статистике чтения нет источника и устройства.</p>' : '';
+    const links = d.links || [];
+    const utm = `<details class="an-utm"><summary>🏷 Ссылки с метками — <b>${links.length}</b>${links.length ? '' : ' (пока нет)'}</summary>
+      <p class="be-note">Ставьте такую ссылку в пост, пин или сторис — и здесь будет видно, сколько людей пришло именно по ней.</p>
+      <div class="adm-utm"><input type="text" data-utm-p value="/" placeholder="Страница, например /flock/">
+        <select data-utm-s aria-label="Где выложите">${['pinterest', 'instagram', 'tiktok', 'facebook', 'threads', 'telegram', 'linkedin', 'patreon', 'email'].map(x => `<option>${x}</option>`).join('')}</select>
+        <input type="text" data-utm-c placeholder="Название (pin-001)"><input type="text" data-utm-n placeholder="Заметка (необязательно)">
+        <button type="button" class="pill-btn pill-fill" data-utm-go>＋ Сохранить</button></div>
+      <p class="be-note" data-utm-out></p>
+      ${links.length ? `<table class="be-table adm-table adm-links"><thead><tr><th>Ссылка</th><th>👥 Людей за период</th><th>🚪 Заходов</th><th></th></tr></thead><tbody>
+        ${links.map(l => { const url = utmUrl(l.path, l.source, l.campaign); return `<tr><td data-l="Ссылка"><b>${esc(l.campaign)}</b> <small>· ${esc(l.source)} → ${esc(pageName(l.path))}</small>${l.note ? `<br><small>${esc(l.note)}</small>` : ''}<br><button type="button" class="bc-link" data-copy="${esc(url)}">📋 Скопировать ссылку</button></td>
+          <td data-l="Людей">${n(l.periodPeople)}</td><td data-l="Заходов">${n(l.period)}</td><td><button type="button" class="bc-link be-danger" data-del="${l.id}" title="Удалить">🗑</button></td></tr>`; }).join('')}
+      </tbody></table>` : ''}</details>`;
+    main.innerHTML = anBar()
+      + sum
+      + `<div class="an-tbl"><table class="be-table adm-table an-table"><thead>${head}</thead>
+          <tbody>${list.length ? show.map(rowHtml).join('') : `<tr><td colspan="${cols.length + 1}">За этот период и фильтры ничего нет.</td></tr>`}</tbody></table></div>`
+      + `<p class="an-foot">${list.length > show.length ? `<button type="button" class="pill-btn" data-an="all">▾ Показать все (${list.length})</button>` : ''}${a.all && list.length > 40 ? '<button type="button" class="bc-link" data-an="less">▴ Свернуть</button>' : ''}
+        <span>${list.length ? `Показано ${show.length} из ${list.length}` : ''}${d.first ? ` · статистика с ${esc(dShort(d.first))}` : ''}</span></p>`
+      + ev + note + utm;
+    anWire();
+  }
+  // CSV текущего вида: что видно в таблице, с фильтрами и сортировкой
+  function anCsv() {
+    const a = anState(), d = anData;
+    if (!d) return;
+    const cols = anCols(a, d), list = anRows(a, d);
+    const head = [AN_BY.find(x => x[0] === a.by)[1], ...cols.map(([, l]) => l.replace(/^\S+\s+/, ''))];
+    const lines = [head, ...list.map(r => [anText(r, a), ...cols.map(([id]) => id === 'dPeople' ? r.people - (r.prevPeople || 0) : (r[id] ?? ''))])];
+    const text = lines.map(l => l.map(v => `"${String(v ?? '').replace(/"/g, '""')}"`).join(';')).join('\r\n');
+    const f = document.createElement('a');
+    f.href = URL.createObjectURL(new Blob(['\ufeff' + text], { type: 'text/csv;charset=utf-8' }));
+    f.download = `pigeonpolly-${d.from}-${d.to}-${a.by}.csv`;
+    f.click();
+  }
+  // «🏷 Ссылки с метками»: сохранить, скопировать, удалить
+  function anLinksWire() {
     const copy = (link, btn, label) => (navigator.clipboard ? navigator.clipboard.writeText(link) : Promise.reject()).then(() => { btn.textContent = '✓ Скопировано'; setTimeout(() => btn.textContent = label, 1600); }).catch(() => prompt('Скопируйте ссылку:', link));
     main.querySelectorAll('[data-copy]').forEach(b => b.onclick = () => copy(b.dataset.copy, b, '📋 Скопировать ссылку'));
     main.querySelectorAll('[data-del]').forEach(b => b.onclick = async () => {
       if (!confirm('Удалить эту ссылку из списка? Заходы по ней останутся в общей статистике.')) return;
-      try { await api('admin/links', { delete: Number(b.dataset.del) }); visitors(); } catch (e) { alert(err(e)); }
+      try { await api('admin/links', { delete: Number(b.dataset.del) }); anGo(); } catch (e) { alert(err(e)); }
     });
-    const go = main.querySelector('[data-utm-go]'), out = main.querySelector('[data-utm-out]');
+    const go = main.querySelector('[data-utm-go]'); if (!go) return;
+    const out = main.querySelector('[data-utm-out]');
     go.onclick = async () => {
       let p = main.querySelector('[data-utm-p]').value.trim() || '/'; p = p.replace(/^https?:\/\/[^/]+/, '').split('#')[0]; if (!p.startsWith('/')) p = '/' + p;
       if (!/[?.]/.test(p) && !p.endsWith('/')) p += '/';
       const c = main.querySelector('[data-utm-c]').value.trim().toLowerCase().replace(/\s+/g, '-').replace(/[^a-z0-9а-яё_-]/gi, '');
       if (!c) { out.textContent = 'Напишите название ссылки, например pin-001.'; return; }
-      // проверяем, что такая страница есть на сайте
       const ok = await fetch(p.split('?')[0], { method: 'HEAD' }).then(r => r.ok).catch(() => true);
-      if (!ok) { out.innerHTML = `Страницы <code>${esc(p)}</code> на сайте нет — проверьте адрес (например, <code>/flock/</code>, <code>/challenge/</code>, <code>/shop/</code>).`; return; }
+      if (!ok) { out.innerHTML = `Страницы <code>${esc(p)}</code> на сайте нет — проверьте адрес (например, <code>/flock/</code>, <code>/challenge/</code>).`; return; }
       go.disabled = true;
       try { await api('admin/links', { path: p, source: main.querySelector('[data-utm-s]').value, campaign: c, note: main.querySelector('[data-utm-n]').value.trim() }); }
       catch (e) { go.disabled = false; out.textContent = err(e); return; }
       const link = utmUrl(p, main.querySelector('[data-utm-s]').value, c);
-      await visitors();
+      await anGo();
       const o = main.querySelector('[data-utm-out]'); if (o) o.innerHTML = `Сохранено и скопировано: <code>${esc(link)}</code>`;
       navigator.clipboard && navigator.clipboard.writeText(link).catch(() => {});
     };
   }
 
-  // ---------- 🔻 воронки — своя вкладка «Аналитики» (раньше были внизу «Посетителей») ----------
-  let fDays = 30;
+  // ---------- 🔻 воронки: шаги по дням (та же панель периода и сравнения) ----------
+  async function funnels(box, qs) {
+    if (!box) return;
+    let d; try { d = await api('admin/funnels?' + qs); } catch (e) { box.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
+    const first = f => f.steps[0].k;
+    box.innerHTML = d.funnels.map(f => {
+      const tot = f.tot || {}, prev = f.prev || {}, k0 = first(f);
+      const cell = (row, s, i) => `<td data-l="${esc(s.label)}"><b>${n(row[s.k] || 0)}</b>${i && row[k0] ? ` <small>${pct(row[s.k] || 0, row[k0])}%</small>` : ''}</td>`;
+      return `<section class="adm-box"><h2>🔻 ${esc(f.name)}</h2>
+        <p class="be-note">За ${d.days} дн. (${esc(dShort(d.from))} – ${esc(dShort(d.to))}). Один человек за сутки на каждом шаге считается один раз; % — от первого шага.</p>
+        ${f.days.length ? `<table class="be-table adm-table"><thead><tr><th>День</th>${f.steps.map(s => `<th>${esc(s.label)}</th>`).join('')}</tr></thead><tbody>
+          <tr class="adm-total"><td data-l="День"><b>Всего</b></td>${f.steps.map((s, i) => cell(tot, s, i)).join('')}</tr>
+          ${f.days.map(r => `<tr><td data-l="День">${esc(dLoc(r.day, { day: 'numeric', month: 'short', weekday: 'short' }))}</td>${f.steps.map((s, i) => cell(r.n, s, i)).join('')}</tr>`).join('')}</tbody></table>
+          <p class="be-note">Дошли до последнего шага: <b>${tot[f.steps[f.steps.length - 1].k] || 0}</b> из ${n(tot[k0] || 0)} (${pct(tot[f.steps[f.steps.length - 1].k] || 0, tot[k0] || 0)}%) ${prev[k0] ? delta(tot[f.steps[f.steps.length - 1].k] || 0, prev[f.steps[f.steps.length - 1].k] || 0) : ''}</p>`
+          : '<p class="be-note">За этот период шагов нет.</p>'}</section>`;
+    }).join('');
+  }
   async function funnelsScreen() {
-    const per = [[7, '7 дней'], [30, '30 дней'], [90, '3 месяца']];
-    main.innerHTML = `<div class="adm-filter" role="toolbar" aria-label="Период">${per.map(([k, l]) => `<button type="button" class="pill-btn" data-fdays="${k}" aria-pressed="${fDays === k}">${l}</button>`).join('')}</div><div data-funnels><p class="be-note">Загрузка…</p></div>`;
-    main.querySelectorAll('[data-fdays]').forEach(b => b.onclick = () => { fDays = Number(b.dataset.fdays); funnelsScreen(); });
-    await funnels(main.querySelector('[data-funnels]'), fDays);
-  }
-
-  // ---------- 📰 аналитика блога (/api/admin/blogstats, worker/analytics.js) ----------
-  let bDays = 30, bsSort = 'views', bsSec = '', bPost = 0, bList = null;
-  const mmss = s => s == null ? '—' : s < 60 ? `${s}\u00a0с` : `${Math.floor(s / 60)}\u00a0мин ${String(s % 60).padStart(2, '0')}\u00a0с`;
-  const trend = (a, b) => !b ? (a ? '<small class="adm-up">новое</small>' : '') : (d => `<small class="${d >= 0 ? 'adm-up' : 'adm-down'}">${d >= 0 ? '▲' : '▼'}${Math.abs(d)}%</small>`)(Math.round((a - b) * 100 / b));
-  // столбики по дням (все дни периода, даже пустые); подпись — наведением или нажатием
-  function dayChart(series, days, h) {
-    if (days === 1) return '';
-    const byDay = Object.fromEntries(series.map(r => [r.day, r]));
-    const xs = []; for (let i = days - 1; i >= 0; i--) { const s = new Date(Date.now() - i * 86400000).toLocaleDateString('sv-SE', { timeZone: 'Europe/Riga' }); xs.push({ day: s, people: (byDay[s] || {}).people || 0, views: (byDay[s] || {}).views || 0 }); }
-    const max = Math.max(1, ...xs.map(x => x.views));
-    const dd = s => new Date(s + 'T12:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', weekday: days <= 14 ? 'short' : undefined });
-    return `<section class="adm-box"><h2>${h}</h2>
-      <div class="adm-chart" role="img" aria-label="${esc(h)}">${xs.map(x => `<div class="adm-col" tabindex="0" data-tip="${esc(dd(x.day))}: ${n(x.views)} просм. · ${n(x.people)} чел."><i style="height:${x.views ? Math.max(3, x.views * 100 / max) : 0}%"></i></div>`).join('')}</div>
-      <div class="adm-chart-x"><span>${dd(xs[0].day)}</span><span class="adm-chart-tip" aria-live="polite">Наведите или нажмите на столбик</span><span>${dd(xs[xs.length - 1].day)}</span></div></section>`;
-  }
-  const chartTips = () => { const tip = main.querySelector('.adm-chart-tip'); if (tip) main.querySelectorAll('.adm-col').forEach(c => { const show = () => { tip.textContent = c.dataset.tip; main.querySelectorAll('.adm-col.on').forEach(x => x.classList.remove('on')); c.classList.add('on'); }; c.onmouseenter = show; c.onfocus = show; c.onclick = show; }); };
-  const perBar = (cur, attr) => `<div class="adm-filter" role="toolbar" aria-label="Период">${[[7, '7 дней'], [30, '30 дней'], [90, '3 месяца'], [365, 'Год']].map(([k, l]) => `<button type="button" class="pill-btn" ${attr}="${k}" aria-pressed="${cur === k}">${l}</button>`).join('')}</div>`;
-  const readNote = first => `<p class="be-note">«Читали» и «дочитали» считаются с ${first ? esc(new Date(first + 'T12:00').toLocaleDateString('ru-RU', { day: 'numeric', month: 'long', year: 'numeric' })) : 'сегодняшнего дня'}: время — сколько статья была открыта на экране (свёрнутая вкладка не считается), «дочитали» — прокрутили хотя бы до последней четверти. Просмотры — все языки статьи вместе; один человек за сутки — один раз. Ваши заходы и роботы не считаются.</p>`;
-  async function blogstats() {
-    if (bPost) return blogPost();
-    main.innerHTML = '<p class="be-note">Загрузка…</p>';
-    let d; try { d = await api('admin/blogstats?days=' + bDays); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    bList = d;
-    const T = d.totals, secName = Object.fromEntries(d.sections.map(s => [s.slug, s.name]));
-    const secsOf = p => String(p.section || '').split(',').map(x => x.trim()).filter(Boolean);
-    const usedSecs = [...new Set(d.posts.flatMap(secsOf))].filter(s => secName[s]);
-    const SORTS = { views: ['📄 Просмотры', p => p.views], people: ['👥 Люди', p => p.people], entries: ['🚪 Извне', p => p.entries], trend: ['📈 Рост', p => p.views - p.prev],
-      avgSec: ['⏱ Время', p => p.avgSec ?? -1], donePct: ['✅ Дочитали', p => p.donePct ?? -1], likes: ['♥', p => p.likes], comments: ['💬', p => p.comments], total: ['👁 Всего', p => p.total], date: ['🗓 Новые', p => p.published_at || 0] };
-    const list = d.posts.filter(p => !bsSec || secsOf(p).includes(bsSec)).sort((a, b) => SORTS[bsSort][1](b) - SORTS[bsSort][1](a));
-    const quiet = d.posts.filter(p => !p.views && (p.published_at || 0) < Date.now() / 1000 - 14 * 86400);
-    const sum = a => a.reduce((s, r) => s + r.n, 0);
-    const head = [['views'], ['people'], ['entries'], ['avgSec'], ['donePct'], ['likes'], ['comments'], ['total']];
-    main.innerHTML = `${perBar(bDays, 'data-bdays')}
-      <div class="adm-cards">
-        <div class="adm-card"><span class="adm-ic">📄</span><b>${n(T.views)}</b><span>просмотров статей</span>${delta(T.views, T.prev)}</div>
-        <div class="adm-card"><span class="adm-ic">👥</span><b>${n(T.people)}</b><span>человек читали</span></div>
-        <div class="adm-card"><span class="adm-ic">🚪</span><b>${n(T.entries)}</b><span>пришли сразу на статью</span><small>извне: поиск, соцсети, ссылки</small></div>
-        <div class="adm-card"><span class="adm-ic">⏱</span><b>${mmss(T.avgSec)}</b><span>в среднем читают</span></div>
-        <div class="adm-card"><span class="adm-ic">✅</span><b>${T.donePct == null ? '—' : T.donePct + '%'}</b><span>дочитали до конца</span></div>
-        <div class="adm-card"><span class="adm-ic">🗂</span><b>${n(T.list)}</b><span>раз открыли список блога</span></div>
-      </div>
-      ${dayChart(d.series, d.days, 'Просмотры статей по дням')}
-      <div class="adm-cols">
-        <section class="adm-box"><h2>Откуда приходят на статьи</h2><p class="be-note">Заходы извне прямо на статью: поиск, соцсети, другие сайты. «Напрямую» — ссылка из мессенджера, закладка.</p>
-          ${bars(d.sources, r => `${SRC_IC[r.k] || '🌐'} ${esc(r.k)}`, sum(d.sources))}</section>
-        <section class="adm-box"><h2>Переходы по сайту</h2><p class="be-note">С какой страницы сайта открыли статью.</p>
-          ${bars(d.inner, r => esc(r.k), sum(d.inner))}</section>
-      </div>
-      <section class="adm-box"><h2>Статьи</h2>
-        <div class="adm-filter">${usedSecs.length ? `<label>Раздел: <select data-bsec><option value="">все разделы</option>${usedSecs.map(s => `<option value="${esc(s)}"${bsSec === s ? ' selected' : ''}>${esc(secName[s])}</option>`).join('')}</select></label>` : ''}
-          <label>Сортировка: <select data-bsort>${Object.entries(SORTS).map(([k, [l]]) => `<option value="${k}"${bsSort === k ? ' selected' : ''}>${l}</option>`).join('')}</select></label></div>
-        <p class="be-note">За выбранный период. «Извне» — пришли сразу на статью; «👁 Всего» — счётчик за всё время. Нажмите на название — откроется всё о статье.</p>
-        <table class="be-table adm-table adm-bstat"><thead><tr><th>Статья</th>${head.map(([k]) => `<th><button type="button" class="adm-sort" data-bs="${k}" aria-pressed="${bsSort === k}">${SORTS[k][0]}${bsSort === k ? ' ↓' : ''}</button></th>`).join('')}<th>Главный источник</th></tr></thead>
-        <tbody>${list.map(p => `<tr><td data-l="Статья"><button type="button" class="bc-link adm-bpost" data-bpost="${p.id}">${esc(title(p))}</button><br><small>${p.published_at ? new Date(p.published_at * 1000).toLocaleDateString('ru-RU', { day: 'numeric', month: 'short', year: 'numeric' }) : ''}${secsOf(p).filter(s => secName[s]).map(s => ' · ' + esc(secName[s])).join('')}${p.members ? ' · 🔒' : ''}</small></td>
-          <td data-l="Просмотры"><b>${n(p.views)}</b> ${trend(p.views, p.prev)}</td><td data-l="Люди">${n(p.people)}</td><td data-l="Извне">${n(p.entries)}</td>
-          <td data-l="Время">${mmss(p.avgSec)}</td><td data-l="Дочитали">${p.donePct == null ? '—' : p.donePct + '%'}</td><td data-l="♥">${n(p.likes)}</td><td data-l="💬">${n(p.comments)}</td><td data-l="Всего">${n(p.total)}</td>
-          <td data-l="Источник">${p.top ? `${SRC_IC[p.top.k] || '🌐'} ${esc(p.top.k)} <small>${n(p.top.n)}</small>` : '—'}</td></tr>`).join('') || '<tr><td colspan="10">Статей пока нет.</td></tr>'}</tbody></table></section>
-      ${quiet.length ? `<section class="adm-box"><h2>😴 Не открывали за этот период</h2><p class="be-note">Статьи старше двух недель без единого просмотра. Можно поделиться ими в соцсетях, обновить название или картинку, поставить ссылку из свежей статьи.</p>
-        <ul class="adm-list">${quiet.map(p => `<li><button type="button" class="bc-link" data-bpost="${p.id}">${esc(title(p))}</button> <small>👁 всего ${n(p.total)}</small> <a href="/blog-editor/#${p.id}" title="Редактировать">✎</a></li>`).join('')}</ul></section>` : ''}
-      ${readNote(d.first)}`;
-    main.querySelectorAll('[data-bdays]').forEach(b => b.onclick = () => { bDays = Number(b.dataset.bdays); blogstats(); });
-    main.querySelectorAll('[data-bs]').forEach(b => b.onclick = () => { bsSort = b.dataset.bs; blogstats(); });
-    const ss = main.querySelector('[data-bsort]'); if (ss) ss.onchange = () => { bsSort = ss.value; blogstats(); };
-    const sc = main.querySelector('[data-bsec]'); if (sc) sc.onchange = () => { bsSec = sc.value; blogstats(); };
-    main.querySelectorAll('[data-bpost]').forEach(b => b.onclick = () => { bPost = Number(b.dataset.bpost); blogstats(); scrollTo(0, 0); });
-    chartTips();
-  }
-  async function blogPost() {
-    main.innerHTML = '<p class="be-note">Загрузка…</p>';
-    let d; try { d = await api(`admin/blogstats?days=${bDays}&post=${bPost}`); } catch (e) { main.innerHTML = `<p class="be-note">${err(e)}</p>`; return; }
-    if (d.error) { bPost = 0; return blogstats(); }
-    const P = d.post, T = d.totals, sum = a => a.reduce((s, r) => s + r.n, 0);
-    const bySlug = {}; ((bList && bList.posts) || []).forEach(p => { bySlug[p.slug] = p; });
-    const pathName = p => { const m = /^\/(?:(?:ru|lv)\/)?blog\/([^/]+)\/$/.exec(p); return m && bySlug[m[1]] ? '📰 ' + title(bySlug[m[1]]) : pageName(p); };
-    const lang = { RU: 'ru', LV: 'lv', EN: 'en' };
-    main.innerHTML = `<p class="adm-quick"><button type="button" class="pill-btn" data-bback>← Все статьи</button> <a class="pill-btn" href="/ru/blog/${esc(P.slug)}/" target="_blank">Открыть статью ↗</a> <a class="pill-btn" href="/blog-editor/#${P.id}">✎ Редактировать</a></p>
-      <h2 class="adm-bh">${esc(title(P))}</h2>
-      ${perBar(bDays, 'data-bdays')}
-      <div class="adm-cards">
-        <div class="adm-card"><span class="adm-ic">📄</span><b>${n(T.views)}</b><span>просмотров</span>${delta(T.views, T.prev)}</div>
-        <div class="adm-card"><span class="adm-ic">👥</span><b>${n(T.people)}</b><span>человек</span></div>
-        <div class="adm-card"><span class="adm-ic">🚪</span><b>${n(T.entries)}</b><span>пришли извне</span></div>
-        <div class="adm-card"><span class="adm-ic">⏱</span><b>${mmss(T.avgSec)}</b><span>в среднем читают</span></div>
-        <div class="adm-card"><span class="adm-ic">✅</span><b>${T.donePct == null ? '—' : T.donePct + '%'}</b><span>дочитали</span></div>
-        <div class="adm-card"><span class="adm-ic">👁</span><b>${n(P.total)}</b><span>просмотров за всё время</span><small>♥ ${n(P.likes)} · 💬 ${n(P.comments)}</small></div>
-      </div>
-      ${dayChart(d.series, d.days, 'Просмотры по дням')}
-      <div class="adm-cols">
-        <section class="adm-box"><h2>Откуда пришли</h2>${bars(d.sources, r => `${SRC_IC[r.k] || '🌐'} ${esc(r.k)}`, sum(d.sources))}
-          ${d.refs.length ? `<h3>Сайты-ссылки</h3>${bars(d.refs, r => esc(r.k), sum(d.refs))}` : ''}
-          ${d.campaigns.length ? `<h3>Ссылки с метками</h3>${bars(d.campaigns, r => esc(r.k), sum(d.campaigns))}` : ''}</section>
-        <section class="adm-box"><h2>Переходы по сайту</h2><p class="be-note">С какой страницы сайта открыли статью.</p>${bars(d.inner, r => esc(r.k), sum(d.inner))}
-          <h3>Куда пошли после статьи</h3>${bars(d.next, r => `<a href="${esc(r.k)}" target="_blank">${esc(pathName(r.k))}</a>`, sum(d.next))}</section>
-      </div>
-      <div class="adm-cols">
-        <section class="adm-box"><h2>Докуда дочитали</h2>${T.reads ? bars(d.depth, r => esc(r.k), T.reads) : '<p class="be-note">Пока нет данных.</p>'}
-          <h3>Сколько времени читали</h3>${T.reads ? bars(d.time, r => esc(r.k), T.reads) : '<p class="be-note">Пока нет данных.</p>'}</section>
-        <section class="adm-box"><h2>Язык статьи</h2>${bars(d.langs, r => esc(r.k) + (P['t_' + lang[r.k]] ? '' : ' <small>(перевода нет — показан другой язык)</small>'), sum(d.langs))}
-          <h3>Устройства</h3>${bars(d.devices, r => `${DEV_IC[r.k] || ''} ${esc(r.k)}`, sum(d.devices))}
-          <h3>Страны</h3>${bars(d.countries, r => `${flag(r.k)} ${esc(regionName(r.k))}`, sum(d.countries))}</section>
-      </div>
-      ${readNote(bList && bList.first)}`;
-    main.querySelector('[data-bback]').onclick = () => { bPost = 0; blogstats(); };
-    main.querySelectorAll('[data-bdays]').forEach(b => b.onclick = () => { bDays = Number(b.dataset.bdays); blogPost(); });
-    chartTips();
+    anMode = 'funnels';
+    main.innerHTML = anBar(1) + '<div data-funnels><p class="be-note">Загрузка…</p></div>';
+    anWire();
+    await funnels(main.querySelector('[data-funnels]'), anQuery());
   }
 
   // ---------- правки блоков сайта (режим «✏️ Править страницу») ----------
