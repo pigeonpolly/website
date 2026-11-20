@@ -84,8 +84,6 @@ PAGES = [
      "Polly’s Potion Lab: a Halloween game. Walk endless mazes with your pixel bird, collect ingredients, discover potion recipes by trial and error and earn buttons."),
     ("advent", "Advent calendar", "advent.html",
      "The Pigeon Polly advent calendar: from December 1 to 31 open a window a day and a pixel bird flies out with a gift for your profile."),
-    ("advent-2026", "Advent for drawing · preview", "advent-2026.html",
-     "A quieter advent for drawing: 24 doors with a prompt, three colours and a small bonus, and the ink course on the 24th."),
     ("palettes", "Palettes", "palettes.html",
      "Color palettes from Pigeon Polly watercolors and sketchbook pages: six colors with HEX codes from every artwork. Copy a color, pick a palette and draw."),
     ("norway", "Polly in Norway", "norway.html",
@@ -110,13 +108,13 @@ PAGES = [
      "Wobbleland: an island of eleven towns drawn in pixels. Explore the interactive map and meet every town with Polly as your guide."),
 ]
 # готовые, но пока не открытые страницы: не попадают в sitemap
-UNLISTED = {"blog-editor", "admin", "garden", "learn/watch", "norway", "norway/workshop", "advent-2026"}
+UNLISTED = {"blog-editor", "admin", "garden", "learn/watch", "norway", "norway/workshop"}
 # редизайн 2.0: страницы на новом шаблоне src/layout-v2.html (шапка, подвал, сезоны — site/assets/v2.css, v2.js)
-V2 = {"", "learn", "learn/watch", "books", "sketchbook", "blog", "freebies", "draw", "norway", "norway/workshop", "prompts", "advent", "advent-2026"}
+V2 = {"", "learn", "learn/watch", "books", "sketchbook", "blog", "freebies", "draw", "norway", "norway/workshop", "prompts", "advent"}
 # часть 5: все остальные страницы — на src/layout-v2-lab.html (новая шапка и подвал, внутри старые style.css и скрипты как есть)
 # ключ правок «Править страницу» (data-ppb): у новых страниц — прежний, с /preview/, чтобы сохранённые правки не потерялись
 EDIT_KEY = {"": "preview", "learn": "preview-learn", "books": "preview-guides", "sketchbook": "preview-about"}
-NOINDEX = {"norway/workshop", "advent-2026"}
+NOINDEX = {"norway/workshop"}
 # адреса в шаблонах и словарях content/i18n остались с /preview/ — build.py меняет их на настоящие в готовой странице (v2_urls)
 V2_HOME = "/preview/"
 V2_LEARN, V2_GUIDES = "/preview/learn/", "/preview/guides/"
