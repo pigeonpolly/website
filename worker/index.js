@@ -2243,7 +2243,7 @@ async function route(req, env, url) {
     const all = (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results;
     // прошедшие окошки открыты для всех (и для гостей): в декабре — дни до сегодняшнего, в январе — все; будущее — секрет (целиком видит только админ)
     const shownTo = t.day ? t.day - 1 : t.month === 1 ? 31 : 0;
-    return json({ year: t.year, month: t.month, today: t.day, claimTo: t.claimTo, catchUp: t.catchUp, lastJan: RULES.adventLastJan, startsAt: t.startsAt, now: t.nowMs, nextAt: t.nextAt, date: t.date, special: ADVENT_SPECIAL, user: u ? { id: u.id, nick: u.nick } : null, opened,
+    return json({ v: 2, year: t.year, month: t.month, today: t.day, claimTo: t.claimTo, catchUp: t.catchUp, lastJan: RULES.adventLastJan, startsAt: t.startsAt, now: t.nowMs, nextAt: t.nextAt, date: t.date, special: ADVENT_SPECIAL, user: u ? { id: u.id, nick: u.nick } : null, opened,
       past: all.filter(r => r.day <= shownTo), shownTo, plan: admin ? all : undefined }, 200, { 'cache-control': 'no-store' });
   }
   if (m === 'POST' && p === '/api/advent/open') {
@@ -3112,6 +3112,7 @@ async function route(req, env, url) {
 
   return json({ error: 'not_found' }, 404);
 }
+
 
 
 
