@@ -9,16 +9,16 @@ from ny_tarot_backs import back_c  # noqa: E402
 from tarot_content import CARDS  # noqa: E402
 
 SKINS = {'a': skin_a, 'b': skin_b, 'c': skin_c}
-LANGS = (('ru', 4), ('en', 5), ('lv', 6))
+LANGS = ('ru', 'en', 'lv')
 OUT = os.path.join(HERE, '..', '..', 'site', 'images', 'cards', 'tarot-2027')
 
 
 def build():
     os.makedirs(OUT, exist_ok=True)
     for i, card in enumerate(CARDS):
-        key, skin, hat, prop = card[0], card[1], card[2], card[3]
-        for lang, idx in LANGS:
-            name, l1, l2, l3, l4 = card[idx]
+        key, skin, hat, prop = card['key'], card['skin'], card['hat'], card['prop']
+        for lang in LANGS:
+            name, l1, l2, l3, l4 = card[lang]
             check_width(name, 104, '%s/%s name' % (key, lang))
             for l in (l1, l2, l3, l4):
                 check_width(l, 108, '%s/%s line' % (key, lang))
