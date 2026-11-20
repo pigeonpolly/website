@@ -57,8 +57,8 @@ SKINS = {'a': skin_a, 'b': skin_b, 'c': skin_c}
 
 
 def draw(card, lang):
-    name, l1, l2, l3 = card[lang]
-    return SKINS[card['skin']](name, (l1, l2, l3))
+    name, l1, l2, l3, l4 = card[lang]
+    return SKINS[card['skin']](name, (l1, l2, l3, l4))
 
 
 def deck_sheet(path):

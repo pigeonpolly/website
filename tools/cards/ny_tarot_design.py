@@ -127,7 +127,7 @@ def check_width(t, maxw, what=''):
 # ---------------- A. «Классическое таро» ----------------
 def skin_a(name='КОРМУШКА УДАЧИ', lines=('СОСЕДИ ДОБРЫЕ,', 'КРОШКИ КРУПНЫЕ,', 'А ГОЛУБИ — СВОИ.'), hat='scarf', prop=None, seed=1):
     check_width(name, 104, 'A name')
-    for l in lines: check_width(l, 104, 'A line')
+    for l in lines: check_width(l, 108, 'A line')
     im = Image.new('RGB', (CW, CH))
     vgrad(im, (46, 33, 78), (20, 14, 38))
     d = ImageDraw.Draw(im)
@@ -140,9 +140,9 @@ def skin_a(name='КОРМУШКА УДАЧИ', lines=('СОСЕДИ ДОБРЫЕ
     d.line([(38, 20), (54, 20)], fill=GOLD_D); d.line([(66, 20), (82, 20)], fill=GOLD_D)
     diamond(d, 60, 20, GOLD, 1)
 
-    m = arch_mask()
+    m = arch_mask(bottom=132)
     sky = Image.new('RGB', (CW, CH), (0, 0, 0))
-    vgrad(sky, (28, 34, 72), (66, 54, 98), 28, 138, 12)
+    vgrad(sky, (28, 34, 72), (66, 54, 98), 28, 132, 12)
     sd = ImageDraw.Draw(sky)
     stars(sd, 22, 7, 132, 32)
     # луна-ореол, Полли на её фоне
@@ -178,14 +178,14 @@ def skin_a(name='КОРМУШКА УДАЧИ', lines=('СОСЕДИ ДОБРЫЕ
             d.point((x, y), fill=(240, 246, 255))
 
     # лента с названием
-    d.rectangle((8, 144, 112, 157), fill=GOLD)
-    d.rectangle((8, 144, 112, 145), fill=(252, 222, 140))
-    d.rectangle((8, 156, 112, 157), fill=GOLD_D)
-    d.rectangle((7, 143, 113, 158), outline=GOLD_D)
-    ctext(d, 60, 147, name, INK)
+    d.rectangle((8, 136, 112, 148), fill=GOLD)
+    d.rectangle((8, 136, 112, 137), fill=(252, 222, 140))
+    d.rectangle((8, 147, 112, 148), fill=GOLD_D)
+    d.rectangle((7, 135, 113, 149), outline=GOLD_D)
+    ctext(d, 60, 139, name, INK)
 
     for i, line in enumerate(lines):
-        ctext(d, 60, 160 + i * 10, line, CREAM)
+        ctext(d, 60, 152 + i * 10, line, CREAM)
 
     ctext(d, 60, 192, '2027', GOLD_D)
     return im
@@ -194,7 +194,7 @@ def skin_a(name='КОРМУШКА УДАЧИ', lines=('СОСЕДИ ДОБРЫЕ
 # ---------------- B. «Новогодняя открытка» ----------------
 def skin_b(name='СИНИЦА В РУКАХ', lines=('ОДНА СИНИЦА', 'В РУКАХ ЛУЧШЕ,', 'ЧЕМ ДВЕ В ЛЕНТЕ.'), hat='santa', prop=None, seed=1):
     check_width(name, 104, 'B name')
-    for l in lines: check_width(l, 104, 'B line')
+    for l in lines: check_width(l, 108, 'B line')
     im = Image.new('RGB', (CW, CH), CREAM)
     d = ImageDraw.Draw(im)
     rnd = random.Random(11)
@@ -260,21 +260,21 @@ def skin_b(name='СИНИЦА В РУКАХ', lines=('ОДНА СИНИЦА', '�
         d.point((x, y), fill=GOLD)
 
     # лента с названием
-    d.rectangle((8, 140, 112, 151), fill=BERRY)
-    d.rectangle((8, 140, 112, 141), fill=(220, 92, 128))
-    d.rectangle((8, 150, 112, 151), fill=BERRY_D)
-    ctext(d, 60, 143, name, CREAM)
+    d.rectangle((8, 136, 112, 147), fill=BERRY)
+    d.rectangle((8, 136, 112, 137), fill=(220, 92, 128))
+    d.rectangle((8, 146, 112, 147), fill=BERRY_D)
+    ctext(d, 60, 139, name, CREAM)
 
     for i, line in enumerate(lines):
-        ctext(d, 60, 157 + i * 10, line, INK)
-    ctext(d, 60, 189, '— ПОЛЛИ, 2027', BERRY)
+        ctext(d, 60, 151 + i * 10, line, INK)
+    ctext(d, 60, 191, '2027', BERRY)
     return im
 
 
 # ---------------- C. «Минимал» ----------------
 def skin_c(name='ПОЛУНОЧНАЯ СОВА', lines=('СПИ СКОЛЬКО ХОЧЕШЬ', 'И ВСТАВАЙ, КОГДА', 'ЗАХОЧЕТСЯ.'), hat='beret', prop=None, seed=1):
     check_width(name, 104, 'C name')
-    for l in lines: check_width(l, 104, 'C line')
+    for l in lines: check_width(l, 108, 'C line')
     im = Image.new('RGB', (CW, CH))
     vgrad(im, (24, 74, 68), (11, 42, 42))
     d = ImageDraw.Draw(im)
@@ -300,10 +300,10 @@ def skin_c(name='ПОЛУНОЧНАЯ СОВА', lines=('СПИ СКОЛЬКО �
         d.point((x, y), fill=(255, 250, 220))
 
     for i, line in enumerate(lines):
-        ctext(d, 60, 126 + i * 10, line, CREAM)
-    ctext(d, 60, 162, '2027', GOLD_D)
+        ctext(d, 60, 122 + i * 10, line, CREAM)
+    ctext(d, 60, 166, '2027', GOLD_D)
     for x in (26, 43, 60, 77, 94):
-        d.point([(x, 178), (x - 1, 179), (x + 1, 179), (x, 180)], fill=GOLD_D)
+        d.point([(x, 180), (x - 1, 181), (x + 1, 181), (x, 182)], fill=GOLD_D)
     return im
 
 

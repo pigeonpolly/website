@@ -18,11 +18,11 @@ def build():
     for i, card in enumerate(CARDS):
         key, skin, hat, prop = card[0], card[1], card[2], card[3]
         for lang, idx in LANGS:
-            name, l1, l2, l3 = card[idx]
+            name, l1, l2, l3, l4 = card[idx]
             check_width(name, 104, '%s/%s name' % (key, lang))
-            for l in (l1, l2, l3):
-                check_width(l, 104, '%s/%s line' % (key, lang))
-            im = SKINS[skin](name, (l1, l2, l3), hat=hat or 'scarf', prop=(prop or None) if skin != 'c' else None, seed=i + 1)
+            for l in (l1, l2, l3, l4):
+                check_width(l, 108, '%s/%s line' % (key, lang))
+            im = SKINS[skin](name, (l1, l2, l3, l4), hat=hat or 'scarf', prop=(prop or None) if skin != 'c' else None, seed=i + 1)
             im.save(os.path.join(OUT, '%s-%s.png' % (key, lang)), optimize=True)
     back_c().save(os.path.join(OUT, 'back.png'), optimize=True)
     print('ok', len(CARDS) * 3 + 1, OUT)
