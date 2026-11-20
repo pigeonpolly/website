@@ -96,7 +96,7 @@ _`python3 tools/docs/build_map.py`: файл (размер) — что в нём
 - `site/assets/ink-course.js` + `ink-course.css` — страница курса туши /ink/ (docs/ink.md): PLAN, T, testView, practice, lessonView
 - `site/assets/diploma.js` — общий пиксельный диплом курсов: PPDiploma {P, C, svg, canvas, mount, save}
 - `site/assets/polly-school.js` (30K) — «Школа Полли» (/polly-helps/, docs/challenge.md): Полли в фартуке у мольберта учит рисоват: IMG, KEY, stepsOf, send, path
-- `site/assets/polly.js` (47K) — Полли-питомец в левом нижнем углу (`PollyPet`): PollyPet, PL/PCOL (слои спрайта), NOW, MONTH, HATW, ACC, MSAY, SEASON, CORNER, HOME_X
+- `site/assets/polly.js` (60K) — Полли-питомец в левом нижнем углу (`PollyPet`): PollyPet, PL/PCOL (слои спрайта), NOW, MONTH, ITEM, hop, poke, HATW, ACC, MSAY, SEASON, CORNER, HOME_X
 - `site/assets/posts-admin.js` — Кабинет → «🖼 Пины»: генератор пинов (тип → дизайн → фото → ✨ тексты → JPG + поля Pinterest): PPPostsAdmin, DESIGNS, DRAW
 - `site/assets/potion-names.js` (27K) — общие данные Зельеварни: ингредиенты, названия зелий (`PPPotion`): PPPotion, ADJ, FALL, ING, potion
 - `site/assets/potions.js` (57K) — игра «Зельеварня» /potions/: лабиринт, котёл, рецепты: DIRS, HUD, play, overlay, brew

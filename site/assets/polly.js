@@ -163,7 +163,9 @@
   };
 
   const peck = async (n, el) => {
+    const my = token;
     for (let i = 0; i < n; i++) {
+      if (my !== token) break;
       if (!reduce) body.classList.add('peck');
       el && el.classList.add('pecked');
       await wait(380);
@@ -214,6 +216,8 @@
     leaf: () => sprite(['....l', '..lll', '.lll.', 'lll..', 's....'], { l: pick(LEAF_C), s: '#5B3A1E' }),
     pumpkin: () => sprite(['.....g.....', '....gg.....', '..oOoOoOo..', '.oOoOoOoOo.', 'oOoOoOoOoOo', 'oOkOoOoOkOo', 'oOoOoOoOoOo', '.oOkkkkkOo.', '..ooooooo..'],
       { o: '#E8812E', O: '#C9621C', g: '#4E7A2E', k: Math.random() < .5 ? '#3A1E0E' : '#E8812E' }),
+    jack: () => sprite(['.....g.....', '....gg.....', '..oOoOoOo..', '.oOoOoOoOo.', 'oOyyOoOyyOo', 'oOoyOoOyoOo', 'oOoOoyoOoOo', '.oyOyOyOyo.', '..oyyyyyo..', '...ooooo...'],
+      { o: '#E8812E', O: '#C9621C', g: '#4E7A2E', y: '#FFD84A' }), // Хеллоуин: светящаяся рожица
     snowball: () => sprite(['.wwww.', 'wwwwww', 'wwwwbw', 'wwwbbw', '.wbbb.'], { w: '#F4F7FB', b: '#C9D6E6' }),
     icecream: () => { const c = pick(['#F7A8C4', '#A8E6CF', '#F5E6A8', '#8B5A3C']); return sprite(['.ppp.', 'ppppp', 'pphpp', 'ccccc', '.cCc.', '.cCc.', '..c..'], { p: c, h: '#FFFFFF', c: '#D9A45B', C: '#B98236' }); },
     cake: () => sprite(['...f..f..f...', '...c..c..c...', '...c..c..c...', '.wwwwwwwwwww.', 'wwrwwwwwrwwww', 'wpppwpppwpppw', 'ppppppppppppp', 'pPpPpPpPpPpPp',
@@ -360,19 +364,21 @@
   // уголок: сезонная вещица лежит рядом с Полли (справа, на «полу» экрана), и Полли играет с ней, не сходя с места
   // 20.11.2026: вещица и погода — по месяцу (MONTH), фразы месяца — к обычным
   const SNOW = ['#FFFFFF', '#E6EEF7', '#D3DFEC'], PINK = ['#F7B6C8', '#FCE1E8', '#F28AB2', '#FFFFFF'];
+  const tag = (k, c) => { if (c) c.dataset.k = k; return c; };
+  const HALLOWEEN = MM === 10 && DD >= 24;
   const MONTH = {
-    1: { mk: () => Math.random() < .5 ? SPR.snowman() : dome(14, 5, ['#F4F7FB', '#E6EEF7', '#FFFFFF', '#D3DFEC']), fall: SNOW, bits: SNOW },
-    2: { mk: SPR.heart, fall: ['#E5484D', '#F28AB2', '#F7A8C4'], bits: ['#E5484D', '#F28AB2', '#FFFFFF'] },
-    3: { mk: SPR.tulip, fall: ['#FFFFFF', '#E9F4E2', '#B9DC9A'], bits: ['#6a9a3a', '#F28AB2'] },
-    4: { mk: SPR.egg, fall: PINK, bits: ['#F6C445', '#5ba3d9', '#F28AB2'] },
-    5: { mk: SPR.can, fall: ['#B79CF2', '#D7C6F7', '#9A7FD9', '#FFFFFF'], bits: ['#8fb3d9', '#B9DCF2', '#FFFFFF'] },
-    6: { mk: () => Math.random() < .5 ? SPR.cheese() : SPR.flower(), fall: ['#F6D04D', '#F28AB2', '#FFFFFF', '#6a9a3a'], bits: ['#F6D04D', '#6a9a3a'] },
-    7: { mk: SPR.icecream, fall: null, bits: ['#F28AB2', '#E5484D', '#F6C445'] },
-    8: { mk: SPR.melon, fall: ['#F6C445', '#FFF3B0', '#FFFFFF'], bits: ['#E5484D', '#1a1528', '#4E9A3A'] },
-    9: { mk: SPR.apple, fall: LEAF_C, bits: LEAF_C },
-    10: { mk: () => Math.random() < .5 ? SPR.pumpkin() : dome(14, 5, LEAF_C), fall: LEAF_C, bits: LEAF_C },
-    11: { mk: SPR.mug, fall: ['#A3592A', '#D9952F', '#8fb3d9'], bits: ['#cfc7bd', '#FFFFFF'] },
-    12: { mk: SPR.gift, fall: SNOW, bits: ['#E5484D', '#F6C445', '#FFFFFF'] },
+    1: { mk: () => Math.random() < .5 ? tag('snowman', SPR.snowman()) : tag('drift', dome(14, 5, ['#F4F7FB', '#E6EEF7', '#FFFFFF', '#D3DFEC'])), fall: SNOW, bits: SNOW },
+    2: { mk: () => tag('heart', SPR.heart()), fall: ['#E5484D', '#F28AB2', '#F7A8C4'], bits: ['#E5484D', '#F28AB2', '#FFFFFF'] },
+    3: { mk: () => tag('tulip', SPR.tulip()), fall: ['#FFFFFF', '#E9F4E2', '#B9DC9A'], bits: ['#6a9a3a', '#F28AB2'] },
+    4: { mk: () => tag('egg', SPR.egg()), fall: PINK, bits: ['#F6C445', '#5ba3d9', '#F28AB2'] },
+    5: { mk: () => tag('can', SPR.can()), fall: ['#B79CF2', '#D7C6F7', '#9A7FD9', '#FFFFFF'], bits: ['#8fb3d9', '#B9DCF2', '#FFFFFF'] },
+    6: { mk: () => Math.random() < .5 ? tag('cheese', SPR.cheese()) : tag('flower', SPR.flower()), fall: ['#F6D04D', '#F28AB2', '#FFFFFF', '#6a9a3a'], bits: ['#F6D04D', '#6a9a3a'] },
+    7: { mk: () => tag('icecream', SPR.icecream()), fall: null, bits: ['#F28AB2', '#E5484D', '#F6C445'] },
+    8: { mk: () => tag('melon', SPR.melon()), fall: ['#F6C445', '#FFF3B0', '#FFFFFF'], bits: ['#E5484D', '#1a1528', '#4E9A3A'] },
+    9: { mk: () => tag('apple', SPR.apple()), fall: LEAF_C, bits: LEAF_C },
+    10: { mk: () => HALLOWEEN ? tag('jack', SPR.jack()) : Math.random() < .5 ? tag('pumpkin', SPR.pumpkin()) : tag('pile', dome(14, 5, LEAF_C)), fall: LEAF_C, bits: LEAF_C },
+    11: { mk: () => tag('mug', SPR.mug()), fall: ['#A3592A', '#D9952F', '#8fb3d9'], bits: ['#cfc7bd', '#FFFFFF'] },
+    12: { mk: () => tag('gift', SPR.gift()), fall: SNOW, bits: ['#E5484D', '#F6C445', '#FFFFFF'] },
   }[MM] || { mk: () => null, fall: null, bits: LEAF_C };
   // фразы месяца (и особых дней) — en / ru / lv
   const MSAY = (() => {
@@ -402,31 +408,102 @@
   })();
   const sayLine = () => MSAY.day.length && Math.random() < .5 ? pick(MSAY.day) : MSAY.month.length && Math.random() < .4 ? pick(MSAY.month) : pick(TXT.say);
   const CORNER = (() => {
-    const mk = BDAY ? SPR.cake() : MONTH.mk();
+    const mk = BDAY ? tag('cake', SPR.cake()) : MONTH.mk();
     if (!mk) return null;
     mk.className = 'polly-prop free'; mk.setAttribute('aria-hidden', 'true'); document.body.appendChild(mk);
     return { el: mk, w: mk.width, h: mk.height, free: true, x: 0, y: 0 };
   })();
   const cornerPlace = () => { if (!CORNER) return; CORNER.x = HOME_X + W + 2; CORNER.y = innerHeight - 8 - CORNER.h; putProp(CORNER); };
   const PARTY = ['#E5484D', '#F6C445', '#93AFCC', '#F2A7B8', '#7f81bf', '#FFFFFF'];
-  async function cornerPlay() {
-    const cx = HOME_X + W + 2, top = innerHeight - 8;
-    if (BDAY) { // клюёт тортик — крошки и конфетти
-      face(1); CORNER.el.classList.add('wiggle'); await peck(2);
-      burst(cx + CORNER.w / 2, top - CORNER.h + 2, PARTY, 10, .8);
-      await wait(400); CORNER.el.classList.remove('wiggle'); return;
-    }
-    if (!CORNER) return;
+  // 20.11.2026: у каждой вещицы своё взаимодействие (ITEM[вид].play) и свои реплики по клику (ITEM[вид].say); к шапкам и вещам — HSAY.
+  // alive() — Полли никто не позвал (ключи кабинета, новый клик); иначе прерываемся и ничего не трогаем
+  const LI = lang === 'ru' ? 1 : lang === 'lv' ? 2 : 0;
+  const ani = (el, kf, o) => { if (!reduce && el.animate) el.animate(kf, o); };
+  const wig = async ms => { CORNER.el.classList.add('wiggle'); await wait(ms); CORNER.el.classList.remove('wiggle'); };
+  const top0 = () => CORNER.y, mid0 = () => CORNER.x + CORNER.w / 2;
+  async function hop(alive, stay, dive) { // запрыгнуть на вещицу (или нырнуть в кучу) и вернуться в уголок
+    if (reduce) { await peck(1); return; }
     face(1);
-    const mid = cx + CORNER.w / 2, ty = top - CORNER.h + 2;
-    if (MONTH.fall && Math.random() < .4) { // сверху падают снежинки / сердечки / лепестки / листья / звёздочки месяца
-      for (let i = 0; i < 9; i++) petal(HOME_X + Math.random() * (W + 30), top - H - 60 - Math.random() * 40, MONTH.fall);
-      if (Math.random() < .5) for (let i = 0; i < 3; i++) { body.classList.add('flap'); await wait(160); body.classList.remove('flap'); await wait(160); }
-      await wait(700); await peck(1); return;
+    if (!await flyTo(mid0() - W / 2, top0() - H + (dive ? CORNER.h : SP)) || !alive()) return;
+    spot = 'item';
+    if (dive) { pet.classList.add('diving'); CORNER.el.classList.add('wiggle'); burst(mid0(), top0() + 4, dive, 16); }
+    else await peck(1);
+    await wait(stay);
+    pet.classList.remove('diving'); CORNER.el.classList.remove('wiggle');
+    if (!alive()) return;
+    if (dive) burst(mid0(), top0() + 4, dive, 12, .8);
+    if (await flyTo(HOME_X, floorY()) && alive()) { face(1); spot = 'floor'; }
+  }
+  const tx3 = a => a.map(r => r[LI]);
+  const ITEM = {
+    snowman: { say: [['He winked at me. I swear.', 'Он мне подмигнул. Честно.', 'Viņš man piemiedza ar aci. Godīgi.'], ['Nice hat. My beret is better.', 'Шляпа ничего. Мой берет лучше.', 'Laba cepure. Mana berete labāka.']],
+      play: async () => { face(1); await peck(1); burst(mid0(), top0() + 4, SNOW, 8, .6); await wig(600); } },
+    drift: { say: [['Snow dive! Ten points.', 'Нырок в снег! Десять баллов.', 'Lēciens sniegā! Desmit punkti.'], ['Brr. Worth it.', 'Брр. Оно того стоило.', 'Brr. Bija tā vērts.']],
+      play: alive => hop(alive, 1300, SNOW) },
+    cake: { say: [['Hands off, it’s my cake!', 'Руки прочь, это мой торт!', 'Rokas nost, tā ir mana torte!'], ['One more candle? Fine.', 'Ещё одну свечку? Ладно.', 'Vēl vienu svecīti? Labi.']],
+      play: async () => { face(1); CORNER.el.classList.add('wiggle'); await peck(2); burst(mid0(), top0() + 2, PARTY, 12, .9); await wait(400); CORNER.el.classList.remove('wiggle'); } },
+    heart: { say: [['Take it, it’s yours.', 'Держи, это тебе.', 'Ņem, tā ir tev.'], ['My heart goes coo.', 'Сердце делает курлык.', 'Sirds dara kū.']],
+      play: async () => { face(1); await peck(1); ani(CORNER.el, [{ scale: '1' }, { scale: '1.35' }, { scale: '1' }], { duration: 450, iterations: 2 }); burst(mid0(), top0(), ['#E5484D', '#F28AB2', '#F7A8C4'], 8, .7); await wait(900); } },
+    tulip: { say: [['Grow, little one, grow!', 'Расти, малыш, расти!', 'Augi, mazais, augi!'], ['First flower! Quick, sketch it.', 'Первый цветок! Быстро, скетч!', 'Pirmais zieds! Ātri, skicē!']],
+      play: async alive => { face(1); for (let i = 0; i < 3 && alive(); i++) { body.classList.add('flap'); await wait(160); body.classList.remove('flap'); await wait(160); }
+        if (!alive()) return; CORNER.el.classList.add('wiggle'); for (let i = 0; i < 4; i++) petal(mid0() - 6 + Math.random() * 12, top0(), MONTH.fall || PINK); await wait(700); CORNER.el.classList.remove('wiggle'); } },
+    egg: { say: [['It wobbles… is someone inside?', 'Качается… там кто-то есть?', 'Šūpojas… vai tur kāds ir iekšā?'], ['Egg fight? Count me in!', 'Битва яиц? Я в деле!', 'Olu kauja? Es piedalos!']],
+      play: async () => { face(1); await peck(1); ani(CORNER.el, [{ rotate: '0deg' }, { rotate: '-25deg' }, { rotate: '22deg' }, { rotate: '-12deg' }, { rotate: '0deg' }], { duration: 1000 }); await wait(1000); } },
+    can: { say: [['Watering the website.', 'Поливаю сайт.', 'Laistu mājaslapu.'], ['Oops, that was your shoe.', 'Ой, это был твой ботинок.', 'Ups, tā bija tava kurpe.']],
+      play: async () => { face(1); await peck(1); ani(CORNER.el, [{ rotate: '0deg' }, { rotate: '28deg' }, { rotate: '28deg' }, { rotate: '0deg' }], { duration: 1200 });
+        await wait(350); for (let i = 0; i < 8; i++) petal(CORNER.x + CORNER.w + Math.random() * 6, top0() + 4, ['#8fb3d9', '#B9DCF2', '#5ba3d9']); await wait(850); } },
+    cheese: { say: [['Caraway, my favourite.', 'Тмин — моё любимое.', 'Ķimenes — mans mīļākais.'], ['Līgo! Pass the cheese.', 'Лиго! Передай сыр.', 'Līgo! Padod sieru.']],
+      play: async () => { face(1); await peck(3); burst(mid0(), top0() + 2, ['#F2C14E', '#FFE08A', '#7a4a1e'], 8, .5); } },
+    flower: { say: [['Smells like summer.', 'Пахнет летом.', 'Smaržo pēc vasaras.'], ['This one goes in my sketchbook.', 'Этот — в скетчбук.', 'Šo — skiču burtnīcā.']],
+      play: async () => { face(1); await peck(1); await wait(500); burst(x + W * .7, y + 20, ['#F28AB2', '#E5484D', '#F7A8C4'], 6, .5); await wait(400); } },
+    icecream: { say: [['Brain freeze!', 'Мозг замёрз!', 'Smadzenes sasala!'], ['Just one lick. Okay, three.', 'Только лизнуть. Ладно, три раза.', 'Tikai nolaizīt. Labi, trīs reizes.']],
+      play: async () => { face(1); await peck(3); for (let i = 0; i < 3; i++) petal(mid0() - 4 + Math.random() * 8, top0() + 6, ['#F28AB2', '#F7A8C4', '#FFFFFF']); body.classList.add('startle'); await wait(400); body.classList.remove('startle'); } },
+    melon: { say: [['Seed-spitting contest!', 'Конкурс по плевкам косточками!', 'Sēklu spļaušanas sacensības!'], ['Watermelon: 92% water, 8% joy.', 'Арбуз: 92% воды, 8% счастья.', 'Arbūzs: 92% ūdens, 8% laimes.']],
+      play: async () => { face(1); await peck(2); for (let i = 0; i < 4; i++) { burst(x + 27 * SP, y + 13 * SP, ['#1a1528'], 1, 1.2); await wait(220); } } },
+    apple: { say: [['A worm! Hi, worm.', 'Червячок! Привет, червячок.', 'Tārpiņš! Sveiks, tārpiņ.'], ['An apple for the teacher. That’s me.', 'Яблоко для учителя. Это я.', 'Ābols skolotājam. Tas esmu es.']],
+      play: async alive => { face(1); await peck(1); if (!alive()) return;
+        const wc = sprite(['.p.', 'pkp', 'ppp', '.pp', 'pp.'], { p: '#F2A7B8', k: '#1a1528' }); wc.className = 'polly-prop free'; wc.setAttribute('aria-hidden', 'true');
+        const wp = { el: wc, w: wc.width, h: wc.height, free: true, x: mid0() + PX, y: top0() - wc.height + PX }; document.body.appendChild(wc); putProp(wp);
+        ani(wc, [{ translate: `0 ${wc.height}px`, opacity: 0 }, { translate: '0 0', opacity: 1 }], { duration: 300, fill: 'forwards' });
+        await wait(300); body.classList.add('startle'); await wait(1300); wc.remove(); body.classList.remove('startle'); } },
+    pumpkin: { say: [['Best seat in the house.', 'Лучшее место в доме.', 'Labākā vieta mājā.'], ['Pumpkin latte, please.', 'Тыквенный латте, пожалуйста.', 'Ķirbju late, lūdzu.']],
+      play: alive => hop(alive, 1800) },
+    jack: { say: [['Boo! Okay, the pumpkin did it.', 'Бу! Ладно, это тыква.', 'Bū! Labi, tas bija ķirbis.'], ['Bats! Draw them before they fly away.', 'Летучие мыши! Рисуй, пока не улетели.', 'Sikspārņi! Zīmē, kamēr neaizlido.']],
+      play: async alive => { ani(CORNER.el, [{ filter: 'brightness(1)' }, { filter: 'brightness(1.7) drop-shadow(0 0 6px #FFD84A)' }, { filter: 'brightness(1)' }], { duration: 450, iterations: 3 });
+        burst(mid0(), top0(), ['#2b2440', '#1a1528', '#3e3673'], 7, 1.6); body.classList.add('startle'); await wait(450); body.classList.remove('startle'); if (alive()) await hop(alive, 1400); } },
+    pile: { say: [['Leaf dive!', 'Нырок в листья!', 'Lēciens lapās!'], ['Crunchy. Very crunchy.', 'Хрустит. Очень хрустит.', 'Čaukst. Ļoti čaukst.']],
+      play: alive => hop(alive, 1300, LEAF_C) },
+    mug: { say: [['Ouch, hot!', 'Ай, горячо!', 'Ai, karsts!'], ['Marshmallows, where are you?', 'Зефирки, вы где?', 'Zefīriņi, kur jūs esat?']],
+      play: async () => { face(1); await peck(1); burst(mid0() - PX, top0(), ['#FFFFFF', '#cfc7bd', '#E6EEF7'], 8, .6); body.classList.add('startle'); await wait(450); body.classList.remove('startle'); } },
+    gift: { say: [['Can I open it now? Now? Now?', 'Можно уже открыть? А сейчас? А сейчас?', 'Vai jau var atvērt? Tagad? Tagad?'], ['It rattles. Buttons?', 'Гремит. Пуговки?', 'Grab. Pogas?']],
+      play: async () => { face(1); await peck(1); await wig(700); ani(CORNER.el, [{ translate: '0 0' }, { translate: '0 -10px' }, { translate: '0 0' }], { duration: 400 }); burst(mid0(), top0(), PARTY, 14, 1); await wait(400); } },
+  };
+  // реплики к шапке и вещи
+  const HSAY = tx3([].concat(
+    HATW === 'wreath' ? [['My wreath is better than yours.', 'Мой венок лучше твоего.', 'Mans vainags labāks par tavu.']] : [],
+    HATW === 'witch' ? [['This hat came with a broom. I lost the broom.', 'Шляпа была с метлой. Метла потерялась.', 'Cepure bija ar slotu. Slota pazuda.']] : [],
+    HATW === 'santa' ? [['Ho-ho-coo!', 'Хо-хо-курлык!', 'Ho-ho-kū!']] : [],
+    ACC === 'scarf' ? [['Scarf on. Winter, bring it.', 'Шарф на месте. Зима, давай.', 'Šalle ir. Ziema, nāc.']] : [],
+    ACC === 'shades' ? [['Sun? Shades on.', 'Солнце? Очки уже на месте.', 'Saule? Brilles jau ir.']] : [],
+    ACC === 'groucho' ? [['Nice nose, right? It’s real.', 'Хороший нос, правда? Настоящий.', 'Labs deguns, vai ne? Īsts.']] : [],
+    ACC === 'ribbon' ? [['Red, white, red.', 'Красный, белый, красный.', 'Sarkans, balts, sarkans.']] : []));
+  const KIND = CORNER && CORNER.el.dataset.k, IT = KIND && ITEM[KIND], ISAY = IT ? tx3(IT.say) : [];
+  const clickLine = () => {
+    const r = Math.random();
+    if (BDAY && r < .4) return pick(BDAY_SAY);
+    if (MSAY.day.length && r < .3) return pick(MSAY.day);
+    if (HSAY.length && r < .45) return pick(HSAY);
+    if (ISAY.length && r < .8) return pick(ISAY);
+    return sayLine();
+  };
+  async function cornerPlay(alive) {
+    if (!CORNER) return;
+    const my = token; alive = alive || (() => my === token && !keysOn);
+    if (!BDAY && MONTH.fall && Math.random() < .35) { // сверху падают снежинки / сердечки / лепестки / листья / звёздочки месяца
+      for (let i = 0; i < 9; i++) petal(HOME_X + Math.random() * (W + 30), innerHeight - 8 - H - 60 - Math.random() * 40, MONTH.fall);
+      await wait(700); if (alive()) await peck(1); return;
     }
-    CORNER.el.classList.add('wiggle'); await peck(2 + Math.floor(Math.random() * 2));
-    burst(mid, ty, MONTH.bits, 8, .6);
-    await wait(400); CORNER.el.classList.remove('wiggle');
+    if (IT) await IT.play(alive);
   }
   async function act() {
     if (x !== HOME_X || spot !== 'floor') { spot = 'floor'; perch = null; x = HOME_X; y = floorY(); place(); }
@@ -435,7 +512,7 @@
     if (roll < 0.35 && CORNER) await cornerPlay();
     else if (BDAY && roll < 0.42) await say(pick(BDAY_SAY));
     else if (roll < 0.5) await peck(1 + Math.floor(Math.random() * 3));
-    else if (roll < 0.7) { face(-dir); await wait(700); face(-dir); }
+    else if (roll < 0.7) { const my = token; face(-dir); await wait(700); if (my === token) face(-dir); } // оглянулась; если позвали (клик, ключи) — не крутить обратно
     else if (roll < 0.8) await sleep();
   }
 
@@ -461,21 +538,23 @@
     }
   }
 
-  body.addEventListener('click', async () => {
+  async function poke() {
     if (busy) return;
     busy = true;
-    token++;
+    const my = ++token, alive = () => my === token;
     if (carry) { const p = carry; carry = null; drop(p); }
     if (push) { const p = push; push = null; seat(p); } pet.classList.remove('diving'); props.forEach(p => p.el.classList.remove('wiggle'));
     const wasSleeping = body.classList.contains('sleeping');
     body.classList.remove('sleeping', 'peck', 'flap');
     zzz.classList.remove('show');
     show('a');
-    if (wasSleeping) { body.classList.add('startle'); setTimeout(() => body.classList.remove('startle'), 400); }
-    await say(wasSleeping ? pick(TXT.wake) : sayLine());
-    await peck(1); // остаётся на месте
-    busy = false;
-  });
+    if (x !== HOME_X || spot !== 'floor') { spot = 'floor'; x = HOME_X; y = floorY(); place(); }
+    if (wasSleeping) { body.classList.add('startle'); setTimeout(() => body.classList.remove('startle'), 400); await say(pick(TXT.wake)); }
+    else await Promise.all([say(clickLine()), IT ? IT.play(alive) : peck(1)]); // остаётся в уголке (кроме прыжка на вещицу)
+    if (alive()) busy = false;
+  }
+  body.addEventListener('click', poke);
+  if (CORNER) { CORNER.el.style.pointerEvents = 'auto'; CORNER.el.style.cursor = 'pointer'; CORNER.el.addEventListener('click', poke); }
 
   // при прокрутке и изменении окна — обратно на «пол»
   let st;
@@ -534,7 +613,8 @@
     }
     if (keysOn === el) return;
     keysOn = el; busy = true; token++;
-    body.classList.remove('sleeping', 'peck', 'flap'); zzz.classList.remove('show'); bubble.classList.remove('show');
+    body.classList.remove('sleeping', 'peck', 'flap', 'startle'); zzz.classList.remove('show'); bubble.classList.remove('show');
+    pet.classList.remove('diving'); pet.style.clipPath = ''; if (CORNER) CORNER.el.classList.remove('wiggle');
     if (carry) { const p = carry; carry = null; drop(p); }
     keysEl.style.display = beak.style.display = 'block';
     spot = 'keys'; perch = null;
