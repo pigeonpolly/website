@@ -1,5 +1,4 @@
 <!doctype html>
-<!-- редизайн 2.0, части 3 и 5: новая шапка и подвал (v2-shell.css), внутри — старые стили и скрипты (style.css). Все страницы не из build.py V2 -->
 <html lang="ru">
 <head>
 <meta charset="utf-8">
@@ -24,36 +23,31 @@
 <meta property="og:image:alt" content="Адвент-календарь · Pigeon Polly Art Lab">
 <meta name="twitter:card" content="summary_large_image">
 <meta name="twitter:image" content="https://www.pigeonpolly.com/images/og/advent-ru.jpg?v=656d1850">
-<script type="application/ld+json">{"@context": "https://schema.org", "@type": "Person", "name": "Alina Otkinska", "url": "https://www.pigeonpolly.com/", "image": "https://www.pigeonpolly.com/assets/og-image.jpg", "jobTitle": "Learning Experience Designer & Artist", "worksFor": {"@type": "Organization", "name": "Transport and Telecommunication Institute (TSI)"}, "alumniOf": [{"@type": "CollegeOrUniversity", "name": "University of Latvia"}], "knowsAbout": ["Learning design", "EdTech", "AI в образовании", "Moodle", "Watercolor", "Illustration"], "sameAs": ["https://lv.linkedin.com/in/otkinska", "https://www.instagram.com/pigeonpolly", "https://www.tiktok.com/@pigeonpolly", "https://www.patreon.com/cw/pigeon_polly", "https://www.pinterest.com/pigeonpollyart/"]}</script>
-<meta name="theme-color" content="#2B1A51">
 <link rel="icon" href="/assets/favicon.png?v=3" type="image/png" sizes="32x32">
 <link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=3">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="/assets/fraunces.css?v=21446b03">
-<link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;700&family=Caveat:wght@700&family=Lora:ital,wght@0,400;0,600;0,700;1,400;1,600&family=Nunito+Sans:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="/assets/style.css?v=052d6858">
-<link rel="stylesheet" href="/assets/ava-deco.css?v=b7863bab">
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;700&family=Caveat:wght@700&family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito+Sans:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/v2.css?v=1cb6e811">
+<link rel="stylesheet" href="/assets/v2-acct.css?v=f9f748a5">
 <link rel="stylesheet" href="/assets/v2-shell.css?v=d338ed59">
+<!-- шапка как на остальных страницах: вход, меню аватара, пуговки, корзина, колокольчик, поиск (стили — v2-acct.css из tools/v2_acct_css.py) -->
 <script>/* вход: /api/whoami сразу, параллельно с загрузкой скриптов — account.js возьмёт ответ (PPWhoP) */try{if(!/devdate=/.test(location.search)&&!sessionStorage.getItem('pp-devdate'))window.PPWhoP=fetch('/api/whoami',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
-<script src="/assets/site.js?v=78c13562" defer></script>
-<script src="/assets/polly.js?v=9077e6a9" defer></script>
-<script src="/assets/can-do.js?v=877ca7f4" defer></script>
 <script src="/assets/birds.js?v=c4476bda" defer></script>
 <script src="/assets/room.js?v=dfd6fe8d" defer></script>
-<script src="/assets/garden-items.js?v=0e83e9e3" defer></script>
-<script src="/assets/potion-names.js?v=15a9d262" defer></script>
 <script src="/assets/toast.js?v=93392a35" defer></script>
-<script src="/assets/day-card.js?v=00ac769a" defer></script>
+<script src="/assets/day-card.js?v=d0702261" defer></script>
 <script src="/assets/hatch.js?v=6d36422a" defer></script>
-<script src="/assets/cart.js?v=5d81e85a" defer></script>
-<script src="/assets/account.js?v=807d4892" defer></script>
+<script src="/assets/cart.js?v=553808d0" defer></script>
+<script src="/assets/account.js?v=383f13aa" defer></script>
 <script src="/assets/news.js?v=1d2af66b" defer></script>
 <script src="/assets/search.js?v=fd80358d" defer></script>
 <script src="/assets/emoji-art.js?v=6375cb5b" defer></script>
 <script src="/assets/v2.js?v=cc8a542a" defer></script>
+<script src="/assets/polly.js?v=9077e6a9" defer></script>
 </head>
-<body class="inner v2s" data-p="advent">
+<body class="v2 v2s">
 <style>/* Полли клюёт семечки, пока грузится страница (src/polly-loader.html, вставляет build.py во все шаблоны). Вид — редизайн 2.0: бумага и акцент сезона (html[data-season], как site/assets/v2.css) */
 #pp-load{--lb:#F4F0EA;--ls:#FBF9F5;--li:#2A211C;--lm:#6C6058;--ll:#DED5CA;--la:#22405F;position:fixed;inset:0;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:var(--lb);color:var(--li);font:500 15px/1.4 Karla,'Nunito Sans',system-ui,sans-serif;text-align:center;padding:16px;opacity:1;transition:opacity .35s}
 html[data-season=winter] #pp-load{--lb:#EEF1F3;--ls:#F8FAFB;--li:#1C2430;--lm:#5D6670;--ll:#D3DAE0;--la:#9E1B22}
@@ -126,33 +120,17 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 </div></div>
 </header>
 <main id="main">
-<nav class="crumbs" aria-label="Где я"><a href="/ru/games/"><span class="nm-t">Играть</span></a><span aria-hidden="true">›</span><span aria-current="page" class="ns-t">Адвент</span></nav>
-<section data-ppb="advent.1" class="page-head">
-  <p class="topics">подарки для птички</p>
-  <h1>Адвент-календарь</h1>
-  <p class="lead">С 1 по 31 декабря — по окошку в день: откройте его, и вылетит птичка с подарком для вашего профиля. Подарок у всех одинаковый. Пропустили день или присоединились позже? Пропущенные окошки можно открыть до 23 января. Пять окошек особые, а в последнем спрятано что-то легендарное. Подарки получают только зарегистрированные птички — войдите, чтобы получить свою.</p>
-</section>
+<link rel="stylesheet" href="/assets/advent.css?v=afff5976">
+<section data-ppb="advent.1" class="adv-hero"><div class="w">
+  <p class="adv-kick">1–31 декабря · одно окошко в день</p>
+  <h1>Адвент <em>для рисующих</em></h1>
+  <p class="adv-lead">Каждое утро открывается новое окошко: маленькое дело для рисования и подарок внутри — палитра, обои, урок или что-то для твоей птички. Заглянуть можно бесплатно; чтобы забрать — войдите.</p>
+  <p class="adv-note">Пропустили день? За пропущенными окошками можно вернуться до 1 марта — кроме окон 24 и 31 декабря.</p>
+</div></section>
 <section data-ppb="advent.2" class="adv" id="advent" aria-live="polite"></section>
-<script src="/assets/advent.js?v=52a0718b" defer></script>
+<script src="/assets/advent.js?v=d327a6b5" defer></script>
 
 </main>
-<dialog class="modal" id="contact" aria-labelledby="contact-t">
-  <div class="modal-band" style="background:#D85A30"></div>
-  <button class="modal-close" aria-label="Закрыть">✕</button>
-  <p class="modal-kicker">Напишите мне</p>
-  <h2 id="contact-t">Написать мне</h2>
-  <form class="contact-form" action="https://formsubmit.co/ajax/769d04d721e5563890ed721ba698f9bc" method="POST">
-    <label>Ваш e-mail
-      <input type="email" name="email" required autocomplete="email" placeholder="you@example.com">
-    </label>
-    <label>Сообщение <span>(необязательно)</span>
-      <textarea name="message" placeholder="Привет, Алина! …"></textarea>
-    </label>
-    <input class="hp" type="text" name="_honey" tabindex="-1" autocomplete="off" aria-hidden="true">
-    <button type="submit">Отправить</button>
-    <p class="form-status" role="status" aria-live="polite"></p>
-  </form>
-</dialog>
 <footer class="ft2"><div class="w">
   <!-- подвал: все страницы сайта по разделам (11.11, просьба Алины); подписи — ключи data-f>…< в content/i18n -->
   <div class="cols">
@@ -164,7 +142,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>Стая</h4><a href="/ru/flock/" data-f>Все птички</a><a href="/ru/flock/news/" data-f>Новости стаи</a><a href="/ru/challenge/" data-f>Челлендж дня</a><a href="/ru/prompts/" data-f>Темы месяца</a><a href="/ru/challenge/#sw-wall" data-f>Рисунки стаи</a><a href="/ru/requests/" data-f>Нарисуй мне</a><a href="/ru/garden/" data-f>Огород птички</a></div>
     <div><h4 data-f>Алина</h4><a href="/ru/sketchbook/" data-f>Скетчбук</a><a href="/ru/about-me/" data-f>Обо мне</a><a href="/ru/on-walls-and-pages/" data-f>На стенах и страницах</a><a href="/ru/projects/" data-f>Обучение и AI</a><a href="/ru/work-with-me/" data-f>Сотрудничество</a><a href="/ru/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="104">v104 · 20.11 19:36</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
+  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="105">v105 · 20.11 19:53</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
 </div></footer>
 </body>
 </html>

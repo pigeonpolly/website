@@ -37,10 +37,10 @@
 <script src="/assets/birds.js?v=c4476bda" defer></script>
 <script src="/assets/room.js?v=dfd6fe8d" defer></script>
 <script src="/assets/toast.js?v=93392a35" defer></script>
-<script src="/assets/day-card.js?v=00ac769a" defer></script>
+<script src="/assets/day-card.js?v=d0702261" defer></script>
 <script src="/assets/hatch.js?v=6d36422a" defer></script>
-<script src="/assets/cart.js?v=5d81e85a" defer></script>
-<script src="/assets/account.js?v=807d4892" defer></script>
+<script src="/assets/cart.js?v=553808d0" defer></script>
+<script src="/assets/account.js?v=383f13aa" defer></script>
 <script src="/assets/news.js?v=1d2af66b" defer></script>
 <script src="/assets/search.js?v=fd80358d" defer></script>
 <script src="/assets/emoji-art.js?v=6375cb5b" defer></script>
@@ -130,7 +130,37 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 <div data-ppb="preview.2" class="pano"><img id="v2-hero" src="/images/v2/hero-autumn.jpg" srcset="/images/v2/hero-autumn-900.jpg 900w, /images/v2/hero-autumn.jpg 1800w" sizes="100vw" alt="Watercolour by Alina Otkinska" fetchpriority="high"><span class="cap2" data-sv="note">Polly on the train ✿</span></div>
 </section>
 
-<section data-ppb="preview.3" class="fl" id="lessons"><div class="w">
+<style>
+.advpromo { padding: 6px 0 26px; }
+.advpromo .w { max-width: 1180px; margin: 0 auto; padding: 0 20px; }
+.advpromo-c { display: flex; align-items: center; gap: 16px; padding: 16px 18px; border-radius: 18px; text-decoration: none;
+  background: linear-gradient(120deg, #FBFDFE, #EDF3F6); color: var(--ink, #1C2430);
+  box-shadow: inset 0 0 0 1px #C6D4DE, 0 8px 22px rgba(28, 36, 48, .08); transition: transform .15s ease, box-shadow .15s ease; }
+.advpromo-c:hover { transform: translateY(-2px); box-shadow: inset 0 0 0 1px #C6D4DE, 0 14px 30px rgba(28, 36, 48, .14); }
+.advpromo-ic { flex: none; width: 46px; height: 46px; border-radius: 12px; display: grid; place-items: center; font-size: 24px;
+  background: #9E1B22; color: #FFF6E5; box-shadow: inset 0 0 0 2px rgba(255, 255, 255, .25); }
+.advpromo-tx { flex: 1; min-width: 0; display: grid; gap: 2px; }
+.advpromo-tx small { font: 700 11px/1 Karla, sans-serif; letter-spacing: .12em; text-transform: uppercase; color: #9E1B22; }
+.advpromo-tx b { font: 700 clamp(17px, 2.2vw, 21px)/1.2 Fraunces, Georgia, serif; }
+.advpromo-tx i { font: 400 14px/1.4 Karla, sans-serif; color: #5D6670; font-style: normal; }
+.advpromo-go { flex: none; font: 700 14px/1 Karla, sans-serif; color: #9E1B22; white-space: nowrap; }
+@media (max-width: 560px) { .advpromo-c { gap: 12px; padding: 13px 14px; } .advpromo-tx i { display: none; } .advpromo-ic { width: 40px; height: 40px; font-size: 20px; } }
+</style>
+<section data-ppb="preview.3" class="advpromo" id="advpromo"><div class="w">
+  <a class="advpromo-c" href="/advent/">
+    <span class="advpromo-ic" aria-hidden="true">🗓</span>
+    <span class="advpromo-tx">
+      <small>1–31 December</small>
+      <b>An advent for drawing</b>
+      <i>A prompt, a palette and a little gift behind every door — one window a day.</i>
+    </span>
+    <span class="advpromo-go">Open →</span>
+  </a>
+</div></section>
+<script>/* ссылка на адвент видна до 1 января включительно, потом прячется */
+(function () { var b = document.getElementById('advpromo'); if (!b) return; var n = new Date(), end = new Date(n.getFullYear(), 0, 2); if (n >= end && n.getMonth() !== 11) b.remove(); })();</script>
+
+<section data-ppb="preview.4" class="fl" id="lessons"><div class="w">
   <div><span class="hand">hi! let’s paint something small ✿</span>
     <h2>Free lessons, <i>open to everyone</i></h2>
     <p>Video lessons you can watch right here, with no sign-up. Grab a brush and paint along.</p>
@@ -143,30 +173,30 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
   </div>
 </div></section>
 
-<section data-ppb="preview.4" class="poll" id="poll" hidden aria-label="Poll"></section>
+<section data-ppb="preview.5" class="poll" id="poll" hidden aria-label="Poll"></section>
 <script src="/assets/poll.js?v=64a1687c" defer></script>
 
-<section data-ppb="preview.5" class="desk" id="guides"><div class="w">
+<section data-ppb="preview.6" class="desk" id="guides"><div class="w">
   <div><span class="k">Books</span><h2>Books to keep <em>on your desk</em></h2>
     <p class="dc">Written, illustrated and designed by Alina. Clear steps and real sketchbook pages, from the first line to a finished little painting. No talent required, just the wish to draw.</p>
     <a class="btn" href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener">Buy on Amazon</a> <a class="btn ghost" href="https://drive.google.com/file/d/1IWMWb0nLOaN2UuJLZA-DqhdmwDh3T9Nx/view?usp=sharing" target="_blank" rel="noopener">Free colouring book →</a></div>
   <div class="books"><a class="b0" href="https://a.co/d/009gymDC" target="_blank" rel="noopener"><img src="/images/e-books/watercolor-sketches.jpg" alt="Watercolor Sketches: Creative Guide" loading="lazy"></a><a class="b1" href="https://a.co/d/0cJY0kk5" target="_blank" rel="noopener"><img src="/images/e-books/ink-sketching.jpg" alt="Ink Sketching: Creative Guide" loading="lazy"></a><a class="b2" href="/blog/new-book-coming-soon/"><span class="lbl">Soon</span><img src="/images/e-books/urban-sketching-digital-traveler.jpg" alt="Urban Sketching: Digital Traveler" loading="lazy"></a><span class="hand">start with this one ↑</span></div>
 </div></section>
 
-<section data-ppb="preview.6" class="jr" id="journal"><div class="w">
+<section data-ppb="preview.7" class="jr" id="journal"><div class="w">
   <span class="doodle" aria-hidden="true">fresh from the sketchbook ↓</span>
   <div class="hd3"><div><span class="k">Journal</span><h2>Notes from <em>the studio</em></h2></div><a class="btn" href="/blog/">All articles</a></div>
   <div class="jg" id="v2-blog"><div class="feat"><div class="im sk"></div></div><div><div class="post"><div class="sk" style="height:90px"></div></div><div class="post"><div class="sk" style="height:90px"></div></div><div class="post"><div class="sk" style="height:90px"></div></div></div></div>
 </div></section>
 
-<section data-ppb="preview.7" class="ab2" id="about"><div class="w">
+<section data-ppb="preview.8" class="ab2" id="about"><div class="w">
   <div class="ph"><img src="/images/home/alina.jpg" alt="Alina Otkinska" loading="lazy"><span>— Alina &amp; Polly</span></div>
   <div><span class="k">Hi, I’m Alina</span><h2>Talent is <em>a marketing trick</em></h2>
     <p>I was sure only people born with a gift could learn to draw. I was wrong. It’s just like building muscle at the gym: all it takes is wanting to. And you’ve already found the gym — right here on my site.</p>
     <a class="btn" href="/sketchbook/">More about me →</a></div>
 </div></section>
 
-<section data-ppb="preview.8" class="lab3" id="lab"><div class="w">
+<section data-ppb="preview.9" class="lab3" id="lab"><div class="w">
   <div class="hd4"><span class="k">Psst… there’s another side</span><h2>Top secret: <em>the Lab</em></h2><span class="hand">open the folder to peek inside</span></div>
   <div class="fold"><div class="bk"></div><span class="tb">case file · the lab</span>
     <div class="ins">
@@ -192,7 +222,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>The Flock</h4><a href="/flock/" data-f>All birds</a><a href="/flock/news/" data-f>Flock news</a><a href="/challenge/" data-f>Daily Challenge</a><a href="/prompts/" data-f>Monthly prompts</a><a href="/challenge/#sw-wall" data-f>Flock drawings</a><a href="/requests/" data-f>Draw this for me</a><a href="/garden/" data-f>Bird garden</a></div>
     <div><h4 data-f>Alina</h4><a href="/sketchbook/" data-f>Sketchbook</a><a href="/about-me/" data-f>About me</a><a href="/on-walls-and-pages/" data-f>On Walls &amp; Pages</a><a href="/projects/" data-f>Learning &amp; AI</a><a href="/work-with-me/" data-f>Work with me</a><a href="/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Alina Otkinska · Pigeon Polly Art Lab · Riga</span><span class="ver" data-ver="104">v104 · 20.11 19:36</span><span><a href="/privacy/">Privacy</a></span></div>
+  <div class="bt"><span>© 2026 Alina Otkinska · Pigeon Polly Art Lab · Riga</span><span class="ver" data-ver="105">v105 · 20.11 19:53</span><span><a href="/privacy/">Privacy</a></span></div>
 </div></footer>
 </body>
 </html>

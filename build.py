@@ -112,7 +112,7 @@ PAGES = [
 # готовые, но пока не открытые страницы: не попадают в sitemap
 UNLISTED = {"blog-editor", "admin", "garden", "learn/watch", "norway", "norway/workshop", "advent-2026"}
 # редизайн 2.0: страницы на новом шаблоне src/layout-v2.html (шапка, подвал, сезоны — site/assets/v2.css, v2.js)
-V2 = {"", "learn", "learn/watch", "books", "sketchbook", "blog", "freebies", "draw", "norway", "norway/workshop", "prompts", "advent-2026"}
+V2 = {"", "learn", "learn/watch", "books", "sketchbook", "blog", "freebies", "draw", "norway", "norway/workshop", "prompts", "advent", "advent-2026"}
 # часть 5: все остальные страницы — на src/layout-v2-lab.html (новая шапка и подвал, внутри старые style.css и скрипты как есть)
 # ключ правок «Править страницу» (data-ppb): у новых страниц — прежний, с /preview/, чтобы сохранённые правки не потерялись
 EDIT_KEY = {"": "preview", "learn": "preview-learn", "books": "preview-guides", "sketchbook": "preview-about"}

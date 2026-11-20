@@ -1,4 +1,4 @@
-// Адвент-календарь (/advent/, вкладка в «Играх»): до 1 декабря — обратный отсчёт; 1–31 декабря вошедший открывает окошки
+﻿// Адвент-календарь (/advent/, вкладка в «Играх»): до 1 декабря — обратный отсчёт; 1–31 декабря вошедший открывает окошки
 // (сегодняшнее и пропущенные), из окошка вылетает птичка с подарком в клюве — вещь сразу в сумке. Что в каком окошке — Алина
 // отмечает в «Коллекциях» на странице стаи (кнопка 📅 у вещи). Сервер: /api/advent, /api/advent/open (worker/index.js).
 (() => {
@@ -11,12 +11,12 @@
     login: ['Sign in to open the windows and collect gifts', 'Войдите, чтобы открывать окошки и собирать подарки', 'Ienāc, lai atvērtu lodziņus un vāktu dāvanas'],
     signin: ['Sign in', 'Войти', 'Ienākt'],
     today: ['Today’s window is waiting!', 'Сегодняшнее окошко ждёт!', 'Šodienas lodziņš gaida!'],
-    missed: ['See you tomorrow! Missed a day? Missed windows can be opened until January {j}.', 'До завтра! Пропустили день? Пропущенные окошки можно открыть до {j} января.', 'Līdz rītam! Izlaidi dienu? Izlaistos lodziņus var atvērt līdz {j}. janvārim.'],
-    catchUp: ['Didn’t make it? Until January {j} you can still open the windows you missed and take all their gifts.', 'Не успели? До {j} января ещё можно открыть пропущенные окошки и забрать все подарки.', 'Nepaguvi? Līdz {j}. janvārim vēl var atvērt izlaistos lodziņus un paņemt visas dāvanas.'],
+    missed: ['See you tomorrow! Missed a day? You can open missed windows until 1 March — except 24 and 31 December.', 'До завтра! Пропустили день? Пропущенные окошки можно открыть до 1 марта — кроме 24 и 31 декабря.', 'Līdz rītam! Izlaidi dienu? Izlaistos lodziņus var atvērt līdz 1. martam — izņemot 24. un 31. decembri.'],
+    catchUp: ['Didn’t make it in December? Until 1 March you can still open the windows you missed — except 24 and 31.', 'Не успели в декабре? До 1 марта ещё можно открыть пропущенные окошки — кроме 24 и 31 декабря.', 'Nepaguvi decembrī? Līdz 1. martam vēl var atvērt izlaistos lodziņus — izņemot 24. un 31. decembri.'],
     was: ['This window held:', 'В этом окошке было:', 'Šajā lodziņā bija:'], wasBtns: ['This window held buttons 🔘', 'В этом окошке были пуговки 🔘', 'Šajā lodziņā bija pogas 🔘'],
     youGot: ['✓ You got it', '✓ Ты это получил(а)', '✓ Tu to saņēmi'], missedIt: ['This day has passed: its window can no longer be opened.', 'Этот день прошёл: окошко больше не открыть.', 'Šī diena ir pagājusi: lodziņu vairs nevar atvērt.'],
-    todayOnly: ['Missed windows can be opened until January {j}.', 'Пропущенные окошки можно открыть до {j} января.', 'Izlaistos lodziņus var atvērt līdz {j}. janvārim.'],
-    tooLate: ['Too late: missed windows could be opened until January {j}.', 'Уже поздно: пропущенные окошки можно было открыть до {j} января.', 'Par vēlu: izlaistos lodziņus varēja atvērt līdz {j}. janvārim.'],
+    todayOnly: ['Missed windows can be opened until 1 March.', 'Пропущенные окошки можно открыть до 1 марта.', 'Izlaistos lodziņus var atvērt līdz 1. martam.'],
+    tooLate: ['Too late: missed windows could be opened until 1 March.', 'Уже поздно: пропущенные окошки можно было открыть до 1 марта.', 'Par vēlu: izlaistos lodziņus varēja atvērt līdz 1. martam.'],
     locked: ['Not yet! This window opens on December {d}.', 'Ещё рано! Это окошко откроется {d} декабря.', 'Vēl par agru! Šis lodziņš atvērsies {d}. decembrī.'],
     got: ['A gift for you:', 'Тебе подарок:', 'Dāvana tev:'],
     inBag: ['It is already in your bag 🎒', 'Он уже у тебя в сумке 🎒', 'Tā jau ir tavā somā 🎒'],
@@ -35,8 +35,10 @@
   const esc = s => String(s).replace(/[&<>"]/g, c => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' }[c]));
   const H = () => (window.PPDevH ? window.PPDevH() : {}); // ?devdate= — проверка на локальном сервере (DEV_FAKE_LOGIN), см. account.js
   let S = null, skew = 0, timer = 0, midnight = 0, wantDay = +((location.hash.match(/^#d=(\d+)$/) || [])[1] || 0); // /advent/#d=5 — сразу на 5-м окошке (из блока на главной и новостей)
-  // окошки вперемешку (одинаково у всех), особые — золотые
-  const ORDER = (() => { const o = [...Array(31)].map((_, i) => i + 1); let a = 20261201; const r = () => (a = (a * 1103515245 + 12345) % 2147483648) / 2147483648; for (let i = o.length - 1; i > 0; i--) { const j = Math.floor(r() * (i + 1)); [o[i], o[j]] = [o[j], o[i]]; } return o; })();
+  // 31 окна по порядку: 1 декабря — первое, 31 — последнее
+  const ORDER = [...Array(31)].map((_, i) => i + 1);
+  // эти окна забирают только в свой день: позже они закрыты
+  const LATE_CLOSED = [24, 31];
 
   function load() {
     return fetch('/api/advent', { credentials: 'same-origin', headers: H() }).then(r => r.ok ? r.json() : null).then(d => {
@@ -60,7 +62,7 @@
     if (!S) { app.innerHTML = ''; return; }
     const opened = Object.fromEntries((S.opened || []).map(o => [o.day, o]));
     const past = {}; (S.past || []).forEach(p => (past[p.day] = past[p.day] || []).push([p.kind, p.item]));
-    const claim = d => !!S.user && d <= (S.claimTo || 0) && !opened[d]; // можно открыть: сегодняшнее и пропущенные (до 23 января)
+    const claim = d => !!S.user && d <= (S.claimTo || 0) && !opened[d] && (!LATE_CLOSED.includes(d) || d === S.today); // сегодняшнее и пропущенные; 24 и 31 — только в свой день
     const isPast = d => d <= (S.shownTo || 0) && !claim(d);
     const plan = {}; (S.plan || []).forEach(p => (plan[p.day] = plan[p.day] || []).push(p));
     const before = !S.today && (Date.now() + skew) < S.startsAt;
@@ -100,8 +102,8 @@
   }
   function tap(btn, d, o) {
     if (o) return show(btn, o, false);
-    if (d > (S.claimTo || 0)) { toast(S.month === 1 ? t('tooLate').replace('{j}', S.lastJan) : t('locked').replace('{d}', d)); btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); return; }
-    if (!S.user) { window.PPAccount && window.PPAccount.openSignIn(); return; }
+    if (d > (S.claimTo || 0) || (LATE_CLOSED.includes(d) && d !== S.today)) { toast(S.month >= 1 && S.month <= 2 ? t('tooLate') : (LATE_CLOSED.includes(d) && d <= (S.claimTo || 0) ? t('missedIt') : t('locked').replace('{d}', d))); btn.classList.remove('shake'); void btn.offsetWidth; btn.classList.add('shake'); return; }
+    if (!S.user) { try { location.hash = '#d=' + d; } catch (e) { /* ок */ } window.PPAccount && window.PPAccount.openSignIn(); return; }
     if (btn.disabled) return;
     btn.disabled = true;
     fetch('/api/advent/open', { method: 'POST', credentials: 'same-origin', headers: Object.assign({ 'content-type': 'application/json' }, H()), body: JSON.stringify({ day: d }) })
@@ -153,3 +155,4 @@
   }
   load();
 })();
+
