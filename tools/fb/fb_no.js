@@ -32,6 +32,7 @@ h1 em{font:italic 400 34px Lora;color:#7A7067;margin-left:16px}
 .ws div{border-top:2px solid #E2D7C6;padding-top:12px}
 .ws b{display:block;font:700 34px Karla;color:#1F2A44}
 .ws span{display:block;font:500 24px Karla;color:#8A7F74;margin-top:3px}
+.ws span tt{font:400 25px 'Noto Sans',sans-serif;color:#6B6158}
 .ws span u{text-decoration:none;color:#2B2A33}
 .foot{position:absolute;right:70px;bottom:22px;font:italic 400 22px Lora;color:#A39888}
 `;
@@ -49,8 +50,8 @@ h1 em{font:italic 400 34px Lora;color:#7A7067;margin-left:16px}
     const rows = Math.ceil(it.w.length / 2), boxH = 1350 - 40 - (230 + rows * 98);
     let aw = 960, ah = aw * h / w; if (ah > boxH) { ah = boxH; aw = ah * w / h; }
     const tags = it.w.map(([no, , , x, y, f]) => `<div class="tag ${y < 16 || f === 'dn' ? 'dn' : ''} ${x > 78 ? 'l' : x < 20 ? 'r' : ''}" style="left:${x}%;top:${y}%"><i></i><b>${esc(no.replace(/^(en|ei|et) /, ''))}</b></div>`).join('');
-    const list = it.w.map(([no, pr, en]) => `<div><b>${esc(no)}</b><span>[${esc(pr)}] · <u>${esc(en)}</u></span></div>`).join('');
-    const html = `<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;1,400&family=Karla:wght@400;500;700&display=block"><style>${CSS}</style></head><body>
+    const list = it.w.map(([no, pr, en]) => `<div><b>${esc(no)}</b><span><tt>[${esc(pr)}]</tt> · <u>${esc(en)}</u></span></div>`).join('');
+    const html = `<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;1,400&family=Karla:wght@400;500;700&family=Noto+Sans:wght@400&display=block"><style>${CSS}</style></head><body>
 <div class="art" style="top:${40 + (boxH - ah) / 2}px;width:${aw}px;height:${ah}px"><img src="file://${file}">${tags}</div>
 <div class="bot"><div class="kick"><s></s>Learning Norwegian</div><h1>${esc(it.t)}<em>${esc(it.en)}</em></h1><div class="ws">${list}</div></div>
 <div class="foot">pigeonpolly.com</div></body></html>`;
