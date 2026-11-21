@@ -3350,6 +3350,11 @@ button.adm-tag.adm-tag-none { background: #fff; border-style: dashed; }
 .room-sel button:hover, .room-sel button:focus-visible { background: var(--pp-acc,#F0A987); color: var(--pp-ink,#2B1A51); }
 .room-bar .room-hint { flex-basis: 100%; order: 3; font-size: 13px; opacity: .75; }
 .bp-room .room-bar { padding: 0 12px 6px; }
+.room-guest { flex-basis: 100%; order: 4; display: flex; flex-wrap: wrap; align-items: center; gap: 6px; }
+.room-guest-hi { font-size: 13px; opacity: .8; margin-right: 2px; }
+.room-guest button { font: 700 13px var(--sans, 'Karla', sans-serif); line-height: 1; padding: 6px 10px; border-radius: 999px; border: 1px solid rgba(0,0,0,.15); background: var(--card, #fff); color: var(--pp-ink,#2B1A51); cursor: pointer; }
+.room-guest button:hover, .room-guest button:focus-visible { background: var(--pp-acc,#F0A987); border-color: var(--pp-acc,#F0A987); }
+.room-guest button[hidden] { display: none; }
 .room-sel[hidden], .room-tray[hidden] { display: none; }
 .room-tray { display: grid; gap: 10px; padding: 14px; border-radius: 16px; background: rgba(255, 255, 255, .06); border: 1px solid var(--line); }
 .room-hint { margin: 0; font-size: 14px; opacity: .85; }

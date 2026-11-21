@@ -4,8 +4,8 @@
 #       sym — имя в коде; doc — раздел docs/*.md.
 # Читать целиком не нужно: grep по нужному виду, или python3 tools/index.py find СЛОВО / where ФАЙЛ.
 # Свежесть: python3 tools/index.py check (перед пушем).
-# файлов 421, страниц 56, маршрутов 216, таблиц 76, ключей meta 68, имён 5707, разделов доков 246
-file	build.py	build.py	0	892 строк, 61 КБ
+# файлов 421, страниц 56, маршрутов 216, таблиц 76, ключей meta 68, имён 5713, разделов доков 246
+file	build.py	build.py	0	892 строк, 60 КБ
 file	content/english/a1.js	content/english/a1.js	0	239 строк, 45 КБ
 file	content/english/a2.js	content/english/a2.js	0	229 строк, 46 КБ
 file	content/english/b1.js	content/english/b1.js	0	262 строк, 69 КБ
@@ -57,9 +57,9 @@ file	docs/a1-pack.md	docs/a1-pack.md	0	10 строк, 2 КБ
 file	docs/admin.md	docs/admin.md	0	180 строк, 52 КБ
 file	docs/artpill.md	docs/artpill.md	0	66 строк, 12 КБ
 file	docs/basics.md	docs/basics.md	0	47 строк, 9 КБ
-file	docs/bird.md	docs/bird.md	0	112 строк, 59 КБ
+file	docs/bird.md	docs/bird.md	0	114 строк, 60 КБ
 file	docs/blog.md	docs/blog.md	0	121 строк, 38 КБ
-file	docs/cards.md	docs/cards.md	0	109 строк, 24 КБ
+file	docs/cards.md	docs/cards.md	0	109 строк, 23 КБ
 file	docs/challenge.md	docs/challenge.md	0	152 строк, 63 КБ
 file	docs/coloring.md	docs/coloring.md	0	7 строк, 2 КБ
 file	docs/db.md	docs/db.md	0	157 строк, 16 КБ
@@ -73,7 +73,7 @@ file	docs/ink.md	docs/ink.md	0	52 строк, 29 КБ
 file	docs/map.md	docs/map.md	0	370 строк, 74 КБ
 file	docs/palettes.md	docs/palettes.md	0	60 строк, 29 КБ
 file	docs/pinterest-dec2026.md	docs/pinterest-dec2026.md	0	55 строк, 4 КБ
-file	docs/plan-status.md	docs/plan-status.md	0	192 строк, 49 КБ
+file	docs/plan-status.md	docs/plan-status.md	0	193 строк, 49 КБ
 file	docs/polly-pet.md	docs/polly-pet.md	0	40 строк, 9 КБ
 file	docs/requests.md	docs/requests.md	0	31 строк, 14 КБ
 file	docs/retired.md	docs/retired.md	0	36 строк, 6 КБ
@@ -85,9 +85,9 @@ file	docs/titos.md	docs/titos.md	0	147 строк, 24 КБ
 file	docs/wobbleland.md	docs/wobbleland.md	0	42 строк, 13 КБ
 file	site/assets/about-admin.js	site/assets/about-admin.js	0	47 строк, 6 КБ
 file	site/assets/about-desk.js	site/assets/about-desk.js	0	738 строк, 52 КБ
-file	site/assets/account.js	site/assets/account.js	0	434 строк, 44 КБ
+file	site/assets/account.js	site/assets/account.js	0	434 строк, 43 КБ
 file	site/assets/admin-v2.css	site/assets/admin-v2.css	0	185 строк, 18 КБ
-file	site/assets/admin.js	site/assets/admin.js	0	1545 строк, 231 КБ
+file	site/assets/admin.js	site/assets/admin.js	0	1545 строк, 229 КБ
 file	site/assets/advent-admin.js	site/assets/advent-admin.js	0	403 строк, 32 КБ
 file	site/assets/advent.css	site/assets/advent.css	0	304 строк, 28 КБ
 file	site/assets/advent.js	site/assets/advent.js	0	248 строк, 20 КБ
@@ -106,7 +106,7 @@ file	site/assets/cards-admin.js	site/assets/cards-admin.js	0	161 строк, 18 
 file	site/assets/cards-ui.js	site/assets/cards-ui.js	0	547 строк, 49 КБ
 file	site/assets/carousel.js	site/assets/carousel.js	0	182 строк, 19 КБ
 file	site/assets/cart.js	site/assets/cart.js	0	37 строк, 3 КБ
-file	site/assets/catalog-ui.js	site/assets/catalog-ui.js	0	448 строк, 42 КБ
+file	site/assets/catalog-ui.js	site/assets/catalog-ui.js	0	448 строк, 41 КБ
 file	site/assets/challenge-admin.js	site/assets/challenge-admin.js	0	630 строк, 77 КБ
 file	site/assets/challenge-data.js	site/assets/challenge-data.js	0	1915 строк, 155 КБ
 file	site/assets/challenge-theme.js	site/assets/challenge-theme.js	0	168 строк, 12 КБ
@@ -139,7 +139,7 @@ file	site/assets/mail-admin.js	site/assets/mail-admin.js	0	73 строк, 9 КБ
 file	site/assets/news.js	site/assets/news.js	0	444 строк, 46 КБ
 file	site/assets/norway.css	site/assets/norway.css	0	16 строк, 1 КБ
 file	site/assets/palettes.js	site/assets/palettes.js	0	439 строк, 40 КБ
-file	site/assets/pancakes.js	site/assets/pancakes.js	0	1016 строк, 114 КБ
+file	site/assets/pancakes.js	site/assets/pancakes.js	0	1016 строк, 113 КБ
 file	site/assets/pixel-badge.js	site/assets/pixel-badge.js	0	105 строк, 13 КБ
 file	site/assets/poll.js	site/assets/poll.js	0	94 строк, 10 КБ
 file	site/assets/polls-admin.js	site/assets/polls-admin.js	0	116 строк, 13 КБ
@@ -147,7 +147,7 @@ file	site/assets/polly-school.js	site/assets/polly-school.js	0	250 строк, 2
 file	site/assets/polly.js	site/assets/polly.js	0	692 строк, 57 КБ
 file	site/assets/posts-admin.js	site/assets/posts-admin.js	0	276 строк, 32 КБ
 file	site/assets/potion-names.js	site/assets/potion-names.js	0	145 строк, 27 КБ
-file	site/assets/potions.js	site/assets/potions.js	0	558 строк, 58 КБ
+file	site/assets/potions.js	site/assets/potions.js	0	558 строк, 57 КБ
 file	site/assets/prompts.css	site/assets/prompts.css	0	32 строк, 2 КБ
 file	site/assets/prompts.js	site/assets/prompts.js	0	116 строк, 5 КБ
 file	site/assets/pw-rules.js	site/assets/pw-rules.js	0	25 строк, 2 КБ
@@ -155,7 +155,7 @@ file	site/assets/quest-polly.js	site/assets/quest-polly.js	0	120 строк, 15 
 file	site/assets/quest-titos.js	site/assets/quest-titos.js	0	317 строк, 33 КБ
 file	site/assets/rain.js	site/assets/rain.js	0	303 строк, 27 КБ
 file	site/assets/requests.js	site/assets/requests.js	0	251 строк, 32 КБ
-file	site/assets/room.js	site/assets/room.js	0	2192 строк, 329 КБ
+file	site/assets/room.js	site/assets/room.js	0	2350 строк, 351 КБ
 file	site/assets/rooms-data.js	site/assets/rooms-data.js	0	2 строк, 5 КБ · СОБРАН, руками не править
 file	site/assets/rooms.js	site/assets/rooms.js	0	289 строк, 39 КБ
 file	site/assets/runes-admin.js	site/assets/runes-admin.js	0	174 строк, 16 КБ
@@ -167,9 +167,9 @@ file	site/assets/shift-music.js	site/assets/shift-music.js	0	151 строк, 11 
 file	site/assets/shift.js	site/assets/shift.js	0	408 строк, 30 КБ
 file	site/assets/site-edit.js	site/assets/site-edit.js	0	288 строк, 24 КБ
 file	site/assets/site.js	site/assets/site.js	0	265 строк, 16 КБ
-file	site/assets/sketch-wall.js	site/assets/sketch-wall.js	0	955 строк, 121 КБ
+file	site/assets/sketch-wall.js	site/assets/sketch-wall.js	0	955 строк, 120 КБ
 file	site/assets/sketchbook.js	site/assets/sketchbook.js	0	138 строк, 13 КБ
-file	site/assets/style.css	site/assets/style.css	0	5729 строк, 514 КБ
+file	site/assets/style.css	site/assets/style.css	0	5734 строк, 509 КБ
 file	site/assets/tarot-admin.js	site/assets/tarot-admin.js	0	127 строк, 11 КБ
 file	site/assets/tarot.css	site/assets/tarot.css	0	70 строк, 6 КБ
 file	site/assets/tarot.js	site/assets/tarot.js	0	342 строк, 18 КБ
@@ -184,7 +184,7 @@ file	site/assets/train.css	site/assets/train.css	0	102 строк, 10 КБ
 file	site/assets/train.js	site/assets/train.js	0	401 строк, 41 КБ
 file	site/assets/translate-btn.js	site/assets/translate-btn.js	0	31 строк, 3 КБ
 file	site/assets/v2-acct.css	site/assets/v2-acct.css	0	532 строк, 43 КБ
-file	site/assets/v2-shell.css	site/assets/v2-shell.css	0	217 строк, 28 КБ
+file	site/assets/v2-shell.css	site/assets/v2-shell.css	0	217 строк, 27 КБ
 file	site/assets/v2.css	site/assets/v2.css	0	729 строк, 78 КБ
 file	site/assets/v2.js	site/assets/v2.js	0	437 строк, 47 КБ
 file	site/assets/wl-town.js	site/assets/wl-town.js	0	716 строк, 68 КБ
@@ -245,7 +245,7 @@ file	src/pages/prompts.html	src/pages/prompts.html	0	16 строк, 1 КБ
 file	src/pages/rain.html	src/pages/rain.html	0	9 строк, 1 КБ
 file	src/pages/requests.html	src/pages/requests.html	0	7 строк, 1 КБ
 file	src/pages/shift.html	src/pages/shift.html	0	10 строк, 1 КБ
-file	src/pages/shop.html	src/pages/shop.html	0	323 строк, 31 КБ
+file	src/pages/shop.html	src/pages/shop.html	0	323 строк, 30 КБ
 file	src/pages/sketchbook.html	src/pages/sketchbook.html	0	7 строк, 0 КБ
 file	src/pages/snail.html	src/pages/snail.html	0	7 строк, 0 КБ
 file	src/pages/titos.html	src/pages/titos.html	0	25 строк, 1 КБ
@@ -272,7 +272,7 @@ file	tools/cards/pixfont.py	tools/cards/pixfont.py	0	153 строк, 9 КБ
 file	tools/cards/props.py	tools/cards/props.py	0	130 строк, 4 КБ
 file	tools/cards/proto_big.py	tools/cards/proto_big.py	0	116 строк, 5 КБ
 file	tools/cards/tarot.py	tools/cards/tarot.py	0	50 строк, 2 КБ
-file	tools/cards/tarot_content.py	tools/cards/tarot_content.py	0	405 строк, 61 КБ
+file	tools/cards/tarot_content.py	tools/cards/tarot_content.py	0	405 строк, 60 КБ
 file	tools/cards/tarot_hole.py	tools/cards/tarot_hole.py	0	74 строк, 4 КБ
 file	tools/cards/unique_crop.py	tools/cards/unique_crop.py	0	212 строк, 11 КБ
 file	tools/cards/write_tarot_js.py	tools/cards/write_tarot_js.py	0	16 строк, 1 КБ
@@ -307,12 +307,12 @@ file	tools/ornaments/render.js	tools/ornaments/render.js	0	14 строк, 1 КБ
 file	tools/palette_names.py	tools/palette_names.py	0	23 строк, 5 КБ
 file	tools/palette_overrides.py	tools/palette_overrides.py	0	15 строк, 6 КБ
 file	tools/palette_titles.py	tools/palette_titles.py	0	128 строк, 12 КБ
-file	tools/palettes.py	tools/palettes.py	0	134 строк, 9 КБ
+file	tools/palettes.py	tools/palettes.py	0	134 строк, 8 КБ
 file	tools/pins/cal-data.js	tools/pins/cal-data.js	0	67 строк, 8 КБ
 file	tools/pins/cal.js	tools/pins/cal.js	0	230 строк, 22 КБ
 file	tools/pins/cover.js	tools/pins/cover.js	0	54 строк, 5 КБ
 file	tools/pins/dec2026.py	tools/pins/dec2026.py	0	154 строк, 7 КБ
-file	tools/pins/holidays27-data.js	tools/pins/holidays27-data.js	0	429 строк, 66 КБ
+file	tools/pins/holidays27-data.js	tools/pins/holidays27-data.js	0	429 строк, 65 КБ
 file	tools/pins/holidays27.js	tools/pins/holidays27.js	0	168 строк, 17 КБ
 file	tools/pins/life_pal.py	tools/pins/life_pal.py	0	22 строк, 1 КБ
 file	tools/pins/nails.js	tools/pins/nails.js	0	61 строк, 6 КБ
@@ -396,7 +396,7 @@ file	worker/flock.js	worker/flock.js	0	124 строк, 10 КБ
 file	worker/garden.js	worker/garden.js	0	243 строк, 22 КБ
 file	worker/guides.js	worker/guides.js	0	199 строк, 15 КБ
 file	worker/ideas.js	worker/ideas.js	0	197 строк, 17 КБ
-file	worker/index.js	worker/index.js	0	3226 строк, 316 КБ
+file	worker/index.js	worker/index.js	0	3226 строк, 313 КБ
 file	worker/kitchen.js	worker/kitchen.js	0	135 строк, 10 КБ
 file	worker/mail-html.js	worker/mail-html.js	0	86 строк, 9 КБ
 file	worker/mail.js	worker/mail.js	0	280 строк, 25 КБ
@@ -3494,35 +3494,41 @@ sym	SMALL	site/assets/room.js	1255	const
 sym	isSmall	site/assets/room.js	1259	const
 sym	GLOW	site/assets/room.js	1261	const
 sym	lidUp	site/assets/room.js	1272	const
-sym	vals	site/assets/room.js	1305	const
-sym	parse	site/assets/room.js	1306	const
-sym	defOf	site/assets/room.js	1307	const
-sym	ROOM_KINDS	site/assets/room.js	1308	const
-sym	nameOf	site/assets/room.js	1309	const
-sym	LEG	site/assets/room.js	1315	const
-sym	th	site/assets/room.js	1321	const
-sym	LIGHTS	site/assets/room.js	1322	const
-sym	addTh	site/assets/room.js	1323	const
-sym	icon	site/assets/room.js	1377	fn
-sym	isRoom	site/assets/room.js	1396	const
-sym	SUR	site/assets/room.js	1398	const
-sym	SUR_C	site/assets/room.js	1401	const
-sym	surpriseIcon	site/assets/room.js	1402	fn
-sym	kindLabel	site/assets/room.js	1410	const
-sym	oldName	site/assets/room.js	1411	const
-sym	isSur	site/assets/room.js	1412	const
-sym	SUR_CARD	site/assets/room.js	1414	const
-sym	surName	site/assets/room.js	1415	const
-sym	surIcon	site/assets/room.js	1416	const
-sym	web	site/assets/room.js	1443	const
-sym	CANDLES	site/assets/room.js	1448	const
-sym	sconce	site/assets/room.js	1449	const
-sym	HOMES	site/assets/room.js	1450	const
-sym	freeSpot	site/assets/room.js	1482	fn
-sym	albumOf	site/assets/room.js	1511	fn
-sym	mount	site/assets/room.js	1513	fn
-sym	aboutOf	site/assets/room.js	2190	const
-sym	PPRoom	site/assets/room.js	2191	win
+sym	TCLOTH	site/assets/room.js	1305	const
+sym	steam	site/assets/room.js	1306	const
+sym	ICE	site/assets/room.js	1307	const
+sym	glint	site/assets/room.js	1308	const
+sym	drift	site/assets/room.js	1309	const
+sym	vals	site/assets/room.js	1373	const
+sym	parse	site/assets/room.js	1374	const
+sym	defOf	site/assets/room.js	1375	const
+sym	ROOM_KINDS	site/assets/room.js	1376	const
+sym	nameOf	site/assets/room.js	1377	const
+sym	LEG	site/assets/room.js	1383	const
+sym	th	site/assets/room.js	1389	const
+sym	LIGHTS	site/assets/room.js	1390	const
+sym	addTh	site/assets/room.js	1391	const
+sym	WINTER_NEW	site/assets/room.js	1444	const
+sym	icon	site/assets/room.js	1448	fn
+sym	isRoom	site/assets/room.js	1467	const
+sym	SUR	site/assets/room.js	1469	const
+sym	SUR_C	site/assets/room.js	1472	const
+sym	surpriseIcon	site/assets/room.js	1473	fn
+sym	kindLabel	site/assets/room.js	1481	const
+sym	oldName	site/assets/room.js	1482	const
+sym	isSur	site/assets/room.js	1483	const
+sym	SUR_CARD	site/assets/room.js	1485	const
+sym	surName	site/assets/room.js	1486	const
+sym	surIcon	site/assets/room.js	1487	const
+sym	web	site/assets/room.js	1514	const
+sym	CANDLES	site/assets/room.js	1519	const
+sym	sconce	site/assets/room.js	1520	const
+sym	HOMES	site/assets/room.js	1521	const
+sym	freeSpot	site/assets/room.js	1553	fn
+sym	albumOf	site/assets/room.js	1582	fn
+sym	mount	site/assets/room.js	1584	fn
+sym	aboutOf	site/assets/room.js	2348	const
+sym	PPRoom	site/assets/room.js	2349	win
 sym	box	site/assets/rooms.js	4	const
 sym	room	site/assets/rooms.js	5	const
 sym	esc	site/assets/rooms.js	7	const
@@ -6594,10 +6600,10 @@ doc	Карточка «Моя птичка»	docs/bird.md	44	h2
 doc	Профиль /bird/	docs/bird.md	47	h2
 doc	Мой кабинет (свой /bird/)	docs/bird.md	51	h2
 doc	Комната птички	docs/bird.md	55	h2
-doc	Кухня: книга рецептов (этап 89)	docs/bird.md	81	h2
-doc	Сумка	docs/bird.md	88	h2
-doc	Видео для соцсетей (этап 15)	docs/bird.md	92	h2
-doc	Огород (этап 22)	docs/bird.md	99	h2
+doc	Кухня: книга рецептов (этап 89)	docs/bird.md	83	h2
+doc	Сумка	docs/bird.md	90	h2
+doc	Видео для соцсетей (этап 15)	docs/bird.md	94	h2
+doc	Огород (этап 22)	docs/bird.md	101	h2
 doc	Блог	docs/blog.md	1	h1
 doc	Кратко	docs/blog.md	3	h2
 doc	Оглавление	docs/blog.md	11	h2
@@ -6716,8 +6722,8 @@ doc	Порядок	docs/pinterest-dec2026.md	48	h2
 doc	Статус плана	docs/plan-status.md	1	h1
 doc	Открыто	docs/plan-status.md	6	h2
 doc	Этапы (готовые — одной строкой)	docs/plan-status.md	20	h2
-doc	Решения Алины	docs/plan-status.md	141	h2
-doc	Допущения (по открытым этапам)	docs/plan-status.md	149	h2
+doc	Решения Алины	docs/plan-status.md	142	h2
+doc	Допущения (по открытым этапам)	docs/plan-status.md	150	h2
 doc	Полли-питомец	docs/polly-pet.md	1	h1
 doc	Кратко	docs/polly-pet.md	3	h2
 doc	Оглавление	docs/polly-pet.md	9	h2
