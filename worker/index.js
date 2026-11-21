@@ -91,6 +91,7 @@ export default {
       if (!(await getMeta(env, 'buttons_backfill'))) await backfillButtons(env).catch(e => healthErr(env, 'backfill', e)); // разовое начисление пуговок за прошлое
       await autoPrice(env).catch(e => healthErr(env, 'price', e)); // раз в сутки: уровень цен под заработки птичек
       await autoRestock(env).catch(e => healthErr(env, 'restock', e)); // раз в сутки (по Риге) пополнить магазин
+      await stockNew(env, new Request('https://pigeonpolly.com/')).catch(e => healthErr(env, 'stockNew', e)); // новые вещи каталога — сразу в продажу
       await seedLegends(env, 'pan_leg_v1', ['furn|pancaketower', 'furn|magicpan', 'hat|pancakecrown', 'item|goldspatula']).catch(e => healthErr(env, 'legends', e)); // ★ блинной темы — разово в продажу
       await seedLegends(env, 'train_leg_v1', ['furn|steamtrain', 'hat|goldcap']).catch(e => healthErr(env, 'legends', e)); // ★ темы «🚆 Поезд» — разово в продажу
       await seedLegends(env, 'train_items_v1', TRAIN_ITEMS, STOCK.norm).catch(e => healthErr(env, 'train items', e)); // вещи темы «🚆 Поезд» (worker/train.js)
@@ -1011,6 +1012,23 @@ async function seedLegends(env, tag, keys, n) { // n — сколько штук
   const st = env.DB.prepare('INSERT INTO shop (kind, item, price, stock, added_at) VALUES (?, ?, ?, ?, ?) ON CONFLICT(kind, item) DO UPDATE SET stock = CASE WHEN shop.stock <= 0 THEN excluded.stock ELSE shop.stock END, added_at = excluded.added_at');
   await env.DB.batch(keys.map(k => { const [a, b] = k.split('|'); return st.bind(a, b, cp[k] || (n ? 30 : 600), n || STOCK.normLeg, now()); }));
   await setMeta(env, tag, String(now()));
+}
+// Новые вещи каталога — сразу в продажу (21.11.2026, просьба Алины): когда каталог меняется (подпись — число вещей и их ключи),
+// всем обычным вещам без строки в shop ставится обычный запас по цене каталога. Уже проданные/закончившиеся не трогает — это autoRestock.
+async function stockNew(env, req) {
+  const cat = await catalog(env, req), cp = cat.prices || {}, keys = [];
+  for (const [k, xs] of Object.entries(cat.items || {})) for (const v of xs) keys.push(k + '|' + v);
+  if (!keys.length) return 0;
+  let h = 0; for (const x of keys.join(',')) h = (h * 31 + x.charCodeAt(0)) | 0;
+  const sig = keys.length + ':' + h;
+  if ((await getMeta(env, 'stock_new_sig')) === sig) return 0;
+  await ensurePrices(env, req);
+  const to = RULES.restockTo > 0 ? RULES.restockTo : STOCK.norm, have = new Set((await env.DB.prepare('SELECT kind, item FROM shop').all()).results.map(r => r.kind + '|' + r.item));
+  const list = keys.filter(k => !have.has(k) && !LEGEND.has(k) && !k.endsWith('|legend') && PPCanDo(...k.split('|')).shop).map(k => k.split('|')).filter(([k, v]) => GIFT_KINDS.includes(k) && v);
+  const st = env.DB.prepare('INSERT OR IGNORE INTO shop (kind, item, price, stock, added_at) VALUES (?, ?, ?, ?, ?)');
+  for (let i = 0; i < list.length; i += 50) await env.DB.batch(list.slice(i, i + 50).map(([k, v]) => st.bind(k, v, cp[k + '|' + v] || 30, to, now())));
+  await setMeta(env, 'stock_new_sig', sig);
+  return list.length;
 }
 async function ensurePrices(env, req) {
   if (await env.DB.prepare("SELECT value FROM meta WHERE key = 'prices_v1'").first()) return;
@@ -2696,6 +2714,7 @@ async function route(req, env, url) {
   // ---------- магазин: вещи из коллекций за пуговки; цену и остаток задаёт Алина в кабинете ----------
   if (m === 'GET' && p === '/api/shop') {
     await ensurePrices(env, req);
+    await stockNew(env, req).catch(e => healthErr(env, 'stockNew', e)); // вышли новые вещи — сразу в продаже
     const rows = (await env.DB.prepare('SELECT kind, item, price, stock, added_at FROM shop').all()).results;
     return json({ items: rows.map(shopRow), max: RULES.shopMax, legendMax: RULES.legendMax, lvl: { low: STOCK.low, many: STOCK.many, lowLeg: STOCK.lowLeg, manyLeg: STOCK.manyLeg } }, 200, { 'cache-control': 'no-store' });
   }
