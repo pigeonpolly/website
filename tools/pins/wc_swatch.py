@@ -1,13 +1,12 @@
 # Пин «акварельная палитра»: мазки-имитация акварели + арт, без текста, мини-лого PP справа внизу.
-# python3 tools/pins/wc_swatch.py <ключ из content/palettes.json> <номер> [y-сдвиг кадра 0..1]
+# python3 tools/pins/wc_swatch.py <ключ из content/palettes.json> <номер> [top|bottom]
+# python3 tools/pins/wc_swatch.py --all  → все пины из tools/pins/wcpal.json
 import json, sys
 import numpy as np
 from PIL import Image, ImageFilter
 
 ROOT = __file__.rsplit('/tools/', 1)[0]
-key, num = sys.argv[1], sys.argv[2]
-fy = float(sys.argv[3]) if len(sys.argv) > 3 else 0.5
-rng = np.random.default_rng(int(num))
+rng = np.random.default_rng(0)
 W, H, M = 1000, 1500, 60
 PAPER = np.array([247, 243, 236], float) / 255
 
@@ -27,9 +26,6 @@ def hex2(c):
     return np.array([int(c[i:i + 2], 16) for i in (1, 3, 5)], float) / 255
 
 
-# бумага: лёгкое зерно и волокна
-paper = np.ones((H, W, 3)) * PAPER
-paper *= (1 + noise(H, W, 1.0, 0.005) + noise(H, W, 10, 0.006))[..., None]
 
 
 def swatch(hexc, w, h):
@@ -72,44 +68,68 @@ def paint(canvas, hexc, x, y, w, h):
     sub *= c[None, None, :] ** (d[..., None] * 1.05)
 
 
-data = {p['key']: p for p in json.load(open(f'{ROOT}/content/palettes.json'))}[key]
-cols = [c['hex'] for c in data['colors']]
-n = len(cols)
-cw = W - 2 * M
-step = cw / n
-sw = int(step - 20)  # промежуток между мазками ~25 px
-for i, c in enumerate(cols):
-    x = int(M + i * step + 10 + rng.integers(-3, 4))
-    y = 70 + int(rng.integers(-8, 9))
-    paint(paper, c, x, y, sw, 250 + int(rng.integers(-14, 15)))
+PAL = {p['key']: p for p in json.load(open(f'{ROOT}/content/palettes.json'))}
+LOGO = Image.open(f'{ROOT}/site/images/logo/v3/pigeon-polly-brown-only-transparent-4000.png').convert('RGBA')
+LOGO = LOGO.crop(LOGO.getbbox())
 
-out = Image.fromarray(np.clip(paper * 255, 0, 255).astype(np.uint8))
 
-# арт: кадр под 880×1000, с тонкой тенью как у бумаги
-art = Image.open(f"{ROOT}/site/{data['img']}").convert('RGB')
-aw, ah = cw, 1000
-r = max(aw / art.width, ah / art.height)
-art = art.resize((round(art.width * r), round(art.height * r)), Image.LANCZOS)
-ox = (art.width - aw) // 2
-oy = int((art.height - ah) * fy)
-art = art.crop((ox, oy, ox + aw, oy + ah))
-AY = 380
-sh = Image.new('L', (W, H), 0)
-sh.paste(60, (M + 3, AY + 6, M + aw + 3, AY + ah + 6))
-sh = sh.filter(ImageFilter.GaussianBlur(8))
-out.paste(Image.new('RGB', (W, H), (90, 70, 55)), (0, 0), sh)
-out.paste(art, (M, AY))
+def smart_crop(art, aw, ah):
+    """кадр aw×ah там, где больше всего деталей (контуры), а не просто по центру"""
+    r = max(aw / art.width, ah / art.height)
+    art = art.resize((round(art.width * r), round(art.height * r)), Image.LANCZOS)
+    g = np.asarray(art.convert('L').resize((art.width // 4, art.height // 4)), float)
+    e = np.abs(np.diff(g, axis=0))[:, :-1] + np.abs(np.diff(g, axis=1))[:-1, :]
+    sx, sy = art.width - aw, art.height - ah
+    best, bx, by = -1, sx // 2, sy // 2
+    for ox in np.linspace(0, sx, 9).astype(int) if sx else [0]:
+        for oy in np.linspace(0, sy, 9).astype(int) if sy else [0]:
+            v = e[oy // 4:(oy + ah) // 4, ox // 4:(ox + aw) // 4].sum()
+            v *= 1 - 0.15 * (abs(ox - sx / 2) / (sx or 1) + abs(oy - sy / 2) / (sy or 1))  # лёгкая тяга к центру
+            if v > best:
+                best, bx, by = v, ox, oy
+    return art.crop((bx, by, bx + aw, by + ah))
 
-# мини-лого PP справа внизу
-logo = Image.open(f'{ROOT}/site/images/logo/v3/pigeon-polly-brown-only-transparent-4000.png').convert('RGBA')
-bb = logo.getbbox()
-logo = logo.crop(bb)
-lh = 64
-logo = logo.resize((round(logo.width * lh / logo.height), lh), Image.LANCZOS)
-a = logo.split()[3].point(lambda v: int(v * 0.85))
-logo.putalpha(a)
-out.paste(logo, (W - M - logo.width, AY + ah + (H - AY - ah - lh) // 2), logo)
 
-dst = f'{ROOT}/site/images/pins/pin-{num}.jpg'
-out.save(dst, quality=90)
-print(dst, cols)
+def render(key, num, layout='top'):
+    global rng
+    rng = np.random.default_rng(int(num))
+    data = PAL[key]
+    cols = [c['hex'] for c in data['colors']]
+    paper = np.ones((H, W, 3)) * PAPER                     # бумага: лёгкое зерно и волокна
+    paper *= (1 + noise(H, W, 1.0, 0.005) + noise(H, W, 10, 0.006))[..., None]
+    art = Image.open(f"{ROOT}/site/{data['img']}").convert('RGB')
+    cw = W - 2 * M
+    ah = int(min(1000, max(760, cw * art.height / art.width)))
+    SH, GAP, LB = 250, 60, 90                               # мазки, промежуток, полоса лого
+    y0 = (H - LB - (SH + GAP + ah)) // 2 + 10
+    sy, ay = (y0, y0 + SH + GAP) if layout == 'top' else (y0 + ah + GAP, y0)
+    n = len(cols)
+    step = cw / n
+    sw = int(step - 20)  # промежуток между мазками ~25 px
+    for i, c in enumerate(cols):
+        x = int(M + i * step + 10 + rng.integers(-3, 4))
+        y = sy + int(rng.integers(-8, 9))
+        paint(paper, c, x, y, sw, SH + int(rng.integers(-14, 15)))
+    out = Image.fromarray(np.clip(paper * 255, 0, 255).astype(np.uint8))
+    art = smart_crop(art, cw, ah)
+    sh = Image.new('L', (W, H), 0)                          # тонкая тень под артом
+    sh.paste(60, (M + 3, ay + 6, M + cw + 3, ay + ah + 6))
+    out.paste(Image.new('RGB', (W, H), (90, 70, 55)), (0, 0), sh.filter(ImageFilter.GaussianBlur(8)))
+    out.paste(art, (M, ay))
+    lh = 64                                                 # мини-лого PP справа внизу
+    logo = LOGO.resize((round(LOGO.width * lh / LOGO.height), lh), Image.LANCZOS)
+    logo.putalpha(logo.split()[3].point(lambda v: int(v * 0.85)))
+    bottom = max(sy + SH, ay + ah)
+    out.paste(logo, (W - M - logo.width, min(H - lh - 24, bottom + (H - bottom - lh) // 2)), logo)
+    dst = f'{ROOT}/site/images/pins/pin-{num}.jpg'
+    out.save(dst, quality=90)
+    return dst
+
+
+if __name__ == '__main__':
+    if sys.argv[1] == '--all':
+        for p in json.load(open(f'{ROOT}/tools/pins/wcpal.json')):
+            render(p['key'], p['n'], p['layout'])
+            print(p['n'], end=' ', flush=True)
+    else:
+        print(render(sys.argv[1], sys.argv[2], sys.argv[3] if len(sys.argv) > 3 else 'top'))
