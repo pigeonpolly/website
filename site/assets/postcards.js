@@ -44,32 +44,6 @@
   const SACK = ['......aaaa......', '.....awwwwa.....', '....aowwwwoa....', '...aoooooooa....', '...annnnnnnna...', '..appppppppppa..', '.apppqpppppqppa.', '.appppppppppppa.', 'appqpppppqppppa', 'apppppppppppppa', 'appppppqppppppa', 'apqppppppppqppa', '.appppppppppppa.', '..aaaaaaaaaaaa..'];
   const SACK_C = { a: '#3a1d14', w: '#f4f1ea', o: '#f6c445', n: '#5ba3d9', p: '#b0412e', q: '#8d2f20' };
   const pix = (g, rows, cols, x0, y0, s) => rows.forEach((r, y) => [...r].forEach((ch, x) => { if (cols[ch]) { g.fillStyle = cols[ch]; g.fillRect(x0 + x * s, y0 + y * s, s, s); } }));
-  const SCENE = {
-    polly(g, w, h, t) {
-      const sk = g.createLinearGradient(0, 0, 0, h); sk.addColorStop(0, '#1F3A5F'); sk.addColorStop(1, '#5B7FA6'); g.fillStyle = sk; g.fillRect(0, 0, w, h);
-      g.fillStyle = '#FFF8DC'; g.beginPath(); g.arc(w * .82, h * .2, h * .08, 0, TAU); g.fill();
-      g.fillStyle = '#EEF3FA'; g.beginPath(); g.ellipse(w * .5, h * 1.02, w * .75, h * .26, 0, 0, TAU); g.fill();
-      const s = Math.max(2, Math.round(h / 70)), pc = document.createElement('canvas');
-      if (window.PollyPet && PollyPet.paint) { PollyPet.paint(pc, { sp: s, hat: 'santa', acc: 'scarf', legs: Math.floor(t * 4) % 2 ? 'legB' : 'legA' }); g.imageSmoothingEnabled = false; g.drawImage(pc, w * .3, h * .9 - pc.height); }
-      pix(g, SACK, SACK_C, w * .3 + 30 * s, h * .9 - 14 * Math.round(s * 1.6) + Math.round(Math.sin(TAU * t * 2) * s), Math.round(s * 1.6));
-    },
-    night(g, w, h) {
-      const sk = g.createLinearGradient(0, 0, 0, h); sk.addColorStop(0, '#0E1730'); sk.addColorStop(1, '#2B3A67'); g.fillStyle = sk; g.fillRect(0, 0, w, h);
-      const r = rnd(7); g.fillStyle = '#fff'; for (let i = 0; i < 60; i++) { g.globalAlpha = .3 + r() * .6; g.fillRect(r() * w, r() * h * .6, 1.5, 1.5); } g.globalAlpha = 1;
-      g.fillStyle = '#121A2E'; const R = rnd(3); let x = 0; while (x < w) { const bw = w * (.05 + R() * .07), bh = h * (.12 + R() * .22); g.fillRect(x, h - bh, bw + 1, bh); if (R() < .3) { g.beginPath(); g.moveTo(x + bw * .2, h - bh); g.lineTo(x + bw * .5, h - bh - h * .12); g.lineTo(x + bw * .8, h - bh); g.fill(); } g.fillStyle = '#F6D04D'; for (let k = 0; k < 4; k++) if (R() < .5) g.fillRect(x + R() * bw * .8, h - bh + R() * bh * .8, 3, 4); g.fillStyle = '#121A2E'; x += bw; }
-    },
-    cake(g, w, h, t) {
-      g.fillStyle = '#FCE9EF'; g.fillRect(0, 0, w, h); const s = Math.max(3, Math.round(h / 50));
-      g.fillStyle = '#F7D3DF'; for (let i = 0; i < 10; i++) g.fillRect(i * w / 10 + w / 40, 0, w / 20, h);
-      const cx = w / 2, by = h * .85, cw = 34 * s;
-      g.fillStyle = '#e8dcd0'; g.fillRect(cx - cw / 2 - 3 * s, by, cw + 6 * s, s * 2);
-      [['#B0412E', 10], ['#F4F1EA', 2], ['#E58FA8', 9], ['#F4F1EA', 2]].reduce((y, [c, n]) => { g.fillStyle = c; g.fillRect(cx - cw / 2, y - n * s, cw, n * s); return y - n * s; }, by);
-      const top = by - 23 * s;
-      for (let i = 0; i < 5; i++) { const x = cx - cw / 2 + (4 + i * 6.5) * s; g.fillStyle = ['#5BA3D9', '#F6C445', '#6A9A3A', '#B79CF2', '#E5484D'][i]; g.fillRect(x, top - 7 * s, 2 * s, 7 * s);
-        const fl = .8 + .3 * Math.sin(TAU * (t * 4 + i * .3)); g.fillStyle = '#F6C445'; g.beginPath(); g.ellipse(x + s, top - 9 * s, s * .9, s * 2 * fl, 0, 0, TAU); g.fill(); g.fillStyle = '#FFF3B0'; g.beginPath(); g.ellipse(x + s, top - 8.5 * s, s * .4, s * fl, 0, 0, TAU); g.fill(); }
-    },
-  };
-
   // ---------- открытка ----------
   const imgs = {};
   const loadImg = src => imgs[src] || (imgs[src] = new Promise(ok => { const i = new Image(); i.onload = () => ok(i); i.onerror = () => ok(null); i.src = src; }));
@@ -77,14 +51,14 @@
   // card(el, d, {msg, from, to, still}) — рисует открытку в el; still — без анимации (миниатюры в списке, пока не наведут)
   function card(el, d, o = {}) {
     el.classList.add('pc-card'); el.dataset.d = d.id; el.style.setProperty('--ink', d.ink);
-    el.innerHTML = `<div class="pc-pic"><canvas class="pc-cv"></canvas></div><div class="pc-strip"><b class="pc-g">${esc(tr(d.g))}</b>`
+    el.innerHTML = `<div class="pc-pic"><canvas class="pc-cv"></canvas></div><div class="pc-strip"><b class="pc-g">${esc(o.greet || tr(d.g))}</b>`
       + (o.msg != null ? `<p class="pc-msg">${esc(o.msg)}</p><p class="pc-sig">${o.from ? '— ' + esc(o.from) : ''}</p>` : '') + '</div>';
     const cv = el.querySelector('.pc-cv'), g = cv.getContext('2d');
     const st = { el, d, cv, g, img: null, run: !o.still, t0: performance.now() };
     const size = () => { const r = cv.getBoundingClientRect(), k = Math.min(2, devicePixelRatio || 1); cv.width = Math.max(10, Math.round(r.width * k)); cv.height = Math.max(10, Math.round(r.width * 2 / 3 * k)); };
     st.frame = t => { const w = cv.width, h = cv.height; g.clearRect(0, 0, w, h);
       if (d.art) { if (st.img) { const i = st.img, k = Math.max(w / i.width, h / i.height); g.drawImage(i, (w - i.width * k) / 2, (h - i.height * k) / 2, i.width * k, i.height * k); } }
-      else SCENE[d.scene](g, w, h, t);
+      else { const SCN = window.PPPostcardScenes; if (SCN) { const lo = st.lo || (st.lo = Object.assign(document.createElement('canvas'), { width: SCN.W, height: SCN.H })); const lg = lo.getContext('2d'); lg.clearRect(0, 0, SCN.W, SCN.H); SCN.draw(d.scene, lg, t); g.imageSmoothingEnabled = false; g.drawImage(lo, 0, 0, w, h); } }
       const fx = st.fx || (st.fx = Object.assign(document.createElement('canvas'), {})); fx.width = w; fx.height = h; fxDraw(fx.getContext('2d'), d.fx, t, w, h); g.drawImage(fx, 0, 0); };
     size(); st.frame(0);
     if (d.art) loadImg(d.art).then(i => { st.img = i; st.frame(0); });
@@ -103,6 +77,7 @@
     count: n => [`${n} ${n === 1 ? 'gift' : 'gifts'} sent`, `${n} ${['подарок', 'подарка', 'подарков'][n % 10 === 1 && n % 100 !== 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : 2]} отправлено`, `${n} dāvanas nosūtītas`][LI],
     pick: ['Pick a postcard', 'Выбери открытку', 'Izvēlies kartīti'],
     write: ['Write a few words', 'Напиши пару слов', 'Uzraksti dažus vārdus'],
+    greet: ['Words on the postcard', 'Надпись на открытке', 'Uzraksts uz kartītes'],
     msg: ['Your message', 'Твоё послание', 'Tavs vēstījums'], msgPh: ['Wishing you a cozy winter and lots of tiny joys…', 'Желаю уютной зимы и много маленьких радостей…', 'Novēlu mājīgu ziemu un daudz mazu prieku…'],
     toName: ['To (name)', 'Кому (имя)', 'Kam (vārds)'], toEmail: ['Their email', 'Почта получателя', 'Saņēmēja e-pasts'],
     from: ['From', 'От кого', 'No kā'], anon: ['Send anonymously — a secret friend', 'Отправить анонимно — от тайного друга', 'Sūtīt anonīmi — no slepena drauga'],
@@ -166,6 +141,7 @@
     const box = document.getElementById('pc-main'), u = me();
     box.innerHTML = `<button type="button" class="pc-back">${tr(W.back)}</button><div class="pc-comp"><div class="pc-prev"></div><form class="pc-form" novalidate>
       <h2 class="pc-h">${tr(W.write)}</h2>
+      <label>${tr(W.greet)}<input name="greet" maxlength="60" value="${esc(tr(d.g))}"></label>
       <label>${tr(W.msg)}<textarea name="msg" maxlength="400" rows="4" placeholder="${esc(tr(W.msgPh))}"></textarea><small class="pc-cnt">0 / 400</small></label>
       <div class="pc-row"><label>${tr(W.toName)}<input name="to_name" maxlength="40" autocomplete="off"></label><label>${tr(W.toEmail)}<input name="to_email" type="email" required maxlength="254" autocomplete="off" inputmode="email"></label></div>
       <label>${tr(W.from)}<input name="from_name" maxlength="40" value="${esc(u ? u.nick || '' : '')}"></label>
@@ -175,7 +151,7 @@
     </form></div>`;
     box.querySelector('.pc-back').onclick = () => { gallery(box); box.scrollIntoView({ behavior: 'smooth' }); };
     const f = box.querySelector('form'), prev = box.querySelector('.pc-prev');
-    const upd = () => { const from = f.anon.checked ? tr(W.secret) : f.from_name.value.trim(); const st = prev._pc; if (st) { st.el.querySelector('.pc-msg').textContent = f.msg.value; st.el.querySelector('.pc-sig').textContent = from ? '— ' + from : ''; } box.querySelector('.pc-cnt').textContent = f.msg.value.length + ' / 400'; f.from_name.disabled = f.anon.checked; };
+    const upd = () => { const from = f.anon.checked ? tr(W.secret) : f.from_name.value.trim(); const st = prev._pc; if (st) { st.el.querySelector('.pc-g').textContent = f.greet.value.trim() || tr(d.g); st.el.querySelector('.pc-msg').textContent = f.msg.value; st.el.querySelector('.pc-sig').textContent = from ? '— ' + from : ''; } box.querySelector('.pc-cnt').textContent = f.msg.value.length + ' / 400'; f.from_name.disabled = f.anon.checked; };
     card(prev, d, { msg: '', from: u ? u.nick : '' });
     f.addEventListener('input', upd); upd();
     const inBtn = box.querySelector('[data-pc-in]'); if (inBtn) inBtn.onclick = e => { e.preventDefault(); window.PPAccount && PPAccount.openSignIn(); };
@@ -184,7 +160,7 @@
       const em = f.to_email.value.trim(); if (!/^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/.test(em)) { er.textContent = tr(W.err.email); f.to_email.focus(); return; }
       const btn = f.querySelector('.pc-send'); btn.disabled = true;
       try {
-        const r = await fetch('/api/postcards/send', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ design: d.id, msg: f.msg.value, to_name: f.to_name.value, to_email: em, from_name: f.from_name.value, anon: f.anon.checked, lang: L }) });
+        const r = await fetch('/api/postcards/send', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ design: d.id, greet: f.greet.value.trim() === tr(d.g) ? '' : f.greet.value, msg: f.msg.value, to_name: f.to_name.value, to_email: em, from_name: f.from_name.value, anon: f.anon.checked, lang: L }) });
         const x = await r.json().catch(() => ({}));
         if (!r.ok) { er.textContent = tr(W.err[x.error] || W.err.x); btn.disabled = false; return; }
         done(d, x, em);
@@ -216,7 +192,7 @@
     const list = (a, mine) => a.length ? `<div class="pc-grid pc-inb">${a.map((c, i) => `<a class="pc-it" href="${pre}/postcards/?c=${esc(c.t)}" data-i="${i}" data-m="${mine ? 1 : 0}"><span class="pc-slot"></span><small>${mine ? `${tr(W.to)} ${esc(c.to || c.email)} · ${tr(W.st[c.mail] || W.st.sent)}` : (c.from ? '— ' + esc(c.from) : '— ' + tr(W.secret))}${!mine && !c.seen ? ' <b class="pc-new">new</b>' : ''}</small></a>`).join('')}</div>` : `<p class="pc-none">${tr(W.none)}</p>`;
     box.innerHTML = `<button type="button" class="pc-back">${tr(W.back)}</button><h2 class="pc-h">${tr(W.inbox)}</h2><h3>${tr(W.got)} · ${x.got.length}</h3>${list(x.got, false)}<h3>${tr(W.sentL)} · ${x.sent.length}</h3>${list(x.sent, true)}`;
     box.querySelector('.pc-back').onclick = () => { history.replaceState(null, '', location.pathname); gallery(box); };
-    box.querySelectorAll('.pc-it').forEach(a => { const c = (a.dataset.m === '1' ? x.sent : x.got)[+a.dataset.i], d = DS.byId(c.design); if (d) card(a.querySelector('.pc-slot'), d, { still: true, msg: c.msg, from: c.from || tr(W.secret) }); });
+    box.querySelectorAll('.pc-it').forEach(a => { const c = (a.dataset.m === '1' ? x.sent : x.got)[+a.dataset.i], d = DS.byId(c.design); if (d) card(a.querySelector('.pc-slot'), d, { still: true, greet: c.greet, msg: c.msg, from: c.from || tr(W.secret) }); });
   }
 
   // ---------- открытка по ссылке из письма: конверт → открытка ----------
@@ -230,7 +206,7 @@
     box.innerHTML = `<div class="pc-view"><button type="button" class="pc-envl" aria-label="${esc(tr(W.tap))}"><span class="pc-flap"></span><span class="pc-body"><span class="pc-to">${esc(W.forYou(c.to))}</span></span><span class="pc-seal">P</span><span class="pc-in"></span></button><p class="pc-tap">${tr(W.tap)}</p>
       <div class="pc-after" hidden>${x.got ? `<p class="pc-kept">${tr(W.kept)}</p>` : ''}<a class="btn pri" href="${pre}/postcards/">🎁 ${tr(W.reply)}</a></div></div>`;
     const env = box.querySelector('.pc-envl'), slot = box.querySelector('.pc-in');
-    card(slot, d, { msg: c.msg, from: c.from || tr(W.secret) });
+    card(slot, d, { greet: c.greet, msg: c.msg, from: c.from || tr(W.secret) });
     const open = () => { if (env.classList.contains('open')) return; env.classList.add('open'); box.querySelector('.pc-tap').hidden = true; setTimeout(() => { box.querySelector('.pc-after').hidden = false; }, 1400); };
     env.onclick = open; setTimeout(open, 2600);
   }

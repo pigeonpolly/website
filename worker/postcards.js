@@ -13,7 +13,7 @@ const D = globalThis.PPPostcardDesigns;
 
 export const POSTCARD_TABLES = [
   // mail: 'sent' | 'queue' | 'off' (писем нет) | 'fail' | 'block' (получатель отказался); seen — получатель видел на сайте (гаснет новость)
-  `CREATE TABLE IF NOT EXISTS postcards (id INTEGER PRIMARY KEY AUTOINCREMENT, token TEXT UNIQUE NOT NULL, design TEXT NOT NULL, msg TEXT, from_uid INTEGER NOT NULL, from_name TEXT, to_name TEXT, to_email TEXT NOT NULL, to_uid INTEGER, lang TEXT, mail TEXT, seen INTEGER DEFAULT 0, created_at INTEGER NOT NULL)`,
+  `CREATE TABLE IF NOT EXISTS postcards (id INTEGER PRIMARY KEY AUTOINCREMENT, token TEXT UNIQUE NOT NULL, design TEXT NOT NULL, greet TEXT, msg TEXT, from_uid INTEGER NOT NULL, from_name TEXT, to_name TEXT, to_email TEXT NOT NULL, to_uid INTEGER, lang TEXT, mail TEXT, seen INTEGER DEFAULT 0, created_at INTEGER NOT NULL)`,
   'CREATE INDEX IF NOT EXISTS postcards_from ON postcards (from_uid, created_at)',
   'CREATE INDEX IF NOT EXISTS postcards_to ON postcards (to_email)',
   'CREATE INDEX IF NOT EXISTS postcards_touid ON postcards (to_uid)',
@@ -32,7 +32,7 @@ const normEmail = s => String(s || '').trim().toLowerCase().slice(0, 254);
 const okEmail = e => /^[^\s@<>"',;]+@[^\s@<>"',;]+\.[^\s@<>"',;]{2,}$/.test(e);
 const hex = b => [...new Uint8Array(b)].map(x => x.toString(16).padStart(2, '0')).join('');
 // имя: одна строка, без управляющих символов и угловых скобок
-const cleanName = s => String(s || '').replace(/[\u0000-\u001f\u007f<>]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, 40);
+const cleanName = (s, n = 40) => String(s || '').replace(/[\u0000-\u001f\u007f<>]/g, ' ').replace(/\s+/g, ' ').trim().slice(0, n);
 // текст: без ссылок (чтобы открытками не рассылали спам), не больше 4 абзацев, строка «—» не обрывает письмо (в mailHtml это подвал)
 const URLISH = /(https?:\/\/|www\.)\S+|\b[\w-]+\.(com|net|org|ru|lv|io|ly|xyz|info|biz|top|site|online|shop|link|click)(\/\S*)?\b/gi;
 const cleanMsg = s => String(s || '').replace(/\r/g, '').replace(/[\u0000-\u0009\u000b-\u001f\u007f]/g, '').replace(URLISH, '…')
@@ -76,7 +76,7 @@ async function mailCard(env, h, c) {
   const text = [T.hi[L](c.to_name), T.who[L](from) + (c.msg ? T.words[L] : '.'), c.msg ? `“${c.msg}”` : '', T.open[L], link, T.bye[L]].filter(Boolean).join('\n\n')
     + '\n\n' + T.foot[L](await blockUrl(h, c.to_email));
   const subject = T.subj[L](from);
-  const html = mailHtml(subject, text, null, { img: `${SITE}/images/postcards/${d.id}.gif`, href: link, caption: d.g[LI[L]], ink: d.ink, btn: T.btn[L] });
+  const html = mailHtml(subject, text, null, { img: `${SITE}/images/postcards/${d.id}.gif`, href: link, caption: c.greet || d.g[LI[L]], ink: d.ink, btn: T.btn[L] });
   return sendMail(env, c.to_email, subject, text, { html, headers: { 'List-Unsubscribe': `<${await blockUrl(h, c.to_email)}>` } });
 }
 // можно ли отправить письмо сейчас: свой лимит открыток и общий лимит писем за сутки
@@ -116,7 +116,7 @@ export async function postcardNews(env, u) {
   return { n: r.n, from: c && c.from_name || '', t: c && c.token };
 }
 
-const pub = (c, me) => ({ t: c.token, design: c.design, msg: c.msg || '', from: c.from_name || '', to: c.to_name || '', lang: c.lang, at: c.created_at,
+const pub = (c, me) => ({ t: c.token, design: c.design, greet: c.greet || '', msg: c.msg || '', from: c.from_name || '', to: c.to_name || '', lang: c.lang, at: c.created_at,
   ...(me ? { email: c.to_email, mail: c.mail } : {}) });
 const PAGE = (L, title, body) => `<!doctype html><html lang="${L}"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex"><title>${title}</title>`
   + `<style>body{margin:0;min-height:100vh;display:grid;place-items:center;background:#F4F0EA;font:17px/1.6 Karla,Arial,sans-serif;color:#2A211C}main{max-width:460px;margin:20px;padding:32px;background:#FBF9F5;border:1px solid #DED5CA;border-radius:20px;text-align:center}h1{font:400 28px/1.2 Georgia,serif;margin:0 0 14px}button,a.b{display:inline-block;margin-top:10px;padding:12px 22px;border:0;border-radius:999px;background:#22405F;color:#fff;font:700 15px Karla,Arial,sans-serif;text-decoration:none;cursor:pointer}</style></head><body><main>${body}</main></body></html>`;
@@ -136,17 +136,17 @@ export async function postcardsApi(req, env, url, h) {
     if (!d) h.fail(400, 'design');
     const to = normEmail(b.to_email);
     if (!okEmail(to)) h.fail(400, 'email');
-    const msg = cleanMsg(b.msg), toName = cleanName(b.to_name), fromName = b.anon ? '' : (cleanName(b.from_name) || u.nick), L = langOf(b.lang);
+    const msg = cleanMsg(b.msg), greet = cleanName(String(b.greet || '').replace(URLISH, '…'), 60), toName = cleanName(b.to_name), fromName = b.anon ? '' : (cleanName(b.from_name) || u.nick), L = langOf(b.lang);
     const R = h.rules(), t = now();
     const mine = await db.prepare('SELECT COUNT(*) AS n, SUM(CASE WHEN to_email = ? THEN 1 ELSE 0 END) AS same FROM postcards WHERE from_uid = ? AND created_at > ?').bind(to, u.id, t - 86400).first();
     if (mine && mine.n >= R.pcDay) h.fail(429, 'day');
     if (mine && mine.same >= 2) h.fail(429, 'same');
     const blocked = await db.prepare('SELECT 1 FROM postcard_block WHERE hash = ?').bind(await emailHash(to)).first();
     const token = 'p' + hex(crypto.getRandomValues(new Uint8Array(12)));
-    const row = { token, design: d.id, msg, from_uid: u.id, from_name: fromName, to_name: toName, to_email: to, lang: L, created_at: t };
+    const row = { token, design: d.id, greet, msg, from_uid: u.id, from_name: fromName, to_name: toName, to_email: to, lang: L, created_at: t };
     const mail = blocked ? 'block' : await trySend(env, h, row);
-    await db.prepare('INSERT INTO postcards (token, design, msg, from_uid, from_name, to_name, to_email, lang, mail, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
-      .bind(token, d.id, msg, u.id, fromName, toName, to, L, mail, t).run();
+    await db.prepare('INSERT INTO postcards (token, design, greet, msg, from_uid, from_name, to_name, to_email, lang, mail, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
+      .bind(token, d.id, greet, msg, u.id, fromName, toName, to, L, mail, t).run();
     const n = await db.prepare('SELECT COUNT(*) AS n FROM postcards').first();
     return h.json({ ok: true, t: token, url: cardUrl(L, token), mail, n: n ? n.n : 0, left: Math.max(0, R.pcDay - (mine ? mine.n : 0) - 1) });
   }
