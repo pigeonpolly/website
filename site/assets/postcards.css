@@ -18,6 +18,17 @@
 @keyframes pc-wig{0%,80%,100%{transform:rotate(0)}85%{transform:rotate(-4deg)}90%{transform:rotate(4deg)}95%{transform:rotate(-2deg)}}
 @keyframes pc-pop{0%{transform:translate(0,0) rotate(0);opacity:1}60%{transform:translate(var(--dx),-90px) rotate(180deg);opacity:1}100%{transform:translate(calc(var(--dx)*1.6),-40px) rotate(320deg);opacity:0}}
 
+/* сколько ещё можно сегодня; кончились — «Полли варит чернила» и отсчёт */
+.pc-q{display:block;margin-top:4px;font:700 13px/1.2 Karla,sans-serif;color:var(--mut);text-align:center}
+.pc-out{display:grid;grid-template-columns:minmax(180px,300px) 1fr;gap:22px;align-items:center;margin:0 0 30px;padding:16px;border-radius:14px;background:#F7F1FB;border:2px dashed #9C86C9}
+.pc-out-pic .pc-strip{display:none}.pc-out-pic.pc-card{padding:6px;box-shadow:none}
+.pc-out-tx b{display:block;font:400 clamp(22px,2.4vw,30px)/1.15 Fraunces,Georgia,serif;color:#2A211C}
+.pc-out-tx p{margin:8px 0 0;color:var(--mut)}
+.pc-out-t{font:700 16px Karla,sans-serif;color:#4B2E83!important}
+.pc-cd{display:inline-block;margin-left:4px;padding:4px 10px;border-radius:8px;background:#4B2E83;color:#fff;font:700 20px/1 'Courier New',monospace;letter-spacing:.06em}
+.pc-form .pc-out{grid-template-columns:150px 1fr;gap:14px;margin:4px 0 0;padding:12px}.pc-form .pc-out-tx b{font-size:20px}
+@media (max-width:560px){.pc-out,.pc-form .pc-out{grid-template-columns:1fr}}
+
 /* открытка */
 .pc-card{display:block;background:#FFFDF8;border:1px solid #E7DFD4;border-radius:6px;padding:10px 10px 0;box-shadow:0 14px 30px rgba(31,35,38,.12);text-align:left;color:var(--ink,#2A211C);font:inherit}
 .pc-pic{position:relative;border-radius:3px;overflow:hidden;aspect-ratio:3/2;background:#eee}

@@ -91,6 +91,10 @@
     sentBlock: ['This address asked not to get postcards from the site — but here is the link:', 'Этот адрес попросил не присылать открытки с сайта — но вот ссылка:', 'Šī adrese lūdza nesūtīt kartītes — bet te ir saite:'],
     link: ['Link to the postcard', 'Ссылка на открытку', 'Saite uz kartīti'], copy: ['Copy', 'Копировать', 'Kopēt'], copied: ['Copied', 'Скопировано', 'Nokopēts'],
     more: ['Send another', 'Отправить ещё', 'Sūtīt vēl'],
+    leftAll: n => [`${n} more can be sent today`, `сегодня можно ещё ${n} ${['открытку', 'открытки', 'открыток'][n % 10 === 1 && n % 100 !== 11 ? 0 : n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14) ? 1 : 2]}`, `šodien vēl var nosūtīt ${n}`][LI],
+    outT: ['Postcards are over for today', 'На сегодня открытки закончились', 'Šodienai kartītes beigušās'],
+    outP: ['Polly is brewing ink and growing paper. Come back very soon!', 'Полли варит чернила и выращивает бумагу. Приходи совсем скоро!', 'Pollijs vāra tinti un audzē papīru. Nāc pavisam drīz!'],
+    outIn: ['New postcards in', 'Новые открытки через', 'Jaunas kartītes pēc'],
     left: n => [`You can send ${n} more today.`, `Сегодня можно отправить ещё ${n}.`, `Šodien vari nosūtīt vēl ${n}.`][LI],
     err: { email: ['Check the email address.', 'Проверь адрес почты.', 'Pārbaudi e-pasta adresi.'], day: ['That’s all postcards for today — come back tomorrow.', 'На сегодня открытки закончились — приходи завтра.', 'Šodienai kartītes beigušās — nāc rīt.'], same: ['Two postcards to one address a day is enough.', 'Двух открыток на один адрес в день достаточно.', 'Pietiek ar divām kartītēm vienai adresei dienā.'], nick: ['Choose a nickname first.', 'Сначала выбери ник.', 'Vispirms izvēlies segvārdu.'], x: ['Something went wrong, try again.', 'Что-то пошло не так, попробуй ещё раз.', 'Kaut kas nogāja greizi, mēģini vēlreiz.'] },
     inbox: ['My postcards', 'Мои открытки', 'Manas kartītes'], got: ['Received', 'Полученные', 'Saņemtās'], sentL: ['Sent', 'Отправленные', 'Nosūtītās'],
@@ -103,15 +107,35 @@
 
   // ---------- шапка: Полли с мешком и счётчик ----------
   function hero(box) {
-    box.innerHTML = '<div class="pc-polly"><span class="pc-bubble"><b class="pc-n">…</b></span><canvas class="pc-pp"></canvas><canvas class="pc-sack"></canvas><span class="pc-pop" aria-hidden="true"></span></div>';
+    box.innerHTML = '<div class="pc-polly"><span class="pc-bubble"><b class="pc-n">…</b><small class="pc-q"></small></span><canvas class="pc-pp"></canvas><canvas class="pc-sack"></canvas><span class="pc-pop" aria-hidden="true"></span></div>';
     const pp = box.querySelector('.pc-pp'), sk = box.querySelector('.pc-sack');
     sk.width = 16 * 7; sk.height = 14 * 7; pix(sk.getContext('2d'), SACK, SACK_C, 0, 0, 7);
     let f = 0; const draw = () => { if (window.PollyPet && PollyPet.paint) PollyPet.paint(pp, { sp: 5, hat: 'santa', acc: 'scarf', legs: f++ % 2 ? 'legB' : 'legA', closed: f % 9 === 0 }); };
     draw(); setInterval(draw, 520); if (!window.PollyPet) setTimeout(draw, 800);
-    fetch('/api/postcards/stats').then(r => r.json()).then(x => setCount(x.n || 0)).catch(() => setCount(0));
+    stats();
     setInterval(() => pop(box), 3200);
   }
   let shown = 0;
+  // сколько открыток ещё можно отправить сегодня на весь сайт (бесплатный лимит писем); 0 — «Полли варит чернила» и отсчёт до полуночи по Риге
+  const quota = { left: null, max: 0, at: 0 };
+  function stats() {
+    return fetch('/api/postcards/stats').then(r => r.json()).then(x => { setCount(x.n || 0); setQuota(x.left, x.reset, x.max); }).catch(() => setCount(0));
+  }
+  function setQuota(left, reset, max) {
+    const was = quota.left; quota.left = left == null ? null : left; if (max) quota.max = max; if (reset) quota.at = Date.now() + reset * 1000;
+    const q = document.querySelector('.pc-q'); if (q) q.textContent = quota.left == null ? '' : quota.left > 0 ? W.leftAll(quota.left) : tr(W.outT);
+    if ((was === 0) !== (quota.left === 0)) { const main = document.getElementById('pc-main'); // лимит кончился или начался новый день — перерисовать то, что открыто
+      if (main.querySelector('.pc-grid:not(.pc-inb)')) gallery(main); else { const pr = main.querySelector('.pc-prev'); if (pr && pr.dataset.d) compose(DS.byId(pr.dataset.d), true); } }
+  }
+  const hms = s => [Math.floor(s / 3600), Math.floor(s / 60) % 60, s % 60].map(v => String(v).padStart(2, '0')).join(':');
+  setInterval(() => { if (quota.left !== 0) return; const s = Math.max(0, Math.round((quota.at - Date.now()) / 1000));
+    document.querySelectorAll('.pc-cd').forEach(el => { el.textContent = hms(s); }); if (s <= 0 && !quota.wait) { quota.wait = true; setTimeout(() => stats().then(() => { quota.wait = false; }), 2000); } }, 1000);
+  const INK = { id: 'ink', scene: 'ink', fx: 'sparkle', ink: '#4B2E83', g: ['', '', ''] };
+  function outBox(el) { // открытки на сегодня кончились: Полли варит чернила и выращивает бумагу + отсчёт
+    const b = document.createElement('div'); b.className = 'pc-out';
+    b.innerHTML = `<div class="pc-out-pic"></div><div class="pc-out-tx"><b>${tr(W.outT)}</b><p>${tr(W.outP)}</p><p class="pc-out-t">${tr(W.outIn)} <span class="pc-cd">${hms(Math.max(0, Math.round((quota.at - Date.now()) / 1000)))}</span></p></div>`;
+    el.appendChild(b); card(b.querySelector('.pc-out-pic'), INK); return b;
+  }
   function setCount(n) {
     const el = document.querySelector('.pc-n'); if (!el) return;
     const a = shown, t0 = performance.now();
@@ -128,8 +152,9 @@
   const me = () => window.PPWho && window.PPWho.user;
   let cat = 'all';
   function gallery(box) {
-    box.innerHTML = `<h2 class="pc-h">${tr(W.pick)}</h2><div class="pc-chips">${DS.CATS.map(([k, n]) => `<button type="button" data-cat="${k}"${k === cat ? ' class="on"' : ''}>${esc(tr(n))}</button>`).join('')}</div><div class="pc-grid"></div>`;
+    box.innerHTML = `<div class="pc-outs"></div><h2 class="pc-h">${tr(W.pick)}</h2><div class="pc-chips">${DS.CATS.map(([k, n]) => `<button type="button" data-cat="${k}"${k === cat ? ' class="on"' : ''}>${esc(tr(n))}</button>`).join('')}</div><div class="pc-grid"></div>`;
     const grid = box.querySelector('.pc-grid');
+    if (quota.left === 0) outBox(box.querySelector('.pc-outs'));
     const fill = () => { grid.innerHTML = ''; DS.DESIGNS.filter(d => cat === 'all' || d.cat === cat).forEach(d => {
       const b = document.createElement('button'); b.type = 'button'; b.className = 'pc-tile'; b.setAttribute('aria-label', tr(d.g)); grid.appendChild(b);
       const st = card(b, d, { still: true }); b.onmouseenter = () => st.run = true; b.onmouseleave = () => { st.run = false; }; b.onfocus = b.onmouseenter; b.onblur = b.onmouseleave;
@@ -137,7 +162,7 @@
     box.querySelectorAll('[data-cat]').forEach(c => c.onclick = () => { cat = c.dataset.cat; box.querySelectorAll('[data-cat]').forEach(x => x.classList.toggle('on', x === c)); fill(); });
     fill();
   }
-  function compose(d) {
+  function compose(d, keep) {
     const box = document.getElementById('pc-main'), u = me();
     box.innerHTML = `<button type="button" class="pc-back">${tr(W.back)}</button><div class="pc-comp"><div class="pc-prev"></div><form class="pc-form" novalidate>
       <h2 class="pc-h">${tr(W.write)}</h2>
@@ -147,10 +172,11 @@
       <label>${tr(W.from)}<input name="from_name" maxlength="40" value="${esc(u ? u.nick || '' : '')}"></label>
       <label class="pc-chk"><input type="checkbox" name="anon"> ${tr(W.anon)}</label>
       <p class="pc-err" role="alert"></p>
-      ${u ? `<button class="btn pri pc-send" type="submit">💌 ${tr(W.send)}</button>` : `<p class="pc-login">${tr(W.login)}</p><a class="btn pri" href="#signin" data-pc-in>${tr(W.loginBtn)}</a>`}
+      ${quota.left === 0 ? '<div class="pc-outs"></div>' : u ? `<button class="btn pri pc-send" type="submit">💌 ${tr(W.send)}</button>` : `<p class="pc-login">${tr(W.login)}</p><a class="btn pri" href="#signin" data-pc-in>${tr(W.loginBtn)}</a>`}
     </form></div>`;
     box.querySelector('.pc-back').onclick = () => { gallery(box); box.scrollIntoView({ behavior: 'smooth' }); };
     const f = box.querySelector('form'), prev = box.querySelector('.pc-prev');
+    if (quota.left === 0) outBox(f.querySelector('.pc-outs'));
     const upd = () => { const from = f.anon.checked ? tr(W.secret) : f.from_name.value.trim(); const st = prev._pc; if (st) { st.el.querySelector('.pc-g').textContent = f.greet.value.trim() || tr(d.g); st.el.querySelector('.pc-msg').textContent = f.msg.value; st.el.querySelector('.pc-sig').textContent = from ? '— ' + from : ''; } box.querySelector('.pc-cnt').textContent = f.msg.value.length + ' / 400'; f.from_name.disabled = f.anon.checked; };
     card(prev, d, { msg: '', from: u ? u.nick : '' });
     f.addEventListener('input', upd); upd();
@@ -162,15 +188,16 @@
       try {
         const r = await fetch('/api/postcards/send', { method: 'POST', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ design: d.id, greet: f.greet.value.trim() === tr(d.g) ? '' : f.greet.value, msg: f.msg.value, to_name: f.to_name.value, to_email: em, from_name: f.from_name.value, anon: f.anon.checked, lang: L }) });
         const x = await r.json().catch(() => ({}));
+        if (x.error === 'out') { setQuota(0, x.reset); return; }
         if (!r.ok) { er.textContent = tr(W.err[x.error] || W.err.x); btn.disabled = false; return; }
         done(d, x, em);
       } catch (_) { er.textContent = tr(W.err.x); btn.disabled = false; }
     };
-    box.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    if (!keep) box.scrollIntoView({ behavior: 'smooth', block: 'start' });
   }
   function done(d, x, em) {
     const box = document.getElementById('pc-main');
-    setCount(x.n || shown + 1); for (let i = 0; i < 5; i++) setTimeout(() => pop(document.getElementById('pc-hero')), i * 160);
+    setCount(x.n || shown + 1); if (x.today != null) { const pq = quota.left; quota.left = x.today; quota.at = Date.now() + (x.reset || 0) * 1000; const q = document.querySelector('.pc-q'); if (q) q.textContent = x.today > 0 ? W.leftAll(x.today) : tr(W.outT); if (pq !== 0 && x.today === 0) quota.left = 0; } for (let i = 0; i < 5; i++) setTimeout(() => pop(document.getElementById('pc-hero')), i * 160);
     const note = x.mail === 'sent' ? W.sentMail(esc(em)) : x.mail === 'queue' ? tr(W.sentQueue) : x.mail === 'block' ? tr(W.sentBlock) : tr(W.sentOff);
     box.innerHTML = `<div class="pc-done"><div class="pc-fly"><span class="pc-env"></span></div><h2 class="pc-h">${tr(W.sent)}</h2><p>${note}</p>
       <label class="pc-link">${tr(W.link)}<span><input readonly value="${esc(x.url)}"><button type="button" class="btn">${tr(W.copy)}</button></span></label>

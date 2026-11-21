@@ -4,7 +4,7 @@
 #       sym — имя в коде; doc — раздел docs/*.md.
 # Читать целиком не нужно: grep по нужному виду, или python3 tools/index.py find СЛОВО / where ФАЙЛ.
 # Свежесть: python3 tools/index.py check (перед пушем).
-# файлов 435, страниц 58, маршрутов 220, таблиц 76, ключей meta 68, имён 5880, разделов доков 252
+# файлов 435, страниц 58, маршрутов 220, таблиц 76, ключей meta 68, имён 5888, разделов доков 253
 file	build.py	build.py	0	897 строк, 60 КБ
 file	content/english/a1.js	content/english/a1.js	0	239 строк, 45 КБ
 file	content/english/a2.js	content/english/a2.js	0	229 строк, 46 КБ
@@ -73,9 +73,9 @@ file	docs/ink.md	docs/ink.md	0	52 строк, 29 КБ
 file	docs/map.md	docs/map.md	0	373 строк, 74 КБ
 file	docs/palettes.md	docs/palettes.md	0	70 строк, 33 КБ
 file	docs/pinterest-dec2026.md	docs/pinterest-dec2026.md	0	55 строк, 4 КБ
-file	docs/plan-status.md	docs/plan-status.md	0	203 строк, 51 КБ
+file	docs/plan-status.md	docs/plan-status.md	0	203 строк, 52 КБ
 file	docs/polly-pet.md	docs/polly-pet.md	0	40 строк, 9 КБ
-file	docs/postcards.md	docs/postcards.md	0	20 строк, 4 КБ
+file	docs/postcards.md	docs/postcards.md	0	24 строк, 6 КБ
 file	docs/requests.md	docs/requests.md	0	31 строк, 14 КБ
 file	docs/retired.md	docs/retired.md	0	36 строк, 6 КБ
 file	docs/rooms.md	docs/rooms.md	0	34 строк, 12 КБ
@@ -149,9 +149,9 @@ file	site/assets/polls-admin.js	site/assets/polls-admin.js	0	116 строк, 13 
 file	site/assets/polly-school.js	site/assets/polly-school.js	0	250 строк, 25 КБ
 file	site/assets/polly.js	site/assets/polly.js	0	702 строк, 58 КБ
 file	site/assets/postcard-designs.js	site/assets/postcard-designs.js	0	57 строк, 6 КБ
-file	site/assets/postcard-scenes.js	site/assets/postcard-scenes.js	0	193 строк, 23 КБ
-file	site/assets/postcards.css	site/assets/postcards.css	0	106 строк, 9 КБ
-file	site/assets/postcards.js	site/assets/postcards.js	0	230 строк, 27 КБ
+file	site/assets/postcard-scenes.js	site/assets/postcard-scenes.js	0	214 строк, 26 КБ
+file	site/assets/postcards.css	site/assets/postcards.css	0	117 строк, 10 КБ
+file	site/assets/postcards.js	site/assets/postcards.js	0	257 строк, 31 КБ
 file	site/assets/posts-admin.js	site/assets/posts-admin.js	0	276 строк, 32 КБ
 file	site/assets/potion-names.js	site/assets/potion-names.js	0	145 строк, 27 КБ
 file	site/assets/potions.js	site/assets/potions.js	0	558 строк, 57 КБ
@@ -422,7 +422,7 @@ file	worker/pancakes.js	worker/pancakes.js	0	122 строк, 12 КБ
 file	worker/pause.js	worker/pause.js	0	40 строк, 3 КБ
 file	worker/pins.js	worker/pins.js	0	52 строк, 4 КБ
 file	worker/polls.js	worker/polls.js	0	184 строк, 15 КБ
-file	worker/postcards.js	worker/postcards.js	0	198 строк, 17 КБ
+file	worker/postcards.js	worker/postcards.js	0	207 строк, 18 КБ
 file	worker/runes-data.js	worker/runes-data.js	0	252 строк, 78 КБ
 file	worker/runes.js	worker/runes.js	0	15 строк, 1 КБ
 file	worker/school.js	worker/school.js	0	148 строк, 15 КБ
@@ -3287,7 +3287,7 @@ sym	PUMPKIN	site/assets/postcard-scenes.js	29	const
 sym	BALLOON	site/assets/postcard-scenes.js	31	const
 sym	FLAGS	site/assets/postcard-scenes.js	32	const
 sym	SC	site/assets/postcard-scenes.js	34	const
-sym	PPPostcardScenes	site/assets/postcard-scenes.js	192	win
+sym	PPPostcardScenes	site/assets/postcard-scenes.js	213	win
 sym	DS	site/assets/postcards.js	7	const
 sym	tr	site/assets/postcards.js	9	const
 sym	pre	site/assets/postcards.js	10	const
@@ -3308,18 +3308,24 @@ sym	live	site/assets/postcards.js	50	const
 sym	card	site/assets/postcards.js	52	fn
 sym	tick	site/assets/postcards.js	69	const
 sym	PPPostcard	site/assets/postcards.js	73	win
-sym	hero	site/assets/postcards.js	105	fn
-sym	shown	site/assets/postcards.js	114	const
-sym	setCount	site/assets/postcards.js	115	fn
-sym	pop	site/assets/postcards.js	121	fn
-sym	me	site/assets/postcards.js	128	const
-sym	cat	site/assets/postcards.js	129	const
-sym	gallery	site/assets/postcards.js	130	fn
-sym	compose	site/assets/postcards.js	140	fn
-sym	done	site/assets/postcards.js	171	fn
-sym	inbox	site/assets/postcards.js	185	fn
-sym	view	site/assets/postcards.js	199	fn
-sym	start	site/assets/postcards.js	215	fn
+sym	hero	site/assets/postcards.js	109	fn
+sym	shown	site/assets/postcards.js	118	const
+sym	quota	site/assets/postcards.js	120	const
+sym	stats	site/assets/postcards.js	121	fn
+sym	setQuota	site/assets/postcards.js	124	fn
+sym	hms	site/assets/postcards.js	130	const
+sym	INK	site/assets/postcards.js	133	const
+sym	outBox	site/assets/postcards.js	134	fn
+sym	setCount	site/assets/postcards.js	139	fn
+sym	pop	site/assets/postcards.js	145	fn
+sym	me	site/assets/postcards.js	152	const
+sym	cat	site/assets/postcards.js	153	const
+sym	gallery	site/assets/postcards.js	154	fn
+sym	compose	site/assets/postcards.js	165	fn
+sym	done	site/assets/postcards.js	198	fn
+sym	inbox	site/assets/postcards.js	212	fn
+sym	view	site/assets/postcards.js	226	fn
+sym	start	site/assets/postcards.js	242	fn
 sym	FR	site/assets/posts-admin.js	8	const
 sym	esc	site/assets/posts-admin.js	9	const
 sym	TYPES	site/assets/posts-admin.js	12	const
@@ -6567,37 +6573,39 @@ sym	pollOut	worker/polls.js	46	fn
 sym	homePoll	worker/polls.js	56	fn
 sym	pollsApi	worker/polls.js	62	fn
 sym	pollPage	worker/polls.js	161	fn
-sym	POSTCARD_TABLES	worker/postcards.js	14	const
-sym	POSTCARD_RULES	worker/postcards.js	22	const
-sym	POSTCARD_RANGE	worker/postcards.js	23	const
-sym	POSTCARD_INT	worker/postcards.js	24	const
-sym	SITE	worker/postcards.js	26	const
-sym	now	worker/postcards.js	27	const
-sym	langOf	worker/postcards.js	28	const
-sym	LI	worker/postcards.js	29	const
-sym	pre	worker/postcards.js	30	const
-sym	normEmail	worker/postcards.js	31	const
-sym	okEmail	worker/postcards.js	32	const
-sym	hex	worker/postcards.js	33	const
-sym	cleanName	worker/postcards.js	35	const
-sym	URLISH	worker/postcards.js	37	const
-sym	cleanMsg	worker/postcards.js	38	const
-sym	secret	worker/postcards.js	41	fn
-sym	sign	worker/postcards.js	46	fn
-sym	emailHash	worker/postcards.js	50	const
-sym	blockUrl	worker/postcards.js	51	const
-sym	cardUrl	worker/postcards.js	52	const
-sym	mailCard	worker/postcards.js	73	fn
-sym	canMail	worker/postcards.js	83	fn
-sym	spent	worker/postcards.js	88	fn
-sym	trySend	worker/postcards.js	89	fn
-sym	postcardCron	worker/postcards.js	98	fn
-sym	mineSql	worker/postcards.js	110	const
-sym	mineArgs	worker/postcards.js	111	const
-sym	postcardNews	worker/postcards.js	112	fn
-sym	pub	worker/postcards.js	119	const
-sym	PAGE	worker/postcards.js	121	const
-sym	postcardsApi	worker/postcards.js	125	fn
+sym	POSTCARD_TABLES	worker/postcards.js	15	const
+sym	POSTCARD_RULES	worker/postcards.js	23	const
+sym	POSTCARD_RANGE	worker/postcards.js	24	const
+sym	POSTCARD_INT	worker/postcards.js	25	const
+sym	SITE	worker/postcards.js	27	const
+sym	now	worker/postcards.js	28	const
+sym	langOf	worker/postcards.js	29	const
+sym	LI	worker/postcards.js	30	const
+sym	pre	worker/postcards.js	31	const
+sym	normEmail	worker/postcards.js	32	const
+sym	okEmail	worker/postcards.js	33	const
+sym	hex	worker/postcards.js	34	const
+sym	cleanName	worker/postcards.js	36	const
+sym	URLISH	worker/postcards.js	38	const
+sym	cleanMsg	worker/postcards.js	39	const
+sym	secret	worker/postcards.js	42	fn
+sym	sign	worker/postcards.js	47	fn
+sym	emailHash	worker/postcards.js	51	const
+sym	blockUrl	worker/postcards.js	52	const
+sym	cardUrl	worker/postcards.js	53	const
+sym	mailCard	worker/postcards.js	74	fn
+sym	canMail	worker/postcards.js	84	fn
+sym	leftToday	worker/postcards.js	90	fn
+sym	rigaReset	worker/postcards.js	94	const
+sym	spent	worker/postcards.js	95	fn
+sym	trySend	worker/postcards.js	96	fn
+sym	postcardCron	worker/postcards.js	105	fn
+sym	mineSql	worker/postcards.js	117	const
+sym	mineArgs	worker/postcards.js	118	const
+sym	postcardNews	worker/postcards.js	119	fn
+sym	pub	worker/postcards.js	126	const
+sym	PAGE	worker/postcards.js	128	const
+sym	postcardsApi	worker/postcards.js	132	fn
 sym	RUNE_SPREADS	worker/runes-data.js	7	const
 sym	RUNE_PREP	worker/runes-data.js	51	const
 sym	RUNES	worker/runes-data.js	61	const
@@ -6922,7 +6930,8 @@ doc	Новая Полли и месяцы (20.11.2026)	docs/polly-pet.md	31	h2
 doc	Открытки /postcards/ («Отправить подарок»)	docs/postcards.md	1	h1
 doc	Кратко	docs/postcards.md	3	h2
 doc	Открытки	docs/postcards.md	8	h2
-doc	Как работает	docs/postcards.md	14	h2
+doc	Сколько можно сегодня (22.11.2026, Алина)	docs/postcards.md	14	h2
+doc	Как работает	docs/postcards.md	18	h2
 doc	«Нарисуй мне»	docs/requests.md	1	h1
 doc	Кратко	docs/requests.md	3	h2
 doc	Оглавление	docs/requests.md	8	h2

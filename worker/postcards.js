@@ -3,7 +3,8 @@
 // Открытка видна получателю на сайте: по ссылке из письма (вошёл — открытка становится его, to_uid) и сама — в «Мои открытки»,
 // если почта аккаунта совпадает и подтверждена (email_ok: Google или ссылка из письма). Новость в «конвертике» — вид postcard.
 // Аноним: from_name = '' (кто отправил, знает только база: from_uid — на случай жалоб). Ссылки из текста вырезаются.
-// Письма: свой суточный лимит pcMailDay (📜 Правила) и общий с остальными письмами (usedToday, meta pc_mail_n:<день>); не влезло — очередь, postcardCron раз в час.
+// Письма: свой суточный лимит pcMailDay (📜 Правила) и общий с остальными письмами (usedToday, meta pc_mail_n:<день>). Лимит кончился — отправка закрыта до полуночи по Риге
+// (на странице — «Полли варит чернила» и обратный отсчёт); письмо не ушло по сбою — очередь, postcardCron раз в час.
 // Получатель может отказаться от открыток с сайта — ссылка в подвале письма (postcard_block, хеш почты).
 import { sendMail, mailOn } from './auth.js';
 import { mailHtml } from './mail-html.js';
@@ -85,6 +86,12 @@ async function canMail(h) {
   const n = Number(await h.getMeta('pc_mail_n:' + day)) || 0;
   return n < R.pcMailDay && (await usedToday(h)) < RESEND_MAX;
 }
+// сколько писем с открытками ещё можно отправить сегодня (на весь сайт) и сколько секунд до полуночи по Риге — новый день лимитов
+async function leftToday(h) {
+  const R = h.rules(), n = Number(await h.getMeta('pc_mail_n:' + h.rigaDay())) || 0;
+  return Math.max(0, Math.min(R.pcMailDay - n, RESEND_MAX - await usedToday(h)));
+}
+const rigaReset = () => { const [H, M, S] = new Date().toLocaleString('en-GB', { timeZone: 'Europe/Riga', hour12: false, hour: '2-digit', minute: '2-digit', second: '2-digit' }).split(':').map(Number); return 86400 - ((H % 24) * 3600 + M * 60 + S); };
 async function spent(h) { const k = 'pc_mail_n:' + h.rigaDay(); await h.setMeta(k, String((Number(await h.getMeta(k)) || 0) + 1)); }
 async function trySend(env, h, c) {
   if (!mailOn(env)) return 'off';
@@ -126,7 +133,8 @@ export async function postcardsApi(req, env, url, h) {
   const p = url.pathname, m = req.method, db = env.DB;
   if (p === '/api/postcards/stats' && m === 'GET') {
     const r = await db.prepare('SELECT COUNT(*) AS n FROM postcards').first();
-    return h.json({ n: r ? r.n : 0, mail: mailOn(env) }, 200, { 'cache-control': 'public, max-age=60' });
+    const on = mailOn(env);
+    return h.json({ n: r ? r.n : 0, mail: on, left: on ? await leftToday(h) : null, max: h.rules().pcMailDay, reset: rigaReset() }, 200, { 'cache-control': 'no-store' });
   }
   if (p === '/api/postcards/send' && m === 'POST') {
     const u = await h.needUser(req, env);
@@ -138,6 +146,7 @@ export async function postcardsApi(req, env, url, h) {
     if (!okEmail(to)) h.fail(400, 'email');
     const msg = cleanMsg(b.msg), greet = cleanName(String(b.greet || '').replace(URLISH, '…'), 60), toName = cleanName(b.to_name), fromName = b.anon ? '' : (cleanName(b.from_name) || u.nick), L = langOf(b.lang);
     const R = h.rules(), t = now();
+    if (mailOn(env) && await leftToday(h) <= 0) h.fail(429, 'out'); // открытки на сегодня закончились — на странице обратный отсчёт до полуночи по Риге
     const mine = await db.prepare('SELECT COUNT(*) AS n, SUM(CASE WHEN to_email = ? THEN 1 ELSE 0 END) AS same FROM postcards WHERE from_uid = ? AND created_at > ?').bind(to, u.id, t - 86400).first();
     if (mine && mine.n >= R.pcDay) h.fail(429, 'day');
     if (mine && mine.same >= 2) h.fail(429, 'same');
@@ -148,7 +157,7 @@ export async function postcardsApi(req, env, url, h) {
     await db.prepare('INSERT INTO postcards (token, design, greet, msg, from_uid, from_name, to_name, to_email, lang, mail, created_at) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)')
       .bind(token, d.id, greet, msg, u.id, fromName, toName, to, L, mail, t).run();
     const n = await db.prepare('SELECT COUNT(*) AS n FROM postcards').first();
-    return h.json({ ok: true, t: token, url: cardUrl(L, token), mail, n: n ? n.n : 0, left: Math.max(0, R.pcDay - (mine ? mine.n : 0) - 1) });
+    return h.json({ ok: true, t: token, url: cardUrl(L, token), mail, n: n ? n.n : 0, today: mailOn(env) ? await leftToday(h) : null, reset: rigaReset(), left: Math.max(0, R.pcDay - (mine ? mine.n : 0) - 1) });
   }
   if (p === '/api/postcards/card' && m === 'GET') {
     const tok = String(url.searchParams.get('t') || '');
