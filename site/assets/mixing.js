@@ -349,7 +349,7 @@
       <div class="mx-dots">${rows.map(x => `<span class="mx-dot" style="background:${x.hex}" title="${esc(x.name)}"></span>`).join('<b>+</b>')}${water ? '<b>+</b><span class="mx-dot mx-sww" title="' + t('water') + '"></span>' : ''}</div>
       <ul class="mx-ing">${rows.map(x => `<li><b>${amt(x.n, water)}</b> ${esc(x.name)} <small>${x.ci} · ${Math.round(x.pct * 100)}%</small>${[...strongIds].some(id => nm(id) === x.name) ? `<em>⚡ ${t('strongS')}</em>` : ''}</li>`).join('')}${waterRow}</ul>
       <p class="mx-how">${steps.length > 1 ? `<span class="mx-path">${steps.map(h => sw(h)).join('<span>→</span>')}</span>` : ''}${howto}</p>
-      <div class="mx-cmp"><div class="mx-strip"><i style="background:${target}"></i><i style="background:${r.hex}"></i></div><div class="mx-cl"><span>${t('want')} <code>${target}</code></span><span>${t('got')} <code>${r.hex}</code></span></div></div></article>`;
+      <div class="mx-cmp"><div class="mx-strip" style="--x:50%;background:${target}"><i style="background:${r.hex}"></i><b class="mx-hd"></b><input type="range" min="0" max="100" value="50" aria-label="${t('want')} / ${t('got')}"></div><div class="mx-cl"><span>${t('want')} <code>${target}</code></span><span>${t('got')} <code>${r.hex}</code></span></div></div></article>`;
   }
 
   // цветовой круг художника (жёлтый — красный — синий): 12 секторов, точка — нужный цвет (ближе к центру — глуше), ◦ — противоположный
@@ -438,6 +438,8 @@
     if (e.target.matches('input[type=color]')) setTarget(e.target.value, 'pick');
     if (e.target.matches('.mx-ph input')) photo(e.target.files[0]);
   });
+  // ползунок сравнения «нужен | получится»: тянем границу
+  app.addEventListener('input', e => { if (e.target.matches('.mx-strip input')) e.target.parentNode.style.setProperty('--x', e.target.value + '%'); });
   let pickT = 0;
   $('input[type=color]').addEventListener('input', e => { clearTimeout(pickT); const v = e.target.value; $('.mx-tsw').style.background = v; pickT = setTimeout(() => setTarget(v, 'pick'), 350); });
   $('.mx-hex').addEventListener('input', e => { const v = e.target.value.trim(); if (/^#?[0-9a-f]{6}$/i.test(v)) setTarget(v, 'hex'); });
