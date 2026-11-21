@@ -1301,6 +1301,27 @@
         rbox(p, -.5, 2 + o, 17, 3.5, '#5A8BE8', OUT, .5); p(0, 2.5 + o, 16, .5, '#8FB3F0'); p(7, 2 + o, 2, 3.5, '#F6D04D');
         blob(p, 5.5, 1 + o, 2.5, 1.5, () => '#F6D04D'); blob(p, 10.5, 1 + o, 2.5, 1.5, () => '#F6D04D'); p(7.25, .5 + o, 1.5, 2, '#E2B63A'); } },
   });
+  // однотонные обои (21.11.2026): светлые и тёмные — ровный цвет и чуть темнее у самого пола; ключи plain_* не переименовывать — хранятся у птичек
+  const plainWall = c => g => { R(g, 0, 0, RW, FY, c); R(g, 0, FY - 4, RW, 1, 'rgba(0,0,0,.06)'); };
+  Object.assign(WALL, {
+    plain_white: [['Plain wall: white', 'Однотонные обои: белые', 'Vienkrāsainas tapetes: baltas'], plainWall('#FBF8F2')],
+    plain_cream: [['Plain wall: cream', 'Однотонные обои: кремовые', 'Vienkrāsainas tapetes: krēmīgas'], plainWall('#F4EAD5')],
+    plain_pearl: [['Plain wall: light grey', 'Однотонные обои: светло-серые', 'Vienkrāsainas tapetes: gaiši pelēkas'], plainWall('#E3E2E0')],
+    plain_blush: [['Plain wall: powder pink', 'Однотонные обои: пудрово-розовые', 'Vienkrāsainas tapetes: pūderrozā'], plainWall('#F6DCDD')],
+    plain_mint: [['Plain wall: mint', 'Однотонные обои: мятные', 'Vienkrāsainas tapetes: piparmētru'], plainWall('#DCEFE5')],
+    plain_sky: [['Plain wall: sky blue', 'Однотонные обои: небесно-голубые', 'Vienkrāsainas tapetes: debeszilas'], plainWall('#DCEAF6')],
+    plain_lilac: [['Plain wall: lilac', 'Однотонные обои: сиреневые', 'Vienkrāsainas tapetes: ceriņu'], plainWall('#E6DDF2')],
+    plain_butter: [['Plain wall: butter yellow', 'Однотонные обои: сливочно-жёлтые', 'Vienkrāsainas tapetes: sviesta dzeltenas'], plainWall('#FAF0C8')],
+    plain_charcoal: [['Plain wall: charcoal', 'Однотонные обои: угольные', 'Vienkrāsainas tapetes: ogles'], plainWall('#34363B')],
+    plain_navy: [['Plain wall: navy', 'Однотонные обои: тёмно-синие', 'Vienkrāsainas tapetes: tumši zilas'], plainWall('#1F2B4A')],
+    plain_forest: [['Plain wall: forest green', 'Однотонные обои: тёмно-зелёные', 'Vienkrāsainas tapetes: tumši zaļas'], plainWall('#22392E')],
+    plain_burgundy: [['Plain wall: burgundy', 'Однотонные обои: бордовые', 'Vienkrāsainas tapetes: bordo'], plainWall('#4E1D27')],
+    plain_chocolate: [['Plain wall: chocolate', 'Однотонные обои: шоколадные', 'Vienkrāsainas tapetes: šokolādes'], plainWall('#3B2820')],
+    plain_plum: [['Plain wall: plum', 'Однотонные обои: сливовые', 'Vienkrāsainas tapetes: plūmju'], plainWall('#3A2240')],
+    plain_teal: [['Plain wall: deep teal', 'Однотонные обои: тёмная бирюза', 'Vienkrāsainas tapetes: tumši tirkīza'], plainWall('#173E44')],
+    plain_black: [['Plain wall: black', 'Однотонные обои: чёрные', 'Vienkrāsainas tapetes: melnas'], plainWall('#18161B')],
+  });
+  const PLAIN_WALLS = ['wall|plain_white', 'wall|plain_cream', 'wall|plain_pearl', 'wall|plain_blush', 'wall|plain_mint', 'wall|plain_sky', 'wall|plain_lilac', 'wall|plain_butter', 'wall|plain_charcoal', 'wall|plain_navy', 'wall|plain_forest', 'wall|plain_burgundy', 'wall|plain_chocolate', 'wall|plain_plum', 'wall|plain_teal', 'wall|plain_black'];
   // ---------- ❄️ Зимний пир (21.11.2026): блюда на стол, длинный стол и скамья, сугробы, ледяные скульптуры ----------
   const TCLOTH = [['#F7F2E8', '#E5484D'], ['#C9463D', '#2E7D4F'], ['#2E7D4F', '#F6D04D']];
   const steam = (p, t, xs, y) => xs.forEach((x, k) => { const a = ((t / 900) + k * .37) % 1; p(x + Math.sin(a * 6 + k) * .5, y + 2 - a * 3, .5, 1, 'rgba(255,255,255,' + (.75 * (1 - a)).toFixed(2) + ')'); });
@@ -1444,6 +1465,7 @@
   const WINTER_NEW = ['furn|longtable:0', 'furn|longtable:1', 'furn|longtable:2', 'furn|feastbench', 'furn|tangerines', 'furn|pelmeni', 'furn|greypeas', 'furn|berrypie', 'furn|pudding', 'furn|hotchoc', 'furn|punchbowl', 'furn|piparkukas', 'furn|stollen', 'furn|snowdrift', 'furn|snowmound', 'furn|snowfir', 'furn|iceswan', 'furn|icepolly', 'furn|icecastle', 'furn|icetree']; // 21.11.2026: зимний пир
   B.GIFT_THEMES.push(['winterfeast', ['❄️ Winter feast', '❄️ Зимний пир', '❄️ Ziemas mielasts'], [...WINTER_NEW, 'furn|snowman', 'furn|snowglobe', 'furn|gingerhouse', 'furn|cookies', 'furn|sled', 'furn|fireplace', 'view|snow', 'floor|snowfloor', 'wall|snowflakes']]);
   addTh('newyear', WINTER_NEW);
+  B.GIFT_THEMES.push(['plainwall', ['🎨 Plain walls', '🎨 Однотонные обои', '🎨 Vienkrāsainas tapetes'], PLAIN_WALLS]); addTh('home', PLAIN_WALLS);
   // иконка вещи для комнаты
   function icon(kind, v, size) {
     const s = 6, c = document.createElement('canvas'), g = c.getContext('2d');
@@ -1501,6 +1523,7 @@
     editOn: ['Arrange the room', 'Обустроить комнату', 'Iekārtot istabu'], editOff: ['Done', 'Готово', 'Gatavs'],
     hint: ['Drag things around · tap one for ⇆ ⬆ ⬇ ↩', 'Вещи можно двигать · нажатие на вещь — ⇆ ⬆ ⬇ ↩', 'Lietas var pārvietot · pieskaries lietai — ⇆ ⬆ ⬇ ↩'],
     tidy: ['🧹 Tidy up', '🧹 Прибраться', '🧹 Sakopt'],
+    clear: ['🎒 All to bag', '🎒 Всё в сумку', '🎒 Visu somā'], clearQ: ['Put all furniture and decorations of this room back in the bag? Wallpaper, floor, window and curtains stay.', 'Убрать всю мебель и украшения этой комнаты в сумку? Обои, пол, вид из окна и шторы останутся.', 'Novākt visas šīs istabas mēbeles un rotājumus somā? Tapetes, grīda, skats pa logu un aizkari paliks.'], cleared: ['Everything is in the bag', 'Всё в сумке', 'Viss ir somā'],
     alive: ['🐈 The cat is alive!', '🐈 Котик ожил!', '🐈 Kaķītis atdzīvojās!'], aliveLiving: ['Cats come alive only in the living room', 'Котики оживают только в гостиной', 'Kaķīši atdzīvojas tikai viesistabā'], aliveErr: ['The potion did not work — try again', 'Зелье не сработало — попробуй ещё раз', 'Dzira nesuvēja — mēģini vēlreiz'],
     lightOff: ['Turn the light off', 'Выключить свет', 'Izslēgt gaismu'], lightOn: ['Turn the light on', 'Включить свет', 'Ieslēgt gaismu'],
     garden: ['Garden', 'Огород', 'Dārzs'], // огород (этап 22) — ссылкой в плане дома
@@ -1593,7 +1616,7 @@
     const pops = new Map(); // вещь → когда «плюхнулась» (подскок)
     box.classList.add('room');
     box.innerHTML = `<div class="room-stage"><canvas class="room-cv" width="${RW}" height="${RH}" aria-label="${t('of').replace('{n}', o.nick)}" role="img"></canvas></div>
-      <div class="room-bar"><span class="room-cap">🏠 ${t('of').replace('{n}', o.nick)}</span>${o.mine ? `<span class="room-hint">${t('hintOff')}</span><button type="button" class="room-tidy" hidden></button><button type="button" class="room-edit" aria-pressed="false"></button><button type="button" class="room-light"></button><span class="room-st" aria-live="polite"></span>` : ''}</div>`;
+      <div class="room-bar"><span class="room-cap">🏠 ${t('of').replace('{n}', o.nick)}</span>${o.mine ? `<span class="room-hint">${t('hintOff')}</span><button type="button" class="room-tidy" hidden></button><button type="button" class="room-clear" hidden></button><button type="button" class="room-edit" aria-pressed="false"></button><button type="button" class="room-light"></button><span class="room-st" aria-live="polite"></span>` : ''}</div>`;
     const cv = box.querySelector('canvas'), stage = box.querySelector('.room-stage');
     const S = o.scale || 4; cv.width = RW * S; cv.height = RH * S;
     const g = cv.getContext('2d'); g.imageSmoothingEnabled = false;
@@ -1889,84 +1912,122 @@
       g.restore();
       if (bird.zz) { const z = Math.floor(now / 600) % 3; for (let i = 0; i <= z; i++) R(g, bird.x + 6 + i * 4, bird.y - h - 2 - i * 4, 3, 1, '#FFFFFF'); }
     }
-    // ---------- гость (21.11.2026): вошедшая птичка в чужой комнате входит в дверь справа, гуляет и играет с хозяином (только на экране гостя, ничего не сохраняется) ----------
-    const gst = o.guest && o.guest.id && !o.mine && !o.still && !o.preview && !o.film ? { x: RW + 8, y: GY, dir: -1, st: 'idle', until: 0, frame: 0, tag: 0,
-      FR: [0, 1, 2].map(f => B.sprite(B.dress(B.looks(o.guest.id), o.guest.avatar || {}), f)) } : null;
+    // ---------- гости (21.11.2026): птички в гостях входят в дверь справа, гуляют и играют с хозяином ----------
+    // gst — своя птичка (вошедшая открыла чужую комнату, кнопки под комнатой); vis — другие гости, которых видно всем: хозяину, гостям и просто зашедшим
+    // (worker/visits.js: гость отмечается раз в 5 с — POST /api/room/visit, остальные опрашивают GET /api/room/visitors; действие гостя видно у всех)
+    const live = !o.still && !o.preview && !o.film && !!o.id;
+    const mkBird = (id, nick, avatar) => ({ id, nick, x: RW + 8, y: GY, dir: -1, st: 'idle', until: 0, frame: 0, tag: 0, FR: [0, 1, 2].map(f => B.sprite(B.dress(B.looks(id), avatar || {}), f)) });
+    const gst = live && o.guest && o.guest.id && !o.mine ? mkBird(o.guest.id, o.guest.nick, o.guest.avatar) : null;
+    const vis = new Map(); // id → птичка-гость (+ home — в какой комнате дома, n — номер последнего действия)
+    const allG = () => [gst, ...[...vis.values()].filter(v => v.home === cur)].filter(Boolean);
     let duet = null; // общее действие гостя и хозяина: пока идёт — хозяин сам не думает
     const balls = []; // снежки в полёте: { sx, sy, tx, ty, t0, dur, hit }
-    const gGo = (now, x, y, then, sp = .05) => { x = Math.max(6, Math.min(RW - 6, x)); const up = Math.abs(y - gst.y) > 1; gst.st = up ? 'hop' : 'walk'; gst.from = { x: gst.x, y: gst.y, t: now }; gst.to = { x, y, then };
-      if (Math.abs(x - gst.x) > .5) gst.dir = x > gst.x ? 1 : -1; gst.until = now + (up ? 650 : Math.max(150, Math.abs(x - gst.x) / sp)); };
-    const gHop = (now, then) => { gst.st = 'hop'; gst.from = { x: gst.x, y: gst.y, t: now }; gst.to = { x: gst.x, y: gst.y, then }; gst.until = now + 520; };
+    const gGo = (v, now, x, y, then, sp = .05) => { x = Math.max(6, Math.min(RW - 6, x)); const up = Math.abs(y - v.y) > 1; v.st = up ? 'hop' : 'walk'; v.from = { x: v.x, y: v.y, t: now }; v.to = { x, y, then };
+      if (Math.abs(x - v.x) > .5) v.dir = x > v.x ? 1 : -1; v.until = now + (up ? 650 : Math.max(150, Math.abs(x - v.x) / sp)); };
+    const gHop = (v, now, then) => { v.st = 'hop'; v.from = { x: v.x, y: v.y, t: now }; v.to = { x: v.x, y: v.y, then }; v.until = now + 520; };
     const hHop = (now, then) => { bird.st = 'hop'; bird.zz = false; bird.from = { x: bird.x, y: bird.y, t: now }; bird.to = { x: bird.x, y: bird.y, then }; bird.until = now + 520; };
     const hFree = () => { bird.scene = null; bird.zz = false; bird.act = null; bird.actQ = null; if (bird.st === 'scene' || bird.st === 'use' || bird.st === 'peck' || bird.st === 'hover') bird.st = 'idle'; if (bird.to) bird.to.then = null; };
     const birdH = () => FR[0].height * .75, hitBird = (b, px, py, fr) => Math.abs(px - b.x) <= fr[0].width * .4 && py <= b.y + 1 && py >= b.y - fr[0].height * .75;
-    function gThink(now, lay) {
-      if (duet || now < gst.until || gst.st === 'walk' || gst.st === 'hop') return;
+    function gThink(v, now, lay) {
+      if ((duet && duet.v === v) || now < v.until || v.st === 'walk' || v.st === 'hop') return;
       const sf = surfaces(lay), r = Math.random();
-      if (!sf.some(z => Math.abs(z.y - gst.y) < 2)) return gGo(now, gst.x, GY);
-      if (r < .2) { const tx = bird.x + (gst.x < bird.x ? -12 : 12); return gGo(now, tx, Math.abs(bird.y - gst.y) < 1 ? gst.y : bird.y, () => { gst.dir = bird.x > gst.x ? 1 : -1; if (Math.random() < .5) emit('heart', gst.x, gst.y - 18); }); }
-      if (r < .55) { const cur = sf.find(s => Math.abs(s.y - gst.y) < 1 && gst.x >= s.x0 - 2 && gst.x <= s.x1 + 2) || sf[0]; return gGo(now, cur.x0 + Math.random() * (cur.x1 - cur.x0), cur.y, null, .03); }
-      if (r < .75 && sf.length > 1) { const s = sf[Math.floor(Math.random() * sf.length)]; return gGo(now, s.x0 + Math.random() * (s.x1 - s.x0), s.y); }
-      gst.st = r < .88 ? 'peck' : 'idle'; gst.until = now + 1200 + Math.random() * 1500;
+      if (!sf.some(z => Math.abs(z.y - v.y) < 2)) return gGo(v, now, v.x, GY);
+      if (r < .2) { const tx = bird.x + (v.x < bird.x ? -12 : 12); return gGo(v, now, tx, Math.abs(bird.y - v.y) < 1 ? v.y : bird.y, () => { v.dir = bird.x > v.x ? 1 : -1; if (Math.random() < .5) emit('heart', v.x, v.y - 18); }); }
+      if (r < .55) { const c = sf.find(s => Math.abs(s.y - v.y) < 1 && v.x >= s.x0 - 2 && v.x <= s.x1 + 2) || sf[0]; return gGo(v, now, c.x0 + Math.random() * (c.x1 - c.x0), c.y, null, .03); }
+      if (r < .75 && sf.length > 1) { const s = sf[Math.floor(Math.random() * sf.length)]; return gGo(v, now, s.x0 + Math.random() * (s.x1 - s.x0), s.y); }
+      v.st = r < .88 ? 'peck' : 'idle'; v.until = now + 1200 + Math.random() * 1500;
     }
-    function gStep(now) {
-      if (gst.st === 'walk' || gst.st === 'hop') {
-        const k = Math.min(1, (now - gst.from.t) / Math.max(1, gst.until - gst.from.t));
-        gst.x = gst.from.x + (gst.to.x - gst.from.x) * k; gst.y = gst.from.y + (gst.to.y - gst.from.y) * k - (gst.st === 'hop' ? Math.sin(Math.PI * k) * (gst.to.x === gst.from.x ? 8 : 14) : 0);
-        gst.frame = gst.st === 'walk' ? Math.floor(now / 160) % 2 : 0;
-        if (k >= 1) { gst.x = gst.to.x; gst.y = gst.to.y; const th = gst.to.then; gst.st = 'idle'; gst.until = now + 600 + Math.random() * 1500; if (th) th(); }
-      } else gst.frame = gst.st === 'peck' ? (Math.floor(now / 250) % 2 ? 2 : 0) : 0;
-      if (gst.st === 'peck' && duet && duet.kind === 'feast' && Math.random() < .06) emit('crumb', gst.x + gst.dir * 3, gst.y - 3, 1, false);
+    function gStep(v, now) {
+      if (v.st === 'walk' || v.st === 'hop') {
+        const k = Math.min(1, (now - v.from.t) / Math.max(1, v.until - v.from.t));
+        v.x = v.from.x + (v.to.x - v.from.x) * k; v.y = v.from.y + (v.to.y - v.from.y) * k - (v.st === 'hop' ? Math.sin(Math.PI * k) * (v.to.x === v.from.x ? 8 : 14) : 0);
+        v.frame = v.st === 'walk' ? Math.floor(now / 160) % 2 : 0;
+        if (k >= 1) { v.x = v.to.x; v.y = v.to.y; const th = v.to.then; v.st = 'idle'; v.until = now + 600 + Math.random() * 1500; if (th) th(); }
+      } else v.frame = v.st === 'peck' ? (Math.floor(now / 250) % 2 ? 2 : 0) : 0;
+      if (v.st === 'peck' && duet && duet.kind === 'feast' && Math.random() < .06) emit('crumb', v.x + v.dir * 3, v.y - 3, 1, false);
     }
-    function gDraw(now) {
-      const c = gst.FR[gst.frame] || gst.FR[0], w = c.width * .75, h = c.height * .75;
-      g.save(); if (gst.dir < 0) { g.translate(Math.round(gst.x) * 2, 0); g.scale(-1, 1); } g.drawImage(c, Math.round(gst.x) - w / 2, Math.round(gst.y) - h + 1, w, h); g.restore();
-      if (now < gst.tag) { const s = '@' + o.guest.nick; g.font = 'bold 5px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; const tw = g.measureText(s).width + 4, x = Math.max(tw / 2 + 1, Math.min(RW - tw / 2 - 1, gst.x)), y = gst.y - h - 5;
+    function gDraw(v, now) {
+      const c = v.FR[v.frame] || v.FR[0], w = c.width * .75, h = c.height * .75;
+      g.save(); if (v.dir < 0) { g.translate(Math.round(v.x) * 2, 0); g.scale(-1, 1); } g.drawImage(c, Math.round(v.x) - w / 2, Math.round(v.y) - h + 1, w, h); g.restore();
+      if (now < v.tag) { const s = '@' + v.nick; g.font = 'bold 5px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; const tw = g.measureText(s).width + 4, x = Math.max(tw / 2 + 1, Math.min(RW - tw / 2 - 1, v.x)), y = v.y - h - 5;
         g.fillStyle = 'rgba(43,26,58,.82)'; g.fillRect(x - tw / 2, y - 3.5, tw, 7); g.fillStyle = '#FFFFFF'; g.fillText(s, x, y + .3); }
+    }
+    function drawBalls(now) {
       for (let i = balls.length - 1; i >= 0; i--) { const b = balls[i], k = (now - b.t0) / b.dur; if (k < 0) continue; if (k >= 1) { balls.splice(i, 1); b.hit(); continue; }
         const x = b.sx + (b.tx - b.sx) * k, y = b.sy + (b.ty - b.sy) * k - Math.sin(Math.PI * k) * 16; R(g, x - 1, y - 1, 2, 2, '#FFFFFF'); R(g, x - 1, y + .5, 2, .5, '#BFD7EA'); }
     }
-    // встать рядом друг с другом на полу: гость справа или слева — как ближе; then — когда оба дошли
-    function meet(now, gap, then) {
-      hFree(); let n = 0; const done = () => { if (++n < 2) return; bird.dir = gst.x > bird.x ? 1 : -1; gst.dir = -bird.dir; then(performance.now()); };
-      const mx = Math.max(gap + 8, Math.min(RW - gap - 8, (bird.x + gst.x) / 2)), hl = bird.x <= gst.x;
-      go(now, mx + (hl ? -gap : gap), GY, done); gGo(now, mx + (hl ? gap : -gap), GY, done, .06);
+    // встать рядом друг с другом на полу; then — когда оба дошли
+    function meet(v, now, gap, then) {
+      hFree(); let n = 0; const done = () => { if (++n < 2) return; bird.dir = v.x > bird.x ? 1 : -1; v.dir = -bird.dir; then(performance.now()); };
+      const mx = Math.max(gap + 8, Math.min(RW - gap - 8, (bird.x + v.x) / 2)), hl = bird.x <= v.x;
+      go(now, mx + (hl ? -gap : gap), GY, done); gGo(v, now, mx + (hl ? gap : -gap), GY, done, .06);
     }
-    const end = ms => setTimeout(() => { duet = null; bird.until = 0; gst.until = performance.now() + 800; }, ms);
+    const end = (v, ms) => setTimeout(() => { duet = null; bird.until = 0; v.until = performance.now() + 800; }, ms);
     const ACTS_G = {
-      wave: now => { duet = { kind: 'wave' }; hFree(); gst.dir = bird.x > gst.x ? 1 : -1; bird.dir = -gst.dir; gst.tag = now + 3000;
-        [0, 520, 1040].forEach((d, k) => setTimeout(() => { if (!box.isConnected) return; gHop(performance.now()); emit(k === 1 ? 'note' : 'star', gst.x, gst.y - 18); }, d));
-        setTimeout(() => { if (!box.isConnected) return; hHop(performance.now(), () => emit('heart', bird.x, bird.y - 20, 2)); }, 700); end(1900); },
-      hug: now => { duet = { kind: 'hug' }; meet(now, 4, t1 => { for (let k = 0; k < 6; k++) setTimeout(() => emit('heart', (bird.x + gst.x) / 2, Math.min(bird.y, gst.y) - 18, 1), k * 260);
-        setTimeout(() => { hHop(performance.now()); gHop(performance.now()); }, 1700); end(2500); }); },
-      dance: now => { duet = { kind: 'dance' }; meet(now, 9, () => { for (let k = 0; k < 8; k++) setTimeout(() => { if (!box.isConnected) return; const t2 = performance.now();
-        if (k % 2) { gHop(t2); gst.dir = -gst.dir; } else { hHop(t2); bird.dir = -bird.dir; } emit('note', k % 2 ? gst.x : bird.x, GY - 20); }, k * 380);
-        setTimeout(() => { bird.dir = gst.x > bird.x ? 1 : -1; gst.dir = -bird.dir; emit('star', (bird.x + gst.x) / 2, GY - 24, 3); }, 3200); end(3700); }); },
-      snow: now => { duet = { kind: 'snow' }; hFree(); gst.dir = bird.x > gst.x ? 1 : -1;
+      wave: (v, now) => { duet = { kind: 'wave', v }; hFree(); v.dir = bird.x > v.x ? 1 : -1; bird.dir = -v.dir; v.tag = now + 3000;
+        [0, 520, 1040].forEach((d, k) => setTimeout(() => { if (!box.isConnected) return; gHop(v, performance.now()); emit(k === 1 ? 'note' : 'star', v.x, v.y - 18); }, d));
+        setTimeout(() => { if (!box.isConnected) return; hHop(performance.now(), () => emit('heart', bird.x, bird.y - 20, 2)); }, 700); end(v, 1900); },
+      hug: (v, now) => { duet = { kind: 'hug', v }; meet(v, now, 4, () => { for (let k = 0; k < 6; k++) setTimeout(() => emit('heart', (bird.x + v.x) / 2, Math.min(bird.y, v.y) - 18, 1), k * 260);
+        setTimeout(() => { hHop(performance.now()); gHop(v, performance.now()); }, 1700); end(v, 2500); }); },
+      dance: (v, now) => { duet = { kind: 'dance', v }; meet(v, now, 9, () => { for (let k = 0; k < 8; k++) setTimeout(() => { if (!box.isConnected) return; const t2 = performance.now();
+        if (k % 2) { gHop(v, t2); v.dir = -v.dir; } else { hHop(t2); bird.dir = -bird.dir; } emit('note', k % 2 ? v.x : bird.x, GY - 20); }, k * 380);
+        setTimeout(() => { bird.dir = v.x > bird.x ? 1 : -1; v.dir = -bird.dir; emit('star', (bird.x + v.x) / 2, GY - 24, 3); }, 3200); end(v, 3700); }); },
+      snow: (v, now) => { duet = { kind: 'snow', v }; hFree(); v.dir = bird.x > v.x ? 1 : -1;
         const hb = birdH(), throwAt = (from, to, fr, ok) => balls.push({ sx: from.x + (to.x > from.x ? 4 : -4), sy: from.y - fr[0].height * .5, tx: to.x, ty: to.y - hb * .6, t0: performance.now() + 120, dur: 700, hit: ok });
-        gHop(now, () => throwAt(gst, bird, gst.FR, () => { emit('flake', bird.x, bird.y - hb * .6, 7); hHop(performance.now()); bird.dir = gst.x > bird.x ? 1 : -1;
-          setTimeout(() => { if (!box.isConnected) return; throwAt(bird, gst, FR, () => { emit('flake', gst.x, gst.y - hb * .6, 7); gHop(performance.now(), () => emit('heart', gst.x, gst.y - 18, 1)); end(900); }); }, 650); })); },
-      feast: now => { const lay = layout(), tb = lay.filter(q => q.it.k === 'furn' && TABLES.includes(parse(q.it.v)[0])).sort((a, b) => b.d.w - a.d.w)[0]; if (!tb) return;
-        duet = { kind: 'feast' }; hFree(); const y = tb.y + tb.d.top, w = tb.d.w, a = tb.x + w * (w > 40 ? .3 : .25), b = tb.x + w * (w > 40 ? .7 : .75); let n = 0;
-        const done = () => { if (++n < 2) return; const t2 = performance.now(); bird.dir = 1; gst.dir = -1; bird.st = 'peck'; bird.act = 'eat'; bird.actQ = null; bird.until = t2 + 4200; gst.st = 'peck'; gst.until = t2 + 4200;
-          setTimeout(() => emit('heart', (bird.x + gst.x) / 2, y - 20, 2), 2000); setTimeout(() => emit('heart', (bird.x + gst.x) / 2, y - 20, 2), 3600); end(4400); };
-        const hl = bird.x <= gst.x; go(now, hl ? a : b, y, done); gGo(now, hl ? b : a, y, done); },
+        gHop(v, now, () => throwAt(v, bird, v.FR, () => { emit('flake', bird.x, bird.y - hb * .6, 7); hHop(performance.now()); bird.dir = v.x > bird.x ? 1 : -1;
+          setTimeout(() => { if (!box.isConnected) return; throwAt(bird, v, FR, () => { emit('flake', v.x, v.y - hb * .6, 7); gHop(v, performance.now(), () => emit('heart', v.x, v.y - 18, 1)); end(v, 900); }); }, 650); })); },
+      feast: (v, now) => { const lay = layout(), tb = lay.filter(q => q.it.k === 'furn' && TABLES.includes(parse(q.it.v)[0])).sort((a, b) => b.d.w - a.d.w)[0]; if (!tb) return;
+        duet = { kind: 'feast', v }; hFree(); const y = tb.y + tb.d.top, w = tb.d.w, a = tb.x + w * (w > 40 ? .3 : .25), b = tb.x + w * (w > 40 ? .7 : .75); let n = 0;
+        const done = () => { if (++n < 2) return; const t2 = performance.now(); bird.dir = 1; v.dir = -1; bird.st = 'peck'; bird.act = 'eat'; bird.actQ = null; bird.until = t2 + 4200; v.st = 'peck'; v.until = t2 + 4200;
+          setTimeout(() => emit('heart', (bird.x + v.x) / 2, y - 20, 2), 2000); setTimeout(() => emit('heart', (bird.x + v.x) / 2, y - 20, 2), 3600); end(v, 4400); };
+        const hl = bird.x <= v.x; go(now, hl ? a : b, y, done); gGo(v, now, hl ? b : a, y, done); },
     };
     const TABLES = ['longtable', 'roundtable', 'coffeetable', 'sidetable', 'chefcounter', 'desk'];
     const hasTable = () => room.items.some(it => it.k === 'furn' && it.in == null && TABLES.includes(parse(it.v)[0]));
+    // гость входит в дверь справа (при смене комнаты дома — тоже)
+    const enter = v => { if (duet && duet.v === v) duet = null; Object.assign(v, { x: RW + 8, y: GY, dir: -1 }); v.tag = performance.now() + 5000; gGo(v, performance.now(), 100 + Math.random() * 60, GY, () => emit('heart', v.x, v.y - 18, 2), .06); };
+    // действие гостя: своё — сразу и на сервер; чужое — когда пришло с сервера (если сейчас идёт другое — птичка просто подпрыгнет)
+    const play = (v, k) => { const now = performance.now(); if (duet || tidy || !ACTS_G[k]) { gHop(v, now, () => emit('heart', v.x, v.y - 18)); return; } if (v.to) v.to.then = null; ACTS_G[k](v, now); };
     let showGuest = () => {};
-    if (gst) {
-      const GT = { hi: ['You are visiting — play together:', 'Ты в гостях — поиграйте вместе:', 'Tu esi ciemos — paspēlējieties kopā:'],
-        wave: ['👋 Wave', '👋 Помахать', '👋 Pamāt'], hug: ['🤗 Hug', '🤗 Обняться', '🤗 Apskauties'], dance: ['💃 Dance', '💃 Потанцевать', '💃 Padejot'],
-        snow: ['❄️ Snowball', '❄️ Снежок', '❄️ Sniega pika'], feast: ['🍽 To the table', '🍽 За стол', '🍽 Pie galda'] };
-      const gb = document.createElement('div'); gb.className = 'room-guest';
-      gb.innerHTML = `<span class="room-guest-hi">${GT.hi[L]}</span>` + Object.keys(ACTS_G).map(k => `<button type="button" data-ga="${k}">${GT[k][L]}</button>`).join('');
-      box.querySelector('.room-bar').appendChild(gb);
-      gb.querySelectorAll('[data-ga]').forEach(b2 => b2.onclick = () => { if (duet || tidy) return; const now = performance.now(); if (gst.to) gst.to.then = null; ACTS_G[b2.dataset.ga](now); });
-      showGuest = () => { gb.querySelector('[data-ga="feast"]').hidden = !hasTable(); };
-      showGuest();
-      gst.enter = () => { duet = null; balls.length = 0; Object.assign(gst, { x: RW + 8, y: GY, dir: -1 }); gst.tag = performance.now() + 5000; gGo(performance.now(), 110 + Math.random() * 50, GY, () => emit('heart', gst.x, gst.y - 18, 2), .06); };
-      gst.enter();
+    const GT = { hi: ['You are visiting — play together:', 'Ты в гостях — поиграйте вместе:', 'Tu esi ciemos — paspēlējieties kopā:'], here: ['Visiting now:', 'Сейчас в гостях:', 'Tagad ciemos:'],
+      wave: ['👋 Wave', '👋 Помахать', '👋 Pamāt'], hug: ['🤗 Hug', '🤗 Обняться', '🤗 Apskauties'], dance: ['💃 Dance', '💃 Потанцевать', '💃 Padejot'],
+      snow: ['❄️ Snowball', '❄️ Снежок', '❄️ Sniega pika'], feast: ['🍽 To the table', '🍽 За стол', '🍽 Pie galda'] };
+    const herePill = document.createElement('div'); herePill.className = 'room-visitors'; herePill.hidden = true; herePill.setAttribute('aria-live', 'polite');
+    const drawHere = () => { const vs = [...vis.values()]; herePill.hidden = !vs.length; if (vs.length) herePill.textContent = '🐦 ' + GT.here[L] + ' ' + vs.map(v => '@' + v.nick).join(', '); };
+    let sync = () => {};
+    if (live) {
+      box.querySelector('.room-bar').appendChild(herePill);
+      if (gst) {
+        const gb = document.createElement('div'); gb.className = 'room-guest';
+        gb.innerHTML = `<span class="room-guest-hi">${GT.hi[L]}</span>` + Object.keys(ACTS_G).map(k => `<button type="button" data-ga="${k}">${GT[k][L]}</button>`).join('');
+        box.querySelector('.room-bar').appendChild(gb);
+        gb.querySelectorAll('[data-ga]').forEach(b2 => b2.onclick = () => { if (duet || tidy) return; play(gst, b2.dataset.ga); sync(b2.dataset.ga); });
+        showGuest = () => { gb.querySelector('[data-ga="feast"]').hidden = !hasTable(); };
+        showGuest(); enter(gst);
+      }
+      // опрос: гость отмечается (и шлёт своё действие), остальные только смотрят; вкладка скрыта — не опрашиваем
+      const myId = gst ? gst.id : o.me && o.me.id;
+      let busy = false, timer = 0;
+      sync = async act => {
+        if (!box.isConnected) { clearInterval(timer); return; }
+        if (busy || (!act && document.hidden)) return; busy = true;
+        try {
+          const r = await (gst ? fetch('/api/room/visit', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ id: o.id, home: cur, act: act || '' }) })
+            : fetch('/api/room/visitors?id=' + o.id, { credentials: 'same-origin' })).then(x => x.ok ? x.json() : null);
+          if (!r || !Array.isArray(r.visitors)) return;
+          const seen = new Set();
+          r.visitors.forEach(x => { if (x.id === myId || x.id === o.id) return; seen.add(x.id);
+            let v = vis.get(x.id); const was = v && v.home === cur;
+            if (!v) { v = mkBird(x.id, x.nick, x.avatar); v.n = x.n; vis.set(x.id, v); }
+            v.home = x.home; if (v.home === cur && !was) enter(v);
+            else if (x.n > v.n && x.act && v.home === cur) play(v, x.act);
+            v.n = x.n; });
+          [...vis.keys()].forEach(id => { if (!seen.has(id)) { const v = vis.get(id); if (v.home === cur) emit('dust', v.x, v.y - 2, 4, true); if (duet && duet.v === v) duet = null; vis.delete(id); } });
+          drawHere();
+        } catch (e) { /* сеть — в следующий раз */ } finally { busy = false; }
+      };
+      timer = setInterval(sync, 5000); setTimeout(sync, 600);
+      if (gst) addEventListener('pagehide', () => { try { navigator.sendBeacon('/api/room/leave', JSON.stringify({ id: o.id })); } catch (e) { /* ок */ } });
     }
     // живой котик: сидит → бежит/идёт в случайное место → потягивается → идёт к дивану и дерёт его когтями (пух летит)
     const SCRATCH = ['sofa', 'armchair', 'gothicchair', 'beanbag', 'pouf', 'cattower', 'throne', 'gamingchair'];
@@ -2051,7 +2112,7 @@
       lay.forEach(q => { if (!q.live) return; if (!o.film && !o.still) catStep(q, now, lay); const X = Math.round(q.live.x), Y = q.y, pp = pops.get(q.it), oy = pp != null && now - pp < 400 ? -10 * Math.sin(Math.PI * (now - pp) / 400) : 0;
         if (q.live.dir > 0) { g.save(); g.translate(X * 2 + q.d.w, 0); g.scale(-1, 1); catDraw(P(g, X, Y + oy), now, q); g.restore(); } else catDraw(P(g, X, Y + oy), now, q); });
       placeSel(lay);
-      if (o.film) o.film(g, now, lay); else { think(now, lay); stepBird(now); drawBird(now, lay); if (gst) { gThink(now, lay); gStep(now); gDraw(now); } } // в видео птичку и всё своё рисует сценарий
+      if (o.film) o.film(g, now, lay); else { think(now, lay); stepBird(now); drawBird(now, lay); allG().forEach(v => { gThink(v, now, lay); gStep(v, now); gDraw(v, now); }); drawBalls(now); } // в видео птичку и всё своё рисует сценарий
       if (tidy && tidy.carry) { const d = defOf(tidy.carry.k, tidy.carry.v); if (d) d.d(P(g, bird.x - d.w / 2, bird.y - FR[0].height * .75 - d.h + 3), now, d.i, ctx); } // несёт вещь над головой
       drawParts(now);
       drawDark(lay, now);
@@ -2089,6 +2150,13 @@
     const fallen = () => room.items.filter(it => it.from != null && it.in == null && boxById(it.from));
     const showTidy = () => { if (!tidyBtn) return; tidyBtn.hidden = !tidy && !fallen().length; tidyBtn.disabled = !!tidy; tidyBtn.textContent = t('tidy'); };
     if (tidyBtn) { showTidy(); tidyBtn.onclick = () => { if (tidy || !fallen().length) return; tidy = { carry: null }; bird.until = 0; if (bird.to) bird.to.then = null; showTidy(); }; } // бросает своё занятие и идёт убирать
+    // «🎒 Всё в сумку» (21.11.2026): вся мебель и украшения текущей комнаты дома — обратно в сумку (альбом остаётся: он в комнате сам); обои, пол, вид, шторы — на месте
+    const clearBtn = box.querySelector('.room-clear');
+    const showClear = () => { if (!clearBtn) return; clearBtn.hidden = !room.items.some(it => !isAlbum(it)); clearBtn.textContent = t('clear'); };
+    if (clearBtn) { showClear(); clearBtn.onclick = () => { if (!room.items.some(it => !isAlbum(it)) || !confirm(t('clearQ'))) return;
+      tidy = null; sel = -1; drag = null; selBar.hidden = true; cats.clear(); jumps.clear(); lids.clear(); pops.clear();
+      const now = performance.now(); layout().forEach(q => { if (!isAlbum(q.it)) emit('dust', q.x + q.d.w / 2, q.y + q.d.h - 1, 2, true); });
+      room.items = room.items.filter(isAlbum); showTidy(); showClear(); save(); changed(); bird.until = now; if (window.PPToast) window.PPToast(t('cleared')); }; }
     const lightBtn = box.querySelector('.room-light');
     const showLight = () => { if (!lightBtn) return; lightBtn.hidden = !!home().dim; lightBtn.textContent = dark() ? '🌙' : '💡'; lightBtn.title = t(dark() ? 'lightOn' : 'lightOff'); lightBtn.setAttribute('aria-label', lightBtn.title); lightBtn.setAttribute('aria-pressed', String(dark())); };
     if (lightBtn) { showLight(); lightBtn.onclick = () => { if (dark()) delete room.light; else room.light = 0; showLight(); save(); changed(); }; }
@@ -2139,7 +2207,7 @@
       saveT = setTimeout(() => fetch('/api/room', { method: 'POST', credentials: 'same-origin', headers: { 'content-type': 'application/json' }, body: JSON.stringify({ room: house }) })
         .then(r => { if (!r.ok) throw 0; if (st) st.textContent = t('saved'); }).catch(() => { if (st) st.textContent = t('err'); }), 500);
     }
-    const changed = () => { if (o.me) o.me.room = house; if (o.onRoom) o.onRoom(house); }; // сумка пересчитывает ✓ (по всем комнатам дома)
+    const changed = () => { if (o.me) o.me.room = house; if (o.onRoom) o.onRoom(house); showClear(); }; // сумка пересчитывает ✓ (по всем комнатам дома)
     function placeSel(lay) {
       if (!o.mine) return;
       const q = sel >= 0 && lay.find(z => z.idx === sel);
@@ -2261,9 +2329,9 @@
     let moved = false;
     const albumAt = e => { const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH; const hit = [...layout()].reverse().find(q => px >= q.x && px <= q.x + q.d.w && py >= q.y && py <= q.y + q.d.h); return hit && isAlbum(hit.it); };
     cv.addEventListener('click', e => { if (moved) { moved = false; return; }
-      if (gst && !duet) { const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH, now = performance.now(); // гость: нажать на свою птичку — подпрыгнет, на хозяина — обрадуется
-        if (hitBird(gst, px, py, gst.FR)) { if (gst.st !== 'walk' && gst.st !== 'hop') gHop(now, () => emit('note', gst.x, gst.y - 18)); gst.tag = now + 2500; return; }
-        if (bird.st !== 'scene' && hitBird(bird, px, py, FR)) { if (bird.st !== 'walk' && bird.st !== 'hop') { hFree(); bird.dir = gst.x > bird.x ? 1 : -1; hHop(now, () => emit('heart', bird.x, bird.y - 20, 2)); } return; } }
+      const gs = edit ? [] : allG(); if (gs.length && !duet) { const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH, now = performance.now(); // гости: нажать на птичку-гостя — подпрыгнет и покажет ник, на хозяина — обрадуется
+        const hv = [...gs].reverse().find(v => hitBird(v, px, py, v.FR)); if (hv) { if (hv.st !== 'walk' && hv.st !== 'hop') gHop(hv, now, () => emit('note', hv.x, hv.y - 18)); hv.tag = now + 2500; return; }
+        if (bird.st !== 'scene' && hitBird(bird, px, py, FR)) { if (bird.st !== 'walk' && bird.st !== 'hop') { hFree(); bird.dir = gs[0].x > bird.x ? 1 : -1; hHop(now, () => emit('heart', bird.x, bird.y - 20, 2)); } return; } }
       if (!o.preview && !o.still && albumAt(e)) openAlbum(); else if (!o.still && !edit) { knock(boxAt(e)); const q = hitAt(e); if (q && sceneOf(q.it)) startScene(q); } }); // этап 21: кровать, плита, гроб, ванна, ноутбук — сцена
     // коробка: нажать 3 раза подряд (мышкой или пальцем) — вещи выпрыгивают; на 1-м и 2-м нажатии крышка вздрагивает. В ✏️ — не открывается
     let knocks = null;
@@ -2305,11 +2373,11 @@
       if (id === cur || !HOMES[id]) return;
       cur = id; room = id === 'living' ? house : ((house.rooms = house.rooms || {})[id] = prep(house.rooms[id] || { items: [] }));
       fixBoxes(); setEdit(false); tidy = null; sel = -1; drag = null; jumps.clear(); lids.clear(); pops.clear(); parts.length = 0;
-      showTidy(); showLight(); showBook(); dkLv = dkTo(); paintBg();
+      showTidy(); showClear(); showLight(); showBook(); dkLv = dkTo(); paintBg();
       capEl.textContent = (id === 'living' ? '🏠 ' + t('of') : HOMES[id].ic + ' ' + HOMES[id].n[L] + ' · @{n}').replace('{n}', o.nick);
       // Полли прибегает из двери справа
       Object.assign(bird, { x: RW + 8, y: GY, zz: false, act: null, actQ: null, scene: null }); walk(performance.now(), 60 + Math.random() * 80, GY, .07);
-      if (gst) { showGuest(); setTimeout(() => { if (box.isConnected) gst.enter(); }, 700); } // гость входит следом
+      showGuest(); duet = null; balls.length = 0; allG().forEach((v, k) => setTimeout(() => { if (box.isConnected && (v === gst || v.home === cur)) enter(v); }, 700 + k * 500)); sync(); // гости входят следом (и сразу отметиться, что гость перешёл)
     }
     if (!o.still && !o.preview && !o.film) {
       const doors = o.doors || { open: {}, need: {}, have: {} }, isOpen = id => id === 'living' || !!(doors.open || {})[id];

@@ -155,3 +155,4 @@ _Собрано скриптом `python3 tools/docs/build_db.py` из CREATE TA
 - `wl_gift:` — worker/wl-holidays.js
 - `wl_mail_n:` — worker/mail.js, worker/wl-holidays.js
 - `works_total` — worker/blog.js, worker/index.js
+- `room_visits` (worker/visits.js, 21.11.2026): owner_id, user_id (PK вместе), home, at (мс последней отметки), act, act_n — кто сейчас в гостях в комнате и его последнее действие; старше 1 ч удаляются, при удалении аккаунта — тоже.

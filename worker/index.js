@@ -18,6 +18,7 @@ import { flockNewsApi, flockEvent as flockEventDb, roomEvent, flockNewsCron, FLO
 import { topApi, topScore, topCron, TOP_TABLES } from './top.js'; // доски топа игр (docs/games.md)
 import { mailApi, mailCron, mailGamesCron, mailAsk, mailPrefs, MAIL_TABLES, MAIL_ALTER, MAIL_RULES, MAIL_RANGE, MAIL_INT } from './mail.js'; // письма по согласию: окно, отписка, рассылка из кабинета (docs/bird.md «Письма»)
 import { aboutChatApi, aboutAskNews, aboutChatNews, ABOUT_CHAT_TABLES, ABOUT_CHAT_ALTER, ACHAT_RULES, ACHAT_RANGE, ACHAT_INT, ACHAT_BADGES, ACHAT_COND } from './about-chat.js'; // чат «Поболтать с Алиной и Полли» на /about-me/ (docs/site.md)
+import { visitsApi, VISIT_TABLES } from './visits.js'; // гости в комнате птички: кто сейчас в гостях и их действия (worker/visits.js)
 import { kitchenApi, dishOf, dishBonus, KITCHEN_TABLES, KITCHEN_RULES, KITCHEN_RANGE, KITCHEN_INT, KITCHEN_BOOL } from './kitchen.js'; // кухня: книга рецептов, блюда с эффектами (этап 89, docs/bird.md)
 import { shiftApi, SHIFT_TABLES, SHIFT_ALTER, SHIFT_RULES, SHIFT_RANGE, SHIFT_INT } from './shift.js'; // «Смена с Полли» (этап 29, docs/rooms.md)
 import { studyApi, studyOk, STUDY_TABLES } from './study.js'; // личный учебник /study/ для Mr.Pepe и Алины (docs/site.md «Учебник»)
@@ -687,6 +688,7 @@ async function ensureSchemaRun(env) {
     ...WEEK_TABLES.map(sql => prep(sql)), // переходы на Amazon: out_clicks (worker/week.js)
     ...ANALYTICS_TABLES.map(sql => prep(sql)), // чтение статей: reads (worker/analytics.js)
     ...KITCHEN_TABLES.map(sql => prep(sql)), // кухня: kitchen (worker/kitchen.js)
+    ...VISIT_TABLES.map(sql => prep(sql)), // гости в комнате: room_visits (worker/visits.js)
     ...SHIFT_TABLES.map(sql => prep(sql)), // «Смена с Полли»: shift_runs (worker/shift.js)
     ...SCHOOL_TABLES.map(sql => prep(sql)), // «Школа Полли»: school_works (worker/school.js)
     ...STUDY_TABLES.map(sql => prep(sql)), // учебник: study_progress (worker/study.js)
@@ -1785,6 +1787,7 @@ async function route(req, env, url) {
   if (m === 'POST' && p === '/api/admin/pause') return pauseApi(req, env, { json, fail, needUser, isAdmin, now });
   if (p === '/api/admin/analytics') { const r = await tableApi(req, env, url, { json, fail, needUser, isAdmin }); if (r) return r; }
   if (p === '/api/admin/week') { const r = await weekApi(req, env, url, { json, fail, needUser, isAdmin, getMeta, now }); if (r) return r; }
+  if (p === '/api/room/visit' || p === '/api/room/visitors' || p === '/api/room/leave') { const r = await visitsApi(req, env, url, { json, fail, currentUser, needUser }); if (r) return r; }
   if (p === '/api/kitchen' || p.startsWith('/api/kitchen/')) { const r = await kitchenApi(req, env, url, { json, fail, currentUser, needUser, rules: () => RULES }); if (r) return r; }
   if (p === '/api/shift' || p.startsWith('/api/shift/')) { const r = await shiftApi(req, env, url, { json, fail, currentUser, needUser, rules: () => RULES, randomHex, award: (uid, kind, ref, n) => award(env, uid, kind, ref, n) }); if (r) return r; }
   if (p.startsWith('/api/titos') || p.startsWith('/api/admin/titos')) { const r = await titosApi(req, env, url, titosHelpers(env)); if (r) return r; }
@@ -3100,6 +3103,7 @@ async function route(req, env, url) {
       env.DB.prepare('DELETE FROM login_fail WHERE k = ?').bind('u:' + u.id),
       env.DB.prepare('DELETE FROM button_log WHERE user_id = ?').bind(u.id),
       env.DB.prepare('DELETE FROM kitchen WHERE user_id = ?').bind(u.id), // кухня: блюдо и книга рецептов (этап 89)
+      env.DB.prepare('DELETE FROM room_visits WHERE user_id = ? OR owner_id = ?').bind(u.id, u.id), // гости в комнате
       env.DB.prepare('DELETE FROM card_owner WHERE user_id = ?').bind(u.id), // карточки снова свободны
       env.DB.prepare('DELETE FROM card_trades WHERE from_id = ? OR to_id = ?').bind(u.id, u.id), // и предложения обмена
       env.DB.prepare('UPDATE users SET feathers = MAX(0, COALESCE(feathers, 0) - (SELECT COUNT(*) FROM feathers f WHERE f.owner_id = users.id AND f.from_id = ?)) WHERE id IN (SELECT owner_id FROM feathers WHERE from_id = ?)').bind(u.id, u.id), // пёрышки этой птички
