@@ -44,11 +44,6 @@
 .hw-door-play .btn.pri:hover{background:#fff;color:var(--gr)}
 .hw-bridge{margin:26px auto 0;max-width:660px;text-align:center;font-size:14px;line-height:1.5;color:var(--mut);padding-top:18px;border-top:1px dashed var(--line)}
 
-.hw-route{padding:24px 0 0}
-.hw-flow{display:flex;flex-wrap:wrap;align-items:center;justify-content:center;gap:10px 12px;font:700 11.5px Karla,'Nunito Sans',sans-serif;letter-spacing:.14em;text-transform:uppercase;color:var(--mut)}
-.hw-flow span{padding:7px 14px;border:1px dashed var(--line);border-radius:999px;background:var(--sheet)}
-.hw-flow i{font-style:normal;color:var(--acc)}
-
 .hw-minute{background:var(--sheet);padding:76px 0 84px;margin-top:36px}
 .hw-h{max-width:760px;margin-bottom:34px}
 .hw-h h2{font-size:clamp(34px,4.2vw,52px);margin-top:12px}
@@ -59,13 +54,19 @@
 .hw-key p{font-size:15.5px;line-height:1.6;color:var(--mut)}
 
 .hw-steps{padding:78px 0 84px}
-.hw-way{list-style:none;border-top:1px solid var(--line)}
-.hw-way li{display:grid;grid-template-columns:52px minmax(0,1fr);gap:22px;padding:28px 0;border-bottom:1px solid var(--line)}
-.hw-n{display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--acc);color:var(--acc);font:400 21px Fraunces,Lora,serif}
-.hw-way h3{font-size:28px;margin-bottom:8px}
-.hw-way p{font-size:16px;line-height:1.62;color:var(--mut);max-width:62ch}
-.hw-way a{display:inline-block;margin-top:10px;font:700 13px Karla,'Nunito Sans',sans-serif;color:var(--acc);border-bottom:1.5px solid color-mix(in srgb,var(--acc) 38%,transparent);padding-bottom:2px}
-.hw-way a:hover{border-color:var(--acc)}
+.hw-trail-hint{margin:-22px 0 28px;text-align:center}
+.hw-trail-hint .hand{font-size:24px}
+.hw-stops{list-style:none;position:relative;height:560px;margin:0;padding:0;display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:18px}
+.hw-stops:before{content:"";position:absolute;left:2%;right:2%;top:280px;border-top:2px dashed var(--line)}
+.hw-stop{position:relative;height:100%;min-width:0}
+.hw-stop-n{position:absolute;left:50%;top:258px;transform:translateX(-50%);z-index:2;display:grid;place-items:center;width:44px;height:44px;border-radius:50%;border:1.5px solid var(--acc);background:var(--bg);color:var(--acc);font:400 20px Fraunces,Lora,serif}
+.hw-stop-card{position:absolute;left:0;right:0;z-index:1;background:var(--sheet);border:1px solid var(--line);border-radius:6px;padding:16px 16px 18px;box-shadow:0 10px 22px rgba(31,35,38,.06)}
+.hw-stop:nth-child(odd) .hw-stop-card{bottom:314px}
+.hw-stop:nth-child(even) .hw-stop-card{top:314px}
+.hw-stop-card h3{font-size:20px;line-height:1.15;margin-bottom:7px}
+.hw-stop-card p{font-size:13px;line-height:1.5;color:var(--mut);margin-bottom:9px}
+.hw-stop-card a{font:700 12px Karla,'Nunito Sans',sans-serif;color:var(--acc);border-bottom:1.5px solid color-mix(in srgb,var(--acc) 38%,transparent);padding-bottom:1px}
+.hw-stop-card a:hover{border-color:var(--acc)}
 
 .hw-words{background:var(--gr);color:#F2EDE6;padding:84px 0}
 .hw-words .k{color:var(--acc2)}
@@ -111,6 +112,12 @@
   .hw-keys{grid-template-columns:1fr 1fr}
   .hw-dl{grid-template-columns:1fr}
   .hw-more-g{grid-template-columns:1fr 1fr}
+  .hw-stops{display:flex;flex-direction:column;height:auto;gap:0;padding-left:46px}
+  .hw-stops:before{left:18px;right:auto;top:6px;bottom:10px;border-top:0;border-left:2px dashed var(--line)}
+  .hw-stop{height:auto;min-height:0;padding:0 0 26px}
+  .hw-stop-card{position:static;padding:14px 16px 16px}
+  .hw-stop-n{left:-46px;top:0;transform:none;width:36px;height:36px;font-size:17px}
+  .hw-stop:nth-child(odd) .hw-stop-card,.hw-stop:nth-child(even) .hw-stop-card{bottom:auto;top:auto}
 }
 @media (max-width:700px){
   .hw-hero h1{font-size:clamp(40px,11vw,56px)}
@@ -126,12 +133,13 @@
   .hw-minute{margin-top:26px}
   .hw-keys{grid-template-columns:1fr}
   .hw-key{padding:24px 22px 26px}
-  .hw-way li{grid-template-columns:38px minmax(0,1fr);gap:14px;padding:24px 0}
-  .hw-n{width:34px;height:34px;font-size:17px}
-  .hw-way h3{font-size:24px}
+  .hw-stop-n{left:-42px;width:32px;height:32px;font-size:15px}
+  .hw-stops{padding-left:42px}
+  .hw-stops:before{left:16px}
+  .hw-stop{padding-bottom:22px}
+  .hw-stop-card h3{font-size:21px}
+  .hw-stop-card p{font-size:13.5px}
   .hw-more-g{grid-template-columns:1fr}
-  .hw-flow{font-size:10.5px;letter-spacing:.1em;gap:8px}
-  .hw-flow span{padding:6px 11px}
   .hw-faq summary{font-size:21px;gap:10px}
   .hw-faq p{padding-left:28px}
   .hw-end{padding:60px 0 68px}
