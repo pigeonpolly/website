@@ -20,7 +20,7 @@ export const POSTCARD_TABLES = [
   'CREATE INDEX IF NOT EXISTS postcards_touid ON postcards (to_uid)',
   'CREATE TABLE IF NOT EXISTS postcard_block (hash TEXT PRIMARY KEY, at INTEGER)',
 ];
-export const POSTCARD_RULES = { pcDay: 5, pcMailDay: 40 };
+export const POSTCARD_RULES = { pcDay: 5, pcMailDay: 89 }; // 89 — решение Алины 22.11.2026
 export const POSTCARD_RANGE = { pcDay: [1, 50], pcMailDay: [0, 90] };
 export const POSTCARD_INT = ['pcDay', 'pcMailDay'];
 
@@ -103,6 +103,10 @@ async function trySend(env, h, c) {
 
 // очередь: открытки, которым не хватило лимита, — раз в час, сколько позволяет лимит
 export async function postcardCron(env, h) {
+  if (await h.getMeta('pc_rule_89') !== '1') { // разово: лимит 89 (Алина, 22.11.2026) — и в уже сохранённых «📜 Правилах», если там стояло прежнее 40
+    try { const r = JSON.parse(await h.getMeta('rules') || 'null'); if (r && r.pcMailDay === 40) { r.pcMailDay = 89; await h.setMeta('rules', JSON.stringify(r)); } } catch (e) {}
+    await h.setMeta('pc_rule_89', '1');
+  }
   if (!mailOn(env)) return;
   const rows = (await env.DB.prepare("SELECT * FROM postcards WHERE mail = 'queue' AND created_at > ? ORDER BY id LIMIT 20").bind(now() - 14 * 86400).all()).results;
   for (const c of rows) {

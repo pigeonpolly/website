@@ -422,7 +422,7 @@ file	worker/pancakes.js	worker/pancakes.js	0	122 строк, 12 КБ
 file	worker/pause.js	worker/pause.js	0	40 строк, 3 КБ
 file	worker/pins.js	worker/pins.js	0	52 строк, 4 КБ
 file	worker/polls.js	worker/polls.js	0	184 строк, 15 КБ
-file	worker/postcards.js	worker/postcards.js	0	207 строк, 18 КБ
+file	worker/postcards.js	worker/postcards.js	0	211 строк, 19 КБ
 file	worker/runes-data.js	worker/runes-data.js	0	252 строк, 78 КБ
 file	worker/runes.js	worker/runes.js	0	15 строк, 1 КБ
 file	worker/school.js	worker/school.js	0	148 строк, 15 КБ
@@ -6606,12 +6606,12 @@ sym	rigaReset	worker/postcards.js	94	const
 sym	spent	worker/postcards.js	95	fn
 sym	trySend	worker/postcards.js	96	fn
 sym	postcardCron	worker/postcards.js	105	fn
-sym	mineSql	worker/postcards.js	117	const
-sym	mineArgs	worker/postcards.js	118	const
-sym	postcardNews	worker/postcards.js	119	fn
-sym	pub	worker/postcards.js	126	const
-sym	PAGE	worker/postcards.js	128	const
-sym	postcardsApi	worker/postcards.js	132	fn
+sym	mineSql	worker/postcards.js	121	const
+sym	mineArgs	worker/postcards.js	122	const
+sym	postcardNews	worker/postcards.js	123	fn
+sym	pub	worker/postcards.js	130	const
+sym	PAGE	worker/postcards.js	132	const
+sym	postcardsApi	worker/postcards.js	136	fn
 sym	RUNE_SPREADS	worker/runes-data.js	7	const
 sym	RUNE_PREP	worker/runes-data.js	51	const
 sym	RUNES	worker/runes-data.js	61	const
