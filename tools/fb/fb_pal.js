@@ -1,6 +1,6 @@
 // Карточки-палитры для постов Facebook на латышском (Алина 16.11.2026: «реально палитры, а не словами»).
 // Стиль — как пины-палитры pins12.js (тёмный фон, арт сверху, 6 цветов с HEX), но 1080×1350 (4:5 для ленты FB) и тексты LV.
-// node tools/fb/fb_pal.js [ключ…] → site/images/fb/pal-<ключ>.jpg. Посты — Notion «Facebook posti LV», docs/growth.md.
+// node tools/fb/fb_pal.js [ключ…] → site/images/fb/pal-<ключ>.jpg. LANG_PAL=en → pal-en-<ключ>.jpg (база «Facebook posts EN»). Посты — Notion «Facebook posti LV», docs/growth.md.
 const fs = require('fs'), path = require('path');
 const { chromium } = require('playwright');
 const ROOT = path.resolve(__dirname, '../..');
@@ -48,24 +48,25 @@ h1.s{font-size:62px}
 
 (async () => {
   const want = process.argv.slice(2);
+  const L = process.env.LANG_PAL === 'en' ? 'en' : 'lv';
   const keys = want.length ? want : Object.keys(KEYS);
   fs.mkdirSync(path.join(ROOT, 'site/images/fb'), { recursive: true });
   const b = await chromium.launch();
   const page = await b.newPage({ viewport: { width: 1080, height: 1350 }, deviceScaleFactor: 1 });
   for (const key of keys) {
     const p = PAL.find(x => x.key === key); if (!p) throw new Error('no palette ' + key);
-    const art = 'file://' + path.join(ROOT, 'site', p.img), t = p.title.lv;
+    const art = 'file://' + path.join(ROOT, 'site', p.img), t = p.title[L];
     const html = `<!doctype html><html><head><meta charset="utf-8"><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Lora:ital,wght@0,600;1,400&family=Karla:wght@400;500;700&display=block"><style>${CSS}</style></head><body>
 <div class="ptop"><img src="${art}" style="object-position:${KEYS[key] || '50% 50%'}"></div>
-<div class="pl"><div class="ptag">KRĀSU PALETE</div><h1 class="${t.length > 20 ? 's' : ''}">${esc(t)}</h1>
-<div class="sw">${p.colors.map(c => `<div class="c"><div style="background:${c.hex}"></div><b>${esc(c.lv)}</b><span>${c.hex}</span></div>`).join('')}</div></div>
-<div class="foot"><i>Pigeon Polly māksla</i><b>pigeonpolly.com</b></div></body></html>`;
+<div class="pl"><div class="ptag">${L === 'en' ? 'COLOR PALETTE' : 'KRĀSU PALETE'}</div><h1 class="${t.length > 20 ? 's' : ''}">${esc(t)}</h1>
+<div class="sw">${p.colors.map(c => `<div class="c"><div style="background:${c.hex}"></div><b>${esc(c[L])}</b><span>${c.hex}</span></div>`).join('')}</div></div>
+<div class="foot"><i>${L === 'en' ? 'Art by Pigeon Polly' : 'Pigeon Polly māksla'}</i><b>pigeonpolly.com</b></div></body></html>`;
     const f = path.join(__dirname, 'out-pal.html'); fs.writeFileSync(f, html);
     await page.goto('file://' + f, { waitUntil: 'networkidle' });
     await page.evaluate(() => document.fonts.ready);
     const bot = await page.evaluate(() => document.querySelector('.sw').getBoundingClientRect().bottom);
     if (bot > 1270) console.log('⚠', key, 'swatches bottom', Math.round(bot));
-    await page.screenshot({ path: path.join(ROOT, 'site/images/fb', `pal-${key}.jpg`), type: 'jpeg', quality: 88 });
+    await page.screenshot({ path: path.join(ROOT, 'site/images/fb', `pal-${L === 'en' ? 'en-' : ''}${key}.jpg`), type: 'jpeg', quality: 88 });
     console.log('ok', key, t);
   }
   fs.unlinkSync(path.join(__dirname, 'out-pal.html'));
