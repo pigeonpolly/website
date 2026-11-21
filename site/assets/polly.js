@@ -633,6 +633,16 @@
     corner: () => cornerPlay(), // проверка игры в уголке (?season=winter и т. п.)
     // для «Выбора Полли» на странице «Нарисуй мне»: кадры спрайта (стоит / в полёте), где она сидит, спрятать/показать
     frames: () => ({ a: F.a, b: F.b, fly: F.fly, w: W, h: H }),
+    // открытки /postcards/: Полли нужного размера в нужной шапке и вещи — paint(canvas, {sp, hat, acc, legs}) (рисует с отступом сверху для шапки)
+    paint(c, o = {}) {
+      const sp = o.sp || 4, top = 2; c.width = 30 * sp; c.height = (35 + top) * sp;
+      const g = c.getContext('2d'); g.clearRect(0, 0, c.width, c.height);
+      ['body', o.legs || 'legA', o.closed && 'closed', o.hat || 'beret', o.acc].forEach(k => {
+        const L = k && PL[k]; if (!L) return;
+        L[1].forEach((r, y) => [...r].forEach((ch, x) => { if (PCOL[ch]) { g.fillStyle = PCOL[ch]; g.fillRect(x * sp, (L[0] + y + top) * sp, sp, sp); } }));
+      });
+      return c;
+    },
     where: () => pet.getBoundingClientRect(),
     away: v => { pet.style.visibility = v ? 'hidden' : ''; },
     async visit(el) {

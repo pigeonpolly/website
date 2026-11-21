@@ -160,7 +160,7 @@ export const mailFree = 'COALESCE(mail_day, \'\') != ?'; // в WHERE, привя
 export const mailSent = (env, h, uid) => env.DB.prepare('UPDATE users SET mail_day = ? WHERE id = ?').bind(h.rigaDay(), uid).run();
 
 const dayKey = h => 'mail_n:' + h.rigaDay();
-async function usedToday(h) { const d = h.rigaDay(); return (await Promise.all(['mail_n:', 'advent_mail_n:', 'wl_mail_n:'].map(k => h.getMeta(k + d)))).reduce((a, v) => a + (Number(v) || 0), 0); } // вместе с адвентом и праздниками Воббленда
+export async function usedToday(h) { const d = h.rigaDay(); return (await Promise.all(['mail_n:', 'advent_mail_n:', 'wl_mail_n:', 'pc_mail_n:'].map(k => h.getMeta(k + d)))).reduce((a, v) => a + (Number(v) || 0), 0); } // вместе с адвентом, праздниками Воббленда и открытками (worker/postcards.js)
 async function spend(h, n) { if (n) await h.setMeta(dayKey(h), String((Number(await h.getMeta(dayKey(h))) || 0) + n)); }
 
 // «отмеченным» в 🐦 Птицах: mail_out.aud_ids — id через запятую

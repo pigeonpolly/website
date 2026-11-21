@@ -30,7 +30,9 @@ function line(s, color) {
 const button = (href, label, acc) => `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:6px 0 4px;"><tr><td style="border-radius:999px;background:${acc};">`
   + `<a href="${esc(href)}" style="display:inline-block;padding:14px 26px;font:700 15px/1.2 ${SANS};color:#FFFFFF;text-decoration:none;border-radius:999px;">${esc(label)} &rarr;</a></td></tr></table>`;
 
-export function mailHtml(subject, text, date) {
+// opt (открытки, worker/postcards.js): img — картинка под заголовком (href — ссылка с неё), caption — надпись рукописным шрифтом (ink — цвет), btn — подпись кнопки
+export function mailHtml(subject, text, date, opt) {
+  opt = opt || {};
   const L = langOf(subject + text), sea = seasonOf(date), acc = ACC[sea], li = { en: 0, ru: 1, lv: 2 }[L];
   const raw = String(text).replace(/\r/g, '').trim();
   const cut = raw.search(/\n—\n|\n—$|^—\n/);
@@ -45,7 +47,7 @@ export function mailHtml(subject, text, date) {
     let lines = [], btns = '';
     for (const s of p.split('\n')) {
       const u = s.trim().match(/^https?:\/\/\S+$/);
-      if (u) btns += button(u[0], BTN[L], acc); else lines.push(line(s, acc));
+      if (u) btns += button(u[0], opt.btn || BTN[L], acc); else lines.push(line(s, acc));
     }
     return (lines.length ? `<p style="${P}">${lines.join('<br>')}</p>` : '') + (btns ? `<div style="margin:-4px 0 22px;">${btns}</div>` : '');
   }).join('');
@@ -71,6 +73,8 @@ export function mailHtml(subject, text, date) {
     + `<table role="presentation" cellpadding="0" cellspacing="0" border="0" style="margin:0 0 20px;"><tr><td style="border:1px solid ${C.line};border-radius:999px;padding:8px 16px;background:${C.bg};font:700 11px/1 ${SANS};letter-spacing:.2em;text-transform:uppercase;color:${C.ink};">`
     + `<span style="color:${acc};">&#9679;</span>&nbsp; ${KICK[L]}</td></tr></table>`
     + `<h1 style="margin:0 0 22px;font:400 30px/1.15 ${SERIF};letter-spacing:-.01em;color:${C.ink};">${esc(subject)}</h1>`
+    + (opt.img ? `<a href="${esc(opt.href || home)}" style="display:block;text-decoration:none;"><img src="${esc(opt.img)}" width="540" alt="${esc(opt.caption || '')}" style="display:block;width:100%;max-width:540px;height:auto;border:0;border-radius:12px;box-shadow:0 8px 22px rgba(42,33,28,.18);"></a>`
+      + (opt.caption ? `<p style="margin:14px 0 22px;font:700 34px/1.15 ${HAND};color:${esc(opt.ink || acc)};text-align:center;">${esc(opt.caption)}</p>` : '<div style="height:20px;"></div>') : '')
     + (hi ? `<p style="margin:0 0 14px;font:700 26px/1.2 ${HAND};color:${acc};">${esc(hi)}</p>` : '')
     + html
     + (sign ? `<p style="margin:8px 0 18px;padding-top:16px;border-top:1px solid ${C.line};font:700 24px/1.2 ${HAND};color:${acc};">${esc(sign)}</p>` : '')
