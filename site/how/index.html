@@ -125,7 +125,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 </div></div>
 </header>
 <main id="main">
-<link rel="stylesheet" href="/assets/how.css?v=d38c50fe">
+<link rel="stylesheet" href="/assets/how.css?v=98ae446a">
 <section data-ppb="how.1" class="hw-hero"><div class="w">
   <div class="hw-hero-tx">
     <span class="k">a guide for the first five minutes</span>
@@ -153,10 +153,40 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
       <h2>Draw &amp; sketch</h2>
       <p class="hw-door-lead">A daily theme, colours from real paintings, free video lessons and notes from the studio. Draw along without signing in — pencil and paper are enough.</p>
       <div class="hw-secs">
-        <a href="/challenge/"><b>Daily Challenge</b><i>a theme a day, a timer and a streak</i><em aria-hidden="true">→</em></a>
-        <a href="/palettes/"><b>Palettes</b><i>colours with HEX codes from every painting</i><em aria-hidden="true">→</em></a>
-        <a href="/learn/"><b>Lessons</b><i>free video lessons to paint along with</i><em aria-hidden="true">→</em></a>
-        <a href="/blog/"><b>Journal</b><i>notes, news and process from the studio</i><em aria-hidden="true">→</em></a>
+        <details class="hw-sec">
+          <summary><b>Daily Challenge</b><i>a theme a day, a timer and a streak</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/challenge/">Today’s theme</a>
+            <a href="/challenge/#sw-wall">The wall of drawings</a>
+            <a href="/prompts/">Monthly prompts</a>
+            <a href="/requests/">Draw this for me</a>
+          </div>
+        </details>
+        <details class="hw-sec">
+          <summary><b>Palettes</b><i>colours with HEX codes from every painting</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/palettes/">All palettes</a>
+          </div>
+        </details>
+        <details class="hw-sec">
+          <summary><b>Lessons</b><i>free video lessons to paint along with</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/learn/">Free video lessons</a>
+            <a href="/polly-helps/">See the World Like an Artist</a>
+            <a href="/ink/">Ink: Sketching Without Fear</a>
+            <a href="/books/">Books</a>
+            <a href="/sketchbook/">Sketchbook</a>
+            <a href="/learn/#free">Colouring pages</a>
+          </div>
+        </details>
+        <details class="hw-sec">
+          <summary><b>Journal</b><i>notes, news and process from the studio</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/blog/">All articles</a>
+            <a href="/blog/?section=art-courier">Art Coo-rier</a>
+            <a href="/freebies/">Free printables</a>
+          </div>
+        </details>
       </div>
       <div class="hw-door-cta"><a class="btn pri" href="/challenge/">Draw today’s theme</a></div>
     </article>
@@ -165,10 +195,49 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
       <h2>Play &amp; explore</h2>
       <p class="hw-door-lead">Wobbleland, Polly’s world and the bird’s kitchen — plus small games that pay in buttons. Free, in the browser, nothing to install.</p>
       <div class="hw-secs">
-        <a href="/wobbleland/"><b>Wobbleland</b><i>eleven pixel towns, holidays and dishes</i><em aria-hidden="true">→</em></a>
-        <a href="/games/"><b>Polly’s world</b><i>office, train, a shift together and Detective Titos</i><em aria-hidden="true">→</em></a>
-        <a href="/bird/#room"><b>The bird’s kitchen</b><i>cook from the garden and keep a recipe book</i><em aria-hidden="true">→</em></a>
-        <a href="/games/"><b>Other games</b><i>Button Rain, potions, pancakes and more</i><em aria-hidden="true">→</em></a>
+        <details class="hw-sec">
+          <summary><b>Wobbleland</b><i>eleven pixel towns, holidays and dishes</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/wobbleland/">The whole island</a>
+            <a href="/wobbleland/#wl-map">Walk the map</a>
+            <a href="/wobbleland/#walk-newwobbleton">Walk a town</a>
+            <a href="/wobbleland/#wl-cal">Town holidays and gifts</a>
+            <a href="/wobbleland/#recipes">Recipe book</a>
+          </div>
+        </details>
+        <details class="hw-sec">
+          <summary><b>Polly’s world</b><i>office, train, a shift together and Detective Titos</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/games/">All games</a>
+            <a href="/titos/">Detective Titos</a>
+            <a href="/shift/">Shift with Polly</a>
+            <a href="/polly-office/">Polly’s Office</a>
+            <a href="/train/">Polly’s Train</a>
+          </div>
+        </details>
+        <details class="hw-sec">
+          <summary><b>The bird’s kitchen</b><i>cook from the garden and keep a recipe book</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/bird/#room">Your kitchen and recipe book</a>
+            <a href="/garden/">The garden</a>
+          </div>
+        </details>
+        <details class="hw-sec">
+          <summary><b>Other games</b><i>Button Rain, potions, pancakes and more</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/rain/">Button Rain</a>
+            <a href="/potions/">Potion Lab</a>
+            <a href="/pancakes/">Polly’s Pancakes</a>
+          </div>
+        </details>
+        <details class="hw-sec">
+          <summary><b>Bird market</b><i>hats, room things, cards and seeds for buttons</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/shop/">The bird market</a>
+            <a href="/shop/#cards">Cards</a>
+            <a href="/shop/#seeds">Seeds</a>
+          </div>
+        </details>
       </div>
       <div class="hw-door-cta"><a class="btn pri" href="/games/">Open all games</a></div>
     </article>
@@ -318,7 +387,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>The Flock</h4><a href="/flock/" data-f>All birds</a><a href="/flock/news/" data-f>Flock news</a><a href="/challenge/" data-f>Daily Challenge</a><a href="/challenge/#sw-wall" data-f>Flock drawings</a><a href="/requests/" data-f>Draw this for me</a><a href="/garden/" data-f>Bird garden</a></div>
     <div><h4 data-f>Alina</h4><a href="/sketchbook/" data-f>Sketchbook</a><a href="/about-me/" data-f>About me</a><a href="/on-walls-and-pages/" data-f>On Walls &amp; Pages</a><a href="/projects/" data-f>Learning &amp; AI</a><a href="/work-with-me/" data-f>Work with me</a><a href="/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Alina Otkinska · Pigeon Polly Art Lab · Riga</span><span class="ver" data-ver="153">v153 · 21.11 14:59</span><span><a href="/privacy/">Privacy</a></span></div>
+  <div class="bt"><span>© 2026 Alina Otkinska · Pigeon Polly Art Lab · Riga</span><span class="ver" data-ver="154">v154 · 21.11 15:05</span><span><a href="/privacy/">Privacy</a></span></div>
 </div></footer>
 </body>
 </html>

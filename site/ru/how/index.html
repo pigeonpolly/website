@@ -125,7 +125,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
 </div></div>
 </header>
 <main id="main">
-<link rel="stylesheet" href="/assets/how.css?v=d38c50fe">
+<link rel="stylesheet" href="/assets/how.css?v=98ae446a">
 <section data-ppb="how.1" class="hw-hero"><div class="w">
   <div class="hw-hero-tx">
     <span class="k">гид на первые пять минут</span>
@@ -153,10 +153,40 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
       <h2>Рисование и скетчинг</h2>
       <p class="hw-door-lead">Тема дня, цвета настоящих картин, бесплатные видеоуроки и заметки из мастерской. Рисуйте вместе без входа — хватит карандаша и бумаги.</p>
       <div class="hw-secs">
-        <a href="/ru/challenge/"><b>Челлендж дня</b><i>тема на каждый день, таймер и серия</i><em aria-hidden="true">→</em></a>
-        <a href="/ru/palettes/"><b>Палитры</b><i>цвета с HEX-кодами из каждой картины</i><em aria-hidden="true">→</em></a>
-        <a href="/ru/learn/"><b>Уроки</b><i>бесплатные видеоуроки — рисуйте вместе</i><em aria-hidden="true">→</em></a>
-        <a href="/ru/blog/"><b>Журнал</b><i>заметки, новости и процесс из мастерской</i><em aria-hidden="true">→</em></a>
+        <details class="hw-sec">
+          <summary><b>Челлендж дня</b><i>тема на каждый день, таймер и серия</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/ru/challenge/">Тема дня</a>
+            <a href="/ru/challenge/#sw-wall">Стена рисунков</a>
+            <a href="/ru/prompts/">Темы на месяц</a>
+            <a href="/ru/requests/">Нарисуй мне</a>
+          </div>
+        </details>
+        <details class="hw-sec">
+          <summary><b>Палитры</b><i>цвета с HEX-кодами из каждой картины</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/ru/palettes/">Все палитры</a>
+          </div>
+        </details>
+        <details class="hw-sec">
+          <summary><b>Уроки</b><i>бесплатные видеоуроки — рисуйте вместе</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/ru/learn/">Бесплатные видеоуроки</a>
+            <a href="/ru/polly-helps/">Смотри на мир как художник</a>
+            <a href="/ru/ink/">Тушь: скетчинг без страха</a>
+            <a href="/ru/books/">Книги</a>
+            <a href="/ru/sketchbook/">Скетчбук</a>
+            <a href="/ru/learn/#free">Раскраски</a>
+          </div>
+        </details>
+        <details class="hw-sec">
+          <summary><b>Журнал</b><i>заметки, новости и процесс из мастерской</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/ru/blog/">Все статьи</a>
+            <a href="/ru/blog/?section=art-courier">Art Coo-rier</a>
+            <a href="/ru/freebies/">Бесплатные материалы для печати</a>
+          </div>
+        </details>
       </div>
       <a class="btn pri" href="/ru/challenge/">Нарисовать тему дня</a>
     </article>
@@ -165,10 +195,49 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
       <h2>Игры и мир Полли</h2>
       <p class="hw-door-lead">Воббленд, мир Полли и кухня птички — плюс маленькие игры, которые платят пуговками. Бесплатно, в браузере, ничего не нужно устанавливать.</p>
       <div class="hw-secs">
-        <a href="/ru/wobbleland/"><b>Воббленд</b><i>одиннадцать пиксельных городков, праздники и блюда</i><em aria-hidden="true">→</em></a>
-        <a href="/ru/games/"><b>Мир Полли</b><i>офис, поезд, смена с Полли и детектив Титос</i><em aria-hidden="true">→</em></a>
-        <a href="/ru/bird/#room"><b>Кухня птички</b><i>готовьте из урожая и собирайте книгу рецептов</i><em aria-hidden="true">→</em></a>
-        <a href="/ru/games/"><b>Другие игры</b><i>«Пуговичный дождь», зелья, блинчики и ещё</i><em aria-hidden="true">→</em></a>
+        <details class="hw-sec">
+          <summary><b>Воббленд</b><i>одиннадцать пиксельных городков, праздники и блюда</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/ru/wobbleland/">Весь остров</a>
+            <a href="/ru/wobbleland/#wl-map">Гулять по карте</a>
+            <a href="/ru/wobbleland/#walk-newwobbleton">Прогуляться по городку</a>
+            <a href="/ru/wobbleland/#wl-cal">Праздники городков и подарки</a>
+            <a href="/ru/wobbleland/#recipes">Книга рецептов</a>
+          </div>
+        </details>
+        <details class="hw-sec">
+          <summary><b>Мир Полли</b><i>офис, поезд, смена с Полли и детектив Титос</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/ru/games/">Все игры</a>
+            <a href="/ru/titos/">Детектив Титос</a>
+            <a href="/ru/shift/">Смена с Полли</a>
+            <a href="/ru/polly-office/">Офис Полли</a>
+            <a href="/ru/train/">Поезд Полли</a>
+          </div>
+        </details>
+        <details class="hw-sec">
+          <summary><b>Кухня птички</b><i>готовьте из урожая и собирайте книгу рецептов</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/ru/bird/#room">Кухня и книга рецептов</a>
+            <a href="/ru/garden/">Огород</a>
+          </div>
+        </details>
+        <details class="hw-sec">
+          <summary><b>Другие игры</b><i>«Пуговичный дождь», зелья, блинчики и ещё</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/ru/rain/">Пуговичный дождь</a>
+            <a href="/ru/potions/">Зельеварня</a>
+            <a href="/ru/pancakes/">Блинная Полли</a>
+          </div>
+        </details>
+        <details class="hw-sec">
+          <summary><b>Птичий рынок</b><i>шапки, вещи для комнаты, карточки и семена за пуговки</i><em aria-hidden="true">▾</em></summary>
+          <div class="hw-sub">
+            <a href="/ru/shop/">Птичий рынок</a>
+            <a href="/ru/shop/#cards">Карточки</a>
+            <a href="/ru/shop/#seeds">Семена</a>
+          </div>
+        </details>
       </div>
       <a class="btn pri" href="/ru/games/">Открыть все игры</a>
     </article>
@@ -318,7 +387,7 @@ addEventListener('pageshow',function(e){if(e.persisted)hide()});
     <div><h4 data-f>Стая</h4><a href="/ru/flock/" data-f>Все птички</a><a href="/ru/flock/news/" data-f>Новости стаи</a><a href="/ru/challenge/" data-f>Челлендж дня</a><a href="/ru/challenge/#sw-wall" data-f>Рисунки стаи</a><a href="/ru/requests/" data-f>Нарисуй мне</a><a href="/ru/garden/" data-f>Огород птички</a></div>
     <div><h4 data-f>Алина</h4><a href="/ru/sketchbook/" data-f>Скетчбук</a><a href="/ru/about-me/" data-f>Обо мне</a><a href="/ru/on-walls-and-pages/" data-f>На стенах и страницах</a><a href="/ru/projects/" data-f>Обучение и AI</a><a href="/ru/work-with-me/" data-f>Сотрудничество</a><a href="/ru/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
   </div>
-  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="153">v153 · 21.11 14:59</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
+  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="154">v154 · 21.11 15:05</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
 </div></footer>
 </body>
 </html>

@@ -30,16 +30,25 @@
 .hw-door-play .hw-door-lead{color:#D8D2CA}
 .hw-secs{display:grid;margin:14px 0 20px;border-top:1px solid var(--line)}
 .hw-door-play .hw-secs{border-color:rgba(242,237,230,.2)}
-.hw-secs a{display:grid;grid-template-columns:minmax(0,1fr) 20px;gap:2px 12px;align-items:center;padding:11px 0;border-bottom:1px solid var(--line)}
-.hw-door-play .hw-secs a{border-color:rgba(242,237,230,.2)}
-.hw-secs b{font:400 20px/1.2 Fraunces,Lora,serif}
-.hw-secs i{grid-column:1;font-style:normal;font-size:13px;line-height:1.4;color:var(--mut)}
-.hw-door-play .hw-secs i{color:#B9B2AA}
-.hw-secs em{grid-column:2;grid-row:1/3;font-style:normal;color:var(--acc);font-size:16px;transition:transform .15s}
-.hw-door-play .hw-secs em{color:var(--acc2)}
-.hw-secs a:hover b{color:var(--acc)}
-.hw-door-play .hw-secs a:hover b{color:var(--acc2)}
-.hw-secs a:hover em{transform:translateX(3px)}
+.hw-sec{border-bottom:1px solid var(--line)}
+.hw-door-play .hw-sec{border-color:rgba(242,237,230,.2)}
+.hw-sec summary{display:grid;grid-template-columns:minmax(0,1fr) 20px;gap:2px 12px;align-items:center;padding:11px 0;cursor:pointer;list-style:none}
+.hw-sec summary::marker{content:""}
+.hw-sec summary::-webkit-details-marker{display:none}
+.hw-sec summary b{font:400 20px/1.2 Fraunces,Lora,serif}
+.hw-sec summary i{grid-column:1;font-style:normal;font-size:13px;line-height:1.4;color:var(--mut)}
+.hw-door-play .hw-sec summary i{color:#B9B2AA}
+.hw-sec summary em{grid-column:2;grid-row:1/3;font-style:normal;color:var(--acc);font-size:14px;transition:transform .15s}
+.hw-door-play .hw-sec summary em{color:var(--acc2)}
+.hw-sec[open] summary em{transform:rotate(180deg)}
+.hw-sec summary:hover b{color:var(--acc)}
+.hw-door-play .hw-sec summary:hover b{color:var(--acc2)}
+.hw-sub{display:grid;gap:1px;margin:0 0 10px 6px;padding:2px 0 2px 12px;border-left:1.5px dotted var(--line)}
+.hw-door-play .hw-sub{border-color:rgba(242,237,230,.25)}
+.hw-sub a{font:700 12.5px/1.45 Karla,'Nunito Sans',sans-serif;color:var(--mut);padding:4px 0}
+.hw-door-play .hw-sub a{color:#C9C2BA}
+.hw-sub a:hover{color:var(--acc)}
+.hw-door-play .hw-sub a:hover{color:var(--acc2)}
 .hw-door-cta{margin-top:auto}
 .hw-door-play .btn.pri{background:#FBF7F1;border-color:#FBF7F1;color:var(--gr);box-shadow:none}
 .hw-door-play .btn.pri:hover{background:#fff;color:var(--gr)}
