@@ -1,0 +1,297 @@
+<!doctype html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<!-- подтверждение домена в Pinterest (Rich Pins и статистика по сайту); тег должен быть на главной -->
+<meta name="p:domain_verify" content="41461638610c02fdcf8386d46f7dd813">
+<title>Как тут всё устроено · Pigeon Polly Art Lab</title>
+<meta name="description" content="Гид по Pigeon Polly Art Lab для тех, кто здесь впервые: что такое пиксельная птичка, зачем нужны пуговки, что продаётся на птичьем рынке и как пройти путь от первого захода до своей птички и комнаты.">
+<link rel="canonical" href="https://www.pigeonpolly.com/ru/how/">
+<link rel="alternate" hreflang="en" href="https://www.pigeonpolly.com/how/"><link rel="alternate" hreflang="lv" href="https://www.pigeonpolly.com/lv/how/"><link rel="alternate" hreflang="ru" href="https://www.pigeonpolly.com/ru/how/"><link rel="alternate" hreflang="x-default" href="https://www.pigeonpolly.com/how/">
+<script>/* язык: последний выбранный в переключателе (pp_lang) — на всех следующих заходах */(function(){try{var h=document.documentElement.lang,s=localStorage.getItem('pp_lang');if(!s)localStorage.setItem('pp_lang',h);else if(s!==h){var a=document.querySelector('link[rel=alternate][hreflang="'+s+'"]'),u=a&&new URL(a.href);if(u&&u.pathname!==location.pathname)location.replace(u.pathname+location.search+location.hash)}}catch(e){}document.addEventListener('click',function(e){var a=e.target.closest&&e.target.closest('.lang-switch a[hreflang]');if(a)try{localStorage.setItem('pp_lang',a.getAttribute('hreflang'))}catch(e){}})})();</script>
+<script>/* сезон: по дате (дек–фев зима, мар–май весна, июн–авг лето, сен–ноя осень) или выбранный вручную (pp_season) */(function(){var m=new Date().getMonth(),s=['winter','winter','spring','spring','spring','summer','summer','summer','autumn','autumn','autumn','winter'][m];try{var v=localStorage.getItem('pp_season');if(/^(winter|spring|summer|autumn)$/.test(v||''))s=v}catch(e){}document.documentElement.setAttribute('data-season',s)})();</script>
+<meta property="og:title" content="How it works · Pigeon Polly Art Lab">
+<meta property="og:description" content="Гид по Pigeon Polly Art Lab для тех, кто здесь впервые: что такое пиксельная птичка, зачем нужны пуговки, что продаётся на птичьем рынке и как пройти путь от первого захода до своей птички и комнаты.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://www.pigeonpolly.com/ru/how/">
+<meta property="og:locale" content="ru_RU"><meta property="og:locale:alternate" content="en_US"><meta property="og:locale:alternate" content="lv_LV">
+<meta property="og:site_name" content="Pigeon Polly Art Lab">
+<meta property="og:image" content="https://www.pigeonpolly.com/images/og/home-ru.jpg?v=f62ff905">
+<meta property="og:image:width" content="1200">
+<meta property="og:image:height" content="630">
+<meta property="og:image:alt" content="Как тут всё устроено · Pigeon Polly Art Lab">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:image" content="https://www.pigeonpolly.com/images/og/home-ru.jpg?v=f62ff905">
+<link rel="icon" href="/assets/favicon.png?v=3" type="image/png" sizes="32x32">
+<link rel="apple-touch-icon" href="/assets/apple-touch-icon.png?v=3">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="/assets/fraunces.css?v=21446b03">
+<link href="https://fonts.googleapis.com/css2?family=Karla:wght@400;500;700&family=Caveat:wght@700&family=Lora:ital,wght@0,400;0,600;1,400&family=Nunito+Sans:wght@400;600;700&family=Special+Elite&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="/assets/v2.css?v=1cb6e811">
+<link rel="stylesheet" href="/assets/v2-acct.css?v=f9f748a5">
+<link rel="stylesheet" href="/assets/v2-shell.css?v=9f777558">
+<link rel="stylesheet" href="/assets/tarot.css?v=4af80b95">
+<!-- шапка как на остальных страницах: вход, меню аватара, пуговки, корзина, колокольчик, поиск (стили — v2-acct.css из tools/v2_acct_css.py) -->
+<script>/* вход: /api/whoami сразу, параллельно с загрузкой скриптов — account.js возьмёт ответ (PPWhoP) */try{if(!/devdate=/.test(location.search)&&!sessionStorage.getItem('pp-devdate'))window.PPWhoP=fetch('/api/whoami',{credentials:'same-origin'}).then(function(r){return r.ok?r.json():null}).catch(function(){return null})}catch(e){}</script>
+<script src="/assets/birds.js?v=c4476bda" defer></script>
+<script src="/assets/room.js?v=dfd6fe8d" defer></script>
+<script src="/assets/toast.js?v=93392a35" defer></script>
+<script src="/assets/day-card.js?v=d0702261" defer></script>
+<script src="/assets/hatch.js?v=6d36422a" defer></script>
+<script src="/assets/cart.js?v=553808d0" defer></script>
+<script src="/assets/account.js?v=383f13aa" defer></script>
+<script src="/assets/news.js?v=1d2af66b" defer></script>
+<script src="/assets/search.js?v=fd80358d" defer></script>
+<script src="/assets/emoji-art.js?v=6375cb5b" defer></script>
+<script src="/assets/tarot.js?v=73776cba" defer></script>
+<script src="/assets/v2.js?v=cc8a542a" defer></script>
+<script src="/assets/polly.js?v=9077e6a9" defer></script>
+</head>
+<body class="v2 v2s">
+<style>/* Полли клюёт семечки, пока грузится страница (src/polly-loader.html, вставляет build.py во все шаблоны). Вид — редизайн 2.0: бумага и акцент сезона (html[data-season], как site/assets/v2.css) */
+#pp-load{--lb:#F4F0EA;--ls:#FBF9F5;--li:#2A211C;--lm:#6C6058;--ll:#DED5CA;--la:#22405F;position:fixed;inset:0;z-index:9999;display:none;flex-direction:column;align-items:center;justify-content:center;gap:22px;background:var(--lb);color:var(--li);font:500 15px/1.4 Karla,'Nunito Sans',system-ui,sans-serif;text-align:center;padding:16px;opacity:1;transition:opacity .35s}
+html[data-season=winter] #pp-load{--lb:#EEF1F3;--ls:#F8FAFB;--li:#1C2430;--lm:#5D6670;--ll:#D3DAE0;--la:#9E1B22}
+html[data-season=spring] #pp-load{--lb:#F1F4F0;--ls:#FAFBF9;--li:#1F2A25;--lm:#5E6A63;--ll:#D4DDD6;--la:#BE2F3A}
+html[data-season=summer] #pp-load{--lb:#F7F4EE;--ls:#FFFDFA;--li:#2A2420;--lm:#6D635B;--ll:#E3DACE;--la:#1F7FAE}
+html.pp-loading #pp-load{display:flex}
+#pp-load.out{opacity:0;pointer-events:none}
+#pp-load .pl-c{position:relative;padding:18px 18px 14px;background:var(--ls);border:1px solid var(--ll);border-radius:4px;transform:rotate(-2deg);box-shadow:0 18px 36px -18px rgba(40,30,20,.35)}
+#pp-load .pl-c:before{content:"";position:absolute;left:50%;top:-11px;width:78px;height:22px;margin-left:-39px;background:color-mix(in srgb,var(--la) 22%,#fff);opacity:.8;transform:rotate(3deg)}
+#pp-load svg{display:block;width:150px;height:auto;overflow:visible;shape-rendering:crispEdges}
+#pp-load .pl-k{font:700 11px Karla,'Nunito Sans',sans-serif;letter-spacing:.22em;text-transform:uppercase;color:var(--la)}
+#pp-load .pl-t{font:italic 300 22px/1.3 Fraunces,Lora,Georgia,serif;max-width:22em;color:var(--li)}
+#pp-load .pl-b{transform-box:fill-box;transform-origin:50% 95%;animation:pl-peck 1.2s steps(3) infinite}
+#pp-load .pl-s{animation:6s linear infinite}
+@keyframes pl-peck{0%,30%,55%,100%{transform:none}40%{transform:translateY(1.4px) rotate(50deg)}}
+#pp-load .pl-d i{display:inline-block;animation:pl-dot 1.2s infinite;font-style:normal;color:var(--la)}
+#pp-load .pl-d i:nth-child(2){animation-delay:.2s}#pp-load .pl-d i:nth-child(3){animation-delay:.4s}
+@keyframes pl-dot{0%,60%,100%{opacity:.25}30%{opacity:1}}
+@media (max-width:480px){#pp-load .pl-t{font-size:19px}}
+@media (prefers-reduced-motion:reduce){#pp-load .pl-b,#pp-load .pl-s,#pp-load .pl-d i{animation:none}}
+</style>
+<div id="pp-load" aria-hidden="true"></div>
+<script>(function(){
+var d=document,h=d.documentElement,el=d.getElementById('pp-load');if(!el)return;
+var L={en:'Polly is pecking seeds while the page loads',ru:'Полли клюёт семечки, пока грузится страница',lv:'Polly knābā sēkliņas, kamēr lapa ielādējas'};
+var B=['......ddd.....','.....dbbbd....','....dbbwwbd...','....dbbwkbdoo.','....dbbbbbdo..','...dbbbbbbd...','..dbbsbbbbd...','.dbbssbbbbd...','dbbssbbbbbd...','dbbbbbbbbd....','.ddbbbbbdd....','...ddddd......','....o..o......','...oo.oo......'];
+/* цвета — как на логотипе (site/assets/logo.png) */var C={d:'#1e1a26',b:'#4c4369',s:'#3b3352',w:'#fbf5ec',k:'#1e1a26',o:'#e8782e'},r='',x,y;
+var lg='';for(y=0;y<B.length;y++)for(x=0;x<14;x++){var c=C[B[y][x]];if(c){var q='<rect x="'+x+'" y="'+y+'" width="1" height="1" fill="'+c+'"/>';if(y<12)r+=q;else lg+=q}}
+/* 4 семечки: падают сверху, Полли склёвывает по одной (время клевка — 40% от 1.2 с) */
+var S=[[15,13.1],[16.6,13.3],[15.8,13.5],[17.4,13.1]],s='',k='';
+S.forEach(function(p,i){var t=(27+i*20);
+k+='@keyframes pl-s'+i+'{0%{opacity:0;transform:translateY(-9px)}'+(2+i)+'%{opacity:0;transform:translateY(-9px)}'+(7+i)+'%,'+(t-1)+'%{opacity:1;transform:none}'+t+'%,100%{opacity:0;transform:none}}';
+s+='<g class="pl-s" style="animation-name:pl-s'+i+'"><rect x="'+p[0]+'" y="'+p[1]+'" width="1.4" height=".85" rx=".3" fill="#3b3352"/><rect x="'+(p[0]+.3)+'" y="'+(p[1]+.3)+'" width=".8" height=".25" fill="#fbf5ec"/></g>'});
+var st=d.createElement('style');st.textContent=k;el.appendChild(st);
+el.insertAdjacentHTML('beforeend','<div class="pl-c"><svg viewBox="-2 -5 23 21"><rect x="-.5" y="14" width="20" height=".4" fill="#3b3352" opacity=".35"/>'+s+lg+'<g class="pl-b">'+r+'<path d="M5 0h5v-1h-1v-1h-3v1h-1z" fill="#c2305c"/><rect x="7" y="-2.6" width=".6" height=".6" fill="#1e1a26"/></g></svg></div><div class="pl-k">Pigeon Polly Art Lab</div><div class="pl-t">'+(L[h.lang]||L.en)+'<span class="pl-d"><i>.</i><i>.</i><i>.</i></span></div>');
+/* показываем, только если загрузка заметная (дольше 0,35 с); прячем по load, но не дольше 4 с после DOMContentLoaded */
+var done=0,on=0,tm=setTimeout(function(){if(!done){on=1;h.classList.add('pp-loading')}},350);
+function hide(){if(done)return;done=1;clearTimeout(tm);if(!on)return;el.classList.add('out');setTimeout(function(){h.classList.remove('pp-loading')},400)}
+addEventListener('load',hide);d.addEventListener('DOMContentLoaded',function(){setTimeout(hide,4000)});el.addEventListener('click',hide);
+addEventListener('pageshow',function(e){if(e.persisted)hide()});
+})();</script>
+
+<a class="skip" href="#main">Перейти к содержанию</a>
+<header class="hd2"><div class="w">
+  <a class="lg" href="/ru/"><span class="lg-m" aria-hidden="true"></span><span>Pigeon Polly <i>Art Lab</i></span></a>
+  <div class="td" id="td" hidden><button type="button" class="td-b" id="td-b" aria-haspopup="dialog" aria-label="Bird tarot"><span class="td-st" aria-hidden="true"><i></i><i></i><i></i></span><b class="td-n" id="td-n" hidden>1</b></button></div>
+  <nav class="nv" aria-label="Main">
+    <div class="nr"><button type="button" class="nr-b" aria-expanded="false"><small>Кабинет 511</small><span>Арт</span></button><div class="nr-d"><p class="nr-h"><em>Кабинет 511</em> — Арт</p><a class="nr-a" href="/ru/blog/">Арт-заметки</a><a class="nr-a" href="/ru/learn/">Уроки</a><a class="nr-a" href="/ru/challenge/">Челлендж</a><a class="nr-a" href="/ru/books/">Книги</a><a class="nr-a" href="/ru/freebies/">Бесплатно</a><a class="nr-a" href="/ru/palettes/">Палитры</a><a class="nr-a" href="/ru/sketchbook/">Скетчбук</a></div></div>
+    <div class="nr"><button type="button" class="nr-b" aria-expanded="false"><small>Кабинет 781</small><span>Игры</span></button><div class="nr-d"><p class="nr-h"><em>Кабинет 781</em> — Игры</p><a class="nr-a" href="/ru/games/">Все игры</a><a class="nr-a" href="/ru/shop/">Птичий рынок</a><a class="nr-a" href="/ru/titos/">Детектив Титос</a><a class="nr-a" href="/ru/wobbleland/">Воббленд</a></div></div>
+    <a class="nr-b" href="/ru/norway/"><small>Кабинет 811</small><span>Полли в Норвегии</span></a>
+    <div class="nr"><button type="button" class="nr-b" aria-expanded="false"><small>Кабинет 101</small><span>Директор</span></button><div class="nr-d"><p class="nr-h"><em>Кабинет 101</em> — Директор</p><a class="nr-a" href="/ru/about-me/">Обо мне</a><a class="nr-a" href="/ru/work-with-me/">Связаться</a><a class="nr-a" href="/ru/about-me/#am-desk">Поболтать</a></div></div>
+  </nav>
+  <div class="hr">
+    <button type="button" class="search-btn" aria-label="Поиск по сайту"><svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" stroke-width="2.2"/><path d="M15.5 15.5 21 21" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"/></svg></button>
+    <a class="help-q" href="/ru/how/" aria-label="Как тут всё устроено" title="Как тут всё устроено"><span aria-hidden="true">?</span></a>
+    <div class="lang2"><button type="button" class="lang-b" aria-expanded="false" aria-controls="lang-m" aria-label="Language">RU</button><div class="lang-m" id="lang-m" hidden><nav class="lang-switch" aria-label="Language"><a href="/how/" hreflang="en" lang="en"><b>EN</b>English</a><a href="/lv/how/" hreflang="lv" lang="lv"><b>LV</b>Latviešu</a><a href="/ru/how/" hreflang="ru" lang="ru" aria-current="true"><b>RU</b>Русский</a></nav></div></div>
+    <div class="sea2"><button type="button" class="sea-b" aria-expanded="false" aria-controls="sea-m" title="Сезон" aria-label="Сезон"><i></i></button><div class="sea-m" id="sea-m" hidden><span class="switch" role="group" aria-label="Сезон"><button type="button" data-s="winter" title="Зима" aria-label="Зима"><i></i>Зима</button><button type="button" data-s="spring" title="Весна" aria-label="Весна"><i></i>Весна</button><button type="button" data-s="summer" title="Лето" aria-label="Лето"><i></i>Лето</button><button type="button" data-s="autumn" title="Осень" aria-label="Осень"><i></i>Осень</button></span></div></div>
+    <a class="hd-btns" id="hd-btns" href="/ru/shop/" hidden aria-label="Пуговки · рынок"><span aria-hidden="true">🔘</span> <b></b></a>
+    <a class="hd-cart bell" id="hd-cart" href="/ru/shop/#cart" hidden aria-label="Cart"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 4h2.5l2.2 10.5h10L20 7H7" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" stroke-linecap="round"/><circle cx="9.5" cy="19" r="1.6" fill="currentColor"/><circle cx="16.5" cy="19" r="1.6" fill="currentColor"/></svg><b class="bell-n" hidden></b></a>
+    <button type="button" class="bell" id="pp-bell" hidden aria-label="News"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M6 17V11a6 6 0 0 1 12 0v6l2 2H4z" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"/><path d="M10 21h4" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"/></svg><b class="bell-n" hidden></b></button>
+    <div class="acct" id="acct"></div>
+    <button type="button" class="burger" aria-expanded="false" aria-controls="drawer" aria-label="Меню">☰</button>
+  </div>
+</div>
+<div class="drawer" id="drawer" hidden><div class="w">
+  <a class="dr-help" href="/ru/how/"><b aria-hidden="true">?</b>Как тут всё устроено</a>
+  <details class="dr-nr"><summary><small>Кабинет 511</small>Арт</summary><div><a class="nr-a" href="/ru/blog/">Арт-заметки</a><a class="nr-a" href="/ru/learn/">Уроки</a><a class="nr-a" href="/ru/challenge/">Челлендж</a><a class="nr-a" href="/ru/books/">Книги</a><a class="nr-a" href="/ru/freebies/">Бесплатно</a><a class="nr-a" href="/ru/palettes/">Палитры</a><a class="nr-a" href="/ru/sketchbook/">Скетчбук</a></div></details>
+  <details class="dr-nr"><summary><small>Кабинет 781</small>Игры</summary><div><a class="nr-a" href="/ru/games/">Все игры</a><a class="nr-a" href="/ru/shop/">Птичий рынок</a><a class="nr-a" href="/ru/titos/">Детектив Титос</a><a class="nr-a" href="/ru/wobbleland/">Воббленд</a></div></details>
+  <a class="dr-nr dr-l" href="/ru/norway/"><small>Кабинет 811</small>Полли в Норвегии</a>
+  <details class="dr-nr"><summary><small>Кабинет 101</small>Директор</summary><div><a class="nr-a" href="/ru/about-me/">Обо мне</a><a class="nr-a" href="/ru/work-with-me/">Связаться</a><a class="nr-a" href="/ru/about-me/#am-desk">Поболтать</a></div></details>
+  <nav class="lang-switch" aria-label="Language"><a href="/how/" hreflang="en" lang="en">EN</a><a href="/lv/how/" hreflang="lv" lang="lv">LV</a><a href="/ru/how/" hreflang="ru" lang="ru" aria-current="true">RU</a></nav>
+    <span class="switch sw-m" role="group" aria-label="Сезон"><button type="button" data-s="winter" title="Зима" aria-label="Зима"></button><button type="button" data-s="spring" title="Весна" aria-label="Весна"></button><button type="button" data-s="summer" title="Лето" aria-label="Лето"></button><button type="button" data-s="autumn" title="Осень" aria-label="Осень"></button></span>
+</div></div>
+</header>
+<main id="main">
+<link rel="stylesheet" href="/assets/how.css?v=68e18a41">
+<section data-ppb="how.1" class="hw-hero"><div class="w">
+  <div class="hw-hero-tx">
+    <span class="k">гид на первые пять минут</span>
+    <h1>Что это за <em>место</em>?</h1>
+    <p class="hw-lead">Pigeon Polly Art Lab — это тихая художественная мастерская и маленький пиксельный мир рядом. Смотрите картины и уроки бесплатно — или вылупите птичку, заработайте пуговки и начните жить в Лаборатории.</p>
+    <p class="hw-free"><span>Бесплатно</span> · смотреть можно без входа · пуговки зарабатывают, их не покупают</p>
+    <div class="hw-ctas">
+      <a class="btn pri" href="/ru/flock/" data-how-join>Вылупите свою птичку</a>
+      <a class="btn" href="#minute">Показать за минуту ↓</a>
+    </div>
+  </div>
+  <figure class="hw-post">
+    <span class="hw-tape" aria-hidden="true"></span>
+    <img src="/images/how/flock.jpg" alt="Пиксельные птички стаи на скамейке" width="420" height="300">
+    <figcaption>стая — пиксельные птички на скамейке</figcaption>
+  </figure>
+</div></section>
+
+<section data-ppb="how.2" class="hw-route"><div class="w">
+  <p class="hw-flow" aria-label="Путь по сайту"><span>осмотреться</span><i aria-hidden="true">→</i><span>вылупить птичку</span><i aria-hidden="true">→</i><span>заработать пуговки</span><i aria-hidden="true">→</i><span>заглянуть на птичий рынок</span><i aria-hidden="true">→</i><span>вернуться завтра</span></p>
+</div></section>
+
+<section data-ppb="how.3" class="hw-minute" id="minute"><div class="w">
+  <div class="hw-h"><span class="k">три слова, без которых никак</span><h2>За одну минуту</h2></div>
+  <div class="hw-keys">
+    <article class="hw-key">
+      <span class="hw-ico" aria-hidden="true">🐦</span>
+      <h3>Ваша птичка</h3>
+      <p>Маленький пиксельный голубь, только ваш. Он появляется, когда вы входите на сайт и выбираете ник, — бесплатно, примерно за минуту. Он гуляет по своей комнате, носит шапки и шарфы, держит в клюве пончик и живёт в Стае вместе с другими птичками.</p>
+    </article>
+    <article class="hw-key">
+      <span class="hw-ico" aria-hidden="true">🔘</span>
+      <h3>Пуговки</h3>
+      <p>Единственные деньги здесь — и купить их нельзя. Их зарабатывают: +3 за первый заход за день, +10 за рисунок в челлендже дня, ещё — за игры, огород, мелкие дела и приглашения. Пуговки — для птичек: чтобы их копить, нужно войти.</p>
+    </article>
+    <article class="hw-key">
+      <span class="hw-ico" aria-hidden="true">🛍</span>
+      <h3>Птичий рынок</h3>
+      <p>Магазин, но только для птичьих вещей: шапки, шарфы, обувь, рамки, фоны, мебель, обои, семена и карточки. Цены — в пуговках. Вещей ограниченное количество, поэтому цена растёт, когда вещь почти закончилась.</p>
+    </article>
+  </div>
+</div></section>
+
+<section data-ppb="how.4" class="hw-steps"><div class="w">
+  <div class="hw-h"><span class="k">весь путь целиком</span><h2>Как всё идёт, шаг за шагом</h2></div>
+  <ol class="hw-way">
+    <li>
+      <span class="hw-n" aria-hidden="true">1</span>
+      <div>
+        <h3>Сначала осмотритесь</h3>
+        <p>Бесплатные уроки, журнал, книги, палитры, заставки и стена челленджа открыты всем. Здесь можно провести час и ни разу не войти — это нормально.</p>
+        <a href="/ru/learn/">Открыть уроки →</a>
+      </div>
+    </li>
+    <li>
+      <span class="hw-n" aria-hidden="true">2</span>
+      <div>
+        <h3>Вылупите птичку</h3>
+        <p>Войдите через Google или с почтой и паролем, выберите ник (🎲 подбросит случайный). Птичка вылупляется, приходит маленький подарок на старт, и в кармане появляются первые пуговки.</p>
+        <a href="/ru/flock/">Посмотреть Стаю →</a>
+      </div>
+    </li>
+    <li>
+      <span class="hw-n" aria-hidden="true">3</span>
+      <div>
+        <h3>Заработайте первые пуговки</h3>
+        <p>+3 просто за то, что зашли сегодня. Нарисуйте тему дня и загрузите рисунок: +10. Пара минут «Пуговичного дождя», огород, дела Титоса, комментарии и приглашения добавят ещё.</p>
+        <a href="/ru/rain/">Играть в «Пуговичный дождь» →</a>
+      </div>
+    </li>
+    <li>
+      <span class="hw-n" aria-hidden="true">4</span>
+      <div>
+        <h3>Потратьте их на птичьем рынке</h3>
+        <p>Шапки, шарфы, вещи для комнаты и карточки. Наденьте вещь на птичку или поставьте в комнату — вещи в комнате можно двигать как угодно. Одну и ту же вещь можно иметь до трёх штук, легендарную — только одну.</p>
+        <a href="/ru/shop/">Открыть птичий рынок →</a>
+      </div>
+    </li>
+    <li>
+      <span class="hw-n" aria-hidden="true">5</span>
+      <div>
+        <h3>Вернитесь завтра</h3>
+        <p>Карточка дня даёт маленькие задания и штампы. Серия растёт, пока рисуете каждый день, огород просит воды, на рынке появляются новые вещи. Пропустите неделю — ничего не потеряется: птичка подождёт.</p>
+        <a href="/ru/challenge/">Посмотреть тему дня →</a>
+      </div>
+    </li>
+  </ol>
+</div></section>
+
+<section data-ppb="how.5" class="hw-words"><div class="w">
+  <div class="hw-h"><span class="k">маленький словарик</span><h2>Что значат слова</h2></div>
+  <dl class="hw-dl">
+    <div><dt>Птичка</dt><dd>Ваш пиксельный голубь. Полли — нарисованный герой картин и книг; ваша птичка — маленькая пиксельная родственница из того же мира.</dd></div>
+    <div><dt>Стая</dt><dd>Все птички живут на одной стене: <a href="/ru/flock/">Стая</a>. Загляните в чью-нибудь комнату и оставьте пёрышко.</dd></div>
+    <div><dt>Пуговки</dt><dd>Деньги сайта. Их зарабатывают, когда заходят, рисуют и играют; картой их не купить.</dd></div>
+    <div><dt>Птичий рынок</dt><dd>Магазин для птички и её комнаты. Ничего не присылают: всё пиксельное и остаётся на сайте.</dd></div>
+    <div><dt>Сумка</dt><dd>Здесь ждут купленные и подаренные вещи. Из сумки они отправляются на птичку или в комнату.</dd></div>
+    <div><dt>Комната</dt><dd>Пиксельная комната птички: обои, пол, вид из окна, шторы, мебель, украшения. В доме шесть комнат; некоторые открываются чуть позже.</dd></div>
+    <div><dt>Огород</dt><dd>За домом. Сажайте семена, поливайте каждый день, ловите жуков и продавайте урожай за пуговки.</dd></div>
+    <div><dt>Челлендж дня</dt><dd>Новая тема каждый день: нарисуйте, загрузите и увидьте рисунок на стене. Рисунок в день — и серия жива.</dd></div>
+    <div><dt>Карточки</dt><dd>Коллекционные пиксельные карточки. Каждая существует в единственном экземпляре на всём сайте, так что карточка в сумке — единственная такая.</dd></div>
+    <div><dt>Смена с Полли</dt><dd>Таймер для работы с пиксельным офисом. Работайте рядом с Полли, и каждый полный час приносит повышение и пуговки.</dd></div>
+  </dl>
+</div></section>
+
+<section data-ppb="how.6" class="hw-more"><div class="w">
+  <div class="hw-h"><span class="k">за углом</span><h2>А если захочется большего</h2></div>
+  <div class="hw-more-g">
+    <a href="/ru/games/">🎮 Игры<small>девять маленьких игр, все бесплатные</small></a>
+    <a href="/ru/titos/">🕵️ Детектив Титос<small>100 дел и кофейник</small></a>
+    <a href="/ru/garden/">🥕 Огород птички<small>семена, вода, урожай</small></a>
+    <a href="/ru/wobbleland/">🗺 Воббленд<small>одиннадцать городков</small></a>
+    <a href="/ru/shop/#cards">🃏 Карточки<small>по одной на весь сайт</small></a>
+    <a href="/ru/challenge/">✏️ Челлендж дня<small>один маленький рисунок в день</small></a>
+  </div>
+</div></section>
+
+<section data-ppb="how.7" class="hw-qa"><div class="w">
+  <div class="hw-h"><span class="k">честные ответы</span><h2>Если интересно…</h2></div>
+  <div class="hw-faq">
+    <details><summary>Нужно ли входить на сайт?</summary><p>Нет. Уроки, журнал, книги, палитры, заставки и стена челленджа открыты всем. Птичке нужен вход: Google или почта с паролем. И то и другое бесплатно.</p></details>
+    <details><summary>Это правда бесплатно?</summary><p>Да. Пуговки нельзя купить, и на сайте ничего не продаётся за деньги. Мои книги есть на Amazon — это отдельная, настоящая полка.</p></details>
+    <details><summary>Мне придёт посылка?</summary><p>Нет. Птичий рынок — пиксельный магазин: шапки, мебель и карточки для птички. Ничего не отправляют почтой.</p></details>
+    <details><summary>Вы будете мне писать?</summary><p>Только если попросите. Есть письмо о новой книге — на него можно подписаться на главной. У писем из Лаборатории (новости, напоминания об огороде, новое дело) своя галочка в профиле, и её можно выключить в любой момент.</p></details>
+    <details><summary>А если я пропущу неделю?</summary><p>Ничего не пропадёт. Птичка подождёт, огород, может быть, попросит воды, серия начнётся заново с единицы — а заработанные пуговки останутся с вами.</p></details>
+    <details><summary>Сколько это занимает времени?</summary><p>Две минуты на ежедневный заход, от пяти до пятнадцати — на рисунок. Таймера нет, терять нечего.</p></details>
+  </div>
+</div></section>
+
+<section data-ppb="how.8" class="hw-end"><div class="w">
+  <span class="hand">вот и всё ✿</span>
+  <h2>Заходите, дверь открыта</h2>
+  <p>Начните с рисунка или с птички. И то и другое бесплатно, и ни то ни другое не спешит.</p>
+  <div class="hw-ctas">
+    <a class="btn pri" href="/ru/flock/" data-how-join>Вылупите свою птичку</a>
+    <a class="btn" href="/ru/learn/">Начать с бесплатного урока</a>
+  </div>
+</div></section>
+<script>
+(function () {
+  document.querySelectorAll('[data-how-join]').forEach(function (a) {
+    a.addEventListener('click', function (e) {
+      if (!window.PPAccount || window.PPAccount.signedIn()) return;
+      e.preventDefault();
+      window.PPAccount.openSignIn();
+    });
+  });
+})();
+</script>
+
+</main>
+<footer class="ft2"><div class="w">
+  <!-- подвал: все страницы сайта по разделам (11.11, просьба Алины); подписи — ключи data-f>…< в content/i18n -->
+  <div class="cols">
+    <div class="intro"><h4>Pigeon Polly <em>Art Lab</em></h4><p>Уроки акварели и туши, творческие гайды и маленький мир нарисованных героев, сделано в Риге.</p>
+      <a class="ft-how" href="/ru/how/" data-f>Впервые здесь? Как тут всё устроено →</a>
+      <div class="soc"><a href="https://www.patreon.com/cw/pigeon_polly" target="_blank" rel="noopener">Patreon</a><a href="https://www.instagram.com/pigeonpolly" target="_blank" rel="noopener">Instagram</a><a href="https://www.tiktok.com/@pigeonpolly" target="_blank" rel="noopener">TikTok</a><a href="https://www.pinterest.com/pigeonpollyart/" target="_blank" rel="noopener">Pinterest</a></div>
+      <a class="ft-friend" href="https://libertas.study/" target="_blank" rel="noopener" data-f><span>Наши друзья:</span><img src="/images/train/libertas.png" alt="Libertas.study" width="86" height="35" loading="lazy"></a></div>
+    <div><h4 data-f>Учиться</h4><a href="/ru/learn/" data-f>Уроки</a><a href="/ru/books/" data-f>Книги</a><a href="/ru/blog/" data-f>Журнал</a><a href="/ru/freebies/" data-f>Бесплатно</a><a href="/ru/palettes/" data-f>Палитры</a><a href="/ru/polly-helps/" data-f>Смотри на мир как художник</a></div>
+    <div><h4 data-f>Игры</h4><a href="/ru/games/" data-f>Все игры</a><a href="/ru/shop/" data-f>Птичий рынок</a><a href="/ru/advent/" data-f>Адвент</a><a href="/ru/rain/" data-f>Пуговичный дождь</a><a href="/ru/potions/" data-f>Зельеварня</a><a href="/ru/pancakes/" data-f>Блинная Полли</a><a href="/ru/train/" data-f>Поезд Полли</a><a href="/ru/titos/" data-f>Детектив Титос</a><a href="/ru/shift/" data-f>Смена с Полли</a><a href="/ru/polly-office/" data-f>Офис Полли</a><a href="/ru/wobbleland/" data-f>Воббленд</a></div>
+    <div><h4 data-f>Стая</h4><a href="/ru/flock/" data-f>Все птички</a><a href="/ru/flock/news/" data-f>Новости стаи</a><a href="/ru/challenge/" data-f>Челлендж дня</a><a href="/ru/challenge/#sw-wall" data-f>Рисунки стаи</a><a href="/ru/requests/" data-f>Нарисуй мне</a><a href="/ru/garden/" data-f>Огород птички</a></div>
+    <div><h4 data-f>Алина</h4><a href="/ru/sketchbook/" data-f>Скетчбук</a><a href="/ru/about-me/" data-f>Обо мне</a><a href="/ru/on-walls-and-pages/" data-f>На стенах и страницах</a><a href="/ru/projects/" data-f>Обучение и AI</a><a href="/ru/work-with-me/" data-f>Сотрудничество</a><a href="/ru/art-pill/" data-f>Art-Pill by Polly</a><a href="https://lv.linkedin.com/in/otkinska" target="_blank" rel="noopener" data-f>LinkedIn</a><a href="https://www.amazon.com/stores/Alina-Otkinska/author/B0FTMCBTQJ" target="_blank" rel="noopener" data-f>Amazon</a></div>
+  </div>
+  <div class="bt"><span>© 2026 Алина Откинская · Pigeon Polly Art Lab · Рига</span><span class="ver" data-ver="146">v146 · 21.11 14:21</span><span><a href="/ru/privacy/">Конфиденциальность</a></span></div>
+</div></footer>
+</body>
+</html>
+
+

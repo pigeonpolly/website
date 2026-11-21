@@ -30,6 +30,8 @@ html[data-season=summer] .v2s .hd2,html[data-season=summer] .v2s .ft2{--bg:#F7F4
 .v2s .ft2 .cols a{display:block}.v2s .ft2 .cols a:hover{color:var(--acc)}
 .v2s .ft2 .intro p{max-width:24em;line-height:1.6;margin-bottom:16px}
 .v2s .ft2 .soc{display:flex;gap:10px;flex-wrap:wrap}.v2s .ft2 .soc a{border:1px solid var(--line);border-radius:999px;padding:2px 14px;line-height:2}
+.v2s .ft2 .cols a.ft-how{display:inline-flex;align-items:center;gap:6px;margin:-4px 0 6px;font:700 13px Karla,'Nunito Sans',sans-serif;color:var(--acc);border-bottom:1.5px solid color-mix(in srgb,var(--acc) 35%,transparent);line-height:1.5}
+.v2s .ft2 .cols a.ft-how:hover{color:var(--acc);border-color:var(--acc)}
 .v2s .ft2 .bt{display:flex;justify-content:space-between;gap:16px;flex-wrap:wrap;border-top:1px solid var(--line);margin-top:40px;padding-top:18px;font-size:12px;color:var(--mut)}
 .v2s .ft2 .bt a{text-decoration:underline}
 
@@ -52,6 +54,10 @@ html[data-season=summer] .v2s .hd2,html[data-season=summer] .v2s .ft2{--bg:#F7F4
  .v2s .drawer .sw-m{display:flex;gap:12px;margin-top:16px}.v2s .drawer .sw-m button{width:22px;height:22px}
  .v2s .ft2 .cols{grid-template-columns:1fr 1fr}.v2s .ft2 .cols>div:first-child{grid-column:1/-1}
 }
+/* «?» в шапке → /how/; на телефоне место дорого — та же ссылка первой строкой в меню ☰ */
+.v2s .drawer .dr-help{display:flex;align-items:center;gap:10px;padding:4px 0 14px;font:700 12px Karla,'Nunito Sans',sans-serif;letter-spacing:.16em;text-transform:uppercase;color:var(--acc)}
+.v2s .drawer .dr-help b{width:26px;height:26px;flex:none;display:grid;place-items:center;border:1.5px solid currentColor;border-radius:50%;font:400 16px/1 Fraunces,Lora,serif;letter-spacing:0}
+@media (max-width:520px){.v2s .hd2 .hr .help-q{display:none}}
 @media (max-width:380px){.v2s .lg span:not(.lg-m){display:none}}
 body.v2s{padding-top:0}
 .v2s .hd2 .lang-switch a{background:none;border:0;box-shadow:none;border-radius:0;font-size:14px}
@@ -93,8 +99,11 @@ html[data-season=summer] body.v2s:has(.wl-map){--wlbg:#2F2622}
 .v2s .hr .search-btn{order:0;margin:0;width:36px;height:36px;border:1.5px solid var(--line);color:var(--ink);background:none}
 .v2s .hr .search-btn:hover{background:var(--sheet);border-color:var(--ink)}
 .v2s .hr .search-btn+.lang-switch{margin-left:0}
+/* «?» в шапке → страница для новичков /how/ */
+.v2s .hd2 .hr .help-q{order:2;flex:none;display:grid;place-items:center;width:36px;height:36px;border:1.5px solid var(--line);border-radius:50%;color:var(--ink);font:400 20px/1 Fraunces,Lora,serif;text-decoration:none}
+.v2s .hd2 .hr .help-q:hover{background:var(--sheet);border-color:var(--ink)}
 .v2s .hr .hd-cart{color:var(--ink)}
-@media (max-width:700px){.v2s .hr .search-btn{width:32px;height:32px}}
+@media (max-width:700px){.v2s .hr .search-btn{width:32px;height:32px}.v2s .hd2 .hr .help-q{width:32px;height:32px;font-size:18px}}
 /* Часть Д: внутри старых страниц — вместо фиолетового графит сезона и его акцент (tools/v2_recolor.py заменил цвета style.css на --pp-*) */
 :root{--pp-accd:#22405F;--pp-ink:#2E2521;--pp-deep:#1F1916;--pp-card:#3A302B;--pp-2:#5C4D44;--pp-acc:#93AFCC}
 html[data-season=winter]{--pp-accd:#9E1B22;--pp-ink:#26303A;--pp-deep:#19212A;--pp-card:#313C47;--pp-2:#4C5A68;--pp-acc:#E2544A}

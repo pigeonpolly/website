@@ -4,8 +4,8 @@
 #       sym — имя в коде; doc — раздел docs/*.md.
 # Читать целиком не нужно: grep по нужному виду, или python3 tools/index.py find СЛОВО / where ФАЙЛ.
 # Свежесть: python3 tools/index.py check (перед пушем).
-# файлов 417, страниц 55, маршрутов 216, таблиц 76, ключей meta 68, имён 5684, разделов доков 245
-file	build.py	build.py	0	890 строк, 60 КБ
+# файлов 421, страниц 56, маршрутов 216, таблиц 76, ключей meta 68, имён 5707, разделов доков 246
+file	build.py	build.py	0	892 строк, 61 КБ
 file	content/english/a1.js	content/english/a1.js	0	239 строк, 45 КБ
 file	content/english/a2.js	content/english/a2.js	0	229 строк, 46 КБ
 file	content/english/b1.js	content/english/b1.js	0	262 строк, 69 КБ
@@ -66,20 +66,20 @@ file	docs/db.md	docs/db.md	0	157 строк, 16 КБ
 file	docs/flock.md	docs/flock.md	0	35 строк, 16 КБ
 file	docs/freebies.md	docs/freebies.md	0	10 строк, 5 КБ
 file	docs/games.md	docs/games.md	0	91 строк, 37 КБ
-file	docs/growth.md	docs/growth.md	0	89 строк, 14 КБ
+file	docs/growth.md	docs/growth.md	0	93 строк, 15 КБ
 file	docs/history.md	docs/history.md	0	105 строк, 25 КБ
 file	docs/index.md	docs/index.md	0	44 строк, 5 КБ
 file	docs/ink.md	docs/ink.md	0	52 строк, 29 КБ
-file	docs/map.md	docs/map.md	0	369 строк, 74 КБ
-file	docs/palettes.md	docs/palettes.md	0	59 строк, 28 КБ
+file	docs/map.md	docs/map.md	0	370 строк, 74 КБ
+file	docs/palettes.md	docs/palettes.md	0	60 строк, 29 КБ
 file	docs/pinterest-dec2026.md	docs/pinterest-dec2026.md	0	55 строк, 4 КБ
-file	docs/plan-status.md	docs/plan-status.md	0	190 строк, 48 КБ
+file	docs/plan-status.md	docs/plan-status.md	0	192 строк, 49 КБ
 file	docs/polly-pet.md	docs/polly-pet.md	0	40 строк, 9 КБ
 file	docs/requests.md	docs/requests.md	0	31 строк, 14 КБ
 file	docs/retired.md	docs/retired.md	0	36 строк, 6 КБ
 file	docs/rooms.md	docs/rooms.md	0	34 строк, 12 КБ
 file	docs/shop.md	docs/shop.md	0	66 строк, 35 КБ
-file	docs/site.md	docs/site.md	0	225 строк, 92 КБ
+file	docs/site.md	docs/site.md	0	226 строк, 93 КБ
 file	docs/titos-cast.md	docs/titos-cast.md	0	48 строк, 7 КБ
 file	docs/titos.md	docs/titos.md	0	147 строк, 24 КБ
 file	docs/wobbleland.md	docs/wobbleland.md	0	42 строк, 13 КБ
@@ -131,6 +131,7 @@ file	site/assets/garden-items.js	site/assets/garden-items.js	0	118 строк, 1
 file	site/assets/garden.js	site/assets/garden.js	0	406 строк, 43 КБ
 file	site/assets/guides-admin.js	site/assets/guides-admin.js	0	110 строк, 14 КБ
 file	site/assets/hatch.js	site/assets/hatch.js	0	123 строк, 9 КБ
+file	site/assets/how.css	site/assets/how.css	0	101 строк, 6 КБ
 file	site/assets/ideas-admin.js	site/assets/ideas-admin.js	0	79 строк, 9 КБ
 file	site/assets/ink-course.css	site/assets/ink-course.css	0	113 строк, 7 КБ
 file	site/assets/ink-course.js	site/assets/ink-course.js	0	254 строк, 27 КБ
@@ -183,7 +184,7 @@ file	site/assets/train.css	site/assets/train.css	0	102 строк, 10 КБ
 file	site/assets/train.js	site/assets/train.js	0	401 строк, 41 КБ
 file	site/assets/translate-btn.js	site/assets/translate-btn.js	0	31 строк, 3 КБ
 file	site/assets/v2-acct.css	site/assets/v2-acct.css	0	532 строк, 43 КБ
-file	site/assets/v2-shell.css	site/assets/v2-shell.css	0	208 строк, 26 КБ
+file	site/assets/v2-shell.css	site/assets/v2-shell.css	0	217 строк, 28 КБ
 file	site/assets/v2.css	site/assets/v2.css	0	729 строк, 78 КБ
 file	site/assets/v2.js	site/assets/v2.js	0	437 строк, 47 КБ
 file	site/assets/wl-town.js	site/assets/wl-town.js	0	716 строк, 68 КБ
@@ -194,8 +195,8 @@ file	site/assets/wobbleland.js	site/assets/wobbleland.js	0	530 строк, 41 К
 file	src/blocks/coming-soon.html	src/blocks/coming-soon.html	0	94 строк, 8 КБ
 file	src/blocks/flock.html	src/blocks/flock.html	0	80 строк, 12 КБ
 file	src/blocks/season.html	src/blocks/season.html	0	149 строк, 15 КБ
-file	src/layout-v2-lab.html	src/layout-v2-lab.html	0	122 строк, 14 КБ
-file	src/layout-v2.html	src/layout-v2.html	0	101 строк, 13 КБ
+file	src/layout-v2-lab.html	src/layout-v2-lab.html	0	125 строк, 15 КБ
+file	src/layout-v2.html	src/layout-v2.html	0	104 строк, 13 КБ
 file	src/pages/404.html	src/pages/404.html	0	9 строк, 1 КБ
 file	src/pages/500.html	src/pages/500.html	0	9 строк, 1 КБ
 file	src/pages/503.html	src/pages/503.html	0	9 строк, 1 КБ
@@ -218,6 +219,7 @@ file	src/pages/freebies.html	src/pages/freebies.html	0	7 строк, 1 КБ
 file	src/pages/games.html	src/pages/games.html	0	33 строк, 4 КБ
 file	src/pages/garden.html	src/pages/garden.html	0	3 строк, 0 КБ
 file	src/pages/halloween.html	src/pages/halloween.html	0	7 строк, 1 КБ
+file	src/pages/how.html	src/pages/how.html	0	150 строк, 9 КБ
 file	src/pages/ink.html	src/pages/ink.html	0	4 строк, 0 КБ
 file	src/pages/norway-workshop.html	src/pages/norway-workshop.html	0	10 строк, 0 КБ
 file	src/pages/norway.html	src/pages/norway.html	0	11 строк, 1 КБ
@@ -288,7 +290,7 @@ file	tools/docs/split_claude_old.py	tools/docs/split_claude_old.py	0	461 стр�
 file	tools/english_book.py	tools/english_book.py	0	42 строк, 3 КБ
 file	tools/english_check.js	tools/english_check.js	0	103 строк, 10 КБ
 file	tools/english_page.py	tools/english_page.py	0	23 строк, 2 КБ
-file	tools/fb/fb_pal.js	tools/fb/fb_pal.js	0	73 строк, 5 КБ
+file	tools/fb/fb_pal.js	tools/fb/fb_pal.js	0	74 строк, 5 КБ
 file	tools/game_covers.py	tools/game_covers.py	0	564 строк, 21 КБ
 file	tools/i18n_add.py	tools/i18n_add.py	0	73 строк, 3 КБ
 file	tools/import_uploads.py	tools/import_uploads.py	0	83 строк, 4 КБ
@@ -299,7 +301,7 @@ file	tools/nederlands_page.py	tools/nederlands_page.py	0	28 строк, 3 КБ
 file	tools/news_shots.js	tools/news_shots.js	0	71 строк, 6 КБ
 file	tools/norsk_check.js	tools/norsk_check.js	0	107 строк, 11 КБ
 file	tools/norsk_page.py	tools/norsk_page.py	0	32 строк, 4 КБ
-file	tools/og_cards.js	tools/og_cards.js	0	259 строк, 27 КБ
+file	tools/og_cards.js	tools/og_cards.js	0	263 строк, 28 КБ
 file	tools/ornaments/make.py	tools/ornaments/make.py	0	294 строк, 24 КБ
 file	tools/ornaments/render.js	tools/ornaments/render.js	0	14 строк, 1 КБ
 file	tools/palette_names.py	tools/palette_names.py	0	23 строк, 5 КБ
@@ -310,6 +312,8 @@ file	tools/pins/cal-data.js	tools/pins/cal-data.js	0	67 строк, 8 КБ
 file	tools/pins/cal.js	tools/pins/cal.js	0	230 строк, 22 КБ
 file	tools/pins/cover.js	tools/pins/cover.js	0	54 строк, 5 КБ
 file	tools/pins/dec2026.py	tools/pins/dec2026.py	0	154 строк, 7 КБ
+file	tools/pins/holidays27-data.js	tools/pins/holidays27-data.js	0	429 строк, 66 КБ
+file	tools/pins/holidays27.js	tools/pins/holidays27.js	0	168 строк, 17 КБ
 file	tools/pins/life_pal.py	tools/pins/life_pal.py	0	22 строк, 1 КБ
 file	tools/pins/nails.js	tools/pins/nails.js	0	61 строк, 6 КБ
 file	tools/pins/pins10-data.js	tools/pins/pins10-data.js	0	160 строк, 31 КБ
@@ -441,6 +445,7 @@ page	/freebies/	src/pages/freebies.html	0	en,ru,lv; v2; скрипты: freebies
 page	/games/	src/pages/games.html	0	en,ru,lv; скрипты: flock.js, games-hub.js; lab-шаблон
 page	/garden/	src/pages/garden.html	0	en,ru,lv; скрипты: dish-chip.js, garden.js; lab-шаблон
 page	/art-portfolio/halloween/	src/pages/halloween.html	0	en,ru,lv; скрипты: palettes.js; lab-шаблон
+page	/how/	src/pages/how.html	0	en,ru,lv; v2
 page	/ink/	src/pages/ink.html	0	en,ru,lv; скрипты: diploma.js, ink-course.js; lab-шаблон
 page	/norway/workshop/	src/pages/norway-workshop.html	0	en,ru,lv; v2
 page	/norway/	src/pages/norway.html	0	en,ru,lv; v2
@@ -843,60 +848,60 @@ sym	CONTENT	build.py	17	const
 sym	OUT	build.py	18	const
 sym	SITE_URL	build.py	19	const
 sym	PAGES	build.py	22	const
-sym	UNLISTED	build.py	109	const
-sym	EDIT_KEY	build.py	114	const
-sym	NOINDEX	build.py	115	const
-sym	V2_HOME	build.py	117	const
-sym	V2_URLS	build.py	120	const
-sym	v2_urls	build.py	124	fn
-sym	v2_page	build.py	131	fn
-sym	PORTFOLIO	build.py	140	const
-sym	SOCIAL	build.py	151	const
-sym	SECTIONS	build.py	161	const
-sym	SECTION_HUB	build.py	187	const
-sym	TAB_ALIAS	build.py	189	const
-sym	CRUMB_ONLY	build.py	191	const
-sym	MENU_HIDE	build.py	195	const
-sym	NAV	build.py	196	const
-sym	SEASONAL	build.py	204	const
-sym	section_of	build.py	207	fn
-sym	section_tabs	build.py	218	fn
-sym	href	build.py	232	fn
-sym	nav_link	build.py	239	fn
-sym	nav_subs	build.py	246	fn
-sym	nav_html	build.py	250	fn
-sym	footer_html	build.py	275	fn
-sym	GALLERY_LABELS	build.py	286	const
-sym	POLLY_ROWS	build.py	295	const
-sym	POLLY_COL	build.py	298	const
-sym	POLLY_SVG	build.py	299	const
-sym	wall_html	build.py	304	fn
-sym	gallery_html	build.py	322	fn
-sym	SK_T	build.py	343	const
-sym	sketchbook_html	build.py	348	fn
-sym	bust	build.py	376	fn
-sym	ebooks_html	build.py	389	fn
-sym	scope_css	build.py	405	fn
-sym	block_html	build.py	434	fn
-sym	mark_editable	build.py	441	fn
-sym	projects_html	build.py	452	fn
-sym	cv_html	build.py	512	fn
-sym	LANGS	build.py	540	const
-sym	localize	build.py	543	fn
-sym	lang_bits	build.py	555	fn
-sym	OG_LOCALE	build.py	567	const
-sym	og_meta	build.py	570	fn
-sym	LANG_NAMES	build.py	588	const
-sym	lang_dd	build.py	591	fn
-sym	wobbleland_data	build.py	598	fn
-sym	rooms_data	build.py	629	fn
-sym	search_entry	build.py	635	fn
-sym	titos_cases	build.py	651	fn
-sym	about_chat	build.py	694	fn
-sym	v2_shelf	build.py	701	fn
-sym	v2_books	build.py	717	fn
-sym	site_version	build.py	734	fn
-sym	build	build.py	759	fn
+sym	UNLISTED	build.py	111	const
+sym	EDIT_KEY	build.py	116	const
+sym	NOINDEX	build.py	117	const
+sym	V2_HOME	build.py	119	const
+sym	V2_URLS	build.py	122	const
+sym	v2_urls	build.py	126	fn
+sym	v2_page	build.py	133	fn
+sym	PORTFOLIO	build.py	142	const
+sym	SOCIAL	build.py	153	const
+sym	SECTIONS	build.py	163	const
+sym	SECTION_HUB	build.py	189	const
+sym	TAB_ALIAS	build.py	191	const
+sym	CRUMB_ONLY	build.py	193	const
+sym	MENU_HIDE	build.py	197	const
+sym	NAV	build.py	198	const
+sym	SEASONAL	build.py	206	const
+sym	section_of	build.py	209	fn
+sym	section_tabs	build.py	220	fn
+sym	href	build.py	234	fn
+sym	nav_link	build.py	241	fn
+sym	nav_subs	build.py	248	fn
+sym	nav_html	build.py	252	fn
+sym	footer_html	build.py	277	fn
+sym	GALLERY_LABELS	build.py	288	const
+sym	POLLY_ROWS	build.py	297	const
+sym	POLLY_COL	build.py	300	const
+sym	POLLY_SVG	build.py	301	const
+sym	wall_html	build.py	306	fn
+sym	gallery_html	build.py	324	fn
+sym	SK_T	build.py	345	const
+sym	sketchbook_html	build.py	350	fn
+sym	bust	build.py	378	fn
+sym	ebooks_html	build.py	391	fn
+sym	scope_css	build.py	407	fn
+sym	block_html	build.py	436	fn
+sym	mark_editable	build.py	443	fn
+sym	projects_html	build.py	454	fn
+sym	cv_html	build.py	514	fn
+sym	LANGS	build.py	542	const
+sym	localize	build.py	545	fn
+sym	lang_bits	build.py	557	fn
+sym	OG_LOCALE	build.py	569	const
+sym	og_meta	build.py	572	fn
+sym	LANG_NAMES	build.py	590	const
+sym	lang_dd	build.py	593	fn
+sym	wobbleland_data	build.py	600	fn
+sym	rooms_data	build.py	631	fn
+sym	search_entry	build.py	637	fn
+sym	titos_cases	build.py	653	fn
+sym	about_chat	build.py	696	fn
+sym	v2_shelf	build.py	703	fn
+sym	v2_books	build.py	719	fn
+sym	site_version	build.py	736	fn
+sym	build	build.py	761	fn
 sym	esc	content/english/engine.js	6	const
 sym	fmt	content/english/engine.js	7	const
 sym	shuffle	content/english/engine.js	8	const
@@ -4660,12 +4665,12 @@ sym	keys	tools/norsk_page.py	18	fn
 sym	fs	tools/og_cards.js	6	const
 sym	ROOT	tools/og_cards.js	8	const
 sym	CARDS	tools/og_cards.js	12	const
-sym	COPY	tools/og_cards.js	178	const
-sym	esc	tools/og_cards.js	180	const
-sym	fileUrl	tools/og_cards.js	181	const
-sym	ACC	tools/og_cards.js	184	const
-sym	NOTE	tools/og_cards.js	185	const
-sym	html	tools/og_cards.js	186	fn
+sym	COPY	tools/og_cards.js	182	const
+sym	esc	tools/og_cards.js	184	const
+sym	fileUrl	tools/og_cards.js	185	const
+sym	ACC	tools/og_cards.js	188	const
+sym	NOTE	tools/og_cards.js	189	const
+sym	html	tools/og_cards.js	190	fn
 sym	HERE	tools/ornaments/make.py	6	const
 sym	beanie	tools/ornaments/make.py	17	fn
 sym	antlers	tools/ornaments/make.py	22	fn
@@ -4775,6 +4780,29 @@ sym	gift	tools/pins/dec2026.py	70	fn
 sym	pin_list	tools/pins/dec2026.py	80	fn
 sym	pin_one	tools/pins/dec2026.py	115	fn
 sym	pin_challenge	tools/pins/dec2026.py	135	fn
+sym	pal	tools/pins/holidays27-data.js	4	const
+sym	list	tools/pins/holidays27-data.js	5	const
+sym	frames	tools/pins/holidays27-data.js	6	const
+sym	bingo	tools/pins/holidays27-data.js	7	const
+sym	pov	tools/pins/holidays27-data.js	8	const
+sym	quote	tools/pins/holidays27-data.js	9	const
+sym	BOOKDAY	tools/pins/holidays27-data.js	11	const
+sym	BIRDDAY	tools/pins/holidays27-data.js	12	const
+sym	BLACKFRI	tools/pins/holidays27-data.js	13	const
+sym	fs	tools/pins/holidays27.js	5	const
+sym	ROOT	tools/pins/holidays27.js	7	const
+sym	SITE	tools/pins/holidays27.js	8	const
+sym	PALS	tools/pins/holidays27.js	9	const
+sym	esc	tools/pins/holidays27.js	12	const
+sym	plain	tools/pins/holidays27.js	13	const
+sym	EMO	tools/pins/holidays27.js	15	const
+sym	CSSf	tools/pins/holidays27.js	17	const
+sym	foot	tools/pins/holidays27.js	31	const
+sym	img	tools/pins/holidays27.js	32	const
+sym	head	tools/pins/holidays27.js	33	const
+sym	HOL	tools/pins/holidays27.js	139	const
+sym	PINS	tools/pins/holidays27.js	140	const
+sym	dup	tools/pins/holidays27.js	151	const
 sym	fs	tools/pins/nails.js	3	const
 sym	ROOT	tools/pins/nails.js	5	const
 sym	NAILS	tools/pins/nails.js	11	const
@@ -6642,6 +6670,7 @@ doc	Что сделать на сайте (этапы, по порядку)	docs
 doc	Как поймём, что работает (через 3 месяца)	docs/growth.md	77	h2
 doc	Facebook LV (16.11.2026)	docs/growth.md	82	h2
 doc	Google (24.10.2026)	docs/growth.md	86	h2
+doc	Facebook EN (21.11.2026)	docs/growth.md	91	h2
 doc	История: устаревшее и заменённое	docs/history.md	1	h1
 doc	Кратко	docs/history.md	3	h2
 doc	Оглавление	docs/history.md	9	h2
@@ -6687,8 +6716,8 @@ doc	Порядок	docs/pinterest-dec2026.md	48	h2
 doc	Статус плана	docs/plan-status.md	1	h1
 doc	Открыто	docs/plan-status.md	6	h2
 doc	Этапы (готовые — одной строкой)	docs/plan-status.md	20	h2
-doc	Решения Алины	docs/plan-status.md	139	h2
-doc	Допущения (по открытым этапам)	docs/plan-status.md	147	h2
+doc	Решения Алины	docs/plan-status.md	141	h2
+doc	Допущения (по открытым этапам)	docs/plan-status.md	149	h2
 doc	Полли-питомец	docs/polly-pet.md	1	h1
 doc	Кратко	docs/polly-pet.md	3	h2
 doc	Оглавление	docs/polly-pet.md	9	h2
@@ -6723,22 +6752,22 @@ doc	Сайт: меню, шапка, главная, общие страницы	
 doc	Кратко	docs/site.md	3	h2
 doc	Оглавление	docs/site.md	9	h2
 doc	Общие страницы	docs/site.md	17	h2
-doc	Меню и шапка	docs/site.md	23	h2
-doc	Главная	docs/site.md	45	h2
-doc	Сборка	docs/site.md	63	h2
-doc	Полли на загрузке (11.11.2026)	docs/site.md	69	h2
-doc	Учебник английского /english/ (личный)	docs/site.md	74	h2
-doc	Учебник /study/ (личный)	docs/site.md	92	h2
-doc	Блокнот в учебниках (/study/, /english/, /norsk/, /nederlands/)	docs/site.md	106	h2
-doc	Кнопки особых букв (/norsk/, /nederlands/)	docs/site.md	114	h2
-doc	Учебник нидерландского /nederlands/ (личный)	docs/site.md	118	h2
-doc	Учебник норвежского /norsk/ (личный)	docs/site.md	130	h2
-doc	Редизайн 2.0 (/preview/)	docs/site.md	155	h2
-doc	Комнаты в шапке (16.11.2026)	docs/site.md	185	h2
-doc	Скетчбук /sketchbook/ (11.11.2026, была «Обо мне» /about/)	docs/site.md	191	h2
-doc	Опрос на главной (12.11.2026)	docs/site.md	199	h2
-doc	/learn/: курсы, шпаргалки, «для своих» (13.11.2026)	docs/site.md	207	h2
-doc	Нарисованные эмодзи	docs/site.md	221	h2
+doc	Меню и шапка	docs/site.md	24	h2
+doc	Главная	docs/site.md	46	h2
+doc	Сборка	docs/site.md	64	h2
+doc	Полли на загрузке (11.11.2026)	docs/site.md	70	h2
+doc	Учебник английского /english/ (личный)	docs/site.md	75	h2
+doc	Учебник /study/ (личный)	docs/site.md	93	h2
+doc	Блокнот в учебниках (/study/, /english/, /norsk/, /nederlands/)	docs/site.md	107	h2
+doc	Кнопки особых букв (/norsk/, /nederlands/)	docs/site.md	115	h2
+doc	Учебник нидерландского /nederlands/ (личный)	docs/site.md	119	h2
+doc	Учебник норвежского /norsk/ (личный)	docs/site.md	131	h2
+doc	Редизайн 2.0 (/preview/)	docs/site.md	156	h2
+doc	Комнаты в шапке (16.11.2026)	docs/site.md	186	h2
+doc	Скетчбук /sketchbook/ (11.11.2026, была «Обо мне» /about/)	docs/site.md	192	h2
+doc	Опрос на главной (12.11.2026)	docs/site.md	200	h2
+doc	/learn/: курсы, шпаргалки, «для своих» (13.11.2026)	docs/site.md	208	h2
+doc	Нарисованные эмодзи	docs/site.md	222	h2
 doc	Жители Воббленда для дел Титоса	docs/titos-cast.md	1	h1
 doc	Детектив Титос (этап 8)	docs/titos.md	1	h1
 doc	ТЗ (от Алины, этап 8)	docs/titos.md	3	h2

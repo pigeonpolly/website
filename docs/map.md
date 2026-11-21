@@ -357,6 +357,7 @@ _Сюда следующие этапы дописывают общие свед
 - Личная страница только для некоторых птичек — как worker/study.js: HTML в worker (не в site/), проверка `studyOk`, флаг в /api/whoami, пункт в меню аватара по флагу (account.js). Так же устроены worker/english.js (/english/) и worker/norsk.js (/norsk/, движок — копия английского в content/norsk/engine.js).
 - Редизайн 2.0: новые страницы — шаблон src/layout-v2.html + site/assets/v2.css/v2.js (build.py `V2`, `NOINDEX`, `V2_HOME`, `v2_books`); сезон — `html[data-season]`, цвета только через токены сезона.
 - Редизайн 2.0, старая страница в новой шапке: src/layout-v2-lab.html + site/assets/v2-shell.css (build.py `V2_LAB`: путь → исходная страница).
+- Страница для новичков `/how/` (21.11.2026): `src/pages/how.html` + `site/assets/how.css`, шаблон V2; вход — «?» `.help-q` в шапке (src/layout-v2*.html, стили v2-shell.css) и `.ft-how` в подвале; на телефоне — `.dr-help` первой строкой в меню ☰.
 - tools/v2_acct_css.py → site/assets/v2-acct.css: стили кнопок шапки (вход, меню аватара, 🔔, 🛒, поиск) из style.css для новых страниц.
 - Видео и гайды без пересборки: worker/guides.js (`guidesApi`, `guidesList`, `guideOut`, `ytId` — id из любой ссылки YouTube), meta `v2_guides`; кабинет — guides-admin.js; сайт — v2.js (`G`, `ytName`, `guidesReady`).
 
