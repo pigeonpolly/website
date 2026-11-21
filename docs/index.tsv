@@ -75,7 +75,7 @@ file	docs/palettes.md	docs/palettes.md	0	72 строк, 34 КБ
 file	docs/pinterest-dec2026.md	docs/pinterest-dec2026.md	0	55 строк, 4 КБ
 file	docs/plan-status.md	docs/plan-status.md	0	203 строк, 52 КБ
 file	docs/polly-pet.md	docs/polly-pet.md	0	40 строк, 9 КБ
-file	docs/postcards.md	docs/postcards.md	0	24 строк, 6 КБ
+file	docs/postcards.md	docs/postcards.md	0	25 строк, 6 КБ
 file	docs/requests.md	docs/requests.md	0	31 строк, 14 КБ
 file	docs/retired.md	docs/retired.md	0	36 строк, 6 КБ
 file	docs/rooms.md	docs/rooms.md	0	34 строк, 12 КБ
@@ -6935,9 +6935,9 @@ doc	Новый дизайн и день рождения (11.11.2026)	docs/polly
 doc	Новая Полли и месяцы (20.11.2026)	docs/polly-pet.md	31	h2
 doc	Открытки /postcards/ («Отправить подарок»)	docs/postcards.md	1	h1
 doc	Кратко	docs/postcards.md	3	h2
-doc	Открытки	docs/postcards.md	8	h2
-doc	Сколько можно сегодня (22.11.2026, Алина)	docs/postcards.md	14	h2
-doc	Как работает	docs/postcards.md	18	h2
+doc	Открытки	docs/postcards.md	9	h2
+doc	Сколько можно сегодня (22.11.2026, Алина)	docs/postcards.md	15	h2
+doc	Как работает	docs/postcards.md	19	h2
 doc	«Нарисуй мне»	docs/requests.md	1	h1
 doc	Кратко	docs/requests.md	3	h2
 doc	Оглавление	docs/requests.md	8	h2
