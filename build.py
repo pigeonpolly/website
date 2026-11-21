@@ -86,6 +86,8 @@ PAGES = [
      "The Pigeon Polly advent calendar: from December 1 to 31 open a window a day and a pixel bird flies out with a gift for your profile."),
     ("palettes", "Palettes", "palettes.html",
      "Color palettes from Pigeon Polly watercolors and sketchbook pages: six colors with HEX codes from every artwork. Copy a color, pick a palette and draw."),
+    ("color-mixing", "How to mix any colour", "color-mixing.html",
+     "Colour mixing guide for watercolour, gouache and acrylic: pick any colour and see which real paints to mix and how much of each, with colour theory tips. By Pigeon Polly."),
     ("norway", "Polly in Norway", "norway.html",
      "Polly in Norway: a new room of Pigeon Polly Art Lab. Polly is packing her suitcase, the room opens soon."),
     # личная «Мастерская» Room 811: пустая комната для черновиков, открывается только Алине (worker/index.js, pageFetch)
@@ -177,6 +179,7 @@ SECTIONS = {
              ("prompts", "Monthly prompts", "🗓", "30 themes to save to your phone or print"),
              ("requests", "Draw this for me", "💡", "Suggest an idea and I’ll draw it"),
              ("palettes", "Palettes", "🎨", "Colours from my paintings and from your photos"),
+             ("color-mixing", "Colour mixing", "🖌", "Which paints to mix for any colour"),
              ("polly-helps", "Polly, help me", "🕊", "How to draw anything from simple shapes"),
              ("e-books", "Books", "📚", "My books about drawing")],
     "about": [("art-portfolio", "Sketchbook", "📓", "Character series, sketchbook pages, AI art"),
