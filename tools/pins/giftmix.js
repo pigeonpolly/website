@@ -37,7 +37,7 @@ function recipe(hex, medium, k = 0) {
   if (water) rows.push({ hex: null, name: 'Water', txt: wb >= 0.5 ? `about ${wb} ${wb > 1 ? 'brushes' : 'brush'}` : 'just wet the brush' });
   return { rows, hex: r.hex, e: r.e, water, short: rows.filter(x => x.hex).map(x => `${x.txt} ${x.name.toLowerCase()}`).join(' + ') + (water ? ` + ${wb >= 0.5 ? 'water' : 'a damp brush'}` : '') };
 }
-const mixLink = (medium, hex) => `/color-mixing/?m=${medium}&c=${hex.slice(1)}`;
+const mixLink = (medium, hex) => `/color-mixing/?tab=find&m=${medium}&c=${hex.slice(1)}`;
 const L = (p, n, camp, src = 'pinterest') => { const [a, h] = p.split('#'); const q = a.includes('?') ? '&' : '?'; return `${SITE}${a}${q}utm_source=${src}&utm_campaign=${camp}&utm_content=${src === 'pinterest' ? 'pin' : 'post'}-${n}${h ? '#' + h : ''}`; };
 
 const CSSf = t => `
@@ -150,7 +150,7 @@ const X = {
   },
   pigment(p, t, n) {
     const P = M.PIG.find(x => x.id === p.id), f = PINFO[p.id];
-    return { tpl: 'Процесс', link: '/color-mixing/',
+    return { tpl: 'Процесс', link: '/color-mixing/?tab=pigs',
       html: () => `<div class="fr" style="position:absolute;right:56px;top:58px;transform:rotate(3deg)">${img(A(p.key), 300, 300, p.pos)}</div>
       ${head(`pigment · ${P.ci}`, p.h || esc(PN[p.id]), 400)}
       <div style="position:absolute;left:56px;top:400px">${swatch(p.id, 888, 260)}</div>
@@ -161,7 +161,7 @@ const X = {
   },
   chart(p, t, n) {
     const rows = p.rows, cols = p.cols, cw = Math.floor(700 / cols.length);
-    return { tpl: 'Палитра', link: '/color-mixing/',
+    return { tpl: 'Палитра', link: '/color-mixing/?tab=play',
       html: () => `${head(`${MED[p.m]} · mixing chart`, p.h)}
       <div style="position:absolute;left:56px;top:${p.top || 360}px;display:grid;grid-template-columns:180px repeat(${cols.length},${cw}px);gap:10px;align-items:center">
         <div></div>${cols.map(b => `<div style="text-align:center"><div class="sw" style="width:${cw * .6}px;height:${cw * .6}px;margin:0 auto;background:${M.P[b].m}"></div><div style="font:700 19px/1.1 Karla;margin-top:8px">${esc(PN[b])}</div></div>`).join('')}
@@ -173,7 +173,7 @@ const X = {
   ladder(p, t, n) {
     // одна пара красок, шаги пропорций: a:b от 4:0 до 0:4
     const [a, b] = p.pair, steps = [[4, 0], [3, 1], [2, 2], [1, 3], [0, 4]].map(([x, y]) => ({ x, y, hex: p.m === 'watercolor' ? M.mixHex([[M.P[a], x], [M.P[b], y]].filter(i => i[1]), 0, p.d || 0.45, true) : M.mixHex([[M.P[a], x], [M.P[b], y]].filter(i => i[1]), p.white || 0, 1, false) }));
-    return { tpl: 'Палитра', link: '/color-mixing/',
+    return { tpl: 'Палитра', link: '/color-mixing/?tab=play',
       html: () => `<div class="fr" style="position:absolute;right:56px;top:58px;transform:rotate(3deg)">${img(A(p.key), 260, 260, p.pos)}</div>
       ${head(`${MED[p.m]} · two paints`, p.h, 350)}
       <div style="position:absolute;left:56px;right:56px;top:420px;display:flex;flex-direction:column;gap:16px">
@@ -194,7 +194,7 @@ const X = {
   rule(p, t, n) {
     const L2 = (it, w) => M.mixHex(it.map(([id, x]) => [M.P[id], x]), w || 0, 1, false);
     const [A1, B1] = p.cmp;
-    return { tpl: 'Процесс', link: '/color-mixing/',
+    return { tpl: 'Процесс', link: '/color-mixing/?tab=play',
       html: () => `${head('mixing rule', p.h)}
       <div class="fr" style="position:absolute;left:56px;right:56px;top:${p.top || 400}px">${img(A(p.key), 888, 420, p.pos)}</div>
       <div style="position:absolute;left:56px;right:56px;top:${(p.top || 400) + 460}px;display:grid;grid-template-columns:1fr 1fr;gap:26px">

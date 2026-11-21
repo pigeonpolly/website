@@ -1,9 +1,19 @@
 /* /color-mixing/ — «Смешивание цветов» (mixing.js, docs/palettes.md). Карточки — на светлой «бумаге», как .pal-mk на «Палитрах» */
-.mx { padding: 0 var(--gutter, 24px) 56px; max-width: 1600px; display: grid; gap: 18px; align-items: start; }
+.mx { padding: 0 var(--gutter, 24px) 56px; max-width: 1600px; }
+.mx-find { display: grid; gap: 18px; align-items: start; }
 .mx-left { display: grid; gap: 18px; }
+/* вкладки как у папки: «Подобрать смесь» · «Смешать самому» · «Пигменты» */
+.mx-tabs { display: flex; gap: 4px; overflow-x: auto; scrollbar-width: none; padding: 6px 4px 0; }
+.mx-tabs::-webkit-scrollbar { display: none; }
+.mx-tabs button { flex: none; font: inherit; font-weight: 700; font-size: 15px; border: 0; cursor: pointer; padding: 10px 18px 9px; border-radius: 14px 14px 0 0; background: #B9AE9F; color: #2A2230; position: relative; top: 3px; transition: background .2s, top .2s; }
+.mx-tabs button:hover { background: #D3C9BB; }
+.mx-tabs button[aria-selected=true] { background: #EDE6DA; top: 0; padding-bottom: 12px; }
+.mx-pane { background: #EDE6DA; border-radius: 0 20px 20px 20px; padding: 16px; }
+.mx-pane .mx-step { box-shadow: 0 4px 14px rgba(0, 0, 0, .08); }
+.mx-pane[hidden] { display: none; }
 /* широкий экран: слева материал, краски и цвет; справа рецепты */
 @media (min-width: 1100px) {
-  .mx { grid-template-columns: minmax(380px, 460px) minmax(0, 1fr); }
+  .mx-find { grid-template-columns: minmax(380px, 460px) minmax(0, 1fr); }
   .mx-left .mx-pg { grid-template-columns: 1fr 1fr; gap: 6px 10px; }
   .mx-left .mx-p { font-size: 13px; }
   .mx-right .mx-out { grid-template-columns: repeat(auto-fill, minmax(230px, 1fr)); }
@@ -79,13 +89,6 @@
 .mx-rules ol { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; line-height: 1.4; }
 .mx-note { margin: 16px 0 0; padding: 12px 14px; background: #FFF6E0; border: 1px solid #F0D9A0; border-radius: 12px; font-size: 14px; line-height: 1.5; color: #5A4A2A; }
 /* «Пигменты — для самых любопытных» */
-.mx-pigs { grid-column: 1 / -1; padding: 14px 22px; background: #F3EEE6; }
-.mx-pigs summary h2 { font-size: clamp(17px, 1.8vw, 20px); }
-.mx-pigs summary { cursor: pointer; list-style: none; }
-.mx-pigs summary::-webkit-details-marker { display: none; }
-.mx-pigs summary h2 { display: inline; margin: 0; }
-.mx-pigs summary::after { content: ' ▾'; font-size: 20px; }
-.mx-pigs[open] summary::after { content: ' ▴'; }
 .mx-pc { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 12px; margin-top: 10px; }
 .mx-pc article { border: 1px solid #E8E0D6; border-radius: 14px; padding: 12px 14px; background: #fff; }
 .mx-pc article > i { display: block; height: 38px; border-radius: 10px; border: 1px solid rgba(0, 0, 0, .1); }
@@ -94,4 +97,52 @@
 .mx-pc p { margin: 6px 0 0; font-size: 14px; line-height: 1.45; }
 .mx-chp { display: flex; flex-wrap: wrap; gap: 4px; }
 .mx-chp span { font-size: 12px; background: #F3EEE6; border-radius: 999px; padding: 2px 8px; color: #4A4250; }
-@media (max-width: 600px) { .mx-step { padding: 16px; border-radius: 16px; } .mx-th { flex-direction: column; align-items: stretch; } .mx-thw { width: auto; } }
+/* «Смешать самому»: полка красок и лужица */
+.mx-play { display: grid; gap: 18px; align-items: start; }
+@media (min-width: 900px) { .mx-play { grid-template-columns: minmax(0, 1fr) minmax(320px, 440px); } .mx-pud { position: sticky; top: calc(var(--header-h, 68px) + 16px); } }
+.mx-pud { display: grid; gap: 0; }
+.mx-pudt { border-radius: 20px 20px 0 0; padding-bottom: 6px; } .mx-pudr { border-radius: 0 0 20px 20px; padding-top: 6px; text-align: center; }
+.mx-pm { margin-bottom: 10px; }
+.mx-por { display: flex; flex-wrap: wrap; align-items: center; gap: 6px; margin: 6px 0 12px; font-weight: 700; }
+.mx-por button { font: inherit; font-weight: 700; min-width: 40px; border: 2px solid #2A2230; background: #fff; color: #2A2230; border-radius: 999px; padding: 4px 10px; cursor: pointer; }
+.mx-por button[aria-pressed=true] { background: #2A2230; color: #FFFDF8; }
+.mx-por .mx-hint { font-weight: 400; margin: 0 0 0 4px; font-size: 13px; }
+.mx-tubes { display: grid; grid-template-columns: repeat(auto-fill, minmax(96px, 1fr)); gap: 8px; }
+.mx-tube { font: inherit; display: flex; flex-direction: column; align-items: center; gap: 6px; padding: 10px 6px 8px; border: 1px solid #E8E0D6; border-radius: 14px; background: #fff; color: #2A2230; cursor: pointer; transition: transform .15s, box-shadow .15s; }
+.mx-tube:hover { transform: translateY(-3px); box-shadow: 0 6px 14px rgba(0, 0, 0, .12); }
+.mx-tube:active { transform: scale(.94); }
+.mx-tube i { width: 46px; height: 46px; border-radius: 50% 50% 50% 8px; transform: rotate(-45deg); background: radial-gradient(circle at 35% 35%, var(--t) 0 18%, var(--c) 55%); border: 1px solid rgba(0, 0, 0, .15); box-shadow: inset -4px -4px 8px rgba(0, 0, 0, .15); }
+.mx-tube span { font-size: 12px; line-height: 1.2; text-align: center; }
+.mx-wat[hidden] { display: none; }
+.mx-wat { display: grid; gap: 4px; margin-top: 14px; font-size: 14px; }
+.mx-wat input { width: 100%; accent-color: #5AA6D6; }
+.mx-pud { text-align: center; }
+.mx-bowl { position: relative; width: min(100%, 300px); aspect-ratio: 1; margin: 0 auto 6px; border-radius: 50%; background: radial-gradient(circle at 50% 45%, #FFFFFF 0 55%, #EEE8DE 70%, #D8CFC2 100%); box-shadow: inset 0 6px 16px rgba(0, 0, 0, .12), 0 8px 22px rgba(0, 0, 0, .1); overflow: hidden; }
+.mx-blob { position: absolute; inset: 15%; border-radius: 47% 53% 45% 55% / 52% 44% 56% 48%; transform: scale(.2); opacity: 0; transition: background 1.1s ease, transform .6s cubic-bezier(.3, 1.6, .5, 1), opacity .4s; animation: mx-wob 7s ease-in-out infinite; box-shadow: inset -10px -12px 24px rgba(0, 0, 0, .14), inset 10px 10px 22px rgba(255, 255, 255, .28); }
+.mx-blob.on { transform: scale(1); opacity: 1; }
+.mx-swirl { position: absolute; inset: 15%; border-radius: 50%; opacity: 0; pointer-events: none; mix-blend-mode: normal; }
+.mx-swirl.go { animation: mx-sw 1.4s ease-out; }
+.mx-bowl.rip::after { content: ''; position: absolute; left: 50%; top: 50%; width: 30%; height: 30%; margin: -15% 0 0 -15%; border-radius: 50%; border: 3px solid rgba(255, 255, 255, .8); animation: mx-rip .9s ease-out forwards; pointer-events: none; }
+.mx-drops { position: absolute; inset: 0; pointer-events: none; }
+.mx-drop { position: absolute; top: -12%; width: 22px; height: 28px; margin-left: -11px; border-radius: 50% 50% 50% 50% / 60% 60% 40% 40%; box-shadow: inset -3px -4px 6px rgba(0, 0, 0, .2); animation: mx-fall .55s cubic-bezier(.5, 0, 1, .6) forwards, mx-sink .8s .55s ease-out forwards; }
+@keyframes mx-fall { to { top: 44%; } }
+@keyframes mx-sink { to { transform: scale(2.6, .3); opacity: 0; } }
+@keyframes mx-sw { 0% { opacity: 0; transform: rotate(0) scale(.85); } 25% { opacity: .9; } 100% { opacity: 0; transform: rotate(320deg) scale(1.05); } }
+@keyframes mx-rip { to { transform: scale(3.2); opacity: 0; } }
+@keyframes mx-wob { 50% { border-radius: 53% 47% 55% 45% / 46% 54% 44% 56%; } }
+@media (prefers-reduced-motion: reduce) { .mx-blob, .mx-swirl.go, .mx-drop, .mx-bowl.rip::after { animation: none !important; } .mx-drop { display: none; } }
+.mx-res { display: flex; flex-wrap: wrap; justify-content: center; align-items: center; gap: 8px; margin: 6px 0 0; font-weight: 700; }
+.mx-reshex { font: 700 15px ui-monospace, monospace; border: 1px solid #D8D0C8; border-radius: 8px; padding: 3px 8px; background: #fff; color: #2A2230; cursor: copy; }
+.mx-rdesc { margin: 2px 0 8px; color: #6A6070; font-size: 14px; }
+.mx-trail { height: 16px; border-radius: 8px; border: 1px solid rgba(0, 0, 0, .1); }
+.mx-plist { list-style: none; margin: 10px 0; padding: 0; display: grid; gap: 6px; text-align: left; }
+.mx-plist li { display: flex; align-items: center; gap: 6px; font-size: 14px; }
+.mx-pn { flex: 1; min-width: 0; }
+.mx-pn small { color: #85798A; }
+.mx-plist button { font: inherit; width: 30px; height: 30px; border-radius: 50%; border: 1px solid #D8D0C8; background: #fff; color: #2A2230; cursor: pointer; flex: none; }
+.mx-pbtn { display: flex; flex-wrap: wrap; justify-content: center; gap: 8px; margin-top: 8px; }
+.mx-pbtn .mx-btn { font-size: 14px; padding: 7px 14px; }
+.mx-pbtn .mx-btn:disabled { opacity: .4; cursor: default; }
+.mx-psaved > div { display: flex; flex-wrap: wrap; gap: 6px; justify-content: center; }
+.mx-sv { width: 36px; height: 36px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px #D8D0C8; cursor: pointer; }
+@media (max-width: 600px) { .mx-tabs { padding: 6px 0 0; gap: 3px; } .mx-tabs button { flex: 1 1 0; min-width: 0; font-size: 13px; line-height: 1.15; padding: 9px 6px 8px; white-space: normal; } .mx-pane { padding: 10px; border-radius: 0 16px 16px 16px; } .mx-pud { display: contents; } .mx-pudt { order: -1; position: sticky; top: calc(var(--header-h, 68px) + 4px); z-index: 2; padding: 10px; border-radius: 16px; display: flex; align-items: center; gap: 12px; text-align: left; } .mx-pudt .mx-res { justify-content: flex-start; } .mx-bowl { width: 110px; flex: none; margin: 0; } .mx-pudt .mx-rdesc { display: none; } .mx-pudt .mx-res { flex-direction: column; align-items: flex-start; gap: 4px; font-size: 15px; } .mx-pudr { border-radius: 16px; } .mx-tubes { grid-template-columns: repeat(4, 1fr); gap: 6px; } .mx-tube { padding: 8px 2px 6px; } .mx-tube i { width: 34px; height: 34px; } .mx-tube span { font-size: 11px; } .mx-step { padding: 16px; border-radius: 16px; } .mx-th { flex-direction: column; align-items: stretch; } .mx-thw { width: auto; } }

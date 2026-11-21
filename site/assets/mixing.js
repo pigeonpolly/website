@@ -256,8 +256,8 @@
   let target = /^#?[0-9a-f]{6}$/i.test(qs.get('c') || '') ? '#' + qs.get('c').replace('#', '').toUpperCase() : '#7A9E7E';
   const myPaints = m => { const s = ls.get('pp-mix-p-' + m); if (s === '-') return []; const v = s ? s.split(',').filter(id => MEDIA[m].all.includes(id)) : null; return v && v.length ? v : MEDIA[m].on.slice(); };
 
-  app.innerHTML = `<div class="mx-pigw"></div>
-    <div class="mx-left"><div class="mx-step"><h2>${t('m1')}</h2><div class="mx-media" role="tablist">${Object.keys(MEDIA).map(m => `<button type="button" role="tab" data-m="${m}">${t(m)}</button>`).join('')}</div>
+  app.innerHTML = `<nav class="mx-tabs" role="tablist"><button type="button" role="tab" data-tab="find"></button><button type="button" role="tab" data-tab="play"></button><button type="button" role="tab" data-tab="pigs"></button></nav>
+    <div class="mx-pane mx-find" data-pane="find"><div class="mx-left"><div class="mx-step"><h2>${t('m1')}</h2><div class="mx-media" role="tablist">${Object.keys(MEDIA).map(m => `<button type="button" role="tab" data-m="${m}">${t(m)}</button>`).join('')}</div>
       <details class="mx-mine"><summary>🎨 ${t('mine')} <span class="mx-cnt"></span></summary><p class="mx-hint">${t('mineTip')}</p><div class="mx-pg"></div><div class="mx-acts"><button type="button" class="mx-all mx-lnk">${t('all')}</button><button type="button" class="mx-nonebtn mx-lnk">${t('clear')}</button><button type="button" class="mx-reset mx-lnk">${t('reset')}</button></div></details></div>
     <div class="mx-step"><h2>${t('m2')}</h2>
       <div class="mx-pickrow"><label class="mx-color"><input type="color" value="${target}" aria-label="${t('pick')}"><span class="mx-tsw"></span></label>
@@ -266,7 +266,8 @@
       <div class="mx-photo" hidden><p class="mx-hint">${t('photoTip')}</p><canvas></canvas></div>
       <div class="mx-pal"><p class="mx-hint">${t('fromPal')}</p><div class="mx-chips"></div><button type="button" class="mx-lnk mx-more">${t('another')}</button></div></div>
     </div><div class="mx-step mx-right"><h2>${t('m3')}</h2><p class="mx-unit"></p><div class="mx-out"></div>
-      <p class="mx-note">⚠️ ${t('note')}</p></div>`;
+      <p class="mx-note">⚠️ ${t('note')}</p></div></div>
+    <div class="mx-pane" data-pane="play" hidden></div><div class="mx-pane" data-pane="pigs" hidden></div>`;
   const $ = s => app.querySelector(s);
 
   function renderMedia() {
@@ -407,7 +408,7 @@
     white: { tr: 'O', st: 0, gr: 0, ts: 3, lf: 'I', d: ['Titanium white, made commercially since around 1920: the most opaque white. It lightens, but also makes colours cooler and chalkier; a touch of yellow or red brings warmth back.', 'Титановые белила, производятся примерно с 1920 года — самые кроющие белила. Осветляют, но ещё делают цвет холоднее и «мелованнее»; капля жёлтого или красного возвращает тепло.', 'Titāna baltā, ražo apmēram kopš 1920. gada — vissedzošākā baltā. Gaišina, bet arī padara krāsu vēsāku un krītaināku; piliens dzeltenās vai sarkanās atgriež siltumu.'] },
   };
   const PT = {
-    h: { en: '🔬 Pigments: properties and stories — for the most curious', ru: '🔬 Пигменты: свойства и истории — для самых любопытных', lv: '🔬 Pigmenti: īpašības un stāsti — zinātkārākajiem' },
+    h: { en: 'Pigments: properties and stories, for the most curious', ru: 'Пигменты: свойства и истории для самых любопытных', lv: 'Pigmenti: īpašības un stāsti zinātkārākajiem' },
     p: { en: 'Left half of the swatch — paint straight from the tube, right half — mixed 1:3 with white. These are typical values; a brand may differ.', ru: 'Левая половина образца — краска из тюбика, правая — разбел 1:3 белилами. Значения типичные, у отдельного бренда могут отличаться.', lv: 'Paraugā pa kreisi — krāsa no tūbiņas, pa labi — atšķaidīta 1:3 ar balto. Vērtības tipiskas, atsevišķam zīmolam var atšķirties.' },
     tr: { T: ['transparent', 'прозрачная', 'caurspīdīga'], ST: ['semi-transparent', 'полупрозрачная', 'puscaurspīdīga'], SO: ['semi-opaque', 'полукроющая', 'puspārklājoša'], O: ['opaque', 'кроющая', 'pārklājoša'] },
     st: [['washes off', 'смывается', 'nomazgājas'], ['stains a little', 'немного окрашивает бумагу', 'mazliet nokrāso papīru'], ['stains paper', 'сильно окрашивает бумагу', 'stipri nokrāso papīru']],
@@ -417,10 +418,10 @@
   };
   function pigmentsHTML() {
     const list = PIG.map(p => ({ id: p.id, name: nm(p.id), ci: p.ci, m: p.m, tt: p.t })).concat([{ id: 'white', name: t('white'), ci: 'PW6', m: WHITE_HEX, tt: WHITE_HEX }]);
-    return `<details class="mx-step mx-pigs"><summary><h2>${PT.h[L]}</h2></summary><p class="mx-hint">${PT.p[L]}</p><div class="mx-pc">${list.map(x => {
+    return `<div class="mx-step mx-pigs"><h2>${PT.h[L]}</h2><p class="mx-hint">${PT.p[L]}</p><div class="mx-pc">${list.map(x => {
       const f = PINFO[x.id], chips = [PT.tr[f.tr][gi], PT.ts[f.ts][gi], PT.st[f.st][gi], f.gr ? PT.gr[gi] : null, PT.lf[gi] + ' ' + f.lf].filter(Boolean);
       return `<article><i style="background:linear-gradient(90deg,${x.m} 50%,${x.tt} 50%)"></i><h3>${esc(x.name)} <small>${x.ci}</small></h3><p class="mx-chp">${chips.map(c => `<span>${esc(c)}</span>`).join('')}</p><p>${esc(f.d[gi])}</p></article>`;
-    }).join('')}</div></details>`;
+    }).join('')}</div></div>`;
   }
 
   let job = 0;
@@ -463,7 +464,7 @@
 
   app.addEventListener('click', e => {
     const m = e.target.closest('[data-m]');
-    if (m) { medium = m.dataset.m; ls.set('pp-mix-m', medium); renderMedia(); run(); return; }
+    if (m) { medium = m.dataset.m; ls.set('pp-mix-m', medium); renderMedia(); run(); if (app.querySelector('.mx-tubes')) { renderShelf(); renderPuddle(false); } return; }
     const c = e.target.closest('[data-c]');
     if (c) { setTarget(c.dataset.c); $('.mx-out').scrollIntoView({ behavior: 'smooth', block: 'start' }); return; }
     if (e.target.closest('.mx-all')) { ls.set('pp-mix-p-' + medium, MEDIA[medium].all.join(',')); renderMedia(); run(); return; }
@@ -511,7 +512,139 @@
   }
   fetch('/assets/palettes.json').then(r => r.ok ? r.json() : []).then(x => { pals = (x || []).filter(p => p.colors && p.colors.length); if (pals.length) palChips(); else $('.mx-pal').hidden = true; }).catch(() => { $('.mx-pal').hidden = true; });
 
-  $('.mx-pigw').outerHTML = pigmentsHTML();
+
+  // ═══ вкладка «Смешать самому»: капаем краски в лужицу и смотрим, что выйдет ═══
+  const PL = {
+    tab1: { en: '🎯 Find a mix', ru: '🎯 Подобрать смесь', lv: '🎯 Atrast maisījumu' },
+    tab2: { en: '🧪 Mix it yourself', ru: '🧪 Смешать самому', lv: '🧪 Sajaukt pašam' },
+    tab3: { en: '🔬 Pigments', ru: '🔬 Пигменты', lv: '🔬 Pigmenti' },
+    h: { en: 'Drop paints into the puddle', ru: 'Капайте краски в лужицу', lv: 'Pilini krāsas peļķītē' },
+    p: { en: 'Tap a paint to add a portion and watch what colour you get. Paints mix like real pigments, not like light on a screen.', ru: 'Нажмите на краску, чтобы добавить порцию, и смотрите, какой цвет получится. Краски смешиваются как настоящие пигменты, а не как свет на экране.', lv: 'Pieskaries krāsai, lai pievienotu porciju, un skaties, kāda krāsa sanāk. Krāsas jaucas kā īsti pigmenti, nevis kā gaisma ekrānā.' },
+    portion: { en: 'Portion:', ru: 'Порция:', lv: 'Porcija:' },
+    water: { en: 'Water', ru: 'Вода', lv: 'Ūdens' },
+    empty: { en: 'The puddle is empty. Add a paint!', ru: 'Лужица пустая. Добавьте краску!', lv: 'Peļķīte ir tukša. Pievieno krāsu!' },
+    near: { en: 'looks like', ru: 'похоже на', lv: 'līdzīgi' },
+    path: { en: 'How the colour changed', ru: 'Как менялся цвет', lv: 'Kā mainījās krāsa' },
+    reset: { en: '↺ Start over', ru: '↺ Начать заново', lv: '↺ Sākt no jauna' },
+    rand: { en: '🎲 Surprise me', ru: '🎲 Удиви меня', lv: '🎲 Pārsteidz mani' },
+    save: { en: '📌 Keep this colour', ru: '📌 Сохранить цвет', lv: '📌 Saglabāt krāsu' },
+    find: { en: '🎯 How to mix it exactly', ru: '🎯 Как смешать его точно', lv: '🎯 Kā to sajaukt precīzi' },
+    saved: { en: 'My colours (tap to bring back the mix)', ru: 'Мои цвета (нажмите, чтобы вернуть смесь)', lv: 'Manas krāsas (pieskaries, lai atgrieztu maisījumu)' },
+    copy: { en: 'Copied', ru: 'Скопировано', lv: 'Nokopēts' },
+  };
+  const pl = (k) => PL[k][L];
+  let play = { items: {}, white: 0, d: 0.4 }, portion = 1, plPath = [], plPrev = null;
+  let NAMES = null;
+  fetch('/assets/palette-names.json').then(r => r.ok ? r.json() : null).then(x => { NAMES = (x || []).map(n => ({ n, lab: labOfHex(n[3]) })); renderPuddle(false); }).catch(() => {});
+  const plItems = () => Object.keys(play.items).filter(id => play.items[id] > 0 && P[id]).map(id => [P[id], play.items[id]]);
+  const plHex = () => {
+    const it = plItems(), water = !!MEDIA[medium].water;
+    if (!it.length) return water ? '#FBFAF6' : (play.white ? WHITE_HEX : null);
+    return water ? mixHex(it, 0, play.d, true) : mixHex(it, play.white, 1, false);
+  };
+  const portions = [0.25, 0.5, 1];
+  function playHTML() {
+    return `<div class="mx-play"><div class="mx-step mx-shelf"><h2>${pl('h')}</h2><p class="mx-hint">${pl('p')}</p>
+      <div class="mx-media mx-pm">${Object.keys(MEDIA).map(m => `<button type="button" role="tab" data-m="${m}">${t(m)}</button>`).join('')}</div>
+      <p class="mx-por">${pl('portion')} ${portions.map(v => `<button type="button" data-por="${v}">${v === 1 ? '1' : v === 0.5 ? '½' : '¼'}</button>`).join('')}<span class="mx-hint"></span></p>
+      <div class="mx-tubes"></div>
+      <label class="mx-wat" hidden><span>💧 ${pl('water')}: <b></b></span><input type="range" min="0" max="100" value="40"></label></div>
+      <div class="mx-pud"><div class="mx-step mx-pudt"><div class="mx-bowl"><div class="mx-blob"></div><div class="mx-swirl"></div><div class="mx-drops"></div></div>
+      <p class="mx-res"><button type="button" class="mx-reshex" title="HEX"></button><span class="mx-rname"></span></p><p class="mx-rdesc"></p></div>
+      <div class="mx-step mx-pudr"><div class="mx-ppath" hidden><p class="mx-sub">${pl('path')}</p><div class="mx-trail"></div></div>
+      <ul class="mx-plist"></ul>
+      <div class="mx-pbtn"><button type="button" class="mx-btn mx-pl-rand">${pl('rand')}</button><button type="button" class="mx-btn mx-pl-save">${pl('save')}</button><button type="button" class="mx-btn mx-pl-find">${pl('find')}</button><button type="button" class="mx-lnk mx-pl-reset">${pl('reset')}</button></div>
+      <div class="mx-psaved" hidden><p class="mx-sub">${pl('saved')}</p><div></div></div></div></div></div>`;
+  }
+  function renderShelf() {
+    const water = !!MEDIA[medium].water, box = app.querySelector('.mx-tubes'); if (!box) return;
+    box.innerHTML = MEDIA[medium].all.map(id => `<button type="button" class="mx-tube" data-add="${id}" title="${esc(nm(id))} · ${P[id].ci}"><i style="--c:${P[id].m};--t:${P[id].t}"></i><span>${esc(nm(id).replace(/ \(.*\)$/, ''))}</span></button>`).join('') +
+      (water ? '' : `<button type="button" class="mx-tube" data-add="white" title="${t('white')} · PW6"><i style="--c:${WHITE_HEX};--t:#FFFFFF"></i><span>${t('white')}</span></button>`);
+    app.querySelector('.mx-wat').hidden = !water;
+    app.querySelectorAll('[data-por]').forEach(b => b.setAttribute('aria-pressed', String(+b.dataset.por === portion)));
+    app.querySelector('.mx-por .mx-hint').textContent = ' ' + (water ? t('unitBrush') : t('unitPea')).split('.')[0] + '.';
+    setWater();
+  }
+  function setWater() {
+    const w = app.querySelector('.mx-wat'); if (!w) return;
+    w.querySelector('input').value = String(Math.round(100 - play.d * 100));
+    w.querySelector('b').textContent = T.cons.find(c => play.d >= c[0])[1][L];
+  }
+  function renderPuddle(drop, dropColor) {
+    const bowl = app.querySelector('.mx-bowl'); if (!bowl) return;
+    const hex = plHex(), it = plItems(), water = !!MEDIA[medium].water;
+    const blob = bowl.querySelector('.mx-blob');
+    blob.style.background = hex || 'transparent'; blob.classList.toggle('on', !!hex);
+    // эффект: падает капля, по лужице идёт круг, цвета закручиваются и сливаются
+    if (drop && dropColor) {
+      const d = document.createElement('i'); d.className = 'mx-drop'; d.style.background = dropColor; d.style.left = (40 + Math.random() * 20) + '%';
+      bowl.querySelector('.mx-drops').appendChild(d); setTimeout(() => d.remove(), 1400);
+      const sw = bowl.querySelector('.mx-swirl'), cols = [plPrev || dropColor, dropColor, plPrev || dropColor, dropColor, hex || dropColor];
+      sw.style.background = `conic-gradient(from ${Math.round(Math.random() * 360)}deg, ${cols.join(',')}, ${cols[0]})`;
+      sw.classList.remove('go'); void sw.offsetWidth; sw.classList.add('go');
+      bowl.classList.remove('rip'); void bowl.offsetWidth; bowl.classList.add('rip');
+    }
+    plPrev = hex;
+    const rh = app.querySelector('.mx-reshex'); rh.textContent = hex && it.length ? hex : ''; rh.style.display = hex && it.length ? '' : 'none';
+    let name = '';
+    if (hex && it.length && NAMES) { const lab = labOfHex(hex); let b = null; for (const x of NAMES) { const e = dE(lab, x.lab); if (!b || e < b.e) b = { e, x }; } name = pl('near') + ' «' + b.x.n[gi] + '»'; }
+    app.querySelector('.mx-rname').textContent = it.length ? name : pl('empty');
+    app.querySelector('.mx-rdesc').textContent = hex && it.length ? describe(labOfHex(hex)).words : '';
+    const tot = it.reduce((a, x) => a + x[1], 0) + (water ? 0 : play.white);
+    const rows = it.map(([p, n]) => ({ id: p.id, hex: p.m, name: nm(p.id), n }));
+    if (!water && play.white) rows.push({ id: 'white', hex: WHITE_HEX, name: t('white'), n: play.white });
+    app.querySelector('.mx-plist').innerHTML = rows.map(r => `<li><span class="mx-sw" style="background:${r.hex}"></span><span class="mx-pn"><b>${amt(r.n, water)}</b> ${esc(r.name)} <small>${Math.round(r.n / tot * 100)}%</small></span><button type="button" data-dec="${r.id}" aria-label="−">−</button><button type="button" data-add="${r.id}" aria-label="+">+</button><button type="button" data-del="${r.id}" aria-label="✕">✕</button></li>`).join('');
+    const pp = app.querySelector('.mx-ppath'); pp.hidden = plPath.length < 2;
+    app.querySelector('.mx-trail').style.background = plPath.length > 1 ? `linear-gradient(90deg, ${plPath.map((h, i) => h + ' ' + Math.round(i / (plPath.length - 1) * 100) + '%').join(',')})` : '';
+    app.querySelector('.mx-pl-find').disabled = app.querySelector('.mx-pl-save').disabled = !(hex && it.length);
+    renderSaved();
+  }
+  const savedGet = () => { try { return JSON.parse(ls.get('pp-mix-saved') || '[]'); } catch (e) { return []; } };
+  function renderSaved() {
+    const s = savedGet(), box = app.querySelector('.mx-psaved'); if (!box) return;
+    box.hidden = !s.length;
+    box.querySelector('div').innerHTML = s.map((x, i) => `<button type="button" class="mx-sv" data-saved="${i}" style="background:${x.hex}" title="${x.hex} · ${esc(t(x.m))}"></button>`).join('');
+  }
+  function addPaint(id, k) {
+    if (id === 'white') play.white = Math.max(0, play.white + k);
+    else play.items[id] = Math.max(0, (play.items[id] || 0) + k);
+    if (play.items[id] === 0) delete play.items[id];
+    const hex = plHex(); if (hex && k > 0) { plPath.push(hex); if (plPath.length > 24) plPath.shift(); }
+    renderPuddle(k > 0, id === 'white' ? WHITE_HEX : P[id] && P[id].m);
+  }
+  function plReset() { play = { items: {}, white: 0, d: play.d }; plPath = []; plPrev = null; renderPuddle(false); }
+  function plRandom() {
+    plReset();
+    const ids = MEDIA[medium].all.filter(id => id !== 'black'), n = 2 + Math.floor(Math.random() * 2), pick = [];
+    while (pick.length < n) { const id = ids[Math.floor(Math.random() * ids.length)]; if (!pick.includes(id)) pick.push(id); }
+    pick.forEach((id, i) => setTimeout(() => addPaint(id, [0.5, 1, 1, 2][Math.floor(Math.random() * 4)]), i * 450));
+    if (!MEDIA[medium].water && Math.random() < 0.6) setTimeout(() => addPaint('white', 1 + Math.floor(Math.random() * 4)), n * 450);
+  }
+  function setTab(tab) {
+    app.querySelectorAll('[data-tab]').forEach(b => b.setAttribute('aria-selected', String(b.dataset.tab === tab)));
+    app.querySelectorAll('.mx-pane').forEach(p => { p.hidden = p.dataset.pane !== tab; });
+    ls.set('pp-mix-tab', tab);
+    if (tab === 'play') { renderShelf(); renderPuddle(false); }
+  }
+  app.addEventListener('click', e => {
+    const tb = e.target.closest('[data-tab]'); if (tb) { setTab(tb.dataset.tab); return; }
+    const a = e.target.closest('[data-add]'); if (a) { addPaint(a.dataset.add, a.closest('.mx-plist') ? (a.dataset.add === 'white' ? 1 : portion) : portion); return; }
+    const dc = e.target.closest('[data-dec]'); if (dc) { addPaint(dc.dataset.dec, -portion); return; }
+    const dl = e.target.closest('[data-del]'); if (dl) { if (dl.dataset.del === 'white') play.white = 0; else delete play.items[dl.dataset.del]; renderPuddle(false); return; }
+    const po = e.target.closest('[data-por]'); if (po) { portion = +po.dataset.por; renderShelf(); return; }
+    if (e.target.closest('.mx-pl-reset')) { plReset(); return; }
+    if (e.target.closest('.mx-pl-rand')) { plRandom(); return; }
+    if (e.target.closest('.mx-reshex')) { const h = plHex(); (navigator.clipboard ? navigator.clipboard.writeText(h) : Promise.reject()).then(() => window.PPToast && window.PPToast(pl('copy') + ': ' + h)).catch(() => {}); return; }
+    if (e.target.closest('.mx-pl-save')) { const h = plHex(); if (!h) return; const s = savedGet().filter(x => x.hex !== h); s.unshift({ hex: h, m: medium, items: play.items, white: play.white, d: play.d }); ls.set('pp-mix-saved', JSON.stringify(s.slice(0, 16))); renderSaved(); return; }
+    const sv = e.target.closest('[data-saved]'); if (sv) { const x = savedGet()[+sv.dataset.saved]; if (!x) return; medium = MEDIA[x.m] ? x.m : medium; ls.set('pp-mix-m', medium); play = { items: Object.assign({}, x.items), white: x.white || 0, d: x.d || 0.4 }; plPath = [x.hex]; plPrev = null; renderMedia(); renderShelf(); renderPuddle(true, x.hex); run(); return; }
+    if (e.target.closest('.mx-pl-find')) { const h = plHex(); if (!h) return; setTab('find'); setTarget(h); app.scrollIntoView({ behavior: 'smooth', block: 'start' }); }
+  });
+  app.addEventListener('input', e => { if (e.target.matches('.mx-wat input')) { play.d = Math.max(0.03, 1 - e.target.value / 100); setWater(); renderPuddle(false); } });
+
+  app.querySelector('[data-pane="pigs"]').innerHTML = pigmentsHTML();
+  app.querySelector('[data-pane="play"]').innerHTML = playHTML();
+  [['find', 'tab1'], ['play', 'tab2'], ['pigs', 'tab3']].forEach(([k, v]) => { app.querySelector(`[data-tab="${k}"]`).textContent = pl(v); });
   renderMedia();
   run();
+  setTab(['find', 'play', 'pigs'].includes(qs.get('tab')) ? qs.get('tab') : (['find', 'play', 'pigs'].includes(ls.get('pp-mix-tab')) ? ls.get('pp-mix-tab') : 'find'));
 })();
