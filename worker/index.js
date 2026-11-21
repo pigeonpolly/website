@@ -412,6 +412,14 @@ const surprise = async (env, req, uid, kind) => { const r = await surpriseKI(env
 
 // ---------- адвент-календарь (/advent/): окошки 1–31 декабря, сутки по Риге ----------
 const ADVENT_SPECIAL = [6, 12, 19, 24, 31];
+// вещи адвента 2026 (21.11.2026, просьба Алины): по 2 на окошко, только из адвента (PPCanDo.isAdv). Кладутся в advent_plan сами, один раз (meta advent_adv_v1), к тому, что уже там лежит
+const ADVENT_ADV = [['furn|advhouse', 'deco|advmittens'], ['furn|advsnowpolly', 'deco|advicicles'], ['furn|advlantern', 'deco|advscarf'], ['furn|advsleigh', 'deco|advstarlight'], ['furn|advnutcracker', 'deco|advwreathgold'], ['furn|advcocoa', 'deco|advbellrow'], ['furn|advpenguin', 'deco|advsnowcloud'], ['furn|advskates', 'deco|advgarland'], ['furn|advcandles', 'deco|advangelbird'], ['furn|advorange', 'deco|advpaperchain'], ['furn|advbear', 'deco|advaurora'], ['furn|advbookstack', 'deco|advclock'], ['furn|advfox', 'deco|advsnowflakebig'], ['furn|advpresents', 'deco|advmoon'], ['furn|advgingerman', 'deco|advcutters'], ['furn|advowl', 'deco|advbulbs'], ['furn|advsnowglobe2', 'deco|advpinecones'], ['furn|advdeer', 'deco|advholly'], ['furn|advlogbasket', 'deco|advmistletoeball'], ['furn|advsnowfamily', 'deco|advbunting'], ['furn|advigloo', 'deco|advstarstring'], ['furn|advmailbox', 'deco|advletters'], ['furn|advcandlelamp', 'deco|advsock'], ['furn|advtree2', 'deco|advstartop'], ['furn|advcarousel', 'deco|advribbons'], ['furn|advsnowbunny', 'deco|advframe'], ['furn|advsamovar', 'deco|advwreathberry'], ['furn|advskis', 'deco|advfrost'], ['furn|advyeti', 'deco|advcomet'], ['furn|advfirework', 'deco|advconfetti'], ['furn|advclocktower', 'deco|advsparkler']];
+async function adventAdv(env) {
+  if (await getMeta(env, 'advent_adv_v1')) return;
+  const st = env.DB.prepare('INSERT OR IGNORE INTO advent_plan (day, kind, item) VALUES (?, ?, ?)');
+  await env.DB.batch(ADVENT_ADV.flatMap((xs, i) => xs.map(x => { const [k, v] = x.split('|'); return st.bind(i + 1, k, v); })));
+  await setMeta(env, 'advent_adv_v1', String(now()));
+}
 const INK_DAY = 24; // окно, которое открывает курс туши (users.ink_ok)
 const ADVENT_LAST_JAN_DEFAULT = 23; // теперь RULES.adventLastJan; // до 23 января (включительно) можно открыть пропущенные окошки // особые окошки (31-е — легендарное); то же в site/assets/advent.js
 // бейдж «Коллекционер»: открыты все 31 окошко адвента одного года (пропущенные — до 23 января). true — только что получен
@@ -2292,6 +2300,7 @@ async function route(req, env, url) {
     return json({ ok: true });
   }
   if (m === 'GET' && p === '/api/advent') {
+    await adventAdv(env).catch(e => healthErr(env, 'adventAdv', e)); // вещи адвента 2026 — в окошки (один раз)
     const t = adventNow(req, env), u = await currentUser(req, env); const admin = (await adminIdentity(u, env)) || !!(u && String(u.nick || '').toLowerCase() === 'pigeonpolly'); // без PIN: план окон видит аккаунт Алины
     const opened = u ? (await env.DB.prepare('SELECT day, kind, item, buttons, got FROM advent_open WHERE user_id = ? AND year = ?').bind(u.id, t.year).all()).results.map(o => ({ ...o, got: parseJ(o.got, o.kind ? [[o.kind, o.item]] : []) })) : [];
     const all = (await env.DB.prepare('SELECT day, kind, item FROM advent_plan ORDER BY day').all()).results;
@@ -2328,6 +2337,11 @@ async function route(req, env, url) {
       const ag = await env.DB.prepare("INSERT INTO gifts (user_id, kind, item, note, status, created_at, opened_at) VALUES (?, ?, ?, 'advent', 'bag', ?, ?)").bind(u.id, ki[0], ki[1], now(), now()).run();
       if (isLeg(ki[0], ki[1])) await flockEventDb(env, 'legend', u, { kind: ki[0], item: ki[1], key: 'g' + ag.meta.last_row_id });
       got.push(ki);
+    }
+    if (files.length && got.length) { // в окошке и файлы, и вещи (вещи адвента 2026 + файлы Алины): kind 'mix', got — пары [вид, вещь] и ['file', файл]
+      const mix = [...files.map(f => ['file', f]), ...got];
+      await env.DB.prepare('UPDATE advent_open SET kind = \'mix\', item = ?, got = ? WHERE user_id = ? AND year = ? AND day = ?').bind(files[0], JSON.stringify(mix), u.id, t.year, day).run();
+      return json({ ok: true, day, kind: 'mix', item: files[0], files, got: mix, ink: inkOk, inkUntil: inkTo, collector: await adventCollector(env, u.id, t.year), collectorBtns: BTN.badges.collector });
     }
     if (files.length) {
       await env.DB.prepare('UPDATE advent_open SET kind = \'file\', item = ?, got = ? WHERE user_id = ? AND year = ? AND day = ?').bind(files[0], JSON.stringify(files), u.id, t.year, day).run();
@@ -2849,6 +2863,7 @@ async function route(req, env, url) {
     const g = await env.DB.prepare("SELECT * FROM gifts WHERE id = ? AND user_id = ? AND status = 'bag'").bind(Number(b.id), u.id).first();
     if (!g) fail(404, 'gift');
     if (g.note === 'starter') fail(403, 'starter');
+    if (!PPCanDo(g.kind, g.item).sell) fail(403, 'sell'); // награды Титоса, вещи адвента — не продаются (PPCanDo)
     const a = await toShop(env, req, u, g);
     const n = RULES.sellPrice;
     await env.DB.prepare('UPDATE users SET buttons = COALESCE(buttons, 0) + ? WHERE id = ?').bind(n, u.id).run();

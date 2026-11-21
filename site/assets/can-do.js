@@ -5,6 +5,7 @@
 //   gift — можно подарить другой птичке; sell — продать за пуговки; bag — убрать из комнаты в сумку; box — положить в адвент-окно и подарок из кабинета;
 //   pack — спрятать в коробку в комнате (этап 11 Г): коробку в коробку и альбом — нельзя (мелкая ли вещь — room.js isSmall).
 // Легендарные: не дарятся. Игровые (бутылочка «Вкус детства» furn|kidpot:N, зелье оживления котика furn|revive — этап 28): не в магазин и не в подарок из кабинета.
+// Вещи адвента (furn|adv*, deco|adv*): только из окошек адвента — не в магазине, не подарить, не продать.
 // Альбом furn|album: есть в каждой комнате сам — ничего нельзя.
 // Награды Титоса (TITOS, за уровни 30/50/90/100, и вещи за дела furn|tc<имя> — isCase; docs/titos.md): только своя — не в магазине, не подарить, не продать, не в подарок из кабинета.
 (function (g) {
@@ -19,10 +20,12 @@
   var isGame = function (kind, item) { return kind === 'furn' && (base(item) === 'kidpot' || base(item) === 'revive'); };
   var isBox = function (kind, item) { return kind === 'furn' && BOXES.indexOf(base(item)) >= 0; };
   var isCase = function (kind, item) { return kind === 'furn' && /^tc[a-z]+$/.test(base(item)); };
+  var isAdv = function (kind, item) { return (kind === 'furn' || kind === 'deco') && /^adv[a-z0-9]+$/.test(base(item)); }; // вещи адвента 2026 (только из окошек; room.js «вещи адвента»)
   function canDo(kind, item) {
     if (kind && typeof kind === 'object') { item = kind.item != null ? kind.item : kind.v; kind = kind.kind || kind.k; }
     if (isAlbum(kind, item)) return { shop: false, gift: false, sell: false, bag: false, box: false, pack: false };
     if (canDo.TITOS.has(kind + '|' + base(item)) || canDo.OWN.has(kind + '|' + base(item)) || isCase(kind, item)) return { shop: false, gift: false, sell: false, bag: true, box: false, pack: true };
+    if (isAdv(kind, item)) return { shop: false, gift: false, sell: false, bag: true, box: false, pack: true };
     var leg = canDo.LEGEND.has(kind + '|' + item) || item === 'legend', game = isGame(kind, item);
     return { shop: !game, gift: !leg, sell: true, bag: true, box: !game, pack: !isBox(kind, item) };
   }
@@ -32,6 +35,7 @@
   canDo.isAlbum = isAlbum;
   canDo.isGame = isGame;
   canDo.isCase = isCase;
+  canDo.isAdv = isAdv;
   canDo.isBox = isBox;
   // для подсказки в Зельеварне и похожего «потратить вещь»: можно только то, что возвращается в магазин и не легендарное
   canDo.spend = function (kind, item) { var c = canDo(kind, item); return c.shop && c.gift; };

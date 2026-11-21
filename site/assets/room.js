@@ -1322,6 +1322,21 @@
     plain_black: [['Plain wall: black', 'Однотонные обои: чёрные', 'Vienkrāsainas tapetes: melnas'], plainWall('#18161B')],
   });
   const PLAIN_WALLS = ['wall|plain_white', 'wall|plain_cream', 'wall|plain_pearl', 'wall|plain_blush', 'wall|plain_mint', 'wall|plain_sky', 'wall|plain_lilac', 'wall|plain_butter', 'wall|plain_charcoal', 'wall|plain_navy', 'wall|plain_forest', 'wall|plain_burgundy', 'wall|plain_chocolate', 'wall|plain_plum', 'wall|plain_teal', 'wall|plain_black'];
+  // ❄️ снежный лес под ночным небом (21.11.2026): вид из окна и обои — звёзды мерцают, идёт снег
+  const nfFir = (g, cx, base, h, c, sn) => { for (let y = 0; y < h; y++) { const k = y / h, w = Math.max(1, Math.round((1 + (y % Math.max(3, Math.round(h / 4)))) * .6 + k * h * .45)); R(g, cx - Math.floor(w / 2), base - h + y, w, 1, (y % Math.max(3, Math.round(h / 4))) === 0 ? sn : c); } R(g, cx - 1, base, 2, 2, '#2A1E1A'); };
+  const nfSky = (g, x, y, w, h, t, seed, n) => { for (let k = 0; k < h; k++) R(g, x, y + k, w, 1, k < h * .4 ? '#0B1030' : k < h * .75 ? '#131A45' : '#1E2A5C'); const r = rngOf(seed); for (let i = 0; i < n; i++) { const sx = x + r() * w, sy = y + r() * h * .7, tw = Math.sin(t / 400 + i * 1.7); if (tw > -.5) R(g, sx, sy, 1, 1, tw > .7 ? '#FFFFFF' : '#C9D6FF'); } };
+  const nfSnow = (g, x, y, w, h, t, n) => { const r = rngOf(17); for (let i = 0; i < n; i++) R(g, x + ((r() * w + t / 400 * (i % 3 + 1)) % w), y + ((r() * h + t / 80 * (1 + (i % 2))) % h), 1, 1, 'rgba(255,255,255,.85)'); };
+  VIEW.snowforest = [['Snowy forest at night', 'Снежный лес ночью', 'Sniegots mežs naktī'], (g, x, y, t) => {
+    nfSky(g, x, y, WW, WH, t, 23, 22); R(g, x + 30, y + 5, 5, 5, '#F4EFD6'); R(g, x + 29, y + 6, 1, 3, '#F4EFD6'); R(g, x + 35, y + 6, 1, 3, '#F4EFD6'); R(g, x + 32, y + 6, 1, 1, '#DCD6B8');
+    [[4, 30, 14], [13, 32, 17], [24, 31, 13], [37, 32, 15]].forEach(([cx, b, h]) => nfFir(g, x + cx, y + b, h, '#1C3A3A', '#9FB8D6'));
+    R(g, x, y + 32, WW, WH - 32, '#DCE6F5'); R(g, x, y + 32, WW, 1, '#FFFFFF');
+    [[8, 40, 12], [20, 41, 15], [32, 40, 11]].forEach(([cx, b, h]) => nfFir(g, x + cx, y + b, h, '#24504A', '#FFFFFF'));
+    R(g, x, y + WH - 2, WW, 2, '#FFFFFF'); nfSnow(g, x, y, WW, WH, t, 16); }];
+  WALL.snowforest = [['Snowy forest at night', 'Снежный лес ночью', 'Sniegots mežs naktī'], g => {
+    nfSky(g, 0, 0, RW, FY, 0, 41, 70); R(g, 18, 8, 9, 9, '#F4EFD6'); R(g, 16, 10, 2, 5, '#F4EFD6'); R(g, 27, 10, 2, 5, '#F4EFD6');
+    const r = rngOf(77); for (let i = 0; i < 16; i++) nfFir(g, 4 + i * 12 + r() * 6, FY - 14 - r() * 6, 22 + r() * 14, '#1C3A3A', '#8FAACB');
+    R(g, 0, FY - 14, RW, 14, '#C9D7EC'); for (let i = 0; i < 12; i++) nfFir(g, 8 + i * 17 + r() * 6, FY - 3, 16 + r() * 10, '#24504A', '#FFFFFF');
+    R(g, 0, FY - 4, RW, 4, '#E6EEF8'); }];
   // ---------- ❄️ Зимний пир (21.11.2026): блюда на стол, длинный стол и скамья, сугробы, ледяные скульптуры ----------
   const TCLOTH = [['#F7F2E8', '#E5484D'], ['#C9463D', '#2E7D4F'], ['#2E7D4F', '#F6D04D']];
   const steam = (p, t, xs, y) => xs.forEach((x, k) => { const a = ((t / 900) + k * .37) % 1; p(x + Math.sin(a * 6 + k) * .5, y + 2 - a * 3, .5, 1, 'rgba(255,255,255,' + (.75 * (1 - a)).toFixed(2) + ')'); });
@@ -1390,6 +1405,89 @@
   });
   ['tangerines', 'pelmeni', 'greypeas', 'berrypie', 'pudding', 'hotchoc', 'punchbowl', 'piparkukas', 'stollen'].forEach(k => SMALL.add(k));
   Object.assign(GLOW, { pudding: ['#9FC0FF', 10] });
+  // ---------- 🎄 вещи адвента 2026 (21.11.2026): по 2 на каждое окошко, только из адвента — не в магазине, не подарить (PPCanDo.isAdv: ключ adv*) ----------
+  // game: true — не в каталоге магазина и сюрпризов; что в каком окошке — ADVENT_ADV в worker/index.js (кладёт в advent_plan сам, один раз)
+  const AP = { k: '#2B1A3A', w: '#FFFFFF', s: '#DCEAF5', r: '#D8283A', R: '#9E1B22', g: '#2E7D4F', G: '#1F5A38', y: '#F6D04D', Y: '#C9962A', o: '#F08A3B', b: '#8C5A34', B: '#5B3A1E', c: '#D9A45B',
+    l: '#BFE3F5', L: '#7FB3E8', n: '#2B3E6B', p: '#F28AB2', v: '#B79CF2', e: '#9AA3AE', E: '#5E6470', i: '#E6F6FF', t: '#4CC38A', m: '#F4EBDD', h: '#FFE9A8', f: '#F7B6C8', q: '#1A1528' };
+  const AD = (en, ru, lv, rows, pal, more) => Object.assign({ n: N(en, ru, lv), w: Math.max(...rows.map(r => r.length)), h: rows.length, top: null, game: true, adv: true, d: S(rows, Object.assign({}, AP, pal || {})) }, more || {});
+  const ADA = (en, ru, lv, w, h, d, more) => Object.assign({ n: N(en, ru, lv), w, h, top: null, game: true, adv: true, d }, more || {}); // анимированные
+  const ablink = (t, k, a, b) => Math.floor(t / k) % 2 ? a : b;
+  Object.assign(FURN, {
+    advhouse: ADA('Mini advent house', 'Домик-адвент', 'Adventes mājiņa', 12, 14, (p, t) => spr(p, ['.....rr.....', '....rRRr....', '...rRRRRr...', '..rRRRRRRr..', '.rRRRRRRRRr.', 'rrrrrrrrrrrr', '.mmmmmmmmmm.', '.mWWmmmmWWm.', '.mWWmmmmWWm.', '.mmmmmmmmmm.', '.mmmmbbmmmm.', '.mWWmbbmWWm.', '.mmmmbbmmmm.', 'kkkkkkkkkkkk'], Object.assign({}, AP, { W: ablink(t, 900, '#FFE08A', '#F6C445') })), { glow: [6, 8] }),
+    advsnowpolly: AD('Snow Polly', 'Снежная Полли', 'Sniega Pollija', ['....kkk.....', '...kwwwk....', '..kwwkwwk...', 'ookwwwwwk...', '...kwwwwk...', '..kwwwwwwk..', '.kwwswwwwwk.', '.kwwwswwwwkk', '.kwwwwswwwk.', '..kwwwwwwk..', '...kkkkkk...', 'sssssssssss.'], {}),
+    advlantern: ADA('Winter lantern', 'Зимний фонарь', 'Ziemas laterna', 8, 14, (p, t) => spr(p, ['...kk...', '..k..k..', '.kkkkkk.', 'kEEEEEEk', 'kEhhhhEk', 'kEhFFhEk', 'kEhFFhEk', 'kEhhhhEk', 'kEhhhhEk', 'kEEEEEEk', '.kkkkkk.', '..kkkk..', 'ssssssss'], Object.assign({}, AP, { F: Math.sin(t / 120) > 0 ? '#F6A23A' : '#F6D04D' })), { glow: [4, 6] }),
+    advsleigh: AD('Toy sleigh', 'Игрушечные сани', 'Rotaļu kamanas', ['r.........', 'rr........', 'rrrrrrrrr.', 'rRRRRRRRrr', 'rRyRRyRRr.', '.rrrrrrrr.', '..e....e..', 'eeeeeeeeee', '.........e'], {}),
+    advnutcracker: AD('Nutcracker', 'Щелкунчик', 'Riekstkodis', ['..kkkk..', '..knnk..', '..knnk..', '.kmmmmk.', '.kmkmkm.', '.kmwwmk.', '..kwwk..', '.kRRRRk.', 'kRyRRyRk', 'kRRyyRRk', '.kRRRRk.', '.knn.nnk', '.knn.nnk', '.kkk.kkk'], {}),
+    advcocoa: ADA('Cocoa corner', 'Уголок какао', 'Kakao stūrītis', 14, 9, (p, t) => { steam(p, t, [3, 9], -2); spr((a, b2, w, h, c) => p(a, b2 + 1, w, h, c), ['.ww...........', 'rrrr..LLLL....', 'rBBr..LBBL.mm.', 'rrrrr.LLLLLmm.', 'rrrr..LLLL.mm.', '.rr....LL..mm.', 'bbbbbbbbbbbbbb', '.B..........B.'], AP); }),
+    advpenguin: AD('Penguin plush', 'Плюшевый пингвин', 'Plīša pingvīns', ['..kkkk...', '.kqqqqk..', 'kqwqqwqk.', 'kqqooqqk.', 'kqwwwwqk.', 'qqwwwwqqk', 'kqwwwwqk.', 'kqwwwwqk.', '.kwwwwk..', '.oo..oo..'], {}),
+    advskates: AD('Ice skates', 'Коньки', 'Slidas', ['.ww...ww....', '.wwr..wwr...', '.wwr..wwr...', '.www..www...', 'wwww.wwww...', 'wwwwwwwwww..', 'eeeeeeeeeeee', '.e...e.e...e'], {}),
+    advcandles: ADA('Advent wreath', 'Адвент-венок', 'Adventes vainags', 18, 11, (p, t) => { [2, 6.5, 11, 15.5].forEach((x, k) => { p(x, 3, 1.5, 4, ['#9B59B6', '#9B59B6', '#F28AB2', '#9B59B6'][k]); const f = Math.sin(t / 110 + k) > 0; p(x + .25, f ? 1 : 1.5, 1, f ? 2 : 1.5, '#F6C445'); });
+      spr((a, b2, w, h, c) => p(a, b2 + 7, w, h, c), ['.gGgrgGgGrgGgGgr..', 'GgGgGgGrgGgGgGgGg.', '.gGrgGgGgGrgGgGg..', '..kkkkkkkkkkkkk...'], AP); }, { glow: [9, 2] }),
+    advorange: AD('Clove oranges', 'Апельсины с гвоздикой', 'Apelsīni ar krustnagliņām', ['...g..g.....', '..ooo.ooo...', '.oBoBoBoBo..', '.ooooooooo..', 'mmmmmmmmmmmm', '.mmmmmmmmmm.', '..kkkkkkkk..'], {}),
+    advbear: AD('Polar bear plush', 'Белый мишка', 'Baltais lācītis', ['.kk....kk.', 'kwwk..kwwk', '.kwwwwwwk.', 'kwkwwwwkwk', 'kwwwqqwwwk', '.kwwwwwwk.', 'kwwwrrwwwk', 'kwwwwwwwwk', 'kwwkwwkwwk', '.kk.kk.kk.'], {}),
+    advbookstack: AD('Winter books and cocoa', 'Зимние книги и какао', 'Ziemas grāmatas un kakao', ['.........ww.', '........rrrr', '........rBBr', 'nnnnnnnnrrrr', 'nyyyyyyy.rr.', 'gggggggggg..', 'rrrrrrrrrrr.', 'rwwwwwwwwwr.'], {}),
+    advfox: AD('Arctic fox', 'Песец', 'Polārlapsa', ['k.k..........', 'kwkw.........', 'kwwwk........', 'kwkwwk.......', 'qwwwwk.....kk', '.kwwwwkkkkwwk', '..kwwwwwwwwwk', '..kwwwwwwwwk.', '..kwkkwkkwk..', '..kk.kk.kk...'], {}),
+    advpresents: AD('Present tower', 'Башня подарков', 'Dāvanu tornis', ['...y.y...', '...yyy...', '..vvyvv..', '..vvyvv..', '.ttttyttt', '.ttttyttt', 'rrrryrrrr', 'rrrryrrrr', 'rrrryrrrr', 'rrrryrrrr'], {}),
+    advgingerman: AD('Big gingerbread man', 'Большой пряничный человечек', 'Liels piparkūku vīriņš', ['....cccc....', '...cccccc...', '...cwccwc...', '...cccccc...', '...cwwwwc...', 'cccccccccccc', 'cwcccrcccwcc', '....crcc....', '....ccrc....', '...cc..cc...', '..cwc..cwc..', '..cc....cc..'], {}),
+    advowl: ADA('Snowy owl', 'Полярная сова', 'Baltā pūce', 10, 11, (p, t) => spr(p, ['.k......k.', '.kwwwwwwk.', 'kwwwwwwwwk', 'kwYYwwYYwk', 'kwYkwwkYwk', 'kwwwoowwwk', 'kwkwwwwkwk', 'kwwwkwwwwk', 'kwkwwwwkwk', '.kwwwwwwk.', '..oo..oo..'], Object.assign({}, AP, { Y: Math.floor(t / 3000) % 7 ? '#F6D04D' : '#FFFFFF', k: '#2B1A3A' }))),
+    advsnowglobe2: ADA('Riga snow globe', 'Снежный шар с Ригой', 'Sniega bumba ar Rīgu', 14, 15, (p, t) => { blob(p, 7, 6.5, 7, 6.5, (u, v) => v > .7 ? '#F4F8FC' : 'rgba(191,227,245,.75)', '#8FC8E8');
+      [[3, 6, 2, 6], [6, 3, 1.5, 9], [8.5, 5, 2, 7], [11, 7, 1.5, 5]].forEach(([x, y, w, h]) => p(x, y, w, h, '#C9463D')); p(6.25, 1.5, 1, 2, '#2E7D4F'); p(3, 5, 2, 1, '#2E7D4F'); p(8.5, 4, 2, 1, '#2E7D4F');
+      for (let k = 0; k < 6; k++) p(2 + ((k * 2.3 + t / 400) % 10), 1.5 + ((k * 1.7 + t / 260) % 9), .5, .5, '#FFFFFF'); p(2, 13, 10, 2, '#8C5A34'); p(2, 13, 10, .5, '#B07A45'); }),
+    advdeer: AD('Reindeer plush', 'Плюшевый олень', 'Plīša ziemeļbriedis', ['b..b.....', '.bb.b....', '..bb.....', '.cccc....', '.ckcc....', 'rcccc....', '..ccccccc', '..ccmcccc', '..ccccccc', '..c.c..cc', '..B.B..BB'], {}),
+    advlogbasket: AD('Firewood basket', 'Корзина с дровами', 'Malkas grozs', ['.bcb.cbc....', 'bcBcbcBcb...', 'cBbcBbcBbc..', 'BBBBBBBBBBB.', 'BcBcBcBcBcB.', 'BBBBBBBBBBB.', '.BcBcBcBcB..', '..BBBBBBB...'], { c: '#E8C08A' }),
+    advsnowfamily: AD('Snowman family', 'Семья снеговиков', 'Sniegavīru ģimene', ['.kkk...........', '.kkk.......kk..', 'kwwwk.....kwwk.', 'wkwkw.....wkkw.', 'wwoww.....woww.', 'rrrrr.....rrrr.', 'wwwwww...wwwww.', 'wwkwww...wwkww.', 'wwwwww.k.wwwww.', 'wwkwww.ww.www..', 'wwwwww.ww......', 'sssssssssssssss'], {}),
+    advigloo: AD('Toy igloo', 'Игрушечное иглу', 'Rotaļu iglu', ['....kkkkk....', '..kkiiiiikk..', '.kiiliiiliik.', 'kiiiiliiiiiik', 'klliiiqqqiilk', 'kiiiilqqqliik', 'kiiliiqqqiiik', 'sssssssssssss'], {}),
+    advmailbox: AD('Letter box to the North', 'Почтовый ящик на Север', 'Pastkastīte uz Ziemeļiem', ['.kkkkkk.', 'krrrrrrk', 'krkkkkrk', 'krrrrrrk', 'krryyrrk', 'krrrrrrk', 'krrrrrrk', '.kkkkkk.', '...ee...', '...ee...', '...ee...', '.eeeeee.'], {}),
+    advcandlelamp: ADA('Candle lantern trio', 'Три фонаря со свечами', 'Trīs laternas ar svecēm', 16, 10, (p, t) => [[0, 3], [5.5, 0], [11, 3]].forEach(([x, y], k) => { p(x + 1.5, y, 2, 1, '#2B1A3A'); p(x, y + 1, 5, h3(y), '#5E6470'); p(x + .5, y + 1.5, 4, h3(y) - 1, '#FFE9A8'); p(x + 2, y + 4, 1, 3, '#FFFFFF'); p(x + 2, y + 3 - (Math.sin(t / 100 + k) > 0 ? .5 : 0), 1, 1, '#F6A23A'); p(x - .5, y + 1 + h3(y), 6, 1, '#2B1A3A'); }), { glow: [8, 5] }),
+    advtree2: ADA('Silver Christmas tree', 'Серебряная ёлка', 'Sudraba egle', 30, 46, (p, t) => { for (let y = 0; y < 38; y++) { const tier = y < 12 ? y / 12 : y < 25 ? (y - 7) / 18 : (y - 18) / 20, w = Math.max(1, Math.round(tier * 28)); for (let x = 0; x < w; x++) p(15 - Math.floor(w / 2) + x, y + 2, 1, 1, (x + y) % 6 === 0 ? '#FFFFFF' : x < w / 3 ? '#9FB4C8' : '#C9D6E3'); }
+      [[13, 12], [17, 18], [10, 24], [20, 28], [14, 33], [8, 36], [22, 36]].forEach(([x, y], k) => p(x, y, 2, 2, (Math.floor(t / 400) + k) % 3 ? ['#4A7BD8', '#B79CF2', '#E5484D'][k % 3] : '#FFE08A')); p(14, 0, 2, 3, '#F6D04D'); p(13, 40, 4, 3, '#6B4329'); p(10, 43, 10, 3, '#4A7BD8'); p(10, 43, 10, 1, '#FFFFFF'); }, { glow: [15, 20] }),
+    advcarousel: ADA('Music box carousel', 'Шкатулка-карусель', 'Mūzikas karuselis', 14, 15, (p, t) => { p(6.5, 0, 1, 2, '#F6D04D'); spr(p, ['..............', '..............', '..rrrrrrrrrr..', '.rwrwrwrwrwrw.', 'rrrrrrrrrrrrrr'], AP); p(1, 5, .5, 6, '#F6D04D'); p(12.5, 5, .5, 6, '#F6D04D'); p(6.75, 5, .5, 6, '#F6D04D');
+      const a = t / 500; [0, 1, 2].forEach(k => { const x = 7 + Math.sin(a + k * 2.1) * 4.5, front = Math.cos(a + k * 2.1) > 0; if (front) { p(x - 1.5, 7.5 + Math.sin(t / 200 + k), 3, 2, ['#FFFFFF', '#F7B6C8', '#BFE3F5'][k]); p(x - 1.5, 7, 1, 1, '#2B1A3A'); } });
+      spr((a2, b2, w, h, c) => p(a2, b2 + 11, w, h, c), ['bbbbbbbbbbbbbb', 'bYbYbYbYbYbYbb', 'BBBBBBBBBBBBBB', '.B..........B.'], AP); }),
+    advsnowbunny: AD('Snow bunny', 'Снежный зайчик', 'Sniega zaķītis', ['.kk.kk...', '.kw.kw...', '.kp.kp...', 'kwwwwwk..', 'kwkwwkwk.', 'kwwpwwwk.', '.kwwwwwwk', '.kwwwwwwk', '.kwwwwwwk', 'ssssssss.'], {}),
+    advsamovar: ADA('Samovar', 'Самовар', 'Samovārs', 12, 15, (p, t) => { steam(p, t, [6], -2); spr((a, b2, w, h, c) => p(a, b2 + 1, w, h, c), ['....rr......', '....YY......', '...YyyY.....', '..YyyyyY....', '.YyyyyyyY...', 'YyhyyyyyyY..', 'YyhyyyyyyYYY', 'YyhyyyyyyY.Y', '.YyyyyyyY...', '..YyyyyY....', '...YYYY.....', '..YYYYYY....', '.YYYYYYYY...', '.Y......Y...'], AP); }),
+    advskis: AD('Skis and poles', 'Лыжи и палки', 'Slēpes un nūjas', ['r.r..e.e', 'r.r..e.e', 'r.r..e.e', 'r.r..e.e', 'r.r..e.e', 'r.r..e.e', 'rkr..e.e', 'r.r..e.e', 'r.r..e.e', 'r.r..e.e', 'r.r..e.e', 'r.r.kekek', 'rrr......'], {}),
+    advyeti: AD('Little yeti plush', 'Маленький йети', 'Mazais jeti', ['..wwwwww..', '.wwwwwwww.', 'wwllllllww', 'wwlklklww.', 'wwllqqllww', 'wwwllllwww', 'wwwwwwwwww', 'wwwwwwwwww', '.ww.ww.ww.', '.ll.ll.ll.'], {}),
+    advfirework: ADA('Firework box', 'Коробка фейерверков', 'Salūta kaste', 14, 14, (p, t) => { const a = (t % 2400) / 2400; if (a < .5) { const r = a * 10; ['#F6D04D', '#E5484D', '#7FB3E8', '#4CC38A', '#B79CF2', '#F28AB2'].forEach((c, k) => { const an = k * Math.PI / 3; p(7 + Math.cos(an) * r, 3 - Math.sin(an) * r * .6, .75, .75, c); }); }
+      spr((a2, b2, w, h, c) => p(a2, b2 + 6, w, h, c), ['..r..L..y..t..', '..r..L..y..t..', 'nnnnnnnnnnnnnn', 'nyyynnnnnnyyyn', 'nnnnyyyyyynnnn', 'nyyynnnnnnyyyn', 'nnnnnnnnnnnnnn', 'kkkkkkkkkkkkkk'], AP); }),
+    advclocktower: ADA('New Year clock', 'Новогодние часы', 'Jaungada pulkstenis', 14, 26, (p, t) => { spr(p, ['......Y.......', '.....YYY......', '....BBBBB.....', '...BBBBBBB....', '..BBBBBBBBB...', '..BmmmmmmmB...', '..BmmmkmmmB...', '..BmmmkmmmB...', '..BmmmkkmmB...', '..BmmmmmmmB...', '..BBBBBBBBB...', '...BbbbbbB....', '...BbbbbbB....', '...BbYbbbB....', '...BbbbbbB....', '...BbbbbbB....', '...BbbbbbB....', '...BbbbbbB....', '...BbbbbbB....', '...BbbbbbB....', '..BBBBBBBBB...', '..BBBBBBBBB...'], AP); p(5.5 + Math.sin(t / 300) * 1.2, 13, 1, 1, '#F6D04D'); } ),
+  });
+  function h3(y) { return y ? 6 : 8; }
+  Object.assign(DECO, {
+    advmittens: AD('Mittens on a string', 'Варежки на верёвочке', 'Dūraiņi uz auklas', ['eeeeeeeeeeee', 'e..........e', 'rr........LL', 'rrr......LLL', 'rrr......LLL', 'wrw......wLw', 'rrr......LLL', 'www......www'], {}),
+    advicicles: ADA('Icicle row', 'Сосульки', 'Lāsteku rinda', 24, 9, (p, t) => { p(0, 0, 24, 1.5, '#FFFFFF'); [[1, 5], [4, 8], [7, 4], [10, 7], [13, 5], [16, 8], [19, 4], [22, 6]].forEach(([x, h], k) => { for (let y = 1; y < h; y++) p(x + (y / h) * .75, y, Math.max(.5, 1.5 * (1 - y / h)), 1, y < 2 ? '#E6F6FF' : '#BFE3F5'); const d = (t / 700 + k * .37) % 1; if (k % 3 === 0 && d < .6) p(x + .5, h + d * 2, .5, .5, '#7FB3E8'); }); }),
+    advscarf: AD('Knitted scarf', 'Вязаный шарф', 'Adīta šalle', ['bbbbbbbbbbbb', '.rwrwrwrwrw.', '.rrrrrrrrrr.', '.rwr.....rw.', '.rrr.....rr.', '.rwr.....rw.', '.rrr.....rr.', '.y.y.....yy.'], {}),
+    advstarlight: ADA('Paper star lamp', 'Бумажная звезда-лампа', 'Papīra zvaigznes lampa', 11, 12, (p, t) => { p(5, 0, .5, 2, '#9AA3AE'); spr((a, b2, w, h, c) => p(a, b2 + 2, w, h, c), ['.....H.....', '....HHH....', 'HHHHHhHHHHH', '.HHHhhhHHH.', '..HHhhhHH..', '..HHHhHHH..', '.HHH...HHH.', 'HH.......HH'], Object.assign({}, AP, { H: '#F6C445', h: ablink(t, 700, '#FFF6C2', '#FFE08A') })); }, { glow: [5, 6] }),
+    advwreathgold: AD('Golden wreath', 'Золотой венок', 'Zelta vainags', ['...YyyY...', '..YyYYyY..', '.Yy....yY.', 'Yy......yY', 'yY......Yy', 'Yy......yY', '.Yy....yY.', '..YyrryY..', '...rrrr...', '..r....r..'], {}),
+    advbellrow: AD('Sleigh bells', 'Бубенцы', 'Zvanu virtene', ['rrrrrrrrrrrrrr', '.Y...Y...Y....', 'YyY.YyY.YyY...', 'YkY.YkY.YkY...', '.Y...Y...Y....'], {}),
+    advsnowcloud: ADA('Snowing cloud', 'Снежное облачко', 'Sniegots mākonītis', 16, 14, (p, t) => { blob(p, 8, 4, 8, 4, (u, v) => v > .7 ? '#DCEAF5' : '#FFFFFF', '#9CC0DA'); for (let k = 0; k < 5; k++) { const a = (t / 1600 + k * .23) % 1; p(2 + k * 3, 8 + a * 6, .75, .75, `rgba(255,255,255,${(1 - a).toFixed(2)})`); } p(5, 3.5, .75, .75, '#2B1A3A'); p(10, 3.5, .75, .75, '#2B1A3A'); p(7, 5, 2, .5, '#F28AB2'); }),
+    advgarland: AD('Pine garland', 'Еловая гирлянда', 'Egļu vītne', ['g.G.g.G.g.G.g.G.g.G.', 'gGgGgGgGgGgGgGgGgGgG', '.gGgGgrgGgGgGgrgGgG.', '..gGgGgGgGgGgGgGgG..', '....gGgGgGrGgGgG....'], {}),
+    advangelbird: AD('Angel bird', 'Птичка-ангел', 'Eņģeļputniņš', ['...yyyy...', '..y....y..', '...vvvv...', 'w.vvkvvo..', 'ww.vvvv.ww', 'www.vv.www', '.wwvvvvww.', '...vvvv...', '...v..v...'], {}),
+    advpaperchain: AD('Paper chain', 'Бумажная цепочка', 'Papīra ķēdīte', ['rr.gg.yy.LL.pp.rr.gg', 'r.rg.gy.yL.Lp.pr.rg.', 'rr.gg.yy.LL.pp.rr.gg'], {}),
+    advaurora: ADA('Aurora ribbon', 'Лента северного сияния', 'Ziemeļblāzmas lente', 28, 8, (p, t) => { for (let x = 0; x < 28; x += .5) { const y = 3 + Math.sin(x / 4 + t / 700) * 2; p(x, y, .5, 2, '#4CC38A'); p(x, y + 2, .5, 1.5, 'rgba(127,211,245,.8)'); p(x, y - 1, .5, 1, 'rgba(183,156,242,.7)'); } }),
+    advclock: AD('Snowflake clock', 'Часы-снежинка', 'Sniegpārsliņas pulkstenis', ['....l.l....', '..l..L..l..', '...lwwwl...', 'l.wwwkwww.l', '.lwwwkwwwl.', 'LLwwwkkkwLL', '.lwwwwwwwl.', 'l.wwwwwww.l', '...lwwwl...', '..l..L..l..', '....l.l....'], {}),
+    advsnowflakebig: AD('Big paper snowflake', 'Большая бумажная снежинка', 'Liela papīra sniegpārsla', ['......w......', '...w..w..w...', '....w.w.w....', '.w...www...w.', '..w.wwwww.w..', '...wwwlwww...', 'wwwwwlllwwwww', '...wwwlwww...', '..w.wwwww.w..', '.w...www...w.', '....w.w.w....', '...w..w..w...', '......w......'], {}),
+    advmoon: AD('Winter moon', 'Зимняя луна', 'Ziemas mēness', ['...hhhh...', '.hhhh.....', 'hhhh......', 'hhhh.....y', 'hhhh......', 'hhhhh.....', '.hhhhh....', '..hhhhhh..', '....hhh...'], {}),
+    advcutters: AD('Cookie cutters', 'Формочки для печенья', 'Cepumu formiņas', ['eeeeeeeeeeeeeeee', '..e....e....e...', '..e....e....e...', '.eee..e.e..e.e..', 'eeeee.eeee.eeee.', '.eee..e..e.e..e.', 'e...e.eeee..ee..'], { e: '#C9CDD6' }),
+    advbulbs: ADA('Big bulb string', 'Гирлянда больших лампочек', 'Lielo spuldzīšu virtene', 26, 6, (p, t) => { for (let x = 0; x < 26; x += .5) p(x, 1 + Math.sin(x / 26 * Math.PI) * 1.5, .5, .5, '#1F5A38'); [2, 7, 12, 17, 22].forEach((x, k) => { const y = 1.5 + Math.sin(x / 26 * Math.PI) * 1.5, on = (Math.floor(t / 500) + k) % 2; p(x, y, 1.5, 1, '#5E6470'); p(x - .25, y + 1, 2, 2.5, on ? ['#E5484D', '#F6D04D', '#4CC38A', '#7FB3E8', '#F28AB2'][k] : '#6E6A78'); }); }, { glow: [13, 3] }),
+    advpinecones: AD('Pinecone garland', 'Гирлянда из шишек', 'Čiekuru vītne', ['rrrrrrrrrrrrrrrrrr', '.b....b....b....b.', 'bBb..bBb..bBb..bBb', 'BbB..BbB..BbB..BbB', '.B....B....B....B.'], {}),
+    advholly: AD('Holly sprig', 'Веточка остролиста', 'Akas zariņš', ['gg....gg', 'gGg..gGg', '.gGggGg.', '..grrg..', '...rr...'], {}),
+    advmistletoeball: AD('Mistletoe ball', 'Шар из омелы', 'Āmuļa bumba', ['...r....', '...r....', '..gGg...', '.gGwGg..', 'gGgGgwg.', '.gwgGg..', '..gGg...', '...rr...', '..r..r..'], {}),
+    advbunting: AD('Winter bunting', 'Зимние флажки', 'Ziemas karodziņi', ['eeeeeeeeeeeeeeeeeeee', 'rrr.LLL.www.ggg.rrr.', '.r...L...w...g...r..'], {}),
+    advstarstring: ADA('Star string', 'Нитка звёздочек', 'Zvaigznīšu virtene', 6, 22, (p, t) => { p(2.75, 0, .5, 22, '#C9CDD6'); [3, 10, 17].forEach((y, k) => { const c = (Math.floor(t / 600) + k) % 2 ? '#F6D04D' : '#FFE9A8'; p(2.5, y, 1, 1, c); p(1.5, y + 1, 3, 1, c); p(2, y + 2, 2, 1, c); p(1.5, y + 3, 1, .5, c); p(3.5, y + 3, 1, .5, c); }); }),
+    advletters: AD('Hanging letters', 'Письма на ниточке', 'Vēstules uz auklas', ['eeeeeeeeeeeeee', '.e....e.....e.', 'mmmm.mmmm..mmmm', 'mkkm.mrrm..mkkm', 'mmkm.mmmm..mkmm', 'mmmm.mmmm..mmmm'], {}),
+    advsock: AD('Big striped sock', 'Большой полосатый носок', 'Liela svītraina zeķe', ['wwwww...', 'rrrrr...', 'wwwww...', 'rrrrr...', 'wwwww...', 'rrrrrr..', 'wwwwwww.', 'rrrrrrrr', '.rrrrrr.'], {}),
+    advstartop: ADA('Golden star', 'Золотая звезда', 'Zelta zvaigzne', 13, 12, (p, t) => { spr(p, ['......Y......', '.....YyY.....', '.....YyY.....', 'YYYYYyyyYYYYY', '.YyyyyhyyyyY.', '..YyyhhhyyY..', '...YyyhyyY...', '..YyyYYYyyY..', '..YyY...YyY..', '.YyY.....YyY.', '.YY.......YY.'], AP); if ((t % 2000) < 300) { p(10, 1, .5, 2, '#FFFFFF'); p(9.25, 1.75, 2, .5, '#FFFFFF'); } }, { glow: [6, 6] }),
+    advribbons: AD('Ribbon bows', 'Банты', 'Lentu banti', ['rr.rr...LL.LL...', 'rrrrr...LLLLL...', '.rrr.....LLL....', '.r.r.....L.L....', 'r...r...L...L...'], {}),
+    advframe: AD('Winter photo frame', 'Зимняя фоторамка', 'Ziemas foto rāmis', ['YYYYYYYYYYYY', 'YllllllllllY', 'YllllllwlllY', 'YllgllllllgY', 'YlgGglllgGgY', 'YgGgGgwgGgGY', 'YwwwwwwwwwwY', 'YYYYYYYYYYYY'], {}),
+    advwreathberry: AD('Berry wreath', 'Ягодный венок', 'Ogu vainags', ['...gGrg...', '..gr..Gg..', '.gG....rg.', 'gr......Gg', 'Gg......rg', 'gr......Gg', '.Gg....rG.', '..gGrgGg..', '...rr.....'], {}),
+    advfrost: AD('Frost pattern', 'Морозный узор', 'Sala raksts', ['l.....l.....l', '.l...l.l...l.', '..l.l...l.l..', 'lllll...lllll', '..l.l...l.l..', '.l...l.l...l.', 'l.....l.....l'], {}),
+    advcomet: ADA('Little comet', 'Маленькая комета', 'Mazā komēta', 18, 8, (p, t) => { const o = Math.sin(t / 500); for (let k = 0; k < 12; k++) p(k, 2 + k * .3 + o * .3, 1, 1.5, `rgba(255,233,168,${(k / 14).toFixed(2)})`); p(12, 4, 3, 3, '#FFE08A'); p(12.5, 4.5, 2, 2, '#FFFFFF'); }),
+    advconfetti: ADA('Confetti garland', 'Гирлянда конфетти', 'Konfeti vītne', 24, 6, (p, t) => { p(0, 0, 24, .5, '#C9CDD6'); for (let k = 0; k < 12; k++) { const sw = Math.sin(t / 300 + k) * .5; p(k * 2 + sw, 1 + (k % 3), 1, 1.5, ['#E5484D', '#F6D04D', '#4CC38A', '#7FB3E8', '#B79CF2', '#F28AB2'][k % 6]); } }),
+    advsparkler: ADA('Sparklers', 'Бенгальские огни', 'Brīnumsvecītes', 10, 16, (p, t) => { [[2, 0], [7, 1]].forEach(([x, y], k) => { p(x, y + 4, .5, 12 - y, '#9AA3AE'); for (let s = 0; s < 6; s++) { const an = (t / 90 + s * 1.1 + k) % 6.28, r = 1 + ((t / 60 + s) % 3); p(x + Math.cos(an) * r, y + 3 + Math.sin(an) * r, .5, .5, s % 2 ? '#FFE08A' : '#FFFFFF'); } }); }, { glow: [5, 4] }),
+  });
+  Object.assign(GLOW, { advhouse: ['#FFE08A', 14], advlantern: ['#FFC75A', 16], advcandles: ['#FFC75A', 18], advcandlelamp: ['#FFC75A', 20], advtree2: ['#DDEBFF', 28], advstarlight: ['#FFE9A8', 16], advbulbs: ['#FFD36B', 18], advstartop: ['#FFE08A', 14], advsparkler: ['#FFF0A0', 14] });
+  ['advhouse', 'advlantern', 'advnutcracker', 'advcocoa', 'advpenguin', 'advskates', 'advcandles', 'advorange', 'advbear', 'advbookstack', 'advpresents', 'advowl', 'advsnowglobe2', 'advdeer', 'advsnowbunny', 'advyeti', 'advcarousel', 'advsamovar'].forEach(k => SMALL.add(k));
   // значения каталога: «sofa:2», «ornament:4»; у вещей без цветов — просто имя
   const vals = o => Object.entries(o).flatMap(([k, d]) => d.v ? [...Array(d.v)].map((_, i) => k + ':' + i) : d.rc ? [k, ...[...Array(d.rc)].map((_, i) => k + ':' + (i + 1))] : [k]);
   const parse = v => { const [k, i] = String(v).split(':'); return [k, +i || 0]; };
@@ -1464,7 +1562,7 @@
   B.GIFT_THEMES.push(['h_office', ['💼 Study', '💼 Кабинет', '💼 Kabinets'], ['furn|laptop', 'furn|officechair', 'furn|filecabinet', 'furn|printer', 'furn|watercooler', 'furn|paperstack', 'deco|corkboard', 'furn|computer', 'furn|desk', 'furn|bookshelf', 'furn|globe']]);
   const WINTER_NEW = ['furn|longtable:0', 'furn|longtable:1', 'furn|longtable:2', 'furn|feastbench', 'furn|tangerines', 'furn|pelmeni', 'furn|greypeas', 'furn|berrypie', 'furn|pudding', 'furn|hotchoc', 'furn|punchbowl', 'furn|piparkukas', 'furn|stollen', 'furn|snowdrift', 'furn|snowmound', 'furn|snowfir', 'furn|iceswan', 'furn|icepolly', 'furn|icecastle', 'furn|icetree']; // 21.11.2026: зимний пир
   B.GIFT_THEMES.push(['winterfeast', ['❄️ Winter feast', '❄️ Зимний пир', '❄️ Ziemas mielasts'], [...WINTER_NEW, 'furn|snowman', 'furn|snowglobe', 'furn|gingerhouse', 'furn|cookies', 'furn|sled', 'furn|fireplace', 'view|snow', 'floor|snowfloor', 'wall|snowflakes']]);
-  addTh('newyear', WINTER_NEW);
+  addTh('newyear', [...WINTER_NEW, 'view|snowforest', 'wall|snowforest']); th('winterfeast')[2].push('view|snowforest', 'wall|snowforest');
   B.GIFT_THEMES.push(['plainwall', ['🎨 Plain walls', '🎨 Однотонные обои', '🎨 Vienkrāsainas tapetes'], PLAIN_WALLS]); addTh('home', PLAIN_WALLS);
   // иконка вещи для комнаты
   function icon(kind, v, size) {
@@ -1929,7 +2027,7 @@
     const hFree = () => { bird.scene = null; bird.zz = false; bird.act = null; bird.actQ = null; if (bird.st === 'scene' || bird.st === 'use' || bird.st === 'peck' || bird.st === 'hover') bird.st = 'idle'; if (bird.to) bird.to.then = null; };
     const birdH = () => FR[0].height * .75, hitBird = (b, px, py, fr) => Math.abs(px - b.x) <= fr[0].width * .4 && py <= b.y + 1 && py >= b.y - fr[0].height * .75;
     function gThink(v, now, lay) {
-      if ((duet && duet.v === v) || now < v.until || v.st === 'walk' || v.st === 'hop') return;
+      if ((duet && (duet.v === v || duet.all)) || now < v.until || v.st === 'walk' || v.st === 'hop') return;
       const sf = surfaces(lay), r = Math.random();
       if (!sf.some(z => Math.abs(z.y - v.y) < 2)) return gGo(v, now, v.x, GY);
       if (r < .2) { const tx = bird.x + (v.x < bird.x ? -12 : 12); return gGo(v, now, tx, Math.abs(bird.y - v.y) < 1 ? v.y : bird.y, () => { v.dir = bird.x > v.x ? 1 : -1; if (Math.random() < .5) emit('heart', v.x, v.y - 18); }); }
@@ -1949,10 +2047,14 @@
     function gDraw(v, now) {
       const c = v.FR[v.frame] || v.FR[0], w = c.width * .75, h = c.height * .75;
       g.save(); if (v.dir < 0) { g.translate(Math.round(v.x) * 2, 0); g.scale(-1, 1); } g.drawImage(c, Math.round(v.x) - w / 2, Math.round(v.y) - h + 1, w, h); g.restore();
+      if (v.zz) { const z = Math.floor(now / 600) % 3; for (let i = 0; i <= z; i++) R(g, v.x + 6 + i * 4, v.y - h - 2 - i * 4, 3, 1, '#FFFFFF'); }
+      if (v.carry) { const px = Math.round(v.x) - 3, py = Math.round(v.y) - h - 6; R(g, px, py + 1, 7, 6, '#E5484D'); R(g, px + 3, py + 1, 1, 6, '#F6D04D'); R(g, px, py + 3, 7, 1, '#F6D04D'); R(g, px + 2, py, 1, 1, '#F6D04D'); R(g, px + 4, py, 1, 1, '#F6D04D'); }
       if (now < v.tag) { const s = '@' + v.nick; g.font = 'bold 5px system-ui, sans-serif'; g.textAlign = 'center'; g.textBaseline = 'middle'; const tw = g.measureText(s).width + 4, x = Math.max(tw / 2 + 1, Math.min(RW - tw / 2 - 1, v.x)), y = v.y - h - 5;
         g.fillStyle = 'rgba(43,26,58,.82)'; g.fillRect(x - tw / 2, y - 3.5, tw, 7); g.fillStyle = '#FFFFFF'; g.fillText(s, x, y + .3); }
     }
+    let flashT = 0; // 📸 вспышка фото
     function drawBalls(now) {
+      if (now - flashT < 450) { g.fillStyle = `rgba(255,255,255,${(.85 * (1 - (now - flashT) / 450)).toFixed(2)})`; g.fillRect(0, 0, RW, RH); }
       for (let i = balls.length - 1; i >= 0; i--) { const b = balls[i], k = (now - b.t0) / b.dur; if (k < 0) continue; if (k >= 1) { balls.splice(i, 1); b.hit(); continue; }
         const x = b.sx + (b.tx - b.sx) * k, y = b.sy + (b.ty - b.sy) * k - Math.sin(Math.PI * k) * 16; R(g, x - 1, y - 1, 2, 2, '#FFFFFF'); R(g, x - 1, y + .5, 2, .5, '#BFD7EA'); }
     }
@@ -1962,14 +2064,20 @@
       const mx = Math.max(gap + 8, Math.min(RW - gap - 8, (bird.x + v.x) / 2)), hl = bird.x <= v.x;
       go(now, mx + (hl ? -gap : gap), GY, done); gGo(v, now, mx + (hl ? gap : -gap), GY, done, .06);
     }
-    const end = (v, ms) => setTimeout(() => { duet = null; bird.until = 0; v.until = performance.now() + 800; }, ms);
+    const end = (v, ms) => setTimeout(() => { duet = null; bird.until = 0; bird.zz = false; allG().forEach(x => { x.zz = false; x.carry = false; x.until = performance.now() + 500 + Math.random() * 800; }); }, ms);
+    const later = (ms, f) => setTimeout(() => { if (box.isConnected) f(performance.now()); }, ms);
+    // все птички в комнате: хозяин и гости (для общих действий — стол, танец, фото)
+    const crowd = v => [v, ...allG().filter(x => x !== v)];
+    const moveB = (b, now, x, y, then) => b === bird ? go(now, x, y, then) : gGo(b, now, x, y, then, .07);
+    const hopB = (b, now, then) => b === bird ? hHop(now, then) : gHop(b, now, then);
+    const allArrive = (list, then) => { let n = 0; return () => { if (++n === list.length) then(performance.now()); }; };
     const ACTS_G = {
       wave: (v, now) => { duet = { kind: 'wave', v }; hFree(); v.dir = bird.x > v.x ? 1 : -1; bird.dir = -v.dir; v.tag = now + 3000;
         [0, 520, 1040].forEach((d, k) => setTimeout(() => { if (!box.isConnected) return; gHop(v, performance.now()); emit(k === 1 ? 'note' : 'star', v.x, v.y - 18); }, d));
         setTimeout(() => { if (!box.isConnected) return; hHop(performance.now(), () => emit('heart', bird.x, bird.y - 20, 2)); }, 700); end(v, 1900); },
       hug: (v, now) => { duet = { kind: 'hug', v }; meet(v, now, 4, () => { for (let k = 0; k < 6; k++) setTimeout(() => emit('heart', (bird.x + v.x) / 2, Math.min(bird.y, v.y) - 18, 1), k * 260);
         setTimeout(() => { hHop(performance.now()); gHop(v, performance.now()); }, 1700); end(v, 2500); }); },
-      dance: (v, now) => { duet = { kind: 'dance', v }; meet(v, now, 9, () => { for (let k = 0; k < 8; k++) setTimeout(() => { if (!box.isConnected) return; const t2 = performance.now();
+      dance: (v, now) => { duet = { kind: 'dance', v }; allG().filter(x => x !== v).forEach((x, k) => later(300 + k * 200, () => { for (let j = 0; j < 4; j++) later(j * 760, t3 => { gHop(x, t3); emit('note', x.x, x.y - 18); }); })); meet(v, now, 9, () => { for (let k = 0; k < 8; k++) setTimeout(() => { if (!box.isConnected) return; const t2 = performance.now();
         if (k % 2) { gHop(v, t2); v.dir = -v.dir; } else { hHop(t2); bird.dir = -bird.dir; } emit('note', k % 2 ? v.x : bird.x, GY - 20); }, k * 380);
         setTimeout(() => { bird.dir = v.x > bird.x ? 1 : -1; v.dir = -bird.dir; emit('star', (bird.x + v.x) / 2, GY - 24, 3); }, 3200); end(v, 3700); }); },
       snow: (v, now) => { duet = { kind: 'snow', v }; hFree(); v.dir = bird.x > v.x ? 1 : -1;
@@ -1977,21 +2085,38 @@
         gHop(v, now, () => throwAt(v, bird, v.FR, () => { emit('flake', bird.x, bird.y - hb * .6, 7); hHop(performance.now()); bird.dir = v.x > bird.x ? 1 : -1;
           setTimeout(() => { if (!box.isConnected) return; throwAt(bird, v, FR, () => { emit('flake', v.x, v.y - hb * .6, 7); gHop(v, performance.now(), () => emit('heart', v.x, v.y - 18, 1)); end(v, 900); }); }, 650); })); },
       feast: (v, now) => { const lay = layout(), tb = lay.filter(q => q.it.k === 'furn' && TABLES.includes(parse(q.it.v)[0])).sort((a, b) => b.d.w - a.d.w)[0]; if (!tb) return;
-        duet = { kind: 'feast', v }; hFree(); const y = tb.y + tb.d.top, w = tb.d.w, a = tb.x + w * (w > 40 ? .3 : .25), b = tb.x + w * (w > 40 ? .7 : .75); let n = 0;
-        const done = () => { if (++n < 2) return; const t2 = performance.now(); bird.dir = 1; v.dir = -1; bird.st = 'peck'; bird.act = 'eat'; bird.actQ = null; bird.until = t2 + 4200; v.st = 'peck'; v.until = t2 + 4200;
-          setTimeout(() => emit('heart', (bird.x + v.x) / 2, y - 20, 2), 2000); setTimeout(() => emit('heart', (bird.x + v.x) / 2, y - 20, 2), 3600); end(v, 4400); };
-        const hl = bird.x <= v.x; go(now, hl ? a : b, y, done); gGo(v, now, hl ? b : a, y, done); },
+        duet = { kind: 'feast', v, all: true }; hFree(); const y = tb.y + tb.d.top, list = [bird, ...crowd(v)], n = list.length;
+        const done = allArrive(list, t2 => { list.forEach((b, k) => { b.dir = k < n / 2 ? 1 : -1; b.st = 'peck'; b.until = t2 + 4400; }); bird.act = 'eat'; bird.actQ = null;
+          later(2000, () => emit('heart', tb.x + tb.d.w / 2, y - 20, 2)); later(3600, () => emit('heart', tb.x + tb.d.w / 2, y - 20, 2)); end(v, 4600); });
+        list.forEach((b, k) => moveB(b, now, tb.x + 6 + (tb.d.w - 12) * (n > 1 ? k / (n - 1) : .5), y, done)); },
+      sing: (v, now) => { duet = { kind: 'sing', v, all: true }; hFree(); const list = [bird, ...crowd(v)]; list.forEach(b => { if (b !== bird) b.dir = bird.x > b.x ? 1 : -1; });
+        for (let k = 0; k < 9; k++) later(k * 420, () => { const b = list[k % list.length]; b.frame = 2; emit('note', b.x, b.y - 20, k === 8 ? 4 : 1); if (k % 3 === 2) hopB(b, performance.now()); }); end(v, 4200); },
+      tag: (v, now) => { duet = { kind: 'tag', v }; hFree(); let k = 0;
+        const run = () => { if (!box.isConnected) return; const t2 = performance.now(), who = k % 2 ? bird : v, chaser = k % 2 ? v : bird, tx = 15 + Math.random() * (RW - 30);
+          if (who === bird) walk(t2, tx, GY, .09); else gGo(v, t2, tx, GY, null, .09); setTimeout(() => { if (!box.isConnected) return; moveB(chaser, performance.now(), tx + (chaser.x < tx ? -6 : 6), GY, () => { emit('star', tx, GY - 18, 2); if (++k < 4) setTimeout(run, 250); else { emit('heart', (bird.x + v.x) / 2, GY - 22, 3); end(v, 500); } }); }, 350); };
+        if (Math.abs(bird.y - GY) > 1) go(now, bird.x, GY, run); else run(); },
+      gift: (v, now) => { duet = { kind: 'gift', v }; hFree(); v.carry = true; const tx = bird.x + (v.x < bird.x ? -9 : 9);
+        gGo(v, now, tx, bird.y, () => { v.dir = bird.x > v.x ? 1 : -1; bird.dir = -v.dir; v.carry = false; emit('paper', bird.x, bird.y - 18, 8); emit('star', bird.x, bird.y - 22, 3);
+          hHop(performance.now(), () => emit('heart', bird.x, bird.y - 20, 3)); later(700, t2 => gHop(v, t2, () => emit('heart', v.x, v.y - 18, 2))); end(v, 1900); }, .07); },
+      nap: (v, now) => { const beds = layout().filter(q => ACT_OF[parse(q.it.v)[0]] === 'sleep' && q.d.top != null && q.d.w >= 14).sort((a, b) => b.d.w - a.d.w), bd = beds[0];
+        duet = { kind: 'nap', v }; hFree(); const y = bd ? bd.y + bd.d.top : GY, x0 = bd ? bd.x + bd.d.w / 2 : Math.max(20, Math.min(RW - 20, (bird.x + v.x) / 2));
+        const done = allArrive([bird, v], () => { bird.dir = 1; v.dir = -1; bird.zz = true; v.zz = true; bird.st = 'idle'; bird.until = performance.now() + 5200; for (let k = 0; k < 4; k++) later(900 + k * 1000, () => emit('heart', x0, y - 22, 1)); end(v, 5200); });
+        go(now, x0 - 5, y, done); gGo(v, now, x0 + 5, y, done, .07); },
+      photo: (v, now) => { duet = { kind: 'photo', v, all: true }; hFree(); const list = [bird, ...crowd(v)], n = list.length, mid = RW / 2 - 6;
+        const done = allArrive(list, () => { list.forEach(b => { b.dir = 1; }); later(500, t2 => { flashT = t2; list.forEach(b => hopB(b, t2)); emit('star', mid, GY - 30, 5); }); end(v, 1700); });
+        list.forEach((b, k) => moveB(b, now, mid + (k - (n - 1) / 2) * 13, GY, done)); },
     };
     const TABLES = ['longtable', 'roundtable', 'coffeetable', 'sidetable', 'chefcounter', 'desk'];
     const hasTable = () => room.items.some(it => it.k === 'furn' && it.in == null && TABLES.includes(parse(it.v)[0]));
     // гость входит в дверь справа (при смене комнаты дома — тоже)
-    const enter = v => { if (duet && duet.v === v) duet = null; Object.assign(v, { x: RW + 8, y: GY, dir: -1 }); v.tag = performance.now() + 5000; gGo(v, performance.now(), 100 + Math.random() * 60, GY, () => emit('heart', v.x, v.y - 18, 2), .06); };
+    const enter = v => { if (duet && duet.v === v) duet = null; Object.assign(v, { x: RW - 16, y: GY, dir: -1, zz: false, carry: false }); v.tag = performance.now() + 5000; emit('star', v.x, v.y - 14, 5); emit('dust', v.x, v.y - 2, 4); gHop(v, performance.now(), () => gGo(v, performance.now(), 100 + Math.random() * 60, GY, () => emit('heart', v.x, v.y - 18, 2), .06)); }; // появляется сразу у двери (со звёздочками) и проходит в комнату
     // действие гостя: своё — сразу и на сервер; чужое — когда пришло с сервера (если сейчас идёт другое — птичка просто подпрыгнет)
     const play = (v, k) => { const now = performance.now(); if (duet || tidy || !ACTS_G[k]) { gHop(v, now, () => emit('heart', v.x, v.y - 18)); return; } if (v.to) v.to.then = null; ACTS_G[k](v, now); };
     let showGuest = () => {};
     const GT = { hi: ['You are visiting — play together:', 'Ты в гостях — поиграйте вместе:', 'Tu esi ciemos — paspēlējieties kopā:'], here: ['Visiting now:', 'Сейчас в гостях:', 'Tagad ciemos:'],
       wave: ['👋 Wave', '👋 Помахать', '👋 Pamāt'], hug: ['🤗 Hug', '🤗 Обняться', '🤗 Apskauties'], dance: ['💃 Dance', '💃 Потанцевать', '💃 Padejot'],
-      snow: ['❄️ Snowball', '❄️ Снежок', '❄️ Sniega pika'], feast: ['🍽 To the table', '🍽 За стол', '🍽 Pie galda'] };
+      snow: ['❄️ Snowball', '❄️ Снежок', '❄️ Sniega pika'], feast: ['🍽 To the table', '🍽 За стол', '🍽 Pie galda'],
+      sing: ['🎵 Sing', '🎵 Спеть', '🎵 Padziedāt'], tag: ['🏃 Tag', '🏃 Догонялки', '🏃 Ķerenes'], gift: ['🎁 Bring a gift', '🎁 Подарок', '🎁 Dāvana'], nap: ['😴 Nap', '😴 Вздремнуть', '😴 Nosnausties'], photo: ['📸 Photo', '📸 Фото', '📸 Foto'] };
     const herePill = document.createElement('div'); herePill.className = 'room-visitors'; herePill.hidden = true; herePill.setAttribute('aria-live', 'polite');
     const drawHere = () => { const vs = [...vis.values()]; herePill.hidden = !vs.length; if (vs.length) herePill.textContent = '🐦 ' + GT.here[L] + ' ' + vs.map(v => '@' + v.nick).join(', '); };
     let sync = () => {};
@@ -2026,7 +2151,8 @@
           drawHere();
         } catch (e) { /* сеть — в следующий раз */ } finally { busy = false; }
       };
-      timer = setInterval(sync, 5000); setTimeout(sync, 600);
+      timer = setInterval(sync, gst ? 4000 : 2500); sync(); // гость отмечается сразу, хозяин видит его через 2–3 с
+      document.addEventListener('visibilitychange', () => { if (!document.hidden) sync(); });
       if (gst) addEventListener('pagehide', () => { try { navigator.sendBeacon('/api/room/leave', JSON.stringify({ id: o.id })); } catch (e) { /* ок */ } });
     }
     // живой котик: сидит → бежит/идёт в случайное место → потягивается → идёт к дивану и дерёт его когтями (пух летит)

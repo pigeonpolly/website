@@ -1,6 +1,6 @@
 // Гости в комнате птички (21.11.2026, docs/bird.md «Гость в чужой комнате»): вошедшая птичка, открывшая чужую комнату,
-// раз в несколько секунд отмечается (POST /api/room/visit) — хозяин и другие гости видят её в комнате и её действия
-// (помахать, обняться, потанцевать, снежок, за стол). Опрос — GET /api/room/visitors?id=<хозяин>&home=<комната дома>.
+// раз в 4 с отмечается (хозяин опрашивает раз в 2,5 с) (POST /api/room/visit) — хозяин и другие гости видят её в комнате и её действия
+// (помахать, обняться, потанцевать, снежок, за стол, спеть, догонялки, подарок, вздремнуть, фото). Опрос — GET /api/room/visitors?id=<хозяин>&home=<комната дома>.
 // Строка живёт, пока гость отмечается: старше VISIT_TTL — не показывается и удаляется. Ушёл — POST /api/room/leave.
 
 export const VISIT_TABLES = [
@@ -10,7 +10,7 @@ export const VISIT_TABLES = [
   'CREATE INDEX IF NOT EXISTS room_visits_at ON room_visits (owner_id, at)',
 ];
 const VISIT_TTL = 20000; // мс без отметки — гость ушёл
-const ACTS = ['wave', 'hug', 'dance', 'snow', 'feast'];
+const ACTS = ['wave', 'hug', 'dance', 'snow', 'feast', 'sing', 'tag', 'gift', 'nap', 'photo'];
 const HOMES = ['living', 'kitchen', 'bedroom', 'crypt', 'bath', 'office'];
 const parse = (s, d) => { try { return JSON.parse(s) || d; } catch (e) { return d; } };
 
