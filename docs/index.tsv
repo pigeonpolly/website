@@ -137,7 +137,7 @@ file	site/assets/ink-course.css	site/assets/ink-course.css	0	113 строк, 7 �
 file	site/assets/ink-course.js	site/assets/ink-course.js	0	254 строк, 27 КБ
 file	site/assets/mail-admin.js	site/assets/mail-admin.js	0	73 строк, 9 КБ
 file	site/assets/mixing.css	site/assets/mixing.css	0	51 строк, 5 КБ
-file	site/assets/mixing.js	site/assets/mixing.js	0	430 строк, 42 КБ
+file	site/assets/mixing.js	site/assets/mixing.js	0	431 строк, 43 КБ
 file	site/assets/news.js	site/assets/news.js	0	444 строк, 46 КБ
 file	site/assets/norway.css	site/assets/norway.css	0	16 строк, 1 КБ
 file	site/assets/palettes.js	site/assets/palettes.js	0	439 строк, 40 КБ
@@ -2890,29 +2890,29 @@ sym	toUnits	site/assets/mixing.js	131	fn
 sym	solve	site/assets/mixing.js	152	fn
 sym	app	site/assets/mixing.js	171	const
 sym	gi	site/assets/mixing.js	173	const
-sym	esc	site/assets/mixing.js	233	const
-sym	nm	site/assets/mixing.js	234	const
-sym	ink	site/assets/mixing.js	235	const
-sym	ls	site/assets/mixing.js	236	const
-sym	plural	site/assets/mixing.js	237	const
-sym	frac	site/assets/mixing.js	242	const
-sym	qs	site/assets/mixing.js	245	const
-sym	medium	site/assets/mixing.js	246	const
-sym	target	site/assets/mixing.js	247	const
-sym	myPaints	site/assets/mixing.js	248	const
-sym	renderMedia	site/assets/mixing.js	263	fn
-sym	amt	site/assets/mixing.js	271	const
-sym	sw	site/assets/mixing.js	276	const
-sym	describe	site/assets/mixing.js	278	fn
-sym	tune	site/assets/mixing.js	297	fn
-sym	recipeHTML	site/assets/mixing.js	319	fn
-sym	job	site/assets/mixing.js	346	const
-sym	run	site/assets/mixing.js	347	fn
-sym	setTarget	site/assets/mixing.js	373	fn
-sym	pickT	site/assets/mixing.js	395	const
-sym	photo	site/assets/mixing.js	400	fn
-sym	pals	site/assets/mixing.js	419	const
-sym	palChips	site/assets/mixing.js	420	fn
+sym	esc	site/assets/mixing.js	234	const
+sym	nm	site/assets/mixing.js	235	const
+sym	ink	site/assets/mixing.js	236	const
+sym	ls	site/assets/mixing.js	237	const
+sym	plural	site/assets/mixing.js	238	const
+sym	frac	site/assets/mixing.js	243	const
+sym	qs	site/assets/mixing.js	246	const
+sym	medium	site/assets/mixing.js	247	const
+sym	target	site/assets/mixing.js	248	const
+sym	myPaints	site/assets/mixing.js	249	const
+sym	renderMedia	site/assets/mixing.js	264	fn
+sym	amt	site/assets/mixing.js	272	const
+sym	sw	site/assets/mixing.js	277	const
+sym	describe	site/assets/mixing.js	279	fn
+sym	tune	site/assets/mixing.js	298	fn
+sym	recipeHTML	site/assets/mixing.js	320	fn
+sym	job	site/assets/mixing.js	347	const
+sym	run	site/assets/mixing.js	348	fn
+sym	setTarget	site/assets/mixing.js	374	fn
+sym	pickT	site/assets/mixing.js	396	const
+sym	photo	site/assets/mixing.js	401	fn
+sym	pals	site/assets/mixing.js	420	const
+sym	palChips	site/assets/mixing.js	421	fn
 sym	esc	site/assets/news.js	8	const
 sym	pl	site/assets/news.js	11	const
 sym	KINDS	site/assets/news.js	32	const

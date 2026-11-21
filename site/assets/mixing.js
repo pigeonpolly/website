@@ -201,9 +201,10 @@
     tip: { en: 'just the tip', ru: 'кончик кисти', lv: 'otas galiņš' },
     white: { en: 'Titanium white', ru: 'Белила титановые', lv: 'Titāna baltā' },
     water: { en: 'Water', ru: 'Вода', lv: 'Ūdens' },
-    cons: [[0.7, { en: 'like butter: paint almost without water', ru: 'как масло: краска почти без воды', lv: 'kā sviests: krāsa gandrīz bez ūdens' }], [0.4, { en: 'like cream', ru: 'как сливки', lv: 'kā saldais krējums' }], [0.2, { en: 'like milk', ru: 'как молоко', lv: 'kā piens' }], [0.1, { en: 'like tea', ru: 'как чай', lv: 'kā tēja' }], [0, { en: 'like weak tea: a very pale wash', ru: 'как слабый чай: очень бледная заливка', lv: 'kā vāja tēja: ļoti gaišs lējums' }]],
-    waterAbout: { en: 'about', ru: 'примерно', lv: 'apmēram' },
+    cons: [[0.7, { en: 'The mix is a thick paste: dark, rich, opaque strokes.', ru: 'Смесь густая, как паста: мазок тёмный, насыщенный, бумага не просвечивает.', lv: 'Maisījums biezs kā pasta: triepiens tumšs, piesātināts, papīrs necaurspīd.' }], [0.4, { en: 'The mix is thick but flows: bright strokes, the paper barely shows through.', ru: 'Смесь густая, но течёт с кисти: мазок яркий, бумага почти не просвечивает.', lv: 'Maisījums biezs, bet tek no otas: triepiens spilgts, papīrs gandrīz necaurspīd.' }], [0.2, { en: 'The mix is runny: a coloured stroke with the paper slightly showing through.', ru: 'Смесь жидкая: мазок цветной, но бумага немного просвечивает.', lv: 'Maisījums šķidrs: triepiens krāsains, bet papīrs mazliet caurspīd.' }], [0.1, { en: 'The mix is very watery: a see-through stroke, the paper shows clearly.', ru: 'Смесь очень водянистая: мазок прозрачный, бумага хорошо видна.', lv: 'Maisījums ļoti ūdeņains: triepiens caurspīdīgs, papīrs labi redzams.' }], [0, { en: 'Almost just water: a barely visible tint.', ru: 'Почти одна вода: еле заметный оттенок.', lv: 'Gandrīz tikai ūdens: tikko manāms tonis.' }]],
+    waterAbout: { en: 'About', ru: 'Примерно', lv: 'Apmēram' },
     waterOf: { en: 'of water', ru: 'воды', lv: 'ūdens' },
+    waterLittle: { en: 'Almost no water: just wet the brush', ru: 'Воды почти не нужно: только смочить кисть', lv: 'Ūdens gandrīz nevajag: tikai samitrināt otu' },
     steps: { en: 'How to mix', ru: 'Как смешивать', lv: 'Kā jaukt' },
     stOpaque: { en: 'Put the white on the palette first and add the colour to it bit by bit: a dark colour is much stronger than white.', ru: 'Сначала положите на палитру белила и добавляйте к ним цвет понемногу: тёмный цвет намного сильнее белил.', lv: 'Vispirms uzliec uz paletes balto un pa druskai pievieno krāsu: tumša krāsa ir daudz stiprāka par balto.' },
     stMain: { en: 'Start with', ru: 'Начните с', lv: 'Sāc ar' },
@@ -325,7 +326,7 @@
     if (water) {
       const cons = T.cons.find(c => r.d >= c[0])[1][L];
       const paint = r.items.reduce((a, it) => a + it[1], 0), wb = Math.max(0, Math.round(paint * (1 / Math.max(r.d, 0.03) - 1) * 2) / 2);
-      waterRow = `<li class="mx-w"><span class="mx-sw mx-sww"></span><span><b>${t('water')}</b>: ${esc(cons)}${wb >= 0.5 ? ` — ${t('waterAbout')} ${amt(wb, true)} ${t('waterOf')}` : ''}</span></li>`;
+      waterRow = `<li class="mx-w"><span class="mx-sw mx-sww"></span><span><b>${wb >= 0.5 ? t('waterAbout') + ' ' + amt(wb, true) + ' ' + t('waterOf') : t('waterLittle')}</b><small>${esc(cons)}</small></span></li>`;
     }
     const bar = rows.map(x => `<i style="flex:${x.pct};background:${x.hex}" title="${Math.round(x.pct * 100)}%"></i>`).join('');
     // шаг за шагом: краски добавляются по очереди
