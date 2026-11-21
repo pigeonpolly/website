@@ -29,7 +29,7 @@ export async function visitsApi(req, env, url, h) {
   }
   if (p === '/api/room/visit' && m === 'POST') {
     const u = await h.needUser(req, env), b = await req.json().catch(() => ({}));
-    const owner = +b.id || 0, home = HOMES.includes(b.home) ? b.home : 'living', act = ACTS.includes(b.act) ? b.act : '';
+    const owner = +b.id || 0, home = HOMES.includes(b.home) ? b.home : 'living', act = ACTS.includes(b.act) || /^use:\d{1,3}$/.test(String(b.act)) ? String(b.act) : ''; // use:N — гость пошёл к вещи N комнаты
     if (!owner || owner === u.id || !u.nick) fail(400, 'id');
     if (!(await env.DB.prepare('SELECT 1 FROM users WHERE id = ? AND banned = 0').bind(owner).first())) fail(404, 'owner');
     await env.DB.prepare(`INSERT INTO room_visits (owner_id, user_id, home, at, act, act_n) VALUES (?, ?, ?, ?, ?, ?)

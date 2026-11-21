@@ -57,7 +57,7 @@ file	docs/a1-pack.md	docs/a1-pack.md	0	10 строк, 2 КБ
 file	docs/admin.md	docs/admin.md	0	180 строк, 52 КБ
 file	docs/artpill.md	docs/artpill.md	0	66 строк, 12 КБ
 file	docs/basics.md	docs/basics.md	0	47 строк, 9 КБ
-file	docs/bird.md	docs/bird.md	0	117 строк, 62 КБ
+file	docs/bird.md	docs/bird.md	0	117 строк, 63 КБ
 file	docs/blog.md	docs/blog.md	0	121 строк, 38 КБ
 file	docs/cards.md	docs/cards.md	0	109 строк, 23 КБ
 file	docs/challenge.md	docs/challenge.md	0	152 строк, 63 КБ
@@ -155,7 +155,7 @@ file	site/assets/quest-polly.js	site/assets/quest-polly.js	0	120 строк, 15 
 file	site/assets/quest-titos.js	site/assets/quest-titos.js	0	317 строк, 33 КБ
 file	site/assets/rain.js	site/assets/rain.js	0	303 строк, 27 КБ
 file	site/assets/requests.js	site/assets/requests.js	0	251 строк, 32 КБ
-file	site/assets/room.js	site/assets/room.js	0	2544 строк, 388 КБ
+file	site/assets/room.js	site/assets/room.js	0	2563 строк, 391 КБ
 file	site/assets/rooms-data.js	site/assets/rooms-data.js	0	2 строк, 5 КБ · СОБРАН, руками не править
 file	site/assets/rooms.js	site/assets/rooms.js	0	289 строк, 39 КБ
 file	site/assets/runes-admin.js	site/assets/runes-admin.js	0	174 строк, 16 КБ
@@ -3542,8 +3542,8 @@ sym	HOMES	site/assets/room.js	1642	const
 sym	freeSpot	site/assets/room.js	1674	fn
 sym	albumOf	site/assets/room.js	1703	fn
 sym	mount	site/assets/room.js	1705	fn
-sym	aboutOf	site/assets/room.js	2542	const
-sym	PPRoom	site/assets/room.js	2543	win
+sym	aboutOf	site/assets/room.js	2561	const
+sym	PPRoom	site/assets/room.js	2562	win
 sym	box	site/assets/rooms.js	4	const
 sym	room	site/assets/rooms.js	5	const
 sym	esc	site/assets/rooms.js	7	const

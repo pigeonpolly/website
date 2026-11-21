@@ -2026,14 +2026,28 @@
     const hHop = (now, then) => { bird.st = 'hop'; bird.zz = false; bird.from = { x: bird.x, y: bird.y, t: now }; bird.to = { x: bird.x, y: bird.y, then }; bird.until = now + 520; };
     const hFree = () => { bird.scene = null; bird.zz = false; bird.act = null; bird.actQ = null; if (bird.st === 'scene' || bird.st === 'use' || bird.st === 'peck' || bird.st === 'hover') bird.st = 'idle'; if (bird.to) bird.to.then = null; };
     const birdH = () => FR[0].height * .75, hitBird = (b, px, py, fr) => Math.abs(px - b.x) <= fr[0].width * .4 && py <= b.y + 1 && py >= b.y - fr[0].height * .75;
+    // гость и вещи (21.11.2026): подходит и делает то же, что хозяин (ACTS: ест, спит на диване, играет, музицирует, греется…); к украшению — подлетает
+    function gUse(v, q, now) {
+      const k = parse(q.it.v)[0], act = q.it.k === 'deco' ? 'deco' : ACT_OF[k] || 'gaze', sf = surfaces(layout());
+      const start = (st, ms) => () => { v.st = st; v.act = act; v.actQ = q; v.dir = q.x + q.d.w / 2 > v.x ? 1 : -1; v.zz = act === 'sleep' || act === 'warm' && st === 'sleep'; v.until = performance.now() + ms; };
+      v.zz = false;
+      if (act === 'sleep' && q.d.top != null) { const z = sf.find(z2 => z2.q === q); if (z) return gGo(v, now, z.x0 + Math.random() * (z.x1 - z.x0), z.y, start('use', 4500 + Math.random() * 3000)); }
+      if (act === 'deco') return gGo(v, now, Math.max(6, Math.min(RW - 6, q.x + q.d.w / 2 + (Math.random() < .5 ? -8 : 8))), Math.min(GY, q.y + q.d.h + 10), start('hover', 2200));
+      const base = q.y + q.d.h, z = sf.find(z2 => Math.abs(z2.y - base) < 1 && q.x + q.d.w / 2 >= z2.x0 - 4 && q.x + q.d.w / 2 <= z2.x1 + 4) || sf[0];
+      const side = Math.random() < .5 && q.x - 6 > z.x0 ? q.x - 6 : q.x + q.d.w + 6 < z.x1 ? q.x + q.d.w + 6 : Math.max(z.x0, q.x - 6);
+      gGo(v, now, Math.max(z.x0, Math.min(z.x1, side)), z.y, start('use', 3500 + Math.random() * 2500));
+    }
     function gThink(v, now, lay) {
       if ((duet && (duet.v === v || duet.all)) || now < v.until || v.st === 'walk' || v.st === 'hop') return;
       const sf = surfaces(lay), r = Math.random();
       if (!sf.some(z => Math.abs(z.y - v.y) < 2)) return gGo(v, now, v.x, GY);
-      if (r < .2) { const tx = bird.x + (v.x < bird.x ? -12 : 12); return gGo(v, now, tx, Math.abs(bird.y - v.y) < 1 ? v.y : bird.y, () => { v.dir = bird.x > v.x ? 1 : -1; if (Math.random() < .5) emit('heart', v.x, v.y - 18); }); }
-      if (r < .55) { const c = sf.find(s => Math.abs(s.y - v.y) < 1 && v.x >= s.x0 - 2 && v.x <= s.x1 + 2) || sf[0]; return gGo(v, now, c.x0 + Math.random() * (c.x1 - c.x0), c.y, null, .03); }
-      if (r < .75 && sf.length > 1) { const s = sf[Math.floor(Math.random() * sf.length)]; return gGo(v, now, s.x0 + Math.random() * (s.x1 - s.x0), s.y); }
-      v.st = r < .88 ? 'peck' : 'idle'; v.until = now + 1200 + Math.random() * 1500;
+      v.zz = false; v.act = null; if (v.st === 'use' || v.st === 'hover') v.st = 'idle';
+      const toys = lay.filter(q => !q.live && (ACT_OF[parse(q.it.v)[0]] || q.it.k === 'deco'));
+      if (toys.length && r < .4) return gUse(v, toys[Math.floor(Math.random() * toys.length)], now);
+      if (r < .55) { const tx = bird.x + (v.x < bird.x ? -12 : 12); return gGo(v, now, tx, Math.abs(bird.y - v.y) < 1 ? v.y : bird.y, () => { v.dir = bird.x > v.x ? 1 : -1; if (Math.random() < .5) emit('heart', v.x, v.y - 18); }); }
+      if (r < .75) { const c = sf.find(s => Math.abs(s.y - v.y) < 1 && v.x >= s.x0 - 2 && v.x <= s.x1 + 2) || sf[0]; return gGo(v, now, c.x0 + Math.random() * (c.x1 - c.x0), c.y, null, .03); }
+      if (r < .88 && sf.length > 1) { const s = sf[Math.floor(Math.random() * sf.length)]; return gGo(v, now, s.x0 + Math.random() * (s.x1 - s.x0), s.y); }
+      v.st = r < .95 ? 'peck' : 'idle'; v.until = now + 1200 + Math.random() * 1500;
     }
     function gStep(v, now) {
       if (v.st === 'walk' || v.st === 'hop') {
@@ -2041,7 +2055,9 @@
         v.x = v.from.x + (v.to.x - v.from.x) * k; v.y = v.from.y + (v.to.y - v.from.y) * k - (v.st === 'hop' ? Math.sin(Math.PI * k) * (v.to.x === v.from.x ? 8 : 14) : 0);
         v.frame = v.st === 'walk' ? Math.floor(now / 160) % 2 : 0;
         if (k >= 1) { v.x = v.to.x; v.y = v.to.y; const th = v.to.then; v.st = 'idle'; v.until = now + 600 + Math.random() * 1500; if (th) th(); }
-      } else v.frame = v.st === 'peck' ? (Math.floor(now / 250) % 2 ? 2 : 0) : 0;
+      } else if (v.st === 'use') { v.frame = v.zz ? 0 : Math.floor(now / 250) % 2 ? 2 : 0; const kind = v.zz ? null : ACT_PART[v.act]; if (kind && Math.random() < (v.act === 'eat' ? .06 : .035)) { const q = v.actQ; emit(kind, q ? q.x + q.d.w / 2 : v.x, q ? q.y - 2 : v.y - 22, 1, kind !== 'crumb'); } }
+      else if (v.st === 'hover') { v.frame = 0; v.y += Math.sin(now / 120) * .15; if (Math.random() < .04) emit('star', v.x, v.y - 18); }
+      else v.frame = v.st === 'peck' ? (Math.floor(now / 250) % 2 ? 2 : 0) : 0;
       if (v.st === 'peck' && duet && duet.kind === 'feast' && Math.random() < .06) emit('crumb', v.x + v.dir * 3, v.y - 3, 1, false);
     }
     function gDraw(v, now) {
@@ -2111,7 +2127,9 @@
     // гость входит в дверь справа (при смене комнаты дома — тоже)
     const enter = v => { if (duet && duet.v === v) duet = null; Object.assign(v, { x: RW - 16, y: GY, dir: -1, zz: false, carry: false }); v.tag = performance.now() + 5000; emit('star', v.x, v.y - 14, 5); emit('dust', v.x, v.y - 2, 4); gHop(v, performance.now(), () => gGo(v, performance.now(), 100 + Math.random() * 60, GY, () => emit('heart', v.x, v.y - 18, 2), .06)); }; // появляется сразу у двери (со звёздочками) и проходит в комнату
     // действие гостя: своё — сразу и на сервер; чужое — когда пришло с сервера (если сейчас идёт другое — птичка просто подпрыгнет)
-    const play = (v, k) => { const now = performance.now(); if (duet || tidy || !ACTS_G[k]) { gHop(v, now, () => emit('heart', v.x, v.y - 18)); return; } if (v.to) v.to.then = null; ACTS_G[k](v, now); };
+    const play = (v, k) => { const now = performance.now();
+      const um = /^use:(\d+)$/.exec(k); if (um) { const it = room.items[+um[1]], q = it && layout().find(z => z.it === it); if (q && !(duet && (duet.v === v || duet.all))) { if (v.to) v.to.then = null; gUse(v, q, now); } return; } // гость нажал на вещь
+      if (duet || tidy || !ACTS_G[k]) { gHop(v, now, () => emit('heart', v.x, v.y - 18)); return; } if (v.to) v.to.then = null; ACTS_G[k](v, now); };
     let showGuest = () => {};
     const GT = { hi: ['You are visiting — play together:', 'Ты в гостях — поиграйте вместе:', 'Tu esi ciemos — paspēlējieties kopā:'], here: ['Visiting now:', 'Сейчас в гостях:', 'Tagad ciemos:'],
       wave: ['👋 Wave', '👋 Помахать', '👋 Pamāt'], hug: ['🤗 Hug', '🤗 Обняться', '🤗 Apskauties'], dance: ['💃 Dance', '💃 Потанцевать', '💃 Padejot'],
@@ -2458,7 +2476,8 @@
       const gs = edit ? [] : allG(); if (gs.length && !duet) { const r = cv.getBoundingClientRect(), px = (e.clientX - r.left) / r.width * RW, py = (e.clientY - r.top) / r.height * RH, now = performance.now(); // гости: нажать на птичку-гостя — подпрыгнет и покажет ник, на хозяина — обрадуется
         const hv = [...gs].reverse().find(v => hitBird(v, px, py, v.FR)); if (hv) { if (hv.st !== 'walk' && hv.st !== 'hop') gHop(hv, now, () => emit('note', hv.x, hv.y - 18)); hv.tag = now + 2500; return; }
         if (bird.st !== 'scene' && hitBird(bird, px, py, FR)) { if (bird.st !== 'walk' && bird.st !== 'hop') { hFree(); bird.dir = gs[0].x > bird.x ? 1 : -1; hHop(now, () => emit('heart', bird.x, bird.y - 20, 2)); } return; } }
-      if (!o.preview && !o.still && albumAt(e)) openAlbum(); else if (!o.still && !edit) { knock(boxAt(e)); const q = hitAt(e); if (q && sceneOf(q.it)) startScene(q); } }); // этап 21: кровать, плита, гроб, ванна, ноутбук — сцена
+      if (!o.preview && !o.still && albumAt(e)) openAlbum(); else if (!o.still && !edit) { knock(boxAt(e)); const q = hitAt(e); if (q && sceneOf(q.it)) startScene(q);
+        else if (q && gst && !q.live && !isAlbum(q.it) && !q.d.box && !(duet && (duet.v === gst || duet.all))) { const i = room.items.indexOf(q.it); if (gst.to) gst.to.then = null; gUse(gst, q, performance.now()); sync('use:' + i); } } }); // этап 21: кровать, плита, гроб, ванна, ноутбук — сцена; гость, нажав на другую вещь, ведёт к ней свою птичку (видно и хозяину)
     // коробка: нажать 3 раза подряд (мышкой или пальцем) — вещи выпрыгивают; на 1-м и 2-м нажатии крышка вздрагивает. В ✏️ — не открывается
     let knocks = null;
     const knock = b => {
