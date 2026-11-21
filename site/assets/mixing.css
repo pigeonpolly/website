@@ -78,4 +78,20 @@
 .mx-rules summary { cursor: pointer; font-weight: 700; font-size: 14px; }
 .mx-rules ol { margin: 6px 0 0; padding-left: 20px; display: grid; gap: 4px; font-size: 14px; line-height: 1.4; }
 .mx-note { margin: 16px 0 0; padding: 12px 14px; background: #FFF6E0; border: 1px solid #F0D9A0; border-radius: 12px; font-size: 14px; line-height: 1.5; color: #5A4A2A; }
+/* «Пигменты — для самых любопытных» */
+.mx-pigs { grid-column: 1 / -1; padding: 14px 22px; background: #F3EEE6; }
+.mx-pigs summary h2 { font-size: clamp(17px, 1.8vw, 20px); }
+.mx-pigs summary { cursor: pointer; list-style: none; }
+.mx-pigs summary::-webkit-details-marker { display: none; }
+.mx-pigs summary h2 { display: inline; margin: 0; }
+.mx-pigs summary::after { content: ' ▾'; font-size: 20px; }
+.mx-pigs[open] summary::after { content: ' ▴'; }
+.mx-pc { display: grid; grid-template-columns: repeat(auto-fill, minmax(min(100%, 280px), 1fr)); gap: 12px; margin-top: 10px; }
+.mx-pc article { border: 1px solid #E8E0D6; border-radius: 14px; padding: 12px 14px; background: #fff; }
+.mx-pc article > i { display: block; height: 38px; border-radius: 10px; border: 1px solid rgba(0, 0, 0, .1); }
+.mx-pc h3 { margin: 10px 0 6px; font-size: 16px; line-height: 1.3; color: #2A2230; }
+.mx-pc h3 small { color: #85798A; font-weight: 400; font-size: 12px; white-space: nowrap; }
+.mx-pc p { margin: 6px 0 0; font-size: 14px; line-height: 1.45; }
+.mx-chp { display: flex; flex-wrap: wrap; gap: 4px; }
+.mx-chp span { font-size: 12px; background: #F3EEE6; border-radius: 999px; padding: 2px 8px; color: #4A4250; }
 @media (max-width: 600px) { .mx-step { padding: 16px; border-radius: 16px; } .mx-th { flex-direction: column; align-items: stretch; } .mx-thw { width: auto; } }
