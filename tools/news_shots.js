@@ -1,5 +1,5 @@
 // Снимки для новостей блога (скилл .claude/skills/site-news): только картинка сцены (canvas), без подписей и кнопок — статьи переводятся.
-// Запуск: python3 -m http.server 8790 --directory site &  затем  node tools/news_shots.js <room|garden|wl|shift|hol|all> [мс ходьбы]
+// Запуск: python3 -m http.server 8790 --directory site &  затем  node tools/news_shots.js <room|winter|garden|wl|shift|hol|all> [мс ходьбы]
 // /api подменяется прямо здесь (данные-примеры), снимки — в _shots/news/. Новая сцена — новый блок по образцу.
 const { chromium } = require('playwright');
 const B = 'http://localhost:8790', O = require('path').join(__dirname, '..', '_shots', 'news') + '/';
@@ -14,6 +14,21 @@ async function page(b, w, h, api = {}) {
 (async () => {
   require('fs').mkdirSync(O, { recursive: true });
   const b = await chromium.launch(); const which = process.argv[2] || 'all';
+  if (which === 'all' || which === 'winter') { // 21.11.2026: зимний пир и гость в чужой комнате (ярлык «@ник» гаснет через 5 с — снимать позже)
+    const p = await page(b, 1100, 820);
+    await p.goto(B + '/ru/garden/', { waitUntil: 'load' }); await p.waitForTimeout(800);
+    await p.evaluate(() => {
+      const m = document.querySelector('main'); m.innerHTML = '<div id="rr" style="max-width:900px;margin:30px auto"></div>';
+      const f = (v, x) => ({ k: 'furn', v, x });
+      const room = { wall: 'snowflakes', floor: 'snowfloor', view: 'snow', items: [f('snowdrift', 0), f('icepolly', 36), f('longtable:0', 54), f('pelmeni', 60), f('greypeas', 74), f('pudding', 88), f('stollen', 100), f('punchbowl', 116), f('tangerines', 132), f('icetree', 152), f('icecastle', 168), f('snowmound', 150)] };
+      PPRoom.mount(document.getElementById('rr'), { id: 5, nick: 'polly', avatar: {}, room, mine: false, guest: { id: 9, nick: 'guest', avatar: {} } });
+    });
+    await p.mouse.move(0, 0); await p.addStyleTag({ content: '.room-door-btn{opacity:0!important}' });
+    await p.waitForTimeout(6500); await (await p.$('.room-cv')).screenshot({ path: O + 'c-winter-room.png' });
+    await p.evaluate(() => document.querySelector('[data-ga="feast"]').click()); await p.waitForTimeout(2600); await (await p.$('.room-cv')).screenshot({ path: O + 'c-winter-feast.png' });
+    await p.waitForTimeout(3000); await p.evaluate(() => document.querySelector('[data-ga="hug"]').click()); await p.waitForTimeout(+process.argv[3] || 2200); await (await p.$('.room-cv')).screenshot({ path: O + 'c-winter-hug.png' });
+    await p.close();
+  }
   if (which === 'all' || which === 'room') {
     const p = await page(b, 1100, 820);
     await p.goto(B + '/ru/garden/', { waitUntil: 'load' }); await p.waitForTimeout(800);
